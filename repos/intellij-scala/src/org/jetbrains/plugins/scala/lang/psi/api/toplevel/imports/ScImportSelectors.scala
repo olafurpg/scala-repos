@@ -8,14 +8,13 @@ package imports
 import com.intellij.psi.PsiElement
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 20.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 20.02.2008
+  */
 trait ScImportSelectors extends ScalaPsiElement {
   def selectors: Array[ScImportSelector]
 
-  def hasWildcard : Boolean
+  def hasWildcard: Boolean
 
   def wildcardElement: Option[PsiElement]
 }

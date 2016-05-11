@@ -18,70 +18,94 @@ import org.jetbrains.plugins.scala.debugger.filters.ScalaDebuggerSettings
 import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{CollectionElementNodeDescriptor, Fail, SimpleMethodInvocationResult}
 
 /**
- * User: Dmitry Naydanov
- * Date: 9/3/12
- */
+  * User: Dmitry Naydanov
+  * Date: 9/3/12
+  */
 class NonStrictCollectionsRenderer extends NodeRendererImpl {
   import org.jetbrains.plugins.scala.debugger.ui.NonStrictCollectionsRenderer.{MethodNotFound, Success}
   import org.jetbrains.plugins.scala.debugger.ui.{NonStrictCollectionsRenderer => companionObject}
 
-  def getStartIndex = ScalaDebuggerSettings.getInstance().COLLECTION_START_INDEX.intValue()
-  def getEndIndex = ScalaDebuggerSettings.getInstance().COLLECTION_END_INDEX.intValue()
+  def getStartIndex =
+    ScalaDebuggerSettings.getInstance().COLLECTION_START_INDEX.intValue()
+  def getEndIndex =
+    ScalaDebuggerSettings.getInstance().COLLECTION_END_INDEX.intValue()
 
   def getUniqueId = "NonStrictCollectionsRenderer"
 
   override def getName = "Scala streams as collections"
 
-  override def setName(text: String) {/*do nothing*/}
+  override def setName(text: String) { /*do nothing*/ }
 
   override def isEnabled: Boolean = !mustNotExpandStreams
 
-  override def setEnabled(enabled: Boolean) {/*see ScalaDebuggerSettingsConfigurable */}
+  override def setEnabled(enabled: Boolean) {
+    /*see ScalaDebuggerSettingsConfigurable */
+  }
 
-  private def mustNotExpandStreams: Boolean = ScalaDebuggerSettings.getInstance().DO_NOT_DISPLAY_STREAMS
+  private def mustNotExpandStreams: Boolean =
+    ScalaDebuggerSettings.getInstance().DO_NOT_DISPLAY_STREAMS
 
-  private def invokeLengthMethodByName(objectRef: ObjectReference, methodName: String, signature: Char,
+  private def invokeLengthMethodByName(objectRef: ObjectReference,
+                                       methodName: String,
+                                       signature: Char,
                                        context: EvaluationContext) = {
-    val suitableMethods = objectRef.referenceType().methodsByName(methodName, "()" + signature)
+    val suitableMethods =
+      objectRef.referenceType().methodsByName(methodName, "()" + signature)
     if (suitableMethods.size() > 0) {
-      companionObject.invokeEmptyArgsMethod(objectRef, suitableMethods get 0, context)
+      companionObject.invokeEmptyArgsMethod(
+          objectRef, suitableMethods get 0, context)
     } else {
       MethodNotFound()
     }
   }
 
-  private def tryToGetSize(objectRef: ObjectReference, context: EvaluationContext): SimpleMethodInvocationResult[_] = {
-    @inline def invoke(name: String) = invokeLengthMethodByName(objectRef, name, 'I', context)
+  private def tryToGetSize(
+      objectRef: ObjectReference,
+      context: EvaluationContext): SimpleMethodInvocationResult[_] = {
+    @inline def invoke(name: String) =
+      invokeLengthMethodByName(objectRef, name, 'I', context)
 
     try {
-      if (!ScalaCollectionRenderer.hasDefiniteSize(objectRef, context) || isStreamView(objectRef.referenceType())) return Success[String]("?")
+      if (!ScalaCollectionRenderer.hasDefiniteSize(objectRef, context) ||
+          isStreamView(objectRef.referenceType())) return Success[String]("?")
     } catch {
       case e: EvaluateException => return Fail(e)
     }
 
     invoke("size") match {
-      case result@Success(_) => result
+      case result @ Success(_) => result
       case a => a
     }
   }
 
-  def buildChildren(value: Value, builder: ChildrenBuilder, evaluationContext: EvaluationContext) {
-    def invokeEmptyArgsMethod(obj: ObjectReference, actualRefType: ReferenceType, methodName: String): Value = {
+  def buildChildren(value: Value,
+                    builder: ChildrenBuilder,
+                    evaluationContext: EvaluationContext) {
+    def invokeEmptyArgsMethod(obj: ObjectReference,
+                              actualRefType: ReferenceType,
+                              methodName: String): Value = {
       val suitableMethods = actualRefType methodsByName methodName
       if (suitableMethods.size() == 0) return null
 
       try {
-        evaluationContext.getDebugProcess.invokeMethod(evaluationContext, obj, suitableMethods get 0, companionObject.EMPTY_ARGS)
-      }
-      catch {
-        case (_: EvaluateException | _: InvocationException | _: InvalidTypeException |
-              _: IncompatibleThreadStateException | _: ClassNotLoadedException) => null
+        evaluationContext.getDebugProcess.invokeMethod(
+            evaluationContext,
+            obj,
+            suitableMethods get 0,
+            companionObject.EMPTY_ARGS)
+      } catch {
+        case (_: EvaluateException | _: InvocationException |
+            _: InvalidTypeException | _: IncompatibleThreadStateException |
+            _: ClassNotLoadedException) =>
+          null
       }
     }
 
-    @inline def getTail(objRef: ObjectReference, actualRefType: ReferenceType) =
+    @inline
+    def getTail(objRef: ObjectReference, actualRefType: ReferenceType) =
       invokeEmptyArgsMethod(objRef, actualRefType, "tail")
-    @inline def getHead(objRef: ObjectReference, actualRefType: ReferenceType) =
+    @inline
+    def getHead(objRef: ObjectReference, actualRefType: ReferenceType) =
       invokeEmptyArgsMethod(objRef, actualRefType, "head")
     @inline def getAll(objRef: ObjectReference, actualType: ReferenceType) =
       (getHead(objRef, actualType), getTail(objRef, actualType))
@@ -92,7 +116,8 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
       builder.setChildren(myChildren)
     }
     value match {
-      case objectRef: ObjectReference if ScalaCollectionRenderer.nonEmpty(objectRef, evaluationContext) =>
+      case objectRef: ObjectReference
+          if ScalaCollectionRenderer.nonEmpty(objectRef, evaluationContext) =>
         var currentTail = objectRef
 
         for (i <- 0 until getStartIndex) {
@@ -107,7 +132,11 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
           getAll(currentTail, currentTail.referenceType()) match {
             case (newHead: ObjectReference, newTail: ObjectReference) =>
               val newNode = builder.getNodeManager.createNode(
-                new CollectionElementNodeDescriptor(indexCount.toString, evaluationContext.getProject, newHead), evaluationContext)
+                  new CollectionElementNodeDescriptor(
+                      indexCount.toString,
+                      evaluationContext.getProject,
+                      newHead),
+                  evaluationContext)
               myChildren add newNode
               currentTail = newTail
               indexCount += 1
@@ -121,18 +150,25 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
     returnChildren()
   }
 
-  def getChildValueExpression(node: DebuggerTreeNode, context: DebuggerContext): PsiExpression = {
+  def getChildValueExpression(
+      node: DebuggerTreeNode, context: DebuggerContext): PsiExpression = {
     node.getDescriptor match {
       case watch: WatchItemDescriptor =>
-        JavaPsiFacade.getInstance(node.getProject).getElementFactory.createExpressionFromText(watch.calcValueName(), null)
-      case collectionItem: CollectionElementNodeDescriptor => collectionItem.getDescriptorEvaluation(context)
+        JavaPsiFacade
+          .getInstance(node.getProject)
+          .getElementFactory
+          .createExpressionFromText(watch.calcValueName(), null)
+      case collectionItem: CollectionElementNodeDescriptor =>
+        collectionItem.getDescriptorEvaluation(context)
       case _ => null
     }
-
   }
 
-  def isExpandable(value: Value, evaluationContext: EvaluationContext, parentDescriptor: NodeDescriptor) = value match {
-    case objectRef: ObjectReferenceImpl => ScalaCollectionRenderer.nonEmpty(objectRef, evaluationContext)
+  def isExpandable(value: Value,
+                   evaluationContext: EvaluationContext,
+                   parentDescriptor: NodeDescriptor) = value match {
+    case objectRef: ObjectReferenceImpl =>
+      ScalaCollectionRenderer.nonEmpty(objectRef, evaluationContext)
     case _ => false
   }
 
@@ -142,24 +178,34 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
     case _ => false
   }
 
-  private def isView(tpe: Type): Boolean = DebuggerUtils.instanceOf(tpe, ScalaCollectionRenderer.viewClassName)
+  private def isView(tpe: Type): Boolean =
+    DebuggerUtils.instanceOf(tpe, ScalaCollectionRenderer.viewClassName)
 
-  private def isStream(tpe: Type): Boolean = DebuggerUtils.instanceOf(tpe, ScalaCollectionRenderer.streamClassName)
+  private def isStream(tpe: Type): Boolean =
+    DebuggerUtils.instanceOf(tpe, ScalaCollectionRenderer.streamClassName)
 
-  private def isStreamView(tpe: Type): Boolean = DebuggerUtils.instanceOf(tpe, ScalaCollectionRenderer.streamViewClassName)
+  private def isStreamView(tpe: Type): Boolean =
+    DebuggerUtils.instanceOf(tpe, ScalaCollectionRenderer.streamViewClassName)
 
-  def calcLabel(descriptor: ValueDescriptor, context: EvaluationContext, listener: DescriptorLabelListener) = {
+  def calcLabel(descriptor: ValueDescriptor,
+                context: EvaluationContext,
+                listener: DescriptorLabelListener) = {
     val stringBuilder = StringBuilderSpinAllocator.alloc()
 
     descriptor.getValue match {
       case obj: ObjectReference =>
         val tpe = obj.referenceType()
-        val sizeString = " size = " + (tryToGetSize(obj, context) match {
-          case Success(value: Int) => value
-          case _ => "?"
-        })
+        val sizeString =
+          " size = " +
+          (tryToGetSize(obj, context) match {
+                case Success(value: Int) => value
+                case _ => "?"
+              })
 
-        stringBuilder append (if (tpe != null) ScalaCollectionRenderer.transformName(tpe.name) + sizeString else "{...}")
+        stringBuilder append
+        (if (tpe != null)
+           ScalaCollectionRenderer.transformName(tpe.name) + sizeString
+         else "{...}")
       case _ => stringBuilder append "{...}"
     }
 
@@ -170,21 +216,27 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
 }
 
 object NonStrictCollectionsRenderer {
-  private val EMPTY_ARGS = util.Collections.unmodifiableList(new util.ArrayList[Value]())
+  private val EMPTY_ARGS =
+    util.Collections.unmodifiableList(new util.ArrayList[Value]())
 
   //it considers only part of cases so it is not intended to be used outside 
-  private def invokeEmptyArgsMethod(obj: ObjectReference, method: Method, context: EvaluationContext): SimpleMethodInvocationResult[_] = {
+  private def invokeEmptyArgsMethod(
+      obj: ObjectReference,
+      method: Method,
+      context: EvaluationContext): SimpleMethodInvocationResult[_] = {
     try {
       context.getDebugProcess.invokeMethod(context, obj, method, EMPTY_ARGS) match {
         case intValue: IntegerValue => Success[Int](intValue.intValue())
-        case boolValue: BooleanValue => Success[Boolean](boolValue.booleanValue())
+        case boolValue: BooleanValue =>
+          Success[Boolean](boolValue.booleanValue())
         case objValue: ObjectReference => Success[Value](objValue)
         case _ => MethodNotFound()
       }
-    }
-    catch {
-      case e@(_: EvaluateException | _: InvocationException | _: InvalidTypeException | 
-            _: IncompatibleThreadStateException | _: ClassNotLoadedException) => Fail[Throwable](e)  
+    } catch {
+      case e @ (_: EvaluateException | _: InvocationException |
+          _: InvalidTypeException | _: IncompatibleThreadStateException |
+          _: ClassNotLoadedException) =>
+        Fail[Throwable](e)
     }
   }
 
@@ -195,21 +247,29 @@ object NonStrictCollectionsRenderer {
 //    if (result == null) TimeoutExceeded() else result
 //  }
 // private case class TimeoutExceeded() extends SimpleMethodInvocationResult[Nothing]
-  
+
   private class SimpleMethodInvocationResult[R]
-  private case class MethodNotFound() extends SimpleMethodInvocationResult[Nothing]
-  private case class Success[R](value: R) extends SimpleMethodInvocationResult[R]
-  private case class Fail[E <: Throwable](exc: E) extends SimpleMethodInvocationResult[E]
-  
-  private class CollectionElementNodeDescriptor(name: String, project: Project, value: Value) extends ValueDescriptorImpl(project, value) {
+  private case class MethodNotFound()
+      extends SimpleMethodInvocationResult[Nothing]
+  private case class Success[R](value: R)
+      extends SimpleMethodInvocationResult[R]
+  private case class Fail[E <: Throwable](exc: E)
+      extends SimpleMethodInvocationResult[E]
+
+  private class CollectionElementNodeDescriptor(
+      name: String, project: Project, value: Value)
+      extends ValueDescriptorImpl(project, value) {
     def calcValue(evaluationContext: EvaluationContextImpl) = value
 
     def getDescriptorEvaluation(context: DebuggerContext): PsiExpression = {
       try {
-        JavaPsiFacade.getInstance(project).getElementFactory.createExpressionFromText(name, PositionUtil getContextElement context)
-      } 
-      catch {
-        case e: IncorrectOperationException => null 
+        JavaPsiFacade
+          .getInstance(project)
+          .getElementFactory
+          .createExpressionFromText(
+              name, PositionUtil getContextElement context)
+      } catch {
+        case e: IncorrectOperationException => null
       }
     }
 

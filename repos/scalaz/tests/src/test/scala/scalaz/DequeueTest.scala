@@ -12,35 +12,38 @@ object DequeueTest extends SpecLite {
   checkAll(plusEmpty.laws[Dequeue])
   checkAll(functor.laws[Dequeue])
 
-  "fromList works" ! forAll{ (l: List[Int]) ⇒
-    Dequeue.fromFoldable(l).toStream must_===(l.toStream)
+  "fromList works" ! forAll { (l: List[Int]) ⇒
+    Dequeue.fromFoldable(l).toStream must_=== (l.toStream)
   }
 
-  "reverse twice is id" ! forAll{ (dq: Dequeue[Int]) ⇒
+  "reverse twice is id" ! forAll { (dq: Dequeue[Int]) ⇒
     dq.reverse.reverse.toIList.must_===(dq.toIList)
   }
 
-  "size consistent with source list" ! forAll{ (l: List[Int]) ⇒
-    Dequeue.fromFoldable(l).size must_===(l.size)
+  "size consistent with source list" ! forAll { (l: List[Int]) ⇒
+    Dequeue.fromFoldable(l).size must_=== (l.size)
   }
 
-  "reverse stream works" ! forAll{ (l: List[Int]) ⇒
-    Dequeue.fromFoldable(l).toBackStream must_===(l.reverse.toStream)
+  "reverse stream works" ! forAll { (l: List[Int]) ⇒
+    Dequeue.fromFoldable(l).toBackStream must_=== (l.reverse.toStream)
   }
 
-  "toIList consistent with Ilist.fromFoldable" ! forAll{ (l: List[Int]) ⇒
-    Dequeue.fromFoldable(l).toIList must_===(IList.fromFoldable(l))
+  "toIList consistent with Ilist.fromFoldable" ! forAll { (l: List[Int]) ⇒
+    Dequeue.fromFoldable(l).toIList must_=== (IList.fromFoldable(l))
   }
 
-  "toBackIList consistent with Ilist.fromFoldable" ! forAll{ (l: List[Int]) ⇒
-    Dequeue.fromFoldable(l).toBackIList must_===(IList.fromFoldable(l.reverse))
+  "toBackIList consistent with Ilist.fromFoldable" ! forAll { (l: List[Int]) ⇒
+    Dequeue.fromFoldable(l).toBackIList must_===
+    (IList.fromFoldable(l.reverse))
   }
 
-  "snoc works" ! forAll{ (l: List[Int]) ⇒
-    (l.foldLeft[Dequeue[Int]](Dequeue.empty)((q,a) ⇒ q snoc a)).toStream must_=== l.toStream
+  "snoc works" ! forAll { (l: List[Int]) ⇒
+    (l.foldLeft[Dequeue[Int]](Dequeue.empty)((q, a) ⇒ q snoc a)).toStream must_===
+      l.toStream
   }
 
-  "cons works" ! forAll{ (l: List[Int]) ⇒
-    (l.foldRight[Dequeue[Int]](Dequeue.empty)((a,q) ⇒ q cons a)).toStream must_=== l.toStream
+  "cons works" ! forAll { (l: List[Int]) ⇒
+    (l.foldRight[Dequeue[Int]](Dequeue.empty)((a, q) ⇒ q cons a)).toStream must_===
+      l.toStream
   }
 }

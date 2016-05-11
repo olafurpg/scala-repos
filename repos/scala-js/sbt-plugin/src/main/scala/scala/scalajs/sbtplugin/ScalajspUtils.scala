@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js sbt plugin        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js sbt plugin        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.sbtplugin
 
@@ -24,13 +23,13 @@ private[sbtplugin] object ScalajspUtils {
     new ScalaJSIRFilesOnClasspathExamples(relPaths)
 
   /** An [[ExampleSource]] showing .sjsir files on a classpath. */
-  private class ScalaJSIRFilesOnClasspathExamples(allRelPaths: Seq[String],
-      prefix: String = "") extends ExampleSource {
+  private class ScalaJSIRFilesOnClasspathExamples(
+      allRelPaths: Seq[String], prefix: String = "")
+      extends ExampleSource {
 
     override def apply(): Iterable[String] = {
       val allExamples = (for {
-        relPath <- allRelPaths
-        if relPath.startsWith(prefix)
+        relPath <- allRelPaths if relPath.startsWith(prefix)
       } yield {
         // Returned examples must not include the prefix
         val remaining = relPath.substring(prefix.length)
@@ -60,5 +59,4 @@ private[sbtplugin] object ScalajspUtils {
     override def withAddedPrefix(addedPrefix: String): ExampleSource =
       new ScalaJSIRFilesOnClasspathExamples(allRelPaths, prefix + addedPrefix)
   }
-
 }

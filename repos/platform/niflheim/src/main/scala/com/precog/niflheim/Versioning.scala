@@ -21,17 +21,18 @@ package com.precog.niflheim
 
 import com.precog.util.PrecogUnit
 
-import java.io.{ File, IOException }
-import java.nio.channels.{ ReadableByteChannel, WritableByteChannel }
+import java.io.{File, IOException}
+import java.nio.channels.{ReadableByteChannel, WritableByteChannel}
 import java.nio.ByteBuffer
 
-import scalaz.{ Validation, Success, Failure }
+import scalaz.{Validation, Success, Failure}
 
 trait Versioning {
   def magic: Short
   def version: Short
 
-  def writeVersion(channel: WritableByteChannel): Validation[IOException, PrecogUnit] = {
+  def writeVersion(
+      channel: WritableByteChannel): Validation[IOException, PrecogUnit] = {
     val buffer = ByteBuffer.allocate(4)
     buffer.putShort(magic)
     buffer.putShort(version)
@@ -42,8 +43,9 @@ trait Versioning {
         channel.write(buffer)
       }
       Success(PrecogUnit)
-    } catch { case ioe: IOException =>
-      Failure(ioe)
+    } catch {
+      case ioe: IOException =>
+        Failure(ioe)
     }
   }
 
@@ -62,10 +64,9 @@ trait Versioning {
       } else {
         Failure(new IOException("Incorrect magic number found."))
       }
-    } catch { case ioe: IOException =>
-      Failure(ioe)
+    } catch {
+      case ioe: IOException =>
+        Failure(ioe)
     }
   }
 }
-
-

@@ -11,25 +11,28 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-
 /**
- * Nikolay.Tropin
- * 4/23/13
- */
-
-class DoubleNegationInspection extends AbstractInspection("DoubleNegation", "Double negation"){
+  * Nikolay.Tropin
+  * 4/23/13
+  */
+class DoubleNegationInspection
+    extends AbstractInspection("DoubleNegation", "Double negation") {
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case expr: ScExpression if DoubleNegationUtil.hasDoubleNegation(expr) =>
-      holder.registerProblem(expr, "Double negation", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new DoubleNegationQuickFix(expr))
+      holder.registerProblem(expr,
+                             "Double negation",
+                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                             new DoubleNegationQuickFix(expr))
     case _ =>
   }
 }
 
 class DoubleNegationQuickFix(expr: ScExpression)
-        extends AbstractFixOnPsiElement("Remove double negation", expr){
+    extends AbstractFixOnPsiElement("Remove double negation", expr) {
   def doApplyFix(project: Project) {
     val scExpr = getElement
-    if (!scExpr.isValid || !DoubleNegationUtil.hasDoubleNegation(scExpr)) return
+    if (!scExpr.isValid || !DoubleNegationUtil.hasDoubleNegation(scExpr))
+      return
 
     val newExpr = DoubleNegationUtil.removeDoubleNegation(scExpr)
     scExpr.replaceExpression(newExpr, removeParenthesis = true)
@@ -42,12 +45,13 @@ object DoubleNegationUtil {
     if (hasNegation(expr))
       expr match {
         case ScPrefixExpr(_, operand) => hasNegation(operand)
-        case ScInfixExpr(left, _, right) => hasNegation(left) || hasNegation(right)
+        case ScInfixExpr(left, _, right) =>
+          hasNegation(left) || hasNegation(right)
         case _ => false
-      }
-    else
+      } else
       expr match {
-        case ScInfixExpr(left, operation, right) => operation.refName == "==" && hasNegation(left) && hasNegation(right)
+        case ScInfixExpr(left, operation, right) =>
+          operation.refName == "==" && hasNegation(left) && hasNegation(right)
         case _ => false
       }
   }
@@ -60,9 +64,12 @@ object DoubleNegationUtil {
         val hasNegRight = hasNegation(right)
         val hasNegInfix = hasNegation(infix)
         val builder = new mutable.StringBuilder()
-        builder.append(if (hasNegLeft) invertedNegationText(left) else left.getText)
-        builder.append(if (hasNegLeft && hasNegInfix && hasNegRight) " != " else " == ")
-        builder.append(if (hasNegRight) invertedNegationText(right) else right.getText)
+        builder.append(
+            if (hasNegLeft) invertedNegationText(left) else left.getText)
+        builder.append(
+            if (hasNegLeft && hasNegInfix && hasNegRight) " != " else " == ")
+        builder.append(
+            if (hasNegRight) invertedNegationText(right) else right.getText)
         builder.toString()
     }
     ScalaPsiElementFactory.createExpressionFromText(text, expr.getManager)
@@ -83,7 +90,7 @@ object DoubleNegationUtil {
     }
   }
 
-   private def invertedNegationText(expr: ScExpression): String = {
+  private def invertedNegationText(expr: ScExpression): String = {
     require(hasNegation(expr))
     val withoutParentheses = stripParentheses(expr)
     withoutParentheses match {

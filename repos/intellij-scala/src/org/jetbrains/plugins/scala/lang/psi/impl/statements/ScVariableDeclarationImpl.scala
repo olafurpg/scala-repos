@@ -17,18 +17,24 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScVariableStub
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 /**
- * @author Alexander Podkhalyuzin
- */
+  * @author Alexander Podkhalyuzin
+  */
+class ScVariableDeclarationImpl private (
+    stub: StubElement[ScVariable], nodeType: IElementType, node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScVariableDeclaration {
+  def this(node: ASTNode) = { this(null, null, node) }
 
-class ScVariableDeclarationImpl private (stub: StubElement[ScVariable], nodeType: IElementType, node: ASTNode)
-  extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScVariableDeclaration {
-  def this(node: ASTNode) = {this(null, null, node)}
+  def this(stub: ScVariableStub) = {
+    this(stub, ScalaElementTypes.VARIABLE_DECLARATION, null)
+  }
 
-  def this(stub: ScVariableStub) = {this(stub, ScalaElementTypes.VARIABLE_DECLARATION, null)}
+  override def toString: String =
+    "ScVariableDeclaration: " + declaredElements.map(_.name).mkString(", ")
 
-  override def toString: String = "ScVariableDeclaration: " + declaredElements.map(_.name).mkString(", ")
-
-  def getType(ctx: TypingContext) = wrap(typeElement) flatMap {_.getType(TypingContext.empty)}
+  def getType(ctx: TypingContext) = wrap(typeElement) flatMap {
+    _.getType(TypingContext.empty)
+  }
 
   def declaredElements = getIdList.fieldIds
 
@@ -36,8 +42,7 @@ class ScVariableDeclarationImpl private (stub: StubElement[ScVariable], nodeType
     val stub = getStub
     if (stub != null) {
       stub.asInstanceOf[ScVariableStub].getTypeElement
-    }
-    else findChild(classOf[ScTypeElement])
+    } else findChild(classOf[ScTypeElement])
   }
 
   def getIdList: ScIdList = findChildByClass(classOf[ScIdList])

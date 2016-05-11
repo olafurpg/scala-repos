@@ -1,4 +1,4 @@
 object EmptyArray {
-  val x: Array[Int] = /*start*/Array.empty/*end*/
+  val x: Array[Int] = /*start*/ Array.empty /*end*/
 }
 //Array[Int]

@@ -1,28 +1,30 @@
 // This is here to tell me if the behavior changes, not because
 // the output is endorsed.
 case class Two[
-  @specialized(Specializable.Everything) A,
-  @specialized(Specializable.Everything) B
+    @specialized(Specializable.Everything) A,
+    @specialized(Specializable.Everything) B
 ](v: A, w: B)
 
 case class TwoLong[
-  @specialized(Char, Boolean, Byte, Short, Int, Long, Float, Double, Unit, AnyRef) A,
-  @specialized(Char, Boolean, Byte, Short, Int, Long, Float, Double, Unit, AnyRef) B
+    @specialized(
+        Char, Boolean, Byte, Short, Int, Long, Float, Double, Unit, AnyRef) A,
+    @specialized(
+        Char, Boolean, Byte, Short, Int, Long, Float, Double, Unit, AnyRef) B
 ](v: A, w: B)
 
 case class TwoCool[
-  @specialized(Specializable.Everything) A,
-  @specialized(Specializable.Everything) B
+    @specialized(Specializable.Everything) A,
+    @specialized(Specializable.Everything) B
 ](v: A, w: B)
 
 case class TwoShort[
-  @specialized(Specializable.Everything) A,
-  @specialized(Specializable.Everything) B
+    @specialized(Specializable.Everything) A,
+    @specialized(Specializable.Everything) B
 ](v: A, w: B)
 
 case class TwoMinimal[
-  @specialized(Int, AnyRef) A,
-  @specialized(Int, AnyRef) B
+    @specialized(Int, AnyRef) A,
+    @specialized(Int, AnyRef) B
 ](v: A, w: B)
 
 object Test {

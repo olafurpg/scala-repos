@@ -21,15 +21,16 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.scheduler._
 import org.apache.spark.ui._
 
-private[ui] class EnvironmentTab(parent: SparkUI) extends SparkUITab(parent, "environment") {
+private[ui] class EnvironmentTab(parent: SparkUI)
+    extends SparkUITab(parent, "environment") {
   val listener = parent.environmentListener
   attachPage(new EnvironmentPage(this))
 }
 
 /**
- * :: DeveloperApi ::
- * A SparkListener that prepares information to be displayed on the EnvironmentTab
- */
+  * :: DeveloperApi ::
+  * A SparkListener that prepares information to be displayed on the EnvironmentTab
+  */
 @DeveloperApi
 class EnvironmentListener extends SparkListener {
   var jvmInformation = Seq[(String, String)]()
@@ -37,7 +38,8 @@ class EnvironmentListener extends SparkListener {
   var systemProperties = Seq[(String, String)]()
   var classpathEntries = Seq[(String, String)]()
 
-  override def onEnvironmentUpdate(environmentUpdate: SparkListenerEnvironmentUpdate) {
+  override def onEnvironmentUpdate(
+      environmentUpdate: SparkListenerEnvironmentUpdate) {
     synchronized {
       val environmentDetails = environmentUpdate.environmentDetails
       jvmInformation = environmentDetails("JVM Information")

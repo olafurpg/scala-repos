@@ -7,12 +7,12 @@ import java.util
 import com.intellij.openapi.util.io.FileUtil
 
 /**
- * User: Dmitry Naydanov
- * Date: 2/7/14
- */
+  * User: Dmitry Naydanov
+  * Date: 2/7/14
+  */
 object WorksheetBoundCompilationInfo {
   private val cache = new util.HashMap[String, (Int, File, File)]()
-  
+
   def updateOrCreate(filePath: String, fileName: String): (Int, File, File) = {
     synchronized {
       val result = cache get filePath

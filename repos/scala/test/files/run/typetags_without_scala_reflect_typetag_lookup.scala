@@ -11,11 +11,15 @@ object Test extends StoreReporterDirectTest {
     }
   """
   def compileLibrary() = {
-    val classpath = List(sys.props("partest.lib"), sys.props("partest.reflect")) mkString sys.props("path.separator")
-    compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(library)
+    val classpath =
+      List(sys.props("partest.lib"), sys.props("partest.reflect")) mkString sys
+        .props("path.separator")
+    compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(
+        library)
   }
 
-  def app = """
+  def app =
+    """
     object Test extends App {
       // tries to materialize a type tag not having scala-reflect.jar on the classpath
       // even though it's easy to materialize a type tag of Int, this line will fail
@@ -27,7 +31,9 @@ object Test extends StoreReporterDirectTest {
     }
   """
   def compileApp() = {
-    val classpath = List(sys.props("partest.lib"), testOutput.path) mkString sys.props("path.separator")
+    val classpath =
+      List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
+          "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(app)
   }
 
@@ -38,6 +44,9 @@ object Test extends StoreReporterDirectTest {
     compileApp();
     // we should get "missing or invalid dependency detected" errors, because we're trying to use an implicit that can't be unpickled
     // but we don't know the number of these errors and their order, so I just ignore them all
-    println(filteredInfos.filterNot(_.msg.contains("missing or invalid dependency detected")).mkString("\n"))
+    println(
+        filteredInfos
+          .filterNot(_.msg.contains("missing or invalid dependency detected"))
+          .mkString("\n"))
   }
 }

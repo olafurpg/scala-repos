@@ -9,5 +9,4 @@ trait RecipeSpec extends AkkaSpec {
   type Message = String
   type Trigger = Unit
   type Job = String
-
 }

@@ -21,12 +21,12 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.rpc._
 
 /**
- * Actor which connects to a worker process and terminates the JVM if the connection is severed.
- * Provides fate sharing between a worker and its associated child processes.
- */
+  * Actor which connects to a worker process and terminates the JVM if the connection is severed.
+  * Provides fate sharing between a worker and its associated child processes.
+  */
 private[spark] class WorkerWatcher(
     override val rpcEnv: RpcEnv, workerUrl: String, isTesting: Boolean = false)
-  extends RpcEndpoint with Logging {
+    extends RpcEndpoint with Logging {
 
   logInfo(s"Connecting to worker $workerUrl")
   if (!isTesting) {
@@ -44,7 +44,8 @@ private[spark] class WorkerWatcher(
   private val expectedAddress = RpcAddress.fromURIString(workerUrl)
   private def isWorker(address: RpcAddress) = expectedAddress == address
 
-  private def exitNonZero() = if (isTesting) isShutDown = true else System.exit(-1)
+  private def exitNonZero() =
+    if (isTesting) isShutDown = true else System.exit(-1)
 
   override def receive: PartialFunction[Any, Unit] = {
     case e => logWarning(s"Received unexpected message: $e")
@@ -64,10 +65,12 @@ private[spark] class WorkerWatcher(
     }
   }
 
-  override def onNetworkError(cause: Throwable, remoteAddress: RpcAddress): Unit = {
+  override def onNetworkError(
+      cause: Throwable, remoteAddress: RpcAddress): Unit = {
     if (isWorker(remoteAddress)) {
       // These logs may not be seen if the worker (and associated pipe) has died
-      logError(s"Could not initialize connection to worker $workerUrl. Exiting.")
+      logError(
+          s"Could not initialize connection to worker $workerUrl. Exiting.")
       logError(s"Error was: $cause")
       exitNonZero()
     }

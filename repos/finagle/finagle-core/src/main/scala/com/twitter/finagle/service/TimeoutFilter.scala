@@ -13,9 +13,9 @@ object TimeoutFilter {
   val role: Stack.Role = new Stack.Role("RequestTimeout")
 
   /**
-   * A class eligible for configuring a [[com.twitter.finagle.Stackable]]
-   * [[com.twitter.finagle.service.TimeoutFilter]] module.
-   */
+    * A class eligible for configuring a [[com.twitter.finagle.Stackable]]
+    * [[com.twitter.finagle.service.TimeoutFilter]] module.
+    */
   case class Param(timeout: Duration) {
     def mk(): (Param, Stack.Param[Param]) =
       (this, Param.param)
@@ -25,23 +25,23 @@ object TimeoutFilter {
   }
 
   /**
-   * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.TimeoutFilter]]
-   * for use in clients.
-   */
+    * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.TimeoutFilter]]
+    * for use in clients.
+    */
   def clientModule[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module3[
-        TimeoutFilter.Param,
-        param.Timer,
-        LatencyCompensation.Compensation,
-        ServiceFactory[Req, Rep]] {
+    new Stack.Module3[TimeoutFilter.Param,
+                      param.Timer,
+                      LatencyCompensation.Compensation,
+                      ServiceFactory[Req, Rep]] {
       val role = TimeoutFilter.role
-      val description = "Apply a timeout-derived deadline to requests; adjust existing deadlines."
+      val description =
+        "Apply a timeout-derived deadline to requests; adjust existing deadlines."
 
       def make(
-        _param: Param,
-        _timer: param.Timer,
-        _compensation: LatencyCompensation.Compensation,
-        next: ServiceFactory[Req, Rep]
+          _param: Param,
+          _timer: param.Timer,
+          _compensation: LatencyCompensation.Compensation,
+          next: ServiceFactory[Req, Rep]
       ): ServiceFactory[Req, Rep] = {
         val timeout = _param.timeout + _compensation.howlong
 
@@ -57,24 +57,24 @@ object TimeoutFilter {
     }
 
   /**
-   * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.TimeoutFilter]]
-   * for use in servers.
-   */
+    * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.TimeoutFilter]]
+    * for use in servers.
+    */
   def serverModule[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module2[
-        TimeoutFilter.Param,
-        param.Timer,
-        ServiceFactory[Req, Rep]] {
+        TimeoutFilter.Param, param.Timer, ServiceFactory[Req, Rep]] {
       val role = TimeoutFilter.role
-      val description = "Apply a timeout-derived deadline to requests; adjust existing deadlines."
+      val description =
+        "Apply a timeout-derived deadline to requests; adjust existing deadlines."
       def make(
-        _param: Param,
-        _timer: param.Timer,
-        next: ServiceFactory[Req, Rep]
+          _param: Param,
+          _timer: param.Timer,
+          next: ServiceFactory[Req, Rep]
       ): ServiceFactory[Req, Rep] = {
         val Param(timeout) = _param
         val param.Timer(timer) = _timer
-        if (!timeout.isFinite || timeout <= Duration.Zero) next else {
+        if (!timeout.isFinite || timeout <= Duration.Zero) next
+        else {
           val exc = new IndividualRequestTimeoutException(timeout)
           val filter = new TimeoutFilter[Req, Rep](timeout, exc, timer)
           filter.andThen(next)
@@ -83,9 +83,9 @@ object TimeoutFilter {
     }
 
   def typeAgnostic(
-    timeout: Duration,
-    exception: RequestTimeoutException,
-    timer: Timer
+      timeout: Duration,
+      exception: RequestTimeoutException,
+      timer: Timer
   ): TypeAgnostic = new TypeAgnostic {
     override def toFilter[Req, Rep]: Filter[Req, Rep, Req, Rep] =
       new TimeoutFilter[Req, Rep](timeout, exception, timer)
@@ -93,22 +93,20 @@ object TimeoutFilter {
 }
 
 /**
- * A [[com.twitter.finagle.Filter]] that applies a global timeout to requests.
- *
- * @param timeout the timeout to apply to requests
- * @param exception an exception object to return in cases of timeout exceedance
- * @param timer a `Timer` object used to track elapsed time
- *
- * @see The sections on
- *      [[https://twitter.github.io/finagle/guide/Clients.html#timeouts-expiration clients]]
- *      and [[https://twitter.github.io/finagle/guide/Servers.html#request-timeout servers]]
- *      in the user guide for more details.
- */
+  * A [[com.twitter.finagle.Filter]] that applies a global timeout to requests.
+  *
+  * @param timeout the timeout to apply to requests
+  * @param exception an exception object to return in cases of timeout exceedance
+  * @param timer a `Timer` object used to track elapsed time
+  *
+  * @see The sections on
+  *      [[https://twitter.github.io/finagle/guide/Clients.html#timeouts-expiration clients]]
+  *      and [[https://twitter.github.io/finagle/guide/Servers.html#request-timeout servers]]
+  *      in the user guide for more details.
+  */
 class TimeoutFilter[Req, Rep](
-    timeout: Duration,
-    exception: RequestTimeoutException,
-    timer: Timer)
-  extends SimpleFilter[Req, Rep] {
+    timeout: Duration, exception: RequestTimeoutException, timer: Timer)
+    extends SimpleFilter[Req, Rep] {
   def this(timeout: Duration, timer: Timer) =
     this(timeout, new IndividualRequestTimeoutException(timeout), timer)
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,34 +31,34 @@ import javafx.{print => jfxp}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /**
- * Companion Object for [[scalafx.print.PrintSides]].
- */
+  * Companion Object for [[scalafx.print.PrintSides]].
+  */
 object PrintSides
-  extends SFXEnumDelegateCompanion[jfxp.PrintSides, PrintSides] {
+    extends SFXEnumDelegateCompanion[jfxp.PrintSides, PrintSides] {
 
   /**
-   * Two sided printing where the vertical edge of the paper is to be used for binding such as in a book.
-   */
+    * Two sided printing where the vertical edge of the paper is to be used for binding such as in a book.
+    */
   val Duplex = new PrintSides(jfxp.PrintSides.DUPLEX)
 
   /**
-   * One sided printing.
-   */
+    * One sided printing.
+    */
   val OneSided = new PrintSides(jfxp.PrintSides.ONE_SIDED)
 
   /**
-   * Two sided printing where the horizontal edge of the paper is to be used for binding such as in a notepad.
-   */
+    * Two sided printing where the horizontal edge of the paper is to be used for binding such as in a notepad.
+    */
   val Tumble = new PrintSides(jfxp.PrintSides.TUMBLE)
 
-  protected override def unsortedValues: Array[PrintSides] = Array(Duplex, OneSided, Tumble)
-
+  protected override def unsortedValues: Array[PrintSides] =
+    Array(Duplex, OneSided, Tumble)
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintSides.html JavaFX PrintSides]].
- *
- * @since 8.0
- */
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintSides.html JavaFX PrintSides]].
+  *
+  * @since 8.0
+  */
 sealed case class PrintSides(override val delegate: jfxp.PrintSides)
-  extends SFXEnumDelegate[jfxp.PrintSides]
+    extends SFXEnumDelegate[jfxp.PrintSides]

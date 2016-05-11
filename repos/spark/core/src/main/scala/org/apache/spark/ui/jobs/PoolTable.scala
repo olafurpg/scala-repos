@@ -35,9 +35,9 @@ private[ui] class PoolTable(pools: Seq[Schedulable], parent: StagesTab) {
     }
   }
 
-  private def poolTable(
-      makeRow: (Schedulable, HashMap[String, HashMap[Int, StageInfo]]) => Seq[Node],
-      rows: Seq[Schedulable]): Seq[Node] = {
+  private def poolTable(makeRow: (Schedulable,
+                        HashMap[String, HashMap[Int, StageInfo]]) => Seq[Node],
+                        rows: Seq[Schedulable]): Seq[Node] = {
     <table class="table table-bordered table-striped table-condensed sortable table-fixed">
       <thead>
         <th>Pool Name</th>
@@ -55,13 +55,15 @@ private[ui] class PoolTable(pools: Seq[Schedulable], parent: StagesTab) {
 
   private def poolRow(
       p: Schedulable,
-      poolToActiveStages: HashMap[String, HashMap[Int, StageInfo]]): Seq[Node] = {
+      poolToActiveStages: HashMap[String, HashMap[Int, StageInfo]])
+    : Seq[Node] = {
     val activeStages = poolToActiveStages.get(p.name) match {
       case Some(stages) => stages.size
       case None => 0
     }
-    val href = "%s/stages/pool?poolname=%s"
-      .format(UIUtils.prependBaseUri(parent.basePath), URLEncoder.encode(p.name, "UTF-8"))
+    val href = "%s/stages/pool?poolname=%s".format(
+        UIUtils.prependBaseUri(parent.basePath),
+        URLEncoder.encode(p.name, "UTF-8"))
     <tr>
       <td>
         <a href={href}>{p.name}</a>
@@ -74,4 +76,3 @@ private[ui] class PoolTable(pools: Seq[Schedulable], parent: StagesTab) {
     </tr>
   }
 }
-

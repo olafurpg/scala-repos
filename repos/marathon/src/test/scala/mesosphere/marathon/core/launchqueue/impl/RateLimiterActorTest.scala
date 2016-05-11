@@ -1,13 +1,13 @@
 package mesosphere.marathon.core.launchqueue.impl
 
-import akka.actor.{ ActorRef, ActorSystem }
+import akka.actor.{ActorRef, ActorSystem}
 import akka.pattern.ask
 import akka.testkit.TestProbe
 import akka.util.Timeout
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.state.{ AppDefinition, AppRepository, PathId }
+import mesosphere.marathon.state.{AppDefinition, AppRepository, PathId}
 import org.mockito.Mockito
 
 import scala.concurrent.Await
@@ -18,23 +18,28 @@ class RateLimiterActorTest extends MarathonSpec {
   test("GetDelay gets current delay") {
     rateLimiter.addDelay(app)
 
-    val delay = askLimiter(RateLimiterActor.GetDelay(app)).asInstanceOf[RateLimiterActor.DelayUpdate]
+    val delay = askLimiter(RateLimiterActor.GetDelay(app))
+      .asInstanceOf[RateLimiterActor.DelayUpdate]
     assert(delay.delayUntil == clock.now() + backoff)
   }
 
   test("AddDelay increases delay and sends update") {
     limiterRef ! RateLimiterActor.AddDelay(app)
-    updateReceiver.expectMsg(RateLimiterActor.DelayUpdate(app, clock.now() + backoff))
-    val delay = askLimiter(RateLimiterActor.GetDelay(app)).asInstanceOf[RateLimiterActor.DelayUpdate]
+    updateReceiver.expectMsg(
+        RateLimiterActor.DelayUpdate(app, clock.now() + backoff))
+    val delay = askLimiter(RateLimiterActor.GetDelay(app))
+      .asInstanceOf[RateLimiterActor.DelayUpdate]
     assert(delay.delayUntil == clock.now() + backoff)
   }
 
   test("ResetDelay resets delay and sends update") {
     limiterRef ! RateLimiterActor.AddDelay(app)
-    updateReceiver.expectMsg(RateLimiterActor.DelayUpdate(app, clock.now() + backoff))
+    updateReceiver.expectMsg(
+        RateLimiterActor.DelayUpdate(app, clock.now() + backoff))
     limiterRef ! RateLimiterActor.ResetDelay(app)
     updateReceiver.expectMsg(RateLimiterActor.DelayUpdate(app, clock.now()))
-    val delay = askLimiter(RateLimiterActor.GetDelay(app)).asInstanceOf[RateLimiterActor.DelayUpdate]
+    val delay = askLimiter(RateLimiterActor.GetDelay(app))
+      .asInstanceOf[RateLimiterActor.DelayUpdate]
     assert(delay.delayUntil == clock.now())
   }
 
@@ -44,7 +49,8 @@ class RateLimiterActorTest extends MarathonSpec {
 
   private val backoff: FiniteDuration = 10.seconds
   private val backoffFactor: Double = 2.0
-  private[this] val app = AppDefinition(id = PathId("/test"), backoff = backoff, backoffFactor = backoffFactor)
+  private[this] val app = AppDefinition(
+      id = PathId("/test"), backoff = backoff, backoffFactor = backoffFactor)
 
   private[this] implicit val timeout: Timeout = 3.seconds
   private[this] implicit var actorSystem: ActorSystem = _
@@ -62,7 +68,8 @@ class RateLimiterActorTest extends MarathonSpec {
     taskTracker = mock[TaskTracker]
     appRepository = mock[AppRepository]
     updateReceiver = TestProbe()
-    val props = RateLimiterActor.props(rateLimiter, appRepository, updateReceiver.ref)
+    val props =
+      RateLimiterActor.props(rateLimiter, appRepository, updateReceiver.ref)
     limiterRef = actorSystem.actorOf(props, "limiter")
   }
 

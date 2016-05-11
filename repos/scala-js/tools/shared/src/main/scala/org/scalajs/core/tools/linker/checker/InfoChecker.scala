@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.linker.checker
 
@@ -67,15 +66,13 @@ private final class InfoChecker(
       val missingMethods = expectedMethodIDs -- actualMethodIDs
       if (missingMethods.nonEmpty) {
         errorCount += 1
-        logger.error(
-            s"Missing methods in $className: $missingMethods")
+        logger.error(s"Missing methods in $className: $missingMethods")
       }
 
       val unexpectedMethods = actualMethodIDs -- expectedMethodIDs
       if (unexpectedMethods.nonEmpty) {
         errorCount += 1
-        logger.error(
-            s"Unexpected methods in $className: $unexpectedMethods")
+        logger.error(s"Unexpected methods in $className: $unexpectedMethods")
       }
     }
 
@@ -87,8 +84,8 @@ private final class InfoChecker(
     }
   }
 
-  private def checkMethodInfo(className: String, info: MethodInfo,
-      expectedInfo: MethodInfo): Unit = {
+  private def checkMethodInfo(
+      className: String, info: MethodInfo, expectedInfo: MethodInfo): Unit = {
 
     /* Note that it is fine for the actual info to contain *more* than the
      * expected info. It can produce non-optimal results, but it is still
@@ -104,11 +101,12 @@ private final class InfoChecker(
     }
 
     def mapIncludes(actual: Map[String, List[String]],
-        expected: Map[String, List[String]]) = {
-      expected forall { case (cls, expectedMethods) =>
-        actual.get(cls) exists { actualMethods =>
-          listIncludes(actualMethods, expectedMethods)
-        }
+                    expected: Map[String, List[String]]) = {
+      expected forall {
+        case (cls, expectedMethods) =>
+          actual.get(cls) exists { actualMethods =>
+            listIncludes(actualMethods, expectedMethods)
+          }
       }
     }
 
@@ -117,14 +115,17 @@ private final class InfoChecker(
         info.isAbstract != expectedInfo.isAbstract ||
         info.isExported != expectedInfo.isExported ||
         !mapIncludes(info.methodsCalled, expectedInfo.methodsCalled) ||
-        !mapIncludes(info.methodsCalledStatically, expectedInfo.methodsCalledStatically) ||
-        !mapIncludes(info.staticMethodsCalled, expectedInfo.staticMethodsCalled) ||
-        !listIncludes(info.instantiatedClasses, expectedInfo.instantiatedClasses) ||
+        !mapIncludes(info.methodsCalledStatically,
+                     expectedInfo.methodsCalledStatically) ||
+        !mapIncludes(info.staticMethodsCalled,
+                     expectedInfo.staticMethodsCalled) || !listIncludes(
+            info.instantiatedClasses, expectedInfo.instantiatedClasses) ||
         !listIncludes(info.accessedModules, expectedInfo.accessedModules) ||
         !listIncludes(info.usedInstanceTests, expectedInfo.usedInstanceTests) ||
         !listIncludes(info.accessedClassData, expectedInfo.accessedClassData)) {
       errorCount += 1
-      logger.error(s"Method info mismatch for $className.${expectedInfo.encodedName}" +
+      logger.error(
+          s"Method info mismatch for $className.${expectedInfo.encodedName}" +
           (if (expectedInfo.isStatic) " (static)" else ""))
       logger.error(s"Expected:\n${methodInfoString(expectedInfo)}")
       logger.error(s"Got:\n${methodInfoString(info)}")
@@ -147,12 +148,13 @@ private final class InfoChecker(
 }
 
 object InfoChecker {
+
   /** Checks that the `ClassInfo`s associated with `ClassDef`s are correct.
-   *
-   *  @return Count of info checking errors (0 in case of success)
-   */
+    *
+    *  @return Count of info checking errors (0 in case of success)
+    */
   def check(infoAndTrees: Traversable[(ClassInfo, ClassDef)],
-      logger: Logger): Int = {
+            logger: Logger): Int = {
     new InfoChecker(infoAndTrees, logger).check()
   }
 }

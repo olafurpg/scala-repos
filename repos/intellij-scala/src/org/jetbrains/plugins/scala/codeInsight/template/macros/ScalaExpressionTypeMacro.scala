@@ -6,19 +6,26 @@ import org.jetbrains.plugins.scala.codeInsight.template.impl.ScalaCodeContextTyp
 import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
 
 /**
- * @author Roman.Shein
- * @since 22.09.2015.
- */
+  * @author Roman.Shein
+  * @since 22.09.2015.
+  */
 class ScalaExpressionTypeMacro extends Macro {
-  override def calculateResult(params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(
+      params: Array[Expression], context: ExpressionContext): Result = {
     if (params.length != 1) return null
-    MacroUtil.resultToScExpr(params.head.calculateResult(context), context).flatMap(_.getType().toOption).
-            map(myType => new ScalaTypeResult(myType)).orNull
+    MacroUtil
+      .resultToScExpr(params.head.calculateResult(context), context)
+      .flatMap(_.getType().toOption)
+      .map(myType => new ScalaTypeResult(myType))
+      .orNull
   }
 
   override def getName: String = MacroUtil.scalaIdPrefix + "expressionType"
 
-  override def getPresentableName: String = MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message("macro.expression.type")
+  override def getPresentableName: String =
+    MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
+        "macro.expression.type")
 
-  override def isAcceptableInContext(context: TemplateContextType): Boolean = context.isInstanceOf[ScalaCodeContextType]
+  override def isAcceptableInContext(context: TemplateContextType): Boolean =
+    context.isInstanceOf[ScalaCodeContextType]
 }

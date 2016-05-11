@@ -2,7 +2,7 @@ object Test {
   def wrap[K](body: => K): K = body
 
   def f(): Option[Int] = {
-    wrap({ return Some(1) ; None })
+    wrap({ return Some(1); None })
   }
 
   def main(args: Array[String]) {

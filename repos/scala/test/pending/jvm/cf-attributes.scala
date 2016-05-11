@@ -24,16 +24,16 @@ object InnerClassTest2 extends Test2 {
 object anonymousFunctions {
   //InnerClass:
   // public final #_ of #_; //class anonymousFunctions$$anonfun$1 of class InnerClass$
-  val twice = (x: Int) => 2*x
+  val twice = (x: Int) => 2 * x
 
   //InnerClass:
   // public final #_ of #_; //class anonymousFunctions$$anonfun$2
-  List(0).map(x => x+1)
+  List(0).map(x => x + 1)
 
   def foo {
     //InnerClass:
     // public final #_ of #_; class anonymousFunctions$$anonfun$3
-    val square = (x: Int) => x*x
+    val square = (x: Int) => x * x
 
     //InnerClass:
     // public final #_ of #_; class anonymousFunctions$$anonfun$foo$1
@@ -43,7 +43,7 @@ object anonymousFunctions {
   object bar {
     //InnerClass:
     // public final #_ of #_; class anonymousFunctions$bar$$anonfun$4 of class anonymousFunctions$bar$
-    val cube = (x: Int) => x*x*x
+    val cube = (x: Int) => x * x * x
 
     //InnerClass:
     // public final #_ of #_; class anonymousFunctions$bar$$anonfun$5
@@ -76,12 +76,12 @@ trait Test1 {
     for (c <- cls.getDeclaredClasses) {
       mods = AccessFlags.asString(c.getModifiers)
       kind = if (c.isInterface) "interface" else "class"
-      println("  "+mods+kind+" "+c.getName+
-              " of class "+c.getEnclosingClass.getName)
+      println("  " + mods + kind + " " + c.getName + " of class " +
+          c.getEnclosingClass.getName)
     }
   }
   def printClass(cls: Class[_]) {
-    println("\n{{ "+cls.getName+" }}")
+    println("\n{{ " + cls.getName + " }}")
     printInnerClasses(cls)
   }
 }
@@ -99,23 +99,23 @@ trait Test2 {
   //   in.close()
   // }
   def printClass(name: String) {
-    try { printClass(Class.forName(name)) }
-    catch { case e: Exception => println(e) }
+    try { printClass(Class.forName(name)) } catch {
+      case e: Exception => println(e)
+    }
   }
   def printClass(cls: Class[_]) {
-    println("\n[[ "+cls.getName+" ]]");
-    try { printInnerClasses(cls) }
-    catch { case e: Exception => println(e) }
+    println("\n[[ " + cls.getName + " ]]");
+    try { printInnerClasses(cls) } catch { case e: Exception => println(e) }
   }
 }
 
 object AccessFlags {
-  val ACC_PUBLIC    = 0x0001
-  val ACC_PRIVATE   = 0x0002
+  val ACC_PUBLIC = 0x0001
+  val ACC_PRIVATE = 0x0002
   val ACC_PROTECTED = 0x0004
-  val ACC_STATIC    = 0x0008
-  val ACC_FINAL     = 0x0010
-  val ACC_ABSTRACT  = 0x0400
+  val ACC_STATIC = 0x0008
+  val ACC_FINAL = 0x0010
+  val ACC_ABSTRACT = 0x0400
 
   def asString(accessFlags: Int): String = {
     val buf = new StringBuilder()
@@ -142,5 +142,4 @@ object AccessFlags {
       buf.toString()
     }
   }
-*/
-
+ */

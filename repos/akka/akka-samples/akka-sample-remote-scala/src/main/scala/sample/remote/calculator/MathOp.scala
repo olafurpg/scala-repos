@@ -14,9 +14,11 @@ trait MathResult
 
 final case class AddResult(nbr: Int, nbr2: Int, result: Int) extends MathResult
 
-final case class SubtractResult(nbr1: Int, nbr2: Int, result: Int) extends MathResult
+final case class SubtractResult(nbr1: Int, nbr2: Int, result: Int)
+    extends MathResult
 
-final case class MultiplicationResult(nbr1: Int, nbr2: Int, result: Int) extends MathResult
+final case class MultiplicationResult(nbr1: Int, nbr2: Int, result: Int)
+    extends MathResult
 
-final case class DivisionResult(nbr1: Double, nbr2: Int, result: Double) extends MathResult
-
+final case class DivisionResult(nbr1: Double, nbr2: Int, result: Double)
+    extends MathResult

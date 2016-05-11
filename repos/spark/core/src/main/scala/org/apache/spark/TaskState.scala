@@ -27,7 +27,8 @@ private[spark] object TaskState extends Enumeration {
 
   type TaskState = Value
 
-  def isFailed(state: TaskState): Boolean = (LOST == state) || (FAILED == state)
+  def isFailed(state: TaskState): Boolean =
+    (LOST == state) || (FAILED == state)
 
   def isFinished(state: TaskState): Boolean = FINISHED_STATES.contains(state)
 

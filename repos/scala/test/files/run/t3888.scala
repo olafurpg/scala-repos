@@ -1,4 +1,3 @@
-
 // in a match, which notion of equals prevails?
 // extending Tuple doesn't seem to be at issue here.
 object Test {
@@ -19,8 +18,8 @@ object Test {
     }
 
   def main(args: Array[String]) = {
-    assert( m1 )
-    assert( m2 )
+    assert(m1)
+    assert(m2)
   }
 }
 

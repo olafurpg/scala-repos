@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.webhooks
 
 import io.prediction.data.storage.Event
@@ -24,11 +23,10 @@ import org.json4s.JObject
 import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
-
 private[prediction] object ConnectorUtil {
 
-  implicit val eventJson4sFormats: Formats = DefaultFormats +
-    new EventJson4sSupport.APISerializer
+  implicit val eventJson4sFormats: Formats =
+    DefaultFormats + new EventJson4sSupport.APISerializer
 
   // intentionally use EventJson4sSupport.APISerializer to convert
   // from JSON to Event object. Don't allow connector directly create
@@ -42,5 +40,4 @@ private[prediction] object ConnectorUtil {
   def toEvent(connector: FormConnector, data: Map[String, String]): Event = {
     read[Event](write(connector.toEventJson(data)))
   }
-
 }

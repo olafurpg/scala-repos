@@ -9,7 +9,7 @@ trait RichTest {
               #xyz"""
   def getObjectName: String = {
     val cn = this.getClass().getName()
-    cn.substring(0, cn.length-1)
+    cn.substring(0, cn.length - 1)
   }
   def length[A](it: Iterator[A]) = it.toList.length
   def length[A](it: Iterable[A]) = it.toList.length
@@ -55,11 +55,11 @@ object RichIntTest extends RichTest {
     println(length(n to m))
 
     println(16.toBinaryString) // should be "10000"
-    println(16.toHexString)    // should be "10"
-    println(16.toOctalString)  // should be "20"
+    println(16.toHexString) // should be "10"
+    println(16.toOctalString) // should be "20"
 
     println(65537.toHexString) // should be "10001"
-    println((-1).toHexString)  // should be "ffffffff"
+    println((-1).toHexString) // should be "ffffffff"
   }
 }
 object RichStringTest1 extends RichTest {
@@ -123,6 +123,7 @@ object RichStringTest6 extends RichTest {
     println("a:b.c$d".split(Array(':', '.', '$')).toList)
   }
 }
+
 /** xxx */
 object Test {
   def main(args: Array[String]) {

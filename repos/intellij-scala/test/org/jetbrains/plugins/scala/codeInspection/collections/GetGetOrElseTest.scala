@@ -4,9 +4,9 @@ package codeInspection.collections
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 
 /**
- * Nikolay.Tropin
- * 2014-05-08
- */
+  * Nikolay.Tropin
+  * 2014-05-08
+  */
 class GetGetOrElseTest extends OperationsOnCollectionInspectionTest {
   val hint = InspectionBundle.message("get.getOrElse.hint")
   override val inspectionClass = classOf[GetGetOrElseInspection]

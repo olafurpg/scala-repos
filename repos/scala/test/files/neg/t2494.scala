@@ -1,1 +1,1 @@
-object A { val a = { println("a = " + a); a = 1} }
+object A { val a = { println("a = " + a); a = 1 } }

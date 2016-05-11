@@ -37,10 +37,10 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import scalafx.Includes._
 
 /**
- * StringProperty Spec tests.
- *
- *
- */
+  * StringProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class StringPropertySpec extends FlatSpec with BeforeAndAfterEach {
   val bean = new Object()
@@ -480,5 +480,6 @@ class StringPropertySpec extends FlatSpec with BeforeAndAfterEach {
     stringProperty() should equal("HellonullWorld15")
   }
 
-  it should "support concatenation starting with nulls/primitives/strings" is (pending)
+  it should "support concatenation starting with nulls/primitives/strings" is
+  (pending)
 }

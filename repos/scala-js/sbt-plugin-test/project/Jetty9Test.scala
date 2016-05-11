@@ -20,12 +20,13 @@ object Jetty9Test {
 
   private val jettyPort = 23548
 
-  val runSetting = run <<= Def.inputTask {
-    val jsEnv = (loadedJSEnv in Compile).value.asInstanceOf[ComJSEnv]
-    val jsConsole = scalaJSConsole.value
+  val runSetting =
+    run <<= Def.inputTask {
+      val jsEnv = (loadedJSEnv in Compile).value.asInstanceOf[ComJSEnv]
+      val jsConsole = scalaJSConsole.value
 
-    val code = new MemVirtualJSFile("runner.js").withContent(
-      """
+      val code = new MemVirtualJSFile("runner.js").withContent(
+          """
       scalajsCom.init(function(msg) {
         jQuery.ajax({
           url: msg,
@@ -40,33 +41,34 @@ object Jetty9Test {
         });
       });
       """
-    )
+      )
 
-    val runner = jsEnv.comRunner(code)
+      val runner = jsEnv.comRunner(code)
 
-    runner.start(streams.value.log, jsConsole)
+      runner.start(streams.value.log, jsConsole)
 
-    val jetty = setupJetty((resourceDirectory in Compile).value)
+      val jetty = setupJetty((resourceDirectory in Compile).value)
 
-    jetty.addLifeCycleListener(new AbstractLifeCycle.AbstractLifeCycleListener {
-      override def lifeCycleStarted(event: LifeCycle): Unit = {
-        try {
-          runner.send(s"http://localhost:$jettyPort/test.txt")
-          val msg = runner.receive()
-          val expected = "It works!"
-          if (msg != expected)
-            sys.error(s"""received "$msg" instead of "$expected"""")
-        } finally {
-          runner.close()
-          jetty.stop()
+      jetty.addLifeCycleListener(
+          new AbstractLifeCycle.AbstractLifeCycleListener {
+        override def lifeCycleStarted(event: LifeCycle): Unit = {
+          try {
+            runner.send(s"http://localhost:$jettyPort/test.txt")
+            val msg = runner.receive()
+            val expected = "It works!"
+            if (msg != expected)
+              sys.error(s"""received "$msg" instead of "$expected"""")
+          } finally {
+            runner.close()
+            jetty.stop()
+          }
         }
-      }
-    })
+      })
 
-    jetty.start()
-    runner.await(30.seconds)
-    jetty.join()
-  }
+      jetty.start()
+      runner.await(30.seconds)
+      jetty.join()
+    }
 
   private def setupJetty(dir: File): Server = {
     val server = new Server(jettyPort)
@@ -80,5 +82,4 @@ object Jetty9Test {
 
     server
   }
-
 }

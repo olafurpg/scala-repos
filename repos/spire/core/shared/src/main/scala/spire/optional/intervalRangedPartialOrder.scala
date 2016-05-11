@@ -9,10 +9,11 @@ import spire.syntax.order._
 object intervalValuePartialOrder {
 
   /** Interval partial order defined as follows:
-   *
-   * I <= J if I is a subset of J.
-   */
-  class IntervalValuePartialOrder[A: Order] extends PartialOrder[Interval[A]] {
+    *
+    * I <= J if I is a subset of J.
+    */
+  class IntervalValuePartialOrder[A : Order]
+      extends PartialOrder[Interval[A]] {
     override def eqv(x: Interval[A], y: Interval[A]): Boolean =
       (x, y) match {
         case (Point(p1), Point(p2)) => p1 === p2
@@ -56,6 +57,7 @@ object intervalValuePartialOrder {
       else Double.NaN
   }
 
-  implicit def intervalValuePartialOrder[A: Order]: PartialOrder[Interval[A]] =
+  implicit def intervalValuePartialOrder[
+      A : Order]: PartialOrder[Interval[A]] =
     new IntervalValuePartialOrder[A]
 }

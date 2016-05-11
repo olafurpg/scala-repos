@@ -53,11 +53,11 @@ object LowPriorityTests {
     case class CC2(s: String)
 
     object Extra {
-      implicit def extraTC[T](implicit ev: LowPriority.Ignoring[Witness.`"anyTC"`.T]): TC[T] =
+      implicit def extraTC[T](
+          implicit ev: LowPriority.Ignoring[Witness.`"anyTC"`.T]): TC[T] =
         new TC[T] { def prop = Some(false) }
     }
   }
-
 }
 
 class LowPriorityTests {
@@ -101,5 +101,4 @@ class LowPriorityTests {
       assert(TC[CC2].prop == Some(true))
     }
   }
-
 }

@@ -22,32 +22,36 @@ package com.precog.ragnarok
 import org.specs2.mutable.Specification
 import org.specs2.ScalaCheck
 
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{Arbitrary, Gen}
 
-import scalaz.std.option.{ some => somez, _ }
+import scalaz.std.option.{some => somez, _}
 import scalaz.syntax.semigroup._
 import scalaz.syntax.applicative._
 import scalaz.syntax.foldable._
 import scalaz.std.list._
 
-
 class StatisticsSpec extends Specification with ScalaCheck {
-  def stats(xs: List[Double]): List[Option[Statistics]] = xs map (x => somez(Statistics(x)))
+  def stats(xs: List[Double]): List[Option[Statistics]] =
+    xs map (x => somez(Statistics(x)))
 
-  private def beRelativelyCloseTo(n: Double)(err: Double) = beCloseTo(n, math.abs(n * err))
+  private def beRelativelyCloseTo(n: Double)(err: Double) =
+    beCloseTo(n, math.abs(n * err))
 
-  private def statsAreEqual(a: Option[Statistics], b: Option[Statistics]) = (a, b) match {
-    case (Some(a), Some(b)) =>
-      a.mean must (beEqualTo(b.mean) or beRelativelyCloseTo(b.mean)(1e-10))
-      a.variance must (beEqualTo(b.variance) or beRelativelyCloseTo(b.variance)(1e-10))
-      a.count must_== b.count
-      a.min must_== b.min
-      a.max must_== b.max
+  private def statsAreEqual(a: Option[Statistics], b: Option[Statistics]) =
+    (a, b) match {
+      case (Some(a), Some(b)) =>
+        a.mean must (beEqualTo(b.mean) or beRelativelyCloseTo(b.mean)(1e-10))
+        a.variance must
+        (beEqualTo(b.variance) or beRelativelyCloseTo(b.variance)(1e-10))
+        a.count must_== b.count
+        a.min must_== b.min
+        a.max must_== b.max
 
-    case _ => ok
-  }
+      case _ => ok
+    }
 
-  implicit val arbDouble: Arbitrary[Double] = Arbitrary(Gen.chooseNum(-1e250, 1e250))
+  implicit val arbDouble: Arbitrary[Double] = Arbitrary(
+      Gen.chooseNum(-1e250, 1e250))
 
   "statistics is a semigroup that" should {
     todo
@@ -87,8 +91,8 @@ class StatisticsSpec extends Specification with ScalaCheck {
     }
 
     "be scalable" ! check { (xs: List[Double]) =>
-      statsAreEqual(stats(xs).suml map (_ * 0.0001), stats(xs map (_ * 0.0001)).suml)
+      statsAreEqual(stats(xs).suml map (_ * 0.0001),
+                    stats(xs map (_ * 0.0001)).suml)
     }
   }
 }
-

@@ -41,58 +41,55 @@ object ZipperExamples extends App {
   import syntax.zipper._
   import test._
 
-  case class Dept[E <: HList](manager : Employee, employees : E)
-  case class Employee(name : String, salary : Int)
-  
-  val dept =
-    Dept(
+  case class Dept[E <: HList](manager: Employee, employees: E)
+  case class Employee(name: String, salary: Int)
+
+  val dept = Dept(
       Employee("Agamemnon", 5000),
-      Employee("Menelaus", 3000) ::
-      Employee("Achilles", 2000) ::
-      Employee("Odysseus", 2000) ::
-      HNil
-    )
+      Employee("Menelaus", 3000) :: Employee("Achilles", 2000) :: Employee(
+          "Odysseus", 2000) :: HNil
+  )
 
   type D = Dept[Employee :: Employee :: Employee :: HNil]
-    
+
   val z = dept.toZipper
-  
+
   val g1 = z.reify
   typed[D](g1)
   println(g1)
   // Dept(Employee(Agamemnon,5000),Employee(Menelaus,3000) :: Employee(Achilles,2000) :: Employee(Odysseus,2000) :: HNil)
-  
+
   val g2 = z.right.get
   typed[Employee :: Employee :: Employee :: HNil](g2)
   println(g2)
   // Employee(Menelaus,3000) :: Employee(Achilles,2000) :: Employee(Odysseus,2000) :: HNil
-  
+
   val g3 = z.get
   typed[Employee](g3)
   println(g3)
   // Employee(Agamemnon,5000)
-  
+
   val g4 = z.down.right.get
   typed[Int](g4)
   println(g4)
   // 5000
-  
+
   val g5 = z.down.get
   typed[String](g5)
   println(g5)
   // Agamemnon
-  
+
   val g6 = z.down.put("King Agamemnon")
-  
+
   val g8 = g6.right.put(8000)
-  
+
   val g9 = g8.up
-  
+
   val agamemnon = g9.get
   typed[Employee](agamemnon)
   println(agamemnon)
   // Employee(King Agamemnon,8000)
-  
+
   val updatedDept = g9.reify
   typed[D](updatedDept)
   println(updatedDept)
@@ -104,17 +101,20 @@ object ZipperExamples extends App {
   // Dept(Employee(King Agamemnon,8000),Employee(Menelaus,3000) :: Employee(Achilles,3000) :: Employee(Odysseus,2000) :: HNil)
 
   // All together in a single pass ...
-  val singlePass =
-    z.
-      down.put("King Agamemnon").
-      right.put(8000).
-    up.right.
-      down.
-      right.
-        down.
-        right.put(3000).
-    root.reify
-    
+  val singlePass = z.down
+    .put("King Agamemnon")
+    .right
+    .put(8000)
+    .up
+    .right
+    .down
+    .right
+    .down
+    .right
+    .put(3000)
+    .root
+    .reify
+
   typed[D](singlePass)
   println(singlePass)
   // Dept(Employee(King Agamemnon,8000),Employee(Menelaus,3000) :: Employee(Achilles,3000) :: Employee(Odysseus,2000) :: HNil)

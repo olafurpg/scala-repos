@@ -68,18 +68,19 @@ object CheckBoxTest extends JFXApp {
       content = mainPane
     }
   }
-
 }
 
-class CheckBoxControls(check: CheckBox) extends PropertiesNodes[CheckBox](check, "CheckBox Properties") {
+class CheckBoxControls(check: CheckBox)
+    extends PropertiesNodes[CheckBox](check, "CheckBox Properties") {
 
   val lblSelected = new Label {
     text = check.selected().toString
   }
-  check.onAction = (event: ActionEvent) => {
-    lblSelected.text = if (check.indeterminate()) "Indeterminate" else check.selected().toString
+  check.onAction = (event: ActionEvent) =>
+    {
+      lblSelected.text = if (check.indeterminate()) "Indeterminate"
+      else check.selected().toString
   }
-
 
   val btnAllowIndeterminate = new ToggleButton {
     text = "Allow Indeterminate"
@@ -88,7 +89,7 @@ class CheckBoxControls(check: CheckBox) extends PropertiesNodes[CheckBox](check,
 
   val btnFire = new Button {
     text = "Fire!"
-    onAction = handle {check.fire()}
+    onAction = handle { check.fire() }
   }
 
   val txfText = new TextField {
@@ -98,5 +99,4 @@ class CheckBoxControls(check: CheckBox) extends PropertiesNodes[CheckBox](check,
   super.addNode("Selected", lblSelected)
   super.addNodes(btnAllowIndeterminate, btnFire)
   super.addNode("Text", txfText)
-
 }

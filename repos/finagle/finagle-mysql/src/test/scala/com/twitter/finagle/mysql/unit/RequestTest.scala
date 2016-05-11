@@ -27,17 +27,35 @@ class SimpleCommandRequestTest extends FunSuite {
 class HandshakeResponseTest extends FunSuite {
   val username = Some("username")
   val password = Some("password")
-  val salt = Array[Byte](70,38,43,66,74,48,79,126,76,66,
-                          70,118,67,40,63,68,120,80,103,54)
+  val salt = Array[Byte](70,
+                         38,
+                         43,
+                         66,
+                         74,
+                         48,
+                         79,
+                         126,
+                         76,
+                         66,
+                         70,
+                         118,
+                         67,
+                         40,
+                         63,
+                         68,
+                         120,
+                         80,
+                         103,
+                         54)
   val req = HandshakeResponse(
-    username,
-    password,
-    Some("test"),
-    Capability(0xfffff6ff),
-    salt,
-    Capability(0xf7ff),
-    Charset.Utf8_general_ci,
-    16777216
+      username,
+      password,
+      Some("test"),
+      Capability(0xfffff6ff),
+      salt,
+      Capability(0xf7ff),
+      Charset.Utf8_general_ci,
+      16777216
   )
   val br = BufferReader(req.toPacket.body)
 
@@ -80,7 +98,7 @@ class ExecuteRequestTest extends FunSuite {
     br.skip(10) // payload header (10bytes)
     br.skip(1) // new params bound flag
     val restSize = br.takeRest().size
-    assert(restSize == ((numOfParams+7)/8))
+    assert(restSize == ((numOfParams + 7) / 8))
   }
 
   // supported types
@@ -99,29 +117,29 @@ class ExecuteRequestTest extends FunSuite {
   val sqlDate = new SQLDate(millis)
   val datetime = new Date(millis)
   val params: IndexedSeq[Parameter] = IndexedSeq(
-    strVal,
-    nonAsciiStrVal,
-    boolVal,
-    byteVal,
-    shortVal,
-    null,
-    intVal,
-    longVal,
-    floatVal,
-    doubleVal,
-    null,
-    timestamp,
-    sqlDate,
-    datetime,
-    null,
-    StringValue(strVal),
-    ByteValue(byteVal),
-    ShortValue(shortVal),
-    IntValue(intVal),
-    LongValue(longVal),
-    FloatValue(floatVal),
-    DoubleValue(doubleVal),
-    null
+      strVal,
+      nonAsciiStrVal,
+      boolVal,
+      byteVal,
+      shortVal,
+      null,
+      intVal,
+      longVal,
+      floatVal,
+      doubleVal,
+      null,
+      timestamp,
+      sqlDate,
+      datetime,
+      null,
+      StringValue(strVal),
+      ByteValue(byteVal),
+      ShortValue(shortVal),
+      IntValue(intVal),
+      LongValue(longVal),
+      FloatValue(floatVal),
+      DoubleValue(doubleVal),
+      null
   )
   // create a prepared statement
   val stmtId = 1
@@ -147,10 +165,8 @@ class ExecuteRequestTest extends FunSuite {
     val bytesAsBigEndian = bytes.reverse
     val bits = BigInt(bytesAsBigEndian)
     for (i <- 0 until params.size) {
-      if (params(i) == null)
-        assert(bits.testBit(i) == true)
-      else
-        assert(bits.testBit(i) == false)
+      if (params(i) == null) assert(bits.testBit(i) == true)
+      else assert(bits.testBit(i) == false)
     }
   }
 
@@ -166,8 +182,7 @@ class ExecuteRequestTest extends FunSuite {
 
   if (hasNewParams) {
     test("type codes") {
-      for (p <- req.params)
-        assert(br.readShort() == p.typeCode)
+      for (p <- req.params) assert(br.readShort() == p.typeCode)
     }
 
     test("String") {
@@ -206,22 +221,26 @@ class ExecuteRequestTest extends FunSuite {
       assert(br.readDouble() == doubleVal)
     }
 
-    val timestampValueLocal = new TimestampValue(TimeZone.getDefault(), TimeZone.getDefault())
+    val timestampValueLocal = new TimestampValue(
+        TimeZone.getDefault(), TimeZone.getDefault())
 
     test("java.sql.Timestamp") {
-      val raw = RawValue(Type.Timestamp, Charset.Binary, true, br.readLengthCodedBytes())
+      val raw = RawValue(
+          Type.Timestamp, Charset.Binary, true, br.readLengthCodedBytes())
       val timestampValueLocal(ts) = raw
       assert(ts == timestamp)
     }
 
     test("java.sql.Date") {
-      val raw = RawValue(Type.Date, Charset.Binary, true, br.readLengthCodedBytes())
+      val raw =
+        RawValue(Type.Date, Charset.Binary, true, br.readLengthCodedBytes())
       val DateValue(d) = raw
       assert(d.toString == sqlDate.toString)
     }
 
     test("java.util.Date") {
-      val raw = RawValue(Type.DateTime, Charset.Binary, true, br.readLengthCodedBytes())
+      val raw = RawValue(
+          Type.DateTime, Charset.Binary, true, br.readLengthCodedBytes())
       val timestampValueLocal(dt) = raw
       assert(dt.getTime == timestamp.getTime)
     }

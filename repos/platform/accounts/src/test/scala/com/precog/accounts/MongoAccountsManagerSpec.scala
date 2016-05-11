@@ -47,19 +47,22 @@ import org.streum.configrity._
 import scalaz._
 import scalaz.syntax.comonad._
 
-object MongoAccountManagerSpec extends Specification with RealMongoSpecSupport {
+object MongoAccountManagerSpec
+    extends Specification with RealMongoSpecSupport {
   val timeout = Duration(30, "seconds")
 
   "MongoAccountManager" should {
     "find an Account by accountId" in new AccountManager {
       accountManager.findAccountById(account.accountId).copoint must beLike {
-        case Some(Account(accountId,_,_,_,_,_,_,_,_,_,_)) => accountId must_== account.accountId
+        case Some(Account(accountId, _, _, _, _, _, _, _, _, _, _)) =>
+          accountId must_== account.accountId
       }
     }
 
-     "find an Account by email address" in new AccountManager {
-       accountManager.findAccountByEmail(account.email).copoint must beLike {
-        case Some(Account(accountId,_,_,_,_,_,_,_,_,_,_)) => accountId must_== account.accountId
+    "find an Account by email address" in new AccountManager {
+      accountManager.findAccountByEmail(account.email).copoint must beLike {
+        case Some(Account(accountId, _, _, _, _, _, _, _, _, _, _)) =>
+          accountId must_== account.accountId
       }
     }
 
@@ -76,49 +79,53 @@ object MongoAccountManagerSpec extends Specification with RealMongoSpecSupport {
         _ <- accountManager.updateAccount(updatedAccount)
         result2 <- accountManager.findAccountById(account.accountId)
       } yield result2).copoint must beLike {
-        case Some(Account(accountId,_,_,_,_,apiKey,_,_,_,_,_)) => apiKey must_== updatedAccount.apiKey
+        case Some(Account(accountId, _, _, _, _, apiKey, _, _, _, _, _)) =>
+          apiKey must_== updatedAccount.apiKey
       }
     }
 
     "move an Account to the deleted collection" in new AccountManager {
-      type Results = (Option[Account], Option[Account], Option[Account])//, Option[Account])
+      type Results = (Option[Account], Option[Account],
+      Option[Account]) //, Option[Account])
 
       (for {
         before <- accountManager.findAccountById(account.accountId)
         deleted <- accountManager.deleteAccount(before.get.accountId)
         after <- accountManager.findAccountById(account.accountId)
-       // deleteCol <- accountManager.findDeletedAccount(account.accountId)
+        // deleteCol <- accountManager.findDeletedAccount(account.accountId)
       } yield {
         (before, deleted, after)
       }).copoint must beLike {
         case (Some(t1), Some(t2), None) =>
           t1 must_== t2
-          //t1 must_== t3
+        //t1 must_== t3
       }
     }
 
     "succeed in deleting a previously deleted Account" in new AccountManager {
-      type Results = (Option[Account], Option[Account], Option[Account], Option[Account])//, Option[Account])
+      type Results = (Option[Account], Option[Account], Option[Account],
+      Option[Account]) //, Option[Account])
 
       (for {
         before <- accountManager.findAccountById(account.accountId)
         deleted1 <- accountManager.deleteAccount(before.get.accountId)
         deleted2 <- accountManager.deleteAccount(before.get.accountId)
         after <- accountManager.findAccountById(account.accountId)
-      //  deleteCol <- accountManager.findDeletedAccount(account.accountId)
+        //  deleteCol <- accountManager.findDeletedAccount(account.accountId)
       } yield {
         (before, deleted1, deleted2, after)
       }).copoint must beLike {
         case (Some(t1), Some(t2), None, None) =>
           t1 must_== t2
-          //t1 must_== t4
+        //t1 must_== t4
       }
     }
 
     "properly generate and retrieve a reset token" in new AccountManager {
       (for {
         tokenId <- accountManager.generateResetToken(account)
-        resolvedAccount <- accountManager.findAccountByResetToken(account.accountId, tokenId)
+        resolvedAccount <- accountManager.findAccountByResetToken(
+            account.accountId, tokenId)
       } yield resolvedAccount).copoint must beLike {
         case \/-(resolvedAccount) =>
           resolvedAccount.accountId must_== account.accountId
@@ -127,8 +134,10 @@ object MongoAccountManagerSpec extends Specification with RealMongoSpecSupport {
 
     "not locate expired password reset tokens" in new AccountManager {
       (for {
-        tokenId <- accountManager.generateResetToken(account, (new DateTime).minusMinutes(5))
-        resolvedAccount <- accountManager.findAccountByResetToken(account.accountId, tokenId)
+        tokenId <- accountManager.generateResetToken(
+            account, (new DateTime).minusMinutes(5))
+        resolvedAccount <- accountManager.findAccountByResetToken(
+            account.accountId, tokenId)
       } yield resolvedAccount).copoint must beLike {
         case -\/(_) => ok
       }
@@ -137,12 +146,17 @@ object MongoAccountManagerSpec extends Specification with RealMongoSpecSupport {
     "update an Account password with a reset token" in new AccountManager {
       val newPassword = "bluemeanies"
       (for {
-        tokenId    <- accountManager.generateResetToken(account)
-        _          <- accountManager.resetAccountPassword(account.accountId, tokenId, newPassword)
-        authResultBad  <- accountManager.authAccount(account.email, origPassword)
-        authResultGood <- accountManager.authAccount(account.email, newPassword)
+        tokenId <- accountManager.generateResetToken(account)
+        _ <- accountManager.resetAccountPassword(account.accountId,
+                                                 tokenId,
+                                                 newPassword)
+        authResultBad <- accountManager.authAccount(account.email,
+                                                    origPassword)
+        authResultGood <- accountManager.authAccount(account.email,
+                                                     newPassword)
       } yield (authResultBad, authResultGood)).copoint must beLike {
-        case (Failure("password mismatch"), Success(authenticated)) => authenticated.accountId must_== account.accountId
+        case (Failure("password mismatch"), Success(authenticated)) =>
+          authenticated.accountId must_== account.accountId
       }
     }
 
@@ -151,16 +165,20 @@ object MongoAccountManagerSpec extends Specification with RealMongoSpecSupport {
       val newPassword2 = "notreally"
 
       (for {
-        tokenId    <- accountManager.generateResetToken(account)
-        _          <- accountManager.resetAccountPassword(account.accountId, tokenId, newPassword)
-        _          <- accountManager.resetAccountPassword(account.accountId, tokenId, newPassword2)
+        tokenId <- accountManager.generateResetToken(account)
+        _ <- accountManager.resetAccountPassword(account.accountId,
+                                                 tokenId,
+                                                 newPassword)
+        _ <- accountManager.resetAccountPassword(account.accountId,
+                                                 tokenId,
+                                                 newPassword2)
         // We should still be able to authenticate with the *first* changed password
         authResult <- accountManager.authAccount(account.email, newPassword)
       } yield authResult).copoint must beLike[Validation[String, Account]] {
-        case Success(authenticated) => authenticated.accountId must_== account.accountId
+        case Success(authenticated) =>
+          authenticated.accountId must_== account.accountId
       }
     }
-
   }
 
   object Counter {
@@ -180,17 +198,28 @@ object MongoAccountManagerSpec extends Specification with RealMongoSpecSupport {
 
   class AccountManager extends After {
     val defaultActorSystem = ActorSystem("AccountManagerTest")
-    implicit val execContext = ExecutionContext.defaultExecutionContext(defaultActorSystem)
-    implicit val M = new UnsafeFutureComonad(execContext, Duration(60, "seconds"))
+    implicit val execContext =
+      ExecutionContext.defaultExecutionContext(defaultActorSystem)
+    implicit val M = new UnsafeFutureComonad(
+        execContext, Duration(60, "seconds"))
 
-    val accountManager = new MongoAccountManager(mongo, mongo.database("test_v1_" + dbInstance.getAndIncrement), defaultSettings) {
+    val accountManager = new MongoAccountManager(
+        mongo,
+        mongo.database("test_v1_" + dbInstance.getAndIncrement),
+        defaultSettings) {
       def newAccountId = M.point("test%04d".format(dbInstance.getAndIncrement))
     }
 
     val notFoundAccountId = "NOT-GOING-TO-FIND"
     val origPassword = "test password"
 
-    val account = (accountManager.createAccount("test@precog.com", origPassword, new DateTime, AccountPlan.Free) { _ => M.point("testapikey") }).copoint
+    val account = (accountManager
+      .createAccount(
+          "test@precog.com", origPassword, new DateTime, AccountPlan.Free) {
+        _ =>
+          M.point("testapikey")
+      })
+      .copoint
 
     def after = {
       defaultActorSystem.shutdown

@@ -6,7 +6,6 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 /**
   * @author Nikolay.Tropin
   */
-
 class ReplaceToWithUntilInspection extends OperationOnCollectionInspection {
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(ReplaceToWithUntil)
@@ -18,8 +17,11 @@ object ReplaceToWithUntil extends SimplificationType {
 
   override def getSimplification(expr: ScExpression): Option[Simplification] = {
     expr match {
-      case qual`.to`(x `-` literal("1")) =>
-        Some(replace(expr).withText(invocationText(qual, "until", x)).highlightFrom(qual))
+      case qual `.to` (x `-` literal("1")) =>
+        Some(
+            replace(expr)
+              .withText(invocationText(qual, "until", x))
+              .highlightFrom(qual))
       case _ => None
     }
   }

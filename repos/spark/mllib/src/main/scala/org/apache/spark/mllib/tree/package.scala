@@ -18,12 +18,11 @@
 package org.apache.spark.mllib
 
 /**
- * This package contains the default implementation of the decision tree algorithm, which supports:
- *  - binary classification,
- *  - regression,
- *  - information loss calculation with entropy and Gini for classification and
- *    variance for regression,
- *  - both continuous and categorical features.
- */
-package object tree {
-}
+  * This package contains the default implementation of the decision tree algorithm, which supports:
+  *  - binary classification,
+  *  - regression,
+  *  - information loss calculation with entropy and Gini for classification and
+  *    variance for regression,
+  *  - both continuous and categorical features.
+  */
+package object tree {}

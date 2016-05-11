@@ -3,10 +3,10 @@ package org.scalajs.core.tools.json
 import java.io.{Reader, Writer}
 
 /** A JSON implementation. Has a representation type and methods to convert
- *  this type to/from primitives, lists and maps.
- *
- *  Further, it can write/read a value of this type to a string.
- */
+  *  this type to/from primitives, lists and maps.
+  *
+  *  Further, it can write/read a value of this type to a string.
+  */
 private[json] trait AbstractJSONImpl {
 
   type Repr
@@ -28,5 +28,4 @@ private[json] trait AbstractJSONImpl {
 
   def deserialize(str: String): Repr
   def deserialize(reader: Reader): Repr
-
 }

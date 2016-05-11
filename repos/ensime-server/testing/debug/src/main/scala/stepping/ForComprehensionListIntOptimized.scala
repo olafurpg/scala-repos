@@ -21,9 +21,7 @@ object ForComprehensionListIntOptimized {
     for (n <- l) {
       noop(n)
     }
-
   }
-
 }
 
 class ForComprehensionListIntOptimized(l: List[Int]) {
@@ -37,7 +35,5 @@ class ForComprehensionListIntOptimized(l: List[Int]) {
     for (n <- l) {
       noop(n)
     }
-
   }
-
 }

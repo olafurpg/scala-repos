@@ -8,6 +8,6 @@ object Test extends Application {
 
   val a = new A
 
-  a./* line: 3 */foo[C](new C)
-  a./* line: 4 */foo(new D)
+  a. /* line: 3 */ foo[C](new C)
+  a. /* line: 4 */ foo(new D)
 }

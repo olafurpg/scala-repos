@@ -17,4 +17,3 @@ class SearchTest extends FunSuite {
     assert(Searching.search(Array("a", "b", "c"), "b") == 1)
   }
 }
-

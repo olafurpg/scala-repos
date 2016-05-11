@@ -1,7 +1,7 @@
 import Ordering.Implicits._
 
 class A {
-  import Predef.{ implicitly => ? }
+  import Predef.{implicitly => ?}
 
   ?[Ordering[List[Int]]]
   ?[Ordering[IndexedSeq[(Int, String)]]]

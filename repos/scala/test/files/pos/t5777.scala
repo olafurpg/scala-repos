@@ -17,11 +17,11 @@ object MyApp {
   implicitly[r.ring.E <:< BigInt.E]
 
   // fail on 2.10, works on 2.9.2
-  (null.asInstanceOf[BigInt.E] : r.ring.E)
+  (null.asInstanceOf[BigInt.E]: r.ring.E)
 
   // works on both versions
   val r1 = new Poly[BigInt.type](BigInt)
-  (null.asInstanceOf[BigInt.E] : r1.ring.E)
+  (null.asInstanceOf[BigInt.E]: r1.ring.E)
 
   // Oddly, -Xprint:typer reports that r and r1 have the same inferred type.
   //

@@ -9,15 +9,17 @@ import scala.collection.mutable.ListBuffer
 import scala.reflect.internal.util.RangePosition
 import scala.reflect.io.AbstractFile
 import scala.tools.nsc.symtab.Flags._
-import scala.tools.refactoring.common.{ CompilerAccess, EnrichedTrees }
+import scala.tools.refactoring.common.{CompilerAccess, EnrichedTrees}
 
 import org.ensime.api._
 
-class SemanticHighlighting(val global: RichPresentationCompiler) extends CompilerAccess with EnrichedTrees {
+class SemanticHighlighting(val global: RichPresentationCompiler)
+    extends CompilerAccess with EnrichedTrees {
 
   import global._
 
-  class SymDesigsTraverser(p: RangePosition, tpeSet: Set[SourceSymbol]) extends Traverser {
+  class SymDesigsTraverser(p: RangePosition, tpeSet: Set[SourceSymbol])
+      extends Traverser {
 
     val log = LoggerFactory.getLogger(getClass)
     val syms = ListBuffer[SymbolDesignation]()
@@ -58,7 +60,8 @@ class SemanticHighlighting(val global: RichPresentationCompiler) extends Compile
             add(DeprecatedSymbol)
           }
 
-          if (sym.ownerChain.exists(_.annotations.exists(_.atp.toString().endsWith("deprecating")))) {
+          if (sym.ownerChain.exists(_.annotations.exists(
+                      _.atp.toString().endsWith("deprecating")))) {
             add(DeprecatedSymbol)
           }
 
@@ -76,8 +79,9 @@ class SemanticHighlighting(val global: RichPresentationCompiler) extends Compile
               false
             }
           } else if (sym.isMethod) {
-            if (sym.nameString == "apply" || sym.nameString == "update") { true }
-            else if (sym.name.isOperatorName) {
+            if (sym.nameString == "apply" || sym.nameString == "update") {
+              true
+            } else if (sym.name.isOperatorName) {
               add(OperatorFieldSymbol)
             } else {
               add(FunctionCallSymbol)
@@ -170,8 +174,8 @@ class SemanticHighlighting(val global: RichPresentationCompiler) extends Compile
   }
 
   def symbolDesignationsInRegion(
-    p: RangePosition,
-    requestedTypes: List[SourceSymbol]
+      p: RangePosition,
+      requestedTypes: List[SourceSymbol]
   ): SymbolDesignations = {
     val typed = new Response[Tree]
     // AskLoadedTyped below doesn't wait, since this code should run in the pres. compiler thread.
@@ -187,6 +191,6 @@ class SemanticHighlighting(val global: RichPresentationCompiler) extends Compile
     }
   }
 
-  def compilationUnitOfFile(f: AbstractFile): Option[CompilationUnit] = unitOfFile.get(f)
-
+  def compilationUnitOfFile(f: AbstractFile): Option[CompilationUnit] =
+    unitOfFile.get(f)
 }

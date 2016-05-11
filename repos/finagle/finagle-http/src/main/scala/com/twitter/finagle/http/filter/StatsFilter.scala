@@ -5,26 +5,26 @@ import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.http.{Request, Response, Status}
 import com.twitter.util.{Duration, Future, Return, Stopwatch, Throw}
 
-
 /**
- * Statistic filter.
- *
- * Add counters:
- *    status.[code]
- *    status.[class]
- *    response_size (deprecated?)
- * And metrics:
- *    time.[code]
- *    time.[class]
- */
+  * Statistic filter.
+  *
+  * Add counters:
+  *    status.[code]
+  *    status.[class]
+  *    response_size (deprecated?)
+  * And metrics:
+  *    time.[code]
+  *    time.[class]
+  */
 class StatsFilter[REQUEST <: Request](stats: StatsReceiver)
-  extends SimpleFilter[REQUEST, Response] {
+    extends SimpleFilter[REQUEST, Response] {
 
   private[this] val statusReceiver = stats.scope("status")
   private[this] val timeReceiver = stats.scope("time")
   private[this] val responseSizeStat = stats.stat("response_size")
 
-  def apply(request: REQUEST, service: Service[REQUEST, Response]): Future[Response] = {
+  def apply(request: REQUEST,
+            service: Service[REQUEST, Response]): Future[Response] = {
     val elapsed = Stopwatch.start()
     val future = service(request)
     future respond {

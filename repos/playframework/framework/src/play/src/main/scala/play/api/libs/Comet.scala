@@ -4,75 +4,82 @@
 package play.api.libs
 
 import akka.NotUsed
-import akka.stream.scaladsl.{ Flow, Source }
-import akka.util.{ ByteString, ByteStringBuilder }
+import akka.stream.scaladsl.{Flow, Source}
+import akka.util.{ByteString, ByteStringBuilder}
 import org.apache.commons.lang3.StringEscapeUtils
 import play.api.libs.iteratee._
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsValue, Json}
 import play.core.Execution.Implicits.internalContext
 import play.twirl.api._
 
 /**
- * Helper function to produce a Comet using <a href="http://doc.akka.io/docs/akka/current/scala/stream/index.html">Akka Streams</a>.
- *
- * Please see <a href="https://en.wikipedia.org/wiki/Comet_(programming)">https://en.wikipedia.org/wiki/Comet_(programming)</a>
- * for details of Comet.
- *
- * Example:
- *
- * {{{
- *   def streamClock() = Action {
- *     val df: DateTimeFormatter = DateTimeFormatter.ofPattern("HH mm ss")
- *     val tickSource = Source.tick(0 millis, 100 millis, "TICK")
- *     val source = tickSource.map((tick) => df.format(ZonedDateTime.now()))
- *     Ok.chunked(source via Comet.flow("parent.clockChanged"))
- *   }
- * }}}
- *
- */
+  * Helper function to produce a Comet using <a href="http://doc.akka.io/docs/akka/current/scala/stream/index.html">Akka Streams</a>.
+  *
+  * Please see <a href="https://en.wikipedia.org/wiki/Comet_(programming)">https://en.wikipedia.org/wiki/Comet_(programming)</a>
+  * for details of Comet.
+  *
+  * Example:
+  *
+  * {{{
+  *   def streamClock() = Action {
+  *     val df: DateTimeFormatter = DateTimeFormatter.ofPattern("HH mm ss")
+  *     val tickSource = Source.tick(0 millis, 100 millis, "TICK")
+  *     val source = tickSource.map((tick) => df.format(ZonedDateTime.now()))
+  *     Ok.chunked(source via Comet.flow("parent.clockChanged"))
+  *   }
+  * }}}
+  *
+  */
 object Comet {
 
-  val initialHtmlChunk = Html(Array.fill[Char](5 * 1024)(' ').mkString + "<html><body>")
+  val initialHtmlChunk = Html(
+      Array.fill[Char](5 * 1024)(' ').mkString + "<html><body>")
 
   val initialByteString = ByteString.fromString(initialHtmlChunk.toString())
 
   /**
-   * Create a Comet Enumeratee.
-   *
-   * @tparam E Type of messages handled by this comet stream.
-   * @param callback Javascript function to call on the browser for each message.
-   * @param initialChunk Initial chunk of data to send for browser compatibility (default to send 5Kb of blank data)
-   */
+    * Create a Comet Enumeratee.
+    *
+    * @tparam E Type of messages handled by this comet stream.
+    * @param callback Javascript function to call on the browser for each message.
+    * @param initialChunk Initial chunk of data to send for browser compatibility (default to send 5Kb of blank data)
+    */
   @deprecated("Please use Comet.flow", "2.5.0")
-  def apply[E](callback: String, initialChunk: Html = initialHtmlChunk): Enumeratee[E, Html] = new Enumeratee[E, Html] {
-    val cb: ByteString = ByteString.fromString(callback)
-    def applyOn[A](inner: Iteratee[Html, A]): Iteratee[E, Iteratee[Html, A]] = {
-      val fedWithInitialChunk = Iteratee.flatten(Enumerator(initialChunk) |>> inner)
-      val eToScript = Enumeratee.map[E](toHtml(callback, _))
-      eToScript.applyOn(fedWithInitialChunk)
+  def apply[E](callback: String,
+               initialChunk: Html = initialHtmlChunk): Enumeratee[E, Html] =
+    new Enumeratee[E, Html] {
+      val cb: ByteString = ByteString.fromString(callback)
+      def applyOn[A](
+          inner: Iteratee[Html, A]): Iteratee[E, Iteratee[Html, A]] = {
+        val fedWithInitialChunk =
+          Iteratee.flatten(Enumerator(initialChunk) |>> inner)
+        val eToScript = Enumeratee.map[E](toHtml(callback, _))
+        eToScript.applyOn(fedWithInitialChunk)
+      }
     }
-  }
 
   /**
-   * Produces a Flow of escaped ByteString from a series of String elements.  Calls
-   * out to Comet.flow internally.
-   *
-   * @param callbackName the javascript callback method.
-   * @return a flow of ByteString elements.
-   */
+    * Produces a Flow of escaped ByteString from a series of String elements.  Calls
+    * out to Comet.flow internally.
+    *
+    * @param callbackName the javascript callback method.
+    * @return a flow of ByteString elements.
+    */
   def string(callbackName: String): Flow[String, ByteString, NotUsed] = {
-    Flow[String].map(str =>
-      ByteString.fromString("'" + StringEscapeUtils.escapeEcmaScript(str) + "'")
-    ).via(flow(callbackName))
+    Flow[String]
+      .map(str =>
+            ByteString.fromString(
+                "'" + StringEscapeUtils.escapeEcmaScript(str) + "'"))
+      .via(flow(callbackName))
   }
 
   /**
-   * Produces a flow of ByteString using `Json.fromJson(_).get` from a Flow of JsValue.  Calls
-   * out to Comet.flow internally.
-   *
-   * @param callbackName the javascript callback method.
-   * @return a flow of ByteString elements.
-   */
+    * Produces a flow of ByteString using `Json.fromJson(_).get` from a Flow of JsValue.  Calls
+    * out to Comet.flow internally.
+    *
+    * @param callbackName the javascript callback method.
+    * @return a flow of ByteString elements.
+    */
   def json(callbackName: String): Flow[JsValue, ByteString, NotUsed] = {
     Flow[JsValue].map { msg =>
       ByteString.fromString(Json.asciiStringify(msg))
@@ -80,25 +87,30 @@ object Comet {
   }
 
   /**
-   * Creates a flow of ByteString.  Useful when you have objects that are not JSON or String where
-   * you may have to do your own conversion.
-   *
-   * Usage example:
-   *
-   * {{{
-   *   val htmlStream: Source[ByteString, ByteString, NotUsed] = Flow[Html].map { html =>
-   *     ByteString.fromString(html.toString())
-   *   }
-   *   ...
-   *   Ok.chunked(htmlStream via Comet.flow("parent.clockChanged"))
-   * }}}
-   */
-  def flow(callbackName: String, initialChunk: ByteString = initialByteString): Flow[ByteString, ByteString, NotUsed] = {
+    * Creates a flow of ByteString.  Useful when you have objects that are not JSON or String where
+    * you may have to do your own conversion.
+    *
+    * Usage example:
+    *
+    * {{{
+    *   val htmlStream: Source[ByteString, ByteString, NotUsed] = Flow[Html].map { html =>
+    *     ByteString.fromString(html.toString())
+    *   }
+    *   ...
+    *   Ok.chunked(htmlStream via Comet.flow("parent.clockChanged"))
+    * }}}
+    */
+  def flow(callbackName: String, initialChunk: ByteString = initialByteString)
+    : Flow[ByteString, ByteString, NotUsed] = {
     val cb: ByteString = ByteString.fromString(callbackName)
-    Flow.apply[ByteString].map(msg => formatted(cb, msg)).prepend(Source.single(initialChunk))
+    Flow
+      .apply[ByteString]
+      .map(msg => formatted(cb, msg))
+      .prepend(Source.single(initialChunk))
   }
 
-  private def formatted(callbackName: ByteString, javascriptMessage: ByteString): ByteString = {
+  private def formatted(
+      callbackName: ByteString, javascriptMessage: ByteString): ByteString = {
     val b: ByteStringBuilder = new ByteStringBuilder
     b.append(ByteString.fromString("""<script type="text/javascript">"""))
     b.append(callbackName)
@@ -115,9 +127,10 @@ object Comet {
       case json: JsValue =>
         Json.stringify(json)
       case other =>
-        throw new IllegalStateException("Illegal type found: only String or JsValue elements are valid")
+        throw new IllegalStateException(
+            "Illegal type found: only String or JsValue elements are valid")
     }
-    Html(s"""<script type="text/javascript">${callbackName}(${javascriptMessage});</script>""")
+    Html(
+        s"""<script type="text/javascript">${callbackName}(${javascriptMessage});</script>""")
   }
-
 }

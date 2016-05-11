@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata.protobuf
 
 import scala.concurrent.duration._
@@ -23,17 +23,24 @@ import akka.util.ByteString
 import akka.cluster.UniqueAddress
 import com.typesafe.config.ConfigFactory
 
-class ReplicatorMessageSerializerSpec extends TestKit(ActorSystem("ReplicatorMessageSerializerSpec",
-  ConfigFactory.parseString("""
+class ReplicatorMessageSerializerSpec
+    extends TestKit(
+        ActorSystem(
+            "ReplicatorMessageSerializerSpec",
+            ConfigFactory.parseString("""
     akka.actor.provider=akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp.port=0
     """))) with WordSpecLike with Matchers with BeforeAndAfterAll {
 
-  val serializer = new ReplicatorMessageSerializer(system.asInstanceOf[ExtendedActorSystem])
+  val serializer = new ReplicatorMessageSerializer(
+      system.asInstanceOf[ExtendedActorSystem])
 
-  val address1 = UniqueAddress(Address("akka.tcp", system.name, "some.host.org", 4711), 1)
-  val address2 = UniqueAddress(Address("akka.tcp", system.name, "other.host.org", 4711), 2)
-  val address3 = UniqueAddress(Address("akka.tcp", system.name, "some.host.org", 4712), 3)
+  val address1 = UniqueAddress(
+      Address("akka.tcp", system.name, "some.host.org", 4711), 1)
+  val address2 = UniqueAddress(
+      Address("akka.tcp", system.name, "other.host.org", 4711), 2)
+  val address3 = UniqueAddress(
+      Address("akka.tcp", system.name, "some.host.org", 4712), 3)
 
   val keyA = GSetKey[String]("A")
 
@@ -63,20 +70,27 @@ class ReplicatorMessageSerializerSpec extends TestKit(ActorSystem("ReplicatorMes
       checkSerialization(Unsubscribe(keyA, ref1))
       checkSerialization(Changed(keyA)(data1))
       checkSerialization(DataEnvelope(data1))
-      checkSerialization(DataEnvelope(data1, pruning = Map(
-        address1 -> PruningState(address2, PruningPerformed),
-        address3 -> PruningState(address2, PruningInitialized(Set(address1.address))))))
+      checkSerialization(
+          DataEnvelope(
+              data1,
+              pruning = Map(
+                    address1 -> PruningState(address2, PruningPerformed),
+                    address3 -> PruningState(
+                        address2, PruningInitialized(Set(address1.address))))))
       checkSerialization(Write("A", DataEnvelope(data1)))
       checkSerialization(WriteAck)
       checkSerialization(Read("A"))
       checkSerialization(ReadResult(Some(DataEnvelope(data1))))
       checkSerialization(ReadResult(None))
-      checkSerialization(Status(Map("A" -> ByteString.fromString("a"),
-        "B" -> ByteString.fromString("b")), chunk = 3, totChunks = 10))
+      checkSerialization(
+          Status(Map("A" -> ByteString.fromString("a"),
+                     "B" -> ByteString.fromString("b")),
+                 chunk = 3,
+                 totChunks = 10))
       checkSerialization(Gossip(Map("A" -> DataEnvelope(data1),
-        "B" -> DataEnvelope(GSet() + "b" + "c")), sendBack = true))
+                                    "B" -> DataEnvelope(GSet() + "b" + "c")),
+                                sendBack = true))
     }
-
   }
 
   "Cache" must {
@@ -138,7 +152,8 @@ class ReplicatorMessageSerializerSpec extends TestKit(ActorSystem("ReplicatorMes
       cache.get(e) should be("E")
     }
 
-    "handle Int wrap around" ignore { // ignored because it takes 20 seconds (but it works)
+    "handle Int wrap around" ignore {
+      // ignored because it takes 20 seconds (but it works)
       val cache = new SmallCache[Read, String](2, 5.seconds, _ ⇒ null)
       val a = Read("a")
       val x = a -> "A"
@@ -176,7 +191,8 @@ class ReplicatorMessageSerializerSpec extends TestKit(ActorSystem("ReplicatorMes
         }
       }
 
-      val cache = new SmallCache[Read, AnyRef](4, 5.seconds, a ⇒ createValue(a))
+      val cache =
+        new SmallCache[Read, AnyRef](4, 5.seconds, a ⇒ createValue(a))
       val a = Read("a")
       val v1 = cache.getOrAdd(a)
       v1.toString should be("v1")
@@ -206,6 +222,5 @@ class ReplicatorMessageSerializerSpec extends TestKit(ActorSystem("ReplicatorMes
       cache.get(b) should be("B")
       cache.get(c) should be("C")
     }
-
   }
 }

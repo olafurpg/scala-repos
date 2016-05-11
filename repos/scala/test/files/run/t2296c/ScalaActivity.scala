@@ -11,7 +11,7 @@ abstract class Outer extends Display {
 
   object ScalaActivity extends Action {
     def run(v: Int) {
-      val testSet = List(1,2,3)
+      val testSet = List(1, 2, 3)
       testSet.map(p => m_glob.items(p)) // crash with illegal access
     }
   }

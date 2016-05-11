@@ -1,10 +1,10 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.io
 
 import java.net.InetSocketAddress
-import akka.testkit.{ TestProbe, ImplicitSender, AkkaSpec }
+import akka.testkit.{TestProbe, ImplicitSender, AkkaSpec}
 import akka.util.ByteString
 import akka.actor.ActorRef
 import akka.io.Udp._
@@ -41,7 +41,6 @@ class UdpIntegrationSpec extends AkkaSpec("""
       simpleSender ! Send(data, serverAddress)
 
       expectMsgType[Received].data should ===(data)
-
     }
 
     "be able to send several packet back and forth with binding" in {
@@ -79,7 +78,8 @@ class UdpIntegrationSpec extends AkkaSpec("""
     "call SocketOption.beforeBind method before bind." in {
       val commander = TestProbe()
       val assertOption = AssertBeforeBind()
-      commander.send(IO(Udp), Bind(testActor, addresses(3), options = List(assertOption)))
+      commander.send(
+          IO(Udp), Bind(testActor, addresses(3), options = List(assertOption)))
       commander.expectMsg(Bound(addresses(3)))
       assert(assertOption.beforeCalled === 1)
     }
@@ -87,7 +87,8 @@ class UdpIntegrationSpec extends AkkaSpec("""
     "call SocketOption.afterConnect method after binding." in {
       val commander = TestProbe()
       val assertOption = AssertAfterChannelBind()
-      commander.send(IO(Udp), Bind(testActor, addresses(4), options = List(assertOption)))
+      commander.send(
+          IO(Udp), Bind(testActor, addresses(4), options = List(assertOption)))
       commander.expectMsg(Bound(addresses(4)))
       assert(assertOption.afterCalled === 1)
     }
@@ -95,12 +96,12 @@ class UdpIntegrationSpec extends AkkaSpec("""
     "call DatagramChannelCreator.create method when opening channel" in {
       val commander = TestProbe()
       val assertOption = AssertOpenDatagramChannel()
-      commander.send(IO(Udp), Bind(testActor, addresses(5), options = List(assertOption)))
+      commander.send(
+          IO(Udp), Bind(testActor, addresses(5), options = List(assertOption)))
       commander.expectMsg(Bound(addresses(5)))
       assert(assertOption.openCalled === 1)
     }
   }
-
 }
 
 private case class AssertBeforeBind() extends SocketOption {

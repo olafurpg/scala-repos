@@ -2,7 +2,7 @@ import scala.language.higherKinds
 
 object TestExplicit {
   trait TC[A]
-  def fTt[A,E[X] <: List[X]](a: A)(implicit tt: TC[E[A]]) = a
+  def fTt[A, E[X] <: List[X]](a: A)(implicit tt: TC[E[A]]) = a
   implicit def tc[T]: TC[T] = ???
 
   // Typechecking results in SOE in TypeVar.isGround
@@ -19,9 +19,9 @@ object TestExplicit {
   // which leads to a cyclic constraint.
 }
 
-object TestImplicit    {
+object TestImplicit {
   trait TC[A]
-  def fTt[A,E[X] <: List[X]](a: A)(implicit tt: TC[E[A]]) = a
+  def fTt[A, E[X] <: List[X]](a: A)(implicit tt: TC[E[A]]) = a
   implicit def tc[T]: TC[T] = ???
 
   // Oddly enough, this one works.

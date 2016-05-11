@@ -3,41 +3,36 @@ package codegen
 
 import scala.reflect.internal.Flags._
 
-trait GenSymbols {
-  self: Reifier =>
+trait GenSymbols { self: Reifier =>
 
   import global._
 
   /** Symbol table of the reifee.
-   *
-   *  Keeps track of auxiliary symbols that are necessary for this reification session.
-   *  These include:
-   *    1) Free vars (terms, types and existentials),
-   *    2) Non-locatable symbols (sometimes, e.g. for RefinedTypes, we need to reify these; to do that we create their copies in the reificode)
-   *    3) Non-locatable symbols that are referred by #1, #2 and #3
-   *
-   *  Exposes three main methods:
-   *    1) `syms` that lists symbols belonging to the table,
-   *    2) `symXXX` family of methods that provide information about the symbols in the table,
-   *    3) `encode` that renders the table into a list of trees (recursively populating #3 and setting up initialization code for #1, #2 and #3)
-   */
+    *
+    *  Keeps track of auxiliary symbols that are necessary for this reification session.
+    *  These include:
+    *    1) Free vars (terms, types and existentials),
+    *    2) Non-locatable symbols (sometimes, e.g. for RefinedTypes, we need to reify these; to do that we create their copies in the reificode)
+    *    3) Non-locatable symbols that are referred by #1, #2 and #3
+    *
+    *  Exposes three main methods:
+    *    1) `syms` that lists symbols belonging to the table,
+    *    2) `symXXX` family of methods that provide information about the symbols in the table,
+    *    3) `encode` that renders the table into a list of trees (recursively populating #3 and setting up initialization code for #1, #2 and #3)
+    */
   def symtab: SymbolTable = state.symtab
 
   /** Reify a reference to a symbol */
   def reifySymRef(sym: Symbol): Tree = {
     assert(sym != null, "sym is null")
-    if (sym == NoSymbol)
-      mirrorSelect(nme.NoSymbol)
-    else if (sym.isRootPackage)
-      mirrorMirrorSelect(nme.RootPackage)
-    else if (sym.isRoot)
-      mirrorMirrorSelect(nme.RootClass)
-    else if (sym.isEmptyPackage)
-      mirrorMirrorSelect(nme.EmptyPackage)
-    else if (sym.isEmptyPackageClass)
-      mirrorMirrorSelect(nme.EmptyPackageClass)
+    if (sym == NoSymbol) mirrorSelect(nme.NoSymbol)
+    else if (sym.isRootPackage) mirrorMirrorSelect(nme.RootPackage)
+    else if (sym.isRoot) mirrorMirrorSelect(nme.RootClass)
+    else if (sym.isEmptyPackage) mirrorMirrorSelect(nme.EmptyPackage)
+    else if (sym.isEmptyPackageClass) mirrorMirrorSelect(nme.EmptyPackageClass)
     else if (sym.isModuleClass)
-      if (sym.sourceModule.isLocatable) Select(Select(reify(sym.sourceModule), nme.asModule), nme.moduleClass)
+      if (sym.sourceModule.isLocatable)
+        Select(Select(reify(sym.sourceModule), nme.asModule), nme.moduleClass)
       else reifySymDef(sym)
     else if (sym.hasPackageFlag)
       mirrorMirrorCall(nme.staticPackage, reify(sym.fullName))
@@ -71,23 +66,32 @@ trait GenSymbols {
        *    object B { object B } => selectType(staticModule("B"), "B")
        *    object B { package B } => impossible
        */
-      val hasPackagelessParent = sym.ownerChain.tail.tail exists (_.isEmptyPackageClass)
-      if (sym.isStatic && (sym.isClass || sym.isModule) && !hasPackagelessParent) {
+      val hasPackagelessParent =
+        sym.ownerChain.tail.tail exists (_.isEmptyPackageClass)
+      if (sym.isStatic && (sym.isClass || sym.isModule) &&
+          !hasPackagelessParent) {
         // SI-6238: if applicable, emit references to StandardDefinitions instead of staticClass/staticModule calls
         val resolver = if (sym.isType) nme.staticClass else nme.staticModule
         mirrorMirrorCall(resolver, reify(sym.fullName))
       } else {
-        if (reifyDebug) println("Locatable: %s (%s) owned by %s (%s) at %s".format(sym, sym.accurateKindString, sym.owner, sym.owner.accurateKindString, sym.owner.fullNameString))
+        if (reifyDebug)
+          println(
+              "Locatable: %s (%s) owned by %s (%s) at %s".format(
+                  sym,
+                  sym.accurateKindString,
+                  sym.owner,
+                  sym.owner.accurateKindString,
+                  sym.owner.fullNameString))
         val rowner = reify(sym.owner)
         val rname = reify(sym.name.toString)
-        if (sym.isType)
-          mirrorBuildCall(nme.selectType, rowner, rname)
-        else if (sym.isMethod && sym.owner.isClass && sym.owner.info.decl(sym.name).isOverloaded) {
+        if (sym.isType) mirrorBuildCall(nme.selectType, rowner, rname)
+        else if (sym.isMethod && sym.owner.isClass &&
+                 sym.owner.info.decl(sym.name).isOverloaded) {
           val index = sym.owner.info.decl(sym.name).alternatives indexOf sym
           assert(index >= 0, sym)
-          mirrorBuildCall(nme.selectOverloadedMethod, rowner, rname, reify(index))
-        } else
-          mirrorBuildCall(nme.selectTerm, rowner, rname)
+          mirrorBuildCall(
+              nme.selectOverloadedMethod, rowner, rname, reify(index))
+        } else mirrorBuildCall(nme.selectTerm, rowner, rname)
       }
     } else {
       // todo. make sure that free methods work correctly
@@ -99,8 +103,12 @@ trait GenSymbols {
 
   def reifyFreeTerm(binding: Tree): Tree =
     reifyIntoSymtab(binding.symbol) { sym =>
-      if (reifyDebug) println("Free term" + (if (sym.isCapturedVariable) " (captured)" else "") + ": " + sym + "(" + sym.accurateKindString + ")")
-      val name = newTermName("" + nme.REIFY_FREE_PREFIX + sym.name + (if (sym.isType) nme.REIFY_FREE_THIS_SUFFIX else ""))
+      if (reifyDebug)
+        println(
+            "Free term" + (if (sym.isCapturedVariable) " (captured)" else "") +
+            ": " + sym + "(" + sym.accurateKindString + ")")
+      val name = newTermName("" + nme.REIFY_FREE_PREFIX + sym.name +
+          (if (sym.isType) nme.REIFY_FREE_THIS_SUFFIX else ""))
       // We need to note whether the free value being reified is stable or not to guide subsequent reflective compilation.
       // Here's why reflection compilation needs our help.
       //
@@ -131,31 +139,63 @@ trait GenSymbols {
       if (sym.isCapturedVariable) {
         assert(binding.isInstanceOf[Ident], showRaw(binding))
         val capturedBinding = referenceCapturedVariable(sym)
-        Reification(name, capturedBinding, mirrorBuildCall(nme.newFreeTerm, reify(sym.name.toString), capturedBinding, mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)), reify(origin(sym))))
+        Reification(
+            name,
+            capturedBinding,
+            mirrorBuildCall(nme.newFreeTerm,
+                            reify(sym.name.toString),
+                            capturedBinding,
+                            mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+                            reify(origin(sym))))
       } else {
-        Reification(name, binding, mirrorBuildCall(nme.newFreeTerm, reify(sym.name.toString), binding, mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)), reify(origin(sym))))
+        Reification(
+            name,
+            binding,
+            mirrorBuildCall(nme.newFreeTerm,
+                            reify(sym.name.toString),
+                            binding,
+                            mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+                            reify(origin(sym))))
       }
     }
 
   def reifyFreeType(binding: Tree): Tree =
     reifyIntoSymtab(binding.symbol) { sym =>
-      if (reifyDebug) println("Free type: %s (%s)".format(sym, sym.accurateKindString))
+      if (reifyDebug)
+        println("Free type: %s (%s)".format(sym, sym.accurateKindString))
       state.reificationIsConcrete = false
       val name: TermName = nme.REIFY_FREE_PREFIX append sym.name
-      Reification(name, binding, mirrorBuildCall(nme.newFreeType, reify(sym.name.toString), mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)), reify(origin(sym))))
+      Reification(
+          name,
+          binding,
+          mirrorBuildCall(nme.newFreeType,
+                          reify(sym.name.toString),
+                          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+                          reify(origin(sym))))
     }
 
   def reifySymDef(sym: Symbol): Tree =
     reifyIntoSymtab(sym) { sym =>
-      if (reifyDebug) println("Sym def: %s (%s)".format(sym, sym.accurateKindString))
+      if (reifyDebug)
+        println("Sym def: %s (%s)".format(sym, sym.accurateKindString))
       val name: TermName = nme.REIFY_SYMDEF_PREFIX append sym.name
-      def reifiedOwner = if (sym.owner.isLocatable) reify(sym.owner) else reifySymDef(sym.owner)
-      Reification(name, Ident(sym), mirrorBuildCall(nme.newNestedSymbol, reifiedOwner, reify(sym.name), reify(sym.pos), mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)), reify(sym.isClass)))
+      def reifiedOwner =
+        if (sym.owner.isLocatable) reify(sym.owner) else reifySymDef(sym.owner)
+      Reification(
+          name,
+          Ident(sym),
+          mirrorBuildCall(nme.newNestedSymbol,
+                          reifiedOwner,
+                          reify(sym.name),
+                          reify(sym.pos),
+                          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+                          reify(sym.isClass)))
     }
 
   case class Reification(name: Name, binding: Tree, tree: Tree)
 
-  private def reifyIntoSymtab(sym: Symbol)(reificode: Symbol => Reification): Tree = {
+  private def reifyIntoSymtab(sym: Symbol)(
+      reificode: Symbol => Reification): Tree = {
     def fromSymtab = symtab symRef sym
     if (fromSymtab == EmptyTree) {
       // reification is lazy, so that we can carefully choose where to evaluate it
@@ -171,7 +211,8 @@ trait GenSymbols {
       //    produces valid Scala code (with vals in a block depending only on lexically preceding vals)
       val reification = reificode(sym)
       import reification.{name, binding}
-      val tree = reification.tree updateAttachment ReifyBindingAttachment(binding)
+      val tree =
+        reification.tree updateAttachment ReifyBindingAttachment(binding)
       state.symtab += (sym, name.toTermName, tree)
     }
     fromSymtab

@@ -15,9 +15,13 @@ class BinaryClockTest extends Specification {
   def write(c: Clock): List[String] =
     (BinaryFormat.clock(since) write c).showBytes.split(',').toList
   def read(bytes: List[String]): Clock =
-    (BinaryFormat.clock(since).read(ByteArray.parseBytes(bytes), false, false))(chess.White)
+    (BinaryFormat
+      .clock(since)
+      .read(ByteArray.parseBytes(bytes), false, false))(chess.White)
   def isomorphism(c: Clock): Clock =
-    (BinaryFormat.clock(since).read(BinaryFormat.clock(since) write c, false, false))(chess.White)
+    (BinaryFormat
+      .clock(since)
+      .read(BinaryFormat.clock(since) write c, false, false))(chess.White)
 
   "binary Clock" should {
     val clock = Clock(120, 2)
@@ -27,23 +31,34 @@ class BinaryClockTest extends Specification {
         bits22 ::: List.fill(10)(_0_)
       }
       write(clock.giveTime(chess.White, 0.03f)) must_== {
-        bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(7)(_0_)
+        bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(7)(
+            _0_)
       }
       write(clock.giveTime(chess.White, -0.03f)) must_== {
-        bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(7)(_0_)
+        bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(7)(
+            _0_)
       }
       write(Clock(0, 3)) must_== {
-        List("00000000", "00000011", "10000000", "00000001", "00101100", "10000000", "00000001", "00101100") ::: List.fill(4)(_0_)
+        List("00000000",
+             "00000011",
+             "10000000",
+             "00000001",
+             "00101100",
+             "10000000",
+             "00000001",
+             "00101100") ::: List.fill(4)(_0_)
       }
     }
     "read" in {
       read(bits22 ::: List.fill(11)(_0_)) must_== {
         clock
       }
-      read(bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(8)(_0_)) must_== {
+      read(bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(
+              8)(_0_)) must_== {
         clock.giveTime(chess.White, 0.03f)
       }
-      read(bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(8)(_0_)) must_== {
+      read(bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(
+              8)(_0_)) must_== {
         clock.giveTime(chess.White, -0.03f)
       }
     }

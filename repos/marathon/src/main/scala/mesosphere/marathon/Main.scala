@@ -1,16 +1,16 @@
 package mesosphere.marathon
 
 import com.google.inject.Module
-import com.twitter.common.quantity.{ Amount, Time }
+import com.twitter.common.quantity.{Amount, Time}
 import com.twitter.common.zookeeper.ZooKeeperClient
 import mesosphere.chaos.App
-import mesosphere.chaos.http.{ HttpModule, HttpService }
+import mesosphere.chaos.http.{HttpModule, HttpService}
 import mesosphere.chaos.metrics.MetricsModule
 import mesosphere.marathon.api.MarathonRestModule
 import mesosphere.marathon.core.CoreGuiceModule
 import mesosphere.marathon.event.EventModule
 import mesosphere.marathon.event.http.HttpEventModule
-import mesosphere.marathon.metrics.{ MetricsReporterModule, MetricsReporterService }
+import mesosphere.marathon.metrics.{MetricsReporterModule, MetricsReporterService}
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
@@ -20,13 +20,13 @@ class MarathonApp extends App {
 
   lazy val zk: ZooKeeperClient = {
     require(
-      conf.zooKeeperSessionTimeout() < Integer.MAX_VALUE,
-      "ZooKeeper timeout too large!"
+        conf.zooKeeperSessionTimeout() < Integer.MAX_VALUE,
+        "ZooKeeper timeout too large!"
     )
 
     val client = new ZooKeeperClient(
-      Amount.of(conf.zooKeeperSessionTimeout().toInt, Time.MILLISECONDS),
-      conf.zooKeeperHostAddresses.asJavaCollection
+        Amount.of(conf.zooKeeperSessionTimeout().toInt, Time.MILLISECONDS),
+        conf.zooKeeperHostAddresses.asJavaCollection
     )
 
     // Marathon can't do anything useful without a ZK connection
@@ -38,8 +38,7 @@ class MarathonApp extends App {
         log.info("Connecting to ZooKeeper...")
         client.get
         connectedToZk = true
-      }
-      catch {
+      } catch {
         case t: Throwable =>
           log.warn("Unable to connect to ZooKeeper, retrying...")
       }
@@ -49,22 +48,22 @@ class MarathonApp extends App {
 
   def modules(): Seq[Module] = {
     Seq(
-      new HttpModule(conf),
-      new MetricsModule,
-      new MetricsReporterModule(conf),
-      new MarathonModule(conf, conf, zk),
-      new MarathonRestModule,
-      new EventModule(conf),
-      new DebugModule(conf),
-      new CoreGuiceModule
+        new HttpModule(conf),
+        new MetricsModule,
+        new MetricsReporterModule(conf),
+        new MarathonModule(conf, conf, zk),
+        new MarathonRestModule,
+        new EventModule(conf),
+        new DebugModule(conf),
+        new CoreGuiceModule
     ) ++ getEventsModule
   }
 
   def getEventsModule: Option[Module] = {
     conf.eventSubscriber.get flatMap {
       case "http_callback" =>
-        log.info("Using HttpCallbackEventSubscriber for event" +
-          "notification")
+        log.info(
+            "Using HttpCallbackEventSubscriber for event" + "notification")
         Some(new HttpEventModule(conf))
 
       case _ =>
@@ -83,12 +82,13 @@ class MarathonApp extends App {
   def runDefault(): Unit = {
     setConcurrentContextDefaults()
 
-    log.info(s"Starting Marathon ${BuildInfo.version} with ${args.mkString(" ")}")
+    log.info(
+        s"Starting Marathon ${BuildInfo.version} with ${args.mkString(" ")}")
 
     run(
-      classOf[HttpService],
-      classOf[MarathonSchedulerService],
-      classOf[MetricsReporterService]
+        classOf[HttpService],
+        classOf[MarathonSchedulerService],
+        classOf[MetricsReporterService]
     )
   }
 

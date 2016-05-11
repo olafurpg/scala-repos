@@ -5,20 +5,33 @@ import java.io.File
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 trait Client {
-  def message(kind: Kind, text: String, source: Option[File] = None, line: Option[Long] = None, column: Option[Long] = None)
+  def message(kind: Kind,
+              text: String,
+              source: Option[File] = None,
+              line: Option[Long] = None,
+              column: Option[Long] = None)
 
-  def error(text: String, source: Option[File] = None, line: Option[Long] = None, column: Option[Long] = None) {
+  def error(text: String,
+            source: Option[File] = None,
+            line: Option[Long] = None,
+            column: Option[Long] = None) {
     message(Kind.ERROR, text, source, line, column)
   }
 
-  def warning(text: String, source: Option[File] = None, line: Option[Long] = None, column: Option[Long] = None) {
+  def warning(text: String,
+              source: Option[File] = None,
+              line: Option[Long] = None,
+              column: Option[Long] = None) {
     message(Kind.WARNING, text, source, line, column)
   }
 
-  def info(text: String, source: Option[File] = None, line: Option[Long] = None, column: Option[Long] = None) {
+  def info(text: String,
+           source: Option[File] = None,
+           line: Option[Long] = None,
+           column: Option[Long] = None) {
     message(Kind.INFO, text, source, line, column)
   }
 
@@ -35,9 +48,8 @@ trait Client {
   def deleted(module: File)
 
   def isCanceled: Boolean
-  
+
   def worksheetOutput(text: String) {}
-  
+
   def compilationEnd() {}
 }
-

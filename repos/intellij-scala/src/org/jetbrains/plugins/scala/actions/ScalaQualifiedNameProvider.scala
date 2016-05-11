@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTypeDefinition}
 
 /**
- * @author Alefas
- * @since 25.06.12
- */
-
+  * @author Alefas
+  * @since 25.06.12
+  */
 class ScalaQualifiedNameProvider extends QualifiedNameProvider {
   def adjustElementToCopy(element: PsiElement) = null
 
@@ -37,7 +36,9 @@ class ScalaQualifiedNameProvider extends QualifiedNameProvider {
     new JavaQualifiedNameProvider().qualifiedNameToElement(fqn, project) //todo:
   }
 
-  def insertQualifiedName(fqn: String, element: PsiElement, editor: Editor, project: Project) {
-    new JavaQualifiedNameProvider().insertQualifiedName(fqn, element, editor, project) //todo:
+  def insertQualifiedName(
+      fqn: String, element: PsiElement, editor: Editor, project: Project) {
+    new JavaQualifiedNameProvider()
+      .insertQualifiedName(fqn, element, editor, project) //todo:
   }
 }

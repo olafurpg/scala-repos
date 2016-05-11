@@ -18,4 +18,4 @@ true
 try
 while
 yield
-*/
+ */

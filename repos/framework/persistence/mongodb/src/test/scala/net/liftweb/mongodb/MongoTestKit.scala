@@ -27,33 +27,36 @@ import com.mongodb.MongoClient
 trait MongoTestKit extends Specification with BeforeAfterEach {
   sequential
 
-  def dbName = "lift_"+this.getClass.getName
-    .replace("$", "")
-    .replace("net.liftweb.mongodb.", "")
-    .replace(".", "_")
-    .toLowerCase
+  def dbName =
+    "lift_" + this.getClass.getName
+      .replace("$", "")
+      .replace("net.liftweb.mongodb.", "")
+      .replace(".", "_")
+      .toLowerCase
 
   def mongo = new MongoClient("127.0.0.1", 27017)
 
   // If you need more than one db, override this
-  def dbs: List[(ConnectionIdentifier, String)] = List((DefaultConnectionIdentifier, dbName))
+  def dbs: List[(ConnectionIdentifier, String)] =
+    List((DefaultConnectionIdentifier, dbName))
 
   def debug = false
 
   def before = {
     // define the dbs
-    dbs foreach { case (id, db) =>
-      MongoDB.defineDb(id, mongo, db)
+    dbs foreach {
+      case (id, db) =>
+        MongoDB.defineDb(id, mongo, db)
     }
   }
 
   def isMongoRunning: Boolean =
     try {
-      if (dbs.length < 1)
-        false
+      if (dbs.length < 1) false
       else {
-        dbs foreach { case (id, _) =>
-          MongoDB.use(id) ( db => { db.getCollectionNames} )
+        dbs foreach {
+          case (id, _) =>
+            MongoDB.use(id)(db => { db.getCollectionNames })
         }
         true
       }
@@ -66,8 +69,11 @@ trait MongoTestKit extends Specification with BeforeAfterEach {
   def after = {
     if (!debug && isMongoRunning) {
       // drop the databases
-      dbs foreach { case (id, _) =>
-        MongoDB.use(id) { db => db.dropDatabase }
+      dbs foreach {
+        case (id, _) =>
+          MongoDB.use(id) { db =>
+            db.dropDatabase
+          }
       }
     }
 
@@ -75,4 +81,3 @@ trait MongoTestKit extends Specification with BeforeAfterEach {
     MongoDB.closeAll()
   }
 }
-

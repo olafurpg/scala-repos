@@ -1,19 +1,23 @@
 package mesosphere.mesos
 
-import mesosphere.mesos.protos.{ Resource, ScalarResource }
+import mesosphere.mesos.protos.{Resource, ScalarResource}
 import org.apache.mesos.Protos
 
 /** The result of an attempted scalar resource match. */
 sealed trait ScalarMatchResult {
+
   /** The name of the matched resource. */
   def resourceName: String
+
   /** The total scalar value to match. */
   def requiredValue: Double
+
   /** Did the offer contain the required resources? */
   def matches: Boolean
 }
 
 object ScalarMatchResult {
+
   /**
     * Express the scope of the match result. This is only interesting for disk resources
     * to distinguish between matching including volume resources and without them.
@@ -22,6 +26,7 @@ object ScalarMatchResult {
     def note: String = ""
   }
   object Scope {
+
     /** Normal match scope for non-disk resources */
     case object NoneDisk extends Scope
     case object IncludingLocalVolumes extends Scope {
@@ -34,10 +39,15 @@ object ScalarMatchResult {
 }
 
 /** An unsuccessful match of a scalar resource. */
-case class NoMatch(resourceName: String, requiredValue: Double, offeredValue: Double, scope: ScalarMatchResult.Scope)
+case class NoMatch(resourceName: String,
+                   requiredValue: Double,
+                   offeredValue: Double,
+                   scope: ScalarMatchResult.Scope)
     extends ScalarMatchResult {
 
-  require(scope == ScalarMatchResult.Scope.NoneDisk || resourceName == Resource.DISK)
+  require(
+      scope == ScalarMatchResult.Scope.NoneDisk ||
+      resourceName == Resource.DISK)
   require(requiredValue > offeredValue)
 
   def matches: Boolean = false
@@ -47,11 +57,15 @@ case class NoMatch(resourceName: String, requiredValue: Double, offeredValue: Do
 }
 
 /** A successful match of a scalar resource requirement. */
-case class ScalarMatch(
-    resourceName: String, requiredValue: Double,
-    consumed: Iterable[ScalarMatch.Consumption], scope: ScalarMatchResult.Scope) extends ScalarMatchResult {
+case class ScalarMatch(resourceName: String,
+                       requiredValue: Double,
+                       consumed: Iterable[ScalarMatch.Consumption],
+                       scope: ScalarMatchResult.Scope)
+    extends ScalarMatchResult {
 
-  require(scope == ScalarMatchResult.Scope.NoneDisk || resourceName == Resource.DISK)
+  require(
+      scope == ScalarMatchResult.Scope.NoneDisk ||
+      resourceName == Resource.DISK)
   require(consumedValue >= requiredValue)
 
   def matches: Boolean = true
@@ -75,6 +89,9 @@ case class ScalarMatch(
 }
 
 object ScalarMatch {
+
   /** A (potentially partial) consumption of a scalar resource. */
-  case class Consumption(consumedValue: Double, role: String, reservation: Option[Protos.Resource.ReservationInfo])
+  case class Consumption(consumedValue: Double,
+                         role: String,
+                         reservation: Option[Protos.Resource.ReservationInfo])
 }

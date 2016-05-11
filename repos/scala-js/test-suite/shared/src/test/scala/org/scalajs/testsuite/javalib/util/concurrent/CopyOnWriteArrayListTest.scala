@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util.concurrent
 
@@ -46,28 +46,23 @@ class CopyOnWriteArrayListTest extends ListTest {
 
     assertEquals(3, list.addAllAbsent(0 until 3))
     assertEquals(3, list.size)
-    for (i <- 0 until 3)
-      assertEquals(i, list.get(i))
+    for (i <- 0 until 3) assertEquals(i, list.get(i))
 
     assertEquals(0, list.addAllAbsent(0 until 2))
     assertEquals(3, list.size)
-    for (i <- 0 until 3)
-      assertEquals(i, list.get(i))
+    for (i <- 0 until 3) assertEquals(i, list.get(i))
 
     assertEquals(3, list.addAllAbsent(3 until 6))
     assertEquals(6, list.size)
-    for (i <- 0 until 6)
-      assertEquals(i, list.get(i))
+    for (i <- 0 until 6) assertEquals(i, list.get(i))
 
     assertEquals(4, list.addAllAbsent(0 until 10))
     assertEquals(10, list.size)
-    for (i <- 0 until 10)
-      assertEquals(i, list.get(i))
+    for (i <- 0 until 10) assertEquals(i, list.get(i))
 
     assertEquals(1, list.addAllAbsent(Seq(42, 42, 42)))
     assertEquals(11, list.size)
-    for (i <- 0 until 10)
-      assertEquals(i, list.get(i))
+    for (i <- 0 until 10) assertEquals(i, list.get(i))
     assertEquals(42, list.get(10))
   }
 
@@ -82,8 +77,7 @@ class CopyOnWriteArrayListTest extends ListTest {
 
     for (i <- 0 to 10) {
       assertTrue(iter.hasNext)
-      if (iter.hasNext)
-        assertEquals(i, iter.next())
+      if (iter.hasNext) assertEquals(i, iter.next())
     }
     assertFalse(iter2.hasNext)
   }
@@ -92,8 +86,7 @@ class CopyOnWriteArrayListTest extends ListTest {
     def test[T <: AnyRef](arr: Array[T]): Unit = {
       val cowal1 = factory.newFrom(arr)
       assertEquals(arr.length, cowal1.length)
-      for (i <- arr.indices)
-        assertEquals(arr(i), cowal1.get(i))
+      for (i <- arr.indices) assertEquals(arr(i), cowal1.get(i))
     }
 
     test(Array("a", "", "da", "23"))
@@ -109,10 +102,11 @@ class CopyOnWriteArrayListFactory extends ListFactory {
   override def implementationName: String =
     "java.util.concurrent.CopyOnWriteArrayList"
 
-  override def empty[E: ClassTag]: ju.concurrent.CopyOnWriteArrayList[E] =
+  override def empty[E : ClassTag]: ju.concurrent.CopyOnWriteArrayList[E] =
     new ju.concurrent.CopyOnWriteArrayList[E]
 
-  def newFrom[E <: AnyRef](arr: Array[E]): ju.concurrent.CopyOnWriteArrayList[E] =
+  def newFrom[E <: AnyRef](
+      arr: Array[E]): ju.concurrent.CopyOnWriteArrayList[E] =
     new ju.concurrent.CopyOnWriteArrayList[E](arr)
 
   // Sorting a CopyOnWriteArrayListFactory was not supported until JDK8.

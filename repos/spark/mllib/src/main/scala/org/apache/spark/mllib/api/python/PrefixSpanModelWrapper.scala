@@ -21,10 +21,10 @@ import org.apache.spark.mllib.fpm.PrefixSpanModel
 import org.apache.spark.rdd.RDD
 
 /**
- * A Wrapper of PrefixSpanModel to provide helper method for Python
- */
+  * A Wrapper of PrefixSpanModel to provide helper method for Python
+  */
 private[python] class PrefixSpanModelWrapper(model: PrefixSpanModel[Any])
-  extends PrefixSpanModel(model.freqSequences) {
+    extends PrefixSpanModel(model.freqSequences) {
 
   def getFreqSequences: RDD[Array[Any]] = {
     SerDe.fromTuple2RDD(model.freqSequences.map(x => (x.javaSequence, x.freq)))

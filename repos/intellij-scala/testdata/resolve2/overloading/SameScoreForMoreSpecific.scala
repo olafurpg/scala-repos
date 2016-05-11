@@ -8,5 +8,5 @@ object Test extends Application {
   }
   val b = new B
 
-  b./* resolved: false */foo(new B)
+  b. /* resolved: false */ foo(new B)
 }

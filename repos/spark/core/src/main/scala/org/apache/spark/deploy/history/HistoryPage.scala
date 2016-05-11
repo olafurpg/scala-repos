@@ -23,19 +23,20 @@ import scala.xml.Node
 
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
-private[history] class HistoryPage(parent: HistoryServer) extends WebUIPage("") {
+private[history] class HistoryPage(parent: HistoryServer)
+    extends WebUIPage("") {
 
   def render(request: HttpServletRequest): Seq[Node] = {
-    val requestedIncomplete =
-      Option(request.getParameter("showIncomplete")).getOrElse("false").toBoolean
+    val requestedIncomplete = Option(request.getParameter("showIncomplete"))
+      .getOrElse("false")
+      .toBoolean
 
-    val allApps = parent.getApplicationList()
-      .filter(_.completed != requestedIncomplete)
+    val allApps =
+      parent.getApplicationList().filter(_.completed != requestedIncomplete)
     val allAppsSize = allApps.size
 
     val providerConfig = parent.getProviderConfig()
-    val content =
-      <div>
+    val content = <div>
           <div class="span12">
             <ul class="unstyled">
               {providerConfig.map { case (k, v) => <li><strong>{k}:</strong> {v}</li> }}

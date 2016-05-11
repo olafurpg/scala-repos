@@ -64,7 +64,8 @@ object ByteStringSinkProbe {
       def expectUtf8EncodedString(string: String): Unit =
         expectBytes(ByteString(string, "utf8"))
 
-      def expectSubscriptionAndComplete(): Unit = probe.expectSubscriptionAndComplete()
+      def expectSubscriptionAndComplete(): Unit =
+        probe.expectSubscriptionAndComplete()
       def expectComplete(): Unit = probe.expectComplete()
       def expectError(): Throwable = probe.expectError()
       def expectError(cause: Throwable): Unit = probe.expectError(cause)

@@ -44,10 +44,9 @@ package pack {
   }
 }
 
-
 object Test extends App {
   import reflect.runtime.universe._
-  def test[T: TypeTag] = {
+  def test[T : TypeTag] = {
     val tt = typeTag[T]
     val clz = tt.mirror.runtimeClass(tt.tpe)
     assert(classOf[Marker].isAssignableFrom(clz), clz.toString)

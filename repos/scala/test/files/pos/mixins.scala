@@ -19,4 +19,3 @@ class Base extends Sub with MixinSubSub {
 }
 trait Mixin1 extends Sub with MixinSubSub {}
 class Base1 extends Mixin1 {}
-

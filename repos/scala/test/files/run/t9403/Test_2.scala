@@ -3,7 +3,6 @@ import scala.tools.asm.Opcodes
 import scala.tools.partest.BytecodeTest
 import scala.tools.partest.ASMConverters._
 
-
 object Test extends BytecodeTest {
   def foo(c: C, x: Int) = c.f(x)
   def goo(c: C, x: Int) = c.g(x)

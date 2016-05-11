@@ -1,18 +1,18 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.actor
 
 import akka.actor._
 import scala.collection.mutable.ListBuffer
 
 /**
- * Requirements are as follows:
- * The first thing the actor needs to do, is to subscribe to a channel of events,
- * Then it must replay (process) all "old" events
- * Then it has to wait for a GoAhead signal to begin processing the new events
- * It mustn't "miss" events that happen between catching up with the old events and getting the GoAhead signal
- */
+  * Requirements are as follows:
+  * The first thing the actor needs to do, is to subscribe to a channel of events,
+  * Then it must replay (process) all "old" events
+  * Then it has to wait for a GoAhead signal to begin processing the new events
+  * It mustn't "miss" events that happen between catching up with the old events and getting the GoAhead signal
+  */
 class UnnestedReceives extends Actor {
   import context.become
   //If you need to store sender/senderFuture you can change it to ListBuffer[(Any, Channel)]
@@ -34,16 +34,21 @@ class UnnestedReceives extends Actor {
   }
 
   def receive = {
-    case 'Replay => //Our first message should be a 'Replay message, all others are invalid
+    case 'Replay =>
+      //Our first message should be a 'Replay message, all others are invalid
       allOldMessages() foreach process //Process all old messages/events
-      become { //Switch behavior to look for the GoAhead signal
-        case 'GoAhead => //When we get the GoAhead signal we process all our buffered messages/events
+      become {
+        //Switch behavior to look for the GoAhead signal
+        case 'GoAhead =>
+          //When we get the GoAhead signal we process all our buffered messages/events
           queue foreach process
           queue.clear
-          become { //Then we change behaviour to process incoming messages/events as they arrive
+          become {
+            //Then we change behaviour to process incoming messages/events as they arrive
             case msg => process(msg)
           }
-        case msg => //While we haven't gotten the GoAhead signal, buffer all incoming messages
+        case msg =>
+          //While we haven't gotten the GoAhead signal, buffer all incoming messages
           queue += msg //Here you have full control, you can handle overflow etc
       }
   }

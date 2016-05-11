@@ -50,12 +50,14 @@ import org.slf4j.LoggerFactory
 
 import scalaz._
 
-class MongoAPIKeyManagerSpec extends Specification with RealMongoSpecSupport with FutureMatchers {
+class MongoAPIKeyManagerSpec
+    extends Specification with RealMongoSpecSupport with FutureMatchers {
 
   override def mongoStartupPause = Some(0l)
   val timeout = Duration(10, "seconds")
 
-  lazy val logger = LoggerFactory.getLogger("com.precog.common.security.MongoAPIKeyManagerSpec")
+  lazy val logger = LoggerFactory.getLogger(
+      "com.precog.common.security.MongoAPIKeyManagerSpec")
 
   "mongo API key manager" should {
 
@@ -63,28 +65,37 @@ class MongoAPIKeyManagerSpec extends Specification with RealMongoSpecSupport wit
       val result = Await.result(apiKeyManager.findAPIKey(rootAPIKey), timeout)
 
       result must beLike {
-        case Some(APIKeyRecord(apiKey, _, _, _, _, _)) => apiKey must_== rootAPIKey
+        case Some(APIKeyRecord(apiKey, _, _, _, _, _)) =>
+          apiKey must_== rootAPIKey
       }
     }
 
     "return current root API key" in new TestAPIKeyManager {
-      val result = Await.result(MongoAPIKeyManager.findRootAPIKey(testDB, MongoAPIKeyManagerSettings.defaults.apiKeys), timeout)
+      val result =
+        Await.result(MongoAPIKeyManager.findRootAPIKey(
+                         testDB, MongoAPIKeyManagerSettings.defaults.apiKeys),
+                     timeout)
 
       result.apiKey mustEqual rootAPIKey
     }
 
     "error if a root API key cannot be found and creation isn't requested" in new TestAPIKeyManager {
-      Await.result(MongoAPIKeyManager.findRootAPIKey(testDB, MongoAPIKeyManagerSettings.defaults.apiKeys + "_empty"), timeout) must throwAn[Exception]
+      Await.result(MongoAPIKeyManager.findRootAPIKey(
+                       testDB,
+                       MongoAPIKeyManagerSettings.defaults.apiKeys + "_empty"),
+                   timeout) must throwAn[Exception]
     }
 
     "not find missing API key" in new TestAPIKeyManager {
-      val result = Await.result(apiKeyManager.findAPIKey(notFoundAPIKeyID), timeout)
+      val result =
+        Await.result(apiKeyManager.findAPIKey(notFoundAPIKeyID), timeout)
       result must beNone
     }
 
     "issue new API key" in new TestAPIKeyManager {
       val name = "newAPIKey"
-      val fResult = apiKeyManager.createAPIKey(Some(name), None, rootAPIKey, Set.empty)
+      val fResult =
+        apiKeyManager.createAPIKey(Some(name), None, rootAPIKey, Set.empty)
 
       val result = Await.result(fResult, timeout)
 
@@ -97,8 +108,10 @@ class MongoAPIKeyManagerSpec extends Specification with RealMongoSpecSupport wit
 
     "list children API keys" in new TestAPIKeyManager {
       val (result, expected) = Await.result(for {
-        k1 <- apiKeyManager.createAPIKey(Some("blah1"), None, child2.apiKey, Set.empty)
-        k2 <- apiKeyManager.createAPIKey(Some("blah2"), None, child2.apiKey, Set.empty)
+        k1 <- apiKeyManager.createAPIKey(
+            Some("blah1"), None, child2.apiKey, Set.empty)
+        k2 <- apiKeyManager.createAPIKey(
+            Some("blah2"), None, child2.apiKey, Set.empty)
         kids <- apiKeyManager.findAPIKeyChildren(child2.apiKey)
       } yield (kids, List(k1, k2)), timeout)
 
@@ -107,7 +120,8 @@ class MongoAPIKeyManagerSpec extends Specification with RealMongoSpecSupport wit
 
     "move API key to deleted pool on deletion" in new TestAPIKeyManager {
 
-      type Results = (Option[APIKeyRecord], Option[APIKeyRecord], Option[APIKeyRecord], Option[APIKeyRecord])
+      type Results = (Option[APIKeyRecord], Option[APIKeyRecord],
+      Option[APIKeyRecord], Option[APIKeyRecord])
 
       val fut: Future[Results] = for {
         before <- apiKeyManager.findAPIKey(child2.apiKey)
@@ -128,7 +142,8 @@ class MongoAPIKeyManagerSpec extends Specification with RealMongoSpecSupport wit
     }
 
     "no failure on deleting API key that is already deleted" in new TestAPIKeyManager {
-      type Results = (Option[APIKeyRecord], Option[APIKeyRecord], Option[APIKeyRecord], Option[APIKeyRecord], Option[APIKeyRecord])
+      type Results = (Option[APIKeyRecord], Option[APIKeyRecord],
+      Option[APIKeyRecord], Option[APIKeyRecord], Option[APIKeyRecord])
 
       val fut: Future[Results] = for {
         before <- apiKeyManager.findAPIKey(child2.apiKey)
@@ -153,7 +168,8 @@ class MongoAPIKeyManagerSpec extends Specification with RealMongoSpecSupport wit
   trait TestAPIKeyManager extends After {
     import MongoAPIKeyManagerSpec.dbId
     val defaultActorSystem = ActorSystem("apiKeyManagerTest")
-    implicit val execContext = ExecutionContext.defaultExecutionContext(defaultActorSystem)
+    implicit val execContext =
+      ExecutionContext.defaultExecutionContext(defaultActorSystem)
 
     val dbName = "test_v1_" + dbId.getAndIncrement()
     val testDB = try {
@@ -165,16 +181,32 @@ class MongoAPIKeyManagerSpec extends Specification with RealMongoSpecSupport wit
     val to = Duration(30, "seconds")
     implicit val queryTimeout: Timeout = to
 
-    val rootAPIKeyOrig = Await.result(MongoAPIKeyManager.createRootAPIKey(testDB, MongoAPIKeyManagerSettings.defaults.apiKeys, MongoAPIKeyManagerSettings.defaults.grants), to)
+    val rootAPIKeyOrig = Await.result(
+        MongoAPIKeyManager.createRootAPIKey(
+            testDB,
+            MongoAPIKeyManagerSettings.defaults.apiKeys,
+            MongoAPIKeyManagerSettings.defaults.grants),
+        to)
 
-    val apiKeyManager = new MongoAPIKeyManager(mongo, testDB, MongoAPIKeyManagerSettings.defaults.copy(rootKeyId = rootAPIKeyOrig.apiKey))
+    val apiKeyManager = new MongoAPIKeyManager(
+        mongo,
+        testDB,
+        MongoAPIKeyManagerSettings.defaults.copy(
+            rootKeyId = rootAPIKeyOrig.apiKey))
 
     val notFoundAPIKeyID = "NOT-GOING-TO-FIND"
 
     val rootAPIKey = Await.result(apiKeyManager.rootAPIKey, to)
-    val child1 = Await.result(apiKeyManager.createAPIKey(Some("child1"), None, rootAPIKey, Set.empty), to)
-    val child2 = Await.result(apiKeyManager.createAPIKey(Some("child2"), None, rootAPIKey, Set.empty), to)
-    val grantChild1 = Await.result(apiKeyManager.createAPIKey(Some("grantChild1"), None, child1.apiKey, Set.empty), to)
+    val child1 = Await.result(apiKeyManager.createAPIKey(
+                                  Some("child1"), None, rootAPIKey, Set.empty),
+                              to)
+    val child2 = Await.result(apiKeyManager.createAPIKey(
+                                  Some("child2"), None, rootAPIKey, Set.empty),
+                              to)
+    val grantChild1 = Await.result(
+        apiKeyManager.createAPIKey(
+            Some("grantChild1"), None, child1.apiKey, Set.empty),
+        to)
 
     // wait until the keys appear in the DB (some delay between insert request and actor insert)
     def waitForAppearance(apiKey: APIKey, name: String) {

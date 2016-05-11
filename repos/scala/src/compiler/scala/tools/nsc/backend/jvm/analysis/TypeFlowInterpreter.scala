@@ -12,10 +12,12 @@ abstract class TypeFlowInterpreter extends BasicInterpreter {
     else super.newValue(tp)
   }
 
-  def isRef(tp: Type) = tp != null && (tp.getSort match {
-    case Type.OBJECT | Type.ARRAY => true
-    case _ => false
-  })
+  def isRef(tp: Type) =
+    tp != null &&
+    (tp.getSort match {
+          case Type.OBJECT | Type.ARRAY => true
+          case _ => false
+        })
 
   def refLub(a: BasicValue, b: BasicValue): BasicValue
 
@@ -27,10 +29,11 @@ abstract class TypeFlowInterpreter extends BasicInterpreter {
 }
 
 /**
- * A [[TypeFlowInterpreter]] which collapses LUBs of non-equal reference types to Object.
- * This could be made more precise by looking up ClassBTypes for the two reference types and using
- * the `jvmWiseLUB` method.
- */
+  * A [[TypeFlowInterpreter]] which collapses LUBs of non-equal reference types to Object.
+  * This could be made more precise by looking up ClassBTypes for the two reference types and using
+  * the `jvmWiseLUB` method.
+  */
 class NonLubbingTypeFlowInterpreter extends TypeFlowInterpreter {
-  def refLub(a: BasicValue, b: BasicValue): BasicValue = BasicValue.REFERENCE_VALUE // java/lang/Object
+  def refLub(a: BasicValue, b: BasicValue): BasicValue =
+    BasicValue.REFERENCE_VALUE // java/lang/Object
 }

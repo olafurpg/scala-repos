@@ -1,9 +1,8 @@
 package org.jetbrains.plugins.scala.lang.resolve2
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 class OverloadingTest extends ResolveTestBase {
   override def folderPath: String = {
     super.folderPath + "overloading/"
@@ -33,5 +32,5 @@ class OverloadingTest extends ResolveTestBase {
   def testSimple() = doTest()
   def testTooMuchImplicits() = doTest()
   def testWeakResolve() = doTest()
-  def testWrong() {doTest()}
+  def testWrong() { doTest() }
 }

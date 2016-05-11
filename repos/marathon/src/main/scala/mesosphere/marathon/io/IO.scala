@@ -2,14 +2,14 @@ package mesosphere.marathon.io
 
 import java.io._
 import java.math.BigInteger
-import java.nio.file.{ Files, Path, Paths }
-import java.security.{ DigestInputStream, MessageDigest }
-import java.util.zip.{ GZIPInputStream, GZIPOutputStream }
+import java.nio.file.{Files, Path, Paths}
+import java.security.{DigestInputStream, MessageDigest}
+import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
 import com.google.common.io.ByteStreams
 
 import scala.annotation.tailrec
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 object IO {
 
@@ -21,7 +21,9 @@ object IO {
   def listFiles(file: String): Array[File] = listFiles(new File(file))
   def listFiles(file: File): Array[File] = {
     if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath)
-    if (!file.isDirectory) throw new FileNotFoundException(s"File ${file.getAbsolutePath} is not a directory!")
+    if (!file.isDirectory)
+      throw new FileNotFoundException(
+          s"File ${file.getAbsolutePath} is not a directory!")
     file.listFiles()
   }
 
@@ -36,8 +38,10 @@ object IO {
   }
 
   def copyFile(sourceFile: File, targetFile: File) {
-    require(sourceFile.exists, "Source file '" + sourceFile.getAbsolutePath + "' does not exist.")
-    require(!sourceFile.isDirectory, "Source file '" + sourceFile.getAbsolutePath + "' is a directory.")
+    require(sourceFile.exists,
+            "Source file '" + sourceFile.getAbsolutePath + "' does not exist.")
+    require(!sourceFile.isDirectory,
+            "Source file '" + sourceFile.getAbsolutePath + "' is a directory.")
     using(new FileInputStream(sourceFile)) { source =>
       using(new FileOutputStream(targetFile)) { target =>
         transfer(source, target, close = false)
@@ -49,7 +53,8 @@ object IO {
     if (!dir.exists()) {
       val result = dir.mkdirs()
       if (!result || !dir.isDirectory || !dir.exists)
-        throw new IOException("Can not create Directory: " + dir.getAbsolutePath)
+        throw new IOException(
+            "Can not create Directory: " + dir.getAbsolutePath)
     }
   }
 
@@ -60,10 +65,9 @@ object IO {
     file.delete()
   }
 
-  def mdSum(
-    in: InputStream,
-    mdName: String = "SHA-1",
-    out: OutputStream = ByteStreams.nullOutputStream()): String = {
+  def mdSum(in: InputStream,
+            mdName: String = "SHA-1",
+            out: OutputStream = ByteStreams.nullOutputStream()): String = {
     val md = MessageDigest.getInstance(mdName)
     transfer(new DigestInputStream(in, md), out)
     //scalastyle:off magic.number
@@ -86,14 +90,14 @@ object IO {
     }
   }
 
-  def transfer(
-    in: InputStream,
-    out: OutputStream,
-    close: Boolean = true,
-    continue: => Boolean = true) {
+  def transfer(in: InputStream,
+               out: OutputStream,
+               close: Boolean = true,
+               continue: => Boolean = true) {
     try {
       val buffer = new Array[Byte](BufferSize)
-      @tailrec def read() {
+      @tailrec
+      def read() {
         val byteCount = in.read(buffer)
         if (byteCount >= 0 && continue) {
           out.write(buffer, 0, byteCount)
@@ -102,8 +106,7 @@ object IO {
         }
       }
       read()
-    }
-    finally { if (close) Try(in.close()) }
+    } finally { if (close) Try(in.close()) }
   }
 
   def copyInputStreamToString(in: InputStream): String = {
@@ -116,7 +119,7 @@ object IO {
     Option(getClass.getResourceAsStream(path)).flatMap { stream =>
       Try(stream.available()) match {
         case Success(length) => Some(fn(stream))
-        case Failure(ex)     => None
+        case Failure(ex) => None
       }
     }
   }
@@ -124,10 +127,8 @@ object IO {
   def using[A <: Closeable, B](closeable: A)(fn: (A) => B): B = {
     try {
       fn(closeable)
-    }
-    finally {
+    } finally {
       Try(closeable.close())
     }
   }
 }
-

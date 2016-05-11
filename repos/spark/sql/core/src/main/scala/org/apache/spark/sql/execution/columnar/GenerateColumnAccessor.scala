@@ -24,19 +24,21 @@ import org.apache.spark.sql.catalyst.expressions.codegen.{CodeFormatter, CodeGen
 import org.apache.spark.sql.types._
 
 /**
- * An Iterator to walk through the InternalRows from a CachedBatch
- */
+  * An Iterator to walk through the InternalRows from a CachedBatch
+  */
 abstract class ColumnarIterator extends Iterator[InternalRow] {
-  def initialize(input: Iterator[CachedBatch], columnTypes: Array[DataType],
-    columnIndexes: Array[Int]): Unit
+  def initialize(input: Iterator[CachedBatch],
+                 columnTypes: Array[DataType],
+                 columnIndexes: Array[Int]): Unit
 }
 
 /**
- * An helper class to update the fields of UnsafeRow, used by ColumnAccessor
- *
- * WARNING: These setter MUST be called in increasing order of ordinals.
- */
-class MutableUnsafeRow(val writer: UnsafeRowWriter) extends GenericMutableRow(null) {
+  * An helper class to update the fields of UnsafeRow, used by ColumnAccessor
+  *
+  * WARNING: These setter MUST be called in increasing order of ordinals.
+  */
+class MutableUnsafeRow(val writer: UnsafeRowWriter)
+    extends GenericMutableRow(null) {
 
   override def isNullAt(i: Int): Boolean = writer.isNullAt(i)
   override def setNullAt(i: Int): Unit = writer.setNullAt(i)
@@ -52,66 +54,71 @@ class MutableUnsafeRow(val writer: UnsafeRowWriter) extends GenericMutableRow(nu
   // the writer will be used directly to avoid creating wrapper objects
   override def setDecimal(i: Int, v: Decimal, precision: Int): Unit =
     throw new UnsupportedOperationException
-  override def update(i: Int, v: Any): Unit = throw new UnsupportedOperationException
+  override def update(i: Int, v: Any): Unit =
+    throw new UnsupportedOperationException
 
   // all other methods inherited from GenericMutableRow are not need
 }
 
 /**
- * Generates bytecode for an [[ColumnarIterator]] for columnar cache.
- */
-object GenerateColumnAccessor extends CodeGenerator[Seq[DataType], ColumnarIterator] with Logging {
+  * Generates bytecode for an [[ColumnarIterator]] for columnar cache.
+  */
+object GenerateColumnAccessor
+    extends CodeGenerator[Seq[DataType], ColumnarIterator] with Logging {
 
   protected def canonicalize(in: Seq[DataType]): Seq[DataType] = in
-  protected def bind(in: Seq[DataType], inputSchema: Seq[Attribute]): Seq[DataType] = in
+  protected def bind(
+      in: Seq[DataType], inputSchema: Seq[Attribute]): Seq[DataType] = in
 
   protected def create(columnTypes: Seq[DataType]): ColumnarIterator = {
     val ctx = newCodeGenContext()
     val numFields = columnTypes.size
-    val (initializeAccessors, extractors) = columnTypes.zipWithIndex.map { case (dt, index) =>
-      val accessorName = ctx.freshName("accessor")
-      val accessorCls = dt match {
-        case NullType => classOf[NullColumnAccessor].getName
-        case BooleanType => classOf[BooleanColumnAccessor].getName
-        case ByteType => classOf[ByteColumnAccessor].getName
-        case ShortType => classOf[ShortColumnAccessor].getName
-        case IntegerType | DateType => classOf[IntColumnAccessor].getName
-        case LongType | TimestampType => classOf[LongColumnAccessor].getName
-        case FloatType => classOf[FloatColumnAccessor].getName
-        case DoubleType => classOf[DoubleColumnAccessor].getName
-        case StringType => classOf[StringColumnAccessor].getName
-        case BinaryType => classOf[BinaryColumnAccessor].getName
-        case dt: DecimalType if dt.precision <= Decimal.MAX_LONG_DIGITS =>
-          classOf[CompactDecimalColumnAccessor].getName
-        case dt: DecimalType => classOf[DecimalColumnAccessor].getName
-        case struct: StructType => classOf[StructColumnAccessor].getName
-        case array: ArrayType => classOf[ArrayColumnAccessor].getName
-        case t: MapType => classOf[MapColumnAccessor].getName
-      }
-      ctx.addMutableState(accessorCls, accessorName, s"$accessorName = null;")
+    val (initializeAccessors, extractors) = columnTypes.zipWithIndex.map {
+      case (dt, index) =>
+        val accessorName = ctx.freshName("accessor")
+        val accessorCls = dt match {
+          case NullType => classOf[NullColumnAccessor].getName
+          case BooleanType => classOf[BooleanColumnAccessor].getName
+          case ByteType => classOf[ByteColumnAccessor].getName
+          case ShortType => classOf[ShortColumnAccessor].getName
+          case IntegerType | DateType => classOf[IntColumnAccessor].getName
+          case LongType | TimestampType => classOf[LongColumnAccessor].getName
+          case FloatType => classOf[FloatColumnAccessor].getName
+          case DoubleType => classOf[DoubleColumnAccessor].getName
+          case StringType => classOf[StringColumnAccessor].getName
+          case BinaryType => classOf[BinaryColumnAccessor].getName
+          case dt: DecimalType if dt.precision <= Decimal.MAX_LONG_DIGITS =>
+            classOf[CompactDecimalColumnAccessor].getName
+          case dt: DecimalType => classOf[DecimalColumnAccessor].getName
+          case struct: StructType => classOf[StructColumnAccessor].getName
+          case array: ArrayType => classOf[ArrayColumnAccessor].getName
+          case t: MapType => classOf[MapColumnAccessor].getName
+        }
+        ctx.addMutableState(
+            accessorCls, accessorName, s"$accessorName = null;")
 
-      val createCode = dt match {
-        case t if ctx.isPrimitiveType(dt) =>
-          s"$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder));"
-        case NullType | StringType | BinaryType =>
-          s"$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder));"
-        case other =>
-          s"""$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder),
+        val createCode = dt match {
+          case t if ctx.isPrimitiveType(dt) =>
+            s"$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder));"
+          case NullType | StringType | BinaryType =>
+            s"$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder));"
+          case other =>
+            s"""$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder),
              (${dt.getClass.getName}) columnTypes[$index]);"""
-      }
+        }
 
-      val extract = s"$accessorName.extractTo(mutableRow, $index);"
-      val patch = dt match {
-        case DecimalType.Fixed(p, s) if p > Decimal.MAX_LONG_DIGITS =>
-          // For large Decimal, it should have 16 bytes for future update even it's null now.
-          s"""
+        val extract = s"$accessorName.extractTo(mutableRow, $index);"
+        val patch = dt match {
+          case DecimalType.Fixed(p, s) if p > Decimal.MAX_LONG_DIGITS =>
+            // For large Decimal, it should have 16 bytes for future update even it's null now.
+            s"""
             if (mutableRow.isNullAt($index)) {
               rowWriter.write($index, (Decimal) null, $p, $s);
             }
            """
-        case other => ""
-      }
-      (createCode, extract + patch)
+          case other => ""
+        }
+        (createCode, extract + patch)
     }.unzip
 
     val code = s"""
@@ -190,6 +197,9 @@ object GenerateColumnAccessor extends CodeGenerator[Seq[DataType], ColumnarItera
 
     logDebug(s"Generated ColumnarIterator: ${CodeFormatter.format(code)}")
 
-    CodeGenerator.compile(code).generate(Array.empty).asInstanceOf[ColumnarIterator]
+    CodeGenerator
+      .compile(code)
+      .generate(Array.empty)
+      .asInstanceOf[ColumnarIterator]
   }
 }

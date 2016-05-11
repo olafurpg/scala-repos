@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.lang
 
@@ -75,7 +75,7 @@ class SystemTest {
 
     assertEquals(12, chars.filter(_ == null).length)
     assertEquals("ab01ab0101ab01ab0101ab0101ab01ab0101ab01",
-        chars.filter(_ != null).map(_.mkString).mkString)
+                 chars.filter(_ != null).map(_.mkString).mkString)
   }
 
   @Test def arraycopy_with_range_overlaps_for_the_same_array(): Unit = {
@@ -113,8 +113,7 @@ class SystemTest {
     val x2 = new HasIDHashCode
     val x1FirstHash = x1.hashCode()
     assertEquals(x1FirstHash, x1.hashCode())
-    if (!executingInJVM)
-      assertNotEquals(x1.hashCode(), x2.hashCode())
+    if (!executingInJVM) assertNotEquals(x1.hashCode(), x2.hashCode())
     assertEquals(x1FirstHash, x1.hashCode())
 
     assertEquals(x1FirstHash, System.identityHashCode(x1))
@@ -126,7 +125,8 @@ class SystemTest {
     val list2 = List(1, 3, 5)
     assertEquals(list2, list1)
     assertEquals(list2.hashCode(), list1.hashCode())
-    assertNotEquals(System.identityHashCode(list1), System.identityHashCode(list2))
+    assertNotEquals(
+        System.identityHashCode(list1), System.identityHashCode(list2))
   }
 
   @Test def identityHashCode_of_null(): Unit = {

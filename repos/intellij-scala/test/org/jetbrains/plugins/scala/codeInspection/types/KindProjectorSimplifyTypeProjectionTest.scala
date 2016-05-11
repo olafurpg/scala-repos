@@ -6,18 +6,22 @@ import org.jetbrains.plugins.scala.codeInspection.{InspectionBundle, ScalaLightI
 import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
 
 /**
- * Author: Svyatoslav Ilinskiy
- * Date: 7/6/15
- */
-class KindProjectorSimplifyTypeProjectionTest extends ScalaLightInspectionFixtureTestAdapter {
-  override protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[KindProjectorSimplifyTypeProjectionInspection]
+  * Author: Svyatoslav Ilinskiy
+  * Date: 7/6/15
+  */
+class KindProjectorSimplifyTypeProjectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
+  override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[KindProjectorSimplifyTypeProjectionInspection]
 
-  override protected def annotation: String = InspectionBundle.message("kind.projector.simplify.type")
+  override protected def annotation: String =
+    InspectionBundle.message("kind.projector.simplify.type")
 
   override protected def setUp(): Unit = {
     super.setUp()
 
-    val defaultProfile = ScalaCompilerConfiguration.instanceIn(getProject).defaultProfile
+    val defaultProfile =
+      ScalaCompilerConfiguration.instanceIn(getProject).defaultProfile
     val newSettings = defaultProfile.getSettings
     newSettings.plugins :+= "kind-projector"
     defaultProfile.setSettings(newSettings)
@@ -40,9 +44,11 @@ class KindProjectorSimplifyTypeProjectionTest extends ScalaLightInspectionFixtur
   }
 
   def testTwoParameters(): Unit = {
-    val code = s"def a: $START({type A[-Alpha, +Gamma] = Function2[Alpha, String, Gamma]})#A$END"
+    val code =
+      s"def a: $START({type A[-Alpha, +Gamma] = Function2[Alpha, String, Gamma]})#A$END"
     check(code)
-    val text = "def a: ({type A[-Alpha, +Gamma] = Function2[Alpha, String, Gamma]})#A"
+    val text =
+      "def a: ({type A[-Alpha, +Gamma] = Function2[Alpha, String, Gamma]})#A"
     val res = "def a: Function2[-?, String, +?]"
     testFix(text, res)
   }
@@ -88,7 +94,8 @@ class KindProjectorSimplifyTypeProjectionTest extends ScalaLightInspectionFixtur
   }
 
   def testMultipleVariantBounds(): Unit = {
-    val code = s"def a: $START({type B[-C >: Int, +A <: Any] = (A, A, C)})#B$END"
+    val code =
+      s"def a: $START({type B[-C >: Int, +A <: Any] = (A, A, C)})#B$END"
     check(code)
     val text = "def a: ({type B[-C >: Int, +A <: Any] = (A, A, C)})#B"
     val res = "def a: Lambda[(`-C >: Int`, `+A <: Any`) => (A, A, C)]"
@@ -106,7 +113,8 @@ class KindProjectorSimplifyTypeProjectionTest extends ScalaLightInspectionFixtur
   }
 
   def testExistentialBounds(): Unit = {
-    val code = s"def a: ({type B[C >: Array[X] forSome { type x }] = (C, C)})#B"
+    val code =
+      s"def a: ({type B[C >: Array[X] forSome { type x }] = (C, C)})#B"
     checkTextHasNoErrors(code)
   }
 

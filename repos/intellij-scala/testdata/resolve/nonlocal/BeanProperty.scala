@@ -3,8 +3,6 @@ package test
 import reflect.BeanProperty
 
 class A {
-  @<ref>BeanProperty
-  def foo {
-
-  }
+  @< ref > BeanProperty
+  def foo {}
 }

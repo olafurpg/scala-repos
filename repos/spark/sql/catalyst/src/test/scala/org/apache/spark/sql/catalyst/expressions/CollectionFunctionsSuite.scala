@@ -20,8 +20,8 @@ package org.apache.spark.sql.catalyst.expressions
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types._
 
-
-class CollectionFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
+class CollectionFunctionsSuite
+    extends SparkFunSuite with ExpressionEvalHelper {
 
   test("Array and Map Size") {
     val a0 = Literal.create(Seq(1, 2, 3), ArrayType(IntegerType))
@@ -32,15 +32,18 @@ class CollectionFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Size(a1), 0)
     checkEvaluation(Size(a2), 2)
 
-    val m0 = Literal.create(Map("a" -> "a", "b" -> "b"), MapType(StringType, StringType))
-    val m1 = Literal.create(Map[String, String](), MapType(StringType, StringType))
+    val m0 = Literal.create(
+        Map("a" -> "a", "b" -> "b"), MapType(StringType, StringType))
+    val m1 =
+      Literal.create(Map[String, String](), MapType(StringType, StringType))
     val m2 = Literal.create(Map("a" -> "a"), MapType(StringType, StringType))
 
     checkEvaluation(Size(m0), 2)
     checkEvaluation(Size(m1), 0)
     checkEvaluation(Size(m2), 1)
 
-    checkEvaluation(Literal.create(null, MapType(StringType, StringType)), null)
+    checkEvaluation(
+        Literal.create(null, MapType(StringType, StringType)), null)
     checkEvaluation(Literal.create(null, ArrayType(StringType)), null)
   }
 
@@ -70,7 +73,8 @@ class CollectionFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     val typeAS = ArrayType(StructType(StructField("a", IntegerType) :: Nil))
     val arrayStruct = Literal.create(Seq(create_row(2), create_row(1)), typeAS)
 
-    checkEvaluation(new SortArray(arrayStruct), Seq(create_row(1), create_row(2)))
+    checkEvaluation(
+        new SortArray(arrayStruct), Seq(create_row(1), create_row(2)))
   }
 
   test("Array contains") {

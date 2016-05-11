@@ -4,6 +4,7 @@ object SCL5472B {
   def foo(a: A): a.type = a
   implicit def t2a(x: (Int, Int)): B = new B
 
-  /*start*/foo(1, 2)/*end*/
+  /*start*/
+  foo(1, 2) /*end*/
 }
 //SCL5472B.B

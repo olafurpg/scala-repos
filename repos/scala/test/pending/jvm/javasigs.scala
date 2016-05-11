@@ -2,17 +2,18 @@ import java.io._
 
 object Scalatest {
   val outputdir = System.getProperty("partest.output", "inner.obj")
-  val scalalib  = System.getProperty("partest.lib", "")
+  val scalalib = System.getProperty("partest.lib", "")
   val classpath = outputdir + File.pathSeparator + scalalib
-  val javacmd   = System.getProperty("javacmd", "java")
-  val javac     = System.getProperty("javaccmd", "javac")
+  val javacmd = System.getProperty("javacmd", "java")
+  val javac = System.getProperty("javaccmd", "javac")
 
   def javac(src: String, opts: String, fname: String) {
     val tmpfilename = outputdir + File.separator + fname
     val tmpfile = new FileWriter(tmpfilename)
     tmpfile.write(src)
     tmpfile.close
-    exec(javac + " -d " + outputdir + " -classpath " + classpath + " " + opts + tmpfilename)
+    exec(javac + " -d " + outputdir + " -classpath " + classpath + " " + opts +
+        tmpfilename)
   }
 
   def java(cname: String) =
@@ -21,7 +22,7 @@ object Scalatest {
   class Slurp(in: BufferedReader) extends Thread("slurper") {
     var done = false
     override def run() {
-      while (!done)  if (in.ready) println(in.readLine())
+      while (!done) if (in.ready) println(in.readLine())
     }
   }
 
@@ -30,7 +31,6 @@ object Scalatest {
     s.start()
     s
   }
-    
 
   /** Execute cmd, wait for the process to end and pipe its output to stdout */
   def exec(cmd: String) {
@@ -50,17 +50,17 @@ object Scalatest {
 // Test correct java signatures for anonymous classes. Enclosing method attributes should
 // allow javac to see the type parameters in foo. See #3249.
 
-class A[U] { 
-   def bar[B](x : => B) = x
-   def foo[C](c : C) : C = bar(c)
+class A[U] {
+  def bar[B](x: => B) = x
+  def foo[C](c: C): C = bar(c)
 }
 
-object B { 
-   def bar[B](x : => B) = x
-   def foo[C](c : C) : C = {
-     class InnerB(x: C)
-     c
-   }
+object B {
+  def bar[B](x: => B) = x
+  def foo[C](c: C): C = {
+    class InnerB(x: C)
+    c
+  }
 }
 
 class B {

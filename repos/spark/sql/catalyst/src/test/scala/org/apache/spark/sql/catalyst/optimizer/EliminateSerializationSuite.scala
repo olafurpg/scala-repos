@@ -32,11 +32,11 @@ case class OtherTuple(_1: Int, _2: Int)
 class EliminateSerializationSuite extends PlanTest {
   private object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
-      Batch("Serialization", FixedPoint(100),
-        EliminateSerialization) :: Nil
+      Batch("Serialization", FixedPoint(100), EliminateSerialization) :: Nil
   }
 
-  implicit private def productEncoder[T <: Product : TypeTag] = ExpressionEncoder[T]()
+  implicit private def productEncoder[T <: Product : TypeTag] =
+    ExpressionEncoder[T]()
   private val func = identity[Iterator[(Int, Int)]] _
   private val func2 = identity[Iterator[OtherTuple]] _
 
@@ -46,8 +46,7 @@ class EliminateSerializationSuite extends PlanTest {
     })
 
     if (newInstances.size != count) {
-      fail(
-        s"""
+      fail(s"""
            |Wrong number of object creations in plan: ${newInstances.size} != $count
            |$plan
          """.stripMargin)
@@ -56,9 +55,7 @@ class EliminateSerializationSuite extends PlanTest {
 
   test("back to back MapPartitions") {
     val input = LocalRelation('_1.int, '_2.int)
-    val plan =
-      MapPartitions(func,
-        MapPartitions(func, input))
+    val plan = MapPartitions(func, MapPartitions(func, input))
 
     val optimized = Optimize.execute(plan.analyze)
     assertObjectCreations(1, optimized)
@@ -66,9 +63,7 @@ class EliminateSerializationSuite extends PlanTest {
 
   test("back to back with object change") {
     val input = LocalRelation('_1.int, '_2.int)
-    val plan =
-      MapPartitions(func,
-        MapPartitions(func2, input))
+    val plan = MapPartitions(func, MapPartitions(func2, input))
 
     val optimized = Optimize.execute(plan.analyze)
     assertObjectCreations(2, optimized)

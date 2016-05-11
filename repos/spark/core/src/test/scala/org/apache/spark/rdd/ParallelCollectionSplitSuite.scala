@@ -89,12 +89,16 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
 
   test("zero slices") {
     val data = Array(1, 2, 3)
-    intercept[IllegalArgumentException] { ParallelCollectionRDD.slice(data, 0) }
+    intercept[IllegalArgumentException] {
+      ParallelCollectionRDD.slice(data, 0)
+    }
   }
 
   test("negative number of slices") {
     val data = Array(1, 2, 3)
-    intercept[IllegalArgumentException] { ParallelCollectionRDD.slice(data, -5) }
+    intercept[IllegalArgumentException] {
+      ParallelCollectionRDD.slice(data, -5)
+    }
   }
 
   test("exclusive ranges sliced into ranges") {
@@ -140,8 +144,8 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
       assert(slices(i).isInstanceOf[Range])
       val range = slices(i).asInstanceOf[Range]
       assert(range.start === i * (N / 40), "slice " + i + " start")
-      assert(range.end   === (i + 1) * (N / 40), "slice " + i + " end")
-      assert(range.step  === 1, "slice " + i + " step")
+      assert(range.end === (i + 1) * (N / 40), "slice " + i + " end")
+      assert(range.step === 1, "slice " + i + " step")
     }
   }
 
@@ -150,14 +154,16 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
       d <- arbitrary[List[Int]]
       n <- Gen.choose(1, 100)
     } yield (d, n)
-    val prop = forAll(gen) {
-      (tuple: (List[Int], Int)) =>
-        val d = tuple._1
-        val n = tuple._2
-        val slices = ParallelCollectionRDD.slice(d, n)
-        ("n slices"    |: slices.size == n) &&
-        ("concat to d" |: Seq.concat(slices: _*).mkString(",") == d.mkString(",")) &&
-        ("equal sizes" |: slices.map(_.size).forall(x => x == d.size / n || x == d.size /n + 1))
+    val prop = forAll(gen) { (tuple: (List[Int], Int)) =>
+      val d = tuple._1
+      val n = tuple._2
+      val slices = ParallelCollectionRDD.slice(d, n)
+      ("n slices" |: slices.size == n) &&
+      ("concat to d" |: Seq.concat(slices: _*).mkString(",") == d.mkString(
+              ",")) &&
+      ("equal sizes" |: slices
+            .map(_.size)
+            .forall(x => x == d.size / n || x == d.size / n + 1))
     }
     check(prop)
   }
@@ -172,10 +178,13 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
     val prop = forAll(gen) {
       case (d: Range, n: Int) =>
         val slices = ParallelCollectionRDD.slice(d, n)
-        ("n slices"    |: slices.size == n) &&
-        ("all ranges"  |: slices.forall(_.isInstanceOf[Range])) &&
-        ("concat to d" |: Seq.concat(slices: _*).mkString(",") == d.mkString(",")) &&
-        ("equal sizes" |: slices.map(_.size).forall(x => x == d.size / n || x == d.size / n + 1))
+        ("n slices" |: slices.size == n) &&
+        ("all ranges" |: slices.forall(_.isInstanceOf[Range])) &&
+        ("concat to d" |: Seq.concat(slices: _*).mkString(",") == d.mkString(
+                ",")) &&
+        ("equal sizes" |: slices
+              .map(_.size)
+              .forall(x => x == d.size / n || x == d.size / n + 1))
     }
     check(prop)
   }
@@ -190,10 +199,13 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
     val prop = forAll(gen) {
       case (d: Range, n: Int) =>
         val slices = ParallelCollectionRDD.slice(d, n)
-        ("n slices"    |: slices.size == n) &&
-        ("all ranges"  |: slices.forall(_.isInstanceOf[Range])) &&
-        ("concat to d" |: Seq.concat(slices: _*).mkString(",") == d.mkString(",")) &&
-        ("equal sizes" |: slices.map(_.size).forall(x => x == d.size / n || x == d.size / n + 1))
+        ("n slices" |: slices.size == n) &&
+        ("all ranges" |: slices.forall(_.isInstanceOf[Range])) &&
+        ("concat to d" |: Seq.concat(slices: _*).mkString(",") == d.mkString(
+                ",")) &&
+        ("equal sizes" |: slices
+              .map(_.size)
+              .forall(x => x == d.size / n || x == d.size / n + 1))
     }
     check(prop)
   }

@@ -13,6 +13,6 @@ package foo {
 object Test {
   trait Dingo extends Any with bippy.Bippy[foo.unrelated.Unrelated]
 
-  def f(x: Dingo): AnyRef = x   // fail - no conversion to AnyRef
-  var x: Int = null             // fail - no conversion from Null
+  def f(x: Dingo): AnyRef = x // fail - no conversion to AnyRef
+  var x: Int = null // fail - no conversion from Null
 }

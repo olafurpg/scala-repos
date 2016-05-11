@@ -39,14 +39,14 @@ class EnsembleEllipse extends EnsembleExample {
     spacing = 25
     padding = Insets(20)
     children = List(
-      new Ellipse{
+        new Ellipse {
           centerX = 40
           centerY = 45
           radiusX = 30
           radiusY = 45
-        fill = Color.BlueViolet
-      },
-        new Ellipse{
+          fill = Color.BlueViolet
+        },
+        new Ellipse {
           centerX = 140
           centerY = 145
           radiusX = 30
@@ -56,5 +56,4 @@ class EnsembleEllipse extends EnsembleExample {
         }
     )
   }
-
 }

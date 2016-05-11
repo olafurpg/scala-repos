@@ -4,9 +4,9 @@ package codeInspection.collections
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 
 /**
- * Nikolay.Tropin
- * 2014-05-07
- */
+  * Nikolay.Tropin
+  * 2014-05-07
+  */
 class FilterIsEmptyCheckTest extends OperationsOnCollectionInspectionTest {
   override val inspectionClass = classOf[FilterEmptyCheckInspection]
   override val hint = InspectionBundle.message("filter.empty.check.hint")
@@ -30,8 +30,7 @@ class FilterIsEmptyCheckTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testWithSideEffect(): Unit = {
-    val text =
-      """var z = 1
+    val text = """var z = 1
         |Seq(0).filter { x =>
         |  z = x
         |  true
@@ -55,7 +54,6 @@ class FilterIsEmptyCheckTest extends OperationsOnCollectionInspectionTest {
     val result = "!Seq(1).exists(x => true)"
     testFix(text, result, hint)
   }
-
 }
 
 class FilterNonEmptyCheckTest extends OperationsOnCollectionInspectionTest {
@@ -106,7 +104,6 @@ class FilterNonEmptyCheckTest extends OperationsOnCollectionInspectionTest {
     val result = "Seq(1).exists(x => true)"
     testFix(text, result, hint)
   }
-
 }
 
 class FilterNotIsEmptyCheckTest extends OperationsOnCollectionInspectionTest {
@@ -136,7 +133,6 @@ class FilterNotIsEmptyCheckTest extends OperationsOnCollectionInspectionTest {
     val result = "List().forall(x => true)"
     testFix(text, result, hint)
   }
-
 }
 
 class FilterNotNonEmptyCheckTest extends OperationsOnCollectionInspectionTest {

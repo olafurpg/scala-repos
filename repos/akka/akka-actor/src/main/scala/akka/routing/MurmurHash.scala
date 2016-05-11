@@ -1,37 +1,35 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2011, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2011, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 /**
- * An implementation of Austin Appleby's MurmurHash 3.0 algorithm
- *  (32 bit version); reference: http://code.google.com/p/smhasher
- *
- *  This is the hash used by collections and case classes (including
- *  tuples).
- *
- *  @author  Rex Kerr
- *  @version 2.9
- *  @since   2.9
- */
-
+  * An implementation of Austin Appleby's MurmurHash 3.0 algorithm
+  *  (32 bit version); reference: http://code.google.com/p/smhasher
+  *
+  *  This is the hash used by collections and case classes (including
+  *  tuples).
+  *
+  *  @author  Rex Kerr
+  *  @version 2.9
+  *  @since   2.9
+  */
 package akka.routing
 
-import java.lang.Integer.{ rotateLeft ⇒ rotl }
+import java.lang.Integer.{rotateLeft ⇒ rotl}
 
 /**
- * An object designed to generate well-distributed non-cryptographic
- *  hashes.  It is designed to hash a collection of integers; along with
- *  the integers to hash, it generates two magic streams of integers to
- *  increase the distribution of repetitive input sequences.  Thus,
- *  three methods need to be called at each step (to start and to
- *  incorporate a new integer) to update the values.  Only one method
- *  needs to be called to finalize the hash.
- */
-
+  * An object designed to generate well-distributed non-cryptographic
+  *  hashes.  It is designed to hash a collection of integers; along with
+  *  the integers to hash, it generates two magic streams of integers to
+  *  increase the distribution of repetitive input sequences.  Thus,
+  *  three methods need to be called at each step (to start and to
+  *  incorporate a new integer) to update the values.  Only one method
+  *  needs to be called to finalize the hash.
+  */
 object MurmurHash {
   // Magic values used for MurmurHash's 32 bit hash.
   // Don't change these without consulting a hashing expert!
@@ -66,14 +64,14 @@ object MurmurHash {
   def startMagicB: Int = hiddenMagicB
 
   /**
-   * Incorporates a new value into an existing hash.
-   *
-   *  @param   hash    the prior hash value
-   *  @param  value    the new value to incorporate
-   *  @param magicA    a magic integer from the stream
-   *  @param magicB    a magic integer from a different stream
-   *  @return          the updated hash value
-   */
+    * Incorporates a new value into an existing hash.
+    *
+    *  @param   hash    the prior hash value
+    *  @param  value    the new value to incorporate
+    *  @param magicA    a magic integer from the stream
+    *  @param magicB    a magic integer from a different stream
+    *  @return          the updated hash value
+    */
   def extendHash(hash: Int, value: Int, magicA: Int, magicB: Int): Int =
     (hash ^ rotl(value * magicA, 11) * magicB) * 3 + visibleMixer
 
@@ -126,19 +124,21 @@ object MurmurHash {
   }
 
   /**
-   * Compute a hash that is symmetric in its arguments--that is,
-   *  where the order of appearance of elements does not matter.
-   *  This is useful for hashing sets, for example.
-   */
+    * Compute a hash that is symmetric in its arguments--that is,
+    *  where the order of appearance of elements does not matter.
+    *  This is useful for hashing sets, for example.
+    */
   def symmetricHash[T](xs: TraversableOnce[T], seed: Int): Int = {
     var a, b, n = 0
     var c = 1
-    xs.foreach(i ⇒ {
-      val h = i.##
-      a += h
-      b ^= h
-      if (h != 0) c *= h
-      n += 1
+    xs.foreach(
+        i ⇒
+          {
+        val h = i.##
+        a += h
+        b ^= h
+        if (h != 0) c *= h
+        n += 1
     })
     var h = startHash(seed * n)
     h = extendHash(h, a, storedMagicA(0), storedMagicB(0))

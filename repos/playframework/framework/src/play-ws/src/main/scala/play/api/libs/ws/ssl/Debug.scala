@@ -6,8 +6,8 @@
 package play.api.libs.ws.ssl
 
 /**
- * @see http://docs.oracle.com/javase/8/docs/technotes/guides/security/certpath/CertPathProgGuide.html
- */
+  * @see http://docs.oracle.com/javase/8/docs/technotes/guides/security/certpath/CertPathProgGuide.html
+  */
 class JavaSecurityDebugBuilder(c: SSLDebugConfig) {
 
   def build(): String = {
@@ -23,16 +23,15 @@ class JavaSecurityDebugBuilder(c: SSLDebugConfig) {
 
     b.toString()
   }
-
 }
 
 /**
- * A builder for setting the system property options in "javax.net.debug" and in "java.security.debug' (in
- * the case of "certpath").
- *
- * @see http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html#Debug
- * @see http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/ReadDebug.html
- */
+  * A builder for setting the system property options in "javax.net.debug" and in "java.security.debug' (in
+  * the case of "certpath").
+  *
+  * @see http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html#Debug
+  * @see http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/ReadDebug.html
+  */
 class JavaxNetDebugBuilder(c: SSLDebugConfig) {
 
   def build(): String = {
@@ -45,26 +44,24 @@ class JavaxNetDebugBuilder(c: SSLDebugConfig) {
 
     val b = new StringBuilder()
 
-    record.map {
-      r =>
-        b.append(" record")
-        if (r.packet) {
-          b.append(" packet")
-        }
-        if (r.plaintext) {
-          b.append(" plaintext")
-        }
+    record.map { r =>
+      b.append(" record")
+      if (r.packet) {
+        b.append(" packet")
+      }
+      if (r.plaintext) {
+        b.append(" plaintext")
+      }
     }
 
-    handshake.map {
-      h =>
-        b.append(" handshake")
-        if (h.data) {
-          b.append(" data")
-        }
-        if (h.verbose) {
-          b.append(" verbose")
-        }
+    handshake.map { h =>
+      b.append(" handshake")
+      if (h.data) {
+        b.append(" data")
+      }
+      if (h.verbose) {
+        b.append(" verbose")
+      }
     }
 
     if (keygen) {

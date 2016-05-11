@@ -22,14 +22,15 @@ object ShoppingCartSpec extends MultiNodeConfig {
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
     """))
-
 }
 
 class ShoppingCartSpecMultiJvmNode1 extends ShoppingCartSpec
 class ShoppingCartSpecMultiJvmNode2 extends ShoppingCartSpec
 class ShoppingCartSpecMultiJvmNode3 extends ShoppingCartSpec
 
-class ShoppingCartSpec extends MultiNodeSpec(ShoppingCartSpec) with STMultiNodeSpec with ImplicitSender {
+class ShoppingCartSpec
+    extends MultiNodeSpec(ShoppingCartSpec) with STMultiNodeSpec
+    with ImplicitSender {
   import ShoppingCartSpec._
   import ShoppingCart._
 
@@ -61,15 +62,17 @@ class ShoppingCartSpec extends MultiNodeSpec(ShoppingCartSpec) with STMultiNodeS
     "handle updates directly after start" in within(15.seconds) {
       runOn(node2) {
         shoppingCart ! new ShoppingCart.AddItem(new LineItem("1", "Apples", 2))
-        shoppingCart ! new ShoppingCart.AddItem(new LineItem("2", "Oranges", 3))
+        shoppingCart ! new ShoppingCart.AddItem(
+            new LineItem("2", "Oranges", 3))
       }
       enterBarrier("updates-done")
 
       awaitAssert {
         shoppingCart ! ShoppingCart.GET_CART
         val cart = expectMsgType[Cart]
-        cart.items.asScala.toSet should be(Set(
-            new LineItem("1", "Apples", 2), new LineItem("2", "Oranges", 3)))
+        cart.items.asScala.toSet should be(
+            Set(new LineItem("1", "Apples", 2),
+                new LineItem("2", "Oranges", 3)))
       }
 
       enterBarrier("after-2")
@@ -81,7 +84,8 @@ class ShoppingCartSpec extends MultiNodeSpec(ShoppingCartSpec) with STMultiNodeS
         shoppingCart ! new ShoppingCart.RemoveItem("2")
       }
       runOn(node3) {
-        shoppingCart ! new ShoppingCart.AddItem(new LineItem("3", "Bananas", 4))
+        shoppingCart ! new ShoppingCart.AddItem(
+            new LineItem("3", "Bananas", 4))
       }
       enterBarrier("updates-done")
 
@@ -89,13 +93,11 @@ class ShoppingCartSpec extends MultiNodeSpec(ShoppingCartSpec) with STMultiNodeS
         shoppingCart ! ShoppingCart.GET_CART
         val cart = expectMsgType[Cart]
         cart.items.asScala.toSet should be(
-            Set(new LineItem("1", "Apples", 7), new LineItem("3", "Bananas", 4)))
+            Set(new LineItem("1", "Apples", 7),
+                new LineItem("3", "Bananas", 4)))
       }
 
       enterBarrier("after-3")
     }
-
   }
-
 }
-

@@ -22,61 +22,67 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 /**
- * Mutable counter for the Memory platform
- */
+  * Mutable counter for the Memory platform
+  */
 class MemoryCounter {
 
   private val count: AtomicLong = new AtomicLong()
 
   /**
-   * Increment the counter
-   * @param by - the amount to increment the counter by
-   */
+    * Increment the counter
+    * @param by - the amount to increment the counter by
+    */
   def incr(by: Long): Unit = {
     val c = count.addAndGet(by)
   }
 
   /**
-   * Get the counter value
-   */
+    * Get the counter value
+    */
   def get: Long = count.get()
 }
 
 /**
- * Incrementor for Memory Counters
- * Returned to the Summingbird Counter object to call incrBy function in job code
- */
-private[summingbird] case class MemoryCounterIncrementor(counter: MemoryCounter) extends CounterIncrementor {
+  * Incrementor for Memory Counters
+  * Returned to the Summingbird Counter object to call incrBy function in job code
+  */
+private[summingbird] case class MemoryCounterIncrementor(
+    counter: MemoryCounter)
+    extends CounterIncrementor {
   def incrBy(by: Long): Unit = counter.incr(by)
 }
 
 /**
- * MemoryStatProvider object, contains counters for the Memory job
- */
+  * MemoryStatProvider object, contains counters for the Memory job
+  */
 private[summingbird] object MemoryStatProvider extends PlatformStatProvider {
 
-  private val countersForJob = new ConcurrentHashMap[JobId, Map[String, MemoryCounter]]()
+  private val countersForJob =
+    new ConcurrentHashMap[JobId, Map[String, MemoryCounter]]()
 
   /**
-   * Returns the counters for the job
-   */
+    * Returns the counters for the job
+    */
   def getCountersForJob(jobID: JobId): Option[Map[String, MemoryCounter]] =
     Option(countersForJob.get(jobID))
 
   /**
-   * Memory counter incrementor, used by the Counter object in Summingbird job
-   */
-  def counterIncrementor(jobID: JobId, group: Group, name: Name): Option[MemoryCounterIncrementor] =
+    * Memory counter incrementor, used by the Counter object in Summingbird job
+    */
+  def counterIncrementor(jobID: JobId,
+                         group: Group,
+                         name: Name): Option[MemoryCounterIncrementor] =
     Option(countersForJob.get(jobID)).map { m =>
-      MemoryCounterIncrementor(m.getOrElse(group.getString + "/" + name.getString,
-        sys.error("It is only valid to create counter objects during job submission")))
+      MemoryCounterIncrementor(m.getOrElse(
+              group.getString + "/" + name.getString,
+              sys.error("It is only valid to create counter objects during job submission")))
     }
 
   /**
-   * Registers counters with the MemoryStatProvider
-   * @param jobID for the job
-   * @param counters - list of counter names with format (group, name)
-   */
+    * Registers counters with the MemoryStatProvider
+    * @param jobID for the job
+    * @param counters - list of counter names with format (group, name)
+    */
   def registerCounters(jobID: JobId, counters: Seq[(Group, Name)]): Unit = {
     val memoryCounters = counters.map {
       case (group, name) =>
@@ -87,9 +93,11 @@ private[summingbird] object MemoryStatProvider extends PlatformStatProvider {
     def put(m: Map[String, MemoryCounter]): Unit =
       countersForJob.putIfAbsent(jobID, memoryCounters) match {
         case null => () // The jobID was not present
-        case previous if (previous.keySet & m.keySet).nonEmpty => // Key intersection nonempty
+        case previous if (previous.keySet & m.keySet).nonEmpty =>
+          // Key intersection nonempty
           // prefer the old values
-          if (countersForJob.replace(jobID, previous, (m ++ previous))) () else put(m)
+          if (countersForJob.replace(jobID, previous, (m ++ previous))) ()
+          else put(m)
         case _ => () // there is something there, but the keys are all present
       }
 

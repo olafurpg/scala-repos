@@ -10,9 +10,12 @@ import org.scalatest.junit.JUnitRunner
 
 @Ignore
 @RunWith(classOf[JUnitRunner])
-final class ServerClientServerIntegrationSuite extends RedisClientServerIntegrationTest {
+final class ServerClientServerIntegrationSuite
+    extends RedisClientServerIntegrationTest {
 
-  test("FLUSHALL should return a StatusReply(\"OK\")", ClientServerTest, RedisTest) {
+  test("FLUSHALL should return a StatusReply(\"OK\")",
+       ClientServerTest,
+       RedisTest) {
     withRedisClient { client =>
       assert(Await.result(client(FlushAll)) == OKStatusReply)
     }

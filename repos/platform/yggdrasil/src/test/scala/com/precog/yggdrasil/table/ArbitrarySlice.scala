@@ -33,7 +33,9 @@ import com.precog.util.BitSetUtil.Implicits._
 
 trait ArbitrarySlice {
   def arbitraryBitSet(size: Int): Gen[BitSet] = {
-    containerOfN[List, Boolean](size, arbitrary[Boolean]) map { BitsetColumn.bitset _ }
+    containerOfN[List, Boolean](size, arbitrary[Boolean]) map {
+      BitsetColumn.bitset _
+    }
   }
 
   private def fullBitSet(size: Int): BitSet = BitSetUtil.range(0, size)
@@ -41,17 +43,51 @@ trait ArbitrarySlice {
   def genColumn(col: ColumnRef, size: Int): Gen[Column] = {
     val bs = fullBitSet(size)
     col.ctype match {
-      case CString            => containerOfN[Array, String](size, arbitrary[String]) map { strs => ArrayStrColumn(bs, strs) }
-      case CBoolean           => containerOfN[Array, Boolean](size, arbitrary[Boolean]) map { bools => ArrayBoolColumn(bs, bools) }
-      case CLong              => containerOfN[Array, Long](size, arbitrary[Long]) map { longs => ArrayLongColumn(bs, longs) }
-      case CDouble            => containerOfN[Array, Double](size, arbitrary[Double]) map { doubles => ArrayDoubleColumn(bs, doubles) }
-      case CNum               => containerOfN[List, Double](size, arbitrary[Double]) map { arr => ArrayNumColumn(bs, arr.map(v => BigDecimal(v)).toArray) }
-      case CNull              => arbitraryBitSet(size) map { s => new BitsetColumn(s) with NullColumn }
-      case CDate              => containerOfN[Array, Long](size, arbitrary[Long]) map { longs => ArrayDateColumn(bs, longs.map { l => new DateTime(l) }) }
-      case CPeriod            => containerOfN[Array, Long](size, arbitrary[Long]) map { longs => ArrayPeriodColumn(bs, longs.map { l => new Period(l) }) }
-      case CEmptyObject       => arbitraryBitSet(size) map { s => new BitsetColumn(s) with EmptyObjectColumn }
-      case CEmptyArray        => arbitraryBitSet(size) map { s => new BitsetColumn(s) with EmptyArrayColumn }
-      case CUndefined         => Gen.value(UndefinedColumn.raw)
+      case CString =>
+        containerOfN[Array, String](size, arbitrary[String]) map { strs =>
+          ArrayStrColumn(bs, strs)
+        }
+      case CBoolean =>
+        containerOfN[Array, Boolean](size, arbitrary[Boolean]) map { bools =>
+          ArrayBoolColumn(bs, bools)
+        }
+      case CLong =>
+        containerOfN[Array, Long](size, arbitrary[Long]) map { longs =>
+          ArrayLongColumn(bs, longs)
+        }
+      case CDouble =>
+        containerOfN[Array, Double](size, arbitrary[Double]) map { doubles =>
+          ArrayDoubleColumn(bs, doubles)
+        }
+      case CNum =>
+        containerOfN[List, Double](size, arbitrary[Double]) map { arr =>
+          ArrayNumColumn(bs, arr.map(v => BigDecimal(v)).toArray)
+        }
+      case CNull =>
+        arbitraryBitSet(size) map { s =>
+          new BitsetColumn(s) with NullColumn
+        }
+      case CDate =>
+        containerOfN[Array, Long](size, arbitrary[Long]) map { longs =>
+          ArrayDateColumn(bs, longs.map { l =>
+            new DateTime(l)
+          })
+        }
+      case CPeriod =>
+        containerOfN[Array, Long](size, arbitrary[Long]) map { longs =>
+          ArrayPeriodColumn(bs, longs.map { l =>
+            new Period(l)
+          })
+        }
+      case CEmptyObject =>
+        arbitraryBitSet(size) map { s =>
+          new BitsetColumn(s) with EmptyObjectColumn
+        }
+      case CEmptyArray =>
+        arbitraryBitSet(size) map { s =>
+          new BitsetColumn(s) with EmptyArrayColumn
+        }
+      case CUndefined => Gen.value(UndefinedColumn.raw)
     }
   }
 
@@ -64,8 +100,11 @@ trait ArbitrarySlice {
     }
 
     for {
-      ids <- listOfN(identities, listOfN(sz, arbitrary[Long]).map(_.sorted.toArray))
-      data <- sequence(refs.toList.map { cr => genColumn(cr, sz).map(col => (cr, col)) }, value(Nil))
+      ids <- listOfN(
+          identities, listOfN(sz, arbitrary[Long]).map(_.sorted.toArray))
+      data <- sequence(refs.toList.map { cr =>
+        genColumn(cr, sz).map(col => (cr, col))
+      }, value(Nil))
     } yield {
       new Slice {
         val size = sz

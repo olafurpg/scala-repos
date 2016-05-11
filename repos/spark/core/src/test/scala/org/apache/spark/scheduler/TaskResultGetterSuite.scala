@@ -38,21 +38,21 @@ import org.apache.spark.storage.TaskResultBlockId
 import org.apache.spark.TestUtils.JavaSourceFromString
 import org.apache.spark.util.{MutableURLClassLoader, RpcUtils, Utils}
 
-
 /**
- * Removes the TaskResult from the BlockManager before delegating to a normal TaskResultGetter.
- *
- * Used to test the case where a BlockManager evicts the task result (or dies) before the
- * TaskResult is retrieved.
- */
-private class ResultDeletingTaskResultGetter(sparkEnv: SparkEnv, scheduler: TaskSchedulerImpl)
-  extends TaskResultGetter(sparkEnv, scheduler) {
+  * Removes the TaskResult from the BlockManager before delegating to a normal TaskResultGetter.
+  *
+  * Used to test the case where a BlockManager evicts the task result (or dies) before the
+  * TaskResult is retrieved.
+  */
+private class ResultDeletingTaskResultGetter(
+    sparkEnv: SparkEnv, scheduler: TaskSchedulerImpl)
+    extends TaskResultGetter(sparkEnv, scheduler) {
   var removedResult = false
 
   @volatile var removeBlockSuccessfully = false
 
   override def enqueueSuccessfulTask(
-    taskSetManager: TaskSetManager, tid: Long, serializedData: ByteBuffer) {
+      taskSetManager: TaskSetManager, tid: Long, serializedData: ByteBuffer) {
     if (!removedResult) {
       // Only remove the result once, since we'd like to test the case where the task eventually
       // succeeds.
@@ -78,35 +78,38 @@ private class ResultDeletingTaskResultGetter(sparkEnv: SparkEnv, scheduler: Task
   }
 }
 
-
 /**
- * A [[TaskResultGetter]] that stores the [[DirectTaskResult]]s it receives from executors
- * _before_ modifying the results in any way.
- */
+  * A [[TaskResultGetter]] that stores the [[DirectTaskResult]]s it receives from executors
+  * _before_ modifying the results in any way.
+  */
 private class MyTaskResultGetter(env: SparkEnv, scheduler: TaskSchedulerImpl)
-  extends TaskResultGetter(env, scheduler) {
+    extends TaskResultGetter(env, scheduler) {
 
   // Use the current thread so we can access its results synchronously
-  protected override val getTaskResultExecutor = MoreExecutors.sameThreadExecutor()
+  protected override val getTaskResultExecutor =
+    MoreExecutors.sameThreadExecutor()
 
   // DirectTaskResults that we receive from the executors
   private val _taskResults = new ArrayBuffer[DirectTaskResult[_]]
 
   def taskResults: Seq[DirectTaskResult[_]] = _taskResults
 
-  override def enqueueSuccessfulTask(tsm: TaskSetManager, tid: Long, data: ByteBuffer): Unit = {
+  override def enqueueSuccessfulTask(
+      tsm: TaskSetManager, tid: Long, data: ByteBuffer): Unit = {
     // work on a copy since the super class still needs to use the buffer
     val newBuffer = data.duplicate()
-    _taskResults += env.closureSerializer.newInstance().deserialize[DirectTaskResult[_]](newBuffer)
+    _taskResults += env.closureSerializer
+      .newInstance()
+      .deserialize[DirectTaskResult[_]](newBuffer)
     super.enqueueSuccessfulTask(tsm, tid, data)
   }
 }
 
-
 /**
- * Tests related to handling task results (both direct and indirect).
- */
-class TaskResultGetterSuite extends SparkFunSuite with BeforeAndAfter with LocalSparkContext {
+  * Tests related to handling task results (both direct and indirect).
+  */
+class TaskResultGetterSuite
+    extends SparkFunSuite with BeforeAndAfter with LocalSparkContext {
 
   // Set the RPC message size to be as small as possible (it must be an integer, so 1 is as small
   // as we can make it) so the tests don't take too long.
@@ -121,13 +124,15 @@ class TaskResultGetterSuite extends SparkFunSuite with BeforeAndAfter with Local
   test("handling results larger than max RPC message size") {
     sc = new SparkContext("local", "test", conf)
     val maxRpcMessageSize = RpcUtils.maxMessageSizeBytes(conf)
-    val result =
-      sc.parallelize(Seq(1), 1).map(x => 1.to(maxRpcMessageSize).toArray).reduce((x, y) => x)
+    val result = sc
+      .parallelize(Seq(1), 1)
+      .map(x => 1.to(maxRpcMessageSize).toArray)
+      .reduce((x, y) => x)
     assert(result === 1.to(maxRpcMessageSize).toArray)
 
     val RESULT_BLOCK_ID = TaskResultBlockId(0)
     assert(sc.env.blockManager.master.getLocations(RESULT_BLOCK_ID).size === 0,
-      "Expect result to be removed from the block manager.")
+           "Expect result to be removed from the block manager.")
   }
 
   test("task retried if result missing from block manager") {
@@ -146,8 +151,10 @@ class TaskResultGetterSuite extends SparkFunSuite with BeforeAndAfter with Local
     val resultGetter = new ResultDeletingTaskResultGetter(sc.env, scheduler)
     scheduler.taskResultGetter = resultGetter
     val maxRpcMessageSize = RpcUtils.maxMessageSizeBytes(conf)
-    val result =
-      sc.parallelize(Seq(1), 1).map(x => 1.to(maxRpcMessageSize).toArray).reduce((x, y) => x)
+    val result = sc
+      .parallelize(Seq(1), 1)
+      .map(x => 1.to(maxRpcMessageSize).toArray)
+      .reduce((x, y) => x)
     assert(resultGetter.removeBlockSuccessfully)
     assert(result === 1.to(maxRpcMessageSize).toArray)
 
@@ -156,36 +163,40 @@ class TaskResultGetterSuite extends SparkFunSuite with BeforeAndAfter with Local
   }
 
   /**
-   * Make sure we are using the context classloader when deserializing failed TaskResults instead
-   * of the Spark classloader.
+    * Make sure we are using the context classloader when deserializing failed TaskResults instead
+    * of the Spark classloader.
 
-   * This test compiles a jar containing an exception and tests that when it is thrown on the
-   * executor, enqueueFailedTask can correctly deserialize the failure and identify the thrown
-   * exception as the cause.
+    * This test compiles a jar containing an exception and tests that when it is thrown on the
+    * executor, enqueueFailedTask can correctly deserialize the failure and identify the thrown
+    * exception as the cause.
 
-   * Before this fix, enqueueFailedTask would throw a ClassNotFoundException when deserializing
-   * the exception, resulting in an UnknownReason for the TaskEndResult.
-   */
+    * Before this fix, enqueueFailedTask would throw a ClassNotFoundException when deserializing
+    * the exception, resulting in an UnknownReason for the TaskEndResult.
+    */
   test("failed task deserialized with the correct classloader (SPARK-11195)") {
     // compile a small jar containing an exception that will be thrown on an executor.
     val tempDir = Utils.createTempDir()
     val srcDir = new File(tempDir, "repro/")
     srcDir.mkdirs()
-    val excSource = new JavaSourceFromString(new File(srcDir, "MyException").getAbsolutePath,
-      """package repro;
+    val excSource =
+      new JavaSourceFromString(new File(srcDir, "MyException").getAbsolutePath,
+                               """package repro;
         |
         |public class MyException extends Exception {
         |}
       """.stripMargin)
-    val excFile = TestUtils.createCompiledClass("MyException", srcDir, excSource, Seq.empty)
-    val jarFile = new File(tempDir, "testJar-%s.jar".format(System.currentTimeMillis()))
+    val excFile = TestUtils.createCompiledClass(
+        "MyException", srcDir, excSource, Seq.empty)
+    val jarFile =
+      new File(tempDir, "testJar-%s.jar".format(System.currentTimeMillis()))
     TestUtils.createJar(Seq(excFile), jarFile, directoryPrefix = Some("repro"))
 
     // ensure we reset the classloader after the test completes
     val originalClassLoader = Thread.currentThread.getContextClassLoader
     try {
       // load the exception from the jar
-      val loader = new MutableURLClassLoader(new Array[URL](0), originalClassLoader)
+      val loader =
+        new MutableURLClassLoader(new Array[URL](0), originalClassLoader)
       loader.addURL(jarFile.toURI.toURL)
       Thread.currentThread().setContextClassLoader(loader)
       val excClass: Class[_] = Utils.classForName("repro.MyException")
@@ -231,7 +242,8 @@ class TaskResultGetterSuite extends SparkFunSuite with BeforeAndAfter with Local
     // Just run 1 task and capture the corresponding DirectTaskResult
     sc.parallelize(1 to 1, 1).count()
     val captor = ArgumentCaptor.forClass(classOf[DirectTaskResult[_]])
-    verify(spyScheduler, times(1)).handleSuccessfulTask(any(), anyLong(), captor.capture())
+    verify(spyScheduler, times(1))
+      .handleSuccessfulTask(any(), anyLong(), captor.capture())
 
     // When a task finishes, the executor sends a serialized DirectTaskResult to the driver
     // without setting the result size so as to avoid serializing the result again. Instead,
@@ -241,11 +253,12 @@ class TaskResultGetterSuite extends SparkFunSuite with BeforeAndAfter with Local
     assert(resultGetter.taskResults.size === 1)
     val resBefore = resultGetter.taskResults.head
     val resAfter = captor.getValue
-    val resSizeBefore = resBefore.accumUpdates.find(_.name == Some(RESULT_SIZE)).flatMap(_.update)
-    val resSizeAfter = resAfter.accumUpdates.find(_.name == Some(RESULT_SIZE)).flatMap(_.update)
+    val resSizeBefore = resBefore.accumUpdates
+      .find(_.name == Some(RESULT_SIZE))
+      .flatMap(_.update)
+    val resSizeAfter =
+      resAfter.accumUpdates.find(_.name == Some(RESULT_SIZE)).flatMap(_.update)
     assert(resSizeBefore.exists(_ == 0L))
     assert(resSizeAfter.exists(_.toString.toLong > 0L))
   }
-
 }
-

@@ -7,5 +7,4 @@ object Foo extends Bar {
 
   class FooConfig extends Config;
   var config: Config = new FooConfig() // or not
-
 }

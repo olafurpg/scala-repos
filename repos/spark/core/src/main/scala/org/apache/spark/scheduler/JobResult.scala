@@ -20,9 +20,9 @@ package org.apache.spark.scheduler
 import org.apache.spark.annotation.DeveloperApi
 
 /**
- * :: DeveloperApi ::
- * A result of a job in the DAGScheduler.
- */
+  * :: DeveloperApi ::
+  * A result of a job in the DAGScheduler.
+  */
 @DeveloperApi
 sealed trait JobResult
 

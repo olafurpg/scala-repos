@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import akka.testkit._
@@ -14,11 +14,12 @@ object FSMTransitionSpec {
     def receive = { case _ ⇒ }
   }
 
-  class SendAnyTransitionFSM(target: ActorRef) extends Actor with FSM[Int, Int] {
+  class SendAnyTransitionFSM(target: ActorRef)
+      extends Actor with FSM[Int, Int] {
     startWith(0, 0)
     when(0) {
       case Event("stay", _) ⇒ stay()
-      case Event(_, _)      ⇒ goto(0)
+      case Event(_, _) ⇒ goto(0)
     }
     onTransition { case from -> to ⇒ target ! (from -> to) }
 
@@ -37,7 +38,9 @@ object FSMTransitionSpec {
       case Event("reply", _) ⇒ stay replying "reply"
     }
     initialize()
-    override def preRestart(reason: Throwable, msg: Option[Any]) { target ! "restarted" }
+    override def preRestart(reason: Throwable, msg: Option[Any]) {
+      target ! "restarted"
+    }
   }
 
   class OtherFSM(target: ActorRef) extends Actor with FSM[Int, Int] {
@@ -58,7 +61,6 @@ object FSMTransitionSpec {
   class Forwarder(target: ActorRef) extends Actor {
     def receive = { case x ⇒ target ! x }
   }
-
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -78,7 +80,7 @@ class FSMTransitionSpec extends AkkaSpec with ImplicitSender {
     }
 
     "notify listeners" in {
-      import FSM.{ CurrentState, SubscribeTransitionCallBack, Transition }
+      import FSM.{CurrentState, SubscribeTransitionCallBack, Transition}
 
       val fsm = system.actorOf(Props(new MyFSM(testActor)))
       within(1 second) {
@@ -169,5 +171,4 @@ class FSMTransitionSpec extends AkkaSpec with ImplicitSender {
       expectMsg("ok")
     }
   }
-
 }

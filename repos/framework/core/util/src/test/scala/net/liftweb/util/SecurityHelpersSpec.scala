@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package net.liftweb
 package util
 
@@ -25,9 +24,9 @@ import org.specs2.mutable.Specification
 import SecurityHelpers._
 
 /**
- * Systems under specification for SecurityHelpers.
- */
-object SecurityHelpersSpec extends Specification  {
+  * Systems under specification for SecurityHelpers.
+  */
+object SecurityHelpersSpec extends Specification {
   "SecurityHelpers Specification".title
 
   "Security Helpers" should {
@@ -36,8 +35,7 @@ object SecurityHelpersSpec extends Specification  {
         <!DOCTYPE foo [
           <!ELEMENT foo ANY >
           <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>
-        <foo>&xxe;</foo>"""
-      ) must throwA[SAXParseException]
+        <foo>&xxe;</foo>""") must throwA[SAXParseException]
     }
 
     "parse XML without a DOCTYPE" in {
@@ -68,7 +66,7 @@ object SecurityHelpersSpec extends Specification  {
       encrypted must_!= "hello world"
       blowfishDecrypt(encrypted, key) must_== "hello world"
     }
-    */
+     */
 
     "provide a md5 function to create a md5 digest from a string" in {
       md5("hello") must_== "XUFAKrxLKna5cZ2REBfFkg=="
@@ -91,6 +89,4 @@ object SecurityHelpersSpec extends Specification  {
       hexDigest256("hello".getBytes) must_!= hexDigest256("hell0".getBytes)
     }
   }
-
 }
-

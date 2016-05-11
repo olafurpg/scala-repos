@@ -13,5 +13,5 @@ class TailCall[@specialized T] {
       dropLeft(2, List(1, 2, 3)).isEmpty
     } => true
   }
-*/
+ */
 }

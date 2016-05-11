@@ -31,31 +31,34 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{StructField, StructType}
 
 /**
- * Params for [[MaxAbsScaler]] and [[MaxAbsScalerModel]].
- */
-private[feature] trait MaxAbsScalerParams extends Params with HasInputCol with HasOutputCol {
+  * Params for [[MaxAbsScaler]] and [[MaxAbsScalerModel]].
+  */
+private[feature] trait MaxAbsScalerParams
+    extends Params with HasInputCol with HasOutputCol {
 
-   /** Validates and transforms the input schema. */
+  /** Validates and transforms the input schema. */
   protected def validateAndTransformSchema(schema: StructType): StructType = {
     val inputType = schema($(inputCol)).dataType
     require(inputType.isInstanceOf[VectorUDT],
-      s"Input column ${$(inputCol)} must be a vector column")
+            s"Input column ${$(inputCol)} must be a vector column")
     require(!schema.fieldNames.contains($(outputCol)),
-      s"Output column ${$(outputCol)} already exists.")
-    val outputFields = schema.fields :+ StructField($(outputCol), new VectorUDT, false)
+            s"Output column ${$(outputCol)} already exists.")
+    val outputFields =
+      schema.fields :+ StructField($(outputCol), new VectorUDT, false)
     StructType(outputFields)
   }
 }
 
 /**
- * :: Experimental ::
- * Rescale each feature individually to range [-1, 1] by dividing through the largest maximum
- * absolute value in each feature. It does not shift/center the data, and thus does not destroy
- * any sparsity.
- */
+  * :: Experimental ::
+  * Rescale each feature individually to range [-1, 1] by dividing through the largest maximum
+  * absolute value in each feature. It does not shift/center the data, and thus does not destroy
+  * any sparsity.
+  */
 @Experimental
-class MaxAbsScaler @Since("2.0.0") (override val uid: String)
-  extends Estimator[MaxAbsScalerModel] with MaxAbsScalerParams with DefaultParamsWritable {
+class MaxAbsScaler @Since("2.0.0")(override val uid: String)
+    extends Estimator[MaxAbsScalerModel] with MaxAbsScalerParams
+    with DefaultParamsWritable {
 
   @Since("2.0.0")
   def this() = this(Identifiable.randomUID("maxAbsScal"))
@@ -68,14 +71,18 @@ class MaxAbsScaler @Since("2.0.0") (override val uid: String)
 
   override def fit(dataset: DataFrame): MaxAbsScalerModel = {
     transformSchema(dataset.schema, logging = true)
-    val input = dataset.select($(inputCol)).rdd.map { case Row(v: Vector) => v }
+    val input =
+      dataset.select($(inputCol)).rdd.map { case Row(v: Vector) => v }
     val summary = Statistics.colStats(input)
     val minVals = summary.min.toArray
     val maxVals = summary.max.toArray
     val n = minVals.length
-    val maxAbs = Array.tabulate(n) { i => math.max(math.abs(minVals(i)), math.abs(maxVals(i))) }
+    val maxAbs = Array.tabulate(n) { i =>
+      math.max(math.abs(minVals(i)), math.abs(maxVals(i)))
+    }
 
-    copyValues(new MaxAbsScalerModel(uid, Vectors.dense(maxAbs)).setParent(this))
+    copyValues(
+        new MaxAbsScalerModel(uid, Vectors.dense(maxAbs)).setParent(this))
   }
 
   override def transformSchema(schema: StructType): StructType = {
@@ -93,15 +100,14 @@ object MaxAbsScaler extends DefaultParamsReadable[MaxAbsScaler] {
 }
 
 /**
- * :: Experimental ::
- * Model fitted by [[MaxAbsScaler]].
- *
- */
+  * :: Experimental ::
+  * Model fitted by [[MaxAbsScaler]].
+  *
+  */
 @Experimental
-class MaxAbsScalerModel private[ml] (
-    override val uid: String,
-    val maxAbs: Vector)
-  extends Model[MaxAbsScalerModel] with MaxAbsScalerParams with MLWritable {
+class MaxAbsScalerModel private[ml](
+    override val uid: String, val maxAbs: Vector)
+    extends Model[MaxAbsScalerModel] with MaxAbsScalerParams with MLWritable {
 
   import MaxAbsScalerModel._
 
@@ -114,7 +120,8 @@ class MaxAbsScalerModel private[ml] (
   override def transform(dataset: DataFrame): DataFrame = {
     transformSchema(dataset.schema, logging = true)
     // TODO: this looks hack, we may have to handle sparse and dense vectors separately.
-    val maxAbsUnzero = Vectors.dense(maxAbs.toArray.map(x => if (x == 0) 1 else x))
+    val maxAbsUnzero =
+      Vectors.dense(maxAbs.toArray.map(x => if (x == 0) 1 else x))
     val reScale = udf { (vector: Vector) =>
       val brz = vector.toBreeze / maxAbsUnzero.toBreeze
       Vectors.fromBreeze(brz)
@@ -138,8 +145,9 @@ class MaxAbsScalerModel private[ml] (
 @Since("1.6.0")
 object MaxAbsScalerModel extends MLReadable[MaxAbsScalerModel] {
 
-  private[MaxAbsScalerModel]
-  class MaxAbsScalerModelWriter(instance: MaxAbsScalerModel) extends MLWriter {
+  private[MaxAbsScalerModel] class MaxAbsScalerModelWriter(
+      instance: MaxAbsScalerModel)
+      extends MLWriter {
 
     private case class Data(maxAbs: Vector)
 
@@ -147,7 +155,11 @@ object MaxAbsScalerModel extends MLReadable[MaxAbsScalerModel] {
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val data = new Data(instance.maxAbs)
       val dataPath = new Path(path, "data").toString
-      sqlContext.createDataFrame(Seq(data)).repartition(1).write.parquet(dataPath)
+      sqlContext
+        .createDataFrame(Seq(data))
+        .repartition(1)
+        .write
+        .parquet(dataPath)
     }
   }
 
@@ -158,9 +170,8 @@ object MaxAbsScalerModel extends MLReadable[MaxAbsScalerModel] {
     override def load(path: String): MaxAbsScalerModel = {
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val dataPath = new Path(path, "data").toString
-      val Row(maxAbs: Vector) = sqlContext.read.parquet(dataPath)
-        .select("maxAbs")
-        .head()
+      val Row(maxAbs: Vector) =
+        sqlContext.read.parquet(dataPath).select("maxAbs").head()
       val model = new MaxAbsScalerModel(metadata.uid, maxAbs)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model

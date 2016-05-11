@@ -1,8 +1,8 @@
 package lila.evaluation
 
-import chess.{ Color, Speed }
-import lila.analyse.{ Accuracy, Analysis }
-import lila.game.{ Game, Pov }
+import chess.{Color, Speed}
+import lila.analyse.{Accuracy, Analysis}
+import lila.game.{Game, Pov}
 import Math.signum
 import org.joda.time.DateTime
 
@@ -13,15 +13,18 @@ case class Assessible(analysed: Analysed) {
   import analysed._
 
   def suspiciousErrorRate(color: Color): Boolean =
-    listAverage(Accuracy.diffsList(Pov(game, color), analysis)) < (game.speed match {
-      case Speed.Bullet => 25
-      case Speed.Blitz  => 20
-      case _            => 15
-    })
+    listAverage(Accuracy.diffsList(Pov(game, color), analysis)) <
+    (game.speed match {
+          case Speed.Bullet => 25
+          case Speed.Blitz => 20
+          case _ => 15
+        })
 
   def alwaysHasAdvantage(color: Color): Boolean =
     !analysis.infos.exists { info =>
-      info.score.fold(info.mate.fold(false) { a => (signum(a).toInt == color.fold(-1, 1)) }) { cp =>
+      info.score.fold(info.mate.fold(false) { a =>
+        (signum(a).toInt == color.fold(-1, 1))
+      }) { cp =>
         color.fold(cp.centipawns < -100, cp.centipawns > 100)
       }
     }
@@ -36,13 +39,13 @@ case class Assessible(analysed: Analysed) {
     game.player(color).hasSuspiciousHoldAlert
 
   def mkFlags(color: Color): PlayerFlags = PlayerFlags(
-    suspiciousErrorRate(color),
-    alwaysHasAdvantage(color),
-    highBlurRate(color),
-    moderateBlurRate(color),
-    consistentMoveTimes(Pov(game, color)),
-    noFastMoves(Pov(game, color)),
-    suspiciousHoldAlert(color)
+      suspiciousErrorRate(color),
+      alwaysHasAdvantage(color),
+      highBlurRate(color),
+      moderateBlurRate(color),
+      consistentMoveTimes(Pov(game, color)),
+      noFastMoves(Pov(game, color)),
+      suspiciousHoldAlert(color)
   )
 
   private val T = true
@@ -54,21 +57,31 @@ case class Assessible(analysed: Analysed) {
     val assessment = flags match {
       //               SF1 SF2 BLR1 BLR2 MTs1 MTs2 Holds
       case PlayerFlags(T, T, T, T, T, T, T) => Cheating // all T, obvious cheat
-      case PlayerFlags(T, _, T, _, _, T, _) => Cheating // high accuracy, high blurs, no fast moves
+      case PlayerFlags(T, _, T, _, _, T, _) =>
+        Cheating // high accuracy, high blurs, no fast moves
 
-      case PlayerFlags(_, _, _, _, _, _, T) => LikelyCheating  // Holds are bad, hmk?
-      case PlayerFlags(T, _, _, T, _, T, _) => LikelyCheating // high accuracy, moderate blurs, no fast moves
-      case PlayerFlags(_, T, _, T, T, _, _) => LikelyCheating // always has advantage, moderate blurs, highly consistent move times
-      case PlayerFlags(_, T, T, _, _, _, _) => LikelyCheating // always has advantage, high blurs
+      case PlayerFlags(_, _, _, _, _, _, T) =>
+        LikelyCheating // Holds are bad, hmk?
+      case PlayerFlags(T, _, _, T, _, T, _) =>
+        LikelyCheating // high accuracy, moderate blurs, no fast moves
+      case PlayerFlags(_, T, _, T, T, _, _) =>
+        LikelyCheating // always has advantage, moderate blurs, highly consistent move times
+      case PlayerFlags(_, T, T, _, _, _, _) =>
+        LikelyCheating // always has advantage, high blurs
 
-      case PlayerFlags(_, T, _, _, T, T, _) => Unclear // always has advantage, consistent move times
-      case PlayerFlags(T, _, _, _, T, T, _) => Unclear // high accuracy, consistent move times, no fast moves
-      case PlayerFlags(T, _, _, F, F, T, _) => Unclear // high accuracy, no fast moves, but doesn't blur or flat line
+      case PlayerFlags(_, T, _, _, T, T, _) =>
+        Unclear // always has advantage, consistent move times
+      case PlayerFlags(T, _, _, _, T, T, _) =>
+        Unclear // high accuracy, consistent move times, no fast moves
+      case PlayerFlags(T, _, _, F, F, T, _) =>
+        Unclear // high accuracy, no fast moves, but doesn't blur or flat line
 
-      case PlayerFlags(T, _, _, _, _, F, _) => UnlikelyCheating // high accuracy, but has fast moves
+      case PlayerFlags(T, _, _, _, _, F, _) =>
+        UnlikelyCheating // high accuracy, but has fast moves
 
-      case PlayerFlags(F, F, _, _, _, _, _) => NotCheating // low accuracy, doesn't hold advantage
-      case _                                => NotCheating
+      case PlayerFlags(F, F, _, _, _, _, _) =>
+        NotCheating // low accuracy, doesn't hold advantage
+      case _ => NotCheating
     }
 
     if (flags.suspiciousHoldAlert) assessment
@@ -77,8 +90,10 @@ case class Assessible(analysed: Analysed) {
     else assessment
   }
 
-  def sfAvg(color: Color): Int = listAverage(Accuracy.diffsList(Pov(game, color), analysis)).toInt
-  def sfSd(color: Color): Int = listDeviation(Accuracy.diffsList(Pov(game, color), analysis)).toInt
+  def sfAvg(color: Color): Int =
+    listAverage(Accuracy.diffsList(Pov(game, color), analysis)).toInt
+  def sfSd(color: Color): Int =
+    listDeviation(Accuracy.diffsList(Pov(game, color), analysis)).toInt
   def mtAvg(color: Color): Int = listAverage(game moveTimes color).toInt
   def mtSd(color: Color): Int = listDeviation(game moveTimes color).toInt
   def blurs(color: Color): Int = game.playerBlurPercent(color)
@@ -86,19 +101,19 @@ case class Assessible(analysed: Analysed) {
 
   def playerAssessment(color: Color): PlayerAssessment =
     PlayerAssessment(
-      _id = game.id + "/" + color.name,
-      gameId = game.id,
-      userId = ~game.player(color).userId,
-      white = (color == Color.White),
-      assessment = rankCheating(color),
-      date = DateTime.now,
-      // meta
-      flags = mkFlags(color),
-      sfAvg = sfAvg(color),
-      sfSd = sfSd(color),
-      mtAvg = mtAvg(color),
-      mtSd = mtSd(color),
-      blurs = blurs(color),
-      hold = hold(color)
+        _id = game.id + "/" + color.name,
+        gameId = game.id,
+        userId = ~game.player(color).userId,
+        white = (color == Color.White),
+        assessment = rankCheating(color),
+        date = DateTime.now,
+        // meta
+        flags = mkFlags(color),
+        sfAvg = sfAvg(color),
+        sfSd = sfSd(color),
+        mtAvg = mtAvg(color),
+        mtSd = mtSd(color),
+        blurs = blurs(color),
+        hold = hold(color)
     )
 }

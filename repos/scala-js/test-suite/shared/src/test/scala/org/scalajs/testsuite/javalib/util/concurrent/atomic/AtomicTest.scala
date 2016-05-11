@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util.concurrent.atomic
 
@@ -126,8 +126,9 @@ class AtomicTest {
     assertSame(thing1, atomic.getAndSet(1, thing2))
     assertSame(thing2, atomic.get(1))
 
-    val initArray = Array(thing1,thing2)
-    val atomic2 = new java.util.concurrent.atomic.AtomicReferenceArray[Foo](initArray)
+    val initArray = Array(thing1, thing2)
+    val atomic2 =
+      new java.util.concurrent.atomic.AtomicReferenceArray[Foo](initArray)
     assertSame(thing1, atomic2.get(0))
     assertSame(thing2, atomic2.get(1))
   }

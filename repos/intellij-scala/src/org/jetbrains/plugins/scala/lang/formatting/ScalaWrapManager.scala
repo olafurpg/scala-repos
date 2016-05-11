@@ -16,11 +16,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScExtendsBlo
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 object ScalaWrapManager {
-  def suggestedWrap(block: ScalaBlock, scalaSettings: ScalaCodeStyleSettings): Wrap = {
+  def suggestedWrap(
+      block: ScalaBlock, scalaSettings: ScalaCodeStyleSettings): Wrap = {
     val settings = block.getCommonSettings
     val node = block.getNode
     val psi = node.getPsi
@@ -30,33 +30,45 @@ object ScalaWrapManager {
       psi.getParent match {
         case parent: PsiElement if elementMatch(parent) =>
           import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils.priority
-          val parentPriority = priority(elementOperation(parent).getText, assignments)
-          val childPriority = priority(elementOperation(psi).getText, assignments)
+          val parentPriority = priority(
+              elementOperation(parent).getText, assignments)
+          val childPriority = priority(
+              elementOperation(psi).getText, assignments)
           val notSamePriority = parentPriority != childPriority
           if (notSamePriority) {
             Wrap.createChildWrap(block.getWrap,
-              WrapType.byLegacyRepresentation(settings.BINARY_OPERATION_WRAP),
-              false)
-          }
-          else Wrap.createWrap(settings.BINARY_OPERATION_WRAP, false)
+                                 WrapType.byLegacyRepresentation(
+                                     settings.BINARY_OPERATION_WRAP),
+                                 false)
+          } else Wrap.createWrap(settings.BINARY_OPERATION_WRAP, false)
         case _ => Wrap.createWrap(settings.BINARY_OPERATION_WRAP, false)
       }
     }
 
     psi match {
       case psi: ScInfixExpr =>
-        return wrapBinary(_.isInstanceOf[ScInfixExpr], _.asInstanceOf[ScInfixExpr].operation, assignments = true)
+        return wrapBinary(_.isInstanceOf[ScInfixExpr],
+                          _.asInstanceOf[ScInfixExpr].operation,
+                          assignments = true)
       case psi: ScInfixPattern =>
-        return wrapBinary(_.isInstanceOf[ScInfixPattern], _.asInstanceOf[ScInfixPattern].reference, assignments = false)
+        return wrapBinary(_.isInstanceOf[ScInfixPattern],
+                          _.asInstanceOf[ScInfixPattern].reference,
+                          assignments = false)
       case psi: ScInfixTypeElement =>
-        return wrapBinary(_.isInstanceOf[ScInfixTypeElement], _.asInstanceOf[ScInfixTypeElement].ref, assignments = false)
+        return wrapBinary(_.isInstanceOf[ScInfixTypeElement],
+                          _.asInstanceOf[ScInfixTypeElement].ref,
+                          assignments = false)
       case psi: ScCompositePattern =>
         return Wrap.createWrap(settings.BINARY_OPERATION_WRAP, false)
       case psi: ScArgumentExprList =>
         val parentSuggestedWrap = block.myParentBlock.suggestedWrap
-        val wrap = if (parentSuggestedWrap != null) Wrap.createChildWrap(parentSuggestedWrap,
-          WrapType.byLegacyRepresentation(settings.CALL_PARAMETERS_WRAP), false)
-        else Wrap.createWrap(settings.CALL_PARAMETERS_WRAP, false)
+        val wrap =
+          if (parentSuggestedWrap != null)
+            Wrap.createChildWrap(
+                parentSuggestedWrap,
+                WrapType.byLegacyRepresentation(settings.CALL_PARAMETERS_WRAP),
+                false)
+          else Wrap.createWrap(settings.CALL_PARAMETERS_WRAP, false)
         if (settings.PREFER_PARAMETERS_WRAP) {
           wrap.ignoreParentWraps()
         }
@@ -67,25 +79,34 @@ object ScalaWrapManager {
         return Wrap.createWrap(settings.METHOD_CALL_CHAIN_WRAP, true)
       case psi: ScPatternArgumentList =>
         return Wrap.createWrap(settings.CALL_PARAMETERS_WRAP, false)
-      case _ if node.getElementType == ScalaTokenTypes.kEXTENDS && block.myLastNode != null =>
-        return Wrap.createChildWrap(block.getWrap, WrapType.byLegacyRepresentation(settings.EXTENDS_LIST_WRAP), true)
+      case _
+          if node.getElementType == ScalaTokenTypes.kEXTENDS &&
+          block.myLastNode != null =>
+        return Wrap.createChildWrap(
+            block.getWrap,
+            WrapType.byLegacyRepresentation(settings.EXTENDS_LIST_WRAP),
+            true)
       case psi: ScParameterClause =>
         return Wrap.createWrap(settings.METHOD_PARAMETERS_WRAP, false)
       case psi: ScParameters =>
         return Wrap.createWrap(settings.METHOD_PARAMETERS_WRAP, true)
       case annot: ScAnnotations if annot.getAnnotations.length > 0 =>
         annot.getParent match {
-          case _: ScTypeDefinition => return Wrap.createWrap(settings.CLASS_ANNOTATION_WRAP, false)
-          case _: ScFunction => return Wrap.createWrap(settings.METHOD_ANNOTATION_WRAP, false)
+          case _: ScTypeDefinition =>
+            return Wrap.createWrap(settings.CLASS_ANNOTATION_WRAP, false)
+          case _: ScFunction =>
+            return Wrap.createWrap(settings.METHOD_ANNOTATION_WRAP, false)
           case _: ScVariable | _: ScValue | _: ScTypeAlias if {
-            annot.getParent.getParent match {
-              case _: ScEarlyDefinitions | _: ScTemplateBody => true;
-              case _ => false
-            }
-          } =>
+                annot.getParent.getParent match {
+                  case _: ScEarlyDefinitions | _: ScTemplateBody => true;
+                  case _ => false
+                }
+              } =>
             return Wrap.createWrap(settings.FIELD_ANNOTATION_WRAP, false)
-          case _: ScVariable | _: ScValue | _: ScTypeAlias => return Wrap.createWrap(settings.VARIABLE_ANNOTATION_WRAP, false)
-          case _: ScParameter => return Wrap.createWrap(settings.PARAMETER_ANNOTATION_WRAP, false)
+          case _: ScVariable | _: ScValue | _: ScTypeAlias =>
+            return Wrap.createWrap(settings.VARIABLE_ANNOTATION_WRAP, false)
+          case _: ScParameter =>
+            return Wrap.createWrap(settings.PARAMETER_ANNOTATION_WRAP, false)
           case _ =>
         }
       case _ =>
@@ -93,14 +114,17 @@ object ScalaWrapManager {
     null
   }
 
-  def arrangeSuggestedWrapForChild(parent: ScalaBlock, child: ASTNode, scalaSettings: ScalaCodeStyleSettings,
+  def arrangeSuggestedWrapForChild(parent: ScalaBlock,
+                                   child: ASTNode,
+                                   scalaSettings: ScalaCodeStyleSettings,
                                    suggestedWrap: Wrap): Wrap = {
     val settings = parent.getCommonSettings
     val parentNode = parent.getNode
     val parentPsi = parentNode.getPsi
     val childPsi = child.getPsi
     if (childPsi.isInstanceOf[ScExtendsBlock] &&
-            childPsi.getFirstChild != null && childPsi.getFirstChild.getNode.getElementType == ScalaTokenTypes.kEXTENDS)
+        childPsi.getFirstChild != null &&
+        childPsi.getFirstChild.getNode.getElementType == ScalaTokenTypes.kEXTENDS)
       return Wrap.createWrap(settings.EXTENDS_KEYWORD_WRAP, true)
 
     def arrageBinary(elementMatch: PsiElement => Boolean,
@@ -120,16 +144,20 @@ object ScalaWrapManager {
 
     parentPsi match {
       case inf: ScInfixExpr =>
-        return arrageBinary(_.isInstanceOf[ScInfixExpr], _.asInstanceOf[ScInfixExpr].operation,
-          _.asInstanceOf[ScInfixExpr].rOp, _.asInstanceOf[ScInfixExpr].lOp)
+        return arrageBinary(_.isInstanceOf[ScInfixExpr],
+                            _.asInstanceOf[ScInfixExpr].operation,
+                            _.asInstanceOf[ScInfixExpr].rOp,
+                            _.asInstanceOf[ScInfixExpr].lOp)
       case inf: ScInfixPattern =>
-        return arrageBinary(_.isInstanceOf[ScInfixPattern], _.asInstanceOf[ScInfixPattern].reference,
-          _.asInstanceOf[ScInfixPattern].rightPattern.orNull,
-          _.asInstanceOf[ScInfixPattern].leftPattern)
+        return arrageBinary(_.isInstanceOf[ScInfixPattern],
+                            _.asInstanceOf[ScInfixPattern].reference,
+                            _.asInstanceOf[ScInfixPattern].rightPattern.orNull,
+                            _.asInstanceOf[ScInfixPattern].leftPattern)
       case inf: ScInfixTypeElement =>
-        return arrageBinary(_.isInstanceOf[ScInfixTypeElement], _.asInstanceOf[ScInfixTypeElement].ref,
-          _.asInstanceOf[ScInfixTypeElement].rOp.orNull,
-          _.asInstanceOf[ScInfixTypeElement].lOp)
+        return arrageBinary(_.isInstanceOf[ScInfixTypeElement],
+                            _.asInstanceOf[ScInfixTypeElement].ref,
+                            _.asInstanceOf[ScInfixTypeElement].rOp.orNull,
+                            _.asInstanceOf[ScInfixTypeElement].lOp)
       case psi: ScCompositePattern =>
         if (childPsi.isInstanceOf[ScPattern]) return suggestedWrap
         else return null
@@ -152,28 +180,35 @@ object ScalaWrapManager {
         if (childPsi.isInstanceOf[ScParameter]) return suggestedWrap
         else return null
       case params: ScParameters =>
-        if (childPsi.isInstanceOf[ScParameterClause] && params.clauses.head != childPsi) return suggestedWrap
+        if (childPsi.isInstanceOf[ScParameterClause] &&
+            params.clauses.head != childPsi) return suggestedWrap
         else return null
       case annot: ScAnnotations =>
         if (childPsi.isInstanceOf[ScAnnotation]) return suggestedWrap
         else return null
-      case _ if parentNode.getElementType == ScalaTokenTypes.kEXTENDS && parent.myLastNode != null =>
-        val e: ScExtendsBlock = PsiTreeUtil.getParentOfType(parentPsi, classOf[ScExtendsBlock])
+      case _
+          if parentNode.getElementType == ScalaTokenTypes.kEXTENDS &&
+          parent.myLastNode != null =>
+        val e: ScExtendsBlock =
+          PsiTreeUtil.getParentOfType(parentPsi, classOf[ScExtendsBlock])
         val first: PsiElement = e.earlyDefinitions match {
           case Some(z) => z
-          case _ => e.templateParents match {
-            case Some(tp) if tp.typeElements.nonEmpty => tp.typeElements.head
-            case _ => null
-          }
+          case _ =>
+            e.templateParents match {
+              case Some(tp) if tp.typeElements.nonEmpty => tp.typeElements.head
+              case _ => null
+            }
         }
         if (first == null) return null
         if (childPsi == first) return suggestedWrap
         if (scalaSettings.WRAP_BEFORE_WITH_KEYWORD) {
-          if (child.getElementType == ScalaTokenTypes.kWITH) return suggestedWrap
+          if (child.getElementType == ScalaTokenTypes.kWITH)
+            return suggestedWrap
           else return null
         } else {
           e.templateParents match {
-            case Some(tp) if tp.typeElements.contains(childPsi) => return suggestedWrap
+            case Some(tp) if tp.typeElements.contains(childPsi) =>
+              return suggestedWrap
             case _ => return null
           }
         }

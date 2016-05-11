@@ -1,4 +1,3 @@
-
 class B extends A {
   lazy val b0 = 71
   lazy val b1 = 72
@@ -14,7 +13,6 @@ class B extends A {
     super.run
     println(List(b0, b1, b2, b3, b4, b5, b6, b7, b8, b9))
   }
-
 }
 
 object Test {

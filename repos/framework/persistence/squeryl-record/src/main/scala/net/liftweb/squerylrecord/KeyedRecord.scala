@@ -18,14 +18,14 @@ import record.MandatoryTypedField
 import org.squeryl.IndirectKeyedEntity
 
 /**
- * Trait to mix into records that have a primary key. The primary key field must be named "idField", though
- * the name of the database column can be changed from that using @Column(name="id") or similar.
- */
+  * Trait to mix into records that have a primary key. The primary key field must be named "idField", though
+  * the name of the database column can be changed from that using @Column(name="id") or similar.
+  */
 trait KeyedRecord[K] extends IndirectKeyedEntity[K, MandatoryTypedField[K]] {
+
   /** The primary key field of the record. Must not be optional. */
   def idField: MandatoryTypedField[K]
 
   /** Implement requirements of KeyedEntity by returning the current value of idField */
   def id = idField.value
 }
-

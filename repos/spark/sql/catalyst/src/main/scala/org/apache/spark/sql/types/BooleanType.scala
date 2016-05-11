@@ -23,27 +23,27 @@ import scala.reflect.runtime.universe.typeTag
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.sql.catalyst.ScalaReflectionLock
 
-
 /**
- * :: DeveloperApi ::
- * The data type representing `Boolean` values. Please use the singleton [[DataTypes.BooleanType]].
- */
+  * :: DeveloperApi ::
+  * The data type representing `Boolean` values. Please use the singleton [[DataTypes.BooleanType]].
+  */
 @DeveloperApi
-class BooleanType private() extends AtomicType {
+class BooleanType private () extends AtomicType {
   // The companion object and this class is separated so the companion object also subclasses
   // this type. Otherwise, the companion object would be of type "BooleanType$" in byte code.
   // Defined with a private constructor so the companion object is the only possible instantiation.
   private[sql] type InternalType = Boolean
-  @transient private[sql] lazy val tag = ScalaReflectionLock.synchronized { typeTag[InternalType] }
+  @transient private[sql] lazy val tag = ScalaReflectionLock.synchronized {
+    typeTag[InternalType]
+  }
   private[sql] val ordering = implicitly[Ordering[InternalType]]
 
   /**
-   * The default size of a value of the BooleanType is 1 byte.
-   */
+    * The default size of a value of the BooleanType is 1 byte.
+    */
   override def defaultSize: Int = 1
 
   private[spark] override def asNullable: BooleanType = this
 }
-
 
 case object BooleanType extends BooleanType

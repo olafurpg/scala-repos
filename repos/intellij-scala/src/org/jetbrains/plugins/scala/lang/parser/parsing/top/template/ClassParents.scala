@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.AnnotType
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 08.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 08.02.2008
+  */
 /*
  *  TemplateParents ::= Constr {with AnnotType}
  */

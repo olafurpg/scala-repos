@@ -36,14 +36,14 @@ import scalafx.event.Event.sfxEvent2jfx
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Event Spec tests.
- *
- *
- */
+  * Event Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class EventSpec
-  extends SimpleSFXDelegateSpec[jfxe.Event, Event](classOf[jfxe.Event], classOf[Event]) {
+    extends SimpleSFXDelegateSpec[jfxe.Event, Event](
+        classOf[jfxe.Event], classOf[Event]) {
 
   override protected def getJavaClassInstance = new jfxe.Event(jfxe.Event.ANY)
-
 }

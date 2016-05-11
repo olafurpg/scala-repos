@@ -35,33 +35,34 @@ import scalafx.geometry.Insets
 import scalafx.scene.paint.Paint
 
 object BackgroundFill {
-  implicit def sfxBackgroundFill2jfx(v: BackgroundFill): jfxsl.BackgroundFill = if (v != null) v.delegate else null
+  implicit def sfxBackgroundFill2jfx(v: BackgroundFill): jfxsl.BackgroundFill =
+    if (v != null) v.delegate else null
 }
 
 /**
- * The fill and associated properties that direct how to fill the background of a Region.
- */
+  * The fill and associated properties that direct how to fill the background of a Region.
+  */
 class BackgroundFill(override val delegate: jfxsl.BackgroundFill)
-  extends SFXDelegate[jfxsl.BackgroundFill] {
+    extends SFXDelegate[jfxsl.BackgroundFill] {
 
   /**
-   * Creates a new BackgroundFill with the specified fill, radii, and insets.
-   */
+    * Creates a new BackgroundFill with the specified fill, radii, and insets.
+    */
   def this(fill: Paint, radii: CornerRadii, insets: Insets) =
     this(new jfxsl.BackgroundFill(fill, radii, insets))
 
   /**
-   * The Paint to use for filling the background of the Region.
-   */
+    * The Paint to use for filling the background of the Region.
+    */
   def fill: Paint = delegate.getFill
 
   /**
-   * The Insets to use for this fill.
-   */
+    * The Insets to use for this fill.
+    */
   def insets: Insets = delegate.getInsets
 
   /**
-   * The Radii to use for representing the four radii of the BackgroundFill.
-   */
+    * The Radii to use for representing the four radii of the BackgroundFill.
+    */
   def radii: CornerRadii = delegate.getRadii
 }

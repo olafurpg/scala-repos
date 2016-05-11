@@ -10,7 +10,8 @@ object HookRepo {
 
   def size = hooks.size
 
-  def findCompatible(hook: Hook): Vector[Hook] = hooks filter (_ compatibleWith hook)
+  def findCompatible(hook: Hook): Vector[Hook] =
+    hooks filter (_ compatibleWith hook)
 
   def truncateIfNeeded = if (size >= hardLimit) {
     logger.warn(s"Found ${size} hooks, cleaning up!")
@@ -26,7 +27,8 @@ object HookRepo {
 
   def bySid(sid: String) = hooks find (_.sid == sid.some)
 
-  def notInUids(uids: Set[String]): Vector[Hook] = hooks.filterNot(h => uids(h.uid))
+  def notInUids(uids: Set[String]): Vector[Hook] =
+    hooks.filterNot(h => uids(h.uid))
 
   def save(hook: Hook) {
     hooks = hooks.filterNot(_.id == hook.id) :+ hook

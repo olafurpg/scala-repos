@@ -2,10 +2,10 @@ package scalaz
 
 ////
 /**
- * Universally quantified [[scalaz.Semigroup]].
- */
+  * Universally quantified [[scalaz.Semigroup]].
+  */
 ////
-trait Plus[F[_]]  { self =>
+trait Plus[F[_]] { self =>
   ////
 
   /**The composition of Plus `F` and `G`, `[x]F[G[x]]`, is a Plus */
@@ -28,10 +28,11 @@ trait Plus[F[_]]  { self =>
   }
 
   trait PlusLaw {
-    def associative[A](f1: F[A], f2: F[A], f3: F[A])(implicit FA: Equal[F[A]]): Boolean =
+    def associative[A](f1: F[A], f2: F[A], f3: F[A])(
+        implicit FA: Equal[F[A]]): Boolean =
       FA.equal(plus(f1, plus(f2, f3)), plus(plus(f1, f2), f3))
   }
-  def plusLaw = 
+  def plusLaw =
     new PlusLaw {}
   ////
   val plusSyntax = new scalaz.syntax.PlusSyntax[F] { def F = Plus.this }

@@ -38,7 +38,7 @@ class FreshNameExtractorTest {
 
   @Test
   def `no numeric suffix? no problem!` = {
-    val Creator   = new FreshNameCreator(prefixes.head)
+    val Creator = new FreshNameCreator(prefixes.head)
     val Extractor = new FreshNameExtractor(prefixes.head)
     TermName(Creator.newName("foo") + "bar") match {
       case Extractor(_) =>

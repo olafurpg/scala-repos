@@ -5,10 +5,10 @@ package play.api.templates
 
 import akka.util.ByteString
 import org.specs2.mutable._
-import play.api.http.{ HttpEntity, Writeable }
+import play.api.http.{HttpEntity, Writeable}
 import play.api.mvc.Results
 import play.core.j.JavaResults
-import play.mvc.{ Results => JResults }
+import play.mvc.{Results => JResults}
 
 object TemplatesSpec extends Specification {
   "toHtmlArgs" should {

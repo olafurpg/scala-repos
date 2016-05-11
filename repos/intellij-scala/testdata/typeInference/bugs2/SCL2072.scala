@@ -11,7 +11,7 @@ object test {
   // commenting out the companion object fixes the resolve error!!
   object Transformation
 
-  /*start*/zero1.transform(1d)/*end*/
-
+  /*start*/
+  zero1.transform(1d) /*end*/
 }
 //Double

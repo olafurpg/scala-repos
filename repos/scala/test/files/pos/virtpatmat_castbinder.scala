@@ -8,8 +8,8 @@ trait IntMapIterator[V, T] {
 
   def next: T =
     pop match {
-      case Bin(t@Tip(_)) => {
-        valueOf(t)
-      }
+      case Bin(t @ Tip(_)) => {
+          valueOf(t)
+        }
     }
 }

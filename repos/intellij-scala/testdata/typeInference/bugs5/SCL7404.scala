@@ -10,6 +10,7 @@ object SCL7404 {
   def goo(x: Int) = 123
   def goo(s: String) = "text"
 
-  /*start*/goo((1, new B))/*end*/
+  /*start*/
+  goo((1, new B)) /*end*/
 }
 //Int

@@ -4,10 +4,12 @@ object A {
   }
 
   class C extends B {
-    /* line: 3 */foo
+    /* line: 3 */
+    foo
   }
 }
 
 class G extends A.B {
-  /* accessible: false */foo
+  /* accessible: false */
+  foo
 }

@@ -1,17 +1,18 @@
 package mesosphere.marathon.api
 
-import java.util.concurrent.{ TimeUnit, CountDownLatch, Semaphore }
+import java.util.concurrent.{TimeUnit, CountDownLatch, Semaphore}
 import javax.servlet.FilterChain
-import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.test.Mockito
-import org.scalatest.{ Matchers, GivenWhenThen }
+import org.scalatest.{Matchers, GivenWhenThen}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class LimitConcurrentRequestsFilterTest extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+class LimitConcurrentRequestsFilterTest
+    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
 
   test("Multiple requests below boundary get answered correctly") {
     Given("A http filter chain")
@@ -19,7 +20,9 @@ class LimitConcurrentRequestsFilterTest extends MarathonSpec with GivenWhenThen 
     val request = mock[HttpServletRequest]
     val response = mock[HttpServletResponse]
     val chain = mock[FilterChain]
-    chain.doFilter(request, response) answers { args => latch.countDown() }
+    chain.doFilter(request, response) answers { args =>
+      latch.countDown()
+    }
     val rf = new LimitConcurrentRequestsFilter(Some(2))
 
     When("requests where made before the limit")
@@ -38,7 +41,9 @@ class LimitConcurrentRequestsFilterTest extends MarathonSpec with GivenWhenThen 
     val request = mock[HttpServletRequest]
     val response = mock[HttpServletResponse]
     val chain = mock[FilterChain]
-    chain.doFilter(request, response) answers { args => latch.countDown(); semaphore.acquire() /* blocks*/ }
+    chain.doFilter(request, response) answers { args =>
+      latch.countDown(); semaphore.acquire() /* blocks*/
+    }
     val rf = new LimitConcurrentRequestsFilter(Some(1))
 
     When("requests where made before the limit")
@@ -48,7 +53,8 @@ class LimitConcurrentRequestsFilterTest extends MarathonSpec with GivenWhenThen 
 
     Then("The requests got answered")
     verify(chain, times(1)).doFilter(request, response)
-    verify(response, times(1)).sendError(503, "Too many concurrent requests! Allowed: 1.")
+    verify(response, times(1))
+      .sendError(503, "Too many concurrent requests! Allowed: 1.")
     semaphore.release() //release the blocked thread
   }
 
@@ -58,7 +64,9 @@ class LimitConcurrentRequestsFilterTest extends MarathonSpec with GivenWhenThen 
     val request = mock[HttpServletRequest]
     val response = mock[HttpServletResponse]
     val chain = mock[FilterChain]
-    chain.doFilter(request, response) answers { args => latch.countDown() }
+    chain.doFilter(request, response) answers { args =>
+      latch.countDown()
+    }
     val rf = new LimitConcurrentRequestsFilter(None)
     rf.semaphore.availablePermits() should be(0)
 

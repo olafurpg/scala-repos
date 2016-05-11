@@ -6,10 +6,13 @@ import org.jetbrains.plugins.scala.project.{ScalaLanguageLevelProxy, ScalaLibrar
 /**
   * @author adkozlov
   */
-object DottyLibraryKind extends PersistentLibraryKind[ScalaLibraryProperties]("Dotty") with ScalaLibraryKind {
+object DottyLibraryKind
+    extends PersistentLibraryKind[ScalaLibraryProperties]("Dotty")
+    with ScalaLibraryKind {
   override def createDefaultProperties(): ScalaLibraryProperties = {
     val props = new ScalaLibraryProperties()
-    props.loadState(new ScalaLibraryPropertiesState(ScalaLanguageLevelProxy.Dotty))
+    props.loadState(
+        new ScalaLibraryPropertiesState(ScalaLanguageLevelProxy.Dotty))
     props
   }
 }

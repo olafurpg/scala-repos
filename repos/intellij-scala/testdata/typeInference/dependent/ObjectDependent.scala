@@ -10,6 +10,7 @@ trait Zoo[T] {
 
 object A extends Zoo[Int] {
   val x: P = new P
-  /*start*/Moo.foo(1)/*end*/
+  /*start*/
+  Moo.foo(1) /*end*/
 }
 //Int

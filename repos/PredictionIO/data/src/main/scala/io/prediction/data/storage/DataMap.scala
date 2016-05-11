@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import org.json4s._
@@ -26,7 +25,7 @@ import scala.collection.JavaConversions
   * @group Event Data
   */
 case class DataMapException(msg: String, cause: Exception)
-  extends Exception(msg, cause) {
+    extends Exception(msg, cause) {
   def this(msg: String) = this(msg, null)
 }
 
@@ -38,11 +37,12 @@ case class DataMapException(msg: String, cause: Exception)
   * @param fields Map of property name to JValue
   * @group Event Data
   */
-class DataMap (
-  val fields: Map[String, JValue]
-) extends Serializable {
-  @transient lazy implicit private val formats = DefaultFormats +
-    new DateTimeJson4sSupport.Serializer
+class DataMap(
+    val fields: Map[String, JValue]
+)
+    extends Serializable {
+  @transient lazy implicit private val formats =
+    DefaultFormats + new DateTimeJson4sSupport.Serializer
 
   /** Check the existence of a required property name. Throw an exception if
     * it does not exist.
@@ -71,11 +71,11 @@ class DataMap (
     * @param name The property name
     * @return Return the property value of type T
     */
-  def get[T: Manifest](name: String): T = {
+  def get[T : Manifest](name: String): T = {
     require(name)
     fields(name) match {
-      case JNull => throw new DataMapException(
-        s"The required field $name cannot be null.")
+      case JNull =>
+        throw new DataMapException(s"The required field $name cannot be null.")
       case x: JValue => x.extract[T]
     }
   }
@@ -87,7 +87,7 @@ class DataMap (
     * @param name The property name
     * @return Return the property value of type Option[T]
     */
-  def getOpt[T: Manifest](name: String): Option[T] = {
+  def getOpt[T : Manifest](name: String): Option[T] = {
     // either the field doesn't exist or its value is null
     fields.get(name).flatMap(_.extract[Option[T]])
   }
@@ -100,7 +100,7 @@ class DataMap (
     * @param default The default property value of type T
     * @return Return the property value of type T
     */
-  def getOrElse[T: Manifest](name: String, default: T): T = {
+  def getOrElse[T : Manifest](name: String, default: T): T = {
     getOpt[T](name).getOrElse(default)
   }
 
@@ -113,7 +113,7 @@ class DataMap (
     * @return Return the property value of type T
     */
   def get[T](name: String, clazz: java.lang.Class[T]): T = {
-    val manifest =  new Manifest[T] {
+    val manifest = new Manifest[T] {
       override def erasure: Class[_] = clazz
       override def runtimeClass: Class[_] = clazz
     }
@@ -136,7 +136,8 @@ class DataMap (
       case None => null
       case Some(JNull) => null
       case Some(x) =>
-        JavaConversions.seqAsJavaList(x.extract[List[String]](formats, manifest[List[String]]))
+        JavaConversions.seqAsJavaList(
+            x.extract[List[String]](formats, manifest[List[String]]))
     }
   }
 
@@ -146,7 +147,7 @@ class DataMap (
     * @param that Right hand side DataMap
     * @return A new DataMap
     */
-  def ++ (that: DataMap): DataMap = DataMap(this.fields ++ that.fields)
+  def ++(that: DataMap): DataMap = DataMap(this.fields ++ that.fields)
 
   /** Creates a new DataMap from this DataMap by removing all elements of
     * another collection.
@@ -154,7 +155,7 @@ class DataMap (
     * @param that A collection containing the removed property names
     * @return A new DataMap
     */
-  def -- (that: GenTraversableOnce[String]): DataMap =
+  def --(that: GenTraversableOnce[String]): DataMap =
     DataMap(this.fields -- that)
 
   /** Tests whether the DataMap is empty.
@@ -185,19 +186,17 @@ class DataMap (
     *
     * @return the object of type T.
     */
-  def extract[T: Manifest]: T = {
+  def extract[T : Manifest]: T = {
     toJObject().extract[T]
   }
 
-  override
-  def toString: String = s"DataMap($fields)"
+  override def toString: String = s"DataMap($fields)"
 
-  override
-  def hashCode: Int = 41 + fields.hashCode
+  override def hashCode: Int = 41 + fields.hashCode
 
-  override
-  def equals(other: Any): Boolean = other match {
-    case that: DataMap => that.canEqual(this) && this.fields.equals(that.fields)
+  override def equals(other: Any): Boolean = other match {
+    case that: DataMap =>
+      that.canEqual(this) && this.fields.equals(that.fields)
     case _ => false
   }
 
@@ -209,6 +208,7 @@ class DataMap (
   * @group Event Data
   */
 object DataMap {
+
   /** Create an empty DataMap
     * @return an empty DataMap
     */
@@ -237,5 +237,4 @@ object DataMap {
     * @return a new DataMap initialized by a JSON string
     */
   def apply(js: String): DataMap = apply(parse(js).asInstanceOf[JObject])
-
 }

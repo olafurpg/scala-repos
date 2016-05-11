@@ -1,8 +1,7 @@
 package scala.runtime
 
 /** Not for public consumption.  Usage by the runtime only.
- */
-
+  */
 object Statics {
   def mix(hash: Int, data: Int): Int = {
     var h = mixLast(hash, data)
@@ -39,7 +38,7 @@ object Statics {
     val iv = lv.toInt | 0
     if (iv == lv) iv
     else (lv ^ (lv >>> 32)).toInt | 0
-    */
+   */
   }
 
   def doubleHash(dv: Double): Int = {
@@ -59,7 +58,7 @@ object Statics {
 
     val lv2 == java.lang.Double.doubleToLongBits(dv)
     return (lv2 ^ (lv2 >>> 32)).toInt | 0
-    */
+   */
   }
 
   def floatHash(fv: Float): Int = {
@@ -74,7 +73,7 @@ object Statics {
       return (lv ^ (lv >>> 32)).toInt | 0
 
     return java.lang.Float.floatToIntBits(fv)
-    */
+   */
   }
 
   def anyHash(x: Any): Int = {

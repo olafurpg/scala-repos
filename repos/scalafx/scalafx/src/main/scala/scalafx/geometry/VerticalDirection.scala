@@ -33,21 +33,23 @@ import scalafx.delegate._
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/geometry/VerticalDirection.html javafx.geometry.VerticalDirection]] */
 object VerticalDirection
-  extends SFXEnumDelegateCompanion[jfxg.VerticalDirection, VerticalDirection] {
+    extends SFXEnumDelegateCompanion[jfxg.VerticalDirection, VerticalDirection] {
 
   /** The down direction. */
   val Down = new VerticalDirection(jfxg.VerticalDirection.DOWN)
-  @deprecated ("Use Down; DOWN will be removed in a future release", "8.0.60-R10")
+  @deprecated(
+      "Use Down; DOWN will be removed in a future release", "8.0.60-R10")
   val DOWN = Down
-
 
   /** The up direction. */
   val Up = new VerticalDirection(jfxg.VerticalDirection.UP)
-  @deprecated ("Use Up; UP will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Up; UP will be removed in a future release", "8.0.60-R10")
   val UP = Up
 
-  protected override def unsortedValues: Array[VerticalDirection] = Array(Down, Up)
+  protected override def unsortedValues: Array[VerticalDirection] =
+    Array(Down, Up)
 }
 
-sealed case class VerticalDirection(override val delegate: jfxg.VerticalDirection)
-  extends SFXEnumDelegate[jfxg.VerticalDirection]
+sealed case class VerticalDirection(
+    override val delegate: jfxg.VerticalDirection)
+    extends SFXEnumDelegate[jfxg.VerticalDirection]

@@ -1,12 +1,12 @@
 trait MyTrait[T <: { var id: U }, U] {
-  def test(t: T): T = { 
+  def test(t: T): T = {
     val v: U = t.id
     t.id = v
     t
   }
 }
 
-class C (var id: String){
+class C(var id: String) {
   // uncommenting this fixes it
   // def id_=(x: AnyRef) { id = x.asInstanceOf[String] }
 }

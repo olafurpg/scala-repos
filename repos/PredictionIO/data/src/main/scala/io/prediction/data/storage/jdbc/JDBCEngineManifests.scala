@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.jdbc
 
 import grizzled.slf4j.Logging
@@ -22,8 +21,10 @@ import io.prediction.data.storage.StorageClientConfig
 import scalikejdbc._
 
 /** JDBC implementation of [[EngineManifests]] */
-class JDBCEngineManifests(client: String, config: StorageClientConfig, prefix: String)
-  extends EngineManifests with Logging {
+class JDBCEngineManifests(
+    client: String, config: StorageClientConfig, prefix: String)
+    extends EngineManifests with Logging {
+
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "enginemanifests")
   DB autoCommit { implicit session =>
@@ -48,8 +49,9 @@ class JDBCEngineManifests(client: String, config: StorageClientConfig, prefix: S
       ${m.engineFactory})""".update().apply()
   }
 
-  def get(id: String, version: String): Option[EngineManifest] = DB localTx { implicit session =>
-    sql"""
+  def get(id: String, version: String): Option[EngineManifest] = DB localTx {
+    implicit session =>
+      sql"""
     SELECT
       id,
       version,
@@ -57,8 +59,10 @@ class JDBCEngineManifests(client: String, config: StorageClientConfig, prefix: S
       description,
       files,
       engineFactory
-    FROM $tableName WHERE id = $id AND version = $version""".
-      map(resultToEngineManifest).single().apply()
+    FROM $tableName WHERE id = $id AND version = $version"""
+        .map(resultToEngineManifest)
+        .single()
+        .apply()
   }
 
   def getAll(): Seq[EngineManifest] = DB localTx { implicit session =>
@@ -93,19 +97,20 @@ class JDBCEngineManifests(client: String, config: StorageClientConfig, prefix: S
     }
   }
 
-  def delete(id: String, version: String): Unit = DB localTx { implicit session =>
-    sql"DELETE FROM $tableName WHERE id = $id AND version = $version".
-      update().apply()
+  def delete(id: String, version: String): Unit = DB localTx {
+    implicit session =>
+      sql"DELETE FROM $tableName WHERE id = $id AND version = $version"
+        .update()
+        .apply()
   }
 
   /** Convert JDBC results to [[EngineManifest]] */
   def resultToEngineManifest(rs: WrappedResultSet): EngineManifest = {
-    EngineManifest(
-      id = rs.string("id"),
-      version = rs.string("version"),
-      name = rs.string("engineName"),
-      description = rs.stringOpt("description"),
-      files = rs.string("files").split(","),
-      engineFactory = rs.string("engineFactory"))
+    EngineManifest(id = rs.string("id"),
+                   version = rs.string("version"),
+                   name = rs.string("engineName"),
+                   description = rs.stringOpt("description"),
+                   files = rs.string("files").split(","),
+                   engineFactory = rs.string("engineFactory"))
   }
 }

@@ -25,15 +25,14 @@ import org.apache.spark.sql.types._
 
 class RowTest extends FunSpec with Matchers {
 
-  val schema = StructType(
-    StructField("col1", StringType) ::
-    StructField("col2", StringType) ::
-    StructField("col3", IntegerType) :: Nil)
+  val schema = StructType(StructField("col1", StringType) :: StructField(
+          "col2", StringType) :: StructField("col3", IntegerType) :: Nil)
   val values = Array("value1", "value2", 1)
   val valuesWithoutCol3 = Array[Any](null, "value2", null)
 
   val sampleRow: Row = new GenericRowWithSchema(values, schema)
-  val sampleRowWithoutCol3: Row = new GenericRowWithSchema(valuesWithoutCol3, schema)
+  val sampleRowWithoutCol3: Row = new GenericRowWithSchema(
+      valuesWithoutCol3, schema)
   val noSchemaRow: Row = new GenericRow(values)
 
   describe("Row (without schema)") {
@@ -66,16 +65,16 @@ class RowTest extends FunSpec with Matchers {
 
     it("getValuesMap() retrieves values of multiple fields as a Map(field -> value)") {
       val expected = Map(
-        "col1" -> "value1",
-        "col2" -> "value2"
+          "col1" -> "value1",
+          "col2" -> "value2"
       )
       sampleRow.getValuesMap(List("col1", "col2")) shouldBe expected
     }
 
     it("getValuesMap() retrieves null value on non AnyVal Type") {
       val expected = Map(
-        "col1" -> null,
-        "col2" -> "value2"
+          "col1" -> null,
+          "col2" -> "value2"
       )
       sampleRowWithoutCol3.getValuesMap[String](List("col1", "col2")) shouldBe expected
     }
@@ -87,7 +86,8 @@ class RowTest extends FunSpec with Matchers {
     }
 
     it("getAs() on type extending AnyVal does not throw exception when value is null") {
-      sampleRowWithoutCol3.getAs[String](sampleRowWithoutCol3.fieldIndex("col1")) shouldBe null
+      sampleRowWithoutCol3.getAs[String](
+          sampleRowWithoutCol3.fieldIndex("col1")) shouldBe null
     }
   }
 

@@ -10,7 +10,8 @@ object Test2 {
   import scala.collection.immutable.List
 
   class Carb[_]
-  implicit def narrow[N, M[_], A](x: Carb[M[A]])(implicit ev: N <:< M[A]): Carb[N] = null
+  implicit def narrow[N, M[_], A](x: Carb[M[A]])(
+      implicit ev: N <:< M[A]): Carb[N] = null
   implicit def bar[M[_], A]: Carb[M[A]] = null
 
   type ListInt = List[Int]

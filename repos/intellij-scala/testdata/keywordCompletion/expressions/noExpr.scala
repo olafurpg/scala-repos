@@ -1,5 +1,3 @@
-class a/*caret*/ {
-
-}
+class a /*caret*/ {}
 /*
-*/
+ */

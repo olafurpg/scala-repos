@@ -44,5 +44,4 @@ object Test {
     assert(imdm(2) == -2)
     assert(imdm.updated(2, 2) == parallel.ParMap(0 -> 0, 1 -> 1, 2 -> 2))
   }
-
 }

@@ -16,10 +16,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-* Time: 9:49:36
-*/
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  * Time: 9:49:36
+  */
 trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
   def body: Option[ScExpression]
 
@@ -29,36 +29,47 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
 
   def removeAssignment()
 
-  def returnUsages(withBooleanInfix: Boolean = false): Array[PsiElement] = body.fold(Array.empty[PsiElement])(exp => {
-    (exp.depthFirst(!_.isInstanceOf[ScFunction]).filter(_.isInstanceOf[ScReturnStmt]) ++ exp.calculateReturns(withBooleanInfix)).
-      filter(_.getContainingFile == getContainingFile).toArray.distinct
-  })
+  def returnUsages(withBooleanInfix: Boolean = false): Array[PsiElement] =
+    body.fold(Array.empty[PsiElement])(
+        exp =>
+          {
+        (exp.depthFirst(!_.isInstanceOf[ScFunction])
+              .filter(_.isInstanceOf[ScReturnStmt]) ++ exp.calculateReturns(
+                withBooleanInfix))
+          .filter(_.getContainingFile == getContainingFile)
+          .toArray
+          .distinct
+    })
 
   def canBeTailRecursive = getParent match {
     case (_: ScTemplateBody) && Parent(Parent(owner: ScTypeDefinition)) =>
       val ownerModifiers = owner.getModifierList
       val methodModifiers = getModifierList
       owner.isInstanceOf[ScObject] ||
-        ownerModifiers.has(ScalaTokenTypes.kFINAL) ||
-        methodModifiers.has(ScalaTokenTypes.kPRIVATE) ||
-        methodModifiers.has(ScalaTokenTypes.kFINAL)
+      ownerModifiers.has(ScalaTokenTypes.kFINAL) ||
+      methodModifiers.has(ScalaTokenTypes.kPRIVATE) ||
+      methodModifiers.has(ScalaTokenTypes.kFINAL)
     case _ => true
   }
 
   def hasTailRecursionAnnotation: Boolean =
-    annotations.exists(_.typeElement.getType(TypingContext.empty)
-      .map(_.canonicalText).exists(_ == "_root_.scala.annotation.tailrec"))
+    annotations.exists(
+        _.typeElement
+          .getType(TypingContext.empty)
+          .map(_.canonicalText)
+          .exists(_ == "_root_.scala.annotation.tailrec"))
 
   def recursiveReferences: Seq[RecursiveReference] = {
     val resultExpressions = returnUsages(withBooleanInfix = true)
 
     @scala.annotation.tailrec
-    def possiblyTailRecursiveCallFor(elem: PsiElement): PsiElement = elem.getParent match {
-      case call: ScMethodCall => possiblyTailRecursiveCallFor(call)
-      case call: ScGenericCall => possiblyTailRecursiveCallFor(call)
-      case ret: ScReturnStmt => ret
-      case _ => elem
-    }
+    def possiblyTailRecursiveCallFor(elem: PsiElement): PsiElement =
+      elem.getParent match {
+        case call: ScMethodCall => possiblyTailRecursiveCallFor(call)
+        case call: ScGenericCall => possiblyTailRecursiveCallFor(call)
+        case ret: ScReturnStmt => ret
+        case _ => elem
+      }
 
     def expandIf(elem: PsiElement): Seq[PsiElement] = {
       elem match {
@@ -75,9 +86,12 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
     body match {
       case Some(body) =>
         for {
-          ref <- body.depthFirst.filterByType(classOf[ScReferenceElement]).toSeq if ref.isReferenceTo(this)
+          ref <- body.depthFirst
+                  .filterByType(classOf[ScReferenceElement])
+                  .toSeq if ref.isReferenceTo(this)
         } yield {
-          RecursiveReference(ref, expressions.contains(possiblyTailRecursiveCallFor(ref)))
+          RecursiveReference(
+              ref, expressions.contains(possiblyTailRecursiveCallFor(ref)))
         }
       case None => Seq.empty
     }
@@ -94,14 +108,16 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
   def isSecondaryConstructor: Boolean = name == "this"
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
-  def getStaticTraitFunctionWrapper(cClass: PsiClassWrapper): StaticTraitScFunctionWrapper = {
+  def getStaticTraitFunctionWrapper(
+      cClass: PsiClassWrapper): StaticTraitScFunctionWrapper = {
     new StaticTraitScFunctionWrapper(this, cClass)
   }
 }
 
 object ScFunctionDefinition {
   object withBody {
-    def unapply(fun: ScFunctionDefinition): Option[ScExpression] = Option(fun).flatMap(_.body)
+    def unapply(fun: ScFunctionDefinition): Option[ScExpression] =
+      Option(fun).flatMap(_.body)
   }
 }
 

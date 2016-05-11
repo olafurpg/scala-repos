@@ -3,14 +3,15 @@
  */
 import scala.tools.nsc._
 import scala.tools.partest.CompilerTest
-import scala.collection.{ mutable, immutable, generic }
+import scala.collection.{mutable, immutable, generic}
 
 object Test extends CompilerTest {
   import global._
   import rootMirror._
   import definitions._
 
-  override def code = """
+  override def code =
+    """
 package extest {
   trait Bippy[A <: AnyRef, B] { }     // wildcards
   trait BippyLike[A <: AnyRef, B <: List[A], This <: BippyLike[A, B, This] with Bippy[A, B]]  // no wildcards
@@ -75,7 +76,10 @@ package extest {
   """
 
   override def check(source: String, unit: global.CompilationUnit) {
-    getPackage(TermName("extest")).moduleClass.info.decls.toList.filter(_.isType).map(_.initialize).sortBy(_.name.toString) foreach { clazz =>
+    getPackage(TermName("extest")).moduleClass.info.decls.toList
+      .filter(_.isType)
+      .map(_.initialize)
+      .sortBy(_.name.toString) foreach { clazz =>
       exitingTyper {
         clazz.info
         println(clazz.defString)

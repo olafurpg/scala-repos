@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.testkit
 
 import akka.stream._
@@ -17,23 +17,27 @@ class StreamTestKitSpec extends AkkaSpec {
 
   "A TestSink Probe" must {
     "#toStrict" in {
-      Source(1 to 4).runWith(TestSink.probe)
-        .toStrict(300.millis) should ===(List(1, 2, 3, 4))
+      Source(1 to 4).runWith(TestSink.probe).toStrict(300.millis) should ===(
+          List(1, 2, 3, 4))
     }
 
     "#toStrict with failing source" in {
       val error = intercept[AssertionError] {
-        Source.fromIterator(() ⇒ new Iterator[Int] {
-          var i = 0
-          override def hasNext: Boolean = true
-          override def next(): Int = {
-            i += 1
-            i match {
-              case 3 ⇒ throw ex
-              case n ⇒ n
-            }
-          }
-        }).runWith(TestSink.probe)
+        Source
+          .fromIterator(
+              () ⇒
+                new Iterator[Int] {
+              var i = 0
+              override def hasNext: Boolean = true
+              override def next(): Int = {
+                i += 1
+                i match {
+                  case 3 ⇒ throw ex
+                  case n ⇒ n
+                }
+              }
+          })
+          .runWith(TestSink.probe)
           .toStrict(300.millis)
       }
 
@@ -48,42 +52,45 @@ class StreamTestKitSpec extends AkkaSpec {
     }
 
     "#expectNextOrError with right element" in {
-      Source(1 to 4).runWith(TestSink.probe)
+      Source(1 to 4)
+        .runWith(TestSink.probe)
         .request(4)
         .expectNextOrError(1, ex)
     }
 
     "#expectNextOrError with right exception" in {
-      Source.failed[Int](ex).runWith(TestSink.probe)
+      Source
+        .failed[Int](ex)
+        .runWith(TestSink.probe)
         .request(4)
         .expectNextOrError(1, ex)
     }
 
     "#expectNextOrError fail if the next element is not the expected one" in {
       intercept[AssertionError] {
-        Source(1 to 4).runWith(TestSink.probe)
+        Source(1 to 4)
+          .runWith(TestSink.probe)
           .request(4)
           .expectNextOrError(100, ex)
       }.getMessage should include("OnNext(1)")
     }
 
     "#expectError" in {
-      Source.failed[Int](ex).runWith(TestSink.probe)
-        .request(1)
-        .expectError() should ===(ex)
+      Source.failed[Int](ex).runWith(TestSink.probe).request(1).expectError() should ===(
+          ex)
     }
 
     "#expectError fail if no error signalled" in {
       intercept[AssertionError] {
-        Source(1 to 4).runWith(TestSink.probe)
-          .request(1)
-          .expectError()
+        Source(1 to 4).runWith(TestSink.probe).request(1).expectError()
       }.getMessage should include("OnNext")
     }
 
     "#expectComplete should fail if error signalled" in {
       intercept[AssertionError] {
-        Source.failed[Int](ex).runWith(TestSink.probe)
+        Source
+          .failed[Int](ex)
+          .runWith(TestSink.probe)
           .request(1)
           .expectComplete()
       }.getMessage should include("OnError")
@@ -91,35 +98,31 @@ class StreamTestKitSpec extends AkkaSpec {
 
     "#expectComplete should fail if next element signalled" in {
       intercept[AssertionError] {
-        Source(1 to 4).runWith(TestSink.probe)
-          .request(1)
-          .expectComplete()
+        Source(1 to 4).runWith(TestSink.probe).request(1).expectComplete()
       }.getMessage should include("OnNext")
     }
 
     "#expectNextOrComplete with right element" in {
-      Source(1 to 4).runWith(TestSink.probe)
-        .request(4)
-        .expectNextOrComplete(1)
+      Source(1 to 4).runWith(TestSink.probe).request(4).expectNextOrComplete(1)
     }
 
     "#expectNextOrComplete with completion" in {
-      Source.single(1).runWith(TestSink.probe)
+      Source
+        .single(1)
+        .runWith(TestSink.probe)
         .request(4)
         .expectNextOrComplete(1)
         .expectNextOrComplete(1337)
     }
 
     "#expectNextN given a number of elements" in {
-      Source(1 to 4).runWith(TestSink.probe)
-        .request(4)
-        .expectNextN(4) should ===(List(1, 2, 3, 4))
+      Source(1 to 4).runWith(TestSink.probe).request(4).expectNextN(4) should ===(
+          List(1, 2, 3, 4))
     }
 
     "#expectNextN given specific elements" in {
-      Source(1 to 4).runWith(TestSink.probe)
-        .request(4)
-        .expectNextN(4) should ===(List(1, 2, 3, 4))
+      Source(1 to 4).runWith(TestSink.probe).request(4).expectNextN(4) should ===(
+          List(1, 2, 3, 4))
     }
   }
 }

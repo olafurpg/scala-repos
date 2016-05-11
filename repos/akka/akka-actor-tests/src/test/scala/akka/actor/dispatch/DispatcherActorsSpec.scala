@@ -5,25 +5,25 @@ import akka.actor._
 import akka.testkit.AkkaSpec
 
 /**
- * Tests the behavior of the executor based event driven dispatcher when multiple actors are being dispatched on it.
- */
+  * Tests the behavior of the executor based event driven dispatcher when multiple actors are being dispatched on it.
+  */
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class DispatcherActorsSpec extends AkkaSpec {
   class SlowActor(finishedCounter: CountDownLatch) extends Actor {
 
     def receive = {
       case x: Int ⇒ {
-        Thread.sleep(50) // slow actor
-        finishedCounter.countDown()
-      }
+          Thread.sleep(50) // slow actor
+          finishedCounter.countDown()
+        }
     }
   }
 
   class FastActor(finishedCounter: CountDownLatch) extends Actor {
     def receive = {
       case x: Int ⇒ {
-        finishedCounter.countDown()
-      }
+          finishedCounter.countDown()
+        }
     }
   }
 

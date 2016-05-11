@@ -13,16 +13,16 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
 import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 
 /**
- * @author Alexander Podkhalyuzin
- *                         Date: 07.03.2008
- */
-
+  * @author Alexander Podkhalyuzin
+  *                         Date: 07.03.2008
+  */
 trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
   def getReferenceElements = Array[PsiJavaCodeReferenceElement]()
 
-
-  def foldFuns(initial: Any)(fail: Any)(l: List[PartialFunction[Any, _]]): Any = l match {
-    case h :: t => if (h.isDefinedAt(initial)) foldFuns(h(initial))(fail)(t) else fail
+  def foldFuns(initial: Any)(fail: Any)(
+      l: List[PartialFunction[Any, _]]): Any = l match {
+    case h :: t =>
+      if (h.isDefinedAt(initial)) foldFuns(h(initial))(fail)(t) else fail
     case Nil => initial
   }
 
@@ -39,18 +39,26 @@ trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
         te.reference match {
           case Some(ref) =>
             ref.bind() match {
-              case Some(r: ScalaResolveResult) if r.getActualElement.isInstanceOf[PsiClass] &&
-                  r.getActualElement.asInstanceOf[PsiClass].qualifiedName == "scala.throws" =>
+              case Some(r: ScalaResolveResult)
+                  if r.getActualElement.isInstanceOf[PsiClass] && r.getActualElement
+                    .asInstanceOf[PsiClass]
+                    .qualifiedName == "scala.throws" =>
                 constr.args match {
                   case Some(args) if args.exprs.length == 1 =>
                     args.exprs(0).getType(TypingContext.empty) match {
-                      case Success(ScParameterizedType(tp, arg), _) if arg.length == 1 =>
+                      case Success(ScParameterizedType(tp, arg), _)
+                          if arg.length == 1 =>
                         ScType.extractClass(tp, Some(getProject)) match {
-                          case Some(clazz) if clazz.qualifiedName == "java.lang.Class" =>
+                          case Some(clazz)
+                              if clazz.qualifiedName == "java.lang.Class" =>
                             ScType.extractClass(arg(0), Some(getProject)) match {
                               case Some(p) =>
-                                JavaPsiFacade.getInstance(getProject).getElementFactory.
-                                  createTypeByFQClassName(p.qualifiedName, GlobalSearchScope.allScope(getProject))
+                                JavaPsiFacade
+                                  .getInstance(getProject)
+                                  .getElementFactory
+                                  .createTypeByFQClassName(
+                                      p.qualifiedName,
+                                      GlobalSearchScope.allScope(getProject))
                               case _ => null
                             }
                           case _ => null

@@ -6,11 +6,10 @@ import scala.math.Ordering
 
 import scala.collection.JavaConversions._
 
-class TreeSet[E] (_comparator: Comparator[_ >: E])
-    extends AbstractSet[E]
-    with NavigableSet[E]
-    with Cloneable
-    with Serializable { self =>
+class TreeSet[E](_comparator: Comparator[_ >: E])
+    extends AbstractSet[E] with NavigableSet[E] with Cloneable
+    with Serializable {
+  self =>
 
   def this() =
     this(null.asInstanceOf[Comparator[_ >: E]])
@@ -33,7 +32,6 @@ class TreeSet[E] (_comparator: Comparator[_ >: E])
     }
 
     def compare(a: Box[E], b: Box[E]): Int = cmp.compare(a.inner, b.inner)
-
   }
 
   protected val inner: mutable.TreeSet[Box[E]] = new mutable.TreeSet[Box[E]]()
@@ -108,8 +106,7 @@ class TreeSet[E] (_comparator: Comparator[_ >: E])
   override def add(e: E): Boolean = {
     val boxed = Box(e)
 
-    if (isEmpty)
-      BoxOrdering.compare(boxed, boxed)
+    if (isEmpty) BoxOrdering.compare(boxed, boxed)
 
     inner.add(boxed)
   }
@@ -123,39 +120,41 @@ class TreeSet[E] (_comparator: Comparator[_ >: E])
   override def addAll(c: Collection[_ <: E]): Boolean = {
     val iter = c.iterator()
     var changed = false
-    while (iter.hasNext)
-      changed = add(iter.next()) || changed
+    while (iter.hasNext) changed = add(iter.next()) || changed
     changed
   }
 
   override def removeAll(c: Collection[_]): Boolean = {
     val iter = c.iterator()
     var changed = false
-    while (iter.hasNext)
-      changed = inner.remove(Box(iter.next).asInstanceOf[Box[E]]) || changed
+    while (iter.hasNext) changed = inner.remove(
+        Box(iter.next).asInstanceOf[Box[E]]) || changed
     changed
   }
 
-  def subSet(fromElement: E, fromInclusive: Boolean, toElement: E,
-      toInclusive: Boolean): NavigableSet[E] = {
+  def subSet(fromElement: E,
+             fromInclusive: Boolean,
+             toElement: E,
+             toInclusive: Boolean): NavigableSet[E] = {
     val boxedFrom = Box(fromElement)
     val boxedTo = Box(toElement)
     val subSetFun = { () =>
       // the creation of a new TreeSet is to avoid a mysterious bug with scala 2.10
       var base = new mutable.TreeSet[Box[E]]
       base ++= inner.range(boxedFrom, boxedTo)
-      if (!fromInclusive)
-        base = base - boxedFrom
+      if (!fromInclusive) base = base - boxedFrom
 
-      if (toInclusive && inner.contains(boxedTo))
-        base = base + boxedTo
+      if (toInclusive && inner.contains(boxedTo)) base = base + boxedTo
 
       base
     }
 
-    new NavigableView(this, subSetFun,
-        Some(fromElement), fromInclusive,
-        Some(toElement), toInclusive)
+    new NavigableView(this,
+                      subSetFun,
+                      Some(fromElement),
+                      fromInclusive,
+                      Some(toElement),
+                      toInclusive)
   }
 
   def headSet(toElement: E, inclusive: Boolean): NavigableSet[E] = {
@@ -163,17 +162,13 @@ class TreeSet[E] (_comparator: Comparator[_ >: E])
     val headSetFun = { () =>
       // the creation of a new TreeSet is to avoid a mysterious bug with scala 2.10
       var base = new mutable.TreeSet[Box[E]]
-      if (inclusive)
-        base ++= inner.to(boxed)
-      else
-        base ++= inner.until(boxed)
+      if (inclusive) base ++= inner.to(boxed)
+      else base ++= inner.until(boxed)
 
       base
     }
 
-    new NavigableView(this, headSetFun,
-        None, true,
-        Some(toElement), inclusive)
+    new NavigableView(this, headSetFun, None, true, Some(toElement), inclusive)
   }
 
   def tailSet(fromElement: E, inclusive: Boolean): NavigableSet[E] = {
@@ -182,15 +177,13 @@ class TreeSet[E] (_comparator: Comparator[_ >: E])
       // the creation of a new TreeSet is to avoid a mysterious bug with scala 2.10
       var base = new mutable.TreeSet[Box[E]]
       base ++= inner.from(boxed)
-      if (!inclusive)
-        base -= boxed
+      if (!inclusive) base -= boxed
 
       base
     }
 
-    new NavigableView(this, tailSetFun,
-        Some(fromElement), inclusive,
-        None, true)
+    new NavigableView(
+        this, tailSetFun, Some(fromElement), inclusive, None, true)
   }
 
   def subSet(fromElement: E, toElement: E): SortedSet[E] =

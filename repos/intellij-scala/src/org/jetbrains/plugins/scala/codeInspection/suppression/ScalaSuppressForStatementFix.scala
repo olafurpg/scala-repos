@@ -19,13 +19,16 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 import scala.collection.JavaConverters._
 
 /**
- * @author Nikolay.Tropin
- */
-
-abstract class ScalaSuppressByLineCommentFix(key: HighlightDisplayKey) extends SuppressByCommentFix(key, classOf[ScalaPsiElement]) {
-  override def createSuppression(project: Project, element: PsiElement, container: PsiElement): Unit = {
-    val text: String = SuppressionUtilCore.SUPPRESS_INSPECTIONS_TAG_NAME + " " + key.getID
-    val comment: PsiComment = SuppressionUtil.createComment(project, text, ScalaLanguage.Instance)
+  * @author Nikolay.Tropin
+  */
+abstract class ScalaSuppressByLineCommentFix(key: HighlightDisplayKey)
+    extends SuppressByCommentFix(key, classOf[ScalaPsiElement]) {
+  override def createSuppression(
+      project: Project, element: PsiElement, container: PsiElement): Unit = {
+    val text: String =
+      SuppressionUtilCore.SUPPRESS_INSPECTIONS_TAG_NAME + " " + key.getID
+    val comment: PsiComment =
+      SuppressionUtil.createComment(project, text, ScalaLanguage.Instance)
     val newLine = ScalaPsiElementFactory.createNewLine(element.getManager)
     container match {
       case owner: ScDocCommentOwner if owner.docComment.isDefined =>
@@ -43,38 +46,64 @@ abstract class ScalaSuppressByLineCommentFix(key: HighlightDisplayKey) extends S
     }
   }
 
-  override def getCommentsFor(container: PsiElement): util.List[_ <: PsiElement] = {
+  override def getCommentsFor(
+      container: PsiElement): util.List[_ <: PsiElement] = {
     ScalaSuppressableInspectionTool.commentsFor(container).asJava
   }
 }
 
-class ScalaSuppressForStatementFix(key: HighlightDisplayKey) extends ScalaSuppressByLineCommentFix(key) {
+class ScalaSuppressForStatementFix(key: HighlightDisplayKey)
+    extends ScalaSuppressByLineCommentFix(key) {
 
-  override def getText: String = InspectionsBundle.message("suppress.inspection.statement")
+  override def getText: String =
+    InspectionsBundle.message("suppress.inspection.statement")
 
-  override def getContainer(context: PsiElement): PsiElement = ScalaRefactoringUtil.findEnclosingBlockStatement(context) match {
-    case None => null
-    case Some(_: ScFunctionDefinition | _: ScVariableDefinition | _: ScPatternDefinition | _: ScTypeAliasDefinition | _: ScMacroDefinition) => null
-    case Some(stmt) => stmt
-  }
+  override def getContainer(context: PsiElement): PsiElement =
+    ScalaRefactoringUtil.findEnclosingBlockStatement(context) match {
+      case None => null
+      case Some(
+          _: ScFunctionDefinition | _: ScVariableDefinition |
+          _: ScPatternDefinition | _: ScTypeAliasDefinition |
+          _: ScMacroDefinition) =>
+        null
+      case Some(stmt) => stmt
+    }
 }
 
-abstract class ScalaSuppressForDefinitionFix(key: HighlightDisplayKey, text: String, defClasses: Class[_ <: PsiElement]*)
-        extends ScalaSuppressByLineCommentFix(key) {
+abstract class ScalaSuppressForDefinitionFix(
+    key: HighlightDisplayKey,
+    text: String,
+    defClasses: Class[_ <: PsiElement]*)
+    extends ScalaSuppressByLineCommentFix(key) {
 
   override def getText: String = text
 
-  override def getContainer(context: PsiElement): PsiElement = PsiTreeUtil.getParentOfType(context, defClasses: _*)
+  override def getContainer(context: PsiElement): PsiElement =
+    PsiTreeUtil.getParentOfType(context, defClasses: _*)
 }
 
-class ScalaSuppressForClassFix(key: HighlightDisplayKey) 
-        extends ScalaSuppressForDefinitionFix(key, InspectionsBundle.message("suppress.inspection.class"), classOf[ScTypeDefinition])
+class ScalaSuppressForClassFix(key: HighlightDisplayKey)
+    extends ScalaSuppressForDefinitionFix(
+        key,
+        InspectionsBundle.message("suppress.inspection.class"),
+        classOf[ScTypeDefinition])
 
 class ScalaSuppressForFunctionFix(key: HighlightDisplayKey)
-        extends ScalaSuppressForDefinitionFix(key, InspectionBundle.message("suppress.inspection.function"), classOf[ScFunctionDefinition], classOf[ScMacroDefinition])
+    extends ScalaSuppressForDefinitionFix(
+        key,
+        InspectionBundle.message("suppress.inspection.function"),
+        classOf[ScFunctionDefinition],
+        classOf[ScMacroDefinition])
 
 class ScalaSuppressForVariableFix(key: HighlightDisplayKey)
-        extends ScalaSuppressForDefinitionFix(key, InspectionBundle.message("suppress.inspection.variable"), classOf[ScVariableDefinition], classOf[ScPatternDefinition])
+    extends ScalaSuppressForDefinitionFix(
+        key,
+        InspectionBundle.message("suppress.inspection.variable"),
+        classOf[ScVariableDefinition],
+        classOf[ScPatternDefinition])
 
 class ScalaSuppressForTypeAliasFix(key: HighlightDisplayKey)
-        extends ScalaSuppressForDefinitionFix(key, InspectionBundle.message("suppress.inspection.typeAlias"), classOf[ScTypeAliasDefinition])
+    extends ScalaSuppressForDefinitionFix(
+        key,
+        InspectionBundle.message("suppress.inspection.typeAlias"),
+        classOf[ScTypeAliasDefinition])

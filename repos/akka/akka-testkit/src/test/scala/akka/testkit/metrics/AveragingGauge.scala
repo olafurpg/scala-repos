@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.testkit.metrics
 
 import java.util.concurrent.atomic.LongAdder
@@ -8,10 +8,10 @@ import java.util.concurrent.atomic.LongAdder
 import com.codahale.metrics.Gauge
 
 /**
- * Gauge which exposes the Arithmetic Mean of values given to it.
- *
- * Can be used to expose average of a series of values to `com.codahale.metrics.ScheduledReporter`.
- */
+  * Gauge which exposes the Arithmetic Mean of values given to it.
+  *
+  * Can be used to expose average of a series of values to `com.codahale.metrics.ScheduledReporter`.
+  */
 class AveragingGauge extends Gauge[Double] {
 
   private val sum = new LongAdder

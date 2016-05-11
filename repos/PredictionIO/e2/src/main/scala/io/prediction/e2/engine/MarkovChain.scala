@@ -20,58 +20,54 @@ import org.apache.spark.mllib.linalg.{SparseVector, Vectors}
 import org.apache.spark.rdd.RDD
 
 /**
- * Class for training a Markov Chain model
- */
+  * Class for training a Markov Chain model
+  */
 object MarkovChain {
+
   /**
-   * Train a Markov Chain model
-   *
-   * @param matrix Tally of all state transitions
-   * @param topN Use the top-N tally for each state
-   */
+    * Train a Markov Chain model
+    *
+    * @param matrix Tally of all state transitions
+    * @param topN Use the top-N tally for each state
+    */
   def train(matrix: CoordinateMatrix, topN: Int): MarkovChainModel = {
     val noOfStates = matrix.numCols().toInt
-    val transitionVectors = matrix.entries
-      .keyBy(_.i.toInt)
-      .groupByKey()
-      .mapValues { rowEntries =>
-      val total = rowEntries.map(_.value).sum
-      val sortedTopN = rowEntries.toSeq
-        .sortBy(_.value)(Ordering.Double.reverse)
-        .take(topN)
-        .map(me => (me.j.toInt, me.value / total))
-        .sortBy(_._1)
+    val transitionVectors =
+      matrix.entries.keyBy(_.i.toInt).groupByKey().mapValues { rowEntries =>
+        val total = rowEntries.map(_.value).sum
+        val sortedTopN = rowEntries.toSeq
+          .sortBy(_.value)(Ordering.Double.reverse)
+          .take(topN)
+          .map(me => (me.j.toInt, me.value / total))
+          .sortBy(_._1)
 
-      new SparseVector(
-        noOfStates,
-        sortedTopN.map(_._1).toArray,
-        sortedTopN.map(_._2).toArray)
-    }
+        new SparseVector(noOfStates,
+                         sortedTopN.map(_._1).toArray,
+                         sortedTopN.map(_._2).toArray)
+      }
 
-    new MarkovChainModel(
-      transitionVectors,
-      topN)
+    new MarkovChainModel(transitionVectors, topN)
   }
 }
 
 /**
- * Markov Chain model
- *
- * @param transitionVectors transition vectors
- * @param n top N used to construct the model
- */
+  * Markov Chain model
+  *
+  * @param transitionVectors transition vectors
+  * @param n top N used to construct the model
+  */
 case class MarkovChainModel(
-  transitionVectors: RDD[(Int, SparseVector)],
-  n: Int) {
+    transitionVectors: RDD[(Int, SparseVector)], n: Int) {
 
   /**
-   * Calculate the probabilities of the next state
-   *
-   * @param currentState probabilities of the current state
-   */
+    * Calculate the probabilities of the next state
+    *
+    * @param currentState probabilities of the current state
+    */
   def predict(currentState: Seq[Double]): Seq[Double] = {
     // multiply the input with transition matrix row by row
-    val nextStateVectors = transitionVectors.map { case (rowIndex, vector) =>
+    val nextStateVectors = transitionVectors.map {
+      case (rowIndex, vector) =>
         val values = vector.indices.map { index =>
           vector(index) * currentState(rowIndex)
         }

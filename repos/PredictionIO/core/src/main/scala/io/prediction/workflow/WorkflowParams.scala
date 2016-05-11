@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.workflow
 
 /** Workflow parameters.
@@ -26,17 +25,16 @@ package io.prediction.workflow
   * @param stopAfterPrepare Stops workflow after data preparation.
   * @group Workflow
   */
-case class WorkflowParams(
-  batch: String = "",
-  verbose: Int = 2,
-  saveModel: Boolean = true,
-  sparkEnv: Map[String, String] =
-    Map[String, String]("spark.executor.extraClassPath" -> "."),
-  skipSanityCheck: Boolean = false,
-  stopAfterRead: Boolean = false,
-  stopAfterPrepare: Boolean = false) {
+case class WorkflowParams(batch: String = "",
+                          verbose: Int = 2,
+                          saveModel: Boolean = true,
+                          sparkEnv: Map[String, String] = Map[String, String](
+                                "spark.executor.extraClassPath" -> "."),
+                          skipSanityCheck: Boolean = false,
+                          stopAfterRead: Boolean = false,
+                          stopAfterPrepare: Boolean = false) {
   // Temporary workaround for WorkflowParamsBuilder for Java. It doesn't support
   // custom spark environment yet.
-  def this(batch: String, verbose: Int, saveModel: Boolean)
-  = this(batch, verbose, saveModel, Map[String, String]())
+  def this(batch: String, verbose: Int, saveModel: Boolean) =
+    this(batch, verbose, saveModel, Map[String, String]())
 }

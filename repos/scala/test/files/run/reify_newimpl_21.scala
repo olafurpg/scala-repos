@@ -13,7 +13,8 @@ object Test extends App {
 
   class D extends C {
     type T = String // this "mistake" is made for a reason!
-    override val tt: TypeTag[T] = implicitly[TypeTag[Int]].asInstanceOf[TypeTag[T]]
+    override val tt: TypeTag[T] =
+      implicitly[TypeTag[Int]].asInstanceOf[TypeTag[T]]
   }
 
   println((new D).code.eval)

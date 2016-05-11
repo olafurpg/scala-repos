@@ -1,11 +1,15 @@
 class Bippy[T](val value: T) extends annotation.StaticAnnotation
 
 class A {
-  @Bippy("hi") def f1: Int = 1
-  @Bippy[String]("hi") def f2: Int = 2
+  @Bippy("hi")
+  def f1: Int = 1
+  @Bippy[String]("hi")
+  def f2: Int = 2
 
-  @throws("what do I throw?") def f3 = throw new RuntimeException
-  @throws[RuntimeException]("that's good to know!") def f4 = throw new RuntimeException
+  @throws("what do I throw?")
+  def f3 = throw new RuntimeException
+  @throws[RuntimeException]("that's good to know!")
+  def f4 = throw new RuntimeException
 }
 
 object Test {

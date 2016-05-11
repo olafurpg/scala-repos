@@ -22,21 +22,23 @@ package util
 
 import com.precog.util.NumericComparisons
 
-import scala.{ specialized => spec }
+import scala.{specialized => spec}
 
 import spire.math.Order
 
 import org.joda.time.DateTime
 
 /**
- * Compare values of different types.
- */
-trait HetOrder[@spec(Boolean, Long, Double, AnyRef) A, @spec(Boolean, Long, Double, AnyRef) B] {
+  * Compare values of different types.
+  */
+trait HetOrder[@spec(Boolean, Long, Double, AnyRef) A,
+               @spec(Boolean, Long, Double, AnyRef) B] {
   def compare(a: A, b: B): Int
 }
 
 trait HetOrderLow {
-  implicit def reverse[@spec(Boolean, Long, Double, AnyRef) A, @spec(Boolean, Long, Double, AnyRef) B](
+  implicit def reverse[
+      @spec(Boolean, Long, Double, AnyRef) A, @spec(Boolean, Long, Double, AnyRef) B](
       implicit ho: HetOrder[A, B]) = new HetOrder[B, A] {
     def compare(b: B, a: A) = {
       val cmp = ho.compare(a, b)
@@ -44,7 +46,8 @@ trait HetOrderLow {
     }
   }
 
-  implicit def fromOrder[@spec(Boolean, Long, Double, AnyRef) A](implicit o: Order[A]) = new HetOrder[A, A] {
+  implicit def fromOrder[@spec(Boolean, Long, Double, AnyRef) A](
+      implicit o: Order[A]) = new HetOrder[A, A] {
     def compare(a: A, b: A) = o.compare(a, b)
   }
 }
@@ -59,15 +62,18 @@ object HetOrder extends HetOrderLow {
   }
 
   implicit object DoubleBigDecimalOrder extends HetOrder[Double, BigDecimal] {
-    def compare(a: Double, b: BigDecimal): Int = NumericComparisons.compare(a, b)
+    def compare(a: Double, b: BigDecimal): Int =
+      NumericComparisons.compare(a, b)
   }
 
-  @inline final def apply[@spec(Boolean, Long, Double, AnyRef) A, @spec(Boolean, Long, Double, AnyRef) B](implicit ho: HetOrder[A, B]) = ho
+  @inline final def apply[
+      @spec(Boolean, Long, Double, AnyRef) A, @spec(Boolean, Long, Double, AnyRef) B](
+      implicit ho: HetOrder[A, B]) = ho
 }
 
 /**
- * Extra `spire.math.Order`s that fill out the rest of our value types.
- */
+  * Extra `spire.math.Order`s that fill out the rest of our value types.
+  */
 object ExtraOrders {
   implicit object BooleanOrder extends Order[Boolean] {
     def eqv(a: Boolean, b: Boolean) = a == b

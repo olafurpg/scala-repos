@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 import akka.actor.Address
@@ -8,8 +8,8 @@ import akka.cluster.Member
 import akka.cluster.UniqueAddress
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object PruningState {
   sealed trait PruningPhase
   final case class PruningInitialized(seen: Set[Address]) extends PruningPhase
@@ -17,9 +17,10 @@ private[akka] object PruningState {
 }
 
 /**
- * INTERNAL API
- */
-private[akka] final case class PruningState(owner: UniqueAddress, phase: PruningState.PruningPhase) {
+  * INTERNAL API
+  */
+private[akka] final case class PruningState(
+    owner: UniqueAddress, phase: PruningState.PruningPhase) {
   import PruningState._
 
   def merge(that: PruningState): PruningState =
@@ -29,10 +30,9 @@ private[akka] final case class PruningState(owner: UniqueAddress, phase: Pruning
       case (PruningInitialized(thisSeen), PruningInitialized(thatSeen)) ⇒
         if (this.owner == that.owner)
           copy(phase = PruningInitialized(thisSeen union thatSeen))
-        else if (Member.addressOrdering.compare(this.owner.address, that.owner.address) > 0)
-          that
-        else
-          this
+        else if (Member.addressOrdering.compare(
+                     this.owner.address, that.owner.address) > 0) that
+        else this
     }
 
   def addSeen(node: Address): PruningState = phase match {
@@ -42,4 +42,3 @@ private[akka] final case class PruningState(owner: UniqueAddress, phase: Pruning
     case _ ⇒ this
   }
 }
-

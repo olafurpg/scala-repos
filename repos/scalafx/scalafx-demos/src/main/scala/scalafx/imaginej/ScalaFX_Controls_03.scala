@@ -40,7 +40,6 @@ package scalafx.imaginej
 //                                  ScalaFX Programming Library Examples
 //
 
-
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.geometry.Insets
@@ -50,27 +49,24 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{HBox, VBox}
 
 /**
- * @author Luc Duponcheel <luc.duponcheel@gmail.com>
- *
- *         based upon:
- *
- *         http://docs.oracle.com/javafx/2.0/ui_controls/radio-button.htm
- *
- */
-
+  * @author Luc Duponcheel <luc.duponcheel@gmail.com>
+  *
+  *         based upon:
+  *
+  *         http://docs.oracle.com/javafx/2.0/ui_controls/radio-button.htm
+  *
+  */
 object ScalaFX_Controls_03 extends JFXApp {
 
-  val theToggleGroup = new ToggleGroup {
+  val theToggleGroup = new ToggleGroup {}
 
-  }
-
-  theToggleGroup.selectedToggle onChange {
-    (_, _, _) =>
-      val selectedToggle = theToggleGroup.getSelectedToggle
-      if (selectedToggle != null) {
-        val userDataString = selectedToggle.getUserData.toString
-        iconImageView.image = new Image(this, "images/" + userDataString + ".jpg")
-      }
+  theToggleGroup.selectedToggle onChange { (_, _, _) =>
+    val selectedToggle = theToggleGroup.getSelectedToggle
+    if (selectedToggle != null) {
+      val userDataString = selectedToggle.getUserData.toString
+      iconImageView.image = new Image(
+          this, "images/" + userDataString + ".jpg")
+    }
   }
 
   val homeRadioButton = new RadioButton {
@@ -78,12 +74,10 @@ object ScalaFX_Controls_03 extends JFXApp {
     userData = "Home"
   }
 
-
   val calendarRadioButton = new RadioButton {
     toggleGroup = theToggleGroup
     userData = "Calendar"
   }
-
 
   val contactsRadioButton = new RadioButton {
     toggleGroup = theToggleGroup
@@ -93,21 +87,20 @@ object ScalaFX_Controls_03 extends JFXApp {
   val vBox = new VBox {
     spacing = 10
     children = List(
-      homeRadioButton,
-      calendarRadioButton,
-      contactsRadioButton
+        homeRadioButton,
+        calendarRadioButton,
+        contactsRadioButton
     )
   }
 
-  val iconImageView = new ImageView {
-  }
+  val iconImageView = new ImageView {}
 
   val hBox = new HBox {
     spacing = 50
     padding = Insets(20, 10, 10, 20)
     children = List(
-      vBox,
-      iconImageView
+        vBox,
+        iconImageView
     )
   }
 
@@ -120,5 +113,3 @@ object ScalaFX_Controls_03 extends JFXApp {
     }
   }
 }
-
-

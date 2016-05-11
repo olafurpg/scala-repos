@@ -5,12 +5,12 @@ import org.jetbrains.plugins.scala.codeInsight.intention.expression.RemoveUnnece
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 /**
- * Nikolay.Tropin
- * 6/27/13
- */
-
+  * Nikolay.Tropin
+  * 6/27/13
+  */
 //test only removing clarifying paretheses here
-class RemoveUnnecessaryParenthesesIntentionTest extends ScalaIntentionTestBase {
+class RemoveUnnecessaryParenthesesIntentionTest
+    extends ScalaIntentionTestBase {
   def familyName: String = RemoveUnnecessaryParenthesesIntention.familyName
 
   def test_1(): Unit = {

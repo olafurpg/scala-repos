@@ -1,6 +1,5 @@
 import sbinary._
 
-trait A
-{
-	def format: Format[A]
+trait A {
+  def format: Format[A]
 }

@@ -8,15 +8,24 @@ import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{A
 import org.jetbrains.plugins.scala.lang.refactoring.introduceVariable.ScalaIntroduceVariableHandler
 
 /**
- * @author Roman.Shein
- * @since 11.09.2015.
- */
-class ScalaIntorduceVariablePostfixTemplate extends PostfixTemplateWithExpressionSelector("var", "val name = expr",
-  new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
-  override def expandForChooseExpression(expression: PsiElement, editor: Editor): Unit = {
+  * @author Roman.Shein
+  * @since 11.09.2015.
+  */
+class ScalaIntorduceVariablePostfixTemplate
+    extends PostfixTemplateWithExpressionSelector(
+        "var",
+        "val name = expr",
+        new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
+  override def expandForChooseExpression(
+      expression: PsiElement, editor: Editor): Unit = {
     val range = expression.getTextRange
-    editor.getSelectionModel.setSelection(range.getStartOffset, range.getEndOffset)
-    new ScalaIntroduceVariableHandler().invokeExpression(expression.getProject, editor, expression.getContainingFile,
-      expression.getTextRange.getStartOffset, expression.getTextRange.getEndOffset)
+    editor.getSelectionModel.setSelection(
+        range.getStartOffset, range.getEndOffset)
+    new ScalaIntroduceVariableHandler().invokeExpression(
+        expression.getProject,
+        editor,
+        expression.getContainingFile,
+        expression.getTextRange.getStartOffset,
+        expression.getTextRange.getEndOffset)
   }
 }

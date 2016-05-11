@@ -13,37 +13,44 @@ class FormatterTest extends FunSuite {
     registry.put(Seq("foo", "qux"), "quux")
 
     val actual = Formatter.asMap(registry)
-    val expected = Map("registry" -> Map("foo" -> Map("bar" -> "baz", "qux" -> "quux")))
+    val expected =
+      Map("registry" -> Map("foo" -> Map("bar" -> "baz", "qux" -> "quux")))
     assert(actual == expected)
   }
 
   test("add should handle empties") {
     assert(
-      Formatter.add(Map.empty, Seq.empty, "big") == Map(Formatter.Eponymous -> "big")
+        Formatter.add(Map.empty, Seq.empty, "big") == Map(
+            Formatter.Eponymous -> "big")
     )
   }
 
-  test("add should handle putting an entry in an existing map if nothing's there") {
+  test(
+      "add should handle putting an entry in an existing map if nothing's there") {
     assert(
-      Formatter.add(Map.empty, Seq("it's"), "big") == Map("it's" -> "big")
+        Formatter.add(Map.empty, Seq("it's"), "big") == Map("it's" -> "big")
     )
   }
 
-  test("add should handle putting recursive entries in an existing map if nothing's there") {
+  test(
+      "add should handle putting recursive entries in an existing map if nothing's there") {
     val actual = Formatter.add(Map.empty, Seq("it's", "very"), "big")
     val expected = Map("it's" -> Map("very" -> "big"))
     assert(actual == expected)
   }
 
   test("add should handle colliding prefixes") {
-    val actual = Formatter.add(Map("it's" -> Map("not" -> "small")), Seq("it's", "very"), "big")
+    val actual = Formatter.add(
+        Map("it's" -> Map("not" -> "small")), Seq("it's", "very"), "big")
     val expected = Map("it's" -> Map("very" -> "big", "not" -> "small"))
     assert(actual == expected)
   }
 
   test("add should handle colliding prefixes that are shorter") {
-    val actual = Formatter.add(Map("it's" -> "small"), Seq("it's", "very"), "big")
-    val expected = Map("it's" -> Map("very" -> "big", Formatter.Eponymous -> "small"))
+    val actual =
+      Formatter.add(Map("it's" -> "small"), Seq("it's", "very"), "big")
+    val expected =
+      Map("it's" -> Map("very" -> "big", Formatter.Eponymous -> "small"))
     assert(actual == expected)
   }
 
@@ -68,7 +75,8 @@ class FormatterTest extends FunSuite {
     val value = "big"
     val actual = Formatter.makeMap(seq, value)
 
-    val expected = Map("my" -> Map("spoon" -> Map("is" -> Map("too" -> "big"))))
+    val expected =
+      Map("my" -> Map("spoon" -> Map("is" -> Map("too" -> "big"))))
     assert(actual == expected)
   }
 

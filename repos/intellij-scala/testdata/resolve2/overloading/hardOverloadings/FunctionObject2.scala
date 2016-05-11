@@ -10,5 +10,5 @@ object Test {
 
   val a = new A
 
-  a./* line: 5, name: apply */foo(false)
+  a. /* line: 5, name: apply */ foo(false)
 }

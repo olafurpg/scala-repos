@@ -5,12 +5,15 @@ import com.intellij.codeInspection.LocalInspectionTool
 import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTestAdapter
 
 /**
- * Nikolay.Tropin
- * 9/26/13
- */
-class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
-  protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[ComparingUnrelatedTypesInspection]
-  protected val annotation: String = ComparingUnrelatedTypesInspection.inspectionName
+  * Nikolay.Tropin
+  * 9/26/13
+  */
+class ComparingUnrelatedTypesInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
+  protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[ComparingUnrelatedTypesInspection]
+  protected val annotation: String =
+    ComparingUnrelatedTypesInspection.inspectionName
 
   def testWeakConformance() {
     val text1 = s"""val a = 0
@@ -42,7 +45,6 @@ class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureT
     checkTextHasError(text2)
     checkTextHasError(text3)
     checkTextHasError(text4)
-
   }
 
   def testString() {
@@ -156,8 +158,7 @@ class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureT
   }
 
   def testTypeAlias(): Unit = {
-    checkTextHasNoErrors(
-      """
+    checkTextHasNoErrors("""
         |object A {
         |  type Coord = Float
         |  def isZero(n: Coord): Boolean = {
@@ -166,8 +167,7 @@ class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureT
         |}
       """.stripMargin)
 
-    checkTextHasError(
-      s"""
+    checkTextHasError(s"""
         |object A {
         |  type Coord = String
         |  def isZero(n: Coord): Boolean = {
@@ -176,8 +176,7 @@ class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureT
         |}
       """.stripMargin)
 
-    checkTextHasNoErrors(
-      """
+    checkTextHasNoErrors("""
         |trait A {
         |  type Coord
         |
@@ -189,8 +188,7 @@ class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureT
   }
 
   def testOverridenMethods(): Unit = {
-    checkTextHasNoErrors(
-      """
+    checkTextHasNoErrors("""
         |case class Dummy(v: Int) {
         |  def ==(value: Int): String = v + " == " + value
         |  def !=(value: Int): Boolean = v != value
@@ -201,8 +199,7 @@ class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureT
         |  val b: Boolean = Dummy(5) != 10
         |}""".stripMargin)
 
-    checkTextHasError(
-      s"""
+    checkTextHasError(s"""
         |case class Dummy(v: Int) {
         |  def ==(value: Int): String = v + " == " + value
         |  def !=(value: Int): Boolean = v != value
@@ -211,12 +208,11 @@ class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureT
         |object Test {
         |  val b: Boolean = ${START}Dummy(5) eq 10$END
         |}""".stripMargin)
-
   }
 
   def testOverridenWithImplicitParam(): Unit = {
     checkTextHasError(
-      s"""
+        s"""
         |class Store(val foo: Int, val bar: String)
         |trait Binder[T] {
         |  def get(implicit store: Store): T
@@ -239,12 +235,10 @@ class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureT
         |}
       """.stripMargin
     )
-
   }
 
   def testOverridenEquals(): Unit = {
-    checkTextHasError(
-      s"""
+    checkTextHasError(s"""
          |case class Dummy(v: Int) {
          |  override def equals(other: Any): Boolean = other match {
          |    case Dummy(o) => o == v
@@ -256,8 +250,7 @@ class ComparingUnrelatedTypesInspectionTest extends ScalaLightInspectionFixtureT
          |  val b: Boolean = ${START}Dummy(5) equals 10$END
          |}""".stripMargin)
 
-    checkTextHasError(
-      s"""
+    checkTextHasError(s"""
          |case class Dummy(v: Int) {
          |  override def equals(other: Any): Boolean = other match {
          |    case Dummy(o) => o == v

@@ -9,15 +9,17 @@ import breeze.storage.Zero
 import breeze.macros.expand
 import breeze.math._
 
-import scala.{specialized=>spec}
+import scala.{specialized => spec}
 import scala.reflect.ClassTag
 import scala.util.hashing.MurmurHash3
 
 /**
- * A HashVector is a sparse vector backed by an OpenAddressHashArray
- * @author dlwh
- */
-class HashVector[@spec(Double, Int, Float, Long) E](val array: OpenAddressHashArray[E]) extends Vector[E] with VectorLike[E, HashVector[E]] {
+  * A HashVector is a sparse vector backed by an OpenAddressHashArray
+  * @author dlwh
+  */
+class HashVector[@spec(Double, Int, Float, Long) E](
+    val array: OpenAddressHashArray[E])
+    extends Vector[E] with VectorLike[E, HashVector[E]] {
 
   // don't delete
   HashVector.init()
@@ -49,23 +51,22 @@ class HashVector[@spec(Double, Int, Float, Long) E](val array: OpenAddressHashAr
   final def index = array.index
   final def isActive(i: Int) = array.isActive(i)
 
-
   override def toString = {
-    activeIterator.mkString("HashVector(",", ", ")")
+    activeIterator.mkString("HashVector(", ", ", ")")
   }
 
-  def allVisitableIndicesActive:Boolean = false
+  def allVisitableIndicesActive: Boolean = false
 
   override def hashCode() = {
     var hash = 47
     // we make the hash code based on index * value, so that zeros don't affect the hashcode.
     val dv = array.default.value(array.zero)
     var i = 0
-    while(i < activeSize) {
-      if(isActive(i)) {
+    while (i < activeSize) {
+      if (isActive(i)) {
         val ind = index(i)
         val v = data(i)
-        if(v != dv) {
+        if (v != dv) {
           hash = MurmurHash3.mix(hash, v.##)
           hash = MurmurHash3.mix(hash, ind)
         }
@@ -78,32 +79,32 @@ class HashVector[@spec(Double, Int, Float, Long) E](val array: OpenAddressHashAr
   }
 }
 
-
-object HashVector extends HashVectorOps
-                          with DenseVector_HashVector_Ops
-                          with HashVector_DenseVector_Ops
-                          with HashVector_SparseVector_Ops
-                          with SparseVector_HashVector_Ops
-                           {
-  def zeros[@spec(Double, Int, Float, Long) V: ClassTag:Zero](size: Int) = {
+object HashVector
+    extends HashVectorOps with DenseVector_HashVector_Ops
+    with HashVector_DenseVector_Ops with HashVector_SparseVector_Ops
+    with SparseVector_HashVector_Ops {
+  def zeros[@spec(Double, Int, Float, Long) V : ClassTag : Zero](size: Int) = {
     new HashVector(new OpenAddressHashArray[V](size))
   }
-  def apply[@spec(Double, Int, Float, Long) V:Zero](values: Array[V]) = {
-    implicit val man = ClassTag[V](values.getClass.getComponentType.asInstanceOf[Class[V]])
+  def apply[@spec(Double, Int, Float, Long) V : Zero](values: Array[V]) = {
+    implicit val man =
+      ClassTag[V](values.getClass.getComponentType.asInstanceOf[Class[V]])
     val oah = new OpenAddressHashArray[V](values.length)
-    for( (v,i) <- values.zipWithIndex) oah(i) = v
+    for ((v, i) <- values.zipWithIndex) oah(i) = v
     new HashVector(oah)
   }
 
-  def apply[V:ClassTag:Zero](values: V*):HashVector[V] = {
+  def apply[V : ClassTag : Zero](values: V*): HashVector[V] = {
     apply(values.toArray)
   }
-  def fill[@spec(Double, Int, Float, Long) V:ClassTag:Zero](size: Int)(v: =>V):HashVector[V] = apply(Array.fill(size)(v))
-  def tabulate[@spec(Double, Int, Float, Long) V:ClassTag:Zero](size: Int)(f: Int=>V):HashVector[V]= apply(Array.tabulate(size)(f))
+  def fill[@spec(Double, Int, Float, Long) V : ClassTag : Zero](size: Int)(
+      v: => V): HashVector[V] = apply(Array.fill(size)(v))
+  def tabulate[@spec(Double, Int, Float, Long) V : ClassTag : Zero](size: Int)(
+      f: Int => V): HashVector[V] = apply(Array.tabulate(size)(f))
 
-  def apply[V:ClassTag:Zero](length: Int)(values: (Int, V)*) = {
+  def apply[V : ClassTag : Zero](length: Int)(values: (Int, V)*) = {
     val r = zeros[V](length)
-    for( (i, v) <- values) {
+    for ((i, v) <- values) {
       r(i) = v
     }
     r
@@ -111,25 +112,28 @@ object HashVector extends HashVectorOps
 
   // implicits
 
-
-  implicit def canCreateZeros[V:ClassTag:Zero]: CanCreateZeros[HashVector[V],Int] =
-    new CanCreateZeros[HashVector[V],Int] {
+  implicit def canCreateZeros[V : ClassTag : Zero]: CanCreateZeros[
+      HashVector[V], Int] =
+    new CanCreateZeros[HashVector[V], Int] {
       def apply(d: Int): HashVector[V] = {
         zeros[V](d)
       }
     }
 
-
   // implicits
-  class CanCopyHashVector[@specialized(Int, Float, Double) V:ClassTag:Zero] extends CanCopy[HashVector[V]] {
+  class CanCopyHashVector[@specialized(Int, Float, Double) V : ClassTag : Zero]
+      extends CanCopy[HashVector[V]] {
     def apply(v1: HashVector[V]) = {
       v1.copy
     }
   }
 
-  implicit def canCopyHash[@specialized(Int, Float, Double) V: ClassTag: Zero]: CanCopyHashVector[V] = new CanCopyHashVector[V]
+  implicit def canCopyHash[
+      @specialized(Int, Float, Double) V : ClassTag : Zero]: CanCopyHashVector[
+      V] = new CanCopyHashVector[V]
 
-  implicit def canMapValues[V, V2: ClassTag: Zero]:CanMapValues[HashVector[V], V, V2, HashVector[V2]] = {
+  implicit def canMapValues[V, V2 : ClassTag : Zero]: CanMapValues[
+      HashVector[V], V, V2, HashVector[V2]] = {
     new CanMapValues[HashVector[V], V, V2, HashVector[V2]] {
       def apply(from: HashVector[V], fn: (V) => V2) = {
         HashVector.tabulate(from.length)(i => fn(from(i)))
@@ -137,14 +141,14 @@ object HashVector extends HashVectorOps
     }
   }
 
-  implicit def canMapActiveValues[V, V2: ClassTag: Zero]:CanMapActiveValues[HashVector[V], V, V2, HashVector[V2]] = {
+  implicit def canMapActiveValues[V, V2 : ClassTag : Zero]: CanMapActiveValues[
+      HashVector[V], V, V2, HashVector[V2]] = {
     new CanMapActiveValues[HashVector[V], V, V2, HashVector[V2]] {
       def apply(from: HashVector[V], fn: (V) => V2) = {
         val out = new OpenAddressHashArray[V2](from.length)
         var i = 0
-        while(i < from.iterableSize) {
-          if(from.isActive(i))
-            out(from.index(i)) = fn(from.data(i))
+        while (i < from.iterableSize) {
+          if (from.isActive(i)) out(from.index(i)) = fn(from.data(i))
           i += 1
         }
         new HashVector(out)
@@ -154,48 +158,48 @@ object HashVector extends HashVectorOps
 
   implicit def scalarOf[T]: ScalarOf[HashVector[T], T] = ScalarOf.dummy
 
-  implicit def canIterateValues[V]:CanTraverseValues[HashVector[V], V] = {
-    new CanTraverseValues[HashVector[V],V] {
-
+  implicit def canIterateValues[V]: CanTraverseValues[HashVector[V], V] = {
+    new CanTraverseValues[HashVector[V], V] {
 
       def isTraversableAgain(from: HashVector[V]): Boolean = true
 
       def traverse(from: HashVector[V], fn: ValuesVisitor[V]): Unit = {
         fn.zeros(from.size - from.activeSize, from.default)
         var i = 0
-        while(i < from.iterableSize) {
-          if(from.isActive(i))
-            fn.visit(from.data(i))
+        while (i < from.iterableSize) {
+          if (from.isActive(i)) fn.visit(from.data(i))
           i += 1
         }
       }
     }
   }
 
-  implicit def canTraverseKeyValuePairs[V]:CanTraverseKeyValuePairs[HashVector[V], Int, V] = {
+  implicit def canTraverseKeyValuePairs[V]: CanTraverseKeyValuePairs[
+      HashVector[V], Int, V] = {
     new CanTraverseKeyValuePairs[HashVector[V], Int, V] {
 
-
-      def traverse(from: HashVector[V], fn: KeyValuePairsVisitor[Int, V]): Unit = {
-        fn.zeros(from.size - from.activeSize, Iterator.range(0, from.size).filterNot(from.index contains _), from.default)
+      def traverse(
+          from: HashVector[V], fn: KeyValuePairsVisitor[Int, V]): Unit = {
+        fn.zeros(from.size - from.activeSize,
+                 Iterator.range(0, from.size).filterNot(from.index contains _),
+                 from.default)
         var i = 0
-        while(i < from.iterableSize) {
-          if(from.isActive(i))
-            fn.visit(from.index(i), from.data(i))
+        while (i < from.iterableSize) {
+          if (from.isActive(i)) fn.visit(from.index(i), from.data(i))
           i += 1
         }
       }
 
       def isTraversableAgain(from: HashVector[V]): Boolean = true
 
-      def traverse(from: HashVector[V], fn: ValuesVisitor[V]): Unit = {
-
-      }
+      def traverse(from: HashVector[V], fn: ValuesVisitor[V]): Unit = {}
     }
   }
 
-  implicit def canMapPairs[V, V2: ClassTag: Zero]:CanMapKeyValuePairs[HashVector[V], Int, V, V2, HashVector[V2]] = {
+  implicit def canMapPairs[V, V2 : ClassTag : Zero]: CanMapKeyValuePairs[
+      HashVector[V], Int, V, V2, HashVector[V2]] = {
     new CanMapKeyValuePairs[HashVector[V], Int, V, V2, HashVector[V2]] {
+
       /**Maps all key-value pairs from the given collection. */
       def map(from: HashVector[V], fn: (Int, V) => V2) = {
         HashVector.tabulate(from.length)(i => fn(i, from(i)))
@@ -205,9 +209,9 @@ object HashVector extends HashVectorOps
       def mapActive(from: HashVector[V], fn: (Int, V) => V2) = {
         val out = new OpenAddressHashArray[V2](from.length)
         var i = 0
-        while(i < from.iterableSize) {
-          if(from.isActive(i))
-          out(from.index(i)) = fn(from.index(i), from.data(i))
+        while (i < from.iterableSize) {
+          if (from.isActive(i))
+            out(from.index(i)) = fn(from.index(i), from.data(i))
           i += 1
         }
         new HashVector(out)
@@ -215,50 +219,57 @@ object HashVector extends HashVectorOps
     }
   }
 
-  implicit def canTabulate[E:ClassTag:Zero]: CanTabulate[Int, HashVector[E], E] = new CanTabulate[Int,HashVector[E],E] {
+  implicit def canTabulate[E : ClassTag : Zero]: CanTabulate[
+      Int, HashVector[E], E] = new CanTabulate[Int, HashVector[E], E] {
     def apply(d: Int, f: (Int) => E): HashVector[E] = tabulate[E](d)(f)
   }
 
-  implicit def space[E:Field:ClassTag:Zero]: MutableFiniteCoordinateField[HashVector[E],Int,E] = {
+  implicit def space[
+      E : Field : ClassTag : Zero]: MutableFiniteCoordinateField[
+      HashVector[E], Int, E] = {
     implicit val _dim = dim.implVDim[E, HashVector[E]]
     MutableFiniteCoordinateField.make[HashVector[E], Int, E]
   }
 
   import breeze.math.PowImplicits._
 
-
   @expand
-  implicit def dv_hv_UpdateOp[@expand.args(Int, Double, Float, Long) T,
-  @expand.args(OpMulScalar, OpDiv, OpSet, OpMod, OpPow) Op <: OpType]
-  (implicit @expand.sequence[Op]({_ * _}, {_ / _}, {(a,b) => b}, {_ % _}, {_ pow _})
-  op: Op.Impl2[T, T, T]):Op.InPlaceImpl2[DenseVector[T], HashVector[T]] = new Op.InPlaceImpl2[DenseVector[T], HashVector[T]] {
-    def apply(a: DenseVector[T], b: HashVector[T]):Unit = {
-      require(a.length == b.length, "Vectors must have the same length")
-      val ad = a.data
-      var aoff = a.offset
-      val astride = a.stride
+  implicit def dv_hv_UpdateOp[
+      @expand.args(Int, Double, Float, Long) T, @expand.args(OpMulScalar, OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
+      implicit @expand.sequence[Op]({ _ * _ }, { _ / _ }, { (a, b) =>
+    b
+  }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+    : Op.InPlaceImpl2[DenseVector[T], HashVector[T]] =
+    new Op.InPlaceImpl2[DenseVector[T], HashVector[T]] {
+      def apply(a: DenseVector[T], b: HashVector[T]): Unit = {
+        require(a.length == b.length, "Vectors must have the same length")
+        val ad = a.data
+        var aoff = a.offset
+        val astride = a.stride
 
-      var i = 0
-      while(i < a.length) {
-        ad(aoff) = op(ad(aoff), b(i))
-        aoff += astride
-        i += 1
+        var i = 0
+        while (i < a.length) {
+          ad(aoff) = op(ad(aoff), b(i))
+          aoff += astride
+          i += 1
+        }
       }
-
     }
-  }
 
   // this shouldn't be necessary but it is:
   @expand
   implicit def dv_hv_op[@expand.args(Int, Double, Float, Long) T,
-  @expand.args(OpAdd, OpSub, OpMulScalar, OpDiv, OpSet, OpMod, OpPow) Op <: OpType] = {
-    DenseVector.pureFromUpdate(implicitly[Op.InPlaceImpl2[DenseVector[T], HashVector[T]]])
+                        @expand.args(OpAdd,
+                                     OpSub,
+                                     OpMulScalar,
+                                     OpDiv,
+                                     OpSet,
+                                     OpMod,
+                                     OpPow) Op <: OpType] = {
+    DenseVector.pureFromUpdate(
+        implicitly[Op.InPlaceImpl2[DenseVector[T], HashVector[T]]])
   }
-
 
   @noinline
   private def init() = {}
 }
-
-
-

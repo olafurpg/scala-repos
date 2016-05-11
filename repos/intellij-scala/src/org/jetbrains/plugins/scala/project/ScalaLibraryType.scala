@@ -10,24 +10,33 @@ import org.jetbrains.plugins.scala.icons.Icons
 import javax.swing.{Icon, JComponent}
 
 /**
- * @author Pavel Fatin
- */
-class ScalaLibraryType extends LibraryType[ScalaLibraryProperties](ScalaLibraryKind) {
+  * @author Pavel Fatin
+  */
+class ScalaLibraryType
+    extends LibraryType[ScalaLibraryProperties](ScalaLibraryKind) {
   override def getIcon = Icons.SCALA_SDK
 
-  override def getIcon(properties: LibraryProperties[_]): Icon = Icons.SCALA_SDK
+  override def getIcon(properties: LibraryProperties[_]): Icon =
+    Icons.SCALA_SDK
 
   def getCreateActionName = "Scala SDK"
 
-  def createNewLibrary(parentComponent: JComponent, contextDirectory: VirtualFile, project: Project) =
+  def createNewLibrary(parentComponent: JComponent,
+                       contextDirectory: VirtualFile,
+                       project: Project) =
     ScalaLibraryDescription.createNewLibrary(parentComponent, contextDirectory)
 
-  def createPropertiesEditor(editorComponent: LibraryEditorComponent[ScalaLibraryProperties]): LibraryPropertiesEditor =
+  def createPropertiesEditor(
+      editorComponent: LibraryEditorComponent[ScalaLibraryProperties])
+    : LibraryPropertiesEditor =
     new ScalaLibraryPropertiesEditor(editorComponent)
 }
 
 object ScalaLibraryType {
   def instance: ScalaLibraryType =
-    Option(LibraryType.findByKind(ScalaLibraryKind).asInstanceOf[ScalaLibraryType])
-            .getOrElse(throw new NoSuchElementException("Scala library type not found"))
+    Option(
+        LibraryType
+          .findByKind(ScalaLibraryKind)
+          .asInstanceOf[ScalaLibraryType]).getOrElse(
+        throw new NoSuchElementException("Scala library type not found"))
 }

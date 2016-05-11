@@ -1,11 +1,12 @@
 package p
 
 /**
- * @define BaseComment This is $BaseVar comment.
- */
+  * @define BaseComment This is $BaseVar comment.
+  */
 trait Base {
+
   /**
-   * Base method has documentation.
-   */
+    * Base method has documentation.
+    */
   def foo: String
 }

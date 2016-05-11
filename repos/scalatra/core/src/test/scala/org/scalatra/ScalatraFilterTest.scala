@@ -65,7 +65,8 @@ class ScalatraFilterTestExtensionMappedServlet extends ScalatraServlet {
   }
 
   // Non path-mapped servlets need this to work
-  override def requestPath(implicit request: HttpServletRequest) = request.getServletPath
+  override def requestPath(implicit request: HttpServletRequest) =
+    request.getServletPath
 }
 
 class ScalatraFilterTestDefaultServlet extends ScalatraServlet {
@@ -78,7 +79,8 @@ class ScalatraFilterTestDefaultServlet extends ScalatraServlet {
   }
 
   // Non path-mapped servlets need this to work
-  override def requestPath(implicit request: HttpServletRequest) = request.getServletPath
+  override def requestPath(implicit request: HttpServletRequest) =
+    request.getServletPath
 }
 
 class ScalatraFilterTestExactMatchServlet extends ScalatraServlet {
@@ -91,7 +93,8 @@ class ScalatraFilterTestExactMatchServlet extends ScalatraServlet {
   }
 
   // Non path-mapped servlets need this to work
-  override def requestPath(implicit request: HttpServletRequest) = request.getServletPath
+  override def requestPath(implicit request: HttpServletRequest) =
+    request.getServletPath
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -103,8 +106,10 @@ class ScalatraFilterTest extends ScalatraFunSuite {
   override def skipDefaultServlet = true
   addServlet(classOf[ScalatraFilterTestPathMappedServlet], "/path-mapped/*")
   addServlet(classOf[ScalatraFilterTestExtensionMappedServlet], "*.do")
-  addServlet(classOf[ScalatraFilterTestExactMatchServlet], "/exact-match/filtered")
-  addServlet(classOf[ScalatraFilterTestExactMatchServlet], "/exact-match/unfiltered")
+  addServlet(
+      classOf[ScalatraFilterTestExactMatchServlet], "/exact-match/filtered")
+  addServlet(
+      classOf[ScalatraFilterTestExactMatchServlet], "/exact-match/unfiltered")
   addServlet(classOf[ScalatraFilterTestDefaultServlet], "/")
 
   test("should filter matching request to path-mapped servlet") {
@@ -218,4 +223,3 @@ class ScalatraFilterWithoutServletMappingTest extends ScalatraFunSuite {
     }
   }
 }
-

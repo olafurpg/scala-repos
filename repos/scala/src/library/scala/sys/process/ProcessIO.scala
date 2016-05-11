@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -47,22 +47,28 @@ import processInternal._
   * @note Failure to close the passed streams may result in resource leakage.
   */
 final class ProcessIO(
-  val writeInput: OutputStream => Unit,
-  val processOutput: InputStream => Unit,
-  val processError: InputStream => Unit,
-  val daemonizeThreads: Boolean
+    val writeInput: OutputStream => Unit,
+    val processOutput: InputStream => Unit,
+    val processError: InputStream => Unit,
+    val daemonizeThreads: Boolean
 ) {
-  def this(in: OutputStream => Unit, out: InputStream => Unit, err: InputStream => Unit) = this(in, out, err, false)
+  def this(in: OutputStream => Unit,
+           out: InputStream => Unit,
+           err: InputStream => Unit) = this(in, out, err, false)
 
   /** Creates a new `ProcessIO` with a different handler for the process input. */
-  def withInput(write: OutputStream => Unit): ProcessIO   = new ProcessIO(write, processOutput, processError, daemonizeThreads)
+  def withInput(write: OutputStream => Unit): ProcessIO =
+    new ProcessIO(write, processOutput, processError, daemonizeThreads)
 
   /** Creates a new `ProcessIO` with a different handler for the normal output. */
-  def withOutput(process: InputStream => Unit): ProcessIO = new ProcessIO(writeInput, process, processError, daemonizeThreads)
+  def withOutput(process: InputStream => Unit): ProcessIO =
+    new ProcessIO(writeInput, process, processError, daemonizeThreads)
 
   /** Creates a new `ProcessIO` with a different handler for the error output. */
-  def withError(process: InputStream => Unit): ProcessIO  = new ProcessIO(writeInput, processOutput, process, daemonizeThreads)
+  def withError(process: InputStream => Unit): ProcessIO =
+    new ProcessIO(writeInput, processOutput, process, daemonizeThreads)
 
   /** Creates a new `ProcessIO`, with `daemonizeThreads` true. */
-  def daemonized(): ProcessIO = new ProcessIO(writeInput, processOutput, processError, true)
+  def daemonized(): ProcessIO =
+    new ProcessIO(writeInput, processOutput, processError, true)
 }

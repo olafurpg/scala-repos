@@ -25,26 +25,26 @@ import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.catalyst.{CatalystConf, EmptyConf, TableIdentifier}
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, SubqueryAlias}
 
-
 /**
- * An interface for looking up relations by name.  Used by an [[Analyzer]].
- */
+  * An interface for looking up relations by name.  Used by an [[Analyzer]].
+  */
 trait Catalog {
 
   val conf: CatalystConf
 
   def tableExists(tableIdent: TableIdentifier): Boolean
 
-  def lookupRelation(tableIdent: TableIdentifier, alias: Option[String] = None): LogicalPlan
+  def lookupRelation(
+      tableIdent: TableIdentifier, alias: Option[String] = None): LogicalPlan
 
   def setCurrentDatabase(databaseName: String): Unit = {
     throw new UnsupportedOperationException
   }
 
   /**
-   * Returns tuples of (tableName, isTemporary) for all tables in the given database.
-   * isTemporary is a Boolean value indicates if a table is a temporary or not.
-   */
+    * Returns tuples of (tableName, isTemporary) for all tables in the given database.
+    * isTemporary is a Boolean value indicates if a table is a temporary or not.
+    */
   def getTables(databaseName: Option[String]): Seq[(String, Boolean)]
 
   def refreshTable(tableIdent: TableIdentifier): Unit
@@ -56,15 +56,16 @@ trait Catalog {
   def unregisterAllTables(): Unit
 
   /**
-   * Get the table name of TableIdentifier for temporary tables.
-   */
+    * Get the table name of TableIdentifier for temporary tables.
+    */
   protected def getTableName(tableIdent: TableIdentifier): String = {
     // It is not allowed to specify database name for temporary tables.
     // We check it here and throw exception if database is defined.
     if (tableIdent.database.isDefined) {
-      throw new AnalysisException("Specifying database name or other qualifiers are not allowed " +
-        "for temporary tables. If the table name has dots (.) in it, please quote the " +
-        "table name with backticks (`).")
+      throw new AnalysisException(
+          "Specifying database name or other qualifiers are not allowed " +
+          "for temporary tables. If the table name has dots (.) in it, please quote the " +
+          "table name with backticks (`).")
     }
     if (conf.caseSensitiveAnalysis) {
       tableIdent.table
@@ -77,7 +78,8 @@ trait Catalog {
 class SimpleCatalog(val conf: CatalystConf) extends Catalog {
   private[this] val tables = new ConcurrentHashMap[String, LogicalPlan]
 
-  override def registerTable(tableIdent: TableIdentifier, plan: LogicalPlan): Unit = {
+  override def registerTable(
+      tableIdent: TableIdentifier, plan: LogicalPlan): Unit = {
     tables.put(getTableName(tableIdent), plan)
   }
 
@@ -93,9 +95,8 @@ class SimpleCatalog(val conf: CatalystConf) extends Catalog {
     tables.containsKey(getTableName(tableIdent))
   }
 
-  override def lookupRelation(
-      tableIdent: TableIdentifier,
-      alias: Option[String] = None): LogicalPlan = {
+  override def lookupRelation(tableIdent: TableIdentifier,
+                              alias: Option[String] = None): LogicalPlan = {
     val tableName = getTableName(tableIdent)
     val table = tables.get(tableName)
     if (table == null) {
@@ -110,7 +111,8 @@ class SimpleCatalog(val conf: CatalystConf) extends Catalog {
       .getOrElse(tableWithQualifiers)
   }
 
-  override def getTables(databaseName: Option[String]): Seq[(String, Boolean)] = {
+  override def getTables(
+      databaseName: Option[String]): Seq[(String, Boolean)] = {
     tables.keySet().asScala.map(_ -> true).toSeq
   }
 
@@ -120,15 +122,16 @@ class SimpleCatalog(val conf: CatalystConf) extends Catalog {
 }
 
 /**
- * A trait that can be mixed in with other Catalogs allowing specific tables to be overridden with
- * new logical plans.  This can be used to bind query result to virtual tables, or replace tables
- * with in-memory cached versions.  Note that the set of overrides is stored in memory and thus
- * lost when the JVM exits.
- */
+  * A trait that can be mixed in with other Catalogs allowing specific tables to be overridden with
+  * new logical plans.  This can be used to bind query result to virtual tables, or replace tables
+  * with in-memory cached versions.  Note that the set of overrides is stored in memory and thus
+  * lost when the JVM exits.
+  */
 trait OverrideCatalog extends Catalog {
   private[this] val overrides = new ConcurrentHashMap[String, LogicalPlan]
 
-  private def getOverriddenTable(tableIdent: TableIdentifier): Option[LogicalPlan] = {
+  private def getOverriddenTable(
+      tableIdent: TableIdentifier): Option[LogicalPlan] = {
     if (tableIdent.database.isDefined) {
       None
     } else {
@@ -153,17 +156,22 @@ trait OverrideCatalog extends Catalog {
 
         // If an alias was specified by the lookup, wrap the plan in a sub-query so that attributes
         // are properly qualified with this alias.
-        alias.map(a => SubqueryAlias(a, tableWithQualifiers)).getOrElse(tableWithQualifiers)
+        alias
+          .map(a => SubqueryAlias(a, tableWithQualifiers))
+          .getOrElse(tableWithQualifiers)
 
       case None => super.lookupRelation(tableIdent, alias)
     }
   }
 
-  abstract override def getTables(databaseName: Option[String]): Seq[(String, Boolean)] = {
-    overrides.keySet().asScala.map(_ -> true).toSeq ++ super.getTables(databaseName)
+  abstract override def getTables(
+      databaseName: Option[String]): Seq[(String, Boolean)] = {
+    overrides.keySet().asScala.map(_ -> true).toSeq ++ super.getTables(
+        databaseName)
   }
 
-  override def registerTable(tableIdent: TableIdentifier, plan: LogicalPlan): Unit = {
+  override def registerTable(
+      tableIdent: TableIdentifier, plan: LogicalPlan): Unit = {
     overrides.put(getTableName(tableIdent), plan)
   }
 
@@ -179,9 +187,9 @@ trait OverrideCatalog extends Catalog {
 }
 
 /**
- * A trivial catalog that returns an error when a relation is requested.  Used for testing when all
- * relations are already filled in and the analyzer needs only to resolve attribute references.
- */
+  * A trivial catalog that returns an error when a relation is requested.  Used for testing when all
+  * relations are already filled in and the analyzer needs only to resolve attribute references.
+  */
 object EmptyCatalog extends Catalog {
 
   override val conf: CatalystConf = EmptyConf
@@ -190,17 +198,18 @@ object EmptyCatalog extends Catalog {
     throw new UnsupportedOperationException
   }
 
-  override def lookupRelation(
-      tableIdent: TableIdentifier,
-      alias: Option[String] = None): LogicalPlan = {
+  override def lookupRelation(tableIdent: TableIdentifier,
+                              alias: Option[String] = None): LogicalPlan = {
     throw new UnsupportedOperationException
   }
 
-  override def getTables(databaseName: Option[String]): Seq[(String, Boolean)] = {
+  override def getTables(
+      databaseName: Option[String]): Seq[(String, Boolean)] = {
     throw new UnsupportedOperationException
   }
 
-  override def registerTable(tableIdent: TableIdentifier, plan: LogicalPlan): Unit = {
+  override def registerTable(
+      tableIdent: TableIdentifier, plan: LogicalPlan): Unit = {
     throw new UnsupportedOperationException
   }
 

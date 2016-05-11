@@ -1,11 +1,11 @@
 package org.jetbrains.sbt.project.modifier
 
 /**
- * Marker class used to distinguish between requests when searching for a modification location using
- * BuildFileModificationLocationProvider.
- * @author Roman.Shein
- * @since 16.03.2015.
- */
+  * Marker class used to distinguish between requests when searching for a modification location using
+  * BuildFileModificationLocationProvider.
+  * @author Roman.Shein
+  * @since 16.03.2015.
+  */
 case class BuildFileElementType(id: String)
 
 object BuildFileElementType {

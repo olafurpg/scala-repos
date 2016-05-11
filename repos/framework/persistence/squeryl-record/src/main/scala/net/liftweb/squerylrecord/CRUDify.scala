@@ -38,19 +38,23 @@ trait CRUDify[K, T <: Record[T] with KeyedEntity[K]] extends Crudify {
 
   override def calcPrefix = table.name :: Nil
 
-  override def fieldsForDisplay: List[FieldPointerType] = metaFields.filter(_.shouldDisplay_?)
+  override def fieldsForDisplay: List[FieldPointerType] =
+    metaFields.filter(_.shouldDisplay_?)
 
-  override def computeFieldFromPointer(instance: TheCrudType, pointer: FieldPointerType): Box[FieldPointerType] = instance.fieldByName(pointer.name)
+  override def computeFieldFromPointer(
+      instance: TheCrudType,
+      pointer: FieldPointerType): Box[FieldPointerType] =
+    instance.fieldByName(pointer.name)
 
   override def findForParam(in: String): Box[TheCrudType] =
-    inTransaction{
-	  table.lookup(idFromString(in))
-  	}
+    inTransaction {
+      table.lookup(idFromString(in))
+    }
 
-  override def findForList(start: Long, count: Int) = 
-    inTransaction{
-	  from(table)(t => select(t)).page(start.toInt, count).toList
-  	}
+  override def findForList(start: Long, count: Int) =
+    inTransaction {
+      from(table)(t => select(t)).page(start.toInt, count).toList
+    }
 
   override def create = createRecord
 
@@ -64,13 +68,12 @@ trait CRUDify[K, T <: Record[T] with KeyedEntity[K]] extends Crudify {
 
     def save = {
       if (in.isPersisted) {
-        inTransaction{
-        	table.update(in)
-        }
-      }
-      else {
         inTransaction {
-        	table.insert(in)
+          table.update(in)
+        }
+      } else {
+        inTransaction {
+          table.insert(in)
         }
       }
       true
@@ -81,10 +84,11 @@ trait CRUDify[K, T <: Record[T] with KeyedEntity[K]] extends Crudify {
     def primaryKeyFieldAsString = in.id.toString
   }
 
-  def buildFieldBridge(from: FieldPointerType): FieldPointerBridge = new SquerylFieldBridge(from)
+  def buildFieldBridge(from: FieldPointerType): FieldPointerBridge =
+    new SquerylFieldBridge(from)
 
-  protected class SquerylFieldBridge(in: FieldPointerType) extends FieldPointerBridge {
+  protected class SquerylFieldBridge(in: FieldPointerType)
+      extends FieldPointerBridge {
     def displayHtml: NodeSeq = in.displayHtml
   }
-
 }

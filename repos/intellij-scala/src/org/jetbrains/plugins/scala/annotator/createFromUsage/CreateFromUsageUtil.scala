@@ -18,35 +18,48 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.types.{Any => scTypeAny, ScType}
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
+
 /**
- * Nikolay.Tropin
- * 2014-07-31
- */
+  * Nikolay.Tropin
+  * 2014-07-31
+  */
 object CreateFromUsageUtil {
 
   def uniqueNames(names: Seq[String]) = {
-    names.foldLeft(List[String]()) { (r, h) =>
-      (h #:: Stream.from(1).map(h + _)).find(!r.contains(_)).get :: r
-    }.reverse
+    names
+      .foldLeft(List[String]()) { (r, h) =>
+        (h #:: Stream.from(1).map(h + _)).find(!r.contains(_)).get :: r
+      }
+      .reverse
   }
-  
-  def nameByType(tp: ScType) = NameSuggester.suggestNamesByType(tp).headOption.getOrElse("value")
-  
+
+  def nameByType(tp: ScType) =
+    NameSuggester.suggestNamesByType(tp).headOption.getOrElse("value")
+
   def nameAndTypeForArg(arg: PsiElement): (String, ScType) = arg match {
     case ref: ScReferenceExpression => (ref.refName, ref.getType().getOrAny)
     case expr: ScExpression =>
-      val tp = expr.getType().getOrAny
-      (nameByType(tp), tp)
-    case bp: ScBindingPattern if !bp.isWildcard => (bp.name, bp.getType(TypingContext.empty).getOrAny)
+      val tp = expr
+        .getType()
+        .getOrAny
+        (nameByType(tp), tp)
+    case bp: ScBindingPattern if !bp.isWildcard =>
+      (bp.name, bp.getType(TypingContext.empty).getOrAny)
     case p: ScPattern =>
-      val tp: ScType = p.getType(TypingContext.empty).getOrAny
-      (nameByType(tp), tp)
+      val tp: ScType = p
+        .getType(TypingContext.empty)
+        .getOrAny
+        (nameByType(tp), tp)
     case _ => ("value", scTypeAny)
   }
-  
+
   def paramsText(args: Seq[PsiElement]) = {
-    val (names, types) = args.map(nameAndTypeForArg).unzip
-    (uniqueNames(names), types).zipped.map((name, tpe) => s"$name: ${tpe.canonicalText}").mkString("(", ", ", ")")
+    val (names, types) = args
+      .map(nameAndTypeForArg)
+      .unzip
+      (uniqueNames(names), types).zipped
+      .map((name, tpe) => s"$name: ${tpe.canonicalText}")
+      .mkString("(", ", ", ")")
   }
 
   def parametersText(ref: ScReferenceElement) = {
@@ -55,11 +68,16 @@ object CreateFromUsageUtil {
         paramsText(patternArgs(p))
       case MethodRepr(_, _, _, args) => paramsText(args) //for case class
       case _ =>
-        val fromConstrArguments = PsiTreeUtil.getParentOfType(ref, classOf[ScConstructor]) match {
-          case ScConstructor(simple: ScSimpleTypeElement, args) if ref.getParent == simple => args
-          case ScConstructor(pt: ScParameterizedTypeElement, args) if ref.getParent == pt.typeElement => args
-          case _ => Seq.empty
-        }
+        val fromConstrArguments =
+          PsiTreeUtil.getParentOfType(ref, classOf[ScConstructor]) match {
+            case ScConstructor(simple: ScSimpleTypeElement, args)
+                if ref.getParent == simple =>
+              args
+            case ScConstructor(pt: ScParameterizedTypeElement, args)
+                if ref.getParent == pt.typeElement =>
+              args
+            case _ => Seq.empty
+          }
         fromConstrArguments.map(argList => paramsText(argList.exprs)).mkString
     }
   }
@@ -72,7 +90,8 @@ object CreateFromUsageUtil {
     }
   }
 
-  def addParametersToTemplate(elem: PsiElement, builder: TemplateBuilder): Unit = {
+  def addParametersToTemplate(
+      elem: PsiElement, builder: TemplateBuilder): Unit = {
     elem.depthFirst.filterByType(classOf[ScParameter]).foreach { parameter =>
       val id = parameter.getNameIdentifier
       builder.replaceElement(id, id.getText)
@@ -83,7 +102,8 @@ object CreateFromUsageUtil {
     }
   }
 
-  def addTypeParametersToTemplate(elem: PsiElement, builder: TemplateBuilder): Unit = {
+  def addTypeParametersToTemplate(
+      elem: PsiElement, builder: TemplateBuilder): Unit = {
     elem.depthFirst.filterByType(classOf[ScTypeParam]).foreach { tp =>
       builder.replaceElement(tp.nameId, tp.name)
     }
@@ -91,15 +111,20 @@ object CreateFromUsageUtil {
 
   def addQmarksToTemplate(elem: PsiElement, builder: TemplateBuilder): Unit = {
     val Q_MARKS = "???"
-    elem.depthFirst.filterByType(classOf[ScReferenceExpression]).filter(_.getText == Q_MARKS)
-            .foreach { qmarks =>
-      builder.replaceElement(qmarks, Q_MARKS)
-    }
+    elem.depthFirst
+      .filterByType(classOf[ScReferenceExpression])
+      .filter(_.getText == Q_MARKS)
+      .foreach { qmarks =>
+        builder.replaceElement(qmarks, Q_MARKS)
+      }
   }
 
-  def addUnapplyResultTypesToTemplate(fun: ScFunction, builder: TemplateBuilder): Unit = {
+  def addUnapplyResultTypesToTemplate(
+      fun: ScFunction, builder: TemplateBuilder): Unit = {
     fun.returnTypeElement match {
-      case Some(ScParameterizedTypeElement(_, Seq(tuple: ScTupleTypeElement))) => //Option[(A, B)]
+      case Some(
+          ScParameterizedTypeElement(_, Seq(tuple: ScTupleTypeElement))) =>
+        //Option[(A, B)]
         tuple.components.foreach(te => builder.replaceElement(te, te.getText))
       case Some(ScParameterizedTypeElement(_, args)) =>
         args.foreach(te => builder.replaceElement(te, te.getText))
@@ -110,7 +135,8 @@ object CreateFromUsageUtil {
   def positionCursor(element: PsiElement): Editor = {
     val offset = element.getTextRange.getEndOffset
     val project = element.getProject
-    val descriptor = new OpenFileDescriptor(project, element.getContainingFile.getVirtualFile, offset)
+    val descriptor = new OpenFileDescriptor(
+        project, element.getContainingFile.getVirtualFile, offset)
     FileEditorManager.getInstance(project).openTextEditor(descriptor, true)
   }
 
@@ -121,7 +147,9 @@ object CreateFromUsageUtil {
   }
 
   def unapplyMethodTypeText(pattern: ScPattern) = {
-    val types = CreateFromUsageUtil.patternArgs(pattern).map(_.getType(TypingContext.empty).getOrAny)
+    val types = CreateFromUsageUtil
+      .patternArgs(pattern)
+      .map(_.getType(TypingContext.empty).getOrAny)
     val typesText = types.map(_.canonicalText).mkString(", ")
     types.size match {
       case 0 => "Boolean"
@@ -146,7 +174,10 @@ object InstanceOfClass {
 object TypeAsClass {
   def unapply(scType: ScType): Option[PsiClass] = scType match {
     case ScType.ExtractClass(aClass) => Some(aClass)
-    case t: ScType => ScType.extractDesignatorSingletonType(t).flatMap(ScType.extractClass(_, None))
+    case t: ScType =>
+      ScType
+        .extractDesignatorSingletonType(t)
+        .flatMap(ScType.extractClass(_, None))
     case _ => None
   }
 }

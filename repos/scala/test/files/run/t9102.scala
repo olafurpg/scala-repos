@@ -1,4 +1,3 @@
-
 object Test extends App {
   import reflect.runtime._, universe._
 
@@ -13,7 +12,7 @@ object Test extends App {
     val ms = typeOf[C].member(TermName("f")).asMethod
     val im = currentMirror reflect (new C)
     val mm = im reflectMethod ms
-    assert(mm(2,3) == 5)
+    assert(mm(2, 3) == 5)
   }
   locally {
     val ms = typeOf[D].member(TermName("f")).asMethod
@@ -64,7 +63,7 @@ object Test extends SessionTest {
         |
         |scala> :quit"""
 }
-*/
+ */
 
 /* was:
 scala> res3(2,3)
@@ -77,5 +76,4 @@ java.lang.IllegalArgumentException
   at scala.reflect.runtime.JavaMirrors$JavaMirror$JavaMethodMirror.jinvoke(JavaMirrors.scala:339)
   at scala.reflect.runtime.JavaMirrors$JavaMirror$JavaTransformingMethodMirror.apply(JavaMirrors.scala:436)
   ... 33 elided
-*/
-
+ */

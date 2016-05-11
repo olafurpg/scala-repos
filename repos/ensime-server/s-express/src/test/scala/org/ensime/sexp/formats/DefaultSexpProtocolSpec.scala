@@ -45,5 +45,4 @@ class DefaultSexpProtocolSpec extends FormatSpec {
     // and Lists of Options give empty lists, muahahaha
     SexpNil.convertTo[List[Option[String]]] should ===(Nil)
   }
-
 }

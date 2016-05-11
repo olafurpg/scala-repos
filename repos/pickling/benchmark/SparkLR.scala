@@ -5,7 +5,11 @@ import java.io._
 import scala.util.Random
 
 // taken from SparkLR:
-package spark.util { final class Vector(val elements: Array[Double]) extends Serializable { override def toString = s"""Vector(${elements.mkString(", ")})""" } }
+package spark.util {
+  final class Vector(val elements: Array[Double]) extends Serializable {
+    override def toString = s"""Vector(${elements.mkString(", ")})"""
+  }
+}
 import scala.collection.mutable.ArrayBuffer
 import spark.util.Vector
 final case class DataPoint(x: Vector, y: Double) extends Serializable

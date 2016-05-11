@@ -23,11 +23,11 @@ import breeze.linalg.{squaredDistance, DenseVector, Vector}
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
- * K-means clustering.
- *
- * This is an example implementation for learning how to use Spark. For more conventional use,
- * please refer to org.apache.spark.mllib.clustering.KMeans
- */
+  * K-means clustering.
+  *
+  * This is an example implementation for learning how to use Spark. For more conventional use,
+  * please refer to org.apache.spark.mllib.clustering.KMeans
+  */
 object SparkKMeans {
 
   def parseVector(line: String): Vector[Double] = {
@@ -50,8 +50,7 @@ object SparkKMeans {
   }
 
   def showWarning() {
-    System.err.println(
-      """WARN: This is a naive implementation of KMeans Clustering and is given as an example!
+    System.err.println("""WARN: This is a naive implementation of KMeans Clustering and is given as an example!
         |Please use the KMeans method found in org.apache.spark.mllib.clustering
         |for more conventional use.
       """.stripMargin)
@@ -76,13 +75,16 @@ object SparkKMeans {
     val kPoints = data.takeSample(withReplacement = false, K, 42).toArray
     var tempDist = 1.0
 
-    while(tempDist > convergeDist) {
-      val closest = data.map (p => (closestPoint(p, kPoints), (p, 1)))
+    while (tempDist > convergeDist) {
+      val closest = data.map(p => (closestPoint(p, kPoints), (p, 1)))
 
-      val pointStats = closest.reduceByKey{case ((p1, c1), (p2, c2)) => (p1 + p2, c1 + c2)}
+      val pointStats = closest.reduceByKey {
+        case ((p1, c1), (p2, c2)) => (p1 + p2, c1 + c2)
+      }
 
-      val newPoints = pointStats.map {pair =>
-        (pair._1, pair._2._1 * (1.0 / pair._2._2))}.collectAsMap()
+      val newPoints = pointStats.map { pair =>
+        (pair._1, pair._2._1 * (1.0 / pair._2._2))
+      }.collectAsMap()
 
       tempDist = 0.0
       for (i <- 0 until K) {

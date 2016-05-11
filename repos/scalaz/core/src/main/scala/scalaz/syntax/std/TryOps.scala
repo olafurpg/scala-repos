@@ -15,7 +15,8 @@ final class TryOps[A](val self: Try[A]) extends AnyVal {
 
   final def toValidation: Validation[Throwable, A] = t.toValidation(self)
 
-  final def toValidationNel: ValidationNel[Throwable, A] = t.toValidationNel(self)
+  final def toValidationNel: ValidationNel[Throwable, A] =
+    t.toValidationNel(self)
 }
 
 trait ToTryOps {

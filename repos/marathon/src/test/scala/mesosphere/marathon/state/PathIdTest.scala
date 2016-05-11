@@ -1,7 +1,7 @@
 package mesosphere.marathon.state
 
 import mesosphere.marathon.state.PathId._
-import org.scalatest.{ FunSpec, GivenWhenThen, Matchers }
+import org.scalatest.{FunSpec, GivenWhenThen, Matchers}
 
 import scala.collection.SortedSet
 
@@ -130,7 +130,8 @@ class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
 
   it("can give all parents as sequence") {
     val parents = PathId("/a/b/c/d").allParents
-    parents should be(Seq(PathId("/a/b/c"), PathId("/a/b"), PathId("/a"), PathId("/")))
+    parents should be(
+        Seq(PathId("/a/b/c"), PathId("/a/b"), PathId("/a"), PathId("/")))
     parents should have size 4
   }
 

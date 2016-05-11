@@ -20,7 +20,7 @@ object iq {
     val q2 = q.enqueue(42).enqueue(0)
     val qa = q :+ 42 :+ 0
     assert(q2 == qa)
-    
+
     val qb = 42 +: 0 +: q
     assert(q2 == qb)
     val qc = 42 +: q :+ 0
@@ -30,7 +30,7 @@ object iq {
     Console.println("qa: " + qa)
     Console.println("qb: " + qb)
     Console.println("qc: " + qc)
-    
+
     /* Test is empty and dequeue.
      * Expected: Head: 42
      */
@@ -38,15 +38,14 @@ object iq {
       if (q2.isEmpty) {
         Console.println("Empty")
         q2
-      }
-      else {
-	val (head, q3) = q2.dequeue
+      } else {
+        val (head, q3) = q2.dequeue
         Console.println("Head: " + head)
         q3
       }
 
     /* Test sequence enqueing. */
-    val q5: Queue[Any] = q4.enqueue(List(1,2,3,4,5,6,7,8,9))
+    val q5: Queue[Any] = q4.enqueue(List(1, 2, 3, 4, 5, 6, 7, 8, 9))
     /* Test toString.
      * Expected: q5: Queue(0,1,2,3,4,5,6,7,8,9)
      */
@@ -56,7 +55,8 @@ object iq {
      */
     Console.println("q5[5]: " + q5(5))
 
-    val q5c: Queue[Int] = Queue.empty.enqueue(List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+    val q5c: Queue[Int] =
+      Queue.empty.enqueue(List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
 
     /* Testing ==
      *  Expected: q5 == q9: true
@@ -73,7 +73,7 @@ object iq {
      * Expected: q8: Queue(2,3,4,5,6,7,8,9,10,11)
      */
     Console.println("q8: " + q8)
-    val q9 = Queue(2,3,4,5,6,7,8,9,10,11)
+    val q9 = Queue(2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
 
     /* Testing ==
      *  Expected: q8 == q9: true
@@ -84,13 +84,13 @@ object iq {
      *  Expected: Elements:  1  2  3  4  5  6  7  8  9
      */
     Console.print("Elements: ");
-    q6.iterator.foreach(e => Console.print(" "+ e + " "))
+    q6.iterator.foreach(e => Console.print(" " + e + " "))
     Console.println;
 
-   /* Testing mkString
+    /* Testing mkString
      *  Expected: String: <1-2-3-4-5-6-7-8-9>
      */
-    Console.println("String: " + q6.mkString("<","-",">"))
+    Console.println("String: " + q6.mkString("<", "-", ">"))
 
     /* Testing length
      *  Expected: Length: 9

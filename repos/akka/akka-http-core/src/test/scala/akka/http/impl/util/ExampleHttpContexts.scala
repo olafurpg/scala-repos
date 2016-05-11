@@ -5,15 +5,15 @@
 package akka.http.impl.util
 
 import java.io.InputStream
-import java.security.{ SecureRandom, KeyStore }
-import java.security.cert.{ CertificateFactory, Certificate }
-import javax.net.ssl.{ SSLParameters, SSLContext, TrustManagerFactory, KeyManagerFactory }
+import java.security.{SecureRandom, KeyStore}
+import java.security.cert.{CertificateFactory, Certificate}
+import javax.net.ssl.{SSLParameters, SSLContext, TrustManagerFactory, KeyManagerFactory}
 
 import akka.http.scaladsl.HttpsConnectionContext
 
 /**
- * These are HTTPS example configurations that take key material from the resources/key folder.
- */
+  * These are HTTPS example configurations that take key material from the resources/key folder.
+  */
 object ExampleHttpContexts {
 
   // TODO show example how to obtain pre-configured context from ssl-config
@@ -58,5 +58,7 @@ object ExampleHttpContexts {
   }
 
   def loadX509Certificate(resourceName: String): Certificate =
-    CertificateFactory.getInstance("X.509").generateCertificate(resourceStream(resourceName))
+    CertificateFactory
+      .getInstance("X.509")
+      .generateCertificate(resourceStream(resourceName))
 }

@@ -9,6 +9,6 @@ class Test {
   }
 
   def run = {
-    call(0,() => System.out.println("here we are"))
+    call(0, () => System.out.println("here we are"))
   }
 }

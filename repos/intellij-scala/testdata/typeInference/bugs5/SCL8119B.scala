@@ -7,6 +7,7 @@ object SCL8119B {
     def f = 1
   }
 
-  /*start*/foo.f/*end*/
+  /*start*/
+  foo.f /*end*/
 }
 //Int

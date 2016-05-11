@@ -37,7 +37,7 @@ import scalafx.testutil.SFXEnumDelegateSpec
 /** Tests for [[scalafx.scene.image.PixelFormat.Type]]. */
 @RunWith(classOf[JUnitRunner])
 class PixelFormatTypeSpec
-  extends SFXEnumDelegateSpec[jfxsi.PixelFormat.Type, PixelFormat.Type](
-    classOf[jfxsi.PixelFormat.Type],
-    classOf[PixelFormat.Type],
-    PixelFormat.Type)
+    extends SFXEnumDelegateSpec[jfxsi.PixelFormat.Type, PixelFormat.Type](
+        classOf[jfxsi.PixelFormat.Type],
+        classOf[PixelFormat.Type],
+        PixelFormat.Type)

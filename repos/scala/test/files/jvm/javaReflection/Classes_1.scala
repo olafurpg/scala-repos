@@ -12,13 +12,13 @@ class A {
     class B
     trait C
     object D
-    new T { }
+    new T {}
     (() => "-1")
     def f = { class KB }
   }
 
   // anonymous class, not a member
-  new T { }
+  new T {}
 
   // anonymous function, not a member
   (() => "1")
@@ -27,14 +27,14 @@ class A {
     class E
     trait F
     object G
-    new T { }
+    new T {}
     (() => "2")
 
     if (new Object().hashCode == 1) {
       class H
       trait I
       object J
-      new T { }
+      new T {}
       (() => "3")
     } else {
       ()
@@ -45,7 +45,7 @@ class A {
     class K
     trait L
     object M
-    new T { }
+    new T {}
     (() => "4")
   }
 
@@ -53,7 +53,7 @@ class A {
     class N
     trait O
     object P
-    new T { }
+    new T {}
     (() => "5")
   }
 
@@ -62,7 +62,7 @@ class A {
     class Q
     trait R
     object S
-    new T { }
+    new T {}
     (() => () => "5")
   }
 }
@@ -71,7 +71,7 @@ object AO {
   class B
   trait C
   object D
-  new T { }
+  new T {}
   (() => "1")
 }
 
@@ -79,6 +79,6 @@ trait AT {
   class B
   trait C
   object D
-  new T { }
+  new T {}
   (() => "1")
 }

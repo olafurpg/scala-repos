@@ -43,17 +43,17 @@ class MathContextTest {
     assertTrue(mc8.getRoundingMode == RoundingMode.UP)
 
     expectThrows(classOf[IllegalArgumentException],
-        new MathContext("prcision=27 roundingMode=CEILING"))
+                 new MathContext("prcision=27 roundingMode=CEILING"))
     expectThrows(classOf[IllegalArgumentException],
-        new MathContext("precision=26 roundingMoe=CEILING"))
+                 new MathContext("precision=26 roundingMoe=CEILING"))
     expectThrows(classOf[IllegalArgumentException],
-        new MathContext("precision=25 roundingMode=CEILINGFAN"))
+                 new MathContext("precision=25 roundingMode=CEILINGFAN"))
     expectThrows(classOf[IllegalArgumentException],
-        new MathContext("precision=24 roundingMode=HALF"))
+                 new MathContext("precision=24 roundingMode=HALF"))
     expectThrows(classOf[IllegalArgumentException],
-        new MathContext("precision=23 roundingMode=UPSIDEDOWN"))
+                 new MathContext("precision=23 roundingMode=UPSIDEDOWN"))
     expectThrows(classOf[IllegalArgumentException],
-        new MathContext("precision=22roundingMode=UP"))
+                 new MathContext("precision=22roundingMode=UP"))
     expectThrows(classOf[IllegalArgumentException], new MathContext(""))
     expectThrows(classOf[NullPointerException], new MathContext(null))
   }

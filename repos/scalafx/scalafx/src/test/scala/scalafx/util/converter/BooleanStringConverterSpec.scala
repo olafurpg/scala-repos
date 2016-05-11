@@ -34,14 +34,19 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 
 /**
- * BooleanStringConverter Spec tests.
- *
- *
- */
+  * BooleanStringConverter Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class BooleanStringConverterSpec
-  extends AbstractStringConverterDelegateSpec[java.lang.Boolean, jfxuc.BooleanStringConverter, Boolean, BooleanStringConverter](classOf[jfxuc.BooleanStringConverter], classOf[BooleanStringConverter], classOf[Boolean]) {
+    extends AbstractStringConverterDelegateSpec[java.lang.Boolean,
+                                                jfxuc.BooleanStringConverter,
+                                                Boolean,
+                                                BooleanStringConverter](
+        classOf[jfxuc.BooleanStringConverter],
+        classOf[BooleanStringConverter],
+        classOf[Boolean]) {
 
   val examples = List((true, "true"), (false, "false"))
-
 }

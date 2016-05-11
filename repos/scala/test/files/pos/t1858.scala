@@ -9,5 +9,4 @@ object Test {
     s.push(1, 2, 3)
     s.push(1, 2, 3, 4)
   }
-
 }

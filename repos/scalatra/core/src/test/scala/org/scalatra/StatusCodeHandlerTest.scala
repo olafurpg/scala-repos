@@ -58,7 +58,6 @@ class StatusCodeHandlerTest extends ScalatraFunSuite {
       status = 303
       "child error"
     }
-
   }
 
   addServlet(new BaseServlet, "/base/*")

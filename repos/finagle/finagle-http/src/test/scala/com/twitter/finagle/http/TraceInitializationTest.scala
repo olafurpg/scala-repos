@@ -18,14 +18,18 @@ class TraceInitializationTest extends FunSuite {
   def req = RequestBuilder().url("http://foo/this/is/a/uri/path").buildGet()
 
   def assertAnnotationsInOrder(records: Seq[Record], annos: Seq[Annotation]) {
-    assert(records.collect { case Record(_, _, ann, _) if annos.contains(ann) => ann } == annos)
+    assert(
+        records.collect {
+      case Record(_, _, ann, _) if annos.contains(ann) => ann
+    } == annos)
   }
 
   /**
-   * Ensure all annotations have the same TraceId (it should be passed between client and server)
-   * Ensure core annotations are present and properly ordered
-   */
-  def testTraces(f: (Tracer, Tracer) => (Service[Request, Response], Closable)) {
+    * Ensure all annotations have the same TraceId (it should be passed between client and server)
+    * Ensure core annotations are present and properly ordered
+    */
+  def testTraces(
+      f: (Tracer, Tracer) => (Service[Request, Response], Closable)) {
     val tracer = new BufferingTracer
 
     val (svc, closable) = f(tracer, tracer)
@@ -33,17 +37,18 @@ class TraceInitializationTest extends FunSuite {
       Closable.all(svc, closable).close()
     }
 
-    assertAnnotationsInOrder(tracer.toSeq, Seq(
-      Annotation.Rpc("GET"),
-      Annotation.BinaryAnnotation("http.uri", "/this/is/a/uri/path"),
-      Annotation.ServiceName("theClient"),
-      Annotation.ClientSend(),
-      Annotation.Rpc("GET"),
-      Annotation.BinaryAnnotation("http.uri", "/this/is/a/uri/path"),
-      Annotation.ServiceName("theServer"),
-      Annotation.ServerRecv(),
-      Annotation.ServerSend(),
-      Annotation.ClientRecv()))
+    assertAnnotationsInOrder(
+        tracer.toSeq,
+        Seq(Annotation.Rpc("GET"),
+            Annotation.BinaryAnnotation("http.uri", "/this/is/a/uri/path"),
+            Annotation.ServiceName("theClient"),
+            Annotation.ClientSend(),
+            Annotation.Rpc("GET"),
+            Annotation.BinaryAnnotation("http.uri", "/this/is/a/uri/path"),
+            Annotation.ServiceName("theServer"),
+            Annotation.ServerRecv(),
+            Annotation.ServerSend(),
+            Annotation.ClientRecv()))
 
     assert(tracer.map(_.traceId).toSet.size == 1)
   }
@@ -53,11 +58,13 @@ class TraceInitializationTest extends FunSuite {
       import com.twitter.finagle
       val server = finagle.Http.server
         .configured(param.Tracer(serverTracer))
-        .configured(param.Label("theServer")).serve(":*", Svc)
+        .configured(param.Label("theServer"))
+        .serve(":*", Svc)
       val port = server.boundAddress.asInstanceOf[InetSocketAddress].getPort
       val client = finagle.Http.client
-        .configured(param.Tracer(clientTracer)).newService(":" + port, "theClient")
-      (client, server)
+        .configured(param.Tracer(clientTracer))
+        .newService(":" + port, "theClient")
+        (client, server)
     }
   }
 
@@ -78,7 +85,7 @@ class TraceInitializationTest extends FunSuite {
         .hostConnectionLimit(1)
         .tracer(clientTracer)
         .build()
-      (client, server)
+        (client, server)
     }
   }
 
@@ -88,7 +95,8 @@ class TraceInitializationTest extends FunSuite {
 
     val server = finagle.Http.server
       .configured(param.Tracer(tracer))
-      .configured(param.Label("theServer")).serve(":*", Svc)
+      .configured(param.Label("theServer"))
+      .serve(":*", Svc)
     try {
       val port = server.boundAddress.asInstanceOf[InetSocketAddress].getPort
       val client = ClientBuilder()

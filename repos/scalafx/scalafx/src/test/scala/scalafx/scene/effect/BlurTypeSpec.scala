@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.effect.BlurType]]. */
 @RunWith(classOf[JUnitRunner])
-class BlurTypeSpec extends SFXEnumDelegateSpec[jfxse.BlurType, BlurType](
-  javaClass = classOf[jfxse.BlurType],
-  scalaClass = classOf[BlurType],
-  companion = BlurType)
+class BlurTypeSpec
+    extends SFXEnumDelegateSpec[jfxse.BlurType, BlurType](
+        javaClass = classOf[jfxse.BlurType],
+        scalaClass = classOf[BlurType],
+        companion = BlurType)

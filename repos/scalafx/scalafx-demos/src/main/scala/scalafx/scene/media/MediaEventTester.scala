@@ -47,21 +47,22 @@ object MediaEventTester extends JFXApp {
   val url = "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv"
   val media = new Media(url)
   media.markers ++= Map(
-    "Clouds" -> (100 ms),
-    "Planes" -> (3000 ms),
-    "Parachute" -> (8000 ms),
-    "Car" -> (13000 ms),
-    "..." -> (15000 ms)
+      "Clouds" -> (100 ms),
+      "Planes" -> (3000 ms),
+      "Parachute" -> (8000 ms),
+      "Car" -> (13000 ms),
+      "..." -> (15000 ms)
   )
 
   val mediaPlayer = new MediaPlayer(media)
-  mediaPlayer.onMarker = (event: MediaMarkerEvent) => Platform.runLater {markerText.text = event.marker.getKey}
+  mediaPlayer.onMarker = (event: MediaMarkerEvent) =>
+    Platform.runLater { markerText.text = event.marker.getKey }
 
   val mediaView = new MediaView(mediaPlayer) {
     onError = (event: MediaErrorEvent) => println("Media view error: " + event)
   }
   val root = new StackPane {
-    children +=(mediaView, markerText)
+    children += (mediaView, markerText)
     style = "-fx-background-color: black;"
   }
 

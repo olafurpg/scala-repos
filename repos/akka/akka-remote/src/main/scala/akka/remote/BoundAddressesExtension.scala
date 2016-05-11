@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.actor.ActorSystem
@@ -11,22 +11,30 @@ import akka.actor.ExtensionId
 import akka.actor.ExtensionIdProvider
 
 /**
- * Extension provides access to bound addresses.
- */
-object BoundAddressesExtension extends ExtensionId[BoundAddressesExtension] with ExtensionIdProvider {
-  override def get(system: ActorSystem): BoundAddressesExtension = super.get(system)
+  * Extension provides access to bound addresses.
+  */
+object BoundAddressesExtension
+    extends ExtensionId[BoundAddressesExtension] with ExtensionIdProvider {
+  override def get(system: ActorSystem): BoundAddressesExtension =
+    super.get(system)
 
   override def lookup = BoundAddressesExtension
 
-  override def createExtension(system: ExtendedActorSystem): BoundAddressesExtension =
+  override def createExtension(
+      system: ExtendedActorSystem): BoundAddressesExtension =
     new BoundAddressesExtension(system)
 }
 
-class BoundAddressesExtension(val system: ExtendedActorSystem) extends Extension {
+class BoundAddressesExtension(val system: ExtendedActorSystem)
+    extends Extension {
+
   /**
-   * Returns a mapping from a protocol to a set of bound addresses.
-   */
-  def boundAddresses: Map[String, Set[Address]] = system.provider
-    .asInstanceOf[RemoteActorRefProvider].transport
-    .asInstanceOf[Remoting].boundAddresses
+    * Returns a mapping from a protocol to a set of bound addresses.
+    */
+  def boundAddresses: Map[String, Set[Address]] =
+    system.provider
+      .asInstanceOf[RemoteActorRefProvider]
+      .transport
+      .asInstanceOf[Remoting]
+      .boundAddresses
 }

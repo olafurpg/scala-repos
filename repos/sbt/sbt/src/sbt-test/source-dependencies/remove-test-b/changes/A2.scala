@@ -1,6 +1,5 @@
 package test
 
-object A
-{
-	def test = B.length
+object A {
+  def test = B.length
 }

@@ -1,5 +1,5 @@
 object Test {
-  def fn[@specialized T, @specialized U](t : T => Int, u : U => Int) : T =
+  def fn[@specialized T, @specialized U](t: T => Int, u: U => Int): T =
     null.asInstanceOf[T]
 }
 
@@ -13,16 +13,18 @@ class C extends A[Int] {
   override def getWith[@specialized(Int) Z](f: Int => Z) = f(value)
 }
 
-abstract class B[T, @specialized(scala.Int) U : Manifest, @specialized(scala.Int) V <% Ordered[V]] {
-    val u: U
-    val v: V
+abstract class B[T,
+                 @specialized(scala.Int) U : Manifest,
+                 @specialized(scala.Int) V <% Ordered[V]] {
+  val u: U
+  val v: V
 
-    def f(t: T, v2: V): Tuple2[U, V] = {
-        val m: Array[U] = null
-        if (m.isEmpty) {
-            (u, v)
-        } else {
-            (u, v2)
-        }
+  def f(t: T, v2: V): Tuple2[U, V] = {
+    val m: Array[U] = null
+    if (m.isEmpty) {
+      (u, v)
+    } else {
+      (u, v2)
     }
+  }
 }

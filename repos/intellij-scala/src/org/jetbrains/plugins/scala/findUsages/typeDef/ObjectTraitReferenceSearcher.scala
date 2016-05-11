@@ -10,12 +10,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTr
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 
 /**
- * User: Alefas
- * Date: 18.02.12
- */
-
-class ObjectTraitReferenceSearcher extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
-  def execute(queryParameters: ReferencesSearch.SearchParameters, consumer: Processor[PsiReference]): Boolean = {
+  * User: Alefas
+  * Date: 18.02.12
+  */
+class ObjectTraitReferenceSearcher
+    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
+  def execute(queryParameters: ReferencesSearch.SearchParameters,
+              consumer: Processor[PsiReference]): Boolean = {
     val scope = inReadAction(queryParameters.getEffectiveSearchScope)
     val element = queryParameters.getElementToSearch
 
@@ -31,28 +32,32 @@ class ObjectTraitReferenceSearcher extends QueryExecutor[PsiReference, Reference
         case _ => None
       }
     }
-    toProcess.foreach{ case (elem, name) =>
-      val processor = new TextOccurenceProcessor {
-        def execute(element: PsiElement, offsetInElement: Int): Boolean = {
-          val references = inReadAction(element.getReferences)
-          for (ref <- references if ref.getRangeInElement.contains(offsetInElement)) {
-            inReadAction {
-              if (ref.isReferenceTo(elem) || ref.resolve() == elem) {
-                if (!consumer.process(ref)) return false
+    toProcess.foreach {
+      case (elem, name) =>
+        val processor = new TextOccurenceProcessor {
+          def execute(element: PsiElement, offsetInElement: Int): Boolean = {
+            val references = inReadAction(element.getReferences)
+            for (ref <- references if ref.getRangeInElement.contains(
+                           offsetInElement)) {
+              inReadAction {
+                if (ref.isReferenceTo(elem) || ref.resolve() == elem) {
+                  if (!consumer.process(ref)) return false
+                }
               }
             }
+            true
           }
-          true
         }
-      }
-      val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-      try {
-        helper.processElementsWithWord(processor, scope, name, UsageSearchContext.IN_CODE, true)
-      }
-      catch {
-        case ignore: IndexNotReadyException =>
-        case ignore: AssertionError if ignore.getMessage endsWith "has null range" =>
-      }
+        val helper: PsiSearchHelper =
+          PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
+        try {
+          helper.processElementsWithWord(
+              processor, scope, name, UsageSearchContext.IN_CODE, true)
+        } catch {
+          case ignore: IndexNotReadyException =>
+          case ignore: AssertionError
+              if ignore.getMessage endsWith "has null range" =>
+        }
     }
     true
   }

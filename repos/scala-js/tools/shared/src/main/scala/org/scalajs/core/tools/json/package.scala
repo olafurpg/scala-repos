@@ -3,11 +3,11 @@ package org.scalajs.core.tools
 import java.io.{Reader, Writer}
 
 /** Some type-class lightweight wrappers around simple-json.
- *
- *  They allow to write `xyz.toJSON` to obtain classes that can be
- *  serialized by simple-json and `fromJSON[T](xyz)` to get an
- *  object back.
- */
+  *
+  *  They allow to write `xyz.toJSON` to obtain classes that can be
+  *  serialized by simple-json and `fromJSON[T](xyz)` to get an
+  *  object back.
+  */
 package object json {
   type JSON = Impl.Repr
 
@@ -22,5 +22,4 @@ package object json {
   def jsonToString(x: JSON): String = Impl.serialize(x)
   def readJSON(str: String): JSON = Impl.deserialize(str)
   def readJSON(reader: Reader): JSON = Impl.deserialize(reader)
-
 }

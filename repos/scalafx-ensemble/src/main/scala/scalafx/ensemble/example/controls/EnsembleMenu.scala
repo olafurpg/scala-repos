@@ -34,7 +34,6 @@ import scalafx.scene.image.Image
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.BorderPane
 
-
 /** An example of a menu bar. Includes illustration of a check menu item.
   *
   * @see scalafx.scene.control.MenuBar
@@ -53,36 +52,38 @@ class EnsembleMenu extends EnsembleExample {
     top = new MenuBar {
       maxWidth = 400
       useSystemMenuBar = true
-      menus = List(
-        new Menu("Scala") {
-          items = List(
+      menus = List(new Menu("Scala") {
+        items = List(
             new Menu("Author Info") {
               graphic = new ImageView {
-                image = new Image(this.getClass.getResourceAsStream("/scalafx/ensemble/images/crumb-selected-focused.png"))
+                image = new Image(this.getClass.getResourceAsStream(
+                        "/scalafx/ensemble/images/crumb-selected-focused.png"))
                 margin = Insets(0, 0, 0, 5)
               }
               items = List(
-                new MenuItem("Type Safe"),
-                new MenuItem("Martin Odersky")
+                  new MenuItem("Type Safe"),
+                  new MenuItem("Martin Odersky")
               )
             },
             new Menu("Features") {
               items = List(
-                new MenuItem("Object Oriented"),
-                new MenuItem("Functional"),
-                fooMenuItem,
-                new CheckMenuItem( """Show "foo" item""") {
-                  selected = true
-                  selected.onInvalidate {
-                    fooMenuItem.setVisible(selected())
-                    println( """Menu item "foo" is now """ + (if (fooMenuItem.visible()) "" else "not") + " visible")
+                  new MenuItem("Object Oriented"),
+                  new MenuItem("Functional"),
+                  fooMenuItem,
+                  new CheckMenuItem("""Show "foo" item""") {
+                    selected = true
+                    selected.onInvalidate {
+                      fooMenuItem.setVisible(selected())
+                      println("""Menu item "foo" is now """ +
+                          (if (fooMenuItem.visible())
+                             "" else "not") + " visible")
+                    }
                   }
-                }
               )
             },
             new MenuItem("ScalaFX")
-          )
-        })
+        )
+      })
     }
   }
 }

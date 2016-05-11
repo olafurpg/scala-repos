@@ -11,7 +11,8 @@ import java.nio.charset.Charset
 private[netty4] trait ChannelSnooper extends ChannelDuplexHandler {
   def name: String
 
-  private[this] lazy val printStream = new PrintStream(System.out, true, "UTF-8")
+  private[this] lazy val printStream = new PrintStream(
+      System.out, true, "UTF-8")
 
   def printer(message: String, exc: Throwable = null): Unit = {
     printStream.println(message)
@@ -36,14 +37,14 @@ private[netty4] trait ChannelSnooper extends ChannelDuplexHandler {
   // everything that's not an inbound/outbound message ie; flush, close, connect, etc
   def printEvent(ch: Channel, eventName: String): Unit =
     print(ch.id, eventIndicator, eventName)
-
 }
 
 /** Log message events */
 @Sharable
 private[netty4] class ByteBufSnooper(val name: String) extends ChannelSnooper {
 
-  override def exceptionCaught(ctx: ChannelHandlerContext, exn: Throwable): Unit = {
+  override def exceptionCaught(
+      ctx: ChannelHandlerContext, exn: Throwable): Unit = {
     printer("Snooped exception", exn)
     super.exceptionCaught(ctx, exn)
   }
@@ -57,7 +58,9 @@ private[netty4] class ByteBufSnooper(val name: String) extends ChannelSnooper {
     super.channelRead(ctx, msg)
   }
 
-  override def write(ctx: ChannelHandlerContext, msg: Object, promise: ChannelPromise): Unit = {
+  override def write(ctx: ChannelHandlerContext,
+                     msg: Object,
+                     promise: ChannelPromise): Unit = {
     msg match {
       case buf: ByteBuf => dump(printOutbound, ctx.channel, buf)
       case _ =>
@@ -67,28 +70,37 @@ private[netty4] class ByteBufSnooper(val name: String) extends ChannelSnooper {
   }
 
   /**
-   * print decoded channel messages
-   */
-  def dump(printer: (Channel, String) => Unit, ch: Channel, buf: ByteBuf): Unit = {
-    val rawStr = buf.toString(buf.readerIndex, buf.readableBytes, Charset.forName("UTF-8"))
+    * print decoded channel messages
+    */
+  def dump(
+      printer: (Channel, String) => Unit, ch: Channel, buf: ByteBuf): Unit = {
+    val rawStr = buf.toString(
+        buf.readerIndex, buf.readableBytes, Charset.forName("UTF-8"))
     val str = rawStr.replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n")
-    val asciiStr = str.map { c => if (c >= 32 && c < 128) c else '?' }
+    val asciiStr = str.map { c =>
+      if (c >= 32 && c < 128) c else '?'
+    }
 
-    for (i <- 0 until asciiStr.length by 60)
-      printer(ch, asciiStr.slice(i, i + 60).lines.mkString("\\n"))
+    for (i <- 0 until asciiStr.length by 60) printer(
+        ch, asciiStr.slice(i, i + 60).lines.mkString("\\n"))
   }
 }
 
 /** Log raw channel events without decoding channel messages */
-private[netty4] class SimpleChannelSnooper(val name: String) extends ChannelSnooper {
+private[netty4] class SimpleChannelSnooper(val name: String)
+    extends ChannelSnooper {
 
   // outbound events
-  override def write(ctx: ChannelHandlerContext, msg: Object, promise: ChannelPromise): Unit = {
-    printOutbound(ctx.channel, s"WRITE ${msg.toString} to ${ctx.channel.remoteAddress}")
+  override def write(ctx: ChannelHandlerContext,
+                     msg: Object,
+                     promise: ChannelPromise): Unit = {
+    printOutbound(
+        ctx.channel, s"WRITE ${msg.toString} to ${ctx.channel.remoteAddress}")
     super.write(ctx, msg, promise)
   }
 
-  override def disconnect(ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
+  override def disconnect(
+      ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
     printEvent(ctx.channel, "disconnect")
     super.disconnect(ctx, future)
   }
@@ -98,12 +110,14 @@ private[netty4] class SimpleChannelSnooper(val name: String) extends ChannelSnoo
     super.flush(ctx)
   }
 
-  override def close(ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
+  override def close(
+      ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
     printEvent(ctx.channel, "close")
     super.close(ctx, future)
   }
 
-  override def deregister(ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
+  override def deregister(
+      ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
     printEvent(ctx.channel, "deregister")
     super.deregister(ctx, future)
   }
@@ -114,16 +128,18 @@ private[netty4] class SimpleChannelSnooper(val name: String) extends ChannelSnoo
   }
 
   override def connect(
-    ctx: ChannelHandlerContext,
-    remoteAddress: SocketAddress,
-    localAddress: SocketAddress,
-    future: ChannelPromise
+      ctx: ChannelHandlerContext,
+      remoteAddress: SocketAddress,
+      localAddress: SocketAddress,
+      future: ChannelPromise
   ): Unit = {
     printEvent(ctx.channel, "connected to " + remoteAddress)
     super.connect(ctx, remoteAddress, localAddress, future)
   }
 
-  override def bind(ctx: ChannelHandlerContext, localAddress: SocketAddress, future: ChannelPromise): Unit = {
+  override def bind(ctx: ChannelHandlerContext,
+                    localAddress: SocketAddress,
+                    future: ChannelPromise): Unit = {
     printEvent(ctx.channel, "bound to " + localAddress)
     super.bind(ctx, localAddress, future)
   }
@@ -149,7 +165,8 @@ private[netty4] class SimpleChannelSnooper(val name: String) extends ChannelSnoo
     super.channelWritabilityChanged(ctx)
   }
 
-  override def userEventTriggered(ctx: ChannelHandlerContext, evt: scala.Any): Unit = {
+  override def userEventTriggered(
+      ctx: ChannelHandlerContext, evt: scala.Any): Unit = {
     printEvent(ctx.channel, "user event triggered")
     super.userEventTriggered(ctx, evt)
   }
@@ -164,20 +181,22 @@ private[netty4] class SimpleChannelSnooper(val name: String) extends ChannelSnoo
     super.channelReadComplete(ctx)
   }
 
-  override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+  override def exceptionCaught(
+      ctx: ChannelHandlerContext, cause: Throwable): Unit = {
     printer("Snooped exception", cause)
     super.exceptionCaught(ctx, cause)
   }
 
-
   override def channelRead(ctx: ChannelHandlerContext, msg: Object): Unit = {
-    printInbound(ctx.channel, s"READ ${msg.toString} from ${ctx.channel.remoteAddress}")
+    printInbound(
+        ctx.channel, s"READ ${msg.toString} from ${ctx.channel.remoteAddress}")
     super.channelRead(ctx, msg)
   }
 }
 
 private[netty4] object ChannelSnooper {
-  def apply(name: String)(thePrinter: (String, Throwable) => Unit): ChannelSnooper = {
+  def apply(name: String)(
+      thePrinter: (String, Throwable) => Unit): ChannelSnooper = {
     new SimpleChannelSnooper(name) {
       override def printer(message: String, exc: Throwable = null): Unit =
         thePrinter(message, exc)

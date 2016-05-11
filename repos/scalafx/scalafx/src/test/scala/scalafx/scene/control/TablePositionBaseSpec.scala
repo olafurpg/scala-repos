@@ -35,16 +35,19 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * TablePositionBase Spec tests.
- */
+  * TablePositionBase Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class TablePositionBaseSpec[TC <: jfxsc.TableColumnBase[_, _]]
-  extends SimpleSFXDelegateSpec[jfxsc.TablePositionBase[TC], TablePositionBase[TC]](classOf[jfxsc.TablePositionBase[TC]], classOf[TablePositionBase[TC]]) {
+    extends SimpleSFXDelegateSpec[
+        jfxsc.TablePositionBase[TC], TablePositionBase[TC]](
+        classOf[jfxsc.TablePositionBase[TC]], classOf[TablePositionBase[TC]]) {
 
-  override def getScalaClassInstance = new TablePositionBase[TC](this.getJavaClassInstance) {}
+  override def getScalaClassInstance =
+    new TablePositionBase[TC](this.getJavaClassInstance) {}
 
-  override def getJavaClassInstance = new jfxsc.TablePositionBase[TC](0, null.asInstanceOf[TC]) {
-    def getColumn: Int = 0
-  }
-
+  override def getJavaClassInstance =
+    new jfxsc.TablePositionBase[TC](0, null.asInstanceOf[TC]) {
+      def getColumn: Int = 0
+    }
 }

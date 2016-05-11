@@ -17,8 +17,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @since  21/10/15
   */
 class ScalaProximityStatistician extends ProximityStatistician {
-  override def serialize(element: PsiElement, location: ProximityLocation): StatisticsInfo = {
-    ScalaStatisticManager.memberKey(element).map(el =>
-      new StatisticsInfo("scalaMember#", el)).getOrElse(return null)
+  override def serialize(
+      element: PsiElement, location: ProximityLocation): StatisticsInfo = {
+    ScalaStatisticManager
+      .memberKey(element)
+      .map(el => new StatisticsInfo("scalaMember#", el))
+      .getOrElse(return null)
   }
 }

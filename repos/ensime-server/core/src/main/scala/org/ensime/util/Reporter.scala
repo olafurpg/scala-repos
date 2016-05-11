@@ -18,7 +18,8 @@ trait ReportHandler {
   def reportJavaNotes(notes: List[Note]): Unit = {}
 }
 
-class PresentationReporter(handler: ReportHandler) extends Reporter with PositionBackCompat {
+class PresentationReporter(handler: ReportHandler)
+    extends Reporter with PositionBackCompat {
 
   val log = LoggerFactory.getLogger(classOf[PresentationReporter])
   private var enabled = true
@@ -32,7 +33,8 @@ class PresentationReporter(handler: ReportHandler) extends Reporter with Positio
     }
   }
 
-  override def info0(pos: Position, msg: String, severity: Severity, force: Boolean): Unit = {
+  override def info0(
+      pos: Position, msg: String, severity: Severity, force: Boolean): Unit = {
     severity.count += 1
     try {
       if (severity.id == 0) {
@@ -42,20 +44,21 @@ class PresentationReporter(handler: ReportHandler) extends Reporter with Positio
           if (pos.isDefined) {
             val source = pos.source
             val f = source.file.absolute.path
-            val posColumn = if (pos.point == -1) {
-              0
-            } else {
-              pos.column
-            }
+            val posColumn =
+              if (pos.point == -1) {
+                0
+              } else {
+                pos.column
+              }
 
             val note = new Note(
-              f,
-              formatMessage(msg),
-              NoteSeverity(severity.id),
-              pos.startOrCursor,
-              pos.endOrCursor,
-              pos.line,
-              posColumn
+                f,
+                formatMessage(msg),
+                NoteSeverity(severity.id),
+                pos.startOrCursor,
+                pos.endOrCursor,
+                pos.line,
+                posColumn
             )
             handler.reportScalaNotes(List(note))
           }

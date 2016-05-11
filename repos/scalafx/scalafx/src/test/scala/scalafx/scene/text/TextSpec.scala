@@ -36,15 +36,14 @@ import scalafx.Includes._
 import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 
 /**
- * Text Spec tests.
- *
- *
- */
+  * Text Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class TextSpec
-  extends SimpleSFXDelegateSpec[jfxst.Text, Text](classOf[jfxst.Text], classOf[Text])
-  with PositionDelegateSpec[Text] {
+    extends SimpleSFXDelegateSpec[jfxst.Text, Text](
+        classOf[jfxst.Text], classOf[Text]) with PositionDelegateSpec[Text] {
 
   val positionDelegate = new Text
-
 }

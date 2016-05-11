@@ -15,11 +15,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.util.{ScalaUtils, TestUtils}
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 30.09.2009
- */
-
-abstract class ScalaRenameTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * User: Alexander Podkhalyuzin
+  * Date: 30.09.2009
+  */
+abstract class ScalaRenameTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   val caretMarker = "/*caret*/"
 
   protected def folderPath: String = TestUtils.getTestDataPath + "/rename/"
@@ -33,11 +33,14 @@ abstract class ScalaRenameTestBase extends ScalaLightPlatformCodeInsightTestCase
     configureFromFileTextAdapter(ioFile.getName, fileText)
     val scalaFile: ScalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(caretMarker) + caretMarker.length + 1
-    assert(offset != caretMarker.length, "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
+    assert(
+        offset != caretMarker.length,
+        "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
     getEditorAdapter.getCaretModel.moveToOffset(offset)
     val element = TargetElementUtil.findTargetElement(
-      InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(getEditorAdapter, scalaFile),
-      TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED)
+        InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(
+            getEditorAdapter, scalaFile),
+        TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED)
     assert(element != null, "Reference is not specified.")
     val searchInComments = element.getText.contains("Comments")
 
@@ -47,13 +50,18 @@ abstract class ScalaRenameTestBase extends ScalaLightPlatformCodeInsightTestCase
     //start to inline
     ScalaUtils.runWriteAction(new Runnable {
       def run() {
-        val subst = RenamePsiElementProcessor.forElement(element).substituteElementToRename(element, getEditorAdapter)
+        val subst = RenamePsiElementProcessor
+          .forElement(element)
+          .substituteElementToRename(element, getEditorAdapter)
         if (subst == null) return
-        new RenameProcessor(getProjectAdapter, subst, "NameAfterRename", searchInComments, false).run()
+        new RenameProcessor(getProjectAdapter,
+                            subst,
+                            "NameAfterRename",
+                            searchInComments,
+                            false).run()
       }
     }, getProjectAdapter, "Test")
     res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
-
 
     val text = lastPsi.getText
     val output = lastPsi.getNode.getElementType match {

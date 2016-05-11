@@ -5,4 +5,3 @@ object Test {
   import c.x
   println(x)
 }
-

@@ -24,7 +24,8 @@ import scala.collection.mutable.ArrayBuffer
   * @author Alexander Podkhalyuzin
   * Date: 04.05.2008
   */
-trait ScMember extends ScalaPsiElement with ScModifierListOwner with PsiMember {
+trait ScMember
+    extends ScalaPsiElement with ScModifierListOwner with PsiMember {
   def getContainingClass: PsiClass = containingClass
 
   def isPrivate: Boolean = hasModifierPropertyScala("private")
@@ -53,13 +54,20 @@ trait ScMember extends ScalaPsiElement with ScModifierListOwner with PsiMember {
     val context = getContext
     (getContainingClassLoose, this) match {
       case (null, _) => null
-      case (found, fun: ScFunction) if fun.syntheticContainingClass.isDefined => fun.syntheticContainingClass.get
+      case (found, fun: ScFunction)
+          if fun.syntheticContainingClass.isDefined =>
+        fun.syntheticContainingClass.get
       case (found, fun: ScFunction) if fun.isSynthetic => found
-      case (found, td: ScTypeDefinition) if td.syntheticContainingClass.isDefined => td.syntheticContainingClass.get
+      case (found, td: ScTypeDefinition)
+          if td.syntheticContainingClass.isDefined =>
+        td.syntheticContainingClass.get
       case (found, td: ScTypeDefinition) if td.isSynthetic => found
       case (found, _: ScClassParameter | _: ScPrimaryConstructor) => found
-      case (found, _) if context == found.extendsBlock || found.extendsBlock.templateBody.contains(context) ||
-        found.extendsBlock.earlyDefinitions.contains(context) => found
+      case (found, _)
+          if context == found.extendsBlock ||
+          found.extendsBlock.templateBody.contains(context) ||
+          found.extendsBlock.earlyDefinitions.contains(context) =>
+        found
       case (found, _) => null // See SCL-3178
     }
   }
@@ -77,8 +85,9 @@ trait ScMember extends ScalaPsiElement with ScModifierListOwner with PsiMember {
         // TODO is all of this mess still necessary?! 
         case c: ScClass if c.isCase =>
           this match {
-            case fun: ScFunction if fun.isSyntheticApply || fun.isSyntheticUnapply ||
-              fun.isSyntheticUnapplySeq =>
+            case fun: ScFunction
+                if fun.isSyntheticApply || fun.isSyntheticUnapply ||
+                fun.isSyntheticUnapplySeq =>
               //this is special case for synthetic apply and unapply methods
               ScalaPsiUtil.getCompanionModule(c) match {
                 case Some(td) => return td
@@ -112,14 +121,17 @@ trait ScMember extends ScalaPsiElement with ScModifierListOwner with PsiMember {
         !hasModifierProperty("private") && !hasModifierProperty("protected")
       case PsiModifier.STATIC => containingClass.isInstanceOf[ScObject]
       case PsiModifier.PRIVATE =>
-        getModifierList.accessModifier.exists(_.access == ScAccessModifier.Type.THIS_PRIVATE)
+        getModifierList.accessModifier.exists(
+            _.access == ScAccessModifier.Type.THIS_PRIVATE)
       case PsiModifier.PROTECTED =>
-        getModifierList.accessModifier.exists(_.access == ScAccessModifier.Type.THIS_PROTECTED)
+        getModifierList.accessModifier.exists(
+            _.access == ScAccessModifier.Type.THIS_PROTECTED)
       case _ => super.hasModifierProperty(name)
     }
   }
 
-  protected def isSimilarMemberForNavigation(m: ScMember, isStrict: Boolean) = false
+  protected def isSimilarMemberForNavigation(m: ScMember, isStrict: Boolean) =
+    false
 
   override def getNavigationElement: PsiElement = getContainingFile match {
     case s: ScalaFileImpl if s.isCompiled => getSourceMirrorMember
@@ -127,30 +139,36 @@ trait ScMember extends ScalaPsiElement with ScModifierListOwner with PsiMember {
   }
 
   private def getSourceMirrorMember: ScMember = getParent match {
-    case tdb: ScTemplateBody => tdb.getParent match {
-      case eb: ScExtendsBlock => eb.getParent match {
-        case td: ScTypeDefinition => td.getNavigationElement match {
-          case c: ScTypeDefinition =>
-            val membersIterator = c.members.iterator
-            val buf: ArrayBuffer[ScMember] = new ArrayBuffer[ScMember]
-            while (membersIterator.hasNext) {
-              val member = membersIterator.next()
-              if (isSimilarMemberForNavigation(member, isStrict = false)) buf += member
-            }
-            if (buf.isEmpty) this
-            else if (buf.length == 1) buf(0)
-            else {
-              val filter = buf.filter(isSimilarMemberForNavigation(_, isStrict = true))
-              if (filter.isEmpty) buf(0)
-              else filter(0)
-            }
-          case _ => this
-        }
+    case tdb: ScTemplateBody =>
+      tdb.getParent match {
+        case eb: ScExtendsBlock =>
+          eb.getParent match {
+            case td: ScTypeDefinition =>
+              td.getNavigationElement match {
+                case c: ScTypeDefinition =>
+                  val membersIterator = c.members.iterator
+                  val buf: ArrayBuffer[ScMember] = new ArrayBuffer[ScMember]
+                  while (membersIterator.hasNext) {
+                    val member = membersIterator.next()
+                    if (isSimilarMemberForNavigation(member, isStrict = false))
+                      buf += member
+                  }
+                  if (buf.isEmpty) this
+                  else if (buf.length == 1) buf(0)
+                  else {
+                    val filter = buf.filter(
+                        isSimilarMemberForNavigation(_, isStrict = true))
+                    if (filter.isEmpty) buf(0)
+                    else filter(0)
+                  }
+                case _ => this
+              }
+            case _ => this
+          }
         case _ => this
       }
-      case _ => this
-    }
-    case c: ScTypeDefinition if this.isInstanceOf[ScPrimaryConstructor] => //primary constructor
+    case c: ScTypeDefinition if this.isInstanceOf[ScPrimaryConstructor] =>
+      //primary constructor
       c.getNavigationElement match {
         case td: ScClass =>
           td.constructor match {
@@ -166,7 +184,8 @@ trait ScMember extends ScalaPsiElement with ScModifierListOwner with PsiMember {
     val accessModifier = Option(getModifierList).flatMap(_.accessModifier)
 
     def fromContainingBlockOrMember(): Option[SearchScope] = {
-      val blockOrMember = PsiTreeUtil.getContextOfType(this, true, classOf[ScBlock], classOf[ScMember])
+      val blockOrMember = PsiTreeUtil.getContextOfType(
+          this, true, classOf[ScBlock], classOf[ScMember])
       blockOrMember match {
         case null => None
         case block: ScBlock => Some(new LocalSearchScope(block))
@@ -175,7 +194,9 @@ trait ScMember extends ScalaPsiElement with ScModifierListOwner with PsiMember {
     }
 
     def fromQualifiedPrivate(): Option[SearchScope] = {
-      accessModifier.filter(am => am.isPrivate && am.getReference != null).map(_.scope) collect {
+      accessModifier
+        .filter(am => am.isPrivate && am.getReference != null)
+        .map(_.scope) collect {
         case p: PsiPackage => new PackageScope(p, true, true)
         case td: ScTypeDefinition => ScalaPsiUtil.withCompanionSearchScope(td)
       }
@@ -183,14 +204,17 @@ trait ScMember extends ScalaPsiElement with ScModifierListOwner with PsiMember {
 
     val fromModifierOrContext = this match {
       case _ if accessModifier.exists(mod => mod.isPrivate && mod.isThis) =>
-        Option(containingClass).orElse(containingFile).map(new LocalSearchScope(_))
+        Option(containingClass)
+          .orElse(containingFile)
+          .map(new LocalSearchScope(_))
       case _ if accessModifier.exists(_.isUnqualifiedPrivateOrThis) =>
         containingClass match {
           case null => containingFile.map(new LocalSearchScope(_))
           case c => Some(ScalaPsiUtil.withCompanionSearchScope(c))
         }
       case cp: ScClassParameter =>
-        Option(cp.containingClass).map(_.getUseScope)
+        Option(cp.containingClass)
+          .map(_.getUseScope)
           .orElse(Option(super.getUseScope))
       case fun: ScFunction if fun.isSynthetic =>
         fun.getSyntheticNavigationElement.map(_.getUseScope)

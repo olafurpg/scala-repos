@@ -19,21 +19,23 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypePresentation, U
 import org.jetbrains.plugins.scala.util.TestUtils
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 10.03.2009
- */
-
-abstract class TypeInferenceTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * User: Alexander Podkhalyuzin
+  * Date: 10.03.2009
+  */
+abstract class TypeInferenceTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   private val startExprMarker = "/*start*/"
   private val endExprMarker = "/*end*/"
   private val fewVariantsMarker = "Few variants:"
   private val ExpectedPattern = """expected: (.*)""".r
   private val SimplifiedPattern = """simplified: (.*)""".r
 
-  protected def folderPath: String = TestUtils.getTestDataPath + "/typeInference/"
+  protected def folderPath: String =
+    TestUtils.getTestDataPath + "/typeInference/"
 
   protected def doInjectorTest(injector: SyntheticMembersInjector): Unit = {
-    val extensionPoint = Extensions.getRootArea.getExtensionPoint(SyntheticMembersInjector.EP_NAME)
+    val extensionPoint = Extensions.getRootArea.getExtensionPoint(
+        SyntheticMembersInjector.EP_NAME)
     extensionPoint.registerExtension(injector)
     try {
       doTest()
@@ -54,12 +56,19 @@ abstract class TypeInferenceTestBase extends ScalaLightPlatformCodeInsightTestCa
     val offset = fileText.indexOf(startExprMarker)
     val startOffset = offset + startExprMarker.length
 
-    assert(offset != -1, "Not specified start marker in test case. Use /*start*/ in scala file for this.")
+    assert(
+        offset != -1,
+        "Not specified start marker in test case. Use /*start*/ in scala file for this.")
     val endOffset = fileText.indexOf(endExprMarker)
-    assert(endOffset != -1, "Not specified end marker in test case. Use /*end*/ in scala file for this.")
+    assert(
+        endOffset != -1,
+        "Not specified end marker in test case. Use /*end*/ in scala file for this.")
 
-    val addOne = if(PsiTreeUtil.getParentOfType(scalaFile.findElementAt(startOffset),classOf[ScExpression]) != null) 0 else 1 //for xml tests
-    val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
+    val addOne =
+      if (PsiTreeUtil.getParentOfType(scalaFile.findElementAt(startOffset),
+                                      classOf[ScExpression]) != null) 0 else 1 //for xml tests
+    val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
+        scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.getType(TypingContext.empty) match {
       case Success(Unit, _) => expr.getTypeIgnoreBaseType(TypingContext.empty)
@@ -75,28 +84,42 @@ abstract class TypeInferenceTestBase extends ScalaLightPlatformCodeInsightTestCa
           case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
             val resText = text.substring(2, text.length - 2).trim
             if (resText.startsWith(fewVariantsMarker)) {
-              val results = resText.substring(fewVariantsMarker.length).trim.split('\n')
+              val results =
+                resText.substring(fewVariantsMarker.length).trim.split('\n')
               if (!results.contains(res)) assertEquals(results(0), res)
               return
             } else resText
           case _ =>
-            throw new AssertionError("Test result must be in last comment statement.")
+            throw new AssertionError(
+                "Test result must be in last comment statement.")
         }
         output match {
           case ExpectedPattern("<none>") =>
             expr.expectedType() match {
-              case Some(et) => fail("found unexpected expected type: %s".format(ScType.presentableText(et)))
+              case Some(et) =>
+                fail(
+                    "found unexpected expected type: %s".format(
+                        ScType.presentableText(et)))
               case None => // all good
             }
           case ExpectedPattern(expectedExpectedTypeText) =>
-            val actualExpectedType = expr.expectedType().getOrElse(sys.error("no expected type"))
-            val actualExpectedTypeText = ScType.presentableText(actualExpectedType)
+            val actualExpectedType =
+              expr.expectedType().getOrElse(sys.error("no expected type"))
+            val actualExpectedTypeText =
+              ScType.presentableText(actualExpectedType)
             assertEquals(expectedExpectedTypeText, actualExpectedTypeText)
           case SimplifiedPattern(expectedText) =>
-            assertEquals(expectedText, ScTypePresentation.withoutAliases(ttypez))
+            assertEquals(
+                expectedText, ScTypePresentation.withoutAliases(ttypez))
           case _ => assertEquals(output, res)
         }
-      case Failure(msg, elem) => assert(assertion = false, msg + " :: " + (elem match {case Some(x) => x.getText case None => "empty element"}))
+      case Failure(msg, elem) =>
+        assert(assertion = false,
+               msg + " :: " +
+               (elem match {
+                     case Some(x) => x.getText
+                     case None => "empty element"
+                   }))
     }
   }
 }

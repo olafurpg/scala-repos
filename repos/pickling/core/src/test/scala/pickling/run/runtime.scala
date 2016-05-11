@@ -203,4 +203,3 @@ class RuntimeArrayTests extends FunSuite {
     assert(p === up)
   }
 }
-

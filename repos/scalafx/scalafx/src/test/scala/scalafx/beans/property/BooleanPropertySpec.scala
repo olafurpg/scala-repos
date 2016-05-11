@@ -37,10 +37,10 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import scalafx.Includes._
 
 /**
- * BooleanProperty Spec tests.
- *
- *
- */
+  * BooleanProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class BooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
   val bean = new Object()
@@ -190,7 +190,8 @@ class BooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
 
   it should "do the right thing with order of operations" in {
     // order of operations should be ! > && > || > ==
-    booleanProperty <== !booleanProperty3 === booleanProperty2 || !booleanProperty2 && !booleanProperty3
+    booleanProperty <== !booleanProperty3 === booleanProperty2 ||
+    !booleanProperty2 && !booleanProperty3
     booleanProperty2() = false
     booleanProperty3() = false
     booleanProperty() should be(true)

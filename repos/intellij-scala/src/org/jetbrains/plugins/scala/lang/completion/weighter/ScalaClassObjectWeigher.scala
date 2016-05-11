@@ -8,17 +8,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 05.01.12
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 05.01.12
+  */
 class ScalaClassObjectWeigher extends ProximityWeigher {
   def weigh(element: PsiElement, location: ProximityLocation): Comparable[_] = {
     val elem = location.getPosition
     val ref = PsiTreeUtil.getParentOfType(elem, classOf[ScReferenceElement])
     if (ref == null) return null
     element match {
-      case o: ScObject => 
+      case o: ScObject =>
         if (ref.isInstanceOf[ScReferenceExpression]) return 1
       case p: PsiClass =>
         if (!ref.isInstanceOf[ScReferenceExpression]) return 1

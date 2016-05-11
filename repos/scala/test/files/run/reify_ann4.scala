@@ -7,7 +7,7 @@ import scala.annotation.meta._
 
 object Test extends App {
   // test 1: reify
-  val tree = reify{
+  val tree = reify {
     class D extends StaticAnnotation
     class C
     val c1 = new C @D

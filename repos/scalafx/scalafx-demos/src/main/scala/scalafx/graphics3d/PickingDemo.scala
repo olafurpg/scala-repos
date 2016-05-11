@@ -100,37 +100,40 @@ object PickingDemo extends JFXApp {
 
     group.transforms = Seq(yRotate)
 
-    scene.onMousePressed = (event: MouseEvent) => {
-      anchorAngleY = angleY()
-      anchorX = event.sceneX
+    scene.onMousePressed = (event: MouseEvent) =>
+      {
+        anchorAngleY = angleY()
+        anchorX = event.sceneX
 
-      // Retrieve information about a pick
-      val pickResult = event.pickResult
+        // Retrieve information about a pick
+        val pickResult = event.pickResult
 
-      // If picked on a Node, place green marker at the location of the pick
-      pickResult.intersectedNode match {
-        case Some(n) =>
-          println("Picked node: '" + n.id() + "'")
-          val p = pickResult.intersectedPoint
-          group.children += createMarker(x = p.x + n.translateX(), y = p.y + n.translateY(), z = p.z + n.translateZ())
-        case None => println("Picked nothing.")
+        // If picked on a Node, place green marker at the location of the pick
+        pickResult.intersectedNode match {
+          case Some(n) =>
+            println("Picked node: '" + n.id() + "'")
+            val p = pickResult.intersectedPoint
+            group.children += createMarker(x = p.x + n.translateX(),
+                                           y = p.y + n.translateY(),
+                                           z = p.z + n.translateZ())
+          case None => println("Picked nothing.")
+        }
+    }
+
+    scene.onMouseDragged = (event: MouseEvent) =>
+      {
+        angleY() = anchorAngleY + anchorX - event.sceneX
+    }
+  }
+
+  private def createMarker(x: Double, y: Double, z: Double): Sphere =
+    new Sphere(35) {
+      material = new PhongMaterial {
+        diffuseColor = Color.Gold
+        specularColor = Color.LightGreen
       }
+      translateX = x
+      translateY = y
+      translateZ = z
     }
-
-    scene.onMouseDragged = (event: MouseEvent) => {
-      angleY() = anchorAngleY + anchorX - event.sceneX
-    }
-
-
-  }
-
-  private def createMarker(x: Double, y: Double, z: Double): Sphere = new Sphere(35) {
-    material = new PhongMaterial {
-      diffuseColor = Color.Gold
-      specularColor = Color.LightGreen
-    }
-    translateX = x
-    translateY = y
-    translateZ = z
-  }
 }

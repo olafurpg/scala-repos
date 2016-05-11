@@ -22,19 +22,20 @@ import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, Time}
 
-private[streaming]
-class MapPartitionedDStream[T: ClassTag, U: ClassTag](
+private[streaming] class MapPartitionedDStream[T : ClassTag, U : ClassTag](
     parent: DStream[T],
     mapPartFunc: Iterator[T] => Iterator[U],
     preservePartitioning: Boolean
-  ) extends DStream[U](parent.ssc) {
+)
+    extends DStream[U](parent.ssc) {
 
   override def dependencies: List[DStream[_]] = List(parent)
 
   override def slideDuration: Duration = parent.slideDuration
 
   override def compute(validTime: Time): Option[RDD[U]] = {
-    parent.getOrCompute(validTime).map(_.mapPartitions[U](mapPartFunc, preservePartitioning))
+    parent
+      .getOrCompute(validTime)
+      .map(_.mapPartitions[U](mapPartFunc, preservePartitioning))
   }
 }
-

@@ -1,7 +1,7 @@
 case class CaseSequenceTopLevel(as: Int*)
 
 object Test {
-   def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit = {
 
     val buffer1 = collection.mutable.Buffer(0, 0)
     CaseSequenceTopLevel(buffer1: _*) match {

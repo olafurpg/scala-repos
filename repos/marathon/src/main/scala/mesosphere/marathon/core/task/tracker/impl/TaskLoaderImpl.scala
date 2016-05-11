@@ -10,7 +10,8 @@ import scala.concurrent.Future
 /**
   * Loads all task data into an [[TaskTracker.TasksByApp]] from a [[TaskRepository]].
   */
-private[tracker] class TaskLoaderImpl(repo: TaskRepository) extends TaskLoader {
+private[tracker] class TaskLoaderImpl(repo: TaskRepository)
+    extends TaskLoader {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private[this] val log = LoggerFactory.getLogger(getClass.getName)
@@ -24,7 +25,8 @@ private[tracker] class TaskLoaderImpl(repo: TaskRepository) extends TaskLoader {
       log.info(s"Loaded ${tasks.size} tasks")
       val tasksByApp = tasks.groupBy(task => Task.Id(task.getId).appId)
       val map = tasksByApp.iterator.map {
-        case (appId, appTasks) => appId -> TaskTracker.AppTasks(appId, appTasks)
+        case (appId, appTasks) =>
+          appId -> TaskTracker.AppTasks(appId, appTasks)
       }.toMap
       TaskTracker.TasksByApp.of(map)
     }

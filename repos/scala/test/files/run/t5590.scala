@@ -1,10 +1,5 @@
-
-
-
 import java.io._
 import collection._
-
-
 
 object Test {
 
@@ -27,5 +22,4 @@ object Test {
     check(lhm)
     check(lhs)
   }
-
 }

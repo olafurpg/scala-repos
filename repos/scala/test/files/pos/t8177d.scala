@@ -8,5 +8,5 @@ trait View[AIn] {
 object Test {
   val view: View[Int] = null
 
-  view f2 5  // fails
+  view f2 5 // fails
 }

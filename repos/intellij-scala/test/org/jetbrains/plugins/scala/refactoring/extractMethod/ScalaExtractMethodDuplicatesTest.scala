@@ -2,9 +2,9 @@ package org.jetbrains.plugins.scala
 package refactoring.extractMethod
 
 /**
- * Nikolay.Tropin
- * 2014-05-19
- */
+  * Nikolay.Tropin
+  * 2014-05-19
+  */
 class ScalaExtractMethodDuplicatesTest extends ScalaExtractMethodTestBase {
   override def folderPath: String = super.folderPath + "duplicates/"
 

@@ -35,18 +35,17 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * TextInputControl Spec tests.
- *
- *
- */
+  * TextInputControl Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class TextInputControlSpec
-  extends SimpleSFXDelegateSpec[jfxsc.TextInputControl, TextInputControl](
-    classOf[jfxsc.TextInputControl], classOf[TextInputControl])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[jfxsc.TextInputControl, TextInputControl](
+        classOf[jfxsc.TextInputControl], classOf[TextInputControl])
+    with RunOnApplicationThread {
 
   override protected def getScalaClassInstance = new TextField
 
   override protected def getJavaClassInstance = new jfxsc.TextField
-
 }

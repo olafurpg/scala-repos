@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.geometry.Orientation]]. */
 @RunWith(classOf[JUnitRunner])
-class OrientationSpec extends SFXEnumDelegateSpec[jfxg.Orientation, Orientation](
-  javaClass = classOf[jfxg.Orientation],
-  scalaClass = classOf[Orientation],
-  companion = Orientation)
+class OrientationSpec
+    extends SFXEnumDelegateSpec[jfxg.Orientation, Orientation](
+        javaClass = classOf[jfxg.Orientation],
+        scalaClass = classOf[Orientation],
+        companion = Orientation)

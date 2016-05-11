@@ -1,4 +1,3 @@
-
 class Test {
   def test(b: Base): Unit = b match {
     case Base_1(Some(_)) =>

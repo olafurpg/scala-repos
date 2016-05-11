@@ -25,11 +25,12 @@ import org.specs2.execute.PendingUntilFixed
 import common._
 import Helpers._
 
-
 /**
- * Systems under specification for Html5 Parser.
- */
-object Html5ParserSpec extends Specification with PendingUntilFixed with Html5Parser with Html5Writer {
+  * Systems under specification for Html5 Parser.
+  */
+object Html5ParserSpec
+    extends Specification with PendingUntilFixed with Html5Parser
+    with Html5Writer {
   "Html5Parser Specification".title
 
   "Htm5 Writer" should {
@@ -44,14 +45,21 @@ object Html5ParserSpec extends Specification with PendingUntilFixed with Html5Pa
 
   "Html5 Parser" should {
     val pages = for {
-      page1 <- tryo(readWholeStream(getClass.getResourceAsStream("Html5ParserSpec.page1.html"))).filter(_ ne null)
-      page2 <- tryo(readWholeStream(getClass.getResourceAsStream("Html5ParserSpec.page2.html"))).filter(_ ne null)
-      page3 <- tryo(readWholeStream(getClass.getResourceAsStream("Html5ParserSpec.page3.html"))).filter(_ ne null)
+      page1 <- tryo(readWholeStream(
+              getClass.getResourceAsStream("Html5ParserSpec.page1.html")))
+        .filter(_ ne null)
+      page2 <- tryo(readWholeStream(
+              getClass.getResourceAsStream("Html5ParserSpec.page2.html")))
+        .filter(_ ne null)
+      page3 <- tryo(readWholeStream(
+              getClass.getResourceAsStream("Html5ParserSpec.page3.html")))
+        .filter(_ ne null)
     } yield (page1, page2, page3)
 
     pages match {
       case Full(p) =>
-        val (page1, page2, page3) = (new String(p._1), new String(p._2), new String(p._3))
+        val (page1, page2, page3) =
+          (new String(p._1), new String(p._2), new String(p._3))
 
         "parse valid page type1" in {
           val parsed = parse(page1).openOrThrowException("Test")
@@ -73,7 +81,9 @@ object Html5ParserSpec extends Specification with PendingUntilFixed with Html5Pa
     }
 
     "change <lift:head> to <head>" in {
-      val parsed = parse("<div><lift:head>123</lift:head></div>").openOrThrowException("Test")
+      val parsed =
+        parse("<div><lift:head>123</lift:head></div>").openOrThrowException(
+            "Test")
       val heads = parsed \\ "head"
       heads.length must_== 1
       heads.text must_== "123"
@@ -81,7 +91,8 @@ object Html5ParserSpec extends Specification with PendingUntilFixed with Html5Pa
     }.pendingUntilFixed
 
     "Parse stuff with lift: namespace" in {
-      val parsed = parse("""<lift:surround with="dog"><div/></lift:surround>""")
+      val parsed =
+        parse("""<lift:surround with="dog"><div/></lift:surround>""")
       val e = parsed.openOrThrowException("Test").asInstanceOf[Elem]
       e.prefix must_== "lift"
       e.label must_== "surround"
@@ -95,6 +106,4 @@ object Html5ParserSpec extends Specification with PendingUntilFixed with Html5Pa
       (parsed.openOrThrowException("Test") \ "@with").text must_== "dog"
     }
   }
-
 }
-

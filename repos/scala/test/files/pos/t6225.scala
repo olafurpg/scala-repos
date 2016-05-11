@@ -1,4 +1,3 @@
-
 package library.x {
   class X {
     class Foo

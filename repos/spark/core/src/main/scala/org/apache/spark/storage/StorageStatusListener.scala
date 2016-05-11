@@ -24,17 +24,20 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.scheduler._
 
 /**
- * :: DeveloperApi ::
- * A SparkListener that maintains executor storage status.
- *
- * This class is thread-safe (unlike JobProgressListener)
- */
+  * :: DeveloperApi ::
+  * A SparkListener that maintains executor storage status.
+  *
+  * This class is thread-safe (unlike JobProgressListener)
+  */
 @DeveloperApi
 class StorageStatusListener(conf: SparkConf) extends SparkListener {
   // This maintains only blocks that are cached (i.e. storage level is not StorageLevel.NONE)
-  private[storage] val executorIdToStorageStatus = mutable.Map[String, StorageStatus]()
-  private[storage] val deadExecutorStorageStatus = new mutable.ListBuffer[StorageStatus]()
-  private[this] val retainedDeadExecutors = conf.getInt("spark.ui.retainedDeadExecutors", 100)
+  private[storage] val executorIdToStorageStatus =
+    mutable.Map[String, StorageStatus]()
+  private[storage] val deadExecutorStorageStatus =
+    new mutable.ListBuffer[StorageStatus]()
+  private[this] val retainedDeadExecutors =
+    conf.getInt("spark.ui.retainedDeadExecutors", 100)
 
   def storageStatusList: Seq[StorageStatus] = synchronized {
     executorIdToStorageStatus.values.toSeq
@@ -45,14 +48,16 @@ class StorageStatusListener(conf: SparkConf) extends SparkListener {
   }
 
   /** Update storage status list to reflect updated block statuses */
-  private def updateStorageStatus(execId: String, updatedBlocks: Seq[(BlockId, BlockStatus)]) {
+  private def updateStorageStatus(
+      execId: String, updatedBlocks: Seq[(BlockId, BlockStatus)]) {
     executorIdToStorageStatus.get(execId).foreach { storageStatus =>
-      updatedBlocks.foreach { case (blockId, updatedStatus) =>
-        if (updatedStatus.storageLevel == StorageLevel.NONE) {
-          storageStatus.removeBlock(blockId)
-        } else {
-          storageStatus.updateBlock(blockId, updatedStatus)
-        }
+      updatedBlocks.foreach {
+        case (blockId, updatedStatus) =>
+          if (updatedStatus.storageLevel == StorageLevel.NONE) {
+            storageStatus.removeBlock(blockId)
+          } else {
+            storageStatus.updateBlock(blockId, updatedStatus)
+          }
       }
     }
   }
@@ -60,8 +65,9 @@ class StorageStatusListener(conf: SparkConf) extends SparkListener {
   /** Update storage status list to reflect the removal of an RDD from the cache */
   private def updateStorageStatus(unpersistedRDDId: Int) {
     storageStatusList.foreach { storageStatus =>
-      storageStatus.rddBlocksById(unpersistedRDDId).foreach { case (blockId, _) =>
-        storageStatus.removeBlock(blockId)
+      storageStatus.rddBlocksById(unpersistedRDDId).foreach {
+        case (blockId, _) =>
+          storageStatus.removeBlock(blockId)
       }
     }
   }
@@ -77,11 +83,13 @@ class StorageStatusListener(conf: SparkConf) extends SparkListener {
     }
   }
 
-  override def onUnpersistRDD(unpersistRDD: SparkListenerUnpersistRDD): Unit = synchronized {
-    updateStorageStatus(unpersistRDD.rddId)
-  }
+  override def onUnpersistRDD(unpersistRDD: SparkListenerUnpersistRDD): Unit =
+    synchronized {
+      updateStorageStatus(unpersistRDD.rddId)
+    }
 
-  override def onBlockManagerAdded(blockManagerAdded: SparkListenerBlockManagerAdded) {
+  override def onBlockManagerAdded(
+      blockManagerAdded: SparkListenerBlockManagerAdded) {
     synchronized {
       val blockManagerId = blockManagerAdded.blockManagerId
       val executorId = blockManagerId.executorId
@@ -91,7 +99,8 @@ class StorageStatusListener(conf: SparkConf) extends SparkListener {
     }
   }
 
-  override def onBlockManagerRemoved(blockManagerRemoved: SparkListenerBlockManagerRemoved) {
+  override def onBlockManagerRemoved(
+      blockManagerRemoved: SparkListenerBlockManagerRemoved) {
     synchronized {
       val executorId = blockManagerRemoved.blockManagerId.executorId
       executorIdToStorageStatus.remove(executorId).foreach { status =>

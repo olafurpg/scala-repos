@@ -2,32 +2,37 @@ package mesosphere.marathon.api.v2
 
 import java.util.Collections
 
-import mesosphere.marathon.api.{ TestGroupManagerFixture, TestAuthFixture }
+import mesosphere.marathon.api.{TestGroupManagerFixture, TestAuthFixture}
 import mesosphere.marathon.api.v2.json.Formats._
 import mesosphere.marathon.api.v2.json.GroupUpdate
 import mesosphere.marathon.core.appinfo._
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state._
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{ ConflictingChangeException, UnknownGroupException, MarathonConf, MarathonSpec }
-import org.scalatest.{ GivenWhenThen, Matchers }
-import play.api.libs.json.{ JsObject, Json }
+import mesosphere.marathon.{ConflictingChangeException, UnknownGroupException, MarathonConf, MarathonSpec}
+import org.scalatest.{GivenWhenThen, Matchers}
+import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class GroupsResourceTest extends MarathonSpec with Matchers with Mockito with GivenWhenThen {
+class GroupsResourceTest
+    extends MarathonSpec with Matchers with Mockito with GivenWhenThen {
   test("dry run update") {
     Given("A real Group Manager with no groups")
     useRealGroupManager()
-    groupRepository.group(GroupRepository.zkRootName) returns Future.successful(Some(Group.empty))
+    groupRepository.group(GroupRepository.zkRootName) returns Future
+      .successful(Some(Group.empty))
 
-    val app = AppDefinition(id = "/test/app".toRootPath, cmd = Some("test cmd"))
-    val update = GroupUpdate(id = Some("/test".toRootPath), apps = Some(Set(app)))
+    val app =
+      AppDefinition(id = "/test/app".toRootPath, cmd = Some("test cmd"))
+    val update =
+      GroupUpdate(id = Some("/test".toRootPath), apps = Some(Set(app)))
 
     When("Doing a dry run update")
     val body = Json.stringify(Json.toJson(update)).getBytes
-    val result = groupsResource.update("/test", force = false, dryRun = true, body, auth.request)
+    val result = groupsResource.update(
+        "/test", force = false, dryRun = true, body, auth.request)
     val json = Json.parse(result.getEntity.toString)
 
     Then("The deployment plan is correct")
@@ -67,17 +72,20 @@ class GroupsResourceTest extends MarathonSpec with Matchers with Mockito with Gi
     create.getStatus should be(auth.NotAuthenticatedStatus)
 
     When(s"the group is created")
-    val createWithPath = groupsResource.createWithPath("/my/id", false, body.getBytes("UTF-8"), req)
+    val createWithPath = groupsResource.createWithPath(
+        "/my/id", false, body.getBytes("UTF-8"), req)
     Then("we receive a NotAuthenticated response")
     createWithPath.getStatus should be(auth.NotAuthenticatedStatus)
 
     When(s"the root group is updated")
-    val updateRoot = groupsResource.updateRoot(false, false, body.getBytes("UTF-8"), req)
+    val updateRoot =
+      groupsResource.updateRoot(false, false, body.getBytes("UTF-8"), req)
     Then("we receive a NotAuthenticated response")
     updateRoot.getStatus should be(auth.NotAuthenticatedStatus)
 
     When(s"the group is updated")
-    val update = groupsResource.update("", false, false, body.getBytes("UTF-8"), req)
+    val update =
+      groupsResource.update("", false, false, body.getBytes("UTF-8"), req)
     Then("we receive a NotAuthenticated response")
     update.getStatus should be(auth.NotAuthenticatedStatus)
 
@@ -96,7 +104,8 @@ class GroupsResourceTest extends MarathonSpec with Matchers with Mockito with Gi
     Given("A real group manager with one app")
     useRealGroupManager()
     val group = Group(PathId.empty, apps = Set(AppDefinition("/a".toRootPath)))
-    groupRepository.group(GroupRepository.zkRootName) returns Future.successful(Some(group))
+    groupRepository.group(GroupRepository.zkRootName) returns Future
+      .successful(Some(group))
     groupRepository.rootGroup returns Future.successful(Some(group))
 
     Given("An unauthorized request")
@@ -111,17 +120,20 @@ class GroupsResourceTest extends MarathonSpec with Matchers with Mockito with Gi
     create.getStatus should be(auth.UnauthorizedStatus)
 
     When(s"the group is created")
-    val createWithPath = groupsResource.createWithPath("/my/id", false, body.getBytes("UTF-8"), req)
+    val createWithPath = groupsResource.createWithPath(
+        "/my/id", false, body.getBytes("UTF-8"), req)
     Then("we receive a Not Authorized response")
     createWithPath.getStatus should be(auth.UnauthorizedStatus)
 
     When(s"the root group is updated")
-    val updateRoot = groupsResource.updateRoot(false, false, body.getBytes("UTF-8"), req)
+    val updateRoot =
+      groupsResource.updateRoot(false, false, body.getBytes("UTF-8"), req)
     Then("we receive a Not Authorized response")
     updateRoot.getStatus should be(auth.UnauthorizedStatus)
 
     When(s"the group is updated")
-    val update = groupsResource.update("", false, false, body.getBytes("UTF-8"), req)
+    val update =
+      groupsResource.update("", false, false, body.getBytes("UTF-8"), req)
     Then("we receive a Not Authorized response")
     update.getStatus should be(auth.UnauthorizedStatus)
 
@@ -136,11 +148,13 @@ class GroupsResourceTest extends MarathonSpec with Matchers with Mockito with Gi
     delete.getStatus should be(auth.UnauthorizedStatus)
   }
 
-  test("authenticated delete without authorization leads to a 404 if the resource doesn't exist") {
+  test(
+      "authenticated delete without authorization leads to a 404 if the resource doesn't exist") {
     Given("A real group manager with no apps")
     useRealGroupManager()
     groupRepository.group("/") returns Future.successful(None)
-    groupRepository.group(GroupRepository.zkRootName) returns Future.successful(Some(Group.empty))
+    groupRepository.group(GroupRepository.zkRootName) returns Future
+      .successful(Some(Group.empty))
     groupRepository.rootGroup returns Future.successful(Some(Group.empty))
 
     Given("An unauthorized request")
@@ -151,64 +165,88 @@ class GroupsResourceTest extends MarathonSpec with Matchers with Mockito with Gi
     When(s"the group is deleted")
     Then("we get a 404")
     // FIXME (gkleiman): this leads to an ugly stack trace
-    intercept[UnknownGroupException] { groupsResource.delete("/foo", false, req) }
+    intercept[UnknownGroupException] {
+      groupsResource.delete("/foo", false, req)
+    }
   }
 
-  test("Group Versions for root are transferred as simple json string array (Fix #2329)") {
+  test(
+      "Group Versions for root are transferred as simple json string array (Fix #2329)") {
     Given("Specific Group versions")
     val groupVersions = Seq(Timestamp.now(), Timestamp.now())
-    groupManager.versions(PathId.empty) returns Future.successful(groupVersions.toIterable)
-    groupManager.group(PathId.empty) returns Future.successful(Some(Group(PathId.empty)))
+    groupManager.versions(PathId.empty) returns Future.successful(
+        groupVersions.toIterable)
+    groupManager.group(PathId.empty) returns Future.successful(
+        Some(Group(PathId.empty)))
 
     When("The versions are queried")
-    val rootVersionsResponse = groupsResource.group("versions", embed, auth.request)
+    val rootVersionsResponse =
+      groupsResource.group("versions", embed, auth.request)
 
     Then("The versions are send as simple json array")
-    rootVersionsResponse.getStatus should be (200)
-    rootVersionsResponse.getEntity should be(Json.toJson(groupVersions).toString())
+    rootVersionsResponse.getStatus should be(200)
+    rootVersionsResponse.getEntity should be(
+        Json.toJson(groupVersions).toString())
   }
 
-  test("Group Versions for path are transferred as simple json string array (Fix #2329)") {
+  test(
+      "Group Versions for path are transferred as simple json string array (Fix #2329)") {
     Given("Specific group versions")
     val groupVersions = Seq(Timestamp.now(), Timestamp.now())
-    groupManager.versions(any) returns Future.successful(groupVersions.toIterable)
-    groupManager.versions("/foo/bla/blub".toRootPath) returns Future.successful(groupVersions.toIterable)
-    groupManager.group("/foo/bla/blub".toRootPath) returns Future.successful(Some(Group("/foo/bla/blub".toRootPath)))
+    groupManager.versions(any) returns Future.successful(
+        groupVersions.toIterable)
+    groupManager.versions("/foo/bla/blub".toRootPath) returns Future
+      .successful(groupVersions.toIterable)
+    groupManager.group("/foo/bla/blub".toRootPath) returns Future.successful(
+        Some(Group("/foo/bla/blub".toRootPath)))
 
     When("The versions are queried")
-    val rootVersionsResponse = groupsResource.group("/foo/bla/blub/versions", embed, auth.request)
+    val rootVersionsResponse =
+      groupsResource.group("/foo/bla/blub/versions", embed, auth.request)
 
     Then("The versions are send as simple json array")
-    rootVersionsResponse.getStatus should be (200)
-    rootVersionsResponse.getEntity should be(Json.toJson(groupVersions).toString())
+    rootVersionsResponse.getStatus should be(200)
+    rootVersionsResponse.getEntity should be(
+        Json.toJson(groupVersions).toString())
   }
 
-  test("Creation of a group with same path as an existing app should be prohibited (fixes #3385)") {
+  test(
+      "Creation of a group with same path as an existing app should be prohibited (fixes #3385)") {
     Given("A real group manager with one app")
     useRealGroupManager()
-    val group = Group("/group".toRootPath, apps = Set(AppDefinition("/group/app".toRootPath)))
-    groupRepository.group(GroupRepository.zkRootName) returns Future.successful(Some(group))
+    val group = Group("/group".toRootPath,
+                      apps = Set(AppDefinition("/group/app".toRootPath)))
+    groupRepository.group(GroupRepository.zkRootName) returns Future
+      .successful(Some(group))
     groupRepository.rootGroup returns Future.successful(Some(group))
 
     When("creating a group with the same path existing app")
-    val body = Json.stringify(Json.toJson(GroupUpdate(id = Some("/group/app".toRootPath))))
+    val body = Json.stringify(
+        Json.toJson(GroupUpdate(id = Some("/group/app".toRootPath))))
 
     Then("we get a 409")
-    intercept[ConflictingChangeException] { groupsResource.create(false, body.getBytes, auth.request) }
+    intercept[ConflictingChangeException] {
+      groupsResource.create(false, body.getBytes, auth.request)
+    }
   }
 
-  test("Creation of a group with same path as an existing group should be prohibited") {
+  test(
+      "Creation of a group with same path as an existing group should be prohibited") {
     Given("A real group manager with one app")
     useRealGroupManager()
     val group = Group("/group".toRootPath)
-    groupRepository.group(GroupRepository.zkRootName) returns Future.successful(Some(group))
+    groupRepository.group(GroupRepository.zkRootName) returns Future
+      .successful(Some(group))
     groupRepository.rootGroup returns Future.successful(Some(group))
 
     When("creating a group with the same path existing app")
-    val body = Json.stringify(Json.toJson(GroupUpdate(id = Some("/group".toRootPath))))
+    val body =
+      Json.stringify(Json.toJson(GroupUpdate(id = Some("/group".toRootPath))))
 
     Then("we get a 409")
-    intercept[ConflictingChangeException] { groupsResource.create(false, body.getBytes, auth.request) }
+    intercept[ConflictingChangeException] {
+      groupsResource.create(false, body.getBytes, auth.request)
+    }
   }
 
   var config: MarathonConf = _
@@ -223,7 +261,8 @@ class GroupsResourceTest extends MarathonSpec with Matchers with Mockito with Gi
     auth = new TestAuthFixture
     config = mock[MarathonConf]
     groupManager = mock[GroupManager]
-    groupsResource = new GroupsResource(groupManager, groupInfo, auth.auth, auth.auth, config)
+    groupsResource = new GroupsResource(
+        groupManager, groupInfo, auth.auth, auth.auth, config)
 
     config.zkTimeoutDuration returns 1.second
   }
@@ -236,6 +275,7 @@ class GroupsResourceTest extends MarathonSpec with Matchers with Mockito with Gi
 
     config.zkTimeoutDuration returns 1.second
 
-    groupsResource = new GroupsResource(groupManager, groupInfo, auth.auth, auth.auth, config)
+    groupsResource = new GroupsResource(
+        groupManager, groupInfo, auth.auth, auth.auth, config)
   }
 }

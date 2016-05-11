@@ -1,7 +1,7 @@
 package akka.dispatch
 
-import akka.testkit.{ DefaultTimeout, AkkaSpec }
-import akka.actor.{ Actor, Props }
+import akka.testkit.{DefaultTimeout, AkkaSpec}
+import akka.actor.{Actor, Props}
 
 object ControlAwareDispatcherSpec {
   val config = """
@@ -17,7 +17,8 @@ object ControlAwareDispatcherSpec {
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ControlAwareDispatcherSpec extends AkkaSpec(ControlAwareDispatcherSpec.config) with DefaultTimeout {
+class ControlAwareDispatcherSpec
+    extends AkkaSpec(ControlAwareDispatcherSpec.config) with DefaultTimeout {
   import ControlAwareDispatcherSpec.ImportantMessage
 
   "A ControlAwareDispatcher" must {
@@ -50,7 +51,6 @@ class ControlAwareDispatcherSpec extends AkkaSpec(ControlAwareDispatcherSpec.con
       }).withDispatcher(dispatcherKey))
 
       def receive = Actor.emptyBehavior
-
     }))
 
     expectMsg(ImportantMessage)

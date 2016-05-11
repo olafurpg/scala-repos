@@ -1,7 +1,7 @@
 trait ITest {
-  def foo : Int
+  def foo: Int
 }
 
-class Test(val foo : Int) extends ITest {
-  def bar = /* line: 5 */foo
+class Test(val foo: Int) extends ITest {
+  def bar = /* line: 5 */ foo
 }

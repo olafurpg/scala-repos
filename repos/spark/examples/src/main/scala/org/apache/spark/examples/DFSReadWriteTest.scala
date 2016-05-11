@@ -49,12 +49,10 @@ object DFSReadWriteTest {
   }
 
   private def printUsage(): Unit = {
-    val usage: String = "DFS Read-Write Test\n" +
-    "\n" +
-    "Usage: localFile dfsDir\n" +
-    "\n" +
-    "localFile - (string) local file to use in test\n" +
-    "dfsDir - (string) DFS directory for read/write tests\n"
+    val usage: String =
+      "DFS Read-Write Test\n" + "\n" + "Usage: localFile dfsDir\n" + "\n" +
+      "localFile - (string) local file to use in test\n" +
+      "dfsDir - (string) DFS directory for read/write tests\n"
 
     println(usage)
   }
@@ -85,7 +83,8 @@ object DFSReadWriteTest {
   }
 
   def runLocalWordCount(fileContents: List[String]): Int = {
-    fileContents.flatMap(_.split(" "))
+    fileContents
+      .flatMap(_.split(" "))
       .flatMap(_.split("\t"))
       .filter(_.nonEmpty)
       .groupBy(w => w)
@@ -127,13 +126,14 @@ object DFSReadWriteTest {
     sc.stop()
 
     if (localWordCount == dfsWordCount) {
-      println(s"Success! Local Word Count ($localWordCount) " +
-        s"and DFS Word Count ($dfsWordCount) agree.")
+      println(
+          s"Success! Local Word Count ($localWordCount) " +
+          s"and DFS Word Count ($dfsWordCount) agree.")
     } else {
-      println(s"Failure! Local Word Count ($localWordCount) " +
-        s"and DFS Word Count ($dfsWordCount) disagree.")
+      println(
+          s"Failure! Local Word Count ($localWordCount) " +
+          s"and DFS Word Count ($dfsWordCount) disagree.")
     }
-
   }
 }
 // scalastyle:on println

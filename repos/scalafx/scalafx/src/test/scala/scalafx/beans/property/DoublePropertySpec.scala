@@ -37,10 +37,10 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import scalafx.Includes._
 
 /**
- * DoubleProperty Spec tests.
- *
- *
- */
+  * DoubleProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class DoublePropertySpec extends FlatSpec with BeforeAndAfterEach {
   val bean = new Object()

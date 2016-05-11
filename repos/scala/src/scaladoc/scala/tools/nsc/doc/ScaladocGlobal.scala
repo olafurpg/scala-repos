@@ -8,16 +8,17 @@ package doc
 
 import reporters.Reporter
 
-trait ScaladocGlobalTrait extends Global {
-  outer =>
+trait ScaladocGlobalTrait extends Global { outer =>
 
   override val useOffsetPositions = false
-  override def newUnitParser(unit: CompilationUnit) = new syntaxAnalyzer.ScaladocUnitParser(unit, Nil)
+  override def newUnitParser(unit: CompilationUnit) =
+    new syntaxAnalyzer.ScaladocUnitParser(unit, Nil)
 
-  override lazy val syntaxAnalyzer = new ScaladocSyntaxAnalyzer[outer.type](outer) {
-    val runsAfter = List[String]()
-    val runsRightAfter = None
-  }
+  override lazy val syntaxAnalyzer =
+    new ScaladocSyntaxAnalyzer[outer.type](outer) {
+      val runsAfter = List[String]()
+      val runsRightAfter = None
+    }
 
   override lazy val loaders = new {
     val global: outer.type = outer
@@ -32,7 +33,8 @@ trait ScaladocGlobalTrait extends Global {
   }
 }
 
-class ScaladocGlobal(settings: doc.Settings, reporter: Reporter) extends Global(settings, reporter) with ScaladocGlobalTrait {
+class ScaladocGlobal(settings: doc.Settings, reporter: Reporter)
+    extends Global(settings, reporter) with ScaladocGlobalTrait {
   override protected def computeInternalPhases() {
     phasesSet += syntaxAnalyzer
     phasesSet += analyzer.namerFactory

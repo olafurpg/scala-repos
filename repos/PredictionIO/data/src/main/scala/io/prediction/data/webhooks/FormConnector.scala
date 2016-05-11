@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.webhooks
 
 import org.json4s.JObject
@@ -26,7 +25,6 @@ private[prediction] trait FormConnector {
   /** Convert from original Form submission data to Event JObject
     * @param data Map of key-value pairs in String type received through webhooks
     * @return Event JObject
-   */
+    */
   def toEventJson(data: Map[String, String]): JObject
-
 }

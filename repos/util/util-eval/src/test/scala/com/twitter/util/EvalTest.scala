@@ -20,13 +20,14 @@ class EvalTest extends WordSpec {
     }
 
     "apply(new File(...))" in {
-      assert((new Eval).apply[Int](TempFile.fromResourcePath("/OnePlusOne.scala")) == 2)
+      assert((new Eval)
+            .apply[Int](TempFile.fromResourcePath("/OnePlusOne.scala")) == 2)
     }
 
     "apply(new File(...), new File(...))" in {
       val derived = (new Eval).apply[() => String](
-        TempFile.fromResourcePath("/Base.scala"),
-        TempFile.fromResourcePath("/Derived.scala"))
+          TempFile.fromResourcePath("/Base.scala"),
+          TempFile.fromResourcePath("/Derived.scala"))
       assert(derived() == "hello")
     }
 
@@ -39,9 +40,10 @@ class EvalTest extends WordSpec {
       val res: String = e(sourceFile)
       assert(res == "hello")
       val className = e.fileToClassName(sourceFile)
-      val processedSource = e.sourceForString(Source.fromFile(sourceFile).getLines().mkString("\n"))
+      val processedSource = e.sourceForString(
+          Source.fromFile(sourceFile).getLines().mkString("\n"))
       val fullClassName = "Evaluator__%s_%s.class".format(
-        className, e.uniqueId(processedSource, None))
+          className, e.uniqueId(processedSource, None))
       val targetFileName = f.getAbsolutePath() + File.separator + fullClassName
       val targetFile = new File(targetFileName)
       assert(targetFile.exists)
@@ -58,9 +60,10 @@ class EvalTest extends WordSpec {
 
       // make sure it created a class file with the expected name
       val className = e.fileToClassName(sourceFile)
-      val processedSource = e.sourceForString(Source.fromFile(sourceFile).getLines().mkString("\n"))
+      val processedSource = e.sourceForString(
+          Source.fromFile(sourceFile).getLines().mkString("\n"))
       val fullClassName = "Evaluator__%s_%s.class".format(
-        className, e.uniqueId(processedSource, None))
+          className, e.uniqueId(processedSource, None))
       val targetFileName = f.getAbsolutePath() + File.separator + fullClassName
       val targetFile = new File(targetFileName)
       assert(targetFile.exists)
@@ -96,12 +99,13 @@ class EvalTest extends WordSpec {
     }
 
     "apply(InputStream)" in {
-      assert((new Eval).apply[Int](getClass.getResourceAsStream("/OnePlusOne.scala")) == 2)
+      assert((new Eval).apply[Int](
+              getClass.getResourceAsStream("/OnePlusOne.scala")) == 2)
     }
 
     "uses deprecated" in {
-      val deprecated = (new Eval).apply[() => String](
-        TempFile.fromResourcePath("/Deprecated.scala"))
+      val deprecated = (new Eval)
+        .apply[() => String](TempFile.fromResourcePath("/Deprecated.scala"))
       assert(deprecated() == "hello")
     }
 
@@ -126,22 +130,23 @@ class EvalTest extends WordSpec {
 
     "#include" in {
       val derived = Eval[() => String](
-        TempFile.fromResourcePath("/Base.scala"),
-        TempFile.fromResourcePath("/DerivedWithInclude.scala"))
+          TempFile.fromResourcePath("/Base.scala"),
+          TempFile.fromResourcePath("/DerivedWithInclude.scala"))
       assert(derived() == "hello")
       assert(derived.toString == "hello, joe")
     }
 
     "recursive #include" in {
-      val derived = Eval[() => String](
-        TempFile.fromResourcePath("/Base.scala"),
-        TempFile.fromResourcePath("/IncludeInclude.scala"))
+      val derived =
+        Eval[() => String](TempFile.fromResourcePath("/Base.scala"),
+                           TempFile.fromResourcePath("/IncludeInclude.scala"))
       assert(derived() == "hello")
       assert(derived.toString == "hello, joe; hello, joe")
     }
 
     "toSource returns post-processed code" in {
-      val derived = Eval.toSource(TempFile.fromResourcePath("/DerivedWithInclude.scala"))
+      val derived =
+        Eval.toSource(TempFile.fromResourcePath("/DerivedWithInclude.scala"))
       assert(derived.contains("hello, joe"))
       assert(derived.contains("new Base"))
     }
@@ -149,7 +154,7 @@ class EvalTest extends WordSpec {
     "throws a compilation error when Ruby is #included" in {
       intercept[Throwable] {
         Eval[() => String](
-          TempFile.fromResourcePath("RubyInclude.scala")
+            TempFile.fromResourcePath("RubyInclude.scala")
         )
       }
     }
@@ -163,9 +168,11 @@ class EvalTest extends WordSpec {
       // with lots o dots
       assert(e.fileToClassName(new File("foo.bar.baz")) == "foo$2ebar")
       // with dashes
-      assert(e.fileToClassName(new File("foo-bar-baz.scala")) == "foo$2dbar$2dbaz")
+      assert(
+          e.fileToClassName(new File("foo-bar-baz.scala")) == "foo$2dbar$2dbaz")
       // with crazy things
-      assert(e.fileToClassName(new File("foo$! -@@@")) == "foo$24$21$20$2d$40$40$40")
+      assert(
+          e.fileToClassName(new File("foo$! -@@@")) == "foo$24$21$20$2d$40$40$40")
     }
 
     "allow custom error reporting" when {
@@ -173,10 +180,13 @@ class EvalTest extends WordSpec {
         val eval = new Eval {
           @volatile var errors: Seq[(String, String)] = Nil
 
-          override lazy val compilerMessageHandler: Option[Reporter] = Some(new AbstractReporter {
+          override lazy val compilerMessageHandler: Option[Reporter] = Some(
+              new AbstractReporter {
             override val settings: Settings = compilerSettings
             override def displayPrompt(): Unit = ()
-            override def display(pos: Position, msg: String, severity: this.type#Severity): Unit = {
+            override def display(pos: Position,
+                                 msg: String,
+                                 severity: this.type#Severity): Unit = {
               errors = errors :+ ((msg, severity.toString))
             }
             override def reset() = {

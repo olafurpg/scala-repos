@@ -17,7 +17,7 @@ class RequestSemaphoreFilterTest extends FunSuite {
     })
 
     val stk: StackBuilder[ServiceFactory[Int, Int]] = new StackBuilder(
-      Stack.Leaf(Stack.Role("never"), neverFactory)
+        Stack.Leaf(Stack.Role("never"), neverFactory)
     )
 
     stk.push(RequestSemaphoreFilter.module[Int, Int])
@@ -25,20 +25,18 @@ class RequestSemaphoreFilterTest extends FunSuite {
     val sr = new InMemoryStatsReceiver
     val max = 10
 
-    val params = Stack.Params.empty +
-      RequestSemaphoreFilter.Param(Some(new AsyncSemaphore(max, 0))) +
-      param.Stats(sr)
+    val params =
+      Stack.Params.empty + RequestSemaphoreFilter.Param(
+          Some(new AsyncSemaphore(max, 0))) + param.Stats(sr)
 
     val factory = stk.make(params)
 
-    for (_ <- 0 to max)
-      factory().flatMap(_(1))
+    for (_ <- 0 to max) factory().flatMap(_ (1))
 
     assert(sr.gauges(Seq("request_concurrency"))() == max)
     assert(sr.gauges(Seq("request_queue_size"))() == 0.0)
 
-    for (_ <- 0 to max)
-      factory().flatMap(_(1))
+    for (_ <- 0 to max) factory().flatMap(_ (1))
 
     assert(sr.gauges(Seq("request_concurrency"))() == max)
     assert(sr.gauges(Seq("request_queue_size"))() == 0.0)

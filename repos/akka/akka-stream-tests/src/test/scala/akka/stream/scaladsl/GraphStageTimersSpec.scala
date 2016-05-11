@@ -1,12 +1,12 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import akka.actor.ActorRef
-import akka.stream.{ Attributes, ActorMaterializer }
+import akka.stream.{Attributes, ActorMaterializer}
 import akka.stream.impl.fusing.GraphStages.SimpleLinearGraphStage
-import akka.stream.stage.{ TimerGraphStageLogic, OutHandler, AsyncCallback, InHandler }
+import akka.stream.stage.{TimerGraphStageLogic, OutHandler, AsyncCallback, InHandler}
 import akka.testkit.AkkaSpec
 import akka.testkit.TestDuration
 
@@ -33,7 +33,6 @@ object GraphStageTimersSpec {
 
     def stopStage(): Unit = stopPromise.trySuccess(None)
   }
-
 }
 
 class GraphStageTimersSpec extends AkkaSpec {
@@ -41,53 +40,59 @@ class GraphStageTimersSpec extends AkkaSpec {
 
   implicit val materializer = ActorMaterializer()
 
-  class TestStage(probe: ActorRef, sideChannel: SideChannel) extends SimpleLinearGraphStage[Int] {
-    override def createLogic(inheritedAttributes: Attributes) = new TimerGraphStageLogic(shape) {
-      val tickCount = Iterator from 1
+  class TestStage(probe: ActorRef, sideChannel: SideChannel)
+      extends SimpleLinearGraphStage[Int] {
+    override def createLogic(inheritedAttributes: Attributes) =
+      new TimerGraphStageLogic(shape) {
+        val tickCount = Iterator from 1
 
-      setHandler(in, new InHandler {
-        override def onPush() = push(out, grab(in))
-      })
+        setHandler(in, new InHandler {
+          override def onPush() = push(out, grab(in))
+        })
 
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = pull(in)
-      })
+        setHandler(out, new OutHandler {
+          override def onPull(): Unit = pull(in)
+        })
 
-      override def preStart() = {
-        sideChannel.asyncCallback = getAsyncCallback(onTestEvent)
+        override def preStart() = {
+          sideChannel.asyncCallback = getAsyncCallback(onTestEvent)
+        }
+
+        override protected def onTimer(timerKey: Any): Unit = {
+          val tick = Tick(tickCount.next())
+          probe ! tick
+          if (timerKey == "TestSingleTimerResubmit" && tick.n == 1)
+            scheduleOnce("TestSingleTimerResubmit", 500.millis.dilated)
+          else if (timerKey == "TestRepeatedTimer" && tick.n == 5)
+            cancelTimer("TestRepeatedTimer")
+        }
+
+        private def onTestEvent(event: Any): Unit = event match {
+          case TestSingleTimer ⇒
+            scheduleOnce("TestSingleTimer", 500.millis.dilated)
+          case TestSingleTimerResubmit ⇒
+            scheduleOnce("TestSingleTimerResubmit", 500.millis.dilated)
+          case TestCancelTimer ⇒
+            scheduleOnce("TestCancelTimer", 1.milli.dilated)
+            // Likely in mailbox but we cannot guarantee
+            cancelTimer("TestCancelTimer")
+            probe ! TestCancelTimerAck
+            scheduleOnce("TestCancelTimer", 500.milli.dilated)
+          case TestRepeatedTimer ⇒
+            schedulePeriodically("TestRepeatedTimer", 100.millis.dilated)
+        }
       }
-
-      override protected def onTimer(timerKey: Any): Unit = {
-        val tick = Tick(tickCount.next())
-        probe ! tick
-        if (timerKey == "TestSingleTimerResubmit" && tick.n == 1)
-          scheduleOnce("TestSingleTimerResubmit", 500.millis.dilated)
-        else if (timerKey == "TestRepeatedTimer" && tick.n == 5)
-          cancelTimer("TestRepeatedTimer")
-      }
-
-      private def onTestEvent(event: Any): Unit = event match {
-        case TestSingleTimer ⇒
-          scheduleOnce("TestSingleTimer", 500.millis.dilated)
-        case TestSingleTimerResubmit ⇒
-          scheduleOnce("TestSingleTimerResubmit", 500.millis.dilated)
-        case TestCancelTimer ⇒
-          scheduleOnce("TestCancelTimer", 1.milli.dilated)
-          // Likely in mailbox but we cannot guarantee
-          cancelTimer("TestCancelTimer")
-          probe ! TestCancelTimerAck
-          scheduleOnce("TestCancelTimer", 500.milli.dilated)
-        case TestRepeatedTimer ⇒
-          schedulePeriodically("TestRepeatedTimer", 100.millis.dilated)
-      }
-    }
   }
 
   "GraphStage timer support" must {
 
     def setupIsolatedStage: SideChannel = {
       val channel = new SideChannel
-      val stopPromise = Source.maybe[Nothing].via(new TestStage(testActor, channel)).to(Sink.ignore).run()
+      val stopPromise = Source
+        .maybe[Nothing]
+        .via(new TestStage(testActor, channel))
+        .to(Sink.ignore)
+        .run()
       channel.stopPromise = stopPromise
       awaitCond(channel.isReady)
       channel
@@ -152,35 +157,40 @@ class GraphStageTimersSpec extends AkkaSpec {
     }
 
     class TestStage2 extends SimpleLinearGraphStage[Int] {
-      override def createLogic(inheritedAttributes: Attributes) = new TimerGraphStageLogic(shape) {
-        var tickCount = 0
+      override def createLogic(inheritedAttributes: Attributes) =
+        new TimerGraphStageLogic(shape) {
+          var tickCount = 0
 
-        override def preStart(): Unit = schedulePeriodically("tick", 100.millis)
+          override def preStart(): Unit =
+            schedulePeriodically("tick", 100.millis)
 
-        setHandler(out, new OutHandler {
-          override def onPull() = () // Do nothing
-          override def onDownstreamFinish() = completeStage()
-        })
+          setHandler(out, new OutHandler {
+            override def onPull() = () // Do nothing
+            override def onDownstreamFinish() = completeStage()
+          })
 
-        setHandler(in, new InHandler {
-          override def onPush() = () // Do nothing
-          override def onUpstreamFinish() = completeStage()
-          override def onUpstreamFailure(ex: Throwable) = failStage(ex)
-        })
+          setHandler(in, new InHandler {
+            override def onPush() = () // Do nothing
+            override def onUpstreamFinish() = completeStage()
+            override def onUpstreamFailure(ex: Throwable) = failStage(ex)
+          })
 
-        override def onTimer(timerKey: Any) = {
-          tickCount += 1
-          if (isAvailable(out)) push(out, tickCount)
-          if (tickCount == 3) cancelTimer("tick")
+          override def onTimer(timerKey: Any) = {
+            tickCount += 1
+            if (isAvailable(out)) push(out, tickCount)
+            if (tickCount == 3) cancelTimer("tick")
+          }
         }
-      }
     }
 
     "produce scheduled ticks as expected" in assertAllStagesStopped {
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
-      Source.fromPublisher(upstream).via(new TestStage2).runWith(Sink.fromSubscriber(downstream))
+      Source
+        .fromPublisher(upstream)
+        .via(new TestStage2)
+        .runWith(Sink.fromSubscriber(downstream))
 
       downstream.request(5)
       downstream.expectNext(1)
@@ -198,26 +208,28 @@ class GraphStageTimersSpec extends AkkaSpec {
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
-      Source.fromPublisher(upstream).via(new SimpleLinearGraphStage[Int] {
-        override def createLogic(inheritedAttributes: Attributes) = new TimerGraphStageLogic(shape) {
-          override def preStart(): Unit = scheduleOnce("tick", 100.millis)
+      Source
+        .fromPublisher(upstream)
+        .via(new SimpleLinearGraphStage[Int] {
+          override def createLogic(inheritedAttributes: Attributes) =
+            new TimerGraphStageLogic(shape) {
+              override def preStart(): Unit = scheduleOnce("tick", 100.millis)
 
-          setHandler(in, new InHandler {
-            override def onPush() = () // Ingore
-          })
+              setHandler(in, new InHandler {
+                override def onPush() = () // Ingore
+              })
 
-          setHandler(out, new OutHandler {
-            override def onPull(): Unit = pull(in)
-          })
+              setHandler(out, new OutHandler {
+                override def onPull(): Unit = pull(in)
+              })
 
-          override def onTimer(timerKey: Any) = throw exception
-        }
-      }).runWith(Sink.fromSubscriber(downstream))
+              override def onTimer(timerKey: Any) = throw exception
+            }
+        })
+        .runWith(Sink.fromSubscriber(downstream))
 
       downstream.request(1)
       downstream.expectError(exception)
     }
-
   }
-
 }

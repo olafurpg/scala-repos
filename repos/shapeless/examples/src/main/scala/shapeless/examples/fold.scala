@@ -17,10 +17,10 @@
 package shapeless.examples
 
 /**
- * Fully polymorphic left fold over an HList.
- *
- * @author Miles Sabin
- */
+  * Fully polymorphic left fold over an HList.
+  *
+  * @author Miles Sabin
+  */
 object FoldExamples extends App {
   import shapeless._
 
@@ -28,8 +28,9 @@ object FoldExamples extends App {
   //  (c : Char, s : String) => s.indexOf(c)
   //  (i : Int, b : Boolean) => if ((i >= 0) == b) "pass" else "fail")
   object combine extends Poly {
-    implicit def caseCharString = use((c : Char, s : String) => s.indexOf(c))
-    implicit def caseIntBoolean = use((i : Int, b : Boolean) => if ((i >= 0) == b) "pass" else "fail")
+    implicit def caseCharString = use((c: Char, s: String) => s.indexOf(c))
+    implicit def caseIntBoolean =
+      use((i: Int, b: Boolean) => if ((i >= 0) == b) "pass" else "fail")
   }
 
   // Computation is:
@@ -44,5 +45,5 @@ object FoldExamples extends App {
   // val c2b = if ((c2a >= 0) == false) "pass" else "fail"
   val l2 = "bar" :: false :: HNil
   val f2 = l2.foldLeft('o')(combine)
-  assert(f2 == "pass")  
+  assert(f2 == "pass")
 }

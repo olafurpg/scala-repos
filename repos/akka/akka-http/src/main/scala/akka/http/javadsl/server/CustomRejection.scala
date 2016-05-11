@@ -5,6 +5,6 @@
 package akka.http.javadsl.server
 
 /**
- * Base class for application defined rejections.
- */
+  * Base class for application defined rejections.
+  */
 abstract class CustomRejection

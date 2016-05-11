@@ -3,8 +3,9 @@ object DifferentLiterals {
   def log(message: String, level: Int) {
     level match {
       case 0 =>
-        /*start*/println("info: ")
-        println(message)/*end*/
+        /*start*/
+        println("info: ")
+        println(message) /*end*/
       case 1 =>
         println("warning: ")
         println(message)
@@ -29,4 +30,4 @@ object DifferentLiterals {
     println(message)
   }
 }
-*/
+ */

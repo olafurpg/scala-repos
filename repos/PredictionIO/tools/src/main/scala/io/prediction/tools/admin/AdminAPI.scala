@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.tools.admin
 
 import akka.actor.{Actor, ActorSystem, Props}
@@ -33,7 +32,7 @@ import spray.routing._
 import scala.concurrent.ExecutionContext
 
 class AdminServiceActor(val commandClient: CommandClient)
-  extends HttpServiceActor {
+    extends HttpServiceActor {
 
   object Json4sProtocol extends Json4sSupport {
     implicit def json4sFormats: Formats = DefaultFormats
@@ -54,10 +53,11 @@ class AdminServiceActor(val commandClient: CommandClient)
       complete(StatusCodes.BadRequest, Map("message" -> msg))
     case MissingQueryParamRejection(msg) :: _ =>
       complete(StatusCodes.NotFound,
-        Map("message" -> s"missing required query parameter ${msg}."))
+               Map("message" -> s"missing required query parameter ${msg}."))
     case AuthenticationFailedRejection(cause, challengeHeaders) :: _ =>
-      complete(StatusCodes.Unauthorized, challengeHeaders,
-        Map("message" -> s"Invalid accessKey."))
+      complete(StatusCodes.Unauthorized,
+               challengeHeaders,
+               Map("message" -> s"Invalid accessKey."))
   }
 
   val jsonPath = """(.+)\.json$""".r
@@ -69,55 +69,49 @@ class AdminServiceActor(val commandClient: CommandClient)
           complete(Map("status" -> "alive"))
         }
       }
-    } ~
-      path("cmd" / "app" / Segment / "data") {
-        appName => {
-          delete {
-            respondWithMediaType(MediaTypes.`application/json`) {
-              complete(commandClient.futureAppDataDelete(appName))
-            }
-          }
-        }
-      } ~
-      path("cmd" / "app" / Segment) {
-        appName => {
-          delete {
-            respondWithMediaType(MediaTypes.`application/json`) {
-              complete(commandClient.futureAppDelete(appName))
-            }
-          }
-        }
-      } ~
-      path("cmd" / "app") {
-        get {
+    } ~ path("cmd" / "app" / Segment / "data") { appName =>
+      {
+        delete {
           respondWithMediaType(MediaTypes.`application/json`) {
-            complete(commandClient.futureAppList())
+            complete(commandClient.futureAppDataDelete(appName))
           }
-        } ~
-          post {
-            entity(as[AppRequest]) {
-              appArgs => respondWithMediaType(MediaTypes.`application/json`) {
-                complete(commandClient.futureAppNew(appArgs))
-              }
-            }
-          }
+        }
       }
+    } ~ path("cmd" / "app" / Segment) { appName =>
+      {
+        delete {
+          respondWithMediaType(MediaTypes.`application/json`) {
+            complete(commandClient.futureAppDelete(appName))
+          }
+        }
+      }
+    } ~ path("cmd" / "app") {
+      get {
+        respondWithMediaType(MediaTypes.`application/json`) {
+          complete(commandClient.futureAppList())
+        }
+      } ~ post {
+        entity(as[AppRequest]) { appArgs =>
+          respondWithMediaType(MediaTypes.`application/json`) {
+            complete(commandClient.futureAppNew(appArgs))
+          }
+        }
+      }
+    }
   def receive: Actor.Receive = runRoute(route)
 }
 
 class AdminServerActor(val commandClient: CommandClient) extends Actor {
   val log = Logging(context.system, this)
   val child = context.actorOf(
-    Props(classOf[AdminServiceActor], commandClient),
-    "AdminServiceActor")
+      Props(classOf[AdminServiceActor], commandClient), "AdminServiceActor")
 
   implicit val system = context.system
 
   def receive: PartialFunction[Any, Unit] = {
     case StartServer(host, portNum) => {
-      IO(Http) ! Http.Bind(child, interface = host, port = portNum)
-
-    }
+        IO(Http) ! Http.Bind(child, interface = host, port = portNum)
+      }
     case m: Http.Bound => log.info("Bound received. AdminServer is ready.")
     case m: Http.CommandFailed => log.error("Command failed.")
     case _ => log.error("Unknown message.")
@@ -125,8 +119,8 @@ class AdminServerActor(val commandClient: CommandClient) extends Actor {
 }
 
 case class AdminServerConfig(
-  ip: String = "localhost",
-  port: Int = 7071
+    ip: String = "localhost",
+    port: Int = 7071
 )
 
 object AdminServer {
@@ -134,23 +128,21 @@ object AdminServer {
     implicit val system = ActorSystem("AdminServerSystem")
 
     val commandClient = new CommandClient(
-      appClient = Storage.getMetaDataApps,
-      accessKeyClient = Storage.getMetaDataAccessKeys,
-      eventClient = Storage.getLEvents()
+        appClient = Storage.getMetaDataApps,
+        accessKeyClient = Storage.getMetaDataAccessKeys,
+        eventClient = Storage.getLEvents()
     )
 
     val serverActor = system.actorOf(
-      Props(classOf[AdminServerActor], commandClient),
-      "AdminServerActor")
+        Props(classOf[AdminServerActor], commandClient), "AdminServerActor")
     serverActor ! StartServer(config.ip, config.port)
     system.awaitTermination
   }
 }
 
 object AdminRun {
-  def main (args: Array[String]) {
-    AdminServer.createAdminServer(AdminServerConfig(
-      ip = "localhost",
-      port = 7071))
+  def main(args: Array[String]) {
+    AdminServer.createAdminServer(
+        AdminServerConfig(ip = "localhost", port = 7071))
   }
 }

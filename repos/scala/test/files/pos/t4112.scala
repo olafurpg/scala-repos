@@ -1,8 +1,4 @@
-
-
 import collection.immutable._
-
-
 
 object Test {
   def main(args: Array[String]) {

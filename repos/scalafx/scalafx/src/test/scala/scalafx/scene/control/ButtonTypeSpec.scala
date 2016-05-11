@@ -36,15 +36,14 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- *
- * Test for [[scalafx.scene.control.ButtonType]].
- */
+  *
+  * Test for [[scalafx.scene.control.ButtonType]].
+  */
 @RunWith(classOf[JUnitRunner])
 class ButtonTypeSpec
-  extends SimpleSFXDelegateSpec[jfxsc.ButtonType, ButtonType](
-    classOf[jfxsc.ButtonType], classOf[ButtonType]) {
+    extends SimpleSFXDelegateSpec[jfxsc.ButtonType, ButtonType](
+        classOf[jfxsc.ButtonType], classOf[ButtonType]) {
 
   override protected def getScalaClassInstance = ButtonType.OK
   override protected def getJavaClassInstance = jfxsc.ButtonType.OK
 }
-

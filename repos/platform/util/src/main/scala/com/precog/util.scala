@@ -43,7 +43,8 @@ package object util {
     }
   }
 
-  implicit def Order2JComparator[A](order: Order[A]): Order2JComparator[A] = new Order2JComparator(order)
+  implicit def Order2JComparator[A](order: Order[A]): Order2JComparator[A] =
+    new Order2JComparator(order)
 
   def using[A, B](a: A)(f: A => B)(implicit close: Close[A]): B = {
     val result = f(a)
@@ -53,7 +54,7 @@ package object util {
 
   private val MAX_LONG = BigInt(Long.MaxValue)
   private val MIN_LONG = BigInt(Long.MinValue)
-  
+
   @inline
   final def isValidLong(i: BigInt): Boolean = {
     MIN_LONG <= i && i <= MAX_LONG
@@ -76,31 +77,39 @@ package object util {
     def append(v1: BigDecimal, v2: => BigDecimal): BigDecimal = v1 + v2
   }
 
-  final class LazyMap[A, B, C](source: Map[A, B], f: B => C) extends Map[A, C] {
+  final class LazyMap[A, B, C](source: Map[A, B], f: B => C)
+      extends Map[A, C] {
     import scala.collection.JavaConverters._
 
-    private val m: mutable.ConcurrentMap[A, C] = new java.util.concurrent.ConcurrentHashMap[A, C]().asScala
+    private val m: mutable.ConcurrentMap[A, C] =
+      new java.util.concurrent.ConcurrentHashMap[A, C]().asScala
 
-    def iterator: Iterator[(A, C)] = source.keysIterator map { a => (a, apply(a)) }
-
-    def get(a: A): Option[C] = {
-      m get a orElse (source get a map { b =>
-        val c = f(b)
-        m.putIfAbsent(a, c)
-        c
-      })
+    def iterator: Iterator[(A, C)] = source.keysIterator map { a =>
+      (a, apply(a))
     }
 
-    def + [C1 >: C](kv: (A, C1)): Map[A, C1] = iterator.toMap + kv
-    def - (a: A): Map[A, C] = iterator.toMap - a
+    def get(a: A): Option[C] = {
+      m get a orElse
+      (source get a map { b =>
+            val c = f(b)
+            m.putIfAbsent(a, c)
+            c
+          })
+    }
+
+    def +[C1 >: C](kv: (A, C1)): Map[A, C1] = iterator.toMap + kv
+    def -(a: A): Map[A, C] = iterator.toMap - a
   }
 
   sealed trait LazyMapValues[A, B] {
     protected def source: Map[A, B]
-    def lazyMapValues[C](f: B => C): Map[A, C] = new LazyMap[A, B, C](source, f)
+    def lazyMapValues[C](f: B => C): Map[A, C] =
+      new LazyMap[A, B, C](source, f)
   }
 
-  implicit def lazyValueMapper[A, B](m: Map[A, B]) = new LazyMapValues[A, B] { val source = m }
+  implicit def lazyValueMapper[A, B](m: Map[A, B]) = new LazyMapValues[A, B] {
+    val source = m
+  }
 
   def arrayEq[@specialized A](a1: Array[A], a2: Array[A]): Boolean = {
     val len = a1.length
@@ -113,14 +122,15 @@ package object util {
     true
   }
 
-  def msTime[A](log: Long => Unit)(f : => A): A = {
+  def msTime[A](log: Long => Unit)(f: => A): A = {
     val start = System.currentTimeMillis
     val result = f
     log(System.currentTimeMillis - start)
     result
   }
 
-  implicit val InstantOrdering: Ordering[Instant] = Ordering.Long.on[Instant](_.getMillis)
+  implicit val InstantOrdering: Ordering[Instant] =
+    Ordering.Long.on[Instant](_.getMillis)
 
   implicit val FutureBind: Bind[Future] = new Bind[Future] {
     def map[A, B](fut: Future[A])(f: A => B) = fut.map(f)

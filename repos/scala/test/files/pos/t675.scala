@@ -6,12 +6,12 @@ trait T {
     Console.println("FOO_0 initialized")
   }
   trait X {
-    def foo : Foo = FOO_0;
+    def foo: Foo = FOO_0;
   }
 }
 
 object Test extends App {
-  val t = new T{}
-  val x = new t.X{}
+  val t = new T {}
+  val x = new t.X {}
   Console.println(x.foo)
 }

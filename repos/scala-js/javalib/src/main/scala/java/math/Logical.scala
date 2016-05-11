@@ -26,17 +26,17 @@ package java.math
 import scala.annotation.tailrec
 
 /** Logical operations over {@code BigInteger}.
- *
- *  The library implements some logical operations over {@code BigInteger}. The
- *  operations provided are listed below.
- *  <ul type="circle">
- *  <li>not</li>
- *  <li>and</li>
- *  <li>andNot</li>
- *  <li>or</li>
- *  <li>xor</li>
- *  </ul>
- */
+  *
+  *  The library implements some logical operations over {@code BigInteger}. The
+  *  operations provided are listed below.
+  *  <ul type="circle">
+  *  <li>not</li>
+  *  <li>and</li>
+  *  <li>andNot</li>
+  *  <li>or</li>
+  *  <li>xor</li>
+  *  </ul>
+  */
 private[math] object Logical {
 
   /** @see BigInteger#not() */
@@ -55,7 +55,7 @@ private[math] object Logical {
             i += 1
           }
         } else {
-          while ((i < bi.numberLength) && (bi.digits(i) == -1)) {
+          while ( (i < bi.numberLength) && (bi.digits(i) == -1)) {
             i += 1
           }
           if (i == bi.numberLength) {
@@ -86,22 +86,14 @@ private[math] object Logical {
 
   /** @see BigInteger#and(BigInteger) */
   def and(bi: BigInteger, that: BigInteger): BigInteger = {
-    if (that.sign == 0 || bi.sign == 0)
-      BigInteger.ZERO
-    else if (that == BigInteger.MINUS_ONE)
-      bi
-    else if (bi == BigInteger.MINUS_ONE)
-      that
-    else if (bi.sign > 0 && that.sign > 0)
-      andPositive(bi, that)
-    else if (bi.sign > 0)
-      andDiffSigns(bi, that)
-    else if (that.sign > 0)
-      andDiffSigns(that, bi)
-    else if (bi.numberLength > that.numberLength)
-      andNegative(bi, that)
-    else
-      andNegative(that, bi)
+    if (that.sign == 0 || bi.sign == 0) BigInteger.ZERO
+    else if (that == BigInteger.MINUS_ONE) bi
+    else if (bi == BigInteger.MINUS_ONE) that
+    else if (bi.sign > 0 && that.sign > 0) andPositive(bi, that)
+    else if (bi.sign > 0) andDiffSigns(bi, that)
+    else if (that.sign > 0) andDiffSigns(that, bi)
+    else if (bi.numberLength > that.numberLength) andNegative(bi, that)
+    else andNegative(that, bi)
   }
 
   /** @return sign = 1, magnitude = val.magnitude & that.magnitude */
@@ -188,7 +180,7 @@ private[math] object Logical {
 
         @inline
         @tailrec
-        def loop(bi1: BigInteger,bi2: BigInteger): Unit = {
+        def loop(bi1: BigInteger, bi2: BigInteger): Unit = {
           if (i < bi1.numberLength) {
             digit = ~(bi2.digits(i) | bi1.digits(i))
             if (digit == 0) {
@@ -231,22 +223,14 @@ private[math] object Logical {
 
   /** @see BigInteger#andNot(BigInteger) */
   def andNot(bi: BigInteger, that: BigInteger): BigInteger = {
-    if (that.sign == 0)
-      bi
-    else if (bi.sign == 0)
-      BigInteger.ZERO
-    else if (bi == BigInteger.MINUS_ONE)
-      that.not()
-    else if (that == BigInteger.MINUS_ONE)
-      BigInteger.ZERO
-    else if (bi.sign > 0 && that.sign > 0)
-      andNotPositive(bi, that)
-    else if (bi.sign > 0)
-      andNotPositiveNegative(bi, that)
-    else if (that.sign > 0)
-      andNotNegativePositive(bi, that)
-    else
-      andNotNegative(bi, that)
+    if (that.sign == 0) bi
+    else if (bi.sign == 0) BigInteger.ZERO
+    else if (bi == BigInteger.MINUS_ONE) that.not()
+    else if (that == BigInteger.MINUS_ONE) BigInteger.ZERO
+    else if (bi.sign > 0 && that.sign > 0) andNotPositive(bi, that)
+    else if (bi.sign > 0) andNotPositiveNegative(bi, that)
+    else if (that.sign > 0) andNotNegativePositive(bi, that)
+    else andNotNegative(bi, that)
   }
 
   /** @return sign = 1, magnitude = val.magnitude & ~that.magnitude */
@@ -271,7 +255,8 @@ private[math] object Logical {
   }
 
   /** @return sign = 1, magnitude = positive.magnitude & ~(-negative.magnitude) */
-  def andNotPositiveNegative(positive: BigInteger, negative: BigInteger): BigInteger = {
+  def andNotPositiveNegative(
+      positive: BigInteger, negative: BigInteger): BigInteger = {
     // PRE: positive > 0 && negative < 0
     val iNeg = negative.getFirstNonzeroDigit
     val iPos = positive.getFirstNonzeroDigit
@@ -303,7 +288,8 @@ private[math] object Logical {
   }
 
   /** @return sign = -1, magnitude = -(-negative.magnitude & ~positive.magnitude) */
-  def andNotNegativePositive(negative: BigInteger, positive: BigInteger): BigInteger = {
+  def andNotNegativePositive(
+      negative: BigInteger, positive: BigInteger): BigInteger = {
     // scalastyle:off return
     // PRE: negative < 0 && positive > 0
     var limit: Int = 0
@@ -340,7 +326,7 @@ private[math] object Logical {
           def loop(): Unit = {
             if (i < limit) {
               digit = ~(negative.digits(i) | positive.digits(i))
-              if(digit == 0) {
+              if (digit == 0) {
                 i += 1
                 loop()
               }
@@ -352,8 +338,7 @@ private[math] object Logical {
             @inline
             @tailrec
             def loop2(bi: BigInteger): Unit = {
-              if (i < bi.numberLength)
-                digit = ~bi.digits(i)
+              if (i < bi.numberLength) digit = ~bi.digits(i)
               if (digit == 0) {
                 i += 1
                 loop2(bi)
@@ -421,10 +406,9 @@ private[math] object Logical {
         } else {
           resDigits(i) = ~bi.digits(i) & (that.digits(i) - 1)
         }
-      } else  {
-        resDigits(i) =
-          if (iThat < iVal) -bi.digits(i) & that.digits(i)
-          else -bi.digits(i) & (that.digits(i) - 1)
+      } else {
+        resDigits(i) = if (iThat < iVal) -bi.digits(i) & that.digits(i)
+        else -bi.digits(i) & (that.digits(i) - 1)
       }
 
       limit = Math.min(bi.numberLength, that.numberLength)
@@ -750,7 +734,9 @@ private[math] object Logical {
       if (digit == 0) {
         val limit = Math.min(positive.numberLength, negative.numberLength)
         i += 1
-        while (i < limit && {digit = positive.digits(i) ^ ~negative.digits(i);digit} == 0) {
+        while (i < limit && {
+          digit = positive.digits(i) ^ ~negative.digits(i); digit
+        } == 0) {
           i += 1
         }
         if (digit == 0) {

@@ -9,15 +9,15 @@ import org.jetbrains.sbt.project.SbtProjectSystem
 import scala.beans.BeanProperty
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 @State(
-  name = "SbtLocalSettings",
-  storages = Array(new Storage(StoragePathMacros.WORKSPACE_FILE))
+    name = "SbtLocalSettings",
+    storages = Array(new Storage(StoragePathMacros.WORKSPACE_FILE))
 )
 class SbtLocalSettings(project: Project)
-  extends AbstractExternalSystemLocalSettings(SbtProjectSystem.Id, project)
-  with PersistentStateComponent[SbtLocalSettingsState] {
+    extends AbstractExternalSystemLocalSettings(SbtProjectSystem.Id, project)
+    with PersistentStateComponent[SbtLocalSettingsState] {
 
   var sbtSupportSuggested = false
   var lastUpdateTimestamp = 0L
@@ -30,8 +30,8 @@ class SbtLocalSettings(project: Project)
     state
   }
 
-  def loadState(state: SbtLocalSettingsState)  {
-    super[AbstractExternalSystemLocalSettings].loadState(state)
+  def loadState(state: SbtLocalSettingsState) {
+    super [AbstractExternalSystemLocalSettings].loadState(state)
     sbtSupportSuggested = state.getSbtSupportSuggested
     lastUpdateTimestamp = state.getLastUpdateTimestamp
   }
@@ -45,5 +45,6 @@ class SbtLocalSettingsState extends AbstractExternalSystemLocalSettings.State {
 }
 
 object SbtLocalSettings {
-  def getInstance(project: Project) = ServiceManager.getService(project, classOf[SbtLocalSettings])
+  def getInstance(project: Project) =
+    ServiceManager.getService(project, classOf[SbtLocalSettings])
 }

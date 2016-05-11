@@ -25,14 +25,14 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
 /**
- * Evaluator for regression.
- *
- * @param predictionAndObservations an RDD of (prediction, observation) pairs
- * @param throughOrigin True if the regression is through the origin. For example, in linear
- *                      regression, it will be true without fitting intercept.
- */
+  * Evaluator for regression.
+  *
+  * @param predictionAndObservations an RDD of (prediction, observation) pairs
+  * @param throughOrigin True if the regression is through the origin. For example, in linear
+  *                      regression, it will be true without fitting intercept.
+  */
 @Since("1.2.0")
-class RegressionMetrics @Since("2.0.0") (
+class RegressionMetrics @Since("2.0.0")(
     predictionAndObservations: RDD[(Double, Double)], throughOrigin: Boolean)
     extends Logging {
 
@@ -41,22 +41,26 @@ class RegressionMetrics @Since("2.0.0") (
     this(predictionAndObservations, false)
 
   /**
-   * An auxiliary constructor taking a DataFrame.
-   * @param predictionAndObservations a DataFrame with two double columns:
-   *                                  prediction and observation
-   */
+    * An auxiliary constructor taking a DataFrame.
+    * @param predictionAndObservations a DataFrame with two double columns:
+    *                                  prediction and observation
+    */
   private[mllib] def this(predictionAndObservations: DataFrame) =
-    this(predictionAndObservations.rdd.map(r => (r.getDouble(0), r.getDouble(1))))
+    this(
+        predictionAndObservations.rdd.map(
+            r => (r.getDouble(0), r.getDouble(1))))
 
   /**
-   * Use MultivariateOnlineSummarizer to calculate summary statistics of observations and errors.
-   */
+    * Use MultivariateOnlineSummarizer to calculate summary statistics of observations and errors.
+    */
   private lazy val summary: MultivariateStatisticalSummary = {
-    val summary: MultivariateStatisticalSummary = predictionAndObservations.map {
-      case (prediction, observation) => Vectors.dense(observation, observation - prediction)
-    }.aggregate(new MultivariateOnlineSummarizer())(
-        (summary, v) => summary.add(v),
-        (sum1, sum2) => sum1.merge(sum2)
+    val summary: MultivariateStatisticalSummary =
+      predictionAndObservations.map {
+        case (prediction, observation) =>
+          Vectors.dense(observation, observation - prediction)
+      }.aggregate(new MultivariateOnlineSummarizer())(
+          (summary, v) => summary.add(v),
+          (sum1, sum2) => sum1.merge(sum2)
       )
     summary
   }
@@ -72,49 +76,49 @@ class RegressionMetrics @Since("2.0.0") (
   }
 
   /**
-   * Returns the variance explained by regression.
-   * explainedVariance = \sum_i (\hat{y_i} - \bar{y})^2 / n
-   * @see [[https://en.wikipedia.org/wiki/Fraction_of_variance_unexplained]]
-   */
+    * Returns the variance explained by regression.
+    * explainedVariance = \sum_i (\hat{y_i} - \bar{y})^2 / n
+    * @see [[https://en.wikipedia.org/wiki/Fraction_of_variance_unexplained]]
+    */
   @Since("1.2.0")
   def explainedVariance: Double = {
     SSreg / summary.count
   }
 
   /**
-   * Returns the mean absolute error, which is a risk function corresponding to the
-   * expected value of the absolute error loss or l1-norm loss.
-   */
+    * Returns the mean absolute error, which is a risk function corresponding to the
+    * expected value of the absolute error loss or l1-norm loss.
+    */
   @Since("1.2.0")
   def meanAbsoluteError: Double = {
     summary.normL1(1) / summary.count
   }
 
   /**
-   * Returns the mean squared error, which is a risk function corresponding to the
-   * expected value of the squared error loss or quadratic loss.
-   */
+    * Returns the mean squared error, which is a risk function corresponding to the
+    * expected value of the squared error loss or quadratic loss.
+    */
   @Since("1.2.0")
   def meanSquaredError: Double = {
     SSerr / summary.count
   }
 
   /**
-   * Returns the root mean squared error, which is defined as the square root of
-   * the mean squared error.
-   */
+    * Returns the root mean squared error, which is defined as the square root of
+    * the mean squared error.
+    */
   @Since("1.2.0")
   def rootMeanSquaredError: Double = {
     math.sqrt(this.meanSquaredError)
   }
 
   /**
-   * Returns R^2^, the unadjusted coefficient of determination.
-   * @see [[http://en.wikipedia.org/wiki/Coefficient_of_determination]]
-   * In case of regression through the origin, the definition of R^2^ is to be modified.
-   * @see J. G. Eisenhauer, Regression through the Origin. Teaching Statistics 25, 76-80 (2003)
-   * [[https://online.stat.psu.edu/~ajw13/stat501/SpecialTopics/Reg_thru_origin.pdf]]
-   */
+    * Returns R^2^, the unadjusted coefficient of determination.
+    * @see [[http://en.wikipedia.org/wiki/Coefficient_of_determination]]
+    * In case of regression through the origin, the definition of R^2^ is to be modified.
+    * @see J. G. Eisenhauer, Regression through the Origin. Teaching Statistics 25, 76-80 (2003)
+    * [[https://online.stat.psu.edu/~ajw13/stat501/SpecialTopics/Reg_thru_origin.pdf]]
+    */
   @Since("1.2.0")
   def r2: Double = {
     if (throughOrigin) {

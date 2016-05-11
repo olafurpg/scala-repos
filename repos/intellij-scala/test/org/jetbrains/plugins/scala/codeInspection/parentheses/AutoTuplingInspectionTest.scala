@@ -8,27 +8,26 @@ import org.jetbrains.plugins.scala.codeInspection.parameters.{AutoTuplingInspect
   * Author: Svyatoslav Ilinskiy
   * Date: 10/14/15.
   */
-class AutoTuplingInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
-  override protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[AutoTuplingInspection]
+class AutoTuplingInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
+  override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[AutoTuplingInspection]
 
   override protected def annotation: String = AutoTuplingInspection.message
   val hint = MakeTuplesExplicitFix.hint
 
   def testBasic(): Unit = {
-    val text =
-      s"""
+    val text = s"""
         |def foo(a: Any) = {}
         |foo$START(1, 2)$END
       """.stripMargin
     checkTextHasError(text)
 
-    val code =
-      """
+    val code = """
         |def foo(a: Any) = {}
         |foo(<caret>1, 2)
       """.stripMargin
-    val result =
-      """
+    val result = """
         |def foo(a: Any) = {}
         |foo((1, 2))
       """.stripMargin
@@ -36,8 +35,7 @@ class AutoTuplingInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
   }
 
   def testSAMNotHighlighted(): Unit = {
-    val text =
-      """
+    val text = """
         |trait SAM {
         |  def foo(): Int
         |}
@@ -48,29 +46,26 @@ class AutoTuplingInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
   }
 
   def testAutoTupledSAMsAreHighlighted(): Unit = {
-    val text =
-      s"""
+    val text = s"""
          |def foo(a: Any) = {}
          |foo$START(() => println("foo"),  () => 2)$END
       """.stripMargin
     checkTextHasError(text)
 
-    val code =
-      """
+    val code = """
         |def foo(a: Any) = {}
         |foo(<caret>() => println("foo"),  () => 2)
       """.stripMargin
-    val result =
-      """
+    val result = """
         |def foo(a: Any) = {}
         |foo((() => println("foo"), () => 2))
       """.stripMargin
     testFix(code, result, hint)
   }
 
-  def testSAMNotHighlightedWhenTypesOfParametersOfAnonymousFunctionAreInferred(): Unit = {
-    val text =
-      """
+  def testSAMNotHighlightedWhenTypesOfParametersOfAnonymousFunctionAreInferred(
+      ): Unit = {
+    val text = """
         |trait SAM {
         |  def foo(s: String): Char
         |}
@@ -80,5 +75,4 @@ class AutoTuplingInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
       """.stripMargin
     checkTextHasNoErrors(text)
   }
-
 }

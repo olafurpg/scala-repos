@@ -1,7 +1,6 @@
 class A
 
-trait B {
-  self: A =>
+trait B { self: A =>
 
   def test {
     println('blubber)

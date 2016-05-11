@@ -35,9 +35,9 @@ import org.apache.spark.sql.test.ProcessTestUtils.ProcessOutputCapturer
 import org.apache.spark.util.Utils
 
 /**
- * A test suite for the `spark-sql` CLI tool.  Note that all test cases share the same temporary
- * Hive metastore and warehouse.
- */
+  * A test suite for the `spark-sql` CLI tool.  Note that all test cases share the same temporary
+  * Hive metastore and warehouse.
+  */
 class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
   val warehousePath = Utils.createTempDir()
   val metastorePath = Utils.createTempDir()
@@ -61,20 +61,19 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
   }
 
   /**
-   * Run a CLI operation and expect all the queries and expected answers to be returned.
-   * @param timeout maximum time for the commands to complete
-   * @param extraArgs any extra arguments
-   * @param errorResponses a sequence of strings whose presence in the stdout of the forked process
-   *                       is taken as an immediate error condition. That is: if a line containing
-   *                       with one of these strings is found, fail the test immediately.
-   *                       The default value is `Seq("Error:")`
-   *
-   * @param queriesAndExpectedAnswers one or more tuples of query + answer
-   */
-  def runCliWithin(
-      timeout: FiniteDuration,
-      extraArgs: Seq[String] = Seq.empty,
-      errorResponses: Seq[String] = Seq("Error:"))(
+    * Run a CLI operation and expect all the queries and expected answers to be returned.
+    * @param timeout maximum time for the commands to complete
+    * @param extraArgs any extra arguments
+    * @param errorResponses a sequence of strings whose presence in the stdout of the forked process
+    *                       is taken as an immediate error condition. That is: if a line containing
+    *                       with one of these strings is found, fail the test immediately.
+    *                       The default value is `Seq("Error:")`
+    *
+    * @param queriesAndExpectedAnswers one or more tuples of query + answer
+    */
+  def runCliWithin(timeout: FiniteDuration,
+                   extraArgs: Seq[String] = Seq.empty,
+                   errorResponses: Seq[String] = Seq("Error:"))(
       queriesAndExpectedAnswers: (String, String)*): Unit = {
 
     val (queries, expectedAnswers) = queriesAndExpectedAnswers.unzip
@@ -105,7 +104,8 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
       buffer += s"${new Timestamp(new Date().getTime)} - $source> $line"
 
       // If we haven't found all expected answers and another expected answer comes up...
-      if (next < expectedAnswers.size && line.contains(expectedAnswers(next))) {
+      if (next < expectedAnswers.size &&
+          line.contains(expectedAnswers(next))) {
         next += 1
         // If all expected answers have been found...
         if (next == expectedAnswers.size) {
@@ -115,7 +115,7 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
         errorResponses.foreach { r =>
           if (line.contains(r)) {
             foundAllExpectedAnswers.tryFailure(
-              new RuntimeException(s"Failed with error line '$line'"))
+                new RuntimeException(s"Failed with error line '$line'"))
           }
         }
       }
@@ -123,19 +123,22 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
 
     val process = new ProcessBuilder(command: _*).start()
 
-    val stdinWriter = new OutputStreamWriter(process.getOutputStream, StandardCharsets.UTF_8)
+    val stdinWriter = new OutputStreamWriter(
+        process.getOutputStream, StandardCharsets.UTF_8)
     stdinWriter.write(queriesString)
     stdinWriter.flush()
     stdinWriter.close()
 
-    new ProcessOutputCapturer(process.getInputStream, captureOutput("stdout")).start()
-    new ProcessOutputCapturer(process.getErrorStream, captureOutput("stderr")).start()
+    new ProcessOutputCapturer(process.getInputStream, captureOutput("stdout"))
+      .start()
+    new ProcessOutputCapturer(process.getErrorStream, captureOutput("stderr"))
+      .start()
 
     try {
       Await.result(foundAllExpectedAnswers.future, timeout)
-    } catch { case cause: Throwable =>
-      val message =
-        s"""
+    } catch {
+      case cause: Throwable =>
+        val message = s"""
            |=======================
            |CliSuite failure output
            |=======================
@@ -149,30 +152,26 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
            |End CliSuite failure output
            |===========================
          """.stripMargin
-      logError(message, cause)
-      fail(message, cause)
+        logError(message, cause)
+        fail(message, cause)
     } finally {
       process.destroy()
     }
   }
 
   test("Simple commands") {
-    val dataFilePath =
-      Thread.currentThread().getContextClassLoader.getResource("data/files/small_kv.txt")
+    val dataFilePath = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("data/files/small_kv.txt")
 
     runCliWithin(3.minute)(
-      "CREATE TABLE hive_test(key INT, val STRING);"
-        -> "OK",
-      "SHOW TABLES;"
-        -> "hive_test",
-      s"LOAD DATA LOCAL INPATH '$dataFilePath' OVERWRITE INTO TABLE hive_test;"
-        -> "OK",
-      "CACHE TABLE hive_test;"
-        -> "",
-      "SELECT COUNT(*) FROM hive_test;"
-        -> "5",
-      "DROP TABLE hive_test;"
-        -> "OK"
+        "CREATE TABLE hive_test(key INT, val STRING);" -> "OK",
+        "SHOW TABLES;" -> "hive_test",
+        s"LOAD DATA LOCAL INPATH '$dataFilePath' OVERWRITE INTO TABLE hive_test;" -> "OK",
+        "CACHE TABLE hive_test;" -> "",
+        "SELECT COUNT(*) FROM hive_test;" -> "5",
+        "DROP TABLE hive_test;" -> "OK"
     )
   }
 
@@ -182,63 +181,52 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
 
   test("Single command with --database") {
     runCliWithin(2.minute)(
-      "CREATE DATABASE hive_test_db;"
-        -> "OK",
-      "USE hive_test_db;"
-        -> "",
-      "CREATE TABLE hive_test(key INT, val STRING);"
-        -> "OK",
-      "SHOW TABLES;"
-        -> "hive_test"
+        "CREATE DATABASE hive_test_db;" -> "OK",
+        "USE hive_test_db;" -> "",
+        "CREATE TABLE hive_test(key INT, val STRING);" -> "OK",
+        "SHOW TABLES;" -> "hive_test"
     )
 
-    runCliWithin(2.minute, Seq("--database", "hive_test_db", "-e", "SHOW TABLES;"))(
-      ""
-        -> "OK",
-      ""
-        -> "hive_test"
+    runCliWithin(2.minute,
+                 Seq("--database", "hive_test_db", "-e", "SHOW TABLES;"))(
+        "" -> "OK",
+        "" -> "hive_test"
     )
   }
 
   test("Commands using SerDe provided in --jars") {
-    val jarFile =
-      "../hive/src/test/resources/hive-hcatalog-core-0.13.1.jar"
-        .split("/")
-        .mkString(File.separator)
+    val jarFile = "../hive/src/test/resources/hive-hcatalog-core-0.13.1.jar"
+      .split("/")
+      .mkString(File.separator)
 
-    val dataFilePath =
-      Thread.currentThread().getContextClassLoader.getResource("data/files/small_kv.txt")
+    val dataFilePath = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("data/files/small_kv.txt")
 
     runCliWithin(3.minute, Seq("--jars", s"$jarFile"))(
-      """CREATE TABLE t1(key string, val string)
+        """CREATE TABLE t1(key string, val string)
         |ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe';
-      """.stripMargin
-        -> "OK",
-      "CREATE TABLE sourceTable (key INT, val STRING);"
-        -> "OK",
-      s"LOAD DATA LOCAL INPATH '$dataFilePath' OVERWRITE INTO TABLE sourceTable;"
-        -> "OK",
-      "INSERT INTO TABLE t1 SELECT key, val FROM sourceTable;"
-        -> "",
-      "SELECT count(key) FROM t1;"
-        -> "5",
-      "DROP TABLE t1;"
-        -> "OK",
-      "DROP TABLE sourceTable;"
-        -> "OK"
+      """.stripMargin -> "OK",
+        "CREATE TABLE sourceTable (key INT, val STRING);" -> "OK",
+        s"LOAD DATA LOCAL INPATH '$dataFilePath' OVERWRITE INTO TABLE sourceTable;" -> "OK",
+        "INSERT INTO TABLE t1 SELECT key, val FROM sourceTable;" -> "",
+        "SELECT count(key) FROM t1;" -> "5",
+        "DROP TABLE t1;" -> "OK",
+        "DROP TABLE sourceTable;" -> "OK"
     )
   }
 
   test("SPARK-11188 Analysis error reporting") {
     runCliWithin(timeout = 2.minute,
-      errorResponses = Seq("AnalysisException"))(
-      "select * from nonexistent_table;"
-        -> "Error in query: Table not found: nonexistent_table;"
+                 errorResponses = Seq("AnalysisException"))(
+        "select * from nonexistent_table;" -> "Error in query: Table not found: nonexistent_table;"
     )
   }
 
   test("SPARK-11624 Spark SQL CLI should set sessionState only once") {
-    runCliWithin(2.minute, Seq("-e", "!echo \"This is a test for Spark-11624\";"))(
-      "" -> "This is a test for Spark-11624")
+    runCliWithin(
+        2.minute, Seq("-e", "!echo \"This is a test for Spark-11624\";"))(
+        "" -> "This is a test for Spark-11624")
   }
 }

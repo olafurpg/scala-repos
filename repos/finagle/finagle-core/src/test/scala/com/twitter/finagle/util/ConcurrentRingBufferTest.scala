@@ -10,19 +10,16 @@ class ConcurrentRingBufferTest extends FunSuite {
     val N = 128
     val b = new ConcurrentRingBuffer[Int](N)
 
-    for (i <- 0 until N)
-      assert(b.tryPut(i))
+    for (i <- 0 until N) assert(b.tryPut(i))
 
-    for (i <- 0 until N)
-      assert(b.tryGet() == Some(i))
+    for (i <- 0 until N) assert(b.tryGet() == Some(i))
   }
 
   test("ConcurrentRingBuffer should not overwrite entries") {
     val N = 128
     val b = new ConcurrentRingBuffer[Int](N)
 
-    for (i <- 0 until N)
-      assert(b.tryPut(i))
+    for (i <- 0 until N) assert(b.tryPut(i))
     assert(!b.tryPut(0))
   }
 
@@ -36,20 +33,19 @@ class ConcurrentRingBufferTest extends FunSuite {
     }
   }
 
-  test("ConcurrentRingBuffer should make slots available for writing immediately") {
+  test(
+      "ConcurrentRingBuffer should make slots available for writing immediately") {
     val N = 128
     val b = new ConcurrentRingBuffer[Int](N)
 
-    for (i <- 0 until N)
-      assert(b.tryPut(i))
+    for (i <- 0 until N) assert(b.tryPut(i))
 
     for (i <- 0 until N) {
       assert(b.tryGet() == Some(i))
       b.tryPut(i * 2)
     }
 
-    for (i <- 0 until N)
-      assert(b.tryGet() == Some(i * 2))
+    for (i <- 0 until N) assert(b.tryGet() == Some(i * 2))
   }
 
   test("ConcurrentRingBuffer should return the size correctly") {
@@ -86,7 +82,7 @@ class ConcurrentRingBufferTest extends FunSuite {
     assert(b.tryGet() == None)
     assert(b.size == 0)
 
-    for (i <- N/2 until N) b.tryGet() // fully drain
+    for (i <- N / 2 until N) b.tryGet() // fully drain
 
     assert(b.tryPeek == None)
   }

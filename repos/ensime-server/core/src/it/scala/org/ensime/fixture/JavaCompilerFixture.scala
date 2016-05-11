@@ -16,10 +16,13 @@ import scala.collection.immutable.Queue
 
 trait JavaCompilerFixture {
   def withJavaCompiler(
-    testCode: (TestKitFix, EnsimeConfig, JavaCompiler, JavaStoreReporter, SearchService) => Any
+      testCode: (TestKitFix, EnsimeConfig, JavaCompiler, JavaStoreReporter,
+      SearchService) => Any
   ): Any
 
-  def runForPositionInCompiledSource(config: EnsimeConfig, cc: JavaCompiler, lines: String*)(testCode: (SourceFileInfo, Int, String, JavaCompiler) => Any): Any = {
+  def runForPositionInCompiledSource(
+      config: EnsimeConfig, cc: JavaCompiler, lines: String*)(
+      testCode: (SourceFileInfo, Int, String, JavaCompiler) => Any): Any = {
     val contents = lines.mkString("\n")
     var offset = 0
     var points = Queue.empty[(Int, String)]
@@ -28,7 +31,8 @@ trait JavaCompilerFixture {
       points :+= ((m.start - offset, m.group(1)))
       offset += ((m.end - m.start))
     }
-    val f = new File(config.rootDir, "testing/simple/src/main/java/org/example/Test1.java")
+    val f = new File(
+        config.rootDir, "testing/simple/src/main/java/org/example/Test1.java")
     val file = SourceFileInfo(f, Some(contents.replaceAll(re, "")), None)
     cc.askTypecheckFiles(List(file))
     assert(points.nonEmpty)
@@ -40,13 +44,12 @@ trait JavaCompilerFixture {
 
 object JavaCompilerFixture {
   private[fixture] def create(
-    config: EnsimeConfig,
-    reportHandler: ReportHandler,
-    search: SearchService
+      config: EnsimeConfig,
+      reportHandler: ReportHandler,
+      search: SearchService
   )(
-    implicit
-    system: ActorSystem,
-    vfs: EnsimeVFS
+      implicit system: ActorSystem,
+      vfs: EnsimeVFS
   ): JavaCompiler = {
     val indexer = TestProbe()
     val parent = TestProbe()
@@ -58,17 +61,18 @@ class JavaStoreReporter extends ReportHandler {
   var notes = scala.collection.mutable.HashSet[Note]()
   override def messageUser(str: String): Unit = {}
   override def clearAllJavaNotes(): Unit = { this.notes.clear() }
-  override def reportJavaNotes(notes: List[Note]): Unit = { this.notes ++= notes }
+  override def reportJavaNotes(notes: List[Note]): Unit = {
+    this.notes ++= notes
+  }
 }
 
 trait IsolatedJavaCompilerFixture
-    extends JavaCompilerFixture
-    with IsolatedEnsimeVFSFixture
-    with IsolatedTestKitFixture
-    with IsolatedSearchServiceFixture {
+    extends JavaCompilerFixture with IsolatedEnsimeVFSFixture
+    with IsolatedTestKitFixture with IsolatedSearchServiceFixture {
 
   override def withJavaCompiler(
-    testCode: (TestKitFix, EnsimeConfig, JavaCompiler, JavaStoreReporter, SearchService) => Any
+      testCode: (TestKitFix, EnsimeConfig, JavaCompiler, JavaStoreReporter,
+      SearchService) => Any
   ): Any = {
     withVFS { implicit vfs =>
       withTestKit { testkit =>

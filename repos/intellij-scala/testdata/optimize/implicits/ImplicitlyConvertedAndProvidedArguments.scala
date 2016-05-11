@@ -23,7 +23,7 @@ trait Scratch[T] {
 
   def useT(t: Int) = error("stub")
   def useU[X](x: X) = error("stub")
-  def useV(s: String, v : Int = 0) = error("stub")
+  def useV(s: String, v: Int = 0) = error("stub")
   def useW(s: String)(w: Int) = error("stub")
   def useX(implicit w: Int) = error("stub")
   def useXY(s: String)(implicit x: X.type, y: Y.type) = error("stub")
@@ -100,4 +100,4 @@ trait Scratch[T] {
     useZ("") + 1
   }
 }
-*/
+ */

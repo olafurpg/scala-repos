@@ -8,9 +8,9 @@ package scala.tools.nsc
 import scala.ref.WeakReference
 
 /** An nsc sub-component.
- *
- *  @author Martin Odersky
- */
+  *
+  *  @author Martin Odersky
+  */
 abstract class SubComponent {
 
   /** The global environment; overridden by instantiation in Global. */
@@ -58,8 +58,10 @@ abstract class SubComponent {
   private var ownPhaseCache: WeakReference[Phase] = new WeakReference(null)
   private var ownPhaseRunId = global.NoRunId
 
-  @inline final def beforeOwnPhase[T](op: => T) = global.enteringPhase(ownPhase)(op)
-  @inline final def afterOwnPhase[T](op: => T)  = global.exitingPhase(ownPhase)(op)
+  @inline final def beforeOwnPhase[T](op: => T) =
+    global.enteringPhase(ownPhase)(op)
+  @inline final def afterOwnPhase[T](op: => T) =
+    global.exitingPhase(ownPhase)(op)
 
   /** The phase corresponding to this subcomponent in the current compiler run */
   def ownPhase: Phase = {

@@ -24,7 +24,8 @@ import scala.collection.Set
 object ResolveProcessor {
   def getQualifiedName(result: ScalaResolveResult, place: PsiElement): String = {
     def defaultForTypeAlias(t: ScTypeAlias): String = {
-      if (t.getParent.isInstanceOf[ScTemplateBody] && t.containingClass != null) {
+      if (t.getParent.isInstanceOf[ScTemplateBody] &&
+          t.containingClass != null) {
         "TypeAlias:" + t.containingClass.qualifiedName + "#" + t.name
       } else null
     }
@@ -38,9 +39,12 @@ object ResolveProcessor {
           case Success(tp, elem) =>
             ScType.extractClass(tp, Option(place).map(_.getProject)) match {
               case Some(c: ScObject) => defaultForTypeAlias(t)
-              case Some(td: ScTypeDefinition) if td.typeParameters.length == 0 && ScalaPsiUtil.hasStablePath(td) =>
+              case Some(td: ScTypeDefinition)
+                  if td.typeParameters.length == 0 &&
+                  ScalaPsiUtil.hasStablePath(td) =>
                 "Class:" + td.qualifiedName
-              case Some(c: PsiClass) if c.getTypeParameters.length == 0 => "Class:" + c.qualifiedName
+              case Some(c: PsiClass) if c.getTypeParameters.length == 0 =>
+                "Class:" + c.qualifiedName
               case _ => defaultForTypeAlias(t)
             }
           case _ => defaultForTypeAlias(t)
@@ -54,7 +58,8 @@ object ResolveProcessor {
 
 class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
                        val ref: PsiElement,
-                       val name: String) extends BaseProcessor(kinds) with PrecedenceHelper[String] {
+                       val name: String)
+    extends BaseProcessor(kinds) with PrecedenceHelper[String] {
   @volatile
   private var resolveScope: GlobalSearchScope = null
   def getResolveScope: GlobalSearchScope = {
@@ -76,16 +81,16 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
   protected var precedence: Int = 0
 
   /**
-   * This method useful for resetting precednce if we dropped
-   * all found candidates to seek implicit conversion candidates.
-   */
+    * This method useful for resetting precednce if we dropped
+    * all found candidates to seek implicit conversion candidates.
+    */
   def resetPrecedence() {
     precedence = 0
   }
 
   import org.jetbrains.plugins.scala.lang.resolve.processor.PrecedenceHelper.PrecedenceTypes._
   def checkImports(): Boolean = precedence <= IMPORT
-  
+
   def checkWildcardImports(): Boolean = precedence <= WILDCARD_IMPORT
 
   def checkPredefinedClassesAndPackages(): Boolean = precedence <= SCALA_PREDEF
@@ -124,10 +129,11 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
     val memb: PsiMember = {
       named match {
         case memb: PsiMember => memb
-        case pl => ScalaPsiUtil.nameContext(named) match {
-          case memb: PsiMember => memb
-          case _ => return true //something strange
-        }
+        case pl =>
+          ScalaPsiUtil.nameContext(named) match {
+            case memb: PsiMember => memb
+            case _ => return true //something strange
+          }
       }
     }
     ResolveUtils.isAccessible(memb, place)
@@ -141,33 +147,55 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
       val accessible = isAccessible(named, ref)
       if (accessibility && !accessible) return true
       named match {
-        case o: ScObject if o.isPackageObject && JavaPsiFacade.getInstance(element.getProject).
-                findPackage(o.qualifiedName) != null =>
+        case o: ScObject
+            if o.isPackageObject && JavaPsiFacade
+              .getInstance(element.getProject)
+              .findPackage(o.qualifiedName) != null =>
         case pack: PsiPackage =>
-          val resolveResult: ScalaResolveResult =
-            new ScalaResolveResult(ScPackageImpl(pack), getSubst(state), getImports(state), nameShadow, isAccessible = accessible)
+          val resolveResult: ScalaResolveResult = new ScalaResolveResult(
+              ScPackageImpl(pack),
+              getSubst(state),
+              getImports(state),
+              nameShadow,
+              isAccessible = accessible)
           addResult(resolveResult)
-        case clazz: PsiClass if !isThisOrSuperResolve || PsiTreeUtil.isContextAncestor(clazz, ref, true) =>
-          addResult(new ScalaResolveResult(named, getSubst(state),
-            getImports(state), nameShadow, boundClass = getBoundClass(state), fromType = getFromType(state), isAccessible = accessible))
+        case clazz: PsiClass
+            if !isThisOrSuperResolve ||
+            PsiTreeUtil.isContextAncestor(clazz, ref, true) =>
+          addResult(
+              new ScalaResolveResult(named,
+                                     getSubst(state),
+                                     getImports(state),
+                                     nameShadow,
+                                     boundClass = getBoundClass(state),
+                                     fromType = getFromType(state),
+                                     isAccessible = accessible))
         case clazz: PsiClass => //do nothing, it's wrong class or object
         case _ if isThisOrSuperResolve => //do nothing for type alias
         case _ =>
-          addResult(new ScalaResolveResult(named, getSubst(state),
-            getImports(state), nameShadow, boundClass = getBoundClass(state), fromType = getFromType(state), isAccessible = accessible))
+          addResult(
+              new ScalaResolveResult(named,
+                                     getSubst(state),
+                                     getImports(state),
+                                     nameShadow,
+                                     boundClass = getBoundClass(state),
+                                     fromType = getFromType(state),
+                                     isAccessible = accessible))
       }
     }
     true
   }
 
-  protected def nameAndKindMatch(named: PsiNamedElement, state: ResolveState): Boolean = {
+  protected def nameAndKindMatch(
+      named: PsiNamedElement, state: ResolveState): Boolean = {
     val nameSet = state.get(ResolverEnv.nameKey)
-    val elName = if (nameSet == null) {
-      val name = named.name
-      if (name == null) return false
-      if (name == "") return false
-      name
-    } else  nameSet
+    val elName =
+      if (nameSet == null) {
+        val name = named.name
+        if (name == null) return false
+        if (name == "") return false
+        name
+      } else nameSet
     val nameMatches = ScalaPsiUtil.memberNamesEquals(elName, name)
     nameMatches && kindMatches(named)
   }
@@ -209,12 +237,16 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
     }
      */
     res.filter {
-      case r@ScalaResolveResult(_: ScTypeAlias | _: ScClass | _: ScTrait, _) =>
+      case r @ ScalaResolveResult(
+          _: ScTypeAlias | _: ScClass | _: ScTrait, _) =>
         res.foldLeft(true) {
           case (false, _) => false
-          case (true, rr@ScalaResolveResult(_: ScTypeAlias | _: ScClass | _: ScTrait, _)) =>
-            rr.element.name != r.element.name ||
-            ScalaPsiUtil.superTypeMembers(rr.element).find(_ == r.element) == None
+          case (true,
+                rr @ ScalaResolveResult(
+                _: ScTypeAlias | _: ScClass | _: ScTrait, _)) =>
+            rr.element.name != r.element.name || ScalaPsiUtil
+              .superTypeMembers(rr.element)
+              .find(_ == r.element) == None
           case (true, _) => true
         }
       case _ => true
@@ -225,7 +257,8 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
     def getName(state: ResolveState) = {
       val stateName = state.get(ResolverEnv.nameKey)
       val result = if (stateName == null) name else stateName
-      if (result != null && result.startsWith("`") && result.endsWith("`") && result.length > 1) result.substring(1, result.length - 1)
+      if (result != null && result.startsWith("`") && result.endsWith("`") &&
+          result.length > 1) result.substring(1, result.length - 1)
       else result
     }
   }

@@ -134,7 +134,8 @@ class BigIntegerToStringTest {
   }
 
   @Test def testRadix2Neg(): Unit = {
-    val value = "-101001100010010001001010101110000101010110001010010101010101010101010101010101010101010101010010101"
+    val value =
+      "-101001100010010001001010101110000101010110001010010101010101010101010101010101010101010101010010101"
     val radix = 2
     val aNumber = new BigInteger(value, radix)
     val result = aNumber.toString(radix)
@@ -142,7 +143,8 @@ class BigIntegerToStringTest {
   }
 
   @Test def testRadix2Pos(): Unit = {
-    val value = "101000011111000000110101010101010101010001001010101010101010010101010101010000100010010"
+    val value =
+      "101000011111000000110101010101010101010001001010101010101010010101010101010000100010010"
     val radix = 2
     val aNumber = new BigInteger(value, radix)
     val result = aNumber.toString(radix)
@@ -150,7 +152,8 @@ class BigIntegerToStringTest {
   }
 
   @Test def testRadix36Neg(): Unit = {
-    val value = "-uhguweut98iu4h3478tq3985pq98yeiuth33485yq4aiuhalai485yiaehasdkr8tywi5uhslei8"
+    val value =
+      "-uhguweut98iu4h3478tq3985pq98yeiuth33485yq4aiuhalai485yiaehasdkr8tywi5uhslei8"
     val radix = 36
     val aNumber = new BigInteger(value, radix)
     val result = aNumber.toString(radix)
@@ -158,7 +161,8 @@ class BigIntegerToStringTest {
   }
 
   @Test def testRadix36Pos(): Unit = {
-    val value = "23895lt45y6vhgliuwhgi45y845htsuerhsi4586ysuerhtsio5y68peruhgsil4568ypeorihtse48y6"
+    val value =
+      "23895lt45y6vhgliuwhgi45y845htsuerhsi4586ysuerhtsio5y68peruhgsil4568ypeorihtse48y6"
     val radix = 36
     val aNumber = new BigInteger(value, radix)
     val result = aNumber.toString(radix)

@@ -19,38 +19,46 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
 import com.twitter.scalding._
-import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{ CompileTimeLengthTypes, ProductLike, TreeOrderedBuf }
+import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{CompileTimeLengthTypes, ProductLike, TreeOrderedBuf}
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 
 object CaseClassOrderedBuf {
-  def dispatch(c: Context)(buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]]): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
-    case tpe if tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass && !tpe.typeSymbol.asClass.isModuleClass && !tpe.typeConstructor.takesTypeArgs =>
+  def dispatch(c: Context)(
+      buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
+    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    case tpe
+        if tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass &&
+        !tpe.typeSymbol.asClass.isModuleClass &&
+        !tpe.typeConstructor.takesTypeArgs =>
       CaseClassOrderedBuf(c)(buildDispatcher, tpe)
   }
 
-  def apply(c: Context)(buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]], outerType: c.Type): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(
+      buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]],
+      outerType: c.Type): TreeOrderedBuf[c.type] = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
     val dispatcher = buildDispatcher
     val elementData: List[(c.universe.Type, TermName, TreeOrderedBuf[c.type])] =
-      outerType
-        .declarations
-        .collect { case m: MethodSymbol if m.isCaseAccessor => m }
-        .map { accessorMethod =>
-          val fieldType = accessorMethod.returnType
-          val b: TreeOrderedBuf[c.type] = dispatcher(fieldType)
-          (fieldType, accessorMethod.name.toTermName, b)
-        }.toList
+      outerType.declarations.collect {
+        case m: MethodSymbol if m.isCaseAccessor => m
+      }.map { accessorMethod =>
+        val fieldType = accessorMethod.returnType
+        val b: TreeOrderedBuf[c.type] = dispatcher(fieldType)
+        (fieldType, accessorMethod.name.toTermName, b)
+      }.toList
 
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+      override def compareBinary(
+          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
         ProductLike.compareBinary(c)(inputStreamA, inputStreamB)(elementData)
 
-      override def hash(element: ctx.TermName): ctx.Tree = ProductLike.hash(c)(element)(elementData)
+      override def hash(element: ctx.TermName): ctx.Tree =
+        ProductLike.hash(c)(element)(elementData)
 
       override def put(inputStream: ctx.TermName, element: ctx.TermName) =
         ProductLike.put(c)(inputStream, element)(elementData)
@@ -72,7 +80,8 @@ object CaseClassOrderedBuf {
        ${outerType.typeSymbol.companionSymbol}(..${getValProcessor.map(_._2)})
         """
       }
-      override def compare(elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+      override def compare(
+          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
         ProductLike.compare(c)(elementA, elementB)(elementData)
 
       override val lazyOuterVariables: Map[String, ctx.Tree] =
@@ -83,4 +92,3 @@ object CaseClassOrderedBuf {
     }
   }
 }
-

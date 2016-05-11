@@ -35,27 +35,27 @@ import org.apache.spark.sql.sources._
 import org.apache.spark.util.Utils
 
 /**
- * A command for writing data to a [[HadoopFsRelation]].  Supports both overwriting and appending.
- * Writing to dynamic partitions is also supported.  Each [[InsertIntoHadoopFsRelation]] issues a
- * single write job, and owns a UUID that identifies this job.  Each concrete implementation of
- * [[HadoopFsRelation]] should use this UUID together with task id to generate unique file path for
- * each task output file.  This UUID is passed to executor side via a property named
- * `spark.sql.sources.writeJobUUID`.
- *
- * Different writer containers, [[DefaultWriterContainer]] and [[DynamicPartitionWriterContainer]]
- * are used to write to normal tables and tables with dynamic partitions.
- *
- * Basic work flow of this command is:
- *
- *   1. Driver side setup, including output committer initialization and data source specific
- *      preparation work for the write job to be issued.
- *   2. Issues a write job consists of one or more executor side tasks, each of which writes all
- *      rows within an RDD partition.
- *   3. If no exception is thrown in a task, commits that task, otherwise aborts that task;  If any
- *      exception is thrown during task commitment, also aborts that task.
- *   4. If all tasks are committed, commit the job, otherwise aborts the job;  If any exception is
- *      thrown during job commitment, also aborts the job.
- */
+  * A command for writing data to a [[HadoopFsRelation]].  Supports both overwriting and appending.
+  * Writing to dynamic partitions is also supported.  Each [[InsertIntoHadoopFsRelation]] issues a
+  * single write job, and owns a UUID that identifies this job.  Each concrete implementation of
+  * [[HadoopFsRelation]] should use this UUID together with task id to generate unique file path for
+  * each task output file.  This UUID is passed to executor side via a property named
+  * `spark.sql.sources.writeJobUUID`.
+  *
+  * Different writer containers, [[DefaultWriterContainer]] and [[DynamicPartitionWriterContainer]]
+  * are used to write to normal tables and tables with dynamic partitions.
+  *
+  * Basic work flow of this command is:
+  *
+  *   1. Driver side setup, including output committer initialization and data source specific
+  *      preparation work for the write job to be issued.
+  *   2. Issues a write job consists of one or more executor side tasks, each of which writes all
+  *      rows within an RDD partition.
+  *   3. If no exception is thrown in a task, commits that task, otherwise aborts that task;  If any
+  *      exception is thrown during task commitment, also aborts that task.
+  *   4. If all tasks are committed, commit the job, otherwise aborts the job;  If any exception is
+  *      thrown during job commitment, also aborts the job.
+  */
 private[sql] case class InsertIntoHadoopFsRelation(
     outputPath: Path,
     partitionColumns: Seq[Attribute],
@@ -65,37 +65,44 @@ private[sql] case class InsertIntoHadoopFsRelation(
     options: Map[String, String],
     @transient query: LogicalPlan,
     mode: SaveMode)
-  extends RunnableCommand {
+    extends RunnableCommand {
 
   override def children: Seq[LogicalPlan] = query :: Nil
 
   override def run(sqlContext: SQLContext): Seq[Row] = {
     // Most formats don't do well with duplicate columns, so lets not allow that
     if (query.schema.fieldNames.length != query.schema.fieldNames.distinct.length) {
-      val duplicateColumns = query.schema.fieldNames.groupBy(identity).collect {
-        case (x, ys) if ys.length > 1 => "\"" + x + "\""
-      }.mkString(", ")
-      throw new AnalysisException(s"Duplicate column(s) : $duplicateColumns found, " +
+      val duplicateColumns = query.schema.fieldNames
+        .groupBy(identity)
+        .collect {
+          case (x, ys) if ys.length > 1 => "\"" + x + "\""
+        }
+        .mkString(", ")
+      throw new AnalysisException(
+          s"Duplicate column(s) : $duplicateColumns found, " +
           s"cannot save to file.")
     }
 
     val hadoopConf = sqlContext.sparkContext.hadoopConfiguration
     val fs = outputPath.getFileSystem(hadoopConf)
-    val qualifiedOutputPath = outputPath.makeQualified(fs.getUri, fs.getWorkingDirectory)
+    val qualifiedOutputPath =
+      outputPath.makeQualified(fs.getUri, fs.getWorkingDirectory)
 
     val pathExists = fs.exists(qualifiedOutputPath)
     val doInsertion = (mode, pathExists) match {
       case (SaveMode.ErrorIfExists, true) =>
-        throw new AnalysisException(s"path $qualifiedOutputPath already exists.")
+        throw new AnalysisException(
+            s"path $qualifiedOutputPath already exists.")
       case (SaveMode.Overwrite, true) =>
         Utils.tryOrIOException {
-          if (!fs.delete(qualifiedOutputPath, true /* recursively */)) {
+          if (!fs.delete(qualifiedOutputPath, true /* recursively */ )) {
             throw new IOException(s"Unable to clear output " +
-              s"directory $qualifiedOutputPath prior to writing to it")
+                s"directory $qualifiedOutputPath prior to writing to it")
           }
         }
         true
-      case (SaveMode.Append, _) | (SaveMode.Overwrite, _) | (SaveMode.ErrorIfExists, false) =>
+      case (SaveMode.Append, _) | (SaveMode.Overwrite, _) |
+          (SaveMode.ErrorIfExists, false) =>
         true
       case (SaveMode.Ignore, exists) =>
         !exists
@@ -114,42 +121,46 @@ private[sql] case class InsertIntoHadoopFsRelation(
       val partitionSet = AttributeSet(partitionColumns)
       val dataColumns = query.output.filterNot(partitionSet.contains)
 
-      val queryExecution = Dataset.newDataFrame(sqlContext, query).queryExecution
+      val queryExecution =
+        Dataset.newDataFrame(sqlContext, query).queryExecution
       SQLExecution.withNewExecutionId(sqlContext, queryExecution) {
         val relation =
-          WriteRelation(
-            sqlContext,
-            dataColumns.toStructType,
-            qualifiedOutputPath.toString,
-            fileFormat.prepareWrite(sqlContext, _, options, dataColumns.toStructType),
-            bucketSpec)
+          WriteRelation(sqlContext,
+                        dataColumns.toStructType,
+                        qualifiedOutputPath.toString,
+                        fileFormat.prepareWrite(
+                            sqlContext, _, options, dataColumns.toStructType),
+                        bucketSpec)
 
-        val writerContainer = if (partitionColumns.isEmpty && bucketSpec.isEmpty) {
-          new DefaultWriterContainer(relation, job, isAppend)
-        } else {
-          new DynamicPartitionWriterContainer(
-            relation,
-            job,
-            partitionColumns = partitionColumns,
-            dataColumns = dataColumns,
-            inputSchema = query.output,
-            PartitioningUtils.DEFAULT_PARTITION_NAME,
-            sqlContext.conf.getConf(SQLConf.PARTITION_MAX_FILES),
-            isAppend)
-        }
+        val writerContainer =
+          if (partitionColumns.isEmpty && bucketSpec.isEmpty) {
+            new DefaultWriterContainer(relation, job, isAppend)
+          } else {
+            new DynamicPartitionWriterContainer(
+                relation,
+                job,
+                partitionColumns = partitionColumns,
+                dataColumns = dataColumns,
+                inputSchema = query.output,
+                PartitioningUtils.DEFAULT_PARTITION_NAME,
+                sqlContext.conf.getConf(SQLConf.PARTITION_MAX_FILES),
+                isAppend)
+          }
 
         // This call shouldn't be put into the `try` block below because it only initializes and
         // prepares the job, any exception thrown from here shouldn't cause abortJob() to be called.
         writerContainer.driverSideSetup()
 
         try {
-          sqlContext.sparkContext.runJob(queryExecution.toRdd, writerContainer.writeRows _)
+          sqlContext.sparkContext.runJob(
+              queryExecution.toRdd, writerContainer.writeRows _)
           writerContainer.commitJob()
           refreshFunction()
-        } catch { case cause: Throwable =>
-          logError("Aborting job.", cause)
-          writerContainer.abortJob()
-          throw new SparkException("Job aborted.", cause)
+        } catch {
+          case cause: Throwable =>
+            logError("Aborting job.", cause)
+            writerContainer.abortJob()
+            throw new SparkException("Job aborted.", cause)
         }
       }
     } else {

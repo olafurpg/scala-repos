@@ -25,19 +25,19 @@ import org.apache.spark.rpc.RpcEnvFileServer
 import org.apache.spark.util.Utils
 
 /**
- * StreamManager implementation for serving files from a NettyRpcEnv.
- *
- * Three kinds of resources can be registered in this manager, all backed by actual files:
- *
- * - "/files": a flat list of files; used as the backend for [[SparkContext.addFile]].
- * - "/jars": a flat list of files; used as the backend for [[SparkContext.addJar]].
- * - arbitrary directories; all files under the directory become available through the manager,
- *   respecting the directory's hierarchy.
- *
- * Only streaming (openStream) is supported.
- */
+  * StreamManager implementation for serving files from a NettyRpcEnv.
+  *
+  * Three kinds of resources can be registered in this manager, all backed by actual files:
+  *
+  * - "/files": a flat list of files; used as the backend for [[SparkContext.addFile]].
+  * - "/jars": a flat list of files; used as the backend for [[SparkContext.addJar]].
+  * - arbitrary directories; all files under the directory become available through the manager,
+  *   respecting the directory's hierarchy.
+  *
+  * Only streaming (openStream) is supported.
+  */
 private[netty] class NettyStreamManager(rpcEnv: NettyRpcEnv)
-  extends StreamManager with RpcEnvFileServer {
+    extends StreamManager with RpcEnvFileServer {
 
   private val files = new ConcurrentHashMap[String, File]()
   private val jars = new ConcurrentHashMap[String, File]()
@@ -59,7 +59,8 @@ private[netty] class NettyStreamManager(rpcEnv: NettyRpcEnv)
     }
 
     if (file != null && file.isFile()) {
-      new FileSegmentManagedBuffer(rpcEnv.transportConf, file, 0, file.length())
+      new FileSegmentManagedBuffer(
+          rpcEnv.transportConf, file, 0, file.length())
     } else {
       null
     }
@@ -67,21 +68,21 @@ private[netty] class NettyStreamManager(rpcEnv: NettyRpcEnv)
 
   override def addFile(file: File): String = {
     require(files.putIfAbsent(file.getName(), file) == null,
-      s"File ${file.getName()} already registered.")
-    s"${rpcEnv.address.toSparkURL}/files/${Utils.encodeFileNameToURIRawPath(file.getName())}"
+            s"File ${file.getName()} already registered.")
+    s"${rpcEnv.address.toSparkURL}/files/${Utils.encodeFileNameToURIRawPath(
+        file.getName())}"
   }
 
   override def addJar(file: File): String = {
     require(jars.putIfAbsent(file.getName(), file) == null,
-      s"JAR ${file.getName()} already registered.")
+            s"JAR ${file.getName()} already registered.")
     s"${rpcEnv.address.toSparkURL}/jars/${Utils.encodeFileNameToURIRawPath(file.getName())}"
   }
 
   override def addDirectory(baseUri: String, path: File): String = {
     val fixedBaseUri = validateDirectoryUri(baseUri)
     require(dirs.putIfAbsent(fixedBaseUri.stripPrefix("/"), path) == null,
-      s"URI '$fixedBaseUri' already registered.")
+            s"URI '$fixedBaseUri' already registered.")
     s"${rpcEnv.address.toSparkURL}$fixedBaseUri"
   }
-
 }

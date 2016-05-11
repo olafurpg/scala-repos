@@ -12,22 +12,24 @@ import akka.actor.ActorSystem
 import akka.testkit._
 
 /**
- * Normally a TestKit will reuse the same actor system for all tests
- * in a suite, but sometimes isolation of the system is needed on a
- * per-test basis, this fixture adds support for that.
- *
- * Instead of extending TestKit, use withTestKit and import
- * the parameter for all implicits.
- *
- * Inspired by https://gist.github.com/derekwyatt/3138807
- */
+  * Normally a TestKit will reuse the same actor system for all tests
+  * in a suite, but sometimes isolation of the system is needed on a
+  * per-test basis, this fixture adds support for that.
+  *
+  * Instead of extending TestKit, use withTestKit and import
+  * the parameter for all implicits.
+  *
+  * Inspired by https://gist.github.com/derekwyatt/3138807
+  */
 trait TestKitFixture {
   require(
-    !this.isInstanceOf[TestKit],
-    "IsolatedActorSystems are incompatible with TestKit. Instead, 'import sys._'"
+      !this.isInstanceOf[TestKit],
+      "IsolatedActorSystems are incompatible with TestKit. Instead, 'import sys._'"
   )
 
-  implicit protected val akkaTimeout: Timeout = ConfigFactory.load().getDuration("akka.test.default-timeout", TimeUnit.MILLISECONDS) milliseconds
+  implicit protected val akkaTimeout: Timeout = ConfigFactory
+    .load()
+    .getDuration("akka.test.default-timeout", TimeUnit.MILLISECONDS) milliseconds
 
   def withTestKit(testCode: TestKitFix => Any): Any
 }
@@ -64,6 +66,6 @@ trait SharedTestKitFixture extends TestKitFixture with BeforeAndAfterAll {
     _testkit.system.awaitTermination()
   }
 
-  override def withTestKit(testCode: TestKitFix => Any): Any = testCode(_testkit)
-
+  override def withTestKit(testCode: TestKitFix => Any): Any =
+    testCode(_testkit)
 }

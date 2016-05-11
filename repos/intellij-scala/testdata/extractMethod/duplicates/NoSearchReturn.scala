@@ -1,19 +1,17 @@
 object NoSearchReturn {
   def foo(i: Int) {
     val y = i
-/*start*/
+    /*start*/
     println(y)
-    if (true) return
-    else println(y)
-/*end*/
+    if (true) return else println(y)
+    /*end*/
 
     println("a")
   }
 
   def foofoo(y: Int) {
     println(1)
-    if (true) return
-    else println(1)
+    if (true) return else println(1)
   }
 }
 /*
@@ -40,4 +38,4 @@ object NoSearchReturn {
     else println(1)
   }
 }
-*/
+ */

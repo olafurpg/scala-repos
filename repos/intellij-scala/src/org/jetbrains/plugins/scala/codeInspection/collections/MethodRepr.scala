@@ -6,8 +6,8 @@ import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class MethodRepr private (val itself: ScExpression,
                           val optionalBase: Option[ScExpression],
                           val optionalMethodRef: Option[ScReferenceExpression],
@@ -15,7 +15,9 @@ class MethodRepr private (val itself: ScExpression,
 
 object MethodRepr {
   //method represented by optional base expression, optional method reference and arguments
-  def unapply(expr: ScExpression): Option[(ScExpression, Option[ScExpression], Option[ScReferenceExpression], Seq[ScExpression])] = {
+  def unapply(
+      expr: ScExpression): Option[(ScExpression, Option[ScExpression], Option[
+          ScReferenceExpression], Seq[ScExpression])] = {
     expr match {
       case call: ScMethodCall =>
         val args = call.args match {
@@ -23,12 +25,15 @@ object MethodRepr {
           case _ => Nil
         }
         call.getEffectiveInvokedExpr match {
-          case baseExpr: ScExpression if call.isApplyOrUpdateCall && !call.isUpdateCall =>
+          case baseExpr: ScExpression
+              if call.isApplyOrUpdateCall && !call.isUpdateCall =>
             Some(expr, Some(baseExpr), None, args)
-          case ref: ScReferenceExpression => Some(expr, ref.qualifier, Some(ref), args)
+          case ref: ScReferenceExpression =>
+            Some(expr, ref.qualifier, Some(ref), args)
           case genericCall: ScGenericCall =>
             genericCall.referencedExpr match {
-              case ref: ScReferenceExpression => Some(expr, ref.qualifier, Some(ref), args)
+              case ref: ScReferenceExpression =>
+                Some(expr, ref.qualifier, Some(ref), args)
               case other => Some(expr, None, None, args)
             }
           case methCall: ScMethodCall => Some(expr, Some(methCall), None, args)
@@ -39,9 +44,20 @@ object MethodRepr {
           case tuple: ScTuple => tuple.exprs
           case _ => Seq(infix.getArgExpr)
         }
-        Some(expr, Some(stripped(infix.getBaseExpr)), Some(infix.operation), args)
-      case prefix: ScPrefixExpr => Some(expr, Some(stripped(prefix.getBaseExpr)), Some(prefix.operation), Seq())
-      case postfix: ScPostfixExpr => Some(expr, Some(stripped(postfix.getBaseExpr)), Some(postfix.operation), Seq())
+        Some(expr,
+             Some(stripped(infix.getBaseExpr)),
+             Some(infix.operation),
+             args)
+      case prefix: ScPrefixExpr =>
+        Some(expr,
+             Some(stripped(prefix.getBaseExpr)),
+             Some(prefix.operation),
+             Seq())
+      case postfix: ScPostfixExpr =>
+        Some(expr,
+             Some(stripped(postfix.getBaseExpr)),
+             Some(postfix.operation),
+             Seq())
       case refExpr: ScReferenceExpression =>
         refExpr.getParent match {
           case _: ScGenericCall => None
@@ -54,19 +70,23 @@ object MethodRepr {
       case genCall: ScGenericCall =>
         genCall.getParent match {
           case mc: ScMethodCall if !mc.isApplyOrUpdateCall => None
-          case _ => genCall.referencedExpr match {
-            case ref: ScReferenceExpression => Some(genCall, ref.qualifier, Some(ref), Seq.empty)
-            case other => Some(genCall, None, None, Seq.empty)
-          }
+          case _ =>
+            genCall.referencedExpr match {
+              case ref: ScReferenceExpression =>
+                Some(genCall, ref.qualifier, Some(ref), Seq.empty)
+              case other => Some(genCall, None, None, Seq.empty)
+            }
         }
       case _ => None
     }
   }
 
-  def apply(itself: ScExpression, optionalBase: Option[ScExpression], optionalMethodRef: Option[ScReferenceExpression], args: Seq[ScExpression]) = {
+  def apply(itself: ScExpression,
+            optionalBase: Option[ScExpression],
+            optionalMethodRef: Option[ScReferenceExpression],
+            args: Seq[ScExpression]) = {
     new MethodRepr(itself, optionalBase, optionalMethodRef, args)
   }
-
 }
 
 object MethodSeq {
@@ -78,7 +98,8 @@ object MethodSeq {
         case MethodRepr(itself, optionalBase, optionalMethodRef, args) =>
           result += MethodRepr(expr, optionalBase, optionalMethodRef, args)
           optionalBase match {
-            case Some(ScParenthesisedExpr(inner)) => extractMethods(stripped(inner))
+            case Some(ScParenthesisedExpr(inner)) =>
+              extractMethods(stripped(inner))
             case Some(expression) => extractMethods(expression)
             case _ =>
           }

@@ -9,51 +9,51 @@ import spire.syntax.nroot._
 import scala.collection.mutable
 
 /**
- * Basic tools for prime factorization.
- *
- * This package is intended to provide tools for factoring numbers,
- * checking primality, generating prime numbers, etc. For now, its
- * main contributions are a method for factoring integers
- * (spire.math.prime.factor) and a type for representing prime factors
- * and their exponents (spire.math.prime.Factors).
- *
- * The factorization currently happens via an implementation of
- * Pollard-Rho with Brent's optimization. This technique works very
- * well for composites with small prime factors (up to 10 decimal
- * digits or so) and can support semiprimes (products of two
- * similarly-sized primes) of 20-40 digits.
- *
- * The implementation does cheat, using BigInteger.isProbablePrime(40)
- * to test basic primality. This has a roughly 1-in-1,000,000,000,000
- * chance of being wrong.
- *
- * Since Pollard-Rho uses random primes, its performance is somewhat
- * non-deterministic. On this machine, factoring 20-digit semiprimes
- * seem to average about 1.5s and factoring 30-digit semiprimes seem
- * to average about 20s. Much larger numbers can be factored provided
- * they are either prime or composites with smallish factors.
- */
+  * Basic tools for prime factorization.
+  *
+  * This package is intended to provide tools for factoring numbers,
+  * checking primality, generating prime numbers, etc. For now, its
+  * main contributions are a method for factoring integers
+  * (spire.math.prime.factor) and a type for representing prime factors
+  * and their exponents (spire.math.prime.Factors).
+  *
+  * The factorization currently happens via an implementation of
+  * Pollard-Rho with Brent's optimization. This technique works very
+  * well for composites with small prime factors (up to 10 decimal
+  * digits or so) and can support semiprimes (products of two
+  * similarly-sized primes) of 20-40 digits.
+  *
+  * The implementation does cheat, using BigInteger.isProbablePrime(40)
+  * to test basic primality. This has a roughly 1-in-1,000,000,000,000
+  * chance of being wrong.
+  *
+  * Since Pollard-Rho uses random primes, its performance is somewhat
+  * non-deterministic. On this machine, factoring 20-digit semiprimes
+  * seem to average about 1.5s and factoring 30-digit semiprimes seem
+  * to average about 20s. Much larger numbers can be factored provided
+  * they are either prime or composites with smallish factors.
+  */
 package object prime {
 
   /**
-   * Determine if the given integer is prime.
-   *
-   * Currently this is using a strong pseudo-primality test (so there
-   * is a 1-in-1,000,000,000,000 chance of being wrong).
-   */
+    * Determine if the given integer is prime.
+    *
+    * Currently this is using a strong pseudo-primality test (so there
+    * is a 1-in-1,000,000,000,000 chance of being wrong).
+    */
   def isPrime(n: SafeLong): Boolean = n.isProbablePrime(40)
 
   /**
-   * Factor the given integer with the default factorization method.
-   */
+    * Factor the given integer with the default factorization method.
+    */
   def factor(n: SafeLong): Factors = factorPollardRho(n)
 
   /**
-   * Factor the given integer using trial division.
-   *
-   * This is the slowest method, but is still reasonable for numbers
-   * up to about 14 decimal digits or so.
-   */
+    * Factor the given integer using trial division.
+    *
+    * This is the slowest method, but is still reasonable for numbers
+    * up to about 14 decimal digits or so.
+    */
   def factorTrialDivision(n0: SafeLong): Factors = {
     if (n0 == 0) return Factors.zero
 
@@ -83,11 +83,11 @@ package object prime {
   }
 
   /**
-   * Factor the given integer using trial division with a wheel.
-   *
-   * This is slightly faster than basic trial divison (about 30% or
-   * so). It's still mostly appropriate for small-ish numbers.
-   */
+    * Factor the given integer using trial division with a wheel.
+    *
+    * This is slightly faster than basic trial divison (about 30% or
+    * so). It's still mostly appropriate for small-ish numbers.
+    */
   def factorWheelDivision(n0: SafeLong): Factors = {
     if (n0 == 0) return Factors.zero
 
@@ -136,7 +136,9 @@ package object prime {
 
       @inline def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
 
-      @tailrec def fastRho(x: SafeLong, q0: SafeLong, r: SafeLong, m: SafeLong): SafeLong = {
+      @tailrec
+      def fastRho(
+          x: SafeLong, q0: SafeLong, r: SafeLong, m: SafeLong): SafeLong = {
         var y = x
         var q = q0
         cfor(0)(r > _, _ + 1)(_ => y = f(y))
@@ -155,7 +157,8 @@ package object prime {
           k = k + m
         }
 
-        if (g == 1) fastRho(y, q, r * 2, m) else if (g == n) slowRho(x, ys) else g
+        if (g == 1) fastRho(y, q, r * 2, m)
+        else if (g == n) slowRho(x, ys) else g
       }
 
       @tailrec def slowRho(x: SafeLong, ys: SafeLong): SafeLong = {
@@ -240,7 +243,8 @@ package object prime {
   }
 
   def fill(start: Int, limit: Int): Array[SafeLong] =
-    if (start == 0) fill(limit) else {
+    if (start == 0) fill(limit)
+    else {
       val siever = sieverUpToNth(start + limit)
       def loop(i: Int, p: SafeLong): Array[SafeLong] =
         if (i < start) loop(i + 1, siever.nextAfter(p))

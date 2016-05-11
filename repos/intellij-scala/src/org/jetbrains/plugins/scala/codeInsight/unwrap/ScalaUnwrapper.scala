@@ -6,10 +6,11 @@ import com.intellij.codeInsight.unwrap.AbstractUnwrapper
 import com.intellij.psi.PsiElement
 
 /**
- * Nikolay.Tropin
- * 2014-06-26
- */
-abstract class ScalaUnwrapper extends AbstractUnwrapper[ScalaUnwrapContext]("") {
+  * Nikolay.Tropin
+  * 2014-06-26
+  */
+abstract class ScalaUnwrapper
+    extends AbstractUnwrapper[ScalaUnwrapContext]("") {
   override def createContext() = new ScalaUnwrapContext
 }
 
@@ -21,5 +22,6 @@ trait ShortTextDescription {
     if (text.length > 20) text.substring(0, 17) + "..." else text
   }
 
-  override def getDescription(e: PsiElement) = CodeInsightBundle.message("unwrap.with.placeholder", shortText(e))
+  override def getDescription(e: PsiElement) =
+    CodeInsightBundle.message("unwrap.with.placeholder", shortText(e))
 }

@@ -17,7 +17,6 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScBlockStatement}
 /**
   * @author yole
   */
-
 class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase {
   def canSelect(e: PsiElement) = {
     e match {
@@ -27,7 +26,10 @@ class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase {
     }
   }
 
-  override def select(e: PsiElement, editorText: CharSequence, cursorOffset: Int, editor: Editor): java.util.List[TextRange] = {
+  override def select(e: PsiElement,
+                      editorText: CharSequence,
+                      cursorOffset: Int,
+                      editor: Editor): java.util.List[TextRange] = {
     val parent: PsiElement = e.getParent
 
     if (!parent.isInstanceOf[ScBlock]) {
@@ -36,14 +38,20 @@ class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase {
 
     def back(e: PsiElement) = e.getPrevSibling
     def forward(e: PsiElement) = e.getNextSibling
-    val startElement = skipWhitespace(findGroupBoundary(e, back, ScalaTokenTypes.tLBRACE), forward)
-    val endElement = skipWhitespace(findGroupBoundary(e, forward, ScalaTokenTypes.tRBRACE), back)
+    val startElement = skipWhitespace(
+        findGroupBoundary(e, back, ScalaTokenTypes.tLBRACE), forward)
+    val endElement = skipWhitespace(
+        findGroupBoundary(e, forward, ScalaTokenTypes.tRBRACE), back)
 
-    val range: TextRange = new TextRange(startElement.getTextRange.getStartOffset, endElement.getTextRange.getEndOffset)
+    val range: TextRange = new TextRange(
+        startElement.getTextRange.getStartOffset,
+        endElement.getTextRange.getEndOffset)
     ExtendWordSelectionHandlerBase.expandToWholeLine(editorText, range)
   }
 
-  def findGroupBoundary(startElement: PsiElement, step: PsiElement => PsiElement, stopAt: IElementType): PsiElement = {
+  def findGroupBoundary(startElement: PsiElement,
+                        step: PsiElement => PsiElement,
+                        stopAt: IElementType): PsiElement = {
     var current: PsiElement = startElement
     while (step(current) != null) {
       val sibling: PsiElement = step(current)
@@ -51,7 +59,8 @@ class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase {
         case leaf: LeafPsiElement =>
           if (leaf.getElementType == stopAt) return current
           if (ScalaPsiUtil.isLineTerminator(leaf)) {
-            val strings: Array[String] = LineTokenizer.tokenize(leaf.getText.toCharArray, false)
+            val strings: Array[String] =
+              LineTokenizer.tokenize(leaf.getText.toCharArray, false)
             if (strings.length > 2) {
               return current
             }
@@ -63,7 +72,8 @@ class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase {
     current
   }
 
-  def skipWhitespace(start: PsiElement, step: PsiElement => PsiElement): PsiElement = {
+  def skipWhitespace(
+      start: PsiElement, step: PsiElement => PsiElement): PsiElement = {
     var current = start
     while (current.isInstanceOf[PsiWhiteSpace]) {
       current = step(current)

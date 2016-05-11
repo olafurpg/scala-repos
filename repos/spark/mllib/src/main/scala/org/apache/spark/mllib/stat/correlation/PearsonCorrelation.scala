@@ -25,25 +25,25 @@ import org.apache.spark.mllib.linalg.distributed.RowMatrix
 import org.apache.spark.rdd.RDD
 
 /**
- * Compute Pearson correlation for two RDDs of the type RDD[Double] or the correlation matrix
- * for an RDD of the type RDD[Vector].
- *
- * Definition of Pearson correlation can be found at
- * http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient
- */
+  * Compute Pearson correlation for two RDDs of the type RDD[Double] or the correlation matrix
+  * for an RDD of the type RDD[Vector].
+  *
+  * Definition of Pearson correlation can be found at
+  * http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient
+  */
 private[stat] object PearsonCorrelation extends Correlation with Logging {
 
   /**
-   * Compute the Pearson correlation for two datasets. NaN if either vector has 0 variance.
-   */
+    * Compute the Pearson correlation for two datasets. NaN if either vector has 0 variance.
+    */
   override def computeCorrelation(x: RDD[Double], y: RDD[Double]): Double = {
     computeCorrelationWithMatrixImpl(x, y)
   }
 
   /**
-   * Compute the Pearson correlation matrix S, for the input matrix, where S(i, j) is the
-   * correlation between column i and j. 0 covariance results in a correlation value of Double.NaN.
-   */
+    * Compute the Pearson correlation matrix S, for the input matrix, where S(i, j) is the
+    * correlation between column i and j. 0 covariance results in a correlation value of Double.NaN.
+    */
   override def computeCorrelationMatrix(X: RDD[Vector]): Matrix = {
     val rowMatrix = new RowMatrix(X)
     val cov = rowMatrix.computeCovariance()
@@ -51,10 +51,11 @@ private[stat] object PearsonCorrelation extends Correlation with Logging {
   }
 
   /**
-   * Compute the Pearson correlation matrix from the covariance matrix.
-   * 0 covariance results in a correlation value of Double.NaN.
-   */
-  def computeCorrelationMatrixFromCovariance(covarianceMatrix: Matrix): Matrix = {
+    * Compute the Pearson correlation matrix from the covariance matrix.
+    * 0 covariance results in a correlation value of Double.NaN.
+    */
+  def computeCorrelationMatrixFromCovariance(
+      covarianceMatrix: Matrix): Matrix = {
     val cov = covarianceMatrix.toBreeze.asInstanceOf[BDM[Double]]
     val n = cov.cols
 
@@ -63,7 +64,7 @@ private[stat] object PearsonCorrelation extends Correlation with Logging {
     while (i < n) {
       // TODO remove once covariance numerical issue resolved.
       cov(i, i) = if (closeToZero(cov(i, i))) 0.0 else math.sqrt(cov(i, i))
-      i +=1
+      i += 1
     }
 
     // Loop through columns since cov is column major
@@ -74,12 +75,13 @@ private[stat] object PearsonCorrelation extends Correlation with Logging {
       sigma = cov(j, j)
       i = 0
       while (i < j) {
-        val corr = if (sigma == 0.0 || cov(i, i) == 0.0) {
-          containNaN = true
-          Double.NaN
-        } else {
-          cov(i, j) / (sigma * cov(i, i))
-        }
+        val corr =
+          if (sigma == 0.0 || cov(i, i) == 0.0) {
+            containNaN = true
+            Double.NaN
+          } else {
+            cov(i, j) / (sigma * cov(i, i))
+          }
         cov(i, j) = corr
         cov(j, i) = corr
         i += 1
@@ -91,7 +93,7 @@ private[stat] object PearsonCorrelation extends Correlation with Logging {
     i = 0
     while (i < n) {
       cov(i, i) = 1.0
-      i +=1
+      i += 1
     }
 
     if (containNaN) {

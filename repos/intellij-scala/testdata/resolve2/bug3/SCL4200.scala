@@ -11,5 +11,5 @@ object A {
 
   val a: A = new A
 
-  a./* resolved: false */foo(new A)
+  a. /* resolved: false */ foo(new A)
 }

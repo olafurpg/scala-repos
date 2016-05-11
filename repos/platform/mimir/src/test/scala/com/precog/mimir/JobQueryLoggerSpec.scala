@@ -40,14 +40,19 @@ class JobQueryLoggerSpec extends Specification {
       val M = Need.need
       val clock = Clock.System
       val jobManager = new InMemoryJobManager[Need]
-      val jobId = jobManager.createJob("password", "error-report-spec", "hard", None, Some(clock.now())).copoint.id
+      val jobId = jobManager
+        .createJob(
+            "password", "error-report-spec", "hard", None, Some(clock.now()))
+        .copoint
+        .id
       val decomposer = new Decomposer[Unit] {
         def decompose(u: Unit): JValue = JNull
       }
     })
   }
 
-  def testChannel(channel: String)(f: (QueryLogger[Need, Unit], String) => Need[Unit]) = {
+  def testChannel(channel: String)(
+      f: (QueryLogger[Need, Unit], String) => Need[Unit]) = {
     withReport { report =>
       val messages = (for {
         _ <- f(report, "Hi there!")
@@ -55,17 +60,27 @@ class JobQueryLoggerSpec extends Specification {
         messages <- report.jobManager.listMessages(report.jobId, channel, None)
       } yield messages).copoint.toList
 
-      messages map { case Message(_, _, _, jobj) =>
-        val JString(msg) = jobj \ "message"
-        msg
+      messages map {
+        case Message(_, _, _, jobj) =>
+          val JString(msg) = jobj \ "message"
+          msg
       } must_== List("Hi there!", "Goodbye now.")
     }
   }
 
   "Job error report" should {
-    "report info messages to the correct channel" in testChannel(channels.Info) { (report, msg) => report.info((), msg) }
-    "report warn messages to the correct channel" in testChannel(channels.Warning) { (report, msg) => report.warn((), msg) }
-    "report error messages to the correct channel" in testChannel(channels.Error) { (report, msg) => report.error((), msg) }
+    "report info messages to the correct channel" in testChannel(channels.Info) {
+      (report, msg) =>
+        report.info((), msg)
+    }
+    "report warn messages to the correct channel" in testChannel(
+        channels.Warning) { (report, msg) =>
+      report.warn((), msg)
+    }
+    "report error messages to the correct channel" in testChannel(
+        channels.Error) { (report, msg) =>
+      report.error((), msg)
+    }
     "cancel jobs on a die" in {
       withReport { report =>
         val reason = "Arrrgggggggggggghhhhhhh....."

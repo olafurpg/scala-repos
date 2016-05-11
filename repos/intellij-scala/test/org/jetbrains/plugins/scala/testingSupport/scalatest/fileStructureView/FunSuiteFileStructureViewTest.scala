@@ -12,7 +12,7 @@ trait FunSuiteFileStructureViewTest extends ScalaTestTestCase {
 
   def addFunSuiteViewTest(): Unit = {
     addFileToProject(className + ".scala",
-      """
+                     """
         |import org.scalatest._
         |
         |class FunSuiteViewTest extends FunSuite {
@@ -44,6 +44,7 @@ trait FunSuiteFileStructureViewTest extends ScalaTestTestCase {
 
   def testFunSuiteIgnoredAndPending(): Unit = {
     addFunSuiteViewTest()
-    runFileStructureViewTest(className, ignoredStatusId, "ignore(\"pending and ignore\")")
+    runFileStructureViewTest(
+        className, ignoredStatusId, "ignore(\"pending and ignore\")")
   }
 }

@@ -5,7 +5,8 @@ object Macros {
   object AImpl {
     def a(ctx: Context)(args: ctx.Expr[Any]*): ctx.Expr[Unit] = {
       import ctx.universe._
-      ctx.Expr[Unit](Apply(Ident(TermName("println")), List(Literal(Constant(1)))))
+      ctx.Expr[Unit](
+          Apply(Ident(TermName("println")), List(Literal(Constant(1)))))
     }
   }
 

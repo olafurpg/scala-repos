@@ -7,20 +7,21 @@ import com.intellij.execution.configurations.{ConfigurationFactory, Configuratio
 import org.jetbrains.plugins.scala.icons.Icons
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 04.02.2009
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 04.02.2009
+  */
 class ScalaScriptConfigurationType extends ConfigurationType {
   val confFactory = new ScalaScriptRunConfigurationFactory(this)
-  
+
   def getIcon: Icon = Icons.SCRIPT_FILE_LOGO
 
   def getDisplayName: String = "Scala Script"
 
-  def getConfigurationTypeDescription: String = "Scala script run configurations"
+  def getConfigurationTypeDescription: String =
+    "Scala script run configurations"
 
-  def getConfigurationFactories: Array[ConfigurationFactory] = Array[ConfigurationFactory](confFactory)
+  def getConfigurationFactories: Array[ConfigurationFactory] =
+    Array[ConfigurationFactory](confFactory)
 
   def getId: String = "ScalaScriptRunConfiguration"
 }

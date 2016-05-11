@@ -8,11 +8,10 @@ import org.scalatest.Suite
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
 
-
 /** Manages a local `sc` {@link SparkContext} variable, correctly stopping it
   * after each test. */
-trait LocalSparkContext 
-extends BeforeAndAfterEach with BeforeAndAfterAll { self: Suite =>
+trait LocalSparkContext extends BeforeAndAfterEach with BeforeAndAfterAll {
+  self: Suite =>
 
   @transient var sc: SparkContext = _
 
@@ -30,7 +29,6 @@ extends BeforeAndAfterEach with BeforeAndAfterAll { self: Suite =>
     LocalSparkContext.stop(sc)
     sc = null
   }
-
 }
 
 object LocalSparkContext {
@@ -50,8 +48,8 @@ object LocalSparkContext {
       stop(sc)
     }
   }
-
 }
+
 /** Shares a local `SparkContext` between all tests in a suite and closes it at the end */
 trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
 
@@ -72,4 +70,3 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
     super.afterAll()
   }
 }
-

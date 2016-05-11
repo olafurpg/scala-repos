@@ -1,13 +1,15 @@
 class Superclass {
+
   /**
-   * @return 123
-   */
+    * @return 123
+    */
   def foo = 123
 }
 
 class Subclass extends Superclass {
+
   /**
-   * hello
-   */
+    * hello
+    */
   override def foo = 456
 }

@@ -23,9 +23,7 @@ object ForComprehensionListInt {
       noop(n)
       noop(n)
     }
-
   }
-
 }
 
 class ForComprehensionListInt(l: List[Int]) {
@@ -41,7 +39,5 @@ class ForComprehensionListInt(l: List[Int]) {
       noop(n)
       noop(n)
     }
-
   }
-
 }

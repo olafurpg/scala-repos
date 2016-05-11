@@ -11,12 +11,15 @@ private[serverset2] trait StatsClient extends ZooKeeperClient {
     lazy val success = stats.counter(s"${name}_successes")
 
     def apply[T](result: Future[T]): Future[T] = {
-      Stat.timeFuture(stats.stat(s"${name}_latency_ms"))(result).onSuccess { _ =>
-        success.incr()
-      }.onFailure {
-        case ke: KeeperException => stats.counter(ke.name).incr()
-        case _ => failure.incr()
-      }
+      Stat
+        .timeFuture(stats.stat(s"${name}_latency_ms"))(result)
+        .onSuccess { _ =>
+          success.incr()
+        }
+        .onFailure {
+          case ke: KeeperException => stats.counter(ke.name).incr()
+          case _ => failure.incr()
+        }
       result
     }
   }
@@ -44,62 +47,84 @@ private[serverset2] trait StatsClient extends ZooKeeperClient {
   protected val underlying: ZooKeeperClient
   protected val stats: StatsReceiver
 
-  def addAuthInfo(scheme: String, auth: Buf): Future[Unit] = underlying.addAuthInfo(scheme, auth)
+  def addAuthInfo(scheme: String, auth: Buf): Future[Unit] =
+    underlying.addAuthInfo(scheme, auth)
   def close(deadline: Time): Future[Unit] = underlying.close()
-  def getEphemerals(): Future[Seq[String]] = EphemeralFilter(underlying.getEphemerals())
+  def getEphemerals(): Future[Seq[String]] =
+    EphemeralFilter(underlying.getEphemerals())
   def sessionId: Long = underlying.sessionId
   def sessionPasswd: Buf = underlying.sessionPasswd
   def sessionTimeout: Duration = underlying.sessionTimeout
 }
 
-private[serverset2] trait StatsReader extends StatsClient with ZooKeeperReader {
+private[serverset2] trait StatsReader
+    extends StatsClient with ZooKeeperReader {
   protected val underlying: ZooKeeperReader
 
-  def exists(path: String): Future[Option[Data.Stat]] = ReadFilter(underlying.exists(path))
-  def existsWatch(path: String): Future[Watched[Option[Data.Stat]]] = WatchFilter(underlying.existsWatch(path))
-  def getData(path: String): Future[Node.Data] = ReadFilter(underlying.getData(path))
-  def getDataWatch(path: String): Future[Watched[Node.Data]] = WatchFilter(underlying.getDataWatch(path))
-  def getACL(path: String): Future[Node.ACL] = ReadFilter(underlying.getACL(path))
-  def getChildren(path: String): Future[Node.Children] = ReadFilter(underlying.getChildren(path))
-  def getChildrenWatch(path: String): Future[Watched[Node.Children]] = WatchFilter(underlying.getChildrenWatch(path))
+  def exists(path: String): Future[Option[Data.Stat]] =
+    ReadFilter(underlying.exists(path))
+  def existsWatch(path: String): Future[Watched[Option[Data.Stat]]] =
+    WatchFilter(underlying.existsWatch(path))
+  def getData(path: String): Future[Node.Data] =
+    ReadFilter(underlying.getData(path))
+  def getDataWatch(path: String): Future[Watched[Node.Data]] =
+    WatchFilter(underlying.getDataWatch(path))
+  def getACL(path: String): Future[Node.ACL] =
+    ReadFilter(underlying.getACL(path))
+  def getChildren(path: String): Future[Node.Children] =
+    ReadFilter(underlying.getChildren(path))
+  def getChildrenWatch(path: String): Future[Watched[Node.Children]] =
+    WatchFilter(underlying.getChildrenWatch(path))
 
   def sync(path: String): Future[Unit] = ReadFilter(underlying.sync(path))
 }
 
-private[serverset2] trait StatsWriter extends StatsClient with ZooKeeperWriter {
+private[serverset2] trait StatsWriter
+    extends StatsClient with ZooKeeperWriter {
   protected val underlying: ZooKeeperWriter
 
   def create(
-    path: String,
-    data: Option[Buf],
-    acl: Seq[Data.ACL],
-    createMode: CreateMode
+      path: String,
+      data: Option[Buf],
+      acl: Seq[Data.ACL],
+      createMode: CreateMode
   ): Future[String] = createMode match {
-    case CreateMode.Ephemeral => EphemeralFilter(underlying.create(path, data, acl, createMode))
-    case CreateMode.EphemeralSequential => EphemeralFilter(underlying.create(path, data, acl, createMode))
+    case CreateMode.Ephemeral =>
+      EphemeralFilter(underlying.create(path, data, acl, createMode))
+    case CreateMode.EphemeralSequential =>
+      EphemeralFilter(underlying.create(path, data, acl, createMode))
     case _ => WriteFilter(underlying.create(path, data, acl, createMode))
   }
 
-  def delete(path: String, version: Option[Int]): Future[Unit] = WriteFilter(underlying.delete(path, version))
+  def delete(path: String, version: Option[Int]): Future[Unit] =
+    WriteFilter(underlying.delete(path, version))
 
-  def setACL(path: String, acl: Seq[Data.ACL], version: Option[Int]): Future[Data.Stat] =
+  def setACL(path: String,
+             acl: Seq[Data.ACL],
+             version: Option[Int]): Future[Data.Stat] =
     WriteFilter(underlying.setACL(path, acl, version))
 
-  def setData(path: String, data: Option[Buf], version: Option[Int]): Future[Data.Stat] =
+  def setData(path: String,
+              data: Option[Buf],
+              version: Option[Int]): Future[Data.Stat] =
     WriteFilter(underlying.setData(path, data, version))
 }
 
 private[serverset2] trait StatsMulti extends StatsClient with ZooKeeperMulti {
   protected val underlying: ZooKeeperMulti
 
-  def multi(ops: Seq[Op]): Future[Seq[OpResult]] = MultiFilter(underlying.multi(ops))
+  def multi(ops: Seq[Op]): Future[Seq[OpResult]] =
+    MultiFilter(underlying.multi(ops))
 }
 
-private[serverset2] trait StatsRW extends ZooKeeperRW with StatsReader with StatsWriter {
+private[serverset2] trait StatsRW
+    extends ZooKeeperRW with StatsReader with StatsWriter {
   protected val underlying: ZooKeeperRW
 }
 
-private[serverset2] trait StatsRWMulti extends ZooKeeperRWMulti with StatsReader with StatsWriter with StatsMulti {
+private[serverset2] trait StatsRWMulti
+    extends ZooKeeperRWMulti with StatsReader with StatsWriter
+    with StatsMulti {
   protected val underlying: ZooKeeperRWMulti
 }
 
@@ -111,9 +136,12 @@ private[serverset2] trait EventStats {
   private[this] lazy val createdCounter = stats.counter(Created.name)
   private[this] lazy val dataChangedCounter = stats.counter(DataChanged.name)
   private[this] lazy val deletedCounter = stats.counter(Deleted.name)
-  private[this] lazy val childrenChangedCounter = stats.counter(ChildrenChanged.name)
-  private[this] lazy val dataWatchRemovedCounter = stats.counter(DataWatchRemoved.name)
-  private[this] lazy val childWatchRemovedCounter = stats.counter(ChildWatchRemoved.name)
+  private[this] lazy val childrenChangedCounter =
+    stats.counter(ChildrenChanged.name)
+  private[this] lazy val dataWatchRemovedCounter =
+    stats.counter(DataWatchRemoved.name)
+  private[this] lazy val childWatchRemovedCounter =
+    stats.counter(ChildWatchRemoved.name)
 
   protected def EventFilter(event: NodeEvent): NodeEvent = {
     event match {
@@ -130,10 +158,10 @@ private[serverset2] trait EventStats {
 
 object SessionStats {
   def watcher(
-    underlying: Var[WatchState],
-    statsReceiver: StatsReceiver,
-    interval: Duration,
-    timer: Timer
+      underlying: Var[WatchState],
+      statsReceiver: StatsReceiver,
+      interval: Duration,
+      timer: Timer
   ): Var[WatchState] = {
     import SessionState._
     val unknownCounter = statsReceiver.counter(Unknown.name)
@@ -142,8 +170,10 @@ object SessionStats {
     val expiredCounter = statsReceiver.counter(Expired.name)
     val syncConnectedCounter = statsReceiver.counter(SyncConnected.name)
     val noSyncConnectedCounter = statsReceiver.counter(NoSyncConnected.name)
-    val connectedReadOnlyCounter = statsReceiver.counter(ConnectedReadOnly.name)
-    val saslAuthenticatedCounter = statsReceiver.counter(SaslAuthenticated.name)
+    val connectedReadOnlyCounter =
+      statsReceiver.counter(ConnectedReadOnly.name)
+    val saslAuthenticatedCounter =
+      statsReceiver.counter(SaslAuthenticated.name)
 
     Var.async[WatchState](WatchState.Pending) { v =>
       val stateTracker = new StateTracker(statsReceiver, interval, timer)

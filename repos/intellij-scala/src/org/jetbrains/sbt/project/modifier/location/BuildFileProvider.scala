@@ -12,19 +12,27 @@ import org.jetbrains.sbt.project.modifier.BuildFileElementType
 import scala.collection.mutable
 
 /**
- * @author Roman.Shein
- * @since 17.03.2015.
- */
+  * @author Roman.Shein
+  * @since 17.03.2015.
+  */
 trait BuildFileProvider {
-  def findBuildFile(module: IJModule, elementType: BuildFileElementType,
-                    vfsFileToCopy: mutable.Map[VirtualFile, LightVirtualFile]): Option[BuildFileEntry[PsiFile]] = {
+  def findBuildFile(module: IJModule,
+                    elementType: BuildFileElementType,
+                    vfsFileToCopy: mutable.Map[VirtualFile, LightVirtualFile])
+    : Option[BuildFileEntry[PsiFile]] = {
 
-    def findVirtualFile(file: File) = Option(VfsUtil.findFileByIoFile(file, true))
+    def findVirtualFile(file: File) =
+      Option(VfsUtil.findFileByIoFile(file, true))
 
-    def toLightVirtualFile(origFile: VirtualFile) = vfsFileToCopy.getOrElseUpdate(origFile,
-      new LightVirtualFile(origFile, VfsUtilCore.loadText(origFile), LocalTimeCounter.currentTime))
+    def toLightVirtualFile(origFile: VirtualFile) =
+      vfsFileToCopy.getOrElseUpdate(
+          origFile,
+          new LightVirtualFile(origFile,
+                               VfsUtilCore.loadText(origFile),
+                               LocalTimeCounter.currentTime))
 
-    def toPsiFile(vFile: VirtualFile) = Option(PsiManager.getInstance(module.getProject).findFile(vFile))
+    def toPsiFile(vFile: VirtualFile) =
+      Option(PsiManager.getInstance(module.getProject).findFile(vFile))
 
     findIoFile(module, elementType).flatMap {
       case BuildFileEntry(buildFile, isModuleLocal) =>
@@ -35,8 +43,9 @@ trait BuildFileProvider {
     }
   }
 
-
-  def findIoFile(module: IJModule, elementType: BuildFileElementType): Option[BuildFileEntry[File]]
+  def findIoFile(
+      module: IJModule,
+      elementType: BuildFileElementType): Option[BuildFileEntry[File]]
 }
 
 case class BuildFileEntry[T](file: T, isModuleLocal: Boolean)

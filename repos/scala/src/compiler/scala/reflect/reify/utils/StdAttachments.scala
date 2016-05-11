@@ -1,8 +1,7 @@
 package scala.reflect.reify
 package utils
 
-trait StdAttachments {
-  self: Utils =>
+trait StdAttachments { self: Utils =>
 
   import global._
 

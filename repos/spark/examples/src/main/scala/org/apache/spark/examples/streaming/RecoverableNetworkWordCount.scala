@@ -30,8 +30,8 @@ import org.apache.spark.streaming.{Seconds, StreamingContext, Time}
 import org.apache.spark.util.IntParam
 
 /**
- * Use this singleton to get or register a Broadcast variable.
- */
+  * Use this singleton to get or register a Broadcast variable.
+  */
 object WordBlacklist {
 
   @volatile private var instance: Broadcast[Seq[String]] = null
@@ -50,8 +50,8 @@ object WordBlacklist {
 }
 
 /**
- * Use this singleton to get or register an Accumulator.
- */
+  * Use this singleton to get or register an Accumulator.
+  */
 object DroppedWordsCounter {
 
   @volatile private var instance: Accumulator[Long] = null
@@ -69,37 +69,39 @@ object DroppedWordsCounter {
 }
 
 /**
- * Counts words in text encoded with UTF8 received from the network every second. This example also
- * shows how to use lazily instantiated singleton instances for Accumulator and Broadcast so that
- * they can be registered on driver failures.
- *
- * Usage: RecoverableNetworkWordCount <hostname> <port> <checkpoint-directory> <output-file>
- *   <hostname> and <port> describe the TCP server that Spark Streaming would connect to receive
- *   data. <checkpoint-directory> directory to HDFS-compatible file system which checkpoint data
- *   <output-file> file to which the word counts will be appended
- *
- * <checkpoint-directory> and <output-file> must be absolute paths
- *
- * To run this on your local machine, you need to first run a Netcat server
- *
- *      `$ nc -lk 9999`
- *
- * and run the example as
- *
- *      `$ ./bin/run-example org.apache.spark.examples.streaming.RecoverableNetworkWordCount \
- *              localhost 9999 ~/checkpoint/ ~/out`
- *
- * If the directory ~/checkpoint/ does not exist (e.g. running for the first time), it will create
- * a new StreamingContext (will print "Creating new context" to the console). Otherwise, if
- * checkpoint data exists in ~/checkpoint/, then it will create StreamingContext from
- * the checkpoint data.
- *
- * Refer to the online documentation for more details.
- */
+  * Counts words in text encoded with UTF8 received from the network every second. This example also
+  * shows how to use lazily instantiated singleton instances for Accumulator and Broadcast so that
+  * they can be registered on driver failures.
+  *
+  * Usage: RecoverableNetworkWordCount <hostname> <port> <checkpoint-directory> <output-file>
+  *   <hostname> and <port> describe the TCP server that Spark Streaming would connect to receive
+  *   data. <checkpoint-directory> directory to HDFS-compatible file system which checkpoint data
+  *   <output-file> file to which the word counts will be appended
+  *
+  * <checkpoint-directory> and <output-file> must be absolute paths
+  *
+  * To run this on your local machine, you need to first run a Netcat server
+  *
+  *      `$ nc -lk 9999`
+  *
+  * and run the example as
+  *
+  *      `$ ./bin/run-example org.apache.spark.examples.streaming.RecoverableNetworkWordCount \
+  *              localhost 9999 ~/checkpoint/ ~/out`
+  *
+  * If the directory ~/checkpoint/ does not exist (e.g. running for the first time), it will create
+  * a new StreamingContext (will print "Creating new context" to the console). Otherwise, if
+  * checkpoint data exists in ~/checkpoint/, then it will create StreamingContext from
+  * the checkpoint data.
+  *
+  * Refer to the online documentation for more details.
+  */
 object RecoverableNetworkWordCount {
 
-  def createContext(ip: String, port: Int, outputPath: String, checkpointDirectory: String)
-    : StreamingContext = {
+  def createContext(ip: String,
+                    port: Int,
+                    outputPath: String,
+                    checkpointDirectory: String): StreamingContext = {
 
     // If you do not see this printed, that means the StreamingContext has been loaded
     // from the new checkpoint
@@ -116,25 +118,29 @@ object RecoverableNetworkWordCount {
     val lines = ssc.socketTextStream(ip, port)
     val words = lines.flatMap(_.split(" "))
     val wordCounts = words.map(x => (x, 1)).reduceByKey(_ + _)
-    wordCounts.foreachRDD((rdd: RDD[(String, Int)], time: Time) => {
-      // Get or register the blacklist Broadcast
-      val blacklist = WordBlacklist.getInstance(rdd.sparkContext)
-      // Get or register the droppedWordsCounter Accumulator
-      val droppedWordsCounter = DroppedWordsCounter.getInstance(rdd.sparkContext)
-      // Use blacklist to drop words and use droppedWordsCounter to count them
-      val counts = rdd.filter { case (word, count) =>
-        if (blacklist.value.contains(word)) {
-          droppedWordsCounter += count
-          false
-        } else {
-          true
-        }
-      }.collect().mkString("[", ", ", "]")
-      val output = "Counts at time " + time + " " + counts
-      println(output)
-      println("Dropped " + droppedWordsCounter.value + " word(s) totally")
-      println("Appending to " + outputFile.getAbsolutePath)
-      Files.append(output + "\n", outputFile, Charset.defaultCharset())
+    wordCounts.foreachRDD(
+        (rdd: RDD[(String, Int)], time: Time) =>
+          {
+        // Get or register the blacklist Broadcast
+        val blacklist = WordBlacklist.getInstance(rdd.sparkContext)
+        // Get or register the droppedWordsCounter Accumulator
+        val droppedWordsCounter =
+          DroppedWordsCounter.getInstance(rdd.sparkContext)
+        // Use blacklist to drop words and use droppedWordsCounter to count them
+        val counts = rdd.filter {
+          case (word, count) =>
+            if (blacklist.value.contains(word)) {
+              droppedWordsCounter += count
+              false
+            } else {
+              true
+            }
+        }.collect().mkString("[", ", ", "]")
+        val output = "Counts at time " + time + " " + counts
+        println(output)
+        println("Dropped " + droppedWordsCounter.value + " word(s) totally")
+        println("Appending to " + outputFile.getAbsolutePath)
+        Files.append(output + "\n", outputFile, Charset.defaultCharset())
     })
     ssc
   }
@@ -143,7 +149,7 @@ object RecoverableNetworkWordCount {
     if (args.length != 4) {
       System.err.println("You arguments were " + args.mkString("[", ", ", "]"))
       System.err.println(
-        """
+          """
           |Usage: RecoverableNetworkWordCount <hostname> <port> <checkpoint-directory>
           |     <output-file>. <hostname> and <port> describe the TCP server that Spark
           |     Streaming would connect to receive data. <checkpoint-directory> directory to
@@ -157,10 +163,12 @@ object RecoverableNetworkWordCount {
       System.exit(1)
     }
     val Array(ip, IntParam(port), checkpointDirectory, outputPath) = args
-    val ssc = StreamingContext.getOrCreate(checkpointDirectory,
-      () => {
-        createContext(ip, port, outputPath, checkpointDirectory)
-      })
+    val ssc = StreamingContext.getOrCreate(
+        checkpointDirectory,
+        () =>
+          {
+            createContext(ip, port, outputPath, checkpointDirectory)
+        })
     ssc.start()
     ssc.awaitTermination()
   }

@@ -4,8 +4,8 @@ import com.intellij.debugger.engine.evaluation.EvaluationContextImpl
 import com.intellij.debugger.engine.evaluation.expression.{Evaluator, Modifier}
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class ScalaCachingEvaluator(evaluator: Evaluator) extends Evaluator {
   private var result: Option[AnyRef] = None
 

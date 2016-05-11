@@ -19,7 +19,7 @@ import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 
 package object shapeless {
-  def unexpected : Nothing = sys.error("Unexpected invocation")
+  def unexpected: Nothing = sys.error("Unexpected invocation")
 
   // Basic definitions
   type Id[+T] = T
@@ -40,15 +40,15 @@ package object shapeless {
   // Type inequalities
   trait =:!=[A, B]
 
-  implicit def neq[A, B] : A =:!= B = new =:!=[A, B] {}
-  implicit def neqAmbig1[A] : A =:!= A = unexpected
-  implicit def neqAmbig2[A] : A =:!= A = unexpected
+  implicit def neq[A, B]: A =:!= B = new =:!=[A, B] {}
+  implicit def neqAmbig1[A]: A =:!= A = unexpected
+  implicit def neqAmbig2[A]: A =:!= A = unexpected
 
   trait <:!<[A, B]
 
-  implicit def nsub[A, B] : A <:!< B = new <:!<[A, B] {}
-  implicit def nsubAmbig1[A, B >: A] : A <:!< B = unexpected
-  implicit def nsubAmbig2[A, B >: A] : A <:!< B = unexpected
+  implicit def nsub[A, B]: A <:!< B = new <:!<[A, B] {}
+  implicit def nsubAmbig1[A, B >: A]: A <:!< B = unexpected
+  implicit def nsubAmbig2[A, B >: A]: A <:!< B = unexpected
 
   // Type-lambda for context bound
   type |¬|[T] = {
@@ -57,7 +57,7 @@ package object shapeless {
 
   // Quantifiers
   type ∃[P[_]] = P[T] forSome { type T }
-  type ∀[P[_]] = ¬[∃[({ type λ[X] = ¬[P[X]]})#λ]]
+  type ∀[P[_]] = ¬[∃[({ type λ[X] = ¬[P[X]] })#λ]]
 
   /** `Optic` definitions */
   val optic = OpticDefns
@@ -97,10 +97,12 @@ package object shapeless {
   type Everything[F <: Poly, K <: Poly, T] = Case1[EverythingAux[F, K], T]
 
   class ApplyEverything[F <: Poly] {
-    def apply(k : Poly): EverythingAux[F, k.type] {} = new EverythingAux[F, k.type]
+    def apply(k: Poly): EverythingAux[F, k.type] {} =
+      new EverythingAux[F, k.type]
   }
 
-  def everything(f: Poly): ApplyEverything[f.type] {} = new ApplyEverything[f.type]
+  def everything(f: Poly): ApplyEverything[f.type] {} =
+    new ApplyEverything[f.type]
 
   /** The SYB everywhere combinator */
   type Everywhere[F <: Poly, T] = Case1[EverywhereAux[F], T]
@@ -122,8 +124,10 @@ package shapeless {
       val analyzer: global.analyzer.type = global.analyzer
       val tCtx = typer.context
       val owner = tCtx.owner
-      if(!owner.isVal && !owner.isLazy)
-        c.abort(c.enclosingPosition, "cachedImplicit should only be used to initialize vals and lazy vals")
+      if (!owner.isVal && !owner.isLazy)
+        c.abort(
+            c.enclosingPosition,
+            "cachedImplicit should only be used to initialize vals and lazy vals")
       val tTpe = weakTypeOf[T]
       val application = casted.macroApplication
       val tpe = {
@@ -137,15 +141,15 @@ package shapeless {
       // the thing we are enclosed in
       val sCtx = tCtx.makeImplicit(false)
       val is = new analyzer.ImplicitSearch(
-        tree = application,
-        pt = tpe,
-        isView = false,
-        context0 = sCtx,
-        pos0 = c.enclosingPosition.asInstanceOf[global.Position]
+          tree = application,
+          pt = tpe,
+          isView = false,
+          context0 = sCtx,
+          pos0 = c.enclosingPosition.asInstanceOf[global.Position]
       ) {
         override def searchImplicit(
-          implicitInfoss: List[List[analyzer.ImplicitInfo]],
-          isLocalToCallsite: Boolean
+            implicitInfoss: List[List[analyzer.ImplicitInfo]],
+            isLocalToCallsite: Boolean
         ): analyzer.SearchResult = {
           val filteredInput = implicitInfoss.map { infos =>
             infos.filter { info =>

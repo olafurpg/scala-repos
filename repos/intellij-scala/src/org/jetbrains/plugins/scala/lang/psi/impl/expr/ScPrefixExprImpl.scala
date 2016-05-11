@@ -12,11 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import scala.collection.Seq
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
-class ScPrefixExprImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScPrefixExpr {
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
+class ScPrefixExprImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScPrefixExpr {
   override def toString: String = "PrefixExpression"
 
   def argumentExpressions: Seq[ScExpression] = Seq.empty

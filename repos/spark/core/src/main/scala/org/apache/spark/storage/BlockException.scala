@@ -17,6 +17,5 @@
 
 package org.apache.spark.storage
 
-private[spark]
-case class BlockException(blockId: BlockId, message: String) extends Exception(message)
-
+private[spark] case class BlockException(blockId: BlockId, message: String)
+    extends Exception(message)

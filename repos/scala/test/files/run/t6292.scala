@@ -1,10 +1,10 @@
- import scala.collection.mutable.DoubleLinkedList
+import scala.collection.mutable.DoubleLinkedList
 
 object Test {
   def main(args: Array[String]): Unit = {
     cloneAndtest(DoubleLinkedList[Int]())
     cloneAndtest(DoubleLinkedList[Int](1))
-    cloneAndtest(DoubleLinkedList[Int](1,2,3,4))
+    cloneAndtest(DoubleLinkedList[Int](1, 2, 3, 4))
   }
 
   def cloneAndtest(l: DoubleLinkedList[Int]): Unit =

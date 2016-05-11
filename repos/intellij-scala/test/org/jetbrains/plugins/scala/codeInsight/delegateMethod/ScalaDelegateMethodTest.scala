@@ -6,23 +6,27 @@ import org.jetbrains.plugins.scala.codeInsight.delegate.ScalaGenerateDelegateHan
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 
 /**
- * Nikolay.Tropin
- * 2014-03-26
- */
-class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * Nikolay.Tropin
+  * 2014-03-26
+  */
+class ScalaDelegateMethodTest
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
 
-  def runTest(fileText: String, expectedText: String, specifyType: Boolean = true) {
-    configureFromFileTextAdapter("dummy.scala", fileText.replace("\r", "").stripMargin.trim)
-    val oldSpecifyType = ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY
+  def runTest(
+      fileText: String, expectedText: String, specifyType: Boolean = true) {
+    configureFromFileTextAdapter(
+        "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
+    val oldSpecifyType =
+      ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = specifyType
-    new ScalaGenerateDelegateHandler().invoke(getProjectAdapter, getEditorAdapter, getFileAdapter)
+    new ScalaGenerateDelegateHandler()
+      .invoke(getProjectAdapter, getEditorAdapter, getFileAdapter)
     checkResultByText(expectedText.replace("\r", "").stripMargin.trim)
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = oldSpecifyType
   }
 
   def testVal() {
-    val text =
-      """class D {
+    val text = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -30,8 +34,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  val d = new D
         |  <caret>
         |}"""
-    val resultText =
-      """class D {
+    val resultText = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -44,8 +47,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testVar() {
-    val text =
-      """class D {
+    val text = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -53,8 +55,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  var d = new D
         |  <caret>
         |}"""
-    val resultText =
-      """class D {
+    val resultText = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -67,8 +68,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testDefParameterless() {
-    val text =
-      """class D {
+    val text = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -76,8 +76,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  def d = new D
         |  <caret>
         |}"""
-    val resultText =
-      """class D {
+    val resultText = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -90,8 +89,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testDefEmptyParen() {
-    val text =
-      """class D {
+    val text = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -99,8 +97,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  def d() = new D
         |  <caret>
         |}"""
-    val resultText =
-      """class D {
+    val resultText = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -113,8 +110,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testDelegateCompoundType() {
-    val text =
-      """trait DT {
+    val text = """trait DT {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -124,8 +120,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  val d = new DC with DT
         |  <caret>
         |}"""
-    val resultText =
-      """trait DT {
+    val resultText = """trait DT {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -140,8 +135,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testTargetFromBaseClass() {
-    val text =
-      """class Base {
+    val text = """class Base {
         |  val d = new D()
         |}
         |
@@ -152,8 +146,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |class A extends Base {
         |  <caret>
         |}"""
-    val result =
-      """class Base {
+    val result = """class Base {
         |  val d = new D()
         |}
         |
@@ -168,8 +161,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testPrivateFromBaseClass() {
-    val text =
-      """class Base {
+    val text = """class Base {
         |  private val d = new D()
         |}
         |
@@ -181,7 +173,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |<caret>
         |}"""
     val result = //no action
-      """class Base {
+    """class Base {
         |  private val d = new D()
         |}
         |
@@ -196,8 +188,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testOverride() {
-    val text =
-      """trait DT {
+    val text = """trait DT {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -207,8 +198,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  val d = new DC
         |  <caret>
         |}"""
-    val result =
-      """trait DT {
+    val result = """trait DT {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -223,8 +213,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testInInner() {
-    val text =
-      """class D {
+    val text = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -234,8 +223,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |    <caret>
         |  }
         |}"""
-    val result =
-      """class D {
+    val result = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -249,8 +237,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testInInner2() = {
-    val text =
-      """class D {
+    val text = """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -260,7 +247,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  }
         |}"""
     val result = //no effect
-      """class D {
+    """class D {
         |  def foo(x: Int): Int = x
         |}
         |
@@ -273,8 +260,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testMultipleParamList() {
-    val text =
-      """class D {
+    val text = """class D {
         |  def foo(x: Int)(y: Int): Int = x
         |}
         |
@@ -282,8 +268,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  val d = new D()
         |  <caret>
         |}"""
-    val result =
-      """class D {
+    val result = """class D {
         |  def foo(x: Int)(y: Int): Int = x
         |}
         |
@@ -296,8 +281,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testGenericDelegate() {
-    val text =
-      """class D[T] {
+    val text = """class D[T] {
         |  def foo(x: T): T = x
         |}
         |
@@ -305,8 +289,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  val d = new D[Int]()
         |  <caret>
         |}"""
-    val result =
-      """class D[T] {
+    val result = """class D[T] {
         |  def foo(x: T): T = x
         |}
         |
@@ -319,8 +302,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testMethodCallNeedTypeParam() {
-    val text =
-      """class D[T] {
+    val text = """class D[T] {
         |  def foo[S <: T](x: T): T = x
         |}
         |
@@ -328,8 +310,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  val d = new D[AnyRef]()
         |  <caret>
         |}"""
-    val result =
-      """class D[T] {
+    val result = """class D[T] {
         |  def foo[S <: T](x: T): T = x
         |}
         |
@@ -342,8 +323,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testNeedTypeParamWithoutRetType() {
-    val text =
-      """class D[T] {
+    val text = """class D[T] {
         |  def foo[S >: AnyRef](x: T): S = null
         |}
         |
@@ -351,8 +331,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  val d = new D[Int]()
         |  <caret>
         |}"""
-    val result =
-      """class D[T] {
+    val result = """class D[T] {
         |  def foo[S >: AnyRef](x: T): S = null
         |}
         |
@@ -365,8 +344,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
   }
 
   def testNoTypeParamWithReturn() {
-    val text =
-      """class D[T] {
+    val text = """class D[T] {
         |  def foo[S >: AnyRef](x: T): S = null
         |}
         |
@@ -374,8 +352,7 @@ class ScalaDelegateMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapt
         |  val d = new D[Int]()
         |  <caret>
         |}"""
-    val result =
-      """class D[T] {
+    val result = """class D[T] {
         |  def foo[S >: AnyRef](x: T): S = null
         |}
         |

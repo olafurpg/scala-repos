@@ -1,6 +1,5 @@
 package a
 
-object A
-{
-	def x = "A"
+object A {
+  def x = "A"
 }

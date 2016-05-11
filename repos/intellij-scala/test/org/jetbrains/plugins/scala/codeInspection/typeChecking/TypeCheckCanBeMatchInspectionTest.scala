@@ -5,15 +5,17 @@ import com.intellij.codeInspection.LocalInspectionTool
 import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTestAdapter
 
 /**
- * Nikolay.Tropin
- * 5/15/13
- */
-class TypeCheckCanBeMatchInspectionTest extends ScalaLightInspectionFixtureTestAdapter{
+  * Nikolay.Tropin
+  * 5/15/13
+  */
+class TypeCheckCanBeMatchInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
 
   val annotation = TypeCheckCanBeMatchInspection.inspectionName
   val hint = TypeCheckCanBeMatchInspection.inspectionName
 
-  protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[TypeCheckCanBeMatchInspection]
+  protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[TypeCheckCanBeMatchInspection]
 
   private def testQuickFix(text: String, result: String) {
     testFix(text, result, hint)
@@ -275,7 +277,8 @@ class TypeCheckCanBeMatchInspectionTest extends ScalaLightInspectionFixtureTestA
                       |if (${START}x.isInstanceOf[Int]$END) x else if (x.isInstanceOf[Long]) x else 0"""
     check(selected)
 
-    val text = """val x = 0
+    val text =
+      """val x = 0
                  |if (x.isInstance<caret>Of[Int]) x else if (x.isInstanceOf[Long]) x else 0"""
     val result = """val x = 0
                    |x match {
@@ -330,5 +333,4 @@ class TypeCheckCanBeMatchInspectionTest extends ScalaLightInspectionFixtureTestA
                    |}"""
     testQuickFix(text, result)
   }
-
 }

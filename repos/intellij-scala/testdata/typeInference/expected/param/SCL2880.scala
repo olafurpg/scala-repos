@@ -5,6 +5,6 @@ object Main {
   }
   implicit def toRichA(a: A): RichA = null
   val a = new A()
-  a(z => /*start*/z/*end*/)
+  a(z => /*start*/ z /*end*/ )
 }
 //Int

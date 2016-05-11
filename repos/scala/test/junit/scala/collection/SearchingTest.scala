@@ -31,7 +31,8 @@ class SearchingTest {
   @Test
   def doesBinarySearchOnIndexedSeqs() {
 
-    class TestIndexedSeq[A](vec: Vector[A]) extends IndexedSeqLike[A, TestIndexedSeq[A]] {
+    class TestIndexedSeq[A](vec: Vector[A])
+        extends IndexedSeqLike[A, TestIndexedSeq[A]] {
       var elementsAccessed = Set.empty[Int]
 
       protected[this] def newBuilder = ??? // not needed for this test

@@ -20,28 +20,35 @@ class SegmentIOAuthSpec extends Specification {
   val eventClient = new LEvents {
     override def init(appId: Int, channelId: Option[Int]): Boolean = true
 
-    override def futureInsert(event: Event, appId: Int, channelId: Option[Int])
-        (implicit ec: ExecutionContext): Future[String] =
+    override def futureInsert(
+        event: Event, appId: Int, channelId: Option[Int])(
+        implicit ec: ExecutionContext): Future[String] =
       Future successful "event_id"
 
-    override def futureFind(
-      appId: Int, channelId: Option[Int], startTime: Option[DateTime],
-      untilTime: Option[DateTime], entityType: Option[String],
-      entityId: Option[String], eventNames: Option[Seq[String]],
-      targetEntityType: Option[Option[String]],
-      targetEntityId: Option[Option[String]], limit: Option[Int],
-      reversed: Option[Boolean])
-        (implicit ec: ExecutionContext): Future[Iterator[Event]] =
+    override def futureFind(appId: Int,
+                            channelId: Option[Int],
+                            startTime: Option[DateTime],
+                            untilTime: Option[DateTime],
+                            entityType: Option[String],
+                            entityId: Option[String],
+                            eventNames: Option[Seq[String]],
+                            targetEntityType: Option[Option[String]],
+                            targetEntityId: Option[Option[String]],
+                            limit: Option[Int],
+                            reversed: Option[Boolean])(
+        implicit ec: ExecutionContext): Future[Iterator[Event]] =
       Future successful List.empty[Event].iterator
 
-    override def futureGet(eventId: String, appId: Int, channelId: Option[Int])
-        (implicit ec: ExecutionContext): Future[Option[Event]] =
+    override def futureGet(
+        eventId: String, appId: Int, channelId: Option[Int])(
+        implicit ec: ExecutionContext): Future[Option[Event]] =
       Future successful None
 
     override def remove(appId: Int, channelId: Option[Int]): Boolean = true
 
-    override def futureDelete(eventId: String, appId: Int, channelId: Option[Int])
-        (implicit ec: ExecutionContext): Future[Boolean] =
+    override def futureDelete(
+        eventId: String, appId: Int, channelId: Option[Int])(
+        implicit ec: ExecutionContext): Future[Boolean] =
       Future successful true
 
     override def close(): Unit = {}
@@ -63,14 +70,14 @@ class SegmentIOAuthSpec extends Specification {
 
   val channelsClient = Storage.getMetaDataChannels()
   val eventServiceActor = system.actorOf(
-    Props(
-      new EventServiceActor(
-        eventClient,
-        accessKeysClient,
-        channelsClient,
-        EventServerConfig()
+      Props(
+          new EventServiceActor(
+              eventClient,
+              accessKeysClient,
+              channelsClient,
+              EventServerConfig()
+          )
       )
-    )
   )
 
   val base64Encoder = new BASE64Encoder
@@ -81,22 +88,21 @@ class SegmentIOAuthSpec extends Specification {
       val accessKey = "abc123:"
       val probe = TestProbe()(system)
       probe.send(
-        eventServiceActor,
-        Post("/webhooks/segmentio.json")
-          .withHeaders(
-            List(
-              RawHeader("Authorization", s"Basic $accessKey")
-            )
+          eventServiceActor,
+          Post("/webhooks/segmentio.json").withHeaders(
+              List(
+                  RawHeader("Authorization", s"Basic $accessKey")
+              )
           )
       )
       probe.expectMsg(
-        HttpResponse(
-          401,
-          HttpEntity(
-            contentType = ContentTypes.`application/json`,
-            string = """{"message":"Invalid accessKey."}"""
+          HttpResponse(
+              401,
+              HttpEntity(
+                  contentType = ContentTypes.`application/json`,
+                  string = """{"message":"Invalid accessKey."}"""
+              )
           )
-        )
       )
       success
     }
@@ -104,17 +110,17 @@ class SegmentIOAuthSpec extends Specification {
     "reject with CredentialsMissed without credentials" in {
       val probe = TestProbe()(system)
       probe.send(
-        eventServiceActor,
-        Post("/webhooks/segmentio.json")
+          eventServiceActor,
+          Post("/webhooks/segmentio.json")
       )
       probe.expectMsg(
-        HttpResponse(
-          401,
-          HttpEntity(
-            contentType = ContentTypes.`application/json`,
-            string = """{"message":"Missing accessKey."}"""
+          HttpResponse(
+              401,
+              HttpEntity(
+                  contentType = ContentTypes.`application/json`,
+                  string = """{"message":"Missing accessKey."}"""
+              )
           )
-        )
       )
       success
     }
@@ -148,24 +154,24 @@ class SegmentIOAuthSpec extends Specification {
       val accessKeyEncoded = base64Encoder.encodeBuffer(accessKey.getBytes)
       val probe = TestProbe()(system)
       probe.send(
-        eventServiceActor,
-        Post(
-          "/webhooks/segmentio.json",
-          HttpEntity(ContentTypes.`application/json`, jsonReq.getBytes)
-        ).withHeaders(
-            List(
-              RawHeader("Authorization", s"Basic $accessKeyEncoded")
-            )
+          eventServiceActor,
+          Post(
+              "/webhooks/segmentio.json",
+              HttpEntity(ContentTypes.`application/json`, jsonReq.getBytes)
+          ).withHeaders(
+              List(
+                  RawHeader("Authorization", s"Basic $accessKeyEncoded")
+              )
           )
       )
       probe.expectMsg(
-        HttpResponse(
-          201,
-          HttpEntity(
-            contentType = ContentTypes.`application/json`,
-            string = """{"eventId":"event_id"}"""
+          HttpResponse(
+              201,
+              HttpEntity(
+                  contentType = ContentTypes.`application/json`,
+                  string = """{"eventId":"event_id"}"""
+              )
           )
-        )
       )
       success
     }

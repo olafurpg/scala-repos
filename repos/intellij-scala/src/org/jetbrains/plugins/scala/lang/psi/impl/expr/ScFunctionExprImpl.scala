@@ -14,10 +14,10 @@ import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
-class ScFunctionExprImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScFunctionExpr {
+  * @author Alexander Podkhalyuzin
+  */
+class ScFunctionExprImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScFunctionExpr {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -38,8 +38,11 @@ class ScFunctionExprImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
     result match {
-      case Some(x) if x == lastParent || (lastParent.isInstanceOf[ScalaPsiElement] &&
-        x == lastParent.asInstanceOf[ScalaPsiElement].getDeepSameElementInContext)=>
+      case Some(x)
+          if x == lastParent ||
+          (lastParent.isInstanceOf[ScalaPsiElement] && x == lastParent
+                .asInstanceOf[ScalaPsiElement]
+                .getDeepSameElementInContext) =>
         for (p <- parameters) {
           if (!processor.execute(p, state)) return false
         }
@@ -50,8 +53,12 @@ class ScFunctionExprImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
 
   protected override def innerType(ctx: TypingContext) = {
     val paramTypes = (parameters: Seq[ScParameter]).map(_.getType(ctx))
-    val resultType = result match {case Some(r) => r.getType(ctx).getOrAny case _ => Unit}
-    collectFailures(paramTypes, Nothing)(ScFunctionType(resultType, _)(getProject, getResolveScope))
+    val resultType = result match {
+      case Some(r) => r.getType(ctx).getOrAny
+      case _ => Unit
+    }
+    collectFailures(paramTypes, Nothing)(
+        ScFunctionType(resultType, _)(getProject, getResolveScope))
   }
 
   override def controlFlowScope: Option[ScalaPsiElement] = result

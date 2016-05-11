@@ -46,5 +46,4 @@ trait AsyncTests extends BasicJSEnvTests {
 
     runner.stop() // should do nothing, and not fail
   }
-
 }

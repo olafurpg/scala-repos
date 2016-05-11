@@ -28,48 +28,52 @@ import java.io._
 // FIXME without breaking code :/
 // @deprecated("Please use CssHelpers instead; we are unifying capitalization across Lift.", "3.0")
 object CSSHelpers extends ControlHelpers {
+
   /**
-   * Adds a prefix to root relative paths in the url segments from the css content
-   *
-   * @param in - the text reader
-   * @param rootPrefix - the prefix to be added
-   * @return (Box[String], String) - returns the tuple containing the parsing output and the original input (as a String)
-   */
+    * Adds a prefix to root relative paths in the url segments from the css content
+    *
+    * @param in - the text reader
+    * @param rootPrefix - the prefix to be added
+    * @return (Box[String], String) - returns the tuple containing the parsing output and the original input (as a String)
+    */
   def fixCSS(in: Reader, rootPrefix: String): (Box[String], String) = {
-      val reader = new BufferedReader(in)
-      val res = new StringBuilder;
-      var line: String = null;
-      try {
-        while ({line = reader.readLine(); line != null}) {
-          res append line + "\n"
-        }
-      } finally {
-        reader close
+    val reader = new BufferedReader(in)
+    val res = new StringBuilder;
+    var line: String = null;
+    try {
+      while ({ line = reader.readLine(); line != null }) {
+        res append line + "\n"
       }
-      val str = res toString;
-      (CSSParser(rootPrefix).fixCSS(str), str);
+    } finally {
+      reader close
+    }
+    val str = res toString;
+    (CSSParser(rootPrefix).fixCSS(str), str);
   }
 }
 
 object CSSParser {
-  @deprecated("Please use CssUrlPrefixer instead; we are unifying capitalization across Lift.", "3.0")
+  @deprecated(
+      "Please use CssUrlPrefixer instead; we are unifying capitalization across Lift.",
+      "3.0")
   def apply(prefix: String) = CssUrlPrefixer(prefix)
 }
 
 /**
- * Utility for prefixing root-relative `url`s in CSS with a given prefix.
- * Typically used to prefix root-relative CSS `url`s with the application
- * context path.
- *
- * After creating the prefixer with the prefix you want to apply to
- * root-relative paths, call `fixCss` with a CSS string to return a fixed CSS
- * string.
- */
-case class CssUrlPrefixer(prefix: String) extends Parsers  {
-  implicit def strToInput(in: String): Input = new scala.util.parsing.input.CharArrayReader(in.toCharArray)
+  * Utility for prefixing root-relative `url`s in CSS with a given prefix.
+  * Typically used to prefix root-relative CSS `url`s with the application
+  * context path.
+  *
+  * After creating the prefixer with the prefix you want to apply to
+  * root-relative paths, call `fixCss` with a CSS string to return a fixed CSS
+  * string.
+  */
+case class CssUrlPrefixer(prefix: String) extends Parsers {
+  implicit def strToInput(in: String): Input =
+    new scala.util.parsing.input.CharArrayReader(in.toCharArray)
   type Elem = Char
 
- lazy val contentParser = Parser[String] {
+  lazy val contentParser = Parser[String] {
     case in =>
       val content = new StringBuilder;
       var seqDone = 0;
@@ -89,7 +93,8 @@ case class CssUrlPrefixer(prefix: String) extends Parsers  {
             case 'u' if (seqDone == 0) => seqDone = 1;
             case 'r' if (seqDone == 1) => seqDone = 2;
             case 'l' if (seqDone == 2) => seqDone = 3;
-            case ' ' | '\t' | '\n' | '\r' if (seqDone == 3 || seqDone == 4) => seqDone = 4
+            case ' ' | '\t' | '\n' | '\r' if (seqDone == 3 || seqDone == 4) =>
+              seqDone = 4
             case '(' if (seqDone == 3 || seqDone == 4) => seqDone = 5
             case _ => seqDone = 0
           }
@@ -99,22 +104,15 @@ case class CssUrlPrefixer(prefix: String) extends Parsers  {
       Success(content toString, rest);
   }
 
-
-
   lazy val spaces = (elem(' ') | elem('\t') | elem('\n') | elem('\r')).*
 
   def pathWith(additionalCharacters: Char*) = {
     elem("path",
-      c => c.isLetterOrDigit ||
-           c == '?' || c == '/' ||
-           c == '&' || c == '@' ||
-           c == ';' || c == '.' ||
-           c == '+' || c == '-' ||
-           c == '=' || c == ':' ||
-           c == ' ' || c == '_' ||
-           c == '#' || c == ',' ||
-           c == '%' || additionalCharacters.contains(c)
-    ).+ ^^ {
+         c =>
+           c.isLetterOrDigit || c == '?' || c == '/' || c == '&' || c == '@' ||
+           c == ';' || c == '.' || c == '+' || c == '-' || c == '=' ||
+           c == ':' || c == ' ' || c == '_' || c == '#' ||
+           c == ',' || c == '%' || additionalCharacters.contains(c)).+ ^^ {
       case l =>
         l.mkString("")
     }
@@ -134,34 +132,35 @@ case class CssUrlPrefixer(prefix: String) extends Parsers  {
     // do the parsing per CSS spec http://www.w3.org/TR/REC-CSS2/syndata.html#uri section 4.3.4
     spaces ~> innerUrl <~ (spaces <~ elem(')')) ^^ {
       case urlPath => {
-        val trimmedPath = urlPath.trim
+          val trimmedPath = urlPath.trim
 
-        val updatedPath =
-          if (trimmedPath.charAt(0) == '/') {
-            escapedPrefix + trimmedPath
-          } else {
-            trimmedPath
-          }
+          val updatedPath =
+            if (trimmedPath.charAt(0) == '/') {
+              escapedPrefix + trimmedPath
+            } else {
+              trimmedPath
+            }
 
-        quoteString + updatedPath + quoteString + ")"
-      }
+          quoteString + updatedPath + quoteString + ")"
+        }
     }
   }
 
   // the URL might be wrapped in simple quotes
-  lazy val singleQuotedPath = fullUrl(elem('\'') ~> pathWith('"') <~ elem('\''), "'")
+  lazy val singleQuotedPath = fullUrl(
+      elem('\'') ~> pathWith('"') <~ elem('\''), "'")
   // the URL might be wrapped in double quotes
-  lazy val doubleQuotedPath = fullUrl(elem('\"') ~> pathWith('\'') <~ elem('\"'), "\"")
+  lazy val doubleQuotedPath = fullUrl(
+      elem('\"') ~> pathWith('\'') <~ elem('\"'), "\"")
   // the URL might not be wrapped at all
   lazy val quotelessPath = fullUrl(path, "")
 
   lazy val phrase =
-    (((contentParser ~ singleQuotedPath) |||
-      (contentParser ~ doubleQuotedPath) |||
-      (contentParser ~ quotelessPath)).* ^^ {
-      case l =>
-        l.flatMap(f => f._1 + f._2).mkString("")
-    }) ~ contentParser ^^ {
+    (((contentParser ~ singleQuotedPath) ||| (contentParser ~ doubleQuotedPath) |||
+            (contentParser ~ quotelessPath)).* ^^ {
+          case l =>
+            l.flatMap(f => f._1 + f._2).mkString("")
+        }) ~ contentParser ^^ {
       case a ~ b =>
         a + b
     }
@@ -172,20 +171,23 @@ case class CssUrlPrefixer(prefix: String) extends Parsers  {
         Full(updatedCss)
 
       case Success(_, remaining) =>
-        val remainingString =
-          remaining.source.subSequence(
-            remaining.offset,
-            remaining.source.length
-          ).toString
+        val remainingString = remaining.source
+          .subSequence(
+              remaining.offset,
+              remaining.source.length
+          )
+          .toString
 
-        common.Failure(s"Parser did not consume all input. Parser error? Unconsumed:\n$remainingString")
+        common.Failure(
+            s"Parser did not consume all input. Parser error? Unconsumed:\n$remainingString")
 
       case failure =>
         common.Failure(s"Parse failed with result $failure") ~> failure
     }
   }
 
-  @deprecated("Please use fixCss instead; we are unifying capitalization across Lift.", "3.0")
+  @deprecated(
+      "Please use fixCss instead; we are unifying capitalization across Lift.",
+      "3.0")
   def fixCSS(in: String): Box[String] = fixCss(in)
 }
-

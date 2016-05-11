@@ -11,19 +11,23 @@ package p {
 }
 
 package object p {
-  implicit def arrayTypeClass[A] : ArrayTC[A] = new ArrayTC[A]
+  implicit def arrayTypeClass[A]: ArrayTC[A] = new ArrayTC[A]
   object intArrayTC extends ArrayTC[Int]
 
   type EnvAlias[W <: HasA] = ViewEnv[W#A]
   type SubAlias[W <: HasA] = ViewEnv[W#A]#SubView
 
-  def f0[R](xs: R)(implicit tc: Indexable[R]): ViewEnv[tc.A]#SubView     = new ViewEnv[tc.A]() get
-  def f1[R](xs: R)(implicit tc: Indexable[R]): EnvAlias[tc.type]#SubView = new ViewEnv[tc.A]() get
-  def f2[R](xs: R)(implicit tc: Indexable[R]): SubAlias[tc.type]         = new ViewEnv[tc.A]() get
+  def f0[R](xs: R)(implicit tc: Indexable[R]): ViewEnv[tc.A]#SubView =
+    new ViewEnv[tc.A]() get
+  def f1[R](xs: R)(implicit tc: Indexable[R]): EnvAlias[tc.type]#SubView =
+    new ViewEnv[tc.A]() get
+  def f2[R](xs: R)(implicit tc: Indexable[R]): SubAlias[tc.type] =
+    new ViewEnv[tc.A]() get
 
-  def g0 = f0(Array(1)) has 2                   // ok
-  def g1 = f1(Array(1)) has 2                   // ok
-  def g2 = f2(Array(1)) has 2                   // "found: Int(2), required: tc.A"
-  def g3 = f2(Array(1))(new ArrayTC[Int]) has 2 // "found: Int(2), required: tc.A"
-  def g4 = f2(Array(1))(intArrayTC) has 2       // ok
+  def g0 = f0(Array(1)) has 2 // ok
+  def g1 = f1(Array(1)) has 2 // ok
+  def g2 = f2(Array(1)) has 2 // "found: Int(2), required: tc.A"
+  def g3 =
+    f2(Array(1))(new ArrayTC[Int]) has 2 // "found: Int(2), required: tc.A"
+  def g4 = f2(Array(1))(intArrayTC) has 2 // ok
 }

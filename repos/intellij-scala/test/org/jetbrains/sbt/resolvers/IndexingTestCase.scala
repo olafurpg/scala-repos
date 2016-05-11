@@ -6,9 +6,9 @@ import org.jetbrains.plugins.scala.base.ScalaFixtureTestCase
 import org.junit.Assert._
 
 /**
- * @author Nikolay Obedin
- * @since 6/9/15.
- */
+  * @author Nikolay Obedin
+  * @since 6/9/15.
+  */
 abstract class IndexingTestCase extends ScalaFixtureTestCase {
 
   var storingManager: SbtResolverIndexesManager = null
@@ -30,9 +30,14 @@ abstract class IndexingTestCase extends ScalaFixtureTestCase {
     index
   }
 
-  def assertIndexContentsEquals(index: SbtResolverIndex, groups: Set[String], artifacts: Set[String], versions: Set[String]): Unit = {
+  def assertIndexContentsEquals(index: SbtResolverIndex,
+                                groups: Set[String],
+                                artifacts: Set[String],
+                                versions: Set[String]): Unit = {
     assertEquals(index.groups(), groups)
     assertEquals(index.artifacts(), artifacts)
-    artifacts foreach { a => assertEquals(index.versions(groups.head, a), versions) }
+    artifacts foreach { a =>
+      assertEquals(index.versions(groups.head, a), versions)
+    }
   }
 }

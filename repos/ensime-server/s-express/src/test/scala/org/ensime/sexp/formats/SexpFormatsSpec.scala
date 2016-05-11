@@ -29,4 +29,3 @@ class SexpFormatsSpec extends FormatSpec with SexpFormats {
     assertFormat(SexpCons(foo, bar))
   }
 }
-

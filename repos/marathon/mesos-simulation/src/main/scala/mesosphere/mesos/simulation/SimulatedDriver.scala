@@ -2,8 +2,8 @@ package mesosphere.mesos.simulation
 
 import java.util
 
-import akka.actor.{ ActorRef, ActorSystem, Props }
-import com.typesafe.config.{ Config, ConfigFactory }
+import akka.actor.{ActorRef, ActorSystem, Props}
+import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.mesos.Protos._
 import org.apache.mesos.SchedulerDriver
 import org.slf4j.LoggerFactory
@@ -38,15 +38,18 @@ class SimulatedDriver(driverProps: Props) extends SchedulerDriver {
   override def declineOffer(offerId: OfferID): Status =
     driverCmd(DriverActor.DeclineOffer(offerId))
 
-  override def launchTasks(offerIds: util.Collection[OfferID], tasks: util.Collection[TaskInfo]): Status =
+  override def launchTasks(offerIds: util.Collection[OfferID],
+                           tasks: util.Collection[TaskInfo]): Status =
     driverCmd(DriverActor.LaunchTasks(offerIds.toSeq, tasks.toSeq))
 
   // Mesos 0.23.x
-  override def acceptOffers(
-    offerIds: util.Collection[OfferID], ops: util.Collection[Offer.Operation], filters: Filters): Status =
+  override def acceptOffers(offerIds: util.Collection[OfferID],
+                            ops: util.Collection[Offer.Operation],
+                            filters: Filters): Status =
     driverCmd(DriverActor.AcceptOffers(offerIds.toSeq, ops.toSeq, filters))
 
-  override def killTask(taskId: TaskID): Status = driverCmd(DriverActor.KillTask(taskId))
+  override def killTask(taskId: TaskID): Status =
+    driverCmd(DriverActor.KillTask(taskId))
   override def reconcileTasks(statuses: util.Collection[TaskStatus]): Status = {
     driverCmd(DriverActor.ReconcileTask(statuses.toSeq))
   }
@@ -55,14 +58,22 @@ class SimulatedDriver(driverProps: Props) extends SchedulerDriver {
 
   override def reviveOffers(): Status = driverCmd(DriverActor.ReviveOffers)
 
-  override def declineOffer(offerId: OfferID, filters: Filters): Status = Status.DRIVER_RUNNING
+  override def declineOffer(offerId: OfferID, filters: Filters): Status =
+    Status.DRIVER_RUNNING
 
-  override def launchTasks(offerIds: util.Collection[OfferID], tasks: util.Collection[TaskInfo],
+  override def launchTasks(offerIds: util.Collection[OfferID],
+                           tasks: util.Collection[TaskInfo],
                            filters: Filters): Status = ???
-  override def launchTasks(offerId: OfferID, tasks: util.Collection[TaskInfo], filters: Filters): Status = ???
-  override def launchTasks(offerId: OfferID, tasks: util.Collection[TaskInfo]): Status = ???
-  override def requestResources(requests: util.Collection[Request]): Status = ???
-  override def sendFrameworkMessage(executorId: ExecutorID, slaveId: SlaveID, data: Array[Byte]): Status = ???
+  override def launchTasks(offerId: OfferID,
+                           tasks: util.Collection[TaskInfo],
+                           filters: Filters): Status = ???
+  override def launchTasks(
+      offerId: OfferID, tasks: util.Collection[TaskInfo]): Status = ???
+  override def requestResources(requests: util.Collection[Request]): Status =
+    ???
+  override def sendFrameworkMessage(
+      executorId: ExecutorID, slaveId: SlaveID, data: Array[Byte]): Status =
+    ???
   override def acknowledgeStatusUpdate(ackStatus: TaskStatus): Status = status
 
   // life cycle
@@ -73,13 +84,14 @@ class SimulatedDriver(driverProps: Props) extends SchedulerDriver {
   var driverActorRefOpt: Option[ActorRef] = None
 
   private def status: Status = system match {
-    case None    => Status.DRIVER_STOPPED
+    case None => Status.DRIVER_STOPPED
     case Some(_) => Status.DRIVER_RUNNING
   }
 
   override def start(): Status = {
     log.info("Starting simulated Mesos")
-    val config: Config = ConfigFactory.load(getClass.getClassLoader, "mesos-simulation.conf")
+    val config: Config =
+      ConfigFactory.load(getClass.getClassLoader, "mesos-simulation.conf")
     val sys: ActorSystem = ActorSystem("mesos-simulation", config)
     system = Some(sys)
     driverActorRefOpt = Some(sys.actorOf(driverProps, "driver"))

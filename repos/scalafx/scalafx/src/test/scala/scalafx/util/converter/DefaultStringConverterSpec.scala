@@ -34,14 +34,19 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 
 /**
- * DefaultStringConverter Spec tests.
- *
- *
- */
+  * DefaultStringConverter Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class DefaultStringConverterSpec
-  extends AbstractStringConverterDelegateSpec[java.lang.String, jfxuc.DefaultStringConverter, String, DefaultStringConverter](classOf[jfxuc.DefaultStringConverter], classOf[DefaultStringConverter], classOf[String]) {
+    extends AbstractStringConverterDelegateSpec[java.lang.String,
+                                                jfxuc.DefaultStringConverter,
+                                                String,
+                                                DefaultStringConverter](
+        classOf[jfxuc.DefaultStringConverter],
+        classOf[DefaultStringConverter],
+        classOf[String]) {
 
   val examples = List(("alpha", "alpha"), ("ação", "ação"), ("", ""))
-
 }

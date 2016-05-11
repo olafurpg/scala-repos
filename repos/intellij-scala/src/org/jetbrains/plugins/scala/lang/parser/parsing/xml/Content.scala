@@ -14,7 +14,6 @@ import scala.annotation.tailrec
   * @author Alexander Podkhalyuzin
   *         Date: 18.04.2008
   */
-
 /*
  *  Content ::= [CharData] {Content1 [CharData]}
  *
@@ -39,9 +38,8 @@ object Content {
     @tailrec
     def subparse() {
       var isReturn = false
-      if (!XmlContent.parse(builder) &&
-        !Reference.parse(builder) &&
-        !ScalaExpr.parse(builder) && !patcher.parse(builder)) isReturn = true
+      if (!XmlContent.parse(builder) && !Reference.parse(builder) &&
+          !ScalaExpr.parse(builder) && !patcher.parse(builder)) isReturn = true
       builder.getTokenType match {
         case ScalaXmlTokenTypes.XML_DATA_CHARACTERS =>
           builder.advanceLexer()

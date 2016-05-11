@@ -32,14 +32,18 @@ import org.apache.spark.serializer.{KryoSerializer, SerializerInstance}
 import org.apache.spark.sql.types.Decimal
 import org.apache.spark.util.MutablePair
 
-private[sql] class SparkSqlSerializer(conf: SparkConf) extends KryoSerializer(conf) {
+private[sql] class SparkSqlSerializer(conf: SparkConf)
+    extends KryoSerializer(conf) {
   override def newKryo(): Kryo = {
     val kryo = super.newKryo()
     kryo.setRegistrationRequired(false)
     kryo.register(classOf[MutablePair[_, _]])
-    kryo.register(classOf[org.apache.spark.sql.catalyst.expressions.GenericRow])
-    kryo.register(classOf[org.apache.spark.sql.catalyst.expressions.GenericInternalRow])
-    kryo.register(classOf[org.apache.spark.sql.catalyst.expressions.GenericMutableRow])
+    kryo.register(
+        classOf[org.apache.spark.sql.catalyst.expressions.GenericRow])
+    kryo.register(
+        classOf[org.apache.spark.sql.catalyst.expressions.GenericInternalRow])
+    kryo.register(
+        classOf[org.apache.spark.sql.catalyst.expressions.GenericMutableRow])
     kryo.register(classOf[java.math.BigDecimal], new JavaBigDecimalSerializer)
     kryo.register(classOf[BigDecimal], new ScalaBigDecimalSerializer)
 
@@ -52,7 +56,7 @@ private[sql] class SparkSqlSerializer(conf: SparkConf) extends KryoSerializer(co
 }
 
 private[execution] class KryoResourcePool(size: Int)
-  extends ResourcePool[SerializerInstance](size) {
+    extends ResourcePool[SerializerInstance](size) {
 
   val ser: SparkSqlSerializer = {
     val sparkConf = Option(SparkEnv.get).map(_.conf).getOrElse(new SparkConf())
@@ -74,24 +78,27 @@ private[sql] object SparkSqlSerializer {
     }
   }
 
-  def serialize[T: ClassTag](o: T): Array[Byte] =
+  def serialize[T : ClassTag](o: T): Array[Byte] =
     acquireRelease { k =>
       JavaUtils.bufferToArray(k.serialize(o))
     }
 
-  def deserialize[T: ClassTag](bytes: Array[Byte]): T =
+  def deserialize[T : ClassTag](bytes: Array[Byte]): T =
     acquireRelease { k =>
       k.deserialize[T](ByteBuffer.wrap(bytes))
     }
 }
 
-private[sql] class JavaBigDecimalSerializer extends Serializer[java.math.BigDecimal] {
+private[sql] class JavaBigDecimalSerializer
+    extends Serializer[java.math.BigDecimal] {
   def write(kryo: Kryo, output: Output, bd: java.math.BigDecimal) {
     // TODO: There are probably more efficient representations than strings...
     output.writeString(bd.toString)
   }
 
-  def read(kryo: Kryo, input: Input, tpe: Class[java.math.BigDecimal]): java.math.BigDecimal = {
+  def read(kryo: Kryo,
+           input: Input,
+           tpe: Class[java.math.BigDecimal]): java.math.BigDecimal = {
     new java.math.BigDecimal(input.readString())
   }
 }

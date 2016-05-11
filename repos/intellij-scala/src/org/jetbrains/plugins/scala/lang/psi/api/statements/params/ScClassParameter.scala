@@ -9,11 +9,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember}
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-*/
-
-trait ScClassParameter extends ScParameter with ScModifierListOwner with ScMember {
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
+trait ScClassParameter
+    extends ScParameter with ScModifierListOwner with ScMember {
   def isVal: Boolean
   def isVar: Boolean
   def isPrivateThis: Boolean
@@ -28,7 +28,8 @@ trait ScClassParameter extends ScParameter with ScModifierListOwner with ScMembe
         case Some(const) => const.effectiveFirstParameterSection.contains(this)
         case None => false
       }
-      val hasExplicitModifier = Option(getModifierList).exists(_.hasExplicitModifiers)
+      val hasExplicitModifier =
+        Option(getModifierList).exists(_.hasExplicitModifiers)
       isInPrimaryConstructorFirstParamSection && !hasExplicitModifier
     case _ => false
   }

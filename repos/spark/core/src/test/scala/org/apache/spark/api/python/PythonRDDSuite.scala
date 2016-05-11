@@ -25,7 +25,7 @@ import org.apache.spark.SparkFunSuite
 class PythonRDDSuite extends SparkFunSuite {
 
   test("Writing large strings to the worker") {
-    val input: List[String] = List("a"*100000)
+    val input: List[String] = List("a" * 100000)
     val buffer = new DataOutputStream(new ByteArrayOutputStream)
     PythonRDD.writeIteratorToStream(input.iterator, buffer)
   }
@@ -36,12 +36,16 @@ class PythonRDDSuite extends SparkFunSuite {
     // The correctness will be tested in Python
     PythonRDD.writeIteratorToStream(Iterator("a", null), buffer)
     PythonRDD.writeIteratorToStream(Iterator(null, "a"), buffer)
-    PythonRDD.writeIteratorToStream(Iterator("a".getBytes(StandardCharsets.UTF_8), null), buffer)
-    PythonRDD.writeIteratorToStream(Iterator(null, "a".getBytes(StandardCharsets.UTF_8)), buffer)
-    PythonRDD.writeIteratorToStream(Iterator((null, null), ("a", null), (null, "b")), buffer)
-    PythonRDD.writeIteratorToStream(Iterator(
-      (null, null),
-      ("a".getBytes(StandardCharsets.UTF_8), null),
-      (null, "b".getBytes(StandardCharsets.UTF_8))), buffer)
+    PythonRDD.writeIteratorToStream(
+        Iterator("a".getBytes(StandardCharsets.UTF_8), null), buffer)
+    PythonRDD.writeIteratorToStream(
+        Iterator(null, "a".getBytes(StandardCharsets.UTF_8)), buffer)
+    PythonRDD.writeIteratorToStream(
+        Iterator((null, null), ("a", null), (null, "b")), buffer)
+    PythonRDD.writeIteratorToStream(
+        Iterator((null, null),
+                 ("a".getBytes(StandardCharsets.UTF_8), null),
+                 (null, "b".getBytes(StandardCharsets.UTF_8))),
+        buffer)
   }
 }

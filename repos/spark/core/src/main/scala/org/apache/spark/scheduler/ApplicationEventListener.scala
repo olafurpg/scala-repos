@@ -18,11 +18,11 @@
 package org.apache.spark.scheduler
 
 /**
- * A simple listener for application events.
- *
- * This listener expects to hear events from a single application only. If events
- * from multiple applications are seen, the behavior is unspecified.
- */
+  * A simple listener for application events.
+  *
+  * This listener expects to hear events from a single application only. If events
+  * from multiple applications are seen, the behavior is unspecified.
+  */
 private[spark] class ApplicationEventListener extends SparkListener {
   var appName: Option[String] = None
   var appId: Option[String] = None
@@ -33,7 +33,8 @@ private[spark] class ApplicationEventListener extends SparkListener {
   var viewAcls: Option[String] = None
   var adminAcls: Option[String] = None
 
-  override def onApplicationStart(applicationStart: SparkListenerApplicationStart) {
+  override def onApplicationStart(
+      applicationStart: SparkListenerApplicationStart) {
     appName = Some(applicationStart.appName)
     appId = applicationStart.appId
     appAttemptId = applicationStart.appAttemptId
@@ -45,7 +46,8 @@ private[spark] class ApplicationEventListener extends SparkListener {
     endTime = Some(applicationEnd.time)
   }
 
-  override def onEnvironmentUpdate(environmentUpdate: SparkListenerEnvironmentUpdate) {
+  override def onEnvironmentUpdate(
+      environmentUpdate: SparkListenerEnvironmentUpdate) {
     synchronized {
       val environmentDetails = environmentUpdate.environmentDetails
       val allProperties = environmentDetails("Spark Properties").toMap

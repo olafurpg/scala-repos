@@ -1,18 +1,16 @@
 package com.twitter.finagle.stats
 
 /**
- * A StatsReceiver receiver proxy that translates all counter, stat, and gauge
- * names according to a `translate` function.
- *
- * @param self The underlying StatsReceiver to which translated names are passed
- *
- * @param namespacePrefix the namespace used for translations
- */
+  * A StatsReceiver receiver proxy that translates all counter, stat, and gauge
+  * names according to a `translate` function.
+  *
+  * @param self The underlying StatsReceiver to which translated names are passed
+  *
+  * @param namespacePrefix the namespace used for translations
+  */
 abstract class NameTranslatingStatsReceiver(
-    val self: StatsReceiver,
-    namespacePrefix: String)
-  extends StatsReceiver
-{
+    val self: StatsReceiver, namespacePrefix: String)
+    extends StatsReceiver {
   def this(self: StatsReceiver) = this(self, "<namespacePrefix>")
 
   override def toString: String =

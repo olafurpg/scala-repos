@@ -9,11 +9,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
 
 /**
- * @author Alefas
- * @since 04/04/14.
- */
+  * @author Alefas
+  * @since 04/04/14.
+  */
 class ScLightBindingPattern(rt: ScType, val b: ScBindingPattern)
-  extends LightElement(b.getManager, b.getLanguage) with ScBindingPattern {
+    extends LightElement(b.getManager, b.getLanguage) with ScBindingPattern {
   setNavigationElement(b)
 
   override def nameId: PsiElement = b.nameId
@@ -22,9 +22,11 @@ class ScLightBindingPattern(rt: ScType, val b: ScBindingPattern)
 
   override def getParent: PsiElement = b.getParent
 
-  override def getType(ctx: TypingContext): TypeResult[ScType] = Success(rt, Some(this))
+  override def getType(ctx: TypingContext): TypeResult[ScType] =
+    Success(rt, Some(this))
 
-  override def getOriginalElement: PsiElement = super[ScBindingPattern].getOriginalElement
+  override def getOriginalElement: PsiElement =
+    super [ScBindingPattern].getOriginalElement
 
   override def toString: String = b.toString
 
@@ -34,9 +36,11 @@ class ScLightBindingPattern(rt: ScType, val b: ScBindingPattern)
 
   override def canNavigateToSource: Boolean = b.canNavigateToSource
 
-  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[
+      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): T =
+  override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): T =
     throw new UnsupportedOperationException("Operation on light element")
 }

@@ -1,22 +1,24 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl
 
 import java.util.concurrent.atomic.AtomicReference
 import scala.annotation.tailrec
 import scala.collection.immutable
-import scala.util.control.{ NoStackTrace }
-import akka.actor.{ Actor, ActorRef, Terminated }
-import org.reactivestreams.{ Publisher, Subscriber }
+import scala.util.control.{NoStackTrace}
+import akka.actor.{Actor, ActorRef, Terminated}
+import org.reactivestreams.{Publisher, Subscriber}
 import org.reactivestreams.Subscription
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object ActorPublisher {
   val NormalShutdownReasonMessage = "Cannot subscribe to shut-down Publisher"
-  class NormalShutdownException extends IllegalStateException(NormalShutdownReasonMessage) with NoStackTrace
+  class NormalShutdownException
+      extends IllegalStateException(NormalShutdownReasonMessage)
+      with NoStackTrace
   val NormalShutdownReason: Throwable = new NormalShutdownException
   val SomeNormalShutdownReason: Some[Throwable] = Some(NormalShutdownReason)
 
@@ -26,16 +28,16 @@ private[akka] object ActorPublisher {
     impl ! ExposedPublisher(a.asInstanceOf[ActorPublisher[Any]])
     a
   }
-
 }
 
 /**
- * INTERNAL API
- *
- * When you instantiate this class, or its subclasses, you MUST send an ExposedPublisher message to the wrapped
- * ActorRef! If you don't need to subclass, prefer the apply() method on the companion object which takes care of this.
- */
-private[akka] class ActorPublisher[T](val impl: ActorRef) extends Publisher[T] {
+  * INTERNAL API
+  *
+  * When you instantiate this class, or its subclasses, you MUST send an ExposedPublisher message to the wrapped
+  * ActorRef! If you don't need to subclass, prefer the apply() method on the companion object which takes care of this.
+  */
+private[akka] class ActorPublisher[T](val impl: ActorRef)
+    extends Publisher[T] {
   import ReactiveStreamsCompliance._
 
   // The subscriber of an subscription attempt is first placed in this list of pending subscribers.
@@ -43,7 +45,8 @@ private[akka] class ActorPublisher[T](val impl: ActorRef) extends Publisher[T] {
   // SubscribePending message. The AtomicReference is set to null by the shutdown method, which is
   // called by the actor from postStop. Pending (unregistered) subscription attempts are denied by
   // the shutdown method. Subscription attempts after shutdown can be denied immediately.
-  private val pendingSubscribers = new AtomicReference[immutable.Seq[Subscriber[_ >: T]]](Nil)
+  private val pendingSubscribers =
+    new AtomicReference[immutable.Seq[Subscriber[_ >: T]]](Nil)
 
   protected val wakeUpMsg: Any = SubscribePending
 
@@ -51,13 +54,11 @@ private[akka] class ActorPublisher[T](val impl: ActorRef) extends Publisher[T] {
     requireNonNullSubscriber(subscriber)
     @tailrec def doSubscribe(): Unit = {
       val current = pendingSubscribers.get
-      if (current eq null)
-        reportSubscribeFailure(subscriber)
+      if (current eq null) reportSubscribeFailure(subscriber)
       else {
         if (pendingSubscribers.compareAndSet(current, subscriber +: current))
           impl ! wakeUpMsg
-        else
-          doSubscribe() // CAS retry
+        else doSubscribe() // CAS retry
       }
     }
 
@@ -72,7 +73,7 @@ private[akka] class ActorPublisher[T](val impl: ActorRef) extends Publisher[T] {
   def shutdown(reason: Option[Throwable]): Unit = {
     shutdownReason = reason
     pendingSubscribers.getAndSet(null) match {
-      case null    ⇒ // already called earlier
+      case null ⇒ // already called earlier
       case pending ⇒ pending foreach reportSubscribeFailure
     }
   }
@@ -91,27 +92,32 @@ private[akka] class ActorPublisher[T](val impl: ActorRef) extends Publisher[T] {
     } catch {
       case _: SpecViolation ⇒ // nothing to do
     }
-
 }
 
 /**
- * INTERNAL API
- */
-private[akka] class ActorSubscription[T]( final val impl: ActorRef, final val subscriber: Subscriber[_ >: T]) extends Subscription {
-  override def request(elements: Long): Unit = impl ! RequestMore(this, elements)
+  * INTERNAL API
+  */
+private[akka] class ActorSubscription[T](
+    final val impl: ActorRef, final val subscriber: Subscriber[_ >: T])
+    extends Subscription {
+  override def request(elements: Long): Unit =
+    impl ! RequestMore(this, elements)
   override def cancel(): Unit = impl ! Cancel(this)
 }
 
 /**
- * INTERNAL API
- */
-private[akka] class ActorSubscriptionWithCursor[T](_impl: ActorRef, _subscriber: Subscriber[_ >: T])
-  extends ActorSubscription[T](_impl, _subscriber) with SubscriptionWithCursor[T]
+  * INTERNAL API
+  */
+private[akka] class ActorSubscriptionWithCursor[T](
+    _impl: ActorRef, _subscriber: Subscriber[_ >: T])
+    extends ActorSubscription[T](_impl, _subscriber)
+    with SubscriptionWithCursor[T]
 
 /**
- * INTERNAL API
- */
-private[akka] trait SoftShutdown { this: Actor ⇒
+  * INTERNAL API
+  */
+private[akka] trait SoftShutdown {
+  this: Actor ⇒
   def softShutdown(): Unit = {
     val children = context.children
     if (children.isEmpty) {
@@ -120,9 +126,8 @@ private[akka] trait SoftShutdown { this: Actor ⇒
       context.children foreach context.watch
       context.become {
         case Terminated(_) ⇒ if (context.children.isEmpty) context.stop(self)
-        case _             ⇒ // ignore all the rest, we’re practically dead
+        case _ ⇒ // ignore all the rest, we’re practically dead
       }
     }
   }
 }
-

@@ -20,12 +20,12 @@ class appTest extends JUnitSuite with ShouldMatchers {
   @Test
   def testSActivityType(): Unit = {
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
-    activity shouldBe a [SActivity]
-    activity shouldBe a [SContext]
-    activity shouldBe a [TraitActivity[_]]
-    activity shouldBe a [Destroyable]
-    activity shouldBe a [Creatable]
-    activity shouldBe a [Registerable]
+    activity shouldBe a[SActivity]
+    activity shouldBe a[SContext]
+    activity shouldBe a[TraitActivity[_]]
+    activity shouldBe a[Destroyable]
+    activity shouldBe a[Creatable]
+    activity shouldBe a[Registerable]
   }
 
   @Test
@@ -39,7 +39,7 @@ class appTest extends JUnitSuite with ShouldMatchers {
   }
 
   @Test
-  def testRunOnUIThread():Unit = {
+  def testRunOnUIThread(): Unit = {
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
     val mainThread = Looper.getMainLooper.getThread
     activity.runOnUiThread {
@@ -47,7 +47,7 @@ class appTest extends JUnitSuite with ShouldMatchers {
     }
 
     Future[Unit] {
-      Thread.currentThread() shouldNot be (mainThread)
+      Thread.currentThread() shouldNot be(mainThread)
       activity.runOnUiThread {
         Thread.currentThread shouldBe mainThread
       }
@@ -65,23 +65,29 @@ class appTest extends JUnitSuite with ShouldMatchers {
   @Test
   def testSStateListDrawable(): Unit = {
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
-    val drawable = activity.find[ImageView](3).getDrawable.asInstanceOf[StateListDrawable]
+    val drawable =
+      activity.find[ImageView](3).getDrawable.asInstanceOf[StateListDrawable]
     val shadowDrawable = Robolectric.shadowOf(drawable)
 
-    val pressedDrawable = shadowDrawable.getDrawableForState(Array(android.R.attr.state_pressed))
-    pressedDrawable shouldBe activity.getResources.getDrawable(android.R.drawable.btn_star_big_on)
+    val pressedDrawable =
+      shadowDrawable.getDrawableForState(Array(android.R.attr.state_pressed))
+    pressedDrawable shouldBe activity.getResources.getDrawable(
+        android.R.drawable.btn_star_big_on)
 
     val normalDrawable = shadowDrawable.getDrawableForState(Array.empty)
-    normalDrawable shouldBe activity.getResources.getDrawable(android.R.drawable.btn_star_big_off)
+    normalDrawable shouldBe activity.getResources.getDrawable(
+        android.R.drawable.btn_star_big_off)
   }
 
   @Test
   def testAlertDialog(): Unit = {
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
     val alert = activity.alertDialog
-    .positiveButton("POS",{(di:DialogInterface,id:Int) => di.dismiss})
-    .show()
-    alert shouldBe a ('showing)
+      .positiveButton("POS", { (di: DialogInterface, id: Int) =>
+        di.dismiss
+      })
+      .show()
+    alert shouldBe a('showing)
 
     val shadowAlert = Robolectric.shadowOf(alert)
     shadowAlert.getTitle shouldBe "TITLE"
@@ -105,11 +111,11 @@ class appTest extends JUnitSuite with ShouldMatchers {
   @Test
   def testSServiceType(): Unit = {
     val service = Robolectric.buildService(classOf[SServiceImpl]).create.get
-    service shouldBe a [SService]
-    service shouldBe a [SContext]
-    service shouldBe a [Destroyable]
-    service shouldBe a [Creatable]
-    service shouldBe a [Registerable]
+    service shouldBe a[SService]
+    service shouldBe a[SContext]
+    service shouldBe a[Destroyable]
+    service shouldBe a[Creatable]
+    service shouldBe a[Registerable]
   }
 
   @Test

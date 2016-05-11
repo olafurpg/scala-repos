@@ -5,26 +5,26 @@ import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
 
 import java.lang.Math
-import java.lang.Long.{ numberOfTrailingZeros, numberOfLeadingZeros }
-import java.lang.Double.{ longBitsToDouble, doubleToLongBits }
-
+import java.lang.Long.{numberOfTrailingZeros, numberOfLeadingZeros}
+import java.lang.Double.{longBitsToDouble, doubleToLongBits}
 
 trait DoubleIsField extends Field[Double] {
-  override def minus(a:Double, b:Double): Double = a - b
-  def negate(a:Double): Double = -a
+  override def minus(a: Double, b: Double): Double = a - b
+  def negate(a: Double): Double = -a
   def one: Double = 1.0
-  def plus(a:Double, b:Double): Double = a + b
-  override def pow(a:Double, b:Int): Double = Math.pow(a, b)
-  override def times(a:Double, b:Double): Double = a * b
+  def plus(a: Double, b: Double): Double = a + b
+  override def pow(a: Double, b: Int): Double = Math.pow(a, b)
+  override def times(a: Double, b: Double): Double = a * b
   def zero: Double = 0.0
 
   override def fromInt(n: Int): Double = n
 
-  def quot(a:Double, b:Double): Double = (a - (a % b)) / b
-  def mod(a:Double, b:Double): Double = a % b
+  def quot(a: Double, b: Double): Double = (a - (a % b)) / b
+  def mod(a: Double, b: Double): Double = a % b
 
-  final def gcd(a:Double, b:Double):Double = {
-    def value(bits: Long): Long = bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
+  final def gcd(a: Double, b: Double): Double = {
+    def value(bits: Long): Long =
+      bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
 
     def exp(bits: Long): Int = ((bits >> 52) & 0x7FF).toInt
 
@@ -36,7 +36,8 @@ trait DoubleIsField extends Field[Double] {
       // We trim of the power of 2s, then add back the shared portion.
       val n = spire.math.gcd(val0 >>> tz0, val1 >>> tz1) << tzShared
       // Number of bits to move the leading 1 to bit position 23.
-      val shift = numberOfLeadingZeros(n) - 11 // Number of bits to move 1 to bit 52
+      val shift =
+        numberOfLeadingZeros(n) - 11 // Number of bits to move 1 to bit 52
       val exp = (exp0 - shift).toLong
       // If exp is 0, then the value is actually just the mantissa * 2^−126,
       // so we need to adjust the *shift* accordingly.
@@ -64,7 +65,7 @@ trait DoubleIsField extends Field[Double] {
   }
 
   override def fromDouble(n: Double): Double = n
-  def div(a:Double, b:Double): Double = a / b
+  def div(a: Double, b: Double): Double = a / b
 }
 
 trait DoubleIsNRoot extends NRoot[Double] {
@@ -100,8 +101,8 @@ trait DoubleIsTrig extends Trig[Double] {
 }
 
 trait DoubleOrder extends Order[Double] {
-  override def eqv(x:Double, y:Double): Boolean = x == y
-  override def neqv(x:Double, y:Double): Boolean = x != y
+  override def eqv(x: Double, y: Double): Boolean = x == y
+  override def neqv(x: Double, y: Double): Boolean = x != y
   override def gt(x: Double, y: Double): Boolean = x > y
   override def gteqv(x: Double, y: Double): Boolean = x >= y
   override def lt(x: Double, y: Double): Boolean = x < y
@@ -116,24 +117,28 @@ trait DoubleIsSigned extends Signed[Double] {
   def abs(a: Double): Double = if (a < 0.0) -a else a
 }
 
-trait DoubleIsReal extends IsRational[Double] with DoubleOrder with DoubleIsSigned {
+trait DoubleIsReal
+    extends IsRational[Double] with DoubleOrder with DoubleIsSigned {
   def toDouble(x: Double): Double = x
-  def ceil(a:Double): Double = Math.ceil(a)
-  def floor(a:Double): Double = Math.floor(a)
-  def round(a:Double): Double = spire.math.round(a)
-  def isWhole(a:Double): Boolean = a % 1.0 == 0.0
-  def toRational(a:Double): Rational = Rational(a)
+  def ceil(a: Double): Double = Math.ceil(a)
+  def floor(a: Double): Double = Math.floor(a)
+  def round(a: Double): Double = spire.math.round(a)
+  def isWhole(a: Double): Boolean = a % 1.0 == 0.0
+  def toRational(a: Double): Rational = Rational(a)
 }
 
 @SerialVersionUID(0L)
-class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
+class DoubleAlgebra
+    extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig
+    with DoubleIsReal with Serializable
 
 trait DoubleInstances {
   implicit final val DoubleAlgebra = new DoubleAlgebra
   import Double._
   import spire.math.NumberTag._
-  implicit final val DoubleTag = new BuiltinFloatTag(0D, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+  implicit final val DoubleTag = new BuiltinFloatTag(
+      0D, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
     def isInfinite(a: Double): Boolean = java.lang.Double.isInfinite(a)
-    def isNaN(a: Double): Boolean =  java.lang.Double.isNaN(a)
+    def isNaN(a: Double): Boolean = java.lang.Double.isNaN(a)
   }
 }

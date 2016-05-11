@@ -33,18 +33,23 @@ import javafx.util.{converter => jfxuc}
 import scala.language.implicitConversions
 
 object NumberStringConverter {
-  implicit def sfxNumberStringConverter2jfx(c: NumberStringConverter): jfxuc.NumberStringConverter = if (c != null) c.delegate else null
+  implicit def sfxNumberStringConverter2jfx(
+      c: NumberStringConverter): jfxuc.NumberStringConverter =
+    if (c != null) c.delegate else null
 }
 
-class NumberStringConverter(delegate: jfxuc.NumberStringConverter = new jfxuc.NumberStringConverter)
-  extends NumberStringConverterDelegate[jfxuc.NumberStringConverter](delegate) {
+class NumberStringConverter(
+    delegate: jfxuc.NumberStringConverter = new jfxuc.NumberStringConverter)
+    extends NumberStringConverterDelegate[jfxuc.NumberStringConverter](
+        delegate) {
 
   def this(locale: Locale) = this(new jfxuc.NumberStringConverter(locale))
 
-  def this(locale: Locale, pattern: String) = this(new jfxuc.NumberStringConverter(locale, pattern))
+  def this(locale: Locale, pattern: String) =
+    this(new jfxuc.NumberStringConverter(locale, pattern))
 
-  def this(numberFormat: NumberFormat) = this(new jfxuc.NumberStringConverter(numberFormat))
+  def this(numberFormat: NumberFormat) =
+    this(new jfxuc.NumberStringConverter(numberFormat))
 
   def this(pattern: String) = this(new jfxuc.NumberStringConverter(pattern))
-
 }

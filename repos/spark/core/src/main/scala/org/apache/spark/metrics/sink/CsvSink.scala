@@ -26,8 +26,10 @@ import com.codahale.metrics.{CsvReporter, MetricRegistry}
 import org.apache.spark.SecurityManager
 import org.apache.spark.metrics.MetricsSystem
 
-private[spark] class CsvSink(val property: Properties, val registry: MetricRegistry,
-    securityMgr: SecurityManager) extends Sink {
+private[spark] class CsvSink(val property: Properties,
+                             val registry: MetricRegistry,
+                             securityMgr: SecurityManager)
+    extends Sink {
   val CSV_KEY_PERIOD = "period"
   val CSV_KEY_UNIT = "unit"
   val CSV_KEY_DIR = "directory"
@@ -53,11 +55,12 @@ private[spark] class CsvSink(val property: Properties, val registry: MetricRegis
     case None => CSV_DEFAULT_DIR
   }
 
-  val reporter: CsvReporter = CsvReporter.forRegistry(registry)
-      .formatFor(Locale.US)
-      .convertDurationsTo(TimeUnit.MILLISECONDS)
-      .convertRatesTo(TimeUnit.SECONDS)
-      .build(new File(pollDir))
+  val reporter: CsvReporter = CsvReporter
+    .forRegistry(registry)
+    .formatFor(Locale.US)
+    .convertDurationsTo(TimeUnit.MILLISECONDS)
+    .convertRatesTo(TimeUnit.SECONDS)
+    .build(new File(pollDir))
 
   override def start() {
     reporter.start(pollPeriod, pollUnit)
@@ -71,4 +74,3 @@ private[spark] class CsvSink(val property: Properties, val registry: MetricRegis
     reporter.report()
   }
 }
-

@@ -7,8 +7,9 @@ object Test {
   class Z extends (String => A) {
     override def apply(v1: String): A = new A(4)
   }
-  implicit val s : Z = new Z
+  implicit val s: Z = new Z
 
-  /*start*/"".foo()/*end*/
+  /*start*/
+  "".foo() /*end*/
 }
 //Int

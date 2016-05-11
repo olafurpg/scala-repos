@@ -5,7 +5,7 @@
 package docs.http.scaladsl.server.directives
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.{ Route, ValidationRejection }
+import akka.http.scaladsl.server.{Route, ValidationRejection}
 import akka.testkit.EventFilter
 import docs.http.scaladsl.server.RoutingSpec
 
@@ -15,11 +15,9 @@ class RouteDirectivesExamplesSpec extends RoutingSpec {
     val route =
       path("a") {
         complete(HttpResponse(entity = "foo"))
-      } ~
-        path("b") {
-          complete((StatusCodes.Created, "bar"))
-        } ~
-        (path("c") & complete("baz")) // `&` also works with `complete` as the 2nd argument
+      } ~ path("b") {
+        complete((StatusCodes.Created, "bar"))
+      } ~ (path("c") & complete("baz")) // `&` also works with `complete` as the 2nd argument
 
     // tests:
     Get("/a") ~> route ~> check {
@@ -42,15 +40,13 @@ class RouteDirectivesExamplesSpec extends RoutingSpec {
     val route =
       path("a") {
         reject // don't handle here, continue on
-      } ~
-        path("a") {
-          complete("foo")
-        } ~
-        path("b") {
-          // trigger a ValidationRejection explicitly
-          // rather than through the `validate` directive
-          reject(ValidationRejection("Restricted!"))
-        }
+      } ~ path("a") {
+        complete("foo")
+      } ~ path("b") {
+        // trigger a ValidationRejection explicitly
+        // rather than through the `validate` directive
+        reject(ValidationRejection("Restricted!"))
+      }
 
     // tests:
     Get("/a") ~> route ~> check {
@@ -63,15 +59,13 @@ class RouteDirectivesExamplesSpec extends RoutingSpec {
   }
 
   "redirect-examples" in {
-    val route =
-      pathPrefix("foo") {
-        pathSingleSlash {
-          complete("yes")
-        } ~
-          pathEnd {
-            redirect("/foo/", StatusCodes.PermanentRedirect)
-          }
+    val route = pathPrefix("foo") {
+      pathSingleSlash {
+        complete("yes")
+      } ~ pathEnd {
+        redirect("/foo/", StatusCodes.PermanentRedirect)
       }
+    }
 
     // tests:
     Get("/foo/") ~> route ~> check {
@@ -84,11 +78,12 @@ class RouteDirectivesExamplesSpec extends RoutingSpec {
     }
   }
 
-  "failwith-examples" in EventFilter[RuntimeException](start = "Error during processing of request", occurrences = 1).intercept {
-    val route =
-      path("foo") {
-        failWith(new RuntimeException("Oops."))
-      }
+  "failwith-examples" in EventFilter[RuntimeException](
+      start = "Error during processing of request",
+      occurrences = 1).intercept {
+    val route = path("foo") {
+      failWith(new RuntimeException("Oops."))
+    }
 
     // tests:
     Get("/foo") ~> Route.seal(route) ~> check {
@@ -96,5 +91,4 @@ class RouteDirectivesExamplesSpec extends RoutingSpec {
       responseAs[String] shouldEqual "There was an internal server error."
     }
   }
-
 }

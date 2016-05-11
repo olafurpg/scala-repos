@@ -25,5 +25,4 @@ object StoreLogger {
   final case class Log(level: Level, message: String) extends LogElem
   final case class Success(message: String) extends LogElem
   final case class Trace(t: Throwable) extends LogElem
-
 }

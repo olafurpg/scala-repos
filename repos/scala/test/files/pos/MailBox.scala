@@ -49,10 +49,10 @@ class MailBox {
       if (s1 != null) {
         s.next = s1.next; s1.elem
       } else {
-	val r = insert(lastReceiver, new Receiver {
+        val r = insert(lastReceiver, new Receiver {
           def isDefined(msg: Any) = f.isDefinedAt(msg);
         });
-	lastReceiver = r;
+        lastReceiver = r;
         r.elem.wait();
         r.elem.msg
       }
@@ -65,13 +65,13 @@ class MailBox {
       var s = sent;
       var s1 = s.next;
       while (s1 != null && !f.isDefinedAt(s1.elem)) {
-        s = s1; s1 = s1.next ;
+        s = s1; s1 = s1.next;
       }
       if (s1 != null) {
         s.next = s1.next; s1.elem
       } else {
         val r = insert(lastReceiver, new Receiver {
-            def isDefined(msg: Any) = f.isDefinedAt(msg);
+          def isDefined(msg: Any) = f.isDefinedAt(msg);
         });
         lastReceiver = r;
         r.elem.wait(msec);

@@ -16,13 +16,13 @@ import org.jetbrains.plugins.scala.lang.psi.types.{Equivalence, ScParameterizedT
 import org.jetbrains.plugins.scala.macroAnnotations.{CachedInsidePsiElement, ModCount}
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
 trait ScTypeAliasDefinition extends ScTypeAlias {
   def aliasedTypeElement: ScTypeElement = {
-    val stub = this.asInstanceOf[ScalaStubBasedElementImpl[_ <: PsiElement]].getStub
+    val stub =
+      this.asInstanceOf[ScalaStubBasedElementImpl[_ <: PsiElement]].getStub
     if (stub != null) {
       return stub.asInstanceOf[ScTypeAliasStub].getTypeElement
     }
@@ -32,7 +32,8 @@ trait ScTypeAliasDefinition extends ScTypeAlias {
 
   def aliasedType(ctx: TypingContext): TypeResult[ScType] = {
     if (ctx.visited.contains(this)) {
-      new Failure(ScalaBundle.message("circular.dependency.detected", name), Some(this)) {override def isCyclic = true}
+      new Failure(ScalaBundle.message("circular.dependency.detected", name),
+                  Some(this)) { override def isCyclic = true }
     } else {
       aliasedTypeElement.getType(ctx(this))
     }
@@ -55,34 +56,45 @@ trait ScTypeAliasDefinition extends ScTypeAlias {
   def isAliasFor(cls: PsiClass): Boolean = {
     if (cls.getTypeParameters.length != typeParameters.length) false
     else if (cls.hasTypeParameters) {
-      val typeParamsAreAppliedInOrderToCorrectClass = aliasedType.getOrAny match {
-        case pte: ScParameterizedType =>
-          val refersToClass = Equivalence.equiv(pte.designator, ScType.designator(cls))
-          val typeParamsAppliedInOrder = (pte.typeArgs corresponds typeParameters) {
-            case (tpt: ScTypeParameterType, tp) if tpt.param == tp => true
-            case _ => false
-          }
-          refersToClass && typeParamsAppliedInOrder
-        case _ => false
-      }
+      val typeParamsAreAppliedInOrderToCorrectClass =
+        aliasedType.getOrAny match {
+          case pte: ScParameterizedType =>
+            val refersToClass =
+              Equivalence.equiv(pte.designator, ScType.designator(cls))
+            val typeParamsAppliedInOrder =
+              (pte.typeArgs corresponds typeParameters) {
+                case (tpt: ScTypeParameterType, tp) if tpt.param == tp => true
+                case _ => false
+              }
+            refersToClass && typeParamsAppliedInOrder
+          case _ => false
+        }
       val varianceAndBoundsMatch = cls match {
-        case sc0@(_: ScClass | _: ScTrait) =>
+        case sc0 @ (_: ScClass | _: ScTrait) =>
           val sc = sc0.asInstanceOf[ScTypeParametersOwner]
           (typeParameters corresponds sc.typeParameters) {
-            case (tp1, tp2) => tp1.variance == tp2.variance && tp1.upperBound == tp2.upperBound && tp1.lowerBound == tp2.lowerBound &&
-                    tp1.contextBound.isEmpty && tp2.contextBound.isEmpty && tp1.viewBound.isEmpty && tp2.viewBound.isEmpty
+            case (tp1, tp2) =>
+              tp1.variance == tp2.variance &&
+              tp1.upperBound == tp2.upperBound &&
+              tp1.lowerBound == tp2.lowerBound && tp1.contextBound.isEmpty &&
+              tp2.contextBound.isEmpty && tp1.viewBound.isEmpty &&
+              tp2.viewBound.isEmpty
           }
         case _ => // Java class
           (typeParameters corresponds cls.getTypeParameters) {
-            case (tp1, tp2) => tp1.variance == ScTypeParam.Invariant && tp1.upperTypeElement.isEmpty && tp2.getExtendsListTypes.isEmpty &&
-                    tp1.lowerTypeElement.isEmpty && tp1.contextBound.isEmpty && tp1.viewBound.isEmpty
+            case (tp1, tp2) =>
+              tp1.variance == ScTypeParam.Invariant &&
+              tp1.upperTypeElement.isEmpty &&
+              tp2.getExtendsListTypes.isEmpty &&
+              tp1.lowerTypeElement.isEmpty && tp1.contextBound.isEmpty &&
+              tp1.viewBound.isEmpty
           }
       }
       typeParamsAreAppliedInOrderToCorrectClass && varianceAndBoundsMatch
-    }
-    else {
+    } else {
       val clsType = ScType.designator(cls)
-      typeParameters.isEmpty && Equivalence.equiv(aliasedType.getOrElse(return false), clsType)
+      typeParameters.isEmpty &&
+      Equivalence.equiv(aliasedType.getOrElse(return false), clsType)
     }
   }
 }

@@ -12,25 +12,31 @@ import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil.IntroduceException
 import org.jetbrains.plugins.scala.lang.refactoring.util.{DialogConflictsReporter, ScalaRefactoringUtil, ScalaVariableValidator}
 
-
 /**
- * Nikolay.Tropin
- * 7/15/13
- */
-class IntroduceFieldContext[T <: PsiElement](val project: Project,
-                                             val editor: Editor,
-                                             val file: PsiFile,
-                                             val element: T,
-                                             val types: Array[ScType],
-                                             val aClass: ScTemplateDefinition) {
+  * Nikolay.Tropin
+  * 7/15/13
+  */
+class IntroduceFieldContext[T <: PsiElement](
+    val project: Project,
+    val editor: Editor,
+    val file: PsiFile,
+    val element: T,
+    val types: Array[ScType],
+    val aClass: ScTemplateDefinition) {
 
   val occurrences = element match {
     case expr: ScExpression =>
-      ScalaRefactoringUtil.getOccurrenceRanges(ScalaRefactoringUtil.unparExpr(expr), aClass.extendsBlock)
+      ScalaRefactoringUtil.getOccurrenceRanges(
+          ScalaRefactoringUtil.unparExpr(expr), aClass.extendsBlock)
     case _ => null
   }
 
-  val validator = ScalaVariableValidator(new DialogConflictsReporter {}, project, editor, file, element, occurrences)
+  val validator = ScalaVariableValidator(new DialogConflictsReporter {},
+                                         project,
+                                         editor,
+                                         file,
+                                         element,
+                                         occurrences)
 
   val canBeInitInDecl = element match {
     case expr: ScExpression => canBeInitializedInDeclaration(expr, aClass)
@@ -42,5 +48,6 @@ class IntroduceFieldContext[T <: PsiElement](val project: Project,
     case _ => throw new IntroduceException
   }
 
-  def canBeInitLocally(replaceAll: Boolean) = ScalaIntroduceFieldHandlerBase.canBeInitInLocalScope(this, replaceAll)
+  def canBeInitLocally(replaceAll: Boolean) =
+    ScalaIntroduceFieldHandlerBase.canBeInitInLocalScope(this, replaceAll)
 }

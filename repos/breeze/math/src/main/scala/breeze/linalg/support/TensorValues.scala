@@ -14,17 +14,22 @@ package support
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-*/
-
+ */
 
 /**
- * Class that is kind of like a collection view of the values in a tensor.
- * @author dlwh
- */
-class TensorValues[K, V, +This](private val tensor: This, active: Boolean = false, f: (V) => Boolean = { (x: Any) => true })(implicit ev: This <:< Tensor[K, V]) {
+  * Class that is kind of like a collection view of the values in a tensor.
+  * @author dlwh
+  */
+class TensorValues[K, V, +This](
+    private val tensor: This, active: Boolean = false, f: (V) => Boolean = {
+  (x: Any) =>
+    true
+})(implicit ev: This <:< Tensor[K, V]) {
   def size = tensor.size
 
-  def iterator = {if(active) tensor.activeValuesIterator else tensor.valuesIterator}.filter(f)
+  def iterator = {
+    if (active) tensor.activeValuesIterator else tensor.valuesIterator
+  }.filter(f)
 
   def foreach[U](fn: V => U) = iterator foreach fn
 
@@ -37,17 +42,17 @@ class TensorValues[K, V, +This](private val tensor: This, active: Boolean = fals
   override def toString = iterator.mkString("TensorValues(", ",", ")")
 
   override def equals(p1: Any) = p1 match {
-    case x: TensorValues[_, _, _] => x.eq(this) || iterator.sameElements(x.iterator)
+    case x: TensorValues[_, _, _] =>
+      x.eq(this) || iterator.sameElements(x.iterator)
     case _ => false
   }
 
-  def map[TT>:This,O,That](fn : (V) => O)
-                          (implicit bf : CanMapValues[TT, V, O, That]) : That = {
-    tensor.mapValues(fn)(bf.asInstanceOf[CanMapValues[Tensor[K, V], V, O, That]])
+  def map[TT >: This, O, That](fn: (V) => O)(
+      implicit bf: CanMapValues[TT, V, O, That]): That = {
+    tensor.mapValues(fn)(
+        bf.asInstanceOf[CanMapValues[Tensor[K, V], V, O, That]])
   }
 
-  def exists(f: V=>Boolean) = iterator exists f
-  def forall(f: V=>Boolean) = iterator forall f
-
-
- }
+  def exists(f: V => Boolean) = iterator exists f
+  def forall(f: V => Boolean) = iterator forall f
+}

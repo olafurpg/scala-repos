@@ -36,7 +36,9 @@ import org.apache.spark.util.Benchmark
   *  build/sbt "sql/test-only *BenchmarkWholeStageCodegen"
   */
 class BenchmarkWholeStageCodegen extends SparkFunSuite {
-  lazy val conf = new SparkConf().setMaster("local[1]").setAppName("benchmark")
+  lazy val conf = new SparkConf()
+    .setMaster("local[1]")
+    .setAppName("benchmark")
     .set("spark.sql.shuffle.partitions", "1")
     .set("spark.sql.autoBroadcastJoinThreshold", "1")
   lazy val sc = SparkContext.getOrCreate(conf)
@@ -67,7 +69,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     -------------------------------------------------------------------------------------------
     rang/filter/sum codegen=false          14332 / 16646         36.0          27.8       1.0X
     rang/filter/sum codegen=true              897 / 1022        584.6           1.7      16.4X
-    */
+   */
   }
 
   ignore("range/limit/sum") {
@@ -81,7 +83,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     -------------------------------------------------------------------------------------------
     range/limit/sum codegen=false             609 /  672        861.6           1.2       1.0X
     range/limit/sum codegen=true              561 /  621        935.3           1.1       1.1X
-    */
+   */
   }
 
   ignore("stat functions") {
@@ -94,8 +96,6 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     runBenchmark("kurtosis", N) {
       sqlContext.range(N).groupBy().agg("id" -> "kurtosis").collect()
     }
-
-
     /**
       Using ImperativeAggregate (as implemented in Spark 1.6):
 
@@ -120,14 +120,19 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       -------------------------------------------------------------------------------------------
       kurtosis codegen=false                 14847 / 15084          7.0         142.9       1.0X
       kurtosis codegen=true                    1652 / 2124         63.0          15.9       9.0X
-      */
+    */
   }
 
   ignore("aggregate with keys") {
     val N = 20 << 20
 
     runBenchmark("Aggregate w keys", N) {
-      sqlContext.range(N).selectExpr("(id & 65535) as k").groupBy("k").sum().collect()
+      sqlContext
+        .range(N)
+        .selectExpr("(id & 65535) as k")
+        .groupBy("k")
+        .sum()
+        .collect()
     }
 
     /*
@@ -136,16 +141,20 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       -------------------------------------------------------------------------------------------
       Aggregate w keys codegen=false           2429 / 2644          8.6         115.8       1.0X
       Aggregate w keys codegen=true            1535 / 1571         13.7          73.2       1.6X
-    */
+   */
   }
 
   ignore("broadcast hash join") {
     val N = 100 << 20
     val M = 1 << 16
-    val dim = broadcast(sqlContext.range(M).selectExpr("id as k", "cast(id as string) as v"))
+    val dim = broadcast(
+        sqlContext.range(M).selectExpr("id as k", "cast(id as string) as v"))
 
     runBenchmark("Join w long", N) {
-      sqlContext.range(N).join(dim, (col("id") bitwiseAND M) === col("k")).count()
+      sqlContext
+        .range(N)
+        .join(dim, (col("id") bitwiseAND M) === col("k"))
+        .count()
     }
 
     /*
@@ -154,15 +163,22 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     -------------------------------------------------------------------------------------------
     Join w long codegen=false                5744 / 5814         18.3          54.8       1.0X
     Join w long codegen=true                  735 /  853        142.7           7.0       7.8X
-    */
+     */
 
-    val dim2 = broadcast(sqlContext.range(M)
-      .selectExpr("cast(id as int) as k1", "cast(id as int) as k2", "cast(id as string) as v"))
+    val dim2 = broadcast(
+        sqlContext
+          .range(M)
+          .selectExpr("cast(id as int) as k1",
+                      "cast(id as int) as k2",
+                      "cast(id as string) as v"))
 
     runBenchmark("Join w 2 ints", N) {
-      sqlContext.range(N).join(dim2,
-        (col("id") bitwiseAND M).cast(IntegerType) === col("k1")
-          && (col("id") bitwiseAND M).cast(IntegerType) === col("k2")).count()
+      sqlContext
+        .range(N)
+        .join(dim2,
+              (col("id") bitwiseAND M).cast(IntegerType) === col("k1") &&
+              (col("id") bitwiseAND M).cast(IntegerType) === col("k2"))
+        .count()
     }
 
     /**
@@ -171,14 +187,17 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     -------------------------------------------------------------------------------------------
     Join w 2 ints codegen=false              7159 / 7224         14.6          68.3       1.0X
     Join w 2 ints codegen=true               1135 / 1197         92.4          10.8       6.3X
-    */
-
-    val dim3 = broadcast(sqlContext.range(M)
-      .selectExpr("id as k1", "id as k2", "cast(id as string) as v"))
+      */
+    val dim3 = broadcast(sqlContext
+          .range(M)
+          .selectExpr("id as k1", "id as k2", "cast(id as string) as v"))
 
     runBenchmark("Join w 2 longs", N) {
-      sqlContext.range(N).join(dim3,
-        (col("id") bitwiseAND M) === col("k1") && (col("id") bitwiseAND M) === col("k2"))
+      sqlContext
+        .range(N)
+        .join(dim3,
+              (col("id") bitwiseAND M) === col("k1") &&
+              (col("id") bitwiseAND M) === col("k2"))
         .count()
     }
 
@@ -190,7 +209,10 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     Join w 2 longs codegen=true               3877 / 3937         27.0          37.0       2.0X
       */
     runBenchmark("outer join w long", N) {
-      sqlContext.range(N).join(dim, (col("id") bitwiseAND M) === col("k"), "left").count()
+      sqlContext
+        .range(N)
+        .join(dim, (col("id") bitwiseAND M) === col("k"), "left")
+        .count()
     }
 
     /**
@@ -200,9 +222,11 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     outer join w long codegen=false        15280 / 16497          6.9         145.7       1.0X
     outer join w long codegen=true            769 /  796        136.3           7.3      19.9X
       */
-
     runBenchmark("semi join w long", N) {
-      sqlContext.range(N).join(dim, (col("id") bitwiseAND M) === col("k"), "leftsemi").count()
+      sqlContext
+        .range(N)
+        .join(dim, (col("id") bitwiseAND M) === col("k"), "leftsemi")
+        .count()
     }
 
     /**
@@ -211,7 +235,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     -------------------------------------------------------------------------------------------
     semi join w long codegen=false           5804 / 5969         18.1          55.3       1.0X
     semi join w long codegen=true             814 /  934        128.8           7.8       7.1X
-     */
+    */
   }
 
   ignore("sort merge join") {
@@ -229,12 +253,11 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     merge join codegen=false                 1588 / 1880          1.3         757.1       1.0X
     merge join codegen=true                  1477 / 1531          1.4         704.2       1.1X
       */
-
     runBenchmark("sort merge join", N) {
-      val df1 = sqlContext.range(N)
-        .selectExpr(s"(id * 15485863) % ${N*10} as k1")
-      val df2 = sqlContext.range(N)
-        .selectExpr(s"(id * 15485867) % ${N*10} as k2")
+      val df1 =
+        sqlContext.range(N).selectExpr(s"(id * 15485863) % ${N * 10} as k1")
+      val df2 =
+        sqlContext.range(N).selectExpr(s"(id * 15485867) % ${N * 10} as k2")
       df1.join(df2, col("k1") === col("k2")).count()
     }
 
@@ -244,7 +267,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     -------------------------------------------------------------------------------------------
     sort merge join codegen=false            3626 / 3667          0.6        1728.9       1.0X
     sort merge join codegen=true             3405 / 3438          0.6        1623.8       1.1X
-      */
+    */
   }
 
   ignore("shuffle hash join") {
@@ -264,15 +287,19 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     -------------------------------------------------------------------------------------------
     shuffle hash join codegen=false          1168 / 1902          3.6         278.6       1.0X
     shuffle hash join codegen=true            850 / 1196          4.9         202.8       1.4X
-     */
+    */
   }
 
   ignore("cube") {
     val N = 5 << 20
 
     runBenchmark("cube", N) {
-      sqlContext.range(N).selectExpr("id", "id % 1000 as k1", "id & 256 as k2")
-        .cube("k1", "k2").sum("id").collect()
+      sqlContext
+        .range(N)
+        .selectExpr("id", "id % 1000 as k1", "id & 256 as k2")
+        .cube("k1", "k2")
+        .sum("id")
+        .collect()
     }
 
     /**
@@ -281,7 +308,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       -------------------------------------------------------------------------------------------
       cube codegen=false                       3188 / 3392          1.6         608.2       1.0X
       cube codegen=true                        1239 / 1394          4.2         236.3       2.6X
-      */
+    */
   }
 
   ignore("hash and BytesToBytesMap") {
@@ -298,7 +325,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       while (i < N) {
         key.setInt(0, i % 1000)
         val h = Murmur3_x86_32.hashUnsafeWords(
-          key.getBaseObject, key.getBaseOffset, key.getSizeInBytes, 42)
+            key.getBaseObject, key.getBaseOffset, key.getSizeInBytes, 42)
         s += h
         i += 1
       }
@@ -376,7 +403,8 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       var s = 0
       i = 0
       while (i < N) {
-        val key = ((i & 100000).toLong << 32) + Integer.rotateRight(i & 100000, 15)
+        val key =
+          ((i & 100000).toLong << 32) + Integer.rotateRight(i & 100000, 15)
         if (map.get(key) != null) {
           s += 1
         }
@@ -414,14 +442,15 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     Seq("off", "on").foreach { heap =>
       benchmark.addCase(s"BytesToBytesMap ($heap Heap)") { iter =>
         val taskMemoryManager = new TaskMemoryManager(
-          new StaticMemoryManager(
-            new SparkConf().set("spark.memory.offHeap.enabled", s"${heap == "off"}")
-              .set("spark.memory.offHeap.size", "102400000"),
-            Long.MaxValue,
-            Long.MaxValue,
-            1),
-          0)
-        val map = new BytesToBytesMap(taskMemoryManager, 1024, 64L<<20)
+            new StaticMemoryManager(
+                new SparkConf()
+                  .set("spark.memory.offHeap.enabled", s"${heap == "off"}")
+                  .set("spark.memory.offHeap.size", "102400000"),
+                Long.MaxValue,
+                Long.MaxValue,
+                1),
+            0)
+        val map = new BytesToBytesMap(taskMemoryManager, 1024, 64L << 20)
         val keyBytes = new Array[Byte](16)
         val valueBytes = new Array[Byte](16)
         val key = new UnsafeRow(1)
@@ -431,15 +460,23 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
         var i = 0
         while (i < N) {
           key.setInt(0, i % 65536)
-          val loc = map.lookup(key.getBaseObject, key.getBaseOffset, key.getSizeInBytes,
-            Murmur3_x86_32.hashLong(i % 65536, 42))
+          val loc = map.lookup(key.getBaseObject,
+                               key.getBaseOffset,
+                               key.getSizeInBytes,
+                               Murmur3_x86_32.hashLong(i % 65536, 42))
           if (loc.isDefined) {
-            value.pointTo(loc.getValueBase, loc.getValueOffset, loc.getValueLength)
+            value.pointTo(loc.getValueBase,
+                          loc.getValueOffset,
+                          loc.getValueLength)
             value.setInt(0, value.getInt(0) + 1)
             i += 1
           } else {
-            loc.putNewKey(key.getBaseObject, key.getBaseOffset, key.getSizeInBytes,
-              value.getBaseObject, value.getBaseOffset, value.getSizeInBytes)
+            loc.putNewKey(key.getBaseObject,
+                          key.getBaseOffset,
+                          key.getSizeInBytes,
+                          value.getBaseObject,
+                          value.getBaseOffset,
+                          value.getSizeInBytes)
           }
         }
       }
@@ -483,7 +520,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     collect 1 million                         439 /  654          2.4         418.7       1.0X
     collect 2 millions                        961 / 1907          1.1         916.4       0.5X
     collect 4 millions                       3193 / 3895          0.3        3044.7       0.1X
-     */
+    */
   }
 
   ignore("collect limit") {
@@ -504,6 +541,6 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     -------------------------------------------------------------------------------------------
     collect limit 1 million                   833 / 1284          1.3         794.4       1.0X
     collect limit 2 millions                 3348 / 4005          0.3        3193.3       0.2X
-     */
+    */
   }
 }

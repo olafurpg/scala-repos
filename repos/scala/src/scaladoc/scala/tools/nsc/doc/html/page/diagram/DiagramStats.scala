@@ -1,6 +1,6 @@
 /**
- * @author Vlad Ureche
- */
+  * @author Vlad Ureche
+  */
 package scala.tools.nsc.doc
 package html.page.diagram
 
@@ -12,21 +12,19 @@ object DiagramStats {
     var instances: Int = 0
 
     def addTime(ms: Long) = {
-      if (maxTime < ms)
-        maxTime = ms
+      if (maxTime < ms) maxTime = ms
       totalTime += ms
       instances += 1
     }
 
     def printStats(print: String => Unit) = {
-      if (instances == 0)
-        print(title + ": no stats gathered")
+      if (instances == 0) print(title + ": no stats gathered")
       else {
         print("  " + title)
         print("  " + "=" * title.length)
         print("    count:        " + instances + " items")
         print("    total time:   " + totalTime + " ms")
-        print("    average time: " + (totalTime/instances) + " ms")
+        print("    average time: " + (totalTime / instances) + " ms")
         print("    maximum time: " + maxTime + " ms")
         print("")
       }

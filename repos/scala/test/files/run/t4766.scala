@@ -1,4 +1,3 @@
-
 import scala.language.postfixOps
 import scala.language.reflectiveCalls
 
@@ -7,5 +6,5 @@ object Test extends App {
     def > = 1
   }
 
-  println(x>)
+  println(x >)
 }

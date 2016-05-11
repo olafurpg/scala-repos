@@ -1,4 +1,3 @@
-
 import scala.tools.partest.SessionTest
 
 object Test extends SessionTest {
@@ -21,7 +20,7 @@ object Test extends SessionTest {
         |                                         ^
         |
         |scala> :quit"""
-        /*
+  /*
         |XXX> XXX> def f = 42
         |
         |// Detected repl transcript paste: ctrl-D to finish.
@@ -32,6 +31,5 @@ object Test extends SessionTest {
         |f: Int
         |
         |XXX> :quit"""
-        */
-
+ */
 }

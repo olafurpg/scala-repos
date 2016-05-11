@@ -1,9 +1,9 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.util
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 import scala.collection.immutable
 
@@ -37,13 +37,15 @@ class ReflectSpec extends WordSpec with Matchers {
       Reflect.findConstructor(classOf[Two], immutable.Seq(null, new B))
     }
     "deal with `null` in 1 matching case" in {
-      val constructor = Reflect.findConstructor(classOf[One], immutable.Seq(null))
+      val constructor =
+        Reflect.findConstructor(classOf[One], immutable.Seq(null))
       constructor.newInstance(null)
     }
     "deal with multiple constructors" in {
       Reflect.findConstructor(classOf[MultipleOne], immutable.Seq(new A))
       Reflect.findConstructor(classOf[MultipleOne], immutable.Seq(new B))
-      Reflect.findConstructor(classOf[MultipleOne], immutable.Seq(new A, new B))
+      Reflect.findConstructor(classOf[MultipleOne],
+                              immutable.Seq(new A, new B))
     }
     "throw when multiple matching constructors" in {
       intercept[IllegalArgumentException] {
@@ -51,5 +53,4 @@ class ReflectSpec extends WordSpec with Matchers {
       }
     }
   }
-
 }

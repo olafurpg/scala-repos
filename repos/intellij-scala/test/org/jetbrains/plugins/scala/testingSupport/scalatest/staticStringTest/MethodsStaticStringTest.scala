@@ -12,7 +12,7 @@ trait MethodsStaticStringTest extends ScalaTestTestCase {
 
   def addMethodsTest() = {
     addFileToProject(methodsFileName,
-      """
+                     """
         |import org.scalatest._
         |
         |class ScalaTestMethodsTest extends PropSpec {
@@ -44,42 +44,63 @@ trait MethodsStaticStringTest extends ScalaTestTestCase {
   def testTrim() = {
     addMethodsTest()
 
-    assert(checkConfigAndSettings(createTestFromLocation(3, 7, methodsFileName), methodsClassName, "testName1"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(3, 7, methodsFileName),
+                               methodsClassName,
+                               "testName1"))
   }
 
   def testToLowerCase() = {
     addMethodsTest()
 
-    assert(checkConfigAndSettings(createTestFromLocation(6, 7, methodsFileName), methodsClassName, "testname2"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(6, 7, methodsFileName),
+                               methodsClassName,
+                               "testname2"))
   }
 
   def testStripSuffix() = {
     addMethodsTest()
 
-    assert(checkConfigAndSettings(createTestFromLocation(9, 7, methodsFileName), methodsClassName, "testName3"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(9, 7, methodsFileName),
+                               methodsClassName,
+                               "testName3"))
   }
 
   def testStripPrefix() = {
     addMethodsTest()
 
-    assert(checkConfigAndSettings(createTestFromLocation(12, 7, methodsFileName), methodsClassName, "testName4"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(12, 7, methodsFileName),
+                               methodsClassName,
+                               "testName4"))
   }
 
   def testSubstring1() = {
     addMethodsTest()
 
-    assert(checkConfigAndSettings(createTestFromLocation(15, 7, methodsFileName), methodsClassName, "testName5"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(15, 7, methodsFileName),
+                               methodsClassName,
+                               "testName5"))
   }
 
   def testSubstring2() = {
     addMethodsTest()
 
-    assert(checkConfigAndSettings(createTestFromLocation(18, 7, methodsFileName), methodsClassName, "testName6"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(18, 7, methodsFileName),
+                               methodsClassName,
+                               "testName6"))
   }
 
   def testReplace() = {
     addMethodsTest()
 
-    assert(checkConfigAndSettings(createTestFromLocation(21, 7, methodsFileName), methodsClassName, "testName7"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(21, 7, methodsFileName),
+                               methodsClassName,
+                               "testName7"))
   }
 }

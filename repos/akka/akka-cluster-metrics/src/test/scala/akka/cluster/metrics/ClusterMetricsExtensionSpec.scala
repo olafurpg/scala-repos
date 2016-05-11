@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.metrics
 
 import scala.language.postfixOps
@@ -12,8 +11,9 @@ import akka.cluster.metrics.StandardMetrics._
 import akka.cluster.Cluster
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class MetricsExtensionSpec extends AkkaSpec(MetricsConfig.clusterSigarMock)
-  with ImplicitSender with RedirectLogging {
+class MetricsExtensionSpec
+    extends AkkaSpec(MetricsConfig.clusterSigarMock) with ImplicitSender
+    with RedirectLogging {
 
   val cluster = Cluster(system)
 
@@ -37,7 +37,8 @@ class MetricsExtensionSpec extends AkkaSpec(MetricsConfig.clusterSigarMock)
   val epsilon = 0.001
 
   // Sleep longer then single sample.
-  def awaitSample(time: Long = 3 * sampleInterval.toMillis) = Thread.sleep(time)
+  def awaitSample(time: Long = 3 * sampleInterval.toMillis) =
+    Thread.sleep(time)
 
   "Metrics Extension" must {
 
@@ -58,25 +59,25 @@ class MetricsExtensionSpec extends AkkaSpec(MetricsConfig.clusterSigarMock)
 
       val history = metricsView.metricsHistory.reverse.map { _.head }
 
-      val expected = List(
-        (0.700, 0.000, 0.000),
-        (0.700, 0.018, 0.007),
-        (0.700, 0.051, 0.020),
-        (0.700, 0.096, 0.038),
-        (0.700, 0.151, 0.060),
-        (0.700, 0.214, 0.085),
-        (0.700, 0.266, 0.106),
-        (0.700, 0.309, 0.123),
-        (0.700, 0.343, 0.137),
-        (0.700, 0.372, 0.148))
+      val expected = List((0.700, 0.000, 0.000),
+                          (0.700, 0.018, 0.007),
+                          (0.700, 0.051, 0.020),
+                          (0.700, 0.096, 0.038),
+                          (0.700, 0.151, 0.060),
+                          (0.700, 0.214, 0.085),
+                          (0.700, 0.266, 0.106),
+                          (0.700, 0.309, 0.123),
+                          (0.700, 0.343, 0.137),
+                          (0.700, 0.372, 0.148))
 
       expected.size should ===(sampleCount)
 
       history.zip(expected) foreach {
         case (mockMetrics, expectedData) ⇒
           (mockMetrics, expectedData) match {
-            case (Cpu(_, _, loadAverageMock, cpuCombinedMock, cpuStolenMock, _),
-              (loadAverageEwma, cpuCombinedEwma, cpuStolenEwma)) ⇒
+            case (
+                Cpu(_, _, loadAverageMock, cpuCombinedMock, cpuStolenMock, _),
+                (loadAverageEwma, cpuCombinedEwma, cpuStolenEwma)) ⇒
               loadAverageMock.get should ===(loadAverageEwma +- epsilon)
               cpuCombinedMock.get should ===(cpuCombinedEwma +- epsilon)
               cpuStolenMock.get should ===(cpuStolenEwma +- epsilon)
@@ -106,13 +107,11 @@ class MetricsExtensionSpec extends AkkaSpec(MetricsConfig.clusterSigarMock)
         awaitSample()
         val size5 = metricsHistorySize
         size5 should ===(size4)
-
       }
 
-      (1 to 3) foreach { step ⇒ cycle() }
-
+      (1 to 3) foreach { step ⇒
+        cycle()
+      }
     }
-
   }
-
 }

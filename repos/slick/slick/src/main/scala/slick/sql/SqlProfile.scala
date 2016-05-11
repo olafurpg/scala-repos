@@ -11,18 +11,24 @@ import slick.lifted.AbstractTable
 import slick.util.DumpInfo
 
 /** Abstract profile for SQL-based databases. */
-trait SqlProfile extends RelationalProfile with SqlTableComponent with SqlActionComponent
-  /* internal: */ with SqlUtilsComponent {
+trait SqlProfile
+    extends RelationalProfile with SqlTableComponent with SqlActionComponent
+    /* internal: */ with SqlUtilsComponent {
 
-  @deprecated("Use the Profile object directly instead of calling `.profile` on it", "3.2")
+  @deprecated(
+      "Use the Profile object directly instead of calling `.profile` on it",
+      "3.2")
   override val profile: SqlProfile = this
 
-  override protected def computeQueryCompiler = super.computeQueryCompiler ++ QueryCompiler.sqlPhases
-  override protected def computeCapabilities = super.computeCapabilities ++ SqlCapabilities.all
+  override protected def computeQueryCompiler =
+    super.computeQueryCompiler ++ QueryCompiler.sqlPhases
+  override protected def computeCapabilities =
+    super.computeCapabilities ++ SqlCapabilities.all
 
   type SchemaDescription = DDL
 
   trait DDL extends SchemaDescriptionDef { self =>
+
     /** Statements to execute first for create(), e.g. creating tables and indexes. */
     protected def createPhase1: Iterable[String]
 
@@ -30,7 +36,8 @@ trait SqlProfile extends RelationalProfile with SqlTableComponent with SqlAction
     protected def createPhase2: Iterable[String]
 
     /** All statements to execute for create() */
-    def createStatements: Iterator[String] = createPhase1.iterator ++ createPhase2.iterator
+    def createStatements: Iterator[String] =
+      createPhase1.iterator ++ createPhase2.iterator
 
     /** Statements to execute first for drop(), e.g. removing connections from other entities. */
     protected def dropPhase1: Iterable[String]
@@ -39,14 +46,15 @@ trait SqlProfile extends RelationalProfile with SqlTableComponent with SqlAction
     protected def dropPhase2: Iterable[String]
 
     /** All statements to execute for drop() */
-    def dropStatements: Iterator[String] = dropPhase1.iterator ++ dropPhase2.iterator
+    def dropStatements: Iterator[String] =
+      dropPhase1.iterator ++ dropPhase2.iterator
 
     /**
-     * Create a new DDL object which combines this and the other DDL object.
-     *
-     * Composition is such that given {{{A.ddl ++ B.ddl}}} the create phases will be
-     * run in FIFO order and the drop phases will be run in LIFO order.
-     */
+      * Create a new DDL object which combines this and the other DDL object.
+      *
+      * Composition is such that given {{{A.ddl ++ B.ddl}}} the create phases will be
+      * run in FIFO order and the drop phases will be run in LIFO order.
+      */
     override def ++(other: DDL): DDL = new DDL {
       protected lazy val createPhase1 = self.createPhase1 ++ other.createPhase1
       protected lazy val createPhase2 = self.createPhase2 ++ other.createPhase2
@@ -54,21 +62,25 @@ trait SqlProfile extends RelationalProfile with SqlTableComponent with SqlAction
       protected lazy val dropPhase2 = other.dropPhase2 ++ self.dropPhase2
     }
 
-    override def hashCode() = 
-      Vector(self.createPhase1, self.createPhase2, self.dropPhase1, self.dropPhase2).hashCode
+    override def hashCode() =
+      Vector(self.createPhase1,
+             self.createPhase2,
+             self.dropPhase1,
+             self.dropPhase2).hashCode
 
     override def equals(o: Any) = o match {
-      case ddl: DDL => 
+      case ddl: DDL =>
         self.createPhase1 == ddl.createPhase1 &&
         self.createPhase2 == ddl.createPhase2 &&
-        self.dropPhase1 == ddl.dropPhase1 &&
-        self.dropPhase2 == ddl.dropPhase2
+        self.dropPhase1 == ddl.dropPhase1 && self.dropPhase2 == ddl.dropPhase2
       case _ => false
     }
   }
 
   object DDL {
-    def apply(create1: Iterable[String], create2: Iterable[String], drop1: Iterable[String],
+    def apply(create1: Iterable[String],
+              create2: Iterable[String],
+              drop1: Iterable[String],
               drop2: Iterable[String]): DDL = new DDL {
       protected def createPhase1 = create1
       protected def createPhase2 = create2
@@ -76,13 +88,16 @@ trait SqlProfile extends RelationalProfile with SqlTableComponent with SqlAction
       protected def dropPhase2 = drop2
     }
 
-    def apply(create1: Iterable[String], drop2: Iterable[String]): DDL = apply(create1, Nil, Nil, drop2)
+    def apply(create1: Iterable[String], drop2: Iterable[String]): DDL =
+      apply(create1, Nil, Nil, drop2)
 
-    def apply(create1: String, drop2: String): DDL = apply(Iterable(create1), Iterable(drop2))
+    def apply(create1: String, drop2: String): DDL =
+      apply(Iterable(create1), Iterable(drop2))
   }
 }
 
 object SqlProfile {
+
   /** Extra column options for SqlProfile */
   object ColumnOption {
     case object NotNull extends ColumnOption[Nothing]
@@ -105,7 +120,7 @@ trait SqlUtilsComponent { self: SqlProfile =>
   /** quotes identifiers to avoid collisions with SQL keywords and other syntax issues */
   def quoteIdentifier(id: String): String = {
     val s = new StringBuilder(id.length + 4) append '"'
-    for(c <- id) if(c == '"') s append "\"\"" else s append c
+    for (c <- id) if (c == '"') s append "\"\"" else s append c
     (s append '"').toString
   }
 
@@ -116,19 +131,21 @@ trait SqlUtilsComponent { self: SqlProfile =>
 
   def likeEncode(s: String) = {
     val b = new StringBuilder
-    for(c <- s) c match {
+    for (c <- s) c match {
       case '%' | '_' | '^' => b append '^' append c
       case _ => b append c
     }
     b.toString
   }
 
-  class QuotingSymbolNamer(parent: Option[SymbolNamer]) extends SymbolNamer("x", "y", parent) {
+  class QuotingSymbolNamer(parent: Option[SymbolNamer])
+      extends SymbolNamer("x", "y", parent) {
     override def namedSymbolName(s: Symbol) = quoteIdentifier(s.name)
   }
 }
 
-trait SqlTableComponent extends RelationalTableComponent { this: SqlProfile =>
+trait SqlTableComponent extends RelationalTableComponent {
+  this: SqlProfile =>
 
   trait ColumnOptions extends super.ColumnOptions {
     def SqlType(typeName: String) = SqlProfile.ColumnOption.SqlType(typeName)
@@ -137,15 +154,18 @@ trait SqlTableComponent extends RelationalTableComponent { this: SqlProfile =>
   override val columnOptions: ColumnOptions = new ColumnOptions {}
 }
 
-trait SqlActionComponent extends RelationalActionComponent { this: SqlProfile =>
+trait SqlActionComponent extends RelationalActionComponent {
+  this: SqlProfile =>
 
-  type ProfileAction[+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
-  type StreamingProfileAction[+R, +T, -E <: Effect] <: SqlStreamingAction[R, T, E] with ProfileAction[R, Streaming[T], E]
+  type ProfileAction [+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
+  type StreamingProfileAction [+R, +T, -E <: Effect] <: SqlStreamingAction[
+      R, T, E] with ProfileAction[R, Streaming[T], E]
 }
 
-trait SqlAction[+R, +S <: NoStream, -E <: Effect] extends BasicAction[R, S, E] {
+trait SqlAction[+R, +S <: NoStream, -E <: Effect]
+    extends BasicAction[R, S, E] {
 
-  type ResultAction[+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
+  type ResultAction [+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
 
   /** Return the SQL statements that will be executed for this Action */
   def statements: Iterable[String]
@@ -154,13 +174,18 @@ trait SqlAction[+R, +S <: NoStream, -E <: Effect] extends BasicAction[R, S, E] {
     * behaves the same as this Action. */
   def overrideStatements(statements: Iterable[String]): ResultAction[R, S, E]
 
-  def getDumpInfo = DumpInfo(DumpInfo.simpleNameFor(getClass), mainInfo = statements.mkString("[", "; ", "]"))
+  def getDumpInfo =
+    DumpInfo(DumpInfo.simpleNameFor(getClass),
+             mainInfo = statements.mkString("[", "; ", "]"))
 }
 
-trait SqlStreamingAction[+R, +T, -E <: Effect] extends BasicStreamingAction[R, T, E] with SqlAction[R, Streaming[T], E]
+trait SqlStreamingAction[+R, +T, -E <: Effect]
+    extends BasicStreamingAction[R, T, E] with SqlAction[R, Streaming[T], E]
 
-trait FixedSqlAction[+R, +S <: NoStream, -E <: Effect] extends SqlAction[R, S, E] {
+trait FixedSqlAction[+R, +S <: NoStream, -E <: Effect]
+    extends SqlAction[R, S, E] {
   type ResultAction[+R, +S <: NoStream, -E <: Effect] = SqlAction[R, S, E]
 }
 
-trait FixedSqlStreamingAction[+R, +T, -E <: Effect] extends SqlStreamingAction[R, T, E] with FixedSqlAction[R, Streaming[T], E]
+trait FixedSqlStreamingAction[+R, +T, -E <: Effect]
+    extends SqlStreamingAction[R, T, E] with FixedSqlAction[R, Streaming[T], E]

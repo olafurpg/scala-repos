@@ -11,7 +11,7 @@ object Test extends SigTest {
       show[Iterable[_]](name)
       show[Seq[_]](name)
       show[Set[_]](name)
-      show[Map[_,_]](name)
+      show[Map[_, _]](name)
       show[Vector[_]](name)
       show[Range](name)
     }

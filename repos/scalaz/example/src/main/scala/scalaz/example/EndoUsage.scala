@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz.{Endo,IList,Zip}
+import scalaz.{Endo, IList, Zip}
 import scalaz.std.function._
 import scalaz.std.anyVal._
 import scalaz.syntax.monoid._
@@ -40,26 +40,27 @@ object EndoUsage extends App {
   // endomorphisms for some type, and squash that down into a single
   // function:
 
-  case class Person(first: String, last: String, age: Int) 
+  case class Person(first: String, last: String, age: Int)
 
-  val lowercaseFirst: Endo[Person] = Endo(p ⇒ p.copy(first=p.first.toLowerCase))
-  val lowercaseLast: Endo[Person] = Endo(p ⇒ p.copy(last=p.last.toLowerCase))
-  val trimFirst: Endo[Person] = Endo(p ⇒ p.copy(first=p.first.trim))
-  val trimLast: Endo[Person] = Endo(p ⇒ p.copy(last=p.last.trim))
-  val birthday: Endo[Person] = Endo(p ⇒ p.copy(age = p.age+1))
-  val endos: IList[Endo[Person]] = IList(lowercaseFirst, lowercaseLast, trimFirst, trimLast, birthday)
+  val lowercaseFirst: Endo[Person] = Endo(
+      p ⇒ p.copy(first = p.first.toLowerCase))
+  val lowercaseLast: Endo[Person] = Endo(p ⇒ p.copy(last = p.last.toLowerCase))
+  val trimFirst: Endo[Person] = Endo(p ⇒ p.copy(first = p.first.trim))
+  val trimLast: Endo[Person] = Endo(p ⇒ p.copy(last = p.last.trim))
+  val birthday: Endo[Person] = Endo(p ⇒ p.copy(age = p.age + 1))
+  val endos: IList[Endo[Person]] = IList(
+      lowercaseFirst, lowercaseLast, trimFirst, trimLast, birthday)
 
   val stewBefore = Person(" Stew ", "O'Connor", 70)
   assert(endos.suml.apply(stewBefore) == Person("stew", "o'connor", 71))
 
   // endofunctors can be zipped together to get back an endofunctor that operates on tuples:
-  val ints = IList(1,2,3)
-  val strings = IList("a","b","c")
+  val ints = IList(1, 2, 3)
+  val strings = IList("a", "b", "c")
 
   val plus1: Endo[Int] = Endo(_ + 1)
   val toUpper: Endo[String] = Endo(_.toUpperCase)
 
   val foo = (ints zip strings) map Zip[Endo].zip(plus1, toUpper).run
-  assert(foo == IList((2,"A"),(3,"B"),(4,"C")))
+  assert(foo == IList((2, "A"), (3, "B"), (4, "C")))
 }
-

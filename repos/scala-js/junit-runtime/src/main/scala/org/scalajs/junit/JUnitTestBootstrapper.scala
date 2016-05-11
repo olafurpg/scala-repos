@@ -14,7 +14,8 @@ trait JUnitTestBootstrapper {
   def invoke(instance: AnyRef, methodName: String): Unit
 }
 
-final class JUnitMethodMetadata(val name: String, annotations: List[Annotation]) {
+final class JUnitMethodMetadata(
+    val name: String, annotations: List[Annotation]) {
 
   def hasTestAnnotation: Boolean =
     annotations.exists(_.isInstanceOf[org.junit.Test])
@@ -39,8 +40,9 @@ final class JUnitMethodMetadata(val name: String, annotations: List[Annotation])
 }
 
 final class JUnitClassMetadata(classAnnotations: List[Annotation],
-    moduleAnnotations: List[Annotation], classMethods: List[JUnitMethodMetadata],
-    moduleMethods: List[JUnitMethodMetadata]) {
+                               moduleAnnotations: List[Annotation],
+                               classMethods: List[JUnitMethodMetadata],
+                               moduleMethods: List[JUnitMethodMetadata]) {
 
   def testMethods: List[JUnitMethodMetadata] = {
     val fixMethodOrderAnnotation = getFixMethodOrderAnnotation

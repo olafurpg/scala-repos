@@ -1,8 +1,6 @@
-
 import scala.tools.nsc._
 import interpreter.ILoop
 import scala.tools.partest.ReplTest
-
 
 object Test extends ReplTest {
   override def extraSettings = "-Yopt:l:classpath"
@@ -18,4 +16,3 @@ object Test extends ReplTest {
     lines.map(l => r.replaceAllIn(l, "<function0>"))
   }
 }
-

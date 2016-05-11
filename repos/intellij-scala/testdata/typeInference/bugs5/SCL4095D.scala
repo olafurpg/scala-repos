@@ -9,9 +9,9 @@ object Apply {
 }
 
 object TestUnit {
-  def foo: Apply[Option[Int]] =  Apply { i =>
+  def foo: Apply[Option[Int]] = Apply { i =>
     if (true) Success(Some(i))
-    else /*start*/Success(None)/*end*/
+    else /*start*/ Success(None) /*end*/
   }
 }
 //Success[Option[Int]]

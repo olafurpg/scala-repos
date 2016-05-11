@@ -1,4 +1,3 @@
-
 package t6278
 
 import language.implicitConversions
@@ -6,7 +5,7 @@ import language.implicitConversions
 object test {
   def ok() {
     class Foo(val i: Int) {
-      def foo[A](body: =>A): A = body
+      def foo[A](body: => A): A = body
     }
     implicit def toFoo(i: Int): Foo = new Foo(i)
 
@@ -16,7 +15,7 @@ object test {
   }
   def nope() {
     implicit class Foo(val i: Int) {
-      def foo[A](body: =>A): A = body
+      def foo[A](body: => A): A = body
     }
 
     val k = 1

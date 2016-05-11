@@ -4,7 +4,6 @@ import breeze.linalg.{Counter, sum}
 import breeze.math.MutableEnumeratedCoordinateField
 import breeze.numerics._
 
-
 /*
  Copyright 2009 David Hall, Daniel Ramage
 
@@ -19,17 +18,19 @@ import breeze.numerics._
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-*/
+ */
 
 /**
- * Represents a Polya distribution, a.k.a Dirichlet compound Multinomial distribution
- * see 
- * http://en.wikipedia.org/wiki/Multivariate_Polya_distribution
- *
- * @author dlwh
- */
-class Polya[T,@specialized(Int) I](params: T)(implicit space: MutableEnumeratedCoordinateField[T, I, Double],
-                                              rand: RandBasis=Rand) extends DiscreteDistr[I] {
+  * Represents a Polya distribution, a.k.a Dirichlet compound Multinomial distribution
+  * see 
+  * http://en.wikipedia.org/wiki/Multivariate_Polya_distribution
+  *
+  * @author dlwh
+  */
+class Polya[T, @specialized(Int) I](
+    params: T)(implicit space: MutableEnumeratedCoordinateField[T, I, Double],
+               rand: RandBasis = Rand)
+    extends DiscreteDistr[I] {
   import space._
   private val innerDirichlet = new Dirichlet(params)
   def draw() = {
@@ -38,9 +39,8 @@ class Polya[T,@specialized(Int) I](params: T)(implicit space: MutableEnumeratedC
 
   lazy val logNormalizer = -lbeta(params)
 
-  def probabilityOf(x: I) = math.exp(lbeta(sum(params), 1.0) - lbeta(params(x), 1.0))
-
-
+  def probabilityOf(x: I) =
+    math.exp(lbeta(sum(params), 1.0) - lbeta(params(x), 1.0))
 //  def probabilityOf(x: T) = math.exp(logProbabilityOf(x))
 //  def logProbabilityOf(x: T) = {
 //    math.exp(unnormalizedLogProbabilityOf(x) + logNormalizer)
@@ -50,21 +50,23 @@ class Polya[T,@specialized(Int) I](params: T)(implicit space: MutableEnumeratedC
 //    val adjustForCount = ev(x).valuesIterator.foldLeft(lgamma(ev(x).sum+1))( (acc,v) => acc-lgamma(v+1))
 //    adjustForCount + lbeta(ev(x + params))
 //  }
-
 }
 
-
 object Polya {
-  /**
-  * Creates a new symmetric Polya of dimension k
-  */
-  def sym(alpha : Double, k : Int) = this(Array.tabulate(k){ x => alpha })
 
   /**
-  * Creates a new Polya of dimension k with the given parameters
-  */
+    * Creates a new symmetric Polya of dimension k
+    */
+  def sym(alpha: Double, k: Int) =
+    this(Array.tabulate(k) { x =>
+      alpha
+    })
+
+  /**
+    * Creates a new Polya of dimension k with the given parameters
+    */
   def apply(arr: Array[Double]) = {
     val swapped: Array[(Int, Double)] = arr.zipWithIndex.map(_.swap)
-    new Polya(Counter(swapped.toIndexedSeq:_*))
+    new Polya(Counter(swapped.toIndexedSeq: _*))
   }
 }

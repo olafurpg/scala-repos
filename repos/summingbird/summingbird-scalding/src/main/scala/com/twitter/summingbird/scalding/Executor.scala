@@ -16,10 +16,10 @@
 package com.twitter.summingbird.scalding
 
 import com.twitter.summingbird._
-import com.twitter.scalding.{ RichDate, DateParser, Hdfs, Args }
+import com.twitter.scalding.{RichDate, DateParser, Hdfs, Args}
 
-import com.twitter.summingbird.batch.{ Timestamp, WaitingState }
-import com.twitter.summingbird.batch.option.{ FlatMapShards, Reducers }
+import com.twitter.summingbird.batch.{Timestamp, WaitingState}
+import com.twitter.summingbird.batch.option.{FlatMapShards, Reducers}
 import com.twitter.summingbird.chill.ChillExecutionConfig
 import com.twitter.algebird.Interval
 
@@ -30,14 +30,12 @@ import java.util.TimeZone
 import org.slf4j.LoggerFactory
 
 /**
- * @author Ian O Connell
- */
-
+  * @author Ian O Connell
+  */
 trait ScaldingExecutionConfig extends ChillExecutionConfig[Scalding] {
-  def getWaitingState(
-    hadoopConfig: Configuration,
-    startDate: Option[Timestamp],
-    batches: Int): WaitingState[Interval[Timestamp]]
+  def getWaitingState(hadoopConfig: Configuration,
+                      startDate: Option[Timestamp],
+                      batches: Int): WaitingState[Interval[Timestamp]]
 }
 
 object Executor {
@@ -45,11 +43,13 @@ object Executor {
 
   def buildHadoopConf(inArgs: Array[String]): (Configuration, Args) = {
     val baseConfig = new Configuration
-    val args = Args(new GenericOptionsParser(baseConfig, inArgs).getRemainingArgs)
+    val args = Args(
+        new GenericOptionsParser(baseConfig, inArgs).getRemainingArgs)
     (baseConfig, args)
   }
 
-  def apply(inArgs: Array[String], generator: (Args => ScaldingExecutionConfig)) {
+  def apply(
+      inArgs: Array[String], generator: (Args => ScaldingExecutionConfig)) {
 
     val (hadoopConf, args) = buildHadoopConf(inArgs)
 
@@ -62,8 +62,10 @@ object Executor {
     // (incremental updates) will use the batch of the previous run as
     // the starting batch, rendering this unnecessary.
     def startDate: Option[Timestamp] =
-      args.optional("start-time")
-        .map(RichDate(_)(TimeZone.getTimeZone("UTC"), DateParser.default).value)
+      args
+        .optional("start-time")
+        .map(
+            RichDate(_)(TimeZone.getTimeZone("UTC"), DateParser.default).value)
 
     // The number of batches to process in this particular run. Imagine
     // a batch size of one hour; For big recomputations, one might want
@@ -78,22 +80,31 @@ object Executor {
     // and would be faster to force a shuffle immediately after the data is read
     def shards: Int = args.getOrElse("shards", "0").toInt
 
-    val options = Map("DEFAULT" -> Options().set(Reducers(reducers)).set(FlatMapShards(shards))) ++ config.getNamedOptions
+    val options =
+      Map("DEFAULT" -> Options()
+            .set(Reducers(reducers))
+            .set(FlatMapShards(shards))) ++ config.getNamedOptions
 
     val scaldPlatform = Scalding(config.name, options)
       .withRegistrars(config.registrars)
-      .withConfigUpdater { c => com.twitter.scalding.Config.tryFrom(config.transformConfig(c.toMap).toMap).get }
+      .withConfigUpdater { c =>
+        com.twitter.scalding.Config
+          .tryFrom(config.transformConfig(c.toMap).toMap)
+          .get
+      }
 
     val toRun = scaldPlatform.plan(config.graph)
 
     try {
-      scaldPlatform
-        .run(config.getWaitingState(hadoopConf, startDate, batches), Hdfs(true, hadoopConf), toRun)
+      scaldPlatform.run(config.getWaitingState(hadoopConf, startDate, batches),
+                        Hdfs(true, hadoopConf),
+                        toRun)
     } catch {
       case f @ FlowPlanException(errs) =>
         /* This is generally due to data not being ready, don't give a failed error code */
         if (!args.boolean("scalding.nothrowplan")) {
-          logger.error("use: --scalding.nothrowplan to not give a failing error code in this case")
+          logger.error(
+              "use: --scalding.nothrowplan to not give a failing error code in this case")
           throw f
         } else {
           logger.info("[ERROR]: ========== FlowPlanException =========")

@@ -19,18 +19,19 @@ import org.jetbrains.plugins.scala.testingSupport.test.AbstractTestRunConfigurat
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 09.12.11
- */
-
-class AbstractTestRerunFailedTestsAction(consoleView: BaseTestsOutputConsoleView)
-  extends AbstractRerunFailedTestsActionAdapter(consoleView) {
+  * User: Alexander Podkhalyuzin
+  * Date: 09.12.11
+  */
+class AbstractTestRerunFailedTestsAction(
+    consoleView: BaseTestsOutputConsoleView)
+    extends AbstractRerunFailedTestsActionAdapter(consoleView) {
   copyFrom(ActionManager.getInstance.getAction("RerunFailedTests"))
   registerCustomShortcutSet(getShortcutSet, consoleView.getComponent)
 
   override def getRunProfile: MyRunProfileAdapter = {
     val properties: TestConsoleProperties = getModel.getProperties
-    val configuration = properties.getConfiguration.asInstanceOf[AbstractTestRunConfiguration]
+    val configuration =
+      properties.getConfiguration.asInstanceOf[AbstractTestRunConfiguration]
     new MyRunProfileAdapter(configuration) {
       def getModules: Array[Module] = configuration.getModules
 
@@ -41,37 +42,50 @@ class AbstractTestRerunFailedTestsAction(consoleView: BaseTestsOutputConsoleView
         }
       }
 
-      def getState(executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+      def getState(
+          executor: Executor, env: ExecutionEnvironment): RunProfileState = {
         val extensionConfiguration =
           properties.asInstanceOf[PropertiesExtension].getRunConfigurationBase
         val state = configuration.getState(executor, env)
         val patcher = state.asInstanceOf[TestCommandLinePatcher]
         val failedTests = getFailedTests(configuration.getProject)
         val buffer = new ArrayBuffer[(String, String)]
-        val classNames = patcher.getClasses.map(s => {
-          val i = s.lastIndexOf(".")
-          if (i < 0) s
-          else s.substring(i + 1)
-        } -> s).toMap
+        val classNames = patcher.getClasses
+          .map(
+              s =>
+                {
+              val i = s.lastIndexOf(".")
+              if (i < 0) s
+              else s.substring(i + 1)
+            } -> s)
+          .toMap
         import scala.collection.JavaConversions._
-        for (failed <- failedTests) { //todo: fix after adding location API
-        def tail() {
-          var parent = failed.getParent
-          while (parent != null) {
-            classNames.get(parent.getName) match {
-              case None =>
-                parent = parent.getParent
-                if (parent == null) buffer += ((classNames.values.iterator.next(), getTestName(failed)))
-              case Some(s) =>
-                buffer += ((s, getTestName(failed)))
-                parent = null
+        for (failed <- failedTests) {
+          //todo: fix after adding location API
+          def tail() {
+            var parent = failed.getParent
+            while (parent != null) {
+              classNames.get(parent.getName) match {
+                case None =>
+                  parent = parent.getParent
+                  if (parent == null)
+                    buffer +=
+                    ((classNames.values.iterator.next(), getTestName(failed)))
+                case Some(s) =>
+                  buffer += ((s, getTestName(failed)))
+                  parent = null
+              }
             }
           }
-        }
-          if (extensionConfiguration != this && extensionConfiguration.isInstanceOf[MyRunProfileAdapter] &&
-            extensionConfiguration.asInstanceOf[MyRunProfileAdapter].previoslyFailed != null) {
+          if (extensionConfiguration != this &&
+              extensionConfiguration.isInstanceOf[MyRunProfileAdapter] &&
+              extensionConfiguration
+                .asInstanceOf[MyRunProfileAdapter]
+                .previoslyFailed != null) {
             var added = false
-            for (f <- extensionConfiguration.asInstanceOf[MyRunProfileAdapter].previoslyFailed if !added) {
+            for (f <- extensionConfiguration
+                       .asInstanceOf[MyRunProfileAdapter]
+                       .previoslyFailed if !added) {
               if (f._2 == getTestName(failed)) {
                 buffer += f
                 added = true

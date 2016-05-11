@@ -6,12 +6,14 @@ import com.intellij.openapi.components.AbstractProjectComponent
 import com.intellij.openapi.project.Project
 
 /**
- * @author Pavel Fatin
- */
-class ScalaProjectCache(project: Project, events: ScalaProjectEvents) extends AbstractProjectComponent(project) {
+  * @author Pavel Fatin
+  */
+class ScalaProjectCache(project: Project, events: ScalaProjectEvents)
+    extends AbstractProjectComponent(project) {
   private val cache = new ConcurrentHashMap[AnyRef, AnyRef]()
 
-  events.addScalaProjectListener(new ScalaProjectListener {
+  events.addScalaProjectListener(
+      new ScalaProjectListener {
     def onScalaProjectChanged() {
       cache.clear()
     }

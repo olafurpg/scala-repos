@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.spark.sql.execution
 
 import org.apache.spark.sql.catalyst.InternalRow
@@ -26,9 +25,9 @@ import org.apache.spark.util.collection.unsafe.sort.{PrefixComparator, PrefixCom
 object SortPrefixUtils {
 
   /**
-   * A dummy prefix comparator which always claims that prefixes are equal. This is used in cases
-   * where we don't know how to generate or compare prefixes for a SortOrder.
-   */
+    * A dummy prefix comparator which always claims that prefixes are equal. This is used in cases
+    * where we don't know how to generate or compare prefixes for a SortOrder.
+    */
   private object NoOpPrefixComparator extends PrefixComparator {
     override def compare(prefix1: Long, prefix2: Long): Int = 0
   }
@@ -36,28 +35,38 @@ object SortPrefixUtils {
   def getPrefixComparator(sortOrder: SortOrder): PrefixComparator = {
     sortOrder.dataType match {
       case StringType =>
-        if (sortOrder.isAscending) PrefixComparators.STRING else PrefixComparators.STRING_DESC
+        if (sortOrder.isAscending) PrefixComparators.STRING
+        else PrefixComparators.STRING_DESC
       case BinaryType =>
-        if (sortOrder.isAscending) PrefixComparators.BINARY else PrefixComparators.BINARY_DESC
-      case BooleanType | ByteType | ShortType | IntegerType | LongType | DateType | TimestampType =>
-        if (sortOrder.isAscending) PrefixComparators.LONG else PrefixComparators.LONG_DESC
-      case dt: DecimalType if dt.precision - dt.scale <= Decimal.MAX_LONG_DIGITS =>
-        if (sortOrder.isAscending) PrefixComparators.LONG else PrefixComparators.LONG_DESC
+        if (sortOrder.isAscending) PrefixComparators.BINARY
+        else PrefixComparators.BINARY_DESC
+      case BooleanType | ByteType | ShortType | IntegerType | LongType |
+          DateType | TimestampType =>
+        if (sortOrder.isAscending) PrefixComparators.LONG
+        else PrefixComparators.LONG_DESC
+      case dt: DecimalType
+          if dt.precision - dt.scale <= Decimal.MAX_LONG_DIGITS =>
+        if (sortOrder.isAscending) PrefixComparators.LONG
+        else PrefixComparators.LONG_DESC
       case FloatType | DoubleType =>
-        if (sortOrder.isAscending) PrefixComparators.DOUBLE else PrefixComparators.DOUBLE_DESC
+        if (sortOrder.isAscending) PrefixComparators.DOUBLE
+        else PrefixComparators.DOUBLE_DESC
       case dt: DecimalType =>
-        if (sortOrder.isAscending) PrefixComparators.DOUBLE else PrefixComparators.DOUBLE_DESC
+        if (sortOrder.isAscending) PrefixComparators.DOUBLE
+        else PrefixComparators.DOUBLE_DESC
       case _ => NoOpPrefixComparator
     }
   }
 
   /**
-   * Creates the prefix comparator for the first field in the given schema, in ascending order.
-   */
+    * Creates the prefix comparator for the first field in the given schema, in ascending order.
+    */
   def getPrefixComparator(schema: StructType): PrefixComparator = {
     if (schema.nonEmpty) {
       val field = schema.head
-      getPrefixComparator(SortOrder(BoundReference(0, field.dataType, field.nullable), Ascending))
+      getPrefixComparator(
+          SortOrder(
+              BoundReference(0, field.dataType, field.nullable), Ascending))
     } else {
       new PrefixComparator {
         override def compare(prefix1: Long, prefix2: Long): Int = 0
@@ -66,13 +75,15 @@ object SortPrefixUtils {
   }
 
   /**
-   * Creates the prefix computer for the first field in the given schema, in ascending order.
-   */
-  def createPrefixGenerator(schema: StructType): UnsafeExternalRowSorter.PrefixComputer = {
+    * Creates the prefix computer for the first field in the given schema, in ascending order.
+    */
+  def createPrefixGenerator(
+      schema: StructType): UnsafeExternalRowSorter.PrefixComputer = {
     if (schema.nonEmpty) {
-      val boundReference = BoundReference(0, schema.head.dataType, nullable = true)
+      val boundReference = BoundReference(
+          0, schema.head.dataType, nullable = true)
       val prefixProjection = UnsafeProjection.create(
-        SortPrefix(SortOrder(boundReference, Ascending)))
+          SortPrefix(SortOrder(boundReference, Ascending)))
       new UnsafeExternalRowSorter.PrefixComputer {
         override def computePrefix(row: InternalRow): Long = {
           prefixProjection.apply(row).getLong(0)

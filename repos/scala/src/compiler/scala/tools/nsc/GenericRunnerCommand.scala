@@ -10,9 +10,8 @@ import scala.reflect.internal.util.ScalaClassLoader
 
 /** A command for ScriptRunner */
 class GenericRunnerCommand(
-  args: List[String],
-  override val settings: GenericRunnerSettings)
-extends CompilerCommand(args, settings) {
+    args: List[String], override val settings: GenericRunnerSettings)
+    extends CompilerCommand(args, settings) {
 
   def this(args: List[String], error: String => Unit) =
     this(args, new GenericRunnerSettings(error))
@@ -23,17 +22,19 @@ extends CompilerCommand(args, settings) {
   override def cmdName = "scala"
   override def cmdDesc = "code runner"
 
-  def compCmdName = "scalac"  // super.cmdName
+  def compCmdName = "scalac" // super.cmdName
 
   // change CompilerCommand behavior
   override def shouldProcessArguments: Boolean = false
 
-  private lazy val (_ok, targetAndArguments) = settings.processArguments(args, processAll = false)
+  private lazy val (_ok, targetAndArguments) =
+    settings.processArguments(args, processAll = false)
   override def ok = _ok
   private def guessHowToRun(target: String): GenericRunnerCommand.HowToRun = {
     if (!ok) Error
     else if (io.Jar.isJarOrZip(target)) AsJar
-    else if (ScalaClassLoader.classExists(settings.classpathURLs, target)) AsObject
+    else if (ScalaClassLoader.classExists(settings.classpathURLs, target))
+      AsObject
     else {
       val f = io.File(target)
       if (!f.hasExtension("class", "jar", "zip") && f.canRead) AsScript
@@ -43,18 +44,22 @@ extends CompilerCommand(args, settings) {
       }
     }
   }
+
   /** String with either the jar file, class name, or script file name. */
   def thingToRun = targetAndArguments.headOption getOrElse ""
+
   /** Arguments to thingToRun. */
   def arguments = targetAndArguments drop 1
 
   val howToRun = targetAndArguments match {
-    case Nil      => AsRepl
-    case hd :: _  => waysToRun find (_.name == settings.howtorun.value) getOrElse guessHowToRun(hd)
+    case Nil => AsRepl
+    case hd :: _ =>
+      waysToRun find (_.name == settings.howtorun.value) getOrElse guessHowToRun(
+          hd)
   }
 
   def shortUsageMsg =
-s"""|Usage: $cmdName <options> [<script|class|object|jar> <arguments>]
+    s"""|Usage: $cmdName <options> [<script|class|object|jar> <arguments>]
     |   or  $cmdName -help
     |
     |All options to $compCmdName (see $compCmdName -help) are also allowed.
@@ -95,7 +100,7 @@ used to prevent this.%n"""
 }
 
 object GenericRunnerCommand {
-  sealed abstract class HowToRun(val name: String) { }
+  sealed abstract class HowToRun(val name: String) {}
   case object AsJar extends HowToRun("jar")
   case object AsObject extends HowToRun("object")
   case object AsScript extends HowToRun("script")

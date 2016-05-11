@@ -6,7 +6,7 @@ class X[R] {
 }
 
 class Boo {
-  implicit def toX[R](v: R) : X[R] = null
+  implicit def toX[R](v: R): X[R] = null
   def goo2 {
     3.xx(34)
   }

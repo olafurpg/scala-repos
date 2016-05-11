@@ -9,6 +9,7 @@ package object scala {
 
   def using: HashSet = null
 
-  /*start*/using.close()/*end*/
+  /*start*/
+  using.close() /*end*/
 }
 //Int

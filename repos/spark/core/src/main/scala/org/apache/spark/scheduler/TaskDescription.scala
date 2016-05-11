@@ -22,22 +22,23 @@ import java.nio.ByteBuffer
 import org.apache.spark.util.SerializableBuffer
 
 /**
- * Description of a task that gets passed onto executors to be executed, usually created by
- * [[TaskSetManager.resourceOffer]].
- */
+  * Description of a task that gets passed onto executors to be executed, usually created by
+  * [[TaskSetManager.resourceOffer]].
+  */
 private[spark] class TaskDescription(
     val taskId: Long,
     val attemptNumber: Int,
     val executorId: String,
     val name: String,
-    val index: Int,    // Index within this task's TaskSet
+    val index: Int, // Index within this task's TaskSet
     _serializedTask: ByteBuffer)
-  extends Serializable {
+    extends Serializable {
 
   // Because ByteBuffers are not serializable, wrap the task in a SerializableBuffer
   private val buffer = new SerializableBuffer(_serializedTask)
 
   def serializedTask: ByteBuffer = buffer.value
 
-  override def toString: String = "TaskDescription(TID=%d, index=%d)".format(taskId, index)
+  override def toString: String =
+    "TaskDescription(TID=%d, index=%d)".format(taskId, index)
 }

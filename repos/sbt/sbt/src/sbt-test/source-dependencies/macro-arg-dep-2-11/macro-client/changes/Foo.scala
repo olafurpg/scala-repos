@@ -1,3 +1,2 @@
 package macros
-object Foo {
-}
+object Foo {}

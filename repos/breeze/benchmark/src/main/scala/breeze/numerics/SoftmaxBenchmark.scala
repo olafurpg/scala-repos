@@ -6,8 +6,8 @@ import breeze.stats.distributions.Rand
 import spire.syntax.cfor._
 
 /**
- * Created by dlwh on 10/3/15.
- */
+  * Created by dlwh on 10/3/15.
+  */
 class SoftmaxBenchmark extends BreezeBenchmark {
   val dv = DenseVector.rand(5000, Rand.uniform.map(_.toFloat))
 
@@ -19,7 +19,6 @@ class SoftmaxBenchmark extends BreezeBenchmark {
 
     sum
   }
-
 }
 
 object SoftmaxBenchmark extends MyRunner(classOf[SoftmaxBenchmark])

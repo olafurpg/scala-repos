@@ -7,15 +7,17 @@ import org.jetbrains.jps.service.JpsServiceManager
 import scala.collection.JavaConverters._
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 abstract class SourceDependenciesProviderService {
   def getSourceDependenciesFor(chunk: ModuleChunk): Seq[JpsModule]
 }
 
 object SourceDependenciesProviderService {
   def getSourceDependenciesFor(chunk: ModuleChunk): Seq[JpsModule] = {
-    val providers = JpsServiceManager.getInstance.getExtensions(classOf[SourceDependenciesProviderService]).asScala
+    val providers = JpsServiceManager.getInstance
+      .getExtensions(classOf[SourceDependenciesProviderService])
+      .asScala
     providers.flatMap(_.getSourceDependenciesFor(chunk)).toSeq
   }
 }

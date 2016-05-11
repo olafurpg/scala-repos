@@ -40,8 +40,8 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
   test("uncorrelated scalar subquery in CTE") {
     assertResult(Array(Row(1))) {
       sql("with t2 as (select 1 as b, 2 as c) " +
-        "select a from (select 1 as a union all select 2 as a) t " +
-        "where a = (select max(b) from t2) ").collect()
+          "select a from (select 1 as a union all select 2 as a) t " +
+          "where a = (select max(b) from t2) ").collect()
     }
   }
 
@@ -53,10 +53,11 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
 
   test("runtime error when the number of rows is greater than 1") {
     val error2 = intercept[RuntimeException] {
-      sql("select (select a from (select 1 as a union all select 2 as a) t) as b").collect()
+      sql("select (select a from (select 1 as a union all select 2 as a) t) as b")
+        .collect()
     }
     assert(error2.getMessage.contains(
-      "more than one row returned by a subquery used as an expression"))
+            "more than one row returned by a subquery used as an expression"))
   }
 
   test("uncorrelated scalar subquery on a DataFrame generated query") {
@@ -64,7 +65,8 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
     df.registerTempTable("subqueryData")
 
     assertResult(Array(Row(4))) {
-      sql("select (select key from subqueryData where key > 2 order by key limit 1) + 1").collect()
+      sql("select (select key from subqueryData where key > 2 order by key limit 1) + 1")
+        .collect()
     }
 
     assertResult(Array(Row(-3))) {
@@ -77,7 +79,7 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
 
     assertResult(Array(Row("two"))) {
       sql("select (select min(value) from subqueryData" +
-        " where key = (select max(key) from subqueryData) - 1)").collect()
+          " where key = (select max(key) from subqueryData) - 1)").collect()
     }
   }
 }

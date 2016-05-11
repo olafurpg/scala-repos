@@ -7,9 +7,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.junit.Assert
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class ScLiteralTest extends SimpleTestCase {
   def testNullLiteral() {
     assertTypeIs("null", types.Null)

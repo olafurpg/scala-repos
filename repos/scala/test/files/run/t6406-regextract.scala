@@ -1,11 +1,10 @@
-
 object Test extends App {
   import util.matching._
   import Regex._
 
   val r = "(\\d+)".r
   val q = """(\d)""".r
-  val ns = List("1,2","x","3,4")
+  val ns = List("1,2", "x", "3,4")
   val u = r.unanchored
 
   val is = ns collect { case u(x) => x } map { case r(x) => x }
@@ -26,5 +25,4 @@ object Test extends App {
     p1(year, month, day) <- p1 findFirstMatchIn t
   } yield year
   println(s"$y1 $y2")
-
 }

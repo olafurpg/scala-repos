@@ -25,7 +25,6 @@ class ThePlugin(val global: Global) extends Plugin {
 
   private class ThePhase(prev: Phase) extends Phase(prev) {
     override def name = ThePlugin.this.name
-    override def run  = ???
+    override def run = ???
   }
 }
-

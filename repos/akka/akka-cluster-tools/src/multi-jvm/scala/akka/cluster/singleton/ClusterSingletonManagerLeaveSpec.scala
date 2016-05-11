@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.singleton
 
 import language.postfixOps
@@ -41,9 +40,10 @@ object ClusterSingletonManagerLeaveSpec extends MultiNodeConfig {
     """))
 
   case object EchoStarted
+
   /**
-   * The singleton actor
-   */
+    * The singleton actor
+    */
   class Echo(testActor: ActorRef) extends Actor {
     override def postStop(): Unit = {
       testActor ! "stopped"
@@ -56,11 +56,16 @@ object ClusterSingletonManagerLeaveSpec extends MultiNodeConfig {
   }
 }
 
-class ClusterSingletonManagerLeaveMultiJvmNode1 extends ClusterSingletonManagerLeaveSpec
-class ClusterSingletonManagerLeaveMultiJvmNode2 extends ClusterSingletonManagerLeaveSpec
-class ClusterSingletonManagerLeaveMultiJvmNode3 extends ClusterSingletonManagerLeaveSpec
+class ClusterSingletonManagerLeaveMultiJvmNode1
+    extends ClusterSingletonManagerLeaveSpec
+class ClusterSingletonManagerLeaveMultiJvmNode2
+    extends ClusterSingletonManagerLeaveSpec
+class ClusterSingletonManagerLeaveMultiJvmNode3
+    extends ClusterSingletonManagerLeaveSpec
 
-class ClusterSingletonManagerLeaveSpec extends MultiNodeSpec(ClusterSingletonManagerLeaveSpec) with STMultiNodeSpec with ImplicitSender {
+class ClusterSingletonManagerLeaveSpec
+    extends MultiNodeSpec(ClusterSingletonManagerLeaveSpec)
+    with STMultiNodeSpec with ImplicitSender {
   import ClusterSingletonManagerLeaveSpec._
 
   override def initialParticipants = roles.size
@@ -76,17 +81,17 @@ class ClusterSingletonManagerLeaveSpec extends MultiNodeSpec(ClusterSingletonMan
 
   def createSingleton(): ActorRef = {
     system.actorOf(ClusterSingletonManager.props(
-      singletonProps = Props(classOf[Echo], testActor),
-      terminationMessage = PoisonPill,
-      settings = ClusterSingletonManagerSettings(system)),
-      name = "echo")
+                       singletonProps = Props(classOf[Echo], testActor),
+                       terminationMessage = PoisonPill,
+                       settings = ClusterSingletonManagerSettings(system)),
+                   name = "echo")
   }
 
   lazy val echoProxy: ActorRef = {
     system.actorOf(ClusterSingletonProxy.props(
-      singletonManagerPath = "/user/echo",
-      settings = ClusterSingletonProxySettings(system)),
-      name = "echoProxy")
+                       singletonManagerPath = "/user/echo",
+                       settings = ClusterSingletonProxySettings(system)),
+                   name = "echoProxy")
   }
 
   "Leaving ClusterSingletonManager" must {
@@ -103,7 +108,8 @@ class ClusterSingletonManagerLeaveSpec extends MultiNodeSpec(ClusterSingletonMan
       join(second, first)
       join(third, first)
       within(10.seconds) {
-        awaitAssert(cluster.state.members.count(m ⇒ m.status == MemberStatus.Up) should be(3))
+        awaitAssert(cluster.state.members
+              .count(m ⇒ m.status == MemberStatus.Up) should be(3))
       }
       enterBarrier("all-up")
 
@@ -122,14 +128,13 @@ class ClusterSingletonManagerLeaveSpec extends MultiNodeSpec(ClusterSingletonMan
         p.within(10.seconds) {
           p.awaitAssert {
             echoProxy.tell("hello2", p.ref)
-            p.expectMsgType[ActorRef](1.seconds).path.address should not be (firstAddress)
-
+            p.expectMsgType[ActorRef](1.seconds).path.address should not be
+            (firstAddress)
           }
         }
       }
 
       enterBarrier("hand-over-done")
     }
-
   }
 }

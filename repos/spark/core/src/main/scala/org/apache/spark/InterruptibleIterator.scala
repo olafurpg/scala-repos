@@ -20,13 +20,14 @@ package org.apache.spark
 import org.apache.spark.annotation.DeveloperApi
 
 /**
- * :: DeveloperApi ::
- * An iterator that wraps around an existing iterator to provide task killing functionality.
- * It works by checking the interrupted flag in [[TaskContext]].
- */
+  * :: DeveloperApi ::
+  * An iterator that wraps around an existing iterator to provide task killing functionality.
+  * It works by checking the interrupted flag in [[TaskContext]].
+  */
 @DeveloperApi
-class InterruptibleIterator[+T](val context: TaskContext, val delegate: Iterator[T])
-  extends Iterator[T] {
+class InterruptibleIterator[+T](
+    val context: TaskContext, val delegate: Iterator[T])
+    extends Iterator[T] {
 
   def hasNext: Boolean = {
     // TODO(aarondav/rxin): Check Thread.interrupted instead of context.interrupted if interrupt

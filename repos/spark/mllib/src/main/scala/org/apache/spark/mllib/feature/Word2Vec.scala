@@ -39,33 +39,33 @@ import org.apache.spark.util.Utils
 import org.apache.spark.util.random.XORShiftRandom
 
 /**
- *  Entry in vocabulary
- */
+  *  Entry in vocabulary
+  */
 private case class VocabWord(
-  var word: String,
-  var cn: Int,
-  var point: Array[Int],
-  var code: Array[Int],
-  var codeLen: Int
+    var word: String,
+    var cn: Int,
+    var point: Array[Int],
+    var code: Array[Int],
+    var codeLen: Int
 )
 
 /**
- * Word2Vec creates vector representation of words in a text corpus.
- * The algorithm first constructs a vocabulary from the corpus
- * and then learns vector representation of words in the vocabulary.
- * The vector representation can be used as features in
- * natural language processing and machine learning algorithms.
- *
- * We used skip-gram model in our implementation and hierarchical softmax
- * method to train the model. The variable names in the implementation
- * matches the original C implementation.
- *
- * For original C implementation, see https://code.google.com/p/word2vec/
- * For research papers, see
- * Efficient Estimation of Word Representations in Vector Space
- * and
- * Distributed Representations of Words and Phrases and their Compositionality.
- */
+  * Word2Vec creates vector representation of words in a text corpus.
+  * The algorithm first constructs a vocabulary from the corpus
+  * and then learns vector representation of words in the vocabulary.
+  * The vector representation can be used as features in
+  * natural language processing and machine learning algorithms.
+  *
+  * We used skip-gram model in our implementation and hierarchical softmax
+  * method to train the model. The variable names in the implementation
+  * matches the original C implementation.
+  *
+  * For original C implementation, see https://code.google.com/p/word2vec/
+  * For research papers, see
+  * Efficient Estimation of Word Representations in Vector Space
+  * and
+  * Distributed Representations of Words and Phrases and their Compositionality.
+  */
 @Since("1.1.0")
 class Word2Vec extends Serializable with Logging {
 
@@ -78,10 +78,10 @@ class Word2Vec extends Serializable with Logging {
   private var maxSentenceLength = 1000
 
   /**
-   * Sets the maximum length (in words) of each sentence in the input data.
-   * Any sentence longer than this threshold will be divided into chunks of
-   * up to `maxSentenceLength` size (default: 1000)
-   */
+    * Sets the maximum length (in words) of each sentence in the input data.
+    * Any sentence longer than this threshold will be divided into chunks of
+    * up to `maxSentenceLength` size (default: 1000)
+    */
   @Since("2.0.0")
   def setMaxSentenceLength(maxSentenceLength: Int): this.type = {
     this.maxSentenceLength = maxSentenceLength
@@ -89,8 +89,8 @@ class Word2Vec extends Serializable with Logging {
   }
 
   /**
-   * Sets vector size (default: 100).
-   */
+    * Sets vector size (default: 100).
+    */
   @Since("1.1.0")
   def setVectorSize(vectorSize: Int): this.type = {
     this.vectorSize = vectorSize
@@ -98,8 +98,8 @@ class Word2Vec extends Serializable with Logging {
   }
 
   /**
-   * Sets initial learning rate (default: 0.025).
-   */
+    * Sets initial learning rate (default: 0.025).
+    */
   @Since("1.1.0")
   def setLearningRate(learningRate: Double): this.type = {
     this.learningRate = learningRate
@@ -107,19 +107,20 @@ class Word2Vec extends Serializable with Logging {
   }
 
   /**
-   * Sets number of partitions (default: 1). Use a small number for accuracy.
-   */
+    * Sets number of partitions (default: 1). Use a small number for accuracy.
+    */
   @Since("1.1.0")
   def setNumPartitions(numPartitions: Int): this.type = {
-    require(numPartitions > 0, s"numPartitions must be greater than 0 but got $numPartitions")
+    require(numPartitions > 0,
+            s"numPartitions must be greater than 0 but got $numPartitions")
     this.numPartitions = numPartitions
     this
   }
 
   /**
-   * Sets number of iterations (default: 1), which should be smaller than or equal to number of
-   * partitions.
-   */
+    * Sets number of iterations (default: 1), which should be smaller than or equal to number of
+    * partitions.
+    */
   @Since("1.1.0")
   def setNumIterations(numIterations: Int): this.type = {
     this.numIterations = numIterations
@@ -127,8 +128,8 @@ class Word2Vec extends Serializable with Logging {
   }
 
   /**
-   * Sets random seed (default: a random long integer).
-   */
+    * Sets random seed (default: a random long integer).
+    */
   @Since("1.1.0")
   def setSeed(seed: Long): this.type = {
     this.seed = seed
@@ -136,8 +137,8 @@ class Word2Vec extends Serializable with Logging {
   }
 
   /**
-   * Sets the window of words (default: 5)
-   */
+    * Sets the window of words (default: 5)
+    */
   @Since("1.6.0")
   def setWindowSize(window: Int): this.type = {
     this.window = window
@@ -145,9 +146,9 @@ class Word2Vec extends Serializable with Logging {
   }
 
   /**
-   * Sets minCount, the minimum number of times a token must appear to be included in the word2vec
-   * model's vocabulary (default: 5).
-   */
+    * Sets minCount, the minimum number of times a token must appear to be included in the word2vec
+    * model's vocabulary (default: 5).
+    */
   @Since("1.3.0")
   def setMinCount(minCount: Int): this.type = {
     this.minCount = minCount
@@ -169,21 +170,24 @@ class Word2Vec extends Serializable with Logging {
   private def learnVocab[S <: Iterable[String]](dataset: RDD[S]): Unit = {
     val words = dataset.flatMap(x => x)
 
-    vocab = words.map(w => (w, 1))
+    vocab = words
+      .map(w => (w, 1))
       .reduceByKey(_ + _)
       .filter(_._2 >= minCount)
-      .map(x => VocabWord(
-        x._1,
-        x._2,
-        new Array[Int](MAX_CODE_LENGTH),
-        new Array[Int](MAX_CODE_LENGTH),
-        0))
+      .map(x =>
+            VocabWord(x._1,
+                      x._2,
+                      new Array[Int](MAX_CODE_LENGTH),
+                      new Array[Int](MAX_CODE_LENGTH),
+                      0))
       .collect()
       .sortWith((a, b) => a.cn > b.cn)
 
     vocabSize = vocab.length
-    require(vocabSize > 0, "The vocabulary size should be > 0. You may need to check " +
-      "the setting of minCount, which could be large enough to remove all your words in sentences.")
+    require(
+        vocabSize > 0,
+        "The vocabulary size should be > 0. You may need to check " +
+        "the setting of minCount, which could be large enough to remove all your words in sentences.")
 
     var a = 0
     while (a < vocabSize) {
@@ -283,11 +287,11 @@ class Word2Vec extends Serializable with Logging {
   }
 
   /**
-   * Computes the vector representation of each word in vocabulary.
-   * @param dataset an RDD of sentences,
-   *                each sentence is expressed as an iterable collection of words
-   * @return a Word2VecModel
-   */
+    * Computes the vector representation of each word in vocabulary.
+    * @param dataset an RDD of sentences,
+    *                each sentence is expressed as an iterable collection of words
+    * @return a Word2VecModel
+    */
   @Since("1.1.0")
   def fit[S <: Iterable[String]](dataset: RDD[S]): Word2VecModel = {
 
@@ -316,94 +320,113 @@ class Word2Vec extends Serializable with Logging {
     val initRandom = new XORShiftRandom(seed)
 
     if (vocabSize.toLong * vectorSize >= Int.MaxValue) {
-      throw new RuntimeException("Please increase minCount or decrease vectorSize in Word2Vec" +
-        " to avoid an OOM. You are highly recommended to make your vocabSize*vectorSize, " +
-        "which is " + vocabSize + "*" + vectorSize + " for now, less than `Int.MaxValue`.")
+      throw new RuntimeException(
+          "Please increase minCount or decrease vectorSize in Word2Vec" +
+          " to avoid an OOM. You are highly recommended to make your vocabSize*vectorSize, " +
+          "which is " + vocabSize + "*" + vectorSize +
+          " for now, less than `Int.MaxValue`.")
     }
 
-    val syn0Global =
-      Array.fill[Float](vocabSize * vectorSize)((initRandom.nextFloat() - 0.5f) / vectorSize)
+    val syn0Global = Array.fill[Float](vocabSize * vectorSize)(
+        (initRandom.nextFloat() - 0.5f) / vectorSize)
     val syn1Global = new Array[Float](vocabSize * vectorSize)
     var alpha = learningRate
 
     for (k <- 1 to numIterations) {
       val bcSyn0Global = sc.broadcast(syn0Global)
       val bcSyn1Global = sc.broadcast(syn1Global)
-      val partial = newSentences.mapPartitionsWithIndex { case (idx, iter) =>
-        val random = new XORShiftRandom(seed ^ ((idx + 1) << 16) ^ ((-k - 1) << 8))
-        val syn0Modify = new Array[Int](vocabSize)
-        val syn1Modify = new Array[Int](vocabSize)
-        val model = iter.foldLeft((bcSyn0Global.value, bcSyn1Global.value, 0L, 0L)) {
-          case ((syn0, syn1, lastWordCount, wordCount), sentence) =>
-            var lwc = lastWordCount
-            var wc = wordCount
-            if (wordCount - lastWordCount > 10000) {
-              lwc = wordCount
-              // TODO: discount by iteration?
-              alpha =
-                learningRate * (1 - numPartitions * wordCount.toDouble / (trainWordsCount + 1))
-              if (alpha < learningRate * 0.0001) alpha = learningRate * 0.0001
-              logInfo("wordCount = " + wordCount + ", alpha = " + alpha)
-            }
-            wc += sentence.length
-            var pos = 0
-            while (pos < sentence.length) {
-              val word = sentence(pos)
-              val b = random.nextInt(window)
-              // Train Skip-gram
-              var a = b
-              while (a < window * 2 + 1 - b) {
-                if (a != window) {
-                  val c = pos - window + a
-                  if (c >= 0 && c < sentence.length) {
-                    val lastWord = sentence(c)
-                    val l1 = lastWord * vectorSize
-                    val neu1e = new Array[Float](vectorSize)
-                    // Hierarchical softmax
-                    var d = 0
-                    while (d < bcVocab.value(word).codeLen) {
-                      val inner = bcVocab.value(word).point(d)
-                      val l2 = inner * vectorSize
-                      // Propagate hidden -> output
-                      var f = blas.sdot(vectorSize, syn0, l1, 1, syn1, l2, 1)
-                      if (f > -MAX_EXP && f < MAX_EXP) {
-                        val ind = ((f + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2.0)).toInt
-                        f = expTable.value(ind)
-                        val g = ((1 - bcVocab.value(word).code(d) - f) * alpha).toFloat
-                        blas.saxpy(vectorSize, g, syn1, l2, 1, neu1e, 0, 1)
-                        blas.saxpy(vectorSize, g, syn0, l1, 1, syn1, l2, 1)
-                        syn1Modify(inner) += 1
-                      }
-                      d += 1
-                    }
-                    blas.saxpy(vectorSize, 1.0f, neu1e, 0, 1, syn0, l1, 1)
-                    syn0Modify(lastWord) += 1
-                  }
+      val partial = newSentences.mapPartitionsWithIndex {
+        case (idx, iter) =>
+          val random =
+            new XORShiftRandom(seed ^ ((idx + 1) << 16) ^ ((-k - 1) << 8))
+          val syn0Modify = new Array[Int](vocabSize)
+          val syn1Modify = new Array[Int](vocabSize)
+          val model =
+            iter.foldLeft((bcSyn0Global.value, bcSyn1Global.value, 0L, 0L)) {
+              case ((syn0, syn1, lastWordCount, wordCount), sentence) =>
+                var lwc = lastWordCount
+                var wc = wordCount
+                if (wordCount - lastWordCount > 10000) {
+                  lwc = wordCount
+                  // TODO: discount by iteration?
+                  alpha = learningRate *
+                  (1 - numPartitions * wordCount.toDouble /
+                      (trainWordsCount + 1))
+                  if (alpha < learningRate * 0.0001)
+                    alpha = learningRate * 0.0001
+                  logInfo("wordCount = " + wordCount + ", alpha = " + alpha)
                 }
-                a += 1
-              }
-              pos += 1
+                wc += sentence.length
+                var pos = 0
+                while (pos < sentence.length) {
+                  val word = sentence(pos)
+                  val b = random.nextInt(window)
+                  // Train Skip-gram
+                  var a = b
+                  while (a < window * 2 + 1 - b) {
+                    if (a != window) {
+                      val c = pos - window + a
+                      if (c >= 0 && c < sentence.length) {
+                        val lastWord = sentence(c)
+                        val l1 = lastWord * vectorSize
+                        val neu1e = new Array[Float](vectorSize)
+                        // Hierarchical softmax
+                        var d = 0
+                        while (d < bcVocab.value(word).codeLen) {
+                          val inner = bcVocab.value(word).point(d)
+                          val l2 = inner * vectorSize
+                          // Propagate hidden -> output
+                          var f =
+                            blas.sdot(vectorSize, syn0, l1, 1, syn1, l2, 1)
+                          if (f > -MAX_EXP && f < MAX_EXP) {
+                            val ind = ((f + MAX_EXP) *
+                                (EXP_TABLE_SIZE / MAX_EXP / 2.0)).toInt
+                            f = expTable.value(ind)
+                            val g = ((1 - bcVocab.value(word).code(d) -
+                                    f) * alpha).toFloat
+                            blas.saxpy(vectorSize, g, syn1, l2, 1, neu1e, 0, 1)
+                            blas.saxpy(vectorSize, g, syn0, l1, 1, syn1, l2, 1)
+                            syn1Modify(inner) += 1
+                          }
+                          d += 1
+                        }
+                        blas.saxpy(vectorSize, 1.0f, neu1e, 0, 1, syn0, l1, 1)
+                        syn0Modify(lastWord) += 1
+                      }
+                    }
+                    a += 1
+                  }
+                  pos += 1
+                }
+                (syn0, syn1, lwc, wc)
             }
-            (syn0, syn1, lwc, wc)
-        }
-        val syn0Local = model._1
-        val syn1Local = model._2
-        // Only output modified vectors.
-        Iterator.tabulate(vocabSize) { index =>
-          if (syn0Modify(index) > 0) {
-            Some((index, syn0Local.slice(index * vectorSize, (index + 1) * vectorSize)))
-          } else {
-            None
-          }
-        }.flatten ++ Iterator.tabulate(vocabSize) { index =>
-          if (syn1Modify(index) > 0) {
-            Some((index + vocabSize, syn1Local.slice(index * vectorSize, (index + 1) * vectorSize)))
-          } else {
-            None
-          }
-        }.flatten
+          val syn0Local = model._1
+          val syn1Local = model._2
+          // Only output modified vectors.
+          Iterator
+            .tabulate(vocabSize) { index =>
+              if (syn0Modify(index) > 0) {
+                Some((index,
+                      syn0Local.slice(index * vectorSize,
+                                      (index + 1) * vectorSize)))
+              } else {
+                None
+              }
+            }
+            .flatten ++ Iterator
+            .tabulate(vocabSize) { index =>
+              if (syn1Modify(index) > 0) {
+                Some((index + vocabSize,
+                      syn1Local.slice(index * vectorSize,
+                                      (index + 1) * vectorSize)))
+              } else {
+                None
+              }
+            }
+            .flatten
       }
-      val synAgg = partial.reduceByKey { case (v1, v2) =>
+      val synAgg = partial.reduceByKey {
+        case (v1, v2) =>
           blas.saxpy(vectorSize, 1.0f, v2, 1, v1, 1)
           v1
       }.collect()
@@ -411,9 +434,14 @@ class Word2Vec extends Serializable with Logging {
       while (i < synAgg.length) {
         val index = synAgg(i)._1
         if (index < vocabSize) {
-          Array.copy(synAgg(i)._2, 0, syn0Global, index * vectorSize, vectorSize)
+          Array.copy(
+              synAgg(i)._2, 0, syn0Global, index * vectorSize, vectorSize)
         } else {
-          Array.copy(synAgg(i)._2, 0, syn1Global, (index - vocabSize) * vectorSize, vectorSize)
+          Array.copy(synAgg(i)._2,
+                     0,
+                     syn1Global,
+                     (index - vocabSize) * vectorSize,
+                     vectorSize)
         }
         i += 1
       }
@@ -427,10 +455,10 @@ class Word2Vec extends Serializable with Logging {
   }
 
   /**
-   * Computes the vector representation of each word in vocabulary (Java version).
-   * @param dataset a JavaRDD of words
-   * @return a Word2VecModel
-   */
+    * Computes the vector representation of each word in vocabulary (Java version).
+    * @param dataset a JavaRDD of words
+    * @return a Word2VecModel
+    */
   @Since("1.1.0")
   def fit[S <: JavaIterable[String]](dataset: JavaRDD[S]): Word2VecModel = {
     fit(dataset.rdd.map(_.asScala))
@@ -438,17 +466,18 @@ class Word2Vec extends Serializable with Logging {
 }
 
 /**
- * Word2Vec model
- * @param wordIndex maps each word to an index, which can retrieve the corresponding
- *                  vector from wordVectors
- * @param wordVectors array of length numWords * vectorSize, vector corresponding
- *                    to the word mapped with index i can be retrieved by the slice
- *                    (i * vectorSize, i * vectorSize + vectorSize)
- */
+  * Word2Vec model
+  * @param wordIndex maps each word to an index, which can retrieve the corresponding
+  *                  vector from wordVectors
+  * @param wordVectors array of length numWords * vectorSize, vector corresponding
+  *                    to the word mapped with index i can be retrieved by the slice
+  *                    (i * vectorSize, i * vectorSize + vectorSize)
+  */
 @Since("1.1.0")
-class Word2VecModel private[spark] (
+class Word2VecModel private[spark](
     private[spark] val wordIndex: Map[String, Int],
-    private[spark] val wordVectors: Array[Float]) extends Serializable with Saveable {
+    private[spark] val wordVectors: Array[Float])
+    extends Serializable with Saveable {
 
   private val numWords = wordIndex.size
   // vectorSize: Dimension of each word's vector.
@@ -475,7 +504,8 @@ class Word2VecModel private[spark] (
 
   @Since("1.5.0")
   def this(model: Map[String, Array[Float]]) = {
-    this(Word2VecModel.buildWordIndex(model), Word2VecModel.buildWordVectors(model))
+    this(Word2VecModel.buildWordIndex(model),
+         Word2VecModel.buildWordVectors(model))
   }
 
   override protected def formatVersion = "1.0"
@@ -486,15 +516,16 @@ class Word2VecModel private[spark] (
   }
 
   /**
-   * Transforms a word to its vector representation
-   * @param word a word
-   * @return vector representation of word
-   */
+    * Transforms a word to its vector representation
+    * @param word a word
+    * @return vector representation of word
+    */
   @Since("1.1.0")
   def transform(word: String): Vector = {
     wordIndex.get(word) match {
       case Some(ind) =>
-        val vec = wordVectors.slice(ind * vectorSize, ind * vectorSize + vectorSize)
+        val vec =
+          wordVectors.slice(ind * vectorSize, ind * vectorSize + vectorSize)
         Vectors.dense(vec.map(_.toDouble))
       case None =>
         throw new IllegalStateException(s"$word not in vocabulary")
@@ -502,11 +533,11 @@ class Word2VecModel private[spark] (
   }
 
   /**
-   * Find synonyms of a word
-   * @param word a word
-   * @param num number of synonyms to find
-   * @return array of (word, cosineSimilarity)
-   */
+    * Find synonyms of a word
+    * @param word a word
+    * @param num number of synonyms to find
+    * @return array of (word, cosineSimilarity)
+    */
   @Since("1.1.0")
   def findSynonyms(word: String, num: Int): Array[(String, Double)] = {
     val vector = transform(word)
@@ -514,11 +545,11 @@ class Word2VecModel private[spark] (
   }
 
   /**
-   * Find synonyms of the vector representation of a word
-   * @param vector vector representation of a word
-   * @param num number of synonyms to find
-   * @return array of (word, cosineSimilarity)
-   */
+    * Find synonyms of the vector representation of a word
+    * @param vector vector representation of a word
+    * @param num number of synonyms to find
+    * @return array of (word, cosineSimilarity)
+    */
   @Since("1.1.0")
   def findSynonyms(vector: Vector, num: Int): Array[(String, Double)] = {
     require(num > 0, "Number of similar words should > 0")
@@ -528,8 +559,17 @@ class Word2VecModel private[spark] (
     val alpha: Float = 1
     val beta: Float = 0
 
-    blas.sgemv(
-      "T", vectorSize, numWords, alpha, wordVectors, vectorSize, fVector, 1, beta, cosineVec, 1)
+    blas.sgemv("T",
+               vectorSize,
+               numWords,
+               alpha,
+               wordVectors,
+               vectorSize,
+               fVector,
+               1,
+               beta,
+               cosineVec,
+               1)
 
     // Need not divide with the norm of the given vector since it is constant.
     val cosVec = cosineVec.map(_.toDouble)
@@ -544,46 +584,48 @@ class Word2VecModel private[spark] (
       }
       ind += 1
     }
-    var topResults = wordList.zip(cosVec)
-      .toSeq
-      .sortBy(-_._2)
-      .take(num + 1)
-      .tail
+    var topResults =
+      wordList.zip(cosVec).toSeq.sortBy(-_._2).take(num + 1).tail
     if (vecNorm != 0.0f) {
-      topResults = topResults.map { case (word, cosVal) =>
-        (word, cosVal / vecNorm)
+      topResults = topResults.map {
+        case (word, cosVal) =>
+          (word, cosVal / vecNorm)
       }
     }
     topResults.toArray
   }
 
   /**
-   * Returns a map of words to their vector representations.
-   */
+    * Returns a map of words to their vector representations.
+    */
   @Since("1.2.0")
   def getVectors: Map[String, Array[Float]] = {
-    wordIndex.map { case (word, ind) =>
-      (word, wordVectors.slice(vectorSize * ind, vectorSize * ind + vectorSize))
+    wordIndex.map {
+      case (word, ind) =>
+        (word,
+         wordVectors.slice(vectorSize * ind, vectorSize * ind + vectorSize))
     }
   }
-
 }
 
 @Since("1.4.0")
 object Word2VecModel extends Loader[Word2VecModel] {
 
-  private def buildWordIndex(model: Map[String, Array[Float]]): Map[String, Int] = {
+  private def buildWordIndex(
+      model: Map[String, Array[Float]]): Map[String, Int] = {
     model.keys.zipWithIndex.toMap
   }
 
-  private def buildWordVectors(model: Map[String, Array[Float]]): Array[Float] = {
+  private def buildWordVectors(
+      model: Map[String, Array[Float]]): Array[Float] = {
     require(model.nonEmpty, "Word2VecMap should be non-empty")
     val (vectorSize, numWords) = (model.head._2.length, model.size)
     val wordList = model.keys.toArray
     val wordVectors = new Array[Float](vectorSize * numWords)
     var i = 0
     while (i < numWords) {
-      Array.copy(model(wordList(i)), 0, wordVectors, i * vectorSize, vectorSize)
+      Array.copy(
+          model(wordList(i)), 0, wordVectors, i * vectorSize, vectorSize)
       i += 1
     }
     wordVectors
@@ -605,21 +647,26 @@ object Word2VecModel extends Loader[Word2VecModel] {
       Loader.checkSchema[Data](dataFrame.schema)
 
       val dataArray = dataFrame.select("word", "vector").collect()
-      val word2VecMap = dataArray.map(i => (i.getString(0), i.getSeq[Float](1).toArray)).toMap
+      val word2VecMap =
+        dataArray.map(i => (i.getString(0), i.getSeq[Float](1).toArray)).toMap
       new Word2VecModel(word2VecMap)
     }
 
-    def save(sc: SparkContext, path: String, model: Map[String, Array[Float]]): Unit = {
+    def save(sc: SparkContext,
+             path: String,
+             model: Map[String, Array[Float]]): Unit = {
 
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
 
       val vectorSize = model.values.head.length
       val numWords = model.size
-      val metadata = compact(render(
-        ("class" -> classNameV1_0) ~ ("version" -> formatVersionV1_0) ~
-        ("vectorSize" -> vectorSize) ~ ("numWords" -> numWords)))
-      sc.parallelize(Seq(metadata), 1).saveAsTextFile(Loader.metadataPath(path))
+      val metadata = compact(
+          render(
+              ("class" -> classNameV1_0) ~ ("version" -> formatVersionV1_0) ~
+              ("vectorSize" -> vectorSize) ~ ("numWords" -> numWords)))
+      sc.parallelize(Seq(metadata), 1)
+        .saveAsTextFile(Loader.metadataPath(path))
 
       // We want to partition the model in partitions of size 32MB
       val partitionSize = (1L << 25)
@@ -630,14 +677,18 @@ object Word2VecModel extends Loader[Word2VecModel] {
       val approxSize = 4L * numWords * vectorSize
       val nPartitions = ((approxSize / partitionSize) + 1).toInt
       val dataArray = model.toSeq.map { case (w, v) => Data(w, v) }
-      sc.parallelize(dataArray.toSeq, nPartitions).toDF().write.parquet(Loader.dataPath(path))
+      sc.parallelize(dataArray.toSeq, nPartitions)
+        .toDF()
+        .write
+        .parquet(Loader.dataPath(path))
     }
   }
 
   @Since("1.4.0")
   override def load(sc: SparkContext, path: String): Word2VecModel = {
 
-    val (loadedClassName, loadedVersion, metadata) = Loader.loadMetadata(sc, path)
+    val (loadedClassName, loadedVersion, metadata) =
+      Loader.loadMetadata(sc, path)
     implicit val formats = DefaultFormats
     val expectedVectorSize = (metadata \ "vectorSize").extract[Int]
     val expectedNumWords = (metadata \ "numWords").extract[Int]
@@ -647,16 +698,19 @@ object Word2VecModel extends Loader[Word2VecModel] {
         val model = SaveLoadV1_0.load(sc, path)
         val vectorSize = model.getVectors.values.head.length
         val numWords = model.getVectors.size
-        require(expectedVectorSize == vectorSize,
-          s"Word2VecModel requires each word to be mapped to a vector of size " +
-          s"$expectedVectorSize, got vector of size $vectorSize")
-        require(expectedNumWords == numWords,
-          s"Word2VecModel requires $expectedNumWords words, but got $numWords")
+        require(
+            expectedVectorSize == vectorSize,
+            s"Word2VecModel requires each word to be mapped to a vector of size " +
+            s"$expectedVectorSize, got vector of size $vectorSize")
+        require(
+            expectedNumWords == numWords,
+            s"Word2VecModel requires $expectedNumWords words, but got $numWords")
         model
-      case _ => throw new Exception(
-        s"Word2VecModel.load did not recognize model with (className, format version):" +
-        s"($loadedClassName, $loadedVersion).  Supported:\n" +
-        s"  ($classNameV1_0, 1.0)")
+      case _ =>
+        throw new Exception(
+            s"Word2VecModel.load did not recognize model with (className, format version):" +
+            s"($loadedClassName, $loadedVersion).  Supported:\n" +
+            s"  ($classNameV1_0, 1.0)")
     }
   }
 }

@@ -3,6 +3,6 @@ class OkTypeAlias {
 
   trait B {
     type M = Seq[Q]
-    val list: /*begin*/List[M]/*end*/ = List(Seq(45))
+    val list: /*begin*/ List[M] /*end*/ = List(Seq(45))
   }
 }

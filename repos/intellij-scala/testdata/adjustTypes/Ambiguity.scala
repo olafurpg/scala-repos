@@ -1,17 +1,15 @@
 package test {
 
-object A {
+  object A {
 
-  object A {}
+    object A {}
 
-  class A {}
-
-}
-
+    class A {}
+  }
 }
 
 object B {
-  val a: /*start*/test.A.A/*end*/ = null
+  val a: /*start*/ test.A.A /*end*/ = null
 }
 
 /*
@@ -31,4 +29,4 @@ object A {
 object B {
   val a: A = null
 }
-*/
+ */

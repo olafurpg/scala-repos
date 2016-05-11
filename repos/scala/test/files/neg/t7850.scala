@@ -13,4 +13,3 @@ object Test {
     println(s"$x1 $x2")
   }
 }
-

@@ -14,17 +14,19 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, T
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 /**
- * @author ilyas, Alexander Podkhalyuzin
- */
-
-class ScTupleTypeElementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScTupleTypeElement {
+  * @author ilyas, Alexander Podkhalyuzin
+  */
+class ScTupleTypeElementImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScTupleTypeElement {
   override def toString: String = "TupleType: " + getText
 
   @Cached(synchronized = true, ModCount.getBlockModificationCount, this)
   def desugarizedInfixType: Option[ScParameterizedTypeElement] = {
     val n = components.length
-    val newTypeText = s"_root_.scala.Tuple$n[${components.map(_.getText).mkString(", ")}]"
-    val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(newTypeText, getContext, this)
+    val newTypeText =
+      s"_root_.scala.Tuple$n[${components.map(_.getText).mkString(", ")}]"
+    val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
+        newTypeText, getContext, this)
     newTypeElement match {
       case p: ScParameterizedTypeElement => Some(p)
       case _ => None
@@ -38,14 +40,14 @@ class ScTupleTypeElementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) wi
     }
   }
 
-    override def accept(visitor: ScalaElementVisitor) {
-        visitor.visitTupleTypeElement(this)
-      }
+  override def accept(visitor: ScalaElementVisitor) {
+    visitor.visitTupleTypeElement(this)
+  }
 
-      override def accept(visitor: PsiElementVisitor) {
-        visitor match {
-          case s: ScalaElementVisitor => s.visitTupleTypeElement(this)
-          case _ => super.accept(visitor)
-        }
-      }
+  override def accept(visitor: PsiElementVisitor) {
+    visitor match {
+      case s: ScalaElementVisitor => s.visitTupleTypeElement(this)
+      case _ => super.accept(visitor)
+    }
+  }
 }

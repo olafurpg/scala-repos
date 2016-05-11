@@ -36,12 +36,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * SeparatorMenuItem Spec tests.
- *
- *
- */
+  * SeparatorMenuItem Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class SeparatorMenuItemSpec
-  extends SimpleSFXDelegateSpec[jfxsc.SeparatorMenuItem, SeparatorMenuItem](
-      classOf[jfxsc.SeparatorMenuItem], classOf[SeparatorMenuItem])
-
+    extends SimpleSFXDelegateSpec[jfxsc.SeparatorMenuItem, SeparatorMenuItem](
+        classOf[jfxsc.SeparatorMenuItem], classOf[SeparatorMenuItem])

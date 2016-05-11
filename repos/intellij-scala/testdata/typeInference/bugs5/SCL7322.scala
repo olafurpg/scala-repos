@@ -3,6 +3,7 @@ object A {
 
   def m(i: Int => Int) = 1
   def m(x: String) = x
-  /*start*/m(1)/*end*/
+  /*start*/
+  m(1) /*end*/
 }
 //Int

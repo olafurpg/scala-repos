@@ -14,26 +14,33 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 
 /**
-* Nikolay.Tropin
-* 2014-03-17
-*/
+  * Nikolay.Tropin
+  * 2014-03-17
+  */
 class ImportStableMemberIntention extends PsiElementBaseIntentionAction {
-  override def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = {
-    val refAtCaret = PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
+  override def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
+    val refAtCaret =
+      PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
     if (refAtCaret == null) return false
     setText(s"Import ${refAtCaret.refName}")
     checkReference(refAtCaret)
   }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement): Unit = {
-    val refAtCaret = PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
+  override def invoke(
+      project: Project, editor: Editor, element: PsiElement): Unit = {
+    val refAtCaret =
+      PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
     if (refAtCaret == null || !checkReference(refAtCaret)) return
     refAtCaret.resolve() match {
       case named: PsiNamedElement =>
         val importHolder = ScalaImportTypeFix.getImportHolder(element, project)
-        val usages = ReferencesSearch.search(named, new LocalSearchScope(importHolder)).findAll()
+        val usages = ReferencesSearch
+          .search(named, new LocalSearchScope(importHolder))
+          .findAll()
         sorted(usages, isQualifier = false).foreach {
-          case usage: ScReferenceElement if checkReference(usage) => replaceAndBind(usage, named.name, named)
+          case usage: ScReferenceElement if checkReference(usage) =>
+            replaceAndBind(usage, named.name, named)
           case _ =>
         }
       case _ =>

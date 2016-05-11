@@ -3,5 +3,5 @@ package a
 import pkgName.Test
 
 object Use {
-	val x = Test
+  val x = Test
 }

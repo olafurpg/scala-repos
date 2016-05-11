@@ -12,16 +12,19 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult}
 
 /**
- * @author Alefas
- * @since 03/04/14.
- */
+  * @author Alefas
+  * @since 03/04/14.
+  */
 class ScLightTypeParam(t: TypeParameter, tParam: ScTypeParam)
-  extends LightElement(tParam.getManager, tParam.getLanguage) with ScTypeParam with PsiClassFake {
+    extends LightElement(tParam.getManager, tParam.getLanguage)
+    with ScTypeParam with PsiClassFake {
   override def nameId: PsiElement = tParam.nameId
 
-  override def upperBound: TypeResult[ScType] = Success(t.upperType(), Some(this))
+  override def upperBound: TypeResult[ScType] =
+    Success(t.upperType(), Some(this))
 
-  override def lowerBound: TypeResult[ScType] = Success(t.lowerType(), Some(this))
+  override def lowerBound: TypeResult[ScType] =
+    Success(t.lowerType(), Some(this))
 
   override def getIndex: Int = tParam.getIndex
 
@@ -30,9 +33,11 @@ class ScLightTypeParam(t: TypeParameter, tParam: ScTypeParam)
   override def addAnnotation(qualifiedName: String): PsiAnnotation =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override def findAnnotation(qualifiedName: String): PsiAnnotation = tParam.findAnnotation(qualifiedName)
+  override def findAnnotation(qualifiedName: String): PsiAnnotation =
+    tParam.findAnnotation(qualifiedName)
 
-  override def getApplicableAnnotations: Array[PsiAnnotation] = tParam.getApplicableAnnotations
+  override def getApplicableAnnotations: Array[PsiAnnotation] =
+    tParam.getApplicableAnnotations
 
   override def getAnnotations: Array[PsiAnnotation] = tParam.getAnnotations
 
@@ -52,13 +57,17 @@ class ScLightTypeParam(t: TypeParameter, tParam: ScTypeParam)
 
   override def toString: String = tParam.toString
 
-  override def typeParameters: Seq[ScTypeParam] = t.typeParams.zip(tParam.typeParameters).map {
-    case (t: TypeParameter, tParam: ScTypeParam) => new ScLightTypeParam(t, tParam)
-  }
+  override def typeParameters: Seq[ScTypeParam] =
+    t.typeParams.zip(tParam.typeParameters).map {
+      case (t: TypeParameter, tParam: ScTypeParam) =>
+        new ScLightTypeParam(t, tParam)
+    }
 
-  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[
+      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): T =
+  override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): T =
     throw new UnsupportedOperationException("Operation on light element")
 }

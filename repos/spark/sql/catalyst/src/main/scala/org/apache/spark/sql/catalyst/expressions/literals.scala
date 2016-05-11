@@ -42,25 +42,31 @@ object Literal {
     case s: Short => Literal(s, ShortType)
     case s: String => Literal(UTF8String.fromString(s), StringType)
     case b: Boolean => Literal(b, BooleanType)
-    case d: BigDecimal => Literal(Decimal(d), DecimalType(Math.max(d.precision, d.scale), d.scale))
+    case d: BigDecimal =>
+      Literal(Decimal(d), DecimalType(Math.max(d.precision, d.scale), d.scale))
     case d: java.math.BigDecimal =>
-      Literal(Decimal(d), DecimalType(Math.max(d.precision, d.scale), d.scale()))
-    case d: Decimal => Literal(d, DecimalType(Math.max(d.precision, d.scale), d.scale))
-    case t: Timestamp => Literal(DateTimeUtils.fromJavaTimestamp(t), TimestampType)
+      Literal(
+          Decimal(d), DecimalType(Math.max(d.precision, d.scale), d.scale()))
+    case d: Decimal =>
+      Literal(d, DecimalType(Math.max(d.precision, d.scale), d.scale))
+    case t: Timestamp =>
+      Literal(DateTimeUtils.fromJavaTimestamp(t), TimestampType)
     case d: Date => Literal(DateTimeUtils.fromJavaDate(d), DateType)
     case a: Array[Byte] => Literal(a, BinaryType)
     case i: CalendarInterval => Literal(i, CalendarIntervalType)
     case null => Literal(null, NullType)
     case v: Literal => v
     case _ =>
-      throw new RuntimeException("Unsupported literal type " + v.getClass + " " + v)
+      throw new RuntimeException(
+          "Unsupported literal type " + v.getClass + " " + v)
   }
 
   /**
-   * Constructs a [[Literal]] of [[ObjectType]], for example when you need to pass an object
-   * into code generation.
-   */
-  def fromObject(obj: AnyRef): Literal = new Literal(obj, ObjectType(obj.getClass))
+    * Constructs a [[Literal]] of [[ObjectType]], for example when you need to pass an object
+    * into code generation.
+    */
+  def fromObject(obj: AnyRef): Literal =
+    new Literal(obj, ObjectType(obj.getClass))
 
   def fromJSON(json: JValue): Literal = {
     val dataType = DataType.parseDataType(json \ "dataType")
@@ -95,8 +101,8 @@ object Literal {
   }
 
   /**
-   * Create a literal with default value for given DataType
-   */
+    * Create a literal with default value for given DataType
+    */
   def default(dataType: DataType): Literal = dataType match {
     case NullType => create(null, NullType)
     case BooleanType => Literal(false)
@@ -115,15 +121,17 @@ object Literal {
     case arr: ArrayType => create(Array(), arr)
     case map: MapType => create(Map(), map)
     case struct: StructType =>
-      create(InternalRow.fromSeq(struct.fields.map(f => default(f.dataType).value)), struct)
+      create(InternalRow.fromSeq(
+                 struct.fields.map(f => default(f.dataType).value)),
+             struct)
     case other =>
       throw new RuntimeException(s"no default for type $dataType")
   }
 }
 
 /**
- * An extractor that matches non-null literal values
- */
+  * An extractor that matches non-null literal values
+  */
 object NonNullLiteral {
   def unapply(literal: Literal): Option[(Any, DataType)] = {
     Option(literal.value).map(_ => (literal.value, literal.dataType))
@@ -131,8 +139,8 @@ object NonNullLiteral {
 }
 
 /**
- * Extractor for retrieving Int literals.
- */
+  * Extractor for retrieving Int literals.
+  */
 object IntegerLiteral {
   def unapply(a: Any): Option[Int] = a match {
     case Literal(a: Int, IntegerType) => Some(a)
@@ -141,8 +149,8 @@ object IntegerLiteral {
 }
 
 /**
- * Extractor for and other utility methods for decimal literals.
- */
+  * Extractor for and other utility methods for decimal literals.
+  */
 object DecimalLiteral {
   def apply(v: Long): Literal = Literal(Decimal(v))
 
@@ -159,10 +167,10 @@ object DecimalLiteral {
 }
 
 /**
- * In order to do type checking, use Literal.create() instead of constructor
- */
+  * In order to do type checking, use Literal.create() instead of constructor
+  */
 case class Literal protected (value: Any, dataType: DataType)
-  extends LeafExpression with CodegenFallback {
+    extends LeafExpression with CodegenFallback {
 
   override def foldable: Boolean = true
   override def nullable: Boolean = value == null
@@ -172,7 +180,8 @@ case class Literal protected (value: Any, dataType: DataType)
   override def equals(other: Any): Boolean = other match {
     case o: Literal =>
       dataType.equals(o.dataType) &&
-        (value == null && null == o.value || value != null && value.equals(o.value))
+      (value == null && null == o.value || value != null &&
+          value.equals(o.value))
     case _ => false
   }
 
@@ -182,7 +191,8 @@ case class Literal protected (value: Any, dataType: DataType)
     val jsonValue = (value, dataType) match {
       case (null, _) => JNull
       case (i: Int, DateType) => JString(DateTimeUtils.toJavaDate(i).toString)
-      case (l: Long, TimestampType) => JString(DateTimeUtils.toJavaTimestamp(l).toString)
+      case (l: Long, TimestampType) =>
+        JString(DateTimeUtils.toJavaTimestamp(l).toString)
       case (other, _) => JString(other.toString)
     }
     ("value" -> jsonValue) :: ("dataType" -> dataType.jsonValue) :: Nil
@@ -204,7 +214,7 @@ case class Literal protected (value: Any, dataType: DataType)
         case FloatType =>
           val v = value.asInstanceOf[Float]
           if (v.isNaN || v.isInfinite) {
-            super[CodegenFallback].genCode(ctx, ev)
+            super [CodegenFallback].genCode(ctx, ev)
           } else {
             ev.isNull = "false"
             ev.value = s"${value}f"
@@ -213,7 +223,7 @@ case class Literal protected (value: Any, dataType: DataType)
         case DoubleType =>
           val v = value.asInstanceOf[Double]
           if (v.isNaN || v.isInfinite) {
-            super[CodegenFallback].genCode(ctx, ev)
+            super [CodegenFallback].genCode(ctx, ev)
           } else {
             ev.isNull = "false"
             ev.value = s"${value}D"
@@ -233,13 +243,15 @@ case class Literal protected (value: Any, dataType: DataType)
           ""
         // eval() version may be faster for non-primitive types
         case other =>
-          super[CodegenFallback].genCode(ctx, ev)
+          super [CodegenFallback].genCode(ctx, ev)
       }
     }
   }
 
   override def sql: String = (value, dataType) match {
-    case (_, NullType | _: ArrayType | _: MapType | _: StructType) if value == null => "NULL"
+    case (_, NullType | _: ArrayType | _: MapType | _: StructType)
+        if value == null =>
+      "NULL"
     case _ if value == null => s"CAST(NULL AS ${dataType.sql})"
     case (v: UTF8String, StringType) =>
       // Escapes all backslashes and double quotes.
@@ -252,7 +264,8 @@ case class Literal protected (value: Any, dataType: DataType)
     case (v: Double, DoubleType) => v + "D"
     case (v: Decimal, t: DecimalType) => s"CAST($v AS ${t.sql})"
     case (v: Int, DateType) => s"DATE '${DateTimeUtils.toJavaDate(v)}'"
-    case (v: Long, TimestampType) => s"TIMESTAMP('${DateTimeUtils.toJavaTimestamp(v)}')"
+    case (v: Long, TimestampType) =>
+      s"TIMESTAMP('${DateTimeUtils.toJavaTimestamp(v)}')"
     case _ => value.toString
   }
 }

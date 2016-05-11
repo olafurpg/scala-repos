@@ -1,4 +1,3 @@
-
 class A {
   def f(xs: List[Int], ys: AnyRef*) = ()
   def f(xs: AnyRef*) = ()

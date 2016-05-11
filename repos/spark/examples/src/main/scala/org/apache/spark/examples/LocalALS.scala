@@ -21,11 +21,11 @@ package org.apache.spark.examples
 import org.apache.commons.math3.linear._
 
 /**
- * Alternating least squares matrix factorization.
- *
- * This is an example implementation for learning how to use Spark. For more conventional use,
- * please refer to org.apache.spark.mllib.recommendation.ALS
- */
+  * Alternating least squares matrix factorization.
+  *
+  * This is an example implementation for learning how to use Spark. For more conventional use,
+  * please refer to org.apache.spark.mllib.recommendation.ALS
+  */
 object LocalALS {
 
   // Parameters set through command line arguments
@@ -41,7 +41,9 @@ object LocalALS {
     mh.multiply(uh.transpose())
   }
 
-  def rmse(targetR: RealMatrix, ms: Array[RealVector], us: Array[RealVector]): Double = {
+  def rmse(targetR: RealMatrix,
+           ms: Array[RealVector],
+           us: Array[RealVector]): Double = {
     val r = new Array2DRowRealMatrix(M, U)
     for (i <- 0 until M; j <- 0 until U) {
       r.setEntry(i, j, ms(i).dotProduct(us(j)))
@@ -55,7 +57,10 @@ object LocalALS {
     math.sqrt(sumSqs / (M.toDouble * U.toDouble))
   }
 
-  def updateMovie(i: Int, m: RealVector, us: Array[RealVector], R: RealMatrix) : RealVector = {
+  def updateMovie(i: Int,
+                  m: RealVector,
+                  us: Array[RealVector],
+                  R: RealMatrix): RealVector = {
     var XtX: RealMatrix = new Array2DRowRealMatrix(F, F)
     var Xty: RealVector = new ArrayRealVector(F)
     // For each user that rated the movie
@@ -74,7 +79,10 @@ object LocalALS {
     new CholeskyDecomposition(XtX).getSolver.solve(Xty)
   }
 
-  def updateUser(j: Int, u: RealVector, ms: Array[RealVector], R: RealMatrix) : RealVector = {
+  def updateUser(j: Int,
+                 u: RealVector,
+                 ms: Array[RealVector],
+                 R: RealMatrix): RealVector = {
     var XtX: RealMatrix = new Array2DRowRealMatrix(F, F)
     var Xty: RealVector = new ArrayRealVector(F)
     // For each movie that the user rated
@@ -94,8 +102,7 @@ object LocalALS {
   }
 
   def showWarning() {
-    System.err.println(
-      """WARN: This is a naive implementation of ALS and is given as an example!
+    System.err.println("""WARN: This is a naive implementation of ALS and is given as an example!
         |Please use the ALS method found in org.apache.spark.mllib.recommendation
         |for more conventional use.
       """.stripMargin)
@@ -105,15 +112,15 @@ object LocalALS {
 
     args match {
       case Array(m, u, f, iters) => {
-        M = m.toInt
-        U = u.toInt
-        F = f.toInt
-        ITERATIONS = iters.toInt
-      }
+          M = m.toInt
+          U = u.toInt
+          F = f.toInt
+          ITERATIONS = iters.toInt
+        }
       case _ => {
-        System.err.println("Usage: LocalALS <M> <U> <F> <iters>")
-        System.exit(1)
-      }
+          System.err.println("Usage: LocalALS <M> <U> <F> <iters>")
+          System.exit(1)
+        }
     }
 
     showWarning()
@@ -141,6 +148,5 @@ object LocalALS {
 
   private def randomMatrix(rows: Int, cols: Int): RealMatrix =
     new Array2DRowRealMatrix(Array.fill(rows, cols)(math.random))
-
 }
 // scalastyle:on println

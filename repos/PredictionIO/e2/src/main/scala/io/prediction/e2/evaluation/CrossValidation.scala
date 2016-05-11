@@ -29,35 +29,41 @@ object CommonHelperFunctions {
     * @tparam Q Input query class.
     * @tparam A Actual value class.
     */
-
-  def splitData[D: ClassTag, TD, EI, Q, A](
-
-     evalK: Int,
-     dataset: RDD[D],
-     evaluatorInfo: EI,
-     trainingDataCreator: RDD[D] => TD,
-     queryCreator: D => Q,
-     actualCreator: D => A): Seq[(TD, EI, RDD[(Q, A)])] = {
+  def splitData[D : ClassTag, TD, EI, Q, A](
+      evalK: Int,
+      dataset: RDD[D],
+      evaluatorInfo: EI,
+      trainingDataCreator: RDD[D] => TD,
+      queryCreator: D => Q,
+      actualCreator: D => A): Seq[(TD, EI, RDD[(Q, A)])] = {
 
     val indexedPoints = dataset.zipWithIndex
 
-    def selectPoint(foldIdx: Int, pt: D, idx: Long, k: Int, isTraining: Boolean): Option[D] = {
+    def selectPoint(foldIdx: Int,
+                    pt: D,
+                    idx: Long,
+                    k: Int,
+                    isTraining: Boolean): Option[D] = {
       if ((idx % k == foldIdx) ^ isTraining) Some(pt)
       else None
     }
 
     (0 until evalK).map { foldIdx =>
-      val trainingPoints = indexedPoints.flatMap { case(pt, idx) =>
-        selectPoint(foldIdx, pt, idx, evalK, true)
+      val trainingPoints = indexedPoints.flatMap {
+        case (pt, idx) =>
+          selectPoint(foldIdx, pt, idx, evalK, true)
       }
-      val testingPoints = indexedPoints.flatMap { case(pt, idx) =>
-        selectPoint(foldIdx, pt, idx, evalK, false)
+      val testingPoints = indexedPoints.flatMap {
+        case (pt, idx) =>
+          selectPoint(foldIdx, pt, idx, evalK, false)
       }
 
       (
-        trainingDataCreator(trainingPoints),
-        evaluatorInfo,
-        testingPoints.map { d => (queryCreator(d), actualCreator(d)) }
+          trainingDataCreator(trainingPoints),
+          evaluatorInfo,
+          testingPoints.map { d =>
+            (queryCreator(d), actualCreator(d))
+          }
       )
     }
   }

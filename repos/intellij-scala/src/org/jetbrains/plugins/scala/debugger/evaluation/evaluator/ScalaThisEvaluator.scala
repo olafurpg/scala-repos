@@ -9,9 +9,9 @@ import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
 
 /**
- * User: Alefas
- * Date: 12.10.11
- */
+  * User: Alefas
+  * Date: 12.10.11
+  */
 class ScalaThisEvaluator(iterations: Int = 0) extends Evaluator {
   private def getOuterObject(objRef: ObjectReference): ObjectReference = {
     if (objRef == null) {
@@ -22,7 +22,8 @@ class ScalaThisEvaluator(iterations: Int = 0) extends Evaluator {
     for (field <- list) {
       val name: String = field.name
       if (name != null && name.startsWith("$outer")) {
-        val rv: ObjectReference = objRef.getValue(field).asInstanceOf[ObjectReference]
+        val rv: ObjectReference =
+          objRef.getValue(field).asInstanceOf[ObjectReference]
         if (rv != null) {
           return rv
         }
@@ -38,7 +39,8 @@ class ScalaThisEvaluator(iterations: Int = 0) extends Evaluator {
     var objRef: Value = context.getThisObject match {
       case null => //so we possibly in trait $class
         try {
-          val variable: LocalVariableProxyImpl = frameProxy.visibleVariableByName("$this")
+          val variable: LocalVariableProxyImpl =
+            frameProxy.visibleVariableByName("$this")
           if (variable == null) null
           else {
             frameProxy.getValue(variable)
@@ -58,11 +60,14 @@ class ScalaThisEvaluator(iterations: Int = 0) extends Evaluator {
         thisRef = getOuterObject(thisRef)
         idx += 1
       }
-      if (thisRef == null) throw EvaluationException(ScalaBundle.message("outer.this.not.available"))
+      if (thisRef == null)
+        throw EvaluationException(
+            ScalaBundle.message("outer.this.not.available"))
       objRef = thisRef
     }
     if (objRef == null) {
-      throw EvaluationException(DebuggerBundle.message("evaluation.error.this.not.avalilable"))
+      throw EvaluationException(
+          DebuggerBundle.message("evaluation.error.this.not.avalilable"))
     }
     objRef
   }

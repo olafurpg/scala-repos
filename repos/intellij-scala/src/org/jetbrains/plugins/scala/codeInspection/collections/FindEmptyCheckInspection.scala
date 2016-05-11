@@ -5,10 +5,10 @@ import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 
 /**
- * Nikolay.Tropin
- * 2014-05-05
- */
-class FindEmptyCheckInspection extends OperationOnCollectionInspection{
+  * Nikolay.Tropin
+  * 2014-05-05
+  */
+class FindEmptyCheckInspection extends OperationOnCollectionInspection {
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(FindIsDefined, FindIsEmpty)
 }
@@ -18,7 +18,7 @@ object FindIsDefined extends SimplificationType() {
 
   override def getSimplification(expr: ScExpression): Option[Simplification] = {
     expr match {
-      case CheckIsDefined(qual`.find`(cond), s, e) =>
+      case CheckIsDefined(qual `.find` (cond), s, e) =>
         val start = Math.min(s, qual.end)
         val end = Math.max(e, expr.end)
         val existsText = invocationText(qual, "exists", cond)
@@ -33,10 +33,11 @@ object FindIsEmpty extends SimplificationType() {
 
   override def getSimplification(expr: ScExpression): Option[Simplification] = {
     expr match {
-      case CheckIsEmpty(qual`.find`(cond), s, e) if qual != null =>
+      case CheckIsEmpty(qual `.find` (cond), s, e) if qual != null =>
         val start = Math.min(s, qual.end)
         val end = Math.max(e, expr.end)
-        val notExistsText = invocationText(negation = true, qual, "exists", cond)
+        val notExistsText = invocationText(
+            negation = true, qual, "exists", cond)
         Some(replace(expr).withText(notExistsText).highlightRange(start, end))
       case _ => None
     }

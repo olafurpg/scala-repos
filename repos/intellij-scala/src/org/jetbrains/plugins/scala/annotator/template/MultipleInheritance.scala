@@ -9,19 +9,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
 import org.jetbrains.plugins.scala.lang.psi.types.ScSubstitutor
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 object MultipleInheritance extends AnnotatorPart[ScTemplateDefinition] {
   def kind = classOf[ScTemplateDefinition]
 
-  def annotate(definition: ScTemplateDefinition, holder: AnnotationHolder, typeAware: Boolean) {
-    definition.refs.map{case (s: ScTypeElement, o: Option[(PsiClass, ScSubstitutor)]) => (s, o.map(_._1))}.
-      groupBy(_._2).foreach {
-      case (Some(psiClass), entries) if isMixable(psiClass) && entries.size > 1 =>
+  def annotate(definition: ScTemplateDefinition,
+               holder: AnnotationHolder,
+               typeAware: Boolean) {
+    definition.refs.map {
+      case (s: ScTypeElement, o: Option[(PsiClass, ScSubstitutor)]) =>
+        (s, o.map(_._1))
+    }.groupBy(_._2).foreach {
+      case (Some(psiClass), entries)
+          if isMixable(psiClass) && entries.size > 1 =>
         entries.map(_._1).foreach { refElement =>
           holder.createErrorAnnotation(refElement,
-            "%s %s inherited multiple times".format(kindOf(psiClass), psiClass.name))
+                                       "%s %s inherited multiple times".format(
+                                           kindOf(psiClass), psiClass.name))
         }
       case _ =>
     }

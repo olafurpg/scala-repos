@@ -6,20 +6,24 @@ import org.jetbrains.plugins.scala.codeInspection.{InspectionBundle, ScalaLightI
 import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
 
 /**
- * Author: Svyatoslav Ilinskiy
- * Date: 7/6/15
- */
-class AppliedTypeLambdaCanBeSimplifiedTest extends ScalaLightInspectionFixtureTestAdapter {
-  override protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[AppliedTypeLambdaCanBeSimplifiedInspection]
+  * Author: Svyatoslav Ilinskiy
+  * Date: 7/6/15
+  */
+class AppliedTypeLambdaCanBeSimplifiedTest
+    extends ScalaLightInspectionFixtureTestAdapter {
+  override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[AppliedTypeLambdaCanBeSimplifiedInspection]
 
   def quickFixAnnotation: String = InspectionBundle.message("simplify.type")
 
-  override protected def annotation: String = InspectionBundle.message("applied.type.lambda.can.be.simplified")
+  override protected def annotation: String =
+    InspectionBundle.message("applied.type.lambda.can.be.simplified")
 
   override protected def setUp(): Unit = {
     super.setUp()
 
-    val defaultProfile = ScalaCompilerConfiguration.instanceIn(getProject).defaultProfile
+    val defaultProfile =
+      ScalaCompilerConfiguration.instanceIn(getProject).defaultProfile
     val newSettings = defaultProfile.getSettings
     newSettings.plugins :+= "kind-projector" //only some of the tests require kind-projector
     defaultProfile.setSettings(newSettings)
@@ -49,6 +53,6 @@ class AppliedTypeLambdaCanBeSimplifiedTest extends ScalaLightInspectionFixtureTe
     testFix(code, res)
   }
 
-  def testFix(text: String, res: String): Unit = testFix(text, res, quickFixAnnotation)
-
+  def testFix(text: String, res: String): Unit =
+    testFix(text, res, quickFixAnnotation)
 }

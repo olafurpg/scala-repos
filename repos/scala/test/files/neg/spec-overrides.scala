@@ -19,8 +19,6 @@ object Test extends App {
   println(fx.a(3))
   println((fx: P).a(3))
   println((fx: P).a(3.0))
-
-
   // val d = new Derived[Int]
   // println((d: Base[Int]).m(10))
 }

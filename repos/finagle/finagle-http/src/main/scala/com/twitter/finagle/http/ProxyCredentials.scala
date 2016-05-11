@@ -4,7 +4,8 @@ import com.twitter.util.Base64StringEncoder
 import scala.collection.JavaConversions._
 
 object ProxyCredentials {
-  def apply(credentials: java.util.Map[String, String]): Option[ProxyCredentials] =
+  def apply(
+      credentials: java.util.Map[String, String]): Option[ProxyCredentials] =
     apply(credentials.toMap)
 
   def apply(credentials: Map[String, String]): Option[ProxyCredentials] = {
@@ -23,4 +24,3 @@ case class ProxyCredentials(username: String, password: String) {
     "Basic " + Base64StringEncoder.encode(bytes)
   }
 }
-

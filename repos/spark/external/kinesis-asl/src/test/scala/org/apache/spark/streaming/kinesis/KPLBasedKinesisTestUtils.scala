@@ -26,7 +26,8 @@ import com.amazonaws.services.kinesis.producer.{KinesisProducer => KPLProducer, 
 import com.google.common.util.concurrent.{FutureCallback, Futures}
 
 private[kinesis] class KPLBasedKinesisTestUtils extends KinesisTestUtils {
-  override protected def getProducer(aggregate: Boolean): KinesisDataGenerator = {
+  override protected def getProducer(
+      aggregate: Boolean): KinesisDataGenerator = {
     if (!aggregate) {
       new SimpleDataGenerator(kinesisClient)
     } else {
@@ -36,7 +37,8 @@ private[kinesis] class KPLBasedKinesisTestUtils extends KinesisTestUtils {
 }
 
 /** A wrapper for the KinesisProducer provided in the KPL. */
-private[kinesis] class KPLDataGenerator(regionName: String) extends KinesisDataGenerator {
+private[kinesis] class KPLDataGenerator(regionName: String)
+    extends KinesisDataGenerator {
 
   private lazy val producer: KPLProducer = {
     val conf = new KinesisProducerConfiguration()
@@ -48,8 +50,10 @@ private[kinesis] class KPLDataGenerator(regionName: String) extends KinesisDataG
     new KPLProducer(conf)
   }
 
-  override def sendData(streamName: String, data: Seq[Int]): Map[String, Seq[(Int, String)]] = {
-    val shardIdToSeqNumbers = new mutable.HashMap[String, ArrayBuffer[(Int, String)]]()
+  override def sendData(
+      streamName: String, data: Seq[Int]): Map[String, Seq[(Int, String)]] = {
+    val shardIdToSeqNumbers =
+      new mutable.HashMap[String, ArrayBuffer[(Int, String)]]()
     data.foreach { num =>
       val str = num.toString
       val data = ByteBuffer.wrap(str.getBytes(StandardCharsets.UTF_8))
@@ -60,8 +64,8 @@ private[kinesis] class KPLDataGenerator(regionName: String) extends KinesisDataG
         override def onSuccess(result: UserRecordResult): Unit = {
           val shardId = result.getShardId
           val seqNumber = result.getSequenceNumber()
-          val sentSeqNumbers = shardIdToSeqNumbers.getOrElseUpdate(shardId,
-            new ArrayBuffer[(Int, String)]())
+          val sentSeqNumbers = shardIdToSeqNumbers.getOrElseUpdate(
+              shardId, new ArrayBuffer[(Int, String)]())
           sentSeqNumbers += ((num, seqNumber))
         }
       }

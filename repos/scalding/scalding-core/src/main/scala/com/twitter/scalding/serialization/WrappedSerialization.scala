@@ -12,21 +12,21 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding.serialization
 
-import org.apache.hadoop.io.serializer.{ Serialization => HSerialization, Deserializer, Serializer }
-import org.apache.hadoop.conf.{ Configurable, Configuration }
+import org.apache.hadoop.io.serializer.{Serialization => HSerialization, Deserializer, Serializer}
+import org.apache.hadoop.conf.{Configurable, Configuration}
 
-import java.io.{ InputStream, OutputStream }
-import com.twitter.bijection.{ Injection, JavaSerializationInjection, Base64String }
+import java.io.{InputStream, OutputStream}
+import com.twitter.bijection.{Injection, JavaSerializationInjection, Base64String}
 import scala.collection.JavaConverters._
 
 /**
- * WrappedSerialization wraps a value in a wrapper class that
- * has an associated Binary that is used to deserialize
- * items wrapped in the wrapper
- */
+  * WrappedSerialization wraps a value in a wrapper class that
+  * has an associated Binary that is used to deserialize
+  * items wrapped in the wrapper
+  */
 class WrappedSerialization[T] extends HSerialization[T] with Configurable {
 
   import WrappedSerialization.ClassSerialization
@@ -47,18 +47,20 @@ class WrappedSerialization[T] extends HSerialization[T] with Configurable {
   def accept(c: Class[_]): Boolean = serializations.contains(c)
 
   def getSerialization(c: Class[T]): Option[Serialization[T]] =
-    serializations.get(c)
+    serializations
+      .get(c)
       // This cast should never fail since we matched the class
       .asInstanceOf[Option[Serialization[T]]]
 
   def getSerializer(c: Class[T]): Serializer[T] =
-    new BinarySerializer(getSerialization(c)
-      .getOrElse(sys.error(s"Serialization for class: ${c} not found")))
+    new BinarySerializer(
+        getSerialization(c).getOrElse(
+            sys.error(s"Serialization for class: ${c} not found")))
 
   def getDeserializer(c: Class[T]): Deserializer[T] =
-    new BinaryDeserializer(getSerialization(c)
-      .getOrElse(sys.error(s"Serialization for class: ${c} not found")))
-
+    new BinaryDeserializer(
+        getSerialization(c).getOrElse(
+            sys.error(s"Serialization for class: ${c} not found")))
 }
 
 class BinarySerializer[T](buf: Serialization[T]) extends Serializer[T] {
@@ -97,30 +99,33 @@ object WrappedSerialization {
   private def deserialize[T](str: String): T =
     getSerializer[T].invert(str).get.get
 
-  private val confKey = "com.twitter.scalding.serialization.WrappedSerialization"
+  private val confKey =
+    "com.twitter.scalding.serialization.WrappedSerialization"
 
-  def rawSetBinary(bufs: Iterable[ClassSerialization[_]], fn: (String, String) => Unit) = {
-    fn(confKey, bufs.map { case (cls, buf) => s"${cls.getName}:${serialize(buf)}" }.mkString(","))
+  def rawSetBinary(
+      bufs: Iterable[ClassSerialization[_]], fn: (String, String) => Unit) = {
+    fn(confKey, bufs.map {
+      case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
+    }.mkString(","))
   }
-  def setBinary(conf: Configuration, bufs: Iterable[ClassSerialization[_]]): Unit =
+  def setBinary(
+      conf: Configuration, bufs: Iterable[ClassSerialization[_]]): Unit =
     rawSetBinary(bufs, { case (k, v) => conf.set(k, v) })
 
   def getBinary(conf: Configuration): Map[Class[_], Serialization[_]] =
-    conf
-      .iterator
-      .asScala
-      .map { it =>
-        (it.getKey, it.getValue)
-      }
-      .filter(_._1.startsWith(confKey))
+    conf.iterator.asScala.map { it =>
+      (it.getKey, it.getValue)
+    }.filter(_._1.startsWith(confKey))
       .map {
         case (_, clsbuf) =>
           clsbuf.split(":") match {
             case Array(className, serialization) =>
               // Jump through a hoop to get scalac happy
-              def deser[T](cls: Class[T]): ClassSerialization[T] = (cls, deserialize[Serialization[T]](serialization))
+              def deser[T](cls: Class[T]): ClassSerialization[T] =
+                (cls, deserialize[Serialization[T]](serialization))
               deser(conf.getClassByName(className))
             case _ => sys.error(s"ill formed bufferables: ${clsbuf}")
           }
-      }.toMap
+      }
+      .toMap
 }

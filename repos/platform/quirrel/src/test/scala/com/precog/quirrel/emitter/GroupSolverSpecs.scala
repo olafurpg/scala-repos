@@ -28,53 +28,67 @@ import com.codecommit.gll.LineStream
 
 import typer._
 
-object GroupSolverSpecs extends Specification
-    with StubPhases
-    with CompilerUtils
-    with Compiler
-    with GroupSolver
-    with ProvenanceChecker
-    with RawErrors 
+object GroupSolverSpecs
+    extends Specification with StubPhases with CompilerUtils with Compiler
+    with GroupSolver with ProvenanceChecker with RawErrors
     with StaticLibrarySpec {
-      
+
   import ast._
   import buckets._
   import library._
-  
+
   "group solver" should {
     "identify and solve group set for trivial solve example" in {
-      val input = "clicks := load(//clicks) solve 'day clicks where clicks.day = 'day"
-      
-      val Let(_, _, _, _,
-        tree @ Solve(_, _, 
-          origin @ Where(_, target, Eq(_, solution, _)))) = compileSingle(input)
-          
+      val input =
+        "clicks := load(//clicks) solve 'day clicks where clicks.day = 'day"
+
+      val Let(_,
+              _,
+              _,
+              _,
+              tree @ Solve(
+              _, _, origin @ Where(_, target, Eq(_, solution, _)))) =
+        compileSingle(input)
+
       val btrace = List()
-      val expected = Group(Some(origin), target, UnfixedSolution("'day", solution, btrace), btrace)
+      val expected = Group(Some(origin),
+                           target,
+                           UnfixedSolution("'day", solution, btrace),
+                           btrace)
       tree.errors must beEmpty
       tree.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "identify composite bucket for trivial solve example with conjunction" in {
-      val input = "clicks := load(//clicks) solve 'day clicks where clicks.day = 'day & clicks.din = 'day"
-      
-      val Let(_, _, _, _,
-        tree @ Solve(_, _, 
-          origin @ Where(_, target, And(_, Eq(_, leftSol, _), Eq(_, rightSol, _))))) = compileSingle(input)
-      
+      val input =
+        "clicks := load(//clicks) solve 'day clicks where clicks.day = 'day & clicks.din = 'day"
+
+      val Let(_,
+              _,
+              _,
+              _,
+              tree @ Solve(
+              _,
+              _,
+              origin @ Where(
+              _, target, And(_, Eq(_, leftSol, _), Eq(_, rightSol, _))))) =
+        compileSingle(input)
+
       val btrace = List()
-      val expected = Group(Some(origin), target,
-        IntersectBucketSpec(
-          UnfixedSolution("'day", leftSol, btrace),
-          UnfixedSolution("'day", rightSol, btrace)),
-        btrace)
-      
+      val expected =
+        Group(Some(origin),
+              target,
+              IntersectBucketSpec(UnfixedSolution("'day", leftSol, btrace),
+                                  UnfixedSolution("'day", rightSol, btrace)),
+              btrace)
+
       tree.errors must beEmpty
       tree.buckets mustEqual Map(Set() -> expected)
     }
 
     "identify and fail to solve problematic case of nested solves" in {
-      val input = """
+      val input =
+        """
         medals := //summer_games/london_medals
         
         solve 'gender
@@ -82,14 +96,14 @@ object GroupSolverSpecs extends Specification
             medals where medals.Weight = 'weight & medals.Gender = 'gender
       """.stripMargin
 
-      val Let(_, _, _, _,
-        tree @ Solve(_, _, _)) = compileSingle(input)
+      val Let(_, _, _, _, tree @ Solve(_, _, _)) = compileSingle(input)
 
       tree.errors mustEqual Set(ConstraintsWithinInnerSolve)
     }
 
     "accept a solve on a union with a `with`" in {
-      val input = """
+      val input =
+        """
         | medals := //summer_games/london_medals
         | athletes := //summer_games/athletes
         | 
@@ -103,7 +117,7 @@ object GroupSolverSpecs extends Specification
 
       let.errors must beEmpty
     }
-    
+
     "accept acceptable case of nested solves" in {
       val input = """
         | medals := //summer_games/london_medals
@@ -115,18 +129,22 @@ object GroupSolverSpecs extends Specification
         |     medals' where medals'.Weight = 'weight
         | """.stripMargin
 
-      val let @ Let(_, _, _, _,
-        tree1 @ Solve(_, _, 
-          Let(_, _, _, _, 
-            tree2 @ Solve(_, _, _)))) = compileSingle(input)
+      val let @ Let(_,
+                    _,
+                    _,
+                    _,
+                    tree1 @ Solve(
+                    _, _, Let(_, _, _, _, tree2 @ Solve(_, _, _)))) =
+        compileSingle(input)
 
       let.errors must beEmpty
       tree1.errors must beEmpty
       tree2.errors must beEmpty
     }
-    
+
     "accept acceptable case when one solve contains a dispatch which contains tic variable from another solve" in {
-      val input = """
+      val input =
+        """
        |  medals := //summer_games/london_medals
        |  
        |  medals' := solve 'gender
@@ -136,14 +154,13 @@ object GroupSolverSpecs extends Specification
        |    medals' where medals'.Weight = 'weight & medals'.isAwesome
        | """.stripMargin
 
-      val let @ Let(_, _, _, _,
-        Let(_, _, _, _,
-          tree @ Solve(_, _, _))) = compileSingle(input)
+      val let @ Let(_, _, _, _, Let(_, _, _, _, tree @ Solve(_, _, _))) =
+        compileSingle(input)
 
       let.errors must beEmpty
       tree.errors must beEmpty
     }
-   
+
     "accept acceptable case when a dispatch in one solve contains, as an actual, a tic variable from another solve" in {
       val input = """
         medals := //summer_games/london_medals
@@ -157,9 +174,8 @@ object GroupSolverSpecs extends Specification
             medals' where medals'.Weight = 'weight & f('gender)
       """.stripMargin
 
-      val let @ Let(_, _, _, _,
-        Let(_, _, _, _,
-          tree @ Solve(_, _, _))) = compileSingle(input)
+      val let @ Let(_, _, _, _, Let(_, _, _, _, tree @ Solve(_, _, _))) =
+        compileSingle(input)
 
       let.errors must beEmpty
       tree.errors must beEmpty
@@ -176,12 +192,11 @@ object GroupSolverSpecs extends Specification
             medals' where medals'.Weight = 'weight & 'gender
       """.stripMargin
 
-      val let @ Let(_, _, _, _,
-          tree @ Solve(_, _, _)) = compileSingle(input)
+      val let @ Let(_, _, _, _, tree @ Solve(_, _, _)) = compileSingle(input)
 
       let.errors must beEmpty
       tree.errors must beEmpty
-    }.pendingUntilFixed 
+    }.pendingUntilFixed
 
     "accept a solve when the tic var is constrained in a let" in {
       val input = """
@@ -192,12 +207,11 @@ object GroupSolverSpecs extends Specification
           gender + 1
       """.stripMargin
 
-      val tree @ Let(_, _, _, _,
-        solve @ Solve(_, _, _)) = compileSingle(input)
+      val tree @ Let(_, _, _, _, solve @ Solve(_, _, _)) = compileSingle(input)
 
       solve.errors must beEmpty
       tree.errors must beEmpty
-    }    
+    }
 
     "accept a solve when a tic var is used in the scope of a nested solve that doesn't bind it" in {
       val input = """
@@ -211,18 +225,22 @@ object GroupSolverSpecs extends Specification
             weight + 'gender
       """.stripMargin
 
-      val tree @ Let(_, _, _, _,
-        solve1 @ Solve(_, _,
-          Let(_, _, _, _,
-            solve2 @ Solve(_, _, _)))) = compileSingle(input)
+      val tree @ Let(_,
+                     _,
+                     _,
+                     _,
+                     solve1 @ Solve(
+                     _, _, Let(_, _, _, _, solve2 @ Solve(_, _, _)))) =
+        compileSingle(input)
 
       solve1.errors must beEmpty
       solve2.errors must beEmpty
       tree.errors must beEmpty
-    }    
+    }
 
     "identify and fail to solve more complicated problematic case of nested solves" in {
-      val input = """
+      val input =
+        """
         medals := //summer_games/london_medals
         
         solve 'gender
@@ -235,8 +253,7 @@ object GroupSolverSpecs extends Specification
           {gender: 'gender, optimalWeight: (histogram.weight where histogram.count = maxCount)}
       """.stripMargin
 
-      val Let(_, _, _, _,
-        tree @ Solve(_, _, _)) = compileSingle(input)
+      val Let(_, _, _, _, tree @ Solve(_, _, _)) = compileSingle(input)
 
       tree.errors mustEqual Set(ConstraintsWithinInnerSolve)
     }
@@ -248,22 +265,35 @@ object GroupSolverSpecs extends Specification
         | solve 'a = bar.a 
         |   count(foo where foo.a = 'a)
         """.stripMargin
-      
-      val Let(_, _, _, _,
-        Let(_, _, _, _,
-          tree @ Solve(_,
-            Vector(Eq(_, _, constrSol)), count @ Dispatch(_, _, Vector(origin @ Where(_, target, Eq(_, bodySol, _))))))) = compileSingle(input)
-          
+
+      val Let(_,
+              _,
+              _,
+              _,
+              Let(
+              _,
+              _,
+              _,
+              _,
+              tree @ Solve(
+              _,
+              Vector(Eq(_, _, constrSol)),
+              count @ Dispatch(
+              _, _, Vector(origin @ Where(_, target, Eq(_, bodySol, _))))))) =
+        compileSingle(input)
+
       val btrace1 = List()
       val btrace2 = List()
-      val expected = IntersectBucketSpec(
-        Group(Some(origin), target,
-          UnfixedSolution("'a", bodySol, btrace1),
-          btrace1),
-        Group(None, constrSol,
-          UnfixedSolution("'a", constrSol, btrace2),
-          btrace2))
-      
+      val expected =
+        IntersectBucketSpec(Group(Some(origin),
+                                  target,
+                                  UnfixedSolution("'a", bodySol, btrace1),
+                                  btrace1),
+                            Group(None,
+                                  constrSol,
+                                  UnfixedSolution("'a", constrSol, btrace2),
+                                  btrace2))
+
       tree.errors must beEmpty
       tree.buckets mustEqual Map(Set() -> expected)
     }
@@ -276,44 +306,58 @@ object GroupSolverSpecs extends Specification
         | solve 'a = bar.a 
         |   count(foo where foo.a = 'a)
         """.stripMargin
-      
-      val Let(_, _, _, _,
-        Let(_, _, _, _,
-          Assert(_, _, 
-            tree @ Solve(_,
-              Vector(Eq(_, _, constrSol)), count @ Dispatch(_, _, Vector(origin @ Where(_, target, Eq(_, bodySol, _)))))))) = compileSingle(input)
-          
+
+      val Let(
+      _,
+      _,
+      _,
+      _,
+      Let(_,
+          _,
+          _,
+          _,
+          Assert(_,
+                 _,
+                 tree @ Solve(
+                 _,
+                 Vector(Eq(_, _, constrSol)),
+                 count @ Dispatch(
+                 _, _, Vector(origin @ Where(_, target, Eq(_, bodySol, _)))))))) =
+        compileSingle(input)
+
       val btrace1 = List()
       val btrace2 = List()
-      val expected = IntersectBucketSpec(
-        Group(Some(origin), target,
-          UnfixedSolution("'a", bodySol, btrace1),
-          btrace1),
-        Group(None, constrSol,
-          UnfixedSolution("'a", constrSol, btrace2),
-          btrace2))
-      
+      val expected =
+        IntersectBucketSpec(Group(Some(origin),
+                                  target,
+                                  UnfixedSolution("'a", bodySol, btrace1),
+                                  btrace1),
+                            Group(None,
+                                  constrSol,
+                                  UnfixedSolution("'a", constrSol, btrace2),
+                                  btrace2))
+
       tree.errors must beEmpty
       tree.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "identify composite bucket for solve with constraint for 'a only solvable in constrains" in {
       val input = """
         | foo := //foo 
         | solve 'a = foo.a 
         |   count(foo where foo.a < 'a)
         """.stripMargin
-      
-      val Let(_, _, _, _,
-        tree @ Solve(_,
-          Vector(Eq(_, _, constrSol)), _)) = compileSingle(input)
-          
-      val expected = Group(None, constrSol, UnfixedSolution("'a", constrSol, Nil), Nil) 
-      
+
+      val Let(_, _, _, _, tree @ Solve(_, Vector(Eq(_, _, constrSol)), _)) =
+        compileSingle(input)
+
+      val expected =
+        Group(None, constrSol, UnfixedSolution("'a", constrSol, Nil), Nil)
+
       tree.errors must beEmpty
       tree.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "identify separate buckets for independent tic variables on same set" in {
       val input = """
         | clicks := load(//clicks)
@@ -324,26 +368,42 @@ object GroupSolverSpecs extends Specification
         |
         |   bar.a + baz.b
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        tree @ Solve(_, _,
-          Let(_, _, _, originA @ Where(_, targetA, Eq(_, solA, _)),
-            Let(_, _, _, originB @ Where(_, targetB, Eq(_, solB, _)), add @ Add(_, descA @ Descent(_, dA, _), descB @ Descent(_, dB, _)))))) = compileSingle(input)
-      
+
+      val Let(_,
+              _,
+              _,
+              _,
+              tree @ Solve(_,
+                           _,
+                           Let(_,
+                               _,
+                               _,
+                               originA @ Where(_, targetA, Eq(_, solA, _)),
+                               Let(_,
+                                   _,
+                                   _,
+                                   originB @ Where(_, targetB, Eq(_, solB, _)),
+                                   add @ Add(_,
+                                             descA @ Descent(_, dA, _),
+                                             descB @ Descent(_, dB, _)))))) =
+        compileSingle(input)
+
       val btrace1 = List()
       val btrace2 = List()
-      val expected = IntersectBucketSpec(
-        Group(Some(originA), targetA,
-          UnfixedSolution("'a", solA, btrace1),
-          btrace1),
-        Group(Some(originB), targetB,
-          UnfixedSolution("'b", solB, btrace2),
-          btrace2))
-      
+      val expected =
+        IntersectBucketSpec(Group(Some(originA),
+                                  targetA,
+                                  UnfixedSolution("'a", solA, btrace1),
+                                  btrace1),
+                            Group(Some(originB),
+                                  targetB,
+                                  UnfixedSolution("'b", solB, btrace2),
+                                  btrace2))
+
       tree.errors must beEmpty
       tree.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "identify separate buckets for independent tic variables on different sets" in {
       val input = """
         | clicks := load(//clicks)
@@ -356,26 +416,52 @@ object GroupSolverSpecs extends Specification
         |   bar ~ baz
         |     bar.a + baz.b
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        Let(_, _, _, _,
-          tree @ Solve(_, _,
-            Let(_, _, _, originA @ Where(_, targetA, Eq(_, solA, _)),
-              Let(_, _, _, originB @ Where(_, targetB, Eq(_, solB, _)), rel @ Relate(_, _, _, add @ Add(_, decA @ Descent(_, dA: Dispatch, _), decB @ Descent(_, dB: Dispatch, _)))))))) = compileSingle(input)
-      
+
+      val Let(_,
+              _,
+              _,
+              _,
+              Let(_,
+                  _,
+                  _,
+                  _,
+                  tree @ Solve(
+                  _,
+                  _,
+                  Let(_,
+                      _,
+                      _,
+                      originA @ Where(_, targetA, Eq(_, solA, _)),
+                      Let(_,
+                          _,
+                          _,
+                          originB @ Where(_, targetB, Eq(_, solB, _)),
+                          rel @ Relate(
+                          _,
+                          _,
+                          _,
+                          add @ Add(_,
+                                    decA @ Descent(_, dA: Dispatch, _),
+                                    decB @ Descent(_, dB: Dispatch, _)))))))) =
+        compileSingle(input)
+
       val btraceA = List()
       val btraceB = List()
-              
-      val expected = IntersectBucketSpec(
-        Group(Some(originA), targetA,
-          UnfixedSolution("'a", solA, btraceA), btraceA),
-        Group(Some(originB), targetB,
-          UnfixedSolution("'b", solB, btraceB), btraceB))
-      
+
+      val expected =
+        IntersectBucketSpec(Group(Some(originA),
+                                  targetA,
+                                  UnfixedSolution("'a", solA, btraceA),
+                                  btraceA),
+                            Group(Some(originB),
+                                  targetB,
+                                  UnfixedSolution("'b", solB, btraceB),
+                                  btraceB))
+
       tree.errors must beEmpty
       tree.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "reject a group set that is a function of tic-variables being solved (cyclic constraints case 2)" in {
       val input = """
         | clicks := load(//clicks)
@@ -387,24 +473,35 @@ object GroupSolverSpecs extends Specification
         |   bar ~ baz
         |     bar.a + baz.b
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        tree @ Solve(_, _,
-          Let(_, _, _, originA @ Where(_, targetA, Eq(_, solA, _)),
-            Let(_, _, _, originB @ Where(_, targetB, Eq(_, solB, _)), _)))) = compileSingle(input)
-      
-      tree.errors must not(beEmpty)     // TODO
+
+      val Let(_,
+              _,
+              _,
+              _,
+              tree @ Solve(_,
+                           _,
+                           Let(_,
+                               _,
+                               _,
+                               originA @ Where(_, targetA, Eq(_, solA, _)),
+                               Let(_,
+                                   _,
+                                   _,
+                                   originB @ Where(_, targetB, Eq(_, solB, _)),
+                                   _)))) = compileSingle(input)
+
+      tree.errors must not(beEmpty) // TODO
     }
-    
+
     "produce an error when a single tic-variable lacks a defining set" in {
       val input = """
         | foo := //foo
         |
         | solve 'a foo where foo.a < 'a
         | """.stripMargin
-        
+
       compileSingle(input).errors must not(beEmpty)
-    }    
+    }
 
     "accept a solve when a single tic-variable has a defining set only in the constraints" in {
       val input = """
@@ -413,7 +510,7 @@ object GroupSolverSpecs extends Specification
         | solve 'a = foo.a 
         |   foo where foo.a < 'a
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
 
@@ -424,7 +521,7 @@ object GroupSolverSpecs extends Specification
         | solve 'a < foo.a
         |   foo where foo.a = 'a
         | """.stripMargin
-        
+
       compileSingle(input).errors must not(beEmpty)
     }
 
@@ -436,7 +533,7 @@ object GroupSolverSpecs extends Specification
         | solve 'a = foo.a 
         |   count(bar where bar.a = 'a)
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
 
@@ -447,20 +544,20 @@ object GroupSolverSpecs extends Specification
         | solve 'a = foo.a 
         |   {count: count(foo where foo.a < 'a), value: 'a}
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "produce an error when a single tic-variable lacks a defining set with extras" in {
       val input = """
         | foo := //foo
         |
         | solve 'a foo where foo.a < 'a & foo.b = 42
         | """.stripMargin
-        
+
       compileSingle(input).errors must not(beEmpty)
     }
-    
+
     "produce an error when one of several tic-variables lacks a defining set" in {
       val input = """
         | foo := //foo
@@ -470,32 +567,34 @@ object GroupSolverSpecs extends Specification
         |   foo'' := foo where foo.b = 'b
         |   foo' + foo''
         | """.stripMargin
-        
+
       compileSingle(input).errors must not(beEmpty)
     }
-    
+
     "accept a solve when one of two reductions cannot be solved in the absence of an outer definition" in {
-      val input = """
+      val input =
+        """
         | foo := //foo
         |
         | solve 'a
         |   count(foo where foo.a = 'a) + count(foo where foo.a = min('a + 1))
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "accept a function when a reduction cannot be solved in the presence of an outer definition" in {
-      val input = """
+      val input =
+        """
         | foo := //foo
         |
         | solve 'a
         |   (foo where foo.a = 'a) + count(foo where foo.a = min('a + 1))
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "accept a function when an optional defining set cannot be solved for a single tic-variable" in {
       val input = """
         | foo := //foo
@@ -505,7 +604,7 @@ object GroupSolverSpecs extends Specification
         |   foo'' := foo where foo.b = 'a
         |   foo' + foo''
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
 
@@ -521,9 +620,10 @@ object GroupSolverSpecs extends Specification
 
       compileSingle(input).errors must beEmpty
     }
-    
+
     "reject shared buckets for dependent tic variables on the same set" in {
-      val input = """
+      val input =
+        """
         | organizations := load(//organizations)
         | 
         | solve 'revenue, 'campaign
@@ -532,11 +632,11 @@ object GroupSolverSpecs extends Specification
         |   
         |   organizations''
         | """.stripMargin
-        
+
       val tree = compileSingle(input)
       tree.errors must not(beEmpty)
     }
-    
+
     "reject bucketing of separate sets within a relation" in {
       val input = """
         | foo := //foo
@@ -545,13 +645,14 @@ object GroupSolverSpecs extends Specification
         | foo ~ bar
         |   solve 'a
         |     foo where bar.a = 'a""".stripMargin
-        
+
       val tree = compileSingle(input)
       tree.errors must not(beEmpty)
     }
-    
+
     "accept shared buckets for dependent tic variables on the same set when at least one can be solved" in {
-      val input = """
+      val input =
+        """
         | campaigns := load(//campaigns)
         | organizations := load(//organizations)
         | 
@@ -563,33 +664,44 @@ object GroupSolverSpecs extends Specification
         |   campaigns' ~ organizations''
         |     { revenue: 'revenue, num: count(campaigns') }
         | """.stripMargin
-        
+
       val tree = compileSingle(input)
       tree.errors must beEmpty
     }
-    
+
     "produce valid AST nodes when solving" in {
       val input = """
         | foo := //foo
         | solve 'a
         |   foo where foo.a = 'a + 42""".stripMargin
-        
-      val Let(_, _, _, _,
-        tree @ Solve(_, _,
-          origin @ Where(_,
-            target,
-            boolean @ Eq(_, fooa, Add(_, TicVar(_, "'a"), n @ NumLit(_, "42")))))) = compileSingle(input)
-        
+
+      val Let(_,
+              _,
+              _,
+              _,
+              tree @ Solve(
+              _,
+              _,
+              origin @ Where(
+              _,
+              target,
+              boolean @ Eq(
+              _, fooa, Add(_, TicVar(_, "'a"), n @ NumLit(_, "42")))))) =
+        compileSingle(input)
+
       tree.errors must beEmpty
-      
+
       tree.buckets(Set()) must beLike {
-        case Group(origin, target, UnfixedSolution("'a", sub @ Sub(_, fooa, n), _), _) => {
-          sub.provenance mustEqual StaticProvenance("/foo")
-          // anything else?
-        }
+        case Group(origin,
+                   target,
+                   UnfixedSolution("'a", sub @ Sub(_, fooa, n), _),
+                   _) => {
+            sub.provenance mustEqual StaticProvenance("/foo")
+            // anything else?
+          }
       }
     }
-    
+
     "reject a constraint which lacks an unambiguous common parent" in {
       val input = """
         | foo := //foo
@@ -599,16 +711,22 @@ object GroupSolverSpecs extends Specification
         |   foo ~ bar
         |     (foo + bar) where (foo - bar).a = 'a
         | """.stripMargin
-        
-      val tree @ Let(_, _, _, _,
-        Let(_, _, _, _,
-          solve @ Solve(_, _, 
-            Relate(_, _, _,
-              Where(_, left, right))))) = compileSingle(input)
-      
+
+      val tree @ Let(_,
+                     _,
+                     _,
+                     _,
+                     Let(_,
+                         _,
+                         _,
+                         _,
+                         solve @ Solve(
+                         _, _, Relate(_, _, _, Where(_, left, right))))) =
+        compileSingle(input)
+
       tree.errors must not(beEmpty)
     }
-    
+
     "reject a constraint which attempts to parent through an assertion" in {
       val input = """
         | foo := //foo
@@ -617,7 +735,7 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   foo where foo'.a = 'a
         | """.stripMargin
-        
+
       compileSingle(input).errors must not(beEmpty)
     }
 
@@ -632,9 +750,10 @@ object GroupSolverSpecs extends Specification
 
       compileSingle(input).errors must beEmpty
     }
-    
+
     "accept a reduced sessionize" in {
-      val input = """
+      val input =
+        """
         | rawInteractions := //interactions
         | 
         | solve 'userId
@@ -646,10 +765,10 @@ object GroupSolverSpecs extends Specification
         |   solve 'it1, 'it2
         |     bounds where bounds = 'it1 & bounds.isLower & bounds = 'it2
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "accept a solve on the results of a relate operation" in {
       val input = """
         | clicks := //clicks
@@ -661,10 +780,10 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   count(data where data.a = 'a)
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "accept a solve on the results of a union operation" in {
       val input = """
         | clicks := //clicks
@@ -675,10 +794,10 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   count(data where data.a = 'a)
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "accept a solve involving variables as actuals" in {
       val input = """
         | foo := //foo
@@ -686,20 +805,30 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   foo where f('a)
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        Let(_, _, _, Eq(_, _, solution),
-          solve @ Solve(_, _,
-            where @ Where(_, target, d: Dispatch)))) = compileSingle(input)
-        
+
+      val Let(_,
+              _,
+              _,
+              _,
+              Let(
+              _,
+              _,
+              _,
+              Eq(_, _, solution),
+              solve @ Solve(_, _, where @ Where(_, target, d: Dispatch)))) =
+        compileSingle(input)
+
       val btrace = List()
-      
-      val expected = Group(Some(where), target, UnfixedSolution("'a", solution, d :: btrace), btrace)
-        
+
+      val expected = Group(Some(where),
+                           target,
+                           UnfixedSolution("'a", solution, d :: btrace),
+                           btrace)
+
       solve.errors must beEmpty
       solve.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "reject a non-relating solve involving variables as actuals" in {
       val input = """
         | foo := //foo
@@ -707,11 +836,11 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   foo where f('a)
         | """.stripMargin
-        
+
       val tree = compileSingle(input)
       tree.errors must not(beEmpty)
     }
-    
+
     "accept a solve involving a where as an actual" in {
       val input = """
         | foo := //foo
@@ -719,19 +848,31 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   f(foo where foo.a = 'a)
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        Let(_, _, _, _,
-          solve @ Solve(_, _,
-            d @ Dispatch(_, _, Vector(where @ Where(_, target, Eq(_, solution, _))))))) = compileSingle(input)
-            
+
+      val Let(_,
+              _,
+              _,
+              _,
+              Let(
+              _,
+              _,
+              _,
+              _,
+              solve @ Solve(
+              _,
+              _,
+              d @ Dispatch(
+              _, _, Vector(where @ Where(_, target, Eq(_, solution, _))))))) =
+        compileSingle(input)
+
       val btrace = List(d)
-      val expected = Group(Some(where), target, UnfixedSolution("'a", solution, btrace), btrace)
-      
+      val expected = Group(
+          Some(where), target, UnfixedSolution("'a", solution, btrace), btrace)
+
       solve.errors must beEmpty
       solve.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "reject a solve involving a where as an actual" in {
       val input = """
         | foo := //foo
@@ -740,11 +881,11 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   f(foo where foo'.a = 'a)
         | """.stripMargin
-        
+
       val tree = compileSingle(input)
       tree.errors must not(beEmpty)
     }
-    
+
     "accept a solve involving relations as actuals" in {
       val input = """
         | foo := //foo
@@ -752,20 +893,34 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   foo where f('a = foo.a)
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        Let(_, _, _, _,
-          solve @ Solve(_, _,
-            where @ Where(_, target, d @ Dispatch(_, _, Vector(Eq(_, _, solution))))))) = compileSingle(input)
-      
+
+      val Let(
+      _,
+      _,
+      _,
+      _,
+      Let(_,
+          _,
+          _,
+          _,
+          solve @ Solve(
+          _,
+          _,
+          where @ Where(
+          _, target, d @ Dispatch(_, _, Vector(Eq(_, _, solution))))))) =
+        compileSingle(input)
+
       val btrace = List()
-      
-      val expected = Group(Some(where), target, UnfixedSolution("'a", solution, d :: btrace), btrace)
-        
+
+      val expected = Group(Some(where),
+                           target,
+                           UnfixedSolution("'a", solution, d :: btrace),
+                           btrace)
+
       solve.errors must beEmpty
       solve.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "reject a solve involving relations as actuals in a function with a problematic body" in {
       val input = """
         | foo := //foo
@@ -773,11 +928,11 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   foo where f('a = foo.a)
         | """.stripMargin
-        
+
       val tree = compileSingle(input)
       tree.errors must not(beEmpty)
     }
-    
+
     "accept a solve involving a generic where within a function" in {
       val input = """
         | foo := //foo
@@ -785,24 +940,33 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   f(foo, foo.a = 'a)
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        Let(_, _, _, where: Where,
-          solve @ Solve(_, _,
-            d @ Dispatch(_, _, Vector(
-              target,
-              Eq(_, solution, _)))))) = compileSingle(input)
-              
+
+      val Let(_,
+              _,
+              _,
+              _,
+              Let(_,
+                  _,
+                  _,
+                  where: Where,
+                  solve @ Solve(
+                  _,
+                  _,
+                  d @ Dispatch(_, _, Vector(target, Eq(_, solution, _)))))) =
+        compileSingle(input)
+
       val btrace = List(d)
-              
-      val expected = Group(Some(where), target, UnfixedSolution("'a", solution, btrace), btrace)
-      
+
+      val expected = Group(
+          Some(where), target, UnfixedSolution("'a", solution, btrace), btrace)
+
       solve.errors must beEmpty
       solve.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "accept another solve with a generic where inside a function" in {
-      val input = """
+      val input =
+        """
         | medals := //summer_games/london_medals
         | athletes := //summer_games/athletes
         | 
@@ -814,19 +978,38 @@ object GroupSolverSpecs extends Specification
         |   count(f(data.winner, data.winner = 'winner))
       """.stripMargin
 
-      val Let(_, _, _, _,
-        Let(_, _, _, _,
-          Let(_, _, _, _,
-            Let(_, _, _, where: Where,
-              solve @ Solve(_, _,
-                d1 @ Dispatch(_, _, Vector(
-                  d2 @ Dispatch(_, _, Vector(
-                    target,
-                    Eq(_, solution, _)))))))))) = compileSingle(input)
+      val Let(_,
+              _,
+              _,
+              _,
+              Let(_,
+                  _,
+                  _,
+                  _,
+                  Let(_,
+                      _,
+                      _,
+                      _,
+                      Let(_,
+                          _,
+                          _,
+                          where: Where,
+                          solve @ Solve(
+                          _,
+                          _,
+                          d1 @ Dispatch(
+                          _,
+                          _,
+                          Vector(d2 @ Dispatch(
+                          _, _, Vector(target, Eq(_, solution, _)))))))))) =
+        compileSingle(input)
 
       val btrace = List(d2)
-                    
-      val expected = Group(Some(where), target, UnfixedSolution("'winner", solution, btrace), btrace)
+
+      val expected = Group(Some(where),
+                           target,
+                           UnfixedSolution("'winner", solution, btrace),
+                           btrace)
 
       solve.errors must beEmpty
       solve.buckets mustEqual Map(Set() -> expected)
@@ -840,11 +1023,11 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   f(foo, foo'.a = 'a)
         | """.stripMargin
-        
+
       val tree = compileSingle(input)
       tree.errors must not(beEmpty)
     }
-    
+
     "accept a solve with relation expressions involving formals" in {
       val input = """
         | foo := //foo
@@ -853,21 +1036,27 @@ object GroupSolverSpecs extends Specification
         |     foo where x = 'a
         | f(foo.a)
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        Let(_, _, _,
-          solve @ Solve(_, _,
-            where @ Where(_, target, Eq(_, solution, _))),
+
+      val Let(
+      _,
+      _,
+      _,
+      _,
+      Let(_,
+          _,
+          _,
+          solve @ Solve(_, _, where @ Where(_, target, Eq(_, solution, _))),
           d @ Dispatch(_, _, _))) = compileSingle(input)
-          
+
       val btrace = List(d)
-          
-      val expected = Group(Some(where), target, UnfixedSolution("'a", solution, btrace), btrace)
-      
+
+      val expected = Group(
+          Some(where), target, UnfixedSolution("'a", solution, btrace), btrace)
+
       solve.errors must beEmpty
       solve.buckets mustEqual Map(Set(d) -> expected)
     }
-    
+
     "accept a solve with relation expressions involving formals of formals" in {
       val input = """
         | foo := //foo
@@ -878,23 +1067,31 @@ object GroupSolverSpecs extends Specification
         |   f(x.a)
         | g(foo)
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        Let(_, _, _,
-          Let(_, _, _,
-            solve @ Solve(_, _,
-              where @ Where(_, target, Eq(_, solution, _))),
-            d @ Dispatch(_, _, _)),
-          d2: Dispatch)) = compileSingle(input)
-          
+
+      val Let(_,
+              _,
+              _,
+              _,
+              Let(_,
+                  _,
+                  _,
+                  Let(_,
+                      _,
+                      _,
+                      solve @ Solve(
+                      _, _, where @ Where(_, target, Eq(_, solution, _))),
+                      d @ Dispatch(_, _, _)),
+                  d2: Dispatch)) = compileSingle(input)
+
       val btrace = List(d, d2)
-          
-      val expected = Group(Some(where), target, UnfixedSolution("'a", solution, btrace), btrace)
-      
+
+      val expected = Group(
+          Some(where), target, UnfixedSolution("'a", solution, btrace), btrace)
+
       solve.errors must beEmpty
       solve.buckets mustEqual Map(Set(d, d2) -> expected)
     }
-    
+
     "reject a solve with relation expressions involving invalid formals of formals" in {
       val input = """
         | foo := //foo
@@ -906,11 +1103,11 @@ object GroupSolverSpecs extends Specification
         |   f(x.a)
         | g(foo')
         | """.stripMargin
-        
+
       val tree = compileSingle(input)
       tree.errors must not(beEmpty)
     }
-    
+
     "accept a solve that requires algebraic manipulation w.r.t. formals" in {
       val input = """
         | foo := //foo
@@ -918,13 +1115,14 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   foo where f(foo.a, 'a / foo.b)
         | """.stripMargin
-        
+
       val tree = compileSingle(input)
       tree.errors must beEmpty
     }
-    
+
     "accept a solve defined by a constraint clause and inequalities in the body" in {
-      val input = """
+      val input =
+        """
         | import std::time::*
         | import std::stats::*
         | import std::math::*
@@ -967,7 +1165,7 @@ object GroupSolverSpecs extends Specification
         | solve 'bins = bins
         |   {bin: 'bins, count: count(result2.action where result2.action = "Online"  & 'bins >= result2.startBin & 'bins <=result2.endBin)}
         | """.stripMargin
-      
+
       compileSingle(input).errors must beEmpty
     }
 
@@ -981,10 +1179,10 @@ object GroupSolverSpecs extends Specification
         |   result := foo where minute(foo) = 'agent
         |   minute(result)
         | """.stripMargin
-      
+
       compileSingle(input).errors must beEmpty
     }
-     
+
     "correctly identify commonality for constraint clause deriving from object def on non-constant fields" in {
       val input = """
         | clicks := //clicks
@@ -993,17 +1191,22 @@ object GroupSolverSpecs extends Specification
         | solve 'bins = data
         |   'bins
         | """.stripMargin
-        
-      val tree @ Let(_, _, _, _,
-        Let(_, _, _, _,
-          solve @ Solve(_, Vector(Eq(_, _, target)), _))) = compileSingle(input)
-          
-      val expected = Group(None, target, UnfixedSolution("'bins", target, Nil), Nil)
-      
+
+      val tree @ Let(
+      _,
+      _,
+      _,
+      _,
+      Let(_, _, _, _, solve @ Solve(_, Vector(Eq(_, _, target)), _))) =
+        compileSingle(input)
+
+      val expected =
+        Group(None, target, UnfixedSolution("'bins", target, Nil), Nil)
+
       tree.errors must beEmpty
       solve.buckets mustEqual Map(Set() -> expected)
     }
-    
+
     "reject a solve where the target includes a reduction on the commonality" in {
       val input = """
         | clicks := //clicks
@@ -1011,12 +1214,13 @@ object GroupSolverSpecs extends Specification
         | solve 'userId
         |   count(clicks) / clicks.time where clicks.userId = 'userId
         | """.stripMargin
-          
+
       compileSingle(input).errors must not(beEmpty)
     }
-    
+
     "accept interaction-totals.qrl" in {
-      val input = """
+      val input =
+        """
         | interactions := //interactions
         | 
         | hourOfDay(time) := time / 3600000           -- timezones, anyone?
@@ -1026,12 +1230,13 @@ object GroupSolverSpecs extends Specification
         |   dayAndHour := dayOfWeek(interactions.time) = 'day & hourOfDay(interactions.time) = 'hour
         |   sum(interactions where dayAndHour)
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "accept a solve grouping on the results of an object concat with a stdlib op1" in {
-      val input = """
+      val input =
+        """
         | import std::time::*
         | 
         | agents := //clicks
@@ -1042,30 +1247,31 @@ object GroupSolverSpecs extends Specification
         | solve 'agent
         |   data where data.millis < upperBound & data.agentId = 'agent
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "accept a solve where the commonality is only equal ignoring location" in {
       val input = """
         | solve 'a
         |   //campaigns where (//campaigns).foo = 'a
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "reject a solve where the extras involve reductions" in {
-      val input = """
+      val input =
+        """
         | sales := //sales
         | solve 'state
         |   sales where sales.state = 'state &
         |     (sales.total = max(sales.total) | sales.total = min(sales.total))
         | """.stripMargin
-        
+
       compileSingle(input).errors must not(beEmpty)
     }
-    
+
     "accept a solve on the results of a denseRank" in {
       val input = """
         | agents := //snapEngage/customer/widget
@@ -1074,10 +1280,10 @@ object GroupSolverSpecs extends Specification
         | solve 'rank
         |   data' where data'.rank = 'rank
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "identify only the first of a double-constrained group set" in {
       val input = """
         | foo := //foo
@@ -1086,29 +1292,35 @@ object GroupSolverSpecs extends Specification
         |   foo' := foo where foo = 'a
         |   count(foo' where foo' = 'a)
         | """.stripMargin
-        
-      val Let(_, _, _, _,
-        solve @ Solve(_, _,
-          Let(_, _, _,
-            where @ Where(_, target, Eq(_, solution, _)),
-            _))) = compileSingle(input) 
-            
-      val expected = Group(Some(where), target, UnfixedSolution("'a", solution, Nil), Nil)
-      
+
+      val Let(_,
+              _,
+              _,
+              _,
+              solve @ Solve(
+              _,
+              _,
+              Let(_, _, _, where @ Where(_, target, Eq(_, solution, _)), _))) =
+        compileSingle(input)
+
+      val expected =
+        Group(Some(where), target, UnfixedSolution("'a", solution, Nil), Nil)
+
       solve.errors must beEmpty
-      solve.buckets mustEqual(Map(Set() -> expected))
+      solve.buckets mustEqual (Map(Set() -> expected))
     }
-    
+
     "reject a solve with a doubly-compared tic variable" in {
       val input = """
         | foo := //foo
         | solve 'a = foo = 'a
         |   'a
         | """.stripMargin
-        
-      compileSingle(input).errors must contain(ExtraVarsInGroupConstraint("'a"))
+
+      compileSingle(input).errors must contain(
+          ExtraVarsInGroupConstraint("'a"))
     }
-    
+
     "accept a solve on the results of an observation" in {
       val input = """
         | foo := //foo
@@ -1117,10 +1329,10 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   r where r = 'a
         | """.stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "not explode more differently" in {
       val input = """
         | createModel(data) :=  
@@ -1132,19 +1344,19 @@ object GroupSolverSpecs extends Specification
         | 
         | createModel(42)
         | """.stripMargin
-      
+
       compileSingle(input) must not(throwA[Throwable])
     }
-    
+
     "allow a solve with a critical condition defined by a Cond" in {
       val input = """
         | foo := //foo
         | solve 'a
         |   foo where (if foo.a then foo.b else foo.c) = 'a""".stripMargin
-        
+
       compileSingle(input).errors must beEmpty
     }
-    
+
     "reject a reduction in an extra" in {
       val input = """
         | foo := //foo
@@ -1152,10 +1364,10 @@ object GroupSolverSpecs extends Specification
         | solve 'a
         |   foo where foo.a = 'a & exists(foo.b = "boo")
         | """.stripMargin
-        
+
       compileSingle(input).errors must not(beEmpty)
     }
-    
+
     "separate bucket specs for groups within functions within union" in {
       val input = """
         | data := new 12
@@ -1164,26 +1376,40 @@ object GroupSolverSpecs extends Specification
         |   solve 'price count(path where path = 'price)
         |     
         | f(data) union f(data with 24)""".stripMargin
-        
-      val Let(_, _, _, _,
-        Let(_, _, _,
-          solve @ Solve(_, _, Dispatch(_, _, Vector(
-            target @ Where(_, path, _)))),
-          Union(_,
-            d1 @ Dispatch(_, _, Vector(data)),
-            d2 @ Dispatch(_, _, Vector(data2))))) = compileSingle(input)
-            
+
+      val Let(_,
+              _,
+              _,
+              _,
+              Let(_,
+                  _,
+                  _,
+                  solve @ Solve(
+                  _, _, Dispatch(_, _, Vector(target @ Where(_, path, _)))),
+                  Union(_,
+                        d1 @ Dispatch(_, _, Vector(data)),
+                        d2 @ Dispatch(_, _, Vector(data2))))) =
+        compileSingle(input)
+
       solve.buckets must haveKey(Set(d1))
       solve.buckets must haveKey(Set(d2))
-      
+
       val spec1 = solve.buckets(Set(d1))
       spec1 must beLike {
-        case Group(Some(`target`), `data`, UnfixedSolution("'price", _, `d1` :: Nil), `d1` :: Nil) => ok
+        case Group(Some(`target`),
+                   `data`,
+                   UnfixedSolution("'price", _, `d1` :: Nil),
+                   `d1` :: Nil) =>
+          ok
       }
-      
+
       val spec2 = solve.buckets(Set(d2))
       spec2 must beLike {
-        case Group(Some(`target`), `data2`, UnfixedSolution("'price", _, `d2` :: Nil), `d2` :: Nil) => ok
+        case Group(Some(`target`),
+                   `data2`,
+                   UnfixedSolution("'price", _, `d2` :: Nil),
+                   `d2` :: Nil) =>
+          ok
       }
     }
   }

@@ -3,6 +3,7 @@ object AA {
     def foo() = x + 1
   }
 
-  /*start*/1.foo()/*end*/
+  /*start*/
+  1.foo() /*end*/
 }
 //Int

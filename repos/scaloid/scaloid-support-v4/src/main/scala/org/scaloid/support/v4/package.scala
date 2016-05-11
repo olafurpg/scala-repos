@@ -35,6 +35,4 @@
 
 package org.scaloid.support
 
-package object v4 extends Implicits {
-
-}
+package object v4 extends Implicits {}

@@ -1,1 +1,1 @@
-class Unimplemented extends TraversableOnce[String] { }
+class Unimplemented extends TraversableOnce[String] {}

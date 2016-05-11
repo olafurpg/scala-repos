@@ -11,12 +11,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext}
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 07.03.2008
-* Time: 9:24:19
-*/
-
-class ScParenthesisedExprImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScParenthesisedExpr {
+  * @author Alexander Podkhalyuzin
+  * Date: 07.03.2008
+  * Time: 9:24:19
+  */
+class ScParenthesisedExprImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScParenthesisedExpr {
   override def toString: String = "ExpressionInParenthesis"
 
   protected override def innerType(ctx: TypingContext) = {
@@ -38,5 +38,4 @@ class ScParenthesisedExprImpl(node: ASTNode) extends ScalaPsiElementImpl(node) w
       case _ => super.accept(visitor)
     }
   }
-
 }

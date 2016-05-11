@@ -9,7 +9,6 @@ object Test extends App {
   Test2.main(Array())
 }
 
-
 object Test2 {
   def main(args: Array[String]): Unit = {
     val x = "abc"

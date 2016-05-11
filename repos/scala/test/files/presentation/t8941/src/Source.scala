@@ -3,6 +3,6 @@ object Foo {
     def m(args: Any*): Unit = {
       ctx.checkLengths(args)
     }
-    ???/*?*/
+    ??? /*?*/
   }
 }

@@ -25,7 +25,6 @@ import org.apache.spark.sql.catalyst.expressions.Literal
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
-
 class TakeOrderedAndProjectSuite extends SparkPlanTest with SharedSQLContext {
 
   private var rand: Random = _
@@ -42,14 +41,16 @@ class TakeOrderedAndProjectSuite extends SparkPlanTest with SharedSQLContext {
       .add("a", IntegerType, nullable = false)
       .add("b", IntegerType, nullable = false)
     val inputData = Seq.fill(10000)(Row(rand.nextInt(), rand.nextInt()))
-    sqlContext.createDataFrame(sparkContext.parallelize(Random.shuffle(inputData), 10), schema)
+    sqlContext.createDataFrame(
+        sparkContext.parallelize(Random.shuffle(inputData), 10), schema)
   }
 
   /**
-   * Adds a no-op filter to the child plan in order to prevent executeCollect() from being
-   * called directly on the child plan.
-   */
-  private def noOpFilter(plan: SparkPlan): SparkPlan = Filter(Literal(true), plan)
+    * Adds a no-op filter to the child plan in order to prevent executeCollect() from being
+    * called directly on the child plan.
+    */
+  private def noOpFilter(plan: SparkPlan): SparkPlan =
+    Filter(Literal(true), plan)
 
   val limit = 250
   val sortOrder = 'a.desc :: 'b.desc :: Nil
@@ -57,29 +58,29 @@ class TakeOrderedAndProjectSuite extends SparkPlanTest with SharedSQLContext {
   test("TakeOrderedAndProject.doExecute without project") {
     withClue(s"seed = $seed") {
       checkThatPlansAgree(
-        generateRandomInputData(),
-        input =>
-          noOpFilter(TakeOrderedAndProject(limit, sortOrder, None, input)),
-        input =>
-          GlobalLimit(limit,
-            LocalLimit(limit,
-              Sort(sortOrder, true, input))),
-        sortAnswers = false)
+          generateRandomInputData(),
+          input =>
+            noOpFilter(TakeOrderedAndProject(limit, sortOrder, None, input)),
+          input =>
+            GlobalLimit(limit,
+                        LocalLimit(limit, Sort(sortOrder, true, input))),
+          sortAnswers = false)
     }
   }
 
   test("TakeOrderedAndProject.doExecute with project") {
     withClue(s"seed = $seed") {
       checkThatPlansAgree(
-        generateRandomInputData(),
-        input =>
-          noOpFilter(TakeOrderedAndProject(limit, sortOrder, Some(Seq(input.output.last)), input)),
-        input =>
-          GlobalLimit(limit,
-            LocalLimit(limit,
-              Project(Seq(input.output.last),
-                Sort(sortOrder, true, input)))),
-        sortAnswers = false)
+          generateRandomInputData(),
+          input =>
+            noOpFilter(TakeOrderedAndProject(
+                    limit, sortOrder, Some(Seq(input.output.last)), input)),
+          input =>
+            GlobalLimit(limit,
+                        LocalLimit(limit,
+                                   Project(Seq(input.output.last),
+                                           Sort(sortOrder, true, input)))),
+          sortAnswers = false)
     }
   }
 }

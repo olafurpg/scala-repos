@@ -11,9 +11,11 @@ import com.twitter.util.{Promise, Return}
  */
 
 object Event {
-  def apply(t: EventType, s: KeeperState, p: Option[String]) = new WatchedEvent(t, s, p.orNull)
+  def apply(t: EventType, s: KeeperState, p: Option[String]) =
+    new WatchedEvent(t, s, p.orNull)
 
-  def unapply(event: WatchedEvent): Option[(EventType, KeeperState, Option[String])] = {
+  def unapply(event: WatchedEvent)
+    : Option[(EventType, KeeperState, Option[String])] = {
     Some((event.getType, event.getState, Option { event.getPath }))
   }
 }
@@ -61,8 +63,12 @@ object StateEvent {
       case KeeperState.Expired => Expired
       case KeeperState.ConnectedReadOnly => ConnectedReadOnly
       case KeeperState.SaslAuthenticated => SaslAuthenticated
-      case KeeperState.Unknown => throw new IllegalArgumentException("Can't convert deprecated state to StateEvent: Unknown")
-      case KeeperState.NoSyncConnected => throw new IllegalArgumentException("Can't convert deprecated state to StateEvent: NoSyncConnected")
+      case KeeperState.Unknown =>
+        throw new IllegalArgumentException(
+            "Can't convert deprecated state to StateEvent: Unknown")
+      case KeeperState.NoSyncConnected =>
+        throw new IllegalArgumentException(
+            "Can't convert deprecated state to StateEvent: NoSyncConnected")
     }
   }
 }

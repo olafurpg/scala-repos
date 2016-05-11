@@ -10,13 +10,13 @@ import com.twitter.util.StorageUnit
 import com.twitter.conversions.storage._
 
 /**
- * ChannelBufferUsageTracker tracks the channel buffer used by outstanding
- * requests. An exception will be thrown if the total size exceeds a limit.
- * ChannelBufferManager uses ChannelBufferUsageTracker.
- */
+  * ChannelBufferUsageTracker tracks the channel buffer used by outstanding
+  * requests. An exception will be thrown if the total size exceeds a limit.
+  * ChannelBufferManager uses ChannelBufferUsageTracker.
+  */
 class ChannelBufferUsageTracker(
-  limit: StorageUnit,
-  statsReceiver: StatsReceiver = NullStatsReceiver
+    limit: StorageUnit,
+    statsReceiver: StatsReceiver = NullStatsReceiver
 ) {
   private[this] object state {
     var currentUsage = 0L
@@ -27,7 +27,9 @@ class ChannelBufferUsageTracker(
   // It is probably not necessary to use synchronized methods here. We
   // can change this if there is a performance problem.
   private[this] val currentUsageStat =
-    statsReceiver.addGauge("channel_buffer_current_usage") { currentUsage.inBytes }
+    statsReceiver.addGauge("channel_buffer_current_usage") {
+      currentUsage.inBytes
+    }
   private[this] val maxUsageStat =
     statsReceiver.addGauge("channel_buffer_max_usage") { maxUsage.inBytes }
 
@@ -37,53 +39,55 @@ class ChannelBufferUsageTracker(
 
   def usageLimit(): StorageUnit = synchronized { state.usageLimit }
 
-  def setUsageLimit(limit: StorageUnit) = synchronized { state.usageLimit = limit }
+  def setUsageLimit(limit: StorageUnit) = synchronized {
+    state.usageLimit = limit
+  }
 
   def increase(size: Long) = synchronized {
     if (state.currentUsage + size > state.usageLimit.inBytes) {
       throw new ChannelBufferUsageException(
-        "Channel buffer usage exceeded limit ("
-        + currentUsage + ", " + size + " vs. " + usageLimit + ")")
+          "Channel buffer usage exceeded limit (" + currentUsage + ", " +
+          size + " vs. " + usageLimit + ")")
     } else {
       state.currentUsage += size
-      if (currentUsage > maxUsage)
-        state.maxUsage = state.currentUsage
+      if (currentUsage > maxUsage) state.maxUsage = state.currentUsage
     }
   }
 
   def decrease(size: Long) = synchronized {
     if (state.currentUsage < size) {
       throw new ChannelBufferUsageException(
-        "invalid ChannelBufferUsageTracker decrease operation ("
-        + size + " vs. " + currentUsage + ")")
+          "invalid ChannelBufferUsageTracker decrease operation (" + size +
+          " vs. " + currentUsage + ")")
     } else {
       state.currentUsage -= size
     }
   }
 }
 
-private[http]
-class ChannelBufferManager(usageTracker: ChannelBufferUsageTracker)
-  extends SimpleChannelHandler
-{
+private[http] class ChannelBufferManager(
+    usageTracker: ChannelBufferUsageTracker)
+    extends SimpleChannelHandler {
   private[this] var bufferUsage = 0L
 
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
     e.getMessage match {
       case buffer: ChannelBuffer => increaseBufferUsage(buffer.capacity())
-      case _                     =>  ()
+      case _ => ()
     }
 
     super.messageReceived(ctx, e)
   }
 
-  override def writeComplete(ctx: ChannelHandlerContext, e: WriteCompletionEvent) {
+  override def writeComplete(
+      ctx: ChannelHandlerContext, e: WriteCompletionEvent) {
     clearBufferUsage()
 
     super.writeComplete(ctx, e)
   }
 
-  override def channelClosed(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+  override def channelClosed(
+      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
     clearBufferUsage()
 
     super.channelClosed(ctx, e)
@@ -101,4 +105,3 @@ class ChannelBufferManager(usageTracker: ChannelBufferUsageTracker)
     bufferUsage = 0
   }
 }
-

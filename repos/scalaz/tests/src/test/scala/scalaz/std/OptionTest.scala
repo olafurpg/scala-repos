@@ -24,7 +24,7 @@ object OptionTest extends SpecLite {
   checkAll("Option", isEmpty.laws[Option])
   checkAll("Option", cobind.laws[Option])
   checkAll("Option", align.laws[Option])
-  
+
   checkAll("Option @@ First", monoid.laws[FirstOption[Int]])
   checkAll("Option @@ Last", monoid.laws[LastOption[Int]])
   checkAll("Option @@ Min", monoid.laws[MinOption[Int]])
@@ -35,7 +35,9 @@ object OptionTest extends SpecLite {
   checkAll("Option @@ Min", monad.laws[MinOption])
   checkAll("Option @@ Max", monad.laws[MaxOption])
 
-  "None is less than anything else" ! forAll { (x: Option[Int]) => Order[Option[Int]].greaterThanOrEqual(x, None) }
+  "None is less than anything else" ! forAll { (x: Option[Int]) =>
+    Order[Option[Int]].greaterThanOrEqual(x, None)
+  }
 
   "None is ignored in Option[A]@@Min" ! forAll { (x: Option[Int]) =>
     import syntax.monoid._
@@ -48,9 +50,9 @@ object OptionTest extends SpecLite {
   }
 
   object instances {
-    def equal[A: Equal] = Equal[Option[A]]
-    def order[A: Order] = Order[Option[A]]
-    def semigroup[A: Semigroup] = Monoid[Option[A]]
+    def equal[A : Equal] = Equal[Option[A]]
+    def order[A : Order] = Order[Option[A]]
+    def semigroup[A : Semigroup] = Monoid[Option[A]]
     def bindRec[A] = BindRec[Option]
     def monad[A] = Monad[Option]
 
@@ -58,6 +60,6 @@ object OptionTest extends SpecLite {
     def monoidLast[A] = Monoid[Option[A] @@ Last]
 
     // checking absence of ambiguity
-    def equal[A: Order] = Equal[Option[A]]
+    def equal[A : Order] = Equal[Option[A]]
   }
 }

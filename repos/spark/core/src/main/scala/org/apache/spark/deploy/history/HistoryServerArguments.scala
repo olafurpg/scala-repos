@@ -24,10 +24,11 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.Utils
 
 /**
- * Command-line parser for the master.
- */
-private[history] class HistoryServerArguments(conf: SparkConf, args: Array[String])
-  extends Logging {
+  * Command-line parser for the master.
+  */
+private[history] class HistoryServerArguments(
+    conf: SparkConf, args: Array[String])
+    extends Logging {
   private var propertiesFile: String = null
 
   parse(args.toList)
@@ -50,7 +51,6 @@ private[history] class HistoryServerArguments(conf: SparkConf, args: Array[Strin
           parse(tail)
 
         case Nil =>
-
         case _ =>
           printUsageAndExit(1)
       }
@@ -58,18 +58,18 @@ private[history] class HistoryServerArguments(conf: SparkConf, args: Array[Strin
   }
 
   private def setLogDirectory(value: String): Unit = {
-    logWarning("Setting log directory through the command line is deprecated as of " +
-      "Spark 1.1.0. Please set this through spark.history.fs.logDirectory instead.")
+    logWarning(
+        "Setting log directory through the command line is deprecated as of " +
+        "Spark 1.1.0. Please set this through spark.history.fs.logDirectory instead.")
     conf.set("spark.history.fs.logDirectory", value)
   }
 
-   // This mutates the SparkConf, so all accesses to it must be made after this line
-   Utils.loadDefaultSparkProperties(conf, propertiesFile)
+  // This mutates the SparkConf, so all accesses to it must be made after this line
+  Utils.loadDefaultSparkProperties(conf, propertiesFile)
 
   private def printUsageAndExit(exitCode: Int) {
     // scalastyle:off println
-    System.err.println(
-      """
+    System.err.println("""
       |Usage: HistoryServer [options]
       |
       |Options:
@@ -101,6 +101,4 @@ private[history] class HistoryServerArguments(conf: SparkConf, args: Array[Strin
     // scalastyle:on println
     System.exit(exitCode)
   }
-
 }
-

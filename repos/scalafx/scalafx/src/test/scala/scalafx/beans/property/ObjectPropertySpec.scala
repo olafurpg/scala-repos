@@ -43,12 +43,13 @@ import scalafx.scene.control.Button
 import scalafx.testutil.RunOnApplicationThread
 
 /**
- * ObjectProperty Spec tests.
- *
- *
- */
+  * ObjectProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
-class ObjectPropertySpec extends FlatSpec with BeforeAndAfterEach with RunOnApplicationThread {
+class ObjectPropertySpec
+    extends FlatSpec with BeforeAndAfterEach with RunOnApplicationThread {
   val bean = new Object()
   var objectProperty: jfxbp.ObjectProperty[String] = null
   var objectProperty2: jfxbp.ObjectProperty[String] = null
@@ -201,7 +202,8 @@ class ObjectPropertySpec extends FlatSpec with BeforeAndAfterEach with RunOnAppl
   it should "support implicit conversion to a String Binding" is (pending)
 
   it should "support implicit conversion from a ScalaFX ObjectProperty with a SFXDelegate of a type T to a JavaFX ObjectProperty of type T" in {
-    val scalaObjProperty: ObjectProperty[Button] = ObjectProperty[Button](new Button("Test"))
+    val scalaObjProperty: ObjectProperty[Button] =
+      ObjectProperty[Button](new Button("Test"))
     val javaObjProperty: jfxbp.ObjectProperty[jfxsc.Button] = scalaObjProperty
 
     javaObjProperty.get should be(scalaObjProperty.get.delegate)
@@ -217,7 +219,8 @@ class ObjectPropertySpec extends FlatSpec with BeforeAndAfterEach with RunOnAppl
 
   it should "bind SFX <==> JFX holding a value type like Double" in {
     val sfxProperty = ObjectProperty[Double](null, "sfx", 13.2)
-    val jfxProperty = new jfxbp.SimpleObjectProperty[Double](this, "jfx", 224.7)
+    val jfxProperty =
+      new jfxbp.SimpleObjectProperty[Double](this, "jfx", 224.7)
 
     sfxProperty <==> jfxProperty
     sfxProperty() = 17.8
@@ -231,7 +234,8 @@ class ObjectPropertySpec extends FlatSpec with BeforeAndAfterEach with RunOnAppl
 
   it should "bind JFX <==> SFX holding a value type like Double" in {
     val sfxProperty = ObjectProperty[Double](null, "sfx", 13.2)
-    val jfxProperty = new jfxbp.SimpleObjectProperty[Double](this, "jfx", 224.7)
+    val jfxProperty =
+      new jfxbp.SimpleObjectProperty[Double](this, "jfx", 224.7)
 
     jfxProperty <==> sfxProperty
     sfxProperty() = 17.8
@@ -245,11 +249,13 @@ class ObjectPropertySpec extends FlatSpec with BeforeAndAfterEach with RunOnAppl
 
   // Testing fillProperty method from companion.
 
-  private def evaluateFillProperty[T <: Object](property: ObjectProperty[T], newValue: T) {
+  private def evaluateFillProperty[T <: Object](
+      property: ObjectProperty[T], newValue: T) {
     val originalValue: T = property.value
     var oldVal: T = null.asInstanceOf[T]
     var newVal: T = null.asInstanceOf[T]
-    property.delegate.addListener(new jfxbv.ChangeListener[T] {
+    property.delegate.addListener(
+        new jfxbv.ChangeListener[T] {
       def changed(obs: jfxbv.ObservableValue[_ <: T], oldV: T, newV: T) {
         oldVal = oldV
         newVal = newV
@@ -268,15 +274,17 @@ class ObjectPropertySpec extends FlatSpec with BeforeAndAfterEach with RunOnAppl
   }
 
   "fillProperty" should "fill property with not null value if receives a not null" in {
-    evaluateFillProperty(ObjectProperty[ju.Date](new ju.Date), new ju.Date(123456L))
+    evaluateFillProperty(
+        ObjectProperty[ju.Date](new ju.Date), new ju.Date(123456L))
   }
 
   "fillProperty" should "supports variance" in {
-    evaluateFillProperty(ObjectProperty[ju.Date](new ju.Date), new java.sql.Date(1234678L))
+    evaluateFillProperty(
+        ObjectProperty[ju.Date](new ju.Date), new java.sql.Date(1234678L))
   }
 
   "fillProperty" should "supports covariance" in {
-    evaluateFillProperty(ObjectProperty[ju.Date](new java.sql.Date(1234678L)), new ju.Date)
+    evaluateFillProperty(
+        ObjectProperty[ju.Date](new java.sql.Date(1234678L)), new ju.Date)
   }
 }
-

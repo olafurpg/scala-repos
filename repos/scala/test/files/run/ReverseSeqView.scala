@@ -1,9 +1,3 @@
-
-
-
-
-
-
 object Test extends App {
 
   val lstv = List(1, 2, 3).view
@@ -12,14 +6,4 @@ object Test extends App {
   assert(lstvr.reverse == List(1, 2, 3))
   assert(lstvr.reverseIterator.toList == List(1, 2, 3))
   assert(lstvr.reverseMap(_ + 1) == List(2, 3, 4))
-
 }
-
-
-
-
-
-
-
-
-

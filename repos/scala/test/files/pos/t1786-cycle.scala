@@ -8,7 +8,8 @@ object O {
 
 trait LongTraversable extends LongTraversableLike[LongTraversable]
 
-trait LongTraversableLike[+Repr <: LongTraversableLike[Repr]] extends GenTraversableLike[Any, Repr]
+trait LongTraversableLike[+Repr <: LongTraversableLike[Repr]]
+    extends GenTraversableLike[Any, Repr]
 
 /*
 % scalac-hash v2.11.0-M8 test/files/pos/t1786-cycle.scala
@@ -54,4 +55,4 @@ Okay again after SI-1786 was reverted.
 |    |    |    |    |    caught scala.reflect.internal.Symbols$CyclicReference: illegal cyclic reference involving trait LongTraversableLike: while typing GenTraversableLike[Any, Repr]
 test/files/pos/t1786-cycle.scala:11: error: illegal cyclic reference involving trait LongTraversableLike
 trait LongTraversableLike[+Repr <: LongTraversableLike[Repr]] extends GenT
-*/
+ */

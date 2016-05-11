@@ -35,7 +35,7 @@ import scala.collection.mutable.LinkedHashSet
 import scala.util.Random
 
 import scalaz._
-import scalaz.effect.IO 
+import scalaz.effect.IO
 import scalaz.syntax.comonad._
 import scalaz.std.anyVal._
 
@@ -51,12 +51,10 @@ import org.scalacheck.Arbitrary._
 import TableModule._
 import TableModule.paths._
 
-trait BlockStoreColumnarTableModuleSpec[M[+_]] extends TableModuleSpec[M] 
-    with BlockLoadSpec[M]
-    with BlockSortSpec[M] 
-    with BlockAlignSpec[M] 
-    { self =>
-
+trait BlockStoreColumnarTableModuleSpec[M[+ _]]
+    extends TableModuleSpec[M] with BlockLoadSpec[M]
+    with BlockSortSpec[M] with BlockAlignSpec[M] {
+  self =>
 
   type MemoId = Int
 
@@ -68,36 +66,37 @@ trait BlockStoreColumnarTableModuleSpec[M[+_]] extends TableModuleSpec[M]
       "a problem sample4" in testLoadSample4
       //"a problem sample5" in testLoadSample5 //pathological sample in the case of duplicated ids.
       //"a dense dataset" in checkLoadDense //scalacheck + numeric columns = pain
-    }                           
+    }
     "sort" >> {
-      "fully homogeneous data"        in homogeneousSortSample
+      "fully homogeneous data" in homogeneousSortSample
       "fully homogeneous data with object" in homogeneousSortSampleWithNonexistentSortKey
       "data with undefined sort keys" in partiallyUndefinedSortSample
-      "heterogeneous sort keys"       in heterogeneousSortSample
+      "heterogeneous sort keys" in heterogeneousSortSample
       "heterogeneous sort keys case 2" in heterogeneousSortSample2
       "heterogeneous sort keys ascending" in heterogeneousSortSampleAscending
       "heterogeneous sort keys descending" in heterogeneousSortSampleDescending
       "top-level hetereogeneous values" in heterogeneousBaseValueTypeSample
-      "sort with a bad schema"        in badSchemaSortSample
-      "merges over three cells"       in threeCellMerge
-      "empty input"                   in emptySort
-      "with uniqueness for keys"      in uniqueSort
+      "sort with a bad schema" in badSchemaSortSample
+      "merges over three cells" in threeCellMerge
+      "empty input" in emptySort
+      "with uniqueness for keys" in uniqueSort
 
-      "arbitrary datasets"            in checkSortDense(SortAscending)
-      "arbitrary datasets descending" in checkSortDense(SortDescending)      
+      "arbitrary datasets" in checkSortDense(SortAscending)
+      "arbitrary datasets descending" in checkSortDense(SortDescending)
     }
   }
 }
 
-object BlockStoreColumnarTableModuleSpec extends BlockStoreColumnarTableModuleSpec[Need] {
+object BlockStoreColumnarTableModuleSpec
+    extends BlockStoreColumnarTableModuleSpec[Need] {
   implicit def M = Need.need
 
   type YggConfig = IdSourceConfig with ColumnarTableModuleConfig
-  
+
   val yggConfig = new IdSourceConfig with ColumnarTableModuleConfig {
     val maxSliceSize = 10
     val smallSliceSize = 3
-    
+
     val idSource = new FreshAtomicIdSource
   }
 }

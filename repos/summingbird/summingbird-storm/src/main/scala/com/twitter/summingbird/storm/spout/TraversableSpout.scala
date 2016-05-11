@@ -22,15 +22,17 @@ import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.tuple.Fields
 import backtype.storm.tuple.Values
 import com.twitter.tormenta.spout.Spout
-import java.util.{ List => JList, ArrayList }
+import java.util.{List => JList, ArrayList}
 import collection.JavaConverters._
 
 object TraversableSpout {
-  def apply[T](items: TraversableOnce[T], fieldName: String = "item"): TraversableSpout[T] =
+  def apply[T](items: TraversableOnce[T],
+               fieldName: String = "item"): TraversableSpout[T] =
     new TraversableSpout(items, fieldName)
 }
 
-class TraversableSpout[+T](items: TraversableOnce[T], fieldName: String) extends Spout[T] {
+class TraversableSpout[+T](items: TraversableOnce[T], fieldName: String)
+    extends Spout[T] {
   private def wrap[T](t: T) = new Values(t.asInstanceOf[AnyRef])
 
   lazy val tupleList = items.toList

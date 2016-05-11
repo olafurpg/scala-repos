@@ -4,7 +4,7 @@ class SelfInvocation(x: Int, y: Int) {
   }
 
   def this(x: Int) {
-    this(/*caret*/)
+    this( /*caret*/ )
   }
 
   def this(b: Boolean) {
@@ -14,4 +14,4 @@ class SelfInvocation(x: Int, y: Int) {
 /*
 s: String
 x: Int, y: Int
-*/
+ */

@@ -1,18 +1,19 @@
 /**
- * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
- */
-
+  * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
+  */
 package akka.util
 
 import java.util.concurrent.locks.ReentrantLock
-import java.util.concurrent.{ TimeUnit, BlockingQueue }
-import java.util.{ AbstractQueue, Queue, Collection, Iterator }
+import java.util.concurrent.{TimeUnit, BlockingQueue}
+import java.util.{AbstractQueue, Queue, Collection, Iterator}
 
 class BoundedBlockingQueue[E <: AnyRef](
-  val maxCapacity: Int, private val backing: Queue[E]) extends AbstractQueue[E] with BlockingQueue[E] {
+    val maxCapacity: Int, private val backing: Queue[E])
+    extends AbstractQueue[E] with BlockingQueue[E] {
 
   backing match {
-    case null => throw new IllegalArgumentException("Backing Queue may not be null")
+    case null =>
+      throw new IllegalArgumentException("Backing Queue may not be null")
     case b: BlockingQueue[_] =>
       require(maxCapacity > 0)
       require(b.size() == 0)
@@ -27,12 +28,12 @@ class BoundedBlockingQueue[E <: AnyRef](
   private val notEmpty = lock.newCondition()
   private val notFull = lock.newCondition()
 
-  def put(e: E): Unit = { //Blocks until not full
+  def put(e: E): Unit = {
+    //Blocks until not full
     if (e eq null) throw new NullPointerException
     lock.lock()
     try {
-      while (backing.size() == maxCapacity)
-        notFull.await()
+      while (backing.size() == maxCapacity) notFull.await()
       require(backing.offer(e))
       notEmpty.signal()
     } finally {
@@ -40,11 +41,11 @@ class BoundedBlockingQueue[E <: AnyRef](
     }
   }
 
-  def take(): E = { //Blocks until not empty
+  def take(): E = {
+    //Blocks until not empty
     lock.lockInterruptibly()
     try {
-      while (backing.size() == 0)
-        notEmpty.await()
+      while (backing.size() == 0) notEmpty.await()
       val e = backing.poll()
       require(e ne null)
       notFull.signal()
@@ -54,7 +55,8 @@ class BoundedBlockingQueue[E <: AnyRef](
     }
   }
 
-  def offer(e: E): Boolean = { //Tries to do it immediately, if fail return false
+  def offer(e: E): Boolean = {
+    //Tries to do it immediately, if fail return false
     if (e eq null) throw new NullPointerException
     lock.lock()
     try {
@@ -69,16 +71,15 @@ class BoundedBlockingQueue[E <: AnyRef](
     }
   }
 
-  def offer(e: E, timeout: Long, unit: TimeUnit): Boolean = { //Tries to do it within the timeout, return false if fail
+  def offer(e: E, timeout: Long, unit: TimeUnit): Boolean = {
+    //Tries to do it within the timeout, return false if fail
     if (e eq null) throw new NullPointerException
     var nanos = unit.toNanos(timeout)
     lock.lockInterruptibly()
     try {
       while (backing.size() == maxCapacity) {
-        if (nanos <= 0)
-          return false
-        else
-          nanos = notFull.awaitNanos(nanos)
+        if (nanos <= 0) return false
+        else nanos = notFull.awaitNanos(nanos)
       }
       require(backing.offer(e)) //Should never fail
       notEmpty.signal()
@@ -88,7 +89,8 @@ class BoundedBlockingQueue[E <: AnyRef](
     }
   }
 
-  def poll(timeout: Long, unit: TimeUnit): E = { //Tries to do it within the timeout, returns null if fail
+  def poll(timeout: Long, unit: TimeUnit): E = {
+    //Tries to do it within the timeout, returns null if fail
     var nanos = unit.toNanos(timeout)
     lock.lockInterruptibly()
     try {
@@ -120,7 +122,8 @@ class BoundedBlockingQueue[E <: AnyRef](
     }
   }
 
-  def poll(): E = { //Tries to remove the head of the queue immediately, if fail, return null
+  def poll(): E = {
+    //Tries to remove the head of the queue immediately, if fail, return null
     lock.lock()
     try {
       backing.poll() match {
@@ -134,7 +137,8 @@ class BoundedBlockingQueue[E <: AnyRef](
     }
   }
 
-  override def remove(e: AnyRef): Boolean = { //Tries to do it immediately, if fail, return false
+  override def remove(e: AnyRef): Boolean = {
+    //Tries to do it immediately, if fail, return false
     if (e eq null) throw new NullPointerException
     lock.lock()
     try {

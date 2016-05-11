@@ -29,12 +29,13 @@ import org.apache.spark.sql.functions.{col, udf}
 import org.apache.spark.sql.types.{ArrayType, StructType}
 
 /**
- * :: Experimental ::
- * Maps a sequence of terms to their term frequencies using the hashing trick.
- */
+  * :: Experimental ::
+  * Maps a sequence of terms to their term frequencies using the hashing trick.
+  */
 @Experimental
 class HashingTF(override val uid: String)
-  extends Transformer with HasInputCol with HasOutputCol with DefaultParamsWritable {
+    extends Transformer with HasInputCol with HasOutputCol
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("hashingTF"))
 
@@ -45,12 +46,12 @@ class HashingTF(override val uid: String)
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
   /**
-   * Number of features.  Should be > 0.
-   * (default = 2^18^)
-   * @group param
-   */
-  val numFeatures = new IntParam(this, "numFeatures", "number of features (> 0)",
-    ParamValidators.gt(0))
+    * Number of features.  Should be > 0.
+    * (default = 2^18^)
+    * @group param
+    */
+  val numFeatures = new IntParam(
+      this, "numFeatures", "number of features (> 0)", ParamValidators.gt(0))
 
   setDefault(numFeatures -> (1 << 18))
 
@@ -63,7 +64,9 @@ class HashingTF(override val uid: String)
   override def transform(dataset: DataFrame): DataFrame = {
     val outputSchema = transformSchema(dataset.schema)
     val hashingTF = new feature.HashingTF($(numFeatures))
-    val t = udf { terms: Seq[_] => hashingTF.transform(terms) }
+    val t = udf { terms: Seq[_] =>
+      hashingTF.transform(terms)
+    }
     val metadata = outputSchema($(outputCol)).metadata
     dataset.select(col("*"), t(col($(inputCol))).as($(outputCol), metadata))
   }
@@ -71,7 +74,7 @@ class HashingTF(override val uid: String)
   override def transformSchema(schema: StructType): StructType = {
     val inputType = schema($(inputCol)).dataType
     require(inputType.isInstanceOf[ArrayType],
-      s"The input column must be ArrayType, but got $inputType.")
+            s"The input column must be ArrayType, but got $inputType.")
     val attrGroup = new AttributeGroup($(outputCol), $(numFeatures))
     SchemaUtils.appendColumn(schema, attrGroup.toStructField())
   }

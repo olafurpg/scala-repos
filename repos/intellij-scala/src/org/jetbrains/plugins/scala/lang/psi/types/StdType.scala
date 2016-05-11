@@ -11,61 +11,66 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{ScSyntheticClass, SyntheticClasses}
 
-
-abstract class StdType(val name: String, val tSuper: Option[StdType]) extends ValueType {
+abstract class StdType(val name: String, val tSuper: Option[StdType])
+    extends ValueType {
   def visitType(visitor: ScalaTypeVisitor) {
     visitor.visitStdType(this)
   }
 
   /**
-   * Return wrapped to option appropriate synthetic class.
-   * In dumb mode returns None (or before it ends to register classes).
-   * @param project in which project to find this class
-   * @return If possible class to represent this type.
-   */
+    * Return wrapped to option appropriate synthetic class.
+    * In dumb mode returns None (or before it ends to register classes).
+    * @param project in which project to find this class
+    * @return If possible class to represent this type.
+    */
   def asClass(project: Project): Option[ScSyntheticClass] = {
     if (SyntheticClasses.get(project).isClassesRegistered)
       Some(SyntheticClasses.get(project).byName(name).get)
     else None
   }
 
-  override def equivInner(r: ScType, subst: ScUndefinedSubstitutor, falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
+  override def equivInner(
+      r: ScType,
+      subst: ScUndefinedSubstitutor,
+      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
     (this, r) match {
       case (l: StdType, _: StdType) => (l == r, subst)
       case (AnyRef, _) => {
-        ScType.extractClass(r) match {
-          case Some(clazz) if clazz.qualifiedName == "java.lang.Object" => (true, subst)
-          case _ => (false, subst)
+          ScType.extractClass(r) match {
+            case Some(clazz) if clazz.qualifiedName == "java.lang.Object" =>
+              (true, subst)
+            case _ => (false, subst)
+          }
         }
-      }
       case (_, _) => {
-        ScType.extractClass(r) match {
-          case Some(o: ScObject)  => (false, subst)
-          case Some(clazz) if clazz.qualifiedName == "scala." + name => (true, subst)
-          case _ => (false, subst)
+          ScType.extractClass(r) match {
+            case Some(o: ScObject) => (false, subst)
+            case Some(clazz) if clazz.qualifiedName == "scala." + name =>
+              (true, subst)
+            case _ => (false, subst)
+          }
         }
-      }
     }
   }
 }
 
 object StdType {
   val QualNameToType = Map(
-    "scala.Any" -> Any,
-    "scala.AnyRef" -> AnyRef,
-    "scala.AnyVal" -> AnyVal,
-    "scala.Unit" -> Unit,
-    "scala.Boolean" -> Boolean,
-    "scala.Byte" -> Byte,
-    "scala.Short" -> Short,
-    "scala.Char" -> Char,
-    "scala.Int" -> Int,
-    "scala.Long" -> Long,
-    "scala.Double" -> Double,
-    "scala.Float" -> Float,
-    "scala.Null" -> Null,
-    "scala.Nothing" -> Nothing,
-    "scala.Singleton" -> Singleton
+      "scala.Any" -> Any,
+      "scala.AnyRef" -> AnyRef,
+      "scala.AnyVal" -> AnyVal,
+      "scala.Unit" -> Unit,
+      "scala.Boolean" -> Boolean,
+      "scala.Byte" -> Byte,
+      "scala.Short" -> Short,
+      "scala.Char" -> Char,
+      "scala.Int" -> Int,
+      "scala.Long" -> Long,
+      "scala.Double" -> Double,
+      "scala.Float" -> Float,
+      "scala.Null" -> Null,
+      "scala.Nothing" -> Nothing,
+      "scala.Singleton" -> Singleton
   )
 
   val ANY = Any
@@ -86,14 +91,14 @@ object StdType {
 
   import com.intellij.psi.CommonClassNames._
   val fqnBoxedToScType = Map(
-    JAVA_LANG_BOOLEAN -> Boolean,
-    JAVA_LANG_BYTE -> Byte,
-    JAVA_LANG_CHARACTER -> Char,
-    JAVA_LANG_SHORT -> Short,
-    JAVA_LANG_INTEGER -> Int,
-    JAVA_LANG_LONG -> Long,
-    JAVA_LANG_FLOAT -> Float,
-    JAVA_LANG_DOUBLE -> Double
+      JAVA_LANG_BOOLEAN -> Boolean,
+      JAVA_LANG_BYTE -> Byte,
+      JAVA_LANG_CHARACTER -> Char,
+      JAVA_LANG_SHORT -> Short,
+      JAVA_LANG_INTEGER -> Int,
+      JAVA_LANG_LONG -> Long,
+      JAVA_LANG_FLOAT -> Float,
+      JAVA_LANG_DOUBLE -> Double
   )
 
   def unboxedType(tp: ScType): ScType = {
@@ -102,7 +107,8 @@ object StdType {
     else tp
   }
 
-  def unapply(tp: StdType): Option[(String, Option[StdType])] = Some(tp.name, tp.tSuper)
+  def unapply(tp: StdType): Option[(String, Option[StdType])] =
+    Some(tp.name, tp.tSuper)
 }
 
 trait ValueType extends ScType {
@@ -131,14 +137,16 @@ case object AnyVal extends StdType("AnyVal", Some(Any)) {
   override def getValType: Option[StdType] = Some(this)
 }
 
-abstract class ValType(override val name: String) extends StdType(name, Some(AnyVal)) {
+abstract class ValType(override val name: String)
+    extends StdType(name, Some(AnyVal)) {
   def apply(element: PsiElement): ScType = {
     apply(element.getManager, element.getResolveScope)
   }
 
   def apply(manager: PsiManager, scope: GlobalSearchScope): ScType = {
-    val clazz =
-      ScalaPsiManager.instance(manager.getProject).getCachedClass(scope, "scala." + name)
+    val clazz = ScalaPsiManager
+      .instance(manager.getProject)
+      .getCachedClass(scope, "scala." + name)
     clazz.map(ScDesignatorType(_)).getOrElse(this)
   }
 

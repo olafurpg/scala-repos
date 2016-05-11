@@ -7,9 +7,8 @@ import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.ensime.util.EnsimeSpec
 
-class SexpParserCheck extends EnsimeSpec
-    with GeneratorDrivenPropertyChecks
-    with ArbitrarySexp {
+class SexpParserCheck
+    extends EnsimeSpec with GeneratorDrivenPropertyChecks with ArbitrarySexp {
 
   import SexpParser.parse
 
@@ -37,19 +36,20 @@ trait ArbitrarySexp {
   lazy val genSexpSymbol: Gen[SexpSymbol] =
     alphaStr.filter(_.nonEmpty).map(SexpSymbol)
 
-  lazy val genSexpKey: Gen[SexpSymbol] =
-    alphaStr.filter(_.nonEmpty).map { s => SexpSymbol(":" + s) }
+  lazy val genSexpKey: Gen[SexpSymbol] = alphaStr.filter(_.nonEmpty).map { s =>
+    SexpSymbol(":" + s)
+  }
 
   // TODO: String/Char should be selected from a wider range
   // TODO: arbitrary[BigDecimal] but it freezes the tests
   // TODO: cons in SexpCons car, but it dramatically slows things
   lazy val genSexpAtom: Gen[SexpAtom] = oneOf(
-    alphaNumChar.map(SexpChar),
-    alphaStr.map(SexpString),
-    genSexpSymbol,
-    arbitrary[Double].map(SexpNumber(_)),
-    //arbitrary[BigDecimal].map(SexpNumber(_)),
-    oneOf(SexpNil, SexpPosInf, SexpNegInf, SexpNaN)
+      alphaNumChar.map(SexpChar),
+      alphaStr.map(SexpString),
+      genSexpSymbol,
+      arbitrary[Double].map(SexpNumber(_)),
+      //arbitrary[BigDecimal].map(SexpNumber(_)),
+      oneOf(SexpNil, SexpPosInf, SexpNegInf, SexpNaN)
   )
 
   def genSexpCons(level: Int): Gen[SexpCons] =
@@ -62,21 +62,22 @@ trait ArbitrarySexp {
     nonEmptyListOf(genSexp(level + 1)).map(SexpList(_))
 
   def genSexpData(level: Int): Gen[Sexp] =
-    mapOfN(2, zip(genSexpKey, genSexp(level + 1))).map {
-      kvs => SexpData(kvs.toList)
+    mapOfN(2, zip(genSexpKey, genSexp(level + 1))).map { kvs =>
+      SexpData(kvs.toList)
     }
 
   // our parser is soooo slow for deep trees
   def genSexp(level: Int): Gen[Sexp] =
     if (level >= 4) genSexpAtom
-    else lzy {
-      oneOf(
-        genSexpAtom,
-        genSexpCons(level + 1),
-        genSexpList(level + 1),
-        genSexpData(level + 1)
-      )
-    }
+    else
+      lzy {
+        oneOf(
+            genSexpAtom,
+            genSexpCons(level + 1),
+            genSexpList(level + 1),
+            genSexpData(level + 1)
+        )
+      }
 
   implicit def arbSexp: Arbitrary[Sexp] = Arbitrary(genSexp(0))
 }

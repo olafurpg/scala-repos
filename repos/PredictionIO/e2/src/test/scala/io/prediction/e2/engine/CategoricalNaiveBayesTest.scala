@@ -19,8 +19,9 @@ import org.scalatest.{Matchers, FlatSpec}
 
 import scala.language.reflectiveCalls
 
-class CategoricalNaiveBayesTest extends FlatSpec with Matchers
-with SharedSparkContext with NaiveBayesFixture {
+class CategoricalNaiveBayesTest
+    extends FlatSpec with Matchers with SharedSparkContext
+    with NaiveBayesFixture {
   val Tolerance = .0001
   val labeledPoints = fruit.labeledPoints
 
@@ -32,40 +33,40 @@ with SharedSparkContext with NaiveBayesFixture {
     model.priors(fruit.Orange) should be(-1.7047 +- Tolerance)
     model.priors(fruit.OtherFruit) should be(-1.0116 +- Tolerance)
 
-    model.likelihoods(fruit.Banana)(0)(fruit.Long) should
-      be(-.2231 +- Tolerance)
-    model.likelihoods(fruit.Banana)(0)(fruit.NotLong) should
-      be(-1.6094 +- Tolerance)
-    model.likelihoods(fruit.Banana)(1)(fruit.Sweet) should
-      be(-.2231 +- Tolerance)
-    model.likelihoods(fruit.Banana)(1)(fruit.NotSweet) should
-      be(-1.6094 +- Tolerance)
-    model.likelihoods(fruit.Banana)(2)(fruit.Yellow) should
-      be(-.2231 +- Tolerance)
-    model.likelihoods(fruit.Banana)(2)(fruit.NotYellow) should
-      be(-1.6094 +- Tolerance)
+    model.likelihoods(fruit.Banana)(0)(fruit.Long) should be(
+        -.2231 +- Tolerance)
+    model.likelihoods(fruit.Banana)(0)(fruit.NotLong) should be(
+        -1.6094 +- Tolerance)
+    model.likelihoods(fruit.Banana)(1)(fruit.Sweet) should be(
+        -.2231 +- Tolerance)
+    model.likelihoods(fruit.Banana)(1)(fruit.NotSweet) should be(
+        -1.6094 +- Tolerance)
+    model.likelihoods(fruit.Banana)(2)(fruit.Yellow) should be(
+        -.2231 +- Tolerance)
+    model.likelihoods(fruit.Banana)(2)(fruit.NotYellow) should be(
+        -1.6094 +- Tolerance)
 
     model.likelihoods(fruit.Orange)(0) should not contain key(fruit.Long)
     model.likelihoods(fruit.Orange)(0)(fruit.NotLong) should be(0.0)
-    model.likelihoods(fruit.Orange)(1)(fruit.Sweet) should
-      be(-.6931 +- Tolerance)
-    model.likelihoods(fruit.Orange)(1)(fruit.NotSweet) should
-      be(-.6931 +- Tolerance)
+    model.likelihoods(fruit.Orange)(1)(fruit.Sweet) should be(
+        -.6931 +- Tolerance)
+    model.likelihoods(fruit.Orange)(1)(fruit.NotSweet) should be(
+        -.6931 +- Tolerance)
     model.likelihoods(fruit.Orange)(2)(fruit.NotYellow) should be(0.0)
     model.likelihoods(fruit.Orange)(2) should not contain key(fruit.Yellow)
 
-    model.likelihoods(fruit.OtherFruit)(0)(fruit.Long) should
-      be(-.6931 +- Tolerance)
-    model.likelihoods(fruit.OtherFruit)(0)(fruit.NotLong) should
-      be(-.6931 +- Tolerance)
-    model.likelihoods(fruit.OtherFruit)(1)(fruit.Sweet) should
-      be(-.2877 +- Tolerance)
-    model.likelihoods(fruit.OtherFruit)(1)(fruit.NotSweet) should
-      be(-1.3863 +- Tolerance)
-    model.likelihoods(fruit.OtherFruit)(2)(fruit.Yellow) should
-      be(-1.3863 +- Tolerance)
-    model.likelihoods(fruit.OtherFruit)(2)(fruit.NotYellow) should
-      be(-.2877 +- Tolerance)
+    model.likelihoods(fruit.OtherFruit)(0)(fruit.Long) should be(
+        -.6931 +- Tolerance)
+    model.likelihoods(fruit.OtherFruit)(0)(fruit.NotLong) should be(
+        -.6931 +- Tolerance)
+    model.likelihoods(fruit.OtherFruit)(1)(fruit.Sweet) should be(
+        -.2877 +- Tolerance)
+    model.likelihoods(fruit.OtherFruit)(1)(fruit.NotSweet) should be(
+        -1.3863 +- Tolerance)
+    model.likelihoods(fruit.OtherFruit)(2)(fruit.Yellow) should be(
+        -1.3863 +- Tolerance)
+    model.likelihoods(fruit.OtherFruit)(2)(fruit.NotYellow) should be(
+        -.2877 +- Tolerance)
   }
 
   "Model's log score" should "be the log score of the given point" in {
@@ -73,9 +74,7 @@ with SharedSparkContext with NaiveBayesFixture {
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
     val score = model.logScore(LabeledPoint(
-      fruit.Banana,
-      Array(fruit.Long, fruit.NotSweet, fruit.NotYellow))
-    )
+            fruit.Banana, Array(fruit.Long, fruit.NotSweet, fruit.NotYellow)))
 
     score should not be None
     score.get should be(-4.2304 +- Tolerance)
@@ -86,9 +85,7 @@ with SharedSparkContext with NaiveBayesFixture {
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
     val score = model.logScore(LabeledPoint(
-      fruit.Banana,
-      Array(fruit.Long, fruit.NotSweet, "Not Exist"))
-    )
+            fruit.Banana, Array(fruit.Long, fruit.NotSweet, "Not Exist")))
 
     score should not be None
     score.get should be(Double.NegativeInfinity)
@@ -99,9 +96,7 @@ with SharedSparkContext with NaiveBayesFixture {
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
     val score = model.logScore(LabeledPoint(
-      "Not Exist",
-      Array(fruit.Long, fruit.NotSweet, fruit.Yellow))
-    )
+            "Not Exist", Array(fruit.Long, fruit.NotSweet, fruit.Yellow)))
 
     score should be(None)
   }
@@ -111,11 +106,11 @@ with SharedSparkContext with NaiveBayesFixture {
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
     val score = model.logScore(
-      LabeledPoint(
-        fruit.Banana,
-        Array(fruit.Long, fruit.NotSweet, "Not Exist")
-      ),
-      ls => ls.min - math.log(2)
+        LabeledPoint(
+            fruit.Banana,
+            Array(fruit.Long, fruit.NotSweet, "Not Exist")
+        ),
+        ls => ls.min - math.log(2)
     )
 
     score should not be None

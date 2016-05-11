@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.camel.internal.component
 
 import language.postfixOps
@@ -19,7 +18,8 @@ class DurationConverterSpec extends WordSpec with Matchers {
   }
 
   "DurationTypeConverter must do the roundtrip" in {
-    convertTo(classOf[Duration], (10 seconds).toString()) should ===(10 seconds)
+    convertTo(classOf[Duration], (10 seconds).toString()) should ===(
+        10 seconds)
   }
 
   "DurationTypeConverter must throw if invalid format" in {
@@ -37,6 +37,4 @@ class DurationConverterSpec extends WordSpec with Matchers {
       mandatoryConvertTo(classOf[Duration], "10233") should ===(10 nanos)
     }.getValue should ===("10233")
   }
-
 }
-

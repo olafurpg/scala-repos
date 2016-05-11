@@ -5,7 +5,7 @@ package play.forkrun.protocol
 
 import org.specs2.mutable._
 import play.forkrun.protocol.Serializers._
-import play.runsupport.Reloader.{ Source, CompileSuccess, CompileFailure, CompileResult }
+import play.runsupport.Reloader.{Source, CompileSuccess, CompileFailure, CompileResult}
 import sbt.serialization._
 
 object SerializersSpec extends Specification with PicklingTestUtils {
@@ -50,23 +50,23 @@ object SerializersSpec extends Specification with PicklingTestUtils {
 
     "roundtrip fork config" in {
       val forkConfig = ForkConfig(
-        projectDirectory = file("foo"),
-        javaOptions = Seq("a"),
-        dependencyClasspath = Seq(file("bar")),
-        allAssets = Seq("a" -> file("baz")),
-        docsClasspath = Seq(file("blah")),
-        docsJar = Option(file("docs")),
-        devSettings = Seq("a" -> "b"),
-        defaultHttpPort = 3456,
-        defaultHttpAddress = "1.2.3.4",
-        watchService = ForkConfig.JNotifyWatchService,
-        monitoredFiles = Seq(file("c")),
-        targetDirectory = file("target"),
-        pollInterval = 100,
-        notifyKey = "abcdefg",
-        reloadKey = "hijklmnop",
-        compileTimeout = 1000,
-        mainClass = "play.Server"
+          projectDirectory = file("foo"),
+          javaOptions = Seq("a"),
+          dependencyClasspath = Seq(file("bar")),
+          allAssets = Seq("a" -> file("baz")),
+          docsClasspath = Seq(file("blah")),
+          docsJar = Option(file("docs")),
+          devSettings = Seq("a" -> "b"),
+          defaultHttpPort = 3456,
+          defaultHttpAddress = "1.2.3.4",
+          watchService = ForkConfig.JNotifyWatchService,
+          monitoredFiles = Seq(file("c")),
+          targetDirectory = file("target"),
+          pollInterval = 100,
+          notifyKey = "abcdefg",
+          reloadKey = "hijklmnop",
+          compileTimeout = 1000,
+          mainClass = "play.Server"
       )
       roundTrip(forkConfig)
     }
@@ -78,33 +78,39 @@ trait PicklingTestUtils extends Specification {
   import org.specs2.matcher._
 
   private def addWhatWeWerePickling[T, U](t: T)(body: => U): U =
-    try body
-    catch {
+    try body catch {
       case e: Throwable =>
         e.printStackTrace()
-        throw new AssertionError(s"Crash round-tripping ${t.getClass.getName}: value was: ${t}", e)
+        throw new AssertionError(
+            s"Crash round-tripping ${t.getClass.getName}: value was: ${t}", e)
     }
 
-  def roundTripArray[A](x: Array[A])(implicit ev0: Pickler[Array[A]], ev1: Unpickler[Array[A]]): MatchResult[Any] =
-    roundTripBase[Array[A]](x)((a, b) =>
-      (a.toList) must beEqualTo(b.toList)) { (a, b) =>
+  def roundTripArray[A](
+      x: Array[A])(implicit ev0: Pickler[Array[A]],
+                   ev1: Unpickler[Array[A]]): MatchResult[Any] =
+    roundTripBase[Array[A]](x)((a, b) => (a.toList) must beEqualTo(b.toList)) {
+      (a, b) =>
+        a.getMessage must beEqualTo(b.getMessage)
+    }
+
+  def roundTrip[A : Pickler : Unpickler](x: A): MatchResult[Any] =
+    roundTripBase[A](x)((a, b) => a must beEqualTo(b)) { (a, b) =>
       a.getMessage must beEqualTo(b.getMessage)
     }
 
-  def roundTrip[A: Pickler: Unpickler](x: A): MatchResult[Any] =
-    roundTripBase[A](x)((a, b) =>
-      a must beEqualTo(b)) { (a, b) =>
-      a.getMessage must beEqualTo(b.getMessage)
+  def roundTripBase[A : Pickler : Unpickler](a: A)(
+      f: (A, A) => MatchResult[Any])(
+      e: (Throwable, Throwable) => MatchResult[Any]): MatchResult[Any] =
+    addWhatWeWerePickling(a) {
+      val json = SerializedValue(a).toJsonString
+      //System.err.println(s"json: $json")
+      val parsed = SerializedValue
+        .fromJsonString(json)
+        .parse[A]
+        .get
+        (a, parsed) match {
+        case (a: Throwable, parsed: Throwable) => e(a, parsed)
+        case _ => f(a, parsed)
+      }
     }
-
-  def roundTripBase[A: Pickler: Unpickler](a: A)(f: (A, A) => MatchResult[Any])(e: (Throwable, Throwable) => MatchResult[Any]): MatchResult[Any] = addWhatWeWerePickling(a) {
-    val json = SerializedValue(a).toJsonString
-    //System.err.println(s"json: $json")
-    val parsed = SerializedValue.fromJsonString(json).parse[A].get
-    (a, parsed) match {
-      case (a: Throwable, parsed: Throwable) => e(a, parsed)
-      case _ => f(a, parsed)
-    }
-  }
-
 }

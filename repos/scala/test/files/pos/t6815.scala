@@ -12,6 +12,7 @@ object Test {
   val u: U = ???
 
   u.emptyValDef match {
-    case u.emptyValDef => // but we shouldn't let that stop us from treating it as a stable identifier pattern.
+    case u.emptyValDef =>
+    // but we shouldn't let that stop us from treating it as a stable identifier pattern.
   }
 }

@@ -18,7 +18,6 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
-
 class ConvertToTypedPatternIntention extends PsiElementBaseIntentionAction {
   def getFamilyName = "Convert to typed pattern"
 
@@ -26,8 +25,10 @@ class ConvertToTypedPatternIntention extends PsiElementBaseIntentionAction {
 
   def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
     element match {
-      case e @ Parent(Both(ref: ScStableCodeReferenceElement, Parent(_: ScConstructorPattern))) => true
-        
+      case e @ Parent(Both(ref: ScStableCodeReferenceElement,
+                           Parent(_: ScConstructorPattern))) =>
+        true
+
       case _ => false
     }
   }
@@ -37,7 +38,8 @@ class ConvertToTypedPatternIntention extends PsiElementBaseIntentionAction {
     val constrPattern = codeRef.getParent.asInstanceOf[ScConstructorPattern]
     val manager = codeRef.getManager
     val name = codeRef.bind() match {
-      case Some( result @ ScalaResolveResult(fun: ScFunctionDefinition, _)) if fun.name == "unapply"=>
+      case Some(result @ ScalaResolveResult(fun: ScFunctionDefinition, _))
+          if fun.name == "unapply" =>
         // TODO follow aliases
         result.parentElement match {
           case Some(obj: ScObject) =>
@@ -53,7 +55,8 @@ class ConvertToTypedPatternIntention extends PsiElementBaseIntentionAction {
       case _ => "value"
     }
     // TODO replace references to the constructor pattern params with "value.param"
-    val newPattern = ScalaPsiElementFactory.createPatternFromText("%s: %s".format(name, codeRef.getText), manager)
+    val newPattern = ScalaPsiElementFactory.createPatternFromText(
+        "%s: %s".format(name, codeRef.getText), manager)
     constrPattern.replace(newPattern)
   }
 }

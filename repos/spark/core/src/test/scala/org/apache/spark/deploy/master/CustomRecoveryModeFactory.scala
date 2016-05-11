@@ -29,24 +29,26 @@ import org.apache.spark.deploy.master._
 import org.apache.spark.serializer.Serializer
 
 class CustomRecoveryModeFactory(
-  conf: SparkConf,
-  serializer: Serializer
-) extends StandaloneRecoveryModeFactory(conf, serializer) {
+    conf: SparkConf,
+    serializer: Serializer
+)
+    extends StandaloneRecoveryModeFactory(conf, serializer) {
 
   CustomRecoveryModeFactory.instantiationAttempts += 1
 
   /**
-   * PersistenceEngine defines how the persistent data(Information about worker, driver etc..)
-   * is handled for recovery.
-   *
-   */
+    * PersistenceEngine defines how the persistent data(Information about worker, driver etc..)
+    * is handled for recovery.
+    *
+    */
   override def createPersistenceEngine(): PersistenceEngine =
     new CustomPersistenceEngine(serializer)
 
   /**
-   * Create an instance of LeaderAgent that decides who gets elected as master.
-   */
-  override def createLeaderElectionAgent(master: LeaderElectable): LeaderElectionAgent =
+    * Create an instance of LeaderAgent that decides who gets elected as master.
+    */
+  override def createLeaderElectionAgent(
+      master: LeaderElectable): LeaderElectionAgent =
     new CustomLeaderElectionAgent(master)
 }
 
@@ -54,15 +56,16 @@ object CustomRecoveryModeFactory {
   @volatile var instantiationAttempts = 0
 }
 
-class CustomPersistenceEngine(serializer: Serializer) extends PersistenceEngine {
+class CustomPersistenceEngine(serializer: Serializer)
+    extends PersistenceEngine {
   val data = mutable.HashMap[String, Array[Byte]]()
 
   CustomPersistenceEngine.lastInstance = Some(this)
 
   /**
-   * Defines how the object is serialized and persisted. Implementation will
-   * depend on the store used.
-   */
+    * Defines how the object is serialized and persisted. Implementation will
+    * depend on the store used.
+    */
   override def persist(name: String, obj: Object): Unit = {
     CustomPersistenceEngine.persistAttempts += 1
     val serialized = serializer.newInstance().serialize(obj)
@@ -72,21 +75,21 @@ class CustomPersistenceEngine(serializer: Serializer) extends PersistenceEngine 
   }
 
   /**
-   * Defines how the object referred by its name is removed from the store.
-   */
+    * Defines how the object referred by its name is removed from the store.
+    */
   override def unpersist(name: String): Unit = {
     CustomPersistenceEngine.unpersistAttempts += 1
     data -= name
   }
 
   /**
-   * Gives all objects, matching a prefix. This defines how objects are
-   * read/deserialized back.
-   */
-  override def read[T: ClassTag](prefix: String): Seq[T] = {
+    * Gives all objects, matching a prefix. This defines how objects are
+    * read/deserialized back.
+    */
+  override def read[T : ClassTag](prefix: String): Seq[T] = {
     CustomPersistenceEngine.readAttempts += 1
-    val results = for ((name, bytes) <- data; if name.startsWith(prefix))
-      yield serializer.newInstance().deserialize[T](ByteBuffer.wrap(bytes))
+    val results = for ((name, bytes) <- data; if name.startsWith(prefix)) yield
+      serializer.newInstance().deserialize[T](ByteBuffer.wrap(bytes))
     results.toSeq
   }
 }
@@ -99,7 +102,7 @@ object CustomPersistenceEngine {
   @volatile var lastInstance: Option[CustomPersistenceEngine] = None
 }
 
-class CustomLeaderElectionAgent(val masterInstance: LeaderElectable) extends LeaderElectionAgent {
+class CustomLeaderElectionAgent(val masterInstance: LeaderElectable)
+    extends LeaderElectionAgent {
   masterInstance.electedLeader()
 }
-

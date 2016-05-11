@@ -1,11 +1,12 @@
 package com.twitter.scalding
 
 import java.util.concurrent.ConcurrentHashMap
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
+
 /**
- * This is a map for values that are produced in futures
- * as is common in Execution
- */
+  * This is a map for values that are produced in futures
+  * as is common in Execution
+  */
 class FutureCache[-K, V] {
   private[this] val cache = new ConcurrentHashMap[K, Future[V]]()
 
@@ -15,8 +16,8 @@ class FutureCache[-K, V] {
     getOrElseUpdateIsNew(k, res)._2
 
   /**
-   * Tells you if this was the first lookup of this key or not
-   */
+    * Tells you if this was the first lookup of this key or not
+    */
   def getOrElseUpdateIsNew(k: K, res: => Future[V]): (Boolean, Future[V]) =
     getOrPromise(k) match {
       case Left(promise) =>
@@ -27,9 +28,9 @@ class FutureCache[-K, V] {
     }
 
   /**
-   * If you get a Left value as a result you MUST complete that Promise
-   * or you may deadlock other callers
-   */
+    * If you get a Left value as a result you MUST complete that Promise
+    * or you may deadlock other callers
+    */
   def getOrPromise(k: K): Either[Promise[V], Future[V]] = {
     /*
      * Since we don't want to evaluate res twice, we make a promise

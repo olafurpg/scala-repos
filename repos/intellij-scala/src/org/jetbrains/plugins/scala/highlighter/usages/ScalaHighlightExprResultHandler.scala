@@ -12,10 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 
 import scala.collection.JavaConversions._
 
-
-class ScalaHighlightExprResultHandler(expr: ScExpression, editor: Editor,
-                                      file: PsiFile, keyword: PsiElement)
-  extends HighlightUsagesHandlerBase[PsiElement](editor, file) {
+class ScalaHighlightExprResultHandler(expr: ScExpression,
+                                      editor: Editor,
+                                      file: PsiFile,
+                                      keyword: PsiElement)
+    extends HighlightUsagesHandlerBase[PsiElement](editor, file) {
   def computeUsages(targets: util.List[PsiElement]) {
     val iterator = targets.listIterator
     while (iterator.hasNext) {
@@ -24,7 +25,8 @@ class ScalaHighlightExprResultHandler(expr: ScExpression, editor: Editor,
     }
   }
 
-  def selectTargets(targets: util.List[PsiElement], selectionConsumer: Consumer[util.List[PsiElement]]) {
+  def selectTargets(targets: util.List[PsiElement],
+                    selectionConsumer: Consumer[util.List[PsiElement]]) {
     selectionConsumer.consume(targets)
   }
 

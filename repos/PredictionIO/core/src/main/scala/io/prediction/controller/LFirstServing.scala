@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.core.BaseAlgorithm
@@ -23,6 +22,7 @@ import io.prediction.core.BaseAlgorithm
   * @group Serving
   */
 class LFirstServing[Q, P] extends LServing[Q, P] {
+
   /** Returns the first algorithm's prediction. */
   def serve(query: Q, predictions: Seq[P]): P = predictions.head
 }
@@ -33,7 +33,9 @@ class LFirstServing[Q, P] extends LServing[Q, P] {
   * @group Serving
   */
 object LFirstServing {
+
   /** Returns an instance of [[LFirstServing]]. */
-  def apply[Q, P](a: Class[_ <: BaseAlgorithm[_, _, Q, P]]): Class[LFirstServing[Q, P]] =
+  def apply[Q, P](
+      a: Class[_ <: BaseAlgorithm[_, _, Q, P]]): Class[LFirstServing[Q, P]] =
     classOf[LFirstServing[Q, P]]
 }

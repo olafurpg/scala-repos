@@ -34,8 +34,10 @@ object IsotonicRegressionExample {
 
     // Create label, feature, weight tuples from input data with weight set to default value 1.0.
     val parsedData = data.map { line =>
-      val parts = line.split(',').map(_.toDouble)
-      (parts(0), parts(1), 1.0)
+      val parts = line
+        .split(',')
+        .map(_.toDouble)
+        (parts(0), parts(1), 1.0)
     }
 
     // Split data into training (60%) and test (40%) sets.
@@ -54,12 +56,15 @@ object IsotonicRegressionExample {
     }
 
     // Calculate mean squared error between predicted and real labels.
-    val meanSquaredError = predictionAndLabel.map { case (p, l) => math.pow((p - l), 2) }.mean()
+    val meanSquaredError = predictionAndLabel.map {
+      case (p, l) => math.pow((p - l), 2)
+    }.mean()
     println("Mean Squared Error = " + meanSquaredError)
 
     // Save and load model
     model.save(sc, "target/tmp/myIsotonicRegressionModel")
-    val sameModel = IsotonicRegressionModel.load(sc, "target/tmp/myIsotonicRegressionModel")
+    val sameModel =
+      IsotonicRegressionModel.load(sc, "target/tmp/myIsotonicRegressionModel")
     // $example off$
   }
 }

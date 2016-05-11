@@ -1,7 +1,8 @@
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-	def code = """:power
+  def code =
+    """:power
 :paste
 {
   val clazz = rootMirror.getClassByName(newTermName("test.ThrowsDeclaration_2"));

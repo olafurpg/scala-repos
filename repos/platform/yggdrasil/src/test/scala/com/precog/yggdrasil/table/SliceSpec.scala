@@ -34,14 +34,19 @@ import org.scalacheck._
 
 class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
 
-  implicit def cValueOrdering: Ordering[CValue] = CValue.CValueOrder.toScalaOrdering
-  implicit def listOrdering[A](implicit ord0: Ordering[A]) = new Ordering[List[A]] {
-    def compare(a: List[A], b: List[A]): Int =
-      (a zip b) map ((ord0.compare _).tupled) find (_ != 0) getOrElse (a.length - b.length)
-  }
+  implicit def cValueOrdering: Ordering[CValue] =
+    CValue.CValueOrder.toScalaOrdering
+  implicit def listOrdering[A](implicit ord0: Ordering[A]) =
+    new Ordering[List[A]] {
+      def compare(a: List[A], b: List[A]): Int =
+        (a zip b) map ((ord0.compare _).tupled) find (_ != 0) getOrElse
+        (a.length - b.length)
+    }
 
   def extractCValues(colGroups: List[List[Column]], row: Int): List[CValue] = {
-    colGroups map { _ find (_.isDefinedAt(row)) map (_.cValue(row)) getOrElse CUndefined }
+    colGroups map {
+      _ find (_.isDefinedAt(row)) map (_.cValue(row)) getOrElse CUndefined
+    }
   }
 
   def columnsByCPath(slice: Slice): Map[CPath, List[Column]] = {
@@ -49,14 +54,18 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
     byCPath.mapValues(_.map(_._2).toList)
   }
 
-  def sortableCValues(slice: Slice, cpaths: VectorCase[CPath]): List[(List[CValue], List[CValue])] = {
+  def sortableCValues(
+      slice: Slice,
+      cpaths: VectorCase[CPath]): List[(List[CValue], List[CValue])] = {
     val byCPath = columnsByCPath(slice)
     (0 until slice.size).map({ row =>
-      (extractCValues(cpaths.map(byCPath).toList, row), extractCValues(byCPath.values.toList, row))
+      (extractCValues(cpaths.map(byCPath).toList, row),
+       extractCValues(byCPath.values.toList, row))
     })(collection.breakOut)
   }
 
-  def toCValues(slice: Slice) = sortableCValues(slice, VectorCase.empty) map (_._2)
+  def toCValues(slice: Slice) =
+    sortableCValues(slice, VectorCase.empty) map (_._2)
 
   def fakeSort(slice: Slice, sortKey: VectorCase[CPath]) =
     sortableCValues(slice, sortKey).sortBy(_._1).map(_._2)
@@ -125,14 +134,14 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
   //}
 
   private def concatProjDesc = Seq(
-    ColumnRef(CPath("0"), CLong),
-    ColumnRef(CPath("1"), CBoolean),
-    ColumnRef(CPath("2"), CString),
-    ColumnRef(CPath("3"), CDouble),
-    ColumnRef(CPath("4"), CNum),
-    ColumnRef(CPath("5"), CEmptyObject),
-    ColumnRef(CPath("6"), CEmptyArray),
-    ColumnRef(CPath("7"), CNum)
+      ColumnRef(CPath("0"), CLong),
+      ColumnRef(CPath("1"), CBoolean),
+      ColumnRef(CPath("2"), CString),
+      ColumnRef(CPath("3"), CDouble),
+      ColumnRef(CPath("4"), CNum),
+      ColumnRef(CPath("5"), CEmptyObject),
+      ColumnRef(CPath("6"), CEmptyArray),
+      ColumnRef(CPath("7"), CNum)
   )
 
   "concat" should {
@@ -163,10 +172,11 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
       implicit def arbSlice = Arbitrary(genSlice(0, concatProjDesc, 23))
 
       check { fullSlices: List[Slice] =>
-        val slices = fullSlices collect {
-          case slice if Random.nextBoolean => slice
-          case _ => emptySlice
-        }
+        val slices =
+          fullSlices collect {
+            case slice if Random.nextBoolean => slice
+            case _ => emptySlice
+          }
         val slice = Slice.concat(slices)
         toCValues(slice) must_== fakeConcat(slices)
       }
@@ -177,14 +187,14 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
       val g1 :: g2 :: gs = pds.map(genSlice(0, _, 17))
 
       implicit val arbSlice = Arbitrary(Gen.oneOf(g1, g2, gs: _*))
-      
+
       check { slices: List[Slice] =>
         val slice = Slice.concat(slices)
         // This is terrible, but there isn't an immediately easy way to test
         // without duplicating concat.
-        toCValues(slice).map(stripUndefineds) must_== fakeConcat(slices).map(stripUndefineds)
+        toCValues(slice).map(stripUndefineds) must_==
+          fakeConcat(slices).map(stripUndefineds)
       }
     }
   }
 }
-

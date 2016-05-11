@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,17 +32,18 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 /**
- * Companion Object for [[scalafx.print.Paper]].
- */
+  * Companion Object for [[scalafx.print.Paper]].
+  */
 object Paper {
 
   /**
-   * Converts a ScalaFX Paper to its JavaFX counterpart.
-   *
-   * @param pp ScalaFX Paper
-   * @return JavaFX Paper
-   */
-  implicit def sfxPaper2jfx(pp: Paper): jfxp.Paper = if (pp != null) pp.delegate else null
+    * Converts a ScalaFX Paper to its JavaFX counterpart.
+    *
+    * @param pp ScalaFX Paper
+    * @return JavaFX Paper
+    */
+  implicit def sfxPaper2jfx(pp: Paper): jfxp.Paper =
+    if (pp != null) pp.delegate else null
 
   /** Specifies the ISO A0 size, 841 mm by 1189 mm. */
   val A0 = new Paper(jfxp.Paper.A0)
@@ -103,33 +104,31 @@ object Paper {
 
   /** Specifies the tabloid size, 11 inches by 17 inches. */
   val Tabloid = new Paper(jfxp.Paper.TABLOID)
-
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/Paper.html JavaFX Paper]].
- *
- * @constructor Creates a new ScalaFX Paper from its JavaFX counterpart.
- * @param delegate JavaFX Paper. Since there is no public constructor for it, there is not a default value.
- *
- * @since 8.0
- */
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/Paper.html JavaFX Paper]].
+  *
+  * @constructor Creates a new ScalaFX Paper from its JavaFX counterpart.
+  * @param delegate JavaFX Paper. Since there is no public constructor for it, there is not a default value.
+  *
+  * @since 8.0
+  */
 final class Paper(override val delegate: jfxp.Paper)
-  extends SFXDelegate[jfxp.Paper] {
+    extends SFXDelegate[jfxp.Paper] {
 
   /**
-   * The height of the paper in points (1/72 inch)
-   */
+    * The height of the paper in points (1/72 inch)
+    */
   def height: Double = delegate.getHeight
 
   /**
-   * The paper name.
-   */
+    * The paper name.
+    */
   def name: String = delegate.getName
 
   /**
-   * The width of the paper in points (1/72 inch)
-   */
+    * The width of the paper in points (1/72 inch)
+    */
   def width: Double = delegate.getWidth
-
 }

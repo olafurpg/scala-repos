@@ -1,20 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.server
 
 import kafka.utils.ZkUtils
@@ -51,19 +50,21 @@ class ServerStartupTest extends ZooKeeperTestHarness {
     val brokerId = 0
     val props1 = TestUtils.createBrokerConfig(brokerId, zkConnect)
     val server1 = TestUtils.createServer(KafkaConfig.fromProps(props1))
-    val brokerRegistration = zkUtils.readData(ZkUtils.BrokerIdsPath + "/" + brokerId)._1
+    val brokerRegistration =
+      zkUtils.readData(ZkUtils.BrokerIdsPath + "/" + brokerId)._1
 
     val props2 = TestUtils.createBrokerConfig(brokerId, zkConnect)
     try {
       TestUtils.createServer(KafkaConfig.fromProps(props2))
       fail("Registering a broker with a conflicting id should fail")
     } catch {
-      case e : RuntimeException =>
+      case e: RuntimeException =>
       // this is expected
     }
 
     // broker registration shouldn't change
-    assertEquals(brokerRegistration, zkUtils.readData(ZkUtils.BrokerIdsPath + "/" + brokerId)._1)
+    assertEquals(brokerRegistration,
+                 zkUtils.readData(ZkUtils.BrokerIdsPath + "/" + brokerId)._1)
 
     server1.shutdown()
     CoreUtils.rm(server1.config.logDirs)
@@ -75,7 +76,9 @@ class ServerStartupTest extends ZooKeeperTestHarness {
     val props = TestUtils.createBrokerConfig(brokerId, zkConnect)
     val server = TestUtils.createServer(KafkaConfig.fromProps(props))
 
-    TestUtils.waitUntilTrue(() => server.metadataCache.getAliveBrokers.nonEmpty, "Wait for cache to update")
+    TestUtils.waitUntilTrue(
+        () => server.metadataCache.getAliveBrokers.nonEmpty,
+        "Wait for cache to update")
     assertEquals(1, server.metadataCache.getAliveBrokers.size)
     assertEquals(brokerId, server.metadataCache.getAliveBrokers.head.id)
 

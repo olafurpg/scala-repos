@@ -10,9 +10,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScDoStmt, ScExpression}
 
 /**
- * @author Alefas
- * @since 23.03.12
- */
+  * @author Alefas
+  * @since 23.03.12
+  */
 class WhileFilter extends ElementFilter {
   def isAcceptable(element: Object, context: PsiElement): Boolean = {
     if (context.isInstanceOf[PsiComment]) return false
@@ -20,10 +20,12 @@ class WhileFilter extends ElementFilter {
     if (leaf != null) {
       var parent = leaf.getParent
       if (parent.isInstanceOf[ScExpression] && parent.getPrevSibling != null &&
-        parent.getPrevSibling.getPrevSibling != null) {
+          parent.getPrevSibling.getPrevSibling != null) {
         val doStmt = parent.getPrevSibling match {
           case x: ScDoStmt => x
-          case x if x.isInstanceOf[PsiWhiteSpace] || x.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE =>
+          case x
+              if x.isInstanceOf[PsiWhiteSpace] ||
+              x.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE =>
             x.getPrevSibling match {
               case x: ScDoStmt => x
               case _ => null
@@ -32,11 +34,14 @@ class WhileFilter extends ElementFilter {
         }
         var text = ""
         if (doStmt == null) {
-          while (parent != null && !parent.isInstanceOf[ScDoStmt]) parent = parent.getParent
+          while (parent != null &&
+          !parent.isInstanceOf[ScDoStmt]) parent = parent.getParent
           if (parent == null) return false
           text = parent.getText
-          text = Pattern.compile(DUMMY_IDENTIFIER, Pattern.LITERAL).matcher(
-            text).replaceAll(Matcher.quoteReplacement(" while (true)"))
+          text = Pattern
+            .compile(DUMMY_IDENTIFIER, Pattern.LITERAL)
+            .matcher(text)
+            .replaceAll(Matcher.quoteReplacement(" while (true)"))
         } else {
           text = doStmt.getText + " while (true)"
         }

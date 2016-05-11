@@ -5,12 +5,12 @@ import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
 import spire.math.BitString
 
 trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
-  override def minus(a:Byte, b:Byte): Byte = (a - b).toByte
-  def negate(a:Byte): Byte = (-a).toByte
+  override def minus(a: Byte, b: Byte): Byte = (a - b).toByte
+  def negate(a: Byte): Byte = (-a).toByte
   def one: Byte = 1.toByte
-  def plus(a:Byte, b:Byte): Byte = (a + b).toByte
-  override def pow(a: Byte, b:Int): Byte = Math.pow(a, b).toByte
-  override def times(a:Byte, b:Byte): Byte = (a * b).toByte
+  def plus(a: Byte, b: Byte): Byte = (a + b).toByte
+  override def pow(a: Byte, b: Int): Byte = Math.pow(a, b).toByte
+  override def times(a: Byte, b: Byte): Byte = (a * b).toByte
   def zero: Byte = 0.toByte
 
   override def fromInt(n: Int): Byte = n.toByte
@@ -49,13 +49,14 @@ trait ByteIsSigned extends Signed[Byte] {
 }
 
 trait ByteOrder extends Order[Byte] {
-  override def eqv(x:Byte, y:Byte): Boolean = x == y
-  override def neqv(x:Byte, y:Byte): Boolean = x != y
+  override def eqv(x: Byte, y: Byte): Boolean = x == y
+  override def neqv(x: Byte, y: Byte): Boolean = x != y
   override def gt(x: Byte, y: Byte): Boolean = x > y
   override def gteqv(x: Byte, y: Byte): Boolean = x >= y
   override def lt(x: Byte, y: Byte): Boolean = x < y
   override def lteqv(x: Byte, y: Byte): Boolean = x <= y
-  def compare(x: Byte, y: Byte): Int = java.lang.Integer.signum((x: Int) - (y: Int))
+  def compare(x: Byte, y: Byte): Int =
+    java.lang.Integer.signum((x: Int) - (y: Int))
 }
 
 trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
@@ -77,13 +78,19 @@ class ByteIsBitString extends BitString[Byte] with Serializable {
   def toHexString(n: Byte): String = Integer.toHexString(n & 0xff)
 
   def bitCount(n: Byte): Int = Integer.bitCount(n & 0xff)
-  def highestOneBit(n: Byte): Byte = (Integer.highestOneBit(n & 0xff) & 0xff).toByte
-  def lowestOneBit(n: Byte): Byte = (Integer.lowestOneBit(n & 0xff) & 0xff).toByte
-  def numberOfLeadingZeros(n: Byte): Int = Integer.numberOfLeadingZeros(n & 0xff) - 24
-  def numberOfTrailingZeros(n: Byte): Int = if (n == 0) 8 else Integer.numberOfTrailingZeros(n & 0xff)
+  def highestOneBit(n: Byte): Byte =
+    (Integer.highestOneBit(n & 0xff) & 0xff).toByte
+  def lowestOneBit(n: Byte): Byte =
+    (Integer.lowestOneBit(n & 0xff) & 0xff).toByte
+  def numberOfLeadingZeros(n: Byte): Int =
+    Integer.numberOfLeadingZeros(n & 0xff) - 24
+  def numberOfTrailingZeros(n: Byte): Int =
+    if (n == 0) 8 else Integer.numberOfTrailingZeros(n & 0xff)
 
-  def leftShift(n: Byte, i: Int): Byte = (((n & 0xff) << (i & 7)) & 0xff).toByte
-  def rightShift(n: Byte, i: Int): Byte = (((n & 0xff) >>> (i & 7)) & 0xff).toByte
+  def leftShift(n: Byte, i: Int): Byte =
+    (((n & 0xff) << (i & 7)) & 0xff).toByte
+  def rightShift(n: Byte, i: Int): Byte =
+    (((n & 0xff) >>> (i & 7)) & 0xff).toByte
   def signedRightShift(n: Byte, i: Int): Byte = ((n >> (i & 7)) & 0xff).toByte
   def rotateLeft(n: Byte, i: Int): Byte = {
     val j = i & 7
@@ -102,5 +109,6 @@ trait ByteInstances {
   implicit final val ByteBitString = new ByteIsBitString
   implicit final val ByteAlgebra = new ByteAlgebra
   import spire.math.NumberTag._
-  implicit final val ByteTag = new BuiltinIntTag[Byte](0, Byte.MinValue, Byte.MaxValue)
+  implicit final val ByteTag =
+    new BuiltinIntTag[Byte](0, Byte.MinValue, Byte.MaxValue)
 }

@@ -1,10 +1,8 @@
 package org.jetbrains.plugins.scala.lang.resolve2
 
-
 /**
- * Pavel.Fatin, 02.02.2010
- */
-
+  * Pavel.Fatin, 02.02.2010
+  */
 class ScopeTest extends ResolveTestBase {
   override def folderPath: String = {
     super.folderPath + "scope/"
@@ -21,5 +19,5 @@ class ScopeTest extends ResolveTestBase {
 //  def testPackageObjectParent = doTest
   def testTwoBlocks() = doTest()
 
-  def testDefaultParameterInNextClause() {doTest()}
+  def testDefaultParameterInNextClause() { doTest() }
 }

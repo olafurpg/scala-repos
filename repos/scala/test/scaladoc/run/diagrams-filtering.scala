@@ -4,7 +4,8 @@ import scala.tools.partest.ScaladocModelTest
 
 object Test extends ScaladocModelTest {
 
-  override def code = """
+  override def code =
+    """
         package scala.test.scaladoc
 
         /** @contentDiagram hideNodes "scala.test.*.A" "java.*", hideEdges ("*G" -> "*E") */
@@ -48,7 +49,11 @@ object Test extends ScaladocModelTest {
 
     // base package
     // Assert we have 7 nodes and 6 edges
-    val base = rootPackage._package("scala")._package("test")._package("scaladoc")._package("diagrams")
+    val base = rootPackage
+      ._package("scala")
+      ._package("test")
+      ._package("scaladoc")
+      ._package("diagrams")
     val packDiag = base.contentDiagram.get
     assert(packDiag.nodes.length == 6)
     assert(packDiag.edges.map(_._2.length).sum == 5)
@@ -57,7 +62,8 @@ object Test extends ScaladocModelTest {
     // Assert we have just 3 nodes and 2 edges
     val A = base._trait("A")
     val ADiag = A.inheritanceDiagram.get
-    assert(ADiag.nodes.length == 3, s"${ADiag.nodes} has length ${ADiag.nodes.length}, expected 3")
+    assert(ADiag.nodes.length == 3,
+           s"${ADiag.nodes} has length ${ADiag.nodes.length}, expected 3")
     assert(ADiag.edges.map(_._2.length).sum == 2)
 
     // trait C
@@ -80,11 +86,13 @@ object Test extends ScaladocModelTest {
     assert(incoming.length == 2) // F and G
     assert(outgoing.head._2.length == 3) // B, C and T
 
-    val (outgoingSuperclass, outgoingImplicit) = outgoing.head._2.partition(_.isNormalNode)
+    val (outgoingSuperclass, outgoingImplicit) =
+      outgoing.head._2.partition(_.isNormalNode)
     assert(outgoingSuperclass.length == 2) // B and C
     assert(outgoingImplicit.length == 1, outgoingImplicit) // T
 
-    val (incomingSubclass, incomingImplicit) = incoming.partition(_._1.isNormalNode)
+    val (incomingSubclass, incomingImplicit) =
+      incoming.partition(_._1.isNormalNode)
     assert(incomingSubclass.length == 2) // F and G
     assert(incomingImplicit.length == 0)
 

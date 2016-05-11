@@ -8,9 +8,9 @@ import scala.reflect.internal.util.Position
 import scala.reflect.internal.util.SourceFile
 
 /**
- * Simulate methods that were added in later versions of the scalac
- * API, or to generate fake methods that we can use in both versions.
- */
+  * Simulate methods that were added in later versions of the scalac
+  * API, or to generate fake methods that we can use in both versions.
+  */
 trait PresentationCompilerBackCompat {
   this: RichPresentationCompiler =>
 

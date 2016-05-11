@@ -1,4 +1,4 @@
-class Certificate{}
+class Certificate {}
 
 object Admin extends Certificate;
 
@@ -9,8 +9,7 @@ object Sensitive {
     if (credentials == Admin) new Sensitive()
     else throw new SecurityViolationException
 }
-class Sensitive private () {
-}
+class Sensitive private () {}
 
 object Attacker {
   val x = Sensitive.makeSensitive(null)

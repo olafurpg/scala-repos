@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
 import java.text.SimpleDateFormat
@@ -22,10 +22,10 @@ import java.util.Date
 import java.util.TimeZone
 
 /**
- * RichDate adds some nice convenience functions to the Java date/calendar classes
- * We commonly do Date/Time work in analysis jobs, so having these operations convenient
- * is very helpful.
- */
+  * RichDate adds some nice convenience functions to the Java date/calendar classes
+  * We commonly do Date/Time work in analysis jobs, so having these operations convenient
+  * is very helpful.
+  */
 object RichDate {
   // Implicits to Java types:
   implicit def toDate(rd: RichDate) = rd.value
@@ -37,12 +37,14 @@ object RichDate {
 
   implicit def apply(d: Date): RichDate = RichDate(d.getTime)
   implicit def apply(d: Calendar): RichDate = RichDate(d.getTime)
+
   /**
-   * Parse the string with one of the value DATE_FORMAT_VALIDATORS in the order listed in DateOps.
-   * We allow either date, date with time in minutes, date with time down to seconds.
-   * The separator between date and time can be a space or "T".
-   */
-  implicit def apply(str: String)(implicit tz: TimeZone, dp: DateParser): RichDate =
+    * Parse the string with one of the value DATE_FORMAT_VALIDATORS in the order listed in DateOps.
+    * We allow either date, date with time in minutes, date with time down to seconds.
+    * The separator between date and time can be a space or "T".
+    */
+  implicit def apply(str: String)(
+      implicit tz: TimeZone, dp: DateParser): RichDate =
     dp.parse(str).get
 
   /* If the format is one of the truncated DateOps formats, we can do
@@ -67,14 +69,15 @@ object RichDate {
   def now: RichDate = RichDate(System.currentTimeMillis())
 
   implicit def richDateOrdering: Ordering[RichDate] = new Ordering[RichDate] {
-    def compare(a: RichDate, b: RichDate) = java.lang.Long.compare(a.timestamp, b.timestamp)
+    def compare(a: RichDate, b: RichDate) =
+      java.lang.Long.compare(a.timestamp, b.timestamp)
   }
 }
 
 /**
- * A value class wrapper for milliseconds since the epoch. Its tempting to extend
- * this with AnyVal but this causes problem with Java code.
- */
+  * A value class wrapper for milliseconds since the epoch. Its tempting to extend
+  * this with AnyVal but this causes problem with Java code.
+  */
 case class RichDate(val timestamp: Long) extends Ordered[RichDate] {
   // these are mutable, don't keep them around
   def value: Date = new java.util.Date(timestamp)
@@ -83,7 +86,8 @@ case class RichDate(val timestamp: Long) extends Ordered[RichDate] {
   def -(interval: Duration) = interval.subtractFrom(this)
 
   //Inverse of the above, d2 + (d1 - d2) == d1
-  def -(that: RichDate) = AbsoluteDuration.fromMillisecs(timestamp - that.timestamp)
+  def -(that: RichDate) =
+    AbsoluteDuration.fromMillisecs(timestamp - that.timestamp)
 
   override def compare(that: RichDate): Int =
     java.lang.Long.compare(timestamp, that.timestamp)
@@ -97,15 +101,16 @@ case class RichDate(val timestamp: Long) extends Ordered[RichDate] {
     }
 
   /**
-   * Use String.format to format the date, as opposed to toString, which uses SimpleDateFormat.
-   */
-  def format(pattern: String)(implicit tz: TimeZone): String = String.format(pattern, toCalendar(tz))
+    * Use String.format to format the date, as opposed to toString, which uses SimpleDateFormat.
+    */
+  def format(pattern: String)(implicit tz: TimeZone): String =
+    String.format(pattern, toCalendar(tz))
 
   /**
-   * Make sure the hashCode is the same as Date for the (questionable) choice
-   * to make them equal. this is the same as what java does (and only sane thing):
-   * http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/java/util/Date.java#989
-   */
+    * Make sure the hashCode is the same as Date for the (questionable) choice
+    * to make them equal. this is the same as what java does (and only sane thing):
+    * http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/java/util/Date.java#989
+    */
   override def hashCode =
     (timestamp.toInt) ^ ((timestamp >> 32).toInt)
 
@@ -117,8 +122,8 @@ case class RichDate(val timestamp: Long) extends Ordered[RichDate] {
   override def toString = value.toString
 
   /**
-   * Use SimpleDateFormat to print the string
-   */
+    * Use SimpleDateFormat to print the string
+    */
   def toString(fmt: String)(implicit tz: TimeZone): String = {
     val cal = toCalendar(tz)
     val sdfmt = new SimpleDateFormat(fmt)
@@ -126,4 +131,3 @@ case class RichDate(val timestamp: Long) extends Ordered[RichDate] {
     sdfmt.format(cal.getTime)
   }
 }
-

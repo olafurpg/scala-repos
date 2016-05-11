@@ -12,16 +12,17 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.scalding
 import cascading.flow.FlowDef
 import java.util.WeakHashMap
 
 /**
- * Immutable state that we attach to the Flow using the FlowStateMap
- */
-case class FlowState(sourceMap: Map[String, Source] = Map.empty, flowConfigUpdates: Set[(String, String)] = Set()) {
+  * Immutable state that we attach to the Flow using the FlowStateMap
+  */
+case class FlowState(sourceMap: Map[String, Source] = Map.empty,
+                     flowConfigUpdates: Set[(String, String)] = Set()) {
   def addSource(id: String, s: Source): FlowState =
     copy(sourceMap = sourceMap + (id -> s))
 
@@ -37,20 +38,20 @@ case class FlowState(sourceMap: Map[String, Source] = Map.empty, flowConfigUpdat
 }
 
 /**
- * This is a mutable threadsafe store for attaching scalding
- * information to the mutable flowDef
- *
- * NOTE: there is a subtle bug in scala regarding case classes
- * with multiple sets of arguments, and their equality.
- * For this reason, we use Source.sourceId as the key in this map
- */
+  * This is a mutable threadsafe store for attaching scalding
+  * information to the mutable flowDef
+  *
+  * NOTE: there is a subtle bug in scala regarding case classes
+  * with multiple sets of arguments, and their equality.
+  * For this reason, we use Source.sourceId as the key in this map
+  */
 object FlowStateMap {
   // Make sure we don't hold FlowState after the FlowDef is gone
   @transient private val flowMap = new WeakHashMap[FlowDef, FlowState]()
 
   /**
-   * Function to update a state.
-   */
+    * Function to update a state.
+    */
   def mutate[T](fd: FlowDef)(fn: FlowState => (FlowState, T)): T = {
     flowMap.synchronized {
       val oldState = Option(flowMap.get(fd)).getOrElse(FlowState())
@@ -72,8 +73,8 @@ object FlowStateMap {
      */
     if (!flowDef.getSources.isEmpty) {
       get(flowDef)
-        .getOrElse(sys.error("Could not find a flowState for flowDef: %s".format(flowDef)))
+        .getOrElse(sys.error(
+                "Could not find a flowState for flowDef: %s".format(flowDef)))
         .validateSources(mode)
     } else ()
 }
-

@@ -7,7 +7,6 @@ trait Monoid[A] {
 
   def append(a1: A, a2: A): A
   def identity: A
-
 }
 
 object Monoid {
@@ -31,7 +30,6 @@ trait Reducer[A, B] {
   def unit(a: A): B
   def prepend(a: A, b: B): B
   def append(b: B, a: A): B
-
 }
 
 object Reducer {

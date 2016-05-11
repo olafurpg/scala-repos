@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import _root_.io.prediction.annotation.DeveloperApi
@@ -40,7 +39,7 @@ import scala.reflect._
   * @group Algorithm
   */
 abstract class LAlgorithm[PD, M : ClassTag, Q, P]
-  extends BaseAlgorithm[RDD[PD], RDD[M], Q, P] {
+    extends BaseAlgorithm[RDD[PD], RDD[M], Q, P] {
 
   def trainBase(sc: SparkContext, pd: RDD[PD]): RDD[M] = pd.map(train)
 
@@ -51,8 +50,8 @@ abstract class LAlgorithm[PD, M : ClassTag, Q, P]
     */
   def train(pd: PD): M
 
-  def batchPredictBase(sc: SparkContext, bm: Any, qs: RDD[(Long, Q)])
-  : RDD[(Long, P)] = {
+  def batchPredictBase(
+      sc: SparkContext, bm: Any, qs: RDD[(Long, Q)]): RDD[(Long, P)] = {
     val mRDD = bm.asInstanceOf[RDD[M]]
     batchPredict(mRDD, qs)
   }
@@ -68,8 +67,9 @@ abstract class LAlgorithm[PD, M : ClassTag, Q, P]
   def batchPredict(mRDD: RDD[M], qs: RDD[(Long, Q)]): RDD[(Long, P)] = {
     val glomQs: RDD[Array[(Long, Q)]] = qs.glom()
     val cartesian: RDD[(M, Array[(Long, Q)])] = mRDD.cartesian(glomQs)
-    cartesian.flatMap { case (m, qArray) =>
-      qArray.map { case (qx, q) => (qx, predict(m, q)) }
+    cartesian.flatMap {
+      case (m, qArray) =>
+        qArray.map { case (qx, q) => (qx, predict(m, q)) }
     }
   }
 
@@ -108,17 +108,13 @@ abstract class LAlgorithm[PD, M : ClassTag, Q, P]
     *         persistence, or Unit for re-training on deployment
     */
   @DeveloperApi
-  override
-  def makePersistentModel(
-    sc: SparkContext,
-    modelId: String,
-    algoParams: Params,
-    bm: Any): Any = {
+  override def makePersistentModel(
+      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any = {
     // Check RDD[M].count == 1
     val m = bm.asInstanceOf[RDD[M]].first()
     if (m.isInstanceOf[PersistentModel[_]]) {
-      if (m.asInstanceOf[PersistentModel[Params]].save(
-        modelId, algoParams, sc)) {
+      if (m.asInstanceOf[PersistentModel[Params]]
+            .save(modelId, algoParams, sc)) {
         PersistentModelManifest(className = m.getClass.getName)
       } else {
         Unit

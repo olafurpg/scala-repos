@@ -9,16 +9,15 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 28.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 28.02.2008
+  */
 /*
  * ExistentialClause ::= 'forSome' '{' ExistentialDcl {semi ExistentialDcl} '}'
  */
 
 object ExistentialClause {
-  def parse(builder: ScalaPsiBuilder) : Boolean = {
+  def parse(builder: ScalaPsiBuilder): Boolean = {
     val existMarker = builder.mark
     builder.getTokenType match {
       case ScalaTokenTypes.kFOR_SOME =>

@@ -1,8 +1,8 @@
 package slick.util
 
 /**
- * Utilities for working with classloaders
- */
+  * Utilities for working with classloaders
+  */
 object ClassLoaderUtil {
 
   /** Get the default classloader to use to dynamically load classes. */

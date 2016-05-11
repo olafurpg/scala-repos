@@ -2,10 +2,10 @@ package scalaz
 
 ////
 /**
- * Profunctors are covariant on the right and contravariant on the left.
- */
+  * Profunctors are covariant on the right and contravariant on the left.
+  */
 ////
-trait Profunctor[=>:[_, _]]  { self =>
+trait Profunctor[=>:[_, _]] { self =>
   ////
   /** Contramap on `A`. */
   def mapfst[A, B, C](fab: (A =>: B))(f: C => A): (C =>: B)
@@ -28,7 +28,7 @@ trait Profunctor[=>:[_, _]]  { self =>
     }
 
   def covariantInstance[C]: Functor[C =>: ?] =
-    new SndCovariant[C]{}
+    new SndCovariant[C] {}
 
   def contravariantInstance[C]: Contravariant[? =>: C] =
     new Contravariant[? =>: C] {
@@ -37,7 +37,9 @@ trait Profunctor[=>:[_, _]]  { self =>
     }
 
   ////
-  val profunctorSyntax = new scalaz.syntax.ProfunctorSyntax[=>:] { def F = Profunctor.this }
+  val profunctorSyntax = new scalaz.syntax.ProfunctorSyntax[=>:] {
+    def F = Profunctor.this
+  }
 }
 
 object Profunctor {
@@ -60,7 +62,8 @@ object Profunctor {
         UpStar(a => Functor[F].map(Tag.unwrap(h)(a))(f))
     }
 
-  implicit def downStarProfunctor[F[_]: Functor]: Profunctor[DownStar[F, ?, ?]] =
+  implicit def downStarProfunctor[
+      F[_]: Functor]: Profunctor[DownStar[F, ?, ?]] =
     new Profunctor[DownStar[F, ?, ?]] {
       def mapfst[A, B, C](h: DownStar[F, A, B])(f: C => A): DownStar[F, C, B] =
         DownStar(fa => Tag.unwrap(h)(Functor[F].map(fa)(f)))

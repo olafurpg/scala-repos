@@ -1,20 +1,23 @@
 package akka.remote.transport
 
-import akka.testkit.{ DefaultTimeout, AkkaSpec }
+import akka.testkit.{DefaultTimeout, AkkaSpec}
 import akka.remote.transport.TestTransport.SwitchableLoggedBehavior
-import scala.concurrent.{ Await, Promise }
+import scala.concurrent.{Await, Promise}
 import scala.util.Failure
 import akka.AkkaException
 import scala.util.control.NoStackTrace
 
 object SwitchableLoggedBehaviorSpec {
-  object TestException extends AkkaException("Test exception") with NoStackTrace
+  object TestException
+      extends AkkaException("Test exception") with NoStackTrace
 }
 
 class SwitchableLoggedBehaviorSpec extends AkkaSpec with DefaultTimeout {
   import akka.remote.transport.SwitchableLoggedBehaviorSpec._
 
-  private def defaultBehavior = new SwitchableLoggedBehavior[Unit, Int]((_) ⇒ Promise.successful(3).future, (_) ⇒ ())
+  private def defaultBehavior =
+    new SwitchableLoggedBehavior[Unit, Int](
+        (_) ⇒ Promise.successful(3).future, (_) ⇒ ())
 
   "A SwitchableLoggedBehavior" must {
 
@@ -33,7 +36,7 @@ class SwitchableLoggedBehaviorSpec extends AkkaSpec with DefaultTimeout {
       behavior.push((_) ⇒ Promise.failed(TestException).future)
       behavior(()).value match {
         case Some(Failure(`TestException`)) ⇒
-        case _                              ⇒ fail("Expected exception")
+        case _ ⇒ fail("Expected exception")
       }
     }
 
@@ -51,7 +54,7 @@ class SwitchableLoggedBehaviorSpec extends AkkaSpec with DefaultTimeout {
 
       behavior(()).value match {
         case Some(Failure(e)) if e eq TestException ⇒
-        case _                                      ⇒ fail("Expected exception")
+        case _ ⇒ fail("Expected exception")
       }
     }
 
@@ -69,7 +72,6 @@ class SwitchableLoggedBehaviorSpec extends AkkaSpec with DefaultTimeout {
 
       behavior.pop()
       Await.result(behavior(()), timeout.duration) should ===(3)
-
     }
 
     "protect the default behavior from popped out" in {
@@ -94,12 +96,11 @@ class SwitchableLoggedBehaviorSpec extends AkkaSpec with DefaultTimeout {
 
     "log calls and parametrers" in {
       val logPromise = Promise[Int]()
-      val behavior = new SwitchableLoggedBehavior[Int, Int]((i) ⇒ Promise.successful(3).future, (i) ⇒ logPromise.success(i))
+      val behavior = new SwitchableLoggedBehavior[Int, Int](
+          (i) ⇒ Promise.successful(3).future, (i) ⇒ logPromise.success(i))
 
       behavior(11)
       Await.result(logPromise.future, timeout.duration) should ===(11)
     }
-
   }
-
 }

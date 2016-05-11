@@ -7,15 +7,17 @@ import views._
 
 object ForumPost extends LilaController with ForumController {
 
-  private val CreateRateLimit = new lila.memo.RateLimit(4, 5 minutes, "forum create post")
+  private val CreateRateLimit =
+    new lila.memo.RateLimit(4, 5 minutes, "forum create post")
 
   def search(text: String, page: Int) = OpenBody { implicit ctx =>
     NotForKids {
       text.trim.isEmpty.fold(
-        Redirect(routes.ForumCateg.index).fuccess,
-        Env.forumSearch(text, page, isGranted(_.StaffForum), ctx.troll) map { paginator =>
-          html.forum.search(text, paginator)
-        }
+          Redirect(routes.ForumCateg.index).fuccess,
+          Env.forumSearch(text, page, isGranted(_.StaffForum), ctx.troll) map {
+            paginator =>
+              html.forum.search(text, paginator)
+          }
       )
     }
   }
@@ -28,33 +30,42 @@ object ForumPost extends LilaController with ForumController {
     }
   }
 
-  def create(categSlug: String, slug: String, page: Int) = OpenBody { implicit ctx =>
-    CreateRateLimit(ctx.req.remoteAddress) {
-      CategGrantWrite(categSlug) {
-        implicit val req = ctx.body
-        OptionFuResult(topicApi.show(categSlug, slug, page, ctx.troll)) {
-          case (categ, topic, posts) =>
-            if (topic.closed) fuccess(BadRequest("This topic is closed"))
-            else forms.post.bindFromRequest.fold(
-              err => forms.anyCaptcha flatMap { captcha =>
-                ctx.userId ?? Env.timeline.status(s"forum:${topic.id}") map { unsub =>
-                  BadRequest(html.forum.topic.show(categ, topic, posts, Some(err -> captcha), unsub))
-                }
-              },
-              data => postApi.makePost(categ, topic, data) map { post =>
-                Redirect(routes.ForumPost.redirect(post.id))
-              }
-            )
+  def create(categSlug: String, slug: String, page: Int) = OpenBody {
+    implicit ctx =>
+      CreateRateLimit(ctx.req.remoteAddress) {
+        CategGrantWrite(categSlug) {
+          implicit val req = ctx.body
+          OptionFuResult(topicApi.show(categSlug, slug, page, ctx.troll)) {
+            case (categ, topic, posts) =>
+              if (topic.closed) fuccess(BadRequest("This topic is closed"))
+              else
+                forms.post.bindFromRequest.fold(
+                    err =>
+                      forms.anyCaptcha flatMap { captcha =>
+                        ctx.userId ?? Env.timeline.status(s"forum:${topic.id}") map {
+                          unsub =>
+                            BadRequest(
+                                html.forum.topic.show(categ,
+                                                      topic,
+                                                      posts,
+                                                      Some(err -> captcha),
+                                                      unsub))
+                        }
+                    },
+                    data =>
+                      postApi.makePost(categ, topic, data) map { post =>
+                        Redirect(routes.ForumPost.redirect(post.id))
+                    }
+                )
+          }
         }
       }
-    }
   }
 
-  def delete(categSlug: String, id: String) = Auth { implicit ctx =>
-    me =>
-      CategGrantMod(categSlug) {
-        postApi.delete(categSlug, id, me) map { Ok(_) }
-      }
+  def delete(categSlug: String, id: String) = Auth { implicit ctx => me =>
+    CategGrantMod(categSlug) {
+      postApi.delete(categSlug, id, me) map { Ok(_) }
+    }
   }
 
   def redirect(id: String) = Open { implicit ctx =>

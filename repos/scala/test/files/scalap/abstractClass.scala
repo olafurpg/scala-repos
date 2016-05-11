@@ -1,5 +1,4 @@
 abstract class AbstractClass {
 
-    def foo: String
-
+  def foo: String
 }

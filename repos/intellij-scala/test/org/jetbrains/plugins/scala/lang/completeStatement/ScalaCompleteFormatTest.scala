@@ -2,19 +2,17 @@ package org.jetbrains.plugins.scala
 package lang.completeStatement
 
 /**
- * @author Ksenia.Sautina
- * @since 2/25/13
- */
+  * @author Ksenia.Sautina
+  * @since 2/25/13
+  */
 class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
   def testFormat() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  val d=7+7+7+77<caret>
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  val d = 7 + 7 + 7 + 77<caret>
         |}
@@ -24,8 +22,7 @@ class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
   }
 
   def testFormat2() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  if (true) {
         |    val d=7+7+7+7+7
@@ -33,8 +30,7 @@ class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
         |  }
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  if (true) {
         |    val d=7+7+7+7+7
@@ -47,8 +43,7 @@ class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
   }
 
   def testFormat3() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  if (true) {
         |    val d=7+7+7+7+7
@@ -57,8 +52,7 @@ class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
         |  }
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  if (true) {
         |    val d=7+7+7+7+7
@@ -72,14 +66,12 @@ class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
   }
 
   def testFormatJava() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |    int d=7+7+7+77;<caret>
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |    int d = 7 + 7 + 7 + 77;<caret>
         |}

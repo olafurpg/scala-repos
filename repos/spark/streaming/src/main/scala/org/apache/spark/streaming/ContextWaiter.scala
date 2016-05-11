@@ -52,9 +52,9 @@ private[streaming] class ContextWaiter {
   }
 
   /**
-   * Return `true` if it's stopped; or throw the reported error if `notifyError` has been called; or
-   * `false` if the waiting time detectably elapsed before return from the method.
-   */
+    * Return `true` if it's stopped; or throw the reported error if `notifyError` has been called; or
+    * `false` if the waiting time detectably elapsed before return from the method.
+    */
   def waitForStopOrError(timeout: Long = -1): Boolean = {
     lock.lock()
     try {

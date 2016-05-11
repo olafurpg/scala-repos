@@ -15,10 +15,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
-abstract class KeywordCompletionTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * @author Alexander Podkhalyuzin
+  */
+abstract class KeywordCompletionTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   private val caretMarker = "/*caret*/"
 
   def folderPath: String = baseRootPath() + "keywordCompletion/"
@@ -27,21 +27,31 @@ abstract class KeywordCompletionTestBase extends ScalaLightPlatformCodeInsightTe
     import org.junit.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
-    val file = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(caretMarker)
-    assert(offset != -1, "Not specified end marker in test case. Use /*caret*/ in scala file for this.")
+    assert(
+        offset != -1,
+        "Not specified end marker in test case. Use /*caret*/ in scala file for this.")
     val fileEditorManager = FileEditorManager.getInstance(getProjectAdapter)
-    val editor = fileEditorManager.openTextEditor(new OpenFileDescriptor(getProjectAdapter, file, offset), false)
+    val editor = fileEditorManager.openTextEditor(
+        new OpenFileDescriptor(getProjectAdapter, file, offset), false)
     val myType = CompletionType.BASIC
-    new CodeCompletionHandlerBase(myType, false, false, true).invokeCompletion(getProjectAdapter, editor)
-    val lookup: LookupImpl = LookupManager.getActiveLookup(editor).asInstanceOf[LookupImpl]
+    new CodeCompletionHandlerBase(myType, false, false, true)
+      .invokeCompletion(getProjectAdapter, editor)
+    val lookup: LookupImpl =
+      LookupManager.getActiveLookup(editor).asInstanceOf[LookupImpl]
     val items: Array[String] =
       if (lookup == null) Array.empty
-      else lookup.getItems.toArray(LookupElement.EMPTY_ARRAY).map(_.getLookupString)
+      else
+        lookup.getItems
+          .toArray(LookupElement.EMPTY_ARRAY)
+          .map(_.getLookupString)
 
     val res = items.filter(ScalaNamesUtil.isKeyword).sorted.mkString("\n")
 
@@ -51,7 +61,8 @@ abstract class KeywordCompletionTestBase extends ScalaLightPlatformCodeInsightTe
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
-      case _ => assertTrue("Test result must be in last comment statement.", false)
+      case _ =>
+        assertTrue("Test result must be in last comment statement.", false)
     }
     assertEquals(output, res.trim)
   }

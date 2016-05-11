@@ -10,5 +10,4 @@ object TestApp extends js.JSApp {
 
     println(Lib.jQuery("p").text())
   }
-
 }

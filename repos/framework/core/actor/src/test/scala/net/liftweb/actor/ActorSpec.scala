@@ -22,10 +22,9 @@ import org.specs2.time.TimeConversions._
 
 import common._
 
-
 /**
- * Systems under specification for Lift Actor.
- */
+  * Systems under specification for Lift Actor.
+  */
 class ActorSpec extends Specification {
   "Actor Specification".title
   sequential
@@ -45,14 +44,16 @@ class ActorSpec extends Specification {
       val a = actor
       a ! Set(33)
       a !? Get()
-      (a.!?(50, Get())) must be_==(Full(Answer(33))).eventually(900, 100.milliseconds)
+      (a.!?(50, Get())) must be_==(Full(Answer(33)))
+        .eventually(900, 100.milliseconds)
     }
 
     "allow setting and getting of a value with subclass of Get()" in {
       val a = actor
       a ! Set(33)
       a ! new FunnyGet()
-      (a.!?(50L, new FunnyGet())) must be_==(Full(Answer(33))).eventually(900, 100.milliseconds)
+      (a.!?(50L, new FunnyGet())) must be_==(Full(Answer(33)))
+        .eventually(900, 100.milliseconds)
     }
 
     "allow adding of a value" in {
@@ -69,12 +70,11 @@ class ActorSpec extends Specification {
 
     "properly timeout" in {
       val a = actor
-      (a !< Set(33)).get(50) must be_==(Empty).eventually(900, 100.milliseconds)
+      (a !< Set(33)).get(50) must be_==(Empty).eventually(900,
+                                                          100.milliseconds)
     }
   }
-
 }
-
 
 case class Add(num: Int)
 case class Sub(num: Int)

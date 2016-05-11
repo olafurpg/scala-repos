@@ -3,7 +3,7 @@
  */
 package play.api.libs.crypto
 
-import java.time.{ Clock, Instant, ZoneId }
+import java.time.{Clock, Instant, ZoneId}
 
 import org.specs2.mutable._
 
@@ -27,18 +27,19 @@ class CSRFTokenSignerSpec extends Specification {
       val token: String = "0FFFFFFFFFFFFFFFFFFFFF24"
       token.length must be_==(24)
       val signedToken = tokenSigner.signToken(token)
-      signedToken must beEqualTo("77adb3c3dfe5ee567556b259549a4ddfa6797c05-0-0FFFFFFFFFFFFFFFFFFFFF24")
+      signedToken must beEqualTo(
+          "77adb3c3dfe5ee567556b259549a4ddfa6797c05-0-0FFFFFFFFFFFFFFFFFFFFF24")
     }
   }
 
   "tokenSigner.compareSignedTokens" should {
     "be successful" in {
-      val token1: String = "b3ba23c672b5e115b0c44335544dbf42934f70f5-1445022964749-0FFFFFFFFFFFFFFFFFFFFF24"
-      val token2: String = "b3ba23c672b5e115b0c44335544dbf42934f70f5-1445022964749-0FFFFFFFFFFFFFFFFFFFFF24"
+      val token1: String =
+        "b3ba23c672b5e115b0c44335544dbf42934f70f5-1445022964749-0FFFFFFFFFFFFFFFFFFFFF24"
+      val token2: String =
+        "b3ba23c672b5e115b0c44335544dbf42934f70f5-1445022964749-0FFFFFFFFFFFFFFFFFFFFF24"
       val actual = tokenSigner.compareSignedTokens(token1, token2)
       actual must beTrue
     }
   }
-
 }
-

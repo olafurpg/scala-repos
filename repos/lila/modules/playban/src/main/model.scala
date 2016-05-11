@@ -3,9 +3,7 @@ package lila.playban
 import org.joda.time.DateTime
 
 case class UserRecord(
-    _id: String,
-    o: Option[List[Outcome]],
-    b: Option[List[TempBan]]) {
+    _id: String, o: Option[List[Outcome]], b: Option[List[TempBan]]) {
 
   def userId = _id
   def outcomes: List[Outcome] = ~o
@@ -24,17 +22,14 @@ case class UserRecord(
   def nbBadOutcomesBeforeBan = if (bans.isEmpty) 4 else 2
 
   def newBan: Option[TempBan] = {
-    !banInEffect &&
-      nbBadOutcomes >= nbBadOutcomesBeforeBan &&
-      badOutcomeRatio >= 1d / 3
+    !banInEffect && nbBadOutcomes >= nbBadOutcomesBeforeBan &&
+    badOutcomeRatio >= 1d / 3
   } option bans.lastOption.filterNot(_.isOld).fold(TempBan.initial) { prev =>
     TempBan(prev.mins * 2)
   }
 }
 
-case class TempBan(
-    date: DateTime,
-    mins: Int) {
+case class TempBan(date: DateTime, mins: Int) {
 
   lazy val endsAt = date plusMinutes mins
 
@@ -53,9 +48,7 @@ object TempBan {
   def apply(minutes: Int): TempBan = TempBan(DateTime.now, minutes min 120)
 }
 
-sealed abstract class Outcome(
-  val id: Int,
-  val name: String)
+sealed abstract class Outcome(val id: Int, val name: String)
 
 object Outcome {
 
@@ -66,7 +59,9 @@ object Outcome {
 
   val all = List(Good, Abort, NoPlay, RageQuit)
 
-  val byId = all map { v => (v.id, v) } toMap
+  val byId = all map { v =>
+    (v.id, v)
+  } toMap
 
   def apply(id: Int): Option[Outcome] = byId get id
 }

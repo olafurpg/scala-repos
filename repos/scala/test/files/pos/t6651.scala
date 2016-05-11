@@ -30,4 +30,3 @@ final class ValueClass[P <: Path](val path: P) extends AnyVal {
   // the wrapped value.
   def bounds[D <: Dep](dep: D)(d2: dep.type, foo: Int): (D, d2.type) = (d2, d2)
 }
-

@@ -5,10 +5,9 @@ import org.jetbrains.plugins.scala.codeInsight.intention.expression.ConvertFromI
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 /**
- * @author Ksenia.Sautina
- * @since 4/9/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 4/9/12
+  */
 class ConvertFromInfixExpressionIntentionTest extends ScalaIntentionTestBase {
   val familyName = ConvertFromInfixExpressionIntention.familyName
 
@@ -97,16 +96,14 @@ class ConvertFromInfixExpressionIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testConvertFromInfixExpression12(): Unit = {
-    val text =
-      """
+    val text = """
         |case class M[A](a: A) {
         |  def map[B](f: A => B): M[B] = M(f(a))
         |}
         |
         |M(1) <caret>map[String] (_.toString)
       """.stripMargin
-    val resultText =
-      """
+    val resultText = """
         |case class M[A](a: A) {
         |  def map[B](f: A => B): M[B] = M(f(a))
         |}
@@ -115,5 +112,4 @@ class ConvertFromInfixExpressionIntentionTest extends ScalaIntentionTestBase {
       """.stripMargin
     doTest(text, resultText)
   }
-
 }

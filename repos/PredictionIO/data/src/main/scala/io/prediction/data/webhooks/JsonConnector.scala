@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.webhooks
 
 import org.json4s.JObject
@@ -25,7 +24,6 @@ private[prediction] trait JsonConnector {
   /** Convert from original JObject to Event JObject
     * @param data original JObject recevived through webhooks
     * @return Event JObject
-   */
+    */
   def toEventJson(data: JObject): JObject
-
 }

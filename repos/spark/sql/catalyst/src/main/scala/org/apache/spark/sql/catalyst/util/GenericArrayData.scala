@@ -43,7 +43,8 @@ class GenericArrayData(val array: Array[Any]) extends ArrayData {
 
   private def getAs[T](ordinal: Int) = array(ordinal).asInstanceOf[T]
   override def isNullAt(ordinal: Int): Boolean = getAs[AnyRef](ordinal) eq null
-  override def get(ordinal: Int, elementType: DataType): AnyRef = getAs(ordinal)
+  override def get(ordinal: Int, elementType: DataType): AnyRef =
+    getAs(ordinal)
   override def getBoolean(ordinal: Int): Boolean = getAs(ordinal)
   override def getByte(ordinal: Int): Byte = getAs(ordinal)
   override def getShort(ordinal: Int): Short = getAs(ordinal)
@@ -51,11 +52,13 @@ class GenericArrayData(val array: Array[Any]) extends ArrayData {
   override def getLong(ordinal: Int): Long = getAs(ordinal)
   override def getFloat(ordinal: Int): Float = getAs(ordinal)
   override def getDouble(ordinal: Int): Double = getAs(ordinal)
-  override def getDecimal(ordinal: Int, precision: Int, scale: Int): Decimal = getAs(ordinal)
+  override def getDecimal(ordinal: Int, precision: Int, scale: Int): Decimal =
+    getAs(ordinal)
   override def getUTF8String(ordinal: Int): UTF8String = getAs(ordinal)
   override def getBinary(ordinal: Int): Array[Byte] = getAs(ordinal)
   override def getInterval(ordinal: Int): CalendarInterval = getAs(ordinal)
-  override def getStruct(ordinal: Int, numFields: Int): InternalRow = getAs(ordinal)
+  override def getStruct(ordinal: Int, numFields: Int): InternalRow =
+    getAs(ordinal)
   override def getArray(ordinal: Int): ArrayData = getAs(ordinal)
   override def getMap(ordinal: Int): MapData = getAs(ordinal)
 
@@ -87,20 +90,23 @@ class GenericArrayData(val array: Array[Any]) extends ArrayData {
         o1 match {
           case b1: Array[Byte] =>
             if (!o2.isInstanceOf[Array[Byte]] ||
-              !java.util.Arrays.equals(b1, o2.asInstanceOf[Array[Byte]])) {
+                !java.util.Arrays.equals(b1, o2.asInstanceOf[Array[Byte]])) {
               return false
             }
           case f1: Float if java.lang.Float.isNaN(f1) =>
-            if (!o2.isInstanceOf[Float] || ! java.lang.Float.isNaN(o2.asInstanceOf[Float])) {
+            if (!o2.isInstanceOf[Float] ||
+                !java.lang.Float.isNaN(o2.asInstanceOf[Float])) {
               return false
             }
           case d1: Double if java.lang.Double.isNaN(d1) =>
-            if (!o2.isInstanceOf[Double] || ! java.lang.Double.isNaN(o2.asInstanceOf[Double])) {
+            if (!o2.isInstanceOf[Double] ||
+                !java.lang.Double.isNaN(o2.asInstanceOf[Double])) {
               return false
             }
-          case _ => if (o1 != o2) {
-            return false
-          }
+          case _ =>
+            if (o1 != o2) {
+              return false
+            }
         }
       }
       i += 1

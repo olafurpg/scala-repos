@@ -4,7 +4,7 @@ import java.io.{ObjectOutput, ObjectInput}
 import scala.collection.mutable.ArrayBuffer
 
 /** An `ObjectOutput` that enables access to the written data using array-valued fields.
- */
+  */
 trait ArrayObjectOutput extends ObjectOutput {
   def booleanArr: Array[Boolean]
   def byteArr: Array[Int]
@@ -28,7 +28,8 @@ class GenObjectInput(booleanIter: Iterator[Boolean],
                      shortIter: Iterator[Int],
                      arrByteIter: Iterator[Array[Byte]],
                      anyRefIter: Iterator[Any],
-                     stringIter: Iterator[String]) extends ObjectInput {
+                     stringIter: Iterator[String])
+    extends ObjectInput {
   def readByte(): Byte = byteIter.next().asInstanceOf[Byte]
   def readBoolean(): Boolean = booleanIter.next()
   def readChar(): Char = charIter.next().asInstanceOf[Char]
@@ -57,30 +58,31 @@ class GenObjectInput(booleanIter: Iterator[Boolean],
 }
 
 case class GenObjectOutput(
-  val booleanArrBuf: ArrayBuffer[Boolean] = new ArrayBuffer[Boolean],
-  val byteArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int], // Byte stored as Int
-  val charArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int],
-  val doubleArrBuf: ArrayBuffer[Double] = new ArrayBuffer[Double],
-  val floatArrBuf: ArrayBuffer[Float] = new ArrayBuffer[Float],
-  val intArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int],
-  val longArrBuf: ArrayBuffer[Long] = new ArrayBuffer[Long],
-  val shortArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int],
-  val arrByteArrBuf: ArrayBuffer[Array[Byte]] = new ArrayBuffer[Array[Byte]],
-  val anyRefArrBuf: ArrayBuffer[Any] = new ArrayBuffer[Any],
-  val stringArrBuf: ArrayBuffer[String] = new ArrayBuffer[String]
-  ) extends ObjectOutput {
-  def toInput: ObjectInput = new GenObjectInput(
-    booleanArrBuf.iterator,
-    byteArrBuf.iterator,
-    charArrBuf.iterator,
-    doubleArrBuf.iterator,
-    floatArrBuf.iterator,
-    intArrBuf.iterator,
-    longArrBuf.iterator,
-    shortArrBuf.iterator,
-    arrByteArrBuf.iterator,
-    anyRefArrBuf.iterator,
-    stringArrBuf.iterator)
+    val booleanArrBuf: ArrayBuffer[Boolean] = new ArrayBuffer[Boolean],
+    val byteArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int], // Byte stored as Int
+    val charArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int],
+    val doubleArrBuf: ArrayBuffer[Double] = new ArrayBuffer[Double],
+    val floatArrBuf: ArrayBuffer[Float] = new ArrayBuffer[Float],
+    val intArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int],
+    val longArrBuf: ArrayBuffer[Long] = new ArrayBuffer[Long],
+    val shortArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int],
+    val arrByteArrBuf: ArrayBuffer[Array[Byte]] = new ArrayBuffer[Array[Byte]],
+    val anyRefArrBuf: ArrayBuffer[Any] = new ArrayBuffer[Any],
+    val stringArrBuf: ArrayBuffer[String] = new ArrayBuffer[String]
+)
+    extends ObjectOutput {
+  def toInput: ObjectInput =
+    new GenObjectInput(booleanArrBuf.iterator,
+                       byteArrBuf.iterator,
+                       charArrBuf.iterator,
+                       doubleArrBuf.iterator,
+                       floatArrBuf.iterator,
+                       intArrBuf.iterator,
+                       longArrBuf.iterator,
+                       shortArrBuf.iterator,
+                       arrByteArrBuf.iterator,
+                       anyRefArrBuf.iterator,
+                       stringArrBuf.iterator)
 
   // Members declared in java.io.DataOutput
   def writeBoolean(x: Boolean): Unit = { booleanArrBuf += x }
@@ -98,7 +100,7 @@ case class GenObjectOutput(
   // Members declared in java.io.ObjectOutput
   def close(): Unit = {}
   def flush(): Unit = ???
-  def write(x1: Array[Byte],x2: Int,x3: Int): Unit = ???
+  def write(x1: Array[Byte], x2: Int, x3: Int): Unit = ???
   def write(x: Array[Byte]): Unit = { arrByteArrBuf += x }
   def write(x: Int): Unit = ???
   def writeObject(x: Any): Unit = { anyRefArrBuf += x }

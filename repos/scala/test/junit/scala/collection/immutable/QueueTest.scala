@@ -13,16 +13,16 @@ class QueueTest {
 
   @Test
   def dequeueOptionOnEmpty() {
-    assert( emptyQueue.dequeueOption == None )
+    assert(emptyQueue.dequeueOption == None)
   }
 
   @Test
   def dequeueOptionOneAdded() {
-    assert( oneAdded.dequeueOption == Some((1,emptyQueue)) )
+    assert(oneAdded.dequeueOption == Some((1, emptyQueue)))
   }
 
   @Test
   def dequeueOptionThreeAdded() {
-    assert( threeAdded.dequeueOption == Some((1,Queue(2 to 3:_*))) )
+    assert(threeAdded.dequeueOption == Some((1, Queue(2 to 3: _*))))
   }
 }

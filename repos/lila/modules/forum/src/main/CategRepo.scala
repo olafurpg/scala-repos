@@ -11,16 +11,18 @@ object CategRepo {
   def bySlug(slug: String) = $find byId slug
 
   def withTeams(teams: Set[String]): Fu[List[Categ]] =
-    $find($query($or(Seq(
-      Json.obj("team" -> $exists(false)),
-      Json.obj("team" -> $in(teams))
-    ))) sort $sort.asc("pos"))
+    $find(
+        $query($or(Seq(
+                    Json.obj("team" -> $exists(false)),
+                    Json.obj("team" -> $in(teams))
+                ))) sort $sort.asc("pos"))
 
-  def nextPosition: Fu[Int] = $primitive.one(
-    $select.all,
-    "pos",
-    _ sort $sort.desc("pos")
-  )(_.asOpt[Int]) map (~_ + 1)
+  def nextPosition: Fu[Int] =
+    $primitive.one(
+        $select.all,
+        "pos",
+        _ sort $sort.desc("pos")
+    )(_.asOpt[Int]) map (~_ + 1)
 
   def nbPosts(id: String): Fu[Int] =
     $primitive.one($select(id), "nbPosts")(_.asOpt[Int]) map (~_)

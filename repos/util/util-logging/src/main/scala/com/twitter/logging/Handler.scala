@@ -19,52 +19,59 @@ package com.twitter.logging
 import java.util.{logging => javalog}
 
 /**
- * A base log handler for scala. This extends the java built-in handler and connects it with a
- * formatter automatically.
- */
-abstract class Handler(val formatter: Formatter, val level: Option[Level]) extends javalog.Handler {
+  * A base log handler for scala. This extends the java built-in handler and connects it with a
+  * formatter automatically.
+  */
+abstract class Handler(val formatter: Formatter, val level: Option[Level])
+    extends javalog.Handler {
   setFormatter(formatter)
 
-  level.foreach { x => setLevel(x) }
+  level.foreach { x =>
+    setLevel(x)
+  }
 
   override def toString = {
-    "<%s level=%s formatter=%s>".format(getClass.getName, getLevel, formatter.toString)
+    "<%s level=%s formatter=%s>".format(
+        getClass.getName, getLevel, formatter.toString)
   }
 }
 
 /**
- * A log handler class which delegates to another handler. This allows to implement filtering
- * log handlers.
- */
-abstract class ProxyHandler(val handler: Handler) 
-  extends Handler(handler.formatter, handler.level) {
-    override def close() = handler.close()
-    
-    override def flush() = handler.flush()
+  * A log handler class which delegates to another handler. This allows to implement filtering
+  * log handlers.
+  */
+abstract class ProxyHandler(val handler: Handler)
+    extends Handler(handler.formatter, handler.level) {
+  override def close() = handler.close()
 
-    override def getEncoding() = handler.getEncoding()
+  override def flush() = handler.flush()
 
-    override def getErrorManager() = handler.getErrorManager()
+  override def getEncoding() = handler.getEncoding()
 
-    override def getFilter() = handler.getFilter()
+  override def getErrorManager() = handler.getErrorManager()
 
-    override def getFormatter() = handler.getFormatter()
+  override def getFilter() = handler.getFilter()
 
-    override def getLevel() = handler.getLevel()
+  override def getFormatter() = handler.getFormatter()
 
-    override def isLoggable(record: javalog.LogRecord) = handler.isLoggable(record)
-    
-    override def publish(record: javalog.LogRecord) = handler.publish(record)
+  override def getLevel() = handler.getLevel()
 
-    override def setEncoding(encoding: String) = handler.setEncoding(encoding)
+  override def isLoggable(record: javalog.LogRecord) =
+    handler.isLoggable(record)
 
-    override def setErrorManager(errorManager: javalog.ErrorManager) = handler.setErrorManager(errorManager)
+  override def publish(record: javalog.LogRecord) = handler.publish(record)
 
-    override def setFilter(filter: javalog.Filter) = handler.setFilter(filter)
+  override def setEncoding(encoding: String) = handler.setEncoding(encoding)
 
-    override def setFormatter(formatter: javalog.Formatter) = handler.setFormatter(formatter)
+  override def setErrorManager(errorManager: javalog.ErrorManager) =
+    handler.setErrorManager(errorManager)
 
-    override def setLevel(level: javalog.Level) = handler.setLevel(level)
+  override def setFilter(filter: javalog.Filter) = handler.setFilter(filter)
+
+  override def setFormatter(formatter: javalog.Formatter) =
+    handler.setFormatter(formatter)
+
+  override def setLevel(level: javalog.Level) = handler.setLevel(level)
 }
 
 object NullHandler extends Handler(BareFormatter, None) {
@@ -77,27 +84,27 @@ object NullHandler extends Handler(BareFormatter, None) {
 }
 
 object StringHandler {
+
   /**
-   * Generates a HandlerFactory that returns a StringHandler
-   */
+    * Generates a HandlerFactory that returns a StringHandler
+    */
   def apply(
-    formatter: Formatter = new Formatter(),
-    level: Option[Level] = None
+      formatter: Formatter = new Formatter(),
+      level: Option[Level] = None
   ) = () => new StringHandler(formatter, level)
 
   /**
-   * for java compatibility
-   */
+    * for java compatibility
+    */
   def apply() = () => new StringHandler()
 }
 
 /**
- * Mostly useful for unit tests: logging goes directly into a string buffer.
- */
+  * Mostly useful for unit tests: logging goes directly into a string buffer.
+  */
 class StringHandler(
-    formatter: Formatter = new Formatter(),
-    level: Option[Level] = None)
-  extends Handler(formatter, level) {
+    formatter: Formatter = new Formatter(), level: Option[Level] = None)
+    extends Handler(formatter, level) {
 
   // thread-safe logging
   private val buffer = new StringBuffer()
@@ -106,9 +113,9 @@ class StringHandler(
     buffer append getFormatter().format(record)
   }
 
-  def close() = { }
+  def close() = {}
 
-  def flush() = { }
+  def flush() = {}
 
   def get = {
     buffer.toString
@@ -121,33 +128,33 @@ class StringHandler(
 }
 
 object ConsoleHandler {
+
   /**
-   * Generates a HandlerFactory that returns a ConsoleHandler
-   */
+    * Generates a HandlerFactory that returns a ConsoleHandler
+    */
   def apply(
-    formatter: Formatter = new Formatter(),
-    level: Option[Level] = None
+      formatter: Formatter = new Formatter(),
+      level: Option[Level] = None
   ) = () => new ConsoleHandler(formatter, level)
 
   /**
-   * for java compatibility
-   */
+    * for java compatibility
+    */
   def apply() = () => new ConsoleHandler()
 }
 
 /**
- * Log things to the console.
- */
+  * Log things to the console.
+  */
 class ConsoleHandler(
-    formatter: Formatter = new Formatter(),
-    level: Option[Level] = None)
-  extends Handler(formatter, level) {
+    formatter: Formatter = new Formatter(), level: Option[Level] = None)
+    extends Handler(formatter, level) {
 
   def publish(record: javalog.LogRecord) = {
     System.err.print(getFormatter().format(record))
   }
 
-  def close() = { }
+  def close() = {}
 
   def flush() = Console.flush
 }

@@ -1,7 +1,7 @@
 class A() {
-     class B() {
-         def foo(x: B) = 0
-     }
+  class B() {
+    def foo(x: B) = 0
+  }
 }
 object test {
   def main = {
@@ -12,4 +12,3 @@ object test {
     ()
   }
 }
-

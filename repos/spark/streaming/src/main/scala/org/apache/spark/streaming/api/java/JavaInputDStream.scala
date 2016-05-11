@@ -23,18 +23,19 @@ import scala.reflect.ClassTag
 import org.apache.spark.streaming.dstream.InputDStream
 
 /**
- * A Java-friendly interface to [[org.apache.spark.streaming.dstream.InputDStream]].
- */
-class JavaInputDStream[T](val inputDStream: InputDStream[T])
-  (implicit override val classTag: ClassTag[T]) extends JavaDStream[T](inputDStream) {
-}
+  * A Java-friendly interface to [[org.apache.spark.streaming.dstream.InputDStream]].
+  */
+class JavaInputDStream[T](val inputDStream: InputDStream[T])(
+    implicit override val classTag: ClassTag[T])
+    extends JavaDStream[T](inputDStream) {}
 
 object JavaInputDStream {
+
   /**
-   * Convert a scala [[org.apache.spark.streaming.dstream.InputDStream]] to a Java-friendly
-   * [[org.apache.spark.streaming.api.java.JavaInputDStream]].
-   */
-  implicit def fromInputDStream[T: ClassTag](
+    * Convert a scala [[org.apache.spark.streaming.dstream.InputDStream]] to a Java-friendly
+    * [[org.apache.spark.streaming.api.java.JavaInputDStream]].
+    */
+  implicit def fromInputDStream[T : ClassTag](
       inputDStream: InputDStream[T]): JavaInputDStream[T] = {
     new JavaInputDStream[T](inputDStream)
   }

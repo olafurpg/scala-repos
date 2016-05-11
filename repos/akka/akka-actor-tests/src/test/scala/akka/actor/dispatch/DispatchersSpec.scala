@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor.dispatch
 
 import scala.collection.JavaConverters.mapAsJavaMapConverter
@@ -10,13 +10,14 @@ import com.typesafe.config.ConfigFactory
 import akka.ConfigurationException
 import akka.actor._
 import akka.dispatch._
-import akka.testkit.{ AkkaSpec, ImplicitSender }
+import akka.testkit.{AkkaSpec, ImplicitSender}
 import akka.routing.FromConfig
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
 object DispatchersSpec {
-  val config = """
+  val config =
+    """
     myapp {
       mydispatcher {
         throughput = 17
@@ -69,7 +70,7 @@ object DispatchersSpec {
   }
 
   class OneShotMailboxType(settings: ActorSystem.Settings, config: Config)
-    extends MailboxType with ProducesMessageQueue[DoublingMailbox] {
+      extends MailboxType with ProducesMessageQueue[DoublingMailbox] {
     val created = new AtomicBoolean(false)
     override def create(owner: Option[ActorRef], system: Option[ActorSystem]) =
       if (created.compareAndSet(false, true)) {
@@ -78,7 +79,8 @@ object DispatchersSpec {
         throw new IllegalStateException("I've already created the mailbox.")
   }
 
-  class DoublingMailbox(owner: Option[ActorRef]) extends UnboundedQueueBasedMessageQueue {
+  class DoublingMailbox(owner: Option[ActorRef])
+      extends UnboundedQueueBasedMessageQueue {
     final val queue = new ConcurrentLinkedQueue[Envelope]()
     override def enqueue(receiver: ActorRef, handle: Envelope): Unit = {
       queue add handle
@@ -88,7 +90,8 @@ object DispatchersSpec {
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class DispatchersSpec extends AkkaSpec(DispatchersSpec.config) with ImplicitSender {
+class DispatchersSpec
+    extends AkkaSpec(DispatchersSpec.config) with ImplicitSender {
   import DispatchersSpec._
   val df = system.dispatchers
   import df._
@@ -101,20 +104,30 @@ class DispatchersSpec extends AkkaSpec(DispatchersSpec.config) with ImplicitSend
   val throughput = "throughput"
   val id = "id"
 
-  def instance(dispatcher: MessageDispatcher): (MessageDispatcher) ⇒ Boolean = _ == dispatcher
-  def ofType[T <: MessageDispatcher: ClassTag]: (MessageDispatcher) ⇒ Boolean = _.getClass == implicitly[ClassTag[T]].runtimeClass
+  def instance(dispatcher: MessageDispatcher): (MessageDispatcher) ⇒ Boolean =
+    _ == dispatcher
+  def ofType[
+      T <: MessageDispatcher : ClassTag]: (MessageDispatcher) ⇒ Boolean =
+    _.getClass == implicitly[ClassTag[T]].runtimeClass
 
-  def typesAndValidators: Map[String, (MessageDispatcher) ⇒ Boolean] = Map(
-    "PinnedDispatcher" -> ofType[PinnedDispatcher],
-    "Dispatcher" -> ofType[Dispatcher])
+  def typesAndValidators: Map[String, (MessageDispatcher) ⇒ Boolean] =
+    Map("PinnedDispatcher" -> ofType[PinnedDispatcher],
+        "Dispatcher" -> ofType[Dispatcher])
 
   def validTypes = typesAndValidators.keys.toList
 
-  val defaultDispatcherConfig = settings.config.getConfig("akka.actor.default-dispatcher")
+  val defaultDispatcherConfig =
+    settings.config.getConfig("akka.actor.default-dispatcher")
 
   lazy val allDispatchers: Map[String, MessageDispatcher] = {
-    validTypes.map(t ⇒ (t, from(ConfigFactory.parseMap(Map(tipe -> t, id -> t).asJava).
-      withFallback(defaultDispatcherConfig)))).toMap
+    validTypes
+      .map(
+          t ⇒
+            (t,
+             from(ConfigFactory
+                   .parseMap(Map(tipe -> t, id -> t).asJava)
+                   .withFallback(defaultDispatcherConfig))))
+      .toMap
   }
 
   def assertMyDispatcherIsUsed(actor: ActorRef): Unit = {
@@ -151,14 +164,17 @@ class DispatchersSpec extends AkkaSpec(DispatchersSpec.config) with ImplicitSend
 
     "throw ConfigurationException if type does not exist" in {
       intercept[ConfigurationException] {
-        from(ConfigFactory.parseMap(Map(tipe -> "typedoesntexist", id -> "invalid-dispatcher").asJava).
-          withFallback(defaultDispatcherConfig))
+        from(ConfigFactory
+              .parseMap(Map(tipe -> "typedoesntexist",
+                            id -> "invalid-dispatcher").asJava)
+              .withFallback(defaultDispatcherConfig))
       }
     }
 
     "get the correct types of dispatchers" in {
       //All created/obtained dispatchers are of the expeced type/instance
-      assert(typesAndValidators.forall(tuple ⇒ tuple._2(allDispatchers(tuple._1))))
+      assert(typesAndValidators.forall(
+              tuple ⇒ tuple._2(allDispatchers(tuple._1))))
     }
 
     "provide lookup of dispatchers by id" in {
@@ -168,12 +184,15 @@ class DispatchersSpec extends AkkaSpec(DispatchersSpec.config) with ImplicitSend
     }
 
     "include system name and dispatcher id in thread names for fork-join-executor" in {
-      assertMyDispatcherIsUsed(system.actorOf(Props[ThreadNameEcho].withDispatcher("myapp.mydispatcher")))
+      assertMyDispatcherIsUsed(system.actorOf(
+              Props[ThreadNameEcho].withDispatcher("myapp.mydispatcher")))
     }
 
     "include system name and dispatcher id in thread names for thread-pool-executor" in {
-      system.actorOf(Props[ThreadNameEcho].withDispatcher("myapp.thread-pool-dispatcher")) ! "what's the name?"
-      val Expected = "(DispatchersSpec-myapp.thread-pool-dispatcher-[1-9][0-9]*)".r
+      system.actorOf(Props[ThreadNameEcho].withDispatcher(
+              "myapp.thread-pool-dispatcher")) ! "what's the name?"
+      val Expected =
+        "(DispatchersSpec-myapp.thread-pool-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {
         case Expected(x) ⇒
       }
@@ -181,51 +200,63 @@ class DispatchersSpec extends AkkaSpec(DispatchersSpec.config) with ImplicitSend
 
     "include system name and dispatcher id in thread names for default-dispatcher" in {
       system.actorOf(Props[ThreadNameEcho]) ! "what's the name?"
-      val Expected = "(DispatchersSpec-akka.actor.default-dispatcher-[1-9][0-9]*)".r
+      val Expected =
+        "(DispatchersSpec-akka.actor.default-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {
         case Expected(x) ⇒
       }
     }
 
     "include system name and dispatcher id in thread names for pinned dispatcher" in {
-      system.actorOf(Props[ThreadNameEcho].withDispatcher("myapp.my-pinned-dispatcher")) ! "what's the name?"
-      val Expected = "(DispatchersSpec-myapp.my-pinned-dispatcher-[1-9][0-9]*)".r
+      system.actorOf(Props[ThreadNameEcho].withDispatcher(
+              "myapp.my-pinned-dispatcher")) ! "what's the name?"
+      val Expected =
+        "(DispatchersSpec-myapp.my-pinned-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {
         case Expected(x) ⇒
       }
     }
 
     "include system name and dispatcher id in thread names for balancing dispatcher" in {
-      system.actorOf(Props[ThreadNameEcho].withDispatcher("myapp.balancing-dispatcher")) ! "what's the name?"
-      val Expected = "(DispatchersSpec-myapp.balancing-dispatcher-[1-9][0-9]*)".r
+      system.actorOf(Props[ThreadNameEcho].withDispatcher(
+              "myapp.balancing-dispatcher")) ! "what's the name?"
+      val Expected =
+        "(DispatchersSpec-myapp.balancing-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {
         case Expected(x) ⇒
       }
     }
 
     "use dispatcher in deployment config" in {
-      assertMyDispatcherIsUsed(system.actorOf(Props[ThreadNameEcho], name = "echo1"))
+      assertMyDispatcherIsUsed(
+          system.actorOf(Props[ThreadNameEcho], name = "echo1"))
     }
 
     "use dispatcher in deployment config, trumps code" in {
       assertMyDispatcherIsUsed(
-        system.actorOf(Props[ThreadNameEcho].withDispatcher("myapp.my-pinned-dispatcher"), name = "echo2"))
+          system.actorOf(Props[ThreadNameEcho].withDispatcher(
+                             "myapp.my-pinned-dispatcher"),
+                         name = "echo2"))
     }
 
     "use pool-dispatcher router of deployment config" in {
-      val pool = system.actorOf(FromConfig.props(Props[ThreadNameEcho]), name = "pool1")
+      val pool =
+        system.actorOf(FromConfig.props(Props[ThreadNameEcho]), name = "pool1")
       pool ! Identify(None)
       val routee = expectMsgType[ActorIdentity].ref.get
       routee ! "what's the name?"
-      val Expected = """(DispatchersSpec-akka\.actor\.deployment\./pool1\.pool-dispatcher-[1-9][0-9]*)""".r
+      val Expected =
+        """(DispatchersSpec-akka\.actor\.deployment\./pool1\.pool-dispatcher-[1-9][0-9]*)""".r
       expectMsgPF() {
         case Expected(x) ⇒
       }
     }
 
     "use balancing-pool router with special routees mailbox of deployment config" in {
-      system.actorOf(FromConfig.props(Props[ThreadNameEcho]), name = "balanced") ! "what's the name?"
-      val Expected = """(DispatchersSpec-BalancingPool-/balanced-[1-9][0-9]*)""".r
+      system.actorOf(FromConfig.props(Props[ThreadNameEcho]),
+                     name = "balanced") ! "what's the name?"
+      val Expected =
+        """(DispatchersSpec-BalancingPool-/balanced-[1-9][0-9]*)""".r
       expectMsgPF() {
         case Expected(x) ⇒
       }

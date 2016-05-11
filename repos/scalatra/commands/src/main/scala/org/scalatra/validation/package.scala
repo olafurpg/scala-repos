@@ -1,5 +1,3 @@
 package org.scalatra
 
-package object validation {
-
-}
+package object validation {}

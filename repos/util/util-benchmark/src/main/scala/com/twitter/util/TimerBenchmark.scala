@@ -5,10 +5,10 @@ import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 
 /**
- * This uses `SingleShotTime` because scheduling work changes the
- * performance of future scheduling (particularly because this
- * does not wait for the tasks to be executed).
- */
+  * This uses `SingleShotTime` because scheduling work changes the
+  * performance of future scheduling (particularly because this
+  * does not wait for the tasks to be executed).
+  */
 // ./sbt 'project util-benchmark' 'run .*TimerBenchmark.*'
 @State(Scope.Benchmark)
 @Warmup(batchSize = 250)
@@ -39,23 +39,23 @@ class TimerBenchmark extends StdBenchAnnotations {
   }
 
   /**
-   * Note: this really just benchmarks how expensive it is to "enqueue"
-   * the work, not expense of "dequeueing" and running.
-   */
+    * Note: this really just benchmarks how expensive it is to "enqueue"
+    * the work, not expense of "dequeueing" and running.
+    */
   private[this] def scheduleOnce(timer: Timer): TimerTask =
     timer.schedule(wayLater) { () }
 
   /**
-   * Note: this really just benchmarks how expensive it is to "enqueue"
-   * the work, not expense of "dequeueing" and running.
-   */
+    * Note: this really just benchmarks how expensive it is to "enqueue"
+    * the work, not expense of "dequeueing" and running.
+    */
   private[this] def schedulePeriodic(timer: Timer): TimerTask =
     timer.schedule(wayLater, period) { () }
 
   /**
-   * Note: this really just benchmarks how expensive it is to "enqueue"
-   * the work, not expense of "dequeueing" and running.
-   */
+    * Note: this really just benchmarks how expensive it is to "enqueue"
+    * the work, not expense of "dequeueing" and running.
+    */
   private[this] def doAt(timer: Timer): Future[Unit] =
     timer.doAt(wayLater) { () }
 
@@ -86,5 +86,4 @@ class TimerBenchmark extends StdBenchAnnotations {
   @Benchmark
   def doAtBaseline(): Future[Unit] =
     doAt(baseline)
-
 }

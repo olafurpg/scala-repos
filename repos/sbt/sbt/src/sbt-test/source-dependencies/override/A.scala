@@ -1,3 +1,3 @@
 trait A {
-	def x: Int
+  def x: Int
 }

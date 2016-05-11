@@ -22,8 +22,8 @@ import breeze.linalg.{DenseVector => BDV, SparseVector => BSV}
 import org.apache.spark.SparkFunSuite
 
 /**
- * Test Breeze vector conversions.
- */
+  * Test Breeze vector conversions.
+  */
 class BreezeVectorConversionSuite extends SparkFunSuite {
 
   val arr = Array(0.1, 0.2, 0.3, 0.4)

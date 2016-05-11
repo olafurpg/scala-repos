@@ -2,18 +2,20 @@ import sbt._
 import Keys._
 import Import._
 
-object TestBuild extends Build
-{
+object TestBuild extends Build {
   lazy val akey = AttributeKey[Int]("TestKey")
   lazy val t = TaskKey[String]("test-task")
   lazy val check = InputKey[Unit]("check")
-  lazy  val root = Project("root", file(".")).aggregate(a, b).settings(
-    check := checkState(checkParser.parsed, state.value)
-  )
+  lazy val root = Project("root", file("."))
+    .aggregate(a, b)
+    .settings(
+        check := checkState(checkParser.parsed, state.value)
+    )
 
   lazy val a = Project("a", file("a")).settings(t := sys.error("Failing"))
 
-  lazy val b = Project("b", file("b")).settings(t <<= Def.task("").updateState(updater))
+  lazy val b =
+    Project("b", file("b")).settings(t <<= Def.task("").updateState(updater))
 
   def checkState(runs: Int, s: State): Unit = {
     val stored = s.get(akey).getOrElse(0)
@@ -22,7 +24,7 @@ object TestBuild extends Build
 
   def updater(s: State, a: AnyRef): State = s.update(akey)(_.getOrElse(0) + 1)
 
-	import complete.DefaultParsers._
+  import complete.DefaultParsers._
 
   lazy val checkParser = token(Space ~> IntBasic)
 }

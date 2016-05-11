@@ -23,7 +23,7 @@ import com.precog.util._
 import com.precog.util.BitSetUtil.Implicits._
 import com.precog.common._
 
-import scala.{ specialized => sepc }
+import scala.{specialized => sepc}
 
 import scalaz._
 
@@ -33,7 +33,8 @@ trait Reduction[A] {
 }
 
 object Reductions {
-  private def bitsOrBust[A](defined: BitSet, mask: Option[BitSet])(f: BitSet => A): Option[A] = {
+  private def bitsOrBust[A](defined: BitSet, mask: Option[BitSet])(
+      f: BitSet => A): Option[A] = {
     val bits = mask map (_ & defined) getOrElse defined
     if (bits.isEmpty) None else Some(f(bits))
   }
@@ -52,49 +53,50 @@ object Reductions {
       def append(x: BigDecimal, y: => BigDecimal): BigDecimal = x min y
     }
 
-    def reduce(segment: Segment, mask: Option[BitSet]): Option[BigDecimal] = segment match {
-      case seg: ArraySegment[a] =>
-        seg.values match {
-          case values: Array[Long] =>
-            bitsOrBust(seg.defined, mask) { bits =>
-              var min = Long.MaxValue
-              bits.foreach { row =>
-                if (values(row) < min) {
-                  min = values(row)
+    def reduce(segment: Segment, mask: Option[BitSet]): Option[BigDecimal] =
+      segment match {
+        case seg: ArraySegment[a] =>
+          seg.values match {
+            case values: Array[Long] =>
+              bitsOrBust(seg.defined, mask) { bits =>
+                var min = Long.MaxValue
+                bits.foreach { row =>
+                  if (values(row) < min) {
+                    min = values(row)
+                  }
                 }
+                BigDecimal(min)
               }
-              BigDecimal(min)
-            }
 
-          case values: Array[Double] =>
-            bitsOrBust(seg.defined, mask) { bits =>
-              var min = Double.PositiveInfinity
-              bits.foreach { row =>
-                if (values(row) < min) {
-                  min = values(row)
+            case values: Array[Double] =>
+              bitsOrBust(seg.defined, mask) { bits =>
+                var min = Double.PositiveInfinity
+                bits.foreach { row =>
+                  if (values(row) < min) {
+                    min = values(row)
+                  }
                 }
+                BigDecimal(min)
               }
-              BigDecimal(min)
-            }
 
-          case values: Array[BigDecimal] =>
-            bitsOrBust(seg.defined, mask) { bits =>
-              var min: BigDecimal = null
-              bits.foreach { row =>
-                if (min == null || values(row) < min) {
-                  min = values(row)
+            case values: Array[BigDecimal] =>
+              bitsOrBust(seg.defined, mask) { bits =>
+                var min: BigDecimal = null
+                bits.foreach { row =>
+                  if (min == null || values(row) < min) {
+                    min = values(row)
+                  }
                 }
+                min
               }
-              min
-            }
 
-          case _ =>
-            None
-        }
+            case _ =>
+              None
+          }
 
-      case _ =>
-        None
-    }
+        case _ =>
+          None
+      }
   }
 
   object max extends Reduction[BigDecimal] {
@@ -102,48 +104,49 @@ object Reductions {
       def append(x: BigDecimal, y: => BigDecimal): BigDecimal = x max y
     }
 
-    def reduce(segment: Segment, mask: Option[BitSet]): Option[BigDecimal] = segment match {
-      case seg: ArraySegment[a] =>
-        seg.values match {
-          case values: Array[Long] =>
-            bitsOrBust(seg.defined, mask) { bits =>
-              var min = Long.MinValue
-              bits.foreach { row =>
-                if (values(row) > min) {
-                  min = values(row)
+    def reduce(segment: Segment, mask: Option[BitSet]): Option[BigDecimal] =
+      segment match {
+        case seg: ArraySegment[a] =>
+          seg.values match {
+            case values: Array[Long] =>
+              bitsOrBust(seg.defined, mask) { bits =>
+                var min = Long.MinValue
+                bits.foreach { row =>
+                  if (values(row) > min) {
+                    min = values(row)
+                  }
                 }
+                BigDecimal(min)
               }
-              BigDecimal(min)
-            }
 
-          case values: Array[Double] =>
-            bitsOrBust(seg.defined, mask) { bits =>
-              var min = Double.NegativeInfinity
-              bits.foreach { row =>
-                if (values(row) > min) {
-                  min = values(row)
+            case values: Array[Double] =>
+              bitsOrBust(seg.defined, mask) { bits =>
+                var min = Double.NegativeInfinity
+                bits.foreach { row =>
+                  if (values(row) > min) {
+                    min = values(row)
+                  }
                 }
+                BigDecimal(min)
               }
-              BigDecimal(min)
-            }
 
-          case values: Array[BigDecimal] =>
-            bitsOrBust(seg.defined, mask) { bits =>
-              var min: BigDecimal = null
-              bits.foreach { row =>
-                if (min == null || values(row) > min) {
-                  min = values(row)
+            case values: Array[BigDecimal] =>
+              bitsOrBust(seg.defined, mask) { bits =>
+                var min: BigDecimal = null
+                bits.foreach { row =>
+                  if (min == null || values(row) > min) {
+                    min = values(row)
+                  }
                 }
+                min
               }
-              min
-            }
 
-          case _ =>
-            None
-        }
+            case _ =>
+              None
+          }
 
-      case _ =>
-        None
-    }
+        case _ =>
+          None
+      }
   }
 }

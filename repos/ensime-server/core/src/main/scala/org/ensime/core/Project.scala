@@ -18,14 +18,15 @@ import org.ensime.util.file._
 import org.ensime.util.FileUtils
 
 /**
- * The Project actor simply forwards messages coming from the user to
- * the respective subcomponent.
- */
+  * The Project actor simply forwards messages coming from the user to
+  * the respective subcomponent.
+  */
 class Project(
     broadcaster: ActorRef,
     implicit val config: EnsimeConfig
-) extends Actor with ActorLogging with Stash {
-  import context.{ dispatcher, system }
+)
+    extends Actor with ActorLogging with Stash {
+  import context.{dispatcher, system}
 
   import FileUtils._
 
@@ -52,31 +53,36 @@ class Project(
     def fileRemoved(f: FileObject): Unit = reTypeCheck()
     override def baseReCreated(f: FileObject): Unit = reTypeCheck()
   }
-  private val classfileWatcher = context.actorOf(Props(new ClassfileWatcher(config, searchService :: reTypecheck :: Nil)), "classFileWatcher")
+  private val classfileWatcher = context.actorOf(
+      Props(new ClassfileWatcher(config, searchService :: reTypecheck :: Nil)),
+      "classFileWatcher")
 
   def receive: Receive = awaitingConnectionInfoReq
 
-  def awaitingConnectionInfoReq: Receive = withLabel("awaitingConnectionInfoReq") {
-    case ConnectionInfoReq =>
-      sender() ! ConnectionInfo()
-      context.become(handleRequests)
-      init()
-      unstashAll()
-    case other =>
-      stash()
-  }
+  def awaitingConnectionInfoReq: Receive =
+    withLabel("awaitingConnectionInfoReq") {
+      case ConnectionInfoReq =>
+        sender() ! ConnectionInfo()
+        context.become(handleRequests)
+        init()
+        unstashAll()
+      case other =>
+        stash()
+    }
 
   private def init(): Unit = {
-    searchService.refresh().onComplete {
-      case Success((deletes, inserts)) =>
-        // legacy clients expect to see IndexerReady on connection.
-        // we could also just blindly send this on each connection.
-        broadcaster ! Broadcaster.Persist(IndexerReadyEvent)
-        log.debug(s"created $inserts and removed $deletes searchable rows")
-      case Failure(problem) =>
-        log.warning(problem.toString)
-        throw problem
-    }(context.dispatcher)
+    searchService
+      .refresh()
+      .onComplete {
+        case Success((deletes, inserts)) =>
+          // legacy clients expect to see IndexerReady on connection.
+          // we could also just blindly send this on each connection.
+          broadcaster ! Broadcaster.Persist(IndexerReadyEvent)
+          log.debug(s"created $inserts and removed $deletes searchable rows")
+        case Failure(problem) =>
+          log.warning(problem.toString)
+          throw problem
+      }(context.dispatcher)
     indexer = context.actorOf(Indexer(searchService), "indexer")
     if (config.scalaLibrary.isDefined || Set("scala", "dotty")(config.name)) {
 
@@ -92,12 +98,16 @@ class Project(
         }
       }))
 
-      scalac = context.actorOf(Analyzer(merger, indexer, searchService), "scalac")
-      javac = context.actorOf(JavaAnalyzer(merger, indexer, searchService), "javac")
+      scalac = context.actorOf(
+          Analyzer(merger, indexer, searchService), "scalac")
+      javac = context.actorOf(
+          JavaAnalyzer(merger, indexer, searchService), "javac")
     } else {
-      log.warning("Detected a pure Java project. Scala queries are not available.")
+      log.warning(
+          "Detected a pure Java project. Scala queries are not available.")
       scalac = system.deadLetters
-      javac = context.actorOf(JavaAnalyzer(broadcaster, indexer, searchService), "javac")
+      javac = context.actorOf(
+          JavaAnalyzer(broadcaster, indexer, searchService), "javac")
     }
     debugger = context.actorOf(DebugManager(broadcaster), "debugging")
     docs = context.actorOf(DocResolver(), "docs")
@@ -117,14 +127,18 @@ class Project(
     case AskReTypecheck =>
       Option(rechecking).foreach(_.cancel())
       rechecking = system.scheduler.scheduleOnce(
-        5 seconds, scalac, ReloadExistingFilesEvent
+          5 seconds,
+          scalac,
+          ReloadExistingFilesEvent
       )
     // HACK: to expedite initial dev, Java requests use the Scala API
     case m @ TypecheckFileReq(sfi) if sfi.file.isJava => javac forward m
-    case m @ CompletionsReq(sfi, _, _, _, _) if sfi.file.isJava => javac forward m
+    case m @ CompletionsReq(sfi, _, _, _, _) if sfi.file.isJava =>
+      javac forward m
     case m @ DocUriAtPointReq(sfi, _) if sfi.file.isJava => javac forward m
     case m @ TypeAtPointReq(sfi, _) if sfi.file.isJava => javac forward m
-    case m @ SymbolDesignationsReq(sfi, _, _, _) if sfi.file.isJava => javac forward m
+    case m @ SymbolDesignationsReq(sfi, _, _, _) if sfi.file.isJava =>
+      javac forward m
     case m @ SymbolAtPointReq(sfi, _) if sfi.file.isJava => javac forward m
 
     // mixed mode query
@@ -142,7 +156,6 @@ class Project(
     case ConnectionInfoReq =>
       sender() ! ConnectionInfo()
   }
-
 }
 object Project {
   def apply(target: ActorRef)(implicit config: EnsimeConfig): Props =

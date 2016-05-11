@@ -1,5 +1,5 @@
 object Test {
-  def main(args : Array[String]) : Unit = {
+  def main(args: Array[String]): Unit = {
     println(s"Method returns Null type: $f")
     println(s"Method takes non Null type: ${g(null)}")
 
@@ -34,16 +34,16 @@ object Test {
 }
 
 abstract class A {
-	def f(x: String): String
+  def f(x: String): String
 }
 
 class B extends A {
-	val nullField = null
+  val nullField = null
 
-	// this forces a bridge method because the return type is different
-	override def f(x: String) : Null = null
+  // this forces a bridge method because the return type is different
+  override def f(x: String): Null = null
 }
 
 object B {
-	val nullCompanionField = null
+  val nullCompanionField = null
 }

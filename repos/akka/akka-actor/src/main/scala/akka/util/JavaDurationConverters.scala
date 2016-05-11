@@ -1,12 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.util
-import java.time.{ Duration ⇒ JDuration }
+import java.time.{Duration ⇒ JDuration}
 import scala.concurrent.duration.Duration
+
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object JavaDurationConverters {
   final implicit class JavaDurationOps(val self: JDuration) extends AnyVal {
     def asScala: Duration = Duration.fromNanos(self.toNanos)

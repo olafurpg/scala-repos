@@ -15,10 +15,9 @@ import org.ensime.util.file._
 import org.ensime.api._
 
 object EnsimeConfigProtocol {
-  object Protocol extends DefaultSexpProtocol
-    with OptionAltFormat
-    with ScalariformFormat
-    with CamelCaseToDashes
+  object Protocol
+      extends DefaultSexpProtocol with OptionAltFormat with ScalariformFormat
+      with CamelCaseToDashes
   import org.ensime.config.EnsimeConfigProtocol.Protocol._
 
   private val log = Logger(this.getClass.getName)
@@ -40,7 +39,7 @@ object EnsimeConfigProtocol {
     else javaHome.tree.filter(_.getName == "rt.jar").toList
 
   def validated(c: EnsimeConfig): EnsimeConfig = c.copy(
-    subprojects = c.subprojects.map(validated)
+      subprojects = c.subprojects.map(validated)
   )
 
   /*
@@ -57,12 +56,13 @@ object EnsimeConfigProtocol {
         dir.mkdirs()
       }
     }
-    Canonised(m.copy(
-      target = None,
-      targets = m.targetDirs,
-      testTarget = None,
-      testTargets = m.testTargetDirs,
-      sourceRoots = m.sourceRoots
-    ))
+    Canonised(
+        m.copy(
+            target = None,
+            targets = m.targetDirs,
+            testTarget = None,
+            testTargets = m.testTargetDirs,
+            sourceRoots = m.sourceRoots
+        ))
   }
 }

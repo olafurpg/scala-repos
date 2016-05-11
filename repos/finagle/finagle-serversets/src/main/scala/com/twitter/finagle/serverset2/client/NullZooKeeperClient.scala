@@ -7,10 +7,10 @@ import com.twitter.io.Buf
 import com.twitter.util.{Duration, Future, Time}
 
 /**
- * Provide a Null client, useful as an initial value for a wrapper that
- * re-establishes a ZooKeeper connection on SessionExpiration, as
- * ZooKeeperClient is designed for single session operation.
- */
+  * Provide a Null client, useful as an initial value for a wrapper that
+  * re-establishes a ZooKeeper connection on SessionExpiration, as
+  * ZooKeeperClient is designed for single session operation.
+  */
 trait NullZooKeeperClient extends ZooKeeperClient {
   def sessionId: Long = -1
   def getEphemerals(): Future[Seq[String]] = Future.never
@@ -33,23 +33,30 @@ trait NullZooKeeperReader extends ZooKeeperReader with NullZooKeeperClient {
 
 trait NullZooKeeperWriter extends ZooKeeperWriter with NullZooKeeperClient {
   def create(
-    path: String,
-    data: Option[Buf],
-    acl: Seq[Data.ACL],
-    createMode: CreateMode
+      path: String,
+      data: Option[Buf],
+      acl: Seq[Data.ACL],
+      createMode: CreateMode
   ): Future[String] = Future.never
 
   def delete(path: String, version: Option[Int]): Future[Unit] = Future.never
-  def setData(path: String, data: Option[Buf], version: Option[Int]): Future[Stat] = Future.never
-  def setACL(path: String, acl: Seq[Data.ACL], version: Option[Int]): Future[Stat] = Future.never
+  def setData(
+      path: String, data: Option[Buf], version: Option[Int]): Future[Stat] =
+    Future.never
+  def setACL(
+      path: String, acl: Seq[Data.ACL], version: Option[Int]): Future[Stat] =
+    Future.never
 }
 
 trait NullZooKeeperMulti extends ZooKeeperMulti with NullZooKeeperClient {
   def multi(ops: Seq[Op]): Future[Seq[OpResult]] = Future.never
 }
 
-trait NullZooKeeperRW extends ZooKeeperRW with NullZooKeeperReader with NullZooKeeperWriter
-trait NullZooKeeperRWMulti extends ZooKeeperRWMulti with NullZooKeeperReader with NullZooKeeperWriter with NullZooKeeperMulti
+trait NullZooKeeperRW
+    extends ZooKeeperRW with NullZooKeeperReader with NullZooKeeperWriter
+trait NullZooKeeperRWMulti
+    extends ZooKeeperRWMulti with NullZooKeeperReader with NullZooKeeperWriter
+    with NullZooKeeperMulti
 
 object NullZooKeeperClient extends NullZooKeeperClient
 object NullZooKeeperReader extends NullZooKeeperReader

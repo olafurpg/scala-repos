@@ -20,6 +20,4 @@ package object commands {
   //  implicit val minDateDefault: org.scalatra.DefaultValue[Date] = default(new Date(0))
   //  implicit val minDateTimeDefault: org.scalatra.DefaultValue[DateTime] = default(new DateTime(0).withZone(DateTimeZone.UTC))
   //  implicit val jsonDefault: org.scalatra.DefaultValue[JValue] = default(JNothing)
-
 }
-

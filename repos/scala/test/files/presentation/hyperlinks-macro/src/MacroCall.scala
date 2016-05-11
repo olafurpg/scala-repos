@@ -2,10 +2,10 @@ object Test {
   def foo = 0
 
   scala.reflect.runtime.universe.reify {
-    foo/*#*/
+    foo /*#*/
   }
 
   identity {
-    foo/*#*/
+    foo /*#*/
   }
 }

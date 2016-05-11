@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding.serialization
 
 import java.io.InputStream
@@ -78,10 +78,11 @@ class PositionInputStream(val wraps: InputStream) extends InputStream {
   }
 
   /**
-   * This throws an exception if it can't set the position to what you give it.
-   */
+    * This throws an exception if it can't set the position to what you give it.
+    */
   def seekToPosition(p: Long) {
-    if (p < pos) illegal(s"Can't seek backwards, at position $pos, trying to goto $p")
+    if (p < pos)
+      illegal(s"Can't seek backwards, at position $pos, trying to goto $p")
     wraps.skipFully(p - pos)
     pos = p
   }

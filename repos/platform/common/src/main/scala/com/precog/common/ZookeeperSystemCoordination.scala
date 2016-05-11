@@ -22,7 +22,7 @@ package com.precog.common
 import java.net.InetAddress
 
 import blueeyes.json._
-import blueeyes.json.serialization.{ Extractor, Decomposer }
+import blueeyes.json.serialization.{Extractor, Decomposer}
 import blueeyes.json.serialization.DefaultSerialization._
 import blueeyes.json.serialization.Extractor._
 import blueeyes.json.serialization.Versioned._
@@ -37,7 +37,6 @@ import org.I0Itec.zkclient.DataUpdater
 import scalaz._
 import scalaz.syntax.apply._
 
-
 object ZookeeperSystemCoordination {
   val defaultRetries = 45
   val defaultDelay = 1000
@@ -51,23 +50,34 @@ object ZookeeperSystemCoordination {
   val relayAgentBasePaths = List("ingest", "relay_agent")
   val shardCheckpointBasePaths = List("bifrost", "checkpoint")
 
-  def toNodeData(jval: JValue): Array[Byte] = jval.renderCompact.getBytes("UTF-8")
-  def fromNodeData(bytes: Array[Byte]): JValue = JParser.parseUnsafe(new String(bytes, "UTF-8"))
+  def toNodeData(jval: JValue): Array[Byte] =
+    jval.renderCompact.getBytes("UTF-8")
+  def fromNodeData(bytes: Array[Byte]): JValue =
+    JParser.parseUnsafe(new String(bytes, "UTF-8"))
 
-  def apply(zkHosts: String, uid: ServiceUID, yggCheckpointsEnabled: Boolean, createCheckpointFlag: Option[String] = None) = {
+  def apply(zkHosts: String,
+            uid: ServiceUID,
+            yggCheckpointsEnabled: Boolean,
+            createCheckpointFlag: Option[String] = None) = {
     val zkc = new ZkClient(zkHosts)
-    new ZookeeperSystemCoordination(zkc, uid, yggCheckpointsEnabled, createCheckpointFlag)
+    new ZookeeperSystemCoordination(
+        zkc, uid, yggCheckpointsEnabled, createCheckpointFlag)
   }
 
   def extractServiceUID(config: Configuration): ServiceUID = {
     val systemId = config[String]("systemId", "test")
     val hostId = config[String]("hostId", InetAddress.getLocalHost.getHostName)
-    val serviceId = config[String]("serviceId", System.getProperty("precog.serviceId", ""))
+    val serviceId =
+      config[String]("serviceId", System.getProperty("precog.serviceId", ""))
     ServiceUID(systemId, hostId, serviceId)
   }
 }
 
-class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yggCheckpointsEnabled: Boolean, createIfMissingFlag: Option[String]) extends SystemCoordination with Logging {
+class ZookeeperSystemCoordination(private val zkc: ZkClient,
+                                  uid: ServiceUID,
+                                  yggCheckpointsEnabled: Boolean,
+                                  createIfMissingFlag: Option[String])
+    extends SystemCoordination with Logging {
   import ZookeeperSystemCoordination._
 
   // Make it difficult to accidentally enable this
@@ -77,18 +87,22 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
   lazy val basePath = delimeter + "precog-" + uid.systemId
 
   lazy val producerIdBase = makeBase(producerIdBasePaths)
-  lazy val producerIdPath = producerIdBase + delimeter + uid.hostId + uid.serviceId
+  lazy val producerIdPath =
+    producerIdBase + delimeter + uid.hostId + uid.serviceId
 
   lazy val relayAgentBase = makeBase(relayAgentBasePaths)
 
   lazy val shardCheckpointBase = makeBase(shardCheckpointBasePaths)
 
-  private def makeBase(elements: List[String]) = basePath + delimeter + elements.mkString(delimeter)
-  private def producerPath(producerId: Int): String = producerIdPath + "%010d".format(producerId)
-  private def producerActivePath(producerId: Int): String = producerPath(producerId) + delimeter + active
+  private def makeBase(elements: List[String]) =
+    basePath + delimeter + elements.mkString(delimeter)
+  private def producerPath(producerId: Int): String =
+    producerIdPath + "%010d".format(producerId)
+  private def producerActivePath(producerId: Int): String =
+    producerPath(producerId) + delimeter + active
 
   def acquireProducerId(): Int = {
-    zkc.createPersistent(producerIdBase, true /* create parents */)
+    zkc.createPersistent(producerIdBase, true /* create parents */ )
 
     // sequential nodes created by zookeeper will be suffixed with a new 10-character
     // integer that represents a montonic increase of the underlying counter.
@@ -98,7 +112,10 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
   }
 
   def registerProducerId(preferredProducerId: Option[Int] = None) = {
-    val producerId = preferredProducerId filter { prodId => !producerIdInUse(prodId) } getOrElse acquireProducerId
+    val producerId =
+      preferredProducerId filter { prodId =>
+        !producerIdInUse(prodId)
+      } getOrElse acquireProducerId
     zkc.createEphemeral(producerActivePath(producerId))
     producerId
   }
@@ -112,9 +129,9 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
   }
 
   /**
-   * An implementation of the DataUpdater interface that increments the sequence ID of a producer ID by
-   * the specified block size, and makes the updated producer state available for subsequent reads
-   */
+    * An implementation of the DataUpdater interface that increments the sequence ID of a producer ID by
+    * the specified block size, and makes the updated producer state available for subsequent reads
+    */
   class BlockUpdater(blockSize: Int) extends DataUpdater[Array[Byte]] {
     private var newState: ProducerState = _
 
@@ -132,7 +149,8 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
     }
   }
 
-  def acquireIdSequenceBlock(producerId: Int, blockSize: Int): IdSequenceBlock = {
+  def acquireIdSequenceBlock(
+      producerId: Int, blockSize: Int): IdSequenceBlock = {
     val updater = new BlockUpdater(blockSize)
     zkc.updateDataSerialized(producerPath(producerId), updater)
 
@@ -147,13 +165,16 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
     }
   }
 
-  private def acquireActivePath(base: String, retries: Int = defaultRetries, delay: Int = defaultDelay): Validation[Error, Unit] = {
+  private def acquireActivePath(
+      base: String,
+      retries: Int = defaultRetries,
+      delay: Int = defaultDelay): Validation[Error, Unit] = {
     val activePath = base + delimeter + active
     if (retries < 0) {
       Failure(Invalid("Unable to acquire relay agent lock"))
     } else {
-      if(!zkc.exists(activePath)) {
-        if(!zkc.exists(base)) {
+      if (!zkc.exists(activePath)) {
+        if (!zkc.exists(base)) {
           zkc.createPersistent(base, true)
         }
         zkc.createEphemeral(activePath)
@@ -161,13 +182,16 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
         Success(())
       } else {
         Thread.sleep(delay)
-        logger.debug("Active path [%s] already registered, retrying in case of stale registration.(%d remain)".format(base, retries))
+        logger.debug(
+            "Active path [%s] already registered, retrying in case of stale registration.(%d remain)"
+              .format(base, retries))
         acquireActivePath(base, retries - 1, delay)
       }
     }
   }
 
-  def registerRelayAgent(agent: String, blockSize: Int): Validation[Error, EventRelayState] = {
+  def registerRelayAgent(
+      agent: String, blockSize: Int): Validation[Error, EventRelayState] = {
     val agentPath = relayAgentPath(agent)
 
     acquireActivePath(agentPath) flatMap { _ =>
@@ -181,10 +205,11 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
         val block = acquireIdSequenceBlock(producerId, blockSize)
         val initialState = EventRelayState(0, block.firstSequenceId, block)
         zkc.updateDataSerialized(
-          relayAgentPath(agent),
-          new DataUpdater[Array[Byte]] {
-            def update(cur: Array[Byte]): Array[Byte] = toNodeData(initialState.serialize)
-          }
+            relayAgentPath(agent),
+            new DataUpdater[Array[Byte]] {
+              def update(cur: Array[Byte]): Array[Byte] =
+                toNodeData(initialState.serialize)
+            }
         )
 
         logger.debug("%s: NEW".format(initialState))
@@ -193,8 +218,10 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
     }
   }
 
-  private def relayAgentPath(agent: String): String = relayAgentBase + delimeter + agent
-  private def relayAgentActivePath(agent: String): String = relayAgentPath(agent) + delimeter + active
+  private def relayAgentPath(agent: String): String =
+    relayAgentBase + delimeter + agent
+  private def relayAgentActivePath(agent: String): String =
+    relayAgentPath(agent) + delimeter + active
 
   def unregisterRelayAgent(agent: String, state: EventRelayState): Unit = {
     // update offset
@@ -203,49 +230,58 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
     zkc.delete(relayAgentActivePath(agent))
   }
 
-  def renewEventRelayState(agent: String, offset: Long, producerId: Int, blockSize: Int): Validation[Error, EventRelayState] = {
+  def renewEventRelayState(
+      agent: String,
+      offset: Long,
+      producerId: Int,
+      blockSize: Int): Validation[Error, EventRelayState] = {
     val block = acquireIdSequenceBlock(producerId, blockSize)
     val newState = EventRelayState(offset, block.firstSequenceId, block)
     logger.debug("%s: RENEWAL".format(newState))
     saveEventRelayState(agent, newState)
   }
 
-  def saveEventRelayState(agent: String, state: EventRelayState): Validation[Error, EventRelayState] = {
+  def saveEventRelayState(
+      agent: String,
+      state: EventRelayState): Validation[Error, EventRelayState] = {
     zkc.updateDataSerialized(
-      relayAgentPath(agent),
-      new DataUpdater[Array[Byte]] {
-        def update(cur: Array[Byte]): Array[Byte] = toNodeData(state.serialize)
-      }
+        relayAgentPath(agent),
+        new DataUpdater[Array[Byte]] {
+          def update(cur: Array[Byte]): Array[Byte] =
+            toNodeData(state.serialize)
+        }
     )
 
     logger.debug("%s: SAVE".format(state))
     Success(state)
   }
 
-  def loadYggCheckpoint(bifrost: String): Option[Validation[Error, YggCheckpoint]] = {
+  def loadYggCheckpoint(
+      bifrost: String): Option[Validation[Error, YggCheckpoint]] = {
     if (yggCheckpointsEnabled) {
       val checkpointPath = shardCheckpointPath(bifrost)
 
       Some(
-        acquireActivePath(checkpointPath) flatMap { _ =>
-          val bytes = zkc.readData(checkpointPath).asInstanceOf[Array[Byte]]
-          if (bytes != null && bytes.length != 0) {
-            val checkpoint = fromNodeData(bytes).validated[YggCheckpoint]
-            logger.debug("yggCheckpoint %s: RESTORED".format(checkpoint))
-            checkpoint
-          } else {
-            if (createOk) {
-              logger.warn("Creating initial ingest checkpoint!")
-              val checkpoint = YggCheckpoint.Empty
-              saveYggCheckpoint(bifrost, checkpoint)
-              Success(checkpoint)
+          acquireActivePath(checkpointPath) flatMap { _ =>
+            val bytes = zkc.readData(checkpointPath).asInstanceOf[Array[Byte]]
+            if (bytes != null && bytes.length != 0) {
+              val checkpoint = fromNodeData(bytes).validated[YggCheckpoint]
+              logger.debug("yggCheckpoint %s: RESTORED".format(checkpoint))
+              checkpoint
             } else {
-              // this case MUST return a failure - if a checkpoint is missing for a bifrost,
-              // it must be created manually via Ratatoskr
-              Failure(Invalid("No checkpoint information found in Zookeeper!"))
+              if (createOk) {
+                logger.warn("Creating initial ingest checkpoint!")
+                val checkpoint = YggCheckpoint.Empty
+                saveYggCheckpoint(bifrost, checkpoint)
+                Success(checkpoint)
+              } else {
+                // this case MUST return a failure - if a checkpoint is missing for a bifrost,
+                // it must be created manually via Ratatoskr
+                Failure(
+                    Invalid("No checkpoint information found in Zookeeper!"))
+              }
             }
           }
-        }
       )
     } else {
       logger.debug("Checkpoints disabled, skipping load")
@@ -253,18 +289,22 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient, uid: ServiceUID, yg
     }
   }
 
-  def shardCheckpointExists(bifrost: String): Boolean = zkc.exists(shardCheckpointPath(bifrost))
+  def shardCheckpointExists(bifrost: String): Boolean =
+    zkc.exists(shardCheckpointPath(bifrost))
 
-  private def shardCheckpointPath(bifrost: String): String = shardCheckpointBase + delimeter + bifrost
-  private def shardCheckpointActivePath(bifrost: String): String = shardCheckpointPath(bifrost) + delimeter + active
+  private def shardCheckpointPath(bifrost: String): String =
+    shardCheckpointBase + delimeter + bifrost
+  private def shardCheckpointActivePath(bifrost: String): String =
+    shardCheckpointPath(bifrost) + delimeter + active
 
   def saveYggCheckpoint(bifrost: String, checkpoint: YggCheckpoint): Unit = {
     if (yggCheckpointsEnabled) {
       zkc.updateDataSerialized(
-        shardCheckpointPath(bifrost),
-        new DataUpdater[Array[Byte]] {
-          def update(cur: Array[Byte]): Array[Byte] = toNodeData(checkpoint.serialize)
-        }
+          shardCheckpointPath(bifrost),
+          new DataUpdater[Array[Byte]] {
+            def update(cur: Array[Byte]): Array[Byte] =
+              toNodeData(checkpoint.serialize)
+          }
       )
 
       logger.debug("%s: SAVE".format(checkpoint))

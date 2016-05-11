@@ -22,39 +22,52 @@ import _root_.scala.util.Sorting
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author Aleksander Podkhalyuzin
- * @since 25.04.2009
- */
-abstract class PatternParameterInfoTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * @author Aleksander Podkhalyuzin
+  * @since 25.04.2009
+  */
+abstract class PatternParameterInfoTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   val caretMarker = "/*caret*/"
 
-  protected def folderPath = baseRootPath() + "parameterInfo/patternParameterInfo/"
+  protected def folderPath =
+    baseRootPath() + "parameterInfo/patternParameterInfo/"
 
   protected def doTest() {
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
-    val file = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(caretMarker)
-    assert(offset != -1, "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
+    assert(
+        offset != -1,
+        "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
     val fileEditorManager = FileEditorManager.getInstance(getProjectAdapter)
-    val editor = fileEditorManager.openTextEditor(new OpenFileDescriptor(getProjectAdapter, file, offset), false)
-    val context = new ShowParameterInfoContext(editor, getProjectAdapter, scalaFile, offset, -1)
+    val editor = fileEditorManager.openTextEditor(
+        new OpenFileDescriptor(getProjectAdapter, file, offset), false)
+    val context = new ShowParameterInfoContext(
+        editor, getProjectAdapter, scalaFile, offset, -1)
     val handler = new ScalaPatternParameterInfoHandler
     val leafElement = scalaFile.findElementAt(offset)
-    val element = PsiTreeUtil.getParentOfType(leafElement, handler.getArgumentListClass)
+    val element =
+      PsiTreeUtil.getParentOfType(leafElement, handler.getArgumentListClass)
     handler.findElementForParameterInfo(context)
     val items = new ArrayBuffer[String]
 
     for (item <- context.getItemsToShow) {
       val uiContext = new ParameterInfoUIContext {
         def getDefaultParameterColor: Color = HintUtil.INFORMATION_COLOR
-        def setupUIComponentPresentation(text: String, highlightStartOffset: Int, highlightEndOffset: Int,
-                                        isDisabled: Boolean, strikeout: Boolean, isDisabledBeforeHighlight: Boolean,
-                                        background: Color): String = {
+        def setupUIComponentPresentation(text: String,
+                                         highlightStartOffset: Int,
+                                         highlightEndOffset: Int,
+                                         isDisabled: Boolean,
+                                         strikeout: Boolean,
+                                         isDisabledBeforeHighlight: Boolean,
+                                         background: Color): String = {
           items.append(text)
           text
         }
@@ -79,7 +92,8 @@ abstract class PatternParameterInfoTestBase extends ScalaLightPlatformCodeInsigh
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
-      case _ => assertTrue("Test result must be in last comment statement.", false)
+      case _ =>
+        assertTrue("Test result must be in last comment statement.", false)
     }
     assertEquals(output, res.toString())
   }

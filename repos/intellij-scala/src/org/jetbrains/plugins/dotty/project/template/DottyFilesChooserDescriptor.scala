@@ -5,4 +5,5 @@ import org.jetbrains.plugins.scala.project.template.AbstractFilesChooserDescript
 /**
   * @author adkozlov
   */
-class DottyFilesChooserDescriptor extends AbstractFilesChooserDescriptor("Dotty", DottySdkDescriptor)
+class DottyFilesChooserDescriptor
+    extends AbstractFilesChooserDescriptor("Dotty", DottySdkDescriptor)

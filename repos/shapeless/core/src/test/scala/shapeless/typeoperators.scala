@@ -29,7 +29,8 @@ class TypeOperatorTests {
   trait ATag
 
   object ATag {
-    implicit def taggedToString[T](value: T with Tagged[ATag]): String = message
+    implicit def taggedToString[T](value: T with Tagged[ATag]): String =
+      message
 
     val message = "This object has ATag tag type"
   }
@@ -45,9 +46,9 @@ class TypeOperatorTests {
   def testNewtype {
     type MyString = Newtype[String, MyStringOps]
 
-    def MyString(s : String) : MyString = newtype(s)
+    def MyString(s: String): MyString = newtype(s)
 
-    case class MyStringOps(s : String) {
+    case class MyStringOps(s: String) {
       def mySize = s.size
     }
     implicit val mkOps = MyStringOps
@@ -69,7 +70,7 @@ class TypeOperatorTests {
     val s2 = "bar"
     val ms2 = MyString(s2)
 
-    assertTrue(ms2 eq (s2 : AnyRef))
+    assertTrue(ms2 eq (s2: AnyRef))
   }
 
   trait Foo {
@@ -78,7 +79,9 @@ class TypeOperatorTests {
   }
 
   object Foo {
-    implicit def mkFoo: Foo { type T = Int } = new Foo { type T = Int ; val t = 23 }
+    implicit def mkFoo: Foo { type T = Int } = new Foo {
+      type T = Int; val t = 23
+    }
   }
 
   trait Foo2[U] {
@@ -87,7 +90,9 @@ class TypeOperatorTests {
   }
 
   object Foo2 {
-    implicit def mkFoo2: Foo2[Char] { type T = Int } = new Foo2[Char] { type T = Int ; val t = 23 }
+    implicit def mkFoo2: Foo2[Char] { type T = Int } = new Foo2[Char] {
+      type T = Int; val t = 23
+    }
   }
 
   trait Bar[T] {
@@ -96,8 +101,12 @@ class TypeOperatorTests {
   }
 
   object Bar {
-    implicit def mkBar1: Bar[Boolean] { type U = Int } = new Bar[Boolean] { type U = Int ; val tu = Right(23) }
-    implicit def mkBar2: Bar[String] { type U = Double } = new Bar[String] { type U = Double ; val tu = Right(13.0) }
+    implicit def mkBar1: Bar[Boolean] { type U = Int } = new Bar[Boolean] {
+      type U = Int; val tu = Right(23)
+    }
+    implicit def mkBar2: Bar[String] { type U = Double } = new Bar[String] {
+      type U = Double; val tu = Right(13.0)
+    }
   }
 
   @Test
@@ -129,7 +138,8 @@ class TypeOperatorTests {
 
   @Test
   def testTheQuantifiers {
-    def bar0[T, U0](implicit b: Bar[T] { type U = U0 }): Bar[T] { type U = U0 } = {
+    def bar0[T, U0](
+        implicit b: Bar[T] { type U = U0 }): Bar[T] { type U = U0 } = {
       val res = the[Bar[T]]
       res
     }

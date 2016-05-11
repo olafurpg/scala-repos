@@ -8,14 +8,14 @@ object SCL6730 {
     def insertTriple(triple: RDFTriple): RDFGraph = new RDFGraph
   }
 
-  case class Exists(fn : BNodeId => RDFGraph)
-                   (implicit seed : BNodeId) extends RDFGraph {
-    override def insertTriple(triple: RDFTriple) : RDFGraph = {
-      Exists{case (bnode) => fn(bnode).insertTriple(triple)} //works ok with case
+  case class Exists(fn: BNodeId => RDFGraph)(implicit seed: BNodeId)
+      extends RDFGraph {
+    override def insertTriple(triple: RDFTriple): RDFGraph = {
+      Exists { case (bnode) => fn(bnode).insertTriple(triple) } //works ok with case
     }
 
-    override def addTriples(triples: Set[RDFTriple]) : RDFGraph = {
-      Exists(bnode => fn(/*start*/bnode/*end*/).addTriples(triples))
+    override def addTriples(triples: Set[RDFTriple]): RDFGraph = {
+      Exists(bnode => fn( /*start*/ bnode /*end*/ ).addTriples(triples))
     }
   }
 }

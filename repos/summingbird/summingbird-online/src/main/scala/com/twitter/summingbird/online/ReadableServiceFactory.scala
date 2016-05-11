@@ -22,4 +22,6 @@ import com.twitter.storehaus.ReadableStore
  * This is our default supplied instance of the OnlineServiceFactory.
  * This is a class for wrapping ReadableStore constructors into our wrapping type.
  */
-case class ReadableServiceFactory[-K, +V](override val serviceStore: () => ReadableStore[K, V]) extends OnlineServiceFactory[K, V]
+case class ReadableServiceFactory[-K, +V](
+    override val serviceStore: () => ReadableStore[K, V])
+    extends OnlineServiceFactory[K, V]

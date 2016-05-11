@@ -17,29 +17,43 @@ class ChainedPackageInspection extends LocalInspectionTool {
   override def getID = "ScalaChainedPackageClause"
 
   // TODO support multiple base packages simultaneously
-  override def checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean) = {
-    val problems = file.asOptionOf[ScalaFile].filter(!_.isScriptFile()).flatMap { scalaFile =>
+  override def checkFile(
+      file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean) = {
+    val problems =
+      file.asOptionOf[ScalaFile].filter(!_.isScriptFile()).flatMap {
+        scalaFile =>
+          scalaFile.getPackagings.headOption.flatMap { firstPackaging =>
+            val basePackages = ScalaProjectSettings
+              .getInstance(file.getProject)
+              .getBasePackages
+              .asScala
 
-      scalaFile.getPackagings.headOption.flatMap { firstPackaging =>
-        val basePackages = ScalaProjectSettings.getInstance(file.getProject).getBasePackages.asScala
-
-        basePackages.find(basePackage => firstPackaging.getPackageName != basePackage
-                && firstPackaging.getPackageName.startsWith(basePackage)).flatMap { basePackage =>
-
-          firstPackaging.reference.map(_.getTextRange).map { range =>
-            manager.createProblemDescriptor(file, range, "Package declaration could use chained package clauses",
-              ProblemHighlightType.WEAK_WARNING, false, new UseChainedPackageQuickFix(scalaFile, basePackage))
+            basePackages
+              .find(basePackage =>
+                    firstPackaging.getPackageName != basePackage &&
+                    firstPackaging.getPackageName.startsWith(basePackage))
+              .flatMap { basePackage =>
+                firstPackaging.reference.map(_.getTextRange).map { range =>
+                  manager.createProblemDescriptor(
+                      file,
+                      range,
+                      "Package declaration could use chained package clauses",
+                      ProblemHighlightType.WEAK_WARNING,
+                      false,
+                      new UseChainedPackageQuickFix(scalaFile, basePackage))
+                }
+              }
           }
-        }
       }
-    }
 
     problems.toArray
   }
 }
 
 class UseChainedPackageQuickFix(myFile: ScalaFile, basePackage: String)
-        extends AbstractFixOnPsiElement(s"Use chained package clauses: package $basePackage; package ...", myFile) {
+    extends AbstractFixOnPsiElement(
+        s"Use chained package clauses: package $basePackage; package ...",
+        myFile) {
   def doApplyFix(project: Project) {
     val file = getElement
     if (file.isValid) file.setPackageName(file.packageName)

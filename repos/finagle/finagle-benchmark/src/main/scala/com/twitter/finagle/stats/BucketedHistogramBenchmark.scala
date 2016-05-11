@@ -24,7 +24,6 @@ class BucketedHistogramBenchmark extends StdBenchAnnotations {
   def percentiles(state: PercentileState): Array[Long] = {
     state.histogram.getQuantiles(BucketedHistogramBenchmark.percentiles)
   }
-
 }
 
 object BucketedHistogramBenchmark {
@@ -55,5 +54,4 @@ object BucketedHistogramBenchmark {
       state.datas.foreach(histogram.add)
     }
   }
-
 }

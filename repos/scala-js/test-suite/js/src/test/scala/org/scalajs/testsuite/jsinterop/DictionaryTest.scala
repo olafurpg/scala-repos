@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.jsinterop
 
@@ -21,7 +21,8 @@ class DictionaryTest {
 
   // scala.scalajs.js.Dictionary
 
-  @Test def should_provide_an_equivalent_of_the_JS_delete_keyword_issue_255(): Unit = {
+  @Test
+  def should_provide_an_equivalent_of_the_JS_delete_keyword_issue_255(): Unit = {
     val obj = js.Dictionary.empty[js.Any]
     obj("foo") = 42
     obj("bar") = "foobar"
@@ -36,11 +37,16 @@ class DictionaryTest {
 
   // This doesn't work on Rhino due to lack of full strict mode support - #679
 
-  @Test def should_behave_as_specified_when_deleting_a_non_configurable_property_issue_461_issue_679(): Unit = {
+  @Test
+  def should_behave_as_specified_when_deleting_a_non_configurable_property_issue_461_issue_679(
+      ): Unit = {
     assumeFalse(executingInRhino)
     val obj = js.Dictionary.empty[js.Any]
-    js.Object.defineProperty(obj.asInstanceOf[js.Object], "nonconfig",
-        js.Dynamic.literal(value = 4, writable = false).asInstanceOf[js.PropertyDescriptor])
+    js.Object.defineProperty(obj.asInstanceOf[js.Object],
+                             "nonconfig",
+                             js.Dynamic
+                               .literal(value = 4, writable = false)
+                               .asInstanceOf[js.PropertyDescriptor])
     assertEquals(4, obj("nonconfig"))
     assertThrows(classOf[Exception], obj.delete("nonconfig"))
     assertEquals(4, obj("nonconfig"))

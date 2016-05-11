@@ -23,7 +23,8 @@ import org.apache.spark.sql.catalyst.util.StringUtils._
 class StringUtilsSuite extends SparkFunSuite {
 
   test("escapeLikeRegex") {
-    assert(escapeLikeRegex("abdef") === "(?s)\\Qa\\E\\Qb\\E\\Qd\\E\\Qe\\E\\Qf\\E")
+    assert(
+        escapeLikeRegex("abdef") === "(?s)\\Qa\\E\\Qb\\E\\Qd\\E\\Qe\\E\\Qf\\E")
     assert(escapeLikeRegex("a\\__b") === "(?s)\\Qa\\E_.\\Qb\\E")
     assert(escapeLikeRegex("a_%b") === "(?s)\\Qa\\E..*\\Qb\\E")
     assert(escapeLikeRegex("a%\\%b") === "(?s)\\Qa\\E.*%\\Qb\\E")

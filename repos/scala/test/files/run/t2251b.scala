@@ -8,10 +8,10 @@ class F extends B[F] { override def toString = "F" }
 class G extends B1[G] { override def toString = "G" }
 
 object Test {
-  import scala.collection.{ mutable, immutable }
-  import scala.collection.immutable.{ Vector }
+  import scala.collection.{mutable, immutable}
+  import scala.collection.immutable.{Vector}
   import scala.reflect.runtime.universe._
-  def what[T: TypeTag](x: T) = println(typeTag[T])
+  def what[T : TypeTag](x: T) = println(typeTag[T])
 
   def main(args: Array[String]): Unit = {
     what(List(List(new C), Stream(new D)))
@@ -27,11 +27,7 @@ object Test {
     what(List(mutable.LinearSeq(new F), collection.IndexedSeq(new G)))
   }
 }
-
-
 // class D extends B[D] { override def toString = "D" }
-
-
 // class E {
 //   val ys = List(List(new C), Stream(new D))
 // }

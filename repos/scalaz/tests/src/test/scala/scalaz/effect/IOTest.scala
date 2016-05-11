@@ -10,7 +10,8 @@ object IOTest extends SpecLite {
     // fix in bb4ebd650
     "not stack overflow" in {
       var counter: Long = 0L
-      val action: IO[Unit] = Stream.from(1).take(40000).traverse_(i => IO { counter += i })
+      val action: IO[Unit] =
+        Stream.from(1).take(40000).traverse_(i => IO { counter += i })
       action.unsafePerformIO()
       counter must_== 800020000L
     }
@@ -42,9 +43,7 @@ object IOTest extends SpecLite {
     "properly handle success" in {
       C.attempt(IO(3)).unsafePerformIO must_== \/-(3)
     }
-
   }
-
 }
 
 // vim: expandtab:ts=2:sw=2

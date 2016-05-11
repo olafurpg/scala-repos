@@ -1,12 +1,11 @@
 object DifferentType {
   def foo(i: Int) {
     val q = i
-/*start*/
+    /*start*/
 
     val x = i
     println(i)
 /*end*/
-
   }
 
   def foofoo(y: Int) {
@@ -35,4 +34,4 @@ object DifferentType {
     println("i")
   }
 }
-*/
+ */

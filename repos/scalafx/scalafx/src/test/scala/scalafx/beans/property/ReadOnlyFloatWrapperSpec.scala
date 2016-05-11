@@ -32,7 +32,6 @@ import org.scalatest.Matchers.{convertToAnyShouldWrapper, equal}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
-
 /** ReadOnlyFloatWrapper Spec tests. */
 @RunWith(classOf[JUnitRunner])
 class ReadOnlyFloatWrapperSpec extends FlatSpec with BeforeAndAfterEach {

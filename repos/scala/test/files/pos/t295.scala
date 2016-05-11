@@ -1,2 +1,1 @@
-object Test extends java.rmi.server.UnicastRemoteObject {
-}
+object Test extends java.rmi.server.UnicastRemoteObject {}

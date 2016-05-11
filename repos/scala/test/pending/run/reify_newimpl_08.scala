@@ -5,7 +5,7 @@ object Test extends App {
   val code = reify {
     class C(val y: Int) {
       val code = reify {
-        reify{y}.splice
+        reify { y }.splice
       }
     }
 

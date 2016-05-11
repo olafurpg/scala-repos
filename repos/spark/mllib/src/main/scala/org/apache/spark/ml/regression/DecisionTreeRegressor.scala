@@ -36,18 +36,19 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
-
 /**
- * :: Experimental ::
- * [[http://en.wikipedia.org/wiki/Decision_tree_learning Decision tree]] learning algorithm
- * for regression.
- * It supports both continuous and categorical features.
- */
+  * :: Experimental ::
+  * [[http://en.wikipedia.org/wiki/Decision_tree_learning Decision tree]] learning algorithm
+  * for regression.
+  * It supports both continuous and categorical features.
+  */
 @Since("1.4.0")
 @Experimental
-final class DecisionTreeRegressor @Since("1.4.0") (@Since("1.4.0") override val uid: String)
-  extends Predictor[Vector, DecisionTreeRegressor, DecisionTreeRegressionModel]
-  with DecisionTreeRegressorParams with DefaultParamsWritable {
+final class DecisionTreeRegressor @Since("1.4.0")(
+    @Since("1.4.0") override val uid: String)
+    extends Predictor[
+        Vector, DecisionTreeRegressor, DecisionTreeRegressionModel]
+    with DecisionTreeRegressorParams with DefaultParamsWritable {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("dtr"))
@@ -64,16 +65,20 @@ final class DecisionTreeRegressor @Since("1.4.0") (@Since("1.4.0") override val 
     super.setMinInstancesPerNode(value)
 
   @Since("1.4.0")
-  override def setMinInfoGain(value: Double): this.type = super.setMinInfoGain(value)
+  override def setMinInfoGain(value: Double): this.type =
+    super.setMinInfoGain(value)
 
   @Since("1.4.0")
-  override def setMaxMemoryInMB(value: Int): this.type = super.setMaxMemoryInMB(value)
+  override def setMaxMemoryInMB(value: Int): this.type =
+    super.setMaxMemoryInMB(value)
 
   @Since("1.4.0")
-  override def setCacheNodeIds(value: Boolean): this.type = super.setCacheNodeIds(value)
+  override def setCacheNodeIds(value: Boolean): this.type =
+    super.setCacheNodeIds(value)
 
   @Since("1.4.0")
-  override def setCheckpointInterval(value: Int): this.type = super.setCheckpointInterval(value)
+  override def setCheckpointInterval(value: Int): this.type =
+    super.setCheckpointInterval(value)
 
   @Since("1.4.0")
   override def setImpurity(value: String): this.type = super.setImpurity(value)
@@ -83,69 +88,89 @@ final class DecisionTreeRegressor @Since("1.4.0") (@Since("1.4.0") override val 
   /** @group setParam */
   def setVarianceCol(value: String): this.type = set(varianceCol, value)
 
-  override protected def train(dataset: DataFrame): DecisionTreeRegressionModel = {
+  override protected def train(
+      dataset: DataFrame): DecisionTreeRegressionModel = {
     val categoricalFeatures: Map[Int, Int] =
       MetadataUtils.getCategoricalFeatures(dataset.schema($(featuresCol)))
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
     val strategy = getOldStrategy(categoricalFeatures)
-    val trees = RandomForest.run(oldDataset, strategy, numTrees = 1, featureSubsetStrategy = "all",
-      seed = $(seed), parentUID = Some(uid))
+    val trees = RandomForest.run(oldDataset,
+                                 strategy,
+                                 numTrees = 1,
+                                 featureSubsetStrategy = "all",
+                                 seed = $(seed),
+                                 parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeRegressionModel]
   }
 
   /** (private[ml]) Train a decision tree on an RDD */
-  private[ml] def train(data: RDD[LabeledPoint],
+  private[ml] def train(
+      data: RDD[LabeledPoint],
       oldStrategy: OldStrategy): DecisionTreeRegressionModel = {
-    val trees = RandomForest.run(data, oldStrategy, numTrees = 1, featureSubsetStrategy = "all",
-      seed = 0L, parentUID = Some(uid))
+    val trees = RandomForest.run(data,
+                                 oldStrategy,
+                                 numTrees = 1,
+                                 featureSubsetStrategy = "all",
+                                 seed = 0L,
+                                 parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeRegressionModel]
   }
 
   /** (private[ml]) Create a Strategy instance to use with the old API. */
-  private[ml] def getOldStrategy(categoricalFeatures: Map[Int, Int]): OldStrategy = {
-    super.getOldStrategy(categoricalFeatures, numClasses = 0, OldAlgo.Regression, getOldImpurity,
-      subsamplingRate = 1.0)
+  private[ml] def getOldStrategy(
+      categoricalFeatures: Map[Int, Int]): OldStrategy = {
+    super.getOldStrategy(categoricalFeatures,
+                         numClasses = 0,
+                         OldAlgo.Regression,
+                         getOldImpurity,
+                         subsamplingRate = 1.0)
   }
 
   @Since("1.4.0")
-  override def copy(extra: ParamMap): DecisionTreeRegressor = defaultCopy(extra)
+  override def copy(extra: ParamMap): DecisionTreeRegressor =
+    defaultCopy(extra)
 }
 
 @Since("1.4.0")
 @Experimental
-object DecisionTreeRegressor extends DefaultParamsReadable[DecisionTreeRegressor] {
+object DecisionTreeRegressor
+    extends DefaultParamsReadable[DecisionTreeRegressor] {
+
   /** Accessor for supported impurities: variance */
-  final val supportedImpurities: Array[String] = TreeRegressorParams.supportedImpurities
+  final val supportedImpurities: Array[String] =
+    TreeRegressorParams.supportedImpurities
 
   @Since("2.0.0")
   override def load(path: String): DecisionTreeRegressor = super.load(path)
 }
 
 /**
- * :: Experimental ::
- * [[http://en.wikipedia.org/wiki/Decision_tree_learning Decision tree]] model for regression.
- * It supports both continuous and categorical features.
- * @param rootNode  Root of the decision tree
- */
+  * :: Experimental ::
+  * [[http://en.wikipedia.org/wiki/Decision_tree_learning Decision tree]] model for regression.
+  * It supports both continuous and categorical features.
+  * @param rootNode  Root of the decision tree
+  */
 @Since("1.4.0")
 @Experimental
-final class DecisionTreeRegressionModel private[ml] (
+final class DecisionTreeRegressionModel private[ml](
     override val uid: String,
     override val rootNode: Node,
     override val numFeatures: Int)
-  extends PredictionModel[Vector, DecisionTreeRegressionModel]
-  with DecisionTreeModel with DecisionTreeRegressorParams with MLWritable with Serializable {
+    extends PredictionModel[Vector, DecisionTreeRegressionModel]
+    with DecisionTreeModel with DecisionTreeRegressorParams with MLWritable
+    with Serializable {
 
   /** @group setParam */
   def setVarianceCol(value: String): this.type = set(varianceCol, value)
 
-  require(rootNode != null,
-    "DecisionTreeRegressionModel given null rootNode, but it requires a non-null rootNode.")
+  require(
+      rootNode != null,
+      "DecisionTreeRegressionModel given null rootNode, but it requires a non-null rootNode.")
 
   /**
-   * Construct a decision tree regression model.
-   * @param rootNode  Root node of tree, with other nodes attached.
-   */
+    * Construct a decision tree regression model.
+    * @param rootNode  Root node of tree, with other nodes attached.
+    */
   private[ml] def this(rootNode: Node, numFeatures: Int) =
     this(Identifiable.randomUID("dtr"), rootNode, numFeatures)
 
@@ -164,21 +189,28 @@ final class DecisionTreeRegressionModel private[ml] (
   }
 
   override protected def transformImpl(dataset: DataFrame): DataFrame = {
-    val predictUDF = udf { (features: Vector) => predict(features) }
-    val predictVarianceUDF = udf { (features: Vector) => predictVariance(features) }
+    val predictUDF = udf { (features: Vector) =>
+      predict(features)
+    }
+    val predictVarianceUDF = udf { (features: Vector) =>
+      predictVariance(features)
+    }
     var output = dataset
     if ($(predictionCol).nonEmpty) {
-      output = output.withColumn($(predictionCol), predictUDF(col($(featuresCol))))
+      output = output.withColumn(
+          $(predictionCol), predictUDF(col($(featuresCol))))
     }
     if (isDefined(varianceCol) && $(varianceCol).nonEmpty) {
-      output = output.withColumn($(varianceCol), predictVarianceUDF(col($(featuresCol))))
+      output = output.withColumn(
+          $(varianceCol), predictVarianceUDF(col($(featuresCol))))
     }
     output
   }
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): DecisionTreeRegressionModel = {
-    copyValues(new DecisionTreeRegressionModel(uid, rootNode, numFeatures), extra).setParent(parent)
+    copyValues(new DecisionTreeRegressionModel(uid, rootNode, numFeatures),
+               extra).setParent(parent)
   }
 
   @Since("1.4.0")
@@ -187,23 +219,24 @@ final class DecisionTreeRegressionModel private[ml] (
   }
 
   /**
-   * Estimate of the importance of each feature.
-   *
-   * This generalizes the idea of "Gini" importance to other losses,
-   * following the explanation of Gini importance from "Random Forests" documentation
-   * by Leo Breiman and Adele Cutler, and following the implementation from scikit-learn.
-   *
-   * This feature importance is calculated as follows:
-   *   - importance(feature j) = sum (over nodes which split on feature j) of the gain,
-   *     where gain is scaled by the number of instances passing through node
-   *   - Normalize importances for tree to sum to 1.
-   *
-   * Note: Feature importance for single decision trees can have high variance due to
-   *       correlated predictor variables. Consider using a [[RandomForestRegressor]]
-   *       to determine feature importance instead.
-   */
+    * Estimate of the importance of each feature.
+    *
+    * This generalizes the idea of "Gini" importance to other losses,
+    * following the explanation of Gini importance from "Random Forests" documentation
+    * by Leo Breiman and Adele Cutler, and following the implementation from scikit-learn.
+    *
+    * This feature importance is calculated as follows:
+    *   - importance(feature j) = sum (over nodes which split on feature j) of the gain,
+    *     where gain is scaled by the number of instances passing through node
+    *   - Normalize importances for tree to sum to 1.
+    *
+    * Note: Feature importance for single decision trees can have high variance due to
+    *       correlated predictor variables. Consider using a [[RandomForestRegressor]]
+    *       to determine feature importance instead.
+    */
   @Since("2.0.0")
-  lazy val featureImportances: Vector = RandomForest.featureImportances(this, numFeatures)
+  lazy val featureImportances: Vector =
+    RandomForest.featureImportances(this, numFeatures)
 
   /** Convert to a model in the old API */
   private[ml] def toOld: OldDecisionTreeModel = {
@@ -216,22 +249,23 @@ final class DecisionTreeRegressionModel private[ml] (
 }
 
 @Since("2.0.0")
-object DecisionTreeRegressionModel extends MLReadable[DecisionTreeRegressionModel] {
+object DecisionTreeRegressionModel
+    extends MLReadable[DecisionTreeRegressionModel] {
 
   @Since("2.0.0")
   override def read: MLReader[DecisionTreeRegressionModel] =
     new DecisionTreeRegressionModelReader
 
   @Since("2.0.0")
-  override def load(path: String): DecisionTreeRegressionModel = super.load(path)
+  override def load(path: String): DecisionTreeRegressionModel =
+    super.load(path)
 
-  private[DecisionTreeRegressionModel]
-  class DecisionTreeRegressionModelWriter(instance: DecisionTreeRegressionModel)
-    extends MLWriter {
+  private[DecisionTreeRegressionModel] class DecisionTreeRegressionModelWriter(
+      instance: DecisionTreeRegressionModel)
+      extends MLWriter {
 
     override protected def saveImpl(path: String): Unit = {
-      val extraMetadata: JObject = Map(
-        "numFeatures" -> instance.numFeatures)
+      val extraMetadata: JObject = Map("numFeatures" -> instance.numFeatures)
       DefaultParamsWriter.saveMetadata(instance, path, sc, Some(extraMetadata))
       val (nodeData, _) = NodeData.build(instance.rootNode, 0)
       val dataPath = new Path(path, "data").toString
@@ -240,7 +274,7 @@ object DecisionTreeRegressionModel extends MLReadable[DecisionTreeRegressionMode
   }
 
   private class DecisionTreeRegressionModelReader
-    extends MLReader[DecisionTreeRegressionModel] {
+      extends MLReader[DecisionTreeRegressionModel] {
 
     /** Checked against metadata when loading model */
     private val className = classOf[DecisionTreeRegressionModel].getName
@@ -250,7 +284,8 @@ object DecisionTreeRegressionModel extends MLReadable[DecisionTreeRegressionMode
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val numFeatures = (metadata.metadata \ "numFeatures").extract[Int]
       val root = loadTreeNodes(path, metadata, sqlContext)
-      val model = new DecisionTreeRegressionModel(metadata.uid, root, numFeatures)
+      val model = new DecisionTreeRegressionModel(
+          metadata.uid, root, numFeatures)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
     }
@@ -262,8 +297,9 @@ object DecisionTreeRegressionModel extends MLReadable[DecisionTreeRegressionMode
       parent: DecisionTreeRegressor,
       categoricalFeatures: Map[Int, Int],
       numFeatures: Int = -1): DecisionTreeRegressionModel = {
-    require(oldModel.algo == OldAlgo.Regression,
-      s"Cannot convert non-regression DecisionTreeModel (old API) to" +
+    require(
+        oldModel.algo == OldAlgo.Regression,
+        s"Cannot convert non-regression DecisionTreeModel (old API) to" +
         s" DecisionTreeRegressionModel (new API).  Algo is: ${oldModel.algo}")
     val rootNode = Node.fromOld(oldModel.topNode, categoricalFeatures)
     val uid = if (parent != null) parent.uid else Identifiable.randomUID("dtr")

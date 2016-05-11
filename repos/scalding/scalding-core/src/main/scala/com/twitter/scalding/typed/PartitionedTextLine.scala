@@ -16,57 +16,63 @@ package com.twitter.scalding
 package typed
 
 import java.util.Properties
-import java.io.{ InputStream, OutputStream }
+import java.io.{InputStream, OutputStream}
 
 import cascading.scheme.Scheme
 import cascading.scheme.hadoop.TextLine
-import cascading.scheme.local.{ TextLine => LocalTextLine }
-import cascading.tap.{ Tap, SinkMode }
-import cascading.tap.hadoop.{ Hfs, PartitionTap }
-import cascading.tap.local.{ FileTap, PartitionTap => LocalPartitionTap }
+import cascading.scheme.local.{TextLine => LocalTextLine}
+import cascading.tap.{Tap, SinkMode}
+import cascading.tap.hadoop.{Hfs, PartitionTap}
+import cascading.tap.local.{FileTap, PartitionTap => LocalPartitionTap}
 import cascading.tap.partition.Partition
-import cascading.tuple.{ Fields, Tuple, TupleEntry }
+import cascading.tuple.{Fields, Tuple, TupleEntry}
 
 /**
- * Scalding source to read or write partitioned text.
- *
- * For writing it expects a pair of `(P, String)`, where `P` is the data used for partitioning and
- * `String` is the output to write out. Below is an example.
- * {{{
- * val data = List(
- *   (("a", "x"), "line1"),
- *   (("a", "y"), "line2"),
- *   (("b", "z"), "line3")
- * )
- * IterablePipe(data, flowDef, mode)
- *   .write(PartitionTextLine[(String, String)](args("out"), "col1=%s/col2=%s"))
- * }}}
- *
- * For reading it produces a pair `(P, (Long, String))` where `P` is the partition data, `Long`
- * is the offset into the file and `String` is a line from the file. Below is an example.
- * {{{
- * val in: TypedPipe[((String, String), (Long, String))] = PartitionTextLine[(String, String)](args("in"), "col1=%s/col2=%s")
- * }}}
- *
- * @param path Base path of the partitioned directory
- * @param template Template for the partitioned path
- * @param encoding Text encoding of the file content
- */
-case class PartitionedTextLine[P](
-  path: String, template: String, encoding: String = TextLine.DEFAULT_CHARSET)(implicit val valueSetter: TupleSetter[String], val valueConverter: TupleConverter[(Long, String)],
-    val partitionSetter: TupleSetter[P], val partitionConverter: TupleConverter[P]) extends SchemedSource with TypedSink[(P, String)] with Mappable[(P, (Long, String))] with HfsTapProvider
-  with java.io.Serializable {
+  * Scalding source to read or write partitioned text.
+  *
+  * For writing it expects a pair of `(P, String)`, where `P` is the data used for partitioning and
+  * `String` is the output to write out. Below is an example.
+  * {{{
+  * val data = List(
+  *   (("a", "x"), "line1"),
+  *   (("a", "y"), "line2"),
+  *   (("b", "z"), "line3")
+  * )
+  * IterablePipe(data, flowDef, mode)
+  *   .write(PartitionTextLine[(String, String)](args("out"), "col1=%s/col2=%s"))
+  * }}}
+  *
+  * For reading it produces a pair `(P, (Long, String))` where `P` is the partition data, `Long`
+  * is the offset into the file and `String` is a line from the file. Below is an example.
+  * {{{
+  * val in: TypedPipe[((String, String), (Long, String))] = PartitionTextLine[(String, String)](args("in"), "col1=%s/col2=%s")
+  * }}}
+  *
+  * @param path Base path of the partitioned directory
+  * @param template Template for the partitioned path
+  * @param encoding Text encoding of the file content
+  */
+case class PartitionedTextLine[P](path: String,
+                                  template: String,
+                                  encoding: String = TextLine.DEFAULT_CHARSET)(
+    implicit val valueSetter: TupleSetter[String],
+    val valueConverter: TupleConverter[(Long, String)],
+    val partitionSetter: TupleSetter[P],
+    val partitionConverter: TupleConverter[P])
+    extends SchemedSource with TypedSink[(P, String)]
+    with Mappable[(P, (Long, String))] with HfsTapProvider
+    with java.io.Serializable {
 
   // The partition fields, offset by the value arity.
-  val partitionFields =
-    PartitionUtil.toFields(valueSetter.arity, valueSetter.arity + partitionSetter.arity)
+  val partitionFields = PartitionUtil.toFields(
+      valueSetter.arity, valueSetter.arity + partitionSetter.arity)
 
   // Create the underlying scheme and explicitly set the sink fields to be only the specified fields
   // see sinkFields in PartitionSchemed for other half of this work around.
   override def hdfsScheme = {
-    val scheme =
-      HadoopSchemeInstance(new TextLine(TextLine.DEFAULT_SOURCE_FIELDS, encoding)
-        .asInstanceOf[Scheme[_, _, _, _, _]])
+    val scheme = HadoopSchemeInstance(
+        new TextLine(TextLine.DEFAULT_SOURCE_FIELDS, encoding)
+          .asInstanceOf[Scheme[_, _, _, _, _]])
     scheme.setSinkFields(PartitionUtil.toFields(0, valueSetter.arity))
     scheme
   }
@@ -74,9 +80,8 @@ case class PartitionedTextLine[P](
   // Create the underlying scheme and explicitly set the sink fields to be only the specified fields
   // see sinkFields in PartitionSchemed for other half of this work around.
   override def localScheme = {
-    val scheme =
-      new LocalTextLine(TextLine.DEFAULT_SOURCE_FIELDS, encoding)
-        .asInstanceOf[Scheme[Properties, InputStream, OutputStream, _, _]]
+    val scheme = new LocalTextLine(TextLine.DEFAULT_SOURCE_FIELDS, encoding)
+      .asInstanceOf[Scheme[Properties, InputStream, OutputStream, _, _]]
     scheme.setSinkFields(PartitionUtil.toFields(0, valueSetter.arity))
     scheme
   }
@@ -90,32 +95,39 @@ case class PartitionedTextLine[P](
     PartitionUtil.toFields(0, valueSetter.arity + partitionSetter.arity)
 
   /** Creates the taps for local and hdfs mode.*/
-  override def createTap(readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
+  override def createTap(
+      readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
     mode match {
       case Local(_) => {
-        val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
-        new LocalPartitionTap(fileTap, new TemplatePartition(partitionFields, template), SinkMode.UPDATE)
-          .asInstanceOf[Tap[_, _, _]]
-      }
+          val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
+          new LocalPartitionTap(
+              fileTap,
+              new TemplatePartition(partitionFields, template),
+              SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+        }
       case Hdfs(_, _) => {
-        val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
-        new PartitionTap(hfs, new TemplatePartition(partitionFields, template), SinkMode.UPDATE)
-          .asInstanceOf[Tap[_, _, _]]
-      }
+          val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
+          new PartitionTap(hfs,
+                           new TemplatePartition(partitionFields, template),
+                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+        }
       case hdfsTest @ HadoopTest(_, _) => {
-        val hfs = createHfsTap(hdfsScheme, hdfsTest.getWritePathFor(this), SinkMode.REPLACE)
-        new PartitionTap(hfs, new TemplatePartition(partitionFields, template), SinkMode.UPDATE)
-          .asInstanceOf[Tap[_, _, _]]
-      }
+          val hfs = createHfsTap(
+              hdfsScheme, hdfsTest.getWritePathFor(this), SinkMode.REPLACE)
+          new PartitionTap(hfs,
+                           new TemplatePartition(partitionFields, template),
+                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+        }
       case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
     }
 
   /**
-   * Combine both the partition and value converter to extract the data from a flat cascading tuple
-   * into a pair of `P` and `(offset, line)`.
-   */
+    * Combine both the partition and value converter to extract the data from a flat cascading tuple
+    * into a pair of `P` and `(offset, line)`.
+    */
   override def converter[U >: (P, (Long, String))] =
-    PartitionUtil.converter[P, (Long, String), U](valueConverter, partitionConverter)
+    PartitionUtil.converter[P, (Long, String), U](
+        valueConverter, partitionConverter)
 
   /** Flatten a pair of `P` and `line` into a cascading tuple.*/
   override def setter[U <: (P, String)] =

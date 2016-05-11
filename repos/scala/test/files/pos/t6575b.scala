@@ -13,5 +13,7 @@ trait Z extends X {
 }
 
 trait Comb extends Y with Z {
-  abstract override def foo: Function1[Int, Int] = { case i => super.foo(i) - 2 }
+  abstract override def foo: Function1[Int, Int] = {
+    case i => super.foo(i) - 2
+  }
 }

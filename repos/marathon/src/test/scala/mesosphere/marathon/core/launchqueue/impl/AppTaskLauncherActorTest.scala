@@ -1,6 +1,6 @@
 package mesosphere.marathon.core.launchqueue.impl
 
-import akka.actor.{ ActorContext, ActorRef, ActorSystem, Cancellable, Props, Terminated }
+import akka.actor.{ActorContext, ActorRef, ActorSystem, Cancellable, Props, Terminated}
 import akka.pattern.ask
 import akka.testkit.TestProbe
 import akka.util.Timeout
@@ -17,8 +17,8 @@ import mesosphere.marathon.core.matcher.manager.OfferMatcherManager
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.bus.TaskStatusUpdateTestHelper
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.state.{ AppDefinition, PathId, Timestamp }
-import mesosphere.marathon.{ MarathonSpec, MarathonTestHelper, Protos, SameAsSeq }
+import mesosphere.marathon.state.{AppDefinition, PathId, Timestamp}
+import mesosphere.marathon.{MarathonSpec, MarathonTestHelper, Protos, SameAsSeq}
 import org.mockito
 import org.mockito.Mockito
 import org.scalatest.GivenWhenThen
@@ -36,15 +36,19 @@ import scala.concurrent.duration._
   * * timeout for task launching feedback
   */
 class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
-  import org.mockito.{ Matchers => m }
+  import org.mockito.{Matchers => m}
 
   test("Initial population of task list from taskTracker with one task") {
-    Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
+    Mockito
+      .when(taskTracker.tasksByAppSync)
+      .thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
 
     val launcherRef = createLauncherRef(instances = 0)
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
-    val counts = Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+    val counts = Await
+      .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+      .asInstanceOf[QueuedTaskInfo]
 
     assert(counts.tasksLaunched == 1)
 
@@ -55,15 +59,22 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     Mockito.verify(taskTracker).tasksByAppSync
   }
 
-  test("Upgrading an app updates app definition in actor and requeries backoff") {
+  test(
+      "Upgrading an app updates app definition in actor and requeries backoff") {
     Given("an entry for an app")
-    Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
+    Mockito
+      .when(taskTracker.tasksByAppSync)
+      .thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
     val launcherRef = createLauncherRef(instances = 3)
     rateLimiterActor.expectMsg(RateLimiterActor.GetDelay(app))
     rateLimiterActor.reply(RateLimiterActor.DelayUpdate(app, clock.now()))
-    val counts = Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+    val counts = Await
+      .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+      .asInstanceOf[QueuedTaskInfo]
     assert(counts.tasksLaunched == 1)
-    Mockito.verify(offerMatcherManager).addSubscription(mockito.Matchers.any())(mockito.Matchers.any())
+    Mockito
+      .verify(offerMatcherManager)
+      .addSubscription(mockito.Matchers.any())(mockito.Matchers.any())
     Mockito.reset(offerMatcherManager)
 
     When("upgrading the app")
@@ -74,7 +85,9 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     rateLimiterActor.expectMsg(RateLimiterActor.GetDelay(upgradedApp))
     val newDelay: Timestamp = clock.now() + 5.seconds
     rateLimiterActor.reply(RateLimiterActor.DelayUpdate(upgradedApp, newDelay))
-    val counts2 = Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+    val counts2 = Await
+      .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+      .asInstanceOf[QueuedTaskInfo]
     assert(counts2.backOffUntil == newDelay)
 
     And("the actor knows the new app definition")
@@ -83,7 +96,9 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     assert(counts2.tasksLeftToLaunch == 1)
 
     And("removes its offer subscription because of the backoff delay")
-    Mockito.verify(offerMatcherManager).removeSubscription(mockito.Matchers.any())(mockito.Matchers.any())
+    Mockito
+      .verify(offerMatcherManager)
+      .removeSubscription(mockito.Matchers.any())(mockito.Matchers.any())
 
     // We don't care about these:
     Mockito.reset(taskTracker)
@@ -91,11 +106,15 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
 
   test("Upgrading an app updates reregisters the offerMatcher at the manager") {
     Given("an entry for an app")
-    Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
+    Mockito
+      .when(taskTracker.tasksByAppSync)
+      .thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
     val launcherRef = createLauncherRef(instances = 1)
     rateLimiterActor.expectMsg(RateLimiterActor.GetDelay(app))
     rateLimiterActor.reply(RateLimiterActor.DelayUpdate(app, clock.now()))
-    val counts = Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+    val counts = Await
+      .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+      .asInstanceOf[QueuedTaskInfo]
     assert(counts.tasksLaunched == 1)
 
     // We don't care about interactions until this point
@@ -105,31 +124,48 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     val upgradedApp = app.copy(cmd = Some("new command"))
     launcherRef ! AppTaskLauncherActor.AddTasks(upgradedApp, 1)
     rateLimiterActor.expectMsg(RateLimiterActor.GetDelay(upgradedApp))
-    rateLimiterActor.reply(RateLimiterActor.DelayUpdate(upgradedApp, clock.now()))
+    rateLimiterActor.reply(
+        RateLimiterActor.DelayUpdate(upgradedApp, clock.now()))
 
     // wait for message being processed
-    Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+    Await
+      .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+      .asInstanceOf[QueuedTaskInfo]
 
     Then("the actor reregisters itself for at the offerMatcher")
     val inOrder = Mockito.inOrder(offerMatcherManager)
-    inOrder.verify(offerMatcherManager).removeSubscription(mockito.Matchers.any())(mockito.Matchers.any())
-    inOrder.verify(offerMatcherManager).addSubscription(mockito.Matchers.any())(mockito.Matchers.any())
+    inOrder
+      .verify(offerMatcherManager)
+      .removeSubscription(mockito.Matchers.any())(mockito.Matchers.any())
+    inOrder
+      .verify(offerMatcherManager)
+      .addSubscription(mockito.Matchers.any())(mockito.Matchers.any())
 
     // We don't care about these:
     Mockito.reset(taskTracker)
   }
 
   test("Process task launch") {
-    Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.empty)
+    Mockito
+      .when(taskTracker.tasksByAppSync)
+      .thenReturn(TaskTracker.TasksByApp.empty)
     val offer = MarathonTestHelper.makeBasicOffer().build()
-    Mockito.when(taskOpFactory.buildTaskOp(m.any())).thenReturn(Some(f.launch(task, marathonTask)))
+    Mockito
+      .when(taskOpFactory.buildTaskOp(m.any()))
+      .thenReturn(Some(f.launch(task, marathonTask)))
 
     val launcherRef = createLauncherRef(instances = 1)
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
-    Await.result(launcherRef ? ActorOfferMatcher.MatchOffer(clock.now() + 1.seconds, offer), 3.seconds).asInstanceOf[MatchedTaskOps]
+    Await
+      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
+                  clock.now() + 1.seconds, offer),
+              3.seconds)
+      .asInstanceOf[MatchedTaskOps]
 
-    val counts = Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+    val counts = Await
+      .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+      .asInstanceOf[QueuedTaskInfo]
 
     assert(counts.tasksLaunched == 0)
 
@@ -138,20 +174,28 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     assert(counts.tasksLeftToLaunch == 0)
 
     Mockito.verify(taskTracker).tasksByAppSync
-    val matchRequest = TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
+    val matchRequest =
+      TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
   }
 
   test("Wait for inflight task launches on stop") {
-    Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.empty)
+    Mockito
+      .when(taskTracker.tasksByAppSync)
+      .thenReturn(TaskTracker.TasksByApp.empty)
     val offer = MarathonTestHelper.makeBasicOffer().build()
-    Mockito.when(taskOpFactory.buildTaskOp(m.any())).thenReturn(Some(f.launch(task, marathonTask)))
+    Mockito
+      .when(taskOpFactory.buildTaskOp(m.any()))
+      .thenReturn(Some(f.launch(task, marathonTask)))
 
     val launcherRef = createLauncherRef(instances = 1)
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
-    val matched =
-      Await.result(launcherRef ? ActorOfferMatcher.MatchOffer(clock.now() + 1.seconds, offer), 3.seconds).asInstanceOf[MatchedTaskOps]
+    val matched = Await
+      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
+                  clock.now() + 1.seconds, offer),
+              3.seconds)
+      .asInstanceOf[MatchedTaskOps]
 
     val testProbe = TestProbe()
     testProbe.watch(launcherRef)
@@ -162,25 +206,33 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     testProbe.expectMsgClass(classOf[Terminated])
 
     Mockito.verify(taskTracker).tasksByAppSync
-    val matchRequest = TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
+    val matchRequest =
+      TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
   }
 
   test("Process task launch reject") {
-    Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.empty)
+    Mockito
+      .when(taskTracker.tasksByAppSync)
+      .thenReturn(TaskTracker.TasksByApp.empty)
     val offer = MarathonTestHelper.makeBasicOffer().build()
-    Mockito.when(taskOpFactory.buildTaskOp(m.any())).thenReturn(Some(f.launch(task, marathonTask)))
+    Mockito
+      .when(taskOpFactory.buildTaskOp(m.any()))
+      .thenReturn(Some(f.launch(task, marathonTask)))
 
     val launcherRef = createLauncherRef(instances = 1)
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
-    val matchedTasks =
-      Await
-        .result(launcherRef ? ActorOfferMatcher.MatchOffer(clock.now() + 1.seconds, offer), 3.seconds)
-        .asInstanceOf[MatchedTaskOps]
+    val matchedTasks = Await
+      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
+                  clock.now() + 1.seconds, offer),
+              3.seconds)
+      .asInstanceOf[MatchedTaskOps]
     matchedTasks.opsWithSource.foreach(_.reject("stuff"))
 
-    val counts = Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+    val counts = Await
+      .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+      .asInstanceOf[QueuedTaskInfo]
 
     assert(counts.tasksLaunched == 0)
 
@@ -189,67 +241,88 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     assert(counts.tasksLeftToLaunch == 1)
 
     Mockito.verify(taskTracker).tasksByAppSync
-    val matchRequest = TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
+    val matchRequest =
+      TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
   }
 
   test("Process task launch timeout") {
-    Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.empty)
+    Mockito
+      .when(taskTracker.tasksByAppSync)
+      .thenReturn(TaskTracker.TasksByApp.empty)
     val offer = MarathonTestHelper.makeBasicOffer().build()
-    Mockito.when(taskOpFactory.buildTaskOp(m.any())).thenReturn(Some(f.launch(task, marathonTask)))
+    Mockito
+      .when(taskOpFactory.buildTaskOp(m.any()))
+      .thenReturn(Some(f.launch(task, marathonTask)))
 
     var scheduleCalled = false
     val props = Props(
-      new AppTaskLauncherActor(
-        launchQueueConfig,
-        offerMatcherManager, clock, taskOpFactory,
-        maybeOfferReviver = None,
-        taskTracker, rateLimiterActor.ref,
-        app, tasksToLaunch = 1
-      ) {
-        override protected def scheduleTaskOperationTimeout(
-          context: ActorContext, message: TaskOpRejected): Cancellable = {
-          scheduleCalled = true
-          mock[Cancellable]
+        new AppTaskLauncherActor(
+            launchQueueConfig,
+            offerMatcherManager,
+            clock,
+            taskOpFactory,
+            maybeOfferReviver = None,
+            taskTracker,
+            rateLimiterActor.ref,
+            app,
+            tasksToLaunch = 1
+        ) {
+          override protected def scheduleTaskOperationTimeout(
+              context: ActorContext, message: TaskOpRejected): Cancellable = {
+            scheduleCalled = true
+            mock[Cancellable]
+          }
         }
-      }
     )
     val launcherRef = actorSystem.actorOf(props, "launcher")
 
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     Await
-      .result(launcherRef ? ActorOfferMatcher.MatchOffer(clock.now() + 1.seconds, offer), 3.seconds)
+      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
+                  clock.now() + 1.seconds, offer),
+              3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
     // just make sure that prior messages have been processed, will not launch further tasks
 
     Await
-      .result(launcherRef ? ActorOfferMatcher.MatchOffer(clock.now() + 1.seconds, offer), 3.seconds)
+      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
+                  clock.now() + 1.seconds, offer),
+              3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
     assert(scheduleCalled)
 
     Mockito.verify(taskTracker).tasksByAppSync
-    val matchRequest = TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
+    val matchRequest =
+      TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
   }
 
   test("Process task launch accept") {
-    Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.empty)
+    Mockito
+      .when(taskTracker.tasksByAppSync)
+      .thenReturn(TaskTracker.TasksByApp.empty)
     val offer = MarathonTestHelper.makeBasicOffer().build()
-    Mockito.when(taskOpFactory.buildTaskOp(m.any())).thenReturn(Some(f.launch(task, marathonTask)))
+    Mockito
+      .when(taskOpFactory.buildTaskOp(m.any()))
+      .thenReturn(Some(f.launch(task, marathonTask)))
 
     val launcherRef = createLauncherRef(instances = 1)
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
-    val matchedTasks =
-      Await
-        .result(launcherRef ? ActorOfferMatcher.MatchOffer(clock.now() + 1.seconds, offer), 3.seconds)
-        .asInstanceOf[MatchedTaskOps]
+    val matchedTasks = Await
+      .result(launcherRef ? ActorOfferMatcher.MatchOffer(
+                  clock.now() + 1.seconds, offer),
+              3.seconds)
+      .asInstanceOf[MatchedTaskOps]
     matchedTasks.opsWithSource.foreach(_.accept())
 
-    val counts = Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+    val counts = Await
+      .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+      .asInstanceOf[QueuedTaskInfo]
 
     assert(counts.tasksLaunched == 1)
     assert(!counts.inProgress)
@@ -257,32 +330,38 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     assert(counts.tasksLeftToLaunch == 0)
 
     Mockito.verify(taskTracker).tasksByAppSync
-    val matchRequest = TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
+    val matchRequest =
+      TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
   }
 
-  for (
-    update <- Seq(
+  for (update <- Seq(
       TaskStatusUpdateTestHelper.finished,
       TaskStatusUpdateTestHelper.lost,
       TaskStatusUpdateTestHelper.killed,
       TaskStatusUpdateTestHelper.error
-    )
-  ) {
-    test(s"Remove terminated task (${update.wrapped.status.getClass.getSimpleName})") {
-      Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
+  )) {
+    test(
+        s"Remove terminated task (${update.wrapped.status.getClass.getSimpleName})") {
+      Mockito
+        .when(taskTracker.tasksByAppSync)
+        .thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
 
       val launcherRef = createLauncherRef(instances = 0)
       launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
       // wait for startup
-      Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+      Await
+        .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+        .asInstanceOf[QueuedTaskInfo]
 
       // task status update
-      val counts = Await.result(
-        launcherRef ? update.withTaskId(marathonTask.taskId).wrapped,
-        3.seconds
-      ).asInstanceOf[QueuedTaskInfo]
+      val counts = Await
+        .result(
+            launcherRef ? update.withTaskId(marathonTask.taskId).wrapped,
+            3.seconds
+        )
+        .asInstanceOf[QueuedTaskInfo]
 
       assert(counts.tasksLaunched == 0)
 
@@ -294,15 +373,14 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     }
   }
 
-  for (
-    update <- Seq(
+  for (update <- Seq(
       TaskStatusUpdateTestHelper.finished,
       TaskStatusUpdateTestHelper.lost,
       TaskStatusUpdateTestHelper.killed,
       TaskStatusUpdateTestHelper.error
-    )
-  ) {
-    test(s"Revive offers if task with constraints terminates (${update.wrapped.status.getClass.getSimpleName})") {
+  )) {
+    test(
+        s"Revive offers if task with constraints terminates (${update.wrapped.status.getClass.getSimpleName})") {
       Given("an actor for an app with constraints and one task")
       val constraint = Protos.Constraint
         .newBuilder()
@@ -310,16 +388,25 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
         .setOperator(Protos.Constraint.Operator.CLUSTER)
         .build()
       val appWithConstraints = app.copy(constraints = Set(constraint))
-      Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
+      Mockito
+        .when(taskTracker.tasksByAppSync)
+        .thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
 
-      val launcherRef = createLauncherRef(instances = 0, appToLaunch = appWithConstraints)
-      launcherRef ! RateLimiterActor.DelayUpdate(appWithConstraints, clock.now())
+      val launcherRef =
+        createLauncherRef(instances = 0, appToLaunch = appWithConstraints)
+      launcherRef ! RateLimiterActor.DelayUpdate(appWithConstraints,
+                                                 clock.now())
 
       And("that has succesfully started up")
-      Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+      Await
+        .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+        .asInstanceOf[QueuedTaskInfo]
 
       When("we get a status update about a terminated task")
-      Await.result(launcherRef ? update.withTaskId(marathonTask.taskId).wrapped, 3.seconds).asInstanceOf[QueuedTaskInfo]
+      Await
+        .result(launcherRef ? update.withTaskId(marathonTask.taskId).wrapped,
+                3.seconds)
+        .asInstanceOf[QueuedTaskInfo]
 
       Then("reviveOffers has been called")
       Mockito.verify(offerReviver).reviveOffers()
@@ -329,26 +416,31 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     }
   }
 
-  for (
-    update <- Seq(
+  for (update <- Seq(
       TaskStatusUpdateTestHelper.staging,
       TaskStatusUpdateTestHelper.running
-    )
-  ) {
-    test(s"DO NOT REMOVE running task (${update.wrapped.status.getClass.getSimpleName})") {
-      Mockito.when(taskTracker.tasksByAppSync).thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
+  )) {
+    test(
+        s"DO NOT REMOVE running task (${update.wrapped.status.getClass.getSimpleName})") {
+      Mockito
+        .when(taskTracker.tasksByAppSync)
+        .thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
 
       val launcherRef = createLauncherRef(instances = 0)
       launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
       // wait for startup
-      Await.result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds).asInstanceOf[QueuedTaskInfo]
+      Await
+        .result(launcherRef ? AppTaskLauncherActor.GetCount, 3.seconds)
+        .asInstanceOf[QueuedTaskInfo]
 
       // task status update
-      val counts = Await.result(
-        launcherRef ? update.withTaskId(marathonTask.taskId).wrapped,
-        3.seconds
-      ).asInstanceOf[QueuedTaskInfo]
+      val counts = Await
+        .result(
+            launcherRef ? update.withTaskId(marathonTask.taskId).wrapped,
+            3.seconds
+        )
+        .asInstanceOf[QueuedTaskInfo]
 
       assert(counts.tasksLaunched == 1)
 
@@ -361,15 +453,20 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
   }
 
   object f {
-    import org.apache.mesos.{ Protos => Mesos }
-    val launch = new TaskOpFactoryHelper(Some("principal"), Some("role")).launch(_: Mesos.TaskInfo, _: Task, None)
+    import org.apache.mesos.{Protos => Mesos}
+    val launch = new TaskOpFactoryHelper(Some("principal"), Some("role"))
+      .launch(_: Mesos.TaskInfo, _: Task, None)
   }
 
   private[this] val app = AppDefinition(id = PathId("/testapp"))
   private[this] val taskId = Task.Id.forApp(app.id)
-  private[this] val task = MarathonTestHelper.makeOneCPUTask(taskId.idString).build()
-  private[this] val marathonTask = MarathonTestHelper.mininimalTask(task.getTaskId.getValue).copy(
-    appVersion = app.version, status = Task.Status(app.version, None, None), networking = Task.NoNetworking)
+  private[this] val task =
+    MarathonTestHelper.makeOneCPUTask(taskId.idString).build()
+  private[this] val marathonTask = MarathonTestHelper
+    .mininimalTask(task.getTaskId.getValue)
+    .copy(appVersion = app.version,
+          status = Task.Status(app.version, None, None),
+          networking = Task.NoNetworking)
 
   private[this] implicit val timeout: Timeout = 3.seconds
   private[this] implicit var actorSystem: ActorSystem = _
@@ -381,15 +478,19 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
   private[this] var offerReviver: OfferReviver = _
   private[this] var rateLimiterActor: TestProbe = _
 
-  private[this] def createLauncherRef(instances: Int, appToLaunch: AppDefinition = app): ActorRef = {
+  private[this] def createLauncherRef(
+      instances: Int, appToLaunch: AppDefinition = app): ActorRef = {
     val props = AppTaskLauncherActor.props(
-      launchQueueConfig,
-      offerMatcherManager, clock, taskOpFactory,
-      maybeOfferReviver = Some(offerReviver),
-      taskTracker, rateLimiterActor.ref) _
+        launchQueueConfig,
+        offerMatcherManager,
+        clock,
+        taskOpFactory,
+        maybeOfferReviver = Some(offerReviver),
+        taskTracker,
+        rateLimiterActor.ref) _
     actorSystem.actorOf(
-      props(appToLaunch, instances),
-      "launcher"
+        props(appToLaunch, instances),
+        "launcher"
     )
   }
 
@@ -413,6 +514,5 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
 
     actorSystem.shutdown()
     actorSystem.awaitTermination()
-
   }
 }

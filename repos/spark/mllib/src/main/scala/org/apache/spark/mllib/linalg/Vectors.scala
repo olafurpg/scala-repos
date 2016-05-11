@@ -37,23 +37,23 @@ import org.apache.spark.sql.catalyst.util.GenericArrayData
 import org.apache.spark.sql.types._
 
 /**
- * Represents a numeric vector, whose index type is Int and value type is Double.
- *
- * Note: Users should not implement this interface.
- */
+  * Represents a numeric vector, whose index type is Int and value type is Double.
+  *
+  * Note: Users should not implement this interface.
+  */
 @SQLUserDefinedType(udt = classOf[VectorUDT])
 @Since("1.0.0")
 sealed trait Vector extends Serializable {
 
   /**
-   * Size of the vector.
-   */
+    * Size of the vector.
+    */
   @Since("1.0.0")
   def size: Int
 
   /**
-   * Converts the instance to a double array.
-   */
+    * Converts the instance to a double array.
+    */
   @Since("1.0.0")
   def toArray: Array[Double]
 
@@ -75,9 +75,9 @@ sealed trait Vector extends Serializable {
   }
 
   /**
-   * Returns a hash code value for the vector. The hash code is based on its size and its first 128
-   * nonzero entries, using a hash algorithm similar to [[java.util.Arrays.hashCode]].
-   */
+    * Returns a hash code value for the vector. The hash code is based on its size and its first 128
+    * nonzero entries, using a hash algorithm similar to [[java.util.Arrays.hashCode]].
+    */
   override def hashCode(): Int = {
     // This is a reference implementation. It calls return in foreachActive, which is slow.
     // Subclasses should override it with optimized implementation.
@@ -100,63 +100,64 @@ sealed trait Vector extends Serializable {
   }
 
   /**
-   * Converts the instance to a breeze vector.
-   */
+    * Converts the instance to a breeze vector.
+    */
   private[spark] def toBreeze: BV[Double]
 
   /**
-   * Gets the value of the ith element.
-   * @param i index
-   */
+    * Gets the value of the ith element.
+    * @param i index
+    */
   @Since("1.1.0")
   def apply(i: Int): Double = toBreeze(i)
 
   /**
-   * Makes a deep copy of this vector.
-   */
+    * Makes a deep copy of this vector.
+    */
   @Since("1.1.0")
   def copy: Vector = {
-    throw new NotImplementedError(s"copy is not implemented for ${this.getClass}.")
+    throw new NotImplementedError(
+        s"copy is not implemented for ${this.getClass}.")
   }
 
   /**
-   * Applies a function `f` to all the active elements of dense and sparse vector.
-   *
-   * @param f the function takes two parameters where the first parameter is the index of
-   *          the vector with type `Int`, and the second parameter is the corresponding value
-   *          with type `Double`.
-   */
+    * Applies a function `f` to all the active elements of dense and sparse vector.
+    *
+    * @param f the function takes two parameters where the first parameter is the index of
+    *          the vector with type `Int`, and the second parameter is the corresponding value
+    *          with type `Double`.
+    */
   @Since("1.6.0")
   def foreachActive(f: (Int, Double) => Unit): Unit
 
   /**
-   * Number of active entries.  An "active entry" is an element which is explicitly stored,
-   * regardless of its value.  Note that inactive entries have value 0.
-   */
+    * Number of active entries.  An "active entry" is an element which is explicitly stored,
+    * regardless of its value.  Note that inactive entries have value 0.
+    */
   @Since("1.4.0")
   def numActives: Int
 
   /**
-   * Number of nonzero elements. This scans all active values and count nonzeros.
-   */
+    * Number of nonzero elements. This scans all active values and count nonzeros.
+    */
   @Since("1.4.0")
   def numNonzeros: Int
 
   /**
-   * Converts this vector to a sparse vector with all explicit zeros removed.
-   */
+    * Converts this vector to a sparse vector with all explicit zeros removed.
+    */
   @Since("1.4.0")
   def toSparse: SparseVector
 
   /**
-   * Converts this vector to a dense vector.
-   */
+    * Converts this vector to a dense vector.
+    */
   @Since("1.4.0")
   def toDense: DenseVector = new DenseVector(this.toArray)
 
   /**
-   * Returns a vector in either dense or sparse format, whichever uses less storage.
-   */
+    * Returns a vector in either dense or sparse format, whichever uses less storage.
+    */
   @Since("1.4.0")
   def compressed: Vector = {
     val nnz = numNonzeros
@@ -169,25 +170,25 @@ sealed trait Vector extends Serializable {
   }
 
   /**
-   * Find the index of a maximal element.  Returns the first maximal element in case of a tie.
-   * Returns -1 if vector has length 0.
-   */
+    * Find the index of a maximal element.  Returns the first maximal element in case of a tie.
+    * Returns -1 if vector has length 0.
+    */
   @Since("1.5.0")
   def argmax: Int
 
   /**
-   * Converts the vector to a JSON string.
-   */
+    * Converts the vector to a JSON string.
+    */
   @Since("1.6.0")
   def toJson: String
 }
 
 /**
- * :: AlphaComponent ::
- *
- * User-defined type for [[Vector]] which allows easy interaction with SQL
- * via [[org.apache.spark.sql.DataFrame]].
- */
+  * :: AlphaComponent ::
+  *
+  * User-defined type for [[Vector]] which allows easy interaction with SQL
+  * via [[org.apache.spark.sql.DataFrame]].
+  */
 @AlphaComponent
 class VectorUDT extends UserDefinedType[Vector] {
 
@@ -196,11 +197,15 @@ class VectorUDT extends UserDefinedType[Vector] {
     // We only use "values" for dense vectors, and "size", "indices", and "values" for sparse
     // vectors. The "values" field is nullable because we might want to add binary vectors later,
     // which uses "size" and "indices", but not "values".
-    StructType(Seq(
-      StructField("type", ByteType, nullable = false),
-      StructField("size", IntegerType, nullable = true),
-      StructField("indices", ArrayType(IntegerType, containsNull = false), nullable = true),
-      StructField("values", ArrayType(DoubleType, containsNull = false), nullable = true)))
+    StructType(
+        Seq(StructField("type", ByteType, nullable = false),
+            StructField("size", IntegerType, nullable = true),
+            StructField("indices",
+                        ArrayType(IntegerType, containsNull = false),
+                        nullable = true),
+            StructField("values",
+                        ArrayType(DoubleType, containsNull = false),
+                        nullable = true)))
   }
 
   override def serialize(obj: Vector): InternalRow = {
@@ -225,8 +230,9 @@ class VectorUDT extends UserDefinedType[Vector] {
   override def deserialize(datum: Any): Vector = {
     datum match {
       case row: InternalRow =>
-        require(row.numFields == 4,
-          s"VectorUDT.deserialize given row with length ${row.numFields} but requires length == 4")
+        require(
+            row.numFields == 4,
+            s"VectorUDT.deserialize given row with length ${row.numFields} but requires length == 4")
         val tpe = row.getByte(0)
         tpe match {
           case 0 =>
@@ -261,16 +267,16 @@ class VectorUDT extends UserDefinedType[Vector] {
 }
 
 /**
- * Factory methods for [[org.apache.spark.mllib.linalg.Vector]].
- * We don't use the name `Vector` because Scala imports
- * [[scala.collection.immutable.Vector]] by default.
- */
+  * Factory methods for [[org.apache.spark.mllib.linalg.Vector]].
+  * We don't use the name `Vector` because Scala imports
+  * [[scala.collection.immutable.Vector]] by default.
+  */
 @Since("1.0.0")
 object Vectors {
 
   /**
-   * Creates a dense vector from its values.
-   */
+    * Creates a dense vector from its values.
+    */
   @Since("1.0.0")
   @varargs
   def dense(firstValue: Double, otherValues: Double*): Vector =
@@ -278,31 +284,32 @@ object Vectors {
 
   // A dummy implicit is used to avoid signature collision with the one generated by @varargs.
   /**
-   * Creates a dense vector from a double array.
-   */
+    * Creates a dense vector from a double array.
+    */
   @Since("1.0.0")
   def dense(values: Array[Double]): Vector = new DenseVector(values)
 
   /**
-   * Creates a sparse vector providing its index array and value array.
-   *
-   * @param size vector size.
-   * @param indices index array, must be strictly increasing.
-   * @param values value array, must have the same length as indices.
-   */
+    * Creates a sparse vector providing its index array and value array.
+    *
+    * @param size vector size.
+    * @param indices index array, must be strictly increasing.
+    * @param values value array, must have the same length as indices.
+    */
   @Since("1.0.0")
   def sparse(size: Int, indices: Array[Int], values: Array[Double]): Vector =
     new SparseVector(size, indices, values)
 
   /**
-   * Creates a sparse vector using unordered (index, value) pairs.
-   *
-   * @param size vector size.
-   * @param elements vector elements in (index, value) pairs.
-   */
+    * Creates a sparse vector using unordered (index, value) pairs.
+    *
+    * @param size vector size.
+    * @param elements vector elements in (index, value) pairs.
+    */
   @Since("1.0.0")
   def sparse(size: Int, elements: Seq[(Int, Double)]): Vector = {
-    require(size > 0, "The size of the requested sparse vector must be greater than 0.")
+    require(size > 0,
+            "The size of the requested sparse vector must be greater than 0.")
 
     val (indices, values) = elements.sortBy(_._1).unzip
     var prev = -1
@@ -310,47 +317,51 @@ object Vectors {
       require(prev < i, s"Found duplicate indices: $i.")
       prev = i
     }
-    require(prev < size, s"You may not write an element to index $prev because the declared " +
-      s"size of your vector is $size")
+    require(
+        prev < size,
+        s"You may not write an element to index $prev because the declared " +
+        s"size of your vector is $size")
 
     new SparseVector(size, indices.toArray, values.toArray)
   }
 
   /**
-   * Creates a sparse vector using unordered (index, value) pairs in a Java friendly way.
-   *
-   * @param size vector size.
-   * @param elements vector elements in (index, value) pairs.
-   */
+    * Creates a sparse vector using unordered (index, value) pairs in a Java friendly way.
+    *
+    * @param size vector size.
+    * @param elements vector elements in (index, value) pairs.
+    */
   @Since("1.0.0")
-  def sparse(size: Int, elements: JavaIterable[(JavaInteger, JavaDouble)]): Vector = {
-    sparse(size, elements.asScala.map { case (i, x) =>
-      (i.intValue(), x.doubleValue())
+  def sparse(
+      size: Int, elements: JavaIterable[(JavaInteger, JavaDouble)]): Vector = {
+    sparse(size, elements.asScala.map {
+      case (i, x) =>
+        (i.intValue(), x.doubleValue())
     }.toSeq)
   }
 
   /**
-   * Creates a vector of all zeros.
-   *
-   * @param size vector size
-   * @return a zero vector
-   */
+    * Creates a vector of all zeros.
+    *
+    * @param size vector size
+    * @return a zero vector
+    */
   @Since("1.1.0")
   def zeros(size: Int): Vector = {
     new DenseVector(new Array[Double](size))
   }
 
   /**
-   * Parses a string resulted from [[Vector.toString]] into a [[Vector]].
-   */
+    * Parses a string resulted from [[Vector.toString]] into a [[Vector]].
+    */
   @Since("1.1.0")
   def parse(s: String): Vector = {
     parseNumeric(NumericParser.parse(s))
   }
 
   /**
-   * Parses the JSON representation of a vector into a [[Vector]].
-   */
+    * Parses the JSON representation of a vector into a [[Vector]].
+    */
   @Since("1.6.0")
   def fromJson(json: String): Vector = {
     implicit val formats = DefaultFormats
@@ -365,7 +376,8 @@ object Vectors {
         val values = (jValue \ "values").extract[Seq[Double]].toArray
         dense(values)
       case _ =>
-        throw new IllegalArgumentException(s"Cannot parse $json into a vector.")
+        throw new IllegalArgumentException(
+            s"Cannot parse $json into a vector.")
     }
   }
 
@@ -381,21 +393,22 @@ object Vectors {
   }
 
   /**
-   * Creates a vector instance from a breeze vector.
-   */
+    * Creates a vector instance from a breeze vector.
+    */
   private[spark] def fromBreeze(breezeVector: BV[Double]): Vector = {
     breezeVector match {
       case v: BDV[Double] =>
         if (v.offset == 0 && v.stride == 1 && v.length == v.data.length) {
           new DenseVector(v.data)
         } else {
-          new DenseVector(v.toArray)  // Can't use underlying array directly, so make a new one
+          new DenseVector(v.toArray) // Can't use underlying array directly, so make a new one
         }
       case v: BSV[Double] =>
         if (v.index.length == v.used) {
           new SparseVector(v.length, v.index, v.data)
         } else {
-          new SparseVector(v.length, v.index.slice(0, v.used), v.data.slice(0, v.used))
+          new SparseVector(
+              v.length, v.index.slice(0, v.used), v.data.slice(0, v.used))
         }
       case v: BV[_] =>
         sys.error("Unsupported Breeze vector type: " + v.getClass.getName)
@@ -403,19 +416,23 @@ object Vectors {
   }
 
   /**
-   * Returns the p-norm of this vector.
-   * @param vector input vector.
-   * @param p norm.
-   * @return norm in L^p^ space.
-   */
+    * Returns the p-norm of this vector.
+    * @param vector input vector.
+    * @param p norm.
+    * @return norm in L^p^ space.
+    */
   @Since("1.3.0")
   def norm(vector: Vector, p: Double): Double = {
-    require(p >= 1.0, "To compute the p-norm of the vector, we require that you specify a p>=1. " +
-      s"You specified p=$p.")
+    require(
+        p >= 1.0,
+        "To compute the p-norm of the vector, we require that you specify a p>=1. " +
+        s"You specified p=$p.")
     val values = vector match {
       case DenseVector(vs) => vs
       case SparseVector(n, ids, vs) => vs
-      case v => throw new IllegalArgumentException("Do not support vector type " + v.getClass)
+      case v =>
+        throw new IllegalArgumentException(
+            "Do not support vector type " + v.getClass)
     }
     val size = values.length
 
@@ -456,15 +473,16 @@ object Vectors {
   }
 
   /**
-   * Returns the squared distance between two Vectors.
-   * @param v1 first Vector.
-   * @param v2 second Vector.
-   * @return squared distance between two Vectors.
-   */
+    * Returns the squared distance between two Vectors.
+    * @param v1 first Vector.
+    * @param v2 second Vector.
+    * @return squared distance between two Vectors.
+    */
   @Since("1.3.0")
   def sqdist(v1: Vector, v2: Vector): Double = {
-    require(v1.size == v2.size, s"Vector dimensions do not match: Dim(v1)=${v1.size} and Dim(v2)" +
-      s"=${v2.size}.")
+    require(v1.size == v2.size,
+            s"Vector dimensions do not match: Dim(v1)=${v1.size} and Dim(v2)" +
+            s"=${v2.size}.")
     var squaredDistance = 0.0
     (v1, v2) match {
       case (v1: SparseVector, v2: SparseVector) =>
@@ -483,7 +501,8 @@ object Vectors {
           if (kv2 >= nnzv2 || (kv1 < nnzv1 && v1Indices(kv1) < v2Indices(kv2))) {
             score = v1Values(kv1)
             kv1 += 1
-          } else if (kv1 >= nnzv1 || (kv2 < nnzv2 && v2Indices(kv2) < v1Indices(kv1))) {
+          } else if (kv1 >= nnzv1 ||
+                     (kv2 < nnzv2 && v2Indices(kv2) < v1Indices(kv1))) {
             score = v2Values(kv2)
             kv2 += 1
           } else {
@@ -509,15 +528,16 @@ object Vectors {
           kv += 1
         }
       case _ =>
-        throw new IllegalArgumentException("Do not support vector type " + v1.getClass +
-          " and " + v2.getClass)
+        throw new IllegalArgumentException(
+            "Do not support vector type " + v1.getClass + " and " +
+            v2.getClass)
     }
     squaredDistance
   }
 
   /**
-   * Returns the squared distance between DenseVector and SparseVector.
-   */
+    * Returns the squared distance between DenseVector and SparseVector.
+    */
   private[mllib] def sqdist(v1: SparseVector, v2: DenseVector): Double = {
     var kv1 = 0
     var kv2 = 0
@@ -545,13 +565,12 @@ object Vectors {
   }
 
   /**
-   * Check equality between sparse/dense vectors
-   */
-  private[mllib] def equals(
-      v1Indices: IndexedSeq[Int],
-      v1Values: Array[Double],
-      v2Indices: IndexedSeq[Int],
-      v2Values: Array[Double]): Boolean = {
+    * Check equality between sparse/dense vectors
+    */
+  private[mllib] def equals(v1Indices: IndexedSeq[Int],
+                            v1Values: Array[Double],
+                            v2Indices: IndexedSeq[Int],
+                            v2Values: Array[Double]): Boolean = {
     val v1Size = v1Values.length
     val v2Size = v2Values.length
     var k1 = 0
@@ -576,12 +595,12 @@ object Vectors {
 }
 
 /**
- * A dense vector represented by a value array.
- */
+  * A dense vector represented by a value array.
+  */
 @Since("1.0.0")
 @SQLUserDefinedType(udt = classOf[VectorUDT])
-class DenseVector @Since("1.0.0") (
-    @Since("1.0.0") val values: Array[Double]) extends Vector {
+class DenseVector @Since("1.0.0")(@Since("1.0.0") val values: Array[Double])
+    extends Vector {
 
   @Since("1.0.0")
   override def size: Int = values.length
@@ -697,24 +716,27 @@ object DenseVector {
 }
 
 /**
- * A sparse vector represented by an index array and an value array.
- *
- * @param size size of the vector.
- * @param indices index array, assume to be strictly increasing.
- * @param values value array, must have the same length as the index array.
- */
+  * A sparse vector represented by an index array and an value array.
+  *
+  * @param size size of the vector.
+  * @param indices index array, assume to be strictly increasing.
+  * @param values value array, must have the same length as the index array.
+  */
 @Since("1.0.0")
 @SQLUserDefinedType(udt = classOf[VectorUDT])
-class SparseVector @Since("1.0.0") (
-    @Since("1.0.0") override val size: Int,
-    @Since("1.0.0") val indices: Array[Int],
-    @Since("1.0.0") val values: Array[Double]) extends Vector {
+class SparseVector @Since("1.0.0")(@Since("1.0.0") override val size: Int,
+                                   @Since("1.0.0") val indices: Array[Int],
+                                   @Since("1.0.0") val values: Array[Double])
+    extends Vector {
 
-  require(indices.length == values.length, "Sparse vectors require that the dimension of the" +
-    s" indices match the dimension of the values. You provided ${indices.length} indices and " +
-    s" ${values.length} values.")
-  require(indices.length <= size, s"You provided ${indices.length} indices and values, " +
-    s"which exceeds the specified vector size ${size}.")
+  require(
+      indices.length == values.length,
+      "Sparse vectors require that the dimension of the" +
+      s" indices match the dimension of the values. You provided ${indices.length} indices and " +
+      s" ${values.length} values.")
+  require(indices.length <= size,
+          s"You provided ${indices.length} indices and values, " +
+          s"which exceeds the specified vector size ${size}.")
 
   override def toString: String =
     s"($size,${indices.mkString("[", ",", "]")},${values.mkString("[", ",", "]")})"
@@ -736,7 +758,8 @@ class SparseVector @Since("1.0.0") (
     new SparseVector(size, indices.clone(), values.clone())
   }
 
-  private[spark] override def toBreeze: BV[Double] = new BSV[Double](indices, values, size)
+  private[spark] override def toBreeze: BV[Double] =
+    new BSV[Double](indices, values, size)
 
   @Since("1.6.0")
   override def foreachActive(f: (Int, Double) => Unit): Unit = {
@@ -851,34 +874,35 @@ class SparseVector @Since("1.0.0") (
   }
 
   /**
-   * Create a slice of this vector based on the given indices.
-   * @param selectedIndices Unsorted list of indices into the vector.
-   *                        This does NOT do bound checking.
-   * @return  New SparseVector with values in the order specified by the given indices.
-   *
-   * NOTE: The API needs to be discussed before making this public.
-   *       Also, if we have a version assuming indices are sorted, we should optimize it.
-   */
+    * Create a slice of this vector based on the given indices.
+    * @param selectedIndices Unsorted list of indices into the vector.
+    *                        This does NOT do bound checking.
+    * @return  New SparseVector with values in the order specified by the given indices.
+    *
+    * NOTE: The API needs to be discussed before making this public.
+    *       Also, if we have a version assuming indices are sorted, we should optimize it.
+    */
   private[spark] def slice(selectedIndices: Array[Int]): SparseVector = {
     var currentIdx = 0
     val (sliceInds, sliceVals) = selectedIndices.flatMap { origIdx =>
       val iIdx = java.util.Arrays.binarySearch(this.indices, origIdx)
-      val i_v = if (iIdx >= 0) {
-        Iterator((currentIdx, this.values(iIdx)))
-      } else {
-        Iterator()
-      }
+      val i_v =
+        if (iIdx >= 0) {
+          Iterator((currentIdx, this.values(iIdx)))
+        } else {
+          Iterator()
+        }
       currentIdx += 1
       i_v
     }.unzip
-    new SparseVector(selectedIndices.length, sliceInds.toArray, sliceVals.toArray)
+    new SparseVector(
+        selectedIndices.length, sliceInds.toArray, sliceVals.toArray)
   }
 
   @Since("1.6.0")
   override def toJson: String = {
-    val jValue = ("type" -> 0) ~
-      ("size" -> size) ~
-      ("indices" -> indices.toSeq) ~
+    val jValue =
+      ("type" -> 0) ~ ("size" -> size) ~ ("indices" -> indices.toSeq) ~
       ("values" -> values.toSeq)
     compact(render(jValue))
   }

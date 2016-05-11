@@ -52,69 +52,72 @@ import org.apache.spark.util.ThreadUtils
  * process happens again once 80% of the validity of this has expired.
  */
 private[yarn] class AMDelegationTokenRenewer(
-    sparkConf: SparkConf,
-    hadoopConf: Configuration) extends Logging {
+    sparkConf: SparkConf, hadoopConf: Configuration)
+    extends Logging {
 
   private var lastCredentialsFileSuffix = 0
 
   private val delegationTokenRenewer =
     Executors.newSingleThreadScheduledExecutor(
-      ThreadUtils.namedThreadFactory("Delegation Token Refresh Thread"))
+        ThreadUtils.namedThreadFactory("Delegation Token Refresh Thread"))
 
   private val hadoopUtil = YarnSparkHadoopUtil.get
 
   private val credentialsFile = sparkConf.get(CREDENTIALS_FILE_PATH)
   private val daysToKeepFiles = sparkConf.get(CREDENTIALS_FILE_MAX_RETENTION)
   private val numFilesToKeep = sparkConf.get(CREDENTIAL_FILE_MAX_COUNT)
-  private val freshHadoopConf =
-    hadoopUtil.getConfBypassingFSCache(hadoopConf, new Path(credentialsFile).toUri.getScheme)
+  private val freshHadoopConf = hadoopUtil.getConfBypassingFSCache(
+      hadoopConf, new Path(credentialsFile).toUri.getScheme)
 
   /**
-   * Schedule a login from the keytab and principal set using the --principal and --keytab
-   * arguments to spark-submit. This login happens only when the credentials of the current user
-   * are about to expire. This method reads spark.yarn.principal and spark.yarn.keytab from
-   * SparkConf to do the login. This method is a no-op in non-YARN mode.
-   *
-   */
+    * Schedule a login from the keytab and principal set using the --principal and --keytab
+    * arguments to spark-submit. This login happens only when the credentials of the current user
+    * are about to expire. This method reads spark.yarn.principal and spark.yarn.keytab from
+    * SparkConf to do the login. This method is a no-op in non-YARN mode.
+    *
+    */
   private[spark] def scheduleLoginFromKeytab(): Unit = {
     val principal = sparkConf.get(PRINCIPAL).get
     val keytab = sparkConf.get(KEYTAB).get
 
     /**
-     * Schedule re-login and creation of new tokens. If tokens have already expired, this method
-     * will synchronously create new ones.
-     */
+      * Schedule re-login and creation of new tokens. If tokens have already expired, this method
+      * will synchronously create new ones.
+      */
     def scheduleRenewal(runnable: Runnable): Unit = {
       val credentials = UserGroupInformation.getCurrentUser.getCredentials
-      val renewalInterval = hadoopUtil.getTimeFromNowToRenewal(sparkConf, 0.75, credentials)
+      val renewalInterval =
+        hadoopUtil.getTimeFromNowToRenewal(sparkConf, 0.75, credentials)
       // Run now!
       if (renewalInterval <= 0) {
         logInfo("HDFS tokens have expired, creating new tokens now.")
         runnable.run()
       } else {
         logInfo(s"Scheduling login from keytab in $renewalInterval millis.")
-        delegationTokenRenewer.schedule(runnable, renewalInterval, TimeUnit.MILLISECONDS)
+        delegationTokenRenewer.schedule(
+            runnable, renewalInterval, TimeUnit.MILLISECONDS)
       }
     }
 
     // This thread periodically runs on the driver to update the delegation tokens on HDFS.
-    val driverTokenRenewerRunnable =
-      new Runnable {
-        override def run(): Unit = {
-          try {
-            writeNewTokensToHDFS(principal, keytab)
-            cleanupOldFiles()
-          } catch {
-            case e: Exception =>
-              // Log the error and try to write new tokens back in an hour
-              logWarning("Failed to write out new credentials to HDFS, will try again in an " +
-                "hour! If this happens too often tasks will fail.", e)
-              delegationTokenRenewer.schedule(this, 1, TimeUnit.HOURS)
-              return
-          }
-          scheduleRenewal(this)
+    val driverTokenRenewerRunnable = new Runnable {
+      override def run(): Unit = {
+        try {
+          writeNewTokensToHDFS(principal, keytab)
+          cleanupOldFiles()
+        } catch {
+          case e: Exception =>
+            // Log the error and try to write new tokens back in an hour
+            logWarning(
+                "Failed to write out new credentials to HDFS, will try again in an " +
+                "hour! If this happens too often tasks will fail.",
+                e)
+            delegationTokenRenewer.schedule(this, 1, TimeUnit.HOURS)
+            return
         }
+        scheduleRenewal(this)
       }
+    }
     // Schedule update of credentials. This handles the case of updating the tokens right now
     // as well, since the renewal interval will be 0, and the thread will get scheduled
     // immediately.
@@ -128,18 +131,23 @@ private[yarn] class AMDelegationTokenRenewer(
     try {
       val remoteFs = FileSystem.get(freshHadoopConf)
       val credentialsPath = new Path(credentialsFile)
-      val thresholdTime = System.currentTimeMillis() - (daysToKeepFiles days).toMillis
-      hadoopUtil.listFilesSorted(
-        remoteFs, credentialsPath.getParent,
-        credentialsPath.getName, SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
+      val thresholdTime =
+        System.currentTimeMillis() - (daysToKeepFiles days).toMillis
+      hadoopUtil
+        .listFilesSorted(remoteFs,
+                         credentialsPath.getParent,
+                         credentialsPath.getName,
+                         SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
         .dropRight(numFilesToKeep)
         .takeWhile(_.getModificationTime < thresholdTime)
         .foreach(x => remoteFs.delete(x.getPath, true))
     } catch {
       // Such errors are not fatal, so don't throw. Make sure they are logged though
       case e: Exception =>
-        logWarning("Error while attempting to cleanup old tokens. If you are seeing many such " +
-          "warnings there may be an issue with your HDFS cluster.", e)
+        logWarning(
+            "Error while attempting to cleanup old tokens. If you are seeing many such " +
+            "warnings there may be an issue with your HDFS cluster.",
+            e)
     }
   }
 
@@ -163,7 +171,8 @@ private[yarn] class AMDelegationTokenRenewer(
     // to login and then relogin every time (the HDFS API may not relogin since we don't use this
     // UGI directly for HDFS communication.
     logInfo(s"Attempting to login to KDC using principal: $principal")
-    val keytabLoggedInUGI = UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytab)
+    val keytabLoggedInUGI =
+      UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytab)
     logInfo("Successfully logged into KDC.")
     val tempCreds = keytabLoggedInUGI.getCredentials
     val credentialsPath = new Path(credentialsFile)
@@ -173,7 +182,8 @@ private[yarn] class AMDelegationTokenRenewer(
       override def run(): Void = {
         val nns = YarnSparkHadoopUtil.get.getNameNodesToAccess(sparkConf) + dst
         hadoopUtil.obtainTokensForNamenodes(nns, freshHadoopConf, tempCreds)
-        hadoopUtil.obtainTokenForHiveMetastore(sparkConf, freshHadoopConf, tempCreds)
+        hadoopUtil.obtainTokenForHiveMetastore(
+            sparkConf, freshHadoopConf, tempCreds)
         hadoopUtil.obtainTokenForHBase(sparkConf, freshHadoopConf, tempCreds)
         null
       }
@@ -185,22 +195,29 @@ private[yarn] class AMDelegationTokenRenewer(
     // was restarted, then the lastCredentialsFileSuffix might be > 0, so find the newest file
     // and update the lastCredentialsFileSuffix.
     if (lastCredentialsFileSuffix == 0) {
-      hadoopUtil.listFilesSorted(
-        remoteFs, credentialsPath.getParent,
-        credentialsPath.getName, SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
-        .lastOption.foreach { status =>
-        lastCredentialsFileSuffix = hadoopUtil.getSuffixForCredentialsPath(status.getPath)
-      }
+      hadoopUtil
+        .listFilesSorted(remoteFs,
+                         credentialsPath.getParent,
+                         credentialsPath.getName,
+                         SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
+        .lastOption
+        .foreach { status =>
+          lastCredentialsFileSuffix = hadoopUtil.getSuffixForCredentialsPath(
+              status.getPath)
+        }
     }
     val nextSuffix = lastCredentialsFileSuffix + 1
     val tokenPathStr =
-      credentialsFile + SparkHadoopUtil.SPARK_YARN_CREDS_COUNTER_DELIM + nextSuffix
+      credentialsFile + SparkHadoopUtil.SPARK_YARN_CREDS_COUNTER_DELIM +
+      nextSuffix
     val tokenPath = new Path(tokenPathStr)
-    val tempTokenPath = new Path(tokenPathStr + SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
+    val tempTokenPath = new Path(
+        tokenPathStr + SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
     logInfo("Writing out delegation tokens to " + tempTokenPath.toString)
     val credentials = UserGroupInformation.getCurrentUser.getCredentials
     credentials.writeTokenStorageFile(tempTokenPath, freshHadoopConf)
-    logInfo(s"Delegation Tokens written out successfully. Renaming file to $tokenPathStr")
+    logInfo(
+        s"Delegation Tokens written out successfully. Renaming file to $tokenPathStr")
     remoteFs.rename(tempTokenPath, tokenPath)
     logInfo("Delegation token file rename complete.")
     lastCredentialsFileSuffix = nextSuffix

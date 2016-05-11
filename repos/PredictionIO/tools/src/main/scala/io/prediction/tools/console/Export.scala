@@ -12,31 +12,27 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.tools.console
 
 import io.prediction.tools.Runner
 
-case class ExportArgs(
-  appId: Int = 0,
-  channel: Option[String] = None,
-  outputPath: String = "",
-  format: String = "json")
+case class ExportArgs(appId: Int = 0,
+                      channel: Option[String] = None,
+                      outputPath: String = "",
+                      format: String = "json")
 
 object Export {
   def eventsToFile(ca: ConsoleArgs): Int = {
-    val channelArg = ca.export.channel
-      .map(ch => Seq("--channel", ch)).getOrElse(Nil)
-    Runner.runOnSpark(
-      "io.prediction.tools.export.EventsToFile",
-      Seq(
-        "--appid",
-        ca.export.appId.toString,
-        "--output",
-        ca.export.outputPath,
-        "--format",
-        ca.export.format) ++ channelArg,
-      ca,
-      Nil)
+    val channelArg =
+      ca.export.channel.map(ch => Seq("--channel", ch)).getOrElse(Nil)
+    Runner.runOnSpark("io.prediction.tools.export.EventsToFile",
+                      Seq("--appid",
+                          ca.export.appId.toString,
+                          "--output",
+                          ca.export.outputPath,
+                          "--format",
+                          ca.export.format) ++ channelArg,
+                      ca,
+                      Nil)
   }
 }

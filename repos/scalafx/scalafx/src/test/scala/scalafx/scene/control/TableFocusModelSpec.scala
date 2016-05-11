@@ -35,13 +35,17 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * TableViewFocusModel tests.
- */
+  * TableViewFocusModel tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class TableFocusModelSpec[T, TC <: jfxsc.TableColumnBase[T, _]]
-  extends SimpleSFXDelegateSpec[jfxsc.TableFocusModel[T, TC], TableFocusModel[T, TC]](classOf[jfxsc.TableFocusModel[T, TC]], classOf[TableFocusModel[T, TC]]) {
+    extends SimpleSFXDelegateSpec[
+        jfxsc.TableFocusModel[T, TC], TableFocusModel[T, TC]](
+        classOf[jfxsc.TableFocusModel[T, TC]],
+        classOf[TableFocusModel[T, TC]]) {
 
-  override def getScalaClassInstance = new TableFocusModel[T, TC](this.getJavaClassInstance) {}
+  override def getScalaClassInstance =
+    new TableFocusModel[T, TC](this.getJavaClassInstance) {}
 
   override def getJavaClassInstance = new jfxsc.TableFocusModel[T, TC] {
     def getItemCount(): Int = 0
@@ -53,5 +57,4 @@ class TableFocusModelSpec[T, TC <: jfxsc.TableColumnBase[T, _]]
     def focusRightCell() {}
     def isFocused(row: Int, column: TC): Boolean = false
   }
-
 }

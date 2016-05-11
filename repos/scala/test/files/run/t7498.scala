@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 object Test extends App {
   import scala.collection.concurrent.TrieMap
 
@@ -17,4 +10,3 @@ object Test extends App {
 
   tm.par.foreach(kv => ())
 }
-

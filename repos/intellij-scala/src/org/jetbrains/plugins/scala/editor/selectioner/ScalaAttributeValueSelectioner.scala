@@ -10,19 +10,23 @@ import org.jetbrains.plugins.scala.extensions.PsiElementExt
 import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes._
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class ScalaAttributeValueSelectioner extends ExtendWordSelectionHandlerBase {
   def canSelect(e: PsiElement) = isPartOfAttributeValue(e)
 
-  override def select(e: PsiElement, editorText: CharSequence, cursorOffset: Int, editor: Editor) = {
+  override def select(e: PsiElement,
+                      editorText: CharSequence,
+                      cursorOffset: Int,
+                      editor: Editor) = {
     val result = super.select(e, editorText, cursorOffset, editor)
 
     val start = e.prevElements.toSeq.takeWhile(isPartOfAttributeValue).last
     val end = e.nextElements.toSeq.takeWhile(isPartOfAttributeValue).last
 
     if (start != end) {
-      result.add(new TextRange(start.getTextRange.getStartOffset, end.getTextRange.getEndOffset))
+      result.add(new TextRange(start.getTextRange.getStartOffset,
+                               end.getTextRange.getEndOffset))
     }
 
     result
@@ -31,9 +35,9 @@ class ScalaAttributeValueSelectioner extends ExtendWordSelectionHandlerBase {
 
 private object ScalaAttributeValueSelectioner {
   private val ValueTokenTypes: Set[IElementType] = Set(
-    XML_ATTRIBUTE_VALUE_START_DELIMITER,
-    XML_ATTRIBUTE_VALUE_TOKEN,
-    XML_ATTRIBUTE_VALUE_END_DELIMITER)
+      XML_ATTRIBUTE_VALUE_START_DELIMITER,
+      XML_ATTRIBUTE_VALUE_TOKEN,
+      XML_ATTRIBUTE_VALUE_END_DELIMITER)
 
   private def isPartOfAttributeValue(e: PsiElement): Boolean =
     ValueTokenTypes.contains(e.getNode.getElementType)

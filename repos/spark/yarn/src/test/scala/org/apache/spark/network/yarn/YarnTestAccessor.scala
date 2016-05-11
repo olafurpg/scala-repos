@@ -19,8 +19,8 @@ package org.apache.spark.network.yarn
 import java.io.File
 
 /**
- * just a cheat to get package-visible members in tests
- */
+  * just a cheat to get package-visible members in tests
+  */
 object YarnTestAccessor {
   def getShuffleServicePort: Int = {
     YarnShuffleService.boundPort
@@ -33,5 +33,4 @@ object YarnTestAccessor {
   def getRegisteredExecutorFile(service: YarnShuffleService): File = {
     service.registeredExecutorFile
   }
-
 }

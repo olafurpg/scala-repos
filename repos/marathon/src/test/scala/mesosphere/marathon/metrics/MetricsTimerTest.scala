@@ -2,12 +2,13 @@ package mesosphere.marathon.metrics
 
 import com.codahale.metrics.MetricRegistry
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ FunSuite, GivenWhenThen, Matchers }
+import org.scalatest.{FunSuite, GivenWhenThen, Matchers}
 
 import scala.concurrent.Promise
 import scala.util.Try
 
-class MetricsTimerTest extends FunSuite with Matchers with GivenWhenThen with ScalaFutures {
+class MetricsTimerTest
+    extends FunSuite with Matchers with GivenWhenThen with ScalaFutures {
   test("time crashing call") {
     When("doing the call (but the future is delayed)")
     val metrics = new Metrics(new MetricRegistry)
@@ -55,7 +56,8 @@ class MetricsTimerTest extends FunSuite with Matchers with GivenWhenThen with Sc
     timer.timer.getCount should be(0)
 
     When("we fulfill the future")
-    val failure: RuntimeException = new scala.RuntimeException("simulated failure")
+    val failure: RuntimeException =
+      new scala.RuntimeException("simulated failure")
     promise.failure(failure)
 
     Then("we get the expected metric results")

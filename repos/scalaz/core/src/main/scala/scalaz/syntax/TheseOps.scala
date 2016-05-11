@@ -22,5 +22,6 @@ final class ThesePairOps[A, B](val self: (A, B)) extends AnyVal {
 
 trait ToTheseOps {
   implicit def ToTheseOps[A](a: A): TheseOps[A] = new TheseOps(a)
-  implicit def ToThesePairOps[A, B](a: (A, B)): ThesePairOps[A, B] = new ThesePairOps(a)
+  implicit def ToThesePairOps[A, B](a: (A, B)): ThesePairOps[A, B] =
+    new ThesePairOps(a)
 }

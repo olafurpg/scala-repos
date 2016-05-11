@@ -32,11 +32,13 @@ import org.apache.spark.shuffle.IndexShuffleBlockResolver
 import org.apache.spark.storage._
 import org.apache.spark.util.Utils
 
+class IndexShuffleBlockResolverSuite
+    extends SparkFunSuite with BeforeAndAfterEach {
 
-class IndexShuffleBlockResolverSuite extends SparkFunSuite with BeforeAndAfterEach {
-
-  @Mock(answer = RETURNS_SMART_NULLS) private var blockManager: BlockManager = _
-  @Mock(answer = RETURNS_SMART_NULLS) private var diskBlockManager: DiskBlockManager = _
+  @Mock(answer = RETURNS_SMART_NULLS)
+  private var blockManager: BlockManager = _
+  @Mock(answer = RETURNS_SMART_NULLS)
+  private var diskBlockManager: DiskBlockManager = _
 
   private var tempDir: File = _
   private val conf: SparkConf = new SparkConf(loadDefaults = false)
@@ -47,12 +49,11 @@ class IndexShuffleBlockResolverSuite extends SparkFunSuite with BeforeAndAfterEa
     MockitoAnnotations.initMocks(this)
 
     when(blockManager.diskBlockManager).thenReturn(diskBlockManager)
-    when(diskBlockManager.getFile(any[BlockId])).thenAnswer(
-      new Answer[File] {
-        override def answer(invocation: InvocationOnMock): File = {
-          new File(tempDir, invocation.getArguments.head.toString)
-        }
-      })
+    when(diskBlockManager.getFile(any[BlockId])).thenAnswer(new Answer[File] {
+      override def answer(invocation: InvocationOnMock): File = {
+        new File(tempDir, invocation.getArguments.head.toString)
+      }
+    })
   }
 
   override def afterEach(): Unit = {

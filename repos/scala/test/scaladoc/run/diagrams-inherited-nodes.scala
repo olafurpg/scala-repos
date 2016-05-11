@@ -51,14 +51,23 @@ object Test extends ScaladocModelTest {
 
     // base package
     // Assert we have 7 nodes and 6 edges
-    val base = rootPackage._package("scala")._package("test")._package("scaladoc")._package("diagrams")._package("inherited")._package("nodes")
+    val base = rootPackage
+      ._package("scala")
+      ._package("test")
+      ._package("scaladoc")
+      ._package("diagrams")
+      ._package("inherited")
+      ._package("nodes")
 
     def checkDiagram(t: String, nodes: Int, edges: Int) = {
       // trait T1
       val T = base._trait(t)
       val TDiag = T.contentDiagram.get
-      assert(TDiag.nodes.length == nodes, t + ": " + TDiag.nodes + ".length == " + nodes)
-      assert(TDiag.edges.map(_._2.length).sum == edges, t + ": " + TDiag.edges.mkString("List(\n", ",\n", "\n)") + ".map(_._2.length).sum == " + edges)
+      assert(TDiag.nodes.length == nodes,
+             t + ": " + TDiag.nodes + ".length == " + nodes)
+      assert(TDiag.edges.map(_._2.length).sum == edges,
+             t + ": " + TDiag.edges.mkString("List(\n", ",\n", "\n)") +
+             ".map(_._2.length).sum == " + edges)
     }
 
     checkDiagram("T1", 3, 2)

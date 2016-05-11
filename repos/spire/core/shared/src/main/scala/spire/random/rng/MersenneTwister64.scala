@@ -1,17 +1,15 @@
 /************************************************************************\
-** Project                                                              **
-**       ______  ______   __    ______    ____                          **
-**      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
-**     / /__   / /_/ /  / /   / /_/ /   / /_                            **
-**    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
-**   ____/ / / /      / /   / / | |   / /__                             **
-**  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
-**                                                                      **
-**      Redistribution and use permitted under the MIT license.         **
-**                                                                      **
+  ** Project                                                              **
+  **       ______  ______   __    ______    ____                          **
+  **      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+  **     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+  **    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+  **   ____/ / / /      / /   / / | |   / /__                             **
+  **  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+  **                                                                      **
+  **      Redistribution and use permitted under the MIT license.         **
+  **                                                                      **
 \************************************************************************/
-
-
 package spire
 package random
 package rng
@@ -22,22 +20,25 @@ import java.nio.ByteBuffer
 import java.util.Arrays
 
 /**
- * This is a 64-bit Scala implementation of MersenneTwister based on MT19937-64.c.
- *
- * <p>MersenneTwister is a fast, 623-dimensionally equidistributed pseudo random number generator
- * with a <tt>2<sup>19937</sup>&nbsp;-&nbsp;1</tt> long period.
- *
- * <p><b>Reference: </b>
- * Makoto Matsumoto and Takuji Nishimura:
- * "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform Pseudo-Random Number Generator",
- * <i>ACM Transactions on Modeling and Computer Simulation,</i> Vol. 8, No. 1, January 1998, pp 3--30.
- *
- * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/VERSIONS/C-LANG/mt19937-64.c">MT19937-64.c</a>
- * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html">Mersenne Twister Home Page</a>
- * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
- * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
- */
-final class MersenneTwister64 protected[random](mt: Array[Long], mti0: Int = 313) extends LongBasedGenerator { // N + 1 = 313
+  * This is a 64-bit Scala implementation of MersenneTwister based on MT19937-64.c.
+  *
+  * <p>MersenneTwister is a fast, 623-dimensionally equidistributed pseudo random number generator
+  * with a <tt>2<sup>19937</sup>&nbsp;-&nbsp;1</tt> long period.
+  *
+  * <p><b>Reference: </b>
+  * Makoto Matsumoto and Takuji Nishimura:
+  * "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform Pseudo-Random Number Generator",
+  * <i>ACM Transactions on Modeling and Computer Simulation,</i> Vol. 8, No. 1, January 1998, pp 3--30.
+  *
+  * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/VERSIONS/C-LANG/mt19937-64.c">MT19937-64.c</a>
+  * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html">Mersenne Twister Home Page</a>
+  * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
+  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
+  */
+final class MersenneTwister64 protected[random](
+    mt: Array[Long], mti0: Int = 313)
+    extends LongBasedGenerator {
+  // N + 1 = 313
 
   import MersenneTwister64.{UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01}
 
@@ -49,7 +50,9 @@ final class MersenneTwister64 protected[random](mt: Array[Long], mti0: Int = 313
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
-    cfor(0)(_ < N, _ + 1) { i => bb.putLong(mt(i)) }
+    cfor(0)(_ < N, _ + 1) { i =>
+      bb.putLong(mt(i))
+    }
     bb.putInt(mti)
     bytes
   }
@@ -57,7 +60,9 @@ final class MersenneTwister64 protected[random](mt: Array[Long], mti0: Int = 313
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
-    cfor(0)(_ < N, _ + 1) { i => mt(i) = bb.getLong() }
+    cfor(0)(_ < N, _ + 1) { i =>
+      mt(i) = bb.getLong()
+    }
     mti = bb.getInt
   }
 
@@ -91,18 +96,20 @@ final class MersenneTwister64 protected[random](mt: Array[Long], mti0: Int = 313
 
     // Tempering
     x ^= (x >>> 29) & 0x5555555555555555L
-    x ^= (x  << 17) & 0x71D67FFFEDA60000L
-    x ^= (x  << 37) & 0xFFF7EEE000000000L
+    x ^= (x << 17) & 0x71D67FFFEDA60000L
+    x ^= (x << 37) & 0xFFF7EEE000000000L
     x ^= (x >>> 43)
 
     x
   }
 }
 
-object MersenneTwister64 extends GeneratorCompanion[MersenneTwister64, (Array[Long], Int)] {
+object MersenneTwister64
+    extends GeneratorCompanion[MersenneTwister64, (Array[Long], Int)] {
 
-  @inline private val UpperMask = 0xFFFFFFFF80000000L // = 0xFFFFFFFFFFFFFFFFL ^ Int.MinValue
-  @inline private val LowerMask = 0x7FFFFFFFL         // = Int.MinValue
+  @inline private val UpperMask =
+    0xFFFFFFFF80000000L // = 0xFFFFFFFFFFFFFFFFL ^ Int.MinValue
+  @inline private val LowerMask = 0x7FFFFFFFL // = Int.MinValue
 
   @inline private val N = 312
   @inline private val M = 156
@@ -115,9 +122,11 @@ object MersenneTwister64 extends GeneratorCompanion[MersenneTwister64, (Array[Lo
 
   @inline private val BYTES = N * 8 + 4
 
-  @inline private def mag01(x: Long) = if ((x & 1) == 0) 0L else 0xB5026F5AA96619EL
+  @inline private def mag01(x: Long) =
+    if ((x & 1) == 0) 0L else 0xB5026F5AA96619EL
 
-  def randomSeed(): (Array[Long], Int) = (Utils.seedFromLong(N, Utils.longFromTime()), N + 1)
+  def randomSeed(): (Array[Long], Int) =
+    (Utils.seedFromLong(N, Utils.longFromTime()), N + 1)
 
   def fromSeed(seed: (Array[Long], Int)): MersenneTwister64 =
     seed match {
@@ -126,9 +135,12 @@ object MersenneTwister64 extends GeneratorCompanion[MersenneTwister64, (Array[Lo
         new MersenneTwister64(mt, mti)
     }
 
-  def fromArray(arr: Array[Long]): MersenneTwister64 = fromSeed((Utils.seedFromArray(N, arr), N + 1))
+  def fromArray(arr: Array[Long]): MersenneTwister64 =
+    fromSeed((Utils.seedFromArray(N, arr), N + 1))
 
-  def fromBytes(bytes: Array[Byte]): MersenneTwister64 = fromArray(Pack.longsFromBytes(bytes, bytes.length / 8))
+  def fromBytes(bytes: Array[Byte]): MersenneTwister64 =
+    fromArray(Pack.longsFromBytes(bytes, bytes.length / 8))
 
-  def fromTime(time: Long = System.nanoTime): MersenneTwister64 = fromSeed((Utils.seedFromLong(N, Utils.longFromTime(time)), N + 1))
+  def fromTime(time: Long = System.nanoTime): MersenneTwister64 =
+    fromSeed((Utils.seedFromLong(N, Utils.longFromTime(time)), N + 1))
 }

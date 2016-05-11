@@ -6,13 +6,9 @@ import scala.concurrent.Future
 import play.api.i18n.Lang
 
 private[i18n] final class FileFix(
-    pool: I18nPool,
-    path: String,
-    keys: I18nKeys,
-    messages: Messages) {
+    pool: I18nPool, path: String, keys: I18nKeys, messages: Messages) {
 
-  val apply: Funit =
-    Future.traverse(pool.nonDefaultLangs.toList)(fix).void
+  val apply: Funit = Future.traverse(pool.nonDefaultLangs.toList)(fix).void
 
   private def fix(lang: Lang): Funit =
     write(lang, sanitize((messages get lang.language) | Map.empty))

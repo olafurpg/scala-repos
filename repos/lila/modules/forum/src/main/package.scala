@@ -15,8 +15,7 @@ package object forum extends PackageObject with WithPlay {
     private[forum] implicit lazy val topicTube =
       Topic.tube inColl Env.current.topicColl
 
-    implicit lazy val postTube =
-      Post.tube inColl Env.current.postColl
+    implicit lazy val postTube = Post.tube inColl Env.current.postColl
   }
 
   private[forum] def teamSlug(id: String) = "team-" + id

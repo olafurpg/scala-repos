@@ -1,9 +1,6 @@
 package scala.collection.parallel
 package immutable
 
-
-
-
 import org.scalacheck._
 import org.scalacheck.Gen
 import org.scalacheck.Gen._
@@ -14,10 +11,9 @@ import org.scalacheck.Arbitrary._
 import scala.collection._
 import scala.collection.parallel.ops._
 
-
-
-
-class ParallelRangeCheck(val tasksupport: TaskSupport) extends ParallelSeqCheck[Int]("ParallelRange[Int]") with ops.IntSeqOperators {
+class ParallelRangeCheck(val tasksupport: TaskSupport)
+    extends ParallelSeqCheck[Int]("ParallelRange[Int]")
+    with ops.IntSeqOperators {
   // ForkJoinTasks.defaultForkJoinPool.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
   // ForkJoinTasks.defaultForkJoinPool.setParallelism(Runtime.getRuntime.availableProcessors * 2)
 
@@ -27,7 +23,8 @@ class ParallelRangeCheck(val tasksupport: TaskSupport) extends ParallelSeqCheck[
 
   def isCheckingViews = false
 
-  def ofSize(vals: Seq[Gen[Int]], sz: Int) = throw new UnsupportedOperationException
+  def ofSize(vals: Seq[Gen[Int]], sz: Int) =
+    throw new UnsupportedOperationException
 
   override def instances(vals: Seq[Gen[Int]]): Gen[Seq[Int]] = sized { start =>
     sized { end =>
@@ -55,21 +52,4 @@ class ParallelRangeCheck(val tasksupport: TaskSupport) extends ParallelSeqCheck[
   }
 
   def values = Seq(choose(-100, 100))
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

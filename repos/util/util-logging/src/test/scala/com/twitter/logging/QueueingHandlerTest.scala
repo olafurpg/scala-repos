@@ -23,10 +23,8 @@ import org.scalatest.concurrent.{IntegrationPatience, Eventually}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class QueueingHandlerTest extends WordSpec
-  with Eventually
-  with IntegrationPatience
-{
+class QueueingHandlerTest
+    extends WordSpec with Eventually with IntegrationPatience {
 
   class MockHandler extends Handler(BareFormatter, None) {
     def publish(record: javalog.LogRecord) = ()
@@ -142,8 +140,7 @@ class QueueingHandlerTest extends WordSpec
     }
 
     "forward formatter to the underlying handler" in {
-      val handler = new MockHandler {
-      }
+      val handler = new MockHandler {}
 
       val queueHandler = new QueueingHandler(handler)
       val formatter = new Formatter()
@@ -157,7 +154,8 @@ class QueueingHandlerTest extends WordSpec
       val formatter = new Formatter() {
         override def format(record: javalog.LogRecord) = {
           val prefix =
-            if (record.getSourceClassName != null) record.getSourceClassName + ": "
+            if (record.getSourceClassName != null)
+              record.getSourceClassName + ": "
             else ""
 
           prefix + formatText(record) + lineTerminator
@@ -166,12 +164,14 @@ class QueueingHandlerTest extends WordSpec
       for (infer <- Seq(true, false)) {
         val logger = freshLogger()
         val stringHandler = new StringHandler(formatter, Some(Logger.INFO))
-        val queueHandler = new QueueingHandler(stringHandler, Int.MaxValue, infer)
+        val queueHandler =
+          new QueueingHandler(stringHandler, Int.MaxValue, infer)
         logger.addHandler(queueHandler)
         val helper = new QueueingHandlerTestHelper()
         helper.logSomething(logger)
 
-        val expectedMessagePrefix = if (infer) helper.getClass.getName + ": " else ""
+        val expectedMessagePrefix =
+          if (infer) helper.getClass.getName + ": " else ""
         val expectedMessage = expectedMessagePrefix + helper.message + "\n"
 
         eventually {

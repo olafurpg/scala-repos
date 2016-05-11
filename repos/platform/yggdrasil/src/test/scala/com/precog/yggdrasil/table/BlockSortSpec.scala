@@ -20,7 +20,6 @@
 package com.precog.yggdrasil
 package table
 
-
 import com.precog.bytecode._
 import com.precog.common._
 import com.precog.util._
@@ -52,20 +51,29 @@ import TableModule._
 
 import PrecogJValueOrder._
 
-trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification with ScalaCheck { self =>
-  def testSortDense(sample: SampleData, sortOrder: DesiredSortOrder, unique: Boolean, sortKeys: JPath*) = {
+trait BlockSortSpec[M[+ _]]
+    extends BlockStoreTestSupport[M] with Specification with ScalaCheck {
+  self =>
+  def testSortDense(sample: SampleData,
+                    sortOrder: DesiredSortOrder,
+                    unique: Boolean,
+                    sortKeys: JPath*) = {
     val module = BlockStoreTestModule.empty[M]
 
     val jvalueOrdering = Order[JValue].toScalaOrdering
-    val desiredJValueOrder = if (sortOrder.isAscending) jvalueOrdering else jvalueOrdering.reverse
+    val desiredJValueOrder =
+      if (sortOrder.isAscending) jvalueOrdering else jvalueOrdering.reverse
 
     val globalIdPath = JPath(".globalId")
 
-    val original = if (unique) {
-      sample.data.map { jv => JArray(sortKeys.map(_.extract(jv \ "value")).toList) -> jv }.toMap.toList.unzip._2.toStream
-    } else {
-      sample.data
-    }
+    val original =
+      if (unique) {
+        sample.data.map { jv =>
+          JArray(sortKeys.map(_.extract(jv \ "value")).toList) -> jv
+        }.toMap.toList.unzip._2.toStream
+      } else {
+        sample.data
+      }
 
     // We have to add in and then later remove the global Id (insert
     // order) to match real sort semantics for disambiguation of equal
@@ -73,7 +81,9 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
     val sorted = original.zipWithIndex.map {
       case (jv, i) => JValue.unsafeInsert(jv, globalIdPath, JNum(i))
     }.sortBy { v =>
-      JArray(sortKeys.map(_.extract(v \ "value")).toList ::: List(v \ "globalId")).asInstanceOf[JValue]
+      JArray(
+          sortKeys.map(_.extract(v \ "value")).toList ::: List(v \ "globalId"))
+        .asInstanceOf[JValue]
     }(desiredJValueOrder).map(_.delete(globalIdPath).get).toList
 
     //def xyz(v: JValue): JValue = {
@@ -83,7 +93,9 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
     val cSortKeys = sortKeys map { CPath(_) }
 
     val resultM = for {
-      sorted <- module.fromSample(sample).sort(module.sortTransspec(cSortKeys: _*), sortOrder)
+      sorted <- module
+        .fromSample(sample)
+        .sort(module.sortTransspec(cSortKeys: _*), sortOrder)
       json <- sorted.toJson
     } yield (json, sorted)
 
@@ -98,17 +110,19 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
     import TableModule.paths.Value
 
     implicit val gen = sample(objectSchema(_, 3))
-    check { (sample: SampleData) => {
-      val Some((_, schema)) = sample.schema
+    check { (sample: SampleData) =>
+      {
+        val Some((_, schema)) = sample.schema
 
-      testSortDense(sample, sortOrder, false, schema.map(_._1).head)
-    }}
+        testSortDense(sample, sortOrder, false, schema.map(_._1).head)
+      }
+    }
   }
 
   // Simple test of sorting on homogeneous data
   def homogeneousSortSample = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":{
             "uid":"joe",
@@ -128,9 +142,13 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[2]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (1 , List(JPath(".uid") -> CString, JPath(".u") -> CBoolean, JPath(".md") -> CString, JPath(".l") -> CEmptyArray))
-      )
+        Some(
+            (1,
+             List(JPath(".uid") -> CString,
+                  JPath(".u") -> CBoolean,
+                  JPath(".md") -> CString,
+                  JPath(".l") -> CEmptyArray))
+        )
     )
 
     testSortDense(sampleData, SortDescending, false, JPath(".uid"))
@@ -139,13 +157,13 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
   // Simple test of sorting on homogeneous data with objects
   def homogeneousSortSampleWithNonexistentSortKey = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {"key":[2],"value":6},
         {"key":[1],"value":5}  
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (1 , List(JPath(".") -> CString))
-      )
+        Some(
+            (1, List(JPath(".") -> CString))
+        )
     )
 
     testSortDense(sampleData, SortDescending, false, JPath(".uid"))
@@ -154,7 +172,7 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
   // Simple test of partially undefined sort key data
   def partiallyUndefinedSortSample = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":{
             "uid":"ted",
@@ -173,17 +191,22 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[1]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (1, List(JPath(".uid") -> CString, JPath(".fa") -> CNull, JPath(".hW") -> CDouble, JPath(".rzp") -> CEmptyObject))
-      )
+        Some(
+            (1,
+             List(JPath(".uid") -> CString,
+                  JPath(".fa") -> CNull,
+                  JPath(".hW") -> CDouble,
+                  JPath(".rzp") -> CEmptyObject))
+        )
     )
 
-    testSortDense(sampleData, SortAscending, false, JPath(".uid"), JPath(".hW"))
+    testSortDense(
+        sampleData, SortAscending, false, JPath(".uid"), JPath(".hW"))
   }
 
   def heterogeneousBaseValueTypeSample = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value": [0, 1],
           "key":[1]
@@ -196,9 +219,13 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[2]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (1, List(JPath("[0]") -> CLong, JPath("[1]") -> CLong, JPath(".uid") -> CString, JPath("abc") -> CLong))
-      )
+        Some(
+            (1,
+             List(JPath("[0]") -> CLong,
+                  JPath("[1]") -> CLong,
+                  JPath(".uid") -> CString,
+                  JPath("abc") -> CLong))
+        )
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".uid"))
@@ -206,7 +233,7 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
 
   def badSchemaSortSample = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":{
             "vxu":[],
@@ -231,24 +258,25 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[2.0,1.0]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some((2,List(
-        JPath(".m") -> CEmptyArray,
-        JPath(".f") -> CBoolean,
-        JPath(".u") -> CDouble,
-        JPath(".q") -> CNum,
-        JPath(".vxu") -> CEmptyArray))))
+        Some(
+            (2,
+             List(JPath(".m") -> CEmptyArray,
+                  JPath(".f") -> CBoolean,
+                  JPath(".u") -> CDouble,
+                  JPath(".q") -> CNum,
+                  JPath(".vxu") -> CEmptyArray))))
     testSortDense(sampleData, SortAscending, false, JPath("q"))
   }
 
   // Simple test of sorting on heterogeneous data
   def heterogeneousSortSample2 = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {"key":[1,4,3],"value":{"b0":["",{"alxk":-1},-5.170005125478374E+307],"y":{"pvbT":[-1458654748381439976,{}]}}},
         {"key":[1,4,4],"value":{"y":false,"qvd":[],"aden":{}}},
         {"key":[3,3,3],"value":{"b0":["gxy",{"alxk":-1},6.614267528783459E+307],"y":{"pvbT":[1,{}]}}}
       ]""") --> classOf[JArray]).elements.toStream,
-      None)
+        None)
 
     testSortDense(sampleData, SortDescending, false, JPath(".y"))
   }
@@ -256,11 +284,11 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
   // Simple test of sorting on heterogeneous data
   def heterogeneousSortSampleDescending = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {"key":[2],"value":{"y":false}},
         {"key":[3],"value":{"y":{"pvbT":1}}}
       ]""") --> classOf[JArray]).elements.toStream,
-      None)
+        None)
 
     testSortDense(sampleData, SortDescending, false, JPath(".y"))
   }
@@ -268,11 +296,11 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
   // Simple test of sorting on heterogeneous data
   def heterogeneousSortSampleAscending = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {"key":[2],"value":{"y":false}},
         {"key":[3],"value":{"y":{"pvbT":1}}}
       ]""") --> classOf[JArray]).elements.toStream,
-      None)
+        None)
 
     testSortDense(sampleData, SortAscending, false, JPath(".y"))
   }
@@ -280,7 +308,7 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
   // Simple test of heterogeneous sort keys
   def heterogeneousSortSample = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":{
            "uid": 12,
@@ -306,16 +334,17 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[2,1,1]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (3, List(JPath(".uid") -> CLong,
-                 JPath(".uid") -> CDouble,
-                 JPath(".f.bn[0]") -> CNull, 
-                 JPath(".f.wei") -> CDouble, 
-                 JPath(".ljz[0]") -> CNull,
-                 JPath(".ljz[1][0]") -> CString,
-                 JPath(".ljz[2]") -> CBoolean,
-                 JPath(".jmy") -> CDouble))
-      )
+        Some(
+            (3,
+             List(JPath(".uid") -> CLong,
+                  JPath(".uid") -> CDouble,
+                  JPath(".f.bn[0]") -> CNull,
+                  JPath(".f.wei") -> CDouble,
+                  JPath(".ljz[0]") -> CNull,
+                  JPath(".ljz[1][0]") -> CString,
+                  JPath(".ljz[2]") -> CBoolean,
+                  JPath(".jmy") -> CDouble))
+        )
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".uid"))
@@ -323,7 +352,7 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
 
   def secondHetSortSample = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":[1.0,0,{
             
@@ -344,14 +373,15 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           },
           "key":[2.0]
         }]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (1, List(JPath(".e") -> CNull,
-                 JPath(".chl") -> CNum,
-                 JPath(".zw1") -> CNum,
-                 JPath("[0]") -> CLong,
-                 JPath("[1]") -> CLong,
-                 JPath("[2]") -> CEmptyObject))
-      )
+        Some(
+            (1,
+             List(JPath(".e") -> CNull,
+                  JPath(".chl") -> CNum,
+                  JPath(".zw1") -> CNum,
+                  JPath("[0]") -> CLong,
+                  JPath("[1]") -> CLong,
+                  JPath("[2]") -> CEmptyObject))
+        )
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".zw1"))
@@ -365,7 +395,7 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
    */
   def threeCellMerge = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":-2355162409801206381,
           "key":[1.0,1.0,11.0]
@@ -499,11 +529,12 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[10.0,1.0,4.0]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (3, List(JPath(".zbtQhnpnun") -> CLong,
-                 JPath(".ohvhwN") -> CNum,
-                 JPath(".viip") -> CNum))
-      )
+        Some(
+            (3,
+             List(JPath(".zbtQhnpnun") -> CLong,
+                  JPath(".ohvhwN") -> CNum,
+                  JPath(".viip") -> CNum))
+        )
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".zbtQhnpnun"))
@@ -511,28 +542,27 @@ trait BlockSortSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
 
   def uniqueSort = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         { "key" : [2], "value" : { "foo" : 10 } },
         { "key" : [1], "value" : { "foo" : 10 } }
        ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (1 , List())
-      )
-    )
-
-    testSortDense(sampleData, SortAscending, false, JPath(".foo"))
-  }  
-
-  def emptySort = {
-    val sampleData = SampleData(
-      (JParser.parseUnsafe("""[]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (1 , List())
-      )
+        Some(
+            (1, List())
+        )
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".foo"))
   }
 
+  def emptySort = {
+    val sampleData = SampleData(
+        (JParser.parseUnsafe("""[]""") --> classOf[JArray]).elements.toStream,
+        Some(
+            (1, List())
+        )
+    )
+
+    testSortDense(sampleData, SortAscending, false, JPath(".foo"))
+  }
 }
 // vim: set ts=4 sw=4 et:

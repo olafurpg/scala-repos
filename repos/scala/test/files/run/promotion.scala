@@ -1,7 +1,6 @@
-
 /** Test that unboxing and promotion (from int to double) work together.
- *  Was bug 819.
- */
+  *  Was bug 819.
+  */
 object Test {
 
   def id[A](x: A): A = x;

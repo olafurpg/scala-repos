@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.core
 
 import io.prediction.annotation.DeveloperApi
@@ -34,7 +33,8 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 abstract class BaseEvaluator[EI, Q, P, A, ER <: BaseEvaluatorResult]
-  extends AbstractDoer {
+    extends AbstractDoer {
+
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. This is called by
     * evaluation workflow to perform evaluation.
@@ -47,20 +47,21 @@ abstract class BaseEvaluator[EI, Q, P, A, ER <: BaseEvaluatorResult]
     */
   @DeveloperApi
   def evaluateBase(
-    sc: SparkContext,
-    evaluation: Evaluation,
-    engineEvalDataSet: Seq[(EngineParams, Seq[(EI, RDD[(Q, P, A)])])],
-    params: WorkflowParams): ER
+      sc: SparkContext,
+      evaluation: Evaluation,
+      engineEvalDataSet: Seq[(EngineParams, Seq[(EI, RDD[(Q, P, A)])])],
+      params: WorkflowParams): ER
 }
 
 /** Base trait of evaluator result */
 trait BaseEvaluatorResult extends Serializable {
+
   /** A short description of the result */
   def toOneLiner(): String = ""
-  
+
   /** HTML portion of the rendered evaluator results */
   def toHTML(): String = ""
-  
+
   /** JSON portion of the rendered evaluator results */
   def toJSON(): String = ""
 
@@ -68,5 +69,5 @@ trait BaseEvaluatorResult extends Serializable {
     * Indicate if this result is inserted into database
     */
   @Experimental
-  val noSave: Boolean = false 
+  val noSave: Boolean = false
 }

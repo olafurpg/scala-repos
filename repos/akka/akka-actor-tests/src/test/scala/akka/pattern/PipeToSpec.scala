@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.pattern
 
 import akka.testkit.AkkaSpec
@@ -47,7 +46,6 @@ class PipeToSpec extends AkkaSpec {
       p.expectMsg(42)
       p.lastSender should ===(testActor)
     }
-
   }
 
   "PipeToSelection" must {
@@ -89,7 +87,5 @@ class PipeToSpec extends AkkaSpec {
       p.expectMsg(42)
       p.lastSender should ===(testActor)
     }
-
   }
-
 }

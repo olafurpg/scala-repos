@@ -18,9 +18,10 @@
 package org.apache.spark.mllib.evaluation.binary
 
 /**
- * Trait for a binary confusion matrix.
- */
+  * Trait for a binary confusion matrix.
+  */
 private[evaluation] trait BinaryConfusionMatrix {
+
   /** number of true positives */
   def numTruePositives: Long
 
@@ -41,14 +42,14 @@ private[evaluation] trait BinaryConfusionMatrix {
 }
 
 /**
- * Implementation of [[org.apache.spark.mllib.evaluation.binary.BinaryConfusionMatrix]].
- *
- * @param count label counter for labels with scores greater than or equal to the current score
- * @param totalCount label counter for all labels
- */
+  * Implementation of [[org.apache.spark.mllib.evaluation.binary.BinaryConfusionMatrix]].
+  *
+  * @param count label counter for labels with scores greater than or equal to the current score
+  * @param totalCount label counter for all labels
+  */
 private[evaluation] case class BinaryConfusionMatrixImpl(
-    count: BinaryLabelCounter,
-    totalCount: BinaryLabelCounter) extends BinaryConfusionMatrix {
+    count: BinaryLabelCounter, totalCount: BinaryLabelCounter)
+    extends BinaryConfusionMatrix {
 
   /** number of true positives */
   override def numTruePositives: Long = count.numPositives
@@ -57,10 +58,12 @@ private[evaluation] case class BinaryConfusionMatrixImpl(
   override def numFalsePositives: Long = count.numNegatives
 
   /** number of false negatives */
-  override def numFalseNegatives: Long = totalCount.numPositives - count.numPositives
+  override def numFalseNegatives: Long =
+    totalCount.numPositives - count.numPositives
 
   /** number of true negatives */
-  override def numTrueNegatives: Long = totalCount.numNegatives - count.numNegatives
+  override def numTrueNegatives: Long =
+    totalCount.numNegatives - count.numNegatives
 
   /** number of positives */
   override def numPositives: Long = totalCount.numPositives

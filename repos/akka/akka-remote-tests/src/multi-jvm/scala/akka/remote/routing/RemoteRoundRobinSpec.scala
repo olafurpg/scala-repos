@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote.routing
 
 import language.postfixOps
@@ -12,7 +12,7 @@ import akka.actor.PoisonPill
 import akka.actor.Address
 import scala.concurrent.Await
 import akka.pattern.ask
-import akka.remote.testkit.{ STMultiNodeSpec, MultiNodeConfig, MultiNodeSpec }
+import akka.remote.testkit.{STMultiNodeSpec, MultiNodeConfig, MultiNodeSpec}
 import akka.routing.Broadcast
 import akka.routing.GetRoutees
 import akka.routing.Routees
@@ -34,7 +34,8 @@ object RemoteRoundRobinMultiJvmSpec extends MultiNodeConfig {
   }
 
   class TestResizer extends Resizer {
-    override def isTimeForResize(messageCounter: Long): Boolean = messageCounter <= 10
+    override def isTimeForResize(messageCounter: Long): Boolean =
+      messageCounter <= 10
     override def resize(currentRoutees: immutable.IndexedSeq[Routee]): Int = 1
   }
 
@@ -72,8 +73,9 @@ class RemoteRoundRobinMultiJvmNode2 extends RemoteRoundRobinSpec
 class RemoteRoundRobinMultiJvmNode3 extends RemoteRoundRobinSpec
 class RemoteRoundRobinMultiJvmNode4 extends RemoteRoundRobinSpec
 
-class RemoteRoundRobinSpec extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec)
-  with STMultiNodeSpec with ImplicitSender with DefaultTimeout {
+class RemoteRoundRobinSpec
+    extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec) with STMultiNodeSpec
+    with ImplicitSender with DefaultTimeout {
   import RemoteRoundRobinMultiJvmSpec._
 
   def initialParticipants = roles.size
@@ -87,7 +89,9 @@ class RemoteRoundRobinSpec extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec)
 
       runOn(fourth) {
         enterBarrier("start")
-        val actor = system.actorOf(RoundRobinPool(nrOfInstances = 0).props(Props[SomeActor]), "service-hello")
+        val actor = system.actorOf(
+            RoundRobinPool(nrOfInstances = 0).props(Props[SomeActor]),
+            "service-hello")
         actor.isInstanceOf[RoutedActorRef] should ===(true)
 
         val connectionCount = 3
@@ -97,10 +101,14 @@ class RemoteRoundRobinSpec extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec)
           actor ! "hit"
         }
 
-        val replies: Map[Address, Int] = (receiveWhile(5 seconds, messages = connectionCount * iterationCount) {
+        val replies: Map[Address, Int] = (receiveWhile(
+            5 seconds, messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
-        }).foldLeft(Map(node(first).address -> 0, node(second).address -> 0, node(third).address -> 0)) {
-          case (replyMap, address) ⇒ replyMap + (address -> (replyMap(address) + 1))
+        }).foldLeft(Map(node(first).address -> 0,
+                        node(second).address -> 0,
+                        node(third).address -> 0)) {
+          case (replyMap, address) ⇒
+            replyMap + (address -> (replyMap(address) + 1))
         }
 
         enterBarrier("broadcast-end")
@@ -120,7 +128,8 @@ class RemoteRoundRobinSpec extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec)
   }
 
   "A remote round robin pool with resizer" must {
-    "be locally instantiated on a remote node after several resize rounds" in within(5 seconds) {
+    "be locally instantiated on a remote node after several resize rounds" in within(
+        5 seconds) {
 
       runOn(first, second, third) {
         enterBarrier("start", "broadcast-end", "end")
@@ -128,22 +137,27 @@ class RemoteRoundRobinSpec extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec)
 
       runOn(fourth) {
         enterBarrier("start")
-        val actor = system.actorOf(RoundRobinPool(
-          nrOfInstances = 1,
-          resizer = Some(new TestResizer)).props(Props[SomeActor]), "service-hello2")
+        val actor =
+          system.actorOf(RoundRobinPool(nrOfInstances = 1,
+                                        resizer = Some(new TestResizer))
+                           .props(Props[SomeActor]),
+                         "service-hello2")
         actor.isInstanceOf[RoutedActorRef] should ===(true)
 
         actor ! GetRoutees
         // initial nrOfInstances 1 + initial resize => 2
         expectMsgType[Routees].routees.size should ===(2)
 
-        val repliesFrom: Set[ActorRef] =
-          (for (n ← 3 to 9) yield {
-            // each message trigger a resize, incrementing number of routees with 1
-            actor ! "hit"
-            Await.result(actor ? GetRoutees, timeout.duration).asInstanceOf[Routees].routees.size should ===(n)
-            expectMsgType[ActorRef]
-          }).toSet
+        val repliesFrom: Set[ActorRef] = (for (n ← 3 to 9) yield {
+          // each message trigger a resize, incrementing number of routees with 1
+          actor ! "hit"
+          Await
+            .result(actor ? GetRoutees, timeout.duration)
+            .asInstanceOf[Routees]
+            .routees
+            .size should ===(n)
+          expectMsgType[ActorRef]
+        }).toSet
 
         enterBarrier("broadcast-end")
         actor ! Broadcast(PoisonPill)
@@ -151,7 +165,8 @@ class RemoteRoundRobinSpec extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec)
         enterBarrier("end")
         repliesFrom.size should ===(7)
         val repliesFromAddresses = repliesFrom.map(_.path.address)
-        repliesFromAddresses should ===(Set(node(first), node(second), node(third)).map(_.address))
+        repliesFromAddresses should ===(
+            Set(node(first), node(second), node(third)).map(_.address))
 
         // shut down the actor before we let the other node(s) shut down so we don't try to send
         // "Terminate" to a shut down node
@@ -182,10 +197,14 @@ class RemoteRoundRobinSpec extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec)
           actor ! "hit"
         }
 
-        val replies: Map[Address, Int] = (receiveWhile(5 seconds, messages = connectionCount * iterationCount) {
+        val replies: Map[Address, Int] = (receiveWhile(
+            5 seconds, messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
-        }).foldLeft(Map(node(first).address -> 0, node(second).address -> 0, node(third).address -> 0)) {
-          case (replyMap, address) ⇒ replyMap + (address -> (replyMap(address) + 1))
+        }).foldLeft(Map(node(first).address -> 0,
+                        node(second).address -> 0,
+                        node(third).address -> 0)) {
+          case (replyMap, address) ⇒
+            replyMap + (address -> (replyMap(address) + 1))
         }
 
         enterBarrier("end")

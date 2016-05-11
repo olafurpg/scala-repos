@@ -30,55 +30,21 @@ import org.xml.sax.InputSource
 object Html5 extends Html5Parser with Html5Writer
 
 trait Html5Writer {
+
   /**
-   * Write the attributes in HTML5 valid format
-   * @param m the attributes
-   * @param writer the place to write the attribute
-   */
+    * Write the attributes in HTML5 valid format
+    * @param m the attributes
+    * @param writer the place to write the attribute
+    */
   protected def writeAttributes(m: MetaData, writer: Writer) {
     m match {
       case null =>
       case Null =>
       case md if (null eq md.value) => writeAttributes(md.next, writer)
       case up: UnprefixedAttribute => {
-        writer.append(' ')
-        writer.append(up.key)
-        val v = up.value
-        writer.append("=\"")
-        val str = v.text
-        var pos = 0
-        val len = str.length
-        while (pos < len) {
-          str.charAt(pos) match {
-            case '"' => writer.append("&quot;")
-            case '<' => writer.append("&lt;")
-            case '&' if str.indexOf(';', pos) >= 0 => writer.append("&amp;")
-            case c if c >= ' ' && c.toInt <= 127 => writer.append(c)
-            case c if c == '\u0085' =>
-            case c => {
-              val str = Integer.toHexString(c)
-              writer.append("&#x")
-              writer.append("0000".substring(str.length))
-              writer.append(str)
-              writer.append(';')
-            }
-          }
-
-          pos += 1
-        }
-
-        writer.append('"')
-
-        writeAttributes(up.next, writer)
-      }
-
-      case pa: PrefixedAttribute => {
-        writer.append(' ')
-        writer.append(pa.pre)
-        writer.append(':')
-        writer.append(pa.key)
-        val v = pa.value
-        if ((v ne null) && !v.isEmpty) {
+          writer.append(' ')
+          writer.append(up.key)
+          val v = up.value
           writer.append("=\"")
           val str = v.text
           var pos = 0
@@ -91,32 +57,68 @@ trait Html5Writer {
               case c if c >= ' ' && c.toInt <= 127 => writer.append(c)
               case c if c == '\u0085' =>
               case c => {
-                val str = Integer.toHexString(c)
-                writer.append("&#x")
-                writer.append("0000".substring(str.length))
-                writer.append(str)
-                writer.append(';')
-              }
+                  val str = Integer.toHexString(c)
+                  writer.append("&#x")
+                  writer.append("0000".substring(str.length))
+                  writer.append(str)
+                  writer.append(';')
+                }
             }
 
             pos += 1
           }
 
           writer.append('"')
+
+          writeAttributes(up.next, writer)
         }
 
-        writeAttributes(pa.next, writer)
-      }
+      case pa: PrefixedAttribute => {
+          writer.append(' ')
+          writer.append(pa.pre)
+          writer.append(':')
+          writer.append(pa.key)
+          val v = pa.value
+          if ((v ne null) && !v.isEmpty) {
+            writer.append("=\"")
+            val str = v.text
+            var pos = 0
+            val len = str.length
+            while (pos < len) {
+              str.charAt(pos) match {
+                case '"' => writer.append("&quot;")
+                case '<' => writer.append("&lt;")
+                case '&' if str.indexOf(';', pos) >= 0 =>
+                  writer.append("&amp;")
+                case c if c >= ' ' && c.toInt <= 127 => writer.append(c)
+                case c if c == '\u0085' =>
+                case c => {
+                    val str = Integer.toHexString(c)
+                    writer.append("&#x")
+                    writer.append("0000".substring(str.length))
+                    writer.append(str)
+                    writer.append(';')
+                  }
+              }
+
+              pos += 1
+            }
+
+            writer.append('"')
+          }
+
+          writeAttributes(pa.next, writer)
+        }
 
       case x => writeAttributes(x.next, writer)
     }
   }
 
   /**
-   * Escape text data
-   * @param str the String to escape
-   * @param the place to send the escaped characters
-   */
+    * Escape text data
+    * @param str the String to escape
+    * @param the place to send the escaped characters
+    */
   protected def escape(str: String, sb: Writer, reverse: Boolean) {
     val len = str.length
     var pos = 0
@@ -129,23 +131,21 @@ trait Html5Writer {
         case '\n' => sb.append('\n')
         case '\r' => sb.append('\r')
         case '\t' => sb.append('\t')
-        case c   =>
+        case c =>
           if (reverse) {
             HtmlEntities.revMap.get(c) match {
               case Some(str) => {
-                sb.append('&')
-                sb.append(str)
-                sb.append(';')
-              }
+                  sb.append('&')
+                  sb.append(str)
+                  sb.append(';')
+                }
               case _ =>
-                if (c >= ' ' &&
-                  c != '\u0085' &&
-                  !(c >= '\u007f' && c <= '\u0095')) sb.append(c)
+                if (c >= ' ' && c != '\u0085' &&
+                    !(c >= '\u007f' && c <= '\u0095')) sb.append(c)
             }
           } else {
-            if (c >= ' ' &&
-              c != '\u0085' &&
-              !(c >= '\u007f' && c <= '\u0095')) sb.append(c)
+            if (c >= ' ' && c != '\u0085' && !(c >= '\u007f' && c <= '\u0095'))
+              sb.append(c)
           }
       }
 
@@ -154,8 +154,8 @@ trait Html5Writer {
   }
 
   /**
-   * Convert a Node to a properly encoded Html5 String
-   */
+    * Convert a Node to a properly encoded Html5 String
+    */
   def toString(x: Node): String = {
     val sr = new StringWriter()
     write(x, sr, false, true)
@@ -163,27 +163,30 @@ trait Html5Writer {
   }
 
   /**
-   * Write the Node out as valid HTML5
-   *
-   * @param x the node to write out
-   * @param writer the place to send the node
-   * @param stripComment should comments be stripped from output?
-   */
-  def write(x: Node, writer: Writer, stripComment: Boolean, convertAmp: Boolean): Unit = {
+    * Write the Node out as valid HTML5
+    *
+    * @param x the node to write out
+    * @param writer the place to send the node
+    * @param stripComment should comments be stripped from output?
+    */
+  def write(x: Node,
+            writer: Writer,
+            stripComment: Boolean,
+            convertAmp: Boolean): Unit = {
     x match {
       case Text(str) => escape(str, writer, !convertAmp)
 
       case PCData(data) => {
-        writer.append("<![CDATA[")
-        writer.append(data)
-        writer.append("]]>")
-      }
+          writer.append("<![CDATA[")
+          writer.append(data)
+          writer.append("]]>")
+        }
 
       case scala.xml.PCData(data) => {
-        writer.append("<![CDATA[")
-        writer.append(data)
-        writer.append("]]>")
-      }
+          writer.append("<![CDATA[")
+          writer.append(data)
+          writer.append("]]>")
+        }
 
       case Unparsed(data) => writer.append(data)
 
@@ -191,78 +194,76 @@ trait Html5Writer {
         escape(a.data.toString, writer, !convertAmp)
 
       case Comment(comment) if !stripComment => {
-        writer.append("<!--")
-        writer.append(comment)
-        writer.append("-->")
-      }
+          writer.append("<!--")
+          writer.append(comment)
+          writer.append("-->")
+        }
 
       case er: EntityRef if convertAmp =>
         HtmlEntities.entMap.get(er.entityName) match {
           case Some(chr) if chr.toInt >= 128 => writer.append(chr)
           case _ => {
-            val sb = new StringBuilder()
-            er.buildString(sb)
-            writer.append(sb)
-          }
+              val sb = new StringBuilder()
+              er.buildString(sb)
+              writer.append(sb)
+            }
         }
-
 
       case er: EntityRef =>
         val sb = new StringBuilder()
         er.buildString(sb)
         writer.append(sb)
 
-
       case x: SpecialNode => {
-        val sb = new StringBuilder()
-        x.buildString(sb)
-        writer.append(sb)
-      }
+          val sb = new StringBuilder()
+          x.buildString(sb)
+          writer.append(sb)
+        }
 
       case g: Group =>
-        for (c <- g.nodes)
-          write(c, writer, stripComment, convertAmp)
+        for (c <- g.nodes) write(c, writer, stripComment, convertAmp)
 
-      case e: Elem if (null eq e.prefix) &&
-        Html5Constants.nonReplaceable_?(e.label) => {
-        writer.append('<')
-        writer.append(e.label)
-        writeAttributes(e.attributes, writer)
-        writer.append(">")
-        e.child match {
-          case null =>
-          case seq => seq.foreach {
-            case Text(str) => writer.append(str)
-            case pc: PCData => {
-              val sb = new StringBuilder()
-              pc.buildString(sb)
-              writer.append(sb)
-            }
-            case pc: scala.xml.PCData => {
-              val sb = new StringBuilder()
-              pc.buildString(sb)
-              writer.append(sb)
-            }
-            case Unparsed(text) => writer.append(text)
-            case a: Atom[_] if a.getClass eq classOf[Atom[_]] =>
-              writer.append(a.data.toString)
+      case e: Elem
+          if (null eq e.prefix) && Html5Constants.nonReplaceable_?(e.label) =>
+        {
+          writer.append('<')
+          writer.append(e.label)
+          writeAttributes(e.attributes, writer)
+          writer.append(">")
+          e.child match {
+            case null =>
+            case seq =>
+              seq.foreach {
+                case Text(str) => writer.append(str)
+                case pc: PCData => {
+                    val sb = new StringBuilder()
+                    pc.buildString(sb)
+                    writer.append(sb)
+                  }
+                case pc: scala.xml.PCData => {
+                    val sb = new StringBuilder()
+                    pc.buildString(sb)
+                    writer.append(sb)
+                  }
+                case Unparsed(text) => writer.append(text)
+                case a: Atom[_] if a.getClass eq classOf[Atom[_]] =>
+                  writer.append(a.data.toString)
 
-            case _ =>
+                case _ =>
+              }
           }
+          writer.append("</")
+          writer.append(e.label)
+          writer.append('>')
         }
-        writer.append("</")
-        writer.append(e.label)
-        writer.append('>')
-      }
 
-      case e: Elem if (null eq e.prefix) &&
-        Html5Constants.voidTag_?(e.label) => {
-        writer.append('<')
-        writer.append(e.label)
-        writeAttributes(e.attributes, writer)
-        writer.append(">")
-      }
-
+      case e: Elem
+          if (null eq e.prefix) && Html5Constants.voidTag_?(e.label) => {
+          writer.append('<')
+          writer.append(e.label)
+          writeAttributes(e.attributes, writer)
+          writer.append(">")
+        }
 
       /*
       case e: Elem if ((e.child eq null) || e.child.isEmpty) => {
@@ -277,23 +278,23 @@ trait Html5Writer {
       }*/
 
       case e: Elem => {
-        writer.append('<')
-        if (null ne e.prefix) {
-          writer.append(e.prefix)
-          writer.append(':')
+          writer.append('<')
+          if (null ne e.prefix) {
+            writer.append(e.prefix)
+            writer.append(':')
+          }
+          writer.append(e.label)
+          writeAttributes(e.attributes, writer)
+          writer.append(">")
+          e.child.foreach(write(_, writer, stripComment, convertAmp))
+          writer.append("</")
+          if (null ne e.prefix) {
+            writer.append(e.prefix)
+            writer.append(':')
+          }
+          writer.append(e.label)
+          writer.append('>')
         }
-        writer.append(e.label)
-        writeAttributes(e.attributes, writer)
-        writer.append(">")
-        e.child.foreach(write(_, writer, stripComment, convertAmp))
-        writer.append("</")
-        if (null ne e.prefix) {
-          writer.append(e.prefix)
-          writer.append(':')
-        }
-        writer.append(e.label)
-        writer.append('>')
-      }
 
       case _ => // dunno what it is, but ignore it
     }
@@ -302,46 +303,45 @@ trait Html5Writer {
 
 object Html5Constants {
   val voidTags: Set[String] = Set("area",
-    "base",
-    "br",
-    "col",
-    "command",
-    "embed",
-    "hr",
-    "img",
-    "input",
-    "keygen",
-    "link",
-    "meta",
-    "param",
-    "source",
-    "wbr")
+                                  "base",
+                                  "br",
+                                  "col",
+                                  "command",
+                                  "embed",
+                                  "hr",
+                                  "img",
+                                  "input",
+                                  "keygen",
+                                  "link",
+                                  "meta",
+                                  "param",
+                                  "source",
+                                  "wbr")
 
   /**
-   * Is the tag a void tag?
-   */
+    * Is the tag a void tag?
+    */
   def voidTag_?(t: String): Boolean = voidTags.contains(t.toLowerCase)
 
   /**
-   * Is the tag a non-replaceable tag?
-   */
+    * Is the tag a non-replaceable tag?
+    */
   def nonReplaceable_?(t: String): Boolean =
-    (t equalsIgnoreCase "script") ||
-      (t equalsIgnoreCase "style")
+    (t equalsIgnoreCase "script") || (t equalsIgnoreCase "style")
 }
 
-
 /**
- * A utility that supports parsing of HTML5 file.
- * The Parser hooks up nu.validator.htmlparser
- * to
- */
+  * A utility that supports parsing of HTML5 file.
+  * The Parser hooks up nu.validator.htmlparser
+  * to
+  */
 trait Html5Parser {
+
   /**
-   * Parse an InputStream as HTML5.  A Full(Elem)
-   * will be returned on successful parsing, otherwise
-   * a Failure.
-   */
+    * Parse an InputStream as HTML5.  A Full(Elem)
+    * will be returned on successful parsing, otherwise
+    * a Failure.
+    */
   def parse(in: InputStream): Box[Elem] = {
     Helpers.tryo {
       val hp = new HtmlParser(common.XmlViolationPolicy.ALLOW)
@@ -395,46 +395,41 @@ trait Html5Parser {
     def checkHead(n: Node): Boolean =
       n match {
         case e: Elem => {
-          e.label == "head" && e.prefix == null &&
-            e.attributes == Null &&
+            e.label == "head" && e.prefix == null && e.attributes == Null &&
             e.child.length == 0
-        }
+          }
         case _ => false
       }
 
     def checkBody(n: Node): Boolean =
       n match {
         case e: Elem => {
-          e.label == "body" && e.prefix == null &&
-            e.attributes == Null &&
-            e.child.length >= 1 &&
-            e.child(0).isInstanceOf[Elem]
-        }
+            e.label == "body" && e.prefix == null && e.attributes == Null &&
+            e.child.length >= 1 && e.child(0).isInstanceOf[Elem]
+          }
         case _ => false
       }
 
     def unapply(n: Node): Option[Elem] = n match {
       case e: Elem => {
-        if (e.label == "html" && e.prefix == null &&
-          e.attributes == Null &&
-          e.child.length == 2 &&
-          checkHead(e.child(0)) &&
-          checkBody(e.child(1))) {
-          Some(e.child(1).asInstanceOf[Elem].child(0).asInstanceOf[Elem])
-        } else {
-          None
+          if (e.label == "html" && e.prefix == null && e.attributes == Null &&
+              e.child.length == 2 && checkHead(e.child(0)) &&
+              checkBody(e.child(1))) {
+            Some(e.child(1).asInstanceOf[Elem].child(0).asInstanceOf[Elem])
+          } else {
+            None
+          }
         }
-      }
 
       case _ => None
     }
   }
 
   /**
-   * Parse an InputStream as HTML5.  A Full(Elem)
-   * will be returned on successful parsing, otherwise
-   * a Failure.
-   */
+    * Parse an InputStream as HTML5.  A Full(Elem)
+    * will be returned on successful parsing, otherwise
+    * a Failure.
+    */
   def parse(str: String): Box[Elem] =
     parse(new ByteArrayInputStream(str.getBytes("UTF-8")))
 }

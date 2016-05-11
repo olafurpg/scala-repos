@@ -24,11 +24,13 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
     withRedisClient { client =>
       val k = StringToChannelBuffer("mykey")
       val v = StringToChannelBuffer("10")
-      val expectedBytes: Array[Byte] = Array(0, -64, 10, 6, 0, -8, 114, 63, -59, -5, -5, 95, 40)
+      val expectedBytes: Array[Byte] =
+        Array(0, -64, 10, 6, 0, -8, 114, 63, -59, -5, -5, 95, 40)
 
       Await.result(client.set(k, v))
-      assert(Await.result(client.dump(k)).fold(fail("Expected result for DUMP"))(_.array) ==
-        expectedBytes)
+      assert(Await
+            .result(client.dump(k))
+            .fold(fail("Expected result for DUMP"))(_.array) == expectedBytes)
       Await.result(client.del(Seq(foo)))
       assert(Await.result(client.dump(foo)) == None)
     }
@@ -40,7 +42,8 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
     withRedisClient { client =>
       Await.result(client.set(foo, bar))
       Await.result(client.set(baz, boo))
-      assert(CBToString(Await.result(client.scan(0, None, None)).apply(1)) == "baz")
+      assert(
+          CBToString(Await.result(client.scan(0, None, None)).apply(1)) == "baz")
 
       val withCount = Await.result(client.scan(0, Some(10), None))
       assert(CBToString(withCount(0)) == "0")
@@ -70,7 +73,7 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
 
       val result = Await.result(client.ttl(foo)) match {
         case Some(num) => num
-        case None      => fail("Could not retrieve key for TTL test")
+        case None => fail("Could not retrieve key for TTL test")
       }
       assert(result <= time)
     }
@@ -88,7 +91,7 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
 
       val result = Await.result(client.ttl(foo)) match {
         case Some(num) => num
-        case None      => fail("Could not retrieve key for TTL")
+        case None => fail("Could not retrieve key for TTL")
       }
       assert(result <= ttl)
     }
@@ -97,7 +100,7 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
   test("Correctly perform the MOVE command", RedisTest, ClientTest) {
     withRedisClient { client =>
       val fromDb = 14
-      val toDb   = 15
+      val toDb = 15
       Await.result(client.select(toDb))
       Await.result(client.del(Seq(foo)))
       Await.result(client.select(fromDb))
@@ -106,7 +109,8 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
       // assert(Await.result(client.move(foo, bar)) == false)
 
       Await.result(client.set(foo, bar))
-      assert(Await.result(client.move(foo, StringToChannelBuffer(toDb.toString))) == true)
+      assert(Await.result(
+              client.move(foo, StringToChannelBuffer(toDb.toString))) == true)
 
       Await.result(client.del(Seq(foo))) // clean up
     }
@@ -120,7 +124,7 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
 
       val result = Await.result(client.pTtl(foo)) match {
         case Some(num) => num
-        case None      => fail("Could not retrieve pTtl for key")
+        case None => fail("Could not retrieve pTtl for key")
       }
       assert(result <= ttl)
     }
@@ -135,7 +139,7 @@ final class KeyClientIntegrationSuite extends RedisClientTest {
 
       val result = Await.result(client.pTtl(foo)) match {
         case Some(num) => num
-        case None      => fail("Could not retrieve pTtl for key")
+        case None => fail("Could not retrieve pTtl for key")
       }
       assert(result <= horizon)
     }

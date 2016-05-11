@@ -1,4 +1,3 @@
-
 trait X {
   val s = "hello"
   val t = "$s"

@@ -1,7 +1,8 @@
 object StringPlusMethod {
   def error(message: String) = {
     val kind = "error: "
-    /*start*/println(kind + message)/*end*/
+    /*start*/
+    println(kind + message) /*end*/
   }
 
   def warning(message: String) = println("warning: " + message)
@@ -23,4 +24,4 @@ object StringPlusMethod {
 
   def info(message: String) = testMethodName("info: ", message)
 }
-*/
+ */

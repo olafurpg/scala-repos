@@ -1,2 +1,4 @@
 trait Y
-abstract class X(x: Int) { self: Y => x }
+abstract class X(x: Int) { self: Y =>
+  x
+}

@@ -1,9 +1,9 @@
 trait U {
-	trait U1 {
-		class X
-	}
-	type U11 <: U1
-  val u : U11 = null.asInstanceOf[U11]
+  trait U1 {
+    class X
+  }
+  type U11 <: U1
+  val u: U11 = null.asInstanceOf[U11]
 }
 trait A extends U
 
@@ -25,9 +25,9 @@ class C {
   }
 }
 object Test {
-	def main(args: Array[String]) {
+  def main(args: Array[String]) {
     // java.lang.NoSuchMethodError: A.u()LB$U11;
     // at C.foo(t6677b.scala:23)
-		new C().foo
-	}
+    new C().foo
+  }
 }

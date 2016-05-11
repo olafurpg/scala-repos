@@ -6,13 +6,15 @@ object NeedTestJVM extends SpecLite {
     "clear the Function0 reference" in {
       @volatile var flag = false
       val method = Need.getClass.getMethod("apply", classOf[Function0[_]])
-      val need = method.invoke(
-        Need,
-        new runtime.AbstractFunction0[String]{
-          override def finalize = {flag = true}
-          override def apply = ""
-        }
-      ).asInstanceOf[Need[String]]
+      val need = method
+        .invoke(
+            Need,
+            new runtime.AbstractFunction0[String] {
+              override def finalize = { flag = true }
+              override def apply = ""
+            }
+        )
+        .asInstanceOf[Need[String]]
 
       flag must_== false
       print(need.value)
@@ -21,5 +23,4 @@ object NeedTestJVM extends SpecLite {
       flag must_== true
     }
   }
-
 }

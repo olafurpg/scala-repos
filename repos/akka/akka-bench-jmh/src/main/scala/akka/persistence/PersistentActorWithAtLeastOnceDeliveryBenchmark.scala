@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.persistence
 
 import scala.concurrent.duration._
@@ -19,10 +19,11 @@ class PersistentActorWithAtLeastOnceDeliveryBenchmark {
 
   val config = PersistenceSpec.config("leveldb", "benchmark")
 
-  lazy val storageLocations = List(
-    "akka.persistence.journal.leveldb.dir",
-    "akka.persistence.journal.leveldb-shared.store.dir",
-    "akka.persistence.snapshot-store.local.dir").map(s ⇒ new File(system.settings.config.getString(s)))
+  lazy val storageLocations =
+    List("akka.persistence.journal.leveldb.dir",
+         "akka.persistence.journal.leveldb-shared.store.dir",
+         "akka.persistence.snapshot-store.local.dir").map(
+        s ⇒ new File(system.settings.config.getString(s)))
 
   var system: ActorSystem = _
 
@@ -36,8 +37,9 @@ class PersistentActorWithAtLeastOnceDeliveryBenchmark {
   val dataCount = 10000
 
   @Setup
-  def setup():Unit = {
-    system = ActorSystem("PersistentActorWithAtLeastOnceDeliveryBenchmark", config)
+  def setup(): Unit = {
+    system = ActorSystem(
+        "PersistentActorWithAtLeastOnceDeliveryBenchmark", config)
 
     probe = TestProbe()(system)
 
@@ -45,13 +47,28 @@ class PersistentActorWithAtLeastOnceDeliveryBenchmark {
 
     destinationActor = system.actorOf(Props[DestinationActor], "destination")
 
-    noPersistPersistentActorWithAtLeastOnceDelivery = system.actorOf(Props(classOf[NoPersistPersistentActorWithAtLeastOnceDelivery], dataCount, probe.ref, destinationActor.path), "nop-1")
-    persistPersistentActorWithAtLeastOnceDelivery = system.actorOf(Props(classOf[PersistPersistentActorWithAtLeastOnceDelivery], dataCount, probe.ref, destinationActor.path), "ep-1")
-    persistAsyncPersistentActorWithAtLeastOnceDelivery = system.actorOf(Props(classOf[PersistAsyncPersistentActorWithAtLeastOnceDelivery], dataCount, probe.ref, destinationActor.path), "epa-1")
+    noPersistPersistentActorWithAtLeastOnceDelivery = system.actorOf(
+        Props(classOf[NoPersistPersistentActorWithAtLeastOnceDelivery],
+              dataCount,
+              probe.ref,
+              destinationActor.path),
+        "nop-1")
+    persistPersistentActorWithAtLeastOnceDelivery = system.actorOf(
+        Props(classOf[PersistPersistentActorWithAtLeastOnceDelivery],
+              dataCount,
+              probe.ref,
+              destinationActor.path),
+        "ep-1")
+    persistAsyncPersistentActorWithAtLeastOnceDelivery = system.actorOf(
+        Props(classOf[PersistAsyncPersistentActorWithAtLeastOnceDelivery],
+              dataCount,
+              probe.ref,
+              destinationActor.path),
+        "epa-1")
   }
 
   @TearDown
-  def shutdown():Unit = {
+  def shutdown(): Unit = {
     system.terminate()
     Await.ready(system.whenTerminated, 15.seconds)
 
@@ -60,30 +77,32 @@ class PersistentActorWithAtLeastOnceDeliveryBenchmark {
 
   @Benchmark
   @OperationsPerInvocation(10000)
-  def persistentActor_persistAsync_with_AtLeastOnceDelivery():Unit = {
-    for (i <- 1 to dataCount)
-      persistAsyncPersistentActorWithAtLeastOnceDelivery.tell(i, probe.ref)
+  def persistentActor_persistAsync_with_AtLeastOnceDelivery(): Unit = {
+    for (i <- 1 to dataCount) persistAsyncPersistentActorWithAtLeastOnceDelivery
+      .tell(i, probe.ref)
     probe.expectMsg(20.seconds, Evt(dataCount))
   }
 
   @Benchmark
   @OperationsPerInvocation(10000)
-  def persistentActor_persist_with_AtLeastOnceDelivery():Unit = {
-    for (i <- 1 to dataCount)
-      persistPersistentActorWithAtLeastOnceDelivery.tell(i, probe.ref)
+  def persistentActor_persist_with_AtLeastOnceDelivery(): Unit = {
+    for (i <- 1 to dataCount) persistPersistentActorWithAtLeastOnceDelivery
+      .tell(i, probe.ref)
     probe.expectMsg(2.minutes, Evt(dataCount))
   }
 
   @Benchmark
   @OperationsPerInvocation(10000)
-  def persistentActor_noPersist_with_AtLeastOnceDelivery():Unit = {
-    for (i <- 1 to dataCount)
-      noPersistPersistentActorWithAtLeastOnceDelivery.tell(i, probe.ref)
+  def persistentActor_noPersist_with_AtLeastOnceDelivery(): Unit = {
+    for (i <- 1 to dataCount) noPersistPersistentActorWithAtLeastOnceDelivery
+      .tell(i, probe.ref)
     probe.expectMsg(20.seconds, Evt(dataCount))
   }
 }
 
-class NoPersistPersistentActorWithAtLeastOnceDelivery(respondAfter: Int, val upStream: ActorRef, val downStream: ActorPath) extends PersistentActor with AtLeastOnceDelivery {
+class NoPersistPersistentActorWithAtLeastOnceDelivery(
+    respondAfter: Int, val upStream: ActorRef, val downStream: ActorPath)
+    extends PersistentActor with AtLeastOnceDelivery {
 
   override def redeliverInterval = 100.milliseconds
 
@@ -115,7 +134,9 @@ class NoPersistPersistentActorWithAtLeastOnceDelivery(respondAfter: Int, val upS
   }
 }
 
-class PersistPersistentActorWithAtLeastOnceDelivery(respondAfter: Int, val upStream: ActorRef, val downStream: ActorPath) extends PersistentActor with AtLeastOnceDelivery {
+class PersistPersistentActorWithAtLeastOnceDelivery(
+    respondAfter: Int, val upStream: ActorRef, val downStream: ActorPath)
+    extends PersistentActor with AtLeastOnceDelivery {
 
   override def redeliverInterval = 100.milliseconds
 
@@ -149,7 +170,9 @@ class PersistPersistentActorWithAtLeastOnceDelivery(respondAfter: Int, val upStr
   }
 }
 
-class PersistAsyncPersistentActorWithAtLeastOnceDelivery(respondAfter: Int, val upStream: ActorRef, val downStream: ActorPath) extends PersistentActor with AtLeastOnceDelivery {
+class PersistAsyncPersistentActorWithAtLeastOnceDelivery(
+    respondAfter: Int, val upStream: ActorRef, val downStream: ActorPath)
+    extends PersistentActor with AtLeastOnceDelivery {
 
   override def redeliverInterval = 100.milliseconds
 

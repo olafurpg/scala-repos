@@ -7,7 +7,8 @@ sealed abstract class RefCountedFinalizer {
 }
 
 object RefCountedFinalizer extends RefCountedFinalizers {
-  def apply(u: IO[Unit], i: IORef[Int]): RefCountedFinalizer = refCountedFinalizer(u, i)
+  def apply(u: IO[Unit], i: IORef[Int]): RefCountedFinalizer =
+    refCountedFinalizer(u, i)
 }
 
 trait RefCountedFinalizers {

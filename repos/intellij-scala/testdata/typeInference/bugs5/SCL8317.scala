@@ -5,6 +5,7 @@ object SCL8317 {
 
   implicit def u(u: Unit): Boolean = false
 
-  /*start*/foo()/*end*/
+  /*start*/
+  foo() /*end*/
 }
 //Int

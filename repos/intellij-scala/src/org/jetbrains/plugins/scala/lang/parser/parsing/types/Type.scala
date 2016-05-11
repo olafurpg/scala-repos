@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
- * @author Alexander Podkhalyuzin
- *         Date: 28.02.2008
- */
-
+  * @author Alexander Podkhalyuzin
+  *         Date: 28.02.2008
+  */
 /*
  * Type ::= InfixType '=>' Type
  *        | '(' ['=>' Type] ')' => Type
@@ -20,7 +19,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  */
 
 object Type {
-  def parse(builder: ScalaPsiBuilder, star: Boolean = false, isPattern: Boolean = false): Boolean = {
+  def parse(builder: ScalaPsiBuilder,
+            star: Boolean = false,
+            isPattern: Boolean = false): Boolean = {
     val typeMarker = builder.mark
     if (!InfixType.parse(builder, star, isPattern)) {
       builder.getTokenType match {
@@ -59,7 +60,6 @@ object Type {
           return false
       }
     }
-
 
     builder.getTokenType match {
       case ScalaTokenTypes.tFUNTYPE =>

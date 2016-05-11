@@ -12,5 +12,4 @@ object DivideExample {
     implicit val instance: Order[User] =
       Divide[Order].deriving2(Function.unlift(unapply))
   }
-
 }

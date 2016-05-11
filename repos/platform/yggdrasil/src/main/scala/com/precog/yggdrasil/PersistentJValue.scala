@@ -25,7 +25,7 @@ import blueeyes.json._
 import org.objectweb.howl.log._
 
 import java.nio.ByteBuffer
-import java.io.{ File, FileOutputStream }
+import java.io.{File, FileOutputStream}
 import java.util.Arrays
 
 import com.weiglewilczek.slf4s.Logging
@@ -64,7 +64,7 @@ object PersistentJValue {
 }
 
 final case class PersistentJValue(baseDir: File, fileName: String)
-extends Logging {
+    extends Logging {
   import PersistentJValue._
 
   private val log = open(baseDir, fileName)
@@ -102,7 +102,8 @@ extends Logging {
       def onError(ex: LogException): Unit = throw ex
       def onRecord(rec: LogRecord): Unit = rec.`type` match {
         case LogRecordType.END_OF_LOG =>
-          logger.debug("Versions TX log replay complete in " + baseDir.getCanonicalPath)
+          logger.debug(
+              "Versions TX log replay complete in " + baseDir.getCanonicalPath)
 
         case LogRecordType.USER =>
           val bytes = rec.getFields()(0)
@@ -126,7 +127,9 @@ extends Logging {
         jv = JParser.parseFromFile(file).valueOr(throw _)
 
       case (Some(rawJson), _) =>
-        jv = JParser.parseFromString(new String(rawJson, "UTF-8")).valueOr(throw _)
+        jv = JParser
+          .parseFromString(new String(rawJson, "UTF-8"))
+          .valueOr(throw _)
         flush()
 
       case (None, None) =>

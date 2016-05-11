@@ -8,16 +8,17 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 trait PsiElementExtTrait {
   protected def repr: PsiElement
 
   def firstChild: Option[PsiElement] = Option(repr.getFirstChild)
   def lastChild: Option[PsiElement] = Option(repr.getLastChild)
-  def elementAt(offset: Int): Option[PsiElement] = Option(repr.findElementAt(offset))
-  def referenceAt(offset: Int): Option[PsiReference] = Option(repr.findReferenceAt(offset))
+  def elementAt(offset: Int): Option[PsiElement] =
+    Option(repr.findElementAt(offset))
+  def referenceAt(offset: Int): Option[PsiReference] =
+    Option(repr.findReferenceAt(offset))
   def parent: Option[PsiElement] = Option(repr.getParent)
   def parents: Iterator[PsiElement] = new ParentsIterator(repr)
   def containingFile: Option[PsiFile] = Option(repr.getContainingFile)
@@ -29,25 +30,27 @@ trait PsiElementExtTrait {
     }
   }
 
-
   def contexts: Iterator[PsiElement] = new ContextsIterator(repr)
 
   def getPrevSiblingNotWhitespace: PsiElement = {
     var prev: PsiElement = repr.getPrevSibling
-    while (prev != null && (prev.isInstanceOf[PsiWhiteSpace] ||
-            prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) prev = prev.getPrevSibling
+    while (prev != null &&
+    (prev.isInstanceOf[PsiWhiteSpace] ||
+        prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) prev = prev.getPrevSibling
     prev
   }
 
   def getPrevSiblingNotWhitespaceComment: PsiElement = {
     var prev: PsiElement = repr.getPrevSibling
-    while (prev != null && (prev.isInstanceOf[PsiWhiteSpace] ||
-            prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE || prev.isInstanceOf[PsiComment]))
-      prev = prev.getPrevSibling
+    while (prev != null &&
+    (prev.isInstanceOf[PsiWhiteSpace] ||
+        prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
+        prev.isInstanceOf[PsiComment])) prev = prev.getPrevSibling
     prev
   }
 
-  def getPrevSiblingCondition(condition: PsiElement => Boolean, strict: Boolean = true): Option[PsiElement] = {
+  def getPrevSiblingCondition(condition: PsiElement => Boolean,
+                              strict: Boolean = true): Option[PsiElement] = {
     if (!strict && condition(repr)) return Some(repr)
     var prev: PsiElement = PsiTreeUtil.prevLeaf(repr)
     while (prev != null && !condition(prev)) {
@@ -58,16 +61,18 @@ trait PsiElementExtTrait {
 
   def getNextSiblingNotWhitespace: PsiElement = {
     var next: PsiElement = repr.getNextSibling
-    while (next != null && (next.isInstanceOf[PsiWhiteSpace] ||
-            next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) next = next.getNextSibling
+    while (next != null &&
+    (next.isInstanceOf[PsiWhiteSpace] ||
+        next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) next = next.getNextSibling
     next
   }
 
   def getNextSiblingNotWhitespaceComment: PsiElement = {
     var next: PsiElement = repr.getNextSibling
-    while (next != null && (next.isInstanceOf[PsiWhiteSpace] ||
-            next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE || next.isInstanceOf[PsiComment]))
-      next = next.getNextSibling
+    while (next != null &&
+    (next.isInstanceOf[PsiWhiteSpace] ||
+        next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
+        next.isInstanceOf[PsiComment])) next = next.getNextSibling
     next
   }
 

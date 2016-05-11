@@ -19,8 +19,8 @@ package com.twitter.summingbird.scalding
 import com.twitter.algebird.monad._
 import com.twitter.summingbird.batch._
 
-import com.twitter.scalding.{ Source => ScaldingSource, Test => TestMode, _ }
-import com.twitter.summingbird.scalding.batch.{ BatchedService => BBatchedService }
+import com.twitter.scalding.{Source => ScaldingSource, Test => TestMode, _}
+import com.twitter.summingbird.scalding.batch.{BatchedService => BBatchedService}
 import scala.collection.mutable.Buffer
 import cascading.tuple.Tuple
 import cascading.flow.FlowDef
@@ -31,14 +31,17 @@ object TestStoreService {
   }
 }
 
-class TestStoreService[K, V](store: TestStore[K, V]) extends StoreService[K, V](store) {
+class TestStoreService[K, V](store: TestStore[K, V])
+    extends StoreService[K, V](store) {
   val sourceToBuffer: Map[ScaldingSource, Buffer[Tuple]] = store.sourceToBuffer
 }
 
-class TestService[K, V](service: String,
-  inBatcher: Batcher,
-  minBatch: BatchID,
-  streams: Map[BatchID, Iterable[(Timestamp, (K, Option[V]))]])(implicit ord: Ordering[K],
+class TestService[K, V](
+    service: String,
+    inBatcher: Batcher,
+    minBatch: BatchID,
+    streams: Map[BatchID, Iterable[(Timestamp, (K, Option[V]))]])(
+    implicit ord: Ordering[K],
     tset: TupleSetter[(Timestamp, (K, Option[V]))],
     tset2: TupleSetter[(Timestamp, (K, V))],
     tconv: TupleConverter[(Timestamp, (K, Option[V]))],
@@ -49,18 +52,20 @@ class TestService[K, V](service: String,
   val ordering = ord
   val reducers = None
   // Needed to init the Test mode:
-  val sourceToBuffer: Map[ScaldingSource, Buffer[Tuple]] =
-    (lasts.map { case (b, it) => lastMappable(b) -> toBuffer(it) } ++
-      streams.map { case (b, it) => streamMappable(b) -> toBuffer(it) }).toMap
+  val sourceToBuffer: Map[ScaldingSource, Buffer[Tuple]] = (lasts.map {
+        case (b, it) => lastMappable(b) -> toBuffer(it)
+      } ++ streams.map { case (b, it) => streamMappable(b) -> toBuffer(it) }).toMap
 
   /** The lasts are computed from the streams */
   lazy val lasts: Map[BatchID, Iterable[(Timestamp, (K, V))]] = {
-    (streams
-      .toList
+    (streams.toList
       .sortBy(_._1)
       .foldLeft(Map.empty[BatchID, Map[K, (Timestamp, V)]]) {
-        case (map, (batch: BatchID, writes: Iterable[(Timestamp, (K, Option[V]))])) =>
-          val thisBatch = writes.foldLeft(map.get(batch).getOrElse(Map.empty[K, (Timestamp, V)])) {
+        case (
+            map,
+            (batch: BatchID, writes: Iterable[(Timestamp, (K, Option[V]))])) =>
+          val thisBatch = writes.foldLeft(
+              map.get(batch).getOrElse(Map.empty[K, (Timestamp, V)])) {
             case (innerMap, (time, (k, v))) =>
               v match {
                 case None => innerMap - k
@@ -78,15 +83,20 @@ class TestService[K, V](service: String,
     new MockMappable[(Timestamp, (K, V))](service + "/last/" + b.toString)
 
   def streamMappable(b: BatchID): Mappable[(Timestamp, (K, Option[V]))] =
-    new MockMappable[(Timestamp, (K, Option[V]))](service + "/stream/" + b.toString)
+    new MockMappable[(Timestamp, (K, Option[V]))](
+        service + "/stream/" + b.toString)
 
-  def toBuffer[T](it: Iterable[T])(implicit ts: TupleSetter[T]): Buffer[Tuple] =
+  def toBuffer[T](it: Iterable[T])(
+      implicit ts: TupleSetter[T]): Buffer[Tuple] =
     it.map { ts(_) }.toBuffer
 
-  override def readStream(batchID: BatchID, mode: Mode): Option[FlowToPipe[(K, Option[V])]] = {
+  override def readStream(
+      batchID: BatchID, mode: Mode): Option[FlowToPipe[(K, Option[V])]] = {
     streams.get(batchID).map { iter =>
       val mappable = streamMappable(batchID)
-      Reader { (fd: (FlowDef, Mode)) => TypedPipe.from(mappable) }
+      Reader { (fd: (FlowDef, Mode)) =>
+        TypedPipe.from(mappable)
+      }
     }
   }
   override def readLast(exclusiveUB: BatchID, mode: Mode) = {

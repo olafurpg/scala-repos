@@ -11,7 +11,8 @@ object Macros {
     import decorators._
     val dummy = q"x"
     dummy.updateAttachment(new Att)
-    if (dummy.attachments.get[Base].isEmpty) c.abort(c.enclosingPosition, "that's not good")
+    if (dummy.attachments.get[Base].isEmpty)
+      c.abort(c.enclosingPosition, "that's not good")
     q"()"
   }
 

@@ -4,9 +4,9 @@ package project.template
 import com.intellij.platform.ProjectTemplate
 
 /**
- * User: Dmitry.Naydanov, Pavel Fatin
- * Date: 11.03.14.
- */
+  * User: Dmitry.Naydanov, Pavel Fatin
+  * Date: 11.03.14.
+  */
 class SbtProjectTemplate extends ProjectTemplate {
   override def getName = "SBT"
 

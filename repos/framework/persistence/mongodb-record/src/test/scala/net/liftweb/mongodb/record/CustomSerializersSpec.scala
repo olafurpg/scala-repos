@@ -36,124 +36,118 @@ import util.Helpers
 
 package customserializersspecs {
 
-case class Child(name: String, birthdate: Date) extends JsonObject[Child] {
-  def meta = Child
-}
-
-object Child extends JsonObjectMeta[Child]
-
-/*
-* Date as String
-*/
-class Person extends MongoRecord[Person] with ObjectIdPk[Person] {
-  def meta = Person
-
-  object children extends MongoJsonObjectListField(this, Child)
-
-  object firstBorn extends JsonObjectField(this, Child) {
-    def defaultValue = Child("", now)
+  case class Child(name: String, birthdate: Date) extends JsonObject[Child] {
+    def meta = Child
   }
 
-}
+  object Child extends JsonObjectMeta[Child]
 
-object Person extends Person with MongoMetaRecord[Person]
+  /*
+   * Date as String
+   */
+  class Person extends MongoRecord[Person] with ObjectIdPk[Person] {
+    def meta = Person
 
-/*
-* Date as Date
-*/
-class Person2 extends MongoRecord[Person2] with ObjectIdPk[Person2] {
-  def meta = Person2
+    object children extends MongoJsonObjectListField(this, Child)
 
-  object children extends MongoJsonObjectListField(this, Child)
-
-  object firstBorn extends JsonObjectField(this, Child) {
-    def defaultValue = Child("", now)
+    object firstBorn extends JsonObjectField(this, Child) {
+      def defaultValue = Child("", now)
+    }
   }
 
-}
+  object Person extends Person with MongoMetaRecord[Person]
 
-object Person2 extends Person2 with MongoMetaRecord[Person2] {
-  override def formats = allFormats
-}
+  /*
+   * Date as Date
+   */
+  class Person2 extends MongoRecord[Person2] with ObjectIdPk[Person2] {
+    def meta = Person2
 
-class Player extends MongoRecord[Player] with ObjectIdPk[Player] {
-  def meta = Player
+    object children extends MongoJsonObjectListField(this, Child)
 
-  object name extends StringField(this, 256)
-
-}
-
-object Player extends Player with MongoMetaRecord[Player]
-
-/*
-* ObjectId as String
-*/
-case class Team(id: String, name: String, qb: String) extends JsonObject[Team] {
-  def meta = Team
-}
-
-object Team extends JsonObjectMeta[Team]
-
-class League extends MongoRecord[League] with ObjectIdPk[League] {
-  def meta = League
-
-  object teams extends MongoJsonObjectListField(this, Team)
-
-  object champion extends JsonObjectField(this, Team) {
-    def defaultValue = Team("", "", "")
+    object firstBorn extends JsonObjectField(this, Child) {
+      def defaultValue = Child("", now)
+    }
   }
 
-}
-
-object League extends League with MongoMetaRecord[League]
-
-/*
-* ObjectId as ObjectId
-*/
-case class Team2(id: ObjectId, name: String, qb: ObjectId) extends JsonObject[Team2] {
-  def meta = Team2
-}
-
-object Team2 extends JsonObjectMeta[Team2]
-
-class League2 extends MongoRecord[League2] with ObjectIdPk[League2] {
-  def meta = League2
-
-  object teams extends MongoJsonObjectListField(this, Team2)
-
-  object champion extends JsonObjectField(this, Team2) {
-    def defaultValue = Team2(ObjectId.get, "", ObjectId.get)
+  object Person2 extends Person2 with MongoMetaRecord[Person2] {
+    override def formats = allFormats
   }
 
+  class Player extends MongoRecord[Player] with ObjectIdPk[Player] {
+    def meta = Player
+
+    object name extends StringField(this, 256)
+  }
+
+  object Player extends Player with MongoMetaRecord[Player]
+
+  /*
+   * ObjectId as String
+   */
+  case class Team(id: String, name: String, qb: String)
+      extends JsonObject[Team] {
+    def meta = Team
+  }
+
+  object Team extends JsonObjectMeta[Team]
+
+  class League extends MongoRecord[League] with ObjectIdPk[League] {
+    def meta = League
+
+    object teams extends MongoJsonObjectListField(this, Team)
+
+    object champion extends JsonObjectField(this, Team) {
+      def defaultValue = Team("", "", "")
+    }
+  }
+
+  object League extends League with MongoMetaRecord[League]
+
+  /*
+   * ObjectId as ObjectId
+   */
+  case class Team2(id: ObjectId, name: String, qb: ObjectId)
+      extends JsonObject[Team2] {
+    def meta = Team2
+  }
+
+  object Team2 extends JsonObjectMeta[Team2]
+
+  class League2 extends MongoRecord[League2] with ObjectIdPk[League2] {
+    def meta = League2
+
+    object teams extends MongoJsonObjectListField(this, Team2)
+
+    object champion extends JsonObjectField(this, Team2) {
+      def defaultValue = Team2(ObjectId.get, "", ObjectId.get)
+    }
+  }
+
+  object League2 extends League2 with MongoMetaRecord[League2] {
+    override def formats = super.formats + new ObjectIdSerializer
+  }
+
+  object WeekDay extends Enumeration {
+    type WeekDay = Value
+    val Mon, Tue, Wed, Thu, Fri, Sat, Sun = Value
+  }
+
+  class EnumRec extends MongoRecord[EnumRec] with ObjectIdPk[EnumRec] {
+    def meta = EnumRec
+
+    object dow extends EnumField(this, WeekDay)
+  }
+
+  object EnumRec extends EnumRec with MongoMetaRecord[EnumRec] {
+    override def collectionName = "enumrecs"
+  }
 }
-
-object League2 extends League2 with MongoMetaRecord[League2] {
-  override def formats = super.formats + new ObjectIdSerializer
-}
-
-object WeekDay extends Enumeration {
-  type WeekDay = Value
-  val Mon, Tue, Wed, Thu, Fri, Sat, Sun = Value
-}
-
-class EnumRec extends MongoRecord[EnumRec] with ObjectIdPk[EnumRec] {
-  def meta = EnumRec
-
-  object dow extends EnumField(this, WeekDay)
-
-}
-
-object EnumRec extends EnumRec with MongoMetaRecord[EnumRec] {
-  override def collectionName = "enumrecs"
-}
-
-}
-
 
 /**
- * Systems under specification for CustomSerializers.
- */
-object CustomSerializersSpec extends Specification  with MongoTestKit {
+  * Systems under specification for CustomSerializers.
+  */
+object CustomSerializersSpec extends Specification with MongoTestKit {
   "CustomSerializers Specification".title
 
   import customserializersspecs._
@@ -179,10 +173,9 @@ object CustomSerializersSpec extends Specification  with MongoTestKit {
       // retrieve it and compare
       val mother2 = Person.find(mother.id.get)
       mother2.isDefined must_== true
-      mother2 foreach {
-        m =>
-          m.children.value mustEqual mother.children.value
-          m.firstBorn.value mustEqual mother.firstBorn.value
+      mother2 foreach { m =>
+        m.children.value mustEqual mother.children.value
+        m.firstBorn.value mustEqual mother.firstBorn.value
       }
 
       // check the conversion functions
@@ -192,25 +185,25 @@ object CustomSerializersSpec extends Specification  with MongoTestKit {
         JsObj(("name", Str("Jill")), ("birthdate", Str("2010-11-03T00:08:00.000Z")))
       )*/
 
-      mother.children.asJValue mustEqual JArray(List(
-        JObject(List(
-          JField("name", JString("Jack")),
-          JField("birthdate", JString("2010-11-02T23:58:00.000Z"))
-        )),
-        JObject(List(
-          JField("name", JString("Jill")),
-          JField("birthdate", JString("2010-11-03T00:08:00.000Z"))))
-      ))
+      mother.children.asJValue mustEqual JArray(
+          List(
+              JObject(List(
+                      JField("name", JString("Jack")),
+                      JField("birthdate", JString("2010-11-02T23:58:00.000Z"))
+                  )),
+              JObject(List(JField("name", JString("Jill")),
+                           JField("birthdate",
+                                  JString("2010-11-03T00:08:00.000Z"))))
+          ))
       mother.children.toForm must beEmpty
       /*
       mother.firstBorn.asJs mustEqual
         JsObj(("name", Str("Jack")), ("birthdate", Str("2010-11-02T23:58:00.000Z")))
-        */
-      mother.firstBorn.asJValue mustEqual
-        JObject(List(
-          JField("name", JString("Jack")),
-          JField("birthdate", JString("2010-11-02T23:58:00.000Z"))
-        ))
+       */
+      mother.firstBorn.asJValue mustEqual JObject(List(
+              JField("name", JString("Jack")),
+              JField("birthdate", JString("2010-11-02T23:58:00.000Z"))
+          ))
       mother.firstBorn.toForm must beEmpty
     }
 
@@ -234,10 +227,9 @@ object CustomSerializersSpec extends Specification  with MongoTestKit {
       // retrieve it and compare
       val mother2 = Person2.find(mother.id.get)
       mother2.isDefined must_== true
-      mother2 foreach {
-        m =>
-          m.children.value mustEqual mother.children.value
-          m.firstBorn.value mustEqual mother.firstBorn.value
+      mother2 foreach { m =>
+        m.children.value mustEqual mother.children.value
+        m.firstBorn.value mustEqual mother.firstBorn.value
       }
 
       // check the conversion functions
@@ -247,28 +239,41 @@ object CustomSerializersSpec extends Specification  with MongoTestKit {
         JsObj(("name", Str("Jill")), ("birthdate", JsObj(("$dt", Str("2010-11-03T00:08:00.000Z")))))
       )*/
 
-      mother.children.asJValue mustEqual JArray(List(
-        JObject(List(
-          JField("name", JString("Jack")),
-          JField("birthdate", JObject(List(JField("$dt", JString("2010-11-02T23:58:00.000Z")))))
-        )),
-        JObject(List(
-          JField("name", JString("Jill")),
-          JField("birthdate", JObject(List(JField("$dt", JString("2010-11-03T00:08:00.000Z")))))
-        ))
-      ))
+      mother.children.asJValue mustEqual JArray(
+          List(
+              JObject(
+                  List(
+                      JField("name", JString("Jack")),
+                      JField("birthdate",
+                             JObject(
+                                 List(JField(
+                                         "$dt",
+                                         JString(
+                                             "2010-11-02T23:58:00.000Z")))))
+                  )),
+              JObject(List(
+                      JField("name", JString("Jill")),
+                      JField(
+                          "birthdate",
+                          JObject(List(JField(
+                                      "$dt",
+                                      JString("2010-11-03T00:08:00.000Z")))))
+                  ))
+          ))
       mother.children.toForm must beEmpty
 
       /*
       mother.firstBorn.asJs mustEqual
         JsObj(("name", Str("Jack")), ("birthdate", JsObj(("$dt", Str("2010-11-02T23:58:00.000Z")))))
-        */
+       */
 
-      mother.firstBorn.asJValue mustEqual
-        JObject(List(
-          JField("name", JString("Jack")),
-          JField("birthdate", JObject(List(JField("$dt", JString("2010-11-02T23:58:00.000Z")))))
-        ))
+      mother.firstBorn.asJValue mustEqual JObject(
+          List(
+              JField("name", JString("Jack")),
+              JField("birthdate",
+                     JObject(List(JField(
+                                 "$dt", JString("2010-11-02T23:58:00.000Z")))))
+          ))
       mother.firstBorn.toForm must beEmpty
     }
 
@@ -291,36 +296,37 @@ object CustomSerializersSpec extends Specification  with MongoTestKit {
       // retrieve it and compare
       val nfl2 = League.find(nfl.id.get)
       nfl2.isDefined must_== true
-      nfl2 foreach {
-        l =>
-          l.teams.value mustEqual nfl.teams.value
-          l.champion.value mustEqual nfl.champion.value
+      nfl2 foreach { l =>
+        l.teams.value mustEqual nfl.teams.value
+        l.champion.value mustEqual nfl.champion.value
       }
 
       // find a player
       val vqb = Player.find(vikes.qb)
       vqb.isDefined must_== true
-      vqb foreach {
-        p =>
-          p.name.value mustEqual "Brett Favre"
+      vqb foreach { p =>
+        p.name.value mustEqual "Brett Favre"
       }
 
       // check the conversion functions
       nfl.id.asJs mustEqual Str(nfl.id.value.toString)
       nfl.id.asJValue mustEqual JString(nfl.id.value.toString)
       val session = new LiftSession("", randomString(20), Empty)
-      val formPattern = <input name=".*" type="text" tabindex="1" value={nfl.id.value.toString} id="_id_id"></input>
+      val formPattern =
+        <input name=".*" type="text" tabindex="1" value={nfl.id.value.toString} id="_id_id"></input>
       S.initIfUninitted(session) {
         val form = nfl.id.toForm
         form.isDefined must_== true
-        form foreach {
-          fprime =>
-            val f = ("* [name]" #> ".*" & "select *" #> (((ns: NodeSeq) => ns.filter {
-              case e: Elem => e.attribute("selected").map(_.text) == Some("selected")
-              case _ => false
-            }) andThen "* [value]" #> ".*"))(fprime)
-            val ret: Boolean = Helpers.compareXml(f, formPattern)
-            ret must_== true
+        form foreach { fprime =>
+          val f = ("* [name]" #> ".*" & "select *" #>
+              (((ns: NodeSeq) =>
+                    ns.filter {
+                      case e: Elem =>
+                        e.attribute("selected").map(_.text) == Some("selected")
+                      case _ => false
+                    }) andThen "* [value]" #> ".*"))(fprime)
+          val ret: Boolean = Helpers.compareXml(f, formPattern)
+          ret must_== true
         }
       }
 
@@ -340,7 +346,6 @@ object CustomSerializersSpec extends Specification  with MongoTestKit {
 
       nfl.id.setFromAny(nflid.toString)
       nfl.id.value mustEqual nflid
-
     }
 
     "handle ObjectId as ObjectId values in JsonObjects using ObjectIdSerializer" in {
@@ -362,36 +367,39 @@ object CustomSerializersSpec extends Specification  with MongoTestKit {
       // retrieve it and compare
       val nfl2 = League2.find(nfl.id.toString)
       nfl2.isDefined must_== true
-      nfl2 foreach {
-        l =>
-          l.teams.value mustEqual nfl.teams.value
-          l.champion.value mustEqual nfl.champion.value
+      nfl2 foreach { l =>
+        l.teams.value mustEqual nfl.teams.value
+        l.champion.value mustEqual nfl.champion.value
       }
 
       // find a player
       val vqb = Player.find(vikes.qb)
       vqb.isDefined must_== true
-      vqb foreach {
-        p =>
-          p.name.value mustEqual "Brett Favre"
+      vqb foreach { p =>
+        p.name.value mustEqual "Brett Favre"
       }
 
       // check the conversion functions
-      nfl.id.asJs.toJsCmd mustEqual """{"$oid":"%s"}""".format(nfl.id.value.toString)
-      nfl.id.asJValue mustEqual JObject(List(JField("$oid", JString(nfl.id.value.toString))))
+      nfl.id.asJs.toJsCmd mustEqual """{"$oid":"%s"}""".format(
+          nfl.id.value.toString)
+      nfl.id.asJValue mustEqual JObject(
+          List(JField("$oid", JString(nfl.id.value.toString))))
       val session = new LiftSession("", randomString(20), Empty)
-      val formPattern = <input name=".*" type="text" tabindex="1" value={nfl.id.value.toString} id="_id_id"></input>
+      val formPattern =
+        <input name=".*" type="text" tabindex="1" value={nfl.id.value.toString} id="_id_id"></input>
       S.initIfUninitted(session) {
         val form = nfl.id.toForm
         form.isDefined must_== true
-        form foreach {
-          fprime =>
-            val f = ("* [name]" #> ".*" & "select *" #> (((ns: NodeSeq) => ns.filter {
-              case e: Elem => e.attribute("selected").map(_.text) == Some("selected")
-              case _ => false
-            }) andThen "* [value]" #> ".*"))(fprime)
-            val ret: Boolean = Helpers.compareXml(f, formPattern)
-            ret must_== true
+        form foreach { fprime =>
+          val f = ("* [name]" #> ".*" & "select *" #>
+              (((ns: NodeSeq) =>
+                    ns.filter {
+                      case e: Elem =>
+                        e.attribute("selected").map(_.text) == Some("selected")
+                      case _ => false
+                    }) andThen "* [value]" #> ".*"))(fprime)
+          val ret: Boolean = Helpers.compareXml(f, formPattern)
+          ret must_== true
         }
       }
 
@@ -403,7 +411,8 @@ object CustomSerializersSpec extends Specification  with MongoTestKit {
       nfl.id.setFromString("garbage")
       nfl.id.valueBox mustEqual Failure("Invalid ObjectId string: garbage")
 
-      nfl.id.setFromJValue(JObject(List(JField("$oid", JString(nflid.toString)))))
+      nfl.id.setFromJValue(
+          JObject(List(JField("$oid", JString(nflid.toString)))))
       nfl.id.value mustEqual nflid
 
       nfl.id.setFromAny(nflid)

@@ -8,6 +8,6 @@ object SCL7388C {
   def b[S](p: PL[S, _]): B[S] = null
 
   def a[T](p: P[_ <: Any, T]): G[T] = new G[T]
-  val g : G[String] = a(/*start*/new B(new PL)/*end*/)
+  val g: G[String] = a( /*start*/ new B(new PL) /*end*/ )
 }
 //SCL7388C.B[String]

@@ -27,7 +27,8 @@ trait RandomForestSpecs extends EvalStackSpecs {
 
   "random forest" should {
     "return correctly structured classification results" in {
-      val input = """
+      val input =
+        """
         data := //iris
         trainingData := {predictors: data.features, dependent: data.species}
 
@@ -36,23 +37,27 @@ trait RandomForestSpecs extends EvalStackSpecs {
 
       val results = evalE(input)
 
-      val categories = Set("Iris-setosa","Iris-versicolor", "Iris-virginica") 
+      val categories = Set("Iris-setosa", "Iris-versicolor", "Iris-virginica")
 
       results must haveSize(150)
 
-      results must haveAllElementsLike { case (ids, value) =>
-        ids must haveSize(1)
-        value must beLike { case SObject(obj) => 
-          obj.keySet mustEqual Set("model1")
-          obj("model1") must beLike { case SString(str) =>
-            categories must contain(str)
+      results must haveAllElementsLike {
+        case (ids, value) =>
+          ids must haveSize(1)
+          value must beLike {
+            case SObject(obj) =>
+              obj.keySet mustEqual Set("model1")
+              obj("model1") must beLike {
+                case SString(str) =>
+                  categories must contain(str)
+              }
           }
-        }
       }
     }
 
     "return correctly structured regression results" in {
-      val input = """
+      val input =
+        """
         data := //auto-mpg
         features0 := data.features
 
@@ -75,17 +80,20 @@ trait RandomForestSpecs extends EvalStackSpecs {
 
       results must haveSize(398)
 
-      results must haveAllElementsLike { case (ids, value) =>
-        ids must haveSize(1)
-        value must beLike { case SObject(obj) => 
-          obj.keySet mustEqual Set("model1")
-          obj("model1") must beLike { case SDecimal(_) => ok }
-        }
+      results must haveAllElementsLike {
+        case (ids, value) =>
+          ids must haveSize(1)
+          value must beLike {
+            case SObject(obj) =>
+              obj.keySet mustEqual Set("model1")
+              obj("model1") must beLike { case SDecimal(_) => ok }
+          }
       }
     }
 
     "return correctly structured classification results given dependent object" in {
-      val input = """
+      val input =
+        """
         data := //iris
         trainingData := {predictors: data.features, dependent: {species: data.species}}
 
@@ -94,21 +102,25 @@ trait RandomForestSpecs extends EvalStackSpecs {
 
       val results = evalE(input)
 
-      val categories = Set("Iris-setosa","Iris-versicolor", "Iris-virginica") 
+      val categories = Set("Iris-setosa", "Iris-versicolor", "Iris-virginica")
 
       results must haveSize(150)
 
-      results must haveAllElementsLike { case (ids, value) =>
-        ids must haveSize(1)
-        value must beLike { case SObject(obj) => 
-          obj.keySet mustEqual Set("model1")
-          obj("model1") must beLike { case SObject(pred) =>
-            pred.keySet mustEqual Set("species")
-            pred("species") must beLike { case SString(str) =>
-              categories must contain(str)
-            }
+      results must haveAllElementsLike {
+        case (ids, value) =>
+          ids must haveSize(1)
+          value must beLike {
+            case SObject(obj) =>
+              obj.keySet mustEqual Set("model1")
+              obj("model1") must beLike {
+                case SObject(pred) =>
+                  pred.keySet mustEqual Set("species")
+                  pred("species") must beLike {
+                    case SString(str) =>
+                      categories must contain(str)
+                  }
+              }
           }
-        }
       }
     }
 
@@ -140,19 +152,23 @@ trait RandomForestSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike { case (ids, value) =>
-        ids must haveSize(0)
-        value must beLike { case SObject(obj) =>
-          obj.keySet mustEqual Set("model1")
-          obj("model1") must beLike { case SDecimal(d) =>
-            d.toDouble mustEqual(0.25)
+      results must haveAllElementsLike {
+        case (ids, value) =>
+          ids must haveSize(0)
+          value must beLike {
+            case SObject(obj) =>
+              obj.keySet mustEqual Set("model1")
+              obj("model1") must beLike {
+                case SDecimal(d) =>
+                  d.toDouble mustEqual (0.25)
+              }
           }
-        }
       }
     }
 
     "return well-predicted classification results" in {
-      val input = """
+      val input =
+        """
         data0 := //iris
         data := data0 with { rand: observe(data0, std::random::uniform(42)) }
 
@@ -176,17 +192,20 @@ trait RandomForestSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike { case (ids, value) =>
-        ids must haveSize(0)
-        value must beLike { case SDecimal(d) =>
-          //println("pred rate classification: " + d.toDouble)
-          d.toDouble must be_>(0.5)
-        }
+      results must haveAllElementsLike {
+        case (ids, value) =>
+          ids must haveSize(0)
+          value must beLike {
+            case SDecimal(d) =>
+              //println("pred rate classification: " + d.toDouble)
+              d.toDouble must be_>(0.5)
+          }
       }
     }
 
     "return well-predicted regression results" in {
-      val input = """
+      val input =
+        """
         data0 := //auto-mpg
         features0 := data0.features
 
@@ -225,12 +244,14 @@ trait RandomForestSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike { case (ids, value) =>
-        ids must haveSize(0)
-        value must beLike { case SDecimal(d) => 
-          // println("r^2 regression: " + d)
-          d.toDouble must be_>(0.6)
-        }
+      results must haveAllElementsLike {
+        case (ids, value) =>
+          ids must haveSize(0)
+          value must beLike {
+            case SDecimal(d) =>
+              // println("r^2 regression: " + d)
+              d.toDouble must be_>(0.6)
+          }
       }
     }
   }

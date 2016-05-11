@@ -3,27 +3,26 @@
 // The first thread waits 1s for the main method to exit and then creates another thread.
 //   This thread waits another second before exiting.
 
-object Spawn
-{
-	def main(args: Array[String]): Unit =	{
-		(new ThreadA).start
-	}
+object Spawn {
+  def main(args: Array[String]): Unit = {
+    (new ThreadA).start
+  }
 
-	class ThreadA extends Thread {
-		override def run(): Unit = {
-			sleep()
-			(new ThreadB).start()
-		}
-	}
-	class ThreadB extends Thread {
-		override def run(): Unit = sleep()
-	}
-	private def sleep(): Unit = {
-		try { Thread.sleep(1000) }
-		catch	{ case e: InterruptedException =>
-			val msg = "TrapExit improperly interrupted non-daemon thread"
-			System.err.println(msg)
-			error(msg)
-		}
-	}
+  class ThreadA extends Thread {
+    override def run(): Unit = {
+      sleep()
+      (new ThreadB).start()
+    }
+  }
+  class ThreadB extends Thread {
+    override def run(): Unit = sleep()
+  }
+  private def sleep(): Unit = {
+    try { Thread.sleep(1000) } catch {
+      case e: InterruptedException =>
+        val msg = "TrapExit improperly interrupted non-daemon thread"
+        System.err.println(msg)
+        error(msg)
+    }
+  }
 }

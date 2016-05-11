@@ -10,7 +10,9 @@ import org.jetbrains.plugins.scala.project.template.SdkSelection
 object DottySdkSelection extends SdkSelection {
   override protected val SdkDescriptor = DottySdkDescriptor
 
-  override protected def filesChooserDescriptor = new DottyFilesChooserDescriptor
+  override protected def filesChooserDescriptor =
+    new DottyFilesChooserDescriptor
 
-  def chooseDottySdkFiles(parentComponent: JComponent) = chooseSdkFiles(parentComponent)
+  def chooseDottySdkFiles(parentComponent: JComponent) =
+    chooseSdkFiles(parentComponent)
 }

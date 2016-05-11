@@ -30,12 +30,15 @@ class ServerActor(
     config: EnsimeConfig,
     protocol: Protocol,
     interface: String = "127.0.0.1"
-) extends Actor with ActorLogging {
+)
+    extends Actor with ActorLogging {
 
   override val supervisorStrategy = OneForOneStrategy() {
     case ex: Exception =>
       log.error(s"Error with monitor actor ${ex.getMessage}", ex)
-      self ! ShutdownRequest(s"Monitor actor failed with ${ex.getClass} - ${ex.toString}", isError = true)
+      self ! ShutdownRequest(
+          s"Monitor actor failed with ${ex.getClass} - ${ex.toString}",
+          isError = true)
       Stop
   }
 
@@ -51,35 +54,49 @@ class ServerActor(
     val preferredTcpPort = PortUtil.port(config.cacheDir, "port")
     val shutdownOnLastDisconnect = Environment.shutdownOnDisconnectFlag
     context.actorOf(Props(
-      new TCPServer(
-        config.cacheDir, protocol, project,
-        broadcaster, shutdownOnLastDisconnect, preferredTcpPort
-      )
-    ), "tcp-server")
+                        new TCPServer(
+                            config.cacheDir,
+                            protocol,
+                            project,
+                            broadcaster,
+                            shutdownOnLastDisconnect,
+                            preferredTcpPort
+                        )
+                    ),
+                    "tcp-server")
 
     // this is a bit ugly in a couple of ways
     // 1) web server creates handlers in the top domain
     // 2) We have to manually capture the failure to write the port file and lift the error to a failure.
-    val webserver = new WebServerImpl(project, broadcaster)(config, context.system, mat, timeout)
+    val webserver = new WebServerImpl(project, broadcaster)(
+        config, context.system, mat, timeout)
 
     // async start the HTTP Server
     val selfRef = self
     val preferredHttpPort = PortUtil.port(config.cacheDir, "http")
-    Http()(context.system).bindAndHandle(webserver.route, interface, preferredHttpPort.getOrElse(0)).onComplete {
-      case Failure(ex) =>
-        log.error(s"Error binding http endpoint ${ex.getMessage}", ex)
-        selfRef ! ShutdownRequest(s"http endpoint failed to bind ($preferredHttpPort)", isError = true)
+    Http()(context.system)
+      .bindAndHandle(
+          webserver.route, interface, preferredHttpPort.getOrElse(0))
+      .onComplete {
+        case Failure(ex) =>
+          log.error(s"Error binding http endpoint ${ex.getMessage}", ex)
+          selfRef ! ShutdownRequest(
+              s"http endpoint failed to bind ($preferredHttpPort)",
+              isError = true)
 
-      case Success(ServerBinding(addr)) =>
-        log.info(s"ENSIME HTTP on ${addr.getAddress}")
-        try {
-          PortUtil.writePort(config.cacheDir, addr.getPort, "http")
-        } catch {
-          case ex: Throwable =>
-            log.error(s"Error initializing http endpoint ${ex.getMessage}", ex)
-            selfRef ! ShutdownRequest(s"http endpoint failed to initialise: ${ex.getMessage}", isError = true)
-        }
-    }(context.system.dispatcher)
+        case Success(ServerBinding(addr)) =>
+          log.info(s"ENSIME HTTP on ${addr.getAddress}")
+          try {
+            PortUtil.writePort(config.cacheDir, addr.getPort, "http")
+          } catch {
+            case ex: Throwable =>
+              log.error(
+                  s"Error initializing http endpoint ${ex.getMessage}", ex)
+              selfRef ! ShutdownRequest(
+                  s"http endpoint failed to initialise: ${ex.getMessage}",
+                  isError = true)
+          }
+      }(context.system.dispatcher)
 
     Environment.info foreach log.info
   }
@@ -101,7 +118,6 @@ class ServerActor(
   def triggerShutdown(request: ShutdownRequest): Unit = {
     Server.shutdown(context.system, request)
   }
-
 }
 
 object Server {
@@ -111,7 +127,8 @@ object Server {
 
   def main(args: Array[String]): Unit = {
     val ensimeFileStr = propOrNone("ensime.config").getOrElse(
-      throw new RuntimeException("ensime.config (the location of the .ensime file) must be set")
+        throw new RuntimeException(
+            "ensime.config (the location of the .ensime file) must be set")
     )
 
     val ensimeFile = new File(ensimeFileStr)
@@ -129,7 +146,9 @@ object Server {
     val protocol: Protocol = propOrElse("ensime.protocol", "swank") match {
       case "swank" => new SwankProtocol
       case "jerk" => new JerkProtocol
-      case other => throw new IllegalArgumentException(s"$other is not a valid ENSIME protocol")
+      case other =>
+        throw new IllegalArgumentException(
+            s"$other is not a valid ENSIME protocol")
     }
 
     val system = ActorSystem("ENSIME")
@@ -140,9 +159,9 @@ object Server {
     val t = new Thread(new Runnable {
       def run(): Unit = {
         if (request.isError)
-          log.error(s"Shutdown requested due to internal error: ${request.reason}")
-        else
-          log.info(s"Shutdown requested: ${request.reason}")
+          log.error(
+              s"Shutdown requested due to internal error: ${request.reason}")
+        else log.info(s"Shutdown requested: ${request.reason}")
 
         log.info("Shutting down the ActorSystem")
         Try(system.shutdown())
@@ -152,10 +171,8 @@ object Server {
 
         log.info("Shutdown complete")
         if (!propIsSet("ensime.server.test")) {
-          if (request.isError)
-            System.exit(1)
-          else
-            System.exit(0)
+          if (request.isError) System.exit(1)
+          else System.exit(0)
         }
       }
     })

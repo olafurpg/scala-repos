@@ -36,7 +36,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 
 /** Tests for [[scalafx.geometry.VPos]]. */
 @RunWith(classOf[JUnitRunner])
-class VPosSpec extends SFXEnumDelegateSpec[jfxg.VPos, VPos](
-  javaClass = classOf[jfxg.VPos],
-  scalaClass = classOf[VPos],
-  companion = VPos)
+class VPosSpec
+    extends SFXEnumDelegateSpec[jfxg.VPos, VPos](
+        javaClass = classOf[jfxg.VPos],
+        scalaClass = classOf[VPos],
+        companion = VPos)

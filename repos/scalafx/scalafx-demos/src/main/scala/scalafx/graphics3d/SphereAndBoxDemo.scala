@@ -37,7 +37,6 @@ import scalafx.scene.paint.{Color, PhongMaterial}
 import scalafx.scene.shape.{Box, Sphere}
 import scalafx.scene.transform.Rotate
 
-
 /** ScalaFX version of the demo from projavafx8-scratchpad */
 object SphereAndBoxDemo extends JFXApp {
 
@@ -98,12 +97,14 @@ object SphereAndBoxDemo extends JFXApp {
 
     node.transforms = Seq(yRotate)
 
-    scene.onMousePressed = (event: MouseEvent) => {
-      anchorX = event.sceneX
-      anchorAngleY = angleY()
+    scene.onMousePressed = (event: MouseEvent) =>
+      {
+        anchorX = event.sceneX
+        anchorAngleY = angleY()
     }
-    scene.onMouseDragged = (event: MouseEvent) => {
-      angleY() = anchorAngleY + anchorX - event.sceneX
+    scene.onMouseDragged = (event: MouseEvent) =>
+      {
+        angleY() = anchorAngleY + anchorX - event.sceneX
     }
   }
 }

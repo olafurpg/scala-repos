@@ -14,7 +14,8 @@ package com.example.p1 {
 
     // Google Token for Scala
     def :: = 0
-    @deprecated("This method is deprecated.") def :::: = 0
+    @deprecated("This method is deprecated.")
+    def :::: = 0
   }
 
   class UpperBound[T <: Int]

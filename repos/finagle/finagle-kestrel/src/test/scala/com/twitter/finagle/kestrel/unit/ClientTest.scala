@@ -19,7 +19,9 @@ import scala.language.postfixOps
 // all this so we can spy() on a client.
 class MockClient extends Client {
   def set(queueName: String, value: Buf, expiry: Time = Time.epoch) = null
-  def get(queueName: String, waitUpTo: Duration = 0.seconds): Future[Option[Buf]] = null
+  def get(
+      queueName: String, waitUpTo: Duration = 0.seconds): Future[Option[Buf]] =
+    null
   def delete(queueName: String): Future[Response] = null
   def flush(queueName: String): Future[Response] = null
   def read(queueName: String): ReadHandle = null
@@ -108,13 +110,14 @@ class ClientTest extends FunSuite with MockitoSugar {
 
         val errf = (h.error ?)
 
-        delays.zipWithIndex foreach { case (delay, i) =>
-          verify(client, times(i + 1)).read("foo")
-          error ! new Exception("sad panda")
-          tc.advance(delay)
-          timer.tick()
-          verify(client, times(i + 2)).read("foo")
-          assert(errf.isDefined == false)
+        delays.zipWithIndex foreach {
+          case (delay, i) =>
+            verify(client, times(i + 1)).read("foo")
+            error ! new Exception("sad panda")
+            tc.advance(delay)
+            timer.tick()
+            verify(client, times(i + 2)).read("foo")
+            assert(errf.isDefined == false)
         }
 
         error ! new Exception("final sad panda")
@@ -148,8 +151,9 @@ class ClientTest extends FunSuite with MockitoSugar {
       when(factory.apply()) thenReturn Future(service)
       val promise = new Promise[Response]()
       @volatile var wasInterrupted = false
-      promise.setInterruptHandler { case _cause =>
-        wasInterrupted = true
+      promise.setInterruptHandler {
+        case _cause =>
+          wasInterrupted = true
       }
       when(service(open)) thenReturn promise
       when(service(closeAndOpen)) thenReturn promise
@@ -163,7 +167,8 @@ class ClientTest extends FunSuite with MockitoSugar {
     }
   }
 
-  test("ThriftConnectedClient.read should interrupt current trift request on close") {
+  test(
+      "ThriftConnectedClient.read should interrupt current trift request on close") {
     val queueName = "foo"
     val clientFactory = mock[FinagledClientFactory]
     val finagledClient = mock[FinagledClosableClient]
@@ -173,8 +178,9 @@ class ClientTest extends FunSuite with MockitoSugar {
     val promise = new Promise[Seq[Item]]()
 
     @volatile var wasInterrupted = false
-    promise.setInterruptHandler { case _cause =>
-      wasInterrupted = true
+    promise.setInterruptHandler {
+      case _cause =>
+        wasInterrupted = true
     }
 
     when(finagledClient.get(queueName, 1, Int.MaxValue, Int.MaxValue)) thenReturn promise

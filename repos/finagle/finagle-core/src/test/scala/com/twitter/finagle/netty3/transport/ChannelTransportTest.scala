@@ -16,15 +16,15 @@ import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
 class ChannelTransportTest
-  extends FunSuite
-  with MockitoSugar
-  with OneInstancePerTest {
+    extends FunSuite with MockitoSugar with OneInstancePerTest {
 
   // For some reason, the scala compiler has a difficult time with
   // mockito's vararg-v-singlearg 'thenReturns'. We force the
   // selection here by using reflection. Sad.
   def when[T](o: T) =
-    Mockito.when(o).asInstanceOf[ {def thenReturn[T](s: T): OngoingStubbing[T]}]
+    Mockito
+      .when(o)
+      .asInstanceOf[ { def thenReturn[T](s: T): OngoingStubbing[T] }]
 
   val ch = mock[Channel]
   val closeFuture = mock[ChannelFuture]
@@ -45,11 +45,12 @@ class ChannelTransportTest
     handler.handleUpstream(ctx, e)
   }
 
-  def sendUpstreamMessage[T <: Object](msg: T) = sendUpstream({
-    val e = mock[MessageEvent]
-    when(e.getMessage).thenReturn(msg)
-    e
-  })
+  def sendUpstreamMessage[T <: Object](msg: T) =
+    sendUpstream({
+      val e = mock[MessageEvent]
+      when(e.getMessage).thenReturn(msg)
+      e
+    })
 
   def newProxyCtx() = new {
     val f = trans.write("one")
@@ -61,7 +62,8 @@ class ChannelTransportTest
     assert(dsme.getMessage == "one")
   }
 
-  test("write to the underlying channel, proxying the underlying ChannelFuture (ok)") {
+  test(
+      "write to the underlying channel, proxying the underlying ChannelFuture (ok)") {
     val ctx = newProxyCtx()
     import ctx._
 
@@ -69,7 +71,8 @@ class ChannelTransportTest
     assert(Await.result(f.liftToTry) == Return.Unit)
   }
 
-  test("write to the underlying channel, proxying the underlying ChannelFuture (err)") {
+  test(
+      "write to the underlying channel, proxying the underlying ChannelFuture (err)") {
     val ctx = newProxyCtx()
     import ctx._
 
@@ -166,11 +169,10 @@ class ChannelTransportTest
   }
 
   test("FIFO queue messages") {
-    for (i <- 0 until 10)
-      sendUpstreamMessage("message:%d".format(i))
+    for (i <- 0 until 10) sendUpstreamMessage("message:%d".format(i))
 
-    for (i <- 0 until 10)
-      assert(Await.result(trans.read()) == "message:%d".format(i))
+    for (i <- 0 until 10) assert(
+        Await.result(trans.read()) == "message:%d".format(i))
 
     assert(!trans.read().isDefined)
   }
@@ -188,7 +190,8 @@ class ChannelTransportTest
     assert(exc1 == ChannelException(exc, remoteAddress))
   }
 
-  test("handle exceptions on pending reads") {  // writes are taken care of by netty
+  test("handle exceptions on pending reads") {
+    // writes are taken care of by netty
     val f = trans.read()
     assert(!f.isDefined)
     sendUpstream({
@@ -210,8 +213,7 @@ class ChannelTransportTest
       e
     })
 
-    assert(Await.result(trans.onClose) ==
-      ChannelException(exc, remoteAddress))
+    assert(Await.result(trans.onClose) == ChannelException(exc, remoteAddress))
   }
 
   test("satisfy pending reads") {
@@ -229,6 +231,7 @@ class ChannelTransportTest
 
     assert(f.poll == Some(Return("a")))
     assert(trans.read().poll == Some(Return("b")))
-    assert(trans.read().poll == Some(Throw(ChannelException(exc, remoteAddress))))
+    assert(
+        trans.read().poll == Some(Throw(ChannelException(exc, remoteAddress))))
   }
 }

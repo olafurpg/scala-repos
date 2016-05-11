@@ -17,7 +17,7 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
   } yield Dentry(Path.read(prefix), NameTree.read(dest))
 
   val okDtabs =
-    Dtab.empty +: (okDentries.permutations map(ds => Dtab(ds))).toIndexedSeq
+    Dtab.empty +: (okDentries.permutations map (ds => Dtab(ds))).toIndexedSeq
 
   def newMsg(): Message = Request(Version.Http11, Method.Get, "/")
 
@@ -32,36 +32,35 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
 
   test("Dtab-Local: read multiple, with commas") {
     val m = newMsg()
-    m.headers.add("Dtab-Local", "/srv#/prod/local/role=>/$/fail;/srv=>/srv#/staging")
+    m.headers.add(
+        "Dtab-Local", "/srv#/prod/local/role=>/$/fail;/srv=>/srv#/staging")
     m.headers.add("Dtab-Local", "/srv/local=>/srv/other,/srv=>/srv#/devel")
     val expected = Dtab.read(
-      "/srv#/prod/local/role => /$/fail;"+
-      "/srv => /srv#/staging;"+
-      "/srv/local => /srv/other;"+
-      "/srv => /srv#/devel"
+        "/srv#/prod/local/role => /$/fail;" + "/srv => /srv#/staging;" +
+        "/srv/local => /srv/other;" + "/srv => /srv#/devel"
     )
     assert(HttpDtab.read(m).get() == expected)
   }
 
   test("Dtab-Local takes precedence over X-Dtab") {
     val m = newMsg()
-    m.headers.add("Dtab-Local", "/srv#/prod/local/role=>/$/fail;/srv=>/srv#/staging")
+    m.headers.add(
+        "Dtab-Local", "/srv#/prod/local/role=>/$/fail;/srv=>/srv#/staging")
     // HttpDtab.write encodes X-Dtab headers
     HttpDtab.write(Dtab.read("/srv => /$/nil"), m)
     m.headers.add("Dtab-Local", "/srv/local=>/srv/other,/srv=>/srv#/devel")
     val expected = Dtab.read(
-      "/srv => /$/nil;"+
-      "/srv#/prod/local/role => /$/fail;"+
-      "/srv => /srv#/staging;"+
-      "/srv/local => /srv/other;"+
-      "/srv => /srv#/devel"
+        "/srv => /$/nil;" + "/srv#/prod/local/role => /$/fail;" +
+        "/srv => /srv#/staging;" + "/srv/local => /srv/other;" +
+        "/srv => /srv#/devel"
     )
     assert(HttpDtab.read(m).get() == expected)
   }
 
   // some base64 encoders insert newlines to enforce max line length.  ensure we aren't doing that
   test("X-Dtab: long dest round-trips") {
-    val expectedDtab = Dtab.read("/s/a => /s/abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")
+    val expectedDtab = Dtab.read(
+        "/s/a => /s/abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")
     val m = newMsg()
     HttpDtab.write(expectedDtab, m)
     val observedDtab = HttpDtab.read(m).get()
@@ -125,21 +124,22 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
     m.headers.set("Dtab-Local", "/srv=>/srv#/staging")
     m.headers.set("onetwothree", "123")
 
-    val headers = Seq(
-      "X-Dtab-00-A", "X-Dtab-00-B",
-      "X-Dtab-01-A", "X-Dtab-01-B",
-      "Dtab-Local")
+    val headers = Seq("X-Dtab-00-A",
+                      "X-Dtab-00-B",
+                      "X-Dtab-01-A",
+                      "X-Dtab-01-B",
+                      "Dtab-Local")
 
-    for (h <- headers)
-      assert(m.headers.contains(h), h+" not in headers")
+    for (h <- headers) assert(m.headers.contains(h), h + " not in headers")
 
     assert(m.headers.contains("onetwothree"), "onetwothree not in headers")
 
     HttpDtab.clear(m)
 
-    assert(m.headers.contains("onetwothree"), "onetwothree was removed from headers")
-    for (h <- headers)
-      assert(!m.headers.contains(h), h+" was not removed from headers")
+    assert(m.headers.contains("onetwothree"),
+           "onetwothree was removed from headers")
+    for (h <- headers) assert(
+        !m.headers.contains(h), h + " was not removed from headers")
   }
 
   test("strip(msg)") {
@@ -149,13 +149,12 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
         ("X-Dtab-00-B", "/$/fail"),
         ("X-Dtab-01-A", "/srv/local"),
         ("X-Dtab-01-B", "/srv/other")
-      )
+    )
     val allHeaders = dtabHeaders :+ (("Accept", "application/json"))
 
-    val message = allHeaders.foldLeft(newMsg()) {
-      (m, h) =>
-        m.headers.set(h._1, h._2)
-        m
+    val message = allHeaders.foldLeft(newMsg()) { (m, h) =>
+      m.headers.set(h._1, h._2)
+      m
     }
 
     val foundHeaders = HttpDtab.strip(message)
@@ -163,4 +162,3 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
     assert(dtabHeaders == foundHeaders)
   }
 }
-

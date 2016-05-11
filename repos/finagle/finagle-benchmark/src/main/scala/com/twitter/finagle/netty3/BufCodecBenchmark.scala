@@ -8,10 +8,10 @@ import org.openjdk.jmh.annotations._
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Benchmarks various buffer wrappers in the presence of length
- * encoded fields. This is useful since many of our protocols
- * (e.g. Mux) make heavy use of length encoding.
- */
+  * Benchmarks various buffer wrappers in the presence of length
+  * encoded fields. This is useful since many of our protocols
+  * (e.g. Mux) make heavy use of length encoding.
+  */
 @State(Scope.Benchmark)
 class BufCodecBenchmark extends StdBenchAnnotations {
   import BufCodecBenchmark._
@@ -29,14 +29,16 @@ class BufCodecBenchmark extends StdBenchAnnotations {
   def setup(): Unit = {
     val values = List.fill(size)("value")
 
-    bufs = values.map { case v =>
-      Buf.ByteArray.Owned(v.getBytes(Charsets.Utf8))
+    bufs = values.map {
+      case v =>
+        Buf.ByteArray.Owned(v.getBytes(Charsets.Utf8))
     }
 
     encodedBuf = TwitterBuf.encode(bufs)
 
-    cbs = values.map { case v =>
-      ChannelBuffers.wrappedBuffer(v.getBytes(Charsets.Utf8))
+    cbs = values.map {
+      case v =>
+        ChannelBuffers.wrappedBuffer(v.getBytes(Charsets.Utf8))
     }
 
     encodedCB = NettyChannelBuffer.encode(cbs)
@@ -109,10 +111,9 @@ object BufCodecBenchmark {
       val bw = BufWriter.fixed(size)
       iter = values.iterator
       while (iter.hasNext) {
-        iter.next() match { case v =>
-          bw
-            .writeIntBE(v.length)
-            .writeBytes(Buf.ByteArray.Owned.extract(v))
+        iter.next() match {
+          case v =>
+            bw.writeIntBE(v.length).writeBytes(Buf.ByteArray.Owned.extract(v))
         }
       }
       bw.owned()

@@ -20,12 +20,13 @@ package org.apache.spark.scheduler.cluster
 import org.apache.hadoop.yarn.api.records.ApplicationId
 
 /**
- * Simple Testing Application Id; ID and cluster timestamp are set in constructor
- * and cannot be updated.
- * @param id app id
- * @param clusterTimestamp timestamp
- */
-private[spark] class StubApplicationId(id: Int, clusterTimestamp: Long) extends ApplicationId {
+  * Simple Testing Application Id; ID and cluster timestamp are set in constructor
+  * and cannot be updated.
+  * @param id app id
+  * @param clusterTimestamp timestamp
+  */
+private[spark] class StubApplicationId(id: Int, clusterTimestamp: Long)
+    extends ApplicationId {
   override def getId: Int = {
     id
   }

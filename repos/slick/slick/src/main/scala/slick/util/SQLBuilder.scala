@@ -18,28 +18,29 @@ final class SQLBuilder { self =>
 
   def sep[T](sequence: Traversable[T], separator: String)(f: T => Unit) {
     var first = true
-    for(x <- sequence) {
-      if(first) first = false else self += separator
+    for (x <- sequence) {
+      if (first) first = false else self += separator
       f(x)
     }
   }
 
   def sep[T](sequence: ConstArray[T], separator: String)(f: T => Unit) {
     var i = 0
-    while(i < sequence.length) {
-      if(i != 0) self += separator
+    while (i < sequence.length) {
+      if (i != 0) self += separator
       f(sequence(i))
       i += 1
     }
   }
 
-  def build = Result(sb.toString, { (p: PreparedStatement, idx: Int, param: Any) =>
-    var i = idx
-    for(s <- setters) {
-      s(p, i, param)
-      i += 1
-    }
-  })
+  def build =
+    Result(sb.toString, { (p: PreparedStatement, idx: Int, param: Any) =>
+      var i = idx
+      for (s <- setters) {
+        s(p, i, param)
+        i += 1
+      }
+    })
 
   def newLineIndent(): Unit = {
     currentIndentLevel += 1
@@ -52,11 +53,12 @@ final class SQLBuilder { self =>
   }
 
   def newLineOrSpace(): Unit =
-    if(GlobalConfig.sqlIndent) newLine() else this += " "
+    if (GlobalConfig.sqlIndent) newLine() else this += " "
 
-  private def newLine(): Unit = if(GlobalConfig.sqlIndent) {
+  private def newLine(): Unit = if (GlobalConfig.sqlIndent) {
     this += "\n"
-    if (1 <= currentIndentLevel) 1.to(currentIndentLevel).foreach(_ => this += "  ")
+    if (1 <= currentIndentLevel)
+      1.to(currentIndentLevel).foreach(_ => this += "  ")
   }
 }
 

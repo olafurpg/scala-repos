@@ -21,9 +21,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.plans.logical._
 
 /**
- * This suite is used to test [[LogicalPlan]]'s `resolveOperators` and make sure it can correctly
- * skips sub-trees that have already been marked as analyzed.
- */
+  * This suite is used to test [[LogicalPlan]]'s `resolveOperators` and make sure it can correctly
+  * skips sub-trees that have already been marked as analyzed.
+  */
 class LogicalPlanSuite extends SparkFunSuite {
   private var invocationCount = 0
   private val function: PartialFunction[LogicalPlan, LogicalPlan] = {

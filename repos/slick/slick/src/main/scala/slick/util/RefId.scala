@@ -9,6 +9,6 @@ final case class RefId[E <: AnyRef](e: E) {
     case RefId(e2) => e eq e2
     case _ => false
   }
-  override def toString = "RefId("+e.toString+")@" + hashCode
+  override def toString = "RefId(" + e.toString + ")@" + hashCode
   def apply() = e
 }

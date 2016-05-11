@@ -1,6 +1,7 @@
 object Test {
   def main(args: Array[String]): Unit = {
-    val a: Array[String] = "goobledy bing, goobledy bling, wikka wokka wup.".split("")
+    val a: Array[String] =
+      "goobledy bing, goobledy bling, wikka wokka wup.".split("")
     val b = java.util.Arrays.asList(a: _*)
     java.util.Collections.shuffle(b)
 

@@ -12,10 +12,10 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
-import org.scalatest.{ WordSpec, Matchers }
+import org.scalatest.{WordSpec, Matchers}
 import org.scalacheck.Arbitrary
 import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
@@ -26,12 +26,13 @@ class ConfigTest extends WordSpec with Matchers {
   "A Config" should {
     "cascadingAppJar works" in {
       val cls = getClass
-      Config.default.setCascadingAppJar(cls)
-        .getCascadingAppJar should contain (Success(cls))
+      Config.default.setCascadingAppJar(cls).getCascadingAppJar should contain(
+          Success(cls))
     }
     "default has serialization set" in {
       val sers = Config.default.get("io.serializations").get.split(",").toList
-      sers.last shouldBe (classOf[com.twitter.chill.hadoop.KryoSerialization].getName)
+      sers.last shouldBe
+      (classOf[com.twitter.chill.hadoop.KryoSerialization].getName)
     }
     "default has chill configured" in {
       Config.default.get(com.twitter.chill.config.ConfiguredInstantiator.KEY) should not be empty
@@ -40,9 +41,10 @@ class ConfigTest extends WordSpec with Matchers {
       val date = RichDate.now
       val (oldDate, newConf) = Config.empty.maybeSetSubmittedTimestamp(date)
       oldDate shouldBe empty
-      newConf.getSubmittedTimestamp should contain (date)
-      val (stillOld, new2) = newConf.maybeSetSubmittedTimestamp(date + Seconds(1))
-      stillOld should contain (date)
+      newConf.getSubmittedTimestamp should contain(date)
+      val (stillOld, new2) =
+        newConf.maybeSetSubmittedTimestamp(date + Seconds(1))
+      stillOld should contain(date)
       new2 shouldBe newConf
     }
     "adding UniqueIDs works" in {
@@ -52,24 +54,29 @@ class ConfigTest extends WordSpec with Matchers {
     }
     "Default serialization should have tokens" in {
       Config.default.getCascadingSerializationTokens should not be empty
-      Config.default.getCascadingSerializationTokens
-        .values
+      Config.default.getCascadingSerializationTokens.values
         .map(Class.forName)
         .filter(c => c.isPrimitive || c.isArray) shouldBe empty
 
       Config.empty.getCascadingSerializationTokens shouldBe empty
 
       // tokenClasses are a subset that don't include primites or arrays.
-      val tokenClasses = Config.default.getCascadingSerializationTokens.values.toSet
+      val tokenClasses =
+        Config.default.getCascadingSerializationTokens.values.toSet
       val kryoClasses = Config.default.getKryoRegisteredClasses.map(_.getName)
       // Tokens are a subset of Kryo registered classes
       (kryoClasses & tokenClasses) shouldBe tokenClasses
       // the only Kryo classes we don't assign tokens for are the primitives + array
       (kryoClasses -- tokenClasses).forall { c =>
         // primitives cannot be forName'd
-        val prim = Set(classOf[Boolean], classOf[Byte], classOf[Short],
-          classOf[Int], classOf[Long], classOf[Float], classOf[Double], classOf[Char])
-          .map(_.getName)
+        val prim = Set(classOf[Boolean],
+                       classOf[Byte],
+                       classOf[Short],
+                       classOf[Int],
+                       classOf[Long],
+                       classOf[Float],
+                       classOf[Double],
+                       classOf[Char]).map(_.getName)
 
         prim(c) || Class.forName(c).isArray
       } shouldBe true
@@ -81,8 +88,9 @@ object ConfigProps extends Properties("Config") {
   implicit def arbConfig: Arbitrary[Config] =
     Arbitrary(Arbitrary.arbitrary[Map[String, String]].map(Config(_)))
 
-  property(".+(k, v).get(k) == Some(v)") = forAll { (c: Config, k: String, v: String) =>
-    (c + (k, v)).get(k) == Some(v)
+  property(".+(k, v).get(k) == Some(v)") = forAll {
+    (c: Config, k: String, v: String) =>
+      (c + (k, v)).get(k) == Some(v)
   }
   property(".-(k).get(k) == None") = forAll { (c: Config, k: String) =>
     (c - k).get(k) == None
@@ -90,15 +98,21 @@ object ConfigProps extends Properties("Config") {
   property("++ unions keys") = forAll { (c1: Config, c2: Config) =>
     (c1 ++ c2).toMap.keySet == (c1.toMap.keySet | c2.toMap.keySet)
   }
-  property("++ == c2.orElse(c1)") = forAll { (c1: Config, c2: Config, keys: Set[String]) =>
-    val merged = c1 ++ c2
-    val testKeys = c1.toMap.keySet | c2.toMap.keySet ++ keys
-    testKeys.forall { k => merged.get(k) == c2.get(k).orElse(c1.get(k)) }
+  property("++ == c2.orElse(c1)") = forAll {
+    (c1: Config, c2: Config, keys: Set[String]) =>
+      val merged = c1 ++ c2
+      val testKeys = c1.toMap.keySet | c2.toMap.keySet ++ keys
+      testKeys.forall { k =>
+        merged.get(k) == c2.get(k).orElse(c1.get(k))
+      }
   }
   property("adding many UniqueIDs works") = forAll { (l: List[String]) =>
-    val uids = l.filterNot { s => s.isEmpty || s.contains(",") }.map(UniqueID(_))
+    val uids = l.filterNot { s =>
+      s.isEmpty || s.contains(",")
+    }.map(UniqueID(_))
     (uids.foldLeft(Config.empty) { (conf, id) =>
-      conf.addUniqueId(id)
-    }.getUniqueIds == uids.toSet)
+            conf.addUniqueId(id)
+          }
+          .getUniqueIds == uids.toSet)
   }
 }

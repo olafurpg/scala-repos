@@ -47,51 +47,75 @@ import com.weiglewilczek.slf4s._
 import scala.annotation.tailrec
 
 import scalaz._
-import scalaz.{ NonEmptyList => NEL }
+import scalaz.{NonEmptyList => NEL}
 import scalaz.\/._
 import scalaz.syntax.std.option._
 
 object KafkaEventStore {
-  def apply(config: Configuration, permissionsFinder: PermissionsFinder[Future])(implicit executor: ExecutionContext): Validation[NEL[String], (EventStore[Future], Stoppable)] = {
+  def apply(
+      config: Configuration, permissionsFinder: PermissionsFinder[Future])(
+      implicit executor: ExecutionContext)
+    : Validation[NEL[String], (EventStore[Future], Stoppable)] = {
     val localConfig = config.detach("local")
     val centralConfig = config.detach("central")
     println("Central config %s".format(centralConfig.toString()))
-    println("centralConfig.get[String](\"zk.connect\")=%s".format(centralConfig.get[String]("zk.connect")))
-    centralConfig.get[String]("zk.connect").toSuccess(NEL("central.zk.connect configuration parameter is required")) map { centralZookeeperHosts =>
-      val serviceUID = ZookeeperSystemCoordination.extractServiceUID(config)
-      val coordination = ZookeeperSystemCoordination(centralZookeeperHosts, serviceUID, yggCheckpointsEnabled = true)
-      val agent = serviceUID.hostId + serviceUID.serviceId
+    println(
+        "centralConfig.get[String](\"zk.connect\")=%s".format(
+            centralConfig.get[String]("zk.connect")))
+    centralConfig
+      .get[String]("zk.connect")
+      .toSuccess(NEL("central.zk.connect configuration parameter is required")) map {
+      centralZookeeperHosts =>
+        val serviceUID = ZookeeperSystemCoordination.extractServiceUID(config)
+        val coordination = ZookeeperSystemCoordination(
+            centralZookeeperHosts, serviceUID, yggCheckpointsEnabled = true)
+        val agent = serviceUID.hostId + serviceUID.serviceId
 
-      val eventIdSeq = SystemEventIdSequence(agent, coordination)
-      val Some((eventStore, esStop)) = LocalKafkaEventStore(localConfig)
+        val eventIdSeq = SystemEventIdSequence(agent, coordination)
+        val Some((eventStore, esStop)) = LocalKafkaEventStore(localConfig)
 
-      val stoppables = if (config[Boolean]("relay_data", true)) {
-        val (_, raStop) = KafkaRelayAgent(permissionsFinder, eventIdSeq, localConfig, centralConfig)
-        esStop.parent(raStop)
-      } else esStop
+        val stoppables =
+          if (config[Boolean]("relay_data", true)) {
+            val (_, raStop) = KafkaRelayAgent(
+                permissionsFinder, eventIdSeq, localConfig, centralConfig)
+            esStop.parent(raStop)
+          } else esStop
 
-      (eventStore, stoppables)
+        (eventStore, stoppables)
     }
   }
 }
 
-class LocalKafkaEventStore(producer: Producer[String, Message], topic: String, maxMessageSize: Int, messagePadding: Int)(implicit executor: ExecutionContext) extends EventStore[Future] with Logging {
-  logger.info("Creating LocalKafkaEventStore for %s with max message size = %d".format(topic, maxMessageSize))
+class LocalKafkaEventStore(
+    producer: Producer[String, Message],
+    topic: String,
+    maxMessageSize: Int,
+    messagePadding: Int)(implicit executor: ExecutionContext)
+    extends EventStore[Future] with Logging {
+  logger.info(
+      "Creating LocalKafkaEventStore for %s with max message size = %d".format(
+          topic, maxMessageSize))
   private[this] val codec = new KafkaEventCodec
   private implicit val M = new blueeyes.bkka.FutureMonad(executor)
 
   def save(event: Event, timeout: Timeout) = {
-    @tailrec def encodeAll(toEncode: List[Event], messages: Vector[Message]): StoreFailure \/ Vector[Message] = {
+    @tailrec
+    def encodeAll(
+        toEncode: List[Event],
+        messages: Vector[Message]): StoreFailure \/ Vector[Message] = {
       toEncode match {
         case x :: xs =>
           val message = codec.toMessage(x)
           if (message.size + messagePadding <= maxMessageSize) {
             encodeAll(xs, messages :+ message)
           } else {
-            val postSplit = x.split(2) 
+            val postSplit = x.split(2)
             if (postSplit.length == 1) {
-              logger.error("Failed to reach reasonable message size for event: %s".format(event))
-              left(StoreFailure("Failed insertion due to excessively large event(s)!"))
+              logger.error(
+                  "Failed to reach reasonable message size for event: %s"
+                    .format(event))
+              left(StoreFailure(
+                      "Failed insertion due to excessively large event(s)!"))
             } else {
               encodeAll(postSplit ::: xs, messages)
             }
@@ -102,14 +126,16 @@ class LocalKafkaEventStore(producer: Producer[String, Message], topic: String, m
     }
 
     val toSend = event.fold(
-      ingest => encodeAll(List(event), Vector.empty),
-      archive => right(List(codec.toMessage(archive))),
-      storeFile => encodeAll(List(event), Vector.empty)
+        ingest => encodeAll(List(event), Vector.empty),
+        archive => right(List(codec.toMessage(archive))),
+        storeFile => encodeAll(List(event), Vector.empty)
     )
 
     toSend traverse { kafkaMessages =>
       Future {
-        producer send { new ProducerData[String, Message](topic, kafkaMessages) }
+        producer send {
+          new ProducerData[String, Message](topic, kafkaMessages)
+        }
         PrecogUnit
       }
     }
@@ -117,7 +143,8 @@ class LocalKafkaEventStore(producer: Producer[String, Message], topic: String, m
 }
 
 object LocalKafkaEventStore {
-  def apply(config: Configuration)(implicit executor: ExecutionContext): Option[(EventStore[Future], Stoppable)] = {
+  def apply(config: Configuration)(implicit executor: ExecutionContext)
+    : Option[(EventStore[Future], Stoppable)] = {
     val localTopic = config[String]("topic")
     val maxMessageSize = config[Int]("broker.max_message_size", 1000000)
     val messagePadding = config[Int]("message_padding", 100)
@@ -132,9 +159,11 @@ object LocalKafkaEventStore {
       props
     }
 
-    val producer = new Producer[String, Message](new ProducerConfig(localProperties))
+    val producer =
+      new Producer[String, Message](new ProducerConfig(localProperties))
     val stoppable = Stoppable.fromFuture(Future { producer.close })
 
-    Some(new LocalKafkaEventStore(producer, localTopic, maxMessageSize, messagePadding) -> stoppable)
+    Some(new LocalKafkaEventStore(
+            producer, localTopic, maxMessageSize, messagePadding) -> stoppable)
   }
 }

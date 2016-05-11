@@ -17,27 +17,22 @@ object AnonFunOnListString {
   def a(l: List[String]) {
 
     l.foreach(noop(_))
-
   }
 
   def b(l: List[String]) {
 
     l.find(_.isEmpty)
-
   }
 
   def c(l: List[String]) {
 
     l.map(_.size)
-
   }
 
   def d(l: List[String]) {
 
     l.foldLeft(0)(_ + _.size)
-
   }
-
 }
 
 class AnonFunOnListString {}

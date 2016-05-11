@@ -2,20 +2,22 @@ package org.scalatra
 
 import java.io._
 
-import org.apache.http.impl.client.{ CloseableHttpClient, HttpClientBuilder }
+import org.apache.http.impl.client.{CloseableHttpClient, HttpClientBuilder}
 import org.scalatest._
 import org.scalatra.test.scalatest.ScalatraFunSuite
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * Test servlet using ContentEncodingSupport.
- */
-class ContentEncodingSupportTestServlet extends ScalatraServlet with ContentEncodingSupportAppBase {
+  * Test servlet using ContentEncodingSupport.
+  */
+class ContentEncodingSupportTestServlet
+    extends ScalatraServlet with ContentEncodingSupportAppBase {
   implicit protected def executor: ExecutionContext = ExecutionContext.global
 }
 
-trait ContentEncodingSupportAppBase extends ScalatraBase with FutureSupport with ContentEncodingSupport {
+trait ContentEncodingSupportAppBase
+    extends ScalatraBase with FutureSupport with ContentEncodingSupport {
   get("/") {
     Helper.body
   }
@@ -30,21 +32,26 @@ trait ContentEncodingSupportAppBase extends ScalatraBase with FutureSupport with
 }
 
 /** Test suite for `deflate`. */
-class DeflateSupportServletTest extends ContentEncodingSupportTest(ContentEncoding.Deflate) {
+class DeflateSupportServletTest
+    extends ContentEncodingSupportTest(ContentEncoding.Deflate) {
   mount(classOf[ContentEncodingSupportTestServlet], "/*")
 }
 
 /** Test suite for `gzip`. */
-class GZipSupportServletTest extends ContentEncodingSupportTest(ContentEncoding.GZip) {
+class GZipSupportServletTest
+    extends ContentEncodingSupportTest(ContentEncoding.GZip) {
   mount(classOf[ContentEncodingSupportTestServlet], "/*")
 }
 
 /** Abstract test suite, for any encoding. */
-abstract class ContentEncodingSupportTest(e: ContentEncoding) extends ScalatraFunSuite with Matchers {
+abstract class ContentEncodingSupportTest(e: ContentEncoding)
+    extends ScalatraFunSuite with Matchers {
   implicit val encoding = e
 
   test("should decode request if Content-Encoding is supported") {
-    post("/", Helper.compress(Helper.body), Map("Content-Encoding" -> encoding.name)) {
+    post("/",
+         Helper.compress(Helper.body),
+         Map("Content-Encoding" -> encoding.name)) {
       response.body should equal(Helper.body)
     }
   }
@@ -93,15 +100,16 @@ abstract class ContentEncodingSupportTest(e: ContentEncoding) extends ScalatraFu
 }
 
 /**
- * Helper object for usage by tests.
- */
+  * Helper object for usage by tests.
+  */
 private object Helper {
   val body = "this is the body"
 
   def compress(str: String)(implicit encoding: ContentEncoding): Array[Byte] = {
     val out = new ByteArrayOutputStream()
 
-    val zout = new BufferedWriter(new OutputStreamWriter(encoding.encode(out), "UTF-8"))
+    val zout = new BufferedWriter(
+        new OutputStreamWriter(encoding.encode(out), "UTF-8"))
     zout.write(str)
     zout.close()
 
@@ -109,15 +117,16 @@ private object Helper {
   }
 
   /**
-   * Uncompresses an array to a string with gzip.
-   */
-  def uncompress(bytes: Array[Byte])(implicit encoding: ContentEncoding): String = {
+    * Uncompresses an array to a string with gzip.
+    */
+  def uncompress(bytes: Array[Byte])(
+      implicit encoding: ContentEncoding): String = {
     convertStreamToString(encoding.decode(new ByteArrayInputStream(bytes)))
   }
 
   /**
-   * Returns a string with the content from the input stream.
-   */
+    * Returns a string with the content from the input stream.
+    */
   private def convertStreamToString(is: InputStream): String = {
     val scanner = new java.util.Scanner(is, "UTF-8").useDelimiter("\\A")
     if (scanner.hasNext) {

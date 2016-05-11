@@ -4,15 +4,15 @@
 
 package akka.http.impl.engine.ws
 
-import scala.concurrent.{ Promise, Future }
-import scala.util.{ Try, Failure, Success }
+import scala.concurrent.{Promise, Future}
+import scala.util.{Try, Failure, Success}
 
 import spray.json._
 
 import akka.actor.ActorSystem
 
 import akka.stream.ActorMaterializer
-import akka.stream.stage.{ TerminationDirective, Context, SyncDirective, PushStage }
+import akka.stream.stage.{TerminationDirective, Context, SyncDirective, PushStage}
 import akka.stream.scaladsl._
 
 import akka.http.scaladsl.Http
@@ -27,8 +27,7 @@ object WSClientAutobahnTest extends App {
   val Agent = "akka-http"
   val Parallelism = 4
 
-  val getCaseCountUri: Uri =
-    s"ws://localhost:9001/getCaseCount"
+  val getCaseCountUri: Uri = s"ws://localhost:9001/getCaseCount"
 
   def runCaseUri(caseIndex: Int, agent: String): Uri =
     s"ws://localhost:9001/runCase?case=$caseIndex&agent=$agent"
@@ -43,8 +42,9 @@ object WSClientAutobahnTest extends App {
     s"ws://localhost:9001/updateReports?agent=$agent"
 
   def runCase(caseIndex: Int, agent: String = Agent): Future[CaseStatus] =
-    runWs(runCaseUri(caseIndex, agent), echo).recover { case _ ⇒ () }.flatMap { _ ⇒
-      getCaseStatus(caseIndex, agent)
+    runWs(runCaseUri(caseIndex, agent), echo).recover { case _ ⇒ () }.flatMap {
+      _ ⇒
+        getCaseStatus(caseIndex, agent)
     }
 
   def richRunCase(caseIndex: Int, agent: String = Agent): Future[CaseResult] = {
@@ -56,7 +56,8 @@ object WSClientAutobahnTest extends App {
     }
     import Console._
     info.flatMap { i ⇒
-      val prefix = f"$YELLOW${i.caseInfo.id}%-7s$RESET - $RESET${i.caseInfo.description}$RESET ... "
+      val prefix =
+        f"$YELLOW${i.caseInfo.id}%-7s$RESET - $RESET${i.caseInfo.description}$RESET ... "
 
       status.onComplete {
         case Success((CaseStatus(status), millis)) ⇒
@@ -74,7 +75,8 @@ object WSClientAutobahnTest extends App {
     runToSingleText(getCaseCountUri).map(_.toInt)
 
   def getCaseInfo(caseId: Int): Future[IndexedCaseInfo] =
-    runToSingleJsonValue[CaseInfo](getCaseInfoUri(caseId)).map(IndexedCaseInfo(caseId, _))
+    runToSingleJsonValue[CaseInfo](getCaseInfoUri(caseId))
+      .map(IndexedCaseInfo(caseId, _))
 
   def getCaseStatus(caseId: Int, agent: String = Agent): Future[CaseStatus] =
     runToSingleJsonValue[CaseStatus](getCaseStatusUri(caseId, agent))
@@ -83,15 +85,16 @@ object WSClientAutobahnTest extends App {
     runToSingleText(updateReportsUri(agent)).map(_ ⇒ ())
 
   /**
-   * Map from textual case ID (like 1.1.1) to IndexedCaseInfo
-   * @return
-   */
+    * Map from textual case ID (like 1.1.1) to IndexedCaseInfo
+    * @return
+    */
   def getCaseMap(): Future[Map[String, IndexedCaseInfo]] = {
-    val res =
-      getCaseCount().flatMap { count ⇒
-        println(s"Retrieving case info for $count cases...")
-        Future.traverse(1 to count)(getCaseInfo).map(_.map(e ⇒ e.caseInfo.id -> e).toMap)
-      }
+    val res = getCaseCount().flatMap { count ⇒
+      println(s"Retrieving case info for $count cases...")
+      Future
+        .traverse(1 to count)(getCaseInfo)
+        .map(_.map(e ⇒ e.caseInfo.id -> e).toMap)
+    }
     res.foreach { res ⇒
       println(s"Received info for ${res.size} cases")
     }
@@ -121,10 +124,12 @@ object WSClientAutobahnTest extends App {
     println("Running complete test suite")
     getCaseCount().flatMap { count ⇒
       println(s"Found $count tests.")
-      Source(1 to count).mapAsyncUnordered(Parallelism)(richRunCase(_)).grouped(count).runWith(Sink.head)
+      Source(1 to count)
+        .mapAsyncUnordered(Parallelism)(richRunCase(_))
+        .grouped(count)
+        .runWith(Sink.head)
     }.map { results ⇒
-      val grouped =
-        results.groupBy(_.status.behavior)
+      val grouped = results.groupBy(_.status.behavior)
 
       println(s"${results.size} tests run.")
       println()
@@ -136,13 +141,15 @@ object WSClientAutobahnTest extends App {
       println()
       println("Not OK tests: ")
       println()
-      results.filterNot(_.status.behavior == "OK").foreach { r ⇒
-        println(f"$RED${r.status.behavior}%-20s$RESET $YELLOW${r.info.id}%-7s$RESET - $RESET${r.info.description}")
-      }
+      results
+        .filterNot(_.status.behavior == "OK")
+        .foreach { r ⇒
+          println(
+              f"$RED${r.status.behavior}%-20s$RESET $YELLOW${r.info.id}%-7s$RESET - $RESET${r.info.description}")
+        }
 
-      ()
-    }
-      .onComplete(completion)
+        ()
+    }.onComplete(completion)
   }
 
   def completion[T]: Try[T] ⇒ Unit = {
@@ -156,7 +163,8 @@ object WSClientAutobahnTest extends App {
   }
   def updateReportsAndShutdown(): Unit =
     updateReports().onComplete { res ⇒
-      println("Reports should now be accessible at http://localhost:8080/cwd/reports/clients/index.html")
+      println(
+          "Reports should now be accessible at http://localhost:8080/cwd/reports/clients/index.html")
       system.terminate()
     }
 
@@ -170,40 +178,44 @@ object WSClientAutobahnTest extends App {
   def completionSignal[T]: Flow[T, T, Future[Unit]] =
     Flow[T].transformMaterializing { () ⇒
       val p = Promise[Unit]()
-      val stage =
-        new PushStage[T, T] {
-          def onPush(elem: T, ctx: Context[T]): SyncDirective = ctx.push(elem)
-          override def onUpstreamFinish(ctx: Context[T]): TerminationDirective = {
-            p.success(())
-            super.onUpstreamFinish(ctx)
-          }
-          override def onDownstreamFinish(ctx: Context[T]): TerminationDirective = {
-            p.success(()) // should this be failure as well?
-            super.onDownstreamFinish(ctx)
-          }
-          override def onUpstreamFailure(cause: Throwable, ctx: Context[T]): TerminationDirective = {
-            p.failure(cause)
-            super.onUpstreamFailure(cause, ctx)
-          }
+      val stage = new PushStage[T, T] {
+        def onPush(elem: T, ctx: Context[T]): SyncDirective = ctx.push(elem)
+        override def onUpstreamFinish(ctx: Context[T]): TerminationDirective = {
+          p.success(())
+          super.onUpstreamFinish(ctx)
         }
+        override def onDownstreamFinish(
+            ctx: Context[T]): TerminationDirective = {
+          p.success(()) // should this be failure as well?
+          super.onDownstreamFinish(ctx)
+        }
+        override def onUpstreamFailure(
+            cause: Throwable, ctx: Context[T]): TerminationDirective = {
+          p.failure(cause)
+          super.onUpstreamFailure(cause, ctx)
+        }
+      }
 
       (stage, p.future)
     }
 
   /**
-   * The autobahn tests define a weird API where every request must be a WebSocket request and
-   * they will send a single websocket message with the result. WebSocket everywhere? Strange,
-   * but somewhat consistent.
-   */
+    * The autobahn tests define a weird API where every request must be a WebSocket request and
+    * they will send a single websocket message with the result. WebSocket everywhere? Strange,
+    * but somewhat consistent.
+    */
   def runToSingleText(uri: Uri): Future[String] = {
     val sink = Sink.head[Message]
-    runWs(uri, Flow.fromSinkAndSourceMat(sink, Source.maybe[Message])(Keep.left)).flatMap {
+    runWs(
+        uri,
+        Flow.fromSinkAndSourceMat(sink, Source.maybe[Message])(Keep.left)).flatMap {
       case tm: TextMessage ⇒ tm.textStream.runWith(Sink.fold("")(_ + _))
       case other ⇒
-        throw new IllegalStateException(s"unexpected element of type ${other.getClass}")
+        throw new IllegalStateException(
+            s"unexpected element of type ${other.getClass}")
     }
   }
-  def runToSingleJsonValue[T: JsonReader](uri: Uri): Future[T] =
+  def runToSingleJsonValue[T : JsonReader](uri: Uri): Future[T] =
     runToSingleText(uri).map(_.parseJson.convertTo[T])
 
   case class IndexedCaseInfo(index: Int, caseInfo: CaseInfo)
@@ -215,13 +227,15 @@ object WSClientAutobahnTest extends App {
   }
   object CaseStatus {
     import DefaultJsonProtocol._
-    implicit def caseStatusFormat: JsonFormat[CaseStatus] = jsonFormat1(CaseStatus.apply)
+    implicit def caseStatusFormat: JsonFormat[CaseStatus] =
+      jsonFormat1(CaseStatus.apply)
   }
 
   // {"id": "1.1.1", "description": "Send text message with payload 0."}
   case class CaseInfo(id: String, description: String)
   object CaseInfo {
     import DefaultJsonProtocol._
-    implicit def caseInfoFormat: JsonFormat[CaseInfo] = jsonFormat2(CaseInfo.apply)
+    implicit def caseInfoFormat: JsonFormat[CaseInfo] =
+      jsonFormat2(CaseInfo.apply)
   }
 }

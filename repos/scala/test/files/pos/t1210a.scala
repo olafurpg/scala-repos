@@ -4,7 +4,7 @@ trait OO {
   abstract class Test { self =>
     type T
 
-    val v: Test {type T = self.T} = self.v.v
+    val v: Test { type T = self.T } = self.v.v
   }
 }
 

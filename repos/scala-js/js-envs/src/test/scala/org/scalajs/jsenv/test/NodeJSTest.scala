@@ -13,11 +13,11 @@ class NodeJSTest extends TimeoutComTests {
   @Test
   def percentageTest: Unit = {
     val counts = 1 to 15
-    val argcs  = 1 to 3
+    val argcs = 1 to 3
     val strings = counts.map("%" * _)
 
     val strlists = for {
-      count  <- argcs
+      count <- argcs
       string <- strings
     } yield List.fill(count)(string)
 
@@ -43,8 +43,7 @@ class NodeJSTest extends TimeoutComTests {
     console.log(null);
     console.log({});
     console.log([1,2]);
-    """ hasOutput
-    """|1
+    """ hasOutput """|1
        |undefined
        |null
        |[object Object]
@@ -66,14 +65,11 @@ class NodeJSTest extends TimeoutComTests {
 
     start(com)
 
-    for (_ <- 1 to n)
-      com.send("ping")
+    for (_ <- 1 to n) com.send("ping")
 
-    for (_ <- 1 to n)
-      assertEquals(com.receive(), "pong: ping")
+    for (_ <- 1 to n) assertEquals(com.receive(), "pong: ping")
 
     com.close()
     com.await(DefaultTimeout)
   }
-
 }

@@ -1,26 +1,25 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.api
 
 import java.io.{File}
 import javax.security.auth.login.Configuration
 
-import kafka.utils.{JaasTestUtils,TestUtils}
+import kafka.utils.{JaasTestUtils, TestUtils}
 import org.apache.hadoop.minikdc.MiniKdc
 import org.apache.kafka.common.security.JaasUtils
 import org.apache.kafka.common.security.kerberos.LoginManager
@@ -39,7 +38,8 @@ case object Both extends SaslSetupMode
  * currently to setup a keytab and jaas files.
  */
 trait SaslSetup {
-  private val workDir = new File(System.getProperty("test.dir", "build/tmp/test-workDir"))
+  private val workDir = new File(
+      System.getProperty("test.dir", "build/tmp/test-workDir"))
   private val kdcConf = MiniKdc.createConf()
   private val kdc = new MiniKdc(kdcConf, workDir)
 
@@ -50,14 +50,17 @@ trait SaslSetup {
     kdc.start()
     kdc.createPrincipal(keytabFile, "client", "kafka/localhost")
     if (mode == Both || mode == ZkSasl)
-      System.setProperty("zookeeper.authProvider.1", "org.apache.zookeeper.server.auth.SASLAuthenticationProvider")
+      System.setProperty(
+          "zookeeper.authProvider.1",
+          "org.apache.zookeeper.server.auth.SASLAuthenticationProvider")
   }
 
   protected def createKeytabAndSetConfiguration(mode: SaslSetupMode): File = {
     val (keytabFile, jaasFile) = createKeytabAndJaasFiles(mode)
     // This will cause a reload of the Configuration singleton when `getConfiguration` is called
     Configuration.setConfiguration(null)
-    System.setProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM, jaasFile.getAbsolutePath)
+    System.setProperty(
+        JaasUtils.JAVA_LOGIN_CONFIG_PARAM, jaasFile.getAbsolutePath)
     keytabFile
   }
 

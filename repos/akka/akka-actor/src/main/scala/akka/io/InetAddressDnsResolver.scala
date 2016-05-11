@@ -1,6 +1,6 @@
 package akka.io
 
-import java.net.{ UnknownHostException, InetAddress }
+import java.net.{UnknownHostException, InetAddress}
 import java.util.concurrent.TimeUnit
 
 import akka.actor.Actor
@@ -8,7 +8,8 @@ import com.typesafe.config.Config
 
 import scala.collection.immutable
 
-class InetAddressDnsResolver(cache: SimpleDnsCache, config: Config) extends Actor {
+class InetAddressDnsResolver(cache: SimpleDnsCache, config: Config)
+    extends Actor {
   val positiveTtl = config.getDuration("positive-ttl", TimeUnit.MILLISECONDS)
   val negativeTtl = config.getDuration("negative-ttl", TimeUnit.MILLISECONDS)
 
@@ -23,7 +24,8 @@ class InetAddressDnsResolver(cache: SimpleDnsCache, config: Config) extends Acto
             answer
           } catch {
             case e: UnknownHostException ⇒
-              val answer = Dns.Resolved(name, immutable.Seq.empty, immutable.Seq.empty)
+              val answer =
+                Dns.Resolved(name, immutable.Seq.empty, immutable.Seq.empty)
               cache.put(answer, negativeTtl)
               answer
           }

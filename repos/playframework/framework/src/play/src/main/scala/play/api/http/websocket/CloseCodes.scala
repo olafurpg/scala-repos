@@ -4,8 +4,8 @@
 package play.api.http.websocket
 
 /**
- * WebSocket close codes
- */
+  * WebSocket close codes
+  */
 object CloseCodes {
   val Regular = 1000
   val GoingAway = 1001

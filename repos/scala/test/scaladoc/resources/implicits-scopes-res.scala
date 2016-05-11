@@ -1,6 +1,6 @@
 /**
- *  Testing scaladoc implicit scopes - looking for implicits in the right places
- */
+  *  Testing scaladoc implicit scopes - looking for implicits in the right places
+  */
 package scala.test.scaladoc.implicits.scopes
 import language.implicitConversions // according to SIP18
 

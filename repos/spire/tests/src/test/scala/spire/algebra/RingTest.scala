@@ -1,7 +1,6 @@
 package spire
 package algebra
 
-
 // scalatest
 import org.scalatest.FunSuite
 
@@ -16,12 +15,12 @@ import java.math.MathContext
 class RingTest extends FunSuite {
 
   /**
-   * We use this function to avoid duplicating our tests for all the different
-   * A's that we want to test. We expect the actual values to be:
-   *
-   *   a=-3  b=3  c=-9
-   */
-  def runWith[@sp A:Ring:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
+    * We use this function to avoid duplicating our tests for all the different
+    * A's that we want to test. We expect the actual values to be:
+    *
+    *   a=-3  b=3  c=-9
+    */
+  def runWith[@sp A : Ring : ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
 
     val m = implicitly[ClassTag[A]]
 
@@ -35,7 +34,7 @@ class RingTest extends FunSuite {
     //val cls = m.runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
-    def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
+    def runTest(name: String)(f: => Unit) = test("%s:%s" format (cls, name))(f)
 
     // Ring[A]'s zero
     val z: A = Ring[A].zero
@@ -78,28 +77,30 @@ class RingTest extends FunSuite {
   runWith[Rational]("Rational")(-3, 3, -9)
   // commented out due to specialization bug
   runWith[Complex[Double]]("Complex[Double]")(-3, 3, -9)
-  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")(Complex(BigDecimal(-3), BigDecimal(0)),
-                               Complex(BigDecimal(3), BigDecimal(0)),
-                               Complex(BigDecimal(-9), BigDecimal(0)))
+  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")(
+      Complex(BigDecimal(-3), BigDecimal(0)),
+      Complex(BigDecimal(3), BigDecimal(0)),
+      Complex(BigDecimal(-9), BigDecimal(0)))
   runWith[Jet[Double]]("Jet[Double]")(Jet(-3), Jet(3), Jet(-9))
-
 
   {
     class XRing extends Ring[String] {
-      def toX(n:Int) = if (n > 0) "x" * n else "-" + "x" * -n
-      def fromX(s:String) = if (s.startsWith("-")) -(s.length - 1) else s.length
+      def toX(n: Int) = if (n > 0) "x" * n else "-" + "x" * -n
+      def fromX(s: String) =
+        if (s.startsWith("-")) -(s.length - 1) else s.length
 
-      private def unop(s:String)(f:Int => Int):String = toX(f(fromX(s)))
-      private def binop(s1:String, s2:String)(f:(Int, Int) => Int):String = toX(f(fromX(s1), fromX(s2)))
+      private def unop(s: String)(f: Int => Int): String = toX(f(fromX(s)))
+      private def binop(s1: String, s2: String)(f: (Int, Int) => Int): String =
+        toX(f(fromX(s1), fromX(s2)))
 
-      def negate(a:String) = unop(a)(-_)
+      def negate(a: String) = unop(a)(-_)
       def one = "x"
-      def plus(a:String, b:String) = binop(a, b)(_ + _)
-      def times(a:String, b:String) = binop(a, b)(_ * _)
+      def plus(a: String, b: String) = binop(a, b)(_ + _)
+      def times(a: String, b: String) = binop(a, b)(_ * _)
       def zero = ""
     }
 
-    def x(n:Int) = xIsRing.fromInt(n)
+    def x(n: Int) = xIsRing.fromInt(n)
 
     implicit object xIsRing extends XRing
 

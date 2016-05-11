@@ -9,9 +9,11 @@ import com.intellij.openapi.components.StorageScheme
 import scala.xml.Elem
 
 /**
- * @author Pavel Fatin
- */
-class ScalaCompilerConfiguration(defaultSettings: ScalaCompilerSettings, profiles: Seq[ScalaCompilerSettingsProfile]) extends XmlConversion {
+  * @author Pavel Fatin
+  */
+class ScalaCompilerConfiguration(defaultSettings: ScalaCompilerSettings,
+                                 profiles: Seq[ScalaCompilerSettingsProfile])
+    extends XmlConversion {
   def createIn(context: ConversionContext): Option[File] = {
     val optionsElement = createOptionsElement()
 
@@ -24,9 +26,11 @@ class ScalaCompilerConfiguration(defaultSettings: ScalaCompilerSettings, profile
     }
   }
 
-  private def addDirectoryBasedOptions(options: Elem, context: ConversionContext): File = {
+  private def addDirectoryBasedOptions(
+      options: Elem, context: ConversionContext): File = {
     val base = Option(context.getSettingsBaseDir)
-            .getOrElse(throw new CannotConvertException("Only directory-based IDEA projects are supported"))
+      .getOrElse(throw new CannotConvertException(
+            "Only directory-based IDEA projects are supported"))
 
     val file = new File(base, "scala_compiler.xml")
     val componentElement = <project version="4"> {options} </project>
@@ -34,7 +38,8 @@ class ScalaCompilerConfiguration(defaultSettings: ScalaCompilerSettings, profile
     file
   }
 
-  private def addProjectBasedOptions(options: Elem, context: ConversionContext) {
+  private def addProjectBasedOptions(
+      options: Elem, context: ConversionContext) {
     val rootElement = context.getProjectSettings.getRootElement
     rootElement.addContent(asJava(options))
   }

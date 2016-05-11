@@ -31,32 +31,33 @@ class HoconColorSettingsPage extends ColorSettingsPage {
        |<braces>}</braces>
        |""".stripMargin.trim
 
-  def getAdditionalHighlightingTagToDescriptorMap = Map(
-    "badchar" -> HHC.BadCharacter,
-    "hashcomment" -> HHC.HashComment,
-    "doubleslashcomment" -> HHC.DoubleSlashComment,
-    "null" -> HHC.Null,
-    "boolean" -> HHC.Boolean,
-    "number" -> HHC.Number,
-    "quotedstring" -> HHC.QuotedString,
-    "multilinestring" -> HHC.MultilineString,
-    "validstringescape" -> HHC.ValidStringEscape,
-    "invalidstringescape" -> HHC.InvalidStringEscape,
-    "brackets" -> HHC.Brackets,
-    "braces" -> HHC.Braces,
-    "imparens" -> HHC.IncludeModifierParens,
-    "substbraces" -> HHC.SubBraces,
-    "pathvalueseparator" -> HHC.KeyValueSeparator,
-    "comma" -> HHC.Comma,
-    "include" -> HHC.Include,
-    "inclmod" -> HHC.IncludeModifier,
-    "substsign" -> HHC.SubstitutionSign,
-    "optsubstsign" -> HHC.OptionalSubstitutionSign,
-    "unquotedstring" -> HHC.UnquotedString,
-    "dot" -> HHC.PathSeparator,
-    "key" -> HHC.EntryKey,
-    "substkey" -> HHC.SubstitutionKey
-  ).asJava
+  def getAdditionalHighlightingTagToDescriptorMap =
+    Map(
+        "badchar" -> HHC.BadCharacter,
+        "hashcomment" -> HHC.HashComment,
+        "doubleslashcomment" -> HHC.DoubleSlashComment,
+        "null" -> HHC.Null,
+        "boolean" -> HHC.Boolean,
+        "number" -> HHC.Number,
+        "quotedstring" -> HHC.QuotedString,
+        "multilinestring" -> HHC.MultilineString,
+        "validstringescape" -> HHC.ValidStringEscape,
+        "invalidstringescape" -> HHC.InvalidStringEscape,
+        "brackets" -> HHC.Brackets,
+        "braces" -> HHC.Braces,
+        "imparens" -> HHC.IncludeModifierParens,
+        "substbraces" -> HHC.SubBraces,
+        "pathvalueseparator" -> HHC.KeyValueSeparator,
+        "comma" -> HHC.Comma,
+        "include" -> HHC.Include,
+        "inclmod" -> HHC.IncludeModifier,
+        "substsign" -> HHC.SubstitutionSign,
+        "optsubstsign" -> HHC.OptionalSubstitutionSign,
+        "unquotedstring" -> HHC.UnquotedString,
+        "dot" -> HHC.PathSeparator,
+        "key" -> HHC.EntryKey,
+        "substkey" -> HHC.SubstitutionKey
+    ).asJava
 
   def getHighlighter =
     SyntaxHighlighterFactory.getSyntaxHighlighter(HoconLanguage, null, null)
@@ -73,30 +74,30 @@ class HoconColorSettingsPage extends ColorSettingsPage {
 
 object HoconColorSettingsPage {
   final val Attrs = Array(
-    "Bad character" -> HHC.BadCharacter,
-    "Hash comment" -> HHC.HashComment,
-    "Double slash comment" -> HHC.DoubleSlashComment,
-    "Null" -> HHC.Null,
-    "Boolean" -> HHC.Boolean,
-    "Number" -> HHC.Number,
-    "Quoted string" -> HHC.QuotedString,
-    "Multiline string" -> HHC.MultilineString,
-    "Valid string escape" -> HHC.ValidStringEscape,
-    "Invalid string escape" -> HHC.InvalidStringEscape,
-    "Brackets" -> HHC.Brackets,
-    "Braces" -> HHC.Braces,
-    "Include modifier parens" -> HHC.IncludeModifierParens,
-    "Substitution braces" -> HHC.SubBraces,
-    "Path-value separator ('=', ':', '+=')" -> HHC.KeyValueSeparator,
-    "Comma" -> HHC.Comma,
-    "Include keyword" -> HHC.Include,
-    "Include modifier" -> HHC.IncludeModifier,
-    "Substitution sign" -> HHC.SubstitutionSign,
-    "Optional substitution sign" -> HHC.OptionalSubstitutionSign,
-    "Unquoted string" -> HHC.UnquotedString,
-    "Path separator" -> HHC.PathSeparator,
-    "Key" -> HHC.EntryKey,
-    "Key in substitution" -> HHC.SubstitutionKey
+      "Bad character" -> HHC.BadCharacter,
+      "Hash comment" -> HHC.HashComment,
+      "Double slash comment" -> HHC.DoubleSlashComment,
+      "Null" -> HHC.Null,
+      "Boolean" -> HHC.Boolean,
+      "Number" -> HHC.Number,
+      "Quoted string" -> HHC.QuotedString,
+      "Multiline string" -> HHC.MultilineString,
+      "Valid string escape" -> HHC.ValidStringEscape,
+      "Invalid string escape" -> HHC.InvalidStringEscape,
+      "Brackets" -> HHC.Brackets,
+      "Braces" -> HHC.Braces,
+      "Include modifier parens" -> HHC.IncludeModifierParens,
+      "Substitution braces" -> HHC.SubBraces,
+      "Path-value separator ('=', ':', '+=')" -> HHC.KeyValueSeparator,
+      "Comma" -> HHC.Comma,
+      "Include keyword" -> HHC.Include,
+      "Include modifier" -> HHC.IncludeModifier,
+      "Substitution sign" -> HHC.SubstitutionSign,
+      "Optional substitution sign" -> HHC.OptionalSubstitutionSign,
+      "Unquoted string" -> HHC.UnquotedString,
+      "Path separator" -> HHC.PathSeparator,
+      "Key" -> HHC.EntryKey,
+      "Key in substitution" -> HHC.SubstitutionKey
   ).map({
     case (displayName, key) => new AttributesDescriptor(displayName, key)
   })

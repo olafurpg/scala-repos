@@ -21,14 +21,13 @@ import org.apache.spark.annotation.Experimental
 import org.apache.spark.sql.execution.streaming.{Offset, Sink}
 
 /**
- * :: Experimental ::
- * Status and metrics of a streaming [[Sink]].
- *
- * @param description Description of the source corresponding to this status
- * @param offset      Current offset up to which data has been written by the sink
- * @since 2.0.0
- */
+  * :: Experimental ::
+  * Status and metrics of a streaming [[Sink]].
+  *
+  * @param description Description of the source corresponding to this status
+  * @param offset      Current offset up to which data has been written by the sink
+  * @since 2.0.0
+  */
 @Experimental
 class SinkStatus private[sql](
-    val description: String,
-    val offset: Option[Offset])
+    val description: String, val offset: Option[Offset])

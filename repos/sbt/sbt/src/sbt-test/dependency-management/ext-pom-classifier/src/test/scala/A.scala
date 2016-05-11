@@ -5,4 +5,3 @@ object Foo {
   // From test slf4j-api JAR
   val bp = new org.slf4j.helpers.BogoPerf
 }
-

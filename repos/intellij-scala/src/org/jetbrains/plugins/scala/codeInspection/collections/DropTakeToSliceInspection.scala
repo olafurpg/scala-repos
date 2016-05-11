@@ -6,23 +6,33 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class DropTakeToSliceInspection extends OperationOnCollectionInspection {
-  override def possibleSimplificationTypes: Array[SimplificationType] = Array(DropTakeToSlice)
+  override def possibleSimplificationTypes: Array[SimplificationType] =
+    Array(DropTakeToSlice)
 }
 
 object DropTakeToSlice extends SimplificationType {
-  override def hint: String = InspectionBundle.message("replace.drop.take.with.slice")
+  override def hint: String =
+    InspectionBundle.message("replace.drop.take.with.slice")
   val takeDropHint = InspectionBundle.message("replace.take.drop.with.slice")
 
-  override def getSimplification(expr: ScExpression): Option[Simplification] = expr match {
-    case qual`.drop`(m)`.take`(n) =>
-      Some(replace(expr).withText(invocationText(qual, "slice", m, sum(m, n))).highlightFrom(qual))
-    case qual`.take`(n)`.drop`(m) =>
-      Some(replace(expr).withText(invocationText(qual, "slice", m, n)).highlightFrom(qual).withHint(takeDropHint))
-    case _ => None
-  }
+  override def getSimplification(expr: ScExpression): Option[Simplification] =
+    expr match {
+      case qual `.drop` (m) `.take` (n) =>
+        Some(
+            replace(expr)
+              .withText(invocationText(qual, "slice", m, sum(m, n)))
+              .highlightFrom(qual))
+      case qual `.take` (n) `.drop` (m) =>
+        Some(
+            replace(expr)
+              .withText(invocationText(qual, "slice", m, n))
+              .highlightFrom(qual)
+              .withHint(takeDropHint))
+      case _ => None
+    }
 
   private def sum(left: ScExpression, right: ScExpression): ScExpression = {
     val sumText = (left, right) match {

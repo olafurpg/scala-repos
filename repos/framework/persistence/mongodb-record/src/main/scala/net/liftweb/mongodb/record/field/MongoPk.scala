@@ -35,14 +35,13 @@ import net.liftweb.record.field.{IntField, LongField, StringField}
  */
 trait MongoPk[PkType] {
   def id: PkType
+
   /** Override this to set default value of id field */
   def defaultIdValue: Any
 }
 
 trait ObjectIdPk[OwnerType <: MongoRecord[OwnerType]]
-  extends MongoPk[ObjectIdField[OwnerType]]
-{
-  self: OwnerType =>
+    extends MongoPk[ObjectIdField[OwnerType]] { self: OwnerType =>
 
   def defaultIdValue = ObjectId.get
 
@@ -54,9 +53,7 @@ trait ObjectIdPk[OwnerType <: MongoRecord[OwnerType]]
 }
 
 trait UUIDPk[OwnerType <: MongoRecord[OwnerType]]
-  extends MongoPk[UUIDField[OwnerType]]
-{
-  self: OwnerType =>
+    extends MongoPk[UUIDField[OwnerType]] { self: OwnerType =>
 
   def defaultIdValue = UUID.randomUUID
 
@@ -68,9 +65,7 @@ trait UUIDPk[OwnerType <: MongoRecord[OwnerType]]
 }
 
 trait StringPk[OwnerType <: MongoRecord[OwnerType]]
-  extends MongoPk[StringField[OwnerType]]
-{
-  self: OwnerType =>
+    extends MongoPk[StringField[OwnerType]] { self: OwnerType =>
 
   def defaultIdValue = StringHelpers.randomString(32)
 
@@ -82,9 +77,7 @@ trait StringPk[OwnerType <: MongoRecord[OwnerType]]
 }
 
 trait IntPk[OwnerType <: MongoRecord[OwnerType]]
-  extends MongoPk[IntField[OwnerType]]
-{
-  self: OwnerType =>
+    extends MongoPk[IntField[OwnerType]] { self: OwnerType =>
 
   def defaultIdValue = Random.nextInt
 
@@ -96,9 +89,7 @@ trait IntPk[OwnerType <: MongoRecord[OwnerType]]
 }
 
 trait LongPk[OwnerType <: MongoRecord[OwnerType]]
-  extends MongoPk[LongField[OwnerType]]
-{
-  self: OwnerType =>
+    extends MongoPk[LongField[OwnerType]] { self: OwnerType =>
 
   def defaultIdValue = Random.nextLong
 

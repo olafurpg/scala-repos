@@ -56,5 +56,4 @@ class HakkerTracker extends PersistentActor {
     case GetEatingCount(name) =>
       sender() ! EatingCount(name, 17)
   }
-
 }

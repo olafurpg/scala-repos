@@ -36,17 +36,17 @@ import scalafx.scene.control.Spinner
 import scalafx.scene.layout.{HBox, VBox}
 
 /**
- * A sample that demonstrates the Spinner control.
- */
+  * A sample that demonstrates the Spinner control.
+  */
 object SpinnersDemo extends JFXApp {
 
   val styles = Seq(
-    "spinner", // defaults to arrows on right stacked vertically
-    Spinner.StyleClassArrowsOnRightHorizontal,
-    Spinner.StyleClassArrowsOnLeftVertical,
-    Spinner.StyleClassArrowsOnLeftHorizontal,
-    Spinner.StyleClassSplitArrowsVertical,
-    Spinner.StyleClassSplitArrowsHorizontal
+      "spinner", // defaults to arrows on right stacked vertically
+      Spinner.StyleClassArrowsOnRightHorizontal,
+      Spinner.StyleClassArrowsOnLeftVertical,
+      Spinner.StyleClassArrowsOnLeftHorizontal,
+      Spinner.StyleClassSplitArrowsVertical,
+      Spinner.StyleClassSplitArrowsHorizontal
   )
 
   val intSpinners = for (s <- styles) yield
@@ -72,9 +72,9 @@ object SpinnersDemo extends JFXApp {
     scene = new Scene {
       content = new VBox(30) {
         children = Seq(
-          new HBox(30, intSpinners: _*),
-          new HBox(30, doubleSpinners: _*),
-          new HBox(30, stringSpinners: _*)
+            new HBox(30, intSpinners: _*),
+            new HBox(30, doubleSpinners: _*),
+            new HBox(30, stringSpinners: _*)
         )
         padding = Insets(24)
       }

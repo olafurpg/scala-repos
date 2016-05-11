@@ -32,22 +32,25 @@ trait PerformanceSpec extends ExamplesFactory {
   def perform(iterations: Int, time: Long)(test: => Any): Result = {
     def batchTest(iterations: Int) = {
       var cnt = 0
-      while(cnt < iterations) {
-        test 
+      while (cnt < iterations) {
+        test
         cnt += 1
       }
     }
     performBatch(iterations, time)(batchTest _)
   }
 
-  def performBatch(iterations: Int, time: Long)(batchTest: Int => Any): Result = {
+  def performBatch(iterations: Int, time: Long)(
+      batchTest: Int => Any): Result = {
     test("warmup", batchTest(iterations))
     val testTime = test("measure", batchTest(iterations))
     val millis = testTime / 1000000
-    if(millis <= time) {
-      new Success("Nailed it! %.02f%% of %d".format( millis * 100.0 / time, time))
+    if (millis <= time) {
+      new Success(
+          "Nailed it! %.02f%% of %d".format(millis * 100.0 / time, time))
     } else {
-      new Failure("Wiff! %.02f times goal of %d".format( millis.toDouble / time, time))
+      new Failure(
+          "Wiff! %.02f times goal of %d".format(millis.toDouble / time, time))
     }
   }
 
@@ -57,8 +60,8 @@ trait PerformanceSpec extends ExamplesFactory {
     System.nanoTime - start
   }
 
-  def newTempDir(): File = IOUtils.createTmpDir("preformance_test").unsafePerformIO
+  def newTempDir(): File =
+    IOUtils.createTmpDir("preformance_test").unsafePerformIO
 
   def cleanupTempDir(dir: File) = IOUtils.recursiveDelete(dir).unsafePerformIO
-
 }

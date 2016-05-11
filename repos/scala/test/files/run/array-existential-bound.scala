@@ -3,10 +3,10 @@ trait Fooz[Q <: Array[_]] {
 }
 
 object Test extends Fooz[Array[Int]] {
-  val f1 = new Fooz[Array[String]] { }
-  val f2 = new Fooz[Array[Int]] { }
-  val f3 = new Fooz[Array[Any]] { }
-  val f4 = new Fooz[Array[_]] { }
+  val f1 = new Fooz[Array[String]] {}
+  val f2 = new Fooz[Array[Int]] {}
+  val f3 = new Fooz[Array[Any]] {}
+  val f4 = new Fooz[Array[_]] {}
 
   def main(args: Array[String]): Unit = {
     println(f1.f0(Array[String]("a", "b")))

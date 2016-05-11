@@ -32,7 +32,5 @@ class JSExportASTTest extends JSASTTest {
     }
 
     assertEquals("Only define the property `foo` once", props, 1)
-
   }
-
 }

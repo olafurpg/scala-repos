@@ -1,11 +1,12 @@
 package mesosphere.marathon.core.leadership
 
-import akka.actor.{ ActorRef, ActorRefFactory, Props }
+import akka.actor.{ActorRef, ActorRefFactory, Props}
 import com.twitter.common.zookeeper.ZooKeeperClient
 import mesosphere.marathon.LeadershipAbdication
 import mesosphere.marathon.core.leadership.impl._
 
 trait LeadershipModule {
+
   /**
     * Create a wrapper around an actor which should only be active if this instance of Marathon is the
     * current leader instance. The wrapper starts the actor with the given props when appropriate and stops
@@ -21,7 +22,9 @@ trait LeadershipModule {
 }
 
 object LeadershipModule {
-  def apply(actorRefFactory: ActorRefFactory, zk: ZooKeeperClient, leader: LeadershipAbdication): LeadershipModule = {
+  def apply(actorRefFactory: ActorRefFactory,
+            zk: ZooKeeperClient,
+            leader: LeadershipAbdication): LeadershipModule = {
     new LeadershipModuleImpl(actorRefFactory, zk, leader)
   }
 }
@@ -34,7 +37,10 @@ object LeadershipModule {
   * The leadership election logic needs to call the appropriate methods for this module to work.
   */
 private[leadership] class LeadershipModuleImpl(
-    actorRefFactory: ActorRefFactory, zk: ZooKeeperClient, leader: LeadershipAbdication) extends LeadershipModule {
+    actorRefFactory: ActorRefFactory,
+    zk: ZooKeeperClient,
+    leader: LeadershipAbdication)
+    extends LeadershipModule {
 
   private[this] var whenLeaderRefs = Set.empty[ActorRef]
   private[this] var started: Boolean = false
@@ -61,5 +67,6 @@ private[leadership] class LeadershipModuleImpl(
   /**
     * Register this actor by default.
     */
-  startWhenLeader(AbdicateOnConnectionLossActor.props(zk, leader), "AbdicateOnConnectionLoss")
+  startWhenLeader(AbdicateOnConnectionLossActor.props(zk, leader),
+                  "AbdicateOnConnectionLoss")
 }

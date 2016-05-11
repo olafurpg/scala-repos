@@ -1,8 +1,7 @@
 package scala.reflect.macros
 package contexts
 
-trait Names {
-  self: Context =>
+trait Names { self: Context =>
 
   import global._
 

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import com.typesafe.config.ConfigFactory
@@ -33,12 +33,13 @@ object SurviveNetworkInstabilityMultiJvmSpec extends MultiNodeConfig {
   val seventh = role("seventh")
   val eighth = role("eighth")
 
-  commonConfig(debugConfig(on = false).withFallback(
-    ConfigFactory.parseString("""
+  commonConfig(
+      debugConfig(on = false)
+        .withFallback(ConfigFactory.parseString("""
       akka.remote.system-message-buffer-size=100
       akka.remote.netty.tcp.connection-timeout = 10s
-      """)).
-    withFallback(MultiNodeClusterSpec.clusterConfig))
+      """))
+        .withFallback(MultiNodeClusterSpec.clusterConfig))
 
   testTransport(on = true)
 
@@ -64,22 +65,30 @@ object SurviveNetworkInstabilityMultiJvmSpec extends MultiNodeConfig {
     }
   }
 
-  class SimulatedException extends RuntimeException("Simulated") with NoStackTrace
+  class SimulatedException
+      extends RuntimeException("Simulated") with NoStackTrace
 }
 
-class SurviveNetworkInstabilityMultiJvmNode1 extends SurviveNetworkInstabilitySpec
-class SurviveNetworkInstabilityMultiJvmNode2 extends SurviveNetworkInstabilitySpec
-class SurviveNetworkInstabilityMultiJvmNode3 extends SurviveNetworkInstabilitySpec
-class SurviveNetworkInstabilityMultiJvmNode4 extends SurviveNetworkInstabilitySpec
-class SurviveNetworkInstabilityMultiJvmNode5 extends SurviveNetworkInstabilitySpec
-class SurviveNetworkInstabilityMultiJvmNode6 extends SurviveNetworkInstabilitySpec
-class SurviveNetworkInstabilityMultiJvmNode7 extends SurviveNetworkInstabilitySpec
-class SurviveNetworkInstabilityMultiJvmNode8 extends SurviveNetworkInstabilitySpec
+class SurviveNetworkInstabilityMultiJvmNode1
+    extends SurviveNetworkInstabilitySpec
+class SurviveNetworkInstabilityMultiJvmNode2
+    extends SurviveNetworkInstabilitySpec
+class SurviveNetworkInstabilityMultiJvmNode3
+    extends SurviveNetworkInstabilitySpec
+class SurviveNetworkInstabilityMultiJvmNode4
+    extends SurviveNetworkInstabilitySpec
+class SurviveNetworkInstabilityMultiJvmNode5
+    extends SurviveNetworkInstabilitySpec
+class SurviveNetworkInstabilityMultiJvmNode6
+    extends SurviveNetworkInstabilitySpec
+class SurviveNetworkInstabilityMultiJvmNode7
+    extends SurviveNetworkInstabilitySpec
+class SurviveNetworkInstabilityMultiJvmNode8
+    extends SurviveNetworkInstabilitySpec
 
 abstract class SurviveNetworkInstabilitySpec
-  extends MultiNodeSpec(SurviveNetworkInstabilityMultiJvmSpec)
-  with MultiNodeClusterSpec
-  with ImplicitSender {
+    extends MultiNodeSpec(SurviveNetworkInstabilityMultiJvmSpec)
+    with MultiNodeClusterSpec with ImplicitSender {
 
   import SurviveNetworkInstabilityMultiJvmSpec._
 
@@ -90,7 +99,8 @@ abstract class SurviveNetworkInstabilitySpec
 
   def assertUnreachable(subjects: RoleName*): Unit = {
     val expected = subjects.toSet map address
-    awaitAssert(clusterView.unreachableMembers.map(_.address) should ===(expected))
+    awaitAssert(
+        clusterView.unreachableMembers.map(_.address) should ===(expected))
   }
 
   system.actorOf(Props[Echo], "echo")
@@ -153,7 +163,8 @@ abstract class SurviveNetworkInstabilitySpec
       assertCanTalk(first, second, third, fourth, fifth)
     }
 
-    "heal after one isolated node" taggedAs LongRunningTest in within(45.seconds) {
+    "heal after one isolated node" taggedAs LongRunningTest in within(
+        45.seconds) {
       val others = Vector(second, third, fourth, fifth)
       runOn(first) {
         for (other ← others) {
@@ -207,7 +218,8 @@ abstract class SurviveNetworkInstabilitySpec
       assertCanTalk((island1 ++ island2): _*)
     }
 
-    "heal after unreachable when ring is changed" taggedAs LongRunningTest in within(60.seconds) {
+    "heal after unreachable when ring is changed" taggedAs LongRunningTest in within(
+        60.seconds) {
       val joining = Vector(sixth, seventh)
       val others = Vector(second, third, fourth, fifth)
       runOn(first) {
@@ -252,7 +264,8 @@ abstract class SurviveNetworkInstabilitySpec
       assertCanTalk((joining ++ others :+ first): _*)
     }
 
-    "down and remove quarantined node" taggedAs LongRunningTest in within(60.seconds) {
+    "down and remove quarantined node" taggedAs LongRunningTest in within(
+        60.seconds) {
       val others = Vector(first, third, fourth, fifth, sixth, seventh)
 
       runOn(third) {
@@ -264,9 +277,14 @@ abstract class SurviveNetworkInstabilitySpec
       enterBarrier("watcher-created")
 
       runOn(second) {
-        val sysMsgBufferSize = system.asInstanceOf[ExtendedActorSystem].provider.asInstanceOf[RemoteActorRefProvider].
-          remoteSettings.SysMsgBufferSize
-        val refs = Vector.fill(sysMsgBufferSize + 1)(system.actorOf(Props[Echo])).toSet
+        val sysMsgBufferSize = system
+          .asInstanceOf[ExtendedActorSystem]
+          .provider
+          .asInstanceOf[RemoteActorRefProvider]
+          .remoteSettings
+          .SysMsgBufferSize
+        val refs =
+          Vector.fill(sysMsgBufferSize + 1)(system.actorOf(Props[Echo])).toSet
         system.actorSelection(node(third) / "user" / "watcher") ! Targets(refs)
         expectMsg(TargetsRegistered)
       }
@@ -274,8 +292,9 @@ abstract class SurviveNetworkInstabilitySpec
       enterBarrier("targets-registered")
 
       runOn(first) {
-        for (role ← others)
-          testConductor.blackhole(role, second, Direction.Both).await
+        for (role ← others) testConductor
+          .blackhole(role, second, Direction.Both)
+          .await
       }
       enterBarrier("blackhole-6")
 
@@ -292,14 +311,16 @@ abstract class SurviveNetworkInstabilitySpec
 
       runOn(others: _*) {
         // second should be removed because of quarantine
-        awaitAssert(clusterView.members.map(_.address) should not contain (address(second)))
+        awaitAssert(clusterView.members.map(_.address) should not contain
+            (address(second)))
       }
 
       enterBarrier("after-6")
       assertCanTalk(others: _*)
     }
 
-    "continue and move Joining to Up after downing of one half" taggedAs LongRunningTest in within(60.seconds) {
+    "continue and move Joining to Up after downing of one half" taggedAs LongRunningTest in within(
+        60.seconds) {
       // note that second is already removed in previous step
       val side1 = Vector(first, third, fourth)
       val side1AfterJoin = side1 :+ eighth
@@ -331,8 +352,9 @@ abstract class SurviveNetworkInstabilitySpec
         // side2 removed
         val expected = (side1AfterJoin map address).toSet
         awaitAssert(clusterView.members.map(_.address) should ===(expected))
-        awaitAssert(clusterView.members.collectFirst { case m if m.address == address(eighth) ⇒ m.status } should ===(
-          Some(MemberStatus.Up)))
+        awaitAssert(clusterView.members.collectFirst {
+          case m if m.address == address(eighth) ⇒ m.status
+        } should ===(Some(MemberStatus.Up)))
       }
 
       enterBarrier("side2-removed")
@@ -361,7 +383,5 @@ abstract class SurviveNetworkInstabilitySpec
       enterBarrier("after-7")
       assertCanTalk((side1AfterJoin): _*)
     }
-
   }
-
 }

@@ -10,9 +10,9 @@ import ExecutionContext.Implicits.global
 
 object index extends Results {
 
-  def apply(input:String) : Future[Result] = {
+  def apply(input: String): Future[Result] = {
     Future(
-      Ok("Hello Coco") as("text/html")
+        Ok("Hello Coco") as ("text/html")
     )
   }
 }

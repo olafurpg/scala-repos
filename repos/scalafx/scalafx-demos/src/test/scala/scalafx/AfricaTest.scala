@@ -44,4 +44,3 @@ class AfricaTest extends WordSpec {
     }
   }
 }
-

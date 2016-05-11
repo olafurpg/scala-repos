@@ -24,7 +24,7 @@ trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase {
 
   def addFeatureSpec() {
     addFileToProject(className + ".scala",
-      """
+                     """
         |import org.scalatest._
         |
         |class FeatureSpecViewTest extends FeatureSpec {
@@ -38,16 +38,19 @@ trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase {
         |   scenario("ignored_inner") {}
         | }
         |}
-      """.stripMargin.trim()
-    )
+      """.stripMargin.trim())
   }
 
-  def testFeatureSpecNormal(): Unit = runTest("scenario(\"child1\")", Some("feature(\"parent\")"))
+  def testFeatureSpecNormal(): Unit =
+    runTest("scenario(\"child1\")", Some("feature(\"parent\")"))
 
-  def testFeatureSpecPending(): Unit = runTest(pendingStatusId, "scenario(\"pending1\")")
+  def testFeatureSpecPending(): Unit =
+    runTest(pendingStatusId, "scenario(\"pending1\")")
 
-  def testFeatureSpecIgnored(): Unit = runTest(ignoredStatusId, "ignore(\"ignored1\")", "ignore(\"ignored2\")")
+  def testFeatureSpecIgnored(): Unit =
+    runTest(ignoredStatusId, "ignore(\"ignored1\")", "ignore(\"ignored2\")")
 
-  def testFeatureSpecIgnoredHierarchy(): Unit = runTest("scenario(\"ignored_inner\")", Some("ignore(\"ignored2\")" +
-    TestNodeProvider.ignoredSuffix))
+  def testFeatureSpecIgnoredHierarchy(): Unit =
+    runTest("scenario(\"ignored_inner\")",
+            Some("ignore(\"ignored2\")" + TestNodeProvider.ignoredSuffix))
 }

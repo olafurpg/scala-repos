@@ -32,7 +32,7 @@ trait RegressionSupport {
       i += 1
     }
     result
-  }    
+  }
 
   def arraySum(xs: Array[Double], ys: Array[Double]): Array[Double] = {
     assert(xs.length == ys.length)
@@ -43,6 +43,5 @@ trait RegressionSupport {
       i += 1
     }
     result
-  }    
+  }
 }
-

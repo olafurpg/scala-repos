@@ -10,14 +10,15 @@ package io
 /** ''Note:  This library is considered experimental and should not be used unless you know what you are doing.'' */
 class PlainDirectory(givenPath: Directory) extends PlainFile(givenPath) {
   override def isDirectory = true
-  override def iterator = givenPath.list filter (_.exists) map (x => new PlainFile(x))
+  override def iterator =
+    givenPath.list filter (_.exists) map (x => new PlainFile(x))
   override def delete(): Unit = givenPath.deleteRecursively()
 }
 
 /** This class implements an abstract file backed by a File.
- *
- * ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
- */
+  *
+  * ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
+  */
 class PlainFile(val givenPath: Path) extends AbstractFile {
   assert(path ne null)
 
@@ -44,7 +45,7 @@ class PlainFile(val givenPath: Path) extends AbstractFile {
   override def hashCode(): Int = fpath.hashCode()
   override def equals(that: Any): Boolean = that match {
     case x: PlainFile => fpath == x.fpath
-    case _            => false
+    case _ => false
   }
 
   /** Is this abstract file a directory? */
@@ -59,21 +60,22 @@ class PlainFile(val givenPath: Path) extends AbstractFile {
     // between the call to `list` and the iteration. This saves a call to `exists`.
     def existsFast(path: Path) = path match {
       case (_: Directory | _: io.File) => true
-      case _                           => path.exists
+      case _ => path.exists
     }
     if (!isDirectory) Iterator.empty
     else givenPath.toDirectory.list filter existsFast map (new PlainFile(_))
   }
 
   /**
-   * Returns the abstract file in this abstract directory with the
-   * specified name. If there is no such file, returns null. The
-   * argument "directory" tells whether to look for a directory or
-   * or a regular file.
-   */
+    * Returns the abstract file in this abstract directory with the
+    * specified name. If there is no such file, returns null. The
+    * argument "directory" tells whether to look for a directory or
+    * or a regular file.
+    */
   def lookupName(name: String, directory: Boolean): AbstractFile = {
     val child = givenPath / name
-    if ((child.isDirectory && directory) || (child.isFile && !directory)) new PlainFile(child)
+    if ((child.isDirectory && directory) || (child.isFile && !directory))
+      new PlainFile(child)
     else null
   }
 
@@ -86,8 +88,8 @@ class PlainFile(val givenPath: Path) extends AbstractFile {
     else if (givenPath.isDirectory) givenPath.toDirectory.deleteRecursively()
 
   /** Returns a plain file with the given name. It does not
-   *  check that it exists.
-   */
+    *  check that it exists.
+    */
   def lookupNameUnchecked(name: String, directory: Boolean): AbstractFile =
     new PlainFile(givenPath / name)
 }

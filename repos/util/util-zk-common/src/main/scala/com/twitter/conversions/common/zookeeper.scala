@@ -9,12 +9,13 @@ import scala.language.implicitConversions
 /** Adapters for common's ZooKeeperClient (and, later, serversets, etc) */
 object zookeeper {
   class CommonZkClientAdapter(zkc: ZooKeeperClient) {
-    def toConnector(timeout: Duration = COMMON_FOREVER)
-                   (implicit pool: FuturePool): CommonConnector = {
+    def toConnector(timeout: Duration = COMMON_FOREVER)(
+        implicit pool: FuturePool): CommonConnector = {
       new CommonConnector(zkc, timeout)
     }
 
-    def toZkClient(timeout: Duration = COMMON_FOREVER)(implicit pool: FuturePool): ZkClient = {
+    def toZkClient(timeout: Duration = COMMON_FOREVER)(
+        implicit pool: FuturePool): ZkClient = {
       ZkClient(toConnector(timeout))
     }
   }

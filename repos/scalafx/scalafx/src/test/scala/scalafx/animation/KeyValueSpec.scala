@@ -38,11 +38,12 @@ import scalafx.beans.property._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * KeyValue Spec tests.
- */
+  * KeyValue Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class KeyValueSpec
-  extends SimpleSFXDelegateSpec[jfxa.KeyValue, KeyValue[_, _]](classOf[jfxa.KeyValue], classOf[KeyValue[_, _]]) {
+    extends SimpleSFXDelegateSpec[jfxa.KeyValue, KeyValue[_, _]](
+        classOf[jfxa.KeyValue], classOf[KeyValue[_, _]]) {
 
   //////////////////////////////
   // PRIVATE VALUES AND METHODS 
@@ -52,14 +53,18 @@ class KeyValueSpec
 
   private val doubleProperty = new DoubleProperty(null, name)
 
-  private def evaluateFromSfx(property: Property[_, _], endValue: Any, kv: KeyValue[_, _], evaluateInterpolator: Boolean = false) {
+  private def evaluateFromSfx(property: Property[_, _],
+                              endValue: Any,
+                              kv: KeyValue[_, _],
+                              evaluateInterpolator: Boolean = false) {
     kv.target should equal(property.delegate)
     kv.endValue should equal(endValue)
     if (evaluateInterpolator)
       kv.interpolator should equal(jfxa.Interpolator.EASE_BOTH)
   }
 
-  private def evaluateFromJfx[S, J](property: jfxbp.Property[J], endValue: S, kv: KeyValue[S, J]) {
+  private def evaluateFromJfx[S, J](
+      property: jfxbp.Property[J], endValue: S, kv: KeyValue[S, J]) {
     kv.target should equal(property.delegate)
     kv.endValue should equal(endValue)
   }
@@ -70,7 +75,8 @@ class KeyValueSpec
 
   override protected def getScalaClassInstance = KeyValue(doubleProperty, 50d)
 
-  override protected def getJavaClassInstance = new jfxa.KeyValue(doubleProperty, double2Double(50))
+  override protected def getJavaClassInstance =
+    new jfxa.KeyValue(doubleProperty, double2Double(50))
 
   /////////
   // TESTS 
@@ -157,12 +163,18 @@ class KeyValueSpec
   it should "support interpolators" in {
     val property = new DoubleProperty(null, name)
     val endValue = 50d
-    evaluateFromSfx(property, endValue, KeyValue(property, endValue, jfxa.Interpolator.EASE_BOTH), true)
+    evaluateFromSfx(property,
+                    endValue,
+                    KeyValue(property, endValue, jfxa.Interpolator.EASE_BOTH),
+                    true)
   }
 
   it should "support interpolators with the ->/tween operator" in {
     val property = new DoubleProperty(null, name)
     val endValue = 50
-    evaluateFromSfx(property, endValue, (property -> endValue tween Interpolator.EASE_BOTH), true)
+    evaluateFromSfx(property,
+                    endValue,
+                    (property -> endValue tween Interpolator.EASE_BOTH),
+                    true)
   }
 }

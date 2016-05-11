@@ -41,17 +41,20 @@ import scalafx.collections.ObservableBuffer
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- *
- * Test for [[scalafx.collections.transformation.SortedBuffer]].
- */
+  *
+  * Test for [[scalafx.collections.transformation.SortedBuffer]].
+  */
 @RunWith(classOf[JUnitRunner])
 class SortedBufferSpec[E]
-  extends SimpleSFXDelegateSpec[jfxct.SortedList[E], SortedBuffer[E]](
-    classOf[jfxct.SortedList[E]], classOf[SortedBuffer[E]]) {
+    extends SimpleSFXDelegateSpec[jfxct.SortedList[E], SortedBuffer[E]](
+        classOf[jfxct.SortedList[E]], classOf[SortedBuffer[E]]) {
 
-  override def getScalaClassInstance = new SortedBuffer(ObservableBuffer.empty[E])
+  override def getScalaClassInstance =
+    new SortedBuffer(ObservableBuffer.empty[E])
 
-  override def getJavaClassInstance = new jfxct.SortedList(jfxc.FXCollections.observableList[E](new ju.ArrayList[E]))
+  override def getJavaClassInstance =
+    new jfxct.SortedList(
+        jfxc.FXCollections.observableList[E](new ju.ArrayList[E]))
 
   it should "assing comparator correctly" in {
 
@@ -65,5 +68,4 @@ class SortedBufferSpec[E]
     sb.comparator = Ordering.Int.reverse
     sb.toList should equal(List(4, 3, 1))
   }
-
 }

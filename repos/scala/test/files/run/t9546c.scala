@@ -10,4 +10,3 @@ object Test {
     foo.Opt.mkOpt
   }
 }
-

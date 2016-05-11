@@ -11,7 +11,7 @@ class ThePlugin(val global: Global) extends Plugin {
 
   val name = "multi"
   val description = "Declares two phases that both follow parser"
-  val components = List[PluginComponent](thePhase1,thePhase2)
+  val components = List[PluginComponent](thePhase1, thePhase2)
 
   private object thePhase1 extends PluginComponent {
     val global = ThePlugin.this.global
@@ -41,4 +41,3 @@ class ThePlugin(val global: Global) extends Plugin {
     def run {}
   }
 }
-

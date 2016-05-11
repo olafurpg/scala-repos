@@ -1,22 +1,16 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.linker.backend.closure
 
 import scala.collection.JavaConverters._
 
-import com.google.javascript.jscomp.{
-  SourceFile => ClosureSource,
-  Compiler => ClosureCompiler,
-  CompilerOptions => ClosureOptions,
-  _
-}
+import com.google.javascript.jscomp.{SourceFile => ClosureSource, Compiler => ClosureCompiler, CompilerOptions => ClosureOptions, _}
 
 import org.scalajs.core.tools.io._
 import org.scalajs.core.tools.javascript.ESLevel
@@ -29,15 +23,16 @@ import org.scalajs.core.tools.linker.backend.{OutputMode, LinkerBackend}
 import org.scalajs.core.tools.linker.backend.emitter.{Emitter, CoreJSLibs}
 
 /** The Closure backend of the Scala.js linker.
- *
- *  Runs a the Google Closure Compiler in advanced mode on the emitted code.
- *  Use this for production builds.
- */
+  *
+  *  Runs a the Google Closure Compiler in advanced mode on the emitted code.
+  *  Use this for production builds.
+  */
 final class ClosureLinkerBackend(
     semantics: Semantics,
     withSourceMap: Boolean,
     config: LinkerBackend.Config
-) extends LinkerBackend(semantics, ESLevel.ES5, withSourceMap, config) {
+)
+    extends LinkerBackend(semantics, ESLevel.ES5, withSourceMap, config) {
 
   private[this] val emitter = {
     new Emitter(semantics, OutputMode.ECMAScript51Isolated)
@@ -50,12 +45,13 @@ final class ClosureLinkerBackend(
     ClosureSource.fromReader(file.toURI.toString(), file.reader)
 
   /** Emit the given [[LinkingUnit]] to the target output
-   *
-   *  @param unit [[LinkingUnit]] to emit
-   *  @param output File to write to
-   */
-  def emit(unit: LinkingUnit, output: WritableVirtualJSFile,
-      logger: Logger): Unit = {
+    *
+    *  @param unit [[LinkingUnit]] to emit
+    *  @param output File to write to
+    */
+  def emit(unit: LinkingUnit,
+           output: WritableVirtualJSFile,
+           logger: Logger): Unit = {
     verifyUnit(unit)
 
     val builder = new ClosureAstBuilder(config.relativizeSourceMapBase)
@@ -69,14 +65,14 @@ final class ClosureLinkerBackend(
     val module = new JSModule("Scala.js")
 
     module.add(new CompilerInput(toClosureSource(
-        CoreJSLibs.lib(semantics, OutputMode.ECMAScript51Isolated))))
+                CoreJSLibs.lib(semantics, OutputMode.ECMAScript51Isolated))))
 
     val ast = builder.closureAST
     module.add(new CompilerInput(ast, ast.getInputId(), false))
 
     // Compile the module
-    val closureExterns =
-      toClosureSource(ClosureLinkerBackend.ScalaJSExternsFile)
+    val closureExterns = toClosureSource(
+        ClosureLinkerBackend.ScalaJSExternsFile)
     val options = closureOptions(output.name)
     val compiler = closureCompiler(logger)
 
@@ -96,8 +92,9 @@ final class ClosureLinkerBackend(
     compiler
   }
 
-  private def writeResult(result: Result, compiler: ClosureCompiler,
-      output: WritableVirtualJSFile): Unit = {
+  private def writeResult(result: Result,
+                          compiler: ClosureCompiler,
+                          output: WritableVirtualJSFile): Unit = {
     def withNewLine(str: String): String = if (str == "") "" else str + "\n"
 
     val (header0, footer0) = config.customOutputWrapper
@@ -124,15 +121,15 @@ final class ClosureLinkerBackend(
     sourceMap.foreach { sm =>
       sm.setWrapperPrefix(header)
       val w = output.sourceMapWriter
-      try sm.appendTo(w, output.name)
-      finally w.close()
+      try sm.appendTo(w, output.name) finally w.close()
     }
   }
 
   private def closureOptions(outputName: String) = {
     val options = new ClosureOptions
     options.prettyPrint = config.prettyPrint
-    CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(options)
+    CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(
+        options)
     options.setLanguageIn(ClosureOptions.LanguageMode.ECMASCRIPT5)
     options.setCheckGlobalThisLevel(CheckLevel.OFF)
 
@@ -146,8 +143,10 @@ final class ClosureLinkerBackend(
 }
 
 private object ClosureLinkerBackend {
+
   /** Minimal set of externs to compile Scala.js-emitted code with Closure. */
-  private val ScalaJSExterns = """
+  private val ScalaJSExterns =
+    """
     /** @constructor */
     function Object() {}
     Object.protoype.toString = function() {};
@@ -164,6 +163,6 @@ private object ClosureLinkerBackend {
     var NaN = 0.0/0.0, Infinity = 1.0/0.0, undefined = void 0;
     """
 
-  private val ScalaJSExternsFile = new MemVirtualJSFile("ScalaJSExterns.js").
-    withContent(ScalaJSExterns)
+  private val ScalaJSExternsFile =
+    new MemVirtualJSFile("ScalaJSExterns.js").withContent(ScalaJSExterns)
 }

@@ -5,8 +5,8 @@ package api
 package statements
 
 /**
- * @author Jason Zaugg
- */
+  * @author Jason Zaugg
+  */
 trait ScMacroDefinition extends ScFunction {
   def typeElement = returnTypeElement
 }

@@ -6,8 +6,8 @@ object PLensTest extends SpecLite {
   import PLens._
 
   "list head" in {
-    listHeadPLens[Int].get(List(1, 2)) must_===(Some(1))
-    listHeadPLens[Int].get(Nil) must_===(None)
+    listHeadPLens[Int].get(List(1, 2)) must_=== (Some(1))
+    listHeadPLens[Int].get(Nil) must_=== (None)
   }
 
   object instances {
@@ -15,5 +15,4 @@ object PLensTest extends SpecLite {
     def choice = Choice[PLens]
     def split = Split[PLens]
   }
-
 }

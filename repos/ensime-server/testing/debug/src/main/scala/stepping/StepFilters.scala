@@ -22,7 +22,8 @@ class StepFilters {
   def fors() {
     val lst = List("one", "two", "three")
 
-    for (n <- lst) { // line 25
+    for (n <- lst) {
+      // line 25
       debug.Helper.noop(immutableVal)
       println(n)
     }
@@ -37,7 +38,6 @@ class StepFilters {
     2 + c.base(10)
     debug.Helper.noop(null)
   }
-
 }
 
 class Base[T] {
@@ -56,5 +56,4 @@ object StepFilters {
   def main(args: Array[String]) {
     new StepFilters().mainTest()
   }
-
 }

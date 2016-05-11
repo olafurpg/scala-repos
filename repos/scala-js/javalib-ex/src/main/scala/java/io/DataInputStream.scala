@@ -3,10 +3,10 @@ package java.io
 import scala.scalajs.js.typedarray._
 
 /** <span class="badge badge-ecma6" style="float: right;">ECMAScript 6</span>
- *  DataInputStream implementation using JavaScript typed arrays.
- */
-class DataInputStream(in: InputStream) extends FilterInputStream(in)
-                                          with DataInput {
+  *  DataInputStream implementation using JavaScript typed arrays.
+  */
+class DataInputStream(in: InputStream)
+    extends FilterInputStream(in) with DataInput {
 
   private var pushedBack: Int = -1
   private var pushedBackMark: Int = -1
@@ -69,24 +69,18 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
   }
 
   def readChar(): Char = {
-    if (hasArrayBuffer)
-      bufDataView.getUint16(consumePos(2)).toChar
-    else
-      view(2).getUint16(0).toChar
+    if (hasArrayBuffer) bufDataView.getUint16(consumePos(2)).toChar
+    else view(2).getUint16(0).toChar
   }
 
   def readDouble(): Double = {
-    if (hasArrayBuffer)
-      bufDataView.getFloat64(consumePos(8))
-    else
-      view(8).getFloat64(0)
+    if (hasArrayBuffer) bufDataView.getFloat64(consumePos(8))
+    else view(8).getFloat64(0)
   }
 
   def readFloat(): Float = {
-    if (hasArrayBuffer)
-      bufDataView.getFloat32(consumePos(4))
-    else
-      view(4).getFloat32(0)
+    if (hasArrayBuffer) bufDataView.getFloat32(consumePos(4))
+    else view(4).getFloat32(0)
   }
 
   def readFully(b: Array[Byte]): Unit = readFully(b, 0, b.length)
@@ -106,10 +100,8 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
   }
 
   def readInt(): Int = {
-    if (hasArrayBuffer)
-      bufDataView.getInt32(consumePos(4))
-    else
-      view(4).getInt32(0)
+    if (hasArrayBuffer) bufDataView.getInt32(consumePos(4))
+    else view(4).getInt32(0)
   }
 
   def readLine(): String = {
@@ -137,10 +129,8 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
   }
 
   def readShort(): Short = {
-    if (hasArrayBuffer)
-      bufDataView.getInt16(consumePos(2))
-    else
-      view(2).getInt16(0)
+    if (hasArrayBuffer) bufDataView.getInt16(consumePos(2))
+    else view(2).getInt16(0)
   }
 
   def readUnsignedByte(): Int = {
@@ -150,10 +140,8 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
   }
 
   def readUnsignedShort(): Int = {
-    if (hasArrayBuffer)
-      bufDataView.getUint16(consumePos(2))
-    else
-      view(2).getUint16(0)
+    if (hasArrayBuffer) bufDataView.getUint16(consumePos(2))
+    else view(2).getUint16(0)
   }
 
   def readUTF(): String = {
@@ -166,15 +154,16 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
     while (i < length) {
       val a = read()
 
-      if (a == -1)
-        badFormat(s"Unexpected EOF: ${length - i} bytes to go")
+      if (a == -1) badFormat(s"Unexpected EOF: ${length - i} bytes to go")
 
       i += 1
 
       val char = {
-        if ((a & 0x80) == 0x00) { // 0xxxxxxx
+        if ((a & 0x80) == 0x00) {
+          // 0xxxxxxx
           a.toChar
-        } else if ((a & 0xE0) == 0xC0 && i < length) { // 110xxxxx
+        } else if ((a & 0xE0) == 0xC0 && i < length) {
+          // 110xxxxx
           val b = read()
           i += 1
 
@@ -184,7 +173,8 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
             badFormat(f"Expected 2 bytes, found: $b%#02x (init: $a%#02x)")
 
           (((a & 0x1F) << 6) | (b & 0x3F)).toChar
-        } else if ((a & 0xF0) == 0xE0 && i < length - 1) { // 1110xxxx
+        } else if ((a & 0xF0) == 0xE0 && i < length - 1) {
+          // 1110xxxx
           val b = read()
           val c = read()
           i += 2
@@ -192,13 +182,13 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
           if (b == -1)
             badFormat(f"Expected 3 bytes, found: EOF (init: $a%#02x)")
 
-          if ((b & 0xC0) != 0x80)   // 10xxxxxx
+          if ((b & 0xC0) != 0x80) // 10xxxxxx
             badFormat(f"Expected 3 bytes, found: $b%#02x (init: $a%#02x)")
 
           if (c == -1)
             badFormat(f"Expected 3 bytes, found: $b%#02x, EOF (init: $a%#02x)")
 
-          if ((c & 0xC0) != 0x80)   // 10xxxxxx
+          if ((c & 0xC0) != 0x80) // 10xxxxxx
             badFormat(
                 f"Expected 3 bytes, found: $b%#02x, $c%#02x (init: $a%#02x)")
 
@@ -233,10 +223,8 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
 
   override def read(): Int = {
     val res = {
-      if (pushedBack != -1)
-        pushedBack
-      else
-        in.read()
+      if (pushedBack != -1) pushedBack
+      else in.read()
     }
 
     pushedBack = -1
@@ -245,8 +233,7 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
   }
 
   override def read(b: Array[Byte], off: Int, len: Int): Int = {
-    if (len == 0)
-      0
+    if (len == 0) 0
     else if (pushedBack != -1) {
       b(off) = pushedBack.toByte
       pushedBack = -1
@@ -263,8 +250,7 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
   }
 
   override def skip(n: Long): Long = {
-    if (n == 0)
-      0L
+    if (n == 0) 0L
     else if (pushedBack != -1) {
       pushedBack = -1
       1L
@@ -273,5 +259,4 @@ class DataInputStream(in: InputStream) extends FilterInputStream(in)
       skipped
     }
   }
-
 }

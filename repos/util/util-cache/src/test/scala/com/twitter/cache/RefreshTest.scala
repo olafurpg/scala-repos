@@ -9,15 +9,11 @@ import org.scalatest._
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class RefreshTest
-  extends FunSuite
-  with MockitoSugar {
+class RefreshTest extends FunSuite with MockitoSugar {
 
   class Ctx {
     val provider = mock[() => Future[Int]]
-    when(provider())
-      .thenReturn(Future.value(1))
-      .thenReturn(Future.value(2))
+    when(provider()).thenReturn(Future.value(1)).thenReturn(Future.value(2))
 
     val ttl = 1.minute
     val memoizedFuture = Refresh.every(ttl) { provider() }
@@ -77,8 +73,7 @@ class RefreshTest
 
     val promise = Promise[Int]
     reset(provider)
-    when(provider())
-      .thenReturn(promise)
+    when(provider()).thenReturn(promise)
 
     val result1 = memoizedFuture()
     val result2 = memoizedFuture()
@@ -91,7 +86,8 @@ class RefreshTest
     verify(provider, times(1))()
   }
 
-  test("it should fail both responses if request is in flight, then request again") {
+  test(
+      "it should fail both responses if request is in flight, then request again") {
     val ctx = new Ctx
     import ctx._
 

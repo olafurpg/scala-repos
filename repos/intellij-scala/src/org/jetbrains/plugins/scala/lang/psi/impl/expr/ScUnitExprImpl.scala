@@ -10,11 +10,12 @@ import org.jetbrains.plugins.scala.lang.psi.types.Unit
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
 
 /**
-* @author ilyas, Alexander Podkhalyuzin
-*/
-
-class ScUnitExprImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScUnitExpr {
+  * @author ilyas, Alexander Podkhalyuzin
+  */
+class ScUnitExprImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScUnitExpr {
   override def toString: String = "UnitExpression"
 
-  protected override def innerType(ctx: TypingContext) = Success(Unit, Some(this))
+  protected override def innerType(ctx: TypingContext) =
+    Success(Unit, Some(this))
 }

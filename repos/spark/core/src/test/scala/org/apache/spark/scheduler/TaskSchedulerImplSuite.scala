@@ -27,7 +27,8 @@ class FakeSchedulerBackend extends SchedulerBackend {
   def defaultParallelism(): Int = 1
 }
 
-class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with Logging {
+class TaskSchedulerImplSuite
+    extends SparkFunSuite with LocalSparkContext with Logging {
 
   test("Scheduler does not always schedule tasks on the same workers") {
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
@@ -41,7 +42,7 @@ class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with L
 
     val numFreeCores = 1
     val workerOffers = Seq(new WorkerOffer("executor0", "host0", numFreeCores),
-      new WorkerOffer("executor1", "host1", numFreeCores))
+                           new WorkerOffer("executor1", "host1", numFreeCores))
     // Repeatedly try to schedule a 1-task job, and make sure that it doesn't always
     // get scheduled on the same executor. While there is a chance this test will fail
     // because the task randomly gets placed on the first executor all 1000 times, the
@@ -74,26 +75,33 @@ class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with L
     }
     // Give zero core offers. Should not generate any tasks
     val zeroCoreWorkerOffers = Seq(new WorkerOffer("executor0", "host0", 0),
-      new WorkerOffer("executor1", "host1", 0))
+                                   new WorkerOffer("executor1", "host1", 0))
     val taskSet = FakeTask.createTaskSet(1)
     taskScheduler.submitTasks(taskSet)
-    var taskDescriptions = taskScheduler.resourceOffers(zeroCoreWorkerOffers).flatten
+    var taskDescriptions =
+      taskScheduler.resourceOffers(zeroCoreWorkerOffers).flatten
     assert(0 === taskDescriptions.length)
 
     // No tasks should run as we only have 1 core free.
     val numFreeCores = 1
-    val singleCoreWorkerOffers = Seq(new WorkerOffer("executor0", "host0", numFreeCores),
-      new WorkerOffer("executor1", "host1", numFreeCores))
+    val singleCoreWorkerOffers =
+      Seq(new WorkerOffer("executor0", "host0", numFreeCores),
+          new WorkerOffer("executor1", "host1", numFreeCores))
     taskScheduler.submitTasks(taskSet)
-    taskDescriptions = taskScheduler.resourceOffers(singleCoreWorkerOffers).flatten
+    taskDescriptions = taskScheduler
+      .resourceOffers(singleCoreWorkerOffers)
+      .flatten
     assert(0 === taskDescriptions.length)
 
     // Now change the offers to have 2 cores in one executor and verify if it
     // is chosen.
-    val multiCoreWorkerOffers = Seq(new WorkerOffer("executor0", "host0", taskCpus),
-      new WorkerOffer("executor1", "host1", numFreeCores))
+    val multiCoreWorkerOffers =
+      Seq(new WorkerOffer("executor0", "host0", taskCpus),
+          new WorkerOffer("executor1", "host1", numFreeCores))
     taskScheduler.submitTasks(taskSet)
-    taskDescriptions = taskScheduler.resourceOffers(multiCoreWorkerOffers).flatten
+    taskDescriptions = taskScheduler
+      .resourceOffers(multiCoreWorkerOffers)
+      .flatten
     assert(1 === taskDescriptions.length)
     assert("executor0" === taskDescriptions(0).executorId)
   }
@@ -112,12 +120,18 @@ class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with L
     }
     val numFreeCores = 1
     taskScheduler.setDAGScheduler(dagScheduler)
-    val taskSet = new TaskSet(
-      Array(new NotSerializableFakeTask(1, 0), new NotSerializableFakeTask(0, 1)), 0, 0, 0, null)
-    val multiCoreWorkerOffers = Seq(new WorkerOffer("executor0", "host0", taskCpus),
-      new WorkerOffer("executor1", "host1", numFreeCores))
+    val taskSet = new TaskSet(Array(new NotSerializableFakeTask(1, 0),
+                                    new NotSerializableFakeTask(0, 1)),
+                              0,
+                              0,
+                              0,
+                              null)
+    val multiCoreWorkerOffers =
+      Seq(new WorkerOffer("executor0", "host0", taskCpus),
+          new WorkerOffer("executor1", "host1", numFreeCores))
     taskScheduler.submitTasks(taskSet)
-    var taskDescriptions = taskScheduler.resourceOffers(multiCoreWorkerOffers).flatten
+    var taskDescriptions =
+      taskScheduler.resourceOffers(multiCoreWorkerOffers).flatten
     assert(0 === taskDescriptions.length)
 
     // Now check that we can still submit tasks
@@ -125,11 +139,14 @@ class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with L
     // still be processed without error
     taskScheduler.submitTasks(taskSet)
     taskScheduler.submitTasks(FakeTask.createTaskSet(1))
-    taskDescriptions = taskScheduler.resourceOffers(multiCoreWorkerOffers).flatten
+    taskDescriptions = taskScheduler
+      .resourceOffers(multiCoreWorkerOffers)
+      .flatten
     assert(taskDescriptions.map(_.executorId) === Seq("executor0"))
   }
 
-  test("refuse to schedule concurrent attempts for the same stage (SPARK-8103)") {
+  test(
+      "refuse to schedule concurrent attempts for the same stage (SPARK-8103)") {
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
@@ -145,13 +162,17 @@ class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with L
     intercept[IllegalStateException] { taskScheduler.submitTasks(attempt2) }
 
     // OK to submit multiple if previous attempts are all zombie
-    taskScheduler.taskSetManagerForAttempt(attempt1.stageId, attempt1.stageAttemptId)
-      .get.isZombie = true
+    taskScheduler
+      .taskSetManagerForAttempt(attempt1.stageId, attempt1.stageAttemptId)
+      .get
+      .isZombie = true
     taskScheduler.submitTasks(attempt2)
     val attempt3 = FakeTask.createTaskSet(1, 2)
     intercept[IllegalStateException] { taskScheduler.submitTasks(attempt3) }
-    taskScheduler.taskSetManagerForAttempt(attempt2.stageId, attempt2.stageAttemptId)
-      .get.isZombie = true
+    taskScheduler
+      .taskSetManagerForAttempt(attempt2.stageId, attempt2.stageAttemptId)
+      .get
+      .isZombie = true
     taskScheduler.submitTasks(attempt3)
   }
 
@@ -175,8 +196,10 @@ class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with L
     assert(1 === taskDescriptions.length)
 
     // now mark attempt 1 as a zombie
-    taskScheduler.taskSetManagerForAttempt(attempt1.stageId, attempt1.stageAttemptId)
-      .get.isZombie = true
+    taskScheduler
+      .taskSetManagerForAttempt(attempt1.stageId, attempt1.stageAttemptId)
+      .get
+      .isZombie = true
 
     // don't schedule anything on another resource offer
     val taskDescriptions2 = taskScheduler.resourceOffers(workerOffers).flatten
@@ -189,11 +212,13 @@ class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with L
     taskScheduler.submitTasks(attempt2)
     val taskDescriptions3 = taskScheduler.resourceOffers(workerOffers).flatten
     assert(1 === taskDescriptions3.length)
-    val mgr = taskScheduler.taskIdToTaskSetManager.get(taskDescriptions3(0).taskId).get
+    val mgr =
+      taskScheduler.taskIdToTaskSetManager.get(taskDescriptions3(0).taskId).get
     assert(mgr.taskSet.stageAttemptId === 1)
   }
 
-  test("if a zombie attempt finishes, continue scheduling tasks for non-zombie attempts") {
+  test(
+      "if a zombie attempt finishes, continue scheduling tasks for non-zombie attempts") {
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
@@ -213,7 +238,9 @@ class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with L
     assert(10 === taskDescriptions.length)
 
     // now mark attempt 1 as a zombie
-    val mgr1 = taskScheduler.taskSetManagerForAttempt(attempt1.stageId, attempt1.stageAttemptId).get
+    val mgr1 = taskScheduler
+      .taskSetManagerForAttempt(attempt1.stageId, attempt1.stageAttemptId)
+      .get
     mgr1.isZombie = true
 
     // don't schedule anything on another resource offer
@@ -273,5 +300,4 @@ class TaskSchedulerImplSuite extends SparkFunSuite with LocalSparkContext with L
     assert(1 === taskDescriptions3.length)
     assert("executor1" === taskDescriptions3(0).executorId)
   }
-
 }

@@ -13,10 +13,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
 
 /**
-* @author Alexander.Podkhalyuzin
-*/
-
-class ScWhileStmtImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScWhileStmt {
+  * @author Alexander.Podkhalyuzin
+  */
+class ScWhileStmtImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScWhileStmt {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -28,27 +28,32 @@ class ScWhileStmtImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScWh
 
   def condition = {
     val rpar = findChildByType[PsiElement](ScalaTokenTypes.tRPARENTHESIS)
-    val c = if (rpar != null) PsiTreeUtil.getPrevSiblingOfType(rpar, classOf[ScExpression]) else null
+    val c =
+      if (rpar != null)
+        PsiTreeUtil.getPrevSiblingOfType(rpar, classOf[ScExpression]) else null
     if (c == null) None else Some(c)
   }
 
   def body = {
     val rpar = findChildByType[PsiElement](ScalaTokenTypes.tRPARENTHESIS)
-    val c = if (rpar != null) PsiTreeUtil.getNextSiblingOfType(rpar, classOf[ScExpression]) else null
+    val c =
+      if (rpar != null)
+        PsiTreeUtil.getNextSiblingOfType(rpar, classOf[ScExpression]) else null
     if (c == null) None else Some(c)
   }
 
   def getLeftParenthesis = {
-    val leftParenthesis = findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS)
+    val leftParenthesis =
+      findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS)
     if (leftParenthesis == null) None else Some(leftParenthesis)
   }
 
   def getRightParenthesis = {
-    val rightParenthesis = findChildByType[PsiElement](ScalaTokenTypes.tRPARENTHESIS)
+    val rightParenthesis =
+      findChildByType[PsiElement](ScalaTokenTypes.tRPARENTHESIS)
     if (rightParenthesis == null) None else Some(rightParenthesis)
   }
 
-
-
-  protected override def innerType(ctx: TypingContext) = Success(types.Unit, Some(this))
+  protected override def innerType(ctx: TypingContext) =
+    Success(types.Unit, Some(this))
 }

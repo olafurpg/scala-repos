@@ -23,13 +23,13 @@ import com.precog.common.jobs._
 import com.precog.common.security._
 
 import blueeyes.json._
-import blueeyes.json.{ serialization => _, _ }
+import blueeyes.json.{serialization => _, _}
 import blueeyes.json.serialization.SerializationImplicits._
 import blueeyes.json.serialization._
 
 import blueeyes.util.Clock
 
-import org.slf4j.{ LoggerFactory, Logger }
+import org.slf4j.{LoggerFactory, Logger}
 
 import scalaz._
 import scalaz.syntax.monad._
@@ -39,7 +39,7 @@ import scala.annotation.tailrec
 
 import java.util.concurrent.ConcurrentHashMap
 
-trait QueryLogger[M[+_], -P] { self =>
+trait QueryLogger[M[+ _], -P] { self =>
   def contramap[P0](f: P0 => P): QueryLogger[M, P0] = new QueryLogger[M, P0] {
     def die(): M[Unit] = self.die()
     def error(pos: P0, msg: String): M[Unit] = self.error(f(pos), msg)
@@ -53,53 +53,53 @@ trait QueryLogger[M[+_], -P] { self =>
   def die(): M[Unit]
 
   /**
-   * This reports a error to the user. Depending on the implementation, this may
-   * also stop computation completely.
-   */
+    * This reports a error to the user. Depending on the implementation, this may
+    * also stop computation completely.
+    */
   def error(pos: P, msg: String): M[Unit]
 
   /**
-   * Report a warning to the user.
-   */
+    * Report a warning to the user.
+    */
   def warn(pos: P, msg: String): M[Unit]
 
   /**
-   * Report an informational message to the user.
-   */
+    * Report an informational message to the user.
+    */
   def info(pos: P, msg: String): M[Unit]
-  
+
   /**
-   * Report an information message for internal use only
-   */
+    * Report an information message for internal use only
+    */
   def log(pos: P, msg: String): M[Unit]
-  
+
   /**
-   * Record timing information for a particular position.  Note that a position
-   * may record multiple timing events, which should be aggregated according to
-   * simple summary statistics.
-   *
-   * Please note the following:
-   *
-   * kx = 303 seconds 
-   *   where
-   *     2^63 - 1 = sum i from 0 to k, x^2
-   *     x > 0
-   *     k = 10000    (an arbitrary, plausible iteration count)
-   * 
-   * This is to say that, for a particular position which is hit 10,000 times,
-   * the total time spent in that particular position must be bounded by 303
-   * seconds to avoid signed Long value overflow.  Conveniently, our query timeout
-   * is 300 seconds, so this is not an issue.
-   */
+    * Record timing information for a particular position.  Note that a position
+    * may record multiple timing events, which should be aggregated according to
+    * simple summary statistics.
+    *
+    * Please note the following:
+    *
+    * kx = 303 seconds 
+    *   where
+    *     2^63 - 1 = sum i from 0 to k, x^2
+    *     x > 0
+    *     k = 10000    (an arbitrary, plausible iteration count)
+    * 
+    * This is to say that, for a particular position which is hit 10,000 times,
+    * the total time spent in that particular position must be bounded by 303
+    * seconds to avoid signed Long value overflow.  Conveniently, our query timeout
+    * is 300 seconds, so this is not an issue.
+    */
   def timing(pos: P, nanos: Long): M[Unit]
-  
+
   def done: M[Unit]
 }
 
 /**
- * Reports errors to a job's channel.
- */
-trait JobQueryLogger[M[+_], P] extends QueryLogger[M, P] {
+  * Reports errors to a job's channel.
+  */
+trait JobQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
   import JobManager._
 
   implicit def M: Monad[M]
@@ -112,32 +112,35 @@ trait JobQueryLogger[M[+_], P] extends QueryLogger[M, P] {
 
   protected def mkMessage(pos: P, msg: String): JValue = {
     JObject(
-      JField("message", JString(msg)) ::
-      JField("timestamp", clock.now().serialize) ::
-      JField("position", decomposer.decompose(pos)) ::
-      Nil)
+        JField("message", JString(msg)) :: JField(
+            "timestamp", clock.now().serialize) :: JField(
+            "position", decomposer.decompose(pos)) :: Nil)
   }
 
   private def send(channel: String, pos: P, msg: String): M[Unit] =
-    jobManager.addMessage(jobId, channel, mkMessage(pos, msg)) map { _ => () }
+    jobManager.addMessage(jobId, channel, mkMessage(pos, msg)) map { _ =>
+      ()
+    }
 
-  def die(): M[Unit] = for {
-    _ <- jobManager.cancel(jobId, "Cancelled because of error.", clock.now())
-  } yield ()
+  def die(): M[Unit] =
+    for {
+      _ <- jobManager.cancel(jobId, "Cancelled because of error.", clock.now())
+    } yield ()
 
   def error(pos: P, msg: String): M[Unit] = send(channels.Error, pos, msg)
 
   def warn(pos: P, msg: String): M[Unit] = send(channels.Warning, pos, msg)
 
   def info(pos: P, msg: String): M[Unit] = send(channels.Info, pos, msg)
-  
+
   def log(pos: P, msg: String): M[Unit] = send(channels.Log, pos, msg)
 }
 
-trait LoggingQueryLogger[M[+_], P] extends QueryLogger[M, P] {
+trait LoggingQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
   implicit def M: Applicative[M]
 
-  protected val logger = LoggerFactory.getLogger("com.precog.mimir.QueryLogger")
+  protected val logger =
+    LoggerFactory.getLogger("com.precog.mimir.QueryLogger")
 
   def die(): M[Unit] = M.point { () }
 
@@ -157,26 +160,26 @@ trait LoggingQueryLogger[M[+_], P] extends QueryLogger[M, P] {
 }
 
 object LoggingQueryLogger {
-  def apply[M[+_]](implicit M0: Monad[M]): QueryLogger[M, Any] = {
+  def apply[M[+ _]](implicit M0: Monad[M]): QueryLogger[M, Any] = {
     new LoggingQueryLogger[M, Any] with TimingQueryLogger[M, Any] {
       val M = M0
     }
   }
 }
 
-trait TimingQueryLogger[M[+_], P] extends QueryLogger[M, P] {
+trait TimingQueryLogger[M[+ _], P] extends QueryLogger[M, P] {
   implicit def M: Monad[M]
-  
+
   private val table = new ConcurrentHashMap[P, Stats]
 
   def timing(pos: P, nanos: Long): M[Unit] = {
     @tailrec
     def loop() {
       val stats = table get pos
-      
+
       if (stats == null) {
         val stats = Stats(1, nanos, nanos * nanos, nanos, nanos)
-        
+
         if (table.putIfAbsent(pos, stats) != stats) {
           loop()
         }
@@ -186,40 +189,44 @@ trait TimingQueryLogger[M[+_], P] extends QueryLogger[M, P] {
         }
       }
     }
-    
+
     M point {
       loop()
     }
   }
-  
+
   def done: M[Unit] = {
-    val logging = table.asScala map {
-      case (pos, stats) =>
-        log(pos, """{"count":%d,"sum":%d,"sumSq":%d,"min":%d,"max":%d}""".format(stats.count, stats.sum, stats.sumSq, stats.min, stats.max))
-    }
-    
+    val logging =
+      table.asScala map {
+        case (pos, stats) =>
+          log(pos,
+              """{"count":%d,"sum":%d,"sumSq":%d,"min":%d,"max":%d}""".format(
+                  stats.count, stats.sum, stats.sumSq, stats.min, stats.max))
+      }
+
     logging reduceOption { _ >> _ } getOrElse (M point ())
   }
-  
-  private case class Stats(count: Long, sum: Long, sumSq: Long, min: Long, max: Long) {
+
+  private case class Stats(
+      count: Long, sum: Long, sumSq: Long, min: Long, max: Long) {
     final def derive(nanos: Long): Stats = {
-      copy(
-        count = count + 1,
-        sum = sum + nanos,
-        sumSq = sumSq + (nanos * nanos),
-        min = min min nanos,
-        max = max max nanos)
+      copy(count = count + 1,
+           sum = sum + nanos,
+           sumSq = sumSq + (nanos * nanos),
+           min = min min nanos,
+           max = max max nanos)
     }
   }
 }
 
-trait ExceptionQueryLogger[M[+_], -P] extends QueryLogger[M, P] {
+trait ExceptionQueryLogger[M[+ _], -P] extends QueryLogger[M, P] {
   implicit def M: Applicative[M]
-  
-  abstract override def die(): M[Unit] = for {
-    _ <- super.die()
-    _ = throw FatalQueryException("Query terminated abnormally.")
-  } yield ()
+
+  abstract override def die(): M[Unit] =
+    for {
+      _ <- super.die()
+      _ = throw FatalQueryException("Query terminated abnormally.")
+    } yield ()
 }
 
 case class FatalQueryException(msg: String) extends RuntimeException(msg)

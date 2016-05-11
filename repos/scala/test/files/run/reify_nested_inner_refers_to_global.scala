@@ -6,8 +6,8 @@ import scala.tools.reflect.ToolBox
 object Test extends App {
   val code = {
     val x = 2
-    reify{
-      reify{x}.splice
+    reify {
+      reify { x }.splice
     }
   }
 

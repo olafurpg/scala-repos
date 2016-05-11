@@ -12,11 +12,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird.chill
 import com.twitter.chill._
-import com.twitter.summingbird.batch.{ BatchID, Timestamp }
+import com.twitter.summingbird.batch.{BatchID, Timestamp}
 
 class BatchIDSerializer extends KSerializer[BatchID] {
   val optimizeForPositive = true

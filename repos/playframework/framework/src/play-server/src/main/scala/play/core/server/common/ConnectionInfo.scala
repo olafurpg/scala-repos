@@ -6,6 +6,6 @@ package play.core.server.common
 import java.net.InetAddress
 
 /**
- * Basic information about an HTTP connection.
- */
+  * Basic information about an HTTP connection.
+  */
 final case class ConnectionInfo(address: InetAddress, secure: Boolean)

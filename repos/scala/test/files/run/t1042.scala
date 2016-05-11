@@ -1,4 +1,4 @@
-abstract class  A {
+abstract class A {
   override def toString(): String // crucial
 
   def toString(sb: StringBuilder): StringBuilder // crucial

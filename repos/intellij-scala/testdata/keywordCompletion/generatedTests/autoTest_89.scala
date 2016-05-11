@@ -1,9 +1,10 @@
- package x 
- import a._ 
- class f 
- class g( ) extends k { 
-   def foo( ) = return true 
- /*caret*/}
+package x
+import a._
+class f
+class g() extends k {
+  def foo() = return true
+  /*caret*/
+}
 /*
 abstract
 case
@@ -35,4 +36,4 @@ type
 val
 var
 while
-*/
+ */

@@ -12,10 +12,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.Type
 import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.02.2008
+  */
 /*
  * PatDef ::= Pattern2 {',' Pattern2} [':' Type] '=' Expr
  */
@@ -34,7 +33,7 @@ object PatDef {
     while (ScalaTokenTypes.tCOMMA.equals(builder.getTokenType)) {
       ParserUtils.eatElement(builder, ScalaTokenTypes.tCOMMA)
 
-      if (!Pattern2.parse(builder, forDef = true))  {
+      if (!Pattern2.parse(builder, forDef = true)) {
         pattern2sMarker.rollbackTo()
         someMarker.drop()
         return false

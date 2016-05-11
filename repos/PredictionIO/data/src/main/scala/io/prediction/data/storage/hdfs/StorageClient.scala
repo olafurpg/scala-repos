@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.hdfs
 
 import grizzled.slf4j.Logging
@@ -22,12 +21,12 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 
-class StorageClient(val config: StorageClientConfig) extends BaseStorageClient
-    with Logging {
+class StorageClient(val config: StorageClientConfig)
+    extends BaseStorageClient with Logging {
   override val prefix = "HDFS"
   val conf = new Configuration
   val fs = FileSystem.get(conf)
-  fs.setWorkingDirectory(
-    new Path(config.properties.getOrElse("PATH", config.properties("HOSTS"))))
+  fs.setWorkingDirectory(new Path(
+          config.properties.getOrElse("PATH", config.properties("HOSTS"))))
   val client = fs
 }

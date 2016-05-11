@@ -8,10 +8,12 @@ import com.intellij.psi.PsiElementVisitor
 
 // This is checked in ScalaUnusedSymbolPass, the inspection is to allow this to be
 // turned on/off in the Inspections settings.
-class VarCouldBeValInspection extends LocalInspectionTool with UnfairLocalInspectionTool {
+class VarCouldBeValInspection
+    extends LocalInspectionTool with UnfairLocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
     new PsiElementVisitor {}
   }
 }

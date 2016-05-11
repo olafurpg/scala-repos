@@ -1,13 +1,13 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.stream
 
 import scala.annotation.tailrec
 import akka.actor.Props
 import akka.stream.ActorMaterializer
 import akka.stream.actor.ActorPublisher
-import akka.stream.scaladsl.{ Flow, Sink, Source }
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.testkit.AkkaSpec
 
 object ActorPublisherDocSpec {
@@ -33,8 +33,7 @@ object ActorPublisherDocSpec {
         sender() ! JobDenied
       case job: Job =>
         sender() ! JobAccepted
-        if (buf.isEmpty && totalDemand > 0)
-          onNext(job)
+        if (buf.isEmpty && totalDemand > 0) onNext(job)
         else {
           buf :+= job
           deliverBuf()
@@ -76,10 +75,13 @@ class ActorPublisherDocSpec extends AkkaSpec {
       testActor ! s
 
     //#actor-publisher-usage
-    val jobManagerSource = Source.actorPublisher[JobManager.Job](JobManager.props)
+    val jobManagerSource =
+      Source.actorPublisher[JobManager.Job](JobManager.props)
     val ref = Flow[JobManager.Job]
       .map(_.payload.toUpperCase)
-      .map { elem => println(elem); elem }
+      .map { elem =>
+        println(elem); elem
+      }
       .to(Sink.ignore)
       .runWith(jobManagerSource)
 
@@ -92,5 +94,4 @@ class ActorPublisherDocSpec extends AkkaSpec {
     expectMsg("B")
     expectMsg("C")
   }
-
 }

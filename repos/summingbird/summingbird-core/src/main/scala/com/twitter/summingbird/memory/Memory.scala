@@ -20,10 +20,11 @@ import com.twitter.summingbird._
 import com.twitter.summingbird.graph.HMap
 import com.twitter.summingbird.option.JobId
 import com.twitter.summingbird.planner.DagOptimizer
-import collection.mutable.{ Map => MutableMap }
+import collection.mutable.{Map => MutableMap}
 
 object Memory {
-  implicit def toSource[T](traversable: TraversableOnce[T])(implicit mf: Manifest[T]): Producer[Memory, T] =
+  implicit def toSource[T](traversable: TraversableOnce[T])(
+      implicit mf: Manifest[T]): Producer[Memory, T] =
     Producer.source[Memory, T](traversable)
 }
 
@@ -31,7 +32,8 @@ trait MemoryService[-K, +V] {
   def get(k: K): Option[V]
 }
 
-class Memory(implicit jobID: JobId = JobId("default.memory.jobId")) extends Platform[Memory] {
+class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
+    extends Platform[Memory] {
   type Source[T] = TraversableOnce[T]
   type Store[K, V] = MutableMap[K, V]
   type Sink[-T] = (T => Unit)
@@ -42,9 +44,12 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId")) extends Plat
   private type JamfMap = HMap[Prod, Stream]
 
   def counter(group: Group, name: Name): Option[Long] =
-    MemoryStatProvider.getCountersForJob(jobID).flatMap { _.get(group.getString + "/" + name.getString).map { _.get } }
+    MemoryStatProvider.getCountersForJob(jobID).flatMap {
+      _.get(group.getString + "/" + name.getString).map { _.get }
+    }
 
-  private def toStream[T](outerProducer: Prod[T], jamfs: JamfMap): (Stream[T], JamfMap) =
+  private def toStream[T](
+      outerProducer: Prod[T], jamfs: JamfMap): (Stream[T], JamfMap) =
     jamfs.get(outerProducer) match {
       case Some(s) => (s, jamfs)
       case None =>
@@ -90,7 +95,9 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId")) extends Plat
 
           case WrittenProducer(producer, fn) =>
             val (s, m) = toStream(producer, jamfs)
-            (s.map { i => fn(i); i }, m)
+            (s.map { i =>
+              fn(i); i
+            }, m)
 
           case LeftJoinedProducer(producer, service) =>
             val (s, m) = toStream(producer, jamfs)
@@ -127,7 +134,8 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId")) extends Plat
     }
 
     val dagOptimizer = new DagOptimizer[Memory] {}
-    val memoryTail = dagOptimizer.optimize(prod, dagOptimizer.ValueFlatMapToFlatMap)
+    val memoryTail =
+      dagOptimizer.optimize(prod, dagOptimizer.ValueFlatMapToFlatMap)
     val memoryDag = memoryTail.asInstanceOf[TailProducer[Memory, T]]
 
     toStream(memoryDag, HMap.empty)._1

@@ -5,7 +5,8 @@ package rng
 import java.nio.ByteBuffer
 import java.util.Arrays
 
-final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long) extends LongBasedGenerator {
+final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long)
+    extends LongBasedGenerator {
   private var x: Long = _x
   private var y: Long = _y
   private var z: Long = _z
@@ -85,6 +86,10 @@ object Cmwc5 extends GeneratorCompanion[Cmwc5, Array[Long]] {
 
   def fromTime(time: Long = System.nanoTime()): Cmwc5 = {
     val lcg = Lcg64.fromTime(time)
-    new Cmwc5(lcg.nextLong(), lcg.nextLong(), lcg.nextLong(), lcg.nextLong(), lcg.nextLong())
+    new Cmwc5(lcg.nextLong(),
+              lcg.nextLong(),
+              lcg.nextLong(),
+              lcg.nextLong(),
+              lcg.nextLong())
   }
 }

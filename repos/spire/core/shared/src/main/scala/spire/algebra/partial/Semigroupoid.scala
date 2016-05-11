@@ -5,7 +5,7 @@ package partial
 import spire.util.Opt
 
 /**
- * A semigroupoid is any set `A` with a partial binary associative operation (`partialOp`),
+  * A semigroupoid is any set `A` with a partial binary associative operation (`partialOp`),
   * which is associative in the following sense: if f,g,h are elements of the semigroupoid
   * such that either:
   *   (i) f |+|? g is defined and g |+|? h is defined
@@ -21,7 +21,8 @@ trait Semigroupoid[A] extends Any {
 }
 
 trait SemigroupoidLowPriority {
-  implicit def fromSemigroup[A](implicit semigroup: Semigroup[A]): Semigroupoid[A] =
+  implicit def fromSemigroup[A](
+      implicit semigroup: Semigroup[A]): Semigroupoid[A] =
     new Semigroupoid[A] {
       override def opIsDefined(x: A, y: A): Boolean = true
       def partialOp(x: A, y: A): Opt[A] = Opt(semigroup.op(x, y))

@@ -22,20 +22,20 @@ import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types
 
 /**
- * @author Mikhail.Mutcianko
- *         date 22.12.14
- */
-
+  * @author Mikhail.Mutcianko
+  *         date 22.12.14
+  */
 case class MacroContext(place: PsiElement, expectedType: Option[ScType])
 
 trait ScalaMacroExpandable {
-  def expandMacro(macros: ScFunction, context: MacroContext): Option[ScalaPsiElement]
+  def expandMacro(
+      macros: ScFunction, context: MacroContext): Option[ScalaPsiElement]
 }
 
 trait ScalaMacroTypeable {
   def checkMacro(macros: ScFunction, context: MacroContext): Option[ScType]
 }
 
-object ScalaMacroDummyTypeable extends ScalaMacroTypeable{
+object ScalaMacroDummyTypeable extends ScalaMacroTypeable {
   def checkMacro(macros: ScFunction, context: MacroContext) = Some(types.Any)
 }

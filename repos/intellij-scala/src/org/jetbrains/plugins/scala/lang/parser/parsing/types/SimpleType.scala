@@ -11,10 +11,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import scala.annotation.tailrec
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 15.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 15.02.2008
+  */
 /*
  * SimpleType ::= SimpleType TypeArgs
  *              | SimpleType '#' id
@@ -24,9 +23,12 @@ import scala.annotation.tailrec
  */
 
 object SimpleType {
-  def parse(builder: ScalaPsiBuilder, isPattern: Boolean, multipleSQBrackets: Boolean = true): Boolean = {
+  def parse(builder: ScalaPsiBuilder,
+            isPattern: Boolean,
+            multipleSQBrackets: Boolean = true): Boolean = {
     @tailrec
-    def parseTail(curMarker: PsiBuilder.Marker, checkSQBracket: Boolean = true) {
+    def parseTail(
+        curMarker: PsiBuilder.Marker, checkSQBracket: Boolean = true) {
       builder.getTokenType match {
         case ScalaTokenTypes.tLSQBRACKET if checkSQBracket =>
           val newMarker = curMarker.precede
@@ -83,9 +85,8 @@ object SimpleType {
             else tupleMarker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
         }
         builder.restoreNewlinesState
-      case ScalaTokenTypes.kTHIS |
-              ScalaTokenTypes.tIDENTIFIER |
-              ScalaTokenTypes.kSUPER =>
+      case ScalaTokenTypes.kTHIS | ScalaTokenTypes.tIDENTIFIER |
+          ScalaTokenTypes.kSUPER =>
         val newMarker = builder.mark
         Path parse (builder, ScalaElementTypes.REFERENCE)
         builder.getTokenType match {

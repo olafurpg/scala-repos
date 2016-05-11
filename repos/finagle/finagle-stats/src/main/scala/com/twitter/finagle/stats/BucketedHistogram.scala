@@ -6,25 +6,23 @@ import java.util
 private[twitter] object BucketedHistogram {
 
   /**
-   * Given an error, compute all the bucket values from 1 until we run out of positive
-   * 32-bit ints. The error should be in percent, between 0.0 and 1.0.
-   *
-   * Each value in the returned array will be at most `1 + (2 * error)` larger than
-   * the previous (before rounding).
-   *
-   * Because percentiles are then computed as the midpoint between two adjacent limits,
-   * this means that a value can be at most `1 + error` percent off of the actual
-   * percentile.
-   *
-   * The last bucket tracks up to `Int.MaxValue`.
-   */
+    * Given an error, compute all the bucket values from 1 until we run out of positive
+    * 32-bit ints. The error should be in percent, between 0.0 and 1.0.
+    *
+    * Each value in the returned array will be at most `1 + (2 * error)` larger than
+    * the previous (before rounding).
+    *
+    * Because percentiles are then computed as the midpoint between two adjacent limits,
+    * this means that a value can be at most `1 + error` percent off of the actual
+    * percentile.
+    *
+    * The last bucket tracks up to `Int.MaxValue`.
+    */
   private[this] def makeLimitsFor(error: Double): Array[Int] = {
     def build(maxValue: Double, factor: Double, n: Double): Stream[Double] = {
       val next = n * factor
-      if (next >= maxValue)
-        Stream.empty
-      else
-        Stream.cons(next, build(maxValue, factor, next))
+      if (next >= maxValue) Stream.empty
+      else Stream.cons(next, build(maxValue, factor, next))
     }
     require(error > 0.0 && error <= 1.0, error)
 
@@ -32,14 +30,14 @@ private[twitter] object BucketedHistogram {
       .map(_.toInt + 1) // this ensures that the smallest value is 2 (below we prepend `1`)
       .distinct
       .force
-    (Seq(1) ++ values).toArray
+      (Seq(1) ++ values).toArray
   }
 
   // 0.5% error => 1797 buckets, 7188 bytes, max 11 compares on binary search
   private[stats] val DefaultErrorPercent = 0.005
 
-  private[this] val DefaultLimits: Array[Int] =
-    makeLimitsFor(DefaultErrorPercent)
+  private[this] val DefaultLimits: Array[Int] = makeLimitsFor(
+      DefaultErrorPercent)
 
   /** check all the limits are non-negative and increasing in value. */
   private def assertLimits(limits: Array[Int]): Unit = {
@@ -55,56 +53,52 @@ private[twitter] object BucketedHistogram {
   }
 
   /**
-   * Creates an instance using the default bucket limits.
-   */
+    * Creates an instance using the default bucket limits.
+    */
   def apply(): BucketedHistogram =
     new BucketedHistogram(DefaultLimits)
-
 }
 
-
 /**
- * Allows for computing approximate percentiles from a stream of
- * data points.
- *
- * The precision is relative to the size of the data points that are
- * collected (not the number of points, but how big each value is).
- *
- * For instances created using the defaults via [[BucketedHistogram.apply()]],
- * the memory footprint should be around 7.2 KB.
- *
- * This is ''not'' internally thread-safe and thread-safety must be applied
- * externally. Typically, this is done via [[MetricsBucketedHistogram]].
- *
- * ''Note:'' while the interface for [[BucketedHistogram.add(Long)]] takes a `Long`,
- * internally the maximum value we will observe is `Int.MaxValue`. This is subject
- * to change and should be considered the minimum upper bound. Also, the smallest
- * value we will record is `0`.
- *
- * ''Note:'' this code borrows heavily from
- * [[https://github.com/twitter/ostrich/blob/master/src/main/scala/com/twitter/ostrich/stats/Histogram.scala Ostrich's Histogram]].
- * A few of the differences include:
- *  - bucket limits are configurable instead of fixed
- *  - counts per bucket are stored in int's
- *  - all synchronization is external
- *  - no tracking of min, max, sum
- *
- * @param limits the values at each index represent upper bounds, exclusive,
- *               of values for the bucket. As an example, given limits of `Array(1, 3, MaxValue)`,
- *               index=0 counts values `[0..1)`,
- *               index=1 counts values `[1..3)`, and
- *               index=2 counts values `[3..MaxValue)`.
- *               An Int per bucket should suffice, as standard usage only gives
- *               20 seconds before rolling to the next BucketedHistogram.
- *               This gives you up to Int.MaxValue / 20 = ~107MM add()s per second
- *               to a ''single'' bucket.
- *
- * @see [[BucketedHistogram.apply()]] for creation.
- */
-private[stats] class BucketedHistogram(
-    limits: Array[Int])
-  extends stats.Histogram
-{
+  * Allows for computing approximate percentiles from a stream of
+  * data points.
+  *
+  * The precision is relative to the size of the data points that are
+  * collected (not the number of points, but how big each value is).
+  *
+  * For instances created using the defaults via [[BucketedHistogram.apply()]],
+  * the memory footprint should be around 7.2 KB.
+  *
+  * This is ''not'' internally thread-safe and thread-safety must be applied
+  * externally. Typically, this is done via [[MetricsBucketedHistogram]].
+  *
+  * ''Note:'' while the interface for [[BucketedHistogram.add(Long)]] takes a `Long`,
+  * internally the maximum value we will observe is `Int.MaxValue`. This is subject
+  * to change and should be considered the minimum upper bound. Also, the smallest
+  * value we will record is `0`.
+  *
+  * ''Note:'' this code borrows heavily from
+  * [[https://github.com/twitter/ostrich/blob/master/src/main/scala/com/twitter/ostrich/stats/Histogram.scala Ostrich's Histogram]].
+  * A few of the differences include:
+  *  - bucket limits are configurable instead of fixed
+  *  - counts per bucket are stored in int's
+  *  - all synchronization is external
+  *  - no tracking of min, max, sum
+  *
+  * @param limits the values at each index represent upper bounds, exclusive,
+  *               of values for the bucket. As an example, given limits of `Array(1, 3, MaxValue)`,
+  *               index=0 counts values `[0..1)`,
+  *               index=1 counts values `[1..3)`, and
+  *               index=2 counts values `[3..MaxValue)`.
+  *               An Int per bucket should suffice, as standard usage only gives
+  *               20 seconds before rolling to the next BucketedHistogram.
+  *               This gives you up to Int.MaxValue / 20 = ~107MM add()s per second
+  *               to a ''single'' bucket.
+  *
+  * @see [[BucketedHistogram.apply()]] for creation.
+  */
+private[stats] class BucketedHistogram(limits: Array[Int])
+    extends stats.Histogram {
   BucketedHistogram.assertLimits(limits)
 
   private[this] def countsLength: Int = limits.length + 1
@@ -119,21 +113,22 @@ private[stats] class BucketedHistogram(
   private[this] var total = 0L
 
   /**
-   * Note: only values between `0` and `Int.MaxValue`, inclusive, are recorded.
-   *
-   * @inheritdoc
-   */
+    * Note: only values between `0` and `Int.MaxValue`, inclusive, are recorded.
+    *
+    * @inheritdoc
+    */
   def add(value: Long): Unit = {
-    val index = if (value >= Int.MaxValue) {
-      total += Int.MaxValue
-      countsLength - 1
-    } else {
-      total += value
-      val asInt = value.toInt
-      // recall that limits represent upper bounds, exclusive — so take the next position (+1).
-      // we assume that no inputs can be larger than the largest value in the limits array.
-      Math.abs(util.Arrays.binarySearch(limits, asInt) + 1)
-    }
+    val index =
+      if (value >= Int.MaxValue) {
+        total += Int.MaxValue
+        countsLength - 1
+      } else {
+        total += value
+        val asInt = value.toInt
+        // recall that limits represent upper bounds, exclusive — so take the next position (+1).
+        // we assume that no inputs can be larger than the largest value in the limits array.
+        Math.abs(util.Arrays.binarySearch(limits, asInt) + 1)
+      }
     counts(index) += 1
     num += 1
   }
@@ -149,17 +144,18 @@ private[stats] class BucketedHistogram(
   }
 
   /**
-   * Calculate the value of the percentile rank, `p`, for the added data points
-   * such that `p * 100`-percent of the data points are the same or less than it.
-   *
-   * @param p must be within 0.0 to 1.0, inclusive.
-   * @return the approximate value for the requested percentile.
-   *         The returned value will be within
-   *         [[BucketedHistogram.DefaultErrorPercent]] of the actual value.
-   */
+    * Calculate the value of the percentile rank, `p`, for the added data points
+    * such that `p * 100`-percent of the data points are the same or less than it.
+    *
+    * @param p must be within 0.0 to 1.0, inclusive.
+    * @return the approximate value for the requested percentile.
+    *         The returned value will be within
+    *         [[BucketedHistogram.DefaultErrorPercent]] of the actual value.
+    */
   def percentile(p: Double): Long = {
     if (p < 0.0 || p > 1.0)
-      throw new AssertionError(s"percentile must be within 0.0 to 1.0 inclusive: $p")
+      throw new AssertionError(
+          s"percentile must be within 0.0 to 1.0 inclusive: $p")
 
     val target = Math.round(p * num)
     var total = 0L
@@ -176,12 +172,12 @@ private[stats] class BucketedHistogram(
   }
 
   /**
-   * The maximum value seen by calls to [[add]].
-   *
-   * @return 0 if no values have been added.
-   *         The returned value will be within
-   *         [[BucketedHistogram.DefaultErrorPercent]] of the actual value.
-   */
+    * The maximum value seen by calls to [[add]].
+    *
+    * @return 0 if no values have been added.
+    *         The returned value will be within
+    *         [[BucketedHistogram.DefaultErrorPercent]] of the actual value.
+    */
   def maximum: Long = {
     if (num == 0) {
       0L
@@ -198,12 +194,12 @@ private[stats] class BucketedHistogram(
   }
 
   /**
-   * The minimum value seen by calls to [[add]].
-   *
-   * @return 0 if no values have been added.
-   *         The returned value will be within
-   *         [[BucketedHistogram.DefaultErrorPercent]] of the actual value.
-   */
+    * The minimum value seen by calls to [[add]].
+    *
+    * @return 0 if no values have been added.
+    *         The returned value will be within
+    *         [[BucketedHistogram.DefaultErrorPercent]] of the actual value.
+    */
   def minimum: Long = {
     if (num == 0) {
       0L
@@ -243,22 +239,21 @@ private[stats] class BucketedHistogram(
   }
 
   /**
-   * The total of all the values seen by calls to [[add]].
-   */
+    * The total of all the values seen by calls to [[add]].
+    */
   def sum: Long = total
 
   /**
-   * The number of values [[add added]].
-   */
+    * The number of values [[add added]].
+    */
   def count: Long = num
 
   /**
-   * The average, or arithmetic mean, of all values seen
-   * by calls to [[add]].
-   *
-   * @return 0.0 if no values have been [[add added]].
-   */
+    * The average, or arithmetic mean, of all values seen
+    * by calls to [[add]].
+    *
+    * @return 0.0 if no values have been [[add added]].
+    */
   def average: Double =
-    if (num == 0) 0.0 else total/num.toDouble
-
+    if (num == 0) 0.0 else total / num.toDouble
 }

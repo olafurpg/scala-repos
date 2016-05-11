@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import akka.stream.testkit.Utils._
@@ -13,7 +13,10 @@ class FlowMergeSpec extends BaseTwoStreamsSetup {
 
   override def setup(p1: Publisher[Int], p2: Publisher[Int]) = {
     val subscriber = TestSubscriber.probe[Outputs]()
-    Source.fromPublisher(p1).merge(Source.fromPublisher(p2)).runWith(Sink.fromSubscriber(subscriber))
+    Source
+      .fromPublisher(p1)
+      .merge(Source.fromPublisher(p2))
+      .runWith(Sink.fromSubscriber(subscriber))
     subscriber
   }
 
@@ -26,8 +29,13 @@ class FlowMergeSpec extends BaseTwoStreamsSetup {
       val source3 = Source(4 to 9)
       val probe = TestSubscriber.manualProbe[Int]()
 
-      source1.merge(source2).merge(source3)
-        .map(_ * 2).map(_ / 2).map(_ + 1).runWith(Sink.fromSubscriber(probe))
+      source1
+        .merge(source2)
+        .merge(source3)
+        .map(_ * 2)
+        .map(_ / 2)
+        .map(_ + 1)
+        .runWith(Sink.fromSubscriber(probe))
 
       val subscription = probe.expectSubscription()
 
@@ -58,13 +66,15 @@ class FlowMergeSpec extends BaseTwoStreamsSetup {
     }
 
     "work with one delayed completed and one nonempty publisher" in assertAllStagesStopped {
-      val subscriber1 = setup(soonToCompletePublisher, nonemptyPublisher(1 to 4))
+      val subscriber1 =
+        setup(soonToCompletePublisher, nonemptyPublisher(1 to 4))
       val subscription1 = subscriber1.expectSubscription()
       subscription1.request(4)
       (1 to 4).foreach(subscriber1.expectNext)
       subscriber1.expectComplete()
 
-      val subscriber2 = setup(nonemptyPublisher(1 to 4), soonToCompletePublisher)
+      val subscriber2 =
+        setup(nonemptyPublisher(1 to 4), soonToCompletePublisher)
       val subscription2 = subscriber2.expectSubscription()
       subscription2.request(4)
       (1 to 4).foreach(subscriber2.expectNext)
@@ -86,8 +96,11 @@ class FlowMergeSpec extends BaseTwoStreamsSetup {
       val up2 = TestPublisher.manualProbe[Int]()
       val down = TestSubscriber.manualProbe[Int]()
 
-      val (graphSubscriber1, graphSubscriber2) = Source.asSubscriber[Int]
-        .mergeMat(Source.asSubscriber[Int])((_, _)).toMat(Sink.fromSubscriber(down))(Keep.left).run
+      val (graphSubscriber1, graphSubscriber2) = Source
+        .asSubscriber[Int]
+        .mergeMat(Source.asSubscriber[Int])((_, _))
+        .toMat(Sink.fromSubscriber(down))(Keep.left)
+        .run
 
       val downstream = down.expectSubscription()
       downstream.cancel()

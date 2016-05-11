@@ -24,23 +24,27 @@ import scala.xml.Node
 import org.apache.spark.internal.Logging
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
-private[sql] class ExecutionPage(parent: SQLTab) extends WebUIPage("execution") with Logging {
+private[sql] class ExecutionPage(parent: SQLTab)
+    extends WebUIPage("execution") with Logging {
 
   private val listener = parent.listener
 
-  override def render(request: HttpServletRequest): Seq[Node] = listener.synchronized {
-    val parameterExecutionId = request.getParameter("id")
-    require(parameterExecutionId != null && parameterExecutionId.nonEmpty,
-      "Missing execution id parameter")
+  override def render(request: HttpServletRequest): Seq[Node] =
+    listener.synchronized {
+      val parameterExecutionId = request.getParameter("id")
+      require(parameterExecutionId != null && parameterExecutionId.nonEmpty,
+              "Missing execution id parameter")
 
-    val executionId = parameterExecutionId.toLong
-    val content = listener.getExecution(executionId).map { executionUIData =>
-      val currentTime = System.currentTimeMillis()
-      val duration =
-        executionUIData.completionTime.getOrElse(currentTime) - executionUIData.submissionTime
+      val executionId = parameterExecutionId.toLong
+      val content = listener
+        .getExecution(executionId)
+        .map { executionUIData =>
+          val currentTime = System.currentTimeMillis()
+          val duration =
+            executionUIData.completionTime.getOrElse(currentTime) -
+            executionUIData.submissionTime
 
-      val summary =
-        <div>
+          val summary = <div>
           <ul class="unstyled">
             <li>
               <strong>Submitted Time: </strong>{UIUtils.formatDate(executionUIData.submissionTime)}
@@ -75,18 +79,20 @@ private[sql] class ExecutionPage(parent: SQLTab) extends WebUIPage("execution") 
           </ul>
         </div>
 
-      val metrics = listener.getExecutionMetrics(executionId)
+          val metrics = listener.getExecutionMetrics(executionId)
 
-      summary ++
-        planVisualization(metrics, executionUIData.physicalPlanGraph) ++
-        physicalPlanDescription(executionUIData.physicalPlanDescription)
-    }.getOrElse {
-      <div>No information to display for Plan {executionId}</div>
+          summary ++ planVisualization(
+              metrics,
+              executionUIData.physicalPlanGraph) ++ physicalPlanDescription(
+              executionUIData.physicalPlanDescription)
+        }
+        .getOrElse {
+          <div>No information to display for Plan {executionId}</div>
+        }
+
+      UIUtils.headerSparkPage(
+          s"Details for Query $executionId", content, parent, Some(5000))
     }
-
-    UIUtils.headerSparkPage(s"Details for Query $executionId", content, parent, Some(5000))
-  }
-
 
   private def planVisualizationResources: Seq[Node] = {
     // scalastyle:off
@@ -98,7 +104,8 @@ private[sql] class ExecutionPage(parent: SQLTab) extends WebUIPage("execution") 
     // scalastyle:on
   }
 
-  private def planVisualization(metrics: Map[Long, String], graph: SparkPlanGraph): Seq[Node] = {
+  private def planVisualization(
+      metrics: Map[Long, String], graph: SparkPlanGraph): Seq[Node] = {
     val metadata = graph.allNodes.flatMap { node =>
       val nodeId = s"plan-meta-data-${node.id}"
       <div id={nodeId}>{node.desc}</div>
@@ -121,7 +128,8 @@ private[sql] class ExecutionPage(parent: SQLTab) extends WebUIPage("execution") 
   private def jobURL(jobId: Long): String =
     "%s/jobs/job?id=%s".format(UIUtils.prependBaseUri(parent.basePath), jobId)
 
-  private def physicalPlanDescription(physicalPlanDescription: String): Seq[Node] = {
+  private def physicalPlanDescription(
+      physicalPlanDescription: String): Seq[Node] = {
     <div>
       <span style="cursor: pointer;" onclick="clickPhysicalPlanDetails();">
         <span id="physical-plan-details-arrow" class="arrow-closed"></span>

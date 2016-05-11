@@ -9,11 +9,11 @@ import com.intellij.psi.{PsiElement, PsiFile}
 import org.jetbrains.plugins.scala.lang.psi.stubs.elements.wrappers.IStubElementTypeWrapper
 
 /**
- * @author ilyas
- */
-
-abstract class ScStubElementType[S <: StubElement[T], T <: PsiElement](debugName: String)
-extends IStubElementTypeWrapper[S, T](debugName) {
+  * @author ilyas
+  */
+abstract class ScStubElementType[S <: StubElement[T], T <: PsiElement](
+    debugName: String)
+    extends IStubElementTypeWrapper[S, T](debugName) {
 
   def getExternalId = "sc." + super.toString
 

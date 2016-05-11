@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import akka.stream._
@@ -12,7 +12,8 @@ import scala.concurrent.duration._
 import org.scalactic.ConversionCheckedTripleEquals
 import org.scalacheck.Shrink
 
-class GraphMergeSortedSpec extends TwoStreamsSetup with GeneratorDrivenPropertyChecks {
+class GraphMergeSortedSpec
+    extends TwoStreamsSetup with GeneratorDrivenPropertyChecks {
 
   override type Outputs = Int
 
@@ -24,7 +25,8 @@ class GraphMergeSortedSpec extends TwoStreamsSetup with GeneratorDrivenPropertyC
     override def out: Outlet[Outputs] = merge.out
   }
 
-  implicit def noShrink[T] = Shrink[T](_ ⇒ Stream.empty) // do not shrink failures, it only destroys evidence
+  implicit def noShrink[T] =
+    Shrink[T](_ ⇒ Stream.empty) // do not shrink failures, it only destroys evidence
 
   "MergeSorted" must {
 
@@ -34,7 +36,8 @@ class GraphMergeSortedSpec extends TwoStreamsSetup with GeneratorDrivenPropertyC
       forAll(gen) { picks ⇒
         val N = picks.size
         val (left, right) = picks.zipWithIndex.partition(_._1)
-        Source(left.map(_._2)).mergeSorted(Source(right.map(_._2)))
+        Source(left.map(_._2))
+          .mergeSorted(Source(right.map(_._2)))
           .grouped(N max 1)
           .concat(Source.single(Nil))
           .runWith(Sink.head)
@@ -43,6 +46,5 @@ class GraphMergeSortedSpec extends TwoStreamsSetup with GeneratorDrivenPropertyC
     }
 
     commonTests()
-
   }
 }

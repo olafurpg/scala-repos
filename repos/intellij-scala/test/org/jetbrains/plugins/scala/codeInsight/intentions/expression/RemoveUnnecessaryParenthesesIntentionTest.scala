@@ -5,10 +5,11 @@ import org.jetbrains.plugins.scala.codeInsight.intention.expression.RemoveUnnece
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 /**
- * Nikolay.Tropin
- * 4/29/13
- */
-class RemoveUnnecessaryParenthesesIntentionTest extends ScalaIntentionTestBase {
+  * Nikolay.Tropin
+  * 4/29/13
+  */
+class RemoveUnnecessaryParenthesesIntentionTest
+    extends ScalaIntentionTestBase {
   def familyName: String = RemoveUnnecessaryParenthesesIntention.familyName
 
   def test_1() {
@@ -24,15 +25,13 @@ class RemoveUnnecessaryParenthesesIntentionTest extends ScalaIntentionTestBase {
   }
 
   def test_3() {
-    val text =
-      """
+    val text = """
         |def f(n: Int): Int = n match {
         |  case even if (<caret>even % 2 == 0) => (even + 1)
         |  case odd =>  1 + (odd * 3)
         |}
       """
-    val result =
-      """
+    val result = """
         |def f(n: Int): Int = n match {
         |  case even if even % 2 == 0 => (even + 1)
         |  case odd => 1 + (odd * 3)
@@ -42,15 +41,13 @@ class RemoveUnnecessaryParenthesesIntentionTest extends ScalaIntentionTestBase {
   }
 
   def test_4() {
-    val text =
-      """
+    val text = """
         |def f(n: Int): Int = n match {
         |  case even if (even % 2 == 0) => (even + 1<caret>)
         |  case odd => 1 + (odd * 3)
         |}
       """
-    val result =
-      """
+    val result = """
         |def f(n: Int): Int = n match {
         |  case even if (even % 2 == 0) => even + 1
         |  case odd => 1 + (odd * 3)
@@ -60,15 +57,13 @@ class RemoveUnnecessaryParenthesesIntentionTest extends ScalaIntentionTestBase {
   }
 
   def test_5() {
-    val text =
-      """
+    val text = """
         |def f(n: Int): Int = n match {
         |  case even if (even % 2 == 0) => (even + 1)
         |  case odd =>  1 + (odd * 3<caret>)
         |}
       """
-    val result =
-      """
+    val result = """
         |def f(n: Int): Int = n match {
         |  case even if (even % 2 == 0) => (even + 1)
         |  case odd => 1 + odd * 3

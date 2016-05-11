@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.persistence.query.journal.leveldb
 
 import akka.actor.ActorLogging
@@ -14,22 +14,28 @@ import akka.stream.actor.ActorPublisherMessage.Cancel
 import akka.stream.actor.ActorPublisherMessage.Request
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object AllPersistenceIdsPublisher {
-  def props(liveQuery: Boolean, maxBufSize: Int, writeJournalPluginId: String): Props =
-    Props(new AllPersistenceIdsPublisher(liveQuery, maxBufSize, writeJournalPluginId))
+  def props(liveQuery: Boolean,
+            maxBufSize: Int,
+            writeJournalPluginId: String): Props =
+    Props(new AllPersistenceIdsPublisher(
+            liveQuery, maxBufSize, writeJournalPluginId))
 
   private case object Continue
 }
 
 /**
- * INTERNAL API
- */
-private[akka] class AllPersistenceIdsPublisher(liveQuery: Boolean, maxBufSize: Int, writeJournalPluginId: String)
-  extends ActorPublisher[String] with DeliveryBuffer[String] with ActorLogging {
+  * INTERNAL API
+  */
+private[akka] class AllPersistenceIdsPublisher(
+    liveQuery: Boolean, maxBufSize: Int, writeJournalPluginId: String)
+    extends ActorPublisher[String] with DeliveryBuffer[String]
+    with ActorLogging {
 
-  val journal: ActorRef = Persistence(context.system).journalFor(writeJournalPluginId)
+  val journal: ActorRef =
+    Persistence(context.system).journalFor(writeJournalPluginId)
 
   def receive = init
 
@@ -44,8 +50,7 @@ private[akka] class AllPersistenceIdsPublisher(liveQuery: Boolean, maxBufSize: I
     case LeveldbJournal.CurrentPersistenceIds(allPersistenceIds) ⇒
       buf ++= allPersistenceIds
       deliverBuf()
-      if (!liveQuery && buf.isEmpty)
-        onCompleteThenStop()
+      if (!liveQuery && buf.isEmpty) onCompleteThenStop()
 
     case LeveldbJournal.PersistenceIdAdded(persistenceId) ⇒
       if (liveQuery) {
@@ -55,10 +60,8 @@ private[akka] class AllPersistenceIdsPublisher(liveQuery: Boolean, maxBufSize: I
 
     case _: Request ⇒
       deliverBuf()
-      if (!liveQuery && buf.isEmpty)
-        onCompleteThenStop()
+      if (!liveQuery && buf.isEmpty) onCompleteThenStop()
 
     case Cancel ⇒ context.stop(self)
   }
-
 }

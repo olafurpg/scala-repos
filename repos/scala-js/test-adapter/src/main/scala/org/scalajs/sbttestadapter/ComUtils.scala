@@ -20,7 +20,7 @@ private[testadapter] object ComUtils {
       handler: LoopHandler[T]): T = {
     receiveResponse(com, timeout)(handler) match {
       case Some(v) => v
-      case None    => receiveLoop(com, timeout)(handler)
+      case None => receiveLoop(com, timeout)(handler)
     }
   }
 
@@ -29,7 +29,7 @@ private[testadapter] object ComUtils {
       handler: LoopHandler[T]): T = {
     receiveResponse(com, deadline.timeLeft)(handler) match {
       case Some(v) => v
-      case None    => receiveLoop(com, deadline)(handler)
+      case None => receiveLoop(com, deadline)(handler)
     }
   }
 
@@ -39,12 +39,10 @@ private[testadapter] object ComUtils {
   def receiveResponse[T](com: ComJSRunner, timeout: Duration)(
       handler: Handler[T]): T = {
     val resp = {
-      try com.receive(timeout)
-      catch {
+      try com.receive(timeout) catch {
         case t: ComJSEnv.ComClosedException =>
           // Check if runner failed. If it did, throw that exception instead
-          if (!com.isRunning())
-            com.await() // Will throw if runner failed
+          if (!com.isRunning()) com.await() // Will throw if runner failed
 
           throw t
       }
@@ -57,15 +55,13 @@ private[testadapter] object ComUtils {
 
     val pos = resp.indexOf(':')
 
-    if (pos == -1)
-      badResponse()
+    if (pos == -1) badResponse()
 
     val status = resp.substring(0, pos)
     val data = resp.substring(pos + 1)
 
     def throwable = {
-      try fromJSON[RemoteException](readJSON(data))
-      catch {
+      try fromJSON[RemoteException](readJSON(data)) catch {
         case t: Throwable => badResponse(t)
       }
     }
@@ -81,8 +77,7 @@ private[testadapter] object ComUtils {
     }
 
     val result = {
-      try handler.lift((status, data))
-      catch {
+      try handler.lift((status, data)) catch {
         case t: Throwable => badResponse(t)
       }
     }
@@ -97,5 +92,4 @@ private[testadapter] object ComUtils {
   val okHandler: Handler[Unit] = {
     case ("ok", "") =>
   }
-
 }

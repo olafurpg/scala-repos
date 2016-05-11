@@ -34,33 +34,34 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
 object MotionBlur {
-  implicit def sfxMotionBlur2jfx(mb: MotionBlur): jfxse.MotionBlur = if (mb != null) mb.delegate else null
+  implicit def sfxMotionBlur2jfx(mb: MotionBlur): jfxse.MotionBlur =
+    if (mb != null) mb.delegate else null
 }
 
-class MotionBlur(override val delegate: jfxse.MotionBlur = new jfxse.MotionBlur)
-  extends Effect(delegate)
-  with InputDelegate[jfxse.MotionBlur]
-  with SFXDelegate[jfxse.MotionBlur] {
+class MotionBlur(
+    override val delegate: jfxse.MotionBlur = new jfxse.MotionBlur)
+    extends Effect(delegate) with InputDelegate[jfxse.MotionBlur]
+    with SFXDelegate[jfxse.MotionBlur] {
 
   /**
-   * Creates a new instance of MotionBlur with the specified angle and radius.
-   */
-  def this(angle: Double, radius: Double) = this(new jfxse.MotionBlur(angle, radius))
+    * Creates a new instance of MotionBlur with the specified angle and radius.
+    */
+  def this(angle: Double, radius: Double) =
+    this(new jfxse.MotionBlur(angle, radius))
 
   /**
-   * The angle of the motion effect, in degrees.
-   */
+    * The angle of the motion effect, in degrees.
+    */
   def angle: DoubleProperty = delegate.angleProperty
   def angle_=(v: Double) {
     angle() = v
   }
 
   /**
-   * The radius of the blur kernel.
-   */
+    * The radius of the blur kernel.
+    */
   def radius: DoubleProperty = delegate.radiusProperty
   def radius_=(v: Double) {
     radius() = v
   }
-
 }

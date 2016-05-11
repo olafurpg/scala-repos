@@ -20,43 +20,58 @@ class RespondWithDirectivesSpec extends RoutingSpec {
     "add the given header to successful responses" in {
       Get() ~> {
         respondWithHeader(customHeader) { completeOk }
-      } ~> check { response shouldEqual HttpResponse(headers = customHeader :: Nil) }
+      } ~> check {
+        response shouldEqual HttpResponse(headers = customHeader :: Nil)
+      }
     }
   }
   "respondWithHeaders" should {
     "add the given headers to successful responses" in {
       Get() ~> {
         respondWithHeaders(customHeader, customHeader2) { completeOk }
-      } ~> check { response shouldEqual HttpResponse(headers = customHeader :: customHeader2 :: Nil) }
+      } ~> check {
+        response shouldEqual HttpResponse(
+            headers = customHeader :: customHeader2 :: Nil)
+      }
     }
   }
   "respondWithDefaultHeader" should {
-    def route(extraHeaders: HttpHeader*) = respondWithDefaultHeader(customHeader) {
-      respondWithHeaders(extraHeaders: _*) {
-        completeOk
+    def route(extraHeaders: HttpHeader*) =
+      respondWithDefaultHeader(customHeader) {
+        respondWithHeaders(extraHeaders: _*) {
+          completeOk
+        }
       }
-    }
 
     "add the given header to a response if the header was missing before" in {
-      Get() ~> route() ~> check { response shouldEqual HttpResponse(headers = customHeader :: Nil) }
+      Get() ~> route() ~> check {
+        response shouldEqual HttpResponse(headers = customHeader :: Nil)
+      }
     }
     "not change a response if the header already existed" in {
-      Get() ~> route(existingHeader) ~> check { response shouldEqual HttpResponse(headers = existingHeader :: Nil) }
+      Get() ~> route(existingHeader) ~> check {
+        response shouldEqual HttpResponse(headers = existingHeader :: Nil)
+      }
     }
   }
   "respondWithDefaultHeaders" should {
-    def route(extraHeaders: HttpHeader*) = respondWithDefaultHeaders(customHeader, customHeader2) {
-      respondWithHeaders(extraHeaders: _*) {
-        completeOk
+    def route(extraHeaders: HttpHeader*) =
+      respondWithDefaultHeaders(customHeader, customHeader2) {
+        respondWithHeaders(extraHeaders: _*) {
+          completeOk
+        }
       }
-    }
 
     "add the given headers to a response if the header was missing before" in {
-      Get() ~> route() ~> check { response shouldEqual HttpResponse(headers = customHeader :: customHeader2 :: Nil) }
+      Get() ~> route() ~> check {
+        response shouldEqual HttpResponse(
+            headers = customHeader :: customHeader2 :: Nil)
+      }
     }
     "not update an existing header" in {
       Get() ~> route(existingHeader) ~> check {
-        response shouldEqual HttpResponse(headers = List(customHeader2, existingHeader))
+        response shouldEqual HttpResponse(
+            headers = List(customHeader2, existingHeader))
       }
     }
   }

@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.library
 
@@ -112,8 +112,8 @@ class UnionTypeTest {
     assertEquals("hello", x2)
 
     /* Note: the *total* upper bound does not work without an explicit
-     * `merge`, because the expected type is not an | type.
-     */
+   * `merge`, because the expected type is not an | type.
+   */
   }
 
   @Test def merge(): Unit = {
@@ -148,16 +148,20 @@ class UnionTypeTest {
     assertEquals(a, a: js.UndefOr[js.UndefOr[Int] | String])
     assertEquals(a, a: js.UndefOr[Int | js.UndefOr[String]])
     assertEquals(a, a: js.UndefOr[js.UndefOr[Int] | js.UndefOr[String]])
-    assertEquals(a, a: js.UndefOr[js.UndefOr[js.UndefOr[Int]] | js.UndefOr[String]])
-    assertEquals(a, a: js.UndefOr[js.UndefOr[Int] | js.UndefOr[js.UndefOr[String]]])
+    assertEquals(
+        a, a: js.UndefOr[js.UndefOr[js.UndefOr[Int]] | js.UndefOr[String]])
+    assertEquals(
+        a, a: js.UndefOr[js.UndefOr[Int] | js.UndefOr[js.UndefOr[String]]])
 
     assertEquals(a, a: js.UndefOr[String | Int])
     assertEquals(a, a: js.UndefOr[String | Int])
     assertEquals(a, a: js.UndefOr[js.UndefOr[String] | Int])
     assertEquals(a, a: js.UndefOr[String | js.UndefOr[Int]])
     assertEquals(a, a: js.UndefOr[js.UndefOr[String] | js.UndefOr[Int]])
-    assertEquals(a, a: js.UndefOr[js.UndefOr[String] | js.UndefOr[js.UndefOr[Int]]])
-    assertEquals(a, a: js.UndefOr[js.UndefOr[js.UndefOr[String]] | js.UndefOr[Int]])
+    assertEquals(
+        a, a: js.UndefOr[js.UndefOr[String] | js.UndefOr[js.UndefOr[Int]]])
+    assertEquals(
+        a, a: js.UndefOr[js.UndefOr[js.UndefOr[String]] | js.UndefOr[Int]])
 
     // Confirm that we're working with triple unions too
 
@@ -183,34 +187,27 @@ class UnionTypeTest {
    */
 
   @Test def neither_left_nor_right(): Unit = {
-    typeError(
-        "3: Boolean | String")
+    typeError("3: Boolean | String")
   }
 
   @Test def none_of_three_types(): Unit = {
-    typeError(
-        "3: Boolean | String | List[Int]")
+    typeError("3: Boolean | String | List[Int]")
   }
 
   @Test def wrong_type_parameter_on_left_or_right(): Unit = {
-    typeError(
-        "List(1, 2): List[String] | String")
-    typeError(
-        "List(1, 2): String | List[String]")
+    typeError("List(1, 2): List[String] | String")
+    typeError("List(1, 2): String | List[String]")
   }
 
   @Test def left_of_OR_type_is_not_a_subtype_of_rhs(): Unit = {
-    typeError(
-        "(1: Int | List[String]): String | List[String]")
+    typeError("(1: Int | List[String]): String | List[String]")
   }
 
   @Test def right_of_OR_type_is_not_a_subtype_of_rhs(): Unit = {
-    typeError(
-        "(1: Int | List[String]): String | Int")
+    typeError("(1: Int | List[String]): String | Int")
   }
 
   @Test def merge_with_an_incorrect_subtype(): Unit = {
-    typeError(
-        "(List(1, 2): List[Int] | Set[Int]).merge: Seq[Int]")
+    typeError("(List(1, 2): List[Int] | Set[Int]).merge: Seq[Int]")
   }
 }

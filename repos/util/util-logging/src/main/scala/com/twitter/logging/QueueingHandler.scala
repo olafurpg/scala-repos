@@ -25,29 +25,30 @@ import java.util.{logging => javalog}
 object QueueingHandler {
 
   private[this] val executor = Executors.newCachedThreadPool(
-    new NamedPoolThreadFactory("QueueingHandlerPool", makeDaemons = true))
+      new NamedPoolThreadFactory("QueueingHandlerPool", makeDaemons = true))
 
   private val DefaultFuturePool = new ExecutorServiceFuturePool(executor)
 
   private object QueueClosedException extends RuntimeException
 
   /**
-   * Generates a HandlerFactory that returns a QueueingHandler
-   *
-   * @param handler Wrapped handler that publishing is proxied to.
-   *
-   * @param maxQueueSize Maximum queue size. Records are sent to
-   * [[QueueingHandler.onOverflow]] when it is at capacity.
-   */
+    * Generates a HandlerFactory that returns a QueueingHandler
+    *
+    * @param handler Wrapped handler that publishing is proxied to.
+    *
+    * @param maxQueueSize Maximum queue size. Records are sent to
+    * [[QueueingHandler.onOverflow]] when it is at capacity.
+    */
   // The type parameter exists to ease java interop
   def apply[H <: Handler](
-    handler: () => H,
-    maxQueueSize: Int = Int.MaxValue,
-    inferClassNames: Boolean = false
+      handler: () => H,
+      maxQueueSize: Int = Int.MaxValue,
+      inferClassNames: Boolean = false
   ): () => QueueingHandler =
     () => new QueueingHandler(handler(), maxQueueSize, inferClassNames)
 
-  def apply(handler: HandlerFactory, maxQueueSize: Int): () => QueueingHandler =
+  def apply(
+      handler: HandlerFactory, maxQueueSize: Int): () => QueueingHandler =
     apply(handler, maxQueueSize, false)
 
   // java interop
@@ -56,28 +57,29 @@ object QueueingHandler {
 }
 
 /**
- * Proxy handler that queues log records and publishes them in another thread to
- * a nested handler. Useful for when a handler may block.
- *
- * @param handler Wrapped handler that publishing is proxied to.
- *
- * @param maxQueueSize Maximum queue size. Records are sent to
- * [[onOverflow]] when it is at capacity.
- *
- * @param inferClassNames [[com.twitter.logging.LogRecord]] and
- * [[java.util.logging.LogRecord]] both attempt to infer the class and
- * method name of the caller, but the inference needs the stack trace at
- * the time that the record is logged. QueueingHandler breaks the
- * inference because the log record is rendered out of band, so the stack
- * trace is gone. Setting this option to true will cause the
- * introspection to happen before the log record is queued, which means
- * that the class name and method name will be available when the log
- * record is passed to the underlying handler. This defaults to false
- * because it loses some of the latency improvements of deferring
- * logging by getting the stack trace synchronously.
- */
-class QueueingHandler(handler: Handler, val maxQueueSize: Int, inferClassNames: Boolean)
-  extends ProxyHandler(handler) {
+  * Proxy handler that queues log records and publishes them in another thread to
+  * a nested handler. Useful for when a handler may block.
+  *
+  * @param handler Wrapped handler that publishing is proxied to.
+  *
+  * @param maxQueueSize Maximum queue size. Records are sent to
+  * [[onOverflow]] when it is at capacity.
+  *
+  * @param inferClassNames [[com.twitter.logging.LogRecord]] and
+  * [[java.util.logging.LogRecord]] both attempt to infer the class and
+  * method name of the caller, but the inference needs the stack trace at
+  * the time that the record is logged. QueueingHandler breaks the
+  * inference because the log record is rendered out of band, so the stack
+  * trace is gone. Setting this option to true will cause the
+  * introspection to happen before the log record is queued, which means
+  * that the class name and method name will be available when the log
+  * record is passed to the underlying handler. This defaults to false
+  * because it loses some of the latency improvements of deferring
+  * logging by getting the stack trace synchronously.
+  */
+class QueueingHandler(
+    handler: Handler, val maxQueueSize: Int, inferClassNames: Boolean)
+    extends ProxyHandler(handler) {
 
   import QueueingHandler._
 
@@ -104,8 +106,7 @@ class QueueingHandler(handler: Handler, val maxQueueSize: Int, inferClassNames: 
     DefaultFuturePool {
       // We run this in a FuturePool to avoid satisfying pollers
       // (which flush the record) inline.
-      if (!queue.offer(record))
-        onOverflow(record)
+      if (!queue.offer(record)) onOverflow(record)
     }
   }
 
@@ -148,9 +149,10 @@ class QueueingHandler(handler: Handler, val maxQueueSize: Int, inferClassNames: 
   }
 
   /**
-   * Called when record dropped.  Default is to log to console.
-   */
+    * Called when record dropped.  Default is to log to console.
+    */
   protected def onOverflow(record: javalog.LogRecord): Unit = {
-    Console.err.println(String.format("[%s] log queue overflow - record dropped", Time.now.toString))
+    Console.err.println(String.format(
+            "[%s] log queue overflow - record dropped", Time.now.toString))
   }
 }

@@ -36,13 +36,13 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.input.TransferMode]]. */
 @RunWith(classOf[JUnitRunner])
-class TransferModeSpec extends SFXEnumDelegateSpec[jfxsi.TransferMode, TransferMode](
-  javaClass = classOf[jfxsi.TransferMode],
-  scalaClass = classOf[TransferMode],
-  companion = TransferMode) {
+class TransferModeSpec
+    extends SFXEnumDelegateSpec[jfxsi.TransferMode, TransferMode](
+        javaClass = classOf[jfxsi.TransferMode],
+        scalaClass = classOf[TransferMode],
+        companion = TransferMode) {
 
   it should "contain all static fields" in {
     TransferMode.ANY should be(jfxsi.TransferMode.ANY)

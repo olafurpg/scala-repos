@@ -6,21 +6,22 @@ import com.gravity.goose.network.HtmlFetcher
 import com.gravity.goose.Configuration
 
 /**
- * Created by Jim Plush
- * User: jim
- * Date: 9/22/11
- * Integration test for Image Utilities helper methods
- */
-
+  * Created by Jim Plush
+  * User: jim
+  * Date: 9/22/11
+  * Integration test for Image Utilities helper methods
+  */
 class ImageUtilsIT {
 
   @Test
   def storeImageLocally() {
     val httpClient: HttpClient = HtmlFetcher.getHttpClient
-    val imgSrc = "http://tctechcrunch2011.files.wordpress.com/2011/09/aaaaa.png?w=288m"
-    println(ImageUtils.storeImageToLocalFile(httpClient, "abc", imgSrc, new Configuration))
+    val imgSrc =
+      "http://tctechcrunch2011.files.wordpress.com/2011/09/aaaaa.png?w=288m"
+    println(
+        ImageUtils.storeImageToLocalFile(
+            httpClient, "abc", imgSrc, new Configuration))
   }
-
 
   @Test
   def imageDimensions() {

@@ -28,24 +28,32 @@ class ShuffleDependencySuite extends SparkFunSuite with LocalSparkContext {
 
   val conf = new SparkConf(loadDefaults = false)
 
-  test("key, value, and combiner classes correct in shuffle dependency without aggregation") {
+  test(
+      "key, value, and combiner classes correct in shuffle dependency without aggregation") {
     sc = new SparkContext("local", "test", conf.clone())
-    val rdd = sc.parallelize(1 to 5, 4)
+    val rdd = sc
+      .parallelize(1 to 5, 4)
       .map(key => (KeyClass(), ValueClass()))
       .groupByKey()
     val dep = rdd.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]]
-    assert(!dep.mapSideCombine, "Test requires that no map-side aggregator is defined")
+    assert(!dep.mapSideCombine,
+           "Test requires that no map-side aggregator is defined")
     assert(dep.keyClassName == classOf[KeyClass].getName)
     assert(dep.valueClassName == classOf[ValueClass].getName)
   }
 
-  test("key, value, and combiner classes available in shuffle dependency with aggregation") {
+  test(
+      "key, value, and combiner classes available in shuffle dependency with aggregation") {
     sc = new SparkContext("local", "test", conf.clone())
-    val rdd = sc.parallelize(1 to 5, 4)
+    val rdd = sc
+      .parallelize(1 to 5, 4)
       .map(key => (KeyClass(), ValueClass()))
-      .aggregateByKey(CombinerClass())({ case (a, b) => a }, { case (a, b) => a })
+      .aggregateByKey(CombinerClass())({ case (a, b) => a }, {
+        case (a, b) => a
+      })
     val dep = rdd.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]]
-    assert(dep.mapSideCombine && dep.aggregator.isDefined, "Test requires map-side aggregation")
+    assert(dep.mapSideCombine && dep.aggregator.isDefined,
+           "Test requires map-side aggregation")
     assert(dep.keyClassName == classOf[KeyClass].getName)
     assert(dep.valueClassName == classOf[ValueClass].getName)
     assert(dep.combinerClassName == Some(classOf[CombinerClass].getName))
@@ -53,15 +61,15 @@ class ShuffleDependencySuite extends SparkFunSuite with LocalSparkContext {
 
   test("combineByKey null combiner class tag handled correctly") {
     sc = new SparkContext("local", "test", conf.clone())
-    val rdd = sc.parallelize(1 to 5, 4)
+    val rdd = sc
+      .parallelize(1 to 5, 4)
       .map(key => (KeyClass(), ValueClass()))
       .combineByKey((v: ValueClass) => v,
-        (c: AnyRef, v: ValueClass) => c,
-        (c1: AnyRef, c2: AnyRef) => c1)
+                    (c: AnyRef, v: ValueClass) => c,
+                    (c1: AnyRef, c2: AnyRef) => c1)
     val dep = rdd.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]]
     assert(dep.keyClassName == classOf[KeyClass].getName)
     assert(dep.valueClassName == classOf[ValueClass].getName)
     assert(dep.combinerClassName == None)
   }
-
 }

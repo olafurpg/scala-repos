@@ -25,32 +25,32 @@ import org.apache.spark.mllib.util.NumericParser
 import org.apache.spark.SparkException
 
 /**
- * Class that represents the features and labels of a data point.
- *
- * @param label Label for this data point.
- * @param features List of features for this data point.
- */
+  * Class that represents the features and labels of a data point.
+  *
+  * @param label Label for this data point.
+  * @param features List of features for this data point.
+  */
 @Since("0.8.0")
 @BeanInfo
-case class LabeledPoint @Since("1.0.0") (
-    @Since("0.8.0") label: Double,
-    @Since("1.0.0") features: Vector) {
+case class LabeledPoint @Since("1.0.0")(
+    @Since("0.8.0") label: Double, @Since("1.0.0") features: Vector) {
   override def toString: String = {
     s"($label,$features)"
   }
 }
 
 /**
- * Parser for [[org.apache.spark.mllib.regression.LabeledPoint]].
- *
- */
+  * Parser for [[org.apache.spark.mllib.regression.LabeledPoint]].
+  *
+  */
 @Since("1.1.0")
 object LabeledPoint {
+
   /**
-   * Parses a string resulted from `LabeledPoint#toString` into
-   * an [[org.apache.spark.mllib.regression.LabeledPoint]].
-   *
-   */
+    * Parses a string resulted from `LabeledPoint#toString` into
+    * an [[org.apache.spark.mllib.regression.LabeledPoint]].
+    *
+    */
   @Since("1.1.0")
   def parse(s: String): LabeledPoint = {
     if (s.startsWith("(")) {
@@ -60,10 +60,12 @@ object LabeledPoint {
         case other =>
           throw new SparkException(s"Cannot parse $other.")
       }
-    } else { // dense format used before v1.0
+    } else {
+      // dense format used before v1.0
       val parts = s.split(',')
       val label = java.lang.Double.parseDouble(parts(0))
-      val features = Vectors.dense(parts(1).trim().split(' ').map(java.lang.Double.parseDouble))
+      val features = Vectors.dense(
+          parts(1).trim().split(' ').map(java.lang.Double.parseDouble))
       LabeledPoint(label, features)
     }
   }

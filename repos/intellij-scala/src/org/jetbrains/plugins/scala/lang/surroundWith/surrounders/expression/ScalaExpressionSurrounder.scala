@@ -5,11 +5,10 @@ package surrounders
 package expression
 
 /**
- * User: Dmitry.Krasilschikov
- * Date: 09.01.2007
- *
- */
-
+  * User: Dmitry.Krasilschikov
+  * Date: 09.01.2007
+  *
+  */
 import com.intellij.lang.ASTNode
 import com.intellij.lang.surroundWith.Surrounder
 import com.intellij.openapi.editor.Editor
@@ -26,17 +25,19 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
  * Surrounds an expression and return an expression
  */
 abstract class ScalaExpressionSurrounder extends Surrounder {
-  def isApplicable(element : PsiElement) : Boolean = {
+  def isApplicable(element: PsiElement): Boolean = {
     element match {
-      case _ : ScExpression | _: PsiWhiteSpace | _: ScValue | _: ScVariable | _: ScFunction | _: ScTypeAlias => {
-        true
-      }
+      case _: ScExpression | _: PsiWhiteSpace | _: ScValue | _: ScVariable |
+          _: ScFunction | _: ScTypeAlias => {
+          true
+        }
       case e => {
-        if (ScalaPsiUtil.isLineTerminator(e)) true
-        else if (e.getNode.getElementType == ScalaTokenTypes.tSEMICOLON) true
-        else if (ScalaTokenTypes.COMMENTS_TOKEN_SET contains e.getNode.getElementType) true
-        else false
-      }
+          if (ScalaPsiUtil.isLineTerminator(e)) true
+          else if (e.getNode.getElementType == ScalaTokenTypes.tSEMICOLON) true
+          else if (ScalaTokenTypes.COMMENTS_TOKEN_SET contains e.getNode.getElementType)
+            true
+          else false
+        }
     }
   }
 
@@ -53,22 +54,22 @@ abstract class ScalaExpressionSurrounder extends Surrounder {
     }
   }
 
-  override def isApplicable(elements : Array[PsiElement]) : Boolean = {
-    for (element <- elements)
-      if (!isApplicable(element)) return false
+  override def isApplicable(elements: Array[PsiElement]): Boolean = {
+    for (element <- elements) if (!isApplicable(element)) return false
     true
   }
 
-  override def surroundElements(project : Project, editor : Editor, elements : Array[PsiElement]) : TextRange = {
+  override def surroundElements(project: Project,
+                                editor: Editor,
+                                elements: Array[PsiElement]): TextRange = {
     val newNode = surroundPsi(elements).getNode
     var childNode: ASTNode = null
 
     for (child <- elements) {
       if (childNode == null) {
         childNode = child.getNode
-        childNode.getTreeParent.replaceChild(childNode,newNode)
-      }
-      else {
+        childNode.getTreeParent.replaceChild(childNode, newNode)
+      } else {
         childNode = child.getNode
         childNode.getTreeParent.removeChild(childNode)
       }
@@ -76,11 +77,13 @@ abstract class ScalaExpressionSurrounder extends Surrounder {
     getSurroundSelectionRange(newNode)
   }
 
-  def surroundPsi(elements: Array[PsiElement]): PsiElement = ScalaPsiElementFactory.createExpressionFromText(
-    if (needParenthesis(elements)) "(" + getTemplateAsString(elements) + ")"
-    else getTemplateAsString(elements),
-    elements(0).getManager
-  )
+  def surroundPsi(elements: Array[PsiElement]): PsiElement =
+    ScalaPsiElementFactory.createExpressionFromText(
+        if (needParenthesis(elements))
+          "(" + getTemplateAsString(elements) + ")"
+        else getTemplateAsString(elements),
+        elements(0).getManager
+    )
 
   def getTemplateAsString(elements: Array[PsiElement]): String = {
     var s: String = ""
@@ -90,5 +93,5 @@ abstract class ScalaExpressionSurrounder extends Surrounder {
     s
   }
 
-  def getSurroundSelectionRange (node : ASTNode) : TextRange
+  def getSurroundSelectionRange(node: ASTNode): TextRange
 }

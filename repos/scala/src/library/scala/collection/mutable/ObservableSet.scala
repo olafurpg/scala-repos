@@ -1,12 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |                                         **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |                                         **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
-
-
 
 package scala
 package collection
@@ -15,17 +13,18 @@ package mutable
 import script._
 
 /** This class is typically used as a mixin. It adds a subscription
- *  mechanism to the `Set` class into which this abstract
- *  class is mixed in. Class `ObservableSet` publishes
- *  events of the type `Message`.
- *
- *  @author  Matthias Zenger
- *  @version 1.0, 08/07/2003
- *  @since   1
- */
-@deprecated("Observables are deprecated because scripting is deprecated.", "2.11.0")
-trait ObservableSet[A] extends Set[A] with Publisher[Message[A] with Undoable]
-{
+  *  mechanism to the `Set` class into which this abstract
+  *  class is mixed in. Class `ObservableSet` publishes
+  *  events of the type `Message`.
+  *
+  *  @author  Matthias Zenger
+  *  @version 1.0, 08/07/2003
+  *  @since   1
+  */
+@deprecated(
+    "Observables are deprecated because scripting is deprecated.", "2.11.0")
+trait ObservableSet[A]
+    extends Set[A] with Publisher[Message[A] with Undoable] {
 
   type Pub <: ObservableSet[A]
 
@@ -47,7 +46,8 @@ trait ObservableSet[A] extends Set[A] with Publisher[Message[A] with Undoable]
 
   abstract override def clear(): Unit = {
     super.clear()
-    publish(new Reset with Undoable {
+    publish(
+        new Reset with Undoable {
       def undo(): Unit = throw new UnsupportedOperationException("cannot undo")
     })
   }

@@ -4,18 +4,21 @@ object SCL6628 {
 
   case class A(x: Int)
 
-  /* resolved: true */foo(A)
+  /* resolved: true */
+  foo(A)
 
   class B(x: Int)
   object B {
     def apply(x: Int): B = new B(x)
   }
 
-  /*resolved: false */foo(B)
+  /*resolved: false */
+  foo(B)
 
   case class C[T](x: T)
 
-  /* resolved: false */foo(C)
+  /* resolved: false */
+  foo(C)
 
-  List(1, 2, 3)./* resolved: false */map(C)
+  List(1, 2, 3). /* resolved: false */ map(C)
 }

@@ -5,19 +5,18 @@ import org.jboss.netty.handler.codec.embedder.EncoderEmbedder
 import org.jboss.netty.handler.codec.http.{HttpContentCompressor, HttpHeaders, HttpMessage}
 
 /**
- * Custom compressor that only handles text-like content-types with the default
- * compression level.
- */
-private[http]
-class TextualContentCompressor extends HttpContentCompressor {
+  * Custom compressor that only handles text-like content-types with the default
+  * compression level.
+  */
+private[http] class TextualContentCompressor extends HttpContentCompressor {
   import TextualContentCompressor._
 
   override def newContentEncoder(msg: HttpMessage, acceptEncoding: String) =
     contentEncoder(msg, acceptEncoding).orNull
 
   private[this] def contentEncoder(
-    msg: HttpMessage,
-    acceptEncoding: String
+      msg: HttpMessage,
+      acceptEncoding: String
   ): Option[EncoderEmbedder[ChannelBuffer]] = {
     Option(msg.headers.get(HttpHeaders.Names.CONTENT_TYPE)) collect {
       case ctype if isTextual(ctype) =>
@@ -36,13 +35,12 @@ class TextualContentCompressor extends HttpContentCompressor {
 }
 
 private object TextualContentCompressor {
-  val TextLike = Set(
-    "image/svg+xml",
-    "application/atom+xml",
-    "application/javascript",
-    "application/json",
-    "application/rss+xml",
-    "application/x-javascript",
-    "application/xhtml+xml",
-    "application/xml")
+  val TextLike = Set("image/svg+xml",
+                     "application/atom+xml",
+                     "application/javascript",
+                     "application/json",
+                     "application/rss+xml",
+                     "application/x-javascript",
+                     "application/xhtml+xml",
+                     "application/xml")
 }

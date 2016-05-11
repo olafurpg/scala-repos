@@ -7,7 +7,6 @@ import breeze.storage.Zero
 
 import scala.util.control.ControlThrowable
 
-
 /**
   * all(t) true if all elements of t are non-zero
   * all(f, t) returns true if all elements of t satisfy f
@@ -17,18 +16,20 @@ import scala.util.control.ControlThrowable
 object all extends UFunc {
   private case object Found extends ControlThrowable
 
-  implicit def reduceUFunc[F, T, S](implicit impl2: Impl2[S => Boolean, T, Boolean],
-                                    base: UFunc.UImpl[F, S, Boolean]): Impl2[F, T, Boolean] = {
-    new Impl2[F, T, Boolean]  {
+  implicit def reduceUFunc[F, T, S](
+      implicit impl2: Impl2[S => Boolean, T, Boolean],
+      base: UFunc.UImpl[F, S, Boolean]): Impl2[F, T, Boolean] = {
+    new Impl2[F, T, Boolean] {
       override def apply(v: F, v2: T): Boolean = {
         all((x: S) => base(x), v2)
       }
     }
   }
 
-  implicit def reduceFun[T, S](implicit ctv: CanTraverseValues[T, S]): Impl2[S=>Boolean, T, Boolean] = {
-    new Impl2[S=>Boolean, T, Boolean] {
-      override def apply(f: S=>Boolean, v2: T): Boolean = {
+  implicit def reduceFun[T, S](implicit ctv: CanTraverseValues[T, S])
+    : Impl2[S => Boolean, T, Boolean] = {
+    new Impl2[S => Boolean, T, Boolean] {
+      override def apply(f: S => Boolean, v2: T): Boolean = {
 
         object Visitor extends ValuesVisitor[S] {
           def visit(a: S): Unit = {
@@ -38,7 +39,6 @@ object all extends UFunc {
           def zeros(numZero: Int, zeroValue: S): Unit = {
             if (numZero != 0 && !f(zeroValue)) throw Found
           }
-
         }
 
         try {
@@ -47,16 +47,15 @@ object all extends UFunc {
         } catch {
           case Found => false
         }
-
       }
     }
   }
 
-  implicit def reduceZero[T, S](implicit impl2: Impl2[S=> Boolean, T, Boolean], z: Zero[S]): Impl[T, Boolean] = new Impl[T, Boolean] {
+  implicit def reduceZero[T, S](
+      implicit impl2: Impl2[S => Boolean, T, Boolean],
+      z: Zero[S]): Impl[T, Boolean] = new Impl[T, Boolean] {
     override def apply(v: T): Boolean = {
       all((_: S) != z.zero, v)
     }
   }
-
-
 }

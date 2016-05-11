@@ -16,28 +16,28 @@ import scala.reflect.ClassTag
 @RunWith(classOf[RobolectricTestRunner])
 @Config(manifest = Config.NONE, emulateSdk = 16)
 class helpersTest extends JUnitSuite with ShouldMatchers {
-  implicit var activity:SActivity = _
-    @Before
-    def createActivity():Unit={
-        activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
-    }
-
-    @Test
-    def testAlert(): Unit ={
-      AppHelpers.alert("TITLE","MESSAGE",()=>{})
-      val alert = ShadowAlertDialog.getLatestAlertDialog
-      alert shouldBe a ('showing)
-
-      val shadowAlert = Robolectric.shadowOf(alert)
-      shadowAlert.getTitle shouldBe "TITLE"
-      shadowAlert.getMessage shouldBe "MESSAGE"
-
-      alert.getButton(DialogInterface.BUTTON_POSITIVE).performClick()
-      alert shouldNot be a 'showing
-    }
+  implicit var activity: SActivity = _
+  @Before
+  def createActivity(): Unit = {
+    activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
+  }
 
   @Test
-  def testOpenUri():Unit ={
+  def testAlert(): Unit = {
+    AppHelpers.alert("TITLE", "MESSAGE", () => {})
+    val alert = ShadowAlertDialog.getLatestAlertDialog
+    alert shouldBe a('showing)
+
+    val shadowAlert = Robolectric.shadowOf(alert)
+    shadowAlert.getTitle shouldBe "TITLE"
+    shadowAlert.getMessage shouldBe "MESSAGE"
+
+    alert.getButton(DialogInterface.BUTTON_POSITIVE).performClick()
+    alert shouldNot be a 'showing
+  }
+
+  @Test
+  def testOpenUri(): Unit = {
     val uri = Uri.parse("http://scaloid.org/")
     AppHelpers.openUri(uri)
     val shadowActivity = Robolectric.shadowOf(activity)
@@ -47,57 +47,66 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
   }
 
   @Test
-  def testPendingService():Unit = {
+  def testPendingService(): Unit = {
     implicit val tag = ClassTag(classOf[SServiceImpl])
-    val shadowPI = Robolectric.shadowOf(AppHelpers.pendingService[SServiceImpl])
+    val shadowPI =
+      Robolectric.shadowOf(AppHelpers.pendingService[SServiceImpl])
     val intent = shadowPI.getSavedIntent
     intent.getComponent.getClassName shouldBe classOf[SServiceImpl].getName
   }
 
   @Test
-  def testPendingActivity():Unit = {
+  def testPendingActivity(): Unit = {
     implicit val tag = ClassTag(classOf[SActivityImpl])
-    val shadowPI = Robolectric.shadowOf(AppHelpers.pendingActivity[SActivityImpl])
+    val shadowPI =
+      Robolectric.shadowOf(AppHelpers.pendingActivity[SActivityImpl])
     val intent = shadowPI.getSavedIntent
     intent.getComponent.getClassName shouldBe classOf[SActivityImpl].getName
   }
 
   @Test
-  def testBroadcastReceiver():Unit={
+  def testBroadcastReceiver(): Unit = {
     val controller = Robolectric.buildActivity(classOf[SActivityImpl]).create
     activity = controller.get()
-    ContentHelpers.broadcastReceiver(new IntentFilter(Intent.ACTION_VIEW))((c:Context,i:Intent)=> c.startActivity(SIntent[SActivityImpl]))
+    ContentHelpers.broadcastReceiver(new IntentFilter(Intent.ACTION_VIEW))(
+        (c: Context, i: Intent) => c.startActivity(SIntent[SActivityImpl]))
     activity = controller.start.resume.get
 
-    val registered = Robolectric.getShadowApplication.getRegisteredReceivers.asScala
+    val registered =
+      Robolectric.getShadowApplication.getRegisteredReceivers.asScala
     registered shouldNot be a 'empty
-    registered.foreach{r=>
+    registered.foreach { r =>
       r.getIntentFilter.getAction(0) shouldBe Intent.ACTION_VIEW
     }
 
-    val intent = new Intent(Intent.ACTION_VIEW,Uri.parse("http://scaloid.org/"))
-    val received = Robolectric.getShadowApplication.getReceiversForIntent(intent).asScala
+    val intent = new Intent(
+        Intent.ACTION_VIEW, Uri.parse("http://scaloid.org/"))
+    val received =
+      Robolectric.getShadowApplication.getReceiversForIntent(intent).asScala
     received.size shouldBe 1
-    received(0).onReceive(Robolectric.getShadowApplication.getApplicationContext,intent)
+    received(0).onReceive(
+        Robolectric.getShadowApplication.getApplicationContext, intent)
     val nextIntent = Robolectric.getShadowApplication.peekNextStartedActivity
     nextIntent.getComponent.getClassName shouldBe classOf[SActivityImpl].getName
   }
 
   @Test
-  def testSharedPreference():Unit = {
-    PreferenceHelpers.defaultSharedPreferences.edit.putString("foo","bar").commit
-    PreferenceHelpers.defaultSharedPreferences.getString("foo","") shouldBe "bar"
+  def testSharedPreference(): Unit = {
+    PreferenceHelpers.defaultSharedPreferences.edit
+      .putString("foo", "bar")
+      .commit
+    PreferenceHelpers.defaultSharedPreferences.getString("foo", "") shouldBe "bar"
   }
 
   @Test
-  def testToast():Unit={
+  def testToast(): Unit = {
     WidgetHelpers.toast("Hello")
     ShadowToast.getTextOfLatestToast shouldBe "Hello"
   }
   @Test
-  def testSpinnerDialog():Unit={
-    val dialog = WidgetHelpers.spinnerDialog("TITLE","MESSAGE")
-    dialog shouldBe a ('showing)
+  def testSpinnerDialog(): Unit = {
+    val dialog = WidgetHelpers.spinnerDialog("TITLE", "MESSAGE")
+    dialog shouldBe a('showing)
 
     val shadowDialog = Robolectric.shadowOf(dialog)
     shadowDialog.getTitle shouldBe "TITLE"

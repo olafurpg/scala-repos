@@ -1,10 +1,10 @@
 package akka.dispatch
 
-import java.util.concurrent.{ ExecutorService, Executor, Executors }
+import java.util.concurrent.{ExecutorService, Executor, Executors}
 import java.util.concurrent.atomic.AtomicInteger
 import scala.concurrent._
 import scala.concurrent.duration._
-import akka.testkit.{ TestLatch, AkkaSpec, DefaultTimeout }
+import akka.testkit.{TestLatch, AkkaSpec, DefaultTimeout}
 import akka.util.SerializedSuspendableExecutionContext
 import akka.testkit.TestActorRef
 import akka.actor.Props
@@ -20,16 +20,20 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
     "be instantiable" in {
       val es = Executors.newCachedThreadPool()
       try {
-        val executor: Executor with ExecutionContext = ExecutionContext.fromExecutor(es)
+        val executor: Executor with ExecutionContext =
+          ExecutionContext.fromExecutor(es)
         executor should not be (null)
 
-        val executorService: ExecutorService with ExecutionContext = ExecutionContext.fromExecutorService(es)
+        val executorService: ExecutorService with ExecutionContext =
+          ExecutionContext.fromExecutorService(es)
         executorService should not be (null)
 
-        val jExecutor: ExecutionContextExecutor = ExecutionContext.fromExecutor(es)
+        val jExecutor: ExecutionContextExecutor =
+          ExecutionContext.fromExecutor(es)
         jExecutor should not be (null)
 
-        val jExecutorService: ExecutionContextExecutorService = ExecutionContexts.fromExecutorService(es)
+        val jExecutorService: ExecutionContextExecutorService =
+          ExecutionContexts.fromExecutorService(es)
         jExecutorService should not be (null)
       } finally {
         es.shutdown
@@ -41,10 +45,11 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
 
       import system.dispatcher
 
-      def batchable[T](f: ⇒ T)(implicit ec: ExecutionContext): Unit = ec.execute(new Batchable {
-        override def isBatchable = true
-        override def run: Unit = f
-      })
+      def batchable[T](f: ⇒ T)(implicit ec: ExecutionContext): Unit =
+        ec.execute(new Batchable {
+          override def isBatchable = true
+          override def run: Unit = f
+        })
 
       val p = Promise[Unit]()
       batchable {
@@ -52,11 +57,15 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
         callingThreadLock.compareAndSet(0, 1) // Enable the lock
         (1 to 100) foreach { i ⇒
           batchable {
-            if (callingThreadLock.get != 0) p.tryFailure(new IllegalStateException("Batch was executed inline!"))
+            if (callingThreadLock.get != 0)
+              p.tryFailure(
+                  new IllegalStateException("Batch was executed inline!"))
             else if (count.incrementAndGet == 100) p.trySuccess(()) //Done
             else if (lock.compareAndSet(0, 1)) {
               try Thread.sleep(10) finally lock.compareAndSet(1, 0)
-            } else p.tryFailure(new IllegalStateException("Executed batch in parallel!"))
+            } else
+              p.tryFailure(
+                  new IllegalStateException("Executed batch in parallel!"))
           }
         }
         callingThreadLock.compareAndSet(1, 0) // Disable the lock
@@ -68,10 +77,11 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
       system.dispatcher.isInstanceOf[BatchingExecutor] should ===(true)
       import system.dispatcher
 
-      def batchable[T](f: ⇒ T)(implicit ec: ExecutionContext): Unit = ec.execute(new Batchable {
-        override def isBatchable = true
-        override def run: Unit = f
-      })
+      def batchable[T](f: ⇒ T)(implicit ec: ExecutionContext): Unit =
+        ec.execute(new Batchable {
+          override def isBatchable = true
+          override def run: Unit = f
+        })
 
       val latch = TestLatch(101)
       batchable {
@@ -96,7 +106,9 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
         // this needs to be within an OnCompleteRunnable so that things are added to the batch
         val p = Future.successful(42)
         // we need the callback list to be non-empty when the blocking{} call is executing
-        p.onComplete { _ ⇒ () }
+        p.onComplete { _ ⇒
+          ()
+        }
         val r = p.map { _ ⇒
           // trigger the resubmitUnbatched() call
           blocking { () }
@@ -105,7 +117,9 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
           // now try again to blockOn()
           blocking { () }
         }
-        p.onComplete { _ ⇒ () }
+        p.onComplete { _ ⇒
+          ()
+        }
         r
       }
       Await.result(f, 3.seconds) should be(())
@@ -130,7 +144,8 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
     "work with same-thread executor plus blocking" in {
       val ec = akka.dispatch.ExecutionContexts.sameThreadExecutionContext
       var x = 0
-      ec.execute(new Runnable {
+      ec.execute(
+          new Runnable {
         override def run = {
           ec.execute(new Runnable {
             override def run = blocking {
@@ -143,7 +158,8 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
     }
 
     "work with same-thread dispatcher plus blocking" in {
-      val a = TestActorRef(Props(new Actor {
+      val a = TestActorRef(
+          Props(new Actor {
         def receive = {
           case msg ⇒
             blocking {
@@ -151,7 +167,8 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
             }
         }
       }))
-      val b = TestActorRef(Props(new Actor {
+      val b = TestActorRef(
+          Props(new Actor {
         def receive = {
           case msg ⇒ a forward msg
         }
@@ -187,9 +204,12 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
 
   "A SerializedSuspendableExecutionContext" must {
     "be suspendable and resumable" in {
-      val sec = SerializedSuspendableExecutionContext(1)(ExecutionContext.global)
+      val sec =
+        SerializedSuspendableExecutionContext(1)(ExecutionContext.global)
       val counter = new AtomicInteger(0)
-      def perform(f: Int ⇒ Int) = sec execute new Runnable { def run = counter.set(f(counter.get)) }
+      def perform(f: Int ⇒ Int) = sec execute new Runnable {
+        def run = counter.set(f(counter.get))
+      }
       perform(_ + 1)
       perform(x ⇒ { sec.suspend(); x * 2 })
       awaitCond(counter.get == 2)
@@ -210,16 +230,24 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
       val submissions = new AtomicInteger(0)
       val counter = new AtomicInteger(0)
       val underlying = new ExecutionContext {
-        override def execute(r: Runnable) { submissions.incrementAndGet(); ExecutionContext.global.execute(r) }
-        override def reportFailure(t: Throwable) { ExecutionContext.global.reportFailure(t) }
+        override def execute(r: Runnable) {
+          submissions.incrementAndGet(); ExecutionContext.global.execute(r)
+        }
+        override def reportFailure(t: Throwable) {
+          ExecutionContext.global.reportFailure(t)
+        }
       }
       val throughput = 25
       val sec = SerializedSuspendableExecutionContext(throughput)(underlying)
       sec.suspend()
-      def perform(f: Int ⇒ Int) = sec execute new Runnable { def run = counter.set(f(counter.get)) }
+      def perform(f: Int ⇒ Int) = sec execute new Runnable {
+        def run = counter.set(f(counter.get))
+      }
 
       val total = 1000
-      1 to total foreach { _ ⇒ perform(_ + 1) }
+      1 to total foreach { _ ⇒
+        perform(_ + 1)
+      }
       sec.size() should ===(total)
       sec.resume()
       awaitCond(counter.get == total)
@@ -228,12 +256,17 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
     }
 
     "execute tasks in serial" in {
-      val sec = SerializedSuspendableExecutionContext(1)(ExecutionContext.global)
+      val sec =
+        SerializedSuspendableExecutionContext(1)(ExecutionContext.global)
       val total = 10000
       val counter = new AtomicInteger(0)
-      def perform(f: Int ⇒ Int) = sec execute new Runnable { def run = counter.set(f(counter.get)) }
+      def perform(f: Int ⇒ Int) = sec execute new Runnable {
+        def run = counter.set(f(counter.get))
+      }
 
-      1 to total foreach { i ⇒ perform(c ⇒ if (c == (i - 1)) c + 1 else c) }
+      1 to total foreach { i ⇒
+        perform(c ⇒ if (c == (i - 1)) c + 1 else c)
+      }
       awaitCond(counter.get == total)
       sec.isEmpty should ===(true)
     }
@@ -242,15 +275,23 @@ class ExecutionContextSpec extends AkkaSpec with DefaultTimeout {
       val submissions = new AtomicInteger(0)
       val counter = new AtomicInteger(0)
       val underlying = new ExecutionContext {
-        override def execute(r: Runnable) { submissions.incrementAndGet(); ExecutionContext.global.execute(r) }
-        override def reportFailure(t: Throwable) { ExecutionContext.global.reportFailure(t) }
+        override def execute(r: Runnable) {
+          submissions.incrementAndGet(); ExecutionContext.global.execute(r)
+        }
+        override def reportFailure(t: Throwable) {
+          ExecutionContext.global.reportFailure(t)
+        }
       }
       val throughput = 25
       val sec = SerializedSuspendableExecutionContext(throughput)(underlying)
       sec.suspend()
-      def perform(f: Int ⇒ Int) = sec execute new Runnable { def run = counter.set(f(counter.get)) }
+      def perform(f: Int ⇒ Int) = sec execute new Runnable {
+        def run = counter.set(f(counter.get))
+      }
       perform(_ + 1)
-      1 to 10 foreach { _ ⇒ perform(identity) }
+      1 to 10 foreach { _ ⇒
+        perform(identity)
+      }
       perform(x ⇒ { sec.suspend(); x * 2 })
       perform(_ + 8)
       sec.size should ===(13)

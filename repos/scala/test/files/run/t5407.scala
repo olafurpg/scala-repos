@@ -8,10 +8,9 @@ object Test extends App {
   val x = Foo(1, Some(2), false)
   println(foo(x))
 
-
   def bar(x: Foo) = x match {
-	  case Foo(x, Some(y), z) => y
-	  case Foo(x, None, z) => 0
-	}
+    case Foo(x, Some(y), z) => y
+    case Foo(x, None, z) => 0
+  }
   println(bar(x))
 }

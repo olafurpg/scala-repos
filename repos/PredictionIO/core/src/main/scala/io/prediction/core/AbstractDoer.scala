@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.core
 
 import grizzled.slf4j.Logging
@@ -30,6 +29,7 @@ abstract class AbstractDoer extends Serializable
   */
 @DeveloperApi
 object Doer extends Logging {
+
   /** :: DeveloperApi ::
     * Instantiates a controller class using supplied controller parameters as
     * constructor parameters
@@ -40,8 +40,7 @@ object Doer extends Logging {
     * @return An instance of the controller class
     */
   @DeveloperApi
-  def apply[C <: AbstractDoer] (
-    cls: Class[_ <: C], params: Params): C = {
+  def apply[C <: AbstractDoer](cls: Class[_ <: C], params: Params): C = {
 
     // Subclasses only allows two kind of constructors.
     // 1. Constructor with P <: Params.
@@ -51,16 +50,18 @@ object Doer extends Logging {
       val constr = cls.getConstructor(params.getClass)
       constr.newInstance(params)
     } catch {
-      case e: NoSuchMethodException => try {
-        val zeroConstr = cls.getConstructor()
-        zeroConstr.newInstance()
-      } catch {
-        case e: NoSuchMethodException =>
-          error(s"${params.getClass.getName} was used as the constructor " +
-            s"argument to ${e.getMessage}, but no constructor can handle it. " +
-            "Aborting.")
-          sys.exit(1)
-      }
+      case e: NoSuchMethodException =>
+        try {
+          val zeroConstr = cls.getConstructor()
+          zeroConstr.newInstance()
+        } catch {
+          case e: NoSuchMethodException =>
+            error(
+                s"${params.getClass.getName} was used as the constructor " +
+                s"argument to ${e.getMessage}, but no constructor can handle it. " +
+                "Aborting.")
+            sys.exit(1)
+        }
     }
   }
 }

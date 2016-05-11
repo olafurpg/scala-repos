@@ -16,12 +16,12 @@ See the License for the specific language governing permissions and
 package akka.sample.osgi.activation
 
 import akka.osgi.ActorSystemActivator
-import akka.actor.{ Props, ActorSystem }
+import akka.actor.{Props, ActorSystem}
 import akka.sample.osgi.internal.Table
 import akka.sample.osgi.service.DiningHakkersServiceImpl
 import akka.sample.osgi.api.DiningHakkersService
-import akka.event.{ LogSource, Logging }
-import org.osgi.framework.{ ServiceRegistration, BundleContext }
+import akka.event.{LogSource, Logging}
+import org.osgi.framework.{ServiceRegistration, BundleContext}
 
 class Activator extends ActorSystemActivator {
 
@@ -39,17 +39,18 @@ class Activator extends ActorSystemActivator {
   }
 
   /**
-   * registers the DinningHakkerService as a Service to be tracked and find by other OSGi bundles.
-   * in other words, this instance may be used in other bundles which listen or track the OSGi Service
-   * @param context  OSGi BundleContext
-   * @param system   ActorSystem
-   */
+    * registers the DinningHakkerService as a Service to be tracked and find by other OSGi bundles.
+    * in other words, this instance may be used in other bundles which listen or track the OSGi Service
+    * @param context  OSGi BundleContext
+    * @param system   ActorSystem
+    */
   def registerHakkersService(context: BundleContext, system: ActorSystem) {
 
     val hakkersService = new DiningHakkersServiceImpl(system)
 
-    diningHakkerService = Some(context.registerService(classOf[DiningHakkersService].getName(), hakkersService, null))
-
+    diningHakkerService = Some(
+        context.registerService(
+            classOf[DiningHakkersService].getName(), hakkersService, null))
   }
 
   override def stop(context: BundleContext) {
@@ -62,7 +63,8 @@ class Activator extends ActorSystemActivator {
     diningHakkerService foreach (_.unregister())
   }
 
-  override def getActorSystemName(context: BundleContext): String = "akka-osgi-sample"
+  override def getActorSystemName(context: BundleContext): String =
+    "akka-osgi-sample"
 }
 
 object Activator {

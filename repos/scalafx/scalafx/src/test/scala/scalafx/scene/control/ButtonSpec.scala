@@ -35,11 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * Button Spec tests.
- *
- *
- */
+  * Button Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ButtonSpec
-  extends SimpleSFXDelegateSpec[jfxsc.Button, Button](classOf[jfxsc.Button], classOf[Button])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsc.Button, Button](
+        classOf[jfxsc.Button], classOf[Button]) with RunOnApplicationThread

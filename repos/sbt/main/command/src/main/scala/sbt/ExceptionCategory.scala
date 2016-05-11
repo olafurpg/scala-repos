@@ -3,7 +3,7 @@ package sbt
 import java.lang.reflect.InvocationTargetException
 import scala.annotation.tailrec
 
-import sbt.internal.util.{ AlreadyHandledException, MessageOnlyException, UnprintableException }
+import sbt.internal.util.{AlreadyHandledException, MessageOnlyException, UnprintableException}
 
 private[sbt] sealed abstract class ExceptionCategory {
   def isFull: Boolean = false
@@ -16,7 +16,7 @@ private[sbt] object ExceptionCategory {
       val cause = ite.getCause
       if (cause == null || cause == ite) new Full(ite) else apply(cause)
     case _: MessageOnlyException => new MessageOnly(t.toString)
-    case _                       => new Full(t)
+    case _ => new Full(t)
   }
 
   object AlreadyHandled extends ExceptionCategory

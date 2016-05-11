@@ -4,17 +4,18 @@
 package scala.tools.nsc.classpath
 
 import scala.reflect.io.AbstractFile
-import scala.tools.nsc.util.{ ClassFileLookup, ClassPath, ClassRepresentation }
+import scala.tools.nsc.util.{ClassFileLookup, ClassPath, ClassRepresentation}
 
 /**
- * A base trait for the particular flat classpath representation implementations.
- *
- * We call this variant of a classpath representation flat because it's possible to
- * query the whole classpath using just single instance extending this trait.
- *
- * This is an alternative design compared to scala.tools.nsc.util.ClassPath
- */
+  * A base trait for the particular flat classpath representation implementations.
+  *
+  * We call this variant of a classpath representation flat because it's possible to
+  * query the whole classpath using just single instance extending this trait.
+  *
+  * This is an alternative design compared to scala.tools.nsc.util.ClassPath
+  */
 trait FlatClassPath extends ClassFileLookup[AbstractFile] {
+
   /** Empty string represents root package */
   private[nsc] def packages(inPackage: String): Seq[PackageEntry]
   private[nsc] def classes(inPackage: String): Seq[ClassFileEntry]
@@ -25,19 +26,20 @@ trait FlatClassPath extends ClassFileLookup[AbstractFile] {
 
   // A default implementation which should be overridden, if we can create the more efficient
   // solution for a given type of FlatClassPath
-  override def findClass(className: String): Option[ClassRepresentation[AbstractFile]] = {
-    val (pkg, simpleClassName) = PackageNameUtils.separatePkgAndClassNames(className)
+  override def findClass(
+      className: String): Option[ClassRepresentation[AbstractFile]] = {
+    val (pkg, simpleClassName) =
+      PackageNameUtils.separatePkgAndClassNames(className)
 
-    val foundClassFromClassFiles = classes(pkg)
-      .find(_.name == simpleClassName)
+    val foundClassFromClassFiles = classes(pkg).find(_.name == simpleClassName)
 
-    def findClassInSources = sources(pkg)
-      .find(_.name == simpleClassName)
+    def findClassInSources = sources(pkg).find(_.name == simpleClassName)
 
     foundClassFromClassFiles orElse findClassInSources
   }
 
-  override def asClassPathString: String = ClassPath.join(asClassPathStrings: _*)
+  override def asClassPathString: String =
+    ClassPath.join(asClassPathStrings: _*)
   def asClassPathStrings: Seq[String]
 }
 
@@ -45,12 +47,14 @@ object FlatClassPath {
   val RootPackage = ""
 }
 
-case class FlatClassPathEntries(packages: Seq[PackageEntry], classesAndSources: Seq[ClassRepClassPathEntry])
+case class FlatClassPathEntries(packages: Seq[PackageEntry],
+                                classesAndSources: Seq[ClassRepClassPathEntry])
 
 object FlatClassPathEntries {
   import scala.language.implicitConversions
   // to have working unzip method
-  implicit def entry2Tuple(entry: FlatClassPathEntries) = (entry.packages, entry.classesAndSources)
+  implicit def entry2Tuple(entry: FlatClassPathEntries) =
+    (entry.packages, entry.classesAndSources)
 }
 
 sealed trait ClassRepClassPathEntry extends ClassRepresentation[AbstractFile]
@@ -67,21 +71,25 @@ trait PackageEntry {
   def name: String
 }
 
-private[nsc] case class ClassFileEntryImpl(file: AbstractFile) extends ClassFileEntry {
+private[nsc] case class ClassFileEntryImpl(file: AbstractFile)
+    extends ClassFileEntry {
   override def name = FileUtils.stripClassExtension(file.name) // class name
 
   override def binary: Option[AbstractFile] = Some(file)
   override def source: Option[AbstractFile] = None
 }
 
-private[nsc] case class SourceFileEntryImpl(file: AbstractFile) extends SourceFileEntry {
+private[nsc] case class SourceFileEntryImpl(file: AbstractFile)
+    extends SourceFileEntry {
   override def name = FileUtils.stripSourceExtension(file.name)
 
   override def binary: Option[AbstractFile] = None
   override def source: Option[AbstractFile] = Some(file)
 }
 
-private[nsc] case class ClassAndSourceFilesEntry(classFile: AbstractFile, srcFile: AbstractFile) extends ClassRepClassPathEntry {
+private[nsc] case class ClassAndSourceFilesEntry(
+    classFile: AbstractFile, srcFile: AbstractFile)
+    extends ClassRepClassPathEntry {
   override def name = FileUtils.stripClassExtension(classFile.name)
 
   override def binary: Option[AbstractFile] = Some(classFile)

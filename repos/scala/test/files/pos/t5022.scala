@@ -4,7 +4,7 @@ class ForSomeVsUnapply {
     def useRep[e](rep: (e, X[e])) = ()
 
     val repUnapply = Wrap.unapply(makeWrap).get
-    useRep(repUnapply)  // okay
+    useRep(repUnapply) // okay
 
     val Wrap(rep0) = makeWrap
     useRep(rep0) // error

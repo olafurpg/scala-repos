@@ -15,19 +15,19 @@ final class RichBippy[C <: Bippy with Singleton](val c1: C) {
 
 object p {
 
-  val c  = new Bippy
+  val c = new Bippy
   val d0 = new RichBippy[c.type](c)
   def d1 = new RichBippy[c.type](c)
- 
-  d0.f[Int](5)(null: c.Foo[Int])  // ok
-  d1.f[Int](5)(null: c.Foo[Int])  // fails
 
-  d0.g[Int](5)(null: c.Foo[Int])  // ok
-  d1.g[Int](5)(null: c.Foo[Int])  // fails
+  d0.f[Int](5)(null: c.Foo[Int]) // ok
+  d1.f[Int](5)(null: c.Foo[Int]) // fails
 
-  d0.h[Int](5)(null: c.Foo[Int])  // ok
-  d1.h[Int](5)(null: c.Foo[Int])  // ok
+  d0.g[Int](5)(null: c.Foo[Int]) // ok
+  d1.g[Int](5)(null: c.Foo[Int]) // fails
 
-  d0.i("")(null)  // ok
-  d1.i("")(null)  // ok
+  d0.h[Int](5)(null: c.Foo[Int]) // ok
+  d1.h[Int](5)(null: c.Foo[Int]) // ok
+
+  d0.i("")(null) // ok
+  d1.i("")(null) // ok
 }

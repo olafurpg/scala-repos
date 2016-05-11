@@ -39,39 +39,44 @@ private[spark] trait ShuffleWriterGroup {
 }
 
 /**
- * Manages assigning disk-based block writers to shuffle tasks. Each shuffle task gets one file
- * per reducer.
- */
+  * Manages assigning disk-based block writers to shuffle tasks. Each shuffle task gets one file
+  * per reducer.
+  */
 // Note: Changes to the format in this file should be kept in sync with
 // org.apache.spark.network.shuffle.ExternalShuffleBlockResolver#getHashBasedShuffleBlockData().
 private[spark] class FileShuffleBlockResolver(conf: SparkConf)
-  extends ShuffleBlockResolver with Logging {
+    extends ShuffleBlockResolver with Logging {
 
   private val transportConf = SparkTransportConf.fromSparkConf(conf, "shuffle")
 
   private lazy val blockManager = SparkEnv.get.blockManager
 
   // Use getSizeAsKb (not bytes) to maintain backwards compatibility if no units are provided
-  private val bufferSize = conf.getSizeAsKb("spark.shuffle.file.buffer", "32k").toInt * 1024
+  private val bufferSize =
+    conf.getSizeAsKb("spark.shuffle.file.buffer", "32k").toInt * 1024
 
   /**
-   * Contains all the state related to a particular shuffle.
-   */
+    * Contains all the state related to a particular shuffle.
+    */
   private class ShuffleState(val numReducers: Int) {
+
     /**
-     * The mapIds of all map tasks completed on this Executor for this shuffle.
-     */
+      * The mapIds of all map tasks completed on this Executor for this shuffle.
+      */
     val completedMapTasks = new ConcurrentLinkedQueue[Int]()
   }
 
   private val shuffleStates = new ConcurrentHashMap[ShuffleId, ShuffleState]
 
   /**
-   * Get a ShuffleWriterGroup for the given map task, which will register it as complete
-   * when the writers are closed successfully
-   */
-  def forMapTask(shuffleId: Int, mapId: Int, numReducers: Int, serializer: Serializer,
-      writeMetrics: ShuffleWriteMetrics): ShuffleWriterGroup = {
+    * Get a ShuffleWriterGroup for the given map task, which will register it as complete
+    * when the writers are closed successfully
+    */
+  def forMapTask(shuffleId: Int,
+                 mapId: Int,
+                 numReducers: Int,
+                 serializer: Serializer,
+                 writeMetrics: ShuffleWriteMetrics): ShuffleWriterGroup = {
     new ShuffleWriterGroup {
       private val shuffleState: ShuffleState = {
         // Note: we do _not_ want to just wrap this java ConcurrentHashMap into a Scala map and use
@@ -86,7 +91,8 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
           val blockId = ShuffleBlockId(shuffleId, mapId, bucketId)
           val blockFile = blockManager.diskBlockManager.getFile(blockId)
           val tmp = Utils.tempFileWith(blockFile)
-          blockManager.getDiskWriter(blockId, tmp, serializerInstance, bufferSize, writeMetrics)
+          blockManager.getDiskWriter(
+              blockId, tmp, serializerInstance, bufferSize, writeMetrics)
         }
       }
       // Creating the file to write to and creating a disk writer both involve interacting with
@@ -117,7 +123,8 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
   private def removeShuffleBlocks(shuffleId: ShuffleId): Boolean = {
     Option(shuffleStates.get(shuffleId)) match {
       case Some(state) =>
-        for (mapId <- state.completedMapTasks.asScala; reduceId <- 0 until state.numReducers) {
+        for (mapId <- state.completedMapTasks.asScala;
+        reduceId <- 0 until state.numReducers) {
           val blockId = new ShuffleBlockId(shuffleId, mapId, reduceId)
           val file = blockManager.diskBlockManager.getFile(blockId)
           if (!file.delete()) {
@@ -127,7 +134,8 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
         logInfo("Deleted all files for shuffle " + shuffleId)
         true
       case None =>
-        logInfo("Could not find files for shuffle " + shuffleId + " for deleting")
+        logInfo(
+            "Could not find files for shuffle " + shuffleId + " for deleting")
         false
     }
   }

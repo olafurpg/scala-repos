@@ -19,16 +19,21 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
 import com.twitter.scalding._
-import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{ CompileTimeLengthTypes, ProductLike, TreeOrderedBuf }
+import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{CompileTimeLengthTypes, ProductLike, TreeOrderedBuf}
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 
 object EitherOrderedBuf {
-  def dispatch(c: Context)(buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]]): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
-    case tpe if tpe.erasure =:= c.universe.typeOf[Either[Any, Any]] => EitherOrderedBuf(c)(buildDispatcher, tpe)
+  def dispatch(c: Context)(
+      buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
+    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    case tpe if tpe.erasure =:= c.universe.typeOf[Either[Any, Any]] =>
+      EitherOrderedBuf(c)(buildDispatcher, tpe)
   }
 
-  def apply(c: Context)(buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]], outerType: c.Type): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(
+      buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]],
+      outerType: c.Type): TreeOrderedBuf[c.type] = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
     val dispatcher = buildDispatcher
@@ -81,7 +86,8 @@ object EitherOrderedBuf {
       val tmpGetHolder = freshT("tmpGetHolder")
       q"""
         val $tmpGetHolder = $inputStreamA.readByte
-        if($tmpGetHolder == (0: _root_.scala.Byte)) Left(${leftBuf.get(inputStreamA)})
+        if($tmpGetHolder == (0: _root_.scala.Byte)) Left(${leftBuf.get(
+          inputStreamA)})
         else Right(${rightBuf.get(inputStreamA)})
       """
     }
@@ -132,25 +138,38 @@ object EitherOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(inputStreamA: TermName, inputStreamB: TermName) = genBinaryCompare(inputStreamA, inputStreamB)
+      override def compareBinary(
+          inputStreamA: TermName, inputStreamB: TermName) =
+        genBinaryCompare(inputStreamA, inputStreamB)
       override def hash(element: TermName): ctx.Tree = genHashFn(element)
-      override def put(inputStream: TermName, element: TermName) = genPutFn(inputStream, element)
-      override def get(inputStreamA: TermName): ctx.Tree = genGetFn(inputStreamA)
-      override def compare(elementA: TermName, elementB: TermName): ctx.Tree = genCompareFn(elementA, elementB)
+      override def put(inputStream: TermName, element: TermName) =
+        genPutFn(inputStream, element)
+      override def get(inputStreamA: TermName): ctx.Tree =
+        genGetFn(inputStreamA)
+      override def compare(elementA: TermName, elementB: TermName): ctx.Tree =
+        genCompareFn(elementA, elementB)
       override val lazyOuterVariables: Map[String, ctx.Tree] =
         rightBuf.lazyOuterVariables ++ leftBuf.lazyOuterVariables
       override def length(element: Tree): CompileTimeLengthTypes[c.type] = {
 
-        def tree(ctl: CompileTimeLengthTypes[_]): c.Tree = ctl.asInstanceOf[CompileTimeLengthTypes[c.type]].t
-        val dyn = q"""_root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen"""
+        def tree(ctl: CompileTimeLengthTypes[_]): c.Tree =
+          ctl.asInstanceOf[CompileTimeLengthTypes[c.type]].t
+        val dyn =
+          q"""_root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen"""
 
-        (leftBuf.length(q"$element.left.get"), rightBuf.length(q"$element.right.get")) match {
-          case (lconst: ConstantLengthCalculation[_], rconst: ConstantLengthCalculation[_]) if lconst.toInt == rconst.toInt =>
+        (leftBuf.length(q"$element.left.get"),
+         rightBuf.length(q"$element.right.get")) match {
+          case (lconst: ConstantLengthCalculation[_],
+                rconst: ConstantLengthCalculation[_])
+              if lconst.toInt == rconst.toInt =>
             // We got lucky, they are the same size:
             ConstantLengthCalculation(c)(1 + rconst.toInt)
-          case (_: NoLengthCalculationAvailable[_], _) => NoLengthCalculationAvailable(c)
-          case (_, _: NoLengthCalculationAvailable[_]) => NoLengthCalculationAvailable(c)
-          case (left: MaybeLengthCalculation[_], right: MaybeLengthCalculation[_]) =>
+          case (_: NoLengthCalculationAvailable[_], _) =>
+            NoLengthCalculationAvailable(c)
+          case (_, _: NoLengthCalculationAvailable[_]) =>
+            NoLengthCalculationAvailable(c)
+          case (left: MaybeLengthCalculation[_],
+                right: MaybeLengthCalculation[_]) =>
             MaybeLengthCalculation(c)(q"""
             if ($element.isLeft) { ${tree(left)} + $dyn(1) }
             else { ${tree(right)} + $dyn(1) }
@@ -177,4 +196,3 @@ object EitherOrderedBuf {
     }
   }
 }
-

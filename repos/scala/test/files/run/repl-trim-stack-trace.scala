@@ -1,10 +1,9 @@
-
-import scala.tools.partest.{ SessionTest, Welcoming }
+import scala.tools.partest.{SessionTest, Welcoming}
 
 // SI-7740
 object Test extends SessionTest with Welcoming {
   def session =
-"""Welcome to Scala
+    """Welcome to Scala
 Type in expressions for evaluation. Or try :help.
 
 scala> def f = throw new Exception("Uh-oh")
@@ -37,7 +36,7 @@ scala> :quit"""
   lazy val elided = """(\s+\.{3} )\d+( elided)""".r
   override def normalize(line: String) = line match {
     case elided(ellipsis, suffix) => s"$ellipsis???$suffix"
-    case s                        => s
+    case s => s
   }
   override def expected = super.expected map normalize
 }

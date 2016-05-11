@@ -6,15 +6,17 @@ import java.time._
 // https://github.com/scala-js/scala-js-java-time/issues/7
 trait TimeInstances extends TimeInstances0 {
 
-  private[this] def orderFromInt[A](f: (A, A) => Int): Order[A] = new Order[A] {
-    def order(x: A, y: A) = Ordering.fromInt(f(x, y))
-  }
+  private[this] def orderFromInt[A](f: (A, A) => Int): Order[A] =
+    new Order[A] {
+      def order(x: A, y: A) = Ordering.fromInt(f(x, y))
+    }
 
   implicit val durationInstance: Monoid[Duration] with Order[Duration] =
     new Monoid[Duration] with Order[Duration] {
       override def zero = Duration.ZERO
       override def append(f1: Duration, f2: => Duration) = f1 plus f2
-      override def order(a1: Duration, a2: Duration) = Ordering.fromInt(a1 compareTo a2)
+      override def order(a1: Duration, a2: Duration) =
+        Ordering.fromInt(a1 compareTo a2)
     }
 
   implicit val periodInstance: Monoid[Period] with Equal[Period] =
@@ -31,8 +33,10 @@ trait TimeInstances extends TimeInstances0 {
       Ordering.fromInt(x compareTo y)
   }
 
-  implicit val monthDayInstance: Order[MonthDay] = orderFromInt[MonthDay](_ compareTo _)
-  implicit val localTimeInstance: Order[LocalTime] = orderFromInt[LocalTime](_ compareTo _)
+  implicit val monthDayInstance: Order[MonthDay] =
+    orderFromInt[MonthDay](_ compareTo _)
+  implicit val localTimeInstance: Order[LocalTime] =
+    orderFromInt[LocalTime](_ compareTo _)
 
   implicit val yearInstance: Enum[Year] = new Enum[Year] {
     override def pred(a: Year) = a.minusYears(1)
@@ -56,7 +60,6 @@ trait TimeInstances extends TimeInstances0 {
     override def order(x: Month, y: Month) =
       Ordering.fromInt(x compareTo y)
   }
-
 }
 
 object time extends TimeInstances

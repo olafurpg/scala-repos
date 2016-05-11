@@ -23,29 +23,39 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 import scala.annotation.tailrec
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 15.09.2009
- */
-
-class RenameScalaClassProcessor extends RenameJavaClassProcessor with ScalaRenameProcessor {
+  * User: Alexander Podkhalyuzin
+  * Date: 15.09.2009
+  */
+class RenameScalaClassProcessor
+    extends RenameJavaClassProcessor with ScalaRenameProcessor {
   override def canProcessElement(element: PsiElement): Boolean = {
-    element.isInstanceOf[ScTypeDefinition] || element.isInstanceOf[PsiClassWrapper] || element.isInstanceOf[ScTypeParam]
+    element.isInstanceOf[ScTypeDefinition] ||
+    element.isInstanceOf[PsiClassWrapper] || element.isInstanceOf[ScTypeParam]
   }
 
-  override def substituteElementToRename(element: PsiElement, editor: Editor): PsiElement = {
+  override def substituteElementToRename(
+      element: PsiElement, editor: Editor): PsiElement = {
     element match {
       case wrapper: PsiClassWrapper => wrapper.definition
       case _ => element
     }
   }
 
-  override def findReferences(element: PsiElement) = ScalaRenameUtil.replaceImportClassReferences(ScalaRenameUtil.findReferences(element))
+  override def findReferences(element: PsiElement) =
+    ScalaRenameUtil.replaceImportClassReferences(
+        ScalaRenameUtil.findReferences(element))
 
-  override def prepareRenaming(element: PsiElement, newName: String, allRenames: util.Map[PsiElement, String]) {
+  override def prepareRenaming(element: PsiElement,
+                               newName: String,
+                               allRenames: util.Map[PsiElement, String]) {
     element match {
       case td: ScTypeDefinition =>
         ScalaPsiUtil.getCompanionModule(td) match {
-          case Some(companion) if ScalaApplicationSettings.getInstance().RENAME_COMPANION_MODULE => allRenames.put(companion, newName)
+          case Some(companion)
+              if ScalaApplicationSettings
+                .getInstance()
+                .RENAME_COMPANION_MODULE =>
+            allRenames.put(companion, newName)
           case _ =>
         }
         @tailrec
@@ -57,7 +67,8 @@ class RenameScalaClassProcessor extends RenameJavaClassProcessor with ScalaRenam
           }
         }
         val file = td.getContainingFile
-        if (file != null && isTop(element.getContext) && file.name == td.name + ".scala") {
+        if (file != null && isTop(element.getContext) &&
+            file.name == td.name + ".scala") {
           allRenames.put(file, newName + ".scala")
         }
       case docTagParam: ScTypeParam =>
@@ -65,10 +76,13 @@ class RenameScalaClassProcessor extends RenameJavaClassProcessor with ScalaRenam
           case commentOwner: ScDocCommentOwner =>
             commentOwner.getDocComment match {
               case comment: ScDocComment =>
-                comment.findTagsByName(MyScaladocParsing.TYPE_PARAM_TAG).foreach {
-                  b => if (b.getValueElement != null && b.getValueElement.getText == docTagParam.name)
-                    allRenames.put(b.getValueElement, newName)
-                }
+                comment
+                  .findTagsByName(MyScaladocParsing.TYPE_PARAM_TAG)
+                  .foreach { b =>
+                    if (b.getValueElement != null &&
+                        b.getValueElement.getText == docTagParam.name)
+                      allRenames.put(b.getValueElement, newName)
+                  }
               case _ =>
             }
           case _ =>
@@ -97,30 +111,44 @@ class RenameScalaClassProcessor extends RenameJavaClassProcessor with ScalaRenam
     ScalaElementToRenameContributor.getAll(element, newName, allRenames)
   }
 
-  override def getElementToSearchInStringsAndComments(element: PsiElement): PsiElement = {
+  override def getElementToSearchInStringsAndComments(
+      element: PsiElement): PsiElement = {
     element match {
       case o: ScObject => o.fakeCompanionClassOrCompanionClass
-      case wrapper: PsiClassWrapper => wrapper.definition match {
-        case o: ScObject => wrapper
-        case definition => definition
-      }
+      case wrapper: PsiClassWrapper =>
+        wrapper.definition match {
+          case o: ScObject => wrapper
+          case definition => definition
+        }
       case _ => element
     }
   }
 
-  override def createRenameDialog(project: Project, element: PsiElement, nameSuggestionContext: PsiElement, editor: Editor): RenameDialog =
+  override def createRenameDialog(project: Project,
+                                  element: PsiElement,
+                                  nameSuggestionContext: PsiElement,
+                                  editor: Editor): RenameDialog =
     new ScalaClassRenameDialog(project, element, nameSuggestionContext, editor)
 
-  override def renameElement(element: PsiElement, newName: String, usages: Array[UsageInfo], listener: RefactoringElementListener) {
-    ScalaRenameUtil.doRenameGenericNamedElement(element, newName, usages, listener)
+  override def renameElement(element: PsiElement,
+                             newName: String,
+                             usages: Array[UsageInfo],
+                             listener: RefactoringElementListener) {
+    ScalaRenameUtil.doRenameGenericNamedElement(
+        element, newName, usages, listener)
   }
 }
 
-class ScalaClassRenameDialog(project: Project, psiElement: PsiElement, nameSuggestionContext: PsiElement, editor: Editor)
-        extends {
-          private val chbRenameCompanion: JCheckBox = new JCheckBox("", true)
-        }
-        with RenameDialog(project: Project, psiElement: PsiElement, nameSuggestionContext: PsiElement, editor: Editor) {
+class ScalaClassRenameDialog(project: Project,
+                             psiElement: PsiElement,
+                             nameSuggestionContext: PsiElement,
+                             editor: Editor)
+    extends {
+  private val chbRenameCompanion: JCheckBox = new JCheckBox("", true)
+} with RenameDialog(project: Project,
+                    psiElement: PsiElement,
+                    nameSuggestionContext: PsiElement,
+                    editor: Editor) {
 
   override def createCenterPanel(): JComponent = {
 
@@ -136,13 +164,14 @@ class ScalaClassRenameDialog(project: Project, psiElement: PsiElement, nameSugge
     }
 
     if (companionType.isDefined) {
-      chbRenameCompanion.setText(ScalaBundle.message("rename.companion.module", companionType.get))
+      chbRenameCompanion.setText(
+          ScalaBundle.message("rename.companion.module", companionType.get))
       chbRenameCompanion.setSelected(true)
-      val panel = Option(super.createCenterPanel()).getOrElse(new JPanel(new BorderLayout()))
+      val panel = Option(super.createCenterPanel())
+        .getOrElse(new JPanel(new BorderLayout()))
       panel.add(chbRenameCompanion, BorderLayout.WEST)
       panel
-    }
-    else null
+    } else null
   }
 
   override def performRename(newName: String) {

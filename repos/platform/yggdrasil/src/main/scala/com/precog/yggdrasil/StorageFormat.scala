@@ -29,10 +29,8 @@ case object LengthEncoded extends StorageFormat {
   final val isFixed = false
 }
 
-case class  FixedWidth(width: Int) extends StorageFormat {
+case class FixedWidth(width: Int) extends StorageFormat {
   def min(i: Int) = width min i
   final val isFixed = true
 }
-
-
 // vim: set ts=4 sw=4 et:

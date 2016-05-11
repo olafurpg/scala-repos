@@ -11,9 +11,10 @@ abstract class CompilerTest extends DirectTest {
   def check(source: String, unit: global.CompilationUnit): Unit
 
   lazy val global: Global = newCompiler()
-  lazy val units: List[global.CompilationUnit] = compilationUnits(global)(sources: _ *)
+  lazy val units: List[global.CompilationUnit] =
+    compilationUnits(global)(sources: _*)
   import global._
-  import definitions.{ compilerTypeFromTag }
+  import definitions.{compilerTypeFromTag}
 
   override def extraSettings = "-usejavacp -d " + testOutput.path
 
@@ -41,13 +42,13 @@ abstract class CompilerTest extends DirectTest {
   }
 
   class SymsInPackage(pkgName: String) {
-    def pkg     = rootMirror.getPackage(TermName(pkgName))
+    def pkg = rootMirror.getPackage(TermName(pkgName))
     def classes = allMembers(pkg) filter (_.isClass)
     def modules = allMembers(pkg) filter (_.isModule)
     def symbols = classes ++ terms filterNot (_ eq NoSymbol)
-    def terms   = allMembers(pkg) filter (s => s.isTerm && !s.isConstructor)
+    def terms = allMembers(pkg) filter (s => s.isTerm && !s.isConstructor)
     def tparams = classes flatMap (_.info.typeParams)
-    def tpes    = symbols map (_.tpe) distinct
+    def tpes = symbols map (_.tpe) distinct
   }
 }
 
@@ -74,13 +75,17 @@ class Sub extends Base {
 
   def check(source: String, unit: global.CompilationUnit) {
     exitingTyper {
-      terms.filter(_.name.toString == "foo").foreach(sym => {
-        val xParam = sym.tpe.paramss.flatten.head
-        val annot = sym.tpe.finalResultType.annotations.head
-        val xRefs = annot.args.head.filter(t => t.symbol == xParam)
-        println(s"testing symbol ${sym.ownerChain}, param $xParam, xRefs $xRefs")
-        assert(xRefs.length == 1, xRefs)
-      })
+      terms
+        .filter(_.name.toString == "foo")
+        .foreach(sym =>
+              {
+            val xParam = sym.tpe.paramss.flatten.head
+            val annot = sym.tpe.finalResultType.annotations.head
+            val xRefs = annot.args.head.filter(t => t.symbol == xParam)
+            println(
+                s"testing symbol ${sym.ownerChain}, param $xParam, xRefs $xRefs")
+            assert(xRefs.length == 1, xRefs)
+        })
     }
   }
 }

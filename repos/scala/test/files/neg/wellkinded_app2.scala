@@ -1,4 +1,4 @@
 // test well-kindedness checks
 class WellKinded[s <: Throwable] {
-      val foo: s[Int]
+  val foo: s[Int]
 }

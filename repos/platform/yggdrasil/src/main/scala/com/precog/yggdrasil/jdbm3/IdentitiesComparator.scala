@@ -22,10 +22,10 @@ package jdbm3
 
 import org.apache.jdbm.Serializer
 
-import java.io.{DataInput,DataOutput}
+import java.io.{DataInput, DataOutput}
 import java.util.Comparator
 
-import com.precog.util.{Vector0,Vector1,Vector2,Vector3,Vector4}
+import com.precog.util.{Vector0, Vector1, Vector2, Vector3, Vector4}
 import com.precog.util.VectorCase
 
 object IdentitiesComparator {
@@ -34,8 +34,9 @@ object IdentitiesComparator {
   def apply(ascending: Boolean) = new IdentitiesComparator(ascending)
 }
 
-class IdentitiesComparator private[jdbm3](val ascending: Boolean) extends Comparator[Identities] with Serializable {
-  def compare (a: Identities, b: Identities) = {
+class IdentitiesComparator private[jdbm3](val ascending: Boolean)
+    extends Comparator[Identities] with Serializable {
+  def compare(a: Identities, b: Identities) = {
     val len = if (a.length < b.length) a.length else b.length
 
     var i = 0

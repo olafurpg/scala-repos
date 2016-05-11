@@ -12,7 +12,7 @@ trait WordSpecFileStructureViewTest extends ScalaTestTestCase {
 
   def addWordSpecViewTest(): Unit = {
     addFileToProject(className + ".scala",
-      """
+                     """
         |import org.scalatest._
         |
         |class WordSpecViewTest extends WordSpec {
@@ -38,8 +38,14 @@ trait WordSpecFileStructureViewTest extends ScalaTestTestCase {
 
   def testWordSpecNormal(): Unit = {
     addWordSpecViewTest()
-    runFileStructureViewTest(className, normalStatusId, "\"parent1\"", "\"child1\"", "\"child2\"", "\"parent2\"",
-      "\"child3\"", "\"child4\"")
+    runFileStructureViewTest(className,
+                             normalStatusId,
+                             "\"parent1\"",
+                             "\"child1\"",
+                             "\"child2\"",
+                             "\"parent2\"",
+                             "\"child3\"",
+                             "\"child4\"")
   }
 
   def testWordSpecHierarchy(): Unit = {

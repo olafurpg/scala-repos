@@ -3,31 +3,35 @@ package mesosphere.marathon.core.task.tracker.impl
 import mesosphere.marathon.Protos.MarathonTask
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.Task.LocalVolumeId
-import mesosphere.marathon.state.{ PathId, Timestamp }
+import mesosphere.marathon.state.{PathId, Timestamp}
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{ MarathonTestHelper, SerializationFailedException }
-import org.apache.mesos.Protos.{ Attribute, TaskStatus }
-import org.apache.mesos.{ Protos => MesosProtos }
-import org.scalatest.{ FunSuite, GivenWhenThen, Matchers }
+import mesosphere.marathon.{MarathonTestHelper, SerializationFailedException}
+import org.apache.mesos.Protos.{Attribute, TaskStatus}
+import org.apache.mesos.{Protos => MesosProtos}
+import org.scalatest.{FunSuite, GivenWhenThen, Matchers}
 
-class TaskSerializerTest extends FunSuite with Mockito with Matchers with GivenWhenThen {
+class TaskSerializerTest
+    extends FunSuite with Mockito with Matchers with GivenWhenThen {
   import scala.collection.JavaConverters._
   val f = new Fixture
 
   test("minimal marathonTask => Task") {
     Given("a minimal MarathonTask")
     val now = MarathonTestHelper.clock.now()
-    val marathonTask = MarathonTask.newBuilder()
+    val marathonTask = MarathonTask
+      .newBuilder()
       .setId("task")
       .setVersion(now.toString)
       .setStagedAt(now.toDateTime.getMillis)
-      .setHost(f.sampleHost).build()
+      .setHost(f.sampleHost)
+      .build()
 
     When("we convert it to task")
     val taskState = TaskSerializer.fromProto(marathonTask)
 
     Then("we get a minimal task State")
-    val expectedState = MarathonTestHelper.mininimalTask(f.taskId.idString, now)
+    val expectedState =
+      MarathonTestHelper.mininimalTask(f.taskId.idString, now)
 
     taskState should be(expectedState)
 
@@ -64,17 +68,16 @@ class TaskSerializerTest extends FunSuite with Mockito with Matchers with GivenW
 
     Given("a MarathonTask with all fields and host ports")
     val samplePorts = Iterable(80, 81)
-    val marathonTask =
-      f.completeTask.toBuilder
-        .addAllPorts(samplePorts.map(Integer.valueOf(_)).asJava)
-        .build()
+    val marathonTask = f.completeTask.toBuilder
+      .addAllPorts(samplePorts.map(Integer.valueOf(_)).asJava)
+      .build()
 
     When("we convert it to task")
     val taskState = TaskSerializer.fromProto(marathonTask)
 
     Then("we get the expected task state")
     val expectedState = f.fullSampleTaskStateWithoutNetworking.copy(
-      networking = Task.HostPorts(samplePorts))
+        networking = Task.HostPorts(samplePorts))
 
     taskState should be(expectedState)
 
@@ -90,9 +93,7 @@ class TaskSerializerTest extends FunSuite with Mockito with Matchers with GivenW
 
     Given("a MarathonTask with all fields and host ports")
     val marathonTask =
-      f.completeTask.toBuilder
-        .addAllNetworks(f.sampleNetworks.asJava)
-        .build()
+      f.completeTask.toBuilder.addAllNetworks(f.sampleNetworks.asJava).build()
 
     When("we convert it to task")
     println(marathonTask)
@@ -100,7 +101,7 @@ class TaskSerializerTest extends FunSuite with Mockito with Matchers with GivenW
 
     Then("we get the expected task state")
     val expectedState = f.fullSampleTaskStateWithoutNetworking.copy(
-      networking = Task.NetworkInfoList(f.sampleNetworks))
+        networking = Task.NetworkInfoList(f.sampleNetworks))
 
     taskState should be(expectedState)
 
@@ -121,7 +122,7 @@ class TaskSerializerTest extends FunSuite with Mockito with Matchers with GivenW
     val taskState = TaskSerializer.fromProto(proto)
 
     Then("We get a correct representation")
-    taskState should equal (f.Resident.reservedState)
+    taskState should equal(f.Resident.reservedState)
 
     When("We serialize it again")
     val serialized = TaskSerializer.toProto(taskState)
@@ -140,7 +141,7 @@ class TaskSerializerTest extends FunSuite with Mockito with Matchers with GivenW
     val taskState = TaskSerializer.fromProto(proto)
 
     Then("We get a correct representation")
-    taskState should equal (f.Resident.launchedOnReservationState)
+    taskState should equal(f.Resident.launchedOnReservationState)
 
     When("We serialize it again")
     val serialized = TaskSerializer.toProto(taskState)
@@ -168,58 +169,71 @@ class TaskSerializerTest extends FunSuite with Mockito with Matchers with GivenW
     private[this] val appId = PathId.fromSafePath("/test")
     val taskId = Task.Id("task")
     val sampleHost: String = "host.some"
-    private[this] val sampleAttributes: Iterable[Attribute] = Iterable(attribute("label1", "value1"))
+    private[this] val sampleAttributes: Iterable[Attribute] = Iterable(
+        attribute("label1", "value1"))
     private[this] val stagedAtLong: Long = 1
     private[this] val startedAtLong: Long = 2
     private[this] val appVersion: Timestamp = Timestamp(3)
-    private[this] val sampleTaskStatus: TaskStatus =
-      MesosProtos.TaskStatus.newBuilder()
-        .setTaskId(MesosProtos.TaskID.newBuilder().setValue(taskId.idString))
-        .setState(MesosProtos.TaskState.TASK_RUNNING)
-        .build()
-    private[this] val sampleSlaveId: MesosProtos.SlaveID.Builder = MesosProtos.SlaveID.newBuilder().setValue("slaveId")
-    val sampleNetworks: Iterable[MesosProtos.NetworkInfo] =
-      Iterable(
-        MesosProtos.NetworkInfo.newBuilder()
-          .addIpAddresses(MesosProtos.NetworkInfo.IPAddress.newBuilder().setIpAddress("1.2.3.4"))
+    private[this] val sampleTaskStatus: TaskStatus = MesosProtos.TaskStatus
+      .newBuilder()
+      .setTaskId(MesosProtos.TaskID.newBuilder().setValue(taskId.idString))
+      .setState(MesosProtos.TaskState.TASK_RUNNING)
+      .build()
+    private[this] val sampleSlaveId: MesosProtos.SlaveID.Builder =
+      MesosProtos.SlaveID.newBuilder().setValue("slaveId")
+    val sampleNetworks: Iterable[MesosProtos.NetworkInfo] = Iterable(
+        MesosProtos.NetworkInfo
+          .newBuilder()
+          .addIpAddresses(MesosProtos.NetworkInfo.IPAddress
+                .newBuilder()
+                .setIpAddress("1.2.3.4"))
           .build()
       )
     val fullSampleTaskStateWithoutNetworking: Task.LaunchedOnReservation =
       Task.LaunchedOnReservation(
-        taskId,
-        Task.AgentInfo(host = sampleHost, agentId = Some(sampleSlaveId.getValue), attributes = sampleAttributes),
-        appVersion = appVersion,
-        status = Task.Status(
-          stagedAt = Timestamp(stagedAtLong),
-          startedAt = Some(Timestamp(startedAtLong)),
-          mesosStatus = Some(sampleTaskStatus)
-        ),
-        networking = Task.NoNetworking,
-        reservation = Task.Reservation(
-          Seq(LocalVolumeId(appId, "my-volume", "uuid-123")),
-          Task.Reservation.State.Launched)
+          taskId,
+          Task.AgentInfo(host = sampleHost,
+                         agentId = Some(sampleSlaveId.getValue),
+                         attributes = sampleAttributes),
+          appVersion = appVersion,
+          status = Task.Status(
+                stagedAt = Timestamp(stagedAtLong),
+                startedAt = Some(Timestamp(startedAtLong)),
+                mesosStatus = Some(sampleTaskStatus)
+            ),
+          networking = Task.NoNetworking,
+          reservation = Task.Reservation(
+                Seq(LocalVolumeId(appId, "my-volume", "uuid-123")),
+                Task.Reservation.State.Launched)
       )
 
-    val completeTask =
-      MarathonTask
-        .newBuilder()
-        .setId(taskId.idString)
-        .setHost(sampleHost)
-        .addAllAttributes(sampleAttributes.asJava)
-        .setStagedAt(stagedAtLong)
-        .setStartedAt(startedAtLong)
-        .setVersion(appVersion.toString)
-        .setStatus(sampleTaskStatus)
-        .setSlaveId(sampleSlaveId)
-        .setReservation(MarathonTask.Reservation.newBuilder
-          .addLocalVolumeIds(LocalVolumeId(appId, "my-volume", "uuid-123").idString)
-          .setState(MarathonTask.Reservation.State.newBuilder()
-            .setType(MarathonTask.Reservation.State.Type.Launched)))
-        .build()
+    val completeTask = MarathonTask
+      .newBuilder()
+      .setId(taskId.idString)
+      .setHost(sampleHost)
+      .addAllAttributes(sampleAttributes.asJava)
+      .setStagedAt(stagedAtLong)
+      .setStartedAt(startedAtLong)
+      .setVersion(appVersion.toString)
+      .setStatus(sampleTaskStatus)
+      .setSlaveId(sampleSlaveId)
+      .setReservation(MarathonTask.Reservation.newBuilder
+            .addLocalVolumeIds(
+                LocalVolumeId(appId, "my-volume", "uuid-123").idString)
+            .setState(MarathonTask.Reservation.State
+                  .newBuilder()
+                  .setType(MarathonTask.Reservation.State.Type.Launched)))
+      .build()
 
-    private[this] def attribute(name: String, textValue: String): MesosProtos.Attribute = {
+    private[this] def attribute(
+        name: String, textValue: String): MesosProtos.Attribute = {
       val text = MesosProtos.Value.Text.newBuilder().setValue(textValue)
-      MesosProtos.Attribute.newBuilder().setName(name).setType(MesosProtos.Value.Type.TEXT).setText(text).build()
+      MesosProtos.Attribute
+        .newBuilder()
+        .setName(name)
+        .setType(MesosProtos.Value.Type.TEXT)
+        .setText(text)
+        .build()
     }
 
     object Resident {
@@ -234,64 +248,88 @@ class TaskSerializerTest extends FunSuite with Mockito with Matchers with GivenW
       private[this] val containerPath = "containerPath"
       private[this] val uuid = "uuid"
       private[this] val attributes = Iterable.empty[MesosProtos.Attribute]
-      private[this] val localVolumeIds = Seq(Task.LocalVolumeId(appId, containerPath, uuid))
+      private[this] val localVolumeIds = Seq(
+          Task.LocalVolumeId(appId, containerPath, uuid))
       private[this] val stagedAt = now - 1.minute
       private[this] val startedAt = now - 55.seconds
-      private[this] val mesosStatus = MarathonTestHelper.statusForState(taskId.idString, MesosProtos.TaskState.TASK_RUNNING)
-      private[this] val status = Task.Status(stagedAt, Some(startedAt), Some(mesosStatus))
+      private[this] val mesosStatus = MarathonTestHelper.statusForState(
+          taskId.idString, MesosProtos.TaskState.TASK_RUNNING)
+      private[this] val status =
+        Task.Status(stagedAt, Some(startedAt), Some(mesosStatus))
       private[this] val hostPorts = Task.HostPorts(Seq(1, 2, 3))
 
-      def reservedProto = MarathonTask.newBuilder()
-        .setId(taskId.idString)
-        .setHost(host)
-        .setSlaveId(MesosProtos.SlaveID.newBuilder().setValue(agentId))
-        .addAllAttributes(attributes.asJava)
-        .setReservation(MarathonTask.Reservation.newBuilder()
-          .addAllLocalVolumeIds(localVolumeIds.map(_.idString).asJava)
-          .setState(MarathonTask.Reservation.State.newBuilder()
-            .setType(MarathonTask.Reservation.State.Type.New)
-            .setTimeout(MarathonTask.Reservation.State.Timeout.newBuilder()
-              .setInitiated(now.toDateTime.getMillis)
-              .setDeadline((now + 1.minute).toDateTime.getMillis)
-              .setReason(MarathonTask.Reservation.State.Timeout.Reason.ReservationTimeout))))
-        .build()
+      def reservedProto =
+        MarathonTask
+          .newBuilder()
+          .setId(taskId.idString)
+          .setHost(host)
+          .setSlaveId(MesosProtos.SlaveID.newBuilder().setValue(agentId))
+          .addAllAttributes(attributes.asJava)
+          .setReservation(MarathonTask.Reservation
+                .newBuilder()
+                .addAllLocalVolumeIds(localVolumeIds.map(_.idString).asJava)
+                .setState(MarathonTask.Reservation.State
+                      .newBuilder()
+                      .setType(MarathonTask.Reservation.State.Type.New)
+                      .setTimeout(MarathonTask.Reservation.State.Timeout
+                            .newBuilder()
+                            .setInitiated(now.toDateTime.getMillis)
+                            .setDeadline((now + 1.minute).toDateTime.getMillis)
+                            .setReason(
+                                MarathonTask.Reservation.State.Timeout.Reason.ReservationTimeout))))
+          .build()
 
-      def reservedState = Task.Reserved(
-        Task.Id(taskId.idString),
-        Task.AgentInfo(host = host, agentId = Some(agentId), attributes),
-        reservation = Task.Reservation(localVolumeIds, Task.Reservation.State.New(Some(Task.Reservation.Timeout(
-          initiated = now, deadline = now + 1.minute, reason = Task.Reservation.Timeout.Reason.ReservationTimeout))))
-      )
+      def reservedState =
+        Task
+          .Reserved(
+            Task.Id(taskId.idString),
+            Task.AgentInfo(host = host, agentId = Some(agentId), attributes),
+            reservation = Task.Reservation(
+                  localVolumeIds,
+                  Task.Reservation.State
+                    .New(
+                      Some(
+                          Task.Reservation.Timeout(
+                              initiated = now,
+                              deadline = now + 1.minute,
+                              reason = Task.Reservation.Timeout.Reason.ReservationTimeout))))
+        )
 
-      def launchedEphemeralProto = MarathonTask.newBuilder()
-        .setId(taskId.idString)
-        .setHost(host)
-        .setSlaveId(MesosProtos.SlaveID.newBuilder().setValue(agentId))
-        .addAllAttributes(attributes.asJava)
-        .setVersion(appVersion.toString)
-        .setStagedAt(stagedAt.toDateTime.getMillis)
-        .setStartedAt(startedAt.toDateTime.getMillis)
-        .setStatus(mesosStatus)
-        .addAllPorts(hostPorts.ports.view.map(Integer.valueOf(_)).asJava)
-        .build()
+      def launchedEphemeralProto =
+        MarathonTask
+          .newBuilder()
+          .setId(taskId.idString)
+          .setHost(host)
+          .setSlaveId(MesosProtos.SlaveID.newBuilder().setValue(agentId))
+          .addAllAttributes(attributes.asJava)
+          .setVersion(appVersion.toString)
+          .setStagedAt(stagedAt.toDateTime.getMillis)
+          .setStartedAt(startedAt.toDateTime.getMillis)
+          .setStatus(mesosStatus)
+          .addAllPorts(hostPorts.ports.view.map(Integer.valueOf(_)).asJava)
+          .build()
 
-      def launchedOnReservationProto = launchedEphemeralProto.toBuilder
-        .setReservation(MarathonTask.Reservation.newBuilder()
-          .addAllLocalVolumeIds(localVolumeIds.map(_.idString).asJava)
-          .setState(MarathonTask.Reservation.State.newBuilder()
-            .setType(MarathonTask.Reservation.State.Type.Launched)))
-        .build()
+      def launchedOnReservationProto =
+        launchedEphemeralProto.toBuilder
+          .setReservation(MarathonTask.Reservation
+                .newBuilder()
+                .addAllLocalVolumeIds(localVolumeIds.map(_.idString).asJava)
+                .setState(MarathonTask.Reservation.State
+                      .newBuilder()
+                      .setType(MarathonTask.Reservation.State.Type.Launched)))
+          .build()
 
       def launchedOnReservationState = Task.LaunchedOnReservation(
-        taskId,
-        Task.AgentInfo(host = host, agentId = Some(agentId), attributes),
-        appVersion,
-        status,
-        hostPorts,
-        Task.Reservation(localVolumeIds, Task.Reservation.State.Launched)
+          taskId,
+          Task.AgentInfo(host = host, agentId = Some(agentId), attributes),
+          appVersion,
+          status,
+          hostPorts,
+          Task.Reservation(localVolumeIds, Task.Reservation.State.Launched)
       )
 
-      def reservedProtoWithoutReservation = reservedProto.toBuilder.clearReservation().build()
+      def reservedProtoWithoutReservation =
+        reservedProto.toBuilder.clearReservation().build()
     }
   }
 }

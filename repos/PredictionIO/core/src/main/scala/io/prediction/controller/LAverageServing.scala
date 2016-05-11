@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.core.BaseAlgorithm
@@ -23,6 +22,7 @@ import io.prediction.core.BaseAlgorithm
   * @group Serving
   */
 class LAverageServing[Q] extends LServing[Q, Double] {
+
   /** Returns the average of all algorithms' predictions. */
   def serve(query: Q, predictions: Seq[Double]): Double = {
     predictions.sum / predictions.length
@@ -35,7 +35,9 @@ class LAverageServing[Q] extends LServing[Q, Double] {
   * @group Serving
   */
 object LAverageServing {
+
   /** Returns an instance of [[LAverageServing]]. */
-  def apply[Q](a: Class[_ <: BaseAlgorithm[_, _, Q, _]]): Class[LAverageServing[Q]] =
+  def apply[Q](
+      a: Class[_ <: BaseAlgorithm[_, _, Q, _]]): Class[LAverageServing[Q]] =
     classOf[LAverageServing[Q]]
 }

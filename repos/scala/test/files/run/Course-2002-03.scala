@@ -2,7 +2,6 @@
 // Programmation IV - 2002 - Week 03
 //############################################################################
 
-
 object M0 {
   class Rational(x: Int, y: Int) {
     def numer = x;
@@ -10,9 +9,7 @@ object M0 {
   }
 
   def addRational(r: Rational, s: Rational): Rational =
-    new Rational(
-      r.numer * s.denom + s.numer * r.denom,
-      r.denom * s.denom);
+    new Rational(r.numer * s.denom + s.numer * r.denom, r.denom * s.denom);
 
   def makeString(r: Rational) =
     r.numer + "/" + r.denom;
@@ -22,7 +19,7 @@ object M0 {
   Console.println(x.numer);
   Console.println(x.denom);
   Console.println(makeString(x));
-  Console.println(makeString(addRational(x,y)));
+  Console.println(makeString(addRational(x, y)));
   Console.println;
 }
 
@@ -33,13 +30,9 @@ object M1 {
     def numer = x;
     def denom = y;
     def add(r: Rational) =
-      new Rational(
-        numer * r.denom + r.numer * denom,
-        denom * r.denom);
+      new Rational(numer * r.denom + r.numer * denom, denom * r.denom);
     def mul(r: Rational) =
-      new Rational(
-        numer * r.numer,
-        denom * r.denom);
+      new Rational(numer * r.numer, denom * r.denom);
     override def toString() = numer + "/" + denom;
   }
 
@@ -62,21 +55,13 @@ object M2 {
     def numer = x / g;
     def denom = y / g;
     def add(r: Rational) =
-      new Rational(
-        numer * r.denom + r.numer * denom,
-        denom * r.denom);
+      new Rational(numer * r.denom + r.numer * denom, denom * r.denom);
     def sub(r: Rational) =
-      new Rational(
-        numer * r.denom - r.numer * denom,
-        denom * r.denom);
+      new Rational(numer * r.denom - r.numer * denom, denom * r.denom);
     def mul(r: Rational) =
-      new Rational(
-        numer * r.numer,
-        denom * r.denom);
+      new Rational(numer * r.numer, denom * r.denom);
     def div(r: Rational) =
-      new Rational(
-        numer * r.denom,
-        denom * r.numer);
+      new Rational(numer * r.denom, denom * r.numer);
     override def toString() = numer + "/" + denom;
   }
 
@@ -120,22 +105,14 @@ object M4 {
     private val g = gcd(x, y);
     def numer = x / g;
     def denom = y / g;
-    def + (r: Rational) =
-      new Rational(
-        numer * r.denom + r.numer * denom,
-        denom * r.denom);
-    def - (r: Rational) =
-      new Rational(
-        numer * r.denom - r.numer * denom,
-        denom * r.denom);
-    def * (r: Rational) =
-      new Rational(
-        numer * r.numer,
-        denom * r.denom);
-    def / (r: Rational) =
-      new Rational(
-        numer * r.denom,
-        denom * r.numer);
+    def +(r: Rational) =
+      new Rational(numer * r.denom + r.numer * denom, denom * r.denom);
+    def -(r: Rational) =
+      new Rational(numer * r.denom - r.numer * denom, denom * r.denom);
+    def *(r: Rational) =
+      new Rational(numer * r.numer, denom * r.denom);
+    def /(r: Rational) =
+      new Rational(numer * r.denom, denom * r.numer);
     override def toString() = numer + "/" + denom;
   }
 
@@ -185,20 +162,24 @@ object M6 {
 
     def ! : Boolean = ifThenElse[Boolean](new False())(new True());
 
-    def && (x: => Boolean): Boolean = ifThenElse[Boolean](x)(new False());
-    def || (x: => Boolean): Boolean = ifThenElse[Boolean](new True())(x);
+    def &&(x: => Boolean): Boolean = ifThenElse[Boolean](x)(new False());
+    def ||(x: => Boolean): Boolean = ifThenElse[Boolean](new True())(x);
 
     // !!! def == (x: Boolean): Boolean = ifThenElse[Boolean](x)(x.!);
     // !!! def != (x: Boolean): Boolean = ifThenElse[Boolean](x.!)(x);
-    def <  (x: Boolean): Boolean = ifThenElse[Boolean](new False())(x);
-    def >  (x: Boolean): Boolean = ifThenElse[Boolean](x.!)(new False());
-    def <= (x: Boolean): Boolean = ifThenElse[Boolean](x)(new True());
-    def >= (x: Boolean): Boolean = ifThenElse[Boolean](new True())(x.!);
+    def <(x: Boolean): Boolean = ifThenElse[Boolean](new False())(x);
+    def >(x: Boolean): Boolean = ifThenElse[Boolean](x.!)(new False());
+    def <=(x: Boolean): Boolean = ifThenElse[Boolean](x)(new True());
+    def >=(x: Boolean): Boolean = ifThenElse[Boolean](new True())(x.!);
   }
-  class True() extends Boolean { // !!! class -> object
-    def ifThenElse[a](t: => a)(e: => a): a = t }
-  class False() extends Boolean { // !!! class -> object
-    def ifThenElse[a](t: => a)(e: => a): a = e }
+  class True() extends Boolean {
+    // !!! class -> object
+    def ifThenElse[a](t: => a)(e: => a): a = t
+  }
+  class False() extends Boolean {
+    // !!! class -> object
+    def ifThenElse[a](t: => a)(e: => a): a = e
+  }
 }
 
 //############################################################################
@@ -208,8 +189,8 @@ object M7 {
     def isZero(): Boolean;
     def predecessor: Nat;
     def successor: Nat;
-    def + (that: Nat): Nat;
-    def - (that: Nat): Nat;
+    def +(that: Nat): Nat;
+    def -(that: Nat): Nat;
   }
 }
 
@@ -235,16 +216,20 @@ object M8 {
     override def toString(): String = {
       val buffer: StringBuilder = new StringBuilder();
       buffer.append('[');
-      foreach(i => {
-        if (buffer.length > 1) {buffer.append(','); ()}; // !!! ; ()
-        buffer.append(i);
-        ()});
+      foreach(
+          i =>
+            {
+          if (buffer.length > 1) { buffer.append(','); () }; // !!! ; ()
+          buffer.append(i);
+          ()
+      });
       buffer.append(']');
       buffer.toString();
     }
   }
 
-  class Empty extends IntSet { // !!! class Empty() -> object Empty
+  class Empty extends IntSet {
+    // !!! class Empty() -> object Empty
     def contains(x: Int): Boolean = false;
     def incl(x: Int): IntSet = new NonEmpty(x, new Empty, new Empty);
     def map(f: Int => Int): IntSet = this;
@@ -265,7 +250,6 @@ object M8 {
       else if (x > elem) new NonEmpty(elem, left, right incl x)
       else this;
 
-
     def map(f: Int => Int): IntSet = {
       val lset = left.map(f);
       val rset = right.map(f);
@@ -279,12 +263,14 @@ object M8 {
     }
 
     def intersect0(that: IntSet, accu: IntSet): IntSet =
-      right.intersect0(that, left.intersect0(that,
-        if (that.contains(elem)) accu.incl(elem) else accu));
+      right.intersect0(
+          that,
+          left.intersect0(
+              that, if (that.contains(elem)) accu.incl(elem) else accu));
 
     def filter0(f: Int => Boolean, accu: IntSet): IntSet =
-      right.filter0(f, left.filter0(f,
-        if (f(elem)) accu.incl(elem) else accu));
+      right.filter0(
+          f, left.filter0(f, if (f(elem)) accu.incl(elem) else accu));
   }
 
   def test = {
@@ -294,7 +280,8 @@ object M8 {
     val set3: IntSet = new Empty incl 1 incl 2 incl 3;
     val set4: IntSet = new Empty incl 1 incl 2 incl 3 incl 4;
     val setx: IntSet = set0 incl -10 incl 5 incl 21 incl -1 incl 0 incl 3;
-    val sety: IntSet = set0 incl 3 incl 7 incl -5 incl 0 incl-9 incl 8 incl-1;
+    val sety: IntSet =
+      set0 incl 3 incl 7 incl -5 incl 0 incl -9 incl 8 incl -1;
 
     Console.println("set0 = " + set0);
     Console.println("set1 = " + (set1.toString()));
@@ -344,29 +331,21 @@ object M9 {
     def numer = x / g;
     def denom = y / g;
     def add(r: Rational) =
-      new Rational(
-        numer * r.denom + r.numer * denom,
-        denom * r.denom);
+      new Rational(numer * r.denom + r.numer * denom, denom * r.denom);
     def sub(r: Rational) =
-      new Rational(
-        numer * r.denom - r.numer * denom,
-        denom * r.denom);
+      new Rational(numer * r.denom - r.numer * denom, denom * r.denom);
     def mul(r: Rational) =
-      new Rational(
-        numer * r.numer,
-        denom * r.denom);
+      new Rational(numer * r.numer, denom * r.denom);
     def equal(r: Rational) =
-      new Rational(
-        numer * r.denom,
-        denom * r.numer);
+      new Rational(numer * r.denom, denom * r.numer);
     def asString = numer.toString().concat("/").concat(denom.toString());
     override def toString() = asString;
   }
 
   def test = {
-    Console.println(new Rational(2,2).asString);
-    Console.println(new Rational(2,2).toString());
-    Console.println(new Rational(2,2));
+    Console.println(new Rational(2, 2).asString);
+    Console.println(new Rational(2, 2).toString());
+    Console.println(new Rational(2, 2));
     Console.println;
   }
 }

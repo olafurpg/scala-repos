@@ -9,9 +9,10 @@ import org.junit.runners.JUnit4
 class WeakHashSetTest {
 
   // a class guaranteed to provide hash collisions
-  case class Collider(x : String) extends Comparable[Collider] with Serializable {
+  case class Collider(x: String)
+      extends Comparable[Collider] with Serializable {
     override def hashCode = 0
-    def compareTo(y : Collider) = this.x compareTo y.x
+    def compareTo(y: Collider) = this.x compareTo y.x
   }
 
   // basic emptiness check
@@ -53,7 +54,9 @@ class WeakHashSetTest {
     val hs = new WeakHashSet[String]()
     val elements = (0 until size).toList map ("a" + _)
     elements foreach (hs += _)
-    elements foreach {i => assert(hs contains i)}
+    elements foreach { i =>
+      assert(hs contains i)
+    }
     hs.diagnostics.fullyValidate
   }
 
@@ -62,9 +65,14 @@ class WeakHashSetTest {
   def checkRehashCollisions {
     val size = 200
     val hs = new WeakHashSet[Collider]()
-    val elements = (0 until size).toList map {x => Collider("a" + x)}
+    val elements =
+      (0 until size).toList map { x =>
+        Collider("a" + x)
+      }
     elements foreach (hs += _)
-    elements foreach {i => assert(hs contains i)}
+    elements foreach { i =>
+      assert(hs contains i)
+    }
     hs.diagnostics.fullyValidate
   }
 
@@ -74,7 +82,10 @@ class WeakHashSetTest {
   def checkRemoveUnreferencedObjects {
     val size = 200
     val hs = new WeakHashSet[Collider]()
-    val elements = (0 until size).toList map {x => Collider("a" + x)}
+    val elements =
+      (0 until size).toList map { x =>
+        Collider("a" + x)
+      }
     elements foreach (hs += _)
     // don't throw the following into a retained collection so gc
     // can remove them
@@ -84,7 +95,9 @@ class WeakHashSetTest {
     System.gc()
     Thread.sleep(1000)
     assert(hs.size == 200)
-    elements foreach {i => assert(hs contains i)}
+    elements foreach { i =>
+      assert(hs contains i)
+    }
     for (i <- 0 until size) {
       assert(!(hs contains Collider("b" + i)))
     }
@@ -96,12 +109,17 @@ class WeakHashSetTest {
   def checkFindOrUpdate {
     val size = 200
     val hs = new WeakHashSet[Collider]()
-    val elements = (0 until size).toList map {x => Collider("a" + x)}
-    elements foreach {x => assert(hs findEntryOrUpdate x eq x)}
+    val elements =
+      (0 until size).toList map { x =>
+        Collider("a" + x)
+      }
+    elements foreach { x =>
+      assert(hs findEntryOrUpdate x eq x)
+    }
     for (i <- 0 until size) {
       // when we do a lookup the result should be the same reference we
       // original put in
-      assert(hs findEntryOrUpdate(Collider("a" + i)) eq elements(i))
+      assert(hs findEntryOrUpdate (Collider("a" + i)) eq elements(i))
     }
     hs.diagnostics.fullyValidate
   }
@@ -144,7 +162,9 @@ class WeakHashSetTest {
     elements foreach (hs += _)
     hs.clear()
     assert(hs.size == 0)
-    elements foreach {i => assert(!(hs contains i))}
+    elements foreach { i =>
+      assert(!(hs contains i))
+    }
     hs.diagnostics.fullyValidate
   }
 
@@ -162,10 +182,12 @@ class WeakHashSetTest {
   @Test
   def checkIteratorCollisions {
     val hs = new WeakHashSet[Collider]
-    val elements = (0 until 20).toList map {x => Collider("a" + x)}
+    val elements =
+      (0 until 20).toList map { x =>
+        Collider("a" + x)
+      }
     elements foreach (hs += _)
     assert(elements.iterator.toList.sorted == elements.sorted)
     hs.diagnostics.fullyValidate
   }
-
 }

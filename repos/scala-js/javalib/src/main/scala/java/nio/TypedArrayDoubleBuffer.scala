@@ -4,7 +4,9 @@ import scala.scalajs.js.typedarray._
 
 private[nio] final class TypedArrayDoubleBuffer private (
     override private[nio] val _typedArray: Float64Array,
-    _initialPosition: Int, _initialLimit: Int, _readOnly: Boolean)
+    _initialPosition: Int,
+    _initialLimit: Int,
+    _readOnly: Boolean)
     extends DoubleBuffer(_typedArray.length, null, -1) {
 
   position(_initialPosition)
@@ -46,11 +48,13 @@ private[nio] final class TypedArrayDoubleBuffer private (
     GenBuffer(this).generic_put(index, c)
 
   @noinline
-  override def get(dst: Array[Double], offset: Int, length: Int): DoubleBuffer =
+  override def get(
+      dst: Array[Double], offset: Int, length: Int): DoubleBuffer =
     GenBuffer(this).generic_get(dst, offset, length)
 
   @noinline
-  override def put(src: Array[Double], offset: Int, length: Int): DoubleBuffer =
+  override def put(
+      src: Array[Double], offset: Int, length: Int): DoubleBuffer =
     GenBuffer(this).generic_put(src, offset, length)
 
   @noinline
@@ -83,13 +87,13 @@ private[nio] final class TypedArrayDoubleBuffer private (
     _typedArray(index) = elem
 
   @inline
-  override private[nio] def load(startIndex: Int,
-      dst: Array[Double], offset: Int, length: Int): Unit =
+  override private[nio] def load(
+      startIndex: Int, dst: Array[Double], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
-  override private[nio] def store(startIndex: Int,
-      src: Array[Double], offset: Int, length: Int): Unit =
+  override private[nio] def store(
+      startIndex: Int, src: Array[Double], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }
 
@@ -99,21 +103,23 @@ private[nio] object TypedArrayDoubleBuffer {
     def bytesPerElem: Int = 8
 
     def apply(typedArray: Float64Array,
-        initialPosition: Int, initialLimit: Int,
-        readOnly: Boolean): TypedArrayDoubleBuffer = {
-      new TypedArrayDoubleBuffer(typedArray,
-          initialPosition, initialLimit, readOnly)
+              initialPosition: Int,
+              initialLimit: Int,
+              readOnly: Boolean): TypedArrayDoubleBuffer = {
+      new TypedArrayDoubleBuffer(
+          typedArray, initialPosition, initialLimit, readOnly)
     }
 
     @inline
-    def newTypedArray(buffer: ArrayBuffer,
-        byteOffset: Int, length: Int): Float64Array = {
+    def newTypedArray(
+        buffer: ArrayBuffer, byteOffset: Int, length: Int): Float64Array = {
       new Float64Array(buffer, byteOffset, length)
     }
   }
 
   @inline
-  def fromTypedArrayByteBuffer(byteBuffer: TypedArrayByteBuffer): DoubleBuffer =
+  def fromTypedArrayByteBuffer(
+      byteBuffer: TypedArrayByteBuffer): DoubleBuffer =
     GenTypedArrayBuffer.generic_fromTypedArrayByteBuffer(byteBuffer)
 
   def wrap(array: Float64Array): DoubleBuffer =

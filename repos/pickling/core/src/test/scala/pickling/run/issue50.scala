@@ -20,7 +20,8 @@ class Issue50Test extends FunSuite {
 }
 
 class Issue50StackOverflowTest extends FunSuite {
-  test("Issue #50 SO http://stackoverflow.com/questions/19413038/unpickler-for-class-with-tuple") {
+  test(
+      "Issue #50 SO http://stackoverflow.com/questions/19413038/unpickler-for-class-with-tuple") {
     val s = new Simple(("test", 3))
     val simplePickled = s.pickle
     assert(simplePickled.unpickle[Simple].x == s.x)

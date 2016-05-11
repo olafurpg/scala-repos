@@ -35,15 +35,14 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * RadioMenuItem Spec tests.
- *
- *
- */
+  * RadioMenuItem Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class RadioMenuItemSpec
-  extends SimpleSFXDelegateSpec[jfxsc.RadioMenuItem, RadioMenuItem](
-    classOf[jfxsc.RadioMenuItem], classOf[RadioMenuItem]) {
+    extends SimpleSFXDelegateSpec[jfxsc.RadioMenuItem, RadioMenuItem](
+        classOf[jfxsc.RadioMenuItem], classOf[RadioMenuItem]) {
 
   override def getJavaClassInstance = new jfxsc.RadioMenuItem("")
-
 }

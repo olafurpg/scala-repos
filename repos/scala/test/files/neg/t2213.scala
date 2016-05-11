@@ -8,4 +8,4 @@ abstract class A {
 
 class C extends A {}
 
-object Q extends A { }
+object Q extends A {}

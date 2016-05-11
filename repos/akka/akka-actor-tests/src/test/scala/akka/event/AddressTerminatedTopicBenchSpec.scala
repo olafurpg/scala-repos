@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.event
 
 import scala.concurrent.duration._
@@ -39,15 +39,18 @@ class AddressTerminatedTopicBenchSpec extends AkkaSpec("akka.loglevel=INFO") {
         val p = Props(classOf[Subscriber], testActor)
         val subscribers = Vector.fill(num)(sys.actorOf(p))
         receiveN(num, 10.seconds)
-        log.info("Starting {} actors took {} ms", num, (System.nanoTime() - t1).nanos.toMillis)
+        log.info("Starting {} actors took {} ms",
+                 num,
+                 (System.nanoTime() - t1).nanos.toMillis)
 
         val t2 = System.nanoTime()
         shutdown(sys, 10.seconds, verifySystemShutdown = true)
-        log.info("Stopping {} actors took {} ms", num, (System.nanoTime() - t2).nanos.toMillis)
+        log.info("Stopping {} actors took {} ms",
+                 num,
+                 (System.nanoTime() - t2).nanos.toMillis)
       } finally {
         if (!sys.isTerminated) shutdown(sys)
       }
     }
-
   }
 }

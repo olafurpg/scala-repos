@@ -38,7 +38,11 @@ object Test extends ScaladocModelTest {
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
-    val base = root._package("scala")._package("test")._package("scaladoc")._package("tagrequirements")
+    val base = root
+      ._package("scala")
+      ._package("test")
+      ._package("scaladoc")
+      ._package("tagrequirements")
 
     val test = base._object("Test")
     /*
@@ -46,8 +50,11 @@ object Test extends ScaladocModelTest {
      * avoid static code analysis noise about unused values.
      */
     assert(extractCommentText(test.comment.get) == "object comment")
-    assert(extractCommentText(test._method("foo").comment.get) == "foo comment")
-    assert(extractCommentText(test._method("bar").comment.get) == "bar comment")
-    assert(extractCommentText(test._method("baz").comment.get) == "baz comment")
+    assert(
+        extractCommentText(test._method("foo").comment.get) == "foo comment")
+    assert(
+        extractCommentText(test._method("bar").comment.get) == "bar comment")
+    assert(
+        extractCommentText(test._method("baz").comment.get) == "baz comment")
   }
 }

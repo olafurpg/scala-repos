@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import org.specs2.mutable._
@@ -58,7 +57,8 @@ class BiMapSpec extends Specification {
     "getOrElse return default values for invalid key" in {
       val keys = Seq(999, -1, -2)
       val defaults = Seq(1234, 5678, 987)
-      val biValues = keys.zip(defaults).map{ case (k,d) => bi.getOrElse(k, d) }
+      val biValues =
+        keys.zip(defaults).map { case (k, d) => bi.getOrElse(k, d) }
 
       biValues must beEqualTo(defaults)
     }
@@ -123,7 +123,7 @@ class BiMapSpec extends Specification {
       val biIntValues = keys.map(k => biInt(k))
 
       biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biIntValues must containTheSameElementsAs(valuesInt))
     }
 
     "create BiMap from Array of unique string" in {
@@ -138,7 +138,7 @@ class BiMapSpec extends Specification {
       val biIntValues = keys.toSeq.map(k => biInt(k))
 
       biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biIntValues must containTheSameElementsAs(valuesInt))
     }
 
     "not guarantee sequential index for Array with duplicated string" in {
@@ -154,7 +154,7 @@ class BiMapSpec extends Specification {
       val biIntValues = keys.toSet[String].map(k => biInt(k))
 
       biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biIntValues must containTheSameElementsAs(valuesInt))
     }
 
     "create BiMap from RDD[String]" in {
@@ -171,7 +171,7 @@ class BiMapSpec extends Specification {
       val biIntValues = keys.map(k => biInt(k))
 
       biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biIntValues must containTheSameElementsAs(valuesInt))
     }
 
     "create BiMap from RDD[String] with duplicated string" in {
@@ -188,7 +188,7 @@ class BiMapSpec extends Specification {
       val biIntValues = keys.distinct.map(k => biInt(k))
 
       biValues must containTheSameElementsAs(values) and
-        (biIntValues must containTheSameElementsAs(valuesInt))
+      (biIntValues must containTheSameElementsAs(valuesInt))
     }
   }
 

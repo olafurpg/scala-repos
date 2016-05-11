@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.impl.model.parser
 
 import akka.parboiled2.Parser
@@ -9,40 +8,49 @@ import akka.http.scaladsl.model.RemoteAddress
 import akka.http.scaladsl.model.headers._
 
 /**
- * Parser rules for all headers that can be parsed with one single rule.
- * All header rules that require more than one single rule are modelled in their own trait.
- */
-private[parser] trait SimpleHeaders { this: Parser with CommonRules with CommonActions with IpAddressParsing ⇒
+  * Parser rules for all headers that can be parsed with one single rule.
+  * All header rules that require more than one single rule are modelled in their own trait.
+  */
+private[parser] trait SimpleHeaders {
+  this: Parser with CommonRules with CommonActions with IpAddressParsing ⇒
 
   // http://tools.ietf.org/html/rfc7233#section-2.3
   def `accept-ranges` = rule {
-    ("none" ~ push(Nil) | zeroOrMore(ws(',')) ~ oneOrMore(`range-unit`).separatedBy(listSep)) ~ EOI ~> (`Accept-Ranges`(_))
+    ("none" ~ push(Nil) | zeroOrMore(ws(',')) ~ oneOrMore(`range-unit`)
+          .separatedBy(listSep)) ~ EOI ~> (`Accept-Ranges`(_))
   }
 
   // http://www.w3.org/TR/cors/#access-control-allow-credentials-response-header
   // in addition to the spec we also allow for a `false` value
-  def `access-control-allow-credentials` = rule(
-    ("true" ~ push(`Access-Control-Allow-Credentials`(true))
-      | "false" ~ push(`Access-Control-Allow-Credentials`(false))) ~ EOI)
+  def `access-control-allow-credentials` =
+    rule(
+        ("true" ~ push(`Access-Control-Allow-Credentials`(true)) | "false" ~ push(
+                `Access-Control-Allow-Credentials`(false))) ~ EOI)
 
   // http://www.w3.org/TR/cors/#access-control-allow-headers-response-header
   def `access-control-allow-headers` = rule {
-    zeroOrMore(token).separatedBy(listSep) ~ EOI ~> (`Access-Control-Allow-Headers`(_))
+    zeroOrMore(token).separatedBy(listSep) ~ EOI ~>
+    (`Access-Control-Allow-Headers`(_))
   }
 
   // http://www.w3.org/TR/cors/#access-control-allow-methods-response-header
   def `access-control-allow-methods` = rule {
-    zeroOrMore(httpMethodDef).separatedBy(listSep) ~ EOI ~> (`Access-Control-Allow-Methods`(_))
+    zeroOrMore(httpMethodDef).separatedBy(listSep) ~ EOI ~>
+    (`Access-Control-Allow-Methods`(_))
   }
 
   // http://www.w3.org/TR/cors/#access-control-allow-origin-response-header
-  def `access-control-allow-origin` = rule(
-    ws('*') ~ EOI ~ push(`Access-Control-Allow-Origin`.`*`)
-      | `origin-list-or-null` ~ EOI ~> (origins ⇒ `Access-Control-Allow-Origin`.forRange(HttpOriginRange(origins: _*))))
+  def `access-control-allow-origin` =
+    rule(
+        ws('*') ~ EOI ~ push(`Access-Control-Allow-Origin`.`*`) | `origin-list-or-null` ~ EOI ~>
+        (origins ⇒
+              `Access-Control-Allow-Origin`.forRange(
+                  HttpOriginRange(origins: _*))))
 
   // http://www.w3.org/TR/cors/#access-control-expose-headers-response-header
   def `access-control-expose-headers` = rule {
-    zeroOrMore(token).separatedBy(listSep) ~ EOI ~> (`Access-Control-Expose-Headers`(_))
+    zeroOrMore(token).separatedBy(listSep) ~ EOI ~>
+    (`Access-Control-Expose-Headers`(_))
   }
 
   // http://www.w3.org/TR/cors/#access-control-max-age-response-header
@@ -52,7 +60,8 @@ private[parser] trait SimpleHeaders { this: Parser with CommonRules with CommonA
 
   // http://www.w3.org/TR/cors/#access-control-request-headers-request-header
   def `access-control-request-headers` = rule {
-    zeroOrMore(token).separatedBy(listSep) ~ EOI ~> (`Access-Control-Request-Headers`(_))
+    zeroOrMore(token).separatedBy(listSep) ~ EOI ~>
+    (`Access-Control-Request-Headers`(_))
   }
 
   // http://www.w3.org/TR/cors/#access-control-request-method-request-header
@@ -79,8 +88,11 @@ private[parser] trait SimpleHeaders { this: Parser with CommonRules with CommonA
   // http://tools.ietf.org/html/rfc7231#section-3.1.2.2
   // http://tools.ietf.org/html/rfc7231#appendix-D
   def `content-encoding` = rule {
-    oneOrMore(token ~> (x ⇒ HttpEncodings.getForKeyCaseInsensitive(x) getOrElse HttpEncoding.custom(x)))
-      .separatedBy(listSep) ~ EOI ~> (`Content-Encoding`(_))
+    oneOrMore(token ~>
+        (x ⇒
+              HttpEncodings.getForKeyCaseInsensitive(x) getOrElse HttpEncoding
+                .custom(x))).separatedBy(listSep) ~ EOI ~>
+    (`Content-Encoding`(_))
   }
 
   // http://tools.ietf.org/html/rfc7230#section-3.3.2
@@ -90,7 +102,8 @@ private[parser] trait SimpleHeaders { this: Parser with CommonRules with CommonA
 
   // http://tools.ietf.org/html/rfc7233#section-4.2
   def `content-range` = rule {
-    (`byte-content-range` | `other-content-range`) ~ EOI ~> (`Content-Range`(_, _))
+    (`byte-content-range` | `other-content-range`) ~ EOI ~>
+    (`Content-Range`(_, _))
   }
 
   // https://tools.ietf.org/html/rfc6265#section-4.2
@@ -134,25 +147,35 @@ private[parser] trait SimpleHeaders { this: Parser with CommonRules with CommonA
   }
 
   // http://tools.ietf.org/html/rfc7232#section-3.1
-  def `if-match` = rule(
-    ws('*') ~ EOI ~ push(`If-Match`.`*`)
-      | oneOrMore(`entity-tag`).separatedBy(listSep) ~ EOI ~> (tags ⇒ `If-Match`(EntityTagRange(tags: _*))))
+  def `if-match` =
+    rule(
+        ws('*') ~ EOI ~ push(`If-Match`.`*`) | oneOrMore(`entity-tag`)
+          .separatedBy(listSep) ~ EOI ~>
+        (tags ⇒ `If-Match`(EntityTagRange(tags: _*))))
 
   // http://tools.ietf.org/html/rfc7232#section-3.3
-  def `if-modified-since` = rule { `HTTP-date` ~ EOI ~> (`If-Modified-Since`(_)) }
+  def `if-modified-since` = rule {
+    `HTTP-date` ~ EOI ~> (`If-Modified-Since`(_))
+  }
 
   // http://tools.ietf.org/html/rfc7232#section-3.2
   def `if-none-match` = rule {
-    ws('*') ~ EOI ~ push(`If-None-Match`.`*`) |
-      oneOrMore(`entity-tag`).separatedBy(listSep) ~ EOI ~> (tags ⇒ `If-None-Match`(EntityTagRange(tags: _*)))
+    ws('*') ~ EOI ~ push(`If-None-Match`.`*`) | oneOrMore(`entity-tag`)
+      .separatedBy(listSep) ~ EOI ~>
+    (tags ⇒ `If-None-Match`(EntityTagRange(tags: _*)))
   }
 
   // http://tools.ietf.org/html/rfc7232#section-3.5
   // http://tools.ietf.org/html/rfc7233#section-3.2
-  def `if-range` = rule { (`entity-tag` ~> (Left(_)) | `HTTP-date` ~> (Right(_))) ~ EOI ~> (`If-Range`(_)) }
+  def `if-range` = rule {
+    (`entity-tag` ~> (Left(_)) | `HTTP-date` ~> (Right(_))) ~ EOI ~>
+    (`If-Range`(_))
+  }
 
   // http://tools.ietf.org/html/rfc7232#section-3.4
-  def `if-unmodified-since` = rule { `HTTP-date` ~ EOI ~> (`If-Unmodified-Since`(_)) }
+  def `if-unmodified-since` = rule {
+    `HTTP-date` ~ EOI ~> (`If-Unmodified-Since`(_))
+  }
 
   // http://tools.ietf.org/html/rfc7232#section-2.2
   def `last-modified` = rule { `HTTP-date` ~ EOI ~> (`Last-Modified`(_)) }
@@ -167,14 +190,20 @@ private[parser] trait SimpleHeaders { this: Parser with CommonRules with CommonA
 
   // http://tools.ietf.org/html/rfc7235#section-4.3
   def `proxy-authenticate` = rule {
-    oneOrMore(challenge).separatedBy(listSep) ~ EOI ~> (`Proxy-Authenticate`(_))
+    oneOrMore(challenge).separatedBy(listSep) ~ EOI ~>
+    (`Proxy-Authenticate`(_))
   }
 
   // http://tools.ietf.org/html/rfc7235#section-4.4
-  def `proxy-authorization` = rule { credentials ~ EOI ~> (`Proxy-Authorization`(_)) }
+  def `proxy-authorization` = rule {
+    credentials ~ EOI ~> (`Proxy-Authorization`(_))
+  }
 
   // http://tools.ietf.org/html/rfc7233#section-3.1
-  def `range` = rule { `byte-ranges-specifier` /*| `other-ranges-specifier` */ ~ EOI ~> (Range(_, _)) }
+  def `range` = rule {
+    `byte-ranges-specifier` /*| `other-ranges-specifier` */ ~ EOI ~>
+    (Range(_, _))
+  }
 
   // http://tools.ietf.org/html/rfc7231#section-5.5.2
   def referer = rule {
@@ -187,17 +216,21 @@ private[parser] trait SimpleHeaders { this: Parser with CommonRules with CommonA
   def server = rule { products ~ EOI ~> (Server(_)) }
 
   def `strict-transport-security` = rule {
-    ignoreCase("max-age=") ~ `delta-seconds` ~ optional(ws(";") ~ ignoreCase("includesubdomains") ~ push(true)) ~ EOI ~> (`Strict-Transport-Security`(_, _))
+    ignoreCase("max-age=") ~ `delta-seconds` ~ optional(
+        ws(";") ~ ignoreCase("includesubdomains") ~ push(true)) ~ EOI ~>
+    (`Strict-Transport-Security`(_, _))
   }
 
   // http://tools.ietf.org/html/rfc7230#section-3.3.1
   def `transfer-encoding` = rule {
-    oneOrMore(`transfer-coding`).separatedBy(listSep) ~ EOI ~> (`Transfer-Encoding`(_))
+    oneOrMore(`transfer-coding`).separatedBy(listSep) ~ EOI ~>
+    (`Transfer-Encoding`(_))
   }
 
   // https://tools.ietf.org/html/rfc6265
   def `set-cookie` = rule {
-    `cookie-pair` ~> (_.toCookie) ~ zeroOrMore(ws(';') ~ `cookie-av`) ~ EOI ~> (`Set-Cookie`(_))
+    `cookie-pair` ~> (_.toCookie) ~ zeroOrMore(ws(';') ~ `cookie-av`) ~ EOI ~>
+    (`Set-Cookie`(_))
   }
 
   // http://tools.ietf.org/html/rfc7230#section-6.7
@@ -222,12 +255,17 @@ private[parser] trait SimpleHeaders { this: Parser with CommonRules with CommonA
   // were not quoted and that's also what the "Transition" section in the draft says:
   // http://tools.ietf.org/html/draft-ietf-appsawg-http-forwarded-10
   def `x-forwarded-for` = {
-    def addr = rule { (`ip-v4-address` | `ip-v6-address`) ~> (RemoteAddress(_)) | "unknown" ~ push(RemoteAddress.Unknown) }
-    rule { oneOrMore(addr).separatedBy(listSep) ~ EOI ~> (`X-Forwarded-For`(_)) }
+    def addr = rule {
+      (`ip-v4-address` | `ip-v6-address`) ~> (RemoteAddress(_)) | "unknown" ~ push(
+          RemoteAddress.Unknown)
+    }
+    rule {
+      oneOrMore(addr).separatedBy(listSep) ~ EOI ~> (`X-Forwarded-For`(_))
+    }
   }
 
   def `x-real-ip` = rule {
-    (`ip-v4-address` | `ip-v6-address`) ~ EOI ~> (b ⇒ `X-Real-Ip`(RemoteAddress(b)))
+    (`ip-v4-address` | `ip-v6-address`) ~ EOI ~>
+    (b ⇒ `X-Real-Ip`(RemoteAddress(b)))
   }
-
 }

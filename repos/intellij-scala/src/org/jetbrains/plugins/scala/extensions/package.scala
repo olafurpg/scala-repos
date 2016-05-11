@@ -41,7 +41,6 @@ import scala.util.{Failure, Success, Try}
 /**
   * Pavel Fatin
   */
-
 package object extensions {
   implicit class PsiMethodExt(val repr: PsiMethod) extends AnyVal {
     import org.jetbrains.plugins.scala.extensions.PsiMethodExt._
@@ -56,11 +55,13 @@ package object extensions {
 
     def hasQueryLikeName = {
       def startsWith(name: String, prefix: String) =
-        name.length > prefix.length && name.startsWith(prefix) && name.charAt(prefix.length).isUpper
+        name.length > prefix.length && name.startsWith(prefix) &&
+        name.charAt(prefix.length).isUpper
 
       repr.getName match {
         case "getInstance" => false // TODO others?
-        case name if startsWith(name, "getAnd") || startsWith(name, "getOr") => false
+        case name if startsWith(name, "getAnd") || startsWith(name, "getOr") =>
+          false
         case AccessorNamePattern() => true
         case _ => false
       }
@@ -84,16 +85,20 @@ package object extensions {
       """(?-i)(?:do|set|add|remove|insert|delete|aquire|release|update)(?:\p{Lu}.*)""".r
   }
 
-  implicit class TraversableExt[CC[X] <: Traversable[X], A](val value: CC[A]) extends AnyVal {
+  implicit class TraversableExt[CC[X] <: Traversable[X], A](val value: CC[A])
+      extends AnyVal {
     private type CanBuildTo[Elem, C[X]] = CanBuildFrom[Nothing, Elem, C[Elem]]
 
     def filterBy[T](aClass: Class[T])(implicit cbf: CanBuildTo[T, CC]): CC[T] =
-      value.filter(aClass.isInstance(_)).map[T, CC[T]](_.asInstanceOf[T])(collection.breakOut)
+      value
+        .filter(aClass.isInstance(_))
+        .map[T, CC[T]](_.asInstanceOf[T])(collection.breakOut)
 
     def findBy[T](aClass: Class[T]): Option[T] =
       value.find(aClass.isInstance(_)).map(_.asInstanceOf[T])
 
-    def mkParenString(implicit ev: A <:< String): String = value.mkString("(", ", ", ")")
+    def mkParenString(implicit ev: A <:< String): String =
+      value.mkString("(", ", ", ")")
   }
 
   implicit class SeqExt[CC[X] <: Seq[X], A](val value: CC[A]) extends AnyVal {
@@ -112,7 +117,8 @@ package object extensions {
       b.result()
     }
 
-    def mapWithIndex[B](f: (A, Int) => B)(implicit cbf: CanBuildTo[B, CC]): CC[B] = {
+    def mapWithIndex[B](f: (A, Int) => B)(
+        implicit cbf: CanBuildTo[B, CC]): CC[B] = {
       val b = cbf()
       var i = 0
       for (x <- value) {
@@ -131,10 +137,12 @@ package object extensions {
     }
   }
 
-  implicit class IterableExt[CC[X] <: Iterable[X], A](val value: CC[A]) extends AnyVal {
+  implicit class IterableExt[CC[X] <: Iterable[X], A](val value: CC[A])
+      extends AnyVal {
     private type CanBuildTo[Elem, C[X]] = CanBuildFrom[Nothing, Elem, C[Elem]]
 
-    def zipMapped[B](f: A => B)(implicit cbf: CanBuildTo[(A, B), CC]): CC[(A, B)] = {
+    def zipMapped[B](f: A => B)(
+        implicit cbf: CanBuildTo[(A, B), CC]): CC[(A, B)] = {
       val b = cbf()
       val it = value.iterator
       while (it.hasNext) {
@@ -145,17 +153,17 @@ package object extensions {
     }
   }
 
-  implicit class ObjectExt[T](val v: T) extends AnyVal{
+  implicit class ObjectExt[T](val v: T) extends AnyVal {
     def toOption: Option[T] = Option(v)
 
-    def asOptionOf[E: ClassTag]: Option[E] = {
+    def asOptionOf[E : ClassTag]: Option[E] = {
       if (classTag[E].runtimeClass.isInstance(v)) Some(v.asInstanceOf[E])
       else None
     }
 
     def getOrElse[H >: T](default: H): H = if (v == null) default else v
 
-    def collectOption[B](pf : scala.PartialFunction[T, B]) = Some(v).collect(pf)
+    def collectOption[B](pf: scala.PartialFunction[T, B]) = Some(v).collect(pf)
   }
 
   implicit class BooleanExt(val b: Boolean) extends AnyVal {
@@ -164,15 +172,17 @@ package object extensions {
     def toInt: Int = if (b) 1 else 0
   }
 
-  implicit class StringExt(val s: String) extends AnyVal{
+  implicit class StringExt(val s: String) extends AnyVal {
     def startsWith(c: Char) = !s.isEmpty && s.charAt(0) == c
 
     def endsWith(c: Char) = !s.isEmpty && s.charAt(s.length - 1) == c
 
-    def parenthesisedIf(condition: Boolean) = if (condition) "(" + s + ")" else s
+    def parenthesisedIf(condition: Boolean) =
+      if (condition) "(" + s + ")" else s
   }
 
-  implicit class PsiElementExt(override val repr: PsiElement) extends PsiElementExtTrait {
+  implicit class PsiElementExt(override val repr: PsiElement)
+      extends PsiElementExtTrait {
     def startOffsetInParent: Int = {
       repr match {
         case s: ScalaPsiElement => s.startOffsetInParent
@@ -182,9 +192,10 @@ package object extensions {
   }
 
   implicit class PsiMemberExt(val member: PsiMember) extends AnyVal {
+
     /**
-     * Second match branch is for Java only.
-     */
+      * Second match branch is for Java only.
+      */
     def containingClass: PsiClass = {
       member match {
         case member: ScMember => member.containingClass
@@ -195,9 +206,10 @@ package object extensions {
   }
 
   implicit class PsiClassExt(val clazz: PsiClass) extends AnyVal {
+
     /**
-     * Second match branch is for Java only.
-     */
+      * Second match branch is for Java only.
+      */
     def qualifiedName: String = {
       clazz match {
         case t: ScTemplateDefinition => t.qualifiedName
@@ -215,18 +227,22 @@ package object extensions {
     def isEffectivelyFinal: Boolean = clazz match {
       case scClass: ScClass => scClass.hasFinalModifier
       case _: ScObject => true
-      case synth: ScSyntheticClass if !Seq("AnyRef", "AnyVal").contains(synth.className) => true //wrappers for value types
+      case synth: ScSyntheticClass
+          if !Seq("AnyRef", "AnyVal").contains(synth.className) =>
+        true //wrappers for value types
       case _ => clazz.hasModifierProperty(PsiModifier.FINAL)
     }
 
-
-    def processPsiMethodsForNode(node: SignatureNodes.Node, isStatic: Boolean, isInterface: Boolean)
-                                (processMethod: PsiMethod => Unit, processName: String => Unit = _ => ()): Unit = {
+    def processPsiMethodsForNode(
+        node: SignatureNodes.Node, isStatic: Boolean, isInterface: Boolean)(
+        processMethod: PsiMethod => Unit,
+        processName: String => Unit = _ => ()): Unit = {
 
       def concreteClassFor(typedDef: ScTypedDefinition): Option[PsiClass] = {
         if (typedDef.isAbstractMember) return None
         clazz match {
-          case wrapper: PsiClassWrapper if wrapper.definition.isInstanceOf[ScObject] =>
+          case wrapper: PsiClassWrapper
+              if wrapper.definition.isInstanceOf[ScObject] =>
             return Some(wrapper) //this is static case, when containing class should be wrapper
           case _ =>
         }
@@ -235,7 +251,10 @@ package object extensions {
           case m: ScMember =>
             m.containingClass match {
               case t: ScTrait =>
-                val linearization = MixinNodes.linearization(clazz).flatMap(tp => ScType.extractClass(tp, Some(clazz.getProject)))
+                val linearization = MixinNodes
+                  .linearization(clazz)
+                  .flatMap(
+                      tp => ScType.extractClass(tp, Some(clazz.getProject)))
                 var index = linearization.indexWhere(_ == t)
                 while (index >= 0) {
                   val cl = linearization(index)
@@ -251,24 +270,34 @@ package object extensions {
 
       node.info.namedElement match {
         case fun: ScFunction if !fun.isConstructor =>
-          val wrappers = fun.getFunctionWrappers(isStatic, isInterface = fun.isAbstractMember, concreteClassFor(fun))
+          val wrappers = fun.getFunctionWrappers(
+              isStatic,
+              isInterface = fun.isAbstractMember,
+              concreteClassFor(fun))
           wrappers.foreach(processMethod)
           wrappers.foreach(w => processName(w.name))
         case method: PsiMethod if !method.isConstructor =>
           if (isStatic) {
-            if (method.containingClass != null && method.containingClass.qualifiedName != "java.lang.Object") {
+            if (method.containingClass != null &&
+                method.containingClass.qualifiedName != "java.lang.Object") {
               processMethod(StaticPsiMethodWrapper.getWrapper(method, clazz))
               processName(method.getName)
             }
-          }
-          else {
+          } else {
             processMethod(method)
             processName(method.getName)
           }
-        case t: ScTypedDefinition if t.isVal || t.isVar ||
-          (t.isInstanceOf[ScClassParameter] && t.asInstanceOf[ScClassParameter].isCaseClassVal) =>
-
-          PsiTypedDefinitionWrapper.processWrappersFor(t, concreteClassFor(t), node.info.name, isStatic, isInterface, processMethod, processName)
+        case t: ScTypedDefinition
+            if t.isVal || t.isVar ||
+            (t.isInstanceOf[ScClassParameter] &&
+                t.asInstanceOf[ScClassParameter].isCaseClassVal) =>
+          PsiTypedDefinitionWrapper.processWrappersFor(t,
+                                                       concreteClassFor(t),
+                                                       node.info.name,
+                                                       isStatic,
+                                                       isInterface,
+                                                       processMethod,
+                                                       processName)
         case _ =>
       }
     }
@@ -286,10 +315,12 @@ package object extensions {
     }
   }
 
-  implicit class PsiNamedElementExt(val named: PsiNamedElement) extends AnyVal {
+  implicit class PsiNamedElementExt(val named: PsiNamedElement)
+      extends AnyVal {
+
     /**
-     * Second match branch is for Java only.
-     */
+      * Second match branch is for Java only.
+      */
     def name: String = {
       named match {
         case nd: ScNamedElement => nd.name
@@ -298,10 +329,12 @@ package object extensions {
     }
   }
 
-  implicit class PsiModifierListOwnerExt(val member: PsiModifierListOwner) extends AnyVal{
+  implicit class PsiModifierListOwnerExt(val member: PsiModifierListOwner)
+      extends AnyVal {
+
     /**
-     * Second match branch is for Java only.
-     */
+      * Second match branch is for Java only.
+      */
     def hasAbstractModifier: Boolean = {
       member match {
         case member: ScModifierListOwner => member.hasAbstractModifier
@@ -310,8 +343,8 @@ package object extensions {
     }
 
     /**
-     * Second match branch is for Java only.
-     */
+      * Second match branch is for Java only.
+      */
     def hasFinalModifier: Boolean = {
       member match {
         case member: ScModifierListOwner => member.hasFinalModifier
@@ -320,11 +353,12 @@ package object extensions {
     }
 
     /**
-     * Second match branch is for Java only.
-     */
+      * Second match branch is for Java only.
+      */
     def hasModifierPropertyScala(name: String): Boolean = {
       member match {
-        case member: ScModifierListOwner => member.hasModifierPropertyScala(name)
+        case member: ScModifierListOwner =>
+          member.hasModifierPropertyScala(name)
         case _ => member.hasModifierProperty(name)
       }
     }
@@ -348,27 +382,32 @@ package object extensions {
 
   import scala.language.implicitConversions
 
-  implicit def toIdeaFunction[A, B](f: Function[A, B]): com.intellij.util.Function[A, B] = new com.intellij.util.Function[A, B] {
-    override def fun(param: A): B = f(param)
-  }
+  implicit def toIdeaFunction[A, B](
+      f: Function[A, B]): com.intellij.util.Function[A, B] =
+    new com.intellij.util.Function[A, B] {
+      override def fun(param: A): B = f(param)
+    }
 
-  implicit def toProcessor[T](action: T => Boolean): Processor[T] = new Processor[T] {
-    override def process(t: T): Boolean = action(t)
-  }
+  implicit def toProcessor[T](action: T => Boolean): Processor[T] =
+    new Processor[T] {
+      override def process(t: T): Boolean = action(t)
+    }
 
   implicit def toRunnable(action: => Any): Runnable = new Runnable {
     override def run(): Unit = action
   }
 
-  implicit def toComputable[T](action: => T): Computable[T] = new Computable[T] {
-    override def compute(): T = action
-  }
+  implicit def toComputable[T](action: => T): Computable[T] =
+    new Computable[T] {
+      override def compute(): T = action
+    }
 
   implicit def toCallable[T](action: => T): Callable[T] = new Callable[T] {
     override def call(): T = action
   }
-  
-  def startCommand(project: Project, commandName: String)(body: => Unit): Unit = {
+
+  def startCommand(project: Project, commandName: String)(
+      body: => Unit): Unit = {
     CommandProcessor.getInstance.executeCommand(project, new Runnable {
       def run() {
         inWriteAction {
@@ -384,7 +423,8 @@ package object extensions {
     })
   }
 
-  def inWriteCommandAction[T](project: Project, commandName: String = "Undefined")(body: => T): T = {
+  def inWriteCommandAction[T](
+      project: Project, commandName: String = "Undefined")(body: => T): T = {
     val computable = new Computable[T] {
       override def compute(): T = body
     }
@@ -405,17 +445,19 @@ package object extensions {
     ApplicationManager.getApplication.executeOnPooledThread(toCallable(body))
   }
 
-  def withProgressSynchronously[T](title: String)(body: ((String => Unit) => T)): T = {
+  def withProgressSynchronously[T](title: String)(
+      body: ((String => Unit) => T)): T = {
     withProgressSynchronouslyTry[T](title)(body) match {
       case Success(result) => result
       case Failure(exception) => throw exception
     }
   }
 
-  def withProgressSynchronouslyTry[T](title: String)(body: ((String => Unit) => T)): Try[T] = {
+  def withProgressSynchronouslyTry[T](title: String)(
+      body: ((String => Unit) => T)): Try[T] = {
     val progressManager = ProgressManager.getInstance
 
-    val computable  = new ThrowableComputable[T, Exception] {
+    val computable = new ThrowableComputable[T, Exception] {
       @throws(classOf[Exception])
       def compute: T = {
         val progressIndicator = progressManager.getProgressIndicator
@@ -424,26 +466,32 @@ package object extensions {
     }
 
     catching(classOf[Exception]).withTry {
-      progressManager.runProcessWithProgressSynchronously(computable, title, false, null)
+      progressManager.runProcessWithProgressSynchronously(
+          computable, title, false, null)
     }
   }
 
   def postponeFormattingWithin[T](project: Project)(body: => T): T = {
-    PostprocessReformattingAspect.getInstance(project).postponeFormattingInside(new Computable[T]{
-      def compute(): T = body
-    })
+    PostprocessReformattingAspect
+      .getInstance(project)
+      .postponeFormattingInside(new Computable[T] {
+        def compute(): T = body
+      })
   }
 
   def withDisabledPostprocessFormatting[T](project: Project)(body: => T): T = {
-    PostprocessReformattingAspect.getInstance(project).disablePostprocessFormattingInside {
-      new Computable[T] {
-        override def compute(): T = body
+    PostprocessReformattingAspect
+      .getInstance(project)
+      .disablePostprocessFormattingInside {
+        new Computable[T] {
+          override def compute(): T = body
+        }
       }
-    }
   }
 
   def invokeLater[T](body: => T) {
-    ApplicationManager.getApplication.invokeLater(new Runnable {
+    ApplicationManager.getApplication.invokeLater(
+        new Runnable {
       def run() {
         body
       }
@@ -452,7 +500,8 @@ package object extensions {
 
   def invokeAndWait[T](body: => Unit) {
     preservingControlFlow {
-      SwingUtilities.invokeAndWait(new Runnable {
+      SwingUtilities.invokeAndWait(
+          new Runnable {
         def run() {
           body
         }
@@ -464,10 +513,11 @@ package object extensions {
     try {
       body
     } catch {
-      case e: InvocationTargetException => e.getTargetException match {
-        case control: NonLocalReturnControl[_] => throw control
-        case _ => throw e
-      }
+      case e: InvocationTargetException =>
+        e.getTargetException match {
+          case control: NonLocalReturnControl[_] => throw control
+          case _ => throw e
+        }
     }
   }
 
@@ -479,8 +529,7 @@ package object extensions {
       val it = cases.iterator
       while (it.hasNext) {
         val caze = it.next()
-        if (caze.isDefinedAt(v1))
-          return caze(v1)
+        if (caze.isDefinedAt(v1)) return caze(v1)
       }
       throw new MatchError(v1.toString)
     }
@@ -491,7 +540,11 @@ package object extensions {
       param match {
         case f: FakePsiParameter => f.parameter.paramType
         case param: ScParameter => param.getType(TypingContext.empty).getOrAny
-        case _ => ScType.create(param.getType, param.getProject, param.getResolveScope, paramTopLevel = true)
+        case _ =>
+          ScType.create(param.getType,
+                        param.getProject,
+                        param.getResolveScope,
+                        paramTopLevel = true)
       }
     }
 
@@ -504,8 +557,11 @@ package object extensions {
             case p: PsiArrayType if param.isVarArgs => p.getComponentType
             case tp => tp
           }
-          ScType.create(paramType, param.getProject, param.getResolveScope, paramTopLevel = true,
-            treatJavaObjectAsAny = treatJavaObjectAsAny)
+          ScType.create(paramType,
+                        param.getProject,
+                        param.getResolveScope,
+                        paramTopLevel = true,
+                        treatJavaObjectAsAny = treatJavaObjectAsAny)
       }
     }
 

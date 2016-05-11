@@ -22,12 +22,12 @@ import org.apache.commons.math3.distribution.{NormalDistribution, TDistribution}
 import org.apache.spark.util.StatCounter
 
 /**
- * An ApproximateEvaluator for sums. It estimates the mean and the count and multiplies them
- * together, then uses the formula for the variance of two independent random variables to get
- * a variance for the result and compute a confidence interval.
- */
+  * An ApproximateEvaluator for sums. It estimates the mean and the count and multiplies them
+  * together, then uses the formula for the variance of two independent random variables to get
+  * a variance for the result and compute a confidence interval.
+  */
 private[spark] class SumEvaluator(totalOutputs: Int, confidence: Double)
-  extends ApproximateEvaluator[StatCounter, BoundedDouble] {
+    extends ApproximateEvaluator[StatCounter, BoundedDouble] {
 
   var outputsMerged = 0
   var counter = new StatCounter
@@ -41,7 +41,8 @@ private[spark] class SumEvaluator(totalOutputs: Int, confidence: Double)
     if (outputsMerged == totalOutputs) {
       new BoundedDouble(counter.sum, 1.0, counter.sum, counter.sum)
     } else if (outputsMerged == 0) {
-      new BoundedDouble(0, 0.0, Double.NegativeInfinity, Double.PositiveInfinity)
+      new BoundedDouble(
+          0, 0.0, Double.NegativeInfinity, Double.PositiveInfinity)
     } else {
       val p = outputsMerged.toDouble / totalOutputs
       val meanEstimate = counter.mean
@@ -49,16 +50,18 @@ private[spark] class SumEvaluator(totalOutputs: Int, confidence: Double)
       val countEstimate = (counter.count + 1 - p) / p
       val countVar = (counter.count + 1) * (1 - p) / (p * p)
       val sumEstimate = meanEstimate * countEstimate
-      val sumVar = (meanEstimate * meanEstimate * countVar) +
-                   (countEstimate * countEstimate * meanVar) +
-                   (meanVar * countVar)
+      val sumVar =
+        (meanEstimate * meanEstimate * countVar) +
+        (countEstimate * countEstimate * meanVar) + (meanVar * countVar)
       val sumStdev = math.sqrt(sumVar)
       val confFactor = {
         if (counter.count > 100) {
-          new NormalDistribution().inverseCumulativeProbability(1 - (1 - confidence) / 2)
+          new NormalDistribution()
+            .inverseCumulativeProbability(1 - (1 - confidence) / 2)
         } else {
           val degreesOfFreedom = (counter.count - 1).toInt
-          new TDistribution(degreesOfFreedom).inverseCumulativeProbability(1 - (1 - confidence) / 2)
+          new TDistribution(degreesOfFreedom)
+            .inverseCumulativeProbability(1 - (1 - confidence) / 2)
         }
       }
       val low = sumEstimate - confFactor * sumStdev

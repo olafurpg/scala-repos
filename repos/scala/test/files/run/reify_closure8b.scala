@@ -7,7 +7,7 @@ object Test extends App {
   // will fail because y is a private field
   // reification doesn't magically make unavailable stuff available
   class Foo(y: Int) {
-    def fun = reify{y}
+    def fun = reify { y }
   }
 
   try {

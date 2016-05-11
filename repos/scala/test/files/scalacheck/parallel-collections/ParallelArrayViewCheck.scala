@@ -1,11 +1,5 @@
 // package scala.collection.parallel
 // package mutable
-
-
-
-
-
-
 // import org.scalacheck._
 // import org.scalacheck.Gen
 // import org.scalacheck.Gen._
@@ -17,9 +11,6 @@
 // import scala.collection.mutable.ArrayBuffer
 // import scala.collection.parallel.ops._
 // import scala.collection.mutable.ArraySeq
-
-
-
 // abstract class ParallelArrayViewCheck[T](tp: String)
 // extends ParallelSeqCheck[T]("ParallelSeqView[" + tp + ", ParallelArray[" + tp + "]]") {
 //   // ForkJoinTasks.defaultForkJoinPool.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
@@ -53,8 +44,6 @@
 //   }
 
 // }
-
-
 // object IntParallelArrayViewCheck extends ParallelArrayViewCheck[Int]("Int") with IntSeqOperators with IntValues {
 //   override def instances(vals: Seq[Gen[Int]]) = oneOf(super.instances(vals), sized { sz =>
 //     (0 until sz).toArray.toSeq
@@ -62,8 +51,6 @@
 //     (-sz until 0).toArray.toSeq
 //   })
 // }
-
-
 // abstract class ParallelArrayViewComposedCheck[T](tp: String)
 // extends ParallelSeqCheck[T]("ParallelSeqView[" + tp + "], ParallelArray[" + tp + "].++.patch.reverse.take.reverse") {
 //   ForkJoinTasks.defaultForkJoinPool.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
@@ -93,8 +80,6 @@
 //   }
 
 // }
-
-
 // object IntParallelArrayViewComposedCheck extends ParallelArrayViewComposedCheck[Int]("Int") with IntSeqOperators with IntValues {
 //   override def instances(vals: Seq[Gen[Int]]) = oneOf(super.instances(vals), sized { sz =>
 //     (0 until sz).toArray.toSeq
@@ -102,21 +87,3 @@
 //     (-sz until 0).toArray.toSeq
 //   })
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

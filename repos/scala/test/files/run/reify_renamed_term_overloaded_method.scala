@@ -2,7 +2,7 @@ import scala.reflect.runtime.universe._
 import scala.tools.reflect.Eval
 
 object O {
-  def show(i: Int)    = i.toString
+  def show(i: Int) = i.toString
   def show(s: String) = s
 }
 

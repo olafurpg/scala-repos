@@ -21,8 +21,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.execution.ui.{SparkListenerSQLExecutionEnd,
-  SparkListenerSQLExecutionStart}
+import org.apache.spark.sql.execution.ui.{SparkListenerSQLExecutionEnd, SparkListenerSQLExecutionStart}
 import org.apache.spark.util.Utils
 
 private[sql] object SQLExecution {
@@ -34,11 +33,11 @@ private[sql] object SQLExecution {
   private def nextExecutionId: Long = _nextExecutionId.getAndIncrement
 
   /**
-   * Wrap an action that will execute "queryExecution" to track all Spark jobs in the body so that
-   * we can connect them with an execution.
-   */
-  def withNewExecutionId[T](
-      sqlContext: SQLContext, queryExecution: QueryExecution)(body: => T): T = {
+    * Wrap an action that will execute "queryExecution" to track all Spark jobs in the body so that
+    * we can connect them with an execution.
+    */
+  def withNewExecutionId[T](sqlContext: SQLContext,
+                            queryExecution: QueryExecution)(body: => T): T = {
     val sc = sqlContext.sparkContext
     val oldExecutionId = sc.getLocalProperty(EXECUTION_ID_KEY)
     if (oldExecutionId == null) {
@@ -46,14 +45,20 @@ private[sql] object SQLExecution {
       sc.setLocalProperty(EXECUTION_ID_KEY, executionId.toString)
       val r = try {
         val callSite = Utils.getCallSite()
-        sqlContext.sparkContext.listenerBus.post(SparkListenerSQLExecutionStart(
-          executionId, callSite.shortForm, callSite.longForm, queryExecution.toString,
-          SparkPlanInfo.fromSparkPlan(queryExecution.executedPlan), System.currentTimeMillis()))
+        sqlContext.sparkContext.listenerBus.post(
+            SparkListenerSQLExecutionStart(
+                executionId,
+                callSite.shortForm,
+                callSite.longForm,
+                queryExecution.toString,
+                SparkPlanInfo.fromSparkPlan(queryExecution.executedPlan),
+                System.currentTimeMillis()))
         try {
           body
         } finally {
-          sqlContext.sparkContext.listenerBus.post(SparkListenerSQLExecutionEnd(
-            executionId, System.currentTimeMillis()))
+          sqlContext.sparkContext.listenerBus.post(
+              SparkListenerSQLExecutionEnd(
+                  executionId, System.currentTimeMillis()))
         }
       } finally {
         sc.setLocalProperty(EXECUTION_ID_KEY, null)
@@ -79,11 +84,12 @@ private[sql] object SQLExecution {
   }
 
   /**
-   * Wrap an action with a known executionId. When running a different action in a different
-   * thread from the original one, this method can be used to connect the Spark jobs in this action
-   * with the known executionId, e.g., `BroadcastHashJoin.broadcastFuture`.
-   */
-  def withExecutionId[T](sc: SparkContext, executionId: String)(body: => T): T = {
+    * Wrap an action with a known executionId. When running a different action in a different
+    * thread from the original one, this method can be used to connect the Spark jobs in this action
+    * with the known executionId, e.g., `BroadcastHashJoin.broadcastFuture`.
+    */
+  def withExecutionId[T](sc: SparkContext, executionId: String)(
+      body: => T): T = {
     val oldExecutionId = sc.getLocalProperty(SQLExecution.EXECUTION_ID_KEY)
     try {
       sc.setLocalProperty(SQLExecution.EXECUTION_ID_KEY, executionId)

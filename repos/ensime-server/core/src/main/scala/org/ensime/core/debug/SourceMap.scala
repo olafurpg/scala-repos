@@ -4,8 +4,8 @@ package org.ensime.core.debug
 
 import java.io.File
 
-import com.sun.jdi.{ AbsentInformationException, Location }
-import org.ensime.api.{ EnsimeConfig, LineSourcePosition }
+import com.sun.jdi.{AbsentInformationException, Location}
+import org.ensime.api.{EnsimeConfig, LineSourcePosition}
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable

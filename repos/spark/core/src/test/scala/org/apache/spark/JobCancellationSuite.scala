@@ -30,12 +30,13 @@ import org.scalatest.Matchers
 import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskStart}
 
 /**
- * Test suite for cancelling running jobs. We run the cancellation tasks for single job action
- * (e.g. count) as well as multi-job action (e.g. take). We test the local and cluster schedulers
- * in both FIFO and fair scheduling modes.
- */
-class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAfter
-  with LocalSparkContext {
+  * Test suite for cancelling running jobs. We run the cancellation tasks for single job action
+  * (e.g. count) as well as multi-job action (e.g. take). We test the local and cluster schedulers
+  * in both FIFO and fair scheduling modes.
+  */
+class JobCancellationSuite
+    extends SparkFunSuite with Matchers with BeforeAndAfter
+    with LocalSparkContext {
 
   override def afterEach() {
     try {
@@ -56,7 +57,8 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
 
   test("local mode, fair scheduler") {
     val conf = new SparkConf().set("spark.scheduler.mode", "FAIR")
-    val xmlPath = getClass.getClassLoader.getResource("fairscheduler.xml").getFile()
+    val xmlPath =
+      getClass.getClassLoader.getResource("fairscheduler.xml").getFile()
     conf.set("spark.scheduler.allocation.file", xmlPath)
     sc = new SparkContext("local[2]", "test", conf)
     testCount()
@@ -76,7 +78,8 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
 
   test("cluster mode, fair scheduler") {
     val conf = new SparkConf().set("spark.scheduler.mode", "FAIR")
-    val xmlPath = getClass.getClassLoader.getResource("fairscheduler.xml").getFile()
+    val xmlPath =
+      getClass.getClassLoader.getResource("fairscheduler.xml").getFile()
     conf.set("spark.scheduler.allocation.file", xmlPath)
     sc = new SparkContext("local-cluster[2,1,1024]", "test", conf)
     testCount()
@@ -93,13 +96,16 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
     sc = new SparkContext("local", "test")
 
     // Run from 1 to 10, and then block and wait for the task to be killed.
-    val rdd = sc.parallelize(1 to 1000, 2).map { x =>
-      if (x > 10) {
-        taskStartedSemaphore.release()
-        taskCancelledSemaphore.acquire()
+    val rdd = sc
+      .parallelize(1 to 1000, 2)
+      .map { x =>
+        if (x > 10) {
+          taskStartedSemaphore.release()
+          taskCancelledSemaphore.acquire()
+        }
+        x
       }
-      x
-    }.cache()
+      .cache()
 
     val rdd1 = rdd.map(x => x)
 
@@ -119,7 +125,8 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
 
     // Add a listener to release the semaphore once any tasks are launched.
     val sem = new Semaphore(0)
-    sc.addSparkListener(new SparkListener {
+    sc.addSparkListener(
+        new SparkListener {
       override def onTaskStart(taskStart: SparkListenerTaskStart) {
         sem.release()
       }
@@ -128,7 +135,11 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
     // jobA is the one to be cancelled.
     val jobA = Future {
       sc.setJobGroup("jobA", "this is a job to be cancelled")
-      sc.parallelize(1 to 10000, 2).map { i => Thread.sleep(10); i }.count()
+      sc.parallelize(1 to 10000, 2)
+        .map { i =>
+          Thread.sleep(10); i
+        }
+        .count()
     }
 
     // Block until both tasks of job A have started and cancel job A.
@@ -149,7 +160,8 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
 
     // Add a listener to release the semaphore once any tasks are launched.
     val sem = new Semaphore(0)
-    sc.addSparkListener(new SparkListener {
+    sc.addSparkListener(
+        new SparkListener {
       override def onTaskStart(taskStart: SparkListenerTaskStart) {
         sem.release()
       }
@@ -161,7 +173,11 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
       // The job group should be inherited by this thread
       override def run(): Unit = {
         exception = intercept[SparkException] {
-          sc.parallelize(1 to 10000, 2).map { i => Thread.sleep(10); i }.count()
+          sc.parallelize(1 to 10000, 2)
+            .map { i =>
+              Thread.sleep(10); i
+            }
+            .count()
         }
       }
     }
@@ -184,7 +200,8 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
 
     // Add a listener to release the semaphore once any tasks are launched.
     val sem = new Semaphore(0)
-    sc.addSparkListener(new SparkListener {
+    sc.addSparkListener(
+        new SparkListener {
       override def onTaskStart(taskStart: SparkListenerTaskStart) {
         sem.release()
       }
@@ -192,8 +209,13 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
 
     // jobA is the one to be cancelled.
     val jobA = Future {
-      sc.setJobGroup("jobA", "this is a job to be cancelled", interruptOnCancel = true)
-      sc.parallelize(1 to 10000, 2).map { i => Thread.sleep(100000); i }.count()
+      sc.setJobGroup(
+          "jobA", "this is a job to be cancelled", interruptOnCancel = true)
+      sc.parallelize(1 to 10000, 2)
+        .map { i =>
+          Thread.sleep(100000); i
+        }
+        .count()
     }
 
     // Block until both tasks of job A have started and cancel job A.
@@ -216,17 +238,21 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
     val sem1 = new Semaphore(0)
 
     sc = new SparkContext("local[2]", "test")
-    sc.addSparkListener(new SparkListener {
+    sc.addSparkListener(
+        new SparkListener {
       override def onTaskStart(taskStart: SparkListenerTaskStart) {
         sem1.release()
       }
     })
 
     // Create two actions that would share the some stages.
-    val rdd = sc.parallelize(1 to 10, 2).map { i =>
-      JobCancellationSuite.twoJobsSharingStageSemaphore.acquire()
-      (i, i)
-    }.reduceByKey(_ + _)
+    val rdd = sc
+      .parallelize(1 to 10, 2)
+      .map { i =>
+        JobCancellationSuite.twoJobsSharingStageSemaphore.acquire()
+        (i, i)
+      }
+      .reduceByKey(_ + _)
     val f1 = rdd.collectAsync()
     val f2 = rdd.countAsync()
 
@@ -246,62 +272,87 @@ class JobCancellationSuite extends SparkFunSuite with Matchers with BeforeAndAft
   def testCount() {
     // Cancel before launching any tasks
     {
-      val f = sc.parallelize(1 to 10000, 2).map { i => Thread.sleep(10); i }.countAsync()
+      val f = sc
+        .parallelize(1 to 10000, 2)
+        .map { i =>
+          Thread.sleep(10); i
+        }
+        .countAsync()
       Future { f.cancel() }
       val e = intercept[SparkException] { f.get() }
-      assert(e.getMessage.contains("cancelled") || e.getMessage.contains("killed"))
+      assert(e.getMessage.contains("cancelled") ||
+          e.getMessage.contains("killed"))
     }
 
     // Cancel after some tasks have been launched
     {
       // Add a listener to release the semaphore once any tasks are launched.
       val sem = new Semaphore(0)
-      sc.addSparkListener(new SparkListener {
+      sc.addSparkListener(
+          new SparkListener {
         override def onTaskStart(taskStart: SparkListenerTaskStart) {
           sem.release()
         }
       })
 
-      val f = sc.parallelize(1 to 10000, 2).map { i => Thread.sleep(10); i }.countAsync()
+      val f = sc
+        .parallelize(1 to 10000, 2)
+        .map { i =>
+          Thread.sleep(10); i
+        }
+        .countAsync()
       Future {
         // Wait until some tasks were launched before we cancel the job.
         sem.acquire()
         f.cancel()
       }
       val e = intercept[SparkException] { f.get() }
-      assert(e.getMessage.contains("cancelled") || e.getMessage.contains("killed"))
+      assert(e.getMessage.contains("cancelled") ||
+          e.getMessage.contains("killed"))
     }
   }
 
   def testTake() {
     // Cancel before launching any tasks
     {
-      val f = sc.parallelize(1 to 10000, 2).map { i => Thread.sleep(10); i }.takeAsync(5000)
+      val f = sc
+        .parallelize(1 to 10000, 2)
+        .map { i =>
+          Thread.sleep(10); i
+        }
+        .takeAsync(5000)
       Future { f.cancel() }
       val e = intercept[SparkException] { f.get() }
-      assert(e.getMessage.contains("cancelled") || e.getMessage.contains("killed"))
+      assert(e.getMessage.contains("cancelled") ||
+          e.getMessage.contains("killed"))
     }
 
     // Cancel after some tasks have been launched
     {
       // Add a listener to release the semaphore once any tasks are launched.
       val sem = new Semaphore(0)
-      sc.addSparkListener(new SparkListener {
+      sc.addSparkListener(
+          new SparkListener {
         override def onTaskStart(taskStart: SparkListenerTaskStart) {
           sem.release()
         }
       })
-      val f = sc.parallelize(1 to 10000, 2).map { i => Thread.sleep(10); i }.takeAsync(5000)
+      val f = sc
+        .parallelize(1 to 10000, 2)
+        .map { i =>
+          Thread.sleep(10); i
+        }
+        .takeAsync(5000)
       Future {
         sem.acquire()
         f.cancel()
       }
       val e = intercept[SparkException] { f.get() }
-      assert(e.getMessage.contains("cancelled") || e.getMessage.contains("killed"))
+      assert(e.getMessage.contains("cancelled") ||
+          e.getMessage.contains("killed"))
     }
   }
 }
-
 
 object JobCancellationSuite {
   val taskStartedSemaphore = new Semaphore(0)

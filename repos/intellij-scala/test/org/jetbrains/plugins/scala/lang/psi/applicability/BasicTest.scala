@@ -2,10 +2,10 @@ package org.jetbrains.plugins.scala
 package lang.psi.applicability
 
 import org.jetbrains.plugins.scala.lang.psi.types._
-/**
- * Pavel.Fatin, 18.05.2010
- */
 
+/**
+  * Pavel.Fatin, 18.05.2010
+  */
 class BasicTest extends ApplicabilityTestBase {
   def testFine() {
     assertProblems("", "") {
@@ -67,7 +67,8 @@ class BasicTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A, b: B)", "") {
       case MissedParametersClause(_) :: Nil =>
-      case MissedValueParameter(Parameter("a")) :: MissedValueParameter(Parameter("b")) :: Nil =>
+      case MissedValueParameter(Parameter("a")) :: MissedValueParameter(
+          Parameter("b")) :: Nil =>
     }
     assertProblems("(a: A)(b: B)", "") {
       case MissedParametersClause(_) :: Nil =>
@@ -83,16 +84,18 @@ class BasicTest extends ApplicabilityTestBase {
       case MissedValueParameter(Parameter("b")) :: Nil =>
     }
     assertProblems("(a: A, b: B)", "()") {
-      case MissedValueParameter(Parameter("a")) :: MissedValueParameter(Parameter("b")) :: Nil =>
+      case MissedValueParameter(Parameter("a")) :: MissedValueParameter(
+          Parameter("b")) :: Nil =>
     }
   }
-  
+
   def testTypeMismatch() {
     assertProblems("(a: A)", "(B)") {
       case TypeMismatch(Expression("B"), Type("A")) :: Nil =>
     }
     assertProblems("(a: A, b: B)", "(B, A)") {
-      case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(Expression("A"), Type("B")) :: Nil =>
+      case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(
+          Expression("A"), Type("B")) :: Nil =>
     }
   }
 }

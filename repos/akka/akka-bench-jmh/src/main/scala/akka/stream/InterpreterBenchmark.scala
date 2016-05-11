@@ -1,12 +1,11 @@
 package akka.stream
 
 import akka.event._
-import akka.stream.impl.fusing.{ GraphInterpreterSpecKit, GraphStages}
+import akka.stream.impl.fusing.{GraphInterpreterSpecKit, GraphStages}
 import akka.stream.impl.fusing.GraphStages
-import akka.stream.impl.fusing.GraphInterpreter.{ DownstreamBoundaryStageLogic, UpstreamBoundaryStageLogic }
+import akka.stream.impl.fusing.GraphInterpreter.{DownstreamBoundaryStageLogic, UpstreamBoundaryStageLogic}
 import akka.stream.stage._
 import org.openjdk.jmh.annotations._
-
 
 import java.util.concurrent.TimeUnit
 
@@ -24,7 +23,7 @@ class InterpreterBenchmark {
 
   @Benchmark
   @OperationsPerInvocation(100000)
-  def graph_interpreter_100k_elements():Unit = {
+  def graph_interpreter_100k_elements(): Unit = {
     new GraphInterpreterSpecKit {
       new TestSetup {
         val identities = Vector.fill(numberOfIds)(GraphStages.identity[Int])
@@ -50,7 +49,8 @@ class InterpreterBenchmark {
 
 object InterpreterBenchmark {
 
-  case class GraphDataSource[T](override val toString: String, data: Vector[T]) extends UpstreamBoundaryStageLogic[T] {
+  case class GraphDataSource[T](override val toString: String, data: Vector[T])
+      extends UpstreamBoundaryStageLogic[T] {
     var idx: Int = 0
     override val out: akka.stream.Outlet[T] = Outlet[T]("out")
     out.id = 0
@@ -68,7 +68,8 @@ object InterpreterBenchmark {
     })
   }
 
-  case class GraphDataSink[T](override val toString: String, var expected: Int) extends DownstreamBoundaryStageLogic[T] {
+  case class GraphDataSink[T](override val toString: String, var expected: Int)
+      extends DownstreamBoundaryStageLogic[T] {
     override val in: akka.stream.Inlet[T] = Inlet[T]("in")
     in.id = 0
 
@@ -84,9 +85,11 @@ object InterpreterBenchmark {
   }
 
   val NoopBus = new LoggingBus {
-    override def subscribe(subscriber: Subscriber, to: Classifier): Boolean = true
+    override def subscribe(subscriber: Subscriber, to: Classifier): Boolean =
+      true
     override def publish(event: Event): Unit = ()
-    override def unsubscribe(subscriber: Subscriber, from: Classifier): Boolean = true
+    override def unsubscribe(
+        subscriber: Subscriber, from: Classifier): Boolean = true
     override def unsubscribe(subscriber: Subscriber): Unit = ()
   }
 }

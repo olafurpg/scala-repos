@@ -38,14 +38,16 @@ import scalafx.scene.paint.Color
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * BackgroundFill Spec tests.
- */
+  * BackgroundFill Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class BackgroundFillSpec
-  extends SimpleSFXDelegateSpec[jfxsl.BackgroundFill, BackgroundFill](
-    classOf[jfxsl.BackgroundFill], classOf[BackgroundFill]) {
+    extends SimpleSFXDelegateSpec[jfxsl.BackgroundFill, BackgroundFill](
+        classOf[jfxsl.BackgroundFill], classOf[BackgroundFill]) {
 
-  override protected def getScalaClassInstance = new BackgroundFill(getJavaClassInstance) {}
+  override protected def getScalaClassInstance =
+    new BackgroundFill(getJavaClassInstance) {}
 
-  override protected def getJavaClassInstance = new jfxsl.BackgroundFill(Color.White, CornerRadii.Empty, Insets(0))
+  override protected def getJavaClassInstance =
+    new jfxsl.BackgroundFill(Color.White, CornerRadii.Empty, Insets(0))
 }

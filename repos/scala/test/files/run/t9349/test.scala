@@ -6,9 +6,8 @@ object Test {
         val i = new o.Inner
     }
     o1 match {
-      case o : Outer =>
+      case o: Outer =>
         val i = new o.Inner
-
     }
     object Extractor {
       def unapply(a: Any): Option[Outer] = Some(o1)

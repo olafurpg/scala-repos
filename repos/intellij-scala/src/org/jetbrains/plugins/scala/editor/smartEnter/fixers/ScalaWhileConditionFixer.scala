@@ -8,14 +8,17 @@ import org.jetbrains.plugins.scala.editor.smartEnter.ScalaSmartEnterProcessor
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScWhileStmt}
 
 /**
- * @author Dmitry.Naydanov
- * @author Ksenia.Sautina
- * @since 1/30/13
- */
+  * @author Dmitry.Naydanov
+  * @author Ksenia.Sautina
+  * @since 1/30/13
+  */
 @SuppressWarnings(Array("HardCodedStringLiteral"))
 class ScalaWhileConditionFixer extends ScalaFixer {
-  def apply(editor: Editor, processor: ScalaSmartEnterProcessor, psiElement: PsiElement): OperationPerformed = {
-    val whileStatement = PsiTreeUtil.getParentOfType(psiElement, classOf[ScWhileStmt], false)
+  def apply(editor: Editor,
+            processor: ScalaSmartEnterProcessor,
+            psiElement: PsiElement): OperationPerformed = {
+    val whileStatement =
+      PsiTreeUtil.getParentOfType(psiElement, classOf[ScWhileStmt], false)
     if (whileStatement == null) return NoOperation
 
     val doc = editor.getDocument
@@ -23,16 +26,22 @@ class ScalaWhileConditionFixer extends ScalaFixer {
     val rightParenthesis = whileStatement.getRightParenthesis.orNull
 
     whileStatement.condition match {
-      case None if leftParenthesis != null && !leftParenthesis.getNextSibling.isInstanceOf[PsiErrorElement] &&
-        whileStatement.lastChild.exists(_.isInstanceOf[PsiErrorElement]) =>
-        doc.insertString(whileStatement.lastChild.get.getTextRange.getEndOffset, ") {}")
+      case None
+          if leftParenthesis != null &&
+          !leftParenthesis.getNextSibling.isInstanceOf[PsiErrorElement] &&
+          whileStatement.lastChild.exists(_.isInstanceOf[PsiErrorElement]) =>
+        doc.insertString(
+            whileStatement.lastChild.get.getTextRange.getEndOffset, ") {}")
         WithEnter(3)
       case None if leftParenthesis == null || rightParenthesis == null =>
         val whileStartOffset = whileStatement.getTextRange.getStartOffset
-        var stopOffset = doc.getLineEndOffset(doc getLineNumber whileStartOffset)
+        var stopOffset =
+          doc.getLineEndOffset(doc getLineNumber whileStartOffset)
         val whLength = "while (".length
 
-        whileStatement.body.foreach(bl => stopOffset = Math.min(stopOffset, bl.getTextRange.getStartOffset))
+        whileStatement.body.foreach(bl =>
+              stopOffset = Math.min(
+                  stopOffset, bl.getTextRange.getStartOffset))
 
         doc.replaceString(whileStartOffset, stopOffset, "while () {\n\n}")
         moveToStart(editor, whileStatement)
@@ -42,7 +51,8 @@ class ScalaWhileConditionFixer extends ScalaFixer {
         moveToStart(editor, leftParenthesis)
         doc.insertString(rightParenthesis.getTextRange.getEndOffset, " {\n\n}")
         WithReformat(1)
-      case Some(cond) if rightParenthesis != null && whileStatement.body.isDefined =>
+      case Some(cond)
+          if rightParenthesis != null && whileStatement.body.isDefined =>
         whileStatement.body match {
           case Some(block: ScBlockExpr) =>
             return placeInWholeBlock(block, editor)
@@ -57,4 +67,3 @@ class ScalaWhileConditionFixer extends ScalaFixer {
     }
   }
 }
-

@@ -1,15 +1,15 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.persistence
 
-import java.io.{ ByteArrayOutputStream, InputStream }
+import java.io.{ByteArrayOutputStream, InputStream}
 
 package object serialization {
+
   /**
-   * Converts an input stream to a byte array.
-   */
+    * Converts an input stream to a byte array.
+    */
   def streamToBytes(inputStream: InputStream): Array[Byte] = {
     val len = 16384
     val buf = Array.ofDim[Byte](len)

@@ -19,5 +19,4 @@ class EscapingStringInterpolationSpec extends EnsimeSpec {
     val thing = "foo"
     s"${1 + 2} $thing" shouldBe "3 foo"
   }
-
 }

@@ -11,7 +11,7 @@ import org.scalatest.junit.JUnitRunner
 class ValidateRequestFilterTest extends FunSuite {
 
   test("ignore ok path and params") {
-    val request  = Request("/")
+    val request = Request("/")
     val response = Await.result(ValidateRequestFilter(request, NullService))
     assert(response.status == Status.Ok)
   }
@@ -23,7 +23,7 @@ class ValidateRequestFilterTest extends FunSuite {
   }
 
   test("errror on invalid params") {
-    val request  = Request("/search.json?q=%3G")
+    val request = Request("/search.json?q=%3G")
     val response = Await.result(ValidateRequestFilter(request, NullService))
     assert(response.status == Status.BadRequest)
   }

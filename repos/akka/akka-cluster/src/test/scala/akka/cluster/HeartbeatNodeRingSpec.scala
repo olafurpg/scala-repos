@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import org.scalatest.WordSpec
@@ -34,7 +33,8 @@ class HeartbeatNodeRingSpec extends WordSpec with Matchers {
     }
 
     "pick specified number of nodes + unreachable as receivers" in {
-      val ring = HeartbeatNodeRing(cc, nodes, unreachable = Set(aa, dd, ee), monitoredByNrOfMembers = 3)
+      val ring = HeartbeatNodeRing(
+          cc, nodes, unreachable = Set(aa, dd, ee), monitoredByNrOfMembers = 3)
       ring.myReceivers should ===(ring.receivers(cc))
 
       ring.receivers(aa) should ===(Set(bb, cc, dd, ff)) // unreachable ee skipped
@@ -47,15 +47,17 @@ class HeartbeatNodeRingSpec extends WordSpec with Matchers {
 
     "pick all except own as receivers when less than total number of nodes" in {
       val expected = Set(aa, bb, dd, ee, ff)
-      HeartbeatNodeRing(cc, nodes, Set.empty, 5).myReceivers should ===(expected)
-      HeartbeatNodeRing(cc, nodes, Set.empty, 6).myReceivers should ===(expected)
-      HeartbeatNodeRing(cc, nodes, Set.empty, 7).myReceivers should ===(expected)
+      HeartbeatNodeRing(cc, nodes, Set.empty, 5).myReceivers should ===(
+          expected)
+      HeartbeatNodeRing(cc, nodes, Set.empty, 6).myReceivers should ===(
+          expected)
+      HeartbeatNodeRing(cc, nodes, Set.empty, 7).myReceivers should ===(
+          expected)
     }
 
     "pick none when alone" in {
       val ring = HeartbeatNodeRing(cc, Set(cc), Set.empty, 3)
       ring.myReceivers should ===(Set())
     }
-
   }
 }

@@ -1,8 +1,7 @@
 import scala.reflect.macros.Context
 import language.experimental.macros
 
-object Def
-{
+object Def {
   def desugar(a: Any): String = macro desugarImpl
 
   def desugarImpl(c: Context)(a: c.Expr[Any]) = {
@@ -10,7 +9,7 @@ object Def
 
     val s = show(a.tree)
     c.Expr(
-      Literal(Constant(s))
+        Literal(Constant(s))
     )
   }
 }

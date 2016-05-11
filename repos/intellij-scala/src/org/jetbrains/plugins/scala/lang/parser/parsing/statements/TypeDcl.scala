@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.params.TypeParamClause
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.Type
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 11.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 11.02.2008
+  */
 /*
  * TypeDcl ::= id [TypeParamClause] ['>:' Type] ['<:' Type]
  */

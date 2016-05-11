@@ -29,7 +29,7 @@ import java.nio.ByteBuffer
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-import scalaz.{ Validation, Success, Failure }
+import scalaz.{Validation, Success, Failure}
 
 object CTypeFlags {
   object Flags {
@@ -76,7 +76,8 @@ object CTypeFlags {
         case CEmptyObject =>
           buffer += FEmptyObject
         case CUndefined =>
-          sys.error("Unexpected CUndefined type. Undefined segments don't exist!")
+          sys.error(
+              "Unexpected CUndefined type. Undefined segments don't exist!")
       }
     }
 
@@ -90,16 +91,19 @@ object CTypeFlags {
   def readCType(buffer: ByteBuffer): Validation[IOException, CType] = {
     import Flags._
 
-    def readCValueType(flag: Byte): Validation[IOException, CValueType[_]] = flag match {
-      case FBoolean => Success(CBoolean)
-      case FString => Success(CString)
-      case FLong => Success(CLong)
-      case FDouble => Success(CDouble)
-      case FBigDecimal => Success(CNum)
-      case FDate => Success(CDate)
-      case FArray => readCValueType(buffer.get()) map (CArrayType(_))
-      case flag => Failure(new IOException("Unexpected segment type flag: %x" format flag))
-    }
+    def readCValueType(flag: Byte): Validation[IOException, CValueType[_]] =
+      flag match {
+        case FBoolean => Success(CBoolean)
+        case FString => Success(CString)
+        case FLong => Success(CLong)
+        case FDouble => Success(CDouble)
+        case FBigDecimal => Success(CNum)
+        case FDate => Success(CDate)
+        case FArray => readCValueType(buffer.get()) map (CArrayType(_))
+        case flag =>
+          Failure(
+              new IOException("Unexpected segment type flag: %x" format flag))
+      }
 
     buffer.get() match {
       case FNull => Success(CNull)
@@ -109,4 +113,3 @@ object CTypeFlags {
     }
   }
 }
-

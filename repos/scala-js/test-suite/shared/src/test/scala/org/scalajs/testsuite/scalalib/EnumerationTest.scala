@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.scalalib
 
@@ -50,12 +50,15 @@ class EnumerationTest {
         val A = Value(nullStr) // Circumvent compiler replacement and warning
       }
 
-      assertTrue(Test.A.toString.startsWith(
-        "<Unknown name for enum field #0 of class "))
+      assertTrue(
+          Test.A.toString
+            .startsWith("<Unknown name for enum field #0 of class "))
     }
   }
 
-  @Test def should_give_a_graceful_error_message_upon_name_based_query_when_unnamed_fields_are_present(): Unit = {
+  @Test
+  def should_give_a_graceful_error_message_upon_name_based_query_when_unnamed_fields_are_present(
+      ): Unit = {
     object Test extends Enumeration {
       private val nullStr: String = null
       val A = Value(nullStr) // Circumvent compiler replacement and warning
@@ -63,9 +66,11 @@ class EnumerationTest {
 
     if (!executingInJVM) {
       // In the JVM the exception thrown is a ClassCastException
-      val ex = expectThrows(classOf[NoSuchElementException], Test.withName("A"))
-      val subMsg = "Couldn't find enum field with name A.\n" +
-          "However, there were the following unnamed fields:"
+      val ex = expectThrows(
+          classOf[NoSuchElementException], Test.withName("A"))
+      val subMsg =
+        "Couldn't find enum field with name A.\n" +
+        "However, there were the following unnamed fields:"
       assertTrue(ex.getMessage.contains(subMsg))
     }
   }
@@ -75,13 +80,13 @@ class EnumerationTest {
   }
 
   @Test def should_respond_to_values(): Unit = {
-    assertEquals("FooBarEnum.ValueSet(A, B, C, D, E, F)",
-        FooBarEnum.values.toString)
+    assertEquals(
+        "FooBarEnum.ValueSet(A, B, C, D, E, F)", FooBarEnum.values.toString)
   }
 
   @Test def should_allow_setting_nextName(): Unit = {
     object Test extends Enumeration {
-      nextName = Iterator("x","y","z")
+      nextName = Iterator("x", "y", "z")
       val a, b, c = Value
     }
 

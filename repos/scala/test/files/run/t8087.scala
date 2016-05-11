@@ -6,7 +6,8 @@ trait Foo {
 class Bar extends Foo
 
 object Test extends App {
-  classOf[Bar].getDeclaredFields.foreach(f => {
-    assert(java.lang.reflect.Modifier.isVolatile(f.getModifiers), f.getName)
+  classOf[Bar].getDeclaredFields.foreach(f =>
+        {
+      assert(java.lang.reflect.Modifier.isVolatile(f.getModifiers), f.getName)
   })
 }

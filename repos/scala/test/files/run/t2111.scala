@@ -1,4 +1,3 @@
-
 object Test extends App {
 
   object Color extends Enumeration {
@@ -16,5 +15,4 @@ object Test extends App {
   println(col.Blue)
   println(col.Green)
   println(col.Red)
-
 }

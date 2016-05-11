@@ -33,13 +33,14 @@ import org.apache.spark.SparkContext
 import org.apache.spark.sql.{Row, SQLContext}
 
 /**
- * Chi Squared selector model.
- *
- * @param selectedFeatures list of indices to select (filter). Must be ordered asc
- */
+  * Chi Squared selector model.
+  *
+  * @param selectedFeatures list of indices to select (filter). Must be ordered asc
+  */
 @Since("1.3.0")
-class ChiSqSelectorModel @Since("1.3.0") (
-  @Since("1.3.0") val selectedFeatures: Array[Int]) extends VectorTransformer with Saveable {
+class ChiSqSelectorModel @Since("1.3.0")(
+    @Since("1.3.0") val selectedFeatures: Array[Int])
+    extends VectorTransformer with Saveable {
 
   require(isSorted(selectedFeatures), "Array has to be sorted asc")
 
@@ -47,30 +48,30 @@ class ChiSqSelectorModel @Since("1.3.0") (
     var i = 1
     val len = array.length
     while (i < len) {
-      if (array(i) < array(i-1)) return false
+      if (array(i) < array(i - 1)) return false
       i += 1
     }
     true
   }
 
   /**
-   * Applies transformation on a vector.
-   *
-   * @param vector vector to be transformed.
-   * @return transformed vector.
-   */
+    * Applies transformation on a vector.
+    *
+    * @param vector vector to be transformed.
+    * @return transformed vector.
+    */
   @Since("1.3.0")
   override def transform(vector: Vector): Vector = {
     compress(vector, selectedFeatures)
   }
 
   /**
-   * Returns a vector with features filtered.
-   * Preserves the order of filtered features the same as their indices are stored.
-   * Might be moved to Vector as .slice
-   * @param features vector
-   * @param filterIndices indices of features to filter, must be ordered asc
-   */
+    * Returns a vector with features filtered.
+    * Preserves the order of filtered features the same as their indices are stored.
+    * Might be moved to Vector as .slice
+    * @param features vector
+    * @param filterIndices indices of features to filter, must be ordered asc
+    */
   private def compress(features: Vector, filterIndices: Array[Int]): Vector = {
     features match {
       case SparseVector(size, indices, values) =>
@@ -104,7 +105,7 @@ class ChiSqSelectorModel @Since("1.3.0") (
         Vectors.dense(filterIndices.map(i => values(i)))
       case other =>
         throw new UnsupportedOperationException(
-          s"Only sparse and dense vectors are supported but got ${other.getClass}.")
+            s"Only sparse and dense vectors are supported but got ${other.getClass}.")
     }
   }
 
@@ -122,30 +123,30 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
     ChiSqSelectorModel.SaveLoadV1_0.load(sc, path)
   }
 
-  private[feature]
-  object SaveLoadV1_0 {
+  private[feature] object SaveLoadV1_0 {
 
     private val thisFormatVersion = "1.0"
 
     /** Model data for import/export */
     case class Data(feature: Int)
 
-    private[feature]
-    val thisClassName = "org.apache.spark.mllib.feature.ChiSqSelectorModel"
+    private[feature] val thisClassName =
+      "org.apache.spark.mllib.feature.ChiSqSelectorModel"
 
     def save(sc: SparkContext, model: ChiSqSelectorModel, path: String): Unit = {
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
-      val metadata = compact(render(
-        ("class" -> thisClassName) ~ ("version" -> thisFormatVersion)))
-      sc.parallelize(Seq(metadata), 1).saveAsTextFile(Loader.metadataPath(path))
+      val metadata = compact(
+          render(
+              ("class" -> thisClassName) ~ ("version" -> thisFormatVersion)))
+      sc.parallelize(Seq(metadata), 1)
+        .saveAsTextFile(Loader.metadataPath(path))
 
       // Create Parquet data.
       val dataArray = Array.tabulate(model.selectedFeatures.length) { i =>
         Data(model.selectedFeatures(i))
       }
       sc.parallelize(dataArray, 1).toDF().write.parquet(Loader.dataPath(path))
-
     }
 
     def load(sc: SparkContext, path: String): ChiSqSelectorModel = {
@@ -171,27 +172,29 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
 }
 
 /**
- * Creates a ChiSquared feature selector.
- * @param numTopFeatures number of features that selector will select
- *                       (ordered by statistic value descending)
- *                       Note that if the number of features is < numTopFeatures, then this will
- *                       select all features.
- */
+  * Creates a ChiSquared feature selector.
+  * @param numTopFeatures number of features that selector will select
+  *                       (ordered by statistic value descending)
+  *                       Note that if the number of features is < numTopFeatures, then this will
+  *                       select all features.
+  */
 @Since("1.3.0")
-class ChiSqSelector @Since("1.3.0") (
-  @Since("1.3.0") val numTopFeatures: Int) extends Serializable {
+class ChiSqSelector @Since("1.3.0")(@Since("1.3.0") val numTopFeatures: Int)
+    extends Serializable {
 
   /**
-   * Returns a ChiSquared feature selector.
-   *
-   * @param data an `RDD[LabeledPoint]` containing the labeled dataset with categorical features.
-   *             Real-valued features will be treated as categorical for each distinct value.
-   *             Apply feature discretizer before using this function.
-   */
+    * Returns a ChiSquared feature selector.
+    *
+    * @param data an `RDD[LabeledPoint]` containing the labeled dataset with categorical features.
+    *             Real-valued features will be treated as categorical for each distinct value.
+    *             Apply feature discretizer before using this function.
+    */
   @Since("1.3.0")
   def fit(data: RDD[LabeledPoint]): ChiSqSelectorModel = {
-    val indices = Statistics.chiSqTest(data)
-      .zipWithIndex.sortBy { case (res, _) => -res.statistic }
+    val indices = Statistics
+      .chiSqTest(data)
+      .zipWithIndex
+      .sortBy { case (res, _) => -res.statistic }
       .take(numTopFeatures)
       .map { case (_, indices) => indices }
       .sorted

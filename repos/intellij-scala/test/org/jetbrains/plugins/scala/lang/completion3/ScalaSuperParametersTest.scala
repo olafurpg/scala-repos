@@ -5,13 +5,12 @@ import com.intellij.codeInsight.completion.CompletionType
 import org.jetbrains.plugins.scala.codeInsight.ScalaCodeInsightTestBase
 
 /**
- * @author Alefas
- * @since 04.09.13
- */
+  * @author Alefas
+  * @since 04.09.13
+  */
 class ScalaSuperParametersTest extends ScalaCodeInsightTestBase {
   def testConstructorCall() {
-    val fileText =
-      """
+    val fileText = """
 class TUI {
   class A(x: Int, y: Int) {
     def this(x: Int, y: Int, z: Int) = this(x, y)
@@ -23,8 +22,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
-    val resultText =
-      """
+    val resultText = """
 class TUI {
   class A(x: Int, y: Int) {
     def this(x: Int, y: Int, z: Int) = this(x, y)
@@ -34,13 +32,13 @@ class TUI {
 }
       """.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "x, y, z").get)
+    completeLookupItem(
+        activeLookup.find(le => le.getLookupString == "x, y, z").get)
     checkResultByText(resultText)
   }
 
   def testConstructorCall2() {
-    val fileText =
-      """
+    val fileText = """
 class TUI {
   class A(x: Int, y: Int) {
     def this(x: Int, y: Int, z: Int) = this(x, y)
@@ -52,8 +50,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
-    val resultText =
-      """
+    val resultText = """
 class TUI {
   class A(x: Int, y: Int) {
     def this(x: Int, y: Int, z: Int) = this(x, y)
@@ -63,13 +60,13 @@ class TUI {
 }
       """.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "x, y").get)
+    completeLookupItem(
+        activeLookup.find(le => le.getLookupString == "x, y").get)
     checkResultByText(resultText)
   }
 
   def testConstructorCall2Smart() {
-    val fileText =
-      """
+    val fileText = """
 class TUI {
   class A(x: Int, y: Int) {
     def this(x: Int, y: Int, z: Int) = this(x, y)
@@ -81,8 +78,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(1, CompletionType.SMART)
 
-    val resultText =
-      """
+    val resultText = """
 class TUI {
   class A(x: Int, y: Int) {
     def this(x: Int, y: Int, z: Int) = this(x, y)
@@ -92,13 +88,13 @@ class TUI {
 }
       """.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "x, y").get)
+    completeLookupItem(
+        activeLookup.find(le => le.getLookupString == "x, y").get)
     checkResultByText(resultText)
   }
 
   def testSuperCall() {
-    val fileText =
-      """
+    val fileText = """
 class TUI {
   class A {
     def foo(x: Int, y: Int, z: Int) = 1
@@ -115,8 +111,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
-    val resultText =
-      """
+    val resultText = """
 class TUI {
   class A {
     def foo(x: Int, y: Int, z: Int) = 1
@@ -131,13 +126,13 @@ class TUI {
 }
       """.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "x, y").get)
+    completeLookupItem(
+        activeLookup.find(le => le.getLookupString == "x, y").get)
     checkResultByText(resultText)
   }
 
   def testSuperCall2() {
-    val fileText =
-      """
+    val fileText = """
 class TUI {
   class A {
     def foo(x: Int, y: Int, z: Int) = 1
@@ -154,8 +149,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
-    val resultText =
-      """
+    val resultText = """
 class TUI {
   class A {
     def foo(x: Int, y: Int, z: Int) = 1
@@ -170,8 +164,8 @@ class TUI {
 }
       """.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "x, y, z").get)
+    completeLookupItem(
+        activeLookup.find(le => le.getLookupString == "x, y, z").get)
     checkResultByText(resultText)
   }
-
 }

@@ -3,7 +3,7 @@ package mesosphere.marathon.core.flow
 import akka.event.EventStream
 import mesosphere.marathon.MarathonSchedulerDriverHolder
 import mesosphere.marathon.core.base.Clock
-import mesosphere.marathon.core.flow.impl.{ OfferReviverDelegate, OfferMatcherLaunchTokensActor, ReviveOffersActor }
+import mesosphere.marathon.core.flow.impl.{OfferReviverDelegate, OfferMatcherLaunchTokensActor, ReviveOffersActor}
 import mesosphere.marathon.core.leadership.LeadershipModule
 import mesosphere.marathon.core.matcher.manager.OfferMatcherManager
 import mesosphere.marathon.core.task.bus.TaskStatusObservables
@@ -27,23 +27,28 @@ class FlowModule(leadershipModule: LeadershipModule) {
     * @return an offer reviver that allows explicit calls to reviveOffers
     */
   def maybeOfferReviver(
-    clock: Clock,
-    conf: ReviveOffersConfig,
-    marathonEventStream: EventStream,
-    offersWanted: Observable[Boolean],
-    driverHolder: MarathonSchedulerDriverHolder): Option[OfferReviver] = {
+      clock: Clock,
+      conf: ReviveOffersConfig,
+      marathonEventStream: EventStream,
+      offersWanted: Observable[Boolean],
+      driverHolder: MarathonSchedulerDriverHolder): Option[OfferReviver] = {
 
     if (conf.reviveOffersForNewApps()) {
       lazy val reviveOffersActor = ReviveOffersActor.props(
-        clock, conf, marathonEventStream,
-        offersWanted, driverHolder
+          clock,
+          conf,
+          marathonEventStream,
+          offersWanted,
+          driverHolder
       )
-      val actorRef = leadershipModule.startWhenLeader(reviveOffersActor, "reviveOffersWhenWanted")
-      log.info(s"Calling reviveOffers is enabled. Use --disable_revive_offers_for_new_apps to disable.")
+      val actorRef = leadershipModule.startWhenLeader(
+          reviveOffersActor, "reviveOffersWhenWanted")
+      log.info(
+          s"Calling reviveOffers is enabled. Use --disable_revive_offers_for_new_apps to disable.")
       Some(new OfferReviverDelegate(actorRef))
-    }
-    else {
-      log.info(s"Calling reviveOffers is disabled. Use --revive_offers_for_new_apps to enable.")
+    } else {
+      log.info(
+          s"Calling reviveOffers is disabled. Use --revive_offers_for_new_apps to enable.")
       None
     }
   }
@@ -57,14 +62,16 @@ class FlowModule(leadershipModule: LeadershipModule) {
     * and not yet completely overloaded.
     */
   def refillOfferMatcherManagerLaunchTokens(
-    conf: LaunchTokenConfig,
-    taskStatusObservables: TaskStatusObservables,
-    offerMatcherManager: OfferMatcherManager): Unit =
-    {
-      lazy val offerMatcherLaunchTokensProps = OfferMatcherLaunchTokensActor.props(
-        conf, taskStatusObservables, offerMatcherManager
+      conf: LaunchTokenConfig,
+      taskStatusObservables: TaskStatusObservables,
+      offerMatcherManager: OfferMatcherManager): Unit = {
+    lazy val offerMatcherLaunchTokensProps =
+      OfferMatcherLaunchTokensActor.props(
+          conf,
+          taskStatusObservables,
+          offerMatcherManager
       )
-      leadershipModule.startWhenLeader(offerMatcherLaunchTokensProps, "offerMatcherLaunchTokens")
-
-    }
+    leadershipModule.startWhenLeader(
+        offerMatcherLaunchTokensProps, "offerMatcherLaunchTokens")
+  }
 }

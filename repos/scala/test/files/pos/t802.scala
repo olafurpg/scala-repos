@@ -10,18 +10,18 @@ trait Test {
     type Brace <: Singleton with BraceImpl;
     trait BraceImpl extends super.BraceImpl;
   }
-  val parens : ParensImpl;
+  val parens: ParensImpl;
   abstract class BracksImpl extends BracesImpl {
     type Brace <: Singleton with BraceImpl;
     trait BraceImpl extends super.BraceImpl;
   }
-  val bracks : BracksImpl;
+  val bracks: BracksImpl;
   trait File {
-    def parens0 : parens.BraceImpl;
-    def bracks0 : bracks.BraceImpl;
-    def braces(b : BracesImpl) = b match {
-    case b if b == parens => parens0;
-    case b if b == bracks => bracks0;
+    def parens0: parens.BraceImpl;
+    def bracks0: bracks.BraceImpl;
+    def braces(b: BracesImpl) = b match {
+      case b if b == parens => parens0;
+      case b if b == bracks => bracks0;
     }
   }
 }

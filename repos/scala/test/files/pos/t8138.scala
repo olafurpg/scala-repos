@@ -1,4 +1,3 @@
-
 class U {
   trait Transformer {
     def transform(a: Tree): Tree = ???
@@ -14,8 +13,9 @@ object Test {
           case _ =>
             // crashes in GenICode:
             // error: Unknown type: <notype>, <notype> [class scala.reflect.internal.Types$NoType$, class scala.reflect.internal.Types$NoType$] TypeRef? false
-            (y: Any) => super.transform(???)
-            null
+            (y: Any) =>
+              super.transform(???)
+              null
         }
         ???
       }

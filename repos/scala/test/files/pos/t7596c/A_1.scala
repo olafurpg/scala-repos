@@ -3,7 +3,7 @@ trait Driver {
 }
 
 object Config {
-  val driver : Driver = ???
+  val driver: Driver = ???
   val driverUniqueName: driver.type = driver
   def driver(a: Any) = ???
 }

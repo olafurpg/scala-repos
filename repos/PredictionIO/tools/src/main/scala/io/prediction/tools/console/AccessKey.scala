@@ -12,26 +12,23 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.tools.console
 
 import io.prediction.data.storage
 
 import grizzled.slf4j.Logging
 
-case class AccessKeyArgs(
-  accessKey: String = "",
-  events: Seq[String] = Seq())
+case class AccessKeyArgs(accessKey: String = "", events: Seq[String] = Seq())
 
 object AccessKey extends Logging {
   def create(ca: ConsoleArgs): Int = {
     val apps = storage.Storage.getMetaDataApps
     apps.getByName(ca.app.name) map { app =>
       val accessKeys = storage.Storage.getMetaDataAccessKeys
-      val accessKey = accessKeys.insert(storage.AccessKey(
-        key = ca.accessKey.accessKey,
-        appid = app.id,
-        events = ca.accessKey.events))
+      val accessKey =
+        accessKeys.insert(storage.AccessKey(key = ca.accessKey.accessKey,
+                                            appid = app.id,
+                                            events = ca.accessKey.events))
       accessKey map { k =>
         info(s"Created new access key: ${k}")
         0

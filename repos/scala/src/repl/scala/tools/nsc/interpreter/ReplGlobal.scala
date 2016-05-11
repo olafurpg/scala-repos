@@ -9,8 +9,8 @@ package interpreter
 import typechecker.Analyzer
 
 /** A layer on top of Global so I can guarantee some extra
- *  functionality for the repl.  It doesn't do much yet.
- */
+  *  functionality for the repl.  It doesn't do much yet.
+  */
 trait ReplGlobal extends Global {
   // This exists mostly because using the reporter too early leads to deadlock.
   private def echo(msg: String) { Console println msg }
@@ -26,7 +26,9 @@ trait ReplGlobal extends Global {
 
     override protected def findMacroClassLoader(): ClassLoader = {
       val loader = super.findMacroClassLoader
-      macroLogVerbose("macro classloader: initializing from a REPL classloader: %s".format(global.classPath.asURLs))
+      macroLogVerbose(
+          "macro classloader: initializing from a REPL classloader: %s".format(
+              global.classPath.asURLs))
       val virtualDirectory = globalSettings.outputDirs.getSingleOutput.get
       new util.AbstractFileClassLoader(virtualDirectory, loader) {}
     }

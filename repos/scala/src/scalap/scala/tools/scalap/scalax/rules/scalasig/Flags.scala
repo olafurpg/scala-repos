@@ -31,8 +31,10 @@ trait Flags {
 
   def isByNameParam = hasFlag(0x00010000)
   def isContravariant = hasFlag(0x00020000)
-  def isLabel = hasFlag(0x00020000) // method symbol is a label. Set by TailCall
-  def isInConstructor = hasFlag(0x00020000) // class symbol is defined in this/superclass constructor
+  def isLabel =
+    hasFlag(0x00020000) // method symbol is a label. Set by TailCall
+  def isInConstructor =
+    hasFlag(0x00020000) // class symbol is defined in this/superclass constructor
 
   def isAbstractOverride = hasFlag(0x00040000)
   def isLocal = hasFlag(0x00080000)
@@ -50,9 +52,12 @@ trait Flags {
   def isSuperAccessor = hasFlag(0x10000000)
   def isParamAccessor = hasFlag(0x20000000)
 
-  def isModuleVar = hasFlag(0x40000000) // for variables: is the variable caching a module value
-  def isMonomorphic = hasFlag(0x40000000) // for type symbols: does not have type parameters
-  def isLazy = hasFlag(0x80000000L) // symbol is a lazy val. can't have MUTABLE unless transformed by typer
+  def isModuleVar =
+    hasFlag(0x40000000) // for variables: is the variable caching a module value
+  def isMonomorphic =
+    hasFlag(0x40000000) // for type symbols: does not have type parameters
+  def isLazy =
+    hasFlag(0x80000000L) // symbol is a lazy val. can't have MUTABLE unless transformed by typer
 
   def isError = hasFlag(0x100000000L)
   def isOverloaded = hasFlag(0x200000000L)
@@ -64,5 +69,4 @@ trait Flags {
   def isExpandedName = hasFlag(0x1000000000L)
   def isImplementationClass = hasFlag(0x2000000000L)
   def isPreSuper = hasFlag(0x2000000000L)
-
 }

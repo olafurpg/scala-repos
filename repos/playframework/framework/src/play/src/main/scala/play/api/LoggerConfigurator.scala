@@ -7,28 +7,28 @@ import java.net.URL
 import java.util.Properties
 
 /**
- * Runs through underlying logger configuration.
- */
+  * Runs through underlying logger configuration.
+  */
 trait LoggerConfigurator {
 
   /**
-   * Initialize the Logger when there's no application ClassLoader available.
-   */
+    * Initialize the Logger when there's no application ClassLoader available.
+    */
   def init(rootPath: java.io.File, mode: Mode.Mode): Unit
 
   /**
-   * Reconfigures the underlying logger infrastructure.
-   */
+    * Reconfigures the underlying logger infrastructure.
+    */
   def configure(env: Environment): Unit
 
   /**
-   * Reconfigures the underlying  logger infrastructure.
-   */
+    * Reconfigures the underlying  logger infrastructure.
+    */
   def configure(properties: Map[String, String], config: Option[URL]): Unit
 
   /**
-   * Shutdown the logger infrastructure.
-   */
+    * Shutdown the logger infrastructure.
+    */
   def shutdown()
 }
 
@@ -40,14 +40,18 @@ object LoggerConfigurator {
     }
   }
 
-  def apply(loggerConfiguratorClassName: String, classLoader: ClassLoader): Option[LoggerConfigurator] = {
+  def apply(loggerConfiguratorClassName: String,
+            classLoader: ClassLoader): Option[LoggerConfigurator] = {
     try {
-      val loggerConfiguratorClass: Class[_] = classLoader.loadClass(loggerConfiguratorClassName)
-      Some(loggerConfiguratorClass.newInstance().asInstanceOf[LoggerConfigurator])
+      val loggerConfiguratorClass: Class[_] =
+        classLoader.loadClass(loggerConfiguratorClassName)
+      Some(
+          loggerConfiguratorClass
+            .newInstance()
+            .asInstanceOf[LoggerConfigurator])
     } catch {
       case ex: Exception =>
-        val msg =
-          s"""
+        val msg = s"""
              |Play cannot load "$loggerConfiguratorClassName". Please make sure you have logback (or another module
              |that implements play.api.LoggerConfigurator) in your classpath.
              """.stripMargin
@@ -75,5 +79,4 @@ object LoggerConfigurator {
       None
     }
   }
-
 }

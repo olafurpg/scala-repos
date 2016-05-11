@@ -7,8 +7,7 @@ class InnerCompanionTraitRename {
     case object None extends Mode
   }
 
-  class Instance
-  ( mode : /*caret*/Mode = Mode.None )
+  class Instance(mode: /*caret*/ Mode = Mode.None)
 }
 /*
 class InnerCompanionTraitRename {
@@ -23,4 +22,4 @@ class InnerCompanionTraitRename {
   class Instance
   ( mode : /*caret*/NameAfterRename = NameAfterRename.None )
 }
-*/
+ */

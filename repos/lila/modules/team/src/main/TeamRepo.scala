@@ -1,6 +1,6 @@
 package lila.team
 
-import org.joda.time.{ DateTime, Period }
+import org.joda.time.{DateTime, Period}
 import play.api.libs.json.Json
 import play.modules.reactivemongo.json.ImplicitBSONHandlers.JsObjectWriter
 import reactivemongo.api._
@@ -24,10 +24,11 @@ object TeamRepo {
     $primitive.one($select(id), "name")(_.asOpt[String])
 
   def userHasCreatedSince(userId: String, duration: Period): Fu[Boolean] =
-    $count.exists(Json.obj(
-      "createdAt" -> $gt($date(DateTime.now minus duration)),
-      "createdBy" -> userId
-    ))
+    $count.exists(
+        Json.obj(
+            "createdAt" -> $gt($date(DateTime.now minus duration)),
+            "createdBy" -> userId
+        ))
 
   def ownerOf(teamId: String): Fu[Option[String]] =
     $primitive.one($select(teamId), "createdBy")(_.asOpt[String])
@@ -40,9 +41,8 @@ object TeamRepo {
   def disable(team: Team) = $update.field(team.id, "enabled", false)
 
   def addRequest(teamId: String, request: Request): Funit =
-    $update(
-      $select(teamId) ++ Json.obj("requests.user" -> $ne(request.user)),
-      $push("requests", request.user))
+    $update($select(teamId) ++ Json.obj("requests.user" -> $ne(request.user)),
+            $push("requests", request.user))
 
   val enabledQuery = Json.obj("enabled" -> true)
 

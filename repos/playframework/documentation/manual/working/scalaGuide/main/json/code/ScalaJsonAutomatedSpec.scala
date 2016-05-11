@@ -10,7 +10,6 @@ import org.junit.runner.RunWith
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
 
-
 @RunWith(classOf[JUnitRunner])
 class ScalaJsonAutomatedSpec extends Specification {
 
@@ -18,9 +17,8 @@ class ScalaJsonAutomatedSpec extends Specification {
   case class Resident(name: String, age: Int, role: Option[String])
   //#model
 
-
   val sampleJson = Json.parse(
-    """{
+      """{
       "name" : "Fiver",
       "age" : 4
     }"""
@@ -44,11 +42,8 @@ class ScalaJsonAutomatedSpec extends Specification {
       import play.api.libs.json._
       import play.api.libs.functional.syntax._
 
-      implicit val residentReads = (
-        (__ \ "name").read[String] and
-        (__ \ "age").read[Int] and
-        (__ \ "role").readNullable[String]
-      )(Resident)
+      implicit val residentReads = ((__ \ "name").read[String] and (__ \ "age")
+            .read[Int] and (__ \ "role").readNullable[String])(Resident)
       //#manual-reads
 
       sampleJson.as[Resident] must_=== sampleData
@@ -75,5 +70,4 @@ class ScalaJsonAutomatedSpec extends Specification {
       Json.toJson(sampleData) must_=== sampleJson
     }
   }
-
 }

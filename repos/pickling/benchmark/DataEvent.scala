@@ -18,13 +18,7 @@ package org.evactor.model.events
 import org.evactor.model.attributes.HasMessage
 
 /**
- * An event with a message of some sort
- */
-case class DataEvent (    
-    val id: String, 
-    val timestamp: Int, 
-    val message: String) 
-  extends Event 
-  with HasMessage {
-
-}
+  * An event with a message of some sort
+  */
+case class DataEvent(val id: String, val timestamp: Int, val message: String)
+    extends Event with HasMessage {}

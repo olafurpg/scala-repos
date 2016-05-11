@@ -7,9 +7,9 @@ import akka.util.ByteString
 import org.ensime.core.Protocol
 
 /**
- * FramedStringProtocol is used to support stream based messaging (e.g. SWANK or JERKY over TCP).
- * Each message consists of a 6 byte h
- */
+  * FramedStringProtocol is used to support stream based messaging (e.g. SWANK or JERKY over TCP).
+  * Each message consists of a 6 byte h
+  */
 trait FramedStringProtocol extends Protocol with SLF4JLogging {
 
   protected def writeString(value: String): ByteString = {
@@ -29,9 +29,9 @@ trait FramedStringProtocol extends Protocol with SLF4JLogging {
 
   val headerLen = 6
 
-  protected def tryReadString(bytes: ByteString): (Option[String], ByteString) = {
-    if (bytes.length < headerLen)
-      (None, bytes) // header is incomplete
+  protected def tryReadString(
+      bytes: ByteString): (Option[String], ByteString) = {
+    if (bytes.length < headerLen) (None, bytes) // header is incomplete
     else {
       val header = bytes.take(headerLen)
       val msgLen = Integer.valueOf(header.utf8String, 16).intValue()
@@ -44,8 +44,10 @@ trait FramedStringProtocol extends Protocol with SLF4JLogging {
       else {
         // take the header and the message and drop the header
         val (messageBytes, remainingBytes) = bytes.splitAt(totalMessageBytes)
-        val msgUTF8 = messageBytes.drop(headerLen).utf8String
-        (Some(msgUTF8), remainingBytes)
+        val msgUTF8 = messageBytes
+          .drop(headerLen)
+          .utf8String
+          (Some(msgUTF8), remainingBytes)
       }
     }
   }

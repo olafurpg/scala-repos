@@ -1,9 +1,4 @@
-
-
-
 import annotation.varargs
-
-
 
 // Failing varargs annotation
 object Test {
@@ -21,7 +16,5 @@ object Test {
   @varargs def v2(a: Int, b: String*) = 0
   def v2(a: Int, b: Array[String]) = 0
 
-  def main(args: Array[String]) {
-  }
-
+  def main(args: Array[String]) {}
 }

@@ -1,12 +1,12 @@
 class NoReturnSeveralOutput {
   def foo(i: Int) {
-/*start*/
+    /*start*/
 
     val x = 0
     val y = "a"
     val z = 1
     val zz = "1"
-/*end*/
+    /*end*/
     println(x + y + z + zz)
   }
 }
@@ -28,4 +28,4 @@ class NoReturnSeveralOutput {
     (x, y, z, zz)
   }
 }
-*/
+ */

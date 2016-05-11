@@ -2,8 +2,8 @@ package docs.stream.cookbook
 
 import akka.event.Logging
 import akka.stream.Attributes
-import akka.stream.scaladsl.{ Sink, Source }
-import akka.testkit.{ EventFilter, TestProbe }
+import akka.stream.scaladsl.{Sink, Source}
+import akka.testkit.{EventFilter, TestProbe}
 
 class RecipeLoggingElements extends RecipeSpec {
 
@@ -16,7 +16,9 @@ class RecipeLoggingElements extends RecipeSpec {
       val mySource = Source(List("1", "2", "3"))
 
       //#println-debug
-      val loggedSource = mySource.map { elem => println(elem); elem }
+      val loggedSource = mySource.map { elem =>
+        println(elem); elem
+      }
       //#println-debug
 
       loggedSource.runWith(Sink.ignore)
@@ -29,7 +31,8 @@ class RecipeLoggingElements extends RecipeSpec {
 
       //#log-custom
       // customise log levels
-      mySource.log("before-map")
+      mySource
+        .log("before-map")
         .withAttributes(Attributes.logLevels(onElement = Logging.WarningLevel))
         .map(analyse)
 
@@ -42,9 +45,6 @@ class RecipeLoggingElements extends RecipeSpec {
       EventFilter.debug(start = "[custom] Element: ").intercept {
         loggedSource.runWith(Sink.ignore)
       }
-
     }
-
   }
-
 }

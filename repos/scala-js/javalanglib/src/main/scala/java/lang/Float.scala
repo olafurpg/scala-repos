@@ -41,7 +41,6 @@ final class Float private () extends Number with Comparable[Float] {
 
   @inline def isInfinite(): scala.Boolean =
     Float.isInfinite(floatValue)
-
 }
 
 object Float {

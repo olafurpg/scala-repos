@@ -14,13 +14,13 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package kafka.common
 
 /**
   * Indicates the brokerId stored in logDirs is not consistent across logDirs.
   */
-class InconsistentBrokerIdException(message: String, cause: Throwable) extends RuntimeException(message, cause) {
+class InconsistentBrokerIdException(message: String, cause: Throwable)
+    extends RuntimeException(message, cause) {
   def this(message: String) = this(message, null)
   def this(cause: Throwable) = this(null, cause)
   def this() = this(null, null)

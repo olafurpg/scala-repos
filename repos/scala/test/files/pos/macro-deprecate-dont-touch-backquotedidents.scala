@@ -35,13 +35,11 @@ object Test9 {
 }
 
 package `macro` {
-  package `macro`.bar {
-  }
+  package `macro`.bar {}
 }
 
 package foo {
-  package `macro`.foo {
-  }
+  package `macro`.foo {}
 }
 
 //object Test12 {

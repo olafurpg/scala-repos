@@ -9,6 +9,6 @@ import play.api.mvc._
 
 object Application extends Controller {
   def index() = Action {
-    Ok("Hello Bob") as("text/plain")
+    Ok("Hello Bob") as ("text/plain")
   }
 }

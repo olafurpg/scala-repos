@@ -29,20 +29,21 @@ import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.util.IntParam
 
 /**
- * A helper program that sends blocks of Kryo-serialized text strings out on a socket at a
- * specified rate. Used to feed data into RawInputDStream.
- */
-private[streaming]
-object RawTextSender extends Logging {
+  * A helper program that sends blocks of Kryo-serialized text strings out on a socket at a
+  * specified rate. Used to feed data into RawInputDStream.
+  */
+private[streaming] object RawTextSender extends Logging {
   def main(args: Array[String]) {
     if (args.length != 4) {
       // scalastyle:off println
-      System.err.println("Usage: RawTextSender <port> <file> <blockSize> <bytesPerSec>")
+      System.err.println(
+          "Usage: RawTextSender <port> <file> <blockSize> <bytesPerSec>")
       // scalastyle:on println
       System.exit(1)
     }
     // Parse the arguments using a pattern match
-    val Array(IntParam(port), file, IntParam(blockSize), IntParam(bytesPerSec)) = args
+    val Array(IntParam(port), file, IntParam(blockSize), IntParam(bytesPerSec)) =
+      args
 
     // Repeat the input data multiple times to fill in a buffer
     val lines = Source.fromFile(file).getLines().toArray
@@ -66,7 +67,8 @@ object RawTextSender extends Logging {
     while (true) {
       val socket = serverSocket.accept()
       logInfo("Got a new connection")
-      val out = new RateLimitedOutputStream(socket.getOutputStream, bytesPerSec)
+      val out = new RateLimitedOutputStream(
+          socket.getOutputStream, bytesPerSec)
       try {
         while (true) {
           out.write(countBuf.array)

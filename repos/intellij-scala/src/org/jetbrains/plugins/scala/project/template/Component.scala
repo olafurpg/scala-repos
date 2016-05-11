@@ -9,12 +9,13 @@ import java.util.regex.Pattern
 import org.jetbrains.plugins.scala.project.Version
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 sealed class Artifact(val prefix: String, resource: Option[String] = None) {
   def title: String = prefix + "*.jar"
 
-  def versionOf(file: File): Option[Version] = externalVersionOf(file).orElse(internalVersionOf(file))
+  def versionOf(file: File): Option[Version] =
+    externalVersionOf(file).orElse(internalVersionOf(file))
 
   private def externalVersionOf(file: File): Option[Version] = {
     val FileName = (prefix + "-(.*?)(?:-src|-sources|-javadoc)?\\.jar").r
@@ -26,17 +27,27 @@ sealed class Artifact(val prefix: String, resource: Option[String] = None) {
   }
 
   private def internalVersionOf(file: File): Option[Version] =
-    resource.flatMap(it => Artifact.readProperty(file, it, "version.number")).map(Version(_))
+    resource
+      .flatMap(it => Artifact.readProperty(file, it, "version.number"))
+      .map(Version(_))
 }
 
 object Artifact {
-  def values: Set[Artifact] = Set(ScalaLibrary, ScalaCompiler, ScalaReflect,
-    ScalaXml, ScalaSwing, ScalaCombinators, ScalaActors)
+  def values: Set[Artifact] =
+    Set(ScalaLibrary,
+        ScalaCompiler,
+        ScalaReflect,
+        ScalaXml,
+        ScalaSwing,
+        ScalaCombinators,
+        ScalaActors)
 
-  private def readProperty(file: File, resource: String, name: String): Option[String] = {
+  private def readProperty(
+      file: File, resource: String, name: String): Option[String] = {
     try {
       val url = new URL("jar:%s!/%s".format(file.toURI.toString, resource))
-      Option(url.openStream).flatMap(it => using(new BufferedInputStream(it))(readProperty(_, name)))
+      Option(url.openStream).flatMap(
+          it => using(new BufferedInputStream(it))(readProperty(_, name)))
     } catch {
       case _: IOException => None
     }
@@ -48,11 +59,14 @@ object Artifact {
     Option(properties.getProperty(name))
   }
 
-  case object ScalaLibrary extends Artifact("scala-library", Some("library.properties"))
+  case object ScalaLibrary
+      extends Artifact("scala-library", Some("library.properties"))
 
-  case object ScalaCompiler extends Artifact("scala-compiler", Some("compiler.properties"))
+  case object ScalaCompiler
+      extends Artifact("scala-compiler", Some("compiler.properties"))
 
-  case object ScalaReflect extends Artifact("scala-reflect", Some("reflect.properties"))
+  case object ScalaReflect
+      extends Artifact("scala-reflect", Some("reflect.properties"))
 
   case object ScalaXml extends Artifact("scala-xml")
 
@@ -87,19 +101,24 @@ object Kind {
   case object Docs extends Kind(".*-javadoc\\.jar")
 }
 
-case class Component(artifact: Artifact, kind: Kind, version: Option[Version], file: File)
+case class Component(
+    artifact: Artifact, kind: Kind, version: Option[Version], file: File)
 
 object Component {
   def discoverIn(files: Seq[File]): Seq[Component] = {
-    val patterns = (Artifact.values ++ DottyArtifact.values).flatMap { artifact =>
-      Kind.values.map(kind => (kind.patternFor(artifact.prefix), artifact, kind))
+    val patterns = (Artifact.values ++ DottyArtifact.values).flatMap {
+      artifact =>
+        Kind.values.map(
+            kind => (kind.patternFor(artifact.prefix), artifact, kind))
     }
 
-    files.filter(it => it.isFile && it.getName.endsWith(".jar")).flatMap { file =>
-      patterns.collect {
-        case (pattern, artifact, kind) if pattern.matcher(file.getName).matches =>
-          Component(artifact, kind, artifact.versionOf(file), file)
-      }
+    files.filter(it => it.isFile && it.getName.endsWith(".jar")).flatMap {
+      file =>
+        patterns.collect {
+          case (pattern, artifact, kind)
+              if pattern.matcher(file.getName).matches =>
+            Component(artifact, kind, artifact.versionOf(file), file)
+        }
     }
   }
 }

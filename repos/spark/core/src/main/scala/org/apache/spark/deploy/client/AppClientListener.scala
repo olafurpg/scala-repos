@@ -18,12 +18,12 @@
 package org.apache.spark.deploy.client
 
 /**
- * Callbacks invoked by deploy client when various events happen. There are currently four events:
- * connecting to the cluster, disconnecting, being given an executor, and having an executor
- * removed (either due to failure or due to revocation).
- *
- * Users of this API should *not* block inside the callback methods.
- */
+  * Callbacks invoked by deploy client when various events happen. There are currently four events:
+  * connecting to the cluster, disconnecting, being given an executor, and having an executor
+  * removed (either due to failure or due to revocation).
+  *
+  * Users of this API should *not* block inside the callback methods.
+  */
 private[spark] trait AppClientListener {
   def connected(appId: String): Unit
 
@@ -33,7 +33,12 @@ private[spark] trait AppClientListener {
   /** An application death is an unrecoverable failure condition. */
   def dead(reason: String): Unit
 
-  def executorAdded(fullId: String, workerId: String, hostPort: String, cores: Int, memory: Int)
+  def executorAdded(fullId: String,
+                    workerId: String,
+                    hostPort: String,
+                    cores: Int,
+                    memory: Int)
 
-  def executorRemoved(fullId: String, message: String, exitStatus: Option[Int]): Unit
+  def executorRemoved(
+      fullId: String, message: String, exitStatus: Option[Int]): Unit
 }

@@ -1,6 +1,6 @@
 package mesosphere.marathon.io.storage
 
-import java.io.{ File, FileInputStream, InputStream, OutputStream }
+import java.io.{File, FileInputStream, InputStream, OutputStream}
 import java.net.URI
 
 import org.apache.hadoop.conf.Configuration
@@ -103,15 +103,15 @@ object StorageProvider {
     config.artifactStore.get.getOrElse("") match {
       case HDFS(uri, base) =>
         new HDFSStorageProvider(
-          new URI(uri),
-          if (base.isEmpty) "/" else base,
-          new Configuration()
+            new URI(uri),
+            if (base.isEmpty) "/" else base,
+            new Configuration()
         )
 
       case FILE(base) =>
         new FileStorageProvider(
-          s"http://${config.hostname.get.get}:${http.httpPort.get.get}/v2/artifacts",
-          new File(base)
+            s"http://${config.hostname.get.get}:${http.httpPort.get.get}/v2/artifacts",
+            new File(base)
         )
 
       case _ =>
@@ -120,13 +120,12 @@ object StorageProvider {
 
   def isValidUrl(url: String): Boolean = url match {
     case HDFS(_, _) => true
-    case FILE(_)    => true
-    case _          => false
+    case FILE(_) => true
+    case _ => false
   }
 
-  def examples: Map[String, String] = Map (
-    "hdfs" -> "hdfs://localhost:54310/path/to/store",
-    "file" -> "file:///var/log/store"
+  def examples: Map[String, String] = Map(
+      "hdfs" -> "hdfs://localhost:54310/path/to/store",
+      "file" -> "file:///var/log/store"
   )
 }
-

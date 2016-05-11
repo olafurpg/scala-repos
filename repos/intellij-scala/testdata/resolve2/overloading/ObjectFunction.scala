@@ -7,5 +7,6 @@ object Test extends Application {
     //def apply(x: A, y: A) = print(5)
   }
 
-  /* line: 6, name: apply */foo(new B, new B)
+  /* line: 6, name: apply */
+  foo(new B, new B)
 }

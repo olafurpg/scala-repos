@@ -13,11 +13,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.types.{ScSubstitutor, ScType, ScTypePresentation}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 
-
 /**
- * Pavel.Fatin, 16.04.2010
- */
-
+  * Pavel.Fatin, 16.04.2010
+  */
 class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
 
   override def update(e: AnActionEvent) {
@@ -28,8 +26,9 @@ class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
     val context = e.getDataContext
     val editor = CommonDataKeys.EDITOR.getData(context)
 
-    if(editor == null) return
-    val file = PsiUtilBase.getPsiFileInEditor(editor, CommonDataKeys.PROJECT.getData(context))
+    if (editor == null) return
+    val file = PsiUtilBase.getPsiFileInEditor(
+        editor, CommonDataKeys.PROJECT.getData(context))
     if (file.getLanguage != ScalaFileType.SCALA_LANGUAGE) return
 
     val selectionModel = editor.getSelectionModel
@@ -37,31 +36,44 @@ class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
       import selectionModel._
 
       def hintForPattern: Option[String] = {
-        val pattern = PsiTreeUtil.findElementOfClassAtRange(file, getSelectionStart, getSelectionEnd, classOf[ScBindingPattern])
+        val pattern = PsiTreeUtil.findElementOfClassAtRange(
+            file,
+            getSelectionStart,
+            getSelectionEnd,
+            classOf[ScBindingPattern])
         ShowTypeInfoAction.typeInfoFromPattern(pattern).map("Type: " + _)
       }
 
       def hintForExpression: Option[String] = {
         val exprWithTypes: Option[(ScExpression, Array[ScType])] =
-          ScalaRefactoringUtil.getExpression(file.getProject, editor, file, getSelectionStart, getSelectionEnd)
+          ScalaRefactoringUtil.getExpression(file.getProject,
+                                             editor,
+                                             file,
+                                             getSelectionStart,
+                                             getSelectionEnd)
 
         exprWithTypes.map {
           case (expr @ ExpressionType(tpe), _) =>
             val tpeText = tpe.presentableText
             val withoutAliases = Some(ScTypePresentation.withoutAliases(tpe))
             val tpeWithoutImplicits = expr.getTypeWithoutImplicits().toOption
-            val tpeWithoutImplicitsText = tpeWithoutImplicits.map(_.presentableText)
+            val tpeWithoutImplicitsText =
+              tpeWithoutImplicits.map(_.presentableText)
             val expectedTypeText = expr.expectedType().map(_.presentableText)
-            val nonSingletonTypeText = ScType.extractDesignatorSingletonType(tpe).map(_.presentableText)
+            val nonSingletonTypeText =
+              ScType.extractDesignatorSingletonType(tpe).map(_.presentableText)
 
             val mainText = Seq("Type: " + tpeText)
-            def additionalTypeText(typeText: Option[String], label: String) = typeText.filter(_ != tpeText).map(s"$label: " + _)
+            def additionalTypeText(typeText: Option[String], label: String) =
+              typeText.filter(_ != tpeText).map(s"$label: " + _)
 
-            val nonSingleton = additionalTypeText(nonSingletonTypeText, "Non-singleton")
+            val nonSingleton =
+              additionalTypeText(nonSingletonTypeText, "Non-singleton")
             val simplified = additionalTypeText(withoutAliases, "Simplified")
             val orig = additionalTypeText(tpeWithoutImplicitsText, "Original")
             val expected = additionalTypeText(expectedTypeText, "Expected")
-            val types = mainText ++ simplified.orElse(nonSingleton) ++ orig ++ expected
+            val types =
+              mainText ++ simplified.orElse(nonSingleton) ++ orig ++ expected
 
             if (types.size == 1) tpeText
             else types.mkString("\n")
@@ -70,29 +82,36 @@ class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
       }
       val hint = hintForPattern orElse hintForExpression
       hint.foreach(ScalaActionUtil.showHint(editor, _))
-
     } else {
-      val offset = TargetElementUtil.adjustOffset(file, editor.getDocument,
-        editor.logicalPositionToOffset(editor.getCaretModel.getLogicalPosition))
-      ShowTypeInfoAction.getTypeInfoHint(editor, file, offset).foreach(ScalaActionUtil.showHint(editor, _))
+      val offset = TargetElementUtil.adjustOffset(
+          file,
+          editor.getDocument,
+          editor.logicalPositionToOffset(
+              editor.getCaretModel.getLogicalPosition))
+      ShowTypeInfoAction
+        .getTypeInfoHint(editor, file, offset)
+        .foreach(ScalaActionUtil.showHint(editor, _))
     }
   }
 }
 
 object ShowTypeInfoAction {
-  def getTypeInfoHint(editor: Editor, file: PsiFile, offset: Int): Option[String] = {
+  def getTypeInfoHint(
+      editor: Editor, file: PsiFile, offset: Int): Option[String] = {
     val typeInfoFromRef = file.findReferenceAt(offset) match {
       case ResolvedWithSubst(e, subst) => typeTextOf(e, subst)
       case _ =>
         val element = file.findElementAt(offset)
         if (element == null) return None
-        if (element.getNode.getElementType != ScalaTokenTypes.tIDENTIFIER) return None
+        if (element.getNode.getElementType != ScalaTokenTypes.tIDENTIFIER)
+          return None
         element match {
           case Parent(p) => typeTextOf(p, ScSubstitutor.empty)
           case _ => None
         }
     }
-    val pattern = PsiTreeUtil.findElementOfClassAtOffset(file, offset, classOf[ScBindingPattern], false)
+    val pattern = PsiTreeUtil.findElementOfClassAtOffset(
+        file, offset, classOf[ScBindingPattern], false)
     typeInfoFromRef.orElse(typeInfoFromPattern(pattern))
   }
 
@@ -105,14 +124,14 @@ object ShowTypeInfoAction {
 
   val NO_TYPE: String = "No type was inferred"
 
-  private[this] def typeTextOf(elem: PsiElement, subst: ScSubstitutor): Option[String] = {
+  private[this] def typeTextOf(
+      elem: PsiElement, subst: ScSubstitutor): Option[String] = {
     typeText(ScType.ofNamedElement(elem, subst))
   }
 
-  private[this] def typeText(optType: Option[ScType], s: ScSubstitutor = ScSubstitutor.empty): Option[String] = {
+  private[this] def typeText(
+      optType: Option[ScType],
+      s: ScSubstitutor = ScSubstitutor.empty): Option[String] = {
     optType.map(ScTypePresentation.withoutAliases)
   }
 }
-
-
-

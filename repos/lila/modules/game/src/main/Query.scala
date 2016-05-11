@@ -1,6 +1,6 @@
 package lila.game
 
-import chess.{ Color, Status }
+import chess.{Color, Status}
 import org.joda.time.DateTime
 import play.api.libs.json._
 
@@ -9,7 +9,7 @@ import lila.user.User
 
 object Query {
 
-  import Game.{ BSONFields => F }
+  import Game.{BSONFields => F}
 
   val all: JsObject = $select.all
 
@@ -29,7 +29,8 @@ object Query {
 
   val mate = status(Status.Mate)
 
-  val draw: JsObject = Json.obj(F.status -> $in(Seq(Status.Draw.id, Status.Stalemate.id)))
+  val draw: JsObject =
+    Json.obj(F.status -> $in(Seq(Status.Draw.id, Status.Stalemate.id)))
 
   def draw(u: String): JsObject = user(u) ++ draw
 
@@ -52,30 +53,30 @@ object Query {
   def user(u: String) = Json.obj(F.playerUids -> u)
   def users(u: Seq[String]) = Json.obj(F.playerUids -> $in(u))
 
-  val noAi = Json.obj(
-    "p0.ai" -> $exists(false),
-    "p1.ai" -> $exists(false))
+  val noAi = Json.obj("p0.ai" -> $exists(false), "p1.ai" -> $exists(false))
 
   def nowPlaying(u: String) = Json.obj(F.playingUids -> u)
 
   def recentlyPlaying(u: String) =
     nowPlaying(u) ++ Json.obj(
-      F.updatedAt -> $gt($date(DateTime.now minusMinutes 5))
+        F.updatedAt -> $gt($date(DateTime.now minusMinutes 5))
     )
 
   // use the us index
   def win(u: String) = user(u) ++ Json.obj(F.winnerId -> u)
 
-  def loss(u: String) = user(u) ++
-    Json.obj(F.status -> $in(Status.finishedWithWinner map (_.id))) ++
-    Json.obj(F.winnerId -> ($ne(u) ++ $exists(true)))
+  def loss(u: String) =
+    user(u) ++ Json.obj(F.status -> $in(Status.finishedWithWinner map (_.id))) ++ Json
+      .obj(F.winnerId -> ($ne(u) ++ $exists(true)))
 
   def opponents(u1: User, u2: User) =
     Json.obj(F.playerUids -> $all(List(u1, u2).sortBy(_.count.game).map(_.id)))
 
-  val noProvisional = Json.obj("p0.p" -> $exists(false), "p1.p" -> $exists(false))
+  val noProvisional =
+    Json.obj("p0.p" -> $exists(false), "p1.p" -> $exists(false))
 
-  def bothRatingsGreaterThan(v: Int) = Json.obj("p0.e" -> $gt(v), "p1.e" -> $gt(v))
+  def bothRatingsGreaterThan(v: Int) =
+    Json.obj("p0.e" -> $gt(v), "p1.e" -> $gt(v))
 
   def turnsGt(nb: Int) = Json.obj(F.turns -> $gt(nb))
 
@@ -84,10 +85,11 @@ object Query {
   def variant(v: chess.variant.Variant) =
     Json.obj(F.variant -> v.standard.fold($exists(false), v.id))
 
-  lazy val notHordeOrSincePawnsAreWhite = $or(Seq(
-    Json.obj(F.variant -> $ne(chess.variant.Horde.id)),
-    sinceHordePawnsAreWhite
-  ))
+  lazy val notHordeOrSincePawnsAreWhite = $or(
+      Seq(
+          Json.obj(F.variant -> $ne(chess.variant.Horde.id)),
+          sinceHordePawnsAreWhite
+      ))
 
   lazy val sinceHordePawnsAreWhite =
     Json.obj(F.createdAt -> $gt($date(hordeWhitePawnsSince)))

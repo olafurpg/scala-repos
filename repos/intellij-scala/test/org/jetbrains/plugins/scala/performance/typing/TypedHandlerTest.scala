@@ -10,9 +10,11 @@ class TypedHandlerTest extends TypingTestWithPerformanceTestBase {
 
   val typingTimeout = 200
 
-  override protected def folderPath: String = super.folderPath + "/typedHandler/"
+  override protected def folderPath: String =
+    super.folderPath + "/typedHandler/"
 
-  def doTest(stringsToType: String*): Unit = doTest(stringsToType.toList, typingTimeout)
+  def doTest(stringsToType: String*): Unit =
+    doTest(stringsToType.toList, typingTimeout)
 
   def testCase() = doTest("case _")
 

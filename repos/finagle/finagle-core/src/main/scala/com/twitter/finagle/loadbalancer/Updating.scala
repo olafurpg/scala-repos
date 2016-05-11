@@ -5,16 +5,16 @@ import com.twitter.finagle.util.OnReady
 import com.twitter.util.{Time, Activity, Future, Promise}
 
 /**
- * A Balancer mix-in which provides the collection over which to load balance
- * by observing `activity`.
- */
+  * A Balancer mix-in which provides the collection over which to load balance
+  * by observing `activity`.
+  */
 private trait Updating[Req, Rep] extends Balancer[Req, Rep] with OnReady {
   private[this] val ready = new Promise[Unit]
   def onReady: Future[Unit] = ready
 
   /**
-   * An activity representing the active set of ServiceFactories.
-   */
+    * An activity representing the active set of ServiceFactories.
+    */
   // Note: this is not a terribly good method name and should be
   // improved in a future commit.
   protected def activity: Activity[Traversable[ServiceFactory[Req, Rep]]]
@@ -27,7 +27,6 @@ private trait Updating[Req, Rep] extends Balancer[Req, Rep] with OnReady {
    */
   private[this] val observation = activity.states.respond {
     case Activity.Pending =>
-
     case Activity.Ok(newList) =>
       update(newList)
       ready.setDone()
@@ -39,10 +38,13 @@ private trait Updating[Req, Rep] extends Balancer[Req, Rep] with OnReady {
   }
 
   override def close(deadline: Time): Future[Unit] = {
-    observation.close(deadline).transform { _ =>
-      super.close(deadline)
-    }.ensure {
-      ready.setDone()
-    }
+    observation
+      .close(deadline)
+      .transform { _ =>
+        super.close(deadline)
+      }
+      .ensure {
+        ready.setDone()
+      }
   }
 }

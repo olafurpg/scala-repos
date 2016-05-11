@@ -4,8 +4,8 @@
 package play.api.http
 
 /**
- * Defines common HTTP Content-Type header values, according to the current available Codec.
- */
+  * Defines common HTTP Content-Type header values, according to the current available Codec.
+  */
 object ContentTypes extends ContentTypes
 
 /** Defines common HTTP Content-Type header values, according to the current available Codec. */
@@ -14,70 +14,70 @@ trait ContentTypes {
   import play.api.mvc.Codec
 
   /**
-   * Content-Type of text.
-   */
+    * Content-Type of text.
+    */
   def TEXT(implicit codec: Codec) = withCharset(MimeTypes.TEXT)
 
   /**
-   * Content-Type of html.
-   */
+    * Content-Type of html.
+    */
   def HTML(implicit codec: Codec) = withCharset(MimeTypes.HTML)
 
   /**
-   * Content-Type of xml.
-   */
+    * Content-Type of xml.
+    */
   def XML(implicit codec: Codec) = withCharset(MimeTypes.XML)
 
   /**
-   * Content-Type of css.
-   */
+    * Content-Type of css.
+    */
   def CSS(implicit codec: Codec) = withCharset(MimeTypes.CSS)
 
   /**
-   * Content-Type of javascript.
-   */
+    * Content-Type of javascript.
+    */
   def JAVASCRIPT(implicit codec: Codec) = withCharset(MimeTypes.JAVASCRIPT)
 
   /**
-   * Content-Type of server sent events.
-   */
+    * Content-Type of server sent events.
+    */
   def EVENT_STREAM(implicit codec: Codec) = withCharset(MimeTypes.EVENT_STREAM)
 
   /**
-   * Content-Type of application cache.
-   */
+    * Content-Type of application cache.
+    */
   val CACHE_MANIFEST = withCharset(MimeTypes.CACHE_MANIFEST)(Codec.utf_8)
 
   /**
-   * Content-Type of json. This content type does not define a charset parameter.
-   */
+    * Content-Type of json. This content type does not define a charset parameter.
+    */
   val JSON = MimeTypes.JSON
 
   /**
-   * Content-Type of form-urlencoded. This content type does not define a charset parameter.
-   */
+    * Content-Type of form-urlencoded. This content type does not define a charset parameter.
+    */
   val FORM = MimeTypes.FORM
 
   /**
-   * Content-Type of binary data.
-   */
+    * Content-Type of binary data.
+    */
   val BINARY = MimeTypes.BINARY
 
   /**
-   * @return the `codec` charset appended to `mimeType`
-   */
-  def withCharset(mimeType: String)(implicit codec: Codec) = s"$mimeType; charset=${codec.charset}"
-
+    * @return the `codec` charset appended to `mimeType`
+    */
+  def withCharset(mimeType: String)(implicit codec: Codec) =
+    s"$mimeType; charset=${codec.charset}"
 }
 
 /**
- * Standard HTTP Verbs
- */
+  * Standard HTTP Verbs
+  */
 object HttpVerbs extends HttpVerbs
 
 /**
- * Standard HTTP Verbs
- */
+  * Standard HTTP Verbs
+  */
 trait HttpVerbs {
   val GET = "GET"
   val POST = "POST"
@@ -95,65 +95,64 @@ object MimeTypes extends MimeTypes
 trait MimeTypes {
 
   /**
-   * Content-Type of text.
-   */
+    * Content-Type of text.
+    */
   val TEXT = "text/plain"
 
   /**
-   * Content-Type of html.
-   */
+    * Content-Type of html.
+    */
   val HTML = "text/html"
 
   /**
-   * Content-Type of json.
-   */
+    * Content-Type of json.
+    */
   val JSON = "application/json"
 
   /**
-   * Content-Type of xml.
-   */
+    * Content-Type of xml.
+    */
   val XML = "application/xml"
 
   /**
-   * Content-Type of css.
-   */
+    * Content-Type of css.
+    */
   val CSS = "text/css"
 
   /**
-   * Content-Type of javascript.
-   */
+    * Content-Type of javascript.
+    */
   val JAVASCRIPT = "text/javascript"
 
   /**
-   * Content-Type of form-urlencoded.
-   */
+    * Content-Type of form-urlencoded.
+    */
   val FORM = "application/x-www-form-urlencoded"
 
   /**
-   * Content-Type of server sent events.
-   */
+    * Content-Type of server sent events.
+    */
   val EVENT_STREAM = "text/event-stream"
 
   /**
-   * Content-Type of binary data.
-   */
+    * Content-Type of binary data.
+    */
   val BINARY = "application/octet-stream"
 
   /**
-   * Content-Type of application cache.
-   */
+    * Content-Type of application cache.
+    */
   val CACHE_MANIFEST = "text/cache-manifest"
-
 }
 
 /**
- * Defines all standard HTTP Status.
- */
+  * Defines all standard HTTP Status.
+  */
 object Status extends Status
 
 /**
- * Defines all standard HTTP status codes.
- */
+  * Defines all standard HTTP status codes.
+  */
 trait Status {
 
   val CONTINUE = 100
@@ -308,13 +307,13 @@ trait HeaderNames {
 }
 
 /**
- * Defines HTTP protocol constants
- */
+  * Defines HTTP protocol constants
+  */
 object HttpProtocol extends HttpProtocol
 
 /**
- * Defines HTTP protocol constants
- */
+  * Defines HTTP protocol constants
+  */
 trait HttpProtocol {
   // Versions
   val HTTP_1_0 = "HTTP/1.0"

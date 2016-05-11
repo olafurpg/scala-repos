@@ -10,9 +10,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeBoundsOwner
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 
 /**
- * @author Svyatoslav ILINSKIY
- * @since  6/27/2014.
- */
+  * @author Svyatoslav ILINSKIY
+  * @since  6/27/2014.
+  */
 class VarianceTest extends SimpleTestCase {
   final val Header = "class A; class B\n"
 
@@ -41,19 +41,22 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testVarianceParameterizedReturnType() {
-    assertMatches(messages("abstract class F[-P[+_], +R](in: P[R]) {def a = in}")) {
+    assertMatches(
+        messages("abstract class F[-P[+_], +R](in: P[R]) {def a = in}")) {
       case Error("a", CovariantPosition()) :: Nil =>
     }
   }
 
   def testVariancePrivateThis() {
-    assertMatches(messages("private[this] abstract class G[-P[+_], +R](in: P[R]) {def a = in}")) {
+    assertMatches(messages(
+            "private[this] abstract class G[-P[+_], +R](in: P[R]) {def a = in}")) {
       case Error("a", CovariantPosition()) :: Nil =>
     }
   }
 
   def testFunctionInsideFunction() {
-    assertMatches(messages("trait H[+S] { def outer = {def inner(s: S) = s }}")) {
+    assertMatches(
+        messages("trait H[+S] { def outer = {def inner(s: S) = s }}")) {
       case Nil =>
     }
   }
@@ -87,7 +90,8 @@ class VarianceTest extends SimpleTestCase {
     }
   }
 
-  def testAbstractPrivateMethod() { //test SCL-7176
+  def testAbstractPrivateMethod() {
+    //test SCL-7176
     assertMatches(messages("private def x")) {
       case Error("x", AbstractModifier()) :: Nil =>
     }
@@ -136,8 +140,7 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testSCL8803() {
-    assertMatches(messages(
-      """object Main extends App {
+    assertMatches(messages("""object Main extends App {
         |
         |  class Sum[+T](dummy: T, val sel: Int) {
         |    def this(d: T, value: List[Int]) = this(d, value.sum)
@@ -150,8 +153,7 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testSCL8863() = {
-    assertMatches(messages(
-      """
+    assertMatches(messages("""
         |class Test[+T]{
         |  var arr: Array[T@uncheckedVariance] = null
         |}
@@ -161,8 +163,7 @@ class VarianceTest extends SimpleTestCase {
   }
 
   def testUV() = {
-    assertMatches(messages(
-      """
+    assertMatches(messages("""
         |import scala.annotation.unchecked.{ uncheckedVariance => uV }
         |
         |class Test[+T] {
@@ -173,8 +174,8 @@ class VarianceTest extends SimpleTestCase {
     }
   }
 
-
-  def messages(@Language(value = "Scala", prefix = Header) code: String): List[Message] = {
+  def messages(@Language(value = "Scala", prefix = Header) code: String)
+    : List[Message] = {
     val annotator = new ScalaAnnotator() {}
     val mock = new AnnotatorHolderMock
 
@@ -193,8 +194,10 @@ class VarianceTest extends SimpleTestCase {
     mock.annotations.filter((p: Message) => !p.isInstanceOf[Info])
   }
 
-  val ContravariantPosition = ContainsPattern("occurs in contravariant position")
+  val ContravariantPosition = ContainsPattern(
+      "occurs in contravariant position")
   val CovariantPosition = ContainsPattern("occurs in covariant position")
-  val AbstractModifier = ContainsPattern("Abstract member may not have private modifier")
+  val AbstractModifier = ContainsPattern(
+      "Abstract member may not have private modifier")
   val NotConformsUpper = ContainsPattern("doesn't conform to upper bound")
 }

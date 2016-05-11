@@ -1,5 +1,4 @@
-
-import scala.language.{ reflectiveCalls }
+import scala.language.{reflectiveCalls}
 
 object Test {
   val c = { class C; new C { def foo = 1 } }

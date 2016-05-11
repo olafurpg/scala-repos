@@ -27,27 +27,27 @@ import org.apache.spark.annotation.{DeveloperApi, Experimental, Since}
 import org.apache.spark.mllib.pmml.export.PMMLModelExportFactory
 
 /**
- * :: DeveloperApi ::
- * Export model to the PMML format
- * Predictive Model Markup Language (PMML) is an XML-based file format
- * developed by the Data Mining Group (www.dmg.org).
- */
+  * :: DeveloperApi ::
+  * Export model to the PMML format
+  * Predictive Model Markup Language (PMML) is an XML-based file format
+  * developed by the Data Mining Group (www.dmg.org).
+  */
 @DeveloperApi
 @Since("1.4.0")
 trait PMMLExportable {
 
   /**
-   * Export the model to the stream result in PMML format
-   */
+    * Export the model to the stream result in PMML format
+    */
   private def toPMML(streamResult: StreamResult): Unit = {
     val pmmlModelExport = PMMLModelExportFactory.createPMMLModelExport(this)
     JAXBUtil.marshalPMML(pmmlModelExport.getPmml, streamResult)
   }
 
   /**
-   * :: Experimental ::
-   * Export the model to a local file in PMML format
-   */
+    * :: Experimental ::
+    * Export the model to a local file in PMML format
+    */
   @Experimental
   @Since("1.4.0")
   def toPMML(localPath: String): Unit = {
@@ -55,9 +55,9 @@ trait PMMLExportable {
   }
 
   /**
-   * :: Experimental ::
-   * Export the model to a directory on a distributed file system in PMML format
-   */
+    * :: Experimental ::
+    * Export the model to a directory on a distributed file system in PMML format
+    */
   @Experimental
   @Since("1.4.0")
   def toPMML(sc: SparkContext, path: String): Unit = {
@@ -66,9 +66,9 @@ trait PMMLExportable {
   }
 
   /**
-   * :: Experimental ::
-   * Export the model to the OutputStream in PMML format
-   */
+    * :: Experimental ::
+    * Export the model to the OutputStream in PMML format
+    */
   @Experimental
   @Since("1.4.0")
   def toPMML(outputStream: OutputStream): Unit = {
@@ -76,9 +76,9 @@ trait PMMLExportable {
   }
 
   /**
-   * :: Experimental ::
-   * Export the model to a String in PMML format
-   */
+    * :: Experimental ::
+    * Export the model to a String in PMML format
+    */
   @Experimental
   @Since("1.4.0")
   def toPMML(): String = {
@@ -86,5 +86,4 @@ trait PMMLExportable {
     toPMML(new StreamResult(writer))
     writer.toString
   }
-
 }

@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.io
 
@@ -39,8 +39,7 @@ class PrintWriterTest {
     assertFalse(sw.flushed)
 
     pw.close()
-    if (!executingInJVM)
-      assertTrue(sw.flushed)
+    if (!executingInJVM) assertTrue(sw.flushed)
     assertTrue(sw.closed)
     assertFalse(pw.checkError())
 
@@ -109,9 +108,11 @@ class PrintWriterTest {
     testPrintlnForward(_.println('Z'), "Z\n", autoFlush = true)
     testPrintlnForward(_.println('\n'), "\n\n", autoFlush = true)
     testPrintlnForward(_.println(5), "5\n", autoFlush = true)
-    testPrintlnForward(_.println(1234567891011L), "1234567891011\n", autoFlush = true)
+    testPrintlnForward(
+        _.println(1234567891011L), "1234567891011\n", autoFlush = true)
     testPrintlnForward(_.println(1.5f), "1.5\n", autoFlush = true)
-    testPrintlnForward(_.println(Math.PI), "3.141592653589793\n", autoFlush = true)
+    testPrintlnForward(
+        _.println(Math.PI), "3.141592653589793\n", autoFlush = true)
     testPrintlnForward(_.println(Array('A', '\n')), "A\n\n", autoFlush = true)
     testPrintlnForward(_.println("hello\n"), "hello\n\n", autoFlush = true)
     testPrintlnForward(_.println(null: String), "null\n", autoFlush = true)
@@ -125,9 +126,11 @@ class PrintWriterTest {
     testPrintlnForward(_.println('Z'), "Z\n", autoFlush = false)
     testPrintlnForward(_.println('\n'), "\n\n", autoFlush = false)
     testPrintlnForward(_.println(5), "5\n", autoFlush = false)
-    testPrintlnForward(_.println(1234567891011L), "1234567891011\n", autoFlush = false)
+    testPrintlnForward(
+        _.println(1234567891011L), "1234567891011\n", autoFlush = false)
     testPrintlnForward(_.println(1.5f), "1.5\n", autoFlush = false)
-    testPrintlnForward(_.println(Math.PI), "3.141592653589793\n", autoFlush = false)
+    testPrintlnForward(
+        _.println(Math.PI), "3.141592653589793\n", autoFlush = false)
     testPrintlnForward(_.println(Array('A', '\n')), "A\n\n", autoFlush = false)
     testPrintlnForward(_.println("hello\n"), "hello\n\n", autoFlush = false)
     testPrintlnForward(_.println(null: String), "null\n", autoFlush = false)
@@ -135,32 +138,36 @@ class PrintWriterTest {
     testPrintlnForward(_.println(null: AnyRef), "null\n", autoFlush = false)
   }
 
-  private def testPrintlnForward(body: PrintWriter => Unit, expected: String,
-      autoFlush: Boolean): Unit = {
+  private def testPrintlnForward(body: PrintWriter => Unit,
+                                 expected: String,
+                                 autoFlush: Boolean): Unit = {
     val (pw, sw) = newPrintWriter(autoFlush = autoFlush)
     body(pw)
     if (autoFlush) assertTrue(sw.flushed)
-    else           assertFalse(sw.flushed)
+    else assertFalse(sw.flushed)
     assertFalse(pw.checkError())
     assertEquals(expected, sw.toString())
   }
 
   @Test def printf_and_format_which_flushes_when_autoFlush_is_true(): Unit = {
     testPrintfFormat(_.printf("%04d", Int.box(5)), "0005", autoFlush = true)
-    testPrintfFormat(_.format("%.5f", Double.box(Math.PI)), "3.14159", autoFlush = true)
+    testPrintfFormat(
+        _.format("%.5f", Double.box(Math.PI)), "3.14159", autoFlush = true)
   }
 
   @Test def printf_and_format_do_not_flush_when_autoFlush_is_false(): Unit = {
     testPrintfFormat(_.printf("%04d", Int.box(5)), "0005", autoFlush = false)
-    testPrintfFormat(_.format("%.5f", Double.box(Math.PI)), "3.14159", autoFlush = false)
+    testPrintfFormat(
+        _.format("%.5f", Double.box(Math.PI)), "3.14159", autoFlush = false)
   }
 
-  private def testPrintfFormat(body: PrintWriter => Unit, expected: String,
-      autoFlush: Boolean): Unit = {
+  private def testPrintfFormat(body: PrintWriter => Unit,
+                               expected: String,
+                               autoFlush: Boolean): Unit = {
     val (pw, sw) = newPrintWriter(autoFlush = autoFlush)
     body(pw)
     if (autoFlush) assertTrue(sw.flushed)
-    else           assertFalse(sw.flushed)
+    else assertFalse(sw.flushed)
     assertFalse(pw.checkError())
     assertEquals(expected, sw.toString())
   }
@@ -235,8 +242,8 @@ class PrintWriterTest {
   }
 
   /** A PrintWriter that exposes various hooks for testing purposes. */
-  private class MockPrintWriter(out: Writer,
-      autoFlush: Boolean) extends PrintWriter(out, autoFlush) {
+  private class MockPrintWriter(out: Writer, autoFlush: Boolean)
+      extends PrintWriter(out, autoFlush) {
     def this(out: Writer) = this(out, false)
 
     override def clearError(): Unit = super.clearError()
@@ -253,8 +260,7 @@ class PrintWriterTest {
     def closed: Boolean = _closed
 
     private def maybeThrow(): Unit = {
-      if (throwing)
-        throw new IOException("MockStringWriter throws")
+      if (throwing) throw new IOException("MockStringWriter throws")
     }
 
     private def writeOp[A](op: => A): A = {
@@ -281,7 +287,8 @@ class PrintWriterTest {
     override def append(csq: CharSequence): StringWriter =
       writeOp(super.append(csq))
 
-    override def append(csq: CharSequence, start: Int, end: Int): StringWriter =
+    override def append(
+        csq: CharSequence, start: Int, end: Int): StringWriter =
       writeOp(super.append(csq, start, end))
 
     override def write(c: Int): Unit =

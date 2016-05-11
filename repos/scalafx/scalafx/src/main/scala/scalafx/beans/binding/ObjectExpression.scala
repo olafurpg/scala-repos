@@ -33,20 +33,25 @@ import scala.language.implicitConversions
 import scalafx.beans.value.ObservableValue
 
 object ObjectExpression {
-  implicit def sfxObjectExpression2jfx[J](oe: ObjectExpression[J]): jfxbb.ObjectExpression[J] = if (oe != null) oe.delegate else null
+  implicit def sfxObjectExpression2jfx[J](
+      oe: ObjectExpression[J]): jfxbb.ObjectExpression[J] =
+    if (oe != null) oe.delegate else null
 }
 
 class ObjectExpression[J](val delegate: jfxbb.ObjectExpression[J]) {
   def ===(v: Null) = delegate.isNull
   def ===(v: ObservableObjectValue[_]) = delegate.isEqualTo(v)
   // explicit conversion needed due to AnyRef typed method
-  def ===[T](v: ObservableValue[T, T]) = delegate.isEqualTo(ObservableValue.sfxObservableValue2jfxObjectValue[T](v))
+  def ===[T](v: ObservableValue[T, T]) =
+    delegate.isEqualTo(ObservableValue.sfxObservableValue2jfxObjectValue[T](v))
   def ===(v: AnyRef) = delegate.isEqualTo(v)
 
   def =!=(v: Null) = delegate.isNotNull
   def =!=(v: ObservableObjectValue[_]) = delegate.isNotEqualTo(v)
   // explicit conversion needed due to AnyRef typed method
-  def =!=[T](v: ObservableValue[T, T]) = delegate.isNotEqualTo(ObservableValue.sfxObservableValue2jfxObjectValue[T](v))
+  def =!=[T](v: ObservableValue[T, T]) =
+    delegate.isNotEqualTo(
+        ObservableValue.sfxObservableValue2jfxObjectValue[T](v))
   def =!=(v: AnyRef) = delegate.isNotEqualTo(v)
 
   def selectDouble(s: String) = jfxbb.Bindings.selectDouble(this.delegate, s)

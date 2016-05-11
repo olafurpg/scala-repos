@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,27 +31,26 @@ import javafx.{print => jfxp}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /**
- * Companion Object for [[scalafx.print.Collation]].
- */
-object Collation
-  extends SFXEnumDelegateCompanion[jfxp.Collation, Collation] {
+  * Companion Object for [[scalafx.print.Collation]].
+  */
+object Collation extends SFXEnumDelegateCompanion[jfxp.Collation, Collation] {
 
   /**
-   * Each copy of a document is printed together.
-   */
+    * Each copy of a document is printed together.
+    */
   val Collated = new Collation(jfxp.Collation.COLLATED)
 
   /**
-   * The same numbered pages are consecutive in the output.
-   */
+    * The same numbered pages are consecutive in the output.
+    */
   val Uncollated = new Collation(jfxp.Collation.UNCOLLATED)
 
-  protected override def unsortedValues: Array[Collation] = Array(Collated, Uncollated)
-
+  protected override def unsortedValues: Array[Collation] =
+    Array(Collated, Uncollated)
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/Collation.html JavaFX Collation]].
- */
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/Collation.html JavaFX Collation]].
+  */
 sealed case class Collation(override val delegate: jfxp.Collation)
-  extends SFXEnumDelegate[jfxp.Collation] 
+    extends SFXEnumDelegate[jfxp.Collation]

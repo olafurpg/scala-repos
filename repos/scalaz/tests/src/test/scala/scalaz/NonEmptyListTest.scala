@@ -38,42 +38,47 @@ object NonEmptyListTest extends SpecLite {
     Foldable[NonEmptyList].findRight(a)(_ % 2 == 0) must_=== Some(4)
   }
 
-  "findLeft" ! forAll{ a: NonEmptyList[Int] =>
+  "findLeft" ! forAll { a: NonEmptyList[Int] =>
     val f = (_: Int) % 3 == 0
-    Foldable[NonEmptyList].findLeft(a)(f) must_=== Foldable[IList].findLeft(a.list)(f)
+    Foldable[NonEmptyList].findLeft(a)(f) must_===
+      Foldable[IList].findLeft(a.list)(f)
   }
 
   "findRight" ! forAll { a: NonEmptyList[Int] =>
     val f = (_: Int) % 3 == 0
-    Foldable[NonEmptyList].findRight(a)(f) must_=== Foldable[IList].findRight(a.list)(f)
+    Foldable[NonEmptyList].findRight(a)(f) must_===
+      Foldable[IList].findRight(a.list)(f)
   }
 
   "distinct" ! forAll { xs: NonEmptyList[Int] =>
-    Option(xs.distinct) must_=== std.list.toNel(Foldable[NonEmptyList].toList(xs).distinct)
+    Option(xs.distinct) must_===
+      std.list.toNel(Foldable[NonEmptyList].toList(xs).distinct)
   }
 
-  "NonEmptyList size is correct" ! forAll { xs:NonEmptyList[Int] =>
-    xs.size must_===(1 + xs.tail.count(b => true)) 
+  "NonEmptyList size is correct" ! forAll { xs: NonEmptyList[Int] =>
+    xs.size must_=== (1 + xs.tail.count(b => true))
   }
 
-  "foldl1 is reduceLeft" ! forAll {(rnge: NonEmptyList[IList[Int]]) =>
+  "foldl1 is reduceLeft" ! forAll { (rnge: NonEmptyList[IList[Int]]) =>
     val F = Foldable1[NonEmptyList]
-    rnge.list.toList.reduceLeft(_++_) must_===(F.foldl1(rnge)(a => b => a ++ b))
+    rnge.list.toList.reduceLeft(_ ++ _) must_===
+    (F.foldl1(rnge)(a => b => a ++ b))
   }
 
-  "foldr1 is reduceRight" ! forAll {(rnge: NonEmptyList[IList[Int]]) =>
+  "foldr1 is reduceRight" ! forAll { (rnge: NonEmptyList[IList[Int]]) =>
     val F = Foldable1[NonEmptyList]
-    rnge.list.toList.reduceRight(_++_) must_===(F.foldr1(rnge)(a => b => a ++ b))
+    rnge.list.toList.reduceRight(_ ++ _) must_===
+    (F.foldr1(rnge)(a => b => a ++ b))
   }
   "foldRight1 is reduceRight" ! forAll { xs: NonEmptyList[IList[Int]] =>
     val F = Foldable1[NonEmptyList]
     xs.list.toList.reduceRight(_ ++ _) must_== F.foldRight1(xs)(_ ++ _)
   }
-  "NonEmptyList.last is correct" ! forAll { xs:NonEmptyList[Int] =>
-    xs.reverse.head must_===(xs.last)
+  "NonEmptyList.last is correct" ! forAll { xs: NonEmptyList[Int] =>
+    xs.reverse.head must_=== (xs.last)
   }
-  "NonEmptyList.init size is correct" ! forAll { xs:NonEmptyList[Int] =>
-    xs.init.count(a => true) must_===(xs.tail.count(a => true))
+  "NonEmptyList.init size is correct" ! forAll { xs: NonEmptyList[Int] =>
+    xs.init.count(a => true) must_=== (xs.tail.count(a => true))
   }
   "correctness of tails" ! forAll { xs: NonEmptyList[Int] =>
     import NonEmptyList._

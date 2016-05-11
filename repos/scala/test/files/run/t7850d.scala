@@ -1,6 +1,8 @@
 // Testing that the ad-hoc overload resolution of isEmpty/get discards
 // parameter-accepting variants
-trait T[A, B >: Null] { def isEmpty: A = false.asInstanceOf[A]; def get: B = null}
+trait T[A, B >: Null] {
+  def isEmpty: A = false.asInstanceOf[A]; def get: B = null
+}
 class Casey1(val a: Int) {
   def isEmpty: Boolean = false
   def isEmpty(x: Int): Boolean = ???

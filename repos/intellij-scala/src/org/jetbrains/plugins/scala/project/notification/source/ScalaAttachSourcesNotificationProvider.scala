@@ -22,53 +22,64 @@ import com.intellij.ui.{EditorNotificationPanel, EditorNotifications, GuiUtils}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 //todo: possibly join with AttachSourcesNorificationProvider
 //todo: differences only in JavaEditorFileSwapper -> ScalaEditorFileSwapper
-class ScalaAttachSourcesNotificationProvider(myProject: Project, notifications: EditorNotifications)
-  extends AttachSourcesNotificationProvider(myProject, notifications) {
+class ScalaAttachSourcesNotificationProvider(
+    myProject: Project, notifications: EditorNotifications)
+    extends AttachSourcesNotificationProvider(myProject, notifications) {
   private val EXTENSION_POINT_NAME: ExtensionPointName[AttachSourcesProvider] =
-    new ExtensionPointName[AttachSourcesProvider]("com.intellij.attachSourcesProvider")
+    new ExtensionPointName[AttachSourcesProvider](
+        "com.intellij.attachSourcesProvider")
 
-  override def createNotificationPanel(file: VirtualFile, fileEditor: FileEditor): EditorNotificationPanel = {
+  override def createNotificationPanel(
+      file: VirtualFile, fileEditor: FileEditor): EditorNotificationPanel = {
     if (file.getFileType ne JavaClassFileType.INSTANCE) return null
-    val libraries: util.List[LibraryOrderEntry] = findOrderEntriesContainingFile(file)
+    val libraries: util.List[LibraryOrderEntry] =
+      findOrderEntriesContainingFile(file)
     if (libraries == null) return null
     val psiFile: PsiFile = PsiManager.getInstance(myProject).findFile(file)
     val isScala = psiFile.isInstanceOf[ScalaFile]
-    if (!isScala) return super.createNotificationPanel(file, fileEditor) //as Java has now different message
+    if (!isScala)
+      return super.createNotificationPanel(file, fileEditor) //as Java has now different message
     val fqn: String =
       if (isScala) ScalaEditorFileSwapper.getFQN(psiFile)
       else getFQN(psiFile)
     if (fqn == null) return null
-    if (isScala && ScalaEditorFileSwapper.findSourceFile(myProject, file) != null) return null
-    if (!isScala && JavaEditorFileSwapper.findSourceFile(myProject, file) != null) return null
+    if (isScala &&
+        ScalaEditorFileSwapper.findSourceFile(myProject, file) != null)
+      return null
+    if (!isScala &&
+        JavaEditorFileSwapper.findSourceFile(myProject, file) != null)
+      return null
     val panel: EditorNotificationPanel = new EditorNotificationPanel
     val sourceFile: VirtualFile = findSourceFile(file)
     var defaultAction: AttachSourcesProvider.AttachSourcesAction = null
     if (sourceFile != null) {
       panel.setText(ScalaBundle.message("library.sources.not.attached"))
-      defaultAction = new AttachSourcesUtil.AttachJarAsSourcesAction(file, sourceFile, myProject)
+      defaultAction = new AttachSourcesUtil.AttachJarAsSourcesAction(
+          file, sourceFile, myProject)
     } else {
       panel.setText(ScalaBundle.message("library.sources.not.found"))
-      defaultAction = new AttachSourcesUtil.ChooseAndAttachSourcesAction(myProject, panel)
+      defaultAction = new AttachSourcesUtil.ChooseAndAttachSourcesAction(
+          myProject, panel)
     }
 
-
-
-    val actions: util.List[AttachSourcesProvider.AttachSourcesAction] = new util.ArrayList[AttachSourcesProvider.AttachSourcesAction]
+    val actions: util.List[AttachSourcesProvider.AttachSourcesAction] =
+      new util.ArrayList[AttachSourcesProvider.AttachSourcesAction]
     var hasNonLightAction: Boolean = false
     for (each <- Extensions.getExtensions(EXTENSION_POINT_NAME)) {
       import scala.collection.JavaConversions._
       for (action <- each.getActions(libraries, psiFile)) {
         if (hasNonLightAction) {
-          if (!action.isInstanceOf[AttachSourcesProvider.LightAttachSourcesAction]) {
+          if (!action.isInstanceOf[
+                  AttachSourcesProvider.LightAttachSourcesAction]) {
             actions.add(action)
           }
         } else {
-          if (!action.isInstanceOf[AttachSourcesProvider.LightAttachSourcesAction]) {
+          if (!action.isInstanceOf[
+                  AttachSourcesProvider.LightAttachSourcesAction]) {
             actions.clear()
             hasNonLightAction = true
           }
@@ -76,8 +87,10 @@ class ScalaAttachSourcesNotificationProvider(myProject: Project, notifications: 
         }
       }
     }
-    Collections.sort(actions, new Comparator[AttachSourcesProvider.AttachSourcesAction] {
-      def compare(o1: AttachSourcesProvider.AttachSourcesAction, o2: AttachSourcesProvider.AttachSourcesAction): Int = {
+    Collections.sort(
+        actions, new Comparator[AttachSourcesProvider.AttachSourcesAction] {
+      def compare(o1: AttachSourcesProvider.AttachSourcesAction,
+                  o2: AttachSourcesProvider.AttachSourcesAction): Int = {
         o1.getName.compareToIgnoreCase(o2.getName)
       }
     })
@@ -87,10 +100,15 @@ class ScalaAttachSourcesNotificationProvider(myProject: Project, notifications: 
     val iterator = actions.iterator()
     while (iterator.hasNext) {
       val each = iterator.next()
-      panel.createActionLabel(GuiUtils.getTextWithoutMnemonicEscaping(each.getName), new Runnable {
+      panel.createActionLabel(
+          GuiUtils.getTextWithoutMnemonicEscaping(each.getName), new Runnable {
         def run() {
-          if (!Comparing.equal(libraries, findOrderEntriesContainingFile(file))) {
-            Messages.showErrorDialog(myProject, "Cannot find library for " + StringUtil.getShortName(fqn), "Error")
+          if (!Comparing.equal(
+                  libraries, findOrderEntriesContainingFile(file))) {
+            Messages.showErrorDialog(
+                myProject,
+                "Cannot find library for " + StringUtil.getShortName(fqn),
+                "Error")
             return
           }
           panel.setText(each.getBusyText)
@@ -98,12 +116,14 @@ class ScalaAttachSourcesNotificationProvider(myProject: Project, notifications: 
             def run() {
               SwingUtilities.invokeLater(new Runnable {
                 def run() {
-                  panel.setText(ScalaBundle.message("library.sources.not.found"))
+                  panel.setText(
+                      ScalaBundle.message("library.sources.not.found"))
                 }
               })
             }
           }
-          val callback: ActionCallback = each.perform(findOrderEntriesContainingFile(file))
+          val callback: ActionCallback =
+            each.perform(findOrderEntriesContainingFile(file))
           callback.doWhenRejected(onFinish)
           callback.doWhenDone(onFinish)
         }
@@ -112,9 +132,14 @@ class ScalaAttachSourcesNotificationProvider(myProject: Project, notifications: 
     panel
   }
 
-  private def findOrderEntriesContainingFile(file: VirtualFile): util.List[LibraryOrderEntry] = {
-    val libs: util.List[LibraryOrderEntry] = new util.ArrayList[LibraryOrderEntry]
-    val entries: util.List[OrderEntry] = ProjectRootManager.getInstance(myProject).getFileIndex.getOrderEntriesForFile(file)
+  private def findOrderEntriesContainingFile(
+      file: VirtualFile): util.List[LibraryOrderEntry] = {
+    val libs: util.List[LibraryOrderEntry] =
+      new util.ArrayList[LibraryOrderEntry]
+    val entries: util.List[OrderEntry] = ProjectRootManager
+      .getInstance(myProject)
+      .getFileIndex
+      .getOrderEntriesForFile(file)
     import scala.collection.JavaConversions._
     for (entry <- entries) {
       entry match {

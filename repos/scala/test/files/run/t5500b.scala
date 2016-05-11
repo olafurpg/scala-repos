@@ -1,22 +1,22 @@
 import scala.{specialized => spec}
 
 class C1A[
-  @spec(Double, Int, AnyRef) A,
-  @spec(Double, Int, AnyRef) B
+    @spec(Double, Int, AnyRef) A,
+    @spec(Double, Int, AnyRef) B
 ]
 
 class C1B[
-  @spec(Double, Int, AnyRef) A,
-  @spec(Double, Int, AnyRef) B
+    @spec(Double, Int, AnyRef) A,
+    @spec(Double, Int, AnyRef) B
 ](v: A)
 
 class C1C[
-  @spec(Double, Int, AnyRef) A,
-  @spec(Double, Int, AnyRef) B
-](v:A, w:B)
+    @spec(Double, Int, AnyRef) A,
+    @spec(Double, Int, AnyRef) B
+](v: A, w: B)
 
 object Test {
-  def main(args:Array[String]) {
+  def main(args: Array[String]) {
     println(new C1A[String, Int].getClass.getName)
     println(new C1A[String, Double].getClass.getName)
     println(new C1A[String, String].getClass.getName)

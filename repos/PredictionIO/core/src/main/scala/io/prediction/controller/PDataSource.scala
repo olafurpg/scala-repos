@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.core.BaseDataSource
@@ -30,9 +29,7 @@ import org.apache.spark.rdd.RDD
   * @tparam A Actual value class.
   * @group Data Source
   */
-
-abstract class PDataSource[TD, EI, Q, A]
-  extends BaseDataSource[TD, EI, Q, A] {
+abstract class PDataSource[TD, EI, Q, A] extends BaseDataSource[TD, EI, Q, A] {
 
   def readTrainingBase(sc: SparkContext): TD = readTraining(sc)
 

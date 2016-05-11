@@ -25,7 +25,8 @@ class Lcg32(seed0: Int) extends IntBasedGenerator {
 object Lcg32 extends GeneratorCompanion[Lcg32, Int] {
   def randomSeed(): Int = System.nanoTime.toInt
 
-  def fromBytes(bytes: Array[Byte]): Lcg32 = new Lcg32(Pack.intFromBytes(bytes))
+  def fromBytes(bytes: Array[Byte]): Lcg32 =
+    new Lcg32(Pack.intFromBytes(bytes))
   def fromSeed(seed: Int): Lcg32 = new Lcg32(seed)
   def fromTime(time: Long = System.nanoTime): Lcg32 = new Lcg32(time.toInt)
 

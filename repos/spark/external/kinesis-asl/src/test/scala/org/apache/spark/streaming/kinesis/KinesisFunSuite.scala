@@ -20,10 +20,10 @@ package org.apache.spark.streaming.kinesis
 import org.apache.spark.SparkFunSuite
 
 /**
- * Helper class that runs Kinesis real data transfer tests or
- * ignores them based on env variable is set or not.
- */
-trait KinesisFunSuite extends SparkFunSuite  {
+  * Helper class that runs Kinesis real data transfer tests or
+  * ignores them based on env variable is set or not.
+  */
+trait KinesisFunSuite extends SparkFunSuite {
   import KinesisTestUtils._
 
   /** Run the test if environment variable is set or ignore the test */
@@ -31,7 +31,9 @@ trait KinesisFunSuite extends SparkFunSuite  {
     if (shouldRunTests) {
       test(testName)(testBody)
     } else {
-      ignore(s"$testName [enable by setting env var $envVarNameForEnablingTests=1]")(testBody)
+      ignore(
+          s"$testName [enable by setting env var $envVarNameForEnablingTests=1]")(
+          testBody)
     }
   }
 
@@ -40,7 +42,9 @@ trait KinesisFunSuite extends SparkFunSuite  {
     if (shouldRunTests) {
       body
     } else {
-      ignore(s"$message [enable by setting env var $envVarNameForEnablingTests=1]")(())
+      ignore(
+          s"$message [enable by setting env var $envVarNameForEnablingTests=1]")(
+          ())
     }
   }
 }

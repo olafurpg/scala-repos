@@ -1,7 +1,7 @@
 object Test {
   trait Universe {
     type Type
-    type TypeTag[A] >: Null <: TypeTagApi[A]
+    type TypeTag [A] >: Null <: TypeTagApi[A]
     trait TypeTagApi[A] { def tpe: Type }
   }
   trait JavaUniverse extends Universe
@@ -10,9 +10,11 @@ object Test {
     def universe: U
   }
   (null: Mirror[_]).universe match {
-    case ju: JavaUniverse => 
+    case ju: JavaUniverse =>
       val ju1 = ju
-      val f = {() => (null: ju.TypeTag[Nothing]).tpe }
+      val f = { () =>
+        (null: ju.TypeTag[Nothing]).tpe
+      }
   }
   trait M[A]
 }

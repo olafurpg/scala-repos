@@ -38,12 +38,14 @@ trait ScType {
   final def equiv(t: ScType): Boolean = Equivalence.equiv(this, t)
 
   /**
-   * Checks, whether the following assignment is correct:
-   * val x: t = (y: this)
-   */
-  final def conforms(t: ScType, checkWeak: Boolean = false): Boolean = Conformance.conforms(t, this, checkWeak)
+    * Checks, whether the following assignment is correct:
+    * val x: t = (y: this)
+    */
+  final def conforms(t: ScType, checkWeak: Boolean = false): Boolean =
+    Conformance.conforms(t, this, checkWeak)
 
-  final def weakConforms(t: ScType): Boolean = Conformance.conforms(t, this, checkWeak = true)
+  final def weakConforms(t: ScType): Boolean =
+    Conformance.conforms(t, this, checkWeak = true)
 
   final def presentableText = ScType.presentableText(this)
 
@@ -73,25 +75,31 @@ trait ScType {
   }
 
   /**
-   * This method is important for parameters expected type.
-   * There shouldn't be any abstract type in this expected type.
-   * todo rewrite with recursiveUpdate method
-   */
+    * This method is important for parameters expected type.
+    * There shouldn't be any abstract type in this expected type.
+    * todo rewrite with recursiveUpdate method
+    */
   def removeAbstracts: ScType = this
 
   def removeVarianceAbstracts(variance: Int): ScType = {
     var index = 0
-    recursiveVarianceUpdate((tp: ScType, i: Int) => {
-      tp match {
-        case ScAbstractType(_, lower, upper) =>
-          i match {
-            case -1 => (true, lower)
-            case 1 => (true, upper)
-            case 0 => (true, ScSkolemizedType(s"_$$${index += 1; index}", Nil, lower, upper))
-          }
-        case _ => (false, tp)
-      }
-    }, variance).unpackedType
+    recursiveVarianceUpdate(
+        (tp: ScType, i: Int) =>
+          {
+            tp match {
+              case ScAbstractType(_, lower, upper) =>
+                i match {
+                  case -1 => (true, lower)
+                  case 1 => (true, upper)
+                  case 0 =>
+                    (true,
+                     ScSkolemizedType(
+                         s"_$$${ index += 1; index }", Nil, lower, upper))
+                }
+              case _ => (false, tp)
+            }
+        },
+        variance).unpackedType
   }
 
   def removeUndefines(): ScType = {
@@ -101,7 +109,9 @@ trait ScType {
     }
   }
 
-  def equivInner(r: ScType, uSubst: ScUndefinedSubstitutor, falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
+  def equivInner(r: ScType,
+                 uSubst: ScUndefinedSubstitutor,
+                 falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
     (false, uSubst)
   }
 
@@ -112,41 +122,52 @@ trait ScType {
   import scala.collection.immutable.{HashSet => IHashSet}
 
   /**
-   * use 'update' to replace appropriate type part with another type
-   * 'update' should return true if type changed, false otherwise.
-   * To just collect info about types (see collectAbstracts) always return false
-   *
-   * default implementation for types, which don't contain other types.
-   */
-  def recursiveUpdate(update: ScType => (Boolean, ScType), visited: IHashSet[ScType] = IHashSet.empty): ScType = {
+    * use 'update' to replace appropriate type part with another type
+    * 'update' should return true if type changed, false otherwise.
+    * To just collect info about types (see collectAbstracts) always return false
+    *
+    * default implementation for types, which don't contain other types.
+    */
+  def recursiveUpdate(update: ScType => (Boolean, ScType),
+                      visited: IHashSet[ScType] = IHashSet.empty): ScType = {
     val res = update(this)
     if (res._1) res._2
     else this
   }
 
-  def recursiveVarianceUpdate(update: (ScType, Int) => (Boolean, ScType), variance: Int = 1): ScType = {
-    recursiveVarianceUpdateModifiable[Unit]((), (tp, v, T) => {
-      val (newTp, newV) = update(tp, v)
-      (newTp, newV, ())
-    }, variance)
+  def recursiveVarianceUpdate(update: (ScType, Int) => (Boolean, ScType),
+                              variance: Int = 1): ScType = {
+    recursiveVarianceUpdateModifiable[Unit](
+        (),
+        (tp, v, T) =>
+          {
+            val (newTp, newV) = update(tp, v)
+            (newTp, newV, ())
+        },
+        variance)
   }
 
-  def recursiveVarianceUpdateModifiable[T](data: T, update: (ScType, Int, T) => (Boolean, ScType, T),
-                                           variance: Int = 1): ScType = {
+  def recursiveVarianceUpdateModifiable[T](
+      data: T,
+      update: (ScType, Int, T) => (Boolean, ScType, T),
+      variance: Int = 1): ScType = {
     val res = update(this, variance, data)
     if (res._1) res._2
     else this
   }
 
   def collectAbstracts: Seq[ScAbstractType] = {
-    val set: mutable.HashSet[ScAbstractType] = new mutable.HashSet[ScAbstractType]
+    val set: mutable.HashSet[ScAbstractType] =
+      new mutable.HashSet[ScAbstractType]
 
-    recursiveUpdate(tp => {
-      tp match {
-        case a: ScAbstractType => set += a
-        case _ =>
-      }
-      (false, tp)
+    recursiveUpdate(
+        tp =>
+          {
+        tp match {
+          case a: ScAbstractType => set += a
+          case _ =>
+        }
+        (false, tp)
     })
 
     set.toSeq
@@ -158,16 +179,19 @@ trait ScType {
 
   def typeDepth: Int = 1
 
-  def baseTypeSeqDepth: Int = 1 //todo: should be implemented according to Scala compiler sources. However concerns about performance stops me.
+  def baseTypeSeqDepth: Int =
+    1 //todo: should be implemented according to Scala compiler sources. However concerns about performance stops me.
 
-  def isGenericType(project: Option[Project] = None): Boolean = ScType.extractClass(this, project).isEmpty
+  def isGenericType(project: Option[Project] = None): Boolean =
+    ScType.extractClass(this, project).isEmpty
 }
 
 object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   def typeParamsDepth(typeParams: Array[TypeParameter]): Int = {
     typeParams.map {
       case typeParam =>
-        val boundsDepth = typeParam.lowerType().typeDepth.max(typeParam.upperType().typeDepth)
+        val boundsDepth =
+          typeParam.lowerType().typeDepth.max(typeParam.upperType().typeDepth)
         if (typeParam.typeParams.nonEmpty) {
           (typeParamsDepth(typeParam.typeParams.toArray) + 1).max(boundsDepth)
         } else boundsDepth
@@ -183,71 +207,85 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   def elemTypeDepth(elem: ScNamedElement): Int = {
     elem match {
       case tp: ScTypeParam =>
-        val boundsDepth = tp.lowerBound.getOrNothing.typeDepth.max(tp.upperBound.getOrAny.typeDepth)
+        val boundsDepth = tp.lowerBound.getOrNothing.typeDepth
+          .max(tp.upperBound.getOrAny.typeDepth)
         typeParametersOwnerDepth(tp, boundsDepth)
       case f: ScFunction =>
         val returnTypeDepth = f.returnType.getOrAny.typeDepth
         typeParametersOwnerDepth(f, returnTypeDepth)
       case ta: ScTypeAliasDefinition =>
-        val aliasedDepth = ta.aliasedType(TypingContext.empty).getOrAny.typeDepth
+        val aliasedDepth =
+          ta.aliasedType(TypingContext.empty).getOrAny.typeDepth
         typeParametersOwnerDepth(ta, aliasedDepth)
       case ta: ScTypeAliasDeclaration =>
-        val boundsDepth = ta.lowerBound.getOrNothing.typeDepth.max(ta.upperBound.getOrAny.typeDepth)
+        val boundsDepth = ta.lowerBound.getOrNothing.typeDepth
+          .max(ta.upperBound.getOrAny.typeDepth)
         typeParametersOwnerDepth(ta, boundsDepth)
-      case t: ScTypedDefinition => t.getType(TypingContext.empty).getOrAny.typeDepth
+      case t: ScTypedDefinition =>
+        t.getType(TypingContext.empty).getOrAny.typeDepth
       case _ => 1
     }
   }
 
   val baseTypesQualMap: Map[String, StdType] = HashMap(
-    "scala.Unit" -> Unit,
-    "scala.Boolean" -> Boolean,
-    "scala.Char" -> Char,
-    "scala.Int" -> Int,
-    "scala.Long" -> Long,
-    "scala.Float" -> Float,
-    "scala.Double" -> Double,
-    "scala.Byte" -> Byte,
-    "scala.Short" -> Short,
-    "scala.AnyVal" -> AnyVal
+      "scala.Unit" -> Unit,
+      "scala.Boolean" -> Boolean,
+      "scala.Char" -> Char,
+      "scala.Int" -> Int,
+      "scala.Long" -> Long,
+      "scala.Float" -> Float,
+      "scala.Double" -> Double,
+      "scala.Byte" -> Byte,
+      "scala.Short" -> Short,
+      "scala.AnyVal" -> AnyVal
   )
 
   @tailrec
-  def extractClass(t: ScType, project: Option[Project] = None): Option[PsiClass] = {
+  def extractClass(
+      t: ScType, project: Option[Project] = None): Option[PsiClass] = {
     t match {
-      case p@ScParameterizedType(t1, _) => extractClass(t1, project) //performance improvement
+      case p @ ScParameterizedType(t1, _) =>
+        extractClass(t1, project) //performance improvement
       case _ => extractClassType(t, project).map(_._1)
     }
   }
 
-  def extractClassType(t: ScType, project: Option[Project] = None,
-                       visitedAlias: HashSet[ScTypeAlias] = HashSet.empty): Option[(PsiClass, ScSubstitutor)] = {
+  def extractClassType(t: ScType,
+                       project: Option[Project] = None,
+                       visitedAlias: HashSet[ScTypeAlias] = HashSet.empty)
+    : Option[(PsiClass, ScSubstitutor)] = {
     t match {
-      case n: NonValueType => extractClassType(n.inferValueType, project, visitedAlias)
+      case n: NonValueType =>
+        extractClassType(n.inferValueType, project, visitedAlias)
       case ScThisType(clazz) => Some(clazz, new ScSubstitutor(t))
-      case ScDesignatorType(clazz: PsiClass) => Some(clazz, ScSubstitutor.empty)
+      case ScDesignatorType(clazz: PsiClass) =>
+        Some(clazz, ScSubstitutor.empty)
       case ScDesignatorType(ta: ScTypeAliasDefinition) =>
         if (visitedAlias.contains(ta)) return None
         val result = ta.aliasedType(TypingContext.empty)
         if (result.isEmpty) return None
         extractClassType(result.get, project, visitedAlias + ta)
-      case proj@ScProjectionType(p, elem, _) => proj.actualElement match {
-        case c: PsiClass => Some((c, proj.actualSubst))
-        case t: ScTypeAliasDefinition =>
-          if (visitedAlias.contains(t)) return None
-          val result = t.aliasedType(TypingContext.empty)
-          if (result.isEmpty) return None
-          extractClassType(proj.actualSubst.subst(result.get), project, visitedAlias + t)
-        case _ => None
-      }
-      case ScExistentialType(quantified, _) => extractClassType(quantified, project, visitedAlias)
-      case p@ScParameterizedType(t1, _) =>
+      case proj @ ScProjectionType(p, elem, _) =>
+        proj.actualElement match {
+          case c: PsiClass => Some((c, proj.actualSubst))
+          case t: ScTypeAliasDefinition =>
+            if (visitedAlias.contains(t)) return None
+            val result = t.aliasedType(TypingContext.empty)
+            if (result.isEmpty) return None
+            extractClassType(
+                proj.actualSubst.subst(result.get), project, visitedAlias + t)
+          case _ => None
+        }
+      case ScExistentialType(quantified, _) =>
+        extractClassType(quantified, project, visitedAlias)
+      case p @ ScParameterizedType(t1, _) =>
         extractClassType(t1, project, visitedAlias) match {
           case Some((c, s)) => Some((c, s.followed(p.substitutor)))
           case None => None
         }
-      case std@StdType(_, _) =>
-        val asClass = std.asClass(project.getOrElse(DecompilerUtil.obtainProject))
+      case std @ StdType(_, _) =>
+        val asClass =
+          std.asClass(project.getOrElse(DecompilerUtil.obtainProject))
         if (asClass.isEmpty) return None
         Some((asClass.get, ScSubstitutor.empty))
       case _ => None
@@ -255,39 +293,46 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   }
 
   /**
-   * Returns named element associated with type `t`.
-   * If withoutAliases is `true` expands alias definitions first
-   * @param t type
-   * @param withoutAliases need to expand alias or not
-   * @return element and substitutor
-   */
-  def extractDesignated(t: ScType, withoutAliases: Boolean): Option[(PsiNamedElement, ScSubstitutor)] = t match {
-    case n: NonValueType => extractDesignated(n.inferValueType, withoutAliases)
-    case ScDesignatorType(ta: ScTypeAliasDefinition) if withoutAliases =>
-      val result = ta.aliasedType(TypingContext.empty)
-      if (result.isEmpty) return None
-      extractDesignated(result.get, withoutAliases)
-    case ScDesignatorType(e) => Some(e, ScSubstitutor.empty)
-    case ScThisType(c) => Some(c, ScSubstitutor.empty)
-    case proj@ScProjectionType(p, e, _) => proj.actualElement match {
-      case t: ScTypeAliasDefinition if withoutAliases =>
-        val result = t.aliasedType(TypingContext.empty)
+    * Returns named element associated with type `t`.
+    * If withoutAliases is `true` expands alias definitions first
+    * @param t type
+    * @param withoutAliases need to expand alias or not
+    * @return element and substitutor
+    */
+  def extractDesignated(
+      t: ScType,
+      withoutAliases: Boolean): Option[(PsiNamedElement, ScSubstitutor)] =
+    t match {
+      case n: NonValueType =>
+        extractDesignated(n.inferValueType, withoutAliases)
+      case ScDesignatorType(ta: ScTypeAliasDefinition) if withoutAliases =>
+        val result = ta.aliasedType(TypingContext.empty)
         if (result.isEmpty) return None
-        extractDesignated(proj.actualSubst.subst(result.get), withoutAliases)
-      case _ => Some((proj.actualElement, proj.actualSubst))
+        extractDesignated(result.get, withoutAliases)
+      case ScDesignatorType(e) => Some(e, ScSubstitutor.empty)
+      case ScThisType(c) => Some(c, ScSubstitutor.empty)
+      case proj @ ScProjectionType(p, e, _) =>
+        proj.actualElement match {
+          case t: ScTypeAliasDefinition if withoutAliases =>
+            val result = t.aliasedType(TypingContext.empty)
+            if (result.isEmpty) return None
+            extractDesignated(
+                proj.actualSubst.subst(result.get), withoutAliases)
+          case _ => Some((proj.actualElement, proj.actualSubst))
+        }
+      case p @ ScParameterizedType(t1, _) =>
+        extractDesignated(t1, withoutAliases) match {
+          case Some((e, s)) => Some((e, s.followed(p.substitutor)))
+          case None => None
+        }
+      case std @ StdType(_, _) =>
+        val asClass = std.asClass(DecompilerUtil.obtainProject)
+        if (asClass.isEmpty) return None
+        Some((asClass.get, ScSubstitutor.empty))
+      case ScTypeParameterType(_, _, _, _, param) =>
+        Some(param, ScSubstitutor.empty)
+      case _ => None
     }
-    case p@ScParameterizedType(t1, _) =>
-      extractDesignated(t1, withoutAliases) match {
-        case Some((e, s)) => Some((e, s.followed(p.substitutor)))
-        case None => None
-      }
-    case std@StdType(_, _) =>
-      val asClass = std.asClass(DecompilerUtil.obtainProject)
-      if (asClass.isEmpty) return None
-      Some((asClass.get, ScSubstitutor.empty))
-    case ScTypeParameterType(_, _, _, _, param) => Some(param, ScSubstitutor.empty)
-    case _ => None
-  }
 
   def isSingletonType(tp: ScType): Boolean = tp match {
     case _: ScThisType => true
@@ -308,15 +353,21 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
     case ScDesignatorType(v) =>
       v match {
         case o: ScObject => None
-        case p: ScParameter if p.isStable => p.getRealParameterType(TypingContext.empty).toOption
-        case t: ScTypedDefinition if t.isStable => t.getType(TypingContext.empty).toOption
+        case p: ScParameter if p.isStable =>
+          p.getRealParameterType(TypingContext.empty).toOption
+        case t: ScTypedDefinition if t.isStable =>
+          t.getType(TypingContext.empty).toOption
         case _ => None
       }
-    case proj@ScProjectionType(_, elem, _) =>
+    case proj @ ScProjectionType(_, elem, _) =>
       elem match {
         case o: ScObject => None
-        case p: ScParameter if p.isStable => p.getRealParameterType(TypingContext.empty).toOption.map(proj.actualSubst.subst)
-        case t: ScTypedDefinition if t.isStable => t.getType(TypingContext.empty).toOption.map(proj.actualSubst.subst)
+        case p: ScParameter if p.isStable =>
+          p.getRealParameterType(TypingContext.empty)
+            .toOption
+            .map(proj.actualSubst.subst)
+        case t: ScTypedDefinition if t.isStable =>
+          t.getType(TypingContext.empty).toOption.map(proj.actualSubst.subst)
         case _ => None
       }
     case _ => None
@@ -325,8 +376,10 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   // TODO: Review this against SLS 3.2.1
   def isStable(t: ScType): Boolean = t match {
     case ScThisType(_) => true
-    case ScProjectionType(projected, element: ScObject, _) => isStable(projected)
-    case ScProjectionType(projected, element: ScTypedDefinition, _) => isStable(projected) && element.isStable
+    case ScProjectionType(projected, element: ScObject, _) =>
+      isStable(projected)
+    case ScProjectionType(projected, element: ScTypedDefinition, _) =>
+      isStable(projected) && element.isStable
     case ScDesignatorType(o: ScObject) => true
     case ScDesignatorType(r: ScTypedDefinition) if r.isStable => true
     case _ => false
@@ -334,41 +387,54 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
 
   def projectionOption(tp: ScType): Option[ScType] = tp match {
     case ScParameterizedType(des, _) => projectionOption(des)
-    case proj@ScProjectionType(p, elem, _) => proj.actualElement match {
-      case c: PsiClass => Some(p)
-      case t: ScTypeAliasDefinition =>
-        projectionOption(proj.actualSubst.subst(t.aliasedType(TypingContext.empty).getOrElse(return None)))
-      case t: ScTypeAliasDeclaration => Some(p)
-      case _ => None
-    }
+    case proj @ ScProjectionType(p, elem, _) =>
+      proj.actualElement match {
+        case c: PsiClass => Some(p)
+        case t: ScTypeAliasDefinition =>
+          projectionOption(
+              proj.actualSubst.subst(
+                  t.aliasedType(TypingContext.empty).getOrElse(return None)))
+        case t: ScTypeAliasDeclaration => Some(p)
+        case _ => None
+      }
     case ScDesignatorType(t: ScTypeAliasDefinition) =>
-      projectionOption(t.aliasedType(TypingContext.empty).getOrElse(return None))
+      projectionOption(
+          t.aliasedType(TypingContext.empty).getOrElse(return None))
     case _ => None
   }
 
   /**
-   * Expands type aliases, including those in a type projection. Type Alias Declarations are replaced by their upper
-   * bound.
-   *
-   * @see http://youtrack.jetbrains.net/issue/SCL-2872
-   */
+    * Expands type aliases, including those in a type projection. Type Alias Declarations are replaced by their upper
+    * bound.
+    *
+    * @see http://youtrack.jetbrains.net/issue/SCL-2872
+    */
   // TODO This is all a bit ad-hoc. What can we learn from scalac?
   // TODO perhaps we need to choose the lower bound if we are in a contravariant position. We get away
   //      with this as we currently only rely on this method to determine covariant types: the parameter
   //      types of FunctionN, or the elements of TupleN
-  def expandAliases(tp: ScType, visited: HashSet[ScType] = HashSet.empty): TypeResult[ScType] = {
+  def expandAliases(
+      tp: ScType,
+      visited: HashSet[ScType] = HashSet.empty): TypeResult[ScType] = {
     if (visited contains tp) return Success(tp, None)
     tp match {
-      case proj@ScProjectionType(p, elem, _) => proj.actualElement match {
-        case t: ScTypeAliasDefinition if t.typeParameters.isEmpty =>
-          t.aliasedType(TypingContext.empty).flatMap(t => expandAliases(proj.actualSubst.subst(t), visited + tp))
-        case t: ScTypeAliasDeclaration if t.typeParameters.isEmpty  =>
-          t.upperBound.flatMap(upper => expandAliases(proj.actualSubst.subst(upper), visited + tp))
-        case _ => Success(tp, None)
-      }
-      case at: ScAbstractType => expandAliases(at.upper, visited + tp) // ugly hack for SCL-3592
+      case proj @ ScProjectionType(p, elem, _) =>
+        proj.actualElement match {
+          case t: ScTypeAliasDefinition if t.typeParameters.isEmpty =>
+            t.aliasedType(TypingContext.empty)
+              .flatMap(
+                  t => expandAliases(proj.actualSubst.subst(t), visited + tp))
+          case t: ScTypeAliasDeclaration if t.typeParameters.isEmpty =>
+            t.upperBound.flatMap(upper =>
+                  expandAliases(proj.actualSubst.subst(upper), visited + tp))
+          case _ => Success(tp, None)
+        }
+      case at: ScAbstractType =>
+        expandAliases(at.upper, visited + tp) // ugly hack for SCL-3592
       case ScDesignatorType(t: ScType) => expandAliases(t, visited + tp)
-      case ScDesignatorType(ta: ScTypeAliasDefinition) => expandAliases(ta.aliasedType(TypingContext.empty).getOrNothing, visited + tp)
+      case ScDesignatorType(ta: ScTypeAliasDefinition) =>
+        expandAliases(
+            ta.aliasedType(TypingContext.empty).getOrNothing, visited + tp)
       case t: ScTypeAliasDeclaration if t.typeParameters.isEmpty =>
         t.upperBound.flatMap(expandAliases(_, visited + tp))
       case t: ScTypeAliasDefinition if t.typeParameters.isEmpty =>
@@ -381,12 +447,15 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   }
 
   @tailrec
-  def removeAliasDefinitions(tp: ScType, visited: HashSet[ScType] = HashSet.empty, expandableOnly: Boolean = false): ScType = {
+  def removeAliasDefinitions(tp: ScType,
+                             visited: HashSet[ScType] = HashSet.empty,
+                             expandableOnly: Boolean = false): ScType = {
     if (visited.contains(tp)) return tp
     var updated = false
     val res = tp.recursiveUpdate { t =>
       t.isAliasType match {
-        case Some(AliasType(ta: ScTypeAliasDefinition, _, upper)) if !expandableOnly || ScTypePresentation.shouldExpand(ta) =>
+        case Some(AliasType(ta: ScTypeAliasDefinition, _, upper))
+            if !expandableOnly || ScTypePresentation.shouldExpand(ta) =>
           updated = true
           (true, upper.getOrAny)
         case _ => (false, t)
@@ -395,62 +464,75 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
     if (!updated) tp
     else removeAliasDefinitions(res, visited + tp, expandableOnly)
   }
-  
+
   /**
-   * Unwraps the method type corresponding to the parameter secion at index `n`.
-   *
-   * For example:
-   *
-   * def foo(a: Int)(b: String): Boolean
-   *
-   * nested(foo.methodType(...), 1) => MethodType(retType = Boolean, params = Seq(String))
-   */
+    * Unwraps the method type corresponding to the parameter secion at index `n`.
+    *
+    * For example:
+    *
+    * def foo(a: Int)(b: String): Boolean
+    *
+    * nested(foo.methodType(...), 1) => MethodType(retType = Boolean, params = Seq(String))
+    */
   @tailrec
   def nested(tpe: ScType, n: Int): Option[ScType] = {
     if (n == 0) Some(tpe)
-    else tpe match {
-      case mt: ScMethodType => nested(mt.returnType, n - 1)
-      case _ => None
-    }
+    else
+      tpe match {
+        case mt: ScMethodType => nested(mt.returnType, n - 1)
+        case _ => None
+      }
   }
 
   /**
-   * Creates a type that designates `element`. Usually this will be a ScDesignatorType, except for the
-   * special case when `element` represent a standard type, such as scala.Double.
-   *
-   * @see http://youtrack.jetbrains.net/issue/SCL-2913
-   */
+    * Creates a type that designates `element`. Usually this will be a ScDesignatorType, except for the
+    * special case when `element` represent a standard type, such as scala.Double.
+    *
+    * @see http://youtrack.jetbrains.net/issue/SCL-2913
+    */
   def designator(element: PsiNamedElement): ScType = {
     element match {
-      case td: ScClass => StdType.QualNameToType.getOrElse(td.qualifiedName, new ScDesignatorType(element))
+      case td: ScClass =>
+        StdType.QualNameToType.getOrElse(
+            td.qualifiedName, new ScDesignatorType(element))
       case _ =>
         val clazzOpt = element match {
           case p: ScClassParameter => Option(p.containingClass)
-          case _ => element.getContext match {
-            case _: ScTemplateBody | _: ScEarlyDefinitions =>
-              Option(ScalaPsiUtil.contextOfType(element, strict = true, classOf[ScTemplateDefinition]))
-            case _ => None
-          }
+          case _ =>
+            element.getContext match {
+              case _: ScTemplateBody | _: ScEarlyDefinitions =>
+                Option(
+                    ScalaPsiUtil.contextOfType(
+                        element, strict = true, classOf[ScTemplateDefinition]))
+              case _ => None
+            }
         }
 
         clazzOpt match {
-          case Some(clazz) => ScProjectionType(ScThisType(clazz), element, superReference = false)
+          case Some(clazz) =>
+            ScProjectionType(
+                ScThisType(clazz), element, superReference = false)
           case _ => new ScDesignatorType(element)
         }
     }
   }
 
-  def ofNamedElement(named: PsiElement, s: ScSubstitutor = ScSubstitutor.empty): Option[ScType] = {
+  def ofNamedElement(
+      named: PsiElement,
+      s: ScSubstitutor = ScSubstitutor.empty): Option[ScType] = {
     val baseType = named match {
       case p: ScPrimaryConstructor => None
       case e: ScFunction if e.isConstructor => None
       case e: ScFunction => e.returnType.toOption
       case e: ScBindingPattern => e.getType(TypingContext.empty).toOption
       case e: ScFieldId => e.getType(TypingContext.empty).toOption
-      case e: ScParameter => e.getRealParameterType(TypingContext.empty).toOption
+      case e: ScParameter =>
+        e.getRealParameterType(TypingContext.empty).toOption
       case e: PsiMethod if e.isConstructor => None
-      case e: PsiMethod =>  create(e.getReturnType, named.getProject, named.getResolveScope).toOption
-      case e: PsiVariable => create(e.getType, named.getProject, named.getResolveScope).toOption
+      case e: PsiMethod =>
+        create(e.getReturnType, named.getProject, named.getResolveScope).toOption
+      case e: PsiVariable =>
+        create(e.getType, named.getProject, named.getResolveScope).toOption
       case _ => None
     }
     baseType.map(s.subst)

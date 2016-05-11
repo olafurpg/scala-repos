@@ -20,8 +20,8 @@ package org.apache.spark.storage
 import org.apache.spark.SparkFunSuite
 
 /**
- * Test various functionalities in StorageUtils and StorageStatus.
- */
+  * Test various functionalities in StorageUtils and StorageStatus.
+  */
 class StorageSuite extends SparkFunSuite {
   private val memAndDisk = StorageLevel.MEMORY_AND_DISK
 
@@ -164,31 +164,49 @@ class StorageSuite extends SparkFunSuite {
   test("storage status containsBlock") {
     val status = storageStatus2
     // blocks that actually exist
-    assert(status.blocks.contains(TestBlockId("dan")) === status.containsBlock(TestBlockId("dan")))
-    assert(status.blocks.contains(TestBlockId("man")) === status.containsBlock(TestBlockId("man")))
-    assert(status.blocks.contains(RDDBlockId(0, 0)) === status.containsBlock(RDDBlockId(0, 0)))
-    assert(status.blocks.contains(RDDBlockId(1, 1)) === status.containsBlock(RDDBlockId(1, 1)))
-    assert(status.blocks.contains(RDDBlockId(2, 2)) === status.containsBlock(RDDBlockId(2, 2)))
-    assert(status.blocks.contains(RDDBlockId(2, 3)) === status.containsBlock(RDDBlockId(2, 3)))
-    assert(status.blocks.contains(RDDBlockId(2, 4)) === status.containsBlock(RDDBlockId(2, 4)))
+    assert(status.blocks.contains(TestBlockId("dan")) === status.containsBlock(
+            TestBlockId("dan")))
+    assert(status.blocks.contains(TestBlockId("man")) === status.containsBlock(
+            TestBlockId("man")))
+    assert(status.blocks.contains(RDDBlockId(0, 0)) === status.containsBlock(
+            RDDBlockId(0, 0)))
+    assert(status.blocks.contains(RDDBlockId(1, 1)) === status.containsBlock(
+            RDDBlockId(1, 1)))
+    assert(status.blocks.contains(RDDBlockId(2, 2)) === status.containsBlock(
+            RDDBlockId(2, 2)))
+    assert(status.blocks.contains(RDDBlockId(2, 3)) === status.containsBlock(
+            RDDBlockId(2, 3)))
+    assert(status.blocks.contains(RDDBlockId(2, 4)) === status.containsBlock(
+            RDDBlockId(2, 4)))
     // blocks that don't exist
-    assert(status.blocks.contains(TestBlockId("fan")) === status.containsBlock(TestBlockId("fan")))
-    assert(status.blocks.contains(RDDBlockId(100, 0)) === status.containsBlock(RDDBlockId(100, 0)))
+    assert(status.blocks.contains(TestBlockId("fan")) === status.containsBlock(
+            TestBlockId("fan")))
+    assert(status.blocks.contains(RDDBlockId(100, 0)) === status.containsBlock(
+            RDDBlockId(100, 0)))
   }
 
   test("storage status getBlock") {
     val status = storageStatus2
     // blocks that actually exist
-    assert(status.blocks.get(TestBlockId("dan")) === status.getBlock(TestBlockId("dan")))
-    assert(status.blocks.get(TestBlockId("man")) === status.getBlock(TestBlockId("man")))
-    assert(status.blocks.get(RDDBlockId(0, 0)) === status.getBlock(RDDBlockId(0, 0)))
-    assert(status.blocks.get(RDDBlockId(1, 1)) === status.getBlock(RDDBlockId(1, 1)))
-    assert(status.blocks.get(RDDBlockId(2, 2)) === status.getBlock(RDDBlockId(2, 2)))
-    assert(status.blocks.get(RDDBlockId(2, 3)) === status.getBlock(RDDBlockId(2, 3)))
-    assert(status.blocks.get(RDDBlockId(2, 4)) === status.getBlock(RDDBlockId(2, 4)))
+    assert(status.blocks.get(TestBlockId("dan")) === status.getBlock(
+            TestBlockId("dan")))
+    assert(status.blocks.get(TestBlockId("man")) === status.getBlock(
+            TestBlockId("man")))
+    assert(status.blocks.get(RDDBlockId(0, 0)) === status.getBlock(
+            RDDBlockId(0, 0)))
+    assert(status.blocks.get(RDDBlockId(1, 1)) === status.getBlock(
+            RDDBlockId(1, 1)))
+    assert(status.blocks.get(RDDBlockId(2, 2)) === status.getBlock(
+            RDDBlockId(2, 2)))
+    assert(status.blocks.get(RDDBlockId(2, 3)) === status.getBlock(
+            RDDBlockId(2, 3)))
+    assert(status.blocks.get(RDDBlockId(2, 4)) === status.getBlock(
+            RDDBlockId(2, 4)))
     // blocks that don't exist
-    assert(status.blocks.get(TestBlockId("fan")) === status.getBlock(TestBlockId("fan")))
-    assert(status.blocks.get(RDDBlockId(100, 0)) === status.getBlock(RDDBlockId(100, 0)))
+    assert(status.blocks.get(TestBlockId("fan")) === status.getBlock(
+            TestBlockId("fan")))
+    assert(status.blocks.get(RDDBlockId(100, 0)) === status.getBlock(
+            RDDBlockId(100, 0)))
   }
 
   test("storage status num[Rdd]Blocks") {
@@ -315,9 +333,12 @@ class StorageSuite extends SparkFunSuite {
 
   test("StorageUtils.getRddBlockLocations with multiple locations") {
     val storageStatuses = stockStorageStatuses
-    storageStatuses(0).addBlock(RDDBlockId(1, 0), BlockStatus(memAndDisk, 1L, 2L))
-    storageStatuses(0).addBlock(RDDBlockId(0, 4), BlockStatus(memAndDisk, 1L, 2L))
-    storageStatuses(2).addBlock(RDDBlockId(0, 0), BlockStatus(memAndDisk, 1L, 2L))
+    storageStatuses(0).addBlock(
+        RDDBlockId(1, 0), BlockStatus(memAndDisk, 1L, 2L))
+    storageStatuses(0).addBlock(
+        RDDBlockId(0, 4), BlockStatus(memAndDisk, 1L, 2L))
+    storageStatuses(2).addBlock(
+        RDDBlockId(0, 0), BlockStatus(memAndDisk, 1L, 2L))
     val blockLocations0 = StorageUtils.getRddBlockLocations(0, storageStatuses)
     val blockLocations1 = StorageUtils.getRddBlockLocations(1, storageStatuses)
     assert(blockLocations0.size === 5)
@@ -331,5 +352,4 @@ class StorageSuite extends SparkFunSuite {
     assert(blockLocations1(RDDBlockId(1, 1)) === Seq("duck:2"))
     assert(blockLocations1(RDDBlockId(1, 2)) === Seq("cat:3"))
   }
-
 }

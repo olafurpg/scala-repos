@@ -5,7 +5,6 @@ object Test extends App {
   def mkList2(x: Boolean) = List(x)
   mkList1(xs: _*)
 
-
   def f(x: Int*) = List(x: _*)
 
   def f(x: Boolean, y: Int*) = List(y: _*)
@@ -13,6 +12,5 @@ object Test extends App {
   def g[a](x: a*) = List(x: _*)
 
   f(true, 1, xs: _*)
-  g(1, xs:_*)
-
+  g(1, xs: _*)
 }

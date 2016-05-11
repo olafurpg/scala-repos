@@ -2,12 +2,12 @@ package scalaz
 
 ////
 /**
- * A type safe alternative to universal equality (`scala.Any#==`).
- *
- * @see [[scalaz.Equal.EqualLaw]]
- */
+  * A type safe alternative to universal equality (`scala.Any#==`).
+  *
+  * @see [[scalaz.Equal.EqualLaw]]
+  */
 ////
-trait Equal[F]  { self =>
+trait Equal[F] { self =>
   ////
   def equal(a1: F, a2: F): Boolean
 
@@ -51,7 +51,7 @@ object Equal {
     def equal(a1: A, a2: A): Boolean = a1 eq a2
   }
 
-  def equalBy[A, B: Equal](f: A => B): Equal[A] = Equal[B] contramap f
+  def equalBy[A, B : Equal](f: A => B): Equal[A] = Equal[B] contramap f
 
   implicit val equalContravariant: Divisible[Equal] = new Divisible[Equal] {
     def contramap[A, B](r: Equal[A])(f: B => A) = r.contramap(f)

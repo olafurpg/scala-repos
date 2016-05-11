@@ -22,7 +22,8 @@ package ragnarok
 package test
 
 object NoDataTestSuite extends PerfTestSuite {
-  val input = """
+  val input =
+    """
     | import std::stats::*
     | import std::time::*
     | 

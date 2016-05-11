@@ -1,12 +1,12 @@
 package akka.dispatch
 
-import akka.actor.{ Actor, Props }
-import akka.testkit.{ ImplicitSender, AkkaSpec }
+import akka.actor.{Actor, Props}
+import akka.testkit.{ImplicitSender, AkkaSpec}
 import com.typesafe.config.ConfigFactory
 
 object ForkJoinPoolStarvationSpec {
-  val config = ConfigFactory.parseString(
-    """
+  val config =
+    ConfigFactory.parseString("""
       |actorhang {
       |
       |  task-dispatcher {
@@ -37,10 +37,10 @@ object ForkJoinPoolStarvationSpec {
         sender ! "All fine"
     }
   }
-
 }
 
-class ForkJoinPoolStarvationSpec extends AkkaSpec(ForkJoinPoolStarvationSpec.config) with ImplicitSender {
+class ForkJoinPoolStarvationSpec
+    extends AkkaSpec(ForkJoinPoolStarvationSpec.config) with ImplicitSender {
   import ForkJoinPoolStarvationSpec._
 
   val Iterations = 1000
@@ -50,10 +50,13 @@ class ForkJoinPoolStarvationSpec extends AkkaSpec(ForkJoinPoolStarvationSpec.con
     "not starve tasks arriving from external dispatchers under high internal traffic" in {
       // Two busy actors that will occupy the threads of the dispatcher
       // Since they submit to the local task queue via fork, they can starve external submissions
-      system.actorOf(Props(new SelfBusyActor).withDispatcher("actorhang.task-dispatcher"))
-      system.actorOf(Props(new SelfBusyActor).withDispatcher("actorhang.task-dispatcher"))
+      system.actorOf(
+          Props(new SelfBusyActor).withDispatcher("actorhang.task-dispatcher"))
+      system.actorOf(
+          Props(new SelfBusyActor).withDispatcher("actorhang.task-dispatcher"))
 
-      val innocentActor = system.actorOf(Props(new InnocentActor).withDispatcher("actorhang.task-dispatcher"))
+      val innocentActor = system.actorOf(
+          Props(new InnocentActor).withDispatcher("actorhang.task-dispatcher"))
 
       for (_ ← 1 to Iterations) {
         // External task submission via the default dispatcher
@@ -61,6 +64,5 @@ class ForkJoinPoolStarvationSpec extends AkkaSpec(ForkJoinPoolStarvationSpec.con
         expectMsg("All fine")
       }
     }
-
   }
 }

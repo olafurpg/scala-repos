@@ -1,19 +1,19 @@
 /**
- * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.forkjoin.ThreadLocalRandom
-import akka.stream.{ OverflowStrategy, ActorMaterializer, ActorMaterializerSettings }
+import akka.stream.{OverflowStrategy, ActorMaterializer, ActorMaterializerSettings}
 import akka.stream.testkit._
 import akka.testkit.AkkaSpec
 
 class FlowBatchSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system)
-    .withInputBuffer(initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system).withInputBuffer(
+      initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -23,7 +23,11 @@ class FlowBatchSpec extends AkkaSpec {
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
-      Source.fromPublisher(publisher).batch(max = 2, seed = i ⇒ i)(aggregate = _ + _).to(Sink.fromSubscriber(subscriber)).run()
+      Source
+        .fromPublisher(publisher)
+        .batch(max = 2, seed = i ⇒ i)(aggregate = _ + _)
+        .to(Sink.fromSubscriber(subscriber))
+        .run()
       val sub = subscriber.expectSubscription()
 
       for (i ← 1 to 100) {
@@ -39,7 +43,12 @@ class FlowBatchSpec extends AkkaSpec {
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[List[Int]]()
 
-      Source.fromPublisher(publisher).batch(max = Long.MaxValue, seed = i ⇒ List(i))(aggregate = (ints, i) ⇒ i :: ints).to(Sink.fromSubscriber(subscriber)).run()
+      Source
+        .fromPublisher(publisher)
+        .batch(max = Long.MaxValue, seed = i ⇒ List(i))(aggregate = (ints,
+              i) ⇒ i :: ints)
+        .to(Sink.fromSubscriber(subscriber))
+        .run()
       val sub = subscriber.expectSubscription()
 
       for (i ← 1 to 10) {
@@ -54,7 +63,9 @@ class FlowBatchSpec extends AkkaSpec {
     "work on a variable rate chain" in {
       val future = Source(1 to 1000)
         .batch(max = 100, seed = i ⇒ i)(aggregate = (sum, i) ⇒ sum + i)
-        .map { i ⇒ if (ThreadLocalRandom.current().nextBoolean()) Thread.sleep(10); i }
+        .map { i ⇒
+          if (ThreadLocalRandom.current().nextBoolean()) Thread.sleep(10); i
+        }
         .runFold(0)(_ + _)
       Await.result(future, 10.seconds) should be(500500)
     }
@@ -63,7 +74,11 @@ class FlowBatchSpec extends AkkaSpec {
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
-      Source.fromPublisher(publisher).batch(max = 2, seed = i ⇒ i)(aggregate = _ + _).to(Sink.fromSubscriber(subscriber)).run()
+      Source
+        .fromPublisher(publisher)
+        .batch(max = 2, seed = i ⇒ i)(aggregate = _ + _)
+        .to(Sink.fromSubscriber(subscriber))
+        .run()
       val sub = subscriber.expectSubscription()
 
       sub.request(1)
@@ -85,7 +100,6 @@ class FlowBatchSpec extends AkkaSpec {
       sub.request(1)
       subscriber.expectNoMsg(500.millis)
       sub.cancel()
-
     }
 
     "work with a buffer and fold" in {
@@ -95,6 +109,5 @@ class FlowBatchSpec extends AkkaSpec {
         .runFold(0)(_ + _)
       Await.result(future, 3.seconds) should be((1 to 50).sum)
     }
-
   }
 }

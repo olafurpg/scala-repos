@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.typedarray
 
@@ -49,7 +49,7 @@ class TypedArrayConversionTest {
 
   @Test def convert_an_Uint16Array_to_a_scala_Array_Char(): Unit = {
     val data = js.Array((1 to 6).map(_ * 10000): _*)
-    val sum = (6*7/2*10000).toChar
+    val sum = (6 * 7 / 2 * 10000).toChar
 
     val x = new Uint16Array(data)
     val y = x.toArray
@@ -105,8 +105,7 @@ class TypedArrayConversionTest {
     assertTrue(y.isInstanceOf[Int8Array])
     assertEquals(x.length, y.length)
 
-    for (i <- 0 until y.length)
-      assertEquals(x(i), y(i))
+    for (i <- 0 until y.length) assertEquals(x(i), y(i))
 
     // Ensure its a copy
     x(0) = 0
@@ -115,14 +114,13 @@ class TypedArrayConversionTest {
 
   @Test def convert_a_scala_Array_Short__to_an_Int16Array(): Unit = {
     val x = ((Short.MinValue to (Short.MinValue + 1000)) ++
-            ((Short.MaxValue - 1000) to Short.MaxValue)).map(_.toShort).toArray
+        ((Short.MaxValue - 1000) to Short.MaxValue)).map(_.toShort).toArray
     val y = x.toTypedArray
 
     assertTrue(y.isInstanceOf[Int16Array])
     assertEquals(x.length, y.length)
 
-    for (i <- 0 until y.length)
-      assertEquals(x(i), y(i))
+    for (i <- 0 until y.length) assertEquals(x(i), y(i))
 
     // Ensure its a copy
     x(0) = 0
@@ -136,8 +134,7 @@ class TypedArrayConversionTest {
     assertTrue(y.isInstanceOf[Uint16Array])
     assertEquals(x.length, y.length)
 
-    for (i <- 0 until y.length)
-      assertEquals(x(i).toInt, y(i))
+    for (i <- 0 until y.length) assertEquals(x(i).toInt, y(i))
 
     // Ensure its a copy
     x(0) = 0
@@ -146,14 +143,13 @@ class TypedArrayConversionTest {
 
   @Test def convert_a_scala_Array_Int__to_an_Int32Array(): Unit = {
     val x = ((Int.MinValue to (Int.MinValue + 1000)) ++
-            ((Int.MaxValue - 1000) to Int.MaxValue)).toArray
+        ((Int.MaxValue - 1000) to Int.MaxValue)).toArray
     val y = x.toTypedArray
 
     assertTrue(y.isInstanceOf[Int32Array])
     assertEquals(x.length, y.length)
 
-    for (i <- 0 until y.length)
-      assertEquals(x(i), y(i))
+    for (i <- 0 until y.length) assertEquals(x(i), y(i))
 
     // Ensure its a copy
     x(0) = 0
@@ -167,8 +163,7 @@ class TypedArrayConversionTest {
     assertTrue(y.isInstanceOf[Float32Array])
     assertEquals(x.length, y.length)
 
-    for (i <- 0 until y.length)
-      assertEquals(x(i), y(i))
+    for (i <- 0 until y.length) assertEquals(x(i), y(i))
 
     // Ensure its a copy
     x(0) = 0
@@ -182,8 +177,7 @@ class TypedArrayConversionTest {
     assertTrue(y.isInstanceOf[Float64Array])
     assertEquals(x.length, y.length)
 
-    for (i <- 0 until y.length)
-      assertEquals(x(i), y(i))
+    for (i <- 0 until y.length) assertEquals(x(i), y(i))
 
     // Ensure its a copy
     x(0) = 0

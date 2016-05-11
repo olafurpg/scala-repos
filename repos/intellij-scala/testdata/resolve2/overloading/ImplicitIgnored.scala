@@ -4,5 +4,6 @@ object Test {
 
   implicit def str2int(x: String): Int = x.length
 
-  /* line: 2 */foo("")
+  /* line: 2 */
+  foo("")
 }

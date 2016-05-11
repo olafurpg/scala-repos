@@ -36,16 +36,16 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Shape Spec tests.
- *
- *
- */
+  * Shape Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ShapeSpec
-  extends SimpleSFXDelegateSpec[jfxss.Shape, Shape](classOf[jfxss.Shape], classOf[Shape]) {
+    extends SimpleSFXDelegateSpec[jfxss.Shape, Shape](
+        classOf[jfxss.Shape], classOf[Shape]) {
 
   override protected def getScalaClassInstance = new Rectangle
 
   override def getJavaClassInstance = new jfxss.Rectangle
-
 }

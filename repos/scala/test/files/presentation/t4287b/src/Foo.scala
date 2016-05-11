@@ -1,6 +1,6 @@
 trait Greeting {
   val name: String
-  val msg = "How are you, "+name
+  val msg = "How are you, " + name
 }
 
 object Greeting {
@@ -11,5 +11,5 @@ class C(i: Int) extends {
   val nameElse = "Bob"
 } with Greeting {
   val name = "avc"
-  println(i/*#*/)
+  println(i /*#*/ )
 }

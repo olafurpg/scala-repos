@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.core.BasePreparator
@@ -31,7 +30,7 @@ import scala.reflect._
   * @group Preparator
   */
 abstract class LPreparator[TD, PD : ClassTag]
-  extends BasePreparator[RDD[TD], RDD[PD]] {
+    extends BasePreparator[RDD[TD], RDD[PD]] {
 
   def prepareBase(sc: SparkContext, rddTd: RDD[TD]): RDD[PD] = {
     rddTd.map(prepare)

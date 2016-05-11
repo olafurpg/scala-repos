@@ -1,9 +1,10 @@
 package org.jetbrains.plugins.scala.codeInspection.collections
 
 /**
- * @author Nikolay.Tropin
- */
-class ComparingDiffCollectionKindsTest extends OperationsOnCollectionInspectionTest {
+  * @author Nikolay.Tropin
+  */
+class ComparingDiffCollectionKindsTest
+    extends OperationsOnCollectionInspectionTest {
   import org.jetbrains.plugins.scala.codeInspection.collections.ComparingDiffCollectionKinds.convertHint
   override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
     classOf[ComparingDiffCollectionKindsInspection]

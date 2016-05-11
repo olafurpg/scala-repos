@@ -19,9 +19,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.overrideImplement.ScalaOIUtil
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
   def handleInsert(context: InsertionContext, item: LookupElement) {
     val editor = context.getEditor
@@ -43,26 +42,33 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
           editor.getCaretModel.moveToOffset(endOffset)
           context.setLaterRunnable(new Runnable {
             def run() {
-              AutoPopupController.getInstance(context.getProject).scheduleAutoPopup(
-                context.getEditor, new Condition[PsiFile] {
-                  def value(t: PsiFile): Boolean = t == context.getFile
-                }
-              )
+              AutoPopupController
+                .getInstance(context.getProject)
+                .scheduleAutoPopup(
+                    context.getEditor,
+                    new Condition[PsiFile] {
+                      def value(t: PsiFile): Boolean = t == context.getFile
+                    }
+                )
             }
           })
         }
-      case item@ScalaLookupItem(clazz: PsiClass) =>
+      case item @ ScalaLookupItem(clazz: PsiClass) =>
         val isRenamed = item.isRenamed.isDefined
         var hasNonEmptyParams = false
         clazz match {
           case c: ScClass =>
             c.constructor match {
-              case Some(constr) if constr.parameters.nonEmpty => hasNonEmptyParams = true
+              case Some(constr) if constr.parameters.nonEmpty =>
+                hasNonEmptyParams = true
               case _ =>
             }
-            c.secondaryConstructors.foreach(fun => if (fun.parameters.nonEmpty) hasNonEmptyParams = true)
+            c.secondaryConstructors.foreach(
+                fun => if (fun.parameters.nonEmpty) hasNonEmptyParams = true)
           case _ =>
-            clazz.getConstructors.foreach(meth => if (meth.getParameterList.getParametersCount > 0) hasNonEmptyParams = true)
+            clazz.getConstructors.foreach(meth =>
+                  if (meth.getParameterList.getParametersCount > 0)
+                    hasNonEmptyParams = true)
         }
         if (context.getCompletionChar == '(') hasNonEmptyParams = true
         if (item.typeParametersProblem) {
@@ -70,7 +76,9 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
           endOffset += 2
           editor.getCaretModel.moveToOffset(endOffset - 1)
         } else if (item.typeParameters.nonEmpty) {
-          val str = item.typeParameters.map(ScType.canonicalText).mkString("[", ", ", "]")
+          val str = item.typeParameters
+            .map(ScType.canonicalText)
+            .mkString("[", ", ", "]")
           document.insertString(endOffset, str)
           endOffset += str.length()
           editor.getCaretModel.moveToOffset(endOffset)
@@ -83,16 +91,19 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
         }
 
         if (clazz.isInterface || clazz.isInstanceOf[ScTrait] ||
-          clazz.hasModifierPropertyScala("abstract")) {
+            clazz.hasModifierPropertyScala("abstract")) {
           document.insertString(endOffset, " {}")
           endOffset += 3
           if (!item.typeParametersProblem)
             editor.getCaretModel.moveToOffset(endOffset - 1)
         }
-        PsiDocumentManager.getInstance(context.getProject).commitDocument(document)
+        PsiDocumentManager
+          .getInstance(context.getProject)
+          .commitDocument(document)
         val file = context.getFile
         val element = file.findElementAt(endOffset - 1)
-        val newT = PsiTreeUtil.getParentOfType(element, classOf[ScNewTemplateDefinition])
+        val newT = PsiTreeUtil.getParentOfType(
+            element, classOf[ScNewTemplateDefinition])
         if (newT != null) {
           newT.extendsBlock.templateParents match {
             case Some(tp: ScTemplateParents) =>
@@ -101,17 +112,24 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
                 val element: ScTypeElement = elements.head
                 val ref: ScStableCodeReferenceElement = element match {
                   case simple: ScSimpleTypeElement => simple.reference.orNull
-                  case par: ScParameterizedTypeElement => par.typeElement match {
-                    case simple: ScSimpleTypeElement => simple.reference.orNull
-                    case _ => null
-                  }
+                  case par: ScParameterizedTypeElement =>
+                    par.typeElement match {
+                      case simple: ScSimpleTypeElement =>
+                        simple.reference.orNull
+                      case _ => null
+                    }
                   case _ => null
                 }
                 if (ref != null && !isRenamed) {
                   if (item.prefixCompletion) {
-                    val newRefText = clazz.qualifiedName.split('.').takeRight(2).mkString(".")
-                    val newRef = ScalaPsiElementFactory.createReferenceFromText(newRefText, clazz.getManager)
-                    val replaced = ref.replace(newRef).asInstanceOf[ScStableCodeReferenceElement]
+                    val newRefText =
+                      clazz.qualifiedName.split('.').takeRight(2).mkString(".")
+                    val newRef =
+                      ScalaPsiElementFactory.createReferenceFromText(
+                          newRefText, clazz.getManager)
+                    val replaced = ref
+                      .replace(newRef)
+                      .asInstanceOf[ScStableCodeReferenceElement]
                     replaced.bindToElement(clazz)
                   } else {
                     ref.bindToElement(clazz)
@@ -124,7 +142,8 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
         }
 
         if ((clazz.isInterface || clazz.isInstanceOf[ScTrait] ||
-          clazz.hasModifierPropertyScala("abstract")) && !item.typeParametersProblem) {
+                clazz.hasModifierPropertyScala("abstract")) &&
+            !item.typeParametersProblem) {
           context.setLaterRunnable(new Runnable {
             def run() {
               val file = context.getFile
@@ -133,9 +152,13 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
 
               element.getParent match {
                 case (_: ScTemplateBody) childOf ((_: ScExtendsBlock) childOf (newTemplateDef: ScNewTemplateDefinition)) =>
-                  val members = ScalaOIUtil.getMembersToImplement(newTemplateDef)
-                  ScalaOIUtil.runAction(members.toSeq, isImplement = true, newTemplateDef, editor)
-                case _ => 
+                  val members =
+                    ScalaOIUtil.getMembersToImplement(newTemplateDef)
+                  ScalaOIUtil.runAction(members.toSeq,
+                                        isImplement = true,
+                                        newTemplateDef,
+                                        editor)
+                case _ =>
               }
             }
           })

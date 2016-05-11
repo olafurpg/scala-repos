@@ -1,28 +1,23 @@
-
-
-
 import scala.math.Ordering
 
-
-
 /** The heart of the problem - we want to retain the ordering when
- *  using `++` on sorted maps.
- *
- *  There are 2 `++` overloads - a generic one in traversables and
- *  a map-specific one in `MapLike` - which knows about the ordering.
- *
- *  The problem here is that the expected return type for the expression
- *  in which `++` appears drives the decision of the overload that needs
- *  to be taken.
- *  The `collection.SortedMap` does not have `++` overridden to return
- *  `SortedMap`, but `immutable.Map` instead.
- *  This is why `collection.SortedMap` used to resort to the generic
- *  `TraversableLike.++` which knows nothing about the ordering.
- *
- *  To avoid `collection.SortedMap`s resort to the more generic `TraverableLike.++`,
- *  we override the `MapLike.++` overload in `collection.SortedMap` to return
- *  the proper type `SortedMap`.
- */
+  *  using `++` on sorted maps.
+  *
+  *  There are 2 `++` overloads - a generic one in traversables and
+  *  a map-specific one in `MapLike` - which knows about the ordering.
+  *
+  *  The problem here is that the expected return type for the expression
+  *  in which `++` appears drives the decision of the overload that needs
+  *  to be taken.
+  *  The `collection.SortedMap` does not have `++` overridden to return
+  *  `SortedMap`, but `immutable.Map` instead.
+  *  This is why `collection.SortedMap` used to resort to the generic
+  *  `TraversableLike.++` which knows nothing about the ordering.
+  *
+  *  To avoid `collection.SortedMap`s resort to the more generic `TraverableLike.++`,
+  *  we override the `MapLike.++` overload in `collection.SortedMap` to return
+  *  the proper type `SortedMap`.
+  */
 object Test {
 
   def main(args: Array[String]) {

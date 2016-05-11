@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js IR                **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js IR                **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.ir
 
@@ -16,11 +15,11 @@ import Infos._
 object InfoSerializers {
 
   /** Scala.js IR File Magic Number
-   *
-   *    CA FE : first part of magic number of Java class files
-   *    4A 53 : "JS" in ASCII
-   *
-   */
+    *
+    *    CA FE : first part of magic number of Java class files
+    *    4A 53 : "JS" in ASCII
+    *
+    */
   final val IRMagicNumber = 0xCAFE4A53
 
   def serialize(stream: OutputStream, classInfo: ClassInfo): Unit = {
@@ -117,34 +116,43 @@ object InfoSerializers {
         val isAbstract = readBoolean()
         val isExported = readBoolean()
         val methodsCalled = readList(readUTF() -> readStrings()).toMap
-        val methodsCalledStatically = readList(readUTF() -> readStrings()).toMap
+        val methodsCalledStatically =
+          readList(readUTF() -> readStrings()).toMap
         val staticMethodsCalled = readList(readUTF() -> readStrings()).toMap
         val instantiatedClasses = readStrings()
         val accessedModules = readStrings()
         val usedInstanceTests = readStrings()
         val accessedClassData = readStrings()
-        MethodInfo(encodedName, isStatic, isAbstract, isExported,
-            methodsCalled, methodsCalledStatically, staticMethodsCalled,
-            instantiatedClasses, accessedModules, usedInstanceTests,
-            accessedClassData)
+        MethodInfo(encodedName,
+                   isStatic,
+                   isAbstract,
+                   isExported,
+                   methodsCalled,
+                   methodsCalledStatically,
+                   staticMethodsCalled,
+                   instantiatedClasses,
+                   accessedModules,
+                   usedInstanceTests,
+                   accessedClassData)
       }
 
       val methods0 = readList(readMethod())
-      val methods = if (useHacks065) {
-        methods0.filter(m => !Definitions.isReflProxyName(m.encodedName))
-      } else {
-        methods0
-      }
+      val methods =
+        if (useHacks065) {
+          methods0.filter(m => !Definitions.isReflProxyName(m.encodedName))
+        } else {
+          methods0
+        }
 
-      val info = ClassInfo(encodedName, isExported, kind,
-          superClass, interfaces, methods)
+      val info = ClassInfo(
+          encodedName, isExported, kind, superClass, interfaces, methods)
 
       (version, info)
     }
 
     /** Reads the Scala.js IR header and verifies the version compatibility.
-     *  Returns the emitted binary version.
-     */
+      *  Returns the emitted binary version.
+      */
     def readHeader(): String = {
       // Check magic number
       if (input.readInt() != IRMagicNumber)
@@ -154,7 +162,9 @@ object InfoSerializers {
       val version = input.readUTF()
       val supported = ScalaJSVersions.binarySupported
       if (!supported.contains(version)) {
-        throw new IRVersionNotSupportedException(version, supported,
+        throw new IRVersionNotSupportedException(
+            version,
+            supported,
             s"This version ($version) of Scala.js IR is not supported. " +
             s"Supported versions are: ${supported.mkString(", ")}")
       }

@@ -20,14 +20,15 @@ package org.apache.spark.util.collection
 import scala.reflect.ClassTag
 
 /**
- * An append-only buffer similar to ArrayBuffer, but more memory-efficient for small buffers.
- * ArrayBuffer always allocates an Object array to store the data, with 16 entries by default,
- * so it has about 80-100 bytes of overhead. In contrast, CompactBuffer can keep up to two
- * elements in fields of the main object, and only allocates an Array[AnyRef] if there are more
- * entries than that. This makes it more efficient for operations like groupBy where we expect
- * some keys to have very few elements.
- */
-private[spark] class CompactBuffer[T: ClassTag] extends Seq[T] with Serializable {
+  * An append-only buffer similar to ArrayBuffer, but more memory-efficient for small buffers.
+  * ArrayBuffer always allocates an Object array to store the data, with 16 entries by default,
+  * so it has about 80-100 bytes of overhead. In contrast, CompactBuffer can keep up to two
+  * elements in fields of the main object, and only allocates an Array[AnyRef] if there are more
+  * entries than that. This makes it more efficient for operations like groupBy where we expect
+  * some keys to have very few elements.
+  */
+private[spark] class CompactBuffer[T : ClassTag]
+    extends Seq[T] with Serializable {
   // First two elements
   private var element0: T = _
   private var element1: T = _
@@ -64,7 +65,7 @@ private[spark] class CompactBuffer[T: ClassTag] extends Seq[T] with Serializable
     }
   }
 
-  def += (value: T): CompactBuffer[T] = {
+  def +=(value: T): CompactBuffer[T] = {
     val newIndex = curSize
     if (newIndex == 0) {
       element0 = value
@@ -79,7 +80,7 @@ private[spark] class CompactBuffer[T: ClassTag] extends Seq[T] with Serializable
     this
   }
 
-  def ++= (values: TraversableOnce[T]): CompactBuffer[T] = {
+  def ++=(values: TraversableOnce[T]): CompactBuffer[T] = {
     values match {
       // Optimize merging of CompactBuffers, used in cogroup and groupByKey
       case compactBuf: CompactBuffer[T] =>
@@ -127,7 +128,8 @@ private[spark] class CompactBuffer[T: ClassTag] extends Seq[T] with Serializable
   /** Increase our size to newSize and grow the backing array if needed. */
   private def growToSize(newSize: Int): Unit = {
     if (newSize < 0) {
-      throw new UnsupportedOperationException("Can't grow buffer past Int.MaxValue elements")
+      throw new UnsupportedOperationException(
+          "Can't grow buffer past Int.MaxValue elements")
     }
     val capacity = if (otherElements != null) otherElements.length + 2 else 2
     if (newSize > capacity) {
@@ -152,9 +154,9 @@ private[spark] class CompactBuffer[T: ClassTag] extends Seq[T] with Serializable
 }
 
 private[spark] object CompactBuffer {
-  def apply[T: ClassTag](): CompactBuffer[T] = new CompactBuffer[T]
+  def apply[T : ClassTag](): CompactBuffer[T] = new CompactBuffer[T]
 
-  def apply[T: ClassTag](value: T): CompactBuffer[T] = {
+  def apply[T : ClassTag](value: T): CompactBuffer[T] = {
     val buf = new CompactBuffer[T]
     buf += value
   }

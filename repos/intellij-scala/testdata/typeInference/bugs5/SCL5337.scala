@@ -10,7 +10,7 @@ abstract class A {
 
   def foo(): Z
 
-
-  /*start*/foo().foo()/*end*/
+  /*start*/
+  foo().foo() /*end*/
 }
 //Int

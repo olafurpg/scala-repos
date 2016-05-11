@@ -15,17 +15,21 @@ import com.typesafe.config.{ConfigFactory, Config}
 trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
 
   /** The external interface of this profile which defines the API. */
-  @deprecated("Use the Profile object directly instead of calling `.profile` on it", "3.2")
+  @deprecated(
+      "Use the Profile object directly instead of calling `.profile` on it",
+      "3.2")
   val profile: BasicProfile = this
 
   /** The back-end type required by this profile */
   type Backend <: BasicBackend
+
   /** The back-end implementation for this profile */
   val backend: Backend
 
   /** The capabilities supported by this profile. This can be used to query at
     * runtime whether a specific feature is supported. */
   final val capabilities: Set[Capability] = computeCapabilities
+
   /** Compute the capabilities. This should be overridden in subclasses as needed. */
   protected def computeCapabilities: Set[Capability] = Set.empty
 
@@ -50,22 +54,39 @@ trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
     @deprecated("User `slickProfile` instead of `slickDriver`", "3.2")
     val slickDriver: self.type = slickProfile
 
-    implicit final def anyToShapedValue[T, U](value: T)(implicit shape: Shape[_ <: FlatShapeLevel, T, U, _]): ShapedValue[T, U] =
+    implicit final def anyToShapedValue[T, U](
+        value: T)(implicit shape: Shape[_ <: FlatShapeLevel, T, U, _])
+      : ShapedValue[T, U] =
       new ShapedValue[T, U](value, shape)
 
-    implicit def repQueryActionExtensionMethods[U](rep: Rep[U]): QueryActionExtensionMethods[U, NoStream] =
-      createQueryActionExtensionMethods[U, NoStream](queryCompiler.run(rep.toNode).tree, ())
-    implicit def streamableQueryActionExtensionMethods[U, C[_]](q: Query[_,U, C]): StreamingQueryActionExtensionMethods[C[U], U] =
-      createStreamingQueryActionExtensionMethods[C[U], U](queryCompiler.run(q.toNode).tree, ())
-    implicit def runnableCompiledQueryActionExtensionMethods[RU](c: RunnableCompiled[_, RU]): QueryActionExtensionMethods[RU, NoStream] =
+    implicit def repQueryActionExtensionMethods[U](
+        rep: Rep[U]): QueryActionExtensionMethods[U, NoStream] =
+      createQueryActionExtensionMethods[U, NoStream](
+          queryCompiler.run(rep.toNode).tree, ())
+    implicit def streamableQueryActionExtensionMethods[U, C[_]](
+        q: Query[_, U, C]): StreamingQueryActionExtensionMethods[C[U], U] =
+      createStreamingQueryActionExtensionMethods[C[U], U](
+          queryCompiler.run(q.toNode).tree, ())
+    implicit def runnableCompiledQueryActionExtensionMethods[RU](
+        c: RunnableCompiled[_, RU])
+      : QueryActionExtensionMethods[RU, NoStream] =
       createQueryActionExtensionMethods[RU, NoStream](c.compiledQuery, c.param)
-    implicit def streamableCompiledQueryActionExtensionMethods[RU, EU](c: StreamableCompiled[_, RU, EU]): StreamingQueryActionExtensionMethods[RU, EU] =
-      createStreamingQueryActionExtensionMethods[RU, EU](c.compiledQuery, c.param)
+    implicit def streamableCompiledQueryActionExtensionMethods[RU, EU](
+        c: StreamableCompiled[_, RU, EU])
+      : StreamingQueryActionExtensionMethods[RU, EU] =
+      createStreamingQueryActionExtensionMethods[RU, EU](
+          c.compiledQuery, c.param)
     // Applying a CompiledFunction always results in only a RunnableCompiled, not a StreamableCompiled, so we need this:
-    implicit def streamableAppliedCompiledFunctionActionExtensionMethods[R, RU, EU, C[_]](c: AppliedCompiledFunction[_, Query[R, EU, C], RU]): StreamingQueryActionExtensionMethods[RU, EU] =
-      createStreamingQueryActionExtensionMethods[RU, EU](c.compiledQuery, c.param)
-    implicit def recordQueryActionExtensionMethods[M, R](q: M)(implicit shape: Shape[_ <: FlatShapeLevel, M, R, _]): QueryActionExtensionMethods[R, NoStream] =
-      createQueryActionExtensionMethods[R, NoStream](queryCompiler.run(shape.toNode(q)).tree, ())
+    implicit def streamableAppliedCompiledFunctionActionExtensionMethods[
+        R, RU, EU, C[_]](c: AppliedCompiledFunction[_, Query[R, EU, C], RU])
+      : StreamingQueryActionExtensionMethods[RU, EU] =
+      createStreamingQueryActionExtensionMethods[RU, EU](
+          c.compiledQuery, c.param)
+    implicit def recordQueryActionExtensionMethods[M, R](q: M)(
+        implicit shape: Shape[_ <: FlatShapeLevel, M, R, _])
+      : QueryActionExtensionMethods[R, NoStream] =
+      createQueryActionExtensionMethods[R, NoStream](
+          queryCompiler.run(shape.toNode(q)).tree, ())
   }
 
   /** The API for using the query language with a single import
@@ -109,54 +130,69 @@ trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
     def findConfigName(classes: Vector[Class[_]]): Option[String] =
       classes.iterator.map { cl =>
         val n = cl.getName
-        if(n.startsWith("slick.") && n.endsWith("Profile")) Some(n) else None
+        if (n.startsWith("slick.") && n.endsWith("Profile")) Some(n) else None
       }.find(_.isDefined).getOrElse {
-        val parents = classes.flatMap { cl => Option(cl.getSuperclass) ++: cl.getInterfaces.toVector }
-        if(parents.isEmpty) None else findConfigName(parents)
+        val parents = classes.flatMap { cl =>
+          Option(cl.getSuperclass) ++: cl.getInterfaces.toVector
+        }
+        if (parents.isEmpty) None else findConfigName(parents)
       }
     GlobalConfig.profileConfig(findConfigName(Vector(getClass)).get)
   }
 
   override def toString = {
     val n = getClass.getName
-    if(n.startsWith("slick.") && n.endsWith("Profile$")) n
+    if (n.startsWith("slick.") && n.endsWith("Profile$")) n
     else super.toString
   }
 }
 
 trait BasicActionComponent { self: BasicProfile =>
 
-  type ProfileAction[+R, +S <: NoStream, -E <: Effect] <: BasicAction[R, S, E]
-  type StreamingProfileAction[+R, +T, -E <: Effect] <: BasicStreamingAction[R, T, E] with ProfileAction[R, Streaming[T], E]
+  type ProfileAction [+R, +S <: NoStream, -E <: Effect] <: BasicAction[R, S, E]
+  type StreamingProfileAction [+R, +T, -E <: Effect] <: BasicStreamingAction[
+      R, T, E] with ProfileAction[R, Streaming[T], E]
 
   @deprecated("Use `ProfileAction` instead of `DriverAction`", "3.2")
-  final type DriverAction[+R, +S <: NoStream, -E <: Effect] = ProfileAction[R, S, E]
-  @deprecated("Use `StreamingProfileAction` instead of `StreamingDriverAction`", "3.2")
-  final type StreamingDriverAction[+R, +T, -E <: Effect] = StreamingProfileAction[R, T, E]
+  final type DriverAction[+R, +S <: NoStream, -E <: Effect] = ProfileAction[
+      R, S, E]
+  @deprecated(
+      "Use `StreamingProfileAction` instead of `StreamingDriverAction`", "3.2")
+  final type StreamingDriverAction[+R, +T, -E <: Effect] = StreamingProfileAction[
+      R, T, E]
 
   //////////////////////////////////////////////////////////// Query Actions
 
-  type QueryActionExtensionMethods[R, S <: NoStream] <: QueryActionExtensionMethodsImpl[R, S]
-  type StreamingQueryActionExtensionMethods[R, T] <: StreamingQueryActionExtensionMethodsImpl[R, T]
+  type QueryActionExtensionMethods [R,
+  S <: NoStream] <: QueryActionExtensionMethodsImpl[R, S]
+  type StreamingQueryActionExtensionMethods [R,
+  T] <: StreamingQueryActionExtensionMethodsImpl[R, T]
 
-  def createQueryActionExtensionMethods[R, S <: NoStream](tree: Node, param: Any): QueryActionExtensionMethods[R, S]
-  def createStreamingQueryActionExtensionMethods[R, T](tree: Node, param: Any): StreamingQueryActionExtensionMethods[R, T]
+  def createQueryActionExtensionMethods[R, S <: NoStream](
+      tree: Node, param: Any): QueryActionExtensionMethods[R, S]
+  def createStreamingQueryActionExtensionMethods[R, T](
+      tree: Node, param: Any): StreamingQueryActionExtensionMethods[R, T]
 
   trait QueryActionExtensionMethodsImpl[R, S <: NoStream] {
+
     /** An Action that runs this query. */
     def result: ProfileAction[R, S, Effect.Read]
   }
 
-  trait StreamingQueryActionExtensionMethodsImpl[R, T] extends QueryActionExtensionMethodsImpl[R, Streaming[T]] {
+  trait StreamingQueryActionExtensionMethodsImpl[R, T]
+      extends QueryActionExtensionMethodsImpl[R, Streaming[T]] {
     def result: StreamingProfileAction[R, T, Effect.Read]
   }
 }
 
-trait BasicAction[+R, +S <: NoStream, -E <: Effect] extends DatabaseAction[R, S, E] {
-  type ResultAction[+R, +S <: NoStream, -E <: Effect] <: BasicAction[R, S, E]
+trait BasicAction[+R, +S <: NoStream, -E <: Effect]
+    extends DatabaseAction[R, S, E] {
+  type ResultAction [+R, +S <: NoStream, -E <: Effect] <: BasicAction[R, S, E]
 }
 
-trait BasicStreamingAction[+R, +T, -E <: Effect] extends BasicAction[R, Streaming[T], E] {
+trait BasicStreamingAction[+R, +T, -E <: Effect]
+    extends BasicAction[R, Streaming[T], E] {
+
   /** Create an Action that returns only the first value of this stream of data. The Action will
     * fail if the stream is empty. Only available on streaming Actions. */
   def head: ResultAction[T, NoStream, E]
@@ -166,8 +202,11 @@ trait BasicStreamingAction[+R, +T, -E <: Effect] extends BasicAction[R, Streamin
   def headOption: ResultAction[Option[T], NoStream, E]
 }
 
-trait FixedBasicAction[+R, +S <: NoStream, -E <: Effect] extends BasicAction[R, S, E] {
+trait FixedBasicAction[+R, +S <: NoStream, -E <: Effect]
+    extends BasicAction[R, S, E] {
   type ResultAction[+R, +S <: NoStream, -E <: Effect] = BasicAction[R, S, E]
 }
 
-trait FixedBasicStreamingAction[+R, +T, -E <: Effect] extends BasicStreamingAction[R, T, E] with FixedBasicAction[R, Streaming[T], E]
+trait FixedBasicStreamingAction[+R, +T, -E <: Effect]
+    extends BasicStreamingAction[R, T, E]
+    with FixedBasicAction[R, Streaming[T], E]

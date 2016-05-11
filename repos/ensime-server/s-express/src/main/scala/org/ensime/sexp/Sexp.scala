@@ -6,13 +6,13 @@ import collection.breakOut
 import scala.collection.immutable.ListMap
 
 /**
- * An S-Expression is either
- *
- * 1. an atom (i.e. symbol, string, number)
- * 2. of the form `(x . y)` where `x` and `y` are S-Expressions (i.e. cons)
- *
- * Everything else is just sugar.
- */
+  * An S-Expression is either
+  *
+  * 1. an atom (i.e. symbol, string, number)
+  * 2. of the form `(x . y)` where `x` and `y` are S-Expressions (i.e. cons)
+  *
+  * Everything else is just sugar.
+  */
 sealed abstract class Sexp {
   //  override def toString = compactPrint
   def compactPrint = SexpCompactPrinter(this)
@@ -76,20 +76,22 @@ object SexpList {
 }
 
 /**
- * Sugar for (:k1 v1 :k2 v2)
- * [keyword symbols](https://www.gnu.org/software/emacs/manual/html_node/elisp/Symbol-Type.html):
- */
+  * Sugar for (:k1 v1 :k2 v2)
+  * [keyword symbols](https://www.gnu.org/software/emacs/manual/html_node/elisp/Symbol-Type.html):
+  */
 object SexpData {
   def apply(kvs: (SexpSymbol, Sexp)*): Sexp = apply(kvs.toList)
 
   def apply(kvs: List[(SexpSymbol, Sexp)]): Sexp =
-    if (kvs.isEmpty)
-      SexpNil
+    if (kvs.isEmpty) SexpNil
     else {
       val mapped = kvs.toMap
-      require(mapped.size == kvs.size, "duplicate keys not allowed: " + mapped.keys)
-      require(mapped.keys.forall(_.value.startsWith(":")), "keys must start with ':' " + mapped.keys)
-      SexpList(kvs.flatMap { case (k, v) => k :: v :: Nil }(breakOut): List[Sexp])
+      require(mapped.size == kvs.size,
+              "duplicate keys not allowed: " + mapped.keys)
+      require(mapped.keys.forall(_.value.startsWith(":")),
+              "keys must start with ':' " + mapped.keys)
+      SexpList(
+          kvs.flatMap { case (k, v) => k :: v :: Nil }(breakOut): List[Sexp])
     }
 
   def unapply(sexp: Sexp): Option[Map[SexpSymbol, Sexp]] = sexp match {
@@ -107,10 +109,8 @@ object SexpData {
       }
       // props.size counts unique keys. We only create data when keys
       // are not duplicated or we could introduce losses
-      if (values.isEmpty || 2 * props.size != values.size)
-        None
-      else
-        Some(props)
+      if (values.isEmpty || 2 * props.size != values.size) None
+      else Some(props)
 
     case _ => None
   }

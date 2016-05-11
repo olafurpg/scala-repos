@@ -8,7 +8,11 @@ import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.Se
   * @author Roman.Shein
   *         Date: 24.12.2015
   */
-class ScalaOptionPostfixTemplate extends ScalaStringBasedPostfixTemplate("Option", "Option(expr)",
-  new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
-  override def getTemplateString(element: PsiElement): String = "Option($expr$)"
+class ScalaOptionPostfixTemplate
+    extends ScalaStringBasedPostfixTemplate(
+        "Option",
+        "Option(expr)",
+        new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
+  override def getTemplateString(element: PsiElement): String =
+    "Option($expr$)"
 }

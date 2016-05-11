@@ -1,12 +1,12 @@
 object Test extends App {
- trait A
- trait B extends A
+  trait A
+  trait B extends A
 
   trait C {
     type U
     trait D { type T >: B <: A }
     type V <: D
-    val y: V#T = new B { }
+    val y: V#T = new B {}
   }
 
   trait Middle extends C {
@@ -17,7 +17,7 @@ object Test extends App {
     trait E
     trait F { type T = E }
     type U = F
-    def frob(arg : E) : E = arg
+    def frob(arg: E): E = arg
     frob(y)
   }
 

@@ -5,7 +5,8 @@ object Test extends App {
 
   val pds = info.getPropertyDescriptors
   for (pd <- pds) {
-    println(s"${pd.getName} -- ${pd.getPropertyType} -- ${pd.getReadMethod} -- ${pd.getWriteMethod}")
+    println(
+        s"${pd.getName} -- ${pd.getPropertyType} -- ${pd.getReadMethod} -- ${pd.getWriteMethod}")
   }
 
   println("method descriptors")

@@ -1,7 +1,7 @@
 trait Ops { self: MyCodes =>
   abstract class Instru
   object opcodes {
-    case class SWITCH(i:Int) extends Instru
+    case class SWITCH(i: Int) extends Instru
     case object EmptyInstr extends Instru
   }
 }
@@ -18,5 +18,4 @@ trait Blox { self: MyCodes =>
   }
 }
 
-abstract class MyCodes extends AnyRef with Ops with Blox {
-}
+abstract class MyCodes extends AnyRef with Ops with Blox {}

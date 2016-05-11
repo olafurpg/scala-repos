@@ -1,5 +1,5 @@
 object Test2 {
- def test[X](name: String) = 12
+  def test[X](name: String) = 12
 }
 class strangeTest(x: Int) extends scala.annotation.StaticAnnotation
 

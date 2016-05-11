@@ -7,44 +7,43 @@ import reflect.macros._
 
 import Def.Initialize
 import sbt.internal.util.complete.Parser
-import sbt.internal.util.appmacro.{ Convert, Converted }
+import sbt.internal.util.appmacro.{Convert, Converted}
 
 object InputInitConvert extends Convert {
-  def apply[T: c.WeakTypeTag](c: Context)(nme: String, in: c.Tree): Converted[c.type] =
-    if (nme == InputWrapper.WrapInitName)
-      Converted.Success(in)
+  def apply[T : c.WeakTypeTag](c: Context)(
+      nme: String, in: c.Tree): Converted[c.type] =
+    if (nme == InputWrapper.WrapInitName) Converted.Success(in)
     else if (nme == InputWrapper.WrapInitTaskName)
-      Converted.Failure(in.pos, "Internal sbt error: initialize+task wrapper not split")
-    else
-      Converted.NotApplicable
+      Converted.Failure(
+          in.pos, "Internal sbt error: initialize+task wrapper not split")
+    else Converted.NotApplicable
 }
 
 /** Converts an input `Tree` of type `Parser[T]` or `State => Parser[T]` into a `Tree` of type `State => Parser[T]`.*/
 object ParserConvert extends Convert {
-  def apply[T: c.WeakTypeTag](c: Context)(nme: String, in: c.Tree): Converted[c.type] =
-    {
-      if (nme == ParserInput.WrapName)
-        Converted.Success(in)
-      else if (nme == ParserInput.WrapInitName)
-        Converted.Failure(in.pos, "Internal sbt error: initialize+parser wrapper not split")
-      else
-        Converted.NotApplicable
-    }
+  def apply[T : c.WeakTypeTag](c: Context)(
+      nme: String, in: c.Tree): Converted[c.type] = {
+    if (nme == ParserInput.WrapName) Converted.Success(in)
+    else if (nme == ParserInput.WrapInitName)
+      Converted.Failure(
+          in.pos, "Internal sbt error: initialize+parser wrapper not split")
+    else Converted.NotApplicable
+  }
 }
 
 /** Convert instance for plain `Task`s not within the settings system. */
 object TaskConvert extends Convert {
-  def apply[T: c.WeakTypeTag](c: Context)(nme: String, in: c.Tree): Converted[c.type] =
-    if (nme == InputWrapper.WrapTaskName)
-      Converted.Success(in)
-    else
-      Converted.NotApplicable
+  def apply[T : c.WeakTypeTag](c: Context)(
+      nme: String, in: c.Tree): Converted[c.type] =
+    if (nme == InputWrapper.WrapTaskName) Converted.Success(in)
+    else Converted.NotApplicable
 }
 
 /** Converts an input `Tree` of type `Initialize[T]`, `Initialize[Task[T]]`, or `Task[T]` into a `Tree` of type `Initialize[Task[T]]`.*/
 object FullConvert extends Convert {
   import InputWrapper._
-  def apply[T: c.WeakTypeTag](c: Context)(nme: String, in: c.Tree): Converted[c.type] =
+  def apply[T : c.WeakTypeTag](
+      c: Context)(nme: String, in: c.Tree): Converted[c.type] =
     if (nme == WrapInitTaskName || nme == WrapPreviousName)
       Converted.Success(in)
     else if (nme == WrapInitName) {
@@ -55,22 +54,22 @@ object FullConvert extends Convert {
       val i = c.Expr[Task[T]](in)
       val t = c.universe.reify(Def.valueStrict[Task[T]](i.splice)).tree
       Converted.Success(t)
-    } else
-      Converted.NotApplicable
+    } else Converted.NotApplicable
 }
 
 /**
- * Converts an input `Tree` of type `State => Parser[T]` or `Initialize[State => Parser[T]]`
- * into a `Tree` of type `Initialize[State => Parser[T]]`.
- */
+  * Converts an input `Tree` of type `State => Parser[T]` or `Initialize[State => Parser[T]]`
+  * into a `Tree` of type `Initialize[State => Parser[T]]`.
+  */
 object InitParserConvert extends Convert {
-  def apply[T: c.WeakTypeTag](c: Context)(nme: String, in: c.Tree): Converted[c.type] =
+  def apply[T : c.WeakTypeTag](c: Context)(
+      nme: String, in: c.Tree): Converted[c.type] =
     if (nme == ParserInput.WrapName) {
       val e = c.Expr[State => Parser[T]](in)
-      val t = c.universe.reify { Def.valueStrict[State => Parser[T]](e.splice) }
+      val t = c.universe.reify {
+        Def.valueStrict[State => Parser[T]](e.splice)
+      }
       Converted.Success(t.tree)
-    } else if (nme == ParserInput.WrapInitName)
-      Converted.Success(in)
-    else
-      Converted.NotApplicable
+    } else if (nme == ParserInput.WrapInitName) Converted.Success(in)
+    else Converted.NotApplicable
 }

@@ -16,9 +16,8 @@ class ContextFilterTest extends FunSuite {
   test("parses Finagle-Ctx headers") {
     val writtenDeadline = Deadline.ofTimeout(5.seconds)
     val service =
-      new ClientContextFilter[Request, Response] andThen
-      new ServerContextFilter[Request, Response] andThen
-      Service.mk[Request, Response] { req =>
+      new ClientContextFilter[Request, Response] andThen new ServerContextFilter[
+          Request, Response] andThen Service.mk[Request, Response] { req =>
         assert(Deadline.current.get == writtenDeadline)
         Future.value(Response())
       }
@@ -40,9 +39,8 @@ class ContextFilterTest extends FunSuite {
 
   test("does not set incorrectly encoded context headers") {
     val service =
-      new ClientContextFilter[Request, Response] andThen
-      new ServerContextFilter[Request, Response] andThen
-      Service.mk[Request, Response] { _ =>
+      new ClientContextFilter[Request, Response] andThen new ServerContextFilter[
+          Request, Response] andThen Service.mk[Request, Response] { _ =>
         assert(Contexts.broadcast.marshal.isEmpty)
         Future.value(Response())
       }

@@ -23,10 +23,11 @@ import org.apache.spark.sql.catalyst.util.TypeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.CalendarInterval
 
+case class UnaryMinus(child: Expression)
+    extends UnaryExpression with ExpectsInputTypes {
 
-case class UnaryMinus(child: Expression) extends UnaryExpression with ExpectsInputTypes {
-
-  override def inputTypes: Seq[AbstractDataType] = Seq(TypeCollection.NumericAndInterval)
+  override def inputTypes: Seq[AbstractDataType] =
+    Seq(TypeCollection.NumericAndInterval)
 
   override def dataType: DataType = child.dataType
 
@@ -34,18 +35,26 @@ case class UnaryMinus(child: Expression) extends UnaryExpression with ExpectsInp
 
   private lazy val numeric = TypeUtils.getNumeric(dataType)
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = dataType match {
-    case dt: DecimalType => defineCodeGen(ctx, ev, c => s"$c.unary_$$minus()")
-    case dt: NumericType => nullSafeCodeGen(ctx, ev, eval => {
-      val originValue = ctx.freshName("origin")
-      // codegen would fail to compile if we just write (-($c))
-      // for example, we could not write --9223372036854775808L in code
-      s"""
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
+    dataType match {
+      case dt: DecimalType =>
+        defineCodeGen(ctx, ev, c => s"$c.unary_$$minus()")
+      case dt: NumericType =>
+        nullSafeCodeGen(ctx,
+                        ev,
+                        eval =>
+                          {
+                            val originValue = ctx.freshName("origin")
+                            // codegen would fail to compile if we just write (-($c))
+                            // for example, we could not write --9223372036854775808L in code
+                            s"""
         ${ctx.javaType(dt)} $originValue = (${ctx.javaType(dt)})($eval);
         ${ev.value} = (${ctx.javaType(dt)})(-($originValue));
-      """})
-    case dt: CalendarIntervalType => defineCodeGen(ctx, ev, c => s"$c.negate()")
-  }
+      """
+                        })
+      case dt: CalendarIntervalType =>
+        defineCodeGen(ctx, ev, c => s"$c.negate()")
+    }
 
   protected override def nullSafeEval(input: Any): Any = {
     if (dataType.isInstanceOf[CalendarIntervalType]) {
@@ -58,10 +67,12 @@ case class UnaryMinus(child: Expression) extends UnaryExpression with ExpectsInp
   override def sql: String = s"(-${child.sql})"
 }
 
-case class UnaryPositive(child: Expression) extends UnaryExpression with ExpectsInputTypes {
+case class UnaryPositive(child: Expression)
+    extends UnaryExpression with ExpectsInputTypes {
   override def prettyName: String = "positive"
 
-  override def inputTypes: Seq[AbstractDataType] = Seq(TypeCollection.NumericAndInterval)
+  override def inputTypes: Seq[AbstractDataType] =
+    Seq(TypeCollection.NumericAndInterval)
 
   override def dataType: DataType = child.dataType
 
@@ -74,12 +85,13 @@ case class UnaryPositive(child: Expression) extends UnaryExpression with Expects
 }
 
 /**
- * A function that get the absolute value of the numeric value.
- */
+  * A function that get the absolute value of the numeric value.
+  */
 @ExpressionDescription(
-  usage = "_FUNC_(expr) - Returns the absolute value of the numeric value",
-  extended = "> SELECT _FUNC_('-1');\n1")
-case class Abs(child: Expression) extends UnaryExpression with ExpectsInputTypes {
+    usage = "_FUNC_(expr) - Returns the absolute value of the numeric value",
+    extended = "> SELECT _FUNC_('-1');\n1")
+case class Abs(child: Expression)
+    extends UnaryExpression with ExpectsInputTypes {
 
   override def inputTypes: Seq[AbstractDataType] = Seq(NumericType)
 
@@ -87,12 +99,14 @@ case class Abs(child: Expression) extends UnaryExpression with ExpectsInputTypes
 
   private lazy val numeric = TypeUtils.getNumeric(dataType)
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = dataType match {
-    case dt: DecimalType =>
-      defineCodeGen(ctx, ev, c => s"$c.abs()")
-    case dt: NumericType =>
-      defineCodeGen(ctx, ev, c => s"(${ctx.javaType(dt)})(java.lang.Math.abs($c))")
-  }
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
+    dataType match {
+      case dt: DecimalType =>
+        defineCodeGen(ctx, ev, c => s"$c.abs()")
+      case dt: NumericType =>
+        defineCodeGen(
+            ctx, ev, c => s"(${ctx.javaType(dt)})(java.lang.Math.abs($c))")
+    }
 
   protected override def nullSafeEval(input: Any): Any = numeric.abs(input)
 }
@@ -101,26 +115,33 @@ abstract class BinaryArithmetic extends BinaryOperator {
 
   override def dataType: DataType = left.dataType
 
-  override lazy val resolved = childrenResolved && checkInputDataTypes().isSuccess
+  override lazy val resolved =
+    childrenResolved && checkInputDataTypes().isSuccess
 
   /** Name of the function for this expression on a [[Decimal]] type. */
   def decimalMethod: String =
-    sys.error("BinaryArithmetics must override either decimalMethod or genCode")
+    sys.error(
+        "BinaryArithmetics must override either decimalMethod or genCode")
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = dataType match {
-    case dt: DecimalType =>
-      defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.$decimalMethod($eval2)")
-    // byte and short are casted into int when add, minus, times or divide
-    case ByteType | ShortType =>
-      defineCodeGen(ctx, ev,
-        (eval1, eval2) => s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
-    case _ =>
-      defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1 $symbol $eval2")
-  }
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
+    dataType match {
+      case dt: DecimalType =>
+        defineCodeGen(
+            ctx, ev, (eval1, eval2) => s"$eval1.$decimalMethod($eval2)")
+      // byte and short are casted into int when add, minus, times or divide
+      case ByteType | ShortType =>
+        defineCodeGen(ctx,
+                      ev,
+                      (eval1, eval2) =>
+                        s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
+      case _ =>
+        defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1 $symbol $eval2")
+    }
 }
 
 private[sql] object BinaryArithmetic {
-  def unapply(e: BinaryArithmetic): Option[(Expression, Expression)] = Some((e.left, e.right))
+  def unapply(e: BinaryArithmetic): Option[(Expression, Expression)] =
+    Some((e.left, e.right))
 }
 
 case class Add(left: Expression, right: Expression) extends BinaryArithmetic {
@@ -133,26 +154,32 @@ case class Add(left: Expression, right: Expression) extends BinaryArithmetic {
 
   protected override def nullSafeEval(input1: Any, input2: Any): Any = {
     if (dataType.isInstanceOf[CalendarIntervalType]) {
-      input1.asInstanceOf[CalendarInterval].add(input2.asInstanceOf[CalendarInterval])
+      input1
+        .asInstanceOf[CalendarInterval]
+        .add(input2.asInstanceOf[CalendarInterval])
     } else {
       numeric.plus(input1, input2)
     }
   }
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = dataType match {
-    case dt: DecimalType =>
-      defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.$$plus($eval2)")
-    case ByteType | ShortType =>
-      defineCodeGen(ctx, ev,
-        (eval1, eval2) => s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
-    case CalendarIntervalType =>
-      defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.add($eval2)")
-    case _ =>
-      defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1 $symbol $eval2")
-  }
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
+    dataType match {
+      case dt: DecimalType =>
+        defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.$$plus($eval2)")
+      case ByteType | ShortType =>
+        defineCodeGen(ctx,
+                      ev,
+                      (eval1, eval2) =>
+                        s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
+      case CalendarIntervalType =>
+        defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.add($eval2)")
+      case _ =>
+        defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1 $symbol $eval2")
+    }
 }
 
-case class Subtract(left: Expression, right: Expression) extends BinaryArithmetic {
+case class Subtract(left: Expression, right: Expression)
+    extends BinaryArithmetic {
 
   override def inputType: AbstractDataType = TypeCollection.NumericAndInterval
 
@@ -162,26 +189,32 @@ case class Subtract(left: Expression, right: Expression) extends BinaryArithmeti
 
   protected override def nullSafeEval(input1: Any, input2: Any): Any = {
     if (dataType.isInstanceOf[CalendarIntervalType]) {
-      input1.asInstanceOf[CalendarInterval].subtract(input2.asInstanceOf[CalendarInterval])
+      input1
+        .asInstanceOf[CalendarInterval]
+        .subtract(input2.asInstanceOf[CalendarInterval])
     } else {
       numeric.minus(input1, input2)
     }
   }
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = dataType match {
-    case dt: DecimalType =>
-      defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.$$minus($eval2)")
-    case ByteType | ShortType =>
-      defineCodeGen(ctx, ev,
-        (eval1, eval2) => s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
-    case CalendarIntervalType =>
-      defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.subtract($eval2)")
-    case _ =>
-      defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1 $symbol $eval2")
-  }
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
+    dataType match {
+      case dt: DecimalType =>
+        defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.$$minus($eval2)")
+      case ByteType | ShortType =>
+        defineCodeGen(ctx,
+                      ev,
+                      (eval1, eval2) =>
+                        s"(${ctx.javaType(dataType)})($eval1 $symbol $eval2)")
+      case CalendarIntervalType =>
+        defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1.subtract($eval2)")
+      case _ =>
+        defineCodeGen(ctx, ev, (eval1, eval2) => s"$eval1 $symbol $eval2")
+    }
 }
 
-case class Multiply(left: Expression, right: Expression) extends BinaryArithmetic {
+case class Multiply(left: Expression, right: Expression)
+    extends BinaryArithmetic {
 
   override def inputType: AbstractDataType = NumericType
 
@@ -190,10 +223,12 @@ case class Multiply(left: Expression, right: Expression) extends BinaryArithmeti
 
   private lazy val numeric = TypeUtils.getNumeric(dataType)
 
-  protected override def nullSafeEval(input1: Any, input2: Any): Any = numeric.times(input1, input2)
+  protected override def nullSafeEval(input1: Any, input2: Any): Any =
+    numeric.times(input1, input2)
 }
 
-case class Divide(left: Expression, right: Expression) extends BinaryArithmetic {
+case class Divide(left: Expression, right: Expression)
+    extends BinaryArithmetic {
 
   override def inputType: AbstractDataType = NumericType
 
@@ -221,22 +256,24 @@ case class Divide(left: Expression, right: Expression) extends BinaryArithmetic 
   }
 
   /**
-   * Special case handling due to division by 0 => null.
-   */
+    * Special case handling due to division by 0 => null.
+    */
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val eval1 = left.gen(ctx)
     val eval2 = right.gen(ctx)
-    val isZero = if (dataType.isInstanceOf[DecimalType]) {
-      s"${eval2.value}.isZero()"
-    } else {
-      s"${eval2.value} == 0"
-    }
+    val isZero =
+      if (dataType.isInstanceOf[DecimalType]) {
+        s"${eval2.value}.isZero()"
+      } else {
+        s"${eval2.value} == 0"
+      }
     val javaType = ctx.javaType(dataType)
-    val divide = if (dataType.isInstanceOf[DecimalType]) {
-      s"${eval1.value}.$decimalMethod(${eval2.value})"
-    } else {
-      s"($javaType)(${eval1.value} $symbol ${eval2.value})"
-    }
+    val divide =
+      if (dataType.isInstanceOf[DecimalType]) {
+        s"${eval1.value}.$decimalMethod(${eval2.value})"
+      } else {
+        s"($javaType)(${eval1.value} $symbol ${eval2.value})"
+      }
     s"""
       ${eval2.code}
       boolean ${ev.isNull} = false;
@@ -255,7 +292,8 @@ case class Divide(left: Expression, right: Expression) extends BinaryArithmetic 
   }
 }
 
-case class Remainder(left: Expression, right: Expression) extends BinaryArithmetic {
+case class Remainder(left: Expression, right: Expression)
+    extends BinaryArithmetic {
 
   override def inputType: AbstractDataType = NumericType
 
@@ -283,22 +321,24 @@ case class Remainder(left: Expression, right: Expression) extends BinaryArithmet
   }
 
   /**
-   * Special case handling for x % 0 ==> null.
-   */
+    * Special case handling for x % 0 ==> null.
+    */
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val eval1 = left.gen(ctx)
     val eval2 = right.gen(ctx)
-    val isZero = if (dataType.isInstanceOf[DecimalType]) {
-      s"${eval2.value}.isZero()"
-    } else {
-      s"${eval2.value} == 0"
-    }
+    val isZero =
+      if (dataType.isInstanceOf[DecimalType]) {
+        s"${eval2.value}.isZero()"
+      } else {
+        s"${eval2.value} == 0"
+      }
     val javaType = ctx.javaType(dataType)
-    val remainder = if (dataType.isInstanceOf[DecimalType]) {
-      s"${eval1.value}.$decimalMethod(${eval2.value})"
-    } else {
-      s"($javaType)(${eval1.value} $symbol ${eval2.value})"
-    }
+    val remainder =
+      if (dataType.isInstanceOf[DecimalType]) {
+        s"${eval1.value}.$decimalMethod(${eval2.value})"
+      } else {
+        s"($javaType)(${eval1.value} $symbol ${eval2.value})"
+      }
     s"""
       ${eval2.code}
       boolean ${ev.isNull} = false;
@@ -318,7 +358,7 @@ case class Remainder(left: Expression, right: Expression) extends BinaryArithmet
 }
 
 case class MaxOf(left: Expression, right: Expression)
-  extends BinaryArithmetic with NonSQLExpression {
+    extends BinaryArithmetic with NonSQLExpression {
 
   // TODO: Remove MaxOf and MinOf, and replace its usage with Greatest and Least.
 
@@ -374,7 +414,7 @@ case class MaxOf(left: Expression, right: Expression)
 }
 
 case class MinOf(left: Expression, right: Expression)
-  extends BinaryArithmetic with NonSQLExpression {
+    extends BinaryArithmetic with NonSQLExpression {
 
   // TODO: Remove MaxOf and MinOf, and replace its usage with Greatest and Least.
 
@@ -444,19 +484,26 @@ case class Pmod(left: Expression, right: Expression) extends BinaryArithmetic {
     dataType match {
       case IntegerType => pmod(left.asInstanceOf[Int], right.asInstanceOf[Int])
       case LongType => pmod(left.asInstanceOf[Long], right.asInstanceOf[Long])
-      case ShortType => pmod(left.asInstanceOf[Short], right.asInstanceOf[Short])
+      case ShortType =>
+        pmod(left.asInstanceOf[Short], right.asInstanceOf[Short])
       case ByteType => pmod(left.asInstanceOf[Byte], right.asInstanceOf[Byte])
-      case FloatType => pmod(left.asInstanceOf[Float], right.asInstanceOf[Float])
-      case DoubleType => pmod(left.asInstanceOf[Double], right.asInstanceOf[Double])
-      case _: DecimalType => pmod(left.asInstanceOf[Decimal], right.asInstanceOf[Decimal])
+      case FloatType =>
+        pmod(left.asInstanceOf[Float], right.asInstanceOf[Float])
+      case DoubleType =>
+        pmod(left.asInstanceOf[Double], right.asInstanceOf[Double])
+      case _: DecimalType =>
+        pmod(left.asInstanceOf[Decimal], right.asInstanceOf[Decimal])
     }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
-      dataType match {
-        case dt: DecimalType =>
-          val decimalAdd = "$plus"
-          s"""
+    nullSafeCodeGen(ctx,
+                    ev,
+                    (eval1, eval2) =>
+                      {
+                        dataType match {
+                          case dt: DecimalType =>
+                            val decimalAdd = "$plus"
+                            s"""
             ${ctx.javaType(dataType)} r = $eval1.remainder($eval2);
             if (r.compare(new org.apache.spark.sql.types.Decimal().set(0)) < 0) {
               ${ev.value} = (r.$decimalAdd($eval2)).remainder($eval2);
@@ -464,9 +511,9 @@ case class Pmod(left: Expression, right: Expression) extends BinaryArithmetic {
               ${ev.value} = r;
             }
           """
-        // byte and short are casted into int when add, minus, times or divide
-        case ByteType | ShortType =>
-          s"""
+                          // byte and short are casted into int when add, minus, times or divide
+                          case ByteType | ShortType =>
+                            s"""
             ${ctx.javaType(dataType)} r = (${ctx.javaType(dataType)})($eval1 % $eval2);
             if (r < 0) {
               ${ev.value} = (${ctx.javaType(dataType)})((r + $eval2) % $eval2);
@@ -474,8 +521,8 @@ case class Pmod(left: Expression, right: Expression) extends BinaryArithmetic {
               ${ev.value} = r;
             }
           """
-        case _ =>
-          s"""
+                          case _ =>
+                            s"""
             ${ctx.javaType(dataType)} r = $eval1 % $eval2;
             if (r < 0) {
               ${ev.value} = (r + $eval2) % $eval2;
@@ -483,43 +530,43 @@ case class Pmod(left: Expression, right: Expression) extends BinaryArithmetic {
               ${ev.value} = r;
             }
           """
-      }
-    })
+                        }
+                    })
   }
 
   private def pmod(a: Int, n: Int): Int = {
     val r = a % n
-    if (r < 0) {(r + n) % n} else r
+    if (r < 0) { (r + n) % n } else r
   }
 
   private def pmod(a: Long, n: Long): Long = {
     val r = a % n
-    if (r < 0) {(r + n) % n} else r
+    if (r < 0) { (r + n) % n } else r
   }
 
   private def pmod(a: Byte, n: Byte): Byte = {
     val r = a % n
-    if (r < 0) {((r + n) % n).toByte} else r.toByte
+    if (r < 0) { ((r + n) % n).toByte } else r.toByte
   }
 
   private def pmod(a: Double, n: Double): Double = {
     val r = a % n
-    if (r < 0) {(r + n) % n} else r
+    if (r < 0) { (r + n) % n } else r
   }
 
   private def pmod(a: Short, n: Short): Short = {
     val r = a % n
-    if (r < 0) {((r + n) % n).toShort} else r.toShort
+    if (r < 0) { ((r + n) % n).toShort } else r.toShort
   }
 
   private def pmod(a: Float, n: Float): Float = {
     val r = a % n
-    if (r < 0) {(r + n) % n} else r
+    if (r < 0) { (r + n) % n } else r
   }
 
   private def pmod(a: Decimal, n: Decimal): Decimal = {
     val r = a % n
-    if (r.compare(Decimal.ZERO) < 0) {(r + n) % n} else r
+    if (r.compare(Decimal.ZERO) < 0) { (r + n) % n } else r
   }
 
   override def sql: String = s"$prettyName(${left.sql}, ${right.sql})"

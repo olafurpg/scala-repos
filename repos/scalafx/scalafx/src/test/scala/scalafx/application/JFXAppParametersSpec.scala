@@ -39,23 +39,28 @@ import scalafx.application.JFXApp.Parameters.sfxParameters2jfx
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * JFXApp.Parameters Spec tests.
- *
- *
- */
+  * JFXApp.Parameters Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class JFXAppParametersSpec
-  extends SimpleSFXDelegateSpec[jfxa.Application.Parameters, JFXApp.Parameters](classOf[jfxa.Application.Parameters], classOf[JFXApp.Parameters]) {
+    extends SimpleSFXDelegateSpec[
+        jfxa.Application.Parameters, JFXApp.Parameters](
+        classOf[jfxa.Application.Parameters], classOf[JFXApp.Parameters]) {
 
-  override protected def getScalaClassInstance = new JFXApp.ParametersImpl(Seq.empty[String])
+  override protected def getScalaClassInstance =
+    new JFXApp.ParametersImpl(Seq.empty[String])
 
-  override protected def getJavaClassInstance = new jfxa.Application.Parameters {
-    def getRaw = Seq.empty[String]
-    def getNamed = Map.empty[String, String]
-    def getUnnamed = Seq.empty[String]
-  }
+  override protected def getJavaClassInstance =
+    new jfxa.Application.Parameters {
+      def getRaw = Seq.empty[String]
+      def getNamed = Map.empty[String, String]
+      def getUnnamed = Seq.empty[String]
+    }
 
-  private def getParameters(args: Seq[String]): JFXApp.Parameters = JFXApp.Parameters(args)
+  private def getParameters(args: Seq[String]): JFXApp.Parameters =
+    JFXApp.Parameters(args)
 
   it should "returns a empty list of parameters from empty arguments" in {
     getParameters(Array[String]()).raw shouldBe empty
@@ -76,7 +81,8 @@ class JFXAppParametersSpec
 
     parameters.raw should contain theSameElementsInOrderAs (args.toSeq)
     parameters.unnamed shouldBe empty
-    parameters.named should contain theSameElementsAs (Map("arg1" -> "value1", "arg2" -> "value2"))
+    parameters.named should contain theSameElementsAs
+    (Map("arg1" -> "value1", "arg2" -> "value2"))
   }
 
   it should "allows mix raw and named arguments" in {
@@ -84,8 +90,8 @@ class JFXAppParametersSpec
     val parameters = getParameters(args)
 
     parameters.raw should contain theSameElementsInOrderAs (args.toSeq)
-    parameters.unnamed should contain theSameElementsInOrderAs (Seq("arg1", "-arg3=value3"))
+    parameters.unnamed should contain theSameElementsInOrderAs
+    (Seq("arg1", "-arg3=value3"))
     parameters.named should contain theSameElementsAs (Map("arg2" -> "value2"))
   }
-
 }

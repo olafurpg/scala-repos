@@ -21,8 +21,7 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
   val factory = new ZkClientFactory(zkTimeout)
 
   implicit val patienceConfig = PatienceConfig(
-    timeout = toSpan(zkTimeout*3),
-    interval = toSpan(zkTimeout))
+      timeout = toSpan(zkTimeout * 3), interval = toSpan(zkTimeout))
 
   before {
     inst = new ZkInstance
@@ -34,12 +33,13 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
   }
 
   def toSpan(d: Duration): Span = Span(d.inNanoseconds, Nanoseconds)
-  def hostPath = "localhost:%d!/foo/bar/baz".format(inst.zookeeperAddress.getPort)
+  def hostPath =
+    "localhost:%d!/foo/bar/baz".format(inst.zookeeperAddress.getPort)
 
   // TODO: remove when no longer flaky.
   override def test(testName: String, testTags: Tag*)(f: => Unit) {
     if (!sys.props.contains("SKIP_FLAKY"))
-      super.test(testName, testTags:_*)(f)
+      super.test(testName, testTags: _*)(f)
   }
 
   test("announce a primary endpoint") {
@@ -66,8 +66,10 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
     try {
       val ann = new ZkAnnouncer(factory)
       val res = new ZkResolver(factory)
-      val addr1 = Address.Inet(new InetSocketAddress(port1), Addr.Metadata.empty)
-      val addr2 = Address.Inet(new InetSocketAddress(port2), Addr.Metadata.empty)
+      val addr1 =
+        Address.Inet(new InetSocketAddress(port1), Addr.Metadata.empty)
+      val addr2 =
+        Address.Inet(new InetSocketAddress(port2), Addr.Metadata.empty)
 
       Await.ready(ann.announce(addr2.addr, "%s!0!addr2".format(hostPath)))
       va2 = res.bind("%s!addr2".format(hostPath))
@@ -82,19 +84,24 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
       eventually { assert(Var.sample(va1) == Addr.Bound(addr1)) }
     } catch {
       case e: TestFailedDueToTimeoutException =>
-        var exceptionString = "#%d eventually failed.\n".format(failedEventually)
+        var exceptionString =
+          "#%d eventually failed.\n".format(failedEventually)
 
-        if(va1 != null) {
-          exceptionString += "va1 status: %s\n".format(Var.sample(va1).toString)
+        if (va1 != null) {
+          exceptionString +=
+            "va1 status: %s\n".format(Var.sample(va1).toString)
         }
 
-        if(va2 != null) {
-          exceptionString += "va2 status: %s\n".format(Var.sample(va2).toString)
+        if (va2 != null) {
+          exceptionString +=
+            "va2 status: %s\n".format(Var.sample(va2).toString)
         }
 
         val endpoint = "/services/ci"
-        val connection = new URL("http", "0.0.0.0", 4680, endpoint).openConnection()
-        val reader = new BufferedReader(new InputStreamReader(connection.getInputStream))
+        val connection =
+          new URL("http", "0.0.0.0", 4680, endpoint).openConnection()
+        val reader =
+          new BufferedReader(new InputStreamReader(connection.getInputStream))
         var fullOutput = ""
         var line = reader.readLine()
         while (line != null) {
@@ -114,7 +121,8 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
     val addr2 = Address.Inet(new InetSocketAddress(port2), Addr.Metadata.empty)
 
     val anm1 = Await.result(ann.announce(addr1.addr, "%s!0".format(hostPath)))
-    val anm2 = Await.result(ann.announce(addr2.addr, "%s!0!addr2".format(hostPath)))
+    val anm2 =
+      Await.result(ann.announce(addr2.addr, "%s!0!addr2".format(hostPath)))
     val va1 = res.bind(hostPath)
     val va2 = res.bind("%s!addr2".format(hostPath))
 
@@ -134,7 +142,8 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
     val addr2 = Address.Inet(new InetSocketAddress(port2), Addr.Metadata.empty)
 
     val anm1 = Await.result(ann.announce(addr1.addr, "%s!0".format(hostPath)))
-    val anm2 = Await.result(ann.announce(addr2.addr, "%s!0!addr2".format(hostPath)))
+    val anm2 =
+      Await.result(ann.announce(addr2.addr, "%s!0!addr2".format(hostPath)))
     val va1 = res.bind(hostPath)
     val va2 = res.bind("%s!addr2".format(hostPath))
 
@@ -151,5 +160,4 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
     val addr = Address.Inet(new InetSocketAddress(port1), Addr.Metadata.empty)
     Await.result(Announcer.announce(addr.addr, "zk!%s!0".format(hostPath)))
   }
-
 }

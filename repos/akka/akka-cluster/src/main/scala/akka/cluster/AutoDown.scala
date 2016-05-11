@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import akka.actor.Actor
@@ -13,8 +13,8 @@ import akka.actor.Address
 import akka.actor.Scheduler
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[cluster] object AutoDown {
 
   def props(autoDownUnreachableAfter: FiniteDuration): Props =
@@ -24,17 +24,17 @@ private[cluster] object AutoDown {
 }
 
 /**
- * INTERNAL API
- *
- * An unreachable member will be downed by this actor if it remains unreachable
- * for the specified duration and this actor is running on the leader node in the
- * cluster.
- *
- * The implementation is split into two classes AutoDown and AutoDownBase to be
- * able to unit test the logic without running cluster.
- */
+  * INTERNAL API
+  *
+  * An unreachable member will be downed by this actor if it remains unreachable
+  * for the specified duration and this actor is running on the leader node in the
+  * cluster.
+  *
+  * The implementation is split into two classes AutoDown and AutoDownBase to be
+  * able to unit test the logic without running cluster.
+  */
 private[cluster] class AutoDown(autoDownUnreachableAfter: FiniteDuration)
-  extends AutoDownBase(autoDownUnreachableAfter) {
+    extends AutoDownBase(autoDownUnreachableAfter) {
 
   val cluster = Cluster(context.system)
   import cluster.InfoLogger._
@@ -58,16 +58,17 @@ private[cluster] class AutoDown(autoDownUnreachableAfter: FiniteDuration)
     logInfo("Leader is auto-downing unreachable node [{}]", node)
     cluster.down(node)
   }
-
 }
 
 /**
- * INTERNAL API
- *
- * The implementation is split into two classes AutoDown and AutoDownBase to be
- * able to unit test the logic without running cluster.
- */
-private[cluster] abstract class AutoDownBase(autoDownUnreachableAfter: FiniteDuration) extends Actor {
+  * INTERNAL API
+  *
+  * The implementation is split into two classes AutoDown and AutoDownBase to be
+  * able to unit test the logic without running cluster.
+  */
+private[cluster] abstract class AutoDownBase(
+    autoDownUnreachableAfter: FiniteDuration)
+    extends Actor {
 
   import AutoDown._
 
@@ -96,8 +97,8 @@ private[cluster] abstract class AutoDownBase(autoDownUnreachableAfter: FiniteDur
 
     case UnreachableMember(m) ⇒ unreachableMember(m)
 
-    case ReachableMember(m)   ⇒ remove(m.uniqueAddress)
-    case MemberRemoved(m, _)  ⇒ remove(m.uniqueAddress)
+    case ReachableMember(m) ⇒ remove(m.uniqueAddress)
+    case MemberRemoved(m, _) ⇒ remove(m.uniqueAddress)
 
     case LeaderChanged(leaderOption) ⇒
       leader = leaderOption.exists(_ == selfAddress)
@@ -113,18 +114,19 @@ private[cluster] abstract class AutoDownBase(autoDownUnreachableAfter: FiniteDur
       }
 
     case _: ClusterDomainEvent ⇒ // not interested in other events
-
   }
 
   def unreachableMember(m: Member): Unit =
-    if (!skipMemberStatus(m.status) && !scheduledUnreachable.contains(m.uniqueAddress))
+    if (!skipMemberStatus(m.status) &&
+        !scheduledUnreachable.contains(m.uniqueAddress))
       scheduleUnreachable(m.uniqueAddress)
 
   def scheduleUnreachable(node: UniqueAddress): Unit = {
     if (autoDownUnreachableAfter == Duration.Zero) {
       downOrAddPending(node)
     } else {
-      val task = scheduler.scheduleOnce(autoDownUnreachableAfter, self, UnreachableTimeout(node))
+      val task = scheduler.scheduleOnce(
+          autoDownUnreachableAfter, self, UnreachableTimeout(node))
       scheduledUnreachable += (node -> task)
     }
   }
@@ -144,5 +146,4 @@ private[cluster] abstract class AutoDownBase(autoDownUnreachableAfter: FiniteDur
     scheduledUnreachable -= node
     pendingUnreachable -= node
   }
-
 }

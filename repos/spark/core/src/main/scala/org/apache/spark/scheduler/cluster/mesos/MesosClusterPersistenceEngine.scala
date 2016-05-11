@@ -29,18 +29,19 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.Utils
 
 /**
- * Persistence engine factory that is responsible for creating new persistence engines
- * to store Mesos cluster mode state.
- */
-private[spark] abstract class MesosClusterPersistenceEngineFactory(conf: SparkConf) {
+  * Persistence engine factory that is responsible for creating new persistence engines
+  * to store Mesos cluster mode state.
+  */
+private[spark] abstract class MesosClusterPersistenceEngineFactory(
+    conf: SparkConf) {
   def createEngine(path: String): MesosClusterPersistenceEngine
 }
 
 /**
- * Mesos cluster persistence engine is responsible for persisting Mesos cluster mode
- * specific state, so that on failover all the state can be recovered and the scheduler
- * can resume managing the drivers.
- */
+  * Mesos cluster persistence engine is responsible for persisting Mesos cluster mode
+  * specific state, so that on failover all the state can be recovered and the scheduler
+  * can resume managing the drivers.
+  */
 private[spark] trait MesosClusterPersistenceEngine {
   def persist(name: String, obj: Object): Unit
   def expunge(name: String): Unit
@@ -49,12 +50,13 @@ private[spark] trait MesosClusterPersistenceEngine {
 }
 
 /**
- * Zookeeper backed persistence engine factory.
- * All Zk engines created from this factory shares the same Zookeeper client, so
- * all of them reuses the same connection pool.
- */
-private[spark] class ZookeeperMesosClusterPersistenceEngineFactory(conf: SparkConf)
-  extends MesosClusterPersistenceEngineFactory(conf) with Logging {
+  * Zookeeper backed persistence engine factory.
+  * All Zk engines created from this factory shares the same Zookeeper client, so
+  * all of them reuses the same connection pool.
+  */
+private[spark] class ZookeeperMesosClusterPersistenceEngineFactory(
+    conf: SparkConf)
+    extends MesosClusterPersistenceEngineFactory(conf) with Logging {
 
   lazy val zk = SparkCuratorUtil.newClient(conf)
 
@@ -64,20 +66,21 @@ private[spark] class ZookeeperMesosClusterPersistenceEngineFactory(conf: SparkCo
 }
 
 /**
- * Black hole persistence engine factory that creates black hole
- * persistence engines, which stores nothing.
- */
+  * Black hole persistence engine factory that creates black hole
+  * persistence engines, which stores nothing.
+  */
 private[spark] class BlackHoleMesosClusterPersistenceEngineFactory
-  extends MesosClusterPersistenceEngineFactory(null) {
+    extends MesosClusterPersistenceEngineFactory(null) {
   def createEngine(path: String): MesosClusterPersistenceEngine = {
     new BlackHoleMesosClusterPersistenceEngine
   }
 }
 
 /**
- * Black hole persistence engine that stores nothing.
- */
-private[spark] class BlackHoleMesosClusterPersistenceEngine extends MesosClusterPersistenceEngine {
+  * Black hole persistence engine that stores nothing.
+  */
+private[spark] class BlackHoleMesosClusterPersistenceEngine
+    extends MesosClusterPersistenceEngine {
   override def persist(name: String, obj: Object): Unit = {}
   override def fetch[T](name: String): Option[T] = None
   override def expunge(name: String): Unit = {}
@@ -85,17 +88,16 @@ private[spark] class BlackHoleMesosClusterPersistenceEngine extends MesosCluster
 }
 
 /**
- * Zookeeper based Mesos cluster persistence engine, that stores cluster mode state
- * into Zookeeper. Each engine object is operating under one folder in Zookeeper, but
- * reuses a shared Zookeeper client.
- */
+  * Zookeeper based Mesos cluster persistence engine, that stores cluster mode state
+  * into Zookeeper. Each engine object is operating under one folder in Zookeeper, but
+  * reuses a shared Zookeeper client.
+  */
 private[spark] class ZookeeperMesosClusterPersistenceEngine(
-    baseDir: String,
-    zk: CuratorFramework,
-    conf: SparkConf)
-  extends MesosClusterPersistenceEngine with Logging {
+    baseDir: String, zk: CuratorFramework, conf: SparkConf)
+    extends MesosClusterPersistenceEngine with Logging {
   private val WORKING_DIR =
-    conf.get("spark.deploy.zookeeper.dir", "/spark_mesos_dispatcher") + "/" + baseDir
+    conf.get("spark.deploy.zookeeper.dir", "/spark_mesos_dispatcher") + "/" +
+    baseDir
 
   SparkCuratorUtil.mkdir(zk, WORKING_DIR)
 
@@ -122,10 +124,10 @@ private[spark] class ZookeeperMesosClusterPersistenceEngine(
     } catch {
       case e: NoNodeException => None
       case e: Exception => {
-        logWarning("Exception while reading persisted file, deleting", e)
-        zk.delete().forPath(zkPath)
-        None
-      }
+          logWarning("Exception while reading persisted file, deleting", e)
+          zk.delete().forPath(zkPath)
+          None
+        }
     }
   }
 

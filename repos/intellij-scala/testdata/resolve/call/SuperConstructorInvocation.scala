@@ -1,5 +1,5 @@
 class a extends b with c {
-   override def foo: Int = super.<ref>foo
+  override def foo: Int = super.< ref > foo
 }
 
 abstract class b {

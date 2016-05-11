@@ -26,17 +26,18 @@ class DelayedReleaseServiceTest extends FunSuite with MockitoSugar {
     val request = Request()
     request.response.setChunked(true)
 
-    val service = mock[Service[Request,Response]]
+    val service = mock[Service[Request, Response]]
     stub(service.close()).toReturn(Future.Done)
     stub(service.apply(any[Request])).toReturn(Future.value(request.response))
 
     val proxy = new DelayedReleaseService(service)
 
-    val f = proxy(request) flatMap { response =>
-      proxy.close()
-      verify(service, never).close()
-      Reader.readAll(response.reader)
-    }
+    val f =
+      proxy(request) flatMap { response =>
+        proxy.close()
+        verify(service, never).close()
+        Reader.readAll(response.reader)
+      }
     request.response.close() // EOF
     verify(service).close()
   }

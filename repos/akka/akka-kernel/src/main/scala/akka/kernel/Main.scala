@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.kernel
 
 import akka.actor.ActorSystem
@@ -13,54 +12,57 @@ import scala.collection.immutable
 import scala.collection.JavaConverters._
 
 /**
- * To use the microkernel at least one 'boot class' needs to be specified.
- * A boot class implements this interface ([[akka.kernel.Bootable]]) and
- * must have an empty default constructor.
- *
- * ActorSystems can be created within the boot class.
- *
- * An example of a simple boot class:
- * {{{
- * class BootApp extends Bootable {
- *   val system = ActorSystem("app")
- *
- *   def startup = {
- *     system.actorOf(Props[FirstActor]) ! FirstMessage
- *   }
- *
- *   def shutdown = {
- *     system.terminate()
- *   }
- * }
- * }}}
- *
- * Boot classes are specified as main arguments to the microkernel.
- *
- * For example, using the akka script an application can be started with
- * the following at the command line:
- * {{{
- * bin/akka org.app.BootApp
- * }}}
- */
-@deprecated("Microkernel is deprecated. Use ordinary main class instead", "2.4")
+  * To use the microkernel at least one 'boot class' needs to be specified.
+  * A boot class implements this interface ([[akka.kernel.Bootable]]) and
+  * must have an empty default constructor.
+  *
+  * ActorSystems can be created within the boot class.
+  *
+  * An example of a simple boot class:
+  * {{{
+  * class BootApp extends Bootable {
+  *   val system = ActorSystem("app")
+  *
+  *   def startup = {
+  *     system.actorOf(Props[FirstActor]) ! FirstMessage
+  *   }
+  *
+  *   def shutdown = {
+  *     system.terminate()
+  *   }
+  * }
+  * }}}
+  *
+  * Boot classes are specified as main arguments to the microkernel.
+  *
+  * For example, using the akka script an application can be started with
+  * the following at the command line:
+  * {{{
+  * bin/akka org.app.BootApp
+  * }}}
+  */
+@deprecated(
+    "Microkernel is deprecated. Use ordinary main class instead", "2.4")
 trait Bootable {
+
   /**
-   * Callback run on microkernel startup.
-   * Create initial actors and messages here.
-   */
+    * Callback run on microkernel startup.
+    * Create initial actors and messages here.
+    */
   def startup(): Unit
 
   /**
-   * Callback run on microkernel shutdown.
-   * Shutdown actor systems here.
-   */
+    * Callback run on microkernel shutdown.
+    * Shutdown actor systems here.
+    */
   def shutdown(): Unit
 }
 
 /**
- * Main class for running the microkernel.
- */
-@deprecated("Microkernel is deprecated. Use ordinary main class instead.", "2.4")
+  * Main class for running the microkernel.
+  */
+@deprecated(
+    "Microkernel is deprecated. Use ordinary main class instead.", "2.4")
 object Main {
   private val quiet = getBoolean("akka.kernel.quiet")
 
@@ -81,7 +83,10 @@ object Main {
     Thread.currentThread.setContextClassLoader(classLoader)
 
     val bootClasses: immutable.Seq[String] = args.to[immutable.Seq]
-    val bootables: immutable.Seq[Bootable] = bootClasses map { c ⇒ classLoader.loadClass(c).newInstance.asInstanceOf[Bootable] }
+    val bootables: immutable.Seq[Bootable] =
+      bootClasses map { c ⇒
+        classLoader.loadClass(c).newInstance.asInstanceOf[Bootable]
+      }
 
     for (bootable ← bootables) {
       log("Starting up " + bootable.getClass.getName)
@@ -112,15 +117,21 @@ object Main {
   private def loadDeployJars(deploy: File): ClassLoader = {
     val jars = deploy.listFiles.filter(_.getName.endsWith(".jar"))
 
-    val nestedJars = jars flatMap { jar ⇒
-      val jarFile = new JarFile(jar)
-      val jarEntries = jarFile.entries.asScala.toArray.filter(_.getName.endsWith(".jar"))
-      jarEntries map { entry ⇒ new File("jar:file:%s!/%s" format (jarFile.getName, entry.getName)) }
-    }
+    val nestedJars =
+      jars flatMap { jar ⇒
+        val jarFile = new JarFile(jar)
+        val jarEntries =
+          jarFile.entries.asScala.toArray.filter(_.getName.endsWith(".jar"))
+        jarEntries map { entry ⇒
+          new File("jar:file:%s!/%s" format (jarFile.getName, entry.getName))
+        }
+      }
 
     val urls = (jars ++ nestedJars) map { _.toURI.toURL }
 
-    urls foreach { url ⇒ log("Deploying " + url) }
+    urls foreach { url ⇒
+      log("Deploying " + url)
+    }
 
     new URLClassLoader(urls, Thread.currentThread.getContextClassLoader)
   }
@@ -141,7 +152,8 @@ object Main {
     }))
   }
 
-  private def banner = """
+  private def banner =
+    """
 ==============================================================================
 
                                                    ZZ:

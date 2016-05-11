@@ -1,7 +1,8 @@
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  override def code = """
+  override def code =
+    """
 import scala.tools.reflect.ToolBox
 import scala.reflect.runtime.universe._
 object O { def apply() = 0 }

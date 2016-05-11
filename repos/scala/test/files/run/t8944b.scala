@@ -3,7 +3,7 @@ case class A(private var foo: Any) {
 }
 object Test {
   def main(args: Array[String]): Unit = {
-    val A("") = new A("")  
+    val A("") = new A("")
     new A("").m
   }
 }

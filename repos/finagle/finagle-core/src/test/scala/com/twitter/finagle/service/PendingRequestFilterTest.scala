@@ -15,7 +15,8 @@ class PendingRequestFilterTest extends FunSuite {
       p
     }
 
-    val (p1, p2, p3) = (new Promise[Unit], new Promise[Unit], new Promise[Unit])
+    val (p1, p2, p3) =
+      (new Promise[Unit], new Promise[Unit], new Promise[Unit])
     val filteredSvc = new PendingRequestFilter(3).andThen(svc)
 
     val (r1, r2, r3) = (filteredSvc(p1), filteredSvc(p2), filteredSvc(p3))

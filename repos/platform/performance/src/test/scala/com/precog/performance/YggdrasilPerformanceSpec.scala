@@ -52,22 +52,22 @@ import scalaz._
 import Scalaz._
 
 trait JDBMPerformanceSpec extends Specification with PerformanceSpec {
-  sequential 
+  sequential
 
   val timeout = Duration(5000, "seconds")
 
   val benchParams = BenchmarkParameters(5, 500, Some(500), false)
   val singleParams = BenchmarkParameters(5, 500, Some(500), false)
 
-  val config = Configuration(Map.empty[String, String]) 
+  val config = Configuration(Map.empty[String, String])
 
-  val tmpDir = newTempDir() 
+  val tmpDir = newTempDir()
   lazy val bifrost = new TestShard(config, tmpDir)
   lazy val executor = new TestQueryExecutor(config, bifrost)
 
   val perfUtil = PerformanceUtil.default
 
-  step {    
+  step {
     Await.result(bifrost.actorsStart, timeout)
   }
 
@@ -75,15 +75,19 @@ trait JDBMPerformanceSpec extends Specification with PerformanceSpec {
 
     val seqId = new AtomicInteger(0)
 
-    def insert(bifrost: TestShard, path: Path, pid: Int, batchSize: Int, batches: Int) {
+    def insert(bifrost: TestShard,
+               path: Path,
+               pid: Int,
+               batchSize: Int,
+               batches: Int) {
 
       val batch = new Array[EventMessage](batchSize)
 
       var id = 0
       var b = 0
-      while(b < batches) {
+      while (b < batches) {
         var i = 0
-        while(i < batchSize) {
+        while (i < batchSize) {
           val jval = AdSamples.adCampaignSample.sample.get
           val event = Event(path, "apiKey", jval, Map.empty)
           batch(i) = EventMessage(EventId(pid, id), event)
@@ -92,65 +96,67 @@ trait JDBMPerformanceSpec extends Specification with PerformanceSpec {
         }
         val result = bifrost.storeBatch(batch, timeout)
         Await.result(result, timeout)
-        
+
         b += 1
       }
     }
-    
+
     "load test sim" in {
       insert(bifrost, Path("/test/query_set"), 2, 10000, 1)
-      val threadCount = 10 
-     
+      val threadCount = 10
+
       val queries = List(
-"(load(//test/query_set))",
-"""
+          "(load(//test/query_set))",
+          """
 tests := load(//test/query_set)
 count(tests where tests.gender = "male")
 """,
-"""
+          """
 tests := load(//test/query_set)
 histogram('platform) :=
   { platform: 'platform, num: count(tests where tests.platform = 'platform) }
 histogram
 """
-)
+      )
 
       def test(i: Int) = {
-        val threads = (0.until(threadCount)) map { i =>
-          if(i == 0) {
-            new Thread {
-              override def run() {
-                insert(bifrost, Path("/test/insert_set"), 2, 10000, 1)
-              }
-            } 
-          } else {
-            new Thread {
-              val rand = new java.util.Random()
-              override def run() {
-                var cnt = 0
-                while(cnt < i) {
-                  val q = queries(rand.nextInt(queries.length))  
-                  val result = executor.execute("apiKey", q,"") 
-                  result match {
-                    case Success(jval) => 
-                    case Failure(e) => new RuntimeException("Query result failure")
-                  }
-                  cnt += 1
+        val threads =
+          (0.until(threadCount)) map { i =>
+            if (i == 0) {
+              new Thread {
+                override def run() {
+                  insert(bifrost, Path("/test/insert_set"), 2, 10000, 1)
                 }
               }
-            } 
+            } else {
+              new Thread {
+                val rand = new java.util.Random()
+                override def run() {
+                  var cnt = 0
+                  while (cnt < i) {
+                    val q = queries(rand.nextInt(queries.length))
+                    val result = executor.execute("apiKey", q, "")
+                    result match {
+                      case Success(jval) =>
+                      case Failure(e) =>
+                        new RuntimeException("Query result failure")
+                    }
+                    cnt += 1
+                  }
+                }
+              }
+            }
           }
-        }
-        
-        threads.foreach{ _.start }
-        threads.foreach{ _.join }
-      } 
-      
+
+        threads.foreach { _.start }
+        threads.foreach { _.join }
+      }
+
       println("load test sim")
-      val result = Performance().benchmark(test(10), benchParams, benchParams)   
+      val result = Performance().benchmark(test(10), benchParams, benchParams)
       perfUtil.uploadResults("load_test_sim", result)
       //val result = Performance().profile(test(10))   
-      
+
       result.report("load test sym", System.out)
       true must_== true
     }
@@ -158,7 +164,13 @@ histogram
     "insert" in {
       val tests = 100000
       val batchSize = 1000
-      val result = Performance().benchmark(insert(bifrost, Path("/test/insert/"), 0, batchSize, tests / batchSize), singleParams, singleParams)   
+      val result = Performance().benchmark(insert(bifrost,
+                                                  Path("/test/insert/"),
+                                                  0,
+                                                  batchSize,
+                                                  tests / batchSize),
+                                           singleParams,
+                                           singleParams)
       perfUtil.uploadResults("insert_100k", result)
       //val result = Performance().profile(insert(bifrost, Path("/test/insert/"), 0, batchSize, tests / batchSize))   
 
@@ -166,7 +178,7 @@ histogram
       result.report("insert 100K", System.out)
       true must_== true
     }
-   
+
     def testRead() = {
       executor.execute("apiKey", "count(load(//test/large))")
     }
@@ -175,20 +187,21 @@ histogram
       insert(bifrost, Path("/test/large"), 1, 100000, 1)
       println("read large test")
 
-      val result = Performance().benchmark(testRead(), benchParams, benchParams)   
+      val result =
+        Performance().benchmark(testRead(), benchParams, benchParams)
       perfUtil.uploadResults("read_100k", result)
       //val result = Performance().profile(testRead())   
       result.report("read 100K", System.out)
       true must_== true
     }
-    
+
     "read small 10K x 10" in {
       insert(bifrost, Path("/test/small1"), 1, 10000, 1)
 
       def test(i: Int) = {
         var cnt = 0
-        while(cnt < i) {
-          val result = executor.execute("apiKey", "count(load(//test/small1))") 
+        while (cnt < i) {
+          val result = executor.execute("apiKey", "count(load(//test/small1))")
           result match {
             case Success(jval) =>
             case Failure(e) => new RuntimeException("Query result failure")
@@ -196,62 +209,64 @@ histogram
           cnt += 1
         }
       }
-      
-      val result = Performance().benchmark(test(10), benchParams, benchParams)   
+
+      val result = Performance().benchmark(test(10), benchParams, benchParams)
       perfUtil.uploadResults("read_10k_10x", result)
       //val result = Performance().profile(test(100))   
-      
+
       result.report("read 10K elements x 10 times", System.out)
       true must_== true
     }
-    
+
     "multi-thread read" in {
       insert(bifrost, Path("/test/small2"), 2, 10000, 1)
-      val threadCount = 10 
-      
+      val threadCount = 10
+
       def test(i: Int) = {
-        val threads = (0.until(threadCount)) map { _ =>
-          new Thread {
-            override def run() {
-              var cnt = 0
-              while(cnt < i) {
-                val result = executor.execute("apiKey", "(load(//test/small2))") 
-                result match {
-                  case Success(jval) =>
-                  case Failure(e) => new RuntimeException("Query result failure")
+        val threads =
+          (0.until(threadCount)) map { _ =>
+            new Thread {
+              override def run() {
+                var cnt = 0
+                while (cnt < i) {
+                  val result =
+                    executor.execute("apiKey", "(load(//test/small2))")
+                  result match {
+                    case Success(jval) =>
+                    case Failure(e) =>
+                      new RuntimeException("Query result failure")
+                  }
+                  cnt += 1
                 }
-                cnt += 1
               }
             }
-          } 
-        }
-        
-        threads.foreach{ _.start }
-        threads.foreach{ _.join }
-      } 
-      
-      val result = Performance().benchmark(test(1), benchParams, benchParams)   
+          }
+
+        threads.foreach { _.start }
+        threads.foreach { _.join }
+      }
+
+      val result = Performance().benchmark(test(1), benchParams, benchParams)
       perfUtil.uploadResults("read_10k_10thread", result)
       //val result = Performance().profile(test(10))   
-      
+
       println("read small thread test")
       result.report("read 10K elements x 1 times with 10 threads", System.out)
       true must_== true
     }
-    
+
     "hw2 test 100K x 1" in {
       insert(bifrost, Path("/test/small3"), 1, 100000, 1)
 
-      val query =
-"""
+      val query = """
 tests := load(//test/small3)
 count(tests where tests.gender = "male")
 """
 
       def test(i: Int) = {
         var cnt = 0
-        while(cnt < i) {
-          val result = executor.execute("apiKey", query) 
+        while (cnt < i) {
+          val result = executor.execute("apiKey", query)
           result match {
             case Success(jval) =>
             case Failure(e) => new RuntimeException("Query result failure")
@@ -259,20 +274,20 @@ count(tests where tests.gender = "male")
           cnt += 1
         }
       }
-      
-      val result = Performance().benchmark(test(1), benchParams, benchParams)   
+
+      val result = Performance().benchmark(test(1), benchParams, benchParams)
       perfUtil.uploadResults("hw2_100k", result)
       //val result = Performance().profile(test(100))   
-      
+
       result.report("hw2 test 100K * 1", System.out)
       true must_== true
     }
-    
+
     "hw3 test" in {
       insert(bifrost, Path("/test/small4"), 1, 100000, 1)
 
       val query =
-"""
+        """
 tests := load(//test/small4)
 histogram('platform) :=
   { platform: 'platform, num: count(tests where tests.platform = 'platform) }
@@ -281,8 +296,8 @@ histogram
 
       def test(i: Int) = {
         var cnt = 0
-        while(cnt < i) {
-          val result = executor.execute("apiKey", query) 
+        while (cnt < i) {
+          val result = executor.execute("apiKey", query)
           result match {
             case Success(jval) =>
             case Failure(e) => new RuntimeException("Query result failure")
@@ -290,15 +305,15 @@ histogram
           cnt += 1
         }
       }
-      
-      val result = Performance().benchmark(test(1), benchParams, benchParams)   
+
+      val result = Performance().benchmark(test(1), benchParams, benchParams)
       perfUtil.uploadResults("hw3_100k", result)
       //val result = Performance().profile(test(100))   
-      
+
       result.report("hw3 test 100K * 1", System.out)
       true must_== true
     }
-    
+
     "handle null scenario" in {
       val nullReal = """
 [{
@@ -376,7 +391,7 @@ histogram
           jvals.zipWithIndex.map {
             case (jval, idx) =>
               val event = Event(Path("/test/null"), "apiKey", jval, Map.empty)
-              EventMessage(EventId(1,idx), event)
+              EventMessage(EventId(1, idx), event)
           }
       }
 
@@ -466,12 +481,12 @@ histogram
           jvals.zipWithIndex.map {
             case (jval, idx) =>
               val event = Event(Path("/test/mixed"), "apiKey", jval, Map.empty)
-              EventMessage(EventId(2,idx), event)
+              EventMessage(EventId(2, idx), event)
           }
       }
 
       Await.result(bifrost.storeBatch(msgs, timeout), timeout)
-      
+
       Thread.sleep(10000)
 
       val result = executor.execute("apiKey", "load(//test/mixed)")
@@ -479,41 +494,51 @@ histogram
         case Success(JArray(vals)) => vals.size must_== 2
       }
     }.pendingUntilFixed
-    
   }
 
   step {
-    Await.result(bifrost.actorsStop, timeout) 
+    Await.result(bifrost.actorsStop, timeout)
     cleanupTempDir(tmpDir)
   }
 }
 
-class TestQueryExecutor(config: Configuration, testShard: TestShard) extends 
-    JDBMQueryExecutor with
-    IterableDatasetOpsComponent { 
+class TestQueryExecutor(config: Configuration, testShard: TestShard)
+    extends JDBMQueryExecutor with IterableDatasetOpsComponent {
 
   override type Dataset[A] = IterableDataset[A]
 
   lazy val actorSystem = ActorSystem("testQueryExecutor")
-  implicit lazy val asyncContext = ExecutionContext.defaultExecutionContext(actorSystem)
+  implicit lazy val asyncContext =
+    ExecutionContext.defaultExecutionContext(actorSystem)
   lazy val yggConfig = new JDBMQueryExecutorConfig {
-      val config = TestQueryExecutor.this.config
-      val sortWorkDir = scratchDir
-      val memoizationBufferSize = sortBufferSize
-      val memoizationWorkDir = scratchDir
-      
-      val clock = blueeyes.util.Clock.System
-      val idSource = new FreshAtomicIdSource
+    val config = TestQueryExecutor.this.config
+    val sortWorkDir = scratchDir
+    val memoizationBufferSize = sortBufferSize
+    val memoizationWorkDir = scratchDir
 
-      object valueSerialization extends SortSerialization[SValue] with SValueRunlengthFormatting with BinarySValueFormatting with ZippedStreamSerialization
-      object eventSerialization extends SortSerialization[SEvent] with SEventRunlengthFormatting with BinarySValueFormatting with ZippedStreamSerialization
-      object groupSerialization extends SortSerialization[(SValue, Identities, SValue)] with GroupRunlengthFormatting with BinarySValueFormatting with ZippedStreamSerialization
-      object memoSerialization extends IncrementalSerialization[(Identities, SValue)] with SEventRunlengthFormatting with BinarySValueFormatting with ZippedStreamSerialization
+    val clock = blueeyes.util.Clock.System
+    val idSource = new FreshAtomicIdSource
 
-      override lazy val flatMapTimeout: Duration = 5000 seconds
-      override lazy val projectionRetrievalTimeout: Timeout = Timeout(5000 seconds)
-      override lazy val maxEvalDuration: Duration = 5000 seconds
-    }  
+    object valueSerialization
+        extends SortSerialization[SValue] with SValueRunlengthFormatting
+        with BinarySValueFormatting with ZippedStreamSerialization
+    object eventSerialization
+        extends SortSerialization[SEvent] with SEventRunlengthFormatting
+        with BinarySValueFormatting with ZippedStreamSerialization
+    object groupSerialization
+        extends SortSerialization[(SValue, Identities, SValue)]
+        with GroupRunlengthFormatting with BinarySValueFormatting
+        with ZippedStreamSerialization
+    object memoSerialization
+        extends IncrementalSerialization[(Identities, SValue)]
+        with SEventRunlengthFormatting with BinarySValueFormatting
+        with ZippedStreamSerialization
+
+    override lazy val flatMapTimeout: Duration = 5000 seconds
+    override lazy val projectionRetrievalTimeout: Timeout = Timeout(
+        5000 seconds)
+    override lazy val maxEvalDuration: Duration = 5000 seconds
+  }
   type Storage = TestShard
 
   object ops extends Ops
@@ -522,13 +547,16 @@ class TestQueryExecutor(config: Configuration, testShard: TestShard) extends
   val storage = testShard
 }
 
-class TestShard(config: Configuration, dataDir: File) extends ActorYggShard[IterableDataset] with StandaloneActorEcosystem {
+class TestShard(config: Configuration, dataDir: File)
+    extends ActorYggShard[IterableDataset] with StandaloneActorEcosystem {
   type YggConfig = ProductionActorConfig
   lazy val yggConfig = new ProductionActorConfig {
     lazy val config = TestShard.this.config
   }
-  lazy val yggState: YggState = YggState.restore(dataDir).unsafePerformIO.toOption.get 
-  lazy val accessControl: AccessControl = new UnlimitedAccessControl()(ExecutionContext.defaultExecutionContext(actorSystem))
+  lazy val yggState: YggState =
+    YggState.restore(dataDir).unsafePerformIO.toOption.get
+  lazy val accessControl: AccessControl = new UnlimitedAccessControl()(
+      ExecutionContext.defaultExecutionContext(actorSystem))
   def waitForRoutingActorIdle() {
     val td = Duration(5000, "seconds")
     implicit val to = new Timeout(td)

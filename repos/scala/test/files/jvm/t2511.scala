@@ -20,7 +20,7 @@ object Test {
     buf.toByteArray
   }
 
-  def unserialize(buf:Array[Byte]) = {
+  def unserialize(buf: Array[Byte]) = {
     val in = new ObjectInputStream(new ByteArrayInputStream(buf))
     in.readObject.asInstanceOf[MyMessage]
   }
@@ -28,8 +28,9 @@ object Test {
   def main(args: Array[String]) {
     val m = unserialize(serialize)
     // Xcheckinit freaks out here but its nullness is what we're testing
-    try println(m.message)
-    catch { case _: UninitializedFieldError => println("null") }
+    try println(m.message) catch {
+      case _: UninitializedFieldError => println("null")
+    }
     println(m.message2)
   }
 }

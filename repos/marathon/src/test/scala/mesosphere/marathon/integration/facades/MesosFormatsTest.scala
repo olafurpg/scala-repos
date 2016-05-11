@@ -1,6 +1,6 @@
 package mesosphere.marathon.integration.facades
 
-import org.scalatest.{ Matchers, GivenWhenThen, FunSuite }
+import org.scalatest.{Matchers, GivenWhenThen, FunSuite}
 import play.api.libs.json.Json
 
 class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
@@ -25,20 +25,20 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
     And("resources of that agent are correct")
 
     /*
-      * "resources": {
+     * "resources": {
           "cpus": 8.0,
           "disk": 52830.0,
           "mem": 5078.0,
           "ports": "[31000-32000]"
         },
-      */
+     */
     agent.resources should equal(
-      ITResources(
-        "cpus" -> 8.0,
-        "disk" -> 52830.0,
-        "mem" -> 5078.0,
-        "ports" -> "[31000-32000]"
-      )
+        ITResources(
+            "cpus" -> 8.0,
+            "disk" -> 52830.0,
+            "mem" -> 5078.0,
+            "ports" -> "[31000-32000]"
+        )
     )
     /* "used_resources": {
         "cpus": 1.0,
@@ -47,12 +47,12 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
         "ports": "[31903-31903]"
       }, */
     agent.usedResources should equal(
-      ITResources(
-        "cpus" -> 1.0,
-        "disk" -> 128.0,
-        "mem" -> 128.0,
-        "ports" -> "[31903-31903]"
-      )
+        ITResources(
+            "cpus" -> 1.0,
+            "disk" -> 128.0,
+            "mem" -> 128.0,
+            "ports" -> "[31903-31903]"
+        )
     )
     /*
       "offered_resources": {
@@ -62,11 +62,11 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
       },
      */
     agent.offeredResources should equal(
-      ITResources(
-        "cpus" -> 0.0,
-        "disk" -> 0.0,
-        "mem" -> 0.0
-      )
+        ITResources(
+            "cpus" -> 0.0,
+            "disk" -> 0.0,
+            "mem" -> 0.0
+        )
     )
     /*
       "reserved_resources": {
@@ -79,14 +79,14 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
       },
      */
     agent.reservedResourcesByRole should equal(
-      Map(
-        "marathon" -> ITResources(
-          "cpus" -> 1.1,
-          "disk" -> 138.0,
-          "mem" -> 144.0,
-          "ports" -> "[31903-31903]"
+        Map(
+            "marathon" -> ITResources(
+                "cpus" -> 1.1,
+                "disk" -> 138.0,
+                "mem" -> 144.0,
+                "ports" -> "[31903-31903]"
+            )
         )
-      )
     )
     /*
       "unreserved_resources": {
@@ -95,14 +95,14 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
         "mem": 4934.0,
         "ports": "[31000-31902, 31904-32000]"
       },
-    */
+     */
     agent.unreservedResources should equal(
-      ITResources(
-        "cpus" -> 6.9,
-        "disk" -> 52692.0,
-        "mem" -> 4934.0,
-        "ports" -> "[31000-31902, 31904-32000]"
-      )
+        ITResources(
+            "cpus" -> 6.9,
+            "disk" -> 52692.0,
+            "mem" -> 4934.0,
+            "ports" -> "[31000-31902, 31904-32000]"
+        )
     )
   }
 

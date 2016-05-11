@@ -27,7 +27,7 @@ class ScopeTest {
     val bar = sym("bar")
 
     val outerElems = List.tabulate(initSize)(i => sym(i.toString))
-    val outer = newScopeWith(outerElems ++ List(foo, bar) : _*)
+    val outer = newScopeWith(outerElems ++ List(foo, bar): _*)
     assertTrue(outer.containsName(foo.name))
     assertTrue(outer.containsName(bar.name))
 

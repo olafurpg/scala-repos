@@ -10,7 +10,8 @@ object Test extends App {
   def test(sym: ClassSymbol): Unit = {
     def fullyInitializeSymbol(sym: Symbol): Unit = {
       val internal = ru.asInstanceOf[scala.reflect.internal.SymbolTable]
-      internal.definitions.fullyInitializeSymbol(sym.asInstanceOf[internal.Symbol])
+      internal.definitions.fullyInitializeSymbol(
+          sym.asInstanceOf[internal.Symbol])
     }
     def defString(sym: Symbol): String = {
       val internal = ru.asInstanceOf[scala.reflect.internal.SymbolTable]
@@ -24,7 +25,9 @@ object Test extends App {
     sym.info
     println(sym.toString)
     println(s"primary constructor: ${showCtor(sym.primaryConstructor)}")
-    val ctors = sym.info.members.filter(_.name == termNames.CONSTRUCTOR).map(sym => showCtor(sym))
+    val ctors = sym.info.members
+      .filter(_.name == termNames.CONSTRUCTOR)
+      .map(sym => showCtor(sym))
     ctors.toList.sorted.foreach(println)
   }
 

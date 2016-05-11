@@ -14,25 +14,28 @@ private[setup] object UserConfigRepo {
 
   def update(user: User)(f: UserConfig => UserConfig): Funit =
     config(user) flatMap { config =>
-      userConfigTube.coll.update(
-        BSONDocument("_id" -> config.id),
-        f(config),
-        upsert = true).void
+      userConfigTube.coll
+        .update(BSONDocument("_id" -> config.id),
+                f(config),
+                upsert = true)
+        .void
     }
 
   def config(user: User): Fu[UserConfig] =
     $find byId user.id recover {
       case e: LilaException => {
-        logger.warn("Can't load config", e)
-        none[UserConfig]
-      }
+          logger.warn("Can't load config", e)
+          none[UserConfig]
+        }
     } map (_ | UserConfig.default(user.id))
 
   def filter(user: User): Fu[FilterConfig] =
-    userConfigTube.coll.find(
-      BSONDocument("_id" -> user.id),
-      BSONDocument("filter" -> true)
-    ).one[BSONDocument] map {
-        _ flatMap (_.getAs[FilterConfig]("filter")) getOrElse FilterConfig.default
-      }
+    userConfigTube.coll
+      .find(
+          BSONDocument("_id" -> user.id),
+          BSONDocument("filter" -> true)
+      )
+      .one[BSONDocument] map {
+      _ flatMap (_.getAs[FilterConfig]("filter")) getOrElse FilterConfig.default
+    }
 }

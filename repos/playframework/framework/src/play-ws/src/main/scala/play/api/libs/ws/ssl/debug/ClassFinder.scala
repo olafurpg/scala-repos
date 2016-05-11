@@ -5,30 +5,30 @@
  */
 package play.api.libs.ws.ssl.debug
 
-import java.net.{ URLConnection, URL }
-import java.util.jar.{ JarEntry, JarInputStream }
+import java.net.{URLConnection, URL}
+import java.util.jar.{JarEntry, JarInputStream}
 
 /**
- * Loads a set of classes from a package (including ones which are NOT already in the classloader)
- * and return the set that
- */
+  * Loads a set of classes from a package (including ones which are NOT already in the classloader)
+  * and return the set that
+  */
 trait ClassFinder {
 
   def logger: org.slf4j.Logger
 
   /**
-   * A resource (in a jar file, usually) in the format "/java/lang/String.class".  This returns
-   * an initial URL that leads to the JAR file we search for classes.
-   */
+    * A resource (in a jar file, usually) in the format "/java/lang/String.class".  This returns
+    * an initial URL that leads to the JAR file we search for classes.
+    */
   def initialResource: String
 
   /**
-   * Returns true if this is a "valid" class, i.e. one we want to return in a set.  Note that all
-   * found classes are loaded into the current thread's classloader, even they are not returned.
-   *
-   * @param className
-   * @return true if this class should be returned in the set of findClasses, false otherwise.
-   */
+    * Returns true if this is a "valid" class, i.e. one we want to return in a set.  Note that all
+    * found classes are loaded into the current thread's classloader, even they are not returned.
+    *
+    * @param className
+    * @return true if this class should be returned in the set of findClasses, false otherwise.
+    */
   def isValidClass(className: String): Boolean
 
   def findClasses: Set[Class[_]] = {
@@ -52,7 +52,8 @@ trait ClassFinder {
       var je: JarEntry = jis.getNextJarEntry
       while (je != null) {
         if (!je.isDirectory) {
-          var className: String = je.getName.substring(0, je.getName.length - 6)
+          var className: String =
+            je.getName.substring(0, je.getName.length - 6)
           className = className.replace('/', '.')
           if (isValidClass(className)) {
             //logger.debug(s"findClasses: adding valid class ${className}")

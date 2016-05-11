@@ -20,26 +20,27 @@ import com.twitter.summingbird.chill.ChillExecutionConfig
 import com.twitter.scalding.Args
 
 /**
- * @author Ian O Connell
- */
-
-trait StormExecutionConfig extends ChillExecutionConfig[Storm] {
-}
+  * @author Ian O Connell
+  */
+trait StormExecutionConfig extends ChillExecutionConfig[Storm] {}
 
 object Executor {
   def apply(inargs: Array[String], generator: Args => StormExecutionConfig) {
     val args = Args(inargs)
     val config = generator(args)
 
-    val storm = if (args.boolean("local")) {
-      Storm.local(config.getNamedOptions)
-    } else {
-      Storm.remote(config.getNamedOptions)
-    }
+    val storm =
+      if (args.boolean("local")) {
+        Storm.local(config.getNamedOptions)
+      } else {
+        Storm.remote(config.getNamedOptions)
+      }
 
     storm
       .withRegistrars(config.registrars)
-      .withConfigUpdater { c => c.updated(config.transformConfig(c.toMap)) }
+      .withConfigUpdater { c =>
+        c.updated(config.transformConfig(c.toMap))
+      }
       .run(config.graph, config.name)
   }
 }

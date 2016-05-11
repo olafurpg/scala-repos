@@ -5,51 +5,53 @@ import java.util.concurrent.{CountDownLatch => JCountDownLatch}
 import scala.annotation.tailrec
 
 object Memoize {
+
   /**
-   * A Snappable is a memoized function for which a
-   * [[scala.collection.immutable.Map]] of the currently memoized computations
-   * can be obtained.
-   */
+    * A Snappable is a memoized function for which a
+    * [[scala.collection.immutable.Map]] of the currently memoized computations
+    * can be obtained.
+    */
   trait Snappable[A, B] extends (A => B) {
+
     /**
-     * Produces a snapshot of the currently memoized computations, as a
-     * [[scala.collection.immutable.Map]]
-     */
+      * Produces a snapshot of the currently memoized computations, as a
+      * [[scala.collection.immutable.Map]]
+      */
     def snap: Map[A, B]
   }
 
   /**
-   * Thread-safe memoization for a function.
-   *
-   * This works like a lazy val indexed by the input value. The memo
-   * is held as part of the state of the returned function, so keeping
-   * a reference to the function will keep a reference to the
-   * (unbounded) memo table. The memo table will never forget a
-   * result, and will retain a reference to the corresponding input
-   * values as well.
-   *
-   * If the computation has side-effects, they will happen exactly
-   * once per input, even if multiple threads attempt to memoize the
-   * same input at one time, unless the computation throws an
-   * exception. If an exception is thrown, then the result will not be
-   * stored, and the computation will be attempted again upon the next
-   * access. Only one value will be computed at a time. The overhead
-   * required to ensure that the effects happen only once is paid only
-   * in the case of a miss (once per input over the life of the memo
-   * table). Computations for different input values will not block
-   * each other.
-   *
-   * The combination of these factors means that this method is useful
-   * for functions that will only ever be called on small numbers of
-   * inputs, are expensive compared to a hash lookup and the memory
-   * overhead, and will be called repeatedly.
-   */
+    * Thread-safe memoization for a function.
+    *
+    * This works like a lazy val indexed by the input value. The memo
+    * is held as part of the state of the returned function, so keeping
+    * a reference to the function will keep a reference to the
+    * (unbounded) memo table. The memo table will never forget a
+    * result, and will retain a reference to the corresponding input
+    * values as well.
+    *
+    * If the computation has side-effects, they will happen exactly
+    * once per input, even if multiple threads attempt to memoize the
+    * same input at one time, unless the computation throws an
+    * exception. If an exception is thrown, then the result will not be
+    * stored, and the computation will be attempted again upon the next
+    * access. Only one value will be computed at a time. The overhead
+    * required to ensure that the effects happen only once is paid only
+    * in the case of a miss (once per input over the life of the memo
+    * table). Computations for different input values will not block
+    * each other.
+    *
+    * The combination of these factors means that this method is useful
+    * for functions that will only ever be called on small numbers of
+    * inputs, are expensive compared to a hash lookup and the memory
+    * overhead, and will be called repeatedly.
+    */
   def apply[A, B](f: A => B): A => B = snappable[A, B](f)
 
   /**
-   * Produces [[com.twitter.util.Memoize.Snappable]], thread-safe
-   * memoization for a function.
-   */
+    * Produces [[com.twitter.util.Memoize.Snappable]], thread-safe
+    * memoization for a function.
+    */
   def snappable[A, B](f: A => B): Snappable[A, B] =
     new Snappable[A, B] {
       private[this] var memo = Map.empty[A, Either[JCountDownLatch, B]]
@@ -60,9 +62,9 @@ object Memoize {
         }
 
       /**
-       * What to do if we do not find the value already in the memo
-       * table.
-       */
+        * What to do if we do not find the value already in the memo
+        * table.
+        */
       @tailrec private[this] def missing(a: A): B =
         synchronized {
           // With the lock, check to see what state the value is in.
@@ -100,19 +102,18 @@ object Memoize {
 
           case Left(latch) =>
             // Compute the value outside of the synchronized block.
-            val b =
-              try {
-                f(a)
-              } catch {
-                case t: Throwable =>
-                  // If there was an exception running the
-                  // computation, then we need to make sure we do not
-                  // starve any waiters before propagating the
-                  // exception.
-                  synchronized { memo = memo - a }
-                  latch.countDown()
-                  throw t
-              }
+            val b = try {
+              f(a)
+            } catch {
+              case t: Throwable =>
+                // If there was an exception running the
+                // computation, then we need to make sure we do not
+                // starve any waiters before propagating the
+                // exception.
+                synchronized { memo = memo - a }
+                latch.countDown()
+                throw t
+            }
 
             // Update the memo table to indicate that the work has
             // been done, and signal to any waiting threads that the
@@ -128,7 +129,7 @@ object Memoize {
         // is absent, call missing() to determine what to do.
         memo.get(a) match {
           case Some(Right(b)) => b
-          case _              => missing(a)
+          case _ => missing(a)
         }
     }
 }

@@ -34,19 +34,20 @@ import scalafx.scene.text.Font
 import scalafx.scene.text.Font.sfxFont2jfx
 
 /**
- * Companion object for [[scalafx.css.StyleConverter]].
- */
+  * Companion object for [[scalafx.css.StyleConverter]].
+  */
 object StyleConverter {
 
   /**
-   * Converts a ScalaFX StyleConverter to its JavaFX counterpart.
-   *
-   * @param s ScalaFX StyleConverter
-   * @tparam F
-   * @tparam T
-   * @return JavaFX StyleConverter
-   */
-  implicit def sfxStyleConverterProperty2jfx[F, T](s: StyleConverter[F, T]): jfxcss.StyleConverter[F, T] =
+    * Converts a ScalaFX StyleConverter to its JavaFX counterpart.
+    *
+    * @param s ScalaFX StyleConverter
+    * @tparam F
+    * @tparam T
+    * @return JavaFX StyleConverter
+    */
+  implicit def sfxStyleConverterProperty2jfx[F, T](
+      s: StyleConverter[F, T]): jfxcss.StyleConverter[F, T] =
     if (s != null) s.delegate else null
 
   // CONVERTERS
@@ -57,62 +58,68 @@ object StyleConverter {
   def colorConverter: StyleConverter[String, javafx.scene.paint.Color] =
     new StyleConverter(jfxcss.StyleConverter.getColorConverter)
 
-  def effectConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]], javafx.scene.effect.Effect] =
+  def effectConverter: StyleConverter[
+      Array[jfxcss.ParsedValue[_, _]], javafx.scene.effect.Effect] =
     new StyleConverter(jfxcss.StyleConverter.getEffectConverter)
 
-  def enumConverter[E <: Enum[E]](enumClass: Class[E]): StyleConverter[String, _ <: Enum[_]] =
+  def enumConverter[E <: Enum[E]](
+      enumClass: Class[E]): StyleConverter[String, _ <: Enum[_]] =
     new StyleConverter(jfxcss.StyleConverter.getEnumConverter(enumClass))
 
-  def fontConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]], javafx.scene.text.Font] =
+  def fontConverter: StyleConverter[
+      Array[jfxcss.ParsedValue[_, _]], javafx.scene.text.Font] =
     new StyleConverter(jfxcss.StyleConverter.getFontConverter)
 
-  def insetsConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]], javafx.geometry.Insets] =
+  def insetsConverter: StyleConverter[
+      Array[jfxcss.ParsedValue[_, _]], javafx.geometry.Insets] =
     new StyleConverter(jfxcss.StyleConverter.getInsetsConverter)
 
-  def paintConverter: StyleConverter[jfxcss.ParsedValue[_, javafx.scene.paint.Paint], javafx.scene.paint.Paint] =
+  def paintConverter: StyleConverter[
+      jfxcss.ParsedValue[_, javafx.scene.paint.Paint],
+      javafx.scene.paint.Paint] =
     new StyleConverter(jfxcss.StyleConverter.getPaintConverter)
 
   /**
-   * CSS length and number values are parsed into a Size object that is converted to a Number
-   * before the value is applied.
-   */
+    * CSS length and number values are parsed into a Size object that is converted to a Number
+    * before the value is applied.
+    */
   def sizeConverter: StyleConverter[_, Number] =
     new StyleConverter(jfxcss.StyleConverter.getSizeConverter)
 
   /**
-   * A converter for quoted strings which may have embedded unicode characters.
-   */
+    * A converter for quoted strings which may have embedded unicode characters.
+    */
   def stringConverter: StyleConverter[String, String] =
     new StyleConverter(jfxcss.StyleConverter.getStringConverter)
 
   /**
-   * A converter for URL strings.
-   */
+    * A converter for URL strings.
+    */
   def urlConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]], String] =
     new StyleConverter(jfxcss.StyleConverter.getUrlConverter)
-
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/css/StyleConverter.html JavaFX
- * StyleConverter]].
- *
- * @constructor Creates a new ScalaFX StyleConverter from a JavaFX StyleConverter. 
- *              Its default value is a new JavaFX StyleConverter.
- * @param delegate JavaFX StyleConverter.
- * @tparam F
- * @tparam T
- * @since 8.0
- */
-class StyleConverter[F, T](override val delegate: jfxcss.StyleConverter[F, T] = new jfxcss.StyleConverter)
-  extends SFXDelegate[jfxcss.StyleConverter[F, T]] {
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/css/StyleConverter.html JavaFX
+  * StyleConverter]].
+  *
+  * @constructor Creates a new ScalaFX StyleConverter from a JavaFX StyleConverter. 
+  *              Its default value is a new JavaFX StyleConverter.
+  * @param delegate JavaFX StyleConverter.
+  * @tparam F
+  * @tparam T
+  * @since 8.0
+  */
+class StyleConverter[F, T](
+    override val delegate: jfxcss.StyleConverter[F, T] = new jfxcss.StyleConverter)
+    extends SFXDelegate[jfxcss.StyleConverter[F, T]] {
 
   /**
-   * Convert from the parsed CSS value to the target property type.
-   *
-   * @param value The ParsedValue to convert
-   * @param font The Font to use when converting a relative value
-   */
-  def convert(value: jfxcss.ParsedValue[F, T], font: Font): T = delegate.convert(value, font)
-
+    * Convert from the parsed CSS value to the target property type.
+    *
+    * @param value The ParsedValue to convert
+    * @param font The Font to use when converting a relative value
+    */
+  def convert(value: jfxcss.ParsedValue[F, T], font: Font): T =
+    delegate.convert(value, font)
 }

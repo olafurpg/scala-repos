@@ -6,7 +6,8 @@ class Test {
   }
 
   def bar() {
-    /*start*/1/*end*/
+    /*start*/
+    1 /*end*/
   }
 }
 /*
@@ -23,4 +24,4 @@ class Test {
     i
   }
 }
-*/
+ */

@@ -16,7 +16,8 @@ object JUnitBootstrapTestFromJasmine extends JasmineTest {
   describe("org.scalajs.testsuite.junit.JUnitBootstrapTest") {
     it("should bootstrap JUnit test classes") {
       // This should not fail
-      JUnitUtil.loadBootstrapper("org.scalajs.testsuite.junit.JUnitBootstrapTest")
+      JUnitUtil.loadBootstrapper(
+          "org.scalajs.testsuite.junit.JUnitBootstrapTest")
     }
   }
 }

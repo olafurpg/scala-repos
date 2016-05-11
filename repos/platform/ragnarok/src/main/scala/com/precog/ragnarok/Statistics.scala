@@ -25,57 +25,61 @@ import blueeyes.json._
 import scalaz._
 import scalaz.std.option._
 
-
 /**
- * Holds statistics for some metric. These statistics are only valid if
- * `n > 2 * tails`. If `n <= 2 * tails`, then the mean and variance will be
- * `NaN` and the count will be `0`.
- */
-case class Statistics private[ragnarok] (
-    tails: Int,
-    allMin: List[Double],
-    allMax: List[Double],
-    m: Double,
-    vn: Double,
-    n: Int) {
+  * Holds statistics for some metric. These statistics are only valid if
+  * `n > 2 * tails`. If `n <= 2 * tails`, then the mean and variance will be
+  * `NaN` and the count will be `0`.
+  */
+case class Statistics private[ragnarok](tails: Int,
+                                        allMin: List[Double],
+                                        allMax: List[Double],
+                                        m: Double,
+                                        vn: Double,
+                                        n: Int) {
 
   //FIXME: keep track of Double error
 
   /**
-   * Multiply this statistic by some constant > 0. Using this is equivalent to
-   * computing the stats of a scaled (by `x`) version of the original dataset.
-   * This can be safely used to convert between units, after the fact, for
-   * example.
-   */
-  def *(x: Double): Statistics = if (x >= 0.0) {
-    Statistics(tails, allMin map (_ * x), allMax map (_ * x), m * x, vn * x * x, n)
-  } else {
-    Statistics(tails, allMax map (_ * x), allMin map (_ * x), m * x, vn * math.abs(x) * math.abs(x), n)
-  }
-
+    * Multiply this statistic by some constant > 0. Using this is equivalent to
+    * computing the stats of a scaled (by `x`) version of the original dataset.
+    * This can be safely used to convert between units, after the fact, for
+    * example.
+    */
+  def *(x: Double): Statistics =
+    if (x >= 0.0) {
+      Statistics(
+          tails, allMin map (_ * x), allMax map (_ * x), m * x, vn * x * x, n)
+    } else {
+      Statistics(tails,
+                 allMax map (_ * x),
+                 allMin map (_ * x),
+                 m * x,
+                 vn * math.abs(x) * math.abs(x),
+                 n)
+    }
 
   def +(x: Double): Statistics = this + Statistics(x, tails = tails)
 
   def +(that: Statistics): Statistics = Statistics.semigroup.append(this, that)
 
-
   // Calculates the mean, variance, and count without outliers.
-  private lazy val meanVarCount: (Double, Double, Int) = if (n > 2 * tails) {
-    (allMin.reverse.tail ++ allMax.tail).foldLeft((m, vn, n)) {
-      case ((m, vn, n), x) =>
-        val mprev = m + (m - x) / (n - 1)
-        val sprev = vn - (x - mprev) * (x - m)
-        (mprev, sprev, n - 1)
-    } match {
-      case (m, vn, 1) => (m, 0.0, 1)
-      case (m, vn, n) => (m, math.abs(vn / (n - 1)), n)
+  private lazy val meanVarCount: (Double, Double, Int) =
+    if (n > 2 * tails) {
+      (allMin.reverse.tail ++ allMax.tail).foldLeft((m, vn, n)) {
+        case ((m, vn, n), x) =>
+          val mprev = m + (m - x) / (n - 1)
+          val sprev = vn - (x - mprev) * (x - m)
+          (mprev, sprev, n - 1)
+      } match {
+        case (m, vn, 1) => (m, 0.0, 1)
+        case (m, vn, n) => (m, math.abs(vn / (n - 1)), n)
+      }
+    } else {
+      (Double.NaN, Double.NaN, 0)
     }
-  } else {
-    (Double.NaN, Double.NaN, 0)
-  }
 
   def min: Double = allMin.last
-  
+
   def max: Double = allMax.head
 
   def mean: Double = meanVarCount._1
@@ -86,26 +90,26 @@ case class Statistics private[ragnarok] (
 
   def count: Int = meanVarCount._3
 
-  def toJson: JObject = JObject(List(
-    JField("mean", JNum(mean)),
-    JField("variance", JNum(variance)),
-    JField("stdDev", JNum(stdDev)),
-    JField("min", JNum(min)),
-    JField("max", JNum(max)),
-    JField("count", JNum(count))))
+  def toJson: JObject =
+    JObject(
+        List(JField("mean", JNum(mean)),
+             JField("variance", JNum(variance)),
+             JField("stdDev", JNum(stdDev)),
+             JField("min", JNum(min)),
+             JField("max", JNum(max)),
+             JField("count", JNum(count))))
 }
-
 
 object Statistics {
   def apply(x: Double, tails: Int = 0): Statistics =
     Statistics(tails, x :: Nil, x :: Nil, x, 0.0, 1)
 
   /**
-   * The `Statistics` semigroup mixes 2 `Statistics` together. The total number
-   * of outliers kept is the minimum of the 2 `Statistics`, as this is the only
-   * way to ensure associativity.
-   */
-  implicit object semigroup extends Semigroup[Statistics] { 
+    * The `Statistics` semigroup mixes 2 `Statistics` together. The total number
+    * of outliers kept is the minimum of the 2 `Statistics`, as this is the only
+    * way to ensure associativity.
+    */
+  implicit object semigroup extends Semigroup[Statistics] {
     def append(x: Statistics, _y: => Statistics): Statistics = {
       val y = _y
 
@@ -114,11 +118,11 @@ object Statistics {
       val z_tails = x.tails min y.tails
 
       Statistics(z_tails,
-        (x.allMin ++ y.allMin).sorted take (z_tails + 1),
-        (x.allMax ++ y.allMax).sorted takeRight (z_tails + 1),
-        z_m, z_vn, x.n + y.n)
+                 (x.allMin ++ y.allMin).sorted take (z_tails + 1),
+                 (x.allMax ++ y.allMax).sorted takeRight (z_tails + 1),
+                 z_m,
+                 z_vn,
+                 x.n + y.n)
     }
   }
 }
-
-

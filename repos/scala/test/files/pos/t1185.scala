@@ -1,15 +1,15 @@
 class Test {
   private[this] var member = 0;
   def foo() = {
-    (() => member=1)()
+    (() => member = 1)()
   }
-  def look=member
+  def look = member
 }
 
-object Main{
-  def main(args : Array[String]){
-    val fff=new Test()
+object Main {
+  def main(args: Array[String]) {
+    val fff = new Test()
     fff.foo()
-    assert(1==fff.look)
+    assert(1 == fff.look)
   }
 }

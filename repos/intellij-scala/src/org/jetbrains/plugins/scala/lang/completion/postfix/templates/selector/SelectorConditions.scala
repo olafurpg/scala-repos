@@ -11,9 +11,9 @@ import org.jetbrains.plugins.scala.util.ScEquivalenceUtil
 import scala.language.implicitConversions
 
 /**
- * @author Roman.Shein
- * @since 08.09.2015.
- */
+  * @author Roman.Shein
+  * @since 08.09.2015.
+  */
 object SelectorConditions {
 
   val BOOLEAN_EXPR = typedCondition(BooleanType)
@@ -24,23 +24,35 @@ object SelectorConditions {
 
   val THROWABLE = isDescendantCondition("java.lang.Throwable")
 
-  def isDescendantCondition(ancestorFqn: String) = new Condition[PsiElement]{
+  def isDescendantCondition(ancestorFqn: String) = new Condition[PsiElement] {
     override def value(t: PsiElement): Boolean = t match {
       case expr: ScExpression =>
         val project = t.getProject
         val manager = ScalaPsiManager.instance(project)
-        expr.getTypeIgnoreBaseType().toOption.flatMap{exprType => ScType.extractClass(exprType, Option(project)).map{ psiClass =>
-          val base = manager.getCachedClass(ancestorFqn, GlobalSearchScope.allScope(project), ClassCategory.ALL)
-          (psiClass != null && base != null && ScEquivalenceUtil.areClassesEquivalent(psiClass, base)) ||
-                  manager.cachedDeepIsInheritor(psiClass, base)}}.getOrElse(false)
+        expr
+          .getTypeIgnoreBaseType()
+          .toOption
+          .flatMap { exprType =>
+            ScType.extractClass(exprType, Option(project)).map { psiClass =>
+              val base =
+                manager.getCachedClass(ancestorFqn,
+                                       GlobalSearchScope.allScope(project),
+                                       ClassCategory.ALL)
+              (psiClass != null && base != null &&
+                  ScEquivalenceUtil.areClassesEquivalent(psiClass, base)) ||
+              manager.cachedDeepIsInheritor(psiClass, base)
+            }
+          }
+          .getOrElse(false)
       case _ => false
     }
   }
 
-  def typedCondition(myType: ValType) = new Condition[PsiElement]{
+  def typedCondition(myType: ValType) = new Condition[PsiElement] {
 
     override def value(t: PsiElement): Boolean = t match {
-      case expr: ScExpression => expr.getTypeIgnoreBaseType().getOrAny == myType
+      case expr: ScExpression =>
+        expr.getTypeIgnoreBaseType().getOrAny == myType
       case _ => false
     }
   }

@@ -3,7 +3,7 @@
 
 package foo {
   object regular extends Duh {
-    def buh(n: Long)   = println("long")
+    def buh(n: Long) = println("long")
     def buh(n: Double) = println("double")
   }
   class regular {
@@ -20,16 +20,16 @@ package foo {
   }
 
   trait Duh {
-    def duh(n: Long)   = println("long")
+    def duh(n: Long) = println("long")
     def duh(n: Double) = println("double")
   }
   package object bar extends Duh {
-    def buh(n: Long)   = println("long")
+    def buh(n: Long) = println("long")
     def buh(n: Double) = println("double")
   }
   package bar {
     object Main {
-      def main(args:Array[String]) {
+      def main(args: Array[String]) {
         duh(33L)
         duh(3.0d)
         foo.bar.duh(33L)

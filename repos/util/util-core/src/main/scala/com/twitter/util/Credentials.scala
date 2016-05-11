@@ -23,11 +23,11 @@ import scala.io.Source
 import scala.util.parsing.combinator._
 
 /**
- * Simple helper to read authentication credentials from a text file.
- *
- * The file's format is assumed to be trivialized yaml, containing lines of the form ``key: value``.
- * Keys can be any word character or '-' and values can be any character except new lines.
- */
+  * Simple helper to read authentication credentials from a text file.
+  *
+  * The file's format is assumed to be trivialized yaml, containing lines of the form ``key: value``.
+  * Keys can be any word character or '-' and values can be any character except new lines.
+  */
 object Credentials {
   object parser extends RegexParsers {
 
@@ -37,7 +37,9 @@ object Credentials {
     private[this] val value = ".+".r
 
     def auth = key ~ ":" ~ value ^^ { case k ~ ":" ~ v => (k, v) }
-    def content: Parser[Map[String, String]] = rep(auth) ^^ { auths => Map(auths: _*) }
+    def content: Parser[Map[String, String]] = rep(auth) ^^ { auths =>
+      Map(auths: _*)
+    }
 
     def apply(in: String): Map[String, String] = {
       parseAll(content, in) match {
@@ -48,20 +50,26 @@ object Credentials {
     }
   }
 
-  def apply(file: File): Map[String, String] = parser(Source.fromFile(file).mkString)
+  def apply(file: File): Map[String, String] =
+    parser(Source.fromFile(file).mkString)
 
   def apply(data: String): Map[String, String] = parser(data)
 
   def byName(name: String): Map[String, String] = {
-    apply(new File(System.getenv().asScala.getOrElse("KEY_FOLDER", "/etc/keys"), name))
+    apply(
+        new File(System.getenv().asScala.getOrElse("KEY_FOLDER", "/etc/keys"),
+                 name))
   }
 }
 
 /**
- * Java interface to Credentials.
- */
+  * Java interface to Credentials.
+  */
 class Credentials {
-  def read(data: String): java.util.Map[String, String] = Credentials(data).asJava
-  def read(file: File): java.util.Map[String, String] = Credentials(file).asJava
-  def byName(name: String): java.util.Map[String, String] = Credentials.byName(name).asJava
+  def read(data: String): java.util.Map[String, String] =
+    Credentials(data).asJava
+  def read(file: File): java.util.Map[String, String] =
+    Credentials(file).asJava
+  def byName(name: String): java.util.Map[String, String] =
+    Credentials.byName(name).asJava
 }

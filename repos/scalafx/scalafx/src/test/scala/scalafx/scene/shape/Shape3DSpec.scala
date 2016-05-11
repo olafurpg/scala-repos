@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 /** Shape3D Spec tests. */
 @RunWith(classOf[JUnitRunner])
 class Shape3DSpec
-  extends SimpleSFXDelegateSpec[jfxss.Shape3D, Shape3D](classOf[jfxss.Shape3D], classOf[Shape3D]) {
+    extends SimpleSFXDelegateSpec[jfxss.Shape3D, Shape3D](
+        classOf[jfxss.Shape3D], classOf[Shape3D]) {
 
   override protected def getScalaClassInstance = new Box()
 

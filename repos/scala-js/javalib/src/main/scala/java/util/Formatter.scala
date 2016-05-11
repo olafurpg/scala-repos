@@ -6,7 +6,8 @@ import scala.scalajs.js
 import java.io._
 import java.lang._
 
-final class Formatter(private val dest: Appendable) extends Closeable with Flushable {
+final class Formatter(private val dest: Appendable)
+    extends Closeable with Flushable {
   import Formatter._
 
   var closed = false
@@ -60,24 +61,26 @@ final class Formatter(private val dest: Appendable) extends Closeable with Flush
           def hasFlag(flag: String) = flags.indexOf(flag) >= 0
 
           val indexStr = matchResult(1).getOrElse("")
-          val index = if (!indexStr.isEmpty) {
-            Integer.parseInt(indexStr)
-          } else if (hasFlag("<")) {
-            lastIndex
-          } else {
-            lastImplicitIndex += 1
-            lastImplicitIndex
-          }
+          val index =
+            if (!indexStr.isEmpty) {
+              Integer.parseInt(indexStr)
+            } else if (hasFlag("<")) {
+              lastIndex
+            } else {
+              lastImplicitIndex += 1
+              lastImplicitIndex
+            }
           lastIndex = index
           if (index <= 0 || index > args.length)
             throw new MissingFormatArgumentException(matchResult(5).get)
-          val arg = args(index-1)
+          val arg = args(index - 1)
 
           val widthStr = matchResult(3).getOrElse("")
           val hasWidth = !widthStr.isEmpty
           val width = {
             if (hasWidth) Integer.parseInt(widthStr)
-            else if (hasFlag("-")) throw new MissingFormatWidthException(format_in)
+            else if (hasFlag("-"))
+              throw new MissingFormatWidthException(format_in)
             else 0
           }
 
@@ -94,20 +97,19 @@ final class Formatter(private val dest: Appendable) extends Closeable with Flush
             conversion <= 'Z'
 
           def intArg: Int = (arg: Any) match {
-            case arg: Int  => arg
+            case arg: Int => arg
             case arg: Char => arg.toInt
           }
           def numberArg: scala.Double = (arg: Any) match {
             case arg: Number => arg.doubleValue()
-            case arg: Char   => arg.toDouble
+            case arg: Char => arg.toDouble
           }
 
           def padCaptureSign(argStr: String, prefix: String) = {
             val firstChar = argStr.charAt(0)
             if (firstChar == '+' || firstChar == '-')
-              pad(argStr.substring(1), firstChar+prefix)
-            else
-              pad(argStr, prefix)
+              pad(argStr.substring(1), firstChar + prefix)
+            else pad(argStr, prefix)
           }
 
           def strRepeat(s: String, times: Int) = {
@@ -122,21 +124,17 @@ final class Formatter(private val dest: Appendable) extends Closeable with Flush
 
           def with_+(s: String, preventZero: scala.Boolean = false) = {
             if (s.charAt(0) != '-') {
-              if (hasFlag("+"))
-                pad(s, "+", preventZero)
-              else if (hasFlag(" "))
-                pad(s, " ", preventZero)
-              else
-                pad(s, "", preventZero)
+              if (hasFlag("+")) pad(s, "+", preventZero)
+              else if (hasFlag(" ")) pad(s, " ", preventZero)
+              else pad(s, "", preventZero)
             } else {
-              if (hasFlag("("))
-                pad(s.substring(1) + ")", "(", preventZero)
-              else
-                pad(s.substring(1), "-", preventZero)
+              if (hasFlag("(")) pad(s.substring(1) + ")", "(", preventZero)
+              else pad(s.substring(1), "-", preventZero)
             }
           }
 
-          def pad(argStr: String, prefix: String = "",
+          def pad(argStr: String,
+                  prefix: String = "",
                   preventZero: Boolean = false) = {
             val prePadLen = argStr.length + prefix.length
 
@@ -152,8 +150,8 @@ final class Formatter(private val dest: Appendable) extends Closeable with Flush
 
                 if (padZero && padRight)
                   throw new java.util.IllegalFormatFlagsException(flags)
-                else if (padRight) prefix + argStr  + padding
-                else if (padZero)  prefix + padding + argStr
+                else if (padRight) prefix + argStr + padding
+                else if (padZero) prefix + padding + argStr
                 else padding + prefix + argStr
               }
             }
@@ -165,45 +163,51 @@ final class Formatter(private val dest: Appendable) extends Closeable with Flush
           }
 
           (conversion: @switch) match {
-            case 'b' | 'B' => pad { arg match {
-              case null => "false"
-              case b: Boolean => String.valueOf(b)
-              case _ => "true"
-            } }
-            case 'h' | 'H' => pad {
-              if (arg eq null) "null"
-              else Integer.toHexString(arg.hashCode)
-            }
-            case 's' | 'S' => arg match {
-              case formattable: Formattable =>
-                val flags = {
-                  (if (hasFlag("-")) FormattableFlags.LEFT_JUSTIFY else 0) |
-                  (if (hasFlag("#")) FormattableFlags.ALTERNATE else 0) |
-                  (if (isConversionUpperCase) FormattableFlags.UPPERCASE else 0)
+            case 'b' | 'B' =>
+              pad {
+                arg match {
+                  case null => "false"
+                  case b: Boolean => String.valueOf(b)
+                  case _ => "true"
                 }
-                formattable.formatTo(this, flags,
-                    if (hasWidth) width else -1,
-                    if (hasPrecision) precision else -1)
-                None // no further processing
-              case _ =>
-                if (!hasFlag("#"))
-                  pad(String.valueOf(arg))
-                else
-                  throw new FormatFlagsConversionMismatchException("#", 's')
-            }
+              }
+            case 'h' | 'H' =>
+              pad {
+                if (arg eq null) "null"
+                else Integer.toHexString(arg.hashCode)
+              }
+            case 's' | 'S' =>
+              arg match {
+                case formattable: Formattable =>
+                  val flags = {
+                    (if (hasFlag("-")) FormattableFlags.LEFT_JUSTIFY else 0) |
+                    (if (hasFlag("#")) FormattableFlags.ALTERNATE else 0) |
+                    (if (isConversionUpperCase) FormattableFlags.UPPERCASE
+                     else 0)
+                  }
+                  formattable.formatTo(this,
+                                       flags,
+                                       if (hasWidth) width else -1,
+                                       if (hasPrecision) precision else -1)
+                  None // no further processing
+                case _ =>
+                  if (!hasFlag("#")) pad(String.valueOf(arg))
+                  else
+                    throw new FormatFlagsConversionMismatchException("#", 's')
+              }
             case 'c' | 'C' =>
               pad(intArg.toChar.toString)
             case 'd' =>
               with_+(numberArg.toString())
             case 'o' =>
               val str = (arg: Any) match {
-                case arg: scala.Int  => Integer.toOctalString(arg)
+                case arg: scala.Int => Integer.toOctalString(arg)
                 case arg: scala.Long => Long.toOctalString(arg)
               }
               padCaptureSign(str, if (hasFlag("#")) "0" else "")
             case 'x' | 'X' =>
               val str = (arg: Any) match {
-                case arg: scala.Int  => Integer.toHexString(arg)
+                case arg: scala.Int => Integer.toHexString(arg)
                 case arg: scala.Long => Long.toHexString(arg)
               }
               padCaptureSign(str, if (hasFlag("#")) "0x" else "")
@@ -237,7 +241,7 @@ final class Formatter(private val dest: Appendable) extends Closeable with Flush
               // JavaDoc: at least 2 digits
               if ('e' == exp.charAt(exp.length - 3)) {
                 exp.substring(0, exp.length - 1) + "0" +
-                  exp.charAt(exp.length - 1)
+                exp.charAt(exp.length - 1)
               } else exp
             }, numberArg.isNaN || numberArg.isInfinite)
           }
@@ -259,7 +263,6 @@ final class Formatter(private val dest: Appendable) extends Closeable with Flush
 
   private def throwClosedException(): Nothing =
     throw new FormatterClosedException()
-
 }
 
 object Formatter {
@@ -270,10 +273,12 @@ object Formatter {
     }
   }
 
-  private val RegularChunk = new RegExpExtractor(new js.RegExp("""^[^\x25]+"""))
-  private val DoublePercent = new RegExpExtractor(new js.RegExp("""^\x25{2}"""))
+  private val RegularChunk = new RegExpExtractor(
+      new js.RegExp("""^[^\x25]+"""))
+  private val DoublePercent = new RegExpExtractor(
+      new js.RegExp("""^\x25{2}"""))
   private val EOLChunk = new RegExpExtractor(new js.RegExp("""^\x25n"""))
-  private val FormattedChunk = new RegExpExtractor(new js.RegExp(
-      """^\x25(?:([1-9]\d*)\$)?([-#+ 0,\(<]*)(\d*)(?:\.(\d+))?([A-Za-z])"""))
-
+  private val FormattedChunk = new RegExpExtractor(
+      new js.RegExp(
+          """^\x25(?:([1-9]\d*)\$)?([-#+ 0,\(<]*)(\d*)(?:\.(\d+))?([A-Za-z])"""))
 }

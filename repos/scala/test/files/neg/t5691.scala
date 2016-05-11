@@ -21,7 +21,7 @@ class B {
   def foo[N[M[List[_]]]] = ???
 
   // ...but not between type parameters in the same list
-  class F[A, M[L[A]]]         // no warning!
-  type G[A, M[L[A]]] = Int    // no warning!
+  class F[A, M[L[A]]] // no warning!
+  type G[A, M[L[A]]] = Int // no warning!
   def bar[A, N[M[L[A]]]] = ??? // no warning!
 }

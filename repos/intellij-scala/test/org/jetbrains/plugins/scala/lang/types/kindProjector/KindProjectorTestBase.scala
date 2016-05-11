@@ -13,9 +13,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScParameterizedTypeEl
 import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
 
 /**
- * Code taken mostly from ExistentialSimplificationTestBase, with minor modifications
- */
-abstract class KindProjectorTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * Code taken mostly from ExistentialSimplificationTestBase, with minor modifications
+  */
+abstract class KindProjectorTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   private val startExprMarker = "/*start*/"
   private val endExprMarker = "/*end*/"
 
@@ -24,7 +25,8 @@ abstract class KindProjectorTestBase extends ScalaLightPlatformCodeInsightTestCa
   override protected def setUp() = {
     super.setUp()
 
-    val defaultProfile = ScalaCompilerConfiguration.instanceIn(getProjectAdapter).defaultProfile
+    val defaultProfile =
+      ScalaCompilerConfiguration.instanceIn(getProjectAdapter).defaultProfile
     val newSettings = defaultProfile.getSettings
     newSettings.plugins = newSettings.plugins :+ "kind-projector"
     defaultProfile.setSettings(newSettings)
@@ -34,19 +36,27 @@ abstract class KindProjectorTestBase extends ScalaLightPlatformCodeInsightTestCa
     import _root_.junit.framework.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
-    val file = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(startExprMarker)
     val startOffset = offset + startExprMarker.length
 
-    assert(offset != -1, "Not specified start marker in test case. Use /*start*/ in scala file for this.")
+    assert(
+        offset != -1,
+        "Not specified start marker in test case. Use /*start*/ in scala file for this.")
     val endOffset = fileText.indexOf(endExprMarker)
-    assert(endOffset != -1, "Not specified end marker in test case. Use /*end*/ in scala file for this.")
+    assert(
+        endOffset != -1,
+        "Not specified end marker in test case. Use /*end*/ in scala file for this.")
 
-    val expr: ScParameterizedTypeElement = PsiTreeUtil.findElementOfClassAtRange(scalaFile, startOffset, endOffset, classOf[ScParameterizedTypeElement])
+    val expr: ScParameterizedTypeElement = PsiTreeUtil
+      .findElementOfClassAtRange(
+        scalaFile, startOffset, endOffset, classOf[ScParameterizedTypeElement])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.computeDesugarizedType
     typez match {
@@ -59,10 +69,13 @@ abstract class KindProjectorTestBase extends ScalaLightPlatformCodeInsightTestCa
           case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
           case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
             text.substring(2, text.length - 2).trim
-          case _ => assertTrue("Test result must be in last comment statement.", false)
+          case _ =>
+            assertTrue("Test result must be in last comment statement.", false)
         }
         assertEquals(output, res)
-      case _ => assert(assertion = false, message = "Projection type not created from parameterized type")
+      case _ =>
+        assert(assertion = false,
+               message = "Projection type not created from parameterized type")
     }
   }
 }

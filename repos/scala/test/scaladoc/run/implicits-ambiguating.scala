@@ -14,10 +14,20 @@ object Test extends ScaladocModelTest {
     import access._
 
     def isAmbiguous(mbr: MemberEntity): Boolean =
-      mbr.byConversion.map(_.source.implicitsShadowing.get(mbr).map(_.isAmbiguous).getOrElse(false)).getOrElse(false)
+      mbr.byConversion
+        .map(_.source.implicitsShadowing
+              .get(mbr)
+              .map(_.isAmbiguous)
+              .getOrElse(false))
+        .getOrElse(false)
 
     // SEE THE test/resources/implicits-chaining-res.scala FOR THE EXPLANATION OF WHAT'S CHECKED HERE:
-    val base = root._package("scala")._package("test")._package("scaladoc")._package("implicits")._package("ambiguating")
+    val base = root
+      ._package("scala")
+      ._package("test")
+      ._package("scaladoc")
+      ._package("implicits")
+      ._package("ambiguating")
     var conv1: ImplicitConversion = null
     var conv2: ImplicitConversion = null
 
@@ -33,29 +43,41 @@ object Test extends ScaladocModelTest {
     assert(conv2.constraints.length == 0)
 
     /** - conv1-5 should be ambiguous
-     *  - conv6-7 should not be ambiguous
-     *  - conv8 should be ambiguous
-     *  - conv9 should be ambiguous
-     *  - conv10 and conv11 should not be ambiguous */
+      *  - conv6-7 should not be ambiguous
+      *  - conv8 should be ambiguous
+      *  - conv9 should be ambiguous
+      *  - conv10 and conv11 should not be ambiguous */
     def check1to9(cls: String): Unit = {
       for (conv <- (1 to 5).map("conv" + _)) {
-        assert(isAmbiguous(conv1._member(conv)), cls + " - AtoX." + conv + " is ambiguous")
-        assert(isAmbiguous(conv2._member(conv)), cls + " - AtoZ." + conv + " is ambiguous")
+        assert(isAmbiguous(conv1._member(conv)),
+               cls + " - AtoX." + conv + " is ambiguous")
+        assert(isAmbiguous(conv2._member(conv)),
+               cls + " - AtoZ." + conv + " is ambiguous")
       }
       for (conv <- (6 to 7).map("conv" + _)) {
-        assert(!isAmbiguous(conv1._member(conv)), cls + " - AtoX." + conv + " is not ambiguous")
-        assert(!isAmbiguous(conv2._member(conv)), cls + " - AtoZ." + conv + " is not ambiguous")
+        assert(!isAmbiguous(conv1._member(conv)),
+               cls + " - AtoX." + conv + " is not ambiguous")
+        assert(!isAmbiguous(conv2._member(conv)),
+               cls + " - AtoZ." + conv + " is not ambiguous")
       }
-      assert(isAmbiguous(conv1._member("conv8")), cls + " - AtoX.conv8 is ambiguous")
-      assert(isAmbiguous(conv2._member("conv8")), cls + " - AtoZ.conv8 is ambiguous")
-      assert(isAmbiguous(conv1._member("conv9")), cls + " - AtoX.conv9 is ambiguous")
-      assert(isAmbiguous(conv2._member("conv9")), cls + " - AtoZ.conv9 is ambiguous")
+      assert(isAmbiguous(conv1._member("conv8")),
+             cls + " - AtoX.conv8 is ambiguous")
+      assert(isAmbiguous(conv2._member("conv8")),
+             cls + " - AtoZ.conv8 is ambiguous")
+      assert(isAmbiguous(conv1._member("conv9")),
+             cls + " - AtoX.conv9 is ambiguous")
+      assert(isAmbiguous(conv2._member("conv9")),
+             cls + " - AtoZ.conv9 is ambiguous")
     }
     check1to9("A")
-    assert(!isAmbiguous(conv1._member("conv10")), "A - AtoX.conv10 is not ambiguous")
-    assert(!isAmbiguous(conv2._member("conv10")), "A - AtoZ.conv10 is not ambiguous")
-    assert(!isAmbiguous(conv1._member("conv11")), "A - AtoX.conv11 is not ambiguous")
-    assert(!isAmbiguous(conv2._member("conv11")), "A - AtoZ.conv11 is not ambiguous")
+    assert(!isAmbiguous(conv1._member("conv10")),
+           "A - AtoX.conv10 is not ambiguous")
+    assert(!isAmbiguous(conv2._member("conv10")),
+           "A - AtoZ.conv10 is not ambiguous")
+    assert(!isAmbiguous(conv1._member("conv11")),
+           "A - AtoX.conv11 is not ambiguous")
+    assert(!isAmbiguous(conv2._member("conv11")),
+           "A - AtoZ.conv11 is not ambiguous")
 
 //// class B ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -70,10 +92,14 @@ object Test extends ScaladocModelTest {
 
     /** conv1-9 should be the same, conv10 should be ambiguous, conv11 should be okay */
     check1to9("B")
-    assert(isAmbiguous(conv1._member("conv10")), "B - AtoX.conv10 is ambiguous")
-    assert(isAmbiguous(conv2._member("conv10")), "B - AtoZ.conv10 is ambiguous")
-    assert(!isAmbiguous(conv1._member("conv11")), "B - AtoX.conv11 is not ambiguous")
-    assert(!isAmbiguous(conv2._member("conv11")), "B - AtoZ.conv11 is not ambiguous")
+    assert(
+        isAmbiguous(conv1._member("conv10")), "B - AtoX.conv10 is ambiguous")
+    assert(
+        isAmbiguous(conv2._member("conv10")), "B - AtoZ.conv10 is ambiguous")
+    assert(!isAmbiguous(conv1._member("conv11")),
+           "B - AtoX.conv11 is not ambiguous")
+    assert(!isAmbiguous(conv2._member("conv11")),
+           "B - AtoZ.conv11 is not ambiguous")
 
 //// class C ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -88,10 +114,14 @@ object Test extends ScaladocModelTest {
 
     /** conv1-9 should be the same, conv10 and conv11 should not be ambiguous */
     check1to9("C")
-    assert(!isAmbiguous(conv1._member("conv10")), "C - AtoX.conv10 is not ambiguous")
-    assert(!isAmbiguous(conv2._member("conv10")), "C - AtoZ.conv10 is not ambiguous")
-    assert(!isAmbiguous(conv1._member("conv11")), "C - AtoX.conv11 is not ambiguous")
-    assert(!isAmbiguous(conv2._member("conv11")), "C - AtoZ.conv11 is not ambiguous")
+    assert(!isAmbiguous(conv1._member("conv10")),
+           "C - AtoX.conv10 is not ambiguous")
+    assert(!isAmbiguous(conv2._member("conv10")),
+           "C - AtoZ.conv10 is not ambiguous")
+    assert(!isAmbiguous(conv1._member("conv11")),
+           "C - AtoX.conv11 is not ambiguous")
+    assert(!isAmbiguous(conv2._member("conv11")),
+           "C - AtoZ.conv11 is not ambiguous")
 
 //// class D ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -106,9 +136,13 @@ object Test extends ScaladocModelTest {
 
     /** conv1-9 should be the same, conv10 should not be ambiguous while conv11 should be ambiguous */
     check1to9("D")
-    assert(!isAmbiguous(conv1._member("conv10")), "D - AtoX.conv10 is not ambiguous")
-    assert(!isAmbiguous(conv2._member("conv10")), "D - AtoZ.conv10 is not ambiguous")
-    assert(isAmbiguous(conv1._member("conv11")), "D - AtoX.conv11 is ambiguous")
-    assert(isAmbiguous(conv2._member("conv11")), "D - AtoZ.conv11 is ambiguous")
+    assert(!isAmbiguous(conv1._member("conv10")),
+           "D - AtoX.conv10 is not ambiguous")
+    assert(!isAmbiguous(conv2._member("conv10")),
+           "D - AtoZ.conv10 is not ambiguous")
+    assert(
+        isAmbiguous(conv1._member("conv11")), "D - AtoX.conv11 is ambiguous")
+    assert(
+        isAmbiguous(conv2._member("conv11")), "D - AtoZ.conv11 is ambiguous")
   }
 }

@@ -9,16 +9,18 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaLexer
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 
 /**
- * @author Alefas
- * @since 27.03.12
- */
-
+  * @author Alefas
+  * @since 27.03.12
+  */
 class ScalaLightKeyword private (manager: PsiManager, text: String)
-  extends LightElement(manager, ScalaFileType.SCALA_LANGUAGE) with ScalaPsiElement {
-  protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+    extends LightElement(manager, ScalaFileType.SCALA_LANGUAGE)
+    with ScalaPsiElement {
+  protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): Array[T] =
     findChildrenByClass[T](clazz)
 
-  protected def findChildByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): T = findChildByClass[T](clazz)
+  protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): T = findChildByClass[T](clazz)
 
   override def getText: String = text
 
@@ -34,7 +36,8 @@ class ScalaLightKeyword private (manager: PsiManager, text: String)
 }
 
 object ScalaLightKeyword {
-  private val keywords = ContainerUtil.newConcurrentMap[(PsiManager, String), ScalaLightKeyword]()
+  private val keywords =
+    ContainerUtil.newConcurrentMap[(PsiManager, String), ScalaLightKeyword]()
 
   def apply(manager: PsiManager, text: String): ScalaLightKeyword = {
     var res = keywords.get((manager, text))

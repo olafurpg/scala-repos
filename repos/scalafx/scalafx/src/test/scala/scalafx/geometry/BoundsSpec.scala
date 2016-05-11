@@ -36,15 +36,17 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Bounds Spec tests.
- *
- */
+  * Bounds Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class BoundsSpec
-  extends SimpleSFXDelegateSpec[jfxg.Bounds, Bounds](classOf[jfxg.Bounds], classOf[Bounds]) {
+    extends SimpleSFXDelegateSpec[jfxg.Bounds, Bounds](
+        classOf[jfxg.Bounds], classOf[Bounds]) {
 
-  override protected def getScalaClassInstance = new Bounds(getJavaClassInstance) {}
+  override protected def getScalaClassInstance =
+    new Bounds(getJavaClassInstance) {}
 
-  override protected def getJavaClassInstance = new jfxg.BoundingBox(0, 0, 0, 0, 0, 0)
-
+  override protected def getJavaClassInstance =
+    new jfxg.BoundingBox(0, 0, 0, 0, 0, 0)
 }

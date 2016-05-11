@@ -24,11 +24,13 @@ object ThreadPoolsSpec extends PlaySpecification {
 
     "make a global thread pool available" in new WithApplication() {
       val controller = app.injector.instanceOf[Samples]
-      contentAsString(controller.someAsyncAction(FakeRequest())) must startWith("The response code was")
+      contentAsString(controller.someAsyncAction(FakeRequest())) must startWith(
+          "The response code was")
     }
 
     "have a global configuration" in {
-      val config = """#default-config
+      val config =
+        """#default-config
         akka {
           actor {
             default-dispatcher {
@@ -57,7 +59,8 @@ object ThreadPoolsSpec extends PlaySpecification {
     }
 
     "use akka default thread pool configuration" in {
-      val config = """#akka-default-config
+      val config =
+        """#akka-default-config
         akka {
           actor {
             default-dispatcher {
@@ -89,7 +92,7 @@ object ThreadPoolsSpec extends PlaySpecification {
     }
 
     "allow configuring a custom thread pool" in runningWithConfig(
-      """#my-context-config
+        """#my-context-config
         my-context {
           fork-join-executor {
             parallelism-factor = 20.0
@@ -100,9 +103,11 @@ object ThreadPoolsSpec extends PlaySpecification {
     ) { implicit app =>
       val akkaSystem = app.actorSystem
       //#my-context-usage
-      val myExecutionContext: ExecutionContext = akkaSystem.dispatchers.lookup("my-context")
+      val myExecutionContext: ExecutionContext =
+        akkaSystem.dispatchers.lookup("my-context")
       //#my-context-usage
-      await(Future(Thread.currentThread().getName)(myExecutionContext)) must startWith("application-my-context")
+      await(Future(Thread.currentThread().getName)(myExecutionContext)) must startWith(
+          "application-my-context")
 
       //#my-context-explicit
       Future {
@@ -130,7 +135,8 @@ object ThreadPoolsSpec extends PlaySpecification {
     }
 
     "allow a synchronous thread pool" in {
-      val config = ConfigFactory.parseString("""#highly-synchronous
+      val config =
+        ConfigFactory.parseString("""#highly-synchronous
       akka {
         actor {
           default-dispatcher {
@@ -150,7 +156,7 @@ object ThreadPoolsSpec extends PlaySpecification {
     }
 
     "allow configuring many custom thread pools" in runningWithConfig(
-    """ #many-specific-config
+        """ #many-specific-config
       contexts {
         simple-db-lookups {
           executor = "thread-pool-executor"
@@ -184,31 +190,38 @@ object ThreadPoolsSpec extends PlaySpecification {
       val akkaSystem = app.actorSystem
       //#many-specific-contexts
       object Contexts {
-        implicit val simpleDbLookups: ExecutionContext = akkaSystem.dispatchers.lookup("contexts.simple-db-lookups")
-        implicit val expensiveDbLookups: ExecutionContext = akkaSystem.dispatchers.lookup("contexts.expensive-db-lookups")
-        implicit val dbWriteOperations: ExecutionContext = akkaSystem.dispatchers.lookup("contexts.db-write-operations")
-        implicit val expensiveCpuOperations: ExecutionContext = akkaSystem.dispatchers.lookup("contexts.expensive-cpu-operations")
+        implicit val simpleDbLookups: ExecutionContext =
+          akkaSystem.dispatchers.lookup("contexts.simple-db-lookups")
+        implicit val expensiveDbLookups: ExecutionContext =
+          akkaSystem.dispatchers.lookup("contexts.expensive-db-lookups")
+        implicit val dbWriteOperations: ExecutionContext =
+          akkaSystem.dispatchers.lookup("contexts.db-write-operations")
+        implicit val expensiveCpuOperations: ExecutionContext =
+          akkaSystem.dispatchers.lookup("contexts.expensive-cpu-operations")
       }
       //#many-specific-contexts
       def test(context: ExecutionContext, name: String) = {
-        await(Future(Thread.currentThread().getName)(context)) must startWith("application-contexts." + name)
+        await(Future(Thread.currentThread().getName)(context)) must startWith(
+            "application-contexts." + name)
       }
       test(Contexts.simpleDbLookups, "simple-db-lookups")
       test(Contexts.expensiveDbLookups, "expensive-db-lookups")
       test(Contexts.dbWriteOperations, "db-write-operations")
       test(Contexts.expensiveCpuOperations, "expensive-cpu-operations")
     }
-
   }
 
-  def runningWithConfig[T: AsResult](config: String )(block: Application => T) = {
-    val parsed: java.util.Map[String,Object] = ConfigFactory.parseString(config).root.unwrapped
-    running(_.configure(Configuration(ConfigFactory.parseString(config))))(block)
+  def runningWithConfig[T : AsResult](config: String)(
+      block: Application => T) = {
+    val parsed: java.util.Map[String, Object] =
+      ConfigFactory.parseString(config).root.unwrapped
+    running(_.configure(Configuration(ConfigFactory.parseString(config))))(
+        block)
   }
 }
 
 // since specs provides defaultContext, implicitly importing it doesn't work
-class Samples @Inject() (wsClient: WSClient) {
+class Samples @Inject()(wsClient: WSClient) {
 
   //#global-thread-pool
   import play.api.libs.concurrent.Execution.Implicits._
@@ -222,5 +235,4 @@ class Samples @Inject() (wsClient: WSClient) {
     }
   }
   //#global-thread-pool
-
 }

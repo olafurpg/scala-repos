@@ -182,5 +182,4 @@ class ContextTest extends FunSuite with AssertionsForJUnit {
     }
     assert(ran == 4)
   }
-
 }

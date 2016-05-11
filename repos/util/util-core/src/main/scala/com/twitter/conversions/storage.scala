@@ -21,24 +21,28 @@ import scala.language.implicitConversions
 
 object storage {
   class RichWholeNumber(wrapped: Long) {
-    def byte: StorageUnit      = bytes
-    def bytes: StorageUnit     = new StorageUnit(wrapped)
-    def kilobyte: StorageUnit  = kilobytes
+    def byte: StorageUnit = bytes
+    def bytes: StorageUnit = new StorageUnit(wrapped)
+    def kilobyte: StorageUnit = kilobytes
     def kilobytes: StorageUnit = new StorageUnit(wrapped * 1024)
-    def megabyte: StorageUnit  = megabytes
+    def megabyte: StorageUnit = megabytes
     def megabytes: StorageUnit = new StorageUnit(wrapped * 1024 * 1024)
-    def gigabyte: StorageUnit  = gigabytes
+    def gigabyte: StorageUnit = gigabytes
     def gigabytes: StorageUnit = new StorageUnit(wrapped * 1024 * 1024 * 1024)
-    def terabyte: StorageUnit  = terabytes
-    def terabytes: StorageUnit = new StorageUnit(wrapped * 1024 * 1024 * 1024 * 1024)
-    def petabyte: StorageUnit  = petabytes
-    def petabytes: StorageUnit = new StorageUnit(wrapped * 1024 * 1024 * 1024 * 1024 * 1024)
+    def terabyte: StorageUnit = terabytes
+    def terabytes: StorageUnit =
+      new StorageUnit(wrapped * 1024 * 1024 * 1024 * 1024)
+    def petabyte: StorageUnit = petabytes
+    def petabytes: StorageUnit =
+      new StorageUnit(wrapped * 1024 * 1024 * 1024 * 1024 * 1024)
 
-    def thousand: Long  = wrapped * 1000
-    def million: Long   = wrapped * 1000 * 1000
-    def billion: Long   = wrapped * 1000 * 1000 * 1000
+    def thousand: Long = wrapped * 1000
+    def million: Long = wrapped * 1000 * 1000
+    def billion: Long = wrapped * 1000 * 1000 * 1000
   }
 
-  implicit def intToStorageUnitableWholeNumber(i: Int): RichWholeNumber = new RichWholeNumber(i)
-  implicit def longToStorageUnitableWholeNumber(l: Long): RichWholeNumber = new RichWholeNumber(l)
+  implicit def intToStorageUnitableWholeNumber(i: Int): RichWholeNumber =
+    new RichWholeNumber(i)
+  implicit def longToStorageUnitableWholeNumber(l: Long): RichWholeNumber =
+    new RichWholeNumber(l)
 }

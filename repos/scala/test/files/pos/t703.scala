@@ -1,6 +1,6 @@
 object Go {
   trait A {
-    def f : Unit; // = Console.println("A");
+    def f: Unit; // = Console.println("A");
   }
   trait B extends A {
     abstract override def f = {
@@ -22,7 +22,7 @@ object Go {
   class Super extends A {
     def f: Unit = Console.println("A")
   }
-  def main(args : Array[String]) : Unit = {
+  def main(args: Array[String]): Unit = {
     object d extends Super with D
     d.f;
   }

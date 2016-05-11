@@ -18,12 +18,11 @@ abstract class Client {
   val d = new Description
 
   // Type alias
-  val den: D<ref>en
+  val den: D < ref > en
 
   // Value
   val p = popa
 
   // Inner class in refinements
   val y: Yole
-
 }

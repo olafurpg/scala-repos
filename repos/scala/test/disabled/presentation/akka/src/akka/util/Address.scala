@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
- */
+  * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
+  */
 package akka.util
 
 import java.net.InetSocketAddress
@@ -23,7 +23,7 @@ class Address(val hostname: String, val port: Int) {
 
   override def equals(that: Any): Boolean = {
     that.isInstanceOf[Address] &&
-      that.asInstanceOf[Address].hostname == hostname &&
-      that.asInstanceOf[Address].port == port
+    that.asInstanceOf[Address].hostname == hostname &&
+    that.asInstanceOf[Address].port == port
   }
 }

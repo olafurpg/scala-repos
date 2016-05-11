@@ -22,15 +22,19 @@ import org.apache.spark.SparkFunSuite
 class AttributeGroupSuite extends SparkFunSuite {
 
   test("attribute group") {
-    val attrs = Array(
-      NumericAttribute.defaultAttr,
-      NominalAttribute.defaultAttr,
-      BinaryAttribute.defaultAttr.withIndex(0),
-      NumericAttribute.defaultAttr.withName("age").withSparsity(0.8),
-      NominalAttribute.defaultAttr.withName("size").withValues("small", "medium", "large"),
-      BinaryAttribute.defaultAttr.withName("clicked").withValues("no", "yes"),
-      NumericAttribute.defaultAttr,
-      NumericAttribute.defaultAttr)
+    val attrs =
+      Array(NumericAttribute.defaultAttr,
+            NominalAttribute.defaultAttr,
+            BinaryAttribute.defaultAttr.withIndex(0),
+            NumericAttribute.defaultAttr.withName("age").withSparsity(0.8),
+            NominalAttribute.defaultAttr
+              .withName("size")
+              .withValues("small", "medium", "large"),
+            BinaryAttribute.defaultAttr
+              .withName("clicked")
+              .withValues("no", "yes"),
+            NumericAttribute.defaultAttr,
+            NumericAttribute.defaultAttr)
     val group = new AttributeGroup("user", attrs)
     assert(group.size === 8)
     assert(group.name === "user")
@@ -43,7 +47,8 @@ class AttributeGroupSuite extends SparkFunSuite {
     intercept[NoSuchElementException] {
       group("abc")
     }
-    assert(group === AttributeGroup.fromMetadata(group.toMetadataImpl, group.name))
+    assert(group === AttributeGroup.fromMetadata(group.toMetadataImpl,
+                                                 group.name))
     assert(group === AttributeGroup.fromStructField(group.toStructField()))
   }
 
@@ -53,7 +58,8 @@ class AttributeGroupSuite extends SparkFunSuite {
     assert(group0.numAttributes === Some(10))
     assert(group0.size === 10)
     assert(group0.attributes.isEmpty)
-    assert(group0 === AttributeGroup.fromMetadata(group0.toMetadataImpl, group0.name))
+    assert(group0 === AttributeGroup.fromMetadata(group0.toMetadataImpl,
+                                                  group0.name))
     assert(group0 === AttributeGroup.fromStructField(group0.toStructField()))
 
     val group1 = new AttributeGroup("item")

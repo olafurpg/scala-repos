@@ -18,5 +18,4 @@ object Test extends App {
   test1(12)
   println("===============")
   test1(123)
-
 }

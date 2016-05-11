@@ -16,8 +16,10 @@ import java.util.concurrent.atomic.AtomicLong
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory
 import scala.language.reflectiveCalls
 
-class PersistentService[Req, Rep](factory: ServiceFactory[Req, Rep]) extends Service[Req, Rep] {
-  @volatile private[this] var currentService: Future[Service[Req, Rep]] = factory()
+class PersistentService[Req, Rep](factory: ServiceFactory[Req, Rep])
+    extends Service[Req, Rep] {
+  @volatile private[this] var currentService: Future[Service[Req, Rep]] =
+    factory()
 
   def apply(req: Req) =
     currentService flatMap { service =>
@@ -56,21 +58,23 @@ object MemcacheStress extends App {
     if (config.nworkers() > 0)
       builder = builder.channelFactory(
           new NioClientSocketChannelFactory(
-            Executors.newCachedThreadPool(new NamedPoolThreadFactory("memcacheboss")),
-            Executors.newCachedThreadPool(new NamedPoolThreadFactory("memcacheIO")),
-            config.nworkers()
+              Executors.newCachedThreadPool(
+                  new NamedPoolThreadFactory("memcacheboss")),
+              Executors.newCachedThreadPool(
+                  new NamedPoolThreadFactory("memcacheIO")),
+              config.nworkers()
           )
-        )
+      )
 
-    if (config.stats())    builder = builder.reportTo(new OstrichStatsReceiver)
-    if (config.tracing())  com.twitter.finagle.tracing.Trace.enable()
-    else                 com.twitter.finagle.tracing.Trace.disable()
+    if (config.stats()) builder = builder.reportTo(new OstrichStatsReceiver)
+    if (config.tracing()) com.twitter.finagle.tracing.Trace.enable()
+    else com.twitter.finagle.tracing.Trace.disable()
 
     val key = "x" * config.keysize()
     val value = Buf.Utf8("y" * config.valuesize())
 
-    val runtime = RuntimeEnvironment(this, Array()/*no args for you*/)
-    val adminService = new AdminHttpService(2000, 100/*backlog*/, runtime)
+    val runtime = RuntimeEnvironment(this, Array() /*no args for you*/ )
+    val adminService = new AdminHttpService(2000, 100 /*backlog*/, runtime)
     adminService.start()
 
     println(builder)

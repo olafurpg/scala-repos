@@ -14,4 +14,3 @@ class Test {
     case CTB(_, B) =>
   }
 }
-

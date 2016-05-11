@@ -14,10 +14,12 @@ import com.intellij.openapi.util.Condition
 import org.jetbrains.annotations.NotNull
 
 /**
- * @author Pavel Fatin
- */
-class SbtProjectSettingsControl(context: Context, initialSettings: SbtProjectSettings)
-        extends AbstractExternalProjectSettingsControl[SbtProjectSettings](initialSettings) {
+  * @author Pavel Fatin
+  */
+class SbtProjectSettingsControl(
+    context: Context, initialSettings: SbtProjectSettings)
+    extends AbstractExternalProjectSettingsControl[SbtProjectSettings](
+        initialSettings) {
 
   private val jdkComboBox: JdkComboBox = {
     val model = new ProjectSdksModel()
@@ -37,14 +39,22 @@ class SbtProjectSettingsControl(context: Context, initialSettings: SbtProjectSet
       }
     }
 
-    result.setSetupButton(button, null, model, new JdkComboBox.NoneJdkComboBoxItem, addToTable, false)
+    result.setSetupButton(button,
+                          null,
+                          model,
+                          new JdkComboBox.NoneJdkComboBoxItem,
+                          addToTable,
+                          false)
 
     result
   }
 
-  private val resolveClassifiersCheckBox = new JCheckBox(SbtBundle("sbt.settings.resolveClassifiers"))
-  private val resolveJavadocsCheckBox = new JCheckBox(SbtBundle("sbt.settings.resolveJavadocs"))
-  private val resolveSbtClassifiersCheckBox = new JCheckBox(SbtBundle("sbt.settings.resolveSbtClassifiers"))
+  private val resolveClassifiersCheckBox = new JCheckBox(
+      SbtBundle("sbt.settings.resolveClassifiers"))
+  private val resolveJavadocsCheckBox = new JCheckBox(
+      SbtBundle("sbt.settings.resolveJavadocs"))
+  private val resolveSbtClassifiersCheckBox = new JCheckBox(
+      SbtBundle("sbt.settings.resolveSbtClassifiers"))
 
   def fillExtraControls(@NotNull content: PaintAwarePanel, indentLevel: Int) {
     val downloadPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0))
@@ -71,15 +81,16 @@ class SbtProjectSettingsControl(context: Context, initialSettings: SbtProjectSet
     val settings = getInitialSettings
 
     selectedJdkName != settings.jdkName ||
-      resolveClassifiersCheckBox.isSelected != settings.resolveClassifiers ||
-      resolveSbtClassifiersCheckBox.isSelected != settings.resolveClassifiers ||
-      resolveJavadocsCheckBox.isSelected != settings.resolveJavadocs
+    resolveClassifiersCheckBox.isSelected != settings.resolveClassifiers ||
+    resolveSbtClassifiersCheckBox.isSelected != settings.resolveClassifiers ||
+    resolveJavadocsCheckBox.isSelected != settings.resolveJavadocs
   }
 
   protected def resetExtraSettings(isDefaultModuleCreation: Boolean) {
     val settings = getInitialSettings
 
-    val jdk = settings.jdkName.flatMap(name => Option(ProjectJdkTable.getInstance.findJdk(name)))
+    val jdk = settings.jdkName.flatMap(
+        name => Option(ProjectJdkTable.getInstance.findJdk(name)))
     jdkComboBox.setSelectedJdk(jdk.orNull)
 
     resolveClassifiersCheckBox.setSelected(settings.resolveClassifiers)
@@ -98,7 +109,9 @@ class SbtProjectSettingsControl(context: Context, initialSettings: SbtProjectSet
     settings.resolveJavadocs = resolveJavadocsCheckBox.isSelected
   }
 
-  private def selectedJdkName = Option(jdkComboBox.getSelectedJdk).map(_.getName)
+  private def selectedJdkName =
+    Option(jdkComboBox.getSelectedJdk).map(_.getName)
 
-  def validate(sbtProjectSettings: SbtProjectSettings) = selectedJdkName.isDefined
+  def validate(sbtProjectSettings: SbtProjectSettings) =
+    selectedJdkName.isDefined
 }

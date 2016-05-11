@@ -16,38 +16,37 @@
 
 package akka.shapeless
 
-
 /**
- * `HList` ADT base trait.
- *
- * @author Miles Sabin
- */
+  * `HList` ADT base trait.
+  *
+  * @author Miles Sabin
+  */
 sealed trait HList
 
 /**
- * Non-empty `HList` element type.
- *
- * @author Miles Sabin
- */
+  * Non-empty `HList` element type.
+  *
+  * @author Miles Sabin
+  */
 final case class ::[+H, +T <: HList](head: H, tail: T) extends HList {
   override def toString = head + " :: " + tail.toString
 }
 
 /**
- * Empty `HList` element type.
- *
- * @author Miles Sabin
- */
+  * Empty `HList` element type.
+  *
+  * @author Miles Sabin
+  */
 sealed trait HNil extends HList {
   def ::[H](h: H) = akka.shapeless.::(h, this)
   override def toString = "HNil"
 }
 
 /**
- * Empty `HList` value.
- *
- * @author Miles Sabin
- */
+  * Empty `HList` value.
+  *
+  * @author Miles Sabin
+  */
 case object HNil extends HNil
 
 object HList {
@@ -58,8 +57,8 @@ object HList {
   implicit def hlistOps[L <: HList](l: L): HListOps[L] = new HListOps(l)
 
   /**
-   * Convenience aliases for HList :: and List :: allowing them to be used together within match expressions.
-   */
+    * Convenience aliases for HList :: and List :: allowing them to be used together within match expressions.
+    */
   object ListCompat {
     val :: = scala.collection.immutable.::
     val #: = akka.shapeless.::

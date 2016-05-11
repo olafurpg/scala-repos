@@ -1,4 +1,3 @@
-
 import scala.tools.partest.JavapTest
 
 object Test extends JavapTest {

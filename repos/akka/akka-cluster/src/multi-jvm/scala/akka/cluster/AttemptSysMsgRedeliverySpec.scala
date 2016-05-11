@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import scala.concurrent.duration._
@@ -11,7 +11,7 @@ import akka.actor.Identify
 import akka.actor.Props
 import akka.remote.transport.ThrottlerTransportAdapter.Direction
 import akka.testkit._
-import akka.remote.testkit.{ STMultiNodeSpec, MultiNodeConfig, MultiNodeSpec }
+import akka.remote.testkit.{STMultiNodeSpec, MultiNodeConfig, MultiNodeSpec}
 import akka.actor.PoisonPill
 
 object AttemptSysMsgRedeliveryMultiJvmSpec extends MultiNodeConfig {
@@ -20,7 +20,8 @@ object AttemptSysMsgRedeliveryMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig))
+  commonConfig(
+      debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig))
 
   testTransport(on = true)
 
@@ -35,8 +36,9 @@ class AttemptSysMsgRedeliveryMultiJvmNode1 extends AttemptSysMsgRedeliverySpec
 class AttemptSysMsgRedeliveryMultiJvmNode2 extends AttemptSysMsgRedeliverySpec
 class AttemptSysMsgRedeliveryMultiJvmNode3 extends AttemptSysMsgRedeliverySpec
 
-class AttemptSysMsgRedeliverySpec extends MultiNodeSpec(AttemptSysMsgRedeliveryMultiJvmSpec)
-  with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+class AttemptSysMsgRedeliverySpec
+    extends MultiNodeSpec(AttemptSysMsgRedeliveryMultiJvmSpec)
+    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
   import AttemptSysMsgRedeliveryMultiJvmSpec._
 
   "AttemptSysMsgRedelivery" must {
@@ -86,5 +88,4 @@ class AttemptSysMsgRedeliverySpec extends MultiNodeSpec(AttemptSysMsgRedeliveryM
       enterBarrier("done")
     }
   }
-
 }

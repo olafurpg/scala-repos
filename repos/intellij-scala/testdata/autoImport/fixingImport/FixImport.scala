@@ -8,7 +8,7 @@ import tin._
 import bon.G
 
 class FixImport extends G {
-  val x = new /*ref*/E
+  val x = new /*ref*/ E
 }
 /*
 package pin
@@ -20,4 +20,4 @@ import bon.G
 class FixImport extends G {
   val x = new E
 }
-*/
+ */

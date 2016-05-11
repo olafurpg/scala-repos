@@ -6,7 +6,7 @@ trait PluginComponent extends TemplateComponent { self: Profile =>
 
   lazy val Plugins = TableQuery[Plugins]
 
-  class Plugins(tag: Tag) extends Table[Plugin](tag, "PLUGIN"){
+  class Plugins(tag: Tag) extends Table[Plugin](tag, "PLUGIN") {
     val pluginId = column[String]("PLUGIN_ID", O PrimaryKey)
     val version = column[String]("VERSION")
     def * = (pluginId, version) <> (Plugin.tupled, Plugin.unapply)
@@ -14,6 +14,6 @@ trait PluginComponent extends TemplateComponent { self: Profile =>
 }
 
 case class Plugin(
-  pluginId: String,
-  version: String
+    pluginId: String,
+    version: String
 )

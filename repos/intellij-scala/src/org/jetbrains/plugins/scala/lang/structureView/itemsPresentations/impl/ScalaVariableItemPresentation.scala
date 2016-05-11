@@ -11,11 +11,12 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.icons.Icons
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 05.05.2008
-*/
-
-class ScalaVariableItemPresentation(private val element: PsiElement, isInherited: Boolean) extends ScalaItemPresentation(element) {
+  * @author Alexander Podkhalyuzin
+  * Date: 05.05.2008
+  */
+class ScalaVariableItemPresentation(
+    private val element: PsiElement, isInherited: Boolean)
+    extends ScalaItemPresentation(element) {
   def getPresentableText: String = {
     ScalaElementPresentation.getPresentableText(myElement)
   }
@@ -25,6 +26,6 @@ class ScalaVariableItemPresentation(private val element: PsiElement, isInherited
   }
 
   override def getTextAttributesKey: TextAttributesKey = {
-    if(isInherited) CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES else null
+    if (isInherited) CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES else null
   }
 }

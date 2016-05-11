@@ -1,9 +1,6 @@
-
-
 object Main {
- val x = {
-   object Boo
-   Boo
- }
+  val x = {
+    object Boo
+    Boo
+  }
 }
-

@@ -29,9 +29,9 @@ class LazyStrictTests {
   def testEffectOrder {
     val effects = ListBuffer[Int]()
 
-    implicit def lazyInt: Lazy[Int] = Lazy[Int]{ effects += 3 ; 23 }
+    implicit def lazyInt: Lazy[Int] = Lazy[Int] { effects += 3; 23 }
 
-    implicit def strictInt: Strict[Int] = Strict[Int]{ effects += 6 ; 23 }
+    implicit def strictInt: Strict[Int] = Strict[Int] { effects += 6; 23 }
 
     def summonLazyInt(implicit li: Lazy[Int]): Int = {
       effects += 2
@@ -62,7 +62,7 @@ class LazyStrictTests {
   def testDefConversion {
     val effects = ListBuffer[Int]()
 
-    def effectfulLazyInt: Int = { effects += 3 ; 23 }
+    def effectfulLazyInt: Int = { effects += 3; 23 }
 
     def useEffectfulLazyInt(li: Lazy[Int]): Int = {
       effects += 2
@@ -71,7 +71,7 @@ class LazyStrictTests {
       i
     }
 
-    def effectfulStrictInt: Int = { effects += 6 ; 23 }
+    def effectfulStrictInt: Int = { effects += 6; 23 }
 
     def useEffectfulStrictInt(li: Strict[Int]): Int = {
       effects += 7
@@ -95,8 +95,8 @@ class LazyStrictTests {
   def testLazyConversion {
     val effects = ListBuffer[Int]()
 
-    lazy val effectfulLazyInt: Int = { effects += 3 ; 23 }
-    lazy val effectfulStrictInt: Int = { effects += 6 ; 23 }
+    lazy val effectfulLazyInt: Int = { effects += 3; 23 }
+    lazy val effectfulStrictInt: Int = { effects += 6; 23 }
 
     def useEffectfulLazyInt(li: Lazy[Int]): Int = {
       effects += 2
@@ -142,9 +142,9 @@ class LazyStrictTests {
     }
 
     effects += 1
-    val il = useEffectfulLazyInt({ effects += 2 ; 23 })
+    val il = useEffectfulLazyInt({ effects += 2; 23 })
     effects += 5
-    val is = useEffectfulStrictInt({ effects += 6 ; 23 })
+    val is = useEffectfulStrictInt({ effects += 6; 23 })
     effects += 9
 
     assertEquals(23, il)
@@ -174,29 +174,37 @@ class LazyStrictTests {
   }
 
   object LazyShows extends CommonShows {
-    implicit def showCons[T](implicit st: Lazy[Show[T]], sl: Lazy[Show[List[T]]]): Show[Cons[T]] = new Show[Cons[T]] {
-      def apply(t: Cons[T]) = s"Cons(${show(t.hd)(st.value)}, ${show(t.tl)(sl.value)})"
-    }
-
-    implicit def showList[T](implicit sc: Lazy[Show[Cons[T]]]): Show[List[T]] = new Show[List[T]] {
-      def apply(t: List[T]) = t match {
-        case n: Nil => show(n)
-        case c: Cons[T] => show(c)(sc.value)
+    implicit def showCons[T](
+        implicit st: Lazy[Show[T]], sl: Lazy[Show[List[T]]]): Show[Cons[T]] =
+      new Show[Cons[T]] {
+        def apply(t: Cons[T]) =
+          s"Cons(${show(t.hd)(st.value)}, ${show(t.tl)(sl.value)})"
       }
-    }
+
+    implicit def showList[T](implicit sc: Lazy[Show[Cons[T]]]): Show[List[T]] =
+      new Show[List[T]] {
+        def apply(t: List[T]) = t match {
+          case n: Nil => show(n)
+          case c: Cons[T] => show(c)(sc.value)
+        }
+      }
   }
 
   object LazyStrictMixShows extends CommonShows {
-    implicit def showCons[T](implicit st: Strict[Show[T]], sl: Strict[Show[List[T]]]): Show[Cons[T]] = new Show[Cons[T]] {
-      def apply(t: Cons[T]) = s"Cons(${show(t.hd)(st.value)}, ${show(t.tl)(sl.value)})"
+    implicit def showCons[T](
+        implicit st: Strict[Show[T]],
+        sl: Strict[Show[List[T]]]): Show[Cons[T]] = new Show[Cons[T]] {
+      def apply(t: Cons[T]) =
+        s"Cons(${show(t.hd)(st.value)}, ${show(t.tl)(sl.value)})"
     }
 
-    implicit def showList[T](implicit sc: Lazy[Show[Cons[T]]]): Show[List[T]] = new Show[List[T]] {
-      def apply(t: List[T]) = t match {
-        case n: Nil => show(n)
-        case c: Cons[T] => show(c)(sc.value)
+    implicit def showList[T](implicit sc: Lazy[Show[Cons[T]]]): Show[List[T]] =
+      new Show[List[T]] {
+        def apply(t: List[T]) = t match {
+          case n: Nil => show(n)
+          case c: Cons[T] => show(c)(sc.value)
+        }
       }
-    }
   }
 
   @Test
@@ -259,12 +267,15 @@ class LazyStrictTests {
 
   object Baz {
     def lazyBaz[T, U](t: T)(implicit bt: Lazy[Aux[T, U]]): Aux[T, U] = bt.value
-    def strictBaz[T, U](t: T)(implicit bt: Strict[Aux[T, U]]): Aux[T, U] = bt.value
+    def strictBaz[T, U](t: T)(implicit bt: Strict[Aux[T, U]]): Aux[T, U] =
+      bt.value
 
     type Aux[T, U0] = Baz[T] { type U = U0 }
 
     implicit val bazIS: Aux[Int, String] = new Baz[Int] { type U = String }
-    implicit val bazBD: Aux[Boolean, Double] = new Baz[Boolean] { type U = Double }
+    implicit val bazBD: Aux[Boolean, Double] = new Baz[Boolean] {
+      type U = Double
+    }
   }
 
   @Test
@@ -304,15 +315,18 @@ class LazyStrictTests {
     trait W[X, Y]
 
     illTyped(
-      "lazily[U[String]]", "No U\\[String]"
+        "lazily[U[String]]",
+        "No U\\[String]"
     )
 
     illTyped(
-      "lazily[V]", "could not find Lazy implicit value of type V"
+        "lazily[V]",
+        "could not find Lazy implicit value of type V"
     )
 
     illTyped(
-      "lazily[W[String, Int]]", "No W\\[String, Int]"
+        "lazily[W[String, Int]]",
+        "No W\\[String, Int]"
     )
   }
 }

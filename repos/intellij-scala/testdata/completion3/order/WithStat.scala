@@ -1,6 +1,6 @@
 object WithStat {
   val a = new A
-  a.<caret>
+  a.< caret >
 
   class A {
     def fboo = ???

@@ -4,27 +4,21 @@
 //   This thread waits another second before calling System.exit.  The first thread hangs around to
 //   ensure that TrapExit actually processes the exit.
 
-object Spawn
-{
-	def main(args: Array[String])
-	{
-		(new ThreadA).start
-	}
-	class ThreadA extends Thread
-	{
-		override def run()
-		{
-			Thread.sleep(1000)
-			(new ThreadB).start()
-			synchronized { wait() }
-		}
-	}
-	class ThreadB extends Thread
-	{
-		override def run()
-		{
-			Thread.sleep(1000)
-			System.exit(0)
-		}
-	}
+object Spawn {
+  def main(args: Array[String]) {
+    (new ThreadA).start
+  }
+  class ThreadA extends Thread {
+    override def run() {
+      Thread.sleep(1000)
+      (new ThreadB).start()
+      synchronized { wait() }
+    }
+  }
+  class ThreadB extends Thread {
+    override def run() {
+      Thread.sleep(1000)
+      System.exit(0)
+    }
+  }
 }

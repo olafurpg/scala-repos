@@ -7,16 +7,16 @@ import Swing._
 import BorderPanel._
 
 /**
- * Demo for ColorChooser.
- * Based on http://download.oracle.com/javase/tutorial/uiswing/components/colorchooser.html
- * 
- * @author andy@hicks.net
- */
+  * Demo for ColorChooser.
+  * Based on http://download.oracle.com/javase/tutorial/uiswing/components/colorchooser.html
+  * 
+  * @author andy@hicks.net
+  */
 object ColorChooserDemo extends SimpleSwingApplication {
   def top = new MainFrame {
     title = "ColorChooser Demo"
     size = new Dimension(400, 400)
-    
+
     contents = ui
   }
 
@@ -29,7 +29,7 @@ object ColorChooserDemo extends SimpleSwingApplication {
     }
 
     colorChooser.border = TitledBorder(EtchedBorder, "Choose Text Color")
-    
+
     val banner = new Label("Welcome to Scala Swing") {
       horizontalAlignment = Alignment.Center
       foreground = Color.yellow
@@ -37,12 +37,12 @@ object ColorChooserDemo extends SimpleSwingApplication {
       opaque = true
       font = new Font("SansSerif", Font.BOLD, 24)
     }
-   
+
     val bannerArea = new BorderPanel {
       layout(banner) = Position.Center
       border = TitledBorder(EtchedBorder, "Banner")
     }
-    
+
     // Display a color selection dialog when button pressed 
     val selectColor = new Button("Choose Background Color") {
       reactions += {

@@ -6,7 +6,7 @@ import mesosphere.marathon.api.LeaderInfo
 import mesosphere.marathon.event.LocalLeadershipEvent
 import mesosphere.marathon.event.http.HttpEventStreamActor._
 import mesosphere.marathon.metrics.Metrics.AtomicIntGauge
-import mesosphere.marathon.metrics.{ MetricPrefixes, Metrics }
+import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
 import org.slf4j.LoggerFactory
 
 import scala.util.Try
@@ -21,22 +21,23 @@ trait HttpEventStreamHandle {
   def close(): Unit
 }
 
-class HttpEventStreamActorMetrics @Inject() (metrics: Metrics) {
-  val numberOfStreams: AtomicIntGauge =
-    metrics.gauge(metrics.name(MetricPrefixes.API, getClass, "number-of-streams"), new AtomicIntGauge)
+class HttpEventStreamActorMetrics @Inject()(metrics: Metrics) {
+  val numberOfStreams: AtomicIntGauge = metrics.gauge(
+      metrics.name(MetricPrefixes.API, getClass, "number-of-streams"),
+      new AtomicIntGauge)
 }
 
 /**
   * This actor handles subscriptions from event stream handler.
   * It subscribes to the event stream and pushes all marathon events to all listener.
   */
-class HttpEventStreamActor(
-  leaderInfo: LeaderInfo,
-  metrics: HttpEventStreamActorMetrics,
-  handleStreamProps: HttpEventStreamHandle => Props)
+class HttpEventStreamActor(leaderInfo: LeaderInfo,
+                           metrics: HttpEventStreamActorMetrics,
+                           handleStreamProps: HttpEventStreamHandle => Props)
     extends Actor {
   //map from handle to actor
-  private[http] var streamHandleActors = Map.empty[HttpEventStreamHandle, ActorRef]
+  private[http] var streamHandleActors =
+    Map.empty[HttpEventStreamHandle, ActorRef]
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   override def preStart(): Unit = {
@@ -61,14 +62,14 @@ class HttpEventStreamActor(
     */
   private[this] def behaviour(newConnectionBehaviour: Receive): Receive = {
     Seq(
-      handleLeadership,
-      cleanupHandlerActors,
-      newConnectionBehaviour,
-      warnAboutUnknownMessages
+        handleLeadership,
+        cleanupHandlerActors,
+        newConnectionBehaviour,
+        warnAboutUnknownMessages
     ).reduceLeft {
-        // Prevent fatal warning about deriving type Any as type parameter
-        _.orElse[Any, Unit](_)
-      }
+      // Prevent fatal warning about deriving type Any as type parameter
+      _.orElse[Any, Unit](_)
+    }
   }
 
   // behaviour components
@@ -84,7 +85,8 @@ class HttpEventStreamActor(
   private[this] def acceptingNewConnections: Receive = {
     case HttpEventStreamConnectionOpen(handle) =>
       metrics.numberOfStreams.setValue(streamHandleActors.size)
-      log.info(s"Add EventStream Handle as event listener: $handle. Current nr of streams: ${streamHandleActors.size}")
+      log.info(
+          s"Add EventStream Handle as event listener: $handle. Current nr of streams: ${streamHandleActors.size}")
       val actor = context.actorOf(handleStreamProps(handle), handle.id)
       context.watch(actor)
       streamHandleActors += handle -> actor
@@ -105,7 +107,7 @@ class HttpEventStreamActor(
   /** Cleanup child actors which are not needed anymore. */
   private[this] def cleanupHandlerActors: Receive = {
     case HttpEventStreamConnectionClosed(handle) => removeHandler(handle)
-    case Terminated(actor)                       => unexpectedTerminationOfHandlerActor(actor)
+    case Terminated(actor) => unexpectedTerminationOfHandlerActor(actor)
   }
 
   private[this] def removeHandler(handle: HttpEventStreamHandle): Unit = {
@@ -115,11 +117,12 @@ class HttpEventStreamActor(
       streamHandleActors -= handle
       metrics.numberOfStreams.setValue(streamHandleActors.size)
       log.info(s"Removed EventStream Handle as event listener: $handle. " +
-        s"Current nr of listeners: ${streamHandleActors.size}")
+          s"Current nr of listeners: ${streamHandleActors.size}")
     }
   }
 
-  private[this] def unexpectedTerminationOfHandlerActor(actor: ActorRef): Unit = {
+  private[this] def unexpectedTerminationOfHandlerActor(
+      actor: ActorRef): Unit = {
     streamHandleActors.find(_._2 == actor).foreach {
       case (handle, ref) =>
         log.error(s"Actor terminated unexpectedly: $handle")

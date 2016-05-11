@@ -25,10 +25,9 @@ import org.specs2.mutable._
 
 import fixtures._
 
-
 /**
- * Systems under specification for RecordField.
- */
+  * Systems under specification for RecordField.
+  */
 object RecordRulesSpec extends Specification {
   "Record Rules Specification".title
   sequential

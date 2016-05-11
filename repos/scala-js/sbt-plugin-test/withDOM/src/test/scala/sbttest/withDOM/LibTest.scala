@@ -18,7 +18,5 @@ object LibTest extends JasmineTest {
       Lib.appendDocument("foo")
       expect(count - oldCount).toEqual(1)
     }
-
   }
-
 }

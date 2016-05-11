@@ -10,9 +10,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.ScalaDocElementTypes
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 12.09.2008
- */
+  * User: Alexander Podkhalyuzin
+  * Date: 12.09.2008
+  */
 class ScalaIndexPatternBuilder extends IndexPatternBuilder {
   def getIndexingLexer(file: PsiFile): Lexer = {
     file match {

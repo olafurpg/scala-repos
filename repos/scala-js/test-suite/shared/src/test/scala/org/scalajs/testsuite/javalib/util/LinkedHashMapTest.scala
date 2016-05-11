@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -60,15 +60,16 @@ abstract class LinkedHashMapTest extends HashMapTest {
     }
 
     assertEquals(expectedSize, lhm.keySet.size)
-    for ((key, index) <- lhm.keySet.zipWithIndex)
-      assertEquals(expectedKey(index), key)
+    for ((key, index) <- lhm.keySet.zipWithIndex) assertEquals(
+        expectedKey(index), key)
 
     assertEquals(expectedSize, lhm.entrySet.size)
-    for ((value, index) <- lhm.values.zipWithIndex)
-      assertEquals(expectedValue(index), value)
+    for ((value, index) <- lhm.values.zipWithIndex) assertEquals(
+        expectedValue(index), value)
   }
 
-  @Test def should_iterate_in_the_same_order_after_removal_of_elements(): Unit = {
+  @Test
+  def should_iterate_in_the_same_order_after_removal_of_elements(): Unit = {
     val lhm = factory.empty[jl.Integer, String]
     (0 until 100).foreach(key => lhm.put(key, s"elem $key"))
 
@@ -89,12 +90,12 @@ abstract class LinkedHashMapTest extends HashMapTest {
     }
 
     assertEquals(expectedSize, lhm.keySet.size)
-    for ((key, index) <- lhm.keySet.zipWithIndex)
-      assertEquals(expectedKey(index), key)
+    for ((key, index) <- lhm.keySet.zipWithIndex) assertEquals(
+        expectedKey(index), key)
 
     assertEquals(expectedSize, lhm.entrySet.size)
-    for ((value, index) <- lhm.values.zipWithIndex)
-      assertEquals(expectedValue(index), value)
+    for ((value, index) <- lhm.values.zipWithIndex) assertEquals(
+        expectedValue(index), value)
   }
 
   @Test def should_iterate_in_order_after_adding_elements(): Unit = {
@@ -110,8 +111,9 @@ abstract class LinkedHashMapTest extends HashMapTest {
 
     val expectedKey = {
       if (factory.accessOrder) {
-        val keys = (2 until 42) ++ (43 until 52) ++ (53 until 98) ++
-            List(99, 0, 100, 42, 52, 1, 98)
+        val keys =
+          (2 until 42) ++ (43 until 52) ++ (53 until 98) ++ List(
+              99, 0, 100, 42, 52, 1, 98)
         keys.takeRight(withSizeLimit.getOrElse(keys.length))
       } else {
         if (withSizeLimit.isDefined) (55 until 100) ++ List(0, 100, 42, 52, 1)
@@ -123,8 +125,7 @@ abstract class LinkedHashMapTest extends HashMapTest {
       val key = expectedKey(index)
       if (key == 0 || key == 1 || key == 42 || key == 52 || key == 98)
         s"new $key"
-      else
-        s"elem $key"
+      else s"elem $key"
     }
 
     val expectedSize = withSizeLimit.getOrElse(101)
@@ -137,12 +138,12 @@ abstract class LinkedHashMapTest extends HashMapTest {
     }
 
     assertEquals(expectedSize, lhm.keySet.size)
-    for ((key, index) <- lhm.keySet.zipWithIndex)
-      assertEquals(expectedKey(index), key)
+    for ((key, index) <- lhm.keySet.zipWithIndex) assertEquals(
+        expectedKey(index), key)
 
     assertEquals(expectedSize, lhm.entrySet.size)
-    for ((value, index) <- lhm.values.zipWithIndex)
-      assertEquals(expectedElem(index), value)
+    for ((value, index) <- lhm.values.zipWithIndex) assertEquals(
+        expectedElem(index), value)
   }
 
   @Test def should_iterate_in__after_accessing_elements(): Unit = {
@@ -191,24 +192,26 @@ abstract class LinkedHashMapTest extends HashMapTest {
     }
 
     assertEquals(expectedSize, lhm.keySet.size)
-    for ((key, index) <- lhm.keySet.zipWithIndex)
-      assertEquals(expectedKey(index), key)
+    for ((key, index) <- lhm.keySet.zipWithIndex) assertEquals(
+        expectedKey(index), key)
 
     assertEquals(expectedSize, lhm.entrySet.size)
-    for ((value, index) <- lhm.values.zipWithIndex)
-      assertEquals(expectedValue(index), value)
+    for ((value, index) <- lhm.values.zipWithIndex) assertEquals(
+        expectedValue(index), value)
   }
-
 }
 
 object LinkedHashMapFactory {
   def allFactories: Iterator[MapFactory] = {
-    Iterator(new LinkedHashMapFactory(true, Some(50)), new LinkedHashMapFactory(true, None),
-        new LinkedHashMapFactory(false, Some(50)), new LinkedHashMapFactory(false, None))
+    Iterator(new LinkedHashMapFactory(true, Some(50)),
+             new LinkedHashMapFactory(true, None),
+             new LinkedHashMapFactory(false, Some(50)),
+             new LinkedHashMapFactory(false, None))
   }
 }
 
-class LinkedHashMapFactory(val accessOrder: Boolean, val withSizeLimit: Option[Int])
+class LinkedHashMapFactory(
+    val accessOrder: Boolean, val withSizeLimit: Option[Int])
     extends HashMapFactory {
   def orderName: String =
     if (accessOrder) "access-order"
@@ -219,11 +222,12 @@ class LinkedHashMapFactory(val accessOrder: Boolean, val withSizeLimit: Option[I
     s"java.util.LinkedHashMap{$orderName$sizeLimitSting}"
   }
 
-  override def empty[K: ClassTag, V: ClassTag]: ju.LinkedHashMap[K, V] = {
+  override def empty[K : ClassTag, V : ClassTag]: ju.LinkedHashMap[K, V] = {
     withSizeLimit match {
       case Some(limit) =>
         new ju.LinkedHashMap[K, V](16, 0.75f, accessOrder) {
-          override protected def removeEldestEntry(eldest: ju.Map.Entry[K, V]): Boolean =
+          override protected def removeEldestEntry(
+              eldest: ju.Map.Entry[K, V]): Boolean =
             size > limit
         }
 

@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.elasticsearch
 
 import grizzled.slf4j.Logging
@@ -23,7 +22,8 @@ import org.json4s.JsonDSL._
 import org.json4s._
 import org.json4s.native.JsonMethods._
 
-class ESSequences(client: Client, config: StorageClientConfig, index: String) extends Logging {
+class ESSequences(client: Client, config: StorageClientConfig, index: String)
+    extends Logging {
   implicit val formats = DefaultFormats
   private val estype = "sequences"
 
@@ -35,22 +35,25 @@ class ESSequences(client: Client, config: StorageClientConfig, index: String) ex
     //   ("auto_expand_replicas" -> "0-all")
     indices.prepareCreate(index).get
   }
-  val typeExistResponse = indices.prepareTypesExists(index).setTypes(estype).get
+  val typeExistResponse =
+    indices.prepareTypesExists(index).setTypes(estype).get
   if (!typeExistResponse.isExists) {
     val mappingJson =
-      (estype ->
-        ("_source" -> ("enabled" -> 0)) ~
-        ("_all" -> ("enabled" -> 0)) ~
-        ("_type" -> ("index" -> "no")) ~
-        ("enabled" -> 0))
-    indices.preparePutMapping(index).setType(estype).
-      setSource(compact(render(mappingJson))).get
+      (estype -> ("_source" -> ("enabled" -> 0)) ~ ("_all" -> ("enabled" -> 0)) ~
+          ("_type" -> ("index" -> "no")) ~ ("enabled" -> 0))
+    indices
+      .preparePutMapping(index)
+      .setType(estype)
+      .setSource(compact(render(mappingJson)))
+      .get
   }
 
   def genNext(name: String): Int = {
     try {
-      val response = client.prepareIndex(index, estype, name).
-        setSource(compact(render("n" -> name))).get
+      val response = client
+        .prepareIndex(index, estype, name)
+        .setSource(compact(render("n" -> name)))
+        .get
       response.getVersion().toInt
     } catch {
       case e: ElasticsearchException =>

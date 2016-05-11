@@ -33,87 +33,95 @@ class InMemoryColumnarQuerySuite extends QueryTest with SharedSQLContext {
 
   test("simple columnar query") {
     val plan = sqlContext.executePlan(testData.logicalPlan).sparkPlan
-    val scan = InMemoryRelation(useCompression = true, 5, MEMORY_ONLY, plan, None)
+    val scan =
+      InMemoryRelation(useCompression = true, 5, MEMORY_ONLY, plan, None)
 
     checkAnswer(scan, testData.collect().toSeq)
   }
 
   test("default size avoids broadcast") {
     // TODO: Improve this test when we have better statistics
-    sparkContext.parallelize(1 to 10).map(i => TestData(i, i.toString))
-      .toDF().registerTempTable("sizeTst")
+    sparkContext
+      .parallelize(1 to 10)
+      .map(i => TestData(i, i.toString))
+      .toDF()
+      .registerTempTable("sizeTst")
     sqlContext.cacheTable("sizeTst")
     assert(
-      sqlContext.table("sizeTst").queryExecution.analyzed.statistics.sizeInBytes >
-        sqlContext.conf.autoBroadcastJoinThreshold)
+        sqlContext
+          .table("sizeTst")
+          .queryExecution
+          .analyzed
+          .statistics
+          .sizeInBytes > sqlContext.conf.autoBroadcastJoinThreshold)
   }
 
   test("projection") {
-    val plan = sqlContext.executePlan(testData.select('value, 'key).logicalPlan).sparkPlan
-    val scan = InMemoryRelation(useCompression = true, 5, MEMORY_ONLY, plan, None)
+    val plan = sqlContext
+      .executePlan(testData.select('value, 'key).logicalPlan)
+      .sparkPlan
+    val scan =
+      InMemoryRelation(useCompression = true, 5, MEMORY_ONLY, plan, None)
 
-    checkAnswer(scan, testData.collect().map {
-      case Row(key: Int, value: String) => value -> key
-    }.map(Row.fromTuple))
+    checkAnswer(scan,
+                testData
+                  .collect()
+                  .map {
+                    case Row(key: Int, value: String) => value -> key
+                  }
+                  .map(Row.fromTuple))
   }
 
-  test("SPARK-1436 regression: in-memory columns must be able to be accessed multiple times") {
+  test(
+      "SPARK-1436 regression: in-memory columns must be able to be accessed multiple times") {
     val plan = sqlContext.executePlan(testData.logicalPlan).sparkPlan
-    val scan = InMemoryRelation(useCompression = true, 5, MEMORY_ONLY, plan, None)
+    val scan =
+      InMemoryRelation(useCompression = true, 5, MEMORY_ONLY, plan, None)
 
     checkAnswer(scan, testData.collect().toSeq)
     checkAnswer(scan, testData.collect().toSeq)
   }
 
   test("SPARK-1678 regression: compression must not lose repeated values") {
-    checkAnswer(
-      sql("SELECT * FROM repeatedData"),
-      repeatedData.collect().toSeq.map(Row.fromTuple))
+    checkAnswer(sql("SELECT * FROM repeatedData"),
+                repeatedData.collect().toSeq.map(Row.fromTuple))
 
     sqlContext.cacheTable("repeatedData")
 
-    checkAnswer(
-      sql("SELECT * FROM repeatedData"),
-      repeatedData.collect().toSeq.map(Row.fromTuple))
+    checkAnswer(sql("SELECT * FROM repeatedData"),
+                repeatedData.collect().toSeq.map(Row.fromTuple))
   }
 
   test("with null values") {
-    checkAnswer(
-      sql("SELECT * FROM nullableRepeatedData"),
-      nullableRepeatedData.collect().toSeq.map(Row.fromTuple))
+    checkAnswer(sql("SELECT * FROM nullableRepeatedData"),
+                nullableRepeatedData.collect().toSeq.map(Row.fromTuple))
 
     sqlContext.cacheTable("nullableRepeatedData")
 
-    checkAnswer(
-      sql("SELECT * FROM nullableRepeatedData"),
-      nullableRepeatedData.collect().toSeq.map(Row.fromTuple))
+    checkAnswer(sql("SELECT * FROM nullableRepeatedData"),
+                nullableRepeatedData.collect().toSeq.map(Row.fromTuple))
   }
 
   test("SPARK-2729 regression: timestamp data type") {
     val timestamps = (0 to 3).map(i => Tuple1(new Timestamp(i))).toDF("time")
     timestamps.registerTempTable("timestamps")
 
-    checkAnswer(
-      sql("SELECT time FROM timestamps"),
-      timestamps.collect().toSeq)
+    checkAnswer(sql("SELECT time FROM timestamps"), timestamps.collect().toSeq)
 
     sqlContext.cacheTable("timestamps")
 
-    checkAnswer(
-      sql("SELECT time FROM timestamps"),
-      timestamps.collect().toSeq)
+    checkAnswer(sql("SELECT time FROM timestamps"), timestamps.collect().toSeq)
   }
 
-  test("SPARK-3320 regression: batched column buffer building should work with empty partitions") {
-    checkAnswer(
-      sql("SELECT * FROM withEmptyParts"),
-      withEmptyParts.collect().toSeq.map(Row.fromTuple))
+  test(
+      "SPARK-3320 regression: batched column buffer building should work with empty partitions") {
+    checkAnswer(sql("SELECT * FROM withEmptyParts"),
+                withEmptyParts.collect().toSeq.map(Row.fromTuple))
 
     sqlContext.cacheTable("withEmptyParts")
 
-    checkAnswer(
-      sql("SELECT * FROM withEmptyParts"),
-      withEmptyParts.collect().toSeq.map(Row.fromTuple))
+    checkAnswer(sql("SELECT * FROM withEmptyParts"),
+                withEmptyParts.collect().toSeq.map(Row.fromTuple))
   }
 
   test("SPARK-4182 Caching complex types") {
@@ -133,34 +141,41 @@ class InMemoryColumnarQuerySuite extends QueryTest with SharedSQLContext {
     assert(df.schema.head.dataType === DecimalType(15, 10))
 
     df.cache().registerTempTable("test_fixed_decimal")
-    checkAnswer(
-      sql("SELECT * FROM test_fixed_decimal"),
-      (1 to 10).map(i => Row(Decimal(i, 15, 10).toJavaBigDecimal)))
+    checkAnswer(sql("SELECT * FROM test_fixed_decimal"),
+                (1 to 10).map(i => Row(Decimal(i, 15, 10).toJavaBigDecimal)))
   }
 
   test("test different data types") {
     // Create the schema.
-    val struct =
-      StructType(
-        StructField("f1", FloatType, true) ::
-        StructField("f2", ArrayType(BooleanType), true) :: Nil)
-    val dataTypes =
-      Seq(StringType, BinaryType, NullType, BooleanType,
-        ByteType, ShortType, IntegerType, LongType,
-        FloatType, DoubleType, DecimalType(25, 5), DecimalType(6, 5),
-        DateType, TimestampType,
-        ArrayType(IntegerType), MapType(StringType, LongType), struct)
-    val fields = dataTypes.zipWithIndex.map { case (dataType, index) =>
-      StructField(s"col$index", dataType, true)
+    val struct = StructType(StructField("f1", FloatType, true) :: StructField(
+            "f2", ArrayType(BooleanType), true) :: Nil)
+    val dataTypes = Seq(StringType,
+                        BinaryType,
+                        NullType,
+                        BooleanType,
+                        ByteType,
+                        ShortType,
+                        IntegerType,
+                        LongType,
+                        FloatType,
+                        DoubleType,
+                        DecimalType(25, 5),
+                        DecimalType(6, 5),
+                        DateType,
+                        TimestampType,
+                        ArrayType(IntegerType),
+                        MapType(StringType, LongType),
+                        struct)
+    val fields = dataTypes.zipWithIndex.map {
+      case (dataType, index) =>
+        StructField(s"col$index", dataType, true)
     }
     val allColumns = fields.map(_.name).mkString(",")
     val schema = StructType(fields)
 
     // Create a RDD for the schema
-    val rdd =
-      sparkContext.parallelize((1 to 10000), 10).map { i =>
-        Row(
-          s"str${i}: test cache.",
+    val rdd = sparkContext.parallelize((1 to 10000), 10).map { i =>
+      Row(s"str${i}: test cache.",
           s"binary${i}: test cache.".getBytes(StandardCharsets.UTF_8),
           null,
           i % 2 == 0,
@@ -177,25 +192,34 @@ class InMemoryColumnarQuerySuite extends QueryTest with SharedSQLContext {
           (i to i + 10).toSeq,
           (i to i + 10).map(j => s"map_key_$j" -> (Long.MaxValue - j)).toMap,
           Row((i - 0.25).toFloat, Seq(true, false, null)))
-      }
-    sqlContext.createDataFrame(rdd, schema).registerTempTable("InMemoryCache_different_data_types")
+    }
+    sqlContext
+      .createDataFrame(rdd, schema)
+      .registerTempTable("InMemoryCache_different_data_types")
     // Cache the table.
     sql("cache table InMemoryCache_different_data_types")
     // Make sure the table is indeed cached.
-    sqlContext.table("InMemoryCache_different_data_types").queryExecution.executedPlan
-    assert(
-      sqlContext.isCached("InMemoryCache_different_data_types"),
-      "InMemoryCache_different_data_types should be cached.")
+    sqlContext
+      .table("InMemoryCache_different_data_types")
+      .queryExecution
+      .executedPlan
+    assert(sqlContext.isCached("InMemoryCache_different_data_types"),
+           "InMemoryCache_different_data_types should be cached.")
     // Issue a query and check the results.
     checkAnswer(
-      sql(s"SELECT DISTINCT ${allColumns} FROM InMemoryCache_different_data_types"),
-      sqlContext.table("InMemoryCache_different_data_types").collect())
+        sql(s"SELECT DISTINCT ${allColumns} FROM InMemoryCache_different_data_types"),
+        sqlContext.table("InMemoryCache_different_data_types").collect())
     sqlContext.dropTempTable("InMemoryCache_different_data_types")
   }
 
-  test("SPARK-10422: String column in InMemoryColumnarCache needs to override clone method") {
-    val df = sqlContext.range(1, 100).selectExpr("id % 10 as id")
-      .rdd.map(id => Tuple1(s"str_$id")).toDF("i")
+  test(
+      "SPARK-10422: String column in InMemoryColumnarCache needs to override clone method") {
+    val df = sqlContext
+      .range(1, 100)
+      .selectExpr("id % 10 as id")
+      .rdd
+      .map(id => Tuple1(s"str_$id"))
+      .toDF("i")
     val cached = df.cache()
     // count triggers the caching action. It should not throw.
     cached.count()
@@ -205,16 +229,21 @@ class InMemoryColumnarQuerySuite extends QueryTest with SharedSQLContext {
 
     // Check result.
     checkAnswer(
-      cached,
-      sqlContext.range(1, 100).selectExpr("id % 10 as id")
-        .rdd.map(id => Tuple1(s"str_$id")).toDF("i")
-    )
+        cached,
+        sqlContext
+          .range(1, 100)
+          .selectExpr("id % 10 as id")
+          .rdd
+          .map(id => Tuple1(s"str_$id"))
+          .toDF("i")
+      )
 
     // Drop the cache.
     cached.unpersist()
   }
 
-  test("SPARK-10859: Predicates pushed to InMemoryColumnarTableScan are not evaluated correctly") {
+  test(
+      "SPARK-10859: Predicates pushed to InMemoryColumnarTableScan are not evaluated correctly") {
     val data = sqlContext.range(10).selectExpr("id", "cast(id as string) as s")
     data.cache()
     assert(data.count() === 10)

@@ -8,9 +8,10 @@ import scala.ref.{WeakReference => sWeakRef}
 import scala.reflect.internal.Depth
 
 /** This trait overrides methods in reflect.internal, bracketing
- *  them in synchronized { ... } to make them thread-safe
- */
-private[reflect] trait SynchronizedTypes extends internal.Types { self: SymbolTable =>
+  *  them in synchronized { ... } to make them thread-safe
+  */
+private[reflect] trait SynchronizedTypes extends internal.Types {
+  self: SymbolTable =>
 
   // No sharing of map objects:
   override protected def commonOwnerMap = new CommonOwnerMap
@@ -42,32 +43,40 @@ private[reflect] trait SynchronizedTypes extends internal.Types { self: SymbolTa
 
   private lazy val _skolemizationLevel = mkThreadLocalStorage(0)
   override def skolemizationLevel = _skolemizationLevel.get
-  override def skolemizationLevel_=(value: Int) = _skolemizationLevel.set(value)
+  override def skolemizationLevel_=(value: Int) =
+    _skolemizationLevel.set(value)
 
   private lazy val _undoLog = mkThreadLocalStorage(new UndoLog)
   override def undoLog = _undoLog.get
 
-  private lazy val _intersectionWitness = mkThreadLocalStorage(perRunCaches.newWeakMap[List[Type], sWeakRef[Type]]())
+  private lazy val _intersectionWitness = mkThreadLocalStorage(
+      perRunCaches.newWeakMap[List[Type], sWeakRef[Type]]())
   override def intersectionWitness = _intersectionWitness.get
 
   private lazy val _subsametypeRecursions = mkThreadLocalStorage(0)
   override def subsametypeRecursions = _subsametypeRecursions.get
-  override def subsametypeRecursions_=(value: Int) = _subsametypeRecursions.set(value)
+  override def subsametypeRecursions_=(value: Int) =
+    _subsametypeRecursions.set(value)
 
-  private lazy val _pendingSubTypes = mkThreadLocalStorage(new mutable.HashSet[SubTypePair])
+  private lazy val _pendingSubTypes = mkThreadLocalStorage(
+      new mutable.HashSet[SubTypePair])
   override def pendingSubTypes = _pendingSubTypes.get
 
   private lazy val _basetypeRecursions = mkThreadLocalStorage(0)
   override def basetypeRecursions = _basetypeRecursions.get
-  override def basetypeRecursions_=(value: Int) = _basetypeRecursions.set(value)
+  override def basetypeRecursions_=(value: Int) =
+    _basetypeRecursions.set(value)
 
-  private lazy val _pendingBaseTypes = mkThreadLocalStorage(new mutable.HashSet[Type])
+  private lazy val _pendingBaseTypes = mkThreadLocalStorage(
+      new mutable.HashSet[Type])
   override def pendingBaseTypes = _pendingBaseTypes.get
 
-  private lazy val _lubResults = mkThreadLocalStorage(new mutable.HashMap[(Depth, List[Type]), Type])
+  private lazy val _lubResults = mkThreadLocalStorage(
+      new mutable.HashMap[(Depth, List[Type]), Type])
   override def lubResults = _lubResults.get
 
-  private lazy val _glbResults = mkThreadLocalStorage(new mutable.HashMap[(Depth, List[Type]), Type])
+  private lazy val _glbResults = mkThreadLocalStorage(
+      new mutable.HashMap[(Depth, List[Type]), Type])
   override def glbResults = _glbResults.get
 
   private lazy val _indent = mkThreadLocalStorage("")
@@ -76,9 +85,11 @@ private[reflect] trait SynchronizedTypes extends internal.Types { self: SymbolTa
 
   private lazy val _toStringRecursions = mkThreadLocalStorage(0)
   override def toStringRecursions = _toStringRecursions.get
-  override def toStringRecursions_=(value: Int) = _toStringRecursions.set(value)
+  override def toStringRecursions_=(value: Int) =
+    _toStringRecursions.set(value)
 
-  private lazy val _toStringSubjects = mkThreadLocalStorage(new mutable.HashSet[Type])
+  private lazy val _toStringSubjects = mkThreadLocalStorage(
+      new mutable.HashSet[Type])
   override def toStringSubjects = _toStringSubjects.get
 
   /* The idea of caches is as follows.
@@ -105,5 +116,4 @@ private[reflect] trait SynchronizedTypes extends internal.Types { self: SymbolTa
 
   override protected def defineBaseTypeSeqOfTypeRef(tpe: TypeRef) =
     gilSynchronized { super.defineBaseTypeSeqOfTypeRef(tpe) }
-
 }

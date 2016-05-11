@@ -14,4 +14,3 @@ object Test {
   (c: D).a // works
   c.a // error
 }
-

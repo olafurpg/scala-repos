@@ -23,13 +23,14 @@ import org.apache.spark.sql.catalyst.plans.logical.{Filter, LogicalPlan, OneRowR
 import org.apache.spark.sql.catalyst.util._
 
 /**
- * Provides helper methods for comparing plans.
- */
+  * Provides helper methods for comparing plans.
+  */
 abstract class PlanTest extends SparkFunSuite with PredicateHelper {
+
   /**
-   * Since attribute references are given globally unique ids during analysis,
-   * we must normalize them to check if two different queries are identical.
-   */
+    * Since attribute references are given globally unique ids during analysis,
+    * we must normalize them to check if two different queries are identical.
+    */
   protected def normalizeExprIds(plan: LogicalPlan) = {
     plan transformAllExpressions {
       case a: AttributeReference =>
@@ -40,14 +41,17 @@ abstract class PlanTest extends SparkFunSuite with PredicateHelper {
   }
 
   /**
-   * Normalizes the filter conditions that appear in the plan. For instance,
-   * ((expr 1 && expr 2) && expr 3), (expr 1 && expr 2 && expr 3), (expr 3 && (expr 1 && expr 2)
-   * etc., will all now be equivalent.
-   */
+    * Normalizes the filter conditions that appear in the plan. For instance,
+    * ((expr 1 && expr 2) && expr 3), (expr 1 && expr 2 && expr 3), (expr 3 && (expr 1 && expr 2)
+    * etc., will all now be equivalent.
+    */
   private def normalizeFilters(plan: LogicalPlan) = {
     plan transform {
       case filter @ Filter(condition: Expression, child: LogicalPlan) =>
-        Filter(splitConjunctivePredicates(condition).sortBy(_.hashCode()).reduce(And), child)
+        Filter(splitConjunctivePredicates(condition)
+                 .sortBy(_.hashCode())
+                 .reduce(And),
+               child)
     }
   }
 
@@ -57,9 +61,10 @@ abstract class PlanTest extends SparkFunSuite with PredicateHelper {
     val normalized2 = normalizeFilters(normalizeExprIds(plan2))
     if (normalized1 != normalized2) {
       fail(
-        s"""
+          s"""
           |== FAIL: Plans do not match ===
-          |${sideBySide(normalized1.treeString, normalized2.treeString).mkString("\n")}
+          |${sideBySide(normalized1.treeString, normalized2.treeString)
+           .mkString("\n")}
          """.stripMargin)
     }
   }

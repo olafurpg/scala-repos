@@ -26,22 +26,23 @@ import org.apache.spark.storage.BlockManagerMessages._
 import org.apache.spark.util.{ThreadUtils, Utils}
 
 /**
- * An RpcEndpoint to take commands from the master to execute options. For example,
- * this is used to remove blocks from the slave's BlockManager.
- */
-private[storage]
-class BlockManagerSlaveEndpoint(
+  * An RpcEndpoint to take commands from the master to execute options. For example,
+  * this is used to remove blocks from the slave's BlockManager.
+  */
+private[storage] class BlockManagerSlaveEndpoint(
     override val rpcEnv: RpcEnv,
     blockManager: BlockManager,
     mapOutputTracker: MapOutputTracker)
-  extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint with Logging {
 
-  private val asyncThreadPool =
-    ThreadUtils.newDaemonCachedThreadPool("block-manager-slave-async-thread-pool")
-  private implicit val asyncExecutionContext = ExecutionContext.fromExecutorService(asyncThreadPool)
+  private val asyncThreadPool = ThreadUtils.newDaemonCachedThreadPool(
+      "block-manager-slave-async-thread-pool")
+  private implicit val asyncExecutionContext =
+    ExecutionContext.fromExecutorService(asyncThreadPool)
 
   // Operations that involve removing blocks may be slow and should be done asynchronously
-  override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
+  override def receiveAndReply(
+      context: RpcCallContext): PartialFunction[Any, Unit] = {
     case RemoveBlock(blockId) =>
       doAsync[Boolean]("removing block " + blockId, context) {
         blockManager.removeBlock(blockId)
@@ -76,19 +77,22 @@ class BlockManagerSlaveEndpoint(
       context.reply(Utils.getThreadDump())
   }
 
-  private def doAsync[T](actionMessage: String, context: RpcCallContext)(body: => T) {
+  private def doAsync[T](actionMessage: String, context: RpcCallContext)(
+      body: => T) {
     val future = Future {
       logDebug(actionMessage)
       body
     }
-    future.onSuccess { case response =>
-      logDebug("Done " + actionMessage + ", response is " + response)
-      context.reply(response)
-      logDebug("Sent response: " + response + " to " + context.senderAddress)
+    future.onSuccess {
+      case response =>
+        logDebug("Done " + actionMessage + ", response is " + response)
+        context.reply(response)
+        logDebug("Sent response: " + response + " to " + context.senderAddress)
     }
-    future.onFailure { case t: Throwable =>
-      logError("Error in " + actionMessage, t)
-      context.sendFailure(t)
+    future.onFailure {
+      case t: Throwable =>
+        logError("Error in " + actionMessage, t)
+        context.sendFailure(t)
     }
   }
 

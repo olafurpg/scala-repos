@@ -17,26 +17,39 @@ import scala.collection.JavaConversions._
 
 class MacroExpansionProvider extends LineMarkerProvider {
 
-  def getLineMarkerInfo(element: PsiElement): LineMarkerInfo[_ <: PsiElement] = null
+  def getLineMarkerInfo(element: PsiElement): LineMarkerInfo[_ <: PsiElement] =
+    null
 
-  override def collectSlowLineMarkers(elements: util.List[PsiElement], result: util.Collection[LineMarkerInfo[_ <: PsiElement]]) = {
-    val expansions = elements.map(p => (p, p.getCopyableUserData(MacroExpandAction.EXPANDED_KEY))).filter(_._2 != null)
+  override def collectSlowLineMarkers(
+      elements: util.List[PsiElement],
+      result: util.Collection[LineMarkerInfo[_ <: PsiElement]]) = {
+    val expansions = elements
+      .map(p => (p, p.getCopyableUserData(MacroExpandAction.EXPANDED_KEY)))
+      .filter(_._2 != null)
 
-    val res = expansions.map { case (current, saved) =>
-      new RelatedItemLineMarkerInfo[PsiElement](current, current.getTextRange, Icons.NO_SCALA_SDK, Pass.UPDATE_OVERRIDEN_MARKERS,
-        new Function[PsiElement, String] {
-          def fun(param: PsiElement): String = "Undo Macro Expansion"
-        },
-        new GutterIconNavigationHandler[PsiElement] {
-          def navigate(mouseEvent: MouseEvent, elt: PsiElement) = {
-            inWriteAction {
-              val newPsi = ScalaPsiElementFactory.createBlockExpressionWithoutBracesFromText(saved, PsiManager.getInstance(current.getProject))
-              current.replace(newPsi)
-              saved
-            }
-          }
-        },
-        GutterIconRenderer.Alignment.RIGHT, util.Arrays.asList[GotoRelatedItem]())
+    val res = expansions.map {
+      case (current, saved) =>
+        new RelatedItemLineMarkerInfo[PsiElement](
+            current,
+            current.getTextRange,
+            Icons.NO_SCALA_SDK,
+            Pass.UPDATE_OVERRIDEN_MARKERS,
+            new Function[PsiElement, String] {
+              def fun(param: PsiElement): String = "Undo Macro Expansion"
+            },
+            new GutterIconNavigationHandler[PsiElement] {
+              def navigate(mouseEvent: MouseEvent, elt: PsiElement) = {
+                inWriteAction {
+                  val newPsi = ScalaPsiElementFactory
+                    .createBlockExpressionWithoutBracesFromText(
+                      saved, PsiManager.getInstance(current.getProject))
+                  current.replace(newPsi)
+                  saved
+                }
+              }
+            },
+            GutterIconRenderer.Alignment.RIGHT,
+            util.Arrays.asList[GotoRelatedItem]())
     }
     result.addAll(res)
   }

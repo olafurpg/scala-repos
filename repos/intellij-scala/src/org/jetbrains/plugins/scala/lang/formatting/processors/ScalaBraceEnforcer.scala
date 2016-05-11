@@ -15,13 +15,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFuncti
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
-class ScalaBraceEnforcer(settings: CodeStyleSettings) extends ScalaRecursiveElementVisitor {
-  private val myPostProcessor: PostFormatProcessorHelper = new PostFormatProcessorHelper(settings)
-  private val commonSetttings = settings.getCommonSettings(ScalaFileType.SCALA_LANGUAGE)
-  private val scalaSettings = settings.getCustomSettings(classOf[ScalaCodeStyleSettings])
+  * @author Alexander Podkhalyuzin
+  */
+class ScalaBraceEnforcer(settings: CodeStyleSettings)
+    extends ScalaRecursiveElementVisitor {
+  private val myPostProcessor: PostFormatProcessorHelper =
+    new PostFormatProcessorHelper(settings)
+  private val commonSetttings =
+    settings.getCommonSettings(ScalaFileType.SCALA_LANGUAGE)
+  private val scalaSettings =
+    settings.getCustomSettings(classOf[ScalaCodeStyleSettings])
 
   override def visitIfStatement(stmt: ScIfStmt) {
     if (checkElementContainsRange(stmt)) {
@@ -55,7 +58,8 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings) extends ScalaRecursiveElem
     if (checkElementContainsRange(stmt)) {
       super.visitDoStatement(stmt)
       stmt.getExprBody match {
-        case Some(e) => processExpression(e, stmt, commonSetttings.DOWHILE_BRACE_FORCE)
+        case Some(e) =>
+          processExpression(e, stmt, commonSetttings.DOWHILE_BRACE_FORCE)
         case _ =>
       }
     }
@@ -65,7 +69,8 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings) extends ScalaRecursiveElem
     if (checkElementContainsRange(expr)) {
       super.visitForExpression(expr)
       expr.body match {
-        case Some(body) => processExpression(body, expr, commonSetttings.FOR_BRACE_FORCE)
+        case Some(body) =>
+          processExpression(body, expr, commonSetttings.FOR_BRACE_FORCE)
         case _ =>
       }
     }
@@ -77,26 +82,29 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings) extends ScalaRecursiveElem
       fun match {
         case d: ScFunctionDefinition =>
           d.body match {
-            case Some(b) => processExpression(b, fun, scalaSettings.METHOD_BRACE_FORCE)
+            case Some(b) =>
+              processExpression(b, fun, scalaSettings.METHOD_BRACE_FORCE)
             case _ =>
           }
         case _ =>
       }
     }
   }
-
 
   override def visitTryExpression(tryStmt: ScTryStmt) {
     if (checkElementContainsRange(tryStmt)) {
       super.visitTryExpression(tryStmt)
       tryStmt.tryBlock.exprs match {
-        case Seq(expr) => processExpression(expr, tryStmt, scalaSettings.TRY_BRACE_FORCE)
+        case Seq(expr) =>
+          processExpression(expr, tryStmt, scalaSettings.TRY_BRACE_FORCE)
         case _ =>
       }
       tryStmt.finallyBlock match {
         case Some(fin) =>
           fin.expression match {
-            case Some(expr) => processExpression(expr, tryStmt, scalaSettings.FINALLY_BRACE_FORCE)
+            case Some(expr) =>
+              processExpression(
+                  expr, tryStmt, scalaSettings.FINALLY_BRACE_FORCE)
             case _ =>
           }
         case _ =>
@@ -104,35 +112,36 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings) extends ScalaRecursiveElem
     }
   }
 
-
   override def visitCaseClause(cc: ScCaseClause) {
     if (checkElementContainsRange(cc)) {
       super.visitCaseClause(cc)
       cc.expr match {
-        case Some(expr) => processExpression(expr, cc, scalaSettings.CASE_CLAUSE_BRACE_FORCE)
+        case Some(expr) =>
+          processExpression(expr, cc, scalaSettings.CASE_CLAUSE_BRACE_FORCE)
         case _ =>
       }
     }
   }
-
 
   override def visitFunctionExpression(stmt: ScFunctionExpr) {
     if (checkElementContainsRange(stmt)) {
       super.visitFunctionExpression(stmt)
       stmt.result match {
-        case Some(expr) => processExpression(expr, stmt, scalaSettings.CLOSURE_BRACE_FORCE)
+        case Some(expr) =>
+          processExpression(expr, stmt, scalaSettings.CLOSURE_BRACE_FORCE)
         case _ =>
       }
     }
   }
 
-  private def processExpression(expr: ScExpression, stmt: PsiElement, option: Int) {
+  private def processExpression(
+      expr: ScExpression, stmt: PsiElement, option: Int) {
     expr match {
       case b: ScBlockExpr =>
       case _ =>
         if (option == CommonCodeStyleSettings.FORCE_BRACES_ALWAYS ||
-          (option == CommonCodeStyleSettings.FORCE_BRACES_IF_MULTILINE &&
-            PostFormatProcessorHelper.isMultiline(stmt))) {
+            (option == CommonCodeStyleSettings.FORCE_BRACES_IF_MULTILINE &&
+                PostFormatProcessorHelper.isMultiline(stmt))) {
           replaceExprWithBlock(expr)
         }
     }
@@ -146,17 +155,19 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings) extends ScalaRecursiveElem
     val oldTextLength: Int = parent.getTextLength
     try {
       val project = expr.getProject
-      val newExpr = ScalaPsiElementFactory.createExpressionFromText("{\n" + expr.getText + "\n}", expr.getManager)
+      val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+          "{\n" + expr.getText + "\n}", expr.getManager)
       val prev = expr.getPrevSibling
-      if (ScalaPsiUtil.isLineTerminator(prev) || prev.isInstanceOf[PsiWhiteSpace]) {
-        CodeEditUtil.removeChild(SourceTreeToPsiMap.psiElementToTree(parent), SourceTreeToPsiMap.psiElementToTree(prev))
+      if (ScalaPsiUtil.isLineTerminator(prev) ||
+          prev.isInstanceOf[PsiWhiteSpace]) {
+        CodeEditUtil.removeChild(SourceTreeToPsiMap.psiElementToTree(parent),
+                                 SourceTreeToPsiMap.psiElementToTree(prev))
       }
       CodeEditUtil.replaceChild(SourceTreeToPsiMap.psiElementToTree(parent),
-        SourceTreeToPsiMap.psiElementToTree(expr),
-        SourceTreeToPsiMap.psiElementToTree(newExpr))
+                                SourceTreeToPsiMap.psiElementToTree(expr),
+                                SourceTreeToPsiMap.psiElementToTree(newExpr))
       CodeStyleManager.getInstance(project).reformat(parent, true)
-    }
-    finally {
+    } finally {
       updateResultRange(oldTextLength, parent.getTextLength)
     }
   }

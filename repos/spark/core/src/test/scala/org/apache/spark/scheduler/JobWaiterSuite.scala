@@ -35,7 +35,8 @@ class JobWaiterSuite extends SparkFunSuite {
       case Some(Failure(e)) =>
         // We should receive the first exception
         assert("Oops 1" === e.getMessage)
-      case other => fail("Should receiver the first exception but it was " + other)
+      case other =>
+        fail("Should receiver the first exception but it was " + other)
     }
   }
 }

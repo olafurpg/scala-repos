@@ -11,18 +11,22 @@ object Macros {
     import c.universe._
 
     def getString: String = {
-      val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) = c.prefix.tree
+      val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) =
+        c.prefix.tree
       s
     }
   }
 
-  def parseContext(c: Context, lower: BigInt, upper: BigInt): Either[String, BigInt] =
+  def parseContext(
+      c: Context, lower: BigInt, upper: BigInt): Either[String, BigInt] =
     parseNumber(LiteralUtil(c).getString, lower, upper)
 
-  def parseNumber(s: String, lower: BigInt, upper: BigInt): Either[String, BigInt] =
+  def parseNumber(
+      s: String, lower: BigInt, upper: BigInt): Either[String, BigInt] =
     try {
       val n = BigInt(s)
-      if (n < lower || n > upper) Left("illegal constant: %s" format s) else Right(n)
+      if (n < lower || n > upper) Left("illegal constant: %s" format s)
+      else Right(n)
     } catch {
       case _: Exception => Left("illegal constant: %s" format s)
     }
@@ -78,20 +82,23 @@ object Macros {
   def rational(c: Context)(): c.Expr[Rational] = {
     import c.universe._
 
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
+    val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) =
+      c.prefix.tree
     val r = Rational(s)
 
     val (n, d) = (r.numerator, r.denominator)
     if (n.isValidLong && d.isValidLong)
       c.Expr(q"spire.math.Rational(${n.toLong}, ${d.toLong})")
     else
-      c.Expr(q"spire.math.Rational(BigInt(${n.toString}), BigInt(${d.toString}))")
+      c.Expr(
+          q"spire.math.Rational(BigInt(${n.toString}), BigInt(${d.toString}))")
   }
 
   def formatWhole(c: Context, sep: String): String = {
     val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*" format sep
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
+    val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) =
+      c.prefix.tree
     if (!s.matches(regex)) c.error(c.enclosingPosition, "invalid whole number")
     s.replace(sep, "")
   }
@@ -99,8 +106,10 @@ object Macros {
   def formatDecimal(c: Context, sep: String, dec: String): String = {
     val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*(%s[0-9]+)?" format (sep, dec)
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    if (!s.matches(regex)) c.error(c.enclosingPosition, "invalid decimal number")
+    val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) =
+      c.prefix.tree
+    if (!s.matches(regex))
+      c.error(c.enclosingPosition, "invalid decimal number")
     s.replace(sep, "").replace(dec, ".")
   }
 
@@ -129,43 +138,54 @@ object Macros {
     try {
       val s = formatWhole(c, sep)
       val b = BigInt(s) // make sure it's ok
-      c.Expr[BigInt](Apply(q"scala.math.BigInt.apply", List(Literal(Constant(s)))))
+      c.Expr[BigInt](
+          Apply(q"scala.math.BigInt.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
-        throw new NumberFormatException("illegal %s BigInt constant" format name)
+        throw new NumberFormatException(
+            "illegal %s BigInt constant" format name)
     }
   }
 
-  def handleBigDecimal(c: Context, name: String, sep: String, dec: String): c.Expr[BigDecimal] = {
+  def handleBigDecimal(c: Context,
+                       name: String,
+                       sep: String,
+                       dec: String): c.Expr[BigDecimal] = {
     import c.universe._
     try {
       val s = formatDecimal(c, sep, dec)
       val b = BigDecimal(s) // make sure it's ok
-      c.Expr[BigDecimal](Apply(q"scala.math.BigDecimal.apply", List(Literal(Constant(s)))))
+      c.Expr[BigDecimal](
+          Apply(q"scala.math.BigDecimal.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
-        throw new NumberFormatException("illegal %s BigInt constant" format name)
+        throw new NumberFormatException(
+            "illegal %s BigInt constant" format name)
     }
   }
 
   def siInt(c: Context)(): c.Expr[Int] = handleInt(c, "SI", " ")
   def siLong(c: Context)(): c.Expr[Long] = handleLong(c, "SI", " ")
   def siBigInt(c: Context)(): c.Expr[BigInt] = handleBigInt(c, "SI", " ")
-  def siBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "SI", " ", ".")
+  def siBigDecimal(c: Context)(): c.Expr[BigDecimal] =
+    handleBigDecimal(c, "SI", " ", ".")
 
   def usInt(c: Context)(): c.Expr[Int] = handleInt(c, "US", ",")
   def usLong(c: Context)(): c.Expr[Long] = handleLong(c, "US", ",")
   def usBigInt(c: Context)(): c.Expr[BigInt] = handleBigInt(c, "US", ",")
-  def usBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "US", ",", ".")
+  def usBigDecimal(c: Context)(): c.Expr[BigDecimal] =
+    handleBigDecimal(c, "US", ",", ".")
 
   def euInt(c: Context)(): c.Expr[Int] = handleInt(c, "EU", ".")
   def euLong(c: Context)(): c.Expr[Long] = handleLong(c, "EU", ".")
   def euBigInt(c: Context)(): c.Expr[BigInt] = handleBigInt(c, "EU", ".")
-  def euBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "EU", ".", ",")
+  def euBigDecimal(c: Context)(): c.Expr[BigDecimal] =
+    handleBigDecimal(c, "EU", ".", ",")
 
   def radix(c: Context)(): c.Expr[Int] = {
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
+    val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) =
+      c.prefix.tree
 
     val name = c.macroApplication.symbol.name.toString
     val base = name.substring(1).toInt
@@ -177,18 +197,20 @@ object Macros {
     c.Expr[Int](Literal(Constant(n)))
   }
 
-  def intAs[A : c.WeakTypeTag](c:Context)(ev : c.Expr[Ring[A]]):c.Expr[A] = {
+  def intAs[A : c.WeakTypeTag](c: Context)(ev: c.Expr[Ring[A]]): c.Expr[A] = {
     import c.universe._
-    c.Expr[A](c.prefix.tree match {
+    c.Expr[A](
+        c.prefix.tree match {
       case Apply((_, List(Literal(Constant(0))))) => q"$ev.zero"
       case Apply((_, List(Literal(Constant(1))))) => q"$ev.one"
       case Apply((_, List(n))) => q"$ev.fromInt($n)"
     })
   }
 
-  def dblAs[A : c.WeakTypeTag](c:Context)(ev : c.Expr[Field[A]]):c.Expr[A]= {
+  def dblAs[A : c.WeakTypeTag](c: Context)(ev: c.Expr[Field[A]]): c.Expr[A] = {
     import c.universe._
-    c.Expr[A](c.prefix.tree match {
+    c.Expr[A](
+        c.prefix.tree match {
       case Apply((_, List(Literal(Constant(0.0))))) => q"$ev.zero"
       case Apply((_, List(Literal(Constant(1.0))))) => q"$ev.one"
       case Apply((_, List(n))) => q"$ev.fromDouble($n)"

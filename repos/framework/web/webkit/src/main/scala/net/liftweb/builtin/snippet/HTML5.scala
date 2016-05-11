@@ -23,11 +23,11 @@ import net.liftweb.http._
 import net.liftweb.common._
 
 /**
- * Sets the DocType to html5
- */
+  * Sets the DocType to html5
+  */
 object HTML5 extends DispatchSnippet {
 
-  def dispatch : DispatchIt = {
+  def dispatch: DispatchIt = {
     case _ => render _
   }
 
@@ -36,4 +36,3 @@ object HTML5 extends DispatchSnippet {
     xhtml
   }
 }
-

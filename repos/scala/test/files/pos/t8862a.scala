@@ -38,7 +38,6 @@ package other {
     implicitly[Option[Oops]]
   }
 
-
   object Blee {
     // implicits found through the companion implicits
     implicitly[p.q.Oops]

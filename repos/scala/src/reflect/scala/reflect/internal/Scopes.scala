@@ -12,20 +12,24 @@ import scala.annotation.tailrec
 trait Scopes extends api.Scopes { self: SymbolTable =>
 
   /** An ADT to represent the results of symbol name lookups.
-   */
-  sealed trait NameLookup { def symbol: Symbol ; def isSuccess = false }
-  case class LookupSucceeded(qualifier: Tree, symbol: Symbol) extends NameLookup { override def isSuccess = true }
-  case class LookupAmbiguous(msg: String) extends NameLookup { def symbol = NoSymbol }
+    */
+  sealed trait NameLookup { def symbol: Symbol; def isSuccess = false }
+  case class LookupSucceeded(qualifier: Tree, symbol: Symbol)
+      extends NameLookup { override def isSuccess = true }
+  case class LookupAmbiguous(msg: String) extends NameLookup {
+    def symbol = NoSymbol
+  }
   case class LookupInaccessible(symbol: Symbol, msg: String) extends NameLookup
   case object LookupNotFound extends NameLookup { def symbol = NoSymbol }
 
   class ScopeEntry(val sym: Symbol, val owner: Scope) {
+
     /** the next entry in the hash bucket
-     */
+      */
     var tail: ScopeEntry = null
 
     /** the next entry in this scope
-     */
+      */
     var next: ScopeEntry = null
 
     def depth = owner.nestingLevel
@@ -45,23 +49,23 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
   }
 
   /** Note: constructor is protected to force everyone to use the factory methods newScope or newNestedScope instead.
-   *  This is necessary because when run from reflection every scope needs to have a
-   *  SynchronizedScope as mixin.
-   */
+    *  This is necessary because when run from reflection every scope needs to have a
+    *  SynchronizedScope as mixin.
+    */
   class Scope protected[Scopes]() extends ScopeApi with MemberScopeApi {
 
     private[scala] var elems: ScopeEntry = _
 
     /** The number of times this scope is nested in another
-     */
+      */
     private[Scopes] var nestinglevel = 0
 
     /** the hash table
-     */
+      */
     private[Scopes] var hashtable: Array[ScopeEntry] = null
 
     /** a cache for all elements, to be used by symbol iterator.
-     */
+      */
     private var elemsCache: List[Symbol] = null
     private var cachedSize = -1
     private def flushElemsCache() {
@@ -70,13 +74,13 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     }
 
     /** size and mask of hash tables
-     *  todo: make hashtables grow?
-     */
+      *  todo: make hashtables grow?
+      */
     private val HASHSIZE = 0x80
     private val HASHMASK = 0x7f
 
     /** the threshold number of entries from which a hashtable is constructed.
-     */
+      */
     private val MIN_HASH = 8
 
     /** Returns a new scope with the same content as this one. */
@@ -87,8 +91,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
 
     /** the number of entries in this scope */
     override def size: Int = {
-      if (cachedSize < 0)
-        cachedSize = directSize
+      if (cachedSize < 0) cachedSize = directSize
 
       cachedSize
     }
@@ -103,13 +106,11 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     }
 
     /** enter a scope entry
-     */
+      */
     protected def enterEntry(e: ScopeEntry) {
       flushElemsCache()
-      if (hashtable ne null)
-        enterInHash(e)
-      else if (size >= MIN_HASH)
-        createHash()
+      if (hashtable ne null) enterInHash(e)
+      else if (size >= MIN_HASH) createHash()
     }
 
     private def enterInHash(e: ScopeEntry): Unit = {
@@ -119,16 +120,17 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     }
 
     /** enter a symbol
-     */
+      */
     def enter[T <: Symbol](sym: T): T = {
       enterEntry(newScopeEntry(sym, this))
       sym
     }
 
     /** enter a symbol, asserting that no symbol with same name exists in scope
-     */
+      */
     def enterUnique(sym: Symbol) {
-      assert(lookup(sym.name) == NoSymbol, (sym.fullLocationString, lookup(sym.name).fullLocationString))
+      assert(lookup(sym.name) == NoSymbol,
+             (sym.fullLocationString, lookup(sym.name).fullLocationString))
       enter(sym)
     }
 
@@ -186,7 +188,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     }
 
     /** remove entry
-     */
+      */
     def unlink(e: ScopeEntry) {
       if (elems == e) {
         elems = e.next
@@ -218,16 +220,18 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     }
 
     /** Lookup a module or a class, filtering out matching names in scope
-     *  which do not match that requirement.
-     */
-    def lookupModule(name: Name): Symbol = findSymbol(lookupAll(name.toTermName))(_.isModule)
-    def lookupClass(name: Name): Symbol  = findSymbol(lookupAll(name.toTypeName))(_.isClass)
+      *  which do not match that requirement.
+      */
+    def lookupModule(name: Name): Symbol =
+      findSymbol(lookupAll(name.toTermName))(_.isModule)
+    def lookupClass(name: Name): Symbol =
+      findSymbol(lookupAll(name.toTypeName))(_.isClass)
 
     /** True if the name exists in this scope, false otherwise. */
     def containsName(name: Name) = lookupEntry(name) != null
 
     /** Lookup a symbol.
-     */
+      */
     def lookup(name: Name): Symbol = {
       val e = lookupEntry(name)
       if (e eq null) NoSymbol
@@ -262,41 +266,44 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     }
 
     /** Returns an iterator yielding every symbol with given name in this scope.
-     */
+      */
     def lookupAll(name: Name): Iterator[Symbol] = new Iterator[Symbol] {
       var e = lookupEntry(name)
       def hasNext: Boolean = e ne null
       def next(): Symbol = try e.sym finally e = lookupNextEntry(e)
     }
 
-    def lookupAllEntries(name: Name): Iterator[ScopeEntry] = new Iterator[ScopeEntry] {
-      var e = lookupEntry(name)
-      def hasNext: Boolean = e ne null
-      def next(): ScopeEntry = try e finally e = lookupNextEntry(e)
-    }
+    def lookupAllEntries(name: Name): Iterator[ScopeEntry] =
+      new Iterator[ScopeEntry] {
+        var e = lookupEntry(name)
+        def hasNext: Boolean = e ne null
+        def next(): ScopeEntry = try e finally e = lookupNextEntry(e)
+      }
 
     def lookupUnshadowedEntries(name: Name): Iterator[ScopeEntry] = {
       lookupEntry(name) match {
         case null => Iterator.empty
-        case e    => lookupAllEntries(name) filter (e1 => (e eq e1) || (e.depth == e1.depth && e.sym != e1.sym))
+        case e =>
+          lookupAllEntries(name) filter
+          (e1 => (e eq e1) || (e.depth == e1.depth && e.sym != e1.sym))
       }
     }
 
     /** lookup a symbol entry matching given name.
-     *  @note from Martin: I believe this is a hotspot or will be one
-     *  in future versions of the type system. I have reverted the previous
-     *  change to use iterators as too costly.
-     */
+      *  @note from Martin: I believe this is a hotspot or will be one
+      *  in future versions of the type system. I have reverted the previous
+      *  change to use iterators as too costly.
+      */
     def lookupEntry(name: Name): ScopeEntry = {
       var e: ScopeEntry = null
       if (hashtable ne null) {
         e = hashtable(name.start & HASHMASK)
-        while ((e ne null) && e.sym.name != name) {
+        while ( (e ne null) && e.sym.name != name) {
           e = e.tail
         }
       } else {
         e = elems
-        while ((e ne null) && e.sym.name != name) {
+        while ( (e ne null) && e.sym.name != name) {
           e = e.next
         }
       }
@@ -304,36 +311,35 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     }
 
     /** lookup next entry with same name as this one
-     *  @note from Martin: I believe this is a hotspot or will be one
-     *  in future versions of the type system. I have reverted the previous
-     *  change to use iterators as too costly.
-     */
+      *  @note from Martin: I believe this is a hotspot or will be one
+      *  in future versions of the type system. I have reverted the previous
+      *  change to use iterators as too costly.
+      */
     def lookupNextEntry(entry: ScopeEntry): ScopeEntry = {
       var e = entry
       if (hashtable ne null)
-        do { e = e.tail } while ((e ne null) && e.sym.name != entry.sym.name)
+        do { e = e.tail } while ( (e ne null) && e.sym.name != entry.sym.name)
       else
-        do { e = e.next } while ((e ne null) && e.sym.name != entry.sym.name)
+        do { e = e.next } while ( (e ne null) && e.sym.name != entry.sym.name)
       e
     }
 
     /** TODO - we can test this more efficiently than checking isSubScope
-     *  in both directions. However the size test might be enough to quickly
-     *  rule out most failures.
-     */
-    def isSameScope(other: Scope) = (
-         (size == other.size)     // optimization - size is cached
-      && (this isSubScope other)
-      && (other isSubScope this)
-    )
+      *  in both directions. However the size test might be enough to quickly
+      *  rule out most failures.
+      */
+    def isSameScope(other: Scope) =
+      ((size == other.size) // optimization - size is cached
+          && (this isSubScope other) && (other isSubScope this))
 
     def isSubScope(other: Scope) = {
       def scopeContainsSym(sym: Symbol): Boolean = {
         @tailrec def entryContainsSym(e: ScopeEntry): Boolean = e match {
           case null => false
-          case _    =>
+          case _ =>
             val comparableInfo = sym.info.substThis(sym.owner, e.sym.owner)
-            (e.sym.info =:= comparableInfo) || entryContainsSym(lookupNextEntry(e))
+            (e.sym.info =:= comparableInfo) ||
+            entryContainsSym(lookupNextEntry(e))
         }
         entryContainsSym(this lookupEntry sym.name)
       }
@@ -341,13 +347,13 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     }
 
     /** Return all symbols as a list in the order they were entered in this scope.
-     */
+      */
     override def toList: List[Symbol] = {
       if (elemsCache eq null) {
         var symbols: List[Symbol] = Nil
         var count = 0
         var e = elems
-        while ((e ne null) && e.owner == this) {
+        while ( (e ne null) && e.owner == this) {
           count += 1
           symbols ::= e.sym
           e = e.next
@@ -359,27 +365,25 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     }
 
     /** Vanilla scope - symbols are stored in declaration order.
-     */
+      */
     def sorted: List[Symbol] = toList
 
     /** Return the nesting level of this scope, i.e. the number of times this scope
-     *  was nested in another */
+      *  was nested in another */
     def nestingLevel = nestinglevel
 
     /** Return all symbols as an iterator in the order they were entered in this scope.
-     */
+      */
     def iterator: Iterator[Symbol] = toList.iterator
 
     override def foreach[U](p: Symbol => U): Unit = toList foreach p
 
-    override def filterNot(p: Symbol => Boolean): Scope = (
-      if (toList exists p) newScopeWith(toList filterNot p: _*)
-      else this
-    )
-    override def filter(p: Symbol => Boolean): Scope = (
-      if (toList forall p) this
-      else newScopeWith(toList filter p: _*)
-    )
+    override def filterNot(p: Symbol => Boolean): Scope =
+      (if (toList exists p) newScopeWith(toList filterNot p: _*)
+       else this)
+    override def filter(p: Symbol => Boolean): Scope =
+      (if (toList forall p) this
+       else newScopeWith(toList filter p: _*))
     @deprecated("Use `toList.reverse` instead", "2.10.0") // Used in SBT 0.12.4
     def reverse: List[Symbol] = toList.reverse
 
@@ -399,25 +403,25 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
   def newScope: Scope = new Scope()
 
   /** Create a new scope to be used in `findMembers`.
-   *
-   *  But why do we need a special scope for `findMembers`?
-   *  Let me tell you a story.
-   *
-   * `findMembers` creates a synthetic scope and then iterates over
-   *  base classes in linearization order, and for every scrutinized class
-   *  iterates over `decls`, the collection of symbols declared in that class.
-   *  Declarations that fit the filter get appended to the created scope.
-   *
-   *  The problem is that `decls` returns a Scope, and to iterate a scope performantly
-   *  one needs to go from its end to its beginning.
-   *
-   *  Hence the `findMembers` scope is populated in a wicked order:
-   *  symbols that belong to the same declaring class come in reverse order of their declaration,
-   *  however, the scope itself is ordered w.r.t the linearization of the target type.
-   *
-   *  Once `members` became a public API, this has been confusing countless numbers of users.
-   *  Therefore we introduce a special flavor of scopes to accommodate this quirk of `findMembers`
-   */
+    *
+    *  But why do we need a special scope for `findMembers`?
+    *  Let me tell you a story.
+    *
+    * `findMembers` creates a synthetic scope and then iterates over
+    *  base classes in linearization order, and for every scrutinized class
+    *  iterates over `decls`, the collection of symbols declared in that class.
+    *  Declarations that fit the filter get appended to the created scope.
+    *
+    *  The problem is that `decls` returns a Scope, and to iterate a scope performantly
+    *  one needs to go from its end to its beginning.
+    *
+    *  Hence the `findMembers` scope is populated in a wicked order:
+    *  symbols that belong to the same declaring class come in reverse order of their declaration,
+    *  however, the scope itself is ordered w.r.t the linearization of the target type.
+    *
+    *  Once `members` became a public API, this has been confusing countless numbers of users.
+    *  Therefore we introduce a special flavor of scopes to accommodate this quirk of `findMembers`
+    */
   private[scala] def newFindMemberScope: Scope = new Scope() {
     override def sorted = {
       val members = toList
@@ -429,11 +433,13 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
 
   /** Create a new scope nested in another one with which it shares its elements */
   final def newNestedScope(outer: Scope): Scope = {
-    val nested = newScope // not `new Scope`, we must allow the runtime reflection universe to mixin SynchronizedScopes!
+    val nested =
+      newScope // not `new Scope`, we must allow the runtime reflection universe to mixin SynchronizedScopes!
     nested.elems = outer.elems
     nested.nestinglevel = outer.nestinglevel + 1
     if (outer.hashtable ne null)
-      nested.hashtable = java.util.Arrays.copyOf(outer.hashtable, outer.hashtable.length)
+      nested.hashtable = java.util.Arrays
+        .copyOf(outer.hashtable, outer.hashtable.length)
     nested
   }
 
@@ -448,13 +454,12 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
   def newPackageScope(pkgClass: Symbol): Scope = newScope
 
   /** Transform scope of members of `owner` using operation `op`
-   *  This is overridden by the reflective compiler to avoid creating new scopes for packages
-   */
+    *  This is overridden by the reflective compiler to avoid creating new scopes for packages
+    */
   def scopeTransform(owner: Symbol)(op: => Scope): Scope = op
 
-
   /** The empty scope (immutable).
-   */
+    */
   object EmptyScope extends Scope {
     override def enterEntry(e: ScopeEntry) {
       abort("EmptyScope.enter")
@@ -462,7 +467,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
   }
 
   /** The error scope.
-   */
+    */
   class ErrorScope(owner: Symbol) extends Scope
 
   private final val maxRecursions = 1000

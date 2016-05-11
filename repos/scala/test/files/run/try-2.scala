@@ -3,15 +3,12 @@
  *
  */
 
-
 object Test {
-
 
   def tryAllUnit: Unit =
     try {
       throw new Error();
-    }
-    catch {
+    } catch {
       case _: Throwable => Console.println("exception happened\n");
     }
 
@@ -43,19 +40,18 @@ object Test {
       case _: Throwable => Console.println("Huh?");
     }
 
+  def execute(f: => Unit) =
+    try {
+      f;
+    } catch {
+      case _: Throwable => ();
+    }
 
-  def execute(f: => Unit) = try {
-    f;
-  } catch {
-    case _: Throwable => ();
-  }
-
-
-  def main(args:Array[String]): Unit = {
+  def main(args: Array[String]): Unit = {
     execute(tryAllUnit);
     execute(tryUnitAll);
     execute(tryAllAll);
     execute(tryUnitUnit);
     execute(tryIntUnit);
- }
+  }
 }

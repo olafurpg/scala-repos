@@ -8,16 +8,17 @@ import com.twitter.io.Buf
 import com.twitter.util.{Await, SynchronizedLruMap}
 
 /**
- * An in-process memcached server.
- */
+  * An in-process memcached server.
+  */
 @deprecated("Moved into test", "7.0.0")
 class Server(address: SocketAddress) {
   val concurrencyLevel = 16
   val slots = 500000
   val slotsPerLru = slots / concurrencyLevel
-  val maps = (0 until concurrencyLevel) map { i =>
-    new SynchronizedLruMap[Buf, Entry](slotsPerLru)
-  }
+  val maps =
+    (0 until concurrencyLevel) map { i =>
+      new SynchronizedLruMap[Buf, Entry](slotsPerLru)
+    }
 
   private[this] val service = {
     val interpreter = new Interpreter(new AtomicMap(maps))
@@ -25,10 +26,7 @@ class Server(address: SocketAddress) {
   }
 
   private[this] val serverSpec =
-    ServerBuilder()
-      .name("finagle")
-      .codec(text.Memcached())
-      .bindTo(address)
+    ServerBuilder().name("finagle").codec(text.Memcached()).bindTo(address)
 
   private[this] var server: Option[BuiltServer] = None
 

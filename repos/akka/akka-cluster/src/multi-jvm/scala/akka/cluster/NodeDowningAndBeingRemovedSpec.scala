@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import scala.collection.immutable.SortedSet
@@ -15,17 +15,22 @@ object NodeDowningAndBeingRemovedMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString(
-    "akka.cluster.auto-down-unreachable-after = off").withFallback(MultiNodeClusterSpec.clusterConfig)))
+  commonConfig(
+      debugConfig(on = false).withFallback(ConfigFactory
+            .parseString("akka.cluster.auto-down-unreachable-after = off")
+            .withFallback(MultiNodeClusterSpec.clusterConfig)))
 }
 
-class NodeDowningAndBeingRemovedMultiJvmNode1 extends NodeDowningAndBeingRemovedSpec
-class NodeDowningAndBeingRemovedMultiJvmNode2 extends NodeDowningAndBeingRemovedSpec
-class NodeDowningAndBeingRemovedMultiJvmNode3 extends NodeDowningAndBeingRemovedSpec
+class NodeDowningAndBeingRemovedMultiJvmNode1
+    extends NodeDowningAndBeingRemovedSpec
+class NodeDowningAndBeingRemovedMultiJvmNode2
+    extends NodeDowningAndBeingRemovedSpec
+class NodeDowningAndBeingRemovedMultiJvmNode3
+    extends NodeDowningAndBeingRemovedSpec
 
 abstract class NodeDowningAndBeingRemovedSpec
-  extends MultiNodeSpec(NodeDowningAndBeingRemovedMultiJvmSpec)
-  with MultiNodeClusterSpec {
+    extends MultiNodeSpec(NodeDowningAndBeingRemovedMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import NodeDowningAndBeingRemovedMultiJvmSpec._
 
@@ -51,8 +56,10 @@ abstract class NodeDowningAndBeingRemovedSpec
         runOn(first) {
           // verify that the nodes are no longer part of the 'members' set
           awaitAssert {
-            clusterView.members.map(_.address) should not contain (address(second))
-            clusterView.members.map(_.address) should not contain (address(third))
+            clusterView.members.map(_.address) should not contain
+            (address(second))
+            clusterView.members.map(_.address) should not contain
+            (address(third))
           }
         }
       }

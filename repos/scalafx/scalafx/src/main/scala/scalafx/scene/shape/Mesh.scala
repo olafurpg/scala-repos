@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,10 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object Mesh {
-  implicit def sfxMesh2jfx(m: Mesh): jfxss.Mesh = if (m != null) m.delegate else null
+  implicit def sfxMesh2jfx(m: Mesh): jfxss.Mesh =
+    if (m != null) m.delegate else null
 }
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/shape/Mesh.html]]. */
 abstract class Mesh(override val delegate: jfxss.Mesh)
-  extends SFXDelegate[jfxss.Mesh] {
-}
+    extends SFXDelegate[jfxss.Mesh] {}

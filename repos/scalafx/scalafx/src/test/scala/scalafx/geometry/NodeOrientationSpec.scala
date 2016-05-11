@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.geometry.NodeOrientation]]. */
 @RunWith(classOf[JUnitRunner])
-class NodeOrientationSpec extends SFXEnumDelegateSpec[jfxg.NodeOrientation, NodeOrientation](
-  javaClass = classOf[jfxg.NodeOrientation],
-  scalaClass = classOf[NodeOrientation],
-  companion = NodeOrientation)
+class NodeOrientationSpec
+    extends SFXEnumDelegateSpec[jfxg.NodeOrientation, NodeOrientation](
+        javaClass = classOf[jfxg.NodeOrientation],
+        scalaClass = classOf[NodeOrientation],
+        companion = NodeOrientation)

@@ -1,14 +1,14 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import akka.NotUsed
 
 /**
- * Convenience functions for often-encountered purposes like keeping only the
- * left (first) or only the right (second) of two input values.
- */
+  * Convenience functions for often-encountered purposes like keeping only the
+  * left (first) or only the right (second) of two input values.
+  */
 object Keep {
   private val _left = (l: Any, r: Any) ⇒ l
   private val _right = (l: Any, r: Any) ⇒ r

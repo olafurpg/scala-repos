@@ -41,24 +41,24 @@
 package java.math
 
 /** Provides the basic arithmetic mutable operations for {@link BigInteger}.
- *
- *  Object that provides the basic arithmetic mutable operations for
- *  {@link BigInteger}. The operations provided are listed below. <ul
- *  type="circle"> <li>Addition.</li> <li>Subtraction.</li> <li>Comparison.</li>
- *  </ul> In addition to this, some <i><b>Inplace</b></i> (mutable) methods are
- *  provided.
- */
+  *
+  *  Object that provides the basic arithmetic mutable operations for
+  *  {@link BigInteger}. The operations provided are listed below. <ul
+  *  type="circle"> <li>Addition.</li> <li>Subtraction.</li> <li>Comparison.</li>
+  *  </ul> In addition to this, some <i><b>Inplace</b></i> (mutable) methods are
+  *  provided.
+  */
 private[math] object Elementary {
 
   private final val UINT_MAX = 0xffffffffL
 
   /** Adds two {@link BigInteger}.
-   *
-   *  @see BigInteger#add(BigInteger) .
-   *  @param op1
-   *  @param op2
-   *  @return the sum.
-   */
+    *
+    *  @see BigInteger#add(BigInteger) .
+    *  @param op1
+    *  @param op2
+    *  @return the sum.
+    */
   def add(op1: BigInteger, op2: BigInteger): BigInteger = {
     // scalastyle:off return
     var resDigits: Array[Int] = null
@@ -106,12 +106,10 @@ private[math] object Elementary {
             }
           }
 
-          if (cmp == BigInteger.EQUALS)
-            return BigInteger.ZERO
+          if (cmp == BigInteger.EQUALS) return BigInteger.ZERO
           else if (cmp == BigInteger.GREATER) // a minuend should not be shorter than subtrahend
             (op1Sign, subtract(op1.digits, op1Len, op2.digits, op2Len))
-          else
-            (op2Sign, subtract(op2.digits, op2Len, op1.digits, op1Len))
+          else (op2Sign, subtract(op2.digits, op2Len, op1.digits, op1Len))
         }
       val res = new BigInteger(resSign, resDigits.length, resDigits)
       res.cutOffLeadingZeroes()
@@ -122,7 +120,7 @@ private[math] object Elementary {
 
   def compareArrays(a: Array[Int], b: Array[Int], size: Int): Int = {
     var i: Int = size - 1
-    while ((i >= 0) && (a(i) == b(i))) {
+    while ( (i >= 0) && (a(i) == b(i))) {
       i -= 1
     }
     if (i < 0) BigInteger.EQUALS
@@ -131,13 +129,13 @@ private[math] object Elementary {
   }
 
   /** In place add on positive or negative {@link BigInteger}.
-   *
-   *  Same as @link #inplaceAdd(BigInteger, BigInteger), but without the
-   *  restriction of non-positive values.
-   *
-   *  @param op1 any number
-   *  @param op2 any number
-   */
+    *
+    *  Same as @link #inplaceAdd(BigInteger, BigInteger), but without the
+    *  restriction of non-positive values.
+    *
+    *  @param op1 any number
+    *  @param op2 any number
+    */
   def completeInPlaceAdd(op1: BigInteger, op2: BigInteger): Unit = {
     // scalastyle:off return
     if (op1.sign == 0) {
@@ -145,14 +143,26 @@ private[math] object Elementary {
     } else if (op2.sign == 0) {
       return
     } else if (op1.sign == op2.sign) {
-      add(op1.digits, op1.digits, op1.numberLength, op2.digits, op2.numberLength)
+      add(op1.digits,
+          op1.digits,
+          op1.numberLength,
+          op2.digits,
+          op2.numberLength)
     } else {
-      val sign =
-        unsignedArraysCompare(op1.digits, op2.digits, op1.numberLength, op2.numberLength)
+      val sign = unsignedArraysCompare(
+          op1.digits, op2.digits, op1.numberLength, op2.numberLength)
       if (sign > 0) {
-        subtract(op1.digits, op1.digits, op1.numberLength, op2.digits, op2.numberLength)
+        subtract(op1.digits,
+                 op1.digits,
+                 op1.numberLength,
+                 op2.digits,
+                 op2.numberLength)
       } else {
-        inverseSubtract(op1.digits, op1.digits, op1.numberLength, op2.digits, op2.numberLength)
+        inverseSubtract(op1.digits,
+                        op1.digits,
+                        op1.numberLength,
+                        op2.digits,
+                        op2.numberLength)
         op1.sign = -op1.sign
       }
     }
@@ -163,28 +173,40 @@ private[math] object Elementary {
   }
 
   /** In place subtract of positive or negative {@link BigInteger}.
-   *
-   *  Same as @link #inplaceSubtract(BigInteger, BigInteger), but without the
-   *  restriction of non-positive values.
-   *
-   *  @param op1 should have enough space to save the result
-   *  @param op2
-   */
+    *
+    *  Same as @link #inplaceSubtract(BigInteger, BigInteger), but without the
+    *  restriction of non-positive values.
+    *
+    *  @param op1 should have enough space to save the result
+    *  @param op2
+    */
   def completeInPlaceSubtract(op1: BigInteger, op2: BigInteger): Unit = {
     val resultSign = op1.compareTo(op2)
     if (op1.sign == 0) {
       System.arraycopy(op2.digits, 0, op1.digits, 0, op2.numberLength)
       op1.sign = -op2.sign
     } else if (op1.sign != op2.sign) {
-      add(op1.digits, op1.digits, op1.numberLength, op2.digits, op2.numberLength)
+      add(op1.digits,
+          op1.digits,
+          op1.numberLength,
+          op2.digits,
+          op2.numberLength)
       op1.sign = resultSign
     } else {
-      val sign =
-        unsignedArraysCompare(op1.digits, op2.digits, op1.numberLength, op2.numberLength)
+      val sign = unsignedArraysCompare(
+          op1.digits, op2.digits, op1.numberLength, op2.numberLength)
       if (sign > 0) {
-        subtract(op1.digits, op1.digits, op1.numberLength, op2.digits, op2.numberLength)
+        subtract(op1.digits,
+                 op1.digits,
+                 op1.numberLength,
+                 op2.digits,
+                 op2.numberLength)
       } else {
-        inverseSubtract(op1.digits, op1.digits, op1.numberLength, op2.digits, op2.numberLength)
+        inverseSubtract(op1.digits,
+                        op1.digits,
+                        op1.numberLength,
+                        op2.digits,
+                        op2.numberLength)
         op1.sign = -op1.sign
       }
     }
@@ -194,25 +216,26 @@ private[math] object Elementary {
   }
 
   /** Performs {@code op1 += op2}.
-   *
-   *  {@code op1} must have enough place to store the result
-   *  (i.e. {@code op1.bitLength() >= op2.bitLength()}).
-   *  Both should be positive (i.e. {@code op1 >= op2}).
-   *
-   *  @param op1 the input minuend, and the output result.
-   *  @param op2 the addend
-   */
+    *
+    *  {@code op1} must have enough place to store the result
+    *  (i.e. {@code op1.bitLength() >= op2.bitLength()}).
+    *  Both should be positive (i.e. {@code op1 >= op2}).
+    *
+    *  @param op1 the input minuend, and the output result.
+    *  @param op2 the addend
+    */
   def inplaceAdd(op1: BigInteger, op2: BigInteger): Unit = {
     add(op1.digits, op1.digits, op1.numberLength, op2.digits, op2.numberLength)
-    op1.numberLength = Math.min(Math.max(op1.numberLength, op2.numberLength) + 1, op1.digits.length)
+    op1.numberLength = Math.min(
+        Math.max(op1.numberLength, op2.numberLength) + 1, op1.digits.length)
     op1.cutOffLeadingZeroes()
     op1.unCache()
   }
 
   /** Performs: {@code op1 += addend}.
-   *
-   *  The number must to have place to hold a possible carry.
-   */
+    *
+    *  The number must to have place to hold a possible carry.
+    */
   def inplaceAdd(op1: BigInteger, addend: Int): Unit = {
     val carry = inplaceAdd(op1.digits, op1.numberLength, addend)
     if (carry == 1) {
@@ -223,9 +246,9 @@ private[math] object Elementary {
   }
 
   /** Adds an integer value to the array of integers remembering carry.
-   *
-   *  @return a possible generated carry (0 or 1)
-   */
+    *
+    *  @return a possible generated carry (0 or 1)
+    */
   def inplaceAdd(a: Array[Int], aSize: Int, addend: Int): Int = {
     var carry: Long = addend & UINT_MAX
     var i = 0
@@ -239,27 +262,28 @@ private[math] object Elementary {
   }
 
   /** Performs {@code op1 -= op2}.
-   *
-   *  {@code op1} must have enough place to store the result
-   *  (i.e. {@code op1.bitLength() >= op2.bitLength()}).
-   *  Both should be positive (what implies that {@code op1 >= op2}).
-   *
-   *  @param op1 the input minuend, and the output result.
-   *  @param op2 the subtrahend
-   */
+    *
+    *  {@code op1} must have enough place to store the result
+    *  (i.e. {@code op1.bitLength() >= op2.bitLength()}).
+    *  Both should be positive (what implies that {@code op1 >= op2}).
+    *
+    *  @param op1 the input minuend, and the output result.
+    *  @param op2 the subtrahend
+    */
   def inplaceSubtract(op1: BigInteger, op2: BigInteger): Unit = {
-    subtract(op1.digits, op1.digits, op1.numberLength, op2.digits, op2.numberLength)
+    subtract(
+        op1.digits, op1.digits, op1.numberLength, op2.digits, op2.numberLength)
     op1.cutOffLeadingZeroes()
     op1.unCache()
   }
 
   /** Subtracts two {@link BigInteger}.
-   *
-   *  @see BigInteger#subtract(BigInteger) .
-   *  @param op1
-   *  @param op2
-   *  @return
-   */
+    *
+    *  @see BigInteger#subtract(BigInteger) .
+    *  @param op1
+    *  @param op2
+    *  @return
+    */
   def subtract(op1: BigInteger, op2: BigInteger): BigInteger = {
     // scalastyle:off return
     var resSign = 0
@@ -298,7 +322,8 @@ private[math] object Elementary {
       val (resSign, resDigits) = {
         if (cmp == BigInteger.LESS) {
           val res =
-            if (op1Sign == op2Sign) subtract(op2.digits, op2Len, op1.digits, op1Len)
+            if (op1Sign == op2Sign)
+              subtract(op2.digits, op2Len, op1.digits, op1Len)
             else add(op2.digits, op2Len, op1.digits, op1Len)
           (-op2Sign, res)
         } else if (op1Sign == op2Sign) {
@@ -315,20 +340,24 @@ private[math] object Elementary {
   }
 
   /**  Adds the value represented by {@code b} to the value represented by {@code a}.
-   *
-   *  It is assumed the magnitude of a is not less than the magnitude of b.
-   *
-   *  @return {@code a + b}
-   */
-  private def add(a: Array[Int], aSize: Int, b: Array[Int], bSize: Int): Array[Int] = {
+    *
+    *  It is assumed the magnitude of a is not less than the magnitude of b.
+    *
+    *  @return {@code a + b}
+    */
+  private def add(
+      a: Array[Int], aSize: Int, b: Array[Int], bSize: Int): Array[Int] = {
     val res = new Array[Int](aSize + 1)
     add(res, a, aSize, b, bSize)
     res
   }
 
   /** Performs {@code res = a + b}. */
-  private def add(res: Array[Int], a: Array[Int], aSize: Int,
-      b: Array[Int], bSize: Int): Unit = {
+  private def add(res: Array[Int],
+                  a: Array[Int],
+                  aSize: Int,
+                  b: Array[Int],
+                  bSize: Int): Unit = {
     var i: Int = 1
     var carry: Long = (a(0) & UINT_MAX) + (b(0) & UINT_MAX)
     res(0) = carry.toInt
@@ -360,13 +389,15 @@ private[math] object Elementary {
         i += 1
       }
     }
-    if (carry != 0)
-      res(i) = carry.toInt
+    if (carry != 0) res(i) = carry.toInt
   }
 
   /** Performs {@code res = b - a}. */
-  private def inverseSubtract(res: Array[Int], a: Array[Int], aSize: Int,
-      b: Array[Int], bSize: Int): Unit = {
+  private def inverseSubtract(res: Array[Int],
+                              a: Array[Int],
+                              aSize: Int,
+                              b: Array[Int],
+                              bSize: Int): Unit = {
     var i: Int = 0
     var borrow: Long = 0
     if (aSize < bSize) {
@@ -399,23 +430,27 @@ private[math] object Elementary {
   }
 
   /** Subtracts the value represented by {@code b} from the value represented by {@code a}.
-   *
-   *  It is assumed the magnitude of a is not less than the magnitude of b.
-   *
-   *  @return {@code a - b}
-   */
-  private def subtract(a: Array[Int], aSize: Int, b: Array[Int], bSize: Int): Array[Int] = {
+    *
+    *  It is assumed the magnitude of a is not less than the magnitude of b.
+    *
+    *  @return {@code a - b}
+    */
+  private def subtract(
+      a: Array[Int], aSize: Int, b: Array[Int], bSize: Int): Array[Int] = {
     val res = new Array[Int](aSize)
     subtract(res, a, aSize, b, bSize)
     res
   }
 
   /** Performs {@code res = a - b}.
-   *
-   *  It is assumed the magnitude of a is not less than the magnitude of b.
-   */
-  private def subtract(res: Array[Int], a: Array[Int], aSize: Int,
-      b: Array[Int], bSize: Int): Unit = {
+    *
+    *  It is assumed the magnitude of a is not less than the magnitude of b.
+    */
+  private def subtract(res: Array[Int],
+                       a: Array[Int],
+                       aSize: Int,
+                       b: Array[Int],
+                       bSize: Int): Unit = {
     var i: Int = 0
     var borrow: Long = 0
     while (i < bSize) {
@@ -433,12 +468,12 @@ private[math] object Elementary {
   }
 
   /** Compares two arrays.
-   *
-   *  Compares two arrays, representing unsigned integer in little-endian order.
-   *  Returns +1,0,-1 if a is - respective - greater, equal or lesser then b
-   */
-  private def unsignedArraysCompare(a: Array[Int], b: Array[Int], aSize: Int,
-      bSize: Int): Int = {
+    *
+    *  Compares two arrays, representing unsigned integer in little-endian order.
+    *  Returns +1,0,-1 if a is - respective - greater, equal or lesser then b
+    */
+  private def unsignedArraysCompare(
+      a: Array[Int], b: Array[Int], aSize: Int, bSize: Int): Int = {
     if (aSize > bSize) {
       1
     } else if (aSize < bSize) {

@@ -1,8 +1,8 @@
 object Test {
   def M[N[O[_]]] = ()
   type A[_] = Any
-  type B[_[_]] = Any
-  type C[_[_[_]]] = Any
+  type B[_ [_]] = Any
+  type C[_ [_ [_]]] = Any
 
   M[Any] // okay, Any is kind overloaded.
 

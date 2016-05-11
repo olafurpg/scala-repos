@@ -52,27 +52,42 @@ abstract class BaseDescription extends Description {
     }
   }
 
-  override def appendValueList[T](start: String, separator: String, end: String,
-      values: T*): Description = {
+  override def appendValueList[T](start: String,
+                                  separator: String,
+                                  end: String,
+                                  values: T*): Description = {
     appendValueList(start, separator, end, Arrays.asList(values))
   }
 
-  override def appendValueList[T](start: String, separator: String, end: String,
-      values:  java.lang.Iterable[T]): Description = {
+  override def appendValueList[T](
+      start: String,
+      separator: String,
+      end: String,
+      values: java.lang.Iterable[T]): Description = {
     appendValueList(start, separator, end, values.iterator())
   }
 
-  private def appendValueList[T](start: String, separator: String, end: String,
+  private def appendValueList[T](
+      start: String,
+      separator: String,
+      end: String,
       values: java.util.Iterator[T]): Description = {
-    appendList(start, separator, end, new SelfDescribingValueIterator[T](values))
+    appendList(
+        start, separator, end, new SelfDescribingValueIterator[T](values))
   }
 
-  override def appendList(start: String, separator: String, end: String,
+  override def appendList(
+      start: String,
+      separator: String,
+      end: String,
       values: java.lang.Iterable[SelfDescribing]): Description = {
     appendList(start, separator, end, values.iterator())
   }
 
-  private def appendList(start: String, separator: String, end: String,
+  private def appendList(
+      start: String,
+      separator: String,
+      end: String,
       i: java.util.Iterator[SelfDescribing]): Description = {
     @tailrec
     def appendElems(separate: Boolean): Unit = {
@@ -99,11 +114,11 @@ abstract class BaseDescription extends Description {
 
   private def toJavaSyntax(ch: Char): String = {
     ch match {
-      case '"'  => "\\\""
+      case '"' => "\\\""
       case '\n' => "\\n"
       case '\r' => "\\r"
       case '\t' => "\\t"
-      case _    => ch.toString
+      case _ => ch.toString
     }
   }
 }

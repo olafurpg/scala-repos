@@ -10,26 +10,30 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.projectImport.ProjectOpenProcessorBase
 
 /**
- * @author Pavel Fatin
- */
-class SbtProjectOpenProcessor(builder: SbtProjectImportBuilder) extends ProjectOpenProcessorBase[SbtProjectImportBuilder](builder) {
+  * @author Pavel Fatin
+  */
+class SbtProjectOpenProcessor(builder: SbtProjectImportBuilder)
+    extends ProjectOpenProcessorBase[SbtProjectImportBuilder](builder) {
   // Actual detection is done via the canOpenProject method (to "open" projects without build.sbt file).
   // However, these "extensions" are used inside ProjectOpenProcessorBase.doOpenProject to determine a project root directory.
   // TODO Don't depend on file extensions in ProjectOpenProcessorBase.doOpenProject to discover a project root (IDEA)
   def getSupportedExtensions = Array(Sbt.BuildFile, Sbt.ProjectDirectory)
 
-  override def canOpenProject(file: VirtualFile) = SbtProjectImportProvider.canImport(file)
+  override def canOpenProject(file: VirtualFile) =
+    SbtProjectImportProvider.canImport(file)
 
   override def doQuickImport(file: VirtualFile, wizardContext: WizardContext) = {
     val path = SbtProjectImportProvider.projectRootOf(file).getPath
 
-    val dialog = new AddModuleWizard(null, path, new SbtProjectImportProvider(getBuilder))
+    val dialog = new AddModuleWizard(
+        null, path, new SbtProjectImportProvider(getBuilder))
 
     getBuilder.prepare(wizardContext)
     getBuilder.getControl(null).setLinkedProjectPath(path)
 
     dialog.getWizardContext.setProjectBuilder(getBuilder)
-    dialog.navigateToStep((step: Step) => step.isInstanceOf[SelectExternalProjectStep])
+    dialog.navigateToStep(
+        (step: Step) => step.isInstanceOf[SelectExternalProjectStep])
 
     if (StringUtil.isEmpty(wizardContext.getProjectName)) {
       val projectName = dialog.getWizardContext.getProjectName

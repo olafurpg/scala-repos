@@ -1,22 +1,23 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl.model
 
-import java.lang.{ Iterable ⇒ JIterable }
+import java.lang.{Iterable ⇒ JIterable}
 import language.implicitConversions
 import scala.collection.immutable
 import scala.util.Try
 import java.nio.charset.Charset
-import akka.http.javadsl.{ model ⇒ jm }
+import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util._
 
 /**
- * A charset range as encountered in `Accept-Charset`. Can either be a single charset, or `*`
- * if all charsets are supported and optionally a qValue for selecting this choice.
- */
-sealed abstract class HttpCharsetRange extends jm.HttpCharsetRange with ValueRenderable with WithQValue[HttpCharsetRange] {
+  * A charset range as encountered in `Accept-Charset`. Can either be a single charset, or `*`
+  * if all charsets are supported and optionally a qValue for selecting this choice.
+  */
+sealed abstract class HttpCharsetRange
+    extends jm.HttpCharsetRange with ValueRenderable
+    with WithQValue[HttpCharsetRange] {
   def qValue: Float
   def matches(charset: HttpCharset): Boolean
 
@@ -30,27 +31,37 @@ sealed abstract class HttpCharsetRange extends jm.HttpCharsetRange with ValueRen
 object HttpCharsetRange {
   case class `*`(qValue: Float) extends HttpCharsetRange {
     require(0.0f <= qValue && qValue <= 1.0f, "qValue must be >= 0 and <= 1.0")
-    final def render[R <: Rendering](r: R): r.type = if (qValue < 1.0f) r ~~ "*;q=" ~~ qValue else r ~~ '*'
+    final def render[R <: Rendering](r: R): r.type =
+      if (qValue < 1.0f) r ~~ "*;q=" ~~ qValue else r ~~ '*'
     def matches(charset: HttpCharset) = true
     def withQValue(qValue: Float) =
-      if (qValue == 1.0f) `*` else if (qValue != this.qValue) `*`(qValue.toFloat) else this
+      if (qValue == 1.0f) `*`
+      else if (qValue != this.qValue) `*`(qValue.toFloat) else this
   }
   object `*` extends `*`(1.0f)
 
-  final case class One(charset: HttpCharset, qValue: Float) extends HttpCharsetRange {
+  final case class One(charset: HttpCharset, qValue: Float)
+      extends HttpCharsetRange {
     require(0.0f <= qValue && qValue <= 1.0f, "qValue must be >= 0 and <= 1.0")
-    def matches(charset: HttpCharset) = this.charset.value.equalsIgnoreCase(charset.value)
+    def matches(charset: HttpCharset) =
+      this.charset.value.equalsIgnoreCase(charset.value)
     def withQValue(qValue: Float) = One(charset, qValue)
-    def render[R <: Rendering](r: R): r.type = if (qValue < 1.0f) r ~~ charset ~~ ";q=" ~~ qValue else r ~~ charset
+    def render[R <: Rendering](r: R): r.type =
+      if (qValue < 1.0f) r ~~ charset ~~ ";q=" ~~ qValue else r ~~ charset
   }
 
-  implicit def apply(charset: HttpCharset): HttpCharsetRange = apply(charset, 1.0f)
-  def apply(charset: HttpCharset, qValue: Float): HttpCharsetRange = One(charset, qValue)
+  implicit def apply(charset: HttpCharset): HttpCharsetRange =
+    apply(charset, 1.0f)
+  def apply(charset: HttpCharset, qValue: Float): HttpCharsetRange =
+    One(charset, qValue)
 }
 
-final case class HttpCharset private[http] (override val value: String)(val aliases: immutable.Seq[String])
-  extends jm.HttpCharset with SingletonValueRenderable with WithQValue[HttpCharsetRange] {
-  @transient private[this] var _nioCharset: Try[Charset] = HttpCharset.findNioCharset(value)
+final case class HttpCharset private[http](
+    override val value: String)(val aliases: immutable.Seq[String])
+    extends jm.HttpCharset with SingletonValueRenderable
+    with WithQValue[HttpCharsetRange] {
+  @transient private[this] var _nioCharset: Try[Charset] =
+    HttpCharset.findNioCharset(value)
 
   /** Returns the Charset for this charset if available or throws an exception otherwise */
   def nioCharset: Charset = _nioCharset.get
@@ -60,7 +71,8 @@ final case class HttpCharset private[http] (override val value: String)(val alia
     _nioCharset = HttpCharset.findNioCharset(value)
   }
 
-  def withQValue(qValue: Float): HttpCharsetRange = HttpCharsetRange(this, qValue.toFloat)
+  def withQValue(qValue: Float): HttpCharsetRange =
+    HttpCharsetRange(this, qValue.toFloat)
   override def toRange: HttpCharsetRange = HttpCharsetRange(this)
 
   /** Java API */
@@ -74,7 +86,8 @@ object HttpCharset {
   def custom(value: String, aliases: String*): HttpCharset =
     HttpCharset(value)(immutable.Seq(aliases: _*))
 
-  private[http] def findNioCharset(name: String): Try[Charset] = Try(Charset.forName(name))
+  private[http] def findNioCharset(name: String): Try[Charset] =
+    Try(Charset.forName(name))
 }
 
 // see http://www.iana.org/assignments/character-sets
@@ -90,8 +103,7 @@ object HttpCharsets extends ObjectRegistry[String, HttpCharset] {
 
   /** Register non-standard charsets that may be missing on some platforms */
   private def tryRegister(value: String)(aliases: String*): Unit =
-    try register(value)(aliases: _*)
-    catch {
+    try register(value)(aliases: _*) catch {
       case e: java.nio.charset.UnsupportedCharsetException ⇒ // ignore
     }
 

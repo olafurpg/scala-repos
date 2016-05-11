@@ -1,10 +1,9 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.io
 
-import akka.testkit.{ TestProbe, AkkaSpec }
+import akka.testkit.{TestProbe, AkkaSpec}
 import akka.testkit.SocketUtil._
 import Tcp._
 
@@ -12,8 +11,7 @@ class CapacityLimitSpec extends AkkaSpec("""
     akka.loglevel = ERROR
     akka.io.tcp.max-channels = 4
     akka.actor.serialize-creators = on
-    """)
-  with TcpIntegrationSpecSupport {
+    """) with TcpIntegrationSpecSupport {
 
   "The TCP transport implementation" should {
 
@@ -31,13 +29,13 @@ class CapacityLimitSpec extends AkkaSpec("""
 
       val bindToFail = Bind(bindHandler.ref, addresses(1))
       commander.send(IO(Tcp), bindToFail)
-      commander.expectMsgType[CommandFailed].cmd should be theSameInstanceAs (bindToFail)
+      commander.expectMsgType[CommandFailed].cmd should be theSameInstanceAs
+      (bindToFail)
 
       val connectToFail = Connect(endpoint)
       commander.send(IO(Tcp), connectToFail)
-      commander.expectMsgType[CommandFailed].cmd should be theSameInstanceAs (connectToFail)
+      commander.expectMsgType[CommandFailed].cmd should be theSameInstanceAs
+      (connectToFail)
     }
-
   }
-
 }

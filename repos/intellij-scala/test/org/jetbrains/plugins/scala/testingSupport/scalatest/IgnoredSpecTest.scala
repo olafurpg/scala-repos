@@ -5,12 +5,18 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
   * @since 22.01.2015.
   */
 trait IgnoredSpecTest extends ScalaTestTestCase {
-  val ignoredTestPath: List[String] = List("[root]", "IgnoredTestSpec", "An IgnoredTestSpec", "should be ignored and have proper suffix !!! IGNORED !!!")
-  val succeededTestPath: List[String] = List("[root]", "IgnoredTestSpec", "An IgnoredTestSpec", "should run tests")
+  val ignoredTestPath: List[String] = List(
+      "[root]",
+      "IgnoredTestSpec",
+      "An IgnoredTestSpec",
+      "should be ignored and have proper suffix !!! IGNORED !!!")
+  val succeededTestPath: List[String] = List(
+      "[root]", "IgnoredTestSpec", "An IgnoredTestSpec", "should run tests")
 
   def testIgnoredTest(): Unit = {
-    addFileToProject("IgnoredTest.scala",
-      """
+    addFileToProject(
+        "IgnoredTest.scala",
+        """
         |import org.scalatest._
         |
         |class IgnoredTestSpec extends FlatSpec with GivenWhenThen {
@@ -30,13 +36,15 @@ trait IgnoredSpecTest extends ScalaTestTestCase {
         |   print(">>TEST: FAILED<<")
         | }
         |}
-      """.stripMargin.trim()
-    )
+      """.stripMargin.trim())
 
-    runTestByLocation(2, 7, "IgnoredTest.scala",
-      checkConfigAndSettings(_, "IgnoredTestSpec"),
-      root => checkResultTreeHasExactNamedPath(root, succeededTestPath: _*) &&
-        checkResultTreeHasExactNamedPath(root, ignoredTestPath: _*)
-    )
+    runTestByLocation(
+        2,
+        7,
+        "IgnoredTest.scala",
+        checkConfigAndSettings(_, "IgnoredTestSpec"),
+        root =>
+          checkResultTreeHasExactNamedPath(root, succeededTestPath: _*) &&
+          checkResultTreeHasExactNamedPath(root, ignoredTestPath: _*))
   }
 }

@@ -35,14 +35,14 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
-
 @RunWith(classOf[JUnitRunner])
 class SplitMenuButtonSpec
-  extends SimpleSFXDelegateSpec[jfxsc.SplitMenuButton, SplitMenuButton](
-    classOf[jfxsc.SplitMenuButton], classOf[SplitMenuButton])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[jfxsc.SplitMenuButton, SplitMenuButton](
+        classOf[jfxsc.SplitMenuButton], classOf[SplitMenuButton])
+    with RunOnApplicationThread {
 
-  override protected def getScalaClassInstance = new SplitMenuButton(new jfxsc.SplitMenuButton())
+  override protected def getScalaClassInstance =
+    new SplitMenuButton(new jfxsc.SplitMenuButton())
 
   override protected def getJavaClassInstance = new jfxsc.SplitMenuButton()
 }

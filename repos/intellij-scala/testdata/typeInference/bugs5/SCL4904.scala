@@ -15,7 +15,8 @@ object G {
     def foo(x: I) = 1
     def foo(x: Any) = "text"
 
-    /*start*/foo(new I)/*end*/
+    /*start*/
+    foo(new I) /*end*/
   }
 }
 //Int

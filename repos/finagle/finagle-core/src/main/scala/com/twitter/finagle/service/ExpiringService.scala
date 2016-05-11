@@ -10,12 +10,12 @@ object ExpiringService {
   val role = Stack.Role("Expiration")
 
   /**
-   * A class eligible for configuring a [[com.twitter.finagle.Stackable]]
-   * [[com.twitter.finagle.service.ExpiringService]].
-   *
-   * @param idleTime max duration for which a connection is allowed to be idle.
-   * @param lifeTime max lifetime of a connection.
-   */
+    * A class eligible for configuring a [[com.twitter.finagle.Stackable]]
+    * [[com.twitter.finagle.service.ExpiringService]].
+    *
+    * @param idleTime max duration for which a connection is allowed to be idle.
+    * @param lifeTime max lifetime of a connection.
+    */
   case class Param(idleTime: Duration, lifeTime: Duration) {
     def mk(): (Param, Stack.Param[Param]) =
       (this, Param.param)
@@ -25,17 +25,18 @@ object ExpiringService {
   }
 
   /**
-   * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.ExpiringService]].
-   */
+    * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.ExpiringService]].
+    */
   private[finagle] def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module3[Param, param.Timer, param.Stats, ServiceFactory[Req, Rep]] {
+    new Stack.Module3[
+        Param, param.Timer, param.Stats, ServiceFactory[Req, Rep]] {
       val role = ExpiringService.role
       val description = "Expire a service after a certain amount of idle time"
       def make(
-        _param: Param,
-        _timer: param.Timer,
-        _stats: param.Stats,
-        next: ServiceFactory[Req, Rep]
+          _param: Param,
+          _timer: param.Timer,
+          _stats: param.Stats,
+          next: ServiceFactory[Req, Rep]
       ) = {
         val param.Timer(timer) = _timer
         val ExpiringService.Param(idleTime, lifeTime) = _param
@@ -46,34 +47,36 @@ object ExpiringService {
 
         (idle, life) match {
           case (None, None) => next
-          case _ => next map { service =>
-            val closeOnRelease = new CloseOnReleaseService(service)
-            new ExpiringService(closeOnRelease, idle, life, timer, statsReceiver) {
-              def onExpire() { closeOnRelease.close() }
+          case _ =>
+            next map { service =>
+              val closeOnRelease = new CloseOnReleaseService(service)
+              new ExpiringService(
+                  closeOnRelease, idle, life, timer, statsReceiver) {
+                def onExpire() { closeOnRelease.close() }
+              }
             }
-          }
         }
       }
     }
 }
 
 /**
- * A service wrapper that expires the `self` service after a
- * certain amount of idle time. By default, expiring calls
- * `close()` on the `self` channel, but this action is
- * customizable.
- *
- * @see The [[https://twitter.github.io/finagle/guide/Clients.html#timeouts-expiration user guide]]
- *      for more details.
- */
+  * A service wrapper that expires the `self` service after a
+  * certain amount of idle time. By default, expiring calls
+  * `close()` on the `self` channel, but this action is
+  * customizable.
+  *
+  * @see The [[https://twitter.github.io/finagle/guide/Clients.html#timeouts-expiration user guide]]
+  *      for more details.
+  */
 abstract class ExpiringService[Req, Rep](
-  self: Service[Req, Rep],
-  maxIdleTime: Option[Duration],
-  maxLifeTime: Option[Duration],
-  timer: Timer,
-  stats: StatsReceiver
-) extends ServiceProxy[Req, Rep](self)
-{
+    self: Service[Req, Rep],
+    maxIdleTime: Option[Duration],
+    maxLifeTime: Option[Duration],
+    timer: Timer,
+    stats: StatsReceiver
+)
+    extends ServiceProxy[Req, Rep](self) {
   private[this] var active = true
   private[this] val latch = new AsyncLatch
 
@@ -99,7 +102,8 @@ abstract class ExpiringService[Req, Rep](
   }
 
   private[this] def deactivate(): Boolean = synchronized {
-    if (!active) false else {
+    if (!active) false
+    else {
       active = false
       idleTask.cancel()
       lifeTask.cancel()
@@ -120,7 +124,8 @@ abstract class ExpiringService[Req, Rep](
 
   override def apply(req: Req): Future[Rep] = {
     val decrLatch = synchronized {
-      if (!active) false else {
+      if (!active) false
+      else {
         if (latch.incr() == 1) {
           idleTask.cancel()
           idleTask = NullTimerTask
@@ -133,8 +138,7 @@ abstract class ExpiringService[Req, Rep](
       if (decrLatch) {
         val n = latch.decr()
         synchronized {
-          if (n == 0 && active)
-            idleTask = startTimer(maxIdleTime, idleCounter)
+          if (n == 0 && active) idleTask = startTimer(maxIdleTime, idleCounter)
         }
       }
     }

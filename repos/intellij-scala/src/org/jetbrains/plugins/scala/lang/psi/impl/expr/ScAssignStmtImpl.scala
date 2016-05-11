@@ -18,10 +18,10 @@ import org.jetbrains.plugins.scala.lang.resolve.{ScalaResolveResult, StdKinds}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
-class ScAssignStmtImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScAssignStmt {
+  * @author Alexander Podkhalyuzin
+  */
+class ScAssignStmtImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScAssignStmt {
   override def toString: String = "AssignStatement"
 
   protected override def innerType(ctx: TypingContext) = {
@@ -47,30 +47,41 @@ class ScAssignStmtImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScA
   }
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
-  def resolveAssignment: Option[ScalaResolveResult] = resolveAssignmentInner(shapeResolve = false)
+  def resolveAssignment: Option[ScalaResolveResult] =
+    resolveAssignmentInner(shapeResolve = false)
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
-  def shapeResolveAssignment: Option[ScalaResolveResult] = resolveAssignmentInner(shapeResolve = true)
+  def shapeResolveAssignment: Option[ScalaResolveResult] =
+    resolveAssignmentInner(shapeResolve = true)
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
   def mirrorMethodCall: Option[ScMethodCall] = {
     getLExpression match {
       case ref: ScReferenceExpression =>
-        val text = s"${ref.refName}_=(${getRExpression.map(_.getText).getOrElse("")})"
-        val mirrorExpr = ScalaPsiElementFactory.createExpressionWithContextFromText(text, getContext, this)
+        val text =
+          s"${ref.refName}_=(${getRExpression.map(_.getText).getOrElse("")})"
+        val mirrorExpr =
+          ScalaPsiElementFactory.createExpressionWithContextFromText(
+              text, getContext, this)
         mirrorExpr match {
           case call: ScMethodCall =>
-            call.getInvokedExpr.asInstanceOf[ScReferenceExpression].setupResolveFunctions(
-              () => resolveAssignment.toArray, () => shapeResolveAssignment.toArray
-            )
+            call.getInvokedExpr
+              .asInstanceOf[ScReferenceExpression]
+              .setupResolveFunctions(
+                  () => resolveAssignment.toArray,
+                  () => shapeResolveAssignment.toArray
+              )
             Some(call)
           case _ => None
         }
       case methodCall: ScMethodCall =>
         val invokedExpr = methodCall.getInvokedExpr
-        val text = s"${invokedExpr.getText}.update(${methodCall.args.exprs.map(_.getText).mkString(",")}," +
+        val text =
+          s"${invokedExpr.getText}.update(${methodCall.args.exprs.map(_.getText).mkString(",")}," +
           s" ${getRExpression.map(_.getText).getOrElse("")}"
-        val mirrorExpr = ScalaPsiElementFactory.createExpressionWithContextFromText(text, getContext, this)
+        val mirrorExpr =
+          ScalaPsiElementFactory.createExpressionWithContextFromText(
+              text, getContext, this)
         //todo: improve performance: do not re-evaluate resolve to "update" method
         mirrorExpr match {
           case call: ScMethodCall => Some(call)
@@ -80,7 +91,8 @@ class ScAssignStmtImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScA
     }
   }
 
-  private def resolveAssignmentInner(shapeResolve: Boolean): Option[ScalaResolveResult] = {
+  private def resolveAssignmentInner(
+      shapeResolve: Boolean): Option[ScalaResolveResult] = {
     getLExpression match {
       case ref: ScReferenceExpression =>
         ref.bind() match {
@@ -89,16 +101,25 @@ class ScAssignStmtImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScA
               case v: ScVariable => None
               case c: ScClassParameter if c.isVar => None
               case f: PsiField => None
-              case fun: ScFunction if ScalaPsiUtil.isViableForAssignmentFunction(fun) =>
-                val processor = new MethodResolveProcessor(ref, fun.name + "_=",
-                  getRExpression.map(expr => List(Seq(new Expression(expr)))).getOrElse(Nil), Nil, ref.getPrevTypeInfoParams,
-                  isShapeResolve = shapeResolve, kinds = StdKinds.methodsOnly)
+              case fun: ScFunction
+                  if ScalaPsiUtil.isViableForAssignmentFunction(fun) =>
+                val processor = new MethodResolveProcessor(
+                    ref,
+                    fun.name + "_=",
+                    getRExpression
+                      .map(expr => List(Seq(new Expression(expr))))
+                      .getOrElse(Nil),
+                    Nil,
+                    ref.getPrevTypeInfoParams,
+                    isShapeResolve = shapeResolve,
+                    kinds = StdKinds.methodsOnly)
                 r.fromType match {
                   case Some(tp) => processor.processType(tp, ref)
                   case None =>
                     fun.getContext match {
                       case d: ScDeclarationSequenceHolder =>
-                        d.processDeclarations(processor, ResolveState.initial(), fun, ref)
+                        d.processDeclarations(
+                            processor, ResolveState.initial(), fun, ref)
                       case _ =>
                     }
                 }

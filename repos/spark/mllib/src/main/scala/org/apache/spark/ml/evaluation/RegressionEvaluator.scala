@@ -27,29 +27,35 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, FloatType}
 
 /**
- * :: Experimental ::
- * Evaluator for regression, which expects two input columns: prediction and label.
- */
+  * :: Experimental ::
+  * Evaluator for regression, which expects two input columns: prediction and label.
+  */
 @Since("1.4.0")
 @Experimental
-final class RegressionEvaluator @Since("1.4.0") (@Since("1.4.0") override val uid: String)
-  extends Evaluator with HasPredictionCol with HasLabelCol with DefaultParamsWritable {
+final class RegressionEvaluator @Since("1.4.0")(
+    @Since("1.4.0") override val uid: String)
+    extends Evaluator with HasPredictionCol with HasLabelCol
+    with DefaultParamsWritable {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("regEval"))
 
   /**
-   * param for metric name in evaluation (supports `"rmse"` (default), `"mse"`, `"r2"`, and `"mae"`)
-   *
-   * Because we will maximize evaluation value (ref: `CrossValidator`),
-   * when we evaluate a metric that is needed to minimize (e.g., `"rmse"`, `"mse"`, `"mae"`),
-   * we take and output the negative of this metric.
-   * @group param
-   */
+    * param for metric name in evaluation (supports `"rmse"` (default), `"mse"`, `"r2"`, and `"mae"`)
+    *
+    * Because we will maximize evaluation value (ref: `CrossValidator`),
+    * when we evaluate a metric that is needed to minimize (e.g., `"rmse"`, `"mse"`, `"mae"`),
+    * we take and output the negative of this metric.
+    * @group param
+    */
   @Since("1.4.0")
   val metricName: Param[String] = {
-    val allowedParams = ParamValidators.inArray(Array("mse", "rmse", "r2", "mae"))
-    new Param(this, "metricName", "metric name in evaluation (mse|rmse|r2|mae)", allowedParams)
+    val allowedParams =
+      ParamValidators.inArray(Array("mse", "rmse", "r2", "mae"))
+    new Param(this,
+              "metricName",
+              "metric name in evaluation (mse|rmse|r2|mae)",
+              allowedParams)
   }
 
   /** @group getParam */
@@ -75,19 +81,23 @@ final class RegressionEvaluator @Since("1.4.0") (@Since("1.4.0") override val ui
     val schema = dataset.schema
     val predictionColName = $(predictionCol)
     val predictionType = schema($(predictionCol)).dataType
-    require(predictionType == FloatType || predictionType == DoubleType,
-      s"Prediction column $predictionColName must be of type float or double, " +
+    require(
+        predictionType == FloatType || predictionType == DoubleType,
+        s"Prediction column $predictionColName must be of type float or double, " +
         s" but not $predictionType")
     val labelColName = $(labelCol)
     val labelType = schema($(labelCol)).dataType
-    require(labelType == FloatType || labelType == DoubleType,
-      s"Label column $labelColName must be of type float or double, but not $labelType")
+    require(
+        labelType == FloatType || labelType == DoubleType,
+        s"Label column $labelColName must be of type float or double, but not $labelType")
 
     val predictionAndLabels = dataset
-      .select(col($(predictionCol)).cast(DoubleType), col($(labelCol)).cast(DoubleType))
-      .rdd.
-      map { case Row(prediction: Double, label: Double) =>
-        (prediction, label)
+      .select(col($(predictionCol)).cast(DoubleType),
+              col($(labelCol)).cast(DoubleType))
+      .rdd
+      .map {
+        case Row(prediction: Double, label: Double) =>
+          (prediction, label)
       }
     val metrics = new RegressionMetrics(predictionAndLabels)
     val metric = $(metricName) match {

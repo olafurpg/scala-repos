@@ -9,10 +9,10 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElementImpl
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocInnerCodeElement
 
 /**
- * User: Dmitry Naidanov
- * Date: 11/14/11
- */
-
-class ScDocInnerCodeElementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScDocInnerCodeElement {
+  * User: Dmitry Naidanov
+  * Date: 11/14/11
+  */
+class ScDocInnerCodeElementImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScDocInnerCodeElement {
   override def toString = "InnerCodeElement"
 }

@@ -5,12 +5,12 @@ object Test {
   }
 }
 trait Q extends Any {
-   def x: Int
-   def inc: XX
+  def x: Int
+  def inc: XX
 }
 case class X(val x: Q) extends AnyVal {
-   def q = X(x.inc)
+  def q = X(x.inc)
 }
 case class XX(val x: Int) extends AnyVal with Q {
-   def inc = XX(x + 1)
+  def inc = XX(x + 1)
 }

@@ -5,6 +5,6 @@ object MethodSpecificity {
 
   implicit def m2[M[X] <: Seq[X], A](l: M[A]) = C("Seq")
 
-  println(/*start*/List(1).s/*end*/) // Prints Seq, resolves to m1
+  println( /*start*/ List(1).s /*end*/ ) // Prints Seq, resolves to m1
 }
 //String

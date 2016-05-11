@@ -6,6 +6,7 @@ object Test {
   }
 
   A(42) match {
-    case x@A(x/*<-- refers to the pattern that includes this comment*/.Ex(42)) =>
+    case x @ A(
+        x /*<-- refers to the pattern that includes this comment*/.Ex(42)) =>
   }
 }

@@ -30,38 +30,53 @@ class PythonRunnerSuite extends SparkFunSuite {
     assert(PythonRunner.formatPath("local:/spark.py") === "/spark.py")
     assert(PythonRunner.formatPath("local:///spark.py") === "/spark.py")
     if (Utils.isWindows) {
-      assert(PythonRunner.formatPath("file:/C:/a/b/spark.py", testWindows = true) ===
-        "C:/a/b/spark.py")
-      assert(PythonRunner.formatPath("C:\\a\\b\\spark.py", testWindows = true) ===
-        "C:/a/b/spark.py")
-      assert(PythonRunner.formatPath("C:\\a b\\spark.py", testWindows = true) ===
-        "C:/a b/spark.py")
+      assert(PythonRunner.formatPath("file:/C:/a/b/spark.py",
+                                     testWindows = true) === "C:/a/b/spark.py")
+      assert(
+          PythonRunner.formatPath("C:\\a\\b\\spark.py", testWindows = true) === "C:/a/b/spark.py")
+      assert(
+          PythonRunner.formatPath("C:\\a b\\spark.py", testWindows = true) === "C:/a b/spark.py")
     }
     intercept[IllegalArgumentException] { PythonRunner.formatPath("one:two") }
-    intercept[IllegalArgumentException] { PythonRunner.formatPath("hdfs:s3:xtremeFS") }
-    intercept[IllegalArgumentException] { PythonRunner.formatPath("hdfs:/path/to/some.py") }
+    intercept[IllegalArgumentException] {
+      PythonRunner.formatPath("hdfs:s3:xtremeFS")
+    }
+    intercept[IllegalArgumentException] {
+      PythonRunner.formatPath("hdfs:/path/to/some.py")
+    }
   }
 
   // Test formatting multiple comma-separated paths to be added to the PYTHONPATH
   test("format paths") {
     assert(PythonRunner.formatPaths("spark.py") === Array("spark.py"))
     assert(PythonRunner.formatPaths("file:/spark.py") === Array("/spark.py"))
-    assert(PythonRunner.formatPaths("file:/app.py,local:/spark.py") ===
-      Array("/app.py", "/spark.py"))
-    assert(PythonRunner.formatPaths("me.py,file:/you.py,local:/we.py") ===
-      Array("me.py", "/you.py", "/we.py"))
+    assert(PythonRunner.formatPaths("file:/app.py,local:/spark.py") === Array(
+            "/app.py", "/spark.py"))
+    assert(
+        PythonRunner.formatPaths("me.py,file:/you.py,local:/we.py") === Array(
+            "me.py", "/you.py", "/we.py"))
     if (Utils.isWindows) {
-      assert(PythonRunner.formatPaths("C:\\a\\b\\spark.py", testWindows = true) ===
-        Array("C:/a/b/spark.py"))
-      assert(PythonRunner.formatPaths("C:\\free.py,pie.py", testWindows = true) ===
-        Array("C:/free.py", "pie.py"))
+      assert(
+          PythonRunner.formatPaths("C:\\a\\b\\spark.py", testWindows = true) === Array(
+              "C:/a/b/spark.py"))
+      assert(
+          PythonRunner.formatPaths("C:\\free.py,pie.py", testWindows = true) === Array(
+              "C:/free.py", "pie.py"))
       assert(PythonRunner.formatPaths("lovely.py,C:\\free.py,file:/d:/fry.py",
-        testWindows = true) ===
-        Array("lovely.py", "C:/free.py", "d:/fry.py"))
+                                      testWindows = true) === Array(
+              "lovely.py", "C:/free.py", "d:/fry.py"))
     }
-    intercept[IllegalArgumentException] { PythonRunner.formatPaths("one:two,three") }
-    intercept[IllegalArgumentException] { PythonRunner.formatPaths("two,three,four:five:six") }
-    intercept[IllegalArgumentException] { PythonRunner.formatPaths("hdfs:/some.py,foo.py") }
-    intercept[IllegalArgumentException] { PythonRunner.formatPaths("foo.py,hdfs:/some.py") }
+    intercept[IllegalArgumentException] {
+      PythonRunner.formatPaths("one:two,three")
+    }
+    intercept[IllegalArgumentException] {
+      PythonRunner.formatPaths("two,three,four:five:six")
+    }
+    intercept[IllegalArgumentException] {
+      PythonRunner.formatPaths("hdfs:/some.py,foo.py")
+    }
+    intercept[IllegalArgumentException] {
+      PythonRunner.formatPaths("foo.py,hdfs:/some.py")
+    }
   }
 }

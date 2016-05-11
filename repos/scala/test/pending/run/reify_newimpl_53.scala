@@ -5,7 +5,7 @@ import scala.tools.reflect.ToolBox
 
 object Test extends App {
   class C[T >: Null] {
-    val code = reify{
+    val code = reify {
       val tt = implicitly[TypeTag[T]]
       println("mah typetag is: %s".format(tt))
     }.tree

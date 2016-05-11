@@ -13,54 +13,59 @@ object ServerCnxnFactory {
   private[this] val UnlimitedClients: java.lang.Integer = -1
 
   /**
-   * Create a ServerCnxnFactory
-   *
-   * Required for creating a in-process ZooKeeperServer for integration
-   * testing. Given an InetAddress, bind to an available port and accept
-   * unlimited clients.
-   *
-   * @param addr InetAddress to bind to with an available port
-   *
-   * @return ServerCnxnFactory
-   */
+    * Create a ServerCnxnFactory
+    *
+    * Required for creating a in-process ZooKeeperServer for integration
+    * testing. Given an InetAddress, bind to an available port and accept
+    * unlimited clients.
+    *
+    * @param addr InetAddress to bind to with an available port
+    *
+    * @return ServerCnxnFactory
+    */
   def apply(addr: InetAddress): ServerCnxnFactory =
     this(new InetSocketAddress(addr, 0), UnlimitedClients)
 
   /**
-   * Create a ServerCnxnFactory
-   *
-   * Required for creating a in-process ZooKeeperServer for integration
-   * testing. Given an InetSocketAddress, bind to an available port and
-   * accept unlimited clients.
-   *
-   * @param sockAddr InetSocketAddress to bind to
-   *
-   * @return ServerCnxnFactory
-   */
+    * Create a ServerCnxnFactory
+    *
+    * Required for creating a in-process ZooKeeperServer for integration
+    * testing. Given an InetSocketAddress, bind to an available port and
+    * accept unlimited clients.
+    *
+    * @param sockAddr InetSocketAddress to bind to
+    *
+    * @return ServerCnxnFactory
+    */
   def apply(sockAddr: InetSocketAddress): ServerCnxnFactory =
     this(sockAddr, UnlimitedClients)
 
   /**
-   * Create a ServerCnxnFactory
-   *
-   * Required for creating a in-process ZooKeeperServer for integration
-   * testing.
-   *
-   * @param sockAddr InetSocketAddress to bind to
-   * @param maxClients maximum number of clients to accept
-   *
-   * @return ServerCnxnFactory
-   */
-  def apply(sockAddr: InetSocketAddress, maxClients: java.lang.Integer): ServerCnxnFactory = {
+    * Create a ServerCnxnFactory
+    *
+    * Required for creating a in-process ZooKeeperServer for integration
+    * testing.
+    *
+    * @param sockAddr InetSocketAddress to bind to
+    * @param maxClients maximum number of clients to accept
+    *
+    * @return ServerCnxnFactory
+    */
+  def apply(sockAddr: InetSocketAddress,
+            maxClients: java.lang.Integer): ServerCnxnFactory = {
     val factory = {
       try {
-        val inst = java.lang.Class.forName("org.apache.zookeeper.server.NIOServerCnxnFactory").newInstance
-        val call = inst.getClass.getMethod("configure", sockAddr.getClass, Integer.TYPE)
+        val inst = java.lang.Class
+          .forName("org.apache.zookeeper.server.NIOServerCnxnFactory")
+          .newInstance
+        val call =
+          inst.getClass.getMethod("configure", sockAddr.getClass, Integer.TYPE)
         call.invoke(inst, sockAddr, maxClients)
         inst
       } catch {
         case t: ClassNotFoundException =>
-          val constructor = java.lang.Class.forName("org.apache.zookeeper.server.NIOServerCnxn$Factory")
+          val constructor = java.lang.Class
+            .forName("org.apache.zookeeper.server.NIOServerCnxn$Factory")
             .getConstructor(sockAddr.getClass, Integer.TYPE)
           constructor.newInstance(sockAddr, maxClients)
       }

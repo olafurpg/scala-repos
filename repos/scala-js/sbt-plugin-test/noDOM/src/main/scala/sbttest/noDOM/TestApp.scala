@@ -8,5 +8,4 @@ object TestApp extends js.JSApp {
     println(Lib.foo("Hello World"))
     println(Lib.sq(10))
   }
-
 }

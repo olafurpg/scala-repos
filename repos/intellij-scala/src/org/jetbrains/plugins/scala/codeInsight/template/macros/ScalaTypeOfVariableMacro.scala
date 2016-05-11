@@ -5,23 +5,31 @@ import org.jetbrains.plugins.scala.codeInsight.template.impl.ScalaCodeContextTyp
 import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
 
 /**
- * @author Roman.Shein
- * @since 29.09.2015.
- */
+  * @author Roman.Shein
+  * @since 29.09.2015.
+  */
 class ScalaTypeOfVariableMacro extends Macro {
-  override def calculateResult(params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(
+      params: Array[Expression], context: ExpressionContext): Result = {
     if (params.length == 0) return null
-    Option(params(0).calculateResult(context)).flatMap(MacroUtil.resultToScExpr(_, context)).
-            flatMap(_.getType().toOption).map(new ScalaTypeResult(_)).orNull
+    Option(params(0).calculateResult(context))
+      .flatMap(MacroUtil.resultToScExpr(_, context))
+      .flatMap(_.getType().toOption)
+      .map(new ScalaTypeResult(_))
+      .orNull
   }
 
-  override def calculateQuickResult(params: Array[Expression], context: ExpressionContext) = calculateResult(params, context)
+  override def calculateQuickResult(
+      params: Array[Expression], context: ExpressionContext) =
+    calculateResult(params, context)
 
-  override def isAcceptableInContext(context: TemplateContextType): Boolean = context.isInstanceOf[ScalaCodeContextType]
+  override def isAcceptableInContext(context: TemplateContextType): Boolean =
+    context.isInstanceOf[ScalaCodeContextType]
 
   override def getName: String = MacroUtil.scalaIdPrefix + "typeOfVariable"
 
-  override def getPresentableName: String = MacroUtil.scalaPresentablePrefix + "typeOfVariable"
+  override def getPresentableName: String =
+    MacroUtil.scalaPresentablePrefix + "typeOfVariable"
 
   override def getDefaultValue: String = "A"
 }

@@ -31,7 +31,8 @@ object SparkSqlExample {
 
   def main(args: Array[String]) {
     val conf = sys.env.get("SPARK_AUDIT_MASTER") match {
-      case Some(master) => new SparkConf().setAppName("Simple Sql App").setMaster(master)
+      case Some(master) =>
+        new SparkConf().setAppName("Simple Sql App").setMaster(master)
       case None => new SparkConf().setAppName("Simple Sql App")
     }
     val sc = new SparkContext(conf)
@@ -41,17 +42,19 @@ object SparkSqlExample {
     sql("DROP TABLE IF EXISTS src")
     sql("CREATE TABLE IF NOT EXISTS src (key INT, value STRING)")
     sql("LOAD DATA LOCAL INPATH 'data.txt' INTO TABLE src")
-    val results = sql("FROM src SELECT key, value WHERE key >= 0 AND KEY < 5").collect()
+    val results =
+      sql("FROM src SELECT key, value WHERE key >= 0 AND KEY < 5").collect()
     results.foreach(println)
-    
+
     def test(f: => Boolean, failureMsg: String) = {
       if (!f) {
         println(failureMsg)
         System.exit(-1)
       }
     }
-    
-    test(results.size == 5, "Unexpected number of selected elements: " + results)
+
+    test(results.size == 5,
+         "Unexpected number of selected elements: " + results)
     println("Test succeeded")
     sc.stop()
   }

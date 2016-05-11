@@ -1,9 +1,9 @@
 class ReturnNoOutput {
   def foo(i: Int): Int = {
-/*start*/
+    /*start*/
     if (true) return i
     println(i)
-/*end*/
+    /*end*/
     println()
     42
   }
@@ -27,4 +27,4 @@ class ReturnNoOutput {
     None
   }
 }
-*/
+ */

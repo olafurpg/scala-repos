@@ -6,7 +6,8 @@ trait SCL4545 {
 
 object test1 extends SCL4545 {
   class V extends this.type#A {
-    /*start*/fii/*end*/
+    /*start*/
+    fii /*end*/
   }
 }
 //Int

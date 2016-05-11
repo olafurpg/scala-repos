@@ -1,9 +1,9 @@
 package akka.stream
 
-import akka.actor.{ ActorSystem, Props }
-import akka.stream.impl.{ StreamSupervisor, ActorMaterializerImpl }
-import akka.stream.scaladsl.{ Sink, Source }
-import akka.testkit.{ AkkaSpec, TestActor, ImplicitSender }
+import akka.actor.{ActorSystem, Props}
+import akka.stream.impl.{StreamSupervisor, ActorMaterializerImpl}
+import akka.stream.scaladsl.{Sink, Source}
+import akka.testkit.{AkkaSpec, TestActor, ImplicitSender}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -27,18 +27,20 @@ class ActorMaterializerSpec extends AkkaSpec with ImplicitSender {
 
       m.shutdown()
 
-      an[AbruptTerminationException] should be thrownBy Await.result(f, 3.seconds)
+      an[AbruptTerminationException] should be thrownBy Await.result(f,
+                                                                     3.seconds)
     }
 
     "refuse materialization after shutdown" in {
       val m = ActorMaterializer.create(system)
       m.shutdown()
-      an[IllegalStateException] should be thrownBy
-        Source(1 to 5).runForeach(println)(m)
+      an[IllegalStateException] should be thrownBy Source(1 to 5)
+        .runForeach(println)(m)
     }
 
     "shut down the supervisor actor it encapsulates" in {
-      val m = ActorMaterializer.create(system).asInstanceOf[ActorMaterializerImpl]
+      val m =
+        ActorMaterializer.create(system).asInstanceOf[ActorMaterializerImpl]
 
       Source.maybe[Any].to(Sink.ignore).run()(m)
       m.supervisor ! StreamSupervisor.GetChildren
@@ -51,9 +53,10 @@ class ActorMaterializerSpec extends AkkaSpec with ImplicitSender {
 
     "handle properly broken Props" in {
       val m = ActorMaterializer.create(system)
-      an[IllegalArgumentException] should be thrownBy
-        Await.result(
-          Source.actorPublisher(Props(classOf[TestActor], "wrong", "arguments")).runWith(Sink.head)(m),
+      an[IllegalArgumentException] should be thrownBy Await.result(
+          Source
+            .actorPublisher(Props(classOf[TestActor], "wrong", "arguments"))
+            .runWith(Sink.head)(m),
           3.seconds)
     }
 
@@ -64,5 +67,4 @@ class ActorMaterializerSpec extends AkkaSpec with ImplicitSender {
       m.isShutdown should ===(true)
     }
   }
-
 }

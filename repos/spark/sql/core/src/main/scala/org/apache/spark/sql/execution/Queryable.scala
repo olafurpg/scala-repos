@@ -61,18 +61,17 @@ private[sql] trait Queryable {
   private[sql] def showString(_numRows: Int, truncate: Boolean = true): String
 
   /**
-   * Format the string representing rows for output
-   * @param rows The rows to show
-   * @param numRows Number of rows to show
-   * @param hasMoreData Whether some rows are not shown due to the limit
-   * @param truncate Whether truncate long strings and align cells right
-   *
-   */
-  private[sql] def formatString (
-      rows: Seq[Seq[String]],
-      numRows: Int,
-      hasMoreData : Boolean,
-      truncate: Boolean = true): String = {
+    * Format the string representing rows for output
+    * @param rows The rows to show
+    * @param numRows Number of rows to show
+    * @param hasMoreData Whether some rows are not shown due to the limit
+    * @param truncate Whether truncate long strings and align cells right
+    *
+    */
+  private[sql] def formatString(rows: Seq[Seq[String]],
+                                numRows: Int,
+                                hasMoreData: Boolean,
+                                truncate: Boolean = true): String = {
     val sb = new StringBuilder
     val numCols = schema.fieldNames.length
 
@@ -87,27 +86,30 @@ private[sql] trait Queryable {
     }
 
     // Create SeparateLine
-    val sep: String = colWidths.map("-" * _).addString(sb, "+", "+", "+\n").toString()
+    val sep: String =
+      colWidths.map("-" * _).addString(sb, "+", "+", "+\n").toString()
 
     // column names
-    rows.head.zipWithIndex.map { case (cell, i) =>
-      if (truncate) {
-        StringUtils.leftPad(cell, colWidths(i))
-      } else {
-        StringUtils.rightPad(cell, colWidths(i))
-      }
+    rows.head.zipWithIndex.map {
+      case (cell, i) =>
+        if (truncate) {
+          StringUtils.leftPad(cell, colWidths(i))
+        } else {
+          StringUtils.rightPad(cell, colWidths(i))
+        }
     }.addString(sb, "|", "|", "|\n")
 
     sb.append(sep)
 
     // data
     rows.tail.map {
-      _.zipWithIndex.map { case (cell, i) =>
-        if (truncate) {
-          StringUtils.leftPad(cell.toString, colWidths(i))
-        } else {
-          StringUtils.rightPad(cell.toString, colWidths(i))
-        }
+      _.zipWithIndex.map {
+        case (cell, i) =>
+          if (truncate) {
+            StringUtils.leftPad(cell.toString, colWidths(i))
+          } else {
+            StringUtils.rightPad(cell.toString, colWidths(i))
+          }
       }.addString(sb, "|", "|", "|\n")
     }
 

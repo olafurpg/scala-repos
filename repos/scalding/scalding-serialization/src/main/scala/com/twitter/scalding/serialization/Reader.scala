@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding.serialization
 
 import java.io.InputStream
@@ -20,10 +20,10 @@ import scala.reflect.ClassTag
 import scala.collection.generic.CanBuildFrom
 
 /**
- * This is a specialized typeclass to make it easier to implement Serializations.
- * The specialization *should* mean that there is no boxing and if the JIT
- * does its work, Reader should compose well (via collections, Tuple2, Option, Either)
- */
+  * This is a specialized typeclass to make it easier to implement Serializations.
+  * The specialization *should* mean that there is no boxing and if the JIT
+  * does its work, Reader should compose well (via collections, Tuple2, Option, Either)
+  */
 trait Reader[@specialized(Boolean, Byte, Short, Int, Long, Float, Double) +T] {
   def read(is: InputStream): T
 }
@@ -32,7 +32,7 @@ object Reader {
   import JavaStreamEnrichments._
 
   def read[@specialized(Boolean, Byte, Short, Int, Long, Float, Double) T](
-    is: InputStream)(implicit r: Reader[T]): T = r.read(is)
+      is: InputStream)(implicit r: Reader[T]): T = r.read(is)
   /*
    * Instances below
    */
@@ -69,28 +69,37 @@ object Reader {
     }
   }
 
-  implicit def option[T: Reader]: Reader[Option[T]] = new Reader[Option[T]] {
+  implicit def option[T : Reader]: Reader[Option[T]] = new Reader[Option[T]] {
     val r = implicitly[Reader[T]]
     def read(is: InputStream) =
       if (is.readByte == (0: Byte)) None
       else Some(r.read(is))
   }
 
-  implicit def either[L: Reader, R: Reader]: Reader[Either[L, R]] = new Reader[Either[L, R]] {
-    val lRead = implicitly[Reader[L]]
-    val rRead = implicitly[Reader[R]]
-    def read(is: InputStream) =
-      if (is.readByte == (0: Byte)) Left(lRead.read(is))
-      else Right(rRead.read(is))
-  }
+  implicit def either[L : Reader, R : Reader]: Reader[Either[L, R]] =
+    new Reader[Either[L, R]] {
+      val lRead = implicitly[Reader[L]]
+      val rRead = implicitly[Reader[R]]
+      def read(is: InputStream) =
+        if (is.readByte == (0: Byte)) Left(lRead.read(is))
+        else Right(rRead.read(is))
+    }
 
-  implicit def tuple2[T1: Reader, T2: Reader]: Reader[(T1, T2)] = new Reader[(T1, T2)] {
-    val r1 = implicitly[Reader[T1]]
-    val r2 = implicitly[Reader[T2]]
-    def read(is: InputStream) = (r1.read(is), r2.read(is))
-  }
+  implicit def tuple2[T1 : Reader, T2 : Reader]: Reader[(T1, T2)] =
+    new Reader[(T1, T2)] {
+      val r1 = implicitly[Reader[T1]]
+      val r2 = implicitly[Reader[T2]]
+      def read(is: InputStream) = (r1.read(is), r2.read(is))
+    }
 
-  implicit def array[@specialized(Boolean, Byte, Short, Int, Long, Float, Double) T: Reader: ClassTag]: Reader[Array[T]] =
+  implicit def array[@specialized(
+                         Boolean,
+                         Byte,
+                         Short,
+                         Int,
+                         Long,
+                         Float,
+                         Double) T : Reader : ClassTag]: Reader[Array[T]] =
     new Reader[Array[T]] {
       val readerT = implicitly[Reader[T]]
       def read(is: InputStream) = {
@@ -109,7 +118,8 @@ object Reader {
     }
 
   // Scala seems to have issues with this being implicit
-  def collection[T: Reader, C](implicit cbf: CanBuildFrom[Nothing, T, C]): Reader[C] = new Reader[C] {
+  def collection[T : Reader, C](
+      implicit cbf: CanBuildFrom[Nothing, T, C]): Reader[C] = new Reader[C] {
     val readerT = implicitly[Reader[T]]
     def read(is: InputStream): C = {
       val builder = cbf()

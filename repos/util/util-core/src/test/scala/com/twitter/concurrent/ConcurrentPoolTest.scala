@@ -17,11 +17,9 @@ class ConcurrentPoolTest extends WordSpec {
   "yield items in FIFO order" in {
     val pool = new ConcurrentPool[Int, Int]
 
-    for (i <- 0 until 10)
-      pool.put(1, i)
+    for (i <- 0 until 10) pool.put(1, i)
 
-    for (i <- 0 until 10)
-      assert(pool.get(1) == Some(i))
+    for (i <- 0 until 10) assert(pool.get(1) == Some(i))
 
     assert(pool.get(1) == None)
   }

@@ -19,8 +19,7 @@ object Ansi {
         val c = s.charAt(i)
         if (c == '\u001B') {
           i += 1
-          while (i < len && s.charAt(i) != 'm')
-            i += 1
+          while (i < len && s.charAt(i) != 'm') i += 1
         } else {
           r += c
         }

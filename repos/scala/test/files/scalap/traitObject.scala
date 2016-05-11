@@ -1,7 +1,7 @@
 trait TraitObject {
-    def foo = 239
+  def foo = 239
 }
 
 object TraitObject {
-    def bar = 42
+  def bar = 42
 }

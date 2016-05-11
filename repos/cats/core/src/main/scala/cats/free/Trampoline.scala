@@ -15,4 +15,3 @@ private[free] abstract class TrampolineFunctions {
   def delay[A](a: => A): Trampoline[A] =
     suspend(done(a))
 }
-

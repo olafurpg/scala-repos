@@ -1,23 +1,25 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.singleton
 
-import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpecLike }
-import akka.testkit.{ TestProbe, TestKit }
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import akka.testkit.{TestProbe, TestKit}
 import akka.actor._
 import com.typesafe.config.ConfigFactory
 import akka.cluster.Cluster
 import scala.concurrent.duration._
 
-class ClusterSingletonProxySpec extends WordSpecLike with Matchers with BeforeAndAfterAll {
+class ClusterSingletonProxySpec
+    extends WordSpecLike with Matchers with BeforeAndAfterAll {
 
   import ClusterSingletonProxySpec._
 
   val seed = new ActorSys()
   seed.cluster.join(seed.cluster.selfAddress)
 
-  val testSystems = (0 until 4).map(_ ⇒ new ActorSys(joinTo = Some(seed.cluster.selfAddress))) :+ seed
+  val testSystems =
+    (0 until 4).map(_ ⇒ new ActorSys(joinTo = Some(seed.cluster.selfAddress))) :+ seed
 
   "The cluster singleton proxy" must {
     "correctly identify the singleton" in {
@@ -31,22 +33,27 @@ class ClusterSingletonProxySpec extends WordSpecLike with Matchers with BeforeAn
 
 object ClusterSingletonProxySpec {
 
-  class ActorSys(name: String = "ClusterSingletonProxySystem", joinTo: Option[Address] = None)
-    extends TestKit(ActorSystem(name, ConfigFactory.parseString(cfg))) {
+  class ActorSys(name: String = "ClusterSingletonProxySystem",
+                 joinTo: Option[Address] = None)
+      extends TestKit(ActorSystem(name, ConfigFactory.parseString(cfg))) {
 
     val cluster = Cluster(system)
     joinTo.foreach(address ⇒ cluster.join(address))
 
     cluster.registerOnMemberUp {
       system.actorOf(ClusterSingletonManager.props(
-        singletonProps = Props[Singleton],
-        terminationMessage = PoisonPill,
-        settings = ClusterSingletonManagerSettings(system).withRemovalMargin(5.seconds)),
-        name = "singletonManager")
+                         singletonProps = Props[Singleton],
+                         terminationMessage = PoisonPill,
+                         settings = ClusterSingletonManagerSettings(system)
+                             .withRemovalMargin(5.seconds)),
+                     name = "singletonManager")
     }
 
-    val proxy = system.actorOf(ClusterSingletonProxy.props("user/singletonManager",
-      settings = ClusterSingletonProxySettings(system)), s"singletonProxy-${cluster.selfAddress.port.getOrElse(0)}")
+    val proxy = system.actorOf(
+        ClusterSingletonProxy.props(
+            "user/singletonManager",
+            settings = ClusterSingletonProxySettings(system)),
+        s"singletonProxy-${cluster.selfAddress.port.getOrElse(0)}")
 
     def testProxy(msg: String) {
       val probe = TestProbe()
@@ -87,5 +94,4 @@ object ClusterSingletonProxySpec {
         sender() ! "Got " + msg
     }
   }
-
 }

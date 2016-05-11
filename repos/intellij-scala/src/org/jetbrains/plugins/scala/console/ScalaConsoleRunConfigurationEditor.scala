@@ -7,12 +7,12 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 10.02.2009
- */
-
-class ScalaConsoleRunConfigurationEditor(project: Project, configuration: ScalaConsoleRunConfiguration)
-        extends SettingsEditor[ScalaConsoleRunConfiguration] {
+  * User: Alexander Podkhalyuzin
+  * Date: 10.02.2009
+  */
+class ScalaConsoleRunConfigurationEditor(
+    project: Project, configuration: ScalaConsoleRunConfiguration)
+    extends SettingsEditor[ScalaConsoleRunConfiguration] {
   val form = new ScalaConsoleRunConfigurationForm(project, configuration)
 
   def resetEditorFrom(s: ScalaConsoleRunConfiguration) {

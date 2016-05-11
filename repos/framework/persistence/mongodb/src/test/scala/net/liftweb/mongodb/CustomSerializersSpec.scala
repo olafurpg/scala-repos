@@ -26,25 +26,21 @@ import org.joda.time.{Instant, DateTime}
 
 import org.specs2.mutable.Specification
 
-
 package customserializersspecs {
 
   /*
-  * ObjectId as String
-  */
-  case class Person(_id: String)
-    extends MongoDocument[Person]
-  {
+   * ObjectId as String
+   */
+  case class Person(_id: String) extends MongoDocument[Person] {
     def meta = Person
   }
   object Person extends MongoDocumentMeta[Person]
 
   /*
-  * ObjectId as ObjectId
-  */
+   * ObjectId as ObjectId
+   */
   case class PersonWithObjectId(_id: ObjectId)
-    extends MongoDocument[PersonWithObjectId]
-  {
+      extends MongoDocument[PersonWithObjectId] {
     def meta = PersonWithObjectId
   }
   object PersonWithObjectId extends MongoDocumentMeta[PersonWithObjectId] {
@@ -54,7 +50,8 @@ package customserializersspecs {
   /*
    * Pattern as Pattern
    */
-  case class PersonWithPattern(_id:ObjectId, pattern: Pattern) extends MongoDocument[PersonWithPattern] {
+  case class PersonWithPattern(_id: ObjectId, pattern: Pattern)
+      extends MongoDocument[PersonWithPattern] {
     def meta = PersonWithPattern
   }
   object PersonWithPattern extends MongoDocumentMeta[PersonWithPattern] {
@@ -62,9 +59,10 @@ package customserializersspecs {
   }
 
   /*
-  * Date as Date
-  */
-  case class PersonWithDate(_id: ObjectId, birthDate: Date) extends MongoDocument[PersonWithDate] {
+   * Date as Date
+   */
+  case class PersonWithDate(_id: ObjectId, birthDate: Date)
+      extends MongoDocument[PersonWithDate] {
     def meta = PersonWithDate
   }
   object PersonWithDate extends MongoDocumentMeta[PersonWithDate] {
@@ -74,7 +72,8 @@ package customserializersspecs {
   /*
    * DateTime as DateTime
    */
-  case class PersonWithDateTime(_id: ObjectId, birthDate: DateTime) extends MongoDocument[PersonWithDateTime] {
+  case class PersonWithDateTime(_id: ObjectId, birthDate: DateTime)
+      extends MongoDocument[PersonWithDateTime] {
     def meta = PersonWithDateTime
   }
   object PersonWithDateTime extends MongoDocumentMeta[PersonWithDateTime] {
@@ -92,10 +91,9 @@ package customserializersspecs {
   }
 }
 
-
 /**
- * Systems under specification for CustomSerializers.
- */
+  * Systems under specification for CustomSerializers.
+  */
 class CustomSerializersSpec extends Specification with MongoTestKit {
   "CustomSerializers Specification".title
 
@@ -140,7 +138,8 @@ class CustomSerializersSpec extends Specification with MongoTestKit {
       checkMongoIsRunning
 
       // test data
-      val pattern = Pattern.compile("(?idmsux-idmsux)m(a)gi(?:ic)?[a-zA-Z]+boom")
+      val pattern =
+        Pattern.compile("(?idmsux-idmsux)m(a)gi(?:ic)?[a-zA-Z]+boom")
       val jack = PersonWithPattern(ObjectId.get, pattern)
 
       // save the PersonWithPattern document

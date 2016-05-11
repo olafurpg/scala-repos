@@ -28,34 +28,48 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.ScType.ExtractClass
 
 /**
- * Nikolay.Tropin
- * 8/8/13
- */
-abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor, expression: PsiElement, context: DebuggerContextImpl, indicator: ProgressIndicator)
-        extends RuntimeTypeEvaluator(editor, expression, context, indicator) {
+  * Nikolay.Tropin
+  * 8/8/13
+  */
+abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
+                                         expression: PsiElement,
+                                         context: DebuggerContextImpl,
+                                         indicator: ProgressIndicator)
+    extends RuntimeTypeEvaluator(editor, expression, context, indicator) {
 
   override def evaluate(evaluationContext: EvaluationContextImpl): PsiType = {
     val project: Project = evaluationContext.getProject
 
-    val evaluator: ExpressionEvaluator = DebuggerInvocationUtil.commitAndRunReadAction(project, new EvaluatingComputable[ExpressionEvaluator] {
-      def compute: ExpressionEvaluator = {
-        val textWithImports = new TextWithImportsImpl(CodeFragmentKind.CODE_BLOCK, expression.getText)
-        val codeFragment = new ScalaCodeFragmentFactory().createCodeFragment(textWithImports, expression, project)
-        ScalaEvaluatorBuilder.build(codeFragment, ContextUtil.getSourcePosition(evaluationContext))
-      }
-    })
+    val evaluator: ExpressionEvaluator =
+      DebuggerInvocationUtil.commitAndRunReadAction(
+          project, new EvaluatingComputable[ExpressionEvaluator] {
+        def compute: ExpressionEvaluator = {
+          val textWithImports = new TextWithImportsImpl(
+              CodeFragmentKind.CODE_BLOCK, expression.getText)
+          val codeFragment = new ScalaCodeFragmentFactory()
+            .createCodeFragment(textWithImports, expression, project)
+          ScalaEvaluatorBuilder.build(
+              codeFragment, ContextUtil.getSourcePosition(evaluationContext))
+        }
+      })
     val value: Value = evaluator.evaluate(evaluationContext)
     if (value != null) {
       inReadAction {
-        Option(getCastableRuntimeType(project, value)).map(new PsiImmediateClassType(_, PsiSubstitutor.EMPTY)).orNull
+        Option(getCastableRuntimeType(project, value))
+          .map(new PsiImmediateClassType(_, PsiSubstitutor.EMPTY))
+          .orNull
       }
-    } else throw EvaluationException(DebuggerBundle.message("evaluation.error.surrounded.expression.null"))
+    } else
+      throw EvaluationException(
+          DebuggerBundle.message(
+              "evaluation.error.surrounded.expression.null"))
   }
 }
 
 object ScalaRuntimeTypeEvaluator {
 
-  val KEY: Key[ScExpression => ScType] = Key.create("SCALA_RUNTIME_TYPE_EVALUATOR")
+  val KEY: Key[ScExpression => ScType] =
+    Key.create("SCALA_RUNTIME_TYPE_EVALUATOR")
 
   def getCastableRuntimeType(project: Project, value: Value): PsiClass = {
     val unwrapped = DebuggerUtil.unwrapScalaRuntimeObjectRef(value)
@@ -67,7 +81,8 @@ object ScalaRuntimeTypeEvaluator {
     jdiType match {
       case classType: ClassType =>
         val superclass: ClassType = classType.superclass
-        val stdTypeNames = Seq("java.lang.Object", "scala.Any", "scala.AnyRef", "scala.AnyVal")
+        val stdTypeNames = Seq(
+            "java.lang.Object", "scala.Any", "scala.AnyRef", "scala.AnyVal")
         if (superclass != null && !stdTypeNames.contains(superclass.name)) {
           psiClass = findPsiClass(project, superclass)
           if (psiClass != null) {
@@ -75,7 +90,10 @@ object ScalaRuntimeTypeEvaluator {
           }
         }
         import scala.collection.JavaConversions._
-        classType.interfaces.map(findPsiClass(project, _)).find(_ != null).orNull
+        classType.interfaces
+          .map(findPsiClass(project, _))
+          .find(_ != null)
+          .orNull
       case _ => null
     }
   }
@@ -83,9 +101,11 @@ object ScalaRuntimeTypeEvaluator {
   private def findPsiClass(project: Project, jdiType: Type): PsiClass = {
     val token: AccessToken = ReadAction.start
     try {
-      ScalaPsiManager.instance(project).getCachedClass(GlobalSearchScope.allScope(project), jdiType.name()).orNull
-    }
-    finally {
+      ScalaPsiManager
+        .instance(project)
+        .getCachedClass(GlobalSearchScope.allScope(project), jdiType.name())
+        .orNull
+    } finally {
       token.finish()
     }
   }

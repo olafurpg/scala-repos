@@ -20,9 +20,10 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
       import play.api.mvc._
 
       val server = NettyServer.fromRouter() {
-        case GET(p"/hello/$to") => Action {
-          Results.Ok(s"Hello $to")
-        }
+        case GET(p"/hello/$to") =>
+          Action {
+            Results.Ok(s"Hello $to")
+          }
       }
       //#simple
 
@@ -42,12 +43,13 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
       import play.api.mvc._
 
       val server = NettyServer.fromRouter(ServerConfig(
-        port = Some(19000),
-        address = "127.0.0.1"
-      )) {
-        case GET(p"/hello/$to") => Action {
-          Results.Ok(s"Hello $to")
-        }
+              port = Some(19000),
+              address = "127.0.0.1"
+          )) {
+        case GET(p"/hello/$to") =>
+          Action {
+            Results.Ok(s"Hello $to")
+          }
       }
       //#config
 
@@ -71,15 +73,17 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
       val components = new NettyServerComponents with BuiltInComponents {
 
         lazy val router = Router.from {
-          case GET(p"/hello/$to") => Action {
-            Results.Ok(s"Hello $to")
-          }
+          case GET(p"/hello/$to") =>
+            Action {
+              Results.Ok(s"Hello $to")
+            }
         }
 
-        override lazy val httpErrorHandler = new DefaultHttpErrorHandler(environment,
-          configuration, sourceMapper, Some(router)) {
+        override lazy val httpErrorHandler = new DefaultHttpErrorHandler(
+            environment, configuration, sourceMapper, Some(router)) {
 
-          override protected def onNotFound(request: RequestHeader, message: String) = {
+          override protected def onNotFound(request: RequestHeader,
+                                            message: String) = {
             Future.successful(Results.NotFound("Nothing was found!"))
           }
         }
@@ -93,7 +97,6 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
         server.stop()
       }
     }
-
   }
 
   def testRequest(port: Int) = {

@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.core
 
 import io.prediction.annotation.DeveloperApi
@@ -25,8 +24,8 @@ import io.prediction.annotation.Experimental
   * @tparam P Predicted result class
   */
 @DeveloperApi
-abstract class BaseServing[Q, P]
-  extends AbstractDoer {
+abstract class BaseServing[Q, P] extends AbstractDoer {
+
   /** :: Experimental ::
     * Engine developers should not use this directly. This is called by serving
     * layer to supplement process the query before sending it to algorithms.

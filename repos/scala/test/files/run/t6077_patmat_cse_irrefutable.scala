@@ -7,7 +7,7 @@ object LiteralNode {
 
 object Test extends App {
   ((new LiteralNode(false)): Any) match {
-    case LiteralNode(true)  => println("uh-oh")
+    case LiteralNode(true) => println("uh-oh")
     case LiteralNode(false) => println("ok")
   }
 }

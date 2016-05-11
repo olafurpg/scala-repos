@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js IR                **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js IR                **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.ir
 
@@ -44,8 +43,9 @@ object Transformers {
           Return(transformExpr(expr), label)
 
         case If(cond, thenp, elsep) =>
-          If(transformExpr(cond), transform(thenp, isStat),
-              transform(elsep, isStat))(tree.tpe)
+          If(transformExpr(cond),
+             transform(thenp, isStat),
+             transform(elsep, isStat))(tree.tpe)
 
         case While(cond, body, label) =>
           While(transformExpr(cond), transformStat(body), label)
@@ -54,7 +54,9 @@ object Transformers {
           DoWhile(transformStat(body), transformExpr(cond), label)
 
         case Try(block, errVar, handler, finalizer) =>
-          Try(transform(block, isStat), errVar, transform(handler, isStat),
+          Try(transform(block, isStat),
+              errVar,
+              transform(handler, isStat),
               transformStat(finalizer))(tree.tpe)
 
         case Throw(expr) =>
@@ -62,8 +64,8 @@ object Transformers {
 
         case Match(selector, cases, default) =>
           Match(transformExpr(selector),
-              cases map (c => (c._1, transform(c._2, isStat))),
-              transform(default, isStat))(tree.tpe)
+                cases map (c => (c._1, transform(c._2, isStat))),
+                transform(default, isStat))(tree.tpe)
 
         // Scala expressions
 
@@ -77,12 +79,13 @@ object Transformers {
           Select(transformExpr(qualifier), item)(tree.tpe)
 
         case Apply(receiver, method, args) =>
-          Apply(transformExpr(receiver), method,
-              args map transformExpr)(tree.tpe)
+          Apply(transformExpr(receiver), method, args map transformExpr)(
+              tree.tpe)
 
         case ApplyStatically(receiver, cls, method, args) =>
-          ApplyStatically(transformExpr(receiver), cls, method,
-              args map transformExpr)(tree.tpe)
+          ApplyStatically(
+              transformExpr(receiver), cls, method, args map transformExpr)(
+              tree.tpe)
 
         case ApplyStatic(cls, method, args) =>
           ApplyStatic(cls, method, args map transformExpr)(tree.tpe)
@@ -138,20 +141,23 @@ object Transformers {
           JSFunctionApply(transformExpr(fun), args map transformExpr)
 
         case JSDotMethodApply(receiver, method, args) =>
-          JSDotMethodApply(transformExpr(receiver), method,
-              args map transformExpr)
+          JSDotMethodApply(
+              transformExpr(receiver), method, args map transformExpr)
 
         case JSBracketMethodApply(receiver, method, args) =>
-          JSBracketMethodApply(transformExpr(receiver), transformExpr(method),
-              args map transformExpr)
+          JSBracketMethodApply(transformExpr(receiver),
+                               transformExpr(method),
+                               args map transformExpr)
 
         case JSSuperBracketSelect(cls, qualifier, item) =>
-          JSSuperBracketSelect(cls, transformExpr(qualifier),
-              transformExpr(item))
+          JSSuperBracketSelect(
+              cls, transformExpr(qualifier), transformExpr(item))
 
         case JSSuperBracketCall(cls, receiver, method, args) =>
-          JSSuperBracketCall(cls, transformExpr(receiver),
-              transformExpr(method), args map transformExpr)
+          JSSuperBracketCall(cls,
+                             transformExpr(receiver),
+                             transformExpr(method),
+                             args map transformExpr)
 
         case JSSuperConstructorCall(args) =>
           JSSuperConstructorCall(args map transformExpr)
@@ -172,21 +178,24 @@ object Transformers {
           JSArrayConstr(items map transformExpr)
 
         case JSObjectConstr(fields) =>
-          JSObjectConstr(fields map {
+          JSObjectConstr(
+              fields map {
             case (name, value) => (name, transformExpr(value))
           })
 
         // Atomic expressions
 
         case Closure(captureParams, params, body, captureValues) =>
-          Closure(captureParams, params, transformExpr(body),
-              captureValues.map(transformExpr))
+          Closure(captureParams,
+                  params,
+                  transformExpr(body),
+                  captureValues.map(transformExpr))
 
         // Trees that need not be transformed
 
-        case _:Skip | _:Continue | _:Debugger | _:LoadModule |
-            _:LoadJSConstructor | _:LoadJSModule  | _:JSLinkingInfo |
-            _:Literal | _:UndefinedParam | _:VarRef | _:This | EmptyTree =>
+        case _: Skip | _: Continue | _: Debugger | _: LoadModule |
+            _: LoadJSConstructor | _: LoadJSModule | _: JSLinkingInfo |
+            _: Literal | _: UndefinedParam | _: VarRef | _: This | EmptyTree =>
           tree
 
         case _ =>
@@ -198,8 +207,12 @@ object Transformers {
   abstract class ClassTransformer extends Transformer {
     def transformClassDef(tree: ClassDef): ClassDef = {
       val ClassDef(name, kind, superClass, parents, jsName, defs) = tree
-      ClassDef(name, kind, superClass, parents, jsName, defs.map(transformDef))(
-          tree.optimizerHints)(tree.pos)
+      ClassDef(name,
+               kind,
+               superClass,
+               parents,
+               jsName,
+               defs.map(transformDef))(tree.optimizerHints)(tree.pos)
     }
 
     def transformDef(tree: Tree): Tree = {
@@ -215,22 +228,21 @@ object Transformers {
               tree.optimizerHints, None)
 
         case PropertyDef(name, getterBody, setterArg, setterBody) =>
-          PropertyDef(
-              name,
-              transformStat(getterBody),
-              setterArg,
-              transformStat(setterBody))
+          PropertyDef(name,
+                      transformStat(getterBody),
+                      setterArg,
+                      transformStat(setterBody))
 
         case ConstructorExportDef(fullName, args, body) =>
           ConstructorExportDef(fullName, args, transformStat(body))
 
-        case _:JSClassExportDef | _:ModuleExportDef =>
+        case _: JSClassExportDef | _: ModuleExportDef =>
           tree
 
         case _ =>
-          sys.error(s"Invalid tree in transformDef() of class ${tree.getClass}")
+          sys.error(
+              s"Invalid tree in transformDef() of class ${tree.getClass}")
       }
     }
   }
-
 }

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.testkit
 
 import language.postfixOps
@@ -23,7 +23,7 @@ object TestkitDocSpec {
 
   class MyActor extends Actor {
     def receive = {
-      case Say42       => sender() ! 42
+      case Say42 => sender() ! 42
       case "some work" => sender() ! "some result"
     }
   }
@@ -153,7 +153,8 @@ class TestkitDocSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
     //#test-expecting-exceptions
     import akka.testkit.TestActorRef
 
-    val actorRef = TestActorRef(new Actor {
+    val actorRef = TestActorRef(
+        new Actor {
       def receive = {
         case "hello" => throw new IllegalArgumentException("boom")
       }
@@ -261,7 +262,8 @@ class TestkitDocSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
   "demonstrate calling thread dispatcher" in {
     //#calling-thread-dispatcher
     import akka.testkit.CallingThreadDispatcher
-    val ref = system.actorOf(Props[MyActor].withDispatcher(CallingThreadDispatcher.Id))
+    val ref =
+      system.actorOf(Props[MyActor].withDispatcher(CallingThreadDispatcher.Id))
     //#calling-thread-dispatcher
   }
 
@@ -270,7 +272,9 @@ class TestkitDocSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
     import akka.testkit.EventFilter
     import com.typesafe.config.ConfigFactory
 
-    implicit val system = ActorSystem("testsystem", ConfigFactory.parseString("""
+    implicit val system = ActorSystem(
+        "testsystem",
+        ConfigFactory.parseString("""
       akka.loggers = ["akka.testkit.TestEventListener"]
       """))
     try {
@@ -294,7 +298,9 @@ class TestkitDocSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       //#put-your-test-code-here
       val probe = TestProbe()
       probe.send(testActor, "hello")
-      try expectMsg("hello") catch { case NonFatal(e) => system.terminate(); throw e }
+      try expectMsg("hello") catch {
+        case NonFatal(e) => system.terminate(); throw e
+      }
       //#put-your-test-code-here
 
       shutdown(system)
@@ -312,5 +318,4 @@ class TestkitDocSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       //#test-within-probe
     }
   }
-
 }

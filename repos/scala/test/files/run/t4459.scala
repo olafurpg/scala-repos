@@ -9,4 +9,3 @@ object Test {
 
   def foo(arg: GenSeq[_]): String = arg.map(x => x).mkString(",")
 }
-

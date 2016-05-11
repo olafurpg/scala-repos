@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.SelfInvocation
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 13.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 13.02.2008
+  */
 /*
  * ConstrExpr ::= SelfInvocation
  *              | '{' SelfInvocation {semi BlockStat} '}'

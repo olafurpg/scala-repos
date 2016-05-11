@@ -1,8 +1,7 @@
 package scala.reflect.reify
 package codegen
 
-trait GenTrees {
-  self: Reifier =>
+trait GenTrees { self: Reifier =>
 
   import global._
   import definitions._
@@ -14,18 +13,16 @@ trait GenTrees {
   def reifyTreeTypes: Boolean = state.reifyTreeTypes
 
   /**
-   *  Reify a tree.
-   *  For internal use only, use `reified` instead.
-   */
+    *  Reify a tree.
+    *  For internal use only, use `reified` instead.
+    */
   def reifyTree(tree: Tree): Tree = {
     assert(tree != null, "tree is null")
 
-    if (tree.isErroneous)
-      CannotReifyErroneousReifee(tree)
+    if (tree.isErroneous) CannotReifyErroneousReifee(tree)
 
     val splicedTree = spliceTree(tree)
-    if (splicedTree != EmptyTree)
-      return splicedTree
+    if (splicedTree != EmptyTree) return splicedTree
 
     // the idea behind the new reincarnation of reifier is a simple maxim:
     //
@@ -43,20 +40,22 @@ trait GenTrees {
     // current approach is uniform and compact
     var rtree: Tree = tree match {
       case FreeDef(_, _, _, _, _) => reifyNestedFreeDef(tree)
-      case FreeRef(_, _)          => reifyNestedFreeRef(tree)
-      case BoundTerm(tree)        => reifyBoundTerm(tree)
-      case BoundType(tree)        => reifyBoundType(tree)
-      case _                      => reifyTreeSyntactically(tree)
+      case FreeRef(_, _) => reifyNestedFreeRef(tree)
+      case BoundTerm(tree) => reifyBoundTerm(tree)
+      case BoundType(tree) => reifyBoundType(tree)
+      case _ => reifyTreeSyntactically(tree)
     }
 
     // usually we don't reify symbols/types, because they can be re-inferred during subsequent reflective compilation
     // however, reification of AnnotatedTypes is special. see `reifyType` to find out why.
     if (reifyTreeSymbols && tree.hasSymbolField) {
-      if (reifyDebug) println("reifying symbol %s for tree %s".format(tree.symbol, tree))
+      if (reifyDebug)
+        println("reifying symbol %s for tree %s".format(tree.symbol, tree))
       rtree = mirrorBuildCall(nme.setSymbol, rtree, reify(tree.symbol))
     }
     if (reifyTreeTypes && tree.tpe != null) {
-      if (reifyDebug) println("reifying type %s for tree %s".format(tree.tpe, tree))
+      if (reifyDebug)
+        println("reifying type %s for tree %s".format(tree.tpe, tree))
       rtree = mirrorBuildCall(nme.setType, rtree, reify(tree.tpe))
     }
 
@@ -64,20 +63,27 @@ trait GenTrees {
   }
 
   def reifyTreeSyntactically(tree: Tree): Tree = tree match {
-    case global.EmptyTree             => reifyMirrorObject(EmptyTree)
-    case global.noSelfType            => mirrorSelect(nme.noSelfType)
-    case global.pendingSuperCall      => mirrorSelect(nme.pendingSuperCall)
-    case Literal(const @ Constant(_)) => mirrorCall(nme.Literal, reifyProduct(const))
-    case Import(expr, selectors)      => mirrorCall(nme.Import, reify(expr), mkList(selectors map reifyProduct))
-    case _                            => reifyProduct(tree)
+    case global.EmptyTree => reifyMirrorObject(EmptyTree)
+    case global.noSelfType => mirrorSelect(nme.noSelfType)
+    case global.pendingSuperCall => mirrorSelect(nme.pendingSuperCall)
+    case Literal(const @ Constant(_)) =>
+      mirrorCall(nme.Literal, reifyProduct(const))
+    case Import(expr, selectors) =>
+      mirrorCall(nme.Import, reify(expr), mkList(selectors map reifyProduct))
+    case _ => reifyProduct(tree)
   }
 
   def reifyFlags(flags: FlagSet) =
-    if (flags != 0) reifyBuildCall(nme.FlagsRepr, flags) else mirrorSelect(nme.NoFlags)
+    if (flags != 0) reifyBuildCall(nme.FlagsRepr, flags)
+    else mirrorSelect(nme.NoFlags)
 
   def reifyModifiers(m: global.Modifiers) =
     if (m == NoMods) mirrorSelect(nme.NoMods)
-    else mirrorFactoryCall(nme.Modifiers, reifyFlags(m.flags), reify(m.privateWithin), reify(m.annotations))
+    else
+      mirrorFactoryCall(nme.Modifiers,
+                        reifyFlags(m.flags),
+                        reify(m.privateWithin),
+                        reify(m.annotations))
 
   private def spliceTree(tree: Tree): Tree = {
     tree match {
@@ -86,8 +92,14 @@ trait GenTrees {
 
         // see `Metalevels` for more info about metalevel breaches
         // and about how we deal with splices that contain them
-        val isMetalevelBreach = splicee exists (sub => sub.hasSymbolField && sub.symbol != NoSymbol && sub.symbol.metalevel > 0)
-        val isRuntimeEval = splicee exists (sub => sub.hasSymbolField && sub.symbol == ExprSplice)
+        val isMetalevelBreach =
+          splicee exists
+          (sub =>
+                sub.hasSymbolField && sub.symbol != NoSymbol &&
+                sub.symbol.metalevel > 0)
+        val isRuntimeEval =
+          splicee exists
+          (sub => sub.hasSymbolField && sub.symbol == ExprSplice)
         if (isMetalevelBreach || isRuntimeEval) {
           // we used to convert dynamic splices into runtime evals transparently, but we no longer do that
           // why? see comments in `Metalevels`
@@ -101,12 +113,14 @@ trait GenTrees {
             case ReifiedTree(_, _, inlinedSymtab, rtree, _, _, _) =>
               if (reifyDebug) println("inlining the splicee")
               // all free vars local to the enclosing reifee should've already been inlined by `Metalevels`
-              for (sym <- inlinedSymtab.syms if sym.isLocalToReifee)
-                abort("free var local to the reifee, should have already been inlined by Metalevels: " + inlinedSymtab.symDef(sym))
+              for (sym <- inlinedSymtab.syms if sym.isLocalToReifee) abort(
+                  "free var local to the reifee, should have already been inlined by Metalevels: " +
+                  inlinedSymtab.symDef(sym))
               state.symtab ++= inlinedSymtab
               rtree
             case tree =>
-              val migrated = Apply(Select(splicee, nme.in), List(Ident(nme.MIRROR_SHORT)))
+              val migrated = Apply(
+                  Select(splicee, nme.in), List(Ident(nme.MIRROR_SHORT)))
               Select(migrated, nme.tree)
           }
         }
@@ -123,15 +137,16 @@ trait GenTrees {
 
     tree match {
       case This(qual) =>
-        assert(sym != NoSymbol, "unexpected: bound term that doesn't have a symbol: " + showRaw(tree))
-        if (sym.isLocalToReifee)
-          mirrorCall(nme.This, reify(qual))
+        assert(sym != NoSymbol,
+               "unexpected: bound term that doesn't have a symbol: " + showRaw(
+                   tree))
+        if (sym.isLocalToReifee) mirrorCall(nme.This, reify(qual))
         else if (sym.isClass && !sym.isModuleClass) {
-          if (reifyDebug) println("This for %s, reified as freeVar".format(sym))
+          if (reifyDebug)
+            println("This for %s, reified as freeVar".format(sym))
           if (reifyDebug) println("Free: " + sym)
           mirrorBuildCall(nme.mkIdent, reifyFreeTerm(This(sym)))
-        }
-        else {
+        } else {
           if (reifyDebug) println("This for %s, reified as This".format(sym))
           mirrorBuildCall(nme.mkThis, reify(sym))
         }
@@ -142,26 +157,28 @@ trait GenTrees {
           // or for untyped code generated during previous phases
           // (see a comment in Reifiers about the latter, starting with "why do we reset attrs?")
           mirrorCall(nme.Ident, reify(name))
-        }
-        else if (!sym.isLocalToReifee) {
+        } else if (!sym.isLocalToReifee) {
           if (sym.isVariable && sym.owner.isTerm) {
             captureVariable(sym) // Note order dependency: captureVariable needs to come before reification here.
-            mirrorCall(nme.Select, mirrorBuildCall(nme.mkIdent, reify(sym)), reify(nme.elem))
-          }
-          else mirrorBuildCall(nme.mkIdent, reify(sym))
-        }
-        else mirrorCall(nme.Ident, reify(name))
+            mirrorCall(nme.Select,
+                       mirrorBuildCall(nme.mkIdent, reify(sym)),
+                       reify(nme.elem))
+          } else mirrorBuildCall(nme.mkIdent, reify(sym))
+        } else mirrorCall(nme.Ident, reify(name))
 
       case Select(qual, name) =>
         if (qual.symbol != null && qual.symbol.hasPackageFlag) {
           mirrorBuildCall(nme.mkIdent, reify(sym))
         } else {
-          val effectiveName = if (sym != null && sym != NoSymbol) sym.name else name
+          val effectiveName =
+            if (sym != null && sym != NoSymbol) sym.name else name
           reifyProduct(Select(qual, effectiveName))
         }
 
       case _ =>
-        throw new Error("internal error: %s (%s, %s) is not supported".format(tree, tree.productPrefix, tree.getClass))
+        throw new Error(
+            "internal error: %s (%s, %s) is not supported".format(
+                tree, tree.productPrefix, tree.getClass))
     }
   }
 
@@ -170,17 +187,22 @@ trait GenTrees {
     val tpe = tree.tpe
 
     def reifyBoundType(tree: RefTree): Tree = {
-      assert(tpe != null, "unexpected: bound type that doesn't have a tpe: " + showRaw(tree))
+      assert(
+          tpe != null,
+          "unexpected: bound type that doesn't have a tpe: " + showRaw(tree))
 
       // if a symbol or a type of the scrutinee are local to reifee
       // (e.g. point to a locally declared class or to a path-dependent thingie that depends on a variable defined within the reifee)
       // then we can reify the scrutinee as a symless AST and that will definitely be hygienic
       // why? because then typechecking of a scrutinee doesn't depend on the environment external to the quasiquote
       // otherwise we need to reify the corresponding type
-      if (sym.isLocalToReifee || tpe.isLocalToReifee || treeInfo.isWildcardStarType(tree))
-        reifyProduct(tree)
+      if (sym.isLocalToReifee || tpe.isLocalToReifee ||
+          treeInfo.isWildcardStarType(tree)) reifyProduct(tree)
       else {
-        if (reifyDebug) println("reifying bound type %s (underlying type is %s)".format(sym, tpe))
+        if (reifyDebug)
+          println(
+              "reifying bound type %s (underlying type is %s)".format(
+                  sym, tpe))
 
         if (tpe.isSpliceable) {
           val spliced = spliceType(tpe)
@@ -188,30 +210,34 @@ trait GenTrees {
           if (spliced == EmptyTree) {
             if (reifyDebug) println("splicing failed: reify as is")
             mirrorBuildCall(nme.mkTypeTree, reify(tpe))
-          }
-          else spliced match {
-            case TypeRefToFreeType(freeType) =>
-              if (reifyDebug) println("splicing returned a free type: " + freeType)
-              Ident(freeType)
+          } else
+            spliced match {
+              case TypeRefToFreeType(freeType) =>
+                if (reifyDebug)
+                  println("splicing returned a free type: " + freeType)
+                Ident(freeType)
+              case _ =>
+                if (reifyDebug) println("splicing succeeded: " + spliced)
+                mirrorBuildCall(nme.mkTypeTree, spliced)
+            }
+        } else
+          tree match {
+            case Select(qual, name) if !qual.symbol.hasPackageFlag =>
+              if (reifyDebug) println(s"reifying Select($qual, $name)")
+              mirrorCall(nme.Select, reify(qual), reify(name))
+            case SelectFromTypeTree(qual, name) =>
+              if (reifyDebug)
+                println(s"reifying SelectFromTypeTree($qual, $name)")
+              mirrorCall(nme.SelectFromTypeTree, reify(qual), reify(name))
+            case _ if sym.isLocatable =>
+              if (reifyDebug)
+                println(s"tpe is locatable: reify as Ident($sym)")
+              mirrorBuildCall(nme.mkIdent, reify(sym))
             case _ =>
-              if (reifyDebug) println("splicing succeeded: " + spliced)
-              mirrorBuildCall(nme.mkTypeTree, spliced)
+              if (reifyDebug)
+                println(s"tpe is not locatable: reify as TypeTree($tpe)")
+              mirrorBuildCall(nme.mkTypeTree, reify(tpe))
           }
-        }
-        else tree match {
-          case Select(qual, name) if !qual.symbol.hasPackageFlag =>
-            if (reifyDebug) println(s"reifying Select($qual, $name)")
-            mirrorCall(nme.Select, reify(qual), reify(name))
-          case SelectFromTypeTree(qual, name) =>
-            if (reifyDebug) println(s"reifying SelectFromTypeTree($qual, $name)")
-            mirrorCall(nme.SelectFromTypeTree, reify(qual), reify(name))
-          case _ if sym.isLocatable =>
-            if (reifyDebug) println(s"tpe is locatable: reify as Ident($sym)")
-            mirrorBuildCall(nme.mkIdent, reify(sym))
-          case _ =>
-            if (reifyDebug) println(s"tpe is not locatable: reify as TypeTree($tpe)")
-            mirrorBuildCall(nme.mkTypeTree, reify(tpe))
-        }
       }
     }
 
@@ -223,7 +249,9 @@ trait GenTrees {
         reifyBoundType(tree)
 
       case _ =>
-        throw new Error("internal error: %s (%s, %s) is not supported".format(tree, tree.productPrefix, tree.getClass))
+        throw new Error(
+            "internal error: %s (%s, %s) is not supported".format(
+                tree, tree.productPrefix, tree.getClass))
     }
   }
 

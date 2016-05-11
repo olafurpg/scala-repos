@@ -6,9 +6,9 @@ object NoSearchGeneric {
 
     def foo {
       val y = x
-/*start*/
+      /*start*/
       println(y)
-/*end*/
+      /*end*/
 
       println("a")
     }
@@ -35,4 +35,4 @@ object NoSearchGeneric {
     println(y)
   }
 }
-*/
+ */

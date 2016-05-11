@@ -34,19 +34,22 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.TilePane
 
 /**
- * An example of a TilePane layout.
- *
- * @see scalafx.scene.layout.TilePane
- * @resource /scalafx/ensemble/images/icon-48x48.png
- */
+  * An example of a TilePane layout.
+  *
+  * @see scalafx.scene.layout.TilePane
+  * @resource /scalafx/ensemble/images/icon-48x48.png
+  */
 class EnsembleTilePane extends EnsembleExample {
 
   def getContent = {
     // Image for buttons
-    val image = new Image(this.getClass.getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+    val image = new Image(
+        this.getClass
+          .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
 
     // Create buttons
-    val buttons = for (i <- 1 to 17) yield new Button("Button " + i, new ImageView(image))
+    val buttons = for (i <- 1 to 17) yield
+      new Button("Button " + i, new ImageView(image))
 
     new TilePane {
       hgap = 3

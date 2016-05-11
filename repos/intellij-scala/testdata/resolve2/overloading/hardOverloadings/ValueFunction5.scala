@@ -9,5 +9,5 @@ object Test {
 
   val a = new A
 
-  a./* resolved: false */foo(3)
+  a. /* resolved: false */ foo(3)
 }

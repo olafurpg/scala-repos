@@ -24,9 +24,10 @@ object ApplicationBuild extends Build {
     def trace(t: => Throwable) = ()
     def success(message: => String) = ()
     def log(level: Level.Value, message: => String) = {
-      if (level == Level.Error) synchronized {
-        messages = message :: messages
-      }
+      if (level == Level.Error)
+        synchronized {
+          messages = message :: messages
+        }
     }
   }
 
@@ -36,28 +37,32 @@ object ApplicationBuild extends Build {
 
   def checkLogContains(msg: String): Task[Boolean] = task {
     if (!bufferLogger.messages.exists(_.contains(msg))) {
-      sys.error("Did not find log message:\n    '" + msg + "'\nin output:\n" + bufferLogger.messages.reverse.mkString("    ", "\n    ", ""))
+      sys.error("Did not find log message:\n    '" + msg + "'\nin output:\n" +
+          bufferLogger.messages.reverse.mkString("    ", "\n    ", ""))
     }
     true
   }
 
-  val checkLogContainsTask = InputKey[Boolean]("checkLogContains") <<=
-    InputTask.separate[String, Boolean](simpleParser _)(state(s => checkLogContains))
+  val checkLogContainsTask =
+    InputKey[Boolean]("checkLogContains") <<= InputTask
+      .separate[String, Boolean](simpleParser _)(state(s => checkLogContains))
 
-  val compileIgnoreErrorsTask = TaskKey[Unit]("compileIgnoreErrors") <<= state.map { state =>
-    Project.runTask(compile in Compile, state)
-  }
+  val compileIgnoreErrorsTask =
+    TaskKey[Unit]("compileIgnoreErrors") <<= state.map { state =>
+      Project.runTask(compile in Compile, state)
+    }
 
-  val main = Project(appName, file(".")).enablePlugins(PlayScala).settings(
-    version := appVersion,
-    extraLoggers ~= { currentFunction =>
-      (key: ScopedKey[_]) => {
-        bufferLogger +: currentFunction(key)
-      }
-    },
-    scalaVersion := sys.props.get("scala.version").getOrElse("2.11.7"),
-    checkLogContainsTask,
-    compileIgnoreErrorsTask
-  )
-
+  val main = Project(appName, file("."))
+    .enablePlugins(PlayScala)
+    .settings(
+        version := appVersion,
+        extraLoggers ~= { currentFunction => (key: ScopedKey[_]) =>
+          {
+            bufferLogger +: currentFunction(key)
+          }
+        },
+        scalaVersion := sys.props.get("scala.version").getOrElse("2.11.7"),
+        checkLogContainsTask,
+        compileIgnoreErrorsTask
+    )
 }

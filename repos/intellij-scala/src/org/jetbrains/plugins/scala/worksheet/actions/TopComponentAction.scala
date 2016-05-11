@@ -14,40 +14,43 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.worksheet.ui.WorksheetUiConstructor
 
 /**
- * User: Dmitry Naydanov
- * Date: 2/17/14
- */
+  * User: Dmitry Naydanov
+  * Date: 2/17/14
+  */
 trait TopComponentAction extends TopComponentDisplayable {
   this: AnAction =>
-  
+
   def shortcutId: Option[String] = None
-  
+
   def genericText = ScalaBundle message bundleKey
-  
-  def bundleKey: String 
-  
+
+  def bundleKey: String
+
   def actionIcon: Icon
-  
+
   def getActionButton = {
-    val button = new ActionButton(this, getTemplatePresentation, ActionPlaces.EDITOR_TOOLBAR,
-      ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE)
+    val button = new ActionButton(this,
+                                  getTemplatePresentation,
+                                  ActionPlaces.EDITOR_TOOLBAR,
+                                  ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE)
     button setToolTipText genericText
     button
   }
-  
+
   override def init(panel: JPanel) {
     val presentation = getTemplatePresentation
 
     presentation setIcon actionIcon
     presentation setEnabled true
 
-    val text = shortcutId flatMap {
-      case id =>
-        KeymapManager.getInstance.getActiveKeymap.getShortcuts(id).headOption map {
-          case shortcut =>
-            genericText + (" (" + KeymapUtil.getShortcutText(shortcut) + ")")
-        }
-    } getOrElse genericText
+    val text =
+      shortcutId flatMap {
+        case id =>
+          KeymapManager.getInstance.getActiveKeymap.getShortcuts(id).headOption map {
+            case shortcut =>
+              genericText + (" (" + KeymapUtil.getShortcutText(shortcut) + ")")
+          }
+      } getOrElse genericText
 
     presentation setText text
 
@@ -84,7 +87,6 @@ trait TopComponentAction extends TopComponentDisplayable {
           case _ => disable()
         }
       }
-
     } catch {
       case e: Exception => disable()
     }

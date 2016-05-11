@@ -7,11 +7,11 @@ class SelfQualifier { self =>
   protected[this] def aProtectedFun: Int = 0
 
   // access to following members is highlighted as a syntax error
-  self./* */aPrivateVal
-  self./* */aPrivateVal
-  self./* */aProtectedVal
-  self./* */aPrivateVar
-  self./* */aProtectedVar
-  self./* */aPrivateFun
-  self./* */aProtectedFun
+  self. /* */ aPrivateVal
+  self. /* */ aPrivateVal
+  self. /* */ aProtectedVal
+  self. /* */ aPrivateVar
+  self. /* */ aProtectedVar
+  self. /* */ aPrivateFun
+  self. /* */ aProtectedFun
 }

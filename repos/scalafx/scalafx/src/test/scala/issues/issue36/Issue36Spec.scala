@@ -37,8 +37,8 @@ import scalafx.Includes._
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectWrapper}
 
 /**
- * Verify that code causing Issue 36 behaves correctly after fix.
- */
+  * Verify that code causing Issue 36 behaves correctly after fix.
+  */
 @RunWith(classOf[JUnitRunner])
 class Issue36Spec extends FlatSpec {
 

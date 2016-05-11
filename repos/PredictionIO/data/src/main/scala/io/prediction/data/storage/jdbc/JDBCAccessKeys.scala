@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.jdbc
 
 import grizzled.slf4j.Logging
@@ -24,8 +23,10 @@ import scalikejdbc._
 import scala.util.Random
 
 /** JDBC implementation of [[AccessKeys]] */
-class JDBCAccessKeys(client: String, config: StorageClientConfig, prefix: String)
-  extends AccessKeys with Logging {
+class JDBCAccessKeys(
+    client: String, config: StorageClientConfig, prefix: String)
+    extends AccessKeys with Logging {
+
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "accesskeys")
   DB autoCommit { implicit session =>
@@ -38,7 +39,9 @@ class JDBCAccessKeys(client: String, config: StorageClientConfig, prefix: String
 
   def insert(accessKey: AccessKey): Option[String] = DB localTx { implicit s =>
     val key = if (accessKey.key.isEmpty) generateKey else accessKey.key
-    val events = if (accessKey.events.isEmpty) None else Some(accessKey.events.mkString(","))
+    val events =
+      if (accessKey.events.isEmpty) None
+      else Some(accessKey.events.mkString(","))
     sql"""
     insert into $tableName values(
       $key,
@@ -48,21 +51,31 @@ class JDBCAccessKeys(client: String, config: StorageClientConfig, prefix: String
   }
 
   def get(key: String): Option[AccessKey] = DB readOnly { implicit session =>
-    sql"SELECT accesskey, appid, events FROM $tableName WHERE accesskey = $key".
-      map(resultToAccessKey).single().apply()
+    sql"SELECT accesskey, appid, events FROM $tableName WHERE accesskey = $key"
+      .map(resultToAccessKey)
+      .single()
+      .apply()
   }
 
   def getAll(): Seq[AccessKey] = DB readOnly { implicit session =>
-    sql"SELECT accesskey, appid, events FROM $tableName".map(resultToAccessKey).list().apply()
+    sql"SELECT accesskey, appid, events FROM $tableName"
+      .map(resultToAccessKey)
+      .list()
+      .apply()
   }
 
-  def getByAppid(appid: Int): Seq[AccessKey] = DB readOnly { implicit session =>
-    sql"SELECT accesskey, appid, events FROM $tableName WHERE appid = $appid".
-      map(resultToAccessKey).list().apply()
+  def getByAppid(appid: Int): Seq[AccessKey] = DB readOnly {
+    implicit session =>
+      sql"SELECT accesskey, appid, events FROM $tableName WHERE appid = $appid"
+        .map(resultToAccessKey)
+        .list()
+        .apply()
   }
 
   def update(accessKey: AccessKey): Unit = DB localTx { implicit session =>
-    val events = if (accessKey.events.isEmpty) None else Some(accessKey.events.mkString(","))
+    val events =
+      if (accessKey.events.isEmpty) None
+      else Some(accessKey.events.mkString(","))
     sql"""
     UPDATE $tableName SET
       appid = ${accessKey.appid},
@@ -77,8 +90,8 @@ class JDBCAccessKeys(client: String, config: StorageClientConfig, prefix: String
   /** Convert JDBC results to [[AccessKey]] */
   def resultToAccessKey(rs: WrappedResultSet): AccessKey = {
     AccessKey(
-      key = rs.string("accesskey"),
-      appid = rs.int("appid"),
-      events = rs.stringOpt("events").map(_.split(",").toSeq).getOrElse(Nil))
+        key = rs.string("accesskey"),
+        appid = rs.int("appid"),
+        events = rs.stringOpt("events").map(_.split(",").toSeq).getOrElse(Nil))
   }
 }

@@ -22,7 +22,8 @@ package p2 {
     def g[B](x: Bound[B]) = ()
 
     def f1(x: Any) = x match { case SubHK(xs) => xs }
-    def f2[B <: Bound[B], CC[X] <: Traversable[X]](sub: SubHK[B, CC]): CC[B] = sub match { case SubHK(xs) => xs }
+    def f2[B <: Bound[B], CC[X] <: Traversable[X]](sub: SubHK[B, CC]): CC[B] =
+      sub match { case SubHK(xs) => xs }
     def f3 = g(f1(SubHK(new MySeq)).head)
     def f4 = g(f2(SubHK(new MySeq)).head)
   }

@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 import akka.actor.Actor
@@ -30,19 +29,23 @@ object LocalConcurrencySpec {
 
     def receive = {
       case s: String ⇒
-        val update = Replicator.Update(Updater.key, ORSet.empty[String], Replicator.WriteLocal)(_ + s)
+        val update = Replicator.Update(
+            Updater.key, ORSet.empty[String], Replicator.WriteLocal)(_ + s)
         replicator ! update
     }
   }
 }
 
-class LocalConcurrencySpec(_system: ActorSystem) extends TestKit(_system)
-  with WordSpecLike with Matchers with BeforeAndAfterAll with ImplicitSender {
+class LocalConcurrencySpec(_system: ActorSystem)
+    extends TestKit(_system) with WordSpecLike with Matchers
+    with BeforeAndAfterAll with ImplicitSender {
   import LocalConcurrencySpec._
 
   def this() {
-    this(ActorSystem("LocalConcurrencySpec",
-      ConfigFactory.parseString("""
+    this(
+        ActorSystem(
+            "LocalConcurrencySpec",
+            ConfigFactory.parseString("""
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.remote.netty.tcp.port=0
       """)))
@@ -66,14 +69,14 @@ class LocalConcurrencySpec(_system: ActorSystem) extends TestKit(_system)
         updater2 ! s"b$n"
       }
 
-      val expected = ((1 to numMessages).map("a" + _) ++ (1 to numMessages).map("b" + _)).toSet
+      val expected = ((1 to numMessages).map("a" + _) ++ (1 to numMessages)
+            .map("b" + _)).toSet
       awaitAssert {
         replicator ! Replicator.Get(Updater.key, Replicator.ReadLocal)
-        val ORSet(elements) = expectMsgType[Replicator.GetSuccess[_]].get(Updater.key)
+        val ORSet(elements) =
+          expectMsgType[Replicator.GetSuccess[_]].get(Updater.key)
         elements should be(expected)
       }
-
     }
-
   }
 }

@@ -12,8 +12,8 @@ import grizzled.slf4j.Logger
 case class AlgorithmParams(mult: Int) extends Params
 
 class Algorithm(val ap: AlgorithmParams)
-  // extends PAlgorithm if Model contains RDD[]
-  extends P2LAlgorithm[TrainingData, Model, Query, PredictedResult] {
+// extends PAlgorithm if Model contains RDD[]
+    extends P2LAlgorithm[TrainingData, Model, Query, PredictedResult] {
 
   @transient lazy val logger = Logger[this.type]
 

@@ -29,6 +29,7 @@ package scalafx.delegate
 import javafx.beans.{binding => jfxbb, property => jfxbp}
 import javafx.{geometry => jfxg}
 
-trait AlignmentPropertyDelegate extends SFXDelegate[jfxbp.ReadOnlyObjectProperty[_]] {
+trait AlignmentPropertyDelegate
+    extends SFXDelegate[jfxbp.ReadOnlyObjectProperty[_]] {
   def alignment = jfxbb.Bindings.select[jfxg.Pos](delegate, "alignment")
 }

@@ -4,15 +4,14 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.testkit._
-import akka.remote.testkit.{ MultiNodeConfig, MultiNodeSpec, STMultiNodeSpec }
+import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, STMultiNodeSpec}
 import akka.remote.testconductor.RoleName
 
 object PiercingShouldKeepQuarantineSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(
-    ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
       #akka.loglevel = INFO
       #akka.remote.log-remote-lifecycle-events = INFO
       akka.remote.retry-gate-closed-for = 0.5s
@@ -23,15 +22,16 @@ object PiercingShouldKeepQuarantineSpec extends MultiNodeConfig {
       case "getuid" ⇒ sender() ! AddressUidExtension(context.system).addressUid
     }
   }
-
 }
 
-class PiercingShouldKeepQuarantineSpecMultiJvmNode1 extends PiercingShouldKeepQuarantineSpec
-class PiercingShouldKeepQuarantineSpecMultiJvmNode2 extends PiercingShouldKeepQuarantineSpec
+class PiercingShouldKeepQuarantineSpecMultiJvmNode1
+    extends PiercingShouldKeepQuarantineSpec
+class PiercingShouldKeepQuarantineSpecMultiJvmNode2
+    extends PiercingShouldKeepQuarantineSpec
 
-abstract class PiercingShouldKeepQuarantineSpec extends MultiNodeSpec(PiercingShouldKeepQuarantineSpec)
-  with STMultiNodeSpec
-  with ImplicitSender {
+abstract class PiercingShouldKeepQuarantineSpec
+    extends MultiNodeSpec(PiercingShouldKeepQuarantineSpec)
+    with STMultiNodeSpec with ImplicitSender {
 
   import PiercingShouldKeepQuarantineSpec._
 
@@ -49,7 +49,8 @@ abstract class PiercingShouldKeepQuarantineSpec extends MultiNodeSpec(PiercingSh
         enterBarrier("actor-identified")
 
         // Manually Quarantine the other system
-        RARP(system).provider.transport.quarantine(node(second).address, Some(uid))
+        RARP(system).provider.transport
+          .quarantine(node(second).address, Some(uid))
 
         // Quarantining is not immediate
         Thread.sleep(1000)
@@ -61,7 +62,6 @@ abstract class PiercingShouldKeepQuarantineSpec extends MultiNodeSpec(PiercingSh
         }
 
         enterBarrier("quarantine-intact")
-
       }
 
       runOn(second) {
@@ -70,8 +70,6 @@ abstract class PiercingShouldKeepQuarantineSpec extends MultiNodeSpec(PiercingSh
         enterBarrier("actor-identified")
         enterBarrier("quarantine-intact")
       }
-
     }
-
   }
 }

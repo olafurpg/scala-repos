@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl.io
 
 import java.io.File
@@ -8,43 +8,51 @@ import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
 
 import akka.Done
-import akka.actor.{ Deploy, ActorLogging, Props }
+import akka.actor.{Deploy, ActorLogging, Props}
 import akka.stream.IOResult
-import akka.stream.actor.{ ActorSubscriberMessage, WatermarkRequestStrategy }
+import akka.stream.actor.{ActorSubscriberMessage, WatermarkRequestStrategy}
 import akka.util.ByteString
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Promise
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 /** INTERNAL API */
 private[akka] object FileSubscriber {
-  def props(f: File, completionPromise: Promise[IOResult], bufSize: Int, openOptions: Set[StandardOpenOption]) = {
+  def props(f: File,
+            completionPromise: Promise[IOResult],
+            bufSize: Int,
+            openOptions: Set[StandardOpenOption]) = {
     require(bufSize > 0, "buffer size must be > 0")
-    Props(classOf[FileSubscriber], f, completionPromise, bufSize, openOptions).withDeploy(Deploy.local)
+    Props(classOf[FileSubscriber], f, completionPromise, bufSize, openOptions)
+      .withDeploy(Deploy.local)
   }
 }
 
 /** INTERNAL API */
-private[akka] class FileSubscriber(f: File, completionPromise: Promise[IOResult], bufSize: Int, openOptions: Set[StandardOpenOption])
-  extends akka.stream.actor.ActorSubscriber
-  with ActorLogging {
+private[akka] class FileSubscriber(f: File,
+                                   completionPromise: Promise[IOResult],
+                                   bufSize: Int,
+                                   openOptions: Set[StandardOpenOption])
+    extends akka.stream.actor.ActorSubscriber with ActorLogging {
 
-  override protected val requestStrategy = WatermarkRequestStrategy(highWatermark = bufSize)
+  override protected val requestStrategy = WatermarkRequestStrategy(
+      highWatermark = bufSize)
 
   private var chan: FileChannel = _
 
   private var bytesWritten: Long = 0
 
-  override def preStart(): Unit = try {
-    chan = FileChannel.open(f.toPath, openOptions.asJava)
+  override def preStart(): Unit =
+    try {
+      chan = FileChannel.open(f.toPath, openOptions.asJava)
 
-    super.preStart()
-  } catch {
-    case ex: Exception ⇒
-      closeAndComplete(IOResult(bytesWritten, Failure(ex)))
-      cancel()
-  }
+      super.preStart()
+    } catch {
+      case ex: Exception ⇒
+        closeAndComplete(IOResult(bytesWritten, Failure(ex)))
+        cancel()
+    }
 
   def receive = {
     case ActorSubscriberMessage.OnNext(bytes: ByteString) ⇒
@@ -57,7 +65,9 @@ private[akka] class FileSubscriber(f: File, completionPromise: Promise[IOResult]
       }
 
     case ActorSubscriberMessage.OnError(ex) ⇒
-      log.error(ex, "Tearing down FileSink({}) due to upstream error", f.getAbsolutePath)
+      log.error(ex,
+                "Tearing down FileSink({}) due to upstream error",
+                f.getAbsolutePath)
       closeAndComplete(IOResult(bytesWritten, Failure(ex)))
       context.stop(self)
 

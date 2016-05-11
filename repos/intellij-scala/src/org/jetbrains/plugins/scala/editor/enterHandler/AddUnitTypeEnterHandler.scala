@@ -13,14 +13,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScBlockExpr
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 
 /**
- * User: Dmitry.Naydanov
- * Date: 09.07.14.
- */
+  * User: Dmitry.Naydanov
+  * Date: 09.07.14.
+  */
 class AddUnitTypeEnterHandler extends EnterHandlerDelegateAdapter {
-  override def postProcessEnter(file: PsiFile, editor: Editor, dataContext: DataContext): Result = {
+  override def postProcessEnter(
+      file: PsiFile, editor: Editor, dataContext: DataContext): Result = {
     val project = file.getProject
     val scalaSettings = ScalaCodeStyleSettings.getInstance(project)
-    if (!scalaSettings.ENFORCE_FUNCTIONAL_SYNTAX_FOR_UNIT) return Result.Continue
+    if (!scalaSettings.ENFORCE_FUNCTIONAL_SYNTAX_FOR_UNIT)
+      return Result.Continue
 
     val caretModel = editor.getCaretModel
     val document = editor.getDocument
@@ -31,7 +33,8 @@ class AddUnitTypeEnterHandler extends EnterHandlerDelegateAdapter {
 
     @inline def checkBlock2(block: ScBlockExpr) = {
       val children: Array[PsiElement] = block.getChildren
-      children.length == 3 && children.apply(1).isInstanceOf[PsiWhiteSpace] && children.apply(1).getText.count(_ == '\n') == 2
+      children.length == 3 && children.apply(1).isInstanceOf[PsiWhiteSpace] &&
+      children.apply(1).getText.count(_ == '\n') == 2
     }
 
     element.getParent match {
@@ -40,8 +43,11 @@ class AddUnitTypeEnterHandler extends EnterHandlerDelegateAdapter {
           case (funDef: ScFunctionDefinition, prev: ScalaPsiElement) =>
             if (funDef.findFirstChildByType(ScalaTokenTypes.tASSIGN) == null)
               extensions.inWriteAction {
-                document.insertString(prev.getTextRange.getEndOffset, ": Unit =")
-                PsiDocumentManager.getInstance(project).commitDocument(document)
+                document.insertString(
+                    prev.getTextRange.getEndOffset, ": Unit =")
+                PsiDocumentManager
+                  .getInstance(project)
+                  .commitDocument(document)
               }
           case _ =>
         }

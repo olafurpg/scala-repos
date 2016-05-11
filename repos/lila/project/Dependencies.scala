@@ -5,24 +5,31 @@ object Dependencies {
 
   object Resolvers {
 
-    val typesafe = "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
-    val sonatype = "sonatype" at "https://oss.sonatype.org/content/repositories/releases"
+    val typesafe =
+      "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
+    val sonatype =
+      "sonatype" at "https://oss.sonatype.org/content/repositories/releases"
     // val sonatypeS = "sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
     val t2v = "t2v.jp repo" at "http://www.t2v.jp/maven-repo/"
     val jgitMaven = "jgit-maven" at "http://download.eclipse.org/jgit/maven"
-    val awesomepom = "awesomepom" at "https://raw.github.com/jibs/maven-repo-scala/master"
+    val awesomepom =
+      "awesomepom" at "https://raw.github.com/jibs/maven-repo-scala/master"
     val sprayRepo = "spray repo" at "http://repo.spray.io"
-    val prismic = "Prismic.io kits" at "https://s3.amazonaws.com/prismic-maven-kits/repository/maven/"
-    val ornicarMaven = "ornicar maven" at "https://raw.githubusercontent.com/ornicar/maven/master/oss.sonatype.org/content/repositories/snapshots"
+    val prismic =
+      "Prismic.io kits" at "https://s3.amazonaws.com/prismic-maven-kits/repository/maven/"
+    val ornicarMaven =
+      "ornicar maven" at "https://raw.githubusercontent.com/ornicar/maven/master/oss.sonatype.org/content/repositories/snapshots"
 
     val commons = Seq(
-      // sonatypeS,
-      ornicarMaven,
-      sonatype,
-      awesomepom,
-      typesafe,
-      prismic,
-      t2v, jgitMaven, sprayRepo)
+                      // sonatypeS,
+                      ornicarMaven,
+                      sonatype,
+                      awesomepom,
+                      typesafe,
+                      prismic,
+                      t2v,
+                      jgitMaven,
+                      sprayRepo)
   }
 
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.7"

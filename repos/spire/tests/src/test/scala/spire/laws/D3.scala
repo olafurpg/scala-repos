@@ -6,8 +6,8 @@ import spire.algebra._
 import org.scalacheck.{Arbitrary, Gen}
 
 /**
- * The smallest non-abelian group, for testing non-abelian groups.
- */
+  * The smallest non-abelian group, for testing non-abelian groups.
+  */
 final class D3 private (val n: Int) extends AnyVal
 
 object D3 {

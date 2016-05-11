@@ -1,13 +1,15 @@
 object Main {
   def doAction(p: String) {}
 
-  def doAction(action: => Unit) {action}
+  def doAction(action: => Unit) { action }
 
   def someAction {
-    /* */doAction(someAction) // (1)
+    /* */
+    doAction(someAction) // (1)
   }
 
   def m {
-    /* */doAction(someAction) // (2)
+    /* */
+    doAction(someAction) // (2)
   }
 }

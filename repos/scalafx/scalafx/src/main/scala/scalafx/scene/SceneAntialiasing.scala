@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,33 +32,36 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 /**
- * Specifies the level of antialiasing desired when rendering 3D primitives.
- *
- * @note In order for scene antialiasing to have an affect, the underlying system must support:
- *       ConditionalFeature.SCENE3D and anti-aliasing.
- */
+  * Specifies the level of antialiasing desired when rendering 3D primitives.
+  *
+  * @note In order for scene antialiasing to have an affect, the underlying system must support:
+  *       ConditionalFeature.SCENE3D and anti-aliasing.
+  */
 object SceneAntialiasing {
 
   /**
-   * Convert a ScalaFX scene antialiasing value to a JavaFX scene-antialiasing value.
-   */
-  implicit def sfxSceneAntialiasing2jfx(v: SceneAntialiasing): jfxs.SceneAntialiasing = if (v != null) v.delegate else null
+    * Convert a ScalaFX scene antialiasing value to a JavaFX scene-antialiasing value.
+    */
+  implicit def sfxSceneAntialiasing2jfx(
+      v: SceneAntialiasing): jfxs.SceneAntialiasing =
+    if (v != null) v.delegate else null
 
   /**
-   * Disables antialiasing.
-   */
+    * Disables antialiasing.
+    */
   val Disabled = new SceneAntialiasing(jfxs.SceneAntialiasing.DISABLED)
 
   /**
-   * Enables antialising, optimized for a balance of quality and performance.
-   */
+    * Enables antialising, optimized for a balance of quality and performance.
+    */
   val Balanced = new SceneAntialiasing(jfxs.SceneAntialiasing.BALANCED)
 
   /**
-   * Defined SceneAntialiasing values
-   */
+    * Defined SceneAntialiasing values
+    */
   val values = Seq(Disabled, Balanced)
 }
 
-sealed case class SceneAntialiasing(override val delegate: jfxs.SceneAntialiasing)
-  extends SFXDelegate[jfxs.SceneAntialiasing]
+sealed case class SceneAntialiasing(
+    override val delegate: jfxs.SceneAntialiasing)
+    extends SFXDelegate[jfxs.SceneAntialiasing]

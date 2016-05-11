@@ -4,15 +4,16 @@ object SearchComments
   * SearchComments
   */
 object Main {
-  /*caret*/ SearchComments
+  /*caret*/
+  SearchComments
 }
 /*
 object NameAfterRename
 
 /**
-  * NameAfterRename
-  */
+ * NameAfterRename
+ */
 object Main {
   /*caret*/ NameAfterRename
 }
-*/
+ */

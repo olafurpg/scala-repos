@@ -1,15 +1,15 @@
-object Bar{
-  def unapply(x : String) = x == "bar";
+object Bar {
+  def unapply(x: String) = x == "bar";
 }
 
-object Even{
-  def unapply(x : Int) = if (x % 2 == 0) Some(x / 2) else None;
+object Even {
+  def unapply(x: Int) = if (x % 2 == 0) Some(x / 2) else None;
 }
 
-object Test extends App{
+object Test extends App {
   val LongWord = "supercalifragilisticexpialidocious";
 
-  def foo(x : Int, y : String) : Int = (x, y) match {
+  def foo(x: Int, y: String): Int = (x, y) match {
     case (Even(i), "bar") => 1
     case (1 | 2 | 3, "foo") => 42;
     case (x, y) if y.length < x => 11;
@@ -21,11 +21,11 @@ object Test extends App{
   }
 
   List(
-    2 -> "bar",
-    2 -> "foo",
-    3 -> "foo",
-    7 -> "flob",
-    3 -> "bar",
-    12 -> LongWord
-  ).foreach({case (x, y) => println(foo(x, y))});
+      2 -> "bar",
+      2 -> "foo",
+      3 -> "foo",
+      7 -> "flob",
+      3 -> "bar",
+      12 -> LongWord
+  ).foreach({ case (x, y) => println(foo(x, y)) });
 }

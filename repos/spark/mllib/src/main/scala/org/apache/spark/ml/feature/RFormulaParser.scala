@@ -24,13 +24,14 @@ import org.apache.spark.mllib.linalg.VectorUDT
 import org.apache.spark.sql.types._
 
 /**
- * Represents a parsed R formula.
- */
+  * Represents a parsed R formula.
+  */
 private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
+
   /**
-   * Resolves formula terms into column names. A schema is necessary for inferring the meaning
-   * of the special '.' term. Duplicate terms will be removed during resolution.
-   */
+    * Resolves formula terms into column names. A schema is necessary for inferring the meaning
+    * of the special '.' term. Duplicate terms will be removed during resolution.
+    */
   def resolve(schema: StructType): ResolvedRFormula = {
     val dotTerms = expandDot(schema)
     var includedTerms = Seq[Seq[String]]()
@@ -47,7 +48,8 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
             includedTerms = includedTerms.filter(_ != Seq(inner.value))
           case ColumnInteraction(cols) =>
             val fromInteraction = expandInteraction(schema, cols).map(_.toSet)
-            includedTerms = includedTerms.filter(t => !fromInteraction.contains(t.toSet))
+            includedTerms = includedTerms.filter(
+                t => !fromInteraction.contains(t.toSet))
           case Dot =>
             // e.g. "- .", which removes all first-order terms
             includedTerms = includedTerms.filter {
@@ -108,27 +110,30 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
 
   // the dot operator excludes complex column types
   private def expandDot(schema: StructType): Seq[String] = {
-    schema.fields.filter(_.dataType match {
-      case _: NumericType | StringType | BooleanType | _: VectorUDT => true
-      case _ => false
-    }).map(_.name).filter(_ != label.value)
+    schema.fields
+      .filter(_.dataType match {
+        case _: NumericType | StringType | BooleanType | _: VectorUDT => true
+        case _ => false
+      })
+      .map(_.name)
+      .filter(_ != label.value)
   }
 }
 
 /**
- * Represents a fully evaluated and simplified R formula.
- * @param label the column name of the R formula label (response variable).
- * @param terms the simplified terms of the R formula. Interactions terms are represented as Seqs
- *              of column names; non-interaction terms as length 1 Seqs.
- * @param hasIntercept whether the formula specifies fitting with an intercept.
- */
+  * Represents a fully evaluated and simplified R formula.
+  * @param label the column name of the R formula label (response variable).
+  * @param terms the simplified terms of the R formula. Interactions terms are represented as Seqs
+  *              of column names; non-interaction terms as length 1 Seqs.
+  * @param hasIntercept whether the formula specifies fitting with an intercept.
+  */
 private[ml] case class ResolvedRFormula(
-  label: String, terms: Seq[Seq[String]], hasIntercept: Boolean)
+    label: String, terms: Seq[Seq[String]], hasIntercept: Boolean)
 
 /**
- * R formula terms. See the R formula docs here for more information:
- * http://stat.ethz.ch/R-manual/R-patched/library/stats/html/formula.html
- */
+  * R formula terms. See the R formula docs here for more information:
+  * http://stat.ethz.ch/R-manual/R-patched/library/stats/html/formula.html
+  */
 private[ml] sealed trait Term
 
 /** A term that may be part of an interaction, e.g. 'x' in 'x:y' */
@@ -141,7 +146,8 @@ private[ml] case object Dot extends InteractableTerm
 private[ml] case class ColumnRef(value: String) extends InteractableTerm
 
 /* R formula interaction of several columns, e.g. "Sepal_Length:Species" in a formula */
-private[ml] case class ColumnInteraction(terms: Seq[InteractableTerm]) extends Term
+private[ml] case class ColumnInteraction(terms: Seq[InteractableTerm])
+    extends Term
 
 /* R formula intercept toggle, e.g. "+ 0" in a formula */
 private[ml] case class Intercept(enabled: Boolean) extends Term
@@ -150,8 +156,8 @@ private[ml] case class Intercept(enabled: Boolean) extends Term
 private[ml] case class Deletion(term: Term) extends Term
 
 /**
- * Limited implementation of R formula parsing. Currently supports: '~', '+', '-', '.', ':'.
- */
+  * Limited implementation of R formula parsing. Currently supports: '~', '+', '-', '.', ':'.
+  */
 private[ml] object RFormulaParser extends RegexParsers {
   private val intercept: Parser[Intercept] =
     "([01])".r ^^ { case a => Intercept(a == "1") }
@@ -161,24 +167,27 @@ private[ml] object RFormulaParser extends RegexParsers {
 
   private val dot: Parser[InteractableTerm] = "\\.".r ^^ { case _ => Dot }
 
-  private val interaction: Parser[List[InteractableTerm]] = rep1sep(columnRef | dot, ":")
+  private val interaction: Parser[List[InteractableTerm]] = rep1sep(
+      columnRef | dot, ":")
 
-  private val term: Parser[Term] = intercept |
-    interaction ^^ { case terms => ColumnInteraction(terms) } | dot | columnRef
+  private val term: Parser[Term] =
+    intercept | interaction ^^ { case terms => ColumnInteraction(terms) } | dot | columnRef
 
-  private val terms: Parser[List[Term]] = (term ~ rep("+" ~ term | "-" ~ term)) ^^ {
-    case op ~ list => list.foldLeft(List(op)) {
-      case (left, "+" ~ right) => left ++ Seq(right)
-      case (left, "-" ~ right) => left ++ Seq(Deletion(right))
+  private val terms: Parser[List[Term]] =
+    (term ~ rep("+" ~ term | "-" ~ term)) ^^ {
+      case op ~ list =>
+        list.foldLeft(List(op)) {
+          case (left, "+" ~ right) => left ++ Seq(right)
+          case (left, "-" ~ right) => left ++ Seq(Deletion(right))
+        }
     }
-  }
 
   private val formula: Parser[ParsedRFormula] =
     (columnRef ~ "~" ~ terms) ^^ { case r ~ "~" ~ t => ParsedRFormula(r, t) }
 
   def parse(value: String): ParsedRFormula = parseAll(formula, value) match {
     case Success(result, _) => result
-    case failure: NoSuccess => throw new IllegalArgumentException(
-      "Could not parse formula: " + value)
+    case failure: NoSuccess =>
+      throw new IllegalArgumentException("Could not parse formula: " + value)
   }
 }

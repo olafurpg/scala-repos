@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 28.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 28.02.2008
+  */
 /*
  * Pattern1 ::= varid ':' TypePat
  *            | '_' ':' TypePat
@@ -22,9 +21,8 @@ object Pattern1 {
 
     def isVarId = {
       val text = builder.getTokenText
-      text.substring(0, 1).toLowerCase != text.substring(0, 1) || (
-              text.apply(0) == '`' && text.apply(text.length - 1) == '`'
-              )
+      text.substring(0, 1).toLowerCase != text.substring(0, 1) ||
+      (text.apply(0) == '`' && text.apply(text.length - 1) == '`')
     }
 
     val pattern1Marker = builder.mark

@@ -23,7 +23,7 @@ import com.precog.common._
 import com.precog.common.accounts._
 import com.precog.common.security._
 
-import akka.dispatch.{ ExecutionContext, Future }
+import akka.dispatch.{ExecutionContext, Future}
 
 import blueeyes.bkka._
 import blueeyes.json._
@@ -105,6 +105,6 @@ class WebAPIKeyManager(authAPIKey: APIKey, client: HttpClient[JValue])(implicit 
       post("/grants/"+grantId+"/children/")(request)(identity[JValue], identityHttpTranscoder[JValue])
     
 }
-*/
+ */
 
 // vim: set ts=4 sw=4 et:

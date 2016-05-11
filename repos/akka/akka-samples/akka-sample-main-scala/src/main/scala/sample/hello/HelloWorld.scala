@@ -17,4 +17,3 @@ class HelloWorld extends Actor {
     case Greeter.Done => context.stop(self)
   }
 }
-

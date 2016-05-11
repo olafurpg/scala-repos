@@ -18,83 +18,83 @@
 package org.apache.spark.sql
 
 /**
- * Runtime configuration interface for Spark. To access this, use `SparkSession.conf`.
- *
- * @since 2.0.0
- */
+  * Runtime configuration interface for Spark. To access this, use `SparkSession.conf`.
+  *
+  * @since 2.0.0
+  */
 abstract class RuntimeConfig {
 
   /**
-   * Sets the given Spark runtime configuration property.
-   *
-   * @since 2.0.0
-   */
+    * Sets the given Spark runtime configuration property.
+    *
+    * @since 2.0.0
+    */
   def set(key: String, value: String): RuntimeConfig
 
   /**
-   * Sets the given Spark runtime configuration property.
-   *
-   * @since 2.0.0
-   */
+    * Sets the given Spark runtime configuration property.
+    *
+    * @since 2.0.0
+    */
   def set(key: String, value: Boolean): RuntimeConfig
 
   /**
-   * Sets the given Spark runtime configuration property.
-   *
-   * @since 2.0.0
-   */
+    * Sets the given Spark runtime configuration property.
+    *
+    * @since 2.0.0
+    */
   def set(key: String, value: Long): RuntimeConfig
 
   /**
-   * Returns the value of Spark runtime configuration property for the given key.
-   *
-   * @throws NoSuchElementException if the key is not set and does not have a default value
-   * @since 2.0.0
-   */
+    * Returns the value of Spark runtime configuration property for the given key.
+    *
+    * @throws NoSuchElementException if the key is not set and does not have a default value
+    * @since 2.0.0
+    */
   @throws[NoSuchElementException]("if the key is not set")
   def get(key: String): String
 
   /**
-   * Returns the value of Spark runtime configuration property for the given key.
-   *
-   * @since 2.0.0
-   */
+    * Returns the value of Spark runtime configuration property for the given key.
+    *
+    * @since 2.0.0
+    */
   def getOption(key: String): Option[String]
 
   /**
-   * Resets the configuration property for the given key.
-   *
-   * @since 2.0.0
-   */
+    * Resets the configuration property for the given key.
+    *
+    * @since 2.0.0
+    */
   def unset(key: String): Unit
 
   /**
-   * Sets the given Hadoop configuration property. This is passed directly to Hadoop during I/O.
-   *
-   * @since 2.0.0
-   */
+    * Sets the given Hadoop configuration property. This is passed directly to Hadoop during I/O.
+    *
+    * @since 2.0.0
+    */
   def setHadoop(key: String, value: String): RuntimeConfig
 
   /**
-   * Returns the value of the Hadoop configuration property.
-   *
-   * @throws NoSuchElementException if the key is not set
-   * @since 2.0.0
-   */
+    * Returns the value of the Hadoop configuration property.
+    *
+    * @throws NoSuchElementException if the key is not set
+    * @since 2.0.0
+    */
   @throws[NoSuchElementException]("if the key is not set")
   def getHadoop(key: String): String
 
   /**
-   * Returns the value of the Hadoop configuration property.
-   *
-   * @since 2.0.0
-   */
+    * Returns the value of the Hadoop configuration property.
+    *
+    * @since 2.0.0
+    */
   def getHadoopOption(key: String): Option[String]
 
   /**
-   * Resets the Hadoop configuration property for the given key.
-   *
-   * @since 2.0.0
-   */
+    * Resets the Hadoop configuration property for the given key.
+    *
+    * @since 2.0.0
+    */
   def unsetHadoop(key: String): Unit
 }

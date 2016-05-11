@@ -15,18 +15,17 @@ package math
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-*/
-
+ */
 
 import scala.math._
 import breeze.linalg.{softmax, logDiff}
 
 /**
- * Represents a double in log space, to prevent under/overflow
- * These guys are horribly slow right now, thanks to boxing in Java. Hopefully that will go away one day.
- *
- * @author dlwh
- */
+  * Represents a double in log space, to prevent under/overflow
+  * These guys are horribly slow right now, thanks to boxing in Java. Hopefully that will go away one day.
+  *
+  * @author dlwh
+  */
 class LogDouble(val logValue: Double) {
   def value = exp(logValue)
 
@@ -37,7 +36,6 @@ class LogDouble(val logValue: Double) {
   def +(other: LogDouble) = new LogDouble(softmax(logValue, other.logValue))
 
   def -(other: LogDouble) = new LogDouble(logDiff(logValue, other.logValue))
-
 
   def *(d: Double) = new LogDouble(logValue + log(d))
 
@@ -59,14 +57,15 @@ class LogDouble(val logValue: Double) {
 
 object LogDouble {
   implicit def doubleExtra(d: Double) = new {
+
     /**
-     * Assumes the double is already logged.
-     */
+      * Assumes the double is already logged.
+      */
     def asLogDouble = new LogDouble(d)
 
     /**
-     * Stores the double in LogSpace
-     */
+      * Stores the double in LogSpace
+      */
     def toLogDouble = new LogDouble(scala.math.log(d))
 
     def logValue = scala.math.log(d)

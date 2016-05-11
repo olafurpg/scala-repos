@@ -4,11 +4,11 @@ import org.scalatest.FunSuite
 import scala.pickling.util.Externalizables
 import java.io.{Externalizable, ObjectInput, ObjectOutput}
 
-
 class ExtData private (private var b: Byte,
                        private var i: Int,
                        private var c: Char,
-                       private var j: Int) extends Externalizable {
+                       private var j: Int)
+    extends Externalizable {
 
   def writeExternal(out: ObjectOutput) {
     out.writeByte(b)
@@ -39,7 +39,8 @@ object ExtData {
 class ExtData2 private (private var b: Byte,
                         private var i: Int,
                         private var bytes: Array[Byte],
-                        private var j: Int) extends Externalizable {
+                        private var j: Int)
+    extends Externalizable {
 
   def writeExternal(out: ObjectOutput) {
     out.writeByte(b)
@@ -79,7 +80,8 @@ class ExtDataComp(private val x: Int) {
 class ExtData3 private (private var b: Byte,
                         private var i: Int,
                         private var bytes: Array[Byte],
-                        private var j: ExtDataComp) extends Externalizable {
+                        private var j: ExtDataComp)
+    extends Externalizable {
 
   def writeExternal(out: ObjectOutput) {
     out.writeByte(b)
@@ -111,51 +113,50 @@ object ExtData3 {
     new ExtData3(b, i, bytes, j)
 }
 
-
 class GenObjectOutputTest extends FunSuite {
   test("Externalizable") {
-    val data  = ExtData(10, 0, 'z', 1)
-    val out   = Externalizables.genOutput[(Byte, Int, Char, Int)]
+    val data = ExtData(10, 0, 'z', 1)
+    val out = Externalizables.genOutput[(Byte, Int, Char, Int)]
     data.writeExternal(out)
 
     val data2 = ExtData(0, 0, 'a', 0)
-    val in    = Externalizables.genInput[(Byte, Int, Char, Int)]((
-      out.byteArr(0).asInstanceOf[Byte],
-      out.intArr(0),
-      out.charArr(0).asInstanceOf[Char],
-      out.intArr(1)))
+    val in = Externalizables.genInput[(Byte, Int, Char, Int)](
+        (out.byteArr(0).asInstanceOf[Byte],
+         out.intArr(0),
+         out.charArr(0).asInstanceOf[Char],
+         out.intArr(1)))
     data2.readExternal(in)
 
     assert(data2 == data)
   }
 
   test("Externalizable Array[Byte]") {
-    val data  = ExtData2(10, 3, Array[Byte](1, 2, 30), 1)
-    val out   = Externalizables.genOutput[(Byte, Int, Array[Byte], Int)]
+    val data = ExtData2(10, 3, Array[Byte](1, 2, 30), 1)
+    val out = Externalizables.genOutput[(Byte, Int, Array[Byte], Int)]
     data.writeExternal(out)
 
     val data2 = ExtData2(0, 0, Array[Byte](), 0)
-    val in    = Externalizables.genInput[(Byte, Int, Array[Byte], Int)]((
-      out.byteArr(0).asInstanceOf[Byte],
-      out.intArr(0),
-      out.arrByteArr(0),
-      out.intArr(1)))
+    val in = Externalizables.genInput[(Byte, Int, Array[Byte], Int)](
+        (out.byteArr(0).asInstanceOf[Byte],
+         out.intArr(0),
+         out.arrByteArr(0),
+         out.intArr(1)))
     data2.readExternal(in)
 
     assert(data2 == data)
   }
 
   test("Externalizable AnyRef") {
-    val data  = ExtData3(10, 3, Array[Byte](1, 2, 30), new ExtDataComp(5))
-    val out   = Externalizables.genOutput[(Byte, Int, Array[Byte], AnyRef)]
+    val data = ExtData3(10, 3, Array[Byte](1, 2, 30), new ExtDataComp(5))
+    val out = Externalizables.genOutput[(Byte, Int, Array[Byte], AnyRef)]
     data.writeExternal(out)
 
     val data2 = ExtData3(0, 0, Array[Byte](), new ExtDataComp(0))
-    val in    = Externalizables.genInput[(Byte, Int, Array[Byte], AnyRef)]((
-      out.byteArr(0).asInstanceOf[Byte],
-      out.intArr(0),
-      out.arrByteArr(0),
-      out.anyRefArr(0).asInstanceOf[AnyRef]))
+    val in = Externalizables.genInput[(Byte, Int, Array[Byte], AnyRef)](
+        (out.byteArr(0).asInstanceOf[Byte],
+         out.intArr(0),
+         out.arrByteArr(0),
+         out.anyRefArr(0).asInstanceOf[AnyRef]))
     data2.readExternal(in)
 
     assert(data2 == data)

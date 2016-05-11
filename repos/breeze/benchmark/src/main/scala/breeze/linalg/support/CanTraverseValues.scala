@@ -3,11 +3,11 @@ package breeze.linalg.support
 import breeze.benchmark._
 import breeze.linalg._
 
-object CanTraverseValuesBenchmark extends MyRunner(classOf[CanTraverseValuesBenchmark])
+object CanTraverseValuesBenchmark
+    extends MyRunner(classOf[CanTraverseValuesBenchmark])
 
-
-
-class CanTraverseValuesBenchmark extends BreezeBenchmark with BuildsRandomVectors {
+class CanTraverseValuesBenchmark
+    extends BreezeBenchmark with BuildsRandomVectors {
 
   /*
   def timeSumWithCanTraverseValues(reps: Int) = runWith(reps, { randomArray(1024*8) })(arr => {
@@ -48,7 +48,7 @@ class CanTraverseValuesBenchmark extends BreezeBenchmark with BuildsRandomVector
     }
     sum
   }
-  */
+   */
 
   /*
   def timeSumMatrix(reps: Int) = runWith(reps, {randomMatrix(1024, 40)}){ arr =>
@@ -78,22 +78,25 @@ class CanTraverseValuesBenchmark extends BreezeBenchmark with BuildsRandomVector
     }
     result
   }
-  */
+   */
 
-  def timeMaxMatrixCols(reps: Int) = runWith(reps, {randomMatrix(40, 1024)}){ arr =>
-    max(arr(::, *))
-  }
+  def timeMaxMatrixCols(reps: Int) =
+    runWith(reps, { randomMatrix(40, 1024) }) { arr =>
+      max(arr(::, *))
+    }
 
-  def timeMaxMatrixRows(reps: Int) = runWith(reps, {randomMatrix(40, 1024)}){ arr =>
-    max(arr(*, ::))
-  }
+  def timeMaxMatrixRows(reps: Int) =
+    runWith(reps, { randomMatrix(40, 1024) }) { arr =>
+      max(arr(*, ::))
+    }
 
-  def timeMinMatrixCols(reps: Int) = runWith(reps, {randomMatrix(40, 1024)}){ arr =>
-    min(arr(::, *))
-  }
+  def timeMinMatrixCols(reps: Int) =
+    runWith(reps, { randomMatrix(40, 1024) }) { arr =>
+      min(arr(::, *))
+    }
 
-  def timeMinMatrixRows(reps: Int) = runWith(reps, {randomMatrix(40, 1024)}){ arr =>
-    max(arr(*, ::))
-  }
-
+  def timeMinMatrixRows(reps: Int) =
+    runWith(reps, { randomMatrix(40, 1024) }) { arr =>
+      max(arr(*, ::))
+    }
 }

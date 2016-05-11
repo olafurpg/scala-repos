@@ -1,10 +1,9 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
-import scala.collection.immutable.{ TreeMap, SortedSet }
+import scala.collection.immutable.{TreeMap, SortedSet}
 import org.scalatest.WordSpec
 import org.scalatest.Matchers
 
@@ -24,7 +23,6 @@ object VectorClockPerfSpec {
     }
     vc.copy(versions = versions)
   }
-
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -32,8 +30,14 @@ class VectorClockPerfSpec extends WordSpec with Matchers {
   import VectorClock._
   import VectorClockPerfSpec._
 
-  val clockSize = sys.props.get("akka.cluster.VectorClockPerfSpec.clockSize").getOrElse("1000").toInt
-  val iterations = sys.props.get("akka.cluster.VectorClockPerfSpec.iterations").getOrElse("10000").toInt
+  val clockSize = sys.props
+    .get("akka.cluster.VectorClockPerfSpec.clockSize")
+    .getOrElse("1000")
+    .toInt
+  val iterations = sys.props
+    .get("akka.cluster.VectorClockPerfSpec.iterations")
+    .getOrElse("10000")
+    .toInt
 
   val (vcBefore, nodes) = createVectorClockOfSize(clockSize)
   val firstNode = nodes.head
@@ -46,7 +50,10 @@ class VectorClockPerfSpec extends WordSpec with Matchers {
   val vcAfterMiddle = vcBaseMiddle :+ firstNode
   val vcConcurrentMiddle = vcBaseMiddle :+ middleNode
 
-  def checkThunkFor(vc1: VectorClock, vc2: VectorClock, thunk: (VectorClock, VectorClock) ⇒ Unit, times: Int): Unit = {
+  def checkThunkFor(vc1: VectorClock,
+                    vc2: VectorClock,
+                    thunk: (VectorClock, VectorClock) ⇒ Unit,
+                    times: Int): Unit = {
     val vcc1 = copyVectorClock(vc1)
     val vcc2 = copyVectorClock(vc2)
     for (i ← 1 to times) {
@@ -81,7 +88,8 @@ class VectorClockPerfSpec extends WordSpec with Matchers {
     }
 
     s"compare Concurrent (last) $iterations times" in {
-      checkThunkFor(vcAfterLast, vcConcurrentLast, compareTo(Concurrent), iterations)
+      checkThunkFor(
+          vcAfterLast, vcConcurrentLast, compareTo(Concurrent), iterations)
     }
 
     s"compare Before (middle) $iterations times" in {
@@ -93,7 +101,8 @@ class VectorClockPerfSpec extends WordSpec with Matchers {
     }
 
     s"compare Concurrent (middle) $iterations times" in {
-      checkThunkFor(vcAfterMiddle, vcConcurrentMiddle, compareTo(Concurrent), iterations)
+      checkThunkFor(
+          vcAfterMiddle, vcConcurrentMiddle, compareTo(Concurrent), iterations)
     }
 
     s"compare !== Before (middle) $iterations times" in {
@@ -107,6 +116,5 @@ class VectorClockPerfSpec extends WordSpec with Matchers {
     s"compare !== Concurrent (middle) $iterations times" in {
       checkThunkFor(vcAfterMiddle, vcConcurrentMiddle, !==, iterations)
     }
-
   }
 }

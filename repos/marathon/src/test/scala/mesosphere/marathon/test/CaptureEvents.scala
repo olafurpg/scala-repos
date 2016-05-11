@@ -1,12 +1,13 @@
 package mesosphere.marathon.test
 
 import akka.actor.ActorDSL._
-import akka.actor.{ ActorSystem, PoisonPill, Terminated }
+import akka.actor.{ActorSystem, PoisonPill, Terminated}
 import akka.event.EventStream
 import akka.testkit.TestProbe
 import mesosphere.marathon.event.MarathonEvent
 
 class CaptureEvents(eventStream: EventStream) {
+
   /**
     * Captures the events send to the EventStream while the block is executing.
     */
@@ -29,8 +30,7 @@ class CaptureEvents(eventStream: EventStream) {
 
     try {
       block
-    }
-    finally {
+    } finally {
       eventStream.unsubscribe(captureEventsActor)
       captureEventsActor ! PoisonPill
       val probe = TestProbe()
@@ -42,5 +42,4 @@ class CaptureEvents(eventStream: EventStream) {
 
     capture
   }
-
 }

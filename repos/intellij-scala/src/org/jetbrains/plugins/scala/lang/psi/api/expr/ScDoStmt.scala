@@ -5,30 +5,30 @@ package api
 package expr
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
 trait ScDoStmt extends ScExpression {
   def condition: Option[ScExpression]
-  
- /**
-   *  retrun loop expression of do statement
-   *  @return body of do statement
-   */
+
+  /**
+    *  retrun loop expression of do statement
+    *  @return body of do statement
+    */
   def getExprBody: Option[ScExpression]
 
- /**
-   *  return does do statement has loop expression
-   *  @return has loop expression
-   */
+  /**
+    *  return does do statement has loop expression
+    *  @return has loop expression
+    */
   def hasExprBody: Boolean
 
-
-  override def accept(visitor: ScalaElementVisitor) = visitor.visitDoStatement(this)
+  override def accept(visitor: ScalaElementVisitor) =
+    visitor.visitDoStatement(this)
 }
 
 object ScDoStmt {
-  def unapply(doStmt: ScDoStmt): Option[(Option[ScExpression], Option[ScExpression])] =
+  def unapply(
+      doStmt: ScDoStmt): Option[(Option[ScExpression], Option[ScExpression])] =
     Some(doStmt.getExprBody, doStmt.condition)
 }

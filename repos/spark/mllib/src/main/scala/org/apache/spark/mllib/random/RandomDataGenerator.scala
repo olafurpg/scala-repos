@@ -23,31 +23,31 @@ import org.apache.spark.annotation.{DeveloperApi, Since}
 import org.apache.spark.util.random.{Pseudorandom, XORShiftRandom}
 
 /**
- * :: DeveloperApi ::
- * Trait for random data generators that generate i.i.d. data.
- */
+  * :: DeveloperApi ::
+  * Trait for random data generators that generate i.i.d. data.
+  */
 @DeveloperApi
 @Since("1.1.0")
 trait RandomDataGenerator[T] extends Pseudorandom with Serializable {
 
   /**
-   * Returns an i.i.d. sample as a generic type from an underlying distribution.
-   */
+    * Returns an i.i.d. sample as a generic type from an underlying distribution.
+    */
   @Since("1.1.0")
   def nextValue(): T
 
   /**
-   * Returns a copy of the RandomDataGenerator with a new instance of the rng object used in the
-   * class when applicable for non-locking concurrent usage.
-   */
+    * Returns a copy of the RandomDataGenerator with a new instance of the rng object used in the
+    * class when applicable for non-locking concurrent usage.
+    */
   @Since("1.1.0")
   def copy(): RandomDataGenerator[T]
 }
 
 /**
- * :: DeveloperApi ::
- * Generates i.i.d. samples from U[0.0, 1.0]
- */
+  * :: DeveloperApi ::
+  * Generates i.i.d. samples from U[0.0, 1.0]
+  */
 @DeveloperApi
 @Since("1.1.0")
 class UniformGenerator extends RandomDataGenerator[Double] {
@@ -68,9 +68,9 @@ class UniformGenerator extends RandomDataGenerator[Double] {
 }
 
 /**
- * :: DeveloperApi ::
- * Generates i.i.d. samples from the standard normal distribution.
- */
+  * :: DeveloperApi ::
+  * Generates i.i.d. samples from the standard normal distribution.
+  */
 @DeveloperApi
 @Since("1.1.0")
 class StandardNormalGenerator extends RandomDataGenerator[Double] {
@@ -80,7 +80,7 @@ class StandardNormalGenerator extends RandomDataGenerator[Double] {
 
   @Since("1.1.0")
   override def nextValue(): Double = {
-      random.nextGaussian()
+    random.nextGaussian()
   }
 
   @Since("1.1.0")
@@ -91,15 +91,15 @@ class StandardNormalGenerator extends RandomDataGenerator[Double] {
 }
 
 /**
- * :: DeveloperApi ::
- * Generates i.i.d. samples from the Poisson distribution with the given mean.
- *
- * @param mean mean for the Poisson distribution.
- */
+  * :: DeveloperApi ::
+  * Generates i.i.d. samples from the Poisson distribution with the given mean.
+  *
+  * @param mean mean for the Poisson distribution.
+  */
 @DeveloperApi
 @Since("1.1.0")
-class PoissonGenerator @Since("1.1.0") (
-    @Since("1.1.0") val mean: Double) extends RandomDataGenerator[Double] {
+class PoissonGenerator @Since("1.1.0")(@Since("1.1.0") val mean: Double)
+    extends RandomDataGenerator[Double] {
 
   private val rng = new PoissonDistribution(mean)
 
@@ -116,15 +116,15 @@ class PoissonGenerator @Since("1.1.0") (
 }
 
 /**
- * :: DeveloperApi ::
- * Generates i.i.d. samples from the exponential distribution with the given mean.
- *
- * @param mean mean for the exponential distribution.
- */
+  * :: DeveloperApi ::
+  * Generates i.i.d. samples from the exponential distribution with the given mean.
+  *
+  * @param mean mean for the exponential distribution.
+  */
 @DeveloperApi
 @Since("1.3.0")
-class ExponentialGenerator @Since("1.3.0") (
-    @Since("1.3.0") val mean: Double) extends RandomDataGenerator[Double] {
+class ExponentialGenerator @Since("1.3.0")(@Since("1.3.0") val mean: Double)
+    extends RandomDataGenerator[Double] {
 
   private val rng = new ExponentialDistribution(mean)
 
@@ -141,17 +141,17 @@ class ExponentialGenerator @Since("1.3.0") (
 }
 
 /**
- * :: DeveloperApi ::
- * Generates i.i.d. samples from the gamma distribution with the given shape and scale.
- *
- * @param shape shape for the gamma distribution.
- * @param scale scale for the gamma distribution
- */
+  * :: DeveloperApi ::
+  * Generates i.i.d. samples from the gamma distribution with the given shape and scale.
+  *
+  * @param shape shape for the gamma distribution.
+  * @param scale scale for the gamma distribution
+  */
 @DeveloperApi
 @Since("1.3.0")
-class GammaGenerator @Since("1.3.0") (
-    @Since("1.3.0") val shape: Double,
-    @Since("1.3.0") val scale: Double) extends RandomDataGenerator[Double] {
+class GammaGenerator @Since("1.3.0")(
+    @Since("1.3.0") val shape: Double, @Since("1.3.0") val scale: Double)
+    extends RandomDataGenerator[Double] {
 
   private val rng = new GammaDistribution(shape, scale)
 
@@ -168,18 +168,18 @@ class GammaGenerator @Since("1.3.0") (
 }
 
 /**
- * :: DeveloperApi ::
- * Generates i.i.d. samples from the log normal distribution with the
- * given mean and standard deviation.
- *
- * @param mean mean for the log normal distribution.
- * @param std standard deviation for the log normal distribution
- */
+  * :: DeveloperApi ::
+  * Generates i.i.d. samples from the log normal distribution with the
+  * given mean and standard deviation.
+  *
+  * @param mean mean for the log normal distribution.
+  * @param std standard deviation for the log normal distribution
+  */
 @DeveloperApi
 @Since("1.3.0")
-class LogNormalGenerator @Since("1.3.0") (
-    @Since("1.3.0") val mean: Double,
-    @Since("1.3.0") val std: Double) extends RandomDataGenerator[Double] {
+class LogNormalGenerator @Since("1.3.0")(
+    @Since("1.3.0") val mean: Double, @Since("1.3.0") val std: Double)
+    extends RandomDataGenerator[Double] {
 
   private val rng = new LogNormalDistribution(mean, std)
 
@@ -196,17 +196,16 @@ class LogNormalGenerator @Since("1.3.0") (
 }
 
 /**
- * :: DeveloperApi ::
- * Generates i.i.d. samples from the Weibull distribution with the
- * given shape and scale parameter.
- *
- * @param alpha shape parameter for the Weibull distribution.
- * @param beta scale parameter for the Weibull distribution.
- */
+  * :: DeveloperApi ::
+  * Generates i.i.d. samples from the Weibull distribution with the
+  * given shape and scale parameter.
+  *
+  * @param alpha shape parameter for the Weibull distribution.
+  * @param beta scale parameter for the Weibull distribution.
+  */
 @DeveloperApi
-class WeibullGenerator(
-    val alpha: Double,
-    val beta: Double) extends RandomDataGenerator[Double] {
+class WeibullGenerator(val alpha: Double, val beta: Double)
+    extends RandomDataGenerator[Double] {
 
   private val rng = new WeibullDistribution(alpha, beta)
 

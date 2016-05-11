@@ -13,4 +13,3 @@ object Test extends App {
   def meh2(x: Int)(implicit b: Int, a: sth.Sth): Unit = {}
   meh2(1)
 }
-

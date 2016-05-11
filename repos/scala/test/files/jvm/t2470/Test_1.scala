@@ -5,7 +5,8 @@ object Test {
   }
 
   def main(args: Array[String]) {
-    val m = classOf[Foo].getDeclaredMethods().find(_.toString.contains("foo")).get
+    val m =
+      classOf[Foo].getDeclaredMethods().find(_.toString.contains("foo")).get
     println(m.getAnnotations().toList)
   }
 }

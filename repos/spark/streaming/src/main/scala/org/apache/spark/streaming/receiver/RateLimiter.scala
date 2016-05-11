@@ -36,24 +36,26 @@ import org.apache.spark.internal.Logging
 private[receiver] abstract class RateLimiter(conf: SparkConf) extends Logging {
 
   // treated as an upper limit
-  private val maxRateLimit = conf.getLong("spark.streaming.receiver.maxRate", Long.MaxValue)
-  private lazy val rateLimiter = GuavaRateLimiter.create(getInitialRateLimit().toDouble)
+  private val maxRateLimit =
+    conf.getLong("spark.streaming.receiver.maxRate", Long.MaxValue)
+  private lazy val rateLimiter =
+    GuavaRateLimiter.create(getInitialRateLimit().toDouble)
 
   def waitToPush() {
     rateLimiter.acquire()
   }
 
   /**
-   * Return the current rate limit. If no limit has been set so far, it returns {{{Long.MaxValue}}}.
-   */
+    * Return the current rate limit. If no limit has been set so far, it returns {{{Long.MaxValue}}}.
+    */
   def getCurrentLimit: Long = rateLimiter.getRate.toLong
 
   /**
-   * Set the rate limit to `newRate`. The new rate will not exceed the maximum rate configured by
-   * {{{spark.streaming.receiver.maxRate}}}, even if `newRate` is higher than that.
-   *
-   * @param newRate A new rate in events per second. It has no effect if it's 0 or negative.
-   */
+    * Set the rate limit to `newRate`. The new rate will not exceed the maximum rate configured by
+    * {{{spark.streaming.receiver.maxRate}}}, even if `newRate` is higher than that.
+    *
+    * @param newRate A new rate in events per second. It has no effect if it's 0 or negative.
+    */
   private[receiver] def updateRate(newRate: Long): Unit =
     if (newRate > 0) {
       if (maxRateLimit > 0) {
@@ -64,9 +66,11 @@ private[receiver] abstract class RateLimiter(conf: SparkConf) extends Logging {
     }
 
   /**
-   * Get the initial rateLimit to initial rateLimiter
-   */
+    * Get the initial rateLimit to initial rateLimiter
+    */
   private def getInitialRateLimit(): Long = {
-    math.min(conf.getLong("spark.streaming.backpressure.initialRate", maxRateLimit), maxRateLimit)
+    math.min(
+        conf.getLong("spark.streaming.backpressure.initialRate", maxRateLimit),
+        maxRateLimit)
   }
 }

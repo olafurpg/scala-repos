@@ -4,5 +4,4 @@ class Foo(val bar: Double) extends AnyVal {
 object Test {
   def main(args: Array[String]): Unit =
     new Foo("")
- }
-
+}

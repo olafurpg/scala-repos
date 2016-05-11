@@ -31,72 +31,85 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.{ThreadUtils, Utils}
 
 private[spark] class ExecutorDelegationTokenUpdater(
-    sparkConf: SparkConf,
-    hadoopConf: Configuration) extends Logging {
+    sparkConf: SparkConf, hadoopConf: Configuration)
+    extends Logging {
 
   @volatile private var lastCredentialsFileSuffix = 0
 
   private val credentialsFile = sparkConf.get(CREDENTIALS_FILE_PATH)
-  private val freshHadoopConf =
-    SparkHadoopUtil.get.getConfBypassingFSCache(
+  private val freshHadoopConf = SparkHadoopUtil.get.getConfBypassingFSCache(
       hadoopConf, new Path(credentialsFile).toUri.getScheme)
 
   private val delegationTokenRenewer =
     Executors.newSingleThreadScheduledExecutor(
-      ThreadUtils.namedThreadFactory("Delegation Token Refresh Thread"))
+        ThreadUtils.namedThreadFactory("Delegation Token Refresh Thread"))
 
   // On the executor, this thread wakes up and picks up new tokens from HDFS, if any.
-  private val executorUpdaterRunnable =
-    new Runnable {
-      override def run(): Unit = Utils.logUncaughtExceptions(updateCredentialsIfRequired())
-    }
+  private val executorUpdaterRunnable = new Runnable {
+    override def run(): Unit =
+      Utils.logUncaughtExceptions(updateCredentialsIfRequired())
+  }
 
   def updateCredentialsIfRequired(): Unit = {
     try {
       val credentialsFilePath = new Path(credentialsFile)
       val remoteFs = FileSystem.get(freshHadoopConf)
-      SparkHadoopUtil.get.listFilesSorted(
-        remoteFs, credentialsFilePath.getParent,
-        credentialsFilePath.getName, SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
-        .lastOption.foreach { credentialsStatus =>
-        val suffix = SparkHadoopUtil.get.getSuffixForCredentialsPath(credentialsStatus.getPath)
-        if (suffix > lastCredentialsFileSuffix) {
-          logInfo("Reading new delegation tokens from " + credentialsStatus.getPath)
-          val newCredentials = getCredentialsFromHDFSFile(remoteFs, credentialsStatus.getPath)
-          lastCredentialsFileSuffix = suffix
-          UserGroupInformation.getCurrentUser.addCredentials(newCredentials)
-          logInfo("Tokens updated from credentials file.")
-        } else {
-          // Check every hour to see if new credentials arrived.
-          logInfo("Updated delegation tokens were expected, but the driver has not updated the " +
-            "tokens yet, will check again in an hour.")
-          delegationTokenRenewer.schedule(executorUpdaterRunnable, 1, TimeUnit.HOURS)
-          return
+      SparkHadoopUtil.get
+        .listFilesSorted(remoteFs,
+                         credentialsFilePath.getParent,
+                         credentialsFilePath.getName,
+                         SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
+        .lastOption
+        .foreach { credentialsStatus =>
+          val suffix = SparkHadoopUtil.get.getSuffixForCredentialsPath(
+              credentialsStatus.getPath)
+          if (suffix > lastCredentialsFileSuffix) {
+            logInfo("Reading new delegation tokens from " +
+                credentialsStatus.getPath)
+            val newCredentials =
+              getCredentialsFromHDFSFile(remoteFs, credentialsStatus.getPath)
+            lastCredentialsFileSuffix = suffix
+            UserGroupInformation.getCurrentUser.addCredentials(newCredentials)
+            logInfo("Tokens updated from credentials file.")
+          } else {
+            // Check every hour to see if new credentials arrived.
+            logInfo(
+                "Updated delegation tokens were expected, but the driver has not updated the " +
+                "tokens yet, will check again in an hour.")
+            delegationTokenRenewer.schedule(
+                executorUpdaterRunnable, 1, TimeUnit.HOURS)
+            return
+          }
         }
-      }
-      val timeFromNowToRenewal =
-        SparkHadoopUtil.get.getTimeFromNowToRenewal(
+      val timeFromNowToRenewal = SparkHadoopUtil.get.getTimeFromNowToRenewal(
           sparkConf, 0.8, UserGroupInformation.getCurrentUser.getCredentials)
       if (timeFromNowToRenewal <= 0) {
         // We just checked for new credentials but none were there, wait a minute and retry.
         // This handles the shutdown case where the staging directory may have been removed(see
         // SPARK-12316 for more details).
-        delegationTokenRenewer.schedule(executorUpdaterRunnable, 1, TimeUnit.MINUTES)
-      } else {
-        logInfo(s"Scheduling token refresh from HDFS in $timeFromNowToRenewal millis.")
         delegationTokenRenewer.schedule(
-          executorUpdaterRunnable, timeFromNowToRenewal, TimeUnit.MILLISECONDS)
+            executorUpdaterRunnable, 1, TimeUnit.MINUTES)
+      } else {
+        logInfo(
+            s"Scheduling token refresh from HDFS in $timeFromNowToRenewal millis.")
+        delegationTokenRenewer.schedule(executorUpdaterRunnable,
+                                        timeFromNowToRenewal,
+                                        TimeUnit.MILLISECONDS)
       }
     } catch {
       // Since the file may get deleted while we are reading it, catch the Exception and come
       // back in an hour to try again
       case NonFatal(e) =>
-        logWarning("Error while trying to update credentials, will try again in 1 hour", e)
-        delegationTokenRenewer.schedule(executorUpdaterRunnable, 1, TimeUnit.HOURS)
+        logWarning(
+            "Error while trying to update credentials, will try again in 1 hour",
+            e)
+        delegationTokenRenewer.schedule(
+            executorUpdaterRunnable, 1, TimeUnit.HOURS)
     }
   }
 
-  private def getCredentialsFromHDFSFile(remoteFs: FileSystem, tokenPath: Path): Credentials = {
+  private def getCredentialsFromHDFSFile(
+      remoteFs: FileSystem, tokenPath: Path): Credentials = {
     val stream = remoteFs.open(tokenPath)
     try {
       val newCredentials = new Credentials()
@@ -110,5 +123,4 @@ private[spark] class ExecutorDelegationTokenUpdater(
   def stop(): Unit = {
     delegationTokenRenewer.shutdown()
   }
-
 }

@@ -13,7 +13,7 @@ object A3 {
 
 class A4 {
   def f(l: List[String]): List[String] = {
-    l map (_ + "1") : @noinline // inlining adds a reference to the nested class scala/collection/generic/GenTraversableFactory$GenericCanBuildFrom
+    l map (_ + "1"): @noinline // inlining adds a reference to the nested class scala/collection/generic/GenTraversableFactory$GenericCanBuildFrom
   }
 }
 
@@ -42,11 +42,13 @@ class A9 {
 class A10 {
   val a9 = new A9()
   // there's no reference to brick in the bytecode (only in the pickle), so there's no InnerClass attribute for it.
-  @a9.brick def f = -7
+  @a9.brick
+  def f = -7
 }
 
 class A11 {
-  @JavaAnnot_1.Ann def f = -8
+  @JavaAnnot_1.Ann
+  def f = -8
 }
 
 object A12 {
@@ -68,13 +70,14 @@ class A14 {
     x
   }
   def g = {
-    val x: Object = new A6 { }
+    val x: Object = new A6 {}
   }
 }
 
 object A15 {
   def f = {
-    class B { // non-static, even though it doesn't have an outer pointer
+    class B {
+      // non-static, even though it doesn't have an outer pointer
       class C // non-static
     }
   }
@@ -83,15 +86,15 @@ object A15 {
 class A16 {
   val x: A6 = {
     class U extends A6
-    new A6 { }
+    new A6 {}
   }
 
   {
     class V extends A6
-    new A6 { }
+    new A6 {}
   }
 
-  new A6 { }
+  new A6 {}
 }
 
 class A17 {
@@ -104,32 +107,33 @@ class A18 {
   def f = {
     def g = {
       class A
-      new A6 { }
+      new A6 {}
       val y = {
-        if ((new Object).hashCode() == 1) {class B {} ; new B} else 2
-        if ((new Object).hashCode() == 1) new A6 { } else "haifish"
+        if ((new Object).hashCode() == 1) { class B {}; new B } else 2
+        if ((new Object).hashCode() == 1) new A6 {} else "haifish"
       }
     }
   }
 }
 
-class A19 {
-  ((x: String) => x + "3")
+class A19 { ((x: String) => x + "3")
 
-  val x = {
-    ((x: String) => x + "1")
-  }
-
-  {
-    ((x: String) => x + "2")
-  }
+val x = { ((x: String) => x + "1")
 }
 
-class A20 {
-  (s: String) => {
-    {(s: String) => ()}
-    {(s: String) => (s: String) => 1}
-  }
+{ ((x: String) => x + "2")
+}
+}
+
+class A20 { (s: String) =>
+  {
+    { (s: String) =>
+      ()
+    }
+    { (s: String) => (s: String) =>
+      1
+    }
+}
 }
 
 class A21 {
@@ -139,7 +143,7 @@ class A21 {
 object A21 {
   class I2
   object I3 {
-    class J2  // static
+    class J2 // static
   }
   def g = { class J3 } // non-static
   val x = { class J4 } // non-static
@@ -173,7 +177,7 @@ trait A24Base {
   // trait with concrete members: interface plus (absract) impl class
   trait DefinitionsApi {
     def Abs: A24Sym
-    def Conc: A24Sym = new A24Sym { }
+    def Conc: A24Sym = new A24Sym {}
   }
 }
 
@@ -186,29 +190,32 @@ trait A24 extends A24Base {
   }
 }
 
-class SI_9105 {    
-                                       //      outerClass       enclMeth
-  val fun = (s: String) => {
-    class A                            //        SI_9105           null
-    def m: Object = { class B; new B } //        SI_9105            m$1
-    val f: Object = { class C; new C } //        SI_9105           null
+class SI_9105 {
+  //      outerClass       enclMeth
+  val fun = (s: String) =>
+    {
+      class A //        SI_9105           null
+      def m: Object = { class B; new B } //        SI_9105            m$1
+      val f: Object = { class C; new C } //        SI_9105           null
   }
-  def met = (s: String) => {
-    class D                            //        SI_9105            met
-    def m: Object = { class E; new E } //        SI_9105            m$1
-    val f: Object = { class F; new F } //        SI_9105            met
-  }
+  def met =
+    (s: String) =>
+      {
+        class D //        SI_9105            met
+        def m: Object = { class E; new E } //        SI_9105            m$1
+        val f: Object = { class F; new F } //        SI_9105            met
+    }
 
   def byName(op: => Any) = 0
 
   val bnV = byName {
-    class G                            //        SI_9105           null
+    class G //        SI_9105           null
     def m: Object = { class H; new H } //        SI_9105            m$1
     val f: Object = { class I; new I } //        SI_9105           null
     ""
   }
   def bnM = byName {
-    class J                            //        SI_9105            bnM
+    class J //        SI_9105            bnM
     def m: Object = { class K; new K } //        SI_9105            m$1
     val f: Object = { class L; new L } //        SI_9105            bnM
     ""
@@ -224,11 +231,12 @@ trait SI_9124 {
 
   private def g: Object = new A { def f3 = 0 } // only encl class (SI_9124), encl meth can be g in 2.12 because the interface SI_9124 now has the method g
 
-  object O { // member, no encl meth attribute
+  object O {
+    // member, no encl meth attribute
     new A { def f4 = 0 } // enclosing class is O$, no enclosing method
   }
 
-          val f1 = { new A { def f5 = 0 }; 1 } // encl class SI_9124, no encl meth
+  val f1 = { new A { def f5 = 0 }; 1 } // encl class SI_9124, no encl meth
   private val f2 = { new A { def f6 = 0 }; 1 } // like above
 }
 
@@ -274,8 +282,9 @@ object NestedInValueClass {
   class A(val arg: String) extends AnyVal {
     // A has InnerClass entries for the two closures (and for A and A$). not for B / C
     def f = {
-      def g = List().map(x => ((s: String) => x)): @noinline // outer class A, no outer method (g is moved to the companion, doesn't exist in A)
-      g.map(x => ((s: String) => x)): @noinline              // outer class A, outer method f
+      def g =
+        List().map(x => ((s: String) => x)): @noinline // outer class A, no outer method (g is moved to the companion, doesn't exist in A)
+      g.map(x => ((s: String) => x)): @noinline // outer class A, outer method f
     }
     // statements and field declarations are not allowed in value classes
   }

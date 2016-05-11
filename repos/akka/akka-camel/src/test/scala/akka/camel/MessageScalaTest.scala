@@ -1,12 +1,11 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.camel
 
 import java.io.InputStream
 import org.apache.camel.NoTypeConversionAvailableException
-import akka.camel.TestSupport.{ SharedCamelSystem }
+import akka.camel.TestSupport.{SharedCamelSystem}
 import org.scalatest.FunSuite
 import org.scalatest.Matchers
 import org.apache.camel.converter.stream.InputStreamCache
@@ -34,25 +33,28 @@ class MessageScalaTest extends FunSuite with Matchers with SharedCamelSystem {
   }
 
   test("mustTransformBodyAndPreserveHeaders") {
-    CamelMessage("a", Map("A" -> "1")).mapBody((body: String) ⇒ body + "b") should ===(CamelMessage("ab", Map("A" -> "1")))
+    CamelMessage("a", Map("A" -> "1")).mapBody((body: String) ⇒ body + "b") should ===(
+        CamelMessage("ab", Map("A" -> "1")))
   }
 
   test("mustConvertBodyAndPreserveHeaders") {
-    CamelMessage(1.4, Map("A" -> "1")).withBodyAs[String] should ===(CamelMessage("1.4", Map("A" -> "1")))
+    CamelMessage(1.4, Map("A" -> "1")).withBodyAs[String] should ===(
+        CamelMessage("1.4", Map("A" -> "1")))
   }
 
   test("mustSetBodyAndPreserveHeaders") {
     CamelMessage("test1", Map("A" -> "1")).copy(body = "test2") should ===(
-      CamelMessage("test2", Map("A" -> "1")))
+        CamelMessage("test2", Map("A" -> "1")))
   }
 
   test("mustSetHeadersAndPreserveBody") {
     CamelMessage("test1", Map("A" -> "1")).copy(headers = Map("C" -> "3")) should ===(
-      CamelMessage("test1", Map("C" -> "3")))
+        CamelMessage("test1", Map("C" -> "3")))
   }
 
   test("mustBeAbleToReReadStreamCacheBody") {
-    val msg = CamelMessage(new InputStreamCache("test1".getBytes("utf-8")), Map.empty)
+    val msg =
+      CamelMessage(new InputStreamCache("test1".getBytes("utf-8")), Map.empty)
     msg.bodyAs[String] should ===("test1")
     // re-read
     msg.bodyAs[String] should ===("test1")

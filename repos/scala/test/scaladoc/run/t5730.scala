@@ -25,12 +25,18 @@ object Test extends ScaladocModelTest {
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
-    val p = rootPackage._package("scala")._package("test")._package("scaladoc")._package("T5730")
+    val p = rootPackage
+      ._package("scala")
+      ._package("test")
+      ._package("scaladoc")
+      ._package("T5730")
 
     val a = p._class("A")
     val c = p._class("C")
 
-    assert(a.constructors.isEmpty, s"there should be no constructors, found: ${a.constructors}")
-    assert(c.constructors.isEmpty, s"there should be no constructors, found: ${c.constructors}")
+    assert(a.constructors.isEmpty,
+           s"there should be no constructors, found: ${a.constructors}")
+    assert(c.constructors.isEmpty,
+           s"there should be no constructors, found: ${c.constructors}")
   }
 }

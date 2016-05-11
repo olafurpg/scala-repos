@@ -12,30 +12,31 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird.online
 
-import com.twitter.util.{ Await, Duration, Future, Try }
+import com.twitter.util.{Await, Duration, Future, Try}
 
-import java.util.{ Queue => JQueue }
-import java.util.concurrent.{ ArrayBlockingQueue, BlockingQueue, LinkedBlockingQueue, TimeUnit }
+import java.util.{Queue => JQueue}
+import java.util.concurrent.{ArrayBlockingQueue, BlockingQueue, LinkedBlockingQueue, TimeUnit}
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
-/**
- *
- * @author Oscar Boykin
- */
 
+/**
+  *
+  * @author Oscar Boykin
+  */
 object Queue {
+
   /**
-   * By default, don't block on put
-   */
+    * By default, don't block on put
+    */
   def apply[T]() = linkedNonBlocking[T]
 
   /**
-   * Use this for blocking puts when the size is reached
-   */
+    * Use this for blocking puts when the size is reached
+    */
   def arrayBlocking[T](size: Int): Queue[T] =
     fromBlocking(new ArrayBlockingQueue(size))
 
@@ -62,17 +63,17 @@ object Queue {
 }
 
 /**
- * Use this class with a thread-safe queue to receive
- * results from futures in one thread.
- * Storm needs us to touch it's code in one event path (via
- * the execute method in bolts)
- */
+  * Use this class with a thread-safe queue to receive
+  * results from futures in one thread.
+  * Storm needs us to touch it's code in one event path (via
+  * the execute method in bolts)
+  */
 abstract class Queue[T] {
 
   /**
-   * These are the only two methods to implement.
-   * these must be thread-safe.
-   */
+    * These are the only two methods to implement.
+    * these must be thread-safe.
+    */
   protected def add(t: T): Unit
   protected def pollNonBlocking: Option[T]
 
@@ -99,8 +100,8 @@ abstract class Queue[T] {
   }
 
   /**
-   * check if something is ready now
-   */
+    * check if something is ready now
+    */
   def poll: Option[T] = {
     val res = pollNonBlocking
     // This is for performance sensitive code. Prefering if to match defensively
@@ -109,9 +110,9 @@ abstract class Queue[T] {
   }
 
   /**
-   * Obviously, this might not be the same by the time you
-   * call trimTo or poll
-   */
+    * Obviously, this might not be the same by the time you
+    * call trimTo or poll
+    */
   def size: Int = count.get
 
   // Do something on all the elements ready:
@@ -136,15 +137,14 @@ abstract class Queue[T] {
   def toSeq: Seq[T] = trimTo(0)
 
   /**
-   * Take items currently in the queue up to the max sequence size we want to return
-   * Due to threading/muliple readers/writers this will not be an exact size
-   */
-
+    * Take items currently in the queue up to the max sequence size we want to return
+    * Due to threading/muliple readers/writers this will not be an exact size
+    */
   def take(maxSeqSize: Int): Seq[T] = trimTo(math.max(size - maxSeqSize, 0))
 
   /**
-   * Take enough elements to get .size == maxLength
-   */
+    * Take enough elements to get .size == maxLength
+    */
   def trimTo(maxLength: Int): Seq[T] = {
     require(maxLength >= 0, "maxLength must be >= 0.")
 

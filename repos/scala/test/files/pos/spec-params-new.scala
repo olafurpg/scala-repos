@@ -1,6 +1,6 @@
 import scala.reflect.{ClassTag, classTag}
 
-class Foo[@specialized A: ClassTag] {
+class Foo[@specialized A : ClassTag] {
 
   // conflicting in bounds, expect a normalized member calling m
   // and bridge + implementation in specialized subclasses

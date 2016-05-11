@@ -12,11 +12,11 @@ class TagMapTest extends FunSuite with GeneratorDrivenPropertyChecks {
   val min = 8
   val max = 10000
 
-  implicit val genTagSet: Arbitrary[TagSet] =
-    Arbitrary(for {
-      start <- Gen.choose(0, max)
-      end <- Gen.choose(start, max-min)
-    } yield TagSet(start to end+min))
+  implicit val genTagSet: Arbitrary[TagSet] = Arbitrary(
+      for {
+    start <- Gen.choose(0, max)
+    end <- Gen.choose(start, max - min)
+  } yield TagSet(start to end + min))
 
   test("map tags to elems") {
     forAll { set: TagSet =>
@@ -30,10 +30,10 @@ class TagMapTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("ignore tags outside its range") {
     forAll { set: TagSet =>
       val range = set.range
-      val right = range.last+1
+      val right = range.last + 1
       val ints = TagMap[java.lang.Integer](set)
       assert(ints.unmap(right) == None)
-      val left = range.start-1
+      val left = range.start - 1
       assert(ints.unmap(left) == None)
     }
   }
@@ -45,19 +45,21 @@ class TagMapTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
       for (i <- range) assert(ints.map(-i) == Some(i))
 
-      assert(ints.sameElements(range.map { i => (i, -i) }))
+      assert(ints.sameElements(range.map { i =>
+        (i, -i)
+      }))
 
-      ints.unmap(3+range.start)
-      ints.unmap(8+range.start)
+      ints.unmap(3 + range.start)
+      ints.unmap(8 + range.start)
       assert(ints.sameElements(range.collect {
-        case i if i != 3+range.start && i != 8+range.start => (i, -i)
+        case i if i != 3 + range.start && i != 8 + range.start => (i, -i)
       }))
 
       // Works in the presence of sharing the underlying
       // TagSet.
-      assert(set.acquire() == Some(3+range.start))
+      assert(set.acquire() == Some(3 + range.start))
       assert(ints.sameElements(range.collect {
-        case i if i != 3+range.start && i != 8+range.start => (i, -i)
+        case i if i != 3 + range.start && i != 8 + range.start => (i, -i)
       }))
     }
   }

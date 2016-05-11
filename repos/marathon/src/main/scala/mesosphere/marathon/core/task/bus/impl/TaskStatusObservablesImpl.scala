@@ -3,9 +3,10 @@ package mesosphere.marathon.core.task.bus.impl
 import mesosphere.marathon.core.task.bus.TaskStatusObservables
 import mesosphere.marathon.core.task.bus.TaskStatusObservables.TaskStatusUpdate
 import mesosphere.marathon.state.PathId
-import rx.lang.scala.{ Observable, Subscription }
+import rx.lang.scala.{Observable, Subscription}
 
-private[bus] class TaskStatusObservablesImpl(eventStream: InternalTaskStatusEventStream)
+private[bus] class TaskStatusObservablesImpl(
+    eventStream: InternalTaskStatusEventStream)
     extends TaskStatusObservables {
 
   override def forAll: Observable[TaskStatusUpdate] = forAppId(PathId.empty)
@@ -19,4 +20,3 @@ private[bus] class TaskStatusObservablesImpl(eventStream: InternalTaskStatusEven
     }
   }
 }
-

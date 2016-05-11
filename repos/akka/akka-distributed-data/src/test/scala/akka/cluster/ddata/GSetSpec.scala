@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 import akka.cluster.ddata.Replicator.Changed
@@ -114,6 +113,5 @@ class GSetSpec extends WordSpec with Matchers {
           elements4 should be(Set("a", "b"))
       }
     }
-
   }
 }

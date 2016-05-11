@@ -17,7 +17,7 @@
 package com.twitter.summingbird.viz
 
 import com.twitter.summingbird._
-import scala.collection.mutable.{ Map => MMap }
+import scala.collection.mutable.{Map => MMap}
 
 case class ProducerViz[P <: Platform[P]](tail: Producer[P, _]) {
   private val dependantState = Dependants(tail)
@@ -30,7 +30,8 @@ case class ProducerViz[P <: Platform[P]](tail: Producer[P, _]) {
   def getName(node: Producer[P, _]): String = {
     val preferredName = node match {
       case NamedProducer(parent, name) => "NamedProducer(%s)".format(name)
-      case _ => node.getClass.getName.replaceFirst("com.twitter.summingbird.", "")
+      case _ =>
+        node.getClass.getName.replaceFirst("com.twitter.summingbird.", "")
     }
 
     nodeLookupTable.get(node) match {
@@ -38,12 +39,12 @@ case class ProducerViz[P <: Platform[P]](tail: Producer[P, _]) {
       case None =>
         nameLookupTable.get(preferredName) match {
           case Some(count) => {
-            val newNum = count + 1
-            val newName = preferredName + "[" + newNum + "]"
-            nodeLookupTable += (node -> newName)
-            nameLookupTable += (preferredName -> newNum)
-            newName
-          }
+              val newNum = count + 1
+              val newName = preferredName + "[" + newNum + "]"
+              nodeLookupTable += (node -> newName)
+              nameLookupTable += (preferredName -> newNum)
+              newName
+            }
           case None =>
             nodeLookupTable += (node -> preferredName)
             nameLookupTable += (preferredName -> 1)
@@ -55,7 +56,10 @@ case class ProducerViz[P <: Platform[P]](tail: Producer[P, _]) {
   override def toString(): String = {
     val base = "digraph summingbirdGraph {\n"
     val graphStr = dependantState.nodes.flatMap { evalNode =>
-      val children = dependantState.dependantsOf(evalNode).getOrElse(sys.error("Invalid node: %s, unable to find dependants".format(evalNode)))
+      val children = dependantState
+        .dependantsOf(evalNode)
+        .getOrElse(sys.error("Invalid node: %s, unable to find dependants"
+                  .format(evalNode)))
       val nodeName = getName(evalNode)
       children.map { c =>
         "\"%s\" -> \"%s\"\n".format(nodeName, getName(c))

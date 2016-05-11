@@ -29,9 +29,9 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
   val m = 4
   val n = 3
   val data = Seq(
-    (0L, Vectors.dense(0.0, 1.0, 2.0)),
-    (1L, Vectors.dense(3.0, 4.0, 5.0)),
-    (3L, Vectors.dense(9.0, 0.0, 1.0))
+      (0L, Vectors.dense(0.0, 1.0, 2.0)),
+      (1L, Vectors.dense(3.0, 4.0, 5.0)),
+      (3L, Vectors.dense(9.0, 0.0, 1.0))
   ).map(x => IndexedRow(x._1, x._2))
   var indexedRows: RDD[IndexedRow] = _
 
@@ -63,11 +63,10 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("toBreeze") {
     val mat = new IndexedRowMatrix(indexedRows)
-    val expected = BDM(
-      (0.0, 1.0, 2.0),
-      (3.0, 4.0, 5.0),
-      (0.0, 0.0, 0.0),
-      (9.0, 0.0, 1.0))
+    val expected = BDM((0.0, 1.0, 2.0),
+                       (3.0, 4.0, 5.0),
+                       (0.0, 0.0, 0.0),
+                       (9.0, 0.0, 1.0))
     assert(mat.toBreeze() === expected)
   }
 
@@ -115,10 +114,8 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("gram") {
     val A = new IndexedRowMatrix(indexedRows)
     val G = A.computeGramianMatrix()
-    val expected = BDM(
-      (90.0, 12.0, 24.0),
-      (12.0, 17.0, 22.0),
-      (24.0, 22.0, 30.0))
+    val expected =
+      BDM((90.0, 12.0, 24.0), (12.0, 17.0, 22.0), (24.0, 22.0, 30.0))
     assert(G.toBreeze === expected)
   }
 
@@ -169,4 +166,3 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
     G.valuesIterator.map(math.abs).sum < 1e-6
   }
 }
-

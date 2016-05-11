@@ -1,8 +1,7 @@
 package java.lang
 
-class StringBuffer(private var content: String) extends CharSequence
-                                                   with Appendable
-                                                   with java.io.Serializable {
+class StringBuffer(private var content: String)
+    extends CharSequence with Appendable with java.io.Serializable {
   def this() = this("")
   def this(initialCapacity: Int) = this("")
   def this(csq: CharSequence) = this(csq.toString)
@@ -36,7 +35,7 @@ class StringBuffer(private var content: String) extends CharSequence
 
   def append(obj: AnyRef): StringBuffer = {
     if (obj == null) append(null: String)
-    else             append(obj.toString())
+    else append(obj.toString())
   }
 
   def append(csq: CharSequence): StringBuffer = append(csq: AnyRef)
@@ -76,8 +75,9 @@ class StringBuffer(private var content: String) extends CharSequence
 
   def deleteCharAt(index: Int): StringBuffer = {
     if (index < 0 || index >= content.length)
-      throw new StringIndexOutOfBoundsException("String index out of range: " + index)
-    content = content.substring(0, index) + content.substring(index+1)
+      throw new StringIndexOutOfBoundsException(
+          "String index out of range: " + index)
+    content = content.substring(0, index) + content.substring(index + 1)
     this
   }
 
@@ -86,11 +86,11 @@ class StringBuffer(private var content: String) extends CharSequence
   }
 
   /**
-   * @param start The beginning index, inclusive.
-   * @param end The ending index, exclusive.
-   * @param str String that will replace previous contents.
-   * @return This StringBuilder.
-   */
+    * @param start The beginning index, inclusive.
+    * @param end The ending index, exclusive.
+    * @param str String that will replace previous contents.
+    * @return This StringBuilder.
+    */
   def replace(start: Int, end: Int, str: String): StringBuffer = {
     val length = content.length
     if (start < 0 || start > end || start > length) {
@@ -105,17 +105,18 @@ class StringBuffer(private var content: String) extends CharSequence
 
   def setCharAt(index: Int, ch: scala.Char): Unit = {
     if (index < 0 || index >= content.length)
-      throw new IndexOutOfBoundsException("String index out of range: " + index)
+      throw new IndexOutOfBoundsException(
+          "String index out of range: " + index)
     content = content.substring(0, index) + ch + content.substring(index + 1)
   }
 
   def setLength(newLength: Int): Unit = {
     if (newLength < 0)
-      throw new IndexOutOfBoundsException("String index out of range: " + newLength)
+      throw new IndexOutOfBoundsException(
+          "String index out of range: " + newLength)
 
     val len = length()
-    if (len == newLength) {
-    } else if (len < newLength) {
+    if (len == newLength) {} else if (len < newLength) {
       var index = len
       while (index < newLength) {
         append("\u0000")
@@ -126,31 +127,40 @@ class StringBuffer(private var content: String) extends CharSequence
     }
   }
 
-  def insert(index: Int, b: scala.Boolean): StringBuffer        = insert(index, b.toString)
-  def insert(index: Int, b: scala.Byte): StringBuffer           = insert(index, b.toString)
-  def insert(index: Int, s: scala.Short): StringBuffer          = insert(index, s.toString)
-  def insert(index: Int, i: scala.Int): StringBuffer            = insert(index, i.toString)
-  def insert(index: Int, l: scala.Long): StringBuffer           = insert(index, l.toString)
-  def insert(index: Int, f: scala.Float): StringBuffer          = insert(index, f.toString)
-  def insert(index: Int, d: scala.Double): StringBuffer         = insert(index, d.toString)
-  def insert(index: Int, c: scala.Char): StringBuffer           = insert(index, c.toString)
-  def insert(index: Int, csq: CharSequence): StringBuffer       = insert(index: Int, csq: AnyRef)
-  def insert(index: Int, arr: Array[scala.Char]): StringBuffer  = insert(index, arr, 0, arr.length)
+  def insert(index: Int, b: scala.Boolean): StringBuffer =
+    insert(index, b.toString)
+  def insert(index: Int, b: scala.Byte): StringBuffer =
+    insert(index, b.toString)
+  def insert(index: Int, s: scala.Short): StringBuffer =
+    insert(index, s.toString)
+  def insert(index: Int, i: scala.Int): StringBuffer =
+    insert(index, i.toString)
+  def insert(index: Int, l: scala.Long): StringBuffer =
+    insert(index, l.toString)
+  def insert(index: Int, f: scala.Float): StringBuffer =
+    insert(index, f.toString)
+  def insert(index: Int, d: scala.Double): StringBuffer =
+    insert(index, d.toString)
+  def insert(index: Int, c: scala.Char): StringBuffer =
+    insert(index, c.toString)
+  def insert(index: Int, csq: CharSequence): StringBuffer =
+    insert(index: Int, csq: AnyRef)
+  def insert(index: Int, arr: Array[scala.Char]): StringBuffer =
+    insert(index, arr, 0, arr.length)
 
   def insert(index: Int, ref: AnyRef): StringBuffer =
-    if (ref == null)
-      insert(index, null: String)
-    else
-      insert(index, ref.toString)
+    if (ref == null) insert(index, null: String)
+    else insert(index, ref.toString)
 
-  def insert(index: Int, csq: CharSequence, start: Int, end: Int): StringBuffer =
-    if (csq == null)
-      insert(index, "null", start, end)
-    else
-      insert(index, csq.subSequence(start, end).toString)
+  def insert(
+      index: Int, csq: CharSequence, start: Int, end: Int): StringBuffer =
+    if (csq == null) insert(index, "null", start, end)
+    else insert(index, csq.subSequence(start, end).toString)
 
-
-  def insert(index: Int, arr: Array[scala.Char], offset: Int, len: Int): StringBuffer = {
+  def insert(index: Int,
+             arr: Array[scala.Char],
+             offset: Int,
+             len: Int): StringBuffer = {
     var str = ""
     var i = 0
     while (i < len) {
@@ -164,10 +174,10 @@ class StringBuffer(private var content: String) extends CharSequence
     val thisLength = length()
     if (index < 0 || index > thisLength)
       throw new StringIndexOutOfBoundsException(index)
-    else if (index == thisLength)
-      append(str)
+    else if (index == thisLength) append(str)
     else
-      content = content.substring(0, index) + Option(str).getOrElse("null") + content.substring(index)
+      content = content.substring(0, index) + Option(str).getOrElse("null") +
+      content.substring(index)
     this
   }
 }

@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content._
 import scala.reflect._
 import scala.language.experimental.macros
-import scala.reflect.macros.blackbox.{ Context => MacroCtx }
+import scala.reflect.macros.blackbox.{Context => MacroCtx}
 
 object MacroImpl {
 

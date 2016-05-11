@@ -7,13 +7,14 @@ import com.twitter.logging.Logger
 trait LogFormatter[-Req, Rep] {
   def format(request: Req, reply: Rep, replyTime: Duration): String
 
-  def formatException(request: Req, throwable: Throwable, replyTime: Duration): String
+  def formatException(
+      request: Req, throwable: Throwable, replyTime: Duration): String
 }
 
 /**
- * A [[com.twitter.finagle.Filter]] that logs all requests according to
- * formatter.
- */
+  * A [[com.twitter.finagle.Filter]] that logs all requests according to
+  * formatter.
+  */
 trait LoggingFilter[Req, Rep] extends SimpleFilter[Req, Rep] {
   val log: Logger
   val formatter: LogFormatter[Req, Rep]
@@ -35,9 +36,9 @@ trait LoggingFilter[Req, Rep] extends SimpleFilter[Req, Rep] {
     log.info(line)
   }
 
-  protected def logException(replyTime: Duration, request: Req, throwable: Throwable) {
+  protected def logException(
+      replyTime: Duration, request: Req, throwable: Throwable) {
     val line = formatter.formatException(request, throwable, replyTime)
     log.info(throwable, line)
   }
-
 }

@@ -9,22 +9,23 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScVariable
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
 import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceExpression, ScalaResolveResult}
 
-
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 trait ScAssignStmt extends ScExpression {
-  def getLExpression: ScExpression = findChildByClassScala(classOf[ScExpression])
+  def getLExpression: ScExpression =
+    findChildByClassScala(classOf[ScExpression])
 
-  def getRExpression: Option[ScExpression] = findLastChild(classOf[ScExpression]) match {
-    case Some(expr: ScExpression) if expr != getLExpression => Some(expr)
-    case _ => None
-  }
+  def getRExpression: Option[ScExpression] =
+    findLastChild(classOf[ScExpression]) match {
+      case Some(expr: ScExpression) if expr != getLExpression => Some(expr)
+      case _ => None
+    }
 
   def assignName: Option[String] = {
     getLExpression match {
-      case ref: ScReferenceExpression if ref.qualifier == None => Some(ref.getText)
+      case ref: ScReferenceExpression if ref.qualifier == None =>
+        Some(ref.getText)
       case _ => None
     }
   }
@@ -47,16 +48,16 @@ trait ScAssignStmt extends ScExpression {
   def mirrorMethodCall: Option[ScMethodCall]
 
   /**
-   * Has sense only in case if left token resolves to parameterless function
-   * @return parameterless function setter, or None otherwise
-   */
+    * Has sense only in case if left token resolves to parameterless function
+    * @return parameterless function setter, or None otherwise
+    */
   def resolveAssignment: Option[ScalaResolveResult]
 
   def shapeResolveAssignment: Option[ScalaResolveResult]
 
   /**
-   * @return element to which equals sign should navigate
-   */
+    * @return element to which equals sign should navigate
+    */
   def assignNavigationElement: PsiElement = {
     getLExpression match {
       case methodCall: ScMethodCall =>
@@ -64,35 +65,43 @@ trait ScAssignStmt extends ScExpression {
           case Some(r) => r.getActualElement
           case None => null
         }
-      case left => resolveAssignment match {
-        case Some(ScalaResolveResult(elem, _)) => elem
-        case _ => left match {
-          case ref: ScReferenceExpression => ref.resolve() match {
-            case v: ScVariable => v
-            case p: ScClassParameter if p.isVar => p
-            case f: PsiField => f
-            case _ => null
-          }
-          case _ => null
+      case left =>
+        resolveAssignment match {
+          case Some(ScalaResolveResult(elem, _)) => elem
+          case _ =>
+            left match {
+              case ref: ScReferenceExpression =>
+                ref.resolve() match {
+                  case v: ScVariable => v
+                  case p: ScClassParameter if p.isVar => p
+                  case f: PsiField => f
+                  case _ => null
+                }
+              case _ => null
+            }
         }
-      }
     }
   }
 
   def isDynamicNamedAssignment: Boolean = {
     getContext match {
-      case context@(_: ScTuple | _: ScParenthesisedExpr | _: ScArgumentExprList) =>
+      case context @ (_: ScTuple | _: ScParenthesisedExpr |
+          _: ScArgumentExprList) =>
         context.getContext match {
           case m: MethodInvocation if m.argumentExpressions.contains(this) =>
             m.getEffectiveInvokedExpr match {
               case r: ScReferenceExpression =>
                 r.bind() match {
-                  case Some(resolveResult) if resolveResult.isDynamic &&
-                    resolveResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED => return true
+                  case Some(resolveResult)
+                      if resolveResult.isDynamic &&
+                      resolveResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
+                    return true
                   case _ =>
                     m.applyOrUpdateElement match {
-                      case Some(innerResult) if innerResult.isDynamic &&
-                        innerResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED => return true
+                      case Some(innerResult)
+                          if innerResult.isDynamic &&
+                          innerResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
+                        return true
                       case _ =>
                     }
                 }

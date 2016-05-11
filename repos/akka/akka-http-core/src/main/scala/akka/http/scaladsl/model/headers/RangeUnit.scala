@@ -1,13 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl.model.headers
 
-import akka.http.impl.util.{ Rendering, ValueRenderable }
-import akka.http.javadsl.{ model ⇒ jm }
+import akka.http.impl.util.{Rendering, ValueRenderable}
+import akka.http.javadsl.{model ⇒ jm}
 
-sealed abstract class RangeUnit extends jm.headers.RangeUnit with ValueRenderable {
+sealed abstract class RangeUnit
+    extends jm.headers.RangeUnit with ValueRenderable {
   def name: String
 }
 

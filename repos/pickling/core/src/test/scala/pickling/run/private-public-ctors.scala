@@ -3,14 +3,15 @@ package scala.pickling.privatepublicctorstest
 import org.scalatest.FunSuite
 import scala.pickling._, scala.pickling.Defaults._, json._
 
-class C private(private var x: Int, private var y: String) {
+class C private (private var x: Int, private var y: String) {
   // another private ctor
   private def this(x: Int) = this(x, "bye")
   // a single public ctor
   def this() = this(5, "hello")
 
   override def equals(other: Any): Boolean =
-    other.isInstanceOf[C] && other.asInstanceOf[C].x == x && other.asInstanceOf[C].y == y
+    other.isInstanceOf[C] && other.asInstanceOf[C].x == x &&
+    other.asInstanceOf[C].y == y
 }
 
 class PrivatePublicCtorsTest extends FunSuite {

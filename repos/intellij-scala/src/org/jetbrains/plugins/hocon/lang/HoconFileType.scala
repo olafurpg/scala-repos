@@ -13,5 +13,4 @@ object HoconFileType extends LanguageFileType(HoconLanguage) {
   def getDescription = "Human-Optimized Config Object Notation"
 
   def getName = "HOCON"
-
 }

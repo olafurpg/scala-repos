@@ -6,4 +6,3 @@ object test {
     new A()
   }
 }
-

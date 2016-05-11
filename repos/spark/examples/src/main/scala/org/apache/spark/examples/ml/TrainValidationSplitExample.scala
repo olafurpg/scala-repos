@@ -24,14 +24,14 @@ import org.apache.spark.ml.tuning.{ParamGridBuilder, TrainValidationSplit}
 import org.apache.spark.sql.SQLContext
 
 /**
- * A simple example demonstrating model selection using TrainValidationSplit.
- *
- * The example is based on [[SimpleParamsExample]] using linear regression.
- * Run with
- * {{{
- * bin/run-example ml.TrainValidationSplitExample
- * }}}
- */
+  * A simple example demonstrating model selection using TrainValidationSplit.
+  *
+  * The example is based on [[SimpleParamsExample]] using linear regression.
+  * Run with
+  * {{{
+  * bin/run-example ml.TrainValidationSplitExample
+  * }}}
+  */
 object TrainValidationSplitExample {
 
   def main(args: Array[String]): Unit = {
@@ -40,7 +40,9 @@ object TrainValidationSplitExample {
     val sqlContext = new SQLContext(sc)
 
     // Prepare training and test data.
-    val data = sqlContext.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+    val data = sqlContext.read
+      .format("libsvm")
+      .load("data/mllib/sample_libsvm_data.txt")
     val Array(training, test) = data.randomSplit(Array(0.9, 0.1), seed = 12345)
 
     val lr = new LinearRegression()
@@ -69,9 +71,7 @@ object TrainValidationSplitExample {
 
     // Make predictions on test data. model is the model with combination of parameters
     // that performed best.
-    model.transform(test)
-      .select("features", "label", "prediction")
-      .show()
+    model.transform(test).select("features", "label", "prediction").show()
 
     sc.stop()
   }

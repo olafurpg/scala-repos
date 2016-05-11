@@ -13,30 +13,32 @@ object TestEvaluator {
   case class Actual(id: Int, ex: Int, qx: Int)
 
   class FakeEngine(val id: Int, val en: Int, val qn: Int)
-  extends BaseEngine[EvalInfo, Query, Prediction, Actual] {
+      extends BaseEngine[EvalInfo, Query, Prediction, Actual] {
     def train(
-      sc: SparkContext, 
-      engineParams: EngineParams,
-      instanceId: String = "",
-      params: WorkflowParams = WorkflowParams()
+        sc: SparkContext,
+        engineParams: EngineParams,
+        instanceId: String = "",
+        params: WorkflowParams = WorkflowParams()
     ): Seq[Any] = {
       Seq[Any]()
     }
 
-    def eval(
-      sc: SparkContext, 
-      engineParams: EngineParams, 
-      params: WorkflowParams)
-    : Seq[(EvalInfo, RDD[(Query, Prediction, Actual)])] = {
-      (0 until en).map { ex => {
-        val qpas = (0 until qn).map { qx => {
-          (Query(id, ex, qx), Prediction(id, ex, qx), Actual(id, ex, qx))
-        }}
-  
-        (EvalInfo(id = id, ex = ex), sc.parallelize(qpas))
-      }}
+    def eval(sc: SparkContext,
+             engineParams: EngineParams,
+             params: WorkflowParams)
+      : Seq[(EvalInfo, RDD[(Query, Prediction, Actual)])] = {
+      (0 until en).map { ex =>
+        {
+          val qpas = (0 until qn).map { qx =>
+            {
+              (Query(id, ex, qx), Prediction(id, ex, qx), Actual(id, ex, qx))
+            }
+          }
+
+          (EvalInfo(id = id, ex = ex), sc.parallelize(qpas))
+        }
+      }
     }
-  
   }
 
   /*
@@ -58,8 +60,7 @@ object TestEvaluator {
       input: Seq[(EvalInfo, (EvalInfo, Seq[(Query, Prediction, Actual)]))]) 
     = input
   }
-  */
-
+ */
 }
 
 /*
@@ -90,4 +91,4 @@ extends FunSuite with Inside with SharedSparkContext {
     }}
   }
 }
-*/
+ */

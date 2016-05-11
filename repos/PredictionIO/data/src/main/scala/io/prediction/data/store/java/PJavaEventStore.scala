@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.store.java
 
 import io.prediction.data.storage.Event
@@ -49,30 +48,29 @@ object PJavaEventStore {
     * @param sc Spark context
     * @return JavaRDD[Event]
     */
-  def find(
-    appName: String,
-    channelName: Option[String],
-    startTime: Option[DateTime],
-    untilTime: Option[DateTime],
-    entityType: Option[String],
-    entityId: Option[String],
-    eventNames: Option[java.util.List[String]],
-    targetEntityType: Option[Option[String]],
-    targetEntityId: Option[Option[String]],
-    sc: SparkContext): JavaRDD[Event] = {
+  def find(appName: String,
+           channelName: Option[String],
+           startTime: Option[DateTime],
+           untilTime: Option[DateTime],
+           entityType: Option[String],
+           entityId: Option[String],
+           eventNames: Option[java.util.List[String]],
+           targetEntityType: Option[Option[String]],
+           targetEntityId: Option[Option[String]],
+           sc: SparkContext): JavaRDD[Event] = {
 
     val eventNamesSeq = eventNames.map(JavaConversions.asScalaBuffer(_).toSeq)
 
     PEventStore.find(
-      appName,
-      channelName,
-      startTime,
-      untilTime,
-      entityType,
-      entityId,
-      eventNamesSeq,
-      targetEntityType,
-      targetEntityId
+        appName,
+        channelName,
+        startTime,
+        untilTime,
+        entityType,
+        entityId,
+        eventNamesSeq,
+        targetEntityType,
+        targetEntityId
     )(sc)
   }
 
@@ -88,22 +86,20 @@ object PJavaEventStore {
     * @param sc Spark context
     * @return JavaRDD[(String, PropertyMap)] JavaRDD of entityId and PropetyMap pair
     */
-  def aggregateProperties(
-    appName: String,
-    entityType: String,
-    channelName: Option[String],
-    startTime: Option[DateTime],
-    untilTime: Option[DateTime],
-    required: Option[java.util.List[String]],
-    sc: SparkContext): JavaRDD[(String, PropertyMap)] = {
+  def aggregateProperties(appName: String,
+                          entityType: String,
+                          channelName: Option[String],
+                          startTime: Option[DateTime],
+                          untilTime: Option[DateTime],
+                          required: Option[java.util.List[String]],
+                          sc: SparkContext): JavaRDD[(String, PropertyMap)] = {
 
     PEventStore.aggregateProperties(
-      appName,
-    entityType,
-    channelName,
-    startTime,
-    untilTime
+        appName,
+        entityType,
+        channelName,
+        startTime,
+        untilTime
     )(sc)
   }
-
 }

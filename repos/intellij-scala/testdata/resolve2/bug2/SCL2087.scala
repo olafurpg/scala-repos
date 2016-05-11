@@ -1,5 +1,4 @@
-object Test
-{
+object Test {
   def foo(bar: () => String) {
     println(bar())
   }
@@ -7,7 +6,8 @@ object Test
   def foo(x: Int, y: Int) = 1
 
   def main(args: Array[String]) {
-    /* line: 3 */foo(bar) // <- error here
+    /* line: 3 */
+    foo(bar) // <- error here
   }
 
   def bar() = {

@@ -6,15 +6,19 @@ package scala.tools.nsc
 import scala.io.StdIn.readLine
 
 /**
- * Simple application to check out amount of memory used by chosen classpath representation.
- * It allows us to create many scalac-like calls based on specified parameters, where each main retains Global.
- * And we need additional tool (e.g. profiler) to measure memory consumption itself.
- */
+  * Simple application to check out amount of memory used by chosen classpath representation.
+  * It allows us to create many scalac-like calls based on specified parameters, where each main retains Global.
+  * And we need additional tool (e.g. profiler) to measure memory consumption itself.
+  */
 object ClassPathMemoryConsumptionTester {
 
   private class TestSettings extends Settings {
-    val requiredInstances = IntSetting("-requiredInstances",
-      "Determine how many times classpath should be loaded", 10, Some((1, 10000)), (_: String) => None)
+    val requiredInstances = IntSetting(
+        "-requiredInstances",
+        "Determine how many times classpath should be loaded",
+        10,
+        Some((1, 10000)),
+        (_: String) => None)
   }
 
   private class MainRetainsGlobal extends scala.tools.nsc.MainClass {
@@ -33,7 +37,8 @@ object ClassPathMemoryConsumptionTester {
   private def doTest(args: Array[String]) = {
     val settings = loadSettings(args.toList)
 
-    val mains = (1 to settings.requiredInstances.value) map (_ => new MainRetainsGlobal)
+    val mains =
+      (1 to settings.requiredInstances.value) map (_ => new MainRetainsGlobal)
 
     // we need original settings without additional params to be able to use them later
     val baseArgs = argsWithoutRequiredInstances(args)
@@ -48,15 +53,15 @@ object ClassPathMemoryConsumptionTester {
     println("Memory consumption can be now measured")
 
     var textFromStdIn = ""
-    while (textFromStdIn.toLowerCase != "exit")
-      textFromStdIn = readLine("Type 'exit' to close application: ")
+    while (textFromStdIn.toLowerCase != "exit") textFromStdIn = readLine(
+        "Type 'exit' to close application: ")
   }
 
   /**
-   * Prints usage information
-   */
+    * Prints usage information
+    */
   private def usage(): Unit =
-    println( """Use classpath and sourcepath options like in the case of e.g. 'scala' command.
+    println("""Use classpath and sourcepath options like in the case of e.g. 'scala' command.
                | There's also one additional option:
                | -requiredInstances <int value> Determine how many times classpath should be loaded
              """.stripMargin.trim)
@@ -72,6 +77,8 @@ object ClassPathMemoryConsumptionTester {
   private def argsWithoutRequiredInstances(args: Array[String]) = {
     val instancesIndex = args.indexOf("-requiredInstances")
     if (instancesIndex == -1) args
-    else args.dropRight(args.length - instancesIndex) ++ args.drop(instancesIndex + 2)
+    else
+      args.dropRight(args.length - instancesIndex) ++ args.drop(
+          instancesIndex + 2)
   }
 }

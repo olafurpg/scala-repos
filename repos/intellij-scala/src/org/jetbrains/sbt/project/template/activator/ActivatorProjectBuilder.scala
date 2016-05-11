@@ -24,10 +24,12 @@ import org.jetbrains.sbt.project.settings.SbtProjectSettings
 import org.jetbrains.sbt.project.template.activator.ActivatorRepoProcessor.DocData
 
 /**
- * User: Dmitry.Naydanov
- * Date: 21.01.15.
- */
-class ActivatorProjectBuilder extends AbstractExternalModuleBuilder[SbtProjectSettings](SbtProjectSystem.Id, new SbtProjectSettings) {
+  * User: Dmitry.Naydanov
+  * Date: 21.01.15.
+  */
+class ActivatorProjectBuilder
+    extends AbstractExternalModuleBuilder[SbtProjectSettings](
+        SbtProjectSystem.Id, new SbtProjectSettings) {
   //TODO Refactor me
   private var allTemplates: Map[String, DocData] = Map.empty
   private val repoProcessor = new ActivatorCachedRepoProcessor
@@ -73,7 +75,8 @@ class ActivatorProjectBuilder extends AbstractExternalModuleBuilder[SbtProjectSe
         val contentRootDir = new File(contentPath)
         FileUtilRt createDirectory contentRootDir
 
-        val vContentRootDir = LocalFileSystem.getInstance refreshAndFindFileByIoFile contentRootDir
+        val vContentRootDir =
+          LocalFileSystem.getInstance refreshAndFindFileByIoFile contentRootDir
         if (vContentRootDir == null) return
         //todo Looks like template name can't be set without some hack (activator itself can't do it)
 
@@ -83,18 +86,22 @@ class ActivatorProjectBuilder extends AbstractExternalModuleBuilder[SbtProjectSe
 
     modifiableRootModel.inheritSdk()
 
-    val settings =
-      ExternalSystemApiUtil.getSettings(modifiableRootModel.getProject, SbtProjectSystem.Id).
-        asInstanceOf[AbstractExternalSystemSettings[_ <: AbstractExternalSystemSettings[_, SbtProjectSettings, _],
-        SbtProjectSettings, _ <: ExternalSystemSettingsListener[SbtProjectSettings]]]
+    val settings = ExternalSystemApiUtil
+      .getSettings(modifiableRootModel.getProject, SbtProjectSystem.Id)
+      .asInstanceOf[AbstractExternalSystemSettings[
+              _ <: AbstractExternalSystemSettings[_, SbtProjectSettings, _],
+              SbtProjectSettings,
+              _ <: ExternalSystemSettingsListener[SbtProjectSettings]]]
 
     getExternalProjectSettings setExternalProjectPath getContentEntryPath
     settings linkProject getExternalProjectSettings
   }
 
-  override def getModuleType: ModuleType[_ <: ModuleBuilder] = JavaModuleType.getModuleType
+  override def getModuleType: ModuleType[_ <: ModuleBuilder] =
+    JavaModuleType.getModuleType
 
-  override def modifySettingsStep(settingsStep: SettingsStep): ModuleWizardStep = {
+  override def modifySettingsStep(
+      settingsStep: SettingsStep): ModuleWizardStep = {
     settingsStep.addSettingsComponent(settingsComponents.getMainPanel)
 
     new SdkSettingsStep(settingsStep, this, new Condition[SdkTypeId] {
@@ -108,7 +115,9 @@ class ActivatorProjectBuilder extends AbstractExternalModuleBuilder[SbtProjectSe
       override def validate(): Boolean = {
         val context = settingsStep.getContext
 
-        if (context.isCreatingNewProject && !ScalaNamesUtil.isIdentifier(context.getProjectName) && context.getProjectName != null)
+        if (context.isCreatingNewProject &&
+            !ScalaNamesUtil.isIdentifier(context.getProjectName) &&
+            context.getProjectName != null)
           error("SBT Project name must be valid Scala identifier")
 
         val text = settingsStep.getModuleNameField.getText
@@ -120,22 +129,27 @@ class ActivatorProjectBuilder extends AbstractExternalModuleBuilder[SbtProjectSe
     }
   }
 
-  private def error(msg: String) = throw new ConfigurationException(msg, "Error")
+  private def error(msg: String) =
+    throw new ConfigurationException(msg, "Error")
 
   private def createStub(id: String, path: String) {
     val moduleDir = new File(path)
     if (!moduleDir.exists()) moduleDir.mkdirs()
 
-    doWithProgress(repoProcessor.createTemplate(id, moduleDir, error), "Downloading template...")
+    doWithProgress(repoProcessor.createTemplate(id, moduleDir, error),
+                   "Downloading template...")
   }
 
   private def downloadTemplateList() {
-    doWithProgress({allTemplates = repoProcessor.extractRepoData()}, "Downloading list of templates...")
+    doWithProgress({ allTemplates = repoProcessor.extractRepoData() },
+    "Downloading list of templates...")
   }
 
   private def doWithProgress(body: => Unit, title: String) {
-    ProgressManager.getInstance().runProcessWithProgressSynchronously(new Runnable {
-      override def run(): Unit = body
-    }, title, false, null)
+    ProgressManager
+      .getInstance()
+      .runProcessWithProgressSynchronously(new Runnable {
+        override def run(): Unit = body
+      }, title, false, null)
   }
 }

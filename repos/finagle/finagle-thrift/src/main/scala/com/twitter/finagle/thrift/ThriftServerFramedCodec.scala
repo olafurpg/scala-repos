@@ -10,11 +10,10 @@ import com.twitter.util.Future
 import org.apache.thrift.protocol.{TMessage, TMessageType, TProtocolFactory}
 import org.apache.thrift.{TApplicationException, TException}
 import org.jboss.netty.buffer.ChannelBuffers
-import org.jboss.netty.channel.{
-  ChannelHandlerContext, ChannelPipelineFactory, Channels, MessageEvent,
-  SimpleChannelDownstreamHandler}
+import org.jboss.netty.channel.{ChannelHandlerContext, ChannelPipelineFactory, Channels, MessageEvent, SimpleChannelDownstreamHandler}
 
-private[finagle] object ThriftServerFramedPipelineFactory  extends ChannelPipelineFactory {
+private[finagle] object ThriftServerFramedPipelineFactory
+    extends ChannelPipelineFactory {
   def getPipeline() = {
     val pipeline = Channels.pipeline()
     pipeline.addLast("thriftFrameCodec", new ThriftFrameCodec)
@@ -35,8 +34,7 @@ object ThriftServerFramedCodec {
 }
 
 class ThriftServerFramedCodecFactory(protocolFactory: TProtocolFactory)
-    extends CodecFactory[Array[Byte], Array[Byte]]#Server
-{
+    extends CodecFactory[Array[Byte], Array[Byte]]#Server {
   def this(statsReceiver: StatsReceiver) =
     this(Protocols.binaryFactory(statsReceiver = statsReceiver))
 
@@ -49,44 +47,48 @@ class ThriftServerFramedCodecFactory(protocolFactory: TProtocolFactory)
 class ThriftServerFramedCodec(
     config: ServerCodecConfig,
     protocolFactory: TProtocolFactory = Protocols.binaryFactory()
-) extends Codec[Array[Byte], Array[Byte]] {
-  def pipelineFactory: ChannelPipelineFactory = ThriftServerFramedPipelineFactory
+)
+    extends Codec[Array[Byte], Array[Byte]] {
+  def pipelineFactory: ChannelPipelineFactory =
+    ThriftServerFramedPipelineFactory
 
   private[this] val preparer = ThriftServerPreparer(
-    protocolFactory, config.serviceName)
+      protocolFactory, config.serviceName)
 
   override def prepareConnFactory(
-    factory: ServiceFactory[Array[Byte],
-    Array[Byte]], params: Stack.Params
+      factory: ServiceFactory[Array[Byte], Array[Byte]],
+      params: Stack.Params
   ) = preparer.prepare(factory, params)
 
-  override def newTraceInitializer = TraceInitializerFilter.serverModule[Array[Byte], Array[Byte]]
+  override def newTraceInitializer =
+    TraceInitializerFilter.serverModule[Array[Byte], Array[Byte]]
 
   override val protocolLibraryName: String = "thrift"
 }
 
 private[finagle] case class ThriftServerPreparer(
-    protocolFactory: TProtocolFactory,
-    serviceName: String) {
-  private[this] val uncaughtExceptionsFilter =
-    new UncaughtAppExceptionFilter(protocolFactory)
+    protocolFactory: TProtocolFactory, serviceName: String) {
+  private[this] val uncaughtExceptionsFilter = new UncaughtAppExceptionFilter(
+      protocolFactory)
 
   def prepare(
-    factory: ServiceFactory[Array[Byte], Array[Byte]],
-    params: Stack.Params
+      factory: ServiceFactory[Array[Byte], Array[Byte]],
+      params: Stack.Params
   ): ServiceFactory[Array[Byte], Array[Byte]] = factory.map { service =>
     val payloadSize = new PayloadSizeFilter[Array[Byte], Array[Byte]](
-      params[param.Stats].statsReceiver, _.length, _.length)
+        params[param.Stats].statsReceiver, _.length, _.length)
 
     val ttwitter = new TTwitterServerFilter(serviceName, protocolFactory)
 
-    payloadSize.andThen(ttwitter).andThen(uncaughtExceptionsFilter).andThen(service)
+    payloadSize
+      .andThen(ttwitter)
+      .andThen(uncaughtExceptionsFilter)
+      .andThen(service)
   }
 }
 
 private[thrift] class ThriftServerChannelBufferEncoder
-  extends SimpleChannelDownstreamHandler
-{
+    extends SimpleChannelDownstreamHandler {
   override def writeRequested(ctx: ChannelHandlerContext, e: MessageEvent) = {
     e.getMessage match {
       // An empty array indicates a oneway reply.
@@ -103,13 +105,13 @@ private[thrift] class ThriftServerChannelBufferEncoder
 private[finagle] object UncaughtAppExceptionFilter {
 
   /**
-   * Creates a Thrift exception message for the given `exception` and thrift `thriftRequest`
-   * message using the given [[org.apache.thrift.protocol.TProtocolFactory]].
-   */
+    * Creates a Thrift exception message for the given `exception` and thrift `thriftRequest`
+    * message using the given [[org.apache.thrift.protocol.TProtocolFactory]].
+    */
   def writeExceptionMessage(
-    thriftRequest: Buf,
-    throwable: Throwable,
-    protocolFactory: TProtocolFactory
+      thriftRequest: Buf,
+      throwable: Throwable,
+      protocolFactory: TProtocolFactory
   ): Buf = {
     val reqBytes = Buf.ByteArray.Owned.extract(thriftRequest)
     // NB! This is technically incorrect for one-way calls,
@@ -120,29 +122,28 @@ private[finagle] object UncaughtAppExceptionFilter {
 
     val buffer = new OutputBuffer(protocolFactory)
     buffer().writeMessageBegin(
-      new TMessage(name, TMessageType.EXCEPTION, msg.seqid))
+        new TMessage(name, TMessageType.EXCEPTION, msg.seqid))
 
     // Note: The wire contents of the exception message differ from Apache's Thrift in that here,
     // e.toString is appended to the error message.
     val x = new TApplicationException(
-      TApplicationException.INTERNAL_ERROR,
-      s"Internal error processing $name: '$throwable'")
+        TApplicationException.INTERNAL_ERROR,
+        s"Internal error processing $name: '$throwable'")
 
     x.write(buffer())
     buffer().writeMessageEnd()
     Buf.ByteArray.Owned(buffer.toArray)
   }
-
 }
 
-private[finagle] class UncaughtAppExceptionFilter(protocolFactory: TProtocolFactory)
-  extends SimpleFilter[Array[Byte], Array[Byte]]
-{
+private[finagle] class UncaughtAppExceptionFilter(
+    protocolFactory: TProtocolFactory)
+    extends SimpleFilter[Array[Byte], Array[Byte]] {
   import UncaughtAppExceptionFilter.writeExceptionMessage
 
   def apply(
-    request: Array[Byte],
-    service: Service[Array[Byte], Array[Byte]]
+      request: Array[Byte],
+      service: Service[Array[Byte], Array[Byte]]
   ): Future[Array[Byte]] =
     service(request).handle {
       case e if !e.isInstanceOf[TException] =>

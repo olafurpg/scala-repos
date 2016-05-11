@@ -1,12 +1,12 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import akka.actor.Status
 import akka.pattern.pipe
 import akka.stream.Attributes.inputBuffer
-import akka.stream.{ ActorMaterializer }
+import akka.stream.{ActorMaterializer}
 import akka.stream.testkit.Utils._
 import akka.stream.testkit._
 import org.scalatest.concurrent.ScalaFutures
@@ -40,7 +40,9 @@ class QueueSinkSpec extends AkkaSpec {
       val sub = probe.expectSubscription()
       val future = queue.pull()
       val future2 = queue.pull()
-      an[IllegalStateException] shouldBe thrownBy { Await.result(future2, 300.millis) }
+      an[IllegalStateException] shouldBe thrownBy {
+        Await.result(future2, 300.millis)
+      }
 
       sub.sendNext(1)
       future.pipeTo(testActor)
@@ -82,7 +84,8 @@ class QueueSinkSpec extends AkkaSpec {
       val sub = probe.expectSubscription()
       sub.sendError(ex)
 
-      the[Exception] thrownBy { Await.result(queue.pull(), 300.millis) } should be(ex)
+      the[Exception] thrownBy { Await.result(queue.pull(), 300.millis) } should be(
+          ex)
     }
 
     "timeout future when stream cannot provide data" in assertAllStagesStopped {
@@ -111,16 +114,21 @@ class QueueSinkSpec extends AkkaSpec {
       sub.sendComplete()
       Await.result(queue.pull(), noMsgTimeout) should be(None)
 
-      queue.pull().onFailure { case e ⇒ e.isInstanceOf[IllegalStateException] should ===(true) }
+      queue.pull().onFailure {
+        case e ⇒ e.isInstanceOf[IllegalStateException] should ===(true)
+      }
     }
 
     "keep on sending even after the buffer has been full" in assertAllStagesStopped {
       val bufferSize = 16
       val streamElementCount = bufferSize + 4
-      val sink = Sink.queue[Int]()
-        .withAttributes(inputBuffer(bufferSize, bufferSize))
+      val sink =
+        Sink.queue[Int]().withAttributes(inputBuffer(bufferSize, bufferSize))
       val (probe, queue) = Source(1 to streamElementCount)
-        .alsoToMat(Flow[Int].take(bufferSize).watchTermination()(Keep.right).to(Sink.ignore))(Keep.right)
+        .alsoToMat(Flow[Int]
+              .take(bufferSize)
+              .watchTermination()(Keep.right)
+              .to(Sink.ignore))(Keep.right)
         .toMat(sink)(Keep.both)
         .run()
       probe.futureValue should ===(akka.Done)
@@ -130,7 +138,6 @@ class QueueSinkSpec extends AkkaSpec {
       }
       queue.pull() pipeTo testActor
       expectMsg(None)
-
     }
 
     "work with one element buffer" in assertAllStagesStopped {
@@ -154,7 +161,9 @@ class QueueSinkSpec extends AkkaSpec {
 
     "fail to materialize with zero sized input buffer" in {
       an[IllegalArgumentException] shouldBe thrownBy {
-        Source.single(()).runWith(Sink.queue().withAttributes(inputBuffer(0, 0)))
+        Source
+          .single(())
+          .runWith(Sink.queue().withAttributes(inputBuffer(0, 0)))
       }
     }
   }

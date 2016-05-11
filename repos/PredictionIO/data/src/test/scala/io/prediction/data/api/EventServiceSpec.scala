@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.api
 
 import io.prediction.data.storage.Storage
@@ -35,16 +34,16 @@ class EventServiceSpec extends Specification {
   val eventClient = Storage.getLEvents()
   val accessKeysClient = Storage.getMetaDataAccessKeys()
   val channelsClient = Storage.getMetaDataChannels()
-  
+
   val eventServiceActor = system.actorOf(
-    Props(
-      new EventServiceActor(
-        eventClient,
-        accessKeysClient,
-        channelsClient,
-        EventServerConfig()
+      Props(
+          new EventServiceActor(
+              eventClient,
+              accessKeysClient,
+              channelsClient,
+              EventServerConfig()
+          )
       )
-    )
   )
 
   "GET / request" should {
@@ -52,13 +51,13 @@ class EventServiceSpec extends Specification {
       val probe = TestProbe()(system)
       probe.send(eventServiceActor, Get("/"))
       probe.expectMsg(
-        HttpResponse(
-          200,
-          HttpEntity(
-            contentType = ContentTypes.`application/json`,
-            string = """{"status":"alive"}"""
+          HttpResponse(
+              200,
+              HttpEntity(
+                  contentType = ContentTypes.`application/json`,
+                  string = """{"status":"alive"}"""
+              )
           )
-        )
       )
       success
     }

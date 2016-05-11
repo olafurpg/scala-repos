@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js API               **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-lang.org/     **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js API               **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-lang.org/     **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package scala.scalajs.js.typedarray
 
@@ -14,11 +13,12 @@ import scala.language.implicitConversions
 import java.nio._
 
 /** Factory methods to create direct buffers from Typed Arrays.
- *
- *  All buffers created by the methods of this object are direct buffers with
- *  the native byte order of the platform.
- */
+  *
+  *  All buffers created by the methods of this object are direct buffers with
+  *  the native byte order of the platform.
+  */
 object TypedArrayBuffer {
+
   /** Wraps an [[ArrayBuffer]] in a direct [[java.nio.ByteBuffer ByteBuffer]]. */
   def wrap(array: ArrayBuffer): ByteBuffer =
     TypedArrayBufferBridge.wrap(array)

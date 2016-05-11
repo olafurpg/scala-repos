@@ -8,7 +8,9 @@ class B {
   object B3 { override def toString = "B3"; def foo = 3 }
   private object B4 { override def toString = "B4"; def foo = 4 }
   object B5 extends B1 { override def toString = "B5"; override def foo = 5 }
-  private object B6 extends B2 { override def toString = "B6"; override def foo = 6 }
+  private object B6 extends B2 {
+    override def toString = "B6"; override def foo = 6
+  }
 }
 
 object Test extends App {
@@ -27,7 +29,8 @@ object Test extends App {
     val sym = b.info.decl(TypeName(name)).asClass
     println(sym)
     val ctor = sym.info.decl(termNames.CONSTRUCTOR).asMethod
-    val ctorMirror = cm.reflect(new B).reflectClass(sym).reflectConstructor(ctor)
+    val ctorMirror =
+      cm.reflect(new B).reflectClass(sym).reflectConstructor(ctor)
     val instance = ctorMirror()
     println(instance)
     testMethodInvocation(instance)

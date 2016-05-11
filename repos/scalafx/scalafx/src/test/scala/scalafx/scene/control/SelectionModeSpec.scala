@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.control.SelectionMode]]. */
 @RunWith(classOf[JUnitRunner])
-class SelectionModeSpec extends SFXEnumDelegateSpec[jfxsc.SelectionMode, SelectionMode](
-  javaClass = classOf[jfxsc.SelectionMode],
-  scalaClass = classOf[SelectionMode],
-  companion = SelectionMode)
+class SelectionModeSpec
+    extends SFXEnumDelegateSpec[jfxsc.SelectionMode, SelectionMode](
+        javaClass = classOf[jfxsc.SelectionMode],
+        scalaClass = classOf[SelectionMode],
+        companion = SelectionMode)

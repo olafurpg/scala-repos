@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.library
 
@@ -235,7 +235,9 @@ class UseAsScalaTypesTest {
     js.use(new A).as[JSDefaultArgs]
   }
 
-  @Test def should_allow_additional_default_arguments_at_the_end_of_the_params(): Unit = {
+  @Test
+  def should_allow_additional_default_arguments_at_the_end_of_the_params(
+      ): Unit = {
     class A {
       @JSExport
       def m(a: Int, b: String, c: Int = ???, d: String = ???): js.Object = ???
@@ -273,7 +275,8 @@ class UseAsScalaTypesTest {
   }
 
   @Test def should_support_anonymous_types(): Unit = {
-    js.use(new { @JSExport def m(a: Int, b: String): js.Object = ??? }).as[JSBasic]
+    js.use(new { @JSExport def m(a: Int, b: String): js.Object = ??? })
+      .as[JSBasic]
   }
 
   @Test def should_allow_Nothing(): Unit = {
@@ -327,8 +330,7 @@ class UseAsScalaTypesTest {
 
   @Test def fails_with_non_trait(): Unit = {
     typeErrorWithMsg(
-        "js.use(???).as[js.Date]",
-        "Only traits can be used with as")
+        "js.use(???).as[js.Date]", "Only traits can be used with as")
   }
 
   @Test def fails_with_class_parents(): Unit = {
@@ -423,9 +425,8 @@ class UseAsScalaTypesTest {
       def sum2(a: Int, b: Int): Int = a + b // should have default
     }
 
-    typeErrorWithMsg(
-        "js.use(new A).as[JSDefaultArgs]",
-        "A does not export a method sum2(Int, Int = ???): Int.")
+    typeErrorWithMsg("js.use(new A).as[JSDefaultArgs]",
+                     "A does not export a method sum2(Int, Int = ???): Int.")
   }
 
   @Test def fails_with_a_mismatching_repeated_argument(): Unit = {
@@ -435,9 +436,8 @@ class UseAsScalaTypesTest {
       def rep(a: Int*): Unit = ???
     }
 
-    typeErrorWithMsg(
-        "js.use(new A).as[JSRepeated]",
-        "A does not export a method rep(Int, String*): Unit.")
+    typeErrorWithMsg("js.use(new A).as[JSRepeated]",
+                     "A does not export a method rep(Int, String*): Unit.")
 
     class B {
       @JSExport
@@ -452,10 +452,9 @@ class UseAsScalaTypesTest {
   // js.use(x).as[T] - Raw JS Types - failure cases
 
   @Test def fails_with_a_missing_apply(): Unit = {
-    typeErrorWithMsg(
-        "js.use(new js.Object).as[JSWithApply]",
-        "scala.scalajs.js.Object does not have a method " +
-        "<apply>(String): Int. (type is not callable)")
+    typeErrorWithMsg("js.use(new js.Object).as[JSWithApply]",
+                     "scala.scalajs.js.Object does not have a method " +
+                     "<apply>(String): Int. (type is not callable)")
   }
 
   @Test def fails_with_a_missing_atJSBracketAccess(): Unit = {
@@ -477,10 +476,9 @@ class UseAsScalaTypesTest {
   }
 
   @Test def fails_with_a_missing_method(): Unit = {
-    typeErrorWithMsg(
-        "js.use(new js.Object).as[JSBasic]",
-        "scala.scalajs.js.Object does not have a method " +
-        "m(Int, String): scala.scalajs.js.Object.")
+    typeErrorWithMsg("js.use(new js.Object).as[JSBasic]",
+                     "scala.scalajs.js.Object does not have a method " +
+                     "m(Int, String): scala.scalajs.js.Object.")
   }
 
   @Test def fails_with_a_missing_overload(): Unit = {
@@ -496,7 +494,6 @@ class UseAsScalaTypesTest {
         "org.scalajs.testsuite.library.UseAsTest.JSGeneric[Int] does not " +
         "have a getter arr: scala.scalajs.js.Array[String].")
   }
-
 }
 
 object UseAsTest {

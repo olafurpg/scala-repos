@@ -69,7 +69,7 @@ object MixedBag extends App {
     val f = kleisli((i: Int) => some(i))
     f map (i => i * 2) map (x => println(x)) run 3
 
-    val K = Arrow[λ[(α,β)=>Kleisli[Option,α,β]]]
+    val K = Arrow[λ[(α, β) => Kleisli[Option, α, β]]]
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
   }
 
@@ -92,7 +92,7 @@ object MixedBag extends App {
 
     def flattenWriter[A](t: Tree[A]): DList[A] = {
       def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match {
-        case \/-(a)     => DList(a).tell
+        case \/-(a) => DList(a).tell
         case -\/((x, y)) => flatten(x) >> flatten(y)
       }
       flatten(t).run._1

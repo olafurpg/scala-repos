@@ -13,13 +13,14 @@ object Test extends Properties("IndexScript") {
     // does partest actually guarantee this? to quote Leonard Nimoy: The answer, of course, is no.
     // this test _will_ fail again some time in the future.
     // Footnote: java.lang.ClassCastException: org.apache.tools.ant.loader.AntClassLoader5 cannot be cast to java.net.URLClassLoader
-    val loader = Thread.currentThread.getContextClassLoader.asInstanceOf[URLClassLoader]
+    val loader =
+      Thread.currentThread.getContextClassLoader.asInstanceOf[URLClassLoader]
     val paths = loader.getURLs.map(u => URLDecoder.decode(u.getPath))
     paths mkString java.io.File.pathSeparator
   }
 
   val docFactory = {
-    val settings = new doc.Settings({Console.err.println(_)})
+    val settings = new doc.Settings({ Console.err.println(_) })
     settings.scaladocQuietRun = true
     settings.nowarn.value = true
     settings.classpath.value = getClasspath
@@ -38,15 +39,16 @@ object Test extends Properties("IndexScript") {
     }
 
   property("allPackages") = {
-    createIndexScript("src/scaladoc/scala/tools/nsc/doc/html/page/IndexScript.scala") match {
+    createIndexScript(
+        "src/scaladoc/scala/tools/nsc/doc/html/page/IndexScript.scala") match {
       case Some(index) =>
         index.allPackages.map(_.toString) == List(
-          "scala",
-          "scala.tools",
-          "scala.tools.nsc",
-          "scala.tools.nsc.doc",
-          "scala.tools.nsc.doc.html",
-          "scala.tools.nsc.doc.html.page"
+            "scala",
+            "scala.tools",
+            "scala.tools.nsc",
+            "scala.tools.nsc.doc",
+            "scala.tools.nsc.doc.html",
+            "scala.tools.nsc.doc.html.page"
         )
       case None =>
         false

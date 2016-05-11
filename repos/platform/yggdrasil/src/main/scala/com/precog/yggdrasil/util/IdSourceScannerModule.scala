@@ -22,7 +22,7 @@ package com.precog.yggdrasil.util
 import scala.annotation.tailrec
 
 import com.precog.common._
-import com.precog.yggdrasil.{ IdSource, TableModule, YggConfigComponent }
+import com.precog.yggdrasil.{IdSource, TableModule, YggConfigComponent}
 import com.precog.yggdrasil.table._
 
 import com.precog.util.{BitSet, BitSetUtil, Loop}
@@ -42,10 +42,12 @@ trait IdSourceScannerModule extends YggConfigComponent {
     def init = 0
     private val id = yggConfig.idSource.nextId()
 
-    def scan(pos: Long, cols: Map[ColumnRef, Column], range: Range): (A, Map[ColumnRef, Column]) = {
+    def scan(pos: Long,
+             cols: Map[ColumnRef, Column],
+             range: Range): (A, Map[ColumnRef, Column]) = {
       val rawCols = cols.values.toArray
-      val defined = BitSetUtil.filteredRange(range.start, range.end) {
-        i => Column.isDefinedAt(rawCols, i)
+      val defined = BitSetUtil.filteredRange(range.start, range.end) { i =>
+        Column.isDefinedAt(rawCols, i)
       }
 
       val idCol = new LongColumn {
@@ -58,9 +60,9 @@ trait IdSourceScannerModule extends YggConfigComponent {
         def apply(row: Int): Long = pos + row
       }
 
-      (pos + range.end, Map(
-        ColumnRef(CPath(CPathIndex(0)), CLong) -> seqCol,
-        ColumnRef(CPath(CPathIndex(1)), CLong) -> idCol))
+      (pos + range.end,
+       Map(ColumnRef(CPath(CPathIndex(0)), CLong) -> seqCol,
+           ColumnRef(CPath(CPathIndex(1)), CLong) -> idCol))
     }
   }
 }

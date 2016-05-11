@@ -57,7 +57,6 @@ object StatsSampleSpecConfig extends MultiNodeConfig {
     }
     #//#router-lookup-config
     """))
-
 }
 //#MultiNodeConfig
 
@@ -75,9 +74,9 @@ import org.scalatest.Matchers
 import akka.remote.testkit.MultiNodeSpec
 import akka.testkit.ImplicitSender
 
-abstract class StatsSampleSpec extends MultiNodeSpec(StatsSampleSpecConfig)
-  with WordSpecLike with Matchers with BeforeAndAfterAll
-  with ImplicitSender {
+abstract class StatsSampleSpec
+    extends MultiNodeSpec(StatsSampleSpecConfig) with WordSpecLike
+    with Matchers with BeforeAndAfterAll with ImplicitSender {
 
   import StatsSampleSpecConfig._
 
@@ -110,7 +109,7 @@ abstract class StatsSampleSpec extends MultiNodeSpec(StatsSampleSpecConfig)
       system.actorOf(Props[StatsService], "statsService")
 
       receiveN(3).collect { case MemberUp(m) => m.address }.toSet should be(
-        Set(firstAddress, secondAddress, thirdAddress))
+          Set(firstAddress, secondAddress, thirdAddress))
 
       Cluster(system).unsubscribe(testActor)
 
@@ -128,15 +127,15 @@ abstract class StatsSampleSpec extends MultiNodeSpec(StatsSampleSpecConfig)
     }
 
     def assertServiceOk(): Unit = {
-      val service = system.actorSelection(node(third) / "user" / "statsService")
+      val service =
+        system.actorSelection(node(third) / "user" / "statsService")
       // eventually the service should be ok,
       // first attempts might fail because worker actors not started yet
       awaitAssert {
         service ! StatsJob("this is the text that will be analyzed")
         expectMsgType[StatsResult](1.second).meanWordLength should be(
-          3.875 +- 0.001)
+            3.875 +- 0.001)
       }
-
     }
     //#test-statsService
 
@@ -144,7 +143,5 @@ abstract class StatsSampleSpec extends MultiNodeSpec(StatsSampleSpecConfig)
       assertServiceOk()
       testConductor.enter("done-3")
     }
-
   }
-
 }

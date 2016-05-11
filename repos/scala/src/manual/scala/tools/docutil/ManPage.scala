@@ -50,11 +50,11 @@ object ManPage {
 
   object Category extends Enumeration {
     val USER_COMMANDS = Value(1, "USER COMMANDS")
-    val SYSTEM_CALLS  = Value(2, "SYSTEM CALLS")
-    val SUBROUTINES   = Value(3, "SUBROUTINES")
-    val DEVICES       = Value(4, "DEVICES")
-    val FILE_FORMATS  = Value(5, "FILE FORMAT DESCRIPTIONS")
-    val GAMES         = Value(6, "GAMES")
+    val SYSTEM_CALLS = Value(2, "SYSTEM CALLS")
+    val SUBROUTINES = Value(3, "SUBROUTINES")
+    val DEVICES = Value(4, "DEVICES")
+    val FILE_FORMATS = Value(5, "FILE FORMAT DESCRIPTIONS")
+    val GAMES = Value(6, "GAMES")
     val MISCELLANEOUS = Value(7, "MISCELLANEOUS")
   }
 

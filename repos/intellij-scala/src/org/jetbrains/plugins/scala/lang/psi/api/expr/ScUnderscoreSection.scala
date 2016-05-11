@@ -13,10 +13,9 @@ import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
 trait ScUnderscoreSection extends ScExpression {
   def bindingExpr: Option[ScExpression] = {
     findChildByClassScala(classOf[ScExpression]) match {
@@ -29,14 +28,16 @@ trait ScUnderscoreSection extends ScExpression {
     if (bindingExpr != None) return Some(this)
 
     @tailrec
-    def go(expr: PsiElement, calcArguments: Boolean = true): Option[ScExpression] = {
+    def go(expr: PsiElement,
+           calcArguments: Boolean = true): Option[ScExpression] = {
       expr.getContext match {
         case args: ScArgumentExprList =>
           if (!calcArguments) return Some(expr.asInstanceOf[ScExpression])
           args.getContext match {
             case call: ScMethodCall => go(call, calcArguments = false)
             case constr: ScConstructor =>
-              PsiTreeUtil.getContextOfType(constr, true, classOf[ScNewTemplateDefinition]) match {
+              PsiTreeUtil.getContextOfType(
+                  constr, true, classOf[ScNewTemplateDefinition]) match {
                 case null => None
                 case n: ScNewTemplateDefinition => go(n, calcArguments = false)
               }
@@ -48,8 +49,10 @@ trait ScUnderscoreSection extends ScExpression {
         case ref: ScReferenceExpression => go(ref, calcArguments = false)
         case call: ScMethodCall => go(call, calcArguments = false)
         case gen: ScGenericCall => go(gen, calcArguments = false)
-        case assign: ScAssignStmt if assign.getLExpression == expr => go(assign, calcArguments = false)
-        case assign: ScAssignStmt if assign.getRExpression == Some(expr) && isUnderscore(expr) =>
+        case assign: ScAssignStmt if assign.getLExpression == expr =>
+          go(assign, calcArguments = false)
+        case assign: ScAssignStmt
+            if assign.getRExpression == Some(expr) && isUnderscore(expr) =>
           go(assign, calcArguments = false)
         case x: ScExpression if calcArguments => Some(x)
         case x: ScMatchStmt if !calcArguments => Some(x)
@@ -60,11 +63,12 @@ trait ScUnderscoreSection extends ScExpression {
             case expr: ScExpression => Some(expr)
             case _ => None
           }
-        case _ => expr match {
-          case x: ScUnderscoreSection => None
-          case x: ScExpression => Some(x)
-          case _ => None
-        }
+        case _ =>
+          expr match {
+            case x: ScUnderscoreSection => None
+            case x: ScExpression => Some(x)
+            case _ => None
+          }
       }
     }
 

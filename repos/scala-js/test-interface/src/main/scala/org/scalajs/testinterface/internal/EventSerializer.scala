@@ -23,5 +23,4 @@ object EventSerializer {
 
     res
   }
-
 }

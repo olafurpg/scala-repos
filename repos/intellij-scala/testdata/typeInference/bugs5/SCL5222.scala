@@ -8,7 +8,8 @@ object SCL5222 {
   class Temp2 extends Temp {
     override def foo() = {
       val str = super.foo()
-      /*start*/str/*end*/
+      /*start*/
+      str /*end*/
       ""
     }
   }

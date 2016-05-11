@@ -10,12 +10,12 @@ import com.twitter.logging.Logger
 import com.twitter.util.{Duration, Future, Timer}
 
 /**
- * An Asynchronous ZooKeeper Client API.
- *
- * A ZkClient instance is configured with settings and defaults (like a retry policy) and is
- * attached to underlying Connector.  This allows new, immutable ZkClient instances to be created
- * with alternative settings on the same underlying Connector.
- */
+  * An Asynchronous ZooKeeper Client API.
+  *
+  * A ZkClient instance is configured with settings and defaults (like a retry policy) and is
+  * attached to underlying Connector.  This allows new, immutable ZkClient instances to be created
+  * with alternative settings on the same underlying Connector.
+  */
 trait ZkClient {
   val name = "zk.client"
   protected[zk] val log = Logger.get(name)
@@ -63,7 +63,9 @@ trait ZkClient {
   def withRetryPolicy(r: RetryPolicy): ZkClient = transform(_retryPolicy = r)
 
   /** Use the current retry policy to perform an operation with a ZooKeeper handle. */
-  def retrying[T](op: ZooKeeper => Future[T]): Future[T] = retryPolicy { apply() flatMap(op) }
+  def retrying[T](op: ZooKeeper => Future[T]): Future[T] = retryPolicy {
+    apply() flatMap (op)
+  }
 
   /** Create a new ZkClient, possibly overriding configuration. */
   protected[this] def transform(
@@ -79,31 +81,30 @@ trait ZkClient {
 }
 
 object ZkClient {
+
   /** Build a ZkClient with a provided Connector */
   def apply(_connector: Connector) = new ZkClient {
     protected[this] val connector = _connector
   }
 
   /** Build a ZkClient with a NativeConnector */
-  def apply(
-      connectString: String,
-      connectTimeout: Option[Duration],
-      sessionTimeout: Duration)
-      (implicit timer: Timer): ZkClient = {
-    apply(NativeConnector(connectString, connectTimeout, sessionTimeout, timer))
+  def apply(connectString: String,
+            connectTimeout: Option[Duration],
+            sessionTimeout: Duration)(implicit timer: Timer): ZkClient = {
+    apply(
+        NativeConnector(connectString, connectTimeout, sessionTimeout, timer))
   }
 
   /** Build a ZkClient with a NativeConnector */
-  def apply(
-      connectString: String,
-      connectTimeout: Duration,
-      sessionTimeout: Duration)
-      (implicit timer: Timer): ZkClient = {
+  def apply(connectString: String,
+            connectTimeout: Duration,
+            sessionTimeout: Duration)(implicit timer: Timer): ZkClient = {
     apply(connectString, Some(connectTimeout), sessionTimeout)(timer)
   }
 
   /** Build a ZkClient with a NativeConnector */
-  def apply(connectString: String, sessionTimeout: Duration)(implicit timer: Timer): ZkClient = {
+  def apply(connectString: String, sessionTimeout: Duration)(
+      implicit timer: Timer): ZkClient = {
     apply(connectString, None, sessionTimeout)(timer)
   }
 }

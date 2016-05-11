@@ -5,15 +5,19 @@ import com.intellij.codeInspection.LocalInspectionTool
 import org.jetbrains.plugins.scala.codeInspection.{InspectionBundle, ScalaLightInspectionFixtureTestAdapter}
 
 /**
- * Nikolay.Tropin
- * 6/3/13
- */
-class ConvertibleToMethodValueInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
+  * Nikolay.Tropin
+  * 6/3/13
+  */
+class ConvertibleToMethodValueInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
   val annotation = InspectionBundle.message("convertible.to.method.value.name")
-  val hintAnon = InspectionBundle.message("convertible.to.method.value.anonymous.hint")
-  val hintEta = InspectionBundle.message("convertible.to.method.value.eta.hint")
+  val hintAnon =
+    InspectionBundle.message("convertible.to.method.value.anonymous.hint")
+  val hintEta =
+    InspectionBundle.message("convertible.to.method.value.eta.hint")
 
-  protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[ConvertibleToMethodValueInspection]
+  protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[ConvertibleToMethodValueInspection]
 
   def test_methodCallUntyped() {
     val selected = s"""object A {
@@ -179,8 +183,7 @@ class ConvertibleToMethodValueInspectionTest extends ScalaLightInspectionFixture
   }
 
   def test_SCL6154() {
-    val text =
-      """class A {
+    val text = """class A {
         |def bar() = {
         |    val x = List(1, 2, 3)
         |    x.map(1 + _)
@@ -199,8 +202,7 @@ class ConvertibleToMethodValueInspectionTest extends ScalaLightInspectionFixture
   }
 
   def testImplicits(): Unit = {
-    checkTextHasNoErrors(
-      """
+    checkTextHasNoErrors("""
         |import scala.language.implicitConversions
         |
         |object TupleMethod extends App {
@@ -226,7 +228,7 @@ class ConvertibleToMethodValueInspectionTest extends ScalaLightInspectionFixture
 
   def testNonStable(): Unit = {
     checkTextHasNoErrors(
-      """class A(s: String) {
+        """class A(s: String) {
         |  def foo(x: String) = x
         |}
         |
@@ -323,7 +325,7 @@ class ConvertibleToMethodValueInspectionTest extends ScalaLightInspectionFixture
                    |  list.map(${START}AObj.foo(_)$END)
                    |}
       """.stripMargin
-    val result =s"""class A(s: String) {
+    val result = s"""class A(s: String) {
                     |  def foo(x: String) = x
                     |}
                     |

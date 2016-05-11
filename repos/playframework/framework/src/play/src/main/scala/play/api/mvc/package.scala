@@ -4,30 +4,29 @@
 package play.api
 
 /**
- * Contains the Controller/Action/Result API to handle HTTP requests.
- *
- * For example, a typical controller:
- * {{{
- * object Application extends Controller {
- *
- *   def index = Action {
- *     Ok("It works!")
- *   }
- *
- * }
- * }}}
- */
+  * Contains the Controller/Action/Result API to handle HTTP requests.
+  *
+  * For example, a typical controller:
+  * {{{
+  * object Application extends Controller {
+  *
+  *   def index = Action {
+  *     Ok("It works!")
+  *   }
+  *
+  * }
+  * }}}
+  */
 package object mvc {
 
   /**
-   * Alias types for Sockets
-   */
+    * Alias types for Sockets
+    */
   object Socket {
 
     /**
-     * A Socket Out
-     */
+      * A Socket Out
+      */
     type Out[A] = play.api.libs.iteratee.Iteratee[A, Unit]
-
   }
 }

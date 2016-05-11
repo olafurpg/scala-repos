@@ -19,12 +19,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports._
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScImportExprStub
 
 /**
- * @author AlexanderPodkhalyuzin
-* Date: 20.02.2008
- */
-
-class ScImportExprImpl private (stub: StubElement[ScImportExpr], nodeType: IElementType, node: ASTNode)
-  extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScImportExpr {
+  * @author AlexanderPodkhalyuzin
+  * Date: 20.02.2008
+  */
+class ScImportExprImpl private (
+    stub: StubElement[ScImportExpr], nodeType: IElementType, node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScImportExpr {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -32,8 +32,10 @@ class ScImportExprImpl private (stub: StubElement[ScImportExpr], nodeType: IElem
     }
   }
 
-  def this(node: ASTNode) = {this(null, null, node)}
-  def this(stub: ScImportExprStub) = {this(stub, ScalaElementTypes.IMPORT_EXPR, null)}
+  def this(node: ASTNode) = { this(null, null, node) }
+  def this(stub: ScImportExprStub) = {
+    this(stub, ScalaElementTypes.IMPORT_EXPR, null)
+  }
 
   override def toString: String = "ImportExpression"
 
@@ -65,12 +67,10 @@ class ScImportExprImpl private (stub: StubElement[ScImportExpr], nodeType: IElem
   }
 
   def qualifier: ScStableCodeReferenceElement = {
-    if (reference.isEmpty)
-      throw new IncorrectOperationException()
+    if (reference.isEmpty) throw new IncorrectOperationException()
     else if (!singleWildcard && selectorSet.isEmpty)
       reference.flatMap(_.qualifier).orNull
-    else
-      reference.get
+    else reference.get
   }
 
   def deleteExpr() {
@@ -86,8 +86,9 @@ class ScImportExprImpl private (stub: StubElement[ScImportExpr], nodeType: IElem
       val next = getNextSibling
       if (next != null) {
         def removeWhitespaceAfterComma(comma: ASTNode) {
-          if (comma.getTreeNext != null && !comma.getTreeNext.getText.contains("\n") &&
-            comma.getTreeNext.getText.trim.isEmpty) {
+          if (comma.getTreeNext != null &&
+              !comma.getTreeNext.getText.contains("\n") &&
+              comma.getTreeNext.getText.trim.isEmpty) {
             remove(comma.getTreeNext)
           }
         }
@@ -96,7 +97,8 @@ class ScImportExprImpl private (stub: StubElement[ScImportExpr], nodeType: IElem
           removeWhitespaceAfterComma(comma)
           remove(comma)
         } else {
-          if (next.getNextSibling != null && next.getNextSibling.getText == ",") {
+          if (next.getNextSibling != null &&
+              next.getNextSibling.getText == ",") {
             val comma = next.getNextSibling
             removeWhitespaceAfterComma(comma.getNode)
             remove(next.getNode)
@@ -107,7 +109,8 @@ class ScImportExprImpl private (stub: StubElement[ScImportExpr], nodeType: IElem
               if (prev.getText == ",") {
                 remove(prev.getNode)
               } else {
-                if (prev.getPrevSibling != null && prev.getPrevSibling.getText == ",") {
+                if (prev.getPrevSibling != null &&
+                    prev.getPrevSibling.getText == ",") {
                   remove(prev.getPrevSibling.getNode)
                 }
               }
@@ -120,7 +123,8 @@ class ScImportExprImpl private (stub: StubElement[ScImportExpr], nodeType: IElem
           if (prev.getText == ",") {
             remove(prev.getNode)
           } else {
-            if (prev.getPrevSibling != null && prev.getPrevSibling.getText == ",") {
+            if (prev.getPrevSibling != null &&
+                prev.getPrevSibling.getText == ",") {
               val prevSibling = prev.getPrevSibling
               remove(prev.getNode)
               remove(prevSibling.getNode)
@@ -132,15 +136,16 @@ class ScImportExprImpl private (stub: StubElement[ScImportExpr], nodeType: IElem
     }
   }
 
-
   def selectorSet: Option[ScImportSelectors] = {
-    val psi: ScImportSelectors = getStubOrPsiChild(ScalaElementTypes.IMPORT_SELECTORS)
+    val psi: ScImportSelectors = getStubOrPsiChild(
+        ScalaElementTypes.IMPORT_SELECTORS)
     Option(psi)
   }
 
   def reference: Option[ScStableCodeReferenceElement] = {
     val stub = getStub
     if (stub != null) stub.asInstanceOf[ScImportExprStub].reference
-    else getFirstChild.asOptionOf[ScStableCodeReferenceElement]  /*findChild(classOf[ScStableCodeReferenceElement])*/
+    else
+      getFirstChild.asOptionOf[ScStableCodeReferenceElement] /*findChild(classOf[ScStableCodeReferenceElement])*/
   }
 }

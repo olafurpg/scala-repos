@@ -4,9 +4,9 @@
 package sbt
 package std
 
-import java.io.{ InputStream, IOException, OutputStream, Reader, Writer }
-import java.io.{ BufferedInputStream, BufferedOutputStream, BufferedReader, BufferedWriter, PrintWriter }
-import java.io.{ Closeable, File, FileInputStream, FileOutputStream, InputStreamReader, OutputStreamWriter }
+import java.io.{InputStream, IOException, OutputStream, Reader, Writer}
+import java.io.{BufferedInputStream, BufferedOutputStream, BufferedReader, BufferedWriter, PrintWriter}
+import java.io.{Closeable, File, FileInputStream, FileOutputStream, InputStreamReader, OutputStreamWriter}
 
 import sbt.internal.io.DeferredWriter
 import sbt.io.IO
@@ -16,11 +16,12 @@ import sbt.util.Logger
 
 // no longer specific to Tasks, so 'TaskStreams' should be renamed
 /**
- * Represents a set of streams associated with a context.
- * In sbt, this is a named set of streams for a particular scoped key.
- * For example, logging for test:compile is by default sent to the "out" stream in the test:compile context.
- */
+  * Represents a set of streams associated with a context.
+  * In sbt, this is a named set of streams for a particular scoped key.
+  * For example, logging for test:compile is by default sent to the "out" stream in the test:compile context.
+  */
 sealed trait TaskStreams[Key] {
+
   /** The default stream ID, used when an ID is not provided. */
   def default = outID
 
@@ -28,21 +29,23 @@ sealed trait TaskStreams[Key] {
   def errorID = "err"
 
   /**
-   * Provides a reader to read text from the stream `sid` for `key`.
-   * It is the caller's responsibility to coordinate writing to the stream.
-   * That is, no synchronization or ordering is provided and so this method should only be called when writing is complete.
-   */
+    * Provides a reader to read text from the stream `sid` for `key`.
+    * It is the caller's responsibility to coordinate writing to the stream.
+    * That is, no synchronization or ordering is provided and so this method should only be called when writing is complete.
+    */
   def readText(key: Key, sid: String = default): BufferedReader
 
   /**
-   * Provides an output stream to read from the stream `sid` for `key`.
-   * It is the caller's responsibility to coordinate writing to the stream.
-   * That is, no synchronization or ordering is provided and so this method should only be called when writing is complete.
-   */
+    * Provides an output stream to read from the stream `sid` for `key`.
+    * It is the caller's responsibility to coordinate writing to the stream.
+    * That is, no synchronization or ordering is provided and so this method should only be called when writing is complete.
+    */
   def readBinary(a: Key, sid: String = default): BufferedInputStream
 
-  final def readText(a: Key, sid: Option[String]): BufferedReader = readText(a, getID(sid))
-  final def readBinary(a: Key, sid: Option[String]): BufferedInputStream = readBinary(a, getID(sid))
+  final def readText(a: Key, sid: Option[String]): BufferedReader =
+    readText(a, getID(sid))
+  final def readBinary(a: Key, sid: Option[String]): BufferedInputStream =
+    readBinary(a, getID(sid))
 
   def key: Key
 
@@ -72,49 +75,60 @@ sealed trait ManagedStreams[Key] extends TaskStreams[Key] {
 
 trait Streams[Key] {
   def apply(a: Key): ManagedStreams[Key]
-  def use[T](key: Key)(f: TaskStreams[Key] => T): T =
-    {
-      val s = apply(key)
-      s.open()
-      try { f(s) } finally { s.close() }
-    }
+  def use[T](key: Key)(f: TaskStreams[Key] => T): T = {
+    val s = apply(key)
+    s.open()
+    try { f(s) } finally { s.close() }
+  }
 }
 trait CloseableStreams[Key] extends Streams[Key] with java.io.Closeable
 object Streams {
-  private[this] val closeQuietly = (c: Closeable) => try { c.close() } catch { case _: IOException => () }
+  private[this] val closeQuietly = (c: Closeable) =>
+    try { c.close() } catch { case _: IOException => () }
 
-  def closeable[Key](delegate: Streams[Key]): CloseableStreams[Key] = new CloseableStreams[Key] {
-    private[this] val streams = new collection.mutable.HashMap[Key, ManagedStreams[Key]]
+  def closeable[Key](delegate: Streams[Key]): CloseableStreams[Key] =
+    new CloseableStreams[Key] {
+      private[this] val streams =
+        new collection.mutable.HashMap[Key, ManagedStreams[Key]]
 
-    def apply(key: Key): ManagedStreams[Key] =
-      synchronized {
-        streams.get(key) match {
-          case Some(s) if !s.isClosed => s
-          case _ =>
-            val newS = delegate(key)
-            streams.put(key, newS)
-            newS
+      def apply(key: Key): ManagedStreams[Key] =
+        synchronized {
+          streams.get(key) match {
+            case Some(s) if !s.isClosed => s
+            case _ =>
+              val newS = delegate(key)
+              streams.put(key, newS)
+              newS
+          }
         }
-      }
 
-    def close(): Unit =
-      synchronized { streams.values.foreach(_.close()); streams.clear() }
-  }
+      def close(): Unit =
+        synchronized { streams.values.foreach(_.close()); streams.clear() }
+    }
 
-  def apply[Key](taskDirectory: Key => File, name: Key => String, mkLogger: (Key, PrintWriter) => Logger): Streams[Key] = new Streams[Key] {
+  def apply[Key](taskDirectory: Key => File,
+                 name: Key => String,
+                 mkLogger: (Key,
+                 PrintWriter) => Logger): Streams[Key] = new Streams[Key] {
 
     def apply(a: Key): ManagedStreams[Key] = new ManagedStreams[Key] {
       private[this] var opened: List[Closeable] = Nil
       private[this] var closed = false
 
       def readText(a: Key, sid: String = default): BufferedReader =
-        make(a, sid)(f => new BufferedReader(new InputStreamReader(new FileInputStream(f), IO.defaultCharset)))
+        make(a, sid)(f =>
+              new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                                                       IO.defaultCharset)))
 
       def readBinary(a: Key, sid: String = default): BufferedInputStream =
         make(a, sid)(f => new BufferedInputStream(new FileInputStream(f)))
 
       def text(sid: String = default): PrintWriter =
-        make(a, sid)(f => new PrintWriter(new DeferredWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), IO.defaultCharset)))))
+        make(a, sid)(
+            f =>
+              new PrintWriter(
+                  new DeferredWriter(new BufferedWriter(new OutputStreamWriter(
+                              new FileOutputStream(f), IO.defaultCharset)))))
 
       def binary(sid: String = default): BufferedOutputStream =
         make(a, sid)(f => new BufferedOutputStream(new FileOutputStream(f)))
@@ -127,14 +141,15 @@ object Streams {
 
       def log(sid: String): Logger = mkLogger(a, text(sid))
 
-      def make[T <: Closeable](a: Key, sid: String)(f: File => T): T = synchronized {
-        checkOpen()
-        val file = taskDirectory(a) / sid
-        IO.touch(file, false)
-        val t = f(file)
-        opened ::= t
-        t
-      }
+      def make[T <: Closeable](a: Key, sid: String)(f: File => T): T =
+        synchronized {
+          checkOpen()
+          val file = taskDirectory(a) / sid
+          IO.touch(file, false)
+          val t = f(file)
+          opened ::= t
+          t
+        }
 
       def key: Key = a
       def open(): Unit = ()
@@ -147,7 +162,8 @@ object Streams {
         }
       }
       def checkOpen(): Unit = synchronized {
-        if (closed) sys.error("Streams for '" + name(a) + "' have been closed.")
+        if (closed)
+          sys.error("Streams for '" + name(a) + "' have been closed.")
       }
     }
   }

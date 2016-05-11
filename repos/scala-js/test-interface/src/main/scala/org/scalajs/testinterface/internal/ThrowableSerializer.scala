@@ -15,8 +15,7 @@ object ThrowableSerializer {
         toString = t.toString(),
         stackTrace = t.getStackTrace().map(serializeTraceElem).toJSArray)
 
-    if (t.getCause() != null)
-      res.cause = serialize(t.getCause())
+    if (t.getCause() != null) res.cause = serialize(t.getCause())
 
     res
   }
@@ -27,5 +26,4 @@ object ThrowableSerializer {
         fileName = e.getFileName,
         lineNumber = e.getLineNumber)
   }
-
 }

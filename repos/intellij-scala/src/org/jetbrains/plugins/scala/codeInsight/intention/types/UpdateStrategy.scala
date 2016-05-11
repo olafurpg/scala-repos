@@ -18,10 +18,10 @@ import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 /**
- * Pavel.Fatin, 28.04.2010
- */
-
-class AddOrRemoveStrategy(editor: Option[Editor]) extends UpdateStrategy(editor)
+  * Pavel.Fatin, 28.04.2010
+  */
+class AddOrRemoveStrategy(editor: Option[Editor])
+    extends UpdateStrategy(editor)
 
 object AddOrRemoveStrategy {
   def withoutEditor = new AddOrRemoveStrategy(None)
@@ -83,7 +83,8 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
   }
 
   def removeFromPattern(pattern: ScTypedPattern) {
-    val newPattern = ScalaPsiElementFactory.createPatternFromText(pattern.name, pattern.getManager)
+    val newPattern = ScalaPsiElementFactory.createPatternFromText(
+        pattern.name, pattern.getManager)
     pattern.replace(newPattern)
   }
 
@@ -98,7 +99,10 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
               val param1 = param.getParent match {
                 case x: ScParameterClause if x.parameters.length == 1 =>
                   // ensure  that the parameter is wrapped in parentheses before we add the type annotation.
-                  val clause: PsiElement = x.replace(ScalaPsiElementFactory.createClauseForFunctionExprFromText("(" + param.getText + ")", param.getManager))
+                  val clause: PsiElement = x.replace(
+                      ScalaPsiElementFactory
+                        .createClauseForFunctionExprFromText(
+                          "(" + param.getText + ")", param.getManager))
                   clause.asInstanceOf[ScParameterClause].parameters.head
                 case _ => param
               }
@@ -111,17 +115,19 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
   }
 
   def removeFromParameter(param: ScParameter) {
-    val newParam = ScalaPsiElementFactory.createParameterFromText(param.name, param.getManager)
-    val newClause = ScalaPsiElementFactory.createClauseForFunctionExprFromText(newParam.getText, param.getManager)
-    val expr : ScFunctionExpr = PsiTreeUtil.getParentOfType(param, classOf[ScFunctionExpr], false)
+    val newParam = ScalaPsiElementFactory.createParameterFromText(
+        param.name, param.getManager)
+    val newClause = ScalaPsiElementFactory.createClauseForFunctionExprFromText(
+        newParam.getText, param.getManager)
+    val expr: ScFunctionExpr =
+      PsiTreeUtil.getParentOfType(param, classOf[ScFunctionExpr], false)
     if (expr != null) {
       val firstClause = expr.params.clauses.head
       val fcText = firstClause.getText
-      if (expr.parameters.size == 1 && fcText.startsWith("(") && fcText.endsWith(")"))
-        firstClause.replace(newClause)
+      if (expr.parameters.size == 1 && fcText.startsWith("(") &&
+          fcText.endsWith(")")) firstClause.replace(newClause)
       else param.replace(newParam)
-    }
-    else param.replace(newParam)
+    } else param.replace(newParam)
   }
 
   def addTypeAnnotation(t: ScType, context: PsiElement, anchor: PsiElement) {
@@ -129,13 +135,15 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
       val parent = anchor.getParent
       val added = parent.addAfter(annotation, anchor)
       val colon = ScalaPsiElementFactory.createColon(context.getManager)
-      val whitespace = ScalaPsiElementFactory.createWhitespace(context.getManager)
+      val whitespace =
+        ScalaPsiElementFactory.createWhitespace(context.getManager)
       parent.addAfter(whitespace, anchor)
       parent.addAfter(colon, anchor)
       added
     }
 
-    def typeElemfromText(s: String) = ScalaPsiElementFactory.createTypeElementFromText(s, context.getManager)
+    def typeElemfromText(s: String) =
+      ScalaPsiElementFactory.createTypeElementFromText(s, context.getManager)
     def typeElemFromType(tp: ScType) = typeElemfromText(tp.canonicalText)
 
     def isSealed(c: PsiClass) = c match {
@@ -145,35 +153,52 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
 
     val tps: Seq[ScTypeElement] = t match {
       case ScCompoundType(comps, _, _) =>
-        val uselessTypes = Set("_root_.scala.Product", "_root_.scala.Serializable", "_root_.java.lang.Object")
+        val uselessTypes = Set("_root_.scala.Product",
+                               "_root_.scala.Serializable",
+                               "_root_.java.lang.Object")
         comps.map(_.canonicalText).filterNot(uselessTypes.contains) match {
           case Seq(base) => Seq(typeElemfromText(base))
-          case types => (Seq(types.mkString(" with ")) ++ types).flatMap { t =>
-            Seq(typeElemfromText(t))
-          }
+          case types =>
+            (Seq(types.mkString(" with ")) ++ types).flatMap { t =>
+              Seq(typeElemfromText(t))
+            }
         }
-      case someOrNone if Set("_root_.scala.Some", "_root_.scala.None").exists(someOrNone.canonicalText.startsWith) =>
-        val replacement = BaseTypes.get(someOrNone).find(_.canonicalText.startsWith("_root_.scala.Option")).getOrElse(someOrNone)
+      case someOrNone
+          if Set("_root_.scala.Some", "_root_.scala.None").exists(
+              someOrNone.canonicalText.startsWith) =>
+        val replacement = BaseTypes
+          .get(someOrNone)
+          .find(_.canonicalText.startsWith("_root_.scala.Option"))
+          .getOrElse(someOrNone)
         Seq(typeElemFromType(replacement))
       case tp =>
         ScType.extractClass(tp, Option(context.getProject)) match {
-          case Some(sc: ScTypeDefinition) if (sc +: sc.supers).exists(isSealed) =>
-            val sealedType = BaseTypes.get(tp).find(ScType.extractClass(_, Option(context.getProject)).exists(isSealed))
-            (sealedType.toSeq :+ tp).map(typeElemFromType)
-          case Some(sc: ScTypeDefinition) if sc.getTruncedQualifiedName.startsWith("scala.collection") =>
+          case Some(sc: ScTypeDefinition)
+              if (sc +: sc.supers).exists(isSealed) =>
+            val sealedType = BaseTypes
+              .get(tp)
+              .find(ScType
+                    .extractClass(_, Option(context.getProject))
+                    .exists(isSealed))
+              (sealedType.toSeq :+ tp).map(typeElemFromType)
+          case Some(sc: ScTypeDefinition)
+              if sc.getTruncedQualifiedName.startsWith("scala.collection") =>
             val goodTypes = Set(
-              "_root_.scala.collection.Seq[",
-              "_root_.scala.collection.mutable.Seq[",
-              "_root_.scala.collection.immutable.Seq[",
-              "_root_.scala.collection.Set[",
-              "_root_.scala.collection.mutable.Set[",
-              "_root_.scala.collection.immutable.Set[",
-              "_root_.scala.collection.Map[",
-              "_root_.scala.collection.mutable.Map[",
-              "_root_.scala.collection.immutable.Map["
+                "_root_.scala.collection.Seq[",
+                "_root_.scala.collection.mutable.Seq[",
+                "_root_.scala.collection.immutable.Seq[",
+                "_root_.scala.collection.Set[",
+                "_root_.scala.collection.mutable.Set[",
+                "_root_.scala.collection.immutable.Set[",
+                "_root_.scala.collection.Map[",
+                "_root_.scala.collection.mutable.Map[",
+                "_root_.scala.collection.immutable.Map["
             )
-            val baseTypes = BaseTypes.get(tp).map(_.canonicalText).filter(t => goodTypes.exists(t.startsWith))
-            (tp.canonicalText +: baseTypes).map(typeElemfromText)
+            val baseTypes = BaseTypes
+              .get(tp)
+              .map(_.canonicalText)
+              .filter(t => goodTypes.exists(t.startsWith))
+              (tp.canonicalText +: baseTypes).map(typeElemfromText)
           case _ => Seq(typeElemFromType(tp))
         }
     }

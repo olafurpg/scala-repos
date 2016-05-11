@@ -9,14 +9,17 @@ package util
 
 import scala.reflect.internal.Chars._
 
-class JavaCharArrayReader(buf: IndexedSeq[Char], start: Int, /* startline: int, startcol: int, */
-                      decodeUni: Boolean, error: String => Unit) extends Iterator[Char] with Cloneable {
+class JavaCharArrayReader(buf: IndexedSeq[Char],
+                          start: Int, /* startline: int, startcol: int, */
+                          decodeUni: Boolean,
+                          error: String => Unit)
+    extends Iterator[Char] with Cloneable {
 
   def this(buf: IndexedSeq[Char], decodeUni: Boolean, error: String => Unit) =
     this(buf, 0, /* 1, 1, */ decodeUni, error)
 
   /** the line and column position of the current character
-  */
+    */
   var ch: Char = _
   var bp = start
   def cpos = bp
@@ -25,10 +28,11 @@ class JavaCharArrayReader(buf: IndexedSeq[Char], start: Int, /* startline: int, 
   def hasNext = bp < buf.length
 
   def next(): Char = {
-    val buf = this.buf.asInstanceOf[collection.mutable.WrappedArray[Char]].array
-    if(!hasNext) {
+    val buf =
+      this.buf.asInstanceOf[collection.mutable.WrappedArray[Char]].array
+    if (!hasNext) {
       ch = SU
-      return SU  // there is an endless stream of SU's at the end
+      return SU // there is an endless stream of SU's at the end
     }
     ch = buf(bp)
     isUnicode = false

@@ -22,9 +22,9 @@ object JSONDeserializer {
     def deserialize(x: JSON): List[T] = Impl.toList(x).map(fromJSON[T] _)
   }
 
-  implicit def mapJSON[V : JSONDeserializer] = new JSONDeserializer[Map[String, V]] {
-    def deserialize(x: JSON): Map[String, V] =
-      Impl.toMap(x).mapValues(fromJSON[V] _)
-  }
-
+  implicit def mapJSON[V : JSONDeserializer] =
+    new JSONDeserializer[Map[String, V]] {
+      def deserialize(x: JSON): Map[String, V] =
+        Impl.toMap(x).mapValues(fromJSON[V] _)
+    }
 }

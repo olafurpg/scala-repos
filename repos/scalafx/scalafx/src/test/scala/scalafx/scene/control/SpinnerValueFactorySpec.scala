@@ -36,20 +36,22 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * SpinnerValueFactory Spec tests.
- *
- */
+  * SpinnerValueFactory Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class SpinnerValueFactorySpec[Integer]
-  extends SimpleSFXDelegateSpec[jfxsc.SpinnerValueFactory[Integer], SpinnerValueFactory[Integer]](
-    classOf[jfxsc.SpinnerValueFactory[Integer]], classOf[SpinnerValueFactory[Integer]])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[
+        jfxsc.SpinnerValueFactory[Integer], SpinnerValueFactory[Integer]](
+        classOf[jfxsc.SpinnerValueFactory[Integer]],
+        classOf[SpinnerValueFactory[Integer]]) with RunOnApplicationThread {
 
-  override protected def getScalaClassInstance = new SpinnerValueFactory[Integer](getJavaClassInstance) {}
+  override protected def getScalaClassInstance =
+    new SpinnerValueFactory[Integer](getJavaClassInstance) {}
 
-  override protected def getJavaClassInstance = new jfxsc.SpinnerValueFactory[Integer]() {
-    override def decrement(steps: Int) = ???
-    override def increment(steps: Int) = ???
-  }
-
+  override protected def getJavaClassInstance =
+    new jfxsc.SpinnerValueFactory[Integer]() {
+      override def decrement(steps: Int) = ???
+      override def increment(steps: Int) = ???
+    }
 }

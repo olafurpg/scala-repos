@@ -6,19 +6,21 @@
 package scala.tools.nsc.interactive
 
 /** A presentation compiler thread. This is a lightweight class, delegating most
- *  of its functionality to the compiler instance.
- *
- */
+  *  of its functionality to the compiler instance.
+  *
+  */
 final class PresentationCompilerThread(var compiler: Global, name: String = "")
-  extends Thread("Scala Presentation Compiler [" + name + "]") {
+    extends Thread("Scala Presentation Compiler [" + name + "]") {
 
   /** The presentation compiler loop.
-   */
+    */
   override def run() {
     compiler.debugLog("starting new runner thread")
     while (compiler ne null) try {
       compiler.checkNoResponsesOutstanding()
-      compiler.log.logreplay("wait for more work", { compiler.scheduler.waitForMoreWork(); true })
+      compiler.log.logreplay("wait for more work", {
+        compiler.scheduler.waitForMoreWork(); true
+      })
       compiler.pollForWork(compiler.NoPosition)
       while (compiler.isOutOfDate) {
         try {
@@ -41,10 +43,14 @@ final class PresentationCompilerThread(var compiler: Global, name: String = "")
 
         ex match {
           case ex: FreshRunReq =>
-            compiler.debugLog("fresh run req caught outside presentation compiler loop; ignored") // This shouldn't be reported
-          case _ : Global#ValidateException => // This will have been reported elsewhere
-            compiler.debugLog("validate exception caught outside presentation compiler loop; ignored")
-          case _ => ex.printStackTrace(); compiler.informIDE("Fatal Error: "+ex)
+            compiler.debugLog(
+                "fresh run req caught outside presentation compiler loop; ignored") // This shouldn't be reported
+          case _: Global#ValidateException =>
+            // This will have been reported elsewhere
+            compiler.debugLog(
+                "validate exception caught outside presentation compiler loop; ignored")
+          case _ =>
+            ex.printStackTrace(); compiler.informIDE("Fatal Error: " + ex)
         }
     }
   }

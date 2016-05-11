@@ -31,9 +31,12 @@ import javafx.util.{converter => jfxuc}
 import scala.language.implicitConversions
 
 object BooleanStringConverter {
-  implicit def sfxBooleanStringConverter2jfx(c: BooleanStringConverter): jfxuc.BooleanStringConverter =
+  implicit def sfxBooleanStringConverter2jfx(
+      c: BooleanStringConverter): jfxuc.BooleanStringConverter =
     if (c != null) c.delegate else null
 }
 
-class BooleanStringConverter(delegate: jfxuc.BooleanStringConverter = new jfxuc.BooleanStringConverter)
-  extends StringConverterDelegate[java.lang.Boolean, Boolean, jfxuc.BooleanStringConverter](delegate)
+class BooleanStringConverter(
+    delegate: jfxuc.BooleanStringConverter = new jfxuc.BooleanStringConverter)
+    extends StringConverterDelegate[
+        java.lang.Boolean, Boolean, jfxuc.BooleanStringConverter](delegate)

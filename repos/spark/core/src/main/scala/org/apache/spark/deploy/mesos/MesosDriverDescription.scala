@@ -23,16 +23,16 @@ import org.apache.spark.deploy.Command
 import org.apache.spark.scheduler.cluster.mesos.MesosClusterRetryState
 
 /**
- * Describes a Spark driver that is submitted from the
- * [[org.apache.spark.deploy.rest.mesos.MesosRestServer]], to be launched by
- * [[org.apache.spark.scheduler.cluster.mesos.MesosClusterScheduler]].
- * @param jarUrl URL to the application jar
- * @param mem Amount of memory for the driver
- * @param cores Number of cores for the driver
- * @param supervise Supervise the driver for long running app
- * @param command The command to launch the driver.
- * @param schedulerProperties Extra properties to pass the Mesos scheduler
- */
+  * Describes a Spark driver that is submitted from the
+  * [[org.apache.spark.deploy.rest.mesos.MesosRestServer]], to be launched by
+  * [[org.apache.spark.scheduler.cluster.mesos.MesosClusterScheduler]].
+  * @param jarUrl URL to the application jar
+  * @param mem Amount of memory for the driver
+  * @param cores Number of cores for the driver
+  * @param supervise Supervise the driver for long running app
+  * @param command The command to launch the driver.
+  * @param schedulerProperties Extra properties to pass the Mesos scheduler
+  */
 private[spark] class MesosDriverDescription(
     val name: String,
     val jarUrl: String,
@@ -44,22 +44,31 @@ private[spark] class MesosDriverDescription(
     val submissionId: String,
     val submissionDate: Date,
     val retryState: Option[MesosClusterRetryState] = None)
-  extends Serializable {
+    extends Serializable {
 
-  def copy(
-      name: String = name,
-      jarUrl: String = jarUrl,
-      mem: Int = mem,
-      cores: Double = cores,
-      supervise: Boolean = supervise,
-      command: Command = command,
-      schedulerProperties: Map[String, String] = schedulerProperties,
-      submissionId: String = submissionId,
-      submissionDate: Date = submissionDate,
-      retryState: Option[MesosClusterRetryState] = retryState): MesosDriverDescription = {
-    new MesosDriverDescription(name, jarUrl, mem, cores, supervise, command, schedulerProperties,
-      submissionId, submissionDate, retryState)
+  def copy(name: String = name,
+           jarUrl: String = jarUrl,
+           mem: Int = mem,
+           cores: Double = cores,
+           supervise: Boolean = supervise,
+           command: Command = command,
+           schedulerProperties: Map[String, String] = schedulerProperties,
+           submissionId: String = submissionId,
+           submissionDate: Date = submissionDate,
+           retryState: Option[MesosClusterRetryState] = retryState)
+    : MesosDriverDescription = {
+    new MesosDriverDescription(name,
+                               jarUrl,
+                               mem,
+                               cores,
+                               supervise,
+                               command,
+                               schedulerProperties,
+                               submissionId,
+                               submissionDate,
+                               retryState)
   }
 
-  override def toString: String = s"MesosDriverDescription (${command.mainClass})"
+  override def toString: String =
+    s"MesosDriverDescription (${command.mainClass})"
 }

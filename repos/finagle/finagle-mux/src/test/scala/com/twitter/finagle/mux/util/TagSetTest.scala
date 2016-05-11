@@ -9,8 +9,7 @@ class TagSetTest extends FunSuite {
   val range = 0 until 10
   test("assign contiguous, small tags in the range") {
     val set = TagSet(range)
-    for (i <- range)
-      assert(set.acquire() == Some(i))
+    for (i <- range) assert(set.acquire() == Some(i))
 
     assert(set.acquire() == None)
 
@@ -30,8 +29,7 @@ class TagSetTest extends FunSuite {
   test("iterate over current tags") {
     val set = TagSet(range)
 
-    for (i <- range)
-      assert(set.acquire() == Some(i))
+    for (i <- range) assert(set.acquire() == Some(i))
 
     assert(set.toSeq == range.toSeq)
 

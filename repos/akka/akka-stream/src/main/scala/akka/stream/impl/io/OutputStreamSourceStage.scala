@@ -1,13 +1,13 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl.io
 
-import java.io.{ IOException, OutputStream }
+import java.io.{IOException, OutputStream}
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.{ BlockingQueue, LinkedBlockingQueue }
+import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue}
 
-import akka.stream.{ Outlet, SourceShape, Attributes }
+import akka.stream.{Outlet, SourceShape, Attributes}
 import akka.stream.Attributes.InputBuffer
 import akka.stream.impl.Stages.DefaultAttributes
 import akka.stream.impl.io.OutputStreamSourceStage._
@@ -15,9 +15,9 @@ import akka.stream.stage._
 import akka.util.ByteString
 
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ Await, Future, Promise }
+import scala.concurrent.{Await, Future, Promise}
 import scala.util.control.NonFatal
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 private[stream] object OutputStreamSourceStage {
   sealed trait AdapterToStageMessage
@@ -33,13 +33,19 @@ private[stream] object OutputStreamSourceStage {
   }
 }
 
-final private[stream] class OutputStreamSourceStage(writeTimeout: FiniteDuration) extends GraphStageWithMaterializedValue[SourceShape[ByteString], OutputStream] {
+final private[stream] class OutputStreamSourceStage(
+    writeTimeout: FiniteDuration)
+    extends GraphStageWithMaterializedValue[
+        SourceShape[ByteString], OutputStream] {
   val out = Outlet[ByteString]("OutputStreamSource.out")
   override def initialAttributes = DefaultAttributes.outputStreamSource
   override val shape: SourceShape[ByteString] = SourceShape.of(out)
 
-  override def createLogicAndMaterializedValue(inheritedAttributes: Attributes): (GraphStageLogic, OutputStream) = {
-    val maxBuffer = inheritedAttributes.getAttribute(classOf[InputBuffer], InputBuffer(16, 16)).max
+  override def createLogicAndMaterializedValue(
+      inheritedAttributes: Attributes): (GraphStageLogic, OutputStream) = {
+    val maxBuffer = inheritedAttributes
+      .getAttribute(classOf[InputBuffer], InputBuffer(16, 16))
+      .max
     require(maxBuffer > 0, "Buffer size must be greater than 0")
 
     val dataQueue = new LinkedBlockingQueue[ByteString](maxBuffer)
@@ -52,11 +58,12 @@ final private[stream] class OutputStreamSourceStage(writeTimeout: FiniteDuration
       private val downstreamCallback: AsyncCallback[Try[ByteString]] =
         getAsyncCallback {
           case Success(elem) ⇒ onPush(elem)
-          case Failure(ex)   ⇒ failStage(ex)
+          case Failure(ex) ⇒ failStage(ex)
         }
 
-      private val upstreamCallback: AsyncCallback[(AdapterToStageMessage, Promise[Unit])] =
-        getAsyncCallback(onAsyncMessage)
+      private val upstreamCallback: AsyncCallback[
+          (AdapterToStageMessage, Promise[Unit])] = getAsyncCallback(
+          onAsyncMessage)
 
       override def wakeUp(msg: AdapterToStageMessage): Future[Unit] = {
         val p = Promise[Unit]()
@@ -64,7 +71,8 @@ final private[stream] class OutputStreamSourceStage(writeTimeout: FiniteDuration
         p.future
       }
 
-      private def onAsyncMessage(event: (AdapterToStageMessage, Promise[Unit])): Unit =
+      private def onAsyncMessage(
+          event: (AdapterToStageMessage, Promise[Unit])): Unit =
         event._1 match {
           case Flush ⇒
             flush = Some(event._2)
@@ -84,17 +92,19 @@ final private[stream] class OutputStreamSourceStage(writeTimeout: FiniteDuration
             p.complete(Success(()))
             flush = None
             true
-          case None ⇒ close match {
-            case Some(p) ⇒
-              p.complete(Success(()))
-              close = None
-              true
-            case None ⇒ false
-          }
+          case None ⇒
+            close match {
+              case Some(p) ⇒
+                p.complete(Success(()))
+                close = None
+                true
+              case None ⇒ false
+            }
         }
 
       private def sendResponseIfNeed(): Unit =
-        if (downstreamStatus.get() == Canceled || dataQueue.isEmpty) unblockUpstream()
+        if (downstreamStatus.get() == Canceled || dataQueue.isEmpty)
+          unblockUpstream()
 
       private def onPush(data: ByteString): Unit =
         if (downstreamStatus.get() == Ok) {
@@ -117,19 +127,23 @@ final private[stream] class OutputStreamSourceStage(writeTimeout: FiniteDuration
         }
       })
     }
-    (logic, new OutputStreamAdapter(dataQueue, downstreamStatus, logic.wakeUp, writeTimeout))
+    (logic,
+     new OutputStreamAdapter(
+         dataQueue, downstreamStatus, logic.wakeUp, writeTimeout))
   }
 }
 
-private[akka] class OutputStreamAdapter(dataQueue: BlockingQueue[ByteString],
-                                        downstreamStatus: AtomicReference[DownstreamStatus],
-                                        sendToStage: (AdapterToStageMessage) ⇒ Future[Unit],
-                                        writeTimeout: FiniteDuration)
-  extends OutputStream {
+private[akka] class OutputStreamAdapter(
+    dataQueue: BlockingQueue[ByteString],
+    downstreamStatus: AtomicReference[DownstreamStatus],
+    sendToStage: (AdapterToStageMessage) ⇒ Future[Unit],
+    writeTimeout: FiniteDuration)
+    extends OutputStream {
 
   var isActive = true
   var isPublisherAlive = true
-  val publisherClosedException = new IOException("Reactive stream is terminated, no writes are possible")
+  val publisherClosedException = new IOException(
+      "Reactive stream is terminated, no writes are possible")
 
   @scala.throws(classOf[IOException])
   private[this] def send(sendAction: () ⇒ Unit): Unit = {
@@ -141,20 +155,24 @@ private[akka] class OutputStreamAdapter(dataQueue: BlockingQueue[ByteString],
 
   @scala.throws(classOf[IOException])
   private[this] def sendData(data: ByteString): Unit =
-    send(() ⇒ {
-      try {
-        dataQueue.put(data)
-      } catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
-      if (downstreamStatus.get() == Canceled) {
-        isPublisherAlive = false
-        throw publisherClosedException
-      }
+    send(
+        () ⇒
+          {
+        try {
+          dataQueue.put(data)
+        } catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
+        if (downstreamStatus.get() == Canceled) {
+          isPublisherAlive = false
+          throw publisherClosedException
+        }
     })
 
   @scala.throws(classOf[IOException])
-  private[this] def sendMessage(message: AdapterToStageMessage, handleCancelled: Boolean = true) =
-    send(() ⇒
-      try {
+  private[this] def sendMessage(
+      message: AdapterToStageMessage, handleCancelled: Boolean = true) =
+    send(
+        () ⇒
+          try {
         Await.ready(sendToStage(message), writeTimeout)
         if (downstreamStatus.get() == Canceled && handleCancelled) {
           //Publisher considered to be terminated at earliest convenience to minimize messages sending back and forth
@@ -163,8 +181,8 @@ private[akka] class OutputStreamAdapter(dataQueue: BlockingQueue[ByteString],
         }
       } catch {
         case e: IOException ⇒ throw e
-        case NonFatal(e)    ⇒ throw new IOException(e)
-      })
+        case NonFatal(e) ⇒ throw new IOException(e)
+    })
 
   @scala.throws(classOf[IOException])
   override def write(b: Int): Unit = {

@@ -46,7 +46,8 @@ import js.JSStringOps._
 /** Emulates a Long on the JavaScript platform. */
 final class RuntimeLong(val lo: Int, val hi: Int)
     extends java.lang.Number with java.io.Serializable
-    with java.lang.Comparable[java.lang.Long] { a =>
+    with java.lang.Comparable[java.lang.Long] {
+  a =>
 
   import RuntimeLong._
   import Utils._
@@ -73,7 +74,7 @@ final class RuntimeLong(val lo: Int, val hi: Int)
 
   override def equals(that: Any): Boolean = that match {
     case b: RuntimeLong => inline_equals(b)
-    case _              => false
+    case _ => false
   }
 
   override def hashCode(): Int =
@@ -113,8 +114,8 @@ final class RuntimeLong(val lo: Int, val hi: Int)
       val TenPow9Lo = 1000000000L.toInt
       val TenPow9Hi = (1000000000L >>> 32).toInt
 
-      val quotRem = unsignedDivModHelper(lo, hi, TenPow9Lo, TenPow9Hi,
-          AskBoth).asInstanceOf[js.Tuple4[Int, Int, Int, Int]]
+      val quotRem = unsignedDivModHelper(lo, hi, TenPow9Lo, TenPow9Hi, AskBoth)
+        .asInstanceOf[js.Tuple4[Int, Int, Int, Int]]
       val quotLo = quotRem._1
       val quotHi = quotRem._2
       val rem = quotRem._3 // remHi must be 0 by construction
@@ -224,7 +225,8 @@ final class RuntimeLong(val lo: Int, val hi: Int)
 
   // Bitwise operations
 
-  def unary_~ : RuntimeLong = // scalastyle:ignore
+  def unary_~ : RuntimeLong =
+    // scalastyle:ignore
     new RuntimeLong(~lo, ~hi)
 
   def |(b: RuntimeLong): RuntimeLong =
@@ -284,7 +286,8 @@ final class RuntimeLong(val lo: Int, val hi: Int)
 
   // Arithmetic operations
 
-  def unary_- : RuntimeLong = // scalastyle:ignore
+  def unary_- : RuntimeLong =
+    // scalastyle:ignore
     inlineLongUnary_-(lo, hi)
 
   @inline
@@ -354,9 +357,7 @@ final class RuntimeLong(val lo: Int, val hi: Int)
     c3 = c3 + (c2 >>> 16)
     c3 = c3 + a3 * b0 + a2 * b1 + a1 * b2 + a0 * b3
 
-    new RuntimeLong(
-        (c0 & 0xffff) | (c1 << 16),
-        (c2 & 0xffff) | (c3 << 16))
+    new RuntimeLong((c0 & 0xffff) | (c1 << 16), (c2 & 0xffff) | (c3 << 16))
   }
 
   def /(b: RuntimeLong): RuntimeLong = {
@@ -365,8 +366,7 @@ final class RuntimeLong(val lo: Int, val hi: Int)
     val blo = b.lo
     val bhi = b.hi
 
-    if (isZero(blo, bhi))
-      throw new ArithmeticException("/ by zero")
+    if (isZero(blo, bhi)) throw new ArithmeticException("/ by zero")
 
     if (isInt32(alo, ahi)) {
       if (isInt32(blo, bhi)) {
@@ -393,8 +393,7 @@ final class RuntimeLong(val lo: Int, val hi: Int)
     val blo = b.lo
     val bhi = b.hi
 
-    if (isZero(blo, bhi))
-      throw new ArithmeticException("/ by zero")
+    if (isZero(blo, bhi)) throw new ArithmeticException("/ by zero")
 
     if (isUInt32(ahi)) {
       if (isUInt32(bhi)) {
@@ -429,8 +428,8 @@ final class RuntimeLong(val lo: Int, val hi: Int)
         val pow = log2OfPowerOfTwo(bhi)
         new RuntimeLong(ahi >>> pow, 0)
       } else {
-        unsignedDivModHelper(alo, ahi, blo, bhi,
-            AskQuotient).asInstanceOf[RuntimeLong]
+        unsignedDivModHelper(alo, ahi, blo, bhi, AskQuotient)
+          .asInstanceOf[RuntimeLong]
       }
     }
   }
@@ -441,13 +440,13 @@ final class RuntimeLong(val lo: Int, val hi: Int)
     val blo = b.lo
     val bhi = b.hi
 
-    if (isZero(blo, bhi))
-      throw new ArithmeticException("/ by zero")
+    if (isZero(blo, bhi)) throw new ArithmeticException("/ by zero")
 
     if (isInt32(alo, ahi)) {
       if (isInt32(blo, bhi)) {
         if (blo != -1) new RuntimeLong(alo % blo)
-        else Zero // Work around https://github.com/ariya/phantomjs/issues/12198
+        else
+          Zero // Work around https://github.com/ariya/phantomjs/issues/12198
       } else {
         // Either a == Int.MinValue && b == (Int.MaxValue + 1), or (abs(b) > abs(a))
         if (alo == Int.MinValue && (blo == 0x80000000 && bhi == 0)) Zero
@@ -469,8 +468,7 @@ final class RuntimeLong(val lo: Int, val hi: Int)
     val blo = b.lo
     val bhi = b.hi
 
-    if (isZero(blo, bhi))
-      throw new ArithmeticException("/ by zero")
+    if (isZero(blo, bhi)) throw new ArithmeticException("/ by zero")
 
     if (isUInt32(ahi)) {
       if (isUInt32(bhi)) {
@@ -502,17 +500,22 @@ final class RuntimeLong(val lo: Int, val hi: Int)
       } else if (blo == 0 && isPowerOfTwo_IKnowItsNot0(bhi)) {
         new RuntimeLong(alo, ahi & (bhi - 1))
       } else {
-        unsignedDivModHelper(alo, ahi, blo, bhi,
-            AskRemainder).asInstanceOf[RuntimeLong]
+        unsignedDivModHelper(alo, ahi, blo, bhi, AskRemainder)
+          .asInstanceOf[RuntimeLong]
       }
     }
   }
 
-  private def unsignedDivModHelper(alo: Int, ahi: Int, blo: Int, bhi: Int,
+  private def unsignedDivModHelper(
+      alo: Int,
+      ahi: Int,
+      blo: Int,
+      bhi: Int,
       ask: Int): RuntimeLong | js.Tuple4[Int, Int, Int, Int] = {
 
     var shift =
-      inlineNumberOfLeadingZeros(blo, bhi) - inlineNumberOfLeadingZeros(alo, ahi)
+      inlineNumberOfLeadingZeros(blo, bhi) - inlineNumberOfLeadingZeros(
+          alo, ahi)
     val initialBShift = inline_<<(blo, bhi, shift)
     var bShiftLo = initialBShift._1
     var bShiftHi = initialBShift._2
@@ -539,10 +542,8 @@ final class RuntimeLong(val lo: Int, val hi: Int)
         val newRem = inline_-(remLo, remHi, bShiftLo, bShiftHi)
         remLo = newRem._1
         remHi = newRem._2
-        if (shift < 32)
-          quotLo |= (1 << shift)
-        else
-          quotHi |= (1 << shift) // == (1 << (shift - 32))
+        if (shift < 32) quotLo |= (1 << shift)
+        else quotHi |= (1 << shift) // == (1 << (shift - 32))
       }
       shift -= 1
       val newBShift = inline_>>>(bShiftLo, bShiftHi, 1)
@@ -557,9 +558,10 @@ final class RuntimeLong(val lo: Int, val hi: Int)
 
       if (ask != AskRemainder) {
         val rem_div_bDouble = remDouble / bDouble
-        val newQuot = inline_+(quotLo, quotHi,
-            unsignedSafeDoubleLo(rem_div_bDouble),
-            unsignedSafeDoubleHi(rem_div_bDouble))
+        val newQuot = inline_+(quotLo,
+                               quotHi,
+                               unsignedSafeDoubleLo(rem_div_bDouble),
+                               unsignedSafeDoubleHi(rem_div_bDouble))
         quotLo = newQuot._1
         quotHi = newQuot._2
       }
@@ -661,7 +663,6 @@ final class RuntimeLong(val lo: Int, val hi: Int)
 
   @deprecated("Use `this.toString + y` instead.", "0.6.6")
   def +(y: String): String = this.toString + y
-
 }
 
 object RuntimeLong {
@@ -669,9 +670,9 @@ object RuntimeLong {
   private final val TwoPow53 = 9223372036854775808.0
 
   /** The magical mask that allows to test whether an unsigned long is a safe
-   *  double.
-   *  @see Utils.isUnsignedSafeDouble
-   */
+    *  double.
+    *  @see Utils.isUnsignedSafeDouble
+    */
   private final val UnsignedSafeDoubleHiMask = 0xffe00000
 
   private final val AskQuotient = 0
@@ -706,6 +707,7 @@ object RuntimeLong {
 
   // In a different object so they can be inlined without cost
   private object Utils {
+
     /** Tests whether the long (lo, hi) is 0. */
     @inline def isZero(lo: Int, hi: Int): Boolean =
       (lo | hi) == 0
@@ -719,14 +721,14 @@ object RuntimeLong {
       hi == 0
 
     /** Tests whether an unsigned long (lo, hi) is a safe Double.
-     *  This test is in fact slightly stricter than necessary, as it tests
-     *  whether `x < 2^53`, although x == 2^53 would be a perfectly safe
-     *  Double. The reason we do this is that testing `x <= 2^53` is much
-     *  slower, as `x == 2^53` basically has to be treated specially.
-     *  Since there is virtually no gain to treating 2^53 itself as a safe
-     *  Double, compared to all numbers smaller than it, we don't bother, and
-     *  stay on the fast side.
-     */
+      *  This test is in fact slightly stricter than necessary, as it tests
+      *  whether `x < 2^53`, although x == 2^53 would be a perfectly safe
+      *  Double. The reason we do this is that testing `x <= 2^53` is much
+      *  slower, as `x == 2^53` basically has to be treated specially.
+      *  Since there is virtually no gain to treating 2^53 itself as a safe
+      *  Double, compared to all numbers smaller than it, we don't bother, and
+      *  stay on the fast side.
+      */
     @inline def isUnsignedSafeDouble(hi: Int): Boolean =
       (hi & UnsignedSafeDoubleHiMask) == 0
 
@@ -748,7 +750,8 @@ object RuntimeLong {
 
     /** Performs the JavaScript operation `(x | 0)`. */
     @inline def rawToInt(x: Double): Int =
-      (x.asInstanceOf[js.Dynamic] | 0.asInstanceOf[js.Dynamic]).asInstanceOf[Int]
+      (x.asInstanceOf[js.Dynamic] | 0.asInstanceOf[js.Dynamic])
+        .asInstanceOf[Int]
 
     /** Tests whether the given non-zero unsigned Int is an exact power of 2. */
     @inline def isPowerOfTwo_IKnowItsNot0(i: Int): Boolean =
@@ -803,5 +806,4 @@ object RuntimeLong {
     def inline_unary_-(lo: Int, hi: Int): (Int, Int) =
       (-lo, if (lo != 0) ~hi else -hi)
   }
-
 }

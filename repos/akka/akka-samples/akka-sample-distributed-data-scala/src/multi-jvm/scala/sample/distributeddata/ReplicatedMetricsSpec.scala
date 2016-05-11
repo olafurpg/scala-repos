@@ -21,21 +21,23 @@ object ReplicatedMetricsSpec extends MultiNodeConfig {
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
     """))
-
 }
 
 class ReplicatedMetricsSpecMultiJvmNode1 extends ReplicatedMetricsSpec
 class ReplicatedMetricsSpecMultiJvmNode2 extends ReplicatedMetricsSpec
 class ReplicatedMetricsSpecMultiJvmNode3 extends ReplicatedMetricsSpec
 
-class ReplicatedMetricsSpec extends MultiNodeSpec(ReplicatedMetricsSpec) with STMultiNodeSpec with ImplicitSender {
+class ReplicatedMetricsSpec
+    extends MultiNodeSpec(ReplicatedMetricsSpec) with STMultiNodeSpec
+    with ImplicitSender {
   import ReplicatedMetricsSpec._
   import ReplicatedMetrics._
 
   override def initialParticipants = roles.size
 
   val cluster = Cluster(system)
-  val replicatedMetrics = system.actorOf(ReplicatedMetrics.props(1.second, 3.seconds))
+  val replicatedMetrics =
+    system.actorOf(ReplicatedMetrics.props(1.second, 3.seconds))
 
   def join(from: RoleName, to: RoleName): Unit = {
     runOn(from) {
@@ -61,7 +63,8 @@ class ReplicatedMetricsSpec extends MultiNodeSpec(ReplicatedMetricsSpec) with ST
       val probe = TestProbe()
       system.eventStream.subscribe(probe.ref, classOf[UsedHeap])
       awaitAssert {
-        probe.expectMsgType[UsedHeap](1.second).percentPerNode.size should be(3)
+        probe.expectMsgType[UsedHeap](1.second).percentPerNode.size should be(
+            3)
       }
       probe.expectMsgType[UsedHeap].percentPerNode.size should be(3)
       probe.expectMsgType[UsedHeap].percentPerNode.size should be(3)
@@ -77,15 +80,13 @@ class ReplicatedMetricsSpec extends MultiNodeSpec(ReplicatedMetricsSpec) with ST
         val probe = TestProbe()
         system.eventStream.subscribe(probe.ref, classOf[UsedHeap])
         awaitAssert {
-          probe.expectMsgType[UsedHeap](1.second).percentPerNode.size should be(2)
+          probe.expectMsgType[UsedHeap](1.second).percentPerNode.size should be(
+              2)
         }
-        probe.expectMsgType[UsedHeap].percentPerNode should not contain (
-          nodeKey(node3Address))
+        probe.expectMsgType[UsedHeap].percentPerNode should not contain
+        (nodeKey(node3Address))
       }
       enterBarrier("after-3")
     }
-
   }
-
 }
-

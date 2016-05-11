@@ -4,8 +4,8 @@ package local
 import org.jetbrains.jps.incremental.scala.data.CompilationData
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 trait Compiler {
   def compile(compilationData: CompilationData, client: Client)
 }

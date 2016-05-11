@@ -3,7 +3,7 @@ object SCL6507 {
 
   object patternMatchingProduct {
 
-    class MyProduct(one: String, two: Int) extends Product2[String, Int]  {
+    class MyProduct(one: String, two: Int) extends Product2[String, Int] {
       def _1 = one
       def _2 = two
 
@@ -22,7 +22,8 @@ object SCL6507 {
 
     val myProduct = MyProduct("one", 2)
     (myProduct, myProduct) match {
-      case (MyProduct(one, two), MyProduct2(three, four)) => /*start*/(one, two, three, four)/*end*/
+      case (MyProduct(one, two), MyProduct2(three, four)) =>
+        /*start*/ (one, two, three, four) /*end*/
     }
   }
 }

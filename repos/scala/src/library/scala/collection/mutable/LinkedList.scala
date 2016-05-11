@@ -1,12 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
-
-
 
 package scala
 package collection
@@ -76,29 +74,30 @@ import generic._
   *  }}}
   */
 @SerialVersionUID(-7308240733518833071L)
-@deprecated("Low-level linked lists are deprecated due to idiosyncrasies in interface and incomplete features.", "2.11.0")
-class LinkedList[A]() extends AbstractSeq[A]
-                         with LinearSeq[A]
-                         with GenericTraversableTemplate[A, LinkedList]
-                         with LinkedListLike[A, LinkedList[A]]
-                         with Serializable {
+@deprecated(
+    "Low-level linked lists are deprecated due to idiosyncrasies in interface and incomplete features.",
+    "2.11.0")
+class LinkedList[A]()
+    extends AbstractSeq[A] with LinearSeq[A]
+    with GenericTraversableTemplate[A, LinkedList]
+    with LinkedListLike[A, LinkedList[A]] with Serializable {
   next = this
 
   /** Creates a new list. If the parameter next is null, the result is an empty list. Otherwise, the result is
-   * a list with elem at the head, followed by the contents of next.
-   *
-   * Note that next is part of the new list, as opposed to the +: operator,
-   * which makes a new copy of the original list.
-   *
-   * @example
-   * {{{
-   *     scala> val m = LinkedList(1)
-   *     m: scala.collection.mutable.LinkedList[Int] = LinkedList(1)
-   *
-   *     scala> val n = new LinkedList[Int](2, m)
-   *     n: scala.collection.mutable.LinkedList[Int] = LinkedList(2, 1)
-   * }}}
-   */
+    * a list with elem at the head, followed by the contents of next.
+    *
+    * Note that next is part of the new list, as opposed to the +: operator,
+    * which makes a new copy of the original list.
+    *
+    * @example
+    * {{{
+    *     scala> val m = LinkedList(1)
+    *     m: scala.collection.mutable.LinkedList[Int] = LinkedList(1)
+    *
+    *     scala> val n = new LinkedList[Int](2, m)
+    *     n: scala.collection.mutable.LinkedList[Int] = LinkedList(2, 1)
+    * }}}
+    */
   def this(elem: A, next: LinkedList[A]) {
     this()
     if (next != null) {
@@ -111,13 +110,14 @@ class LinkedList[A]() extends AbstractSeq[A]
 }
 
 /** $factoryInfo
- *  @define Coll `LinkedList`
- *  @define coll linked list
- */
+  *  @define Coll `LinkedList`
+  *  @define coll linked list
+  */
 @deprecated("Low-level linked lists are deprecated.", "2.11.0")
 object LinkedList extends SeqFactory[LinkedList] {
   override def empty[A]: LinkedList[A] = new LinkedList[A]
-  implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, LinkedList[A]] = ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
+  implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, LinkedList[A]] =
+    ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 
   def newBuilder[A]: Builder[A, LinkedList[A]] =
     (new MutableList) mapResult ((l: MutableList[A]) => l.toLinkedList)

@@ -18,12 +18,13 @@ class Netty3AssumptionsTest extends FunSuite {
 
   def makeServer() = {
     val bootstrap = new ServerBootstrap(
-      new NioServerSocketChannelFactory(executor, executor))
+        new NioServerSocketChannelFactory(executor, executor))
     bootstrap.setPipelineFactory(new ChannelPipelineFactory {
       def getPipeline = {
         val pipeline = Channels.pipeline()
         pipeline.addLast("stfu", new SimpleChannelUpstreamHandler {
-          override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
+          override def messageReceived(
+              ctx: ChannelHandlerContext, e: MessageEvent) {
             /* nothing */
           }
         })
@@ -33,8 +34,8 @@ class Netty3AssumptionsTest extends FunSuite {
     bootstrap.bind(new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
   }
 
-
-  test("Channel.close() should leave the channel in a closed state [immediately]") {
+  test(
+      "Channel.close() should leave the channel in a closed state [immediately]") {
 
     val ch = makeServer()
     val addr = ch.getLocalAddress
@@ -44,7 +45,8 @@ class Netty3AssumptionsTest extends FunSuite {
 
     val pipeline = Channels.pipeline
     pipeline.addLast("stfu", new SimpleChannelUpstreamHandler {
-      override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent) {
+      override def exceptionCaught(ctx: ChannelHandlerContext,
+                                   e: ExceptionEvent) {
         // nothing here.
       }
     })
@@ -52,18 +54,20 @@ class Netty3AssumptionsTest extends FunSuite {
 
     val latch = new CountDownLatch(1)
 
-    bootstrap.connect(addr).addListener(new ChannelFutureListener {
-      override def operationComplete(f: ChannelFuture): Unit =
-        if (f.isSuccess) {
-          val channel = f.getChannel
-          assert(channel.isOpen)
-          Channels.close(channel)
-          assert(!channel.isOpen)
-          latch.countDown()
-        } else {
-          throw new Exception("connect attempt failed: " + f)
-        }
-    })
+    bootstrap
+      .connect(addr)
+      .addListener(new ChannelFutureListener {
+        override def operationComplete(f: ChannelFuture): Unit =
+          if (f.isSuccess) {
+            val channel = f.getChannel
+            assert(channel.isOpen)
+            Channels.close(channel)
+            assert(!channel.isOpen)
+            latch.countDown()
+          } else {
+            throw new Exception("connect attempt failed: " + f)
+          }
+      })
 
     assert(latch.await(1.second))
 

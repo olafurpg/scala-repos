@@ -5,6 +5,6 @@ class O1 {
 object O2 extends O1 {
   override def f {}
 
-  println(/* line: 6 */f)
-  println(super./* line: 2 */f)
+  println( /* line: 6 */ f)
+  println(super. /* line: 2 */ f)
 }

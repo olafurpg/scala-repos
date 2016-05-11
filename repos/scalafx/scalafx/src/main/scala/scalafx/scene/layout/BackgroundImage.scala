@@ -34,44 +34,49 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.image.Image
 
 object BackgroundImage {
-  implicit def sfxBackgroundImage2jfx(v: BackgroundImage): jfxsl.BackgroundImage = if (v != null) v.delegate else null
+  implicit def sfxBackgroundImage2jfx(
+      v: BackgroundImage): jfxsl.BackgroundImage =
+    if (v != null) v.delegate else null
 }
 
 /**
- * Defines properties describing how to render an image as the background to some `Region`.
- */
+  * Defines properties describing how to render an image as the background to some `Region`.
+  */
 class BackgroundImage(override val delegate: jfxsl.BackgroundImage)
-  extends SFXDelegate[jfxsl.BackgroundImage] {
+    extends SFXDelegate[jfxsl.BackgroundImage] {
 
   /**
-   * Creates a new BackgroundImage.
-   */
-  def this(image: Image, repeatX: BackgroundRepeat, repeatY: BackgroundRepeat,
-           position: BackgroundPosition, size: BackgroundSize) =
+    * Creates a new BackgroundImage.
+    */
+  def this(image: Image,
+           repeatX: BackgroundRepeat,
+           repeatY: BackgroundRepeat,
+           position: BackgroundPosition,
+           size: BackgroundSize) =
     this(new jfxsl.BackgroundImage(image, repeatX, repeatY, position, size))
 
   /**
-   * The image to be used.
-   */
+    * The image to be used.
+    */
   def image: Image = delegate.getImage
 
   /**
-   * The position of this BackgroundImage relative to the Region.
-   */
+    * The position of this BackgroundImage relative to the Region.
+    */
   def position: BackgroundPosition = delegate.getPosition
 
   /**
-   * Indicates in what manner (if at all) the background image is to be repeated along the x-axis of the region.
-   */
+    * Indicates in what manner (if at all) the background image is to be repeated along the x-axis of the region.
+    */
   def repeatX: BackgroundRepeat = delegate.getRepeatX
 
   /**
-   * Indicates in what manner (if at all) the background image is to be repeated along the y-axis of the region.
-   */
+    * Indicates in what manner (if at all) the background image is to be repeated along the y-axis of the region.
+    */
   def repeatY: BackgroundRepeat = delegate.getRepeatY
 
   /**
-   * The size of this image relative to the Region.
-   */
+    * The size of this image relative to the Region.
+    */
   def size: BackgroundSize = delegate.getSize
 }

@@ -1,1 +1,1 @@
-class S(j:J) { j.foo(J.E.E1) }
+class S(j: J) { j.foo(J.E.E1) }

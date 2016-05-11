@@ -29,7 +29,8 @@ class InferSchemaSuite extends SparkFunSuite {
     assert(CSVInferSchema.inferField(NullType, "60") == IntegerType)
     assert(CSVInferSchema.inferField(NullType, "3.5") == DoubleType)
     assert(CSVInferSchema.inferField(NullType, "test") == StringType)
-    assert(CSVInferSchema.inferField(NullType, "2015-08-20 15:57:00") == TimestampType)
+    assert(
+        CSVInferSchema.inferField(NullType, "2015-08-20 15:57:00") == TimestampType)
     assert(CSVInferSchema.inferField(NullType, "True") == BooleanType)
     assert(CSVInferSchema.inferField(NullType, "FAlSE") == BooleanType)
   }
@@ -40,17 +41,22 @@ class InferSchemaSuite extends SparkFunSuite {
     assert(CSVInferSchema.inferField(IntegerType, "1.0") == DoubleType)
     assert(CSVInferSchema.inferField(DoubleType, null) == DoubleType)
     assert(CSVInferSchema.inferField(DoubleType, "test") == StringType)
-    assert(CSVInferSchema.inferField(LongType, "2015-08-20 14:57:00") == TimestampType)
-    assert(CSVInferSchema.inferField(DoubleType, "2015-08-20 15:57:00") == TimestampType)
+    assert(
+        CSVInferSchema.inferField(LongType, "2015-08-20 14:57:00") == TimestampType)
+    assert(
+        CSVInferSchema.inferField(DoubleType, "2015-08-20 15:57:00") == TimestampType)
     assert(CSVInferSchema.inferField(LongType, "True") == BooleanType)
     assert(CSVInferSchema.inferField(IntegerType, "FALSE") == BooleanType)
     assert(CSVInferSchema.inferField(TimestampType, "FALSE") == BooleanType)
   }
 
   test("Timestamp field types are inferred correctly from other types") {
-    assert(CSVInferSchema.inferField(IntegerType, "2015-08-20 14") == StringType)
-    assert(CSVInferSchema.inferField(DoubleType, "2015-08-20 14:10") == StringType)
-    assert(CSVInferSchema.inferField(LongType, "2015-08 14:49:00") == StringType)
+    assert(
+        CSVInferSchema.inferField(IntegerType, "2015-08-20 14") == StringType)
+    assert(
+        CSVInferSchema.inferField(DoubleType, "2015-08-20 14:10") == StringType)
+    assert(
+        CSVInferSchema.inferField(LongType, "2015-08 14:49:00") == StringType)
   }
 
   test("Boolean fields types are inferred correctly from other types") {
@@ -59,15 +65,15 @@ class InferSchemaSuite extends SparkFunSuite {
   }
 
   test("Type arrays are merged to highest common type") {
-    assert(
-      CSVInferSchema.mergeRowTypes(Array(StringType),
-        Array(DoubleType)).deep == Array(StringType).deep)
-    assert(
-      CSVInferSchema.mergeRowTypes(Array(IntegerType),
-        Array(LongType)).deep == Array(LongType).deep)
-    assert(
-      CSVInferSchema.mergeRowTypes(Array(DoubleType),
-        Array(LongType)).deep == Array(DoubleType).deep)
+    assert(CSVInferSchema
+          .mergeRowTypes(Array(StringType), Array(DoubleType))
+          .deep == Array(StringType).deep)
+    assert(CSVInferSchema
+          .mergeRowTypes(Array(IntegerType), Array(LongType))
+          .deep == Array(LongType).deep)
+    assert(CSVInferSchema
+          .mergeRowTypes(Array(DoubleType), Array(LongType))
+          .deep == Array(DoubleType).deep)
   }
 
   test("Null fields are handled properly when a nullValue is specified") {
@@ -76,12 +82,14 @@ class InferSchemaSuite extends SparkFunSuite {
     assert(CSVInferSchema.inferField(LongType, "null", "null") == LongType)
     assert(CSVInferSchema.inferField(IntegerType, "\\N", "\\N") == IntegerType)
     assert(CSVInferSchema.inferField(DoubleType, "\\N", "\\N") == DoubleType)
-    assert(CSVInferSchema.inferField(TimestampType, "\\N", "\\N") == TimestampType)
+    assert(
+        CSVInferSchema.inferField(TimestampType, "\\N", "\\N") == TimestampType)
     assert(CSVInferSchema.inferField(BooleanType, "\\N", "\\N") == BooleanType)
   }
 
   test("Merging Nulltypes should yield Nulltype.") {
-    val mergedNullTypes = CSVInferSchema.mergeRowTypes(Array(NullType), Array(NullType))
+    val mergedNullTypes =
+      CSVInferSchema.mergeRowTypes(Array(NullType), Array(NullType))
     assert(mergedNullTypes.deep == Array(NullType).deep)
   }
 }

@@ -1,4 +1,3 @@
-
 object Test {
   import java.util.Comparator
 

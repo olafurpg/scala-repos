@@ -21,7 +21,7 @@ class TreeGenTest {
     assertEquals("scala.Some", ref.toString) // was scala.this.Some
     ref match {
       case sel @ Select(pre @ Ident(preName), name) =>
-      assertEquals(TermName("scala"), preName)
+        assertEquals(TermName("scala"), preName)
         assertEquals(TypeName("Some"), name)
         assertEquals(SomeClass, sel.symbol)
       case _ => fail(showRaw(ref))
@@ -34,7 +34,8 @@ class TreeGenTest {
     val ref = gen.mkAttributedRef(ScalaRuntimeModule)
     assertEquals("scala.runtime.ScalaRunTime", ref.toString)
     ref match {
-      case sel @ Select(Select(Ident(TermName("scala")), TermName("runtime")), TermName("ScalaRunTime")) =>
+      case sel @ Select(Select(Ident(TermName("scala")), TermName("runtime")),
+                        TermName("ScalaRunTime")) =>
       case _ => fail(showRaw(ref))
     }
   }

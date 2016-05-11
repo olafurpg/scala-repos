@@ -8,7 +8,8 @@ object SCL6022 {
   val a = A
 
   object B {
-    /*start*/a[Int]/*end*/
+    /*start*/
+    a[Int] /*end*/
   }
 }
 //Int

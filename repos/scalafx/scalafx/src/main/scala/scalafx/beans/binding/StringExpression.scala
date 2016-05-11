@@ -32,7 +32,8 @@ import javafx.beans.{binding => jfxbb}
 import scala.language.implicitConversions
 
 object StringExpression {
-  implicit def sfxStringExpression2jfx(se: StringExpression): jfxbb.StringExpression =
+  implicit def sfxStringExpression2jfx(
+      se: StringExpression): jfxbb.StringExpression =
     if (se != null) se.delegate else null
 }
 

@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.apache.spark.sql.execution.streaming
 
@@ -32,17 +32,18 @@ import org.apache.spark.serializer.JavaSerializer
 import org.apache.spark.sql.SQLContext
 
 /**
- * A [[MetadataLog]] implementation based on HDFS. [[HDFSMetadataLog]] uses the specified `path`
- * as the metadata storage.
- *
- * When writing a new batch, [[HDFSMetadataLog]] will firstly write to a temp file and then rename
- * it to the final batch file. If the rename step fails, there must be multiple writers and only
- * one of them will succeed and the others will fail.
- *
- * Note: [[HDFSMetadataLog]] doesn't support S3-like file systems as they don't guarantee listing
- * files in a directory always shows the latest files.
- */
-class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String) extends MetadataLog[T] {
+  * A [[MetadataLog]] implementation based on HDFS. [[HDFSMetadataLog]] uses the specified `path`
+  * as the metadata storage.
+  *
+  * When writing a new batch, [[HDFSMetadataLog]] will firstly write to a temp file and then rename
+  * it to the final batch file. If the rename step fails, there must be multiple writers and only
+  * one of them will succeed and the others will fail.
+  *
+  * Note: [[HDFSMetadataLog]] doesn't support S3-like file systems as they don't guarantee listing
+  * files in a directory always shows the latest files.
+  */
+class HDFSMetadataLog[T : ClassTag](sqlContext: SQLContext, path: String)
+    extends MetadataLog[T] {
 
   private val metadataPath = new Path(path)
 
@@ -50,7 +51,8 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String) extends
     if (metadataPath.toUri.getScheme == null) {
       FileContext.getFileContext(sqlContext.sparkContext.hadoopConfiguration)
     } else {
-      FileContext.getFileContext(metadataPath.toUri, sqlContext.sparkContext.hadoopConfiguration)
+      FileContext.getFileContext(
+          metadataPath.toUri, sqlContext.sparkContext.hadoopConfiguration)
     }
 
   if (!fc.util().exists(metadataPath)) {
@@ -58,18 +60,20 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String) extends
   }
 
   /**
-   * A `PathFilter` to filter only batch files
-   */
+    * A `PathFilter` to filter only batch files
+    */
   private val batchFilesFilter = new PathFilter {
-    override def accept(path: Path): Boolean = try {
-      path.getName.toLong
-      true
-    } catch {
-      case _: NumberFormatException => false
-    }
+    override def accept(path: Path): Boolean =
+      try {
+        path.getName.toLong
+        true
+      } catch {
+        case _: NumberFormatException => false
+      }
   }
 
-  private val serializer = new JavaSerializer(sqlContext.sparkContext.conf).newInstance()
+  private val serializer =
+    new JavaSerializer(sqlContext.sparkContext.conf).newInstance()
 
   private def batchFile(batchId: Long): Path = {
     new Path(metadataPath, batchId.toString)
@@ -83,7 +87,8 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String) extends
         writeBatch(batchId, JavaUtils.bufferToArray(buffer))
         true
       } catch {
-        case e: IOException if "java.lang.InterruptedException" == e.getMessage =>
+        case e: IOException
+            if "java.lang.InterruptedException" == e.getMessage =>
           // create may convert InterruptedException to IOException. Let's convert it back to
           // InterruptedException so that this failure won't crash StreamExecution
           throw new InterruptedException("Creating file is interrupted")
@@ -92,11 +97,11 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String) extends
   }
 
   /**
-   * Write a batch to a temp file then rename it to the batch file.
-   *
-   * There may be multiple [[HDFSMetadataLog]] using the same metadata path. Although it is not a
-   * valid behavior, we still need to prevent it from destroying the files.
-   */
+    * Write a batch to a temp file then rename it to the batch file.
+    *
+    * There may be multiple [[HDFSMetadataLog]] using the same metadata path. Although it is not a
+    * valid behavior, we still need to prevent it from destroying the files.
+    */
   private def writeBatch(batchId: Long, bytes: Array[Byte]): Unit = {
     // Use nextId to create a temp file
     var nextId = 0
@@ -120,13 +125,13 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String) extends
             // If "rename" fails, it means some other "HDFSMetadataLog" has committed the batch.
             // So throw an exception to tell the user this is not a valid behavior.
             throw new ConcurrentModificationException(
-              s"Multiple HDFSMetadataLog are using $path", e)
+                s"Multiple HDFSMetadataLog are using $path", e)
           case e: FileNotFoundException =>
             // Sometimes, "create" will succeed when multiple writers are calling it at the same
             // time. However, only one writer can call "rename" successfully, others will get
             // FileNotFoundException because the first writer has removed it.
             throw new ConcurrentModificationException(
-              s"Multiple HDFSMetadataLog are using $path", e)
+                s"Multiple HDFSMetadataLog are using $path", e)
         }
       } catch {
         case e: IOException if isFileAlreadyExistsException(e) =>
@@ -149,9 +154,9 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String) extends
 
   private def isFileAlreadyExistsException(e: IOException): Boolean = {
     e.isInstanceOf[FileAlreadyExistsException] ||
-      // Old Hadoop versions don't throw FileAlreadyExistsException. Although it's fixed in
-      // HADOOP-9361, we still need to support old Hadoop versions.
-      (e.getMessage != null && e.getMessage.startsWith("File already exists: "))
+    // Old Hadoop versions don't throw FileAlreadyExistsException. Although it's fixed in
+    // HADOOP-9361, we still need to support old Hadoop versions.
+    (e.getMessage != null && e.getMessage.startsWith("File already exists: "))
   }
 
   override def get(batchId: Long): Option[T] = {
@@ -166,19 +171,26 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String) extends
   }
 
   override def get(startId: Option[Long], endId: Long): Array[(Long, T)] = {
-    val batchIds = fc.util().listStatus(metadataPath, batchFilesFilter)
+    val batchIds = fc
+      .util()
+      .listStatus(metadataPath, batchFilesFilter)
       .map(_.getPath.getName.toLong)
       .filter { batchId =>
-      batchId <= endId && (startId.isEmpty || batchId >= startId.get)
-    }
-    batchIds.sorted.map(batchId => (batchId, get(batchId))).filter(_._2.isDefined).map {
-      case (batchId, metadataOption) =>
-        (batchId, metadataOption.get)
-    }
+        batchId <= endId && (startId.isEmpty || batchId >= startId.get)
+      }
+    batchIds.sorted
+      .map(batchId => (batchId, get(batchId)))
+      .filter(_._2.isDefined)
+      .map {
+        case (batchId, metadataOption) =>
+          (batchId, metadataOption.get)
+      }
   }
 
   override def getLatest(): Option[(Long, T)] = {
-    val batchIds = fc.util().listStatus(metadataPath, batchFilesFilter)
+    val batchIds = fc
+      .util()
+      .listStatus(metadataPath, batchFilesFilter)
       .map(_.getPath.getName.toLong)
       .sorted
       .reverse

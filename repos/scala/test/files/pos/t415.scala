@@ -5,5 +5,5 @@ abstract class A {
 
 abstract class B {
   def a: A;
-  val y: String  = a.x;
+  val y: String = a.x;
 }

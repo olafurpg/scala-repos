@@ -1,6 +1,5 @@
 import language._
 
-
 object Test {
   def foo = (null: Any) match {
     case a: A[k] =>
@@ -14,9 +13,9 @@ class A[K[L[_]]]
 
 class B[K[M[_]]]
 
-
 object Test2 {
   def foo = (null: Any) match {
-    case a: A[k] => new B[k]() // this one worked before as the info of `A` was complete
+    case a: A[k] =>
+      new B[k]() // this one worked before as the info of `A` was complete
   }
 }

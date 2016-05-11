@@ -7,11 +7,11 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 
 /**
- * Pavel.Fatin, 18.05.2010
- */
-
+  * Pavel.Fatin, 18.05.2010
+  */
 class PatternDefinitionAnnotatorTest extends SimpleTestCase {
-  final val Header = "class A; class B; object A extends A; object B extends B\n"
+  final val Header =
+    "class A; class B; object A extends A; object B extends B\n"
 
   def testFine() {
     assertMatches(messages("val v = A")) {
@@ -59,15 +59,18 @@ class PatternDefinitionAnnotatorTest extends SimpleTestCase {
     }
   }
 
-  def messages(@Language(value = "Scala", prefix = Header) code: String): List[Message] = {
-    val definition = (Header + code).parse.depthFirst.findByType(classOf[ScPatternDefinition]).get
-    
+  def messages(@Language(value = "Scala", prefix = Header) code: String)
+    : List[Message] = {
+    val definition = (Header +
+        code).parse.depthFirst.findByType(classOf[ScPatternDefinition]).get
+
     val annotator = new PatternDefinitionAnnotator() {}
     val mock = new AnnotatorHolderMock
-    
-    annotator.annotatePatternDefinition(definition, mock, highlightErrors = true)
+
+    annotator.annotatePatternDefinition(
+        definition, mock, highlightErrors = true)
     mock.annotations
   }
-  
+
   val TypeMismatch = ContainsPattern("Type mismatch")
 }

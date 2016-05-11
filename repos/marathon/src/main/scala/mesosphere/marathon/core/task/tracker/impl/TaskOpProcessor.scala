@@ -2,19 +2,21 @@ package mesosphere.marathon.core.task.tracker.impl
 
 import akka.actor.ActorRef
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.state.{ PathId, Timestamp }
+import mesosphere.marathon.state.{PathId, Timestamp}
 import org.apache.mesos.Protos.TaskStatus
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 private[tracker] object TaskOpProcessor {
-  case class Operation(deadline: Timestamp, sender: ActorRef, taskId: Task.Id, action: Action) {
+  case class Operation(
+      deadline: Timestamp, sender: ActorRef, taskId: Task.Id, action: Action) {
     def appId: PathId = taskId.appId
   }
 
   sealed trait Action
 
   object Action {
+
     /** Update an existing task or create a new task. */
     case class Update(task: Task) extends Action {
       override def toString: String = "Update/Create"
@@ -44,5 +46,6 @@ private[tracker] object TaskOpProcessor {
   * Processes durable operations on tasks.
   */
 private[tracker] trait TaskOpProcessor {
-  def process(op: TaskOpProcessor.Operation)(implicit ec: ExecutionContext): Future[Unit]
+  def process(op: TaskOpProcessor.Operation)(
+      implicit ec: ExecutionContext): Future[Unit]
 }

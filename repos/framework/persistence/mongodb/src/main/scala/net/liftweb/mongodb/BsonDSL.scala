@@ -31,6 +31,8 @@ object BsonDSL extends JsonDSL {
   implicit def pattern2jvalue(p: Pattern): JValue = JsonRegex(p)
   implicit def regex2jvalue(r: Regex): JValue = JsonRegex(r.pattern)
   implicit def uuid2jvalue(u: UUID): JValue = JsonUUID(u)
-  implicit def date2jvalue(d: Date)(implicit formats: Formats): JValue = JsonDate(d)
-  implicit def datetime2jvalue(d: DateTime)(implicit formats: Formats): JValue = JsonDateTime(d)
+  implicit def date2jvalue(d: Date)(implicit formats: Formats): JValue =
+    JsonDate(d)
+  implicit def datetime2jvalue(d: DateTime)(
+      implicit formats: Formats): JValue = JsonDateTime(d)
 }

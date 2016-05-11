@@ -1,14 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.pattern
 
 import language.postfixOps
 
-import akka.actor.{ Props, ActorRef, Actor }
+import akka.actor.{Props, ActorRef, Actor}
 import scala.concurrent.duration._
-import akka.testkit.{ TimingTest, AkkaSpec, filterException }
+import akka.testkit.{TimingTest, AkkaSpec, filterException}
 import docs.pattern.SchedulerPatternSpec.ScheduleInConstructor
 
 object SchedulerPatternSpec {
@@ -69,7 +68,8 @@ object SchedulerPatternSpec {
 
 class SchedulerPatternSpec extends AkkaSpec {
 
-  def testSchedule(actor: ActorRef, startDuration: FiniteDuration,
+  def testSchedule(actor: ActorRef,
+                   startDuration: FiniteDuration,
                    afterRestartDuration: FiniteDuration) = {
 
     filterException[ArithmeticException] {
@@ -88,12 +88,16 @@ class SchedulerPatternSpec extends AkkaSpec {
   }
 
   "send periodic ticks from the constructor" taggedAs TimingTest in {
-    testSchedule(system.actorOf(Props(classOf[ScheduleInConstructor], testActor)),
-      3000 millis, 2000 millis)
+    testSchedule(
+        system.actorOf(Props(classOf[ScheduleInConstructor], testActor)),
+        3000 millis,
+        2000 millis)
   }
 
   "send ticks from the preStart and receive" taggedAs TimingTest in {
-    testSchedule(system.actorOf(Props(classOf[ScheduleInConstructor], testActor)),
-      3000 millis, 2500 millis)
+    testSchedule(
+        system.actorOf(Props(classOf[ScheduleInConstructor], testActor)),
+        3000 millis,
+        2500 millis)
   }
 }

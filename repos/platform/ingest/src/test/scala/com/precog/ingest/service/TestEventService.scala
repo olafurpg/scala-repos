@@ -35,7 +35,7 @@ import org.specs2.specification._
 import org.scalacheck.Gen._
 
 import akka.actor.ActorSystem
-import akka.dispatch.{ Future, ExecutionContext, Await }
+import akka.dispatch.{Future, ExecutionContext, Await}
 import akka.util._
 
 import org.joda.time.DateTime
@@ -61,10 +61,8 @@ import blueeyes.core.service._
 import blueeyes.core.service.test.BlueEyesServiceSpecification
 import blueeyes.json._
 
-trait TestEventService extends
-    BlueEyesServiceSpecification with
-    EventService with
-    AkkaDefaults {
+trait TestEventService
+    extends BlueEyesServiceSpecification with EventService with AkkaDefaults {
   import EventService._
   import Permission._
 
@@ -84,72 +82,122 @@ trait TestEventService extends
   private val to = Duration(5, "seconds")
 
   val asyncContext = defaultFutureDispatch
-  implicit val M: Monad[Future] with Comonad[Future] = new UnsafeFutureComonad(asyncContext, to)
+  implicit val M: Monad[Future] with Comonad[Future] = new UnsafeFutureComonad(
+      asyncContext, to)
 
-  private val apiKeyManager = new InMemoryAPIKeyManager[Future](blueeyes.util.Clock.System)
+  private val apiKeyManager =
+    new InMemoryAPIKeyManager[Future](blueeyes.util.Clock.System)
 
   protected val rootAPIKey = Await.result(apiKeyManager.rootAPIKey, to)
-  protected val testAccount = TestAccounts.createAccount("test@example.com", "open sesame", new DateTime, AccountPlan.Free, None, None) {
-    accountId => apiKeyManager.newStandardAPIKeyRecord(accountId).map(_.apiKey)
+  protected val testAccount = TestAccounts
+    .createAccount("test@example.com",
+                   "open sesame",
+                   new DateTime,
+                   AccountPlan.Free,
+                   None,
+                   None) { accountId =>
+      apiKeyManager.newStandardAPIKeyRecord(accountId).map(_.apiKey)
   } copoint
 
-  private val accountFinder = new TestAccountFinder[Future](Map(testAccount.apiKey -> testAccount.accountId), Map(testAccount.accountId -> testAccount))
+  private val accountFinder = new TestAccountFinder[Future](
+      Map(testAccount.apiKey -> testAccount.accountId),
+      Map(testAccount.accountId -> testAccount))
 
-  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(0, Duration(1, "second"))
+  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(
+      0, Duration(1, "second"))
 
   val shortFutureTimeouts = FutureTimeouts(5, Duration(50, "millis"))
 
-
   val accessTest = Set[Permission](
-    ReadPermission(Path.Root, WrittenByAccount("test")),
-    WritePermission(testAccount.rootPath, WriteAsAny),
-    DeletePermission(testAccount.rootPath, WrittenByAny)
+      ReadPermission(Path.Root, WrittenByAccount("test")),
+      WritePermission(testAccount.rootPath, WriteAsAny),
+      DeletePermission(testAccount.rootPath, WrittenByAny)
   )
 
-  val expiredAccount = TestAccounts.createAccount("expired@example.com", "open sesame", new DateTime, AccountPlan.Free, None, None) {
-    accountId =>
-      apiKeyManager.newStandardAPIKeyRecord(accountId).map(_.apiKey).flatMap { expiredAPIKey =>
-        apiKeyManager.deriveAndAddGrant(None, None, testAccount.apiKey, accessTest, expiredAPIKey, Some(new DateTime().minusYears(1000))).map(_ => expiredAPIKey)
-      }
+  val expiredAccount = TestAccounts
+    .createAccount("expired@example.com",
+                   "open sesame",
+                   new DateTime,
+                   AccountPlan.Free,
+                   None,
+                   None) { accountId =>
+      apiKeyManager.newStandardAPIKeyRecord(accountId).map(_.apiKey).flatMap {
+        expiredAPIKey =>
+          apiKeyManager
+            .deriveAndAddGrant(None,
+                               None,
+                               testAccount.apiKey,
+                               accessTest,
+                               expiredAPIKey,
+                               Some(new DateTime().minusYears(1000)))
+            .map(_ => expiredAPIKey)
+    }
   } copoint
 
   private val stored = scala.collection.mutable.ArrayBuffer.empty[Event]
 
-  def configureEventService(config: Configuration): EventService.State = { 
+  def configureEventService(config: Configuration): EventService.State = {
     val apiKeyFinder = new DirectAPIKeyFinder(apiKeyManager)
-    val permissionsFinder = new PermissionsFinder(apiKeyFinder, accountFinder, new Instant(1363327426906L))
+    val permissionsFinder = new PermissionsFinder(
+        apiKeyFinder, accountFinder, new Instant(1363327426906L))
     val eventStore = new EventStore[Future] {
-      def save(action: Event, timeout: Timeout) = M.point { stored += action; \/-(PrecogUnit) }
+      def save(action: Event, timeout: Timeout) = M.point {
+        stored += action; \/-(PrecogUnit)
+      }
     }
-    val jobManager = new InMemoryJobManager[({ type l[+a] = EitherT[Future, String, a] })#l]
-    val shardClient = new HttpClient.EchoClient((_: HttpRequest[ByteChunk]).content)
+    val jobManager =
+      new InMemoryJobManager[({ type l[+a] = EitherT[Future, String, a] })#l]
+    val shardClient =
+      new HttpClient.EchoClient((_: HttpRequest[ByteChunk]).content)
     val localhost = ServiceLocation("http", "localhost", 80, None)
-    val tmpdir = java.io.File.createTempFile("test.ingest.tmpdir", null).getParentFile()
-    val serviceConfig = ServiceConfig(localhost, localhost, Timeout(10000l), 500, 1024, tmpdir, Timeout(10000l))
+    val tmpdir =
+      java.io.File.createTempFile("test.ingest.tmpdir", null).getParentFile()
+    val serviceConfig = ServiceConfig(localhost,
+                                      localhost,
+                                      Timeout(10000l),
+                                      500,
+                                      1024,
+                                      tmpdir,
+                                      Timeout(10000l))
 
-    buildServiceState(serviceConfig, apiKeyFinder, permissionsFinder, eventStore, jobManager, Stoppable.Noop)
+    buildServiceState(serviceConfig,
+                      apiKeyFinder,
+                      permissionsFinder,
+                      eventStore,
+                      jobManager,
+                      Stoppable.Noop)
   }
 
   implicit def jValueToFutureJValue(j: JValue) = Future(j)
 
-  def track[A](contentType: MimeType, apiKey: Option[APIKey], path: Path, ownerAccountId: Option[AccountId], sync: Boolean = true, batch: Boolean = false)(data: A)(implicit
-    bi: A => Future[JValue],
-    t: AsyncHttpTranscoder[A, ByteChunk]
-  ): Future[(HttpResponse[JValue], List[Ingest])] = {
-    val svc = client.contentType[A](contentType).query("receipt", sync.toString).query("mode", if (batch) "batch" else "stream").path("/ingest/v2/fs/")
+  def track[A](contentType: MimeType,
+               apiKey: Option[APIKey],
+               path: Path,
+               ownerAccountId: Option[AccountId],
+               sync: Boolean = true,
+               batch: Boolean = false)(data: A)(
+      implicit bi: A => Future[JValue], t: AsyncHttpTranscoder[A, ByteChunk])
+    : Future[(HttpResponse[JValue], List[Ingest])] = {
+    val svc = client
+      .contentType[A](contentType)
+      .query("receipt", sync.toString)
+      .query("mode", if (batch) "batch" else "stream")
+      .path("/ingest/v2/fs/")
 
-    val queries = List(apiKey.map(("apiKey", _)), ownerAccountId.map(("ownerAccountId", _))).sequence
+    val queries = List(apiKey.map(("apiKey", _)),
+                       ownerAccountId.map(("ownerAccountId", _))).sequence
 
-    val svcWithQueries = queries.map(svc.queries(_ :_*)).getOrElse(svc)
+    val svcWithQueries = queries.map(svc.queries(_: _*)).getOrElse(svc)
 
     stored.clear()
     for {
       response <- svcWithQueries.post[A](path.toString)(data)
-      content <- response.content map (a => bi(a) map (Some(_))) getOrElse Future(None)
+      content <- response.content map (a => bi(a) map (Some(_))) getOrElse Future(
+          None)
     } yield {
       (
-        response.copy(content = content),
-        stored.toList collect { case in: Ingest => in }
+          response.copy(content = content),
+          stored.toList collect { case in: Ingest => in }
       )
     }
   }

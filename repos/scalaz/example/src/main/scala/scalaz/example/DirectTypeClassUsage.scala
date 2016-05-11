@@ -2,7 +2,6 @@ package scalaz.example
 
 import scalaz.Semigroup
 
-
 object DirectTypeClassUsage extends App {
 
   val o1: Option[Int] = Some(0)
@@ -24,7 +23,6 @@ object DirectTypeClassUsage extends App {
     join(o2)
   }
 
-
   // Direct use of type class for multiple types
   def direct2() {
     import scalaz._
@@ -43,5 +41,4 @@ object DirectTypeClassUsage extends App {
 
     Semigroup[Option[Int]].append(Some(1), None)
   }
-
 }

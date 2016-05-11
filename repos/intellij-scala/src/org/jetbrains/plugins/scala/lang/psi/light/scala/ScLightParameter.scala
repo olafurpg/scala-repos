@@ -12,21 +12,24 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
 
 /**
- * @author Alefas
- * @since 03/04/14.
- */
+  * @author Alefas
+  * @since 03/04/14.
+  */
 class ScLightParameter(val param: ScParameter, tp: ScType, i: Int)
-  extends LightElement(param.getManager, param.getLanguage) with ScParameter {
+    extends LightElement(param.getManager, param.getLanguage)
+    with ScParameter {
   override def nameId: PsiElement = param.nameId
 
-  override def getType(ctx: TypingContext): TypeResult[ScType] = Success(tp, Some(this))
+  override def getType(ctx: TypingContext): TypeResult[ScType] =
+    Success(tp, Some(this))
 
   override def remove(): Unit =
     throw new UnsupportedOperationException("Operation on light element")
 
   override def deprecatedName: Option[String] = param.deprecatedName
 
-  override def getActualDefaultExpression: Option[ScExpression] = param.getActualDefaultExpression
+  override def getActualDefaultExpression: Option[ScExpression] =
+    param.getActualDefaultExpression
 
   override def baseDefaultParam: Boolean = param.baseDefaultParam
 
@@ -44,9 +47,11 @@ class ScLightParameter(val param: ScParameter, tp: ScType, i: Int)
 
   override def getModifierList: ScModifierList = param.getModifierList
 
-  override def hasModifierProperty(name: String): Boolean = param.hasModifierProperty(name)
+  override def hasModifierProperty(name: String): Boolean =
+    param.hasModifierProperty(name)
 
-  override def hasModifierPropertyScala(name: String): Boolean = param.hasModifierPropertyScala(name)
+  override def hasModifierPropertyScala(name: String): Boolean =
+    param.hasModifierPropertyScala(name)
 
   override def hasAbstractModifier: Boolean = param.hasAbstractModifier
 
@@ -54,16 +59,20 @@ class ScLightParameter(val param: ScParameter, tp: ScType, i: Int)
 
   override def getAnnotations: Array[PsiAnnotation] = param.getAnnotations
 
-  override def getApplicableAnnotations: Array[PsiAnnotation] = param.getApplicableAnnotations
+  override def getApplicableAnnotations: Array[PsiAnnotation] =
+    param.getApplicableAnnotations
 
-  override def findAnnotation(qualifiedName: String): PsiAnnotation = param.findAnnotation(qualifiedName)
+  override def findAnnotation(qualifiedName: String): PsiAnnotation =
+    param.findAnnotation(qualifiedName)
 
   override def addAnnotation(qualifiedName: String): PsiAnnotation =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override def hasAnnotation(qualifiedName: String): Option[ScAnnotation] = param.hasAnnotation(qualifiedName)
+  override def hasAnnotation(qualifiedName: String): Option[ScAnnotation] =
+    param.hasAnnotation(qualifiedName)
 
-  override def hasAnnotation(clazz: PsiClass): Boolean = param.hasAnnotation(clazz)
+  override def hasAnnotation(clazz: PsiClass): Boolean =
+    param.hasAnnotation(clazz)
 
   override def annotationNames: Seq[String] = param.annotationNames
 
@@ -72,9 +81,11 @@ class ScLightParameter(val param: ScParameter, tp: ScType, i: Int)
   override def setModifierProperty(name: String, value: Boolean): Unit =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[
+      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): T =
+  override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): T =
     throw new UnsupportedOperationException("Operation on light element")
 }

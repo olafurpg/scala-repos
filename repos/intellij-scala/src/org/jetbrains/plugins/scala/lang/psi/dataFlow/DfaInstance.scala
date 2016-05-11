@@ -4,9 +4,8 @@ package dataFlow
 import org.jetbrains.plugins.scala.lang.psi.controlFlow.Instruction
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 trait DfaInstance[E] {
   def isForward: Boolean
   //val fun: Instruction => E => E

@@ -41,4 +41,4 @@ class ReturnSeveralOutput1 {
     Right(TestMethodNameResult(x, y, z, zz))
   }
 }
-*/
+ */

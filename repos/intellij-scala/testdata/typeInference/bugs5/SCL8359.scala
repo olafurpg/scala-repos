@@ -9,6 +9,7 @@ object SCL8359 {
   }
   val e: A[ElementType] = new A
 
-  /*start*/e.foo/*end*/
+  /*start*/
+  e.foo /*end*/
 }
 //Int

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.pattern.extended
 
 import akka.actor._
@@ -21,7 +21,8 @@ class ExplicitAskSpec extends AkkaSpec {
     "allow to access an explicit reference to actor to respond to" in {
       implicit val timeout = Timeout(5.seconds)
 
-      val target = system.actorOf(Props(new Actor {
+      val target = system.actorOf(
+          Props(new Actor {
         def receive = {
           case Request(respondTo) ⇒ respondTo ! Response(self)
         }
@@ -45,5 +46,4 @@ class ExplicitAskSpec extends AkkaSpec {
       f.futureValue should ===(Response(target))
     }
   }
-
 }

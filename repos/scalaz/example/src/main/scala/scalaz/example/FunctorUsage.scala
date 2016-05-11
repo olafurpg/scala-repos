@@ -38,7 +38,7 @@ object FunctorUsage extends App {
 
   // List is a functor which applies the function to each element of
   // the list.
-  assert(Functor[List].map(List("qwer", "adsfg"))(len) === List(4,5))
+  assert(Functor[List].map(List("qwer", "adsfg"))(len) === List(4, 5))
 
   //
   // lift
@@ -56,12 +56,14 @@ object FunctorUsage extends App {
   // that sound exciting? It's not that exciting, it means that we get
   // two additional derived functions which allow us to turn the
   // contained values into tuples:
-  assert(Functor[List].strengthL("a", List(1,2,3)) === List("a" -> 1, "a" -> 2, "a" -> 3)) 
-  assert(Functor[List].strengthR(List(1,2,3), "a") === List(1 -> "a", 2 -> "a", 3 -> "a"))
+  assert(Functor[List].strengthL("a", List(1, 2, 3)) === List(
+          "a" -> 1, "a" -> 2, "a" -> 3))
+  assert(Functor[List].strengthR(List(1, 2, 3), "a") === List(
+          1 -> "a", 2 -> "a", 3 -> "a"))
 
   // there is syntax for the strength functions
-  assert(List(1,2,3).strengthL("a") === List("a" -> 1, "a" -> 2, "a" -> 3))
-  assert(List(1,2,3).strengthR("a") === List(1 -> "a", 2 -> "a", 3 -> "a"))
+  assert(List(1, 2, 3).strengthL("a") === List("a" -> 1, "a" -> 2, "a" -> 3))
+  assert(List(1, 2, 3).strengthR("a") === List(1 -> "a", 2 -> "a", 3 -> "a"))
 
   //
   // fproduct
@@ -70,15 +72,14 @@ object FunctorUsage extends App {
   // Functor provides a fproduct function which pairs a value with the
   // result of applying a function to that value.
   val source = List("a", "aa", "b", "ccccc")
-  val result = Map("a" -> 1, "aa" -> 2, "b" ->  1, "ccccc" -> 5)
+  val result = Map("a" -> 1, "aa" -> 2, "b" -> 1, "ccccc" -> 5)
 
   assert(source.fproduct(len).toMap === result)
-
 
   //
   // void
   //
-  
+
   // We can "void" a functor, which will change any F[A] into a F[Unit]
   assert(Functor[Option].void(Some(1)) === Some(()))
 
@@ -88,15 +89,13 @@ object FunctorUsage extends App {
   // to void a functor.
 
   // pretend this is our database
-  var database = Map("abc" → 1,
-                     "aaa" → 2,
-                     "qqq" → 3)
+  var database = Map("abc" → 1, "aaa" → 2, "qqq" → 3)
 
   // Return a Task which removes items from our database and returns the number of items deleted
   def del(f: String => Boolean): Task[Int] = Task.delay {
-    val (count, db) = database.foldRight(0 → List.empty[(String,Int)]) {
-      case ((k,_),(d,r)) if f(k) => (d+1, r)
-      case (i,(d,r)) => (d, i::r)
+    val (count, db) = database.foldRight(0 → List.empty[(String, Int)]) {
+      case ((k, _), (d, r)) if f(k) => (d + 1, r)
+      case (i, (d, r)) => (d, i :: r)
     }
     database = db.toMap
     count
@@ -129,5 +128,6 @@ object FunctorUsage extends App {
   // Functors compose! Given any Functor F[_] and any Functor G[_] we
   // can compose the two Functors to create a new Functor on F[G[_]]:
   val listOpt = Functor[List] compose Functor[Option]
-  assert(listOpt.map(List(Some(1), None, Some(3)))(_ + 1) === List(Some(2), None, Some(4)))
+  assert(listOpt.map(List(Some(1), None, Some(3)))(_ + 1) === List(
+          Some(2), None, Some(4)))
 }

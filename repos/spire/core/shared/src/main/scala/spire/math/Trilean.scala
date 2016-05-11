@@ -4,44 +4,44 @@ package math
 import spire.algebra.lattice.Heyting
 
 /**
- * Implementation of three-valued logic.
- *
- * This type resembles Boolean, but has three values instead of two:
- *
- *  - Trilean.True (equivalent to true)
- *  - Trilean.False (equivalent to false)
- *  - Trilean.Unknown
- *
- * Trilean supports the same operations that Boolean does, and as long
- * as all values are True or False, the results will be the
- * same. However, the truth tables have to be extended to work with
- * unknown:
- *
- * not:
- * -+-
- * T|F
- * U|U
- * F|T
- *
- * and:
- *  |T U F
- * -+-----
- * T|T U F
- * U|U U F
- * F|F F F
- *
- * or:
- *  |T U F
- * -+-----
- * T|T T T
- * U|T U U
- * F|T U F
- *
- * Trilean is implemented as a value type, so in most cases it will
- * only have the overhead of a single Int. However, in some situations
- * it will be boxed.
- */
-class Trilean (val value: Int) extends AnyVal { lhs =>
+  * Implementation of three-valued logic.
+  *
+  * This type resembles Boolean, but has three values instead of two:
+  *
+  *  - Trilean.True (equivalent to true)
+  *  - Trilean.False (equivalent to false)
+  *  - Trilean.Unknown
+  *
+  * Trilean supports the same operations that Boolean does, and as long
+  * as all values are True or False, the results will be the
+  * same. However, the truth tables have to be extended to work with
+  * unknown:
+  *
+  * not:
+  * -+-
+  * T|F
+  * U|U
+  * F|T
+  *
+  * and:
+  *  |T U F
+  * -+-----
+  * T|T U F
+  * U|U U F
+  * F|F F F
+  *
+  * or:
+  *  |T U F
+  * -+-----
+  * T|T T T
+  * U|T U U
+  * F|T U F
+  *
+  * Trilean is implemented as a value type, so in most cases it will
+  * only have the overhead of a single Int. However, in some situations
+  * it will be boxed.
+  */
+class Trilean(val value: Int) extends AnyVal { lhs =>
   def isTrue: Boolean = value == -1
   def isFalse: Boolean = value == 0
   def isUnknown: Boolean = value == 1
@@ -142,7 +142,8 @@ object Trilean {
 
   final def liftPf[A](p0: PartialFunction[A, Boolean]): A => Trilean = {
     val p = p0.andThen(Trilean(_))
-    (a: A) => p.applyOrElse(a, (_: A) => Unknown)
+    (a: A) =>
+      p.applyOrElse(a, (_: A) => Unknown)
   }
 
   final def testRef[A <: AnyRef](a: A)(f: A => Boolean): Trilean =

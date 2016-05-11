@@ -33,14 +33,16 @@ trait EventIdSequence {
   def getLastOffset(): Long
 }
 
-class SystemEventIdSequence private(agent: String,
-                                    coordination: SystemCoordination,
-                                    private var state: SystemEventIdSequence.InternalState,
-                                    blockSize: Int) /*(implicit executor: ExecutionContext) */ extends EventIdSequence {
+class SystemEventIdSequence private (
+    agent: String,
+    coordination: SystemCoordination,
+    private var state: SystemEventIdSequence.InternalState,
+    blockSize: Int) /*(implicit executor: ExecutionContext) */
+    extends EventIdSequence {
   import SystemEventIdSequence.InternalState
 
   def next(offset: Long) = {
-    if(state.isEmpty) {
+    if (state.isEmpty) {
       state = refill(offset)
     }
     state.next()
@@ -51,16 +53,18 @@ class SystemEventIdSequence private(agent: String,
   }
 
   private def refill(offset: Long): InternalState = {
-    coordination.renewEventRelayState(agent, offset, state.block.producerId, blockSize) match {
-      case Success(ers @ EventRelayState(_,_,_)) => InternalState(ers)
-      case Failure(e)                            => sys.error("Error trying to renew relay agent: " + e)
+    coordination.renewEventRelayState(
+        agent, offset, state.block.producerId, blockSize) match {
+      case Success(ers @ EventRelayState(_, _, _)) => InternalState(ers)
+      case Failure(e) => sys.error("Error trying to renew relay agent: " + e)
     }
   }
 
   def saveState(offset: Long) = {
     state = coordination.saveEventRelayState(agent, currentRelayState(offset)) match {
-      case Success(ers @ EventRelayState(_,_,_)) => InternalState(ers)
-      case Failure(e)                            => sys.error("Error trying to save relay agent state: " + e)
+      case Success(ers @ EventRelayState(_, _, _)) => InternalState(ers)
+      case Failure(e) =>
+        sys.error("Error trying to save relay agent state: " + e)
     }
 
     PrecogUnit
@@ -72,26 +76,34 @@ class SystemEventIdSequence private(agent: String,
 }
 
 object SystemEventIdSequence {
-  class UnableToRetrieveRelayAgentState() extends Exception("Unable to retrieve relay agent state.")
+  class UnableToRetrieveRelayAgentState()
+      extends Exception("Unable to retrieve relay agent state.")
 
   private[ingest] case class InternalState(eventRelayState: EventRelayState) {
-    private val nextSequenceId = new AtomicInteger(eventRelayState.nextSequenceId)
+    private val nextSequenceId = new AtomicInteger(
+        eventRelayState.nextSequenceId)
 
     val block = eventRelayState.idSequenceBlock
     val lastOffset = eventRelayState.offset
 
     def current = nextSequenceId.get
     def isEmpty = current > block.lastSequenceId
-    def next() = if(isEmpty) sys.error("Next on empty sequence is invalid.") else
-      EventId(block.producerId, nextSequenceId.getAndIncrement)
+    def next() =
+      if (isEmpty) sys.error("Next on empty sequence is invalid.")
+      else EventId(block.producerId, nextSequenceId.getAndIncrement)
   }
 
-  def apply(agent: String, coordination: SystemCoordination, blockSize: Int = 100000): SystemEventIdSequence = {
+  def apply(agent: String,
+            coordination: SystemCoordination,
+            blockSize: Int = 100000): SystemEventIdSequence = {
     def loadInitialState() = {
-      val eventRelayState = coordination.registerRelayAgent(agent, blockSize).getOrElse(throw new UnableToRetrieveRelayAgentState)
+      val eventRelayState = coordination
+        .registerRelayAgent(agent, blockSize)
+        .getOrElse(throw new UnableToRetrieveRelayAgentState)
       InternalState(eventRelayState)
     }
 
-    new SystemEventIdSequence(agent, coordination, loadInitialState(), blockSize)
+    new SystemEventIdSequence(
+        agent, coordination, loadInitialState(), blockSize)
   }
 }

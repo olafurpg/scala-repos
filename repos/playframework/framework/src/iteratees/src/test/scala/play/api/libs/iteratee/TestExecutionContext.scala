@@ -8,19 +8,19 @@ import scala.concurrent.ExecutionContext
 object TestExecutionContext {
 
   /**
-   * Create a `TestExecutionContext` that delegates to the iteratee package's default `ExecutionContext`.
-   */
-  def apply(): TestExecutionContext = new TestExecutionContext(Execution.trampoline)
-
+    * Create a `TestExecutionContext` that delegates to the iteratee package's default `ExecutionContext`.
+    */
+  def apply(): TestExecutionContext =
+    new TestExecutionContext(Execution.trampoline)
 }
 
 /**
- * An `ExecutionContext` that counts its executions.
- *
- * @param delegate The underlying `ExecutionContext` to delegate execution to.
- */
-class TestExecutionContext(delegate: ExecutionContext) extends ExecutionContext {
-  top =>
+  * An `ExecutionContext` that counts its executions.
+  *
+  * @param delegate The underlying `ExecutionContext` to delegate execution to.
+  */
+class TestExecutionContext(delegate: ExecutionContext)
+    extends ExecutionContext { top =>
 
   val count = new java.util.concurrent.atomic.AtomicInteger()
 
@@ -32,7 +32,8 @@ class TestExecutionContext(delegate: ExecutionContext) extends ExecutionContext 
   }
 
   def execute(runnable: Runnable): Unit = {
-    throw new RuntimeException("Cannot execute unprepared TestExecutionContext")
+    throw new RuntimeException(
+        "Cannot execute unprepared TestExecutionContext")
   }
 
   def reportFailure(t: Throwable): Unit = {
@@ -41,7 +42,9 @@ class TestExecutionContext(delegate: ExecutionContext) extends ExecutionContext 
 
   override def prepare(): ExecutionContext = {
     val isLocal = Option(local.get()).getOrElse(false: java.lang.Boolean)
-    if (!isLocal) throw new RuntimeException("Can only prepare TestExecutionContext within 'preparable' scope")
+    if (!isLocal)
+      throw new RuntimeException(
+          "Can only prepare TestExecutionContext within 'preparable' scope")
     val preparedDelegate = delegate.prepare()
     return new ExecutionContext {
 
@@ -53,11 +56,8 @@ class TestExecutionContext(delegate: ExecutionContext) extends ExecutionContext 
       def reportFailure(t: Throwable): Unit = {
         println(t)
       }
-
     }
   }
 
   def executionCount: Int = count.get()
-
 }
-

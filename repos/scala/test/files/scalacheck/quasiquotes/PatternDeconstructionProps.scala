@@ -1,15 +1,17 @@
 import org.scalacheck._, Prop._, Gen._, Arbitrary._
 import scala.reflect.runtime.universe._, Flag._
 
-object PatternDeconstructionProps extends QuasiquoteProperties("pattern deconstruction") {
+object PatternDeconstructionProps
+    extends QuasiquoteProperties("pattern deconstruction") {
   property("extract bind") = forAll { (bind: Bind) =>
     val pq"$bind0" = pq"$bind"
     bind0 ≈ bind
   }
 
-  property("extract bind and subpattern") = forAll { (name: TermName, subp: Tree) =>
-    val pq"$name0 @ $subp0" = pq"$name @ $subp"
-    name0 ≈ name && subp0 ≈ subp
+  property("extract bind and subpattern") = forAll {
+    (name: TermName, subp: Tree) =>
+      val pq"$name0 @ $subp0" = pq"$name @ $subp"
+      name0 ≈ name && subp0 ≈ subp
   }
 
   property("extract typed") = forAll { (typ: Tree) =>
@@ -27,9 +29,11 @@ object PatternDeconstructionProps extends QuasiquoteProperties("pattern deconstr
     pat0 ≈ pat && subpats0 ≈ subpats
   }
 
-  property("extract apply last") = forAll { (pat: Tree, subpats: List[Tree], subpatlast: Tree) =>
-    val pq"$pat0(..$subpats0, $subpatlast0)" = pq"$pat(..$subpats, $subpatlast)"
-    pat0 ≈ pat && subpats0 ≈ subpats && subpatlast0 ≈ subpatlast
+  property("extract apply last") = forAll {
+    (pat: Tree, subpats: List[Tree], subpatlast: Tree) =>
+      val pq"$pat0(..$subpats0, $subpatlast0)" =
+        pq"$pat(..$subpats, $subpatlast)"
+      pat0 ≈ pat && subpats0 ≈ subpats && subpatlast0 ≈ subpatlast
   }
 
   property("extract casedef") = forAll { (pat: Tree, cond: Tree, body: Tree) =>

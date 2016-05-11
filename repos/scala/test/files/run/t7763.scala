@@ -7,10 +7,11 @@ object Test {
     def withExpectedType(): B = {
       a().asInstanceOf[B]
     }
-    def test(a: => Any) = try {
-      a
-      sys.error("no CCE!")
-    } catch {case _: ClassCastException => }
+    def test(a: => Any) =
+      try {
+        a
+        sys.error("no CCE!")
+      } catch { case _: ClassCastException => }
 
     test(noExpectedType())
     test(withExpectedType())

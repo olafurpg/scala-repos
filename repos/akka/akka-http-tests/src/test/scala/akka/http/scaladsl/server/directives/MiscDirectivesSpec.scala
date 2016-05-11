@@ -5,7 +5,7 @@
 package akka.http.scaladsl.server
 package directives
 
-import scala.concurrent.{ Await, Promise }
+import scala.concurrent.{Await, Promise}
 import scala.concurrent.duration._
 import scala.util.Try
 import akka.http.scaladsl.model._
@@ -16,12 +16,14 @@ class MiscDirectivesSpec extends RoutingSpec {
 
   "the extractClientIP directive" should {
     "extract from a X-Forwarded-For header" in {
-      Get() ~> addHeaders(`X-Forwarded-For`(remoteAddress("2.3.4.5")), RawHeader("x-real-ip", "1.2.3.4")) ~> {
+      Get() ~> addHeaders(`X-Forwarded-For`(remoteAddress("2.3.4.5")),
+                          RawHeader("x-real-ip", "1.2.3.4")) ~> {
         extractClientIP { echoComplete }
       } ~> check { responseAs[String] shouldEqual "2.3.4.5" }
     }
     "extract from a Remote-Address header" in {
-      Get() ~> addHeaders(`X-Real-Ip`(remoteAddress("1.2.3.4")), `Remote-Address`(remoteAddress("5.6.7.8"))) ~> {
+      Get() ~> addHeaders(`X-Real-Ip`(remoteAddress("1.2.3.4")),
+                          `Remote-Address`(remoteAddress("5.6.7.8"))) ~> {
         extractClientIP { echoComplete }
       } ~> check { responseAs[String] shouldEqual "5.6.7.8" }
     }

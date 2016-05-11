@@ -5,11 +5,15 @@ import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.Se
 import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{SelectorConditions, AncestorSelector}
 
 /**
- * @author Roman.Shein
- * @since 08.09.2015.
- */
-class ScalaAssertPostfixTemplate extends ScalaStringBasedPostfixTemplate("assert", "assert(expr)",
-  new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, Topmost)) {
+  * @author Roman.Shein
+  * @since 08.09.2015.
+  */
+class ScalaAssertPostfixTemplate
+    extends ScalaStringBasedPostfixTemplate(
+        "assert",
+        "assert(expr)",
+        new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, Topmost)) {
 
-  override def getTemplateString(element: PsiElement): String = "assert($expr$)"
+  override def getTemplateString(element: PsiElement): String =
+    "assert($expr$)"
 }

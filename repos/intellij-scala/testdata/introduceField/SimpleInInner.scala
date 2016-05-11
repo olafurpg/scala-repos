@@ -1,7 +1,8 @@
 /*selectedClassNumber = 0*/
 class Test {
   object A {
-    /*start*/1/*end*/
+    /*start*/
+    1 /*end*/
   }
   def foo() {
     1
@@ -21,4 +22,4 @@ class Test {
   }
   1
 }
-*/
+ */

@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.actor.InternalActorRef
@@ -9,22 +8,23 @@ import akka.actor.Terminated
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.dispatch.sysmsg.DeathWatchNotification
-import akka.dispatch.{ UnboundedMessageQueueSemantics, RequiresMessageQueue }
+import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object RemoteDeploymentWatcher {
   final case class WatchRemote(actor: ActorRef, supervisor: ActorRef)
 }
 
 /**
- * INTERNAL API
- *
- * Responsible for cleaning up child references of remote deployed actors when remote node
- * goes down (jvm crash, network failure), i.e. triggered by [[akka.actor.AddressTerminated]].
- */
-private[akka] class RemoteDeploymentWatcher extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+  * INTERNAL API
+  *
+  * Responsible for cleaning up child references of remote deployed actors when remote node
+  * goes down (jvm crash, network failure), i.e. triggered by [[akka.actor.AddressTerminated]].
+  */
+private[akka] class RemoteDeploymentWatcher
+    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import RemoteDeploymentWatcher._
   var supervisors = Map.empty[ActorRef, InternalActorRef]
 
@@ -35,8 +35,10 @@ private[akka] class RemoteDeploymentWatcher extends Actor with RequiresMessageQu
 
     case t @ Terminated(a) if supervisors isDefinedAt a ⇒
       // send extra DeathWatchNotification to the supervisor so that it will remove the child
-      supervisors(a).sendSystemMessage(DeathWatchNotification(a, existenceConfirmed = t.existenceConfirmed,
-        addressTerminated = t.addressTerminated))
+      supervisors(a).sendSystemMessage(
+          DeathWatchNotification(a,
+                                 existenceConfirmed = t.existenceConfirmed,
+                                 addressTerminated = t.addressTerminated))
       supervisors -= a
 
     case _: Terminated ⇒

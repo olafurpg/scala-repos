@@ -1,10 +1,9 @@
 /*     ___ ____ ___   __   ___   ___
-**    / _// __// _ | / /  / _ | / _ \  Scala classfile decoder
-**  __\ \/ /__/ __ |/ /__/ __ |/ ___/  (c) 2003-2013, LAMP/EPFL
-** /____/\___/_/ |_/____/_/ |_/_/      http://scala-lang.org/
-**
-*/
-
+ **    / _// __// _ | / /  / _ | / _ \  Scala classfile decoder
+ **  __\ \/ /__/ __ |/ /__/ __ |/ ___/  (c) 2003-2013, LAMP/EPFL
+ ** /____/\___/_/ |_/____/_/ |_/_/      http://scala-lang.org/
+ **
+ */
 
 package scala.tools.scalap
 
@@ -13,9 +12,9 @@ import mutable.ListBuffer
 
 object Arguments {
   case class Parser(optionPrefix: Char) {
-    val options: mutable.Set[String]                = new mutable.HashSet
-    val prefixes: mutable.Set[String]               = new mutable.HashSet
-    val optionalArgs: mutable.Set[String]           = new mutable.HashSet
+    val options: mutable.Set[String] = new mutable.HashSet
+    val prefixes: mutable.Set[String] = new mutable.HashSet
+    val optionalArgs: mutable.Set[String] = new mutable.HashSet
     val prefixedBindings: mutable.Map[String, Char] = new mutable.HashMap
     val optionalBindings: mutable.Map[String, Char] = new mutable.HashMap
 
@@ -46,10 +45,12 @@ object Arguments {
       this
     }
 
-    def parseBinding(str: String, separator: Char): (String, String) = (str indexOf separator) match {
-      case -1   => argumentError(s"missing '$separator' in binding '$str'") ; ("", "")
-      case idx  => ((str take idx).trim, (str drop (idx + 1)).trim)
-    }
+    def parseBinding(str: String, separator: Char): (String, String) =
+      (str indexOf separator) match {
+        case -1 =>
+          argumentError(s"missing '$separator' in binding '$str'"); ("", "")
+        case idx => ((str take idx).trim, (str drop (idx + 1)).trim)
+      }
 
     def parse(args: Array[String]): Arguments = {
       val res = new Arguments
@@ -60,59 +61,59 @@ object Arguments {
     def parse(args: Array[String], res: Arguments) {
       if (args != null) {
         var i = 0
-        while (i < args.length)
-          if ((args(i) == null) || (args(i).length() == 0))
+        while (i < args.length) if ((args(i) == null) ||
+                                    (args(i).length() == 0)) i += 1
+        else if (args(i).charAt(0) != optionPrefix) {
+          res.addOther(args(i))
+          i += 1
+        } else if (options(args(i))) {
+          res.addOption(args(i))
+          i += 1
+        } else if (optionalArgs contains args(i)) {
+          if ((i + 1) == args.length) {
+            argumentError(s"missing argument for '${args(i)}'")
             i += 1
-          else if (args(i).charAt(0) != optionPrefix) {
-            res.addOther(args(i))
-            i += 1
-          } else if (options(args(i))) {
-            res.addOption(args(i))
-            i += 1
-          } else if (optionalArgs contains args(i)) {
-            if ((i + 1) == args.length) {
-              argumentError(s"missing argument for '${args(i)}'")
-              i += 1
-            } else {
-              res.addArgument(args(i), args(i + 1))
-              i += 2
-            }
-          } else if (optionalBindings contains args(i)) {
-            if ((i + 1) == args.length) {
-              argumentError(s"missing argument for '${args(i)}'")
-              i += 1
-            } else {
-              res.addBinding(args(i),
-                parseBinding(args(i + 1), optionalBindings(args(i))))
-              i += 2
-            }
           } else {
-            val iter = prefixes.iterator
-            val j = i
-            while ((i == j) && iter.hasNext) {
+            res.addArgument(args(i), args(i + 1))
+            i += 2
+          }
+        } else if (optionalBindings contains args(i)) {
+          if ((i + 1) == args.length) {
+            argumentError(s"missing argument for '${args(i)}'")
+            i += 1
+          } else {
+            res.addBinding(
+                args(i), parseBinding(args(i + 1), optionalBindings(args(i))))
+            i += 2
+          }
+        } else {
+          val iter = prefixes.iterator
+          val j = i
+          while ( (i == j) && iter.hasNext) {
+            val prefix = iter.next
+            if (args(i) startsWith prefix) {
+              res.addPrefixed(
+                  prefix, args(i).substring(prefix.length()).trim())
+              i += 1
+            }
+          }
+          if (i == j) {
+            val iter = prefixedBindings.keysIterator
+            while ( (i == j) && iter.hasNext) {
               val prefix = iter.next
               if (args(i) startsWith prefix) {
-                res.addPrefixed(prefix, args(i).substring(prefix.length()).trim())
-                i += 1
+                val arg = args(i).substring(prefix.length()).trim()
+                i = i + 1
+                res.addBinding(
+                    prefix, parseBinding(arg, prefixedBindings(prefix)))
               }
             }
             if (i == j) {
-              val iter = prefixedBindings.keysIterator
-              while ((i == j) && iter.hasNext) {
-                val prefix = iter.next
-                if (args(i) startsWith prefix) {
-                  val arg = args(i).substring(prefix.length()).trim()
-                  i = i + 1
-                  res.addBinding(prefix,
-                    parseBinding(arg, prefixedBindings(prefix)))
-                }
-              }
-              if (i == j) {
-                argumentError(s"unknown option '${args(i)}'")
-                i = i + 1
-              }
+              argumentError(s"unknown option '${args(i)}'")
+              i = i + 1
             }
           }
+        }
       }
     }
   }
@@ -125,11 +126,12 @@ object Arguments {
 }
 
 class Arguments {
-  private val options   = new mutable.HashSet[String]
+  private val options = new mutable.HashSet[String]
   private val arguments = new mutable.HashMap[String, String]
-  private val prefixes  = new mutable.HashMap[String, mutable.HashSet[String]]
-  private val bindings  = new mutable.HashMap[String, mutable.HashMap[String, String]]
-  private val others    = new ListBuffer[String]
+  private val prefixes = new mutable.HashMap[String, mutable.HashSet[String]]
+  private val bindings =
+    new mutable.HashMap[String, mutable.HashMap[String, String]]
+  private val others = new ListBuffer[String]
 
   def addOption(option: String): Unit = options += option
 

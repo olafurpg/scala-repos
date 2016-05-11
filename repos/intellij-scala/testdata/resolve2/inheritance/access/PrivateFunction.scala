@@ -3,5 +3,5 @@ class P {
 }
 
 class C extends P {
-  println(/* accessible: false */ f)
+  println( /* accessible: false */ f)
 }

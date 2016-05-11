@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.singleton
 
 import language.postfixOps
@@ -47,7 +46,7 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
                                           """))
 
   nodeConfig(first, second, third, fourth, fifth, sixth)(
-    ConfigFactory.parseString("akka.cluster.roles =[worker]"))
+      ConfigFactory.parseString("akka.cluster.roles =[worker]"))
 
   object PointToPointChannel {
     case object RegisterConsumer
@@ -61,11 +60,11 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
   }
 
   /**
-   * This channel is extremely strict with regards to
-   * registration and unregistration of consumer to
-   * be able to detect misbehaviour (e.g. two active
-   * singleton instances).
-   */
+    * This channel is extremely strict with regards to
+    * registration and unregistration of consumer to
+    * be able to detect misbehaviour (e.g. two active
+    * singleton instances).
+    */
   class PointToPointChannel extends Actor with ActorLogging {
 
     import PointToPointChannel._
@@ -82,7 +81,7 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
         sender() ! UnexpectedUnregistration
         context stop self
       case Reset ⇒ sender() ! ResetOk
-      case msg   ⇒ // no consumer, drop
+      case msg ⇒ // no consumer, drop
     }
 
     def active(consumer: ActorRef): Receive = {
@@ -91,11 +90,15 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
         sender() ! UnregistrationOk
         context.become(idle)
       case UnregisterConsumer ⇒
-        log.info("UnexpectedUnregistration: [{}], expected [{}]", sender().path, consumer.path)
+        log.info("UnexpectedUnregistration: [{}], expected [{}]",
+                 sender().path,
+                 consumer.path)
         sender() ! UnexpectedUnregistration
         context stop self
       case RegisterConsumer ⇒
-        log.info("Unexpected RegisterConsumer [{}], active consumer [{}]", sender().path, consumer.path)
+        log.info("Unexpected RegisterConsumer [{}], active consumer [{}]",
+                 sender().path,
+                 consumer.path)
         sender() ! UnexpectedRegistration
         context stop self
       case Reset ⇒
@@ -113,9 +116,10 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
   }
 
   /**
-   * The Singleton actor
-   */
-  class Consumer(queue: ActorRef, delegateTo: ActorRef) extends Actor with ActorLogging {
+    * The Singleton actor
+    */
+  class Consumer(queue: ActorRef, delegateTo: ActorRef)
+      extends Actor with ActorLogging {
 
     import Consumer._
     import PointToPointChannel._
@@ -151,7 +155,6 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
       //#consumer-end
     }
   }
-
 }
 
 class ClusterSingletonManagerMultiJvmNode1 extends ClusterSingletonManagerSpec
@@ -163,7 +166,9 @@ class ClusterSingletonManagerMultiJvmNode6 extends ClusterSingletonManagerSpec
 class ClusterSingletonManagerMultiJvmNode7 extends ClusterSingletonManagerSpec
 class ClusterSingletonManagerMultiJvmNode8 extends ClusterSingletonManagerSpec
 
-class ClusterSingletonManagerSpec extends MultiNodeSpec(ClusterSingletonManagerSpec) with STMultiNodeSpec with ImplicitSender {
+class ClusterSingletonManagerSpec
+    extends MultiNodeSpec(ClusterSingletonManagerSpec) with STMultiNodeSpec
+    with ImplicitSender {
 
   import ClusterSingletonManagerSpec._
   import ClusterSingletonManagerSpec.PointToPointChannel._
@@ -184,7 +189,9 @@ class ClusterSingletonManagerSpec extends MultiNodeSpec(ClusterSingletonManagerS
 
   def queue: ActorRef = {
     // this is used from inside actor construction, i.e. other thread, and must therefore not call `node(controller`
-    system.actorSelection(controllerRootActorPath / "user" / "queue").tell(Identify("queue"), identifyProbe.ref)
+    system
+      .actorSelection(controllerRootActorPath / "user" / "queue")
+      .tell(Identify("queue"), identifyProbe.ref)
     identifyProbe.expectMsgType[ActorIdentity].ref.get
   }
 
@@ -200,31 +207,37 @@ class ClusterSingletonManagerSpec extends MultiNodeSpec(ClusterSingletonManagerS
 
   def awaitMemberUp(memberProbe: TestProbe, nodes: RoleName*): Unit = {
     runOn(nodes.filterNot(_ == nodes.head): _*) {
-      memberProbe.expectMsgType[MemberUp](15.seconds).member.address should ===(node(nodes.head).address)
+      memberProbe.expectMsgType[MemberUp](15.seconds).member.address should ===(
+          node(nodes.head).address)
     }
     runOn(nodes.head) {
-      memberProbe.receiveN(nodes.size, 15.seconds).collect { case MemberUp(m) ⇒ m.address }.toSet should ===(
-        nodes.map(node(_).address).toSet)
+      memberProbe
+        .receiveN(nodes.size, 15.seconds)
+        .collect { case MemberUp(m) ⇒ m.address }
+        .toSet should ===(nodes.map(node(_).address).toSet)
     }
     enterBarrier(nodes.head.name + "-up")
   }
 
   def createSingleton(): ActorRef = {
     //#create-singleton-manager
-    system.actorOf(ClusterSingletonManager.props(
-      singletonProps = Props(classOf[Consumer], queue, testActor),
-      terminationMessage = End,
-      settings = ClusterSingletonManagerSettings(system).withRole("worker")),
-      name = "consumer")
+    system.actorOf(
+        ClusterSingletonManager.props(
+            singletonProps = Props(classOf[Consumer], queue, testActor),
+            terminationMessage = End,
+            settings = ClusterSingletonManagerSettings(system).withRole(
+                  "worker")),
+        name = "consumer")
     //#create-singleton-manager
   }
 
   def createSingletonProxy(): ActorRef = {
     //#create-singleton-proxy
-    system.actorOf(ClusterSingletonProxy.props(
-      singletonManagerPath = "/user/consumer",
-      settings = ClusterSingletonProxySettings(system).withRole("worker")),
-      name = "consumerProxy")
+    system.actorOf(
+        ClusterSingletonProxy.props(singletonManagerPath = "/user/consumer",
+                                    settings = ClusterSingletonProxySettings(
+                                          system).withRole("worker")),
+        name = "consumerProxy")
     //#create-singleton-proxy
   }
 
@@ -255,7 +268,8 @@ class ClusterSingletonManagerSpec extends MultiNodeSpec(ClusterSingletonManagerS
   }
 
   def consumer(oldest: RoleName): ActorSelection =
-    system.actorSelection(RootActorPath(node(oldest).address) / "user" / "consumer" / "singleton")
+    system.actorSelection(
+        RootActorPath(node(oldest).address) / "user" / "consumer" / "singleton")
 
   def verifyRegistration(oldest: RoleName): Unit = {
     enterBarrier("before-" + oldest.name + "-registration-verified")
@@ -278,7 +292,8 @@ class ClusterSingletonManagerSpec extends MultiNodeSpec(ClusterSingletonManagerS
     runOn(oldest) {
       expectMsg(5.seconds, msg)
     }
-    runOn(roles.filterNot(r ⇒ r == oldest || r == controller || r == observer): _*) {
+    runOn(
+        roles.filterNot(r ⇒ r == oldest || r == controller || r == observer): _*) {
       expectNoMsg(1 second)
     }
     enterBarrier("after-" + msg + "-verified")
@@ -340,14 +355,16 @@ class ClusterSingletonManagerSpec extends MultiNodeSpec(ClusterSingletonManagerS
       verifyProxyMsg(first, fifth, msg = msg())
 
       join(sixth, first)
-      awaitMemberUp(memberProbe, sixth, fifth, fourth, third, second, observer, first)
+      awaitMemberUp(
+          memberProbe, sixth, fifth, fourth, third, second, observer, first)
       verifyMsg(first, msg = msg())
       verifyProxyMsg(first, sixth, msg = msg())
 
       enterBarrier("after-1")
     }
 
-    "let the proxy route messages to the singleton in a 6 node cluster" in within(60 seconds) {
+    "let the proxy route messages to the singleton in a 6 node cluster" in within(
+        60 seconds) {
       verifyProxyMsg(first, first, msg = msg())
       verifyProxyMsg(first, second, msg = msg())
       verifyProxyMsg(first, third, msg = msg())
@@ -373,7 +390,9 @@ class ClusterSingletonManagerSpec extends MultiNodeSpec(ClusterSingletonManagerS
       verifyProxyMsg(second, sixth, msg = msg())
 
       runOn(leaveRole) {
-        system.actorSelection("/user/consumer").tell(Identify("singleton"), identifyProbe.ref)
+        system
+          .actorSelection("/user/consumer")
+          .tell(Identify("singleton"), identifyProbe.ref)
         identifyProbe.expectMsgPF() {
           case ActorIdentity("singleton", None) ⇒ // already terminated
           case ActorIdentity("singleton", Some(singleton)) ⇒
@@ -414,6 +433,5 @@ class ClusterSingletonManagerSpec extends MultiNodeSpec(ClusterSingletonManagerS
       verifyMsg(sixth, msg = msg())
       verifyProxyMsg(sixth, sixth, msg = msg())
     }
-
   }
 }

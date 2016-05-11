@@ -1,4 +1,3 @@
-
 trait Test {
   type +[A, B] = (A, B)
   type *[A, B] = (A, B)

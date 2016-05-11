@@ -6,14 +6,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMethodCall
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * Pavel Fatin
- */
-
-class RemoveCallParentheses(call: ScMethodCall) extends AbstractFixOnPsiElement("Remove call parentheses", call) {
+  * Pavel Fatin
+  */
+class RemoveCallParentheses(call: ScMethodCall)
+    extends AbstractFixOnPsiElement("Remove call parentheses", call) {
   def doApplyFix(project: Project) {
     val mCall = getElement
     val text = mCall.getInvokedExpr.getText
-    val exp = ScalaPsiElementFactory.createExpressionFromText(text, mCall.getManager)
+    val exp =
+      ScalaPsiElementFactory.createExpressionFromText(text, mCall.getManager)
     mCall.replace(exp)
   }
 }

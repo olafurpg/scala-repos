@@ -5,7 +5,6 @@ package math
 import scala.math.{Ordering => SOrdering}
 import scalaz.Ordering
 
-
 trait OrderingInstances {
   def orderingMonoid[A] = new Monoid[SOrdering[A]] {
     def append(f1: SOrdering[A], f2: => SOrdering[A]) = new SOrdering[A] {
@@ -21,9 +20,10 @@ trait OrderingInstances {
 }
 
 trait OrderingFunctions {
-  final def ToScalazOrderFromOrdering[A](oa: SOrdering[A]): scalaz.Order[A] = new scalaz.Order[A] {
-    def order(x: A, y: A): Ordering = Ordering.fromInt(oa.compare(x, y))
-  }
+  final def ToScalazOrderFromOrdering[A](oa: SOrdering[A]): scalaz.Order[A] =
+    new scalaz.Order[A] {
+      def order(x: A, y: A): Ordering = Ordering.fromInt(oa.compare(x, y))
+    }
 }
 
 object ordering extends OrderingInstances

@@ -1,8 +1,9 @@
 trait test {
   type T = (Int, Int)
-  def tuply(t: T){}
+  def tuply(t: T) {}
 
-  /*start*/tuply(1, 2)/*end*/
+  /*start*/
+  tuply(1, 2) /*end*/
 }
 
 // Unit

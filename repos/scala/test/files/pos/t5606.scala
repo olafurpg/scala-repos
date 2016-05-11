@@ -1,9 +1,1 @@
-
-
-
-
-
-
-
-
-case class CaseTest[_](someData:String)
+case class CaseTest[_](someData: String)

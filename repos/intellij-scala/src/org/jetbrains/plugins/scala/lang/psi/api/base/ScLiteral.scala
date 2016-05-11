@@ -12,19 +12,22 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-*/
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
+trait ScLiteral
+    extends ScExpression with PsiLiteral with PsiLanguageInjectionHost {
 
-trait ScLiteral extends ScExpression with PsiLiteral with PsiLanguageInjectionHost {
   /**
-   * This method works only for null literal (to avoid possibly dangerous usage)
-   * @param tp type, which should be returned by method getTypeWithouImplicits
-   */
+    * This method works only for null literal (to avoid possibly dangerous usage)
+    * @param tp type, which should be returned by method getTypeWithouImplicits
+    */
   def setTypeWithoutImplicits(tp: Option[ScType])
   def isString: Boolean
   def isMultiLineString: Boolean
-  def getAnnotationOwner(annotationOwnerLookUp: ScLiteral => Option[PsiAnnotationOwner with PsiElement]): Option[PsiAnnotationOwner]
+  def getAnnotationOwner(
+      annotationOwnerLookUp: ScLiteral => Option[
+          PsiAnnotationOwner with PsiElement]): Option[PsiAnnotationOwner]
   def isSymbol: Boolean
   def isChar: Boolean
   def contentRange: TextRange
@@ -43,12 +46,22 @@ class ScLiteralValueExtractor[T](literalTypes: IElementType*)(f: AnyRef => T) {
   }
 }
 
-object ScIntLiteral extends ScLiteralValueExtractor(tINTEGER)(_.asInstanceOf[java.lang.Integer].intValue)
+object ScIntLiteral
+    extends ScLiteralValueExtractor(tINTEGER)(
+        _.asInstanceOf[java.lang.Integer].intValue)
 
-object ScFloatLiteral extends ScLiteralValueExtractor(tFLOAT)(_.asInstanceOf[java.lang.Float].floatValue)
+object ScFloatLiteral
+    extends ScLiteralValueExtractor(tFLOAT)(
+        _.asInstanceOf[java.lang.Float].floatValue)
 
-object ScCharLiteral extends ScLiteralValueExtractor(tCHAR)(_.asInstanceOf[java.lang.Character].charValue)
+object ScCharLiteral
+    extends ScLiteralValueExtractor(tCHAR)(
+        _.asInstanceOf[java.lang.Character].charValue)
 
-object ScBooleanLiteral extends ScLiteralValueExtractor(kTRUE, kFALSE)(_.asInstanceOf[java.lang.Boolean].booleanValue)
+object ScBooleanLiteral
+    extends ScLiteralValueExtractor(kTRUE, kFALSE)(
+        _.asInstanceOf[java.lang.Boolean].booleanValue)
 
-object ScStringLiteral extends ScLiteralValueExtractor(tSTRING, tWRONG_STRING, tMULTILINE_STRING)(_.asInstanceOf[String])
+object ScStringLiteral
+    extends ScLiteralValueExtractor(tSTRING, tWRONG_STRING, tMULTILINE_STRING)(
+        _.asInstanceOf[String])

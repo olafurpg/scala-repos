@@ -22,17 +22,22 @@ trait ScParameterClause extends ScalaPsiElement {
   def effectiveParameters: Seq[ScParameter]
 
   //hack: no ClassParamList present at the moment
-  def unsafeClassParameters = effectiveParameters.asInstanceOf[Seq[ScClassParameter]]
+  def unsafeClassParameters =
+    effectiveParameters.asInstanceOf[Seq[ScClassParameter]]
 
-  def paramTypes: Seq[ScType] = parameters.map(_.getType(TypingContext.empty).getOrAny)
+  def paramTypes: Seq[ScType] =
+    parameters.map(_.getType(TypingContext.empty).getOrAny)
 
   def isImplicit: Boolean
 
-  def implicitToken: Option[PsiElement] = Option(findFirstChildByType(ScalaTokenTypes.kIMPLICIT))
+  def implicitToken: Option[PsiElement] =
+    Option(findFirstChildByType(ScalaTokenTypes.kIMPLICIT))
 
-  def hasRepeatedParam: Boolean = parameters.lastOption.exists(_.isRepeatedParameter)
+  def hasRepeatedParam: Boolean =
+    parameters.lastOption.exists(_.isRepeatedParameter)
 
-  def getSmartParameters: Seq[Parameter] = effectiveParameters.map(new Parameter(_))
+  def getSmartParameters: Seq[Parameter] =
+    effectiveParameters.map(new Parameter(_))
 
   /**
     * add parameter as last parameter in clause

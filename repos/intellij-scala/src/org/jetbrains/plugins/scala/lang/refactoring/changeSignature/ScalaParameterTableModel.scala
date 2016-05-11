@@ -16,14 +16,16 @@ import org.jetbrains.plugins.scala.lang.refactoring.ui.ScalaCodeFragmentTableCel
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Nikolay.Tropin
- * 2014-08-29
- */
+  * Nikolay.Tropin
+  * 2014-08-29
+  */
 class ScalaParameterTableModel(typeContext: PsiElement,
                                defaultValueContext: PsiElement,
                                methodDescriptor: ScalaMethodDescriptor,
                                columnInfos: ColumnInfo[_, _]*)
-        extends ParameterTableModelBase[ScalaParameterInfo, ScalaParameterTableModelItem](typeContext, defaultValueContext, columnInfos: _*) {
+    extends ParameterTableModelBase[
+        ScalaParameterInfo, ScalaParameterTableModelItem](
+        typeContext, defaultValueContext, columnInfos: _*) {
 
   val project = defaultValueContext.getProject
   val initialParams: Seq[Seq[ScalaParameterInfo]] = methodDescriptor.parameters
@@ -32,49 +34,70 @@ class ScalaParameterTableModel(typeContext: PsiElement,
 
   private val codeFragments = ArrayBuffer[PsiElement]()
 
-  def this(typeContext: PsiElement, defaultValueContext: PsiElement, methodDescriptor: ScalaMethodDescriptor) {
-    this(typeContext, defaultValueContext, methodDescriptor,
-      new ScalaNameColumn(typeContext.getProject),
-      new ScalaTypeColumn(typeContext.getProject),
-      new ScalaDefaultValueColumn(typeContext.getProject))
+  def this(typeContext: PsiElement,
+           defaultValueContext: PsiElement,
+           methodDescriptor: ScalaMethodDescriptor) {
+    this(typeContext,
+         defaultValueContext,
+         methodDescriptor,
+         new ScalaNameColumn(typeContext.getProject),
+         new ScalaTypeColumn(typeContext.getProject),
+         new ScalaDefaultValueColumn(typeContext.getProject))
   }
 
-  override def createRowItem(parameterInfo: ScalaParameterInfo): ScalaParameterTableModelItem = {
+  override def createRowItem(
+      parameterInfo: ScalaParameterInfo): ScalaParameterTableModelItem = {
     val info = Option(parameterInfo).getOrElse(ScalaParameterInfo(project))
 
     val paramTypeCodeFragment = new ScalaCodeFragment(project, info.typeText)
-    val defaultValueCodeFragment = new ScalaCodeFragment(project, info.getDefaultValue)
+    val defaultValueCodeFragment = new ScalaCodeFragment(
+        project, info.getDefaultValue)
 
     val fragments = Seq(paramTypeCodeFragment, defaultValueCodeFragment)
     codeFragments ++= fragments
-    fragments.foreach(HighlightLevelUtil.forceRootHighlighting(_, FileHighlightingSetting.SKIP_HIGHLIGHTING))
+    fragments.foreach(HighlightLevelUtil.forceRootHighlighting(
+            _, FileHighlightingSetting.SKIP_HIGHLIGHTING))
 
     paramTypeCodeFragment.setContext(typeContext.getParent, typeContext)
-    defaultValueCodeFragment.setContext(defaultValueContext.getParent, defaultValueContext)
+    defaultValueCodeFragment.setContext(
+        defaultValueContext.getParent, defaultValueContext)
 
-    defaultValueCodeFragment.setVisibilityChecker(JavaCodeFragment.VisibilityChecker.EVERYTHING_VISIBLE)
+    defaultValueCodeFragment.setVisibilityChecker(
+        JavaCodeFragment.VisibilityChecker.EVERYTHING_VISIBLE)
 
     val newClauseParams = initialParams.flatMap(_.headOption).drop(1)
     val startsNewClause = newClauseParams.contains(parameterInfo)
 
-    new ScalaParameterTableModelItem(info, paramTypeCodeFragment, defaultValueCodeFragment, startsNewClause)
+    new ScalaParameterTableModelItem(
+        info, paramTypeCodeFragment, defaultValueCodeFragment, startsNewClause)
   }
 
   def clear(): Unit = {
-    codeFragments.foreach(HighlightLevelUtil.forceRootHighlighting(_, FileHighlightingSetting.NONE))
+    codeFragments.foreach(HighlightLevelUtil.forceRootHighlighting(
+            _, FileHighlightingSetting.NONE))
   }
 }
 
 object ScalaParameterTableModel {
-  class ScalaTypeColumn(project: Project) extends TypeColumn[ScalaParameterInfo, ScalaParameterTableModelItem](project, ScalaFileType.SCALA_FILE_TYPE) {
-    override def doCreateEditor(o: ScalaParameterTableModelItem): TableCellEditor = new ScalaCodeFragmentTableCellEditor(project)
+  class ScalaTypeColumn(project: Project)
+      extends TypeColumn[ScalaParameterInfo, ScalaParameterTableModelItem](
+          project, ScalaFileType.SCALA_FILE_TYPE) {
+    override def doCreateEditor(
+        o: ScalaParameterTableModelItem): TableCellEditor =
+      new ScalaCodeFragmentTableCellEditor(project)
   }
 
-  class ScalaNameColumn(project: Project) extends NameColumn[ScalaParameterInfo, ScalaParameterTableModelItem](project)
+  class ScalaNameColumn(project: Project)
+      extends NameColumn[ScalaParameterInfo, ScalaParameterTableModelItem](
+          project)
 
   class ScalaDefaultValueColumn(project: Project)
-          extends ParameterTableModelBase.DefaultValueColumn[ScalaParameterInfo, ScalaParameterTableModelItem](project, ScalaFileType.SCALA_FILE_TYPE) {
+      extends ParameterTableModelBase.DefaultValueColumn[
+          ScalaParameterInfo, ScalaParameterTableModelItem](
+          project, ScalaFileType.SCALA_FILE_TYPE) {
 
-    override def doCreateEditor(item: ScalaParameterTableModelItem): TableCellEditor = new ScalaCodeFragmentTableCellEditor(project)
+    override def doCreateEditor(
+        item: ScalaParameterTableModelItem): TableCellEditor =
+      new ScalaCodeFragmentTableCellEditor(project)
   }
 }

@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.geometry.VerticalDirection]]. */
 @RunWith(classOf[JUnitRunner])
-class VerticalDirectionSpec extends SFXEnumDelegateSpec[jfxg.VerticalDirection, VerticalDirection](
-  javaClass = classOf[jfxg.VerticalDirection],
-  scalaClass = classOf[VerticalDirection],
-  companion = VerticalDirection)
+class VerticalDirectionSpec
+    extends SFXEnumDelegateSpec[jfxg.VerticalDirection, VerticalDirection](
+        javaClass = classOf[jfxg.VerticalDirection],
+        scalaClass = classOf[VerticalDirection],
+        companion = VerticalDirection)

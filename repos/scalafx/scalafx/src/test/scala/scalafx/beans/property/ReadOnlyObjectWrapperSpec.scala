@@ -41,17 +41,14 @@ import scalafx.beans.property.PropertyIncludes.jfxReadOnlyObjectWrapper2sfx
 import scalafx.scene.control.Button
 import scalafx.testutil.RunOnApplicationThread
 
-
 /**
- * ObjectProperty Spec tests.
- *
- *
- */
+  * ObjectProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ReadOnlyObjectWrapperSpec
-  extends FlatSpec
-  with BeforeAndAfterEach
-  with RunOnApplicationThread {
+    extends FlatSpec with BeforeAndAfterEach with RunOnApplicationThread {
 
   val bean = new Object()
   var objectProperty: jfxbp.ReadOnlyObjectWrapper[String] = null
@@ -62,7 +59,8 @@ class ReadOnlyObjectWrapperSpec
   override protected def beforeEach() {
     objectProperty = new ReadOnlyObjectWrapper[String](bean, "Test Object")
     objectProperty2 = new ReadOnlyObjectWrapper[String](bean, "Test Object 2")
-    sfxObjectProperty = new ReadOnlyObjectWrapper[String](bean, "SFX Test Object")
+    sfxObjectProperty = new ReadOnlyObjectWrapper[String](
+        bean, "SFX Test Object")
     booleanProperty = new BooleanProperty(bean, "Test Boolean")
   }
 
@@ -205,15 +203,18 @@ class ReadOnlyObjectWrapperSpec
   it should "support implicit conversion to a String Binding" is (pending)
 
   it should "support implicit conversion from a ScalaFX ReadOnlyObjectWrapper with a SFXDelegate of a type T to a JavaFX ReadOnlyObjectWrapper of type T" in {
-    val scalaObjProperty: ReadOnlyObjectWrapper[Button] = ReadOnlyObjectWrapper[Button](new Button("Test"))
-    val javaObjProperty: jfxbp.ReadOnlyObjectWrapper[jfxsc.Button] = scalaObjProperty
+    val scalaObjProperty: ReadOnlyObjectWrapper[Button] =
+      ReadOnlyObjectWrapper[Button](new Button("Test"))
+    val javaObjProperty: jfxbp.ReadOnlyObjectWrapper[jfxsc.Button] =
+      scalaObjProperty
 
     javaObjProperty.get should be(scalaObjProperty.get.delegate)
   }
 
   it should "support readOnlyProperty" in {
     val wrapper = ReadOnlyObjectWrapper("Test")
-    val readOnlyProperty: ReadOnlyObjectProperty[String] = wrapper.readOnlyProperty
+    val readOnlyProperty: ReadOnlyObjectProperty[String] =
+      wrapper.readOnlyProperty
     readOnlyProperty() should equal("Test")
 
     wrapper.value = "New value"
@@ -244,7 +245,8 @@ class ReadOnlyObjectWrapperSpec
     val readOnlyProperty = p.readOnlyProperty
     assert(42.1 === readOnlyProperty())
 
-    val jfxProperty = new jfxbp.SimpleObjectProperty[Double](this, "jfx", 224.3)
+    val jfxProperty =
+      new jfxbp.SimpleObjectProperty[Double](this, "jfx", 224.3)
     assert(224.3 === jfxProperty())
 
     jfxProperty <== readOnlyProperty

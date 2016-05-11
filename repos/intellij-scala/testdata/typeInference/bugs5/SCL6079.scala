@@ -9,7 +9,7 @@ abstract class A {
 
   implicit def goo(implicit i: Int): C = sys.exit()
 
-  /*start*/foo(1)/*end*/
-
+  /*start*/
+  foo(1) /*end*/
 }
 //Int

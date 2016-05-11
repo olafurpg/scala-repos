@@ -3,25 +3,24 @@ object Test extends AnyRef with App {
 
   def try1 = {
     Console.print("1 + 1 = ");
-    Console.println(1 + (
-      try {
-        x;
-      } catch {
-        case _: Error => 1;
-      }
-    ));
+    Console.println(
+        1 +
+        (try {
+          x;
+        } catch {
+          case _: Error => 1;
+        }));
   }
 
   def try2 = {
     Console.print("1 + 1 = ");
     Console.println(
-      (try { x } catch {
-        case _: Error => 1;
-      })
-      +
-      (try { x } catch {
-        case _: Error => 1;
-      })
+        (try { x } catch {
+          case _: Error => 1;
+        }) +
+        (try { x } catch {
+              case _: Error => 1;
+            })
     );
   }
 
@@ -57,28 +56,28 @@ object Test extends AnyRef with App {
     }
   }
 
-  def try5 = try {
-    Console.print("1 + 1 = ");
+  def try5 =
     try {
-      if (true)
-        sys.error("exit");
-      1+1;
-      ()
+      Console.print("1 + 1 = ");
+      try {
+        if (true) sys.error("exit");
+        1 + 1;
+        ()
+      } catch {
+        case _: Throwable =>
+          Console.println("2");
+          sys.error("for good");
+      }
+      Console.println("a");
     } catch {
-      case _: Throwable =>
-        Console.println("2");
-        sys.error("for good");
+      case _: Throwable => ();
     }
-    Console.println("a");
-  } catch {
-    case _: Throwable => ();
-  }
 
   class A {
     private val result = {
       val y = try { x } catch {
-          case _: Error => 1;
-        };
+        case _: Error => 1;
+      };
       x + y
     }
     Console.print("1 + 1 = ");
@@ -87,23 +86,22 @@ object Test extends AnyRef with App {
 
   // ticket #981
   def try6 {
-   class SekwencjaArray {
-    def get = null
-   }
+    class SekwencjaArray {
+      def get = null
+    }
 
-   var sekw : SekwencjaArray =
-     try {
-       null
-     } catch {
-       case _: Throwable => null
-     }
+    var sekw: SekwencjaArray = try {
+      null
+    } catch {
+      case _: Throwable => null
+    }
 
     new AnyRef {
-      def getValueAt(row:Int, col:Int) = sekw.get
+      def getValueAt(row: Int, col: Int) = sekw.get
     }
   }
 
-/*
+  /*
   def finally1 = {
     Console.print("1 + 1 = ");
     Console.println(1 + (
@@ -115,7 +113,7 @@ object Test extends AnyRef with App {
     ));
   }
 
-*/
+   */
 
   try1;
   try2;

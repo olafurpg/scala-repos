@@ -2,9 +2,7 @@ package com.twitter.finagle.http.netty
 
 import com.twitter.finagle.http.{Status, Version, Method, Request, Response}
 import java.net.InetSocketAddress
-import org.jboss.netty.handler.codec.http.{
-  HttpVersion, HttpResponseStatus, HttpMethod, HttpRequest, HttpResponse
-}
+import org.jboss.netty.handler.codec.http.{HttpVersion, HttpResponseStatus, HttpMethod, HttpRequest, HttpResponse}
 
 // TODO Use bijection-core when bijection.Conversion is contravariant in A.
 // See: github.com/twitter/bijection/pull/180.

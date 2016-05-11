@@ -12,9 +12,10 @@ import org.jetbrains.sbt.project.notifications.LegacyProjectFormatNotifier._
 import org.jetbrains.sbt.project.settings.SbtLocalSettings
 
 /**
- * @author Pavel Fatin
- */
-class LegacyProjectFormatNotifier(project: Project) extends AbstractProjectComponent(project) {
+  * @author Pavel Fatin
+  */
+class LegacyProjectFormatNotifier(project: Project)
+    extends AbstractProjectComponent(project) {
   override def projectOpened() {
 
     val sbtSettings = SbtLocalSettings.getInstance(project)
@@ -22,17 +23,24 @@ class LegacyProjectFormatNotifier(project: Project) extends AbstractProjectCompo
     if (!sbtSettings.sbtSupportSuggested) {
       val modules = ModuleManager.getInstance(project).getModules.toSeq
 
-      val fromGenIdea = modules.exists(_.getModuleFilePath.contains(".idea_modules"))
+      val fromGenIdea =
+        modules.exists(_.getModuleFilePath.contains(".idea_modules"))
 
       if (fromGenIdea) {
         sbtSettings.sbtSupportSuggested = true
 
-        val builder = NotificationUtil.builder(project, Message).setNotificationType(NotificationType.WARNING)
+        val builder = NotificationUtil
+          .builder(project, Message)
+          .setNotificationType(NotificationType.WARNING)
 
         builder.setHandler { ref =>
           val manager = ActionManager.getInstance
           Option(manager.getAction("ImportProject")).foreach { action =>
-            manager.tryToExecute(action, ActionCommand.getInputEvent("ImportProject"), null, ActionPlaces.UNKNOWN, true)
+            manager.tryToExecute(action,
+                                 ActionCommand.getInputEvent("ImportProject"),
+                                 null,
+                                 ActionPlaces.UNKNOWN,
+                                 true)
           }
         }
 
@@ -43,10 +51,11 @@ class LegacyProjectFormatNotifier(project: Project) extends AbstractProjectCompo
 }
 
 object LegacyProjectFormatNotifier {
-  def Message = "<html>" +
-          "<p>This IDEA project is converted from an SBT project by <b>gen-idea</b> tool," +
-          "<br />which currently relies on a legacy Scala project model.</p>" +
-          "<br />" +
-          "<p>Please consider using built-in SBT support via the <a href=\"ftp://import\">Import project</a> action.</p>" +
-          "</html>"
+  def Message =
+    "<html>" +
+    "<p>This IDEA project is converted from an SBT project by <b>gen-idea</b> tool," +
+    "<br />which currently relies on a legacy Scala project model.</p>" +
+    "<br />" +
+    "<p>Please consider using built-in SBT support via the <a href=\"ftp://import\">Import project</a> action.</p>" +
+    "</html>"
 }

@@ -26,7 +26,8 @@ import org.apache.spark.deploy.mesos.MesosDriverDescription
 import org.apache.spark.scheduler.cluster.mesos.{MesosClusterRetryState, MesosClusterSubmissionState}
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
-private[ui] class DriverPage(parent: MesosClusterUI) extends WebUIPage("driver") {
+private[ui] class DriverPage(parent: MesosClusterUI)
+    extends WebUIPage("driver") {
 
   override def render(request: HttpServletRequest): Seq[Node] = {
     val driverId = request.getParameter("id")
@@ -34,8 +35,7 @@ private[ui] class DriverPage(parent: MesosClusterUI) extends WebUIPage("driver")
 
     val state = parent.scheduler.getDriverState(driverId)
     if (state.isEmpty) {
-      val content =
-        <div>
+      val content = <div>
           <p>Cannot find driver {driverId}</p>
         </div>
       return UIUtils.basicSparkPage(content, s"Details for Job $driverId")
@@ -46,27 +46,30 @@ private[ui] class DriverPage(parent: MesosClusterUI) extends WebUIPage("driver")
     val commandEnvHeaders = Seq("Command environment variable", "Value")
     val launchedHeaders = Seq("Launched property", "Value")
     val commandHeaders = Seq("Command property", "Value")
-    val retryHeaders = Seq("Last failed status", "Next retry time", "Retry count")
+    val retryHeaders = Seq(
+        "Last failed status", "Next retry time", "Retry count")
     val driverDescription = Iterable.apply(driverState.description)
     val submissionState = Iterable.apply(driverState.submissionState)
     val command = Iterable.apply(driverState.description.command)
-    val schedulerProperties = Iterable.apply(driverState.description.schedulerProperties)
-    val commandEnv = Iterable.apply(driverState.description.command.environment)
+    val schedulerProperties =
+      Iterable.apply(driverState.description.schedulerProperties)
+    val commandEnv =
+      Iterable.apply(driverState.description.command.environment)
     val driverTable =
       UIUtils.listingTable(driverHeaders, driverRow, driverDescription)
     val commandTable =
       UIUtils.listingTable(commandHeaders, commandRow, command)
     val commandEnvTable =
       UIUtils.listingTable(commandEnvHeaders, propertiesRow, commandEnv)
-    val schedulerTable =
-      UIUtils.listingTable(schedulerHeaders, propertiesRow, schedulerProperties)
+    val schedulerTable = UIUtils.listingTable(
+        schedulerHeaders, propertiesRow, schedulerProperties)
     val launchedTable =
       UIUtils.listingTable(launchedHeaders, launchedRow, submissionState)
-    val retryTable =
-      UIUtils.listingTable(
-        retryHeaders, retryRow, Iterable.apply(driverState.description.retryState))
-    val content =
-      <p>Driver state information for driver id {driverId}</p>
+    val retryTable = UIUtils.listingTable(
+        retryHeaders,
+        retryRow,
+        Iterable.apply(driverState.description.retryState))
+    val content = <p>Driver state information for driver id {driverId}</p>
         <a href={UIUtils.prependBaseUri("/")}>Back to Drivers</a>
         <div class="row-fluid">
           <div class="span12">
@@ -89,7 +92,8 @@ private[ui] class DriverPage(parent: MesosClusterUI) extends WebUIPage("driver")
     UIUtils.basicSparkPage(content, s"Details for Job $driverId")
   }
 
-  private def launchedRow(submissionState: Option[MesosClusterSubmissionState]): Seq[Node] = {
+  private def launchedRow(
+      submissionState: Option[MesosClusterSubmissionState]): Seq[Node] = {
     submissionState.map { state =>
       <tr>
         <td>Mesos Slave ID</td>
@@ -114,9 +118,11 @@ private[ui] class DriverPage(parent: MesosClusterUI) extends WebUIPage("driver")
     }.getOrElse(Seq[Node]())
   }
 
-  private def propertiesRow(properties: collection.Map[String, String]): Seq[Node] = {
-    properties.map { case (k, v) =>
-      <tr>
+  private def propertiesRow(
+      properties: collection.Map[String, String]): Seq[Node] = {
+    properties.map {
+      case (k, v) =>
+        <tr>
         <td>{k}</td><td>{v}</td>
       </tr>
     }.toSeq

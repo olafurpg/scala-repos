@@ -31,16 +31,21 @@ import javafx.scene.{control => jfxsc}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[scalafx.scene.control.ContentDisplay]] */
-object ContentDisplay extends SFXEnumDelegateCompanion[jfxsc.ContentDisplay, ContentDisplay] {
+object ContentDisplay
+    extends SFXEnumDelegateCompanion[jfxsc.ContentDisplay, ContentDisplay] {
 
   val Bottom = new ContentDisplay(jfxsc.ContentDisplay.BOTTOM)
-  @deprecated("Use Bottom; BOTTOM will be removed in a future release", "2.2.60")
+  @deprecated(
+      "Use Bottom; BOTTOM will be removed in a future release", "2.2.60")
   val BOTTOM = Bottom
   val Center = new ContentDisplay(jfxsc.ContentDisplay.CENTER)
-  @deprecated("Use Center; CENTER will be removed in a future release", "2.2.60")
+  @deprecated(
+      "Use Center; CENTER will be removed in a future release", "2.2.60")
   val CENTER = Center
   val GraphicOnly = new ContentDisplay(jfxsc.ContentDisplay.GRAPHIC_ONLY)
-  @deprecated("Use GraphicOnly; GRAPHIC_ONLY will be removed in a future release", "2.2.60")
+  @deprecated(
+      "Use GraphicOnly; GRAPHIC_ONLY will be removed in a future release",
+      "2.2.60")
   val GRAPHIC_ONLY = GraphicOnly
   val Left = new ContentDisplay(jfxsc.ContentDisplay.LEFT)
   @deprecated("Use Left; LEFT will be removed in a future release", "2.2.60")
@@ -49,16 +54,23 @@ object ContentDisplay extends SFXEnumDelegateCompanion[jfxsc.ContentDisplay, Con
   @deprecated("Use Right; RIGHT will be removed in a future release", "2.2.60")
   val RIGHT = Right
   val TextOnly = new ContentDisplay(jfxsc.ContentDisplay.TEXT_ONLY)
-  @deprecated("Use TextOnly; TEXT_ONLY will be removed in a future release", "2.2.60")
+  @deprecated(
+      "Use TextOnly; TEXT_ONLY will be removed in a future release", "2.2.60")
   val TEXT_ONLY = TextOnly
   val Top = new ContentDisplay(jfxsc.ContentDisplay.TOP)
   @deprecated("Use Top; TOP will be removed in a future release", "2.2.60")
   val TOP = Top
 
   protected override def unsortedValues: Array[ContentDisplay] = Array(
-    Top, Right, Bottom, Left, Center, GraphicOnly, TextOnly
+      Top,
+      Right,
+      Bottom,
+      Left,
+      Center,
+      GraphicOnly,
+      TextOnly
   )
 }
 
-
-sealed case class ContentDisplay(override val delegate: jfxsc.ContentDisplay) extends SFXEnumDelegate[jfxsc.ContentDisplay]
+sealed case class ContentDisplay(override val delegate: jfxsc.ContentDisplay)
+    extends SFXEnumDelegate[jfxsc.ContentDisplay]

@@ -6,8 +6,7 @@ import org.openjdk.jmh.annotations._
 @State(Scope.Benchmark)
 class DtabBenchmark extends StdBenchAnnotations {
 
-  private[this] val baseDtab =
-    """
+  private[this] val baseDtab = """
       |    /zk       => /$/com.foobar.serverset;
       |    /zk       => /$/com.foobar.fixedserverset;
       |
@@ -28,9 +27,8 @@ class DtabBenchmark extends StdBenchAnnotations {
 
   @Setup(Level.Iteration)
   def setup(): Unit = {
-    parsedDtab =
-      if (dtab == "") Dtab.read(baseDtab)
-      else Dtab.read(dtab)
+    parsedDtab = if (dtab == "") Dtab.read(baseDtab)
+    else Dtab.read(dtab)
   }
 
   @Benchmark
@@ -40,5 +38,4 @@ class DtabBenchmark extends StdBenchAnnotations {
   @Benchmark
   def read(): Dtab =
     Dtab.read(dtab)
-
 }

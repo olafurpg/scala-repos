@@ -12,11 +12,11 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.store.java
 
 /** Used by Java-based engines to mock Some and None */
 object OptionHelper {
+
   /** Mimics a None from Java-based engine */
   def none[T]: Option[T] = {
     Option(null.asInstanceOf[T])

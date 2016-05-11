@@ -8,19 +8,24 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 class ScalaCompletionConfidence extends CompletionConfidence {
-  override def shouldSkipAutopopup(contextElement: PsiElement, psiFile: PsiFile, offset: Int): ThreeState = {
+  override def shouldSkipAutopopup(contextElement: PsiElement,
+                                   psiFile: PsiFile,
+                                   offset: Int): ThreeState = {
     if (offset != 0) {
-      val elementType: IElementType = psiFile.findElementAt(offset - 1).getNode.getElementType
+      val elementType: IElementType =
+        psiFile.findElementAt(offset - 1).getNode.getElementType
       elementType match {
-        case ScalaTokenTypes.tINTEGER | ScalaTokenTypes.tFLOAT => return ThreeState.YES
-        case ScalaTokenTypes.tSTRING | ScalaTokenTypes.tMULTILINE_STRING if psiFile.getText.charAt(offset - 1) == '$' =>
+        case ScalaTokenTypes.tINTEGER | ScalaTokenTypes.tFLOAT =>
+          return ThreeState.YES
+        case ScalaTokenTypes.tSTRING | ScalaTokenTypes.tMULTILINE_STRING
+            if psiFile.getText.charAt(offset - 1) == '$' =>
           return ThreeState.NO
-        case ScalaTokenTypes.tINTERPOLATED_STRING | ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING
-          if psiFile.getText.charAt(offset - 1) == '.' =>
+        case ScalaTokenTypes.tINTERPOLATED_STRING |
+            ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING
+            if psiFile.getText.charAt(offset - 1) == '.' =>
           psiFile.findElementAt(offset).getPrevSibling match {
             case ref: ScReferenceExpression => return ThreeState.NO
             case _ =>

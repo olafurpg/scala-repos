@@ -6,18 +6,21 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
 import org.jetbrains.plugins.scala.codeInspection.booleans.DoubleNegationInspection
 
 /**
- * Nikolay.Tropin
- * 6/3/13
- */
-abstract class ScalaLightInspectionFixtureTestAdapter extends ScalaLightCodeInsightFixtureTestAdapter{
+  * Nikolay.Tropin
+  * 6/3/13
+  */
+abstract class ScalaLightInspectionFixtureTestAdapter
+    extends ScalaLightCodeInsightFixtureTestAdapter {
   protected val START = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_START
   protected val END = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_END
   protected def classOfInspection: Class[_ <: LocalInspectionTool]
   protected def annotation: String
-  protected def normalize(str: String): String = str.stripMargin.replace("\r", "").trim
+  protected def normalize(str: String): String =
+    str.stripMargin.replace("\r", "").trim
 
   protected def check(text: String): Unit = {
-    checkTextHasError(normalize(text), normalize(annotation), classOfInspection)
+    checkTextHasError(
+        normalize(text), normalize(annotation), classOfInspection)
   }
 
   protected def testFix(text: String, result: String, hint: String): Unit = {

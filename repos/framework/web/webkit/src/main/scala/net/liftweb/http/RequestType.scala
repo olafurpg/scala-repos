@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package net.liftweb 
-package http 
+package net.liftweb
+package http
 
 import provider._
 
-abstract class RequestType extends Serializable{
+abstract class RequestType extends Serializable {
   def post_? : Boolean = false
 
   def get_? : Boolean = false
@@ -74,4 +74,3 @@ object RequestType {
     }
   }
 }
-

@@ -8,7 +8,8 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class BufInputStreamTest extends FunSuite {
-  private[this] val fileString = "Test_All_Tests\nTest_java_io_BufferedInputStream\nTest_java_io_BufferedOutputStream\nTest_ByteArrayInputStream\nTest_java_io_ByteArrayOutputStream\nTest_java_io_DataInputStream\n"
+  private[this] val fileString =
+    "Test_All_Tests\nTest_java_io_BufferedInputStream\nTest_java_io_BufferedOutputStream\nTest_ByteArrayInputStream\nTest_java_io_ByteArrayOutputStream\nTest_java_io_DataInputStream\n"
   private[this] val fileBuf = Buf.ByteArray.Owned(fileString.getBytes)
 
   test("Constructor") {
@@ -18,7 +19,8 @@ class BufInputStreamTest extends FunSuite {
 
   test("available") {
     val is = new BufInputStream(fileBuf)
-    assert(is.available() == fileString.length(), "Returned incorrect number of available bytes")
+    assert(is.available() == fileString.length(),
+           "Returned incorrect number of available bytes")
   }
 
   test("close") {
@@ -28,13 +30,15 @@ class BufInputStreamTest extends FunSuite {
     assert(i != -1)
     try {
       is.close()
-    } catch { case e: IOException =>
+    } catch {
+      case e: IOException =>
         fail("Test 1: Failed to close the input stream.")
     }
     try {
       val j = is.read()
       assert(j != -1)
-    } catch { case e: Exception =>
+    } catch {
+      case e: Exception =>
         fail("Test 2: Should be able to read from closed stream.")
     }
   }
@@ -55,7 +59,8 @@ class BufInputStreamTest extends FunSuite {
       val s1 = new String(array1, 0, array1.length)
       val s2 = new String(array2, 0, array2.length)
       assert(s1.equals(s2), "Failed to mark correct position")
-    } catch { case e: Exception =>
+    } catch {
+      case e: Exception =>
         fail("Exception during mark test")
     }
   }
@@ -69,7 +74,9 @@ class BufInputStreamTest extends FunSuite {
     val is = new BufInputStream(fileBuf)
     val c = is.read()
     is.reset()
-    assert(c == fileString.charAt(0), "read returned incorrect char %s %s".format(c, fileString.charAt(0)))
+    assert(
+        c == fileString.charAt(0),
+        "read returned incorrect char %s %s".format(c, fileString.charAt(0)))
   }
 
   test("read") {
@@ -97,7 +104,7 @@ class BufInputStreamTest extends FunSuite {
     val array = new Array[Byte](20)
 
     intercept[IndexOutOfBoundsException] {
-      is.read(array , -1, 1)
+      is.read(array, -1, 1)
       fail("IndexOutOfBoundsException expected.")
     }
   }
@@ -107,7 +114,7 @@ class BufInputStreamTest extends FunSuite {
     val array = new Array[Byte](20)
 
     intercept[IllegalArgumentException] {
-      is.read(array , 1, -1)
+      is.read(array, 1, -1)
       fail("IllegalArgumentException expected.")
     }
   }
@@ -165,6 +172,7 @@ class BufInputStreamTest extends FunSuite {
     val c = is.read(array, 0, array.length)
     assert(c == fileBuf.length, "Stream should have been exhausted")
     assert(is.read(array, c, 0) == -1, "Stream should have repored exhaustion")
-    assert(is.read(array, c, array.length - c) == -1, "Stream should have repored exhaustion")
+    assert(is.read(array, c, array.length - c) == -1,
+           "Stream should have repored exhaustion")
   }
 }

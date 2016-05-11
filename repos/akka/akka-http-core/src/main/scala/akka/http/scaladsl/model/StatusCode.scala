@@ -1,15 +1,15 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl.model
 
 import language.implicitConversions
 import akka.http.impl.util._
-import akka.http.javadsl.{ model ⇒ jm }
+import akka.http.javadsl.{model ⇒ jm}
 
 /** The result status code of an HTTP response. */
-sealed abstract class StatusCode extends jm.StatusCode with LazyValueBytesRenderable {
+sealed abstract class StatusCode
+    extends jm.StatusCode with LazyValueBytesRenderable {
   def intValue: Int
   def value: String = intValue.toString + ' ' + reason
   def reason: String
@@ -23,9 +23,8 @@ sealed abstract class StatusCode extends jm.StatusCode with LazyValueBytesRender
 object StatusCode {
   import StatusCodes._
   implicit def int2StatusCode(code: Int): StatusCode =
-    getForKey(code).getOrElse(
-      throw new RuntimeException(
-        "Non-standard status codes cannot be created by implicit conversion. Use `StatusCodes.custom` instead."))
+    getForKey(code).getOrElse(throw new RuntimeException(
+            "Non-standard status codes cannot be created by implicit conversion. Use `StatusCodes.custom` instead."))
 }
 
 object StatusCodes extends ObjectRegistry[Int, StatusCode] {
@@ -74,11 +73,11 @@ object StatusCodes extends ObjectRegistry[Int, StatusCode] {
   }
 
   /**
-   * Create a custom status code and allow full customization of behavior. The value of `allowsEntity`
-   * changes the parser behavior: If it is set to true, a response with this status code is required to include a
-   * `Content-Length` header to be parsed correctly when keep-alive is enabled (which is the default in HTTP/1.1).
-   * If `allowsEntity` is false, an entity is never expected.
-   */
+    * Create a custom status code and allow full customization of behavior. The value of `allowsEntity`
+    * changes the parser behavior: If it is set to true, a response with this status code is required to include a
+    * `Content-Length` header to be parsed correctly when keep-alive is enabled (which is the default in HTTP/1.1).
+    * If `allowsEntity` is false, an entity is never expected.
+    */
   def custom(intValue: Int, reason: String, defaultMessage: String, isSuccess: Boolean, allowsEntity: Boolean): StatusCode =
     StatusCodes.CustomStatusCode(intValue)(reason, defaultMessage, isSuccess, allowsEntity)
 

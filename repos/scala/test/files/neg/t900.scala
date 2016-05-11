@@ -1,5 +1,5 @@
 trait Foo {
-        type bar
-        val x : bar
-        def break(): x.type
+  type bar
+  val x: bar
+  def break(): x.type
 }

@@ -19,9 +19,7 @@ object AnonFunOnListInt {
     l foreach { i =>
       noop(i)
     }
-
   }
-
 }
 
 class AnonFunOnListInt {}

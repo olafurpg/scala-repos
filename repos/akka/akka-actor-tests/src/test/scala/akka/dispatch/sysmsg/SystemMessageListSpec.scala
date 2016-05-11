@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.dispatch.sysmsg
 
 import akka.testkit.AkkaSpec
@@ -23,7 +23,8 @@ class SystemMessageListSpec extends AkkaSpec {
       val create2 = Failed(null, null, 2)
       ((create0 :: LNil).head eq create0) should ===(true)
       ((create1 :: create0 :: LNil).head eq create1) should ===(true)
-      ((create2 :: create1 :: create0 :: LNil).head eq create2) should ===(true)
+      ((create2 :: create1 :: create0 :: LNil).head eq create2) should ===(
+          true)
 
       (create2.next eq create1) should ===(true)
       (create1.next eq create0) should ===(true)
@@ -59,7 +60,6 @@ class SystemMessageListSpec extends AkkaSpec {
 
       list.tail.tail.tail.size should ===(0)
       list.tail.tail.tail.isEmpty should ===(true)
-
     }
 
     "properly reverse contents" in {
@@ -81,7 +81,6 @@ class SystemMessageListSpec extends AkkaSpec {
       (create1.next eq create2) should ===(true)
       (create2.next eq null) should ===(true)
     }
-
   }
 
   "EarliestFirstSystemMessageList" must {
@@ -111,6 +110,5 @@ class SystemMessageListSpec extends AkkaSpec {
       ((create0 :: LNil reverse_::: ENil).head eq create0) should ===(true)
       ((LNil reverse_::: create0 :: ENil).head eq create0) should ===(true)
     }
-
   }
 }

@@ -22,8 +22,7 @@ package ragnarok
 package test
 
 object MedalsTestSuite extends PerfTestSuite {
-  query(
-    """
+  query("""
       | import std::math::floor
       | 
       | historic := //summer_games/historic_medals

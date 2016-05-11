@@ -24,19 +24,20 @@ import net.liftweb.util.Helpers._
 import java.io.{Writer, InputStream}
 
 /**
- * This trait encapsulates the various choices related to
- * parsing and emitting HTML/XHTML
- */
+  * This trait encapsulates the various choices related to
+  * parsing and emitting HTML/XHTML
+  */
 trait HtmlProperties {
+
   /**
-   * When we emit the HTML, what DocType will be emitted
-   */
+    * When we emit the HTML, what DocType will be emitted
+    */
   def docType: Box[String]
 
   /**
-   * Creates a new instance of HtmlProperties with the
-   * docType property changed
-   */
+    * Creates a new instance of HtmlProperties with the
+    * docType property changed
+    */
   def setDocType(newDocType: () => Box[String]) = {
     val old = this
     new HtmlProperties {
@@ -53,14 +54,14 @@ trait HtmlProperties {
   }
 
   /**
-   * When we output the HTML, what encoding will be emitted
-   */
+    * When we output the HTML, what encoding will be emitted
+    */
   def encoding: Box[String]
 
   /**
-   * Creates a new instance of HtmlProperties with the
-   * encoding property changed
-   */
+    * Creates a new instance of HtmlProperties with the
+    * encoding property changed
+    */
   def setEncoding(newEncoding: () => Box[String]) = {
     val old = this
     new HtmlProperties {
@@ -76,19 +77,18 @@ trait HtmlProperties {
     }
   }
 
-
   /**
-   * For XHTML, the Encoding appears before the
-   * DocType, except if you're writing to IE6,
-   * so, rather than having a hard-coded calculation
-   * we allow the calculation to be done here.
-   */
+    * For XHTML, the Encoding appears before the
+    * DocType, except if you're writing to IE6,
+    * so, rather than having a hard-coded calculation
+    * we allow the calculation to be done here.
+    */
   def htmlOutputHeader: Box[String]
 
   /**
-   * Creates a new instance of HtmlProperties with the
-   * htmlOutputHeader property changed
-   */
+    * Creates a new instance of HtmlProperties with the
+    * htmlOutputHeader property changed
+    */
   def setHtmlOutputHeader(newHeader: () => Box[String]) = {
     val old = this
     new HtmlProperties {
@@ -105,15 +105,15 @@ trait HtmlProperties {
   }
 
   /**
-   * What's the content type that should be put in the
-   * response header?
-   */
+    * What's the content type that should be put in the
+    * response header?
+    */
   def contentType: Box[String]
 
   /**
-   * Creates a new instance of HtmlProperties with the
-   * contentType property changed
-   */
+    * Creates a new instance of HtmlProperties with the
+    * contentType property changed
+    */
   def setContentType(newContentType: () => Box[String]) = {
     val old = this
     new HtmlProperties {
@@ -130,16 +130,16 @@ trait HtmlProperties {
   }
 
   /**
-   * How are we parsing incoming files into a NodeSeq?
-   * This will likely point to either PCDataXmlParser.apply or
-   * Html5.parse
-   */
+    * How are we parsing incoming files into a NodeSeq?
+    * This will likely point to either PCDataXmlParser.apply or
+    * Html5.parse
+    */
   def htmlParser: InputStream => Box[NodeSeq]
 
   /**
-   * Creates a new instance of HtmlProperties with the
-   * htmlParser property changed
-   */
+    * Creates a new instance of HtmlProperties with the
+    * htmlParser property changed
+    */
   def setHtmlParser(newParser: InputStream => Box[NodeSeq]) = {
     val old = this
     new HtmlProperties {
@@ -155,17 +155,16 @@ trait HtmlProperties {
     }
   }
 
-
   /**
-   * Given a NodeSeq and a Writer, convert the output
-   * to the writer.
-   */
+    * Given a NodeSeq and a Writer, convert the output
+    * to the writer.
+    */
   def htmlWriter: (Node, Writer) => Unit
 
   /**
-   * Creates a new instance of HtmlProperties with the
-   * htmlWriter property changed
-   */
+    * Creates a new instance of HtmlProperties with the
+    * htmlWriter property changed
+    */
   def setHtmlWriter(newWriter: (Node, Writer) => Unit) = {
     val old = this
     new HtmlProperties {
@@ -181,16 +180,15 @@ trait HtmlProperties {
     }
   }
 
-
   /**
-   * Are there HTML5 forms support?
-   */
+    * Are there HTML5 forms support?
+    */
   def html5FormsSupport: Boolean
 
   /**
-   * Creates a new instance of HtmlProperties with the
-   * html5FormsSupport property changed
-   */
+    * Creates a new instance of HtmlProperties with the
+    * html5FormsSupport property changed
+    */
   def setHtml5FormsSupport(newFormsSupport: Boolean) = {
     val old = this
     new HtmlProperties {
@@ -206,17 +204,16 @@ trait HtmlProperties {
     }
   }
 
-
   /**
-   * What is the maximum number of open HTTP
-   * requests.
-   */
+    * What is the maximum number of open HTTP
+    * requests.
+    */
   def maxOpenRequests: Int
 
   /**
-   * Creates a new instance of HtmlProperties with the
-   * maxOpenRequests property changed
-   */
+    * Creates a new instance of HtmlProperties with the
+    * maxOpenRequests property changed
+    */
   def setMaxOpenRequests(maxOpen: Int) = {
     val old = this
     new HtmlProperties {
@@ -232,17 +229,16 @@ trait HtmlProperties {
     }
   }
 
-
   /**
-   * What's the UserAgent that was used to create
-   * this HtmlChoice
-   */
+    * What's the UserAgent that was used to create
+    * this HtmlChoice
+    */
   def userAgent: Box[String]
 
   /**
-   * Creates a new instance of HtmlProperties with the
-   * userAgent property changed
-   */
+    * Creates a new instance of HtmlProperties with the
+    * userAgent property changed
+    */
   def setUserAgent(newUA: Box[String]) = {
     val old = this
     new HtmlProperties {
@@ -257,17 +253,18 @@ trait HtmlProperties {
       def userAgent = newUA
     }
   }
-
 }
 
 /**
- * This set of properties is based on Lift's current XHTML support
- */
-final case class OldHtmlProperties(userAgent: Box[String]) extends HtmlProperties {
+  * This set of properties is based on Lift's current XHTML support
+  */
+final case class OldHtmlProperties(userAgent: Box[String])
+    extends HtmlProperties {
+
   /**
-   * If you want to change the DocType header, override this method rather than using
-   * setDocType.
-   */
+    * If you want to change the DocType header, override this method rather than using
+    * setDocType.
+    */
   def docType: Box[String] = {
     if (S.skipDocType) {
       Empty
@@ -294,13 +291,17 @@ final case class OldHtmlProperties(userAgent: Box[String]) extends HtmlPropertie
   def htmlParser: InputStream => Box[NodeSeq] = PCDataXmlParser.apply _
 
   def htmlWriter: (Node, Writer) => Unit =
-    (n: Node, w: Writer) => {
-      val sb = new StringBuilder(64000)
-      AltXML.toXML(n, scala.xml.TopScope,
-                   sb, false, !LiftRules.convertToEntity.vend,
-                   S.legacyIeCompatibilityMode)
-      w.append(sb)
-      w.flush()
+    (n: Node, w: Writer) =>
+      {
+        val sb = new StringBuilder(64000)
+        AltXML.toXML(n,
+                     scala.xml.TopScope,
+                     sb,
+                     false,
+                     !LiftRules.convertToEntity.vend,
+                     S.legacyIeCompatibilityMode)
+        w.append(sb)
+        w.flush()
     }
 
   def htmlOutputHeader: Box[String] =
@@ -314,15 +315,14 @@ final case class OldHtmlProperties(userAgent: Box[String]) extends HtmlPropertie
 
       case (Full(dt), _) if dt.length > 0 => Full(dt.trim + "\n")
 
-      case (_, Full(enc)) if enc.length > 0=> Full(enc.trim + "\n")
+      case (_, Full(enc)) if enc.length > 0 => Full(enc.trim + "\n")
 
       case _ => Empty
     }
 
   val html5FormsSupport: Boolean = {
     val r = S.request openOr Req.nil
-    r.isSafari5 || r.isFirefox36 || r.isFirefox40 ||
-    r.isChrome5 || r.isChrome6
+    r.isSafari5 || r.isFirefox36 || r.isFirefox40 || r.isChrome5 || r.isChrome6
   }
 
   val maxOpenRequests: Int =
@@ -330,15 +330,16 @@ final case class OldHtmlProperties(userAgent: Box[String]) extends HtmlPropertie
 }
 
 /**
- * If you're going to use HTML5, then this is the set of properties
- * to use
- */
-final case class Html5Properties(userAgent: Box[String]) extends HtmlProperties {
+  * If you're going to use HTML5, then this is the set of properties
+  * to use
+  */
+final case class Html5Properties(userAgent: Box[String])
+    extends HtmlProperties {
   def docType: Box[String] = Full("<!DOCTYPE html>")
   def encoding: Box[String] = Empty
 
   def contentType: Box[String] = {
-      Full("text/html; charset=utf-8")
+    Full("text/html; charset=utf-8")
   }
 
   def htmlParser: InputStream => Box[Elem] = Html5.parse _
@@ -350,8 +351,7 @@ final case class Html5Properties(userAgent: Box[String]) extends HtmlProperties 
 
   val html5FormsSupport: Boolean = {
     val r = S.request openOr Req.nil
-    r.isSafari5 || r.isFirefox36 || r.isFirefox40 ||
-    r.isChrome5 || r.isChrome6
+    r.isSafari5 || r.isFirefox36 || r.isFirefox40 || r.isChrome5 || r.isChrome6
   }
 
   val maxOpenRequests: Int =
@@ -359,18 +359,19 @@ final case class Html5Properties(userAgent: Box[String]) extends HtmlProperties 
 }
 
 /**
- * If you're going to use HTML5 out, but
- * want XHTML in (so you can have mixed case snippet tags
- * and you don't get the Html5 parsers obnoxious table behavior),
- * then this is the set of properties
- * to use
- */
-final case class XHtmlInHtml5OutProperties(userAgent: Box[String]) extends HtmlProperties {
+  * If you're going to use HTML5 out, but
+  * want XHTML in (so you can have mixed case snippet tags
+  * and you don't get the Html5 parsers obnoxious table behavior),
+  * then this is the set of properties
+  * to use
+  */
+final case class XHtmlInHtml5OutProperties(userAgent: Box[String])
+    extends HtmlProperties {
   def docType: Box[String] = Full("<!DOCTYPE html>")
   def encoding: Box[String] = Empty
 
   def contentType: Box[String] = {
-      Full("text/html; charset=utf-8")
+    Full("text/html; charset=utf-8")
   }
 
   def htmlParser: InputStream => Box[NodeSeq] = PCDataXmlParser.apply _
@@ -382,11 +383,9 @@ final case class XHtmlInHtml5OutProperties(userAgent: Box[String]) extends HtmlP
 
   val html5FormsSupport: Boolean = {
     val r = S.request openOr Req.nil
-    r.isSafari5 || r.isFirefox36 || r.isFirefox40 ||
-    r.isChrome5 || r.isChrome6
+    r.isSafari5 || r.isFirefox36 || r.isFirefox40 || r.isChrome5 || r.isChrome6
   }
 
   val maxOpenRequests: Int =
     LiftRules.maxConcurrentRequests.vend(S.request openOr Req.nil)
 }
-

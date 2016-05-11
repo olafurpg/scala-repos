@@ -35,7 +35,7 @@ import scala.collection.mutable.LinkedHashSet
 import scala.util.Random
 
 import scalaz._
-import scalaz.effect.IO 
+import scalaz.effect.IO
 import scalaz.syntax.comonad._
 import scalaz.syntax.monad._
 import scalaz.std.anyVal._
@@ -55,58 +55,64 @@ import java.nio.CharBuffer
 import TableModule._
 import SampleData._
 
-trait TestColumnarTableModule[M[+_]] extends ColumnarTableModuleTestSupport[M] {
+trait TestColumnarTableModule[M[+ _]]
+    extends ColumnarTableModuleTestSupport[M] {
   type GroupId = Int
   import trans._
   import constants._
- 
+
   private val groupId = new java.util.concurrent.atomic.AtomicInteger
   def newGroupId = groupId.getAndIncrement
 
-  class Table(slices: StreamT[M, Slice], size: TableSize) extends ColumnarTable(slices, size) {
+  class Table(slices: StreamT[M, Slice], size: TableSize)
+      extends ColumnarTable(slices, size) {
     import trans._
     def load(apiKey: APIKey, jtpe: JType) = sys.error("todo")
-    def sort(sortKey: TransSpec1, sortOrder: DesiredSortOrder, unique: Boolean = false) = M.point(this)
-    def groupByN(groupKeys: Seq[TransSpec1], valueSpec: TransSpec1, sortOrder: DesiredSortOrder = SortAscending, unique: Boolean = false): M[Seq[Table]] = sys.error("todo")
+    def sort(sortKey: TransSpec1,
+             sortOrder: DesiredSortOrder,
+             unique: Boolean = false) = M.point(this)
+    def groupByN(groupKeys: Seq[TransSpec1],
+                 valueSpec: TransSpec1,
+                 sortOrder: DesiredSortOrder = SortAscending,
+                 unique: Boolean = false): M[Seq[Table]] = sys.error("todo")
   }
-  
+
   trait TableCompanion extends ColumnarTableCompanion {
-    def apply(slices: StreamT[M, Slice], size: TableSize) = new Table(slices, size)
+    def apply(slices: StreamT[M, Slice], size: TableSize) =
+      new Table(slices, size)
 
-    def singleton(slice: Slice) = new Table(slice :: StreamT.empty[M, Slice], ExactSize(1))
+    def singleton(slice: Slice) =
+      new Table(slice :: StreamT.empty[M, Slice], ExactSize(1))
 
-    def align(sourceLeft: Table, alignOnL: TransSpec1, sourceRight: Table, alignOnR: TransSpec1): M[(Table, Table)] = 
+    def align(sourceLeft: Table,
+              alignOnL: TransSpec1,
+              sourceRight: Table,
+              alignOnR: TransSpec1): M[(Table, Table)] =
       sys.error("not implemented here")
   }
 
   object Table extends TableCompanion
 }
 
-trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M] 
-    with TableModuleSpec[M]
-    with CogroupSpec[M]
-    with CrossSpec[M]
-    with TransformSpec[M]
-    with CompactSpec[M] 
-    with TakeRangeSpec[M]
-    with CanonicalizeSpec[M]
-    with PartitionMergeSpec[M]
-    with ToArraySpec[M]
-    with ConcatSpec[M]
+trait ColumnarTableModuleSpec[M[+ _]]
+    extends TestColumnarTableModule[M] with TableModuleSpec[M]
+    with CogroupSpec[M] with CrossSpec[M] with TransformSpec[M]
+    with CompactSpec[M] with TakeRangeSpec[M] with CanonicalizeSpec[M]
+    with PartitionMergeSpec[M] with ToArraySpec[M] with ConcatSpec[M]
     with SampleSpec[M]
     //with UnionAllSpec[M]
     //with CrossAllSpec[M]
     //with GroupingGraphSpec[M]
-    with DistinctSpec[M] 
-    with SchemasSpec[M]
-    { spec => 
+    with DistinctSpec[M] with SchemasSpec[M] {
+  spec =>
 
   import trans._
   import constants._
-    
+
   override val defaultPrettyParams = Pretty.Params(2)
 
-  lazy val xlogger = LoggerFactory.getLogger("com.precog.yggdrasil.table.ColumnarTableModuleSpec")
+  lazy val xlogger = LoggerFactory.getLogger(
+      "com.precog.yggdrasil.table.ColumnarTableModuleSpec")
 
   def streamToString(stream: StreamT[M, CharBuffer]): String = {
     def loop(stream: StreamT[M, CharBuffer], sb: StringBuilder): M[String] =
@@ -119,7 +125,6 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
       }
     loop(stream, new StringBuilder).copoint
   }
-
 
   def testRenderCsv(json: String, maxSliceSize: Option[Int] = None): String = {
     val t0 = System.currentTimeMillis()
@@ -152,17 +157,20 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
         case v => Some(v)
       }
     }
-  
+
     val table = fromJson(seq.toStream)
-    
+
     val expected = JArray(seq.toList)
-    
-    val arrayM = table.renderJson("[", ",", "]").foldLeft("")(_ + _.toString).map(JParser.parseUnsafe)
-    
+
+    val arrayM = table
+      .renderJson("[", ",", "]")
+      .foldLeft("")(_ + _.toString)
+      .map(JParser.parseUnsafe)
+
     val minimized = minimize(expected) getOrElse JArray(Nil)
     arrayM.copoint mustEqual minimized
   }
-  
+
   def renderLotsToCsv(lots: Int, maxSliceSize: Option[Int] = None) {
     val event = "{\"x\":123,\"y\":\"foobar\",\"z\":{\"xx\":1.0,\"yy\":2.0}}"
     val events = event * lots
@@ -174,24 +182,31 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
   "a table dataset" should {
     "verify bijection from static JSON" in {
       val sample: List[JValue] = List(
-        JObject(
-          JField("key", JArray(JNum(-1L), JNum(0L))),
-          JField("value", JNull)
-        ), 
-        JObject(
-          JField("key", JArray(JNum(-3090012080927607325l), JNum(2875286661755661474l))),
-          JField("value", JObject(
-            JField("q8b", JArray(
-              JNum(6.615224799778253E307d), 
-              JArray(JBool(false), JNull, JNum(-8.988465674311579E307d), JNum(-3.536399224770604E307d))
-            )), 
-            JField("lwu",JNum(-5.121099465699862E307d))
-          ))
-        ), 
-        JObject(
-          JField("key", JArray(JNum(-3918416808128018609l), JNum(-1L))),
-          JField("value", JNum(-1.0))
-        )
+          JObject(
+              JField("key", JArray(JNum(-1L), JNum(0L))),
+              JField("value", JNull)
+          ),
+          JObject(
+              JField("key",
+                     JArray(JNum(-3090012080927607325l),
+                            JNum(2875286661755661474l))),
+              JField("value",
+                     JObject(
+                         JField("q8b",
+                                JArray(
+                                    JNum(6.615224799778253E307d),
+                                    JArray(JBool(false),
+                                           JNull,
+                                           JNum(-8.988465674311579E307d),
+                                           JNum(-3.536399224770604E307d))
+                                )),
+                         JField("lwu", JNum(-5.121099465699862E307d))
+                     ))
+          ),
+          JObject(
+              JField("key", JArray(JNum(-3918416808128018609l), JNum(-1L))),
+              JField("value", JNum(-1.0))
+          )
       )
 
       val dataset = fromJson(sample.toStream)
@@ -200,71 +215,61 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
     }
 
     "verify bijection from JSON" in checkMappings(this)
-    
+
     "verify renderJson round tripping" in {
       implicit val gen = sample(schema)
-      
+
       check { data: SampleData =>
         testRenderJson(data.data)
-      }.set(minTestsOk -> 20000, workers -> Runtime.getRuntime.availableProcessors)
+      }.set(minTestsOk -> 20000,
+            workers -> Runtime.getRuntime.availableProcessors)
     }
-    
+
     "handle special cases of renderJson" >> {
       "undefined at beginning of array" >> {
-        testRenderJson(JArray(
-          JUndefined ::
-          JNum(1) ::
-          JNum(2) :: Nil) :: Nil)
+        testRenderJson(JArray(JUndefined :: JNum(1) :: JNum(2) :: Nil) :: Nil)
       }
-      
+
       "undefined in middle of array" >> {
-        testRenderJson(JArray(
-          JNum(1) ::
-          JUndefined ::
-          JNum(2) :: Nil) :: Nil)
+        testRenderJson(JArray(JNum(1) :: JUndefined :: JNum(2) :: Nil) :: Nil)
       }
-      
+
       "fully undefined array" >> {
-        testRenderJson(JArray(
-          JUndefined ::
-          JUndefined ::
-          JUndefined :: Nil) :: Nil)
+        testRenderJson(
+            JArray(JUndefined :: JUndefined :: JUndefined :: Nil) :: Nil)
       }
-      
+
       "undefined at beginning of object" >> {
-        testRenderJson(JObject(
-          JField("foo", JUndefined) ::
-          JField("bar", JNum(1)) ::
-          JField("baz", JNum(2)) :: Nil) :: Nil)
+        testRenderJson(JObject(JField("foo", JUndefined) :: JField(
+                    "bar", JNum(1)) :: JField("baz", JNum(2)) :: Nil) :: Nil)
       }
-      
+
       "undefined in middle of object" >> {
         testRenderJson(JObject(
-          JField("foo", JNum(1)) ::
-          JField("bar", JUndefined) ::
-          JField("baz", JNum(2)) :: Nil) :: Nil)
+                JField("foo", JNum(1)) :: JField("bar", JUndefined) :: JField(
+                    "baz", JNum(2)) :: Nil) :: Nil)
       }
-      
+
       "fully undefined object" >> {
         testRenderJson(JObject(Map.empty) :: Nil)
       }
-      
+
       "undefined row" >> {
-        testRenderJson(
-          JObject(Nil) ::
-          JNum(42) :: Nil)
+        testRenderJson(JObject(Nil) :: JNum(42) :: Nil)
       }
-      
+
       "check utf-8 encoding" in check { str: String =>
         val s = str.toList.map((c: Char) => if (c < ' ') ' ' else c).mkString
         testRenderJson(JString(s) :: Nil)
-      }.set(minTestsOk -> 20000, workers -> Runtime.getRuntime.availableProcessors)
-      
+      }.set(minTestsOk -> 20000,
+            workers -> Runtime.getRuntime.availableProcessors)
+
       "check long encoding" in check { ln: Long =>
         testRenderJson(JNum(ln) :: Nil)
-      }.set(minTestsOk -> 20000, workers -> Runtime.getRuntime.availableProcessors)
+      }.set(minTestsOk -> 20000,
+            workers -> Runtime.getRuntime.availableProcessors)
     }
-    
+
     "in cogroup" >> {
       "perform a trivial cogroup" in testTrivialCogroup(identity[Table])
       "perform a simple cogroup" in testSimpleCogroup(identity[Table])
@@ -283,55 +288,79 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
       "not truncate cogroup when left side has long equal spans" in testLongEqualSpansOnLeft
       "not truncate cogroup when both sides have long equal spans" in testLongEqualSpansOnBoth
       "not truncate cogroup when left side is long span and right is increasing" in testLongLeftSpanWithIncreasingRight
-      
-      "survive scalacheck" in { 
-        check { cogroupData: (SampleData, SampleData) => testCogroup(cogroupData._1, cogroupData._2) } 
+
+      "survive scalacheck" in {
+        check { cogroupData: (SampleData, SampleData) =>
+          testCogroup(cogroupData._1, cogroupData._2)
+        }
       }
     }
 
     "in cross" >> {
       "perform a simple cartesian" in testSimpleCross
-      
+
       "split a cross that would exceed maxSliceSize boundaries" in {
         val sample: List[JValue] = List(
-          JObject(
-            JField("key", JArray(JNum(-1L) :: JNum(0L) :: Nil)) ::
-            JField("value", JNull) :: Nil
-          ), 
-          JObject(
-            JField("key", JArray(JNum(-3090012080927607325l) :: JNum(2875286661755661474l) :: Nil)) ::
-            JField("value", JObject(List(
-              JField("q8b", JArray(List(
-                JNum(6.615224799778253E307d), 
-                JArray(List(JBool(false), JNull, JNum(-8.988465674311579E307d))), JNum(-3.536399224770604E307d)))), 
-              JField("lwu",JNum(-5.121099465699862E307d))))
-            ) :: Nil
-          ), 
-          JObject(
-            JField("key", JArray(JNum(-3918416808128018609l) :: JNum(-1L) :: Nil)) ::
-            JField("value", JNum(-1.0)) :: Nil
-          ),
-          JObject(
-            JField("key", JArray(JNum(-3918416898128018609l) :: JNum(-2L) :: Nil)) ::
-            JField("value", JNum(-1.0)) :: Nil
-          ),
-          JObject(
-            JField("key", JArray(JNum(-3918426808128018609l) :: JNum(-3L) :: Nil)) ::
-            JField("value", JNum(-1.0)) :: Nil
-          )
+            JObject(
+                JField("key", JArray(JNum(-1L) :: JNum(0L) :: Nil)) :: JField(
+                    "value", JNull) :: Nil
+            ),
+            JObject(
+                JField(
+                    "key",
+                    JArray(JNum(-3090012080927607325l) :: JNum(
+                            2875286661755661474l) :: Nil)) :: JField(
+                    "value",
+                    JObject(List(
+                            JField("q8b",
+                                   JArray(List(JNum(6.615224799778253E307d),
+                                               JArray(List(
+                                                       JBool(false),
+                                                       JNull,
+                                                       JNum(-8.988465674311579E307d))),
+                                               JNum(
+                                                   -3.536399224770604E307d)))),
+                            JField("lwu", JNum(-5.121099465699862E307d))))) :: Nil
+            ),
+            JObject(
+                JField(
+                    "key",
+                    JArray(JNum(-3918416808128018609l) :: JNum(-1L) :: Nil)) :: JField(
+                    "value", JNum(-1.0)) :: Nil
+            ),
+            JObject(
+                JField(
+                    "key",
+                    JArray(JNum(-3918416898128018609l) :: JNum(-2L) :: Nil)) :: JField(
+                    "value", JNum(-1.0)) :: Nil
+            ),
+            JObject(
+                JField(
+                    "key",
+                    JArray(JNum(-3918426808128018609l) :: JNum(-3L) :: Nil)) :: JField(
+                    "value", JNum(-1.0)) :: Nil
+            )
         )
-        
+
         val dataset1 = fromJson(sample.toStream, Some(3))
         val dataset2 = fromJson(sample.toStream, Some(3))
-        
-        dataset1.cross(dataset1)(InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight))).slices.uncons.copoint must beLike {
-          case Some((head, _)) => head.size must beLessThanOrEqualTo(yggConfig.maxSliceSize)
+
+        dataset1
+          .cross(dataset1)(
+              InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+          .slices
+          .uncons
+          .copoint must beLike {
+          case Some((head, _)) =>
+            head.size must beLessThanOrEqualTo(yggConfig.maxSliceSize)
         }
       }
-      
+
       "cross across slice boundaries on one side" in testCrossSingles
       "survive scalacheck" in {
-        check { cogroupData: (SampleData, SampleData) => testCross(cogroupData._1, cogroupData._2) } 
+        check { cogroupData: (SampleData, SampleData) =>
+          testCross(cogroupData._1, cogroupData._2)
+        }
       }
     }
 
@@ -348,7 +377,7 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
       "give the identity transform for the trivial 'true' filter" in checkTrueFilter
       "give the identity transform for a nontrivial filter" in checkFilter
       "give a transformation for a big decimal and a long" in testMod2Filter
-      
+
       "perform an object dereference" in checkObjectDeref
       "perform an array dereference" in checkArrayDeref
       "perform metadata dereference on data without metadata" in checkMetaDeref
@@ -393,7 +422,8 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
 
       "delete elements according to a JType" in checkObjectDelete
       "delete only field in object without removing from array" in {
-        val JArray(elements) = JParser.parseUnsafe("""[
+        val JArray(elements) =
+          JParser.parseUnsafe("""[
           {"foo": 4, "bar": 12},
           {"foo": 5},
           {"bar": 45},
@@ -450,20 +480,20 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
       "perform dynamic object deref" in testDerefObjectDynamic
       "perform an array swap" in checkArraySwap
       "replace defined rows with a constant" in checkConst
-      
+
       "check cond" in checkCond
     }
 
     "in compact" >> {
-      "be the identity on fully defined tables"  in testCompactIdentity
-      "preserve all defined rows"                in testCompactPreserve
-      "have no undefined rows"                   in testCompactRows
-      "have no empty slices"                     in testCompactSlices
-      "preserve all defined key rows"            in testCompactPreserveKey
-      "have no undefined key rows"               in testCompactRowsKey
-      "have no empty key slices"                 in testCompactSlicesKey
+      "be the identity on fully defined tables" in testCompactIdentity
+      "preserve all defined rows" in testCompactPreserve
+      "have no undefined rows" in testCompactRows
+      "have no empty slices" in testCompactSlices
+      "preserve all defined key rows" in testCompactPreserveKey
+      "have no undefined key rows" in testCompactRowsKey
+      "have no empty key slices" in testCompactSlicesKey
     }
-    
+
     "in distinct" >> {
       "be the identity on tables with no duplicate rows" in testDistinctIdentity
       "peform properly when the same row appears in two different slices" in testDistinctAcrossSlices
@@ -513,11 +543,11 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
     }
 
     "in sample" >> {
-       "sample from a dataset" in testSample
-       "return no samples given empty sequence of transspecs" in testSampleEmpty
-       "sample from a dataset given non-identity transspecs" in testSampleTransSpecs
-       "return full set when sample size larger than dataset" in testLargeSampleSize
-       "resurn empty table when sample size is 0" in test0SampleSize
+      "sample from a dataset" in testSample
+      "return no samples given empty sequence of transspecs" in testSampleEmpty
+      "sample from a dataset given non-identity transspecs" in testSampleTransSpecs
+      "return full set when sample size larger than dataset" in testLargeSampleSize
+      "resurn empty table when sample size is 0" in test0SampleSize
     }
   }
 
@@ -527,8 +557,11 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
 
   "logging" should {
     "run" in {
-      testSimpleCogroup(t => t.logged(xlogger, "test-logging", "start stream", "end stream") {
-        slice => "size: " + slice.size
+      testSimpleCogroup(
+          t =>
+            t.logged(xlogger, "test-logging", "start stream", "end stream") {
+          slice =>
+            "size: " + slice.size
       })
     }
   }
@@ -537,7 +570,8 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
     "single traversal" >> {
       implicit val gen = sample(objectSchema(_, 3))
       check { (sample: SampleData) =>
-        val expectedSlices = (sample.data.size.toDouble / defaultSliceSize).ceil
+        val expectedSlices =
+          (sample.data.size.toDouble / defaultSliceSize).ceil
 
         val table = fromSample(sample)
         val t0 = table.transform(TransSpec1.Id)
@@ -553,10 +587,14 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
     "multiple transforms" >> {
       implicit val gen = sample(objectSchema(_, 3))
       check { (sample: SampleData) =>
-        val expectedSlices = (sample.data.size.toDouble / defaultSliceSize).ceil
+        val expectedSlices =
+          (sample.data.size.toDouble / defaultSliceSize).ceil
 
         val table = fromSample(sample)
-        val t0 = table.transform(TransSpec1.Id).transform(TransSpec1.Id).transform(TransSpec1.Id)
+        val t0 = table
+          .transform(TransSpec1.Id)
+          .transform(TransSpec1.Id)
+          .transform(TransSpec1.Id)
         t0.toJson.copoint must_== sample.data
 
         table.metrics.startCount must_== 1
@@ -569,10 +607,14 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
     "multiple forcing calls" >> {
       implicit val gen = sample(objectSchema(_, 3))
       check { (sample: SampleData) =>
-        val expectedSlices = (sample.data.size.toDouble / defaultSliceSize).ceil
+        val expectedSlices =
+          (sample.data.size.toDouble / defaultSliceSize).ceil
 
         val table = fromSample(sample)
-        val t0 = table.compact(TransSpec1.Id).compact(TransSpec1.Id).compact(TransSpec1.Id)
+        val t0 = table
+          .compact(TransSpec1.Id)
+          .compact(TransSpec1.Id)
+          .compact(TransSpec1.Id)
         table.toJson.copoint must_== sample.data
         t0.toJson.copoint must_== sample.data
 
@@ -584,19 +626,20 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
     }
 
     "render to CSV in a simple case" in {
-      val events = """
+      val events =
+        """
 {"a": 1, "b": {"bc": 999, "bd": "foooooo", "be": true, "bf": null, "bg": false}, "c": [1.999], "d": "dog"}
 {"a": 2, "b": {"bc": 998, "bd": "fooooo", "be": null, "bf": false, "bg": true}, "c": [2.999], "d": "dogg"}
 {"a": 3, "b": {"bc": 997, "bd": "foooo", "be": false, "bf": true, "bg": null}, "c": [3.999], "d": "doggg"}
 {"a": 4, "b": {"bc": 996, "bd": "fooo", "be": true, "bf": null, "bg": false}, "c": [4.999], "d": "dogggg"}
 """.trim
 
-      val expected = "" +
-      ".a,.b.bc,.b.bd,.b.be,.b.bf,.b.bg,.c[0],.d\r\n" +
-      "1,999,foooooo,true,null,false,1.999,dog\r\n" +
-      "2,998,fooooo,null,false,true,2.999,dogg\r\n" +
-      "3,997,foooo,false,true,null,3.999,doggg\r\n" +
-      "4,996,fooo,true,null,false,4.999,dogggg\r\n"
+      val expected =
+        "" + ".a,.b.bc,.b.bd,.b.be,.b.bf,.b.bg,.c[0],.d\r\n" +
+        "1,999,foooooo,true,null,false,1.999,dog\r\n" +
+        "2,998,fooooo,null,false,true,2.999,dogg\r\n" +
+        "3,997,foooo,false,true,null,3.999,doggg\r\n" +
+        "4,996,fooo,true,null,false,4.999,dogggg\r\n"
 
       testRenderCsv(events) must_== expected
     }
@@ -609,13 +652,12 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
     }
 
     "test string escaping" in {
-      val csv = testRenderCsv("{\"s\":\"a\\\"b\",\"t\":\",\",\"u\":\"aa\\nbb\",\"v\":\"a,b\\\"c\\r\\nd\"}")
+      val csv = testRenderCsv(
+          "{\"s\":\"a\\\"b\",\"t\":\",\",\"u\":\"aa\\nbb\",\"v\":\"a,b\\\"c\\r\\nd\"}")
 
-      val expected = "" +
-".s,.t,.u,.v\r\n" +
-"\"a\"\"b\",\",\",\"aa\n" +
-"bb\",\"a,b\"\"c\r\n" +
-"d\"\r\n"
+      val expected =
+        "" + ".s,.t,.u,.v\r\n" + "\"a\"\"b\",\",\",\"aa\n" +
+        "bb\",\"a,b\"\"c\r\n" + "d\"\r\n"
 
       csv must_== expected
     }
@@ -633,45 +675,46 @@ trait ColumnarTableModuleSpec[M[+_]] extends TestColumnarTableModule[M]
 {"c": 100, "g": 934}
 """.trim
 
-      val expected = "" +
-".a,.b,.c,.d,.e,.f.aaa,.g\r\n" +
-"1,,,,,,\r\n" +
-",99.1,,,,,\r\n" +
-"true,,,,,,\r\n" +
-",,jgeiwgjewigjewige,,,,\r\n" +
-",foo,,999,,,\r\n" +
-",,,,null,,\r\n" +
-",,,,,9,\r\n" +
-",,100,,,,934\r\n"
+      val expected =
+        "" + ".a,.b,.c,.d,.e,.f.aaa,.g\r\n" + "1,,,,,,\r\n" +
+        ",99.1,,,,,\r\n" + "true,,,,,,\r\n" + ",,jgeiwgjewigjewige,,,,\r\n" +
+        ",foo,,999,,,\r\n" + ",,,,null,,\r\n" + ",,,,,9,\r\n" +
+        ",,100,,,,934\r\n"
 
       testRenderCsv(input) must_== expected
 
-      val expected2 = "" +
-".a,.b\r\n1,\r\n,99.1\r\n\r\n" +
-".a,.c\r\ntrue,\r\n,jgeiwgjewigjewige\r\n\r\n" +
-".b,.d,.e\r\nfoo,999,\r\n,,null\r\n\r\n" +
-".c,.f.aaa,.g\r\n,9,\r\n100,,934\r\n"
+      val expected2 =
+        "" + ".a,.b\r\n1,\r\n,99.1\r\n\r\n" +
+        ".a,.c\r\ntrue,\r\n,jgeiwgjewigjewige\r\n\r\n" +
+        ".b,.d,.e\r\nfoo,999,\r\n,,null\r\n\r\n" +
+        ".c,.f.aaa,.g\r\n,9,\r\n100,,934\r\n"
 
       testRenderCsv(input, Some(2)) must_== expected2
     }
   }
 }
 
-object ColumnarTableModuleSpec extends ColumnarTableModuleSpec[Free.Trampoline] {
-  implicit def M = new Monad[Free.Trampoline] with Comonad[Free.Trampoline] with Cobind.FromCojoin[Free.Trampoline] {
-    import scalaz.Free._
-    import scalaz.std.function._
-    override def point[A](a: => A) = freeMonad[Function0].point(a)
-    override def bind[A, B](m: Free.Trampoline[A])(f: A => Free.Trampoline[B]) = freeMonad[Function0].bind(m)(f)
-    override def copoint[A](m: Free.Trampoline[A]) = m go { f => f() }
-    override def cojoin[A](m: Free.Trampoline[A]) = point(m)
-  }
+object ColumnarTableModuleSpec
+    extends ColumnarTableModuleSpec[Free.Trampoline] {
+  implicit def M =
+    new Monad[Free.Trampoline] with Comonad[Free.Trampoline]
+    with Cobind.FromCojoin[Free.Trampoline] {
+      import scalaz.Free._
+      import scalaz.std.function._
+      override def point[A](a: => A) = freeMonad[Function0].point(a)
+      override def bind[A, B](m: Free.Trampoline[A])(
+          f: A => Free.Trampoline[B]) = freeMonad[Function0].bind(m)(f)
+      override def copoint[A](m: Free.Trampoline[A]) = m go { f =>
+        f()
+      }
+      override def cojoin[A](m: Free.Trampoline[A]) = point(m)
+    }
 
   type YggConfig = IdSourceConfig with ColumnarTableModuleConfig
   val yggConfig = new IdSourceConfig with ColumnarTableModuleConfig {
     val maxSliceSize = 10
     val smallSliceSize = 3
-    
+
     val idSource = new FreshAtomicIdSource
   }
 }

@@ -15,11 +15,10 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.packaging.ScPackagingI
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Trait that implements logic by some type definitions aggregation
- *
- * @author ilyas
- */
-
+  * Trait that implements logic by some type definitions aggregation
+  *
+  * @author ilyas
+  */
 trait ScToplevelElement extends ScalaPsiElement {
   def typeDefinitions: Seq[ScTypeDefinition] = {
     val buff = new ArrayBuffer[ScTypeDefinition]
@@ -42,7 +41,9 @@ trait ScToplevelElement extends ScalaPsiElement {
       case _ => null
     }
     if (stub != null) {
-      stub.getChildrenByType[ScTypeDefinition](TokenSets.TMPL_DEF_BIT_SET, JavaArrayFactoryUtil.ScTypeDefinitionFactory)
+      stub.getChildrenByType[ScTypeDefinition](
+          TokenSets.TMPL_DEF_BIT_SET,
+          JavaArrayFactoryUtil.ScTypeDefinitionFactory)
     } else findChildrenByClassScala(classOf[ScTypeDefinition]).toSeq
   }
 
@@ -53,7 +54,8 @@ trait ScToplevelElement extends ScalaPsiElement {
       case _ => null
     }
     if (stub != null) {
-      stub.getChildrenByType[ScPackaging](ScalaElementTypes.PACKAGING, JavaArrayFactoryUtil.ScPackagingFactory)
+      stub.getChildrenByType[ScPackaging](
+          ScalaElementTypes.PACKAGING, JavaArrayFactoryUtil.ScPackagingFactory)
     } else {
       val buffer = new ArrayBuffer[ScPackaging]
       var curr = getFirstChild

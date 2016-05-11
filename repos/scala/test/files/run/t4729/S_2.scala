@@ -1,5 +1,5 @@
 import scala.language.reflectiveCalls
- // Scala class:
+// Scala class:
 class ScalaVarArgs extends J_1 {
   // -- no problem on overriding it using ordinary class
   def method(s: String*) { println(s) }

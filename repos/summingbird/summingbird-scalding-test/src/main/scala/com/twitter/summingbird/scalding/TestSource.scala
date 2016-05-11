@@ -1,5 +1,3 @@
-
-
 /*
  Copyright 2013 Twitter, Inc.
 
@@ -21,20 +19,26 @@ package com.twitter.summingbird.scalding
 import com.twitter.algebird.monad._
 import com.twitter.summingbird.batch._
 
-import com.twitter.scalding.{ Source => ScaldingSource, Test => TestMode, _ }
-import com.twitter.summingbird.{ Producer, TimeExtractor }
+import com.twitter.scalding.{Source => ScaldingSource, Test => TestMode, _}
+import com.twitter.summingbird.{Producer, TimeExtractor}
 import scala.collection.mutable.Buffer
 import cascading.tuple.Tuple
 import cascading.flow.FlowDef
 
-class LocalIterableSource[+T](src: Iterable[T], valid: Boolean) extends IterableSource[T](src) {
+class LocalIterableSource[+T](src: Iterable[T], valid: Boolean)
+    extends IterableSource[T](src) {
   override def validateTaps(mode: Mode): Unit = {
     assert(valid, "Cannot create valid source with the provided DateRange")
   }
 }
 object TestSource {
   // limit the source date range to the given range
-  def apply[T](iter: Iterable[T], dateRangeOpt: Option[DateRange] = None)(implicit mf: Manifest[T], te: TimeExtractor[T], tc: TupleConverter[T], tset: TupleSetter[T]): (Map[ScaldingSource, Buffer[Tuple]], Producer[Scalding, T]) = {
+  def apply[T](iter: Iterable[T], dateRangeOpt: Option[DateRange] = None)(
+      implicit mf: Manifest[T],
+      te: TimeExtractor[T],
+      tc: TupleConverter[T],
+      tset: TupleSetter[T])
+    : (Map[ScaldingSource, Buffer[Tuple]], Producer[Scalding, T]) = {
     val src = IterableSource(iter)
     val prod = Scalding.sourceFromMappable { dr =>
       if (dateRangeOpt.isDefined) {

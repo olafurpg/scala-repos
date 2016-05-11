@@ -35,29 +35,27 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.layout.Region
 
 object Control {
-  implicit def sfxControl2jfx(v: Control): jfxsc.Control = if (v != null) v.delegate else null
+  implicit def sfxControl2jfx(v: Control): jfxsc.Control =
+    if (v != null) v.delegate else null
 }
 
 abstract class Control(override val delegate: jfxsc.Control)
-  extends Region(delegate)
-  with Skinnable
-  with SFXDelegate[jfxsc.Control] {
+    extends Region(delegate) with Skinnable with SFXDelegate[jfxsc.Control] {
 
   /**
-   * The ContextMenu to show for this control.
-   */
-  def contextMenu: ObjectProperty[jfxsc.ContextMenu] = delegate.contextMenuProperty
+    * The ContextMenu to show for this control.
+    */
+  def contextMenu: ObjectProperty[jfxsc.ContextMenu] =
+    delegate.contextMenuProperty
   def contextMenu_=(v: ContextMenu) {
     contextMenu() = v
   }
 
   /**
-   * The ToolTip for this control.
-   */
+    * The ToolTip for this control.
+    */
   def tooltip: ObjectProperty[jfxsc.Tooltip] = delegate.tooltipProperty
   def tooltip_=(v: Tooltip) {
     tooltip() = v
   }
-
-
 }

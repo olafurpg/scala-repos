@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package net.liftweb 
-package record 
-package field 
+package net.liftweb
+package record
+package field
 
 import net.liftweb.http.{S}
 import net.liftweb.http.js._
@@ -31,22 +31,24 @@ import JE._
 trait NumericTypedField[MyType] extends TypedField[MyType] {
 
   /** Augments genericSetFromAny with support for values of type Number (optionally wrapped in any of the usual suspects) */
-  protected final def setNumericFromAny(in: Any, f: Number => MyType)(implicit m: Manifest[MyType]): Box[MyType] =
+  protected final def setNumericFromAny(in: Any, f: Number => MyType)(
+      implicit m: Manifest[MyType]): Box[MyType] =
     in match {
-      case     (n: Number) => setBox(Full(f(n)))
+      case (n: Number) => setBox(Full(f(n)))
       case Some(n: Number) => setBox(Full(f(n)))
       case Full(n: Number) => setBox(Full(f(n)))
-      case (n: Number)::_  => setBox(Full(f(n)))
+      case (n: Number) :: _ => setBox(Full(f(n)))
       case _ => genericSetFromAny(in)
     }
 
   private def elem = S.fmapFunc((s: List[String]) => setFromAny(s)) {
-    funcName => <input type={formInputType} name={funcName} value={valueBox.map(_.toString) openOr ""} tabindex={tabIndex.toString}/>
+    funcName =>
+      <input type={formInputType} name={funcName} value={valueBox.map(_.toString) openOr ""} tabindex={tabIndex.toString}/>
   }
 
   /**
-   * Returns form input of this field
-   */
+    * Returns form input of this field
+    */
   def toForm: Box[NodeSeq] =
     uniqueFieldId match {
       case Full(id) => Full(elem % ("id" -> id))
@@ -56,6 +58,4 @@ trait NumericTypedField[MyType] extends TypedField[MyType] {
   override def noValueErrorMessage = S.?("number.required")
 
   def asJs = valueBox.map(v => JsRaw(String.valueOf(v))) openOr JsNull
-
 }
-

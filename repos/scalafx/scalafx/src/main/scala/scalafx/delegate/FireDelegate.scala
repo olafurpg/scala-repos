@@ -32,25 +32,22 @@ import scalafx.delegate.FireDelegate._
 object FireDelegate {
 
   /**
-   * Defines a Type that contains a `fire()` method that has no return (`void`).
-   */
+    * Defines a Type that contains a `fire()` method that has no return (`void`).
+    */
   type Fired = {
     def fire()
   }
-
 }
 
 /**
- * Unify classes that contains a `fire()` method that has no return (`void`)
- */
-trait FireDelegate[J <: Object with Fired]
-  extends SFXDelegate[J] {
+  * Unify classes that contains a `fire()` method that has no return (`void`)
+  */
+trait FireDelegate[J <: Object with Fired] extends SFXDelegate[J] {
 
   /**
-   * Fires some kind of event.
-   */
+    * Fires some kind of event.
+    */
   def fire() {
     delegate.fire()
   }
-
 }

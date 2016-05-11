@@ -3,13 +3,15 @@ package breeze.stats.distributions
 import breeze.numerics.{pow, exp, log}
 
 /**
- * http://en.wikipedia.org/wiki/Laplace_distribution
- *
- * @author dlwh
- **/
-case class Pareto(scale: Double, shape: Double)(implicit rand: RandBasis = Rand) extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf {
+  * http://en.wikipedia.org/wiki/Laplace_distribution
+  *
+  * @author dlwh
+  **/
+case class Pareto(
+    scale: Double, shape: Double)(implicit rand: RandBasis = Rand)
+    extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf {
   def mean: Double = {
-    if(shape <= 1) {
+    if (shape <= 1) {
       Double.PositiveInfinity
     } else {
       scale * shape / (shape - 1)
@@ -19,22 +21,23 @@ case class Pareto(scale: Double, shape: Double)(implicit rand: RandBasis = Rand)
   def mode: Double = scale
 
   def variance: Double = {
-    if(shape <= 1) throw new IllegalArgumentException("undefined variance for shape < 1")
-    else if(shape <= 2) Double.PositiveInfinity
+    if (shape <= 1)
+      throw new IllegalArgumentException("undefined variance for shape < 1")
+    else if (shape <= 2) Double.PositiveInfinity
     else {
-      pow(scale/(shape - 1.0), 2.0) * shape /(shape - 2.0)
+      pow(scale / (shape - 1.0), 2.0) * shape / (shape - 2.0)
     }
   }
 
   def entropy: Double = {
-    log(scale/shape) + 1.0/shape + 1.0
+    log(scale / shape) + 1.0 / shape + 1.0
   }
 
-  lazy val logNormalizer: Double = - math.log(shape) - shape * math.log(scale)
+  lazy val logNormalizer: Double = -math.log(shape) - shape * math.log(scale)
 
   /**
-   * Gets one sample from the distribution. Equivalent to sample()
-   */
+    * Gets one sample from the distribution. Equivalent to sample()
+    */
   def draw(): Double = {
     val e = new Exponential(shape)
     exp(e.draw()) * scale
@@ -54,5 +57,4 @@ case class Pareto(scale: Double, shape: Double)(implicit rand: RandBasis = Rand)
     case x =>
       1 - math.pow(scale / x, shape)
   }
-
 }

@@ -19,20 +19,18 @@ private[http] object HttpClientDispatcher {
 }
 
 /**
- * Client dispatcher for HTTP.
- *
- * The dispatcher modifies each request with Dtab encoding from Dtab.local
- * and streams chunked responses via `Reader`.  If the request already contains
- * Dtab headers they will be stripped and an error will be logged.
- *
- * @param statsReceiver typically scoped to `clientName/dispatcher`
- */
+  * Client dispatcher for HTTP.
+  *
+  * The dispatcher modifies each request with Dtab encoding from Dtab.local
+  * and streams chunked responses via `Reader`.  If the request already contains
+  * Dtab headers they will be stripped and an error will be logged.
+  *
+  * @param statsReceiver typically scoped to `clientName/dispatcher`
+  */
 class HttpClientDispatcher(
-    trans: Transport[Any, Any],
-    statsReceiver: StatsReceiver)
-  extends GenSerialClientDispatcher[Request, Response, Any, Any](
-    trans,
-    statsReceiver) {
+    trans: Transport[Any, Any], statsReceiver: StatsReceiver)
+    extends GenSerialClientDispatcher[Request, Response, Any, Any](
+        trans, statsReceiver) {
 
   import GenSerialClientDispatcher.wrapWriteException
   import HttpClientDispatcher._
@@ -45,9 +43,11 @@ class HttpClientDispatcher(
     val dtabHeaders = HttpDtab.strip(req)
     if (dtabHeaders.nonEmpty) {
       // Log an error immediately if we find any Dtab headers already in the request and report them
-      val headersString = dtabHeaders.map({case (k, v) => s"[$k: $v]"}).mkString(", ")
-      log.error(s"discarding manually set dtab headers in request: $headersString\n" +
-        s"set Dtab.local instead to send Dtab information.")
+      val headersString =
+        dtabHeaders.map({ case (k, v) => s"[$k: $v]" }).mkString(", ")
+      log.error(
+          s"discarding manually set dtab headers in request: $headersString\n" +
+          s"set Dtab.local instead to send Dtab information.")
     }
 
     // It's kind of nasty to modify the request inline like this, but it's
@@ -63,34 +63,41 @@ class HttpClientDispatcher(
       if (len > 0) req.headerMap.set(Fields.ContentLength, len.toString)
     }
 
-    trans.write(from[Request, HttpRequest](req)).rescue(wrapWriteException).before {
-      // Do these concurrently:
-      Future.join(
-        // 1. Drain the Request body into the Transport.
-        if (req.isChunked) streamChunks(trans, req.reader)
-        else Future.Done,
-        // 2. Drain the Transport into Response body.
-        trans.read() flatMap {
-          case res: HttpResponse if HttpNackFilter.isNack(res) =>
-            p.updateIfEmpty(Throw(NackFailure))
-            Future.Done
+    trans
+      .write(from[Request, HttpRequest](req))
+      .rescue(wrapWriteException)
+      .before {
+        // Do these concurrently:
+        Future
+          .join(
+              // 1. Drain the Request body into the Transport.
+              if (req.isChunked) streamChunks(trans, req.reader)
+              else Future.Done,
+              // 2. Drain the Transport into Response body.
+              trans.read() flatMap {
+                case res: HttpResponse if HttpNackFilter.isNack(res) =>
+                  p.updateIfEmpty(Throw(NackFailure))
+                  Future.Done
 
-          case res: HttpResponse if !res.isChunked =>
-            val response = Response(res, BufReader(ChannelBufferBuf.Owned(res.getContent)))
-            p.updateIfEmpty(Return(response))
-            Future.Done
+                case res: HttpResponse if !res.isChunked =>
+                  val response = Response(
+                      res, BufReader(ChannelBufferBuf.Owned(res.getContent)))
+                  p.updateIfEmpty(Return(response))
+                  Future.Done
 
-          case res: HttpResponse =>
-            val coll = Transport.collate(trans, readChunk)
-            p.updateIfEmpty(Return(Response(res, coll)))
-            coll
+                case res: HttpResponse =>
+                  val coll = Transport.collate(trans, readChunk)
+                  p.updateIfEmpty(Return(Response(res, coll)))
+                  coll
 
-          case invalid =>
-            // We rely on the base class to satisfy p.
-            Future.exception(new IllegalArgumentException(s"invalid message '$invalid'"))
-        }
-      ).unit
-    } onFailure { _ =>
+                case invalid =>
+                  // We rely on the base class to satisfy p.
+                  Future.exception(new IllegalArgumentException(
+                          s"invalid message '$invalid'"))
+              }
+          )
+          .unit
+      } onFailure { _ =>
       // This Future represents the totality of the exchange;
       // thus failure represents *any* failure that can happen
       // during the exchange.

@@ -19,39 +19,43 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
 import scala.annotation.tailrec
 
 object ScalaResolveResult {
-  def empty = new ScalaResolveResult(null, ScSubstitutor.empty, Set[ImportUsed]())
+  def empty =
+    new ScalaResolveResult(null, ScSubstitutor.empty, Set[ImportUsed]())
 
-  def unapply(r: ScalaResolveResult): Some[(PsiNamedElement, ScSubstitutor)] = Some(r.element, r.substitutor)
+  def unapply(r: ScalaResolveResult): Some[(PsiNamedElement, ScSubstitutor)] =
+    Some(r.element, r.substitutor)
 }
 
-class ScalaResolveResult(val element: PsiNamedElement,
-                         val substitutor: ScSubstitutor = ScSubstitutor.empty,
-                         val importsUsed: collection.Set[ImportUsed] = collection.Set[ImportUsed](),
-                         val nameShadow: Option[String] = None,
-                         val implicitConversionClass: Option[PsiClass] = None,
-                         val problems: Seq[ApplicabilityProblem] = Seq.empty,
-                         val boundClass: PsiClass = null,
-                         val implicitFunction: Option[PsiNamedElement] = None,
-                         val implicitType: Option[ScType] = None,
-                         val defaultParameterUsed: Boolean = false,
-                         val innerResolveResult: Option[ScalaResolveResult] = None,
-                         val parentElement: Option[PsiNamedElement] = None,
-                         val isNamedParameter: Boolean = false,
-                         val fromType: Option[ScType] = None,
-                         val tuplingUsed: Boolean = false,
-                         val isSetterFunction: Boolean = false,
-                         val isAssignment: Boolean = false,
-                         val notCheckedResolveResult: Boolean = false, 
-                         val isAccessible: Boolean = true,
-                         val resultUndef: Option[ScUndefinedSubstitutor] = None,
-                         val prefixCompletion: Boolean = false,
-                         val isDynamic: Boolean = false,
-                         val isForwardReference: Boolean = false,
-                         val implicitParameterType: Option[ScType] = None,
-                         val implicitParameters: Seq[ScalaResolveResult] = Seq.empty,
-                         val implicitReason: ImplicitResult = NoResult,
-                         val implicitSearchState: Option[ImplicitState] = None,
-                         val unresolvedTypeParameters: Option[Seq[TypeParameter]] = None) extends ResolveResult {
+class ScalaResolveResult(
+    val element: PsiNamedElement,
+    val substitutor: ScSubstitutor = ScSubstitutor.empty,
+    val importsUsed: collection.Set[ImportUsed] = collection.Set[ImportUsed](),
+    val nameShadow: Option[String] = None,
+    val implicitConversionClass: Option[PsiClass] = None,
+    val problems: Seq[ApplicabilityProblem] = Seq.empty,
+    val boundClass: PsiClass = null,
+    val implicitFunction: Option[PsiNamedElement] = None,
+    val implicitType: Option[ScType] = None,
+    val defaultParameterUsed: Boolean = false,
+    val innerResolveResult: Option[ScalaResolveResult] = None,
+    val parentElement: Option[PsiNamedElement] = None,
+    val isNamedParameter: Boolean = false,
+    val fromType: Option[ScType] = None,
+    val tuplingUsed: Boolean = false,
+    val isSetterFunction: Boolean = false,
+    val isAssignment: Boolean = false,
+    val notCheckedResolveResult: Boolean = false,
+    val isAccessible: Boolean = true,
+    val resultUndef: Option[ScUndefinedSubstitutor] = None,
+    val prefixCompletion: Boolean = false,
+    val isDynamic: Boolean = false,
+    val isForwardReference: Boolean = false,
+    val implicitParameterType: Option[ScType] = None,
+    val implicitParameters: Seq[ScalaResolveResult] = Seq.empty,
+    val implicitReason: ImplicitResult = NoResult,
+    val implicitSearchState: Option[ImplicitState] = None,
+    val unresolvedTypeParameters: Option[Seq[TypeParameter]] = None)
+    extends ResolveResult {
   if (element == null) throw new NullPointerException("element is null")
 
   def getElement = element
@@ -59,8 +63,8 @@ class ScalaResolveResult(val element: PsiNamedElement,
   lazy val name: String = element.name
 
   /**
-   * this is important to get precedence information
-   */
+    * this is important to get precedence information
+    */
   def getActualElement = {
     parentElement match {
       case Some(e) => e
@@ -85,28 +89,53 @@ class ScalaResolveResult(val element: PsiNamedElement,
 
   def isRenamed: Option[String] = nameShadow
 
-  def copy(subst: ScSubstitutor = substitutor, problems: Seq[ApplicabilityProblem] = problems,
-           defaultParameterUsed: Boolean = defaultParameterUsed,
-           innerResolveResult: Option[ScalaResolveResult] = innerResolveResult,
-           tuplingUsed: Boolean = tuplingUsed,
-           isSetterFunction: Boolean = isSetterFunction,
-           isAssignment: Boolean = isAssignment,
-           notCheckedResolveResult: Boolean = notCheckedResolveResult,
-           isAccessible: Boolean = isAccessible, resultUndef: Option[ScUndefinedSubstitutor] = None,
-           isDynamic: Boolean = isDynamic,
-           isForwardReference: Boolean = isForwardReference,
-           implicitParameterType: Option[ScType] = implicitParameterType,
-           importsUsed: collection.Set[ImportUsed] = importsUsed,
-           implicitParameters: Seq[ScalaResolveResult] = implicitParameters,
-           implicitReason: ImplicitResult = implicitReason,
-           implicitSearchState: Option[ImplicitState] = implicitSearchState,
-           unresolvedTypeParameters: Option[Seq[TypeParameter]] = unresolvedTypeParameters): ScalaResolveResult =
-    new ScalaResolveResult(element, subst, importsUsed, nameShadow, implicitConversionClass, problems, boundClass,
-      implicitFunction, implicitType, defaultParameterUsed, innerResolveResult, parentElement,
-      isNamedParameter, fromType, tuplingUsed, isSetterFunction, isAssignment, notCheckedResolveResult,
-      isAccessible, resultUndef, isDynamic = isDynamic, isForwardReference = isForwardReference,
-      implicitParameterType = implicitParameterType, implicitParameters = implicitParameters,
-      implicitReason = implicitReason, implicitSearchState = implicitSearchState, unresolvedTypeParameters = unresolvedTypeParameters)
+  def copy(
+      subst: ScSubstitutor = substitutor,
+      problems: Seq[ApplicabilityProblem] = problems,
+      defaultParameterUsed: Boolean = defaultParameterUsed,
+      innerResolveResult: Option[ScalaResolveResult] = innerResolveResult,
+      tuplingUsed: Boolean = tuplingUsed,
+      isSetterFunction: Boolean = isSetterFunction,
+      isAssignment: Boolean = isAssignment,
+      notCheckedResolveResult: Boolean = notCheckedResolveResult,
+      isAccessible: Boolean = isAccessible,
+      resultUndef: Option[ScUndefinedSubstitutor] = None,
+      isDynamic: Boolean = isDynamic,
+      isForwardReference: Boolean = isForwardReference,
+      implicitParameterType: Option[ScType] = implicitParameterType,
+      importsUsed: collection.Set[ImportUsed] = importsUsed,
+      implicitParameters: Seq[ScalaResolveResult] = implicitParameters,
+      implicitReason: ImplicitResult = implicitReason,
+      implicitSearchState: Option[ImplicitState] = implicitSearchState,
+      unresolvedTypeParameters: Option[Seq[TypeParameter]] = unresolvedTypeParameters)
+    : ScalaResolveResult =
+    new ScalaResolveResult(element,
+                           subst,
+                           importsUsed,
+                           nameShadow,
+                           implicitConversionClass,
+                           problems,
+                           boundClass,
+                           implicitFunction,
+                           implicitType,
+                           defaultParameterUsed,
+                           innerResolveResult,
+                           parentElement,
+                           isNamedParameter,
+                           fromType,
+                           tuplingUsed,
+                           isSetterFunction,
+                           isAssignment,
+                           notCheckedResolveResult,
+                           isAccessible,
+                           resultUndef,
+                           isDynamic = isDynamic,
+                           isForwardReference = isForwardReference,
+                           implicitParameterType = implicitParameterType,
+                           implicitParameters = implicitParameters,
+                           implicitReason = implicitReason,
+                           implicitSearchState = implicitSearchState,
+                           unresolvedTypeParameters = unresolvedTypeParameters)
 
   //In valid program we should not have two resolve results with the same element but different substitutor,
   // so factor by element
@@ -120,9 +149,10 @@ class ScalaResolveResult(val element: PsiNamedElement,
   }
 
   override def hashCode: Int =
-    element.hashCode + innerResolveResult.hashCode() * 31 + nameShadow.hashCode() * 31 * 31 + implicitFunction.hashCode() * 31 * 31
+    element.hashCode + innerResolveResult.hashCode() * 31 +
+    nameShadow.hashCode() * 31 * 31 + implicitFunction.hashCode() * 31 * 31
 
-  override def toString =  {
+  override def toString = {
     val name = element match {
       case named: ScNamedElement => named.name
       case it => it.toString
@@ -133,8 +163,8 @@ class ScalaResolveResult(val element: PsiNamedElement,
   private var precedence = -1
 
   /**
-   * See [[org.jetbrains.plugins.scala.lang.resolve.processor.PrecedenceHelper.PrecedenceTypes]]
-   */
+    * See [[org.jetbrains.plugins.scala.lang.resolve.processor.PrecedenceHelper.PrecedenceTypes]]
+    */
   def getPrecedence(place: PsiElement, placePackageName: => String): Int = {
     import org.jetbrains.plugins.scala.lang.resolve.processor.PrecedenceHelper.PrecedenceTypes._
     def getPrecedenceInner: Int = {
@@ -156,7 +186,9 @@ class ScalaResolveResult(val element: PsiNamedElement,
             case o: ScObject if o.isPackageObject =>
               val qualifier = o.qualifiedName
               val packageSuffix: String = ".`package`"
-              if (qualifier.endsWith(packageSuffix)) qualifier.substring(0, qualifier.length - packageSuffix.length) else qualifier
+              if (qualifier.endsWith(packageSuffix))
+                qualifier.substring(0, qualifier.length - packageSuffix.length)
+              else qualifier
             case p: ScPackaging => p.fullPackageName
             case _ => getPackageName(element.getParent)
           }
@@ -190,8 +222,9 @@ class ScalaResolveResult(val element: PsiNamedElement,
             return getPackagePrecedence(qualifier)
           case clazz: PsiClass =>
             return getClazzPrecedence(clazz)
-          case memb@(_: ScBindingPattern | _: PsiMember) =>
-            val clazzStub = ScalaPsiUtil.getContextOfType(getActualElement, false, classOf[PsiClass])
+          case memb @ (_: ScBindingPattern | _: PsiMember) =>
+            val clazzStub = ScalaPsiUtil.getContextOfType(
+                getActualElement, false, classOf[PsiClass])
             val clazz: PsiClass = clazzStub match {
               case clazz: PsiClass => clazz
               case _ => null
@@ -205,10 +238,13 @@ class ScalaResolveResult(val element: PsiNamedElement,
                 case "scala" => return SCALA
                 case _ =>
                   clazz match {
-                    case o: ScObject if o.isPackageObject  && !PsiTreeUtil.isContextAncestor(o, place, false) =>
+                    case o: ScObject
+                        if o.isPackageObject &&
+                        !PsiTreeUtil.isContextAncestor(o, place, false) =>
                       var q = o.qualifiedName
                       val packageSuffix: String = ".`package`"
-                      if (q.endsWith(packageSuffix)) q = q.substring(0, q.length - packageSuffix.length)
+                      if (q.endsWith(packageSuffix))
+                        q = q.substring(0, q.length - packageSuffix.length)
                       if (q == placePackageName) return OTHER_MEMBERS
                       else return PACKAGE_LOCAL
                     case _ => return OTHER_MEMBERS
@@ -220,7 +256,8 @@ class ScalaResolveResult(val element: PsiNamedElement,
         return OTHER_MEMBERS
       }
       val importsUsedSeq = importsUsed.toSeq
-      val importUsed: ImportUsed = importsUsedSeq.apply(importsUsedSeq.length - 1)
+      val importUsed: ImportUsed =
+        importsUsedSeq.apply(importsUsedSeq.length - 1)
       // TODO this conflates imported functions and imported implicit views. ScalaResolveResult should really store
       //      these separately.
       importUsed match {
@@ -257,5 +294,4 @@ class ScalaResolveResult(val element: PsiNamedElement,
     }
     precedence
   }
-
 }

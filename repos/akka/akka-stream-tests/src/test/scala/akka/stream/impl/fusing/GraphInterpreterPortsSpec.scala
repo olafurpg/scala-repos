@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl.fusing
 
 import akka.testkit.AkkaSpec
@@ -210,7 +210,6 @@ class GraphInterpreterPortsSpec extends AkkaSpec with GraphInterpreterSpecKit {
       an[IllegalArgumentException] should be thrownBy { in.pull() }
       an[IllegalArgumentException] should be thrownBy { out.push(0) }
       an[IllegalArgumentException] should be thrownBy { in.grab() }
-
     }
 
     "propagate complete while pull is in flight" in new PortTestSetup {
@@ -517,7 +516,6 @@ class GraphInterpreterPortsSpec extends AkkaSpec with GraphInterpreterSpecKit {
       an[IllegalArgumentException] should be thrownBy { in.pull() }
       an[IllegalArgumentException] should be thrownBy { out.push(0) }
       an[IllegalArgumentException] should be thrownBy { in.grab() }
-
     }
 
     "propagate cancel while pull is in flight" in new PortTestSetup {
@@ -922,7 +920,6 @@ class GraphInterpreterPortsSpec extends AkkaSpec with GraphInterpreterSpecKit {
       an[IllegalArgumentException] should be thrownBy { in.pull() }
       an[IllegalArgumentException] should be thrownBy { out.push(0) }
       an[IllegalArgumentException] should be thrownBy { in.grab() }
-
     }
 
     "propagate failure while pull is in flight" in new PortTestSetup {
@@ -1173,7 +1170,5 @@ class GraphInterpreterPortsSpec extends AkkaSpec with GraphInterpreterSpecKit {
       an[IllegalArgumentException] should be thrownBy { out.push(0) }
       an[IllegalArgumentException] should be thrownBy { in.grab() }
     }
-
   }
-
 }

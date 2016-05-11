@@ -2,7 +2,8 @@ import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
 
-  def code = """
+  def code =
+    """
 class A
 object A // warn
 trait B

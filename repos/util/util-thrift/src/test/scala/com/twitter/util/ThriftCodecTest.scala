@@ -24,5 +24,4 @@ class ThriftCodecTest extends FunSuite {
     val codec = new CompactThriftCodec[TestThriftStructure]()
     roundTrip(codec)
   }
-
 }

@@ -7,23 +7,23 @@ import scala.tools.nsc.io.AbstractFile
 import java.net.URL
 
 /**
- * Simple interface that allows us to abstract over how class file lookup is performed
- * in different classpath representations.
- */
+  * Simple interface that allows us to abstract over how class file lookup is performed
+  * in different classpath representations.
+  */
 // TODO at the end, after the possible removal of the old classpath representation, this class shouldn't be generic
 // T should be just changed to AbstractFile
 trait ClassFileLookup[T] {
   def findClassFile(name: String): Option[AbstractFile]
 
   /**
-   * It returns both classes from class file and source files (as our base ClassRepresentation).
-   * So note that it's not so strictly related to findClassFile.
-   */
+    * It returns both classes from class file and source files (as our base ClassRepresentation).
+    * So note that it's not so strictly related to findClassFile.
+    */
   def findClass(name: String): Option[ClassRepresentation[T]]
 
   /**
-   * A sequence of URLs representing this classpath.
-   */
+    * A sequence of URLs representing this classpath.
+    */
   def asURLs: Seq[URL]
 
   /** The whole classpath in the form of one String.
@@ -40,8 +40,8 @@ trait ClassFileLookup[T] {
 }
 
 /**
- * Represents classes which can be loaded with a ClassfileLoader and/or SourcefileLoader.
- */
+  * Represents classes which can be loaded with a ClassfileLoader and/or SourcefileLoader.
+  */
 // TODO at the end, after the possible removal of the old classpath implementation, this class shouldn't be generic
 // T should be just changed to AbstractFile
 trait ClassRepresentation[T] {
@@ -52,6 +52,7 @@ trait ClassRepresentation[T] {
 }
 
 object ClassRepresentation {
-  def unapply[T](classRep: ClassRepresentation[T]): Option[(Option[T], Option[AbstractFile])] =
+  def unapply[T](classRep: ClassRepresentation[T])
+    : Option[(Option[T], Option[AbstractFile])] =
     Some((classRep.binary, classRep.source))
 }

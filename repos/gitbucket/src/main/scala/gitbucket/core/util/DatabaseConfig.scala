@@ -15,5 +15,4 @@ object DatabaseConfig {
   val user: String = config.getString("db.user")
   val password: String = config.getString("db.password")
   val driver: String = config.getString("db.driver")
-
 }

@@ -7,7 +7,7 @@ class A extends A0 {
 }
 
 abstract class B extends A {
-  def print() : String
+  def print(): String
 }
 
 class C extends B {
@@ -21,7 +21,6 @@ trait T extends B {
 class D extends A {
   override def print(): String = super.print() // okay
 }
-
 
 // it's okay do this when trait are in the mix, as the
 // suitable super accessor methods are used.

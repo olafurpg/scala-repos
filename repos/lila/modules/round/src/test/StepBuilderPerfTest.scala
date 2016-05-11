@@ -18,26 +18,31 @@ class StepBuilderPerfTest extends Specification {
   // val iterations = 1
 
   def runOne(withOpening: Boolean)(moves: List[String]) =
-    StepBuilder("abcd1234", moves, chess.variant.Standard, None, format.Forsyth.initial, withOpening = withOpening)
+    StepBuilder("abcd1234",
+                moves,
+                chess.variant.Standard,
+                None,
+                format.Forsyth.initial,
+                withOpening = withOpening)
   def run(withOpening: Boolean) { gameMoves foreach runOne(withOpening) }
 
   def runTests(withOpening: Boolean) = {
-      runOne(withOpening)(gameMoves.head)
-      println("warming up")
+    runOne(withOpening)(gameMoves.head)
+    println("warming up")
+    run(withOpening)
+    println("running tests")
+    val durations = for (i ← 1 to iterations) yield {
+      val start = System.currentTimeMillis
       run(withOpening)
-      println("running tests")
-      val durations = for (i ← 1 to iterations) yield {
-        val start = System.currentTimeMillis
-        run(withOpening)
-        val duration = System.currentTimeMillis - start
-        println(s"$nb games in $duration ms")
-        duration
-      }
-      val nbGames = iterations * nb
-      val moveMicros = (1000 * durations.sum) / nbGames
-      println(s"Average = $moveMicros microseconds per game")
-      println(s"          ${1000000 / moveMicros} games per second")
-      true === true
+      val duration = System.currentTimeMillis - start
+      println(s"$nb games in $duration ms")
+      duration
+    }
+    val nbGames = iterations * nb
+    val moveMicros = (1000 * durations.sum) / nbGames
+    println(s"Average = $moveMicros microseconds per game")
+    println(s"          ${1000000 / moveMicros} games per second")
+    true === true
   }
 
   "playing a game" should {

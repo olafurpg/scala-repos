@@ -7,14 +7,12 @@
 // TEST 1
 // self-type is other trait
 
-
-import scala.language.{ reflectiveCalls }
+import scala.language.{reflectiveCalls}
 
 trait Aa
 trait Ab
 
-trait B {
-  self: Aa with Ab =>
+trait B { self: Aa with Ab =>
 
   def y = new { def f() = println("Success 1") }
   def fail() = {
@@ -30,8 +28,7 @@ object Test1 extends Aa with Ab with B
 
 class A2
 
-trait B2 {
-  self: A2 =>
+trait B2 { self: A2 =>
 
   def y = new { def f() = println("Success 2") }
   def fail() = {
@@ -66,4 +63,3 @@ object Test {
     Test3.fail()
   }
 }
-

@@ -9,15 +9,18 @@ case class NamedThing(name: String = "tom")
 
 class Bottle(val of: String)
 
-class BottleSerializer extends CustomSerializer[Bottle](implicit formats => ({
-  case json: JValue =>
-    val b = for {
-      of <- (json \ "of").extractOpt[String]
-    } yield (new Bottle(of))
-    b.get
-}, {
-  case a: Bottle => JObject(JField("of", JString(a.of)))
-})) {}
+class BottleSerializer
+    extends CustomSerializer[Bottle](
+        implicit formats =>
+          ({
+        case json: JValue =>
+          val b = for {
+            of <- (json \ "of").extractOpt[String]
+          } yield (new Bottle(of))
+          b.get
+      }, {
+        case a: Bottle => JObject(JField("of", JString(a.of)))
+      })) {}
 
 class JValueResultSpec extends MutableScalatraSpec {
 
@@ -25,7 +28,8 @@ class JValueResultSpec extends MutableScalatraSpec {
 
   addServlet(new ScalatraServlet with JacksonJsonSupport {
 
-    implicit protected def jsonFormats: Formats = DefaultFormats + new BottleSerializer
+    implicit protected def jsonFormats: Formats =
+      DefaultFormats + new BottleSerializer
 
     notFound {
       status = 404
@@ -157,7 +161,8 @@ class JValueResultSpec extends MutableScalatraSpec {
 
     "render a map" in {
       get("/map") {
-        parse(body) must_== JObject(List(JField("rum", bottleRum), JField("thing", jValue)))
+        parse(body) must_==
+          JObject(List(JField("rum", bottleRum), JField("thing", jValue)))
       }
     }
 
@@ -168,5 +173,4 @@ class JValueResultSpec extends MutableScalatraSpec {
       }
     }
   }
-
 }

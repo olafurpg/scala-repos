@@ -27,16 +27,17 @@
 
 package scalafx.scene.control
 
-import javafx.scene.{ control => jfxsc }
+import javafx.scene.{control => jfxsc}
 import scalafx.Includes._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * Spinner Spec tests.
- */
+  * Spinner Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class SpinnerSpec[T]
-  extends SimpleSFXDelegateSpec[jfxsc.Spinner[T], Spinner[T]](classOf[jfxsc.Spinner[T]], classOf[Spinner[T]])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsc.Spinner[T], Spinner[T]](
+        classOf[jfxsc.Spinner[T]], classOf[Spinner[T]])
+    with RunOnApplicationThread

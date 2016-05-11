@@ -7,23 +7,21 @@ import scala.tools.partest.DirectTest
 import scala.collection.JavaConverters._
 
 /**
- * Test that the ICodeReader does not crash if the bytecode of a method has unreachable code.
- */
+  * Test that the ICodeReader does not crash if the bytecode of a method has unreachable code.
+  */
 object Test extends DirectTest {
   def code: String = ???
 
   def show(): Unit = {
     // The bytecode of f will be modified using ASM by `addDeadCode`
-    val aCode =
-      """
+    val aCode = """
         |package p
         |class A {
         |  @inline final def f = 1
         |}
       """.stripMargin
 
-    val bCode =
-      """
+    val bCode = """
         |package p
         |class B {
         |  def g = (new A()).f

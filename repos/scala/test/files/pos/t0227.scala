@@ -1,31 +1,32 @@
 final class Settings {
-    def f[T](a_args: T*): List[T] = Nil
+  def f[T](a_args: T*): List[T] = Nil
 }
 
 abstract class Factory {
-    type libraryType <: Base
+  type libraryType <: Base
 
-    final def apply(settings: Settings): libraryType = sys.error("bla")
+  final def apply(settings: Settings): libraryType = sys.error("bla")
 }
 
 abstract class Base {
-    val settings: Settings
+  val settings: Settings
 
-    protected val demands: List[Factory] = Nil
+  protected val demands: List[Factory] = Nil
 }
 
 class SA(val settings: Settings) extends Base {
-    override val demands =  List(
-            SD
-        ) :::  settings.f(
-            SC
-        )
+  override val demands =
+    List(
+        SD
+    ) ::: settings.f(
+        SC
+    )
 }
 
 object SC extends Factory {
-    type libraryType = Base
+  type libraryType = Base
 }
 
 object SD extends Factory {
-    type libraryType = SA
+  type libraryType = SA
 }

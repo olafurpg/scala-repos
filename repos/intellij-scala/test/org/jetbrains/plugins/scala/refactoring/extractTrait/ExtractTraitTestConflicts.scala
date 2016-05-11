@@ -2,13 +2,12 @@ package org.jetbrains.plugins.scala
 package refactoring.extractTrait
 
 /**
- * Nikolay.Tropin
- * 2014-06-04
- */
+  * Nikolay.Tropin
+  * 2014-06-04
+  */
 class ExtractTraitTestConflicts extends ExtractTraitTestBase {
   def testPrivateMember() {
-    val text =
-      """
+    val text = """
         |class A {<caret>
         |
         |  def foo() = bar()
@@ -17,11 +16,14 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         |}
       """.stripMargin
 
-    val message = ScalaBundle.message("private.member.cannot.be.used.in.extracted.member", "bar", "foo(): Int")
-    checkException(text, message, onlyDeclarations = false, onlyFirstMember = true)
+    val message = ScalaBundle.message(
+        "private.member.cannot.be.used.in.extracted.member",
+        "bar",
+        "foo(): Int")
+    checkException(
+        text, message, onlyDeclarations = false, onlyFirstMember = true)
 
-    val result =
-      """
+    val result = """
         |class A extends ExtractedTrait {
         |
         |  override def foo() = bar()
@@ -38,8 +40,7 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
   }
 
   def testFromAnonymousClass() {
-    val text =
-      """
+    val text = """
         |object A {
         |  val x = new Runnable {<caret>
         |    def run() = bar()
@@ -49,11 +50,14 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         |}
       """.stripMargin
 
-    val message = ScalaBundle.message("member.of.anonymous.class.cannot.be.used.in.extracted.member", "bar", "run(): Unit")
-    checkException(text, message, onlyDeclarations = false, onlyFirstMember = true)
+    val message = ScalaBundle.message(
+        "member.of.anonymous.class.cannot.be.used.in.extracted.member",
+        "bar",
+        "run(): Unit")
+    checkException(
+        text, message, onlyDeclarations = false, onlyFirstMember = true)
 
-    val result =
-      """
+    val result = """
         |object A {
         |  val x = new Runnable with ExtractedTrait
         |
@@ -66,12 +70,12 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         |
         |}
       """.stripMargin
-    checkResult(text, result, onlyDeclarations = false, onlyFirstMember = false)
+    checkResult(
+        text, result, onlyDeclarations = false, onlyFirstMember = false)
   }
 
   def testSuperReference() {
-    val text =
-      """
+    val text = """
         |class A extends AA {<caret>
         |  def foo() = super.bar()
         |}
@@ -80,13 +84,14 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         |  def bar() {}
         |}
       """.stripMargin
-    val message = ScalaBundle.message("super.reference.used.in.extracted.member", "foo(): Unit")
-    checkException(text, message, onlyDeclarations = false, onlyFirstMember = true)
+    val message = ScalaBundle.message(
+        "super.reference.used.in.extracted.member", "foo(): Unit")
+    checkException(
+        text, message, onlyDeclarations = false, onlyFirstMember = true)
   }
 
   def testClassTypeParams() {
-    val text =
-      """
+    val text = """
         |class A extends AA[Int] {<caret>
         |  def foo() = bar()
         |}
@@ -95,8 +100,9 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         |  def bar() {}
         |}
       """.stripMargin
-    val message = ScalaBundle.message("type.parameters.for.self.type.not.supported", "AA")
-    checkException(text, message, onlyDeclarations = false, onlyFirstMember = true)
+    val message =
+      ScalaBundle.message("type.parameters.for.self.type.not.supported", "AA")
+    checkException(
+        text, message, onlyDeclarations = false, onlyFirstMember = true)
   }
-
 }

@@ -10,9 +10,11 @@ object X {
 
   // this doesn't
   def bar(x: X, y: X): (x.T, y.T) = macro barImpl
-  def barImpl(c: Context)(x: c.Expr[X], y: c.Expr[X]): c.Expr[(x.value.T, y.value.T)] = ???
+  def barImpl(c: Context)(
+      x: c.Expr[X], y: c.Expr[X]): c.Expr[(x.value.T, y.value.T)] = ???
 
   // neither does this
   def baz(x: X)(xs: List[x.T]): Unit = macro bazImpl
-  def bazImpl(c: Context)(x: c.Expr[X])(xs: c.Expr[List[x.value.T]]): c.Expr[Unit] = ???
+  def bazImpl(c: Context)(x: c.Expr[X])(
+      xs: c.Expr[List[x.value.T]]): c.Expr[Unit] = ???
 }

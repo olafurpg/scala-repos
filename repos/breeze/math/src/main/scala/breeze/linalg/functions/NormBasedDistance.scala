@@ -23,15 +23,15 @@ import breeze.linalg.norm
 import breeze.linalg.operators.OpSub
 
 /**
- * TODO
- *
- * @author dlwh
- **/
+  * TODO
+  *
+  * @author dlwh
+  **/
 trait NormBasedDistance extends UFunc {
 
-  implicit def distanceFromNormAndSub[T, U, V]
-  (implicit subImpl: OpSub.Impl2[T, U, V],
-   normImpl: norm.Impl2[V, Double, Double]): Impl2[T, U, Double] = {
+  implicit def distanceFromNormAndSub[T, U, V](
+      implicit subImpl: OpSub.Impl2[T, U, V],
+      normImpl: norm.Impl2[V, Double, Double]): Impl2[T, U, Double] = {
 
     new Impl2[T, U, Double] {
       def apply(v: T, v2: U): Double = {
@@ -41,6 +41,4 @@ trait NormBasedDistance extends UFunc {
   }
 
   protected def normConstant: Double
-
 }
-

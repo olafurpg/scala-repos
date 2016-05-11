@@ -10,40 +10,57 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinitio
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 /**
- * @author Roman.Shein
- * @since 23.09.2015.
- */
+  * @author Roman.Shein
+  * @since 23.09.2015.
+  */
 class ScalaComponentTypeOfMacro extends Macro {
-  override def calculateResult(params: Array[Expression], context: ExpressionContext): Result = {
+  override def calculateResult(
+      params: Array[Expression], context: ExpressionContext): Result = {
     if (params.length != 1) return null
     params.head.calculateResult(context) match {
       case scTypeRes: ScalaTypeResult =>
-        MacroUtil.getComponentFromArrayType(scTypeRes.myType).map(new ScalaTypeResult(_)).orNull
+        MacroUtil
+          .getComponentFromArrayType(scTypeRes.myType)
+          .map(new ScalaTypeResult(_))
+          .orNull
       case otherRes: Result =>
-        MacroUtil.resultToScExpr(otherRes, context).flatMap(_.getType().toOption).
-                flatMap(MacroUtil.getComponentFromArrayType).map(new ScalaTypeResult(_)).orNull
+        MacroUtil
+          .resultToScExpr(otherRes, context)
+          .flatMap(_.getType().toOption)
+          .flatMap(MacroUtil.getComponentFromArrayType)
+          .map(new ScalaTypeResult(_))
+          .orNull
     }
   }
 
-  override def calculateLookupItems(params: Array[Expression], context: ExpressionContext): Array[LookupElement] = {
+  override def calculateLookupItems(
+      params: Array[Expression],
+      context: ExpressionContext): Array[LookupElement] = {
     if (params.length != 1) return null
     val outerItems = params(0).calculateLookupItems(context)
     if (outerItems == null) return null
 
     outerItems.flatMap {
-      case lookupItem: ScalaLookupItem => lookupItem.element match {
-        case typeDef: ScTypeDefinition =>
-          typeDef.getType(TypingContext.empty).toOption.flatMap(MacroUtil.getComponentFromArrayType).
-                  map(MacroUtil.getTypeLookupItem(_, context.getProject))
-        case _ => None
-      }
+      case lookupItem: ScalaLookupItem =>
+        lookupItem.element match {
+          case typeDef: ScTypeDefinition =>
+            typeDef
+              .getType(TypingContext.empty)
+              .toOption
+              .flatMap(MacroUtil.getComponentFromArrayType)
+              .map(MacroUtil.getTypeLookupItem(_, context.getProject))
+          case _ => None
+        }
       case _ => None
     }.filter(_.isDefined).map(_.get)
   }
 
   def getName: String = MacroUtil.scalaIdPrefix + "componentTypeOf"
 
-  def getPresentableName: String = MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message("macro.component.type.of.array")
+  def getPresentableName: String =
+    MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
+        "macro.component.type.of.array")
 
-  override def isAcceptableInContext(context: TemplateContextType): Boolean = context.isInstanceOf[ScalaCodeContextType]
+  override def isAcceptableInContext(context: TemplateContextType): Boolean =
+    context.isInstanceOf[ScalaCodeContextType]
 }

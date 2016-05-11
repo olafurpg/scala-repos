@@ -3,7 +3,7 @@ final class Mu[F](val value: Any) extends AnyVal {
     // crash
     ((y: Mu[F]) => y.cata(f))
     // crash
-    def foo(x : Mu[F]) = x.cata(f)
+    def foo(x: Mu[F]) = x.cata(f)
 
     // // okay
     def x: Mu[F] = ???

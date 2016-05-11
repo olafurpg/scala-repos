@@ -16,7 +16,8 @@ final class Serial(seed0: Long) extends LongBasedGenerator {
 
 object Serial extends GeneratorCompanion[Serial, Long] {
   def randomSeed(): Long = System.nanoTime()
-  def fromBytes(bytes: Array[Byte]): Serial = new Serial(Pack.longFromBytes(bytes))
+  def fromBytes(bytes: Array[Byte]): Serial =
+    new Serial(Pack.longFromBytes(bytes))
   def fromSeed(seed: Long): Serial = new Serial(seed)
   def fromTime(time: Long = System.nanoTime()): Serial = new Serial(time)
 }

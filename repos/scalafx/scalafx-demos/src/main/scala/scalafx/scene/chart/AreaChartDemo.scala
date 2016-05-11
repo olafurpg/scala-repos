@@ -32,7 +32,6 @@ import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Side
 import scalafx.scene.Scene
 
-
 object AreaChartDemo extends JFXApp {
 
   stage = new JFXApp.PrimaryStage {
@@ -42,9 +41,12 @@ object AreaChartDemo extends JFXApp {
         title = "Area Chart"
         legendSide = Side.Right
         data = ObservableBuffer(
-          xySeries("Series 1", Seq((0, 4), (2, 5), (4, 4), (6, 2), (8, 6), (10, 8))),
-          xySeries("Series 2", Seq((0, 8), (2, 2), (4, 9), (6, 7), (8, 5), (10, 7))),
-          xySeries("Series 3", Seq((0, 2), (2, 5), (4, 8), (6, 6), (8, 9), (10, 7))))
+            xySeries("Series 1",
+                     Seq((0, 4), (2, 5), (4, 4), (6, 2), (8, 6), (10, 8))),
+            xySeries("Series 2",
+                     Seq((0, 8), (2, 2), (4, 9), (6, 7), (8, 5), (10, 7))),
+            xySeries("Series 3",
+                     Seq((0, 2), (2, 5), (4, 8), (6, 6), (8, 9), (10, 7))))
       }
     }
   }
@@ -52,7 +54,8 @@ object AreaChartDemo extends JFXApp {
   /** Create XYChart.Series from a sequence of number pairs. */
   def xySeries(name: String, data: Seq[(Int, Int)]) =
     XYChart.Series[Number, Number](
-      name,
-      ObservableBuffer(data.map {case (x, y) => XYChart.Data[Number, Number](x, y)})
+        name,
+        ObservableBuffer(
+            data.map { case (x, y) => XYChart.Data[Number, Number](x, y) })
     )
 }

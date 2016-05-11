@@ -32,18 +32,21 @@ object ApplyUsage extends App {
   assert(Apply[Option].ap(none)(some(double)) === none)
   assert(Apply[Option].ap(1.some)(none[Int => Int]) === none[Int])
   assert(Apply[Option].ap(none)(none[Int => Int]) === none[Int])
-  assert(Apply[List].ap(List(1,2,3))(List(double, addTwo)) === List(2,4,6,3,4,5))
+  assert(Apply[List].ap(List(1, 2, 3))(List(double, addTwo)) === List(
+          2, 4, 6, 3, 4, 5))
 
   // from these two methods (map and ap) we are able to derive some
   // very useful methods which allow us to "lift" a function of
   // multiple arguments into a context. There are methods named
   // by how many parameters they take
-  val add2 = ((_:Int) + (_:Int))
-  val add3 = ((_:Int) + (_:Int) + (_:Int))
-  val add4 = ((_:Int) + (_:Int) + (_:Int) + (_:Int))
+  val add2 = ((_: Int) + (_: Int))
+  val add3 = ((_: Int) + (_: Int) + (_: Int))
+  val add4 = ((_: Int) + (_: Int) + (_: Int) + (_: Int))
   assert(Apply[Option].apply2(some(1), some(2))(add2) === some(3))
   assert(Apply[Option].apply3(some(1), some(2), some(3))(add3) === some(6))
-  assert(Apply[Option].apply4(some(1), some(2), some(3), some(4))(add4) === some(10))
+  assert(
+      Apply[Option].apply4(some(1), some(2), some(3), some(4))(add4) === some(
+          10))
 
   // the effects from the context we are operating on are carried
   // through the computation, so, for example, in the case of the
@@ -53,10 +56,14 @@ object ApplyUsage extends App {
 
   // tuple2, tuple3 etc, will construct tuples from values from the
   // provided contexts
-  assert(Apply[List].tuple3(List(1,2,3), List("a", "b"), List(())) ===
-           List((1,"a",()),(1,"b",()),(2,"a",()),
-                (2,"b",()),(3,"a",()),(3,"b",())))
-
+  assert(
+      Apply[List].tuple3(List(1, 2, 3), List("a", "b"), List(())) === List(
+          (1, "a", ()),
+          (1, "b", ()),
+          (2, "a", ()),
+          (2, "b", ()),
+          (3, "a", ()),
+          (3, "b", ())))
 
   // There some helpful syntax available for the Apply typeclass:
   import scalaz.syntax.apply._
@@ -64,7 +71,7 @@ object ApplyUsage extends App {
   // <*> is syntax for the "ap" method
   val plus1: Int => Int = _ + 1
   val plus2: Int => Int = _ + 2
-  assert(List(1,2,3) <*> List(plus1, plus2) === List(2,3,4,3,4,5))
+  assert(List(1, 2, 3) <*> List(plus1, plus2) === List(2, 3, 4, 3, 4, 5))
 
   // |@| is refered to as "applicative builder", it allows you to
   // evaluate a function of multiple arguments in a context, similar
@@ -72,18 +79,25 @@ object ApplyUsage extends App {
   assert((some(1) |@| some(2) |@| some(3))(_ + _ + _) === Some(6))
   assert((some(1) |@| none[Int] |@| some(3))(_ + _ + _) === None)
 
-  def add8(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int, g: Int, h: Int) = a+b+c+d+e+f+g+h
-  val someOf8Options = (1.some |@| 2.some |@| 3.some |@| 4.some |@|
-                        5.some |@| 6.some |@| 7.some |@| 8.some)(add8 _)
+  def add8(a: Int, b: Int, c: Int, d: Int, e: Int, f: Int, g: Int, h: Int) =
+    a + b + c + d + e + f + g + h
+  val someOf8Options =
+    (1.some |@| 2.some |@| 3.some |@| 4.some |@| 5.some |@| 6.some |@| 7.some |@| 8.some)(
+        add8 _)
   assert(someOf8Options === 36.some)
 
   // the applicative builder created by |@| also has a "tupled" method
   // which will tuple the arguments
-  assert((List(1,2,3) |@| List("a","b","c")).tupled ===
-           List(1 -> "a", 1 -> "b", 1 -> "c",
-                2 -> "a", 2 -> "b", 2 -> "c",
-                3 -> "a", 3 -> "b", 3 -> "c"))
-
+  assert(
+      (List(1, 2, 3) |@| List("a", "b", "c")).tupled === List(1 -> "a",
+                                                              1 -> "b",
+                                                              1 -> "c",
+                                                              2 -> "a",
+                                                              2 -> "b",
+                                                              2 -> "c",
+                                                              3 -> "a",
+                                                              3 -> "b",
+                                                              3 -> "c"))
 
   // there are ^, ^^, ^^^, etc methods which correspond respectively
   // to apply2, apply, apply4, etc.
@@ -102,7 +116,7 @@ object ApplyUsage extends App {
   // writer is used to emit log messages along with the value being
   // computed.
 
-  import scalaz.{Writer,DList}
+  import scalaz.{Writer, DList}
   import scalaz.syntax.writer._
   type Logged[A] = Writer[DList[String], A]
 
@@ -111,7 +125,7 @@ object ApplyUsage extends App {
 
   // log that we are adding, and return the results of adding x and y
   def compute(x: Int, y: Int): Logged[Int] =
-    log("adding " + x + " and " + y) as (x+y)
+    log("adding " + x + " and " + y) as (x + y)
 
   // we log a message "begin", we add two numbers, we log "end",
   // neither calls to "log" compute a value, they are only evaluated
@@ -119,13 +133,13 @@ object ApplyUsage extends App {
   // discard the computed value (which in this case is Unit), while
   // preserving the value computed in the call to "compute"
   def addAndLog(x: Int, y: Int): Logged[Int] =
-    log("begin") *> compute(x,y) <* log("end")
+    log("begin") *> compute(x, y) <* log("end")
 
-  val (written,result) = addAndLog(1,2).run
+  val (written, result) = addAndLog(1, 2).run
   assert(written === DList("begin", "adding 1 and 2", "end"))
   assert(result === 3)
 
-  val (written2,result2) = addAndLog(1, 10).run
+  val (written2, result2) = addAndLog(1, 10).run
   assert(written2 === DList("begin", "adding 1 and 10", "end"))
   assert(result2 === 11)
 
@@ -135,15 +149,21 @@ object ApplyUsage extends App {
   val applyVLO = Apply[Vector] compose Apply[List] compose Apply[Option]
 
   val deepResult =
-    applyVLO.apply2(Vector(List(1.some, none[Int]),
-                           List(2.some, 3.some)),
+    applyVLO.apply2(Vector(List(1.some, none[Int]), List(2.some, 3.some)),
                     Vector(List("a".some, "b".some, "c".some)))(_.toString + _)
 
-  val expectedDeep = Vector(List(Some("1a"), Some("1b"), Some("1c"),
-                                 None, None, None),
-                            List(Some("2a"), Some("2b"), Some("2c"),
-                                 Some("3a"), Some("3b"), Some("3c")))
+  val expectedDeep = Vector(List(Some("1a"),
+                                 Some("1b"),
+                                 Some("1c"),
+                                 None,
+                                 None,
+                                 None),
+                            List(Some("2a"),
+                                 Some("2b"),
+                                 Some("2c"),
+                                 Some("3a"),
+                                 Some("3b"),
+                                 Some("3c")))
 
   assert(deepResult === expectedDeep)
-
 }

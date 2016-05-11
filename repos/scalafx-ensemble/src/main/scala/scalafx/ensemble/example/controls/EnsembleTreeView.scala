@@ -33,7 +33,6 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.{TreeItem, TreeView}
 import scalafx.scene.layout.StackPane
 
-
 class EnsembleTreeView extends EnsembleExample {
 
   def getContent = {
@@ -44,18 +43,18 @@ class EnsembleTreeView extends EnsembleExample {
       root = new TreeItem[String]("Root Node") {
         expanded = true
         children = ObservableBuffer(
-          new TreeItem[String] {
-            value = "Node 1"
-          },
-          new TreeItem[String] {
-            value = "Node 2"
-          },
-          new TreeItem[String] {
-            value = "Node 3"
-            children = ObservableBuffer(
-              (4 to 12).map(n => new TreeItem[String]("Child Node " + n))
-            )
-          }
+            new TreeItem[String] {
+              value = "Node 1"
+            },
+            new TreeItem[String] {
+              value = "Node 2"
+            },
+            new TreeItem[String] {
+              value = "Node 3"
+              children = ObservableBuffer(
+                  (4 to 12).map(n => new TreeItem[String]("Child Node " + n))
+              )
+            }
         )
       }
     }

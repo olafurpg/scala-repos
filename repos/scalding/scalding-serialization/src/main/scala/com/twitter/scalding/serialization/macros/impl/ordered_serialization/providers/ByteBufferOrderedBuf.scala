@@ -19,7 +19,7 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
 import com.twitter.scalding._
-import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{ CompileTimeLengthTypes, ProductLike, TreeOrderedBuf }
+import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{CompileTimeLengthTypes, ProductLike, TreeOrderedBuf}
 import CompileTimeLengthTypes._
 
 import java.nio.ByteBuffer
@@ -27,7 +27,8 @@ import com.twitter.scalding.serialization.OrderedSerialization
 
 object ByteBufferOrderedBuf {
   def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
-    case tpe if tpe =:= c.universe.typeOf[ByteBuffer] => ByteBufferOrderedBuf(c)(tpe)
+    case tpe if tpe =:= c.universe.typeOf[ByteBuffer] =>
+      ByteBufferOrderedBuf(c)(tpe)
   }
 
   def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] = {
@@ -40,7 +41,8 @@ object ByteBufferOrderedBuf {
       override val tpe = outerType
       override def hash(element: ctx.TermName): ctx.Tree = q"$element.hashCode"
 
-      override def compareBinary(inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) = {
+      override def compareBinary(
+          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) = {
         val lenA = freshT("lenA")
         val lenB = freshT("lenB")
         val queryLength = freshT("queryLength")
@@ -81,7 +83,8 @@ object ByteBufferOrderedBuf {
       _root_.java.nio.ByteBuffer.wrap($bytes)
     """
       }
-      override def compare(elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree = q"""
+      override def compare(
+          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree = q"""
         $elementA.compareTo($elementB)
       """
       override def length(element: Tree): CompileTimeLengthTypes[c.type] = {
@@ -96,4 +99,3 @@ object ByteBufferOrderedBuf {
     }
   }
 }
-

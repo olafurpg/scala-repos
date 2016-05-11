@@ -1,7 +1,8 @@
 // Test that scala doesn't apply boxing or varargs conversions to the
 // @PolymorphicSignature magical methods, MethodHandle#{invoke, invokeExact}
 object Test {
-  val code = """
+  val code =
+    """
 
 object O {
   private def foo = "foo"

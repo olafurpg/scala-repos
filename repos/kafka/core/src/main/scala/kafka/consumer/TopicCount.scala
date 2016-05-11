@@ -1,20 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * 
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  * 
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.consumer
 
 import scala.collection._
@@ -27,10 +26,10 @@ private[kafka] trait TopicCount {
   def getConsumerThreadIdsPerTopic: Map[String, Set[ConsumerThreadId]]
   def getTopicCountMap: Map[String, Int]
   def pattern: String
-
 }
 
-case class ConsumerThreadId(consumer: String, threadId: Int) extends Ordered[ConsumerThreadId] {
+case class ConsumerThreadId(consumer: String, threadId: Int)
+    extends Ordered[ConsumerThreadId] {
   override def toString = "%s-%d".format(consumer, threadId)
 
   def compare(that: ConsumerThreadId) = toString.compare(that.toString)
@@ -41,24 +40,30 @@ private[kafka] object TopicCount extends Logging {
   val blackListPattern = "black_list"
   val staticPattern = "static"
 
-  def makeThreadId(consumerIdString: String, threadId: Int) = consumerIdString + "-" + threadId
+  def makeThreadId(consumerIdString: String, threadId: Int) =
+    consumerIdString + "-" + threadId
 
   def makeConsumerThreadIdsPerTopic(consumerIdString: String,
-                                    topicCountMap: Map[String,  Int]) = {
-    val consumerThreadIdsPerTopicMap = new mutable.HashMap[String, Set[ConsumerThreadId]]()
+                                    topicCountMap: Map[String, Int]) = {
+    val consumerThreadIdsPerTopicMap =
+      new mutable.HashMap[String, Set[ConsumerThreadId]]()
     for ((topic, nConsumers) <- topicCountMap) {
       val consumerSet = new mutable.HashSet[ConsumerThreadId]
       assert(nConsumers >= 1)
-      for (i <- 0 until nConsumers)
-        consumerSet += ConsumerThreadId(consumerIdString, i)
+      for (i <- 0 until nConsumers) consumerSet +=
+        ConsumerThreadId(consumerIdString, i)
       consumerThreadIdsPerTopicMap.put(topic, consumerSet)
     }
     consumerThreadIdsPerTopicMap
   }
 
-  def constructTopicCount(group: String, consumerId: String, zkUtils: ZkUtils, excludeInternalTopics: Boolean) : TopicCount = {
+  def constructTopicCount(group: String,
+                          consumerId: String,
+                          zkUtils: ZkUtils,
+                          excludeInternalTopics: Boolean): TopicCount = {
     val dirs = new ZKGroupDirs(group)
-    val topicCountString = zkUtils.readData(dirs.consumerRegistryDir + "/" + consumerId)._1
+    val topicCountString =
+      zkUtils.readData(dirs.consumerRegistryDir + "/" + consumerId)._1
     var subscriptionPattern: String = null
     var topMap: Map[String, Int] = null
     try {
@@ -66,14 +71,21 @@ private[kafka] object TopicCount extends Logging {
         case Some(m) =>
           val consumerRegistrationMap = m.asInstanceOf[Map[String, Any]]
           consumerRegistrationMap.get("pattern") match {
-            case Some(pattern) => subscriptionPattern = pattern.asInstanceOf[String]
-            case None => throw new KafkaException("error constructing TopicCount : " + topicCountString)
+            case Some(pattern) =>
+              subscriptionPattern = pattern.asInstanceOf[String]
+            case None =>
+              throw new KafkaException(
+                  "error constructing TopicCount : " + topicCountString)
           }
           consumerRegistrationMap.get("subscription") match {
             case Some(sub) => topMap = sub.asInstanceOf[Map[String, Int]]
-            case None => throw new KafkaException("error constructing TopicCount : " + topicCountString)
+            case None =>
+              throw new KafkaException(
+                  "error constructing TopicCount : " + topicCountString)
           }
-        case None => throw new KafkaException("error constructing TopicCount : " + topicCountString)
+        case None =>
+          throw new KafkaException(
+              "error constructing TopicCount : " + topicCountString)
       }
     } catch {
       case e: Throwable =>
@@ -90,32 +102,39 @@ private[kafka] object TopicCount extends Logging {
       val regex = topMap.head._1
       val numStreams = topMap.head._2
       val filter =
-        if (hasWhiteList)
-          new Whitelist(regex)
-        else
-          new Blacklist(regex)
-      new WildcardTopicCount(zkUtils, consumerId, filter, numStreams, excludeInternalTopics)
+        if (hasWhiteList) new Whitelist(regex)
+        else new Blacklist(regex)
+      new WildcardTopicCount(
+          zkUtils, consumerId, filter, numStreams, excludeInternalTopics)
     }
   }
 
-  def constructTopicCount(consumerIdString: String, topicCount: Map[String, Int]) =
+  def constructTopicCount(
+      consumerIdString: String, topicCount: Map[String, Int]) =
     new StaticTopicCount(consumerIdString, topicCount)
 
-  def constructTopicCount(consumerIdString: String, filter: TopicFilter, numStreams: Int, zkUtils: ZkUtils, excludeInternalTopics: Boolean) =
-    new WildcardTopicCount(zkUtils, consumerIdString, filter, numStreams, excludeInternalTopics)
-
+  def constructTopicCount(consumerIdString: String,
+                          filter: TopicFilter,
+                          numStreams: Int,
+                          zkUtils: ZkUtils,
+                          excludeInternalTopics: Boolean) =
+    new WildcardTopicCount(
+        zkUtils, consumerIdString, filter, numStreams, excludeInternalTopics)
 }
 
 private[kafka] class StaticTopicCount(val consumerIdString: String,
-                                val topicCountMap: Map[String, Int])
-                                extends TopicCount {
+                                      val topicCountMap: Map[String, Int])
+    extends TopicCount {
 
-  def getConsumerThreadIdsPerTopic = TopicCount.makeConsumerThreadIdsPerTopic(consumerIdString, topicCountMap)
+  def getConsumerThreadIdsPerTopic =
+    TopicCount.makeConsumerThreadIdsPerTopic(consumerIdString, topicCountMap)
 
   override def equals(obj: Any): Boolean = {
     obj match {
       case null => false
-      case n: StaticTopicCount => consumerIdString == n.consumerIdString && topicCountMap == n.topicCountMap
+      case n: StaticTopicCount =>
+        consumerIdString == n.consumerIdString &&
+        topicCountMap == n.topicCountMap
       case _ => false
     }
   }
@@ -129,14 +148,19 @@ private[kafka] class WildcardTopicCount(zkUtils: ZkUtils,
                                         consumerIdString: String,
                                         topicFilter: TopicFilter,
                                         numStreams: Int,
-                                        excludeInternalTopics: Boolean) extends TopicCount {
+                                        excludeInternalTopics: Boolean)
+    extends TopicCount {
   def getConsumerThreadIdsPerTopic = {
-    val wildcardTopics = zkUtils.getChildrenParentMayNotExist(ZkUtils.BrokerTopicsPath)
-                         .filter(topic => topicFilter.isTopicAllowed(topic, excludeInternalTopics))
-    TopicCount.makeConsumerThreadIdsPerTopic(consumerIdString, Map(wildcardTopics.map((_, numStreams)): _*))
+    val wildcardTopics = zkUtils
+      .getChildrenParentMayNotExist(ZkUtils.BrokerTopicsPath)
+      .filter(
+          topic => topicFilter.isTopicAllowed(topic, excludeInternalTopics))
+    TopicCount.makeConsumerThreadIdsPerTopic(
+        consumerIdString, Map(wildcardTopics.map((_, numStreams)): _*))
   }
 
-  def getTopicCountMap = Map(CoreUtils.JSONEscapeString(topicFilter.regex) -> numStreams)
+  def getTopicCountMap =
+    Map(CoreUtils.JSONEscapeString(topicFilter.regex) -> numStreams)
 
   def pattern: String = {
     topicFilter match {
@@ -144,6 +168,4 @@ private[kafka] class WildcardTopicCount(zkUtils: ZkUtils,
       case bl: Blacklist => TopicCount.blackListPattern
     }
   }
-
 }
-

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,12 +34,14 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
-
 /** Border Spec tests. */
 @RunWith(classOf[JUnitRunner])
-class BorderSpec extends SimpleSFXDelegateSpec[jfxsl.Border, Border](classOf[jfxsl.Border], classOf[Border]) {
+class BorderSpec
+    extends SimpleSFXDelegateSpec[jfxsl.Border, Border](
+        classOf[jfxsl.Border], classOf[Border]) {
 
-  override protected def getScalaClassInstance = new Border(getJavaClassInstance) {}
+  override protected def getScalaClassInstance =
+    new Border(getJavaClassInstance) {}
 
   override protected def getJavaClassInstance = Border.EMPTY
 }

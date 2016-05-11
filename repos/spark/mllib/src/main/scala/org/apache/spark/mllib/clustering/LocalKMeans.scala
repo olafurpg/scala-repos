@@ -24,15 +24,15 @@ import org.apache.spark.mllib.linalg.BLAS.{axpy, scal}
 import org.apache.spark.mllib.linalg.Vectors
 
 /**
- * An utility object to run K-means locally. This is private to the ML package because it's used
- * in the initialization of KMeans but not meant to be publicly exposed.
- */
+  * An utility object to run K-means locally. This is private to the ML package because it's used
+  * in the initialization of KMeans but not meant to be publicly exposed.
+  */
 private[mllib] object LocalKMeans extends Logging {
 
   /**
-   * Run K-means++ on the weighted point set `points`. This first does the K-means++
-   * initialization procedure and then rounds of Lloyd's algorithm.
-   */
+    * Run K-means++ on the weighted point set `points`. This first does the K-means++
+    * initialization procedure and then rounds of Lloyd's algorithm.
+    */
   def kMeansPlusPlus(
       seed: Int,
       points: Array[VectorWithNorm],
@@ -49,9 +49,13 @@ private[mllib] object LocalKMeans extends Logging {
     for (i <- 1 until k) {
       // Pick the next center with a probability proportional to cost under current centers
       val curCenters = centers.view.take(i)
-      val sum = points.view.zip(weights).map { case (p, w) =>
-        w * KMeans.pointCost(curCenters, p)
-      }.sum
+      val sum = points.view
+        .zip(weights)
+        .map {
+          case (p, w) =>
+            w * KMeans.pointCost(curCenters, p)
+        }
+        .sum
       val r = rand.nextDouble() * sum
       var cumulativeScore = 0.0
       var j = 0
@@ -60,8 +64,9 @@ private[mllib] object LocalKMeans extends Logging {
         j += 1
       }
       if (j == 0) {
-        logWarning("kMeansPlusPlus initialization ran out of distinct points for centers." +
-          s" Using duplicate point for center k = $i.")
+        logWarning(
+            "kMeansPlusPlus initialization ran out of distinct points for centers." +
+            s" Using duplicate point for center k = $i.")
         centers(i) = points(0).toDense
       } else {
         centers(i) = points(j - 1).toDense
@@ -104,7 +109,8 @@ private[mllib] object LocalKMeans extends Logging {
     }
 
     if (iteration == maxIterations) {
-      logInfo(s"Local KMeans++ reached the max number of iterations: $maxIterations.")
+      logInfo(
+          s"Local KMeans++ reached the max number of iterations: $maxIterations.")
     } else {
       logInfo(s"Local KMeans++ converged in $iteration iterations.")
     }
@@ -112,7 +118,8 @@ private[mllib] object LocalKMeans extends Logging {
     centers
   }
 
-  private def pickWeighted[T](rand: Random, data: Array[T], weights: Array[Double]): T = {
+  private def pickWeighted[T](
+      rand: Random, data: Array[T], weights: Array[Double]): T = {
     val r = rand.nextDouble() * weights.sum
     var i = 0
     var curWeight = 0.0

@@ -1,6 +1,4 @@
-
 object Test extends App {
-
 
   // test that finally is not covered by any exception handlers.
   def throwCatchFinally {
@@ -15,11 +13,9 @@ object Test extends App {
   def bar {
     try {
       println("hi")
-    }
-    catch {
+    } catch {
       case e: Throwable => println("SHOULD NOT GET HERE")
-    }
-    finally {
+    } finally {
       println("In Finally")
       throw new RuntimeException("ouch")
     }
@@ -71,20 +67,17 @@ object Test extends App {
   // return inside finally (each finally is executed once)
   def retFinally {
     try {
-      try println("body")
-      finally {
+      try println("body") finally {
         println("in finally 1")
         return
       }
     } finally println("in finally 2")
   }
 
-
   // throw inside finally (finally is executed once, exception is propagated)
   def throwFinally {
     try {
-      try println("body")
-      finally {
+      try println("body") finally {
         println("in finally")
         throw new Exception
       }

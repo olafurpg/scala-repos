@@ -5,8 +5,8 @@ import com.twitter.finagle.http.{Method, Request, Response}
 import com.twitter.util.Future
 
 /**
- * HEAD filter.  Implements HEAD by converting to a GET.
- */
+  * HEAD filter.  Implements HEAD by converting to a GET.
+  */
 class HeadFilter[Req <: Request] extends SimpleFilter[Req, Response] {
 
   def apply(request: Req, service: Service[Req, Response]): Future[Response] =
@@ -29,6 +29,5 @@ class HeadFilter[Req <: Request] extends SimpleFilter[Req, Response] {
       service(request)
     }
 }
-
 
 object HeadFilter extends HeadFilter[Request]

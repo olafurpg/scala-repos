@@ -5,11 +5,11 @@ import org.jetbrains.plugins.scala.codeInsight.intention.booleans.ReplaceEqualsO
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 /**
- * @author Ksenia.Sautina
- * @since 4/20/12
- */
-
-class ReplaceEqualsOrEqualityInMethodCallExprIntentionTest extends ScalaIntentionTestBase {
+  * @author Ksenia.Sautina
+  * @since 4/20/12
+  */
+class ReplaceEqualsOrEqualityInMethodCallExprIntentionTest
+    extends ScalaIntentionTestBase {
   val familyName = ReplaceEqualsOrEqualityInMethodCallExprIntention.familyName
 
   def testReplaceQuality() {

@@ -5,16 +5,16 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
 /**
- * Nikolay.Tropin
- * 2014-10-17
- */
+  * Nikolay.Tropin
+  * 2014-10-17
+  */
 trait ImplicitParametersOwner extends ScalaPsiElement {
 
   /**
-   * Warning! There is a hack in scala compiler for ClassManifest and ClassTag.
-   * In case of implicit parameter with type ClassManifest[T]
-   * this method will return ClassManifest with substitutor of type T.
-   * @return implicit parameters used for this expression
-   */
+    * Warning! There is a hack in scala compiler for ClassManifest and ClassTag.
+    * In case of implicit parameter with type ClassManifest[T]
+    * this method will return ClassManifest with substitutor of type T.
+    * @return implicit parameters used for this expression
+    */
   def findImplicitParameters: Option[Seq[ScalaResolveResult]]
 }

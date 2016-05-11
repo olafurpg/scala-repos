@@ -8,14 +8,15 @@ package object util {
 
 package testo {
 
-import org.codehaus.groovy.syntax.Numbers
+  import org.codehaus.groovy.syntax.Numbers
 
-object C {
-  import util.Numbers
+  object C {
+    import util.Numbers
 
-  class SomeClass {
-    /*start*/Numbers.PI/*end*/
+    class SomeClass {
+      /*start*/
+      Numbers.PI /*end*/
+    }
   }
-}
 }
 //Double

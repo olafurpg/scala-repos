@@ -26,28 +26,37 @@ import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types.DoubleType
 
 /**
- * :: Experimental ::
- * Evaluator for multiclass classification, which expects two input columns: score and label.
- */
+  * :: Experimental ::
+  * Evaluator for multiclass classification, which expects two input columns: score and label.
+  */
 @Since("1.5.0")
 @Experimental
-class MulticlassClassificationEvaluator @Since("1.5.0") (@Since("1.5.0") override val uid: String)
-  extends Evaluator with HasPredictionCol with HasLabelCol with DefaultParamsWritable {
+class MulticlassClassificationEvaluator @Since("1.5.0")(
+    @Since("1.5.0") override val uid: String)
+    extends Evaluator with HasPredictionCol with HasLabelCol
+    with DefaultParamsWritable {
 
   @Since("1.5.0")
   def this() = this(Identifiable.randomUID("mcEval"))
 
   /**
-   * param for metric name in evaluation (supports `"f1"` (default), `"precision"`, `"recall"`,
-   * `"weightedPrecision"`, `"weightedRecall"`)
-   * @group param
-   */
+    * param for metric name in evaluation (supports `"f1"` (default), `"precision"`, `"recall"`,
+    * `"weightedPrecision"`, `"weightedRecall"`)
+    * @group param
+    */
   @Since("1.5.0")
   val metricName: Param[String] = {
-    val allowedParams = ParamValidators.inArray(Array("f1", "precision",
-      "recall", "weightedPrecision", "weightedRecall"))
-    new Param(this, "metricName", "metric name in evaluation " +
-      "(f1|precision|recall|weightedPrecision|weightedRecall)", allowedParams)
+    val allowedParams = ParamValidators.inArray(
+        Array("f1",
+              "precision",
+              "recall",
+              "weightedPrecision",
+              "weightedRecall"))
+    new Param(this,
+              "metricName",
+              "metric name in evaluation " +
+              "(f1|precision|recall|weightedPrecision|weightedRecall)",
+              allowedParams)
   }
 
   /** @group getParam */
@@ -74,10 +83,11 @@ class MulticlassClassificationEvaluator @Since("1.5.0") (@Since("1.5.0") overrid
     SchemaUtils.checkColumnType(schema, $(predictionCol), DoubleType)
     SchemaUtils.checkColumnType(schema, $(labelCol), DoubleType)
 
-    val predictionAndLabels = dataset.select($(predictionCol), $(labelCol)).rdd.map {
-      case Row(prediction: Double, label: Double) =>
-        (prediction, label)
-    }
+    val predictionAndLabels =
+      dataset.select($(predictionCol), $(labelCol)).rdd.map {
+        case Row(prediction: Double, label: Double) =>
+          (prediction, label)
+      }
     val metrics = new MulticlassMetrics(predictionAndLabels)
     val metric = $(metricName) match {
       case "f1" => metrics.weightedFMeasure
@@ -99,13 +109,15 @@ class MulticlassClassificationEvaluator @Since("1.5.0") (@Since("1.5.0") overrid
   }
 
   @Since("1.5.0")
-  override def copy(extra: ParamMap): MulticlassClassificationEvaluator = defaultCopy(extra)
+  override def copy(extra: ParamMap): MulticlassClassificationEvaluator =
+    defaultCopy(extra)
 }
 
 @Since("1.6.0")
 object MulticlassClassificationEvaluator
-  extends DefaultParamsReadable[MulticlassClassificationEvaluator] {
+    extends DefaultParamsReadable[MulticlassClassificationEvaluator] {
 
   @Since("1.6.0")
-  override def load(path: String): MulticlassClassificationEvaluator = super.load(path)
+  override def load(path: String): MulticlassClassificationEvaluator =
+    super.load(path)
 }

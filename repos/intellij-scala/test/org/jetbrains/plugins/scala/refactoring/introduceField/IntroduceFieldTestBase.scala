@@ -19,10 +19,11 @@ import org.jetbrains.plugins.scala.util.ScalaUtils
 import org.junit.Assert._
 
 /**
- * Nikolay.Tropin
- * 7/17/13
- */
-abstract class IntroduceFieldTestBase() extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * Nikolay.Tropin
+  * 7/17/13
+  */
+abstract class IntroduceFieldTestBase()
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   private val startMarker = "/*start*/"
   private val endMarker = "/*end*/"
   private val replaceAllMarker = "/*replaceAll*/"
@@ -34,16 +35,22 @@ abstract class IntroduceFieldTestBase() extends ScalaLightPlatformCodeInsightTes
 
   protected def doTest() {
     val filePath = folderPath + getTestName(false) + ".scala"
-    val file = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
 
     val startOffset = fileText.indexOf(startMarker)
-    assert(startOffset != -1, "Not specified start marker in test case. Use /*start*/ in scala file for this.")
+    assert(
+        startOffset != -1,
+        "Not specified start marker in test case. Use /*start*/ in scala file for this.")
     fileText = fileText.replace(startMarker, "")
 
     val endOffset = fileText.indexOf(endMarker)
-    assert(endOffset != -1, "Not specified end marker in test case. Use /*end*/ in scala file for this.")
+    assert(
+        endOffset != -1,
+        "Not specified end marker in test case. Use /*end*/ in scala file for this.")
     fileText = fileText.replace(endMarker, "")
 
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
@@ -55,20 +62,30 @@ abstract class IntroduceFieldTestBase() extends ScalaLightPlatformCodeInsightTes
 
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
     val replaceAll = fileText.contains(replaceAllMarker)
-    val initInDecl = if (fileText.contains(initInDeclarationMarker)) Some(true)
-    else if (fileText.contains(initLocallyMarker)) Some(false)
-    else None
-    val selectedClassNumber = fileText.indexOf(selectedClassNumberMarker) match {
-      case -1 => 0
-      case idx: Int => fileText.charAt(idx + selectedClassNumberMarker.length).toString.toInt
-    }
+    val initInDecl =
+      if (fileText.contains(initInDeclarationMarker)) Some(true)
+      else if (fileText.contains(initLocallyMarker)) Some(false)
+      else None
+    val selectedClassNumber =
+      fileText.indexOf(selectedClassNumberMarker) match {
+        case -1 => 0
+        case idx: Int =>
+          fileText
+            .charAt(idx + selectedClassNumberMarker.length)
+            .toString
+            .toInt
+      }
 
     //start to inline
     try {
       val handler = new ScalaIntroduceFieldFromExpressionHandler
-      val Some((expr, types)) = ScalaRefactoringUtil.getExpression(getProjectAdapter, editor, scalaFile, startOffset, endOffset)
-      val aClass = expr.parents.toList.filter(_.isInstanceOf[ScTemplateDefinition])(selectedClassNumber).asInstanceOf[ScTemplateDefinition]
-      val ifc = new IntroduceFieldContext[ScExpression](getProjectAdapter, editor, scalaFile, expr, types, aClass)
+      val Some((expr, types)) = ScalaRefactoringUtil.getExpression(
+          getProjectAdapter, editor, scalaFile, startOffset, endOffset)
+      val aClass = expr.parents.toList
+        .filter(_.isInstanceOf[ScTemplateDefinition])(selectedClassNumber)
+        .asInstanceOf[ScTemplateDefinition]
+      val ifc = new IntroduceFieldContext[ScExpression](
+          getProjectAdapter, editor, scalaFile, expr, types, aClass)
       val settings = new IntroduceFieldSettings[ScExpression](ifc)
       settings.replaceAll = replaceAll
       initInDecl.foreach(settings.initInDeclaration = _)
@@ -83,9 +100,11 @@ abstract class IntroduceFieldTestBase() extends ScalaLightPlatformCodeInsightTes
         }
       }, getProjectAdapter, "Test")
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
-    }
-    catch {
-      case e: Exception => assert(assertion = false, message = e.getMessage + "\n" + e.getStackTrace.map(_.toString).mkString("  \n"))
+    } catch {
+      case e: Exception =>
+        assert(assertion = false,
+               message = e.getMessage + "\n" +
+                 e.getStackTrace.map(_.toString).mkString("  \n"))
     }
 
     val text = lastPsi.getText

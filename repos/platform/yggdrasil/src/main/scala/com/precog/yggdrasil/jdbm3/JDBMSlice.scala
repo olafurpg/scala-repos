@@ -40,14 +40,21 @@ import scala.annotation.tailrec
 import JDBMProjection._
 
 object JDBMSlice {
-  private lazy val logger = LoggerFactory.getLogger("com.precog.yggdrasil.jdbm3.JDBMSlice")
+  private lazy val logger =
+    LoggerFactory.getLogger("com.precog.yggdrasil.jdbm3.JDBMSlice")
 
-  def load(size: Int, source: () => Iterator[java.util.Map.Entry[Array[Byte],Array[Byte]]], keyDecoder: ColumnDecoder, valDecoder: ColumnDecoder): (Array[Byte], Array[Byte], Int) = {
+  def load(
+      size: Int,
+      source: () => Iterator[java.util.Map.Entry[Array[Byte], Array[Byte]]],
+      keyDecoder: ColumnDecoder,
+      valDecoder: ColumnDecoder): (Array[Byte], Array[Byte], Int) = {
     var firstKey: Array[Byte] = null.asInstanceOf[Array[Byte]]
-    var lastKey: Array[Byte]  = null.asInstanceOf[Array[Byte]]
+    var lastKey: Array[Byte] = null.asInstanceOf[Array[Byte]]
 
     @tailrec
-    def consumeRows(source: Iterator[java.util.Map.Entry[Array[Byte], Array[Byte]]], row: Int): Int = {
+    def consumeRows(
+        source: Iterator[java.util.Map.Entry[Array[Byte], Array[Byte]]],
+        row: Int): Int = {
       if (source.hasNext) {
         val entry = source.next
         val rowKey = entry.getKey
@@ -62,7 +69,7 @@ object JDBMSlice {
         row
       }
     }
-    
+
     val rows = {
       // FIXME: Looping here is a blatantly poor way to work around ConcurrentModificationExceptions
       // From the Javadoc for CME, the exception is an indication of a bug
@@ -79,7 +86,8 @@ object JDBMSlice {
         tries += 1
       }
       if (finalCount == -1) {
-        throw new VicciniException("Block read failed with too many concurrent mods.")
+        throw new VicciniException(
+            "Block read failed with too many concurrent mods.")
       } else {
         finalCount
       }
@@ -88,20 +96,21 @@ object JDBMSlice {
     (firstKey, lastKey, rows)
   }
 
-  def columnFor(prefix: CPath, sliceSize: Int)(ref: ColumnRef): (ColumnRef, ArrayColumn[_]) =
+  def columnFor(prefix: CPath, sliceSize: Int)(
+      ref: ColumnRef): (ColumnRef, ArrayColumn[_]) =
     (ref.copy(selector = (prefix \ ref.selector)), (ref.ctype match {
-      case CString      => ArrayStrColumn.empty(sliceSize)
-      case CBoolean     => ArrayBoolColumn.empty()
-      case CLong        => ArrayLongColumn.empty(sliceSize)
-      case CDouble      => ArrayDoubleColumn.empty(sliceSize)
-      case CNum         => ArrayNumColumn.empty(sliceSize)
-      case CDate        => ArrayDateColumn.empty(sliceSize)
-      case CPeriod      => ArrayPeriodColumn.empty(sliceSize)
-      case CNull        => MutableNullColumn.empty()
+      case CString => ArrayStrColumn.empty(sliceSize)
+      case CBoolean => ArrayBoolColumn.empty()
+      case CLong => ArrayLongColumn.empty(sliceSize)
+      case CDouble => ArrayDoubleColumn.empty(sliceSize)
+      case CNum => ArrayNumColumn.empty(sliceSize)
+      case CDate => ArrayDateColumn.empty(sliceSize)
+      case CPeriod => ArrayPeriodColumn.empty(sliceSize)
+      case CNull => MutableNullColumn.empty()
       case CEmptyObject => MutableEmptyObjectColumn.empty()
-      case CEmptyArray  => MutableEmptyArrayColumn.empty()
-      case CArrayType(elemType) => ArrayHomogeneousArrayColumn.empty(sliceSize)(elemType)
-      case CUndefined   => sys.error("CUndefined cannot be serialized")
+      case CEmptyArray => MutableEmptyArrayColumn.empty()
+      case CArrayType(elemType) =>
+        ArrayHomogeneousArrayColumn.empty(sliceSize)(elemType)
+      case CUndefined => sys.error("CUndefined cannot be serialized")
     }))
 }
-

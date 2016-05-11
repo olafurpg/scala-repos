@@ -17,7 +17,8 @@ class CompactLocalVariablesTest {
 
   // recurse-unreachable-jumps is required for eliminating catch blocks, in the first dce round they
   // are still live.only after eliminating the empty handler the catch blocks become unreachable.
-  val methodOptCompiler     = newCompiler(extraArgs = "-Yopt:unreachable-code,compact-locals")
+  val methodOptCompiler = newCompiler(
+      extraArgs = "-Yopt:unreachable-code,compact-locals")
   val noCompactVarsCompiler = newCompiler(extraArgs = "-Yopt:unreachable-code")
 
   @Test
@@ -58,21 +59,38 @@ class CompactLocalVariablesTest {
         |}
         |""".stripMargin
 
-    val List(noCompact)   = compileMethods(noCompactVarsCompiler)(code)
+    val List(noCompact) = compileMethods(noCompactVarsCompiler)(code)
     val List(withCompact) = compileMethods(methodOptCompiler)(code)
 
     // code is the same, except for local var indices
     assertTrue(noCompact.instructions.size == withCompact.instructions.size)
 
-    val varOpSlots = convertMethod(withCompact).instructions collect {
-      case VarOp(_, v) => v
-    }
-    assertTrue(varOpSlots.toString, varOpSlots == List(1, 2, 4, 5, 7, 8, 10, 11,  // stores
-                                                       1, 7, 2, 8, 4, 10, 5, 11)) // loads
+    val varOpSlots =
+      convertMethod(withCompact).instructions collect {
+        case VarOp(_, v) => v
+      }
+    assertTrue(varOpSlots.toString,
+               varOpSlots == List(1,
+                                  2,
+                                  4,
+                                  5,
+                                  7,
+                                  8,
+                                  10,
+                                  11, // stores
+                                  1,
+                                  7,
+                                  2,
+                                  8,
+                                  4,
+                                  10,
+                                  5,
+                                  11)) // loads
 
     // the local variables descriptor table is cleaned up to remove stale entries after dce,
     // also when the slots are not compacted
-    assertTrue(noCompact.localVariables.size == withCompact.localVariables.size)
+    assertTrue(
+        noCompact.localVariables.size == withCompact.localVariables.size)
 
     assertTrue(noCompact.maxLocals == 25)
     assertTrue(withCompact.maxLocals == 13)

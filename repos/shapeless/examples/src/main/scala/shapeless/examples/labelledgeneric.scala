@@ -19,37 +19,40 @@ package shapeless.examples
 import shapeless._
 
 /**
- * LabelledGeneric examples.
- * 
- * @author Miles Sabin
- */
+  * LabelledGeneric examples.
+  * 
+  * @author Miles Sabin
+  */
 object LabelledGenericExamples extends App {
   import record._
   import ops.record._
   import syntax.singleton._
 
   case class Book(author: String, title: String, id: Int, price: Double)
-  case class ExtendedBook(author: String, title: String, id: Int, price: Double, inPrint: Boolean)
+  case class ExtendedBook(
+      author: String, title: String, id: Int, price: Double, inPrint: Boolean)
 
   val bookGen = LabelledGeneric[Book]
   val bookExtGen = LabelledGeneric[ExtendedBook]
 
-  val tapl = Book("Benjamin Pierce", "Types and Programming Languages", 262162091, 44.11)
+  val tapl = Book(
+      "Benjamin Pierce", "Types and Programming Languages", 262162091, 44.11)
 
   val rec = bookGen.to(tapl)
 
   // Read price field
-  val currentPrice = rec('price)  // Static type is Double
-  println("Current price is "+currentPrice)
+  val currentPrice = rec('price) // Static type is Double
+  println("Current price is " + currentPrice)
   println
 
   // Update price field, relying on static type of currentPrice
-  val updated = bookGen.from(rec.updateWith('price)(_+2.0))
+  val updated = bookGen.from(rec.updateWith('price)(_ + 2.0))
   println(updated)
   println
 
   // Add a new field, map back into ExtendedBook
-  val extended = bookExtGen.from(rec + ('inPrint ->> true)) // Static type is ExtendedBook
+  val extended =
+    bookExtGen.from(rec + ('inPrint ->> true)) // Static type is ExtendedBook
   println(extended)
   println
 
@@ -65,9 +68,9 @@ object LabelledGenericExamples extends App {
 }
 
 /**
- * Utility trait intended for inferring a field type from a sample value and unpacking it into its
- * key and value types.
- */
+  * Utility trait intended for inferring a field type from a sample value and unpacking it into its
+  * key and value types.
+  */
 import labelled.FieldType
 
 trait Field {
@@ -77,7 +80,9 @@ trait Field {
 }
 
 object Field {
-  def apply[K0, V0](sample: FieldType[K0, V0]) = new Field { type K = K0; type V = V0 }
+  def apply[K0, V0](sample: FieldType[K0, V0]) = new Field {
+    type K = K0; type V = V0
+  }
 }
 
 object OldWineNewBottles extends App {

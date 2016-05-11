@@ -27,17 +27,17 @@ class KeywordCompletionExpressionsTest extends KeywordCompletionTestBase {
 
   def testinfixExpr(): Unit = doTest()
 
-  def testmatch(): Unit  = doTest()
+  def testmatch(): Unit = doTest()
 
-  def testnew(): Unit  = doTest()
+  def testnew(): Unit = doTest()
 
-  def testnoExpr(): Unit  = doTest()
+  def testnoExpr(): Unit = doTest()
 
-  def testtry(): Unit  = doTest()
+  def testtry(): Unit = doTest()
 
-  def testyield1(): Unit  = doTest()
+  def testyield1(): Unit = doTest()
 
-  def testyield2(): Unit  = doTest()
+  def testyield2(): Unit = doTest()
 
-  def testyield3(): Unit  = doTest()
+  def testyield3(): Unit = doTest()
 }

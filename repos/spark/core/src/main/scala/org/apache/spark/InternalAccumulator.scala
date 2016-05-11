@@ -19,11 +19,10 @@ package org.apache.spark
 
 import org.apache.spark.storage.{BlockId, BlockStatus}
 
-
 /**
- * A collection of fields and methods concerned with internal accumulators that represent
- * task level metrics.
- */
+  * A collection of fields and methods concerned with internal accumulators that represent
+  * task level metrics.
+  */
 private[spark] object InternalAccumulator {
 
   import AccumulatorParam._
@@ -51,8 +50,10 @@ private[spark] object InternalAccumulator {
 
   // Names of shuffle read metrics
   object shuffleRead {
-    val REMOTE_BLOCKS_FETCHED = SHUFFLE_READ_METRICS_PREFIX + "remoteBlocksFetched"
-    val LOCAL_BLOCKS_FETCHED = SHUFFLE_READ_METRICS_PREFIX + "localBlocksFetched"
+    val REMOTE_BLOCKS_FETCHED =
+      SHUFFLE_READ_METRICS_PREFIX + "remoteBlocksFetched"
+    val LOCAL_BLOCKS_FETCHED =
+      SHUFFLE_READ_METRICS_PREFIX + "localBlocksFetched"
     val REMOTE_BYTES_READ = SHUFFLE_READ_METRICS_PREFIX + "remoteBytesRead"
     val LOCAL_BYTES_READ = SHUFFLE_READ_METRICS_PREFIX + "localBytesRead"
     val FETCH_WAIT_TIME = SHUFFLE_READ_METRICS_PREFIX + "fetchWaitTime"
@@ -83,29 +84,32 @@ private[spark] object InternalAccumulator {
   // scalastyle:on
 
   /**
-   * Create an internal [[Accumulator]] by name, which must begin with [[METRICS_PREFIX]].
-   */
+    * Create an internal [[Accumulator]] by name, which must begin with [[METRICS_PREFIX]].
+    */
   def create(name: String): Accumulator[_] = {
-    require(name.startsWith(METRICS_PREFIX),
-      s"internal accumulator name must start with '$METRICS_PREFIX': $name")
+    require(
+        name.startsWith(METRICS_PREFIX),
+        s"internal accumulator name must start with '$METRICS_PREFIX': $name")
     getParam(name) match {
       case p @ LongAccumulatorParam => newMetric[Long](0L, name, p)
       case p @ IntAccumulatorParam => newMetric[Int](0, name, p)
       case p @ StringAccumulatorParam => newMetric[String]("", name, p)
       case p @ UpdatedBlockStatusesAccumulatorParam =>
         newMetric[Seq[(BlockId, BlockStatus)]](Seq(), name, p)
-      case p => throw new IllegalArgumentException(
-        s"unsupported accumulator param '${p.getClass.getSimpleName}' for metric '$name'.")
+      case p =>
+        throw new IllegalArgumentException(
+            s"unsupported accumulator param '${p.getClass.getSimpleName}' for metric '$name'.")
     }
   }
 
   /**
-   * Get the [[AccumulatorParam]] associated with the internal metric name,
-   * which must begin with [[METRICS_PREFIX]].
-   */
+    * Get the [[AccumulatorParam]] associated with the internal metric name,
+    * which must begin with [[METRICS_PREFIX]].
+    */
   def getParam(name: String): AccumulatorParam[_] = {
-    require(name.startsWith(METRICS_PREFIX),
-      s"internal accumulator name must start with '$METRICS_PREFIX': $name")
+    require(
+        name.startsWith(METRICS_PREFIX),
+        s"internal accumulator name must start with '$METRICS_PREFIX': $name")
     name match {
       case UPDATED_BLOCK_STATUSES => UpdatedBlockStatusesAccumulatorParam
       case shuffleRead.LOCAL_BLOCKS_FETCHED => IntAccumulatorParam
@@ -117,76 +121,69 @@ private[spark] object InternalAccumulator {
   }
 
   /**
-   * Accumulators for tracking internal metrics.
-   */
+    * Accumulators for tracking internal metrics.
+    */
   def createAll(): Seq[Accumulator[_]] = {
     Seq[String](
-      EXECUTOR_DESERIALIZE_TIME,
-      EXECUTOR_RUN_TIME,
-      RESULT_SIZE,
-      JVM_GC_TIME,
-      RESULT_SERIALIZATION_TIME,
-      MEMORY_BYTES_SPILLED,
-      DISK_BYTES_SPILLED,
-      PEAK_EXECUTION_MEMORY,
-      UPDATED_BLOCK_STATUSES).map(create) ++
-      createShuffleReadAccums() ++
-      createShuffleWriteAccums() ++
-      createInputAccums() ++
-      createOutputAccums() ++
-      sys.props.get("spark.testing").map(_ => create(TEST_ACCUM)).toSeq
+        EXECUTOR_DESERIALIZE_TIME,
+        EXECUTOR_RUN_TIME,
+        RESULT_SIZE,
+        JVM_GC_TIME,
+        RESULT_SERIALIZATION_TIME,
+        MEMORY_BYTES_SPILLED,
+        DISK_BYTES_SPILLED,
+        PEAK_EXECUTION_MEMORY,
+        UPDATED_BLOCK_STATUSES).map(create) ++ createShuffleReadAccums() ++ createShuffleWriteAccums() ++ createInputAccums() ++ createOutputAccums() ++ sys.props
+      .get("spark.testing")
+      .map(_ => create(TEST_ACCUM))
+      .toSeq
   }
 
   /**
-   * Accumulators for tracking shuffle read metrics.
-   */
+    * Accumulators for tracking shuffle read metrics.
+    */
   def createShuffleReadAccums(): Seq[Accumulator[_]] = {
-    Seq[String](
-      shuffleRead.REMOTE_BLOCKS_FETCHED,
-      shuffleRead.LOCAL_BLOCKS_FETCHED,
-      shuffleRead.REMOTE_BYTES_READ,
-      shuffleRead.LOCAL_BYTES_READ,
-      shuffleRead.FETCH_WAIT_TIME,
-      shuffleRead.RECORDS_READ).map(create)
+    Seq[String](shuffleRead.REMOTE_BLOCKS_FETCHED,
+                shuffleRead.LOCAL_BLOCKS_FETCHED,
+                shuffleRead.REMOTE_BYTES_READ,
+                shuffleRead.LOCAL_BYTES_READ,
+                shuffleRead.FETCH_WAIT_TIME,
+                shuffleRead.RECORDS_READ).map(create)
   }
 
   /**
-   * Accumulators for tracking shuffle write metrics.
-   */
+    * Accumulators for tracking shuffle write metrics.
+    */
   def createShuffleWriteAccums(): Seq[Accumulator[_]] = {
-    Seq[String](
-      shuffleWrite.BYTES_WRITTEN,
-      shuffleWrite.RECORDS_WRITTEN,
-      shuffleWrite.WRITE_TIME).map(create)
+    Seq[String](shuffleWrite.BYTES_WRITTEN,
+                shuffleWrite.RECORDS_WRITTEN,
+                shuffleWrite.WRITE_TIME).map(create)
   }
 
   /**
-   * Accumulators for tracking input metrics.
-   */
+    * Accumulators for tracking input metrics.
+    */
   def createInputAccums(): Seq[Accumulator[_]] = {
-    Seq[String](
-      input.READ_METHOD,
-      input.BYTES_READ,
-      input.RECORDS_READ).map(create)
+    Seq[String](input.READ_METHOD, input.BYTES_READ, input.RECORDS_READ)
+      .map(create)
   }
 
   /**
-   * Accumulators for tracking output metrics.
-   */
+    * Accumulators for tracking output metrics.
+    */
   def createOutputAccums(): Seq[Accumulator[_]] = {
-    Seq[String](
-      output.WRITE_METHOD,
-      output.BYTES_WRITTEN,
-      output.RECORDS_WRITTEN).map(create)
+    Seq[String](output.WRITE_METHOD,
+                output.BYTES_WRITTEN,
+                output.RECORDS_WRITTEN).map(create)
   }
 
   /**
-   * Accumulators for tracking internal metrics.
-   *
-   * These accumulators are created with the stage such that all tasks in the stage will
-   * add to the same set of accumulators. We do this to report the distribution of accumulator
-   * values across all tasks within each stage.
-   */
+    * Accumulators for tracking internal metrics.
+    *
+    * These accumulators are created with the stage such that all tasks in the stage will
+    * add to the same set of accumulators. We do this to report the distribution of accumulator
+    * values across all tasks within each stage.
+    */
   def create(sc: SparkContext): Seq[Accumulator[_]] = {
     val accums = createAll()
     accums.foreach { accum =>
@@ -197,13 +194,15 @@ private[spark] object InternalAccumulator {
   }
 
   /**
-   * Create a new accumulator representing an internal task metric.
-   */
-  private def newMetric[T](
-      initialValue: T,
-      name: String,
-      param: AccumulatorParam[T]): Accumulator[T] = {
-    new Accumulator[T](initialValue, param, Some(name), internal = true, countFailedValues = true)
+    * Create a new accumulator representing an internal task metric.
+    */
+  private def newMetric[T](initialValue: T,
+                           name: String,
+                           param: AccumulatorParam[T]): Accumulator[T] = {
+    new Accumulator[T](initialValue,
+                       param,
+                       Some(name),
+                       internal = true,
+                       countFailedValues = true)
   }
-
 }

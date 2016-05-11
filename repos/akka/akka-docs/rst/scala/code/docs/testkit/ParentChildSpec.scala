@@ -13,9 +13,8 @@ import akka.testkit.TestActorRef
 import akka.actor.ActorRefFactory
 
 /**
- * Parent-Child examples
- */
-
+  * Parent-Child examples
+  */
 //#test-example
 class Parent extends Actor {
   val child = context.actorOf(Props[Child], "child")
@@ -23,7 +22,7 @@ class Parent extends Actor {
 
   def receive = {
     case "pingit" => child ! "ping"
-    case "pong"   => ponged = true
+    case "pong" => ponged = true
   }
 }
 
@@ -49,25 +48,25 @@ class DependentParent(childProps: Props) extends Actor {
 
   def receive = {
     case "pingit" => child ! "ping"
-    case "pong"   => ponged = true
+    case "pong" => ponged = true
   }
 }
 
-class GenericDependentParent(childMaker: ActorRefFactory => ActorRef) extends Actor {
+class GenericDependentParent(childMaker: ActorRefFactory => ActorRef)
+    extends Actor {
   val child = childMaker(context)
   var ponged = false
 
   def receive = {
     case "pingit" => child ! "ping"
-    case "pong"   => ponged = true
+    case "pong" => ponged = true
   }
 }
 //#test-dependentparent
 
 /**
- * Test specification
- */
-
+  * Test specification
+  */
 class MockedChild extends Actor {
   def receive = {
     case "ping" => sender ! "pong"
@@ -101,7 +100,8 @@ class ParentChildSpec extends WordSpec with Matchers with TestKitBase {
       val probe = TestProbe()
       //#child-maker-test
       val maker = (_: ActorRefFactory) => probe.ref
-      val parent = system.actorOf(Props(classOf[GenericDependentParent], maker))
+      val parent =
+        system.actorOf(Props(classOf[GenericDependentParent], maker))
       //#child-maker-test
       probe.send(parent, "pingit")
       probe.expectMsg("ping")
@@ -110,7 +110,8 @@ class ParentChildSpec extends WordSpec with Matchers with TestKitBase {
     "demonstrate production version of child creator" in {
       //#child-maker-prod
       val maker = (f: ActorRefFactory) => f.actorOf(Props[Child])
-      val parent = system.actorOf(Props(classOf[GenericDependentParent], maker))
+      val parent =
+        system.actorOf(Props(classOf[GenericDependentParent], maker))
       //#child-maker-prod
     }
   }
@@ -119,11 +120,12 @@ class ParentChildSpec extends WordSpec with Matchers with TestKitBase {
   "A fabricated parent" should {
     "test its child responses" in {
       val proxy = TestProbe()
-      val parent = system.actorOf(Props(new Actor {
+      val parent = system.actorOf(
+          Props(new Actor {
         val child = context.actorOf(Props[Child], "child")
         def receive = {
           case x if sender == child => proxy.ref forward x
-          case x                    => child forward x
+          case x => child forward x
         }
       }))
 

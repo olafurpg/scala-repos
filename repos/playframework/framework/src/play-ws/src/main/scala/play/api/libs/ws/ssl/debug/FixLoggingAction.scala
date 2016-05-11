@@ -10,11 +10,13 @@ import java.security.PrivilegedExceptionAction
 import play.api.libs.ws.ssl.MonkeyPatcher
 
 /**
- * A privileged action that will find relevant classes containing static final fields of type T and replace
- * them with the object referenced by {{newDebug}}, and switch out the "args" field value with the value defined
- * in {{newOptions}}.  This is the only way to change JSSE debugging after the class loads.
- */
-abstract class FixLoggingAction extends PrivilegedExceptionAction[Unit] with MonkeyPatcher with ClassFinder {
+  * A privileged action that will find relevant classes containing static final fields of type T and replace
+  * them with the object referenced by {{newDebug}}, and switch out the "args" field value with the value defined
+  * in {{newOptions}}.  This is the only way to change JSSE debugging after the class loads.
+  */
+abstract class FixLoggingAction
+    extends PrivilegedExceptionAction[Unit] with MonkeyPatcher
+    with ClassFinder {
 
   def newOptions: String
 
@@ -23,5 +25,4 @@ abstract class FixLoggingAction extends PrivilegedExceptionAction[Unit] with Mon
     val modifiers: Int = field.getModifiers
     field.getType == definedType && isStatic(modifiers)
   }
-
 }

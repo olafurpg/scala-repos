@@ -10,8 +10,8 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
 
   private[this] val currentTestClassName = new mutable.Stack[String]()
 
-  def this(loggers: Array[Logger], settings: RunSettings,
-      testClassName: String) = {
+  def this(
+      loggers: Array[Logger], settings: RunSettings, testClassName: String) = {
     this(loggers, settings)
     currentTestClassName.push(testClassName)
   }
@@ -20,18 +20,15 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
     currentTestClassName.push(s)
 
   def popCurrentTestClassName(): Unit = {
-    if (currentTestClassName.size > 1)
-      currentTestClassName.pop()
+    if (currentTestClassName.size > 1) currentTestClassName.pop()
   }
 
   def debug(s: String): Unit = {
-    for (l <- loggers)
-      l.debug(filterAnsiIfNeeded(l, s))
+    for (l <- loggers) l.debug(filterAnsiIfNeeded(l, s))
   }
 
   def error(s: String): Unit = {
-    for (l <- loggers)
-      l.error(filterAnsiIfNeeded(l, s))
+    for (l <- loggers) l.error(filterAnsiIfNeeded(l, s))
   }
 
   def error(s: String, t: Throwable): Unit = {
@@ -41,13 +38,11 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
   }
 
   def info(s: String): Unit = {
-    for (l <- loggers)
-      l.info(filterAnsiIfNeeded(l, s))
+    for (l <- loggers) l.info(filterAnsiIfNeeded(l, s))
   }
 
   def warn(s: String): Unit = {
-    for (l <- loggers)
-      l.warn(filterAnsiIfNeeded(l, s))
+    for (l <- loggers) l.warn(filterAnsiIfNeeded(l, s))
   }
 
   private def filterAnsiIfNeeded(l: Logger, s: String): String =
@@ -66,16 +61,22 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
       if (settings.color) findTestFileName(trace, testClassName)
       else null
     }
-    val i = trace.indexWhere {
-      p => p.getFileName != null && p.getFileName.contains("JUnitExecuteTest.scala")
-    } - 1
+    val i =
+      trace.indexWhere { p =>
+        p.getFileName != null &&
+        p.getFileName.contains("JUnitExecuteTest.scala")
+      } - 1
     val m = if (i > 0) i else trace.length - 1
-    logStackTracePart(trace, m, trace.length - m - 1, t, testClassName, testFileName)
+    logStackTracePart(
+        trace, m, trace.length - m - 1, t, testClassName, testFileName)
   }
 
-  private def logStackTracePart(trace: Array[StackTraceElement], m: Int,
-      framesInCommon: Int, t: Throwable, testClassName: String,
-      testFileName: String): Unit = {
+  private def logStackTracePart(trace: Array[StackTraceElement],
+                                m: Int,
+                                framesInCommon: Int,
+                                t: Throwable,
+                                testClassName: String,
+                                testFileName: String): Unit = {
     val m0 = m
     var m2 = m
     var top = 0
@@ -104,8 +105,9 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
     }
 
     for (i <- top to m2) {
-      error("    at " +
-        stackTraceElementToString(trace(i), testClassName, testFileName))
+      error(
+          "    at " + stackTraceElementToString(
+              trace(i), testClassName, testFileName))
     }
     if (m0 != m2) {
       // skip junit-related frames
@@ -118,7 +120,9 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
   }
 
   private def logStackTraceAsCause(causedTrace: Array[StackTraceElement],
-      t: Throwable, testClassName: String, testFileName: String): Unit = {
+                                   t: Throwable,
+                                   testClassName: String,
+                                   testFileName: String): Unit = {
     if (t != null) {
       val trace = t.getStackTrace
       var m = trace.length - 1
@@ -128,22 +132,26 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
         n -= 1
       }
       error("Caused by: " + t)
-      logStackTracePart(trace, m, trace.length - 1 - m, t, testClassName, testFileName)
+      logStackTracePart(
+          trace, m, trace.length - 1 - m, t, testClassName, testFileName)
     }
   }
 
-  private def findTestFileName(trace: Array[StackTraceElement], testClassName: String): String = {
+  private def findTestFileName(
+      trace: Array[StackTraceElement], testClassName: String): String = {
     trace.collectFirst {
       case e if testClassName.equals(e.getClassName) => e.getFileName
     }.orNull
   }
 
   private def stackTraceElementToString(e: StackTraceElement,
-      testClassName: String, testFileName: String): String = {
-    val highlight = settings.color && {
-      testClassName == e.getClassName ||
-      (testFileName != null && testFileName == e.getFileName)
-    }
+                                        testClassName: String,
+                                        testFileName: String): String = {
+    val highlight =
+      settings.color && {
+        testClassName == e.getClassName ||
+        (testFileName != null && testFileName == e.getFileName)
+      }
     var r = ""
     r += settings.decodeName(e.getClassName + '.' + e.getMethodName)
     r += '('
@@ -156,7 +164,8 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
       r += c(e.getFileName, if (highlight) TESTFILE1 else null)
       if (e.getLineNumber >= 0) {
         r += ':'
-        r += c(String.valueOf(e.getLineNumber), if (highlight) TESTFILE2 else null)
+        r += c(String.valueOf(e.getLineNumber),
+               if (highlight) TESTFILE2 else null)
       }
     }
     r += ')'

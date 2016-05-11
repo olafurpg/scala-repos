@@ -11,4 +11,3 @@ object Test {
     case T(T(_)) => ()
   }
 }
-

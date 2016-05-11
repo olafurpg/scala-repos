@@ -9,16 +9,15 @@ final class ComplianceRequirement(
 object ComplianceRequirement {
 
   /** Checks whether the given semantics are compliant with the given
-   *  requirements.
-   *  @throws BadComplianceException if the semantics are not compliant.
-   */
+    *  requirements.
+    *  @throws BadComplianceException if the semantics are not compliant.
+    */
   final def checkCompliance(requirements: Traversable[ComplianceRequirement],
-      semantics: Semantics): Unit = {
-    val unmet = requirements.filterNot(compliance =>
-        semantics.isCompliant(compliance.semantics))
+                            semantics: Semantics): Unit = {
+    val unmet = requirements.filterNot(
+        compliance => semantics.isCompliant(compliance.semantics))
 
-    if (unmet.nonEmpty)
-      throw new BadComplianceException(unmet.toList)
+    if (unmet.nonEmpty) throw new BadComplianceException(unmet.toList)
   }
 
   def mergeFromManifests(
@@ -34,5 +33,4 @@ object ComplianceRequirement {
       (semantics, tups) <- flatTups.groupBy(_._1)
     } yield new ComplianceRequirement(semantics, tups.map(_._2).toList)
   }
-
 }

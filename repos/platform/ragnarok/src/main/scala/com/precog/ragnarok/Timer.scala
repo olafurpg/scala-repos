@@ -19,10 +19,9 @@
  */
 package com.precog.ragnarok
 
-import scalaz.{ Ordering => _, _ }
+import scalaz.{Ordering => _, _}
 
-import org.joda.time.{ Instant, Interval }
-
+import org.joda.time.{Instant, Interval}
 
 trait Timer[T] {
   import scala.math.Ordering.Implicits._
@@ -39,25 +38,20 @@ trait Timer[T] {
   }
 }
 
-
 /**
- * Nanosecond timer, implemented using `System.nanoTime()`.
- */
+  * Nanosecond timer, implemented using `System.nanoTime()`.
+  */
 object SimpleTimer extends Timer[Long] {
   def now() = System.nanoTime()
 
   val TimeOrdering: Ordering[Long] = Ordering.Long
 }
 
-
 /**
- * Millisecond timer, implemented using Joda Time `Instant`s.
- */
+  * Millisecond timer, implemented using Joda Time `Instant`s.
+  */
 object JodaTimer extends Timer[Instant] {
   def now() = new Instant()
 
   val TimeOrdering: Ordering[Instant] = Ordering.Long.on[Instant](_.getMillis)
 }
-
-
-

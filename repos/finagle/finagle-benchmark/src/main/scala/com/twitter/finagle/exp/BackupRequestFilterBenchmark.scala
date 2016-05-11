@@ -9,10 +9,10 @@ import java.util.concurrent.atomic.AtomicInteger
 import org.openjdk.jmh.annotations.{Benchmark, Scope, State}
 
 /**
- * This test is used for allocation more so than performance.
- *
- * In other words, it's best run with "-prof gc".
- */
+  * This test is used for allocation more so than performance.
+  *
+  * In other words, it's best run with "-prof gc".
+  */
 @State(Scope.Benchmark)
 class BackupRequestFilterBenchmark extends StdBenchAnnotations {
 
@@ -21,22 +21,20 @@ class BackupRequestFilterBenchmark extends StdBenchAnnotations {
   private[this] val Response = Future.value(1000)
 
   private[this] val backupReqFilter = new BackupRequestFilter[String, Int](
-    95,
-    1.second,
-    timer,
-    NullStatsReceiver,
-    1.minute
+      95,
+      1.second,
+      timer,
+      NullStatsReceiver,
+      1.minute
   )
 
-  private[this] val svc =
-    backupReqFilter.andThen(Service.const(Response))
+  private[this] val svc = backupReqFilter.andThen(Service.const(Response))
 
-  private[this] val sometimesSleepySvc =
-    backupReqFilter.andThen(Service.mk[String, Int] { _ =>
-      if (i.incrementAndGet() % 100 == 0)
-        Thread.sleep(2)
-      Response
-    })
+  private[this] val sometimesSleepySvc = backupReqFilter.andThen(
+      Service.mk[String, Int] { _ =>
+    if (i.incrementAndGet() % 100 == 0) Thread.sleep(2)
+    Response
+  })
 
   @Benchmark
   def noBackups(): Int =
@@ -45,5 +43,4 @@ class BackupRequestFilterBenchmark extends StdBenchAnnotations {
   @Benchmark
   def onePercentBackups(): Int =
     Await.result(sometimesSleepySvc(""))
-
 }

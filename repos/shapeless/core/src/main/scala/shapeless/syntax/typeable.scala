@@ -18,19 +18,20 @@ package shapeless
 package syntax
 
 object typeable {
-  implicit def typeableOps[T](t : T): TypeableOps[T] = new TypeableOps(t)
+  implicit def typeableOps[T](t: T): TypeableOps[T] = new TypeableOps(t)
 }
 
-final class TypeableOps[T](val t : T) extends AnyVal with Serializable {
-  /**
-   * Cast the receiver to a value of type `U` if possible. This operation will be as precise wrt erasure as possible
-   * given the in-scope `Typeable` instances available.
-   */
-  def cast[U](implicit castU : Typeable[U]) = castU.cast(t)
+final class TypeableOps[T](val t: T) extends AnyVal with Serializable {
 
   /**
-   * Cast the receiver to a value of subtype `U` of the receiver's static type if possible. This operation will be as
-   * precise wrt erasure as possible given the in-scope `Typeable` instances available.
-   */
+    * Cast the receiver to a value of type `U` if possible. This operation will be as precise wrt erasure as possible
+    * given the in-scope `Typeable` instances available.
+    */
+  def cast[U](implicit castU: Typeable[U]) = castU.cast(t)
+
+  /**
+    * Cast the receiver to a value of subtype `U` of the receiver's static type if possible. This operation will be as
+    * precise wrt erasure as possible given the in-scope `Typeable` instances available.
+    */
   def narrowTo[U <: T](implicit castU: Typeable[U]) = castU.cast(t)
 }

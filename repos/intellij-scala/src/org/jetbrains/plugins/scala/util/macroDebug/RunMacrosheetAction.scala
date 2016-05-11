@@ -15,27 +15,38 @@ import org.jetbrains.plugins.scala.worksheet.actions.{CleanWorksheetAction, TopC
 import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
- * @author Ksenia.Sautina
- * @author Dmitry Naydanov        
- * @since 10/17/12
- */
-
+  * @author Ksenia.Sautina
+  * @author Dmitry Naydanov        
+  * @since 10/17/12
+  */
 class RunMacrosheetAction extends AnAction with TopComponentAction {
-  def createBlankEditor(project: Project, defaultText: String = "", lang: Language = StdLanguages.TEXT): Editor = {
-    val editor = EditorFactory.getInstance.createViewer(PsiDocumentManager.getInstance(project).getDocument(
-      PsiFileFactory.getInstance(project).createFileFromText("dummy", lang, defaultText)), project)
+  def createBlankEditor(project: Project,
+                        defaultText: String = "",
+                        lang: Language = StdLanguages.TEXT): Editor = {
+    val editor = EditorFactory.getInstance.createViewer(
+        PsiDocumentManager
+          .getInstance(project)
+          .getDocument(PsiFileFactory
+                .getInstance(project)
+                .createFileFromText("dummy", lang, defaultText)),
+        project)
     editor setBorder null
     editor
   }
 
   def actionPerformed(e: AnActionEvent) {
-    val editor = FileEditorManager.getInstance(e.getProject).getSelectedTextEditor
+    val editor =
+      FileEditorManager.getInstance(e.getProject).getSelectedTextEditor
     if (editor == null) return
 
-    val psiFile: PsiFile = PsiDocumentManager.getInstance(e.getProject).getPsiFile(editor.getDocument)
+    val psiFile: PsiFile = PsiDocumentManager
+      .getInstance(e.getProject)
+      .getPsiFile(editor.getDocument)
     psiFile match {
       case file: ScalaFile =>
-        val viewer = WorksheetEditorPrinter.newMacrosheetUiFor(editor, file.getVirtualFile).getViewerEditor
+        val viewer = WorksheetEditorPrinter
+          .newMacrosheetUiFor(editor, file.getVirtualFile)
+          .getViewerEditor
 
         val project = e.getProject
 
@@ -44,14 +55,16 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
             override def run() {
               extensions.inWriteAction {
                 CleanWorksheetAction.resetScrollModel(viewer)
-                CleanWorksheetAction.cleanWorksheet(file.getNode, editor, viewer, project)
+                CleanWorksheetAction.cleanWorksheet(
+                    file.getNode, editor, viewer, project)
               }
             }
           }, ModalityState.any())
         }
 
         ScalaMacroDebuggingUtil.macrosToExpand.clear()
-        ScalaMacroDebuggingUtil.allMacroCalls.foreach(ScalaMacroDebuggingUtil.macrosToExpand.add)
+        ScalaMacroDebuggingUtil.allMacroCalls.foreach(
+            ScalaMacroDebuggingUtil.macrosToExpand.add)
         ScalaMacroDebuggingUtil.expandMacros(project)
 
       case _ =>

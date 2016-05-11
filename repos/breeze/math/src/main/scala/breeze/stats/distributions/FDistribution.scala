@@ -14,19 +14,25 @@ package distributions
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-*/
+ */
 import math.log
 import org.apache.commons.math3.distribution.{FDistribution => ApacheFDistribution, RealDistribution => ApacheRealDistribution}
-/**
- * The F-distribution - ratio of two scaled chi^2 variables
- *
- * @author stucchio
-*/
 
-class FDistribution(numeratorDegreesOfFreedom: Double, denominatorDegreesOfFreedom: Double) extends ApacheContinuousDistribution /* with Moments[Double,Double] */ {
+/**
+  * The F-distribution - ratio of two scaled chi^2 variables
+  *
+  * @author stucchio
+  */
+class FDistribution(
+    numeratorDegreesOfFreedom: Double, denominatorDegreesOfFreedom: Double)
+    extends ApacheContinuousDistribution /* with Moments[Double,Double] */ {
   //Moments not implemented cause I can't find the entropy of it
-  protected final val inner = new ApacheFDistribution(numeratorDegreesOfFreedom, denominatorDegreesOfFreedom)
-  def mode = ((numeratorDegreesOfFreedom-2)/numeratorDegreesOfFreedom)*(denominatorDegreesOfFreedom/(denominatorDegreesOfFreedom+2))
+  protected final val inner = new ApacheFDistribution(
+      numeratorDegreesOfFreedom, denominatorDegreesOfFreedom)
+  def mode =
+    ((numeratorDegreesOfFreedom - 2) / numeratorDegreesOfFreedom) *
+    (denominatorDegreesOfFreedom / (denominatorDegreesOfFreedom + 2))
 }
 
-object FDistribution extends ContinuousDistributionUFuncProvider[Double,FDistribution]
+object FDistribution
+    extends ContinuousDistributionUFuncProvider[Double, FDistribution]

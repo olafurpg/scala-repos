@@ -12,11 +12,12 @@ import org.jetbrains.plugins.scala.extensions._
 
 import scala.annotation.tailrec
 
-class UTestRunConfiguration(override val project: Project,
-                            override val configurationFactory: ConfigurationFactory,
-                            override val name: String)
-        extends AbstractTestRunConfiguration(project, configurationFactory, name)
-        with ScalaTestingConfiguration {
+class UTestRunConfiguration(
+    override val project: Project,
+    override val configurationFactory: ConfigurationFactory,
+    override val name: String)
+    extends AbstractTestRunConfiguration(project, configurationFactory, name)
+    with ScalaTestingConfiguration {
 
   override protected[test] def isInvalidSuite(clazz: PsiClass): Boolean = {
     val list: PsiModifierList = clazz.getModifierList
@@ -24,16 +25,21 @@ class UTestRunConfiguration(override val project: Project,
   }
 
   @tailrec
-  private def getClassPath(currentClass: ScTypeDefinition, acc: String = ""): String = {
-    val parentTypeDef = PsiTreeUtil.getParentOfType(currentClass, classOf[ScTypeDefinition], true)
+  private def getClassPath(
+      currentClass: ScTypeDefinition, acc: String = ""): String = {
+    val parentTypeDef = PsiTreeUtil.getParentOfType(
+        currentClass, classOf[ScTypeDefinition], true)
     if (parentTypeDef == null) {
       currentClass.qualifiedName + acc
     } else {
-      getClassPath(parentTypeDef, acc + (if (parentTypeDef.isObject) "$" else ".") + currentClass.getName)
+      getClassPath(parentTypeDef,
+                   acc + (if (parentTypeDef.isObject) "$" else ".") +
+                   currentClass.getName)
     }
   }
 
-  override protected def getClassFileNames(classes: scala.collection.mutable.HashSet[PsiClass]): Seq[String] =
+  override protected def getClassFileNames(
+      classes: scala.collection.mutable.HashSet[PsiClass]): Seq[String] =
     classes.map {
       case typeDef: ScTypeDefinition => getClassPath(typeDef)
       case aClass => aClass.qualifiedName
@@ -43,7 +49,8 @@ class UTestRunConfiguration(override val project: Project,
 
   override def suitePaths = List("utest.framework.TestSuite")
 
-  override def mainClass = "org.jetbrains.plugins.scala.testingSupport.uTest.UTestRunner"
+  override def mainClass =
+    "org.jetbrains.plugins.scala.testingSupport.uTest.UTestRunner"
 
   override def errorMessage: String = "utest is not specified"
 

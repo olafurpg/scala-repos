@@ -11,5 +11,4 @@ object Test extends InteractiveTest {
     askLoadedTyped(b).get
     super.runDefaultTests()
   }
-
 }

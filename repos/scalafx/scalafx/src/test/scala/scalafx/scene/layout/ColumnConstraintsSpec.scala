@@ -36,11 +36,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * ColumnConstraints Spec tests.
- *
- *
- */
+  * ColumnConstraints Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ColumnConstraintsSpec
-  extends SimpleSFXDelegateSpec[jfxsl.ColumnConstraints, ColumnConstraints](
-    classOf[jfxsl.ColumnConstraints], classOf[ColumnConstraints])
+    extends SimpleSFXDelegateSpec[jfxsl.ColumnConstraints, ColumnConstraints](
+        classOf[jfxsl.ColumnConstraints], classOf[ColumnConstraints])

@@ -38,10 +38,11 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
   test("call-by-name tail evaluated at most once") {
     val p = new Promise[Unit]
-    val s = () +:: {
-      if (p.setDone()) of(())
-      else AsyncStream.empty[Unit]
-    }
+    val s =
+      () +:: {
+        if (p.setDone()) of(())
+        else AsyncStream.empty[Unit]
+      }
     assert(toSeq(s) == toSeq(s))
   }
 
@@ -98,10 +99,11 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
   test("lazy ops") {
     val p = new Promise[Unit]
-    val s = () +:: {
-      p.setDone()
-      undefined: AsyncStream[Unit]
-    }
+    val s =
+      () +:: {
+        p.setDone()
+        undefined: AsyncStream[Unit]
+      }
 
     s.map(x => 0)
     assert(!p.isDefined)
@@ -130,10 +132,14 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     s.uncons
     assert(!p.isDefined)
 
-    s.foldRight(Future.Done) { (_, _) => Future.Done }
+    s.foldRight(Future.Done) { (_, _) =>
+      Future.Done
+    }
     assert(!p.isDefined)
 
-    s.scanLeft(Future.Done) { (_, _) => Future.Done }
+    s.scanLeft(Future.Done) { (_, _) =>
+      Future.Done
+    }
     assert(!p.isDefined)
 
     s ++ s
@@ -149,11 +155,12 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("memoized stream") {
     class Ctx[A](ops: AsyncStream[Int] => AsyncStream[A]) {
       var once = 0
-      val s: AsyncStream[Int] = 2 +:: {
-        once = once + 1
-        if (once > 1) throw new Exception("evaluated more than once")
-        AsyncStream.of(1)
-      }
+      val s: AsyncStream[Int] =
+        2 +:: {
+          once = once + 1
+          if (once > 1) throw new Exception("evaluated more than once")
+          AsyncStream.of(1)
+        }
 
       val ss = ops(s)
       ss.foreach(_ => ())
@@ -168,7 +175,11 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     new Ctx(s => s.withFilter(_ => true))
     new Ctx(s => s.take(2))
     new Ctx(s => s.takeWhile(_ => true))
-    new Ctx(s => s.scanLeft(Future.Done) { (_, _) => Future.Done })
+    new Ctx(
+        s =>
+          s.scanLeft(Future.Done) { (_, _) =>
+        Future.Done
+    })
     new Ctx(s => s ++ s)
   }
 
@@ -251,7 +262,7 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
   test("scanLeft is eager") {
     val never = AsyncStream.fromFuture(Future.never)
-    val hd = never.scanLeft("hi")((_,_) => ???).head
+    val hd = never.scanLeft("hi")((_, _) => ???).head
     assert(hd.isDefined)
     assert(await(hd) == Some("hi"))
   }
@@ -310,14 +321,16 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
   }
 
   test("take") {
-    forAll(genListAndN) { case (as, n) =>
-      assert(toSeq(fromSeq(as).take(n)) == as.take(n))
+    forAll(genListAndN) {
+      case (as, n) =>
+        assert(toSeq(fromSeq(as).take(n)) == as.take(n))
     }
   }
 
   test("drop") {
-    forAll(genListAndN) { case (as, n) =>
-      assert(toSeq(fromSeq(as).drop(n)) == as.drop(n))
+    forAll(genListAndN) {
+      case (as, n) =>
+        assert(toSeq(fromSeq(as).drop(n)) == as.drop(n))
     }
   }
 
@@ -378,41 +391,45 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("buffer() has the same properties as take() and drop()") {
     // We need items to be non-empty, because AsyncStream.empty ++
     // <something> forces the future to be created.
-    val gen = Gen.zip(Gen.nonEmptyListOf(Arbitrary.arbitrary[Char]), Arbitrary.arbitrary[Int])
+    val gen = Gen.zip(Gen.nonEmptyListOf(Arbitrary.arbitrary[Char]),
+                      Arbitrary.arbitrary[Int])
 
-    forAll(gen) { case (items, n) =>
-      var forced1 = false
-      val stream1 = fromSeq(items) ++ { forced1 = true; AsyncStream.empty[Char] }
-      var forced2 = false
-      val stream2 = fromSeq(items) ++ { forced2 = true; AsyncStream.empty[Char] }
+    forAll(gen) {
+      case (items, n) =>
+        var forced1 = false
+        val stream1 =
+          fromSeq(items) ++ { forced1 = true; AsyncStream.empty[Char] }
+        var forced2 = false
+        val stream2 =
+          fromSeq(items) ++ { forced2 = true; AsyncStream.empty[Char] }
 
-      val takeResult = toSeq(stream2.take(n))
-      val (bufferResult, bufferRest) = await(stream1.buffer(n))
-      assert(takeResult == bufferResult)
+        val takeResult = toSeq(stream2.take(n))
+        val (bufferResult, bufferRest) = await(stream1.buffer(n))
+        assert(takeResult == bufferResult)
 
-      // Strictness property: we should only need to force the full
-      // stream if we asked for more items that were present in the
-      // stream.
-      assert(forced1 == (n > items.size))
-      assert(forced1 == forced2)
-      val wasForced = forced1
+        // Strictness property: we should only need to force the full
+        // stream if we asked for more items that were present in the
+        // stream.
+        assert(forced1 == (n > items.size))
+        assert(forced1 == forced2)
+        val wasForced = forced1
 
-      // Strictness property: Since AsyncStream contains a Future
-      // rather than a thunk, we need to evaluate the next element in
-      // order to get the result of drop and the rest of the stream
-      // after buffering.
-      val bufferTail = bufferRest()
-      val dropTail = stream2.drop(n)
-      assert(forced1 == (n >= items.size))
-      assert(forced1 == forced2)
+        // Strictness property: Since AsyncStream contains a Future
+        // rather than a thunk, we need to evaluate the next element in
+        // order to get the result of drop and the rest of the stream
+        // after buffering.
+        val bufferTail = bufferRest()
+        val dropTail = stream2.drop(n)
+        assert(forced1 == (n >= items.size))
+        assert(forced1 == forced2)
 
-      // This is the only case that should have caused the item to be forced.
-      assert((wasForced == forced1) || n == items.size)
+        // This is the only case that should have caused the item to be forced.
+        assert((wasForced == forced1) || n == items.size)
 
-      // Forcing the rest of the sequence should always cause evaluation.
-      assert(toSeq(bufferTail) == toSeq(dropTail))
-      assert(forced1)
-      assert(forced2)
+        // Forcing the rest of the sequence should always cause evaluation.
+        assert(toSeq(bufferTail) == toSeq(dropTail))
+        assert(forced1)
+        assert(forced2)
     }
   }
 
@@ -435,38 +452,40 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
   }
 
   test("grouped should be lazy") {
-    val gen =
-      for {
-        // We need items to be non-empty, because AsyncStream.empty ++
-        // <something> forces the future to be created.
-        items <- Gen.nonEmptyListOf(Arbitrary.arbitrary[Char])
+    val gen = for {
+      // We need items to be non-empty, because AsyncStream.empty ++
+      // <something> forces the future to be created.
+      items <- Gen.nonEmptyListOf(Arbitrary.arbitrary[Char])
 
-        // We need to make sure that the chunk size (1) is valid and (2)
-        // is short enough that forcing the first group does not force
-        // the exception.
-        groupSize <- Gen.chooseNum(1, items.size)
-      } yield (items, groupSize)
+      // We need to make sure that the chunk size (1) is valid and (2)
+      // is short enough that forcing the first group does not force
+      // the exception.
+      groupSize <- Gen.chooseNum(1, items.size)
+    } yield (items, groupSize)
 
-    forAll(gen) { case (items, groupSize) =>
-      var forced = false
-      val stream: AsyncStream[Char] = fromSeq(items) ++ { forced = true; AsyncStream.empty }
+    forAll(gen) {
+      case (items, groupSize) =>
+        var forced = false
+        val stream: AsyncStream[Char] =
+          fromSeq(items) ++ { forced = true; AsyncStream.empty }
 
-      val expected = items.grouped(groupSize).toSeq.headOption
-      // This will take up to items.size items from the stream. This
-      // does not require forcing the tail.
-      val actual = await(stream.grouped(groupSize).head)
-      assert(actual == expected)
-      assert(!forced)
-      val expectedChunks = items.grouped(groupSize).toSeq
-      val allChunks = toSeq(stream.grouped(groupSize))
-      assert(allChunks == expectedChunks)
-      assert(forced)
+        val expected = items.grouped(groupSize).toSeq.headOption
+        // This will take up to items.size items from the stream. This
+        // does not require forcing the tail.
+        val actual = await(stream.grouped(groupSize).head)
+        assert(actual == expected)
+        assert(!forced)
+        val expectedChunks = items.grouped(groupSize).toSeq
+        val allChunks = toSeq(stream.grouped(groupSize))
+        assert(allChunks == expectedChunks)
+        assert(forced)
     }
   }
 
   test("mapConcurrent preserves items") {
     forAll(Arbitrary.arbitrary[List[Int]], Gen.choose(1, 10)) { (xs, conc) =>
-      assert(toSeq(AsyncStream.fromSeq(xs).mapConcurrent(conc)(Future.value)).sorted == xs.sorted)
+      assert(
+          toSeq(AsyncStream.fromSeq(xs).mapConcurrent(conc)(Future.value)).sorted == xs.sorted)
     }
   }
 
@@ -498,7 +517,7 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
         // The stream as a whole is still blocking on the unsatisfied promise
         assert(!mapped.foreach(_ => ()).isDefined)
 
-      // Unblock the first value
+        // Unblock the first value
         first.setValue(xs.head)
       }
 
@@ -513,12 +532,11 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     forAll(Gen.choose(2, 10), Arbitrary.arbitrary[Seq[Int]]) { (conc, xs) =>
       val q = new scala.collection.mutable.Queue[Promise[Unit]]
 
-      val mapped =
-        AsyncStream.fromSeq(xs).mapConcurrent(conc) { _ =>
-          val p = new Promise[Unit]
-          q.enqueue(p)
-          p
-        }
+      val mapped = AsyncStream.fromSeq(xs).mapConcurrent(conc) { _ =>
+        val p = new Promise[Unit]
+        q.enqueue(p)
+        p
+      }
 
       // If there are at least `conc` items in the queue, then we should
       // have started exactly `conc` of them. Otherwise, we should have
@@ -556,22 +574,22 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     }
   }
 
-  test("mapConcurrent makes progress, even with blocking streams and blocking work") {
-    val gen =
-      Gen.zip(
+  test(
+      "mapConcurrent makes progress, even with blocking streams and blocking work") {
+    val gen = Gen.zip(
         Gen.choose(0, 10).label("numActions"),
         Gen.choose(0, 10).flatMap(Gen.listOfN(_, Arbitrary.arbitrary[Int])),
         Gen.choose(1, 11).label("concurrency")
-      )
+    )
 
-    forAll(gen) { case (numActions, items, concurrency) =>
-      val input: AsyncStream[Int] =
-        AsyncStream.fromSeq(items) ++ AsyncStream.fromFuture(Future.never)
+    forAll(gen) {
+      case (numActions, items, concurrency) =>
+        val input: AsyncStream[Int] =
+          AsyncStream.fromSeq(items) ++ AsyncStream.fromFuture(Future.never)
 
-      var workStarted = 0
-      var workFinished = 0
-      val result =
-        input.mapConcurrent(concurrency) { i =>
+        var workStarted = 0
+        var workFinished = 0
+        val result = input.mapConcurrent(concurrency) { i =>
           workStarted += 1
           if (workFinished < numActions) {
             workFinished += 1
@@ -583,19 +601,19 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
           }
         }
 
-      // How much work should have been started by mapConcurrent.
-      val expectedStarted = items.size.min(concurrency)
-      assert(workStarted == expectedStarted, "work started")
+        // How much work should have been started by mapConcurrent.
+        val expectedStarted = items.size.min(concurrency)
+        assert(workStarted == expectedStarted, "work started")
 
-      val expectedFinished = numActions.min(expectedStarted)
-      assert(workFinished == expectedFinished, "expected finished")
+        val expectedFinished = numActions.min(expectedStarted)
+        assert(workFinished == expectedFinished, "expected finished")
 
-      // Make sure that all of the finished items are now
-      // available. (As a side-effect, this will force more work to
-      // be done if concurrency was the limiting factor.)
-      val completed = toSeq(result.take(workFinished)).sorted
-      val expectedCompleted = items.take(expectedFinished).sorted
-      assert(completed == expectedCompleted)
+        // Make sure that all of the finished items are now
+        // available. (As a side-effect, this will force more work to
+        // be done if concurrency was the limiting factor.)
+        val completed = toSeq(result.take(workFinished)).sorted
+        val expectedCompleted = items.take(expectedFinished).sorted
+        assert(completed == expectedCompleted)
     }
   }
 
@@ -624,7 +642,7 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
     forAll { xs: List[Int] =>
       val p = new Promise[Unit]
       // The promise will be defined iff the tail is forced.
-      val s = AsyncStream.fromSeq(xs) ++ { p.setDone() ; AsyncStream.empty }
+      val s = AsyncStream.fromSeq(xs) ++ { p.setDone(); AsyncStream.empty }
 
       // If the input is empty, then the tail will be forced right away.
       assert(p.isDefined == xs.isEmpty)
@@ -636,25 +654,26 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
   }
 
   test("withEffect") {
-    forAll(genListAndN) { case (xs, n) =>
-      var i = 0
-      val s = AsyncStream.fromSeq(xs).withEffect(_ => i += 1)
+    forAll(genListAndN) {
+      case (xs, n) =>
+        var i = 0
+        val s = AsyncStream.fromSeq(xs).withEffect(_ => i += 1)
 
-      // Is lazy on initial application (with the exception of the first element)
-      assert(i == (if (xs.isEmpty) 0 else 1))
+        // Is lazy on initial application (with the exception of the first element)
+        assert(i == (if (xs.isEmpty) 0 else 1))
 
-      // Is lazy when consuming the stream
-      await(s.take(n).force)
+        // Is lazy when consuming the stream
+        await(s.take(n).force)
 
-      // If the list is empty, no effects should occur.  If the list is
-      // non-empty, the effect will occur for the first item right away,
-      // since the head is not lazy. Otherwise, we expect the same
-      // number of effects as items demanded.
-      val expected = if (xs.isEmpty) 0 else 1.max(xs.length.min(n))
-      assert(i == expected)
+        // If the list is empty, no effects should occur.  If the list is
+        // non-empty, the effect will occur for the first item right away,
+        // since the head is not lazy. Otherwise, we expect the same
+        // number of effects as items demanded.
+        val expected = if (xs.isEmpty) 0 else 1.max(xs.length.min(n))
+        assert(i == expected)
 
-      // Preserves the elements in the stream
-      assert(toSeq(s) == xs)
+        // Preserves the elements in the stream
+        assert(toSeq(s) == xs)
     }
   }
 }
@@ -676,7 +695,8 @@ private object AsyncStreamTest {
     s match {
       case Nil => AsyncStream.empty
       case a +: Nil => AsyncStream.of(a)
-      case a +: b +: Nil => AsyncStream.embed(Future.value(a +:: AsyncStream.of(b)))
+      case a +: b +: Nil =>
+        AsyncStream.embed(Future.value(a +:: AsyncStream.of(b)))
       case a +: as => a +:: fromSeq(as)
     }
 }

@@ -23,6 +23,4 @@ object SimpleStepping {
   def main(args: Array[String]) {
     new SimpleStepping().mainTest
   }
-
 }
-

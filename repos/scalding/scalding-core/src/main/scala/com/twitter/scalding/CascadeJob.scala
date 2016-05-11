@@ -32,5 +32,4 @@ abstract class CascadeJob(args: Args) extends Job(args) {
    * Good for checking the cascade stats
    */
   def postProcessCascade(cascade: Cascade) = {}
-
 }

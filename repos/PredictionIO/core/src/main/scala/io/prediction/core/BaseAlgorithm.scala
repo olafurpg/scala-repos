@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.core
 
 import com.google.gson.TypeAdapterFactory
@@ -29,6 +28,7 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 trait BaseQuerySerializer {
+
   /** :: DeveloperApi ::
     * Serializer for Scala query classes using
     * [[io.prediction.controller.Utils.json4sDefaultFormats]]
@@ -53,7 +53,8 @@ trait BaseQuerySerializer {
   */
 @DeveloperApi
 abstract class BaseAlgorithm[PD, M, Q, P]
-  extends AbstractDoer with BaseQuerySerializer {
+    extends AbstractDoer with BaseQuerySerializer {
+
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. This is called by workflow
     * to train a model.
@@ -75,8 +76,8 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     * @return Batch of predicted results
     */
   @DeveloperApi
-  def batchPredictBase(sc: SparkContext, bm: Any, qs: RDD[(Long, Q)])
-  : RDD[(Long, P)]
+  def batchPredictBase(
+      sc: SparkContext, bm: Any, qs: RDD[(Long, Q)]): RDD[(Long, P)]
 
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. Called by serving to
@@ -106,10 +107,8 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     */
   @DeveloperApi
   def makePersistentModel(
-    sc: SparkContext,
-    modelId: String,
-    algoParams: Params,
-    bm: Any): Any = Unit
+      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any =
+    Unit
 
   /** :: DeveloperApi ::
     * Obtains the type signature of query for this algorithm
@@ -117,7 +116,8 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     * @return Type signature of query
     */
   def queryClass: Class[Q] = {
-    val types = TypeResolver.resolveRawArguments(classOf[BaseAlgorithm[PD, M, Q, P]], getClass)
+    val types = TypeResolver.resolveRawArguments(
+        classOf[BaseAlgorithm[PD, M, Q, P]], getClass)
     types(2).asInstanceOf[Class[Q]]
   }
 }

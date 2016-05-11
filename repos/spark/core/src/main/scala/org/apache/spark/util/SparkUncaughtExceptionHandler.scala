@@ -20,18 +20,20 @@ package org.apache.spark.util
 import org.apache.spark.internal.Logging
 
 /**
- * The default uncaught exception handler for Executors terminates the whole process, to avoid
- * getting into a bad state indefinitely. Since Executors are relatively lightweight, it's better
- * to fail fast when things go wrong.
- */
+  * The default uncaught exception handler for Executors terminates the whole process, to avoid
+  * getting into a bad state indefinitely. Since Executors are relatively lightweight, it's better
+  * to fail fast when things go wrong.
+  */
 private[spark] object SparkUncaughtExceptionHandler
-  extends Thread.UncaughtExceptionHandler with Logging {
+    extends Thread.UncaughtExceptionHandler with Logging {
 
   override def uncaughtException(thread: Thread, exception: Throwable) {
     try {
       // Make it explicit that uncaught exceptions are thrown when container is shutting down.
       // It will help users when they analyze the executor logs
-      val inShutdownMsg = if (ShutdownHookManager.inShutdown()) "[Container in shutdown] " else ""
+      val inShutdownMsg =
+        if (ShutdownHookManager.inShutdown()) "[Container in shutdown] "
+        else ""
       val errMsg = "Uncaught exception in thread "
       logError(inShutdownMsg + errMsg + thread, exception)
 
@@ -46,7 +48,8 @@ private[spark] object SparkUncaughtExceptionHandler
       }
     } catch {
       case oom: OutOfMemoryError => Runtime.getRuntime.halt(SparkExitCode.OOM)
-      case t: Throwable => Runtime.getRuntime.halt(SparkExitCode.UNCAUGHT_EXCEPTION_TWICE)
+      case t: Throwable =>
+        Runtime.getRuntime.halt(SparkExitCode.UNCAUGHT_EXCEPTION_TWICE)
     }
   }
 

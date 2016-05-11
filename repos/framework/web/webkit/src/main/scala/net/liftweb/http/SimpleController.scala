@@ -23,10 +23,9 @@ import net.liftweb.util._
 import provider._
 
 /**
- * The base trait of Controllers that handle pre-view requests
- */
-trait SimpleController
- {
+  * The base trait of Controllers that handle pre-view requests
+  */
+trait SimpleController {
   def request: Req
 
   def httpRequest: HTTPRequest
@@ -34,10 +33,11 @@ trait SimpleController
   def param(name: String): Box[String] = {
     request.params.get(name) match {
       case None => Empty
-      case Some(nl) => nl.take(1) match {
-        case Nil => Empty
-        case l => Full(l.head)
-      }
+      case Some(nl) =>
+        nl.take(1) match {
+          case Nil => Empty
+          case l => Full(l.head)
+        }
     }
   }
 
@@ -58,4 +58,3 @@ trait SimpleController
     httpRequest.session.removeAttribute(name)
   }
 }
-

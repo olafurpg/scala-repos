@@ -8,13 +8,13 @@ package play.api.libs.ws.ssl
 import javax.net.ssl.SSLContext
 
 /**
- * This class contains sets of recommended and deprecated TLS cipher suites.
- *
- * The JSSE list of cipher suites is different from the RFC defined list, with some cipher suites prefixed with "SSL_"
- * instead of "TLS_".  A full list is available from the <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/SunProviders.html#SupportedCipherSuites">SunJSSE provider list</a>
- *
- * Please see https://www.playframework.com/documentation/latest/CipherSuites for more details.
- */
+  * This class contains sets of recommended and deprecated TLS cipher suites.
+  *
+  * The JSSE list of cipher suites is different from the RFC defined list, with some cipher suites prefixed with "SSL_"
+  * instead of "TLS_".  A full list is available from the <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/SunProviders.html#SupportedCipherSuites">SunJSSE provider list</a>
+  *
+  * Please see https://www.playframework.com/documentation/latest/CipherSuites for more details.
+  */
 object Ciphers {
 
   // We want to prioritize ECC and perfect forward security.
@@ -22,22 +22,22 @@ object Ciphers {
   // using OpenJDK, you're out of luck.
   // http://armoredbarista.blogspot.com/2013/10/how-to-use-ecc-with-openjdk.html
 
-  def recommendedCiphers: Seq[String] = foldVersion(
-    run16 = java16RecommendedCiphers,
-    runHigher = java17RecommendedCiphers)
+  def recommendedCiphers: Seq[String] =
+    foldVersion(
+        run16 = java16RecommendedCiphers, runHigher = java17RecommendedCiphers)
 
   lazy val java17RecommendedCiphers: Seq[String] = {
     SSLContext.getDefault.getDefaultSSLParameters.getCipherSuites
   }.filterNot(deprecatedCiphers.contains(_))
 
   val java16RecommendedCiphers: Seq[String] = Seq(
-    "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
-    "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
-    "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
-    "TLS_RSA_WITH_AES_256_CBC_SHA",
-    "TLS_RSA_WITH_AES_128_CBC_SHA",
-    "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
-    "TLS_EMPTY_RENEGOTIATION_INFO_SCSV" // per RFC 5746
+      "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+      "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+      "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
+      "TLS_RSA_WITH_AES_256_CBC_SHA",
+      "TLS_RSA_WITH_AES_128_CBC_SHA",
+      "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
+      "TLS_EMPTY_RENEGOTIATION_INFO_SCSV" // per RFC 5746
   )
 
   // Suite B profile for TLS (requires 1.2): http://tools.ietf.org/html/rfc6460
@@ -53,7 +53,8 @@ object Ciphers {
                                      |TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
                                    """.stripMargin.split("\n")
 
-  val suiteBTransitionalCiphers: Seq[String] = """TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+  val suiteBTransitionalCiphers: Seq[String] =
+    """TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
                                                  |TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384
                                                  |TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
                                                  |TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
@@ -64,16 +65,16 @@ object Ciphers {
   // From http://op-co.de/blog/posts/android_ssl_downgrade/
   // Caveat: https://news.ycombinator.com/item?id=6548545
   val recommendedSmithCiphers = Seq(
-    "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-    "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
-    "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
-    "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
-    "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
-    "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
-    "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
-    "TLS_RSA_WITH_AES_128_CBC_SHA",
-    "TLS_RSA_WITH_AES_256_CBC_SHA",
-    "SSL_RSA_WITH_3DES_EDE_CBC_SHA"
+      "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+      "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+      "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+      "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+      "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+      "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+      "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
+      "TLS_RSA_WITH_AES_128_CBC_SHA",
+      "TLS_RSA_WITH_AES_256_CBC_SHA",
+      "SSL_RSA_WITH_3DES_EDE_CBC_SHA"
   )
 
   val exportCiphers = """SSL_RSA_EXPORT_WITH_RC4_40_MD5
@@ -177,6 +178,6 @@ object Ciphers {
 
   // See RFC 4346, RFC 5246, and RFC 5469
   // rc4 added to deprecated ciphers as of https://tools.ietf.org/html/rfc7465
-  val deprecatedCiphers = desCiphers ++ nullCiphers ++ anonCiphers ++ exportCiphers ++ rc4Ciphers
-
+  val deprecatedCiphers =
+    desCiphers ++ nullCiphers ++ anonCiphers ++ exportCiphers ++ rc4Ciphers
 }

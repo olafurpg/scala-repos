@@ -7,16 +7,21 @@ package play.api.templates
 object PlayMagic {
 
   /**
-   * Generates a set of valid HTML attributes.
-   *
-   * For example:
-   * {{{
-   * toHtmlArgs(Seq('id -> "item", 'style -> "color:red"))
-   * }}}
-   */
-  def toHtmlArgs(args: Map[Symbol, Any]) = play.twirl.api.Html(args.map({
-    case (s, None) => s.name
-    case (s, v) => s.name + "=\"" + play.twirl.api.HtmlFormat.escape(v.toString).body + "\""
-  }).mkString(" "))
-
+    * Generates a set of valid HTML attributes.
+    *
+    * For example:
+    * {{{
+    * toHtmlArgs(Seq('id -> "item", 'style -> "color:red"))
+    * }}}
+    */
+  def toHtmlArgs(args: Map[Symbol, Any]) =
+    play.twirl.api.Html(
+        args
+          .map({
+        case (s, None) => s.name
+        case (s, v) =>
+          s.name +
+          "=\"" + play.twirl.api.HtmlFormat.escape(v.toString).body + "\""
+      })
+          .mkString(" "))
 }

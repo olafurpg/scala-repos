@@ -15,11 +15,11 @@ import org.jetbrains.plugins.scala.codeInspection.AbstractFixOnPsiElement
 import org.jetbrains.plugins.scala.extensions._
 
 /**
- * User: Alefas
- * Date: 06.02.12
- */
-
-class RenameElementQuickfix(myRef: PsiElement, name: String) extends AbstractFixOnPsiElement(name, myRef) {
+  * User: Alefas
+  * Date: 06.02.12
+  */
+class RenameElementQuickfix(myRef: PsiElement, name: String)
+    extends AbstractFixOnPsiElement(name, myRef) {
   def doApplyFix(project: Project) {
     val elem = getElement
     if (!elem.isValid) return
@@ -30,23 +30,33 @@ class RenameElementQuickfix(myRef: PsiElement, name: String) extends AbstractFix
     }
   }
 
-  private def actionEventForElement(project: Project, action: AnAction): AnActionEvent = {
+  private def actionEventForElement(
+      project: Project, action: AnAction): AnActionEvent = {
     import scala.collection.JavaConversions._
     import scala.collection.mutable
 
     val ref = getElement
     val map = mutable.Map[String, AnyRef]()
     val containingFile = ref.getContainingFile
-    val editor: Editor = InjectedLanguageUtil.openEditorFor(containingFile, project)
+    val editor: Editor =
+      InjectedLanguageUtil.openEditorFor(containingFile, project)
     if (editor.isInstanceOf[EditorWindow]) {
       map.put(CommonDataKeys.EDITOR.getName, editor)
       map.put(CommonDataKeys.PSI_ELEMENT.getName, ref)
     } else if (ApplicationManager.getApplication.isUnitTestMode) {
-      val element = new TextEditorPsiDataProvider().getData(CommonDataKeys.PSI_ELEMENT.getName,
-        editor, editor.getCaretModel.getCurrentCaret)
+      val element = new TextEditorPsiDataProvider().getData(
+          CommonDataKeys.PSI_ELEMENT.getName,
+          editor,
+          editor.getCaretModel.getCurrentCaret)
       map.put(CommonDataKeys.PSI_ELEMENT.getName, element)
     }
-    val dataContext = SimpleDataContext.getSimpleContext(map, DataManager.getInstance.getDataContext(editor.getComponent))
-    new AnActionEvent(null, dataContext, "", action.getTemplatePresentation, ActionManager.getInstance, 0)
+    val dataContext = SimpleDataContext.getSimpleContext(
+        map, DataManager.getInstance.getDataContext(editor.getComponent))
+    new AnActionEvent(null,
+                      dataContext,
+                      "",
+                      action.getTemplatePresentation,
+                      ActionManager.getInstance,
+                      0)
   }
 }

@@ -13,4 +13,4 @@ import java.util.ArrayList
 class UsedImport {
   val x: ArrayList[Int] = new ArrayList[Int](5)
 }
-*/
+ */

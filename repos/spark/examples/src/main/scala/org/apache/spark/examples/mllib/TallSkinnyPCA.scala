@@ -23,17 +23,17 @@ import org.apache.spark.mllib.linalg.distributed.RowMatrix
 import org.apache.spark.mllib.linalg.Vectors
 
 /**
- * Compute the principal components of a tall-and-skinny matrix, whose rows are observations.
- *
- * The input matrix must be stored in row-oriented dense format, one line per row with its entries
- * separated by space. For example,
- * {{{
- * 0.5 1.0
- * 2.0 3.0
- * 4.0 5.0
- * }}}
- * represents a 3-by-2 matrix, whose first row is (0.5, 1.0).
- */
+  * Compute the principal components of a tall-and-skinny matrix, whose rows are observations.
+  *
+  * The input matrix must be stored in row-oriented dense format, one line per row with its entries
+  * separated by space. For example,
+  * {{{
+  * 0.5 1.0
+  * 2.0 3.0
+  * 4.0 5.0
+  * }}}
+  * represents a 3-by-2 matrix, whose first row is (0.5, 1.0).
+  */
 object TallSkinnyPCA {
   def main(args: Array[String]) {
     if (args.length != 1) {

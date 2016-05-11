@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import com.typesafe.config.ConfigFactory
@@ -16,18 +15,24 @@ object DisallowJoinOfTwoClustersMultiJvmSpec extends MultiNodeConfig {
   val b2 = role("b2")
   val c1 = role("c1")
 
-  commonConfig(debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+  commonConfig(debugConfig(on = false).withFallback(
+          MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
-class DisallowJoinOfTwoClustersMultiJvmNode1 extends DisallowJoinOfTwoClustersSpec
-class DisallowJoinOfTwoClustersMultiJvmNode2 extends DisallowJoinOfTwoClustersSpec
-class DisallowJoinOfTwoClustersMultiJvmNode3 extends DisallowJoinOfTwoClustersSpec
-class DisallowJoinOfTwoClustersMultiJvmNode4 extends DisallowJoinOfTwoClustersSpec
-class DisallowJoinOfTwoClustersMultiJvmNode5 extends DisallowJoinOfTwoClustersSpec
+class DisallowJoinOfTwoClustersMultiJvmNode1
+    extends DisallowJoinOfTwoClustersSpec
+class DisallowJoinOfTwoClustersMultiJvmNode2
+    extends DisallowJoinOfTwoClustersSpec
+class DisallowJoinOfTwoClustersMultiJvmNode3
+    extends DisallowJoinOfTwoClustersSpec
+class DisallowJoinOfTwoClustersMultiJvmNode4
+    extends DisallowJoinOfTwoClustersSpec
+class DisallowJoinOfTwoClustersMultiJvmNode5
+    extends DisallowJoinOfTwoClustersSpec
 
 abstract class DisallowJoinOfTwoClustersSpec
-  extends MultiNodeSpec(DisallowJoinOfTwoClustersMultiJvmSpec)
-  with MultiNodeClusterSpec {
+    extends MultiNodeSpec(DisallowJoinOfTwoClustersMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import DisallowJoinOfTwoClustersMultiJvmSpec._
 
@@ -73,6 +78,5 @@ abstract class DisallowJoinOfTwoClustersSpec
 
       enterBarrier("after-1")
     }
-
   }
 }

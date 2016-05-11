@@ -3,14 +3,17 @@ package atmosphere
 
 import grizzled.slf4j.Logger
 import org.atmosphere.container._
-import org.atmosphere.cpr.{ AtmosphereFramework, Action => AtmoAction }
+import org.atmosphere.cpr.{AtmosphereFramework, Action => AtmoAction}
 
-class ScalatraAtmosphereFramework(isFilter: Boolean = false, autoDetectHandlers: Boolean = false) extends AtmosphereFramework(isFilter, autoDetectHandlers) {
+class ScalatraAtmosphereFramework(
+    isFilter: Boolean = false, autoDetectHandlers: Boolean = false)
+    extends AtmosphereFramework(isFilter, autoDetectHandlers) {
 
   private[this] val logger = Logger[ScalatraAtmosphereFramework]
   def setupTomcat7() {
     if (!getAsyncSupport.supportWebSocket) {
-      if (!isCometSupportSpecified && !isCometSupportConfigured.getAndSet(true)) {
+      if (!isCometSupportSpecified &&
+          !isCometSupportConfigured.getAndSet(true)) {
         asyncSupport.synchronized {
           asyncSupport = new Tomcat7CometSupport(config)
         }
@@ -20,7 +23,8 @@ class ScalatraAtmosphereFramework(isFilter: Boolean = false, autoDetectHandlers:
 
   def setupTomcat() {
     if (!getAsyncSupport.supportWebSocket) {
-      if (!isCometSupportSpecified && !isCometSupportConfigured.getAndSet(true)) {
+      if (!isCometSupportSpecified &&
+          !isCometSupportConfigured.getAndSet(true)) {
         asyncSupport.synchronized {
           asyncSupport = new TomcatCometSupport(config)
         }
@@ -29,7 +33,8 @@ class ScalatraAtmosphereFramework(isFilter: Boolean = false, autoDetectHandlers:
   }
 
   def setupJBoss() {
-    if (!isCometSupportSpecified && !isCometSupportConfigured.getAndSet(true)) {
+    if (!isCometSupportSpecified &&
+        !isCometSupportConfigured.getAndSet(true)) {
       asyncSupport.synchronized {
         asyncSupport = new JBossWebCometSupport(config)
       }
@@ -38,5 +43,4 @@ class ScalatraAtmosphereFramework(isFilter: Boolean = false, autoDetectHandlers:
 
   def enableSessionSupport() = sessionSupport(true)
   def disableSessionSupport() = sessionSupport(false)
-
 }

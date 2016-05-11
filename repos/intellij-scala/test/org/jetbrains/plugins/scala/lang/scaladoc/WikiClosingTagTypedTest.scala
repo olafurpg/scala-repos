@@ -4,10 +4,9 @@ package lang.scaladoc
 import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
 
 /**
- * User: Dmitry Naydanov
- * Date: 2/25/12
- */
-
+  * User: Dmitry Naydanov
+  * Date: 2/25/12
+  */
 class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
 
   def testCodeLinkClosingTagInput() {
@@ -18,8 +17,7 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
   }
 
   def testInnerCodeClosingTagInput() {
-    val text =
-      ("""
+    val text = ("""
     |  /**
     |    *
     |    * {{{
@@ -29,8 +27,7 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
     |    */
     """).stripMargin.replace("\r", "")
 
-    val assumedStub =
-      ("""
+    val assumedStub = ("""
     |  /**
     |    *
     |    * {{{
@@ -44,16 +41,14 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
   }
 
   def testItalicClosingTagInput() {
-    val text =
-      ("""
+    val text = ("""
       | /**
       |   * ''blah blah blah blah
       |   *   blah blah blah '""" + CARET_MARKER + """'
       |   */
       """).stripMargin.replace("\r", "")
 
-    val assumedStub =
-      ("""
+    val assumedStub = ("""
       | /**
       |   * ''blah blah blah blah
       |   *   blah blah blah ''""" + CARET_MARKER + """
@@ -71,15 +66,13 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
   }
 
   def testMonospaceClosingTag() {
-    val text =
-      ("""
+    val text = ("""
       | /**
       |   * `blah-blah""" + CARET_MARKER + """`
       |   */
       """).stripMargin.replace("\r", "")
 
-    val assumedStub =
-      ("""
+    val assumedStub = ("""
       | /**
       |   * `blah-blah`""" + CARET_MARKER + """
       |   */
@@ -96,16 +89,14 @@ class WikiClosingTagTypedTest extends ScalaLightCodeInsightFixtureTestAdapter {
   }
 
   def testUnderlinedClosingTag() {
-    val text =
-      ("""
+    val text = ("""
       | /**
       |   * __blah blahblahblahblahblah
       |   *       blah blah blah blah""" + CARET_MARKER + """__
       |   */
       """).stripMargin.replace("\r", "")
 
-    val assumedStub =
-      ("""
+    val assumedStub = ("""
       | /**
       |   * __blah blahblahblahblahblah
       |   *       blah blah blah blah_""" + CARET_MARKER + """_

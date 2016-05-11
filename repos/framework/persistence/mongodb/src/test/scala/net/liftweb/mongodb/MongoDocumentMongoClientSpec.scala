@@ -30,8 +30,9 @@ import org.specs2.mutable.Specification
 import json._
 
 package mongoclienttestdocs {
-  case class SessCollection(_id: ObjectId, name: String, dbtype: String, count: Int)
-    extends MongoDocument[SessCollection] {
+  case class SessCollection(
+      _id: ObjectId, name: String, dbtype: String, count: Int)
+      extends MongoDocument[SessCollection] {
 
     def meta = SessCollection
   }
@@ -44,8 +45,8 @@ package mongoclienttestdocs {
 }
 
 /**
- * Systems under specification for MongoDocumentMongoClient.
- */
+  * Systems under specification for MongoDocumentMongoClient.
+  */
 class MongoDocumentMongoClientSpec extends Specification with MongoTestKit {
   "MongoDocumentMongoClient Specification".title
 
@@ -68,5 +69,4 @@ class MongoDocumentMongoClientSpec extends Specification with MongoTestKit {
 
     success
   }
-
 }

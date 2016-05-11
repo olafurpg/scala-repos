@@ -2,7 +2,9 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Optional` */
-final class OptionalOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Optional[F]) extends Ops[F[A]] {
+final class OptionalOps[F[_], A] private[syntax](
+    val self: F[A])(implicit val F: Optional[F])
+    extends Ops[F[A]] {
   ////
 
   /** If the value has an `a`, return it; otherwise it must be
@@ -26,7 +28,7 @@ final class OptionalOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   def isEmpty: Boolean = F.isEmpty(self)
 
   final class Conditional[X](some: => X) {
-    def |(none: => X): X = F.?(self)(some,none)
+    def |(none: => X): X = F.?(self)(some, none)
   }
 
   /** Returns `some` if this context is defined, otherwise `none`. */
@@ -42,22 +44,23 @@ final class OptionalOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
 }
 
 sealed trait ToOptionalOps0 {
-  implicit def ToOptionalOpsUnapply[FA](v: FA)(implicit F0: Unapply[Optional, FA]) =
-    new OptionalOps[F0.M,F0.A](F0(v))(F0.TC)
-
+  implicit def ToOptionalOpsUnapply[FA](v: FA)(
+      implicit F0: Unapply[Optional, FA]) =
+    new OptionalOps[F0.M, F0.A](F0(v))(F0.TC)
 }
 
 trait ToOptionalOps extends ToOptionalOps0 {
-  implicit def ToOptionalOps[F[_],A](v: F[A])(implicit F0: Optional[F]) =
-    new OptionalOps[F,A](v)
+  implicit def ToOptionalOps[F[_], A](v: F[A])(implicit F0: Optional[F]) =
+    new OptionalOps[F, A](v)
 
   ////
 
   ////
 }
 
-trait OptionalSyntax[F[_]]  {
-  implicit def ToOptionalOps[A](v: F[A]): OptionalOps[F, A] = new OptionalOps[F,A](v)(OptionalSyntax.this.F)
+trait OptionalSyntax[F[_]] {
+  implicit def ToOptionalOps[A](v: F[A]): OptionalOps[F, A] =
+    new OptionalOps[F, A](v)(OptionalSyntax.this.F)
 
   def F: Optional[F]
   ////

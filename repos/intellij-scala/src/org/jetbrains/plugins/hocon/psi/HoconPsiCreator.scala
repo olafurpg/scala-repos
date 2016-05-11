@@ -29,5 +29,4 @@ object HoconPsiCreator {
     case Boolean => new HBoolean(ast)
     case _ => new ASTWrapperPsiElement(ast)
   }
-
 }

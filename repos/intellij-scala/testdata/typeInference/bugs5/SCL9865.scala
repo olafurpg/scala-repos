@@ -13,6 +13,7 @@ object Y {
 }
 
 object Z {
-  /*start*/(new X.A().foo(), new Y.A().foo())/*end*/
+  /*start*/
+  (new X.A().foo(), new Y.A().foo()) /*end*/
 }
 //(Int, Int)

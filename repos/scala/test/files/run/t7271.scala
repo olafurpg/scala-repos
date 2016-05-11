@@ -7,7 +7,8 @@ import scala.reflect.internal.Positions
 
 object Test extends DirectTest {
 
-  override def extraSettings: String = "-usejavacp -Xprint:parser -Ystop-after:parser -d " + testOutput.path
+  override def extraSettings: String =
+    "-usejavacp -Xprint:parser -Ystop-after:parser -d " + testOutput.path
 
   override def code = """
     class C {
@@ -28,7 +29,8 @@ object Test extends DirectTest {
 
     val settings = new Settings()
     settings.Xprintpos.value = true
-    val command = new CompilerCommand((CommandLineParser tokenize extraSettings) ++ args.toList, settings)
+    val command = new CompilerCommand(
+        (CommandLineParser tokenize extraSettings) ++ args.toList, settings)
     new Global(command.settings, new ConsoleReporter(settings)) with Positions
   }
 }

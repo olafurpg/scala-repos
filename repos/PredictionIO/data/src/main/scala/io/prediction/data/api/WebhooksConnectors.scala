@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.api
 
 import io.prediction.data.webhooks.JsonConnector
@@ -24,11 +23,10 @@ import io.prediction.data.webhooks.mailchimp.MailChimpConnector
 private[prediction] object WebhooksConnectors {
 
   val json: Map[String, JsonConnector] = Map(
-    "segmentio" -> SegmentIOConnector
+      "segmentio" -> SegmentIOConnector
   )
 
   val form: Map[String, FormConnector] = Map(
-    "mailchimp" -> MailChimpConnector
+      "mailchimp" -> MailChimpConnector
   )
-
 }

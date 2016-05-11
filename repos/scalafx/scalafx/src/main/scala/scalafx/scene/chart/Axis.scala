@@ -43,14 +43,19 @@ import scalafx.scene.paint.Paint
 import scalafx.scene.text.Font
 
 object Axis {
-  implicit def sfxAxis2jfx[T](v: Axis[T]): jfxsc.Axis[T] = if (v != null) v.delegate else null
+  implicit def sfxAxis2jfx[T](v: Axis[T]): jfxsc.Axis[T] =
+    if (v != null) v.delegate else null
 
   object TickMark {
-    implicit def sfxTickMark2jfx[T](v: Axis.TickMark[T]): jfxsc.Axis.TickMark[T] = if (v != null) v.delegate else null
+    implicit def sfxTickMark2jfx[T](
+        v: Axis.TickMark[T]): jfxsc.Axis.TickMark[T] =
+      if (v != null) v.delegate else null
   }
 
-  class TickMark[T](override val delegate: jfxsc.Axis.TickMark[T] = new jfxsc.Axis.TickMark[T]())
-    extends SFXDelegate[jfxsc.Axis.TickMark[T]] {
+  class TickMark[T](
+      override val delegate: jfxsc.Axis.TickMark[T] = new jfxsc.Axis.TickMark[
+            T]())
+      extends SFXDelegate[jfxsc.Axis.TickMark[T]] {
 
     def label: StringExpression = delegate.labelProperty
     def label_=(value: String) {
@@ -72,12 +77,10 @@ object Axis {
       delegate.setTextVisible(v)
     }
   }
-
 }
 
 abstract class Axis[T](override val delegate: jfxsc.Axis[T])
-  extends Region(delegate)
-  with SFXDelegate[jfxsc.Axis[T]] {
+    extends Region(delegate) with SFXDelegate[jfxsc.Axis[T]] {
 
   def animated: BooleanProperty = delegate.animatedProperty
   def animated_=(v: Boolean) {
@@ -99,12 +102,14 @@ abstract class Axis[T](override val delegate: jfxsc.Axis[T])
     side() = v
   }
 
-  def tickLabelFill: ObjectProperty[jfxsp.Paint] = delegate.tickLabelFillProperty
+  def tickLabelFill: ObjectProperty[jfxsp.Paint] =
+    delegate.tickLabelFillProperty
   def tickLabelFill_=(v: Paint) {
     tickLabelFill() = v
   }
 
-  def tickLabelFont: ObjectProperty[jfxst.Font] = delegate.tickLabelFontProperty
+  def tickLabelFont: ObjectProperty[jfxst.Font] =
+    delegate.tickLabelFontProperty
   def tickLabelFont_=(v: Font) {
     tickLabelFont() = v
   }
@@ -136,9 +141,11 @@ abstract class Axis[T](override val delegate: jfxsc.Axis[T])
 
   def displayPosition(value: T) = delegate.getDisplayPosition(value)
 
-  def tickMarks: ObservableBuffer[jfxsc.Axis.TickMark[T]] = delegate.getTickMarks
+  def tickMarks: ObservableBuffer[jfxsc.Axis.TickMark[T]] =
+    delegate.getTickMarks
 
-  def valueForDisplay(displayPosition: Double): T = delegate.getValueForDisplay(displayPosition)
+  def valueForDisplay(displayPosition: Double): T =
+    delegate.getValueForDisplay(displayPosition)
 
   def zeroPosition = delegate.getZeroPosition
 
@@ -159,5 +166,4 @@ abstract class Axis[T](override val delegate: jfxsc.Axis[T])
   def toNumericValue(value: T) = delegate.toNumericValue(value)
 
   def toRealValue(value: Double): T = delegate.toRealValue(value)
-
 }

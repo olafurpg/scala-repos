@@ -7,13 +7,14 @@ object Test extends App {
     // a key that has many hashCode collisions
     case class Collision(i: Int) { override def hashCode = i / 5 }
 
-    def subsetTest[T](emptyA:Set[T], emptyB:Set[T], mkKey:Int => T, n:Int) {
+    def subsetTest[T](
+        emptyA: Set[T], emptyB: Set[T], mkKey: Int => T, n: Int) {
       val outside = mkKey(n + 1)
-      for(i <- 0 to n) {
+      for (i <- 0 to n) {
         val a = emptyA ++ (0 until i).map(mkKey)
         // every set must be a subset of itself
         require(a.subsetOf(a), "A set must be the subset of itself")
-        for(k <- 0 to i) {
+        for (k <- 0 to i) {
           // k <= i, so b is definitely a subset
           val b = emptyB ++ (0 until k).map(mkKey)
           // c has less elements than a, but contains a value that is not in a
@@ -32,20 +33,22 @@ object Test extends App {
     subsetTest(HashSet.empty[Int], ListSet.empty[Int], identity, 100)
 
     // test the HashSet/HashSet case for Collision keys
-    subsetTest(HashSet.empty[Collision], HashSet.empty[Collision], Collision, 100)
+    subsetTest(
+        HashSet.empty[Collision], HashSet.empty[Collision], Collision, 100)
 
     // test the HashSet/other set case for Collision keys
-    subsetTest(HashSet.empty[Collision], ListSet.empty[Collision], Collision, 100)
+    subsetTest(
+        HashSet.empty[Collision], ListSet.empty[Collision], Collision, 100)
   }
 
   /**
-   * A main performance benefit of the new subsetOf is that we do not have to call hashCode during subsetOf
-   * since we already have the hash codes in the HashSet1 nodes.
-   */
+    * A main performance benefit of the new subsetOf is that we do not have to call hashCode during subsetOf
+    * since we already have the hash codes in the HashSet1 nodes.
+    */
   def testNoHashCodeInvocationsDuringSubsetOf() = {
     var count = 0
 
-    case class HashCodeCounter(i:Int) {
+    case class HashCodeCounter(i: Int) {
       override def hashCode = {
         count += 1
         i
@@ -56,7 +59,8 @@ object Test extends App {
     val b = HashSet.empty ++ (0 until 50).map(HashCodeCounter)
     val count0 = count
     val result = b.subsetOf(a)
-    require(count == count0, "key.hashCode must not be called during subsetOf of two HashSets")
+    require(count == count0,
+            "key.hashCode must not be called during subsetOf of two HashSets")
     result
   }
   testCorrectness()

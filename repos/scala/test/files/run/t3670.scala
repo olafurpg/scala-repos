@@ -14,10 +14,10 @@ class C {
 class M extends App {
   def foo {
     lazy val a = {
-        lazy val b = 1
-        lazy val c = 2
-        println(b)
-        println(c)
+      lazy val b = 1
+      lazy val c = 2
+      println(b)
+      println(c)
     }
     a
     lazy val d = 42
@@ -26,6 +26,6 @@ class M extends App {
 }
 
 object Test extends App {
-    new C()
-    new M().foo
+  new C()
+  new M().foo
 }

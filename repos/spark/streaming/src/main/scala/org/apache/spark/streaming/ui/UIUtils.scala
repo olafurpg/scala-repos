@@ -28,8 +28,8 @@ import org.apache.commons.lang3.StringEscapeUtils
 private[streaming] object UIUtils {
 
   /**
-   * Return the short string for a `TimeUnit`.
-   */
+    * Return the short string for a `TimeUnit`.
+    */
   def shortTimeUnitString(unit: TimeUnit): String = unit match {
     case TimeUnit.NANOSECONDS => "ns"
     case TimeUnit.MICROSECONDS => "us"
@@ -41,9 +41,9 @@ private[streaming] object UIUtils {
   }
 
   /**
-   * Find the best `TimeUnit` for converting milliseconds to a friendly string. Return the value
-   * after converting, also with its TimeUnit.
-   */
+    * Find the best `TimeUnit` for converting milliseconds to a friendly string. Return the value
+    * after converting, also with its TimeUnit.
+    */
   def normalizeDuration(milliseconds: Long): (Double, TimeUnit) = {
     if (milliseconds < 1000) {
       return (milliseconds, TimeUnit.MILLISECONDS)
@@ -65,45 +65,48 @@ private[streaming] object UIUtils {
   }
 
   /**
-   * Convert `milliseconds` to the specified `unit`. We cannot use `TimeUnit.convert` because it
-   * will discard the fractional part.
-   */
-  def convertToTimeUnit(milliseconds: Long, unit: TimeUnit): Double = unit match {
-    case TimeUnit.NANOSECONDS => milliseconds * 1000 * 1000
-    case TimeUnit.MICROSECONDS => milliseconds * 1000
-    case TimeUnit.MILLISECONDS => milliseconds
-    case TimeUnit.SECONDS => milliseconds / 1000.0
-    case TimeUnit.MINUTES => milliseconds / 1000.0 / 60.0
-    case TimeUnit.HOURS => milliseconds / 1000.0 / 60.0 / 60.0
-    case TimeUnit.DAYS => milliseconds / 1000.0 / 60.0 / 60.0 / 24.0
-  }
+    * Convert `milliseconds` to the specified `unit`. We cannot use `TimeUnit.convert` because it
+    * will discard the fractional part.
+    */
+  def convertToTimeUnit(milliseconds: Long, unit: TimeUnit): Double =
+    unit match {
+      case TimeUnit.NANOSECONDS => milliseconds * 1000 * 1000
+      case TimeUnit.MICROSECONDS => milliseconds * 1000
+      case TimeUnit.MILLISECONDS => milliseconds
+      case TimeUnit.SECONDS => milliseconds / 1000.0
+      case TimeUnit.MINUTES => milliseconds / 1000.0 / 60.0
+      case TimeUnit.HOURS => milliseconds / 1000.0 / 60.0 / 60.0
+      case TimeUnit.DAYS => milliseconds / 1000.0 / 60.0 / 60.0 / 24.0
+    }
 
   // SimpleDateFormat is not thread-safe. Don't expose it to avoid improper use.
   private val batchTimeFormat = new ThreadLocal[SimpleDateFormat]() {
-    override def initialValue(): SimpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+    override def initialValue(): SimpleDateFormat =
+      new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
   }
 
-  private val batchTimeFormatWithMilliseconds = new ThreadLocal[SimpleDateFormat]() {
-    override def initialValue(): SimpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS")
-  }
+  private val batchTimeFormatWithMilliseconds =
+    new ThreadLocal[SimpleDateFormat]() {
+      override def initialValue(): SimpleDateFormat =
+        new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS")
+    }
 
   /**
-   * If `batchInterval` is less than 1 second, format `batchTime` with milliseconds. Otherwise,
-   * format `batchTime` without milliseconds.
-   *
-   * @param batchTime the batch time to be formatted
-   * @param batchInterval the batch interval
-   * @param showYYYYMMSS if showing the `yyyy/MM/dd` part. If it's false, the return value wll be
-   *                     only `HH:mm:ss` or `HH:mm:ss.SSS` depending on `batchInterval`
-   * @param timezone only for test
-   */
-  def formatBatchTime(
-      batchTime: Long,
-      batchInterval: Long,
-      showYYYYMMSS: Boolean = true,
-      timezone: TimeZone = null): String = {
-    val oldTimezones =
-      (batchTimeFormat.get.getTimeZone, batchTimeFormatWithMilliseconds.get.getTimeZone)
+    * If `batchInterval` is less than 1 second, format `batchTime` with milliseconds. Otherwise,
+    * format `batchTime` without milliseconds.
+    *
+    * @param batchTime the batch time to be formatted
+    * @param batchInterval the batch interval
+    * @param showYYYYMMSS if showing the `yyyy/MM/dd` part. If it's false, the return value wll be
+    *                     only `HH:mm:ss` or `HH:mm:ss.SSS` depending on `batchInterval`
+    * @param timezone only for test
+    */
+  def formatBatchTime(batchTime: Long,
+                      batchInterval: Long,
+                      showYYYYMMSS: Boolean = true,
+                      timezone: TimeZone = null): String = {
+    val oldTimezones = (batchTimeFormat.get.getTimeZone,
+                        batchTimeFormatWithMilliseconds.get.getTimeZone)
     if (timezone != null) {
       batchTimeFormat.get.setTimeZone(timezone)
       batchTimeFormatWithMilliseconds.get.setTimeZone(timezone)
@@ -150,11 +153,11 @@ private[streaming] object UIUtils {
     val isMultiline = failureReason.indexOf('\n') >= 0
     // Display the first line by default
     val failureReasonSummary = StringEscapeUtils.escapeHtml4(
-      if (isMultiline) {
-        failureReason.substring(0, failureReason.indexOf('\n'))
-      } else {
-        failureReason
-      })
+        if (isMultiline) {
+      failureReason.substring(0, failureReason.indexOf('\n'))
+    } else {
+      failureReason
+    })
     val failureDetails =
       if (isMultiline && !includeFirstLineInExpandDetails) {
         // Skip the first line
@@ -162,19 +165,19 @@ private[streaming] object UIUtils {
       } else {
         failureReason
       }
-    val details = if (isMultiline) {
-      // scalastyle:off
-      <span onclick="this.parentNode.querySelector('.stacktrace-details').classList.toggle('collapsed')"
+    val details =
+      if (isMultiline) {
+        // scalastyle:off
+        <span onclick="this.parentNode.querySelector('.stacktrace-details').classList.toggle('collapsed')"
             class="expand-details">
         +details
-      </span> ++
-        <div class="stacktrace-details collapsed">
+      </span> ++ <div class="stacktrace-details collapsed">
           <pre>{failureDetails}</pre>
         </div>
-      // scalastyle:on
-    } else {
-      ""
-    }
+        // scalastyle:on
+      } else {
+        ""
+      }
 
     if (rowspan == 1) {
       <td valign="middle" style="max-width: 300px">{failureReasonSummary}{details}</td>

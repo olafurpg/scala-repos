@@ -1,3 +1,3 @@
 package scala
 
-package object runtime { }
+package object runtime {}

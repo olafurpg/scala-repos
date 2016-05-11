@@ -23,29 +23,33 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, ReturnAnswer}
 
 /**
- * The primary workflow for executing relational queries using Spark.  Designed to allow easy
- * access to the intermediate phases of query execution for developers.
- *
- * While this is not a public class, we should avoid changing the function names for the sake of
- * changing them, because a lot of developers use the feature for debugging.
- */
+  * The primary workflow for executing relational queries using Spark.  Designed to allow easy
+  * access to the intermediate phases of query execution for developers.
+  *
+  * While this is not a public class, we should avoid changing the function names for the sake of
+  * changing them, because a lot of developers use the feature for debugging.
+  */
 class QueryExecution(val sqlContext: SQLContext, val logical: LogicalPlan) {
 
-  def assertAnalyzed(): Unit = try sqlContext.sessionState.analyzer.checkAnalysis(analyzed) catch {
-    case e: AnalysisException =>
-      val ae = new AnalysisException(e.message, e.line, e.startPosition, Some(analyzed))
-      ae.setStackTrace(e.getStackTrace)
-      throw ae
-  }
+  def assertAnalyzed(): Unit =
+    try sqlContext.sessionState.analyzer.checkAnalysis(analyzed) catch {
+      case e: AnalysisException =>
+        val ae = new AnalysisException(
+            e.message, e.line, e.startPosition, Some(analyzed))
+        ae.setStackTrace(e.getStackTrace)
+        throw ae
+    }
 
-  lazy val analyzed: LogicalPlan = sqlContext.sessionState.analyzer.execute(logical)
+  lazy val analyzed: LogicalPlan =
+    sqlContext.sessionState.analyzer.execute(logical)
 
   lazy val withCachedData: LogicalPlan = {
     assertAnalyzed()
     sqlContext.cacheManager.useCachedData(analyzed)
   }
 
-  lazy val optimizedPlan: LogicalPlan = sqlContext.sessionState.optimizer.execute(withCachedData)
+  lazy val optimizedPlan: LogicalPlan =
+    sqlContext.sessionState.optimizer.execute(withCachedData)
 
   lazy val sparkPlan: SparkPlan = {
     SQLContext.setActive(sqlContext)
@@ -54,7 +58,8 @@ class QueryExecution(val sqlContext: SQLContext, val logical: LogicalPlan) {
 
   // executedPlan should not be used to initialize any SparkPlan. It should be
   // only used for execution.
-  lazy val executedPlan: SparkPlan = sqlContext.sessionState.prepareForExecution.execute(sparkPlan)
+  lazy val executedPlan: SparkPlan =
+    sqlContext.sessionState.prepareForExecution.execute(sparkPlan)
 
   /** Internal version of the RDD. Avoids copies and has no schema */
   lazy val toRdd: RDD[InternalRow] = executedPlan.execute()
@@ -70,7 +75,9 @@ class QueryExecution(val sqlContext: SQLContext, val logical: LogicalPlan) {
 
   override def toString: String = {
     def output =
-      analyzed.output.map(o => s"${o.name}: ${o.dataType.simpleString}").mkString(", ")
+      analyzed.output
+        .map(o => s"${o.name}: ${o.dataType.simpleString}")
+        .mkString(", ")
 
     s"""== Parsed Logical Plan ==
        |${stringOrError(logical)}

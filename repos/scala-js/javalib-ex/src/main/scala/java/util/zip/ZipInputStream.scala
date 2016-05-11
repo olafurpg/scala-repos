@@ -6,11 +6,11 @@ import scala.scalajs.js
 import scala.scalajs.js.typedarray._
 
 /** <a href="https://stuk.github.io/jszip/" target="_blank"
- *     class="badge badge-external" style="float: right;">
- *  External: JSZip</a>
- *  ZipInputStream implementation using
- *  <a href="https://stuk.github.io/jszip/" target="_blank">JSZip</a>
- */
+  *     class="badge badge-external" style="float: right;">
+  *  External: JSZip</a>
+  *  ZipInputStream implementation using
+  *  <a href="https://stuk.github.io/jszip/" target="_blank">JSZip</a>
+  */
 class ZipInputStream(in: InputStream) extends InflaterInputStream(in) {
 
   // Not implemented
@@ -54,8 +54,7 @@ class ZipInputStream(in: InputStream) extends InflaterInputStream(in) {
   }
 
   def closeEntry(): Unit = {
-    if (inner != null)
-      inner.close()
+    if (inner != null) inner.close()
     inner = null
   }
 
@@ -68,7 +67,7 @@ class ZipInputStream(in: InputStream) extends InflaterInputStream(in) {
       res.setComment(jsEntry.comment.asInstanceOf[String])
 
       inner = new ArrayBufferInputStream(
-        jsEntry.asArrayBuffer().asInstanceOf[ArrayBuffer])
+          jsEntry.asArrayBuffer().asInstanceOf[ArrayBuffer])
 
       res
     } else null
@@ -89,5 +88,4 @@ class ZipInputStream(in: InputStream) extends InflaterInputStream(in) {
     if (inner == null) 0
     else inner.skip(n)
   }
-
 }

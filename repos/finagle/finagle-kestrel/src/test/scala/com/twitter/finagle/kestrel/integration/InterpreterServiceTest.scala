@@ -18,8 +18,10 @@ class InterpreterServiceTest extends FunSuite {
   val value = Buf.Utf8("value")
 
   def exec(fn: Service[Command, Response] => Unit) {
-    val server: Server = new Server(new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
-    val address: InetSocketAddress = server.start().boundAddress.asInstanceOf[InetSocketAddress]
+    val server: Server = new Server(
+        new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
+    val address: InetSocketAddress =
+      server.start().boundAddress.asInstanceOf[InetSocketAddress]
     val client: Service[Command, Response] = ClientBuilder()
       .hosts(address)
       .codec(Kestrel())
@@ -39,7 +41,8 @@ class InterpreterServiceTest extends FunSuite {
         _ <- client(Set(queueName, Time.now, value))
         r <- client(Get(queueName))
       } yield r
-      assert(Await.result(result, 5.seconds) == Values(Seq(Value(queueName, value))))
+      assert(Await.result(result, 5.seconds) == Values(
+              Seq(Value(queueName, value))))
     }
   }
 
@@ -51,7 +54,8 @@ class InterpreterServiceTest extends FunSuite {
         _ <- client(Abort(queueName))
         r <- client(Open(queueName))
       } yield r
-      assert(Await.result(result, 5.seconds) == Values(Seq(Value(queueName, value))))
+      assert(Await.result(result, 5.seconds) == Values(
+              Seq(Value(queueName, value))))
     }
   }
 }

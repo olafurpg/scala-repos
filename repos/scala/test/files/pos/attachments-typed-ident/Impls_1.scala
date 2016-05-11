@@ -8,9 +8,11 @@ object Macros {
     import c.universe._
     import internal._
     val ident = updateAttachment(Ident(TermName("bar")), MyAttachment)
-    assert(attachments(ident).get[MyAttachment.type].isDefined, attachments(ident))
+    assert(attachments(ident).get[MyAttachment.type].isDefined,
+           attachments(ident))
     val typed = c.typecheck(ident)
-    assert(attachments(typed).get[MyAttachment.type].isDefined, attachments(typed))
+    assert(attachments(typed).get[MyAttachment.type].isDefined,
+           attachments(typed))
     c.Expr[Int](typed)
   }
 

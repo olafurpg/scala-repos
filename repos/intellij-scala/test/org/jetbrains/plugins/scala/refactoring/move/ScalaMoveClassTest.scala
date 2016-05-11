@@ -23,11 +23,11 @@ import org.jetbrains.plugins.scala.util.TestUtils
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author Alefas
- * @since 30.10.12
- */
+  * @author Alefas
+  * @since 30.10.12
+  */
 class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
-def testPackageObject() {
+  def testPackageObject() {
     doTest("packageObject", Array("com.`package`"), "org")
   }
 
@@ -40,7 +40,12 @@ def testPackageObject() {
   }
 
   def testSCL2625() {
-    doTest("scl2625", Array("somepackage.Dummy", "somepackage.MoreBusiness", "somepackage.Business", "somepackage.AnotherEnum"), "dest")
+    doTest("scl2625",
+           Array("somepackage.Dummy",
+                 "somepackage.MoreBusiness",
+                 "somepackage.Business",
+                 "somepackage.AnotherEnum"),
+           "dest")
   }
 
   def testSCL4623() {
@@ -68,7 +73,9 @@ def testPackageObject() {
   }
 
   def testSCL4894() {
-    doTest("scl4894", Array("moveRefactoring.foo.B", "moveRefactoring.foo.BB"), "moveRefactoring.bar")
+    doTest("scl4894",
+           Array("moveRefactoring.foo.B", "moveRefactoring.foo.BB"),
+           "moveRefactoring.bar")
   }
 
   def testSCL4972() {
@@ -83,19 +90,26 @@ def testPackageObject() {
     doTest("bothJavaAndScala", Array("org.A", "org.J"), "com")
   }
 
-
 //  wait for fix SCL-6316
 //  def testWithoutCompanion() {
 //    doTest("withoutCompanion", Array("source.A"), "target", Kinds.onlyObjects, moveCompanion = false)
 //  }
 
-
-
-  def doTest(testName: String, classNames: Array[String], newPackageName: String, mode: Kinds.Value = Kinds.all, moveCompanion: Boolean = true) {
+  def doTest(testName: String,
+             classNames: Array[String],
+             newPackageName: String,
+             mode: Kinds.Value = Kinds.all,
+             moveCompanion: Boolean = true) {
     val root: String = TestUtils.getTestDataPath + "/move/" + testName
     val rootBefore: String = root + "/before"
-    val rootDir: VirtualFile = PsiTestUtil.createTestProjectStructure(getProjectAdapter, getModuleAdapter, rootBefore, new util.HashSet[File]())
-    VirtualFilePointerManager.getInstance.asInstanceOf[VirtualFilePointerManagerImpl].storePointers()
+    val rootDir: VirtualFile = PsiTestUtil.createTestProjectStructure(
+        getProjectAdapter,
+        getModuleAdapter,
+        rootBefore,
+        new util.HashSet[File]())
+    VirtualFilePointerManager.getInstance
+      .asInstanceOf[VirtualFilePointerManagerImpl]
+      .storePointers()
     val settings = ScalaApplicationSettings.getInstance()
     val moveCompanionOld = settings.MOVE_COMPANION
     settings.MOVE_COMPANION = moveCompanion
@@ -106,28 +120,47 @@ def testPackageObject() {
     }
     settings.MOVE_COMPANION = moveCompanionOld
     val rootAfter: String = root + "/after"
-    val rootDir2: VirtualFile = LocalFileSystem.getInstance.findFileByPath(rootAfter.replace(File.separatorChar, '/'))
-    VirtualFilePointerManager.getInstance.asInstanceOf[VirtualFilePointerManagerImpl].storePointers()
-    getProjectAdapter.getComponent(classOf[PostprocessReformattingAspect]).doPostponedFormatting()
+    val rootDir2: VirtualFile = LocalFileSystem.getInstance.findFileByPath(
+        rootAfter.replace(File.separatorChar, '/'))
+    VirtualFilePointerManager.getInstance
+      .asInstanceOf[VirtualFilePointerManagerImpl]
+      .storePointers()
+    getProjectAdapter
+      .getComponent(classOf[PostprocessReformattingAspect])
+      .doPostponedFormatting()
     PlatformTestUtil.assertDirectoriesEqual(rootDir2, rootDir)
   }
 
-  private def performAction(classNames: Array[String], newPackageName: String, mode: Kinds.Value) {
+  private def performAction(
+      classNames: Array[String], newPackageName: String, mode: Kinds.Value) {
     val classes = new ArrayBuffer[PsiClass]()
     for (name <- classNames) {
-      classes ++= ScalaPsiManager.instance(getProjectAdapter).getCachedClasses(GlobalSearchScope.allScope(getProjectAdapter), name).filter {
-        case o: ScObject if o.isSyntheticObject => false
-        case c: ScClass if mode == Kinds.onlyObjects => false
-        case o: ScObject if mode == Kinds.onlyClasses => false
-        case _ => true
-      }
+      classes ++= ScalaPsiManager
+        .instance(getProjectAdapter)
+        .getCachedClasses(GlobalSearchScope.allScope(getProjectAdapter), name)
+        .filter {
+          case o: ScObject if o.isSyntheticObject => false
+          case c: ScClass if mode == Kinds.onlyObjects => false
+          case o: ScObject if mode == Kinds.onlyClasses => false
+          case _ => true
+        }
     }
-    val aPackage: PsiPackage = JavaPsiFacade.getInstance(getProjectAdapter).findPackage(newPackageName)
-    val dirs: Array[PsiDirectory] = aPackage.getDirectories(GlobalSearchScope.moduleScope(getModuleAdapter))
+    val aPackage: PsiPackage =
+      JavaPsiFacade.getInstance(getProjectAdapter).findPackage(newPackageName)
+    val dirs: Array[PsiDirectory] =
+      aPackage.getDirectories(GlobalSearchScope.moduleScope(getModuleAdapter))
     assert(dirs.length == 1)
     ScalaFileImpl.performMoveRefactoring {
-      new ScalaMoveClassesOrPackagesProcessor(getProjectAdapter, classes.toArray,
-        new SingleSourceRootMoveDestination(PackageWrapper.create(JavaDirectoryService.getInstance.getPackage(dirs(0))), dirs(0)), true, true, null).run()
+      new ScalaMoveClassesOrPackagesProcessor(
+          getProjectAdapter,
+          classes.toArray,
+          new SingleSourceRootMoveDestination(
+              PackageWrapper.create(
+                  JavaDirectoryService.getInstance.getPackage(dirs(0))),
+              dirs(0)),
+          true,
+          true,
+          null).run()
     }
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
   }

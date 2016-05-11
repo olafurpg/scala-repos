@@ -1,7 +1,6 @@
 package t1
 
-trait Element[T] {
-}
+trait Element[T] {}
 
 trait Config {
   type T <: Element[T]

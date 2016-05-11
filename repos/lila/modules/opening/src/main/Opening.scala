@@ -5,20 +5,16 @@ import org.joda.time.DateTime
 
 import lila.rating.Perf
 
-case class Move(
-  first: String,
-  cp: Int,
-  line: List[String])
+case class Move(first: String, cp: Int, line: List[String])
 
-case class Opening(
-    id: Opening.ID,
-    fen: String,
-    moves: List[Move],
-    color: Color,
-    date: DateTime,
-    perf: Perf,
-    attempts: Int,
-    wins: Int) {
+case class Opening(id: Opening.ID,
+                   fen: String,
+                   moves: List[Move],
+                   color: Color,
+                   date: DateTime,
+                   perf: Perf,
+                   attempts: Int,
+                   wins: Int) {
 
   lazy val goal = qualityMoves.count(_.quality == Quality.Good) min 4
 
@@ -48,26 +44,21 @@ object Quality {
     else Bad
 }
 
-case class QualityMove(
-  move: Move,
-  quality: Quality)
+case class QualityMove(move: Move, quality: Quality)
 
 object Opening {
 
   type ID = Int
 
-  def make(
-    fen: String,
-    color: Color,
-    moves: List[Move])(id: ID) = new Opening(
-    id = id,
-    fen = fen,
-    moves = moves,
-    color = color,
-    date = DateTime.now,
-    perf = Perf.default,
-    attempts = 0,
-    wins = 0)
+  def make(fen: String, color: Color, moves: List[Move])(id: ID) =
+    new Opening(id = id,
+                fen = fen,
+                moves = moves,
+                color = color,
+                date = DateTime.now,
+                perf = Perf.default,
+                attempts = 0,
+                wins = 0)
 
   import reactivemongo.bson._
   import lila.db.BSON
@@ -75,15 +66,16 @@ object Opening {
 
   implicit val moveBSONHandler = new BSON[Move] {
 
-    def reads(r: BSON.Reader): Move = Move(
-      first = r str "first",
-      cp = r int "cp",
-      line = chess.format.pgn.Binary.readMoves(r.bytes("line").value.toList).get)
+    def reads(r: BSON.Reader): Move =
+      Move(first = r str "first",
+           cp = r int "cp",
+           line = chess.format.pgn.Binary
+               .readMoves(r.bytes("line").value.toList)
+               .get)
 
-    def writes(w: BSON.Writer, o: Move) = BSONDocument(
-      "first" -> o.first,
-      "cp" -> o.cp,
-      "line" -> lila.db.ByteArray {
+    def writes(w: BSON.Writer, o: Move) =
+      BSONDocument(
+          "first" -> o.first, "cp" -> o.cp, "line" -> lila.db.ByteArray {
         chess.format.pgn.Binary.writeMoves(o.line).get.toArray
       })
   }
@@ -105,24 +97,24 @@ object Opening {
     import BSONFields._
     import Perf.perfBSONHandler
 
-    def reads(r: BSON.Reader): Opening = Opening(
-      id = r int id,
-      fen = r str fen,
-      moves = r.get[List[Move]](moves),
-      color = Color(r bool white),
-      date = r date date,
-      perf = r.get[Perf](perf),
-      attempts = r int attempts,
-      wins = r int wins)
+    def reads(r: BSON.Reader): Opening =
+      Opening(id = r int id,
+              fen = r str fen,
+              moves = r.get[List[Move]](moves),
+              color = Color(r bool white),
+              date = r date date,
+              perf = r.get[Perf](perf),
+              attempts = r int attempts,
+              wins = r int wins)
 
-    def writes(w: BSON.Writer, o: Opening) = BSONDocument(
-      id -> o.id,
-      fen -> o.fen,
-      moves -> o.moves,
-      white -> o.color.white,
-      date -> o.date,
-      perf -> o.perf,
-      attempts -> o.attempts,
-      wins -> o.wins)
+    def writes(w: BSON.Writer, o: Opening) =
+      BSONDocument(id -> o.id,
+                   fen -> o.fen,
+                   moves -> o.moves,
+                   white -> o.color.white,
+                   date -> o.date,
+                   perf -> o.perf,
+                   attempts -> o.attempts,
+                   wins -> o.wins)
   }
 }

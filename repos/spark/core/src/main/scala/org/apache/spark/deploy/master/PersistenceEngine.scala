@@ -23,35 +23,35 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.rpc.RpcEnv
 
 /**
- * Allows Master to persist any state that is necessary in order to recover from a failure.
- * The following semantics are required:
- *   - addApplication and addWorker are called before completing registration of a new app/worker.
- *   - removeApplication and removeWorker are called at any time.
- * Given these two requirements, we will have all apps and workers persisted, but
- * we might not have yet deleted apps or workers that finished (so their liveness must be verified
- * during recovery).
- *
- * The implementation of this trait defines how name-object pairs are stored or retrieved.
- */
+  * Allows Master to persist any state that is necessary in order to recover from a failure.
+  * The following semantics are required:
+  *   - addApplication and addWorker are called before completing registration of a new app/worker.
+  *   - removeApplication and removeWorker are called at any time.
+  * Given these two requirements, we will have all apps and workers persisted, but
+  * we might not have yet deleted apps or workers that finished (so their liveness must be verified
+  * during recovery).
+  *
+  * The implementation of this trait defines how name-object pairs are stored or retrieved.
+  */
 @DeveloperApi
 abstract class PersistenceEngine {
 
   /**
-   * Defines how the object is serialized and persisted. Implementation will
-   * depend on the store used.
-   */
+    * Defines how the object is serialized and persisted. Implementation will
+    * depend on the store used.
+    */
   def persist(name: String, obj: Object)
 
   /**
-   * Defines how the object referred by its name is removed from the store.
-   */
+    * Defines how the object referred by its name is removed from the store.
+    */
   def unpersist(name: String)
 
   /**
-   * Gives all objects, matching a prefix. This defines how objects are
-   * read/deserialized back.
-   */
-  def read[T: ClassTag](prefix: String): Seq[T]
+    * Gives all objects, matching a prefix. This defines how objects are
+    * read/deserialized back.
+    */
+  def read[T : ClassTag](prefix: String): Seq[T]
 
   final def addApplication(app: ApplicationInfo): Unit = {
     persist("app_" + app.id, app)
@@ -78,13 +78,15 @@ abstract class PersistenceEngine {
   }
 
   /**
-   * Returns the persisted data sorted by their respective ids (which implies that they're
-   * sorted by time of creation).
-   */
-  final def readPersistedData(
-      rpcEnv: RpcEnv): (Seq[ApplicationInfo], Seq[DriverInfo], Seq[WorkerInfo]) = {
+    * Returns the persisted data sorted by their respective ids (which implies that they're
+    * sorted by time of creation).
+    */
+  final def readPersistedData(rpcEnv: RpcEnv)
+    : (Seq[ApplicationInfo], Seq[DriverInfo], Seq[WorkerInfo]) = {
     rpcEnv.deserialize { () =>
-      (read[ApplicationInfo]("app_"), read[DriverInfo]("driver_"), read[WorkerInfo]("worker_"))
+      (read[ApplicationInfo]("app_"),
+       read[DriverInfo]("driver_"),
+       read[WorkerInfo]("worker_"))
     }
   }
 
@@ -97,6 +99,5 @@ private[master] class BlackHolePersistenceEngine extends PersistenceEngine {
 
   override def unpersist(name: String): Unit = {}
 
-  override def read[T: ClassTag](name: String): Seq[T] = Nil
-
+  override def read[T : ClassTag](name: String): Seq[T] = Nil
 }

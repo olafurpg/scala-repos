@@ -3,9 +3,9 @@ package scala.scalajs.runtime
 import java.lang.{Double => JDouble, Integer => JInteger}
 
 /** Explicit box for number values when doing a reflective call.
- *  This class and its methods are only here to properly support reflective
- *  calls on numbers.
- */
+  *  This class and its methods are only here to properly support reflective
+  *  calls on numbers.
+  */
 class NumberReflectiveCall(value: Double) {
 
   // Methods of java.lang.Double and java.lang.Integer
@@ -29,12 +29,12 @@ class NumberReflectiveCall(value: Double) {
 
   // Methods of scala.Double
 
-  def toByte: scala.Byte     = value.toByte
-  def toShort: scala.Short   = value.toShort
-  def toChar: scala.Char     = value.toChar
-  def toInt: scala.Int       = value.toInt
-  def toLong: scala.Long     = value.toLong
-  def toFloat: scala.Float   = value.toFloat
+  def toByte: scala.Byte = value.toByte
+  def toShort: scala.Short = value.toShort
+  def toChar: scala.Char = value.toChar
+  def toInt: scala.Int = value.toInt
+  def toLong: scala.Long = value.toLong
+  def toFloat: scala.Float = value.toFloat
   def toDouble: scala.Double = value
 
   // scalastyle:off disallow.space.before.token
@@ -162,5 +162,4 @@ class NumberReflectiveCall(value: Double) {
   def ^(x: scala.Char): scala.Int = value.toInt ^ x
   def ^(x: scala.Int): scala.Int = value.toInt ^ x
   def ^(x: scala.Long): scala.Long = value.toInt ^ x
-
 }

@@ -1,5 +1,5 @@
 import scala.tools.partest.SessionTest
-import scala.PartialFunction.{ cond => when }
+import scala.PartialFunction.{cond => when}
 
 object Elision {
   val elideMsg = """  ... \d+ elided""".r
@@ -13,7 +13,7 @@ object Test extends SessionTest {
   def elided(s: String) = when(s) { case elideMsg() => true }
   override def eval() = super.eval() filterNot elided
   def session =
-"""
+    """
 scala> val 1 = 2
 scala.MatchError: 2 (of class java.lang.Integer)
 

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import language.postfixOps
@@ -15,42 +15,55 @@ import scala.concurrent.duration._
 import scala.collection.immutable
 import akka.remote.transport.ThrottlerTransportAdapter.Direction
 
-final case class SplitBrainMultiNodeConfig(failureDetectorPuppet: Boolean) extends MultiNodeConfig {
+final case class SplitBrainMultiNodeConfig(failureDetectorPuppet: Boolean)
+    extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
   val third = role("third")
   val fourth = role("fourth")
   val fifth = role("fifth")
 
-  commonConfig(debugConfig(on = false).
-    withFallback(ConfigFactory.parseString("""
+  commonConfig(
+      debugConfig(on = false)
+        .withFallback(ConfigFactory.parseString("""
         akka.remote.retry-gate-closed-for = 3 s
         akka.cluster {
           auto-down-unreachable-after = 1s
           failure-detector.threshold = 4
-        }""")).
-    withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
+        }"""))
+        .withFallback(
+            MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 
   testTransport(on = true)
 }
 
-class SplitBrainWithFailureDetectorPuppetMultiJvmNode1 extends SplitBrainSpec(failureDetectorPuppet = true)
-class SplitBrainWithFailureDetectorPuppetMultiJvmNode2 extends SplitBrainSpec(failureDetectorPuppet = true)
-class SplitBrainWithFailureDetectorPuppetMultiJvmNode3 extends SplitBrainSpec(failureDetectorPuppet = true)
-class SplitBrainWithFailureDetectorPuppetMultiJvmNode4 extends SplitBrainSpec(failureDetectorPuppet = true)
-class SplitBrainWithFailureDetectorPuppetMultiJvmNode5 extends SplitBrainSpec(failureDetectorPuppet = true)
+class SplitBrainWithFailureDetectorPuppetMultiJvmNode1
+    extends SplitBrainSpec(failureDetectorPuppet = true)
+class SplitBrainWithFailureDetectorPuppetMultiJvmNode2
+    extends SplitBrainSpec(failureDetectorPuppet = true)
+class SplitBrainWithFailureDetectorPuppetMultiJvmNode3
+    extends SplitBrainSpec(failureDetectorPuppet = true)
+class SplitBrainWithFailureDetectorPuppetMultiJvmNode4
+    extends SplitBrainSpec(failureDetectorPuppet = true)
+class SplitBrainWithFailureDetectorPuppetMultiJvmNode5
+    extends SplitBrainSpec(failureDetectorPuppet = true)
 
-class SplitBrainWithAccrualFailureDetectorMultiJvmNode1 extends SplitBrainSpec(failureDetectorPuppet = false)
-class SplitBrainWithAccrualFailureDetectorMultiJvmNode2 extends SplitBrainSpec(failureDetectorPuppet = false)
-class SplitBrainWithAccrualFailureDetectorMultiJvmNode3 extends SplitBrainSpec(failureDetectorPuppet = false)
-class SplitBrainWithAccrualFailureDetectorMultiJvmNode4 extends SplitBrainSpec(failureDetectorPuppet = false)
-class SplitBrainWithAccrualFailureDetectorMultiJvmNode5 extends SplitBrainSpec(failureDetectorPuppet = false)
+class SplitBrainWithAccrualFailureDetectorMultiJvmNode1
+    extends SplitBrainSpec(failureDetectorPuppet = false)
+class SplitBrainWithAccrualFailureDetectorMultiJvmNode2
+    extends SplitBrainSpec(failureDetectorPuppet = false)
+class SplitBrainWithAccrualFailureDetectorMultiJvmNode3
+    extends SplitBrainSpec(failureDetectorPuppet = false)
+class SplitBrainWithAccrualFailureDetectorMultiJvmNode4
+    extends SplitBrainSpec(failureDetectorPuppet = false)
+class SplitBrainWithAccrualFailureDetectorMultiJvmNode5
+    extends SplitBrainSpec(failureDetectorPuppet = false)
 
 abstract class SplitBrainSpec(multiNodeConfig: SplitBrainMultiNodeConfig)
-  extends MultiNodeSpec(multiNodeConfig)
-  with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
 
-  def this(failureDetectorPuppet: Boolean) = this(SplitBrainMultiNodeConfig(failureDetectorPuppet))
+  def this(failureDetectorPuppet: Boolean) =
+    this(SplitBrainMultiNodeConfig(failureDetectorPuppet))
 
   import multiNodeConfig._
 
@@ -67,7 +80,8 @@ abstract class SplitBrainSpec(multiNodeConfig: SplitBrainMultiNodeConfig)
       enterBarrier("after-1")
     }
 
-    "detect network partition and mark nodes on other side as unreachable and form new cluster" taggedAs LongRunningTest in within(30 seconds) {
+    "detect network partition and mark nodes on other side as unreachable and form new cluster" taggedAs LongRunningTest in within(
+        30 seconds) {
       enterBarrier("before-split")
 
       runOn(first) {
@@ -94,7 +108,5 @@ abstract class SplitBrainSpec(multiNodeConfig: SplitBrainMultiNodeConfig)
 
       enterBarrier("after-2")
     }
-
   }
-
 }

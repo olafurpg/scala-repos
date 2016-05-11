@@ -26,8 +26,8 @@ object StreamRequest {
     case class Custom(name: String) extends Method
 
     /**
-     * Create a method from a String. The input is case-insensitive.
-     */
+      * Create a method from a String. The input is case-insensitive.
+      */
     def apply(name: String): Method = name.toUpperCase match {
       case "OPTIONS" => Method.Options
       case "GET" => Method.Get

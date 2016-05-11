@@ -11,7 +11,7 @@ import org.scalatest.concurrent.ScalaFutures
 import akka.http.scaladsl.settings.ClientConnectionSettings
 import akka.util.ByteString
 import akka.event.NoLogging
-import akka.stream.{ ClosedShape, ActorMaterializer }
+import akka.stream.{ClosedShape, ActorMaterializer}
 import akka.stream.TLSProtocol._
 import akka.stream.testkit._
 import akka.stream.scaladsl._
@@ -22,7 +22,8 @@ import akka.http.scaladsl.model.headers._
 import akka.http.impl.util._
 import akka.testkit.AkkaSpec
 
-class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.loglevel = OFF") with Inside {
+class LowLevelOutgoingConnectionSpec
+    extends AkkaSpec("akka.loggers = []\n akka.loglevel = OFF") with Inside {
   implicit val materializer = ActorMaterializer()
 
   "The connection-level client implementation" should {
@@ -31,8 +32,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
 
       "has a request with empty entity" in new TestSetup {
         sendStandardRequest()
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Content-Length: 0
             |
             |""")
@@ -47,9 +47,12 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
 
       "has a request with default entity" in new TestSetup {
         val probe = TestPublisher.manualProbe[ByteString]()
-        requestsSub.sendNext(HttpRequest(PUT, entity = HttpEntity(ContentTypes.`application/octet-stream`, 8, Source.fromPublisher(probe))))
-        expectWireData(
-          """PUT / HTTP/1.1
+        requestsSub.sendNext(HttpRequest(
+                PUT,
+                entity = HttpEntity(ContentTypes.`application/octet-stream`,
+                                    8,
+                                    Source.fromPublisher(probe))))
+        expectWireData("""PUT / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
             |Content-Type: application/octet-stream
@@ -66,8 +69,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         expectWireData("XY")
         sub.sendComplete()
 
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Content-Length: 0
             |
             |""")
@@ -82,13 +84,13 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
 
       "has a response with a chunked entity" in new TestSetup {
         sendStandardRequest()
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Transfer-Encoding: chunked
             |
             |""")
 
-        val HttpResponse(_, _, HttpEntity.Chunked(ct, chunks), _) = expectResponse()
+        val HttpResponse(_, _, HttpEntity.Chunked(ct, chunks), _) =
+          expectResponse()
         ct shouldEqual ContentTypes.`application/octet-stream`
 
         val probe = TestSubscriber.manualProbe[ChunkStreamPart]()
@@ -118,15 +120,13 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
       "exhibits eager request stream completion" in new TestSetup {
         requestsSub.sendNext(HttpRequest())
         requestsSub.sendComplete()
-        expectWireData(
-          """GET / HTTP/1.1
+        expectWireData("""GET / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
             |
             |""")
 
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Content-Length: 0
             |
             |""")
@@ -146,16 +146,14 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
       requestsSub.sendNext(HttpRequest())
       requestsSub.sendComplete()
 
-      expectWireData(
-        """GET / HTTP/1.1
+      expectWireData("""GET / HTTP/1.1
           |Host: example.com
           |User-Agent: akka-http/test
           |
           |""")
 
       // two chunks sent by server
-      sendWireData(
-        """HTTP/1.1 200 OK
+      sendWireData("""HTTP/1.1 200 OK
           |Transfer-Encoding: chunked
           |
           |6
@@ -186,15 +184,13 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
       twice {
         requestsSub.sendNext(HttpRequest())
 
-        expectWireData(
-          """GET / HTTP/1.1
+        expectWireData("""GET / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
             |
             |""")
 
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Transfer-Encoding: chunked
             |
             |6
@@ -203,7 +199,8 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
             |
             |""")
 
-        val whenComplete = expectResponse().entity.dataBytes.runWith(Sink.ignore)
+        val whenComplete =
+          expectResponse().entity.dataBytes.runWith(Sink.ignore)
         whenComplete.futureValue should be(akka.Done)
       }
     }
@@ -211,20 +208,19 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
     "handle several requests on one persistent connection" which {
       "has a first response that was chunked" in new TestSetup {
         requestsSub.sendNext(HttpRequest())
-        expectWireData(
-          """GET / HTTP/1.1
+        expectWireData("""GET / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
             |
             |""")
 
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Transfer-Encoding: chunked
             |
             |""")
 
-        val HttpResponse(_, _, HttpEntity.Chunked(ct, chunks), _) = expectResponse()
+        val HttpResponse(_, _, HttpEntity.Chunked(ct, chunks), _) =
+          expectResponse()
 
         val probe = TestSubscriber.manualProbe[ChunkStreamPart]()
         chunks.runWith(Sink.fromSubscriber(probe))
@@ -241,8 +237,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         probe.expectComplete()
 
         // simulate that response is received before method bypass reaches response parser
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Content-Length: 0
             |
             |""")
@@ -250,8 +245,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         responsesSub.request(1)
 
         requestsSub.sendNext(HttpRequest())
-        expectWireData(
-          """GET / HTTP/1.1
+        expectWireData("""GET / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
             |
@@ -269,9 +263,12 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
 
       "catch the request entity stream being shorter than the Content-Length" in new TestSetup {
         val probe = TestPublisher.manualProbe[ByteString]()
-        requestsSub.sendNext(HttpRequest(PUT, entity = HttpEntity(ContentTypes.`application/octet-stream`, 8, Source.fromPublisher(probe))))
-        expectWireData(
-          """PUT / HTTP/1.1
+        requestsSub.sendNext(HttpRequest(
+                PUT,
+                entity = HttpEntity(ContentTypes.`application/octet-stream`,
+                                    8,
+                                    Source.fromPublisher(probe))))
+        expectWireData("""PUT / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
             |Content-Type: application/octet-stream
@@ -295,9 +292,12 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
 
       "catch the request entity stream being longer than the Content-Length" in new TestSetup {
         val probe = TestPublisher.manualProbe[ByteString]()
-        requestsSub.sendNext(HttpRequest(PUT, entity = HttpEntity(ContentTypes.`application/octet-stream`, 8, Source.fromPublisher(probe))))
-        expectWireData(
-          """PUT / HTTP/1.1
+        requestsSub.sendNext(HttpRequest(
+                PUT,
+                entity = HttpEntity(ContentTypes.`application/octet-stream`,
+                                    8,
+                                    Source.fromPublisher(probe))))
+        expectWireData("""PUT / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
             |Content-Type: application/octet-stream
@@ -321,8 +321,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
 
       "catch illegal response starts" in new TestSetup {
         sendStandardRequest()
-        sendWireData(
-          """HTTP/1.2 200 OK
+        sendWireData("""HTTP/1.2 200 OK
             |
             |""")
 
@@ -336,14 +335,14 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
 
       "catch illegal response chunks" in new TestSetup {
         sendStandardRequest()
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Transfer-Encoding: chunked
             |
             |""")
 
         responsesSub.request(1)
-        val HttpResponse(_, _, HttpEntity.Chunked(ct, chunks), _) = responses.expectNext()
+        val HttpResponse(_, _, HttpEntity.Chunked(ct, chunks), _) =
+          responses.expectNext()
         ct shouldEqual ContentTypes.`application/octet-stream`
 
         val probe = TestSubscriber.manualProbe[ChunkStreamPart]()
@@ -382,18 +381,17 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
     "support response length verification" which isDefinedVia {
       import HttpEntity._
 
-      class LengthVerificationTest(maxContentLength: Int) extends TestSetup(maxContentLength) {
+      class LengthVerificationTest(maxContentLength: Int)
+          extends TestSetup(maxContentLength) {
         val entityBase = "0123456789ABCD"
 
         def sendStrictResponseWithLength(bytes: Int) =
-          sendWireData(
-            s"""HTTP/1.1 200 OK
+          sendWireData(s"""HTTP/1.1 200 OK
                |Content-Length: $bytes
                |
                |${entityBase take bytes}""")
         def sendDefaultResponseWithLength(bytes: Int) = {
-          sendWireData(
-            s"""HTTP/1.1 200 OK
+          sendWireData(s"""HTTP/1.1 200 OK
                |Content-Length: $bytes
                |
                |${entityBase take 3}""")
@@ -401,8 +399,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
           sendWireData(entityBase.slice(7, bytes))
         }
         def sendChunkedResponseWithLength(bytes: Int) =
-          sendWireData(
-            s"""HTTP/1.1 200 OK
+          sendWireData(s"""HTTP/1.1 200 OK
                |Transfer-Encoding: chunked
                |
                |3
@@ -415,8 +412,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
                |
                |""")
         def sendCloseDelimitedResponseWithLength(bytes: Int) = {
-          sendWireData(
-            s"""HTTP/1.1 200 OK
+          sendWireData(s"""HTTP/1.1 200 OK
                |
                |${entityBase take 3}""")
           sendWireData(entityBase.slice(3, 7))
@@ -427,24 +423,35 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         implicit class XResponse(response: HttpResponse) {
           def expectStrictEntityWithLength(bytes: Int) =
             response shouldEqual HttpResponse(
-              entity = Strict(ContentTypes.`application/octet-stream`, ByteString(entityBase take bytes)))
+                entity = Strict(ContentTypes.`application/octet-stream`,
+                                ByteString(entityBase take bytes)))
 
-          def expectEntity[T <: HttpEntity: ClassTag](bytes: Int) =
+          def expectEntity[T <: HttpEntity : ClassTag](bytes: Int) =
             inside(response) {
               case HttpResponse(_, _, entity: T, _) ⇒
-                entity.toStrict(100.millis).awaitResult(100.millis).data.utf8String shouldEqual entityBase.take(bytes)
+                entity
+                  .toStrict(100.millis)
+                  .awaitResult(100.millis)
+                  .data
+                  .utf8String shouldEqual entityBase.take(bytes)
             }
 
-          def expectSizeErrorInEntityOfType[T <: HttpEntity: ClassTag](limit: Int, actualSize: Option[Long] = None) =
+          def expectSizeErrorInEntityOfType[T <: HttpEntity : ClassTag](
+              limit: Int, actualSize: Option[Long] = None) =
             inside(response) {
               case HttpResponse(_, _, entity: T, _) ⇒
-                def gatherBytes = entity.dataBytes.runFold(ByteString.empty)(_ ++ _).awaitResult(100.millis)
-                (the[Exception] thrownBy gatherBytes).getCause shouldEqual EntityStreamSizeException(limit, actualSize)
+                def gatherBytes =
+                  entity.dataBytes
+                    .runFold(ByteString.empty)(_ ++ _)
+                    .awaitResult(100.millis)
+                  (the[Exception] thrownBy gatherBytes).getCause shouldEqual EntityStreamSizeException(
+                    limit, actualSize)
             }
         }
       }
 
-      "the config setting (strict entity)" in new LengthVerificationTest(maxContentLength = 10) {
+      "the config setting (strict entity)" in new LengthVerificationTest(
+          maxContentLength = 10) {
         sendStandardRequest()
         sendStrictResponseWithLength(10)
         expectResponse().expectStrictEntityWithLength(10)
@@ -453,20 +460,24 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         // as single element Default entities!
         sendStandardRequest()
         sendStrictResponseWithLength(11)
-        expectResponse().expectSizeErrorInEntityOfType[Default](limit = 10, actualSize = Some(11))
+        expectResponse().expectSizeErrorInEntityOfType[Default](
+            limit = 10, actualSize = Some(11))
       }
 
-      "the config setting (default entity)" in new LengthVerificationTest(maxContentLength = 10) {
+      "the config setting (default entity)" in new LengthVerificationTest(
+          maxContentLength = 10) {
         sendStandardRequest()
         sendDefaultResponseWithLength(10)
         expectResponse().expectEntity[Default](10)
 
         sendStandardRequest()
         sendDefaultResponseWithLength(11)
-        expectResponse().expectSizeErrorInEntityOfType[Default](limit = 10, actualSize = Some(11))
+        expectResponse().expectSizeErrorInEntityOfType[Default](
+            limit = 10, actualSize = Some(11))
       }
 
-      "the config setting (chunked entity)" in new LengthVerificationTest(maxContentLength = 10) {
+      "the config setting (chunked entity)" in new LengthVerificationTest(
+          maxContentLength = 10) {
         sendStandardRequest()
         sendChunkedResponseWithLength(10)
         expectResponse().expectEntity[Chunked](10)
@@ -485,89 +496,123 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         new LengthVerificationTest(maxContentLength = 10) {
           sendStandardRequest()
           sendCloseDelimitedResponseWithLength(11)
-          expectResponse().expectSizeErrorInEntityOfType[CloseDelimited](limit = 10)
+          expectResponse()
+            .expectSizeErrorInEntityOfType[CloseDelimited](limit = 10)
         }
       }
 
-      "a smaller programmatically-set limit (strict entity)" in new LengthVerificationTest(maxContentLength = 12) {
+      "a smaller programmatically-set limit (strict entity)" in new LengthVerificationTest(
+          maxContentLength = 12) {
         sendStandardRequest()
         sendStrictResponseWithLength(10)
-        expectResponse().mapEntity(_ withSizeLimit 10).expectStrictEntityWithLength(10)
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectStrictEntityWithLength(10)
 
         // entities that would be strict but have a Content-Length > the configured maximum are delivered
         // as single element Default entities!
         sendStandardRequest()
         sendStrictResponseWithLength(11)
-        expectResponse().mapEntity(_ withSizeLimit 10)
-          .expectSizeErrorInEntityOfType[Default](limit = 10, actualSize = Some(11))
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectSizeErrorInEntityOfType[Default](limit = 10,
+                                                  actualSize = Some(11))
       }
 
-      "a smaller programmatically-set limit (default entity)" in new LengthVerificationTest(maxContentLength = 12) {
+      "a smaller programmatically-set limit (default entity)" in new LengthVerificationTest(
+          maxContentLength = 12) {
         sendStandardRequest()
         sendDefaultResponseWithLength(10)
-        expectResponse().mapEntity(_ withSizeLimit 10).expectEntity[Default](10)
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectEntity[Default](10)
 
         sendStandardRequest()
         sendDefaultResponseWithLength(11)
-        expectResponse().mapEntity(_ withSizeLimit 10)
-          .expectSizeErrorInEntityOfType[Default](limit = 10, actualSize = Some(11))
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectSizeErrorInEntityOfType[Default](limit = 10,
+                                                  actualSize = Some(11))
       }
 
-      "a smaller programmatically-set limit (chunked entity)" in new LengthVerificationTest(maxContentLength = 12) {
+      "a smaller programmatically-set limit (chunked entity)" in new LengthVerificationTest(
+          maxContentLength = 12) {
         sendStandardRequest()
         sendChunkedResponseWithLength(10)
-        expectResponse().mapEntity(_ withSizeLimit 10).expectEntity[Chunked](10)
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectEntity[Chunked](10)
 
         sendStandardRequest()
         sendChunkedResponseWithLength(11)
-        expectResponse().mapEntity(_ withSizeLimit 10).expectSizeErrorInEntityOfType[Chunked](limit = 10)
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectSizeErrorInEntityOfType[Chunked](limit = 10)
       }
 
       "a smaller programmatically-set limit (close-delimited entity)" in {
         new LengthVerificationTest(maxContentLength = 12) {
           sendStandardRequest()
           sendCloseDelimitedResponseWithLength(10)
-          expectResponse().mapEntity(_ withSizeLimit 10).expectEntity[CloseDelimited](10)
+          expectResponse()
+            .mapEntity(_ withSizeLimit 10)
+            .expectEntity[CloseDelimited](10)
         }
         new LengthVerificationTest(maxContentLength = 12) {
           sendStandardRequest()
           sendCloseDelimitedResponseWithLength(11)
-          expectResponse().mapEntity(_ withSizeLimit 10).expectSizeErrorInEntityOfType[CloseDelimited](limit = 10)
+          expectResponse()
+            .mapEntity(_ withSizeLimit 10)
+            .expectSizeErrorInEntityOfType[CloseDelimited](limit = 10)
         }
       }
 
-      "a larger programmatically-set limit (strict entity)" in new LengthVerificationTest(maxContentLength = 8) {
+      "a larger programmatically-set limit (strict entity)" in new LengthVerificationTest(
+          maxContentLength = 8) {
         // entities that would be strict but have a Content-Length > the configured maximum are delivered
         // as single element Default entities!
         sendStandardRequest()
         sendStrictResponseWithLength(10)
-        expectResponse().mapEntity(_ withSizeLimit 10).expectEntity[Default](10)
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectEntity[Default](10)
 
         sendStandardRequest()
         sendStrictResponseWithLength(11)
-        expectResponse().mapEntity(_ withSizeLimit 10)
-          .expectSizeErrorInEntityOfType[Default](limit = 10, actualSize = Some(11))
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectSizeErrorInEntityOfType[Default](limit = 10,
+                                                  actualSize = Some(11))
       }
 
-      "a larger programmatically-set limit (default entity)" in new LengthVerificationTest(maxContentLength = 8) {
+      "a larger programmatically-set limit (default entity)" in new LengthVerificationTest(
+          maxContentLength = 8) {
         sendStandardRequest()
         sendDefaultResponseWithLength(10)
-        expectResponse().mapEntity(_ withSizeLimit 10).expectEntity[Default](10)
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectEntity[Default](10)
 
         sendStandardRequest()
         sendDefaultResponseWithLength(11)
-        expectResponse().mapEntity(_ withSizeLimit 10)
-          .expectSizeErrorInEntityOfType[Default](limit = 10, actualSize = Some(11))
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectSizeErrorInEntityOfType[Default](limit = 10,
+                                                  actualSize = Some(11))
       }
 
-      "a larger programmatically-set limit (chunked entity)" in new LengthVerificationTest(maxContentLength = 8) {
+      "a larger programmatically-set limit (chunked entity)" in new LengthVerificationTest(
+          maxContentLength = 8) {
         sendStandardRequest()
         sendChunkedResponseWithLength(10)
-        expectResponse().mapEntity(_ withSizeLimit 10).expectEntity[Chunked](10)
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
+          .expectEntity[Chunked](10)
 
         sendStandardRequest()
         sendChunkedResponseWithLength(11)
-        expectResponse().mapEntity(_ withSizeLimit 10)
+        expectResponse()
+          .mapEntity(_ withSizeLimit 10)
           .expectSizeErrorInEntityOfType[Chunked](limit = 10)
       }
 
@@ -575,12 +620,16 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         new LengthVerificationTest(maxContentLength = 8) {
           sendStandardRequest()
           sendCloseDelimitedResponseWithLength(10)
-          expectResponse().mapEntity(_ withSizeLimit 10).expectEntity[CloseDelimited](10)
+          expectResponse()
+            .mapEntity(_ withSizeLimit 10)
+            .expectEntity[CloseDelimited](10)
         }
         new LengthVerificationTest(maxContentLength = 8) {
           sendStandardRequest()
           sendCloseDelimitedResponseWithLength(11)
-          expectResponse().mapEntity(_ withSizeLimit 10).expectSizeErrorInEntityOfType[CloseDelimited](limit = 10)
+          expectResponse()
+            .mapEntity(_ withSizeLimit 10)
+            .expectSizeErrorInEntityOfType[CloseDelimited](limit = 10)
         }
       }
     }
@@ -588,9 +637,10 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
     "support requests with an `Expect: 100-continue` headers" which {
 
       "have a strict entity and receive a `100 Continue` response" in new TestSetup {
-        requestsSub.sendNext(HttpRequest(POST, headers = List(Expect.`100-continue`), entity = "ABCDEF"))
-        expectWireData(
-          """POST / HTTP/1.1
+        requestsSub.sendNext(HttpRequest(POST,
+                                         headers = List(Expect.`100-continue`),
+                                         entity = "ABCDEF"))
+        expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
             |Host: example.com
             |User-Agent: akka-http/test
@@ -601,15 +651,13 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         netOutSub.request(1)
         netOut.expectNoMsg(50.millis)
 
-        sendWireData(
-          """HTTP/1.1 100 Continue
+        sendWireData("""HTTP/1.1 100 Continue
             |
             |""")
 
         netOut.expectNext().utf8String shouldEqual "ABCDEF"
 
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Content-Length: 0
             |
             |""")
@@ -624,10 +672,13 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
 
       "have a default entity and receive a `100 Continue` response" in new TestSetup {
         val entityParts = List("ABC", "DE", "FGH").map(ByteString(_))
-        requestsSub.sendNext(HttpRequest(POST, headers = List(Expect.`100-continue`),
-          entity = HttpEntity(ContentTypes.`application/octet-stream`, 8, Source(entityParts))))
-        expectWireData(
-          """POST / HTTP/1.1
+        requestsSub.sendNext(HttpRequest(
+                POST,
+                headers = List(Expect.`100-continue`),
+                entity = HttpEntity(ContentTypes.`application/octet-stream`,
+                                    8,
+                                    Source(entityParts))))
+        expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
             |Host: example.com
             |User-Agent: akka-http/test
@@ -638,8 +689,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         netOutSub.request(1)
         netOut.expectNoMsg(50.millis)
 
-        sendWireData(
-          """HTTP/1.1 100 Continue
+        sendWireData("""HTTP/1.1 100 Continue
             |
             |""")
 
@@ -647,8 +697,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         expectWireData("DE")
         expectWireData("FGH")
 
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Content-Length: 0
             |
             |""")
@@ -662,9 +711,10 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
       }
 
       "receive a normal response" in new TestSetup {
-        requestsSub.sendNext(HttpRequest(POST, headers = List(Expect.`100-continue`), entity = "ABCDEF"))
-        expectWireData(
-          """POST / HTTP/1.1
+        requestsSub.sendNext(HttpRequest(POST,
+                                         headers = List(Expect.`100-continue`),
+                                         entity = "ABCDEF"))
+        expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
             |Host: example.com
             |User-Agent: akka-http/test
@@ -675,8 +725,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         netOutSub.request(1)
         netOut.expectNoMsg(50.millis)
 
-        sendWireData(
-          """HTTP/1.1 200 OK
+        sendWireData("""HTTP/1.1 200 OK
             |Content-Length: 0
             |
             |""")
@@ -692,10 +741,11 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
       }
 
       "receive an error response" in new TestSetup {
-        requestsSub.sendNext(HttpRequest(POST, headers = List(Expect.`100-continue`), entity = "ABCDEF"))
+        requestsSub.sendNext(HttpRequest(POST,
+                                         headers = List(Expect.`100-continue`),
+                                         entity = "ABCDEF"))
         requestsSub.sendComplete()
-        expectWireData(
-          """POST / HTTP/1.1
+        expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
             |Host: example.com
             |User-Agent: akka-http/test
@@ -706,8 +756,7 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
         netOutSub.request(1)
         netOut.expectNoMsg(50.millis)
 
-        sendWireData(
-          """HTTP/1.1 400 Bad Request
+        sendWireData("""HTTP/1.1 400 Bad Request
             |Content-Length: 0
             |
             |""")
@@ -722,18 +771,15 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
 
     "ignore interim 1xx responses" in new TestSetup {
       sendStandardRequest()
-      sendWireData(
-        """HTTP/1.1 102 Processing
+      sendWireData("""HTTP/1.1 102 Processing
           |Content-Length: 0
           |
           |""")
-      sendWireData(
-        """HTTP/1.1 102 Processing
+      sendWireData("""HTTP/1.1 102 Processing
           |Content-Length: 0
           |
           |""")
-      sendWireData(
-        """HTTP/1.1 200 OK
+      sendWireData("""HTTP/1.1 200 OK
           |Content-Length: 0
           |
           |""")
@@ -752,34 +798,45 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
     val responses = TestSubscriber.manualProbe[HttpResponse]()
 
     def settings = {
-      val s = ClientConnectionSettings(system)
-        .withUserAgentHeader(Some(`User-Agent`(List(ProductVersion("akka-http", "test")))))
+      val s = ClientConnectionSettings(system).withUserAgentHeader(
+          Some(`User-Agent`(List(ProductVersion("akka-http", "test")))))
       if (maxResponseContentLength < 0) s
-      else s.withParserSettings(s.parserSettings.withMaxContentLength(maxResponseContentLength))
+      else
+        s.withParserSettings(
+            s.parserSettings.withMaxContentLength(maxResponseContentLength))
     }
 
     val (netOut, netIn) = {
       val netOut = TestSubscriber.manualProbe[ByteString]
       val netIn = TestPublisher.manualProbe[ByteString]()
 
-      RunnableGraph.fromGraph(GraphDSL.create(OutgoingConnectionBlueprint(Host("example.com"), settings, NoLogging)) { implicit b ⇒
-        client ⇒
-          import GraphDSL.Implicits._
-          Source.fromPublisher(netIn) ~> Flow[ByteString].map(SessionBytes(null, _)) ~> client.in2
-          client.out1 ~> Flow[SslTlsOutbound].collect { case SendBytes(x) ⇒ x } ~> Sink.fromSubscriber(netOut)
-          Source.fromPublisher(requests) ~> client.in1
-          client.out2 ~> Sink.fromSubscriber(responses)
-          ClosedShape
-      }).run()
+      RunnableGraph
+        .fromGraph(GraphDSL.create(OutgoingConnectionBlueprint(
+                    Host("example.com"), settings, NoLogging)) {
+          implicit b ⇒ client ⇒
+            import GraphDSL.Implicits._
+            Source.fromPublisher(netIn) ~> Flow[ByteString].map(
+                SessionBytes(null, _)) ~> client.in2
+            client.out1 ~> Flow[SslTlsOutbound].collect {
+              case SendBytes(x) ⇒ x
+            } ~> Sink.fromSubscriber(netOut)
+            Source.fromPublisher(requests) ~> client.in1
+            client.out2 ~> Sink.fromSubscriber(responses)
+            ClosedShape
+        })
+        .run()
 
       netOut -> netIn
     }
 
     def wipeDate(string: String) =
-      string.fastSplit('\n').map {
-        case s if s.startsWith("Date:") ⇒ "Date: XXXX\r"
-        case s                          ⇒ s
-      }.mkString("\n")
+      string
+        .fastSplit('\n')
+        .map {
+          case s if s.startsWith("Date:") ⇒ "Date: XXXX\r"
+          case s ⇒ s
+        }
+        .mkString("\n")
 
     val netInSub = netIn.expectSubscription()
     val netOutSub = netOut.expectSubscription()
@@ -789,20 +846,21 @@ class LowLevelOutgoingConnectionSpec extends AkkaSpec("akka.loggers = []\n akka.
     requestsSub.expectRequest(16)
     netInSub.expectRequest(16)
 
-    def sendWireData(data: String): Unit = sendWireData(ByteString(data.stripMarginWithNewline("\r\n"), "ASCII"))
+    def sendWireData(data: String): Unit =
+      sendWireData(ByteString(data.stripMarginWithNewline("\r\n"), "ASCII"))
     def sendWireData(data: ByteString): Unit = netInSub.sendNext(data)
 
     def expectWireData(s: String) = {
       netOutSub.request(1)
-      netOut.expectNext().utf8String shouldEqual s.stripMarginWithNewline("\r\n")
+      netOut.expectNext().utf8String shouldEqual s.stripMarginWithNewline(
+          "\r\n")
     }
 
     def closeNetworkInput(): Unit = netInSub.sendComplete()
 
     def sendStandardRequest() = {
       requestsSub.sendNext(HttpRequest())
-      expectWireData(
-        """GET / HTTP/1.1
+      expectWireData("""GET / HTTP/1.1
           |Host: example.com
           |User-Agent: akka-http/test
           |

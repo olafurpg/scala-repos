@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.store
 
 import io.prediction.data.storage.Storage
@@ -52,31 +51,30 @@ object PEventStore {
     * @return RDD[Event]
     */
   def find(
-    appName: String,
-    channelName: Option[String] = None,
-    startTime: Option[DateTime] = None,
-    untilTime: Option[DateTime] = None,
-    entityType: Option[String] = None,
-    entityId: Option[String] = None,
-    eventNames: Option[Seq[String]] = None,
-    targetEntityType: Option[Option[String]] = None,
-    targetEntityId: Option[Option[String]] = None
+      appName: String,
+      channelName: Option[String] = None,
+      startTime: Option[DateTime] = None,
+      untilTime: Option[DateTime] = None,
+      entityType: Option[String] = None,
+      entityId: Option[String] = None,
+      eventNames: Option[Seq[String]] = None,
+      targetEntityType: Option[Option[String]] = None,
+      targetEntityId: Option[Option[String]] = None
   )(sc: SparkContext): RDD[Event] = {
 
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
     eventsDb.find(
-      appId = appId,
-      channelId = channelId,
-      startTime = startTime,
-      untilTime = untilTime,
-      entityType = entityType,
-      entityId = entityId,
-      eventNames = eventNames,
-      targetEntityType = targetEntityType,
-      targetEntityId = targetEntityId
+        appId = appId,
+        channelId = channelId,
+        startTime = startTime,
+        untilTime = untilTime,
+        entityType = entityType,
+        entityId = entityId,
+        eventNames = eventNames,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId
     )(sc)
-
   }
 
   /** Aggregate properties of entities based on these special events:
@@ -91,26 +89,23 @@ object PEventStore {
     * @param sc Spark context
     * @return RDD[(String, PropertyMap)] RDD of entityId and PropetyMap pair
     */
-  def aggregateProperties(
-    appName: String,
-    entityType: String,
-    channelName: Option[String] = None,
-    startTime: Option[DateTime] = None,
-    untilTime: Option[DateTime] = None,
-    required: Option[Seq[String]] = None)
-    (sc: SparkContext): RDD[(String, PropertyMap)] = {
+  def aggregateProperties(appName: String,
+                          entityType: String,
+                          channelName: Option[String] = None,
+                          startTime: Option[DateTime] = None,
+                          untilTime: Option[DateTime] = None,
+                          required: Option[Seq[String]] = None)(
+      sc: SparkContext): RDD[(String, PropertyMap)] = {
 
-      val (appId, channelId) = Common.appNameToId(appName, channelName)
+    val (appId, channelId) = Common.appNameToId(appName, channelName)
 
-      eventsDb.aggregateProperties(
+    eventsDb.aggregateProperties(
         appId = appId,
         entityType = entityType,
         channelId = channelId,
         startTime = startTime,
         untilTime = untilTime,
         required = required
-      )(sc)
-
-    }
-
+    )(sc)
+  }
 }

@@ -18,15 +18,16 @@ private[loadbalancer] object Heap {
 }
 
 /**
- * Provide heap operations for some type T.
- *
- * nb: 1-indexed heaps, ranges are inclusive.
- * indexer will only be invoked on swaps. the
- * caller is responsible for maintaining the
- * initial value.
- */
+  * Provide heap operations for some type T.
+  *
+  * nb: 1-indexed heaps, ranges are inclusive.
+  * indexer will only be invoked on swaps. the
+  * caller is responsible for maintaining the
+  * initial value.
+  */
 private[loadbalancer] class Heap[T](
-  ord: Ordering[T], indexer: Heap.Indexer[T]
+    ord: Ordering[T],
+    indexer: Heap.Indexer[T]
 ) {
   import ord._
 
@@ -40,9 +41,10 @@ private[loadbalancer] class Heap[T](
 
   @tailrec
   final def fixDown(heap: Array[T], i: Int, j: Int) {
-    if (j < i*2) return
+    if (j < i * 2) return
 
-    val m = if (j == i*2 || heap(2*i) < heap(2*i+1)) 2*i else 2*i + 1
+    val m =
+      if (j == i * 2 || heap(2 * i) < heap(2 * i + 1)) 2 * i else 2 * i + 1
     if (heap(m) < heap(i)) {
       swap(heap, i, m)
       fixDown(heap, m, j)
@@ -51,16 +53,17 @@ private[loadbalancer] class Heap[T](
 
   @tailrec
   final def fixUp(heap: Array[T], i: Int) {
-    if (i != 1 && heap(i) < heap(i/2)) {
-      swap(heap, i, i/2)
-      fixUp(heap, i/2)
+    if (i != 1 && heap(i) < heap(i / 2)) {
+      swap(heap, i, i / 2)
+      fixUp(heap, i / 2)
     }
   }
 
   def isValid(heap: Array[T], i: Int, j: Int): Boolean =
-    if (j < i*2) true else {
-      val left = heap(i) < heap(i*2)
-      val right = if (j == i*2) true else heap(i) < heap(i*2+1)
+    if (j < i * 2) true
+    else {
+      val left = heap(i) < heap(i * 2)
+      val right = if (j == i * 2) true else heap(i) < heap(i * 2 + 1)
       left && right
     }
 }

@@ -1,8 +1,8 @@
 package cats
 package tests
 
-import cats.data.{ Func, AppFunc, Const }
-import Func.{ appFunc, appFuncU }
+import cats.data.{Func, AppFunc, Const}
+import Func.{appFunc, appFuncU}
 
 /*
  * This an example of applicative function composition.
@@ -10,8 +10,9 @@ import Func.{ appFunc, appFuncU }
  */
 class WordCountTest extends CatsSuite {
   test("wordcount") {
-    import cats.data.State.{ get, set }
-    val text = "Faith, I must leave thee, love, and shortly too.\nMy operant powers their functions leave to do.\n".toList
+    import cats.data.State.{get, set}
+    val text =
+      "Faith, I must leave thee, love, and shortly too.\nMy operant powers their functions leave to do.\n".toList
     // A type alias to treat Int as cartesian applicative
     type Count[A] = Const[Int, A]
     // Tye type parameter to Count is ceremonial, so hardcode it to Unit
@@ -23,8 +24,9 @@ class WordCountTest extends CatsSuite {
     val countChar: AppFunc[Count, Char, Unit] = appFunc(count)
     def testIf(b: Boolean): Int = if (b) 1 else 0
     // An applicative functor to count each line
-    val countLine: AppFunc[Count, Char, Unit] =
-      appFunc { (c: Char) => liftInt(testIf(c == '\n')) }
+    val countLine: AppFunc[Count, Char, Unit] = appFunc { (c: Char) =>
+      liftInt(testIf(c == '\n'))
+    }
     def isSpace(c: Char): Boolean = (c == ' ' || c == '\n')
 
     // To count words, we need to detect transitions from whitespace to non-whitespace.
@@ -44,8 +46,8 @@ class WordCountTest extends CatsSuite {
     val lineCount = allResults.first.second
     val charCount = allResults.second
     val wordCount = wordCountState.runA(false).value
-    charCount.getConst should === (96)
-    lineCount.getConst should === (2)
-    wordCount.getConst should === (17)
+    charCount.getConst should ===(96)
+    lineCount.getConst should ===(2)
+    wordCount.getConst should ===(17)
   }
 }

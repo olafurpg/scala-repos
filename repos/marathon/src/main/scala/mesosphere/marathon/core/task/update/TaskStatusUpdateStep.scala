@@ -14,5 +14,6 @@ import scala.concurrent.Future
 trait TaskStatusUpdateStep {
   def name: String
 
-  def processUpdate(timestamp: Timestamp, task: Task, mesosStatus: TaskStatus): Future[_]
+  def processUpdate(
+      timestamp: Timestamp, task: Task, mesosStatus: TaskStatus): Future[_]
 }

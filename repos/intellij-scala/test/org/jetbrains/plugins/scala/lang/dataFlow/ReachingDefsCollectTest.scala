@@ -13,29 +13,36 @@ import org.junit.Assert
 import scala.util.Sorting
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 class ReachingDefsCollectTest extends LightScalaTestCase {
-  override protected  def getBasePath: String = TestUtils.getTestDataPath + "/dataFlow/reachingDefsCollect/"
+  override protected def getBasePath: String =
+    TestUtils.getTestDataPath + "/dataFlow/reachingDefsCollect/"
 
   override def setUp() {
     super.setUp()
     myFixture.setTestDataPath(getBasePath)
   }
 
-  def readInput = TestUtils.readInput(getBasePath + getTestName(true) + ".test")
+  def readInput =
+    TestUtils.readInput(getBasePath + getTestName(true) + ".test")
 
   def doTest() {
     val input = readInput
     myFixture.configureByText(ScalaFileType.SCALA_FILE_TYPE, input.get(0))
     val file: ScalaFile = myFixture.getFile.asInstanceOf[ScalaFile]
     val model: SelectionModel = myFixture.getEditor.getSelectionModel
-    val start: PsiElement = file.findElementAt(if (model.hasSelection) model.getSelectionStart else 0)
-    val end: PsiElement = file.findElementAt(if (model.hasSelection) model.getSelectionEnd - 1 else file.getTextLength - 1)
+    val start: PsiElement = file.findElementAt(
+        if (model.hasSelection) model.getSelectionStart else 0)
+    val end: PsiElement = file.findElementAt(if (model.hasSelection)
+          model.getSelectionEnd - 1 else file.getTextLength - 1)
     val range = ScalaPsiUtil.getElementsRange(start, end)
-    val scope = PsiTreeUtil.getParentOfType(PsiTreeUtil.findCommonParent(start, end),
-      classOf[ScControlFlowOwner], false).getParent.asInstanceOf[ScalaPsiElement]
+    val scope = PsiTreeUtil
+      .getParentOfType(PsiTreeUtil.findCommonParent(start, end),
+                       classOf[ScControlFlowOwner],
+                       false)
+      .getParent
+      .asInstanceOf[ScalaPsiElement]
 
     import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.ReachingDefintionsCollector._
     val infos = collectVariableInfo(range, scope)
@@ -45,7 +52,9 @@ class ReachingDefsCollectTest extends LightScalaTestCase {
 
   protected def dumpDefInfos(infos: FragmentVariableInfos): String = {
     def variablesText(info: Iterable[VariableInfo]): String =
-      Sorting.stableSort(info.map(p => p.element.toString).toSeq).mkString("\n")
+      Sorting
+        .stableSort(info.map(p => p.element.toString).toSeq)
+        .mkString("\n")
     val inputElements = variablesText(infos.inputVariables)
     val outputElements = variablesText(infos.outputVariables)
     s"""INPUT:
@@ -60,6 +69,4 @@ class ReachingDefsCollectTest extends LightScalaTestCase {
   def testClosure1() {
     doTest()
   }
-
-
 }

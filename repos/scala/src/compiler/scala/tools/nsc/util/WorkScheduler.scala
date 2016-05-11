@@ -13,7 +13,9 @@ class WorkScheduler {
 
   /** Called from server: block until one of todo list, throwables or interruptReqs is nonempty */
   def waitForMoreWork() = synchronized {
-    while (todo.isEmpty && throwables.isEmpty && interruptReqs.isEmpty) { wait() }
+    while (todo.isEmpty && throwables.isEmpty && interruptReqs.isEmpty) {
+      wait()
+    }
   }
 
   /** called from Server: test whether one of todo list, throwables, or InterruptReqs is nonempty */
@@ -31,19 +33,21 @@ class WorkScheduler {
   }
 
   def dequeueAllInterrupts(f: InterruptReq => Unit): Unit = synchronized {
-    interruptReqs.dequeueAll { iq => f(iq); true }
+    interruptReqs.dequeueAll { iq =>
+      f(iq); true
+    }
   }
 
   /** Called from server: return optional exception posted by client
-   *  Reset to no exception.
-   */
+    *  Reset to no exception.
+    */
   def pollThrowable(): Option[Throwable] = synchronized {
-    if (throwables.isEmpty)
-      None
+    if (throwables.isEmpty) None
     else {
       val result = Some(throwables.dequeue())
       if (!throwables.isEmpty)
-        postWorkItem { () => }
+        postWorkItem { () =>
+        }
       result
     }
   }
@@ -82,8 +86,8 @@ class WorkScheduler {
   }
 
   /** Called from client:
-   *  Require an exception to be thrown on next poll.
-   */
+    *  Require an exception to be thrown on next poll.
+    */
   def raise(exc: Throwable) = synchronized {
     throwables enqueue exc
     postWorkItem { new EmptyAction }
@@ -93,4 +97,3 @@ class WorkScheduler {
 class EmptyAction extends (() => Unit) {
   def apply() {}
 }
-

@@ -1,16 +1,20 @@
 import scala.language.dynamics
-import scala.reflect.{ ClassTag, classTag }
+import scala.reflect.{ClassTag, classTag}
 
 object Util {
-  def show[T](x: T): T = { println(x) ; x }
-  def mkArgs(xs: Any*) = xs map { case ((k, v)) => k + "=" + v ; case x => "" + x } mkString ("(", ", ", ")")
+  def show[T](x: T): T = { println(x); x }
+  def mkArgs(xs: Any*) =
+    xs map { case ((k, v)) => k + "=" + v; case x => "" + x } mkString
+    ("(", ", ", ")")
 }
 import Util._
 
 abstract class MonoDynamic extends Dynamic {
-  def selectDynamic(name: String): String                           = show(this + "." + name)
-  def applyDynamic(name: String)(args: Any*): String                = show(this + "." + name + mkArgs(args: _*))
-  def applyDynamicNamed(name: String)(args: (String, Any)*): String = show(this + "." + name + mkArgs(args: _*))
+  def selectDynamic(name: String): String = show(this + "." + name)
+  def applyDynamic(name: String)(args: Any*): String =
+    show(this + "." + name + mkArgs(args: _*))
+  def applyDynamicNamed(name: String)(args: (String, Any)*): String =
+    show(this + "." + name + mkArgs(args: _*))
 
   override def toString = (this.getClass.getName split '.').last
 }
@@ -23,12 +27,16 @@ object Mono extends MonoDynamic {
   def f3 = f(this.bar())
   def f4 = f(this.bar)
   def f5 = f(f(f(f(f(f(this.bar)))))) + f(f(f(f(f(f(this.baz))))))
-  def f6 = f(f(f(f(f(f(this.bar(bippy = 1, boppy = 2))))))) + f(f(f(f(f(f(this.baz))))))
+  def f6 =
+    f(f(f(f(f(f(this.bar(bippy = 1, boppy = 2))))))) + f(
+        f(f(f(f(f(this.baz))))))
 }
 
 object Poly extends Dynamic {
-  def selectDynamic[T: ClassTag](name: String): String = show(s"$this.$name[${classTag[T]}]")
-  def applyDynamic[T: ClassTag](name: String)(args: Any*): String = show(args.mkString(s"$this.$name[${classTag[T]}](", ", ", ")"))
+  def selectDynamic[T : ClassTag](name: String): String =
+    show(s"$this.$name[${classTag[T]}]")
+  def applyDynamic[T : ClassTag](name: String)(args: Any*): String =
+    show(args.mkString(s"$this.$name[${classTag[T]}](", ", ", ")"))
 
   def f(s: String): String = s
 
@@ -49,7 +57,8 @@ object Poly extends Dynamic {
 
 object Updating extends Dynamic {
   def selectDynamic(name: String): String = show(s"$this.$name")
-  def updateDynamic(name: String)(value: Any): String = show(s"$this.$name = $value")
+  def updateDynamic(name: String)(value: Any): String =
+    show(s"$this.$name = $value")
 
   def f1 = this.bar
   def f2 = this.bar = "b"
@@ -61,11 +70,10 @@ object Nest1 extends Dynamic {
   def applyDynamic(name: String)(args: Any*): Nest2.type = Nest2
 
   object Nest2 extends Dynamic {
-    def applyDynamicNamed(name: String)(args: (String, Any)*): Nest3.type = Nest3
+    def applyDynamicNamed(name: String)(args: (String, Any)*): Nest3.type =
+      Nest3
 
-    object Nest3 extends MonoDynamic {
-
-    }
+    object Nest3 extends MonoDynamic {}
   }
 
   def f1 = Nest1.bip().bop(foo = "bar").bippy(1, 2, 3)
@@ -87,11 +95,13 @@ object Named extends Dynamic {
 }
 
 object Named2 extends Dynamic {
-  def applyDynamic(name: String)(a: Any)(b: Any = "b", c: Any = "c"): Named2.type = {
+  def applyDynamic(name: String)(a: Any)(
+      b: Any = "b", c: Any = "c"): Named2.type = {
     show(this + "." + name + mkArgs(a) + mkArgs(b, c))
     this
   }
-  def applyDynamicNamed(name: String)(a: (String, Any))(b: (String, Any), c: (String, Any)): Named2.type = {
+  def applyDynamicNamed(name: String)(
+      a: (String, Any))(b: (String, Any), c: (String, Any)): Named2.type = {
     show(this + "." + name + mkArgs(a) + mkArgs(b, c))
     this
   }
@@ -109,26 +119,25 @@ object Named2 extends Dynamic {
   override def toString = "Named2"
 }
 
-
 object Test {
   def main(args: Array[String]): Unit = {
     {
       import Mono._
-      f1 ; f2 ; f3 ; f4 ; f5
+      f1; f2; f3; f4; f5
       f6
     }
     {
       import Poly._
-      f1 ; f2 ; f3 ; f4 ; f5
-      f6 ; f7 ; f8 ; f9 ; f10
+      f1; f2; f3; f4; f5
+      f6; f7; f8; f9; f10
     }
     {
       import Updating._
-      f1 ; f2
+      f1; f2
     }
     {
       import Nest1._
-      f1 ; f2
+      f1; f2
     }
     {
       import Named._
@@ -136,8 +145,8 @@ object Test {
     }
     {
       import Named2._
-      f1 ; f2 ; f3 ; f4 ; f5
-      f6 ; f7 ; f8 ; f9
+      f1; f2; f3; f4; f5
+      f6; f7; f8; f9
     }
   }
 }

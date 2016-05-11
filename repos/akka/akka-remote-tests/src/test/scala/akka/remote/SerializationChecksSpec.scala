@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.testkit.AkkaSpec
@@ -13,7 +13,5 @@ class SerializationChecksSpec extends AkkaSpec {
       system.settings.SerializeAllCreators should ===(true)
       system.settings.SerializeAllMessages should ===(true)
     }
-
   }
-
 }

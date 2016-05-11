@@ -2,14 +2,15 @@ package breeze.optimize
 
 import breeze.util.SerializableLogging
 
-abstract class CubicLineSearch extends SerializableLogging with MinimizingLineSearch {
+abstract class CubicLineSearch
+    extends SerializableLogging with MinimizingLineSearch {
   import scala.math._
 
   case class Bracket(
-    t: Double, // 1d line search parameter
-    dd: Double, // Directional Derivative at t
-    fval: Double // Function value at t
-    )
+      t: Double, // 1d line search parameter
+      dd: Double, // Directional Derivative at t
+      fval: Double // Function value at t
+  )
 
   /*
    * Invoke line search, returning stepsize
@@ -52,18 +53,19 @@ abstract class CubicLineSearch extends SerializableLogging with MinimizingLineSe
  * works better than other approaches in my experience.
  * Based on Nocedal & Wright.
  */
-class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int) extends CubicLineSearch {
+class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int)
+    extends CubicLineSearch {
   import scala.math._
 
   val c1 = 1e-4
   val c2 = 0.9
 
   /**
-   * Performs a line search on the function f, returning a point satisfying
-   * the Strong Wolfe conditions. Based on the line search detailed in
-   * Nocedal & Wright Numerical Optimization p58.
-   */
-  def minimize(f: DiffFunction[Double], init: Double = 1.0):Double = {
+    * Performs a line search on the function f, returning a point satisfying
+    * the Strong Wolfe conditions. Based on the line search detailed in
+    * Nocedal & Wright Numerical Optimization p58.
+    */
+  def minimize(f: DiffFunction[Double], init: Double = 1.0): Double = {
 
     def phi(t: Double): Bracket = {
       val (pval, pdd) = f.calculate(t)
@@ -76,20 +78,21 @@ class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int) extends Cu
     val dd = low.dd
 
     if (dd > 0) {
-      throw new FirstOrderException("Line search invoked with non-descent direction: " + dd)
+      throw new FirstOrderException(
+          "Line search invoked with non-descent direction: " + dd)
     }
 
     /**
-     * Assuming a point satisfying the strong wolfe conditions exists within
-     * the passed interval, this method finds it by iteratively refining the
-     * interval. Nocedal & Wright give the following invariants for zoom's loop:
-     *
-     *  - The interval bounded by low.t and hi.t contains a point satisfying the
-     *    strong Wolfe conditions.
-     *  - Among all points evaluated so far that satisfy the "sufficient decrease"
-     *    condition, low.t is the one with the smallest fval.
-     *  - hi.t is chosen so that low.dd * (hi.t - low.t) < 0.
-     */
+      * Assuming a point satisfying the strong wolfe conditions exists within
+      * the passed interval, this method finds it by iteratively refining the
+      * interval. Nocedal & Wright give the following invariants for zoom's loop:
+      *
+      *  - The interval bounded by low.t and hi.t contains a point satisfying the
+      *    strong Wolfe conditions.
+      *  - Among all points evaluated so far that satisfy the "sufficient decrease"
+      *    condition, low.t is the one with the smallest fval.
+      *  - hi.t is chosen so that low.dd * (hi.t - low.t) < 0.
+      */
     def zoom(linit: Bracket, rinit: Bracket): Double = {
 
       var low = linit
@@ -102,8 +105,8 @@ class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int) extends Cu
         // Evaluate objective at t, and build bracket
         val c = phi(t)
         //logger.debug("ZOOM:\n c: " + c + " \n l: " + low + " \nr: " + hi)
-        logger.info("Line search t: " + t + " fval: " + c.fval +
-          " rhs: " + (fval + c1 * c.t * dd) + " cdd: " + c.dd)
+        logger.info("Line search t: " + t + " fval: " + c.fval + " rhs: " +
+            (fval + c1 * c.t * dd) + " cdd: " + c.dd)
 
         ///////////////
         /// Update left or right bracket, or both
@@ -143,15 +146,18 @@ class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int) extends Cu
 
       // If phi has a bounded domain, inf or nan usually indicates we took
       // too large a step.
-      if (java.lang.Double.isInfinite(c.fval) || java.lang.Double.isNaN(c.fval)) {
+      if (java.lang.Double.isInfinite(c.fval) ||
+          java.lang.Double.isNaN(c.fval)) {
         t /= 2.0
-        logger.error("Encountered bad values in function evaluation. Decreasing step size to " + t)
+        logger.error(
+            "Encountered bad values in function evaluation. Decreasing step size to " +
+            t)
       } else {
 
         // Zoom if "sufficient decrease" condition is not satisfied
-        if ((c.fval > fval + c1 * t * dd) ||
-          (c.fval >= low.fval && i > 0)) {
-          logger.debug("Line search t: " + t + " fval: " + c.fval + " cdd: " + c.dd)
+        if ((c.fval > fval + c1 * t * dd) || (c.fval >= low.fval && i > 0)) {
+          logger.debug(
+              "Line search t: " + t + " fval: " + c.fval + " cdd: " + c.dd)
           return zoom(low, c)
         }
 
@@ -165,18 +171,19 @@ class StrongWolfeLineSearch(maxZoomIter: Int, maxLineSearchIter: Int) extends Cu
         // Occurs if we skipped over the nearest local minimum
         // over to the next one.
         if (c.dd >= 0) {
-          logger.debug("Line search t: " + t + " fval: " + c.fval +
-            " rhs: " + (fval + c1 * t * dd) + " cdd: " + c.dd)
+          logger.debug("Line search t: " + t + " fval: " + c.fval + " rhs: " +
+              (fval + c1 * t * dd) + " cdd: " + c.dd)
           return zoom(c, low)
         }
 
         low = c
         t *= 1.5
-        logger.debug("Sufficent Decrease condition but not curvature condition satisfied. Increased t to: " + t)
+        logger.debug(
+            "Sufficent Decrease condition but not curvature condition satisfied. Increased t to: " +
+            t)
       }
     }
 
     throw new FirstOrderException("Line search failed")
   }
-
 }

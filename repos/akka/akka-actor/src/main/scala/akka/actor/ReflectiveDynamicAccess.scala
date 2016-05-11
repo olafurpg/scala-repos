@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import scala.collection.immutable
@@ -9,21 +9,25 @@ import scala.reflect.ClassTag
 import scala.util.Try
 
 /**
- * This is the default [[akka.actor.DynamicAccess]] implementation used by [[akka.actor.ExtendedActorSystem]]
- * unless overridden. It uses reflection to turn fully-qualified class names into `Class[_]` objects
- * and creates instances from there using `getDeclaredConstructor()` and invoking that. The class loader
- * to be used for all this is determined by the actor system’s class loader by default.
- */
-class ReflectiveDynamicAccess(val classLoader: ClassLoader) extends DynamicAccess {
+  * This is the default [[akka.actor.DynamicAccess]] implementation used by [[akka.actor.ExtendedActorSystem]]
+  * unless overridden. It uses reflection to turn fully-qualified class names into `Class[_]` objects
+  * and creates instances from there using `getDeclaredConstructor()` and invoking that. The class loader
+  * to be used for all this is determined by the actor system’s class loader by default.
+  */
+class ReflectiveDynamicAccess(val classLoader: ClassLoader)
+    extends DynamicAccess {
 
-  override def getClassFor[T: ClassTag](fqcn: String): Try[Class[_ <: T]] =
+  override def getClassFor[T : ClassTag](fqcn: String): Try[Class[_ <: T]] =
     Try[Class[_ <: T]]({
-      val c = Class.forName(fqcn, false, classLoader).asInstanceOf[Class[_ <: T]]
+      val c =
+        Class.forName(fqcn, false, classLoader).asInstanceOf[Class[_ <: T]]
       val t = implicitly[ClassTag[T]].runtimeClass
-      if (t.isAssignableFrom(c)) c else throw new ClassCastException(t + " is not assignable from " + c)
+      if (t.isAssignableFrom(c)) c
+      else throw new ClassCastException(t + " is not assignable from " + c)
     })
 
-  override def createInstanceFor[T: ClassTag](clazz: Class[_], args: immutable.Seq[(Class[_], AnyRef)]): Try[T] =
+  override def createInstanceFor[T : ClassTag](
+      clazz: Class[_], args: immutable.Seq[(Class[_], AnyRef)]): Try[T] =
     Try {
       val types = args.map(_._1).toArray
       val values = args.map(_._2).toArray
@@ -31,13 +35,22 @@ class ReflectiveDynamicAccess(val classLoader: ClassLoader) extends DynamicAcces
       constructor.setAccessible(true)
       val obj = constructor.newInstance(values: _*)
       val t = implicitly[ClassTag[T]].runtimeClass
-      if (t.isInstance(obj)) obj.asInstanceOf[T] else throw new ClassCastException(clazz.getName + " is not a subtype of " + t)
-    } recover { case i: InvocationTargetException if i.getTargetException ne null ⇒ throw i.getTargetException }
+      if (t.isInstance(obj)) obj.asInstanceOf[T]
+      else
+        throw new ClassCastException(
+            clazz.getName + " is not a subtype of " + t)
+    } recover {
+      case i: InvocationTargetException if i.getTargetException ne null ⇒
+        throw i.getTargetException
+    }
 
-  override def createInstanceFor[T: ClassTag](fqcn: String, args: immutable.Seq[(Class[_], AnyRef)]): Try[T] =
-    getClassFor(fqcn) flatMap { c ⇒ createInstanceFor(c, args) }
+  override def createInstanceFor[T : ClassTag](
+      fqcn: String, args: immutable.Seq[(Class[_], AnyRef)]): Try[T] =
+    getClassFor(fqcn) flatMap { c ⇒
+      createInstanceFor(c, args)
+    }
 
-  override def getObjectFor[T: ClassTag](fqcn: String): Try[T] = {
+  override def getObjectFor[T : ClassTag](fqcn: String): Try[T] = {
     val classTry =
       if (fqcn.endsWith("$")) getClassFor(fqcn)
       else getClassFor(fqcn + "$") recoverWith { case _ ⇒ getClassFor(fqcn) }
@@ -47,11 +60,15 @@ class ReflectiveDynamicAccess(val classLoader: ClassLoader) extends DynamicAcces
         module.setAccessible(true)
         val t = implicitly[ClassTag[T]].runtimeClass
         module.get(null) match {
-          case null                  ⇒ throw new NullPointerException
-          case x if !t.isInstance(x) ⇒ throw new ClassCastException(fqcn + " is not a subtype of " + t)
-          case x: T                  ⇒ x
+          case null ⇒ throw new NullPointerException
+          case x if !t.isInstance(x) ⇒
+            throw new ClassCastException(fqcn + " is not a subtype of " + t)
+          case x: T ⇒ x
         }
-      } recover { case i: InvocationTargetException if i.getTargetException ne null ⇒ throw i.getTargetException }
+      } recover {
+        case i: InvocationTargetException if i.getTargetException ne null ⇒
+          throw i.getTargetException
+      }
     }
   }
 }

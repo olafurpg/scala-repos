@@ -1,7 +1,7 @@
 package com.twitter.scalding
 
-import org.scalatest.{ Matchers, WordSpec }
-import org.apache.hadoop.fs.{ Path => HadoopPath, PathFilter }
+import org.scalatest.{Matchers, WordSpec}
+import org.apache.hadoop.fs.{Path => HadoopPath, PathFilter}
 
 class PathFilterTest extends WordSpec with Matchers {
   "RichPathFilter" should {
@@ -33,7 +33,6 @@ class PathFilterTest extends WordSpec with Matchers {
       AlwaysFalse.not.accept(p) shouldBe true
       AlwaysTrue.not.not.accept(p) shouldBe true
     }
-
   }
 }
 

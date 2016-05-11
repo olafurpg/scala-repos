@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.linker.frontend.optimizer
 
@@ -18,7 +17,7 @@ import java.util.concurrent.atomic._
 private[optimizer] object ConcurrencyUtils {
 
   /** An atomic accumulator supports adding single elements and retrieving and
-   *  deleting all contained elements */
+    *  deleting all contained elements */
   type AtomicAcc[T] = AtomicReference[List[T]]
 
   object AtomicAcc {
@@ -62,7 +61,7 @@ private[optimizer] object ConcurrencyUtils {
     @inline final def empty[T]: TrieSet[T] = TrieMap.empty
   }
 
-  implicit class TrieMapOps[K,V](val map: TrieMap[K,V]) extends AnyVal {
+  implicit class TrieMapOps[K, V](val map: TrieMap[K, V]) extends AnyVal {
     @inline final def getOrPut(k: K, default: => V): V = {
       map.get(k).getOrElse {
         val v = default
@@ -70,5 +69,4 @@ private[optimizer] object ConcurrencyUtils {
       }
     }
   }
-
 }

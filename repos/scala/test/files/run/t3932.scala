@@ -18,7 +18,6 @@ class O3 extends C {
   def g2 = (f == f)
 }
 
-
 object Test {
   def main(args: Array[String]): Unit = {
     println(O1.g1)
@@ -30,6 +29,5 @@ object Test {
     val o3 = new O3()
     println(o3.g1)
     println(o3.g2)
-
   }
 }

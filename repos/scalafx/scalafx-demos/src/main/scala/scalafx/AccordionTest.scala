@@ -32,7 +32,6 @@
 
 package scalafx
 
-
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
@@ -49,17 +48,17 @@ object AccordionTest extends JFXApp {
       fill = Color.LightGreen
       content = new Accordion {
         panes = List(
-          new TitledPane {
-            content = new Arc {
-              radiusX = 25
-              radiusY = 50
-              startAngle = 135
-              length = 45
-              fill = Color.Black
-              stroke = Color.Yellow
-              strokeWidth = 3
+            new TitledPane {
+              content = new Arc {
+                radiusX = 25
+                radiusY = 50
+                startAngle = 135
+                length = 45
+                fill = Color.Black
+                stroke = Color.Yellow
+                strokeWidth = 3
+              }
             }
-          }
         )
       }
     }

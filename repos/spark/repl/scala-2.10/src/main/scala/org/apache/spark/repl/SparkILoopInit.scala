@@ -17,10 +17,9 @@ import scala.tools.nsc.util.stackTraceString
 import org.apache.spark.SPARK_VERSION
 
 /**
- *  Machinery for the asynchronous initialization of the repl.
- */
-private[repl] trait SparkILoopInit {
-  self: SparkILoop =>
+  *  Machinery for the asynchronous initialization of the repl.
+  */
+private[repl] trait SparkILoopInit { self: SparkILoop =>
 
   /** Print a welcome message */
   def printWelcome() {
@@ -33,37 +32,39 @@ private[repl] trait SparkILoopInit {
 """.format(SPARK_VERSION))
     import Properties._
     val welcomeMsg = "Using Scala %s (%s, Java %s)".format(
-      versionString, javaVmName, javaVersion)
+        versionString, javaVmName, javaVersion)
     echo(welcomeMsg)
     echo("Type in expressions to have them evaluated.")
     echo("Type :help for more information.")
-   }
+  }
 
   protected def asyncMessage(msg: String) {
-    if (isReplInfo || isReplPower)
-      echoAndRefresh(msg)
+    if (isReplInfo || isReplPower) echoAndRefresh(msg)
   }
 
   private val initLock = new java.util.concurrent.locks.ReentrantLock()
-  private val initCompilerCondition = initLock.newCondition() // signal the compiler is initialized
-  private val initLoopCondition = initLock.newCondition()     // signal the whole repl is initialized
+  private val initCompilerCondition =
+    initLock.newCondition() // signal the compiler is initialized
+  private val initLoopCondition =
+    initLock.newCondition() // signal the whole repl is initialized
   private val initStart = System.nanoTime
 
   private def withLock[T](body: => T): T = {
     initLock.lock()
-    try body
-    finally initLock.unlock()
+    try body finally initLock.unlock()
   }
   // a condition used to ensure serial access to the compiler.
   @volatile private var initIsComplete = false
   @volatile private var initError: String = null
-  private def elapsed() = "%.3f".format((System.nanoTime - initStart).toDouble / 1000000000L)
+  private def elapsed() =
+    "%.3f".format((System.nanoTime - initStart).toDouble / 1000000000L)
 
   // the method to be called when the interpreter is initialized.
   // Very important this method does nothing synchronous (i.e. do
   // not try to use the interpreter) because until it returns, the
   // repl's lazy val `global` is still locked.
-  protected def initializedCallback() = withLock(initCompilerCondition.signal())
+  protected def initializedCallback() =
+    withLock(initCompilerCondition.signal())
 
   // Spins off a thread which awaits a single message once the interpreter
   // has been initialized.
@@ -84,8 +85,7 @@ private[repl] trait SparkILoopInit {
       println("""
         |Failed to initialize the REPL due to an unexpected error.
         |This is a bug, please, report it along with the error diagnostics printed below.
-        |%s.""".stripMargin.format(initError)
-      )
+        |%s.""".stripMargin.format(initError))
       // scalastyle:on println
       false
     } else true
@@ -94,10 +94,11 @@ private[repl] trait SparkILoopInit {
   //   () => intp.bind("lastWarnings", "" + typeTag[List[(Position, String)]], intp.lastWarnings _),
   // )
 
-  protected def postInitThunks = List[Option[() => Unit]](
-    Some(intp.setContextClassLoader _),
-    if (isReplPower) Some(() => enablePowerMode(true)) else None
-  ).flatten
+  protected def postInitThunks =
+    List[Option[() => Unit]](
+        Some(intp.setContextClassLoader _),
+        if (isReplPower) Some(() => enablePowerMode(true)) else None
+    ).flatten
   // ++ (
   //   warningsThunks
   // )

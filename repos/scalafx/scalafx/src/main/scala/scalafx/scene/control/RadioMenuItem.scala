@@ -33,33 +33,33 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
 object RadioMenuItem {
-  implicit def sfxRadioMenuItem2jfx(m: RadioMenuItem): jfxsc.RadioMenuItem = if (m != null) m.delegate else null
+  implicit def sfxRadioMenuItem2jfx(m: RadioMenuItem): jfxsc.RadioMenuItem =
+    if (m != null) m.delegate else null
 }
 
 /**
- * Wrapper class for [[scalafx.scene.control.RadioMenuItem]]
- *
- */
+  * Wrapper class for [[scalafx.scene.control.RadioMenuItem]]
+  *
+  */
 class RadioMenuItem(override val delegate: jfxsc.RadioMenuItem)
-  extends MenuItem(delegate)
-  with Toggle
-  with SFXDelegate[jfxsc.RadioMenuItem] {
+    extends MenuItem(delegate) with Toggle
+    with SFXDelegate[jfxsc.RadioMenuItem] {
 
   /**
-   * Constructs a RadioMenuItem and sets the display text with the specified text.
-   */
+    * Constructs a RadioMenuItem and sets the display text with the specified text.
+    */
   def this(text: String) = this(new jfxsc.RadioMenuItem(text))
 
   /**
-   * Constructs a RadioMenuItem and sets the display text with the specified text and sets the
-   * graphic [[scalafx.scene.Node]] to the given node.
-   */
-  def this(text: String, graphic: Node) = this(new jfxsc.RadioMenuItem(text, graphic))
+    * Constructs a RadioMenuItem and sets the display text with the specified text and sets the
+    * graphic [[scalafx.scene.Node]] to the given node.
+    */
+  def this(text: String, graphic: Node) =
+    this(new jfxsc.RadioMenuItem(text, graphic))
 
   override def properties = delegate.getProperties
   //  def userData: AnyRef = delegate.getUserData()
   //  def userData_=(v: AnyRef) {
   //    delegate.setUserData(v)
   //  }
-
 }

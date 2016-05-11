@@ -35,7 +35,8 @@ import scalafx.ensemble.commons.ExampleInfo
 /** Creates SBT project for a sample code. */
 object SBTProjectBuilder {
 
-  private var _parentDir = new File(System.getProperty("user.home", ".")).getCanonicalFile
+  private var _parentDir =
+    new File(System.getProperty("user.home", ".")).getCanonicalFile
 
   private val sourceSubDir = "src/main/scala/"
   private val resourceSubDir = "src/main/resources/"
@@ -73,16 +74,23 @@ object SBTProjectBuilder {
     val sampleSubDir = sourceSubDir + sampleInfo.packagePath
 
     // Write sample Scala code
-    val samplePath = new File(projectDir, sampleSubDir + "/" + sampleInfo.classSimpleName + ".scala").toPath
+    val samplePath = new File(
+        projectDir,
+        sampleSubDir + "/" + sampleInfo.classSimpleName + ".scala").toPath
     Files.createDirectories(samplePath.getParent)
     Files.write(samplePath, sampleInfo.sourceCode.getBytes)
 
     // Copy resources, if used by the sample.
-    sampleInfo.resources.foreach(resource => copyResource(new File(projectDir, resourceSubDir), resource))
+    sampleInfo.resources.foreach(resource =>
+          copyResource(new File(projectDir, resourceSubDir), resource))
 
     // Copy project files
-    copyText(projectDir, "build.sbt",
-      filters = List("@name@" -> projectName, "@mainClass@" -> (sampleInfo.packageName + "." + sampleInfo.classSimpleName)))
+    copyText(projectDir,
+             "build.sbt",
+             filters = List("@name@" -> projectName,
+                            "@mainClass@" ->
+                            (sampleInfo.packageName + "." +
+                                sampleInfo.classSimpleName)))
     copyText(projectDir, "project/build.properties")
     copyText(projectDir, "project/plugins.sbt")
     copyText(projectDir, "README.md")
@@ -91,11 +99,14 @@ object SBTProjectBuilder {
   /** Copy text resource from the classpath relative to this object to a `projectDir`.
     * Line ending will be changed to platform specific.
     */
-  private def copyText(projectDir: File, fileName: String, filters: List[(String, String)] = Nil) {
+  private def copyText(projectDir: File,
+                       fileName: String,
+                       filters: List[(String, String)] = Nil) {
+
     /** Apply all filters in turn. */
     def filter(string: String, filters: List[(String, String)]): String = {
       filters match {
-        case Nil       => string
+        case Nil => string
         case f :: tail => filter(string.replaceAll(f._1, f._2), tail)
       }
     }
@@ -109,7 +120,10 @@ object SBTProjectBuilder {
       Files.write(path, content.getBytes)
     } catch {
       case t: Throwable =>
-        throw new IOException("Error while creating SBT project. Failed to copy text file: " + fileName, t)
+        throw new IOException(
+            "Error while creating SBT project. Failed to copy text file: " +
+            fileName,
+            t)
     }
   }
 
@@ -123,8 +137,10 @@ object SBTProjectBuilder {
       Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING)
     } catch {
       case t: Throwable =>
-        throw new IOException("Error while creating SBT project. Failed to copy resource: " + fileName, t)
+        throw new IOException(
+            "Error while creating SBT project. Failed to copy resource: " +
+            fileName,
+            t)
     }
   }
-
 }

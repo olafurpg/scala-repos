@@ -9,24 +9,13 @@ package typechecker
 import scala.reflect.internal.util.Statistics
 
 /** The main attribution phase.
- */
-trait Analyzer extends AnyRef
-            with Contexts
-            with Namers
-            with Typers
-            with Infer
-            with Implicits
-            with EtaExpansion
-            with SyntheticMethods
-            with Unapplies
-            with Macros
-            with NamesDefaults
-            with TypeDiagnostics
-            with ContextErrors
-            with StdAttachments
-            with AnalyzerPlugins
-{
-  val global : Global
+  */
+trait Analyzer
+    extends AnyRef with Contexts with Namers with Typers with Infer
+    with Implicits with EtaExpansion with SyntheticMethods with Unapplies
+    with Macros with NamesDefaults with TypeDiagnostics with ContextErrors
+    with StdAttachments with AnalyzerPlugins {
+  val global: Global
   import global._
 
   object namerFactory extends {
@@ -50,7 +39,7 @@ trait Analyzer extends AnyRef
   } with SubComponent {
     val phaseName = "packageobjects"
     val runsAfter = List[String]()
-    val runsRightAfter= Some("namer")
+    val runsRightAfter = Some("namer")
 
     def newPhase(_prev: Phase): StdPhase = new StdPhase(_prev) {
       override val checkable = false
@@ -88,7 +77,8 @@ trait Analyzer extends AnyRef
       // compiler run). This is good enough for the resident compiler, which was the most affected.
       undoLog.clear()
       override def run() {
-        val start = if (Statistics.canEnable) Statistics.startTimer(typerNanos) else null
+        val start =
+          if (Statistics.canEnable) Statistics.startTimer(typerNanos) else null
         global.echoPhaseSummary(this)
         for (unit <- currentRun.units) {
           applyPhase(unit)
@@ -100,14 +90,12 @@ trait Analyzer extends AnyRef
         try {
           val typer = newTyper(rootContext(unit))
           unit.body = typer.typed(unit.body)
-          if (global.settings.Yrangepos && !global.reporter.hasErrors) global.validatePositions(unit.body)
+          if (global.settings.Yrangepos && !global.reporter.hasErrors)
+            global.validatePositions(unit.body)
           for (workItem <- unit.toCheck) workItem()
-          if (settings.warnUnusedImport)
-            warnUnusedImports(unit)
-          if (settings.warnUnused)
-            typer checkUnused unit
-        }
-        finally {
+          if (settings.warnUnusedImport) warnUnusedImports(unit)
+          if (settings.warnUnused) typer checkUnused unit
+        } finally {
           unit.toCheck.clear()
         }
       }

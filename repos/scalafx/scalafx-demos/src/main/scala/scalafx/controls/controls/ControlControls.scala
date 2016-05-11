@@ -29,7 +29,8 @@ package scalafx.controls.controls
 
 import scalafx.scene.control.{Control, Label, TextField, Tooltip}
 
-class ControlControls(target: Control) extends PropertiesNodes[Control](target, "Control Properties") {
+class ControlControls(target: Control)
+    extends PropertiesNodes[Control](target, "Control Properties") {
 
   val lblHeight = new Label {
     text <== target.height.asString()
@@ -71,7 +72,8 @@ class ControlControls(target: Control) extends PropertiesNodes[Control](target, 
 
   val txfTooltip = new TextField
   txfTooltip.text.onChange {
-    target.tooltip = if (txfTooltip.text.get.isEmpty) null else Tooltip(txfTooltip.text())
+    target.tooltip = if (txfTooltip.text.get.isEmpty) null
+    else Tooltip(txfTooltip.text())
   }
 
   super.addNode("Max Height", sldMaxHeight)
@@ -102,4 +104,4 @@ The ContextMenu to show for this control.
 ObjectProperty<Skin<?>>	skin
 Skin is responsible for rendering this Control.
 
-*/
+ */

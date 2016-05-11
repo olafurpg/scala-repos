@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 18.04.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 18.04.2008
+  */
 /*
  * Comment ::= <!-- comment -->
  */
@@ -25,8 +24,10 @@ object Comment {
         commentMarker.drop()
         return false
     }
-    while (builder.getTokenType!=ScalaXmlTokenTypes.XML_COMMENT_END && builder.getTokenType != null) {
-      if (builder.getTokenType == ScalaXmlTokenTypes.XML_BAD_CHARACTER) builder error ErrMsg("xml.wrong.character")
+    while (builder.getTokenType != ScalaXmlTokenTypes.XML_COMMENT_END &&
+    builder.getTokenType != null) {
+      if (builder.getTokenType == ScalaXmlTokenTypes.XML_BAD_CHARACTER)
+        builder error ErrMsg("xml.wrong.character")
       builder.advanceLexer()
     }
     builder.getTokenType match {

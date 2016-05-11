@@ -35,15 +35,15 @@ import scalafx.Includes._
 import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 
 /**
- * Scale Spec tests.
- *
- *
- */
+  * Scale Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ScaleSpec
-  extends SimpleSFXDelegateSpec[jfxst.Scale, Scale](classOf[jfxst.Scale], classOf[Scale])
-  with PositionDelegateSpec[Scale] {
+    extends SimpleSFXDelegateSpec[jfxst.Scale, Scale](
+        classOf[jfxst.Scale], classOf[Scale])
+    with PositionDelegateSpec[Scale] {
 
   val positionDelegate = new Scale(new jfxst.Scale)
-
 }

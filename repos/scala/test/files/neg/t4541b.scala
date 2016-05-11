@@ -1,10 +1,6 @@
-
-
-
-
-
 @SerialVersionUID(1L)
-final class SparseArray[@specialized(Int) T](private var data: Array[T]) extends Serializable {
+final class SparseArray[@specialized(Int) T](private var data: Array[T])
+    extends Serializable {
   def use(inData: Array[T]) = {
     data = inData;
   }
@@ -13,4 +9,3 @@ final class SparseArray[@specialized(Int) T](private var data: Array[T]) extends
     use(that.data.clone)
   }
 }
-

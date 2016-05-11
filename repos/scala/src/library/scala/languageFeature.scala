@@ -1,12 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2015, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2015, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
-
-
 
 package scala
 
@@ -14,7 +12,8 @@ import scala.annotation.meta
 
 object languageFeature {
 
-  @meta.languageFeature("extension of type scala.Dynamic", enableRequired = true)
+  @meta.languageFeature(
+      "extension of type scala.Dynamic", enableRequired = true)
   sealed trait dynamics
   object dynamics extends dynamics
 
@@ -22,7 +21,8 @@ object languageFeature {
   sealed trait postfixOps
   object postfixOps extends postfixOps
 
-  @meta.languageFeature("reflective access of structural type member #", enableRequired = false)
+  @meta.languageFeature(
+      "reflective access of structural type member #", enableRequired = false)
   sealed trait reflectiveCalls
   object reflectiveCalls extends reflectiveCalls
 
@@ -34,7 +34,8 @@ object languageFeature {
   sealed trait higherKinds
   object higherKinds extends higherKinds
 
-  @meta.languageFeature("#, which cannot be expressed by wildcards, ", enableRequired = false)
+  @meta.languageFeature(
+      "#, which cannot be expressed by wildcards, ", enableRequired = false)
   sealed trait existentials
   object existentials extends existentials
 
@@ -44,4 +45,3 @@ object languageFeature {
     object macros extends macros
   }
 }
-

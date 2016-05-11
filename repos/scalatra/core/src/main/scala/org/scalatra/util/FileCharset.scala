@@ -1,6 +1,6 @@
 package org.scalatra.util
 
-import java.io.{ File, FileInputStream }
+import java.io.{File, FileInputStream}
 import java.nio.charset.Charset
 
 import grizzled.slf4j.Logger
@@ -29,14 +29,16 @@ object FileCharset {
       getCharset(detector, Codec.fileEncodingCodec)
     } catch {
       case t: Throwable =>
-        logger.warn("Failed to detect charset for file: " + file.getPath + ".", t)
+        logger.warn(
+            "Failed to detect charset for file: " + file.getPath + ".", t)
         Codec.defaultCharsetCodec.charSet
     } finally {
       detector.reset()
     }
   }
 
-  private[this] def getCharset(detector: UniversalDetector, default: Codec): Charset = {
+  private[this] def getCharset(
+      detector: UniversalDetector, default: Codec): Charset = {
     val cs = detector.getDetectedCharset
     if (cs == null || cs.trim().isEmpty) {
       default.charSet
@@ -63,5 +65,4 @@ object FileCharset {
       detector.reset()
     }
   }
-
 }

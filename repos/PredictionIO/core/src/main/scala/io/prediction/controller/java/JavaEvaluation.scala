@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller.java
 
 import io.prediction.controller.Evaluation
@@ -28,8 +27,8 @@ import scala.collection.JavaConversions.asScalaBuffer
   *
   * @group Evaluation
   */
-
 abstract class JavaEvaluation extends Evaluation {
+
   /** Set the [[BaseEngine]] and [[Metric]] for this [[Evaluation]]
     *
     * @param baseEngine [[BaseEngine]] for this [[JavaEvaluation]]
@@ -40,8 +39,7 @@ abstract class JavaEvaluation extends Evaluation {
     * @tparam A Actual result class
     */
   def setEngineMetric[EI, Q, P, A](
-    baseEngine: BaseEngine[EI, Q, P, A],
-    metric: Metric[EI, Q, P, A, _]) {
+      baseEngine: BaseEngine[EI, Q, P, A], metric: Metric[EI, Q, P, A, _]) {
 
     engineMetric = (baseEngine, metric)
   }
@@ -57,9 +55,9 @@ abstract class JavaEvaluation extends Evaluation {
     * @tparam A Actual result class
     */
   def setEngineMetrics[EI, Q, P, A](
-    baseEngine: BaseEngine[EI, Q, P, A],
-    metric: Metric[EI, Q, P, A, _],
-    metrics: java.util.List[_ <: Metric[EI, Q, P, A, _]]) {
+      baseEngine: BaseEngine[EI, Q, P, A],
+      metric: Metric[EI, Q, P, A, _],
+      metrics: java.util.List[_ <: Metric[EI, Q, P, A, _]]) {
 
     engineMetrics = (baseEngine, metric, asScalaBuffer(metrics))
   }

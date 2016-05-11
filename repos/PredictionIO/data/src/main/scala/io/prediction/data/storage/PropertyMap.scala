@@ -31,38 +31,33 @@ import org.json4s.native.JsonMethods.parse
   * @param lastUpdated last updated time of this PropertyMap
   */
 class PropertyMap(
-  fields: Map[String, JValue],
-  val firstUpdated: DateTime,
-  val lastUpdated: DateTime
-) extends DataMap(fields) {
+    fields: Map[String, JValue],
+    val firstUpdated: DateTime,
+    val lastUpdated: DateTime
+)
+    extends DataMap(fields) {
 
-  override
-  def toString: String = s"PropertyMap(${fields}, ${firstUpdated}, ${lastUpdated})"
+  override def toString: String =
+    s"PropertyMap(${fields}, ${firstUpdated}, ${lastUpdated})"
 
-  override
-  def hashCode: Int =
-    41 * (
-      41 * (
-        41 + fields.hashCode
-      ) + firstUpdated.hashCode
-    ) + lastUpdated.hashCode
+  override def hashCode: Int =
+    41 * (41 * (41 + fields.hashCode) + firstUpdated.hashCode) +
+    lastUpdated.hashCode
 
-  override
-  def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match {
     case that: PropertyMap => {
-      (that.canEqual(this)) &&
-      (super.equals(that)) &&
-      (this.firstUpdated.equals(that.firstUpdated)) &&
-      (this.lastUpdated.equals(that.lastUpdated))
-    }
-    case that: DataMap => { // for testing purpose
-      super.equals(that)
-    }
+        (that.canEqual(this)) && (super.equals(that)) &&
+        (this.firstUpdated.equals(that.firstUpdated)) &&
+        (this.lastUpdated.equals(that.lastUpdated))
+      }
+    case that: DataMap => {
+        // for testing purpose
+        super.equals(that)
+      }
     case _ => false
   }
 
-  override
-  def canEqual(other: Any): Boolean = other.isInstanceOf[PropertyMap]
+  override def canEqual(other: Any): Boolean = other.isInstanceOf[PropertyMap]
 }
 
 /** Companion object of the [[PropertyMap]] class. */
@@ -77,7 +72,8 @@ object PropertyMap {
     * @return a new PropertyMap
     */
   def apply(fields: Map[String, JValue],
-    firstUpdated: DateTime, lastUpdated: DateTime): PropertyMap =
+            firstUpdated: DateTime,
+            lastUpdated: DateTime): PropertyMap =
     new PropertyMap(fields, firstUpdated, lastUpdated)
 
   /** Create an PropertyMap from a JSON String and firstUpdated and lastUpdated
@@ -87,10 +83,11 @@ object PropertyMap {
     * @param lastUpdated Last updated time
     * @return a new PropertyMap
     */
-  def apply(js: String, firstUpdated: DateTime, lastUpdated: DateTime)
-  : PropertyMap = apply(
-      fields = parse(js).asInstanceOf[JObject].obj.toMap,
-      firstUpdated = firstUpdated,
-      lastUpdated = lastUpdated
+  def apply(
+      js: String, firstUpdated: DateTime, lastUpdated: DateTime): PropertyMap =
+    apply(
+        fields = parse(js).asInstanceOf[JObject].obj.toMap,
+        firstUpdated = firstUpdated,
+        lastUpdated = lastUpdated
     )
 }

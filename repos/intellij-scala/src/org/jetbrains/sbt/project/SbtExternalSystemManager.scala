@@ -25,11 +25,15 @@ import org.jetbrains.sbt.settings.{SbtExternalSystemConfigurable, SbtSystemSetti
 import scala.collection.mutable
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class SbtExternalSystemManager
-  extends ExternalSystemManager[SbtProjectSettings, SbtProjectSettingsListener, SbtSystemSettings, SbtLocalSettings, SbtExecutionSettings]
-  with ExternalSystemConfigurableAware {
+    extends ExternalSystemManager[SbtProjectSettings,
+                                  SbtProjectSettingsListener,
+                                  SbtSystemSettings,
+                                  SbtLocalSettings,
+                                  SbtExecutionSettings]
+    with ExternalSystemConfigurableAware {
 
   def enhanceLocalProcessing(urls: util.List[URL]) {
     urls.add(jarWith[scala.App].toURI.toURL)
@@ -44,10 +48,11 @@ class SbtExternalSystemManager
     classpath.add(jarWith[scala.xml.Node])
 
     parameters.getVMParametersList.addProperty(
-      ExternalSystemConstants.EXTERNAL_SYSTEM_ID_KEY, SbtProjectSystem.Id.getId)
+        ExternalSystemConstants.EXTERNAL_SYSTEM_ID_KEY,
+        SbtProjectSystem.Id.getId)
 
     parameters.getVMParametersList.addProperty(
-      PathManager.PROPERTY_LOG_PATH, PathManager.getLogPath)
+        PathManager.PROPERTY_LOG_PATH, PathManager.getLogPath)
   }
 
   def getSystemId = SbtProjectSystem.Id
@@ -56,7 +61,8 @@ class SbtExternalSystemManager
 
   def getLocalSettingsProvider = SbtLocalSettings.getInstance _
 
-  def getExecutionSettingsProvider = SbtExternalSystemManager.executionSettingsFor _
+  def getExecutionSettingsProvider =
+    SbtExternalSystemManager.executionSettingsFor _
 
   def getProjectResolverClass = classOf[SbtProjectResolver]
 
@@ -64,83 +70,110 @@ class SbtExternalSystemManager
 
   def getExternalProjectDescriptor = new SbtOpenProjectDescriptor()
 
-  def getConfigurable(project: Project): Configurable = new SbtExternalSystemConfigurable(project)
+  def getConfigurable(project: Project): Configurable =
+    new SbtExternalSystemConfigurable(project)
 }
 
 object SbtExternalSystemManager {
   def executionSettingsFor(project: Project, path: String) = {
     val settings = SbtSystemSettings.getInstance(project)
-    val projectSettings = Option(settings.getLinkedProjectSettings(path)).getOrElse(SbtProjectSettings.default)
+    val projectSettings = Option(settings.getLinkedProjectSettings(path))
+      .getOrElse(SbtProjectSettings.default)
 
-    val customLauncher = settings.customLauncherEnabled.option(settings.getCustomLauncherPath).map(_.toFile)
-    val customSbtStructureFile = settings.customSbtStructurePath.nonEmpty.option(settings.customSbtStructurePath.toFile)
+    val customLauncher = settings.customLauncherEnabled
+      .option(settings.getCustomLauncherPath)
+      .map(_.toFile)
+    val customSbtStructureFile = settings.customSbtStructurePath.nonEmpty
+      .option(settings.customSbtStructurePath.toFile)
 
-    val realProjectPath = Option(projectSettings.getExternalProjectPath).getOrElse(path)
+    val realProjectPath =
+      Option(projectSettings.getExternalProjectPath).getOrElse(path)
     val projectJdkName = getProjectJdkName(project, projectSettings)
     val vmExecutable = getVmExecutable(projectJdkName, settings)
     val vmOptions = getVmOptions(settings)
-    val environment = Map.empty ++ getAndroidEnvironmentVariables(projectJdkName)
+    val environment =
+      Map.empty ++ getAndroidEnvironmentVariables(projectJdkName)
 
     new SbtExecutionSettings(realProjectPath,
-      vmExecutable, vmOptions, environment, customLauncher, customSbtStructureFile, projectJdkName,
-      projectSettings.resolveClassifiers, projectSettings.resolveJavadocs, projectSettings.resolveSbtClassifiers)
+                             vmExecutable,
+                             vmOptions,
+                             environment,
+                             customLauncher,
+                             customSbtStructureFile,
+                             projectJdkName,
+                             projectSettings.resolveClassifiers,
+                             projectSettings.resolveJavadocs,
+                             projectSettings.resolveSbtClassifiers)
   }
 
-  private def getProjectJdkName(project: Project, projectSettings: SbtProjectSettings): Option[String] = {
-    val jdkInProject = Option(ProjectRootManager.getInstance(project).getProjectSdk).map(_.getName)
+  private def getProjectJdkName(
+      project: Project,
+      projectSettings: SbtProjectSettings): Option[String] = {
+    val jdkInProject = Option(
+        ProjectRootManager.getInstance(project).getProjectSdk).map(_.getName)
     val jdkInImportSettings = projectSettings.jdkName
     jdkInImportSettings.orElse(jdkInProject)
   }
 
-  private def getVmExecutable(projectJdkName: Option[String], settings: SbtSystemSettings): File =
-      if (!ApplicationManager.getApplication.isUnitTestMode)
-        getRealVmExecutable(projectJdkName, settings)
-      else
-        getUnitTestVmExecutable
+  private def getVmExecutable(
+      projectJdkName: Option[String], settings: SbtSystemSettings): File =
+    if (!ApplicationManager.getApplication.isUnitTestMode)
+      getRealVmExecutable(projectJdkName, settings)
+    else getUnitTestVmExecutable
 
   private def getUnitTestVmExecutable: File = {
     val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
-    val sdk = if (internalSdk == null) IdeaTestUtil.getMockJdk17 else internalSdk
+    val sdk =
+      if (internalSdk == null) IdeaTestUtil.getMockJdk17 else internalSdk
     val sdkType = sdk.getSdkType.asInstanceOf[JavaSdkType]
     new File(sdkType.getVMExecutablePath(sdk))
   }
 
-  private def getRealVmExecutable(projectJdkName: Option[String], settings: SbtSystemSettings): File = {
+  private def getRealVmExecutable(
+      projectJdkName: Option[String], settings: SbtSystemSettings): File = {
     val customVmFile = new File(settings.getCustomVMPath) / "bin" / "java"
     val customVmExecutable = settings.customVMEnabled.option(customVmFile)
 
     customVmExecutable.orElse {
-      val projectSdk = projectJdkName.flatMap(name => Option(ProjectJdkTable.getInstance().findJdk(name)))
+      val projectSdk = projectJdkName.flatMap(
+          name => Option(ProjectJdkTable.getInstance().findJdk(name)))
       projectSdk.map { sdk =>
         sdk.getSdkType match {
-          case sdkType : JavaSdkType =>
+          case sdkType: JavaSdkType =>
             new File(sdkType.getVMExecutablePath(sdk))
           case _ =>
-            throw new ExternalSystemException(SbtBundle("sbt.import.noProjectJvmFound"))
+            throw new ExternalSystemException(
+                SbtBundle("sbt.import.noProjectJvmFound"))
         }
       }
     } getOrElse {
-      throw new ExternalSystemException(SbtBundle("sbt.import.noCustomJvmFound"))
+      throw new ExternalSystemException(
+          SbtBundle("sbt.import.noCustomJvmFound"))
     }
   }
 
-  private def getAndroidEnvironmentVariables(projectJdkName: Option[String]): Map[String, String] =
+  private def getAndroidEnvironmentVariables(
+      projectJdkName: Option[String]): Map[String, String] =
     projectJdkName
       .flatMap(name => Option(ProjectJdkTable.getInstance().findJdk(name)))
       .flatMap { sdk =>
         try {
-          sdk.getSdkType.isInstanceOf[AndroidSdkType].option(Map("ANDROID_HOME" -> sdk.getSdkModificator.getHomePath))
+          sdk.getSdkType
+            .isInstanceOf[AndroidSdkType]
+            .option(Map("ANDROID_HOME" -> sdk.getSdkModificator.getHomePath))
         } catch {
-          case _ : NoClassDefFoundError => None
+          case _: NoClassDefFoundError => None
         }
-      }.getOrElse(Map.empty)
+      }
+      .getOrElse(Map.empty)
 
   private def getVmOptions(settings: SbtSystemSettings): Seq[String] = {
     val userOptions = settings.getVmParameters.split("\\s+").toSeq
-    val ideaProxyOptions = proxyOptionsFor(HttpConfigurable.getInstance).filterNot { opt =>
-      val optName = opt.split('=').head + "="
-      userOptions.exists(_.startsWith(optName))
-    }
+    val ideaProxyOptions =
+      proxyOptionsFor(HttpConfigurable.getInstance).filterNot { opt =>
+        val optName = opt.split('=').head + "="
+        userOptions.exists(_.startsWith(optName))
+      }
     Seq(s"-Xmx${settings.getMaximumHeapSize}M") ++ userOptions ++ ideaProxyOptions
   }
 
@@ -148,7 +181,9 @@ object SbtExternalSystemManager {
     val useProxy = http.USE_HTTP_PROXY && !http.PROXY_TYPE_IS_SOCKS
     val useCredentials = useProxy && http.PROXY_AUTHENTICATION
 
-    useProxy.seq(s"-Dhttp.proxyHost=${http.PROXY_HOST}", s"-Dhttp.proxyPort=${http.PROXY_PORT}") ++
-      useCredentials.seq(s"-Dhttp.proxyUser=${http.PROXY_LOGIN}", s"-Dhttp.proxyPassword=${http.getPlainProxyPassword}")
+    useProxy.seq(s"-Dhttp.proxyHost=${http.PROXY_HOST}",
+                 s"-Dhttp.proxyPort=${http.PROXY_PORT}") ++ useCredentials.seq(
+        s"-Dhttp.proxyUser=${http.PROXY_LOGIN}",
+        s"-Dhttp.proxyPassword=${http.getPlainProxyPassword}")
   }
 }

@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import io.prediction.annotation.DeveloperApi
@@ -37,17 +36,17 @@ import org.joda.time.DateTimeZone
   * @group Event Data
   */
 case class Event(
-  val eventId: Option[String] = None,
-  val event: String,
-  val entityType: String,
-  val entityId: String,
-  val targetEntityType: Option[String] = None,
-  val targetEntityId: Option[String] = None,
-  val properties: DataMap = DataMap(), // default empty
-  val eventTime: DateTime = DateTime.now,
-  val tags: Seq[String] = Nil,
-  val prId: Option[String] = None,
-  val creationTime: DateTime = DateTime.now
+    val eventId: Option[String] = None,
+    val event: String,
+    val entityType: String,
+    val entityId: String,
+    val targetEntityType: Option[String] = None,
+    val targetEntityId: Option[String] = None,
+    val properties: DataMap = DataMap(), // default empty
+    val eventTime: DateTime = DateTime.now,
+    val tags: Seq[String] = Nil,
+    val prId: Option[String] = None,
+    val creationTime: DateTime = DateTime.now
 ) {
   override def toString(): String = {
     s"Event(id=$eventId,event=$event,eType=$entityType,eId=$entityId," +
@@ -63,6 +62,7 @@ case class Event(
   */
 @DeveloperApi
 object EventValidation {
+
   /** Default time zone is set to UTC */
   val defaultTimeZone = DateTimeZone.UTC
 
@@ -71,8 +71,8 @@ object EventValidation {
     * @param name Event name
     * @return true if event name starts with \$ or pio_, false otherwise
     */
-  def isReservedPrefix(name: String): Boolean = name.startsWith("$") ||
-    name.startsWith("pio_")
+  def isReservedPrefix(name: String): Boolean =
+    name.startsWith("$") || name.startsWith("pio_")
 
   /** PredictionIO reserves some single entity event names. They are currently
     * \$set, \$unset, and \$delete.
@@ -112,27 +112,29 @@ object EventValidation {
     require(!e.entityType.isEmpty, "entityType must not be empty string.")
     require(!e.entityId.isEmpty, "entityId must not be empty string.")
     require(e.targetEntityType.map(!_.isEmpty).getOrElse(true),
-      "targetEntityType must not be empty string")
+            "targetEntityType must not be empty string")
     require(e.targetEntityId.map(!_.isEmpty).getOrElse(true),
-      "targetEntityId must not be empty string.")
+            "targetEntityId must not be empty string.")
     require(!((e.targetEntityType != None) && (e.targetEntityId == None)),
-      "targetEntityType and targetEntityId must be specified together.")
+            "targetEntityType and targetEntityId must be specified together.")
     require(!((e.targetEntityType == None) && (e.targetEntityId != None)),
-      "targetEntityType and targetEntityId must be specified together.")
+            "targetEntityType and targetEntityId must be specified together.")
     require(!((e.event == "$unset") && e.properties.isEmpty),
-      "properties cannot be empty for $unset event")
+            "properties cannot be empty for $unset event")
     require(!isReservedPrefix(e.event) || isSpecialEvents(e.event),
-      s"${e.event} is not a supported reserved event name.")
+            s"${e.event} is not a supported reserved event name.")
     require(!isSpecialEvents(e.event) ||
-      ((e.targetEntityType == None) && (e.targetEntityId == None)),
-      s"Reserved event ${e.event} cannot have targetEntity")
-    require(!isReservedPrefix(e.entityType) ||
-      isBuiltinEntityTypes(e.entityType),
-      s"The entityType ${e.entityType} is not allowed. " +
+            ((e.targetEntityType == None) && (e.targetEntityId == None)),
+            s"Reserved event ${e.event} cannot have targetEntity")
+    require(
+        !isReservedPrefix(e.entityType) || isBuiltinEntityTypes(e.entityType),
+        s"The entityType ${e.entityType} is not allowed. " +
         s"'pio_' is a reserved name prefix.")
-    require(e.targetEntityType.map{ t =>
-      (!isReservedPrefix(t) || isBuiltinEntityTypes(t))}.getOrElse(true),
-      s"The targetEntityType ${e.targetEntityType.get} is not allowed. " +
+    require(
+        e.targetEntityType.map { t =>
+          (!isReservedPrefix(t) || isBuiltinEntityTypes(t))
+        }.getOrElse(true),
+        s"The targetEntityType ${e.targetEntityType.get} is not allowed. " +
         s"'pio_' is a reserved name prefix.")
     validateProperties(e)
   }
@@ -144,7 +146,8 @@ object EventValidation {
   val builtinProperties: Set[String] = Set()
 
   /** Checks whether an entity type is a built-in entity type */
-  def isBuiltinEntityTypes(name: String): Boolean = builtinEntityTypes.contains(name)
+  def isBuiltinEntityTypes(name: String): Boolean =
+    builtinEntityTypes.contains(name)
 
   /** Validate event properties, throwing exceptions when the candidate violates
     * any of the following:
@@ -156,9 +159,8 @@ object EventValidation {
   def validateProperties(e: Event): Unit = {
     e.properties.keySet.foreach { k =>
       require(!isReservedPrefix(k) || builtinProperties.contains(k),
-        s"The property ${k} is not allowed. " +
-          s"'pio_' is a reserved name prefix.")
+              s"The property ${k} is not allowed. " +
+              s"'pio_' is a reserved name prefix.")
     }
   }
-
 }

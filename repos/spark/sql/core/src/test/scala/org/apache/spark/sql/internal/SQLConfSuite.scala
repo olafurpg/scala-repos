@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.apache.spark.sql.internal
 
@@ -78,7 +78,7 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
   test("deprecated property") {
     sqlContext.conf.clear()
     val original = sqlContext.conf.numShufflePartitions
-    try{
+    try {
       sql(s"set ${SQLConf.Deprecated.MAPRED_REDUCE_TASKS}=10")
       assert(sqlContext.conf.numShufflePartitions === 10)
     } finally {
@@ -91,13 +91,15 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
     val e = intercept[IllegalArgumentException] {
       sql(s"set ${SQLConf.CASE_SENSITIVE.key}=10")
     }
-    assert(e.getMessage === s"${SQLConf.CASE_SENSITIVE.key} should be boolean, but was 10")
+    assert(
+        e.getMessage === s"${SQLConf.CASE_SENSITIVE.key} should be boolean, but was 10")
   }
 
   test("Test SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE's method") {
     sqlContext.conf.clear()
 
-    sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "100")
+    sqlContext.setConf(
+        SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "100")
     assert(sqlContext.conf.targetPostShuffleInputSize === 100)
 
     sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "1k")
@@ -115,18 +117,21 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
     // Test overflow exception
     intercept[IllegalArgumentException] {
       // This value exceeds Long.MaxValue
-      sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "90000000000g")
+      sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
+                         "90000000000g")
     }
 
     intercept[IllegalArgumentException] {
       // This value less than Int.MinValue
-      sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "-90000000000g")
+      sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
+                         "-90000000000g")
     }
 
     // Test invalid input
     intercept[IllegalArgumentException] {
       // This value exceeds Long.MaxValue
-      sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "-1g")
+      sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
+                         "-1g")
     }
     sqlContext.conf.clear()
   }

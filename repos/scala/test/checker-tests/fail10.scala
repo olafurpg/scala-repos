@@ -1,6 +1,6 @@
-class ClassCounts extends scala.collection.mutable.HashMap[Class[_], Int] { }
+class ClassCounts extends scala.collection.mutable.HashMap[Class[_], Int] {}
 
-class A {  
+class A {
   def f(xs: ClassCounts) {
     // ok
     xs(getClass) = xs(getClass) + 1

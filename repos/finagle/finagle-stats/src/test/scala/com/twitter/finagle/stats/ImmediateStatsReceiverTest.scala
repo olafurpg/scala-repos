@@ -16,8 +16,7 @@ class ImmediateStatsReceiverTest extends FunSuite with BeforeAndAfter {
 
   private[this] def metrics(name: String): Option[Long] = {
     val sample = registry.sample()
-    if (!sample.containsKey(name))
-      None
+    if (!sample.containsKey(name)) None
     else {
       val x = sample.get(name)
       Some(x.longValue())

@@ -13,5 +13,4 @@ trait HttpRequestHandler extends Plugin {
     * @param response the response object to fill.
     */
   def serve(request: HttpRequest, response: HttpResponse): Unit
-
 }

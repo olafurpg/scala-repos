@@ -1,4 +1,3 @@
-
 import language._
 
 object Sample {

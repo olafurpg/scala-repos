@@ -1,13 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.osgi.test
 
 import akka.actor.Actor
 
 /**
- * Simple ping-pong actor, used for testing
- */
+  * Simple ping-pong actor, used for testing
+  */
 object PingPong {
 
   abstract class TestMessage
@@ -21,5 +21,4 @@ object PingPong {
         sender() ! Pong
     }
   }
-
 }

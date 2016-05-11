@@ -3,7 +3,7 @@ package mesosphere.marathon.state
 import mesosphere.marathon.Protos
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.api.JsonTestHelper
-import org.apache.mesos.{ Protos => MesosProtos }
+import org.apache.mesos.{Protos => MesosProtos}
 import org.scalatest.Matchers
 import play.api.libs.json.Json
 
@@ -18,27 +18,28 @@ class IpAddressTest extends MarathonSpec with Matchers {
     lazy val defaultIpAddress = IpAddress()
 
     lazy val ipAddressWithGroups = IpAddress(
-      groups = Vector("foo", "bar"),
-      labels = Map.empty
+        groups = Vector("foo", "bar"),
+        labels = Map.empty
     )
 
     lazy val ipAddressWithGroupsAndLabels = IpAddress(
-      groups = Vector("a", "b", "c"),
-      labels = Map(
-        "foo" -> "bar",
-        "baz" -> "buzz"
-      )
+        groups = Vector("a", "b", "c"),
+        labels = Map(
+              "foo" -> "bar",
+              "baz" -> "buzz"
+          )
     )
 
     lazy val ipAddressWithDiscoveryInfo = IpAddress(
-      groups = Vector("a", "b", "c"),
-      labels = Map(
-        "foo" -> "bar",
-        "baz" -> "buzz"
-      ),
-      discoveryInfo = DiscoveryInfo(
-        ports = Vector(DiscoveryInfo.Port(name = "http", number = 80, protocol = "tcp"))
-      )
+        groups = Vector("a", "b", "c"),
+        labels = Map(
+              "foo" -> "bar",
+              "baz" -> "buzz"
+          ),
+        discoveryInfo = DiscoveryInfo(
+              ports = Vector(DiscoveryInfo.Port(
+                        name = "http", number = 80, protocol = "tcp"))
+          )
     )
   }
 
@@ -50,8 +51,10 @@ class IpAddressTest extends MarathonSpec with Matchers {
     val proto = f.defaultIpAddress.toProto
 
     // The default IpAddress has an empty DiscoveryInfo
-    val defaultIpAddressProto =
-      Protos.IpAddress.newBuilder().setDiscoveryInfo(Protos.DiscoveryInfo.getDefaultInstance).build()
+    val defaultIpAddressProto = Protos.IpAddress
+      .newBuilder()
+      .setDiscoveryInfo(Protos.DiscoveryInfo.getDefaultInstance)
+      .build()
     proto should be(defaultIpAddressProto)
   }
 
@@ -65,9 +68,10 @@ class IpAddressTest extends MarathonSpec with Matchers {
   test("ToProto with groups and labels") {
     val f = fixture()
     val proto = f.ipAddressWithGroupsAndLabels.toProto
-    proto.getGroupsList.asScala should equal(f.ipAddressWithGroupsAndLabels.groups)
-    proto.getLabelsList.asScala.map(kv => kv.getKey -> kv.getValue).toMap should
-      equal(f.ipAddressWithGroupsAndLabels.labels)
+    proto.getGroupsList.asScala should equal(
+        f.ipAddressWithGroupsAndLabels.groups)
+    proto.getLabelsList.asScala.map(kv => kv.getKey -> kv.getValue).toMap should equal(
+        f.ipAddressWithGroupsAndLabels.labels)
   }
 
   test("ToProto with groups and labels and discovery") {
@@ -79,13 +83,13 @@ class IpAddressTest extends MarathonSpec with Matchers {
       .setNumber(80)
       .setProtocol("tcp")
       .build
-    val discoveryInfoProto = Protos.DiscoveryInfo.newBuilder
-      .addPorts(portProto)
-      .build
+    val discoveryInfoProto =
+      Protos.DiscoveryInfo.newBuilder.addPorts(portProto).build
 
-    proto.getGroupsList.asScala should equal(f.ipAddressWithGroupsAndLabels.groups)
-    proto.getLabelsList.asScala.map(kv => kv.getKey -> kv.getValue).toMap should
-      equal(f.ipAddressWithGroupsAndLabels.labels)
+    proto.getGroupsList.asScala should equal(
+        f.ipAddressWithGroupsAndLabels.groups)
+    proto.getLabelsList.asScala.map(kv => kv.getKey -> kv.getValue).toMap should equal(
+        f.ipAddressWithGroupsAndLabels.labels)
     proto.getDiscoveryInfo should equal(discoveryInfoProto)
   }
 
@@ -99,9 +103,8 @@ class IpAddressTest extends MarathonSpec with Matchers {
 
   test("ConstructFromProto with groups") {
     val f = fixture()
-    val protoWithGroups = Protos.IpAddress.newBuilder
-      .addAllGroups(Seq("foo", "bar").asJava)
-      .build
+    val protoWithGroups =
+      Protos.IpAddress.newBuilder.addAllGroups(Seq("foo", "bar").asJava).build
     val result = IpAddress.fromProto(protoWithGroups)
     result should equal(f.ipAddressWithGroups)
   }
@@ -125,9 +128,8 @@ class IpAddressTest extends MarathonSpec with Matchers {
       .setNumber(80)
       .setProtocol("tcp")
       .build
-    val discoveryInfoProto = Protos.DiscoveryInfo.newBuilder
-      .addPorts(portProto)
-      .build
+    val discoveryInfoProto =
+      Protos.DiscoveryInfo.newBuilder.addPorts(portProto).build
 
     val protoWithDiscovery = Protos.IpAddress.newBuilder
       .addAllGroups(Seq("a", "b", "c").asJava)
@@ -151,12 +153,14 @@ class IpAddressTest extends MarathonSpec with Matchers {
 
   test("JSON Serialization round-trip ipAddressWithGroupsAndLabels") {
     val f = fixture()
-    JsonTestHelper.assertSerializationRoundtripWorks(f.ipAddressWithGroupsAndLabels)
+    JsonTestHelper.assertSerializationRoundtripWorks(
+        f.ipAddressWithGroupsAndLabels)
   }
 
   test("JSON Serialization round-trip ipAddressWithDiscoveryInfo") {
     val f = fixture()
-    JsonTestHelper.assertSerializationRoundtripWorks(f.ipAddressWithDiscoveryInfo)
+    JsonTestHelper.assertSerializationRoundtripWorks(
+        f.ipAddressWithDiscoveryInfo)
   }
 
   private[this] def fromJson(json: String): IpAddress = {
@@ -164,8 +168,7 @@ class IpAddressTest extends MarathonSpec with Matchers {
   }
 
   test("Reading empty IpAddress from JSON") {
-    val json =
-      """
+    val json = """
       {}
       """
 
@@ -175,8 +178,7 @@ class IpAddressTest extends MarathonSpec with Matchers {
   }
 
   test("Reading IpAddress with groups from JSON") {
-    val json =
-      """
+    val json = """
       {
         "groups": ["foo", "bar"]
       }
@@ -188,8 +190,7 @@ class IpAddressTest extends MarathonSpec with Matchers {
   }
 
   test("Reading complete IpAddress from JSON") {
-    val json =
-      """
+    val json = """
       {
         "groups": ["a", "b", "c"],
         "labels": {
@@ -203,6 +204,4 @@ class IpAddressTest extends MarathonSpec with Matchers {
     val f = fixture()
     readResult should equal(f.ipAddressWithGroupsAndLabels)
   }
-
 }
-

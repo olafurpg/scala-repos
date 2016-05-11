@@ -10,9 +10,11 @@ import spray.json._
 class JerkProtocol extends FramedStringProtocol {
   import JerkEnvelopeFormats._
 
-  override def encode(resp: RpcResponseEnvelope): ByteString = writeString(resp.toJson.compactPrint)
+  override def encode(resp: RpcResponseEnvelope): ByteString =
+    writeString(resp.toJson.compactPrint)
 
-  override def decode(bytes: ByteString): (Option[RpcRequestEnvelope], ByteString) = {
+  override def decode(
+      bytes: ByteString): (Option[RpcRequestEnvelope], ByteString) = {
     tryReadString(bytes) match {
       case (Some(message), remainder) =>
         val parsedMessage = message.parseJson.convertTo[RpcRequestEnvelope]

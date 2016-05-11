@@ -40,19 +40,20 @@ package enumnamefieldspecs {
   }
   object JsonObj extends JsonObjectMeta[JsonObj]
 
-  class EnumNameRec extends MongoRecord[EnumNameRec] with ObjectIdPk[EnumNameRec] {
+  class EnumNameRec
+      extends MongoRecord[EnumNameRec] with ObjectIdPk[EnumNameRec] {
     def meta = EnumNameRec
 
     object dow extends EnumNameField(this, WeekDay)
     object dowOptional extends OptionalEnumNameField(this, WeekDay)
-    object jsonobj extends JsonObjectField[EnumNameRec, JsonObj](this, JsonObj) {
+    object jsonobj
+        extends JsonObjectField[EnumNameRec, JsonObj](this, JsonObj) {
       def defaultValue = JsonObj(WeekDay.Mon)
     }
 
     override def equals(other: Any): Boolean = other match {
       case that: EnumNameRec =>
-        this.id.get == that.id.get &&
-        this.dow.value == that.dow.value &&
+        this.id.get == that.id.get && this.dow.value == that.dow.value &&
         this.dowOptional.valueBox == that.dowOptional.valueBox &&
         this.jsonobj.value == that.jsonobj.value
       case _ => false
@@ -64,10 +65,9 @@ package enumnamefieldspecs {
   }
 }
 
-
 /**
- * Systems under specification for EnumNameField.
- */
+  * Systems under specification for EnumNameField.
+  */
 object EnumNameFieldSpec extends Specification with MongoTestKit {
   "EnumNameField Specification".title
 

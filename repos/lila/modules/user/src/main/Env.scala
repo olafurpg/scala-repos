@@ -4,15 +4,14 @@ import akka.actor._
 import com.typesafe.config.Config
 
 import lila.common.PimpedConfig._
-import lila.memo.{ ExpireSetMemo, MongoCache }
+import lila.memo.{ExpireSetMemo, MongoCache}
 
-final class Env(
-    config: Config,
-    db: lila.db.Env,
-    mongoCache: MongoCache.Builder,
-    scheduler: lila.common.Scheduler,
-    timeline: ActorSelection,
-    system: ActorSystem) {
+final class Env(config: Config,
+                db: lila.db.Env,
+                mongoCache: MongoCache.Builder,
+                scheduler: lila.common.Scheduler,
+                timeline: ActorSelection,
+                system: ActorSystem) {
 
   private val settings = new {
     val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
@@ -35,13 +34,15 @@ final class Env(
 
   lazy val trophyApi = new TrophyApi(db(CollectionTrophy))
 
-  lazy val rankingApi = new RankingApi(db(CollectionRanking), mongoCache, lightUser)
+  lazy val rankingApi = new RankingApi(
+      db(CollectionRanking), mongoCache, lightUser)
 
   lazy val jsonView = new JsonView(isOnline)
 
   val forms = DataForm
 
-  def lightUser(id: String): Option[lila.common.LightUser] = lightUserApi get id
+  def lightUser(id: String): Option[lila.common.LightUser] =
+    lightUserApi get id
 
   def isOnline(userId: String) = onlineUserIdMemo get userId
 
@@ -57,11 +58,14 @@ final class Env(
 
   system.actorOf(Props(new Actor {
     override def preStart() {
-      system.lilaBus.subscribe(self, 'adjustCheater, 'adjustBooster, 'userActive)
+      system.lilaBus
+        .subscribe(self, 'adjustCheater, 'adjustBooster, 'userActive)
     }
     def receive = {
-      case lila.hub.actorApi.mod.MarkCheater(userId) => rankingApi remove userId
-      case lila.hub.actorApi.mod.MarkBooster(userId) => rankingApi remove userId
+      case lila.hub.actorApi.mod.MarkCheater(userId) =>
+        rankingApi remove userId
+      case lila.hub.actorApi.mod.MarkBooster(userId) =>
+        rankingApi remove userId
       case User.Active(user) =>
         if (!user.seenRecently) UserRepo setSeenAt user.id
         onlineUserIdMemo put user.id
@@ -77,20 +81,19 @@ final class Env(
     }
   }
 
-  lazy val cached = new Cached(
-    nbTtl = CachedNbTtl,
-    onlineUserIdMemo = onlineUserIdMemo,
-    mongoCache = mongoCache,
-    rankingApi = rankingApi)
+  lazy val cached = new Cached(nbTtl = CachedNbTtl,
+                               onlineUserIdMemo = onlineUserIdMemo,
+                               mongoCache = mongoCache,
+                               rankingApi = rankingApi)
 }
 
 object Env {
 
-  lazy val current: Env = "user" boot new Env(
-    config = lila.common.PlayApp loadConfig "user",
-    db = lila.db.Env.current,
-    mongoCache = lila.memo.Env.current.mongoCache,
-    scheduler = lila.common.PlayApp.scheduler,
-    timeline = lila.hub.Env.current.actor.timeline,
-    system = lila.common.PlayApp.system)
+  lazy val current: Env =
+    "user" boot new Env(config = lila.common.PlayApp loadConfig "user",
+                        db = lila.db.Env.current,
+                        mongoCache = lila.memo.Env.current.mongoCache,
+                        scheduler = lila.common.PlayApp.scheduler,
+                        timeline = lila.hub.Env.current.actor.timeline,
+                        system = lila.common.PlayApp.system)
 }

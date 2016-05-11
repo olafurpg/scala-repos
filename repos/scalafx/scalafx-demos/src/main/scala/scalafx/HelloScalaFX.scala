@@ -49,14 +49,11 @@ object HelloScalaFX extends JFXApp {
           text = "Scala"
           style = "-fx-font-size: 100pt"
           fill = new LinearGradient(
-            endX = 0,
-            stops = Stops(PaleGreen, SeaGreen))
+              endX = 0, stops = Stops(PaleGreen, SeaGreen))
         }, new Text {
           text = "FX"
           style = "-fx-font-size: 100pt"
-          fill = new LinearGradient(
-            endX = 0,
-            stops = Stops(Cyan, DodgerBlue))
+          fill = new LinearGradient(endX = 0, stops = Stops(Cyan, DodgerBlue))
           effect = new DropShadow {
             color = DodgerBlue
             radius = 25

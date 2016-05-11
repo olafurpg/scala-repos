@@ -17,15 +17,13 @@ class ThreadLocalRandom extends Random {
   initialized = true
 
   override def setSeed(seed: Long): Unit = {
-    if (initialized)
-      throw new UnsupportedOperationException()
+    if (initialized) throw new UnsupportedOperationException()
 
     super.setSeed(seed)
   }
 
   def nextInt(least: Int, bound: Int): Int = {
-    if (least >= bound)
-      throw new IllegalArgumentException()
+    if (least >= bound) throw new IllegalArgumentException()
 
     val difference = bound - least
     if (difference > 0) {
@@ -46,8 +44,7 @@ class ThreadLocalRandom extends Random {
   }
 
   def nextLong(_n: Long): Long = {
-    if (_n <= 0)
-      throw new IllegalArgumentException("n must be positive")
+    if (_n <= 0) throw new IllegalArgumentException("n must be positive")
 
     /*
      * Divide n by two until small enough for nextInt. On each
@@ -66,16 +63,14 @@ class ThreadLocalRandom extends Random {
       val nextn =
         if ((bits & 2) == 0) halfn
         else n - halfn
-      if ((bits & 1) == 0)
-        offset += n - nextn
+      if ((bits & 1) == 0) offset += n - nextn
       n = nextn
     }
     offset + nextInt(n.toInt)
   }
 
   def nextLong(least: Long, bound: Long): Long = {
-    if (least >= bound)
-      throw new IllegalArgumentException()
+    if (least >= bound) throw new IllegalArgumentException()
 
     val difference = bound - least
     if (difference >= 0) {
@@ -96,15 +91,13 @@ class ThreadLocalRandom extends Random {
   }
 
   def nextDouble(n: Double): Double = {
-    if (n <= 0)
-      throw new IllegalArgumentException("n must be positive")
+    if (n <= 0) throw new IllegalArgumentException("n must be positive")
 
     nextDouble() * n
   }
 
   def nextDouble(least: Double, bound: Double): Double = {
-    if (least >= bound)
-      throw new IllegalArgumentException()
+    if (least >= bound) throw new IllegalArgumentException()
 
     /* Based on documentation for Random.doubles to avoid issue #2144 and other
      * possible rounding up issues:
@@ -118,9 +111,7 @@ class ThreadLocalRandom extends Random {
 
 object ThreadLocalRandom {
 
-  private val _current =
-    new ThreadLocalRandom()
+  private val _current = new ThreadLocalRandom()
 
   def current(): ThreadLocalRandom = _current
-
 }

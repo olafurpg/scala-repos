@@ -2,7 +2,7 @@ trait T
 
 class V1(val l: Long) extends AnyVal { self: T =>
   def foo: V1 = self
-  def bar: T  = self
+  def bar: T = self
 }
 
 class V2(val l: Long) extends AnyVal { self =>
@@ -10,7 +10,7 @@ class V2(val l: Long) extends AnyVal { self =>
 }
 
 class V3(val l: Long) extends AnyVal { self: Long =>
-  def foo: V3   = self
+  def foo: V3 = self
   def bar: Long = self
 }
 
@@ -18,7 +18,7 @@ class V3(val l: Long) extends AnyVal { self: Long =>
 
 class C1(val l: Long) { self: T =>
   def foo: C1 = self
-  def bar: T  = self
+  def bar: T = self
 }
 
 class C2(val l: Long) { self =>
@@ -26,7 +26,7 @@ class C2(val l: Long) { self =>
 }
 
 class C3(val l: Long) { self: Long =>
-  def foo: C3   = self
+  def foo: C3 = self
   def bar: Long = self
 }
 

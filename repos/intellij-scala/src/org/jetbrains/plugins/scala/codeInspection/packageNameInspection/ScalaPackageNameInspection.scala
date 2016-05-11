@@ -2,7 +2,6 @@ package org.jetbrains.plugins.scala
 package codeInspection
 package packageNameInspection
 
-
 import com.intellij.codeInspection._
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi._
@@ -11,18 +10,20 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 08.07.2009
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 08.07.2009
+  */
 class ScalaPackageNameInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
   override def getID: String = "ScalaPackageName"
 
-  override def checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array[ProblemDescriptor] = {
+  override def checkFile(file: PsiFile,
+                         manager: InspectionManager,
+                         isOnTheFly: Boolean): Array[ProblemDescriptor] = {
     file match {
-      case file: ScalaFile if IntentionAvailabilityChecker.checkInspection(this, file) =>
+      case file: ScalaFile
+          if IntentionAvailabilityChecker.checkInspection(this, file) =>
         if (file.isScriptFile()) return null
         if (file.typeDefinitions.isEmpty) return null
 
@@ -37,11 +38,17 @@ class ScalaPackageNameInspection extends LocalInspectionTool {
           case seq => seq
         }
 
-        def problemDescriptors(buffer: Seq[LocalQuickFix]): Seq[ProblemDescriptor] = ranges.map { range =>
-          manager.createProblemDescriptor(file, range,
-            "Package names doesn't correspond to directories structure, this may cause " +
-                    "problems with resolve to classes from this file", ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-            isOnTheFly, buffer: _*)
+        def problemDescriptors(
+            buffer: Seq[LocalQuickFix]): Seq[ProblemDescriptor] = ranges.map {
+          range =>
+            manager.createProblemDescriptor(
+                file,
+                range,
+                "Package names doesn't correspond to directories structure, this may cause " +
+                "problems with resolve to classes from this file",
+                ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                isOnTheFly,
+                buffer: _*)
         }
 
         val expectedPackageName = file.typeDefinitions.head match {
@@ -52,13 +59,14 @@ class ScalaPackageNameInspection extends LocalInspectionTool {
         }
 
         if (packName == null) {
-          val fixes = Seq(new EnablePerformanceProblemsQuickFix(file.getProject))
+          val fixes = Seq(
+              new EnablePerformanceProblemsQuickFix(file.getProject))
           problemDescriptors(fixes).toArray
         } else if (packName != expectedPackageName) {
           val fixes = Seq(
-            new ScalaRenamePackageQuickFix(file, expectedPackageName),
-            new ScalaMoveToPackageQuickFix(file, packName),
-            new EnablePerformanceProblemsQuickFix(file.getProject))
+              new ScalaRenamePackageQuickFix(file, expectedPackageName),
+              new ScalaMoveToPackageQuickFix(file, packName),
+              new EnablePerformanceProblemsQuickFix(file.getProject))
 
           problemDescriptors(fixes).toArray
         } else null

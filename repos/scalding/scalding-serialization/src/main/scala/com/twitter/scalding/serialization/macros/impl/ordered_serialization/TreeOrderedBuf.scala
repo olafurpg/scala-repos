@@ -31,44 +31,44 @@ object CommonCompareBinary {
   val minSizeForFulBinaryCompare = 24
 
   /**
-   * This method will compare two InputStreams of given lengths
-   * If the inputsteam supports mark/reset (such as those backed by Array[Byte]),
-   * and the lengths are equal and longer than minSizeForFulBinaryCompare we first
-   * check if they are byte-for-byte identical, which is a cheap way to avoid doing
-   * potentially complex logic in binary comparators
-   */
+    * This method will compare two InputStreams of given lengths
+    * If the inputsteam supports mark/reset (such as those backed by Array[Byte]),
+    * and the lengths are equal and longer than minSizeForFulBinaryCompare we first
+    * check if they are byte-for-byte identical, which is a cheap way to avoid doing
+    * potentially complex logic in binary comparators
+    */
   final def earlyEqual(inputStreamA: InputStream,
-    lenA: Int,
-    inputStreamB: InputStream,
-    lenB: Int): Boolean =
-    (lenA > minSizeForFulBinaryCompare &&
-      (lenA == lenB) &&
-      inputStreamA.markSupported &&
-      inputStreamB.markSupported) && {
-        inputStreamA.mark(lenA)
-        inputStreamB.mark(lenB)
+                       lenA: Int,
+                       inputStreamB: InputStream,
+                       lenB: Int): Boolean =
+    (lenA > minSizeForFulBinaryCompare && (lenA == lenB) &&
+        inputStreamA.markSupported && inputStreamB.markSupported) && {
+      inputStreamA.mark(lenA)
+      inputStreamB.mark(lenB)
 
-        var pos: Int = 0
-        while (pos < lenA) {
-          val a = inputStreamA.read
-          val b = inputStreamB.read
-          pos += 1
-          if (a != b) {
-            inputStreamA.reset()
-            inputStreamB.reset()
-            // yeah, return sucks, but trying to optimize here
-            return false
-          }
-          // a == b, but may be eof
-          if (a < 0) return JavaStreamEnrichments.eof
+      var pos: Int = 0
+      while (pos < lenA) {
+        val a = inputStreamA.read
+        val b = inputStreamB.read
+        pos += 1
+        if (a != b) {
+          inputStreamA.reset()
+          inputStreamB.reset()
+          // yeah, return sucks, but trying to optimize here
+          return false
         }
-        // we consumed all the bytes, and they were all equal
-        true
+        // a == b, but may be eof
+        if (a < 0) return JavaStreamEnrichments.eof
       }
+      // we consumed all the bytes, and they were all equal
+      true
+    }
 }
 object TreeOrderedBuf {
   import CompileTimeLengthTypes._
-  def toOrderedSerialization[T](c: Context)(t: TreeOrderedBuf[c.type])(implicit T: t.ctx.WeakTypeTag[T]): t.ctx.Expr[OrderedSerialization[T]] = {
+  def toOrderedSerialization[T](c: Context)(
+      t: TreeOrderedBuf[c.type])(implicit T: t.ctx.WeakTypeTag[T])
+    : t.ctx.Expr[OrderedSerialization[T]] = {
     import t.ctx.universe._
     def freshT(id: String) = newTermName(c.fresh(s"fresh_$id"))
     val outputLength = freshT("outputLength")
@@ -79,10 +79,15 @@ object TreeOrderedBuf {
       val fnBodyOpt = t.length(q"$element") match {
         case _: NoLengthCalculationAvailable[_] => None
         case const: ConstantLengthCalculation[_] => None
-        case f: FastLengthCalculation[_] => Some(q"""
-        _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen(${f.asInstanceOf[FastLengthCalculation[c.type]].t})
+        case f: FastLengthCalculation[_] =>
+          Some(
+              q"""
+        _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen(${f
+            .asInstanceOf[FastLengthCalculation[c.type]]
+            .t})
         """)
-        case m: MaybeLengthCalculation[_] => Some(m.asInstanceOf[MaybeLengthCalculation[c.type]].t)
+        case m: MaybeLengthCalculation[_] =>
+          Some(m.asInstanceOf[MaybeLengthCalculation[c.type]].t)
       }
 
       fnBodyOpt.map { fnBody =>
@@ -100,7 +105,7 @@ object TreeOrderedBuf {
       val lensLen = freshT("lensLen")
       val element = freshT("element")
       val callDynamic = (q"""override def staticSize: Option[Int] = None""",
-        q"""
+                         q"""
 
       override def dynamicSize($element: $typeName): Option[Int] = {
         if(skipLenCalc) None else {
@@ -122,10 +127,13 @@ object TreeOrderedBuf {
       """)
 
       t.length(q"$element") match {
-        case _: NoLengthCalculationAvailable[_] => (q"""
-          override def staticSize: Option[Int] = None""", q"""
+        case _: NoLengthCalculationAvailable[_] =>
+          (q"""
+          override def staticSize: Option[Int] = None""",
+           q"""
           override def dynamicSize($element: $typeName): Option[Int] = None""")
-        case const: ConstantLengthCalculation[_] => (q"""
+        case const: ConstantLengthCalculation[_] =>
+          (q"""
           override val staticSize: Option[Int] = Some(${const.toInt})""", q"""
           override def dynamicSize($element: $typeName): Option[Int] = staticSize""")
         case f: FastLengthCalculation[_] => callDynamic
@@ -140,11 +148,11 @@ object TreeOrderedBuf {
       val len = freshT("len")
 
       /**
-       * This is the worst case: we have to serialize in a side buffer
-       * and then see how large it actually is. This happens for cases, like
-       * string, where the cost to see the serialized size is not cheaper than
-       * directly serializing.
-       */
+        * This is the worst case: we have to serialize in a side buffer
+        * and then see how large it actually is. This happens for cases, like
+        * string, where the cost to see the serialized size is not cheaper than
+        * directly serializing.
+        */
       q"""
       private[this] def noLengthWrite($element: $T, $outerOutputStream: _root_.java.io.OutputStream): Unit = {
         // Start with pretty big buffers because reallocation will be expensive
@@ -160,10 +168,11 @@ object TreeOrderedBuf {
     def putFnGen(outerbaos: TermName, element: TermName) = {
       val oldPos = freshT("oldPos")
       val len = freshT("len")
+
       /**
-       * This is the case where the length is cheap to compute, either
-       * constant or easily computable from an instance.
-       */
+        * This is the case where the length is cheap to compute, either
+        * constant or easily computable from an instance.
+        */
       def withLenCalc(lenC: Tree) = q"""
         val $len = $lenC
         $outerbaos.writePosVarInt($len)
@@ -313,7 +322,8 @@ abstract class TreeOrderedBuf[C <: Context] {
   val ctx: C
   val tpe: ctx.Type
   // Expected byte buffers to be in values a and b respestively, the tree has the value of the result
-  def compareBinary(inputStreamA: ctx.TermName, inputStreamB: ctx.TermName): ctx.Tree
+  def compareBinary(
+      inputStreamA: ctx.TermName, inputStreamB: ctx.TermName): ctx.Tree
   // expects the thing to be tested on in the indiciated TermName
   def hash(element: ctx.TermName): ctx.Tree
 
@@ -329,5 +339,4 @@ abstract class TreeOrderedBuf[C <: Context] {
   def lazyOuterVariables: Map[String, ctx.Tree]
   // Return the constant size or a tree
   def length(element: ctx.universe.Tree): CompileTimeLengthTypes[ctx.type]
-
 }

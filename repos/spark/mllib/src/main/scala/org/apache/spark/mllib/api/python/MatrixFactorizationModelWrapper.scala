@@ -23,31 +23,37 @@ import org.apache.spark.mllib.recommendation.{MatrixFactorizationModel, Rating}
 import org.apache.spark.rdd.RDD
 
 /**
- * A Wrapper of MatrixFactorizationModel to provide helper method for Python.
- */
-private[python] class MatrixFactorizationModelWrapper(model: MatrixFactorizationModel)
-  extends MatrixFactorizationModel(model.rank, model.userFeatures, model.productFeatures) {
+  * A Wrapper of MatrixFactorizationModel to provide helper method for Python.
+  */
+private[python] class MatrixFactorizationModelWrapper(
+    model: MatrixFactorizationModel)
+    extends MatrixFactorizationModel(
+        model.rank, model.userFeatures, model.productFeatures) {
 
   def predict(userAndProducts: JavaRDD[Array[Any]]): RDD[Rating] =
     predict(SerDe.asTupleRDD(userAndProducts.rdd))
 
   def getUserFeatures: RDD[Array[Any]] = {
-    SerDe.fromTuple2RDD(userFeatures.map {
+    SerDe.fromTuple2RDD(
+        userFeatures.map {
       case (user, feature) => (user, Vectors.dense(feature))
     }.asInstanceOf[RDD[(Any, Any)]])
   }
 
   def getProductFeatures: RDD[Array[Any]] = {
-    SerDe.fromTuple2RDD(productFeatures.map {
+    SerDe.fromTuple2RDD(
+        productFeatures.map {
       case (product, feature) => (product, Vectors.dense(feature))
     }.asInstanceOf[RDD[(Any, Any)]])
   }
 
   def wrappedRecommendProductsForUsers(num: Int): RDD[Array[Any]] = {
-    SerDe.fromTuple2RDD(recommendProductsForUsers(num).asInstanceOf[RDD[(Any, Any)]])
+    SerDe.fromTuple2RDD(
+        recommendProductsForUsers(num).asInstanceOf[RDD[(Any, Any)]])
   }
 
   def wrappedRecommendUsersForProducts(num: Int): RDD[Array[Any]] = {
-    SerDe.fromTuple2RDD(recommendUsersForProducts(num).asInstanceOf[RDD[(Any, Any)]])
+    SerDe.fromTuple2RDD(
+        recommendUsersForProducts(num).asInstanceOf[RDD[(Any, Any)]])
   }
 }

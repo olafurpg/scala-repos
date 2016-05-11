@@ -8,25 +8,25 @@ class DebugConfTest extends MarathonSpec {
 
   test("tracing can be enabled") {
     val conf = MarathonTestHelper.makeConfig(
-      "--master", "127.0.0.1:5050",
-      "--tracing"
+        "--master",
+        "127.0.0.1:5050",
+        "--tracing"
     )
     assert(conf.enableDebugTracing)
   }
 
   test("tracing can be enabled using the deprecated ---enable_tracing") {
     val conf = MarathonTestHelper.makeConfig(
-      "--master", "127.0.0.1:5050",
-      "--enable_tracing"
+        "--master",
+        "127.0.0.1:5050",
+        "--enable_tracing"
     )
     assert(conf.enableDebugTracing)
   }
 
   test("tracing can be disabled") {
-    val conf = MarathonTestHelper.makeConfig("" +
-      "--master", "127.0.0.1:5050",
-      "--disable_tracing"
-    )
+    val conf = MarathonTestHelper.makeConfig(
+        "" + "--master", "127.0.0.1:5050", "--disable_tracing")
     assert(!conf.enableDebugTracing)
   }
 
@@ -37,24 +37,27 @@ class DebugConfTest extends MarathonSpec {
 
   test("metrics can be enabled") {
     val conf = MarathonTestHelper.makeConfig(
-      "--master", "127.0.0.1:5050",
-      "--metrics"
+        "--master",
+        "127.0.0.1:5050",
+        "--metrics"
     )
     assert(conf.metrics())
   }
 
   test("the deprecated --enable_metrics is accepted") {
     val conf = MarathonTestHelper.makeConfig(
-      "--master", "127.0.0.1:5050",
-      "--enable_metrics"
+        "--master",
+        "127.0.0.1:5050",
+        "--enable_metrics"
     )
     assert(conf.metrics())
   }
 
   test("metrics can be disabled") {
     val conf = MarathonTestHelper.makeConfig(
-      "--master", "127.0.0.1:5050",
-      "--disable_metrics"
+        "--master",
+        "127.0.0.1:5050",
+        "--disable_metrics"
     )
     assert(!conf.metrics())
   }

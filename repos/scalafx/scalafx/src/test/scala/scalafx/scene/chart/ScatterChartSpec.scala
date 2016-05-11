@@ -35,16 +35,18 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * ScatterChart Spec tests.
- *
- *
- */
+  * ScatterChart Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ScatterChartSpec
-  extends SimpleSFXDelegateSpec[jfxsc.ScatterChart[Number, Number], ScatterChart[Number, Number]](
-    classOf[jfxsc.ScatterChart[Number, Number]], classOf[ScatterChart[Number, Number]])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[
+        jfxsc.ScatterChart[Number, Number], ScatterChart[Number, Number]](
+        classOf[jfxsc.ScatterChart[Number, Number]],
+        classOf[ScatterChart[Number, Number]]) with RunOnApplicationThread {
 
-  override def getJavaClassInstance = new jfxsc.ScatterChart[Number, Number](new jfxsc.NumberAxis, new jfxsc.NumberAxis)
-
+  override def getJavaClassInstance =
+    new jfxsc.ScatterChart[Number, Number](
+        new jfxsc.NumberAxis, new jfxsc.NumberAxis)
 }

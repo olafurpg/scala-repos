@@ -9,8 +9,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackageCont
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait}
 
 /**
- * Pavel.Fatin, 20.01.2010
- */
+  * Pavel.Fatin, 20.01.2010
+  */
 trait ScalaSeparatorProvider {
   val DefaultGroup = 0
   val MultilineLevel = 10
@@ -27,33 +27,30 @@ trait ScalaSeparatorProvider {
       if (g.get >= MultilineLevel) {
         true
       } else {
-        g != getGroupAbove(element) {_ => true}
+        g != getGroupAbove(element) { _ =>
+          true
+        }
       }
     } else false
   }
 
   def hasElementAbove(element: PsiElement) = {
-    getGroupAbove(element) {!_.isInstanceOf[ScImportStmt]}.isDefined
+    getGroupAbove(element) { !_.isInstanceOf[ScImportStmt] }.isDefined
   }
 
   def getGroup(element: PsiElement) = {
-    for (g <- groupOf(element))
-    yield if (isMultiline(element)) MultilineLevel + g else g
+    for (g <- groupOf(element)) yield
+      if (isMultiline(element)) MultilineLevel + g else g
   }
 
   def groupOf(element: PsiElement): Option[Int] = {
     element match {
-      case _: ScValue |
-              _: ScVariable |
-              _: ScTypeAlias |
-              _: ScFunction |
-              _: ScImportStmt |
-              _: ScPackageContainer |
-              _: ScClass |
-              _: ScObject |
-              _: ScTrait |
-              _: ScBlock => Some(DefaultGroup)
-      case it: ScNewTemplateDefinition if it.extendsBlock != null => Some(DefaultGroup)
+      case _: ScValue | _: ScVariable | _: ScTypeAlias | _: ScFunction |
+          _: ScImportStmt | _: ScPackageContainer | _: ScClass | _: ScObject |
+          _: ScTrait | _: ScBlock =>
+        Some(DefaultGroup)
+      case it: ScNewTemplateDefinition if it.extendsBlock != null =>
+        Some(DefaultGroup)
       case _ => None
     }
   }
@@ -82,7 +79,8 @@ trait ScalaSeparatorProvider {
     }
   }
 
-  def getGroupAbove(element: PsiElement)(filter: PsiElement => Boolean): Option[Int] = {
+  def getGroupAbove(element: PsiElement)(
+      filter: PsiElement => Boolean): Option[Int] = {
     var lines = 0
     var e = element.getPrevSibling
     while (e != null) {

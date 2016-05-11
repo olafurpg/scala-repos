@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -15,21 +15,20 @@ import scala.collection.parallel.ParSetLike
 import scala.collection.parallel.Combiner
 
 /** An immutable variant of `ParSet`.
- *
- *  @define Coll `mutable.ParSet`
- *  @define coll mutable parallel set
- */
+  *
+  *  @define Coll `mutable.ParSet`
+  *  @define coll mutable parallel set
+  */
 trait ParSet[T]
-extends scala.collection/*.immutable*/.GenSet[T]
-   with GenericParTemplate[T, ParSet]
-   with parallel.ParSet[T]
-   with ParIterable[T]
-   with ParSetLike[T, ParSet[T], scala.collection.immutable.Set[T]]
-{
-self =>
+    extends scala.collection /*.immutable*/ .GenSet[T]
+    with GenericParTemplate[T, ParSet]
+    with parallel.ParSet[T] with ParIterable[T]
+    with ParSetLike[T, ParSet[T], scala.collection.immutable.Set[T]] {
+  self =>
   override def empty: ParSet[T] = ParHashSet[T]()
 
-  override def companion: GenericCompanion[ParSet] with GenericParCompanion[ParSet] = ParSet
+  override def companion: GenericCompanion[ParSet] with GenericParCompanion[
+      ParSet] = ParSet
 
   override def stringPrefix = "ParSet"
 
@@ -38,11 +37,12 @@ self =>
 }
 
 /** $factoryInfo
- *  @define Coll `mutable.ParSet`
- *  @define coll mutable parallel set
- */
+  *  @define Coll `mutable.ParSet`
+  *  @define coll mutable parallel set
+  */
 object ParSet extends ParSetFactory[ParSet] {
   def newCombiner[T]: Combiner[T, ParSet[T]] = HashSetCombiner[T]
 
-  implicit def canBuildFrom[T]: CanCombineFrom[Coll, T, ParSet[T]] = new GenericCanCombineFrom[T]
+  implicit def canBuildFrom[T]: CanCombineFrom[Coll, T, ParSet[T]] =
+    new GenericCanCombineFrom[T]
 }

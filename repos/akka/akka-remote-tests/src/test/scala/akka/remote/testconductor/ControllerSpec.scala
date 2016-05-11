@@ -1,10 +1,10 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote.testconductor
 
 import akka.testkit.AkkaSpec
-import akka.actor.{ PoisonPill, Props, AddressFromURIString }
+import akka.actor.{PoisonPill, Props, AddressFromURIString}
 import akka.testkit.ImplicitSender
 import akka.remote.testconductor.Controller.NodeInfo
 import java.net.InetSocketAddress
@@ -19,7 +19,8 @@ object ControllerSpec {
     """
 }
 
-class ControllerSpec extends AkkaSpec(ControllerSpec.config) with ImplicitSender {
+class ControllerSpec
+    extends AkkaSpec(ControllerSpec.config) with ImplicitSender {
 
   val A = RoleName("a")
   val B = RoleName("b")
@@ -27,7 +28,10 @@ class ControllerSpec extends AkkaSpec(ControllerSpec.config) with ImplicitSender
   "A Controller" must {
 
     "publish its nodes" in {
-      val c = system.actorOf(Props(classOf[Controller], 1, new InetSocketAddress(InetAddress.getLocalHost, 0)))
+      val c = system.actorOf(
+          Props(classOf[Controller],
+                1,
+                new InetSocketAddress(InetAddress.getLocalHost, 0)))
       c ! NodeInfo(A, AddressFromURIString("akka://sys"), testActor)
       expectMsg(ToClient(Done))
       c ! NodeInfo(B, AddressFromURIString("akka://sys"), testActor)
@@ -36,7 +40,5 @@ class ControllerSpec extends AkkaSpec(ControllerSpec.config) with ImplicitSender
       expectMsgType[Iterable[RoleName]].toSet should ===(Set(A, B))
       c ! PoisonPill // clean up so network connections don't accumulate during test run
     }
-
   }
-
 }

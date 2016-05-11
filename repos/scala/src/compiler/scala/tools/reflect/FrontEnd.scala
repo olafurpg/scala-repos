@@ -14,11 +14,11 @@ trait FrontEnd {
       case _ => "<unknown>"
     }
   }
-  val INFO    = new Severity(0)
+  val INFO = new Severity(0)
   val WARNING = new Severity(1)
-  val ERROR   = new Severity(2)
+  val ERROR = new Severity(2)
 
-  def hasErrors   = ERROR.count > 0
+  def hasErrors = ERROR.count > 0
   def hasWarnings = WARNING.count > 0
 
   case class Info(pos: Position, msg: String, severity: Severity)

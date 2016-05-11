@@ -16,7 +16,8 @@ import org.scalatest.{BeforeAndAfter, OneInstancePerTest, FunSuite}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ThriftClientFinagleServerTest extends FunSuite with BeforeAndAfter with OneInstancePerTest {
+class ThriftClientFinagleServerTest
+    extends FunSuite with BeforeAndAfter with OneInstancePerTest {
 
   val somewayPromise = new Promise[Unit]
   val processor = new B.ServiceIface {
@@ -47,7 +48,8 @@ class ThriftClientFinagleServerTest extends FunSuite with BeforeAndAfter with On
   val serverAddr = server.boundAddress.asInstanceOf[InetSocketAddress]
 
   val (client, transport) = {
-    val socket = new TSocket(serverAddr.getHostName, serverAddr.getPort, 1000/*ms*/)
+    val socket = new TSocket(
+        serverAddr.getHostName, serverAddr.getPort, 1000 /*ms*/ )
     val transport = new TFramedTransport(socket)
     val protocol = new TBinaryProtocol(transport)
     (new B.Client(protocol), transport)
@@ -72,24 +74,31 @@ class ThriftClientFinagleServerTest extends FunSuite with BeforeAndAfter with On
   }
 
   test("treat undeclared exceptions as internal failures") {
-    val exc = intercept[TApplicationException] { client.multiply(1, 0/*div by zero*/) }
-    assert(exc.getMessage() == "Internal error processing multiply: 'java.lang.ArithmeticException: / by zero'")
+    val exc = intercept[TApplicationException] {
+      client.multiply(1, 0 /*div by zero*/ )
+    }
+    assert(
+        exc.getMessage() == "Internal error processing multiply: 'java.lang.ArithmeticException: / by zero'")
   }
 
   test("treat synchronous exceptions as transport exceptions") {
-    val exc = intercept[TApplicationException] { client.complex_return("throwAnException") }
-    assert(exc.getMessage() == "Internal error processing complex_return: 'java.lang.Exception: msg'")
+    val exc = intercept[TApplicationException] {
+      client.complex_return("throwAnException")
+    }
+    assert(
+        exc.getMessage() == "Internal error processing complex_return: 'java.lang.Exception: msg'")
   }
 
   test("handle one-way calls") {
     assert(somewayPromise.isDefined == false)
-    client.someway()                  // just returns(!)
+    client.someway() // just returns(!)
     assert(Await.result(somewayPromise.liftToTry) == Return.Unit)
   }
 
   test("handle wrong interface") {
     val (client, transport) = {
-      val socket = new TSocket(serverAddr.getHostName, serverAddr.getPort, 1000/*ms*/)
+      val socket =
+        new TSocket(serverAddr.getHostName, serverAddr.getPort, 1000 /*ms*/ )
       val transport = new TFramedTransport(socket)
       val protocol = new TBinaryProtocol(transport)
       (new F.Client(protocol), transport)
@@ -112,8 +121,9 @@ class ThriftClientFinagleServerTest extends FunSuite with BeforeAndAfter with On
         .reportTo(statsReceiver)
         .build()
 
-      val client = new B.ServiceToClient(service, new TBinaryProtocol.Factory())
-      assert(Await.result(client.multiply(4,2)) == 2)
+      val client =
+        new B.ServiceToClient(service, new TBinaryProtocol.Factory())
+      assert(Await.result(client.multiply(4, 2)) == 2)
 
       val key = Seq(name, "codec_connection_preparation_latency_ms")
       assert(statsReceiver.repr.stats.contains(key) == true)

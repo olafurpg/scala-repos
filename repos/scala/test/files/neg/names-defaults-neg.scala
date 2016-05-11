@@ -13,8 +13,8 @@ object Test extends App {
   test2(x = 1)
   test2(y = 1)
   test1(c = 0, b = "joke")
-  test7((m = 1))  // named arguments must be top-level assignments
-  test7({m = 1})
+  test7((m = 1)) // named arguments must be top-level assignments
+  test7({ m = 1 })
   test7 { m = 1 } // no named arguments in argument block
   test8(x = 1)
 
@@ -25,15 +25,12 @@ object Test extends App {
   // error message when there are too many argument lists (not very nice..)
   test3(b = 3, a = 1)(3)
 
-
-
   // overloading resolution
   object t1 {
     def f(a: Int, b: String) = "first"
     def f(b: String, a: Int) = "second"
   }
   t1.f(b = "dkljf", a = 1)
-
 
   object t3 {
     def f(a1: Int) = "first"
@@ -60,7 +57,6 @@ object Test extends App {
   }
   println(t8.f(a = 0, b = "1")) // ambiguous reference
 
-
   // case class copy does not exist if there's a vararg
   val fac = Fact(1)(2, 3)
   val facc = fac.copy(b = "dlkfj")()
@@ -68,15 +64,14 @@ object Test extends App {
   // no defaults in patterns
   A1() match { case A1(_) => () }
 
-
   // return types of default getters
 
   // definition compiles, but default cannot  be used, it doesn't conform
-  def test4[T[P]](x: T[T[List[T[X forSome { type X }]]]] = List(1,2)) = x
+  def test4[T[P]](x: T[T[List[T[X forSome { type X }]]]] = List(1, 2)) = x
   test4()
 
   // doesn't compile
-  def test6[T](x: List[List[T]] = List(1,2)) = x
+  def test6[T](x: List[List[T]] = List(1, 2)) = x
 
   // correct error message
   new A2[String]()
@@ -102,7 +97,7 @@ object Test extends App {
   f3818(y = 1, m = 1)
 
   // DEFINITIONS
-  def test1(a: Int, b: String) = a +": "+ b
+  def test1(a: Int, b: String) = a + ": " + b
   def test2(x: Unit) = println("test2")
   def test3(a: Int, b: Int) = a + b
   def test7(m: Int) = m
@@ -127,14 +122,13 @@ case class A1(x: Int = 1, y: String = "2")
 
 class A2[T](a: T = 1)
 
-
 // anonymous functions
 object anfun {
   var var2 = 0
   def delay(var2: => Unit) { var2 }
   delay(var2 = 40)
 
-  def testAnnFun(a: Int, b: String) = println(a +": "+ b)
+  def testAnnFun(a: Int, b: String) = println(a + ": " + b)
   val taf2: Int => Unit = testAnnFun(a = _, b = get("+"))
   val taf3 = testAnnFun(b = _: String, a = get(8))
   val taf4: (Int, String) => Unit = testAnnFun(_, b = _)
@@ -159,7 +153,6 @@ object t3685 {
   class t13 { def x: Int = t.f(x = 1) }
   class t14 { val x: Int = t.f(x = 1) }
   class t15 { var x: Int = t.f(x = 1) }
-
 
   object u { def f[T](x: T) = 100 }
 

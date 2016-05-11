@@ -32,4 +32,3 @@ object Test extends ReplTest {
     |:type println("side effect!")
   """.stripMargin
 }
-

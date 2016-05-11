@@ -26,6 +26,4 @@ object packageSpec extends Specification {
     "return non-equal results for non-equal length identities" in todo
   }
 }
-
-
 // vim: set ts=4 sw=4 et:

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.io
 
 import java.io.File
@@ -14,7 +14,7 @@ import akka.stream.impl.ActorMaterializerImpl
 import akka.stream.impl.StreamSupervisor
 import akka.stream.impl.StreamSupervisor.Children
 import akka.stream.io.FileSourceSpec.Settings
-import akka.stream.scaladsl.{ FileIO, Sink }
+import akka.stream.scaladsl.{FileIO, Sink}
 import akka.stream.testkit._
 import akka.stream.testkit.Utils._
 import akka.stream.testkit.scaladsl.TestSink
@@ -33,21 +33,20 @@ object FileSourceSpec {
 
 class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
-  val settings = ActorMaterializerSettings(system).withDispatcher("akka.actor.default-dispatcher")
+  val settings = ActorMaterializerSettings(system).withDispatcher(
+      "akka.actor.default-dispatcher")
   implicit val materializer = ActorMaterializer(settings)
 
   val TestText = {
-    ("a" * 1000) +
-      ("b" * 1000) +
-      ("c" * 1000) +
-      ("d" * 1000) +
-      ("e" * 1000) +
-      ("f" * 1000)
+    ("a" * 1000) + ("b" * 1000) + ("c" * 1000) + ("d" * 1000) + ("e" * 1000) +
+    ("f" * 1000)
   }
 
   val testFile = {
     val f = File.createTempFile("file-source-spec", ".tmp")
-    new OutputStreamWriter(new FileOutputStream(f), UTF_8).append(TestText).close()
+    new OutputStreamWriter(new FileOutputStream(f), UTF_8)
+      .append(TestText)
+      .close()
     f
   }
 
@@ -75,7 +74,8 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val chunkSize = 512
       val bufferAttributes = Attributes.inputBuffer(1, 2)
 
-      val p = FileIO.fromFile(testFile, chunkSize)
+      val p = FileIO
+        .fromFile(testFile, chunkSize)
         .withAttributes(bufferAttributes)
         .runWith(Sink.asPublisher(false))
       val c = TestSubscriber.manualProbe[ByteString]()
@@ -112,7 +112,8 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
       val demandAllButOneChunks = TestText.length / chunkSize - 1
 
-      val p = FileIO.fromFile(testFile, chunkSize)
+      val p = FileIO
+        .fromFile(testFile, chunkSize)
         .withAttributes(bufferAttributes)
         .runWith(Sink.asPublisher(false))
 
@@ -128,7 +129,8 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       }
 
       sub.request(demandAllButOneChunks)
-      for (i ← 1 to demandAllButOneChunks) c.expectNext().utf8String should ===(nextChunk())
+      for (i ← 1 to demandAllButOneChunks) c.expectNext().utf8String should ===(
+          nextChunk())
       c.expectNoMsg(300.millis)
 
       sub.request(1)
@@ -149,23 +151,25 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       c.expectError()
     }
 
-    List(
-      Settings(chunkSize = 512, readAhead = 2),
-      Settings(chunkSize = 512, readAhead = 4),
-      Settings(chunkSize = 2048, readAhead = 2),
-      Settings(chunkSize = 2048, readAhead = 4)) foreach { settings ⇒
-        import settings._
+    List(Settings(chunkSize = 512, readAhead = 2),
+         Settings(chunkSize = 512, readAhead = 4),
+         Settings(chunkSize = 2048, readAhead = 2),
+         Settings(chunkSize = 2048, readAhead = 4)) foreach { settings ⇒
+      import settings._
 
-        s"count lines in real file (chunkSize = $chunkSize, readAhead = $readAhead)" in {
-          val s = FileIO.fromFile(manyLines, chunkSize = chunkSize)
-            .withAttributes(Attributes.inputBuffer(readAhead, readAhead))
+      s"count lines in real file (chunkSize = $chunkSize, readAhead = $readAhead)" in {
+        val s = FileIO
+          .fromFile(manyLines, chunkSize = chunkSize)
+          .withAttributes(Attributes.inputBuffer(readAhead, readAhead))
 
-          val f = s.runWith(Sink.fold(0) { case (acc, l) ⇒ acc + l.utf8String.count(_ == '\n') })
+        val f = s.runWith(Sink.fold(0) {
+          case (acc, l) ⇒ acc + l.utf8String.count(_ == '\n')
+        })
 
-          val lineCount = Await.result(f, 3.seconds)
-          lineCount should ===(LinesCount)
-        }
+        val lineCount = Await.result(f, 3.seconds)
+        lineCount should ===(LinesCount)
       }
+    }
 
     "use dedicated blocking-io-dispatcher by default" in assertAllStagesStopped {
       val sys = ActorSystem("dispatcher-testing", UnboundedMailboxConfig)
@@ -173,11 +177,18 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       implicit val timeout = Timeout(500.millis)
 
       try {
-        val p = FileIO.fromFile(manyLines).runWith(TestSink.probe)(materializer)
+        val p =
+          FileIO.fromFile(manyLines).runWith(TestSink.probe)(materializer)
 
-        materializer.asInstanceOf[ActorMaterializerImpl].supervisor.tell(StreamSupervisor.GetChildren, testActor)
-        val ref = expectMsgType[Children].children.find(_.path.toString contains "fileSource").get
-        try assertDispatcher(ref, "akka.stream.default-blocking-io-dispatcher") finally p.cancel()
+        materializer
+          .asInstanceOf[ActorMaterializerImpl]
+          .supervisor
+          .tell(StreamSupervisor.GetChildren, testActor)
+        val ref = expectMsgType[Children].children
+          .find(_.path.toString contains "fileSource")
+          .get
+        try assertDispatcher(ref, "akka.stream.default-blocking-io-dispatcher") finally p
+          .cancel()
       } finally shutdown(sys)
     }
 
@@ -189,18 +200,27 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       implicit val timeout = Timeout(500.millis)
 
       try {
-        val p = FileIO.fromFile(manyLines)
-          .withAttributes(ActorAttributes.dispatcher("akka.actor.default-dispatcher"))
+        val p = FileIO
+          .fromFile(manyLines)
+          .withAttributes(
+              ActorAttributes.dispatcher("akka.actor.default-dispatcher"))
           .runWith(TestSink.probe)(materializer)
 
-        materializer.asInstanceOf[ActorMaterializerImpl].supervisor.tell(StreamSupervisor.GetChildren, testActor)
-        val ref = expectMsgType[Children].children.find(_.path.toString contains "File").get
-        try assertDispatcher(ref, "akka.actor.default-dispatcher") finally p.cancel()
+        materializer
+          .asInstanceOf[ActorMaterializerImpl]
+          .supervisor
+          .tell(StreamSupervisor.GetChildren, testActor)
+        val ref = expectMsgType[Children].children
+          .find(_.path.toString contains "File")
+          .get
+        try assertDispatcher(ref, "akka.actor.default-dispatcher") finally p
+          .cancel()
       } finally shutdown(sys)
     }
 
     "not signal onComplete more than once" in {
-      FileIO.fromFile(testFile, 2 * TestText.length)
+      FileIO
+        .fromFile(testFile, 2 * TestText.length)
         .runWith(TestSink.probe)
         .requestNext(ByteString(TestText, UTF_8.name))
         .expectComplete()
@@ -212,5 +232,4 @@ class FileSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
     testFile.delete()
     manyLines.delete()
   }
-
 }

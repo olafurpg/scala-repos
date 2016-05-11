@@ -23,7 +23,8 @@ import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class ElementwiseProductSuite
-  extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest {
+    extends SparkFunSuite with MLlibTestSparkContext
+    with DefaultReadWriteTest {
 
   test("read/write") {
     val ep = new ElementwiseProduct()

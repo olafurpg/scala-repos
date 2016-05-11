@@ -19,49 +19,53 @@ package syntax
 package std
 
 object product {
-  implicit def productOps[P <: Product](p: P): ProductOps[P] = new ProductOps[P](p)
+  implicit def productOps[P <: Product](p: P): ProductOps[P] =
+    new ProductOps[P](p)
 }
 
 final class ProductOps[P](val p: P) extends AnyVal {
   import ops.product._
 
   /**
-   * Returns an `HList` containing the elements of this tuple.
-   */
+    * Returns an `HList` containing the elements of this tuple.
+    */
   def productElements(implicit gen: Generic[P]): gen.Repr = gen.to(p)
 
   /**
-   * Compute the length of this product.
-   */
-  def length(implicit length : ProductLength[P]) : length.Out = length(p)
+    * Compute the length of this product.
+    */
+  def length(implicit length: ProductLength[P]): length.Out = length(p)
 
   /**
-   * Returns a tuple containing the values of this product.
-   */
+    * Returns a tuple containing the values of this product.
+    */
   def toTuple[T](implicit toTuple: ToTuple.Aux[P, T]): T = toTuple(p)
 
   /**
-   * Returns an `HList` containing the elements of this product.
-   */
+    * Returns an `HList` containing the elements of this product.
+    */
   def toHList[L <: HList](implicit toHList: ToHList.Aux[P, L]): L = toHList(p)
 
   /**
-   * Returns a record containing the elements of this labelled product.
-   */
-  def toRecord[R <: HList](implicit toRecord: ToRecord.Aux[P, R]): R = toRecord(p)
+    * Returns a record containing the elements of this labelled product.
+    */
+  def toRecord[R <: HList](implicit toRecord: ToRecord.Aux[P, R]): R =
+    toRecord(p)
 
   /**
-   * Returns a collection `M` whose elements are typed as the Lub of the elements of this product.
-   */
-  def to[M[_]](implicit toTraversable: ToTraversable[P, M]): toTraversable.Out = toTraversable(p)
+    * Returns a collection `M` whose elements are typed as the Lub of the elements of this product.
+    */
+  def to[M[_]](
+      implicit toTraversable: ToTraversable[P, M]): toTraversable.Out =
+    toTraversable(p)
 
   /**
-   * Returns a `Map` whose values are typed as the Lub of the values of this product.
-   */
+    * Returns a `Map` whose values are typed as the Lub of the values of this product.
+    */
   def toMap[K, V](implicit toMap: ToMap.Aux[P, K, V]): Map[K, V] = toMap(p)
 
   /**
-   * Returns a sized collection `M` whose elements are typed as the Lub of the elements of this product.
-   */
+    * Returns a sized collection `M` whose elements are typed as the Lub of the elements of this product.
+    */
   def toSized[M[_]](implicit toSized: ToSized[P, M]): toSized.Out = toSized(p)
 }

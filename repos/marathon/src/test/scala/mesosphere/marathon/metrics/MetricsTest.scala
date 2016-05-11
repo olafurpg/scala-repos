@@ -2,13 +2,13 @@ package mesosphere.marathon.metrics
 
 import java.util.concurrent.TimeUnit
 
-import com.codahale.metrics.{ ExponentiallyDecayingReservoir, MetricRegistry }
-import com.google.inject.{ Guice, AbstractModule }
-import com.google.inject.matcher.{ AbstractMatcher, Matchers }
+import com.codahale.metrics.{ExponentiallyDecayingReservoir, MetricRegistry}
+import com.google.inject.{Guice, AbstractModule}
+import com.google.inject.matcher.{AbstractMatcher, Matchers}
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.metrics.Metrics._
-import org.aopalliance.intercept.{ MethodInvocation, MethodInterceptor }
+import org.aopalliance.intercept.{MethodInvocation, MethodInterceptor}
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -18,9 +18,7 @@ class FooBar {
   def dummy(): Unit = {}
 }
 
-class MetricsTest
-    extends MarathonSpec
-    with MockitoSugar {
+class MetricsTest extends MarathonSpec with MockitoSugar {
   private var metrics: Metrics = _
 
   class TestModule extends AbstractModule {
@@ -44,11 +42,14 @@ class MetricsTest
     metrics = new Metrics(new MetricRegistry())
   }
 
-  test("Metrics#className should strip 'EnhancerByGuice' from the metric names") {
-    val instance = Guice.createInjector(new TestModule).getInstance(classOf[FooBar])
+  test(
+      "Metrics#className should strip 'EnhancerByGuice' from the metric names") {
+    val instance =
+      Guice.createInjector(new TestModule).getInstance(classOf[FooBar])
     assert(instance.getClass.getName.contains("EnhancerByGuice"))
 
-    assert(metrics.className(instance.getClass) == "mesosphere.marathon.metrics.FooBar")
+    assert(
+        metrics.className(instance.getClass) == "mesosphere.marathon.metrics.FooBar")
   }
 
   test("Metrics caches the class names") {
@@ -62,15 +63,19 @@ class MetricsTest
     verify(metricsSpy, times(2)).stripGuiceMarksFromClassName(any())
   }
 
-  test("Metrics#name should use a dot to separate the class name and the method name") {
-    val expectedName = "service.mesosphere.marathon.core.task.tracker.TaskTracker.write-request-time"
-    val actualName = metrics.name("service", classOf[TaskTracker], "write-request-time")
+  test(
+      "Metrics#name should use a dot to separate the class name and the method name") {
+    val expectedName =
+      "service.mesosphere.marathon.core.task.tracker.TaskTracker.write-request-time"
+    val actualName =
+      metrics.name("service", classOf[TaskTracker], "write-request-time")
 
     assert(expectedName.equals(actualName))
   }
 
   test("The Histogram wrapper should properly proxy updates") {
-    val origHistogram = new com.codahale.metrics.Histogram(new ExponentiallyDecayingReservoir())
+    val origHistogram =
+      new com.codahale.metrics.Histogram(new ExponentiallyDecayingReservoir())
     val histogram = new Histogram(origHistogram)
 
     histogram.update(10L)
@@ -90,7 +95,8 @@ class MetricsTest
     assert(origMeter.getCount == 11)
   }
 
-  test("The Timer wrapper should properly time method calls and proxy the updates") {
+  test(
+      "The Timer wrapper should properly time method calls and proxy the updates") {
     val origTimer = mock[com.codahale.metrics.Timer]
     val timer = new Timer(origTimer)
 
@@ -98,7 +104,8 @@ class MetricsTest
 
     val durationCaptor = ArgumentCaptor.forClass(classOf[Long])
 
-    verify(origTimer).update(durationCaptor.capture(), org.mockito.Matchers.eq(TimeUnit.NANOSECONDS))
+    verify(origTimer).update(durationCaptor.capture(),
+                             org.mockito.Matchers.eq(TimeUnit.NANOSECONDS))
 
     assert(durationCaptor.getValue > 0)
   }

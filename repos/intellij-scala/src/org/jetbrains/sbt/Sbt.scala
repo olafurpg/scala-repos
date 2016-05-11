@@ -6,8 +6,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 object Sbt {
   val Name = "SBT"
 
@@ -35,7 +35,8 @@ object Sbt {
 
   val BuildModuleName = "SBT module"
 
-  val BuildModuleDescription = "SBT modules are used to mark content roots and to provide libraries for SBT project definitions"
+  val BuildModuleDescription =
+    "SBT modules are used to mark content roots and to provide libraries for SBT project definitions"
 
   val BuildLibraryName = "sbt-and-plugins"
 
@@ -57,7 +58,7 @@ object Sbt {
     val baseDir = new File(project.getBasePath)
     val projectDir = baseDir / Sbt.ProjectDirectory
     file.getName == Sbt.BuildFile && file.isUnder(baseDir) ||
-      file.getName.endsWith(s".${Sbt.FileExtension}") && file.isUnder(baseDir) ||
-      file.getName.endsWith(".scala") && file.isUnder(projectDir)
+    file.getName.endsWith(s".${Sbt.FileExtension}") && file.isUnder(baseDir) ||
+    file.getName.endsWith(".scala") && file.isUnder(projectDir)
   }
 }

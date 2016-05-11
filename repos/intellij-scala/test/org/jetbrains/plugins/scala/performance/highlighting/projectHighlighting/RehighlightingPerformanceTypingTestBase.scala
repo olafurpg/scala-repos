@@ -18,7 +18,8 @@ import org.jetbrains.plugins.scala.util.TestUtils
   * Author: Svyatoslav Ilinskiy
   * Date: 11/17/2015
   */
-abstract class RehighlightingPerformanceTypingTestBase extends DownloadingAndImportingTestCase {
+abstract class RehighlightingPerformanceTypingTestBase
+    extends DownloadingAndImportingTestCase {
 
   var myCodeInsightTestFixture: CodeInsightTestFixture = null
 
@@ -39,14 +40,16 @@ abstract class RehighlightingPerformanceTypingTestBase extends DownloadingAndImp
 
       override def tearDown(): Unit = ()
     }
-    myCodeInsightTestFixture = IdeaTestFixtureFactory.getFixtureFactory.createCodeInsightFixture(fakeFixture)
+    myCodeInsightTestFixture = IdeaTestFixtureFactory.getFixtureFactory
+      .createCodeInsightFixture(fakeFixture)
     myCodeInsightTestFixture.setUp()
 
-    libLoader = ScalaLibraryLoader.withMockJdk(myCodeInsightTestFixture.getProject, myCodeInsightTestFixture.getModule,
-      TestUtils.getTestDataPath + "/")
+    libLoader = ScalaLibraryLoader.withMockJdk(
+        myCodeInsightTestFixture.getProject,
+        myCodeInsightTestFixture.getModule,
+        TestUtils.getTestDataPath + "/")
     libLoader.loadScala(TestUtils.DEFAULT_SCALA_SDK_VERSION)
   }
-
 
   override def tearDown(): Unit = {
     myCodeInsightTestFixture.tearDown()
@@ -62,30 +65,38 @@ abstract class RehighlightingPerformanceTypingTestBase extends DownloadingAndImp
              pos: LogicalPosition,
              typeInSetup: Option[String]): Unit = {
     val file = findFile(filename)
-    val fileManager: FileManager = PsiManager.getInstance(myProject).asInstanceOf[PsiManagerEx].getFileManager
+    val fileManager: FileManager = PsiManager
+      .getInstance(myProject)
+      .asInstanceOf[PsiManagerEx]
+      .getFileManager
 
     myCodeInsightTestFixture.openFileInEditor(file)
     val editor = myCodeInsightTestFixture.getEditor
     val initialText = editor.getDocument.getText
-    PlatformTestUtil.startPerformanceTest(s"Performance test $filename", timeoutInMillis, new ThrowableRunnable[Nothing] {
-      override def run(): Unit = {
-        stringsToType.foreach { s =>
-          myCodeInsightTestFixture.`type`(s)
+    PlatformTestUtil
+      .startPerformanceTest(s"Performance test $filename",
+                            timeoutInMillis,
+                            new ThrowableRunnable[Nothing] {
+                              override def run(): Unit = {
+                                stringsToType.foreach { s =>
+                                  myCodeInsightTestFixture.`type`(s)
+                                  myCodeInsightTestFixture.doHighlighting()
+                                }
+                                fileManager.cleanupForNextTest()
+                              }
+                            })
+      .setup(new ThrowableRunnable[Nothing] {
+        override def run(): Unit = {
+          //file.refresh(false, false)
+          inWriteCommandAction(myProject) {
+            editor.getDocument.setText(initialText)
+          }
+          editor.getCaretModel.moveToLogicalPosition(pos)
+          typeInSetup.foreach(myCodeInsightTestFixture.`type`)
           myCodeInsightTestFixture.doHighlighting()
         }
-        fileManager.cleanupForNextTest()
-      }
-    }).setup(new ThrowableRunnable[Nothing] {
-      override def run(): Unit = {
-        //file.refresh(false, false)
-        inWriteCommandAction(myProject) {
-          editor.getDocument.setText(initialText)
-        }
-        editor.getCaretModel.moveToLogicalPosition(pos)
-        typeInSetup.foreach(myCodeInsightTestFixture.`type`)
-        myCodeInsightTestFixture.doHighlighting()
-      }
-    }).assertTiming()
+      })
+      .assertTiming()
     inWriteCommandAction(myProject) {
       editor.getDocument.setText(initialText)
     }

@@ -11,5 +11,4 @@ class ResponseClassTest extends FunSuite {
     intercept[IllegalArgumentException] { ResponseClass.Successful(0.0) }
     intercept[IllegalArgumentException] { ResponseClass.Successful(1.1) }
   }
-
 }

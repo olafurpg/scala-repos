@@ -12,5 +12,4 @@ object InputTest extends SpecLite {
   checkAll(monad.laws[Input])
   checkAll(plus.laws[Input])
   checkAll(traverse.laws[Input])
-
 }

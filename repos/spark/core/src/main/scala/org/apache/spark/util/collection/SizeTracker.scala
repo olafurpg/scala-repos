@@ -22,18 +22,18 @@ import scala.collection.mutable
 import org.apache.spark.util.SizeEstimator
 
 /**
- * A general interface for collections to keep track of their estimated sizes in bytes.
- * We sample with a slow exponential back-off using the SizeEstimator to amortize the time,
- * as each call to SizeEstimator is somewhat expensive (order of a few milliseconds).
- */
+  * A general interface for collections to keep track of their estimated sizes in bytes.
+  * We sample with a slow exponential back-off using the SizeEstimator to amortize the time,
+  * as each call to SizeEstimator is somewhat expensive (order of a few milliseconds).
+  */
 private[spark] trait SizeTracker {
 
   import SizeTracker._
 
   /**
-   * Controls the base of the exponential which governs the rate of sampling.
-   * E.g., a value of 2 would mean we sample at 1, 2, 4, 8, ... elements.
-   */
+    * Controls the base of the exponential which governs the rate of sampling.
+    * E.g., a value of 2 would mean we sample at 1, 2, 4, 8, ... elements.
+    */
   private val SAMPLE_GROWTH_RATE = 1.1
 
   /** Samples taken since last resetSamples(). Only the last two are kept for extrapolation. */
@@ -51,9 +51,9 @@ private[spark] trait SizeTracker {
   resetSamples()
 
   /**
-   * Reset samples collected so far.
-   * This should be called after the collection undergoes a dramatic change in size.
-   */
+    * Reset samples collected so far.
+    * This should be called after the collection undergoes a dramatic change in size.
+    */
   protected def resetSamples(): Unit = {
     numUpdates = 1
     nextSampleNum = 1
@@ -62,8 +62,8 @@ private[spark] trait SizeTracker {
   }
 
   /**
-   * Callback to be invoked after every update.
-   */
+    * Callback to be invoked after every update.
+    */
   protected def afterUpdate(): Unit = {
     numUpdates += 1
     if (nextSampleNum == numUpdates) {
@@ -72,8 +72,8 @@ private[spark] trait SizeTracker {
   }
 
   /**
-   * Take a new sample of the current collection's size.
-   */
+    * Take a new sample of the current collection's size.
+    */
   private def takeSample(): Unit = {
     samples.enqueue(Sample(SizeEstimator.estimate(this), numUpdates))
     // Only use the last two samples to extrapolate
@@ -82,7 +82,8 @@ private[spark] trait SizeTracker {
     }
     val bytesDelta = samples.toList.reverse match {
       case latest :: previous :: tail =>
-        (latest.size - previous.size).toDouble / (latest.numUpdates - previous.numUpdates)
+        (latest.size - previous.size).toDouble /
+        (latest.numUpdates - previous.numUpdates)
       // If fewer than 2 samples, assume no change
       case _ => 0
     }
@@ -91,11 +92,12 @@ private[spark] trait SizeTracker {
   }
 
   /**
-   * Estimate the current size of the collection in bytes. O(1) time.
-   */
+    * Estimate the current size of the collection in bytes. O(1) time.
+    */
   def estimateSize(): Long = {
     assert(samples.nonEmpty)
-    val extrapolatedDelta = bytesPerUpdate * (numUpdates - samples.last.numUpdates)
+    val extrapolatedDelta =
+      bytesPerUpdate * (numUpdates - samples.last.numUpdates)
     (samples.last.size + extrapolatedDelta).toLong
   }
 }

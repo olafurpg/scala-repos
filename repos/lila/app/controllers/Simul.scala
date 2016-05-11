@@ -7,8 +7,8 @@ import play.api.mvc._
 import lila.api.Context
 import lila.app._
 import lila.common.HTTPRequest
-import lila.game.{ Pov, GameRepo }
-import lila.simul.{ Simul => Sim }
+import lila.game.{Pov, GameRepo}
+import lila.simul.{Simul => Sim}
 import lila.user.UserRepo
 import views._
 
@@ -16,7 +16,8 @@ object Simul extends LilaController {
 
   private def env = Env.simul
 
-  private def simulNotFound(implicit ctx: Context) = NotFound(html.simul.notFound())
+  private def simulNotFound(implicit ctx: Context) =
+    NotFound(html.simul.notFound())
 
   val home = Open { implicit ctx =>
     fetchSimuls map {
@@ -38,11 +39,10 @@ object Simul extends LilaController {
   def show(id: String) = Open { implicit ctx =>
     env.repo find id flatMap {
       _.fold(simulNotFound.fuccess) { sim =>
-        env.version(sim.id) zip
-          env.jsonView(sim) zip
-          chatOf(sim) map {
-            case ((version, data), chat) => html.simul.show(sim, version, data, chat)
-          }
+        env.version(sim.id) zip env.jsonView(sim) zip chatOf(sim) map {
+          case ((version, data), chat) =>
+            html.simul.show(sim, version, data, chat)
+        }
       }
     } map NoCache
   }
@@ -75,49 +75,47 @@ object Simul extends LilaController {
     }
   }
 
-  def form = Auth { implicit ctx =>
-    me =>
-      NoEngine {
-        Ok(html.simul.form(env.forms.create, env.forms)).fuccess
-      }
+  def form = Auth { implicit ctx => me =>
+    NoEngine {
+      Ok(html.simul.form(env.forms.create, env.forms)).fuccess
+    }
   }
 
-  def create = AuthBody { implicit ctx =>
-    implicit me =>
-      NoEngine {
-        implicit val req = ctx.body
-        env.forms.create.bindFromRequest.fold(
+  def create = AuthBody { implicit ctx => implicit me =>
+    NoEngine {
+      implicit val req = ctx.body
+      env.forms.create.bindFromRequest.fold(
           err => BadRequest(html.simul.form(err, env.forms)).fuccess,
-          setup => env.api.create(setup, me) map { simul =>
-            Redirect(routes.Simul.show(simul.id))
+          setup =>
+            env.api.create(setup, me) map { simul =>
+              Redirect(routes.Simul.show(simul.id))
           })
-      }
+    }
   }
 
-  def join(id: String, variant: String) = Auth { implicit ctx =>
-    implicit me =>
-      NoEngine {
-        fuccess {
-          env.api.addApplicant(id, me, variant)
-          if (HTTPRequest isXhr ctx.req) Ok(Json.obj("ok" -> true)) as JSON
-          else Redirect(routes.Simul.show(id))
-        }
-      }
-  }
-
-  def withdraw(id: String) = Auth { implicit ctx =>
-    me =>
+  def join(id: String, variant: String) = Auth { implicit ctx => implicit me =>
+    NoEngine {
       fuccess {
-        env.api.removeApplicant(id, me)
+        env.api.addApplicant(id, me, variant)
         if (HTTPRequest isXhr ctx.req) Ok(Json.obj("ok" -> true)) as JSON
         else Redirect(routes.Simul.show(id))
       }
+    }
   }
 
-  def websocket(id: String, apiVersion: Int) = SocketOption[JsValue] { implicit ctx =>
-    get("sri") ?? { uid =>
-      env.socketHandler.join(id, uid, ctx.me)
+  def withdraw(id: String) = Auth { implicit ctx => me =>
+    fuccess {
+      env.api.removeApplicant(id, me)
+      if (HTTPRequest isXhr ctx.req) Ok(Json.obj("ok" -> true)) as JSON
+      else Redirect(routes.Simul.show(id))
     }
+  }
+
+  def websocket(id: String, apiVersion: Int) = SocketOption[JsValue] {
+    implicit ctx =>
+      get("sri") ?? { uid =>
+        env.socketHandler.join(id, uid, ctx.me)
+      }
   }
 
   private def chatOf(sim: Sim)(implicit ctx: Context) =
@@ -125,10 +123,12 @@ object Simul extends LilaController {
       Env.chat.api.userChat find sim.id map (_.forUser(ctx.me).some)
     }
 
-  private def AsHost(simulId: Sim.ID)(f: Sim => Result)(implicit ctx: Context): Fu[Result] =
+  private def AsHost(simulId: Sim.ID)(
+      f: Sim => Result)(implicit ctx: Context): Fu[Result] =
     env.repo.find(simulId) flatMap {
       case None => notFound
-      case Some(simul) if ctx.userId.exists(simul.hostId ==) => fuccess(f(simul))
+      case Some(simul) if ctx.userId.exists(simul.hostId ==) =>
+        fuccess(f(simul))
       case _ => fuccess(Unauthorized)
     }
 }

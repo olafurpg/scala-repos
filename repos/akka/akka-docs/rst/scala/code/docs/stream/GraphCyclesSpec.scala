@@ -1,6 +1,6 @@
 package docs.stream
 
-import akka.stream.{ ClosedShape, OverflowStrategy, ActorMaterializer }
+import akka.stream.{ClosedShape, OverflowStrategy, ActorMaterializer}
 import akka.stream.scaladsl._
 import akka.testkit.AkkaSpec
 
@@ -104,7 +104,5 @@ class GraphCyclesSpec extends AkkaSpec {
       //#zipping-live
       // format: ON
     }
-
   }
-
 }

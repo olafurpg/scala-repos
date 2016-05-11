@@ -1,14 +1,14 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.sharding
 
 import akka.actor._
-import akka.cluster.{ MemberStatus, Cluster }
+import akka.cluster.{MemberStatus, Cluster}
 import akka.cluster.ClusterEvent.CurrentClusterState
 import akka.remote.testconductor.RoleName
-import akka.remote.testkit.{ MultiNodeConfig, MultiNodeSpec, STMultiNodeSpec }
-import akka.testkit.{ TestProbe, TestDuration }
+import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, STMultiNodeSpec}
+import akka.testkit.{TestProbe, TestDuration}
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.duration._
@@ -21,7 +21,7 @@ object ClusterShardingGetStatsSpec {
   class ShardedActor extends Actor with ActorLogging {
     log.info(s"entity started {}", self.path)
     def receive = {
-      case Stop    ⇒ context.stop(self)
+      case Stop ⇒ context.stop(self)
       case _: Ping ⇒ sender() ! Pong
     }
   }
@@ -60,17 +60,22 @@ object ClusterShardingGetStatsSpecConfig extends MultiNodeConfig {
     akka.actor.warn-about-java-serializer-usage=false
     """))
 
-  nodeConfig(first, second, third)(ConfigFactory.parseString(
-    """akka.cluster.roles=["shard"]"""))
-
+  nodeConfig(first, second, third)(
+      ConfigFactory.parseString("""akka.cluster.roles=["shard"]"""))
 }
 
-class ClusterShardingGetStatsSpecMultiJvmNode1 extends ClusterShardingGetStatsSpec
-class ClusterShardingGetStatsSpecMultiJvmNode2 extends ClusterShardingGetStatsSpec
-class ClusterShardingGetStatsSpecMultiJvmNode3 extends ClusterShardingGetStatsSpec
-class ClusterShardingGetStatsSpecMultiJvmNode4 extends ClusterShardingGetStatsSpec
+class ClusterShardingGetStatsSpecMultiJvmNode1
+    extends ClusterShardingGetStatsSpec
+class ClusterShardingGetStatsSpecMultiJvmNode2
+    extends ClusterShardingGetStatsSpec
+class ClusterShardingGetStatsSpecMultiJvmNode3
+    extends ClusterShardingGetStatsSpec
+class ClusterShardingGetStatsSpecMultiJvmNode4
+    extends ClusterShardingGetStatsSpec
 
-abstract class ClusterShardingGetStatsSpec extends MultiNodeSpec(ClusterShardingGetStatsSpecConfig) with STMultiNodeSpec {
+abstract class ClusterShardingGetStatsSpec
+    extends MultiNodeSpec(ClusterShardingGetStatsSpecConfig)
+    with STMultiNodeSpec {
 
   import ClusterShardingGetStatsSpec._
   import ClusterShardingGetStatsSpecConfig._
@@ -79,19 +84,18 @@ abstract class ClusterShardingGetStatsSpec extends MultiNodeSpec(ClusterSharding
 
   def startShard(): ActorRef = {
     ClusterSharding(system).start(
-      typeName = shardTypeName,
-      entityProps = Props(new ShardedActor),
-      settings = ClusterShardingSettings(system).withRole("shard"),
-      extractEntityId = extractEntityId,
-      extractShardId = extractShardId)
+        typeName = shardTypeName,
+        entityProps = Props(new ShardedActor),
+        settings = ClusterShardingSettings(system).withRole("shard"),
+        extractEntityId = extractEntityId,
+        extractShardId = extractShardId)
   }
 
   def startProxy(): ActorRef = {
-    ClusterSharding(system).startProxy(
-      typeName = shardTypeName,
-      role = Some("shard"),
-      extractEntityId = extractEntityId,
-      extractShardId = extractShardId)
+    ClusterSharding(system).startProxy(typeName = shardTypeName,
+                                       role = Some("shard"),
+                                       extractEntityId = extractEntityId,
+                                       extractShardId = extractShardId)
   }
 
   def join(from: RoleName): Unit = {
@@ -114,7 +118,8 @@ abstract class ClusterShardingGetStatsSpec extends MultiNodeSpec(ClusterSharding
       // make sure all nodes are up
       within(10.seconds) {
         awaitAssert {
-          Cluster(system).state.members.count(_.status == MemberStatus.Up) should ===(4)
+          Cluster(system).state.members.count(_.status == MemberStatus.Up) should ===(
+              4)
         }
       }
 
@@ -133,8 +138,10 @@ abstract class ClusterShardingGetStatsSpec extends MultiNodeSpec(ClusterSharding
       within(10.seconds) {
         awaitAssert {
           val probe = TestProbe()
-          region.tell(ShardRegion.GetClusterShardingStats(10.seconds.dilated), probe.ref)
-          val shardStats = probe.expectMsgType[ShardRegion.ClusterShardingStats]
+          region.tell(ShardRegion.GetClusterShardingStats(10.seconds.dilated),
+                      probe.ref)
+          val shardStats =
+            probe.expectMsgType[ShardRegion.ClusterShardingStats]
           shardStats.regions.size should ===(3)
           shardStats.regions.values.map(_.stats.size).sum should ===(0)
           shardStats.regions.keys.forall(_.hasGlobalScope) should ===(true)
@@ -166,8 +173,10 @@ abstract class ClusterShardingGetStatsSpec extends MultiNodeSpec(ClusterSharding
         awaitAssert {
           val probe = TestProbe()
           val region = ClusterSharding(system).shardRegion(shardTypeName)
-          region.tell(ShardRegion.GetClusterShardingStats(10.seconds.dilated), probe.ref)
-          val regions = probe.expectMsgType[ShardRegion.ClusterShardingStats].regions
+          region.tell(ShardRegion.GetClusterShardingStats(10.seconds.dilated),
+                      probe.ref)
+          val regions =
+            probe.expectMsgType[ShardRegion.ClusterShardingStats].regions
           regions.size shouldEqual 3
           regions.values.flatMap(_.stats.values).sum shouldEqual 4
           regions.keys.forall(_.hasGlobalScope) should be(true)
@@ -212,8 +221,11 @@ abstract class ClusterShardingGetStatsSpec extends MultiNodeSpec(ClusterSharding
         within(20.seconds) {
           awaitAssert {
             val probe = TestProbe()
-            region.tell(ShardRegion.GetClusterShardingStats(20.seconds.dilated), probe.ref)
-            val regions = probe.expectMsgType[ShardRegion.ClusterShardingStats].regions
+            region.tell(
+                ShardRegion.GetClusterShardingStats(20.seconds.dilated),
+                probe.ref)
+            val regions =
+              probe.expectMsgType[ShardRegion.ClusterShardingStats].regions
             regions.size === 2
             regions.values.flatMap(_.stats.values).sum should ===(4)
           }

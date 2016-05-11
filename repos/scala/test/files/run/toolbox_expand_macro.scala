@@ -6,8 +6,7 @@ import scala.tools.reflect.{ToolBox}
 object Test extends App {
   val toolBox = cm.mkToolBox()
   val x = 21
-  val runtimeMacro =
-    q"""object RuntimeMacro {
+  val runtimeMacro = q"""object RuntimeMacro {
       import scala.reflect.macros.whitebox.Context
       import scala.language.experimental.macros
 

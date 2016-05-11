@@ -1,6 +1,7 @@
 package mesosphere.marathon.api
 
 object MarathonMediaType {
+
   /**
     * JSON media type plus a weight which prefers this media type over alternatives if there are multiple
     * matches and no other has a qs value of >= 2.

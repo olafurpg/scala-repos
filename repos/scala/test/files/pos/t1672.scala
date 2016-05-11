@@ -1,6 +1,6 @@
 object Test {
   @annotation.tailrec
-  def bar : Nothing = {
+  def bar: Nothing = {
     try {
       throw new RuntimeException
     } catch {

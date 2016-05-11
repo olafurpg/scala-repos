@@ -35,18 +35,17 @@ object IoExceptionOr {
     }
   def unapply[A](ioExceptionOr: IoExceptionOr[A]) = ioExceptionOr.toOption
 
-  type IoException =
-  java.io.IOException
+  type IoException = java.io.IOException
 
   def ioException[A]: IoException => IoExceptionOr[A] =
-    e => new IoExceptionOr[A] {
-      def fold[X](ioException: IoException => X, or: A => X) =
-        ioException(e)
+    e =>
+      new IoExceptionOr[A] {
+        def fold[X](ioException: IoException => X, or: A => X) =
+          ioException(e)
     }
 
   def ioExceptionOr[A](a: A): IoExceptionOr[A] = new IoExceptionOr[A] {
     def fold[X](ioException: IoException => X, or: A => X) =
       or(a)
   }
-
 }

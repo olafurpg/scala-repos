@@ -7,16 +7,16 @@ package com.twitter.concurrent
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentLinkedQueue}
 
 /**
- * The ConcurrentPool provides a concurrent object pool on top of the
- * java.util.concurrent primitives.
- *
- * The pool currently supports only FIFO ordering of items, and does
- * not yet clean up per-key object lists.
- */
+  * The ConcurrentPool provides a concurrent object pool on top of the
+  * java.util.concurrent primitives.
+  *
+  * The pool currently supports only FIFO ordering of items, and does
+  * not yet clean up per-key object lists.
+  */
 @deprecated("use finagle's BufferingPool", "6.2.x")
 class ConcurrentPool[K, V] {
   type Queue = ConcurrentLinkedQueue[V]
-  type Map   = ConcurrentHashMap[K, Queue]
+  type Map = ConcurrentHashMap[K, Queue]
 
   val map = new Map
   val deathQueue = new ConcurrentLinkedQueue[Tuple2[K, Queue]]
@@ -55,14 +55,11 @@ class ConcurrentPool[K, V] {
 
       if (objs.isEmpty) {
         val deadMap = map.remove(k)
-        if (deadMap ne null)
-          deathQueue.offer((k, deadMap))
+        if (deadMap ne null) deathQueue.offer((k, deadMap))
       }
 
-      if (obj == null)
-        None
-      else
-        Some(obj)
+      if (obj == null) None
+      else Some(obj)
     }
   }
 }

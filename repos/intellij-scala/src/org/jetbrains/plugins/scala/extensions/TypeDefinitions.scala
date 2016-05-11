@@ -4,9 +4,9 @@ import com.intellij.psi.PsiClass
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScToplevelElement
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 object TypeDefinitions {
-  def unapplySeq(e: ScToplevelElement): Some[Seq[PsiClass]] = Some(e.typeDefinitions)
+  def unapplySeq(e: ScToplevelElement): Some[Seq[PsiClass]] =
+    Some(e.typeDefinitions)
 }

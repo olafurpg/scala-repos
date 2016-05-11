@@ -23,7 +23,7 @@ package test
 
 object SitaClustering extends PerfTestSuite {
   query(
-    """
+      """
     import std::stats::*
 
     locations := //sita1k

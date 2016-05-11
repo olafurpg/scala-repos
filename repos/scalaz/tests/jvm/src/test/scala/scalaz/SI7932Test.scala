@@ -1,9 +1,9 @@
 package scalaz
 
 /**
- * - [[https://issues.scala-lang.org/browse/SI-7932]]
- * - [[https://github.com/scalaz/scalaz/pull/932]]
- */
+  * - [[https://issues.scala-lang.org/browse/SI-7932]]
+  * - [[https://github.com/scalaz/scalaz/pull/932]]
+  */
 object SI7932Test extends SpecLite {
 
   "SI-7932" in {
@@ -17,5 +17,4 @@ object SI7932Test extends SpecLite {
   }
 
   abstract class C extends M[Float]
-
 }

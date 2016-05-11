@@ -23,8 +23,8 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types.{BooleanType, DataType}
 
 /**
- * A test suite that makes sure code generation handles expression internally states correctly.
- */
+  * A test suite that makes sure code generation handles expression internally states correctly.
+  */
 class CodegenExpressionCachingSuite extends SparkFunSuite {
 
   test("GenerateUnsafeProjection should initialize expressions") {
@@ -81,24 +81,22 @@ class CodegenExpressionCachingSuite extends SparkFunSuite {
     assert(instance1.apply(null) === false)
     assert(instance2.apply(null) === true)
   }
-
 }
 
 /**
- * An expression that's non-deterministic and doesn't support codegen.
- */
+  * An expression that's non-deterministic and doesn't support codegen.
+  */
 case class NondeterministicExpression()
-  extends LeafExpression with Nondeterministic with CodegenFallback {
-  override protected def initInternal(): Unit = { }
+    extends LeafExpression with Nondeterministic with CodegenFallback {
+  override protected def initInternal(): Unit = {}
   override protected def evalInternal(input: InternalRow): Any = false
   override def nullable: Boolean = false
   override def dataType: DataType = BooleanType
 }
 
-
 /**
- * An expression with mutable state so we can change it freely in our test suite.
- */
+  * An expression with mutable state so we can change it freely in our test suite.
+  */
 case class MutableExpression() extends LeafExpression with CodegenFallback {
   var mutableState: Boolean = false
   override def eval(input: InternalRow): Any = mutableState

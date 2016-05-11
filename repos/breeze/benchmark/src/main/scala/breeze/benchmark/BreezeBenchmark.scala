@@ -21,15 +21,16 @@ package breeze.benchmark
 import com.google.caliper.{Runner, SimpleBenchmark}
 
 /**
- * Extend this to create an actual benchmarking class.
- */
+  * Extend this to create an actual benchmarking class.
+  */
 trait BreezeBenchmark extends SimpleBenchmark {
+
   /**
-   * Sugar to run 'f' for 'reps' number of times.
-   */
-  def run[A](reps:Int)(f: => A): A = {
+    * Sugar to run 'f' for 'reps' number of times.
+    */
+  def run[A](reps: Int)(f: => A): A = {
     if (reps < 1) sys.error("!")
-    var i=0
+    var i = 0
     var result: Option[A] = None
     while (i < reps) {
       result = Some(f)
@@ -38,9 +39,9 @@ trait BreezeBenchmark extends SimpleBenchmark {
     result.get
   }
 
-  def runWith[A,B](reps: Int, constructor: =>B)(f: B=>A): A = {
+  def runWith[A, B](reps: Int, constructor: => B)(f: B => A): A = {
     if (reps < 1) sys.error("!")
-    var i=0
+    var i = 0
     var result: Option[A] = None
     val obj: B = constructor
     while (i < reps) {
@@ -50,9 +51,10 @@ trait BreezeBenchmark extends SimpleBenchmark {
     result.get
   }
 
-  def runWith2[A,B,C](reps: Int, constructor: =>B, constructor2: =>C)(f: (B,C)=>A): A = {
+  def runWith2[A, B, C](reps: Int, constructor: => B, constructor2: => C)(
+      f: (B, C) => A): A = {
     if (reps < 1) sys.error("!")
-    var i=0
+    var i = 0
     var result: Option[A] = None
     val obj1: B = constructor
     val obj2: C = constructor2
@@ -64,11 +66,10 @@ trait BreezeBenchmark extends SimpleBenchmark {
   }
 }
 
-
 /**
- * Extend this to create a main object which will run 'cls' (a benchmark).
- */
-abstract class MyRunner(val cls:java.lang.Class[_ <: com.google.caliper.Benchmark]) {
-  def main(args:Array[String]): Unit = Runner.main(cls, args:_*)
+  * Extend this to create a main object which will run 'cls' (a benchmark).
+  */
+abstract class MyRunner(
+    val cls: java.lang.Class[_ <: com.google.caliper.Benchmark]) {
+  def main(args: Array[String]): Unit = Runner.main(cls, args: _*)
 }
-

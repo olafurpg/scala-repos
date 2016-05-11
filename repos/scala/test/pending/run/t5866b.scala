@@ -8,10 +8,10 @@ class Bar(val d: String) extends AnyVal {
 
 object Test {
   def main(args: Array[String]): Unit = {
-    val f: Foo = {val n: Any = null; n.asInstanceOf[Foo]}
+    val f: Foo = { val n: Any = null; n.asInstanceOf[Foo] }
     println(f)
 
-    val b: Bar = {val n: Any = null; n.asInstanceOf[Bar]}
+    val b: Bar = { val n: Any = null; n.asInstanceOf[Bar] }
     println(b)
   }
 }

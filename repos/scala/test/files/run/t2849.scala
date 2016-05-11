@@ -42,7 +42,4 @@ object Test {
       }
     }
   }
-
 }
-
-

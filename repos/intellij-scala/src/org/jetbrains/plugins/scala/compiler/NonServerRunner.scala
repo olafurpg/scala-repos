@@ -17,43 +17,51 @@ import org.jetbrains.plugins.scala
 import _root_.scala.collection.JavaConverters._
 
 /**
- * User: Dmitry Naydanov
- * Date: 2/11/14
- */
-class NonServerRunner(project: Project, errorHandler: Option[ErrorHandler] = None) {
-  private val SERVER_CLASS_NAME = "org.jetbrains.jps.incremental.scala.remote.Main"
+  * User: Dmitry Naydanov
+  * Date: 2/11/14
+  */
+class NonServerRunner(
+    project: Project, errorHandler: Option[ErrorHandler] = None) {
+  private val SERVER_CLASS_NAME =
+    "org.jetbrains.jps.incremental.scala.remote.Main"
 
-  private def classPath(jdk: JDK) = (jdk.tools +: CompileServerLauncher.compilerJars).map(
-    file => FileUtil toCanonicalPath file.getPath).mkString(File.pathSeparator)
+  private def classPath(jdk: JDK) =
+    (jdk.tools +: CompileServerLauncher.compilerJars)
+      .map(file => FileUtil toCanonicalPath file.getPath)
+      .mkString(File.pathSeparator)
 
   private val jvmParameters = CompileServerLauncher.jvmParameters
-  
-  def buildProcess(args: Seq[String], listener: String => Unit): CompilationProcess = {
-    val sdk = Option(ProjectRootManager.getInstance(project).getProjectSdk) getOrElse {
-      val all = ProjectJdkTable.getInstance.getSdksOfType(JavaSdk.getInstance())
-      
-      if (all.isEmpty) {
-        error("No JDK available")
-        return null
-      } 
-      
-      all.get(0)
-    }
+
+  def buildProcess(
+      args: Seq[String], listener: String => Unit): CompilationProcess = {
+    val sdk =
+      Option(ProjectRootManager.getInstance(project).getProjectSdk) getOrElse {
+        val all =
+          ProjectJdkTable.getInstance.getSdksOfType(JavaSdk.getInstance())
+
+        if (all.isEmpty) {
+          error("No JDK available")
+          return null
+        }
+
+        all.get(0)
+      }
 
     CompileServerLauncher.compilerJars.foreach {
       case p => assert(p.exists(), p.getPath)
     }
-    
+
     scala.compiler.findJdkByName(sdk.getName) match {
-      case Left(msg) => 
+      case Left(msg) =>
         error(msg)
         null
       case Right(jdk) =>
-        val commands = ((FileUtil toCanonicalPath jdk.executable.getPath) +: "-cp" +: classPath(jdk) +: jvmParameters :+ 
-          SERVER_CLASS_NAME).++(args)
+        val commands =
+          ((FileUtil toCanonicalPath jdk.executable.getPath) +: "-cp" +: classPath(
+                  jdk) +: jvmParameters :+ SERVER_CLASS_NAME).++(args)
 
         val builder = new ProcessBuilder(commands.asJava)
-        
+
         new CompilationProcess {
           var myProcess: Option[Process] = None
           var myCallbacks: Seq[() => Unit] = Seq.empty
@@ -66,14 +74,17 @@ class NonServerRunner(project: Project, errorHandler: Option[ErrorHandler] = Non
             val p = builder.start()
             myProcess = Some(p)
 
-            val reader = new BufferedReader(new InputStreamReader(p.getInputStream))
+            val reader = new BufferedReader(
+                new InputStreamReader(p.getInputStream))
             new MyBase64StreamReader(reader, listener)
 
             val processWaitFor = new ProcessWaitFor(p, new TaskExecutor {
-              override def executeTask(task: Runnable): Future[_] = BaseOSProcessHandler.ExecutorServiceHolder.submit(task)
+              override def executeTask(task: Runnable): Future[_] =
+                BaseOSProcessHandler.ExecutorServiceHolder.submit(task)
             })
 
-            processWaitFor.setTerminationCallback(new Consumer[Integer] {
+            processWaitFor.setTerminationCallback(
+                new Consumer[Integer] {
               override def consume(t: Integer) {
                 myCallbacks.foreach(c => c())
               }
@@ -87,26 +98,27 @@ class NonServerRunner(project: Project, errorHandler: Option[ErrorHandler] = Non
         }
     }
   }
-  
+
   private def error(message: String) {
     errorHandler.foreach(_.error(message))
   }
-  
-  private class MyBase64StreamReader(private val reader: Reader, listener: String => Unit) extends BaseDataReader(null) {
+
+  private class MyBase64StreamReader(
+      private val reader: Reader, listener: String => Unit)
+      extends BaseDataReader(null) {
     start()
-    
+
     private val charBuffer = new Array[Char](8192)
     private val text = new StringBuilder
-    
+
     def executeOnPooledThread(runnable: Runnable): Future[_] =
       BaseOSProcessHandler.ExecutorServiceHolder.submit(runnable)
 
     def onTextAvailable(text: String) {
       try {
         listener(text)
-      }
-      catch {
-        case e: Exception =>  
+      } catch {
+        case e: Exception =>
       }
     }
 
@@ -116,28 +128,29 @@ class NonServerRunner(project: Project, errorHandler: Option[ErrorHandler] = Non
 
     override def readAvailable() = {
       var read = false
-      
+
       while (reader.ready()) {
         val n = reader.read(charBuffer)
-        
+
         if (n > 0) {
           read = true
-          
+
           for (i <- 0 until n) {
             charBuffer(i) match {
               case '=' if i == 0 && text.isEmpty =>
               case '=' if i == n - 1 || charBuffer.charAt(i + 1) != '=' =>
-                if ( (text.length +1) % 4 == 0 ) text.append('=') else if ( (text.length + 2) % 4 == 0 ) text.append("==")
+                if ((text.length + 1) % 4 == 0) text.append('=')
+                else if ((text.length + 2) % 4 == 0) text.append("==")
                 onTextAvailable(text.toString())
                 text.clear()
-              case '\n' if text.nonEmpty && text.startsWith("Listening") => 
+              case '\n' if text.nonEmpty && text.startsWith("Listening") =>
                 text.clear()
-              case c => text.append(c) 
+              case c => text.append(c)
             }
           }
         }
       }
-      
+
       read
     }
   }

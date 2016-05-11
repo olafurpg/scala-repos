@@ -4,7 +4,7 @@ object Test {
     case Some(b) => 3 // no warning was emitted
   }
 
-  (Some(1): @ unchecked) match {
+  (Some(1): @unchecked) match {
     case Some(a) => 2
     case Some(b) => 3 // no warning was emitted
   }

@@ -1,7 +1,4 @@
-
-
 import collection.mutable._
-
 
 object Test {
 
@@ -28,5 +25,4 @@ object Test {
       println(table.length)
     }
   }
-
 }

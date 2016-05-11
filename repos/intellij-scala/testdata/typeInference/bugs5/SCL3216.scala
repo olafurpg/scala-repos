@@ -6,8 +6,8 @@ object SCL3216 {
     implicit def foo2x[X <: T[X]](f: T[X]): String = ""
   }
 
-
   import Implicits._
-  /*start*/Foo.substring(0)/*end*/
+  /*start*/
+  Foo.substring(0) /*end*/
 }
 //String

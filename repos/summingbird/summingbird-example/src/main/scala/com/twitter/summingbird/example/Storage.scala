@@ -17,7 +17,7 @@
 package com.twitter.summingbird.example
 
 import com.twitter.algebird.Monoid
-import com.twitter.bijection.{ Base64String, Bijection, Codec, Injection }
+import com.twitter.bijection.{Base64String, Bijection, Codec, Injection}
 import com.twitter.bijection.netty.Implicits._
 import com.twitter.conversions.time._
 import com.twitter.finagle.builder.ClientBuilder
@@ -25,15 +25,15 @@ import com.twitter.finagle.memcachedx.KetamaClientBuilder
 import com.twitter.finagle.memcachedx.protocol.text.Memcached
 import com.twitter.storehaus.Store
 import com.twitter.storehaus.algebra.MergeableStore
-import com.twitter.storehaus.memcache.{ HashEncoder, MemcacheStore }
+import com.twitter.storehaus.memcache.{HashEncoder, MemcacheStore}
 import com.twitter.summingbird.batch.BatchID
 import org.jboss.netty.buffer.ChannelBuffer
 
 /**
- * TODO: Delete when https://github.com/twitter/storehaus/pull/121 is
- * merged into Storehaus and Storehaus sees its next release. This
- * pull req will make it easier to create Memcache store instances.
- */
+  * TODO: Delete when https://github.com/twitter/storehaus/pull/121 is
+  * merged into Storehaus and Storehaus sees its next release. This
+  * pull req will make it easier to create Memcache store instances.
+  */
 object Memcache {
   val DEFAULT_TIMEOUT = 1.seconds
 
@@ -55,24 +55,27 @@ object Memcache {
   }
 
   /**
-   * Returns a function that encodes a key to a Memcache key string
-   * given a unique namespace string.
-   */
-  def keyEncoder[T](namespace: String)(implicit inj: Codec[T]): T => String = { key: T =>
-    def concat(bytes: Array[Byte]): Array[Byte] =
-      namespace.getBytes ++ bytes
+    * Returns a function that encodes a key to a Memcache key string
+    * given a unique namespace string.
+    */
+  def keyEncoder[T](namespace: String)(implicit inj: Codec[T]): T => String = {
+    key: T =>
+      def concat(bytes: Array[Byte]): Array[Byte] =
+        namespace.getBytes ++ bytes
 
-    (inj.andThen(concat _)
-      .andThen(HashEncoder())
-      .andThen(Bijection.connect[Array[Byte], Base64String]))(key).str
+      (inj
+        .andThen(concat _)
+        .andThen(HashEncoder())
+        .andThen(Bijection.connect[Array[Byte], Base64String]))(key)
+        .str
   }
 
-  def store[K: Codec, V: Codec](keyPrefix: String): Store[K, V] = {
+  def store[K : Codec, V : Codec](keyPrefix: String): Store[K, V] = {
     implicit val valueToBuf = Injection.connect[V, Array[Byte], ChannelBuffer]
-    MemcacheStore(client)
-      .convert(keyEncoder[K](keyPrefix))
+    MemcacheStore(client).convert(keyEncoder[K](keyPrefix))
   }
 
-  def mergeable[K: Codec, V: Codec: Monoid](keyPrefix: String): MergeableStore[K, V] =
+  def mergeable[K : Codec, V : Codec : Monoid](
+      keyPrefix: String): MergeableStore[K, V] =
     MergeableStore.fromStore(store[K, V](keyPrefix))
 }

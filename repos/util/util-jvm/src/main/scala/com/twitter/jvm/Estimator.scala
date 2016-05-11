@@ -3,9 +3,10 @@ package com.twitter.jvm
 import scala.util.Random
 
 /**
- * An estimator for values of type T.
- */
+  * An estimator for values of type T.
+  */
 trait Estimator[T] {
+
   /** A scalar measurement `m` was taken */
   def measure(m: T)
 
@@ -14,8 +15,8 @@ trait Estimator[T] {
 }
 
 /**
- * A simple Kalman filter to estimate a scalar value.
- */
+  * A simple Kalman filter to estimate a scalar value.
+  */
 class Kalman(N: Int) {
   private[this] val mbuf = new Array[Double](N)
   private[this] val ebuf = new Array[Double](N)
@@ -24,72 +25,72 @@ class Kalman(N: Int) {
   private[this] var weight: Double = 0.9
 
   /**
-   * Update the filter with measurement `m`
-   * and measurement error `e`.
-   */
+    * Update the filter with measurement `m`
+    * and measurement error `e`.
+    */
   def measure(m: Double, e: Double) {
-    val i = (n%N).toInt
+    val i = (n % N).toInt
     mbuf(i) = m
     ebuf(i) = e
 
-    if (n == 0)
-      est = m
+    if (n == 0) est = m
 
-    est += weight*(m-est)
+    est += weight * (m - est)
     val mv = mvar
     val ev = evar
-    if (mv + ev == 0)
-      weight = 1D
-    else
-      weight = mv / (mv+ev)
+    if (mv + ev == 0) weight = 1D
+    else weight = mv / (mv + ev)
     n += 1
   }
 
   private[this] def mvar = variance(
-    if (n < N) mbuf take n.toInt
-    else mbuf
+      if (n < N) mbuf take n.toInt
+      else mbuf
   )
 
   private[this] def evar = variance(
-    if (n < N) ebuf take n.toInt
-    else ebuf
+      if (n < N) ebuf take n.toInt
+      else ebuf
   )
 
   def estimate = est
 
   private[this] def variance(samples: Array[Double]): Double = {
-    if (samples.length == 1)
-      return 0D
+    if (samples.length == 1) return 0D
 
     val sum = samples.sum
     val mean = sum / samples.length
-    val diff = (samples map { x => (x-mean)*(x-mean) }).sum
-    diff/(samples.length-1)
+    val diff = (samples map { x =>
+          (x - mean) * (x - mean)
+        }).sum
+    diff / (samples.length - 1)
   }
 
   override def toString =
-    "Kalman<estimate=%f, weight=%f, mvar=%f, evar=%f>".format(estimate, weight, mvar, evar)
+    "Kalman<estimate=%f, weight=%f, mvar=%f, evar=%f>".format(
+        estimate, weight, mvar, evar)
 }
 
 /**
- * A Kalman filter in which measurement errors are normally
- * distributed over the given range (as a fraction of the measured
- * value).
- */
-class KalmanGaussianError(N: Int, range: Double) extends Kalman(N) with Estimator[Double] {
-  require(range >= 0D && range <1D)
+  * A Kalman filter in which measurement errors are normally
+  * distributed over the given range (as a fraction of the measured
+  * value).
+  */
+class KalmanGaussianError(N: Int, range: Double)
+    extends Kalman(N) with Estimator[Double] {
+  require(range >= 0D && range < 1D)
   private[this] val rng = new Random
 
   def measure(m: Double) {
-    measure(m, rng.nextGaussian()*range*m)
+    measure(m, rng.nextGaussian() * range * m)
   }
 }
 
-
 /**
- * An estimator for weighted windows of means.
- */
-class WindowedMeans(N: Int, windows: Seq[(Int, Int)]) extends Estimator[Double] {
+  * An estimator for weighted windows of means.
+  */
+class WindowedMeans(N: Int, windows: Seq[(Int, Int)])
+    extends Estimator[Double] {
   require(windows forall { case (_, i) => i <= N })
   private[this] val normalized = {
     val sum = (windows map { case (w, _) => w }).sum
@@ -101,47 +102,44 @@ class WindowedMeans(N: Int, windows: Seq[(Int, Int)]) extends Estimator[Double] 
   private[this] def mean(from: Long, count: Int): Double = {
     require(count <= N && count > 0)
     val i = {
-      val x = ((from-count)%N).toInt
+      val x = ((from - count) % N).toInt
       if (x < 0) (x + N)
       else x
     }
-    val j = (from%N).toInt
+    val j = (from % N).toInt
     val sum =
       if (i == j) buf.sum
       else if (i < j) buf.slice(i, j).sum
       else buf.slice(i, N).sum + buf.slice(0, j).sum
-    sum/count
+    sum / count
   }
 
   def measure(m: Double) {
-    if (n == 0)
-      java.util.Arrays.fill(buf, m)
-    else
-      buf((n%N).toInt) = m
+    if (n == 0) java.util.Arrays.fill(buf, m)
+    else buf((n % N).toInt) = m
     n += 1
   }
 
   def estimate = {
     require(n > 0)
-    val weightedMeans = normalized map { case (w, i) => w*mean(n, i) }
+    val weightedMeans = normalized map { case (w, i) => w * mean(n, i) }
     weightedMeans.sum
   }
 }
 
 /**
- * Unix-like load average, an exponentially weighted moving average,
- * smoothed to the given interval (counted in number of
- * measurements).
- * See: http://web.mit.edu/saltzer/www/publications/instrumentation.html
- */
+  * Unix-like load average, an exponentially weighted moving average,
+  * smoothed to the given interval (counted in number of
+  * measurements).
+  * See: http://web.mit.edu/saltzer/www/publications/instrumentation.html
+  */
 class LoadAverage(interval: Double) extends Estimator[Double] {
-  private[this] val a = math.exp(-1D/interval)
+  private[this] val a = math.exp(-1D / interval)
   private[this] var load = Double.NaN
 
   def measure(m: Double) {
-    load =
-      if (load.isNaN) m
-      else load*a + m*(1-a)
+    load = if (load.isNaN) m
+    else load * a + m * (1 - a)
   }
 
   def estimate = load

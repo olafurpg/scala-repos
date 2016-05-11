@@ -35,7 +35,9 @@ object RandomForestRegressorExample {
 
     // $example on$
     // Load and parse the data file, converting it to a DataFrame.
-    val data = sqlContext.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+    val data = sqlContext.read
+      .format("libsvm")
+      .load("data/mllib/sample_libsvm_data.txt")
 
     // Automatically identify categorical features, and index them.
     // Set maxCategories so features with > 4 distinct values are treated as continuous.
@@ -54,8 +56,7 @@ object RandomForestRegressorExample {
       .setFeaturesCol("indexedFeatures")
 
     // Chain indexer and forest in a Pipeline
-    val pipeline = new Pipeline()
-      .setStages(Array(featureIndexer, rf))
+    val pipeline = new Pipeline().setStages(Array(featureIndexer, rf))
 
     // Train model.  This also runs the indexer.
     val model = pipeline.fit(trainingData)

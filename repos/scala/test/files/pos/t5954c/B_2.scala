@@ -13,6 +13,6 @@ package object A {
   var h = "wtf"
   def i = "lol"
   type j = String
-  class K(val k : Int) extends AnyVal
-  implicit class L(val l : Int)
+  class K(val k: Int) extends AnyVal
+  implicit class L(val l: Int)
 }

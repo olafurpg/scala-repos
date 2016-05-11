@@ -1,19 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.utils.timer
 
 import java.util.concurrent.{DelayQueue, ExecutorService, TimeUnit}
@@ -23,16 +23,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 import kafka.utils.threadsafe
 
 @threadsafe
-class Timer(taskExecutor: ExecutorService, tickMs: Long = 1, wheelSize: Int = 20, startMs: Long = System.currentTimeMillis) {
+class Timer(taskExecutor: ExecutorService,
+            tickMs: Long = 1,
+            wheelSize: Int = 20,
+            startMs: Long = System.currentTimeMillis) {
 
   private[this] val delayQueue = new DelayQueue[TimerTaskList]()
   private[this] val taskCounter = new AtomicInteger(0)
   private[this] val timingWheel = new TimingWheel(
-    tickMs = tickMs,
-    wheelSize = wheelSize,
-    startMs = startMs,
-    taskCounter = taskCounter,
-    delayQueue
+      tickMs = tickMs,
+      wheelSize = wheelSize,
+      startMs = startMs,
+      taskCounter = taskCounter,
+      delayQueue
   )
 
   // Locks used to protect data structures while ticking
@@ -57,7 +60,8 @@ class Timer(taskExecutor: ExecutorService, tickMs: Long = 1, wheelSize: Int = 20
     }
   }
 
-  private[this] val reinsert = (timerTaskEntry: TimerTaskEntry) => addTimerTaskEntry(timerTaskEntry)
+  private[this] val reinsert = (timerTaskEntry: TimerTaskEntry) =>
+    addTimerTaskEntry(timerTaskEntry)
 
   /*
    * Advances the clock if there is an expired bucket. If there isn't any expired bucket when called,
@@ -84,4 +88,3 @@ class Timer(taskExecutor: ExecutorService, tickMs: Long = 1, wheelSize: Int = 20
 
   def size(): Int = taskCounter.get
 }
-

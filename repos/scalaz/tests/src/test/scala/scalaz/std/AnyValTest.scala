@@ -9,12 +9,19 @@ import Tags._
 object AnyValTest extends SpecLite {
 
   checkAll("Unit", order.laws[Unit])
-  checkAll("Boolean", order.laws[Boolean].withProp("benchmark", order.scalaOrdering[Boolean]))
-  checkAll("Char", order.laws[Char].withProp("benchmark", order.scalaOrdering[Char]))
-  checkAll("Short", order.laws[Short].withProp("benchmark", order.scalaOrdering[Short]))
-  checkAll("Int", order.laws[Int].withProp("benchmark", order.scalaOrdering[Int]))
-  checkAll("Long", order.laws[Long].withProp("benchmark", order.scalaOrdering[Long]))
-  checkAll("Float", order.laws[Float].withProp("benchmark", order.scalaOrdering[Float]))
+  checkAll(
+      "Boolean",
+      order.laws[Boolean].withProp("benchmark", order.scalaOrdering[Boolean]))
+  checkAll("Char",
+           order.laws[Char].withProp("benchmark", order.scalaOrdering[Char]))
+  checkAll("Short",
+           order.laws[Short].withProp("benchmark", order.scalaOrdering[Short]))
+  checkAll(
+      "Int", order.laws[Int].withProp("benchmark", order.scalaOrdering[Int]))
+  checkAll("Long",
+           order.laws[Long].withProp("benchmark", order.scalaOrdering[Long]))
+  checkAll("Float",
+           order.laws[Float].withProp("benchmark", order.scalaOrdering[Float]))
   checkAll("Int @@ Multiplication", order.laws[Int @@ Multiplication])
   checkAll("Boolean @@ Conjunction", order.laws[Boolean @@ Conjunction])
   checkAll("Char @@ Multiplication", order.laws[Char @@ Multiplication])
@@ -51,5 +58,4 @@ object AnyValTest extends SpecLite {
   checkAll("Byte @@ Multiplication", enum.laws[Byte @@ Multiplication])
   checkAll("Long @@ Multiplication", enum.laws[Long @@ Multiplication])
   checkAll("Short @@ Multiplication", enum.laws[Short @@ Multiplication])
-
 }

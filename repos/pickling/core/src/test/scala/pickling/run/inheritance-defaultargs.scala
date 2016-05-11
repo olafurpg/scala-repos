@@ -12,14 +12,19 @@ abstract class Person extends Creature {
   val age: Int
 }
 
-case class Firefighter(val name: String, val age: Int, val salary: Int, val species: String = "human") extends Person
+case class Firefighter(val name: String,
+                       val age: Int,
+                       val salary: Int,
+                       val species: String = "human")
+    extends Person
 
 class InheritanceDefaultArgsTest extends FunSuite {
   test("main") {
     val f = new Firefighter("Muriel", 41, 30000)
 
     val pickleF = (f: Firefighter).pickle
-    assert(pickleF.value === """
+    assert(
+        pickleF.value === """
       |{
       |  "$type": "scala.pickling.inheritance.defaultargs.Firefighter",
       |  "name": "Muriel",
@@ -31,7 +36,8 @@ class InheritanceDefaultArgsTest extends FunSuite {
     assert(pickleF.unpickle[Firefighter] === f)
 
     val pickleP = (f: Person).pickle
-    assert(pickleP.value === """
+    assert(
+        pickleP.value === """
       |{
       |  "$type": "scala.pickling.inheritance.defaultargs.Firefighter",
       |  "name": "Muriel",
@@ -43,7 +49,8 @@ class InheritanceDefaultArgsTest extends FunSuite {
     assert(pickleP.unpickle[Person] === f)
 
     val pickleC = (f: Creature).pickle
-    assert(pickleC.value === """
+    assert(
+        pickleC.value === """
       |{
       |  "$type": "scala.pickling.inheritance.defaultargs.Firefighter",
       |  "name": "Muriel",

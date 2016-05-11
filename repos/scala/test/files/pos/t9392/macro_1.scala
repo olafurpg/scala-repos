@@ -1,6 +1,5 @@
 import language.experimental.macros
 
-
 object Macro {
 
   import reflect.macros.blackbox.Context

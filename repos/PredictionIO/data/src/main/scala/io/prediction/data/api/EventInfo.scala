@@ -12,13 +12,8 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.api
 
 import io.prediction.data.storage.Event
 
-case class EventInfo(
-  appId: Int,
-  channelId: Option[Int],
-  event: Event)
-
+case class EventInfo(appId: Int, channelId: Option[Int], event: Event)

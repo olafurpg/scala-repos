@@ -6,8 +6,7 @@ import org.scalatra.test.specs2.MutableScalatraSpec
 
 class ActionResultServlet extends ScalatraServlet with ActionResultTestBase
 
-trait ActionResultTestBase {
-  self: ScalatraBase =>
+trait ActionResultTestBase { self: ScalatraBase =>
   error {
     case e => BadRequest("something went wrong")
   }
@@ -42,14 +41,13 @@ trait ActionResultTestBase {
 
   get("/contentType") {
     val headerName =
-      if (params.getOrElse("lcase", "false") == "true")
-        "content-type"
-      else
-        "Content-Type"
+      if (params.getOrElse("lcase", "false") == "true") "content-type"
+      else "Content-Type"
 
-    Ok("Hello, world!", headers = Map(
-      headerName -> "application/vnd.ms-excel"
-    ))
+    Ok("Hello, world!",
+       headers = Map(
+             headerName -> "application/vnd.ms-excel"
+         ))
   }
 
   get("/custom-reason") {
@@ -109,14 +107,16 @@ abstract class ActionResultsSpec extends MutableScalatraSpec {
 
     "infer contentType for Array[Byte]" in {
       get("/bytes") {
-        response.getContentType mustEqual "text/plain; charset=" + java.nio.charset.Charset.defaultCharset.displayName
+        response.getContentType mustEqual "text/plain; charset=" +
+        java.nio.charset.Charset.defaultCharset.displayName
       }
     }
 
     "render the inputStream" in {
       val expected = {
         val o = new ByteArrayOutputStream()
-        val i = getClass.getResourceAsStream("/org/scalatra/servlet/smiley.png")
+        val i =
+          getClass.getResourceAsStream("/org/scalatra/servlet/smiley.png")
         org.eclipse.jetty.util.IO.copy(i, o)
         o.toByteArray
       }

@@ -33,26 +33,37 @@ import JsonDSL._
 private[mongodb] object Meta {
 
   /*
-  * For converting scala objects into DBObject values
-  */
+   * For converting scala objects into DBObject values
+   */
   object Reflection {
     import java.lang.reflect._
 
     /*
-    * These don't require a conversion and can be put directly into a DBObject
-    */
-    val primitives = Set[Class[_]](classOf[String], classOf[Int], classOf[Long], classOf[Double],
-                                  classOf[Float], classOf[Byte], classOf[BigInt], classOf[Boolean],
-                                  classOf[Short], classOf[java.lang.Integer], classOf[java.lang.Long],
-                                  classOf[java.lang.Double], classOf[java.lang.Float],
-                                  classOf[java.lang.Byte], classOf[java.lang.Boolean],
-                                  classOf[java.lang.Short], classOf[scala.Array[Byte]])
+     * These don't require a conversion and can be put directly into a DBObject
+     */
+    val primitives = Set[Class[_]](classOf[String],
+                                   classOf[Int],
+                                   classOf[Long],
+                                   classOf[Double],
+                                   classOf[Float],
+                                   classOf[Byte],
+                                   classOf[BigInt],
+                                   classOf[Boolean],
+                                   classOf[Short],
+                                   classOf[java.lang.Integer],
+                                   classOf[java.lang.Long],
+                                   classOf[java.lang.Double],
+                                   classOf[java.lang.Float],
+                                   classOf[java.lang.Byte],
+                                   classOf[java.lang.Boolean],
+                                   classOf[java.lang.Short],
+                                   classOf[scala.Array[Byte]])
 
     def primitive_?(clazz: Class[_]) = primitives contains clazz
 
     /*
-    * This is used to convert DBObjects into JObjects
-    */
+     * This is used to convert DBObjects into JObjects
+     */
     def primitive2jvalue(a: Any) = a match {
       case x: String => JString(x)
       case x: Int => JInt(x)
@@ -74,9 +85,12 @@ private[mongodb] object Meta {
     }
 
     /*
-    * Date types require formatting
-    */
-    val datetypes = Set[Class[_]](classOf[Calendar], classOf[Date], classOf[GregorianCalendar], classOf[DateTime])
+     * Date types require formatting
+     */
+    val datetypes = Set[Class[_]](classOf[Calendar],
+                                  classOf[Date],
+                                  classOf[GregorianCalendar],
+                                  classOf[DateTime])
 
     def datetype_?(clazz: Class[_]) = datetypes contains clazz
 
@@ -93,16 +107,16 @@ private[mongodb] object Meta {
     }
 
     /*
-    * Extended Mongo types.
-    */
+     * Extended Mongo types.
+     */
     val mongotypes = Set[Class[_]](
-      classOf[DBRef], classOf[ObjectId], classOf[Pattern], classOf[UUID])
+        classOf[DBRef], classOf[ObjectId], classOf[Pattern], classOf[UUID])
 
     def mongotype_?(clazz: Class[_]) = mongotypes contains clazz
 
     /*
-    * Definitive place for JValue conversion of mongo types
-    */
+     * Definitive place for JValue conversion of mongo types
+     */
     def mongotype2jvalue(a: Any)(implicit formats: Formats) = a match {
       case x: ObjectId => JsonObjectId.asJValue(x, formats)
       case x: Pattern => JsonRegex(x)
@@ -113,7 +127,8 @@ private[mongodb] object Meta {
   }
 
   @deprecated("use JsonDate.apply", "2.6")
-  def dateAsJValue(d: Date, formats: Formats): JValue = ("$dt" -> formats.dateFormat.format(d))
+  def dateAsJValue(d: Date, formats: Formats): JValue =
+    ("$dt" -> formats.dateFormat.format(d))
   @deprecated("use JsonObjectId.apply", "2.6")
   def objectIdAsJValue(oid: ObjectId): JValue = JsonObjectId(oid)
   @deprecated("use JsonRegex.apply", "2.6")
@@ -124,7 +139,4 @@ private[mongodb] object Meta {
   @deprecated("use JsonObjectId.asJValue", "2.6")
   def objectIdAsJValue(oid: ObjectId, formats: Formats): JValue =
     JsonObjectId.asJValue(oid, formats)
-
-
 }
-

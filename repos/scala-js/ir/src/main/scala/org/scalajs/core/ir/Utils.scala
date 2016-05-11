@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js IR                **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js IR                **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.ir
 
@@ -25,9 +24,8 @@ object Utils {
 
     if (base.isOpaque || !base.isAbsolute || base.getRawPath == null ||
         trgt.isOpaque || !trgt.isAbsolute || trgt.getRawPath == null ||
-        base.getScheme != trgt.getScheme  ||
-        base.getRawAuthority != trgt.getRawAuthority)
-      trgt
+        base.getScheme != trgt.getScheme ||
+        base.getRawAuthority != trgt.getRawAuthority) trgt
     else {
       val trgtCmps = trgt.getRawPath.split('/')
       val baseCmps = base.getRawPath.split('/')
@@ -45,8 +43,8 @@ object Utils {
   }
 
   /** Adds an empty authority to URIs with the "file" scheme without authority.
-   *  Some browsers don't fetch URIs without authority correctly.
-   */
+    *  Some browsers don't fetch URIs without authority correctly.
+    */
   def fixFileURI(uri: URI): URI =
     if (uri.getScheme() != "file" || uri.getAuthority() != null) uri
     else new URI("file", "", uri.getPath(), uri.getQuery(), uri.getFragment())
@@ -57,10 +55,8 @@ object Utils {
     var i = 0
     while (i != end) {
       val c = str.charAt(i)
-      if (c >= 32 && c <= 126 && c != '\\' && c != '"')
-        i += 1
-      else
-        return createEscapeJSString(str)
+      if (c >= 32 && c <= 126 && c != '\\' && c != '"') i += 1
+      else return createEscapeJSString(str)
     }
     str
     // scalastyle:on return
@@ -88,12 +84,10 @@ object Utils {
       // Find all consecutive ASCII printable characters from `start`
       while (i != end && c >= 32 && c <= 126 && c != 34 && c != 92) {
         i += 1
-        if (i != end)
-          c = str.charAt(i)
+        if (i != end) c = str.charAt(i)
       }
       // Print ASCII printable characters from `start`
-      if (start != i)
-        out.append(str, start, i)
+      if (start != i) out.append(str, start, i)
 
       // Print next non ASCII printable character
       if (i != end) {
@@ -116,12 +110,12 @@ object Utils {
   }
 
   /** A ByteArrayOutput stream that allows to jump back to a given
-   *  position and complete some bytes. Methods must be called in the
-   *  following order only:
-   *  - [[markJump]]
-   *  - [[jumpBack]]
-   *  - [[continue]]
-   */
+    *  position and complete some bytes. Methods must be called in the
+    *  following order only:
+    *  - [[markJump]]
+    *  - [[jumpBack]]
+    *  - [[continue]]
+    */
   private[ir] class JumpBackByteArrayOutputStream
       extends java.io.ByteArrayOutputStream {
     protected var jumpBackPos: Int = -1
@@ -153,5 +147,4 @@ object Utils {
       headPos = -1
     }
   }
-
 }

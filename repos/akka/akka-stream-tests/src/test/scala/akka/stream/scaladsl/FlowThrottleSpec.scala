@@ -1,9 +1,9 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
-import akka.stream.ThrottleMode.{ Shaping, Enforcing }
+import akka.stream.ThrottleMode.{Shaping, Enforcing}
 import akka.stream._
 import akka.stream.testkit._
 import akka.stream.testkit.scaladsl.TestSink
@@ -15,14 +15,17 @@ import scala.util.control.NoStackTrace
 import akka.testkit.AkkaSpec
 
 class FlowThrottleSpec extends AkkaSpec {
-  implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system).withInputBuffer(1, 1))
+  implicit val materializer = ActorMaterializer(
+      ActorMaterializerSettings(system).withInputBuffer(1, 1))
 
   def genByteString(length: Int) =
-    ByteString(new Random().shuffle(0 to 255).take(length).map(_.toByte).toArray)
+    ByteString(
+        new Random().shuffle(0 to 255).take(length).map(_.toByte).toArray)
 
   "Throttle for single cost elements" must {
     "work for the happy case" in Utils.assertAllStagesStopped {
-      Source(1 to 5).throttle(1, 100.millis, 0, Shaping)
+      Source(1 to 5)
+        .throttle(1, 100.millis, 0, Shaping)
         .runWith(TestSink.probe[Int])
         .request(5)
         .expectNext(1, 2, 3, 4, 5)
@@ -33,7 +36,10 @@ class FlowThrottleSpec extends AkkaSpec {
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
-      Source.fromPublisher(upstream).throttle(1, 300.millis, 0, Shaping).runWith(Sink.fromSubscriber(downstream))
+      Source
+        .fromPublisher(upstream)
+        .throttle(1, 300.millis, 0, Shaping)
+        .runWith(Sink.fromSubscriber(downstream))
 
       downstream.request(20)
       upstream.sendNext(1)
@@ -51,7 +57,10 @@ class FlowThrottleSpec extends AkkaSpec {
     "not send downstream if upstream does not emit element" in Utils.assertAllStagesStopped {
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
-      Source.fromPublisher(upstream).throttle(1, 300.millis, 0, Shaping).runWith(Sink.fromSubscriber(downstream))
+      Source
+        .fromPublisher(upstream)
+        .throttle(1, 300.millis, 0, Shaping)
+        .runWith(Sink.fromSubscriber(downstream))
 
       downstream.request(2)
       upstream.sendNext(1)
@@ -66,15 +75,20 @@ class FlowThrottleSpec extends AkkaSpec {
 
     "cancel when downstream cancels" in Utils.assertAllStagesStopped {
       val downstream = TestSubscriber.probe[Int]()
-      Source(1 to 10).throttle(1, 300.millis, 0, Shaping).runWith(Sink.fromSubscriber(downstream))
+      Source(1 to 10)
+        .throttle(1, 300.millis, 0, Shaping)
+        .runWith(Sink.fromSubscriber(downstream))
       downstream.cancel()
     }
 
     "send elements downstream as soon as time comes" in Utils.assertAllStagesStopped {
-      val probe = Source(1 to 10).throttle(2, 500.millis, 0, Shaping).runWith(TestSink.probe[Int])
+      val probe = Source(1 to 10)
+        .throttle(2, 500.millis, 0, Shaping)
+        .runWith(TestSink.probe[Int])
         .request(5)
       probe.receiveWithin(600.millis) should be(Seq(1, 2))
-      probe.expectNoMsg(100.millis)
+      probe
+        .expectNoMsg(100.millis)
         .expectNext(3)
         .expectNoMsg(100.millis)
         .expectNext(4)
@@ -84,7 +98,10 @@ class FlowThrottleSpec extends AkkaSpec {
     "burst according to its maximum if enough time passed" in Utils.assertAllStagesStopped {
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
-      Source.fromPublisher(upstream).throttle(1, 200.millis, 5, Shaping).runWith(Sink.fromSubscriber(downstream))
+      Source
+        .fromPublisher(upstream)
+        .throttle(1, 200.millis, 5, Shaping)
+        .runWith(Sink.fromSubscriber(downstream))
       downstream.request(1)
       upstream.sendNext(1)
       downstream.expectNoMsg(100.millis)
@@ -99,7 +116,10 @@ class FlowThrottleSpec extends AkkaSpec {
     "burst some elements if have enough time" in Utils.assertAllStagesStopped {
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
-      Source.fromPublisher(upstream).throttle(1, 200.millis, 5, Shaping).runWith(Sink.fromSubscriber(downstream))
+      Source
+        .fromPublisher(upstream)
+        .throttle(1, 200.millis, 5, Shaping)
+        .runWith(Sink.fromSubscriber(downstream))
       downstream.request(1)
       upstream.sendNext(1)
       downstream.expectNoMsg(100.millis)
@@ -113,14 +133,16 @@ class FlowThrottleSpec extends AkkaSpec {
 
     "throw exception when exceeding throughtput in enforced mode" in Utils.assertAllStagesStopped {
       an[RateExceededException] shouldBe thrownBy {
-        Await.result(
-          Source(1 to 5).throttle(1, 200.millis, 5, Enforcing).runWith(Sink.ignore),
-          2.seconds)
+        Await.result(Source(1 to 5)
+                       .throttle(1, 200.millis, 5, Enforcing)
+                       .runWith(Sink.ignore),
+                     2.seconds)
       }
     }
 
     "properly combine shape and throttle modes" in Utils.assertAllStagesStopped {
-      Source(1 to 5).throttle(1, 100.millis, 5, Shaping)
+      Source(1 to 5)
+        .throttle(1, 100.millis, 5, Shaping)
         .throttle(1, 100.millis, 5, Enforcing)
         .runWith(TestSink.probe[Int])
         .request(5)
@@ -131,7 +153,8 @@ class FlowThrottleSpec extends AkkaSpec {
 
   "Throttle for various cost elements" must {
     "work for happy case" in Utils.assertAllStagesStopped {
-      Source(1 to 5).throttle(1, 100.millis, 0, (_) ⇒ 1, Shaping)
+      Source(1 to 5)
+        .throttle(1, 100.millis, 0, (_) ⇒ 1, Shaping)
         .runWith(TestSink.probe[Int])
         .request(5)
         .expectNext(1, 2, 3, 4, 5)
@@ -140,7 +163,8 @@ class FlowThrottleSpec extends AkkaSpec {
 
     "emit elements according to cost" in Utils.assertAllStagesStopped {
       val list = (1 to 4).map(_ * 2).map(genByteString)
-      Source(list).throttle(2, 200.millis, 0, _.length, Shaping)
+      Source(list)
+        .throttle(2, 200.millis, 0, _.length, Shaping)
         .runWith(TestSink.probe[ByteString])
         .request(4)
         .expectNext(list(0))
@@ -156,7 +180,10 @@ class FlowThrottleSpec extends AkkaSpec {
     "not send downstream if upstream does not emit element" in Utils.assertAllStagesStopped {
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
-      Source.fromPublisher(upstream).throttle(2, 300.millis, 0, identity, Shaping).runWith(Sink.fromSubscriber(downstream))
+      Source
+        .fromPublisher(upstream)
+        .throttle(2, 300.millis, 0, identity, Shaping)
+        .runWith(Sink.fromSubscriber(downstream))
 
       downstream.request(2)
       upstream.sendNext(1)
@@ -171,15 +198,20 @@ class FlowThrottleSpec extends AkkaSpec {
 
     "cancel when downstream cancels" in Utils.assertAllStagesStopped {
       val downstream = TestSubscriber.probe[Int]()
-      Source(1 to 10).throttle(2, 200.millis, 0, identity, Shaping).runWith(Sink.fromSubscriber(downstream))
+      Source(1 to 10)
+        .throttle(2, 200.millis, 0, identity, Shaping)
+        .runWith(Sink.fromSubscriber(downstream))
       downstream.cancel()
     }
 
     "send elements downstream as soon as time comes" in Utils.assertAllStagesStopped {
-      val probe = Source(1 to 10).throttle(4, 500.millis, 0, _ ⇒ 2, Shaping).runWith(TestSink.probe[Int])
+      val probe = Source(1 to 10)
+        .throttle(4, 500.millis, 0, _ ⇒ 2, Shaping)
+        .runWith(TestSink.probe[Int])
         .request(5)
       probe.receiveWithin(600.millis) should be(Seq(1, 2))
-      probe.expectNoMsg(100.millis)
+      probe
+        .expectNoMsg(100.millis)
         .expectNext(3)
         .expectNoMsg(100.millis)
         .expectNext(4)
@@ -189,7 +221,10 @@ class FlowThrottleSpec extends AkkaSpec {
     "burst according to its maximum if enough time passed" in Utils.assertAllStagesStopped {
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
-      Source.fromPublisher(upstream).throttle(2, 400.millis, 5, (_) ⇒ 1, Shaping).runWith(Sink.fromSubscriber(downstream))
+      Source
+        .fromPublisher(upstream)
+        .throttle(2, 400.millis, 5, (_) ⇒ 1, Shaping)
+        .runWith(Sink.fromSubscriber(downstream))
       downstream.request(1)
       upstream.sendNext(1)
       downstream.expectNoMsg(100.millis)
@@ -204,7 +239,10 @@ class FlowThrottleSpec extends AkkaSpec {
     "burst some elements if have enough time" in Utils.assertAllStagesStopped {
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
-      Source.fromPublisher(upstream).throttle(2, 400.millis, 5, (e) ⇒ if (e < 4) 1 else 20, Shaping).runWith(Sink.fromSubscriber(downstream))
+      Source
+        .fromPublisher(upstream)
+        .throttle(2, 400.millis, 5, (e) ⇒ if (e < 4) 1 else 20, Shaping)
+        .runWith(Sink.fromSubscriber(downstream))
       downstream.request(1)
       upstream.sendNext(1)
       downstream.expectNoMsg(100.millis)
@@ -218,14 +256,16 @@ class FlowThrottleSpec extends AkkaSpec {
 
     "throw exception when exceeding throughtput in enforced mode" in Utils.assertAllStagesStopped {
       an[RateExceededException] shouldBe thrownBy {
-        Await.result(
-          Source(1 to 5).throttle(2, 200.millis, 0, identity, Enforcing).runWith(Sink.ignore),
-          2.seconds)
+        Await.result(Source(1 to 5)
+                       .throttle(2, 200.millis, 0, identity, Enforcing)
+                       .runWith(Sink.ignore),
+                     2.seconds)
       }
     }
 
     "properly combine shape and throttle modes" in Utils.assertAllStagesStopped {
-      Source(1 to 5).throttle(2, 200.millis, 0, identity, Shaping)
+      Source(1 to 5)
+        .throttle(2, 200.millis, 0, identity, Shaping)
         .throttle(1, 100.millis, 5, Enforcing)
         .runWith(TestSink.probe[Int])
         .request(5)
@@ -235,7 +275,8 @@ class FlowThrottleSpec extends AkkaSpec {
 
     "handle rate calculation function exception" in Utils.assertAllStagesStopped {
       val ex = new RuntimeException with NoStackTrace
-      Source(1 to 5).throttle(2, 200.millis, 0, (_) ⇒ { throw ex }, Shaping)
+      Source(1 to 5)
+        .throttle(2, 200.millis, 0, (_) ⇒ { throw ex }, Shaping)
         .throttle(1, 100.millis, 5, Enforcing)
         .runWith(TestSink.probe[Int])
         .request(5)

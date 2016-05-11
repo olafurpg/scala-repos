@@ -13,8 +13,8 @@ class ReusableBuildersTest {
     val b = collection.mutable.HashSet.newBuilder[Int]
     b += 3
     b.clear
-    assert(!b.isInstanceOf[collection.mutable.ReusableBuilder[_,_]])
-    assert(b.isInstanceOf[collection.mutable.GrowingBuilder[_,_]])
+    assert(!b.isInstanceOf[collection.mutable.ReusableBuilder[_, _]])
+    assert(b.isInstanceOf[collection.mutable.GrowingBuilder[_, _]])
     assert(b.result == Set[Int]())
   }
 
@@ -30,7 +30,7 @@ class ReusableBuildersTest {
     b.clear
     b += 0f
     val zero = b.result
-    assert(b.isInstanceOf[collection.mutable.ReusableBuilder[_,_]])
+    assert(b.isInstanceOf[collection.mutable.ReusableBuilder[_, _]])
     assert(three.toList == 3 :: Nil)
     assert(sixteen.toList == (1 to 16))
     assert(zero.toList == 0 :: Nil)

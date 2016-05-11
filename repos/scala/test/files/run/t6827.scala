@@ -32,7 +32,6 @@ object Test extends App {
   // okay, see SI-7128
   "...".toIterator.copyToArray(new Array[Char](0), 0, 0)
 
-
   // Bonus test from @som-snytt to check for overflow in
   // index calculations.
   def testOverflow(start: Int, len: Int, expected: List[Char]) {

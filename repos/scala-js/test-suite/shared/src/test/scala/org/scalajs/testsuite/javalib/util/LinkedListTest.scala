@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -45,8 +45,7 @@ class LinkedListTest extends AbstractListTest {
 
     assertEquals(5, ll.size())
 
-    for (i <- 0 until s.size)
-      assertEquals(s(i), ll.poll())
+    for (i <- 0 until s.size) assertEquals(s(i), ll.poll())
 
     assertTrue(ll.isEmpty)
   }
@@ -62,15 +61,16 @@ class LinkedListTest extends AbstractListTest {
     assertEquals(6, ll.size())
   }
 
-  @Test def `could_be_instantiated_with_a_prepopulated_Collection_-_LinkedListTest`(): Unit = {
+  @Test
+  def `could_be_instantiated_with_a_prepopulated_Collection_-_LinkedListTest`(
+      ): Unit = {
     val s = Seq(1, 5, 2, 3, 4)
     val l = asJavaCollection(s)
     val ll = new LinkedList[Int](l)
 
     assertEquals(5, ll.size())
 
-    for (i <- 0 until s.size)
-      assertEquals(s(i), ll.poll())
+    for (i <- 0 until s.size) assertEquals(s(i), ll.poll())
 
     assertTrue(ll.isEmpty)
   }
@@ -184,6 +184,6 @@ class LinkedListFactory extends AbstractListFactory {
   override def implementationName: String =
     "java.util.LinkedList"
 
-  override def empty[E: ClassTag]: LinkedList[E] =
+  override def empty[E : ClassTag]: LinkedList[E] =
     new LinkedList[E]()
 }

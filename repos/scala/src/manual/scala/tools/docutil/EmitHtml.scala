@@ -13,11 +13,12 @@ object EmitHtml {
   val out = Console
 
   def escape(text: String) =
-    text.replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
+    text
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
 
-/* */
+  /* */
   def emitSection(section: Section, depth: Int) {
     def emitPara(text: AbstractText) {
       out println "<div>"
@@ -26,10 +27,10 @@ object EmitHtml {
     }
     def emitText(text: AbstractText) {
       text match {
-        case seq:SeqText =>
+        case seq: SeqText =>
           seq.components foreach emitText
 
-        case seq:SeqPara =>
+        case seq: SeqPara =>
           seq.components foreach emitPara
 
         case Text(text) =>
@@ -69,7 +70,7 @@ object EmitHtml {
           emitText(text)
           out print "\""
 
-        case DefinitionList(definitions @ _*) =>
+        case DefinitionList(definitions @ _ *) =>
           out println "<ins><dl>"
           for (d <- definitions) {
             out println "<dt>"
@@ -82,9 +83,9 @@ object EmitHtml {
           out println "</dl></ins>"
 
         case Link(label, url) =>
-           out.print("<a href=\"" + url + "\">")
-           emitText(label)
-           out print "</a>"
+          out.print("<a href=\"" + url + "\">")
+          emitText(label)
+          out print "</a>"
 
         case _ =>
           sys.error("unknown text node: " + text)
@@ -108,7 +109,7 @@ object EmitHtml {
           out print escape(text)
           out println "</pre>"
 
-        case lst:BulletList =>
+        case lst: BulletList =>
           out println "<ul>"
           for (item <- lst.items) {
             out print "<li>"
@@ -117,7 +118,7 @@ object EmitHtml {
           }
           out println "</ul>"
 
-        case lst:NumberedList =>
+        case lst: NumberedList =>
           out println "<ol>"
           for (item <- lst.items) {
             out print "<li>"
@@ -138,9 +139,8 @@ object EmitHtml {
     }
 
     val name = section.title.replaceAll("\\p{Space}", "_").toLowerCase()
-    out.println("\n<h" + depth + " id=\"" + name + "\">" +
-                section.title +
-                "</h" + depth + ">")
+    out.println("\n<h" + depth + " id=\"" + name + "\">" + section.title +
+        "</h" + depth + ">")
     section.paragraphs foreach emitParagraph
   }
 
@@ -171,15 +171,19 @@ object EmitHtml {
   }
 
   def emitDocument(document: Document) {
-    out.println("<?xml version=\"1.1\" encoding=\"" + document.encoding + "\"?>")
-    out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">")
-    out.println("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n")
+    out.println(
+        "<?xml version=\"1.1\" encoding=\"" + document.encoding + "\"?>")
+    out.println(
+        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">")
+    out.println(
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n")
 
     out println "<head>"
     out.println("<title>" + document.title + " man page</title>")
     out.println("<meta http-equiv=\"Content-Language\" content=\"en\"/>")
-    out.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=" +
-                  document.encoding + "\"/>")
+    out.println(
+        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=" +
+        document.encoding + "\"/>")
     out.println("<meta name=\"Author\" content=\"" + document.author + "\"/>")
     out println "<style type=\"text/css\">"
     out println "  <!--"
@@ -202,14 +206,15 @@ object EmitHtml {
     out println "</html>"
   }
 
-  def main(args: Array[String]) = args match{
-    case Array(classname)           => emitHtml(classname)
-    case Array(classname, file, _*) => emitHtml(classname, new java.io.FileOutputStream(file))
-    case _                          => sys.exit(1)
+  def main(args: Array[String]) = args match {
+    case Array(classname) => emitHtml(classname)
+    case Array(classname, file, _ *) =>
+      emitHtml(classname, new java.io.FileOutputStream(file))
+    case _ => sys.exit(1)
   }
 
   def emitHtml(classname: String, outStream: java.io.OutputStream = out.out) {
-    if(outStream != out.out) out setOut outStream
+    if (outStream != out.out) out setOut outStream
     try {
       val cl = this.getClass.getClassLoader()
       val clasz = cl loadClass classname

@@ -1,6 +1,6 @@
 package mesosphere.marathon.event.http
 
-import mesosphere.marathon.{ MarathonSpec, Protos }
+import mesosphere.marathon.{MarathonSpec, Protos}
 
 class EventSubscribersTest extends MarathonSpec {
 
@@ -30,7 +30,10 @@ class EventSubscribersTest extends MarathonSpec {
   }
 
   test("mergeFromProtoNotEmpty") {
-    val proto = Protos.EventSubscribers.newBuilder().addCallbackUrls("http://localhost:9090/callback").build()
+    val proto = Protos.EventSubscribers
+      .newBuilder()
+      .addCallbackUrls("http://localhost:9090/callback")
+      .build()
     val subscribers = EventSubscribers()
     val mergeResult = subscribers.mergeFromProto(proto)
 

@@ -20,37 +20,37 @@ package org.apache.spark.ml.regression
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.ml.{PredictionModel, Predictor, PredictorParams}
 
-
 /**
- * :: DeveloperApi ::
- *
- * Single-label regression
- *
- * @tparam FeaturesType  Type of input features.  E.g., [[org.apache.spark.mllib.linalg.Vector]]
- * @tparam Learner  Concrete Estimator type
- * @tparam M  Concrete Model type
- */
+  * :: DeveloperApi ::
+  *
+  * Single-label regression
+  *
+  * @tparam FeaturesType  Type of input features.  E.g., [[org.apache.spark.mllib.linalg.Vector]]
+  * @tparam Learner  Concrete Estimator type
+  * @tparam M  Concrete Model type
+  */
 @DeveloperApi
 private[spark] abstract class Regressor[
     FeaturesType,
     Learner <: Regressor[FeaturesType, Learner, M],
     M <: RegressionModel[FeaturesType, M]]
-  extends Predictor[FeaturesType, Learner, M] with PredictorParams {
+    extends Predictor[FeaturesType, Learner, M] with PredictorParams {
 
   // TODO: defaultEvaluator (follow-up PR)
 }
 
 /**
- * :: DeveloperApi ::
- *
- * Model produced by a [[Regressor]].
- *
- * @tparam FeaturesType  Type of input features.  E.g., [[org.apache.spark.mllib.linalg.Vector]]
- * @tparam M  Concrete Model type.
- */
+  * :: DeveloperApi ::
+  *
+  * Model produced by a [[Regressor]].
+  *
+  * @tparam FeaturesType  Type of input features.  E.g., [[org.apache.spark.mllib.linalg.Vector]]
+  * @tparam M  Concrete Model type.
+  */
 @DeveloperApi
-abstract class RegressionModel[FeaturesType, M <: RegressionModel[FeaturesType, M]]
-  extends PredictionModel[FeaturesType, M] with PredictorParams {
+abstract class RegressionModel[
+    FeaturesType, M <: RegressionModel[FeaturesType, M]]
+    extends PredictionModel[FeaturesType, M] with PredictorParams {
 
   // TODO: defaultEvaluator (follow-up PR)
 }

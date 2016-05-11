@@ -8,6 +8,7 @@ object test {
   val richC: RichC = null
   val c: C = null
 
-  /*start*/(richC[Int]("abc"), c("abc"), c[Int](" "))/*end*/
+  /*start*/
+  (richC[Int]("abc"), c("abc"), c[Int](" ")) /*end*/
 }
 // (String, String, String)

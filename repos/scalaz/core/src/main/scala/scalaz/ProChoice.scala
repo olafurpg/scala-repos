@@ -2,8 +2,8 @@ package scalaz
 
 ////
 /**
- * Strength on a coproduct.
- */
+  * Strength on a coproduct.
+  */
 ////
 trait ProChoice[=>:[_, _]] extends Profunctor[=>:] { self =>
   ////
@@ -12,7 +12,9 @@ trait ProChoice[=>:[_, _]] extends Profunctor[=>:] { self =>
   def right[A, B, C](fa: A =>: B): (C \/ A) =>: (C \/ B)
 
   ////
-  val proChoiceSyntax = new scalaz.syntax.ProChoiceSyntax[=>:] { def F = ProChoice.this }
+  val proChoiceSyntax = new scalaz.syntax.ProChoiceSyntax[=>:] {
+    def F = ProChoice.this
+  }
 }
 
 object ProChoice {

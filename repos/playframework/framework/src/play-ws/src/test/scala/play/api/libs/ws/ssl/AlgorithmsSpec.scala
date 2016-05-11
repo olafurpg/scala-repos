@@ -7,7 +7,7 @@ package play.api.libs.ws.ssl
 
 import org.specs2.mutable._
 
-import java.security.{ SecureRandom, KeyPairGenerator }
+import java.security.{SecureRandom, KeyPairGenerator}
 import org.joda.time.Instant
 import play.core.server.ssl.CertificateGenerator
 import sun.security.x509.AlgorithmId
@@ -26,7 +26,13 @@ object AlgorithmsSpec extends Specification {
       val keyGen = KeyPairGenerator.getInstance("RSA")
       keyGen.initialize(1024, new SecureRandom())
       val pair = keyGen.generateKeyPair()
-      val cert = CertificateGenerator.generateCertificate(dn, pair, from.toDate, to.toDate, "SHA1WithRSA", AlgorithmId.sha1WithRSAEncryption_oid)
+      val cert = CertificateGenerator.generateCertificate(
+          dn,
+          pair,
+          from.toDate,
+          to.toDate,
+          "SHA1WithRSA",
+          AlgorithmId.sha1WithRSAEncryption_oid)
 
       // RSA is getModulus.bitLength
       keySize(cert.getPublicKey) must_== Some(1024)
@@ -41,12 +47,17 @@ object AlgorithmsSpec extends Specification {
       val keyGen = KeyPairGenerator.getInstance("DSA")
       keyGen.initialize(1024, new SecureRandom())
       val pair = keyGen.generateKeyPair()
-      val cert = CertificateGenerator.generateCertificate(dn, pair, from.toDate, to.toDate, "SHA1WithDSA", AlgorithmId.sha1WithDSA_oid)
+      val cert =
+        CertificateGenerator.generateCertificate(dn,
+                                                 pair,
+                                                 from.toDate,
+                                                 to.toDate,
+                                                 "SHA1WithDSA",
+                                                 AlgorithmId.sha1WithDSA_oid)
 
       // DSA is getP.bitLength
       keySize(cert.getPublicKey) must_== Some(1024)
     }
-
   }
 
   "decompose" should {
@@ -60,17 +71,18 @@ object AlgorithmsSpec extends Specification {
     }
 
     "decompose SHA1" in {
-      decomposes("SHA1WithRSA") must containTheSameElementsAs(Seq("SHA1", "SHA-1", "RSA"))
+      decomposes("SHA1WithRSA") must containTheSameElementsAs(
+          Seq("SHA1", "SHA-1", "RSA"))
     }
 
     "map SHA-1 to SHA1" in {
-      decomposes("SHA-1WithRSA") must containTheSameElementsAs(Seq("SHA1", "SHA-1", "RSA"))
+      decomposes("SHA-1WithRSA") must containTheSameElementsAs(
+          Seq("SHA1", "SHA-1", "RSA"))
     }
 
     "decompose SHA256" in {
-      decomposes("SHA256WithRSA") must containTheSameElementsAs(Seq("SHA256", "RSA"))
+      decomposes("SHA256WithRSA") must containTheSameElementsAs(
+          Seq("SHA256", "RSA"))
     }
-
   }
-
 }

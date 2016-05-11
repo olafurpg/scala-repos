@@ -1,5 +1,6 @@
 class NamedAndDefaultArgsTest extends NamedAndDefaultArgs {
-  override def foo(i: Int = 1, j: Int, s: String = "aaa", b: Boolean) = super.foo(i, j, s, b)
+  override def foo(i: Int = 1, j: Int, s: String = "aaa", b: Boolean) =
+    super.foo(i, j, s, b)
 
   foo(j = 1, b = true)
   this foo (0, 1, b = true, s = "bbb")

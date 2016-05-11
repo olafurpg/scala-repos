@@ -7,16 +7,19 @@ import com.codahale.metrics.MetricRegistry
 import com.twitter.common.zookeeper.Candidate
 import mesosphere.marathon.metrics.Metrics
 import org.mockito.Mockito
-import org.scalatest.{ Matchers, GivenWhenThen }
+import org.scalatest.{Matchers, GivenWhenThen}
 
-class MarathonLeaderInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
+class MarathonLeaderInfoTest
+    extends MarathonSpec with GivenWhenThen with Matchers {
   class Fixture {
     lazy val candidate = mock[Candidate]
     lazy val maybeCandidate = Some(candidate)
     lazy val leader = new AtomicBoolean(false)
     lazy val eventStream = new EventStream()
-    lazy val metrics = new MarathonLeaderInfoMetrics(new Metrics(new MetricRegistry))
-    lazy val leaderInfo = new MarathonLeaderInfo(maybeCandidate, leader, eventStream, metrics)
+    lazy val metrics = new MarathonLeaderInfoMetrics(
+        new Metrics(new MetricRegistry))
+    lazy val leaderInfo = new MarathonLeaderInfo(
+        maybeCandidate, leader, eventStream, metrics)
 
     def verifyNoMoreInteractions(): Unit = {
       Mockito.verifyNoMoreInteractions(candidate)

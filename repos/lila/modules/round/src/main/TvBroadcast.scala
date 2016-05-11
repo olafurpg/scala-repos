@@ -28,10 +28,11 @@ private final class TvBroadcast extends Actor {
       channel push msg
 
     case move: MoveEvent if Some(move.gameId) == featuredId =>
-      channel push makeMessage("fen", Json.obj(
-        "fen" -> move.fen,
-        "lm" -> move.move
-      ))
+      channel push makeMessage("fen",
+                               Json.obj(
+                                   "fen" -> move.fen,
+                                   "lm" -> move.move
+                               ))
   }
 }
 

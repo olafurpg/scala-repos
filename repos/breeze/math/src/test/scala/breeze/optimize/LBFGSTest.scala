@@ -13,7 +13,7 @@ package breeze.optimize
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. 
-*/
+ */
 
 import org.scalatest._
 import org.scalatest.junit._
@@ -27,7 +27,7 @@ import breeze.linalg._
 class LBFGSTest extends OptimizeTestBase {
 
   test("optimize a simple multivariate gaussian") {
-    val lbfgs = new LBFGS[DenseVector[Double]](100,4)
+    val lbfgs = new LBFGS[DenseVector[Double]](100, 4)
 
     def optimizeThis(init: DenseVector[Double]) = {
       val f = new DiffFunction[DenseVector[Double]] {
@@ -36,35 +36,32 @@ class LBFGSTest extends OptimizeTestBase {
         }
       }
 
-      val result = lbfgs.minimize(f,init) 
-      norm(result - 3.0,2) < 1E-10
+      val result = lbfgs.minimize(f, init)
+      norm(result - 3.0, 2) < 1E-10
     }
 
     check(Prop.forAll(optimizeThis _))
-
   }
 
   test("optimize a simple multivariate gaussian with counters") {
-    val lbfgsString = new LBFGS[Counter[String,Double]](1000,4)
+    val lbfgsString = new LBFGS[Counter[String, Double]](1000, 4)
 
-    def optimizeThis(init: Counter[String,Double]) = {
-      val f = new DiffFunction[Counter[String,Double]] {
-        def calculate(x: Counter[String,Double]) = {
-          ((x - 3.0) dot (x - 3.0),(x :* 2.0) - 6.0)
+    def optimizeThis(init: Counter[String, Double]) = {
+      val f = new DiffFunction[Counter[String, Double]] {
+        def calculate(x: Counter[String, Double]) = {
+          ((x - 3.0) dot (x - 3.0), (x :* 2.0) - 6.0)
         }
       }
 
-      val result = lbfgsString.minimize(f,init)
-      norm(result - 3.0,2) < 1E-5
+      val result = lbfgsString.minimize(f, init)
+      norm(result - 3.0, 2) < 1E-5
     }
 
-    check(Prop.forAll(optimizeThis _ ))
-
+    check(Prop.forAll(optimizeThis _))
   }
 
-
   test("optimize a simple multivariate gaussian with l2 regularization") {
-    val lbfgs = new LBFGS[DenseVector[Double]](10000,4)
+    val lbfgs = new LBFGS[DenseVector[Double]](10000, 4)
 
     def optimizeThis(init: DenseVector[Double]) = {
       val f = new DiffFunction[DenseVector[Double]] {
@@ -74,19 +71,19 @@ class LBFGSTest extends OptimizeTestBase {
       }
 
       val targetValue = 3 / (1.0 / 2 + 1)
-      val result = lbfgs.minimize(DiffFunction.withL2Regularization(f, 1.0),init)
-      val ok = norm(result :- (DenseVector.ones[Double](init.size) :* targetValue),2)/result.size < 3E-3
-      ok || (throw new RuntimeException("Failed to find optimum for init " + init))
+      val result =
+        lbfgs.minimize(DiffFunction.withL2Regularization(f, 1.0), init)
+      val ok =
+        norm(result :- (DenseVector.ones[Double](init.size) :* targetValue), 2) / result.size < 3E-3
+      ok ||
+      (throw new RuntimeException("Failed to find optimum for init " + init))
     }
 
     check(Prop.forAll(optimizeThis _))
+  }
 
-   }
-
-
-
-   test("lbfgs-c rosenbroch example") {
-    val lbfgs = new LBFGS[DenseVector[Double]](40,6)
+  test("lbfgs-c rosenbroch example") {
+    val lbfgs = new LBFGS[DenseVector[Double]](40, 6)
 
     def optimizeThis(init: DenseVector[Double]) = {
       val f = new DiffFunction[DenseVector[Double]] {
@@ -95,36 +92,29 @@ class LBFGSTest extends OptimizeTestBase {
           var fx = 0.0
           val g = DenseVector.zeros[Double](x.length)
 
-          for(i <- 0 until x.length by 2) {
+          for (i <- 0 until x.length by 2) {
             val t1 = 1.0 - x(i)
-            val t2 = 10.0 * (x(i+1) - (x(i) * x(i)))
-            g(i+1) = 20 * t2
-            g(i) = -2 * (x(i) * g(i+1) + t1)
+            val t2 = 10.0 * (x(i + 1) - (x(i) * x(i)))
+            g(i + 1) = 20 * t2
+            g(i) = -2 * (x(i) * g(i + 1) + t1)
             fx += t1 * t1 + t2 * t2
-
           }
           fx -> g
-
         }
       }
 
       val targetValue = 1.0
 
-      val result = lbfgs.minimize(f,init)
+      val result = lbfgs.minimize(f, init)
 
-      val ok = norm(result :- DenseVector.ones[Double](init.size) * targetValue,2)/result.size < 1E-5
-      ok || (throw new RuntimeException("Failed to find optimum for init " + init))
+      val ok =
+        norm(result :- DenseVector.ones[Double](init.size) * targetValue, 2) / result.size < 1E-5
+      ok ||
+      (throw new RuntimeException("Failed to find optimum for init " + init))
     }
     val init = DenseVector.zeros[Double](100)
     init(0 until init.length by 2) := -1.2
     init(1 until init.length by 2) := 1.0
     assert(optimizeThis(init))
-
-
-   }
-
-
-
-
+  }
 }
-

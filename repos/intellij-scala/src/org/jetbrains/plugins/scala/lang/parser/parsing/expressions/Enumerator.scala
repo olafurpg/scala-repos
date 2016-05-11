@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.patterns.{Guard, Pattern1}
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
 /*
  * Enumerator ::= Generator
  *              | Guard

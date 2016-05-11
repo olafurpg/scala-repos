@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.linker
 
@@ -17,13 +16,13 @@ import org.scalajs.core.tools.javascript.ESLevel
 import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
 
 /** A box around a [[GenLinker]] to support clearing.
- *
- *  This further supports:
- *  - batch mode (clearing after every operation)
- *  - clearing if linker throws
- *
- *  This class is not thread-safe.
- */
+  *
+  *  This further supports:
+  *  - batch mode (clearing after every operation)
+  *  - clearing if linker throws
+  *
+  *  This class is not thread-safe.
+  */
 final class ClearableLinker(newLinker: () => GenLinker, batchMode: Boolean)
     extends GenLinker {
 
@@ -42,12 +41,14 @@ final class ClearableLinker(newLinker: () => GenLinker, batchMode: Boolean)
   }
 
   def linkUnit(irFiles: Seq[VirtualScalaJSIRFile],
-      symbolRequirements: SymbolRequirement, logger: Logger): LinkingUnit = {
+               symbolRequirements: SymbolRequirement,
+               logger: Logger): LinkingUnit = {
     linkerOp(_.linkUnit(irFiles, symbolRequirements, logger))
   }
 
   def link(irFiles: Seq[VirtualScalaJSIRFile],
-      output: WritableVirtualJSFile, logger: Logger): Unit = {
+           output: WritableVirtualJSFile,
+           logger: Logger): Unit = {
     linkerOp(_.link(irFiles, output, logger))
   }
 
@@ -67,8 +68,7 @@ final class ClearableLinker(newLinker: () => GenLinker, batchMode: Boolean)
         throw t
     } finally {
       // Clear if we are in batch mode
-      if (batchMode)
-        clear()
+      if (batchMode) clear()
     }
   }
 
@@ -77,15 +77,12 @@ final class ClearableLinker(newLinker: () => GenLinker, batchMode: Boolean)
     if (_linker == null) {
       val candidate = newLinker()
 
-      if (_semantics == null)
-        _semantics = candidate.semantics
+      if (_semantics == null) _semantics = candidate.semantics
       else
         require(_semantics == candidate.semantics, "Linker changed Semantics")
 
-      if (_esLevel == null)
-        _esLevel = candidate.esLevel
-      else
-        require(_esLevel == candidate.esLevel, "Linker changed ESLevel")
+      if (_esLevel == null) _esLevel = candidate.esLevel
+      else require(_esLevel == candidate.esLevel, "Linker changed ESLevel")
 
       _linker = candidate
     }

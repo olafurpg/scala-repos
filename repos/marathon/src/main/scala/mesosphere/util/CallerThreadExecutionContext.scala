@@ -17,5 +17,6 @@ object CallerThreadExecutionContext {
     override def execute(command: Runnable): Unit = command.run()
   }
 
-  implicit lazy val callerThreadExecutionContext = ExecutionContext.fromExecutor(executor)
+  implicit lazy val callerThreadExecutionContext =
+    ExecutionContext.fromExecutor(executor)
 }

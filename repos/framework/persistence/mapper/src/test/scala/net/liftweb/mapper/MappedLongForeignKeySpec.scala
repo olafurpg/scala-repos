@@ -22,11 +22,11 @@ import org.specs2.mutable.Specification
 import common._
 import util._
 
-
 /**
- * Systems under specification for MappedLongForeignKey.
- */
-object MappedLongForeignKeySpec extends Specification with org.specs2.specification.BeforeExample {
+  * Systems under specification for MappedLongForeignKey.
+  */
+object MappedLongForeignKeySpec
+    extends Specification with org.specs2.specification.BeforeExample {
   "MappedLongForeignKey Specification".title
   sequential
 
@@ -38,11 +38,13 @@ object MappedLongForeignKeySpec extends Specification with org.specs2.specificat
   def before = MapperSpecsModel.cleanup()
 
   "MappedLongForeignKey" should {
-      (try {
-        provider.setupDB
-      } catch {
-        case e if !provider.required_? => 1 must be_==(2).orSkip("Provider %s not available: %s".format(provider, e))
-      }) must not(throwA[Exception]).orSkip
+    (try {
+      provider.setupDB
+    } catch {
+      case e if !provider.required_? =>
+        1 must be_==(2).orSkip(
+            "Provider %s not available: %s".format(provider, e))
+    }) must not(throwA[Exception]).orSkip
 
     "Not allow comparison to another FK" in {
       val dog = Dog.create.name("Froo").saveMe
@@ -68,22 +70,21 @@ object MappedLongForeignKeySpec extends Specification with org.specs2.specificat
       dog.owner(user)
       dog.owner.obj.isDefined must beTrue
     }
-    
+
     "be primed after setting a Boxed reference" in {
       val dog = Dog.create
       val user = User.create
       dog.owner(Full(user))
       dog.owner.obj.isDefined must beTrue
     }
-    
+
     "be empty after setting an Empty" in {
       val user = User.create
       val dog = Dog.create.owner(user)
       dog.owner(Empty)
-      
+
       dog.owner.obj must_== Empty
       dog.owner.get must_== 0L
     }
   }
 }
-

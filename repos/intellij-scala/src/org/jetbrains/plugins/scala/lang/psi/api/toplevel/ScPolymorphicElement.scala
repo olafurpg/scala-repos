@@ -5,7 +5,7 @@ package api
 package toplevel
 
 /**
- * @author ven
- */
-trait ScPolymorphicElement extends ScTypeParametersOwner with ScTypeBoundsOwner with ScNamedElement {
-}
+  * @author ven
+  */
+trait ScPolymorphicElement
+    extends ScTypeParametersOwner with ScTypeBoundsOwner with ScNamedElement {}

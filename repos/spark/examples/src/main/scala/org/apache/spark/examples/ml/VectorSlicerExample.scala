@@ -39,12 +39,15 @@ object VectorSlicerExample {
 
     val defaultAttr = NumericAttribute.defaultAttr
     val attrs = Array("f1", "f2", "f3").map(defaultAttr.withName)
-    val attrGroup = new AttributeGroup("userFeatures", attrs.asInstanceOf[Array[Attribute]])
+    val attrGroup = new AttributeGroup(
+        "userFeatures", attrs.asInstanceOf[Array[Attribute]])
 
     val dataRDD = sc.parallelize(data)
-    val dataset = sqlContext.createDataFrame(dataRDD, StructType(Array(attrGroup.toStructField())))
+    val dataset = sqlContext.createDataFrame(
+        dataRDD, StructType(Array(attrGroup.toStructField())))
 
-    val slicer = new VectorSlicer().setInputCol("userFeatures").setOutputCol("features")
+    val slicer =
+      new VectorSlicer().setInputCol("userFeatures").setOutputCol("features")
 
     slicer.setIndices(Array(1)).setNames(Array("f3"))
     // or slicer.setIndices(Array(1, 2)), or slicer.setNames(Array("f2", "f3"))

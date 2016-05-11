@@ -3,14 +3,13 @@ package codeInsight.intention.types
 
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
-class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
+class ConvertScalaToJavaCollectionIntentionTest
+    extends ScalaIntentionTestBase {
 
   def familyName: String = ConvertScalaToJavaCollectionIntention.getFamilyName
 
-
   def testIntentionIsAvailable() {
-    checkIntentionIsAvailable(
-      """
+    checkIntentionIsAvailable("""
         |class UsesScalaCollections {
         |  val list = N<caret>il
         |}
@@ -19,7 +18,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
 
   def testIntentionIsAvailable2() {
     checkIntentionIsAvailable(
-      """
+        """
         |class UsesScalaCollections {
         |  val list = List(1,2,3)
         |  val javaList = lis<caret>t
@@ -30,7 +29,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
 
   def testIntentionIsAvailable_MutableMap() {
     checkIntentionIsAvailable(
-      """
+        """
         |import scala.collection.mutable
         |
         |class UsesScalaCollections {
@@ -43,7 +42,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
 
   def testIntentionIsAvailable_Seq() {
     checkIntentionIsAvailable(
-      """
+        """
         |class UsesScalaCollections {
         |  val seq = Seq("1")
         |  val javaList = se<caret>q
@@ -54,7 +53,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
 
   def testIntentionIsAvailable_Set() {
     checkIntentionIsAvailable(
-      """
+        """
         |class UsesScalaCollections {
         |  val set = Set("1")
         |  val javaSet = se<caret>t
@@ -65,7 +64,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
 
   def testIntentionIsAvailable_Iterator() {
     checkIntentionIsAvailable(
-      """
+        """
         |class UsesScalaCollections {
         |  val iter = Iterator(1)
         |  val javaIter = it<caret>er
@@ -76,7 +75,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
 
   def testIntentionIsAvailable_Iterable() {
     checkIntentionIsAvailable(
-      """
+        """
         |class UsesScalaCollections {
         |  val iter = Iterable(1)
         |  val javaIter = it<caret>er
@@ -86,8 +85,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testIntentionIsNotAvailable() {
-    checkIntentionIsNotAvailable(
-      """
+    checkIntentionIsNotAvailable("""
         |import scala.collection.JavaConverters._
         |
         |class UsesScalaCollections {
@@ -97,8 +95,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testIntentionIsNotAvailable2() {
-    checkIntentionIsNotAvailable(
-      """
+    checkIntentionIsNotAvailable("""
         |import scala.collection.JavaConverters._
         |
         |class UsesScalaCollections {
@@ -109,16 +106,14 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testIntentionAction_Simple() {
-    val text =
-      """
+    val text = """
         |import scala.collection.immutable
         |
         |class UsesScalaCollections {
         |  val map = immutable.HashMap<caret>("1" -> 1)
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |import scala.collection.JavaConverters._
         |import scala.collection.immutable
         |
@@ -131,8 +126,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testIntentionAction_Import_Already_Exists() {
-    val text =
-      """
+    val text = """
         |import scala.collection.mutable
         |import scala.collection.JavaConverters._
         |
@@ -140,8 +134,7 @@ class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
         |  val map = mutable.HashMap<caret>(1 -> "1")
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |import scala.collection.mutable
         |import scala.collection.JavaConverters._
         |

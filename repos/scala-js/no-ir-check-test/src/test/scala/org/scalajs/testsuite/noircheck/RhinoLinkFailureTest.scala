@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.noircheck
 
@@ -13,8 +13,7 @@ import scala.scalajs.js
 
 object RhinoLinkFailureTest extends JasmineTest {
 
-  when("rhino").
-  describe("Rhino Linking") {
+  when("rhino").describe("Rhino Linking") {
 
     it("should throw an exception if it fails loading a class") {
 
@@ -28,7 +27,5 @@ object RhinoLinkFailureTest extends JasmineTest {
           expect(e.toString).toContain("sc_parallel_Splitter$")
       }
     }
-
   }
-
 }

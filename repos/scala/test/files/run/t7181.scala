@@ -18,9 +18,7 @@ case class CaughtException(action: Action) extends RuntimeException
 object Test extends App {
   def test(action: Action, expectException: Boolean = false) {
     var gotException = false
-    val result = try
-      driver(action)
-    catch {
+    val result = try driver(action) catch {
       case UncaughtException(a) =>
         gotException = true
         a
@@ -49,19 +47,20 @@ object Test extends App {
           throw CaughtException(action)
       }
     } catch {
-      case CaughtException(action) => action match {
-        case ExceptionNormalExit =>
-          println(s"normal exit $action")
-          action
-        case ExceptionReturn =>
-          println(s"return $action")
-          return action
-        case ExceptionUncaughtException =>
-          println(s"uncaught exception $action")
-          throw UncaughtException(action)
-        case _ =>
-          sys.error(s"unexpected $action in exception handler")
-      }
+      case CaughtException(action) =>
+        action match {
+          case ExceptionNormalExit =>
+            println(s"normal exit $action")
+            action
+          case ExceptionReturn =>
+            println(s"return $action")
+            return action
+          case ExceptionUncaughtException =>
+            println(s"uncaught exception $action")
+            throw UncaughtException(action)
+          case _ =>
+            sys.error(s"unexpected $action in exception handler")
+        }
     } finally {
       println(s"finally $action")
     }

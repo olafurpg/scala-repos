@@ -39,10 +39,10 @@ import scalafx.beans.property._
 import scalafx.delegate.SFXDelegate
 
 /**
- * Bindings Spec tests.
- *
- *
- */
+  * Bindings Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
   def bean = new Object()
@@ -81,7 +81,8 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   "BindingIncludes" should "support min" in {
-    doubleProperty1 <== min(doubleProperty2, doubleProperty3, 25, 26l, 27f, 28d)
+    doubleProperty1 <==
+      min(doubleProperty2, doubleProperty3, 25, 26l, 27f, 28d)
     doubleProperty1() should equal(0)
     doubleProperty2() = 50
     doubleProperty3() = 43
@@ -89,7 +90,8 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
   }
 
   "BindingIncludes" should "support max" in {
-    doubleProperty1 <== max(doubleProperty2, doubleProperty3, 25, 26l, 27f, 28d)
+    doubleProperty1 <==
+      max(doubleProperty2, doubleProperty3, 25, 26l, 27f, 28d)
     doubleProperty1() should equal(28)
     doubleProperty2() = 50
     doubleProperty3() = 43
@@ -101,24 +103,31 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
     longProperty1() = 10
     floatProperty1() = 15
     doubleProperty1() = 30
-    doubleProperty2 <== when(booleanProperty1) choose 31 otherwise integerProperty1
+    doubleProperty2 <==
+      when(booleanProperty1) choose 31 otherwise integerProperty1
     doubleProperty2() should equal(5)
-    doubleProperty2 <== when(booleanProperty1) choose 31 otherwise longProperty1
+    doubleProperty2 <==
+      when(booleanProperty1) choose 31 otherwise longProperty1
     doubleProperty2() should equal(10)
-    doubleProperty2 <== when(booleanProperty1) choose 31 otherwise floatProperty1
+    doubleProperty2 <==
+      when(booleanProperty1) choose 31 otherwise floatProperty1
     doubleProperty2() should equal(15)
-    doubleProperty2 <== when(booleanProperty1) choose 31 otherwise doubleProperty1
+    doubleProperty2 <==
+      when(booleanProperty1) choose 31 otherwise doubleProperty1
     doubleProperty2() should equal(30)
   }
 
   it should "support `when .. choose .. otherwise with all number/property combinations" in {
     doubleProperty2() = 15
     doubleProperty3() = 30
-    doubleProperty1 <== when(booleanProperty1) choose doubleProperty2 otherwise doubleProperty3
+    doubleProperty1 <==
+      when(booleanProperty1) choose doubleProperty2 otherwise doubleProperty3
     doubleProperty1() should equal(30)
-    doubleProperty1 <== when(booleanProperty1) choose doubleProperty2 otherwise 15d
+    doubleProperty1 <==
+      when(booleanProperty1) choose doubleProperty2 otherwise 15d
     doubleProperty1() should equal(15)
-    doubleProperty1 <== when(booleanProperty1) choose 25d otherwise doubleProperty3
+    doubleProperty1 <==
+      when(booleanProperty1) choose 25d otherwise doubleProperty3
     doubleProperty1() should equal(30)
   }
 
@@ -135,22 +144,28 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
 
   it should "support `when .. choose .. otherwise` with boolean types" in {
     booleanProperty3() = true
-    booleanProperty1 <== when(booleanProperty2) choose booleanProperty2 otherwise booleanProperty3
+    booleanProperty1 <==
+      when(booleanProperty2) choose booleanProperty2 otherwise booleanProperty3
     booleanProperty1() should be(true)
-    booleanProperty1 <== when(booleanProperty2) choose booleanProperty2 otherwise false
+    booleanProperty1 <==
+      when(booleanProperty2) choose booleanProperty2 otherwise false
     booleanProperty1() should be(false)
-    booleanProperty1 <== when(booleanProperty2) choose true otherwise booleanProperty3
+    booleanProperty1 <==
+      when(booleanProperty2) choose true otherwise booleanProperty3
     booleanProperty1() should be(true)
   }
 
   it should "support `when .. choose .. otherwise` with string types" in {
     stringProperty2() = "Hello"
     stringProperty3() = "World"
-    stringProperty1 <== when(booleanProperty1) choose stringProperty3 otherwise stringProperty2
+    stringProperty1 <==
+      when(booleanProperty1) choose stringProperty3 otherwise stringProperty2
     stringProperty1() should equal("Hello")
-    stringProperty1 <== when(booleanProperty1) choose "string before" otherwise stringProperty3
+    stringProperty1 <==
+      when(booleanProperty1) choose "string before" otherwise stringProperty3
     stringProperty1() should equal("World")
-    stringProperty1 <== when(booleanProperty1) choose stringProperty2 otherwise "string after"
+    stringProperty1 <==
+      when(booleanProperty1) choose stringProperty2 otherwise "string after"
     stringProperty1() should equal("string after")
   }
 
@@ -160,11 +175,14 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
     val obj3 = new Object()
     objectProperty2() = obj2
     objectProperty3() = obj3
-    objectProperty1 <== when(booleanProperty1) choose objectProperty2 otherwise objectProperty3
+    objectProperty1 <==
+      when(booleanProperty1) choose objectProperty2 otherwise objectProperty3
     objectProperty1() should equal(obj3)
-    objectProperty1 <== when(booleanProperty1) choose obj1 otherwise objectProperty2
+    objectProperty1 <==
+      when(booleanProperty1) choose obj1 otherwise objectProperty2
     objectProperty1() should equal(obj2)
-    objectProperty1 <== when(booleanProperty1) choose objectProperty2 otherwise obj1
+    objectProperty1 <==
+      when(booleanProperty1) choose objectProperty2 otherwise obj1
     objectProperty1() should equal(obj1)
   }
 
@@ -177,12 +195,14 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
       def getWidth: Double = widthProperty.getValue
       def setWidth(v: Double) = widthProperty.setValue(v)
     }
-    class DoublePropertySFX(val delegate: DoubleHolderJFX = new DoubleHolderJFX())
-      extends SFXDelegate[DoubleHolderJFX] {
+    class DoublePropertySFX(
+        val delegate: DoubleHolderJFX = new DoubleHolderJFX())
+        extends SFXDelegate[DoubleHolderJFX] {
       val width: DoubleProperty = delegate.widthProperty
     }
 
-    val dp1 = new ObjectProperty[DoubleHolderJFX](this, "level 2 property", new DoubleHolderJFX())
+    val dp1 = new ObjectProperty[DoubleHolderJFX](
+        this, "level 2 property", new DoubleHolderJFX())
     val prop2 = new DoubleProperty(this, "prop2", 0.0)
     prop2() should equal(0.0)
 
@@ -193,14 +213,14 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
     prop2() should equal(3.0)
   }
 
-
   it should "support that select* funk..." is (pending)
 
   it should "support string conversions from everything..." is (pending)
 
   it should "support implicit upconversions to expressions..." is (pending)
 
-  it should "support raw javafx mixing (make sure all the implicits are in place)" is (pending)
+  it should "support raw javafx mixing (make sure all the implicits are in place)" is
+  (pending)
 
   it should "test the SFX 'any' special cases" is (pending)
 }

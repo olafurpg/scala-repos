@@ -36,13 +36,13 @@ object MemcachedClientPipelineFactory extends ChannelPipelineFactory {
 }
 
 object MemcachedServerPipelineFactory extends ChannelPipelineFactory {
-  private val storageCommands = collection.Set[ChannelBuffer](
-    "set", "add", "replace", "append", "prepend")
+  private val storageCommands =
+    collection.Set[ChannelBuffer]("set", "add", "replace", "append", "prepend")
 
   def getPipeline() = {
     val pipeline = Channels.pipeline()
 
-  //        pipeline.addLast("exceptionHandler", new ExceptionHandler)
+    //        pipeline.addLast("exceptionHandler", new ExceptionHandler)
 
     pipeline.addLast("decoder", new ServerDecoder(storageCommands))
     pipeline.addLast("decoding2command", new DecodingToCommand)
@@ -65,8 +65,11 @@ class Memcached extends CodecFactory[Command, Response] {
       def pipelineFactory = MemcachedClientPipelineFactory
 
       // pass every request through a filter to create trace data
-      override def prepareConnFactory(underlying: ServiceFactory[Command, Response], params: Stack.Params) =
-        new MemcachedLoggingFilter(params[param.Stats].statsReceiver).andThen(underlying)
+      override def prepareConnFactory(
+          underlying: ServiceFactory[Command, Response],
+          params: Stack.Params) =
+        new MemcachedLoggingFilter(params[param.Stats].statsReceiver)
+          .andThen(underlying)
 
       override def newTraceInitializer = MemcachedTraceInitializer.Module
     }
@@ -76,9 +79,9 @@ class Memcached extends CodecFactory[Command, Response] {
 }
 
 /**
- * Adds tracing information for each memcached request.
- * Including command name, when request was sent and when it was received.
- */
+  * Adds tracing information for each memcached request.
+  * Including command name, when request was sent and when it was received.
+  */
 private class MemcachedTracingFilter extends SimpleFilter[Command, Response] {
   def apply(command: Command, service: Service[Command, Response]) = {
     Trace.recordServiceName("memcached")
@@ -87,11 +90,12 @@ private class MemcachedTracingFilter extends SimpleFilter[Command, Response] {
 
     val response = service(command)
     if (Trace.isActivelyTracing) {
-      response onSuccess  {
+      response onSuccess {
         case Values(values) =>
           command match {
             case cmd: RetrievalCommand =>
-              val keys: immutable.Set[String] = immutable.Set(cmd.keys map { case Buf.Utf8(s) => s }: _*)
+              val keys: immutable.Set[String] =
+                immutable.Set(cmd.keys map { case Buf.Utf8(s) => s }: _*)
               val hits = values.map {
                 case value =>
                   val Buf.Utf8(keyStr) = value.key
@@ -99,10 +103,12 @@ private class MemcachedTracingFilter extends SimpleFilter[Command, Response] {
                   keyStr
               }
               val misses: immutable.Set[String] = keys -- hits
-              misses foreach { k: String => Trace.recordBinary(k, "Miss") }
-              case _ =>
+              misses foreach { k: String =>
+                Trace.recordBinary(k, "Miss")
+              }
+            case _ =>
           }
-        case _  =>
+        case _ =>
       } ensure {
         Trace.record(Annotation.ClientRecv())
       }
@@ -112,28 +118,21 @@ private class MemcachedTracingFilter extends SimpleFilter[Command, Response] {
 }
 
 private class MemcachedLoggingFilter(stats: StatsReceiver)
-  extends SimpleFilter[Command, Response] {
+    extends SimpleFilter[Command, Response] {
 
   private[this] val serviceName = "memcached"
 
   private[this] val error = stats.scope("error")
-  private[this] val succ  = stats.scope("success")
+  private[this] val succ = stats.scope("success")
 
   override def apply(command: Command, service: Service[Command, Response]) = {
     service(command) map { response =>
       response match {
-        case NotFound()
-          | Stored()
-          | NotStored()
-          | Exists()
-          | Deleted()
-          | NoOp()
-          | Info(_, _)
-          | InfoLines(_)
-          | Values(_)
-          | Number(_)      => succ.counter(command.name).incr()
-        case Error(_)      => error.counter(command.name).incr()
-        case _             => error.counter(command.name).incr()
+        case NotFound() | Stored() | NotStored() | Exists() | Deleted() |
+            NoOp() | Info(_, _) | InfoLines(_) | Values(_) | Number(_) =>
+          succ.counter(command.name).incr()
+        case Error(_) => error.counter(command.name).incr()
+        case _ => error.counter(command.name).incr()
       }
       response
     }

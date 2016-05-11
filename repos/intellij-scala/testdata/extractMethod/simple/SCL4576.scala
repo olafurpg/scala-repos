@@ -4,7 +4,7 @@ object SCL4576 {
 
   def foo() {
     val x = 1
-/*start*/
+    /*start*/
     //some text
     print(x + zz)
 /*end*/
@@ -27,4 +27,4 @@ object SCL4576 {
     print(x + zz)
   }
 }
-*/
+ */

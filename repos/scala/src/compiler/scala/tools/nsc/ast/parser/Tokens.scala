@@ -9,14 +9,16 @@ package ast.parser
 object Tokens extends CommonTokens {
   final val STRINGPART = 7 // a part of an interpolated string
   final val SYMBOLLIT = 8
-  final val INTERPOLATIONID = 9 // the lead identifier of an interpolated string
+  final val INTERPOLATIONID =
+    9 // the lead identifier of an interpolated string
 
   def isLiteral(code: Int) = code >= CHARLIT && code <= INTERPOLATIONID
 
   /** identifiers */
   final val IDENTIFIER = 10
   final val BACKQUOTED_IDENT = 11
-  def isIdentifier(code: Int) = code == IDENTIFIER || code == BACKQUOTED_IDENT // used by ide
+  def isIdentifier(code: Int) =
+    code == IDENTIFIER || code == BACKQUOTED_IDENT // used by ide
 
   /** modifiers */
   final val IMPLICIT = 40

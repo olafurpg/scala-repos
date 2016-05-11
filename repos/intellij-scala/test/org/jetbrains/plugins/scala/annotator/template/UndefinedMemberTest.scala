@@ -3,9 +3,8 @@ package org.jetbrains.plugins.scala.annotator.template
 import org.jetbrains.plugins.scala.annotator.{AnnotatorTestBase, Error}
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class UndefinedMemberTest extends AnnotatorTestBase(UndefinedMember) {
   def testValidHolders() {
     assertNothing(messages("class C { def f }"))

@@ -41,24 +41,28 @@ import org.joda.time.DateTime
 
 import scalaz._
 
-trait TestJobService extends BlueEyesServiceSpecification with JobService with AkkaDefaults {
+trait TestJobService
+    extends BlueEyesServiceSpecification with JobService with AkkaDefaults {
   type JobResource = Unit
 
-  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(20, Duration(5, "seconds"))
+  override implicit val defaultFutureTimeouts: FutureTimeouts = FutureTimeouts(
+      20, Duration(5, "seconds"))
   val validAPIKey = "secret"
 
   lazy val executionContext = defaultFutureDispatch
-  implicit lazy val M: Monad[Future] with Comonad[Future] = new UnsafeFutureComonad(executionContext, Duration(10, "seconds"))
+  implicit lazy val M: Monad[Future] with Comonad[Future] =
+    new UnsafeFutureComonad(executionContext, Duration(10, "seconds"))
 
   lazy val shortFutureTimeouts = FutureTimeouts(5, Duration(50, "millis"))
 
   lazy val clock = blueeyes.util.Clock.System
   lazy val jobs = new InMemoryJobManager[Future]
 
-  def jobManager(config: Configuration): (Unit, JobManager[Future]) = ((), jobs)
+  def jobManager(config: Configuration): (Unit, JobManager[Future]) =
+    ((), jobs)
 
-
-  def authService(config: Configuration): AuthService[Future] = TestAuthService[Future](Set(validAPIKey))
+  def authService(config: Configuration): AuthService[Future] =
+    TestAuthService[Future](Set(validAPIKey))
 
   def close(u: Unit): Future[Unit] = Future { u }
 }
@@ -66,77 +70,108 @@ trait TestJobService extends BlueEyesServiceSpecification with JobService with A
 class JobServiceSpec extends TestJobService {
   import scalaz.syntax.comonad._
   import DefaultBijections._
-  import blueeyes.json.serialization.DefaultSerialization.{ DateTimeDecomposer => _, DateTimeExtractor => _, _ }
+  import blueeyes.json.serialization.DefaultSerialization.{DateTimeDecomposer => _, DateTimeExtractor => _, _}
   import JobState._
 
   val JSON = MimeTypes.application / MimeTypes.json
 
   val jobsClient = client.contentType[ByteChunk](JSON).path("/jobs/v1/")
 
-  val simpleJob: JValue = JObject(List(
-    JField("name", JString("abc")),
-    JField("type", JString("cba"))
-  ))
+  val simpleJob: JValue = JObject(
+      List(
+          JField("name", JString("abc")),
+          JField("type", JString("cba"))
+      ))
 
-  val jobWithData: JValue = JObject(List(
-    JField("name", JString("xyz")),
-    JField("type", JString("zyx")),
-    JField("data", JObject(JField("x", JNum(1))))
-  ))
+  val jobWithData: JValue = JObject(
+      List(
+          JField("name", JString("xyz")),
+          JField("type", JString("zyx")),
+          JField("data", JObject(JField("x", JNum(1))))
+      ))
 
   def startJob(ts: Option[DateTime] = None): JValue = JObject(
-    JField("state", JString("started")) ::
-    (ts map { dt => JField("timestamp", dt.serialize) :: Nil } getOrElse Nil)
+      JField("state", JString("started")) ::
+      (ts map { dt =>
+            JField("timestamp", dt.serialize) :: Nil
+          } getOrElse Nil)
   )
 
-  def postJob(job: JValue, apiKey: String = validAPIKey) = jobsClient.query("apiKey", apiKey).post[JValue]("/jobs/")(job)
+  def postJob(job: JValue, apiKey: String = validAPIKey) =
+    jobsClient.query("apiKey", apiKey).post[JValue]("/jobs/")(job)
 
-  def postJobAndGetId(job: JValue, apiKey: String = validAPIKey) = for {
-    res <- jobsClient.query("apiKey", apiKey).post[JValue]("/jobs/")(job)
-    Some(JString(jobId)) = res.content map (_ \ "id")
-  } yield jobId
+  def postJobAndGetId(job: JValue, apiKey: String = validAPIKey) =
+    for {
+      res <- jobsClient.query("apiKey", apiKey).post[JValue]("/jobs/")(job)
+      Some(JString(jobId)) = res.content map (_ \ "id")
+    } yield jobId
 
   def getJob(jobId: String) = jobsClient.get[JValue]("/jobs/%s".format(jobId))
 
-  def putState(jobId: String, state: JValue) = jobsClient.put[JValue]("/jobs/%s/state".format(jobId))(state)
+  def putState(jobId: String, state: JValue) =
+    jobsClient.put[JValue]("/jobs/%s/state".format(jobId))(state)
 
-  def getState(jobId: String) = jobsClient.get[JValue]("/jobs/%s/state".format(jobId))
+  def getState(jobId: String) =
+    jobsClient.get[JValue]("/jobs/%s/state".format(jobId))
 
   def postMessage(jobId: String, channel: String, msg: JValue) =
-    jobsClient.post[JValue]("/jobs/%s/messages/%s" format (jobId, channel))(msg)
+    jobsClient.post[JValue]("/jobs/%s/messages/%s" format (jobId, channel))(
+        msg)
 
-  def postMessageAndGetId(jobId: String, channel: String, msg: JValue) = for {
-    res <- postMessage(jobId, channel, msg)
-    Some(JNum(id)) = res.content map (_ \ "id")
-  } yield id
+  def postMessageAndGetId(jobId: String, channel: String, msg: JValue) =
+    for {
+      res <- postMessage(jobId, channel, msg)
+      Some(JNum(id)) = res.content map (_ \ "id")
+    } yield id
 
   def getMessages(jobId: String, channel: String, after: Option[BigDecimal]) = {
-    val client0 = after map { id => jobsClient.query("after", id.toInt.toString) } getOrElse jobsClient
-    client0.contentType[ByteChunk](JSON).get[JValue]("/jobs/%s/messages/%s" format (jobId, channel))
+    val client0 =
+      after map { id =>
+        jobsClient.query("after", id.toInt.toString)
+      } getOrElse jobsClient
+    client0
+      .contentType[ByteChunk](JSON)
+      .get[JValue]("/jobs/%s/messages/%s" format (jobId, channel))
   }
 
   def putStatusRaw(jobId: String, prev: Option[BigDecimal])(obj: JValue) = {
-    val client0 = prev map { id => jobsClient.query("prevStatusId", id.toLong.toString) } getOrElse jobsClient
-    client0.contentType[ByteChunk](JSON).put[JValue]("/jobs/%s/status".format(jobId))(obj)
+    val client0 =
+      prev map { id =>
+        jobsClient.query("prevStatusId", id.toLong.toString)
+      } getOrElse jobsClient
+    client0
+      .contentType[ByteChunk](JSON)
+      .put[JValue]("/jobs/%s/status".format(jobId))(obj)
   }
 
-  def putStatus(jobId: String, message: String, progress: BigDecimal, unit: String, info: Option[JValue] = None, prev: Option[BigDecimal] = None) = {
-    putStatusRaw(jobId, prev)(JObject(
-      JField("message", JString(message)) ::
-      JField("progress", JNum(progress)) ::
-      JField("unit", JString(unit)) ::
-      (info map (JField("info", _) :: Nil) getOrElse Nil)
-    ))
+  def putStatus(jobId: String,
+                message: String,
+                progress: BigDecimal,
+                unit: String,
+                info: Option[JValue] = None,
+                prev: Option[BigDecimal] = None) = {
+    putStatusRaw(jobId, prev)(
+        JObject(
+            JField("message", JString(message)) :: JField(
+                "progress", JNum(progress)) :: JField("unit", JString(unit)) ::
+            (info map (JField("info", _) :: Nil) getOrElse Nil)
+        ))
   }
 
-  def putStatusAndGetId(jobId: String, message: String, progress: BigDecimal, unit: String, info: Option[JValue] = None, prev: Option[BigDecimal] = None) = {
+  def putStatusAndGetId(jobId: String,
+                        message: String,
+                        progress: BigDecimal,
+                        unit: String,
+                        info: Option[JValue] = None,
+                        prev: Option[BigDecimal] = None) = {
     for {
       res <- putStatus(jobId, message, progress, unit, info, prev)
       Some(JNum(id)) = res.content map (_ \ "id")
     } yield id
   }
 
-  def getStatus(jobId: String) = jobsClient.get[JValue]("/jobs/%s/status".format(jobId))
+  def getStatus(jobId: String) =
+    jobsClient.get[JValue]("/jobs/%s/status".format(jobId))
 
   "job service" should {
     "allow job creation" in {
@@ -160,7 +195,8 @@ class JobServiceSpec extends TestJobService {
     "start job in unstarted state" in {
       postJob(simpleJob, validAPIKey).copoint must beLike {
         case HttpResponse(HttpStatus(Created, _), _, Some(obj), _) =>
-          (obj \ "state").validated[JobState] must_== Success(JobState.NotStarted)
+          (obj \ "state").validated[JobState] must_==
+            Success(JobState.NotStarted)
       }
     }
 
@@ -171,7 +207,6 @@ class JobServiceSpec extends TestJobService {
         HttpResponse(HttpStatus(OK, _), _, Some(obj), _) <- getJob(jobId)
       } yield obj).copoint
 
-      
       val data = JObject(JField("x", JNum(1)) :: Nil)
 
       (obj \ "name", obj \ "type", obj \ "data") must beLike {
@@ -189,8 +224,12 @@ class JobServiceSpec extends TestJobService {
       } yield (st1, st2, st3)).copoint
 
       st1.validated[JobState] must_== Success(NotStarted)
-      st2.validated[JobState] must beLike { case Success(Started(_, NotStarted)) => ok }
-      st3.validated[JobState] must beLike { case Success(Started(_, NotStarted)) => ok }
+      st2.validated[JobState] must beLike {
+        case Success(Started(_, NotStarted)) => ok
+      }
+      st3.validated[JobState] must beLike {
+        case Success(Started(_, NotStarted)) => ok
+      }
     }
 
     "start jobs with explicit date time" in {
@@ -198,7 +237,8 @@ class JobServiceSpec extends TestJobService {
       val (state, job) = (for {
         res <- postJob(simpleJob, validAPIKey)
         Some(JString(jobId)) = res.content map (_ \ "id")
-        HttpResponse(HttpStatus(OK, _), _, Some(obj1), _) <- putState(jobId, startJob(Some(dt)))
+        HttpResponse(HttpStatus(OK, _), _, Some(obj1), _) <- putState(
+            jobId, startJob(Some(dt)))
         HttpResponse(_, _, Some(obj2), _) <- getJob(jobId)
       } yield (obj1, obj2)).copoint
 
@@ -213,31 +253,32 @@ class JobServiceSpec extends TestJobService {
         job <- postJob(simpleJob)
         Some(JString(jobId)) = job.content map (_ \ "id")
         _ <- putState(jobId, startJob())
-        res <- putState(jobId, JObject(JField("state", JString("cancelled")) :: Nil))
+        res <- putState(jobId,
+                        JObject(JField("state", JString("cancelled")) :: Nil))
       } yield res).copoint must beLike {
         case HttpResponse(HttpStatus(BadRequest, _), _, _, _) => ok
       }
     }
 
     val cancellation: JValue = JObject(
-      JField("state", JString("cancelled")) ::
-      JField("reason", JString("Because I said so.")) ::
-      Nil)
+        JField("state", JString("cancelled")) :: JField(
+            "reason", JString("Because I said so.")) :: Nil)
 
-    val abort: JValue = JObject(
-      JField("state", JString("aborted")) ::
-      JField("reason", JString("Yabba dabba doo!")) ::
-      Nil)
+    val abort: JValue = JObject(JField("state", JString("aborted")) :: JField(
+            "reason", JString("Yabba dabba doo!")) :: Nil)
 
     "cancel started job with reason" in {
       val st = (for {
         jobId <- postJobAndGetId(simpleJob)
         _ <- putState(jobId, startJob())
-        HttpResponse(HttpStatus(OK, _), _, Some(st), _) <- putState(jobId, cancellation)
+        HttpResponse(HttpStatus(OK, _), _, Some(st), _) <- putState(
+            jobId, cancellation)
       } yield st).copoint
-      
+
       st.validated[JobState] must beLike {
-        case Success(Cancelled("Because I said so.", _, Started(_, NotStarted))) => ok
+        case Success(
+            Cancelled("Because I said so.", _, Started(_, NotStarted))) =>
+          ok
       }
     }
 
@@ -283,7 +324,9 @@ class JobServiceSpec extends TestJobService {
       } yield res).copoint must beLike {
         case HttpResponse(HttpStatus(OK, _), _, Some(obj), _) =>
           obj.validated[JobState] must beLike {
-            case Success(Aborted("Yabba dabba doo!", _, Started(_, NotStarted))) => ok
+            case Success(
+                Aborted("Yabba dabba doo!", _, Started(_, NotStarted))) =>
+              ok
           }
       }
     }
@@ -297,7 +340,10 @@ class JobServiceSpec extends TestJobService {
       } yield res).copoint must beLike {
         case HttpResponse(HttpStatus(OK, _), _, Some(obj), _) =>
           obj.validated[JobState] must beLike {
-            case Success(Aborted("Yabba dabba doo!", _, Cancelled(_, _, Started(_, NotStarted)))) => ok
+            case Success(Aborted("Yabba dabba doo!",
+                                 _,
+                                 Cancelled(_, _, Started(_, NotStarted)))) =>
+              ok
           }
       }
     }
@@ -313,7 +359,9 @@ class JobServiceSpec extends TestJobService {
       }
     }
 
-    def say(name: String, msg: String): JValue = JObject(JField("name", JString(name)) :: JField("msg", JString(msg)) :: Nil)
+    def say(name: String, msg: String): JValue =
+      JObject(
+          JField("name", JString(name)) :: JField("msg", JString(msg)) :: Nil)
 
     "post a simple message to a job" in {
       (for {
@@ -347,7 +395,7 @@ class JobServiceSpec extends TestJobService {
         msgsAfterM3 <- getMessages(jobId, "abc", Some(m3id))
         msgsAfterM5 <- getMessages(jobId, "abc", Some(m5id))
       } yield (msgs, msgsAfterM3, msgsAfterM5)).copoint
-    
+
       msgs must beLike {
         case HttpResponse(HttpStatus(OK, _), _, Some(JArray(msgs)), _) =>
           msgs.map(_ \ "value").toList must_== List(m1, m2, m3, m4, m5)
@@ -403,7 +451,9 @@ class JobServiceSpec extends TestJobService {
         status1 <- putStatus(jobId, "Nearly there!", 99.999, "%")
         status2 <- getStatus(jobId)
       } yield (jobId, status1, status2)).copoint must beLike {
-        case (jobId, status1 @ HttpResponse(HttpStatus(OK, _), _, Some(obj), _), status2) =>
+        case (jobId,
+              status1 @ HttpResponse(HttpStatus(OK, _), _, Some(obj), _),
+              status2) =>
           obj \ "jobId" must_== JString(jobId)
           obj \ "value" \ "message" must_== JString("Nearly there!")
           obj \ "value" \ "progress" must_== JNum(99.999)
@@ -424,21 +474,32 @@ class JobServiceSpec extends TestJobService {
     "allow status updates to be conditional" in {
       (for {
         jobId <- postJobAndGetId(simpleJob)
-        id1 <- putStatusAndGetId(jobId, "Nearly there!", 99.999, "%", None, None)
-        id2 <- putStatusAndGetId(jobId, "Very nearly there!", 99.99999, "%", None, Some(id1))
-        res <- putStatus(jobId, "Very nearly, almost there!", 99.9999999, "%", None, Some(id2))
+        id1 <- putStatusAndGetId(
+            jobId, "Nearly there!", 99.999, "%", None, None)
+        id2 <- putStatusAndGetId(
+            jobId, "Very nearly there!", 99.99999, "%", None, Some(id1))
+        res <- putStatus(jobId,
+                         "Very nearly, almost there!",
+                         99.9999999,
+                         "%",
+                         None,
+                         Some(id2))
       } yield res).copoint must beLike {
         case HttpResponse(HttpStatus(OK, _), _, Some(obj), _) =>
-          obj \ "value" \ "message" must_== JString("Very nearly, almost there!")
+          obj \ "value" \ "message" must_==
+            JString("Very nearly, almost there!")
       }
     }
 
     "notify of conflicting status updates when conditional" in {
       (for {
         jobId <- postJobAndGetId(simpleJob)
-        id <- putStatusAndGetId(jobId, "Nearly there!", 99.999, "%", None, None)
-        _ <- putStatusAndGetId(jobId, "Very nearly there!", 99.99999, "%", None, Some(id))
-        res <- putStatus(jobId, "Very nearly there!", 99.99999, "%", None, Some(id))
+        id <- putStatusAndGetId(
+            jobId, "Nearly there!", 99.999, "%", None, None)
+        _ <- putStatusAndGetId(
+            jobId, "Very nearly there!", 99.99999, "%", None, Some(id))
+        res <- putStatus(
+            jobId, "Very nearly there!", 99.99999, "%", None, Some(id))
       } yield res).copoint must beLike {
         case HttpResponse(HttpStatus(Conflict, _), _, _, _) => ok
       }
@@ -448,9 +509,15 @@ class JobServiceSpec extends TestJobService {
       val (res1, res2, res3, res4) = (for {
         jobId <- postJobAndGetId(simpleJob)
         res1 <- putStatusRaw(jobId, None)(JObject(Nil))
-        res2 <- putStatusRaw(jobId, None)(JObject(JField("message", JString("a")) :: JField("unit", JString("%")) :: Nil))
-        res3 <- putStatusRaw(jobId, None)(JObject(JField("message", JString("a")) :: JField("progress", JNum(99)) :: Nil))
-        res4 <- putStatusRaw(jobId, None)(JObject(JField("progress", JNum(99)) :: JField("unit", JString("%")) :: Nil))
+        res2 <- putStatusRaw(jobId, None)(
+            JObject(JField("message", JString("a")) :: JField(
+                    "unit", JString("%")) :: Nil))
+        res3 <- putStatusRaw(jobId, None)(
+            JObject(JField("message", JString("a")) :: JField(
+                    "progress", JNum(99)) :: Nil))
+        res4 <- putStatusRaw(jobId, None)(
+            JObject(JField("progress", JNum(99)) :: JField(
+                    "unit", JString("%")) :: Nil))
       } yield (res1, res2, res3, res4)).copoint
 
       def mustBeBad(res: HttpResponse[JValue]) = res must beLike {
@@ -464,4 +531,3 @@ class JobServiceSpec extends TestJobService {
     }
   }
 }
-

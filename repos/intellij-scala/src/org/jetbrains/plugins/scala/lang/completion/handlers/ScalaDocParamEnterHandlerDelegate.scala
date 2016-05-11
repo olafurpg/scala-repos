@@ -12,12 +12,12 @@ import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTag
 
 /**
- * User: Dmitry Naydanov
- * Date: 2/1/12
- */
-
+  * User: Dmitry Naydanov
+  * Date: 2/1/12
+  */
 class ScalaDocParamEnterHandlerDelegate extends EnterHandlerDelegateAdapter {
-  override def postProcessEnter(file: PsiFile, editor: Editor, dataContext: DataContext): Result = {
+  override def postProcessEnter(
+      file: PsiFile, editor: Editor, dataContext: DataContext): Result = {
     if (!file.isInstanceOf[ScalaFile]) {
       return Result.Continue
     }
@@ -46,27 +46,36 @@ class ScalaDocParamEnterHandlerDelegate extends EnterHandlerDelegateAdapter {
       return Result.Continue
     }
 
-    val probData = if (tagValueElement != null) tagValueElement.getNextSibling else tagNameElement.getNextSibling
+    val probData =
+      if (tagValueElement != null) tagValueElement.getNextSibling
+      else tagNameElement.getNextSibling
     if (probData == null) {
       return Result.Continue
     }
-    val nextProbData = if (probData.getNextSibling != null) probData.getNextSibling.getNode else null
+    val nextProbData =
+      if (probData.getNextSibling != null) probData.getNextSibling.getNode
+      else null
 
     val startOffset = tagParent.getNameElement.getTextRange.getStartOffset
-    val endOffset = probData.getTextRange.getStartOffset + (Option(nextProbData).map(_.getElementType) match {
-      case Some(ScalaDocTokenType.DOC_COMMENT_DATA) => probData.getTextLength
-      case Some(ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS) => 1
-      case _ => 0
-    })
-    
-    if (document.getLineNumber(caretOffset) - 1 == document.getLineNumber(tagParent.getNameElement.getTextOffset)) {
+    val endOffset =
+      probData.getTextRange.getStartOffset +
+      (Option(nextProbData).map(_.getElementType) match {
+            case Some(ScalaDocTokenType.DOC_COMMENT_DATA) =>
+              probData.getTextLength
+            case Some(ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS) => 1
+            case _ => 0
+          })
+
+    if (document.getLineNumber(caretOffset) - 1 == document.getLineNumber(
+            tagParent.getNameElement.getTextOffset)) {
       val toInsert = StringUtil.repeat(" ", endOffset - startOffset)
       extensions.inWriteAction {
         document.insertString(caretOffset, toInsert)
-        PsiDocumentManager.getInstance(file.getProject).commitDocument(document)
+        PsiDocumentManager
+          .getInstance(file.getProject)
+          .commitDocument(document)
       }
     }
-
 
     Result.Continue
   }

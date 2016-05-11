@@ -4,10 +4,10 @@ package codeInspection.collections
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 
 /**
- * Nikolay.Tropin
- * 2014-05-06
- */
-class ExistsEqualsTest extends OperationsOnCollectionInspectionTest{
+  * Nikolay.Tropin
+  * 2014-05-06
+  */
+class ExistsEqualsTest extends OperationsOnCollectionInspectionTest {
   val hint = InspectionBundle.message("exists.equals.hint")
   val forallNotEqualsHint = InspectionBundle.message("forall.notEquals.hint")
   def test_1() {

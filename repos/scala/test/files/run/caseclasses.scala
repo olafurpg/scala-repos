@@ -9,7 +9,7 @@ object M {
   abstract case class C(x: String) {}
   object C extends (String => C) {
     def apply(x: String): C = {
-      println("creating C("+x+")")
+      println("creating C(" + x + ")")
       new C(x) {}
     }
   }
@@ -17,12 +17,12 @@ object M {
 
 object Test extends App {
 
-  def Abs(x: Int) = new Abs(x * 2){}
+  def Abs(x: Int) = new Abs(x * 2) {}
   (Abs(2): @unchecked) match {
     case Abs(4) => ;
   }
 
-  def fn[a,b](x: a => b) = x;
+  def fn[a, b](x: a => b) = x;
   val f = fn(Foo(1))
   (f(2): AnyRef) match {
     case Foo(1) => Console.println("OK")
@@ -32,7 +32,7 @@ object Test extends App {
     Bar() productElement 3
     throw new NullPointerException("duh")
   } catch {
-    case x:IndexOutOfBoundsException =>
+    case x: IndexOutOfBoundsException =>
   }
 
   M.C("hi") match {
@@ -44,8 +44,6 @@ object Test extends App {
     f(2) productElement 3
     throw new NullPointerException("duh")
   } catch {
-    case x:IndexOutOfBoundsException =>
+    case x: IndexOutOfBoundsException =>
   }
-
 }
-

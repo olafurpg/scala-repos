@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util.concurrent
 
@@ -20,7 +20,8 @@ import scala.reflect.ClassTag
 
 class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
 
-  override def factory: ConcurrentLinkedQueueFactory = new ConcurrentLinkedQueueFactory
+  override def factory: ConcurrentLinkedQueueFactory =
+    new ConcurrentLinkedQueueFactory
 
   @Test def should_store_and_remove_ordered_integers(): Unit = {
     val pq = factory.empty[Int]
@@ -174,7 +175,7 @@ class ConcurrentLinkedQueueFactory extends AbstractCollectionFactory {
   override def implementationName: String =
     "java.util.concurrent.ConcurrentLinkedQueue"
 
-  override def empty[E: ClassTag]: ConcurrentLinkedQueue[E] =
+  override def empty[E : ClassTag]: ConcurrentLinkedQueue[E] =
     new ConcurrentLinkedQueue[E]()
 
   def newFrom[E](coll: ju.Collection[E]): ConcurrentLinkedQueue[E] =

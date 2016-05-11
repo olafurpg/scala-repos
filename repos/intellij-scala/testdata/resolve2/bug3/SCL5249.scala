@@ -6,10 +6,8 @@ object A {
   }
 
   trait ZZ extends Z {
-    trait S extends super.S {
-
-    }
-    val s : S = new S {}
+    trait S extends super.S {}
+    val s: S = new S {}
   }
 
   object ZZ extends ZZ
@@ -17,6 +15,6 @@ object A {
   import ZZ.s._
 
   object Test {
-    val s: /* line: 4 */Session = 123
+    val s: /* line: 4 */ Session = 123
   }
 }

@@ -3,15 +3,16 @@ package com.twitter.io
 import com.twitter.util.{Future, Return, Try, Throw}
 
 /**
- * Construct a Reader from a Buf.
- */
+  * Construct a Reader from a Buf.
+  */
 private[io] class BufReader(buf: Buf) extends Reader {
   @volatile private[this] var state: Try[Buf] = Return(buf)
 
   def read(n: Int) = synchronized {
     state match {
       case Return(buf) =>
-        if (buf.isEmpty) Future.None else {
+        if (buf.isEmpty) Future.None
+        else {
           val f = Future.value(Some(buf.slice(0, n)))
           state = Return(buf.slice(n, Int.MaxValue))
           f

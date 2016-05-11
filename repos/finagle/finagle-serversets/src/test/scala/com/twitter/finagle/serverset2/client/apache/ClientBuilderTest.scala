@@ -11,27 +11,29 @@ import com.twitter.finagle.stats.DefaultStatsReceiver
 @RunWith(classOf[JUnitRunner])
 class ClientBuilderTest extends FlatSpec {
   val config = ClientConfig(
-    hosts = "localhost:2181",
-    sessionTimeout = 10.seconds,
-    statsReceiver = DefaultStatsReceiver,
-    readOnlyOK = false,
-    sessionId = None,
-    password = None,
-    timer = Timer.Nil
+      hosts = "localhost:2181",
+      sessionTimeout = 10.seconds,
+      statsReceiver = DefaultStatsReceiver,
+      readOnlyOK = false,
+      sessionId = None,
+      password = None,
+      timer = Timer.Nil
   )
 
   "reader" should "return Apache ZK reader" in {
     val zkr = ClientBuilder().reader()
 
     assert(zkr.value.isInstanceOf[ZooKeeperReader])
-    assert(zkr.value.getClass == ApacheZooKeeper.newClient(config).value.getClass)
+    assert(
+        zkr.value.getClass == ApacheZooKeeper.newClient(config).value.getClass)
   }
 
   "writer" should "return Apache ZK writer" in {
     val zkw = ClientBuilder().writer()
 
     assert(zkw.value.isInstanceOf[ZooKeeperRW])
-    assert(zkw.value.getClass == ApacheZooKeeper.newClient(config).value.getClass)
+    assert(
+        zkw.value.getClass == ApacheZooKeeper.newClient(config).value.getClass)
   }
 
   "multi" should "raise RuntimeException" in {

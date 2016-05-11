@@ -8,9 +8,9 @@ object Test {
   }
 
   import scala.reflect.ClassTag
-  def ct[A: ClassTag]: Expr[A] = ???
-  def tt[A: TypeTag]: Expr[A] = ???
-  def wtt[A: WeakTypeTag]: Expr[A] = ???
+  def ct[A : ClassTag]: Expr[A] = ???
+  def tt[A : TypeTag]: Expr[A] = ???
+  def wtt[A : WeakTypeTag]: Expr[A] = ???
 
   reify {
     ct[String].splice

@@ -37,10 +37,10 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import scalafx.Includes._
 
 /**
- * FloatProperty Spec tests.
- *
- *
- */
+  * FloatProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class FloatPropertySpec extends FlatSpec with BeforeAndAfterEach {
   val bean = new Object()

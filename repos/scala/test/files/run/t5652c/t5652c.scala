@@ -1,6 +1,6 @@
 class A1 {
-  def f1 = { def g = 1 ; class A { def a = g } ; new A().a }
-  def f2 = { def g = 2 ; class A { def a = g } ; new A().a }
+  def f1 = { def g = 1; class A { def a = g }; new A().a }
+  def f2 = { def g = 2; class A { def a = g }; new A().a }
 }
 
 object Test extends App {

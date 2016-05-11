@@ -21,51 +21,63 @@ trait RangeDirectives {
   import akka.http.scaladsl.server.directives.RouteDirectives._
 
   /**
-   * Answers GET requests with an `Accept-Ranges: bytes` header and converts HttpResponses coming back from its inner
-   * route into partial responses if the initial request contained a valid `Range` request header. The requested
-   * byte-ranges may be coalesced.
-   * This directive is transparent to non-GET requests
-   * Rejects requests with unsatisfiable ranges `UnsatisfiableRangeRejection`.
-   * Rejects requests with too many expected ranges.
-   *
-   * Note: if you want to combine this directive with `conditional(...)` you need to put
-   * it on the *inside* of the `conditional(...)` directive, i.e. `conditional(...)` must be
-   * on a higher level in your route structure in order to function correctly.
-   *
-   * @see [[https://tools.ietf.org/html/rfc7233]]
-   */
+    * Answers GET requests with an `Accept-Ranges: bytes` header and converts HttpResponses coming back from its inner
+    * route into partial responses if the initial request contained a valid `Range` request header. The requested
+    * byte-ranges may be coalesced.
+    * This directive is transparent to non-GET requests
+    * Rejects requests with unsatisfiable ranges `UnsatisfiableRangeRejection`.
+    * Rejects requests with too many expected ranges.
+    *
+    * Note: if you want to combine this directive with `conditional(...)` you need to put
+    * it on the *inside* of the `conditional(...)` directive, i.e. `conditional(...)` must be
+    * on a higher level in your route structure in order to function correctly.
+    *
+    * @see [[https://tools.ietf.org/html/rfc7233]]
+    */
   def withRangeSupport: Directive0 =
     extractRequestContext.flatMap { ctx ⇒
       val settings = ctx.settings
       implicit val log = ctx.log
-      import settings.{ rangeCountLimit, rangeCoalescingThreshold }
+      import settings.{rangeCountLimit, rangeCoalescingThreshold}
 
       class IndexRange(val start: Long, val end: Long) {
         def length = end - start
-        def apply(entity: UniversalEntity): UniversalEntity = entity.transformDataBytes(length, StreamUtils.sliceBytesTransformer(start, length))
-        def distance(other: IndexRange) = mergedEnd(other) - mergedStart(other) - (length + other.length)
-        def mergeWith(other: IndexRange) = new IndexRange(mergedStart(other), mergedEnd(other))
-        def contentRange(entityLength: Long) = ContentRange(start, end - 1, entityLength)
-        private def mergedStart(other: IndexRange) = math.min(start, other.start)
+        def apply(entity: UniversalEntity): UniversalEntity =
+          entity.transformDataBytes(
+              length, StreamUtils.sliceBytesTransformer(start, length))
+        def distance(other: IndexRange) =
+          mergedEnd(other) - mergedStart(other) - (length + other.length)
+        def mergeWith(other: IndexRange) =
+          new IndexRange(mergedStart(other), mergedEnd(other))
+        def contentRange(entityLength: Long) =
+          ContentRange(start, end - 1, entityLength)
+        private def mergedStart(other: IndexRange) =
+          math.min(start, other.start)
         private def mergedEnd(other: IndexRange) = math.max(end, other.end)
       }
 
       def indexRange(entityLength: Long)(range: ByteRange): IndexRange =
         range match {
-          case ByteRange.Slice(start, end)    ⇒ new IndexRange(start, math.min(end + 1, entityLength))
-          case ByteRange.FromOffset(first)    ⇒ new IndexRange(first, entityLength)
-          case ByteRange.Suffix(suffixLength) ⇒ new IndexRange(math.max(0, entityLength - suffixLength), entityLength)
+          case ByteRange.Slice(start, end) ⇒
+            new IndexRange(start, math.min(end + 1, entityLength))
+          case ByteRange.FromOffset(first) ⇒
+            new IndexRange(first, entityLength)
+          case ByteRange.Suffix(suffixLength) ⇒
+            new IndexRange(
+                math.max(0, entityLength - suffixLength), entityLength)
         }
 
       // See comment of the `range-coalescing-threshold` setting in `reference.conf` for the rationale of this behavior.
       def coalesceRanges(iRanges: Seq[IndexRange]): Seq[IndexRange] =
         iRanges.foldLeft(Seq.empty[IndexRange]) { (acc, iRange) ⇒
-          val (mergeCandidates, otherCandidates) = acc.partition(_.distance(iRange) <= rangeCoalescingThreshold)
+          val (mergeCandidates, otherCandidates) =
+            acc.partition(_.distance(iRange) <= rangeCoalescingThreshold)
           val merged = mergeCandidates.foldLeft(iRange)(_ mergeWith _)
           otherCandidates :+ merged
         }
 
-      def multipartRanges(ranges: Seq[ByteRange], entity: UniversalEntity): Multipart.ByteRanges = {
+      def multipartRanges(ranges: Seq[ByteRange],
+                          entity: UniversalEntity): Multipart.ByteRanges = {
         val length = entity.contentLength
         val iRanges: Seq[IndexRange] = ranges.map(indexRange(length))
 
@@ -78,9 +90,12 @@ trait RangeDirectives {
           case 0 ⇒ Source.empty
           case 1 ⇒
             val range = coalescedRanges.head
-            val flow = StreamUtils.sliceBytesTransformer(range.start, range.length)
+            val flow =
+              StreamUtils.sliceBytesTransformer(range.start, range.length)
             val bytes = entity.dataBytes.via(flow)
-            val part = Multipart.ByteRanges.BodyPart(range.contentRange(length), HttpEntity(entity.contentType, range.length, bytes))
+            val part = Multipart.ByteRanges.BodyPart(
+                range.contentRange(length),
+                HttpEntity(entity.contentType, range.length, bytes))
             Source.single(part)
           case n ⇒
             Source fromGraph GraphDSL.create() { implicit b ⇒
@@ -88,11 +103,17 @@ trait RangeDirectives {
               val bcast = b.add(Broadcast[ByteString](n))
               val merge = b.add(Concat[Multipart.ByteRanges.BodyPart](n))
               for (range ← coalescedRanges) {
-                val flow = StreamUtils.sliceBytesTransformer(range.start, range.length)
-                bcast ~> flow.buffer(16, OverflowStrategy.backpressure).prefixAndTail(0).map {
-                  case (_, bytes) ⇒
-                    Multipart.ByteRanges.BodyPart(range.contentRange(length), HttpEntity(entity.contentType, range.length, bytes))
-                } ~> merge
+                val flow =
+                  StreamUtils.sliceBytesTransformer(range.start, range.length)
+                bcast ~> flow
+                  .buffer(16, OverflowStrategy.backpressure)
+                  .prefixAndTail(0)
+                  .map {
+                    case (_, bytes) ⇒
+                      Multipart.ByteRanges.BodyPart(
+                          range.contentRange(length),
+                          HttpEntity(entity.contentType, range.length, bytes))
+                  } ~> merge
               }
               entity.dataBytes ~> bcast
               SourceShape(merge.out)
@@ -101,21 +122,27 @@ trait RangeDirectives {
         Multipart.ByteRanges(source)
       }
 
-      def rangeResponse(range: ByteRange, entity: UniversalEntity, length: Long, headers: immutable.Seq[HttpHeader]) = {
+      def rangeResponse(range: ByteRange,
+                        entity: UniversalEntity,
+                        length: Long,
+                        headers: immutable.Seq[HttpHeader]) = {
         val aiRange = indexRange(length)(range)
-        HttpResponse(PartialContent, `Content-Range`(aiRange.contentRange(length)) +: headers, aiRange(entity))
+        HttpResponse(PartialContent,
+                     `Content-Range`(aiRange.contentRange(length)) +: headers,
+                     aiRange(entity))
       }
 
       def satisfiable(entityLength: Long)(range: ByteRange): Boolean =
         range match {
-          case ByteRange.Slice(firstPos, _)   ⇒ firstPos < entityLength
+          case ByteRange.Slice(firstPos, _) ⇒ firstPos < entityLength
           case ByteRange.FromOffset(firstPos) ⇒ firstPos < entityLength
-          case ByteRange.Suffix(length)       ⇒ length > 0
+          case ByteRange.Suffix(length) ⇒ length > 0
         }
-      def universal(entity: HttpEntity): Option[UniversalEntity] = entity match {
-        case u: UniversalEntity ⇒ Some(u)
-        case _                  ⇒ None
-      }
+      def universal(entity: HttpEntity): Option[UniversalEntity] =
+        entity match {
+          case u: UniversalEntity ⇒ Some(u)
+          case _ ⇒ None
+        }
 
       def applyRanges(ranges: immutable.Seq[ByteRange]): Directive0 =
         extractRequestContext.flatMap { ctx ⇒
@@ -125,10 +152,16 @@ trait RangeDirectives {
                 case Some(entity) ⇒
                   val length = entity.contentLength
                   ranges.filter(satisfiable(length)) match {
-                    case Nil                   ⇒ ctx.reject(UnsatisfiableRangeRejection(ranges, length))
-                    case Seq(satisfiableRange) ⇒ ctx.complete(rangeResponse(satisfiableRange, entity, length, headers))
+                    case Nil ⇒
+                      ctx.reject(UnsatisfiableRangeRejection(ranges, length))
+                    case Seq(satisfiableRange) ⇒
+                      ctx.complete(rangeResponse(
+                              satisfiableRange, entity, length, headers))
                     case satisfiableRanges ⇒
-                      ctx.complete((PartialContent, headers, multipartRanges(satisfiableRanges, entity)))
+                      ctx.complete(
+                          (PartialContent,
+                           headers,
+                           multipartRanges(satisfiableRanges, entity)))
                   }
                 case None ⇒
                   // Ranges not supported for Chunked or CloseDelimited responses
@@ -138,13 +171,16 @@ trait RangeDirectives {
         }
 
       def rangeHeaderOfGetRequests(ctx: RequestContext): Option[Range] =
-        if (ctx.request.method == HttpMethods.GET) ctx.request.header[Range] else None
+        if (ctx.request.method == HttpMethods.GET) ctx.request.header[Range]
+        else None
 
       extract(rangeHeaderOfGetRequests).flatMap {
         case Some(Range(RangeUnits.Bytes, ranges)) ⇒
-          if (ranges.size <= rangeCountLimit) applyRanges(ranges) & RangeDirectives.respondWithAcceptByteRangesHeader
+          if (ranges.size <= rangeCountLimit)
+            applyRanges(ranges) & RangeDirectives.respondWithAcceptByteRangesHeader
           else reject(TooManyRangesRejection(rangeCountLimit))
-        case _ ⇒ MethodDirectives.get & RangeDirectives.respondWithAcceptByteRangesHeader | pass
+        case _ ⇒
+          MethodDirectives.get & RangeDirectives.respondWithAcceptByteRangesHeader | pass
       }
     }
 }

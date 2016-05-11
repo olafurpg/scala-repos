@@ -17,12 +17,14 @@
 
 package org.apache.spark.sql.catalyst.util
 
-class ArrayBasedMapData(val keyArray: ArrayData, val valueArray: ArrayData) extends MapData {
+class ArrayBasedMapData(val keyArray: ArrayData, val valueArray: ArrayData)
+    extends MapData {
   require(keyArray.numElements() == valueArray.numElements())
 
   override def numElements(): Int = keyArray.numElements()
 
-  override def copy(): MapData = new ArrayBasedMapData(keyArray.copy(), valueArray.copy())
+  override def copy(): MapData =
+    new ArrayBasedMapData(keyArray.copy(), valueArray.copy())
 
   // We need to check equality of map type in tests.
   override def equals(o: Any): Boolean = {
@@ -54,7 +56,8 @@ object ArrayBasedMapData {
   }
 
   def apply(keys: Array[Any], values: Array[Any]): ArrayBasedMapData = {
-    new ArrayBasedMapData(new GenericArrayData(keys), new GenericArrayData(values))
+    new ArrayBasedMapData(
+        new GenericArrayData(keys), new GenericArrayData(values))
   }
 
   def toScalaMap(map: ArrayBasedMapData): Map[Any, Any] = {
@@ -71,7 +74,8 @@ object ArrayBasedMapData {
     keys.zip(values).toMap
   }
 
-  def toJavaMap(keys: Array[Any], values: Array[Any]): java.util.Map[Any, Any] = {
+  def toJavaMap(
+      keys: Array[Any], values: Array[Any]): java.util.Map[Any, Any] = {
     import scala.collection.JavaConverters._
     keys.zip(values).toMap.asJava
   }

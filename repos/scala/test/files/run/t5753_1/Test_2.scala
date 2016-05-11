@@ -1,4 +1,4 @@
 object Test extends App {
-    import Macros._
-    println(foo(42))
+  import Macros._
+  println(foo(42))
 }

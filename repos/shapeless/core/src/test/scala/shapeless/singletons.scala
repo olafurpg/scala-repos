@@ -102,15 +102,15 @@ class SingletonTypesTests {
   }
 
   object Show {
-    implicit val showTrue  = new Show[True] { def show = "true" }
+    implicit val showTrue = new Show[True] { def show = "true" }
     implicit val showFalse = new Show[False] { def show = "false" }
 
-    implicit val showOne   = new Show[_1] { def show = "One" }
-    implicit val showTwo   = new Show[_2] { def show = "Two" }
+    implicit val showOne = new Show[_1] { def show = "One" }
+    implicit val showTwo = new Show[_2] { def show = "Two" }
     implicit val showThree = new Show[_3] { def show = "Three" }
 
-    implicit val showFoo   = new Show[Foo] { def show = "'foo" }
-    implicit val showBar   = new Show[Bar] { def show = "'bar" }
+    implicit val showFoo = new Show[Foo] { def show = "'foo" }
+    implicit val showBar = new Show[Bar] { def show = "'bar" }
   }
 
   def show[T](t: T)(implicit s: Show[T]) = s.show
@@ -148,15 +148,25 @@ class SingletonTypesTests {
   }
 
   object LiteralShow {
-    implicit val showTrue  = new LiteralShow[Witness.`true`.T] { def show = "true" }
-    implicit val showFalse = new LiteralShow[Witness.`false`.T] { def show = "false" }
+    implicit val showTrue = new LiteralShow[Witness.`true`.T] {
+      def show = "true"
+    }
+    implicit val showFalse = new LiteralShow[Witness.`false`.T] {
+      def show = "false"
+    }
 
-    implicit val showOne   = new LiteralShow[Witness.`1`.T] { def show = "One" }
-    implicit val showTwo   = new LiteralShow[Witness.`2`.T] { def show = "Two" }
-    implicit val showThree = new LiteralShow[Witness.`3`.T] { def show = "Three" }
+    implicit val showOne = new LiteralShow[Witness.`1`.T] { def show = "One" }
+    implicit val showTwo = new LiteralShow[Witness.`2`.T] { def show = "Two" }
+    implicit val showThree = new LiteralShow[Witness.`3`.T] {
+      def show = "Three"
+    }
 
-    implicit val showFoo   = new LiteralShow[Witness.`'foo`.T] { def show = "'foo" }
-    implicit val showBar   = new LiteralShow[Witness.`'bar`.T] { def show = "'bar" }
+    implicit val showFoo = new LiteralShow[Witness.`'foo`.T] {
+      def show = "'foo"
+    }
+    implicit val showBar = new LiteralShow[Witness.`'bar`.T] {
+      def show = "'bar"
+    }
   }
 
   def literalShow[T](t: T)(implicit s: LiteralShow[T]) = s.show
@@ -194,9 +204,16 @@ class SingletonTypesTests {
   }
 
   object LiteralsShow {
-    implicit val showTrueFalse        = new LiteralsShow[HList.`true, false`.T] { def show = "true, false" }
-    implicit val showOneOrTwoOrThree  = new LiteralsShow[Coproduct.`1, 2, 3`.T] { def show = "One | Two | Three" }
-    implicit val showFooBar           = new LiteralsShow[HList.`'foo, 'bar`.T] { def show = "'foo, 'bar" }
+    implicit val showTrueFalse = new LiteralsShow[HList.`true, false`.T] {
+      def show = "true, false"
+    }
+    implicit val showOneOrTwoOrThree =
+      new LiteralsShow[Coproduct.`1, 2, 3`.T] {
+        def show = "One | Two | Three"
+      }
+    implicit val showFooBar = new LiteralsShow[HList.`'foo, 'bar`.T] {
+      def show = "'foo, 'bar"
+    }
   }
 
   def literalsShow[T](t: T)(implicit s: LiteralsShow[T]) = s.show
@@ -464,8 +481,12 @@ class SingletonTypesTests {
   }
 
   object Rel {
-    implicit def relTrue:  Rel[True]  { type Out = Int  } = new Rel[True]  { type Out = Int }
-    implicit def relFalse: Rel[False] { type Out = String } = new Rel[False] { type Out = String }
+    implicit def relTrue: Rel[True] { type Out = Int } = new Rel[True] {
+      type Out = Int
+    }
+    implicit def relFalse: Rel[False] { type Out = String } = new Rel[False] {
+      type Out = String
+    }
   }
 
   def check(w: WitnessWith[Rel])(v: w.instance.Out) = v
@@ -559,15 +580,14 @@ class SingletonTypesTests {
     assertTypedEquals[Int](2, n)
   }
 
-
   trait B
   case object A extends B
 
   @Test
   def singletonWiden {
-    illTyped(" Widen[A.type] ", "could not find implicit value for parameter widen:.*")
+    illTyped(" Widen[A.type] ",
+             "could not find implicit value for parameter widen:.*")
   }
-
 }
 
 package SingletonTypeTestsAux {

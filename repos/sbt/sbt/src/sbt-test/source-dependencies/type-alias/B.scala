@@ -1,3 +1,3 @@
 object B {
-	def y: A.X = Option(3)
+  def y: A.X = Option(3)
 }

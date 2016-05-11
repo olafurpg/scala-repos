@@ -2,7 +2,8 @@
 // should look for the fp bit.  Until then, just a pos test.
 import annotation.strictfp
 
-@strictfp class FPTest {
+@strictfp
+class FPTest {
   def main(args: Array[String]): Unit = {
     val d: Double = 8e+307
     println(4.0 * d * 0.5);

@@ -160,5 +160,4 @@ class AsyncQueueTest extends FunSuite {
     assert(Return(Queue(3)) == q.drain())
     assert(0 == q.size)
   }
-
 }

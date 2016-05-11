@@ -2,14 +2,13 @@ import scala.language.implicitConversions
 
 object A {
   object B {
-    implicit def int2string(x: Int) = "["+x.toString+"]"
+    implicit def int2string(x: Int) = "[" + x.toString + "]"
   }
 }
 
 class C(x: String) {
 
-  class Inner {
-  }
+  class Inner {}
 
   object Inner {
     val s: String = x

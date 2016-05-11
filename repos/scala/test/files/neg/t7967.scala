@@ -1,6 +1,6 @@
-
 trait B
-trait C {self: B =>}
+trait C { self: B =>
+}
 
 object Test {
   new C {} // fails

@@ -36,18 +36,24 @@ import com.precog.bifrost.nihdb.NIHDBQueryExecutorComponent
 import com.precog.standalone.StandaloneShardServer
 
 object DesktopShardServer
-    extends StandaloneShardServer
-    with NIHDBQueryExecutorComponent {
+    extends StandaloneShardServer with NIHDBQueryExecutorComponent {
   val caveatMessage = None
 
   val actorSystem = ActorSystem("desktopExecutorActorSystem")
-  implicit val executionContext = ExecutionContext.defaultExecutionContext(actorSystem)
+  implicit val executionContext =
+    ExecutionContext.defaultExecutionContext(actorSystem)
   implicit val M: Monad[Future] = new FutureMonad(executionContext)
 
-  def platformFor(config: Configuration, apiKeyFinder: APIKeyFinder[Future], jobManager: JobManager[Future]) = {
+  def platformFor(config: Configuration,
+                  apiKeyFinder: APIKeyFinder[Future],
+                  jobManager: JobManager[Future]) = {
     val rootAPIKey = config[String]("security.masterAccount.apiKey")
-    val accountFinder = new StaticAccountFinder("desktop", rootAPIKey, Some("/"))
-    val platform = platformFactory(config.detach("queryExecutor"), apiKeyFinder, accountFinder, jobManager)
+    val accountFinder = new StaticAccountFinder(
+        "desktop", rootAPIKey, Some("/"))
+    val platform = platformFactory(config.detach("queryExecutor"),
+                                   apiKeyFinder,
+                                   accountFinder,
+                                   jobManager)
 
     val stoppable = Stoppable.fromFuture {
       platform.shutdown

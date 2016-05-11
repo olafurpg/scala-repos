@@ -12,7 +12,11 @@ object Test extends ScaladocModelTest {
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
-    val main = rootPackage._package("test")._package("scaladoc")._package("template")._package("owners")
+    val main = rootPackage
+      ._package("test")
+      ._package("scaladoc")
+      ._package("template")
+      ._package("owners")
     val X = main._trait("X")
     val Y = main._trait("Y")
     val Z = main._trait("Z")
@@ -24,7 +28,6 @@ object Test extends ScaladocModelTest {
         assert(tpl == X, tpl + " == X")
       }
 
-    for (tpl <- List(X, Y, Z, T))
-      checkTemplateOwner(tpl)
+    for (tpl <- List(X, Y, Z, T)) checkTemplateOwner(tpl)
   }
 }

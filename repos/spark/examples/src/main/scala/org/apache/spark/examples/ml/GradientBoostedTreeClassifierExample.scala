@@ -29,13 +29,16 @@ import org.apache.spark.sql.SQLContext
 
 object GradientBoostedTreeClassifierExample {
   def main(args: Array[String]): Unit = {
-    val conf = new SparkConf().setAppName("GradientBoostedTreeClassifierExample")
+    val conf =
+      new SparkConf().setAppName("GradientBoostedTreeClassifierExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
 
     // $example on$
     // Load and parse the data file, converting it to a DataFrame.
-    val data = sqlContext.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+    val data = sqlContext.read
+      .format("libsvm")
+      .load("data/mllib/sample_libsvm_data.txt")
 
     // Index labels, adding metadata to the label column.
     // Fit on whole dataset to include all labels in index.

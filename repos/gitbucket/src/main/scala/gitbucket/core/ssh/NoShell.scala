@@ -7,7 +7,7 @@ import org.apache.sshd.server.{Environment, ExitCallback, Command}
 import java.io.{OutputStream, InputStream}
 import org.eclipse.jgit.lib.Constants
 
-class NoShell(sshAddress:SshAddress) extends Factory[Command] {
+class NoShell(sshAddress: SshAddress) extends Factory[Command] {
   override def create(): Command = new Command() {
     private var in: InputStream = null
     private var out: OutputStream = null
@@ -32,7 +32,9 @@ class NoShell(sshAddress:SshAddress) extends Factory[Command] {
           | Please use:
           |
           | git clone ssh://%s@%s:%d/OWNER/REPOSITORY_NAME.git
-        """.stripMargin.format(user, sshAddress.host, sshAddress.port).replace("\n", "\r\n") + "\r\n"
+        """.stripMargin
+          .format(user, sshAddress.host, sshAddress.port)
+          .replace("\n", "\r\n") + "\r\n"
       err.write(Constants.encode(message))
       err.flush()
       in.close()

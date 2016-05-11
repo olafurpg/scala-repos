@@ -7,35 +7,23 @@ object Test extends App {
 
   val x = NaN
 
-  if (NaN == NaN)
-    println("if (NaN == NaN) is broken")
-  else
-    println("if (NaN == NaN) is good")
+  if (NaN == NaN) println("if (NaN == NaN) is broken")
+  else println("if (NaN == NaN) is good")
 
-  if (x == x)
-    println("if (x == x) is broken")
-  else
-    println("if (x == x) is good")
+  if (x == x) println("if (x == x) is broken")
+  else println("if (x == x) is good")
 
-  if (x == NaN)
-    println("if (x == NaN) is broken")
-  else
-    println("if (x == NaN) is good")
+  if (x == NaN) println("if (x == NaN) is broken")
+  else println("if (x == NaN) is good")
 
-  if (NaN != NaN)
-    println("if (NaN != NaN) is good")
-  else
-    println("if (NaN != NaN) broken")
+  if (NaN != NaN) println("if (NaN != NaN) is good")
+  else println("if (NaN != NaN) broken")
 
-  if (x != x)
-    println("if (x != x) is good")
-  else
-    println("if (x != x) broken")
+  if (x != x) println("if (x != x) is good")
+  else println("if (x != x) broken")
 
-  if (NaN != x)
-    println("if (NaN != x) is good")
-  else
-    println("if (NaN != x) is broken")
+  if (NaN != x) println("if (NaN != x) is good")
+  else println("if (NaN != x) is broken")
 
   x match {
     case 0.0d => println("x matched 0!")

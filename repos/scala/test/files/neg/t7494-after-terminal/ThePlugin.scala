@@ -10,7 +10,8 @@ class ThePlugin(val global: Global) extends Plugin {
   import global._
 
   val name = "afterterminal"
-  val description = "Declares one plugin that wants to be after the terminal phase"
+  val description =
+    "Declares one plugin that wants to be after the terminal phase"
   val components = List[PluginComponent](thePhase)
 
   private object thePhase extends PluginComponent {
@@ -28,4 +29,3 @@ class ThePlugin(val global: Global) extends Plugin {
     def run {}
   }
 }
-

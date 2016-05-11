@@ -34,14 +34,17 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
   private val workerEndpoint = parent.worker.self
 
   override def renderJson(request: HttpServletRequest): JValue = {
-    val workerState = workerEndpoint.askWithRetry[WorkerStateResponse](RequestWorkerState)
+    val workerState =
+      workerEndpoint.askWithRetry[WorkerStateResponse](RequestWorkerState)
     JsonProtocol.writeWorkerState(workerState)
   }
 
   def render(request: HttpServletRequest): Seq[Node] = {
-    val workerState = workerEndpoint.askWithRetry[WorkerStateResponse](RequestWorkerState)
+    val workerState =
+      workerEndpoint.askWithRetry[WorkerStateResponse](RequestWorkerState)
 
-    val executorHeaders = Seq("ExecutorID", "Cores", "State", "Memory", "Job Details", "Logs")
+    val executorHeaders = Seq(
+        "ExecutorID", "Cores", "State", "Memory", "Job Details", "Logs")
     val runningExecutors = workerState.executors
     val runningExecutorTable =
       UIUtils.listingTable(executorHeaders, executorRow, runningExecutors)
@@ -49,17 +52,20 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
     val finishedExecutorTable =
       UIUtils.listingTable(executorHeaders, executorRow, finishedExecutors)
 
-    val driverHeaders = Seq("DriverID", "Main Class", "State", "Cores", "Memory", "Logs", "Notes")
+    val driverHeaders = Seq(
+        "DriverID", "Main Class", "State", "Cores", "Memory", "Logs", "Notes")
     val runningDrivers = workerState.drivers.sortBy(_.driverId).reverse
-    val runningDriverTable = UIUtils.listingTable(driverHeaders, driverRow, runningDrivers)
-    val finishedDrivers = workerState.finishedDrivers.sortBy(_.driverId).reverse
-    val finishedDriverTable = UIUtils.listingTable(driverHeaders, driverRow, finishedDrivers)
+    val runningDriverTable =
+      UIUtils.listingTable(driverHeaders, driverRow, runningDrivers)
+    val finishedDrivers =
+      workerState.finishedDrivers.sortBy(_.driverId).reverse
+    val finishedDriverTable =
+      UIUtils.listingTable(driverHeaders, driverRow, finishedDrivers)
 
     // For now we only show driver information if the user has submitted drivers to the cluster.
     // This is until we integrate the notion of drivers and applications in the UI.
 
-    val content =
-      <div class="row-fluid"> <!-- Worker Details -->
+    val content = <div class="row-fluid"> <!-- Worker Details -->
         <div class="span12">
           <ul class="unstyled">
             <li><strong>ID:</strong> {workerState.workerId}</li>
@@ -97,8 +103,9 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
           }
         </div>
       </div>;
-    UIUtils.basicSparkPage(content, "Spark Worker at %s:%s".format(
-      workerState.host, workerState.port))
+    UIUtils.basicSparkPage(
+        content,
+        "Spark Worker at %s:%s".format(workerState.host, workerState.port))
   }
 
   def executorRow(executor: ExecutorRunner): Seq[Node] = {
@@ -123,7 +130,6 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
         .format(executor.appId, executor.execId)}>stderr</a>
       </td>
     </tr>
-
   }
 
   def driverRow(driver: DriverRunner): Seq[Node] = {

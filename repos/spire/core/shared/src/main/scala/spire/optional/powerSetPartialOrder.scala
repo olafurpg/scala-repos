@@ -4,6 +4,7 @@ package optional
 import spire.algebra.PartialOrder
 
 object powerSetPartialOrder {
+
   /** Set partial order defined as follows:
     *
     * S <= T if S is a subset of T.
@@ -16,15 +17,12 @@ object powerSetPartialOrder {
     override def gt(x: Set[A], y: Set[A]): Boolean = y.subsetOf(x) && x != y
 
     def partialCompare(x: Set[A], y: Set[A]): Double = {
-      if (eqv(x, y))
-        0.0
-      else if (lt(x, y))
-        -1.0
-      else if (gt(x, y))
-        1.0
-      else
-        Double.NaN
+      if (eqv(x, y)) 0.0
+      else if (lt(x, y)) -1.0
+      else if (gt(x, y)) 1.0
+      else Double.NaN
     }
   }
-  implicit def powerSetPartialOrder[A]: PartialOrder[Set[A]] = new PowerSetPartialOrder[A]
+  implicit def powerSetPartialOrder[A]: PartialOrder[Set[A]] =
+    new PowerSetPartialOrder[A]
 }

@@ -35,13 +35,17 @@ object Test extends DirectTest {
     //   final static def closure = { x -> "banana" }
     //
     // }
-    writeFile(GroovyInterfaceDump.dump(), new File(outdir, "GroovyInterface.class"))
-    writeFile(GroovyInterface$1Dump.dump(), new File(outdir, "GroovyInterface$1.class"))
+    writeFile(
+        GroovyInterfaceDump.dump(), new File(outdir, "GroovyInterface.class"))
+    writeFile(GroovyInterface$1Dump.dump(),
+              new File(outdir, "GroovyInterface$1.class"))
     compileCode("object Test { def foo(g: GroovyInterface) = g.toString }")
   }
 
   def compileCode(code: String) = {
-    val classpath = List(sys.props("partest.lib"), testOutput.path) mkString sys.props("path.separator")
+    val classpath =
+      List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
+          "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(code)
   }
 }

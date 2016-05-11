@@ -34,45 +34,42 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.VBox
 
 /**
- * Several Label controls, displayed in various alignments with respect to an
- * image.
- *
- * @see scalafx.scene.control.Label
- * @resource /scalafx/ensemble/images/icon-48x48.png
- */
+  * Several Label controls, displayed in various alignments with respect to an
+  * image.
+  *
+  * @see scalafx.scene.control.Label
+  * @resource /scalafx/ensemble/images/icon-48x48.png
+  */
 class EnsembleAdvancedLabel extends EnsembleExample {
 
   def getContent = {
-    val icon = new Image(this.getClass.getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+    val icon = new Image(
+        this.getClass
+          .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
     new VBox {
       spacing = 10
       padding = Insets(20)
-      children = List(
-        new Label {
-          text = "Image above"
-          graphic = new ImageView(icon)
-          contentDisplay = ContentDisplay.Top
-        },
-        new Label {
-          text = "Image on the right"
-          graphic = new ImageView(icon)
-          contentDisplay = ContentDisplay.Right
-        },
-        new Label {
-          text = "Image below"
-          graphic = new ImageView(icon)
-          contentDisplay = ContentDisplay.Bottom
-        },
-        new Label {
-          text = "Image on the left"
-          graphic = new ImageView(icon)
-          contentDisplay = ContentDisplay.Left
-        },
-        new Label {
-          text = "Image centered"
-          graphic = new ImageView(icon)
-          contentDisplay = ContentDisplay.Center
-        })
+      children = List(new Label {
+        text = "Image above"
+        graphic = new ImageView(icon)
+        contentDisplay = ContentDisplay.Top
+      }, new Label {
+        text = "Image on the right"
+        graphic = new ImageView(icon)
+        contentDisplay = ContentDisplay.Right
+      }, new Label {
+        text = "Image below"
+        graphic = new ImageView(icon)
+        contentDisplay = ContentDisplay.Bottom
+      }, new Label {
+        text = "Image on the left"
+        graphic = new ImageView(icon)
+        contentDisplay = ContentDisplay.Left
+      }, new Label {
+        text = "Image centered"
+        graphic = new ImageView(icon)
+        contentDisplay = ContentDisplay.Center
+      })
     }
   }
 }

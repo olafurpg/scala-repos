@@ -1,8 +1,8 @@
 import scala.reflect.ClassTag
 
-@deprecated("Suppress warnings", since="2.11")
+@deprecated("Suppress warnings", since = "2.11")
 object Test extends App {
-  def classTagIsClassManifest[T: ClassTag] = {
+  def classTagIsClassManifest[T : ClassTag] = {
     println(classManifest[T])
   }
 

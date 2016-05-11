@@ -6,10 +6,10 @@ import com.twitter.finagle.{Dtab, SimpleFilter, Service}
 import com.twitter.util.{Throw, Return, Future}
 
 /**
- * Delegate to the dtab contained inside of the request.
- */
+  * Delegate to the dtab contained inside of the request.
+  */
 abstract class DtabFilter[Req <: Message, Rep <: Message]
-  extends SimpleFilter[Req, Rep] {
+    extends SimpleFilter[Req, Rep] {
 
   def respondToInvalid(req: Req, msg: String): Future[Rep]
 

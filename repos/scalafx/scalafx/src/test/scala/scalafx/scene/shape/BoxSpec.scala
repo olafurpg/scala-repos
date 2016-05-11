@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,4 +38,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 /** Box Spec tests. */
 @RunWith(classOf[JUnitRunner])
 class BoxSpec
-  extends SimpleSFXDelegateSpec[jfxss.Box, Box](classOf[jfxss.Box], classOf[Box])
+    extends SimpleSFXDelegateSpec[jfxss.Box, Box](
+        classOf[jfxss.Box], classOf[Box])

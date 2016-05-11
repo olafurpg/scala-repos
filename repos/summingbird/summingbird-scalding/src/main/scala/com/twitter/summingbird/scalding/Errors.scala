@@ -17,4 +17,5 @@
 package com.twitter.summingbird.scalding
 
 /** Puts a type on the final exception thrown by the scalding Planner */
-case class FlowPlanException(errs: List[FailureReason]) extends Exception(errs.mkString("\n"))
+case class FlowPlanException(errs: List[FailureReason])
+    extends Exception(errs.mkString("\n"))

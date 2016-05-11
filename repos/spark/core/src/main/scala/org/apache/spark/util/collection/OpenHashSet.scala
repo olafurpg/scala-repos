@@ -24,30 +24,30 @@ import com.google.common.hash.Hashing
 import org.apache.spark.annotation.Private
 
 /**
- * A simple, fast hash set optimized for non-null insertion-only use case, where keys are never
- * removed.
- *
- * The underlying implementation uses Scala compiler's specialization to generate optimized
- * storage for two primitive types (Long and Int). It is much faster than Java's standard HashSet
- * while incurring much less memory overhead. This can serve as building blocks for higher level
- * data structures such as an optimized HashMap.
- *
- * This OpenHashSet is designed to serve as building blocks for higher level data structures
- * such as an optimized hash map. Compared with standard hash set implementations, this class
- * provides its various callbacks interfaces (e.g. allocateFunc, moveFunc) and interfaces to
- * retrieve the position of a key in the underlying array.
- *
- * It uses quadratic probing with a power-of-2 hash table size, which is guaranteed
- * to explore all spaces for each key (see http://en.wikipedia.org/wiki/Quadratic_probing).
- */
+  * A simple, fast hash set optimized for non-null insertion-only use case, where keys are never
+  * removed.
+  *
+  * The underlying implementation uses Scala compiler's specialization to generate optimized
+  * storage for two primitive types (Long and Int). It is much faster than Java's standard HashSet
+  * while incurring much less memory overhead. This can serve as building blocks for higher level
+  * data structures such as an optimized HashMap.
+  *
+  * This OpenHashSet is designed to serve as building blocks for higher level data structures
+  * such as an optimized hash map. Compared with standard hash set implementations, this class
+  * provides its various callbacks interfaces (e.g. allocateFunc, moveFunc) and interfaces to
+  * retrieve the position of a key in the underlying array.
+  *
+  * It uses quadratic probing with a power-of-2 hash table size, which is guaranteed
+  * to explore all spaces for each key (see http://en.wikipedia.org/wiki/Quadratic_probing).
+  */
 @Private
-class OpenHashSet[@specialized(Long, Int) T: ClassTag](
-    initialCapacity: Int,
-    loadFactor: Double)
-  extends Serializable {
+class OpenHashSet[@specialized(Long, Int) T : ClassTag](
+    initialCapacity: Int, loadFactor: Double)
+    extends Serializable {
 
-  require(initialCapacity <= OpenHashSet.MAX_CAPACITY,
-    s"Can't make capacity bigger than ${OpenHashSet.MAX_CAPACITY} elements")
+  require(
+      initialCapacity <= OpenHashSet.MAX_CAPACITY,
+      s"Can't make capacity bigger than ${OpenHashSet.MAX_CAPACITY} elements")
   require(initialCapacity >= 1, "Invalid initial capacity")
   require(loadFactor < 1.0, "Load factor must be less than 1.0")
   require(loadFactor > 0.0, "Load factor must be greater than 0.0")
@@ -106,9 +106,9 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](
   def contains(k: T): Boolean = getPos(k) != INVALID_POS
 
   /**
-   * Add an element to the set. If the set is over capacity after the insertion, grow the set
-   * and rehash all elements.
-   */
+    * Add an element to the set. If the set is over capacity after the insertion, grow the set
+    * and rehash all elements.
+    */
   def add(k: T) {
     addWithoutResize(k)
     rehashIfNeeded(k, grow, move)
@@ -123,15 +123,15 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](
   }
 
   /**
-   * Add an element to the set. This one differs from add in that it doesn't trigger rehashing.
-   * The caller is responsible for calling rehashIfNeeded.
-   *
-   * Use (retval & POSITION_MASK) to get the actual position, and
-   * (retval & NONEXISTENCE_MASK) == 0 for prior existence.
-   *
-   * @return The position where the key is placed, plus the highest order bit is set if the key
-   *         does not exists previously.
-   */
+    * Add an element to the set. This one differs from add in that it doesn't trigger rehashing.
+    * The caller is responsible for calling rehashIfNeeded.
+    *
+    * Use (retval & POSITION_MASK) to get the actual position, and
+    * (retval & NONEXISTENCE_MASK) == 0 for prior existence.
+    *
+    * @return The position where the key is placed, plus the highest order bit is set if the key
+    *         does not exists previously.
+    */
   def addWithoutResize(k: T): Int = {
     var pos = hashcode(hasher.hash(k)) & _mask
     var delta = 1
@@ -155,22 +155,23 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](
   }
 
   /**
-   * Rehash the set if it is overloaded.
-   * @param k A parameter unused in the function, but to force the Scala compiler to specialize
-   *          this method.
-   * @param allocateFunc Callback invoked when we are allocating a new, larger array.
-   * @param moveFunc Callback invoked when we move the key from one position (in the old data array)
-   *                 to a new position (in the new data array).
-   */
-  def rehashIfNeeded(k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
+    * Rehash the set if it is overloaded.
+    * @param k A parameter unused in the function, but to force the Scala compiler to specialize
+    *          this method.
+    * @param allocateFunc Callback invoked when we are allocating a new, larger array.
+    * @param moveFunc Callback invoked when we move the key from one position (in the old data array)
+    *                 to a new position (in the new data array).
+    */
+  def rehashIfNeeded(
+      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
     if (_size > _growThreshold) {
       rehash(k, allocateFunc, moveFunc)
     }
   }
 
   /**
-   * Return the position of the element in the underlying array, or INVALID_POS if it is not found.
-   */
+    * Return the position of the element in the underlying array, or INVALID_POS if it is not found.
+    */
   def getPos(k: T): Int = {
     var pos = hashcode(hasher.hash(k)) & _mask
     var delta = 1
@@ -208,25 +209,27 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](
   }
 
   /**
-   * Return the next position with an element stored, starting from the given position inclusively.
-   */
+    * Return the next position with an element stored, starting from the given position inclusively.
+    */
   def nextPos(fromPos: Int): Int = _bitset.nextSetBit(fromPos)
 
   /**
-   * Double the table's size and re-hash everything. We are not really using k, but it is declared
-   * so Scala compiler can specialize this method (which leads to calling the specialized version
-   * of putInto).
-   *
-   * @param k A parameter unused in the function, but to force the Scala compiler to specialize
-   *          this method.
-   * @param allocateFunc Callback invoked when we are allocating a new, larger array.
-   * @param moveFunc Callback invoked when we move the key from one position (in the old data array)
-   *                 to a new position (in the new data array).
-   */
-  private def rehash(k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
+    * Double the table's size and re-hash everything. We are not really using k, but it is declared
+    * so Scala compiler can specialize this method (which leads to calling the specialized version
+    * of putInto).
+    *
+    * @param k A parameter unused in the function, but to force the Scala compiler to specialize
+    *          this method.
+    * @param allocateFunc Callback invoked when we are allocating a new, larger array.
+    * @param moveFunc Callback invoked when we move the key from one position (in the old data array)
+    *                 to a new position (in the new data array).
+    */
+  private def rehash(
+      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
     val newCapacity = _capacity * 2
-    require(newCapacity > 0 && newCapacity <= OpenHashSet.MAX_CAPACITY,
-      s"Can't contain more than ${(loadFactor * OpenHashSet.MAX_CAPACITY).toInt} elements")
+    require(
+        newCapacity > 0 && newCapacity <= OpenHashSet.MAX_CAPACITY,
+        s"Can't contain more than ${(loadFactor * OpenHashSet.MAX_CAPACITY).toInt} elements")
     allocateFunc(newCapacity)
     val newBitset = new BitSet(newCapacity)
     val newData = new Array[T](newCapacity)
@@ -266,8 +269,8 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](
   }
 
   /**
-   * Re-hash a value to deal better with hash functions that don't differ in the lower bits.
-   */
+    * Re-hash a value to deal better with hash functions that don't differ in the lower bits.
+    */
   private def hashcode(h: Int): Int = Hashing.murmur3_32().hashInt(h).asInt()
 
   private def nextPowerOf2(n: Int): Int = {
@@ -276,9 +279,7 @@ class OpenHashSet[@specialized(Long, Int) T: ClassTag](
   }
 }
 
-
-private[spark]
-object OpenHashSet {
+private[spark] object OpenHashSet {
 
   val MAX_CAPACITY = 1 << 30
   val INVALID_POS = -1
@@ -286,9 +287,9 @@ object OpenHashSet {
   val POSITION_MASK = (1 << 31) - 1
 
   /**
-   * A set of specialized hash function implementation to avoid boxing hash code computation
-   * in the specialized implementation of OpenHashSet.
-   */
+    * A set of specialized hash function implementation to avoid boxing hash code computation
+    * in the specialized implementation of OpenHashSet.
+    */
   sealed class Hasher[@specialized(Long, Int) T] extends Serializable {
     def hash(o: T): Int = o.hashCode()
   }
@@ -302,7 +303,7 @@ object OpenHashSet {
   }
 
   private def grow1(newSize: Int) {}
-  private def move1(oldPos: Int, newPos: Int) { }
+  private def move1(oldPos: Int, newPos: Int) {}
 
   private val grow = grow1 _
   private val move = move1 _

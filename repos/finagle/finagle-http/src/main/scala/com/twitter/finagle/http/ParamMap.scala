@@ -8,18 +8,18 @@ import scala.collection.immutable
 import scala.collection.JavaConverters._
 
 /**
- * Request parameter map.
- *
- * This is a multi-map.  Use getAll() get all values for a key.
- */
+  * Request parameter map.
+  *
+  * This is a multi-map.  Use getAll() get all values for a key.
+  */
 abstract class ParamMap
-  extends immutable.Map[String, String]
-  with immutable.MapLike[String, String, ParamMap] {
+    extends immutable.Map[String, String]
+    with immutable.MapLike[String, String, ParamMap] {
 
   /**
-   * Add a key/value pair to the map, returning a new map.
-   * Overwrites all values if the key exists.
-   */
+    * Add a key/value pair to the map, returning a new map.
+    * Overwrites all values if the key exists.
+    */
   def +[B >: String](kv: (String, B)): ParamMap = {
     val (key, value) = (kv._1, kv._2.toString)
     val map = MapParamMap.tuplesToMultiMap(iterator.toSeq)
@@ -28,9 +28,9 @@ abstract class ParamMap
   }
 
   /**
-   * Removes a key from this map, returning a new map.
-   * All values for the key are removed.
-   */
+    * Removes a key from this map, returning a new map.
+    * All values for the key are removed.
+    */
   def -(name: String): ParamMap = {
     val map = MapParamMap.tuplesToMultiMap(iterator.toSeq)
     new MapParamMap(map - name, isValid)
@@ -50,9 +50,9 @@ abstract class ParamMap
     super.keysIterator.toSeq.distinct.iterator
 
   /**
-   * Check if there was a parse error.  On a parse error, the parameters
-   * are treated as empty (versus throwing a parse exception).
-   */
+    * Check if there was a parse error.  On a parse error, the parameters
+    * are treated as empty (versus throwing a parse exception).
+    */
   def isValid: Boolean
 
   /** Get all parameters with name. */
@@ -96,19 +96,18 @@ abstract class ParamMap
 
   override def toString = {
     val encoder = new QueryStringEncoder("", Charset.forName("utf-8"))
-    iterator foreach { case (k, v) =>
-      encoder.addParam(k, v)
+    iterator foreach {
+      case (k, v) =>
+        encoder.addParam(k, v)
     }
     encoder.toString
   }
 }
 
-
 /** Map-backed ParamMap. */
 class MapParamMap(
-    underlying: Map[String, Seq[String]],
-    val isValid: Boolean = true)
-  extends ParamMap {
+    underlying: Map[String, Seq[String]], val isValid: Boolean = true)
+    extends ParamMap {
 
   def get(name: String): Option[String] =
     underlying.get(name) flatMap { _.headOption }
@@ -117,8 +116,7 @@ class MapParamMap(
     underlying.getOrElse(name, Nil)
 
   def iterator: Iterator[(String, String)] = {
-    for ((k, vs) <- underlying.iterator; v <- vs) yield
-      (k, v)
+    for ((k, vs) <- underlying.iterator; v <- vs) yield (k, v)
   }
 
   override def keySet: Set[String] =
@@ -128,23 +126,24 @@ class MapParamMap(
     underlying.keysIterator
 }
 
-
 object MapParamMap {
   def apply(params: Tuple2[String, String]*): MapParamMap =
     new MapParamMap(MapParamMap.tuplesToMultiMap(params))
 
   def apply(map: Map[String, String]): MapParamMap =
-    new MapParamMap(map.mapValues { value => Seq(value) })
+    new MapParamMap(
+        map.mapValues { value =>
+      Seq(value)
+    })
 
   private[http] def tuplesToMultiMap(
-    tuples: Seq[Tuple2[String, String]]
+      tuples: Seq[Tuple2[String, String]]
   ): Map[String, Seq[String]] = {
-    tuples
-      .groupBy { case (k, v) => k }
-      .mapValues { case values => values.map { _._2 } }
+    tuples.groupBy { case (k, v) => k }.mapValues {
+      case values => values.map { _._2 }
+    }
   }
 }
-
 
 /** Empty ParamMap */
 object EmptyParamMap extends ParamMap {
@@ -156,23 +155,22 @@ object EmptyParamMap extends ParamMap {
 }
 
 /**
- * HttpRequest-backed param map.  Handle parameters in the URL and form encoded
- * body.  Multipart forms are not supported (not needed, could be abusive).
- *
- * This map is a multi-map.  Use getAll() to get all values for a key.
- */
+  * HttpRequest-backed param map.  Handle parameters in the URL and form encoded
+  * body.  Multipart forms are not supported (not needed, could be abusive).
+  *
+  * This map is a multi-map.  Use getAll() to get all values for a key.
+  */
 class RequestParamMap(val request: Request) extends ParamMap {
   override def isValid: Boolean = _isValid
 
   private[this] var _isValid = true
 
-  private[this] val getParams: JMap[String, JList[String]] =
-    parseParams(request.uri)
+  private[this] val getParams: JMap[String, JList[String]] = parseParams(
+      request.uri)
 
   private[this] val postParams: JMap[String, JList[String]] = {
     if (request.method != Method.Trace &&
-        request.mediaType == Some(MediaType.WwwForm) &&
-        request.length > 0) {
+        request.mediaType == Some(MediaType.WwwForm) && request.length > 0) {
       parseParams("?" + request.contentString)
     } else {
       ParamMap.EmptyJMap
@@ -199,7 +197,7 @@ class RequestParamMap(val request: Request) extends ParamMap {
   /** Get value */
   def get(name: String): Option[String] =
     jget(postParams, name) match {
-      case None  => jget(getParams, name)
+      case None => jget(getParams, name)
       case value => value
     }
 
@@ -213,7 +211,8 @@ class RequestParamMap(val request: Request) extends ParamMap {
     keySet.iterator
 
   // Get value from JMap, which might be null
-  private def jget(params: JMap[String, JList[String]], name: String): Option[String] = {
+  private def jget(
+      params: JMap[String, JList[String]], name: String): Option[String] = {
     val values = params.get(name)
     if (values != null && !values.isEmpty()) {
       Some(values.get(0))
@@ -223,7 +222,8 @@ class RequestParamMap(val request: Request) extends ParamMap {
   }
 
   // Get values from JMap, which might be null
-  private def jgetAll(params: JMap[String, JList[String]], name: String): Iterable[String] = {
+  private def jgetAll(
+      params: JMap[String, JList[String]], name: String): Iterable[String] = {
     val values = params.get(name)
     if (values != null) {
       values.asScala
@@ -233,7 +233,8 @@ class RequestParamMap(val request: Request) extends ParamMap {
   }
 
   // Get iterable for JMap, which might be null
-  private def jiterator(params: JMap[String, JList[String]]): Iterator[(String, String)] =
+  private def jiterator(
+      params: JMap[String, JList[String]]): Iterator[(String, String)] =
     params.entrySet.asScala.flatMap { entry =>
       entry.getValue.asScala map { value =>
         (entry.getKey, value)
@@ -241,8 +242,8 @@ class RequestParamMap(val request: Request) extends ParamMap {
     }.toIterator
 }
 
-
 object ParamMap {
+
   /** Create ParamMap from parameter list. */
   def apply(params: Tuple2[String, String]*): ParamMap =
     MapParamMap(params: _*)

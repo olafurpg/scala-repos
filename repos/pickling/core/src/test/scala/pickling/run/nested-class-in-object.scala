@@ -6,7 +6,7 @@ import scala.pickling._, scala.pickling.Defaults._
 trait Command
 
 object Commands {
-   case class SomeCommand(x: String) extends Command
+  case class SomeCommand(x: String) extends Command
 }
 
 case class CommandMessage(cmd: Command)

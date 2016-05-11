@@ -8,13 +8,14 @@ import org.ensime.api._
 import org.ensime.core._
 
 /**
- * Spawned to listen to the server's response to an RpcRequest.
- */
+  * Spawned to listen to the server's response to an RpcRequest.
+  */
 class RequestHandler(
     envelope: RpcRequestEnvelope,
     project: ActorRef,
     server: ActorRef
-) extends Actor with ActorLogging {
+)
+    extends Actor with ActorLogging {
 
   override def preStart(): Unit = {
     log.debug(envelope.req.toString)
@@ -48,12 +49,11 @@ class RequestHandler(
       server forward RpcResponseEnvelope(Some(envelope.callId), response)
       context stop self
   }
-
 }
 object RequestHandler {
   def apply(
-    env: RpcRequestEnvelope,
-    project: ActorRef,
-    server: ActorRef
+      env: RpcRequestEnvelope,
+      project: ActorRef,
+      server: ActorRef
   ): Props = Props(classOf[RequestHandler], env, project, server)
 }

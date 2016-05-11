@@ -1,4 +1,4 @@
-import scala.collection.{ mutable, immutable, generic }
+import scala.collection.{mutable, immutable, generic}
 import immutable.ListSet
 
 object Test {
@@ -15,5 +15,3 @@ object Test {
     assert(ys1 == ys2)
   }
 }
-
-

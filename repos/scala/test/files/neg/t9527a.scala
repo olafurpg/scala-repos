@@ -5,4 +5,3 @@ class C {
     implicitly[Int => String]
   }
 }
-

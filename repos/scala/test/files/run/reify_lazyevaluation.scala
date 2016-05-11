@@ -1,5 +1,4 @@
-
-import scala.language.{ implicitConversions }
+import scala.language.{implicitConversions}
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.Eval
 
@@ -14,14 +13,14 @@ object Test extends App {
       implicit def force[A](s: Susp[A]): A = s()
 
       /**
-       * Data type of suspended computations. (The name froms from ML.)
-       */
+        * Data type of suspended computations. (The name froms from ML.)
+        */
       abstract class Susp[+A] extends Function0[A]
 
       /**
-       * Implementation of suspended computations, separated from the
-       * abstract class so that the type parameter can be invariant.
-       */
+        * Implementation of suspended computations, separated from the
+        * abstract class so that the type parameter can be invariant.
+        */
       class SuspImpl[A](lazyValue: => A) extends Susp[A] {
         private var maybeValue: Option[A] = None
 
@@ -30,7 +29,7 @@ object Test extends App {
             val value = lazyValue
             maybeValue = Some(value)
             value
-        case Some(value) =>
+          case Some(value) =>
             value
         }
 
@@ -45,14 +44,14 @@ object Test extends App {
 
     val s: Susp[Int] = delay { println("evaluating..."); 3 }
 
-    println("s     = " + s)       // show that s is unevaluated
-    println("s()   = " + s())     // evaluate s
-    println("s     = " + s)       // show that the value is saved
+    println("s     = " + s) // show that s is unevaluated
+    println("s()   = " + s()) // evaluate s
+    println("s     = " + s) // show that the value is saved
     println("2 + s = " + (2 + s)) // implicit call to force()
 
     val sl = delay { Some(3) }
     val sl1: Susp[Some[Int]] = sl
-    val sl2: Susp[Option[Int]] = sl1   // the type is covariant
+    val sl2: Susp[Option[Int]] = sl1 // the type is covariant
 
     println("sl2   = " + sl2)
     println("sl2() = " + sl2())

@@ -48,4 +48,4 @@ abstract class Foo$Int extends Foo[Int] {
     def bar$Int(x: Int): Int
   }
 }
-*/
+ */

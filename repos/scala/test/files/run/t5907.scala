@@ -13,7 +13,7 @@ object Test extends App {
     val c2 = C2()(1)
     println(c2.copy()(37))
 
-    val c3 = C3(1,2)(3)
+    val c3 = C3(1, 2)(3)
     println(c3.copy()(27))
     println(c3.copy(y = 22)(27))
     println(c3.copy(y = 7, x = 11)(27))
@@ -22,9 +22,9 @@ object Test extends App {
     println(c4.copy())
     println(c4.copy(x = 23))
 
-    val c5 = C5(1,2)(3,"a")
-    println(c5.copy()(33,"b"))
-    println(c5.copy(y = 19)(33,"b"))
+    val c5 = C5(1, 2)(3, "a")
+    println(c5.copy()(33, "b"))
+    println(c5.copy(y = 19)(33, "b"))
 
     {
       implicit val i = 193
@@ -52,13 +52,13 @@ object Test extends App {
       println(c7.copy(37)(298)(899)("ekjr"))
     }
 
-    val c8 = C8(1)(2,3)()("els")
+    val c8 = C8(1)(2, 3)()("els")
     println(c8.copy(x = 172)(989, 77)()("eliurna"))
 
     {
       implicit val s = "schtring"
-      println(c8.copy()(82,2111)())
-      println(c8.copy(x = -1)(92,29)()("lken"))
+      println(c8.copy()(82, 2111)())
+      println(c8.copy(x = -1)(92, 29)()("lken"))
     }
 
     val c9 = C9(1)(2)()()("u")
@@ -113,6 +113,6 @@ case class C8(x: Int)(y: Int, z: Int)()(implicit s: String) {
 case class C9(x: Int)(y: Int)()()(implicit s: String) {
   override def toString = s"c9: $x, $y, $s"
 }
-case class C10[T,U <: T](x: T)(y: U)(implicit z: T) {
+case class C10[T, U <: T](x: T)(y: U)(implicit z: T) {
   override def toString = s"c9: $x, $y, $z"
 }

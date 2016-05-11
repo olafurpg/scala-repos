@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.lang
 
@@ -54,7 +54,8 @@ class ClassTest {
     assertEquals("Integer", classOf[java.lang.Integer].getSimpleName())
     assertEquals("Class", classOf[java.lang.Class[_]].getSimpleName())
     assertEquals("Map", classOf[scala.collection.Map[_, _]].getSimpleName())
-    assertEquals("InnerClass", classOf[ClassTestClass#InnerClass].getSimpleName())
+    assertEquals(
+        "InnerClass", classOf[ClassTestClass#InnerClass].getSimpleName())
   }
 
   @Test def getComponentType(): Unit = {

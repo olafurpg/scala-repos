@@ -1,5 +1,5 @@
 class Foo[T](v: T) {}
 
 object Test {
- new Foo[Boolean](Boolean.FALSE)
+  new Foo[Boolean](Boolean.FALSE)
 }

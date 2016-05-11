@@ -18,16 +18,15 @@ if one of the following applies:
      in which it is defined. That is, a selection p.M is only legal if the prefix is this
      or O.this, for some class O enclosing the reference. In addition, the restrictions
      for unqualified protected apply.
-*/
-
+  */
 object E {
   val e = new E
   import e._
   def n(a: A, b: B, c: C) = {
-    b.protE    // 1c
-    c.protE    // 1c
-    a.protE    // 1c
-    A.protOE   // 1c
+    b.protE // 1c
+    c.protE // 1c
+    a.protE // 1c
+    A.protOE // 1c
   }
 }
 
@@ -44,9 +43,9 @@ class E {
 
     // 1a
     prot; protE; protT
-    def foo = {prot; protE; protT}
+    def foo = { prot; protE; protT }
     new { prot; protE }
-    def this(a: Any) = {this(); prot; protE; protT}
+    def this(a: Any) = { this(); prot; protE; protT }
     object B extends A {
       A.this.prot
       A.this.protE
@@ -72,43 +71,43 @@ class E {
     super.protT
 
     def n(a: A, b: B, c: C) = {
-      b.prot    // 3
-      c.prot    // 3
-      a.prot    // not allowed, prefix type `A` does not conform to `B`
+      b.prot // 3
+      c.prot // 3
+      a.prot // not allowed, prefix type `A` does not conform to `B`
 
-      b.protT   // not allowed
-      c.protT   // not allowed
-      a.protT   // not allowed
+      b.protT // not allowed
+      c.protT // not allowed
+      a.protT // not allowed
     }
   }
   object B {
     def n(a: A, b: B, c: C) = {
-      b.prot    // 3 !!!
-      c.prot    // 3 !!!
+      b.prot // 3 !!!
+      c.prot // 3 !!!
       // Wording of 3 seems insufficient, missing:
       // "... (if the access is from a class), or
       // the type instance of companion class (if the access is from a module)"
-      a.prot    // not allowed
+      a.prot // not allowed
 
-      b.protT   // not allowed
-      c.protT   // not allowed
-      a.protT   // not allowed
+      b.protT // not allowed
+      c.protT // not allowed
+      a.protT // not allowed
     }
   }
   class C extends B
 
   class Z {
     def n(a: A, b: B, c: C) = {
-      b.prot    // not allowed
-      c.prot    // not allowed
-      a.prot    // not allowed
-      b.protE   // 2
-      a.protE   // 2
-      c.protE   // 2
+      b.prot // not allowed
+      c.prot // not allowed
+      a.prot // not allowed
+      b.protE // 2
+      a.protE // 2
+      c.protE // 2
 
-      b.protT   // not allowed
-      c.protT   // not allowed
-      a.protT   // not allowed
+      b.protT // not allowed
+      c.protT // not allowed
+      a.protT // not allowed
     }
   }
 }
@@ -117,11 +116,11 @@ class Other {
   val e = new E
   import e._
   def n(a: A, b: B, c: C) = {
-    b.prot    // not allowed
-    c.prot    // not allowed
-    a.prot    // not allowed
-    b.protE   // not allowed
-    a.protE   // not allowed
-    c.protE   // not allowed
+    b.prot // not allowed
+    c.prot // not allowed
+    a.prot // not allowed
+    b.protE // not allowed
+    a.protE // not allowed
+    c.protE // not allowed
   }
 }

@@ -7,12 +7,12 @@ import org.scalajs.core.tools.io._
 import java.io.File
 
 /** A helper class to temporarily store virtual files to the filesystem.
- *
- *  Can be used with tools that require real files.
- *  @param singleDir if true, forces files to be copied into
- *      [[cacheDir]]. Useful to setup include directories for
- *      example.
- */
+  *
+  *  Can be used with tools that require real files.
+  *  @param singleDir if true, forces files to be copied into
+  *      [[cacheDir]]. Useful to setup include directories for
+  *      example.
+  */
 final class VirtualFileMaterializer(singleDir: Boolean = false) {
   import VirtualFileMaterializer._
 
@@ -23,8 +23,8 @@ final class VirtualFileMaterializer(singleDir: Boolean = false) {
   }
 
   /** Create a target file to write/copy to. Will also call
-   *  deleteOnExit on the file.
-   */
+    *  deleteOnExit on the file.
+    */
   private def trgFile(name: String): File = {
     val f = new File(cacheDir, name)
     f.deleteOnExit()
@@ -50,9 +50,9 @@ final class VirtualFileMaterializer(singleDir: Boolean = false) {
   }
 
   /** Removes the cache directory. Any operation on this
-   *  VirtualFileMaterializer is invalid after [[close]] has been
-   *  called.
-   */
+    *  VirtualFileMaterializer is invalid after [[close]] has been
+    *  called.
+    */
   def close(): Unit = {
     cacheDir.listFiles().foreach(_.delete)
     cacheDir.delete()
@@ -70,12 +70,11 @@ final class VirtualFileMaterializer(singleDir: Boolean = false) {
     @tailrec
     def loop(tries: Int): File = {
       val tempDir = new File(baseDir, baseName + tries)
-      if (tempDir.mkdir())
-        tempDir
-      else if (tries < TempDirAttempts)
-        loop(tries + 1)
+      if (tempDir.mkdir()) tempDir
+      else if (tries < TempDirAttempts) loop(tries + 1)
       else {
-        throw new IllegalStateException("Failed to create directory within " +
+        throw new IllegalStateException(
+            "Failed to create directory within " +
             s"$TempDirAttempts attempts (tried ${baseName}0 to " +
             s"${baseName}${TempDirAttempts - 1})")
       }
@@ -83,7 +82,6 @@ final class VirtualFileMaterializer(singleDir: Boolean = false) {
 
     loop(0)
   }
-
 }
 
 private object VirtualFileMaterializer {

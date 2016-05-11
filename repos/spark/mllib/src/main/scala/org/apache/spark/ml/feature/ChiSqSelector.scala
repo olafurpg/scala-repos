@@ -33,21 +33,23 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 
 /**
- * Params for [[ChiSqSelector]] and [[ChiSqSelectorModel]].
- */
-private[feature] trait ChiSqSelectorParams extends Params
-  with HasFeaturesCol with HasOutputCol with HasLabelCol {
+  * Params for [[ChiSqSelector]] and [[ChiSqSelectorModel]].
+  */
+private[feature] trait ChiSqSelectorParams
+    extends Params with HasFeaturesCol with HasOutputCol with HasLabelCol {
 
   /**
-   * Number of features that selector will select (ordered by statistic value descending). If the
-   * number of features is < numTopFeatures, then this will select all features. The default value
-   * of numTopFeatures is 50.
-   * @group param
-   */
-  final val numTopFeatures = new IntParam(this, "numTopFeatures",
-    "Number of features that selector will select, ordered by statistics value descending. If the" +
+    * Number of features that selector will select (ordered by statistic value descending). If the
+    * number of features is < numTopFeatures, then this will select all features. The default value
+    * of numTopFeatures is 50.
+    * @group param
+    */
+  final val numTopFeatures = new IntParam(
+      this,
+      "numTopFeatures",
+      "Number of features that selector will select, ordered by statistics value descending. If the" +
       " number of features is < numTopFeatures, then this will select all features.",
-    ParamValidators.gtEq(1))
+      ParamValidators.gtEq(1))
   setDefault(numTopFeatures -> 50)
 
   /** @group getParam */
@@ -55,13 +57,14 @@ private[feature] trait ChiSqSelectorParams extends Params
 }
 
 /**
- * :: Experimental ::
- * Chi-Squared feature selection, which selects categorical features to use for predicting a
- * categorical label.
- */
+  * :: Experimental ::
+  * Chi-Squared feature selection, which selects categorical features to use for predicting a
+  * categorical label.
+  */
 @Experimental
 final class ChiSqSelector(override val uid: String)
-  extends Estimator[ChiSqSelectorModel] with ChiSqSelectorParams with DefaultParamsWritable {
+    extends Estimator[ChiSqSelectorModel] with ChiSqSelectorParams
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("chiSqSelector"))
 
@@ -104,14 +107,15 @@ object ChiSqSelector extends DefaultParamsReadable[ChiSqSelector] {
 }
 
 /**
- * :: Experimental ::
- * Model fitted by [[ChiSqSelector]].
- */
+  * :: Experimental ::
+  * Model fitted by [[ChiSqSelector]].
+  */
 @Experimental
-final class ChiSqSelectorModel private[ml] (
+final class ChiSqSelectorModel private[ml](
     override val uid: String,
     private val chiSqSelector: feature.ChiSqSelectorModel)
-  extends Model[ChiSqSelectorModel] with ChiSqSelectorParams with MLWritable {
+    extends Model[ChiSqSelectorModel] with ChiSqSelectorParams
+    with MLWritable {
 
   import ChiSqSelectorModel._
 
@@ -131,7 +135,8 @@ final class ChiSqSelectorModel private[ml] (
     val transformedSchema = transformSchema(dataset.schema, logging = true)
     val newField = transformedSchema.last
     val selector = udf { chiSqSelector.transform _ }
-    dataset.withColumn($(outputCol), selector(col($(featuresCol))), newField.metadata)
+    dataset.withColumn(
+        $(outputCol), selector(col($(featuresCol))), newField.metadata)
   }
 
   override def transformSchema(schema: StructType): StructType = {
@@ -142,16 +147,19 @@ final class ChiSqSelectorModel private[ml] (
   }
 
   /**
-   * Prepare the output column field, including per-feature metadata.
-   */
+    * Prepare the output column field, including per-feature metadata.
+    */
   private def prepOutputField(schema: StructType): StructField = {
     val selector = chiSqSelector.selectedFeatures.toSet
     val origAttrGroup = AttributeGroup.fromStructField(schema($(featuresCol)))
-    val featureAttributes: Array[Attribute] = if (origAttrGroup.attributes.nonEmpty) {
-      origAttrGroup.attributes.get.zipWithIndex.filter(x => selector.contains(x._2)).map(_._1)
-    } else {
-      Array.fill[Attribute](selector.size)(NominalAttribute.defaultAttr)
-    }
+    val featureAttributes: Array[Attribute] =
+      if (origAttrGroup.attributes.nonEmpty) {
+        origAttrGroup.attributes.get.zipWithIndex
+          .filter(x => selector.contains(x._2))
+          .map(_._1)
+      } else {
+        Array.fill[Attribute](selector.size)(NominalAttribute.defaultAttr)
+      }
     val newAttributeGroup = new AttributeGroup($(outputCol), featureAttributes)
     newAttributeGroup.toStructField()
   }
@@ -168,8 +176,9 @@ final class ChiSqSelectorModel private[ml] (
 @Since("1.6.0")
 object ChiSqSelectorModel extends MLReadable[ChiSqSelectorModel] {
 
-  private[ChiSqSelectorModel]
-  class ChiSqSelectorModelWriter(instance: ChiSqSelectorModel) extends MLWriter {
+  private[ChiSqSelectorModel] class ChiSqSelectorModelWriter(
+      instance: ChiSqSelectorModel)
+      extends MLWriter {
 
     private case class Data(selectedFeatures: Seq[Int])
 
@@ -177,7 +186,11 @@ object ChiSqSelectorModel extends MLReadable[ChiSqSelectorModel] {
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val data = Data(instance.selectedFeatures.toSeq)
       val dataPath = new Path(path, "data").toString
-      sqlContext.createDataFrame(Seq(data)).repartition(1).write.parquet(dataPath)
+      sqlContext
+        .createDataFrame(Seq(data))
+        .repartition(1)
+        .write
+        .parquet(dataPath)
     }
   }
 
@@ -188,7 +201,8 @@ object ChiSqSelectorModel extends MLReadable[ChiSqSelectorModel] {
     override def load(path: String): ChiSqSelectorModel = {
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val dataPath = new Path(path, "data").toString
-      val data = sqlContext.read.parquet(dataPath).select("selectedFeatures").head()
+      val data =
+        sqlContext.read.parquet(dataPath).select("selectedFeatures").head()
       val selectedFeatures = data.getAs[Seq[Int]](0).toArray
       val oldModel = new feature.ChiSqSelectorModel(selectedFeatures)
       val model = new ChiSqSelectorModel(metadata.uid, oldModel)
@@ -198,7 +212,8 @@ object ChiSqSelectorModel extends MLReadable[ChiSqSelectorModel] {
   }
 
   @Since("1.6.0")
-  override def read: MLReader[ChiSqSelectorModel] = new ChiSqSelectorModelReader
+  override def read: MLReader[ChiSqSelectorModel] =
+    new ChiSqSelectorModelReader
 
   @Since("1.6.0")
   override def load(path: String): ChiSqSelectorModel = super.load(path)

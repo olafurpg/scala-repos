@@ -5,7 +5,7 @@
 package akka.http.impl.engine.ws
 
 import scala.annotation.tailrec
-import scala.util.{ Try, Failure, Success }
+import scala.util.{Try, Failure, Success}
 import akka.util.ByteString
 import akka.parboiled2
 import parboiled2._
@@ -29,29 +29,30 @@ final case class Bits(elements: Seq[Bits.BitElement]) {
 
     require(bits % 8 == 0)
     val data = new Array[Byte](bits / 8)
-    @tailrec def rec(byteIdx: Int, bitIdx: Int, remaining: Seq[Bits.BitElement]): Unit =
+    @tailrec
+    def rec(byteIdx: Int, bitIdx: Int, remaining: Seq[Bits.BitElement]): Unit =
       if (bitIdx >= 8) rec(byteIdx + 1, bitIdx - 8, remaining)
-      else remaining match {
-        case Zero +: rest ⇒
-          // zero by default
-          rec(byteIdx, bitIdx + 1, rest)
-        case One +: rest ⇒
-          data(byteIdx) = (data(byteIdx) | (1 << (7 - bitIdx))).toByte
-          rec(byteIdx, bitIdx + 1, rest)
-        case Multibit(bits, value) +: rest ⇒
-          val numBits = math.min(8 - bitIdx, bits)
-          val remainingBits = bits - numBits
-          val highestNBits = value >> remainingBits
-          val lowestNBitMask = (~(0xff << numBits) & 0xff)
-          data(byteIdx) = (data(byteIdx) | (highestNBits & lowestNBitMask)).toByte
+      else
+        remaining match {
+          case Zero +: rest ⇒
+            // zero by default
+            rec(byteIdx, bitIdx + 1, rest)
+          case One +: rest ⇒
+            data(byteIdx) = (data(byteIdx) | (1 << (7 - bitIdx))).toByte
+            rec(byteIdx, bitIdx + 1, rest)
+          case Multibit(bits, value) +: rest ⇒
+            val numBits = math.min(8 - bitIdx, bits)
+            val remainingBits = bits - numBits
+            val highestNBits = value >> remainingBits
+            val lowestNBitMask = (~(0xff << numBits) & 0xff)
+            data(byteIdx) = (data(byteIdx) | (highestNBits & lowestNBitMask)).toByte
 
-          if (remainingBits > 0)
-            rec(byteIdx + 1, 0, Multibit(remainingBits, value) +: rest)
-          else
-            rec(byteIdx, bitIdx + numBits, rest)
-        case Nil ⇒
-          require(bitIdx == 0 && byteIdx == bits / 8)
-      }
+            if (remainingBits > 0)
+              rec(byteIdx + 1, 0, Multibit(remainingBits, value) +: rest)
+            else rec(byteIdx, bitIdx + numBits, rest)
+          case Nil ⇒
+            require(bitIdx == 0 && byteIdx == bits / 8)
+        }
     rec(0, 0, elements)
 
     ByteString(data) // this could be ByteString1C
@@ -73,9 +74,11 @@ class BitSpecParser(val input: ParserInput) extends parboiled2.Parser {
   import Bits._
   def parseBits(): Try[Bits] =
     bits.run() match {
-      case s: Success[Bits]       ⇒ s
-      case Failure(e: ParseError) ⇒ Failure(new RuntimeException(formatError(e, new ErrorFormatter(showTraces = true))))
-      case _                      ⇒ throw new IllegalStateException()
+      case s: Success[Bits] ⇒ s
+      case Failure(e: ParseError) ⇒
+        Failure(new RuntimeException(
+                formatError(e, new ErrorFormatter(showTraces = true))))
+      case _ ⇒ throw new IllegalStateException()
     }
 
   def bits: Rule1[Bits] = rule { zeroOrMore(element) ~ EOI ~> (Bits(_)) }
@@ -97,6 +100,7 @@ class BitSpecParser(val input: ParserInput) extends parboiled2.Parser {
     capture(oneOrMore('x' ~ ws)) ~> (_.count(_ == 'x')) ~ '=' ~ value ~ ws ~> Multibit
   }
   def value: Rule1[Long] = rule {
-    capture(oneOrMore(CharPredicate.HexDigit)) ~> ((str: String) ⇒ java.lang.Long.parseLong(str, 16))
+    capture(oneOrMore(CharPredicate.HexDigit)) ~>
+    ((str: String) ⇒ java.lang.Long.parseLong(str, 16))
   }
 }

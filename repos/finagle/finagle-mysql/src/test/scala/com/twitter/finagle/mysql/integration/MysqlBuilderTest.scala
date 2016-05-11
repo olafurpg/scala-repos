@@ -46,6 +46,5 @@ class MysqlBuilderTest extends FunSuite with IntegrationClient {
 
       assert(mysqlTraces.nonEmpty, "missing traces")
     }
-
   }
 }

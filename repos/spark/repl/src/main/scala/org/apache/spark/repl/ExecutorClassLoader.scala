@@ -33,18 +33,18 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.{ParentClassLoader, Utils}
 
 /**
- * A ClassLoader that reads classes from a Hadoop FileSystem or HTTP URI,
- * used to load classes defined by the interpreter when the REPL is used.
- * Allows the user to specify if user class path should be first.
- * This class loader delegates getting/finding resources to parent loader,
- * which makes sense until REPL never provide resource dynamically.
- */
-class ExecutorClassLoader(
-    conf: SparkConf,
-    env: SparkEnv,
-    classUri: String,
-    parent: ClassLoader,
-    userClassPathFirst: Boolean) extends ClassLoader with Logging {
+  * A ClassLoader that reads classes from a Hadoop FileSystem or HTTP URI,
+  * used to load classes defined by the interpreter when the REPL is used.
+  * Allows the user to specify if user class path should be first.
+  * This class loader delegates getting/finding resources to parent loader,
+  * which makes sense until REPL never provide resource dynamically.
+  */
+class ExecutorClassLoader(conf: SparkConf,
+                          env: SparkEnv,
+                          classUri: String,
+                          parent: ClassLoader,
+                          userClassPathFirst: Boolean)
+    extends ClassLoader with Logging {
   val uri = new URI(classUri)
   val directory = uri.getPath
 
@@ -57,7 +57,8 @@ class ExecutorClassLoader(
     case "spark" => getClassFileInputStreamFromSparkRPC
     case "http" | "https" | "ftp" => getClassFileInputStreamFromHttpServer
     case _ =>
-      val fileSystem = FileSystem.get(uri, SparkHadoopUtil.get.newConfiguration(conf))
+      val fileSystem =
+        FileSystem.get(uri, SparkHadoopUtil.get.newConfiguration(conf))
       getClassFileInputStreamFromFileSystem(fileSystem)
   }
 
@@ -71,26 +72,27 @@ class ExecutorClassLoader(
 
   override def findClass(name: String): Class[_] = {
     userClassPathFirst match {
-      case true => findClassLocally(name).getOrElse(parentLoader.loadClass(name))
+      case true =>
+        findClassLocally(name).getOrElse(parentLoader.loadClass(name))
       case false => {
-        try {
-          parentLoader.loadClass(name)
-        } catch {
-          case e: ClassNotFoundException => {
-            val classOption = findClassLocally(name)
-            classOption match {
-              case None =>
-                // If this class has a cause, it will break the internal assumption of Janino
-                // (the compiler used for Spark SQL code-gen).
-                // See org.codehaus.janino.ClassLoaderIClassLoader's findIClass, you will see
-                // its behavior will be changed if there is a cause and the compilation
-                // of generated class will fail.
-                throw new ClassNotFoundException(name)
-              case Some(a) => a
-            }
+          try {
+            parentLoader.loadClass(name)
+          } catch {
+            case e: ClassNotFoundException => {
+                val classOption = findClassLocally(name)
+                classOption match {
+                  case None =>
+                    // If this class has a cause, it will break the internal assumption of Janino
+                    // (the compiler used for Spark SQL code-gen).
+                    // See org.codehaus.janino.ClassLoaderIClassLoader's findIClass, you will see
+                    // its behavior will be changed if there is a cause and the compilation
+                    // of generated class will fail.
+                    throw new ClassNotFoundException(name)
+                  case Some(a) => a
+                }
+              }
           }
         }
-      }
     }
   }
 
@@ -116,16 +118,21 @@ class ExecutorClassLoader(
     }
   }
 
-  private def getClassFileInputStreamFromHttpServer(pathInDirectory: String): InputStream = {
-    val url = if (SparkEnv.get.securityManager.isAuthenticationEnabled()) {
-      val uri = new URI(classUri + "/" + urlEncode(pathInDirectory))
-      val newuri = Utils.constructURIForAuthentication(uri, SparkEnv.get.securityManager)
-      newuri.toURL
-    } else {
-      new URL(classUri + "/" + urlEncode(pathInDirectory))
-    }
-    val connection: HttpURLConnection = Utils.setupSecureURLConnection(url.openConnection(),
-      SparkEnv.get.securityManager).asInstanceOf[HttpURLConnection]
+  private def getClassFileInputStreamFromHttpServer(
+      pathInDirectory: String): InputStream = {
+    val url =
+      if (SparkEnv.get.securityManager.isAuthenticationEnabled()) {
+        val uri = new URI(classUri + "/" + urlEncode(pathInDirectory))
+        val newuri = Utils.constructURIForAuthentication(
+            uri, SparkEnv.get.securityManager)
+        newuri.toURL
+      } else {
+        new URL(classUri + "/" + urlEncode(pathInDirectory))
+      }
+    val connection: HttpURLConnection = Utils
+      .setupSecureURLConnection(
+          url.openConnection(), SparkEnv.get.securityManager)
+      .asInstanceOf[HttpURLConnection]
     // Set the connection timeouts (for testing purposes)
     if (httpUrlConnectionTimeoutMillis != -1) {
       connection.setConnectTimeout(httpUrlConnectionTimeoutMillis)
@@ -176,7 +183,9 @@ class ExecutorClassLoader(
         None
       case e: Exception =>
         // Something bad happened while checking if the class exists
-        logError(s"Failed to check existence of class $name on REPL class server at $uri", e)
+        logError(
+            s"Failed to check existence of class $name on REPL class server at $uri",
+            e)
         None
     } finally {
       if (inputStream != null) {
@@ -198,7 +207,7 @@ class ExecutorClassLoader(
       // be initialized later through reflection when it is used in a task.
       val cr = new ClassReader(in)
       val cw = new ClassWriter(
-        ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS)
+          ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS)
       val cleaner = new ConstructorCleaner(name, cw)
       cr.accept(cleaner, 0)
       return cw.toByteArray
@@ -220,17 +229,20 @@ class ExecutorClassLoader(
   }
 
   /**
-   * URL-encode a string, preserving only slashes
-   */
+    * URL-encode a string, preserving only slashes
+    */
   def urlEncode(str: String): String = {
     str.split('/').map(part => URLEncoder.encode(part, "UTF-8")).mkString("/")
   }
 }
 
 class ConstructorCleaner(className: String, cv: ClassVisitor)
-extends ClassVisitor(ASM5, cv) {
-  override def visitMethod(access: Int, name: String, desc: String,
-      sig: String, exceptions: Array[String]): MethodVisitor = {
+    extends ClassVisitor(ASM5, cv) {
+  override def visitMethod(access: Int,
+                           name: String,
+                           desc: String,
+                           sig: String,
+                           exceptions: Array[String]): MethodVisitor = {
     val mv = cv.visitMethod(access, name, desc, sig, exceptions)
     if (name == "<init>" && (access & ACC_STATIC) == 0) {
       // This is the constructor, time to clean it; just output some new
@@ -238,7 +250,8 @@ extends ClassVisitor(ASM5, cv) {
       // field in the class to point to it, but do nothing otherwise.
       mv.visitCode()
       mv.visitVarInsn(ALOAD, 0) // load this
-      mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false)
+      mv.visitMethodInsn(
+          INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false)
       mv.visitVarInsn(ALOAD, 0) // load this
       // val classType = className.replace('.', '/')
       // mv.visitFieldInsn(PUTSTATIC, classType, "MODULE$", "L" + classType + ";")

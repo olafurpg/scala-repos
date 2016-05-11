@@ -34,27 +34,32 @@ import scalafx.beans.property.{BooleanProperty, DoubleProperty}
 import scalafx.delegate.SFXDelegate
 
 object PerspectiveCamera {
-  implicit def sfxPerspectiveCamera2jfx(c: PerspectiveCamera): jfxs.PerspectiveCamera = if (c != null) c.delegate else null
+  implicit def sfxPerspectiveCamera2jfx(
+      c: PerspectiveCamera): jfxs.PerspectiveCamera =
+    if (c != null) c.delegate else null
 }
 
-class PerspectiveCamera(override val delegate: jfxs.PerspectiveCamera = new jfxs.PerspectiveCamera)
-  extends Camera(delegate) with SFXDelegate[jfxs.PerspectiveCamera] {
+class PerspectiveCamera(
+    override val delegate: jfxs.PerspectiveCamera = new jfxs.PerspectiveCamera)
+    extends Camera(delegate) with SFXDelegate[jfxs.PerspectiveCamera] {
 
   /** Constructs a PerspectiveCamera with the specified fixedEyeAtCameraZero flag.  */
-  def this(fixedEyeAtCameraZero: Boolean) = this(new jfxs.PerspectiveCamera(fixedEyeAtCameraZero))
+  def this(fixedEyeAtCameraZero: Boolean) =
+    this(new jfxs.PerspectiveCamera(fixedEyeAtCameraZero))
 
   /**
-   * Specifies the vertical angle of the camera's projection.
-   */
+    * Specifies the vertical angle of the camera's projection.
+    */
   def fieldOfView: DoubleProperty = delegate.fieldOfViewProperty
   def fieldOfView_=(v: Double) {
     fieldOfView() = v
   }
 
   /**
-   * Defines whether the `fieldOfView` property is to apply to the vertical dimension of the projection plane.
-   */
-  def verticalFieldOfView: BooleanProperty = delegate.verticalFieldOfViewProperty
+    * Defines whether the `fieldOfView` property is to apply to the vertical dimension of the projection plane.
+    */
+  def verticalFieldOfView: BooleanProperty =
+    delegate.verticalFieldOfViewProperty
   def verticalFieldOfView_=(v: Boolean) {
     verticalFieldOfView() = v
   }

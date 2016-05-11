@@ -13,48 +13,73 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticF
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 /**
- * Pavel Fatin
- */
-
-class ScalaRedundantConversionInspection extends AbstractInspection("Redundant conversion") {
+  * Pavel Fatin
+  */
+class ScalaRedundantConversionInspection
+    extends AbstractInspection("Redundant conversion") {
   def actionFor(holder: ProblemsHolder) = {
-    case element @ ScReferenceExpression.withQualifier(qualifier) && PsiReferenceEx.resolve(target) =>
+    case element @ ScReferenceExpression.withQualifier(qualifier) && PsiReferenceEx
+          .resolve(target) =>
       process(element, qualifier, target, qualifier.getTextLength, holder)
-    case element @ ScPostfixExpr(operand, operator @ PsiReferenceEx.resolve(target)) =>
-      process(element, operand, target, operator.getStartOffsetInParent, holder)
+    case element @ ScPostfixExpr(
+        operand, operator @ PsiReferenceEx.resolve(target)) =>
+      process(
+          element, operand, target, operator.getStartOffsetInParent, holder)
   }
 
-  private def process(element: PsiElement, left: ScExpression, target: PsiElement, offset: Int, holder: ProblemsHolder) {
+  private def process(element: PsiElement,
+                      left: ScExpression,
+                      target: PsiElement,
+                      offset: Int,
+                      holder: ProblemsHolder) {
     target match {
       case f: ScSyntheticFunction if f.name.startsWith("to") =>
         for (leftType <- left.getType(TypingContext.empty);
-             conversionType = f.retType if leftType.equiv(conversionType))
-          registerProblem(element, left, conversionType.presentableText, offset, holder)
-      case f: PsiMethod if f.getName == "toString" &&
-              f.getParameterList.getParametersCount == 0 &&
-              (f.getTypeParameterList == null || f.getTypeParameterList.getTypeParameters.isEmpty) =>
-        for (leftType <- left.getType(TypingContext.empty) if leftType.canonicalText == "_root_.java.lang.String")
-          registerProblem(element, left, "java.lang.String", offset, holder)
+        conversionType = f.retType
+            if leftType.equiv(conversionType)) registerProblem(
+            element, left, conversionType.presentableText, offset, holder)
+      case f: PsiMethod
+          if f.getName == "toString" &&
+          f.getParameterList.getParametersCount == 0 &&
+          (f.getTypeParameterList == null ||
+              f.getTypeParameterList.getTypeParameters.isEmpty) =>
+        for (leftType <- left.getType(TypingContext.empty)
+                            if leftType.canonicalText == "_root_.java.lang.String") registerProblem(
+            element, left, "java.lang.String", offset, holder)
       case _ =>
     }
   }
 
-  private def registerProblem(element: PsiElement, left: ScExpression, conversionType: String,
-                      offset: Int, holder: ProblemsHolder) {
+  private def registerProblem(element: PsiElement,
+                              left: ScExpression,
+                              conversionType: String,
+                              offset: Int,
+                              holder: ProblemsHolder) {
     val descriptor = {
       val range = new TextRange(offset, element.getTextLength)
 
-      val message = "Casting '%s' to '%s' is redundant".format(left.getText, conversionType)
+      val message = "Casting '%s' to '%s' is redundant".format(
+          left.getText, conversionType)
 
-      new ProblemDescriptorImpl(element, element, message, Array(new RemoveConversionQuickFix(element, left)),
-        ProblemHighlightType.LIKE_UNUSED_SYMBOL, false, range, null, false)
+      new ProblemDescriptorImpl(
+          element,
+          element,
+          message,
+          Array(new RemoveConversionQuickFix(element, left)),
+          ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+          false,
+          range,
+          null,
+          false)
     }
 
     holder.registerProblem(descriptor)
   }
 
-  private class RemoveConversionQuickFix(element: PsiElement, expr: ScExpression)
-          extends AbstractFixOnTwoPsiElements("Remove Redundant Conversion", element, expr) {
+  private class RemoveConversionQuickFix(
+      element: PsiElement, expr: ScExpression)
+      extends AbstractFixOnTwoPsiElements(
+          "Remove Redundant Conversion", element, expr) {
     def doApplyFix(project: Project) {
       val elem = getFirstElement
       val scExpr = getSecondElement
@@ -63,5 +88,3 @@ class ScalaRedundantConversionInspection extends AbstractInspection("Redundant c
     }
   }
 }
-
-

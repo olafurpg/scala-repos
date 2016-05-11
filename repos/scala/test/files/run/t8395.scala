@@ -1,4 +1,4 @@
- object Test {
+object Test {
   def baz(x: Object) = {
     val s @ (_s: String) = x
     x

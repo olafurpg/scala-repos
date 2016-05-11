@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.routing
 
 import scala.concurrent.Await
@@ -32,8 +32,9 @@ object ConsistentHashingRouterSpec {
 
   class Echo extends Actor {
     def receive = {
-      case x: ConsistentHashableEnvelope ⇒ sender() ! s"Unexpected envelope: $x"
-      case _                             ⇒ sender() ! self
+      case x: ConsistentHashableEnvelope ⇒
+        sender() ! s"Unexpected envelope: $x"
+      case _ ⇒ sender() ! self
     }
   }
 
@@ -47,7 +48,9 @@ object ConsistentHashingRouterSpec {
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ConsistentHashingRouterSpec extends AkkaSpec(ConsistentHashingRouterSpec.config) with DefaultTimeout with ImplicitSender {
+class ConsistentHashingRouterSpec
+    extends AkkaSpec(ConsistentHashingRouterSpec.config) with DefaultTimeout
+    with ImplicitSender {
   import ConsistentHashingRouterSpec._
   implicit val ec = system.dispatcher
 
@@ -55,7 +58,9 @@ class ConsistentHashingRouterSpec extends AkkaSpec(ConsistentHashingRouterSpec.c
 
   "consistent hashing router" must {
     "create routees from configuration" in {
-      val currentRoutees = Await.result(router1 ? GetRoutees, timeout.duration).asInstanceOf[Routees]
+      val currentRoutees = Await
+        .result(router1 ? GetRoutees, timeout.duration)
+        .asInstanceOf[Routees]
       currentRoutees.routees.size should ===(3)
     }
 
@@ -72,7 +77,8 @@ class ConsistentHashingRouterSpec extends AkkaSpec(ConsistentHashingRouterSpec.c
 
       router1 ! Msg(MsgKey("c"), "C")
       val destinationC = expectMsgType[ActorRef]
-      router1 ! ConsistentHashableEnvelope(message = "CC", hashKey = MsgKey("c"))
+      router1 ! ConsistentHashableEnvelope(message = "CC",
+                                           hashKey = MsgKey("c"))
       expectMsg(destinationC)
     }
 
@@ -80,8 +86,10 @@ class ConsistentHashingRouterSpec extends AkkaSpec(ConsistentHashingRouterSpec.c
       def hashMapping: ConsistentHashMapping = {
         case Msg2(key, data) ⇒ key
       }
-      val router2 = system.actorOf(ConsistentHashingPool(nrOfInstances = 1, hashMapping = hashMapping).
-        props(Props[Echo]), "router2")
+      val router2 = system.actorOf(
+          ConsistentHashingPool(nrOfInstances = 1, hashMapping = hashMapping)
+            .props(Props[Echo]),
+          "router2")
 
       router2 ! Msg2("a", "A")
       val destinationA = expectMsgType[ActorRef]
@@ -95,9 +103,9 @@ class ConsistentHashingRouterSpec extends AkkaSpec(ConsistentHashingRouterSpec.c
 
       router2 ! Msg2(MsgKey("c"), "C")
       val destinationC = expectMsgType[ActorRef]
-      router2 ! ConsistentHashableEnvelope(message = "CC", hashKey = MsgKey("c"))
+      router2 ! ConsistentHashableEnvelope(message = "CC",
+                                           hashKey = MsgKey("c"))
       expectMsg(destinationC)
     }
   }
-
 }

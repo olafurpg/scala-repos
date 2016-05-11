@@ -17,9 +17,9 @@
 package com.twitter.summingbird.batch
 
 /**
- * Job state models the memory of when the next job should
- * try to cover
- */
+  * Job state models the memory of when the next job should
+  * try to cover
+  */
 trait WaitingState[T] {
   // Record that you are running, and get the starting time:
   def begin: PrepareState[T]

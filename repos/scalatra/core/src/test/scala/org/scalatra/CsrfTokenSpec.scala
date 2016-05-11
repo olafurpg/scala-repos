@@ -40,8 +40,7 @@ object CsrfTokenSpec extends MutableScalatraSpec {
 
   "the post should be invalid when it uses a different csrf token" in {
     session {
-      get("/renderForm") {
-      }
+      get("/renderForm") {}
       post("/renderForm", CsrfTokenSupport.DefaultKey -> "Hey I'm different") {
         status must be_==(403)
         body must not be_== ("SUCCESS")
@@ -56,16 +55,15 @@ object CsrfTokenSpec extends MutableScalatraSpec {
         token = ("value=\"(\\w+)\"".r findFirstMatchIn body).get.subgroups.head
       }
       get("/renderForm") {
-        val token2 = ("value=\"(\\w+)\"".r findFirstMatchIn body).get.subgroups.head
+        val token2 =
+          ("value=\"(\\w+)\"".r findFirstMatchIn body).get.subgroups.head
         token must be_==(token2)
       }
       post("/renderForm", CsrfTokenSupport.DefaultKey -> token) {
         body must be_==("SUCCESS")
       }
     }
-
   }
-
 }
 
 // vim: set si ts=2 sw=2 sts=2 et:

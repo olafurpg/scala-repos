@@ -19,14 +19,15 @@ import scala.collection.Seq
 
 trait ScDeclarationSequenceHolder extends ScalaPsiElement {
   override def processDeclarations(processor: PsiScopeProcessor,
-      state : ResolveState,
-      lastParent: PsiElement,
-      place: PsiElement): Boolean = {
+                                   state: ResolveState,
+                                   lastParent: PsiElement,
+                                   place: PsiElement): Boolean = {
     def processElement(e: PsiElement, state: ResolveState): Boolean = {
       def isOkForFakeCompanionModule(t: ScTypeDefinition): Boolean = {
         (processor match {
           case b: BaseProcessor =>
-            b.kinds.contains(ResolveTargets.OBJECT) || b.kinds.contains(ResolveTargets.VAL)
+            b.kinds.contains(ResolveTargets.OBJECT) ||
+            b.kinds.contains(ResolveTargets.VAL)
           case _ => true
         }) && t.fakeCompanionModule.isDefined
       }
@@ -70,10 +71,13 @@ trait ScDeclarationSequenceHolder extends ScalaPsiElement {
       while (run != null) {
         ProgressManager.checkCanceled()
         place match {
-          case id: ScStableCodeReferenceElement => run match {
-            case po: ScObject if po.isPackageObject && id.qualName == po.qualifiedName => // do nothing
-            case _ => if (!processElement(run, state)) return false
-          }
+          case id: ScStableCodeReferenceElement =>
+            run match {
+              case po: ScObject
+                  if po.isPackageObject && id.qualName == po.qualifiedName =>
+              // do nothing
+              case _ => if (!processElement(run, state)) return false
+            }
           case _ => if (!processElement(run, state)) return false
         }
         run = run.getPrevSibling
@@ -81,7 +85,8 @@ trait ScDeclarationSequenceHolder extends ScalaPsiElement {
 
       //forward references are allowed (e.g. 2 local methods see each other)
       run = lastParent.getNextSibling
-      val forwardState = state.put(BaseProcessor.FORWARD_REFERENCE_KEY, lang.Boolean.TRUE)
+      val forwardState =
+        state.put(BaseProcessor.FORWARD_REFERENCE_KEY, lang.Boolean.TRUE)
       while (run != null) {
         ProgressManager.checkCanceled()
         if (!processElement(run, forwardState)) return false

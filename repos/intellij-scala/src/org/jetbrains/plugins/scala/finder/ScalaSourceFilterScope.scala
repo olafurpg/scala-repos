@@ -10,10 +10,11 @@ import org.jetbrains.plugins.scala.ScalaFileType
 import org.jetbrains.plugins.scala.util.ScalaLanguageDerivative
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 17.02.2010
- */
-class ScalaSourceFilterScope(myDelegate: GlobalSearchScope, project: Project) extends GlobalSearchScope(project) {
+  * User: Alexander Podkhalyuzin
+  * Date: 17.02.2010
+  */
+class ScalaSourceFilterScope(myDelegate: GlobalSearchScope, project: Project)
+    extends GlobalSearchScope(project) {
   val myIndex = ProjectRootManager.getInstance(project).getFileIndex
 
   def isSearchInLibraries: Boolean = {
@@ -29,18 +30,24 @@ class ScalaSourceFilterScope(myDelegate: GlobalSearchScope, project: Project) ex
   }
 
   def contains(file: VirtualFile): Boolean = {
-    (null == myDelegate || myDelegate.contains(file)) && (
-      (FileTypeManager.getInstance().isFileOfType(file, ScalaFileType.SCALA_FILE_TYPE) ||
-        ScalaLanguageDerivative.hasDerivativeForFileType(file.getFileType)) && myIndex.isInSourceContent(file) ||
-        StdFileTypes.CLASS.getDefaultExtension == file.getExtension && myIndex.isInLibraryClasses(file))
+    (null == myDelegate || myDelegate.contains(file)) &&
+    ((FileTypeManager
+              .getInstance()
+              .isFileOfType(file, ScalaFileType.SCALA_FILE_TYPE) ||
+            ScalaLanguageDerivative.hasDerivativeForFileType(file.getFileType)) &&
+        myIndex.isInSourceContent(file) ||
+        StdFileTypes.CLASS.getDefaultExtension == file.getExtension &&
+        myIndex.isInLibraryClasses(file))
   }
 }
 
-class SourceFilterScope(myDelegate: GlobalSearchScope, project: Project) extends GlobalSearchScope(project) {
+class SourceFilterScope(myDelegate: GlobalSearchScope, project: Project)
+    extends GlobalSearchScope(project) {
   val myIndex = ProjectRootManager.getInstance(project).getFileIndex
 
   override def contains(file: VirtualFile): Boolean = {
-    (myDelegate == null || myDelegate.contains(file)) && myIndex.isInSourceContent(file)
+    (myDelegate == null || myDelegate.contains(file)) &&
+    myIndex.isInSourceContent(file)
   }
 
   override def compare(file1: VirtualFile, file2: VirtualFile): Int = {

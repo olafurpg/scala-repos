@@ -1,5 +1,5 @@
 object Test {
-  val list = new java.util.ArrayList[String] { };
+  val list = new java.util.ArrayList[String] {};
   list add "a"
   list add "c"
   list add "b"

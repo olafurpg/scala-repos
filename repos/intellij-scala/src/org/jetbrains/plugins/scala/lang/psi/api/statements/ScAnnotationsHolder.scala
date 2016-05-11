@@ -19,10 +19,9 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
 import scala.annotation.tailrec
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 10.01.2009
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 10.01.2009
+  */
 trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
   def annotations: Seq[ScAnnotation] = {
     val stub: StubElement[_ <: PsiElement] = this match {
@@ -32,8 +31,9 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
       case _ => null
     }
     if (stub != null) {
-      val annots: Array[ScAnnotations] =
-        stub.getChildrenByType(TokenSet.create(ScalaElementTypes.ANNOTATIONS), JavaArrayFactoryUtil.ScAnnotationsFactory)
+      val annots: Array[ScAnnotations] = stub.getChildrenByType(
+          TokenSet.create(ScalaElementTypes.ANNOTATIONS),
+          JavaArrayFactoryUtil.ScAnnotationsFactory)
       if (annots.length > 0) {
         return annots(0).getAnnotations.toSeq
       } else return Seq.empty
@@ -43,15 +43,21 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
     else Seq.empty
   }
 
-  def annotationNames: Seq[String] = annotations.map((x: ScAnnotation) => {
-    val text: String = x.annotationExpr.constr.typeElement.getText
-    text.substring(text.lastIndexOf(".", 0) + 1, text.length)
-  })
+  def annotationNames: Seq[String] =
+    annotations.map(
+        (x: ScAnnotation) =>
+          {
+        val text: String = x.annotationExpr.constr.typeElement.getText
+        text.substring(text.lastIndexOf(".", 0) + 1, text.length)
+    })
 
-  def hasAnnotation(clazz: PsiClass): Boolean = hasAnnotation(clazz.qualifiedName).isDefined
+  def hasAnnotation(clazz: PsiClass): Boolean =
+    hasAnnotation(clazz.qualifiedName).isDefined
 
   def hasAnnotation(qualifiedName: String): Option[ScAnnotation] = {
-    annotations.find(annot => acceptType(annot.typeElement.getType(TypingContext.empty).getOrAny, qualifiedName))
+    annotations.find(annot =>
+          acceptType(annot.typeElement.getType(TypingContext.empty).getOrAny,
+                     qualifiedName))
   }
 
   def allMatchingAnnotations(qualifiedName: String): Seq[ScAnnotation] = {
@@ -63,12 +69,15 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
   @tailrec
   private def acceptType(tp: ScType, qualifiedName: String): Boolean = {
     tp match {
-      case ScDesignatorType(clazz: PsiClass) => clazz.qualifiedName == qualifiedName
-      case ScParameterizedType(ScDesignatorType(clazz: PsiClass), _) => clazz.qualifiedName == qualifiedName
+      case ScDesignatorType(clazz: PsiClass) =>
+        clazz.qualifiedName == qualifiedName
+      case ScParameterizedType(ScDesignatorType(clazz: PsiClass), _) =>
+        clazz.qualifiedName == qualifiedName
       case _ =>
         tp.isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, _, _)) =>
-            acceptType(ta.aliasedType(TypingContext.empty).getOrAny, qualifiedName)
+            acceptType(
+                ta.aliasedType(TypingContext.empty).getOrAny, qualifiedName)
           case _ => false
         }
     }
@@ -77,7 +86,8 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
   def addAnnotation(qualifiedName: String): PsiAnnotation = {
     val container = findChildByClassScala(classOf[ScAnnotations])
 
-    val element = ScalaPsiElementFactory.createAnAnnotation(qualifiedName, getManager)
+    val element =
+      ScalaPsiElementFactory.createAnAnnotation(qualifiedName, getManager)
 
     val added = container.add(element).asInstanceOf[PsiAnnotation]
     container.add(ScalaPsiElementFactory.createNewLine(getManager))
@@ -96,7 +106,8 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
 
   def findAnnotationNoAliases(qualifiedName: String): PsiAnnotation = {
     val name = qualifiedName.split('.').last
-    if (!annotations.exists(_.constructor.reference.exists(_.refName == name))) return null
+    if (!annotations.exists(_.constructor.reference.exists(_.refName == name)))
+      return null
 
     hasAnnotation(qualifiedName) match {
       case Some(x) => x
@@ -104,7 +115,8 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
     }
   }
 
-  def getApplicableAnnotations: Array[PsiAnnotation] = getAnnotations //todo: understatnd and fix
+  def getApplicableAnnotations: Array[PsiAnnotation] =
+    getAnnotations //todo: understatnd and fix
 
   def getAnnotations: Array[PsiAnnotation] = annotations.toArray
 }

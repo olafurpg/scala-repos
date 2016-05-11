@@ -1,8 +1,6 @@
 import scala.tools.partest._
 import java.io._
 
-
-
 // I think this may be due to a bug in partest where it uses some other version
 // of the scala-library.jar - _hashCode is in line 202 currently, not 212!
 //
@@ -11,8 +9,9 @@ import java.io._
 //  [partest] java.lang.NoClassDefFoundError: scala/util/MurmurHash3$
 //  [partest] 	at scala.runtime.ScalaRunTime$._hashCode(ScalaRunTime.scala:212)
 object Test extends DirectTest {
-  
-  override def extraSettings: String = "-usejavacp -Xprint:spec -optimize -Ylog:inliner -d " + testOutput.path
+
+  override def extraSettings: String =
+    "-usejavacp -Xprint:spec -optimize -Ylog:inliner -d " + testOutput.path
 
   override def code = """
     class C2[@specialized(Boolean) U]() {

@@ -5,4 +5,3 @@ object X {
     // SI-5986 spurious exhaustivity warning here
   }
 }
-

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import scala.concurrent.Await
@@ -21,7 +21,8 @@ class LastSinkSpec extends AkkaSpec with ScriptedTest {
   "A Flow with Sink.last" must {
 
     "yield the last value" in assertAllStagesStopped {
-      Await.result(Source(1 to 42).map(identity).runWith(Sink.last), 1.second) should be(42)
+      Await.result(Source(1 to 42).map(identity).runWith(Sink.last), 1.second) should be(
+          42)
     }
 
     "yield the first error" in assertAllStagesStopped {
@@ -36,12 +37,12 @@ class LastSinkSpec extends AkkaSpec with ScriptedTest {
         Await.result(Source.empty[Int].runWith(Sink.last), 1.second)
       }.getMessage should be("last of empty stream")
     }
-
   }
   "A Flow with Sink.lastOption" must {
 
     "yield the last value" in assertAllStagesStopped {
-      Await.result(Source(1 to 42).map(identity).runWith(Sink.lastOption), 1.second) should be(Some(42))
+      Await.result(Source(1 to 42).map(identity).runWith(Sink.lastOption),
+                   1.second) should be(Some(42))
     }
 
     "yield the first error" in assertAllStagesStopped {
@@ -52,9 +53,8 @@ class LastSinkSpec extends AkkaSpec with ScriptedTest {
     }
 
     "yield None for empty stream" in assertAllStagesStopped {
-      Await.result(Source.empty[Int].runWith(Sink.lastOption), 1.second) should be(None)
+      Await.result(Source.empty[Int].runWith(Sink.lastOption), 1.second) should be(
+          None)
     }
-
   }
-
 }

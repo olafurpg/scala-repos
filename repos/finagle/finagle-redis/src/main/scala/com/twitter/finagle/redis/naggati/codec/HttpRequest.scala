@@ -21,7 +21,8 @@ import Stages._
 
 case class RequestLine(method: String, resource: String, version: String)
 case class HeaderLine(name: String, value: String)
-case class HttpRequest(request: RequestLine, headers: List[HeaderLine], body: Array[Byte])
+case class HttpRequest(
+    request: RequestLine, headers: List[HeaderLine], body: Array[Byte])
 
 object HttpRequest {
   def codec(bytesReadCounter: Int => Unit, bytesWrittenCounter: Int => Unit) =
@@ -43,7 +44,9 @@ object HttpRequest {
     readLine(true, "UTF-8") { line =>
       if (line == "") {
         // end of headers
-        val contentLength = headers.find { _.name == "content-length" }.map { _.value.toInt }.getOrElse(0)
+        val contentLength = headers.find { _.name == "content-length" }.map {
+          _.value.toInt
+        }.getOrElse(0)
         readBytes(contentLength) { data =>
           emit(HttpRequest(requestLine, headers.reverse, data))
         }
@@ -52,7 +55,8 @@ object HttpRequest {
         if (headers.size == 0) {
           throw new ProtocolError("Malformed header line: " + line)
         }
-        val newHeaderLine = HeaderLine(headers.head.name, headers.head.value + " " + line.trim)
+        val newHeaderLine =
+          HeaderLine(headers.head.name, headers.head.value + " " + line.trim)
         readHeader(requestLine, newHeaderLine :: headers.drop(1))
       } else {
         val newHeaderLine = line.split(':').toList match {

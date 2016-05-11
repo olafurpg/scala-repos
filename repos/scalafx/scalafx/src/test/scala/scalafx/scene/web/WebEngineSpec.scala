@@ -35,11 +35,12 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * WebEngine Spec tests.
- *
- *
- */
+  * WebEngine Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class WebEngineSpec
-  extends SimpleSFXDelegateSpec[jfxsw.WebEngine, WebEngine](classOf[jfxsw.WebEngine], classOf[WebEngine])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsw.WebEngine, WebEngine](
+        classOf[jfxsw.WebEngine], classOf[WebEngine])
+    with RunOnApplicationThread

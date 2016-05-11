@@ -8,7 +8,8 @@ import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.frame.FrameDecoder
 
 object AbstractDecoder {
-  private val Delimiter = ChannelBuffers.wrappedBuffer("\r\n".getBytes(Charsets.Utf8))
+  private val Delimiter =
+    ChannelBuffers.wrappedBuffer("\r\n".getBytes(Charsets.Utf8))
   private val DelimiterLength = Delimiter.capacity
   private val FindCRLF = new ChannelBufferIndexFinder() {
     def find(buffer: ChannelBuffer, guessedIndex: Int): Boolean = {
@@ -16,7 +17,7 @@ object AbstractDecoder {
       if (buffer.writerIndex < enoughBytesForDelimeter) return false
 
       buffer.getByte(guessedIndex) == '\r' &&
-        buffer.getByte(guessedIndex + 1) == '\n'
+      buffer.getByte(guessedIndex + 1) == '\n'
     }
   }
 }
@@ -24,25 +25,26 @@ object AbstractDecoder {
 abstract class AbstractDecoder extends FrameDecoder {
   import AbstractDecoder._
 
-  override def channelOpen(ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+  override def channelOpen(
+      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
     start()
     super.channelOpen(ctx, e)
   }
 
-  override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
+  override def exceptionCaught(
+      ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
     start()
     super.exceptionCaught(ctx, e)
   }
 
   /**
-   * @param needsData return the number of bytes needed, or `-1` if no more bytes
-   *                  are necessary.
-   */
+    * @param needsData return the number of bytes needed, or `-1` if no more bytes
+    *                  are necessary.
+    */
   protected def decodeLine(
-    buffer: ChannelBuffer,
-    needsData: Seq[ChannelBuffer] => Int
-  )(continue: Seq[ChannelBuffer] => Decoding
-  ): Decoding = {
+      buffer: ChannelBuffer,
+      needsData: Seq[ChannelBuffer] => Int
+  )(continue: Seq[ChannelBuffer] => Decoding): Decoding = {
     val frameLength = buffer.bytesBefore(FindCRLF)
     if (frameLength < 0) {
       null
@@ -63,12 +65,10 @@ abstract class AbstractDecoder extends FrameDecoder {
   }
 
   protected def decodeData(
-    bytesNeeded: Int,
-    buffer: ChannelBuffer
-  )(continue: ChannelBuffer => Decoding
-  ): Decoding = {
-    if (buffer.readableBytes < (bytesNeeded + DelimiterLength))
-      null
+      bytesNeeded: Int,
+      buffer: ChannelBuffer
+  )(continue: ChannelBuffer => Decoding): Decoding = {
+    if (buffer.readableBytes < (bytesNeeded + DelimiterLength)) null
     else {
       if (!FindCRLF.find(buffer, bytesNeeded + buffer.readerIndex))
         throw new ClientError("Missing delimiter")
@@ -83,5 +83,6 @@ abstract class AbstractDecoder extends FrameDecoder {
   }
 
   protected[memcached] def start(): Unit
-  protected[memcached] def awaitData(tokens: Seq[ChannelBuffer], bytesNeeded: Int): Unit
+  protected[memcached] def awaitData(
+      tokens: Seq[ChannelBuffer], bytesNeeded: Int): Unit
 }

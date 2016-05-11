@@ -1,6 +1,4 @@
 /**
- * Foo
- */
-object Scaladoc8 {
-
-}
+  * Foo
+  */
+object Scaladoc8 {}

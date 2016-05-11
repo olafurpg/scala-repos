@@ -6,5 +6,6 @@ object K {
 class Tac {
   import K.{Z => ZK, F => FK}
 
-  /* name: Z */ZK
+  /* name: Z */
+  ZK
 }

@@ -16,6 +16,6 @@ object Test {
   def f3() = 1 to 50 map boop
 
   def main(args: Array[String]): Unit = {
-    f1() ; f2() ; f3()
+    f1(); f2(); f3()
   }
 }

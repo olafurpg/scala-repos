@@ -7,9 +7,9 @@ import org.scalatest.FunSuite
 @RunWith(classOf[JUnitRunner])
 class CapabilityTest extends FunSuite {
   val c = Capability(Capability.LongPassword,
-                   Capability.SSL,
-                   Capability.Transactions,
-                   Capability.MultiResults)
+                     Capability.SSL,
+                     Capability.Transactions,
+                     Capability.MultiResults)
 
   test("contain capability") {
     assertResult(true) { c.has(Capability.SSL) }
@@ -17,13 +17,15 @@ class CapabilityTest extends FunSuite {
   }
 
   test("contain all capabilities") {
-    assertResult(false) { c.hasAll(Capability.LongPassword, Capability.NoSchema) }
+    assertResult(false) {
+      c.hasAll(Capability.LongPassword, Capability.NoSchema)
+    }
     assertResult(true) {
       c.hasAll(
-        Capability.LongPassword,
-        Capability.SSL,
-        Capability.Transactions,
-        Capability.MultiResults
+          Capability.LongPassword,
+          Capability.SSL,
+          Capability.Transactions,
+          Capability.MultiResults
       )
     }
   }
@@ -37,8 +39,8 @@ class CapabilityTest extends FunSuite {
     val c2 = c + Capability.LocalFiles + Capability.Compress
     assertResult(true) {
       c2.hasAll(
-        Capability.LocalFiles,
-        Capability.Compress
+          Capability.LocalFiles,
+          Capability.Compress
       )
     }
   }

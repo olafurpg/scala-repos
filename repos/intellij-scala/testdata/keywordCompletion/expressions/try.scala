@@ -1,7 +1,5 @@
 class a {
-  try {
-
-  }
+  try {}
   /*caret*/
 }
 /*
@@ -37,4 +35,4 @@ type
 val
 var
 while
-*/
+ */

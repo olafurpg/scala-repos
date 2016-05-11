@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.tck
 
 import org.reactivestreams.Publisher
@@ -12,4 +12,3 @@ class EmptyPublisherTest extends AkkaPublisherVerification[Int] {
 
   override def maxElementsFromPublisher(): Long = 0
 }
-

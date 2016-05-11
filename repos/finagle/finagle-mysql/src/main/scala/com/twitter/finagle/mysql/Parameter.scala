@@ -5,9 +5,9 @@ import java.util.logging.Logger
 import language.implicitConversions
 
 /**
- * A value of type `A` can implicitly convert to a `Parameter` if an evidence `CanBeParameter[A]` is
- * available in scope. This type is not to be instantiated in any other manner.
- */
+  * A value of type `A` can implicitly convert to a `Parameter` if an evidence `CanBeParameter[A]` is
+  * available in scope. This type is not to be instantiated in any other manner.
+  */
 sealed trait Parameter {
   type A
   def value: A
@@ -22,11 +22,12 @@ sealed trait Parameter {
 }
 
 /**
- * Note: There is a Java-friendly API for this object: [[com.twitter.finagle.exp.mysql.Parameters]].
- */
+  * Note: There is a Java-friendly API for this object: [[com.twitter.finagle.exp.mysql.Parameters]].
+  */
 object Parameter {
 
-  implicit def wrap[_A](_value: _A)(implicit _evidence: CanBeParameter[_A]): Parameter = {
+  implicit def wrap[_A](_value: _A)(
+      implicit _evidence: CanBeParameter[_A]): Parameter = {
     if (_value == null) {
       NullParameter
     } else {
@@ -42,12 +43,12 @@ object Parameter {
   private val log = Logger.getLogger("finagle-mysql")
 
   /**
-   * This converts the compile time error we would get with `wrap` into
-   * a run time error. This method should only be used to ease migration
-   * from Any to Parameter. It maintains the previous behavior where
-   * we log a failure to encode and transparently write a SQL NULL to
-   * the wire.
-   */
+    * This converts the compile time error we would get with `wrap` into
+    * a run time error. This method should only be used to ease migration
+    * from Any to Parameter. It maintains the previous behavior where
+    * we log a failure to encode and transparently write a SQL NULL to
+    * the wire.
+    */
   def unsafeWrap(value: Any): Parameter = value match {
     case v: String => wrap(v)
     case v: Boolean => wrap(v)
@@ -65,7 +66,8 @@ object Parameter {
     case v =>
       // Unsupported type. Write the error to log, and write the type as null.
       // This allows us to safely skip writing the parameter without corrupting the buffer.
-      log.warning(s"Unknown parameter ${v.getClass.getName} will be treated as SQL NULL.")
+      log.warning(
+          s"Unknown parameter ${v.getClass.getName} will be treated as SQL NULL.")
       Parameter.NullParameter
   }
 
@@ -77,8 +79,8 @@ object Parameter {
 }
 
 /**
- * A Java adaptation of the [[com.twitter.finagle.exp.mysql.Parameter]] companion object.
- */
+  * A Java adaptation of the [[com.twitter.finagle.exp.mysql.Parameter]] companion object.
+  */
 object Parameters {
 
   def nullParameter: Parameter = Parameter.NullParameter

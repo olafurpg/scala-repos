@@ -5,13 +5,13 @@
 package akka.http.impl.engine.ws
 
 import akka.stream.stage._
-import akka.util.{ ByteStringBuilder, ByteString }
+import akka.util.{ByteStringBuilder, ByteString}
 
 /**
- * A utf16 (= Java char) to utf8 encoder.
- *
- * INTERNAL API
- */
+  * A utf16 (= Java char) to utf8 encoder.
+  *
+  * INTERNAL API
+  */
 private[http] class Utf8Encoder extends PushStage[String, ByteString] {
   import Utf8Encoder._
 
@@ -34,7 +34,8 @@ private[http] class Utf8Encoder extends PushStage[String, ByteString] {
         } else if (char >= SurrogateFirst && char < SurrogateSecond)
           surrogateValue = 0x10000 | ((char ^ SurrogateFirst) << 10)
         else if (char >= SurrogateSecond && char < 0xdfff)
-          throw new IllegalArgumentException(f"Unexpected UTF-16 surrogate continuation")
+          throw new IllegalArgumentException(
+              f"Unexpected UTF-16 surrogate continuation")
         else if (char <= Utf8ThreeByteLimit) {
           b(0xe0 | ((char & 0xf000) >> 12)) // upper 4 bits
           b(0x80 | ((char & 0x0fc0) >> 6)) // middle 6 bits
@@ -48,7 +49,9 @@ private[http] class Utf8Encoder extends PushStage[String, ByteString] {
         b(0x80 | ((surrogateValue & 0x0fc0) >> 6)) // second middle 6 bits
         b(0x80 | (surrogateValue & 0x3f)) // lower 6 bits
         surrogateValue = 0
-      } else throw new IllegalArgumentException(f"Expected UTF-16 surrogate continuation")
+      } else
+        throw new IllegalArgumentException(
+            f"Expected UTF-16 surrogate continuation")
 
     var offset = 0
     while (offset < input.length) {
@@ -60,14 +63,17 @@ private[http] class Utf8Encoder extends PushStage[String, ByteString] {
     else ctx.pull()
   }
 
-  override def onUpstreamFinish(ctx: Context[ByteString]): TerminationDirective =
-    if (inSurrogatePair) ctx.fail(new IllegalArgumentException("Truncated String input (ends in the middle of surrogate pair)"))
+  override def onUpstreamFinish(
+      ctx: Context[ByteString]): TerminationDirective =
+    if (inSurrogatePair)
+      ctx.fail(new IllegalArgumentException(
+              "Truncated String input (ends in the middle of surrogate pair)"))
     else super.onUpstreamFinish(ctx)
 }
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[http] object Utf8Encoder {
   val SurrogateFirst = 0xd800
   val SurrogateSecond = 0xdc00

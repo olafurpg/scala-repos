@@ -1,15 +1,19 @@
 import scala.annotation.compileTimeOnly
 import scala.language.existentials
 
-@compileTimeOnly("C1") class C1
+@compileTimeOnly("C1")
+class C1
 object C1
 
 class C2
-@compileTimeOnly("C2") object C2
+@compileTimeOnly("C2")
+object C2
 
-@compileTimeOnly("C3") case class C3(x: Int)
+@compileTimeOnly("C3")
+case class C3(x: Int)
 
-@compileTimeOnly("C4") case class C4(x: Int)
+@compileTimeOnly("C4")
+case class C4(x: Int)
 object C4
 
 object pkg {
@@ -20,13 +24,18 @@ object pkg {
 }
 
 class C6(@compileTimeOnly("C6.x") val x: Int) {
-  @compileTimeOnly("C6.foo") def foo = 2
-  @compileTimeOnly("C6.Foo") type Foo = Int
-  @compileTimeOnly("C6.y") var y = 3
+  @compileTimeOnly("C6.foo")
+  def foo = 2
+  @compileTimeOnly("C6.Foo")
+  type Foo = Int
+  @compileTimeOnly("C6.y")
+  var y = 3
 }
 
-@compileTimeOnly("C7") class C7
-@compileTimeOnly("C8") class C8[T]
+@compileTimeOnly("C7")
+class C7
+@compileTimeOnly("C8")
+class C8[T]
 
 object Test extends App {
   new C1()

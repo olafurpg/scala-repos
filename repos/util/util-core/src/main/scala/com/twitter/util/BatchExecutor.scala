@@ -6,33 +6,34 @@ import java.util.logging.{Level, Logger}
 import scala.collection.mutable
 
 /**
- * A "batcher" that takes a function `Seq[In] => Future[Seq[Out]]` and
- * exposes a `In => Future[Out]` interface that batches the underlying
- * asynchronous operations. Thus, one can incrementally submit tasks to be
- * performed when the criteria for batch flushing is met. This class is used
- * internally to the util-core package by `Future.batched` and not intended
- * for public consumption.
- *
- * A batcher's size can be controlled at runtime with the `sizePercentile`
- * function argument. This function returns a float between 0.0 and 1.0,
- * representing the fractional size of the `sizeThreshold` that should be
- * used for the next batch to be collected.
- *
- * TODO: Possible future improvements:
- * - Rather than having separate sizeThreshold and sizePercentile parameters,
- *   just have a single call-by-name sizeThreshold parameter, and let the
- *   caller implement whatever logic they want to compute the next batch size.
- * - Add more functionality to class Batcher. Could support things like querying the queue size,
- *   attaching callbacks to flush operations, etc.
- */
+  * A "batcher" that takes a function `Seq[In] => Future[Seq[Out]]` and
+  * exposes a `In => Future[Out]` interface that batches the underlying
+  * asynchronous operations. Thus, one can incrementally submit tasks to be
+  * performed when the criteria for batch flushing is met. This class is used
+  * internally to the util-core package by `Future.batched` and not intended
+  * for public consumption.
+  *
+  * A batcher's size can be controlled at runtime with the `sizePercentile`
+  * function argument. This function returns a float between 0.0 and 1.0,
+  * representing the fractional size of the `sizeThreshold` that should be
+  * used for the next batch to be collected.
+  *
+  * TODO: Possible future improvements:
+  * - Rather than having separate sizeThreshold and sizePercentile parameters,
+  *   just have a single call-by-name sizeThreshold parameter, and let the
+  *   caller implement whatever logic they want to compute the next batch size.
+  * - Add more functionality to class Batcher. Could support things like querying the queue size,
+  *   attaching callbacks to flush operations, etc.
+  */
 private[util] class BatchExecutor[In, Out](
-  sizeThreshold: Int,
-  timeThreshold: Duration = Duration.Top,
-  sizePercentile: => Float = 1.0f,
-  f: Seq[In] => Future[Seq[Out]]
+    sizeThreshold: Int,
+    timeThreshold: Duration = Duration.Top,
+    sizePercentile: => Float = 1.0f,
+    f: Seq[In] => Future[Seq[Out]]
 )(
-  implicit timer: Timer
-) extends Function1[In, Future[Out]] { batcher =>
+    implicit timer: Timer
+)
+    extends Function1[In, Future[Out]] { batcher =>
   import java.util.logging.Level.WARNING
 
   class ScheduledFlush(after: Duration, timer: Timer) {
@@ -46,10 +47,8 @@ private[util] class BatchExecutor[In, Out](
 
     def flush() {
       val doAfter = batcher.synchronized {
-        if (!cancelled)
-          flushBatch()
-        else
-          () => ()
+        if (!cancelled) flushBatch()
+        else () => ()
       }
       doAfter()
     }
@@ -64,11 +63,16 @@ private[util] class BatchExecutor[In, Out](
 
   def currentBufPercentile = sizePercentile match {
     case tooHigh if tooHigh > 1.0f =>
-      log.log(WARNING, "value returned for sizePercentile (%f) was > 1.0f, using 1.0", tooHigh)
+      log.log(WARNING,
+              "value returned for sizePercentile (%f) was > 1.0f, using 1.0",
+              tooHigh)
       1.0f
 
     case tooLow if tooLow < 0.0f =>
-      log.log(WARNING, "value returned for sizePercentile (%f) was negative, using 0.0f", tooLow)
+      log.log(
+          WARNING,
+          "value returned for sizePercentile (%f) was negative, using 0.0f",
+          tooLow)
       0.0f
 
     case p => p
@@ -77,7 +81,7 @@ private[util] class BatchExecutor[In, Out](
   def newBufThreshold =
     math.round(currentBufPercentile * sizeThreshold) match {
       case tooLow if tooLow < 1 => 1
-      case size =>  math.min(size, sizeThreshold)
+      case size => math.min(size, sizeThreshold)
     }
 
   def apply(t: In): Future[Out] = enqueue(t)
@@ -86,11 +90,11 @@ private[util] class BatchExecutor[In, Out](
     val promise = new Promise[Out]
     val doAfter = synchronized {
       buf.append((t, promise))
-      if (buf.size >= currentBufThreshold)
-        flushBatch()
+      if (buf.size >= currentBufThreshold) flushBatch()
       else {
         scheduleFlushIfNecessary()
-        () => ()
+        () =>
+          ()
       }
     }
 
@@ -120,26 +124,32 @@ private[util] class BatchExecutor[In, Out](
 
     scheduled foreach { _.cancel() }
     scheduled = scala.None
-    currentBufThreshold = newBufThreshold  // set the next batch's size
+    currentBufThreshold = newBufThreshold // set the next batch's size
 
-    () => try {
-      executeBatch(prevBatch)
-    } catch {
-      case e: Throwable =>
-        log.log(WARNING, "unhandled exception caught in Future.batched: %s".format(e.toString), e)
-    }
+    () =>
+      try {
+        executeBatch(prevBatch)
+      } catch {
+        case e: Throwable =>
+          log.log(WARNING,
+                  "unhandled exception caught in Future.batched: %s".format(
+                      e.toString),
+                  e)
+      }
   }
 
   def executeBatch(batch: Seq[(In, Promise[Out])]) {
-    val uncancelled = batch filter { case (in, p) =>
-      p.isInterrupted match {
-        case Some(_cause) =>
-          p.setException(new CancellationException)
-          false
+    val uncancelled =
+      batch filter {
+        case (in, p) =>
+          p.isInterrupted match {
+            case Some(_cause) =>
+              p.setException(new CancellationException)
+              false
 
-        case scala.None => true
+            case scala.None => true
+          }
       }
-    }
 
     val ins = uncancelled map { case (in, _) => in }
     // N.B. intentionally not linking cancellation of these promises to the execution of the batch
@@ -149,13 +159,14 @@ private[util] class BatchExecutor[In, Out](
 
     f(ins) respond {
       case Return(outs) =>
-        (outs zip promises) foreach { case (out, p) =>
-          p() = Return(out)
+        (outs zip promises) foreach {
+          case (out, p) =>
+            p() = Return(out)
         }
 
       case Throw(e) =>
         val t = Throw(e)
-        promises foreach { _() = t }
+        promises foreach { _ () = t }
     }
   }
 }

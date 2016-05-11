@@ -5,17 +5,18 @@ package internal
 import Depth._
 
 final class Depth private (val depth: Int) extends AnyVal with Ordered[Depth] {
-  def max(that: Depth): Depth   = if (this < that) that else this
-  def decr(n: Int): Depth       = if (isAnyDepth) this else Depth(depth - n)
-  def incr(n: Int): Depth       = if (isAnyDepth) this else Depth(depth + n)
-  def decr: Depth               = decr(1)
-  def incr: Depth               = incr(1)
+  def max(that: Depth): Depth = if (this < that) that else this
+  def decr(n: Int): Depth = if (isAnyDepth) this else Depth(depth - n)
+  def incr(n: Int): Depth = if (isAnyDepth) this else Depth(depth + n)
+  def decr: Depth = decr(1)
+  def incr: Depth = incr(1)
 
   def isNegative = depth < 0
-  def isZero     = depth == 0
+  def isZero = depth == 0
   def isAnyDepth = this == AnyDepth
 
-  def compare(that: Depth): Int = if (depth < that.depth) -1 else if (this == that) 0 else 1
+  def compare(that: Depth): Int =
+    if (depth < that.depth) -1 else if (this == that) 0 else 1
   override def toString = s"Depth($depth)"
 }
 
@@ -26,7 +27,7 @@ object Depth {
   final val AnyDepthValue = -3
   final val AnyDepth = new Depth(AnyDepthValue)
 
-  final val Zero     = new Depth(0)
+  final val Zero = new Depth(0)
 
   // SI-9018: A negative depth is used to signal that we have breached the recursion limit.
   // The LUB/GLB implementation will then truncate to Any/Nothing.

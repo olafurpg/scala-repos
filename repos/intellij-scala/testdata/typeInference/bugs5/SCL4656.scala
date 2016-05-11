@@ -6,7 +6,8 @@ package scala {
 
 package zlo {
   object Z {
-    /*start*/H.foo()/*end*/
+    /*start*/
+    H.foo() /*end*/
   }
 }
 //Int

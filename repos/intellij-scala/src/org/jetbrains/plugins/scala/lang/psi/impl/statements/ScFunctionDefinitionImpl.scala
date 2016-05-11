@@ -23,32 +23,36 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, Unit}
 
 /**
- * @author Alexander Podkhalyuzin
- * Date: 22.02.2008
- */
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
+class ScFunctionDefinitionImpl protected (
+    stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
+    extends ScFunctionImpl(stub, nodeType, node) with ScFunctionDefinition {
+  def this(node: ASTNode) = { this(null, null, node) }
 
-class ScFunctionDefinitionImpl protected (stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-  extends ScFunctionImpl(stub, nodeType, node) with ScFunctionDefinition {
-  def this(node: ASTNode) = {this(null, null, node)}
-
-  def this(stub: ScFunctionStub) = {this(stub, ScalaElementTypes.FUNCTION_DEFINITION, null)}
+  def this(stub: ScFunctionStub) = {
+    this(stub, ScalaElementTypes.FUNCTION_DEFINITION, null)
+  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
     //process function's parameters for dependent method types, and process type parameters
-    if (!super[ScFunctionImpl].processDeclarations(processor, state, lastParent, place)) return false
+    if (!super [ScFunctionImpl].processDeclarations(
+            processor, state, lastParent, place)) return false
 
     //do not process parameters for default parameters, only for function body
     //processing parameters for default parameters in ScParameters
-    val parameterIncludingSynthetic: Seq[ScParameter] = effectiveParameterClauses.flatMap(_.effectiveParameters)
+    val parameterIncludingSynthetic: Seq[ScParameter] =
+      effectiveParameterClauses.flatMap(_.effectiveParameters)
     if (getStub == null) {
       body match {
-        case Some(x) 
-          if lastParent != null && 
-            (!needCheckProcessingDeclarationsForBody || 
-            x.startOffsetInParent == lastParent.startOffsetInParent) =>
+        case Some(x)
+            if lastParent != null &&
+            (!needCheckProcessingDeclarationsForBody ||
+                x.startOffsetInParent == lastParent.startOffsetInParent) =>
           for (p <- parameterIncludingSynthetic) {
             ProgressManager.checkCanceled()
             if (!processor.execute(p, state)) return false
@@ -56,7 +60,8 @@ class ScFunctionDefinitionImpl protected (stub: StubElement[ScFunction], nodeTyp
         case _ =>
       }
     } else {
-      if (lastParent != null && lastParent.getContext != lastParent.getParent) {
+      if (lastParent != null &&
+          lastParent.getContext != lastParent.getParent) {
         for (p <- parameterIncludingSynthetic) {
           ProgressManager.checkCanceled()
           if (!processor.execute(p, state)) return false
@@ -65,28 +70,31 @@ class ScFunctionDefinitionImpl protected (stub: StubElement[ScFunction], nodeTyp
     }
     true
   }
-  
+
   protected def needCheckProcessingDeclarationsForBody = true
 
   override def toString: String = "ScFunctionDefinition: " + name
 
   def returnTypeInner: TypeResult[ScType] = returnTypeElement match {
     case None if !hasAssign => Success(Unit, Some(this))
-    case None => body match {
-      case Some(b) => b.getType(TypingContext.empty)
-      case _ => Success(Unit, Some(this))
-    }
+    case None =>
+      body match {
+        case Some(b) => b.getType(TypingContext.empty)
+        case _ => Success(Unit, Some(this))
+      }
     case Some(rte: ScTypeElement) => rte.getType(TypingContext.empty)
   }
 
   def body: Option[ScExpression] = {
     val stub = getStub
-    if (stub != null) stub.asInstanceOf[ScFunctionStub].getBodyExpression else findChild(classOf[ScExpression])
+    if (stub != null) stub.asInstanceOf[ScFunctionStub].getBodyExpression
+    else findChild(classOf[ScExpression])
   }
 
   override def hasAssign: Boolean = {
     val stub = getStub
-    if (stub != null) stub.asInstanceOf[ScFunctionStub].hasAssign else assignment.isDefined
+    if (stub != null) stub.asInstanceOf[ScFunctionStub].hasAssign
+    else assignment.isDefined
   }
 
   def assignment = Option(findChildByType[PsiElement](ScalaTokenTypes.tASSIGN))
@@ -95,7 +103,8 @@ class ScFunctionDefinitionImpl protected (stub: StubElement[ScFunction], nodeTyp
     body match {
       case Some(block: ScBlockExpr) => // do nothing
       case Some(exp: ScExpression) =>
-        val block = ScalaPsiElementFactory.createBlockFromExpr(exp, exp.getManager)
+        val block =
+          ScalaPsiElementFactory.createBlockFromExpr(exp, exp.getManager)
         exp.replace(block)
       case _ =>
     }
@@ -103,7 +112,8 @@ class ScFunctionDefinitionImpl protected (stub: StubElement[ScFunction], nodeTyp
   }
 
   override def getBody: FakePsiCodeBlock = body match {
-    case Some(b) => new FakePsiCodeBlock(b) // Needed so that LineBreakpoint.canAddLineBreakpoint allows line breakpoints on one-line method definitions
+    case Some(b) =>
+      new FakePsiCodeBlock(b) // Needed so that LineBreakpoint.canAddLineBreakpoint allows line breakpoints on one-line method definitions
     case None => null
   }
 

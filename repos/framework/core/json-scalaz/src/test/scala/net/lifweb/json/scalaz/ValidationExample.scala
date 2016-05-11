@@ -14,11 +14,11 @@ object ValidationExample extends Specification {
   case class Person(name: String, age: Int)
 
   "Validation" should {
-    def min(x: Int): Int => Result[Int] = (y: Int) => 
-      if (y < x) Fail("min", y + " < " + x) else y.success
+    def min(x: Int): Int => Result[Int] =
+      (y: Int) => if (y < x) Fail("min", y + " < " + x) else y.success
 
-    def max(x: Int): Int => Result[Int] = (y: Int) => 
-      if (y > x) Fail("max", y + " > " + x) else y.success
+    def max(x: Int): Int => Result[Int] =
+      (y: Int) => if (y > x) Fail("max", y + " > " + x) else y.success
 
     val json = JsonParser.parse(""" {"name":"joe","age":17} """)
 
@@ -33,7 +33,8 @@ object ValidationExample extends Specification {
     "pass when age within limits" in {
       // Age must be between 16 an 60
       import Validation.Monad._
-      val person = Person.applyJSON(field("name"), validate[Int]("age") >=> min(16) >=> max(60) apply _)
+      val person = Person.applyJSON(
+          field("name"), validate[Int]("age") >=> min(16) >=> max(60) apply _)
       person(json) mustEqual Success(Person("joe", 17))
     }
   }
@@ -67,5 +68,5 @@ object ValidationExample extends Specification {
       ranges mustEqual Success(List(Range(10, 17), Range(12, 13)))
     }
   }
-  */
+ */
 }

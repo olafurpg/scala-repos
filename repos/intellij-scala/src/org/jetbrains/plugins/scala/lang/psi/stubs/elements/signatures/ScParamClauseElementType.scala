@@ -12,25 +12,28 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterCla
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScParamClauseStubImpl
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 19.10.2008
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 19.10.2008
+  */
 class ScParamClauseElementType
-extends ScStubElementType[ScParamClauseStub, ScParameterClause]("parameter clause") {
+    extends ScStubElementType[ScParamClauseStub, ScParameterClause](
+        "parameter clause") {
   def serialize(stub: ScParamClauseStub, dataStream: StubOutputStream) {
     dataStream.writeBoolean(stub.isImplicit)
   }
 
   def indexStub(stub: ScParamClauseStub, sink: IndexSink) {}
 
-  def deserializeImpl(dataStream: StubInputStream, parentStub: Any): ScParamClauseStub = {
+  def deserializeImpl(
+      dataStream: StubInputStream, parentStub: Any): ScParamClauseStub = {
     val implic = dataStream.readBoolean
-    new ScParamClauseStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]], this, implic)
+    new ScParamClauseStubImpl(
+        parentStub.asInstanceOf[StubElement[PsiElement]], this, implic)
   }
 
-  def createStubImpl[ParentPsi <: PsiElement](psi: ScParameterClause, parentStub: StubElement[ParentPsi]) = {
-    new ScParamClauseStubImpl(parentStub, this, psi.isImplicit)     
+  def createStubImpl[ParentPsi <: PsiElement](
+      psi: ScParameterClause, parentStub: StubElement[ParentPsi]) = {
+    new ScParamClauseStubImpl(parentStub, this, psi.isImplicit)
   }
 
   def createPsi(stub: ScParamClauseStub): ScParameterClause = {

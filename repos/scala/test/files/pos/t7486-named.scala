@@ -1,4 +1,3 @@
-
 object Test {
   def fold(empty: Any) = ()
   implicit val notAnnotatedImplicit = new {

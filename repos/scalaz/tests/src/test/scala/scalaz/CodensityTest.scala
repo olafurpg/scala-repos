@@ -8,12 +8,12 @@ import std.anyVal._
 import std.option._
 
 object CodensityTest extends SpecLite {
-  implicit def arbCodensity[F[_], A](implicit A: Arbitrary[F[A]], M: Monad[F])
-      : Arbitrary[Codensity[F, A]] =
+  implicit def arbCodensity[F[_], A](
+      implicit A: Arbitrary[F[A]], M: Monad[F]): Arbitrary[Codensity[F, A]] =
     Functor[Arbitrary].map(A)(Codensity.rep(_))
 
-  implicit def eqlCodensity[F[_], A](implicit A: Equal[F[A]], M: Applicative[F])
-      : Equal[Codensity[F, A]] =
+  implicit def eqlCodensity[F[_], A](
+      implicit A: Equal[F[A]], M: Applicative[F]): Equal[Codensity[F, A]] =
     Equal.equalBy(_.improve)
 
   checkAll("List", monadPlus.laws[Codensity[List, ?]])

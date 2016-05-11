@@ -1,11 +1,10 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl.marshalling
 
 import scala.collection.immutable.ListMap
-import org.scalatest.{ BeforeAndAfterAll, FreeSpec, Matchers }
+import org.scalatest.{BeforeAndAfterAll, FreeSpec, Matchers}
 import akka.util.ByteString
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -18,7 +17,9 @@ import headers._
 import HttpCharsets._
 import MediaTypes._
 
-class MarshallingSpec extends FreeSpec with Matchers with BeforeAndAfterAll with MultipartMarshallers with MarshallingTestUtils {
+class MarshallingSpec
+    extends FreeSpec with Matchers with BeforeAndAfterAll
+    with MultipartMarshallers with MarshallingTestUtils {
   implicit val system = ActorSystem(getClass.getSimpleName)
   implicit val materializer = ActorMaterializer()
   import system.dispatcher
@@ -34,8 +35,9 @@ class MarshallingSpec extends FreeSpec with Matchers with BeforeAndAfterAll with
       marshal("Ha“llo".toCharArray) shouldEqual HttpEntity("Ha“llo")
     }
     "FormDataMarshaller should marshal FormData instances to application/x-www-form-urlencoded content" in {
-      marshal(FormData(Map("name" -> "Bob", "pass" -> "hällo", "admin" -> ""))) shouldEqual
-        HttpEntity(`application/x-www-form-urlencoded` withCharset `UTF-8`, "name=Bob&pass=h%C3%A4llo&admin=")
+      marshal(FormData(Map("name" -> "Bob", "pass" -> "hällo", "admin" -> ""))) shouldEqual HttpEntity(
+          `application/x-www-form-urlencoded` withCharset `UTF-8`,
+          "name=Bob&pass=h%C3%A4llo&admin=")
     }
   }
 
@@ -46,27 +48,36 @@ class MarshallingSpec extends FreeSpec with Matchers with BeforeAndAfterAll with
       marshal(None: Option[String]) shouldEqual HttpEntity.Empty
     }
     "eitherMarshaller should enable marshalling of Either[A, B]" in {
-      marshal[Either[Array[Char], String]](Right("right")) shouldEqual HttpEntity("right")
-      marshal[Either[Array[Char], String]](Left("left".toCharArray)) shouldEqual HttpEntity("left")
+      marshal[Either[Array[Char], String]](Right("right")) shouldEqual HttpEntity(
+          "right")
+      marshal[Either[Array[Char], String]](Left("left".toCharArray)) shouldEqual HttpEntity(
+          "left")
     }
   }
 
   "The MultipartMarshallers." - {
     "multipartMarshaller should correctly marshal multipart content with" - {
       "one empty part" in {
-        marshal(Multipart.General(`multipart/mixed`, Multipart.General.BodyPart.Strict(""))) shouldEqual HttpEntity(
-          contentType = `multipart/mixed` withBoundary randomBoundary withCharset `UTF-8`,
-          string = s"""--$randomBoundary
+        marshal(Multipart.General(
+                `multipart/mixed`,
+                Multipart.General.BodyPart.Strict(""))) shouldEqual HttpEntity(
+            contentType = `multipart/mixed` withBoundary randomBoundary withCharset `UTF-8`,
+            string = s"""--$randomBoundary
                       |Content-Type: text/plain; charset=UTF-8
                       |
                       |
                       |--$randomBoundary--""".stripMarginWithNewline("\r\n"))
       }
       "one non-empty part" in {
-        marshal(Multipart.General(`multipart/alternative`, Multipart.General.BodyPart.Strict(
-          entity = HttpEntity(ContentTypes.`text/plain(UTF-8)`, "test@there.com"),
-          headers = `Content-Disposition`(ContentDispositionTypes.`form-data`, Map("name" -> "email")) :: Nil))) shouldEqual
-          HttpEntity(
+        marshal(
+            Multipart.General(
+                `multipart/alternative`,
+                Multipart.General.BodyPart.Strict(
+                    entity = HttpEntity(ContentTypes.`text/plain(UTF-8)`,
+                                        "test@there.com"),
+                    headers = `Content-Disposition`(
+                          ContentDispositionTypes.`form-data`,
+                          Map("name" -> "email")) :: Nil))) shouldEqual HttpEntity(
             contentType = `multipart/alternative` withBoundary randomBoundary withCharset `UTF-8`,
             string = s"""--$randomBoundary
                         |Content-Type: text/plain; charset=UTF-8
@@ -76,12 +87,16 @@ class MarshallingSpec extends FreeSpec with Matchers with BeforeAndAfterAll with
                         |--$randomBoundary--""".stripMarginWithNewline("\r\n"))
       }
       "two different parts" in {
-        marshal(Multipart.General(`multipart/related`,
-          Multipart.General.BodyPart.Strict(HttpEntity(`text/plain` withCharset `US-ASCII`, "first part, with a trailing linebreak\r\n")),
-          Multipart.General.BodyPart.Strict(
-            HttpEntity(`application/octet-stream`, ByteString("filecontent")),
-            RawHeader("Content-Transfer-Encoding", "binary") :: Nil))) shouldEqual
-          HttpEntity(
+        marshal(
+            Multipart.General(
+                `multipart/related`,
+                Multipart.General.BodyPart.Strict(
+                    HttpEntity(`text/plain` withCharset `US-ASCII`,
+                               "first part, with a trailing linebreak\r\n")),
+                Multipart.General.BodyPart.Strict(
+                    HttpEntity(`application/octet-stream`,
+                               ByteString("filecontent")),
+                    RawHeader("Content-Transfer-Encoding", "binary") :: Nil))) shouldEqual HttpEntity(
             contentType = `multipart/related` withBoundary randomBoundary withCharset `UTF-8`,
             string = s"""--$randomBoundary
                       |Content-Type: text/plain; charset=US-ASCII
@@ -100,9 +115,8 @@ class MarshallingSpec extends FreeSpec with Matchers with BeforeAndAfterAll with
     "multipartFormDataMarshaller should correctly marshal 'multipart/form-data' content with" - {
       "two fields" in {
         marshal(Multipart.FormData(ListMap(
-          "surname" -> HttpEntity("Mike"),
-          "age" -> marshal(<int>42</int>)))) shouldEqual
-          HttpEntity(
+                    "surname" -> HttpEntity("Mike"),
+                    "age" -> marshal(<int>42</int>)))) shouldEqual HttpEntity(
             contentType = `multipart/form-data` withBoundary randomBoundary withCharset `UTF-8`,
             string = s"""--$randomBoundary
                       |Content-Type: text/plain; charset=UTF-8
@@ -118,12 +132,19 @@ class MarshallingSpec extends FreeSpec with Matchers with BeforeAndAfterAll with
       }
 
       "two fields having a custom `Content-Disposition`" in {
-        marshal(Multipart.FormData(Source(List(
-          Multipart.FormData.BodyPart("attachment[0]", HttpEntity(`text/csv` withCharset `UTF-8`, "name,age\r\n\"John Doe\",20\r\n"),
-            Map("filename" -> "attachment.csv")),
-          Multipart.FormData.BodyPart("attachment[1]", HttpEntity("naice!".getBytes),
-            Map("filename" -> "attachment2.csv"), List(RawHeader("Content-Transfer-Encoding", "binary"))))))) shouldEqual
-          HttpEntity(
+        marshal(Multipart.FormData(
+                Source(List(Multipart.FormData.BodyPart(
+                                "attachment[0]",
+                                HttpEntity(`text/csv` withCharset `UTF-8`,
+                                           "name,age\r\n\"John Doe\",20\r\n"),
+                                Map("filename" -> "attachment.csv")),
+                            Multipart.FormData.BodyPart(
+                                "attachment[1]",
+                                HttpEntity("naice!".getBytes),
+                                Map("filename" -> "attachment2.csv"),
+                                List(RawHeader(
+                                        "Content-Transfer-Encoding",
+                                        "binary"))))))) shouldEqual HttpEntity(
             contentType = `multipart/form-data` withBoundary randomBoundary withCharset `UTF-8`,
             string = s"""--$randomBoundary
                         |Content-Type: text/csv; charset=UTF-8
@@ -146,7 +167,9 @@ class MarshallingSpec extends FreeSpec with Matchers with BeforeAndAfterAll with
   override def afterAll() = system.terminate()
 
   protected class FixedRandom extends java.util.Random {
-    override def nextBytes(array: Array[Byte]): Unit = "my-stable-boundary".getBytes("UTF-8").copyToArray(array)
+    override def nextBytes(array: Array[Byte]): Unit =
+      "my-stable-boundary".getBytes("UTF-8").copyToArray(array)
   }
-  override protected val multipartBoundaryRandom = new FixedRandom // fix for stable value
+  override protected val multipartBoundaryRandom =
+    new FixedRandom // fix for stable value
 }

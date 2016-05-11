@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.core.BaseEngine
@@ -34,8 +33,7 @@ trait Deployment extends EngineFactory {
   }
 
   /** Returns the [[Engine]] contained in this [[Deployment]]. */
-  private [prediction] 
-  def engine: BaseEngine[_, _, _, _] = {
+  private[prediction] def engine: BaseEngine[_, _, _, _] = {
     assert(engineSet, "Engine not set")
     _engine
   }

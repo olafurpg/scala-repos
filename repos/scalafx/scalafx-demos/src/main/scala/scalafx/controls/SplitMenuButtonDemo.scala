@@ -36,7 +36,6 @@ import scalafx.scene.Scene
 import scalafx.scene.control.{MenuItem, SplitMenuButton}
 import scalafx.scene.layout.VBox
 
-
 object SplitMenuButtonDemo extends JFXApp {
 
   stage = new PrimaryStage {
@@ -45,28 +44,31 @@ object SplitMenuButtonDemo extends JFXApp {
         padding = Insets(10)
         spacing = 10
         children = List(
-          new SplitMenuButton {
-            text = "SplitMenuButton 1"
-            onAction = {ae: ActionEvent => {println(ae.eventType + " occurred on SplitMenuButton")}}
-            items = List(
-              new MenuItem("MenuItem A") {
-                onAction = {ae: ActionEvent => {println(ae.eventType + " occurred on Menu Item A")}}
-              },
-              new MenuItem("MenuItem B")
-            )
-          },
-          // Use varargs constructor
-          new SplitMenuButton(
-            new MenuItem("MenuItem C") {
-              onAction = (ae: ActionEvent) => println(ae.eventType + " occurred on Menu Item C")
+            new SplitMenuButton {
+              text = "SplitMenuButton 1"
+              onAction = { ae: ActionEvent =>
+                { println(ae.eventType + " occurred on SplitMenuButton") }
+              }
+              items = List(
+                  new MenuItem("MenuItem A") {
+                    onAction = { ae: ActionEvent =>
+                      { println(ae.eventType + " occurred on Menu Item A") }
+                    }
+                  },
+                  new MenuItem("MenuItem B")
+              )
             },
-            new MenuItem("MenuItem D"),
-            new MenuItem("MenuItem E")
-          )
+            // Use varargs constructor
+            new SplitMenuButton(
+                new MenuItem("MenuItem C") {
+                  onAction = (ae: ActionEvent) =>
+                    println(ae.eventType + " occurred on Menu Item C")
+                },
+                new MenuItem("MenuItem D"),
+                new MenuItem("MenuItem E")
+            )
         )
       }
     }
   }
-
-
 }

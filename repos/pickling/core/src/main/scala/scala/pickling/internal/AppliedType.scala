@@ -18,8 +18,9 @@ object AppliedType {
 
     if (rem.isEmpty || rem.startsWith(",") || rem.startsWith("]")) {
       (AppliedType(typename, List()), rem)
-    } else { // parse type arguments
-      var typeArgs  = List[AppliedType]()
+    } else {
+      // parse type arguments
+      var typeArgs = List[AppliedType]()
       var remaining = rem
 
       while (remaining.startsWith("[") || remaining.startsWith(",")) {
@@ -29,26 +30,26 @@ object AppliedType {
         remaining = rem
       }
 
-      (AppliedType(typename, typeArgs), if (remaining.startsWith("]")) remaining.substring(1) else remaining)
+      (AppliedType(typename, typeArgs),
+       if (remaining.startsWith("]")) remaining.substring(1) else remaining)
     }
   }
 
   /* Parse an applied type.
- *
- * @param  s the string that is parsed
- * @return   The applied type, or None if we found leftovers in the string.
- */
+   *
+   * @param  s the string that is parsed
+   * @return   The applied type, or None if we found leftovers in the string.
+   */
   def parseFull(s: String): Option[AppliedType] = {
     val (result, remaining) = parse(s)
-    if(remaining.isEmpty) Some(result)
+    if (remaining.isEmpty) Some(result)
     else None
   }
-
 }
 
 /**
- * Simple representation of an applied type. Used for reading pickled types.
- */
+  * Simple representation of an applied type. Used for reading pickled types.
+  */
 case class AppliedType(typename: String, typeargs: List[AppliedType]) {
   override def toString =
     typename + (if (typeargs.isEmpty) "" else typeargs.mkString("[", ",", "]"))

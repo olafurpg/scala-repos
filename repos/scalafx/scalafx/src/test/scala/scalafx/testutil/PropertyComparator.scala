@@ -28,24 +28,27 @@ package scalafx.testutil
 
 import java.lang.reflect.Method
 
-trait PropertyComparator
-  extends AbstractComparator {
+trait PropertyComparator extends AbstractComparator {
 
   private def getScalaFXProperties(scalafxClass: Class[_]) = {
-    scalafxClass.getMethods
-      .map(m => m.getName)
-      .toSet
+    scalafxClass.getMethods.map(m => m.getName).toSet
   }
 
-  protected def getDesirableMethodName(javaMethod: Method): String = javaMethod.getName
+  protected def getDesirableMethodName(javaMethod: Method): String =
+    javaMethod.getName
 
-  protected def isSpecialMethodName(name: String) = super.isImplementation(name) ||
-    (name == "applyTo") || (name == "create") || (name == "build") ||
-    name.endsWith("Property") || name.startsWith("get") || name.startsWith("set") || name.startsWith("is")
+  protected def isSpecialMethodName(name: String) =
+    super.isImplementation(name) || (name == "applyTo") || (name == "create") ||
+    (name == "build") || name.endsWith("Property") || name.startsWith("get") ||
+    name.startsWith("set") || name.startsWith("is")
 
-  private def assertProperties(javaFxProperties: Set[String], scalaFxClass: Class[_], complement: String) {
+  private def assertProperties(javaFxProperties: Set[String],
+                               scalaFxClass: Class[_],
+                               complement: String) {
     val diff = javaFxProperties diff getScalaFXProperties(scalaFxClass)
-    assert(diff.isEmpty, "Missing %s: ".format(complement) + diff.toList.sorted.mkString(", "))
+    assert(
+        diff.isEmpty,
+        "Missing %s: ".format(complement) + diff.toList.sorted.mkString(", "))
   }
 
   private def getProperties(javafxClass: Class[_]): Set[String] = {
@@ -64,7 +67,10 @@ trait PropertyComparator
     assertProperties(getProperties(javafxClass), scalafxClass, "Properties")
   }
 
-  def comparePropertiesInProxy(javafxClass: Class[_], scalafxPropertyProxy: Class[_]) {
-    assertProperties(getProperties(javafxClass), scalafxPropertyProxy, "Properties in Proxy")
+  def comparePropertiesInProxy(
+      javafxClass: Class[_], scalafxPropertyProxy: Class[_]) {
+    assertProperties(getProperties(javafxClass),
+                     scalafxPropertyProxy,
+                     "Properties in Proxy")
   }
 }

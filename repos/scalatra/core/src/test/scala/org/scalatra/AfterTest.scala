@@ -22,7 +22,6 @@ trait AfterTestAppBase extends ScalatraBase {
   get("/other/path") {}
 
   get("/third/path") {}
-
 }
 
 class AfterServletTest extends AfterTest {
@@ -44,5 +43,4 @@ abstract class AfterTest extends ScalatraFunSuite {
       status should equal(206)
     }
   }
-
 }

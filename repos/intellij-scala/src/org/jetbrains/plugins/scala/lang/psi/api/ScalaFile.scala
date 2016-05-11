@@ -11,11 +11,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScToplevelElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 
 /**
- * @author ilyas
- */
-
-trait ScalaFile extends ScalaPsiElement with ScToplevelElement with PsiClassOwnerEx with ScDeclarationSequenceHolder
-    with PsiImportHolder with ScImportsHolder with PsiFileWithStubSupport {
+  * @author ilyas
+  */
+trait ScalaFile
+    extends ScalaPsiElement with ScToplevelElement with PsiClassOwnerEx
+    with ScDeclarationSequenceHolder with PsiImportHolder with ScImportsHolder
+    with PsiFileWithStubSupport {
 
   @Deprecated
   def importClass(aClass: PsiClass): Boolean = {

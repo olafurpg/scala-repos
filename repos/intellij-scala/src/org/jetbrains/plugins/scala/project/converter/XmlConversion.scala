@@ -9,8 +9,8 @@ import org.jdom.output.{Format, XMLOutputter}
 import scala.xml.{Elem, PrettyPrinter}
 
 /**
-* @author Pavel Fatin
-*/
+  * @author Pavel Fatin
+  */
 trait XmlConversion {
   protected def formatXml(element: Element): String = {
     val outputter = new XMLOutputter(Format.getPrettyFormat)

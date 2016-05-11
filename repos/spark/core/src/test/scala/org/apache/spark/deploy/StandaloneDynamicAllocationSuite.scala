@@ -35,13 +35,11 @@ import org.apache.spark.scheduler.cluster._
 import org.apache.spark.scheduler.cluster.CoarseGrainedClusterMessages.RegisterExecutor
 
 /**
- * End-to-end tests for dynamic allocation in standalone mode.
- */
+  * End-to-end tests for dynamic allocation in standalone mode.
+  */
 class StandaloneDynamicAllocationSuite
-  extends SparkFunSuite
-  with LocalSparkContext
-  with BeforeAndAfterAll
-  with PrivateMethodTester {
+    extends SparkFunSuite with LocalSparkContext with BeforeAndAfterAll
+    with PrivateMethodTester {
 
   private val numWorkers = 2
   private val conf = new SparkConf()
@@ -53,14 +51,16 @@ class StandaloneDynamicAllocationSuite
   private var workers: Seq[Worker] = null
 
   /**
-   * Start the local cluster.
-   * Note: local-cluster mode is insufficient because we want a reference to the Master.
-   */
+    * Start the local cluster.
+    * Note: local-cluster mode is insufficient because we want a reference to the Master.
+    */
   override def beforeAll(): Unit = {
     super.beforeAll()
-    masterRpcEnv = RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
+    masterRpcEnv = RpcEnv.create(
+        Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
     workerRpcEnvs = (0 until numWorkers).map { i =>
-      RpcEnv.create(Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
+      RpcEnv.create(
+          Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
     }
     master = makeMaster()
     workers = makeWorkers(10, 2048)
@@ -293,9 +293,8 @@ class StandaloneDynamicAllocationSuite
   }
 
   test("dynamic allocation with cores per executor AND max cores") {
-    sc = new SparkContext(appConf
-      .set("spark.executor.cores", "2")
-      .set("spark.cores.max", "8"))
+    sc = new SparkContext(
+        appConf.set("spark.executor.cores", "2").set("spark.cores.max", "8"))
     val appId = sc.applicationId
     eventually(timeout(10.seconds), interval(10.millis)) {
       val apps = getApplications()
@@ -433,7 +432,8 @@ class StandaloneDynamicAllocationSuite
     assert(executors.size === 2)
 
     // simulate running a task on the executor
-    val getMap = PrivateMethod[mutable.HashMap[String, Int]]('executorIdToTaskCount)
+    val getMap =
+      PrivateMethod[mutable.HashMap[String, Int]]('executorIdToTaskCount)
     val taskScheduler = sc.taskScheduler.asInstanceOf[TaskSchedulerImpl]
     val executorIdToTaskCount = taskScheduler invokePrivate getMap()
     executorIdToTaskCount(executors.head) = 1
@@ -454,7 +454,8 @@ class StandaloneDynamicAllocationSuite
     val myConf = appConf
       .set("spark.dynamicAllocation.enabled", "true")
       .set("spark.shuffle.service.enabled", "true")
-      .set("spark.dynamicAllocation.initialExecutors", initialExecutorLimit.toString)
+      .set("spark.dynamicAllocation.initialExecutors",
+           initialExecutorLimit.toString)
     sc = new SparkContext(myConf)
     val appId = sc.applicationId
     eventually(timeout(10.seconds), interval(10.millis)) {
@@ -480,7 +481,8 @@ class StandaloneDynamicAllocationSuite
 
   /** Make a master to which our application will send executor requests. */
   private def makeMaster(): Master = {
-    val master = new Master(masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
+    val master = new Master(
+        masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
     masterRpcEnv.setupEndpoint(Master.ENDPOINT_NAME, master)
     master
   }
@@ -489,8 +491,15 @@ class StandaloneDynamicAllocationSuite
   private def makeWorkers(cores: Int, memory: Int): Seq[Worker] = {
     (0 until numWorkers).map { i =>
       val rpcEnv = workerRpcEnvs(i)
-      val worker = new Worker(rpcEnv, 0, cores, memory, Array(masterRpcEnv.address),
-        Worker.ENDPOINT_NAME, null, conf, securityManager)
+      val worker = new Worker(rpcEnv,
+                              0,
+                              cores,
+                              memory,
+                              Array(masterRpcEnv.address),
+                              Worker.ENDPOINT_NAME,
+                              null,
+                              conf,
+                              securityManager)
       rpcEnv.setupEndpoint(Worker.ENDPOINT_NAME, worker)
       worker
     }
@@ -518,7 +527,8 @@ class StandaloneDynamicAllocationSuite
   }
 
   /** Kill the given executor, specifying whether to force kill it. */
-  private def killExecutor(sc: SparkContext, executorId: String, force: Boolean): Boolean = {
+  private def killExecutor(
+      sc: SparkContext, executorId: String, force: Boolean): Boolean = {
     syncExecutors(sc)
     sc.schedulerBackend match {
       case b: CoarseGrainedSchedulerBackend =>
@@ -528,12 +538,12 @@ class StandaloneDynamicAllocationSuite
   }
 
   /**
-   * Return a list of executor IDs belonging to this application.
-   *
-   * Note that we must use the executor IDs according to the Master, which has the most
-   * updated view. We cannot rely on the executor IDs according to the driver because we
-   * don't wait for executors to register. Otherwise the tests will take much longer to run.
-   */
+    * Return a list of executor IDs belonging to this application.
+    *
+    * Note that we must use the executor IDs according to the Master, which has the most
+    * updated view. We cannot rely on the executor IDs according to the driver because we
+    * don't wait for executors to register. Otherwise the tests will take much longer to run.
+    */
   private def getExecutorIds(sc: SparkContext): Seq[String] = {
     val app = getApplications().find(_.id == sc.applicationId)
     assert(app.isDefined)
@@ -543,26 +553,28 @@ class StandaloneDynamicAllocationSuite
   }
 
   /**
-   * Sync executor IDs between the driver and the Master.
-   *
-   * This allows us to avoid waiting for new executors to register with the driver before
-   * we submit a request to kill them. This must be called before each kill request.
-   */
+    * Sync executor IDs between the driver and the Master.
+    *
+    * This allows us to avoid waiting for new executors to register with the driver before
+    * we submit a request to kill them. This must be called before each kill request.
+    */
   private def syncExecutors(sc: SparkContext): Unit = {
-    val driverExecutors = sc.getExecutorStorageStatus
-      .map(_.blockManagerId.executorId)
-      .filter { _ != SparkContext.DRIVER_IDENTIFIER}
+    val driverExecutors =
+      sc.getExecutorStorageStatus.map(_.blockManagerId.executorId).filter {
+        _ != SparkContext.DRIVER_IDENTIFIER
+      }
     val masterExecutors = getExecutorIds(sc)
-    val missingExecutors = masterExecutors.toSet.diff(driverExecutors.toSet).toSeq.sorted
+    val missingExecutors =
+      masterExecutors.toSet.diff(driverExecutors.toSet).toSeq.sorted
     missingExecutors.foreach { id =>
       // Fake an executor registration so the driver knows about us
       val endpointRef = mock(classOf[RpcEndpointRef])
       val mockAddress = mock(classOf[RpcAddress])
       when(endpointRef.address).thenReturn(mockAddress)
       val message = RegisterExecutor(id, endpointRef, 10, Map.empty)
-      val backend = sc.schedulerBackend.asInstanceOf[CoarseGrainedSchedulerBackend]
+      val backend =
+        sc.schedulerBackend.asInstanceOf[CoarseGrainedSchedulerBackend]
       backend.driverEndpoint.askWithRetry[CoarseGrainedClusterMessage](message)
     }
   }
-
 }

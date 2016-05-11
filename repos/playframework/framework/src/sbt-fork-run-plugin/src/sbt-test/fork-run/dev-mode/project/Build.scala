@@ -20,38 +20,37 @@ object DevModeBuild {
   }
 
   def settings: Seq[Setting[_]] = Seq(
-    DevModeKeys.writeRunProperties := {
-      IO.write(file("run.properties"), s"project.version=${play.core.PlayVersion.current}")
-    },
-
-    DevModeKeys.waitForServer := {
-      DevModeBuild.waitForServer()
-    },
-
-    DevModeKeys.resetReloads := {
-      (target.value / "reload.log").delete()
-    },
-
-    DevModeKeys.verifyReloads := {
-      val expected = Def.spaceDelimited().parsed.head.toInt
-      val actual = try IO.readLines(target.value / "reload.log").count(_.nonEmpty)
-      catch {
-        case _: java.io.IOException => 0
+      DevModeKeys.writeRunProperties := {
+        IO.write(file("run.properties"),
+                 s"project.version=${play.core.PlayVersion.current}")
+      },
+      DevModeKeys.waitForServer := {
+        DevModeBuild.waitForServer()
+      },
+      DevModeKeys.resetReloads := {
+        (target.value / "reload.log").delete()
+      },
+      DevModeKeys.verifyReloads := {
+        val expected = Def.spaceDelimited().parsed.head.toInt
+        val actual = try IO
+          .readLines(target.value / "reload.log")
+          .count(_.nonEmpty) catch {
+          case _: java.io.IOException => 0
+        }
+        if (expected == actual) {
+          println(s"Expected and got $expected reloads")
+        } else {
+          throw new RuntimeException(
+              s"Expected $expected reloads but got $actual")
+        }
+      },
+      DevModeKeys.verifyResourceContains := {
+        val args = Def.spaceDelimited("<path> <status> <words> ...").parsed
+        val path = args.head
+        val status = args.tail.head.toInt
+        val assertions = args.tail.tail
+        DevModeBuild.verifyResourceContains(path, status, assertions, 0)
       }
-      if (expected == actual) {
-        println(s"Expected and got $expected reloads")
-      } else {
-        throw new RuntimeException(s"Expected $expected reloads but got $actual")
-      }
-    },
-
-    DevModeKeys.verifyResourceContains := {
-      val args = Def.spaceDelimited("<path> <status> <words> ...").parsed
-      val path = args.head
-      val status = args.tail.head.toInt
-      val assertions = args.tail.tail
-      DevModeBuild.verifyResourceContains(path, status, assertions, 0)
-    }
   )
 
   val ServerMaxAttempts = 3 * 60
@@ -62,13 +61,16 @@ object DevModeBuild {
     println(s"Connecting to server: attempt $attempts")
     try {
       val url = new java.net.URL("http://localhost:9000")
-      val connection = url.openConnection().asInstanceOf[java.net.HttpURLConnection]
+      val connection =
+        url.openConnection().asInstanceOf[java.net.HttpURLConnection]
       connection.connect()
       connection match {
         case h: java.net.HttpURLConnection =>
-          println(s"Server gave us status ${h.getResponseCode} ${h.getResponseMessage}")
-        if (h.getResponseCode != 200)
-          throw new Exception(s"Bad response code ${h.getResponseCode} from server")
+          println(
+              s"Server gave us status ${h.getResponseCode} ${h.getResponseMessage}")
+          if (h.getResponseCode != 200)
+            throw new Exception(
+                s"Bad response code ${h.getResponseCode} from server")
         case _ =>
           println(s"Not an HttpURLConnection? ${connection.getClass.getName}")
       }
@@ -91,40 +93,47 @@ object DevModeBuild {
   val ReadTimeout = 10000
 
   @tailrec
-  def verifyResourceContains(path: String, status: Int, assertions: Seq[String], attempts: Int): Unit = {
+  def verifyResourceContains(path: String,
+                             status: Int,
+                             assertions: Seq[String],
+                             attempts: Int): Unit = {
     println(s"Attempt $attempts at $path")
     val messages = ListBuffer.empty[String]
     try {
       val url = new java.net.URL("http://localhost:9000" + path)
       val conn = url.openConnection().asInstanceOf[java.net.HttpURLConnection]
       conn.setConnectTimeout(ConnectTimeout)
-      conn.setReadTimeout(ReadTimeout)      
+      conn.setReadTimeout(ReadTimeout)
 
       if (status == conn.getResponseCode) {
         messages += s"Resource at $path returned $status as expected"
       } else {
-        throw new RuntimeException(s"Resource at $path returned ${conn.getResponseCode} instead of $status")
+        throw new RuntimeException(
+            s"Resource at $path returned ${conn.getResponseCode} instead of $status")
       }
 
-      val is = if (conn.getResponseCode >= 400) {
-        conn.getErrorStream
-      } else {
-        conn.getInputStream
-      }
+      val is =
+        if (conn.getResponseCode >= 400) {
+          conn.getErrorStream
+        } else {
+          conn.getInputStream
+        }
 
       // The input stream may be null if there's no body
-      val contents = if (is != null) {
-        val c = IO.readStream(is)
-        is.close()
-        c
-      } else ""
+      val contents =
+        if (is != null) {
+          val c = IO.readStream(is)
+          is.close()
+          c
+        } else ""
       conn.disconnect()
 
       assertions.foreach { assertion =>
         if (contents.contains(assertion)) {
           messages += s"Resource at $path contained $assertion"
         } else {
-          throw new RuntimeException(s"Resource at $path didn't contain '$assertion':\n$contents")
+          throw new RuntimeException(
+              s"Resource at $path didn't contain '$assertion':\n$contents")
         }
       }
 

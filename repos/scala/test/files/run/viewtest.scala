@@ -3,7 +3,10 @@ object Test extends App {
   val xs: SeqView[(String, Int), Seq[_]] = List("x").view.zip(Stream.from(0))
   println(xs)
 
-  val ys = List(1, 2, 3).view map { x => println("mapping "+x); x + 1 }
+  val ys =
+    List(1, 2, 3).view map { x =>
+      println("mapping " + x); x + 1
+    }
   println("ys defined")
   println(ys.head)
   println(ys.tail)
@@ -42,4 +45,4 @@ java.lang.ClassCastException: scala.collection.generic.IterableViewTemplate$$ano
         at RequestResult$result(<console>)
         at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
         at sun.reflect.Nat...
-*/
+ */

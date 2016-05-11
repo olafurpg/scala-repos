@@ -22,8 +22,7 @@ package ragnarok
 package test
 
 object SitaTestSuite extends PerfTestSuite {
-  query(
-    """
+  query("""
 import std::time::*
 
 locations := //sita

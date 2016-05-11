@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.view
 
 import io.prediction.data.storage.Event
@@ -27,17 +26,17 @@ import scala.concurrent.ExecutionContext.Implicits.global // TODO
 
 @deprecated("Use LEvents or LEventStore instead.", "0.9.2")
 object ViewPredicates {
-  def getStartTimePredicate(startTimeOpt: Option[DateTime])
-  : (Event => Boolean) = {
+  def getStartTimePredicate(
+      startTimeOpt: Option[DateTime]): (Event => Boolean) = {
     startTimeOpt.map(getStartTimePredicate).getOrElse(_ => true)
   }
 
-  def getStartTimePredicate(startTime: DateTime): (Event => Boolean) = {
-    e => (!(e.eventTime.isBefore(startTime) || e.eventTime.isEqual(startTime)))
+  def getStartTimePredicate(startTime: DateTime): (Event => Boolean) = { e =>
+    (!(e.eventTime.isBefore(startTime) || e.eventTime.isEqual(startTime)))
   }
 
-  def getUntilTimePredicate(untilTimeOpt: Option[DateTime])
-  : (Event => Boolean) = {
+  def getUntilTimePredicate(
+      untilTimeOpt: Option[DateTime]): (Event => Boolean) = {
     untilTimeOpt.map(getUntilTimePredicate).getOrElse(_ => true)
   }
 
@@ -45,8 +44,8 @@ object ViewPredicates {
     _.eventTime.isBefore(untilTime)
   }
 
-  def getEntityTypePredicate(entityTypeOpt: Option[String]): (Event => Boolean)
-  = {
+  def getEntityTypePredicate(
+      entityTypeOpt: Option[String]): (Event => Boolean) = {
     entityTypeOpt.map(getEntityTypePredicate).getOrElse(_ => true)
   }
 
@@ -54,8 +53,7 @@ object ViewPredicates {
     (_.entityType == entityType)
   }
 
-  def getEventPredicate(eventOpt: Option[String]): (Event => Boolean)
-  = {
+  def getEventPredicate(eventOpt: Option[String]): (Event => Boolean) = {
     eventOpt.map(getEventPredicate).getOrElse(_ => true)
   }
 
@@ -67,26 +65,27 @@ object ViewPredicates {
 @deprecated("Use LEvents instead.", "0.9.2")
 object ViewAggregators {
   def getDataMapAggregator(): ((Option[DataMap], Event) => Option[DataMap]) = {
-    (p, e) => {
-      e.event match {
-        case "$set" => {
-          if (p == None) {
-            Some(e.properties)
-          } else {
-            p.map(_ ++ e.properties)
-          }
+    (p, e) =>
+      {
+        e.event match {
+          case "$set" => {
+              if (p == None) {
+                Some(e.properties)
+              } else {
+                p.map(_ ++ e.properties)
+              }
+            }
+          case "$unset" => {
+              if (p == None) {
+                None
+              } else {
+                p.map(_ -- e.properties.keySet)
+              }
+            }
+          case "$delete" => None
+          case _ => p // do nothing for others
         }
-        case "$unset" => {
-          if (p == None) {
-            None
-          } else {
-            p.map(_ -- e.properties.keySet)
-          }
-        }
-        case "$delete" => None
-        case _ => p // do nothing for others
       }
-    }
   }
 }
 
@@ -100,48 +99,41 @@ object EventSeq {
   implicit def listToEventSeq(l: List[Event]): EventSeq = new EventSeq(l)
 }
 
-
 @deprecated("Use LEvents instead.", "0.9.2")
 class EventSeq(val events: List[Event]) {
-  def filter(
-    eventOpt: Option[String] = None,
-    entityTypeOpt: Option[String] = None,
-    startTimeOpt: Option[DateTime] = None,
-    untilTimeOpt: Option[DateTime] = None): EventSeq = {
+  def filter(eventOpt: Option[String] = None,
+             entityTypeOpt: Option[String] = None,
+             startTimeOpt: Option[DateTime] = None,
+             untilTimeOpt: Option[DateTime] = None): EventSeq = {
 
     events
-    .filter(ViewPredicates.getEventPredicate(eventOpt))
-    .filter(ViewPredicates.getStartTimePredicate(startTimeOpt))
-    .filter(ViewPredicates.getUntilTimePredicate(untilTimeOpt))
-    .filter(ViewPredicates.getEntityTypePredicate(entityTypeOpt))
+      .filter(ViewPredicates.getEventPredicate(eventOpt))
+      .filter(ViewPredicates.getStartTimePredicate(startTimeOpt))
+      .filter(ViewPredicates.getUntilTimePredicate(untilTimeOpt))
+      .filter(ViewPredicates.getEntityTypePredicate(entityTypeOpt))
   }
 
   def filter(p: (Event => Boolean)): EventSeq = events.filter(p)
 
-  def aggregateByEntityOrdered[T](init: T, op: (T, Event) => T)
-  : Map[String, T] = {
+  def aggregateByEntityOrdered[T](
+      init: T, op: (T, Event) => T): Map[String, T] = {
     events
-    .groupBy( _.entityId )
-    .mapValues( _.sortBy(_.eventTime.getMillis).foldLeft[T](init)(op))
-    .toMap
+      .groupBy(_.entityId)
+      .mapValues(_.sortBy(_.eventTime.getMillis).foldLeft[T](init)(op))
+      .toMap
   }
-
-
 }
 
-
 @deprecated("Use LEventStore instead.", "0.9.2")
-class LBatchView(
-  val appId: Int,
-  val startTime: Option[DateTime],
-  val untilTime: Option[DateTime]) {
+class LBatchView(val appId: Int,
+                 val startTime: Option[DateTime],
+                 val untilTime: Option[DateTime]) {
 
   @transient lazy val eventsDb = Storage.getLEvents()
 
-  @transient lazy val _events = eventsDb.find(
-    appId = appId,
-    startTime = startTime,
-    untilTime = untilTime).toList
+  @transient lazy val _events = eventsDb
+    .find(appId = appId, startTime = startTime, untilTime = untilTime)
+    .toList
 
   @transient lazy val events: EventSeq = new EventSeq(_events)
 
@@ -157,17 +149,15 @@ class LBatchView(
       entityType: String,
       startTimeOpt: Option[DateTime] = None,
       untilTimeOpt: Option[DateTime] = None
-      ): Map[String, DataMap] = {
+  ): Map[String, DataMap] = {
 
     events
-    .filter(entityTypeOpt = Some(entityType))
-    .filter(e => EventValidation.isSpecialEvents(e.event))
-    .aggregateByEntityOrdered(
-      init = None,
-      op = ViewAggregators.getDataMapAggregator())
-    .filter{ case (k, v) => (v != None) }
-    .mapValues(_.get)
-
+      .filter(entityTypeOpt = Some(entityType))
+      .filter(e => EventValidation.isSpecialEvents(e.event))
+      .aggregateByEntityOrdered(init = None,
+                                op = ViewAggregators.getDataMapAggregator())
+      .filter { case (k, v) => (v != None) }
+      .mapValues(_.get)
   }
 
   /*
@@ -183,7 +173,7 @@ class LBatchView(
       .toMap
 
   }
-  */
+   */
 
   /*
   def groupByEntityOrdered[T](
@@ -196,5 +186,5 @@ class LBatchView(
       .mapValues( _.sortBy(_.eventTime.getMillis).map(map(_)) )
       .toMap
   }
-  */
+ */
 }

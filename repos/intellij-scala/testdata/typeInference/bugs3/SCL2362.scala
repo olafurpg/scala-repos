@@ -1,6 +1,7 @@
 object some {
   import AH.R
-  /*start*/R/*end*/
+  /*start*/
+  R /*end*/
 }
 
 package object AH {

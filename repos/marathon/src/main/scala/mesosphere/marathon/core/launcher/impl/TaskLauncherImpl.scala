@@ -4,22 +4,25 @@ import java.util.Collections
 
 import mesosphere.marathon.MarathonSchedulerDriverHolder
 import mesosphere.marathon.core.base.Clock
-import mesosphere.marathon.core.launcher.{ TaskOp, TaskLauncher }
-import mesosphere.marathon.metrics.{ MetricPrefixes, Metrics }
-import org.apache.mesos.Protos.{ OfferID, Status }
-import org.apache.mesos.{ Protos, SchedulerDriver }
+import mesosphere.marathon.core.launcher.{TaskOp, TaskLauncher}
+import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
+import org.apache.mesos.Protos.{OfferID, Status}
+import org.apache.mesos.{Protos, SchedulerDriver}
 import org.slf4j.LoggerFactory
 
 private[launcher] class TaskLauncherImpl(
     metrics: Metrics,
     marathonSchedulerDriverHolder: MarathonSchedulerDriverHolder,
-    clock: Clock) extends TaskLauncher {
+    clock: Clock)
+    extends TaskLauncher {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
-  private[this] val usedOffersMeter = metrics.meter(metrics.name(MetricPrefixes.SERVICE, getClass, "usedOffers"))
-  private[this] val launchedTasksMeter = metrics.meter(metrics.name(MetricPrefixes.SERVICE, getClass, "launchedTasks"))
-  private[this] val declinedOffersMeter =
-    metrics.meter(metrics.name(MetricPrefixes.SERVICE, getClass, "declinedOffers"))
+  private[this] val usedOffersMeter =
+    metrics.meter(metrics.name(MetricPrefixes.SERVICE, getClass, "usedOffers"))
+  private[this] val launchedTasksMeter = metrics.meter(
+      metrics.name(MetricPrefixes.SERVICE, getClass, "launchedTasks"))
+  private[this] val declinedOffersMeter = metrics.meter(
+      metrics.name(MetricPrefixes.SERVICE, getClass, "declinedOffers"))
 
   override def acceptOffer(offerID: OfferID, taskOps: Seq[TaskOp]): Boolean = {
     val accepted = withDriver(s"launchTasks($offerID)") { driver =>
@@ -32,23 +35,29 @@ private[launcher] class TaskLauncherImpl(
       if (log.isDebugEnabled()) {
         log.debug(s"Operations on $offerID:\n${operations.mkString("\n")}")
       }
-      driver.acceptOffers(Collections.singleton(offerID), operations.asJava, noFilter)
+      driver.acceptOffers(
+          Collections.singleton(offerID), operations.asJava, noFilter)
     }
     if (accepted) {
       usedOffersMeter.mark()
       val launchCount = taskOps.count {
         case TaskOp.Launch(_, _, _, _) => true
-        case _                         => false
+        case _ => false
       }
       launchedTasksMeter.mark(launchCount)
     }
     accepted
   }
 
-  override def declineOffer(offerID: OfferID, refuseMilliseconds: Option[Long]): Unit = {
+  override def declineOffer(
+      offerID: OfferID, refuseMilliseconds: Option[Long]): Unit = {
     val declined = withDriver(s"declineOffer(${offerID.getValue})") {
       val filters = refuseMilliseconds
-        .map(seconds => Protos.Filters.newBuilder().setRefuseSeconds(seconds / 1000.0).build())
+        .map(seconds =>
+              Protos.Filters
+                .newBuilder()
+                .setRefuseSeconds(seconds / 1000.0)
+                .build())
         .getOrElse(Protos.Filters.getDefaultInstance)
       _.declineOffer(offerID, filters)
     }
@@ -57,7 +66,8 @@ private[launcher] class TaskLauncherImpl(
     }
   }
 
-  private[this] def withDriver(description: => String)(block: SchedulerDriver => Status): Boolean = {
+  private[this] def withDriver(description: => String)(
+      block: SchedulerDriver => Status): Boolean = {
     marathonSchedulerDriverHolder.driver match {
       case Some(driver) =>
         val status = block(driver)

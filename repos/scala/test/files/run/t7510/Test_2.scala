@@ -6,4 +6,3 @@ object Test extends App {
   val tb = cm.mkToolBox()
   tb.compile(tb.parse("@foo.Ann_1 class C"))
 }
-

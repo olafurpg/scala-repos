@@ -1,13 +1,15 @@
 // negatives
 package foo1 {
-  object Foo {  // companion is trait
+  object Foo {
+    // companion is trait
     def main(args: Array[String]): Unit = ()
   }
   trait Foo
 }
 
 package foo2 {
-  object Foo {  // companion has its own main
+  object Foo {
+    // companion has its own main
     def main(args: Array[String]): Unit = ()
   }
   class Foo {
@@ -19,7 +21,8 @@ package foo2 {
 // because forwarders need more work.
 
 package foo3 {
-  object Foo {  // Companion contains main, but not an interfering main.
+  object Foo {
+    // Companion contains main, but not an interfering main.
     def main(args: Array[String]): Unit = ()
   }
   class Foo {
@@ -28,7 +31,8 @@ package foo3 {
 }
 
 package foo4 {
-  object Foo extends Foo {  // Inherits main from the class
+  object Foo extends Foo {
+    // Inherits main from the class
   }
   class Foo {
     def main(args: Array[String]): Unit = ()
@@ -36,7 +40,8 @@ package foo4 {
 }
 
 package foo5 {
-  object Foo extends Foo {  // Overrides main from the class
+  object Foo extends Foo {
+    // Overrides main from the class
     override def main(args: Array[String]): Unit = ()
   }
   class Foo {

@@ -11,12 +11,11 @@ object Test {
 
   object addWithFilter {
     trait NoImplicit
-    implicit def enrich(v: Any)
-                       (implicit F0: NoImplicit): HasWithFilter = ???
+    implicit def enrich(v: Any)(implicit F0: NoImplicit): HasWithFilter = ???
   }
 
   BrokenMethod().withFilter(_ => true) // okay
-  BrokenMethod().filter(_ => true)     // okay
+  BrokenMethod().filter(_ => true) // okay
 
   locally {
     import addWithFilter._

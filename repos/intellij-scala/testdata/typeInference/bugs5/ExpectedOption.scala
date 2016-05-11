@@ -6,6 +6,7 @@ object ExpectedOption {
     var foo: String = "text"
   }
 
-  /*start*/foo(_.foo_=)/*end*/
+  /*start*/
+  foo(_.foo_=) /*end*/
 }
 //String

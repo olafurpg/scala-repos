@@ -3,17 +3,16 @@ package lila.analyse
 import akka.actor._
 import akka.pattern.pipe
 import com.typesafe.config.Config
-import scala.util.{ Success, Failure }
-import spray.caching.{ LruCache, Cache }
+import scala.util.{Success, Failure}
+import spray.caching.{LruCache, Cache}
 
 import lila.common.PimpedConfig._
 
-final class Env(
-    config: Config,
-    db: lila.db.Env,
-    system: ActorSystem,
-    roundSocket: ActorSelection,
-    indexer: ActorSelection) {
+final class Env(config: Config,
+                db: lila.db.Env,
+                system: ActorSystem,
+                roundSocket: ActorSelection,
+                indexer: ActorSelection) {
 
   private val CollectionAnalysis = config getString "collection.analysis"
   private val NetDomain = config getString "net.domain"
@@ -24,19 +23,17 @@ final class Env(
   private[analyse] lazy val analysisColl = db(CollectionAnalysis)
 
   lazy val analyser = new Analyser(
-    indexer = indexer,
-    roundSocket = roundSocket,
-    bus = system.lilaBus)
+      indexer = indexer, roundSocket = roundSocket, bus = system.lilaBus)
 
   lazy val annotator = new Annotator(NetDomain)
 }
 
 object Env {
 
-  lazy val current = "analyse" boot new Env(
-    config = lila.common.PlayApp loadConfig "analyse",
-    db = lila.db.Env.current,
-    system = lila.common.PlayApp.system,
-    roundSocket = lila.hub.Env.current.socket.round,
-    indexer = lila.hub.Env.current.actor.gameSearch)
+  lazy val current =
+    "analyse" boot new Env(config = lila.common.PlayApp loadConfig "analyse",
+                           db = lila.db.Env.current,
+                           system = lila.common.PlayApp.system,
+                           roundSocket = lila.hub.Env.current.socket.round,
+                           indexer = lila.hub.Env.current.actor.gameSearch)
 }

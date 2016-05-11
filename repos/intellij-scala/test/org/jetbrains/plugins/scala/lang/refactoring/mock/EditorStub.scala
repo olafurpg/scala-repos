@@ -13,9 +13,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class EditorStub extends Editor {
   def putUserData[T](key: Key[T], value: T): Unit = {}
 
@@ -43,7 +42,8 @@ class EditorStub extends Editor {
 
   def isDisposed: Boolean = false
 
-  def removeEditorMouseMotionListener(listener: EditorMouseMotionListener): Unit = {}
+  def removeEditorMouseMotionListener(
+      listener: EditorMouseMotionListener): Unit = {}
 
   def addEditorMouseMotionListener(listener: EditorMouseMotionListener): Unit = {}
 
@@ -59,11 +59,13 @@ class EditorStub extends Editor {
 
   def offsetToLogicalPosition(offset: Int): LogicalPosition = null
 
-  def visualToLogicalPosition(visiblePos: VisualPosition): LogicalPosition = null
+  def visualToLogicalPosition(visiblePos: VisualPosition): LogicalPosition =
+    null
 
   def visualPositionToXY(visible: VisualPosition): Point = null
 
-  def logicalToVisualPosition(logicalPos: LogicalPosition): VisualPosition = null
+  def logicalToVisualPosition(logicalPos: LogicalPosition): VisualPosition =
+    null
 
   def logicalPositionToOffset(pos: LogicalPosition): Int = 0
 
@@ -99,5 +101,6 @@ class EditorStub extends Editor {
 
   def getInsets: Insets = null
 
-  override def offsetToVisualPosition(i: Int, b: Boolean, b1: Boolean): VisualPosition = null
+  override def offsetToVisualPosition(
+      i: Int, b: Boolean, b1: Boolean): VisualPosition = null
 }

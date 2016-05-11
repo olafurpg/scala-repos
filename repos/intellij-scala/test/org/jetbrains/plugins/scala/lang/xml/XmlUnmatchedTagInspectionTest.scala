@@ -5,21 +5,20 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
 import org.jetbrains.plugins.scala.codeInspection.xml.ScalaXmlUnmatchedTagInspection
 
 /**
- * User: Dmitry Naydanov
- * Date: 4/9/12
- */
-
-class XmlUnmatchedTagInspectionTest extends ScalaLightCodeInsightFixtureTestAdapter {
+  * User: Dmitry Naydanov
+  * Date: 4/9/12
+  */
+class XmlUnmatchedTagInspectionTest
+    extends ScalaLightCodeInsightFixtureTestAdapter {
   val noOpeningTagError = ScalaBundle.message("xml.no.opening.tag")
   val noClosingTagError = ScalaBundle.message("xml.no.closing.tag")
   val s = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_START
   val e = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_END
 
-
   private def check(text: String, annotation: String) {
-    checkTextHasError(text, annotation, classOf[ScalaXmlUnmatchedTagInspection])
+    checkTextHasError(
+        text, annotation, classOf[ScalaXmlUnmatchedTagInspection])
   }
-
 
   def testSimpleClosingError() {
     val text = "val xml = <aaa>blah blah" + s + "</aab>" + e
@@ -28,14 +27,14 @@ class XmlUnmatchedTagInspectionTest extends ScalaLightCodeInsightFixtureTestAdap
   }
 
   def testSimpleOpeningError() {
-    val text = "val xml = " + s + "<sdgdsjh attr1=\"1\">" + e + "blah lbah</asfgsd>"
+    val text =
+      "val xml = " + s + "<sdgdsjh attr1=\"1\">" + e + "blah lbah</asfgsd>"
 
     check(text, noClosingTagError)
   }
 
   def testNestedOpeningError() {
-    val text =
-      """
+    val text = """
         val xml = <aaa attr="1" attr2="2">
                     <bbb>blah blah</bbb>
                     <ccc attr="100500">
@@ -50,8 +49,7 @@ class XmlUnmatchedTagInspectionTest extends ScalaLightCodeInsightFixtureTestAdap
   }
 
   def testNestedClosingError() {
-    val text =
-      """
+    val text = """
         val xml = <aaa attr="1" attr2="2">
                     <bbb>blah blah</bbb>
                     <ccc attr="100500">
@@ -66,8 +64,7 @@ class XmlUnmatchedTagInspectionTest extends ScalaLightCodeInsightFixtureTestAdap
   }
 
   def testErrorInsideCase() {
-    val text =
-      """
+    val text = """
         <a>blah</a> match {
           case <b>blah</b> =>
           case <aa><bb><cc>{e@_*}</cc>""" + s + """</dd>""" + e + """</aa> =>

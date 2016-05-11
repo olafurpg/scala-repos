@@ -27,18 +27,16 @@ import org.apache.spark.rpc.RpcEnv
 import org.apache.spark.util.Utils
 
 /**
- * Testing class that creates a Spark standalone process in-cluster (that is, running the
- * spark.deploy.master.Master and spark.deploy.worker.Workers in the same JVMs). Executors launched
- * by the Workers still run in separate JVMs. This can be used to test distributed operation and
- * fault recovery without spinning up a lot of processes.
- */
-private[spark]
-class LocalSparkCluster(
-    numWorkers: Int,
-    coresPerWorker: Int,
-    memoryPerWorker: Int,
-    conf: SparkConf)
-  extends Logging {
+  * Testing class that creates a Spark standalone process in-cluster (that is, running the
+  * spark.deploy.master.Master and spark.deploy.worker.Workers in the same JVMs). Executors launched
+  * by the Workers still run in separate JVMs. This can be used to test distributed operation and
+  * fault recovery without spinning up a lot of processes.
+  */
+private[spark] class LocalSparkCluster(numWorkers: Int,
+                                       coresPerWorker: Int,
+                                       memoryPerWorker: Int,
+                                       conf: SparkConf)
+    extends Logging {
 
   private val localHostname = Utils.localHostName()
   private val masterRpcEnvs = ArrayBuffer[RpcEnv]()
@@ -50,21 +48,31 @@ class LocalSparkCluster(
     logInfo("Starting a local Spark cluster with " + numWorkers + " workers.")
 
     // Disable REST server on Master in this mode unless otherwise specified
-    val _conf = conf.clone()
+    val _conf = conf
+      .clone()
       .setIfMissing("spark.master.rest.enabled", "false")
       .set("spark.shuffle.service.enabled", "false")
 
     /* Start the Master */
-    val (rpcEnv, webUiPort, _) = Master.startRpcEnvAndEndpoint(localHostname, 0, 0, _conf)
+    val (rpcEnv, webUiPort, _) =
+      Master.startRpcEnvAndEndpoint(localHostname, 0, 0, _conf)
     masterWebUIPort = webUiPort
     masterRpcEnvs += rpcEnv
-    val masterUrl = "spark://" + Utils.localHostNameForURI() + ":" + rpcEnv.address.port
+    val masterUrl =
+      "spark://" + Utils.localHostNameForURI() + ":" + rpcEnv.address.port
     val masters = Array(masterUrl)
 
     /* Start the Workers */
     for (workerNum <- 1 to numWorkers) {
-      val workerEnv = Worker.startRpcEnvAndEndpoint(localHostname, 0, 0, coresPerWorker,
-        memoryPerWorker, masters, null, Some(workerNum), _conf)
+      val workerEnv = Worker.startRpcEnvAndEndpoint(localHostname,
+                                                    0,
+                                                    0,
+                                                    coresPerWorker,
+                                                    memoryPerWorker,
+                                                    masters,
+                                                    null,
+                                                    Some(workerNum),
+                                                    _conf)
       workerRpcEnvs += workerEnv
     }
 

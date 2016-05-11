@@ -1,35 +1,36 @@
 package spire
 package math
 
-
 import spire.algebra.Order
 
 trait Select extends Any {
-  def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit
+  def select[@sp A : Order : ClassTag](data: Array[A], k: Int): Unit
 }
 
 /**
- * Given a function for finding approximate medians, this will create an exact
- * median finder.
- */
+  * Given a function for finding approximate medians, this will create an exact
+  * median finder.
+  */
 trait SelectLike extends Any with Select {
 
-  def approxMedian[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int): A
+  def approxMedian[@sp A : Order](
+      data: Array[A], left: Int, right: Int, stride: Int): A
 
   /**
-   * Puts the k-th element of data, according to some Order, in the k-th
-   * position. All values before k are less than or equal to data(k) and all
-   * values above k are greater than or equal to data(k).
-   *
-   * This is an in-place algorithm and is not stable and it WILL mess up the
-   * order of equal elements.
-   */
-  final def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit = {
+    * Puts the k-th element of data, according to some Order, in the k-th
+    * position. All values before k are less than or equal to data(k) and all
+    * values above k are greater than or equal to data(k).
+    *
+    * This is an in-place algorithm and is not stable and it WILL mess up the
+    * order of equal elements.
+    */
+  final def select[@sp A : Order : ClassTag](data: Array[A], k: Int): Unit = {
     select(data, 0, data.length, 1, k)
   }
 
   // Copy of InsertSort.sort, but with a stride.
-  final def sort[@sp A](data: Array[A], left: Int, right: Int, stride: Int)(implicit o: Order[A]): Unit = {
+  final def sort[@sp A](data: Array[A], left: Int, right: Int, stride: Int)(
+      implicit o: Order[A]): Unit = {
     var i = left
     while (i < right) {
       val item = data(i)
@@ -44,13 +45,14 @@ trait SelectLike extends Any with Select {
   }
 
   @tailrec
-  protected final def select[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int, k: Int): Unit = {
+  protected final def select[@sp A : Order](
+      data: Array[A], left: Int, right: Int, stride: Int, k: Int): Unit = {
     val length = (right - left + stride - 1) / stride
     if (length < 10) {
       sort(data, left, right, stride)
-
     } else {
-      val c = partition(data, left, right, stride)(approxMedian(data, left, right, stride))
+      val c = partition(data, left, right, stride)(
+          approxMedian(data, left, right, stride))
       val span = equalSpan(data, c, stride)
 
       if (c <= k && k < (c + span)) {
@@ -64,7 +66,8 @@ trait SelectLike extends Any with Select {
     }
   }
 
-  final def equalSpan[@sp A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Int = {
+  final def equalSpan[@sp A](data: Array[A], offset: Int, stride: Int)(
+      implicit o: Order[A]): Int = {
     val m = data(offset)
     var i = offset + stride
     var len = 1
@@ -75,10 +78,12 @@ trait SelectLike extends Any with Select {
     len
   }
 
-  final def partition[@sp A](data: Array[A], left: Int, right: Int, stride: Int)(m: A)(implicit o: Order[A]): Int = {
-    var i = left  // Iterator.
-    var j = left  // Pointer to first element > m.
-    var k = left  // Pointer to end of equal elements.
+  final def partition[@sp A](
+      data: Array[A], left: Int, right: Int, stride: Int)(m: A)(
+      implicit o: Order[A]): Int = {
+    var i = left // Iterator.
+    var j = left // Pointer to first element > m.
+    var k = left // Pointer to end of equal elements.
     var t = m
 
     while (i < right) {
@@ -108,7 +113,8 @@ trait SelectLike extends Any with Select {
 }
 
 trait MutatingMedianOf5 {
-  final def mo5[@sp A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Unit = {
+  final def mo5[@sp A](data: Array[A], offset: Int, stride: Int)(
+      implicit o: Order[A]): Unit = {
     var i0 = offset
     var i1 = offset + 1 * stride
     var i2 = offset + 2 * stride
@@ -118,27 +124,28 @@ trait MutatingMedianOf5 {
 
     if (o.gt(data(i3), data(i4))) { t = i3; i3 = i4; i4 = t }
     if (o.gt(data(i1), data(i2))) { t = i1; i1 = i2; i2 = t }
-    val i = if (o.lt(data(i4), data(i2))) {
-      // Ignore 2. 3 < 4.
-      if (o.lt(data(i1), data(i0))) { t = i0; i0 = i1; i1 = t }
-      if (o.lt(data(i4), data(i1))) {
-        // Ignore 1. 3 < 4
-        if (o.lt(data(i4), data(i0))) i0 else i4
+    val i =
+      if (o.lt(data(i4), data(i2))) {
+        // Ignore 2. 3 < 4.
+        if (o.lt(data(i1), data(i0))) { t = i0; i0 = i1; i1 = t }
+        if (o.lt(data(i4), data(i1))) {
+          // Ignore 1. 3 < 4
+          if (o.lt(data(i4), data(i0))) i0 else i4
+        } else {
+          // Ignore 4. 0 < 1
+          if (o.lt(data(i3), data(i1))) i1 else i3
+        }
       } else {
-        // Ignore 4. 0 < 1
-        if (o.lt(data(i3), data(i1))) i1 else i3
+        // Ignore 4. 1 < 2.
+        if (o.lt(data(i3), data(i0))) { t = i0; i0 = i3; i3 = t }
+        if (o.lt(data(i3), data(i2))) {
+          // Ignore 2. 0 < 3
+          if (o.lt(data(i3), data(i1))) i1 else i3
+        } else {
+          // Ignore 3. 1 < 2
+          if (o.lt(data(i2), data(i0))) i0 else i2
+        }
       }
-    } else {
-      // Ignore 4. 1 < 2.
-      if (o.lt(data(i3), data(i0))) { t = i0; i0 = i3; i3 = t }
-      if (o.lt(data(i3), data(i2))) {
-        // Ignore 2. 0 < 3
-        if (o.lt(data(i3), data(i1))) i1 else i3
-      } else {
-        // Ignore 3. 1 < 2
-        if (o.lt(data(i2), data(i0))) i0 else i2
-      }
-    }
 
     val m = data(i)
     data(i) = data(offset)
@@ -151,138 +158,234 @@ trait HighBranchingMedianOf5 {
   // Benchmarks show that this is slightly faster than the version above.
 
   // scalastyle:off method.length
-  final def mo5[@sp A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Unit = {
+  final def mo5[@sp A](data: Array[A], offset: Int, stride: Int)(
+      implicit o: Order[A]): Unit = {
     val ai1 = data(offset)
     val ai2 = data(offset + stride)
     val ai3 = data(offset + 2 * stride)
     val ai4 = data(offset + 3 * stride)
     val ai5 = data(offset + 4 * stride)
 
-    val i = if (o.lt(ai1, ai2)) {            // i1 < i2
-      if (o.lt(ai3, ai4)) {          // i1 < i2, i3 < i4
-        if (o.lt(ai2, ai4)) {        // Drop i4
-          if (o.lt(ai3, ai5)) {      // i1 < i2, i3 < i5
-            if (o.lt(ai2, ai5)) {    // Drop i5
-              if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
-              if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
+    val i =
+      if (o.lt(ai1, ai2)) {
+        // i1 < i2
+        if (o.lt(ai3, ai4)) {
+          // i1 < i2, i3 < i4
+          if (o.lt(ai2, ai4)) {
+            // Drop i4
+            if (o.lt(ai3, ai5)) {
+              // i1 < i2, i3 < i5
+              if (o.lt(ai2, ai5)) {
+                // Drop i5
+                if (o.lt(ai2, ai3)) (offset + 2 * stride)
+                else (offset + 1 * stride)
+              } else {
+                // Drop i2
+                if (o.lt(ai1, ai5)) (offset + 4 * stride)
+                else (offset + 0 * stride)
+              }
+            } else {
+              // i1 < i2, i5 < i3
+              if (o.lt(ai2, ai3)) {
+                // Drop i3
+                if (o.lt(ai2, ai5)) (offset + 4 * stride)
+                else (offset + 1 * stride)
+              } else {
+                // Drop i2
+                if (o.lt(ai1, ai3)) (offset + 2 * stride)
+                else (offset + 0 * stride)
+              }
             }
-          } else {                 // i1 < i2, i5 < i3
-            if (o.lt(ai2, ai3)) {    // Drop i3
-              if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
-              if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
+          } else {
+            // Drop i2
+            if (o.lt(ai1, ai5)) {
+              // i1 < i5, i3 < i4
+              if (o.lt(ai5, ai4)) {
+                // Drop i4
+                if (o.lt(ai5, ai3)) (offset + 2 * stride)
+                else (offset + 4 * stride)
+              } else {
+                // Drop i5
+                if (o.lt(ai1, ai4)) (offset + 3 * stride)
+                else (offset + 0 * stride)
+              }
+            } else {
+              // i5 < i1, i3 < i4
+              if (o.lt(ai1, ai4)) {
+                // Drop i4
+                if (o.lt(ai1, ai3)) (offset + 2 * stride)
+                else (offset + 0 * stride)
+              } else {
+                // Drop i1
+                if (o.lt(ai5, ai4)) (offset + 3 * stride)
+                else (offset + 4 * stride)
+              }
             }
           }
-        } else {                   // Drop i2
-          if (o.lt(ai1, ai5)) {      // i1 < i5, i3 < i4
-            if (o.lt(ai5, ai4)) {    // Drop i4
-              if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
-            } else {                // Drop i5
-              if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
+        } else {
+          // i1 < i2, i4 < i3
+          if (o.lt(ai2, ai3)) {
+            // Drop i3
+            if (o.lt(ai4, ai5)) {
+              // i1 < i2, i4 < i5
+              if (o.lt(ai2, ai5)) {
+                // Drop i5
+                if (o.lt(ai2, ai4)) (offset + 3 * stride)
+                else (offset + 1 * stride)
+              } else {
+                // Drop i2
+                if (o.lt(ai1, ai5)) (offset + 4 * stride)
+                else (offset + 0 * stride)
+              }
+            } else {
+              // i1 < i2, i5 < i4
+              if (o.lt(ai2, ai4)) {
+                // Drop i4
+                if (o.lt(ai2, ai5)) (offset + 4 * stride)
+                else (offset + 1 * stride)
+              } else {
+                // Drop i2
+                if (o.lt(ai1, ai4)) (offset + 3 * stride)
+                else (offset + 0 * stride)
+              }
             }
-          } else {                 // i5 < i1, i3 < i4
-            if (o.lt(ai1, ai4)) {    // Drop i4
-              if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
-            } else {                // Drop i1
-              if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
+          } else {
+            // Drop i2
+            if (o.lt(ai1, ai5)) {
+              // i1 < i5, i4 < i3
+              if (o.lt(ai5, ai3)) {
+                // Drop i3
+                if (o.lt(ai5, ai4)) (offset + 3 * stride)
+                else (offset + 4 * stride)
+              } else {
+                // Drop i5
+                if (o.lt(ai1, ai3)) (offset + 2 * stride)
+                else (offset + 0 * stride)
+              }
+            } else {
+              // i5 < i1, i4 < i3
+              if (o.lt(ai1, ai3)) {
+                // Drop i3
+                if (o.lt(ai1, ai4)) (offset + 3 * stride)
+                else (offset + 0 * stride)
+              } else {
+                // Drop i1
+                if (o.lt(ai5, ai3)) (offset + 2 * stride)
+                else (offset + 4 * stride)
+              }
             }
           }
         }
-      } else {                     // i1 < i2, i4 < i3
-        if (o.lt(ai2, ai3)) {        // Drop i3
-          if (o.lt(ai4, ai5)) {      // i1 < i2, i4 < i5
-            if (o.lt(ai2, ai5)) {    // Drop i5
-              if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
-              if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
+      } else {
+        // i2 < i1
+        if (o.lt(ai3, ai4)) {
+          // i2 < i1, i3 < i4
+          if (o.lt(ai1, ai4)) {
+            // Drop i4
+            if (o.lt(ai3, ai5)) {
+              // i2 < i1, i3 < i5
+              if (o.lt(ai1, ai5)) {
+                // Drop i5
+                if (o.lt(ai1, ai3)) (offset + 2 * stride)
+                else (offset + 0 * stride)
+              } else {
+                // Drop i1
+                if (o.lt(ai2, ai5)) (offset + 4 * stride)
+                else (offset + 1 * stride)
+              }
+            } else {
+              // i2 < i1, i5 < i3
+              if (o.lt(ai1, ai3)) {
+                // Drop i3
+                if (o.lt(ai1, ai5)) (offset + 4 * stride)
+                else (offset + 0 * stride)
+              } else {
+                // Drop i1
+                if (o.lt(ai2, ai3)) (offset + 2 * stride)
+                else (offset + 1 * stride)
+              }
             }
-          } else {                 // i1 < i2, i5 < i4
-            if (o.lt(ai2, ai4)) {    // Drop i4
-              if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
-              if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
+          } else {
+            // Drop i1
+            if (o.lt(ai2, ai5)) {
+              // i2 < i5, i3 < i4
+              if (o.lt(ai5, ai4)) {
+                // Drop i4
+                if (o.lt(ai5, ai3)) (offset + 2 * stride)
+                else (offset + 4 * stride)
+              } else {
+                // Drop i5
+                if (o.lt(ai2, ai4)) (offset + 3 * stride)
+                else (offset + 1 * stride)
+              }
+            } else {
+              // i5 < i2, i3 < i4
+              if (o.lt(ai2, ai4)) {
+                // Drop i4
+                if (o.lt(ai2, ai3)) (offset + 2 * stride)
+                else (offset + 1 * stride)
+              } else {
+                // Drop i2
+                if (o.lt(ai5, ai4)) (offset + 3 * stride)
+                else (offset + 4 * stride)
+              }
             }
           }
-        } else {                   // Drop i2
-          if (o.lt(ai1, ai5)) {      // i1 < i5, i4 < i3
-            if (o.lt(ai5, ai3)) {    // Drop i3
-              if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
-            } else {                // Drop i5
-              if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
+        } else {
+          // i2 < i1, i4 < i3
+          if (o.lt(ai1, ai3)) {
+            // Drop i3
+            if (o.lt(ai4, ai5)) {
+              // i2 < i1, i4 < i5
+              if (o.lt(ai1, ai5)) {
+                // Drop i5
+                if (o.lt(ai1, ai4)) (offset + 3 * stride)
+                else (offset + 0 * stride)
+              } else {
+                // Drop i1
+                if (o.lt(ai2, ai5)) (offset + 4 * stride)
+                else (offset + 1 * stride)
+              }
+            } else {
+              // i2 < i1, i5 < i4
+              if (o.lt(ai1, ai4)) {
+                // Drop i4
+                if (o.lt(ai1, ai5)) (offset + 4 * stride)
+                else (offset + 0 * stride)
+              } else {
+                // Drop i1
+                if (o.lt(ai2, ai4)) (offset + 3 * stride)
+                else (offset + 1 * stride)
+              }
             }
-          } else {                 // i5 < i1, i4 < i3
-            if (o.lt(ai1, ai3)) {    // Drop i3
-              if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
-            } else {               // Drop i1
-              if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
+          } else {
+            // Drop i1
+            if (o.lt(ai2, ai5)) {
+              // i2 < i5, i4 < i3
+              if (o.lt(ai5, ai3)) {
+                // Drop i3
+                if (o.lt(ai5, ai4)) (offset + 3 * stride)
+                else (offset + 4 * stride)
+              } else {
+                // Drop i5
+                if (o.lt(ai2, ai3)) (offset + 2 * stride)
+                else (offset + 1 * stride)
+              }
+            } else {
+              // i5 < i2, i4 < i3
+              if (o.lt(ai2, ai3)) {
+                // Drop i3
+                if (o.lt(ai2, ai4)) (offset + 3 * stride)
+                else (offset + 1 * stride)
+              } else {
+                // Drop i2
+                if (o.lt(ai5, ai3)) (offset + 2 * stride)
+                else (offset + 4 * stride)
+              }
             }
           }
         }
       }
-    } else {                       // i2 < i1
-      if (o.lt(ai3, ai4)) {          // i2 < i1, i3 < i4
-        if (o.lt(ai1, ai4)) {        // Drop i4
-          if (o.lt(ai3, ai5)) {      // i2 < i1, i3 < i5
-            if (o.lt(ai1, ai5)) {    // Drop i5
-              if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
-            } else {               // Drop i1
-              if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
-            }
-          } else {                 // i2 < i1, i5 < i3
-            if (o.lt(ai1, ai3)) {    // Drop i3
-              if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
-            } else {               // Drop i1
-              if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
-            }
-          }
-        } else {                   // Drop i1
-          if (o.lt(ai2, ai5)) {      // i2 < i5, i3 < i4
-            if (o.lt(ai5, ai4)) {    // Drop i4
-              if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
-            } else {                // Drop i5
-              if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
-            }
-          } else {                 // i5 < i2, i3 < i4
-            if (o.lt(ai2, ai4)) {    // Drop i4
-              if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
-              if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
-            }
-          }
-        }
-      } else {                     // i2 < i1, i4 < i3
-        if (o.lt(ai1, ai3)) {        // Drop i3
-          if (o.lt(ai4, ai5)) {      // i2 < i1, i4 < i5
-            if (o.lt(ai1, ai5)) {    // Drop i5
-              if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
-            } else {               // Drop i1
-              if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
-            }
-          } else {                 // i2 < i1, i5 < i4
-            if (o.lt(ai1, ai4)) {    // Drop i4
-              if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
-            } else {                // Drop i1
-              if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
-            }
-          }
-        } else {                   // Drop i1
-          if (o.lt(ai2, ai5)) {      // i2 < i5, i4 < i3
-            if (o.lt(ai5, ai3)) {    // Drop i3
-              if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
-            } else {                // Drop i5
-              if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
-            }
-          } else {                 // i5 < i2, i4 < i3
-            if (o.lt(ai2, ai3)) {    // Drop i3
-              if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
-              if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
-            }
-          }
-        }
-      }
-    }
 
     val m = data(i)
     data(i) = data(offset)
@@ -298,7 +401,8 @@ object LinearSelect extends SelectLike with HighBranchingMedianOf5 {
   // one side. This makes this quite a bit slower in the general case (though
   // not terribly so), but doesn't suffer from bad worst-case behaviour.
 
-  final def approxMedian[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int): A = {
+  final def approxMedian[@sp A : Order](
+      data: Array[A], left: Int, right: Int, stride: Int): A = {
     var offset = left
     var last = left + 4 * stride
     val nextStride = 5 * stride
@@ -322,7 +426,8 @@ object QuickSelect extends SelectLike with HighBranchingMedianOf5 {
   // pivot, quickly is essential. So, we have 3 cases, getting slightly smarter
   // about our pivot as the array grows.
 
-  final def approxMedian[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int): A = {
+  final def approxMedian[@sp A : Order](
+      data: Array[A], left: Int, right: Int, stride: Int): A = {
     val length = (right - left + stride - 1) / stride
 
     if (length >= 5) {
@@ -345,12 +450,14 @@ object QuickSelect extends SelectLike with HighBranchingMedianOf5 {
 }
 
 object Selection {
-  final def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit =
+  final def select[@sp A : Order : ClassTag](data: Array[A], k: Int): Unit =
     quickSelect(data, k)
 
-  final def linearSelect[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit =
+  final def linearSelect[@sp A : Order : ClassTag](
+      data: Array[A], k: Int): Unit =
     LinearSelect.select(data, k)
 
-  final def quickSelect[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit =
+  final def quickSelect[@sp A : Order : ClassTag](
+      data: Array[A], k: Int): Unit =
     QuickSelect.select(data, k)
 }

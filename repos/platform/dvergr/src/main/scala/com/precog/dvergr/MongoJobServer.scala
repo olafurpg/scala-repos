@@ -31,7 +31,9 @@ import blueeyes.BlueEyesServer
 import org.streum.configrity.Configuration
 import scalaz._
 
-object MongoJobServer extends BlueEyesServer with JobService with ManagedMongoJobManagerModule with AkkaDefaults {
+object MongoJobServer
+    extends BlueEyesServer with JobService with ManagedMongoJobManagerModule
+    with AkkaDefaults {
   implicit val executionContext = defaultFutureDispatch
   implicit val M: Monad[Future] = new FutureMonad(defaultFutureDispatch)
 
@@ -53,4 +55,3 @@ object MongoJobServer extends BlueEyesServer with JobService with ManagedMongoJo
     WebAuthService(protocol, host, port, path).withM[Future]
   }
 }
-

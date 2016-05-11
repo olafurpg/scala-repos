@@ -23,9 +23,12 @@ import org.apache.spark.rpc.{RpcAddress, RpcEndpointAddress, RpcEnv}
 class WorkerWatcherSuite extends SparkFunSuite {
   test("WorkerWatcher shuts down on valid disassociation") {
     val conf = new SparkConf()
-    val rpcEnv = RpcEnv.create("test", "localhost", 12345, conf, new SecurityManager(conf))
-    val targetWorkerUrl = RpcEndpointAddress(RpcAddress("1.2.3.4", 1234), "Worker").toString
-    val workerWatcher = new WorkerWatcher(rpcEnv, targetWorkerUrl, isTesting = true)
+    val rpcEnv = RpcEnv.create(
+        "test", "localhost", 12345, conf, new SecurityManager(conf))
+    val targetWorkerUrl =
+      RpcEndpointAddress(RpcAddress("1.2.3.4", 1234), "Worker").toString
+    val workerWatcher =
+      new WorkerWatcher(rpcEnv, targetWorkerUrl, isTesting = true)
     rpcEnv.setupEndpoint("worker-watcher", workerWatcher)
     workerWatcher.onDisconnected(RpcAddress("1.2.3.4", 1234))
     assert(workerWatcher.isShutDown)
@@ -34,10 +37,13 @@ class WorkerWatcherSuite extends SparkFunSuite {
 
   test("WorkerWatcher stays alive on invalid disassociation") {
     val conf = new SparkConf()
-    val rpcEnv = RpcEnv.create("test", "localhost", 12345, conf, new SecurityManager(conf))
-    val targetWorkerUrl = RpcEndpointAddress(RpcAddress("1.2.3.4", 1234), "Worker").toString
+    val rpcEnv = RpcEnv.create(
+        "test", "localhost", 12345, conf, new SecurityManager(conf))
+    val targetWorkerUrl =
+      RpcEndpointAddress(RpcAddress("1.2.3.4", 1234), "Worker").toString
     val otherRpcAddress = RpcAddress("4.3.2.1", 1234)
-    val workerWatcher = new WorkerWatcher(rpcEnv, targetWorkerUrl, isTesting = true)
+    val workerWatcher =
+      new WorkerWatcher(rpcEnv, targetWorkerUrl, isTesting = true)
     rpcEnv.setupEndpoint("worker-watcher", workerWatcher)
     workerWatcher.onDisconnected(otherRpcAddress)
     assert(!workerWatcher.isShutDown)

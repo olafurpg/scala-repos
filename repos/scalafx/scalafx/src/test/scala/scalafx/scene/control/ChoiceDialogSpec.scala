@@ -37,11 +37,11 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- *
- * Test for [[scalafx.scene.control.ChoiceDialog]].
- */
+  *
+  * Test for [[scalafx.scene.control.ChoiceDialog]].
+  */
 @RunWith(classOf[JUnitRunner])
 class ChoiceDialogSpec[T]
-  extends SimpleSFXDelegateSpec[jfxsc.ChoiceDialog[T], ChoiceDialog[T]](
-    classOf[jfxsc.ChoiceDialog[T]], classOf[ChoiceDialog[T]])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsc.ChoiceDialog[T], ChoiceDialog[T]](
+        classOf[jfxsc.ChoiceDialog[T]], classOf[ChoiceDialog[T]])
+    with RunOnApplicationThread

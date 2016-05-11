@@ -7,12 +7,12 @@ import org.scalatest.junit.JUnitRunner
 
 import com.twitter.util.Promise
 
-
 abstract class LocalSchedulerTest(lifo: Boolean) extends FunSuite {
   private val scheduler = new LocalScheduler(lifo)
-  def submit(f: => Unit) = scheduler.submit(new Runnable {
-    def run() = f
-  })
+  def submit(f: => Unit) =
+    scheduler.submit(new Runnable {
+      def run() = f
+    })
 
   val N = 100
 
@@ -45,15 +45,12 @@ abstract class LocalSchedulerTest(lifo: Boolean) extends FunSuite {
   test("handle many submits") {
     var ran = Nil: List[Int]
     submit {
-      for (which <- 0 until N)
-        submit {
-          ran ::= which
-        }
+      for (which <- 0 until N) submit {
+        ran ::= which
+      }
     }
-    if (lifo)
-      assert(ran == (0 until N))
-    else
-      assert(ran == (0 until N).reverse)
+    if (lifo) assert(ran == (0 until N))
+    else assert(ran == (0 until N).reverse)
   }
 }
 
@@ -64,7 +61,8 @@ class LocalSchedulerFifoTest extends LocalSchedulerTest(false)
 class LocalSchedulerLifoTest extends LocalSchedulerTest(true)
 
 @RunWith(classOf[JUnitRunner])
-class ThreadPoolSchedulerTest extends FunSuite with Eventually with IntegrationPatience {
+class ThreadPoolSchedulerTest
+    extends FunSuite with Eventually with IntegrationPatience {
   test("works") {
     val p = new Promise[Unit]
     val scheduler = new ThreadPoolScheduler("test")

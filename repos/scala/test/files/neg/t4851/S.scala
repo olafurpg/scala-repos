@@ -11,7 +11,7 @@ object Test {
   val z3 = new J2(())
 
   def anyId(a: Any) = a
-  val w1 = anyId(1, 2 ,3)
+  val w1 = anyId(1, 2, 3)
 
   def main(args: Array[String]): Unit = {
     println(x1)

@@ -27,7 +27,8 @@ import org.apache.spark.sql.sources._
 
 case class OrcData(intField: Int, stringField: String)
 
-abstract class OrcSuite extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
+abstract class OrcSuite
+    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
   import hiveContext._
 
   var orcTableDir: File = null
@@ -52,8 +53,7 @@ abstract class OrcSuite extends QueryTest with TestHiveSingleton with BeforeAndA
       .toDF()
       .registerTempTable(s"orc_temp_table")
 
-    sql(
-      s"""CREATE EXTERNAL TABLE normal_orc(
+    sql(s"""CREATE EXTERNAL TABLE normal_orc(
          |  intField INT,
          |  stringField STRING
          |)
@@ -61,8 +61,7 @@ abstract class OrcSuite extends QueryTest with TestHiveSingleton with BeforeAndA
          |LOCATION '${orcTableAsDir.getCanonicalPath}'
        """.stripMargin)
 
-    sql(
-      s"""INSERT INTO TABLE normal_orc
+    sql(s"""INSERT INTO TABLE normal_orc
          |SELECT intField, stringField FROM orc_temp_table
        """.stripMargin)
   }
@@ -75,61 +74,54 @@ abstract class OrcSuite extends QueryTest with TestHiveSingleton with BeforeAndA
   test("create temporary orc table") {
     checkAnswer(sql("SELECT COUNT(*) FROM normal_orc_source"), Row(10))
 
-    checkAnswer(
-      sql("SELECT * FROM normal_orc_source"),
-      (1 to 10).map(i => Row(i, s"part-$i")))
+    checkAnswer(sql("SELECT * FROM normal_orc_source"),
+                (1 to 10).map(i => Row(i, s"part-$i")))
+
+    checkAnswer(sql("SELECT * FROM normal_orc_source where intField > 5"),
+                (6 to 10).map(i => Row(i, s"part-$i")))
 
     checkAnswer(
-      sql("SELECT * FROM normal_orc_source where intField > 5"),
-      (6 to 10).map(i => Row(i, s"part-$i")))
-
-    checkAnswer(
-      sql("SELECT COUNT(intField), stringField FROM normal_orc_source GROUP BY stringField"),
-      (1 to 10).map(i => Row(1, s"part-$i")))
+        sql("SELECT COUNT(intField), stringField FROM normal_orc_source GROUP BY stringField"),
+        (1 to 10).map(i => Row(1, s"part-$i")))
   }
 
   test("create temporary orc table as") {
     checkAnswer(sql("SELECT COUNT(*) FROM normal_orc_as_source"), Row(10))
 
-    checkAnswer(
-      sql("SELECT * FROM normal_orc_source"),
-      (1 to 10).map(i => Row(i, s"part-$i")))
+    checkAnswer(sql("SELECT * FROM normal_orc_source"),
+                (1 to 10).map(i => Row(i, s"part-$i")))
+
+    checkAnswer(sql("SELECT * FROM normal_orc_source WHERE intField > 5"),
+                (6 to 10).map(i => Row(i, s"part-$i")))
 
     checkAnswer(
-      sql("SELECT * FROM normal_orc_source WHERE intField > 5"),
-      (6 to 10).map(i => Row(i, s"part-$i")))
-
-    checkAnswer(
-      sql("SELECT COUNT(intField), stringField FROM normal_orc_source GROUP BY stringField"),
-      (1 to 10).map(i => Row(1, s"part-$i")))
+        sql("SELECT COUNT(intField), stringField FROM normal_orc_source GROUP BY stringField"),
+        (1 to 10).map(i => Row(1, s"part-$i")))
   }
 
   test("appending insert") {
     sql("INSERT INTO TABLE normal_orc_source SELECT * FROM orc_temp_table WHERE intField > 5")
 
-    checkAnswer(
-      sql("SELECT * FROM normal_orc_source"),
-      (1 to 5).map(i => Row(i, s"part-$i")) ++ (6 to 10).flatMap { i =>
-        Seq.fill(2)(Row(i, s"part-$i"))
-      })
+    checkAnswer(sql("SELECT * FROM normal_orc_source"),
+                (1 to 5).map(i => Row(i, s"part-$i")) ++ (6 to 10).flatMap {
+                  i =>
+                    Seq.fill(2)(Row(i, s"part-$i"))
+                })
   }
 
   test("overwrite insert") {
-    sql(
-      """INSERT OVERWRITE TABLE normal_orc_as_source
+    sql("""INSERT OVERWRITE TABLE normal_orc_as_source
         |SELECT * FROM orc_temp_table WHERE intField > 5
       """.stripMargin)
 
-    checkAnswer(
-      sql("SELECT * FROM normal_orc_as_source"),
-      (6 to 10).map(i => Row(i, s"part-$i")))
+    checkAnswer(sql("SELECT * FROM normal_orc_as_source"),
+                (6 to 10).map(i => Row(i, s"part-$i")))
   }
 
   test("write null values") {
     sql("DROP TABLE IF EXISTS orcNullValues")
 
-    val df = sql(
-      """
+    val df = sql("""
         |SELECT
         |  CAST(null as TINYINT) as c0,
         |  CAST(null as SMALLINT) as c1,
@@ -148,8 +140,7 @@ abstract class OrcSuite extends QueryTest with TestHiveSingleton with BeforeAndA
     df.write.format("orc").saveAsTable("orcNullValues")
 
     checkAnswer(
-      sql("SELECT * FROM orcNullValues"),
-      Row.fromSeq(Seq.fill(11)(null)))
+        sql("SELECT * FROM orcNullValues"), Row.fromSeq(Seq.fill(11)(null)))
 
     sql("DROP TABLE IF EXISTS orcNullValues")
   }
@@ -159,16 +150,14 @@ class OrcSourceSuite extends OrcSuite {
   override def beforeAll(): Unit = {
     super.beforeAll()
 
-    hiveContext.sql(
-      s"""CREATE TEMPORARY TABLE normal_orc_source
+    hiveContext.sql(s"""CREATE TEMPORARY TABLE normal_orc_source
          |USING org.apache.spark.sql.hive.orc
          |OPTIONS (
          |  PATH '${new File(orcTableAsDir.getAbsolutePath).getCanonicalPath}'
          |)
        """.stripMargin)
 
-    hiveContext.sql(
-      s"""CREATE TEMPORARY TABLE normal_orc_as_source
+    hiveContext.sql(s"""CREATE TEMPORARY TABLE normal_orc_as_source
          |USING org.apache.spark.sql.hive.orc
          |OPTIONS (
          |  PATH '${new File(orcTableAsDir.getAbsolutePath).getCanonicalPath}'
@@ -179,29 +168,36 @@ class OrcSourceSuite extends OrcSuite {
   test("SPARK-12218 Converting conjunctions into ORC SearchArguments") {
     // The `LessThan` should be converted while the `StringContains` shouldn't
     assertResult(
-      """leaf-0 = (LESS_THAN a 10)
+        """leaf-0 = (LESS_THAN a 10)
         |expr = leaf-0
       """.stripMargin.trim
     ) {
-      OrcFilters.createFilter(Array(
-        LessThan("a", 10),
-        StringContains("b", "prefix")
-      )).get.toString
+      OrcFilters
+        .createFilter(Array(
+                LessThan("a", 10),
+                StringContains("b", "prefix")
+            ))
+        .get
+        .toString
     }
 
     // The `LessThan` should be converted while the whole inner `And` shouldn't
     assertResult(
-      """leaf-0 = (LESS_THAN a 10)
+        """leaf-0 = (LESS_THAN a 10)
         |expr = leaf-0
       """.stripMargin.trim
     ) {
-      OrcFilters.createFilter(Array(
-        LessThan("a", 10),
-        Not(And(
-          GreaterThan("a", 1),
-          StringContains("b", "prefix")
-        ))
-      )).get.toString
+      OrcFilters
+        .createFilter(
+            Array(
+                LessThan("a", 10),
+                Not(And(
+                        GreaterThan("a", 1),
+                        StringContains("b", "prefix")
+                    ))
+            ))
+        .get
+        .toString
     }
   }
 }

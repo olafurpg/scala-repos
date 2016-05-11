@@ -1,17 +1,18 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.testkit.AkkaSpec
 import com.typesafe.config._
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{Await, Future}
 import TypedActorRemoteDeploySpec._
-import akka.actor.{ Deploy, ActorSystem, TypedProps, TypedActor }
+import akka.actor.{Deploy, ActorSystem, TypedProps, TypedActor}
 import scala.concurrent.duration._
 
 object TypedActorRemoteDeploySpec {
-  val conf = ConfigFactory.parseString("""
+  val conf =
+    ConfigFactory.parseString("""
       akka.actor.provider = "akka.remote.RemoteActorRefProvider"
       akka.remote.netty.tcp.port = 0
                                                             """)
@@ -22,10 +23,11 @@ object TypedActorRemoteDeploySpec {
   }
 
   class RemoteNameServiceImpl extends RemoteNameService {
-    def getName: Future[String] = Future.successful(TypedActor.context.system.name)
-    def getNameSelfDeref: Future[String] = TypedActor.self[RemoteNameService].getName
+    def getName: Future[String] =
+      Future.successful(TypedActor.context.system.name)
+    def getNameSelfDeref: Future[String] =
+      TypedActor.self[RemoteNameService].getName
   }
-
 }
 
 class TypedActorRemoteDeploySpec extends AkkaSpec(conf) {
@@ -36,7 +38,8 @@ class TypedActorRemoteDeploySpec extends AkkaSpec(conf) {
   def verify[T](f: RemoteNameService ⇒ Future[T], expected: T) = {
     val ts = TypedActor(system)
     val echoService: RemoteNameService = ts.typedActorOf(
-      TypedProps[RemoteNameServiceImpl].withDeploy(Deploy(scope = RemoteScope(remoteAddress))))
+        TypedProps[RemoteNameServiceImpl].withDeploy(
+            Deploy(scope = RemoteScope(remoteAddress))))
     Await.result(f(echoService), 3.seconds) should ===(expected)
     val actor = ts.getActorRefFor(echoService)
     system.stop(actor)
@@ -53,11 +56,9 @@ class TypedActorRemoteDeploySpec extends AkkaSpec(conf) {
     "be possible to deploy remotely and be able to dereference self" in {
       verify({ _.getNameSelfDeref }, remoteName)
     }
-
   }
 
   override def afterTermination() {
     shutdown(remoteSystem)
   }
-
 }

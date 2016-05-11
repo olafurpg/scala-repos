@@ -3,8 +3,8 @@ package breeze.util
 import org.slf4j.Logger
 
 /**
- * A logger that only evaluates parameters lazily if the corresponding log level is enabled.
- */
+  * A logger that only evaluates parameters lazily if the corresponding log level is enabled.
+  */
 class LazyLogger(log: Logger) extends Serializable {
 
   def info(msg: => String) {

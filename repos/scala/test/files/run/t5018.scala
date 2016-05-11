@@ -1,10 +1,5 @@
-
-
-
 import java.io._
 import collection._
-
-
 
 object Test {
 
@@ -12,7 +7,8 @@ object Test {
     val buffer = new ByteArrayOutputStream
     val out = new ObjectOutputStream(buffer)
     out.writeObject(obj)
-    val in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray))
+    val in = new ObjectInputStream(
+        new ByteArrayInputStream(buffer.toByteArray))
     in.readObject.asInstanceOf[T]
   }
 
@@ -32,6 +28,4 @@ object Test {
     val minusmap = mutable.Map(1 -> 1).withDefault(x => -x)
     assert(serializeDeserialize(minusmap) == minusmap)
   }
-
 }
-

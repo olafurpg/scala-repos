@@ -2,9 +2,8 @@ package org.jetbrains.plugins.scala
 package extensions
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 object && {
   def unapply[T](obj: T) = Some((obj, obj))
 }

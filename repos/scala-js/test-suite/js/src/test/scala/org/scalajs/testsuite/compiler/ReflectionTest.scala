@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.compiler
 
@@ -28,7 +28,7 @@ import org.scalajs.testsuite.utils.Platform._
 class ReflectionTest {
   import ReflectionTest._
 
-  def implicitClassTagTest[A: ClassTag](x: Any): Boolean = x match {
+  def implicitClassTagTest[A : ClassTag](x: Any): Boolean = x match {
     case x: A => true
     case _ => false
   }
@@ -39,7 +39,7 @@ class ReflectionTest {
 
   @Test def should_append_$_to_class_name_of_objects(): Unit = {
     assertEquals("org.scalajs.testsuite.compiler.ReflectionTest$TestObject$",
-      TestObject.getClass.getName)
+                 TestObject.getClass.getName)
   }
 
   @Test def java_lang_Class_getName_renamed_through_semantics(): Unit = {
@@ -64,8 +64,7 @@ class ReflectionTest {
   }
 
   @Test def isInstance_for_raw_JS_class(): Unit = {
-    js.Dynamic.global.ReflectionTestRawJSClass =
-      js.eval("""(function() {})""")
+    js.Dynamic.global.ReflectionTestRawJSClass = js.eval("""(function() {})""")
 
     val obj = new ReflectionTestRawJSClass
     assertTrue(obj.isInstanceOf[ReflectionTestRawJSClass])
@@ -84,12 +83,14 @@ class ReflectionTest {
   }
 
   @Test def isInstance_for_raw_JS_traits_should_fail(): Unit = {
-    assertThrows(classOf[Exception], classOf[ReflectionTestRawJSTrait].isInstance(5))
+    assertThrows(
+        classOf[Exception], classOf[ReflectionTestRawJSTrait].isInstance(5))
 
     val ct = classTag[ReflectionTestRawJSTrait]
     assertThrows(classOf[Exception], ct.unapply(new AnyRef))
 
-    assertThrows(classOf[Exception], implicitClassTagTest[ReflectionTestRawJSTrait](new AnyRef))
+    assertThrows(classOf[Exception],
+                 implicitClassTagTest[ReflectionTestRawJSTrait](new AnyRef))
   }
 
   @Test def getClass_for_normal_types(): Unit = {
@@ -115,7 +116,9 @@ class ReflectionTest {
     assertEquals(classOf[scala.runtime.BoxedUnit], ((): Any).getClass)
   }
 
-  @Test def class_isAssignableFrom_should_mimic_runtime_type_tests_behavior_issue_879(): Unit = {
+  @Test
+  def class_isAssignableFrom_should_mimic_runtime_type_tests_behavior_issue_879(
+      ): Unit = {
     assertTrue(classOf[Short].isAssignableFrom(classOf[Byte]))
     assertTrue(classOf[Byte].isAssignableFrom(classOf[Byte]))
     assertFalse(classOf[Byte].isAssignableFrom(classOf[Short]))
@@ -126,13 +129,15 @@ class ReflectionTest {
   }
 
   @Test def getSuperclass_issue_1489(): Unit = {
-    assertEquals(classOf[SomeParentClass], classOf[SomeChildClass].getSuperclass)
+    assertEquals(
+        classOf[SomeParentClass], classOf[SomeChildClass].getSuperclass)
     assertNull(classOf[AnyRef].getSuperclass)
     assertEquals(classOf[AnyRef], classOf[String].getSuperclass)
     assertEquals(classOf[Number], classOf[Integer].getSuperclass)
 
-    assertEquals("org.scalajs.testsuite.compiler.ReflectionTest$ParentClassWhoseDataIsNotAccessedDirectly",
-      classOf[ChildClassWhoseDataIsAccessedDirectly].getSuperclass.getName)
+    assertEquals(
+        "org.scalajs.testsuite.compiler.ReflectionTest$ParentClassWhoseDataIsNotAccessedDirectly",
+        classOf[ChildClassWhoseDataIsAccessedDirectly].getSuperclass.getName)
   }
 
   @Test def cast_positive(): Unit = {
@@ -167,6 +172,6 @@ object ReflectionTest {
   class SomeChildClass extends SomeParentClass
 
   class ParentClassWhoseDataIsNotAccessedDirectly
-  class ChildClassWhoseDataIsAccessedDirectly extends ParentClassWhoseDataIsNotAccessedDirectly
-
+  class ChildClassWhoseDataIsAccessedDirectly
+      extends ParentClassWhoseDataIsNotAccessedDirectly
 }

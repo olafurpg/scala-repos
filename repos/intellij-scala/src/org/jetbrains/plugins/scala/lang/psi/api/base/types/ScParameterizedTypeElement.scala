@@ -6,10 +6,9 @@ package base
 package types
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 13.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 13.03.2008
+  */
 trait ScParameterizedTypeElement extends ScTypeElement {
 
   def typeArgList: ScTypeArgs
@@ -22,7 +21,8 @@ trait ScParameterizedTypeElement extends ScTypeElement {
 }
 
 object ScParameterizedTypeElement {
-  def unapply(pte: ScParameterizedTypeElement): Option[(ScTypeElement, Seq[ScTypeElement])] = {
+  def unapply(pte: ScParameterizedTypeElement)
+    : Option[(ScTypeElement, Seq[ScTypeElement])] = {
     pte match {
       case null => None
       case _ => Some(pte.typeElement, pte.typeArgList.typeArgs)

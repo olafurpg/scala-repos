@@ -2,10 +2,10 @@ import scala.tools.partest.ReplTest
 import scala.tools.util.Javap
 
 object Test extends ReplTest {
-  
+
   // ugh, windows
   def expectedOutput =
-"""Type in expressions to have them evaluated.
+    """Type in expressions to have them evaluated.
 Type :help for more information.
 
 scala> 
@@ -22,7 +22,7 @@ scala>
 scala> 
 """
 
-  override def eval() = 
+  override def eval() =
     if (Javap.isAvailable()) super.eval()
     else expectedOutput.lines
 

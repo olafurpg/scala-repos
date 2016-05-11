@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.types._
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 02.06.2009
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 02.06.2009
+  */
 object InspectionsUtil {
   val ERROR_HANDLING = "(Scala) Error Handling"
 
@@ -27,15 +26,20 @@ object InspectionsUtil {
     conformsToTypeFromClass(exprType, className, expr.getProject)
   }
 
-  def conformsToTypeFromClass(scType: ScType, className: String, project: Project): Boolean = {
+  def conformsToTypeFromClass(
+      scType: ScType, className: String, project: Project): Boolean = {
     def typeFromClassName(fqn: String, project: Project): Option[ScType] = {
-      val clazz = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project))
+      val clazz = JavaPsiFacade
+        .getInstance(project)
+        .findClass(fqn, GlobalSearchScope.allScope(project))
       Option(clazz).map { c =>
         val designatorType = ScDesignatorType(c)
         c.getTypeParameters.toSeq match {
           case Seq() => designatorType
           case params =>
-            val undefines = params.map(p => ScUndefinedType(new ScTypeParameterType(p, ScSubstitutor.empty)))
+            val undefines = params.map(p =>
+                  ScUndefinedType(
+                      new ScTypeParameterType(p, ScSubstitutor.empty)))
             ScParameterizedType(designatorType, undefines)
         }
       }

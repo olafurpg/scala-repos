@@ -35,6 +35,7 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object HostServices {
+
   /**
     * Converts a ScalaFX HostServices to its JavaFX counterpart.
     *
@@ -59,7 +60,7 @@ object HostServices {
   * @define ORIGINALDOC Original Documentation]].
   */
 class HostServices(override val delegate: jfx.HostServices)
-  extends SFXDelegate[jfx.HostServices] {
+    extends SFXDelegate[jfx.HostServices] {
 
   /**
     * Gets the code base URI for this application.
@@ -75,5 +76,4 @@ class HostServices(override val delegate: jfx.HostServices)
     * Returns the JavaScript handle of the enclosing DOM window of the web page containing this application.
     */
   def webContext: JSObject = delegate.getWebContext
-
 }

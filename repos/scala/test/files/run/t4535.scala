@@ -1,7 +1,4 @@
-
-
 import collection._
-
 
 // #4535
 object Test {
@@ -18,7 +15,10 @@ object Test {
     as push 6
     println(as.reverse)
 
-    println(as map { x => x })
+    println(
+        as map { x =>
+      x
+    })
 
     for (i <- 0 until 100) {
       as push i
@@ -26,5 +26,4 @@ object Test {
       assert(as == as.reverse.reverse)
     }
   }
-
 }

@@ -45,90 +45,90 @@ trait BaseField extends FieldIdentifier with util.BaseField {
   def forceDirty_? : Boolean = false
 
   /**
-   * Should the field be ignored by the OR Mapper?
-   */
+    * Should the field be ignored by the OR Mapper?
+    */
   def ignoreField_? = false
 
   /**
-   * Is the value of this field optional (e.g. NULLable)?
-   */
+    * Is the value of this field optional (e.g. NULLable)?
+    */
   def optional_? = false
 
   /**
-   * Can the value of this field be read without obscuring the result?
-   */
+    * Can the value of this field be read without obscuring the result?
+    */
   def canRead_? : Boolean = safe_? || checkCanRead_?
 
   /**
-   * If the owner is not in "safe" mode, check the current environment to see if
-   * the field can be read
-   */
+    * If the owner is not in "safe" mode, check the current environment to see if
+    * the field can be read
+    */
   def checkCanRead_? = true
 
   /**
-   * Can the value of this field be written?
-   */
+    * Can the value of this field be written?
+    */
   def canWrite_? : Boolean = safe_? || checkCanWrite_?
 
   /**
-   * If the owner is not in "safe" mode, check the current environment to see if
-   * the field can be written
-   */
+    * If the owner is not in "safe" mode, check the current environment to see if
+    * the field can be written
+    */
   def checkCanWrite_? = true
 
   /**
-   * Convert the field value to an XHTML representation
-   */
+    * Convert the field value to an XHTML representation
+    */
   def toXHtml: NodeSeq = Text(toString)
 
   /**
-   * Generate a form control for the field
-   */
+    * Generate a form control for the field
+    */
   def toForm: Box[NodeSeq]
 
   /**
-   * Returns the field's value as a valid JavaScript expression
-   */
+    * Returns the field's value as a valid JavaScript expression
+    */
   def asJs: JsExp
 
   /** Encode the field value into a JValue */
   def asJValue: JValue
 
   /**
-   * What form elements are we going to add to this field?
-   */
+    * What form elements are we going to add to this field?
+    */
   def formElemAttrs: Seq[SHtml.ElemAttr] = Nil
 
   /**
-   * Set the name of this field
-   */
-  private[record] final def setName_!(newName : String) : String = {
+    * Set the name of this field
+    */
+  private[record] final def setName_!(newName: String): String = {
     if (safe_?) fieldName = newName
     fieldName
   }
 
   /**
-   * The error message used when the field value could not be set
-   */
-  def noValueErrorMessage : String = "Value cannot be changed"
+    * The error message used when the field value could not be set
+    */
+  def noValueErrorMessage: String = "Value cannot be changed"
 
   /**
-   * The error message used when the field value must be set
-   */
-  def notOptionalErrorMessage : String = "Value required"
+    * The error message used when the field value must be set
+    */
+  def notOptionalErrorMessage: String = "Value required"
 
   /**
-   * Form field's type.
-   * Defaults to 'text', but you may want to change it to other HTML5 values.
-   */
+    * Form field's type.
+    * Defaults to 'text', but you may want to change it to other HTML5 values.
+    */
   def formInputType = "text"
 
   def tabIndex: Int = 1
 
-  override def uniqueFieldId: Box[String] = Full(name+"_id")
+  override def uniqueFieldId: Box[String] = Full(name + "_id")
 
   def label: NodeSeq = uniqueFieldId match {
-    case Full(id) =>  <label for={id}>{displayName}</label>
+    case Full(id) => <label for={id}>{displayName}</label>
     case _ => NodeSeq.Empty
   }
 
@@ -139,24 +139,28 @@ trait BaseField extends FieldIdentifier with util.BaseField {
 
 /** Refined trait for fields owned by a particular record type */
 trait OwnedField[OwnerType <: Record[OwnerType]] extends BaseField {
+
   /**
-   * Return the owner of this field
-   */
+    * Return the owner of this field
+    */
   def owner: OwnerType
 
   /**
-   * The text name of this field
-   */
-  def name: String = RecordRules.fieldName.vend.apply(owner.meta.connectionIdentifier, fieldName)
+    * The text name of this field
+    */
+  def name: String =
+    RecordRules.fieldName.vend
+      .apply(owner.meta.connectionIdentifier, fieldName)
 
   /**
     * The display name of this field (e.g., "First Name")
     */
-  override def displayName: String = RecordRules.displayName.vend.apply(owner, S.locale, name)
+  override def displayName: String =
+    RecordRules.displayName.vend.apply(owner, S.locale, name)
 
   /**
-   * Are we in "safe" mode (i.e., the value of the field can be read or written without any security checks.)
-   */
+    * Are we in "safe" mode (i.e., the value of the field can be read or written without any security checks.)
+    */
   override final def safe_? : Boolean = owner.safe_?
 }
 
@@ -175,10 +179,10 @@ trait TypedField[ThisType] extends BaseField {
   private[record] var needsDefault: Boolean = true
 
   /**
-   * Helper for implementing asJValue for a conversion to an encoded JString
-   *
-   * @param encode function to transform the field value into a String
-   */
+    * Helper for implementing asJValue for a conversion to an encoded JString
+    *
+    * @param encode function to transform the field value into a String
+    */
   protected def asJString(encode: MyType => String): JValue =
     valueBox.map(v => JString(encode(v))) openOr (JNothing: JValue)
 
@@ -186,14 +190,15 @@ trait TypedField[ThisType] extends BaseField {
   def setFromJValue(jvalue: JValue): Box[MyType]
 
   /**
-   * Helper for implementing setFromJValue for a conversion from an encoded JString
-   *
-   * @param decode function to try and transform a String into a field value
-   */
-  protected def setFromJString(jvalue: JValue)(decode: String => Box[MyType]): Box[MyType] = jvalue match {
-    case JNothing|JNull if optional_? => setBox(Empty)
-    case JString(s)                   => setBox(decode(s))
-    case other                        => setBox(FieldHelpers.expectedA("JString", other))
+    * Helper for implementing setFromJValue for a conversion from an encoded JString
+    *
+    * @param decode function to try and transform a String into a field value
+    */
+  protected def setFromJString(jvalue: JValue)(
+      decode: String => Box[MyType]): Box[MyType] = jvalue match {
+    case JNothing | JNull if optional_? => setBox(Empty)
+    case JString(s) => setBox(decode(s))
+    case other => setBox(FieldHelpers.expectedA("JString", other))
   }
 
   def validations: List[ValidationFunction] = Nil
@@ -203,7 +208,7 @@ trait TypedField[ThisType] extends BaseField {
 
   /** Helper function that does validation of a value by using the validators specified for the field */
   protected def runValidation(in: Box[MyType]): List[FieldError] = in match {
-    case Full(_) => validations.flatMap(_(toValueType(in))).distinct
+    case Full(_) => validations.flatMap(_ (toValueType(in))).distinct
     case Empty => Nil
     case Failure(msg, _, _) => Text(msg)
   }
@@ -217,16 +222,16 @@ trait TypedField[ThisType] extends BaseField {
   protected implicit def nodeToFieldError(node: Node): List[FieldError] =
     List(FieldError(this, node))
 
-  protected implicit def boxNodeFuncToFieldError(in: Box[MyType] => Box[Node]):
-  Box[MyType] => List[FieldError] =
+  protected implicit def boxNodeFuncToFieldError(
+      in: Box[MyType] => Box[Node]): Box[MyType] => List[FieldError] =
     param => boxNodeToFieldError(in(param))
 
   /** The default value of the field when no value is set. Must return a Full Box unless optional_? is true */
   def defaultValueBox: Box[MyType]
 
   /**
-   * Convert the field to a String... usually of the form "displayName=value"
-   */
+    * Convert the field to a String... usually of the form "displayName=value"
+    */
   def asString = displayName + "=" + data
 
   def obscure(in: MyType): Box[MyType] = Failure("value obscured")
@@ -235,16 +240,15 @@ trait TypedField[ThisType] extends BaseField {
     needsDefault = false
     val oldValue = data
     data = in match {
-      case _ if !canWrite_?      => Failure(noValueErrorMessage)
-      case Full(_)               => set_!(in)
-      case _ if optional_?       => set_!(in)
-      case (f: Failure)          => set_!(f) // preserve failures set in
-      case _                     => Failure(notOptionalErrorMessage)
+      case _ if !canWrite_? => Failure(noValueErrorMessage)
+      case Full(_) => set_!(in)
+      case _ if optional_? => set_!(in)
+      case (f: Failure) => set_!(f) // preserve failures set in
+      case _ => Failure(notOptionalErrorMessage)
     }
     if (forceDirty_?) {
       dirty_?(true)
-    }
-    else if (!dirty_?) {
+    } else if (!dirty_?) {
       val same = (oldValue, data) match {
         case (Full(ov), Full(nv)) => ov == nv
         case (a, b) => a == b
@@ -259,7 +263,8 @@ trait TypedField[ThisType] extends BaseField {
 
   protected def toBoxMyType(in: ValueType): Box[MyType]
 
-  protected def set_!(in: Box[MyType]): Box[MyType] = runFilters(in, setFilterBox)
+  protected def set_!(in: Box[MyType]): Box[MyType] =
+    runFilters(in, setFilterBox)
 
   def setFilter: List[ValueType => ValueType] = Nil
 
@@ -267,64 +272,72 @@ trait TypedField[ThisType] extends BaseField {
   protected def liftSetFilterToBox(in: Box[MyType]): Box[MyType]
 
   /**
-   * A list of functions that transform the value before it is set.  The transformations
-   * are also applied before the value is used in a query.  Typical applications
-   * of this are trimming and/or toLowerCase-ing strings
-   */
-  protected def setFilterBox: List[Box[MyType] => Box[MyType]] = liftSetFilterToBox _ :: Nil
+    * A list of functions that transform the value before it is set.  The transformations
+    * are also applied before the value is used in a query.  Typical applications
+    * of this are trimming and/or toLowerCase-ing strings
+    */
+  protected def setFilterBox: List[Box[MyType] => Box[MyType]] =
+    liftSetFilterToBox _ :: Nil
 
-  def runFilters(in: Box[MyType], filter: List[Box[MyType] => Box[MyType]]): Box[MyType] = filter match {
-    case Nil => in
-    case x :: xs => runFilters(x(in), xs)
-  }
+  def runFilters(
+      in: Box[MyType], filter: List[Box[MyType] => Box[MyType]]): Box[MyType] =
+    filter match {
+      case Nil => in
+      case x :: xs => runFilters(x(in), xs)
+    }
 
   /**
-   * Set the value of the field from anything.
-   * Implementations of this method should accept at least the following (pattern => valueBox)
-   *   - value: MyType       => setBox(Full(value))
-   *   - Some(value: MyType) => setBox(Full(value))
-   *   - Full(value: MyType) => setBox(Full(value))
-   *   - (value: MyType)::_  => setBox(Full(value))
-   *   - s: String           => setFromString(s)
-   *   - Some(s: String)     => setFromString(s)
-   *   - Full(s: String)     => setFromString(s)
-   *   - null|None|Empty     => setBox(defaultValueBox)
-   *   - f: Failure          => setBox(f)
-   * And usually convert the input to a string and uses setFromString as a last resort.
-   *
-   * Note that setFromAny should _always_ call setBox, even if the conversion fails. This is so that validation
-   * properly notes the error.
-   *
-   * The method genericSetFromAny implements this guideline.
-   */
+    * Set the value of the field from anything.
+    * Implementations of this method should accept at least the following (pattern => valueBox)
+    *   - value: MyType       => setBox(Full(value))
+    *   - Some(value: MyType) => setBox(Full(value))
+    *   - Full(value: MyType) => setBox(Full(value))
+    *   - (value: MyType)::_  => setBox(Full(value))
+    *   - s: String           => setFromString(s)
+    *   - Some(s: String)     => setFromString(s)
+    *   - Full(s: String)     => setFromString(s)
+    *   - null|None|Empty     => setBox(defaultValueBox)
+    *   - f: Failure          => setBox(f)
+    * And usually convert the input to a string and uses setFromString as a last resort.
+    *
+    * Note that setFromAny should _always_ call setBox, even if the conversion fails. This is so that validation
+    * properly notes the error.
+    *
+    * The method genericSetFromAny implements this guideline.
+    */
   def setFromAny(in: Any): Box[MyType]
 
   /** Generic implementation of setFromAny that implements exactly what the doc for setFromAny specifies, using a Manifest to check types */
-  protected final def genericSetFromAny(in: Any)(implicit m: Manifest[MyType]): Box[MyType] = in match {
-    case value       if m.runtimeClass.isInstance(value) => setBox(Full(value.asInstanceOf[MyType]))
-    case Some(value) if m.runtimeClass.isInstance(value) => setBox(Full(value.asInstanceOf[MyType]))
-    case Full(value) if m.runtimeClass.isInstance(value) => setBox(Full(value.asInstanceOf[MyType]))
-    case (value)::_  if m.runtimeClass.isInstance(value) => setBox(Full(value.asInstanceOf[MyType]))
-    case     (value: String) => setFromString(value)
+  protected final def genericSetFromAny(in: Any)(
+      implicit m: Manifest[MyType]): Box[MyType] = in match {
+    case value if m.runtimeClass.isInstance(value) =>
+      setBox(Full(value.asInstanceOf[MyType]))
+    case Some(value) if m.runtimeClass.isInstance(value) =>
+      setBox(Full(value.asInstanceOf[MyType]))
+    case Full(value) if m.runtimeClass.isInstance(value) =>
+      setBox(Full(value.asInstanceOf[MyType]))
+    case (value) :: _ if m.runtimeClass.isInstance(value) =>
+      setBox(Full(value.asInstanceOf[MyType]))
+    case (value: String) => setFromString(value)
     case Some(value: String) => setFromString(value)
     case Full(value: String) => setFromString(value)
-    case (value: String)::_  => setFromString(value)
-    case null|None|Empty     => setBox(defaultValueBox)
-    case (failure: Failure)  => setBox(failure)
-    case Some(other)         => setFromString(String.valueOf(other))
-    case Full(other)         => setFromString(String.valueOf(other))
-    case other               => setFromString(String.valueOf(other))
+    case (value: String) :: _ => setFromString(value)
+    case null | None | Empty => setBox(defaultValueBox)
+    case (failure: Failure) => setBox(failure)
+    case Some(other) => setFromString(String.valueOf(other))
+    case Full(other) => setFromString(String.valueOf(other))
+    case other => setFromString(String.valueOf(other))
   }
 
   /**
-   * Set the value of the field using some kind of type-specific conversion from a String.
-   * By convention, if the field is optional_?, then the empty string should be treated as no-value (Empty).
-   * Note that setFromString should _always_ call setBox, even if the conversion fails. This is so that validation
-   * properly notes the error.
-   *
-   * @return Full(convertedValue) if the conversion succeeds (the field value will be set by side-effect)
-   *         Empty or Failure if the conversion does not succeed
-   */
+    * Set the value of the field using some kind of type-specific conversion from a String.
+    * By convention, if the field is optional_?, then the empty string should be treated as no-value (Empty).
+    * Note that setFromString should _always_ call setBox, even if the conversion fails. This is so that validation
+    * properly notes the error.
+    *
+    * @return Full(convertedValue) if the conversion succeeds (the field value will be set by side-effect)
+    *         Empty or Failure if the conversion does not succeed
+    */
   def setFromString(s: String): Box[MyType]
 
   def valueBox: Box[MyType] = synchronized {
@@ -339,31 +352,32 @@ trait TypedField[ThisType] extends BaseField {
 
   /** Clear the value of this field */
   def clear: Unit = optional_? match {
-    case true  => setBox(Empty)
+    case true => setBox(Empty)
     case false => setBox(defaultValueBox)
   }
 }
 
-trait MandatoryTypedField[ThisType] extends TypedField[ThisType] with Product1[ThisType] {
+trait MandatoryTypedField[ThisType]
+    extends TypedField[ThisType] with Product1[ThisType] {
 
   /**
-   * ValueType represents the type that users will work with.  For MandatoryTypeField, this is
-   * equal to ThisType.
-   */
+    * ValueType represents the type that users will work with.  For MandatoryTypeField, this is
+    * equal to ThisType.
+    */
   type ValueType = ThisType // For util.BaseField
 
   //TODO: fullfil the contract of Product1[ThisType]
-  def canEqual(a:Any) = false
+  def canEqual(a: Any) = false
 
   def _1 = value
 
   override def optional_? = false
 
   /**
-   * Set the value of the field to the given value.
-   * Note: Because setting a field can fail (return non-Full), this method will
-   * return defaultValue if the field could not be set.
-   */
+    * Set the value of the field to the given value.
+    * Note: Because setting a field can fail (return non-Full), this method will
+    * return defaultValue if the field could not be set.
+    */
   def set(in: MyType): MyType = setBox(Full(in)) openOr defaultValue
 
   def toValueType(in: Box[MyType]) = in openOr defaultValue
@@ -373,42 +387,46 @@ trait MandatoryTypedField[ThisType] extends TypedField[ThisType] with Product1[T
 
   def get: MyType = value
 
-  protected def liftSetFilterToBox(in: Box[MyType]): Box[MyType] = in.map(v => setFilter.foldLeft(v)((prev, f) => f(prev)))
+  protected def liftSetFilterToBox(in: Box[MyType]): Box[MyType] =
+    in.map(v => setFilter.foldLeft(v)((prev, f) => f(prev)))
 
   /**
-   * The default value of the field when a field has no value set and is optional, or a method that must return a value (e.g. value) is used
-   */
+    * The default value of the field when a field has no value set and is optional, or a method that must return a value (e.g. value) is used
+    */
   def defaultValue: MyType
 
-  def defaultValueBox: Box[MyType] = if (optional_?) Empty else Full(defaultValue)
+  def defaultValueBox: Box[MyType] =
+    if (optional_?) Empty else Full(defaultValue)
 
   override def toString = valueBox match {
-    case Full(null)|null => "null"
+    case Full(null) | null => "null"
     case Full(v) => v.toString
-    case _ => defaultValueBox.map(v => if (v != null) v.toString else "null") openOr ""
+    case _ =>
+      defaultValueBox.map(v => if (v != null) v.toString else "null") openOr ""
   }
 }
 
-trait OptionalTypedField[ThisType] extends TypedField[ThisType] with Product1[Box[ThisType]] {
+trait OptionalTypedField[ThisType]
+    extends TypedField[ThisType] with Product1[Box[ThisType]] {
 
   /**
-   * ValueType represents the type that users will work with.  For OptionalTypedField, this is
-   * equal to Option[ThisType].
-   */
+    * ValueType represents the type that users will work with.  For OptionalTypedField, this is
+    * equal to Option[ThisType].
+    */
   type ValueType = Option[ThisType] // For util.BaseField
 
   //TODO: fullfil the contract of Product1[ThisType]
-  def canEqual(a:Any) = false
+  def canEqual(a: Any) = false
 
   def _1 = value
 
   final override def optional_? = true
 
   /**
-   * Set the value of the field to the given value.
-   * Note: Because setting a field can fail (return non-Full), this method will
-   * return defaultValueBox if the field could not be set.
-   */
+    * Set the value of the field to the given value.
+    * Note: Because setting a field can fail (return non-Full), this method will
+    * return defaultValueBox if the field could not be set.
+    */
   def set(in: Option[MyType]): Option[MyType] = setBox(in) or defaultValueBox
 
   def toValueType(in: Box[MyType]) = in
@@ -419,51 +437,55 @@ trait OptionalTypedField[ThisType] extends TypedField[ThisType] with Product1[Bo
 
   def get: Option[MyType] = value
 
-  protected def liftSetFilterToBox(in: Box[MyType]): Box[MyType] =  setFilter.foldLeft(in){ (prev, f) =>
-	prev match {
-	  case fail: Failure => fail //stop on failure, otherwise some filters will clober it to Empty
-	  case other => f(other)
-	}
-  }
+  protected def liftSetFilterToBox(in: Box[MyType]): Box[MyType] =
+    setFilter.foldLeft(in) { (prev, f) =>
+      prev match {
+        case fail: Failure =>
+          fail //stop on failure, otherwise some filters will clober it to Empty
+        case other => f(other)
+      }
+    }
 
   def defaultValueBox: Box[MyType] = Empty
 
   override def toString = valueBox match {
-    case Full(null)|null => "null"
+    case Full(null) | null => "null"
     case Full(v) => v.toString
-    case _ => defaultValueBox.map(v => if (v != null) v.toString else "null") openOr ""
+    case _ =>
+      defaultValueBox.map(v => if (v != null) v.toString else "null") openOr ""
   }
-
 }
 
 /**
- * A simple field that can store and retrieve a value of a given type
- */
-trait Field[ThisType, OwnerType <: Record[OwnerType]] extends OwnedField[OwnerType] with TypedField[ThisType] {
+  * A simple field that can store and retrieve a value of a given type
+  */
+trait Field[ThisType, OwnerType <: Record[OwnerType]]
+    extends OwnedField[OwnerType] with TypedField[ThisType] {
 
   def apply(in: MyType): OwnerType = apply(Full(in))
 
-  def apply(in: Box[MyType]): OwnerType = if (owner.meta.mutable_?) {
-    this.setBox(in)
-    owner
-  } else {
-    owner.meta.createWithMutableField(owner, this, in)
-  }
+  def apply(in: Box[MyType]): OwnerType =
+    if (owner.meta.mutable_?) {
+      this.setBox(in)
+      owner
+    } else {
+      owner.meta.createWithMutableField(owner, this, in)
+    }
 }
 
 /**
- * Mix in to a field to change its form display to be formatted with the label aside.
- *
- * E.g.
- *   <div id={ id + "_holder" }>
- *     <div><label for={ id }>{ displayName }</label></div>
- *     { control }
- *   </div>
- */
-trait DisplayWithLabel[OwnerType <: Record[OwnerType]] extends OwnedField[OwnerType] {
+  * Mix in to a field to change its form display to be formatted with the label aside.
+  *
+  * E.g.
+  *   <div id={ id + "_holder" }>
+  *     <div><label for={ id }>{ displayName }</label></div>
+  *     { control }
+  *   </div>
+  */
+trait DisplayWithLabel[OwnerType <: Record[OwnerType]]
+    extends OwnedField[OwnerType] {
   override abstract def toForm: Box[NodeSeq] =
-    for (id <- uniqueFieldId; control <- super.toForm)
-    yield
+    for (id <- uniqueFieldId; control <- super.toForm) yield
       <div id={ id + "_holder" }>
         <div><label for={ id }>{ displayName }</label></div>
         { control }
@@ -471,15 +493,18 @@ trait DisplayWithLabel[OwnerType <: Record[OwnerType]] extends OwnedField[OwnerT
       </div>
 }
 
-trait KeyField[MyType, OwnerType <: Record[OwnerType] with KeyedRecord[OwnerType, MyType]] extends Field[MyType, OwnerType] {
-  def ===(other: KeyField[MyType, OwnerType]): Boolean = this.valueBox == other.valueBox
+trait KeyField[
+    MyType, OwnerType <: Record[OwnerType] with KeyedRecord[OwnerType, MyType]]
+    extends Field[MyType, OwnerType] {
+  def ===(other: KeyField[MyType, OwnerType]): Boolean =
+    this.valueBox == other.valueBox
 }
-
 
 object FieldHelpers {
-  def expectedA(what: String, notA: AnyRef): Failure = Failure("Expected a " + what + ", not a " + (if (notA == null) "null" else notA.getClass.getName))
+  def expectedA(what: String, notA: AnyRef): Failure =
+    Failure("Expected a " + what + ", not a " +
+        (if (notA == null) "null" else notA.getClass.getName))
 }
-
 
 trait LifecycleCallbacks {
   this: BaseField =>

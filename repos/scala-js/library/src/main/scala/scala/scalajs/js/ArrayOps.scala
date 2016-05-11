@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js API               **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-lang.org/     **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js API               **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-lang.org/     **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 
 package scala.scalajs.js
@@ -16,8 +16,7 @@ import mutable.Builder
 /** Equivalent of scm.ArrayOps for js.Array */
 @inline
 final class ArrayOps[A](private[this] val array: Array[A])
-    extends mutable.ArrayLike[A, Array[A]]
-       with Builder[A, Array[A]] {
+    extends mutable.ArrayLike[A, Array[A]] with Builder[A, Array[A]] {
 
   import ArrayOps._
 
@@ -63,32 +62,29 @@ final class ArrayOps[A](private[this] val array: Array[A])
 
   override def reduceLeft[B >: A](op: (B, A) => B): B = {
     val length = this.length
-    if (length <= 0)
-      throwUnsupported("empty.reduceLeft")
+    if (length <= 0) throwUnsupported("empty.reduceLeft")
 
     @inline
     @tailrec
     def loop(start: Int, z: B): B =
       if (start == length) z
-      else loop(start+1, op(z, this(start)))
+      else loop(start + 1, op(z, this(start)))
 
     loop(1, this(0))
   }
 
   override def reduceRight[B >: A](op: (A, B) => B): B = {
     val length = this.length
-    if (length <= 0)
-      throwUnsupported("empty.reduceRight")
+    if (length <= 0) throwUnsupported("empty.reduceRight")
 
     @inline
     @tailrec
     def loop(end: Int, z: B): B =
       if (end == 0) z
-      else loop(end-1, op(this(end-1), z))
+      else loop(end - 1, op(this(end - 1), z))
 
-    loop(length-1, this(length-1))
+    loop(length - 1, this(length - 1))
   }
-
 }
 
 object ArrayOps {
@@ -107,13 +103,12 @@ object ArrayOps {
     @tailrec
     def loop(src: Array[_ <: A], i: Int, len: Int, offset: Int): Unit =
       if (i != len) {
-        result(i+offset) = src(i)
-        loop(src, i+1, len, offset)
+        result(i + offset) = src(i)
+        loop(src, i + 1, len, offset)
       }
 
     loop(left, 0, leftLength, 0)
     loop(right, 0, rightLength, leftLength)
     result
   }
-
 }

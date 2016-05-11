@@ -17,11 +17,11 @@ import org.jetbrains.plugins.scala.util.ScalaLanguageDerivative
 import scala.collection.JavaConversions
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 31.05.2010
- */
-
-class ScalaAnnotatorHighlightVisitor(project: Project) extends HighlightVisitor {
+  * User: Alexander Podkhalyuzin
+  * Date: 31.05.2010
+  */
+class ScalaAnnotatorHighlightVisitor(project: Project)
+    extends HighlightVisitor {
   def order: Int = 0
 
   private var myHolder: HighlightInfoHolder = null
@@ -37,25 +37,33 @@ class ScalaAnnotatorHighlightVisitor(project: Project) extends HighlightVisitor 
     runAnnotator(element)
   }
 
-  def analyze(file: PsiFile, updateWholeFile: Boolean, holder: HighlightInfoHolder, action: Runnable): Boolean = {
+  def analyze(file: PsiFile,
+              updateWholeFile: Boolean,
+              holder: HighlightInfoHolder,
+              action: Runnable): Boolean = {
 //    val time = System.currentTimeMillis()
     var success = true
     try {
       myHolder = holder
-      myAnnotationHolder = new AnnotationHolderImpl(holder.getAnnotationSession)
+      myAnnotationHolder = new AnnotationHolderImpl(
+          holder.getAnnotationSession)
       if (updateWholeFile) {
         val project: Project = file.getProject
-        val refCountHolder: ScalaRefCountHolder = ScalaRefCountHolder.getInstance(file)
+        val refCountHolder: ScalaRefCountHolder =
+          ScalaRefCountHolder.getInstance(file)
         myRefCountHolder = refCountHolder
-        val document: Document = PsiDocumentManager.getInstance(project).getDocument(file)
-        val dirtyScope: TextRange = if (document == null) file.getTextRange else {
-          DaemonCodeAnalyzer.getInstance(project) match {
-            case analyzerImpl: DaemonCodeAnalyzerImpl =>
-              val fileStatusMap = analyzerImpl.getFileStatusMap
-              fileStatusMap.getFileDirtyScope(document, Pass.UPDATE_ALL)
-            case _ => file.getTextRange
+        val document: Document =
+          PsiDocumentManager.getInstance(project).getDocument(file)
+        val dirtyScope: TextRange =
+          if (document == null) file.getTextRange
+          else {
+            DaemonCodeAnalyzer.getInstance(project) match {
+              case analyzerImpl: DaemonCodeAnalyzerImpl =>
+                val fileStatusMap = analyzerImpl.getFileStatusMap
+                fileStatusMap.getFileDirtyScope(document, Pass.UPDATE_ALL)
+              case _ => file.getTextRange
+            }
           }
-        }
         success = refCountHolder.analyze(action, dirtyScope, file)
       } else {
         myRefCountHolder = null

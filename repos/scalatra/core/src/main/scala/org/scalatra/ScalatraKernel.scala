@@ -22,5 +22,4 @@ object ScalatraKernel {
 
   @deprecated("Use org.scalatra.MultiParamsKey", "2.1.0")
   val MultiParamsKey = "org.scalatra.MultiParams"
-
 }

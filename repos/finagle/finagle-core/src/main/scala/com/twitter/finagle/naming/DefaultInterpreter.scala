@@ -4,12 +4,12 @@ import com.twitter.finagle._
 import com.twitter.util.Activity
 
 /**
- * Interpret names against the Dtab, using the default evaluation
- * strategy. Recursively look up and rewrite paths according to entries
- * matching the path prefix in the Dtab. If a path does not match any
- * Dtab entry prefix, the global Namer is invoked to resolve it. This is
- * how paths starting with `/$/` are bound.
- */
+  * Interpret names against the Dtab, using the default evaluation
+  * strategy. Recursively look up and rewrite paths according to entries
+  * matching the path prefix in the Dtab. If a path does not match any
+  * Dtab entry prefix, the global Namer is invoked to resolve it. This is
+  * how paths starting with `/$/` are bound.
+  */
 object DefaultInterpreter extends NameInterpreter {
 
   override def bind(dtab: Dtab, path: Path): Activity[NameTree[Name.Bound]] = {

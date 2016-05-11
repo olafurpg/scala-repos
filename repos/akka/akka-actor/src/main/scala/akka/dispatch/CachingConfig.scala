@@ -1,18 +1,17 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.dispatch
 
-import java.util.concurrent.{ ConcurrentHashMap, TimeUnit }
+import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 
 import com.typesafe.config._
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object CachingConfig {
   val emptyConfig = ConfigFactory.empty()
 
@@ -21,8 +20,12 @@ private[akka] object CachingConfig {
     val exists: Boolean
     val config: Config
   }
-  final case class ValuePathEntry(valid: Boolean, exists: Boolean, config: Config = emptyConfig) extends PathEntry
-  final case class StringPathEntry(valid: Boolean, exists: Boolean, config: Config, value: String) extends PathEntry
+  final case class ValuePathEntry(
+      valid: Boolean, exists: Boolean, config: Config = emptyConfig)
+      extends PathEntry
+  final case class StringPathEntry(
+      valid: Boolean, exists: Boolean, config: Config, value: String)
+      extends PathEntry
 
   val invalidPathEntry = ValuePathEntry(false, true)
   val nonExistingPathEntry = ValuePathEntry(true, false)
@@ -30,47 +33,51 @@ private[akka] object CachingConfig {
 }
 
 /**
- * INTERNAL API
- *
- * A CachingConfig is a Config that wraps another Config and is used to cache path lookup and string
- * retrieval, which we happen to do a lot in some critical paths of the actor creation and mailbox
- * selection code.
- *
- * All other Config operations are delegated to the wrapped Config.
- */
+  * INTERNAL API
+  *
+  * A CachingConfig is a Config that wraps another Config and is used to cache path lookup and string
+  * retrieval, which we happen to do a lot in some critical paths of the actor creation and mailbox
+  * selection code.
+  *
+  * All other Config operations are delegated to the wrapped Config.
+  */
 private[akka] class CachingConfig(_config: Config) extends Config {
 
   import CachingConfig._
 
-  private val (config: Config, entryMap: ConcurrentHashMap[String, PathEntry]) = _config match {
-    case cc: CachingConfig ⇒ (cc.config, cc.entryMap)
-    case _                 ⇒ (_config, new ConcurrentHashMap[String, PathEntry])
-  }
+  private val (config: Config, entryMap: ConcurrentHashMap[String, PathEntry]) =
+    _config match {
+      case cc: CachingConfig ⇒ (cc.config, cc.entryMap)
+      case _ ⇒ (_config, new ConcurrentHashMap[String, PathEntry])
+    }
 
-  private def getPathEntry(path: String): PathEntry = entryMap.get(path) match {
-    case null ⇒
-      val ne = Try { config.hasPath(path) } match {
-        case Failure(e)     ⇒ invalidPathEntry
-        case Success(false) ⇒ nonExistingPathEntry
-        case _ ⇒
-          Try { config.getValue(path) } match {
-            case Failure(e) ⇒
-              emptyPathEntry
-            case Success(v) ⇒
-              if (v.valueType() == ConfigValueType.STRING)
-                StringPathEntry(true, true, v.atKey("cached"), v.unwrapped().asInstanceOf[String])
-              else
-                ValuePathEntry(true, true, v.atKey("cached"))
-          }
-      }
+  private def getPathEntry(path: String): PathEntry =
+    entryMap.get(path) match {
+      case null ⇒
+        val ne = Try { config.hasPath(path) } match {
+          case Failure(e) ⇒ invalidPathEntry
+          case Success(false) ⇒ nonExistingPathEntry
+          case _ ⇒
+            Try { config.getValue(path) } match {
+              case Failure(e) ⇒
+                emptyPathEntry
+              case Success(v) ⇒
+                if (v.valueType() == ConfigValueType.STRING)
+                  StringPathEntry(true,
+                                  true,
+                                  v.atKey("cached"),
+                                  v.unwrapped().asInstanceOf[String])
+                else ValuePathEntry(true, true, v.atKey("cached"))
+            }
+        }
 
-      entryMap.putIfAbsent(path, ne) match {
-        case null ⇒ ne
-        case e    ⇒ e
-      }
+        entryMap.putIfAbsent(path, ne) match {
+          case null ⇒ ne
+          case e ⇒ e
+        }
 
-    case e ⇒ e
-  }
+      case e ⇒ e
+    }
 
   def checkValid(reference: Config, restrictToPaths: String*) {
     config.checkValid(reference, restrictToPaths: _*)
@@ -80,7 +87,8 @@ private[akka] class CachingConfig(_config: Config) extends Config {
 
   def origin() = config.origin()
 
-  def withFallback(other: ConfigMergeable) = new CachingConfig(config.withFallback(other))
+  def withFallback(other: ConfigMergeable) =
+    new CachingConfig(config.withFallback(other))
 
   def resolve() = resolve(ConfigResolveOptions.defaults())
 
@@ -92,9 +100,9 @@ private[akka] class CachingConfig(_config: Config) extends Config {
 
   def hasPath(path: String) = {
     val entry = getPathEntry(path)
-    if (entry.valid)
-      entry.exists
-    else // run the real code to get proper exceptions
+    if (entry.valid) entry.exists
+    else
+      // run the real code to get proper exceptions
       config.hasPath(path)
   }
 
@@ -132,9 +140,11 @@ private[akka] class CachingConfig(_config: Config) extends Config {
 
   def getBytes(path: String) = config.getBytes(path)
 
-  def getMilliseconds(path: String) = config.getDuration(path, TimeUnit.MILLISECONDS)
+  def getMilliseconds(path: String) =
+    config.getDuration(path, TimeUnit.MILLISECONDS)
 
-  def getNanoseconds(path: String) = config.getDuration(path, TimeUnit.NANOSECONDS)
+  def getNanoseconds(path: String) =
+    config.getDuration(path, TimeUnit.NANOSECONDS)
 
   def getList(path: String) = config.getList(path)
 
@@ -158,9 +168,11 @@ private[akka] class CachingConfig(_config: Config) extends Config {
 
   def getBytesList(path: String) = config.getBytesList(path)
 
-  def getMillisecondsList(path: String) = config.getDurationList(path, TimeUnit.MILLISECONDS)
+  def getMillisecondsList(path: String) =
+    config.getDurationList(path, TimeUnit.MILLISECONDS)
 
-  def getNanosecondsList(path: String) = config.getDurationList(path, TimeUnit.NANOSECONDS)
+  def getNanosecondsList(path: String) =
+    config.getDurationList(path, TimeUnit.NANOSECONDS)
 
   def withOnlyPath(path: String) = new CachingConfig(config.withOnlyPath(path))
 
@@ -170,11 +182,14 @@ private[akka] class CachingConfig(_config: Config) extends Config {
 
   def atKey(key: String) = new CachingConfig(config.atKey(key))
 
-  def withValue(path: String, value: ConfigValue) = new CachingConfig(config.withValue(path, value))
+  def withValue(path: String, value: ConfigValue) =
+    new CachingConfig(config.withValue(path, value))
 
-  def getDuration(path: String, unit: TimeUnit) = config.getDuration(path, unit)
+  def getDuration(path: String, unit: TimeUnit) =
+    config.getDuration(path, unit)
 
-  def getDurationList(path: String, unit: TimeUnit) = config.getDurationList(path, unit)
+  def getDurationList(path: String, unit: TimeUnit) =
+    config.getDurationList(path, unit)
 
   def getDuration(path: String): java.time.Duration = config.getDuration(path)
 
@@ -188,8 +203,8 @@ private[akka] class CachingConfig(_config: Config) extends Config {
 
   def isResolved() = config.isResolved()
 
-  def resolveWith(source: Config, options: ConfigResolveOptions) = config.resolveWith(source, options)
+  def resolveWith(source: Config, options: ConfigResolveOptions) =
+    config.resolveWith(source, options)
 
   def resolveWith(source: Config) = config.resolveWith(source)
 }
-

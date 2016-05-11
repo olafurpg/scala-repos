@@ -19,10 +19,10 @@ object EndoRingExample extends App {
     }
 
     /**
-     * This turns the group of Sets under union into an abelian group by
-     * keeping track of the inclusions and exclusions separately. This let's
-     * us ensure it is commutative and that we always have an inverse.
-     */
+      * This turns the group of Sets under union into an abelian group by
+      * keeping track of the inclusions and exclusions separately. This let's
+      * us ensure it is commutative and that we always have an inverse.
+      */
     implicit def PairedSetAbGroup[A] = new AbGroup[(Set[A], Set[A])] {
       def op(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) = {
         val (a1, a2) = a
@@ -41,11 +41,11 @@ object EndoRingExample extends App {
   type Endo[A] = A => A
 
   /**
-   * Toy example of a non-numeric Ring. This constructs the endomorphism ring
-   * for an abelian group `ab`. This defines addition as group addition after
-   * applying the endomorphism and multiplication as composition.
-   */
-  class EndoRing[A:AbGroup] extends Ring[Endo[A]] {
+    * Toy example of a non-numeric Ring. This constructs the endomorphism ring
+    * for an abelian group `ab`. This defines addition as group addition after
+    * applying the endomorphism and multiplication as composition.
+    */
+  class EndoRing[A : AbGroup] extends Ring[Endo[A]] {
     def plus(f: Endo[A], g: Endo[A]): Endo[A] = a => f(a) |+| g(a)
     def negate(f: Endo[A]): Endo[A] = a => f(a).inverse
     def times(f: Endo[A], g: Endo[A]): Endo[A] = a => f(g(a))
@@ -58,7 +58,7 @@ object EndoRingExample extends App {
   }
 
   object EndoRing {
-    def apply[A: AbGroup] = new EndoRing[A]
+    def apply[A : AbGroup] = new EndoRing[A]
   }
 
   implicit val intEndoRing = EndoRing[Int]
@@ -108,7 +108,7 @@ object EndoRingExample extends App {
   assert(range == Set(1, 2, 3, 4, 5, 11, 12, 13, 14, 15))
 
   // It's distributive.
-  val q = Set(1,2,3)
+  val q = Set(1, 2, 3)
   val e1 = (double + triple) * triple
   val e2 = (double * triple) + (triple * triple)
   assert(e1(q) == e2(q))

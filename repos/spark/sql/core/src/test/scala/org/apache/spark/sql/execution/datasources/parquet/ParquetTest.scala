@@ -36,22 +36,23 @@ import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.sql.types.StructType
 
 /**
- * A helper trait that provides convenient facilities for Parquet testing.
- *
- * NOTE: Considering classes `Tuple1` ... `Tuple22` all extend `Product`, it would be more
- * convenient to use tuples rather than special case classes when writing test cases/suites.
- * Especially, `Tuple1.apply` can be used to easily wrap a single type/value.
- */
+  * A helper trait that provides convenient facilities for Parquet testing.
+  *
+  * NOTE: Considering classes `Tuple1` ... `Tuple22` all extend `Product`, it would be more
+  * convenient to use tuples rather than special case classes when writing test cases/suites.
+  * Especially, `Tuple1.apply` can be used to easily wrap a single type/value.
+  */
 private[sql] trait ParquetTest extends SQLTestUtils {
 
   /**
-   * Reads the parquet file at `path`
-   */
-  protected def readParquetFile(path: String, testVectorized: Boolean = true)
-      (f: DataFrame => Unit) = {
+    * Reads the parquet file at `path`
+    */
+  protected def readParquetFile(path: String, testVectorized: Boolean = true)(
+      f: DataFrame => Unit) = {
     (true :: false :: Nil).foreach { vectorized =>
       if (!vectorized || testVectorized) {
-        withSQLConf(SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key -> vectorized.toString) {
+        withSQLConf(
+            SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key -> vectorized.toString) {
           f(sqlContext.read.parquet(path.toString))
         }
       }
@@ -59,12 +60,11 @@ private[sql] trait ParquetTest extends SQLTestUtils {
   }
 
   /**
-   * Writes `data` to a Parquet file, which is then passed to `f` and will be deleted after `f`
-   * returns.
-   */
-  protected def withParquetFile[T <: Product: ClassTag: TypeTag]
-      (data: Seq[T])
-      (f: String => Unit): Unit = {
+    * Writes `data` to a Parquet file, which is then passed to `f` and will be deleted after `f`
+    * returns.
+    */
+  protected def withParquetFile[T <: Product : ClassTag : TypeTag](
+      data: Seq[T])(f: String => Unit): Unit = {
     withTempPath { file =>
       sqlContext.createDataFrame(data).write.parquet(file.getCanonicalPath)
       f(file.getCanonicalPath)
@@ -72,46 +72,52 @@ private[sql] trait ParquetTest extends SQLTestUtils {
   }
 
   /**
-   * Writes `data` to a Parquet file and reads it back as a [[DataFrame]],
-   * which is then passed to `f`. The Parquet file will be deleted after `f` returns.
-   */
-  protected def withParquetDataFrame[T <: Product: ClassTag: TypeTag]
-      (data: Seq[T], testVectorized: Boolean = true)
-      (f: DataFrame => Unit): Unit = {
-    withParquetFile(data)(path => readParquetFile(path.toString, testVectorized)(f))
+    * Writes `data` to a Parquet file and reads it back as a [[DataFrame]],
+    * which is then passed to `f`. The Parquet file will be deleted after `f` returns.
+    */
+  protected def withParquetDataFrame[T <: Product : ClassTag : TypeTag](
+      data: Seq[T], testVectorized: Boolean = true)(
+      f: DataFrame => Unit): Unit = {
+    withParquetFile(data)(
+        path => readParquetFile(path.toString, testVectorized)(f))
   }
 
   /**
-   * Writes `data` to a Parquet file, reads it back as a [[DataFrame]] and registers it as a
-   * temporary table named `tableName`, then call `f`. The temporary table together with the
-   * Parquet file will be dropped/deleted after `f` returns.
-   */
-  protected def withParquetTable[T <: Product: ClassTag: TypeTag]
-      (data: Seq[T], tableName: String, testVectorized: Boolean = true)
-      (f: => Unit): Unit = {
+    * Writes `data` to a Parquet file, reads it back as a [[DataFrame]] and registers it as a
+    * temporary table named `tableName`, then call `f`. The temporary table together with the
+    * Parquet file will be dropped/deleted after `f` returns.
+    */
+  protected def withParquetTable[T <: Product : ClassTag : TypeTag](
+      data: Seq[T], tableName: String, testVectorized: Boolean = true)(
+      f: => Unit): Unit = {
     withParquetDataFrame(data, testVectorized) { df =>
       sqlContext.registerDataFrameAsTable(df, tableName)
       withTempTable(tableName)(f)
     }
   }
 
-  protected def makeParquetFile[T <: Product: ClassTag: TypeTag](
+  protected def makeParquetFile[T <: Product : ClassTag : TypeTag](
       data: Seq[T], path: File): Unit = {
-    sqlContext.createDataFrame(data).write.mode(SaveMode.Overwrite).parquet(path.getCanonicalPath)
+    sqlContext
+      .createDataFrame(data)
+      .write
+      .mode(SaveMode.Overwrite)
+      .parquet(path.getCanonicalPath)
   }
 
-  protected def makeParquetFile[T <: Product: ClassTag: TypeTag](
+  protected def makeParquetFile[T <: Product : ClassTag : TypeTag](
       df: DataFrame, path: File): Unit = {
     df.write.mode(SaveMode.Overwrite).parquet(path.getCanonicalPath)
   }
 
-  protected def makePartitionDir(
-      basePath: File,
-      defaultPartitionName: String,
-      partitionCols: (String, Any)*): File = {
-    val partNames = partitionCols.map { case (k, v) =>
-      val valueString = if (v == null || v == "") defaultPartitionName else v.toString
-      s"$k=$valueString"
+  protected def makePartitionDir(basePath: File,
+                                 defaultPartitionName: String,
+                                 partitionCols: (String, Any)*): File = {
+    val partNames = partitionCols.map {
+      case (k, v) =>
+        val valueString =
+          if (v == null || v == "") defaultPartitionName else v.toString
+        s"$k=$valueString"
     }
 
     val partDir = partNames.foldLeft(basePath) { (parent, child) =>
@@ -125,43 +131,57 @@ private[sql] trait ParquetTest extends SQLTestUtils {
   protected def writeMetadata(
       schema: StructType, path: Path, configuration: Configuration): Unit = {
     val parquetSchema = new CatalystSchemaConverter().convert(schema)
-    val extraMetadata = Map(CatalystReadSupport.SPARK_METADATA_KEY -> schema.json).asJava
+    val extraMetadata = Map(
+        CatalystReadSupport.SPARK_METADATA_KEY -> schema.json).asJava
     val createdBy = s"Apache Spark ${org.apache.spark.SPARK_VERSION}"
-    val fileMetadata = new FileMetaData(parquetSchema, extraMetadata, createdBy)
-    val parquetMetadata = new ParquetMetadata(fileMetadata, Seq.empty[BlockMetaData].asJava)
+    val fileMetadata = new FileMetaData(
+        parquetSchema, extraMetadata, createdBy)
+    val parquetMetadata = new ParquetMetadata(
+        fileMetadata, Seq.empty[BlockMetaData].asJava)
     val footer = new Footer(path, parquetMetadata)
-    ParquetFileWriter.writeMetadataFile(configuration, path, Seq(footer).asJava)
+    ParquetFileWriter.writeMetadataFile(
+        configuration, path, Seq(footer).asJava)
   }
 
   /**
-   * This is an overloaded version of `writeMetadata` above to allow writing customized
-   * Parquet schema.
-   */
+    * This is an overloaded version of `writeMetadata` above to allow writing customized
+    * Parquet schema.
+    */
   protected def writeMetadata(
-      parquetSchema: MessageType, path: Path, configuration: Configuration,
+      parquetSchema: MessageType,
+      path: Path,
+      configuration: Configuration,
       extraMetadata: Map[String, String] = Map.empty[String, String]): Unit = {
     val extraMetadataAsJava = extraMetadata.asJava
     val createdBy = s"Apache Spark ${org.apache.spark.SPARK_VERSION}"
-    val fileMetadata = new FileMetaData(parquetSchema, extraMetadataAsJava, createdBy)
-    val parquetMetadata = new ParquetMetadata(fileMetadata, Seq.empty[BlockMetaData].asJava)
+    val fileMetadata = new FileMetaData(
+        parquetSchema, extraMetadataAsJava, createdBy)
+    val parquetMetadata = new ParquetMetadata(
+        fileMetadata, Seq.empty[BlockMetaData].asJava)
     val footer = new Footer(path, parquetMetadata)
-    ParquetFileWriter.writeMetadataFile(configuration, path, Seq(footer).asJava)
+    ParquetFileWriter.writeMetadataFile(
+        configuration, path, Seq(footer).asJava)
   }
 
   protected def readAllFootersWithoutSummaryFiles(
       path: Path, configuration: Configuration): Seq[Footer] = {
     val fs = path.getFileSystem(configuration)
-    ParquetFileReader.readAllFootersInParallel(configuration, fs.getFileStatus(path)).asScala.toSeq
+    ParquetFileReader
+      .readAllFootersInParallel(configuration, fs.getFileStatus(path))
+      .asScala
+      .toSeq
   }
 
-  protected def readFooter(path: Path, configuration: Configuration): ParquetMetadata = {
+  protected def readFooter(
+      path: Path, configuration: Configuration): ParquetMetadata = {
     ParquetFileReader.readFooter(
-      configuration,
-      new Path(path, ParquetFileWriter.PARQUET_METADATA_FILE),
-      ParquetMetadataConverter.NO_FILTER)
+        configuration,
+        new Path(path, ParquetFileWriter.PARQUET_METADATA_FILE),
+        ParquetMetadataConverter.NO_FILTER)
   }
 
-  protected def testStandardAndLegacyModes(testName: String)(f: => Unit): Unit = {
+  protected def testStandardAndLegacyModes(testName: String)(
+      f: => Unit): Unit = {
     test(s"Standard mode - $testName") {
       withSQLConf(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key -> "false") { f }
     }

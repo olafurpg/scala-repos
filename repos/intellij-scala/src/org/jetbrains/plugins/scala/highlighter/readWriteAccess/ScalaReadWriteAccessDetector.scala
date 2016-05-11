@@ -9,14 +9,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScPatternDefinition,
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 06.10.2008
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 06.10.2008
+  */
 class ScalaReadWriteAccessDetector extends ReadWriteAccessDetector {
   def getExpressionAccess(expression: PsiElement): Access = {
     expression match {
-      case expression: ScExpression if ScalaReadWriteAccessDetector.isAccessedForWriting(expression) => Access.Write
+      case expression: ScExpression
+          if ScalaReadWriteAccessDetector.isAccessedForWriting(expression) =>
+        Access.Write
       case _ => Access.Read
     }
   }
@@ -27,28 +28,30 @@ class ScalaReadWriteAccessDetector extends ReadWriteAccessDetector {
       case _ => false
     }
   }
-  def getReferenceAccess(referencedElement: PsiElement, reference: PsiReference): Access =
+  def getReferenceAccess(
+      referencedElement: PsiElement, reference: PsiReference): Access =
     getExpressionAccess(reference.getElement)
 
   def isDeclarationWriteAccess(element: PsiElement): Boolean = {
     element match {
       case x: PsiNamedElement =>
         ScalaPsiUtil.nameContext(x) match {
-         case _: ScVariableDefinition | _: ScPatternDefinition => true
-         case _ => false
-       }
+          case _: ScVariableDefinition | _: ScPatternDefinition => true
+          case _ => false
+        }
       case _ => false
     }
   }
 }
 
 private object ScalaReadWriteAccessDetector {
-  def isAccessedForReading(expression: ScExpression): Boolean = !isAccessedForWriting(expression)
+  def isAccessedForReading(expression: ScExpression): Boolean =
+    !isAccessedForWriting(expression)
 
   //Now it's just inverse prev method
   def isAccessedForWriting(expression: ScExpression): Boolean = {
     expression.getParent match {
-      case assign : ScAssignStmt if expression == assign.getLExpression => true
+      case assign: ScAssignStmt if expression == assign.getLExpression => true
       case _ => false
     }
   }

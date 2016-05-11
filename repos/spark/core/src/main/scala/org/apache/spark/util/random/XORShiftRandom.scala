@@ -25,16 +25,16 @@ import scala.util.hashing.MurmurHash3
 import org.apache.spark.util.Utils.timeIt
 
 /**
- * This class implements a XORShift random number generator algorithm
- * Source:
- * Marsaglia, G. (2003). Xorshift RNGs. Journal of Statistical Software, Vol. 8, Issue 14.
- * @see <a href="http://www.jstatsoft.org/v08/i14/paper">Paper</a>
- * This implementation is approximately 3.5 times faster than
- * {@link java.util.Random java.util.Random}, partly because of the algorithm, but also due
- * to renouncing thread safety. JDK's implementation uses an AtomicLong seed, this class
- * uses a regular Long. We can forgo thread safety since we use a new instance of the RNG
- * for each thread.
- */
+  * This class implements a XORShift random number generator algorithm
+  * Source:
+  * Marsaglia, G. (2003). Xorshift RNGs. Journal of Statistical Software, Vol. 8, Issue 14.
+  * @see <a href="http://www.jstatsoft.org/v08/i14/paper">Paper</a>
+  * This implementation is approximately 3.5 times faster than
+  * {@link java.util.Random java.util.Random}, partly because of the algorithm, but also due
+  * to renouncing thread safety. JDK's implementation uses an AtomicLong seed, this class
+  * uses a regular Long. We can forgo thread safety since we use a new instance of the RNG
+  * for each thread.
+  */
 private[spark] class XORShiftRandom(init: Long) extends JavaRandom(init) {
 
   def this() = this(System.nanoTime)
@@ -48,7 +48,7 @@ private[spark] class XORShiftRandom(init: Long) extends JavaRandom(init) {
     nextSeed ^= (nextSeed >>> 35)
     nextSeed ^= (nextSeed << 4)
     seed = nextSeed
-    (nextSeed & ((1L << bits) -1)).asInstanceOf[Int]
+    (nextSeed & ((1L << bits) - 1)).asInstanceOf[Int]
   }
 
   override def setSeed(s: Long) {
@@ -68,9 +68,9 @@ private[spark] object XORShiftRandom {
   }
 
   /**
-   * Main method for running benchmark
-   * @param args takes one argument - the number of random numbers to generate
-   */
+    * Main method for running benchmark
+    * @param args takes one argument - the number of random numbers to generate
+    */
   def main(args: Array[String]): Unit = {
     // scalastyle:off println
     if (args.length != 1) {
@@ -83,10 +83,10 @@ private[spark] object XORShiftRandom {
   }
 
   /**
-   * @param numIters Number of random numbers to generate while running the benchmark
-   * @return Map of execution times for {@link java.util.Random java.util.Random}
-   * and XORShift
-   */
+    * @param numIters Number of random numbers to generate while running the benchmark
+    * @return Map of execution times for {@link java.util.Random java.util.Random}
+    * and XORShift
+    */
   def benchmark(numIters: Int): Map[String, Long] = {
 
     val seed = 1L

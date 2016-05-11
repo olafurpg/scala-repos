@@ -27,29 +27,36 @@ object StringUtils {
   // replace the % with .*, match 0 or more times with any character
   def escapeLikeRegex(v: String): String = {
     if (!v.isEmpty) {
-      "(?s)" + (' ' +: v.init).zip(v).flatMap {
-        case (prev, '\\') => ""
-        case ('\\', c) =>
-          c match {
-            case '_' => "_"
-            case '%' => "%"
-            case _ => Pattern.quote("\\" + c)
-          }
-        case (prev, c) =>
-          c match {
-            case '_' => "."
-            case '%' => ".*"
-            case _ => Pattern.quote(Character.toString(c))
-          }
-      }.mkString
+      "(?s)" + (' ' +: v.init)
+        .zip(v)
+        .flatMap {
+          case (prev, '\\') => ""
+          case ('\\', c) =>
+            c match {
+              case '_' => "_"
+              case '%' => "%"
+              case _ => Pattern.quote("\\" + c)
+            }
+          case (prev, c) =>
+            c match {
+              case '_' => "."
+              case '%' => ".*"
+              case _ => Pattern.quote(Character.toString(c))
+            }
+        }
+        .mkString
     } else {
       v
     }
   }
 
-  private[this] val trueStrings = Set("t", "true", "y", "yes", "1").map(UTF8String.fromString)
-  private[this] val falseStrings = Set("f", "false", "n", "no", "0").map(UTF8String.fromString)
+  private[this] val trueStrings =
+    Set("t", "true", "y", "yes", "1").map(UTF8String.fromString)
+  private[this] val falseStrings =
+    Set("f", "false", "n", "no", "0").map(UTF8String.fromString)
 
-  def isTrueString(s: UTF8String): Boolean = trueStrings.contains(s.toLowerCase)
-  def isFalseString(s: UTF8String): Boolean = falseStrings.contains(s.toLowerCase)
+  def isTrueString(s: UTF8String): Boolean =
+    trueStrings.contains(s.toLowerCase)
+  def isFalseString(s: UTF8String): Boolean =
+    falseStrings.contains(s.toLowerCase)
 }

@@ -2,27 +2,27 @@ package com.twitter.io
 
 import com.twitter.concurrent.AsyncStream
 import com.twitter.util._
-import java.io.{
-  File, FileInputStream, FileNotFoundException, InputStream, OutputStream}
+import java.io.{File, FileInputStream, FileNotFoundException, InputStream, OutputStream}
 
 /**
- * A Reader represents a stream of bytes, read in discrete chunks.
- * Readers permit at most one outstanding read.
- */
+  * A Reader represents a stream of bytes, read in discrete chunks.
+  * Readers permit at most one outstanding read.
+  */
 trait Reader {
+
   /**
-   * Asynchronously read at most `n` bytes from the byte stream. The
-   * returned future represents the results of the read request. If
-   * the read fails, the Reader is considered failed -- future reads
-   * will also fail.
-   *
-   * A result of None indicates EOF.
-   */
+    * Asynchronously read at most `n` bytes from the byte stream. The
+    * returned future represents the results of the read request. If
+    * the read fails, the Reader is considered failed -- future reads
+    * will also fail.
+    *
+    * A result of None indicates EOF.
+    */
   def read(n: Int): Future[Option[Buf]]
 
   /**
-   * Discard this reader: its output is no longer required.
-   */
+    * Discard this reader: its output is no longer required.
+    */
   def discard()
 }
 
@@ -34,8 +34,8 @@ object Reader {
   }
 
   /**
-   * Read the entire bytestream presented by `r`.
-   */
+    * Read the entire bytestream presented by `r`.
+    */
   def readAll(r: Reader): Future[Buf] = {
     def loop(left: Buf): Future[Buf] =
       r.read(Int.MaxValue) flatMap {
@@ -47,39 +47,39 @@ object Reader {
   }
 
   /**
-   * Reader from a Buf.
-   */
+    * Reader from a Buf.
+    */
   def fromBuf(buf: Buf): Reader = BufReader(buf)
 
   class ReaderDiscarded
-    extends Exception("This writer's reader has been discarded")
+      extends Exception("This writer's reader has been discarded")
 
   /**
-   * A [[Reader]] that is linked with a [[Writer]] and `close`-ing
-   * is synchronous.
-   *
-   * Just as with [[Reader readers]] and [[Writer writers]],
-   * only one outstanding `read` or `write` is permitted.
-   *
-   * For a proper `close`, it should only be done when
-   * no writes are outstanding:
-   * {{{
-   *   val rw = Reader.writable()
-   *   ...
-   *   rw.write(buf).before(rw.close())
-   * }}}
-   *
-   * If a producer is interested in knowing when all writes
-   * have been read and the reader has seen the EOF, it can
-   * wait until the future returned by `close()` is satisfied:
-   * {{{
-   *   val rw = Reader.writable()
-   *   ...
-   *   rw.close().ensure {
-   *     println("party on! ♪┏(・o･)┛♪ the Reader has seen the EOF")
-   *   }
-   * }}}
-   */
+    * A [[Reader]] that is linked with a [[Writer]] and `close`-ing
+    * is synchronous.
+    *
+    * Just as with [[Reader readers]] and [[Writer writers]],
+    * only one outstanding `read` or `write` is permitted.
+    *
+    * For a proper `close`, it should only be done when
+    * no writes are outstanding:
+    * {{{
+    *   val rw = Reader.writable()
+    *   ...
+    *   rw.write(buf).before(rw.close())
+    * }}}
+    *
+    * If a producer is interested in knowing when all writes
+    * have been read and the reader has seen the EOF, it can
+    * wait until the future returned by `close()` is satisfied:
+    * {{{
+    *   val rw = Reader.writable()
+    *   ...
+    *   rw.close().ensure {
+    *     println("party on! ♪┏(・o･)┛♪ the Reader has seen the EOF")
+    *   }
+    * }}}
+    */
   trait Writable extends Reader with Writer with Closable
 
   private sealed trait State
@@ -88,40 +88,40 @@ object Reader {
   private object Idle extends State
 
   /**
-   * Indicates a read is pending and is awaiting a `write`.
-   *
-   * @param n number of bytes to read.
-   * @param p when satisfied it indicates that this read has completed.
-   */
+    * Indicates a read is pending and is awaiting a `write`.
+    *
+    * @param n number of bytes to read.
+    * @param p when satisfied it indicates that this read has completed.
+    */
   private case class Reading(n: Int, p: Promise[Option[Buf]]) extends State
 
   /**
-   * Indicates a write of `buf` is pending to be `read`.
-   *
-   * @param buf the [[Buf]] to write.
-   * @param p when satisfied it indicates that this write has been fully read.
-   */
+    * Indicates a write of `buf` is pending to be `read`.
+    *
+    * @param buf the [[Buf]] to write.
+    * @param p when satisfied it indicates that this write has been fully read.
+    */
   private case class Writing(buf: Buf, p: Promise[Unit]) extends State
 
   /** Indicates this was `fail`-ed or `discard`-ed. */
   private case class Failing(exc: Throwable) extends State
 
   /**
-   * Indicates a close occurred while `Idle` — no reads or writes were pending.
-   *
-   * @param reof satified when a `read` sees the EOF.
-   */
+    * Indicates a close occurred while `Idle` — no reads or writes were pending.
+    *
+    * @param reof satified when a `read` sees the EOF.
+    */
   private case class Closing(reof: Promise[Unit]) extends State
 
   /** Indicates the reader has seen the EOF. No more reads or writes are allowed. */
   private case object Eof extends State
 
   /**
-   * Create a new [[Writable]] which is a [[Reader]] that is linked
-   * with a [[Writer]].
-   *
-   * @see Readers.writable() for a Java API.
-   */
+    * Create a new [[Writable]] which is a [[Reader]] that is linked
+    * with a [[Writer]].
+    *
+    * @see Readers.writable() for a Java API.
+    */
   def writable(): Writable = new Writable {
     // thread-safety provided by synchronization on `this`
     private[this] var state: State = Idle
@@ -131,10 +131,10 @@ object Reader {
     }
 
     /**
-     * The returned [[com.twitter.util.Future]] is satisfied when this has either been
-     * [[discard discarded]], a [[read]] has seen the EOF, or a [[read]]
-     * has seen the [[fail failure]].
-     */
+      * The returned [[com.twitter.util.Future]] is satisfied when this has either been
+      * [[discard discarded]], a [[read]] has seen the EOF, or a [[read]]
+      * has seen the [[fail failure]].
+      */
     def close(deadline: Time): Future[Unit] = synchronized {
       state match {
         case Failing(t) =>
@@ -159,9 +159,9 @@ object Reader {
         case Writing(_, p) =>
           val reof = new Promise[Unit]()
           state = Closing(reof)
-          p.setException(new IllegalStateException("close while write is pending"))
+          p.setException(
+              new IllegalStateException("close while write is pending"))
           reof
-
       }
     }
 
@@ -241,7 +241,7 @@ object Reader {
       val oldState = state
       oldState match {
         case Eof | Failing(_) =>
-          // do not update state to failing
+        // do not update state to failing
         case Idle =>
           state = Failing(cause)
         case Closing(reof) =>
@@ -258,31 +258,32 @@ object Reader {
   }
 
   /**
-   * Create a new Reader for a File
-   *
-   * @see Readers.fromFile for a Java API
-   */
+    * Create a new Reader for a File
+    *
+    * @see Readers.fromFile for a Java API
+    */
   @throws(classOf[FileNotFoundException])
   @throws(classOf[SecurityException])
   def fromFile(f: File): Reader = fromStream(new FileInputStream(f))
 
   /**
-   * Wrap InputStream s in with a Reader
-   *
-   * @see Readers.fromStream for a Java API
-   */
+    * Wrap InputStream s in with a Reader
+    *
+    * @see Readers.fromStream for a Java API
+    */
   def fromStream(s: InputStream): Reader = InputStreamReader(s)
 
   /**
-   * Convenient abstraction to read from a stream of Readers as if it were a
-   * single Reader.
-   */
+    * Convenient abstraction to read from a stream of Readers as if it were a
+    * single Reader.
+    */
   def concat(readers: AsyncStream[Reader]): Reader = {
     val target = Reader.writable()
-    val f = copyMany(readers, target) respond {
-      case Throw(exc) => target.fail(exc)
-      case _ => target.close()
-    }
+    val f =
+      copyMany(readers, target) respond {
+        case Throw(exc) => target.fail(exc)
+        case _ => target.close()
+      }
     new Reader {
       def read(n: Int) = target.read(n)
       def discard() {
@@ -300,40 +301,42 @@ object Reader {
   }
 
   /**
-   * Copy bytes from many Readers to a Writer. The Writer is unmanaged, the
-   * caller is responsible for finalization and error handling, e.g.:
-   *
-   * {{{
-   * Reader.copyMany(readers, writer) ensure writer.close()
-   * }}}
-   *
-   * @param bufsize The number of bytes to read each time.
-   */
-  def copyMany(readers: AsyncStream[Reader], target: Writer, bufsize: Int): Future[Unit] =
+    * Copy bytes from many Readers to a Writer. The Writer is unmanaged, the
+    * caller is responsible for finalization and error handling, e.g.:
+    *
+    * {{{
+    * Reader.copyMany(readers, writer) ensure writer.close()
+    * }}}
+    *
+    * @param bufsize The number of bytes to read each time.
+    */
+  def copyMany(readers: AsyncStream[Reader],
+               target: Writer,
+               bufsize: Int): Future[Unit] =
     readers.foreachF(Reader.copy(_, target, bufsize))
 
   /**
-   * Copy bytes from many Readers to a Writer. The Writer is unmanaged, the
-   * caller is responsible for finalization and error handling, e.g.:
-   *
-   * {{{
-   * Reader.copyMany(readers, writer) ensure writer.close()
-   * }}}
-   */
+    * Copy bytes from many Readers to a Writer. The Writer is unmanaged, the
+    * caller is responsible for finalization and error handling, e.g.:
+    *
+    * {{{
+    * Reader.copyMany(readers, writer) ensure writer.close()
+    * }}}
+    */
   def copyMany(readers: AsyncStream[Reader], target: Writer): Future[Unit] =
     copyMany(readers, target, Writer.BufferSize)
 
   /**
-   * Copy the bytes from a Reader to a Writer in chunks of size `n`. The Writer
-   * is unmanaged, the caller is responsible for finalization and error
-   * handling, e.g.:
-   *
-   * {{{
-   * Reader.copy(r, w, n) ensure w.close()
-   * }}}
-   *
-   * @param n The number of bytes to read on each refill of the Writer.
-   */
+    * Copy the bytes from a Reader to a Writer in chunks of size `n`. The Writer
+    * is unmanaged, the caller is responsible for finalization and error
+    * handling, e.g.:
+    *
+    * {{{
+    * Reader.copy(r, w, n) ensure w.close()
+    * }}}
+    *
+    * @param n The number of bytes to read on each refill of the Writer.
+    */
   def copy(r: Reader, w: Writer, n: Int): Future[Unit] = {
     def loop(): Future[Unit] =
       r.read(n) flatMap {
@@ -349,22 +352,23 @@ object Reader {
   }
 
   /**
-   * Copy the bytes from a Reader to a Writer in chunks of size
-   * `Writer.BufferSize`. The Writer is unmanaged, the caller is responsible
-   * for finalization and error handling, e.g.:
-   *
-   * {{{
-   * Reader.copy(r, w) ensure w.close()
-   * }}}
-   */
+    * Copy the bytes from a Reader to a Writer in chunks of size
+    * `Writer.BufferSize`. The Writer is unmanaged, the caller is responsible
+    * for finalization and error handling, e.g.:
+    *
+    * {{{
+    * Reader.copy(r, w) ensure w.close()
+    * }}}
+    */
   def copy(r: Reader, w: Writer): Future[Unit] = copy(r, w, Writer.BufferSize)
 }
 
 /**
- * A Writer represents a sink for a stream of bytes, providing
- * a convenient interface for the producer of such streams.
- */
+  * A Writer represents a sink for a stream of bytes, providing
+  * a convenient interface for the producer of such streams.
+  */
 trait Writer {
+
   /**
     * Write a chunk. The returned future is completed
     * when the chunk has been fully read by the sink.
@@ -375,45 +379,45 @@ trait Writer {
   def write(buf: Buf): Future[Unit]
 
   /**
-   * Indicate that the producer of the bytestream has
-   * failed. No further writes are allowed.
-   */
+    * Indicate that the producer of the bytestream has
+    * failed. No further writes are allowed.
+    */
   def fail(cause: Throwable)
 }
 
 /**
- * @see Writers for Java friendly APIs.
- */
+  * @see Writers for Java friendly APIs.
+  */
 object Writer {
 
   /**
-   * Represents a [[Writer]] which is [[Closable]].
-   *
-   * Exists primarily for Java compatibility.
-   */
+    * Represents a [[Writer]] which is [[Closable]].
+    *
+    * Exists primarily for Java compatibility.
+    */
   trait ClosableWriter extends Writer with Closable
 
   val BufferSize = 4096
 
   /**
-   * Construct a [[ClosableWriter]] from a given OutputStream.
-   *
-   * This [[Writer]] is not thread safe. If multiple threads attempt to `write`, the
-   * behavior is identical to multiple threads calling `write` on the underlying
-   * OutputStream.
-   *
-   * @param bufsize Size of the copy buffer between Writer and OutputStream.
-   */
+    * Construct a [[ClosableWriter]] from a given OutputStream.
+    *
+    * This [[Writer]] is not thread safe. If multiple threads attempt to `write`, the
+    * behavior is identical to multiple threads calling `write` on the underlying
+    * OutputStream.
+    *
+    * @param bufsize Size of the copy buffer between Writer and OutputStream.
+    */
   def fromOutputStream(out: OutputStream, bufsize: Int): ClosableWriter =
     new OutputStreamWriter(out, bufsize)
 
   /**
-   * Construct a [[ClosableWriter]] from a given OutputStream.
-   *
-   * This [[Writer]] is not thread safe. If multiple threads attempt to `write`, the
-   * behavior is identical to multiple threads calling `write` on the underlying
-   * OutputStream.
-   */
+    * Construct a [[ClosableWriter]] from a given OutputStream.
+    *
+    * This [[Writer]] is not thread safe. If multiple threads attempt to `write`, the
+    * behavior is identical to multiple threads calling `write` on the underlying
+    * OutputStream.
+    */
   def fromOutputStream(out: OutputStream): ClosableWriter =
     fromOutputStream(out, BufferSize)
 }

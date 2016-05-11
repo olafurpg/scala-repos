@@ -4,7 +4,7 @@ package foo
 // Changing the order of these lines to trigger the unstable highlighting.
 
 // No unresolved errors after removing `with T2`
-object `package` extends /* */T1 with /* */T2
+object `package` extends /* */ T1 with /* */ T2
 
 trait T1
 

@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 import akka.actor.Address
@@ -18,12 +17,18 @@ class PNCounterMapSpec extends WordSpec with Matchers {
   "A PNCounterMap" must {
 
     "be able to increment and decrement entries" in {
-      val m = PNCounterMap().increment(node1, "a", 2).increment(node1, "b", 3).decrement(node2, "a", 1)
+      val m = PNCounterMap()
+        .increment(node1, "a", 2)
+        .increment(node1, "b", 3)
+        .decrement(node2, "a", 1)
       m.entries should be(Map("a" -> 1, "b" -> 3))
     }
 
     "be able to have its entries correctly merged with another ORMap with other entries" in {
-      val m1 = PNCounterMap().increment(node1, "a", 1).increment(node1, "b", 3).increment(node1, "c", 2)
+      val m1 = PNCounterMap()
+        .increment(node1, "a", 1)
+        .increment(node1, "b", 3)
+        .increment(node1, "c", 2)
       val m2 = PNCounterMap().increment(node2, "c", 5)
 
       // merge both ways
@@ -33,7 +38,10 @@ class PNCounterMapSpec extends WordSpec with Matchers {
     }
 
     "be able to remove entry" in {
-      val m1 = PNCounterMap().increment(node1, "a", 1).increment(node1, "b", 3).increment(node1, "c", 2)
+      val m1 = PNCounterMap()
+        .increment(node1, "a", 1)
+        .increment(node1, "b", 3)
+        .increment(node1, "c", 2)
       val m2 = PNCounterMap().increment(node2, "c", 5)
 
       val merged1 = m1 merge m2
@@ -47,7 +55,8 @@ class PNCounterMapSpec extends WordSpec with Matchers {
     }
 
     "have unapply extractor" in {
-      val m1 = PNCounterMap.empty.increment(node1, "a", 1).increment(node2, "b", 2)
+      val m1 =
+        PNCounterMap.empty.increment(node1, "a", 1).increment(node2, "b", 2)
       val PNCounterMap(entries1) = m1
       val entries2: Map[String, BigInt] = entries1
       Changed(PNCounterMapKey("key"))(m1) match {
@@ -57,6 +66,5 @@ class PNCounterMapSpec extends WordSpec with Matchers {
           entries4 should be(Map("a" -> 1L, "b" -> 2L))
       }
     }
-
   }
 }

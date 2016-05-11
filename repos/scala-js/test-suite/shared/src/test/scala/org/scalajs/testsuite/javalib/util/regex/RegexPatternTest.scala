@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util.regex
 
@@ -35,7 +35,8 @@ class RegexPatternTest {
     matches("waz*up", "WAZZZZZZZZZZZUP")
 
     def matches(regex: String, input: String): Unit = {
-      val result = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(input)
+      val result =
+        Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(input)
       assertTrue(result.matches())
     }
   }
@@ -74,8 +75,7 @@ class RegexPatternTest {
       split("a", "", Array("", "a"))
     }
     split("a", "^d*", Array("a"))
-    if (!executingInJVM)
-      split("a", "d*", Array("", "a"))
+    if (!executingInJVM) split("a", "d*", Array("", "a"))
     split("a", "(?=a)", Array("a"))
     split("ab", "a", Array("", "b"))
 
@@ -101,12 +101,14 @@ class RegexPatternTest {
     splitWithLimit("", "", 1, Array(""))
 
     // Should remove leading empty match under some conditions - #1171
-    if (!executingInJVM)
-      splitWithLimit("abc", "", 2, Array("", "abc"))
+    if (!executingInJVM) splitWithLimit("abc", "", 2, Array("", "abc"))
     splitWithLimit("abc", "(?=a)", 2, Array("abc"))
     splitWithLimit("ab", "a", 1, Array("ab"))
 
-    def splitWithLimit(input: String, regex: String, limit: Int, expected: Array[String]): Unit = {
+    def splitWithLimit(input: String,
+                       regex: String,
+                       limit: Int,
+                       expected: Array[String]): Unit = {
       val result = Pattern.compile(regex).split(input, limit)
       assertArrayEquals(expected, result)
     }
@@ -139,7 +141,8 @@ class RegexPatternTest {
   }
 
   @Test def quote(): Unit = {
-    val splitWithQuote = Pattern.compile(Pattern.quote("$1&$2")).split("Scala$1&$2.js")
+    val splitWithQuote =
+      Pattern.compile(Pattern.quote("$1&$2")).split("Scala$1&$2.js")
     val splitNoQuote = Pattern.compile("$1&$2").split("Scala$1&$2.js")
     assertEquals("Scala.js", splitWithQuote.mkString)
     assertEquals("Scala$1&$2.js", splitNoQuote.mkString)
@@ -148,5 +151,4 @@ class RegexPatternTest {
   @Test def compile_should_throw_for_invalid_patterns_issue_1718(): Unit = {
     assertThrows(classOf[Throwable], Pattern.compile("*"))
   }
-
 }

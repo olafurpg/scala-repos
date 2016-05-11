@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.compiler
 
@@ -20,7 +20,9 @@ class OptimizerTest {
 
   // Inlineable classes
 
-  @Test def must_update_fields_of_this_in_the_computation_of_other_fields_issue_1153(): Unit = {
+  @Test
+  def must_update_fields_of_this_in_the_computation_of_other_fields_issue_1153(
+      ): Unit = {
     val foo = new InlineClassDependentFields(5)
     assertEquals(5, foo.x)
     assertTrue(foo.b)
@@ -36,7 +38,7 @@ class OptimizerTest {
 
   @Test def `must_not_break_*_(-1)_for_Int_issue_1453`(): Unit = {
     @noinline
-    def start0: Int = (() => 10) ()
+    def start0: Int = (() => 10)()
 
     val start = start0
     val step = -1
@@ -47,22 +49,21 @@ class OptimizerTest {
 
   @Test def `must_not_break_*_(-1)_for_Float_and_Double_issue_1478`(): Unit = {
     @noinline
-    def a: Float = (() => 5.0f) ()
+    def a: Float = (() => 5.0f)()
     assertEquals(-5.0f, a * -1.0f)
 
     @noinline
-    def b: Double = (() => 7.0) ()
+    def b: Double = (() => 7.0)()
     assertEquals(-7.0, b * -1.0)
   }
 
   @Test def must_not_break_foreach_on_downward_Range_issue_1453(): Unit = {
     @noinline
-    def start0: Int = (() => 10) ()
+    def start0: Int = (() => 10)()
 
     val elements = js.Array[Int]()
     for (i <- start0 to 2 by -1) {
-      if (i < 0)
-        sys.error("Going into infinite loop")
+      if (i < 0) sys.error("Going into infinite loop")
       elements.push(i)
     }
     assertArrayEquals(Array(10, 9, 8, 7, 6, 5, 4, 3, 2), elements.toArray)
@@ -89,7 +90,9 @@ class OptimizerTest {
     assertEquals("I am constant", str + "constant")
   }
 
-  @Test def must_not_break_when_folding_the_empty_string_when_associated_with_a_string(): Unit = {
+  @Test
+  def must_not_break_when_folding_the_empty_string_when_associated_with_a_string(
+      ): Unit = {
     @noinline def str: String = "hello"
     assertEquals("hello", str + "")
     assertEquals("hello", "" + str)
@@ -113,7 +116,8 @@ class OptimizerTest {
     assertEquals("abcdefg", "a" + b + "c" + d + "e" + f + "g")
   }
 
-  @Test def must_not_break_when_folding_integer_in_double_and_stringLit(): Unit = {
+  @Test
+  def must_not_break_when_folding_integer_in_double_and_stringLit(): Unit = {
     assertEquals("1hello", 1.0 + "hello")
     assertEquals("hello1", "hello" + 1.0)
   }
@@ -137,13 +141,18 @@ class OptimizerTest {
     assertEquals("helloNaN", "hello" + Double.NaN)
   }
 
-  @Test def must_not_break_when_folding_double_with_decimal_and_stringLit(): Unit = {
+  @Test
+  def must_not_break_when_folding_double_with_decimal_and_stringLit(): Unit = {
     assumeFalse(isInFullOpt)
-    assertEquals("1.2323919403474454e+21hello", 1.2323919403474454E21 + "hello")
-    assertEquals("hello1.2323919403474454e+21", "hello" + 1.2323919403474454E21)
+    assertEquals(
+        "1.2323919403474454e+21hello", 1.2323919403474454E21 + "hello")
+    assertEquals(
+        "hello1.2323919403474454e+21", "hello" + 1.2323919403474454E21)
   }
 
-  @Test def must_not_break_when_folding_double_that_JVM_would_print_in_scientific_notation_and_stringLit(): Unit = {
+  @Test
+  def must_not_break_when_folding_double_that_JVM_would_print_in_scientific_notation_and_stringLit(
+      ): Unit = {
     assumeFalse(isInFullOpt)
     assertEquals("123456789012345hello", 123456789012345d + "hello")
     assertEquals("hello123456789012345", "hello" + 123456789012345d)
@@ -276,7 +285,7 @@ class OptimizerTest {
 
   @Test def must_not_break_when_folding_unit_and_stringLit(): Unit = {
     assertEquals("undefined is undefined?", () + " is undefined?")
-    assertEquals("undefined is undefined", "undefined is " +())
+    assertEquals("undefined is undefined", "undefined is " + ())
   }
 
   @Test def must_not_break_when_folding_null_and_stringLit(): Unit = {
@@ -294,7 +303,7 @@ object OptimizerTest {
   @inline
   class InlineClassDependentFields(val x: Int) {
     val b = x > 3
-    val y = if (b) x + 6 else x-2
+    val y = if (b) x + 6 else x - 2
   }
 
   @inline
@@ -303,5 +312,4 @@ object OptimizerTest {
     val y = x
     val z = t.y
   }
-
 }

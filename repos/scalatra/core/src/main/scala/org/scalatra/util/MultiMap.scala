@@ -6,12 +6,13 @@ object MultiMap {
 
   def apply(): MultiMap = new MultiMap
 
-  def apply[SeqType <: Seq[String]](wrapped: Map[String, SeqType]): MultiMap = new MultiMap(wrapped)
+  def apply[SeqType <: Seq[String]](wrapped: Map[String, SeqType]): MultiMap =
+    new MultiMap(wrapped)
 
   def empty: MultiMap = apply()
 
-  implicit def map2MultiMap(map: Map[String, Seq[String]]): MultiMap = new MultiMap(map)
-
+  implicit def map2MultiMap(map: Map[String, Seq[String]]): MultiMap =
+    new MultiMap(map)
 }
 
 class MultiMap(wrapped: Map[String, Seq[String]] = Map.empty)
@@ -32,5 +33,4 @@ class MultiMap(wrapped: Map[String, Seq[String]] = Map.empty)
   def iterator: Iterator[(String, Seq[String])] = wrapped.iterator
 
   override def default(a: String): Seq[String] = wrapped.default(a)
-
 }

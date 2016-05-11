@@ -18,6 +18,6 @@
 package org.apache.spark.metrics
 
 /**
- * Sources used in Spark's metrics system.
- */
+  * Sources used in Spark's metrics system.
+  */
 package object source

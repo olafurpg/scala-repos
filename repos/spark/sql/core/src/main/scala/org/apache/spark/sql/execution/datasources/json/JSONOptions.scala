@@ -23,13 +23,13 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.sql.execution.datasources.{CompressionCodecs, ParseModes}
 
 /**
- * Options for the JSON data source.
- *
- * Most of these map directly to Jackson's internal options, specified in [[JsonParser.Feature]].
- */
+  * Options for the JSON data source.
+  *
+  * Most of these map directly to Jackson's internal options, specified in [[JsonParser.Feature]].
+  */
 private[sql] class JSONOptions(
     @transient private val parameters: Map[String, String])
-  extends Logging with Serializable  {
+    extends Logging with Serializable {
 
   val samplingRatio =
     parameters.get("samplingRatio").map(_.toDouble).getOrElse(1.0)
@@ -43,18 +43,24 @@ private[sql] class JSONOptions(
     parameters.get("allowUnquotedFieldNames").map(_.toBoolean).getOrElse(false)
   val allowSingleQuotes =
     parameters.get("allowSingleQuotes").map(_.toBoolean).getOrElse(true)
-  val allowNumericLeadingZeros =
-    parameters.get("allowNumericLeadingZeros").map(_.toBoolean).getOrElse(false)
+  val allowNumericLeadingZeros = parameters
+    .get("allowNumericLeadingZeros")
+    .map(_.toBoolean)
+    .getOrElse(false)
   val allowNonNumericNumbers =
     parameters.get("allowNonNumericNumbers").map(_.toBoolean).getOrElse(true)
-  val allowBackslashEscapingAnyCharacter =
-    parameters.get("allowBackslashEscapingAnyCharacter").map(_.toBoolean).getOrElse(false)
-  val compressionCodec = parameters.get("compression").map(CompressionCodecs.getCodecClassName)
+  val allowBackslashEscapingAnyCharacter = parameters
+    .get("allowBackslashEscapingAnyCharacter")
+    .map(_.toBoolean)
+    .getOrElse(false)
+  val compressionCodec =
+    parameters.get("compression").map(CompressionCodecs.getCodecClassName)
   private val parseMode = parameters.getOrElse("mode", "PERMISSIVE")
 
   // Parse mode flags
   if (!ParseModes.isValidMode(parseMode)) {
-    logWarning(s"$parseMode is not a valid parse mode. Using ${ParseModes.DEFAULT}.")
+    logWarning(
+        s"$parseMode is not a valid parse mode. Using ${ParseModes.DEFAULT}.")
   }
 
   val failFast = ParseModes.isFailFastMode(parseMode)
@@ -64,11 +70,16 @@ private[sql] class JSONOptions(
   /** Sets config options on a Jackson [[JsonFactory]]. */
   def setJacksonOptions(factory: JsonFactory): Unit = {
     factory.configure(JsonParser.Feature.ALLOW_COMMENTS, allowComments)
-    factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, allowUnquotedFieldNames)
-    factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, allowSingleQuotes)
-    factory.configure(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS, allowNumericLeadingZeros)
-    factory.configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, allowNonNumericNumbers)
-    factory.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER,
-      allowBackslashEscapingAnyCharacter)
+    factory.configure(
+        JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, allowUnquotedFieldNames)
+    factory.configure(
+        JsonParser.Feature.ALLOW_SINGLE_QUOTES, allowSingleQuotes)
+    factory.configure(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS,
+                      allowNumericLeadingZeros)
+    factory.configure(
+        JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, allowNonNumericNumbers)
+    factory.configure(
+        JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER,
+        allowBackslashEscapingAnyCharacter)
   }
 }

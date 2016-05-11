@@ -2,7 +2,8 @@
 /*replaceAll*/
 class Test {
   object A {
-    /*start*/1/*end*/
+    /*start*/
+    1 /*end*/
   }
 
   def foo() {
@@ -28,4 +29,4 @@ class Test {
 
   i
 }
-*/
+ */

@@ -16,5 +16,4 @@ class InitTest extends FunSuite {
         assert(version != null)
     }
   }
-
 }

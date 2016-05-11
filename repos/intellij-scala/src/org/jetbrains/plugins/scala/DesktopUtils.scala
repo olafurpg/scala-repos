@@ -9,12 +9,12 @@ import com.intellij.notification.{Notification, NotificationListener, Notificati
 import org.intellij.lang.annotations.Language
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 object DesktopUtils {
   @Language("HTML")
-  private val MessageFormat = """
+  private val MessageFormat =
+    """
   <html>
   <body>
   Unable to launch web browser, please manually open:<br>
@@ -28,20 +28,25 @@ object DesktopUtils {
   }
 
   def browse(url: String) {
-    val supported = Desktop.isDesktopSupported && Desktop.getDesktop.isSupported(Desktop.Action.BROWSE)
+    val supported =
+      Desktop.isDesktopSupported &&
+      Desktop.getDesktop.isSupported(Desktop.Action.BROWSE)
 
-    if(supported)
-      Desktop.getDesktop.browse(new URI(url))
+    if (supported) Desktop.getDesktop.browse(new URI(url))
     else
-      Notifications.Bus.notify(new Notification("scala", "Problem opening web page",
-        MessageFormat.format(url), NotificationType.WARNING, Listener))
+      Notifications.Bus.notify(
+          new Notification("scala",
+                           "Problem opening web page",
+                           MessageFormat.format(url),
+                           NotificationType.WARNING,
+                           Listener))
   }
 
-   private object Listener extends NotificationListener.Adapter {
+  private object Listener extends NotificationListener.Adapter {
     def hyperlinkActivated(notification: Notification, event: HyperlinkEvent) {
       Option(event.getURL).foreach { url =>
-         val clipboard = Toolkit.getDefaultToolkit.getSystemClipboard
-         clipboard.setContents(new StringSelection(url.toExternalForm), null)
+        val clipboard = Toolkit.getDefaultToolkit.getSystemClipboard
+        clipboard.setContents(new StringSelection(url.toExternalForm), null)
       }
     }
   }

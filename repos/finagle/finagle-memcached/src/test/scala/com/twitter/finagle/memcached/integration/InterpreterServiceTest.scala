@@ -20,7 +20,8 @@ class InterpreterServiceTest extends FunSuite with BeforeAndAfter {
   var client: Service[Command, Response] = null
 
   before {
-    server = new InProcessMemcached(new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
+    server = new InProcessMemcached(
+        new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
     val address = server.start().boundAddress.asInstanceOf[InetSocketAddress]
     client = ClientBuilder()
       .hosts(address)
@@ -42,7 +43,8 @@ class InterpreterServiceTest extends FunSuite with BeforeAndAfter {
       _ <- client(Set(key, 0, Time.epoch, value))
       r <- client(Get(Seq(key)))
     } yield r
-    assert(Await.result(result, 1.second) == Values(Seq(Value(key, value, None, Some(Buf.Utf8(zero))))))
+    assert(Await.result(result, 1.second) == Values(
+            Seq(Value(key, value, None, Some(Buf.Utf8(zero))))))
     assert(client.isAvailable)
   }
 
@@ -50,5 +52,4 @@ class InterpreterServiceTest extends FunSuite with BeforeAndAfter {
     val result = client(Quit())
     assert(Await.result(result) == NoOp())
   }
-
 }

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import scala.collection.immutable.SortedSet
@@ -19,9 +19,12 @@ object LeaderLeavingMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).
-    withFallback(ConfigFactory.parseString("akka.cluster.auto-down-unreachable-after = 0s")).
-    withFallback(MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+  commonConfig(
+      debugConfig(on = false)
+        .withFallback(ConfigFactory.parseString(
+                "akka.cluster.auto-down-unreachable-after = 0s"))
+        .withFallback(
+            MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
 class LeaderLeavingMultiJvmNode1 extends LeaderLeavingSpec
@@ -29,8 +32,8 @@ class LeaderLeavingMultiJvmNode2 extends LeaderLeavingSpec
 class LeaderLeavingMultiJvmNode3 extends LeaderLeavingSpec
 
 abstract class LeaderLeavingSpec
-  extends MultiNodeSpec(LeaderLeavingMultiJvmSpec)
-  with MultiNodeClusterSpec {
+    extends MultiNodeSpec(LeaderLeavingMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import LeaderLeavingMultiJvmSpec._
   import ClusterEvent._
@@ -55,7 +58,6 @@ abstract class LeaderLeavingSpec
           // verify that the LEADER is shut down
           awaitCond(cluster.isTerminated)
           enterBarrier("leader-shutdown")
-
         } else {
 
           val exitingLatch = TestLatch()
@@ -63,9 +65,11 @@ abstract class LeaderLeavingSpec
           cluster.subscribe(system.actorOf(Props(new Actor {
             def receive = {
               case state: CurrentClusterState ⇒
-                if (state.members.exists(m ⇒ m.address == oldLeaderAddress && m.status == Exiting))
-                  exitingLatch.countDown()
-              case MemberExited(m) if m.address == oldLeaderAddress ⇒ exitingLatch.countDown()
+                if (state.members.exists(m ⇒
+                          m.address == oldLeaderAddress &&
+                          m.status == Exiting)) exitingLatch.countDown()
+              case MemberExited(m) if m.address == oldLeaderAddress ⇒
+                exitingLatch.countDown()
               case _ ⇒ // ignore
             }
           }).withDeploy(Deploy.local)), classOf[MemberEvent])
@@ -80,10 +84,13 @@ abstract class LeaderLeavingSpec
           markNodeAsUnavailable(oldLeaderAddress)
 
           // verify that the LEADER is no longer part of the 'members' set
-          awaitAssert(clusterView.members.map(_.address) should not contain (oldLeaderAddress))
+          awaitAssert(clusterView.members.map(_.address) should not contain
+              (oldLeaderAddress))
 
           // verify that the LEADER is not part of the 'unreachable' set
-          awaitAssert(clusterView.unreachableMembers.map(_.address) should not contain (oldLeaderAddress))
+          awaitAssert(
+              clusterView.unreachableMembers.map(_.address) should not contain
+              (oldLeaderAddress))
 
           // verify that we have a new LEADER
           awaitAssert(clusterView.leader should not be (oldLeaderAddress))

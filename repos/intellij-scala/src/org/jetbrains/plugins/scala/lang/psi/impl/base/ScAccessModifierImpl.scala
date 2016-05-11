@@ -23,14 +23,17 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScAccessModifierStub
 import scala.collection.mutable.ArrayBuffer
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 07.03.2008
-*/
-
-class ScAccessModifierImpl private (stub: StubElement[ScAccessModifier], nodeType: IElementType, node: ASTNode)
-  extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScAccessModifier {
-  def this(node: ASTNode) = {this(null, null, node)}
-  def this(stub: ScAccessModifierStub) = {this(stub, ScalaElementTypes.ACCESS_MODIFIER, null)}
+  * @author Alexander Podkhalyuzin
+  * Date: 07.03.2008
+  */
+class ScAccessModifierImpl private (
+    stub: StubElement[ScAccessModifier], nodeType: IElementType, node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScAccessModifier {
+  def this(node: ASTNode) = { this(null, null, node) }
+  def this(stub: ScAccessModifierStub) = {
+    this(stub, ScalaElementTypes.ACCESS_MODIFIER, null)
+  }
 
   override def toString: String = "AccessModifier"
 
@@ -46,11 +49,14 @@ class ScAccessModifierImpl private (stub: StubElement[ScAccessModifier], nodeTyp
   }
 
   def scope = getReference match {
-    case null => PsiTreeUtil.getParentOfType(this, classOf[ScTypeDefinition], true)
-    case ref => ref.resolve() match {
-      case named: PsiNamedElement => named
-      case _ => PsiTreeUtil.getParentOfType(this, classOf[ScTypeDefinition], true)
-    }
+    case null =>
+      PsiTreeUtil.getParentOfType(this, classOf[ScTypeDefinition], true)
+    case ref =>
+      ref.resolve() match {
+        case named: PsiNamedElement => named
+        case _ =>
+          PsiTreeUtil.getParentOfType(this, classOf[ScTypeDefinition], true)
+      }
   }
 
   //return ref only for {private|protected}[Id], not for private[this]
@@ -80,84 +86,94 @@ class ScAccessModifierImpl private (stub: StubElement[ScAccessModifier], nodeTyp
 
   override def getReference = {
     val text = idText
-    if (text.isEmpty) null else new PsiReference {
-      def getElement = ScAccessModifierImpl.this
-      def getRangeInElement = {
-        val id = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
-        new TextRange(0, id.getTextLength).shiftRight(id.getStartOffsetInParent)
-      }
-      def getCanonicalText = resolve() match {
-        case td : ScTypeDefinition => td.qualifiedName
-        case p : PsiPackage => p.getQualifiedName
-        case _ => null
-      }
-      def isSoft = false
+    if (text.isEmpty) null
+    else
+      new PsiReference {
+        def getElement = ScAccessModifierImpl.this
+        def getRangeInElement = {
+          val id = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
+          new TextRange(0, id.getTextLength)
+            .shiftRight(id.getStartOffsetInParent)
+        }
+        def getCanonicalText = resolve() match {
+          case td: ScTypeDefinition => td.qualifiedName
+          case p: PsiPackage => p.getQualifiedName
+          case _ => null
+        }
+        def isSoft = false
 
-      def handleElementRename(newElementName: String) = doRename(newElementName)
-      def bindToElement(e : PsiElement) = e match {
-        case td : ScTypeDefinition => doRename(td.name)
-        case p : PsiPackage => doRename(p.name)
-        case _ => throw new IncorrectOperationException("cannot bind to anything but type definition or package")
-      }
+        def handleElementRename(newElementName: String) =
+          doRename(newElementName)
+        def bindToElement(e: PsiElement) = e match {
+          case td: ScTypeDefinition => doRename(td.name)
+          case p: PsiPackage => doRename(p.name)
+          case _ =>
+            throw new IncorrectOperationException(
+                "cannot bind to anything but type definition or package")
+        }
 
-      private def doRename(newName : String) = {
-        val id = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
-        val parent = id.getNode.getTreeParent
-        parent.replaceChild(id.getNode, ScalaPsiElementFactory.createIdentifier(newName, getManager))
-        ScAccessModifierImpl.this
-      }
+        private def doRename(newName: String) = {
+          val id = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
+          val parent = id.getNode.getTreeParent
+          parent.replaceChild(
+              id.getNode,
+              ScalaPsiElementFactory.createIdentifier(newName, getManager))
+          ScAccessModifierImpl.this
+        }
 
-      def isReferenceTo(element: PsiElement) = element match {
-        case td : ScTypeDefinition => td.name == text.get && resolve == td
-        case p : PsiPackage => p.name == text.get && resolve == p
-        case _ => false
-      }
+        def isReferenceTo(element: PsiElement) = element match {
+          case td: ScTypeDefinition => td.name == text.get && resolve == td
+          case p: PsiPackage => p.name == text.get && resolve == p
+          case _ => false
+        }
 
-      def resolve(): PsiElement = {
-        val name = text.get
-        def findPackage(qname : String) : PsiPackage = {
-          var pack: PsiPackage = ScPackageImpl(JavaPsiFacade.getInstance(getProject).findPackage(qname))
-          while (pack != null) {
-            if (pack.name == name) return pack
-            pack = pack.getParentPackage
+        def resolve(): PsiElement = {
+          val name = text.get
+          def findPackage(qname: String): PsiPackage = {
+            var pack: PsiPackage = ScPackageImpl(
+                JavaPsiFacade.getInstance(getProject).findPackage(qname))
+            while (pack != null) {
+              if (pack.name == name) return pack
+              pack = pack.getParentPackage
+            }
+            null
           }
-          null
+
+          def find(e: PsiElement): PsiNamedElement = e match {
+            case null => null
+            case td: ScTypeDefinition if td.name == name => td
+            case file: ScalaFile => findPackage("")
+            case container: ScPackageContainer => findPackage(container.fqn)
+            case _ => find(e.getParent)
+          }
+          find(getParent)
         }
 
-        def find(e : PsiElement) : PsiNamedElement = e match {
-          case null => null
-          case td : ScTypeDefinition if td.name == name => td
-          case file : ScalaFile => findPackage("")
-          case container : ScPackageContainer => findPackage(container.fqn)
-          case _ => find(e.getParent)
-        }
-        find(getParent)
-      }
-
-      def getVariants: Array[Object] = {
-        val buff = new ArrayBuffer[Object]
-        def processPackages(qname : String) {
-          var pack: PsiPackage = ScPackageImpl(JavaPsiFacade.getInstance(getProject).findPackage(qname))
-          while (pack != null && pack.name != null) {
-            buff += pack
-            pack = pack.getParentPackage
+        def getVariants: Array[Object] = {
+          val buff = new ArrayBuffer[Object]
+          def processPackages(qname: String) {
+            var pack: PsiPackage = ScPackageImpl(
+                JavaPsiFacade.getInstance(getProject).findPackage(qname))
+            while (pack != null && pack.name != null) {
+              buff += pack
+              pack = pack.getParentPackage
+            }
           }
-        }
-        def append(e : PsiElement) {
-          e match {
-            case null =>
-            case td: ScTypeDefinition => buff += td; append(td.getParent)
-            case file: ScalaFile => processPackages("")
-            case container: ScPackageContainer => processPackages(container.fqn)
-            case _ => append(e.getParent)
+          def append(e: PsiElement) {
+            e match {
+              case null =>
+              case td: ScTypeDefinition => buff += td; append(td.getParent)
+              case file: ScalaFile => processPackages("")
+              case container: ScPackageContainer =>
+                processPackages(container.fqn)
+              case _ => append(e.getParent)
+            }
           }
+          append(getParent)
+          buff.toArray
         }
-        append(getParent)
-        buff.toArray
       }
-    }
   }
-
 
   def access = {
     assert(isPrivate || isProtected)

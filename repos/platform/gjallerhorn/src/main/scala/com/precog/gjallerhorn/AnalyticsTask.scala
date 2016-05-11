@@ -33,7 +33,8 @@ import specs2._
 
 import scalaz._
 
-class AnalyticsTask(settings: Settings) extends Task(settings: Settings) with Specification {
+class AnalyticsTask(settings: Settings)
+    extends Task(settings: Settings) with Specification {
 
   val simpleData = """
     {"a":1,"b":"Tom"}
@@ -44,13 +45,16 @@ class AnalyticsTask(settings: Settings) extends Task(settings: Settings) with Sp
   """
 
   def asyncQuery(auth: String, prefixPath: String, query: String): String = {
-    val req = (analytics / "queries").POST <<? List(
-      "apiKey" -> auth,
-      "q" -> query,
-      "prefixPath" -> prefixPath
-    )
-    val json = JParser.parseFromString(Http(req OK as.String)()).valueOr(throw _)
-    (json \ "jobId").deserialize[String]
+    val req =
+      (analytics / "queries").POST <<? List(
+          "apiKey" -> auth,
+          "q" -> query,
+          "prefixPath" -> prefixPath
+      )
+    val json = JParser
+      .parseFromString(Http(req OK as.String)())
+      .valueOr(throw _)
+      (json \ "jobId").deserialize[String]
   }
 
   "analytics web service" should {
@@ -60,20 +64,25 @@ class AnalyticsTask(settings: Settings) extends Task(settings: Settings) with Sp
     // retreive the results at some point.
     "run async queries" in {
       val account = createAccount
-      ingestString(account, simpleData, "application/json")(_ / account.bareRootPath / "foo" / "")
+      ingestString(account, simpleData, "application/json")(
+          _ / account.bareRootPath / "foo" / "")
 
       EventuallyResults.eventually(10, 1.second) {
-        val json = metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
+        val json =
+          metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
         (json \ "size").deserialize[Long] must_== 5
       }
 
-      val jobId = asyncQuery(account.apiKey, "/" + account.bareRootPath, "mean((//foo).a)")
+      val jobId = asyncQuery(
+          account.apiKey, "/" + account.bareRootPath, "mean((//foo).a)")
 
       EventuallyResults.eventually(10, 1.second) {
-        val res = (analytics / "queries" / jobId) <<? List("apiKey" -> account.apiKey)
+        val res =
+          (analytics / "queries" / jobId) <<? List("apiKey" -> account.apiKey)
         val str = Http(res OK as.String)()
         if (str != "") {
-          val json = JParser.parseFromString(Http(res OK as.String)()).valueOr(throw _)
+          val json =
+            JParser.parseFromString(Http(res OK as.String)()).valueOr(throw _)
           val mean = (json \ "data")(0).deserialize[Double]
           mean must_== 3.0
         } else {

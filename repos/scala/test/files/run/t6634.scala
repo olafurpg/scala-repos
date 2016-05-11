@@ -17,7 +17,7 @@ object Test extends App {
   println("Trying lb1 ...")
   try {
     lb1.remove(6, 6)
- } catch {
+  } catch {
     // Not thrown in 2.11, is thrown in 2.12
     case ex: IndexOutOfBoundsException => println(ex)
   }
@@ -65,9 +65,9 @@ object Test extends App {
 
   // buffer should neither be changed nor corrupted after calling remove with invalid arguments
   def checkNotCorrupted(
-    lb: ListBuffer[Symbol],
-    expectedString: String = "ListBuffer('a, 'b, 'c, 'd, 'e)",
-    expectedLength: Int = 5) = {
+      lb: ListBuffer[Symbol],
+      expectedString: String = "ListBuffer('a, 'b, 'c, 'd, 'e)",
+      expectedLength: Int = 5) = {
     println("Checking ...")
     val replStr = scala.runtime.ScalaRunTime.replStringOf(lb, 100)
     if (replStr == expectedString + "\n") println("String OK.")

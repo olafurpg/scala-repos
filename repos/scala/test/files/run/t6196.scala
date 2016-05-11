@@ -3,7 +3,7 @@ import scala.collection.immutable.HashSet
 object Test extends App {
 
   case class Collision(value: Int) extends Ordered[Collision] {
-    def compare(that:Collision) = value compare that.value
+    def compare(that: Collision) = value compare that.value
 
     override def hashCode = value / 5
   }
@@ -13,8 +13,8 @@ object Test extends App {
     val s = HashSet.empty[T] ++ (0 until n).map(mkKey)
     for (i <- 0 until n) {
       val ki = mkKey(i)
-      val a = s.filter(o.lt(_,ki))
-      val b = s.filterNot(o.lt(_,ki))
+      val a = s.filter(o.lt(_, ki))
+      val b = s.filterNot(o.lt(_, ki))
       require(a.size == i && (0 until i).forall(i => a.contains(mkKey(i))))
       require(b.size == n - i && (i until n).forall(i => b.contains(mkKey(i))))
     }
@@ -33,15 +33,15 @@ object Test extends App {
   def testNoHashing() {
     var hashCount = 0
     var equalsCount = 0
-    case class HashCounter(value:Int) extends Ordered[HashCounter] {
-      def compare(that:HashCounter) = value compare that.value
+    case class HashCounter(value: Int) extends Ordered[HashCounter] {
+      def compare(that: HashCounter) = value compare that.value
 
       override def hashCode = {
         hashCount += 1
         value
       }
 
-      override def equals(that:Any) = {
+      override def equals(that: Any) = {
         equalsCount += 1
         that match {
           case HashCounter(value) => this.value == value
@@ -53,7 +53,7 @@ object Test extends App {
     val s = HashSet.empty[HashCounter] ++ (0 until 100).map(HashCounter)
     val hashCount0 = hashCount
     val equalsCount0 = equalsCount
-    val t = s.filter(_<HashCounter(50))
+    val t = s.filter(_ < HashCounter(50))
     require(hashCount == hashCount0)
     require(equalsCount == equalsCount0)
   }

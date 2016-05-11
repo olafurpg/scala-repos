@@ -1,3 +1,3 @@
 object B {
-	val x: Int = (new example.A).x
+  val x: Int = (new example.A).x
 }

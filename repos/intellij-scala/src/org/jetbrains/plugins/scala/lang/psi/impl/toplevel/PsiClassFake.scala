@@ -12,17 +12,16 @@ import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.meta.PsiMetaData
 import com.intellij.psi.{PsiClass, PsiElement, _};
 
-
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 trait PsiClassFake extends PsiClass with PsiReferenceList {
   //todo: this methods from PsiReferenceList to avoid NPE. It's possible for asking different roles, so we can
   //todo: have problems for simple implementation of them
   def getRole: Role = Role.EXTENDS_LIST
   def getReferencedTypes: Array[PsiClassType] = PsiClassType.EMPTY_ARRAY
-  def getReferenceElements: Array[PsiJavaCodeReferenceElement] = PsiJavaCodeReferenceElement.EMPTY_ARRAY
+  def getReferenceElements: Array[PsiJavaCodeReferenceElement] =
+    PsiJavaCodeReferenceElement.EMPTY_ARRAY
 
   def isInterface: Boolean = false
 
@@ -52,7 +51,8 @@ trait PsiClassFake extends PsiClass with PsiReferenceList {
 
   def getInnerClasses: Array[PsiClass] = PsiClass.EMPTY_ARRAY // todo
 
-  def getInitializers: Array[PsiClassInitializer] = PsiClassInitializer.EMPTY_ARRAY
+  def getInitializers: Array[PsiClassInitializer] =
+    PsiClassInitializer.EMPTY_ARRAY
 
   def getAllFields: Array[PsiField] = getFields
 
@@ -62,15 +62,23 @@ trait PsiClassFake extends PsiClass with PsiReferenceList {
 
   def findFieldByName(name: String, checkBases: Boolean): PsiField = null
 
-  def findMethodBySignature(patternMethod: PsiMethod, checkBases: Boolean): PsiMethod = null
+  def findMethodBySignature(
+      patternMethod: PsiMethod, checkBases: Boolean): PsiMethod = null
 
-  def findMethodsBySignature(patternMethod: PsiMethod, checkBases: Boolean): Array[PsiMethod] = PsiMethod.EMPTY_ARRAY
+  def findMethodsBySignature(
+      patternMethod: PsiMethod, checkBases: Boolean): Array[PsiMethod] =
+    PsiMethod.EMPTY_ARRAY
 
-  def findMethodsAndTheirSubstitutorsByName(name: String, checkBases: Boolean): List[Pair[PsiMethod, PsiSubstitutor]] = Collections.emptyList[Pair[PsiMethod, PsiSubstitutor]]
+  def findMethodsAndTheirSubstitutorsByName(
+      name: String,
+      checkBases: Boolean): List[Pair[PsiMethod, PsiSubstitutor]] =
+    Collections.emptyList[Pair[PsiMethod, PsiSubstitutor]]
 
-  def findMethodsAndTheirSubstitutors: List[Pair[PsiMethod, PsiSubstitutor]] = Collections.emptyList[Pair[PsiMethod, PsiSubstitutor]]
+  def findMethodsAndTheirSubstitutors: List[Pair[PsiMethod, PsiSubstitutor]] =
+    Collections.emptyList[Pair[PsiMethod, PsiSubstitutor]]
 
-  def getAllMethodsAndTheirSubstitutors: List[Pair[PsiMethod, PsiSubstitutor]] = Collections.emptyList[Pair[PsiMethod, PsiSubstitutor]]
+  def getAllMethodsAndTheirSubstitutors: List[Pair[PsiMethod, PsiSubstitutor]] =
+    Collections.emptyList[Pair[PsiMethod, PsiSubstitutor]]
 
   def findInnerClassByName(name: String, checkBases: Boolean): PsiClass = null
 
@@ -82,13 +90,17 @@ trait PsiClassFake extends PsiClass with PsiReferenceList {
 
   def isInheritor(baseClass: PsiClass, checkDeep: Boolean): Boolean = false
 
-  def isInheritorDeep(baseClass: PsiClass, classToPass: PsiClass): Boolean = false
+  def isInheritorDeep(baseClass: PsiClass, classToPass: PsiClass): Boolean =
+    false
 
-  def getVisibleSignatures: Collection[HierarchicalMethodSignature] = Collections.emptyList[HierarchicalMethodSignature]
+  def getVisibleSignatures: Collection[HierarchicalMethodSignature] =
+    Collections.emptyList[HierarchicalMethodSignature]
 
-  def getModifierList: PsiModifierList = ScalaPsiUtil.getEmptyModifierList(getManager)
+  def getModifierList: PsiModifierList =
+    ScalaPsiUtil.getEmptyModifierList(getManager)
 
-  def hasModifierProperty(name: String): Boolean = name.equals(PsiModifier.PUBLIC)
+  def hasModifierProperty(name: String): Boolean =
+    name.equals(PsiModifier.PUBLIC)
 
   def getDocComment: PsiDocComment = null
 
@@ -104,7 +116,8 @@ trait PsiClassFake extends PsiClass with PsiReferenceList {
 
   def getTypeParameters: Array[PsiTypeParameter] = PsiTypeParameter.EMPTY_ARRAY
 
-  def findMethodsByName(name: String, checkBases: Boolean): Array[PsiMethod] = Array[PsiMethod]()
+  def findMethodsByName(name: String, checkBases: Boolean): Array[PsiMethod] =
+    Array[PsiMethod]()
 
   def getMethods = Array[PsiMethod]()
 

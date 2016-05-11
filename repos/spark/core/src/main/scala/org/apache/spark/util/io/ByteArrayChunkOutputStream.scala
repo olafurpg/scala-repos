@@ -21,14 +21,13 @@ import java.io.OutputStream
 
 import scala.collection.mutable.ArrayBuffer
 
-
 /**
- * An OutputStream that writes to fixed-size chunks of byte arrays.
- *
- * @param chunkSize size of each chunk, in bytes.
- */
-private[spark]
-class ByteArrayChunkOutputStream(chunkSize: Int) extends OutputStream {
+  * An OutputStream that writes to fixed-size chunks of byte arrays.
+  *
+  * @param chunkSize size of each chunk, in bytes.
+  */
+private[spark] class ByteArrayChunkOutputStream(chunkSize: Int)
+    extends OutputStream {
 
   private val chunks = new ArrayBuffer[Array[Byte]]
 
@@ -36,11 +35,11 @@ class ByteArrayChunkOutputStream(chunkSize: Int) extends OutputStream {
   private var lastChunkIndex = -1
 
   /**
-   * Next position to write in the last chunk.
-   *
-   * If this equals chunkSize, it means for next write we need to allocate a new chunk.
-   * This can also never be 0.
-   */
+    * Next position to write in the last chunk.
+    *
+    * If this equals chunkSize, it means for next write we need to allocate a new chunk.
+    * This can also never be 0.
+    */
   private var position = chunkSize
 
   override def write(b: Int): Unit = {
@@ -54,7 +53,8 @@ class ByteArrayChunkOutputStream(chunkSize: Int) extends OutputStream {
     while (written < len) {
       allocateNewChunkIfNeeded()
       val thisBatch = math.min(chunkSize - position, len - written)
-      System.arraycopy(bytes, written + off, chunks(lastChunkIndex), position, thisBatch)
+      System.arraycopy(
+          bytes, written + off, chunks(lastChunkIndex), position, thisBatch)
       written += thisBatch
       position += thisBatch
     }
@@ -86,7 +86,8 @@ class ByteArrayChunkOutputStream(chunkSize: Int) extends OutputStream {
         ret(lastChunkIndex) = chunks(lastChunkIndex)
       } else {
         ret(lastChunkIndex) = new Array[Byte](position)
-        System.arraycopy(chunks(lastChunkIndex), 0, ret(lastChunkIndex), 0, position)
+        System.arraycopy(
+            chunks(lastChunkIndex), 0, ret(lastChunkIndex), 0, position)
       }
       ret
     }

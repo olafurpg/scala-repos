@@ -21,25 +21,26 @@ import org.apache.spark.annotation.{DeveloperApi, Since}
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
 /**
- * :: DeveloperApi ::
- * MultivariateOnlineSummarizer implements [[MultivariateStatisticalSummary]] to compute the mean,
- * variance, minimum, maximum, counts, and nonzero counts for instances in sparse or dense vector
- * format in a online fashion.
- *
- * Two MultivariateOnlineSummarizer can be merged together to have a statistical summary of
- * the corresponding joint dataset.
- *
- * A numerically stable algorithm is implemented to compute the mean and variance of instances:
- * Reference: [[http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance variance-wiki]]
- * Zero elements (including explicit zero values) are skipped when calling add(),
- * to have time complexity O(nnz) instead of O(n) for each column.
- *
- * For weighted instances, the unbiased estimation of variance is defined by the reliability
- * weights: [[https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Reliability_weights]].
- */
+  * :: DeveloperApi ::
+  * MultivariateOnlineSummarizer implements [[MultivariateStatisticalSummary]] to compute the mean,
+  * variance, minimum, maximum, counts, and nonzero counts for instances in sparse or dense vector
+  * format in a online fashion.
+  *
+  * Two MultivariateOnlineSummarizer can be merged together to have a statistical summary of
+  * the corresponding joint dataset.
+  *
+  * A numerically stable algorithm is implemented to compute the mean and variance of instances:
+  * Reference: [[http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance variance-wiki]]
+  * Zero elements (including explicit zero values) are skipped when calling add(),
+  * to have time complexity O(nnz) instead of O(n) for each column.
+  *
+  * For weighted instances, the unbiased estimation of variance is defined by the reliability
+  * weights: [[https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Reliability_weights]].
+  */
 @Since("1.1.0")
 @DeveloperApi
-class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with Serializable {
+class MultivariateOnlineSummarizer
+    extends MultivariateStatisticalSummary with Serializable {
 
   private var n = 0
   private var currMean: Array[Double] = _
@@ -54,11 +55,11 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
   private var currMin: Array[Double] = _
 
   /**
-   * Add a new sample to this summarizer, and update the statistical summary.
-   *
-   * @param sample The sample in dense/sparse vector format to be added into this summarizer.
-   * @return This MultivariateOnlineSummarizer object.
-   */
+    * Add a new sample to this summarizer, and update the statistical summary.
+    *
+    * @param sample The sample in dense/sparse vector format to be added into this summarizer.
+    * @return This MultivariateOnlineSummarizer object.
+    */
   @Since("1.1.0")
   def add(sample: Vector): this.type = add(sample, 1.0)
 
@@ -67,7 +68,8 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
     if (weight == 0.0) return this
 
     if (n == 0) {
-      require(instance.size > 0, s"Vector should have dimension larger than zero.")
+      require(
+          instance.size > 0, s"Vector should have dimension larger than zero.")
       n = instance.size
 
       currMean = Array.ofDim[Double](n)
@@ -79,8 +81,9 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
       currMin = Array.fill[Double](n)(Double.MaxValue)
     }
 
-    require(n == instance.size, s"Dimensions mismatch when adding new sample." +
-      s" Expecting $n but got ${instance.size}.")
+    require(n == instance.size,
+            s"Dimensions mismatch when adding new sample." +
+            s" Expecting $n but got ${instance.size}.")
 
     val localCurrMean = currMean
     val localCurrM2n = currM2n
@@ -100,7 +103,8 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
 
         val prevMean = localCurrMean(index)
         val diff = value - prevMean
-        localCurrMean(index) = prevMean + weight * diff / (localNnz(index) + weight)
+        localCurrMean(index) = prevMean + weight * diff /
+        (localNnz(index) + weight)
         localCurrM2n(index) += weight * (value - localCurrMean(index)) * diff
         localCurrM2(index) += weight * value * value
         localCurrL1(index) += weight * math.abs(value)
@@ -116,17 +120,18 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
   }
 
   /**
-   * Merge another MultivariateOnlineSummarizer, and update the statistical summary.
-   * (Note that it's in place merging; as a result, `this` object will be modified.)
-   *
-   * @param other The other MultivariateOnlineSummarizer to be merged.
-   * @return This MultivariateOnlineSummarizer object.
-   */
+    * Merge another MultivariateOnlineSummarizer, and update the statistical summary.
+    * (Note that it's in place merging; as a result, `this` object will be modified.)
+    *
+    * @param other The other MultivariateOnlineSummarizer to be merged.
+    * @return This MultivariateOnlineSummarizer object.
+    */
   @Since("1.1.0")
   def merge(other: MultivariateOnlineSummarizer): this.type = {
     if (this.weightSum != 0.0 && other.weightSum != 0.0) {
-      require(n == other.n, s"Dimensions mismatch when merging with another summarizer. " +
-        s"Expecting $n but got ${other.n}.")
+      require(n == other.n,
+              s"Dimensions mismatch when merging with another summarizer. " +
+              s"Expecting $n but got ${other.n}.")
       totalCnt += other.totalCnt
       weightSum += other.weightSum
       weightSquareSum += other.weightSquareSum
@@ -140,7 +145,8 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
           // merge mean together
           currMean(i) += deltaMean * otherNnz / totalNnz
           // merge m2n together
-          currM2n(i) += other.currM2n(i) + deltaMean * deltaMean * thisNnz * otherNnz / totalNnz
+          currM2n(i) += other.currM2n(i) +
+          deltaMean * deltaMean * thisNnz * otherNnz / totalNnz
           // merge m2 together
           currM2(i) += other.currM2(i)
           // merge l1 together
@@ -169,9 +175,9 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
   }
 
   /**
-   * Sample mean of each dimension.
-   *
-   */
+    * Sample mean of each dimension.
+    *
+    */
   @Since("1.1.0")
   override def mean: Vector = {
     require(weightSum > 0, s"Nothing has been added to this summarizer.")
@@ -186,9 +192,9 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
   }
 
   /**
-   * Unbiased estimate of sample variance of each dimension.
-   *
-   */
+    * Unbiased estimate of sample variance of each dimension.
+    *
+    */
   @Since("1.1.0")
   override def variance: Vector = {
     require(weightSum > 0, s"Nothing has been added to this summarizer.")
@@ -203,8 +209,9 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
       var i = 0
       val len = currM2n.length
       while (i < len) {
-        realVariance(i) = (currM2n(i) + deltaMean(i) * deltaMean(i) * nnz(i) *
-          (weightSum - nnz(i)) / weightSum) / denominator
+        realVariance(i) =
+        (currM2n(i) + deltaMean(i) * deltaMean(i) * nnz(i) *
+            (weightSum - nnz(i)) / weightSum) / denominator
         i += 1
       }
     }
@@ -212,16 +219,16 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
   }
 
   /**
-   * Sample size.
-   *
-   */
+    * Sample size.
+    *
+    */
   @Since("1.1.0")
   override def count: Long = totalCnt
 
   /**
-   * Number of nonzero elements in each dimension.
-   *
-   */
+    * Number of nonzero elements in each dimension.
+    *
+    */
   @Since("1.1.0")
   override def numNonzeros: Vector = {
     require(weightSum > 0, s"Nothing has been added to this summarizer.")
@@ -230,9 +237,9 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
   }
 
   /**
-   * Maximum value of each dimension.
-   *
-   */
+    * Maximum value of each dimension.
+    *
+    */
   @Since("1.1.0")
   override def max: Vector = {
     require(weightSum > 0, s"Nothing has been added to this summarizer.")
@@ -246,9 +253,9 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
   }
 
   /**
-   * Minimum value of each dimension.
-   *
-   */
+    * Minimum value of each dimension.
+    *
+    */
   @Since("1.1.0")
   override def min: Vector = {
     require(weightSum > 0, s"Nothing has been added to this summarizer.")
@@ -262,9 +269,9 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
   }
 
   /**
-   * L2 (Euclidian) norm of each dimension.
-   *
-   */
+    * L2 (Euclidian) norm of each dimension.
+    *
+    */
   @Since("1.2.0")
   override def normL2: Vector = {
     require(weightSum > 0, s"Nothing has been added to this summarizer.")
@@ -281,9 +288,9 @@ class MultivariateOnlineSummarizer extends MultivariateStatisticalSummary with S
   }
 
   /**
-   * L1 norm of each dimension.
-   *
-   */
+    * L1 norm of each dimension.
+    *
+    */
   @Since("1.2.0")
   override def normL1: Vector = {
     require(weightSum > 0, s"Nothing has been added to this summarizer.")

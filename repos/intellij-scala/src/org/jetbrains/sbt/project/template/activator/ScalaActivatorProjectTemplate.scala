@@ -8,17 +8,19 @@ import com.intellij.platform.ProjectTemplate
 import org.jetbrains.sbt.Sbt
 
 /**
- * User: Dmitry.Naydanov
- * Date: 22.01.15.
- */
+  * User: Dmitry.Naydanov
+  * Date: 22.01.15.
+  */
 class ScalaActivatorProjectTemplate extends ProjectTemplate {
   override def getName: String = "Activator"
 
   override def getIcon: Icon = Sbt.Icon
 
-  override def getDescription: String = "Project based on Typesafe activator templates"
+  override def getDescription: String =
+    "Project based on Typesafe activator templates"
 
   override def validateSettings(): ValidationInfo = null
 
-  override def createModuleBuilder(): AbstractModuleBuilder = new ActivatorProjectBuilder
+  override def createModuleBuilder(): AbstractModuleBuilder =
+    new ActivatorProjectBuilder
 }

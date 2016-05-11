@@ -6,11 +6,11 @@ class ImplicitsLocalTypeInferenceTest extends ImplicitsTestBase {
   override def folderPath: String = super.folderPath + "localTypeInference/"
 
   def testApplyImplicit() = doTest()
-  
+
   def testConvert1() = doTest()
 
   def testConvert2() = doTest()
-  
+
   def testFromDependentObject() = doTest()
 
   def testSCL2920() = doTest()

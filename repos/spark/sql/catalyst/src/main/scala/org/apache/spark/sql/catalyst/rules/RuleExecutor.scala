@@ -35,18 +35,22 @@ object RuleExecutor {
   def dumpTimeSpent(): String = {
     val map = timeMap.asMap().asScala
     val maxSize = map.keys.map(_.toString.length).max
-    map.toSeq.sortBy(_._2).reverseMap { case (k, v) =>
-      s"${k.padTo(maxSize, " ").mkString} $v"
-    }.mkString("\n", "\n", "")
+    map.toSeq
+      .sortBy(_._2)
+      .reverseMap {
+        case (k, v) =>
+          s"${k.padTo(maxSize, " ").mkString} $v"
+      }
+      .mkString("\n", "\n", "")
   }
 }
 
 abstract class RuleExecutor[TreeType <: TreeNode[_]] extends Logging {
 
   /**
-   * An execution strategy for rules that indicates the maximum number of executions. If the
-   * execution reaches fix point (i.e. converge) before maxIterations, it will stop.
-   */
+    * An execution strategy for rules that indicates the maximum number of executions. If the
+    * execution reaches fix point (i.e. converge) before maxIterations, it will stop.
+    */
   abstract class Strategy { def maxIterations: Int }
 
   /** A strategy that only runs once. */
@@ -56,16 +60,16 @@ abstract class RuleExecutor[TreeType <: TreeNode[_]] extends Logging {
   case class FixedPoint(maxIterations: Int) extends Strategy
 
   /** A batch of rules. */
-  protected case class Batch(name: String, strategy: Strategy, rules: Rule[TreeType]*)
+  protected case class Batch(
+      name: String, strategy: Strategy, rules: Rule[TreeType]*)
 
   /** Defines a sequence of rule batches, to be overridden by the implementation. */
   protected def batches: Seq[Batch]
 
-
   /**
-   * Executes the batches of rules defined by the subclass. The batches are executed serially
-   * using the defined execution strategy. Within each batch, rules are also executed serially.
-   */
+    * Executes the batches of rules defined by the subclass. The batches are executed serially
+    * using the defined execution strategy. Within each batch, rules are also executed serially.
+    */
   def execute(plan: TreeType): TreeType = {
     var curPlan = plan
 
@@ -85,10 +89,10 @@ abstract class RuleExecutor[TreeType <: TreeNode[_]] extends Logging {
             RuleExecutor.timeMap.addAndGet(rule.ruleName, runTime)
 
             if (!result.fastEquals(plan)) {
-              logTrace(
-                s"""
+              logTrace(s"""
                   |=== Applying Rule ${rule.ruleName} ===
-                  |${sideBySide(plan.treeString, result.treeString).mkString("\n")}
+                  |${sideBySide(plan.treeString, result.treeString).mkString(
+                          "\n")}
                 """.stripMargin)
             }
 
@@ -98,22 +102,22 @@ abstract class RuleExecutor[TreeType <: TreeNode[_]] extends Logging {
         if (iteration > batch.strategy.maxIterations) {
           // Only log if this is a rule that is supposed to run more than once.
           if (iteration != 2) {
-            logInfo(s"Max iterations (${iteration - 1}) reached for batch ${batch.name}")
+            logInfo(
+                s"Max iterations (${iteration - 1}) reached for batch ${batch.name}")
           }
           continue = false
         }
 
         if (curPlan.fastEquals(lastPlan)) {
           logTrace(
-            s"Fixed point reached for batch ${batch.name} after ${iteration - 1} iterations.")
+              s"Fixed point reached for batch ${batch.name} after ${iteration - 1} iterations.")
           continue = false
         }
         lastPlan = curPlan
       }
 
       if (!batchStartPlan.fastEquals(curPlan)) {
-        logDebug(
-          s"""
+        logDebug(s"""
           |=== Result of Batch ${batch.name} ===
           |${sideBySide(plan.treeString, curPlan.treeString).mkString("\n")}
         """.stripMargin)

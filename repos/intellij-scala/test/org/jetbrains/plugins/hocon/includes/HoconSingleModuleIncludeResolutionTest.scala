@@ -5,7 +5,8 @@ import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
 import com.intellij.testFramework.LightPlatformTestCase
 import org.jetbrains.plugins.hocon.HoconLightMultiFileTestCase
 
-class HoconSingleModuleIncludeResolutionTest extends HoconLightMultiFileTestCase with HoconIncludeResolutionTest {
+class HoconSingleModuleIncludeResolutionTest
+    extends HoconLightMultiFileTestCase with HoconIncludeResolutionTest {
 
   protected def project: Project = LightPlatformTestCase.getProject
 

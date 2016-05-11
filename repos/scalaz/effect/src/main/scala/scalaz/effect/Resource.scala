@@ -5,10 +5,10 @@ package effect
 import java.io.Closeable
 
 /**
- *
- */
+  *
+  */
 ////
-trait Resource[F]  { self =>
+trait Resource[F] { self =>
   ////
 
   def close(f: F): IO[Unit]
@@ -19,7 +19,9 @@ trait Resource[F]  { self =>
   }
 
   ////
-  val resourceSyntax = new scalaz.syntax.effect.ResourceSyntax[F] { def F = Resource.this }
+  val resourceSyntax = new scalaz.syntax.effect.ResourceSyntax[F] {
+    def F = Resource.this
+  }
 }
 
 object Resource {
@@ -31,7 +33,7 @@ object Resource {
     new Resource[A] {
       def close(a: A): IO[Unit] = closeAction(a)
     }
- 
+
   def resourceFromCloseable[A <: Closeable]: Resource[A] =
     resource(a => IO(a.close))
 

@@ -18,13 +18,13 @@ object Test {
   class Op[I];
   class IntOp extends Op[Int];
 
-  class Rich(x : Double) {
-    def +       (op : IntOp): IntOp = op;
-    def +    [I](op : Op[I]): Op[I] = op;
-    def plus [I](op : Op[I]): Op[I] = op;
+  class Rich(x: Double) {
+    def +(op: IntOp): IntOp = op;
+    def +[I](op: Op[I]): Op[I] = op;
+    def plus[I](op: Op[I]): Op[I] = op;
   }
 
-  implicit def iToRich(x : Double) =
+  implicit def iToRich(x: Double) =
     new Rich(x);
 
   // fails to compile

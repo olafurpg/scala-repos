@@ -35,7 +35,8 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Paint
 
 object Circle {
-  implicit def sfxCircle2jfx(v: Circle): jfxss.Circle = if (v != null) v.delegate else null
+  implicit def sfxCircle2jfx(v: Circle): jfxss.Circle =
+    if (v != null) v.delegate else null
 
   def apply(radius: Double) = new Circle(new jfxss.Circle(radius))
   def apply(centerX: Double, centerY: Double, radius: Double) =
@@ -46,7 +47,8 @@ object Circle {
     new Circle(new jfxss.Circle(radius, fill))
 }
 
-class Circle(override val delegate: jfxss.Circle = new jfxss.Circle()) extends Shape(delegate) with SFXDelegate[jfxss.Circle] {
+class Circle(override val delegate: jfxss.Circle = new jfxss.Circle())
+    extends Shape(delegate) with SFXDelegate[jfxss.Circle] {
   def centerX: DoubleProperty = delegate.centerXProperty
   def centerX_=(v: Double) {
     centerX() = v

@@ -1,5 +1,3 @@
-
-
 object Test {
   def main(args: Array[String]) {
     val a = new Array[Int](10)
@@ -10,22 +8,3 @@ object Test {
     assert(a.toSeq == List(0, 0, 0, 3, 4, 5, 6, 7, 8, 9))
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

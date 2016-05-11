@@ -20,10 +20,10 @@
 package com.precog.common
 package jobs
 
-import blueeyes.core.http.{ MimeType, MimeTypes }
+import blueeyes.core.http.{MimeType, MimeTypes}
 
 import blueeyes.json._
-import blueeyes.json.serialization.{ Decomposer, Extractor }
+import blueeyes.json.serialization.{Decomposer, Extractor}
 import blueeyes.json.serialization.DefaultSerialization._
 
 import org.apache.commons.codec.binary.Base64
@@ -59,25 +59,30 @@ trait JobResultSerialization {
   import Validation._
 
   implicit object JobResultDecomposer extends Decomposer[JobResult] {
-    override def decompose(result: JobResult): JValue = JObject(List(
-      JField("content", JString(Base64.encodeBase64String(result.content))),
-      JField("mimeTypes", JArray(result.mimeTypes map { mimeType =>
-        JString(mimeType.value)
-      }))
-    ))
+    override def decompose(result: JobResult): JValue =
+      JObject(
+          List(
+              JField("content",
+                     JString(Base64.encodeBase64String(result.content))),
+              JField("mimeTypes", JArray(result.mimeTypes map { mimeType =>
+            JString(mimeType.value)
+          }))
+          ))
   }
 
   implicit object JobResultExtractor extends Extractor[JobResult] {
     import Extractor._
 
     override def validated(obj: JValue): Validation[Error, JobResult] = {
-      val mimeTypes = (obj \ "mimeTypes").validated[List[String]] flatMap { rawTypes =>
-        success[Error, List[MimeType]]((rawTypes flatMap (MimeTypes.parseMimeTypes(_))).toList)
-      }
-      (mimeTypes |@| (obj \ "content").validated[String]) { (mimeTypes, content) =>
-        JobResult(mimeTypes, Base64.decodeBase64(content))
+      val mimeTypes =
+        (obj \ "mimeTypes").validated[List[String]] flatMap { rawTypes =>
+          success[Error, List[MimeType]](
+              (rawTypes flatMap (MimeTypes.parseMimeTypes(_))).toList)
+        }
+      (mimeTypes |@| (obj \ "content").validated[String]) {
+        (mimeTypes, content) =>
+          JobResult(mimeTypes, Base64.decodeBase64(content))
       }
     }
   }
 }
-

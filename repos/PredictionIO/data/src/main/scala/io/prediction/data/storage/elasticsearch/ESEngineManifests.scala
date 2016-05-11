@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.elasticsearch
 
 import grizzled.slf4j.Logging
@@ -26,25 +25,29 @@ import org.json4s._
 import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
-class ESEngineManifests(client: Client, config: StorageClientConfig, index: String)
-  extends EngineManifests with Logging {
+class ESEngineManifests(
+    client: Client, config: StorageClientConfig, index: String)
+    extends EngineManifests with Logging {
   implicit val formats = DefaultFormats + new EngineManifestSerializer
   private val estype = "engine_manifests"
   private def esid(id: String, version: String) = s"$id $version"
 
   def insert(engineManifest: EngineManifest): Unit = {
     val json = write(engineManifest)
-    val response = client.prepareIndex(
-      index,
-      estype,
-      esid(engineManifest.id, engineManifest.version)).
-      setSource(json).execute().actionGet()
+    val response = client
+      .prepareIndex(
+          index, estype, esid(engineManifest.id, engineManifest.version))
+      .setSource(json)
+      .execute()
+      .actionGet()
   }
 
   def get(id: String, version: String): Option[EngineManifest] = {
     try {
-      val response = client.prepareGet(index, estype, esid(id, version)).
-        execute().actionGet()
+      val response = client
+        .prepareGet(index, estype, esid(id, version))
+        .execute()
+        .actionGet()
       if (response.isExists) {
         Some(read[EngineManifest](response.getSourceAsString))
       } else {
@@ -73,7 +76,10 @@ class ESEngineManifests(client: Client, config: StorageClientConfig, index: Stri
 
   def delete(id: String, version: String): Unit = {
     try {
-      client.prepareDelete(index, estype, esid(id, version)).execute().actionGet()
+      client
+        .prepareDelete(index, estype, esid(id, version))
+        .execute()
+        .actionGet()
     } catch {
       case e: ElasticsearchException => error(e.getMessage)
     }

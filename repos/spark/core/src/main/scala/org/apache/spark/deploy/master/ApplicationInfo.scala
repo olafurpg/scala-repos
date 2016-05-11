@@ -26,14 +26,13 @@ import org.apache.spark.deploy.ApplicationDescription
 import org.apache.spark.rpc.RpcEndpointRef
 import org.apache.spark.util.Utils
 
-private[spark] class ApplicationInfo(
-    val startTime: Long,
-    val id: String,
-    val desc: ApplicationDescription,
-    val submitDate: Date,
-    val driver: RpcEndpointRef,
-    defaultCores: Int)
-  extends Serializable {
+private[spark] class ApplicationInfo(val startTime: Long,
+                                     val id: String,
+                                     val desc: ApplicationDescription,
+                                     val submitDate: Date,
+                                     val driver: RpcEndpointRef,
+                                     defaultCores: Int)
+    extends Serializable {
 
   @transient var state: ApplicationState.Value = _
   @transient var executors: mutable.HashMap[Int, ExecutorDesc] = _
@@ -41,7 +40,8 @@ private[spark] class ApplicationInfo(
   @transient var coresGranted: Int = _
   @transient var endTime: Long = _
   @transient var appSource: ApplicationSource = _
-  @transient @volatile var appUIUrlAtHistoryServer: Option[String] = None
+  @transient
+  @volatile var appUIUrlAtHistoryServer: Option[String] = None
 
   // A cap on the number of executors this application can have at any given time.
   // By default, this is infinite. Only after the first allocation request is issued by the
@@ -52,10 +52,11 @@ private[spark] class ApplicationInfo(
 
   init()
 
-  private def readObject(in: java.io.ObjectInputStream): Unit = Utils.tryOrIOException {
-    in.defaultReadObject()
-    init()
-  }
+  private def readObject(in: java.io.ObjectInputStream): Unit =
+    Utils.tryOrIOException {
+      in.defaultReadObject()
+      init()
+    }
 
   private def init() {
     state = ApplicationState.WAITING
@@ -81,11 +82,11 @@ private[spark] class ApplicationInfo(
     }
   }
 
-  private[master] def addExecutor(
-      worker: WorkerInfo,
-      cores: Int,
-      useID: Option[Int] = None): ExecutorDesc = {
-    val exec = new ExecutorDesc(newExecutorId(useID), this, worker, cores, desc.memoryPerExecutorMB)
+  private[master] def addExecutor(worker: WorkerInfo,
+                                  cores: Int,
+                                  useID: Option[Int] = None): ExecutorDesc = {
+    val exec = new ExecutorDesc(
+        newExecutorId(useID), this, worker, cores, desc.memoryPerExecutorMB)
     executors(exec.id) = exec
     coresGranted += cores
     exec
@@ -124,9 +125,9 @@ private[spark] class ApplicationInfo(
   }
 
   /**
-   * Return the limit on the number of executors this application can have.
-   * For testing only.
-   */
+    * Return the limit on the number of executors this application can have.
+    * For testing only.
+    */
   private[deploy] def getExecutorLimit: Int = executorLimit
 
   def duration: Long = {
@@ -138,9 +139,8 @@ private[spark] class ApplicationInfo(
   }
 
   /**
-   * Returns the original application UI url unless there is its address at history server
-   * is defined
-   */
+    * Returns the original application UI url unless there is its address at history server
+    * is defined
+    */
   def curAppUIUrl: String = appUIUrlAtHistoryServer.getOrElse(desc.appUiUrl)
-
 }

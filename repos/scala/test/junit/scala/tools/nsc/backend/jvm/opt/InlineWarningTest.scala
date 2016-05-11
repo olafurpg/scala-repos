@@ -31,7 +31,8 @@ object InlineWarningTest extends ClearAfterClass.Clearable {
   val argsNoWarn = "-Yopt:l:classpath"
   val args = argsNoWarn + " -Yopt-warnings"
   var compiler = newCompiler(extraArgs = args)
-  var compilerWarnAll = newCompiler(extraArgs = argsNoWarn + " -Yopt-warnings:_")
+  var compilerWarnAll = newCompiler(
+      extraArgs = argsNoWarn + " -Yopt-warnings:_")
   def clear(): Unit = { compiler = null; compilerWarnAll = null }
 }
 
@@ -42,14 +43,16 @@ class InlineWarningTest extends ClearAfterClass {
   val compiler = InlineWarningTest.compiler
   val compilerWarnAll = InlineWarningTest.compilerWarnAll
 
-  def compile(scalaCode: String, javaCode: List[(String, String)] = Nil, allowMessage: StoreReporter#Info => Boolean = _ => false, compiler: Global = compiler): List[ClassNode] = {
+  def compile(scalaCode: String,
+              javaCode: List[(String, String)] = Nil,
+              allowMessage: StoreReporter#Info => Boolean = _ => false,
+              compiler: Global = compiler): List[ClassNode] = {
     compileClasses(compiler)(scalaCode, javaCode, allowMessage)
   }
 
   @Test
   def nonFinal(): Unit = {
-    val code =
-      """class C {
+    val code = """class C {
         |  @inline def m1 = 1
         |}
         |trait T {
@@ -63,22 +66,25 @@ class InlineWarningTest extends ClearAfterClass {
       """.stripMargin
     var count = 0
     val warns = Set(
-      "C::m1()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
-      "T::m2()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
-      "D::m2()I is annotated @inline but cannot be inlined: the method is not final and may be overridden")
-    compile(code, allowMessage = i => {count += 1; warns.exists(i.msg contains _)})
+        "C::m1()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
+        "T::m2()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
+        "D::m2()I is annotated @inline but cannot be inlined: the method is not final and may be overridden")
+    compile(code,
+            allowMessage = i => { count += 1; warns.exists(i.msg contains _) })
     assert(count == 5, count) // TODO SD-85: 5th warning
   }
 
   // TODO SD-85: no more impl classes. this test (and the warning it tests!) can be removed
-  @org.junit.Ignore @Test
+  @org.junit.Ignore
+  @Test
   def traitMissingImplClass(): Unit = {
     val codeA = "trait T { @inline final def f = 1 }"
     val codeB = "class C { def t1(t: T) = t.f }"
 
-    val removeImpl = (outDir: AbstractFile) => {
-      val f = outDir.lookupName("T$class.class", directory = false)
-      if (f != null) f.delete()
+    val removeImpl = (outDir: AbstractFile) =>
+      {
+        val f = outDir.lookupName("T$class.class", directory = false)
+        if (f != null) f.delete()
     }
 
     val warn =
@@ -87,11 +93,18 @@ class InlineWarningTest extends ClearAfterClass {
         |Note that the following parent classes could not be found on the classpath: T$class""".stripMargin
 
     var c = 0
-    compileSeparately(List(codeA, codeB), extraArgs = InlineWarningTest.args, afterEach = removeImpl, allowMessage = i => {c += 1; i.msg contains warn})
+    compileSeparately(List(codeA, codeB),
+                      extraArgs = InlineWarningTest.args,
+                      afterEach = removeImpl,
+                      allowMessage = i => { c += 1; i.msg contains warn })
     assert(c == 1, c)
 
     // only summary here
-    compileSeparately(List(codeA, codeB), extraArgs = InlineWarningTest.argsNoWarn, afterEach = removeImpl, allowMessage = _.msg contains "there was one inliner warning")
+    compileSeparately(
+        List(codeA, codeB),
+        extraArgs = InlineWarningTest.argsNoWarn,
+        afterEach = removeImpl,
+        allowMessage = _.msg contains "there was one inliner warning")
   }
 
   @Test
@@ -105,51 +118,61 @@ class InlineWarningTest extends ClearAfterClass {
       """.stripMargin
 
     var c = 0
-    compile(code, allowMessage = i => {c += 1; i.msg contains "operand stack at the callsite in C::t1()V contains more values"})
+    compile(
+        code,
+        allowMessage = i =>
+            {
+            c += 1;
+            i.msg contains "operand stack at the callsite in C::t1()V contains more values"
+        })
     assert(c == 1, c)
   }
 
   @Test
   def mixedWarnings(): Unit = {
-    val javaCode =
-      """public class A {
+    val javaCode = """public class A {
         |  public static final int bar() { return 100; }
         |}
       """.stripMargin
 
-    val scalaCode =
-      """class B {
+    val scalaCode = """class B {
         |  @inline final def flop = A.bar
         |  def g = flop
         |}
       """.stripMargin
 
     val warns = List(
-      """failed to determine if bar should be inlined:
+        """failed to determine if bar should be inlined:
         |The method bar()I could not be found in the class A or any of its parents.
         |Note that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: A""".stripMargin,
-
-      """B::flop()I is annotated @inline but could not be inlined:
+        """B::flop()I is annotated @inline but could not be inlined:
         |Failed to check if B::flop()I can be safely inlined to B without causing an IllegalAccessError. Checking instruction INVOKESTATIC A.bar ()I failed:
         |The method bar()I could not be found in the class A or any of its parents.
         |Note that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: A""".stripMargin)
 
     var c = 0
-    val List(b) = compile(scalaCode, List((javaCode, "A.java")), allowMessage = i => {c += 1; warns.tail.exists(i.msg contains _)})
+    val List(b) = compile(
+        scalaCode,
+        List((javaCode, "A.java")),
+        allowMessage = i => { c += 1; warns.tail.exists(i.msg contains _) })
     assert(c == 1, c)
 
     // no warnings here
-    compileClasses(newCompiler(extraArgs = InlineWarningTest.argsNoWarn + " -Yopt-warnings:none"))(scalaCode, List((javaCode, "A.java")))
+    compileClasses(newCompiler(extraArgs = InlineWarningTest.argsNoWarn +
+              " -Yopt-warnings:none"))(scalaCode, List((javaCode, "A.java")))
 
     c = 0
-    compileClasses(newCompiler(extraArgs = InlineWarningTest.argsNoWarn + " -Yopt-warnings:no-inline-mixed"))(scalaCode, List((javaCode, "A.java")), allowMessage = i => {c += 1; warns.exists(i.msg contains _)})
+    compileClasses(newCompiler(extraArgs = InlineWarningTest.argsNoWarn +
+              " -Yopt-warnings:no-inline-mixed"))(
+        scalaCode,
+        List((javaCode, "A.java")),
+        allowMessage = i => { c += 1; warns.exists(i.msg contains _) })
     assert(c == 2, c)
   }
 
   @Test
   def cannotInlinePrivateCallIntoDifferentClass(): Unit = {
-    val code =
-      """class M {
+    val code = """class M {
         |  @inline final def f = {
         |    @noinline def nested = 0
         |    nested
@@ -175,8 +198,7 @@ class InlineWarningTest extends ClearAfterClass {
 
   @Test
   def dontWarnWhenNotIlnineAnnotated(): Unit = {
-    val code =
-      """class M {
+    val code = """class M {
         |  final def f(t: Int => Int) = {
         |    @noinline def nested = 0
         |    nested + t(1)
@@ -196,14 +218,15 @@ class InlineWarningTest extends ClearAfterClass {
         |that would cause an IllegalAccessError when inlined into class N""".stripMargin
 
     var c = 0
-    compile(code, compiler = compilerWarnAll, allowMessage = i => { c += 1; i.msg contains warn })
+    compile(code,
+            compiler = compilerWarnAll,
+            allowMessage = i => { c += 1; i.msg contains warn })
     assert(c == 1, c)
   }
 
   @Test
   def cannotMixStrictfp(): Unit = {
-    val code =
-      """import annotation.strictfp
+    val code = """import annotation.strictfp
         |class C {
         |  @strictfp @inline final def f = 0
         |  @strictfp def t1 = f
@@ -211,8 +234,7 @@ class InlineWarningTest extends ClearAfterClass {
         |}
       """.stripMargin
 
-    val warn =
-      """C::f()I is annotated @inline but could not be inlined:
+    val warn = """C::f()I is annotated @inline but could not be inlined:
         |The callsite method C::t2()I
         |does not have the same strictfp mode as the callee C::f()I.""".stripMargin
 

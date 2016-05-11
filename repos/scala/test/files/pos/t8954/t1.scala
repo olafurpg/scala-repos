@@ -1,7 +1,8 @@
 package scala.foo
 
 // 1. a class about to be made final
-@deprecatedInheritance class A {
+@deprecatedInheritance
+class A {
   def foo(): Unit = ???
 }
 
@@ -9,5 +10,6 @@ package scala.foo
 // - no inheritance warning because same file
 // - no "override non-deprecated member" because @deprecatedInheritance
 class B2 extends A {
-  @deprecated("","") override def foo(): Unit = ???
+  @deprecated("", "")
+  override def foo(): Unit = ???
 }

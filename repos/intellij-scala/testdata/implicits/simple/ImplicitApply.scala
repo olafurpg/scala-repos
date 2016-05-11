@@ -6,7 +6,7 @@ object Main {
   implicit def toRichA(a: A): RichA = null
   val a = new A()
   implicit def i2s(x: Int): String = ""
-  a(/*start*/23/*end*/)
+  a( /*start*/ 23 /*end*/ )
 }
 /*
 Seq(any2ArrowAssoc,
@@ -30,4 +30,4 @@ Seq(any2ArrowAssoc,
     long2LongConflict,
     longWrapper),
 Some(i2s)
-*/
+ */

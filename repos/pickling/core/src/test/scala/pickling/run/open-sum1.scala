@@ -9,10 +9,12 @@ package outer {
     val age: Int
   }
 
-  case class Firefighter(val name: String, val age: Int, val since: Int) extends Person
+  case class Firefighter(val name: String, val age: Int, val since: Int)
+      extends Person
 
   package inner {
-    case class Employee(val name: String, val age: Int, val salary: Int) extends Person
+    case class Employee(val name: String, val age: Int, val salary: Int)
+        extends Person
   }
 }
 
@@ -21,13 +23,14 @@ class OpenSum1Test extends FunSuite {
     import outer._
 
     val f: Person = new Firefighter(
-      name = "Jeff",
-      age = 45,
-      since = 1990
+        name = "Jeff",
+        age = 45,
+        since = 1990
     )
 
     val pickle = f.pickle
-    assert(pickle.value.toString === """
+    assert(
+        pickle.value.toString === """
       |{
       |  "$type": "scala.pickling.open.sum1.outer.Firefighter",
       |  "name": "Jeff",

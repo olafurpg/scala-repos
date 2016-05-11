@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.event
 
 import akka.actor.Actor
@@ -30,11 +30,13 @@ class DeadLetterListener extends Actor {
       count += 1
       val done = maxCount != Int.MaxValue && count >= maxCount
       val doneMsg = if (done) ", no more dead letters will be logged" else ""
-      eventStream.publish(Info(rcp.path.toString, rcp.getClass,
-        s"Message [${message.getClass.getName}] from $snd to $rcp was not delivered. [$count] dead letters encountered$doneMsg. " +
-          "This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' " +
-          "and 'akka.log-dead-letters-during-shutdown'."))
+      eventStream.publish(
+          Info(
+              rcp.path.toString,
+              rcp.getClass,
+              s"Message [${message.getClass.getName}] from $snd to $rcp was not delivered. [$count] dead letters encountered$doneMsg. " +
+              "This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' " +
+              "and 'akka.log-dead-letters-during-shutdown'."))
       if (done) context.stop(self)
   }
-
 }

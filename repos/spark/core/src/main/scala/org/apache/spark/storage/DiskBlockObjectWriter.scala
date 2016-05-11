@@ -26,13 +26,13 @@ import org.apache.spark.serializer.{SerializationStream, SerializerInstance}
 import org.apache.spark.util.Utils
 
 /**
- * A class for writing JVM objects directly to a file on disk. This class allows data to be appended
- * to an existing block and can guarantee atomicity in the case of faults as it allows the caller to
- * revert partial writes.
- *
- * This class does not support concurrent writes. Also, once the writer has been opened it cannot be
- * reopened again.
- */
+  * A class for writing JVM objects directly to a file on disk. This class allows data to be appended
+  * to an existing block and can guarantee atomicity in the case of faults as it allows the caller to
+  * revert partial writes.
+  *
+  * This class does not support concurrent writes. Also, once the writer has been opened it cannot be
+  * reopened again.
+  */
 private[spark] class DiskBlockObjectWriter(
     val file: File,
     serializerInstance: SerializerInstance,
@@ -43,8 +43,7 @@ private[spark] class DiskBlockObjectWriter(
     // are themselves performing writes. All updates must be relative.
     writeMetrics: ShuffleWriteMetrics,
     val blockId: BlockId = null)
-  extends OutputStream
-  with Logging {
+    extends OutputStream with Logging {
 
   /** The file channel, used for repositioning / truncating the file. */
   private var channel: FileChannel = null
@@ -57,33 +56,34 @@ private[spark] class DiskBlockObjectWriter(
   private var commitAndCloseHasBeenCalled = false
 
   /**
-   * Cursors used to represent positions in the file.
-   *
-   * xxxxxxxx|--------|---       |
-   *         ^        ^          ^
-   *         |        |        finalPosition
-   *         |      reportedPosition
-   *       initialPosition
-   *
-   * initialPosition: Offset in the file where we start writing. Immutable.
-   * reportedPosition: Position at the time of the last update to the write metrics.
-   * finalPosition: Offset where we stopped writing. Set on closeAndCommit() then never changed.
-   * -----: Current writes to the underlying file.
-   * xxxxx: Existing contents of the file.
-   */
+    * Cursors used to represent positions in the file.
+    *
+    * xxxxxxxx|--------|---       |
+    *         ^        ^          ^
+    *         |        |        finalPosition
+    *         |      reportedPosition
+    *       initialPosition
+    *
+    * initialPosition: Offset in the file where we start writing. Immutable.
+    * reportedPosition: Position at the time of the last update to the write metrics.
+    * finalPosition: Offset where we stopped writing. Set on closeAndCommit() then never changed.
+    * -----: Current writes to the underlying file.
+    * xxxxx: Existing contents of the file.
+    */
   private val initialPosition = file.length()
   private var finalPosition: Long = -1
   private var reportedPosition = initialPosition
 
   /**
-   * Keep track of number of records written and also use this to periodically
-   * output bytes written since the latter is expensive to do for each record.
-   */
+    * Keep track of number of records written and also use this to periodically
+    * output bytes written since the latter is expensive to do for each record.
+    */
   private var numRecordsWritten = 0
 
   def open(): DiskBlockObjectWriter = {
     if (hasBeenClosed) {
-      throw new IllegalStateException("Writer already closed. Cannot be reopened.")
+      throw new IllegalStateException(
+          "Writer already closed. Cannot be reopened.")
     }
     fos = new FileOutputStream(file, true)
     ts = new TimeTrackingOutputStream(writeMetrics, fos)
@@ -121,8 +121,8 @@ private[spark] class DiskBlockObjectWriter(
   def isOpen: Boolean = objOut != null
 
   /**
-   * Flush the partial writes and commit them as a single atomic block.
-   */
+    * Flush the partial writes and commit them as a single atomic block.
+    */
   def commitAndClose(): Unit = {
     if (initialized) {
       // NOTE: Because Kryo doesn't flush the underlying stream we explicitly flush both the
@@ -139,14 +139,13 @@ private[spark] class DiskBlockObjectWriter(
     commitAndCloseHasBeenCalled = true
   }
 
-
   /**
-   * Reverts writes that haven't been flushed yet. Callers should invoke this function
-   * when there are runtime exceptions. This method will not throw, though it may be
-   * unsuccessful in truncating written data.
-   *
-   * @return the file that this DiskBlockObjectWriter wrote to.
-   */
+    * Reverts writes that haven't been flushed yet. Callers should invoke this function
+    * when there are runtime exceptions. This method will not throw, though it may be
+    * unsuccessful in truncating written data.
+    *
+    * @return the file that this DiskBlockObjectWriter wrote to.
+    */
   def revertPartialWritesAndClose(): File = {
     // Discard current writes. We do this by flushing the outstanding writes and then
     // truncating the file to its initial position.
@@ -168,14 +167,16 @@ private[spark] class DiskBlockObjectWriter(
       }
     } catch {
       case e: Exception =>
-        logError("Uncaught exception while reverting partial writes to file " + file, e)
+        logError("Uncaught exception while reverting partial writes to file " +
+                 file,
+                 e)
         file
     }
   }
 
   /**
-   * Writes a key-value pair.
-   */
+    * Writes a key-value pair.
+    */
   def write(key: Any, value: Any) {
     if (!initialized) {
       open()
@@ -197,8 +198,8 @@ private[spark] class DiskBlockObjectWriter(
   }
 
   /**
-   * Notify the writer that a record worth of bytes has been written with OutputStream#write.
-   */
+    * Notify the writer that a record worth of bytes has been written with OutputStream#write.
+    */
   def recordWritten(): Unit = {
     numRecordsWritten += 1
     writeMetrics.incRecordsWritten(1)
@@ -210,21 +211,21 @@ private[spark] class DiskBlockObjectWriter(
   }
 
   /**
-   * Returns the file segment of committed data that this Writer has written.
-   * This is only valid after commitAndClose() has been called.
-   */
+    * Returns the file segment of committed data that this Writer has written.
+    * This is only valid after commitAndClose() has been called.
+    */
   def fileSegment(): FileSegment = {
     if (!commitAndCloseHasBeenCalled) {
       throw new IllegalStateException(
-        "fileSegment() is only valid after commitAndClose() has been called")
+          "fileSegment() is only valid after commitAndClose() has been called")
     }
     new FileSegment(file, initialPosition, finalPosition - initialPosition)
   }
 
   /**
-   * Report the number of bytes written in this writer's shuffle write metrics.
-   * Note that this is only valid before the underlying streams are closed.
-   */
+    * Report the number of bytes written in this writer's shuffle write metrics.
+    * Note that this is only valid before the underlying streams are closed.
+    */
   private def updateBytesWritten() {
     val pos = channel.position()
     writeMetrics.incBytesWritten(pos - reportedPosition)

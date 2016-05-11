@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -288,7 +288,8 @@ trait ListTest extends CollectionTest {
     assertEquals(-1, al.lastIndexOf("four"))
   }
 
-  @Test def shouldGiveTheFirstOrLastIndexOfAnElementForDoubleCornerCases(): Unit = {
+  @Test
+  def shouldGiveTheFirstOrLastIndexOfAnElementForDoubleCornerCases(): Unit = {
     val al = factory.empty[Double]
 
     al.add(-0.0)
@@ -337,19 +338,16 @@ trait ListTest extends CollectionTest {
     val al0 = al.subList(0, al.size)
     assertEquals(6, al0.size)
     assertEquals(al.size, al0.size)
-    for (i <- 0 until al.size)
-      assertEquals(al.get(i), al0.get(i))
+    for (i <- 0 until al.size) assertEquals(al.get(i), al0.get(i))
     al0.set(3, "zero")
     assertEquals("zero", al0.get(3))
-    for (i <- 0 until al.size)
-      assertEquals(al.get(i), al0.get(i))
+    for (i <- 0 until al.size) assertEquals(al.get(i), al0.get(i))
     testListIterator(al, Seq("one", "two", "three", "zero", "five", "six"))
     testListIterator(al0, Seq("one", "two", "three", "zero", "five", "six"))
 
     val al1 = al.subList(2, 5)
     assertEquals(3, al1.size)
-    for (i <- 0 until 3)
-      assertEquals(al.get(2 + i), al1.get(i))
+    for (i <- 0 until 3) assertEquals(al.get(2 + i), al1.get(i))
     al1.set(0, "nine")
     assertEquals("nine", al1.get(0))
     for (i <- 0 until 3) {
@@ -399,8 +397,7 @@ trait ListTest extends CollectionTest {
       val s = Seq("one", "two", "three")
       val ll = factory.empty[String]
 
-      for (e <- s)
-        ll.add(e)
+      for (e <- s) ll.add(e)
 
       val iter = ll.listIterator(1)
 
@@ -457,13 +454,14 @@ trait ListTest extends CollectionTest {
 
 object ListFactory {
   def allFactories: Iterator[ListFactory] =
-    Iterator(new ArrayListFactory, new LinkedListFactory, new AbstractListFactory)
+    Iterator(
+        new ArrayListFactory, new LinkedListFactory, new AbstractListFactory)
 }
 
 trait ListFactory extends CollectionFactory {
-  def empty[E: ClassTag]: ju.List[E]
+  def empty[E : ClassTag]: ju.List[E]
 
   /** Sortable using java.util.Collections.sort
-   */
+    */
   def sortableUsingCollections: Boolean = true
 }

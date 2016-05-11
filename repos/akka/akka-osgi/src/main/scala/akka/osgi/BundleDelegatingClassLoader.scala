@@ -1,14 +1,14 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.osgi
 
 import language.existentials
 import java.net.URL
 import java.util.Enumeration
-import org.osgi.framework.{ BundleContext, Bundle }
+import org.osgi.framework.{BundleContext, Bundle}
 import scala.util.Try
-import org.osgi.framework.wiring.{ BundleRevision, BundleWire, BundleWiring }
+import org.osgi.framework.wiring.{BundleRevision, BundleWire, BundleWiring}
 import scala.collection.JavaConverters._
 import scala.util.Success
 import scala.util.Failure
@@ -22,27 +22,34 @@ object BundleDelegatingClassLoader {
   /*
    * Create a bundle delegating ClassLoader for the bundle context's bundle
    */
-  def apply(context: BundleContext): BundleDelegatingClassLoader = new BundleDelegatingClassLoader(context.getBundle, null)
+  def apply(context: BundleContext): BundleDelegatingClassLoader =
+    new BundleDelegatingClassLoader(context.getBundle, null)
 
-  def apply(context: BundleContext, fallBackCLassLoader: Option[ClassLoader]): BundleDelegatingClassLoader =
-    new BundleDelegatingClassLoader(context.getBundle, fallBackCLassLoader.orNull)
+  def apply(
+      context: BundleContext,
+      fallBackCLassLoader: Option[ClassLoader]): BundleDelegatingClassLoader =
+    new BundleDelegatingClassLoader(
+        context.getBundle, fallBackCLassLoader.orNull)
 }
 
 /*
  * A bundle delegating ClassLoader implementation - this will try to load classes and resources from the bundle
  * and the bundles transitive dependencies. If there's a ClassLoader specified, that will be used as a fallback.
  */
-class BundleDelegatingClassLoader(bundle: Bundle, fallBackClassLoader: ClassLoader) extends ClassLoader(fallBackClassLoader) {
+class BundleDelegatingClassLoader(
+    bundle: Bundle, fallBackClassLoader: ClassLoader)
+    extends ClassLoader(fallBackClassLoader) {
 
   private val bundles = findTransitiveBundles(bundle).toList
 
   override def findClass(name: String): Class[_] = {
     @tailrec def find(remaining: List[Bundle]): Class[_] = {
       if (remaining.isEmpty) throw new ClassNotFoundException(name)
-      else Try { remaining.head.loadClass(name) } match {
-        case Success(cls) ⇒ cls
-        case Failure(_)   ⇒ find(remaining.tail)
-      }
+      else
+        Try { remaining.head.loadClass(name) } match {
+          case Success(cls) ⇒ cls
+          case Failure(_) ⇒ find(remaining.tail)
+        }
     }
     find(bundles)
   }
@@ -50,23 +57,25 @@ class BundleDelegatingClassLoader(bundle: Bundle, fallBackClassLoader: ClassLoad
   override def findResource(name: String): URL = {
     @tailrec def find(remaining: List[Bundle]): URL = {
       if (remaining.isEmpty) getParent.getResource(name)
-      else Option { remaining.head.getResource(name) } match {
-        case Some(r) ⇒ r
-        case None    ⇒ find(remaining.tail)
-      }
+      else
+        Option { remaining.head.getResource(name) } match {
+          case Some(r) ⇒ r
+          case None ⇒ find(remaining.tail)
+        }
     }
     find(bundles)
   }
 
   override def findResources(name: String): Enumeration[URL] = {
-    val resources = bundles.flatMap {
-      bundle ⇒ Option(bundle.getResources(name)).map { _.asScala.toList }.getOrElse(Nil)
+    val resources = bundles.flatMap { bundle ⇒
+      Option(bundle.getResources(name)).map { _.asScala.toList }.getOrElse(Nil)
     }
     java.util.Collections.enumeration(resources.asJava)
   }
 
   private def findTransitiveBundles(bundle: Bundle): Set[Bundle] = {
-    @tailrec def process(processed: Set[Bundle], remaining: Set[Bundle]): Set[Bundle] = {
+    @tailrec
+    def process(processed: Set[Bundle], remaining: Set[Bundle]): Set[Bundle] = {
       if (remaining.isEmpty) {
         processed
       } else {
@@ -78,10 +87,12 @@ class BundleDelegatingClassLoader(bundle: Bundle, fallBackClassLoader: ClassLoad
           val direct: Set[Bundle] =
             if (wiring == null) Set.empty
             else {
-              val requiredWires: List[BundleWire] =
-                wiring.getRequiredWires(BundleRevision.PACKAGE_NAMESPACE).asScala.toList
-              requiredWires.flatMap {
-                wire ⇒ Option(wire.getProviderWiring) map { _.getBundle }
+              val requiredWires: List[BundleWire] = wiring
+                .getRequiredWires(BundleRevision.PACKAGE_NAMESPACE)
+                .asScala
+                .toList
+              requiredWires.flatMap { wire ⇒
+                Option(wire.getProviderWiring) map { _.getBundle }
               }.toSet
             }
           process(processed + b, rest ++ (direct -- processed))
@@ -91,4 +102,3 @@ class BundleDelegatingClassLoader(bundle: Bundle, fallBackClassLoader: ClassLoad
     process(Set.empty, Set(bundle))
   }
 }
-

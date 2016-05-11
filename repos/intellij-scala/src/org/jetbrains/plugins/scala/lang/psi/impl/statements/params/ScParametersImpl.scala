@@ -16,24 +16,29 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScParamClausesStub
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-*/
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
+class ScParametersImpl private (
+    stub: StubElement[ScParameters], nodeType: IElementType, node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScParameters {
 
-class ScParametersImpl private (stub: StubElement[ScParameters], nodeType: IElementType, node: ASTNode)
-  extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScParameters {
-
-  def this(node: ASTNode) = {this(null, null, node)}
-  def this(stub: ScParamClausesStub) = {this(stub, ScalaElementTypes.PARAM_CLAUSES, null)}
+  def this(node: ASTNode) = { this(null, null, node) }
+  def this(stub: ScParamClausesStub) = {
+    this(stub, ScalaElementTypes.PARAM_CLAUSES, null)
+  }
 
   override def toString: String = "Parameters"
 
   def clauses: Seq[ScParameterClause] = {
-    getStubOrPsiChildren(ScalaElementTypes.PARAM_CLAUSE, JavaArrayFactoryUtil.ScParameterClauseFactory).toSeq
+    getStubOrPsiChildren(ScalaElementTypes.PARAM_CLAUSE,
+                         JavaArrayFactoryUtil.ScParameterClauseFactory).toSeq
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor, state: ResolveState,
-                                   lastParent: PsiElement, place: PsiElement): Boolean = {
+  override def processDeclarations(processor: PsiScopeProcessor,
+                                   state: ResolveState,
+                                   lastParent: PsiElement,
+                                   place: PsiElement): Boolean = {
     if (lastParent != null) {
       val clausesIterator = clauses.iterator
       var break = false
@@ -70,7 +75,8 @@ class ScParametersImpl private (stub: StubElement[ScParameters], nodeType: IElem
           case Some(clause) =>
             clause.addParameter(param).parameters.last
           case _ =>
-            val clause = ScalaPsiElementFactory.createClauseFromText("()", getManager)
+            val clause =
+              ScalaPsiElementFactory.createClauseFromText("()", getManager)
             val newClause = clause.addParameter(param)
             super.add(clause)
             newClause.parameters.last

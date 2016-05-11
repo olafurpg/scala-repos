@@ -26,8 +26,7 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
   }
 
   def testSelection(): Unit = {
-    val before =
-      """
+    val before = """
         |class MyClass {
         |  val a: Int = 1
         |  val b: Int = 2
@@ -36,8 +35,7 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
         |}
       """.stripMargin.replace("\r", "")
 
-    val after =
-      """
+    val after = """
         |class MyClass {
         |  val a: Int = 1
         |  val b: Int = 2
@@ -50,8 +48,7 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
   }
 
   def testSelectionInParent(): Unit = {
-    val before =
-      """
+    val before = """
         |class MyClass {
         |  val a: Int = 1
         |  val b: Int = 2
@@ -62,8 +59,7 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
         |}
       """.stripMargin.replace("\r", "")
 
-    val after =
-      """
+    val after = """
         |class MyClass {
         |  val a: Int = 1
         |  val b: Int = 2
@@ -78,8 +74,7 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
   }
 
   def testSelectionNearScalaDoc(): Unit = {
-    val before =
-      """
+    val before = """
         |class MyClass {
         |/*start*//**
         |  * @param x
@@ -90,8 +85,7 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
         |}
       """.stripMargin.replace("\r", "")
 
-    val after =
-      """
+    val after = """
         |class MyClass {
         |  /**
         |    * @param x
@@ -106,8 +100,7 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
   }
 
   def testSelectionNearScalaDocExtended(): Unit = {
-    val before =
-      """
+    val before = """
         |class MyClass {
         |/*start*//**
         |  * @param x
@@ -118,8 +111,7 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
         |}
       """.stripMargin.replace("\r", "")
 
-    val after =
-      """
+    val after = """
         |class MyClass {
         |  /**
         |    * @param x
@@ -132,5 +124,4 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
 
     doTextTest(before, after)
   }
-
 }

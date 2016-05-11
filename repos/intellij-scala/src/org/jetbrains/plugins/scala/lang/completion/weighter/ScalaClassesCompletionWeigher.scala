@@ -9,12 +9,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTy
 import org.jetbrains.plugins.scala.settings._
 
 /**
- * @author Alefas
- * @since 28.03.12
- */
+  * @author Alefas
+  * @since 28.03.12
+  */
 class ScalaClassesCompletionWeigher extends CompletionWeigher {
-  def weigh(element: LookupElement, location: CompletionLocation): Comparable[_] = {
-    if (!ScalaProjectSettings.getInstance(location.getProject).isScalaPriority) return null
+  def weigh(
+      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+    if (!ScalaProjectSettings.getInstance(location.getProject).isScalaPriority)
+      return null
     ScalaLookupItem.original(element) match {
       case s: ScalaLookupItem =>
         s.element match {

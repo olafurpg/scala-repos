@@ -15,20 +15,25 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
 /**
- * @author Alefas
- * @since 26.05.12
- */
-
-class ReferenceMustBePrefixedInspection extends AbstractInspection(id, displayName) {
+  * @author Alefas
+  * @since 26.05.12
+  */
+class ReferenceMustBePrefixedInspection
+    extends AbstractInspection(id, displayName) {
   def actionFor(holder: ProblemsHolder) = {
-    case ref: ScReferenceElement if ref.qualifier.isEmpty && !ref.getParent.isInstanceOf[ScImportSelector] =>
+    case ref: ScReferenceElement
+        if ref.qualifier.isEmpty &&
+        !ref.getParent.isInstanceOf[ScImportSelector] =>
       ref.bind() match {
         case Some(r: ScalaResolveResult) if r.nameShadow.isEmpty =>
           r.getActualElement match {
             case clazz: PsiClass if ScalaPsiUtil.hasStablePath(clazz) =>
               val qualName = clazz.qualifiedName
-              if (ScalaCodeStyleSettings.getInstance(holder.getProject).hasImportWithPrefix(qualName)) {
-                holder.registerProblem(ref, getDisplayName, new AddPrefixFix(ref, clazz))
+              if (ScalaCodeStyleSettings
+                    .getInstance(holder.getProject)
+                    .hasImportWithPrefix(qualName)) {
+                holder.registerProblem(
+                    ref, getDisplayName, new AddPrefixFix(ref, clazz))
               }
             case _ =>
           }
@@ -43,25 +48,30 @@ object ReferenceMustBePrefixedInspection {
 }
 
 class AddPrefixFix(ref: ScReferenceElement, clazz: PsiClass)
-        extends AbstractFixOnTwoPsiElements(AddPrefixFix.hint, ref, clazz) {
+    extends AbstractFixOnTwoPsiElements(AddPrefixFix.hint, ref, clazz) {
   def doApplyFix(project: Project) {
     val refElem = getFirstElement
     val cl = getSecondElement
     if (!refElem.isValid || !cl.isValid) return
     val parts = cl.qualifiedName.split('.')
     val packageName = parts.dropRight(1).mkString(".")
-    val pckg = JavaPsiFacade.getInstance(cl.getProject).findPackage(packageName)
+    val pckg =
+      JavaPsiFacade.getInstance(cl.getProject).findPackage(packageName)
     if (parts.length < 2) return
     val newRefText = parts.takeRight(2).mkString(".")
     refElem match {
       case stRef: ScStableCodeReferenceElement =>
-        stRef.replace(ScalaPsiElementFactory.createReferenceFromText(newRefText, stRef.getManager)) match {
-          case r: ScStableCodeReferenceElement => r.qualifier.foreach(_.bindToPackage(pckg, addImport = true))
+        stRef.replace(ScalaPsiElementFactory.createReferenceFromText(
+                newRefText, stRef.getManager)) match {
+          case r: ScStableCodeReferenceElement =>
+            r.qualifier.foreach(_.bindToPackage(pckg, addImport = true))
           case _ =>
         }
       case ref: ScReferenceExpression =>
-        ref.replace(ScalaPsiElementFactory.createExpressionWithContextFromText(newRefText, ref.getContext, ref)) match {
-          case ScReferenceExpression.withQualifier(q: ScReferenceExpression) => q.bindToPackage(pckg, addImport = true)
+        ref.replace(ScalaPsiElementFactory.createExpressionWithContextFromText(
+                newRefText, ref.getContext, ref)) match {
+          case ScReferenceExpression.withQualifier(q: ScReferenceExpression) =>
+            q.bindToPackage(pckg, addImport = true)
           case _ =>
         }
       case _ =>

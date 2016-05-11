@@ -14,7 +14,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package kafka.common
 
 import java.io.InputStream
@@ -35,5 +34,4 @@ trait MessageReader {
   def readMessage(): ProducerRecord[Array[Byte], Array[Byte]]
 
   def close() {}
-
 }

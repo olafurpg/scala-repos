@@ -4,12 +4,12 @@
 
 object Test1 {
 
-  object WeekDays extends Enumeration  {
+  object WeekDays extends Enumeration {
     val Mon, Tue, Wed, Thu, Fri, Sat, Sun = Value
   }
 
   def isWorkingDay(d: WeekDays.Value) =
-    ! (d == WeekDays.Sat || d == WeekDays.Sun);
+    !(d == WeekDays.Sat || d == WeekDays.Sun);
 
   def run: Int = {
     val it = WeekDays.values filter (isWorkingDay);
@@ -20,12 +20,12 @@ object Test1 {
 object Test2 {
 
   object ThreadState extends Enumeration {
-    val New          = Value("NEW");
-    val Runnable     = Value("RUNNABLE");
-    val Blocked      = Value("BLOCKED");
-    val Waiting      = Value("WAITING");
+    val New = Value("NEW");
+    val Runnable = Value("RUNNABLE");
+    val Blocked = Value("BLOCKED");
+    val Waiting = Value("WAITING");
     val TimedWaiting = Value("TIMED_WAITING");
-    val Terminated   = Value("TERMINATED");
+    val Terminated = Value("TERMINATED");
   }
 
   def run: Int = {
@@ -44,7 +44,8 @@ object Test3 {
   }
 
   def run: Int = {
-    val it = for (d <- Direction.values; if d.toString() startsWith "N") yield d;
+    val it = for (d <- Direction.values; if d.toString() startsWith "N") yield
+      d;
     it.toList.length
   }
 }
@@ -81,7 +82,7 @@ object Test5 {
     val North, South, East, West = Value;
   }
 
-  object WeekDays extends Enumeration  {
+  object WeekDays extends Enumeration {
     val Mon, Tue, Wed, Thu, Fri, Sat, Sun = Value
   }
 
@@ -135,13 +136,13 @@ object Test {
       if (actual == expected) {
         Console.print(" was successful");
       } else {
-        Console.print(" failed: expected "+ expected +", found "+ actual);
+        Console.print(" failed: expected " + expected + ", found " + actual);
       }
     } catch {
       case exception: Throwable => {
-        Console.print(" raised exception " + exception);
-        exception.printStackTrace();
-      }
+          Console.print(" raised exception " + exception);
+          exception.printStackTrace();
+        }
     }
     Console.println;
   }

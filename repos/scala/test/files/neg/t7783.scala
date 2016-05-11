@@ -1,10 +1,13 @@
-object O { class C; @deprecated("", "") type D = C; def foo: Seq[D] = Nil }
+object O {
+  class C; @deprecated("", "")
+  type D = C; def foo: Seq[D] = Nil
+}
 
 object NoWarn {
-  O.foo                        // nowarn
-  O.foo +: Nil                 // nowarn
+  O.foo // nowarn
+  O.foo +: Nil // nowarn
   def bar(a: Any, b: Any) = () // nowarn
-  bar(b = O.foo, a = ())       // nowarn
+  bar(b = O.foo, a = ()) // nowarn
 }
 
 object Warn {

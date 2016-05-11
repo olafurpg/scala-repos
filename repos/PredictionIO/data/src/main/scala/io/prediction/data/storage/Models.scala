@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import com.google.common.io.BaseEncoding
@@ -27,9 +26,7 @@ import org.json4s._
   * @group Model Data
   */
 @DeveloperApi
-case class Model(
-  id: String,
-  models: Array[Byte])
+case class Model(id: String, models: Array[Byte])
 
 /** :: DeveloperApi ::
   * Base trait for of the [[Model]] data access object
@@ -38,6 +35,7 @@ case class Model(
   */
 @DeveloperApi
 trait Models {
+
   /** Insert a new [[Model]] */
   def insert(i: Model): Unit
 
@@ -54,27 +52,24 @@ trait Models {
   * @group Model Data
   */
 @DeveloperApi
-class ModelSerializer extends CustomSerializer[Model](
-  format => ({
-    case JObject(fields) =>
-      implicit val formats = DefaultFormats
-      val seed = Model(
-          id = "",
-          models = Array[Byte]())
-      fields.foldLeft(seed) { case (i, field) =>
-        field match {
-          case JField("id", JString(id)) => i.copy(id = id)
-          case JField("models", JString(models)) =>
-            i.copy(models = BaseEncoding.base64.decode(models))
-          case _ => i
-        }
-      }
-  },
-  {
-    case i: Model =>
-      JObject(
-        JField("id", JString(i.id)) ::
-        JField("models", JString(BaseEncoding.base64.encode(i.models))) ::
-        Nil)
-  }
-))
+class ModelSerializer
+    extends CustomSerializer[Model](format =>
+          ({
+        case JObject(fields) =>
+          implicit val formats = DefaultFormats
+          val seed = Model(id = "", models = Array[Byte]())
+          fields.foldLeft(seed) {
+            case (i, field) =>
+              field match {
+                case JField("id", JString(id)) => i.copy(id = id)
+                case JField("models", JString(models)) =>
+                  i.copy(models = BaseEncoding.base64.decode(models))
+                case _ => i
+              }
+          }
+      }, {
+        case i: Model =>
+          JObject(JField("id", JString(i.id)) :: JField(
+                  "models",
+                  JString(BaseEncoding.base64.encode(i.models))) :: Nil)
+      }))

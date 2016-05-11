@@ -1,4 +1,3 @@
-object Spawn
-{
-	def main(args: Array[String]): Unit = ()
+object Spawn {
+  def main(args: Array[String]): Unit = ()
 }

@@ -1,7 +1,7 @@
 import language._
 
 object Test {
-  class Foo[T](val x: T) ; object Foo { def unapply[T](x: Foo[T]) = Some(x.x) }
+  class Foo[T](val x: T); object Foo { def unapply[T](x: Foo[T]) = Some(x.x) }
   def f1[T](x: Foo[T]) = x match { case Foo(y) => y }
   def f2[M[_], T](x: M[T]) = x match { case Foo(y) => y }
 

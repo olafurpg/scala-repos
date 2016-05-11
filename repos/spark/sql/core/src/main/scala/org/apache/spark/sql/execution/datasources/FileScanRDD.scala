@@ -23,33 +23,32 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.catalyst.InternalRow
 
 /**
- * A single file that should be read, along with partition column values that
- * need to be prepended to each row.  The reading should start at the first
- * valid record found after `offset`.
- */
-case class PartitionedFile(
-    partitionValues: InternalRow,
-    filePath: String,
-    start: Long,
-    length: Long)
+  * A single file that should be read, along with partition column values that
+  * need to be prepended to each row.  The reading should start at the first
+  * valid record found after `offset`.
+  */
+case class PartitionedFile(partitionValues: InternalRow,
+                           filePath: String,
+                           start: Long,
+                           length: Long)
 
 /**
- * A collection of files that should be read as a single task possibly from multiple partitioned
- * directories.
- *
- * IMPLEMENT ME: This is just a placeholder for a future implementation.
- * TODO: This currently does not take locality information about the files into account.
- */
-case class FilePartition(val index: Int, files: Seq[PartitionedFile]) extends Partition
+  * A collection of files that should be read as a single task possibly from multiple partitioned
+  * directories.
+  *
+  * IMPLEMENT ME: This is just a placeholder for a future implementation.
+  * TODO: This currently does not take locality information about the files into account.
+  */
+case class FilePartition(val index: Int, files: Seq[PartitionedFile])
+    extends Partition
 
-class FileScanRDD(
-    @transient val sqlContext: SQLContext,
-    readFunction: (PartitionedFile) => Iterator[InternalRow],
-    @transient val filePartitions: Seq[FilePartition])
+class FileScanRDD(@transient val sqlContext: SQLContext,
+                  readFunction: (PartitionedFile) => Iterator[InternalRow],
+                  @transient val filePartitions: Seq[FilePartition])
     extends RDD[InternalRow](sqlContext.sparkContext, Nil) {
 
-
-  override def compute(split: Partition, context: TaskContext): Iterator[InternalRow] = {
+  override def compute(
+      split: Partition, context: TaskContext): Iterator[InternalRow] = {
     throw new NotImplementedError("Not Implemented Yet")
   }
 

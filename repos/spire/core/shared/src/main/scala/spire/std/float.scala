@@ -5,25 +5,24 @@ import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
 
 import java.lang.Math
-import java.lang.Integer.{ numberOfTrailingZeros, numberOfLeadingZeros }
-import java.lang.Float.{ intBitsToFloat, floatToIntBits }
-
+import java.lang.Integer.{numberOfTrailingZeros, numberOfLeadingZeros}
+import java.lang.Float.{intBitsToFloat, floatToIntBits}
 
 trait FloatIsField extends Field[Float] {
-  override def minus(a:Float, b:Float): Float = a - b
-  def negate(a:Float): Float = -a
+  override def minus(a: Float, b: Float): Float = a - b
+  def negate(a: Float): Float = -a
   def one: Float = 1.0F
-  def plus(a:Float, b:Float): Float = a + b
-  override def pow(a:Float, b:Int): Float = Math.pow(a, b).toFloat
-  override def times(a:Float, b:Float): Float = a * b
+  def plus(a: Float, b: Float): Float = a + b
+  override def pow(a: Float, b: Int): Float = Math.pow(a, b).toFloat
+  override def times(a: Float, b: Float): Float = a * b
   def zero: Float = 0.0F
 
   override def fromInt(n: Int): Float = n
 
-  def quot(a:Float, b:Float): Float = (a - (a % b)) / b
-  def mod(a:Float, b:Float): Float = a % b
+  def quot(a: Float, b: Float): Float = (a - (a % b)) / b
+  def mod(a: Float, b: Float): Float = a % b
 
-  final def gcd(a:Float, b:Float):Float = {
+  final def gcd(a: Float, b: Float): Float = {
     def value(bits: Int): Int = bits & 0x007FFFFF | 0x00800000
 
     def exp(bits: Int): Int = ((bits >> 23) & 0xFF).toInt
@@ -65,7 +64,7 @@ trait FloatIsField extends Field[Float] {
 
   override def fromDouble(n: Double): Float = n.toFloat
 
-  def div(a:Float, b:Float): Float = a / b
+  def div(a: Float, b: Float): Float = a / b
 }
 
 trait FloatIsNRoot extends NRoot[Float] {
@@ -90,7 +89,8 @@ trait FloatIsTrig extends Trig[Float] {
   def asin(a: Float): Float = Math.asin(a.toDouble).toFloat
   def acos(a: Float): Float = Math.acos(a.toDouble).toFloat
   def atan(a: Float): Float = Math.atan(a.toDouble).toFloat
-  def atan2(y: Float, x: Float): Float = Math.atan2(y.toDouble, x.toDouble).toFloat
+  def atan2(y: Float, x: Float): Float =
+    Math.atan2(y.toDouble, x.toDouble).toFloat
 
   def sinh(x: Float): Float = Math.sinh(x.toDouble).toFloat
   def cosh(x: Float): Float = Math.cosh(x.toDouble).toFloat
@@ -106,8 +106,8 @@ trait FloatIsSigned extends Signed[Float] {
 }
 
 trait FloatOrder extends Order[Float] {
-  override def eqv(x:Float, y:Float): Boolean = x == y
-  override def neqv(x:Float, y:Float): Boolean = x != y
+  override def eqv(x: Float, y: Float): Boolean = x == y
+  override def neqv(x: Float, y: Float): Boolean = x != y
   override def gt(x: Float, y: Float): Boolean = x > y
   override def gteqv(x: Float, y: Float): Boolean = x >= y
   override def lt(x: Float, y: Float): Boolean = x < y
@@ -117,24 +117,28 @@ trait FloatOrder extends Order[Float] {
   def compare(x: Float, y: Float): Int = java.lang.Float.compare(x, y)
 }
 
-trait FloatIsReal extends IsRational[Float] with FloatOrder with FloatIsSigned {
+trait FloatIsReal
+    extends IsRational[Float] with FloatOrder with FloatIsSigned {
   def toDouble(x: Float): Double = x.toDouble
-  def ceil(a:Float): Float = Math.ceil(a).toFloat
-  def floor(a:Float): Float = Math.floor(a).toFloat
-  def round(a:Float): Float = spire.math.round(a)
-  def isWhole(a:Float): Boolean = a % 1.0 == 0.0
-  def toRational(a:Float): Rational = Rational(a)
+  def ceil(a: Float): Float = Math.ceil(a).toFloat
+  def floor(a: Float): Float = Math.floor(a).toFloat
+  def round(a: Float): Float = spire.math.round(a)
+  def isWhole(a: Float): Boolean = a % 1.0 == 0.0
+  def toRational(a: Float): Rational = Rational(a)
 }
 
 @SerialVersionUID(0L)
-class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal with Serializable
+class FloatAlgebra
+    extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal
+    with Serializable
 
 trait FloatInstances {
   implicit final val FloatAlgebra = new FloatAlgebra
   import Float._
   import spire.math.NumberTag._
-  implicit final val FloatTag = new BuiltinFloatTag(0F, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+  implicit final val FloatTag = new BuiltinFloatTag(
+      0F, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
     def isInfinite(a: Float): Boolean = java.lang.Float.isInfinite(a)
-    def isNaN(a: Float): Boolean =  java.lang.Float.isNaN(a)
+    def isNaN(a: Float): Boolean = java.lang.Float.isNaN(a)
   }
 }

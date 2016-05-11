@@ -1,7 +1,7 @@
 object A1 {
- object A2 {
-   class X { def unapply(v : Int) = Some(v + 1) }
- }
+  object A2 {
+    class X { def unapply(v: Int) = Some(v + 1) }
+  }
 }
 
 object B1 {
@@ -17,9 +17,6 @@ object Test {
     println(res)
   }
 }
-
-
-
 /*
 compiler crash:
 
@@ -44,4 +41,4 @@ object C {
   }
 }
 
-*/
+ */

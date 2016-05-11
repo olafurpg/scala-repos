@@ -2,8 +2,8 @@
 // doesn't crash the compiler over private type escaping scope.
 trait T {
   class C {
-     private object O1 {
-        object O2
-     }
+    private object O1 {
+      object O2
+    }
   }
 }

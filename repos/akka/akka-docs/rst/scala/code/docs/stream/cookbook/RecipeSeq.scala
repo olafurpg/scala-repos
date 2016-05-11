@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.stream.cookbook
 
 import akka.stream.scaladsl._
@@ -38,7 +38,5 @@ class RecipeSeq extends RecipeSpec {
       limited.futureValue should ===(Seq("1", "2", "3"))
       ignoreOverflow.futureValue should ===(Seq("1", "2", "3"))
     }
-
   }
-
 }

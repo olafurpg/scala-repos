@@ -22,15 +22,20 @@ object Test extends ScaladocModelTest {
 
     // find Link
     def find(body: Any): Option[Link] = body match {
-        case l: Link => Some(l)
-        case s: Seq[_]  => s.toList.map(find(_)).flatten.headOption
-        case p: Product => p.productIterator.toList.map(find(_)).flatten.headOption
-        case _          => None
-      }
+      case l: Link => Some(l)
+      case s: Seq[_] => s.toList.map(find(_)).flatten.headOption
+      case p: Product =>
+        p.productIterator.toList.map(find(_)).flatten.headOption
+      case _ => None
+    }
 
-    val link = find(test.comment.get.body).collect { case Link(ta, Text(ti)) => (ta, ti) }
+    val link = find(test.comment.get.body).collect {
+      case Link(ta, Text(ti)) => (ta, ti)
+    }
     assert(link.isDefined)
     val expected = ("http://www.scala-lang.org", "this great website")
-    link.foreach {l => assert(l == expected, s"$l != $expected")}
+    link.foreach { l =>
+      assert(l == expected, s"$l != $expected")
+    }
   }
 }

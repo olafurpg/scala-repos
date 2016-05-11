@@ -5,7 +5,7 @@ object Test {
   def main(args: Array[String]) {
     test(collection.mutable.ArrayBuffer[String]())
     test(collection.mutable.ListBuffer[String]())
-    class BBuf(z:ListBuffer[String]) extends BufferProxy[String] {
+    class BBuf(z: ListBuffer[String]) extends BufferProxy[String] {
       def self = z
     }
     test(new BBuf(collection.mutable.ListBuffer[String]()))
@@ -21,15 +21,17 @@ object Test {
     assert(x.length == 2, "length B")
 
     // testing method -= (removing last element)
-    x -=  "two"
+    x -= "two"
 
     assert(x.length == 1, "length C")
 
-    try { x(1); sys.error("no exception for removed element") }
-    catch { case i:IndexOutOfBoundsException => }
+    try { x(1); sys.error("no exception for removed element") } catch {
+      case i: IndexOutOfBoundsException =>
+    }
 
-    try { x.remove(1); sys.error("no exception for removed element") }
-    catch { case i:IndexOutOfBoundsException => }
+    try { x.remove(1); sys.error("no exception for removed element") } catch {
+      case i: IndexOutOfBoundsException =>
+    }
 
     x += "two2"
     assert(x.length == 2, "length D")
@@ -54,5 +56,4 @@ object Test {
     assert(List("a", "b") == dest.toList, "dest")
     assert(List("a", "b") == x.toList, "source")
   }
-
 }

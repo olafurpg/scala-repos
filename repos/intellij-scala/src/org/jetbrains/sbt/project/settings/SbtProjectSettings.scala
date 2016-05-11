@@ -7,8 +7,8 @@ import org.jetbrains.annotations.Nullable
 import scala.beans.BeanProperty
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class SbtProjectSettings extends ExternalProjectSettings {
 
   super.setUseAutoImport(false)

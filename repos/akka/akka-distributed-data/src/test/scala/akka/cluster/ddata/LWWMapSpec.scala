@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 import akka.actor.Address
@@ -19,12 +18,17 @@ class LWWMapSpec extends WordSpec with Matchers {
   "A LWWMap" must {
 
     "be able to set entries" in {
-      val m = LWWMap.empty[Int].put(node1, "a", 1, defaultClock[Int]).put(node2, "b", 2, defaultClock[Int])
+      val m = LWWMap
+        .empty[Int]
+        .put(node1, "a", 1, defaultClock[Int])
+        .put(node2, "b", 2, defaultClock[Int])
       m.entries should be(Map("a" -> 1, "b" -> 2))
     }
 
     "be able to have its entries correctly merged with another LWWMap with other entries" in {
-      val m1 = LWWMap.empty.put(node1, "a", 1, defaultClock[Int]).put(node1, "b", 2, defaultClock[Int])
+      val m1 = LWWMap.empty
+        .put(node1, "a", 1, defaultClock[Int])
+        .put(node1, "b", 2, defaultClock[Int])
       val m2 = LWWMap.empty.put(node2, "c", 3, defaultClock[Int])
 
       // merge both ways
@@ -34,7 +38,9 @@ class LWWMapSpec extends WordSpec with Matchers {
     }
 
     "be able to remove entry" in {
-      val m1 = LWWMap.empty.put(node1, "a", 1, defaultClock[Int]).put(node1, "b", 2, defaultClock[Int])
+      val m1 = LWWMap.empty
+        .put(node1, "a", 1, defaultClock[Int])
+        .put(node1, "b", 2, defaultClock[Int])
       val m2 = LWWMap.empty.put(node2, "c", 3, defaultClock[Int])
 
       val merged1 = m1 merge m2
@@ -58,6 +64,5 @@ class LWWMapSpec extends WordSpec with Matchers {
           entries4 should be(Map("a" -> 1L))
       }
     }
-
   }
 }

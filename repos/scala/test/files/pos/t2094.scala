@@ -1,13 +1,9 @@
 object Test extends App {
   // compiles:
-  Map[Int, Value](
-    0 -> KnownType(classOf[Object]),
-    1 -> UnknownValue())
+  Map[Int, Value](0 -> KnownType(classOf[Object]), 1 -> UnknownValue())
 
   // does not compile:
-  Map(
-    0 -> KnownType(classOf[Object]),
-    1 -> UnknownValue())
+  Map(0 -> KnownType(classOf[Object]), 1 -> UnknownValue())
 
   // Experiment.scala:10: error: type mismatch;
   //  found   : (Int, KnownType)

@@ -12,30 +12,31 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding.typed
 
 /**
- * used for types that may know how many reducers they need
- * e.g. CoGrouped, Grouped, SortedGrouped, UnsortedGrouped
- */
+  * used for types that may know how many reducers they need
+  * e.g. CoGrouped, Grouped, SortedGrouped, UnsortedGrouped
+  */
 trait HasReducers {
   def reducers: Option[Int]
 }
 
 /**
- * used for types that must know how many reducers they need
- * e.g. Sketched
- */
+  * used for types that must know how many reducers they need
+  * e.g. Sketched
+  */
 trait MustHaveReducers extends HasReducers {
   def reducers: Some[Int]
 }
 
 /**
- * used for objects that may _set_ how many reducers they need
- * e.g. CoGrouped, Grouped, SortedGrouped, UnsortedGrouped
- */
+  * used for objects that may _set_ how many reducers they need
+  * e.g. CoGrouped, Grouped, SortedGrouped, UnsortedGrouped
+  */
 trait WithReducers[+This <: WithReducers[This]] extends HasReducers {
+
   /** never mutates this, instead returns a new item. */
   def withReducers(reds: Int): This
 }

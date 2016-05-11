@@ -5,9 +5,8 @@ package surrounders
 package expression
 
 /**
- * @author: Dmitry Krasilschikov
- */
-
+  * @author: Dmitry Krasilschikov
+  */
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -24,17 +23,19 @@ class ScalaWithDoWhileSurrounder extends ScalaExpressionSurrounder {
 
   override def getTemplateDescription = "do / while"
 
-  override def getSurroundSelectionRange (withDoWhileNode : ASTNode ) : TextRange = {
+  override def getSurroundSelectionRange(withDoWhileNode: ASTNode): TextRange = {
     val element: PsiElement = withDoWhileNode.getPsi match {
-      case x: ScParenthesisedExpr => x.expr match {
-        case Some(y) => y
-        case _ => return x.getTextRange
-      }
+      case x: ScParenthesisedExpr =>
+        x.expr match {
+          case Some(y) => y
+          case _ => return x.getTextRange
+        }
       case x => x
     }
     val doWhileStmt = element.asInstanceOf[ScDoStmt]
 
-    val conditionNode : ASTNode = doWhileStmt.getNode.getLastChildNode.getTreePrev
+    val conditionNode: ASTNode =
+      doWhileStmt.getNode.getLastChildNode.getTreePrev
 
     val startOffset = conditionNode.getTextRange.getStartOffset
     val endOffset = conditionNode.getTextRange.getEndOffset

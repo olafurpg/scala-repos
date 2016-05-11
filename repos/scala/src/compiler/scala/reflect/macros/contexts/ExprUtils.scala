@@ -1,8 +1,7 @@
 package scala.reflect.macros
 package contexts
 
-trait ExprUtils {
-  self: Context =>
+trait ExprUtils { self: Context =>
 
   import universe._
 
@@ -14,7 +13,8 @@ trait ExprUtils {
 
   def literalFalse = Expr[Boolean](Literal(Constant(false)))(TypeTag.Boolean)
 
-  def literal(x: Boolean) = Expr[Boolean](Literal(Constant(x)))(TypeTag.Boolean)
+  def literal(x: Boolean) =
+    Expr[Boolean](Literal(Constant(x)))(TypeTag.Boolean)
 
   def literal(x: Byte) = Expr[Byte](Literal(Constant(x)))(TypeTag.Byte)
 
@@ -28,7 +28,9 @@ trait ExprUtils {
 
   def literal(x: Double) = Expr[Double](Literal(Constant(x)))(TypeTag.Double)
 
-  def literal(x: String) = Expr[String](Literal(Constant(x)))(TypeTag[String](definitions.StringClass.toTypeConstructor))
+  def literal(x: String) =
+    Expr[String](Literal(Constant(x)))(
+        TypeTag[String](definitions.StringClass.toTypeConstructor))
 
   def literal(x: Char) = Expr[Char](Literal(Constant(x)))(TypeTag.Char)
 }

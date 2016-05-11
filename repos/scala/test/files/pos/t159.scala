@@ -4,9 +4,9 @@ object foo {
   def cooked(ckd: StringBuilder) {
     'a' match {
       case '-' =>
-        val _ = ckd.append( '_' );
+        val _ = ckd.append('_');
       case 'v' =>
-        val _ = ckd.append( '_' );
+        val _ = ckd.append('_');
     }
   }
 }

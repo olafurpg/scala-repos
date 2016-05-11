@@ -15,6 +15,7 @@ object A {
   def f10(x: Int) = new Bippy[t forSome { type t <: Unit }]
   def f11(x: Int) = new Bippy[t forSome { type t >: Null }]
 
-  class Boppy[+T1,-T2]
-  def g1 = new Boppy[t forSome { type t <: Int }, u forSome { type u <: String }]
+  class Boppy[+T1, -T2]
+  def g1 =
+    new Boppy[t forSome { type t <: Int }, u forSome { type u <: String }]
 }

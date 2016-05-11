@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypesEx
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 18.04.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 18.04.2008
+  */
 object CDSect {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val cDataMarker = builder.mark()
@@ -24,7 +23,8 @@ object CDSect {
     }
     builder.getTokenType match {
       case ScalaXmlTokenTypes.XML_DATA_CHARACTERS => builder.advanceLexer()
-      case ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_START => ScalaExpr.parse(builder)
+      case ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_START =>
+        ScalaExpr.parse(builder)
       case _ =>
     }
     builder.getTokenType match {

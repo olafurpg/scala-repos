@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.lang
 
@@ -400,10 +400,14 @@ class IntegerTest {
   }
 
   @Test def toBinaryString(): Unit = {
-    assertEquals("11111111111111111111111111111111", Integer.toBinaryString(-1))
-    assertEquals("11111111111111111101100011101111", Integer.toBinaryString(-10001))
-    assertEquals("10000000000000000000000000000000", Integer.toBinaryString(MinValue))
-    assertEquals("1111111111111111111111111111111", Integer.toBinaryString(MaxValue))
+    assertEquals(
+        "11111111111111111111111111111111", Integer.toBinaryString(-1))
+    assertEquals(
+        "11111111111111111101100011101111", Integer.toBinaryString(-10001))
+    assertEquals(
+        "10000000000000000000000000000000", Integer.toBinaryString(MinValue))
+    assertEquals(
+        "1111111111111111111111111111111", Integer.toBinaryString(MaxValue))
   }
 
   @Test def toHexString(): Unit = {
@@ -445,8 +449,7 @@ class IntegerTest {
     def test(s: String, v: Int, radix: Int = 10): Unit = {
       assertEquals(v, Integer.parseInt(s, radix))
       assertEquals(v, Integer.valueOf(s, radix).intValue())
-      if (radix == 10)
-        assertEquals(v, new Integer(s).intValue())
+      if (radix == 10) assertEquals(v, new Integer(s).intValue())
     }
 
     test("0", 0)
@@ -456,8 +459,7 @@ class IntegerTest {
     test("30000", 30000)
     test("-90000", -90000)
     test("Kona", 411787, 27)
-    if (!executingInJVMOnJDK6)
-      test("+42", 42)
+    if (!executingInJVMOnJDK6) test("+42", 42)
     test("-0", 0)
     test("-FF", -255, 16)
   }
@@ -530,15 +532,18 @@ class IntegerTest {
      */
     assertEquals("17777777777", Integer.toString(2147483647, 8))
     assertEquals("7fffffff", Integer.toString(2147483647, 16))
-    assertEquals("1111111111111111111111111111111", Integer.toString(2147483647, 2))
+    assertEquals(
+        "1111111111111111111111111111111", Integer.toString(2147483647, 2))
     assertEquals("2147483647", Integer.toString(2147483647, 10))
     assertEquals("-17777777777", Integer.toString(-2147483647, 8))
     assertEquals("-7fffffff", Integer.toString(-2147483647, 16))
-    assertEquals("-1111111111111111111111111111111", Integer.toString(-2147483647, 2))
+    assertEquals(
+        "-1111111111111111111111111111111", Integer.toString(-2147483647, 2))
     assertEquals("-2147483647", Integer.toString(-2147483647, 10))
     assertEquals("-20000000000", Integer.toString(-2147483648, 8))
     assertEquals("-80000000", Integer.toString(-2147483648, 16))
-    assertEquals("-10000000000000000000000000000000", Integer.toString(-2147483648, 2))
+    assertEquals(
+        "-10000000000000000000000000000000", Integer.toString(-2147483648, 2))
     assertEquals("-2147483648", Integer.toString(-2147483648, 10))
   }
 }

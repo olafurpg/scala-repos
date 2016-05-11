@@ -20,14 +20,10 @@ object Test extends App {
   }
 
   val replStr = scala.runtime.ScalaRunTime.replStringOf(lb1, 100)
-  if (replStr == "ListBuffer('a, 'b, 'c, 'd, 'e)\n")
-    println("replStringOf OK")
-  else
-    println("replStringOf FAILED: " + replStr)
+  if (replStr == "ListBuffer('a, 'b, 'c, 'd, 'e)\n") println("replStringOf OK")
+  else println("replStringOf FAILED: " + replStr)
 
   val len = lb1.length
-  if (len == 5)
-    println("length OK")
-  else
-    println("length FAILED: " + len)
+  if (len == 5) println("length OK")
+  else println("length FAILED: " + len)
 }

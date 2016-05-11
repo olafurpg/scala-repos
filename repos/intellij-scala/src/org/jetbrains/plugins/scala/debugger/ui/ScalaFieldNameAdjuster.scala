@@ -8,14 +8,15 @@ import org.jetbrains.plugins.scala.debugger.ui.ScalaFieldNameAdjuster.objectSuff
 import scala.collection.JavaConverters._
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class ScalaFieldNameAdjuster extends NodeDescriptorNameAdjuster {
 
   override def isApplicable(descriptor: NodeDescriptor): Boolean = {
     descriptor match {
       case fd: FieldDescriptor if fd.getObject != null =>
-        DebuggerUtil.isScala(fd.getObject.referenceType()) && isObscureName(fd.getField.name())
+        DebuggerUtil.isScala(fd.getObject.referenceType()) &&
+        isObscureName(fd.getField.name())
       case _ => false
     }
   }
@@ -38,12 +39,16 @@ class ScalaFieldNameAdjuster extends NodeDescriptorNameAdjuster {
 
         def isFieldFromTrait = {
           def hasMethodForField(ref: ReferenceType) = {
-            ref.methodsByName(name).asScala.exists(_.signature().startsWith("()"))
+            ref
+              .methodsByName(name)
+              .asScala
+              .exists(_.signature().startsWith("()"))
           }
 
           field.declaringType() match {
             case ct: ClassType =>
-              val traits = ct.allInterfaces().asScala.filter(DebuggerUtil.isScala(_))
+              val traits =
+                ct.allInterfaces().asScala.filter(DebuggerUtil.isScala(_))
               traits.exists(hasMethodForField)
             case _ => false
           }
@@ -58,12 +63,9 @@ class ScalaFieldNameAdjuster extends NodeDescriptorNameAdjuster {
           stripped.drop(stripped.lastIndexOf('$') + 1)
         }
 
-        if (isScalaObject)
-          s"[object] ${lastPart(name)}"
-        else if (isLocalFromOuterField)
-          name.takeWhile(_ != '$')
-        else if (nameStartsWithFqn || isFieldFromTrait)
-          lastPart(name)
+        if (isScalaObject) s"[object] ${lastPart(name)}"
+        else if (isLocalFromOuterField) name.takeWhile(_ != '$')
+        else if (nameStartsWithFqn || isFieldFromTrait) lastPart(name)
         else name
     }
   }

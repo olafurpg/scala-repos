@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2002-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2002-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -14,18 +14,18 @@ package util
 import scala.compat.Platform.EOL
 
 /** This object provides utility methods to extract elements
- *  from Strings.
- *
- *  @author Martin Odersky
- *  @version 1.0
- */
+  *  from Strings.
+  *
+  *  @author Martin Odersky
+  *  @version 1.0
+  */
 trait StringOps {
-  def oempty(xs: String*)        = xs filterNot (x => x == null || x == "")
+  def oempty(xs: String*) = xs filterNot (x => x == null || x == "")
   def ojoin(xs: String*): String = oempty(xs: _*) mkString " "
   def longestCommonPrefix(xs: List[String]): String = xs match {
-    case Nil      => ""
+    case Nil => ""
     case w :: Nil => w
-    case _        =>
+    case _ =>
       def lcp(ss: List[String]): String = {
         val w :: ws = ss
         if (w == "") ""
@@ -34,18 +34,20 @@ trait StringOps {
       }
       lcp(xs)
   }
+
   /** Like String#trim, but trailing whitespace only.
-   */
+    */
   def trimTrailingSpace(s: String): String = {
     var end = s.length
-    while (end > 0 && s.charAt(end - 1).isWhitespace)
-      end -= 1
+    while (end > 0 && s.charAt(end - 1).isWhitespace) end -= 1
 
     if (end == s.length) s
     else s.substring(0, end)
   }
+
   /** Breaks the string into lines and strips each line before reassembling. */
-  def trimAllTrailingSpace(s: String): String = s.lines map trimTrailingSpace mkString EOL
+  def trimAllTrailingSpace(s: String): String =
+    s.lines map trimTrailingSpace mkString EOL
 
   def decompose(str: String, sep: Char): List[String] = {
     def ws(start: Int): List[String] =
@@ -61,27 +63,31 @@ trait StringOps {
 
   def words(str: String): List[String] = decompose(str, ' ')
 
-  def splitWhere(str: String, f: Char => Boolean, doDropIndex: Boolean = false): Option[(String, String)] =
+  def splitWhere(str: String,
+                 f: Char => Boolean,
+                 doDropIndex: Boolean = false): Option[(String, String)] =
     splitAt(str, str indexWhere f, doDropIndex)
 
-  def splitAt(str: String, idx: Int, doDropIndex: Boolean = false): Option[(String, String)] =
+  def splitAt(str: String,
+              idx: Int,
+              doDropIndex: Boolean = false): Option[(String, String)] =
     if (idx == -1) None
     else Some((str take idx, str drop (if (doDropIndex) idx + 1 else idx)))
 
   /** Returns a string meaning "n elements".
-   */
+    */
   def countElementsAsString(n: Int, elements: String): String =
     n match {
-      case 0 => "no "    + elements + "s"
-      case 1 => "one "   + elements
-      case 2 => "two "   + elements + "s"
+      case 0 => "no " + elements + "s"
+      case 1 => "one " + elements
+      case 2 => "two " + elements + "s"
       case 3 => "three " + elements + "s"
-      case 4 => "four "  + elements + "s"
+      case 4 => "four " + elements + "s"
       case _ => "" + n + " " + elements + "s"
     }
 
   /** Turns a count into a friendly English description if n<=4.
-   */
+    */
   def countAsString(n: Int): String =
     n match {
       case 0 => "none"
@@ -93,4 +99,4 @@ trait StringOps {
     }
 }
 
-object StringOps extends StringOps { }
+object StringOps extends StringOps {}

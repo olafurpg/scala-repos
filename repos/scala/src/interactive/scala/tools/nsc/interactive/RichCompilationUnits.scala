@@ -19,11 +19,12 @@ trait RichCompilationUnits { self: Global =>
   /** The status value of a unit that has been partially typechecked */
   final val PartiallyChecked = 0
 
-  class RichCompilationUnit(source: SourceFile) extends CompilationUnit(source) {
+  class RichCompilationUnit(source: SourceFile)
+      extends CompilationUnit(source) {
 
     /** The runid of the latest compiler run that typechecked this unit,
-     *  or else @see NotLoaded, JustParsed
-     */
+      *  or else @see NotLoaded, JustParsed
+      */
     var status: Int = NotLoaded
 
     /** Unit has been parsed */
@@ -42,10 +43,10 @@ trait RichCompilationUnits { self: Global =>
     val problems = new ArrayBuffer[Problem]
 
     /** The position of a targeted type check
-     *  If this is different from NoPosition, the type checking
-     *  will stop once a tree that contains this position range
-     *  is fully attributed.
-     */
+      *  If this is different from NoPosition, the type checking
+      *  will stop once a tree that contains this position range
+      *  is fully attributed.
+      */
     var _targetPos: Position = NoPosition
     override def targetPos: Position = _targetPos
     def targetPos_=(p: Position) { _targetPos = p }

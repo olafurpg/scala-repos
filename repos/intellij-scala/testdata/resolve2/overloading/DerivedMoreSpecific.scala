@@ -10,5 +10,6 @@ object Test extends Application {
   val b = new B
   import b._
 
-  /* line: 7 */foo(3)
+  /* line: 7 */
+  foo(3)
 }

@@ -23,5 +23,6 @@ private[deploy] object ExecutorState extends Enumeration {
 
   type ExecutorState = Value
 
-  def isFinished(state: ExecutorState): Boolean = Seq(KILLED, FAILED, LOST, EXITED).contains(state)
+  def isFinished(state: ExecutorState): Boolean =
+    Seq(KILLED, FAILED, LOST, EXITED).contains(state)
 }

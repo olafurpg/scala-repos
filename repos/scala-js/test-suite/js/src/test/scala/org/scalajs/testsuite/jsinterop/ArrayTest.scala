@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.jsinterop
 
@@ -21,7 +21,9 @@ class ArrayTest {
 
   // scala.scalajs.js.Array
 
-  @Test def should_provide_implicit_conversion_from_js_Array_to_ArrayOps_String(): Unit = {
+  @Test
+  def should_provide_implicit_conversion_from_js_Array_to_ArrayOps_String(
+      ): Unit = {
     var propCount = 0
     var propString = ""
 
@@ -35,7 +37,9 @@ class ArrayTest {
     assertEquals("Scala.js", propString)
   }
 
-  @Test def should_provide_implicit_conversion_from_js_Array_to_ArrayOps_Int(): Unit = {
+  @Test
+  def should_provide_implicit_conversion_from_js_Array_to_ArrayOps_Int(
+      ): Unit = {
     var propCount = 0
     var propString = ""
 
@@ -49,7 +53,9 @@ class ArrayTest {
     assertEquals("7357", propString)
   }
 
-  @Test def should_provide_implicit_conversion_from_js_Array_to_ArrayOps_Char(): Unit = {
+  @Test
+  def should_provide_implicit_conversion_from_js_Array_to_ArrayOps_Char(
+      ): Unit = {
     var propCount = 0
     var propString = ""
 
@@ -63,7 +69,9 @@ class ArrayTest {
     assertEquals("Scala", propString)
   }
 
-  @Test def should_provide_implicit_conversion_from_js_Array_to_ArrayOps_value_class(): Unit = {
+  @Test
+  def should_provide_implicit_conversion_from_js_Array_to_ArrayOps_value_class(
+      ): Unit = {
     var propCount = 0
     var propString = ""
 
@@ -83,7 +91,8 @@ class ArrayTest {
     import js.JSConverters._
     assertJSArrayEquals(js.Array("foo", "bar"), List("foo", "bar").toJSArray)
     assertJSArrayEquals(js.Array(1, 2, 3), Iterator(1, 2, 3).toJSArray)
-    assertJSArrayEquals(js.Array(0.3, 7.3, 8.9), Array(0.3, 7.3, 8.9).toJSArray)
+    assertJSArrayEquals(
+        js.Array(0.3, 7.3, 8.9), Array(0.3, 7.3, 8.9).toJSArray)
     assertJSArrayEquals(js.Array(), None.toJSArray)
     // The following fails on 2.10.x
     //assertJSArrayEquals(js.Array("Hello World"), Some("Hello World").toJSArray)
@@ -95,5 +104,4 @@ object ArrayTest {
   private class VC(val x: Int) extends AnyVal {
     override def toString(): String = s"VC($x)"
   }
-
 }

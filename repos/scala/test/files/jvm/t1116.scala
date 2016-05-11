@@ -17,7 +17,9 @@ object Serialize {
 }
 
 object Foo {
-  def obj_foo(x: Int) = { () => x }
+  def obj_foo(x: Int) = { () =>
+    x
+  }
 }
 
 object Test {

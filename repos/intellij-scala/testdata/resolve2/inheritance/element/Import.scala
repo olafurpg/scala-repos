@@ -23,13 +23,13 @@ class C1 {
 }
 
 class C2 extends C1 {
-  println(/* resolved: false */ f)
-  println(/* resolved: false */ C)
-  println(/* resolved: false */ CC)
-  println(/* resolved: false */ CO)
-  println(/* resolved: false */ T)
-  println(/* resolved: false */ O)
-  println(/* resolved: false */ A)
-  println(/* resolved: false */ v1)
-  println(/* resolved: false */ v2)
+  println( /* resolved: false */ f)
+  println( /* resolved: false */ C)
+  println( /* resolved: false */ CC)
+  println( /* resolved: false */ CO)
+  println( /* resolved: false */ T)
+  println( /* resolved: false */ O)
+  println( /* resolved: false */ A)
+  println( /* resolved: false */ v1)
+  println( /* resolved: false */ v2)
 }

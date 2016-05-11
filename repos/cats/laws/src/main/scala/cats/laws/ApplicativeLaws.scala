@@ -5,8 +5,8 @@ import cats.syntax.apply._
 import cats.syntax.functor._
 
 /**
- * Laws that must be obeyed by any `Applicative`.
- */
+  * Laws that must be obeyed by any `Applicative`.
+  */
 trait ApplicativeLaws[F[_]] extends ApplyLaws[F] {
   implicit override def F: Applicative[F]
 
@@ -23,11 +23,12 @@ trait ApplicativeLaws[F[_]] extends ApplyLaws[F] {
     fa.map(f) <-> F.pure(f).ap(fa)
 
   /**
-   * This law is [[applyComposition]] stated in terms of `pure`. It is a
-   * combination of [[applyComposition]] and [[applicativeMap]] and hence not
-   * strictly necessary.
-   */
-  def applicativeComposition[A, B, C](fa: F[A], fab: F[A => B], fbc: F[B => C]): IsEq[F[C]] = {
+    * This law is [[applyComposition]] stated in terms of `pure`. It is a
+    * combination of [[applyComposition]] and [[applicativeMap]] and hence not
+    * strictly necessary.
+    */
+  def applicativeComposition[A, B, C](
+      fa: F[A], fab: F[A => B], fbc: F[B => C]): IsEq[F[C]] = {
     val compose: (B => C) => (A => B) => (A => C) = _.compose
     F.pure(compose).ap(fbc).ap(fab).ap(fa) <-> fbc.ap(fab.ap(fa))
   }

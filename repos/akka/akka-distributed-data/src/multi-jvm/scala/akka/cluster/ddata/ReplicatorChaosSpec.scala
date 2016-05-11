@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 import scala.concurrent.duration._
@@ -36,15 +36,19 @@ class ReplicatorChaosSpecMultiJvmNode3 extends ReplicatorChaosSpec
 class ReplicatorChaosSpecMultiJvmNode4 extends ReplicatorChaosSpec
 class ReplicatorChaosSpecMultiJvmNode5 extends ReplicatorChaosSpec
 
-class ReplicatorChaosSpec extends MultiNodeSpec(ReplicatorChaosSpec) with STMultiNodeSpec with ImplicitSender {
+class ReplicatorChaosSpec
+    extends MultiNodeSpec(ReplicatorChaosSpec) with STMultiNodeSpec
+    with ImplicitSender {
   import ReplicatorChaosSpec._
   import Replicator._
 
   override def initialParticipants = roles.size
 
   implicit val cluster = Cluster(system)
-  val replicator = system.actorOf(Replicator.props(
-    ReplicatorSettings(system).withRole("backend").withGossipInterval(1.second)), "replicator")
+  val replicator = system.actorOf(Replicator.props(ReplicatorSettings(system)
+                                        .withRole("backend")
+                                        .withGossipInterval(1.second)),
+                                  "replicator")
   val timeout = 3.seconds.dilated
 
   val KeyA = GCounterKey("A")
@@ -67,12 +71,13 @@ class ReplicatorChaosSpec extends MultiNodeSpec(ReplicatorChaosSpec) with STMult
       awaitAssert {
         replicator ! Get(key, ReadLocal)
         val value = expectMsgPF() {
-          case g @ GetSuccess(`key`, _) ⇒ g.dataValue match {
-            case c: GCounter  ⇒ c.value
-            case c: PNCounter ⇒ c.value
-            case c: GSet[_]   ⇒ c.elements
-            case c: ORSet[_]  ⇒ c.elements
-          }
+          case g @ GetSuccess(`key`, _) ⇒
+            g.dataValue match {
+              case c: GCounter ⇒ c.value
+              case c: PNCounter ⇒ c.value
+              case c: GSet[_] ⇒ c.elements
+              case c: ORSet[_] ⇒ c.elements
+            }
         }
         value should be(expected)
       }
@@ -108,7 +113,8 @@ class ReplicatorChaosSpec extends MultiNodeSpec(ReplicatorChaosSpec) with STMult
           replicator ! Update(KeyB, PNCounter(), WriteLocal)(_ - 1)
           replicator ! Update(KeyC, GCounter(), WriteAll(timeout))(_ + 1)
         }
-        receiveN(15).map(_.getClass).toSet should be(Set(classOf[UpdateSuccess[_]]))
+        receiveN(15).map(_.getClass).toSet should be(
+            Set(classOf[UpdateSuccess[_]]))
       }
 
       runOn(second) {
@@ -116,7 +122,8 @@ class ReplicatorChaosSpec extends MultiNodeSpec(ReplicatorChaosSpec) with STMult
         replicator ! Update(KeyB, PNCounter(), WriteTo(2, timeout))(_ + 20)
         replicator ! Update(KeyC, GCounter(), WriteAll(timeout))(_ + 20)
         receiveN(3).toSet should be(Set(UpdateSuccess(KeyA, None),
-          UpdateSuccess(KeyB, None), UpdateSuccess(KeyC, None)))
+                                        UpdateSuccess(KeyB, None),
+                                        UpdateSuccess(KeyC, None)))
 
         replicator ! Update(KeyE, GSet(), WriteLocal)(_ + "e1" + "e2")
         expectMsg(UpdateSuccess(KeyE, None))
@@ -160,8 +167,9 @@ class ReplicatorChaosSpec extends MultiNodeSpec(ReplicatorChaosSpec) with STMult
       val side1 = Seq(first, second)
       val side2 = Seq(third, fourth, fifth)
       runOn(first) {
-        for (a ← side1; b ← side2)
-          testConductor.blackhole(a, b, Direction.Both).await
+        for (a ← side1; b ← side2) testConductor
+          .blackhole(a, b, Direction.Both)
+          .await
       }
       enterBarrier("split")
 
@@ -213,8 +221,9 @@ class ReplicatorChaosSpec extends MultiNodeSpec(ReplicatorChaosSpec) with STMult
       val side1 = Seq(first, second)
       val side2 = Seq(third, fifth) // fourth was shutdown
       runOn(first) {
-        for (a ← side1; b ← side2)
-          testConductor.passThrough(a, b, Direction.Both).await
+        for (a ← side1; b ← side2) testConductor
+          .passThrough(a, b, Direction.Both)
+          .await
       }
       enterBarrier("split-repaired")
 
@@ -229,6 +238,4 @@ class ReplicatorChaosSpec extends MultiNodeSpec(ReplicatorChaosSpec) with STMult
       enterBarrier("after-3")
     }
   }
-
 }
-

@@ -23,9 +23,9 @@ object StreamsStressTest extends App {
       new Thread(new Runnable {
         def run(): Unit = {
           try {
-            for(j <- 1 to repeats) {
+            for (j <- 1 to repeats) {
               run1
-              if(j % 100 == 0) println(s"Thread $i: Stream $j successful")
+              if (j % 100 == 0) println(s"Thread $i: Stream $j successful")
             }
           } catch { case t: Throwable => env.flop(t, t.toString) }
         }
@@ -39,7 +39,8 @@ object StreamsStressTest extends App {
 
   def run1: Unit = {
     val sub = env.newManualSubscriber(createPublisher(1L))
-    sub.requestNextElementOrEndOfStream("Timeout while waiting for next element from Publisher")
+    sub.requestNextElementOrEndOfStream(
+        "Timeout while waiting for next element from Publisher")
     sub.requestEndOfStream()
   }
 
@@ -50,7 +51,11 @@ object StreamsStressTest extends App {
       def * = id
     }
     val data = TableQuery[Data]
-    val a = data.schema.create >> (data ++= Range.apply(0, elements.toInt)) >> data.sortBy(_.id).map(_.id).result
+    val a =
+      data.schema.create >> (data ++= Range.apply(0, elements.toInt)) >> data
+        .sortBy(_.id)
+        .map(_.id)
+        .result
     db.stream(a.withPinnedSession)
   }
 }

@@ -4,7 +4,7 @@ abstract class ParamExtractor {
   def buggedfFunction(filter: Filter) = {
 
     2 match {
-      case filter(a) => /*start*/a/*end*/
+      case filter(a) => /*start*/ a /*end*/
     }
   }
 }

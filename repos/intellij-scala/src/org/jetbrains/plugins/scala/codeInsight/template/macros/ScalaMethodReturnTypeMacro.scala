@@ -9,23 +9,29 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScFunctionType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 /**
- * @author Roman.Shein
- * @since 24.09.2015.
- */
+  * @author Roman.Shein
+  * @since 24.09.2015.
+  */
 class ScalaMethodReturnTypeMacro extends Macro {
-  override def calculateResult(params: Array[Expression], context: ExpressionContext): Result = {
-    Option(PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset, classOf[ScFunction])).
-            map(_.getType(TypingContext.empty).getOrAny match {
-              case ScFunctionType(rt, _) => rt
-              case t => t
-            }).map(new ScalaTypeResult(_)).orNull
+  override def calculateResult(
+      params: Array[Expression], context: ExpressionContext): Result = {
+    Option(PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
+                                       classOf[ScFunction]))
+      .map(_.getType(TypingContext.empty).getOrAny match {
+        case ScFunctionType(rt, _) => rt
+        case t => t
+      })
+      .map(new ScalaTypeResult(_))
+      .orNull
   }
 
   override def getName: String = MacroUtil.scalaIdPrefix + "methodReturnType"
 
-  override def getPresentableName: String = MacroUtil.scalaPresentablePrefix + "methodReturnType()"
+  override def getPresentableName: String =
+    MacroUtil.scalaPresentablePrefix + "methodReturnType()"
 
   override def getDefaultValue = "a"
 
-  override def isAcceptableInContext(context: TemplateContextType): Boolean = context.isInstanceOf[ScalaCodeContextType]
+  override def isAcceptableInContext(context: TemplateContextType): Boolean =
+    context.isInstanceOf[ScalaCodeContextType]
 }

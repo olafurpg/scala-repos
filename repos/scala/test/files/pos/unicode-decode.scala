@@ -5,5 +5,4 @@ object Test {
   val y$ub = 5
   val y$u0A = 6
   val z$up = 2
-
 }

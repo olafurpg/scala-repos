@@ -14,7 +14,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package kafka.server
 
 import java.io._
@@ -36,10 +35,11 @@ class BrokerMetadataCheckpoint(val file: File) extends Logging {
       try {
         val brokerMetaProps = new Properties()
         brokerMetaProps.setProperty("version", 0.toString)
-        brokerMetaProps.setProperty("broker.id", brokerMetadata.brokerId.toString)
+        brokerMetaProps.setProperty(
+            "broker.id", brokerMetadata.brokerId.toString)
         val temp = new File(file.getAbsolutePath + ".tmp")
         val fileOutputStream = new FileOutputStream(temp)
-        brokerMetaProps.store(fileOutputStream,"")
+        brokerMetaProps.store(fileOutputStream, "")
         fileOutputStream.flush()
         fileOutputStream.getFD().sync()
         fileOutputStream.close()
@@ -55,21 +55,28 @@ class BrokerMetadataCheckpoint(val file: File) extends Logging {
   def read(): Option[BrokerMetadata] = {
     lock synchronized {
       try {
-        val brokerMetaProps = new VerifiableProperties(Utils.loadProps(file.getAbsolutePath()))
-        val version = brokerMetaProps.getIntInRange("version", (0, Int.MaxValue))
+        val brokerMetaProps =
+          new VerifiableProperties(Utils.loadProps(file.getAbsolutePath()))
+        val version =
+          brokerMetaProps.getIntInRange("version", (0, Int.MaxValue))
         version match {
           case 0 =>
-            val brokerId = brokerMetaProps.getIntInRange("broker.id", (0, Int.MaxValue))
+            val brokerId =
+              brokerMetaProps.getIntInRange("broker.id", (0, Int.MaxValue))
             return Some(BrokerMetadata(brokerId))
           case _ =>
-            throw new IOException("Unrecognized version of the server meta.properties file: " + version)
+            throw new IOException(
+                "Unrecognized version of the server meta.properties file: " +
+                version)
         }
       } catch {
         case e: FileNotFoundException =>
-          warn("No meta.properties file under dir %s".format(file.getAbsolutePath()))
+          warn("No meta.properties file under dir %s".format(
+                  file.getAbsolutePath()))
           None
         case e1: Exception =>
-          error("Failed to read meta.properties file under dir %s due to %s".format(file.getAbsolutePath(), e1.getMessage))
+          error("Failed to read meta.properties file under dir %s due to %s"
+                .format(file.getAbsolutePath(), e1.getMessage))
           throw e1
       }
     }

@@ -5,6 +5,4 @@ class Example {
   def f2 = "2"
 
   "".size
-
 }
-

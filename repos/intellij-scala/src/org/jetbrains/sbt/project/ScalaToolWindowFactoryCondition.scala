@@ -6,4 +6,5 @@ import com.intellij.openapi.externalSystem.service.settings.AbstractExternalSyst
 /**
   * @author Pavel Fatin
   */
-class ScalaToolWindowFactoryCondition extends AbstractExternalSystemToolWindowCondition(SbtProjectSystem.Id)
+class ScalaToolWindowFactoryCondition
+    extends AbstractExternalSystemToolWindowCondition(SbtProjectSystem.Id)

@@ -1,15 +1,13 @@
 /*     ___ ____ ___   __   ___   ___
-**    / _// __// _ | / /  / _ | / _ \    Scala classfile decoder
-**  __\ \/ /__/ __ |/ /__/ __ |/ ___/    (c) 2003-2010, LAMP/EPFL
-** /____/\___/_/ |_/____/_/ |_/_/        http://scala-lang.org/
-**
-*/
-
+ **    / _// __// _ | / /  / _ | / _ \    Scala classfile decoder
+ **  __\ \/ /__/ __ |/ /__/ __ |/ ___/    (c) 2003-2010, LAMP/EPFL
+ ** /____/\___/_/ |_/____/_/ |_/_/        http://scala-lang.org/
+ **
+ */
 
 package scala.tools.scalap
 
 import java.io._
-
 
 class CodeWriter(writer: Writer) {
 
@@ -31,7 +29,7 @@ class CodeWriter(writer: Writer) {
 
   def getIndentWidth = if (step == null) -1 else step.length()
 
-  def setIndentWidth(width: Int): CodeWriter = 
+  def setIndentWidth(width: Int): CodeWriter =
     setIndentString(List.fill(width)(' ').mkString)
 
   def getIndentString = step;
@@ -52,8 +50,7 @@ class CodeWriter(writer: Writer) {
   }
 
   def newline: CodeWriter = {
-    if (step == null)
-      newspace
+    if (step == null) newspace
     else if (!line) {
       try {
         writer.write(nl)
@@ -64,8 +61,7 @@ class CodeWriter(writer: Writer) {
       align = true
       space = false
       this
-    } else
-      this
+    } else this
   }
 
   def newspace: CodeWriter = {
@@ -111,24 +107,24 @@ class CodeWriter(writer: Writer) {
 
   def print(value: Double): CodeWriter = print(String.valueOf(value))
 
-  def print(value: String): CodeWriter = try {
-    if (align) {
-      var i = 0
-      while (i < level) {
-        writer.write(step)
-        i += 1
+  def print(value: String): CodeWriter =
+    try {
+      if (align) {
+        var i = 0
+        while (i < level) {
+          writer.write(step)
+          i += 1
+        }
       }
+      if (space) writer.write(" ")
+      writer.write(value)
+      align = false
+      space = false
+      line = false
+      this
+    } catch {
+      case e: Throwable => sys.error("IO error")
     }
-    if (space)
-      writer.write(" ")
-    writer.write(value)
-    align = false
-    space = false
-    line = false
-    this
-  } catch {
-    case e: Throwable => sys.error("IO error")
-  }
 
   override def toString(): String = writer.toString()
 }

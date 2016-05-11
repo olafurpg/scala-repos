@@ -25,35 +25,48 @@ trait StringHelper { self: NumberHelper =>
     nl2br(escape(text).take(length)).replace("<br /><br />", "<br />")
   }
 
-  def pluralize(s: String, n: Int) = "%d %s%s".format(n, s, if (n > 1) "s" else "")
+  def pluralize(s: String, n: Int) =
+    "%d %s%s".format(n, s, if (n > 1) "s" else "")
 
-  def autoLink(text: String) = Html { (nl2br _ compose addLinks _ compose escape _)(text) }
+  def autoLink(text: String) = Html {
+    (nl2br _ compose addLinks _ compose escape _)(text)
+  }
 
   // the replace quot; -> " is required
   // to avoid issues caused by addLinks
   // when an url is surrounded by quotes
-  def escape(text: String) = escapeEvenDoubleQuotes(text).replace("&quot;", "\"")
+  def escape(text: String) =
+    escapeEvenDoubleQuotes(text).replace("&quot;", "\"")
   def escapeEvenDoubleQuotes(text: String) = escapeHtml4(text)
 
-  def nl2br(text: String) = text.replace("\r\n", "<br />").replace("\n", "<br />")
+  def nl2br(text: String) =
+    text.replace("\r\n", "<br />").replace("\n", "<br />")
 
   private val markdownLinkRegex = """\[([^\[]+)\]\(([^\)]+)\)""".r
 
   def markdownLinks(text: String) = Html {
     nl2br {
-      markdownLinkRegex.replaceAllIn(escape(text), m => {
-        s"""<a href="${m group 2}">${m group 1}</a>"""
-      })
+      markdownLinkRegex.replaceAllIn(
+          escape(text),
+          m =>
+            {
+              s"""<a href="${m group 2}">${m group 1}</a>"""
+          })
     }
   }
 
-  private val urlRegex = """(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s<>]+|\(([^\s<>]+|(\([^\s<>]+\)))*\))+(?:\(([^\s<>]+|(\([^\s<>]+\)))*\)|[^\s`!\[\]{};:'".,<>?«»“”‘’]))""".r
+  private val urlRegex =
+    """(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s<>]+|\(([^\s<>]+|(\([^\s<>]+\)))*\))+(?:\(([^\s<>]+|(\([^\s<>]+\)))*\)|[^\s`!\[\]{};:'".,<>?«»“”‘’]))""".r
 
-  def addLinks(text: String) = urlRegex.replaceAllIn(text, m => {
-    val url = delocalize(quoteReplacement(m group 1))
-    val target = if (url contains netDomain) "" else " target='blank'"
-    s"""<a$target rel="nofollow" href="${prependHttp(url)}">$url</a>"""
-  })
+  def addLinks(text: String) =
+    urlRegex.replaceAllIn(
+        text,
+        m =>
+          {
+            val url = delocalize(quoteReplacement(m group 1))
+            val target = if (url contains netDomain) "" else " target='blank'"
+            s"""<a$target rel="nofollow" href="${prependHttp(url)}">$url</a>"""
+        })
 
   private def prependHttp(url: String): String =
     url startsWith "http" fold (url, "http://" + url)
@@ -63,7 +76,8 @@ trait StringHelper { self: NumberHelper =>
   def showNumber(n: Int): String = if (n > 0) s"+$n" else n.toString
 
   implicit def lilaRichString(str: String) = new {
-    def active(other: String, one: String = "active") = if (str == other) one else ""
+    def active(other: String, one: String = "active") =
+      if (str == other) one else ""
   }
 
   def when(cond: Boolean, str: String) = cond ?? str
@@ -74,12 +88,17 @@ trait StringHelper { self: NumberHelper =>
   private val NumberLastRegex = """^(.+)\s(\d+)$""".r
   def splitNumber(s: String)(implicit ctx: UserContext): Html = Html {
     s match {
-      case NumberFirstRegex(number, text) => "<strong>%s</strong><br />%s".format((~parseIntOption(number)).localize, text)
-      case NumberLastRegex(text, number)  => "%s<br /><strong>%s</strong>".format(text, (~parseIntOption(number)).localize)
-      case h                              => h.replace("\n", "<br />")
+      case NumberFirstRegex(number, text) =>
+        "<strong>%s</strong><br />%s".format(
+            (~parseIntOption(number)).localize, text)
+      case NumberLastRegex(text, number) =>
+        "%s<br /><strong>%s</strong>".format(
+            text, (~parseIntOption(number)).localize)
+      case h => h.replace("\n", "<br />")
     }
   }
-  def splitNumber(s: Html)(implicit ctx: UserContext): Html = splitNumber(s.body)
+  def splitNumber(s: Html)(implicit ctx: UserContext): Html =
+    splitNumber(s.body)
 
   private def base64encode(str: String) = {
     import java.util.Base64

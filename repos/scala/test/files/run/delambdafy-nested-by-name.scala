@@ -3,7 +3,7 @@
 // so this test covers that case
 object Test {
   def meth1(arg1: => String) = arg1
-  def meth2(arg2: => String) = meth1({println("hello"); arg2})
+  def meth2(arg2: => String) = meth1({ println("hello"); arg2 })
 
   def main(args: Array[String]) {
     println(meth2("world"))

@@ -12,7 +12,7 @@ trait WordSpecStaticStringTest extends ScalaTestTestCase {
 
   def addWordSpec() = {
     addFileToProject(wordSpecFileName,
-      """
+                     """
         |import org.scalatest._
         |
         |class WordSpecStringTest extends WordSpec {
@@ -43,25 +43,42 @@ trait WordSpecStaticStringTest extends ScalaTestTestCase {
   def testWordSpecSum() = {
     addWordSpec()
 
-    assert(checkConfigAndSettings(createTestFromLocation(17, 10, wordSpecFileName), wordSpecClassName, "sum name should test"))
+    assert(
+        checkConfigAndSettings(
+            createTestFromLocation(17, 10, wordSpecFileName),
+            wordSpecClassName,
+            "sum name should test"))
   }
 
   def testWordSpecVal() = {
     addWordSpec()
 
-    assert(checkConfigAndSettings(createTestFromLocation(6, 10, wordSpecFileName), wordSpecClassName, "const should const"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(6, 10, wordSpecFileName),
+                               wordSpecClassName,
+                               "const should const"))
   }
 
   def testWordSpecValSum() = {
     addWordSpec()
 
-    assert(checkConfigAndSettings(createTestFromLocation(14, 10, wordSpecFileName), wordSpecClassName, "sum name should constconst"))
-    assert(checkConfigAndSettings(createTestFromLocation(9, 10, wordSpecFileName), wordSpecClassName, "const should const sum"))
+    assert(
+        checkConfigAndSettings(
+            createTestFromLocation(14, 10, wordSpecFileName),
+            wordSpecClassName,
+            "sum name should constconst"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(9, 10, wordSpecFileName),
+                               wordSpecClassName,
+                               "const should const sum"))
   }
 
   def testWordSpecNonConst() = {
     addWordSpec()
 
-    assert(checkConfigAndSettings(createTestFromLocation(19, 10, wordSpecFileName), wordSpecClassName))
+    assert(
+        checkConfigAndSettings(
+            createTestFromLocation(19, 10, wordSpecFileName),
+            wordSpecClassName))
   }
 }

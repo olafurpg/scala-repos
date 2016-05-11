@@ -6,8 +6,8 @@ package akka.http.scaladsl.marshalling
 
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Accept
-import akka.http.scaladsl.model.{ ContentTypes, MediaRanges }
-import akka.http.scaladsl.server.{ Route, RoutingSpec }
+import akka.http.scaladsl.model.{ContentTypes, MediaRanges}
+import akka.http.scaladsl.server.{Route, RoutingSpec}
 
 class ContentNegotiationGivenResponseCodeSpec extends RoutingSpec {
 
@@ -25,7 +25,8 @@ class ContentNegotiationGivenResponseCodeSpec extends RoutingSpec {
 
   "Return NotAcceptable for" should {
     "200 OK response, when entity not available in Accept-ed MediaRange" in {
-      val request = Post("/200-text").addHeader(Accept(MediaRanges.`application/*`))
+      val request =
+        Post("/200-text").addHeader(Accept(MediaRanges.`application/*`))
 
       request ~> Route.seal(routes) ~> check {
         status should ===(NotAcceptable)
@@ -34,7 +35,8 @@ class ContentNegotiationGivenResponseCodeSpec extends RoutingSpec {
     }
 
     "201 Created response, when entity not available in Accept-ed MediaRange" in {
-      val request = Post("/201-text").addHeader(Accept(MediaRanges.`application/*`))
+      val request =
+        Post("/201-text").addHeader(Accept(MediaRanges.`application/*`))
       request ~> Route.seal(routes) ~> check {
         status should ===(NotAcceptable)
         entityAs[String] should include("text/plain")
@@ -44,7 +46,8 @@ class ContentNegotiationGivenResponseCodeSpec extends RoutingSpec {
 
   "Allow not explicitly Accept-ed content type to be returned if response code is non-2xx" should {
     "400 BadRequest response, when entity not available in Accept-ed MediaRange" in {
-      val request = Post("/400-text").addHeader(Accept(MediaRanges.`application/*`))
+      val request =
+        Post("/400-text").addHeader(Accept(MediaRanges.`application/*`))
       request ~> Route.seal(routes) ~> check {
         status should ===(BadRequest)
         contentType should ===(ContentTypes.`text/plain(UTF-8)`)
@@ -52,5 +55,4 @@ class ContentNegotiationGivenResponseCodeSpec extends RoutingSpec {
       }
     }
   }
-
 }

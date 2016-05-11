@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package net.liftweb 
-package mongodb 
-package record 
-package field 
+package net.liftweb
+package mongodb
+package record
+package field
 
 import net.liftweb.common.{Box, Empty, Failure, Full}
 import net.liftweb.http.js.JE.{JsNull, JsRaw}
@@ -27,21 +27,21 @@ import net.liftweb.json.JsonAST._
 import com.mongodb.DBObject
 
 /**
-* Describes common aspects related to Mongo fields
-*/
+  * Describes common aspects related to Mongo fields
+  */
 trait MongoFieldFlavor[MyType] {
 
   /*
-  * convert this field's value into a DBObject so it can be stored in Mongo.
-  */
+   * convert this field's value into a DBObject so it can be stored in Mongo.
+   */
   def asDBObject: DBObject
 
   // set this field's value using a DBObject returned from Mongo.
   def setFromDBObject(obj: DBObject): Box[MyType]
 
   /**
-  * Returns the field's value as a valid JavaScript expression
-  */
+    * Returns the field's value as a valid JavaScript expression
+    */
   def asJs = asJValue match {
     case JNothing => JsNull
     case jv => JsRaw(compactRender(jv))
@@ -49,6 +49,4 @@ trait MongoFieldFlavor[MyType] {
 
   /** Encode the field value into a JValue */
   def asJValue: JValue
-
 }
-

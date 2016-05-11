@@ -11,7 +11,8 @@ case class Size(value: Int)
 case class SearchResponse(ids: List[String])
 
 object SearchResponse {
-  def apply(txt: String): SearchResponse = SearchResponse(txt.split(',').toList)
+  def apply(txt: String): SearchResponse =
+    SearchResponse(txt.split(',').toList)
 }
 
 case class CountResponse(count: Int)

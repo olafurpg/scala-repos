@@ -1,4 +1,3 @@
-object PublishedIvy
-{
-	val x = 4
+object PublishedIvy {
+  val x = 4
 }

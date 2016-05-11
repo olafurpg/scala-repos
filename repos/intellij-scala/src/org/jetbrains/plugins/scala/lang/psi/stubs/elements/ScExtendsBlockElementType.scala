@@ -12,11 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScExtendsBlockStubImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 class ScExtendsBlockElementType
-extends ScStubElementType[ScExtendsBlockStub, ScExtendsBlock]("extends block") {
+    extends ScStubElementType[ScExtendsBlockStub, ScExtendsBlock](
+        "extends block") {
 
   def serialize(stub: ScExtendsBlockStub, dataStream: StubOutputStream) {
     dataStream.writeInt(stub.getBaseClasses.length)
@@ -29,21 +29,23 @@ extends ScStubElementType[ScExtendsBlockStub, ScExtendsBlock]("extends block") {
     }
   }
 
-  def deserializeImpl(dataStream: StubInputStream, parentStub: Any): ScExtendsBlockStub = {
+  def deserializeImpl(
+      dataStream: StubInputStream, parentStub: Any): ScExtendsBlockStub = {
     val n = dataStream.readInt
     val baseClasses = new Array[StringRef](n)
     for (i <- 0 until n) baseClasses(i) = dataStream.readName
-    new ScExtendsBlockStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]], this, baseClasses)
+    new ScExtendsBlockStubImpl(
+        parentStub.asInstanceOf[StubElement[PsiElement]], this, baseClasses)
   }
 
-  def createStubImpl[ParentPsi <: PsiElement](psi: ScExtendsBlock, parentStub: StubElement[ParentPsi]) = {
+  def createStubImpl[ParentPsi <: PsiElement](
+      psi: ScExtendsBlock, parentStub: StubElement[ParentPsi]) = {
     val baseNames = psi.directSupersNames
     new ScExtendsBlockStubImpl(parentStub, this, baseNames.toArray)
   }
 
-  def createPsi(stub: ScExtendsBlockStub): ScExtendsBlock = new ScExtendsBlockImpl(stub)
+  def createPsi(stub: ScExtendsBlockStub): ScExtendsBlock =
+    new ScExtendsBlockImpl(stub)
 
   override def isLeftBound = true
 }
-
-

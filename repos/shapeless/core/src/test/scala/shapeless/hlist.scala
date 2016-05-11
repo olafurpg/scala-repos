@@ -70,22 +70,23 @@ class HListTests {
   type APc = Apple :+: Pear :+: CNil
   type ABPc = Apple :+: Banana :+: Pear :+: CNil
 
-  val a : Apple = Apple()
-  val p : Pear = Pear()
-  val b : Banana = Banana()
-  val f : Fruit = new Fruit {}
+  val a: Apple = Apple()
+  val p: Pear = Pear()
+  val b: Banana = Banana()
+  val f: Fruit = new Fruit {}
 
-  val ap : AP = a :: p :: HNil
-  val bp : BP = b :: p :: HNil
-  val apap : APAP = a :: p :: a :: p :: HNil
-  val apbp : APBP = a :: p :: b :: p :: HNil
+  val ap: AP = a :: p :: HNil
+  val bp: BP = b :: p :: HNil
+  val apap: APAP = a :: p :: a :: p :: HNil
+  val apbp: APBP = a :: p :: b :: p :: HNil
   val apapList = a :: p :: a :: p :: Nil
   val apbpList = a :: p :: b :: p :: Nil
   val apapArray = Array(a, p, a, p)
   val apbpArray = Array(a, p, b, p)
 
   trait Ctv[-T]
-  type CICSCICICD = Ctv[Int] :: Ctv[String] :: Ctv[Int] :: Ctv[Int] :: Ctv[Double] :: HNil
+  type CICSCICICD = Ctv[Int] :: Ctv[String] :: Ctv[Int] :: Ctv[Int] :: Ctv[
+      Double] :: HNil
 
   val ci: Ctv[Int] = new Ctv[Int] {}
   val cs: Ctv[String] = new Ctv[String] {}
@@ -111,23 +112,29 @@ class HListTests {
   val mimsmimemdArray = Array[M[_]](mi, ms, mi, mExist, md)
   val mimsmimemd: MIMSMIMEMD = mi :: ms :: mi :: mExist :: md :: HNil
 
-  trait M2[A,B]
-  type M2IM2SM2IM2IM2D = M2[Int, Unit] :: M2[String, Unit] :: M2[Int, Unit] :: M2[Int, Unit] :: M2[Double, Unit] :: HNil
+  trait M2[A, B]
+  type M2IM2SM2IM2IM2D = M2[Int, Unit] :: M2[String, Unit] :: M2[Int, Unit] :: M2[
+      Int, Unit] :: M2[Double, Unit] :: HNil
 
   val m2i: M2[Int, Unit] = new M2[Int, Unit] {}
   val m2s: M2[String, Unit] = new M2[String, Unit] {}
   val m2d: M2[Double, Unit] = new M2[Double, Unit] {}
   val m2im2sm2im2im2dList = m2i :: m2s :: m2i :: m2i :: m2d :: Nil
   val m2im2sm2im2im2dArray = Array(m2i, m2s, m2i, m2i, m2d)
-  val m2im2sm2im2im2d: M2IM2SM2IM2IM2D = m2i :: m2s :: m2i :: m2i :: m2d :: HNil
+  val m2im2sm2im2im2d: M2IM2SM2IM2IM2D =
+    m2i :: m2s :: m2i :: m2i :: m2d :: HNil
 
   val m2iExist: M2[Int, _] = new M2[Int, Unit] {}
   val m2sExist: M2[String, _] = new M2[String, Unit] {}
   val m2dExist: M2[Double, _] = new M2[Double, Unit] {}
-  type M2EIM2ESM2EIM2EEM2ED = M2[Int, _] :: M2[String, _] :: M2[Int, _] :: M2[Int, _] :: M2[Double, _] :: HNil
-  val m2eim2esm2eim2eem2edList = m2iExist :: m2sExist :: m2iExist :: m2iExist :: m2dExist :: Nil
-  val m2eim2esm2eim2eem2edArray = Array(m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
-  val m2eim2esm2eim2eem2ed: M2EIM2ESM2EIM2EEM2ED = m2iExist :: m2sExist :: m2iExist :: m2iExist :: m2dExist :: HNil
+  type M2EIM2ESM2EIM2EEM2ED = M2[Int, _] :: M2[String, _] :: M2[Int, _] :: M2[
+      Int, _] :: M2[Double, _] :: HNil
+  val m2eim2esm2eim2eem2edList =
+    m2iExist :: m2sExist :: m2iExist :: m2iExist :: m2dExist :: Nil
+  val m2eim2esm2eim2eem2edArray = Array(
+      m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
+  val m2eim2esm2eim2eem2ed: M2EIM2ESM2EIM2EEM2ED =
+    m2iExist :: m2sExist :: m2iExist :: m2iExist :: m2dExist :: HNil
 
   object mkString extends (Any -> String)(_.toString)
   object fruit extends (Fruit -> Fruit)(f => f)
@@ -176,10 +183,12 @@ class HListTests {
     val l1 = 1 :: "foo" :: 2 :: 3 :: HNil
 
     val l2 = l1 map singleton
-    assertTypedEquals[SISSSISI](Set(1) :: Set("foo") :: Set(2) :: Set(3) :: HNil, l2)
+    assertTypedEquals[SISSSISI](
+        Set(1) :: Set("foo") :: Set(2) :: Set(3) :: HNil, l2)
 
     val l3 = l1 map option
-    assertTypedEquals[OIOSOIOI](Option(1) :: Option("foo") :: Option(2) :: Option(3) :: HNil, l3)
+    assertTypedEquals[OIOSOIOI](
+        Option(1) :: Option("foo") :: Option(2) :: Option(3) :: HNil, l3)
 
     val l4 = Option(1) :: Option("foo") :: Option(2) :: Option(3) :: HNil
 
@@ -199,13 +208,15 @@ class HListTests {
 
     val l8 = 23 :: "foo" :: true :: HNil
     val l9 = l8 map mkString
-    assertTypedEquals[String :: String :: String :: HNil]("23" :: "foo" :: "true" :: HNil, l9)
+    assertTypedEquals[String :: String :: String :: HNil](
+        "23" :: "foo" :: "true" :: HNil, l9)
 
     val l10 = apbp map fruit
     assertTypedEquals[Fruit :: Fruit :: Fruit :: Fruit :: HNil](apbp, l10)
 
     val l11 = apbp map mkString
-    assertTypedEquals[String :: String :: String :: String :: HNil]("Apple()" :: "Pear()" :: "Banana()" :: "Pear()" :: HNil, l11)
+    assertTypedEquals[String :: String :: String :: String :: HNil](
+        "Apple()" :: "Pear()" :: "Banana()" :: "Pear()" :: HNil, l11)
   }
 
   object dup extends Poly1 {
@@ -217,14 +228,17 @@ class HListTests {
     val l1 = 1 :: "foo" :: true :: HNil
 
     val l2 = l1 flatMap dup
-    assertTypedEquals[Int :: Int :: String :: String :: Boolean :: Boolean :: HNil](
-      1 :: 1 :: "foo" :: "foo" :: true :: true :: HNil, l2)
+    assertTypedEquals[
+        Int :: Int :: String :: String :: Boolean :: Boolean :: HNil](
+        1 :: 1 :: "foo" :: "foo" :: true :: true :: HNil, l2)
 
-    val l3 = (1 :: "foo" :: HNil) :: (HNil : HNil) :: (2.0 :: true :: HNil) :: ("bar" :: HNil) :: HNil
+    val l3 =
+      (1 :: "foo" :: HNil) :: (HNil: HNil) :: (2.0 :: true :: HNil) ::
+      ("bar" :: HNil) :: HNil
 
     val l4 = l3 flatMap identity
     assertTypedEquals[Int :: String :: Double :: Boolean :: String :: HNil](
-      1 :: "foo" :: 2.0 :: true :: "bar" :: HNil, l4)
+        1 :: "foo" :: 2.0 :: true :: "bar" :: HNil, l4)
 
     val l5 = 23 :: "foo" :: 7 :: true :: 0 :: HNil
     val l6 = l5 flatMap incInt
@@ -232,13 +246,15 @@ class HListTests {
 
     val l7 = Set(23) :: "foo" :: Set(true) :: 23 :: HNil
     val l8 = l7 flatMap extendedChoose
-    assertTypedEquals[Option[Int] :: Option[Boolean] :: HNil](Option(23) :: Option(true) :: HNil, l8)
+    assertTypedEquals[Option[Int] :: Option[Boolean] :: HNil](
+        Option(23) :: Option(true) :: HNil, l8)
   }
 
   @Test
   def testConformance {
     val l1 = 1 :: "foo" :: 2 :: 3 :: HNil
-    assertTypedEquals[Any :: AnyRef :: Any :: Any :: HNil](1 :: "foo" :: 2 :: 3 :: HNil, l1)
+    assertTypedEquals[Any :: AnyRef :: Any :: Any :: HNil](
+        1 :: "foo" :: 2 :: 3 :: HNil, l1)
 
     val ap = a :: p :: HNil
     typed[AP](ap)
@@ -248,7 +264,7 @@ class HListTests {
     typed[APAP](apap)
     val apbp = a :: p :: b :: p :: HNil
     typed[APBP](apbp)
-    val ffff : FFFF = apap
+    val ffff: FFFF = apap
     typed[FFFF](ffff)
   }
 
@@ -278,7 +294,7 @@ class HListTests {
     typed[Nat._4](apbp.length)
     assertEquals(4, Nat toInt apbp.length)
 
-    val ffff : FFFF = apap
+    val ffff: FFFF = apap
     typed[Nat._4](ffff.length)
     assertEquals(4, Nat toInt ffff.length)
   }
@@ -440,7 +456,8 @@ class HListTests {
     {
       // must compile without requiring an implicit ReversePrepend
       def reversePrependWithHNil[L <: HList](list: L) = HNil reverse_::: list
-      def reversePrependToHNil[L <: HList : Reverse](list: L) = list reverse_::: HNil
+      def reversePrependToHNil[L <: HList : Reverse](list: L) =
+        list reverse_::: HNil
       val r4 = reversePrependWithHNil(ap)
       assertTypedSame[AP](ap, r4)
       val r5 = reversePrependToHNil(ap)
@@ -452,7 +469,7 @@ class HListTests {
 
   @Test
   def testToSizedList {
-    def equalInferredTypes[A,B](a: A, b: B)(implicit eq: A =:= B) {}
+    def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
     val hnil = HNil
     val snil = hnil.toSized[List]
@@ -501,18 +518,20 @@ class HListTests {
     assertEquals(m2im2sm2im2im2dList, sizedM2im2sm2im2im2d.unsized)
 
     val sizedM2eim2esm2eim2eem2ed = m2eim2esm2eim2eem2ed.toSized[List]
-    assertEquals(Nat toInt m2eim2esm2eim2eem2ed.length, sizedM2eim2esm2eim2eem2ed.length)
+    assertEquals(Nat toInt m2eim2esm2eim2eem2ed.length,
+                 sizedM2eim2esm2eim2eem2ed.length)
     // equalInferredTypes(m2eim2esm2eim2eem2edList, sizedM2eim2esm2eim2eem2ed.unsized)
     assertTypedEquals[List[M2[_ >: Double with Int with String, _]]](
-      m2eim2esm2eim2eem2edList, sizedM2eim2esm2eim2eem2ed.unsized)
+        m2eim2esm2eim2eem2edList, sizedM2eim2esm2eim2eem2ed.unsized)
   }
 
   @Test
   def testToSizedArray {
-    def assertArrayEquals2[T](arr1 : Array[T], arr2 : Array[T]) =
-      assertArrayEquals(arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
+    def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
+      assertArrayEquals(
+          arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
 
-    def equalInferredTypes[A,B](a: A, b: B)(implicit eq: A =:= B) {}
+    def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
     val hnil = HNil
     val snil = hnil.toSized[Array]
@@ -556,15 +575,19 @@ class HListTests {
     assertArrayEquals2(m2im2sm2im2im2dArray, sizedM2im2sm2im2im2d.unsized)
 
     val sizedM2eim2esm2eim2eem2ed = m2eim2esm2eim2eem2ed.toSized[Array]
-    assertEquals(Nat toInt m2eim2esm2eim2eem2ed.length, sizedM2eim2esm2eim2eem2ed.length)
+    assertEquals(Nat toInt m2eim2esm2eim2eem2ed.length,
+                 sizedM2eim2esm2eim2eem2ed.length)
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, sizedM2eim2esm2eim2eem2ed.unsized)
-    typed[Array[M2[_ >: Double with Int with String, _]]](sizedM2eim2esm2eim2eem2ed.unsized)
-    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any), sizedM2eim2esm2eim2eem2ed.unsized.map(x => x: Any))
+    typed[Array[M2[_ >: Double with Int with String, _]]](
+        sizedM2eim2esm2eim2eem2ed.unsized)
+    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any),
+                       sizedM2eim2esm2eim2eem2ed.unsized.map(x => x: Any))
   }
 
   @Test
   def testUnifier {
-    def lub[X, Y, L](x : X, y : Y)(implicit lb : Lub[X, Y, L]) : (L, L) = (lb.left(x), lb.right(y))
+    def lub[X, Y, L](x: X, y: Y)(implicit lb: Lub[X, Y, L]): (L, L) =
+      (lb.left(x), lb.right(y))
 
     val u21 = lub(a, a)
     typed[(Apple, Apple)](u21)
@@ -587,8 +610,12 @@ class HListTests {
 
     implicitly[Lub[HNil, HNil, HNil]]
     implicitly[Lub[Apple :: HNil, Apple :: HNil, Apple :: HNil]]
-    implicitly[Lub[Fruit :: Pear :: HNil, Fruit :: Fruit :: HNil, Fruit :: Fruit :: HNil]]
-    implicitly[Lub[Apple :: Pear :: HNil, Pear :: Apple :: HNil, Fruit :: Fruit :: HNil]]
+    implicitly[Lub[Fruit :: Pear :: HNil,
+                   Fruit :: Fruit :: HNil,
+                   Fruit :: Fruit :: HNil]]
+    implicitly[Lub[Apple :: Pear :: HNil,
+                   Pear :: Apple :: HNil,
+                   Fruit :: Fruit :: HNil]]
     implicitly[Lub[ISII, IIII, IYII]]
 
     val u31 = lub(HNil, HNil)
@@ -600,7 +627,9 @@ class HListTests {
     val u34 = lub(a :: p :: HNil, p :: a :: HNil)
     typed[(Fruit :: Fruit :: HNil, Fruit :: Fruit :: HNil)](u34)
     val u35 = lub(1 :: "two" :: 3 :: 4 :: HNil, 1 :: 2 :: 3 :: 4 :: HNil)
-    typed[(Int :: Any :: Int :: Int :: HNil, Int :: Any :: Int :: Int :: HNil)](u35)
+    typed[
+        (Int :: Any :: Int :: Int :: HNil, Int :: Any :: Int :: Int :: HNil)](
+        u35)
 
     implicitly[Unifier.Aux[Apple :: HNil, Apple :: HNil]]
     implicitly[Unifier.Aux[Fruit :: Pear :: HNil, Fruit :: Fruit :: HNil]]
@@ -608,7 +637,8 @@ class HListTests {
 
     implicitly[Unifier.Aux[Int :: String :: Int :: Int :: HNil, YYYY]]
 
-    val uapap = implicitly[Unifier.Aux[Apple :: Pear :: Apple :: Pear :: HNil, FFFF]]
+    val uapap =
+      implicitly[Unifier.Aux[Apple :: Pear :: Apple :: Pear :: HNil, FFFF]]
     val unified1 = uapap(apap)
     typed[FFFF](unified1)
     val unified2 = apap.unify
@@ -621,16 +651,19 @@ class HListTests {
     assertFalse(ununified2.isDefined)
     typed[Option[APBP]](ununified2)
 
-    def getUnifier[L <: HList, Out <: HList](l : L)(implicit u : Unifier.Aux[L, Out]) = u
+    def getUnifier[L <: HList, Out <: HList](l: L)(
+        implicit u: Unifier.Aux[L, Out]) = u
 
     val u2 = getUnifier(a :: HNil)
     typed[Unifier.Aux[Apple :: HNil, Apple :: HNil]](u2)
     val u3 = getUnifier(a :: a :: HNil)
     typed[Unifier.Aux[Apple :: Apple :: HNil, Apple :: Apple :: HNil]](u3)
     val u4 = getUnifier(a :: a :: a :: HNil)
-    typed[Unifier.Aux[Apple :: Apple :: Apple :: HNil, Apple :: Apple :: Apple :: HNil]](u4)
+    typed[Unifier.Aux[Apple :: Apple :: Apple :: HNil,
+                      Apple :: Apple :: Apple :: HNil]](u4)
     val u5 = getUnifier(a :: a :: a :: a :: HNil)
-    typed[Unifier.Aux[Apple :: Apple :: Apple :: Apple :: HNil, Apple :: Apple :: Apple :: Apple :: HNil]](u5)
+    typed[Unifier.Aux[Apple :: Apple :: Apple :: Apple :: HNil,
+                      Apple :: Apple :: Apple :: Apple :: HNil]](u5)
     val u6 = getUnifier(a :: p :: HNil)
     //typed[Unifier.Aux[Apple :: Pear :: HNil, Fruit :: Fruit :: HNil]](u6)
     val u7 = getUnifier(a :: f :: HNil)
@@ -648,7 +681,8 @@ class HListTests {
 
     val invar1 = Set(23) :: Set("foo") :: HNil
     val uinvar1 = invar1.unify
-    typed[Set[_ >: Int with String] :: Set[_ >: Int with String] :: HNil](uinvar1)
+    typed[Set[_ >: Int with String] :: Set[_ >: Int with String] :: HNil](
+        uinvar1)
 
     // Unifying three or more elements which have an invariant outer type constructor and differing type
     // arguments fails, presumably due to a failure to compute a sensible LUB.
@@ -658,12 +692,13 @@ class HListTests {
 
   @Test
   def testSubtypeUnifier {
-    val fruits : Apple :: Pear :: Fruit :: HNil = a :: p :: f :: HNil
+    val fruits: Apple :: Pear :: Fruit :: HNil = a :: p :: f :: HNil
     typed[Fruit :: Fruit :: Fruit :: HNil](fruits.unifySubtypes[Fruit])
     typed[Apple :: Pear :: Fruit :: HNil](fruits.unifySubtypes[Apple])
-    assertEquals(a :: p :: f :: HNil, fruits.unifySubtypes[Fruit].filter[Fruit])
+    assertEquals(
+        a :: p :: f :: HNil, fruits.unifySubtypes[Fruit].filter[Fruit])
 
-    val stuff : Apple :: String :: Pear :: HNil = a :: "foo" :: p :: HNil
+    val stuff: Apple :: String :: Pear :: HNil = a :: "foo" :: p :: HNil
     typed[Fruit :: String :: Fruit :: HNil](stuff.unifySubtypes[Fruit])
     assertEquals(HNil, stuff.filter[Fruit])
     assertEquals(a :: p :: HNil, stuff.unifySubtypes[Fruit].filter[Fruit])
@@ -709,16 +744,17 @@ class HListTests {
     val moreStuff = (a :: "foo" :: p :: HNil).to[List]
     typed[List[Any]](moreStuff)
 
-
-    def equalInferredTypes[A,B](a: A, b: B)(implicit eq: A =:= B) {}
+    def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
     val ctv = cicscicicd.to[List]
     equalInferredTypes(cicscicicdList, ctv)
-    assertTypedEquals[List[Ctv[Int with String with Double]]](cicscicicdList, ctv)
+    assertTypedEquals[List[Ctv[Int with String with Double]]](
+        cicscicicdList, ctv)
 
     val m = mimsmimimd.to[List]
     equalInferredTypes(mimsmimimdList, m)
-    assertTypedEquals[List[M[_ >: Int with String with Double]]](mimsmimimdList, m)
+    assertTypedEquals[List[M[_ >: Int with String with Double]]](
+        mimsmimimdList, m)
 
     val mWithEx = mimsmimemd.to[List]
     //  equalType(mimsmimemdList, mWithEx)
@@ -726,11 +762,13 @@ class HListTests {
 
     val m2 = m2im2sm2im2im2d.to[List]
     equalInferredTypes(m2im2sm2im2im2dList, m2)
-    assertTypedEquals[List[M2[_ >: Int with String with Double, Unit]]](m2im2sm2im2im2dList, m2)
+    assertTypedEquals[List[M2[_ >: Int with String with Double, Unit]]](
+        m2im2sm2im2im2dList, m2)
 
     val m2e = m2eim2esm2eim2eem2ed.to[List]
     // equalType(m2eim2esm2eim2eem2edList, m2e)
-    assertTypedEquals[List[M2[_ >: Int with String with Double, _]]](m2eim2esm2eim2eem2edList, m2e)
+    assertTypedEquals[List[M2[_ >: Int with String with Double, _]]](
+        m2eim2esm2eim2eem2edList, m2e)
   }
 
   @Test
@@ -739,15 +777,26 @@ class HListTests {
     assertTypedEquals[List[CNil]](Nil, r1)
 
     val r2 = ap.toCoproduct[List]
-    assertTypedEquals[List[APc]](List(Coproduct[APc](a), Coproduct[APc](p)), r2)
+    assertTypedEquals[List[APc]](
+        List(Coproduct[APc](a), Coproduct[APc](p)), r2)
 
     val r3 = apap.toCoproduct[List]
-    assertTypedEquals[List[APc]](List(Coproduct[APc](a), Coproduct[APc](p), Coproduct[APc](a), Coproduct[APc](p)), r3)
+    assertTypedEquals[List[APc]](List(Coproduct[APc](a),
+                                      Coproduct[APc](p),
+                                      Coproduct[APc](a),
+                                      Coproduct[APc](p)),
+                                 r3)
 
     val r4 = apbp.toCoproduct[Vector]
-    assertTypedEquals[Vector[ABPc]](Vector[ABPc](Coproduct[ABPc](a), Coproduct[ABPc](p), Coproduct[ABPc](b), Coproduct[ABPc](p)), r4)
+    assertTypedEquals[Vector[ABPc]](Vector[ABPc](Coproduct[ABPc](a),
+                                                 Coproduct[ABPc](p),
+                                                 Coproduct[ABPc](b),
+                                                 Coproduct[ABPc](p)),
+                                    r4)
 
-    def equalInferedCoproducts[A <: Coproduct, B <: Coproduct](a: A, b: B)(implicit bInA: ops.coproduct.Basis[A, B], aInB: ops.coproduct.Basis[B, A]){}
+    def equalInferedCoproducts[A <: Coproduct, B <: Coproduct](a: A, b: B)(
+        implicit bInA: ops.coproduct.Basis[A, B],
+        aInB: ops.coproduct.Basis[B, A]) {}
     val abpc = Coproduct[ABPc](a)
 
     val r5 = (a :: b :: a :: p :: b :: a :: HNil).toCoproduct[Set]
@@ -759,17 +808,15 @@ class HListTests {
     val r7 = (a :: b :: p :: HNil).toCoproduct[Seq]
     equalInferedCoproducts(abpc, r7.head)
 
-
     val r8 = (a :: b :: HNil).toCoproduct[Seq]
 
-    illTyped{
+    illTyped {
       """equalInferedCoproducts(abpc, r8.head)"""
     }
 
-    illTyped{
+    illTyped {
       """(1 :: "foo" :: HNil).toPrecise[Array]"""
     }
-
   }
 
   @Test
@@ -817,16 +864,17 @@ class HListTests {
     val moreStuff = (a :: "foo" :: p :: HNil).toList
     typed[List[Any]](moreStuff)
 
-
-    def equalInferredTypes[A,B](a: A, b: B)(implicit eq: A =:= B) {}
+    def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
     val ctv = cicscicicd.toList
     equalInferredTypes(cicscicicdList, ctv)
-    assertTypedEquals[List[Ctv[Int with String with Double]]](cicscicicdList, ctv)
+    assertTypedEquals[List[Ctv[Int with String with Double]]](
+        cicscicicdList, ctv)
 
     val m = mimsmimimd.toList
     equalInferredTypes(mimsmimimdList, m)
-    assertTypedEquals[List[M[_ >: Int with String with Double]]](mimsmimimdList, m)
+    assertTypedEquals[List[M[_ >: Int with String with Double]]](
+        mimsmimimdList, m)
 
     // With existentials, it gets more tricky
     val mWithEx = mimsmimemd.toList
@@ -838,20 +886,23 @@ class HListTests {
     // Second order higher kinded types are ok...
     val m2 = m2im2sm2im2im2d.toList
     equalInferredTypes(m2im2sm2im2im2dList, m2)
-    assertTypedEquals[List[M2[_ >: Int with String with Double, Unit]]](m2im2sm2im2im2dList, m2)
+    assertTypedEquals[List[M2[_ >: Int with String with Double, Unit]]](
+        m2im2sm2im2im2dList, m2)
 
     // ...as long as existentials are not involved.
     val m2e = m2eim2esm2eim2eem2ed.toList
     // Compiler complains that it
     //    Cannot prove that List[HListTests.this.M2[_ >: Double with Int with Int with String with Int, _ >: _$5 with _$3 with _$3 with _$4 with _$3]] =:= List[HListTests.this.M2[_35,_36] forSome { type _$10; type _$9; type _34 >: _$10 with _$9; type _$8; type _$7; type _32 >: _$8 with _$7; type _35 >: Double with Int with Int with String; type _36 >: _34 with _32 }]
     // equalType(m2eim2esm2eim2eem2edList, m2e)
-    assertTypedEquals[List[M2[_ >: Int with String with Double, _]]](m2eim2esm2eim2eem2edList, m2e)
+    assertTypedEquals[List[M2[_ >: Int with String with Double, _]]](
+        m2eim2esm2eim2eem2edList, m2e)
   }
 
   @Test
   def testToTraversableArray {
-    def assertArrayEquals2[T](arr1 : Array[T], arr2 : Array[T]) =
-      assertArrayEquals(arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
+    def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
+      assertArrayEquals(
+          arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
 
     val empty = HNil.to[Array]
     typed[Array[Nothing]](empty)
@@ -865,12 +916,13 @@ class HListTests {
       implicitly[ToTraversable.Aux[M[Int] :: HNil, Array, M[_]]]
     }
 
-    val fruits1 = apap.to[Array].map(x => x : Fruit) // Default inferred type is too precise
-                                                     // (Product with Serializable with Fruit)
+    val fruits1 =
+      apap.to[Array].map(x => x: Fruit) // Default inferred type is too precise
+    // (Product with Serializable with Fruit)
     typed[Array[Fruit]](fruits1)
     assertArrayEquals2(Array[Fruit](a, p, a, p), fruits1)
 
-    val fruits2 = apbp.to[Array].map(x => x : Fruit)
+    val fruits2 = apbp.to[Array].map(x => x: Fruit)
     typed[Array[Fruit]](fruits2)
     assertArrayEquals2(Array[Fruit](a, p, b, p), fruits2)
 
@@ -895,12 +947,11 @@ class HListTests {
     val ll2 = l7.to[Array]
     typed[Boolean](ll2(0))
 
-    val moreStuff = (a :: "foo" :: p :: HNil).to[Array].map(x => x : AnyRef)
+    val moreStuff = (a :: "foo" :: p :: HNil).to[Array].map(x => x: AnyRef)
     typed[Array[AnyRef]](moreStuff)
     assertArrayEquals2(Array[AnyRef](a, "foo", p), moreStuff)
 
-
-    def equalInferredTypes[A,B](a: A, b: B)(implicit eq: A =:= B) {}
+    def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
     val ctv = cicscicicd.to[Array]
     equalInferredTypes(cicscicicdArray, ctv)
@@ -925,13 +976,15 @@ class HListTests {
     val m2e = m2eim2esm2eim2eem2ed.to[Array]
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
-    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x : Any), m2e.map(x => x : Any))
+    assertArrayEquals2(
+        m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x => x: Any))
   }
 
   @Test
   def testToArray {
-    def assertArrayEquals2[T](arr1 : Array[T], arr2 : Array[T]) =
-      assertArrayEquals(arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
+    def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
+      assertArrayEquals(
+          arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
 
     val empty = HNil.toArray
     typed[Array[Nothing]](empty)
@@ -988,8 +1041,7 @@ class HListTests {
     typed[Array[AnyRef]](moreStuff)
     assertArrayEquals2(Array[AnyRef](a, "foo", p), moreStuff)
 
-
-    def equalInferredTypes[A,B](a: A, b: B)(implicit eq: A =:= B) {}
+    def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
     val ctv = cicscicicd.toArray
     equalInferredTypes(cicscicicdArray, ctv)
@@ -1014,16 +1066,19 @@ class HListTests {
     val m2e = m2eim2esm2eim2eem2ed.toArray
     // equalInferredTypes(m2eim2esm2eim2eem2edArray, m2e)
     typed[Array[M2[_ >: Int with String with Double, _]]](m2e)
-    assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x : Any), m2e.map(x => x : Any))
+    assertArrayEquals2(
+        m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x => x: Any))
   }
 
   @Test
   def testFoldMap {
     implicitly[Mapper.Aux[isDefined.type, HNil, HNil]]
-    implicitly[Mapper.Aux[isDefined.type, Option[Int] :: HNil, Boolean :: HNil]]
+    implicitly[
+        Mapper.Aux[isDefined.type, Option[Int] :: HNil, Boolean :: HNil]]
 
     val tl1 = Option(1) :: Option("foo") :: Option(2) :: Option(3) :: HNil
-    val tl2 = Option(1) :: Option("foo") :: (None : Option[Int]) :: Option(3) :: HNil
+    val tl2 =
+      Option(1) :: Option("foo") :: (None: Option[Int]) :: Option(3) :: HNil
 
     val mlfl1 = (tl1 map isDefined).toList.foldLeft(true)(_ && _)
     assertTrue(mlfl1)
@@ -1063,9 +1118,7 @@ class HListTests {
     assertTypedEquals[Long](5L, at6)
 
     val sn2 =
-      0 :: 1 :: 2 :: 3 :: 4 :: 5 :: 6 :: 7 :: 8 :: 9 ::
-      10 :: 11 :: 12 :: 13 :: 14 :: 15 :: 16 :: 17 :: 18 :: 19 ::
-      20 :: 21 :: 22 :: HNil
+      0 :: 1 :: 2 :: 3 :: 4 :: 5 :: 6 :: 7 :: 8 :: 9 :: 10 :: 11 :: 12 :: 13 :: 14 :: 15 :: 16 :: 17 :: 18 :: 19 :: 20 :: 21 :: 22 :: HNil
 
     val at22 = sn2(_22)
     assertTypedEquals[Int](22, at22)
@@ -1098,9 +1151,7 @@ class HListTests {
     assertTypedEquals[Long](5L, at6)
 
     val sn2 =
-      0 :: 1 :: 2 :: 3 :: 4 :: 5 :: 6 :: 7 :: 8 :: 9 ::
-      10 :: 11 :: 12 :: 13 :: 14 :: 15 :: 16 :: 17 :: 18 :: 19 ::
-      20 :: 21 :: 22 :: HNil
+      0 :: 1 :: 2 :: 3 :: 4 :: 5 :: 6 :: 7 :: 8 :: 9 :: 10 :: 11 :: 12 :: 13 :: 14 :: 15 :: 16 :: 17 :: 18 :: 19 :: 20 :: 21 :: 22 :: HNil
 
     val at22 = sn2(22)
     assertTypedEquals[Int](22, at22)
@@ -1114,19 +1165,21 @@ class HListTests {
     assertTypedEquals[HNil](HNil, r1)
 
     val r2 = sn1.drop(_0)
-    assertTypedEquals[Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil](
-      23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil, r2)
+    assertTypedEquals[
+        Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil](
+        23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil, r2)
 
     val r3 = sn1.take(_2)
     assertTypedEquals[Int :: Double :: HNil](23 :: 3.0 :: HNil, r3)
 
     val r4 = sn1.drop(_2)
     assertTypedEquals[String :: Unit :: String :: Boolean :: Long :: HNil](
-      "foo" :: () :: "bar" :: true :: 5L :: HNil, r4)
+        "foo" :: () :: "bar" :: true :: 5L :: HNil, r4)
 
     val r5 = sn1.take(_7)
-    assertTypedEquals[Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil](
-      23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil, r5)
+    assertTypedEquals[
+        Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil](
+        23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil, r5)
 
     val r6 = sn1.drop(_7)
     assertTypedEquals[HNil](HNil, r6)
@@ -1140,19 +1193,21 @@ class HListTests {
     assertTypedEquals[HNil](HNil, r1)
 
     val r2 = sn1.drop(0)
-    assertTypedEquals[Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil](
-      23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil, r2)
+    assertTypedEquals[
+        Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil](
+        23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil, r2)
 
     val r3 = sn1.take(2)
     assertTypedEquals[Int :: Double :: HNil](23 :: 3.0 :: HNil, r3)
 
     val r4 = sn1.drop(2)
     assertTypedEquals[String :: Unit :: String :: Boolean :: Long :: HNil](
-      "foo" :: () :: "bar" :: true :: 5L :: HNil, r4)
+        "foo" :: () :: "bar" :: true :: 5L :: HNil, r4)
 
     val r5 = sn1.take(7)
-    assertTypedEquals[Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil](
-      23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil, r5)
+    assertTypedEquals[
+        Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil](
+        23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil, r5)
 
     val r6 = sn1.drop(7)
     assertTypedEquals[HNil](HNil, r6)
@@ -1163,38 +1218,70 @@ class HListTests {
     val sn1 = 23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil
 
     val sni0 = sn1.split(_0)
-    typed[(HNil, (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](sni0)
+    typed[
+        (HNil, (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](
+        sni0)
     val sni1 = sn1.split(_1)
-    typed[((Int :: HNil), (Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](sni1)
+    typed[
+        ((Int :: HNil), (Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](
+        sni1)
     val sni2 = sn1.split(_2)
-    typed[((Int :: Double :: HNil), (String :: Unit :: String :: Boolean :: Long :: HNil))](sni2)
+    typed[
+        ((Int :: Double :: HNil), (String :: Unit :: String :: Boolean :: Long :: HNil))](
+        sni2)
     val sni3 = sn1.split(_3)
-    typed[((Int :: Double :: String :: HNil), (Unit :: String :: Boolean :: Long :: HNil))](sni3)
+    typed[
+        ((Int :: Double :: String :: HNil), (Unit :: String :: Boolean :: Long :: HNil))](
+        sni3)
     val sni4 = sn1.split(_4)
-    typed[((Int :: Double :: String :: Unit :: HNil), (String :: Boolean :: Long :: HNil))](sni4)
+    typed[
+        ((Int :: Double :: String :: Unit :: HNil), (String :: Boolean :: Long :: HNil))](
+        sni4)
     val sni5 = sn1.split(_5)
-    typed[((Int :: Double :: String :: Unit :: String :: HNil), (Boolean :: Long :: HNil))](sni5)
+    typed[
+        ((Int :: Double :: String :: Unit :: String :: HNil), (Boolean :: Long :: HNil))](
+        sni5)
     val sni6 = sn1.split(_6)
-    typed[((Int :: Double :: String :: Unit :: String :: Boolean :: HNil), (Long :: HNil))](sni6)
+    typed[
+        ((Int :: Double :: String :: Unit :: String :: Boolean :: HNil), (Long :: HNil))](
+        sni6)
     val sni7 = sn1.split(_7)
-    typed[((Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil), HNil)](sni7)
+    typed[
+        ((Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil), HNil)](
+        sni7)
 
     val snri0 = sn1.reverse_split(_0)
-    typed[(HNil, (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](snri0)
+    typed[
+        (HNil, (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](
+        snri0)
     val snri1 = sn1.reverse_split(_1)
-    typed[((Int :: HNil), (Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](snri1)
+    typed[
+        ((Int :: HNil), (Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](
+        snri1)
     val snri2 = sn1.reverse_split(_2)
-    typed[((Double :: Int :: HNil), (String :: Unit :: String :: Boolean :: Long :: HNil))](snri2)
+    typed[
+        ((Double :: Int :: HNil), (String :: Unit :: String :: Boolean :: Long :: HNil))](
+        snri2)
     val snri3 = sn1.reverse_split(_3)
-    typed[((String :: Double :: Int :: HNil), (Unit :: String :: Boolean :: Long :: HNil))](snri3)
+    typed[
+        ((String :: Double :: Int :: HNil), (Unit :: String :: Boolean :: Long :: HNil))](
+        snri3)
     val snri4 = sn1.reverse_split(_4)
-    typed[((Unit :: String :: Double :: Int :: HNil), (String :: Boolean :: Long :: HNil))](snri4)
+    typed[
+        ((Unit :: String :: Double :: Int :: HNil), (String :: Boolean :: Long :: HNil))](
+        snri4)
     val snri5 = sn1.reverse_split(_5)
-    typed[((String :: Unit :: String :: Double :: Int :: HNil), (Boolean :: Long :: HNil))](snri5)
+    typed[
+        ((String :: Unit :: String :: Double :: Int :: HNil), (Boolean :: Long :: HNil))](
+        snri5)
     val snri6 = sn1.reverse_split(_6)
-    typed[((Boolean :: String :: Unit :: String :: Double :: Int :: HNil), (Long :: HNil))](snri6)
+    typed[
+        ((Boolean :: String :: Unit :: String :: Double :: Int :: HNil), (Long :: HNil))](
+        snri6)
     val snri7 = sn1.reverse_split(_7)
-    typed[((Long :: Boolean :: String :: Unit :: String :: Double :: Int :: HNil), HNil)](snri7)
+    typed[
+        ((Long :: Boolean :: String :: Unit :: String :: Double :: Int :: HNil), HNil)](
+        snri7)
   }
 
   @Test
@@ -1202,38 +1289,70 @@ class HListTests {
     val sn1 = 23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil
 
     val sni0 = sn1.split(0)
-    typed[(HNil, (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](sni0)
+    typed[
+        (HNil, (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](
+        sni0)
     val sni1 = sn1.split(1)
-    typed[((Int :: HNil), (Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](sni1)
+    typed[
+        ((Int :: HNil), (Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](
+        sni1)
     val sni2 = sn1.split(2)
-    typed[((Int :: Double :: HNil), (String :: Unit :: String :: Boolean :: Long :: HNil))](sni2)
+    typed[
+        ((Int :: Double :: HNil), (String :: Unit :: String :: Boolean :: Long :: HNil))](
+        sni2)
     val sni3 = sn1.split(3)
-    typed[((Int :: Double :: String :: HNil), (Unit :: String :: Boolean :: Long :: HNil))](sni3)
+    typed[
+        ((Int :: Double :: String :: HNil), (Unit :: String :: Boolean :: Long :: HNil))](
+        sni3)
     val sni4 = sn1.split(4)
-    typed[((Int :: Double :: String :: Unit :: HNil), (String :: Boolean :: Long :: HNil))](sni4)
+    typed[
+        ((Int :: Double :: String :: Unit :: HNil), (String :: Boolean :: Long :: HNil))](
+        sni4)
     val sni5 = sn1.split(5)
-    typed[((Int :: Double :: String :: Unit :: String :: HNil), (Boolean :: Long :: HNil))](sni5)
+    typed[
+        ((Int :: Double :: String :: Unit :: String :: HNil), (Boolean :: Long :: HNil))](
+        sni5)
     val sni6 = sn1.split(6)
-    typed[((Int :: Double :: String :: Unit :: String :: Boolean :: HNil), (Long :: HNil))](sni6)
+    typed[
+        ((Int :: Double :: String :: Unit :: String :: Boolean :: HNil), (Long :: HNil))](
+        sni6)
     val sni7 = sn1.split(7)
-    typed[((Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil), HNil)](sni7)
+    typed[
+        ((Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil), HNil)](
+        sni7)
 
     val snri0 = sn1.reverse_split(0)
-    typed[(HNil, (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](snri0)
+    typed[
+        (HNil, (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](
+        snri0)
     val snri1 = sn1.reverse_split(1)
-    typed[((Int :: HNil), (Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](snri1)
+    typed[
+        ((Int :: HNil), (Double :: String :: Unit :: String :: Boolean :: Long :: HNil))](
+        snri1)
     val snri2 = sn1.reverse_split(2)
-    typed[((Double :: Int :: HNil), (String :: Unit :: String :: Boolean :: Long :: HNil))](snri2)
+    typed[
+        ((Double :: Int :: HNil), (String :: Unit :: String :: Boolean :: Long :: HNil))](
+        snri2)
     val snri3 = sn1.reverse_split(3)
-    typed[((String :: Double :: Int :: HNil), (Unit :: String :: Boolean :: Long :: HNil))](snri3)
+    typed[
+        ((String :: Double :: Int :: HNil), (Unit :: String :: Boolean :: Long :: HNil))](
+        snri3)
     val snri4 = sn1.reverse_split(4)
-    typed[((Unit :: String :: Double :: Int :: HNil), (String :: Boolean :: Long :: HNil))](snri4)
+    typed[
+        ((Unit :: String :: Double :: Int :: HNil), (String :: Boolean :: Long :: HNil))](
+        snri4)
     val snri5 = sn1.reverse_split(5)
-    typed[((String :: Unit :: String :: Double :: Int :: HNil), (Boolean :: Long :: HNil))](snri5)
+    typed[
+        ((String :: Unit :: String :: Double :: Int :: HNil), (Boolean :: Long :: HNil))](
+        snri5)
     val snri6 = sn1.reverse_split(6)
-    typed[((Boolean :: String :: Unit :: String :: Double :: Int :: HNil), (Long :: HNil))](snri6)
+    typed[
+        ((Boolean :: String :: Unit :: String :: Double :: Int :: HNil), (Long :: HNil))](
+        snri6)
     val snri7 = sn1.reverse_split(7)
-    typed[((Long :: Boolean :: String :: Unit :: String :: Double :: Int :: HNil), HNil)](snri7)
+    typed[
+        ((Long :: Boolean :: String :: Unit :: String :: Double :: Int :: HNil), HNil)](
+        snri7)
   }
 
   @Test
@@ -1241,38 +1360,70 @@ class HListTests {
     val sn1 = 23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil
 
     val sni0 = sn1.splitP(_0)
-    typed[(HNil) :: (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](sni0)
+    typed[
+        (HNil) :: (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        sni0)
     val sni1 = sn1.splitP(_1)
-    typed[(Int :: HNil) :: (Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](sni1)
+    typed[
+        (Int :: HNil) :: (Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        sni1)
     val sni2 = sn1.splitP(_2)
-    typed[(Int :: Double :: HNil) :: (String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](sni2)
+    typed[
+        (Int :: Double :: HNil) :: (String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        sni2)
     val sni3 = sn1.splitP(_3)
-    typed[(Int :: Double :: String :: HNil) :: (Unit :: String :: Boolean :: Long :: HNil) :: HNil](sni3)
+    typed[
+        (Int :: Double :: String :: HNil) :: (Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        sni3)
     val sni4 = sn1.splitP(_4)
-    typed[(Int :: Double :: String :: Unit :: HNil) :: (String :: Boolean :: Long :: HNil) :: HNil](sni4)
+    typed[
+        (Int :: Double :: String :: Unit :: HNil) :: (String :: Boolean :: Long :: HNil) :: HNil](
+        sni4)
     val sni5 = sn1.splitP(_5)
-    typed[(Int :: Double :: String :: Unit :: String :: HNil) :: (Boolean :: Long :: HNil) :: HNil](sni5)
+    typed[
+        (Int :: Double :: String :: Unit :: String :: HNil) :: (Boolean :: Long :: HNil) :: HNil](
+        sni5)
     val sni6 = sn1.splitP(_6)
-    typed[(Int :: Double :: String :: Unit :: String :: Boolean :: HNil) :: (Long :: HNil) :: HNil](sni6)
+    typed[
+        (Int :: Double :: String :: Unit :: String :: Boolean :: HNil) :: (Long :: HNil) :: HNil](
+        sni6)
     val sni7 = sn1.splitP(_7)
-    typed[(Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: (HNil) :: HNil](sni7)
+    typed[
+        (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: (HNil) :: HNil](
+        sni7)
 
     val snri0 = sn1.reverse_splitP(_0)
-    typed[(HNil) :: (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](snri0)
+    typed[
+        (HNil) :: (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        snri0)
     val snri1 = sn1.reverse_splitP(_1)
-    typed[(Int :: HNil) :: (Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](snri1)
+    typed[
+        (Int :: HNil) :: (Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        snri1)
     val snri2 = sn1.reverse_splitP(_2)
-    typed[(Double :: Int :: HNil) :: (String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](snri2)
+    typed[
+        (Double :: Int :: HNil) :: (String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        snri2)
     val snri3 = sn1.reverse_splitP(_3)
-    typed[(String :: Double :: Int :: HNil) :: (Unit :: String :: Boolean :: Long :: HNil) :: HNil](snri3)
+    typed[
+        (String :: Double :: Int :: HNil) :: (Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        snri3)
     val snri4 = sn1.reverse_splitP(_4)
-    typed[(Unit :: String :: Double :: Int :: HNil) :: (String :: Boolean :: Long :: HNil) :: HNil](snri4)
+    typed[
+        (Unit :: String :: Double :: Int :: HNil) :: (String :: Boolean :: Long :: HNil) :: HNil](
+        snri4)
     val snri5 = sn1.reverse_splitP(_5)
-    typed[(String :: Unit :: String :: Double :: Int :: HNil) :: (Boolean :: Long :: HNil) :: HNil](snri5)
+    typed[
+        (String :: Unit :: String :: Double :: Int :: HNil) :: (Boolean :: Long :: HNil) :: HNil](
+        snri5)
     val snri6 = sn1.reverse_splitP(_6)
-    typed[(Boolean :: String :: Unit :: String :: Double :: Int :: HNil) :: (Long :: HNil) :: HNil](snri6)
+    typed[
+        (Boolean :: String :: Unit :: String :: Double :: Int :: HNil) :: (Long :: HNil) :: HNil](
+        snri6)
     val snri7 = sn1.reverse_splitP(_7)
-    typed[(Long :: Boolean :: String :: Unit :: String :: Double :: Int :: HNil) :: (HNil) :: HNil](snri7)
+    typed[
+        (Long :: Boolean :: String :: Unit :: String :: Double :: Int :: HNil) :: (HNil) :: HNil](
+        snri7)
   }
 
   @Test
@@ -1280,38 +1431,70 @@ class HListTests {
     val sn1 = 23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil
 
     val sni0 = sn1.splitP(0)
-    typed[(HNil) :: (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](sni0)
+    typed[
+        (HNil) :: (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        sni0)
     val sni1 = sn1.splitP(1)
-    typed[(Int :: HNil) :: (Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](sni1)
+    typed[
+        (Int :: HNil) :: (Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        sni1)
     val sni2 = sn1.splitP(2)
-    typed[(Int :: Double :: HNil) :: (String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](sni2)
+    typed[
+        (Int :: Double :: HNil) :: (String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        sni2)
     val sni3 = sn1.splitP(3)
-    typed[(Int :: Double :: String :: HNil) :: (Unit :: String :: Boolean :: Long :: HNil) :: HNil](sni3)
+    typed[
+        (Int :: Double :: String :: HNil) :: (Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        sni3)
     val sni4 = sn1.splitP(4)
-    typed[(Int :: Double :: String :: Unit :: HNil) :: (String :: Boolean :: Long :: HNil) :: HNil](sni4)
+    typed[
+        (Int :: Double :: String :: Unit :: HNil) :: (String :: Boolean :: Long :: HNil) :: HNil](
+        sni4)
     val sni5 = sn1.splitP(5)
-    typed[(Int :: Double :: String :: Unit :: String :: HNil) :: (Boolean :: Long :: HNil) :: HNil](sni5)
+    typed[
+        (Int :: Double :: String :: Unit :: String :: HNil) :: (Boolean :: Long :: HNil) :: HNil](
+        sni5)
     val sni6 = sn1.splitP(6)
-    typed[(Int :: Double :: String :: Unit :: String :: Boolean :: HNil) :: (Long :: HNil) :: HNil](sni6)
+    typed[
+        (Int :: Double :: String :: Unit :: String :: Boolean :: HNil) :: (Long :: HNil) :: HNil](
+        sni6)
     val sni7 = sn1.splitP(7)
-    typed[(Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: (HNil) :: HNil](sni7)
+    typed[
+        (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: (HNil) :: HNil](
+        sni7)
 
     val snri0 = sn1.reverse_splitP(0)
-    typed[(HNil) :: (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](snri0)
+    typed[
+        (HNil) :: (Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        snri0)
     val snri1 = sn1.reverse_splitP(1)
-    typed[(Int :: HNil) :: (Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](snri1)
+    typed[
+        (Int :: HNil) :: (Double :: String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        snri1)
     val snri2 = sn1.reverse_splitP(2)
-    typed[(Double :: Int :: HNil) :: (String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](snri2)
+    typed[
+        (Double :: Int :: HNil) :: (String :: Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        snri2)
     val snri3 = sn1.reverse_splitP(3)
-    typed[(String :: Double :: Int :: HNil) :: (Unit :: String :: Boolean :: Long :: HNil) :: HNil](snri3)
+    typed[
+        (String :: Double :: Int :: HNil) :: (Unit :: String :: Boolean :: Long :: HNil) :: HNil](
+        snri3)
     val snri4 = sn1.reverse_splitP(4)
-    typed[(Unit :: String :: Double :: Int :: HNil) :: (String :: Boolean :: Long :: HNil) :: HNil](snri4)
+    typed[
+        (Unit :: String :: Double :: Int :: HNil) :: (String :: Boolean :: Long :: HNil) :: HNil](
+        snri4)
     val snri5 = sn1.reverse_splitP(5)
-    typed[(String :: Unit :: String :: Double :: Int :: HNil) :: (Boolean :: Long :: HNil) :: HNil](snri5)
+    typed[
+        (String :: Unit :: String :: Double :: Int :: HNil) :: (Boolean :: Long :: HNil) :: HNil](
+        snri5)
     val snri6 = sn1.reverse_splitP(6)
-    typed[(Boolean :: String :: Unit :: String :: Double :: Int :: HNil) :: (Long :: HNil) :: HNil](snri6)
+    typed[
+        (Boolean :: String :: Unit :: String :: Double :: Int :: HNil) :: (Long :: HNil) :: HNil](
+        snri6)
     val snri7 = sn1.reverse_splitP(7)
-    typed[(Long :: Boolean :: String :: Unit :: String :: Double :: Int :: HNil) :: (HNil) :: HNil](snri7)
+    typed[
+        (Long :: Boolean :: String :: Unit :: String :: Double :: Int :: HNil) :: (HNil) :: HNil](
+        snri7)
   }
 
   @Test
@@ -1336,54 +1519,56 @@ class HListTests {
     val si1 = si.selectManyType[HNil]
     assertTypedEquals[HNil](HNil, si1)
 
-    val si2 = si.selectManyType[_0::HNil]
-    assertTypedEquals[Int::HNil](1::HNil, si2)
+    val si2 = si.selectManyType[_0 :: HNil]
+    assertTypedEquals[Int :: HNil](1 :: HNil, si2)
 
-    val si3 = si.selectManyType[_2::HNil]
-    assertTypedEquals[String::HNil]("foo"::HNil, si3)
+    val si3 = si.selectManyType[_2 :: HNil]
+    assertTypedEquals[String :: HNil]("foo" :: HNil, si3)
 
-    val si4 = si.selectManyType[_0::_1::_2::_3::HNil]
-    assertTypedEquals[Int::Boolean::String::Double::HNil](1 :: true :: "foo" :: 2.0 :: HNil, si4)
+    val si4 = si.selectManyType[_0 :: _1 :: _2 :: _3 :: HNil]
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: true :: "foo" :: 2.0 :: HNil, si4)
 
     val si5 = si.selectMany(0)
-    assertTypedEquals[Int::HNil](1::HNil, si5)
+    assertTypedEquals[Int :: HNil](1 :: HNil, si5)
 
     val si6 = si.selectMany(2)
-    assertTypedEquals[String::HNil]("foo"::HNil, si6)
+    assertTypedEquals[String :: HNil]("foo" :: HNil, si6)
 
-    val si7 = si.selectMany(0,1,2,3)
-    assertTypedEquals[Int::Boolean::String::Double::HNil](1 :: true :: "foo" :: 2.0 :: HNil, si7)
-
+    val si7 = si.selectMany(0, 1, 2, 3)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: true :: "foo" :: 2.0 :: HNil, si7)
   }
   @Test
   def testSelectRange: Unit = {
     val sl = 1 :: true :: "foo" :: 2.0 :: HNil
 
-    val sl1  = sl.selectRange[_0,_0]
-    val sl1i = sl.selectRange(0,0)
+    val sl1 = sl.selectRange[_0, _0]
+    val sl1i = sl.selectRange(0, 0)
     assertTypedEquals[HNil](HNil, sl1)
     assertTypedEquals[HNil](HNil, sl1i)
 
-    val sl2  = sl.selectRange[_1,_1]
-    val sl2i = sl.selectRange(1,1)
+    val sl2 = sl.selectRange[_1, _1]
+    val sl2i = sl.selectRange(1, 1)
     assertTypedEquals[HNil](HNil, sl2)
     assertTypedEquals[HNil](HNil, sl2i)
 
-    val sl3 = sl.selectRange[_0,_2]
-    val sl3i = sl.selectRange(0,2)
-    assertTypedEquals[Int::Boolean::HNil](1::true::HNil, sl3)
-    assertTypedEquals[Int::Boolean::HNil](1::true::HNil, sl3i)
+    val sl3 = sl.selectRange[_0, _2]
+    val sl3i = sl.selectRange(0, 2)
+    assertTypedEquals[Int :: Boolean :: HNil](1 :: true :: HNil, sl3)
+    assertTypedEquals[Int :: Boolean :: HNil](1 :: true :: HNil, sl3i)
 
-    val sl4 = sl.selectRange[_2,_4]
-    val sl4i = sl.selectRange(2,4)
-    assertTypedEquals[String::Double::HNil]("foo"::2.0::HNil, sl4)
-    assertTypedEquals[String::Double::HNil]("foo"::2.0::HNil, sl4i)
+    val sl4 = sl.selectRange[_2, _4]
+    val sl4i = sl.selectRange(2, 4)
+    assertTypedEquals[String :: Double :: HNil]("foo" :: 2.0 :: HNil, sl4)
+    assertTypedEquals[String :: Double :: HNil]("foo" :: 2.0 :: HNil, sl4i)
 
-    val sl5 = sl.selectRange[_0,_4]
-    val sl5i = sl.selectRange(0,4)
-    assertTypedEquals[Int::Boolean::String::Double::HNil](1 :: true :: "foo" :: 2.0 :: HNil, sl5)
-    assertTypedEquals[Int::Boolean::String::Double::HNil](1 :: true :: "foo" :: 2.0 :: HNil, sl5i)
-
+    val sl5 = sl.selectRange[_0, _4]
+    val sl5i = sl.selectRange(0, 4)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: true :: "foo" :: 2.0 :: HNil, sl5)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: true :: "foo" :: 2.0 :: HNil, sl5i)
   }
 
   @Test
@@ -1407,7 +1592,8 @@ class HListTests {
 
     val l2 = 1 :: true :: "foo" :: 2 :: HNil
     val f2 = l2.filterNot[String]
-    assertTypedEquals[Int :: Boolean :: Int :: HNil](1 :: true :: 2 :: HNil, f2)
+    assertTypedEquals[Int :: Boolean :: Int :: HNil](
+        1 :: true :: 2 :: HNil, f2)
 
     typed[HNil](l2.filter[Double])
   }
@@ -1421,14 +1607,18 @@ class HListTests {
     assertTypedEquals[(Int :: Int :: HNil, HNil)]((1 :: 2 :: HNil, HNil), r1)
 
     val r2 = l1.partitionP[Int]
-    assertTypedEquals[(Int :: Int :: HNil) :: HNil :: HNil]((1 :: 2 :: HNil) :: HNil :: HNil, r2)
+    assertTypedEquals[(Int :: Int :: HNil) :: HNil :: HNil](
+        (1 :: 2 :: HNil) :: HNil :: HNil, r2)
 
     val r3 = l2.partition[Int]
-    assertTypedEquals[(Int :: Int :: HNil, Boolean :: String :: HNil)]((1 :: 2 :: HNil, true :: "foo" :: HNil), r3)
+    assertTypedEquals[(Int :: Int :: HNil, Boolean :: String :: HNil)](
+        (1 :: 2 :: HNil, true :: "foo" :: HNil), r3)
 
     val r4 = l2.partitionP[Int]
-    assertTypedEquals[(Int :: Int :: HNil) :: (Boolean :: String :: HNil) :: HNil](
-      (1 :: 2 :: HNil) :: (true :: "foo" :: HNil) :: HNil, r4
+    assertTypedEquals[
+        (Int :: Int :: HNil) :: (Boolean :: String :: HNil) :: HNil](
+        (1 :: 2 :: HNil) :: (true :: "foo" :: HNil) :: HNil,
+        r4
     )
   }
 
@@ -1438,41 +1628,49 @@ class HListTests {
 
     val (i, r1) = sl.replace(23)
     assertTypedEquals[Int](1, i)
-    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](23 :: true :: "foo" :: 2.0 :: HNil, r1)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        23 :: true :: "foo" :: 2.0 :: HNil, r1)
 
     val (b, r2) = sl.replace(false)
     assertTypedEquals[Boolean](true, b)
-    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](1 :: false :: "foo" :: 2.0 :: HNil, r2)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: false :: "foo" :: 2.0 :: HNil, r2)
 
     val (s, r3) = sl.replace("bar")
     assertTypedEquals[String]("foo", s)
-    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](1 :: true :: "bar" :: 2.0 :: HNil, r3)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: true :: "bar" :: 2.0 :: HNil, r3)
 
     val (d, r4) = sl.replace(3.0)
     typed[Double](d)
     assertEquals(2.0, d, Double.MinPositiveValue)
-    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](1 :: true :: "foo" :: 3.0 :: HNil, r4)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: true :: "foo" :: 3.0 :: HNil, r4)
 
     val (i2, r5) = sl.replaceType[Int]('*')
     typed[Char](r5(0))
     assertTypedEquals[Int](1, i2)
-    assertTypedEquals[Char :: Boolean :: String :: Double :: HNil]('*' :: true :: "foo" :: 2.0 :: HNil, r5)
+    assertTypedEquals[Char :: Boolean :: String :: Double :: HNil](
+        '*' :: true :: "foo" :: 2.0 :: HNil, r5)
 
     val (b2, r6) = sl.replaceType[Boolean]('*')
     typed[Char](r6(1))
     assertTypedEquals[Boolean](true, b2)
-    assertTypedEquals[Int :: Char :: String :: Double :: HNil](1 :: '*' :: "foo" :: 2.0 :: HNil, r6)
+    assertTypedEquals[Int :: Char :: String :: Double :: HNil](
+        1 :: '*' :: "foo" :: 2.0 :: HNil, r6)
 
     val (s2, r7) = sl.replaceType[String]('*')
     typed[Char](r7(2))
     assertTypedEquals[String]("foo", s2)
-    assertTypedEquals[Int :: Boolean :: Char :: Double :: HNil](1 :: true :: '*' :: 2.0 :: HNil, r7)
+    assertTypedEquals[Int :: Boolean :: Char :: Double :: HNil](
+        1 :: true :: '*' :: 2.0 :: HNil, r7)
 
     val (d2, r8) = sl.replaceType[Double]('*')
     typed[Double](d2)
     typed[Char](r8(3))
     assertEquals(2.0, d2, Double.MinPositiveValue)
-    assertTypedEquals[Int :: Boolean :: String :: Char :: HNil](1 :: true :: "foo" :: '*' :: HNil, r8)
+    assertTypedEquals[Int :: Boolean :: String :: Char :: HNil](
+        1 :: true :: "foo" :: '*' :: HNil, r8)
 
     val fruits = a :: p :: a :: f :: HNil
     val (x1, rr1) = fruits.replaceType[Pear](a)
@@ -1514,40 +1712,51 @@ class HListTests {
     assertTypedEquals[SL](1 :: true :: "foo" :: 3.0 :: HNil, r4)
 
     val r5 = sl.updatedType[Int]('*')
-    assertTypedEquals[Char :: Boolean :: String :: Double :: HNil]('*' :: true :: "foo" :: 2.0 :: HNil, r5)
+    assertTypedEquals[Char :: Boolean :: String :: Double :: HNil](
+        '*' :: true :: "foo" :: 2.0 :: HNil, r5)
 
     val r6 = sl.updatedType[Boolean]('*')
-    assertTypedEquals[Int :: Char :: String :: Double :: HNil](1 :: '*' :: "foo" :: 2.0 :: HNil, r6)
+    assertTypedEquals[Int :: Char :: String :: Double :: HNil](
+        1 :: '*' :: "foo" :: 2.0 :: HNil, r6)
 
     val r7 = sl.updatedType[String]('*')
-    assertTypedEquals[Int :: Boolean :: Char :: Double :: HNil](1 :: true :: '*' :: 2.0 :: HNil, r7)
+    assertTypedEquals[Int :: Boolean :: Char :: Double :: HNil](
+        1 :: true :: '*' :: 2.0 :: HNil, r7)
 
     val r8 = sl.updatedType[Double]('*')
     assertTypedEquals(1 :: true :: "foo" :: '*' :: HNil, r8)
 
-    val r9 = sl.updateWith((i : Int) => i * 2)
-    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](2 :: true :: "foo" :: 2.0 :: HNil, r9)
+    val r9 = sl.updateWith((i: Int) => i * 2)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        2 :: true :: "foo" :: 2.0 :: HNil, r9)
 
-    val r10 = sl.updateWith((b : Boolean) => !b)
-    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](1 :: false :: "foo" :: 2.0 :: HNil, r10)
+    val r10 = sl.updateWith((b: Boolean) => !b)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: false :: "foo" :: 2.0 :: HNil, r10)
 
-    val r11 = sl.updateWith((s : String) => s.toUpperCase)
-    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](1 :: true :: "FOO" :: 2.0 :: HNil, r11)
+    val r11 = sl.updateWith((s: String) => s.toUpperCase)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: true :: "FOO" :: 2.0 :: HNil, r11)
 
-    val r12 = sl.updateWith((d : Double) => d / 2.0)
-    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](1 :: true :: "foo" :: 1.0 :: HNil, r12)
+    val r12 = sl.updateWith((d: Double) => d / 2.0)
+    assertTypedEquals[Int :: Boolean :: String :: Double :: HNil](
+        1 :: true :: "foo" :: 1.0 :: HNil, r12)
 
-    val r13 = sl.updateWith((i : Int) => i.toString)
-    assertTypedEquals[String :: Boolean :: String :: Double :: HNil]("1" :: true :: "foo" :: 2.0 :: HNil, r13)
+    val r13 = sl.updateWith((i: Int) => i.toString)
+    assertTypedEquals[String :: Boolean :: String :: Double :: HNil](
+        "1" :: true :: "foo" :: 2.0 :: HNil, r13)
 
-    val r14 = sl.updateWith((b : Boolean) => b.toString)
-    assertTypedEquals[Int :: String :: String :: Double :: HNil](1 :: "true" :: "foo" :: 2.0 :: HNil, r14)
+    val r14 = sl.updateWith((b: Boolean) => b.toString)
+    assertTypedEquals[Int :: String :: String :: Double :: HNil](
+        1 :: "true" :: "foo" :: 2.0 :: HNil, r14)
 
-    val r15 = sl.updateWith((_ : String) => 0xF00)
-    assertTypedEquals[Int :: Boolean :: Int :: Double :: HNil](1 :: true :: 0xF00 :: 2.0 :: HNil, r15)
+    val r15 = sl.updateWith((_: String) => 0xF00)
+    assertTypedEquals[Int :: Boolean :: Int :: Double :: HNil](
+        1 :: true :: 0xF00 :: 2.0 :: HNil, r15)
 
-    val r16 = sl.updateWith((d : Double) => d.toString)
-    assertTypedEquals[Int :: Boolean :: String :: String :: HNil](1 :: true :: "foo" :: 2.0.toString :: HNil, r16)
+    val r16 = sl.updateWith((d: Double) => d.toString)
+    assertTypedEquals[Int :: Boolean :: String :: String :: HNil](
+        1 :: true :: "foo" :: 2.0.toString :: HNil, r16)
 
     val fruits = a :: p :: a :: f :: HNil
 
@@ -1569,9 +1778,9 @@ class HListTests {
 
   @Test
   def testSplitLeft {
-    type SL  = Int :: Boolean :: String :: Double :: HNil
+    type SL = Int :: Boolean :: String :: Double :: HNil
     type SL2 = Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil
-    val sl: SL   = 1 :: true :: "foo" :: 2.0 :: HNil
+    val sl: SL = 1 :: true :: "foo" :: 2.0 :: HNil
     val sl2: SL2 = 23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil
 
     val (sp1, sp2) = sl.splitLeft[String]
@@ -1597,9 +1806,9 @@ class HListTests {
 
   @Test
   def testSplitLeftP {
-    type SL  = Int :: Boolean :: String :: Double :: HNil
+    type SL = Int :: Boolean :: String :: Double :: HNil
     type SL2 = Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil
-    val sl: SL   = 1 :: true :: "foo" :: 2.0 :: HNil
+    val sl: SL = 1 :: true :: "foo" :: 2.0 :: HNil
     val sl2: SL2 = 23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil
 
     val sp1 :: sp2 :: HNil = sl.splitLeftP[String]
@@ -1625,9 +1834,9 @@ class HListTests {
 
   @Test
   def testSplitRight {
-    type SL  = Int :: Boolean :: String :: Double :: HNil
+    type SL = Int :: Boolean :: String :: Double :: HNil
     type SL2 = Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil
-    val sl: SL   = 1 :: true :: "foo" :: 2.0 :: HNil
+    val sl: SL = 1 :: true :: "foo" :: 2.0 :: HNil
     val sl2: SL2 = 23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil
 
     val (srp1, srp2) = sl.splitRight[String]
@@ -1653,9 +1862,9 @@ class HListTests {
 
   @Test
   def testSplitRightP {
-    type SL  = Int :: Boolean :: String :: Double :: HNil
+    type SL = Int :: Boolean :: String :: Double :: HNil
     type SL2 = Int :: Double :: String :: Unit :: String :: Boolean :: Long :: HNil
-    val sl: SL   = 1 :: true :: "foo" :: 2.0 :: HNil
+    val sl: SL = 1 :: true :: "foo" :: 2.0 :: HNil
     val sl2: SL2 = 23 :: 3.0 :: "foo" :: () :: "bar" :: true :: 5L :: HNil
 
     val srp1 :: srp2 :: HNil = sl.splitRightP[String]
@@ -1685,40 +1894,41 @@ class HListTests {
     val l2 = ("a" :: HNil) :: HNil
 
     val r1 = l1.zipOne(l2)
-    assertTypedEquals[(Int :: String :: HNil) :: HNil]((1 :: "a" :: HNil) :: HNil, r1)
+    assertTypedEquals[(Int :: String :: HNil) :: HNil](
+        (1 :: "a" :: HNil) :: HNil, r1)
     val r2 = l1.mapConst(HNil)
     assertTypedEquals[HNil :: HNil](HNil :: HNil, r2)
     val r3 = (l1 :: HNil).transpose
     assertTypedEquals[(Int :: HNil) :: HNil]((1 :: HNil) :: HNil, r3)
 
     val l3 = 1 :: 2 :: 3 :: HNil
-    val l4 = ("a" :: 1.0 :: HNil) :: ("b" :: 2.0 :: HNil) :: ("c" :: 3.0 :: HNil) :: HNil
+    val l4 =
+      ("a" :: 1.0 :: HNil) :: ("b" :: 2.0 :: HNil) :: ("c" :: 3.0 :: HNil) :: HNil
 
     type ISD = Int :: String :: Double :: HNil
     val z2 = l3.zipOne(l4)
     assertTypedEquals[ISD :: ISD :: ISD :: HNil](
-      (1 :: "a" :: 1.0 :: HNil) :: (2 :: "b" :: 2.0 :: HNil) :: (3 :: "c" :: 3.0 :: HNil) :: HNil, z2
+        (1 :: "a" :: 1.0 :: HNil) :: (2 :: "b" :: 2.0 :: HNil) ::
+        (3 :: "c" :: 3.0 :: HNil) :: HNil,
+        z2
     )
 
     val r5 = l3.mapConst(HNil)
-    assertTypedEquals[HNil :: HNil :: HNil :: HNil](HNil :: HNil :: HNil :: HNil, r5)
+    assertTypedEquals[HNil :: HNil :: HNil :: HNil](
+        HNil :: HNil :: HNil :: HNil, r5)
 
     val t2 = l4.transpose
     assertTypedEquals[
-      (String :: String :: String :: HNil) ::
-      (Double :: Double :: Double :: HNil) :: HNil
+        (String :: String :: String :: HNil) :: (Double :: Double :: Double :: HNil) :: HNil
     ](("a" :: "b" :: "c" :: HNil) :: (1.0 :: 2.0 :: 3.0 :: HNil) :: HNil, t2)
 
     val t3 = z2.transpose
     assertTypedEquals[
-      (Int :: Int :: Int :: HNil) ::
-      (String :: String :: String :: HNil) ::
-      (Double :: Double :: Double :: HNil) :: HNil
+        (Int :: Int :: Int :: HNil) :: (String :: String :: String :: HNil) :: (Double :: Double :: Double :: HNil) :: HNil
     ](
-      (1 :: 2 :: 3 :: HNil) ::
-      ("a" :: "b" :: "c" :: HNil) ::
-      (1.0 :: 2.0 :: 3.0 :: HNil) :: HNil,
-      t3
+        (1 :: 2 :: 3 :: HNil) :: ("a" :: "b" :: "c" :: HNil) ::
+        (1.0 :: 2.0 :: 3.0 :: HNil) :: HNil,
+        t3
     )
 
     val r8 = t3.transpose
@@ -1732,48 +1942,53 @@ class HListTests {
 
     val t1 = (l1 :: l2 :: HNil).transpose
     val z1 = t1.map(tupled)
-    assertTypedEquals[(Int, Int) :: (String, String) :: (Double, Double) :: HNil](
-      (1, 2) :: ("a", "b") :: (1.0, 2.0) :: HNil, z1)
+    assertTypedEquals[
+        (Int, Int) :: (String, String) :: (Double, Double) :: HNil](
+        (1, 2) :: ("a", "b") :: (1.0, 2.0) :: HNil, z1)
 
-    def zip[L <: HList, OutT <: HList](l : L)
-      (implicit
-        transposer : Transposer.Aux[L, OutT],
-        mapper : Mapper[tupled.type, OutT]) = l.transpose.map(tupled)
+    def zip[L <: HList, OutT <: HList](l: L)(
+        implicit transposer: Transposer.Aux[L, OutT],
+        mapper: Mapper[tupled.type, OutT]) = l.transpose.map(tupled)
 
     val z2 = zip(l1 :: l2 :: HNil)
-    assertTypedEquals[(Int, Int) :: (String, String) :: (Double, Double) :: HNil](
-      (1, 2) :: ("a", "b") :: (1.0, 2.0) :: HNil, z2)
+    assertTypedEquals[
+        (Int, Int) :: (String, String) :: (Double, Double) :: HNil](
+        (1, 2) :: ("a", "b") :: (1.0, 2.0) :: HNil, z2)
 
     val z3 = (l1 :: l2 :: HNil).zip
-    assertTypedEquals[(Int, Int) :: (String, String) :: (Double, Double) :: HNil](
-      (1, 2) :: ("a", "b") :: (1.0, 2.0) :: HNil, z3)
+    assertTypedEquals[
+        (Int, Int) :: (String, String) :: (Double, Double) :: HNil](
+        (1, 2) :: ("a", "b") :: (1.0, 2.0) :: HNil, z3)
 
     val t2 = z1.map(productElements).transpose
     val u1 = t2.tupled
-    assertTypedEquals[(Int :: String :: Double :: HNil, Int :: String :: Double :: HNil)](
-      (1 :: "a" :: 1.0 :: HNil, 2 :: "b" :: 2.0 :: HNil), u1)
+    assertTypedEquals[
+        (Int :: String :: Double :: HNil, Int :: String :: Double :: HNil)](
+        (1 :: "a" :: 1.0 :: HNil, 2 :: "b" :: 2.0 :: HNil), u1)
 
-    def unzip[L <: HList, OutM <: HList, OutT <: HList](l : L)
-      (implicit
-        mapper : Mapper.Aux[productElements.type, L, OutM],
-        transposer : Transposer.Aux[OutM, OutT],
-        tupler : Tupler[OutT]) = l.map(productElements).transpose.tupled
+    def unzip[L <: HList, OutM <: HList, OutT <: HList](l: L)(
+        implicit mapper: Mapper.Aux[productElements.type, L, OutM],
+        transposer: Transposer.Aux[OutM, OutT],
+        tupler: Tupler[OutT]) = l.map(productElements).transpose.tupled
 
     val u2 = unzip(z1)
-    assertTypedEquals[(Int :: String :: Double :: HNil, Int :: String :: Double :: HNil)](
-      (1 :: "a" :: 1.0 :: HNil, 2 :: "b" :: 2.0 :: HNil), u2)
+    assertTypedEquals[
+        (Int :: String :: Double :: HNil, Int :: String :: Double :: HNil)](
+        (1 :: "a" :: 1.0 :: HNil, 2 :: "b" :: 2.0 :: HNil), u2)
 
     val r1 = z1.unzip
-    assertTypedEquals[(Int :: String :: Double :: HNil, Int :: String :: Double :: HNil)](
-      (1 :: "a" :: 1.0 :: HNil, 2 :: "b" :: 2.0 :: HNil), r1)
+    assertTypedEquals[
+        (Int :: String :: Double :: HNil, Int :: String :: Double :: HNil)](
+        (1 :: "a" :: 1.0 :: HNil, 2 :: "b" :: 2.0 :: HNil), r1)
 
     val r2 = l1 zip l2
-    assertTypedEquals[(Int, Int) :: (String, String) :: (Double, Double) :: HNil](
-      (1, 2) :: ("a", "b") :: (1.0, 2.0) :: HNil, r2)
+    assertTypedEquals[
+        (Int, Int) :: (String, String) :: (Double, Double) :: HNil](
+        (1, 2) :: ("a", "b") :: (1.0, 2.0) :: HNil, r2)
 
-    val intInc : Int => Int = _+1
-    val stringInc : String => String = _+"*"
-    val doubleInc : Double => Int = _.toInt+1
+    val intInc: Int => Int = _ + 1
+    val stringInc: String => String = _ + "*"
+    val doubleInc: Double => Int = _.toInt + 1
 
     val l3 = intInc :: stringInc :: doubleInc :: HNil
 
@@ -1793,8 +2008,8 @@ class HListTests {
     assertTypedEquals[Int](1, is._1)
     assertTypedEquals[String]("foo", is._2)
 
-    val is2 = (l : Any) match {
-      case (i : Int) :: true :: (s : String) :: 2.0 :: HNil => (i, s)
+    val is2 = (l: Any) match {
+      case (i: Int) :: true :: (s: String) :: 2.0 :: HNil => (i, s)
       case _ => sys.error("Not matched")
     }
 
@@ -1809,10 +2024,11 @@ class HListTests {
     }
 
     assertTypedEquals[String]("foo", tl._1)
-    assertTypedEquals[Unit :: String :: Boolean :: Long :: HNil](() :: "bar" :: true :: 5L :: HNil, tl._2)
+    assertTypedEquals[Unit :: String :: Boolean :: Long :: HNil](
+        () :: "bar" :: true :: 5L :: HNil, tl._2)
 
-    val tl2 = (l2 : Any) match {
-      case 23 #: 3.0 #: (s : String) #: xs => (s, xs)
+    val tl2 = (l2: Any) match {
+      case 23 #: 3.0 #: (s: String) #: xs => (s, xs)
       case _ => sys.error("Not matched")
     }
 
@@ -1833,7 +2049,8 @@ class HListTests {
     }
     assertTypedEquals[List[Int]](List(2, 3, 4), tll2)
 
-    val mixed = 23 :: "foo" :: (1 :: 2 :: 3 :: 4 :: 5 :: Nil) :: false :: () :: HNil
+    val mixed =
+      23 :: "foo" :: (1 :: 2 :: 3 :: 4 :: 5 :: Nil) :: false :: () :: HNil
     val tmixed = mixed match {
       case _ #: _ #: (_ :: 2 :: x :: tl1) #: tl2 => (x, tl1, tl2)
       case _ => sys.error("Not matched")
@@ -1848,17 +2065,22 @@ class HListTests {
     val l = 1 :: true :: "foo" :: HNil
 
     val li = l.removeElem[Int]
-    assertTypedEquals[(Int, Boolean :: String :: HNil)]((1, true :: "foo" :: HNil), li)
+    assertTypedEquals[(Int, Boolean :: String :: HNil)](
+        (1, true :: "foo" :: HNil), li)
 
     val lb = l.removeElem[Boolean]
-    assertTypedEquals[(Boolean, Int :: String :: HNil)]((true, 1 :: "foo" :: HNil), lb)
+    assertTypedEquals[(Boolean, Int :: String :: HNil)](
+        (true, 1 :: "foo" :: HNil), lb)
 
     val ls = l.removeElem[String]
-    assertTypedEquals[(String, Int :: Boolean :: HNil)](("foo", 1 :: true :: HNil), ls)
+    assertTypedEquals[(String, Int :: Boolean :: HNil)](
+        ("foo", 1 :: true :: HNil), ls)
 
     val withDuplicates = 1 :: 'a' :: 'b' :: HNil
-    val remover = implicitly[Remove.Aux[Int :: Char :: Char :: HNil, Char, (Char, Int :: Char :: HNil)]]
-    assertTypedEquals[(Char, Int :: Char :: HNil)](('a', 1 :: 'b' :: HNil), remover(withDuplicates))
+    val remover = implicitly[Remove.Aux[
+            Int :: Char :: Char :: HNil, Char, (Char, Int :: Char :: HNil)]]
+    assertTypedEquals[(Char, Int :: Char :: HNil)](
+        ('a', 1 :: 'b' :: HNil), remover(withDuplicates))
   }
 
   @Test
@@ -1866,16 +2088,20 @@ class HListTests {
     val l = 1 :: true :: "foo" :: HNil
 
     val lnil = l.removeAll[HNil]
-    assertTypedEquals[(HNil, Int :: Boolean :: String :: HNil)]((HNil, 1 :: true :: "foo" :: HNil), lnil)
+    assertTypedEquals[(HNil, Int :: Boolean :: String :: HNil)](
+        (HNil, 1 :: true :: "foo" :: HNil), lnil)
 
     val li = l.removeAll[Int :: HNil]
-    assertTypedEquals[(Int :: HNil, Boolean :: String :: HNil)]((1 :: HNil, true :: "foo" :: HNil), li)
+    assertTypedEquals[(Int :: HNil, Boolean :: String :: HNil)](
+        (1 :: HNil, true :: "foo" :: HNil), li)
 
     val lb = l.removeAll[Boolean :: HNil]
-    assertTypedEquals[(Boolean :: HNil, Int :: String :: HNil)]((true :: HNil, 1 :: "foo" :: HNil), lb)
+    assertTypedEquals[(Boolean :: HNil, Int :: String :: HNil)](
+        (true :: HNil, 1 :: "foo" :: HNil), lb)
 
     val lbi = l.removeAll[Boolean :: Int :: HNil]
-    assertTypedEquals[(Boolean :: Int :: HNil, String :: HNil)]((true :: 1 :: HNil, "foo" :: HNil), lbi)
+    assertTypedEquals[(Boolean :: Int :: HNil, String :: HNil)](
+        (true :: 1 :: HNil, "foo" :: HNil), lbi)
   }
 
   @Test
@@ -1899,13 +2125,16 @@ class HListTests {
     assertTypedEquals[L1](l1, lself)
 
     val l12 = l1.union(l2)
-    assertTypedEquals[String :: Long :: Int :: Boolean :: HNil]("foo" :: 3L :: 2 :: true :: HNil, l12)
+    assertTypedEquals[String :: Long :: Int :: Boolean :: HNil](
+        "foo" :: 3L :: 2 :: true :: HNil, l12)
 
     val l21 = l2.union(l1)
-    assertTypedEquals[Int :: String :: Boolean :: Long :: HNil](2 :: "bar" :: true :: 3L :: HNil, l21)
+    assertTypedEquals[Int :: String :: Boolean :: Long :: HNil](
+        2 :: "bar" :: true :: 3L :: HNil, l21)
 
-
-    illTyped { """implicitly[Union.Aux[Int :: HNil, Int :: HNil, Int :: Int :: HNil]]"""}
+    illTyped {
+      """implicitly[Union.Aux[Int :: HNil, Int :: HNil, Int :: Int :: HNil]]"""
+    }
 
     val ldup1 = (l3).union(l4)
     assertTypedEquals[Int :: Int :: Int :: HNil](1 :: 2 :: 6 :: HNil, ldup1)
@@ -1937,7 +2166,9 @@ class HListTests {
     val l21 = l2.intersect[L1]
     assertTypedEquals[Int :: String :: HNil](2 :: "bar" :: HNil, l21)
 
-    illTyped { """implicitly[Intersection.Aux[Int :: HNil, Int :: HNil, HNil]]"""}
+    illTyped {
+      """implicitly[Intersection.Aux[Int :: HNil, Int :: HNil, HNil]]"""
+    }
 
     val ldup1 = (l3).intersect[Int :: HNil]
     assertTypedEquals[Int :: HNil](4 :: HNil, ldup1)
@@ -2018,8 +2249,9 @@ class HListTests {
   }
 
   object combine extends Poly {
-    implicit def caseCharString = use((c : Char, s : String) => s.indexOf(c))
-    implicit def caseIntBoolean = use((i : Int, b : Boolean) => if ((i >= 0) == b) "pass" else "fail")
+    implicit def caseCharString = use((c: Char, s: String) => s.indexOf(c))
+    implicit def caseIntBoolean =
+      use((i: Int, b: Boolean) => if ((i >= 0) == b) "pass" else "fail")
   }
 
   @Test
@@ -2030,11 +2262,13 @@ class HListTests {
 
     implicitly[LeftFolder.Aux[HNil, String, combine.type, String]]
     implicitly[LeftFolder.Aux[Boolean :: HNil, Int, combine.type, String]]
-    implicitly[LeftFolder.Aux[String :: Boolean :: HNil, Char, combine.type, String]]
+    implicitly[
+        LeftFolder.Aux[String :: Boolean :: HNil, Char, combine.type, String]]
 
     val tf1 = implicitly[LeftFolder[HNil, String, combine.type]]
     val tf2 = implicitly[LeftFolder[Boolean :: HNil, Int, combine.type]]
-    val tf3 = implicitly[LeftFolder[String :: Boolean :: HNil, Char, combine.type]]
+    val tf3 =
+      implicitly[LeftFolder[String :: Boolean :: HNil, Char, combine.type]]
 
     val l1 = "foo" :: true :: HNil
     val f1 = l1.foldLeft('o')(combine)
@@ -2055,13 +2289,13 @@ class HListTests {
     val l = 1 :: true :: "foo" :: HNil
 
     val r1 = l.updatedAt[_0](2)
-    assertTypedEquals[IBS](2 ::  true :: "foo" :: HNil, r1)
+    assertTypedEquals[IBS](2 :: true :: "foo" :: HNil, r1)
 
     val r2 = l.updatedAt[_1](false)
     assertTypedEquals[IBS](1 :: false :: "foo" :: HNil, r2)
 
     val r3 = l.updatedAt[_2]("bar")
-    assertTypedEquals[IBS](1 ::  true :: "bar" :: HNil, r3)
+    assertTypedEquals[IBS](1 :: true :: "bar" :: HNil, r3)
   }
 
   @Test
@@ -2070,13 +2304,13 @@ class HListTests {
     val l = 1 :: true :: "foo" :: HNil
 
     val r1 = l.updatedAt(0, 2)
-    assertTypedEquals[IBS](2 ::  true :: "foo" :: HNil, r1)
+    assertTypedEquals[IBS](2 :: true :: "foo" :: HNil, r1)
 
     val r2 = l.updatedAt(1, false)
     assertTypedEquals[IBS](1 :: false :: "foo" :: HNil, r2)
 
     val r3 = l.updatedAt(2, "bar")
-    assertTypedEquals[IBS](1 ::  true :: "bar" :: HNil, r3)
+    assertTypedEquals[IBS](1 :: true :: "bar" :: HNil, r3)
   }
 
   @Test
@@ -2103,7 +2337,8 @@ class HListTests {
 
   @Test
   def testNatTRelMap {
-    type L1 = Option[Int] :: Option[Boolean] :: Option[String] :: Option[Nothing] :: HNil
+    type L1 = Option[Int] :: Option[Boolean] :: Option[String] :: Option[
+        Nothing] :: HNil
     type L2 = List[Int] :: List[Boolean] :: List[String] :: List[Nothing] :: HNil
     val nattrel = implicitly[NatTRel[L1, Option, L2, List]]
 
@@ -2111,7 +2346,8 @@ class HListTests {
     val l2 = nattrel.map(optionToList, l1)
 
     assertTypedEquals[L2](l2,
-      List(1, 1, 1) :: List(true, true, true) :: List("three", "three", "three") :: List() :: HNil)
+                          List(1, 1, 1) :: List(true, true, true) :: List(
+                              "three", "three", "three") :: List() :: HNil)
   }
 
   @Test
@@ -2160,21 +2396,24 @@ class HListTests {
     val r4 = (1 :: HNil).zipWith(2 :: HNil)(add)
     assertTypedEquals[Int :: HNil](3 :: HNil, r4)
 
-    { // longList zipWith longerList
-      type Left  = Int :: String :: Double :: HNil
+    {
+      // longList zipWith longerList
+      type Left = Int :: String :: Double :: HNil
       type Right = Int :: Double :: String :: Boolean :: HNil
 
-      val left: Left   = 1 :: "foo" :: 1.2 :: HNil
+      val left: Left = 1 :: "foo" :: 1.2 :: HNil
       val right: Right = 2 :: 2.3 :: "3.4" :: true :: HNil
 
       object zipFn extends Poly2 {
-        implicit val caseIntInt       = at[Int, Int](_ + _)
-        implicit val caseStringDouble = at[String, Double](_ + " -> " + _.toString)
+        implicit val caseIntInt = at[Int, Int](_ + _)
+        implicit val caseStringDouble =
+          at[String, Double](_ + " -> " + _.toString)
         implicit val caseDoubleString = at[Double, String](_ + _.toDouble)
       }
 
       val r5 = left.zipWith(right)(zipFn)
-      assertTypedEquals[Int :: String :: Double :: HNil](3 :: "foo -> 2.3" :: 4.6 :: HNil, r5)
+      assertTypedEquals[Int :: String :: Double :: HNil](
+          3 :: "foo -> 2.3" :: 4.6 :: HNil, r5)
     }
 
     def testZipWithIndex: Unit = {
@@ -2184,16 +2423,18 @@ class HListTests {
       assertTypedEquals[HNil](HNil, r1)
 
       // One element HList zipWithIndex
-      val r2 = (0::HNil).zipWithIndex
-      assertTypedEquals[(Int,_0)::HNil]((0,_0)::HNil, r2)
+      val r2 = (0 :: HNil).zipWithIndex
+      assertTypedEquals[(Int, _0) :: HNil]((0, _0) :: HNil, r2)
 
       // HList zipWithIndex
-      val r3 = (0::1::2::3::HNil).zipWithIndex
-      assertTypedEquals[(Int,_0)::(Int,_1)::(Int,_2)::(Int,_3)::HNil]((0,_0)::(1,_1)::(2,_2)::(3,_3)::HNil, r3)
-
+      val r3 = (0 :: 1 :: 2 :: 3 :: HNil).zipWithIndex
+      assertTypedEquals[
+          (Int, _0) :: (Int, _1) :: (Int, _2) :: (Int, _3) :: HNil](
+          (0, _0) :: (1, _1) :: (2, _2) :: (3, _3) :: HNil, r3)
     }
 
-    { // invalid polys
+    {
+      // invalid polys
       illTyped("""
         (1 :: HNil).zipWith(2 :: HNil)(empty)
       """)
@@ -2217,10 +2458,7 @@ class HListTests {
     import record._
     import syntax.singleton._
 
-    val orig =
-      ("intField" ->> 1) ::
-      ("boolField" ->> true) ::
-      HNil
+    val orig = ("intField" ->> 1) :: ("boolField" ->> true) :: HNil
 
     val result = orig.values.zipWithKeys(orig.keys)
     sameTyped(orig)(result)
@@ -2247,7 +2485,8 @@ class HListTests {
       illTyped("""result.get("otherField")""")
 
       // key/value lengths must match up
-      illTyped(""" orig.tail.values.zipWithKeys[HList.`"intField", "boolField"`.T] """)
+      illTyped(
+          """ orig.tail.values.zipWithKeys[HList.`"intField", "boolField"`.T] """)
       illTyped(""" orig.values.zipWithKeys[HList.`"boolField"`.T] """)
     }
   }
@@ -2259,7 +2498,7 @@ class HListTests {
     object empty extends Poly1
 
     object complex extends Poly1 {
-      implicit val caseInt    = at[Int](_.toDouble)
+      implicit val caseInt = at[Int](_.toDouble)
       implicit val caseString = at[String](_ => 1)
     }
 
@@ -2292,11 +2531,18 @@ class HListTests {
   def testOrdering {
     assertEquals(List(HNil: HNil, HNil), List(HNil: HNil, HNil).sorted)
 
-    assertEquals(List(1 :: HNil, 2 :: HNil, 3 :: HNil), List(2 :: HNil, 1 :: HNil, 3 :: HNil).sorted)
+    assertEquals(List(1 :: HNil, 2 :: HNil, 3 :: HNil),
+                 List(2 :: HNil, 1 :: HNil, 3 :: HNil).sorted)
 
     assertEquals(
-      List(1 :: "abc" :: HNil, 1 :: "def" :: HNil, 2 :: "abc" :: HNil, 2 :: "def" :: HNil),
-      List(2 :: "abc" :: HNil, 1 :: "def" :: HNil, 2 :: "def" :: HNil, 1 :: "abc" :: HNil).sorted
+        List(1 :: "abc" :: HNil,
+             1 :: "def" :: HNil,
+             2 :: "abc" :: HNil,
+             2 :: "def" :: HNil),
+        List(2 :: "abc" :: HNil,
+             1 :: "def" :: HNil,
+             2 :: "def" :: HNil,
+             1 :: "abc" :: HNil).sorted
     )
   }
 
@@ -2310,41 +2556,45 @@ class HListTests {
     val r2 = (HNil :: HNil).mapCons('a')
     assertTypedEquals[(Char :: HNil) :: HNil]((('a' :: HNil) :: HNil), r2)
 
-    val r3 = ((1 :: HNil) :: ("foo" :: HNil) :: (2.0 :: HNil) :: HNil).mapCons('a')
-    assertTypedEquals[(C::I::HNil) :: (C::S::HNil) :: (C::D::HNil) :: HNil](
-      ('a' :: 1 :: HNil) :: ('a' :: "foo" :: HNil) :: ('a' :: 2.0 :: HNil) :: HNil,
-      r3
+    val r3 = ((1 :: HNil) :: ("foo" :: HNil) :: (2.0 :: HNil) :: HNil)
+      .mapCons('a')
+    assertTypedEquals[
+        (C :: I :: HNil) :: (C :: S :: HNil) :: (C :: D :: HNil) :: HNil](
+        ('a' :: 1 :: HNil) :: ('a' :: "foo" :: HNil) :: ('a' :: 2.0 :: HNil) :: HNil,
+        r3
     )
   }
 
   @Test
   def testInterleave {
     type C = Char; type S = String; type I = Int; type D = Double
-    def interleave[I, L <: HList](i: I, l: L)(implicit interleave: Interleave[I, L]): interleave.Out = interleave(i, l)
+    def interleave[I, L <: HList](i: I, l: L)(
+        implicit interleave: Interleave[I, L]): interleave.Out =
+      interleave(i, l)
 
     val r1 = interleave('i', HNil)
     assertTypedEquals[(Char :: HNil) :: HNil](('i' :: HNil) :: HNil, r1)
 
     val r2 = interleave('i', 1 :: HNil)
-    assertTypedEquals[(C::I::HNil) :: (I::C::HNil) :: HNil](('i' :: 1 :: HNil) :: (1 :: 'i' :: HNil) :: HNil,
-      r2
-    )
+    assertTypedEquals[(C :: I :: HNil) :: (I :: C :: HNil) :: HNil](
+        ('i' :: 1 :: HNil) :: (1 :: 'i' :: HNil) :: HNil, r2)
 
     val r3 = interleave('i', 1 :: "foo" :: HNil)
-    assertTypedEquals[(C::I::S::HNil) :: (I::C::S::HNil) :: (I::S::C::HNil) :: HNil](
-      ('i' :: 1 :: "foo" :: HNil) ::
-      (1 :: 'i' :: "foo" :: HNil) ::
-      (1 :: "foo" :: 'i' :: HNil) :: HNil,
-      r3
+    assertTypedEquals[
+        (C :: I :: S :: HNil) :: (I :: C :: S :: HNil) :: (I :: S :: C :: HNil) :: HNil](
+        ('i' :: 1 :: "foo" :: HNil) :: (1 :: 'i' :: "foo" :: HNil) ::
+        (1 :: "foo" :: 'i' :: HNil) :: HNil,
+        r3
     )
 
     val r4 = interleave('i', 1 :: "foo" :: 2.0 :: HNil)
-    assertTypedEquals[(C::I::S::D::HNil) :: (I::C::S::D::HNil) :: (I::S::C::D::HNil) :: (I::S::D::C::HNil) :: HNil](
-      ('i' :: 1 :: "foo" :: 2.0 :: HNil) ::
-      (1 :: 'i' :: "foo" :: 2.0 :: HNil) ::
-      (1 :: "foo" :: 'i' :: 2.0 :: HNil) ::
-      (1 :: "foo" :: 2.0 :: 'i' :: HNil) :: HNil,
-      r4
+    assertTypedEquals[
+        (C :: I :: S :: D :: HNil) :: (I :: C :: S :: D :: HNil) :: (I :: S :: C :: D :: HNil) :: (I :: S :: D :: C :: HNil) :: HNil](
+        ('i' :: 1 :: "foo" :: 2.0 :: HNil) ::
+        (1 :: 'i' :: "foo" :: 2.0 :: HNil) ::
+        (1 :: "foo" :: 'i' :: 2.0 :: HNil) ::
+        (1 :: "foo" :: 2.0 :: 'i' :: HNil) :: HNil,
+        r4
     )
   }
 
@@ -2352,7 +2602,8 @@ class HListTests {
   def testFlatMapInterleave {
     type C = Char; type I = Int
 
-    def flatMapInterleave[I, L <: HList](i: I, l: L)(implicit flatMapInterleave: FlatMapInterleave[I, L]) =
+    def flatMapInterleave[I, L <: HList](i: I, l: L)(
+        implicit flatMapInterleave: FlatMapInterleave[I, L]) =
       flatMapInterleave(i, l)
 
     val r1 = flatMapInterleave('i', HNil)
@@ -2362,12 +2613,11 @@ class HListTests {
     assertTypedEquals[(Char :: HNil) :: HNil](('i' :: HNil) :: HNil, r2)
 
     val r3 = flatMapInterleave('i', (1 :: HNil) :: (2 :: HNil) :: HNil)
-    assertTypedEquals[(C::I::HNil) :: (I::C::HNil) :: (C::I::HNil) :: (I::C::HNil) :: HNil](
-      ('i' :: 1 :: HNil) ::
-      (1 :: 'i' :: HNil) ::
-      ('i' :: 2 :: HNil) ::
-      (2 :: 'i' :: HNil) :: HNil,
-      r3
+    assertTypedEquals[
+        (C :: I :: HNil) :: (I :: C :: HNil) :: (C :: I :: HNil) :: (I :: C :: HNil) :: HNil](
+        ('i' :: 1 :: HNil) :: (1 :: 'i' :: HNil) :: ('i' :: 2 :: HNil) ::
+        (2 :: 'i' :: HNil) :: HNil,
+        r3
     )
   }
 
@@ -2382,30 +2632,26 @@ class HListTests {
     assertTypedEquals[(Int :: HNil) :: HNil]((1 :: HNil) :: HNil, r2)
 
     val r3 = (1 :: "foo" :: HNil).permutations
-    assertTypedEquals[(I::S::HNil) :: (S::I::HNil) :: HNil](
-      (1 :: "foo" :: HNil) ::
-      ("foo" :: 1 :: HNil) :: HNil,
-      r3
+    assertTypedEquals[(I :: S :: HNil) :: (S :: I :: HNil) :: HNil](
+        (1 :: "foo" :: HNil) :: ("foo" :: 1 :: HNil) :: HNil,
+        r3
     )
 
     val r4 = (1 :: "foo" :: 2.0 :: HNil).permutations
     assertTypedEquals[
-      (I::S::D::HNil) :: (S::I::D::HNil) :: (S::D::I::HNil) ::
-      (I::D::S::HNil) :: (D::I::S::HNil) :: (D::S::I::HNil) :: HNil
+        (I :: S :: D :: HNil) :: (S :: I :: D :: HNil) :: (S :: D :: I :: HNil) :: (I :: D :: S :: HNil) :: (D :: I :: S :: HNil) :: (D :: S :: I :: HNil) :: HNil
     ](
-      (1 :: "foo" :: 2.0 :: HNil) ::
-      ("foo" :: 1 :: 2.0 :: HNil) ::
-      ("foo" :: 2.0 :: 1 :: HNil) ::
-      (1 :: 2.0 :: "foo" :: HNil) ::
-      (2.0 :: 1 :: "foo" :: HNil) ::
-      (2.0 :: "foo" :: 1 :: HNil) :: HNil,
-      r4
+        (1 :: "foo" :: 2.0 :: HNil) :: ("foo" :: 1 :: 2.0 :: HNil) ::
+        ("foo" :: 2.0 :: 1 :: HNil) :: (1 :: 2.0 :: "foo" :: HNil) ::
+        (2.0 :: 1 :: "foo" :: HNil) :: (2.0 :: "foo" :: 1 :: HNil) :: HNil,
+        r4
     )
   }
 
   @Test
   def testMkString {
-    assertEquals(s"⸨1, foo, ${2.0}⸩", (1 :: "foo" :: 2.0 :: HNil).mkString("⸨", ", ", "⸩"))
+    assertEquals(s"⸨1, foo, ${2.0}⸩",
+                 (1 :: "foo" :: 2.0 :: HNil).mkString("⸨", ", ", "⸩"))
   }
 
   @Test
@@ -2417,7 +2663,8 @@ class HListTests {
     val in4 = 1 :: "foo" :: 2.0 :: 'a' :: HNil
     type S = String; type I = Int; type D = Double; type C = Char
 
-    { // rotateLeft(0)
+    {
+      // rotateLeft(0)
       val r1 = in0.rotateLeft(0)
       assertTypedSame[HNil](HNil, r1)
       val r2 = in1.rotateLeft(0)
@@ -2430,7 +2677,8 @@ class HListTests {
       assertTypedSame[I :: S :: D :: C :: HNil](in4, r5)
     }
 
-    { // rotateLeft[_0]
+    {
+      // rotateLeft[_0]
       val r1 = in0.rotateLeft[_0]
       assertTypedSame[HNil](HNil, r1)
       val r2 = in1.rotateLeft[_0]
@@ -2443,7 +2691,8 @@ class HListTests {
       assertTypedSame[I :: S :: D :: C :: HNil](in4, r5)
     }
 
-    { // rotateLeft(n % size == 0)
+    {
+      // rotateLeft(n % size == 0)
       val r1 = in1.rotateLeft(1)
       assertTypedSame[I :: HNil](in1, r1)
       val r2 = in1.rotateLeft(2)
@@ -2462,8 +2711,9 @@ class HListTests {
       assertTypedSame[I :: S :: D :: C :: HNil](in4, r8)
     }
 
-    { // rotateLeft[N % Size == 0]
-    val r1 = in1.rotateLeft[_1]
+    {
+      // rotateLeft[N % Size == 0]
+      val r1 = in1.rotateLeft[_1]
       assertTypedSame[I :: HNil](in1, r1)
       val r2 = in1.rotateLeft[_2]
       assertTypedSame[I :: HNil](in1, r2)
@@ -2481,7 +2731,8 @@ class HListTests {
       assertTypedSame[I :: S :: D :: C :: HNil](in4, r8)
     }
 
-    { // other(n)
+    {
+      // other(n)
       val r1 = in2.rotateLeft(1)
       assertTypedEquals[S :: I :: HNil]("foo" :: 1 :: HNil, r1)
 
@@ -2489,42 +2740,53 @@ class HListTests {
       assertTypedEquals[S :: D :: I :: HNil]("foo" :: 2.0 :: 1 :: HNil, r2)
 
       val r3 = in4.rotateLeft(1)
-      assertTypedEquals[S :: D :: C :: I :: HNil]("foo" :: 2.0 :: 'a' :: 1 :: HNil, r3)
+      assertTypedEquals[S :: D :: C :: I :: HNil](
+          "foo" :: 2.0 :: 'a' :: 1 :: HNil, r3)
 
       val r4 = in4.rotateLeft(2)
-      assertTypedEquals[D :: C :: I :: S :: HNil](2.0 :: 'a' :: 1 :: "foo" :: HNil, r4)
+      assertTypedEquals[D :: C :: I :: S :: HNil](
+          2.0 :: 'a' :: 1 :: "foo" :: HNil, r4)
 
       val r5 = in4.rotateLeft(3)
-      assertTypedEquals[C :: I :: S :: D :: HNil]('a' :: 1 :: "foo" :: 2.0 :: HNil, r5)
+      assertTypedEquals[C :: I :: S :: D :: HNil](
+          'a' :: 1 :: "foo" :: 2.0 :: HNil, r5)
 
       val r6 = in4.rotateLeft(5)
-      assertTypedEquals[S :: D :: C :: I :: HNil]("foo" :: 2.0 :: 'a' :: 1 :: HNil, r6)
+      assertTypedEquals[S :: D :: C :: I :: HNil](
+          "foo" :: 2.0 :: 'a' :: 1 :: HNil, r6)
 
       val r7 = in4.rotateLeft(6)
-      assertTypedEquals[D :: C :: I :: S :: HNil](2.0 :: 'a' :: 1 :: "foo" :: HNil, r7)
+      assertTypedEquals[D :: C :: I :: S :: HNil](
+          2.0 :: 'a' :: 1 :: "foo" :: HNil, r7)
     }
 
-    { // other[N]
-    val r1 = in2.rotateLeft[_1]
+    {
+      // other[N]
+      val r1 = in2.rotateLeft[_1]
       assertTypedEquals[S :: I :: HNil]("foo" :: 1 :: HNil, r1)
 
       val r2 = in3.rotateLeft[_1]
       assertTypedEquals[S :: D :: I :: HNil]("foo" :: 2.0 :: 1 :: HNil, r2)
 
       val r3 = in4.rotateLeft[_1]
-      assertTypedEquals[S :: D :: C :: I :: HNil]("foo" :: 2.0 :: 'a' :: 1 :: HNil, r3)
+      assertTypedEquals[S :: D :: C :: I :: HNil](
+          "foo" :: 2.0 :: 'a' :: 1 :: HNil, r3)
 
       val r4 = in4.rotateLeft[_2]
-      assertTypedEquals[D :: C :: I :: S :: HNil](2.0 :: 'a' :: 1 :: "foo" :: HNil, r4)
+      assertTypedEquals[D :: C :: I :: S :: HNil](
+          2.0 :: 'a' :: 1 :: "foo" :: HNil, r4)
 
       val r5 = in4.rotateLeft[_3]
-      assertTypedEquals[C :: I :: S :: D :: HNil]('a' :: 1 :: "foo" :: 2.0 :: HNil, r5)
+      assertTypedEquals[C :: I :: S :: D :: HNil](
+          'a' :: 1 :: "foo" :: 2.0 :: HNil, r5)
 
       val r6 = in4.rotateLeft[_5]
-      assertTypedEquals[S :: D :: C :: I :: HNil]("foo" :: 2.0 :: 'a' :: 1 :: HNil, r6)
+      assertTypedEquals[S :: D :: C :: I :: HNil](
+          "foo" :: 2.0 :: 'a' :: 1 :: HNil, r6)
 
       val r7 = in4.rotateLeft[_6]
-      assertTypedEquals[D :: C :: I :: S :: HNil](2.0 :: 'a' :: 1 :: "foo" :: HNil, r7)
+      assertTypedEquals[D :: C :: I :: S :: HNil](
+          2.0 :: 'a' :: 1 :: "foo" :: HNil, r7)
     }
   }
 
@@ -2537,7 +2799,8 @@ class HListTests {
     val in4 = 1 :: "foo" :: 2.0 :: 'a' :: HNil
     type S = String; type I = Int; type D = Double; type C = Char
 
-    { // rotateRight(0)
+    {
+      // rotateRight(0)
       val r1 = in0.rotateRight(0)
       assertTypedSame[HNil](HNil, r1)
       val r2 = in1.rotateRight(0)
@@ -2550,7 +2813,8 @@ class HListTests {
       assertTypedSame[I :: S :: D :: C :: HNil](in4, r5)
     }
 
-    { // rotateRight[_0]
+    {
+      // rotateRight[_0]
       val r1 = in0.rotateRight[_0]
       assertTypedSame[HNil](HNil, r1)
       val r2 = in1.rotateRight[_0]
@@ -2563,7 +2827,8 @@ class HListTests {
       assertTypedSame[I :: S :: D :: C :: HNil](in4, r5)
     }
 
-    { // rotateRight(n % size == 0)
+    {
+      // rotateRight(n % size == 0)
       val r1 = in1.rotateRight(1)
       assertTypedSame[I :: HNil](in1, r1)
       val r2 = in1.rotateRight(2)
@@ -2582,7 +2847,8 @@ class HListTests {
       assertTypedSame[I :: S :: D :: C :: HNil](in4, r8)
     }
 
-    { // rotateRight[N % Size == 0]
+    {
+      // rotateRight[N % Size == 0]
       val r1 = in1.rotateRight[_1]
       assertTypedSame[I :: HNil](in1, r1)
       val r2 = in1.rotateRight[_2]
@@ -2601,7 +2867,8 @@ class HListTests {
       assertTypedSame[I :: S :: D :: C :: HNil](in4, r8)
     }
 
-    { // others(n)
+    {
+      // others(n)
       val r1 = in2.rotateRight(1)
       assertTypedEquals[S :: I :: HNil]("foo" :: 1 :: HNil, r1)
 
@@ -2609,22 +2876,28 @@ class HListTests {
       assertTypedEquals[D :: I :: S :: HNil](2.0 :: 1 :: "foo" :: HNil, r2)
 
       val r3 = in4.rotateRight(1)
-      assertTypedEquals[C :: I :: S :: D :: HNil]('a' :: 1 :: "foo" :: 2.0 :: HNil, r3)
+      assertTypedEquals[C :: I :: S :: D :: HNil](
+          'a' :: 1 :: "foo" :: 2.0 :: HNil, r3)
 
       val r4 = in4.rotateRight(2)
-      assertTypedEquals[D :: C :: I :: S :: HNil](2.0 :: 'a' :: 1 :: "foo" :: HNil, r4)
+      assertTypedEquals[D :: C :: I :: S :: HNil](
+          2.0 :: 'a' :: 1 :: "foo" :: HNil, r4)
 
       val r5 = in4.rotateRight(3)
-      assertTypedEquals[S :: D :: C :: I :: HNil]("foo" :: 2.0 :: 'a' :: 1 :: HNil, r5)
+      assertTypedEquals[S :: D :: C :: I :: HNil](
+          "foo" :: 2.0 :: 'a' :: 1 :: HNil, r5)
 
       val r6 = in4.rotateRight(5)
-      assertTypedEquals[C :: I :: S :: D :: HNil]('a' :: 1 :: "foo" :: 2.0 :: HNil, r6)
+      assertTypedEquals[C :: I :: S :: D :: HNil](
+          'a' :: 1 :: "foo" :: 2.0 :: HNil, r6)
 
       val r7 = in4.rotateRight(6)
-      assertTypedEquals[D :: C :: I :: S :: HNil](2.0 :: 'a' :: 1 :: "foo" :: HNil, r7)
+      assertTypedEquals[D :: C :: I :: S :: HNil](
+          2.0 :: 'a' :: 1 :: "foo" :: HNil, r7)
     }
 
-    { // others[N]
+    {
+      // others[N]
       val r1 = in2.rotateRight[_1]
       assertTypedEquals[S :: I :: HNil]("foo" :: 1 :: HNil, r1)
 
@@ -2632,24 +2905,29 @@ class HListTests {
       assertTypedEquals[D :: I :: S :: HNil](2.0 :: 1 :: "foo" :: HNil, r2)
 
       val r3 = in4.rotateRight[_1]
-      assertTypedEquals[C :: I :: S :: D :: HNil]('a' :: 1 :: "foo" :: 2.0 :: HNil, r3)
+      assertTypedEquals[C :: I :: S :: D :: HNil](
+          'a' :: 1 :: "foo" :: 2.0 :: HNil, r3)
 
       val r4 = in4.rotateRight[_2]
-      assertTypedEquals[D :: C :: I :: S :: HNil](2.0 :: 'a' :: 1 :: "foo" :: HNil, r4)
+      assertTypedEquals[D :: C :: I :: S :: HNil](
+          2.0 :: 'a' :: 1 :: "foo" :: HNil, r4)
 
       val r5 = in4.rotateRight[_3]
-      assertTypedEquals[S :: D :: C :: I :: HNil]("foo" :: 2.0 :: 'a' :: 1 :: HNil, r5)
+      assertTypedEquals[S :: D :: C :: I :: HNil](
+          "foo" :: 2.0 :: 'a' :: 1 :: HNil, r5)
 
       val r6 = in4.rotateRight[_5]
-      assertTypedEquals[C :: I :: S :: D :: HNil]('a' :: 1 :: "foo" :: 2.0 :: HNil, r6)
+      assertTypedEquals[C :: I :: S :: D :: HNil](
+          'a' :: 1 :: "foo" :: 2.0 :: HNil, r6)
 
       val r7 = in4.rotateRight[_6]
-      assertTypedEquals[D :: C :: I :: S :: HNil](2.0 :: 'a' :: 1 :: "foo" :: HNil, r7)
+      assertTypedEquals[D :: C :: I :: S :: HNil](
+          2.0 :: 'a' :: 1 :: "foo" :: HNil, r7)
     }
   }
 
   object smear extends Poly {
-    implicit val caseIntInt    = use((x: Int, y: Int) => x + y)
+    implicit val caseIntInt = use((x: Int, y: Int) => x + y)
     implicit val caseStringInt = use((x: String, y: Int) => x.toInt + y)
     implicit val caseIntString = use((x: Int, y: String) => x + y.toInt)
   }
@@ -2664,7 +2942,7 @@ class HListTests {
   }
 
   @Test
-  def testScanRight{
+  def testScanRight {
     val in = 1 :: "2" :: HNil
     val out = in.scanRight(1)(smear)
 
@@ -2817,47 +3095,53 @@ class HListTests {
   def testPatch {
     val basehl = 1 :: 2 :: "three" :: HNil
 
-    { //patch an empty hlist
+    {
+      //patch an empty hlist
       val out = HNil.patch(0, basehl, 0)
-      val out2 = HNil.patch[_0,_0](basehl)
+      val out2 = HNil.patch[_0, _0](basehl)
 
       typed[Int :: Int :: String :: HNil](out)
       assertEquals(out, basehl)
       assertTypedEquals[Int :: Int :: String :: HNil](out, out2)
     }
 
-    { //single patch w/ nothing removed
+    {
+      //single patch w/ nothing removed
       val out = basehl.patch(1, 4 :: HNil, 0)
-      val out2 = basehl.patch[_1,_0](4 :: HNil)
+      val out2 = basehl.patch[_1, _0](4 :: HNil)
 
       typed[Int :: Int :: Int :: String :: HNil](out)
       assertEquals(1 :: 4 :: 2 :: "three" :: HNil, out)
       assertTypedEquals[Int :: Int :: Int :: String :: HNil](out, out2)
     }
 
-    { //single patch w/ 2 elements removed
+    {
+      //single patch w/ 2 elements removed
       val out = basehl.patch(1, 3 :: HNil, 2)
-      val out2 = basehl.patch[_1,_2](3 :: HNil)
+      val out2 = basehl.patch[_1, _2](3 :: HNil)
 
       typed[Int :: Int :: HNil](out)
       assertEquals(1 :: 3 :: HNil, out)
       assertTypedEquals[Int :: Int :: HNil](out, out2)
     }
 
-    { //essentially append
+    {
+      //essentially append
       val p = 4 :: 5 :: "six" :: HNil
       val out = basehl.patch(3, p, 0)
-      val out2 = basehl.patch[_3,_0](p)
+      val out2 = basehl.patch[_3, _0](p)
 
       typed[Int :: Int :: String :: Int :: Int :: String :: HNil](out)
       assertEquals(1 :: 2 :: "three" :: 4 :: 5 :: "six" :: HNil, out)
-      assertTypedEquals[Int :: Int :: String :: Int :: Int :: String :: HNil](out, out2)
+      assertTypedEquals[Int :: Int :: String :: Int :: Int :: String :: HNil](
+          out, out2)
     }
 
-    { //several patched w/ everything from original removed
+    {
+      //several patched w/ everything from original removed
       val sub = 4 :: "five" :: "six" :: HNil
       val out = basehl.patch(0, sub, 3)
-      val out2 = basehl.patch[_0,_3](sub)
+      val out2 = basehl.patch[_0, _3](sub)
 
       typed[Int :: String :: String :: HNil](out)
       assertEquals(sub, out)
@@ -2901,7 +3185,8 @@ class HListTests {
 
     typed[HList.`2`.T](2.narrow :: HNil)
 
-    typed[HList.`2, "a", true`.T](2.narrow :: "a".narrow :: true.narrow :: HNil)
+    typed[HList.`2, "a", true`.T](
+        2.narrow :: "a".narrow :: true.narrow :: HNil)
 
     illTyped(""" typed[HList.`2`.T](3.narrow :: HNil) """)
 
@@ -2947,12 +3232,10 @@ class HListTests {
 
   object selectAll extends SingletonProductArgs {
     class Apply[K <: HList] {
-      def from[T, R <: HList, S <: HList, Out](t: T)
-        (implicit
-          gen: LabelledGeneric.Aux[T, R],
+      def from[T, R <: HList, S <: HList, Out](t: T)(
+          implicit gen: LabelledGeneric.Aux[T, R],
           sel: SelectAll.Aux[R, K, S],
-          tp: Tupler.Aux[S, Out]
-        ): Out =
+          tp: Tupler.Aux[S, Out]): Out =
         tp(sel(gen.to(t)))
     }
 
@@ -2961,9 +3244,11 @@ class HListTests {
 
   trait NonSingletonHNilTC[T]
   object NonSingletonHNilTC {
-    def apply[T](t: T)(implicit i: NonSingletonHNilTC[T]): NonSingletonHNilTC[T] = i
+    def apply[T](t: T)(
+        implicit i: NonSingletonHNilTC[T]): NonSingletonHNilTC[T] = i
 
-    implicit val nsHNilTC: NonSingletonHNilTC[HNil] = new NonSingletonHNilTC[HNil] {}
+    implicit val nsHNilTC: NonSingletonHNilTC[HNil] =
+      new NonSingletonHNilTC[HNil] {}
   }
 
   @Test
@@ -2971,7 +3256,9 @@ class HListTests {
     object Obj
 
     val l = SFoo(23, "foo", 'bar, Obj, true)
-    typed[Witness.`23`.T :: Witness.`"foo"`.T :: Witness.`'bar`.T :: Obj.type :: Witness.`true`.T :: HNil](l)
+    typed[
+        Witness.`23`.T :: Witness.`"foo"`.T :: Witness.`'bar`.T :: Obj.type :: Witness.`true`.T :: HNil](
+        l)
 
     // Annotations on the LHS here and subsequently, otherwise scalac will
     // widen the RHS to a non-singleton type.
@@ -3008,28 +3295,32 @@ class HListTests {
   }
 
   @Test
-  def selectAllTest: Unit ={
-    import shapeless._, record._ , ops.hlist.SelectAll
+  def selectAllTest: Unit = {
+    import shapeless._, record._, ops.hlist.SelectAll
 
     //is there any way to do it without runtime overhead?
     class TypeCaptured[T](val value: T) {
       type _type = T
     }
 
-    def getFieldsByTypesOfSuper[Sub <: HList, Super <: HList](l: Sub)(implicit sa: SelectAll[Sub, Super]) = sa(l)
+    def getFieldsByTypesOfSuper[Sub <: HList, Super <: HList](l: Sub)(
+        implicit sa: SelectAll[Sub, Super]) = sa(l)
 
-    val hsuper = new TypeCaptured("2":: true :: HNil)
-    val hsub = new TypeCaptured(1 :: "2":: true :: HNil)
+    val hsuper = new TypeCaptured("2" :: true :: HNil)
+    val hsub = new TypeCaptured(1 :: "2" :: true :: HNil)
 
     //testing with plain HList
-    assertTypedEquals[hsuper._type](hsuper.value, getFieldsByTypesOfSuper[hsub._type, hsuper._type](hsub.value))
+    assertTypedEquals[hsuper._type](
+        hsuper.value,
+        getFieldsByTypesOfSuper[hsub._type, hsuper._type](hsub.value))
 
     val rsuper = new TypeCaptured(Record(b = true, c = "blah"))
-    val rsub =  new TypeCaptured(Record(a = 1, b = true, c = "blah"))
+    val rsub = new TypeCaptured(Record(a = 1, b = true, c = "blah"))
 
     //testing with Record
-    assertTypedEquals[rsuper._type](rsuper.value, getFieldsByTypesOfSuper[rsub._type, rsuper._type](rsub.value))
-
+    assertTypedEquals[rsuper._type](
+        rsuper.value,
+        getFieldsByTypesOfSuper[rsub._type, rsuper._type](rsub.value))
   }
 
   object FooNat extends NatProductArgs {
@@ -3062,8 +3353,8 @@ class HListTests {
     illTyped("""
       r.tail.tail.tail.head
              """)
-    val res = FooNatTypeParams(1,2,3,4)
-    assertEquals(_4,res)
+    val res = FooNatTypeParams(1, 2, 3, 4)
+    assertEquals(_4, res)
   }
 
   implicit class Interpolator(val sc: StringContext) {
@@ -3102,8 +3393,8 @@ class HListTests {
 
   @Test
   def testCollectFirst {
-    object Foo extends Poly1{
-      implicit def iinst = at[Int]{ _ + 1 }
+    object Foo extends Poly1 {
+      implicit def iinst = at[Int] { _ + 1 }
     }
     val hlist1 = "foo" :: 2.0 :: 1 :: HNil
     assertTypedEquals[Int](hlist1.collectFirst(Foo), 2)
@@ -3115,52 +3406,51 @@ class HListTests {
   @Test
   def testGrouper {
     object toInt extends Poly1 {
-      implicit def default[N <: Nat](implicit toi: ops.nat.ToInt[N]) = at[N](_ => toi())
+      implicit def default[N <: Nat](implicit toi: ops.nat.ToInt[N]) =
+        at[N](_ => toi())
     }
-    def range[R <: HList](a: Nat, b: Nat)(implicit
-                                          range: ops.nat.Range.Aux[a.N, b.N, R],
-                                          mapper: ops.hlist.Mapper[toInt.type, R]
-      ) = mapper(range())
+    def range[R <: HList](a: Nat, b: Nat)(
+        implicit range: ops.nat.Range.Aux[a.N, b.N, R],
+        mapper: ops.hlist.Mapper[toInt.type, R]) = mapper(range())
 
     // group HNil
-    assertEquals(HNil: HNil, (HNil: HNil) group(2, 1))
+    assertEquals(HNil: HNil, (HNil: HNil) group (2, 1))
     // group a HList of 4 items into 2 (4/2) tuples of 2 items
     assertEquals(
-      (0, 1) ::(2, 3) :: HNil,
-      range(0, 4) group(2, 2)
+        (0, 1) :: (2, 3) :: HNil,
+        range(0, 4) group (2, 2)
     )
 
     // group a HList of 5 items into 2 (5/2) tuples of 2 items
     // the last item does not make a complete partition and is dropped.
     assertEquals(
-      (0, 1) ::(2, 3) :: HNil,
-      range(0, 5) group(2, 2)
+        (0, 1) :: (2, 3) :: HNil,
+        range(0, 5) group (2, 2)
     )
 
     // uses the step to select the starting point for each partition
     assertEquals(
-      (0, 1) ::(4, 5) :: HNil,
-      range(0, 6) group(2, 4)
+        (0, 1) :: (4, 5) :: HNil,
+        range(0, 6) group (2, 4)
     )
 
     // if the step is smaller than the partition size, items will be reused
     assertEquals(
-      (0, 1) ::(1, 2) ::(2, 3) :: HNil,
-      range(0, 4) group(2, 1)
+        (0, 1) :: (1, 2) :: (2, 3) :: HNil,
+        range(0, 4) group (2, 1)
     )
 
     // when there are not enough items to fill the last partition, a pad can be supplied.
     assertEquals(
-      (0, 1) ::(2, 3) ::(4, 'a') :: HNil,
-      range(0, 5) group(2, 2, 'a' :: HNil)
+        (0, 1) :: (2, 3) :: (4, 'a') :: HNil,
+        range(0, 5) group (2, 2, 'a' :: HNil)
     )
 
     // but only as many pad elements are used as necessary to fill the final partition.
     assertEquals(
-      (0, 1) ::(2, 3) ::(4, 'a') :: HNil,
-      range(0, 5) group(2, 2, 'a' :: 'b' :: 'c' :: HNil)
+        (0, 1) :: (2, 3) :: (4, 'a') :: HNil,
+        range(0, 5) group (2, 2, 'a' :: 'b' :: 'c' :: HNil)
     )
-
   }
 
   @Test
@@ -3171,7 +3461,8 @@ class HListTests {
 
     assertEquals(HNil, implicitly[LiftAll[F, HNil]].instances)
     assertEquals(FInt :: HNil, implicitly[LiftAll[F, Int :: HNil]].instances)
-    assertEquals(FString :: FInt :: HNil, implicitly[LiftAll[F, String :: Int :: HNil]].instances)
+    assertEquals(FString :: FInt :: HNil,
+                 implicitly[LiftAll[F, String :: Int :: HNil]].instances)
     illTyped("implicitly[LiftAll[F, Long :: String :: Int :: HNil]]")
 
     assertEquals(FInt :: HNil, LiftAll[F](1 :: HNil).instances)
@@ -3214,20 +3505,24 @@ class HListTests {
 
   @Test
   def testToSizedHList {
-    val ns = List(1,2,3,4)
+    val ns = List(1, 2, 3, 4)
     assertTypedEquals[Option[III]](None, ns.toSizedHList(3))
-    assertTypedEquals[Option[IIII]](Some(1 :: 2 :: 3 :: 4 :: HNil), ns.toSizedHList(4))
+    assertTypedEquals[Option[IIII]](
+        Some(1 :: 2 :: 3 :: 4 :: HNil), ns.toSizedHList(4))
   }
 
   @Test
   def testModifierAt {
     // first element
-    assertEquals((1, 42 :: 2 :: 3 :: HNil), (1 :: 2 :: 3 :: HNil).updateAtWith(0)(_ => 42))
+    assertEquals((1, 42 :: 2 :: 3 :: HNil),
+                 (1 :: 2 :: 3 :: HNil).updateAtWith(0)(_ => 42))
 
     //last element
-    assertEquals((3, 1 :: 2 :: 42 :: HNil), (1 :: 2 :: 3 :: HNil).updateAtWith(2)(_ => 42))
+    assertEquals((3, 1 :: 2 :: 42 :: HNil),
+                 (1 :: 2 :: 3 :: HNil).updateAtWith(2)(_ => 42))
 
     //different type
-    assertEquals((3, 1 :: 2 :: 42.0 :: HNil), (1 :: 2 :: 3 :: HNil).updateAtWith(2)(_ => 42.0))
+    assertEquals((3, 1 :: 2 :: 42.0 :: HNil),
+                 (1 :: 2 :: 3 :: HNil).updateAtWith(2)(_ => 42.0))
   }
 }

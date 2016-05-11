@@ -20,4 +20,4 @@ class PreparedData(
   val events: RDD[Event]
 ) extends Serializable
 
-*/
+ */

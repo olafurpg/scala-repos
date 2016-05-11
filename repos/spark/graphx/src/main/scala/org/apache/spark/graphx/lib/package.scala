@@ -18,6 +18,6 @@
 package org.apache.spark.graphx
 
 /**
- * Various analytics functions for graphs.
- */
+  * Various analytics functions for graphs.
+  */
 package object lib

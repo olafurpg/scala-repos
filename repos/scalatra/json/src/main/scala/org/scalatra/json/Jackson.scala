@@ -1,20 +1,23 @@
 package org.scalatra
 package json
 
-import java.io.{ InputStream, InputStreamReader, Writer }
+import java.io.{InputStream, InputStreamReader, Writer}
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import org.json4s._
 import org.scalatra.util.RicherString._
 
-trait JacksonJsonSupport extends JsonSupport[JValue] with JacksonJsonOutput with JValueResult {
+trait JacksonJsonSupport
+    extends JsonSupport[JValue] with JacksonJsonOutput with JValueResult {
 
   override def initialize(config: ConfigT): Unit = {
     super.initialize(config)
-    mapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, jsonFormats.wantsBigDecimal)
+    mapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS,
+                     jsonFormats.wantsBigDecimal)
   }
 
-  protected def readJsonFromStreamWithCharset(stream: InputStream, charset: String): JValue = {
+  protected def readJsonFromStreamWithCharset(
+      stream: InputStream, charset: String): JValue = {
     val rdr = new InputStreamReader(stream, charset)
     if (rdr.ready()) mapper.readValue(rdr, classOf[JValue])
     else {
@@ -29,7 +32,9 @@ trait JacksonJsonSupport extends JsonSupport[JValue] with JacksonJsonOutput with
   }
 }
 
-trait JacksonJsonValueReaderProperty extends JsonValueReaderProperty[JValue] { self: jackson.JsonMethods => }
+trait JacksonJsonValueReaderProperty extends JsonValueReaderProperty[JValue] {
+  self: jackson.JsonMethods =>
+}
 
 trait JacksonJsonOutput extends JsonOutput[JValue] with jackson.JsonMethods {
   protected def writeJson(json: JValue, writer: Writer) {

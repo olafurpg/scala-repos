@@ -48,35 +48,33 @@ class EnsembleBubbleChart extends EnsembleExample {
     val yAxis = NumberAxis("Y", 0d, 140d, 20d)
 
     // Helper function to convert a tuple to `XYChart.Data`
-    val toChartData = (t: (Double, Double, Double)) => XYChart.Data[Number, Number](t._1, t._2, t._3)
+    val toChartData = (t: (Double, Double, Double)) =>
+      XYChart.Data[Number, Number](t._1, t._2, t._3)
 
     val series1 = new XYChart.Series[Number, Number] {
       name = "Series 1"
-      data = Seq(
-        (30d, 40d, 10d),
-        (60d, 20d, 13d),
-        (10d, 90d, 7d),
-        (100d, 40d, 10d),
-        (50d, 23d, 5d)).map(toChartData)
+      data = Seq((30d, 40d, 10d),
+                 (60d, 20d, 13d),
+                 (10d, 90d, 7d),
+                 (100d, 40d, 10d),
+                 (50d, 23d, 5d)).map(toChartData)
     }
 
     val series2 = new XYChart.Series[Number, Number] {
       name = "Series 2"
-      data = Seq(
-        (13d, 100d, 7d),
-        (20d, 80d, 13d),
-        (100d, 60d, 10d),
-        (30d, 40d, 6d)).map(toChartData)
+      data = Seq((13d, 100d, 7d),
+                 (20d, 80d, 13d),
+                 (100d, 60d, 10d),
+                 (30d, 40d, 6d)).map(toChartData)
     }
 
     val series3 = new XYChart.Series[Number, Number] {
       name = "Series 3"
-      data = Seq(
-        (17d, 55d, 7d),
-        (67d, 98d, 13d),
-        (45d, 23d, 10d),
-        (89d, 87d, 6d),
-        (59d, 34d, 12d)).map(toChartData)
+      data = Seq((17d, 55d, 7d),
+                 (67d, 98d, 13d),
+                 (45d, 23d, 10d),
+                 (89d, 87d, 6d),
+                 (59d, 34d, 12d)).map(toChartData)
     }
 
     new BubbleChart(xAxis, yAxis) {

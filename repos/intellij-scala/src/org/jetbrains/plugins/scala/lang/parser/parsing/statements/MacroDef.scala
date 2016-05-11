@@ -10,10 +10,10 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.top.Qual_Id
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.{Type, TypeArgs}
 
 /**
- * @author Jason Zaugg
- *
- * MacroDef ::= MacroDef ::= FunSig [‘:’ Type] ‘=’ ‘macro’ QualId [TypeArgs]
- */
+  * @author Jason Zaugg
+  *
+  * MacroDef ::= MacroDef ::= FunSig [‘:’ Type] ‘=’ ‘macro’ QualId [TypeArgs]
+  */
 object MacroDef {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val marker = builder.mark
@@ -54,8 +54,7 @@ object MacroDef {
                   marker.rollbackTo()
                   false
               }
-            }
-            else {
+            } else {
               marker.rollbackTo()
               false
             }

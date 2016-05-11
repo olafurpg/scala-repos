@@ -24,7 +24,7 @@ case class Name(getString: String) extends AnyVal
 
 /*
  User-defined Counter
-*/
+ */
 case class Counter(group: Group, name: Name)(implicit jobID: JobId) {
   // Need to register the counter for this job,
   // this is used to pass counter info to the Storm platform during initialization

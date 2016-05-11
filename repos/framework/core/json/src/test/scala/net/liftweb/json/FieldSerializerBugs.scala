@@ -24,7 +24,7 @@ object FieldSerializerBugs extends Specification {
 
   implicit val formats = DefaultFormats + FieldSerializer[AnyRef]()
 
-/* FIXME: For some reason this fails on CI
+  /* FIXME: For some reason this fails on CI
   "AtomicInteger should not cause stack overflow" in {
     import java.util.concurrent.atomic.AtomicInteger
 
@@ -32,15 +32,14 @@ object FieldSerializerBugs extends Specification {
     val atomic = read[AtomicInteger](ser)
     atomic.get mustEqual 1
   }
-  */
+   */
 
   "Name with symbols is correctly serialized" in {
     implicit val formats = DefaultFormats + FieldSerializer[AnyRef]()
 
     val s = WithSymbol(5)
     val str = Serialization.write(s)
-    (str mustEqual """{"a-b*c":5}""") and
-      (read[WithSymbol](str) mustEqual s)
+    (str mustEqual """{"a-b*c":5}""") and (read[WithSymbol](str) mustEqual s)
   }
 
   "FieldSerialization should work with Options" in {
@@ -57,5 +56,3 @@ object FieldSerializerBugs extends Specification {
     var field: Option[Int] = None
   }
 }
-
-

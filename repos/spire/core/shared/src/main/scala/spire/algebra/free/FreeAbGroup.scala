@@ -2,28 +2,29 @@ package spire
 package algebra
 package free
 
-
 import spire.std.option._
 import spire.std.map._
 import spire.std.int._
 import spire.syntax.rng._
 
-final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs =>
+final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal {
+  lhs =>
 
   /**
-   * Maps the terms using `f` to type `B` and sums their results using the
-   * [[AbGroup]] for `B`.
-   */
+    * Maps the terms using `f` to type `B` and sums their results using the
+    * [[AbGroup]] for `B`.
+    */
   def run[B](f: A => B)(implicit B: AbGroup[B]): B =
-    terms.foldLeft(B.id) { case (total, (a, n)) =>
-      B.op(total, B.combinen(f(a), n))
+    terms.foldLeft(B.id) {
+      case (total, (a, n)) =>
+        B.op(total, B.combinen(f(a), n))
     }
 
   /**
-   * As long as there are no negative terms, this maps the terms using `f`,
-   * then sums the results using the [[CMonoid]] for `B`. If there is a
-   * negative term, then `None` is returned.
-   */
+    * As long as there are no negative terms, this maps the terms using `f`,
+    * then sums the results using the [[CMonoid]] for `B`. If there is a
+    * negative term, then `None` is returned.
+    */
   def runMonoid[B](f: A => B)(implicit B: CMonoid[B]): Option[B] = {
     val it = terms.iterator
 
@@ -38,11 +39,11 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
   }
 
   /**
-   * As long as there are no negative terms and at least 1 positive term,
-   * this maps the terms using `f`, then sums the results using the
-   * [[CSemigroup]] for `B`. If there is a negative term, or if there are
-   * no terms at all, then `None` is returned.
-   */
+    * As long as there are no negative terms and at least 1 positive term,
+    * this maps the terms using `f`, then sums the results using the
+    * [[CSemigroup]] for `B`. If there is a negative term, or if there are
+    * no terms at all, then `None` is returned.
+    */
   def runSemigroup[B](f: A => B)(implicit B: CSemigroup[B]): Option[B] = {
     val it = terms.iterator
 
@@ -66,27 +67,31 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
   }
 
   /**
-   * Sums up the results of the negative and positive terms separately, using
-   * `f` to map the terms to type `B` and using its [[CMonoid]]. This returns
-   * a tuple with the sum of the negative terms on the left and the sum of the
-   * positive terms on the right.
-   */
+    * Sums up the results of the negative and positive terms separately, using
+    * `f` to map the terms to type `B` and using its [[CMonoid]]. This returns
+    * a tuple with the sum of the negative terms on the left and the sum of the
+    * positive terms on the right.
+    */
   def split[B](f: A => B)(implicit B: CMonoid[B]): (B, B) =
-    terms.foldLeft((B.id, B.id)) { case ((ltotal, rtotal), (a, n)) =>
-      if (n < 0) (B.op(ltotal, B.combinen(f(a), -n)), rtotal)
-      else if (n > 0) (ltotal, B.op(rtotal, B.combinen(f(a), n)))
-      else (ltotal, rtotal)
+    terms.foldLeft((B.id, B.id)) {
+      case ((ltotal, rtotal), (a, n)) =>
+        if (n < 0) (B.op(ltotal, B.combinen(f(a), -n)), rtotal)
+        else if (n > 0) (ltotal, B.op(rtotal, B.combinen(f(a), n)))
+        else (ltotal, rtotal)
     }
 
   /**
-   * Sums up the results of the negative and positive terms separately, using
-   * `f` to map the terms to type `B` and using its [[CSemigroup]]. This returns
-   * a tuple with the sum of the negative terms on the left and the sum of the
-   * positive terms on the right. If either side has no terms at all, then that
-   * side is `None`.
-   */
-  def splitSemigroup[B](f: A => B)(implicit B: CSemigroup[B]): (Option[B], Option[B]) =
-    split[Option[B]] { a => Some(f(a)) }
+    * Sums up the results of the negative and positive terms separately, using
+    * `f` to map the terms to type `B` and using its [[CSemigroup]]. This returns
+    * a tuple with the sum of the negative terms on the left and the sum of the
+    * positive terms on the right. If either side has no terms at all, then that
+    * side is `None`.
+    */
+  def splitSemigroup[B](f: A => B)(
+      implicit B: CSemigroup[B]): (Option[B], Option[B]) =
+    split[Option[B]] { a =>
+      Some(f(a))
+    }
 
   def |+|(rhs: FreeAbGroup[A]): FreeAbGroup[A] =
     new FreeAbGroup(lhs.terms + rhs.terms)
@@ -99,10 +104,14 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
 
   override def toString: String =
     if (terms.isEmpty) "e"
-    else terms.filter(_._2 != 0).map {
-      case (a, n) if n == 1 => a.toString
-      case (a, n) if n != 0 => s"($a)^$n"
-    }.mkString(" |+| ")
+    else
+      terms
+        .filter(_._2 != 0)
+        .map {
+          case (a, n) if n == 1 => a.toString
+          case (a, n) if n != 0 => s"($a)^$n"
+        }
+        .mkString(" |+| ")
 }
 
 object FreeAbGroup { companion =>
@@ -111,10 +120,12 @@ object FreeAbGroup { companion =>
   final def apply[A](a: A): FreeAbGroup[A] = lift(a)
   final def lift[A](a: A): FreeAbGroup[A] = new FreeAbGroup[A](Map((a, 1)))
 
-  implicit def FreeAbGroupGroup[A]: AbGroup[FreeAbGroup[A]] = new AbGroup[FreeAbGroup[A]] {
-    def id: FreeAbGroup[A] = companion.id
-    def op(a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |+| b
-    def inverse(a: FreeAbGroup[A]): FreeAbGroup[A] = a.inverse
-    override def opInverse(a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |-| b
-  }
+  implicit def FreeAbGroupGroup[A]: AbGroup[FreeAbGroup[A]] =
+    new AbGroup[FreeAbGroup[A]] {
+      def id: FreeAbGroup[A] = companion.id
+      def op(a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |+| b
+      def inverse(a: FreeAbGroup[A]): FreeAbGroup[A] = a.inverse
+      override def opInverse(
+          a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |-| b
+    }
 }

@@ -18,29 +18,32 @@ package shapeless
 package ops
 
 object function {
+
   /**
-   * Type class supporting conversion of arbitrary functions to functions of a single `HList`
-   * argument. 
-   * 
-   * @author Miles Sabin
-   */
+    * Type class supporting conversion of arbitrary functions to functions of a single `HList`
+    * argument. 
+    * 
+    * @author Miles Sabin
+    */
   trait FnToProduct[-F] extends Serializable {
     type Out
     def apply(f: F): Out
   }
 
   object FnToProduct extends FnToProductInstances {
-    def apply[F <: AnyRef](implicit fntop: FnToProduct[F]): Aux[F, fntop.Out] = fntop
+    def apply[F <: AnyRef](implicit fntop: FnToProduct[F]): Aux[F, fntop.Out] =
+      fntop
   }
 
   /**
-   * Type class supporting conversion of functions of a single `HList` argument to ordinary functions. 
-   * 
-   * @author Miles Sabin
-   */
+    * Type class supporting conversion of functions of a single `HList` argument to ordinary functions. 
+    * 
+    * @author Miles Sabin
+    */
   trait FnFromProduct[F] extends DepFn1[F] with Serializable
-    
+
   object FnFromProduct extends FnFromProductInstances {
-    def apply[F](implicit fnfromp: FnFromProduct[F]): Aux[F, fnfromp.Out] = fnfromp
+    def apply[F](implicit fnfromp: FnFromProduct[F]): Aux[F, fnfromp.Out] =
+      fnfromp
   }
 }

@@ -32,25 +32,29 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object StringProperty {
-  implicit def sfxStringProperty2jfx(sp: StringProperty): jfxbp.StringProperty = if (sp != null) sp.delegate else null
+  implicit def sfxStringProperty2jfx(
+      sp: StringProperty): jfxbp.StringProperty =
+    if (sp != null) sp.delegate else null
 
   /**
-   * Creates a new StringProperty instance using the SimpleStringProperty as the target observable.
-   *
-   * @param value the initial value
-   * @return      the StringProperty instance
-   */
+    * Creates a new StringProperty instance using the SimpleStringProperty as the target observable.
+    *
+    * @param value the initial value
+    * @return      the StringProperty instance
+    */
   def apply(value: String) = new StringProperty(value)
 }
 
-class StringProperty(override val delegate: jfxbp.StringProperty = new jfxbp.SimpleStringProperty)
-  extends ReadOnlyStringProperty(delegate)
-  with Property[String, String]
-  with SFXDelegate[jfxbp.StringProperty] {
+class StringProperty(
+    override val delegate: jfxbp.StringProperty = new jfxbp.SimpleStringProperty)
+    extends ReadOnlyStringProperty(delegate) with Property[String, String]
+    with SFXDelegate[jfxbp.StringProperty] {
 
-  def this(initialValue: String) = this(new jfxbp.SimpleStringProperty(initialValue))
+  def this(initialValue: String) =
+    this(new jfxbp.SimpleStringProperty(initialValue))
 
-  def this(bean: Object, name: String) = this(new jfxbp.SimpleStringProperty(bean, name))
+  def this(bean: Object, name: String) =
+    this(new jfxbp.SimpleStringProperty(bean, name))
 
   def this(bean: Object, name: String, initialValue: String) =
     this(new jfxbp.SimpleStringProperty(bean, name, initialValue))

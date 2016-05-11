@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
 import cascading.tuple.Fields
@@ -57,20 +57,19 @@ class ReplTest extends WordSpec {
         // shallow verification that the snapshot was created correctly without
         // actually running a new flow to check the contents (just check that
         // it's a TypedPipe from a MemorySink or SequenceFile)
-        assert(s.toString.contains("IterablePipe") || s.toString.contains("TypedPipeFactory"))
+        assert(s.toString.contains("IterablePipe") ||
+            s.toString.contains("TypedPipeFactory"))
 
         val pipeName = mode match {
           case m: HadoopMode => m.jobConf.get("hadoop.tmp.dir")
           case _ => "IterableSource"
         }
         assert(s.toPipe(Fields.ALL).toString.contains(pipeName))
-
       }
 
       "can be mapped and saved -- TypedPipe[String]" in {
-        val s = TypedPipe.from(TextLine(helloPath))
-          .flatMap(_.split("\\s+"))
-          .snapshot
+        val s =
+          TypedPipe.from(TextLine(helloPath)).flatMap(_.split("\\s+")).snapshot
 
         val out = TypedTsv[String](testPath + "output1.txt")
 
@@ -82,18 +81,20 @@ class ReplTest extends WordSpec {
       }
 
       "tuples -- TypedPipe[(String,Int)]" in {
-        val s = TypedPipe.from(TextLine(helloPath))
+        val s = TypedPipe
+          .from(TextLine(helloPath))
           .flatMap(_.split("\\s+"))
           .map(w => (w.toLowerCase, w.length))
           .snapshot
 
         val output = s.toList
-        assert(output === helloRef.flatMap(_.split("\\s+")).map(w => (w.toLowerCase, w.length)))
+        assert(output === helloRef
+              .flatMap(_.split("\\s+"))
+              .map(w => (w.toLowerCase, w.length)))
       }
 
       "grouped -- Grouped[String,String]" which {
-        val grp = TypedPipe.from(TextLine(helloPath))
-          .groupBy(_.toLowerCase)
+        val grp = TypedPipe.from(TextLine(helloPath)).groupBy(_.toLowerCase)
 
         val correct = helloRef.map(l => (l.toLowerCase, l))
 
@@ -108,12 +109,16 @@ class ReplTest extends WordSpec {
       }
 
       "joined -- CoGrouped[String, Long]" which {
-        val linesByWord = TypedPipe.from(TextLine(helloPath))
+        val linesByWord = TypedPipe
+          .from(TextLine(helloPath))
           .flatMap(_.split("\\s+"))
           .groupBy(_.toLowerCase)
-        val wordScores = TypedPipe.from(TypedTsv[(String, Double)](tutorialData + "/word_scores.tsv")).group
+        val wordScores = TypedPipe
+          .from(TypedTsv[(String, Double)](tutorialData + "/word_scores.tsv"))
+          .group
 
-        val grp = linesByWord.join(wordScores)
+        val grp = linesByWord
+          .join(wordScores)
           .mapValues { case (text, score) => score }
           .sum
 
@@ -143,7 +148,8 @@ class ReplTest extends WordSpec {
 
     "run entire flow" in {
       resetFlowDef()
-      val hello = TypedPipe.from(TextLine(helloPath))
+      val hello = TypedPipe
+        .from(TextLine(helloPath))
         .flatMap(_.split("\\s+"))
         .map(_.toLowerCase)
         .distinct
@@ -161,7 +167,8 @@ class ReplTest extends WordSpec {
       val hello = TypedPipe.from(TextLine(helloPath))
       "support toIterator" in {
         hello.toIterator.foreach { line: String =>
-          assert(line.contains("Hello world") || line.contains("Goodbye world"))
+          assert(
+              line.contains("Hello world") || line.contains("Goodbye world"))
         }
       }
       "support toList" in {
@@ -176,7 +183,8 @@ class ReplTest extends WordSpec {
         assert(out === helloRef.flatMap(_.split("\\s+")))
       }
       "tuple" in {
-        assert(hello.map(l => (l, l.length)).toList === helloRef.map(l => (l, l.length)))
+        assert(hello.map(l => (l, l.length)).toList === helloRef.map(
+                l => (l, l.length)))
       }
     }
   }
@@ -204,16 +212,16 @@ class ReplTest extends WordSpec {
     "enumerate matching files" in {
       root.setReadable(true)
 
-      val actual = ScaldingILoop
-        .findAllUpPath(currentDirectory.getAbsolutePath)("this_matches")
+      val actual = ScaldingILoop.findAllUpPath(
+          currentDirectory.getAbsolutePath)("this_matches")
       assert(actual === List(matchingFile))
     }
 
     "ignore directories with restricted permissions" in {
       root.setReadable(false)
 
-      val actual = ScaldingILoop
-        .findAllUpPath(currentDirectory.getAbsolutePath)("this_matches")
+      val actual = ScaldingILoop.findAllUpPath(
+          currentDirectory.getAbsolutePath)("this_matches")
       assert(actual === List.empty)
     }
   }

@@ -11,10 +11,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.SelfType
 import scala.annotation.tailrec
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 08.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 08.02.2008
+  */
 /*
  *  TemplateBody ::= '{' [SelfType] TemplateStat {semi TemplateStat} '}'
  */
@@ -44,24 +43,24 @@ object TemplateBody {
           if (TemplateStat parse builder) {
             builder.getTokenType match {
               case ScalaTokenTypes.tRBRACE => {
-                builder.advanceLexer() //Ate }
-                true
-              }
+                  builder.advanceLexer() //Ate }
+                  true
+                }
               case ScalaTokenTypes.tSEMICOLON => {
-                while (builder.getTokenType == ScalaTokenTypes.tSEMICOLON) builder.advanceLexer()
-                subparse()
-              }
-              case _ => {
-                if (builder.newlineBeforeCurrentToken) subparse()
-                else {
-                  builder error ScalaBundle.message("semi.expected")
-                  builder.advanceLexer() //Ate something
+                  while (builder.getTokenType == ScalaTokenTypes.tSEMICOLON) builder
+                    .advanceLexer()
                   subparse()
                 }
-              }
+              case _ => {
+                  if (builder.newlineBeforeCurrentToken) subparse()
+                  else {
+                    builder error ScalaBundle.message("semi.expected")
+                    builder.advanceLexer() //Ate something
+                    subparse()
+                  }
+                }
             }
-          }
-          else {
+          } else {
             builder error ScalaBundle.message("def.dcl.expected")
             builder.advanceLexer() //Ate something
             subparse()

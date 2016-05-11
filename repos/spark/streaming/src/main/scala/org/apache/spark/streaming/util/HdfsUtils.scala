@@ -29,10 +29,12 @@ private[streaming] object HdfsUtils {
     // If the file exists and we have append support, append instead of creating a new file
     val stream: FSDataOutputStream = {
       if (dfs.isFile(dfsPath)) {
-        if (conf.getBoolean("hdfs.append.support", false) || dfs.isInstanceOf[RawLocalFileSystem]) {
+        if (conf.getBoolean("hdfs.append.support", false) ||
+            dfs.isInstanceOf[RawLocalFileSystem]) {
           dfs.append(dfsPath)
         } else {
-          throw new IllegalStateException("File exists and there is no append support!")
+          throw new IllegalStateException(
+              "File exists and there is no append support!")
         }
       } else {
         dfs.create(dfsPath)
@@ -66,12 +68,15 @@ private[streaming] object HdfsUtils {
   }
 
   /** Get the locations of the HDFS blocks containing the given file segment. */
-  def getFileSegmentLocations(
-      path: String, offset: Long, length: Long, conf: Configuration): Array[String] = {
+  def getFileSegmentLocations(path: String,
+                              offset: Long,
+                              length: Long,
+                              conf: Configuration): Array[String] = {
     val dfsPath = new Path(path)
     val dfs = getFileSystemForPath(dfsPath, conf)
     val fileStatus = dfs.getFileStatus(dfsPath)
-    val blockLocs = Option(dfs.getFileBlockLocations(fileStatus, offset, length))
+    val blockLocs = Option(
+        dfs.getFileBlockLocations(fileStatus, offset, length))
     blockLocs.map(_.flatMap(_.getHosts)).getOrElse(Array.empty)
   }
 

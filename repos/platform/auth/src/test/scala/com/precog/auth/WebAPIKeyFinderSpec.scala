@@ -37,19 +37,27 @@ import org.streum.configrity.Configuration
 import scalaz._
 import scalaz.syntax.comonad._
 
-class WebAPIKeyFinderSpec extends APIKeyFinderSpec[Future] with AkkaDefaults { self =>
+class WebAPIKeyFinderSpec extends APIKeyFinderSpec[Future] with AkkaDefaults {
+  self =>
   implicit lazy val executionContext = defaultFutureDispatch
-  implicit lazy val M: Monad[Future] with Comonad[Future] = new UnsafeFutureComonad(executionContext, Duration(5, "seconds"))
+  implicit lazy val M: Monad[Future] with Comonad[Future] =
+    new UnsafeFutureComonad(executionContext, Duration(5, "seconds"))
 
-  def withAPIKeyFinder[A](mgr: APIKeyManager[Future])(f: APIKeyFinder[Future] => A): A = {
+  def withAPIKeyFinder[A](mgr: APIKeyManager[Future])(
+      f: APIKeyFinder[Future] => A): A = {
     val testService = new TestAPIKeyService {
       val apiKeyManager = mgr
     }
-    val (service, stoppable) = testService.server(Configuration.parse(testService.config), executionContext).start.get.copoint
+    val (service, stoppable) = testService
+      .server(Configuration.parse(testService.config), executionContext)
+      .start
+      .get
+      .copoint
     val client = new HttpClient[ByteChunk] {
       def isDefinedAt(req: HttpRequest[ByteChunk]) = true
       def apply(req: HttpRequest[ByteChunk]) =
-        service.service(req) getOrElse Future(HttpResponse(HttpStatus(NotFound)))
+        service.service(req) getOrElse Future(
+            HttpResponse(HttpStatus(NotFound)))
     }
 
     val apiKeyFinder = new WebAPIKeyFinder {
@@ -57,7 +65,8 @@ class WebAPIKeyFinderSpec extends APIKeyFinderSpec[Future] with AkkaDefaults { s
       val rootAPIKey = self.M.copoint(mgr.rootAPIKey)
       val rootGrantId = self.M.copoint(mgr.rootGrantId)
       val executor = self.executionContext
-      protected def withRawClient[A](f: HttpClient[ByteChunk] => A): A = f(client.path("/security/v1/"))
+      protected def withRawClient[A](f: HttpClient[ByteChunk] => A): A =
+        f(client.path("/security/v1/"))
     }
 
     val result = f(apiKeyFinder.withM[Future])

@@ -10,10 +10,9 @@ object Test {
       val x = 1
     }
   }
-  trait Trees extends rTrees {
-    self: SymbolTable =>
+  trait Trees extends rTrees { self: SymbolTable =>
     object treeInfo extends {
-    val trees : Trees.this.type = Trees.this
+      val trees: Trees.this.type = Trees.this
     } with TreeInfo
   }
   abstract class SymbolTable extends Trees
@@ -22,11 +21,10 @@ object Test {
     val global: Global
   }
 
-  trait Typers {
-    self: Analyzer =>
+  trait Typers { self: Analyzer =>
     import global._
-    private def argMode(fun : Tree) = {
-      treeInfo./* line: 5 */goo(fun)
+    private def argMode(fun: Tree) = {
+      treeInfo. /* line: 5 */ goo(fun)
     }
   }
 }

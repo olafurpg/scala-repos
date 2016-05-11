@@ -3,7 +3,7 @@
  */
 package play.api.routing.sird
 
-import java.net.{ URL, URI }
+import java.net.{URL, URI}
 
 import org.specs2.mutable.Specification
 import play.core.test.FakeRequest
@@ -165,7 +165,5 @@ object UrlContextSpec extends Specification {
         }
       }
     }
-
   }
-
 }

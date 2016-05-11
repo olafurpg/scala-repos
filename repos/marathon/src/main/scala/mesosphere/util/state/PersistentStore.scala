@@ -22,7 +22,6 @@ trait PersistentEntity {
     * This will create a new entity, that can be used afterwards.
     */
   def withNewContent(bytes: IndexedSeq[Byte]): PersistentEntity
-
 }
 
 /**

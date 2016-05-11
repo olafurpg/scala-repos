@@ -11,12 +11,19 @@ import scala.reflect.ClassTag
 /**
   * @author Pavel Fatin
   */
-abstract class InspectionTestCase[T <: LocalInspectionTool : ClassTag] extends SimpleTestCase {
-  protected def assertHighlights(@Language("Scala") code: String, highlights: Highlight*) {
-    Assert.assertEquals(highlights, highlight(code, implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]))
+abstract class InspectionTestCase[T <: LocalInspectionTool : ClassTag]
+    extends SimpleTestCase {
+  protected def assertHighlights(
+      @Language("Scala") code: String, highlights: Highlight*) {
+    Assert.assertEquals(
+        highlights,
+        highlight(
+            code, implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]))
   }
 
-  protected def highlight(@Language("Scala") code: String, inspection: Class[_ <: LocalInspectionTool]): Seq[Highlight] = {
+  protected def highlight(
+      @Language("Scala") code: String,
+      inspection: Class[_ <: LocalInspectionTool]): Seq[Highlight] = {
     fixture.configureByText("dummy.scala", code)
     fixture.enableInspections(inspection)
 
@@ -28,7 +35,11 @@ abstract class InspectionTestCase[T <: LocalInspectionTool : ClassTag] extends S
         case _ => Information
       }
       if (severity == Information) Seq.empty
-      else Seq(Highlight(it.getStartOffset, it.getEndOffset, it.getDescription, severity))
+      else
+        Seq(Highlight(it.getStartOffset,
+                      it.getEndOffset,
+                      it.getDescription,
+                      severity))
     }
   }
 
@@ -42,5 +53,6 @@ abstract class InspectionTestCase[T <: LocalInspectionTool : ClassTag] extends S
 
   protected case object Information extends Severity
 
-  protected case class Highlight(begin: Int, end: Int, description: String, severity: Severity = Warning)
+  protected case class Highlight(
+      begin: Int, end: Int, description: String, severity: Severity = Warning)
 }

@@ -46,7 +46,8 @@ object CustomRouteExample {
 
   class CustomRouteBuilder extends RouteBuilder {
     def configure {
-      from("direct:welcome").process(new Processor() {
+      from("direct:welcome").process(
+          new Processor() {
         def process(exchange: Exchange) {
           // Create a 'welcome' message from the input message
           exchange.getOut.setBody("Welcome %s" format exchange.getIn.getBody)
@@ -54,5 +55,4 @@ object CustomRouteExample {
       })
     }
   }
-
 }

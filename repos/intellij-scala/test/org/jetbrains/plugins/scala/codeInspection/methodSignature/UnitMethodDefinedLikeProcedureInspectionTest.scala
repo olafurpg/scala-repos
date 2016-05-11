@@ -5,12 +5,15 @@ import com.intellij.codeInspection.LocalInspectionTool
 import org.jetbrains.plugins.scala.codeInspection.{InspectionBundle, ScalaLightInspectionFixtureTestAdapter}
 
 /**
- * Nikolay.Tropin
- * 6/25/13
- */
-class UnitMethodDefinedLikeProcedureInspectionTest extends ScalaLightInspectionFixtureTestAdapter{
-  protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[UnitMethodDefinedLikeProcedureInspection]
-  protected def annotation: String = InspectionBundle.message("unit.method.like.procedure.name")
+  * Nikolay.Tropin
+  * 6/25/13
+  */
+class UnitMethodDefinedLikeProcedureInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
+  protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[UnitMethodDefinedLikeProcedureInspection]
+  protected def annotation: String =
+    InspectionBundle.message("unit.method.like.procedure.name")
   private val hint = InspectionBundle.message("insert.return.type.and.equals")
 
   def test1(): Unit = {

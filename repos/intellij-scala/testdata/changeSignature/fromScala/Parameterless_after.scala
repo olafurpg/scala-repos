@@ -3,7 +3,7 @@ class Parameterless {
 
   bar()
   bar()
-  this bar()
+  this bar ()
   this.bar()
 }
 

@@ -1,7 +1,9 @@
 object SCL6549 {
   class implicitsearchbug {
-    def doesntWork[Y, Z](y: Y)(implicit x: implicitsearchbug.Foo[this.type, Y, Z]) = x(y)
-    def works[Y, Z](y: Y)(implicit x: implicitsearchbug.Foo[implicitInstance.type, Y, Z]) = x(y)
+    def doesntWork[Y, Z](y: Y)(
+        implicit x: implicitsearchbug.Foo[this.type, Y, Z]) = x(y)
+    def works[Y, Z](y: Y)(
+        implicit x: implicitsearchbug.Foo[implicitInstance.type, Y, Z]) = x(y)
   }
 
   object implicitsearchbug {
@@ -14,7 +16,6 @@ object SCL6549 {
     implicit object bar extends implicitsearchbug.Foo[this.type, Int, Double] {
       def apply(y: Int): Double = 3
     }
-
   }
 
   object ImplicitMain {
@@ -26,14 +27,16 @@ object SCL6549 {
 
     {
       // for comparison:
-      implicit object baz extends implicitsearchbug.Foo[implicitInstance.type, Double, Int] {
+      implicit object baz
+          extends implicitsearchbug.Foo[implicitInstance.type, Double, Int] {
         def apply(y: Double): Int = 3
       }
 
       // Ok: z inferred as Int, should be Int. (baz implicit is found.)
       val z = implicitInstance.doesntWork(3.0)
 
-      /*start*/(x, y, z)/*end*/
+      /*start*/
+      (x, y, z) /*end*/
     }
   }
 }

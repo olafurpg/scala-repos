@@ -46,23 +46,30 @@ object RandomForestRegressionExample {
     val maxDepth = 4
     val maxBins = 32
 
-    val model = RandomForest.trainRegressor(trainingData, categoricalFeaturesInfo,
-      numTrees, featureSubsetStrategy, impurity, maxDepth, maxBins)
+    val model = RandomForest.trainRegressor(trainingData,
+                                            categoricalFeaturesInfo,
+                                            numTrees,
+                                            featureSubsetStrategy,
+                                            impurity,
+                                            maxDepth,
+                                            maxBins)
 
     // Evaluate model on test instances and compute test error
     val labelsAndPredictions = testData.map { point =>
       val prediction = model.predict(point.features)
       (point.label, prediction)
     }
-    val testMSE = labelsAndPredictions.map{ case(v, p) => math.pow((v - p), 2)}.mean()
+    val testMSE = labelsAndPredictions.map {
+      case (v, p) => math.pow((v - p), 2)
+    }.mean()
     println("Test Mean Squared Error = " + testMSE)
     println("Learned regression forest model:\n" + model.toDebugString)
 
     // Save and load model
     model.save(sc, "target/tmp/myRandomForestRegressionModel")
-    val sameModel = RandomForestModel.load(sc, "target/tmp/myRandomForestRegressionModel")
+    val sameModel =
+      RandomForestModel.load(sc, "target/tmp/myRandomForestRegressionModel")
     // $example off$
   }
 }
 // scalastyle:on println
-

@@ -34,25 +34,24 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
 object Bloom {
-  implicit def sfxBloom2jfx(b: Bloom): jfxse.Bloom = if (b != null) b.delegate else null
+  implicit def sfxBloom2jfx(b: Bloom): jfxse.Bloom =
+    if (b != null) b.delegate else null
 }
 
 class Bloom(override val delegate: jfxse.Bloom = new jfxse.Bloom)
-  extends Effect(delegate)
-  with InputDelegate[jfxse.Bloom]
-  with SFXDelegate[jfxse.Bloom] {
+    extends Effect(delegate) with InputDelegate[jfxse.Bloom]
+    with SFXDelegate[jfxse.Bloom] {
 
   /**
-   * Creates a new instance of Bloom with the specified threshold.
-   */
+    * Creates a new instance of Bloom with the specified threshold.
+    */
   def this(threshold: Double) = this(new jfxse.Bloom(threshold))
 
   /**
-   * The threshold value controls the minimum luminosity value of the pixels that will be made to glow.
-   */
+    * The threshold value controls the minimum luminosity value of the pixels that will be made to glow.
+    */
   def threshold: DoubleProperty = delegate.thresholdProperty
   def threshold_=(v: Double) {
     threshold() = v
   }
-
 }

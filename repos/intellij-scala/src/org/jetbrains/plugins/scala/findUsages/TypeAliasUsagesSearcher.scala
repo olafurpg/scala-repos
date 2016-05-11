@@ -15,26 +15,28 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
 import org.jetbrains.plugins.scala.lang.resolve.ResolvableReferenceElement
 
-
 /**
- * Finds usages of a type alias definition which refers to a class.
- *
- * The usages resolve *directly* to the class, so they are missed by the
- * standard reference search.
- *
- * @see [[org.jetbrains.plugins.scala.lang.resolve.processor.ConstructorResolveProcessor]]
- *
- * {{{
- *   class X()
- *   object A {
- *     type /*search*/alias = X
- *   }
- *   new A./*found*/alias()
- * }}}
- */
-class TypeAliasUsagesSearcher extends QueryExecutorBase[PsiReference, ReferencesSearch.SearchParameters](true) {
+  * Finds usages of a type alias definition which refers to a class.
+  *
+  * The usages resolve *directly* to the class, so they are missed by the
+  * standard reference search.
+  *
+  * @see [[org.jetbrains.plugins.scala.lang.resolve.processor.ConstructorResolveProcessor]]
+  *
+  * {{{
+  *   class X()
+  *   object A {
+  *     type /*search*/alias = X
+  *   }
+  *   new A./*found*/alias()
+  * }}}
+  */
+class TypeAliasUsagesSearcher
+    extends QueryExecutorBase[PsiReference, ReferencesSearch.SearchParameters](
+        true) {
 
-  def processQuery(@NotNull parameters: ReferencesSearch.SearchParameters, @NotNull consumer: Processor[PsiReference]) {
+  def processQuery(@NotNull parameters: ReferencesSearch.SearchParameters,
+                   @NotNull consumer: Processor[PsiReference]) {
     val target: PsiElement = parameters.getElementToSearch
     val ta = target match {
       case named: PsiNamedElement =>
@@ -46,22 +48,34 @@ class TypeAliasUsagesSearcher extends QueryExecutorBase[PsiReference, References
     }
     val name: String = ta.name
     if (name == null || StringUtil.isEmptyOrSpaces(name)) return
-    val scope: SearchScope = inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
+    val scope: SearchScope =
+      inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
     val collector: SearchRequestCollector = parameters.getOptimizer
     val session: SearchSession = collector.getSearchSession
-    collector.searchWord(name, scope, UsageSearchContext.IN_CODE, true, new MyProcessor(target, null, session))
+    collector.searchWord(name,
+                         scope,
+                         UsageSearchContext.IN_CODE,
+                         true,
+                         new MyProcessor(target, null, session))
   }
 
-  private class MyProcessor(myTarget: PsiElement, @Nullable prefix: String, mySession: SearchSession) extends RequestResultProcessor(myTarget, prefix) {
-    def processTextOccurrence(element: PsiElement, offsetInElement: Int, consumer: Processor[PsiReference]): Boolean = inReadAction {
+  private class MyProcessor(
+      myTarget: PsiElement, @Nullable prefix: String, mySession: SearchSession)
+      extends RequestResultProcessor(myTarget, prefix) {
+    def processTextOccurrence(
+        element: PsiElement,
+        offsetInElement: Int,
+        consumer: Processor[PsiReference]): Boolean = inReadAction {
       ScalaPsiUtil.getParentOfType(element, classOf[ScConstructor]) match {
-        case cons: ScConstructor if PsiTreeUtil.isAncestor(cons.typeElement, element, false) =>
+        case cons: ScConstructor
+            if PsiTreeUtil.isAncestor(cons.typeElement, element, false) =>
           element match {
-            case resRef: ResolvableReferenceElement => resRef.bind().flatMap(_.parentElement) match {
-              case Some(`myTarget`) =>
-                consumer.process(resRef)
-              case _ => true
-            }
+            case resRef: ResolvableReferenceElement =>
+              resRef.bind().flatMap(_.parentElement) match {
+                case Some(`myTarget`) =>
+                  consumer.process(resRef)
+                case _ => true
+              }
             case _ => true
           }
         case _ => true

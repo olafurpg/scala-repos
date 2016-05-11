@@ -11,8 +11,8 @@ import com.intellij.util.StringBuilderSpinAllocator
 import org.jetbrains.plugins.scala.lang.lexer.{ScalaLexer, ScalaTokenTypes}
 
 /**
- * @author Alexander Podkhalyuzin
- */
+  * @author Alexander Podkhalyuzin
+  */
 object ScalaDirUtil {
   def getPackageStatement(text: CharSequence): String = {
     val lexer: Lexer = new ScalaLexer
@@ -53,18 +53,18 @@ object ScalaDirUtil {
     try {
       readPackage(true)
       val packageName: String = buffer.toString
-      if (packageName.length == 0 || StringUtil.endsWithChar(packageName, '.')) return null
+      if (packageName.length == 0 || StringUtil.endsWithChar(packageName, '.'))
+        return null
       packageName
-    }
-    finally {
+    } finally {
       StringBuilderSpinAllocator.dispose(buffer)
     }
   }
 
   def skipWhiteSpaceAndComments(lexer: Lexer) {
-    while (ScalaTokenTypes.WHITES_SPACES_AND_COMMENTS_TOKEN_SET.contains(lexer.getTokenType)) {
+    while (ScalaTokenTypes.WHITES_SPACES_AND_COMMENTS_TOKEN_SET.contains(
+        lexer.getTokenType)) {
       lexer.advance()
     }
   }
 }
-

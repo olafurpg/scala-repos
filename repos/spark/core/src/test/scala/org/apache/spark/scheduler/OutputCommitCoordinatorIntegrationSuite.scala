@@ -25,22 +25,21 @@ import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkFunSui
 import org.apache.spark.util.Utils
 
 /**
- * Integration tests for the OutputCommitCoordinator.
- *
- * See also: [[OutputCommitCoordinatorSuite]] for unit tests that use mocks.
- */
+  * Integration tests for the OutputCommitCoordinator.
+  *
+  * See also: [[OutputCommitCoordinatorSuite]] for unit tests that use mocks.
+  */
 class OutputCommitCoordinatorIntegrationSuite
-  extends SparkFunSuite
-  with LocalSparkContext
-  with Timeouts {
+    extends SparkFunSuite with LocalSparkContext with Timeouts {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
     val conf = new SparkConf()
       .set("master", "local[2,4]")
       .set("spark.speculation", "true")
-      .set("spark.hadoop.mapred.output.committer.class",
-        classOf[ThrowExceptionOnFirstAttemptOutputCommitter].getCanonicalName)
+      .set(
+          "spark.hadoop.mapred.output.committer.class",
+          classOf[ThrowExceptionOnFirstAttemptOutputCommitter].getCanonicalName)
     sc = new SparkContext("local[2, 4]", "test", conf)
   }
 
@@ -49,7 +48,9 @@ class OutputCommitCoordinatorIntegrationSuite
     failAfter(Span(60, Seconds)) {
       val tempDir = Utils.createTempDir()
       try {
-        sc.parallelize(1 to 4, 2).map(_.toString).saveAsTextFile(tempDir.getAbsolutePath + "/out")
+        sc.parallelize(1 to 4, 2)
+          .map(_.toString)
+          .saveAsTextFile(tempDir.getAbsolutePath + "/out")
       } finally {
         Utils.deleteRecursively(tempDir)
       }
@@ -57,7 +58,8 @@ class OutputCommitCoordinatorIntegrationSuite
   }
 }
 
-private class ThrowExceptionOnFirstAttemptOutputCommitter extends FileOutputCommitter {
+private class ThrowExceptionOnFirstAttemptOutputCommitter
+    extends FileOutputCommitter {
   override def commitTask(context: TaskAttemptContext): Unit = {
     val ctx = TaskContext.get()
     if (ctx.attemptNumber < 1) {

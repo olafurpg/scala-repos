@@ -1,31 +1,29 @@
-import scala.collection.immutable.{ Range, NumericRange }
+import scala.collection.immutable.{Range, NumericRange}
 
 object Test {
-  def rangeForeach(range : Range) = {
+  def rangeForeach(range: Range) = {
     val buffer = new scala.collection.mutable.ListBuffer[Int];
     range.foreach(buffer += _);
-    assert(buffer.toList == range.iterator.toList, buffer.toList+"/"+range.iterator.toList)
+    assert(buffer.toList == range.iterator.toList,
+           buffer.toList + "/" + range.iterator.toList)
   }
 
   def boundaryTests() = {
     // #4321
     assert((Int.MinValue to Int.MaxValue by Int.MaxValue).size == 3)
     // #4308
-    val caught = (
-      try   { (Long.MinValue to Long.MaxValue).sum ; false }
-      catch { case _: IllegalArgumentException => true }
-    )
+    val caught = (try { (Long.MinValue to Long.MaxValue).sum; false } catch {
+      case _: IllegalArgumentException => true
+    })
     assert(caught)
     // #7432
-    val noElemAtMin = (
-      try   { (10 until 10).min ; false }
-      catch { case _: NoSuchElementException => true }
-    )
+    val noElemAtMin = (try { (10 until 10).min; false } catch {
+      case _: NoSuchElementException => true
+    })
     assert(noElemAtMin)
-    val noElemAtMax = (
-      try   { (10 until 10).max ; false }
-      catch { case _: NoSuchElementException => true }
-    )
+    val noElemAtMax = (try { (10 until 10).max; false } catch {
+      case _: NoSuchElementException => true
+    })
     assert(noElemAtMax)
   }
 
@@ -36,7 +34,7 @@ object Test {
 
     def gr1 = NumericRange(x, x, x)
     def gr2 = NumericRange.inclusive(x, x, x)
-    def gr3 = NumericRange(x, x * fromInt(4), x * fromInt(2))  // SI-9348
+    def gr3 = NumericRange(x, x * fromInt(4), x * fromInt(2)) // SI-9348
     def gr4 = NumericRange(x, x * fromInt(-2), x * fromInt(-2))
     def gr5 = NumericRange(x, x * fromInt(10), x)
     def gr6 = NumericRange.inclusive(x, x * fromInt(10), x)
@@ -57,12 +55,12 @@ object Test {
     implicit val imp2 = Numeric.DoubleAsIfIntegral
 
     val _grs = List[GR[_]](
-      GR(BigDecimal(5.0)),
-      GR(BigDecimal(0.25)),  // SI-9348
-      GR(BigInt(5)),
-      GR(5L),
-      GR(5.0d),
-      GR(2.toByte)
+        GR(BigDecimal(5.0)),
+        GR(BigDecimal(0.25)), // SI-9348
+        GR(BigInt(5)),
+        GR(5L),
+        GR(5.0d),
+        GR(2.toByte)
     )
     val grs = _grs ::: (_grs map (_.negated))
     grs foreach (_.check)

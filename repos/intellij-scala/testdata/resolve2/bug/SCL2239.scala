@@ -7,6 +7,8 @@ object Test {
 
   val x: Throwable = null
 
-  /* line: 2 */a(x)
-  /* line: 6 */b(x)
+  /* line: 2 */
+  a(x)
+  /* line: 6 */
+  b(x)
 }

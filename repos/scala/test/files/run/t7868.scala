@@ -3,10 +3,9 @@ object A {
 
   def run = (0: Short) match {
     case A(_) =>
-    case _    =>
+    case _ =>
   }
 }
-
 
 object Test extends App {
   A.run

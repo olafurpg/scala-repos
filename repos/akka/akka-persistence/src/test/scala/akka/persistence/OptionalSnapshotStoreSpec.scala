@@ -3,10 +3,10 @@
  */
 package akka.persistence
 
-import akka.actor.{ Actor, Props }
+import akka.actor.{Actor, Props}
 import akka.event.Logging
 import akka.event.Logging.Warning
-import akka.testkit.{ EventFilter, ImplicitSender, TestEvent }
+import akka.testkit.{EventFilter, ImplicitSender, TestEvent}
 import com.typesafe.config.ConfigFactory
 
 object OptionalSnapshotStoreSpec {
@@ -25,25 +25,31 @@ object OptionalSnapshotStoreSpec {
     override def receiveRecover: Receive = Actor.emptyBehavior
   }
 
-  class PickedSnapshotStorePersistentActor(name: String) extends AnyPersistentActor(name) {
-    override def snapshotPluginId: String = "akka.persistence.snapshot-store.local"
+  class PickedSnapshotStorePersistentActor(name: String)
+      extends AnyPersistentActor(name) {
+    override def snapshotPluginId: String =
+      "akka.persistence.snapshot-store.local"
   }
 }
 
-class OptionalSnapshotStoreSpec extends PersistenceSpec(ConfigFactory.parseString(
-  s"""
+class OptionalSnapshotStoreSpec
+    extends PersistenceSpec(
+        ConfigFactory.parseString(s"""
     akka.persistence.publish-plugin-commands = on
     akka.persistence.journal.plugin = "akka.persistence.journal.inmem"
-    akka.persistence.journal.leveldb.dir = "target/journal-${classOf[OptionalSnapshotStoreSpec].getName}"
+    akka.persistence.journal.leveldb.dir = "target/journal-${classOf[
+        OptionalSnapshotStoreSpec].getName}"
 
     akka.actor.warn-about-java-serializer-usage = off
 
     # snapshot store plugin is NOT defined, things should still work
-    akka.persistence.snapshot-store.local.dir = "target/snapshots-${classOf[OptionalSnapshotStoreSpec].getName}/"
+    akka.persistence.snapshot-store.local.dir = "target/snapshots-${classOf[
+        OptionalSnapshotStoreSpec].getName}/"
   """)) with ImplicitSender {
   import OptionalSnapshotStoreSpec._
 
-  system.eventStream.publish(TestEvent.Mute(EventFilter[akka.pattern.AskTimeoutException]()))
+  system.eventStream.publish(
+      TestEvent.Mute(EventFilter[akka.pattern.AskTimeoutException]()))
 
   "Persistence extension" must {
     "initialize properly even in absence of configured snapshot store" in {
@@ -54,17 +60,18 @@ class OptionalSnapshotStoreSpec extends PersistenceSpec(ConfigFactory.parseStrin
     }
 
     "fail if PersistentActor tries to saveSnapshot without snapshot-store available" in {
-      val persistentActor = system.actorOf(Props(classOf[AnyPersistentActor], name))
+      val persistentActor =
+        system.actorOf(Props(classOf[AnyPersistentActor], name))
       persistentActor ! "snap"
-      expectMsgType[SaveSnapshotFailure].cause.getMessage should include("No snapshot store configured")
+      expectMsgType[SaveSnapshotFailure].cause.getMessage should include(
+          "No snapshot store configured")
     }
 
     "successfully save a snapshot when no default snapshot-store configured, yet PersistentActor picked one explicitly" in {
-      val persistentActor = system.actorOf(Props(classOf[PickedSnapshotStorePersistentActor], name))
+      val persistentActor = system.actorOf(
+          Props(classOf[PickedSnapshotStorePersistentActor], name))
       persistentActor ! "snap"
       expectMsgType[SaveSnapshotSuccess]
     }
-
   }
 }
-

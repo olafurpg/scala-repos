@@ -1,7 +1,8 @@
 import java.util.{Date, Timer, Enumeration, UUID, Locale}
 import scala.util._
 
-class NotUsedNameClash { //Both packages have `Random` class
+class NotUsedNameClash {
+  //Both packages have `Random` class
   def foo(): Unit = {
     val d: Date = null
     val t: Timer = null
@@ -27,4 +28,4 @@ class NotUsedNameClash { //Both packages have `Random` class
     val tr: Try = null
   }
 }
-*/
+ */

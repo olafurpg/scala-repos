@@ -26,8 +26,8 @@ import org.apache.spark.mllib.util.Loader
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 /**
- * Helper methods for import/export of GLM regression models.
- */
+  * Helper methods for import/export of GLM regression models.
+  */
 private[regression] object GLMRegressionModel {
 
   object SaveLoadV1_0 {
@@ -38,23 +38,23 @@ private[regression] object GLMRegressionModel {
     case class Data(weights: Vector, intercept: Double)
 
     /**
-     * Helper method for saving GLM regression model metadata and data.
-     * @param modelClass  String name for model class, to be saved with metadata
-     */
-    def save(
-        sc: SparkContext,
-        path: String,
-        modelClass: String,
-        weights: Vector,
-        intercept: Double): Unit = {
+      * Helper method for saving GLM regression model metadata and data.
+      * @param modelClass  String name for model class, to be saved with metadata
+      */
+    def save(sc: SparkContext,
+             path: String,
+             modelClass: String,
+             weights: Vector,
+             intercept: Double): Unit = {
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
 
       // Create JSON metadata.
-      val metadata = compact(render(
-        ("class" -> modelClass) ~ ("version" -> thisFormatVersion) ~
-          ("numFeatures" -> weights.size)))
-      sc.parallelize(Seq(metadata), 1).saveAsTextFile(Loader.metadataPath(path))
+      val metadata = compact(
+          render(("class" -> modelClass) ~ ("version" -> thisFormatVersion) ~
+              ("numFeatures" -> weights.size)))
+      sc.parallelize(Seq(metadata), 1)
+        .saveAsTextFile(Loader.metadataPath(path))
 
       // Create Parquet data.
       val data = Data(weights, intercept)
@@ -64,26 +64,32 @@ private[regression] object GLMRegressionModel {
     }
 
     /**
-     * Helper method for loading GLM regression model data.
-     * @param modelClass  String name for model class (used for error messages)
-     * @param numFeatures  Number of features, to be checked against loaded data.
-     *                     The length of the weights vector should equal numFeatures.
-     */
-    def loadData(sc: SparkContext, path: String, modelClass: String, numFeatures: Int): Data = {
+      * Helper method for loading GLM regression model data.
+      * @param modelClass  String name for model class (used for error messages)
+      * @param numFeatures  Number of features, to be checked against loaded data.
+      *                     The length of the weights vector should equal numFeatures.
+      */
+    def loadData(sc: SparkContext,
+                 path: String,
+                 modelClass: String,
+                 numFeatures: Int): Data = {
       val datapath = Loader.dataPath(path)
       val sqlContext = SQLContext.getOrCreate(sc)
       val dataRDD = sqlContext.read.parquet(datapath)
       val dataArray = dataRDD.select("weights", "intercept").take(1)
-      assert(dataArray.length == 1, s"Unable to load $modelClass data from: $datapath")
+      assert(dataArray.length == 1,
+             s"Unable to load $modelClass data from: $datapath")
       val data = dataArray(0)
-      assert(data.size == 2, s"Unable to load $modelClass data from: $datapath")
+      assert(
+          data.size == 2, s"Unable to load $modelClass data from: $datapath")
       data match {
         case Row(weights: Vector, intercept: Double) =>
-          assert(weights.size == numFeatures, s"Expected $numFeatures features, but" +
-            s" found ${weights.size} features when loading $modelClass weights from $datapath")
+          assert(
+              weights.size == numFeatures,
+              s"Expected $numFeatures features, but" +
+              s" found ${weights.size} features when loading $modelClass weights from $datapath")
           Data(weights, intercept)
       }
     }
   }
-
 }

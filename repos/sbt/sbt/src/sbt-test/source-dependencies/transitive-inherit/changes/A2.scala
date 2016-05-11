@@ -1,4 +1,3 @@
-trait A
-{
-	def x = 5
+trait A {
+  def x = 5
 }

@@ -37,53 +37,54 @@ private[spark] case class NarrowCoGroupSplitDep(
     @transient rdd: RDD[_],
     @transient splitIndex: Int,
     var split: Partition
-  ) extends Serializable {
+)
+    extends Serializable {
 
   @throws(classOf[IOException])
-  private def writeObject(oos: ObjectOutputStream): Unit = Utils.tryOrIOException {
-    // Update the reference to parent split at the time of task serialization
-    split = rdd.partitions(splitIndex)
-    oos.defaultWriteObject()
-  }
+  private def writeObject(oos: ObjectOutputStream): Unit =
+    Utils.tryOrIOException {
+      // Update the reference to parent split at the time of task serialization
+      split = rdd.partitions(splitIndex)
+      oos.defaultWriteObject()
+    }
 }
 
 /**
- * Stores information about the narrow dependencies used by a CoGroupedRdd.
- *
- * @param narrowDeps maps to the dependencies variable in the parent RDD: for each one to one
- *                   dependency in dependencies, narrowDeps has a NarrowCoGroupSplitDep (describing
- *                   the partition for that dependency) at the corresponding index. The size of
- *                   narrowDeps should always be equal to the number of parents.
- */
+  * Stores information about the narrow dependencies used by a CoGroupedRdd.
+  *
+  * @param narrowDeps maps to the dependencies variable in the parent RDD: for each one to one
+  *                   dependency in dependencies, narrowDeps has a NarrowCoGroupSplitDep (describing
+  *                   the partition for that dependency) at the corresponding index. The size of
+  *                   narrowDeps should always be equal to the number of parents.
+  */
 private[spark] class CoGroupPartition(
     idx: Int, val narrowDeps: Array[Option[NarrowCoGroupSplitDep]])
-  extends Partition with Serializable {
+    extends Partition with Serializable {
   override val index: Int = idx
   override def hashCode(): Int = idx
 }
 
 /**
- * :: DeveloperApi ::
- * A RDD that cogroups its parents. For each key k in parent RDDs, the resulting RDD contains a
- * tuple with the list of values for that key.
- *
- * Note: This is an internal API. We recommend users use RDD.cogroup(...) instead of
- * instantiating this directly.
- *
- * @param rdds parent RDDs.
- * @param part partitioner used to partition the shuffle output
- */
+  * :: DeveloperApi ::
+  * A RDD that cogroups its parents. For each key k in parent RDDs, the resulting RDD contains a
+  * tuple with the list of values for that key.
+  *
+  * Note: This is an internal API. We recommend users use RDD.cogroup(...) instead of
+  * instantiating this directly.
+  *
+  * @param rdds parent RDDs.
+  * @param part partitioner used to partition the shuffle output
+  */
 @DeveloperApi
-class CoGroupedRDD[K: ClassTag](
-    @transient var rdds: Seq[RDD[_ <: Product2[K, _]]],
-    part: Partitioner)
-  extends RDD[(K, Array[Iterable[_]])](rdds.head.context, Nil) {
+class CoGroupedRDD[K : ClassTag](
+    @transient var rdds: Seq[RDD[_ <: Product2[K, _]]], part: Partitioner)
+    extends RDD[(K, Array[Iterable[_]])](rdds.head.context, Nil) {
 
   // For example, `(k, a) cogroup (k, b)` produces k -> Array(ArrayBuffer as, ArrayBuffer bs).
   // Each ArrayBuffer is represented as a CoGroup, and the resulting Array as a CoGroupCombiner.
   // CoGroupValue is the intermediate state of each value before being merged in compute.
   private type CoGroup = CompactBuffer[Any]
-  private type CoGroupValue = (Any, Int)  // Int is dependency number
+  private type CoGroupValue = (Any, Int) // Int is dependency number
   private type CoGroupCombiner = Array[CoGroup]
 
   private var serializer: Serializer = SparkEnv.get.serializer
@@ -102,7 +103,7 @@ class CoGroupedRDD[K: ClassTag](
       } else {
         logDebug("Adding shuffle dependency with " + rdd)
         new ShuffleDependency[K, Any, CoGroupCombiner](
-          rdd.asInstanceOf[RDD[_ <: Product2[K, _]]], part, serializer)
+            rdd.asInstanceOf[RDD[_ <: Product2[K, _]]], part, serializer)
       }
     }
   }
@@ -111,14 +112,15 @@ class CoGroupedRDD[K: ClassTag](
     val array = new Array[Partition](part.numPartitions)
     for (i <- 0 until array.length) {
       // Each CoGroupPartition will have a dependency per contributing RDD
-      array(i) = new CoGroupPartition(i, rdds.zipWithIndex.map { case (rdd, j) =>
-        // Assume each RDD contributed a single dependency, and get it
-        dependencies(j) match {
-          case s: ShuffleDependency[_, _, _] =>
-            None
-          case _ =>
-            Some(new NarrowCoGroupSplitDep(rdd, i, rdd.partitions(i)))
-        }
+      array(i) = new CoGroupPartition(i, rdds.zipWithIndex.map {
+        case (rdd, j) =>
+          // Assume each RDD contributed a single dependency, and get it
+          dependencies(j) match {
+            case s: ShuffleDependency[_, _, _] =>
+              None
+            case _ =>
+              Some(new NarrowCoGroupSplitDep(rdd, i, rdd.partitions(i)))
+          }
       }.toArray)
     }
     array
@@ -126,7 +128,9 @@ class CoGroupedRDD[K: ClassTag](
 
   override val partitioner: Some[Partitioner] = Some(part)
 
-  override def compute(s: Partition, context: TaskContext): Iterator[(K, Array[Iterable[_]])] = {
+  override def compute(
+      s: Partition,
+      context: TaskContext): Iterator[(K, Array[Iterable[_]])] = {
     val split = s.asInstanceOf[CoGroupPartition]
     val numRdds = dependencies.length
 
@@ -142,46 +146,53 @@ class CoGroupedRDD[K: ClassTag](
       case shuffleDependency: ShuffleDependency[_, _, _] =>
         // Read map outputs of shuffle
         val it = SparkEnv.get.shuffleManager
-          .getReader(shuffleDependency.shuffleHandle, split.index, split.index + 1, context)
+          .getReader(shuffleDependency.shuffleHandle,
+                     split.index,
+                     split.index + 1,
+                     context)
           .read()
         rddIterators += ((it, depNum))
     }
 
     val map = createExternalMap(numRdds)
     for ((it, depNum) <- rddIterators) {
-      map.insertAll(it.map(pair => (pair._1, new CoGroupValue(pair._2, depNum))))
+      map.insertAll(
+          it.map(pair => (pair._1, new CoGroupValue(pair._2, depNum))))
     }
     context.taskMetrics().incMemoryBytesSpilled(map.memoryBytesSpilled)
     context.taskMetrics().incDiskBytesSpilled(map.diskBytesSpilled)
     context.taskMetrics().incPeakExecutionMemory(map.peakMemoryUsedBytes)
-    new InterruptibleIterator(context,
-      map.iterator.asInstanceOf[Iterator[(K, Array[Iterable[_]])]])
+    new InterruptibleIterator(
+        context, map.iterator.asInstanceOf[Iterator[(K, Array[Iterable[_]])]])
   }
 
   private def createExternalMap(numRdds: Int)
     : ExternalAppendOnlyMap[K, CoGroupValue, CoGroupCombiner] = {
 
-    val createCombiner: (CoGroupValue => CoGroupCombiner) = value => {
-      val newCombiner = Array.fill(numRdds)(new CoGroup)
-      newCombiner(value._2) += value._1
-      newCombiner
+    val createCombiner: (CoGroupValue => CoGroupCombiner) = value =>
+      {
+        val newCombiner = Array.fill(numRdds)(new CoGroup)
+        newCombiner(value._2) += value._1
+        newCombiner
     }
-    val mergeValue: (CoGroupCombiner, CoGroupValue) => CoGroupCombiner =
-      (combiner, value) => {
-      combiner(value._2) += value._1
-      combiner
+    val mergeValue: (CoGroupCombiner,
+    CoGroupValue) => CoGroupCombiner = (combiner, value) =>
+      {
+        combiner(value._2) += value._1
+        combiner
     }
-    val mergeCombiners: (CoGroupCombiner, CoGroupCombiner) => CoGroupCombiner =
-      (combiner1, combiner2) => {
+    val mergeCombiners: (CoGroupCombiner,
+    CoGroupCombiner) => CoGroupCombiner = (combiner1, combiner2) =>
+      {
         var depNum = 0
         while (depNum < numRdds) {
           combiner1(depNum) ++= combiner2(depNum)
           depNum += 1
         }
         combiner1
-      }
+    }
     new ExternalAppendOnlyMap[K, CoGroupValue, CoGroupCombiner](
-      createCombiner, mergeValue, mergeCombiners)
+        createCombiner, mergeValue, mergeCombiners)
   }
 
   override def clearDependencies() {

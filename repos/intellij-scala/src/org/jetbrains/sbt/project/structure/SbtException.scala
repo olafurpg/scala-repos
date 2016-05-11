@@ -7,8 +7,8 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.util.io.FileUtil
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class SbtException(message: String) extends Exception(message)
 
 object SbtException {
@@ -27,8 +27,10 @@ object SbtException {
       case NotTrimmed =>
         new SbtException(SbtBundle("sbt.import.error", log))
       case Trimmed(whatsLeft) =>
-        new SbtException(SbtBundle("sbt.import.errorLogIsTooLong", whatsLeft,
-                          dumpLog(log).getAbsolutePath))
+        new SbtException(
+            SbtBundle("sbt.import.errorLogIsTooLong",
+                      whatsLeft,
+                      dumpLog(log).getAbsolutePath))
     }
   }
 
@@ -36,15 +38,16 @@ object SbtException {
     val dependencies = lines.foldLeft("") { (acc, line) =>
       if (line.startsWith("[warn]")) {
         val trimmed = line.substring(6).trim
-        if (trimmed.startsWith(":: ") && !trimmed.contains("UNRESOLVED DEPENDENCIES"))
+        if (trimmed.startsWith(":: ") &&
+            !trimmed.contains("UNRESOLVED DEPENDENCIES"))
           acc + s"<li>${trimmed.substring(2)}</li>"
-        else
-          acc
-      } else
-        acc
+        else acc
+      } else acc
     }
-    new SbtException(SbtBundle("sbt.import.unresolvedDependencies", dependencies,
-                      dumpLog(joinLines(lines)).getAbsolutePath))
+    new SbtException(
+        SbtBundle("sbt.import.unresolvedDependencies",
+                  dependencies,
+                  dumpLog(joinLines(lines)).getAbsolutePath))
   }
 
   private object Utils {
@@ -58,8 +61,7 @@ object SbtException {
     def trimLogIfNecessary(lines: Seq[String]): TrimResult =
       if (lines.length > ACCEPTABLE_TO_DISPLAY_LOG_SIZE)
         Trimmed(joinLines(lines.takeRight(ACCEPTABLE_TO_DISPLAY_LOG_SIZE)))
-      else
-        NotTrimmed
+      else NotTrimmed
 
     def dumpLog(log: String): File = {
       val file = new File(PathManager.getLogPath, "sbt.last.log")

@@ -8,8 +8,8 @@ package play.api.libs.ws.ssl
 import java.lang.reflect.Field
 
 /**
- *
- */
+  *
+  */
 trait MonkeyPatcher {
 
   // Define unsafe to monkeypatch fields
@@ -20,16 +20,14 @@ trait MonkeyPatcher {
   }
 
   /**
-   * Monkeypatches any given field.
-   *
-   * @param field the field to change
-   * @param newObject the new object to place in the field.
-   */
+    * Monkeypatches any given field.
+    *
+    * @param field the field to change
+    * @param newObject the new object to place in the field.
+    */
   def monkeyPatchField(field: Field, newObject: AnyRef) {
     val base = unsafe.staticFieldBase(field)
     val offset = unsafe.staticFieldOffset(field)
     unsafe.putObject(base, offset, newObject)
   }
-
 }
-

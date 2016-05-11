@@ -1,7 +1,6 @@
 package spire
 package algebra
 
-
 // scalatest
 import org.scalatest.FunSuite
 
@@ -13,9 +12,9 @@ import spire.implicits.{eqOps => _, _}
 
 import java.math.MathContext
 
-
 class SignedTest extends FunSuite {
-  def runWith[@sp(Int, Long, Float, Double) A: Signed: ClassTag](neg: A, pos: A, zero: A): Unit = {
+  def runWith[@sp(Int, Long, Float, Double) A : Signed : ClassTag](
+      neg: A, pos: A, zero: A): Unit = {
     val m = implicitly[ClassTag[A]]
 
     //// the name to use for this A
@@ -28,7 +27,7 @@ class SignedTest extends FunSuite {
     val cls = m.runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
-    def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
+    def runTest(name: String)(f: => Unit) = test("%s:%s" format (cls, name))(f)
 
     runTest("-neg.abs === pos")(assert(neg.abs === pos))
     runTest("pos.abs === pos")(assert(pos.abs === pos))

@@ -20,13 +20,12 @@ package org.apache.spark.ml.classification
 object ClassifierSuite {
 
   /**
-   * Mapping from all Params to valid settings which differ from the defaults.
-   * This is useful for tests which need to exercise all Params, such as save/load.
-   * This excludes input columns to simplify some tests.
-   */
+    * Mapping from all Params to valid settings which differ from the defaults.
+    * This is useful for tests which need to exercise all Params, such as save/load.
+    * This excludes input columns to simplify some tests.
+    */
   val allParamSettings: Map[String, Any] = Map(
-    "predictionCol" -> "myPrediction",
-    "rawPredictionCol" -> "myRawPrediction"
+      "predictionCol" -> "myPrediction",
+      "rawPredictionCol" -> "myRawPrediction"
   )
-
 }

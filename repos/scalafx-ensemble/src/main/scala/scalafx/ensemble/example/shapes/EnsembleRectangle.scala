@@ -36,30 +36,33 @@ import scalafx.scene.shape.Rectangle
 class EnsembleRectangle extends EnsembleExample {
   def getContent = {
     // function literal to get Rectangle object
-    val rectObj = (rect: Rectangle) => {rect.setStroke(Color.Burlywood); rect}
-    val rectArcObj = (height: Int, width: Int) => {
-      val rect = Rectangle(100, 100, Color.White)
-      rect.setStroke(Color.Green)
-      rect.setArcWidth(width)
-      rect.setArcHeight(height)
-      rect
+    val rectObj = (rect: Rectangle) =>
+      { rect.setStroke(Color.Burlywood); rect }
+    val rectArcObj = (height: Int, width: Int) =>
+      {
+        val rect = Rectangle(100, 100, Color.White)
+        rect.setStroke(Color.Green)
+        rect.setArcWidth(width)
+        rect.setArcHeight(height)
+        rect
     }
-    val fillArc = (height: Int, width: Int, color: Paint) => {
-      val rect = Rectangle(100, 100, color)
-      rect.setStroke(Color.Black)
-      rect.setArcWidth(width)
-      rect.setArcHeight(height)
-      rect
+    val fillArc = (height: Int, width: Int, color: Paint) =>
+      {
+        val rect = Rectangle(100, 100, color)
+        rect.setStroke(Color.Black)
+        rect.setArcWidth(width)
+        rect.setArcHeight(height)
+        rect
     }
 
     new HBox {
       spacing = 20
       padding = Insets(20)
       children = List(
-        Rectangle(100, 100, Color.Red),
-        rectObj(Rectangle(100, 100, Color.White)),
-        rectArcObj(20, 20),
-        fillArc(20, 20, Color.Blue)
+          Rectangle(100, 100, Color.Red),
+          rectObj(Rectangle(100, 100, Color.White)),
+          rectArcObj(20, 20),
+          fillArc(20, 20, Color.Blue)
       )
     }
   }

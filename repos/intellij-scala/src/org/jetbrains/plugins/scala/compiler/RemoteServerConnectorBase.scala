@@ -15,11 +15,11 @@ import org.jetbrains.plugins.scala.project._
 import org.jetbrains.plugins.scala.project.settings.ScalaCompilerSettings
 
 /**
- * Nikolay.Tropin
- * 2014-10-07
- */
-
-abstract class RemoteServerConnectorBase(module: Module, filesToCompile: Seq[File], outputDir: File) {
+  * Nikolay.Tropin
+  * 2014-10-07
+  */
+abstract class RemoteServerConnectorBase(
+    module: Module, filesToCompile: Seq[File], outputDir: File) {
 
   checkFilesToCompile(filesToCompile)
 
@@ -29,18 +29,22 @@ abstract class RemoteServerConnectorBase(module: Module, filesToCompile: Seq[Fil
 
   private val libRoot = {
     if (ApplicationManager.getApplication.isUnitTestMode) {
-      if (PlatformUtils.isIdeaCommunity) new File("./out/plugin/Scala/lib").getAbsoluteFile
+      if (PlatformUtils.isIdeaCommunity)
+        new File("./out/plugin/Scala/lib").getAbsoluteFile
       else new File("../../out/plugin/Scala/lib").getAbsoluteFile
-    }
-    else new File(PathUtil.getJarPathForClass(getClass)).getParentFile
+    } else new File(PathUtil.getJarPathForClass(getClass)).getParentFile
   }
 
   private val libCanonicalPath = PathUtil.getCanonicalPath(libRoot.getPath)
 
   private val sbtData = SbtData.from(
-    new URLClassLoader(Array(new URL("jar:file:" + (if (libCanonicalPath startsWith "/") "" else "/" ) + libCanonicalPath + "/jps/sbt-interface.jar!/")), getClass.getClassLoader),
-    new File(libRoot, "jps"),
-    System.getProperty("java.class.version")
+      new URLClassLoader(
+          Array(new URL("jar:file:" +
+                  (if (libCanonicalPath startsWith "/") "" else "/") +
+                  libCanonicalPath + "/jps/sbt-interface.jar!/")),
+          getClass.getClassLoader),
+      new File(libRoot, "jps"),
+      System.getProperty("java.class.version")
   ) match {
     case Left(msg) => throw new IllegalArgumentException(msg)
     case Right(data) => data
@@ -54,28 +58,35 @@ abstract class RemoteServerConnectorBase(module: Module, filesToCompile: Seq[Fil
 
   private val compilerClasspath = scalaSdk.compilerClasspath
 
-  private val compilerSettingsJar = new File(libCanonicalPath, "compiler-settings.jar")
-  
-  protected val runnersJar = new File(libCanonicalPath, "scala-plugin-runners.jar")
+  private val compilerSettingsJar = new File(
+      libCanonicalPath, "compiler-settings.jar")
 
-  val additionalCp = compilerClasspath :+ runnersJar :+ compilerSettingsJar :+ outputDir
+  protected val runnersJar = new File(
+      libCanonicalPath, "scala-plugin-runners.jar")
+
+  val additionalCp =
+    compilerClasspath :+ runnersJar :+ compilerSettingsJar :+ outputDir
 
   protected def worksheetArgs: Array[String] = Array()
 
   protected def classpath: String = {
-    val classesRoots = assemblyClasspath().toSeq map (f => new File(f.getCanonicalPath stripSuffix "!" stripSuffix "!/"))
+    val classesRoots =
+      assemblyClasspath().toSeq map
+      (f => new File(f.getCanonicalPath stripSuffix "!" stripSuffix "!/"))
     (classesRoots ++ additionalCp).mkString("\n")
   }
 
   import _root_.scala.language.implicitConversions
 
-  implicit def file2path(file: File): String = FileUtil.toCanonicalPath(file.getAbsolutePath)
+  implicit def file2path(file: File): String =
+    FileUtil.toCanonicalPath(file.getAbsolutePath)
   implicit def option2string(opt: Option[String]): String = opt getOrElse ""
-  implicit def files2paths(files: Iterable[File]): String = files map file2path mkString "\n"
+  implicit def files2paths(files: Iterable[File]): String =
+    files map file2path mkString "\n"
   implicit def array2string(arr: Array[String]): String = arr mkString "\n"
 
   /**
-   *     Seq(
+    *     Seq(
       fileToPath(sbtData.interfaceJar),
       fileToPath(sbtData.sourceJar),
       fileToPath(sbtData.interfacesHome),
@@ -97,56 +108,65 @@ abstract class RemoteServerConnectorBase(module: Module, filesToCompile: Seq[Fil
       sequenceToString(worksheetFiles),
       nameHashing.name
     )
-   */
+    */
   def arguments = Seq[String](
-    sbtData.interfaceJar,
-    sbtData.sourceJar,
-    sbtData.interfacesHome,
-    sbtData.javaClassVersion,
-    compilerClasspath,
-    findJdk,
-    filesToCompile,
-    classpath,
-    outputDir,
-    scalaParameters,
-    javaParameters,
-    compilerSettings.compileOrder.toString,
-    "", //cache file
-    "",
-    "",
-    IncrementalityType.IDEA.name(),
-    sourceRoot,
-    outputDir,
-    worksheetArgs,
-    compilerSettings.sbtIncOptions.asString
+      sbtData.interfaceJar,
+      sbtData.sourceJar,
+      sbtData.interfacesHome,
+      sbtData.javaClassVersion,
+      compilerClasspath,
+      findJdk,
+      filesToCompile,
+      classpath,
+      outputDir,
+      scalaParameters,
+      javaParameters,
+      compilerSettings.compileOrder.toString,
+      "", //cache file
+      "",
+      "",
+      IncrementalityType.IDEA.name(),
+      sourceRoot,
+      outputDir,
+      worksheetArgs,
+      compilerSettings.sbtIncOptions.asString
   )
-  
-  protected def configurationError(message: String) = throw new IllegalArgumentException(message)
+
+  protected def configurationError(message: String) =
+    throw new IllegalArgumentException(message)
 
   protected def settings = ScalaCompileServerSettings.getInstance()
 
-  private def assemblyClasspath() = OrderEnumerator.orderEntries(module).compileOnly().getClassesRoots
+  private def assemblyClasspath() =
+    OrderEnumerator.orderEntries(module).compileOnly().getClassesRoots
 
-  private def compilerSettings: ScalaCompilerSettings = module.scalaCompilerSettings
+  private def compilerSettings: ScalaCompilerSettings =
+    module.scalaCompilerSettings
 
-  private def scalaSdk = module.scalaSdk.getOrElse(
-          configurationError("No Scala SDK configured for module: " + module.getName))
+  private def scalaSdk =
+    module.scalaSdk.getOrElse(configurationError(
+            "No Scala SDK configured for module: " + module.getName))
 
-  private def findJdk = scala.compiler.findJdkByName(settings.COMPILE_SERVER_SDK) match {
-    case Right(jdk) => jdk.executable
-    case Left(msg) =>
-      configurationError(s"Cannot find jdk ${settings.COMPILE_SERVER_SDK} for compile server, underlying message: $msg" )
-  }
+  private def findJdk =
+    scala.compiler.findJdkByName(settings.COMPILE_SERVER_SDK) match {
+      case Right(jdk) => jdk.executable
+      case Left(msg) =>
+        configurationError(
+            s"Cannot find jdk ${settings.COMPILE_SERVER_SDK} for compile server, underlying message: $msg")
+    }
 
   private def checkFilesToCompile(files: Seq[File]) = {
     if (files.isEmpty)
       throw new IllegalArgumentException("Non-empty list of files expected")
 
-    files.find(!_.exists()).foreach(f =>
-      throw new IllegalArgumentException(s"File ${f.getCanonicalPath} does not exists" )
-    )
+    files
+      .find(!_.exists())
+      .foreach(f =>
+            throw new IllegalArgumentException(
+                s"File ${f.getCanonicalPath} does not exists"))
 
     if (files.map(_.getParent).distinct.size != 1)
-      throw new IllegalArgumentException("All files should be in the same directory")
+      throw new IllegalArgumentException(
+          "All files should be in the same directory")
   }
 }

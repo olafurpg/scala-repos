@@ -168,6 +168,5 @@ object DslSpec extends Specification {
         }
       }
     }
-
   }
 }

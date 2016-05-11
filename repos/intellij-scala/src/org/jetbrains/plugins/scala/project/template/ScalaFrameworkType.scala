@@ -5,8 +5,8 @@ import com.intellij.framework.FrameworkTypeEx
 import org.jetbrains.plugins.scala.icons.Icons
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class ScalaFrameworkType extends FrameworkTypeEx("Scala") {
   override def getIcon = Icons.SCALA_SMALL_LOGO
 
@@ -16,5 +16,6 @@ class ScalaFrameworkType extends FrameworkTypeEx("Scala") {
 }
 
 object ScalaFrameworkType {
-  val Instance = FrameworkTypeEx.EP_NAME.findExtension(classOf[ScalaFrameworkType])
+  val Instance =
+    FrameworkTypeEx.EP_NAME.findExtension(classOf[ScalaFrameworkType])
 }

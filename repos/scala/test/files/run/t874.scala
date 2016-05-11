@@ -1,5 +1,4 @@
-
-import scala.language.{ reflectiveCalls }
+import scala.language.{reflectiveCalls}
 object Test {
   abstract class Base {
     val U: {
@@ -9,10 +8,10 @@ object Test {
   }
   class Mix extends Base {
     case class U[A](x1: A)(x2: Int) {
-      Console.println("U created with "+x1+" and "+x2)
+      Console.println("U created with " + x1 + " and " + x2)
     }
   }
-  def main(args : Array[String]) : Unit = {
+  def main(args: Array[String]): Unit = {
     val obvious: Base = new Mix;
     obvious.U("abc")(1)
   }

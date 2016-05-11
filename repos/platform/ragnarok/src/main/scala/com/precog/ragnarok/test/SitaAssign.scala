@@ -22,8 +22,7 @@ package ragnarok
 package test
 
 object SitaAssign extends PerfTestSuite {
-  query(
-    """
+  query("""
 locations := //sita
 --locations := //sita100k
 import std::stats::*

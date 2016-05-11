@@ -7,13 +7,13 @@ import com.twitter.util.{Future, Time}
 import scala.util.control.NonFatal
 
 /**
- * A Transport with close behavior managed by ConnectionManager.
- *
- * @note the connection manager will close connections as required by RFC 2616 § 8
- *       irrespective of any pending requests in the dispatcher.
- */
+  * A Transport with close behavior managed by ConnectionManager.
+  *
+  * @note the connection manager will close connections as required by RFC 2616 § 8
+  *       irrespective of any pending requests in the dispatcher.
+  */
 class HttpTransport(self: Transport[Any, Any], manager: ConnectionManager)
-  extends Transport[Any, Any] {
+    extends Transport[Any, Any] {
 
   def this(self: Transport[Any, Any]) = this(self, new ConnectionManager)
 
@@ -22,8 +22,7 @@ class HttpTransport(self: Transport[Any, Any], manager: ConnectionManager)
   def read(): Future[Any] =
     self.read() onSuccess { m =>
       manager.observeMessage(m)
-      if (manager.shouldClose)
-        self.close()
+      if (manager.shouldClose) self.close()
     }
 
   def write(m: Any): Future[Unit] =

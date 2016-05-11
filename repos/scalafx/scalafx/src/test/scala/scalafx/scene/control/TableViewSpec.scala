@@ -37,13 +37,13 @@ import scalafx.collections.ObservableBuffer
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * TableViewSpec tests.
- */
+  * TableViewSpec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class TableViewSpec[S]
-  extends SimpleSFXDelegateSpec[jfxsc.TableView[S], TableView[S]](
-    classOf[jfxsc.TableView[S]], classOf[TableView[S]])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[jfxsc.TableView[S], TableView[S]](
+        classOf[jfxsc.TableView[S]], classOf[TableView[S]])
+    with RunOnApplicationThread {
 
   it should "not drop assigned columns - Issue 41" in {
     val firstTC = new TableColumn[String, String]("First Name")
@@ -52,7 +52,7 @@ class TableViewSpec[S]
     val tableView = new TableView[String]()
     tableView.columns.size should (equal(0))
 
-    tableView.columns +=(firstTC, lastTC)
+    tableView.columns += (firstTC, lastTC)
     tableView.columns.size should (equal(2))
   }
 
@@ -63,7 +63,7 @@ class TableViewSpec[S]
     val tableView = new TableView[String]()
     tableView.columns.size should (equal(0))
 
-    tableView.columns +=(firstTC, lastTC)
+    tableView.columns += (firstTC, lastTC)
     tableView.columns.size should (equal(2))
 
     tableView.sortOrder.size should (equal(0))
@@ -77,7 +77,8 @@ class TableViewSpec[S]
 
   it should "not alter the delegate state during implicit conversion - Issue 154" in {
     val rocky = "Rocky"
-    val characters = ObservableBuffer[String]("Peggy", "Sue", "555-6798", rocky, "Raccoon", "555-6798")
+    val characters = ObservableBuffer[String](
+        "Peggy", "Sue", "555-6798", rocky, "Raccoon", "555-6798")
 
     val tableView = new TableView[String](characters) {
       columns += new TableColumn[String, String]("Name")
@@ -96,6 +97,5 @@ class TableViewSpec[S]
     // Clear selection
     tableView.selectionModel().clearSelection()
     tableView.selectionModel().selectedItem() should equal(null)
-
   }
 }

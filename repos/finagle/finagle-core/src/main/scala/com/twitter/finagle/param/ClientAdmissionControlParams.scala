@@ -8,12 +8,13 @@ import com.twitter.finagle.service.PendingRequestFilter
   *
   * @tparam A a [[Stack.Parameterized]] client to configure
   */
-class ClientAdmissionControlParams[A <: Stack.Parameterized[A]](self: Stack.Parameterized[A]) {
+class ClientAdmissionControlParams[A <: Stack.Parameterized[A]](
+    self: Stack.Parameterized[A]) {
 
   /**
-   * Configures a limit on the maximum number of outstanding requests per
-   * connection. Default is no limit.
-   */
+    * Configures a limit on the maximum number of outstanding requests per
+    * connection. Default is no limit.
+    */
   def maxPendingRequests(requestLimit: Int): A = {
     val lim =
       if (requestLimit == Int.MaxValue) None

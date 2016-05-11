@@ -40,4 +40,4 @@ class ReturnSeveralOutput2 {
     Right((x, y, z, zz))
   }
 }
-*/
+ */

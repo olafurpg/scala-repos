@@ -14,4 +14,3 @@ object Test extends ScaladocModelTest {
     println(p.inSource)
   }
 }
-

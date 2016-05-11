@@ -20,22 +20,21 @@ package org.apache.spark.sql
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 
-
 // TODO: don't swallow original stack trace if it exists
 
 /**
- * :: DeveloperApi ::
- * Thrown when a query fails to analyze, usually because the query itself is invalid.
- */
+  * :: DeveloperApi ::
+  * Thrown when a query fails to analyze, usually because the query itself is invalid.
+  */
 @DeveloperApi
-class AnalysisException protected[sql] (
-    val message: String,
-    val line: Option[Int] = None,
-    val startPosition: Option[Int] = None,
-    val plan: Option[LogicalPlan] = None)
-  extends Exception with Serializable {
+class AnalysisException protected[sql](val message: String,
+                                       val line: Option[Int] = None,
+                                       val startPosition: Option[Int] = None,
+                                       val plan: Option[LogicalPlan] = None)
+    extends Exception with Serializable {
 
-  def withPosition(line: Option[Int], startPosition: Option[Int]): AnalysisException = {
+  def withPosition(
+      line: Option[Int], startPosition: Option[Int]): AnalysisException = {
     val newException = new AnalysisException(message, line, startPosition)
     newException.setStackTrace(getStackTrace)
     newException

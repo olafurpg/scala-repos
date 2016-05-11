@@ -12,18 +12,18 @@ import com.intellij.util.SystemProperties
 import org.jdom.Document
 
 /**
- * @author Alefas
- * @since 21/05/14.
- */
-class ImportPanelConverterProvider extends ConverterProvider("ImportPanelConverterProvider") {
+  * @author Alefas
+  * @since 21/05/14.
+  */
+class ImportPanelConverterProvider
+    extends ConverterProvider("ImportPanelConverterProvider") {
   override def getConversionDescription: String = {
     "Scala imports settings will be moved to Code Style settings."
   }
 
   override def createConverter(context: ConversionContext): ProjectConverter = {
     import org.jdom.Element
-    val actualSettingsSet =
-      Set(
+    val actualSettingsSet = Set(
         "addFullQualifiedImports",
         "addImportMostCloseToReference",
         "classCountToUseImportOnDemand",
@@ -31,10 +31,12 @@ class ImportPanelConverterProvider extends ConverterProvider("ImportPanelConvert
         "importShortestPathForAmbiguousReferences",
         "importsWithPrefix",
         "sortImports"
-      )
+    )
 
     def getElements: Seq[Element] = {
-      context.getSettingsBaseDir.listFiles().find(_.getName == "scala_settings.xml") match {
+      context.getSettingsBaseDir
+        .listFiles()
+        .find(_.getName == "scala_settings.xml") match {
         case Some(file) =>
           import com.intellij.conversion.impl.ConversionContextImpl
           context match {
@@ -45,8 +47,10 @@ class ImportPanelConverterProvider extends ConverterProvider("ImportPanelConvert
               children.find(_.getName == "component") match {
                 case Some(componentChild) =>
                   componentChild.getChildren.filter { elem =>
-                    elem.getName == "option" && elem.getAttribute("name") != null &&
-                      actualSettingsSet.contains(elem.getAttribute("name").getValue)
+                    elem.getName == "option" &&
+                    elem.getAttribute("name") != null &&
+                    actualSettingsSet.contains(
+                        elem.getAttribute("name").getValue)
                   }
                 case None => Seq.empty
               }
@@ -64,18 +68,23 @@ class ImportPanelConverterProvider extends ConverterProvider("ImportPanelConvert
       }
 
       override def getAdditionalAffectedFiles: util.Collection[File] = {
-        context.getSettingsBaseDir.listFiles().find(_.getName == "codeStyleSettings.xml") match {
+        context.getSettingsBaseDir
+          .listFiles()
+          .find(_.getName == "codeStyleSettings.xml") match {
           case Some(file) => Collections.singleton(file)
           case None => Collections.emptyList()
         }
       }
 
       override def processingFinished(): Unit = {
-        context.getSettingsBaseDir.listFiles().find(_.getName == "codeStyleSettings.xml") match {
+        context.getSettingsBaseDir
+          .listFiles()
+          .find(_.getName == "codeStyleSettings.xml") match {
           case Some(file) =>
             context match {
               case context: ConversionContextImpl =>
-                val settings = new ComponentManagerSettingsImpl(file, context) {}                
+                val settings =
+                  new ComponentManagerSettingsImpl(file, context) {}
                 val root = settings.getRootElement
                 for {
                   component <- Option(root.getChild("component"))
@@ -87,9 +96,12 @@ class ImportPanelConverterProvider extends ConverterProvider("ImportPanelConvert
                     settingsValue = new Element("ScalaCodeStyleSettings")
                     value.addContent(settingsValue)
                   }
-                  getElements.foreach(elem => settingsValue.addContent(elem.clone()))
+                  getElements.foreach(
+                      elem => settingsValue.addContent(elem.clone()))
                 }
-                JDOMUtil.writeDocument(new Document(root.clone()), file, SystemProperties.getLineSeparator)
+                JDOMUtil.writeDocument(new Document(root.clone()),
+                                       file,
+                                       SystemProperties.getLineSeparator)
             }
           case _ =>
         }

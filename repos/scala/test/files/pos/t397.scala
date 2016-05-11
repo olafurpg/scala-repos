@@ -7,10 +7,10 @@ abstract class Root {
 
   abstract class Graph {
     type W;
-    type E <: Edge{type V = W};
+    type E <: Edge { type V = W };
     def edge: E;
   }
 
-  val g: Graph{type W = Int};
+  val g: Graph { type W = Int };
   val x: Int = g.edge.source;
 }

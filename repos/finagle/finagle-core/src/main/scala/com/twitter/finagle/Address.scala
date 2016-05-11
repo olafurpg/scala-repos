@@ -6,13 +6,13 @@ import scala.collection.JavaConverters._
 import scala.util.control.NoStackTrace
 
 /**
- * An [[Address]] represents the physical location of a single host or
- * endpoint. It also includes [[Addr.Metadata]] (typically set by [[Namer]]s
- * and [[Resolver]]s) that provides additional configuration to client stacks.
- *
- * Note that a bound [[Addr]] contains a set of [[Address]]es and [[Addr.Metadata]]
- * that pertains to the entire set.
- */
+  * An [[Address]] represents the physical location of a single host or
+  * endpoint. It also includes [[Addr.Metadata]] (typically set by [[Namer]]s
+  * and [[Resolver]]s) that provides additional configuration to client stacks.
+  *
+  * Note that a bound [[Addr]] contains a set of [[Address]]es and [[Addr.Metadata]]
+  * that pertains to the entire set.
+  */
 sealed trait Address
 
 object Address {
@@ -20,16 +20,14 @@ object Address {
     Address.Failed(new IllegalArgumentException("failing") with NoStackTrace)
 
   /**
-   * An address represented by an Internet socket address.
-   */
-  case class Inet(
-      addr: InetSocketAddress,
-      metadata: Addr.Metadata)
-    extends Address
+    * An address represented by an Internet socket address.
+    */
+  case class Inet(addr: InetSocketAddress, metadata: Addr.Metadata)
+      extends Address
 
   /**
-   * An address that fails with the given `cause`.
-   */
+    * An address that fails with the given `cause`.
+    */
   case class Failed(cause: Throwable) extends Address
 
   /** Create a new [[Address]] with given [[java.net.InetSocketAddress]]. */
@@ -47,40 +45,44 @@ object Address {
 
 package exp {
   object Address {
+
     /** Create a new [[Address]] with the given [[com.twitter.finagle.ServiceFactory]]. */
-    def apply[Req, Rep](factory: com.twitter.finagle.ServiceFactory[Req, Rep]): Address =
+    def apply[Req, Rep](
+        factory: com.twitter.finagle.ServiceFactory[Req, Rep]): Address =
       Address.ServiceFactory(factory, Addr.Metadata.empty)
 
     /**
-     * An endpoint address represented by a [[com.twitter.finagle.ServiceFactory]]
-     * that implements the endpoint.
-     */
+      * An endpoint address represented by a [[com.twitter.finagle.ServiceFactory]]
+      * that implements the endpoint.
+      */
     case class ServiceFactory[Req, Rep](
         factory: com.twitter.finagle.ServiceFactory[Req, Rep],
         metadata: Addr.Metadata)
-      extends Address
+        extends Address
   }
 }
 
 /**
- * A Java adaptation of the [[com.twitter.finagle.Address]] companion object.
- */
+  * A Java adaptation of the [[com.twitter.finagle.Address]] companion object.
+  */
 object Addresses {
+
   /**
-   * @see com.twitter.finagle.Address.Inet
-   */
+    * @see com.twitter.finagle.Address.Inet
+    */
   def newInetAddress(ia: InetSocketAddress): Address =
     Address.Inet(ia, Addr.Metadata.empty)
 
   /**
-   * @see com.twitter.finagle.Address.Inet
-   */
-  def newInetAddress(ia: InetSocketAddress, metadata: JMap[String, Any]): Address =
+    * @see com.twitter.finagle.Address.Inet
+    */
+  def newInetAddress(
+      ia: InetSocketAddress, metadata: JMap[String, Any]): Address =
     Address.Inet(ia, metadata.asScala.toMap)
 
   /**
-   * @see com.twitter.finagle.Address.Failed
-   */
+    * @see com.twitter.finagle.Address.Failed
+    */
   def newFailedAddress(cause: Throwable): Address =
     Address.Failed(cause)
 }

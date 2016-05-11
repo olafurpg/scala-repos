@@ -1,7 +1,7 @@
 object SCL2820 {
   object TypingObject extends TypingTrait {
-    val columns  = List[Col](
-      /*start*/Col.String('title)/*end*/
+    val columns = List[Col](
+        /*start*/ Col.String('title) /*end*/
     )
   }
 

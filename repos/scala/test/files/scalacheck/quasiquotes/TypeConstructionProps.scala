@@ -1,13 +1,16 @@
 import org.scalacheck._, Prop._, Gen._, Arbitrary._
-import scala.reflect.runtime.universe._, Flag._, internal.reificationSupport.ScalaDot
+import scala.reflect.runtime.universe._, Flag._,
+internal.reificationSupport.ScalaDot
 
-object TypeConstructionProps extends QuasiquoteProperties("type construction")  {
+object TypeConstructionProps
+    extends QuasiquoteProperties("type construction") {
   property("bare idents contain type names") = test {
     tq"x" ≈ Ident(TypeName("x"))
   }
 
-  property("unquote type names into AppliedTypeTree") = forAll { (name1: TypeName, name2: TypeName) =>
-    tq"$name1[$name2]" ≈ AppliedTypeTree(Ident(name1), List(Ident(name2)))
+  property("unquote type names into AppliedTypeTree") = forAll {
+    (name1: TypeName, name2: TypeName) =>
+      tq"$name1[$name2]" ≈ AppliedTypeTree(Ident(name1), List(Ident(name2)))
   }
 
   property("tuple type") = test {

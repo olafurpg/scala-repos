@@ -14,24 +14,30 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 /**
- * Author: Svyatoslav Ilinskiy
- * Date: 6/29/15
- */
-class ConvertExpressionToSAMInspection extends AbstractInspection(inspectionId, inspectionName) {
-  override def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+  * Author: Svyatoslav Ilinskiy
+  * Date: 6/29/15
+  */
+class ConvertExpressionToSAMInspection
+    extends AbstractInspection(inspectionId, inspectionName) {
+  override def actionFor(
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case param: ScNewTemplateDefinition if ScalaPsiUtil.isSAMEnabled(param) =>
       for (expected <- param.expectedTypes()) {
         inspectAccordingToExpectedType(expected, param, holder)
       }
   }
 
-  private def inspectAccordingToExpectedType(expected: ScType, definition: ScNewTemplateDefinition, holder: ProblemsHolder) {
+  private def inspectAccordingToExpectedType(
+      expected: ScType,
+      definition: ScNewTemplateDefinition,
+      holder: ProblemsHolder) {
     ScalaPsiUtil.toSAMType(expected, definition.getResolveScope) match {
       case Some(expectedMethodType) =>
         definition.members match {
           case Seq(fun: ScFunctionDefinition) =>
             fun.body match {
-              case Some(funBody) if expectedMethodType.conforms(fun.getType().getOrNothing) =>
+              case Some(funBody)
+                  if expectedMethodType.conforms(fun.getType().getOrNothing) =>
                 lazy val replacement: String = {
                   val res = new StringBuilder
                   fun.effectiveParameterClauses.headOption match {
@@ -43,12 +49,18 @@ class ConvertExpressionToSAMInspection extends AbstractInspection(inspectionId, 
                   res.append(funBody.getText)
                   res.toString()
                 }
-                val fix = new ReplaceExpressionWithSAMQuickFix(definition, replacement)
+                val fix = new ReplaceExpressionWithSAMQuickFix(
+                    definition, replacement)
                 val extendsBlock = definition.extendsBlock
-                val lBraceInParent = extendsBlock.templateBody.map(_.startOffsetInParent + extendsBlock.startOffsetInParent)
-                val rangeInElement: TextRange = lBraceInParent.map(new TextRange(0, _)).orNull
-                holder.registerProblem(definition, inspectionName, ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                  rangeInElement, fix)
+                val lBraceInParent = extendsBlock.templateBody.map(
+                    _.startOffsetInParent + extendsBlock.startOffsetInParent)
+                val rangeInElement: TextRange =
+                  lBraceInParent.map(new TextRange(0, _)).orNull
+                holder.registerProblem(definition,
+                                       inspectionName,
+                                       ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+                                       rangeInElement,
+                                       fix)
               case _ =>
             }
           case _ =>
@@ -69,13 +81,15 @@ class ConvertExpressionToSAMInspection extends AbstractInspection(inspectionId, 
   }
 }
 
-class ReplaceExpressionWithSAMQuickFix(elem: PsiElement, replacement: => String)
-  extends AbstractFixOnPsiElement(inspectionName, elem) {
-  
+class ReplaceExpressionWithSAMQuickFix(
+    elem: PsiElement, replacement: => String)
+    extends AbstractFixOnPsiElement(inspectionName, elem) {
+
   override def doApplyFix(project: Project): Unit = {
     val element = getElement
     if (!element.isValid) return
-    element.replace(ScalaPsiElementFactory.createExpressionFromText(replacement, element.getManager))
+    element.replace(ScalaPsiElementFactory.createExpressionFromText(
+            replacement, element.getManager))
   }
 }
 

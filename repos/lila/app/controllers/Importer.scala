@@ -18,22 +18,26 @@ object Importer extends LilaController {
   def sendGame = OpenBody { implicit ctx =>
     implicit def req = ctx.body
     env.forms.importForm.bindFromRequest.fold(
-      failure => fuccess {
-        Ok(html.game.importGame(failure))
-      },
-      data => env.importer(data, ctx.userId) flatMap { game =>
-        (data.analyse.isDefined && game.analysable) ?? {
-          Env.fishnet.analyser(game, lila.fishnet.Work.Sender(
-            userId = ctx.userId,
-            ip = HTTPRequest.lastRemoteAddress(ctx.req).some,
-            mod = isGranted(_.Hunter),
-            system = false))
-        } inject Redirect(routes.Round.watcher(game.id, "white"))
-      } recover {
-        case e =>
-          logger.branch("importer").warn("sendGame", e)
-          Redirect(routes.Importer.importGame)
-      }
+        failure =>
+          fuccess {
+            Ok(html.game.importGame(failure))
+        },
+        data =>
+          env.importer(data, ctx.userId) flatMap { game =>
+            (data.analyse.isDefined && game.analysable) ?? {
+              Env.fishnet.analyser(
+                  game,
+                  lila.fishnet.Work.Sender(
+                      userId = ctx.userId,
+                      ip = HTTPRequest.lastRemoteAddress(ctx.req).some,
+                      mod = isGranted(_.Hunter),
+                      system = false))
+            } inject Redirect(routes.Round.watcher(game.id, "white"))
+          } recover {
+            case e =>
+              logger.branch("importer").warn("sendGame", e)
+              Redirect(routes.Importer.importGame)
+        }
     )
   }
 
@@ -48,14 +52,16 @@ object Importer extends LilaController {
       s"$url$fenParam"
     }
     GameRepo game id flatMap {
-      case Some(game) if game.createdAt.isAfter(masterGameEncodingFixedAt) => fuccess(redirectAtFen(game))
-      case _ => (GameRepo remove id) >> Env.explorer.fetchPgn(id) flatMap {
-        case None => fuccess(NotFound)
-        case Some(pgn) => env.importer(
-          lila.importer.ImportData(pgn, none),
-          user = "lichess".some,
-          forceId = id.some) map redirectAtFen
-      }
+      case Some(game) if game.createdAt.isAfter(masterGameEncodingFixedAt) =>
+        fuccess(redirectAtFen(game))
+      case _ =>
+        (GameRepo remove id) >> Env.explorer.fetchPgn(id) flatMap {
+          case None => fuccess(NotFound)
+          case Some(pgn) =>
+            env.importer(lila.importer.ImportData(pgn, none),
+                         user = "lichess".some,
+                         forceId = id.some) map redirectAtFen
+        }
     }
   }
 }

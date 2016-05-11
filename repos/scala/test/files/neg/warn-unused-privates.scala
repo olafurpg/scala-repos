@@ -1,17 +1,17 @@
 class Bippy(a: Int, b: Int) {
-  private def this(c: Int) = this(c, c)           // warn
-  private def bippy(x: Int): Int      = bippy(x)  // TODO: could warn
-  private def boop(x: Int)            = x+a+b     // warn
-  final private val MILLIS1           = 2000      // no warn, might have been inlined
-  final private val MILLIS2: Int      = 1000      // warn
-  final private val HI_COMPANION: Int = 500       // no warn, accessed from companion
+  private def this(c: Int) = this(c, c) // warn
+  private def bippy(x: Int): Int = bippy(x) // TODO: could warn
+  private def boop(x: Int) = x + a + b // warn
+  final private val MILLIS1 = 2000 // no warn, might have been inlined
+  final private val MILLIS2: Int = 1000 // warn
+  final private val HI_COMPANION: Int = 500 // no warn, accessed from companion
   def hi() = Bippy.HI_INSTANCE
 }
 object Bippy {
   def hi(x: Bippy) = x.HI_COMPANION
-  private val HI_INSTANCE: Int = 500      // no warn, accessed from instance
-  private val HEY_INSTANCE: Int = 1000    // warn
-  private lazy val BOOL: Boolean = true   // warn
+  private val HI_INSTANCE: Int = 500 // no warn, accessed from instance
+  private val HEY_INSTANCE: Int = 1000 // warn
+  private lazy val BOOL: Boolean = true // warn
 }
 
 class A(val msg: String)
@@ -20,23 +20,23 @@ class B2(msg0: String) extends A(msg0)
 class B3(msg0: String) extends A("msg")
 
 /*** Early defs warnings disabled primarily due to SI-6595.
- *   The test case is here to assure we aren't issuing false positives;
- *   the ones labelled "warn" don't warn.
- ***/
+  *   The test case is here to assure we aren't issuing false positives;
+  *   the ones labelled "warn" don't warn.
+  ***/
 class Boppy extends {
-  private val hmm: String = "abc"       // no warn, used in early defs
-  private val hom: String = "def"       // no warn, used in body
-  private final val him   = "ghi"       // no warn, might have been (was) inlined
-  final val him2          = "ghi"       // no warn, same
-  final val himinline     = him
-  private val hum: String = "jkl"       // warn
+  private val hmm: String = "abc" // no warn, used in early defs
+  private val hom: String = "def" // no warn, used in body
+  private final val him = "ghi" // no warn, might have been (was) inlined
+  final val him2 = "ghi" // no warn, same
+  final val himinline = him
+  private val hum: String = "jkl" // warn
   final val ding = hmm.length
 } with Mutable {
   val dinger = hom
   private val hummer = "def" // warn
 
-  private final val bum   = "ghi"       // no warn, might have been (was) inlined
-  final val bum2          = "ghi"       // no warn, same
+  private final val bum = "ghi" // no warn, might have been (was) inlined
+  final val bum2 = "ghi" // no warn, same
 }
 
 trait Accessors {
@@ -93,7 +93,8 @@ object Types {
 
   def l1() = {
     object HiObject { def f = this } // warn
-    class Hi { // warn
+    class Hi {
+      // warn
       def f1: Hi = new Hi
       def f2(x: Hi) = x
     }

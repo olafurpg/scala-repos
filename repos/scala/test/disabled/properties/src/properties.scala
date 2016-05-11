@@ -26,14 +26,18 @@ object properties {
 
   class User {
     // Create a property with custom getter and setter
-    val firstname = Property("")./*!*/get { v => v.toUpperCase() }./*!*/set { v => "Mr. " + v }
+    val firstname = Property(""). /*!*/ get { v =>
+      v.toUpperCase()
+    }. /*!*/ set { v =>
+      "Mr. " + v
+    }
     val lastname = Property("<noname>")
 
     /** Scala provides syntactic sugar for calling 'apply'. Simply
-     *  adding a list of arguments between parenthesis (in this case,
-     *  an empty list) is translated to a call to 'apply' with those
-     *  arguments.
-     */
+      *  adding a list of arguments between parenthesis (in this case,
+      *  an empty list) is translated to a call to 'apply' with those
+      *  arguments.
+      */
     override def toString() = firstname() + " " + lastname()
   }
 
@@ -42,7 +46,7 @@ object properties {
 
     // Syntactic sugar for 'update': an assignment is translated to a
     // call to method 'update'
-    user1./*!*/firstname() = "Robert"
+    user1. /*!*/ firstname() = "Robert"
 
     val user2 = new User
     user2.firstname() = "bob"

@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller.java
 
 import io.prediction.controller.LAlgorithm
@@ -28,4 +27,5 @@ import scala.reflect.ClassTag
   * @group Algorithm
   */
 abstract class LJavaAlgorithm[PD, M, Q, P]
-  extends LAlgorithm[PD, M, Q, P]()(ClassTag.AnyRef.asInstanceOf[ClassTag[M]])
+    extends LAlgorithm[PD, M, Q, P]()(
+        ClassTag.AnyRef.asInstanceOf[ClassTag[M]])

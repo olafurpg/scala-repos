@@ -1,16 +1,16 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import scala.language.postfixOps
 
-import akka.testkit.{ PerformanceTest, ImplicitSender, AkkaSpec }
+import akka.testkit.{PerformanceTest, ImplicitSender, AkkaSpec}
 import scala.concurrent.duration._
 import akka.testkit.metrics._
 import org.scalatest.BeforeAndAfterAll
 import akka.testkit.metrics.HeapMemoryUsage
-import com.codahale.metrics.{ Histogram }
+import com.codahale.metrics.{Histogram}
 
 object ActorCreationPerfSpec {
 
@@ -39,7 +39,6 @@ object ActorCreationPerfSpec {
       case IsAlive ⇒
         sender() ! Alive
       case Create(number, propsCreator) ⇒
-
         for (i ← 1 to number) {
           val start = System.nanoTime()
           context.actorOf(propsCreator.apply())
@@ -51,7 +50,8 @@ object ActorCreationPerfSpec {
         sender() ! Created
       case WaitForChildren ⇒
         context.children.foreach(_ ! IsAlive)
-        context.become(waiting(context.children.size, sender()), discardOld = false)
+        context.become(
+            waiting(context.children.size, sender()), discardOld = false)
     }
 
     def waiting(number: Int, replyTo: ActorRef): Receive = {
@@ -80,7 +80,8 @@ object ActorCreationPerfSpec {
         sender() ! Created
       case WaitForChildren ⇒
         context.children.foreach(_ ! IsAlive)
-        context.become(waiting(context.children.size, sender()), discardOld = false)
+        context.become(
+            waiting(context.children.size, sender()), discardOld = false)
     }
 
     def waiting(number: Int, replyTo: ActorRef): Receive = {
@@ -99,8 +100,9 @@ object ActorCreationPerfSpec {
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ActorCreationPerfSpec extends AkkaSpec("akka.actor.serialize-messages = off") with ImplicitSender
-  with MetricsKit with BeforeAndAfterAll {
+class ActorCreationPerfSpec
+    extends AkkaSpec("akka.actor.serialize-messages = off") with ImplicitSender
+    with MetricsKit with BeforeAndAfterAll {
 
   import ActorCreationPerfSpec._
 
@@ -109,22 +111,33 @@ class ActorCreationPerfSpec extends AkkaSpec("akka.actor.serialize-messages = of
   val BlockingTimeKey = ActorCreationKey / "synchronous-part"
   val TotalTimeKey = ActorCreationKey / "total"
 
-  val warmUp: Int = Integer.getInteger("akka.test.actor.ActorPerfSpec.warmUp", 50000)
-  val nrOfActors: Int = Integer.getInteger("akka.test.actor.ActorPerfSpec.numberOfActors", 100000)
-  val nrOfRepeats: Int = Integer.getInteger("akka.test.actor.ActorPerfSpec.numberOfRepeats", 3)
+  val warmUp: Int =
+    Integer.getInteger("akka.test.actor.ActorPerfSpec.warmUp", 50000)
+  val nrOfActors: Int =
+    Integer.getInteger("akka.test.actor.ActorPerfSpec.numberOfActors", 100000)
+  val nrOfRepeats: Int =
+    Integer.getInteger("akka.test.actor.ActorPerfSpec.numberOfRepeats", 3)
 
-  def runWithCounterInside(metricName: String, scenarioName: String, number: Int, propsCreator: () ⇒ Props) {
+  def runWithCounterInside(metricName: String,
+                           scenarioName: String,
+                           number: Int,
+                           propsCreator: () ⇒ Props) {
     val hist = histogram(BlockingTimeKey / metricName)
 
-    val driver = system.actorOf(Props(classOf[TimingDriver], hist), scenarioName)
+    val driver =
+      system.actorOf(Props(classOf[TimingDriver], hist), scenarioName)
     driver ! IsAlive
     expectMsg(Alive)
 
     driver ! Create(number, propsCreator)
-    expectMsgPF(15 seconds, s"$scenarioName waiting for Created") { case Created ⇒ }
+    expectMsgPF(15 seconds, s"$scenarioName waiting for Created") {
+      case Created ⇒
+    }
 
     driver ! WaitForChildren
-    expectMsgPF(15 seconds, s"$scenarioName waiting for Waited") { case Waited ⇒ }
+    expectMsgPF(15 seconds, s"$scenarioName waiting for Waited") {
+      case Waited ⇒
+    }
 
     driver ! PoisonPill
     watch(driver)
@@ -132,7 +145,9 @@ class ActorCreationPerfSpec extends AkkaSpec("akka.actor.serialize-messages = of
     gc()
   }
 
-  def runWithoutCounter(scenarioName: String, number: Int, propsCreator: () ⇒ Props): HeapMemoryUsage = {
+  def runWithoutCounter(scenarioName: String,
+                        number: Int,
+                        propsCreator: () ⇒ Props): HeapMemoryUsage = {
     val mem = measureMemory(TotalTimeKey / scenarioName)
 
     val driver = system.actorOf(Props(classOf[Driver]), scenarioName)
@@ -143,10 +158,14 @@ class ActorCreationPerfSpec extends AkkaSpec("akka.actor.serialize-messages = of
     val before = mem.getHeapSnapshot
 
     driver ! Create(number, propsCreator)
-    expectMsgPF(15 seconds, s"$scenarioName waiting for Created") { case Created ⇒ }
+    expectMsgPF(15 seconds, s"$scenarioName waiting for Created") {
+      case Created ⇒
+    }
 
     driver ! WaitForChildren
-    expectMsgPF(15 seconds, s"$scenarioName waiting for Waited") { case Waited ⇒ }
+    expectMsgPF(15 seconds, s"$scenarioName waiting for Waited") {
+      case Waited ⇒
+    }
 
     gc()
     val after = mem.getHeapSnapshot
@@ -173,7 +192,10 @@ class ActorCreationPerfSpec extends AkkaSpec("akka.actor.serialize-messages = of
       // note: measuring per-actor-memory-use in this scenario is skewed as the Actor contains references to counters etc!
       //       for measuring actor size use refer to the `runWithoutCounter` method
       for (i ← 1 to nrOfRepeats) {
-        runWithCounterInside(name, s"${scenarioName}_driver_inside_$i", nrOfActors, propsCreator)
+        runWithCounterInside(name,
+                             s"${scenarioName}_driver_inside_$i",
+                             nrOfActors,
+                             propsCreator)
       }
 
       reportAndClearMetrics()
@@ -183,8 +205,11 @@ class ActorCreationPerfSpec extends AkkaSpec("akka.actor.serialize-messages = of
       val avgMem = averageGauge(ActorCreationKey / name / "avg-mem-per-actor")
 
       for (i ← 1 to nrOfRepeats) {
-        val heapUsed = timedWithKnownOps(TotalTimeKey / s"creating-$nrOfActors-actors" / name, ops = nrOfActors) {
-          runWithoutCounter(s"${scenarioName}_driver_outside_$i", nrOfActors, propsCreator)
+        val heapUsed = timedWithKnownOps(
+            TotalTimeKey / s"creating-$nrOfActors-actors" / name,
+            ops = nrOfActors) {
+          runWithoutCounter(
+              s"${scenarioName}_driver_outside_$i", nrOfActors, propsCreator)
         }
 
         avgMem.add(heapUsed.used / nrOfActors) // average actor size, over nrOfRepeats
@@ -207,12 +232,14 @@ class ActorCreationPerfSpec extends AkkaSpec("akka.actor.serialize-messages = of
     val props2 = Props(new EmptyActor)
     registerTests("Props(new EmptyActor) same", () ⇒ { props2 })
 
-    registerTests("Props(classOf[EmptyArgsActor], ...) new", () ⇒ { Props(classOf[EmptyArgsActor], 4711, 1729) })
+    registerTests("Props(classOf[EmptyArgsActor], ...) new",
+                  () ⇒ { Props(classOf[EmptyArgsActor], 4711, 1729) })
 
     val props3 = Props(classOf[EmptyArgsActor], 4711, 1729)
     registerTests("Props(classOf[EmptyArgsActor], ...) same", () ⇒ { props3 })
 
-    registerTests("Props(new EmptyArgsActor(...)) new", () ⇒ { Props(new EmptyArgsActor(4711, 1729)) })
+    registerTests("Props(new EmptyArgsActor(...)) new",
+                  () ⇒ { Props(new EmptyArgsActor(4711, 1729)) })
 
     val props4 = Props(new EmptyArgsActor(4711, 1729))
     registerTests("Props(new EmptyArgsActor(...)) same", () ⇒ { props4 })

@@ -20,7 +20,7 @@ case class BlackholeterSpec() extends FlatSpec with MustMatchers {
     when(base.apply("hello")).thenReturn(Future.value("hi"))
     val stack = Blackholeter(Var(0.0)) andThen base
     1 to repeatFor foreach { _ =>
-      Await.result(stack("hello")) must equal ("hi")
+      Await.result(stack("hello")) must equal("hi")
     }
     verify(base, times(repeatFor)).apply("hello")
   }
@@ -31,7 +31,7 @@ case class BlackholeterSpec() extends FlatSpec with MustMatchers {
     when(base.apply("hello")).thenReturn(Future.value("hi"))
     val stack = ByzantineBlackholeter(Var(0.0)) andThen base
     1 to repeatFor foreach { _ =>
-      Await.result(stack("hello")) must equal ("hi")
+      Await.result(stack("hello")) must equal("hi")
     }
     verify(base, times(repeatFor)).apply("hello")
   }
@@ -44,12 +44,16 @@ case class BlackholeterSpec() extends FlatSpec with MustMatchers {
 
     var pass = 0
 
-    evaluating { Await.result(Future.collect(1 to repeatFor map { _ =>
-        stack("hello") onSuccess { _ => pass += 1 }
-    }), 10.seconds) } must produce[TimeoutException]
+    evaluating {
+      Await.result(Future.collect(1 to repeatFor map { _ =>
+        stack("hello") onSuccess { _ =>
+          pass += 1
+        }
+      }), 10.seconds)
+    } must produce[TimeoutException]
 
     val passRatio = pass.toDouble / repeatFor.toDouble
-    passRatio must be (0.5 plusOrMinus 0.05)
+    passRatio must be(0.5 plusOrMinus 0.05)
     // Verify that the service was called the number of required times
     verify(base, times(repeatFor)).apply("hello")
   }
@@ -64,13 +68,14 @@ case class BlackholeterSpec() extends FlatSpec with MustMatchers {
 
     evaluating {
       Await.result(Future.collect(1 to repeatFor map { _ =>
-        stack("hello") onSuccess { _ => pass += 1 }
+        stack("hello") onSuccess { _ =>
+          pass += 1
+        }
       }), 10.seconds)
     } must produce[TimeoutException]
 
     val passRatio = pass.toDouble / repeatFor.toDouble
-    passRatio must be (0.5 plusOrMinus 0.05)
+    passRatio must be(0.5 plusOrMinus 0.05)
     verify(base, times(pass)).apply("hello")
   }
-
 }

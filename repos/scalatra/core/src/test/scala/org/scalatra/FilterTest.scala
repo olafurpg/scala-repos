@@ -59,7 +59,6 @@ class FilterTestFilter extends ScalatraFilter {
     beforeCount = 0
     pass
   }
-
 }
 
 class MultipleFilterTestServlet extends ScalatraServlet {
@@ -82,7 +81,6 @@ class MultipleFilterTestServlet extends ScalatraServlet {
   after() {
     response.writer.print("five\n")
   }
-
 }
 
 class FilterTest extends ScalatraFunSuite with BeforeAndAfterEach {
@@ -154,4 +152,3 @@ class FilterTest extends ScalatraFunSuite with BeforeAndAfterEach {
     }
   }
 }
-

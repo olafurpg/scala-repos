@@ -4,6 +4,7 @@ object SCL3552 {
     def update(x: Boolean, y: Boolean): Boolean = x || y
   }
 
-  /*start*/Foo(false) = true/*end*/
+  /*start*/
+  Foo(false) = true /*end*/
 }
 //Boolean

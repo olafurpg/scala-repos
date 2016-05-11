@@ -34,15 +34,15 @@ import scalafx.beans.property.BooleanProperty
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-
 object CheckMenuItem {
-  implicit def sfxCheckMenuItem2jfx(m: CheckMenuItem): jfxsc.CheckMenuItem = if (m != null) m.delegate else null
+  implicit def sfxCheckMenuItem2jfx(m: CheckMenuItem): jfxsc.CheckMenuItem =
+    if (m != null) m.delegate else null
 }
 
 /** A MenuItem that can be toggled between selected and unselected states. */
-class CheckMenuItem(override val delegate: jfxsc.CheckMenuItem = new jfxsc.CheckMenuItem)
-  extends MenuItem
-  with SFXDelegate[jfxsc.CheckMenuItem] {
+class CheckMenuItem(
+    override val delegate: jfxsc.CheckMenuItem = new jfxsc.CheckMenuItem)
+    extends MenuItem with SFXDelegate[jfxsc.CheckMenuItem] {
 
   /** Constructs a CheckMenuItem and sets the display text with the specified text. */
   def this(text: String) = this(new jfxsc.CheckMenuItem(text))
@@ -50,8 +50,8 @@ class CheckMenuItem(override val delegate: jfxsc.CheckMenuItem = new jfxsc.Check
   /** Constructs a CheckMenuItem and sets the display text with the specified text and
     * sets the graphic Node to the given node.
     */
-  def this(text: String, graphic: Node) = this(new jfxsc.CheckMenuItem(text, graphic))
-
+  def this(text: String, graphic: Node) =
+    this(new jfxsc.CheckMenuItem(text, graphic))
 
   /** Represents the current state of this CheckMenuItem.
     *

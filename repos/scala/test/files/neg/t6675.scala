@@ -1,9 +1,10 @@
 object X {
-  def unapply(s: String): Option[(Int,Int,Int)] = Some((1,2,3))
+  def unapply(s: String): Option[(Int, Int, Int)] = Some((1, 2, 3))
 }
 
 object Y {
-  def unapplySeq(s: String): Option[Seq[(Int,Int,Int)]] = Some(Seq((1,2,3)))
+  def unapplySeq(s: String): Option[Seq[(Int, Int, Int)]] =
+    Some(Seq((1, 2, 3)))
 }
 
 object Test {

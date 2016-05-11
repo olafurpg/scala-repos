@@ -7,11 +7,11 @@ import java.io.File
 
 import akka.actor._
 import akka.persistence.EndToEndEventAdapterSpec.NewA
-import akka.persistence.journal.{ EventSeq, EventAdapter }
-import akka.testkit.{ TestProbe, EventFilter }
-import com.typesafe.config.{ Config, ConfigFactory }
+import akka.persistence.journal.{EventSeq, EventAdapter}
+import akka.testkit.{TestProbe, EventFilter}
+import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.commons.io.FileUtils
-import org.scalatest.{ WordSpecLike, Matchers, BeforeAndAfterAll }
+import org.scalatest.{WordSpecLike, Matchers, BeforeAndAfterAll}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -31,44 +31,54 @@ object EndToEndEventAdapterSpec {
 
     override def toJournal(event: Any): Any =
       event match { case m: AppModel ⇒ JSON(m.payload) }
-    override def fromJournal(event: Any, manifest: String): EventSeq = event match {
-      case m: JSON if m.payload.toString.startsWith("a") ⇒ EventSeq.single(A(m.payload))
-      case _ ⇒ EventSeq.empty
-    }
+    override def fromJournal(event: Any, manifest: String): EventSeq =
+      event match {
+        case m: JSON if m.payload.toString.startsWith("a") ⇒
+          EventSeq.single(A(m.payload))
+        case _ ⇒ EventSeq.empty
+      }
   }
   class NewAEndToEndAdapter(system: ExtendedActorSystem) extends EventAdapter {
     override def manifest(event: Any): String = event.getClass.getCanonicalName
 
     override def toJournal(event: Any): Any =
       event match { case m: AppModel ⇒ JSON(m.payload) }
-    override def fromJournal(event: Any, manifest: String): EventSeq = event match {
-      case m: JSON if m.payload.toString.startsWith("a") ⇒ EventSeq.single(NewA(m.payload))
-      case _ ⇒ EventSeq.empty
-    }
+    override def fromJournal(event: Any, manifest: String): EventSeq =
+      event match {
+        case m: JSON if m.payload.toString.startsWith("a") ⇒
+          EventSeq.single(NewA(m.payload))
+        case _ ⇒ EventSeq.empty
+      }
   }
   class BEndToEndAdapter(system: ExtendedActorSystem) extends EventAdapter {
     override def manifest(event: Any): String = event.getClass.getCanonicalName
 
     override def toJournal(event: Any): Any =
       event match { case m: AppModel ⇒ JSON(m.payload) }
-    override def fromJournal(event: Any, manifest: String): EventSeq = event match {
-      case m: JSON if m.payload.toString.startsWith("b") ⇒ EventSeq.single(B(m.payload))
-      case _ ⇒ EventSeq.empty
-    }
+    override def fromJournal(event: Any, manifest: String): EventSeq =
+      event match {
+        case m: JSON if m.payload.toString.startsWith("b") ⇒
+          EventSeq.single(B(m.payload))
+        case _ ⇒ EventSeq.empty
+      }
   }
   class NewBEndToEndAdapter(system: ExtendedActorSystem) extends EventAdapter {
     override def manifest(event: Any): String = event.getClass.getCanonicalName
 
     override def toJournal(event: Any): Any =
       event match { case m: AppModel ⇒ JSON(m.payload) }
-    override def fromJournal(event: Any, manifest: String): EventSeq = event match {
-      case m: JSON if m.payload.toString.startsWith("b") ⇒ EventSeq.single(NewB(m.payload))
-      case _ ⇒ EventSeq.empty
-    }
+    override def fromJournal(event: Any, manifest: String): EventSeq =
+      event match {
+        case m: JSON if m.payload.toString.startsWith("b") ⇒
+          EventSeq.single(NewB(m.payload))
+        case _ ⇒ EventSeq.empty
+      }
   }
 
-  class EndToEndAdapterActor(name: String, override val journalPluginId: String, probe: Option[ActorRef])
-    extends NamedPersistentActor(name) with PersistentActor {
+  class EndToEndAdapterActor(name: String,
+                             override val journalPluginId: String,
+                             probe: Option[ActorRef])
+      extends NamedPersistentActor(name) with PersistentActor {
 
     var state: List[Any] = Nil
 
@@ -84,20 +94,19 @@ object EndToEndEventAdapterSpec {
 
     override def receiveRecover = {
       case RecoveryCompleted ⇒ // ignore
-      case e                 ⇒ state ::= e
+      case e ⇒ state ::= e
     }
     override def receiveCommand = persistIncoming
-
   }
-
 }
 
-abstract class EndToEndEventAdapterSpec(journalName: String, journalConfig: Config)
-  extends WordSpecLike with Matchers with BeforeAndAfterAll {
+abstract class EndToEndEventAdapterSpec(
+    journalName: String, journalConfig: Config)
+    extends WordSpecLike with Matchers with BeforeAndAfterAll {
   import EndToEndEventAdapterSpec._
 
-  val storageLocations = List("akka.persistence.journal.leveldb.dir")
-    .map(s ⇒ new File(journalConfig.getString(s)))
+  val storageLocations = List("akka.persistence.journal.leveldb.dir").map(
+      s ⇒ new File(journalConfig.getString(s)))
 
   override protected def beforeAll() {
     storageLocations.foreach(FileUtils.deleteDirectory)
@@ -109,8 +118,7 @@ abstract class EndToEndEventAdapterSpec(journalName: String, journalConfig: Conf
 
   val noAdaptersConfig = ConfigFactory.parseString("")
 
-  val adaptersConfig = ConfigFactory.parseString(
-    s"""
+  val adaptersConfig = ConfigFactory.parseString(s"""
     |akka.persistence.journal {
     |  $journalName {
     |    event-adapters {
@@ -130,8 +138,7 @@ abstract class EndToEndEventAdapterSpec(journalName: String, journalConfig: Conf
     |akka.loggers = ["akka.testkit.TestEventListener"]
     """.stripMargin)
 
-  val newAdaptersConfig = ConfigFactory.parseString(
-    s"""
+  val newAdaptersConfig = ConfigFactory.parseString(s"""
     |akka.persistence.journal {
     |  $journalName {
     |    event-adapters {
@@ -150,38 +157,44 @@ abstract class EndToEndEventAdapterSpec(journalName: String, journalConfig: Conf
     |}
     """.stripMargin)
 
-  def persister(name: String, probe: Option[ActorRef] = None)(implicit system: ActorSystem) =
-    system.actorOf(Props(classOf[EndToEndAdapterActor], name, "akka.persistence.journal." + journalName, probe), name)
+  def persister(name: String, probe: Option[ActorRef] = None)(
+      implicit system: ActorSystem) =
+    system.actorOf(Props(classOf[EndToEndAdapterActor],
+                         name,
+                         "akka.persistence.journal." + journalName,
+                         probe),
+                   name)
 
-  def withActorSystem[T](name: String, config: Config)(block: ActorSystem ⇒ T): T = {
+  def withActorSystem[T](name: String, config: Config)(
+      block: ActorSystem ⇒ T): T = {
     val system = ActorSystem(name, journalConfig withFallback config)
     try block(system) finally Await.ready(system.terminate(), 3.seconds)
   }
 
   "EventAdapters in end-to-end scenarios" must {
 
-    "use the same adapter when reading as was used when writing to the journal" in
-      withActorSystem("SimpleSystem", adaptersConfig) { implicit system ⇒
-        val p = TestProbe()
-        implicit val ref = p.ref
+    "use the same adapter when reading as was used when writing to the journal" in withActorSystem(
+        "SimpleSystem", adaptersConfig) { implicit system ⇒
+      val p = TestProbe()
+      implicit val ref = p.ref
 
-        val p1 = persister("p1")
-        val a = A("a1")
-        val b = B("b1")
-        p1 ! a
-        p1 ! b
-        p.expectMsg(a)
-        p.expectMsg(b)
+      val p1 = persister("p1")
+      val a = A("a1")
+      val b = B("b1")
+      p1 ! a
+      p1 ! b
+      p.expectMsg(a)
+      p.expectMsg(b)
 
-        p.watch(p1)
-        p1 ! PoisonPill
-        p.expectTerminated(p1)
+      p.watch(p1)
+      p1 ! PoisonPill
+      p.expectTerminated(p1)
 
-        val p11 = persister("p1")
-        p11 ! GetState
-        p.expectMsg(A("a1"))
-        p.expectMsg(B("b1"))
-      }
+      val p11 = persister("p1")
+      p11 ! GetState
+      p.expectMsg(A("a1"))
+      p.expectMsg(B("b1"))
+    }
 
     "allow using an adapter, when write was performed without an adapter" in {
       val persistentName = "p2"
@@ -208,14 +221,15 @@ abstract class EndToEndEventAdapterSpec(journalName: String, journalConfig: Conf
         p.expectMsg(B("b1"))
       }
 
-      withActorSystem("NowAdaptersAddedSystem", newAdaptersConfig) { implicit system ⇒
-        val p = TestProbe()
-        implicit val ref = p.ref
+      withActorSystem("NowAdaptersAddedSystem", newAdaptersConfig) {
+        implicit system ⇒
+          val p = TestProbe()
+          implicit val ref = p.ref
 
-        val p22 = persister(persistentName)
-        p22 ! GetState
-        p.expectMsg(NewA("a1"))
-        p.expectMsg(NewB("b1"))
+          val p22 = persister(persistentName)
+          p22 ! GetState
+          p.expectMsg(NewA("a1"))
+          p.expectMsg(NewB("b1"))
       }
     }
 
@@ -225,18 +239,29 @@ abstract class EndToEndEventAdapterSpec(journalName: String, journalConfig: Conf
       val journalPath = s"akka.persistence.journal.$journalName"
       val missingAdapterConfig = adaptersConfig
         .withoutPath(s"$journalPath.event-adapters.a")
-        .withoutPath(s"""$journalPath.event-adapter-bindings."${classOf[EndToEndEventAdapterSpec].getCanonicalName}$$A"""")
+        .withoutPath(s"""$journalPath.event-adapter-bindings."${classOf[
+            EndToEndEventAdapterSpec].getCanonicalName}$$A"""")
 
-      withActorSystem("MissingAdapterSystem", journalConfig.withFallback(missingAdapterConfig)) { implicit system2 ⇒
-        EventFilter[ActorInitializationException](occurrences = 1, pattern = ".*undefined event-adapter.*") intercept {
-          intercept[IllegalArgumentException] {
-            Persistence(system2).adaptersFor(s"akka.persistence.journal.$journalName").get(classOf[String])
-          }.getMessage should include("was bound to undefined event-adapter: a (bindings: [a, b], known adapters: b)")
-        }
+      withActorSystem("MissingAdapterSystem",
+                      journalConfig.withFallback(missingAdapterConfig)) {
+        implicit system2 ⇒
+          EventFilter[ActorInitializationException](
+              occurrences = 1,
+              pattern = ".*undefined event-adapter.*") intercept {
+            intercept[IllegalArgumentException] {
+              Persistence(system2)
+                .adaptersFor(s"akka.persistence.journal.$journalName")
+                .get(classOf[String])
+            }.getMessage should include(
+                "was bound to undefined event-adapter: a (bindings: [a, b], known adapters: b)")
+          }
       }
     }
   }
 }
 
 // needs persistence between actor systems, thus not running with the inmem journal
-class LeveldbEndToEndEventAdapterSpec extends EndToEndEventAdapterSpec("leveldb", PersistenceSpec.config("leveldb", "LeveldbEndToEndEventAdapterSpec"))
+class LeveldbEndToEndEventAdapterSpec
+    extends EndToEndEventAdapterSpec(
+        "leveldb",
+        PersistenceSpec.config("leveldb", "LeveldbEndToEndEventAdapterSpec"))

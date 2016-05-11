@@ -9,17 +9,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.util.IntentionUtils
 
 /**
- * @author Ksenia.Sautina
- * @since 6/20/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 6/20/12
+  */
 object MakeExplicitAction {
   final val MAKE_EXPLICIT = "Make explicit"
   final val MAKE_EXPLICIT_STATICALLY = "Make explicit (Import method)"
-
 }
 
-class MakeExplicitAction  extends AnAction("Replace implicit conversion action") {
+class MakeExplicitAction
+    extends AnAction("Replace implicit conversion action") {
 
   def actionPerformed(e: AnActionEvent) {
     val context = e.getDataContext
@@ -41,7 +40,12 @@ class MakeExplicitAction  extends AnAction("Replace implicit conversion action")
     val file = PsiUtilBase.getPsiFileInEditor(editor, project)
     if (!file.isInstanceOf[ScalaFile]) return
 
-    IntentionUtils.showMakeExplicitPopup(project, expression, function, editor, secondPart, getCurrentItemBounds _)
+    IntentionUtils.showMakeExplicitPopup(project,
+                                         expression,
+                                         function,
+                                         editor,
+                                         secondPart,
+                                         getCurrentItemBounds _)
   }
 
   def getCurrentItemBounds: Rectangle = {
@@ -49,7 +53,8 @@ class MakeExplicitAction  extends AnAction("Replace implicit conversion action")
     if (index < 0) {
       throw new RuntimeException("Index = " + index + " is less than zero.")
     }
-    val itemBounds: Rectangle = GoToImplicitConversionAction.getList.getCellBounds(index, index)
+    val itemBounds: Rectangle =
+      GoToImplicitConversionAction.getList.getCellBounds(index, index)
     if (itemBounds == null) {
       throw new RuntimeException("No bounds for index = " + index + ".")
     }

@@ -12,11 +12,12 @@ import play.api.libs.ws._
 import scala.concurrent.Future
 
 /**
- * Logs WSRequest and pulls information into Curl format to an SLF4J logger.
- *
- * @param logger an SLF4J logger
- */
-class AhcCurlRequestLogger(logger: org.slf4j.Logger) extends WSRequestFilter with CurlFormat {
+  * Logs WSRequest and pulls information into Curl format to an SLF4J logger.
+  *
+  * @param logger an SLF4J logger
+  */
+class AhcCurlRequestLogger(logger: org.slf4j.Logger)
+    extends WSRequestFilter with CurlFormat {
   def apply(executor: WSRequestExecutor): WSRequestExecutor = {
     new WSRequestExecutor {
       override def execute(request: WSRequest): Future[WSResponse] = {
@@ -30,7 +31,8 @@ class AhcCurlRequestLogger(logger: org.slf4j.Logger) extends WSRequestFilter wit
 
 object AhcCurlRequestLogger {
 
-  private val logger = LoggerFactory.getLogger("play.api.libs.ws.ahc.AhcCurlRequestLogger")
+  private val logger =
+    LoggerFactory.getLogger("play.api.libs.ws.ahc.AhcCurlRequestLogger")
 
   private val instance = new AhcCurlRequestLogger(logger)
 

@@ -8,9 +8,7 @@ import org.scalatest.{Matchers, FunSuite}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class DefaultMonitorTest extends FunSuite
-  with Matchers
-{
+class DefaultMonitorTest extends FunSuite with Matchers {
   private val handler = new StringHandler(BareFormatter, Some(Level.TRACE))
   private val logger = Logger.get("DefaultMonitorTest")
   logger.addHandler(handler)
@@ -46,5 +44,4 @@ class DefaultMonitorTest extends FunSuite
 
     handler.get should include("Exception propagated to DefaultMonitor")
   }
-
 }

@@ -1,4 +1,3 @@
-
 package scala.io
 
 import org.junit.Test
@@ -8,7 +7,7 @@ import org.junit.runners.JUnit4
 
 import scala.tools.testing.AssertUtil._
 
-import java.io.{ Console => _, _ }
+import java.io.{Console => _, _}
 
 @RunWith(classOf[JUnit4])
 class SourceTest {
@@ -53,15 +52,17 @@ class SourceTest {
     } while (s.ch != '\n')
     s.next()
     val out = new ByteArrayOutputStream
-    val ps  = new PrintStream(out, true, charSet)
+    val ps = new PrintStream(out, true, charSet)
     s.reportError(s.pos, "That doesn't sound right.", ps)
     assertEquals("0030: THAT DOESN'T SOUND RIGHT.", out.toString(charSet))
   }
   @Test def canAltCustomizeReporting() = {
-    class CapitalReporting(is: InputStream)(implicit codec: Codec) extends Source {
+    class CapitalReporting(is: InputStream)(implicit codec: Codec)
+        extends Source {
       override val iter = {
         val r = new InputStreamReader(is, codec.decoder)
-        Iterator continually (codec wrap r.read()) takeWhile (_ != -1) map (_.toChar)
+        Iterator continually (codec wrap r.read()) takeWhile (_ != -1) map
+        (_.toChar)
       }
       override def report(pos: Int, msg: String, out: PrintStream): Unit = {
         out print f"$pos%04x: ${msg.toUpperCase}"
@@ -83,7 +84,7 @@ class SourceTest {
     } while (s.ch != '\n')
     s.next()
     val out = new ByteArrayOutputStream
-    val ps  = new PrintStream(out, true, charSet)
+    val ps = new PrintStream(out, true, charSet)
     s.reportError(s.pos, "That doesn't sound right.", ps)
     assertEquals("0030: THAT DOESN'T SOUND RIGHT.", out.toString(charSet))
   }

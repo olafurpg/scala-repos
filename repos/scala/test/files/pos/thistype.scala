@@ -11,5 +11,4 @@ object Test {
   def main(args: Array[String]) {
     new MouseCtl().enable.mouseDown(1, 2)
   }
-
 }

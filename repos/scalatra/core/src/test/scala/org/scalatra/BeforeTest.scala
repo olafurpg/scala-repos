@@ -21,7 +21,6 @@ class BeforeTestServlet extends ScalatraServlet {
   get("/other/path") {}
 
   get("/third/path") {}
-
 }
 
 class BeforeTest extends ScalatraFunSuite {
@@ -41,5 +40,4 @@ class BeforeTest extends ScalatraFunSuite {
       status should equal(206)
     }
   }
-
 }

@@ -44,16 +44,15 @@ case object JObjectUnfixedT extends JObjectT
 
 case class JUnionT(left: JType, right: JType) extends JType {
   override def toString = {
-    if (this == JType.JUniverseT)
-      "JUniverseT"
-    else
-      "JUnionT" + "(" + left + ", " + right + ")"
+    if (this == JType.JUniverseT) "JUniverseT"
+    else "JUnionT" + "(" + left + ", " + right + ")"
   }
 }
 
 object JType {
   // TODO JArrayHomogeneousT can't go in here. Is this just used for tests?
-  val JPrimitiveUnfixedT = JNumberT | JTextT | JBooleanT | JNullT | JDateT | JPeriodT
+  val JPrimitiveUnfixedT =
+    JNumberT | JTextT | JBooleanT | JNullT | JDateT | JPeriodT
   // val JUnfixedT = JPrimitiveUnfixedT | JObjectUnfixedT | JArrayUnfixedT
   // val JUniverseT = JUnionT(JUnionT(JUnionT(JUnionT(JUnionT(JUnionT(JUnionT(JNumberT, JTextT), JBooleanT), JNullT), JDateT), JPeriodT), JObjectUnfixedT), JArrayUnfixedT)
   val JUniverseT = JPrimitiveUnfixedT | JObjectUnfixedT | JArrayUnfixedT

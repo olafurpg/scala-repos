@@ -1,7 +1,7 @@
 package lila.common
 
 import scala.annotation._
-import scala.math.{ pow, abs, sqrt, E, exp }
+import scala.math.{pow, abs, sqrt, E, exp}
 import scalaz.NonEmptyList
 
 object Maths {
@@ -11,13 +11,14 @@ object Maths {
     a.map(i => pow(n.toDouble(i) - m, 2)).list.sum / a.size
   }
 
-  def deviation[T](a: NonEmptyList[T])(implicit n: Numeric[T]): Double = sqrt(variance(a))
+  def deviation[T](a: NonEmptyList[T])(implicit n: Numeric[T]): Double =
+    sqrt(variance(a))
 
   // ridiculously performance optimized mean function
   def mean[T](a: NonEmptyList[T])(implicit n: Numeric[T]): Double = {
     @tailrec def recurse(a: List[T], sum: T, depth: Int): Double = {
       a match {
-        case Nil     => n.toDouble(sum) / depth
+        case Nil => n.toDouble(sum) / depth
         case x :: xs => recurse(xs, n.plus(sum, x), depth + 1)
       }
     }

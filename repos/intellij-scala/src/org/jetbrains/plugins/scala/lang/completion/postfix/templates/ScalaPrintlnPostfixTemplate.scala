@@ -5,11 +5,15 @@ import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{S
 import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.SelectorType._
 
 /**
- * @author Roman.Shein
- * @since 13.09.2015.
- */
-class ScalaPrintlnPostfixTemplate extends ScalaStringBasedPostfixTemplate("sout", "println(expr)",
-  new AncestorSelector(SelectorConditions.ANY_EXPR, Topmost)) {
+  * @author Roman.Shein
+  * @since 13.09.2015.
+  */
+class ScalaPrintlnPostfixTemplate
+    extends ScalaStringBasedPostfixTemplate(
+        "sout",
+        "println(expr)",
+        new AncestorSelector(SelectorConditions.ANY_EXPR, Topmost)) {
 
-  override def getTemplateString(element: PsiElement): String = "println($expr$)"
+  override def getTemplateString(element: PsiElement): String =
+    "println($expr$)"
 }

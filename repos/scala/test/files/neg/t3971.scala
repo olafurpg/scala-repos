@@ -8,5 +8,5 @@ class A {
   f(h("abc"))
 
   // a perverse piece of code from a perverse coder
-  ({"ab".reverse; "ba".equals})(0): String
+  ({ "ab".reverse; "ba".equals })(0): String
 }

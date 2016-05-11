@@ -7,4 +7,4 @@ class OneImport
 package x
 
 class OneImport
-*/
+ */

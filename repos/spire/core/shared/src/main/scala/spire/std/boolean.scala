@@ -14,15 +14,15 @@ trait BooleanIsBool extends Bool[Boolean] {
 
 trait BooleanIsRig extends CRig[Boolean] {
   def one: Boolean = true
-  def plus(a:Boolean, b:Boolean): Boolean = a || b
-  override def pow(a:Boolean, b:Int): Boolean = a
-  override def times(a:Boolean, b:Boolean): Boolean = a && b
+  def plus(a: Boolean, b: Boolean): Boolean = a || b
+  override def pow(a: Boolean, b: Int): Boolean = a
+  override def times(a: Boolean, b: Boolean): Boolean = a && b
   def zero: Boolean = false
 }
 
 trait BooleanOrder extends Order[Boolean] with Serializable {
-  override def eqv(x:Boolean, y:Boolean): Boolean = x == y
-  override def neqv(x:Boolean, y:Boolean): Boolean = x != y
+  override def eqv(x: Boolean, y: Boolean): Boolean = x == y
+  override def neqv(x: Boolean, y: Boolean): Boolean = x != y
   override def gt(x: Boolean, y: Boolean): Boolean = x && !y
   override def lt(x: Boolean, y: Boolean): Boolean = !x && y
   override def gteqv(x: Boolean, y: Boolean): Boolean = x == y || x
@@ -30,15 +30,18 @@ trait BooleanOrder extends Order[Boolean] with Serializable {
 
   override def min(x: Boolean, y: Boolean): Boolean = x && y
   override def max(x: Boolean, y: Boolean): Boolean = x || y
-  def compare(x: Boolean, y: Boolean): Int = if (x) {
-    if (y) 0 else 1
-  } else {
-    if (y) -1 else 0
-  }
+  def compare(x: Boolean, y: Boolean): Int =
+    if (x) {
+      if (y) 0 else 1
+    } else {
+      if (y) -1 else 0
+    }
 }
 
 @SerialVersionUID(0L)
-class BooleanStructure extends BooleanIsBool with BooleanIsRig with BooleanOrder with Serializable {
+class BooleanStructure
+    extends BooleanIsBool with BooleanIsRig with BooleanOrder
+    with Serializable {
   override def one: Boolean = true
   override def zero: Boolean = false
   override def isOne(a: Boolean)(implicit ev: Eq[Boolean]): Boolean = a

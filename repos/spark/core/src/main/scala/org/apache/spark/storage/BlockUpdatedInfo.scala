@@ -21,25 +21,24 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.storage.BlockManagerMessages.UpdateBlockInfo
 
 /**
- * :: DeveloperApi ::
- * Stores information about a block status in a block manager.
- */
+  * :: DeveloperApi ::
+  * Stores information about a block status in a block manager.
+  */
 @DeveloperApi
-case class BlockUpdatedInfo(
-    blockManagerId: BlockManagerId,
-    blockId: BlockId,
-    storageLevel: StorageLevel,
-    memSize: Long,
-    diskSize: Long)
+case class BlockUpdatedInfo(blockManagerId: BlockManagerId,
+                            blockId: BlockId,
+                            storageLevel: StorageLevel,
+                            memSize: Long,
+                            diskSize: Long)
 
 private[spark] object BlockUpdatedInfo {
 
-  private[spark] def apply(updateBlockInfo: UpdateBlockInfo): BlockUpdatedInfo = {
-    BlockUpdatedInfo(
-      updateBlockInfo.blockManagerId,
-      updateBlockInfo.blockId,
-      updateBlockInfo.storageLevel,
-      updateBlockInfo.memSize,
-      updateBlockInfo.diskSize)
+  private[spark] def apply(
+      updateBlockInfo: UpdateBlockInfo): BlockUpdatedInfo = {
+    BlockUpdatedInfo(updateBlockInfo.blockManagerId,
+                     updateBlockInfo.blockId,
+                     updateBlockInfo.storageLevel,
+                     updateBlockInfo.memSize,
+                     updateBlockInfo.diskSize)
   }
 }

@@ -10,9 +10,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
 
 trait ScTypedDeclaration extends ScDeclaration {
-  def typeElement : Option[ScTypeElement]
+  def typeElement: Option[ScTypeElement]
 
-  def getType(ctx: TypingContext) : TypeResult[ScType]
+  def getType(ctx: TypingContext): TypeResult[ScType]
 
-  def declaredElements : Seq[ScTypedDefinition]
+  def declaredElements: Seq[ScTypedDefinition]
 }

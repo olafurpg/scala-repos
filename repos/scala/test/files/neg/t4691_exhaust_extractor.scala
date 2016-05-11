@@ -11,7 +11,6 @@ object Baz2 {
   def unapply(x: Bar2): Some[Int] = Some(2)
 }
 
-
 object Test {
   // warning: missing Bar3
   def f1(x: Foo) = x match {

@@ -14,7 +14,7 @@ object Test extends App {
   def empty {
     val none = DoubleLinkedList()
     require(none.size == 0)
-    none.foreach( _ => require(false))
+    none.foreach(_ => require(false))
   }
 
   def builder_1 {
@@ -24,7 +24,7 @@ object Test extends App {
 
   def builder_2 {
     val ten = DoubleLinkedList(1 to 10: _*)
-    require((ten.size*(ten.size+1))/2 == ten.reduceLeft(_ + _))
+    require((ten.size * (ten.size + 1)) / 2 == ten.reduceLeft(_ + _))
   }
 
   def chaining_1 {
@@ -44,7 +44,7 @@ object Test extends App {
     // Post-insert size test
     require(11 == ten.size)
     // Post-insert data test
-    require((ten.size*(ten.size+1))/2 == ten.reduceLeft(_ + _))
+    require((ten.size * (ten.size + 1)) / 2 == ten.reduceLeft(_ + _))
     // Post-insert chaining test
     require(ten == ten.reverse.reverse)
     // Post-insert position test
@@ -74,7 +74,7 @@ object Test extends App {
     // Post-append size test
     require(11 == ten.size)
     // Post-append data test
-    require((ten.size*(ten.size+1))/2 == ten.reduceLeft(_ + _))
+    require((ten.size * (ten.size + 1)) / 2 == ten.reduceLeft(_ + _))
     // Post-append chaining test
     require(ten == ten.reverse.reverse)
     // Post-append position test

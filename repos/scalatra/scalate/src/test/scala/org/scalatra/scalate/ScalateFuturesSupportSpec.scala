@@ -1,13 +1,13 @@
 package org.scalatra.scalate
 
-import java.util.concurrent.{ ExecutorService, Executors, ThreadFactory }
+import java.util.concurrent.{ExecutorService, Executors, ThreadFactory}
 
 import org.fusesource.scalate.layout.DefaultLayoutStrategy
 import org.scalatra._
 import org.scalatra.test.specs2.MutableScalatraSpec
 import org.specs2.specification._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 class DaemonThreadFactory extends ThreadFactory {
   def newThread(r: Runnable): Thread = {
@@ -21,7 +21,9 @@ object DaemonThreadFactory {
   def newPool() = Executors.newCachedThreadPool(new DaemonThreadFactory)
 }
 
-class ScalateFuturesSupportServlet(exec: ExecutorService) extends ScalatraServlet with ScalateSupport with ScalateUrlGeneratorSupport with FlashMapSupport with FutureSupport {
+class ScalateFuturesSupportServlet(exec: ExecutorService)
+    extends ScalatraServlet with ScalateSupport with ScalateUrlGeneratorSupport
+    with FlashMapSupport with FutureSupport {
   protected implicit val executor = ExecutionContext.fromExecutorService(exec)
 
   get("/barf") {
@@ -37,7 +39,11 @@ class ScalateFuturesSupportServlet(exec: ExecutorService) extends ScalatraServle
   }
 
   get("/params") {
-    new AsyncResult { val is = Future { layoutTemplate("/params.jade", "foo" -> "Configurable") } }
+    new AsyncResult {
+      val is = Future {
+        layoutTemplate("/params.jade", "foo" -> "Configurable")
+      }
+    }
   }
 
   get("/jade-template") {
@@ -45,7 +51,9 @@ class ScalateFuturesSupportServlet(exec: ExecutorService) extends ScalatraServle
   }
 
   get("/jade-params") {
-    new AsyncResult { val is = Future { jade("params", "foo" -> "Configurable") } }
+    new AsyncResult {
+      val is = Future { jade("params", "foo" -> "Configurable") }
+    }
   }
 
   get("/scaml-template") {
@@ -53,7 +61,9 @@ class ScalateFuturesSupportServlet(exec: ExecutorService) extends ScalatraServle
   }
 
   get("/scaml-params") {
-    new AsyncResult { val is = Future { scaml("params", "foo" -> "Configurable") } }
+    new AsyncResult {
+      val is = Future { scaml("params", "foo" -> "Configurable") }
+    }
   }
 
   get("/ssp-template") {
@@ -61,7 +71,9 @@ class ScalateFuturesSupportServlet(exec: ExecutorService) extends ScalatraServle
   }
 
   get("/ssp-params") {
-    new AsyncResult { val is = Future { ssp("params", "foo" -> "Configurable") } }
+    new AsyncResult {
+      val is = Future { ssp("params", "foo" -> "Configurable") }
+    }
   }
 
   get("/mustache-template") {
@@ -69,15 +81,25 @@ class ScalateFuturesSupportServlet(exec: ExecutorService) extends ScalatraServle
   }
 
   get("/mustache-params") {
-    new AsyncResult { val is = Future { mustache("params", "foo" -> "Configurable") } }
+    new AsyncResult {
+      val is = Future { mustache("params", "foo" -> "Configurable") }
+    }
   }
 
   get("/layout-strategy") {
-    new AsyncResult { val is = Future { templateEngine.layoutStrategy.asInstanceOf[DefaultLayoutStrategy].defaultLayouts mkString ";" } }
+    new AsyncResult {
+      val is = Future {
+        templateEngine.layoutStrategy
+          .asInstanceOf[DefaultLayoutStrategy]
+          .defaultLayouts mkString ";"
+      }
+    }
   }
 
   val urlGeneration = get("/url-generation") {
-    new AsyncResult { val is = Future { layoutTemplate("/urlGeneration.jade") } }
+    new AsyncResult {
+      val is = Future { layoutTemplate("/urlGeneration.jade") }
+    }
   }
 
   val urlGenerationWithParams = get("/url-generation-with-params/:a/vs/:b") {
@@ -85,7 +107,9 @@ class ScalateFuturesSupportServlet(exec: ExecutorService) extends ScalatraServle
     new AsyncResult {
       val is = Future {
         println("Rendering reverse routing template")
-        layoutTemplate("/urlGenerationWithParams.jade", ("a" -> params("a")), ("b" -> params("b")))
+        layoutTemplate("/urlGenerationWithParams.jade",
+                       ("a" -> params("a")),
+                       ("b" -> params("b")))
       }
     }
   }
@@ -100,12 +124,11 @@ class ScalateFuturesSupportServlet(exec: ExecutorService) extends ScalatraServle
 
   get("/bindings/*") {
     new AsyncResult {
-      val is =
-        Future {
-          flash.now("message") = "flash works"
-          session("message") = "session works"
-          jade(requestPath)
-        }
+      val is = Future {
+        flash.now("message") = "flash works"
+        session("message") = "session works"
+        jade(requestPath)
+      }
     }
   }
 
@@ -119,16 +142,19 @@ class ScalateFuturesSupportServlet(exec: ExecutorService) extends ScalatraServle
 
   get("/template-attributes") {
     new AsyncResult {
-      val is =
-        Future {
-          templateAttributes("foo") = "from attributes"
-          scaml("params")
-        }
+      val is = Future {
+        templateAttributes("foo") = "from attributes"
+        scaml("params")
+      }
     }
   }
 
   get("/render-to-string") {
-    new AsyncResult { val is = Future { response.setHeader("X-Template-Output", layoutTemplate("simple")) } }
+    new AsyncResult {
+      val is = Future {
+        response.setHeader("X-Template-Output", layoutTemplate("simple"))
+      }
+    }
   }
 }
 
@@ -188,20 +214,21 @@ class ScalateFuturesSupportSpec extends MutableScalatraSpec {
   // Testing the default layouts is going to be hard, but we can at least
   // verify that it's looking in the right place.
   def e5 = get("/layout-strategy") {
-    body must_== (List(
-      "/WEB-INF/templates/layouts/default.mustache",
-      "/WEB-INF/templates/layouts/default.ssp",
-      "/WEB-INF/templates/layouts/default.scaml",
-      "/WEB-INF/templates/layouts/default.jade",
-      "/WEB-INF/layouts/default.mustache",
-      "/WEB-INF/layouts/default.ssp",
-      "/WEB-INF/layouts/default.scaml",
-      "/WEB-INF/layouts/default.jade",
-      "/WEB-INF/scalate/layouts/default.mustache",
-      "/WEB-INF/scalate/layouts/default.ssp",
-      "/WEB-INF/scalate/layouts/default.scaml",
-      "/WEB-INF/scalate/layouts/default.jade"
-    ) mkString ";")
+    body must_==
+    (List(
+            "/WEB-INF/templates/layouts/default.mustache",
+            "/WEB-INF/templates/layouts/default.ssp",
+            "/WEB-INF/templates/layouts/default.scaml",
+            "/WEB-INF/templates/layouts/default.jade",
+            "/WEB-INF/layouts/default.mustache",
+            "/WEB-INF/layouts/default.ssp",
+            "/WEB-INF/layouts/default.scaml",
+            "/WEB-INF/layouts/default.jade",
+            "/WEB-INF/scalate/layouts/default.mustache",
+            "/WEB-INF/scalate/layouts/default.ssp",
+            "/WEB-INF/scalate/layouts/default.scaml",
+            "/WEB-INF/scalate/layouts/default.jade"
+        ) mkString ";")
   }
 
   def e6 = get("/url-generation") {

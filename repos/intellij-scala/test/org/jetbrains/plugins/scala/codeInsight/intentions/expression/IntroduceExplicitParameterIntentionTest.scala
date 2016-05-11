@@ -5,11 +5,10 @@ import org.jetbrains.plugins.scala.codeInsight.intention.expression.IntroduceExp
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 /**
- * @author Ksenia.Sautina
- * @since 4/13/12
- */
-
-class IntroduceExplicitParameterIntentionTest extends ScalaIntentionTestBase{
+  * @author Ksenia.Sautina
+  * @since 4/13/12
+  */
+class IntroduceExplicitParameterIntentionTest extends ScalaIntentionTestBase {
   def familyName = IntroduceExplicitParameterIntention.familyName
 
   def testIntroduceExplicitParameter() {
@@ -34,13 +33,11 @@ class IntroduceExplicitParameterIntentionTest extends ScalaIntentionTestBase{
   }
 
   def testIntroduceExplicitParameter4() {
-    val text =
-      """
+    val text = """
         |val name: String = "gfgfgfgfg"
         |val nameHasUpperCase = name.exists(<caret>_.isUpper)
       """
-    val resultText =
-      """
+    val resultText = """
         |val name: String = "gfgfgfgfg"
         |val nameHasUpperCase = name.exists(c => c.isUpper)
       """
@@ -50,16 +47,17 @@ class IntroduceExplicitParameterIntentionTest extends ScalaIntentionTestBase{
 
   def testIntroduceExplicitParameter5() {
     val text = "val a2: ((Int, Int, Int) => Int) = <caret>_ + _ + _ + 5"
-    val resultText = "val a2: ((Int, Int, Int) => Int) = (i, i1, i2) => i + i1 + i2 + 5"
+    val resultText =
+      "val a2: ((Int, Int, Int) => Int) = (i, i1, i2) => i + i1 + i2 + 5"
 
     doTest(text, resultText)
   }
 
   def testIntroduceExplicitParameter6() {
     val text = "val nameHasUpperCase = name.exists(<caret>_ == 'c')"
-    val resultText = "val nameHasUpperCase = name.exists(value => value == 'c')"
+    val resultText =
+      "val nameHasUpperCase = name.exists(value => value == 'c')"
 
     doTest(text, resultText)
   }
-
 }

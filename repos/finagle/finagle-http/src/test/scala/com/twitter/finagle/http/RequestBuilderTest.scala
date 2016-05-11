@@ -11,17 +11,17 @@ import scala.collection.JavaConverters._
 class RequestBuilderTest extends FunSuite {
   val URL0 = new URL("http://joe:blow@www.google.com:77/xxx?foo=bar#xxx")
   val URL1 = new URL("https://www.google.com/")
-  val URL2 = new URL("http://joe%40host.com:blow@www.google.com:77/xxx?foo=bar#xxx")
+  val URL2 = new URL(
+      "http://joe%40host.com:blow@www.google.com:77/xxx?foo=bar#xxx")
 
   val BODY0 = Buf.Utf8("blah")
-  val FORM0 = Seq (
-    "k1" -> "v1",
-    "k2" -> "v2",
-    "k3" -> "v3"
+  val FORM0 = Seq(
+      "k1" -> "v1",
+      "k2" -> "v2",
+      "k3" -> "v3"
   )
 
-  val MULTIPART0 =
-    """--Boundary
+  val MULTIPART0 = """--Boundary
 Content-Disposition: form-data; name="k1"
 Content-Type: text/plain; charset=UTF-8
 
@@ -217,9 +217,7 @@ v3
     val B = "B"
     val C = "C"
     val D = "D"
-    val builder0 = RequestBuilder()
-      .url(URL0)
-      .setHeader(A, B)
+    val builder0 = RequestBuilder().url(URL0).setHeader(A, B)
 
     assert(builder0.buildGet.headers.get(A) == B)
     assert(builder0.buildHead.headers.get(A) == B)
@@ -227,8 +225,7 @@ v3
     assert(builder0.buildPut(BODY0).headers.get(A) == B)
     assert(builder0.buildPost(BODY0).headers.get(A) == B)
 
-    val builder1 = builder0
-      .setHeader(A, C)
+    val builder1 = builder0.setHeader(A, C)
 
     assert(builder1.buildGet.headers.get(A) == C)
     assert(builder1.buildHead.headers.get(A) == C)
@@ -236,8 +233,7 @@ v3
     assert(builder1.buildPut(BODY0).headers.get(A) == C)
     assert(builder1.buildPost(BODY0).headers.get(A) == C)
 
-    val builder2 = builder1
-      .setHeader(A, Seq())
+    val builder2 = builder1.setHeader(A, Seq())
 
     assert(builder2.buildGet.headers.get(A) == null)
     assert(builder2.buildHead.headers.get(A) == null)
@@ -245,20 +241,18 @@ v3
     assert(builder2.buildPut(BODY0).headers.get(A) == null)
     assert(builder2.buildPost(BODY0).headers.get(A) == null)
 
-    val builder3 = builder2
-      .setHeader(A, Seq(B, C))
+    val builder3 = builder2.setHeader(A, Seq(B, C))
 
-    val pair = Seq(B,C).asJava
+    val pair = Seq(B, C).asJava
     assert(builder3.buildGet.headers.getAll(A) == pair)
     assert(builder3.buildHead.headers.getAll(A) == pair)
     assert(builder3.buildDelete.headers.getAll(A) == pair)
     assert(builder3.buildPut(BODY0).headers.getAll(A) == pair)
     assert(builder3.buildPost(BODY0).headers.getAll(A) == pair)
 
-    val builder4 = builder3
-      .addHeader(A, D)
+    val builder4 = builder3.addHeader(A, D)
 
-    val triple = Seq(B,C, D).asJava
+    val triple = Seq(B, C, D).asJava
     assert(builder4.buildGet.headers.getAll(A) == triple)
     assert(builder4.buildHead.headers.getAll(A) == triple)
     assert(builder4.buildDelete.headers.getAll(A) == triple)
@@ -267,9 +261,7 @@ v3
   }
 
   test("build form") {
-    val builder0 = RequestBuilder()
-      .url(URL0)
-      .addFormElement(FORM0:_*)
+    val builder0 = RequestBuilder().url(URL0).addFormElement(FORM0: _*)
 
     val req0 = builder0.buildFormPost(false)
     val content = req0.contentString.replace("\r\n", "\n")
@@ -277,12 +269,11 @@ v3
   }
 
   test("build multipart form") {
-    val builder0 = RequestBuilder()
-      .url(URL0)
-      .addFormElement(FORM0:_*)
+    val builder0 = RequestBuilder().url(URL0).addFormElement(FORM0: _*)
 
     val req0 = builder0.buildFormPost(true)
-    val content = "--[^-\r\n]+".r.replaceAllIn(req0.contentString, "--Boundary")
+    val content = "--[^-\r\n]+".r
+      .replaceAllIn(req0.contentString, "--Boundary")
       .replace("\r\n", "\n")
     assert(content == MULTIPART0)
   }

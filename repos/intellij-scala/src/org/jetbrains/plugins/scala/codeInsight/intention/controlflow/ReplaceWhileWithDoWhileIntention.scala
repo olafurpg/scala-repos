@@ -11,10 +11,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScWhileStmt}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * Nikolay.Tropin
- * 4/17/13
- */
-
+  * Nikolay.Tropin
+  * 4/17/13
+  */
 object ReplaceWhileWithDoWhileIntention {
   def familyName = "Replace while with do while"
 }
@@ -24,22 +23,25 @@ class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = ReplaceWhileWithDoWhileIntention.familyName
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = {
+  def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
     for {
-      whileStmt <- Option(PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt], false))
+      whileStmt <- Option(
+          PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt], false))
       condition <- whileStmt.condition
       body <- whileStmt.body
     } {
       val offset = editor.getCaretModel.getOffset
-      if (offset >= whileStmt.getTextRange.getStartOffset && offset <= condition.getTextRange.getStartOffset - 1)
-        return true
+      if (offset >= whileStmt.getTextRange.getStartOffset &&
+          offset <= condition.getTextRange.getStartOffset - 1) return true
     }
 
     false
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
-    val whileStmt: ScWhileStmt = PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt])
+    val whileStmt: ScWhileStmt =
+      PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt])
     if (whileStmt == null || !whileStmt.isValid) return
 
     for {
@@ -51,11 +53,15 @@ class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction {
 
       val newStmtText = s"if ($condText) {\n do $bodyText while ($condText)\n}"
 
-      val newStmt: ScExpression = ScalaPsiElementFactory.createExpressionFromText(newStmtText, element.getManager)
+      val newStmt: ScExpression =
+        ScalaPsiElementFactory.createExpressionFromText(
+            newStmtText, element.getManager)
 
       inWriteAction {
         whileStmt.replaceExpression(newStmt, removeParenthesis = true)
-        PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
+        PsiDocumentManager
+          .getInstance(project)
+          .commitDocument(editor.getDocument)
       }
     }
   }

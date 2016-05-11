@@ -16,27 +16,31 @@ class Bug3307 {
   }
 
   ({ () =>
-    f { implicit x => println(x) } })()
+    f { implicit x =>
+      println(x)
+    }
+  })()
 }
 
 // issue 3301
-  trait T[X]
+trait T[X]
 
 class Bug3301 {
   def t[A]: T[A] = sys.error("stub")
 
-  () => {
-    type X = Int
+  () =>
+    {
+      type X = Int
 
-    def foo[X] = t[X]
-    ()
+      def foo[X] = t[X]
+      ()
   }
 }
 // issue 3299
 object Failure {
   def thunk() {
     for (i <- 1 to 2) {
-      val Array(a, b) = Array(1,2)
+      val Array(a, b) = Array(1, 2)
       ()
     }
   }
@@ -44,21 +48,19 @@ object Failure {
 
 // issue 3296
 
-object AA
-{
-    def f(block: => Unit) {}
+object AA {
+  def f(block: => Unit) {}
 
-    object BB
-    {
-        f {
-            object CC
+  object BB {
+    f {
+      object CC
 
-            ()
-        }
+      ()
     }
+  }
 
   def foo[T](x: T) = { object A; false }
 }
 
 // issue 3325
-object O { def f[@specialized T] { for(k <- Nil: List[T]) { } } }
+object O { def f[@specialized T] { for (k <- Nil: List[T]) {} } }

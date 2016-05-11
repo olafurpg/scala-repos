@@ -17,15 +17,13 @@ trait TimeoutTests extends JSEnvTest {
     setTimeout(function() { console.log("2"); }, 100);
     setTimeout(function() { console.log("3"); }, 300);
     setTimeout(function() { console.log("4"); },   0);
-    """ hasOutput
-    """|4
+    """ hasOutput """|4
        |2
        |1
        |3
        |""".stripMargin
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-
   }
 
   @Test
@@ -41,14 +39,12 @@ trait TimeoutTests extends JSEnvTest {
     }, 100);
     setTimeout(function() { console.log("3"); }, 300);
     setTimeout(function() { console.log("4"); },   0);
-    """ hasOutput
-    """|4
+    """ hasOutput """|4
        |2
        |3
        |""".stripMargin
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-
   }
 
   @Test
@@ -61,15 +57,13 @@ trait TimeoutTests extends JSEnvTest {
     setTimeout(function() { console.log("2"); }, 100);
     setTimeout(function(msg) { console.log(msg); }, 300, "Hello World");
     setTimeout(function() { console.log("4"); },   0);
-    """ hasOutput
-    """|4
+    """ hasOutput """|4
        |2
        |1foobar
        |Hello World
        |""".stripMargin
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-
   }
 
   @Test
@@ -87,8 +81,7 @@ trait TimeoutTests extends JSEnvTest {
       clearInterval(i2);
       clearInterval(i3);
     }, 10000);
-    """ hasOutput
-    """|each 1300
+    """ hasOutput """|each 1300
        |each 2200
        |each 1300
        |each 3100
@@ -104,8 +97,7 @@ trait TimeoutTests extends JSEnvTest {
        |each 3100
        |""".stripMargin
 
-     assertTrue("Execution took too little time", deadline.isOverdue())
-
+    assertTrue("Execution took too little time", deadline.isOverdue())
   }
 
   @Test
@@ -124,7 +116,5 @@ trait TimeoutTests extends JSEnvTest {
     """ hasOutput (1 to 10).map(_ + "\n").mkString
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-
   }
-
 }

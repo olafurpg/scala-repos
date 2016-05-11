@@ -103,10 +103,12 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
     val pebblesParents = Person.findAll(("childId" -> bammbammId))
 
     pebblesParents.length must_== 2
-    pebblesParents.map(_.id.get).filterNot(rubblesIds.contains(_)) must_== List()
+    pebblesParents.map(_.id.get).filterNot(rubblesIds.contains(_)) must_==
+      List()
 
     // query for Bamm-Bamm's and Pebbles' parents using List[UUID]
-    val pebblesAndBammBammsParents = Person.findAll(("childId" -> ("$in" -> List(pebblesId, bammbammId))))
+    val pebblesAndBammBammsParents =
+      Person.findAll(("childId" -> ("$in" -> List(pebblesId, bammbammId))))
 
     pebblesAndBammBammsParents.length must_== 4
 
@@ -114,7 +116,8 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
     val dinosOwners = Person.findAll(("petId" -> dinoId))
 
     dinosOwners.length must_== 2
-    dinosOwners.map(_.id.get).filterNot(flinstonesIds.contains(_)) must_== List()
+    dinosOwners.map(_.id.get).filterNot(flinstonesIds.contains(_)) must_==
+      List()
 
     // query for the Rubbles using a Regex
     val rubbles = Person.findAll(("name" -> "^Rubble".r))
@@ -123,7 +126,8 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
     rubbles.map(_.id.get).filterNot(rubblesIds.contains(_)) must_== List()
 
     // query for the Flinstones using a Pattern
-    val flinstones = Person.findAll(("name" -> Pattern.compile("^flinst", Pattern.CASE_INSENSITIVE)))
+    val flinstones = Person.findAll(
+        ("name" -> Pattern.compile("^flinst", Pattern.CASE_INSENSITIVE)))
 
     flinstones.length must_== 2
     flinstones.map(_.id.get).filterNot(flinstonesIds.contains(_)) must_== List()
@@ -132,7 +136,8 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
     val flinstones2 = Person.findAll(("_id" -> ("$in" -> flinstonesIds)))
 
     flinstones2.length must_== 2
-    flinstones2.map(_.id.get).filterNot(flinstonesIds.contains(_)) must_== List()
+    flinstones2.map(_.id.get).filterNot(flinstonesIds.contains(_)) must_==
+      List()
 
     // query using Dates
     implicit val formats = Person.formats // this is needed for Dates
@@ -141,23 +146,31 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
     val people = Person.findAll(("birthDate" -> ("$gt" -> qryDate.getTime)))
 
     people.length must_== 3
-    people.map(_.id.get).filterNot(List(wilma.id.get, barney.id.get, betty.id.get).contains(_)) must_== List()
+    people
+      .map(_.id.get)
+      .filterNot(List(wilma.id.get, barney.id.get, betty.id.get).contains(_)) must_==
+      List()
 
     // you do not need to define the implicit formats val if you write your query in the MongoMetaRecord object.
     val people2 = Person.findAllBornAfter(qryDate.getTime)
 
     people2.length must_== 3
-    people2.map(_.id.get).filterNot(List(wilma.id.get, barney.id.get, betty.id.get).contains(_)) must_== List()
+    people2
+      .map(_.id.get)
+      .filterNot(List(wilma.id.get, barney.id.get, betty.id.get).contains(_)) must_==
+      List()
 
     // query with Sort
     val people3 = Person.findAll(JObject(Nil), ("birthDate" -> -1))
 
     people3.length must_== 4
-    people3.map(_.id.get) must_== List(betty.id.get, barney.id.get, wilma.id.get, fred.id.get)
+    people3.map(_.id.get) must_==
+      List(betty.id.get, barney.id.get, wilma.id.get, fred.id.get)
 
     val people4 = Person.findAll(JObject(Nil), ("birthDate" -> 1))
 
     people4.length must_== 4
-    people4.map(_.id.get) must_== List(fred.id.get, wilma.id.get, barney.id.get, betty.id.get)
+    people4.map(_.id.get) must_==
+      List(fred.id.get, wilma.id.get, barney.id.get, betty.id.get)
   }
 }

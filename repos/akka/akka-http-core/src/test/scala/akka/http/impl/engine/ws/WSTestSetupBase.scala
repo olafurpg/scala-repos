@@ -28,7 +28,8 @@ trait WSTestSetupBase extends Matchers {
         val m = Random.nextInt()
         (Some(m), maskedBytes(data, m)._1)
       } else (None, data)
-    send(frameHeader(opcode, data.length, fin, theMask, rsv1, rsv2, rsv3) ++ theData)
+    send(
+        frameHeader(opcode, data.length, fin, theMask, rsv1, rsv2, rsv3) ++ theData)
   }
 
   def sendWSCloseFrame(closeCode: Int, mask: Boolean = false): Unit =
@@ -41,7 +42,8 @@ trait WSTestSetupBase extends Matchers {
                     rsv1: Boolean = false,
                     rsv2: Boolean = false,
                     rsv3: Boolean = false): Unit =
-    expectBytes(frameHeader(opcode, data.length, fin, mask, rsv1, rsv2, rsv3) ++ data)
+    expectBytes(
+        frameHeader(opcode, data.length, fin, mask, rsv1, rsv2, rsv3) ++ data)
 
   def expectWSCloseFrame(closeCode: Int, mask: Boolean = false): Unit =
     expectBytes(closeFrame(closeCode, mask))
@@ -49,21 +51,25 @@ trait WSTestSetupBase extends Matchers {
   def expectNetworkData(length: Int): ByteString = expectBytes(length)
   def expectNetworkData(data: ByteString): Unit = expectBytes(data)
 
-  def expectFrameOnNetwork(opcode: Opcode, data: ByteString, fin: Boolean): Unit = {
+  def expectFrameOnNetwork(
+      opcode: Opcode, data: ByteString, fin: Boolean): Unit = {
     expectFrameHeaderOnNetwork(opcode, data.size, fin)
     expectNetworkData(data)
   }
-  def expectMaskedFrameOnNetwork(opcode: Opcode, data: ByteString, fin: Boolean): Unit = {
+  def expectMaskedFrameOnNetwork(
+      opcode: Opcode, data: ByteString, fin: Boolean): Unit = {
     val Some(mask) = expectFrameHeaderOnNetwork(opcode, data.size, fin)
     val masked = maskedBytes(data, mask)._1
     expectNetworkData(masked)
   }
 
   def expectMaskedCloseFrame(closeCode: Int): Unit =
-    expectMaskedFrameOnNetwork(Protocol.Opcode.Close, closeFrameData(closeCode), fin = true)
+    expectMaskedFrameOnNetwork(
+        Protocol.Opcode.Close, closeFrameData(closeCode), fin = true)
 
   /** Returns the mask if any is available */
-  def expectFrameHeaderOnNetwork(opcode: Opcode, length: Long, fin: Boolean): Option[Int] = {
+  def expectFrameHeaderOnNetwork(
+      opcode: Opcode, length: Long, fin: Boolean): Option[Int] = {
     val (op, l, f, m) = expectFrameHeaderOnNetwork()
     op shouldEqual opcode
     l shouldEqual length
@@ -84,24 +90,18 @@ trait WSTestSetupBase extends Matchers {
         (length16Bytes(0) & 0xff) << 8 | (length16Bytes(1) & 0xff) << 0
       case 127 ⇒
         val length64Bytes = expectNetworkData(8)
-        (length64Bytes(0) & 0xff).toLong << 56 |
-          (length64Bytes(1) & 0xff).toLong << 48 |
-          (length64Bytes(2) & 0xff).toLong << 40 |
-          (length64Bytes(3) & 0xff).toLong << 32 |
-          (length64Bytes(4) & 0xff).toLong << 24 |
-          (length64Bytes(5) & 0xff).toLong << 16 |
-          (length64Bytes(6) & 0xff).toLong << 8 |
-          (length64Bytes(7) & 0xff).toLong << 0
+        (length64Bytes(0) & 0xff).toLong << 56 | (length64Bytes(1) & 0xff).toLong << 48 |
+        (length64Bytes(2) & 0xff).toLong << 40 | (length64Bytes(3) & 0xff).toLong << 32 |
+        (length64Bytes(4) & 0xff).toLong << 24 | (length64Bytes(5) & 0xff).toLong << 16 |
+        (length64Bytes(6) & 0xff).toLong << 8 | (length64Bytes(7) & 0xff).toLong << 0
       case x ⇒ x
     }
     val mask =
       if (hasMask) {
         val maskBytes = expectNetworkData(4)
         val mask =
-          (maskBytes(0) & 0xff) << 24 |
-            (maskBytes(1) & 0xff) << 16 |
-            (maskBytes(2) & 0xff) << 8 |
-            (maskBytes(3) & 0xff) << 0
+          (maskBytes(0) & 0xff) << 24 | (maskBytes(1) & 0xff) << 16 |
+          (maskBytes(2) & 0xff) << 8 | (maskBytes(3) & 0xff) << 0
         Some(mask)
       } else None
 

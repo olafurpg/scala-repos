@@ -1,21 +1,21 @@
 package com.twitter.scalding.reducer_estimation
 
 import com.twitter.scalding._
-import com.twitter.scalding.reducer_estimation.RuntimeReducerEstimator.{ RuntimePerReducer, EstimationScheme, IgnoreInputSize }
-import com.twitter.scalding.platform.{ HadoopPlatformJobTest, HadoopSharedPlatformTest }
-import org.scalatest.{ Matchers, WordSpec }
+import com.twitter.scalding.reducer_estimation.RuntimeReducerEstimator.{RuntimePerReducer, EstimationScheme, IgnoreInputSize}
+import com.twitter.scalding.platform.{HadoopPlatformJobTest, HadoopSharedPlatformTest}
+import org.scalatest.{Matchers, WordSpec}
 import scala.collection.JavaConverters._
-import scala.util.{ Success, Try }
+import scala.util.{Success, Try}
 
 object HistoryService1 extends HistoryServiceWithData {
   import HistoryServiceWithData._
 
-  def fetchHistory(info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
+  def fetchHistory(
+      info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
     Success(
-      Seq(
-        makeHistory(inputSize * 2, 0, List(10, 1000, 3000)),
-        makeHistory(inputSize / 2, 0, List(10, 200, 400)),
-        makeHistory(inputSize * 4, 0, List(10, 2400, 3000))))
+        Seq(makeHistory(inputSize * 2, 0, List(10, 1000, 3000)),
+            makeHistory(inputSize / 2, 0, List(10, 200, 400)),
+            makeHistory(inputSize * 4, 0, List(10, 2400, 3000))))
 }
 
 class Estimator1 extends RuntimeReducerEstimator {
@@ -34,7 +34,8 @@ class DummyEstimator extends ReducerEstimator {
   def estimateReducers(info: FlowStrategyInfo) = Some(42)
 }
 
-class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopSharedPlatformTest {
+class RuntimeReducerEstimatorTest
+    extends WordSpec with Matchers with HadoopSharedPlatformTest {
 
   "Single-step job with runtime-based reducer estimator" should {
     "set reducers correctly with median estimation scheme" in {
@@ -44,8 +45,8 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
       // + (EstimationScheme -> "median")
       // + (IgnoreInputSize -> false)
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
-        .inspectCompletedFlow { flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
+        flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -67,8 +68,7 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
           // will take 1500 ms total.
           // To do this in 25 ms, we need 60 reducers.
           assert(conf.getNumReduceTasks == 60)
-        }
-        .run
+      }.run
     }
 
     "set reducers correctly with mean estimation scheme" in {
@@ -78,8 +78,8 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
         .+(EstimationScheme -> "mean")
       // + (IgnoreInputSize -> false)
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
-        .inspectCompletedFlow { flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
+        flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -102,8 +102,7 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
           //
           // To do this in 25 ms, we need 61.03 reducers, which rounds up to 62.
           assert(conf.getNumReduceTasks == 62)
-        }
-        .run
+      }.run
     }
 
     "set reducers correctly with mean estimation scheme ignoring input size" in {
@@ -113,8 +112,8 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
         .+(EstimationScheme -> "mean")
         .+(IgnoreInputSize -> "true")
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
-        .inspectCompletedFlow { flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
+        flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -132,8 +131,7 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
           //
           // To do this in 25 ms, we need 134 reducers.
           assert(conf.getNumReduceTasks == 134)
-        }
-        .run
+      }.run
     }
 
     "set reducers correctly with median estimation scheme ignoring input size" in {
@@ -143,8 +141,8 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
         .+(IgnoreInputSize -> "true")
       // + (EstimationScheme -> "median")
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
-        .inspectCompletedFlow { flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
+        flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -162,8 +160,7 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
           //
           // To do this in 25 ms, we need 120 reducers.
           assert(conf.getNumReduceTasks == 120)
-        }
-        .run
+      }.run
     }
 
     "not set reducers when history service is empty" in {
@@ -171,8 +168,8 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
         .addReducerEstimator(classOf[EmptyRuntimeEstimator])
         .addReducerEstimator(classOf[DummyEstimator])
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
-        .inspectCompletedFlow { flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
+        flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -182,7 +179,7 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
           // so it should have fallen back to DummyEstimator,
           // which returns 42.
           assert(conf.getNumReduceTasks == 42)
-        }
+      }
     }
 
     "not set reducers when history service fails" in {
@@ -190,8 +187,8 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
         .addReducerEstimator(classOf[ErrorRuntimeEstimator])
         .addReducerEstimator(classOf[DummyEstimator])
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
-        .inspectCompletedFlow { flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
+        flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -201,7 +198,7 @@ class RuntimeReducerEstimatorTest extends WordSpec with Matchers with HadoopShar
           // so it should have fallen back to DummyEstimator,
           // which returns 42.
           assert(conf.getNumReduceTasks == 42)
-        }
+      }
     }
   }
 }

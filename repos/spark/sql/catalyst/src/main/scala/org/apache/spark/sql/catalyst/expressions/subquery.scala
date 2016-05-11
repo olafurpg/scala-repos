@@ -23,37 +23,36 @@ import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, SubqueryAlias}
 import org.apache.spark.sql.types.DataType
 
 /**
- * An interface for subquery that is used in expressions.
- */
+  * An interface for subquery that is used in expressions.
+  */
 abstract class SubqueryExpression extends LeafExpression {
 
   /**
-   * The logical plan of the query.
-   */
+    * The logical plan of the query.
+    */
   def query: LogicalPlan
 
   /**
-   * Either a logical plan or a physical plan. The generated tree string (explain output) uses this
-   * field to explain the subquery.
-   */
+    * Either a logical plan or a physical plan. The generated tree string (explain output) uses this
+    * field to explain the subquery.
+    */
   def plan: QueryPlan[_]
 
   /**
-   * Updates the query with new logical plan.
-   */
+    * Updates the query with new logical plan.
+    */
   def withNewPlan(plan: LogicalPlan): SubqueryExpression
 }
 
 /**
- * A subquery that will return only one row and one column. This will be converted into a physical
- * scalar subquery during planning.
- *
- * Note: `exprId` is used to have unique name in explain string output.
- */
+  * A subquery that will return only one row and one column. This will be converted into a physical
+  * scalar subquery during planning.
+  *
+  * Note: `exprId` is used to have unique name in explain string output.
+  */
 case class ScalarSubquery(
-    query: LogicalPlan,
-    exprId: ExprId = NamedExpression.newExprId)
-  extends SubqueryExpression with Unevaluable {
+    query: LogicalPlan, exprId: ExprId = NamedExpression.newExprId)
+    extends SubqueryExpression with Unevaluable {
 
   override def plan: LogicalPlan = SubqueryAlias(toString, query)
 
@@ -63,8 +62,9 @@ case class ScalarSubquery(
 
   override def checkInputDataTypes(): TypeCheckResult = {
     if (query.schema.length != 1) {
-      TypeCheckResult.TypeCheckFailure("Scalar subquery must return only one column, but got " +
-        query.schema.length.toString)
+      TypeCheckResult.TypeCheckFailure(
+          "Scalar subquery must return only one column, but got " +
+          query.schema.length.toString)
     } else {
       TypeCheckResult.TypeCheckSuccess
     }
@@ -73,7 +73,8 @@ case class ScalarSubquery(
   override def foldable: Boolean = false
   override def nullable: Boolean = true
 
-  override def withNewPlan(plan: LogicalPlan): ScalarSubquery = ScalarSubquery(plan, exprId)
+  override def withNewPlan(plan: LogicalPlan): ScalarSubquery =
+    ScalarSubquery(plan, exprId)
 
   override def toString: String = s"subquery#${exprId.id}"
 }

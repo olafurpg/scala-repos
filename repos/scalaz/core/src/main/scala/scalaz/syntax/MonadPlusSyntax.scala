@@ -2,13 +2,15 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MonadPlus` */
-final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F: MonadPlus[F]) extends Ops[F[A]] {
+final class MonadPlusOps[F[_], A] private[syntax](val self: F[A])(
+    implicit val F: MonadPlus[F])
+    extends Ops[F[A]] {
   ////
   import Leibniz.===
 
   def filter(f: A => Boolean) =
     F.filter(self)(f)
-  
+
   def withFilter(f: A => Boolean) =
     filter(f)
 
@@ -20,29 +22,33 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
     F.unite[T, B](ftb)
   }
 
-  final def separate[G[_, _], B, C](implicit ev: A === G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
+  final def separate[G[_, _], B, C](
+      implicit ev: A === G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
     F.separate(ev.subst(self))
 
   ////
 }
 
 sealed trait ToMonadPlusOps0 {
-  implicit def ToMonadPlusOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadPlus, FA]) =
-    new MonadPlusOps[F0.M,F0.A](F0(v))(F0.TC)
-
+  implicit def ToMonadPlusOpsUnapply[FA](v: FA)(
+      implicit F0: Unapply[MonadPlus, FA]) =
+    new MonadPlusOps[F0.M, F0.A](F0(v))(F0.TC)
 }
 
-trait ToMonadPlusOps extends ToMonadPlusOps0 with ToMonadOps with ToApplicativePlusOps {
-  implicit def ToMonadPlusOps[F[_],A](v: F[A])(implicit F0: MonadPlus[F]) =
-    new MonadPlusOps[F,A](v)
+trait ToMonadPlusOps
+    extends ToMonadPlusOps0 with ToMonadOps with ToApplicativePlusOps {
+  implicit def ToMonadPlusOps[F[_], A](v: F[A])(implicit F0: MonadPlus[F]) =
+    new MonadPlusOps[F, A](v)
 
   ////
 
   ////
 }
 
-trait MonadPlusSyntax[F[_]] extends MonadSyntax[F] with ApplicativePlusSyntax[F] {
-  implicit def ToMonadPlusOps[A](v: F[A]): MonadPlusOps[F, A] = new MonadPlusOps[F,A](v)(MonadPlusSyntax.this.F)
+trait MonadPlusSyntax[F[_]]
+    extends MonadSyntax[F] with ApplicativePlusSyntax[F] {
+  implicit def ToMonadPlusOps[A](v: F[A]): MonadPlusOps[F, A] =
+    new MonadPlusOps[F, A](v)(MonadPlusSyntax.this.F)
 
   def F: MonadPlus[F]
   ////

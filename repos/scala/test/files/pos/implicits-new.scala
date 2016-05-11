@@ -3,13 +3,13 @@ import scala.reflect.{ClassTag, classTag}
 
 // #1435
 object t1435 {
-  implicit def a(s:String):String = sys.error("")
-  implicit def a(i:Int):String = sys.error("")
-  implicit def b(i:Int):String = sys.error("")
+  implicit def a(s: String): String = sys.error("")
+  implicit def a(i: Int): String = sys.error("")
+  implicit def b(i: Int): String = sys.error("")
 }
 
 class C1435 {
-  val v:String = {
+  val v: String = {
     import t1435.a
     2
   }
@@ -22,8 +22,10 @@ class C1492 {
 
   def foo(x: X => X) {}
 
-  foo ( implicit x => implicitly[X] )
-  foo { implicit x => implicitly[X] }
+  foo(implicit x => implicitly[X])
+  foo { implicit x =>
+    implicitly[X]
+  }
 }
 
 // #1579
@@ -41,11 +43,11 @@ object Test1579 {
 // #1625
 object Test1625 {
 
-  class Wrapped(x:Any) {
+  class Wrapped(x: Any) {
     def unwrap() = x
   }
 
-  implicit def byName[A](x: =>A) = new Wrapped(x)
+  implicit def byName[A](x: => A) = new Wrapped(x)
 
   implicit def byVal[A](x: A) = x
 
@@ -60,7 +62,9 @@ object Test1625 {
 }
 
 object Test2188 {
-  implicit def toJavaList[A: ClassTag](t:collection.Seq[A]):java.util.List[A] = java.util.Arrays.asList(t.toArray:_*)
+  implicit def toJavaList[A : ClassTag](
+      t: collection.Seq[A]): java.util.List[A] =
+    java.util.Arrays.asList(t.toArray: _*)
 
   val x: java.util.List[String] = List("foo")
 }

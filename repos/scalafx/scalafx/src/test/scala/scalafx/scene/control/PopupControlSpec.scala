@@ -35,13 +35,14 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * PopupControl Spec tests.
- *
- */
+  * PopupControl Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class PopupControlSpec
-  extends SimpleSFXDelegateSpec[jfxsc.PopupControl, PopupControl](classOf[jfxsc.PopupControl], classOf[PopupControl])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[jfxsc.PopupControl, PopupControl](
+        classOf[jfxsc.PopupControl], classOf[PopupControl])
+    with RunOnApplicationThread {
 
   override protected def getJavaClassInstance = {
     val label = new jfxsc.Label
@@ -49,5 +50,4 @@ class PopupControlSpec
     val popupControl: PopupControl = label.getTooltip
     popupControl
   }
-
 }

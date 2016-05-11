@@ -1,6 +1,5 @@
-
-import scala.language.{ postfixOps }
-import java.{ lang => jl }
+import scala.language.{postfixOps}
+import java.{lang => jl}
 
 trait T[A] {
   def f(): A
@@ -20,7 +19,7 @@ class Arr {
   //
   // because java inflict's its reference-only generic-arrays on us.
   //
-  def arr4[T: Manifest](xss: Array[Array[T]]): Array[T] = xss map (_.head)
+  def arr4[T : Manifest](xss: Array[Array[T]]): Array[T] = xss map (_.head)
 }
 
 object Test {
@@ -28,8 +27,12 @@ object Test {
   val c2: Class[_] = classOf[C]
   val c3: Class[_] = classOf[Arr]
 
-  val c1m = c1.getMethods.toList filter (_.getName == "f") map (_.getGenericReturnType.toString)
-  val c2m = c2.getMethods.toList filter (_.getName == "f") map (_.getGenericReturnType.toString)
+  val c1m =
+    c1.getMethods.toList filter (_.getName == "f") map
+    (_.getGenericReturnType.toString)
+  val c2m =
+    c2.getMethods.toList filter (_.getName == "f") map
+    (_.getGenericReturnType.toString)
   val c3m = c3.getDeclaredMethods.toList map (_.toGenericString)
 
   def main(args: Array[String]): Unit = {

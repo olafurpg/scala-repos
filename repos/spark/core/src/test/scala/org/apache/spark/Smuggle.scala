@@ -34,12 +34,12 @@ import scala.language.implicitConversions
   * a lock or semaphore into the task, and then the task can block until the test gives
   * the go-ahead to proceed via the lock.
   */
-class Smuggle[T] private(val key: Symbol) extends Serializable {
+class Smuggle[T] private (val key: Symbol) extends Serializable {
   def smuggledObject: T = Smuggle.get(key)
 }
 
-
 object Smuggle {
+
   /**
     * Wraps the specified object to be smuggled into a serialized task without
     * being serialized itself.
@@ -62,7 +62,7 @@ object Smuggle {
   private val lock = new ReentrantReadWriteLock
   private val smuggledObjects = mutable.WeakHashMap.empty[Symbol, Any]
 
-  private def get[T](key: Symbol) : T = {
+  private def get[T](key: Symbol): T = {
     lock.readLock().lock()
     try {
       smuggledObjects(key).asInstanceOf[T]
@@ -78,6 +78,6 @@ object Smuggle {
     * @tparam T
     * @return the smuggled object represented by the wrapper.
     */
-  implicit def unpackSmuggledObject[T](smuggle : Smuggle[T]): T = smuggle.smuggledObject
-
+  implicit def unpackSmuggledObject[T](smuggle: Smuggle[T]): T =
+    smuggle.smuggledObject
 }

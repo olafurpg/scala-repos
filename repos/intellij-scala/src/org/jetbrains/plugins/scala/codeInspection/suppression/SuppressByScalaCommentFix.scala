@@ -12,16 +12,20 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScExtendsBloc
 import scala.annotation.tailrec
 
 /**
- * @author Nikolay.Tropin
- */
-class SuppressByScalaCommentFix(key: HighlightDisplayKey) extends SuppressByCommentFix(key, classOf[ScBlockStatement]) {
+  * @author Nikolay.Tropin
+  */
+class SuppressByScalaCommentFix(key: HighlightDisplayKey)
+    extends SuppressByCommentFix(key, classOf[ScBlockStatement]) {
   override def getContainer(context: PsiElement): PsiElement = {
     @tailrec
     def inner(elem: PsiElement): ScBlockStatement = {
       elem match {
-        case (bs: ScBlockStatement) childOf (_: ScBlock | _: ScExtendsBlock | _: ScEarlyDefinitions) => bs
+        case (bs: ScBlockStatement) childOf (_: ScBlock | _: ScExtendsBlock |
+            _: ScEarlyDefinitions) =>
+          bs
         case null => null
-        case _ => inner(PsiTreeUtil.getParentOfType(elem, classOf[ScBlockStatement]))
+        case _ =>
+          inner(PsiTreeUtil.getParentOfType(elem, classOf[ScBlockStatement]))
       }
     }
     inner(context)

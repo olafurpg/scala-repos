@@ -24,6 +24,7 @@ package scalaz
   * @see [[http://hackage.haskell.org/package/kan-extensions-4.0.1/docs/Data-Functor-Contravariant-Coyoneda.html]]
   */
 sealed abstract class ContravariantCoyoneda[F[_], A] {
+
   /** The pivot between `fi` and `k`, usually existential. */
   type I
 
@@ -52,10 +53,12 @@ sealed abstract class ContravariantCoyoneda[F[_], A] {
 }
 
 sealed abstract class ContravariantCoyonedaInstances {
+
   /** `ContravariantCoyoneda[F,_]` is a contravariant functor for any
     * `F`.
     */
-  implicit def contravariantCoyonedaContravariant[F[_]]: Contravariant[ContravariantCoyoneda[F, ?]] =
+  implicit def contravariantCoyonedaContravariant[F[_]]: Contravariant[
+      ContravariantCoyoneda[F, ?]] =
     new Contravariant[ContravariantCoyoneda[F, ?]] {
       def contramap[A, B](fa: ContravariantCoyoneda[F, A])(f: B => A) =
         fa contramap f
@@ -63,10 +66,11 @@ sealed abstract class ContravariantCoyonedaInstances {
 }
 
 object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
+
   /** Lift the `I` type member to a parameter.  It is usually more
     * convenient to use `Aux` than a structural type.
     */
-  type Aux[F[_], A, B] = ContravariantCoyoneda[F, A] {type I = B}
+  type Aux[F[_], A, B] = ContravariantCoyoneda[F, A] { type I = B }
 
   /** See `by` method. */
   final class By[F[_]] {
@@ -82,7 +86,7 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
 
   /** Like `lift(fa).contramap(_k)`. */
   def apply[F[_], A, B](fa: F[B])(_k: A => B): Aux[F, A, B] =
-    new ContravariantCoyoneda[F, A]{
+    new ContravariantCoyoneda[F, A] {
       type I = B
       val k = _k
       val fi = fa

@@ -20,8 +20,10 @@ object DebugConfigurationSpec extends Specification with After {
 
   // Loggers not needed, but useful to doublecheck that the code is doing what it should.
   // sbt 'test-only play.api.libs.ws.ssl.debug.DebugConfigurationSpec'
-  val internalDebugLogger = org.slf4j.LoggerFactory.getLogger("play.api.libs.ws.ssl.debug.FixInternalDebugLogging")
-  val certpathDebugLogger = org.slf4j.LoggerFactory.getLogger("play.api.libs.ws.ssl.debug.FixCertpathDebugLogging")
+  val internalDebugLogger = org.slf4j.LoggerFactory
+    .getLogger("play.api.libs.ws.ssl.debug.FixInternalDebugLogging")
+  val certpathDebugLogger = org.slf4j.LoggerFactory
+    .getLogger("play.api.libs.ws.ssl.debug.FixCertpathDebugLogging")
 
   def setLoggerDebug(slf4jLogger: org.slf4j.Logger) {
     val logbackLogger = slf4jLogger.asInstanceOf[ch.qos.logback.classic.Logger]
@@ -80,5 +82,4 @@ object DebugConfigurationSpec extends Specification with After {
       System.getProperty("javax.net.debug") must not contain ("ssl")
     }
   }
-
 }

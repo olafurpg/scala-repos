@@ -13,29 +13,30 @@ import org.jetbrains.plugins.scala.lang.completion
 import org.jetbrains.sbt.resolvers.SbtResolverIndexesManager
 
 /**
- * @author Nikolay Obedin
- * @since 7/17/14.
- */
+  * @author Nikolay Obedin
+  * @since 7/17/14.
+  */
+abstract class CompletionTestBase
+    extends completion.CompletionTestBase with MockSbt {
 
-abstract class CompletionTestBase extends completion.CompletionTestBase with MockSbt {
-
-  override def folderPath  = super.folderPath + "Sbt/"
+  override def folderPath = super.folderPath + "Sbt/"
   override def testFileExt = ".sbt"
 
-
   /**
-   * @inheritdoc
-   * Instead of using original file copy its contents into
-   * mock file prepending implicit SBT imports
-   */
+    * @inheritdoc
+    * Instead of using original file copy its contents into
+    * mock file prepending implicit SBT imports
+    */
   override def loadFile = {
     val fileName = getTestName(false) + testFileExt
     val filePath = folderPath + fileName
-    val file = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
     val fileText =
       Sbt.DefaultImplicitImports.map("import " + _).mkString("\n") + "\n" +
-      StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+      StringUtil.convertLineSeparators(FileUtil.loadFile(
+              new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     val mockFile = new LightVirtualFile(fileName, fileText)
     assert(mockFile != null, "Mock file can not be created")
     (fileName, mockFile)
@@ -43,20 +44,25 @@ abstract class CompletionTestBase extends completion.CompletionTestBase with Moc
 
   override def loadAndSetFileText(filePath: String, file: VirtualFile) = {
     val fileText = new String(file.contentsToByteArray())
-    configureFromFileTextAdapter (filePath, fileText)
+    configureFromFileTextAdapter(filePath, fileText)
     fileText
   }
 
   override def checkResult(got: Array[String], _expected: String) {
     import scala.collection.JavaConversions._
     val expected = _expected.split("\n")
-    UsefulTestCase.assertContainsElements[String](got.toSet.toSeq, expected.toSeq)
+    UsefulTestCase.assertContainsElements[String](
+        got.toSet.toSeq, expected.toSeq)
   }
 
   override def setUp() {
     super.setUpWithoutScalaLib()
     addSbtAsModuleDependency(getModuleAdapter)
-    inWriteAction(StartupManager.getInstance(getProjectAdapter).asInstanceOf[StartupManagerImpl].startCacheUpdate())
+    inWriteAction(
+        StartupManager
+          .getInstance(getProjectAdapter)
+          .asInstanceOf[StartupManagerImpl]
+          .startCacheUpdate())
     FileUtil.delete(SbtResolverIndexesManager.DEFAULT_INDEXES_DIR)
   }
 
@@ -65,4 +71,3 @@ abstract class CompletionTestBase extends completion.CompletionTestBase with Moc
     FileUtil.delete(SbtResolverIndexesManager.DEFAULT_INDEXES_DIR)
   }
 }
-

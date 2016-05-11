@@ -7,22 +7,23 @@ import com.intellij.execution.configurations.{ConfigurationFactory, Configuratio
 import org.jetbrains.plugins.scala.icons.Icons
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 03.05.2009
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 03.05.2009
+  */
 class Specs2ConfigurationType extends ConfigurationType {
 
   val confFactory = new Specs2RunConfigurationFactory(this)
 
-  def getConfigurationFactories: Array[ConfigurationFactory] = Array[ConfigurationFactory](confFactory)
+  def getConfigurationFactories: Array[ConfigurationFactory] =
+    Array[ConfigurationFactory](confFactory)
 
   def getDisplayName: String = "Specs2"
 
-  def getConfigurationTypeDescription: String = "Specs2 testing framework run configuration"
+  def getConfigurationTypeDescription: String =
+    "Specs2 testing framework run configuration"
 
-  def getId: String = "Specs2RunConfiguration" //if you want to change id, change it in Android plugin too
+  def getId: String =
+    "Specs2RunConfiguration" //if you want to change id, change it in Android plugin too
 
   def getIcon: Icon = Icons.SCALA_TEST
-
 }

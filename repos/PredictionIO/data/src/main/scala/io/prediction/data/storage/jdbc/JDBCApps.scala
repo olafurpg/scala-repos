@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.jdbc
 
 import grizzled.slf4j.Logging
@@ -23,7 +22,8 @@ import scalikejdbc._
 
 /** JDBC implementation of [[Apps]] */
 class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
-  extends Apps with Logging {
+    extends Apps with Logging {
+
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "apps")
   DB autoCommit { implicit session =>
@@ -35,43 +35,47 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
   }
 
   def insert(app: App): Option[Int] = DB localTx { implicit session =>
-    val q = if (app.id == 0) {
-      sql"""
+    val q =
+      if (app.id == 0) {
+        sql"""
       insert into $tableName (name, description) values(${app.name}, ${app.description})
       """
-    } else {
-      sql"""
+      } else {
+        sql"""
       insert into $tableName values(${app.id}, ${app.name}, ${app.description})
       """
-    }
+      }
     Some(q.updateAndReturnGeneratedKey().apply().toInt)
   }
 
   def get(id: Int): Option[App] = DB readOnly { implicit session =>
-    sql"SELECT id, name, description FROM $tableName WHERE id = ${id}".map(rs =>
-      App(
-        id = rs.int("id"),
-        name = rs.string("name"),
-        description = rs.stringOpt("description"))
-    ).single().apply()
+    sql"SELECT id, name, description FROM $tableName WHERE id = ${id}"
+      .map(rs =>
+            App(id = rs.int("id"),
+                name = rs.string("name"),
+                description = rs.stringOpt("description")))
+      .single()
+      .apply()
   }
 
   def getByName(name: String): Option[App] = DB readOnly { implicit session =>
-    sql"SELECT id, name, description FROM $tableName WHERE name = ${name}".map(rs =>
-      App(
-        id = rs.int("id"),
-        name = rs.string("name"),
-        description = rs.stringOpt("description"))
-    ).single().apply()
+    sql"SELECT id, name, description FROM $tableName WHERE name = ${name}"
+      .map(rs =>
+            App(id = rs.int("id"),
+                name = rs.string("name"),
+                description = rs.stringOpt("description")))
+      .single()
+      .apply()
   }
 
   def getAll(): Seq[App] = DB readOnly { implicit session =>
-    sql"SELECT id, name, description FROM $tableName".map(rs =>
-      App(
-        id = rs.int("id"),
-        name = rs.string("name"),
-        description = rs.stringOpt("description"))
-    ).list().apply()
+    sql"SELECT id, name, description FROM $tableName"
+      .map(rs =>
+            App(id = rs.int("id"),
+                name = rs.string("name"),
+                description = rs.stringOpt("description")))
+      .list()
+      .apply()
   }
 
   def update(app: App): Unit = DB localTx { implicit session =>

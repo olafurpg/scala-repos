@@ -1,11 +1,6 @@
-
-
-
-
 class Bar[@specialized(Int, AnyRef) A](a: A) {
   val memb = a
 }
-
 
 class WithInner[@specialized(Int, AnyRef) A](a: A) {
   class Inner {
@@ -13,15 +8,12 @@ class WithInner[@specialized(Int, AnyRef) A](a: A) {
   }
 }
 
-
 class Baz[@specialized(Int, AnyRef) A, @specialized(Int, AnyRef) B] {
   def ab(a: A, b: B) = (a, b)
 }
 
-
 trait Base[@specialized(Int, AnyRef) A]
 class Concrete[@specialized(Int, AnyRef) A] extends Base[A]
-
 
 class WithAnon[@specialized(Int, AnyRef) A](a: A) {
   new AnyRef {
@@ -29,23 +21,19 @@ class WithAnon[@specialized(Int, AnyRef) A](a: A) {
   }
 }
 
-
 class Norm {
   def id[@specialized(Int, AnyRef) A](a: A) = a
 }
 
-
 class Qux[@specialized(AnyRef) A] {
   def memb[@specialized(AnyRef) B](a: A, b: B) = (a, b)
 }
-
 
 class Foo[@specialized(Int, AnyRef) A](val a: Array[A]) {
   a(0)
 
   def id(elem: A) = a(0) = elem
 }
-
 
 // instantiation and selection
 object Test {

@@ -1,7 +1,7 @@
 package p1 {
-package p2 {
-case class C
-}
+  package p2 {
+    case class C
+  }
 }
 
 import p1.p2.C

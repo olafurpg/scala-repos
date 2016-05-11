@@ -1,6 +1,6 @@
 /** This is a test to make sure distinct always
- *  returns the first of any duplicated element.
- */
+  *  returns the first of any duplicated element.
+  */
 object Test {
   val alphabet = 'a' to 'z' mkString ""
   val alphaList = ('a' to 'z').toList

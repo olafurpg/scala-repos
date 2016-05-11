@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 import org.scalatest.WordSpec
 
@@ -49,7 +49,8 @@ class ArgTest extends WordSpec {
     }
 
     "remove empty args in lists" in {
-      val map = Args(Array("", "hello", "--one", "1", "", "\t", "--two", "2", "", "3"))
+      val map =
+        Args(Array("", "hello", "--one", "1", "", "\t", "--two", "2", "", "3"))
       assert(map("") === "hello")
       assert(map.list("") === List("hello"))
       assert(map("one") === "1")
@@ -125,7 +126,15 @@ class ArgTest extends WordSpec {
     }
 
     "correctly parse numeric args" in {
-      val map = Args(Array("--anInt", "-1", "--aLong", "21474836470", "--aDecimal", "3.141592654", "--aString", "foo"))
+      val map = Args(
+          Array("--anInt",
+                "-1",
+                "--aLong",
+                "21474836470",
+                "--aDecimal",
+                "3.141592654",
+                "--aString",
+                "foo"))
       assert(map.int("anInt") == "-1".toInt)
       assert(map.int("anInt", 2) == "-1".toInt)
       assert(map.int("nothing", 2) == 2)

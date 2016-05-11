@@ -14,6 +14,7 @@ object SCL5538 {
 
   val d = new D
 
-  /*start*/d.aMethod/*end*/
+  /*start*/
+  d.aMethod /*end*/
 }
 //Int

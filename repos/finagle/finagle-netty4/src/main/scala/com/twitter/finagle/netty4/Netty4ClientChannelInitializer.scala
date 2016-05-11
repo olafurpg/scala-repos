@@ -21,26 +21,27 @@ private[netty4] object Netty4ClientChannelInitializer {
 }
 
 /**
- * Client channel initialization logic.
- *
- * @param transportP the [[Promise]] satisfied when a connected transport is created.
- * @param params configuration parameters.
- * @param encoder serialize an [[In]]-typed application message.
- * @param decoderFactory initialize per-channel deserializer for
- *                       emitting [[Out]]-typed messages.
- * @tparam In the application request type.
- * @tparam Out the application response type.
- */
+  * Client channel initialization logic.
+  *
+  * @param transportP the [[Promise]] satisfied when a connected transport is created.
+  * @param params configuration parameters.
+  * @param encoder serialize an [[In]]-typed application message.
+  * @param decoderFactory initialize per-channel deserializer for
+  *                       emitting [[Out]]-typed messages.
+  * @tparam In the application request type.
+  * @tparam Out the application response type.
+  */
 private[netty4] class Netty4ClientChannelInitializer[In, Out](
     transportP: Promise[Transport[In, Out]],
     params: Stack.Params,
     encoder: Option[FrameEncoder[In]] = None,
     decoderFactory: Option[() => FrameDecoder[Out]] = None)
-  extends AbstractNetty4ClientChannelInitializer[In, Out](transportP, params) {
+    extends AbstractNetty4ClientChannelInitializer[In, Out](transportP, params) {
   import Netty4ClientChannelInitializer._
 
   private[this] val encodeHandler = encoder.map(new EncodeHandler[In](_))
-  private[this] val decodeHandler = decoderFactory.map(new DecodeHandler[Out](_))
+  private[this] val decodeHandler =
+    decoderFactory.map(new DecodeHandler[Out](_))
 
   override def initChannel(ch: SocketChannel): Unit = {
     super.initChannel(ch)
@@ -52,51 +53,52 @@ private[netty4] class Netty4ClientChannelInitializer[In, Out](
     encodeHandler.foreach { enc =>
       if (pipe.get(WriteTimeoutHandlerKey) != null)
         pipe.addBefore(WriteTimeoutHandlerKey, FrameEncoderHandlerKey, enc)
-      else
-        pipe.addLast(FrameEncoderHandlerKey, enc)
+      else pipe.addLast(FrameEncoderHandlerKey, enc)
     }
   }
 }
 
 /**
- * Base initializer which installs read / write timeouts and a connection handler
- */
+  * Base initializer which installs read / write timeouts and a connection handler
+  */
 private[netty4] abstract class AbstractNetty4ClientChannelInitializer[In, Out](
-    transportP: Promise[Transport[In, Out]],
-    params: Stack.Params)
-  extends ChannelInitializer[SocketChannel] {
-    import Netty4ClientChannelInitializer._
-    private[this] val Timer(timer) = params[Timer]
-    private[this] val Transport.Liveness(readTimeout, writeTimeout, _) = params[Transport.Liveness]
+    transportP: Promise[Transport[In, Out]], params: Stack.Params)
+    extends ChannelInitializer[SocketChannel] {
+  import Netty4ClientChannelInitializer._
+  private[this] val Timer(timer) = params[Timer]
+  private[this] val Transport.Liveness(readTimeout, writeTimeout, _) =
+    params[Transport.Liveness]
 
-    def initChannel(ch: SocketChannel): Unit = {
-      val pipe = ch.pipeline
+  def initChannel(ch: SocketChannel): Unit = {
+    val pipe = ch.pipeline
 
-      if (readTimeout.isFinite) {
-        val (timeoutValue, timeoutUnit) = readTimeout.inTimeUnit
-        pipe.addFirst(ReadTimeoutHandlerKey, new ReadTimeoutHandler(timeoutValue, timeoutUnit))
-      }
-
-      if (writeTimeout.isFinite)
-        pipe.addLast(WriteTimeoutHandlerKey, new WriteCompletionTimeoutHandler(timer, writeTimeout))
-
-      pipe.addLast(ConnectionHandlerKey, new ConnectionHandler(transportP))
+    if (readTimeout.isFinite) {
+      val (timeoutValue, timeoutUnit) = readTimeout.inTimeUnit
+      pipe.addFirst(ReadTimeoutHandlerKey,
+                    new ReadTimeoutHandler(timeoutValue, timeoutUnit))
     }
+
+    if (writeTimeout.isFinite)
+      pipe.addLast(WriteTimeoutHandlerKey,
+                   new WriteCompletionTimeoutHandler(timer, writeTimeout))
+
+    pipe.addLast(ConnectionHandlerKey, new ConnectionHandler(transportP))
   }
+}
 
 /**
- * Channel Initializer which exposes the netty pipeline to the transporter.
- * @param transportP the [[Promise]] satisfied when a connected transport is created.
- * @param params configuration parameters.
- * @param pipeCb a callback for initialized pipelines
- * @tparam In the application request type.
- * @tparam Out the application response type.
- */
+  * Channel Initializer which exposes the netty pipeline to the transporter.
+  * @param transportP the [[Promise]] satisfied when a connected transport is created.
+  * @param params configuration parameters.
+  * @param pipeCb a callback for initialized pipelines
+  * @tparam In the application request type.
+  * @tparam Out the application response type.
+  */
 private[netty4] class RawNetty4ClientChannelInitializer[In, Out](
     transportP: Promise[Transport[In, Out]],
     params: Stack.Params,
     pipeCb: ChannelPipeline => Unit)
-  extends AbstractNetty4ClientChannelInitializer[In, Out](transportP, params) {
+    extends AbstractNetty4ClientChannelInitializer[In, Out](transportP, params) {
 
   override def initChannel(ch: SocketChannel): Unit = {
     super.initChannel(ch)
@@ -105,8 +107,8 @@ private[netty4] class RawNetty4ClientChannelInitializer[In, Out](
 }
 
 private[netty4] class ConnectionHandler[In, Out](
-    p: Promise[Transport[In,Out]])
-  extends ChannelInboundHandlerAdapter {
+    p: Promise[Transport[In, Out]])
+    extends ChannelInboundHandlerAdapter {
 
   override def channelActive(ctx: ChannelHandlerContext): Unit = {
     val transport = new ChannelTransport[In, Out](ctx.channel)

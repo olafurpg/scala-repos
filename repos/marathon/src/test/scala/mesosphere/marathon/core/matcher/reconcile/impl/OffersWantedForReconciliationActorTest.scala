@@ -1,17 +1,17 @@
 package mesosphere.marathon.core.matcher.reconcile.impl
 
-import akka.actor.{ Terminated, Cancellable }
+import akka.actor.{Terminated, Cancellable}
 import akka.event.EventStream
-import akka.testkit.{ TestProbe, TestActorRef }
+import akka.testkit.{TestProbe, TestActorRef}
 import mesosphere.marathon.MarathonTestHelper
 import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.flow.ReviveOffersConfig
 import mesosphere.marathon.event.DeploymentStepSuccess
-import mesosphere.marathon.state.{ Group, Residency, PathId, AppDefinition }
-import mesosphere.marathon.test.{ MarathonActorSupport, Mockito }
+import mesosphere.marathon.state.{Group, Residency, PathId, AppDefinition}
+import mesosphere.marathon.test.{MarathonActorSupport, Mockito}
 import mesosphere.marathon.upgrade.DeploymentPlan
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ FunSuite, GivenWhenThen, Matchers }
+import org.scalatest.{FunSuite, GivenWhenThen, Matchers}
 import rx.lang.scala.Subject
 import rx.lang.scala.subjects.PublishSubject
 
@@ -19,7 +19,8 @@ import scala.concurrent.Promise
 import scala.concurrent.duration._
 
 class OffersWantedForReconciliationActorTest
-    extends FunSuite with MarathonActorSupport with Mockito with GivenWhenThen with Matchers with ScalaFutures {
+    extends FunSuite with MarathonActorSupport with Mockito with GivenWhenThen
+    with Matchers with ScalaFutures {
   test("want offers on startup but times out") {
     val f = new Fixture()
 
@@ -61,9 +62,12 @@ class OffersWantedForReconciliationActorTest
 
     When("the deployment for a resident app stops")
     val valAfterDeploymentStepSuccess = f.futureOffersWanted()
-    val app = AppDefinition(PathId("/resident"), residency = Some(Residency.default))
-    val plan = DeploymentPlan(original = Group.empty.copy(apps = Set(app)), target = Group.empty)
-    f.eventStream.publish(DeploymentStepSuccess(plan = plan, currentStep = plan.steps.head))
+    val app =
+      AppDefinition(PathId("/resident"), residency = Some(Residency.default))
+    val plan = DeploymentPlan(
+        original = Group.empty.copy(apps = Set(app)), target = Group.empty)
+    f.eventStream.publish(
+        DeploymentStepSuccess(plan = plan, currentStep = plan.steps.head))
 
     Then("there is interest for offers")
     valAfterDeploymentStepSuccess.futureValue should be(true)
@@ -83,7 +87,8 @@ class OffersWantedForReconciliationActorTest
   }
 
   class Fixture {
-    lazy val reviveOffersConfig: ReviveOffersConfig = MarathonTestHelper.defaultConfig()
+    lazy val reviveOffersConfig: ReviveOffersConfig =
+      MarathonTestHelper.defaultConfig()
     lazy val clock: ConstantClock = ConstantClock()
     lazy val eventStream: EventStream = system.eventStream
     lazy val offersWanted: Subject[Boolean] = PublishSubject()
@@ -104,12 +109,13 @@ class OffersWantedForReconciliationActorTest
     }
 
     lazy val actorInstance = new OffersWantedForReconciliationActor(
-      reviveOffersConfig,
-      clock,
-      eventStream,
-      offersWanted
+        reviveOffersConfig,
+        clock,
+        eventStream,
+        offersWanted
     ) {
-      override protected def scheduleNextCheck: Cancellable = Fixture.this.scheduleNextCheck
+      override protected def scheduleNextCheck: Cancellable =
+        Fixture.this.scheduleNextCheck
     }
     lazy val actor = TestActorRef(actorInstance)
 

@@ -20,10 +20,11 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 /**
- * Nikolay.Tropin
- * 2014-10-07
- */
-class ScalaEvaluatorCompileHelper(project: Project) extends AbstractProjectComponent(project) with EvaluatorCompileHelper {
+  * Nikolay.Tropin
+  * 2014-10-07
+  */
+class ScalaEvaluatorCompileHelper(project: Project)
+    extends AbstractProjectComponent(project) with EvaluatorCompileHelper {
 
   private val tempFiles = mutable.Set[File]()
 
@@ -37,7 +38,8 @@ class ScalaEvaluatorCompileHelper(project: Project) extends AbstractProjectCompo
     override def sessionDetached(session: DebuggerSession) = {
       clearTempFiles()
 
-      if (!ScalaCompileServerSettings.getInstance().COMPILE_SERVER_ENABLED && EvaluatorCompileHelper.needCompileServer) {
+      if (!ScalaCompileServerSettings.getInstance().COMPILE_SERVER_ENABLED &&
+          EvaluatorCompileHelper.needCompileServer) {
         CompileServerLauncher.ensureNotRunning(project)
       }
     }
@@ -45,12 +47,16 @@ class ScalaEvaluatorCompileHelper(project: Project) extends AbstractProjectCompo
 
   override def projectOpened(): Unit = {
     if (!ApplicationManager.getApplication.isUnitTestMode) {
-      DebuggerManagerEx.getInstanceEx(project).addDebuggerManagerListener(listener)
+      DebuggerManagerEx
+        .getInstanceEx(project)
+        .addDebuggerManagerListener(listener)
     }
   }
 
   override def projectClosed(): Unit = {
-    DebuggerManagerEx.getInstanceEx(project).removeDebuggerManagerListener(listener)
+    DebuggerManagerEx
+      .getInstanceEx(project)
+      .removeDebuggerManagerListener(listener)
   }
 
   private def clearTempFiles() = {
@@ -74,7 +80,9 @@ class ScalaEvaluatorCompileHelper(project: Project) extends AbstractProjectCompo
     compile(fileText, module, tempDir())
   }
 
-  def compile(files: Seq[File], module: Module, outputDir: File): Array[(File, String)] = {
+  def compile(files: Seq[File],
+              module: Module,
+              outputDir: File): Array[(File, String)] = {
     CompileServerLauncher.ensureServerRunning(project)
     val connector = new ServerConnector(module, files, outputDir)
     try {
@@ -82,13 +90,15 @@ class ScalaEvaluatorCompileHelper(project: Project) extends AbstractProjectCompo
         case Left(output) => output
         case Right(errors) => throw EvaluationException(errors.mkString("\n"))
       }
-    }
-    catch {
-      case e: Exception => throw EvaluationException("Could not compile:\n" + e.getMessage)
+    } catch {
+      case e: Exception =>
+        throw EvaluationException("Could not compile:\n" + e.getMessage)
     }
   }
 
-  def compile(fileText: String, module: Module, outputDir: File): Array[(File, String)] = {
+  def compile(fileText: String,
+              module: Module,
+              outputDir: File): Array[(File, String)] = {
     compile(Seq(writeToTempFile(fileText)), module, outputDir)
   }
 
@@ -100,17 +110,22 @@ class ScalaEvaluatorCompileHelper(project: Project) extends AbstractProjectCompo
 }
 
 object ScalaEvaluatorCompileHelper {
-  def instance(project: Project) = project.getComponent(classOf[ScalaEvaluatorCompileHelper])
+  def instance(project: Project) =
+    project.getComponent(classOf[ScalaEvaluatorCompileHelper])
 }
 
-
-private class ServerConnector(module: Module, filesToCompile: Seq[File], outputDir: File)
-  extends RemoteServerConnectorBase(module, filesToCompile, outputDir) {
+private class ServerConnector(
+    module: Module, filesToCompile: Seq[File], outputDir: File)
+    extends RemoteServerConnectorBase(module, filesToCompile, outputDir) {
 
   val errors = ListBuffer[String]()
 
   val client = new Client {
-    override def message(kind: Kind, text: String, source: Option[File], line: Option[Long], column: Option[Long]): Unit = {
+    override def message(kind: Kind,
+                         text: String,
+                         source: Option[File],
+                         line: Option[Long],
+                         column: Option[Long]): Unit = {
       if (kind == Kind.ERROR) errors += text
     }
     override def deleted(module: File): Unit = {}
@@ -123,18 +138,25 @@ private class ServerConnector(module: Module, filesToCompile: Seq[File], outputD
   }
 
   @tailrec
-  private def classfiles(dir: File, namePrefix: String = ""): Array[(File, String)] = dir.listFiles() match {
-    case Array(d) if d.isDirectory => classfiles(d, s"$namePrefix${d.getName}.")
-    case files => files.map(f => (f, s"$namePrefix${f.getName}".stripSuffix(".class")))
-  }
+  private def classfiles(
+      dir: File, namePrefix: String = ""): Array[(File, String)] =
+    dir.listFiles() match {
+      case Array(d) if d.isDirectory =>
+        classfiles(d, s"$namePrefix${d.getName}.")
+      case files =>
+        files.map(f => (f, s"$namePrefix${f.getName}".stripSuffix(".class")))
+    }
 
   def compile(): Either[Array[(File, String)], Seq[String]] = {
     val project = module.getProject
 
-    val compilationProcess = new RemoteServerRunner(project).buildProcess(arguments, client)
-    var result: Either[Array[(File, String)], Seq[String]] = Right(Seq("Compilation failed"))
+    val compilationProcess =
+      new RemoteServerRunner(project).buildProcess(arguments, client)
+    var result: Either[Array[(File, String)], Seq[String]] = Right(
+        Seq("Compilation failed"))
     compilationProcess.addTerminationCallback {
-      result = if (errors.nonEmpty) Right(errors) else Left(classfiles(outputDir))
+      result = if (errors.nonEmpty) Right(errors)
+      else Left(classfiles(outputDir))
     }
     compilationProcess.run()
     result

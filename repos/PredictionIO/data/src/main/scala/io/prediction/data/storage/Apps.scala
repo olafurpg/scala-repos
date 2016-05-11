@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import io.prediction.annotation.DeveloperApi
@@ -26,10 +25,7 @@ import io.prediction.annotation.DeveloperApi
   * @group Meta Data
   */
 @DeveloperApi
-case class App(
-  id: Int,
-  name: String,
-  description: Option[String])
+case class App(id: Int, name: String, description: Option[String])
 
 /** :: DeveloperApi ::
   * Base trait of the [[App]] data access object
@@ -38,6 +34,7 @@ case class App(
   */
 @DeveloperApi
 trait Apps {
+
   /** Insert a new [[App]]. Returns a generated app ID if the supplied app ID is 0. */
   def insert(app: App): Option[Int]
 

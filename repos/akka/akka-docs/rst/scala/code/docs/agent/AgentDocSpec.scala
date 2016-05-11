@@ -1,13 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.agent
 
 import language.postfixOps
 
 import akka.agent.Agent
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, ExecutionContext }
+import scala.concurrent.{Await, ExecutionContext}
 import akka.testkit._
 import scala.concurrent.Future
 
@@ -58,8 +58,10 @@ class AgentDocSpec extends AkkaSpec {
     agent send (_ * 2)
     //#send
 
-    def longRunningOrBlockingFunction = (i: Int) => i * 1 // Just for the example code
-    def someExecutionContext() = scala.concurrent.ExecutionContext.Implicits.global // Just for the example code
+    def longRunningOrBlockingFunction =
+      (i: Int) => i * 1 // Just for the example code
+    def someExecutionContext() =
+      scala.concurrent.ExecutionContext.Implicits.global // Just for the example code
     //#send-off
     // the ExecutionContext you want to run the function on
     implicit val ec = someExecutionContext()
@@ -81,8 +83,10 @@ class AgentDocSpec extends AkkaSpec {
     val f3: Future[Int] = agent alter (_ * 2)
     //#alter
 
-    def longRunningOrBlockingFunction = (i: Int) => i * 1 // Just for the example code
-    def someExecutionContext() = ExecutionContext.global // Just for the example code
+    def longRunningOrBlockingFunction =
+      (i: Int) => i * 1 // Just for the example code
+    def someExecutionContext() =
+      ExecutionContext.global // Just for the example code
 
     //#alter-off
     // the ExecutionContext you want to run the function on
@@ -133,8 +137,7 @@ class AgentDocSpec extends AkkaSpec {
     val agent2 = Agent(5)
 
     // uses foreach
-    for (value <- agent1)
-      println(value)
+    for (value <- agent1) println(value)
 
     // uses map
     val agent3 = for (value <- agent1) yield value + 1

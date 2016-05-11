@@ -35,12 +35,13 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * ChoiceBoxTableCell Spec tests.
- *
- *
- */
+  * ChoiceBoxTableCell Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ChoiceBoxTableCellSpec[S, T]
-  extends SimpleSFXDelegateSpec[jfxscc.ChoiceBoxTableCell[S, T], ChoiceBoxTableCell[S, T]](
-    classOf[jfxscc.ChoiceBoxTableCell[S, T]], classOf[ChoiceBoxTableCell[S, T]])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[
+        jfxscc.ChoiceBoxTableCell[S, T], ChoiceBoxTableCell[S, T]](
+        classOf[jfxscc.ChoiceBoxTableCell[S, T]],
+        classOf[ChoiceBoxTableCell[S, T]]) with RunOnApplicationThread

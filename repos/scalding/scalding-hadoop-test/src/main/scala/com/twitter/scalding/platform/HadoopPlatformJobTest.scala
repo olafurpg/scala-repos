@@ -12,54 +12,70 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding.platform
 
 import cascading.flow.Flow
 import com.twitter.scalding._
 import com.twitter.scalding.source.TypedText
 
-import java.io.{ BufferedWriter, File, FileWriter }
+import java.io.{BufferedWriter, File, FileWriter}
 
 import org.apache.hadoop.mapred.JobConf
 
 import org.slf4j.LoggerFactory
 
 /**
- * This class is used to construct unit tests in scalding which
- * use Hadoop's MiniCluster to more fully simulate and test
- * the logic which is deployed in a job.
- */
+  * This class is used to construct unit tests in scalding which
+  * use Hadoop's MiniCluster to more fully simulate and test
+  * the logic which is deployed in a job.
+  */
 case class HadoopPlatformJobTest(
-  cons: (Args) => Job,
-  cluster: LocalCluster,
-  argsMap: Map[String, List[String]] = Map.empty,
-  dataToCreate: Seq[(String, Seq[String])] = Vector(),
-  sourceWriters: Seq[Args => Job] = Vector.empty,
-  sourceReaders: Seq[Mode => Unit] = Vector.empty,
-  flowCheckers: Seq[Flow[JobConf] => Unit] = Vector.empty) {
+    cons: (Args) => Job,
+    cluster: LocalCluster,
+    argsMap: Map[String, List[String]] = Map.empty,
+    dataToCreate: Seq[(String, Seq[String])] = Vector(),
+    sourceWriters: Seq[Args => Job] = Vector.empty,
+    sourceReaders: Seq[Mode => Unit] = Vector.empty,
+    flowCheckers: Seq[Flow[JobConf] => Unit] = Vector.empty) {
   private val LOG = LoggerFactory.getLogger(getClass)
 
-  def arg(inArg: String, value: List[String]): HadoopPlatformJobTest = copy(argsMap = argsMap + (inArg -> value))
+  def arg(inArg: String, value: List[String]): HadoopPlatformJobTest =
+    copy(argsMap = argsMap + (inArg -> value))
 
-  def arg(inArg: String, value: String): HadoopPlatformJobTest = arg(inArg, List(value))
+  def arg(inArg: String, value: String): HadoopPlatformJobTest =
+    arg(inArg, List(value))
 
-  def source[T: TypeDescriptor](location: String, data: Seq[T]): HadoopPlatformJobTest = source(TypedText.tsv[T](location), data)
+  def source[T : TypeDescriptor](
+      location: String, data: Seq[T]): HadoopPlatformJobTest =
+    source(TypedText.tsv[T](location), data)
 
   def source[T](out: TypedSink[T], data: Seq[T]): HadoopPlatformJobTest =
-    copy(sourceWriters = sourceWriters :+ { args: Args =>
+    copy(
+        sourceWriters = sourceWriters :+ { args: Args =>
       new Job(args) {
-        TypedPipe.from(List("")).flatMap { _ => data }.write(out)
+        TypedPipe
+          .from(List(""))
+          .flatMap { _ =>
+            data
+          }
+          .write(out)
       }
     })
 
-  def sink[T: TypeDescriptor](location: String)(toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
+  def sink[T : TypeDescriptor](location: String)(
+      toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
     sink(TypedText.tsv[T](location))(toExpect)
 
-  def sink[T](in: Mappable[T])(toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
-    copy(sourceReaders = sourceReaders :+ { m: Mode => toExpect(in.toIterator(Config.defaultFrom(m), m).toSeq) })
+  def sink[T](in: Mappable[T])(
+      toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
+    copy(
+        sourceReaders = sourceReaders :+ { m: Mode =>
+      toExpect(in.toIterator(Config.defaultFrom(m), m).toSeq)
+    })
 
-  def inspectCompletedFlow(checker: Flow[JobConf] => Unit): HadoopPlatformJobTest =
+  def inspectCompletedFlow(
+      checker: Flow[JobConf] => Unit): HadoopPlatformJobTest =
     copy(flowCheckers = flowCheckers :+ checker)
 
   private def createSources() {
@@ -80,12 +96,14 @@ case class HadoopPlatformJobTest(
         tmpFile.delete()
     }
 
-    sourceWriters.foreach { cons => runJob(initJob(cons)) }
+    sourceWriters.foreach { cons =>
+      runJob(initJob(cons))
+    }
   }
 
   private def checkSinks() {
     LOG.debug("Executing sinks")
-    sourceReaders.foreach { _(cluster.mode) }
+    sourceReaders.foreach { _ (cluster.mode) }
   }
 
   def run {
@@ -103,7 +121,8 @@ case class HadoopPlatformJobTest(
     }
   }
 
-  private def initJob(cons: Args => Job): Job = cons(Mode.putMode(cluster.mode, new Args(argsMap)))
+  private def initJob(cons: Args => Job): Job =
+    cons(Mode.putMode(cluster.mode, new Args(argsMap)))
 
   @annotation.tailrec
   private final def runJob(job: Job) {

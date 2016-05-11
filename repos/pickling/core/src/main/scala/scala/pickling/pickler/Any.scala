@@ -8,18 +8,23 @@ object AnyPickler extends Pickler[Any] {
     val clazz = picklee.getClass
     val classLoader = this.getClass.getClassLoader
     internal.GRL.lock()
-    val tag = try FastTypeTag.mkRaw(clazz, scala.reflect.runtime.universe.runtimeMirror(classLoader))
-    finally internal.GRL.unlock()
-    val p = internal.currentRuntime.picklers.genPickler(classLoader, clazz, tag)
+    val tag =
+      try FastTypeTag.mkRaw(clazz,
+                            scala.reflect.runtime.universe.runtimeMirror(
+                                classLoader)) finally internal.GRL.unlock()
+    val p =
+      internal.currentRuntime.picklers.genPickler(classLoader, clazz, tag)
     p.asInstanceOf[Pickler[Any]].pickle(picklee, builder)
   }
   override def tag: FastTypeTag[Any] = FastTypeTag[Any]
   override def toString = "AnyPickler"
 }
+
 /** An unpickler for "Any" value (will look up unpickler at runtime, or generate it. */
 object AnyUnpickler extends Unpickler[Any] {
   def unpickle(tag: String, reader: PReader): Any = {
-    val actualUnpickler = internal.currentRuntime.picklers.genUnpickler(scala.reflect.runtime.currentMirror, tag)
+    val actualUnpickler = internal.currentRuntime.picklers
+      .genUnpickler(scala.reflect.runtime.currentMirror, tag)
     actualUnpickler.unpickle(tag, reader)
   }
   def tag: FastTypeTag[Any] = FastTypeTag[Any]
@@ -27,7 +32,7 @@ object AnyUnpickler extends Unpickler[Any] {
 }
 
 /** Attempts to unpickle Any by looking up registered unpicklers using `currentMirror`.
- */
+  */
 trait AnyUnpicklers {
   // Any
   implicit val anyUnpickler: Unpickler[Any] = AnyUnpickler

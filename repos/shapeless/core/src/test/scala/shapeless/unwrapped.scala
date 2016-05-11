@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2016 Miles Sabin
  *
@@ -35,7 +34,8 @@ class UnwrappedTests {
   }
   object Pass {
     type Aux[T, U0] = Pass[T] { type U = U0 }
-    implicit def unwrappedPasses[W, U0](implicit uw: Unwrapped.Aux[W, U0]): Pass.Aux[W, U0] =
+    implicit def unwrappedPasses[W, U0](
+        implicit uw: Unwrapped.Aux[W, U0]): Pass.Aux[W, U0] =
       new Pass[W] {
         type U = U0
         def actual(w: W): W = w
@@ -64,7 +64,7 @@ class UnwrappedTests {
       def stringValue: String = s
     }
     type MyString = Newtype[String, MyStringOps]
-    def MyString(s : String) : MyString = newtype(s)
+    def MyString(s: String): MyString = newtype(s)
     implicit val mkOps = MyStringOps
 
     val pass = the[Pass[MyString]]
@@ -86,11 +86,12 @@ class UnwrappedTests {
 
     def tag[U] = new Tagger[U]
     class Tagger[U] {
-      def apply[T](t : T) : T @@ U = t.asInstanceOf[T @@ U]
+      def apply[T](t: T): T @@ U = t.asInstanceOf[T @@ U]
     }
     def value[T](t: Tagged[T, _]): T = t.asInstanceOf[T]
 
-    implicit def taggedUnwrapped[UI, T, UF](implicit chain: Lazy[Unwrapped.Aux[UI, UF]]) =
+    implicit def taggedUnwrapped[UI, T, UF](
+        implicit chain: Lazy[Unwrapped.Aux[UI, UF]]) =
       new Unwrapped[UI @@ T] {
         type U = UF
         def unwrap(w: UI @@ T) = chain.value.unwrap(value(w))
@@ -134,7 +135,6 @@ class UnwrappedTests {
     def MyString(a: AvWrapper): MyString = newtype(a)
     implicit val mkOps = MyStringOps
 
-
     val ms = MyString(AvWrapper("testing"))
 
     val pass = the[Pass[MyString]]
@@ -155,5 +155,4 @@ class UnwrappedTests {
     val u = w.unwrap
     test.typed(u: String)
   }
-
 }

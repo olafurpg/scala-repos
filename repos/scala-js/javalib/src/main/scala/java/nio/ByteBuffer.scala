@@ -29,9 +29,9 @@ object ByteBuffer {
     TypedArrayByteBuffer.wrap(array)
 }
 
-abstract class ByteBuffer private[nio] (
-    _capacity: Int, private[nio] val _array: Array[Byte],
-    private[nio] val _arrayOffset: Int)
+abstract class ByteBuffer private[nio](_capacity: Int,
+                                       private[nio] val _array: Array[Byte],
+                                       private[nio] val _arrayOffset: Int)
     extends Buffer(_capacity) with Comparable[ByteBuffer] {
 
   private[nio] type ElementType = Byte
@@ -95,7 +95,7 @@ abstract class ByteBuffer private[nio] (
 
   override def equals(that: Any): Boolean = that match {
     case that: ByteBuffer => compareTo(that) == 0
-    case _                => false
+    case _ => false
   }
 
   @noinline
@@ -104,11 +104,10 @@ abstract class ByteBuffer private[nio] (
 
   final def order(): ByteOrder =
     if (_isBigEndian) ByteOrder.BIG_ENDIAN
-    else              ByteOrder.LITTLE_ENDIAN
+    else ByteOrder.LITTLE_ENDIAN
 
   final def order(bo: ByteOrder): ByteBuffer = {
-    if (bo == null)
-      throw new NullPointerException
+    if (bo == null) throw new NullPointerException
     _isBigEndian = bo == ByteOrder.BIG_ENDIAN
     this
   }
@@ -165,12 +164,12 @@ abstract class ByteBuffer private[nio] (
   private[nio] def store(index: Int, elem: Byte): Unit
 
   @inline
-  private[nio] def load(startIndex: Int,
-      dst: Array[Byte], offset: Int, length: Int): Unit =
+  private[nio] def load(
+      startIndex: Int, dst: Array[Byte], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
-  private[nio] def store(startIndex: Int,
-      src: Array[Byte], offset: Int, length: Int): Unit =
+  private[nio] def store(
+      startIndex: Int, src: Array[Byte], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }

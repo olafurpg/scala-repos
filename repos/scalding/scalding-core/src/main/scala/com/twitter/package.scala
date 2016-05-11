@@ -12,16 +12,17 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter
 
-import org.apache.hadoop.fs.{ Path, PathFilter }
+import org.apache.hadoop.fs.{Path, PathFilter}
 
 package object scalding {
+
   /**
-   * The objects for the Typed-API live in the scalding.typed package
-   * but are aliased here.
-   */
+    * The objects for the Typed-API live in the scalding.typed package
+    * but are aliased here.
+    */
   val TDsl = com.twitter.scalding.typed.TDsl
   val TypedPipe = com.twitter.scalding.typed.TypedPipe
   type TypedPipe[+T] = com.twitter.scalding.typed.TypedPipe[T]
@@ -32,8 +33,8 @@ package object scalding {
   type Grouped[K, +V] = com.twitter.scalding.typed.Grouped[K, V]
 
   /**
-   * Make sure this is in sync with version.sbt
-   */
+    * Make sure this is in sync with version.sbt
+    */
   val scaldingVersion: String = "0.15.0"
 
   object RichPathFilter {
@@ -53,16 +54,17 @@ package object scalding {
     def not: PathFilter = {
       new NotPathFilter(f)
     }
-
   }
 
-  private[this] class AndPathFilter(filters: Seq[PathFilter]) extends PathFilter {
+  private[this] class AndPathFilter(filters: Seq[PathFilter])
+      extends PathFilter {
     override def accept(p: Path): Boolean = {
       filters.forall(_.accept(p))
     }
   }
 
-  private[this] class OrPathFilter(filters: Seq[PathFilter]) extends PathFilter {
+  private[this] class OrPathFilter(filters: Seq[PathFilter])
+      extends PathFilter {
     override def accept(p: Path): Boolean = {
       filters.exists(_.accept(p))
     }

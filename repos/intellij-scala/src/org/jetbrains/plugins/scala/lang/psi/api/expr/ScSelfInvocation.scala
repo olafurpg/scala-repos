@@ -9,14 +9,14 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
 trait ScSelfInvocation extends ScalaPsiElement {
   def args: Option[ScArgumentExprList] = findChild(classOf[ScArgumentExprList])
 
-  def arguments: Seq[ScArgumentExprList] = findChildrenByClassScala(classOf[ScArgumentExprList]).toSeq
+  def arguments: Seq[ScArgumentExprList] =
+    findChildrenByClassScala(classOf[ScArgumentExprList]).toSeq
 
   def bind: Option[PsiElement]
 

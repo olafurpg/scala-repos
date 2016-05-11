@@ -7,6 +7,7 @@ object SCL4150 {
   class A[T, K] extends B with C[T]
   def foo[T[_], H](t: T[H]): T[H] = exit()
 
-  /*start*/foo(new A[Int, String])/*end*/
+  /*start*/
+  foo(new A[Int, String]) /*end*/
 }
 //SCL4150.C[Int]

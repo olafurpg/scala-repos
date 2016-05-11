@@ -17,19 +17,22 @@ import scala.concurrent.Future
 /**
   * Trigger rescale of affected app if a task died.
   */
-class ScaleAppUpdateStepImpl @Inject() (
-    @Named("schedulerActor") schedulerActor: ActorRef) extends TaskStatusUpdateStep {
+class ScaleAppUpdateStepImpl @Inject()(
+    @Named("schedulerActor") schedulerActor: ActorRef)
+    extends TaskStatusUpdateStep {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   override def name: String = "scaleApp"
 
-  override def processUpdate(timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
+  override def processUpdate(
+      timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
     val taskId = task.taskId
 
     status.getState match {
       case Terminated(_) =>
         // Remove from our internal list
-        log.info(s"initiating a scale check for app [${taskId.appId}] after $taskId terminated")
+        log.info(
+            s"initiating a scale check for app [${taskId.appId}] after $taskId terminated")
         schedulerActor ! ScaleApp(taskId.appId)
 
       case _ =>

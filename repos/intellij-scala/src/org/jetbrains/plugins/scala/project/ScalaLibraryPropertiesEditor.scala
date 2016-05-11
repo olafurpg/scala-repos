@@ -4,9 +4,11 @@ package project
 import com.intellij.openapi.roots.libraries.ui.{LibraryPropertiesEditor, LibraryEditorComponent}
 
 /**
- * @author Pavel Fatin
- */
-private class ScalaLibraryPropertiesEditor(editorComponent: LibraryEditorComponent[ScalaLibraryProperties]) extends LibraryPropertiesEditor {
+  * @author Pavel Fatin
+  */
+private class ScalaLibraryPropertiesEditor(
+    editorComponent: LibraryEditorComponent[ScalaLibraryProperties])
+    extends LibraryPropertiesEditor {
   private val form = new ScalaLibraryEditorForm()
 
   def createComponent() = form.getComponent

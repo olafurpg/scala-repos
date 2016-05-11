@@ -1,5 +1,5 @@
 class Force {
-	val t1 = new Thread {
+  val t1 = new Thread {
     override def run() {
       scala.`package`
     }
@@ -17,7 +17,7 @@ class Force {
 
 object Test {
   def main(args: Array[String]) {
-     new Force()
+    new Force()
   }
 }
 
@@ -68,4 +68,4 @@ object Test {
   at scala.package$.<init>(package.scala:46)
   at scala.package$.<clinit>(package.scala)
   at Force$$anon$1.run(predef-cycle.scala:4)
-  */
+ */

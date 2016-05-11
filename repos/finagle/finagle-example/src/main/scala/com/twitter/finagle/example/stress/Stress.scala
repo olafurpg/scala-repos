@@ -11,17 +11,17 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
 
 /**
- * A program to stress an HTTP server. The code below throttles request using an
- * asynchronous semaphore. Specify the uri, concurrency level,  and the total number
- * of requests at the command line.
- */
+  * A program to stress an HTTP server. The code below throttles request using an
+  * asynchronous semaphore. Specify the uri, concurrency level,  and the total number
+  * of requests at the command line.
+  */
 object Stress {
   def main(args: Array[String]) {
-    val uri           = new URI(args(0))
-    val concurrency   = args(1).toInt
+    val uri = new URI(args(0))
+    val concurrency = args(1).toInt
     val totalRequests = args(2).toInt
 
-    val errors    = new AtomicInteger(0)
+    val errors = new AtomicInteger(0)
     val responses = AtomicLongMap.create[Status]()
 
     val request = Request(Version.Http11, Method.Get, uri.getPath)
@@ -44,8 +44,9 @@ object Stress {
       Future.times(totalRequests / concurrency) {
         client(request) onSuccess { response =>
           responses.incrementAndGet(response.status)
-        } handle { case e =>
-          errors.incrementAndGet()
+        } handle {
+          case e =>
+            errors.incrementAndGet()
         } ensure {
           completedRequests.incrementAndGet()
         }
@@ -59,12 +60,14 @@ object Stress {
 
       val duration = elapsed()
       println("%20s\t%s".format("Status", "Count"))
-      for ((status, count) <- responses.asMap.asScala)
-        println("%20s\t%d".format(status, count))
+      for ((status, count) <- responses.asMap.asScala) println(
+          "%20s\t%d".format(status, count))
       println("================")
-      println("%d requests completed in %dms (%f requests per second)".format(
-        completedRequests.get, duration.inMilliseconds,
-        totalRequests.toFloat / duration.inMillis.toFloat * 1000))
+      println(
+          "%d requests completed in %dms (%f requests per second)".format(
+              completedRequests.get,
+              duration.inMilliseconds,
+              totalRequests.toFloat / duration.inMillis.toFloat * 1000))
       println("%d errors".format(errors.get))
 
       println("stats")
@@ -73,5 +76,4 @@ object Stress {
       statsReceiver.print()
     }
   }
-
 }

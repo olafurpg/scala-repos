@@ -3,15 +3,13 @@ import scala.collection.immutable.HashMap
 /**
   *  [[HashMap]]
   */
-class A {
-
-}
+class A {}
 /*
 import scala.collection.immutable.HashMap
 
 /**
-  *  [[HashMap]]
-  */
+ *  [[HashMap]]
+ */
 class A {
 
 }

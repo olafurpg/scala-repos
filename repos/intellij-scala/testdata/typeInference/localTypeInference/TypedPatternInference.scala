@@ -9,7 +9,8 @@ object K {
 
   x match {
     case a: A[_] =>
-      /*start*/foo(a)/*end*/
+      /*start*/
+      foo(a) /*end*/
       1
     case _ =>
   }

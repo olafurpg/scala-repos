@@ -1,4 +1,4 @@
-class Constructor protected(i: Int, b: Boolean = true) {
+class Constructor protected (i: Int, b: Boolean = true) {
 
   def this(i: Int, j: Int) {
     this(i)

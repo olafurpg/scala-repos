@@ -19,14 +19,16 @@ import java.util.concurrent.RejectedExecutionException
   * that you're depending on that sometimes slows when it takes bursty traffic). This is better for
   * resources that are artificially bounded, like a rate-limited API.
   */
-class RequestMeterFilter[Req, Rep](meter: AsyncMeter) extends SimpleFilter[Req, Rep] {
+class RequestMeterFilter[Req, Rep](meter: AsyncMeter)
+    extends SimpleFilter[Req, Rep] {
   def apply(request: Req, service: Service[Req, Rep]) = {
     meter.await(1).transform {
-      case Throw(noPermit) => noPermit match {
-        case e: RejectedExecutionException =>
-          Future.exception(Failure.rejected(noPermit))
-        case e => Future.exception(e)
-      }
+      case Throw(noPermit) =>
+        noPermit match {
+          case e: RejectedExecutionException =>
+            Future.exception(Failure.rejected(noPermit))
+          case e => Future.exception(e)
+        }
       case _ => service(request)
     }
   }

@@ -11,38 +11,58 @@ import java.security._
 import java.math.BigInteger
 import java.util.Date
 import sun.security.util.ObjectIdentifier
-import org.joda.time.{ Duration, Days, Instant }
+import org.joda.time.{Duration, Days, Instant}
 import scala.util.Properties.isJavaAtLeast
 
 /**
- * Used for testing only.  This relies on internal sun.security packages, so cannot be used in OpenJDK.
- */
+  * Used for testing only.  This relies on internal sun.security packages, so cannot be used in OpenJDK.
+  */
 object CertificateGenerator {
 
   // http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyPairGenerator
   // http://www.keylength.com/en/4/
 
   /**
-   * Generates a certificate using RSA (which is available in 1.6).
-   */
-  def generateRSAWithSHA256(keySize: Int = 2048, from: Instant = Instant.now, duration: Duration = Days.days(365).toStandardDuration): X509Certificate = {
-    val dn = "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
+    * Generates a certificate using RSA (which is available in 1.6).
+    */
+  def generateRSAWithSHA256(keySize: Int = 2048,
+                            from: Instant = Instant.now,
+                            duration: Duration = Days
+                                .days(365)
+                                .toStandardDuration): X509Certificate = {
+    val dn =
+      "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
 
     val keyGen = KeyPairGenerator.getInstance("RSA")
     keyGen.initialize(keySize, new SecureRandom())
     val pair = keyGen.generateKeyPair()
-    generateCertificate(dn, pair, from.toDate, to.toDate, "SHA256withRSA", AlgorithmId.sha256WithRSAEncryption_oid)
+    generateCertificate(dn,
+                        pair,
+                        from.toDate,
+                        to.toDate,
+                        "SHA256withRSA",
+                        AlgorithmId.sha256WithRSAEncryption_oid)
   }
 
-  def generateRSAWithSHA1(keySize: Int = 2048, from: Instant = Instant.now, duration: Duration = Days.days(365).toStandardDuration): X509Certificate = {
-    val dn = "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
+  def generateRSAWithSHA1(keySize: Int = 2048,
+                          from: Instant = Instant.now,
+                          duration: Duration = Days
+                              .days(365)
+                              .toStandardDuration): X509Certificate = {
+    val dn =
+      "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
 
     val keyGen = KeyPairGenerator.getInstance("RSA")
     keyGen.initialize(keySize, new SecureRandom())
     val pair = keyGen.generateKeyPair()
-    generateCertificate(dn, pair, from.toDate, to.toDate, "SHA1withRSA", AlgorithmId.sha256WithRSAEncryption_oid)
+    generateCertificate(dn,
+                        pair,
+                        from.toDate,
+                        to.toDate,
+                        "SHA1withRSA",
+                        AlgorithmId.sha256WithRSAEncryption_oid)
   }
 
   def toPEM(certificate: X509Certificate) = {
@@ -57,17 +77,33 @@ object CertificateGenerator {
     pemCert
   }
 
-  def generateRSAWithMD5(keySize: Int = 2048, from: Instant = Instant.now, duration: Duration = Days.days(365).toStandardDuration): X509Certificate = {
-    val dn = "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
+  def generateRSAWithMD5(keySize: Int = 2048,
+                         from: Instant = Instant.now,
+                         duration: Duration = Days
+                             .days(365)
+                             .toStandardDuration): X509Certificate = {
+    val dn =
+      "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
 
     val keyGen = KeyPairGenerator.getInstance("RSA")
     keyGen.initialize(keySize, new SecureRandom())
     val pair = keyGen.generateKeyPair()
-    generateCertificate(dn, pair, from.toDate, to.toDate, "MD5WithRSA", AlgorithmId.md5WithRSAEncryption_oid)
+    generateCertificate(dn,
+                        pair,
+                        from.toDate,
+                        to.toDate,
+                        "MD5WithRSA",
+                        AlgorithmId.md5WithRSAEncryption_oid)
   }
 
-  private[play] def generateCertificate(dn: String, pair: KeyPair, from: Date, to: Date, algorithm: String, oid: ObjectIdentifier): X509Certificate = {
+  private[play] def generateCertificate(
+      dn: String,
+      pair: KeyPair,
+      from: Date,
+      to: Date,
+      algorithm: String,
+      oid: ObjectIdentifier): X509Certificate = {
 
     val info: X509CertInfo = new X509CertInfo
     val interval: CertificateValidity = new CertificateValidity(from, to)
@@ -81,10 +117,13 @@ object CertificateGenerator {
 
     info.set(X509CertInfo.VALIDITY, interval)
     info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(sn))
-    info.set(X509CertInfo.SUBJECT, if (justName) owner else new CertificateSubjectName(owner))
-    info.set(X509CertInfo.ISSUER, if (justName) owner else new CertificateIssuerName(owner))
+    info.set(X509CertInfo.SUBJECT,
+             if (justName) owner else new CertificateSubjectName(owner))
+    info.set(X509CertInfo.ISSUER,
+             if (justName) owner else new CertificateIssuerName(owner))
     info.set(X509CertInfo.KEY, new CertificateX509Key(pair.getPublic))
-    info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3))
+    info.set(
+        X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3))
 
     var algo: AlgorithmId = new AlgorithmId(oid)
 
@@ -93,7 +132,9 @@ object CertificateGenerator {
     val privkey: PrivateKey = pair.getPrivate
     cert.sign(privkey, algorithm)
     algo = cert.get(X509CertImpl.SIG_ALG).asInstanceOf[AlgorithmId]
-    info.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, algo)
+    info.set(
+        CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM,
+        algo)
     cert = new X509CertImpl(info)
     cert.sign(privkey, algorithm)
     cert

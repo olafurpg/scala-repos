@@ -10,16 +10,16 @@ class DtabTest extends FunSuite with AssertionsForJUnit {
   def pathTree(t: String) =
     NameTree.read(t).map(Name(_))
 
-  def assertEquiv[T: Equiv](left: T, right: T) = assert(
-    if (Equiv[T].equiv(left, right)) None
-    else Some(left + "!=" + right)
+  def assertEquiv[T : Equiv](left: T, right: T) = assert(
+      if (Equiv[T].equiv(left, right)) None
+      else Some(left + "!=" + right)
   )
 
   test("d1 ++ d2") {
     val d1 = Dtab.read("/foo => /bar")
     val d2 = Dtab.read("/foo=>/biz;/biz=>/$/inet/0/8080;/bar=>/$/inet/0/9090")
 
-    assert(d1++d2 == Dtab.read("""
+    assert(d1 ++ d2 == Dtab.read("""
       /foo=>/bar;
       /foo=>/biz;
       /biz=>/$/inet/0/8080;
@@ -39,9 +39,8 @@ class DtabTest extends FunSuite with AssertionsForJUnit {
     assert(d1.stripPrefix(d1).isEmpty)
     assert(d1.stripPrefix(d2).isEmpty)
 
-    assertEquiv(
-      (d1 + Dentry.read("/foo => /123")).stripPrefix(d1),
-      Dtab.read("/foo=>/123"))
+    assertEquiv((d1 + Dentry.read("/foo => /123")).stripPrefix(d1),
+                Dtab.read("/foo=>/123"))
 
     assertEquiv(d1.stripPrefix(d1 + Dentry.read("/s => /b")), d1)
     assert(Dtab.empty.stripPrefix(d1).isEmpty)
@@ -54,9 +53,11 @@ class DtabTest extends FunSuite with AssertionsForJUnit {
     b += Dentry.read("/c => /d")
     val dtab = b.result
 
-    val dtab1: Dtab = dtab map { case Dentry(a, b) =>
-      Dentry.read("%s=>%s".format(a.show.toUpperCase, b.show.toUpperCase))
-    }
+    val dtab1: Dtab =
+      dtab map {
+        case Dentry(a, b) =>
+          Dentry.read("%s=>%s".format(a.show.toUpperCase, b.show.toUpperCase))
+      }
 
     assert(dtab1.size == 2)
     dtab1(0) match {
@@ -68,11 +69,11 @@ class DtabTest extends FunSuite with AssertionsForJUnit {
 
   test("Allows trailing semicolon") {
     val dtab = try {
-        Dtab.read("""
+      Dtab.read("""
           /b => /c;
           /a => /b;
           """)
-      } catch { case _: IllegalArgumentException => Dtab.empty }
+    } catch { case _: IllegalArgumentException => Dtab.empty }
     assert(dtab.length == 2)
   }
 }

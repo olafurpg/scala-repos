@@ -5,9 +5,11 @@ import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.Se
 import scala.language.implicitConversions
 
 /**
- * @author Roman.Shein
- * @since 11.09.2015.
- */
+  * @author Roman.Shein
+  * @since 11.09.2015.
+  */
 package object templates {
-  implicit def toExpandedCondition[T](condition: Condition[T]): ExpandedCondition[T] = new ExpandedCondition(condition)
+  implicit def toExpandedCondition[T](
+      condition: Condition[T]): ExpandedCondition[T] =
+    new ExpandedCondition(condition)
 }

@@ -19,8 +19,7 @@
  */
 package com.precog.ragnarok
 
-import org.joda.time.{ Instant, Interval }
-
+import org.joda.time.{Instant, Interval}
 
 // Scalaz has a MetricSpace, but its raison d'etre is for Lev. dist and can
 // only be used for integer distances.
@@ -37,10 +36,7 @@ object MetricSpace {
   }
 
   implicit object InstantMetricSpace extends MetricSpace[Instant] {
-    def distance(a: Instant, b: Instant) = math.abs(b.getMillis - a.getMillis).toDouble
+    def distance(a: Instant, b: Instant) =
+      math.abs(b.getMillis - a.getMillis).toDouble
   }
 }
-
-
-
-

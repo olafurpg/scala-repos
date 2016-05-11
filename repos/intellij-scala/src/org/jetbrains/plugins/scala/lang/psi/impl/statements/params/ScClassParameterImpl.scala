@@ -18,16 +18,18 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScParameterStub
 import org.jetbrains.plugins.scala.lang.psi.stubs.elements.wrappers.DummyASTNode
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-*/
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
+class ScClassParameterImpl private (
+    stub: StubElement[ScParameter], nodeType: IElementType, node: ASTNode)
+    extends ScParameterImpl(stub, nodeType, node) with ScClassParameter {
 
-class ScClassParameterImpl private (stub: StubElement[ScParameter], nodeType: IElementType, node: ASTNode)
-  extends ScParameterImpl(stub, nodeType, node) with ScClassParameter {
+  def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(node: ASTNode) = {this(null, null, node)}
-
-  def this(stub: ScParameterStub) = {this(stub, ScalaElementTypes.CLASS_PARAM, null)}
+  def this(stub: ScParameterStub) = {
+    this(stub, ScalaElementTypes.CLASS_PARAM, null)
+  }
 
   override def toString: String = "ClassParameter: " + name
 
@@ -66,7 +68,8 @@ class ScClassParameterImpl private (stub: StubElement[ScParameter], nodeType: IE
   override def getOriginalElement: PsiElement = {
     val ccontainingClass = containingClass
     if (ccontainingClass == null) return this
-    val originalClass: PsiClass = ccontainingClass.getOriginalElement.asInstanceOf[PsiClass]
+    val originalClass: PsiClass =
+      ccontainingClass.getOriginalElement.asInstanceOf[PsiClass]
     if (ccontainingClass eq originalClass) return this
     if (!originalClass.isInstanceOf[ScClass]) return this
     val c = originalClass.asInstanceOf[ScClass]

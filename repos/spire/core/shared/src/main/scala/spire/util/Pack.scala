@@ -7,10 +7,10 @@ import scala.language.experimental.macros
 import spire.macros.compat.Context
 
 /**
- * These methods are all big-endian.
- *
- * That is, bytes[0] is the most-significant byte.
- */
+  * These methods are all big-endian.
+  *
+  * That is, bytes[0] is the most-significant byte.
+  */
 object Pack {
 
   @inline private[this] def ism(n: Int, shift: Int): Byte =
@@ -115,10 +115,16 @@ object Pack {
   def longFromBytes(bytes: Array[Byte]): Long =
     longFromByteBuffer(ByteBuffer.wrap(bytes))
 
-  def longFromBytes(b1: Byte, b2: Byte, b3: Byte, b4: Byte, b5: Byte, b6: Byte, b7: Byte, b8: Byte): Long =
-    (b1 & 0xffL) << 56 | (b2 & 0xffL) << 48 | (b3 & 0xffL) << 40 |
-      (b4 & 0xffL) << 32 | (b5 & 0xffL) << 24 | (b6 & 0xffL) << 16 |
-      (b7 & 0xffL) << 8 | (b8 & 0xffL)
+  def longFromBytes(b1: Byte,
+                    b2: Byte,
+                    b3: Byte,
+                    b4: Byte,
+                    b5: Byte,
+                    b6: Byte,
+                    b7: Byte,
+                    b8: Byte): Long =
+    (b1 & 0xffL) << 56 | (b2 & 0xffL) << 48 | (b3 & 0xffL) << 40 | (b4 & 0xffL) << 32 |
+    (b5 & 0xffL) << 24 | (b6 & 0xffL) << 16 | (b7 & 0xffL) << 8 | (b8 & 0xffL)
 
   def longFromByteBuffer(bb: ByteBuffer): Long =
     if (bb.remaining >= 8) {
@@ -166,7 +172,8 @@ object Pack {
       throw new IllegalArgumentException(s"$index outside of 0-3")
     }
 
-  def intToByteMacro(c: Context)(n: c.Expr[Int])(index: c.Expr[Int]): c.Expr[Byte] = {
+  def intToByteMacro(c: Context)(n: c.Expr[Int])(
+      index: c.Expr[Int]): c.Expr[Byte] = {
     import c.universe._
     index.tree match {
       case Literal(Constant(i: Int)) =>
@@ -188,7 +195,8 @@ object Pack {
       throw new IllegalArgumentException(s"$index outside of 0-7")
     }
 
-  def longToByteMacro(c: Context)(n: c.Expr[Long])(index: c.Expr[Int]): c.Expr[Byte] = {
+  def longToByteMacro(c: Context)(n: c.Expr[Long])(
+      index: c.Expr[Int]): c.Expr[Byte] = {
     import c.universe._
     index.tree match {
       case Literal(Constant(i: Int)) =>

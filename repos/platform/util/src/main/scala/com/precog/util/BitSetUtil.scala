@@ -114,7 +114,8 @@ object BitSetUtil {
     val len = bitset.length
     if (from <= 0) {
       val bits = bitset.copy()
-      if (to >= len) bits else {
+      if (to >= len) bits
+      else {
         bits.clear(to, len)
         bits
       }
@@ -140,11 +141,12 @@ object BitSetUtil {
 
   def filteredList[A](as: List[A])(pred: A => Boolean): BitSet = {
     val bs = new BitSet
-    @inline @tailrec def loop(lst: List[A], i: Int): Unit = lst match {
+    @inline
+    @tailrec def loop(lst: List[A], i: Int): Unit = lst match {
       case h :: t =>
         if (pred(h)) bs.set(i)
         loop(t, i + 1)
-      case Nil => 
+      case Nil =>
     }
     loop(as, 0)
     bs
@@ -152,11 +154,12 @@ object BitSetUtil {
 
   def filteredSeq[A](as: List[A])(pred: A => Boolean): BitSet = {
     val bs = new BitSet
-    @inline @tailrec def loop(lst: List[A], i: Int): Unit = lst match {
+    @inline
+    @tailrec def loop(lst: List[A], i: Int): Unit = lst match {
       case h :: t =>
         if (pred(h)) bs.set(i)
         loop(t, i + 1)
-      case Nil => 
+      case Nil =>
     }
     loop(as, 0)
     bs
@@ -172,15 +175,13 @@ object BitSetUtil {
         arr(j) = base + bit
         j += 1
       }
-      if (bit < 63)
-        loopBits(long, bit + 1, base)
+      if (bit < 63) loopBits(long, bit + 1, base)
     }
 
     @tailrec
     def loopLongs(i: Int, longs: Array[Long], last: Int, base: Int) {
       loopBits(longs(i), 0, base)
-      if (i < last)
-        loopLongs(i + 1, longs, last, base + 64)
+      if (i < last) loopLongs(i + 1, longs, last, base + 64)
     }
 
     loopLongs(0, bs.getBits, bs.getBitsLength - 1, 0)
@@ -189,19 +190,18 @@ object BitSetUtil {
 
   def bitSetToList(bs: BitSet): List[Int] = {
     @tailrec
-    def loopBits(long: Long, bit: Int, base: Int, sofar: List[Int]): List[Int] = {
-      if (bit < 0)
-        sofar
+    def loopBits(
+        long: Long, bit: Int, base: Int, sofar: List[Int]): List[Int] = {
+      if (bit < 0) sofar
       else if (((long >> bit) & 1) == 1)
         loopBits(long, bit - 1, base, (base + bit) :: sofar)
-      else
-        loopBits(long, bit - 1, base, sofar)
+      else loopBits(long, bit - 1, base, sofar)
     }
 
     @tailrec
-    def loopLongs(i: Int, longs: Array[Long], base: Int, sofar: List[Int]): List[Int] = {
-      if (i < 0)
-        sofar
+    def loopLongs(
+        i: Int, longs: Array[Long], base: Int, sofar: List[Int]): List[Int] = {
+      if (i < 0) sofar
       else
         loopLongs(i - 1, longs, base - 64, loopBits(longs(i), 63, base, sofar))
     }

@@ -1,5 +1,4 @@
-
-import scala.language.{ reflectiveCalls }
+import scala.language.{reflectiveCalls}
 
 object test1 {
 
@@ -37,7 +36,7 @@ object test1 {
     def r: Array[Unit] = Array((), ())
     def s: Array[String] = Array("one", "two")
     def t: Array[Tata] = Array(t1, t2)
-    def u[T](f: T=>T, v:T): T = f(v)
+    def u[T](f: T => T, v: T): T = f(v)
     var v = 4
     var w = 11
     val x = t1
@@ -64,12 +63,12 @@ object test1 {
     def r: Array[Unit]
     def s: Array[String]
     def t: Array[Tata]
-    def u[T](f: T=>T, v:T): T
+    def u[T](f: T => T, v: T): T
     var v: Int
     val y: Tata
   }
 
-  def l (r: rt) {
+  def l(r: rt) {
     println(" 1. " + r.c)
     println(" 2. " + r.a + 1)
     println(" 3. " + r.d(o1))
@@ -93,7 +92,7 @@ object test1 {
     println("21. " + r.r(0))
     println("22. " + r.m(r.s))
     println("23. " + r.t(0).tatMe)
-    println("24. " + r.u[Int](_+1,0))
+    println("24. " + r.u[Int](_ + 1, 0))
     println("25. " + r.y)
     println("26. " + r.e(null))
   }
@@ -125,7 +124,7 @@ object test1 {
   Rec.g(11)
 
   this.l(Rec)
-  this.mb(new Object{def e[T](x: T): T = x})
+  this.mb(new Object { def e[T](x: T): T = x })
   this.m1(Rec)
   this.m2[Tata](Rec)
   this.m3[Tata](new Rec3[Tata], t1)
@@ -164,14 +163,12 @@ object test3 {
   def m(r: { def f: Nothing }) =
     try {
       r.f
-    }
-    catch {
+    } catch {
       case e: Exc => println("caught")
       case e: Throwable => println(e)
     }
 
   m(Rec)
-
 }
 
 object test4 {
@@ -181,7 +178,7 @@ object test4 {
   val aar = Array(new A, new A, new A)
   val nar = Array(1, 2)
 
-  def f(p: {def size: Int}) = println(p.size)
+  def f(p: { def size: Int }) = println(p.size)
   //def g[T <: {def size: Int}](p: T) = println(p.size) // open issue
   //def h[T <% {def size: Int}](p: T) = println(p.size) // open issue
 
@@ -193,7 +190,6 @@ object test4 {
 
   //h(aar)
   //h(nar)
-
 }
 
 object Test extends App {

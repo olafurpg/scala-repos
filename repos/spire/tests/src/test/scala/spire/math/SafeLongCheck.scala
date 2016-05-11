@@ -9,7 +9,8 @@ import org.scalatest._
 import prop._
 import spire.util.Opt
 
-class SafeLongCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class SafeLongCheck
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import SafeLong.zero
 
@@ -235,7 +236,8 @@ class SafeLongCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     smin gcd smin shouldBe firstBig
     SafeLong(13) gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe SafeLong(13)
     smin gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe firstBig
-    SafeLong.minusOne gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe SafeLong.one
+    SafeLong.minusOne gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe SafeLong
+      .one
 
     (SafeLong(0) gcd SafeLong(-13)) shouldBe SafeLong(13)
     (SafeLong(0) gcd smin) shouldBe firstBig

@@ -1,5 +1,5 @@
 package test
 
 class X {
-	def bar(b: B) = b
+  def bar(b: B) = b
 }

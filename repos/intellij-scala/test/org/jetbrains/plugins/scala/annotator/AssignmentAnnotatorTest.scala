@@ -7,9 +7,8 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAssignStmt
 
 /**
- * Pavel.Fatin, 18.05.2010
- */
-
+  * Pavel.Fatin, 18.05.2010
+  */
 class AssignmentAnnotatorTest extends SimpleTestCase {
   final val Header = """
   class A; class B
@@ -31,7 +30,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
       case Nil =>
     }
   }*/
-  
+
   def testValue() {
     assertMatches(messages("val v = A; v = A")) {
       case Error("v = A", ReassignmentToVal()) :: Nil =>
@@ -40,7 +39,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
       case Error("v = B", ReassignmentToVal()) :: Nil =>
     }
   }
-  
+
   def testFunctionParameter() {
     assertMatches(messages("def f(p: A) { p = A }")) {
       case Error("p = A", ReassignmentToVal()) :: Nil =>
@@ -49,7 +48,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
       case Error("p = B", ReassignmentToVal()) :: Nil =>
     }
   }
-  
+
   def testClassParameter() {
     assertMatches(messages("case class C(var p: A) { p = A }")) {
       case Nil =>
@@ -58,12 +57,12 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
       case Error("p = B", ReassignmentToVal()) :: Nil =>
     }
   }
-  
+
   def testClassVariableParameter() {
     assertMatches(messages("class C(var p: A) { p = A }")) {
       case Nil =>
     }
-  // TODO right expression "B" must have expected type    
+    // TODO right expression "B" must have expected type    
 //    assertMatches(messages("class C(var p: A) { p = B }")) {
 //      case Error("B", TypeMismatch()) :: Nil =>
 //    }
@@ -77,7 +76,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
       case Error("p = B", ReassignmentToVal()) :: Nil =>
     }
   }
-  
+
   def testFunctionLiteralParameter() {
     assertMatches(messages("(p: A) => { p = A }")) {
       case Error("p = A", ReassignmentToVal()) :: Nil =>
@@ -86,7 +85,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
       case Error("p = B", ReassignmentToVal()) :: Nil =>
     }
   }
-  
+
   //TODO fails on server
 //  def testParameterInsideBlock {
 //    assertMatches(messages("{ p: A => p = A }")) {
@@ -96,7 +95,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
 //      case Error("p = B", ReassignmentToVal()) :: Nil =>
 //    }
 //  }
-  
+
   def testForComprehensionGenerator() {
     assertMatches(messages("for(v: A <- null) { v = A }")) {
       case Error("v = A", ReassignmentToVal()) :: Nil =>
@@ -105,7 +104,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
       case Error("v = B", ReassignmentToVal()) :: Nil =>
     }
   }
-  
+
   def testForComprehensionEnumerator() {
     assertMatches(messages("for(x <- null; v = A) { v = A }")) {
       case Error("v = A", ReassignmentToVal()) :: Nil =>
@@ -114,7 +113,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
       case Error("v = B", ReassignmentToVal()) :: Nil =>
     }
   }
-  
+
   def testCaseClause() {
     assertMatches(messages("A match { case v: A => v = A }")) {
       case Error("v = A", ReassignmentToVal()) :: Nil =>
@@ -131,11 +130,12 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
   }
 
   def testUpdateOkay() {
-    assertMatches(messages("val a = new { def update(x: Int): Unit = () }; a() = 1")) {
+    assertMatches(
+        messages("val a = new { def update(x: Int): Unit = () }; a() = 1")) {
       case Nil =>
     }
   }
-  
+
   def testVarInsideVar() {
     assertMatches(messages("val x = { var a = A; a = A }")) {
       case Nil =>
@@ -150,12 +150,13 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
       case Nil =>
     }
   }
-  
+
   def testSetter() {
     assertMatches(messages("def a = A; def a_=(x: A) {}; a = A")) {
       case Nil =>
     }
-    assertMatches(messages("def a(implicit b: B) = A; def a_=(x: A) {}; a = A")) {
+    assertMatches(
+        messages("def a(implicit b: B) = A; def a_=(x: A) {}; a = A")) {
       case Nil =>
     }
     assertMatches(messages("def a() = A; def a_=(x: A) {}; a = A")) {
@@ -169,16 +170,18 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
     }
   }
 
-  def messages(@Language(value = "Scala", prefix = Header) code: String): List[Message] = {
-    val assignment = (Header + code).parse.depthFirst.findByType(classOf[ScAssignStmt]).get
-    
+  def messages(@Language(value = "Scala", prefix = Header) code: String)
+    : List[Message] = {
+    val assignment =
+      (Header + code).parse.depthFirst.findByType(classOf[ScAssignStmt]).get
+
     val annotator = new AssignmentAnnotator() {}
     val mock = new AnnotatorHolderMock
-    
+
     annotator.annotateAssignment(assignment, mock, advancedHighlighting = true)
     mock.annotations
   }
-  
+
   val TypeMismatch = StartWith("Type mismatch")
   val ReassignmentToVal = StartWith("Reassignment to val")
 

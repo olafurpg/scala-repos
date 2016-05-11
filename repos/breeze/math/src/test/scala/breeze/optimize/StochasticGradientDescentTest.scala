@@ -13,7 +13,7 @@ package breeze.optimize
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. 
-*/
+ */
 
 import org.scalatest._
 import org.scalatest.junit._
@@ -22,13 +22,11 @@ import org.scalacheck._
 import org.junit.runner.RunWith
 import breeze.linalg._
 
-
 @RunWith(classOf[JUnitRunner])
 class StochasticGradientDescentTest extends OptimizeTestBase {
 
-
   test("optimize a simple multivariate gaussian") {
-    val sgd = StochasticGradientDescent[DenseVector[Double]](2.0,100)
+    val sgd = StochasticGradientDescent[DenseVector[Double]](2.0, 100)
 
     def optimizeThis(init: DenseVector[Double]) = {
       val f = new BatchDiffFunction[DenseVector[Double]] {
@@ -39,31 +37,29 @@ class StochasticGradientDescentTest extends OptimizeTestBase {
         val fullRange = 0 to 1
       }
 
-      val result = sgd.minimize(f,init) 
-      norm(result :- DenseVector.ones[Double](init.size) * 3.0,2) < 1E-10
+      val result = sgd.minimize(f, init)
+      norm(result :- DenseVector.ones[Double](init.size) * 3.0, 2) < 1E-10
     }
 
     check(Prop.forAll(optimizeThis _))
-
   }
 
   test("optimize a simple multivariate gaussian with counters") {
-    val sgd =  StochasticGradientDescent[Counter[String,Double]](1.0,100)
+    val sgd = StochasticGradientDescent[Counter[String, Double]](1.0, 100)
 
-    def optimizeThis(init: Counter[String,Double]) = {
-      val f = new BatchDiffFunction[Counter[String,Double]] {
-        def calculate(x: Counter[String,Double], r: IndexedSeq[Int]) = {
+    def optimizeThis(init: Counter[String, Double]) = {
+      val f = new BatchDiffFunction[Counter[String, Double]] {
+        def calculate(x: Counter[String, Double], r: IndexedSeq[Int]) = {
           val r = x - 3.0
           ((r dot r), (x * 2.0) - 6.0)
         }
         val fullRange = 0 to 1
       }
 
-      val result = sgd.minimize(f,init)
-      norm(result - 3.0,2) < 1E-3
+      val result = sgd.minimize(f, init)
+      norm(result - 3.0, 2) < 1E-3
     }
 
-    check(Prop.forAll(optimizeThis _ ))
-
+    check(Prop.forAll(optimizeThis _))
   }
 }

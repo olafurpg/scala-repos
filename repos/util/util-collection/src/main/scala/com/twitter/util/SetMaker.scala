@@ -6,8 +6,8 @@ import scala.collection.mutable.{Map, Set}
 import com.google.common.collect.{MapMaker => GoogleMapMaker}
 
 /**
- * Use guava `MapMaker` to create a scala `Set`
- */
+  * Use guava `MapMaker` to create a scala `Set`
+  */
 object SetMaker {
   def apply[A](f: Config[A] => Any): Set[A] = {
     val config = new Config[A]
@@ -19,11 +19,14 @@ object SetMaker {
     private val mapMaker = new GoogleMapMaker
 
     def weakValues = { mapMaker.weakKeys; mapMaker.weakValues; this }
-    def concurrencyLevel(level: Int) = { mapMaker.concurrencyLevel(level); this }
-    def initialCapacity(capacity: Int) = { mapMaker.initialCapacity(capacity); this }
+    def concurrencyLevel(level: Int) = {
+      mapMaker.concurrencyLevel(level); this
+    }
+    def initialCapacity(capacity: Int) = {
+      mapMaker.initialCapacity(capacity); this
+    }
 
-    def apply() = new MapToSetAdapter[A](
-      mapMaker.makeMap[A, A]().asScala)
+    def apply() = new MapToSetAdapter[A](mapMaker.makeMap[A, A]().asScala)
   }
 }
 

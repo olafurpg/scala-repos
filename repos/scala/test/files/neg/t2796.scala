@@ -8,7 +8,7 @@ trait T1 extends {
 } with Base
 
 trait T2 extends {
-  type X = Int                       // warn
+  type X = Int // warn
 } with Base
 
 class C1 extends {
@@ -17,7 +17,7 @@ class C1 extends {
 
 object Test {
   def main(args: Array[String]) {
-    assert(new C1 ().useAbstractVal == "C1.abstractVal")
+    assert(new C1().useAbstractVal == "C1.abstractVal")
     // This currently fails. a more ambitious approach to this ticket would add $earlyinit$
     // to traits and call it from the right places in the right order.
     //

@@ -14,4 +14,3 @@ object Test extends App {
   var v = new C(42).foo[Int].get
   println(v)
 }
-

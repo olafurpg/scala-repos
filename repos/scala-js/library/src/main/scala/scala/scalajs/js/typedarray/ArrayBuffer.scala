@@ -3,8 +3,8 @@ package scala.scalajs.js.typedarray
 import scala.scalajs.js
 
 /** <span class="badge badge-ecma6" style="float: right;">ECMAScript 6</span>
- *  An ArrayBuffer is a block of contiguous, non-resizable memory.
- */
+  *  An ArrayBuffer is a block of contiguous, non-resizable memory.
+  */
 @js.native
 class ArrayBuffer(length: Int) extends js.Object {
 
@@ -17,5 +17,4 @@ class ArrayBuffer(length: Int) extends js.Object {
   // Note: Some specifications specify a static isView method on ArrayBuffer
   // that checks whether a given object is an ArrayBufferView. We omit it here
   // since neither Node.js nor PhantomJS support it at the time of writing.
-
 }

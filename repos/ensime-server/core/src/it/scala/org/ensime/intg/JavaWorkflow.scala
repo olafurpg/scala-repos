@@ -8,10 +8,9 @@ import org.ensime.util.EnsimeSpec
 import org.ensime.util.file._
 
 // a pure java project, checking that how things behave without scala
-class JavaWorkflow extends EnsimeSpec
-    with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture
-    with IsolatedProjectFixture {
+class JavaWorkflow
+    extends EnsimeSpec with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.JavaTestProject
 
@@ -29,7 +28,13 @@ class JavaWorkflow extends EnsimeSpec
           expectMsg(VoidResponse)
 
           project ! TypeAtPointReq(Left(fooFile), OffsetRange(30))
-          expectMsg(BasicTypeInfo("pure.NoScalaHere", DeclaredAs.Class, "pure.NoScalaHere", Nil, Nil, Some(EmptySourcePosition())))
+          expectMsg(
+              BasicTypeInfo("pure.NoScalaHere",
+                            DeclaredAs.Class,
+                            "pure.NoScalaHere",
+                            Nil,
+                            Nil,
+                            Some(EmptySourcePosition())))
         }
       }
     }

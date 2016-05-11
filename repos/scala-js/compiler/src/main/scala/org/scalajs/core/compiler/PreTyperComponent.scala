@@ -9,59 +9,60 @@ import scala.tools.nsc
 import nsc._
 
 /** This `jspretyper` phase prepares a fix for issue SI-9487 in the case of
- *  anonymous classes that extend js.Any.
- *
- *  During `typer`, due to a bug (SI-9487), Scalac transfroms some public method
- *  definitions of a quite specific syntactic form of anonymous classes into
- *  private methods. This affects both methods and field accessors. This phase
- *  identifies any anonymous class and adds a `@WasPublicBeforeTyper` annotation
- *  on its public methods and fields. After the `typer` in `jsinterop` the
- *  anonymous classes are fixed if they extend js.Any using the annotations as
- *  reference.
- *
- *  As an example:
- *  {{{
- *  class $anon extends ... {
- *    val foo = ???
- *    var bar = ???
- *    def baz = ???
- *    private val foo2 = ???
- *    private var bar2 = ???
- *    private def baz2 = ???
- *  }
- *  }}}
- *
- *  Would become:
- *  {{{
- *  class $anon extends ... {
- *    @WasPublicBeforeTyper val foo = ???
- *    @WasPublicBeforeTyper var bar = ???
- *    @WasPublicBeforeTyper def baz = ???
- *    private val foo2 = ???
- *    private var bar2 = ???
- *    private def baz2 = ???
- *  }
- *  }}}
- *
- *  And after `typer` (if has SI-9487) will be:
- *  {{{
- *  class $anon extends ... {
- *    @WasPublicBeforeTyper private[this] var foo = ???
- *    private <stable> <accessor> def foo = ??? // Needs fix
- *
- *    @WasPublicBeforeTyper private[this] var bar = ???
- *    private <accessor> def bar = ??? // Needs fix
- *    private <accessor> def bar_=(...) = ??? // Needs fix
- *
- *    @WasPublicBeforeTyper private def baz = ??? // Needs fix
- *    ...
- *  }
- *  }}}
- *
- *  @author Nicolas Stucki
- */
-abstract class PreTyperComponent extends plugins.PluginComponent
-    with transform.Transform with PluginComponent210Compat {
+  *  anonymous classes that extend js.Any.
+  *
+  *  During `typer`, due to a bug (SI-9487), Scalac transfroms some public method
+  *  definitions of a quite specific syntactic form of anonymous classes into
+  *  private methods. This affects both methods and field accessors. This phase
+  *  identifies any anonymous class and adds a `@WasPublicBeforeTyper` annotation
+  *  on its public methods and fields. After the `typer` in `jsinterop` the
+  *  anonymous classes are fixed if they extend js.Any using the annotations as
+  *  reference.
+  *
+  *  As an example:
+  *  {{{
+  *  class $anon extends ... {
+  *    val foo = ???
+  *    var bar = ???
+  *    def baz = ???
+  *    private val foo2 = ???
+  *    private var bar2 = ???
+  *    private def baz2 = ???
+  *  }
+  *  }}}
+  *
+  *  Would become:
+  *  {{{
+  *  class $anon extends ... {
+  *    @WasPublicBeforeTyper val foo = ???
+  *    @WasPublicBeforeTyper var bar = ???
+  *    @WasPublicBeforeTyper def baz = ???
+  *    private val foo2 = ???
+  *    private var bar2 = ???
+  *    private def baz2 = ???
+  *  }
+  *  }}}
+  *
+  *  And after `typer` (if has SI-9487) will be:
+  *  {{{
+  *  class $anon extends ... {
+  *    @WasPublicBeforeTyper private[this] var foo = ???
+  *    private <stable> <accessor> def foo = ??? // Needs fix
+  *
+  *    @WasPublicBeforeTyper private[this] var bar = ???
+  *    private <accessor> def bar = ??? // Needs fix
+  *    private <accessor> def bar_=(...) = ??? // Needs fix
+  *
+  *    @WasPublicBeforeTyper private def baz = ??? // Needs fix
+  *    ...
+  *  }
+  *  }}}
+  *
+  *  @author Nicolas Stucki
+  */
+abstract class PreTyperComponent
+    extends plugins.PluginComponent with transform.Transform
+    with PluginComponent210Compat {
 
   import global._
 
@@ -77,17 +78,25 @@ abstract class PreTyperComponent extends plugins.PluginComponent
       case tree: ClassDef if needsAnnotations(tree) =>
         val newBody = tree.impl.body.map {
           case vdef: ValDef if needsAnnotations(vdef) =>
-            treeCopy.ValDef(vdef, withWasPublic(vdef.mods), vdef.name,
-                vdef.tpt, transform(vdef.rhs))
+            treeCopy.ValDef(vdef,
+                            withWasPublic(vdef.mods),
+                            vdef.name,
+                            vdef.tpt,
+                            transform(vdef.rhs))
 
           case ddef: DefDef if needsAnnotations(ddef) =>
-            treeCopy.DefDef(ddef, withWasPublic(ddef.mods), ddef.name,
-                ddef.tparams, ddef.vparamss, ddef.tpt, transform(ddef.rhs))
+            treeCopy.DefDef(ddef,
+                            withWasPublic(ddef.mods),
+                            ddef.name,
+                            ddef.tparams,
+                            ddef.vparamss,
+                            ddef.tpt,
+                            transform(ddef.rhs))
 
           case member => transform(member)
         }
-        val newImpl =
-          treeCopy.Template(tree.impl, tree.impl.parents, tree.impl.self, newBody)
+        val newImpl = treeCopy.Template(
+            tree.impl, tree.impl.parents, tree.impl.self, newBody)
         treeCopy.ClassDef(tree, tree.mods, tree.name, tree.tparams, newImpl)
 
       case tree: Template =>
@@ -126,8 +135,9 @@ abstract class PreTyperComponent extends plugins.PluginComponent
   private val wasPublicBeforeTyper = newTypeName("WasPublicBeforeTyper")
 
   private def anonymousClassMethodWasPublicAnnotation: Tree = {
-    val runtimePackage = Select(Select(Select(Select(Ident(nme.ROOTPKG),
-        nme.scala_), scalajs), js), nme.annotation)
+    val runtimePackage = Select(
+        Select(Select(Select(Ident(nme.ROOTPKG), nme.scala_), scalajs), js),
+        nme.annotation)
     val cls = Select(runtimePackage, wasPublicBeforeTyper)
     Apply(Select(New(cls), nme.CONSTRUCTOR), Nil)
   }

@@ -6,7 +6,7 @@ package scala
 package reflect.internal.util
 
 /** A common class for lightweight sets.
- */
+  */
 abstract class Set[T <: AnyRef] {
 
   def findEntry(x: T): T

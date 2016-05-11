@@ -39,16 +39,19 @@ object TestHelper extends Matchers {
     obuf.compare(a, b)
   }
 
-  def deserializeSeq[T](items: Int, buf: InputStream)(implicit orderedBuffer: OrderedSerialization[T]): Seq[T] = {
+  def deserializeSeq[T](items: Int, buf: InputStream)(
+      implicit orderedBuffer: OrderedSerialization[T]): Seq[T] = {
     (0 until items).map { _ =>
       orderedBuffer.read(buf).get
     }.toList
   }
 
-  def serialize[T](t: T)(implicit orderedBuffer: OrderedSerialization[T]): InputStream =
+  def serialize[T](t: T)(
+      implicit orderedBuffer: OrderedSerialization[T]): InputStream =
     serializeSeq(List(t))
 
-  def serializeSeq[T](t: Seq[T])(implicit orderedBuffer: OrderedSerialization[T]): InputStream = {
+  def serializeSeq[T](t: Seq[T])(
+      implicit orderedBuffer: OrderedSerialization[T]): InputStream = {
     val baos = new ByteArrayOutputStream
     t.foreach({ e =>
       orderedBuffer.write(baos, e)
@@ -60,7 +63,8 @@ object TestHelper extends Matchers {
     obuf.compareBinary(serialize(a), serialize(b)).unsafeToInt
   }
 
-  def checkManyExplicit[T](i: List[T])(implicit obuf: OrderedSerialization[T]) = {
+  def checkManyExplicit[T](i: List[T])(
+      implicit obuf: OrderedSerialization[T]) = {
     val serializedA = serializeSeq(i)
     val serializedB = serializeSeq(i)
     (0 until i.size).foreach { _ =>
@@ -68,7 +72,9 @@ object TestHelper extends Matchers {
     }
   }
 
-  def compareSerialized[T](a: T, b: T)(implicit orderedBuffer: OrderedSerialization[T]): OrderedSerialization.Result = {
+  def compareSerialized[T](a: T, b: T)(
+      implicit orderedBuffer: OrderedSerialization[T])
+    : OrderedSerialization.Result = {
     val bufA = serializeSeq[T]((0 until 20).map(_ => a))
     val bufB = serializeSeq[T]((0 until 20).map(_ => b))
     val r = (0 until 20).map { _ =>
@@ -77,5 +83,4 @@ object TestHelper extends Matchers {
     if (r.distinct.size == 1) r.head
     else sys.error("Results are inconsistent.." + r)
   }
-
 }

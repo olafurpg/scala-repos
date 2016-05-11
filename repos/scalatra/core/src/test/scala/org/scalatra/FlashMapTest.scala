@@ -1,10 +1,10 @@
 package org.scalatra
 
-import java.io.{ ByteArrayOutputStream, ObjectOutputStream }
+import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.{ BeforeAndAfterEach, FunSuite, Matchers }
+import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
 @RunWith(classOf[JUnitRunner])
 class FlashMapTest extends FunSuite with Matchers with BeforeAndAfterEach {
@@ -72,7 +72,9 @@ class FlashMapTest extends FunSuite with Matchers with BeforeAndAfterEach {
 
   test("iterated keys are removed on sweep") {
     val keys = Set("1", "2")
-    keys foreach { k => flash(k) = true }
+    keys foreach { k =>
+      flash(k) = true
+    }
     // Iteration order is unspecified
     val (gottenKey, _) = flash.iterator.next
     val ungottenKey = (keys - gottenKey).head

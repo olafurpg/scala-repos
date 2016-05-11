@@ -27,7 +27,8 @@ class DistributedQueryingTest {
     TableQuery[T]
   }
 
-  class U(tag: slick.lifted.Tag) extends dc2.profile.Table[(Int, Int, String)](tag, "tdb2_U") {
+  class U(tag: slick.lifted.Tag)
+      extends dc2.profile.Table[(Int, Int, String)](tag, "tdb2_U") {
     import dc2.profile.api._
     def id = column[Int]("id", O.PrimaryKey)
     def a = column[Int]("a")
@@ -36,27 +37,52 @@ class DistributedQueryingTest {
   }
   val us = slick.lifted.TableQuery[U]
 
-  val tData = Seq((1, 1, "a"), (2, 1, "b"), (3, 2, "c"), (4, 2, "d"), (5, 3, "e"), (6, 3, "f"))
-  val uData = Seq((1, 1, "A"), (2, 1, "B"), (3, 2, "C"), (4, 2, "D"), (5, 3, "E"), (6, 3, "F"))
+  val tData = Seq((1, 1, "a"),
+                  (2, 1, "b"),
+                  (3, 2, "c"),
+                  (4, 2, "d"),
+                  (5, 3, "e"),
+                  (6, 3, "f"))
+  val uData = Seq((1, 1, "A"),
+                  (2, 1, "B"),
+                  (3, 2, "C"),
+                  (4, 2, "D"),
+                  (5, 3, "E"),
+                  (6, 3, "F"))
 
   @Test
   def test1: Unit = {
     try {
       try {
-        val db = DistributedBackend.Database(Seq(dc1.db, dc2.db), ExecutionContext.global)
-        ;{
+        val db = DistributedBackend.Database(
+            Seq(dc1.db, dc2.db), ExecutionContext.global);
+        {
           import dc1.profile.api._
-          Await.result(dc1.db.run(DBIO.seq(ts.schema.create, ts ++= tData)), Duration.Inf)
-        };{
+          Await.result(dc1.db.run(DBIO.seq(ts.schema.create, ts ++= tData)),
+                       Duration.Inf)
+        };
+        {
           import dc2.profile.api._
-          Await.result(dc2.db.run(DBIO.seq(us.schema.create, us ++= uData)), Duration.Inf)
-        };{
+          Await.result(dc2.db.run(DBIO.seq(us.schema.create, us ++= uData)),
+                       Duration.Inf)
+        };
+        {
           import dProfile.api._
-          Await.result(db.run(DBIO.seq(
-            ts.result.map(d => assertEquals(tData.toSet, d.toSet)),
-            us.result.map(d => assertEquals(uData.toSet, d.toSet)),
-            ts.flatMap(t => us.map(u => (t, u))).result.map(d => assertEquals(tData.flatMap(t => uData.map(u => (t, u))).toSet, d.toSet))
-          )), Duration.Inf)
+          Await.result(
+              db.run(
+                  DBIO.seq(
+                      ts.result.map(d => assertEquals(tData.toSet, d.toSet)),
+                      us.result.map(d => assertEquals(uData.toSet, d.toSet)),
+                      ts.flatMap(t => us.map(u => (t, u)))
+                        .result
+                        .map(d =>
+                              assertEquals(
+                                  tData
+                                    .flatMap(t => uData.map(u => (t, u)))
+                                    .toSet,
+                                  d.toSet))
+                    )),
+              Duration.Inf)
         }
       } finally dc2.db.close
     } finally dc1.db.close

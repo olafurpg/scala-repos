@@ -37,15 +37,18 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- *
- * Test for [[scalafx.scene.control.TextFormatter]].
- */
+  *
+  * Test for [[scalafx.scene.control.TextFormatter]].
+  */
 @RunWith(classOf[JUnitRunner])
 class TextFormatterSpec
-  extends SimpleSFXDelegateSpec[jfxsc.TextFormatter[String], TextFormatter[String]](
-    classOf[jfxsc.TextFormatter[String]], classOf[TextFormatter[String]])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[
+        jfxsc.TextFormatter[String], TextFormatter[String]](
+        classOf[jfxsc.TextFormatter[String]], classOf[TextFormatter[String]])
+    with RunOnApplicationThread {
 
-  override protected def getScalaClassInstance: TextFormatter[String] = new TextFormatter(getJavaClassInstance)
-  override protected def getJavaClassInstance: jfxsc.TextFormatter[String] = new jfxsc.TextFormatter(TextFormatter.IdentityStringConverter)
+  override protected def getScalaClassInstance: TextFormatter[String] =
+    new TextFormatter(getJavaClassInstance)
+  override protected def getJavaClassInstance: jfxsc.TextFormatter[String] =
+    new jfxsc.TextFormatter(TextFormatter.IdentityStringConverter)
 }

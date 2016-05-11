@@ -12,10 +12,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.Nothing
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
 
 /**
-* @author Alexander Podkhalyuzin, ilyas
-*/
-
-class ScThrowStmtImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScThrowStmt {
+  * @author Alexander Podkhalyuzin, ilyas
+  */
+class ScThrowStmtImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScThrowStmt {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -25,7 +25,8 @@ class ScThrowStmtImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScTh
 
   override def toString: String = "ThrowStatement"
 
-  protected override def innerType(ctx: TypingContext) = Success(Nothing, Some(this))
+  protected override def innerType(ctx: TypingContext) =
+    Success(Nothing, Some(this))
 
   def body = findChild(classOf[ScExpression])
 }

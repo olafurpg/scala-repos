@@ -12,12 +12,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScArguments, 
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScExtendsBlock
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 10.09.2008
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 10.09.2008
+  */
 class ScalaWordSelectioner extends ExtendWordSelectionHandlerBase {
-  override def select(e: PsiElement, editorText: CharSequence, cursorOffset: Int, editor: Editor): java.util.List[TextRange] = {
+  override def select(e: PsiElement,
+                      editorText: CharSequence,
+                      cursorOffset: Int,
+                      editor: Editor): java.util.List[TextRange] = {
     val result = super.select(e, editorText, cursorOffset, editor)
     e match {
       //case for selecting parameters without parenthesises
@@ -26,10 +28,12 @@ class ScalaWordSelectioner extends ExtendWordSelectionHandlerBase {
         if (range.getEndOffset - range.getStartOffset != 0) {
           val start = range.getStartOffset + 1
           //just look for last parenthesis
-          val end = if (Set(ScalaTokenTypes.tRPARENTHESIS, ScalaTokenTypes.tRSQBRACKET).contains(
-            e.getNode.getLastChildNode.getElementType
-          )) range.getEndOffset - 1
-          else range.getEndOffset
+          val end =
+            if (Set(ScalaTokenTypes.tRPARENTHESIS, ScalaTokenTypes.tRSQBRACKET)
+                  .contains(
+                    e.getNode.getLastChildNode.getElementType
+                )) range.getEndOffset - 1
+            else range.getEndOffset
           result.add(new TextRange(start, end))
         }
       //case for selecting extends block
@@ -41,44 +45,54 @@ class ScalaWordSelectioner extends ExtendWordSelectionHandlerBase {
         }
         result.add(new TextRange(start, end))
         def isEmptyChar(c: Char): Boolean = c == ' ' || c == '\n'
-        while (isEmptyChar(ext.getContainingFile.getText.charAt(end - 1))) end = end - 1
+        while (isEmptyChar(ext.getContainingFile.getText.charAt(end - 1))) end = end -
+        1
         if (start <= end) result.add(new TextRange(start, end))
       //case for references
       case x: ScReferenceElement =>
         //choosing end offset, another to method call
-        val offset = if (!x.getParent.isInstanceOf[ScMethodCall]) x.getTextRange.getEndOffset
-        else x.getParent.getTextRange.getEndOffset
+        val offset =
+          if (!x.getParent.isInstanceOf[ScMethodCall])
+            x.getTextRange.getEndOffset
+          else x.getParent.getTextRange.getEndOffset
         //clear result if method call
         if (x.getParent.isInstanceOf[ScMethodCall]) result.clear()
         x.qualifier match {
           case Some(qual) => {
-            //get ranges for previos qualifier
-            val ranges = select(qual, editorText, cursorOffset, editor).toArray(new Array[TextRange](0))
-            for (fRange <- ranges if fRange.getEndOffset == qual.getTextRange.getEndOffset) {
-              //cancatenating ranges
-              val tRange = new TextRange(if (fRange.getStartOffset != fRange.getEndOffset) fRange.getStartOffset
-              else {
-                //if we have dummy range we must find td letter to concatenate ranges
-                var end = fRange.getEndOffset
-                var flag = true
-                while (flag) {
-                  editorText.charAt(end) match {
-                    case ' ' | '.' | '\n' => end += 1
-                    case _ => flag = false
-                  }
-                }
-                end
-              }, offset)
-              result.add(tRange)
+              //get ranges for previos qualifier
+              val ranges = select(qual, editorText, cursorOffset, editor)
+                .toArray(new Array[TextRange](0))
+              for (fRange <- ranges
+                                if fRange.getEndOffset == qual.getTextRange.getEndOffset) {
+                //cancatenating ranges
+                val tRange = new TextRange(
+                    if (fRange.getStartOffset != fRange.getEndOffset)
+                      fRange.getStartOffset
+                    else {
+                      //if we have dummy range we must find td letter to concatenate ranges
+                      var end = fRange.getEndOffset
+                      var flag = true
+                      while (flag) {
+                        editorText.charAt(end) match {
+                          case ' ' | '.' | '\n' => end += 1
+                          case _ => flag = false
+                        }
+                      }
+                      end
+                    },
+                    offset)
+                result.add(tRange)
+              }
+              //adding dummy range for recursion
+              result.add(new TextRange(offset, offset))
             }
-            //adding dummy range for recursion
-            result.add(new TextRange(offset, offset))
-          }
-          case None => result.add(new TextRange(offset, offset)) //adding dummy range for recursion
+          case None =>
+            result.add(new TextRange(offset, offset)) //adding dummy range for recursion
         }
       case x: ScMethodCall =>
         x.getEffectiveInvokedExpr match {
-          case ref: ScReferenceElement => return select(ref, editorText, cursorOffset, editor)
+          case ref: ScReferenceElement =>
+            return select(ref, editorText, cursorOffset, editor)
           case _ =>
         }
       case _ =>

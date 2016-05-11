@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.compiler
 
@@ -23,8 +23,10 @@ class FloatJSTest {
     assertTrue(froundNotInlined(Double.NaN).isNaN)
     assertEquals(Double.PositiveInfinity, 1 / froundNotInlined(0.0).toDouble)
     assertEquals(Double.NegativeInfinity, 1 / froundNotInlined(-0.0).toDouble)
-    assertEquals(Float.PositiveInfinity, froundNotInlined(Double.PositiveInfinity))
-    assertEquals(Float.NegativeInfinity, froundNotInlined(Double.NegativeInfinity))
+    assertEquals(
+        Float.PositiveInfinity, froundNotInlined(Double.PositiveInfinity))
+    assertEquals(
+        Float.NegativeInfinity, froundNotInlined(Double.NegativeInfinity))
   }
 
   @Test def fround_overflows(): Unit = {
@@ -33,8 +35,10 @@ class FloatJSTest {
   }
 
   @Test def fround_underflows(): Unit = {
-    assertEquals(Double.PositiveInfinity, 1 / froundNotInlined(1e-300).toDouble)
-    assertEquals(Double.NegativeInfinity, 1 / froundNotInlined(-1e-300).toDouble)
+    assertEquals(
+        Double.PositiveInfinity, 1 / froundNotInlined(1e-300).toDouble)
+    assertEquals(
+        Double.NegativeInfinity, 1 / froundNotInlined(-1e-300).toDouble)
   }
 
   @Test def fround_normal_cases(): Unit = {
@@ -69,7 +73,8 @@ class FloatJSTest {
     test(1.973497969450596E-21, 1.973498047135062E-21)
   }
 
-  @Test def Int_should_be_cast_to_Float_when_comparing_to_Float_issue_1878(): Unit = {
+  @Test
+  def Int_should_be_cast_to_Float_when_comparing_to_Float_issue_1878(): Unit = {
     val intMax: Int = Int.MaxValue
     val float: Float = (Int.MaxValue - 1).toFloat
 

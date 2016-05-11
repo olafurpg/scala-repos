@@ -1,8 +1,8 @@
 import language._
 
 object Foo {
-  object I { 
-    def +(other: I.type) : Unit = ()
+  object I {
+    def +(other: I.type): Unit = ()
   }
   object BI {
     def +(other: BI.type): Unit = ()

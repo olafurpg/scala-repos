@@ -10,5 +10,5 @@ object Test extends Application {
   val a = new A
   //implicit def c2fun = (c: C) => (x: String) => print("no")
   implicit def a2b: A => B = p => new B
-  a./* line: 7 */foo("")
+  a. /* line: 7 */ foo("")
 }

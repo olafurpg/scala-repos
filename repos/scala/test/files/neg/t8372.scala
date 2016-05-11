@@ -6,5 +6,6 @@ class t8372 {
   // type inference early enough
   def unzip[T1, T2](a: Array[(T1, T2)]) = a.unzip
   // the same as above
-  def unzip3[T1, T2, T3](a: Array[(T1, T2, T3)]): (Array[T1], Array[T2], Array[T3]) = a.unzip3
+  def unzip3[T1, T2, T3](
+      a: Array[(T1, T2, T3)]): (Array[T1], Array[T2], Array[T3]) = a.unzip3
 }

@@ -18,9 +18,10 @@
 package org.apache.spark.util
 
 /**
- * A class loader which makes some protected methods in ClassLoader accessible.
- */
-private[spark] class ParentClassLoader(parent: ClassLoader) extends ClassLoader(parent) {
+  * A class loader which makes some protected methods in ClassLoader accessible.
+  */
+private[spark] class ParentClassLoader(parent: ClassLoader)
+    extends ClassLoader(parent) {
 
   override def findClass(name: String): Class[_] = {
     super.findClass(name)
@@ -33,5 +34,4 @@ private[spark] class ParentClassLoader(parent: ClassLoader) extends ClassLoader(
   override def loadClass(name: String, resolve: Boolean): Class[_] = {
     super.loadClass(name, resolve)
   }
-
 }

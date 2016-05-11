@@ -1,5 +1,5 @@
 trait Bool {
-  type If[T]
+  type If [T]
 }
 
 trait False extends Bool {

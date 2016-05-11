@@ -22,8 +22,7 @@ package ragnarok
 package test
 
 object KeenfulTestSuite1 extends PerfTestSuite {
-  query(
-    """
+  query("""
 import std::time::*
 
 data := //keenful

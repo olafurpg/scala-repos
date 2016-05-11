@@ -1,4 +1,3 @@
-object B
-{
-	val x = A.x("3")
+object B {
+  val x = A.x("3")
 }

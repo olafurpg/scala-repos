@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
 /**
- * @author Ksenia.Sautina
- * @since 7/25/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 7/25/12
+  */
 class SendSelectionToConsoleAction extends AnAction {
 
   override def update(e: AnActionEvent) {
@@ -62,8 +61,7 @@ class SendSelectionToConsoleAction extends AnAction {
         case _: ScalaFile => enable()
         case _ => disable()
       }
-    }
-    catch {
+    } catch {
       case e: Exception => disable()
     }
   }
@@ -90,7 +88,8 @@ class SendSelectionToConsoleAction extends AnAction {
 
       extensions.inWriteAction {
         val range: TextRange = new TextRange(0, document.getTextLength)
-        consoleEditor.getSelectionModel.setSelection(range.getStartOffset, range.getEndOffset)
+        consoleEditor.getSelectionModel.setSelection(
+            range.getStartOffset, range.getEndOffset)
         console.addToHistory(range, console.getConsoleEditor, true)
         controller.addToHistory(text)
 
@@ -98,22 +97,22 @@ class SendSelectionToConsoleAction extends AnAction {
         consoleEditor.getDocument.setText("")
       }
 
-      text.split('\n').foreach(line => {
-        if (line != "") {
-          val outputStream: OutputStream = processHandler.getProcessInput
-          try {
-            val bytes: Array[Byte] = (line + "\n").getBytes
-            outputStream.write(bytes)
-            outputStream.flush()
-          }
-          catch {
-            case e: IOException => //ignore
-          }
-        }
-        console.textSent(line + "\n")
-      })
+      text
+        .split('\n')
+        .foreach(line =>
+              {
+            if (line != "") {
+              val outputStream: OutputStream = processHandler.getProcessInput
+              try {
+                val bytes: Array[Byte] = (line + "\n").getBytes
+                outputStream.write(bytes)
+                outputStream.flush()
+              } catch {
+                case e: IOException => //ignore
+              }
+            }
+            console.textSent(line + "\n")
+        })
     }
   }
 }
-
-

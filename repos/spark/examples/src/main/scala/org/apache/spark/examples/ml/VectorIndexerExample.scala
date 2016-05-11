@@ -31,7 +31,9 @@ object VectorIndexerExample {
     val sqlContext = new SQLContext(sc)
 
     // $example on$
-    val data = sqlContext.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+    val data = sqlContext.read
+      .format("libsvm")
+      .load("data/mllib/sample_libsvm_data.txt")
 
     val indexer = new VectorIndexer()
       .setInputCol("features")
@@ -42,7 +44,7 @@ object VectorIndexerExample {
 
     val categoricalFeatures: Set[Int] = indexerModel.categoryMaps.keys.toSet
     println(s"Chose ${categoricalFeatures.size} categorical features: " +
-      categoricalFeatures.mkString(", "))
+        categoricalFeatures.mkString(", "))
 
     // Create new column "indexed" with categorical values transformed to indices
     val indexedData = indexerModel.transform(data)

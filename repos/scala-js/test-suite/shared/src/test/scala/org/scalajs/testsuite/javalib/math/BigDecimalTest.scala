@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.math
 
@@ -12,7 +12,7 @@ import java.math.BigDecimal
 import org.junit.Test
 import org.junit.Assert._
 
-class BigDecimalTest  {
+class BigDecimalTest {
 
   // java.lang.Math.BigDecimal Int/Long Constructors
 
@@ -120,7 +120,7 @@ class BigDecimalTest  {
   }
 
   @Test def `should accept 9999.9999 as a double`(): Unit = {
-    val d:Double = 9999.9999
+    val d: Double = 9999.9999
     val bd = new BigDecimal(d)
     assertEquals(d, bd.doubleValue(), 0.0)
   }

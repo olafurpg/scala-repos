@@ -23,9 +23,8 @@ class TempFileTest extends WordSpec {
 
       assert(Arrays.equals(c1, c2))
       assert(Arrays.equals(c2, c3))
-      assert(new DataInputStream(new ByteArrayInputStream(c1)).readInt == 0xcafebabe)
+      assert(
+          new DataInputStream(new ByteArrayInputStream(c1)).readInt == 0xcafebabe)
     }
-
   }
-
 }

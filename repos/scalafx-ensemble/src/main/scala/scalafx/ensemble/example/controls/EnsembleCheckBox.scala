@@ -45,19 +45,16 @@ class EnsembleCheckBox extends EnsembleExample {
     hgrow = Priority.Always
     spacing = 10
     padding = Insets(20)
-    children = List(
-      new CheckBox {
-        text = "Simple CheckBox"
-      },
-      new CheckBox {
-        text = "Three state checkbox"
-        allowIndeterminate = true
-        indeterminate = false
-      },
-      new CheckBox {
-        text = "Disabled"
-        selected = true
-        disable = true
-      })
+    children = List(new CheckBox {
+      text = "Simple CheckBox"
+    }, new CheckBox {
+      text = "Three state checkbox"
+      allowIndeterminate = true
+      indeterminate = false
+    }, new CheckBox {
+      text = "Disabled"
+      selected = true
+      disable = true
+    })
   }
 }

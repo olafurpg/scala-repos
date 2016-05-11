@@ -7,31 +7,30 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 /**
- * @author ktakagaki
- * @date 2/18/14.
- */
+  * @author ktakagaki
+  * @date 2/18/14.
+  */
 @RunWith(classOf[JUnitRunner])
 class rootMeanSquareTest extends FunSuite {
 
-  test("rootMeanSquare Double"){
+  test("rootMeanSquare Double") {
     val temp = DenseVector[Double](3.0, 5.0, 1.0, 1.0)
-    assert( rootMeanSquare(temp) == 3.0 )
+    assert(rootMeanSquare(temp) == 3.0)
   }
 
-  test("rootMeanSquare Float"){
+  test("rootMeanSquare Float") {
     val temp = DenseVector[Float](3.0f, 5.0f, 1.0f, 1.0f)
-    assert( rootMeanSquare(temp) == 3.0f )
+    assert(rootMeanSquare(temp) == 3.0f)
   }
 
-  test("rootMeanSquare Int"){
+  test("rootMeanSquare Int") {
     val temp = DenseVector[Int](3, 5, 1, 1)
     println(rootMeanSquare(temp))
-    assert( rootMeanSquare(temp) == 3d )
+    assert(rootMeanSquare(temp) == 3d)
   }
 
-  test("rootMeanSquare Long"){
+  test("rootMeanSquare Long") {
     val temp = DenseVector[Long](3L, 5L, 1L, 1L)
-    assert( rootMeanSquare(temp) == 3d )
+    assert(rootMeanSquare(temp) == 3d)
   }
-
 }

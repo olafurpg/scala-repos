@@ -1,6 +1,6 @@
 class CompanionAccess {
   class A {
-    A./*ref*/y
+    A. /*ref*/ y
   }
 
   object A {

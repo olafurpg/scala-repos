@@ -9,11 +9,14 @@ import com.intellij.util.Processor
 import org.jetbrains.annotations.NotNull
 
 /**
- * Searches for scala methods defined inside of local scopes, ie methods for which .getContainingClass == null.
- * These are not considered by [[com.intellij.psi.impl.search.MethodUsagesSearcher]]
- */
-class NonMemberMethodUsagesSearcher extends QueryExecutorBase[PsiReference, MethodReferencesSearch.SearchParameters] {
-  def processQuery(@NotNull p: MethodReferencesSearch.SearchParameters, @NotNull consumer: Processor[PsiReference]) {
+  * Searches for scala methods defined inside of local scopes, ie methods for which .getContainingClass == null.
+  * These are not considered by [[com.intellij.psi.impl.search.MethodUsagesSearcher]]
+  */
+class NonMemberMethodUsagesSearcher
+    extends QueryExecutorBase[
+        PsiReference, MethodReferencesSearch.SearchParameters] {
+  def processQuery(@NotNull p: MethodReferencesSearch.SearchParameters,
+                   @NotNull consumer: Processor[PsiReference]) {
     extensions.inReadAction {
       val method: PsiMethod = p.getMethod
       val collector: SearchRequestCollector = p.getOptimizer
@@ -24,8 +27,8 @@ class NonMemberMethodUsagesSearcher extends QueryExecutorBase[PsiReference, Meth
           consumer.process(t)
         }
       }
-      ReferencesSearch.searchOptimized(method, searchScope, false, collector, newConsumer)
+      ReferencesSearch.searchOptimized(
+          method, searchScope, false, collector, newConsumer)
     }
   }
 }
-

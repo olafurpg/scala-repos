@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.metrics
 
 import java.io.File
@@ -14,19 +13,19 @@ import scala.util.Failure
 import scala.util.Try
 
 /**
- * Provide sigar instance as `SigarProxy`.
- *
- * User can provision sigar classes and native library in one of the following ways:
- *
- * 1) Use <a href="https://github.com/kamon-io/sigar-loader">Kamon sigar-loader</a> as a project dependency for the user project.
- * Metrics extension will extract and load sigar library on demand with help of Kamon sigar provisioner.
- *
- * 2) Use <a href="https://github.com/kamon-io/sigar-loader">Kamon sigar-loader</a> as java agent: `java -javaagent:/path/to/sigar-loader.jar`
- * Kamon sigar loader agent will extract and load sigar library during JVM start.
- *
- * 3) Place `sigar.jar` on the `classpath` and sigar native library for the o/s on the `java.library.path`
- * User is required to manage both project dependency and library deployment manually.
- */
+  * Provide sigar instance as `SigarProxy`.
+  *
+  * User can provision sigar classes and native library in one of the following ways:
+  *
+  * 1) Use <a href="https://github.com/kamon-io/sigar-loader">Kamon sigar-loader</a> as a project dependency for the user project.
+  * Metrics extension will extract and load sigar library on demand with help of Kamon sigar provisioner.
+  *
+  * 2) Use <a href="https://github.com/kamon-io/sigar-loader">Kamon sigar-loader</a> as java agent: `java -javaagent:/path/to/sigar-loader.jar`
+  * Kamon sigar loader agent will extract and load sigar library during JVM start.
+  *
+  * 3) Place `sigar.jar` on the `classpath` and sigar native library for the o/s on the `java.library.path`
+  * User is required to manage both project dependency and library deployment manually.
+  */
 trait SigarProvider {
 
   /** Library extract location. */
@@ -57,10 +56,10 @@ trait SigarProvider {
   }
 
   /**
-   *  Create sigar instance with 2-phase sigar library loading.
-   *  1) Assume that library is already provisioned.
-   *  2) Attempt to provision library via sigar-loader.
-   */
+    *  Create sigar instance with 2-phase sigar library loading.
+    *  1) Assume that library is already provisioned.
+    *  2) Attempt to provision library via sigar-loader.
+    */
   def createSigarInstance: SigarProxy = {
     TryNative {
       verifiedSigarInstance
@@ -68,33 +67,35 @@ trait SigarProvider {
       provisionSigarLibrary()
       verifiedSigarInstance
     } recover {
-      case e: Throwable ⇒ throw new RuntimeException("Failed to load sigar:", e)
+      case e: Throwable ⇒
+        throw new RuntimeException("Failed to load sigar:", e)
     } get
   }
-
 }
 
 object SigarProvider {
+
   /**
-   * Release underlying sigar proxy resources.
-   *
-   * Note: `SigarProxy` is not `Sigar` during tests.
-   */
+    * Release underlying sigar proxy resources.
+    *
+    * Note: `SigarProxy` is not `Sigar` during tests.
+    */
   def close(sigar: SigarProxy) = {
     if (sigar.isInstanceOf[Sigar]) sigar.asInstanceOf[Sigar].close()
   }
 }
 
 /**
- * Provide sigar instance as `SigarProxy` with configured location via [[ClusterMetricsSettings]].
- */
-case class DefaultSigarProvider(settings: ClusterMetricsSettings) extends SigarProvider {
+  * Provide sigar instance as `SigarProxy` with configured location via [[ClusterMetricsSettings]].
+  */
+case class DefaultSigarProvider(settings: ClusterMetricsSettings)
+    extends SigarProvider {
   def extractFolder = settings.NativeLibraryExtractFolder
 }
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[metrics] object TryNative {
   def apply[T](r: ⇒ T): Try[T] =
     try Success(r) catch {

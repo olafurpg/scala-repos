@@ -6,5 +6,6 @@ trait PimpedType[T] {
 
 class Sub extends PimpedType[X] {
   import value._
-  /* line: 1 */ x // resolve error
+  /* line: 1 */
+  x // resolve error
 }

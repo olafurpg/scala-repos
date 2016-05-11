@@ -7,16 +7,17 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
 
 /**
- * User: Alefas
- * Date: 06.02.12
- */
-
-class TypeParameterShadowInspection extends AbstractInspection("TypeParameterShadowInspection", "Suspicious shadowing by a Type Parameter") {
+  * User: Alefas
+  * Date: 06.02.12
+  */
+class TypeParameterShadowInspection
+    extends AbstractInspection("TypeParameterShadowInspection",
+                               "Suspicious shadowing by a Type Parameter") {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case refPat: ScTypeParam => check(refPat, holder)
   }
-  
+
   private def isShadowing(refPat: ScTypeParam): Option[ScTypeParametersOwner] = {
     var parent: PsiElement = refPat.getParent
     val owner = refPat.owner
@@ -36,10 +37,13 @@ class TypeParameterShadowInspection extends AbstractInspection("TypeParameterSha
   private def check(typeParam: ScTypeParam, holder: ProblemsHolder) {
     isShadowing(typeParam) match {
       case Some(_) =>
-        holder.registerProblem(typeParam.nameId, getDisplayName + ": " + typeParam.name, new RenameTypeParameterFix(typeParam))
+        holder.registerProblem(typeParam.nameId,
+                               getDisplayName + ": " + typeParam.name,
+                               new RenameTypeParameterFix(typeParam))
       case _ =>
     }
   }
 }
 
-class RenameTypeParameterFix(tp: ScTypeParam) extends RenameElementQuickfix(tp, "Rename Variable Pattern")
+class RenameTypeParameterFix(tp: ScTypeParam)
+    extends RenameElementQuickfix(tp, "Rename Variable Pattern")

@@ -1,4 +1,3 @@
-
 package scala.util
 
 import org.junit.Assert._
@@ -7,8 +6,8 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 /** The java version property uses the spec version
- *  and must work for all "major.minor" and fail otherwise.
- */
+  *  and must work for all "major.minor" and fail otherwise.
+  */
 @RunWith(classOf[JUnit4])
 class SpecVersionTest {
   val sut = new PropertiesTrait {

@@ -1,9 +1,9 @@
- package x 
- import a._ 
- class f 
- class g( ) extends k { 
-   def foo( ) = /*caret*/return true
- } 
+package x
+import a._
+class f
+class g() extends k {
+  def foo() = /*caret*/ return true
+}
 /*
 do
 false
@@ -18,4 +18,4 @@ throw
 true
 try
 while
-*/
+ */

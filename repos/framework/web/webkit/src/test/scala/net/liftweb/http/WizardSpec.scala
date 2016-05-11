@@ -24,12 +24,13 @@ import util._
 import http._
 
 /**
- * System under specification for Wizard.
- */
-object WizardSpec extends Specification  {
+  * System under specification for Wizard.
+  */
+object WizardSpec extends Specification {
   "Wizard Specification".title
 
-  val session: LiftSession = new LiftSession("", Helpers.randomString(20), Empty)
+  val session: LiftSession = new LiftSession(
+      "", Helpers.randomString(20), Empty)
 
   class WizardForTesting extends Wizard {
     object completeInfo extends WizardVar(false)
@@ -40,22 +41,25 @@ object WizardSpec extends Specification  {
     }
 
     class NameAndAgeScreen extends Screen {
-      val name = field(S ? "First Name", "",
-                       valMinLen(2, S ? "Name Too Short"))
+      val name = field(
+          S ? "First Name", "", valMinLen(2, S ? "Name Too Short"))
 
-      val age = field(S ? "Age", 0,
+      val age = field(S ? "Age",
+                      0,
                       minVal(5, S ? "Too young"),
                       maxVal(120, S ? "You should be dead"))
 
       override def nextScreen = if (age.is < 18) parentName else favoritePet
     }
     class ParentNameScreen extends Screen {
-      val parentName = field(S ? "Mom or Dad's name", "",
+      val parentName = field(S ? "Mom or Dad's name",
+                             "",
                              valMinLen(2, S ? "Name Too Short"),
                              valMaxLen(40, S ? "Name Too Long"))
     }
     class FavoritePetScreen extends Screen {
-      val petName = field(S ? "Pet's name", "",
+      val petName = field(S ? "Pet's name",
+                          "",
                           valMinLen(2, S ? "Name Too Short"),
                           valMaxLen(40, S ? "Name Too Long"))
     }
@@ -73,33 +77,39 @@ object WizardSpec extends Specification  {
   }
 
   "A field must have a correct Manifest" in {
-    MyWizard.nameAndAge.age.manifest.runtimeClass.getName must_== classOf[Int].getName
+    MyWizard.nameAndAge.age.manifest.runtimeClass.getName must_==
+      classOf[Int].getName
   }
 
   "A wizard must transition from first screen to second screen" in {
     S.initIfUninitted(session) {
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.nameAndAge
 
       MyWizard.nextScreen
 
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.nameAndAge
 
       MyWizard.nameAndAge.name.set("David")
       MyWizard.nameAndAge.age.set(14)
 
       MyWizard.nextScreen
 
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.parentName
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.parentName
 
       MyWizard.prevScreen
 
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.nameAndAge
 
       MyWizard.nameAndAge.age.set(45)
 
       MyWizard.nextScreen
 
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.favoritePet
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.favoritePet
 
       S.clearCurrentNotices
 
@@ -115,24 +125,28 @@ object WizardSpec extends Specification  {
 
   "A wizard must be able to snapshot itself" in {
     val ss = S.initIfUninitted(session) {
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.nameAndAge
 
       MyWizard.nextScreen
 
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.nameAndAge
 
       MyWizard.nameAndAge.name.set("David")
       MyWizard.nameAndAge.age.set(14)
 
       MyWizard.nextScreen
 
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.parentName
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.parentName
 
       MyWizard.createSnapshot
     }
 
     S.initIfUninitted(session) {
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.nameAndAge
     }
 
     S.initIfUninitted(session) {
@@ -140,13 +154,15 @@ object WizardSpec extends Specification  {
 
       MyWizard.prevScreen
 
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.nameAndAge
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.nameAndAge
 
       MyWizard.nameAndAge.age.set(45)
 
       MyWizard.nextScreen
 
-      MyWizard.currentScreen.openOrThrowException("legacy code") must_== MyWizard.favoritePet
+      MyWizard.currentScreen.openOrThrowException("legacy code") must_==
+        MyWizard.favoritePet
 
       S.clearCurrentNotices
 
@@ -160,4 +176,3 @@ object WizardSpec extends Specification  {
     }
   }
 }
-

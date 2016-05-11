@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.dispatch
 
 import java.util.concurrent.TimeUnit
@@ -21,7 +21,6 @@ class CachingConfigBenchmark {
   val deepConfig = ConfigFactory.parseString(deepConfigString)
   val deepCaching = new CachingConfig(deepConfig)
 
-  @Benchmark def deep_config  = deepConfig.hasPath(deepKey)
+  @Benchmark def deep_config = deepConfig.hasPath(deepKey)
   @Benchmark def deep_caching = deepCaching.hasPath(deepKey)
-
 }

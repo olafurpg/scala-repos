@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -53,7 +53,6 @@ class LinkedHashSetTest extends HashSetTest {
     assertFalse(iter2.hasNext())
     assertTrue(result2.equals(l2))
   }
-
 }
 
 object LinkedHashSetFactory extends HashSetFactory {
@@ -65,6 +64,6 @@ class LinkedHashSetFactory extends HashSetFactory {
   override def implementationName: String =
     "java.util.LinkedHashSet"
 
-  override def empty[E: ClassTag]: ju.LinkedHashSet[E] =
+  override def empty[E : ClassTag]: ju.LinkedHashSet[E] =
     new ju.LinkedHashSet[E]()
 }

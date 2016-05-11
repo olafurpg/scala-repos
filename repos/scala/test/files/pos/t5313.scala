@@ -2,12 +2,12 @@ object DepBug {
   class A {
     class B
     def mkB = new B
-    def m(b : B) = b
+    def m(b: B) = b
   }
 
   trait Dep {
-    val a : A
-    val b : a.B
+    val a: A
+    val b: a.B
   }
 
   val dep = new Dep {
@@ -15,16 +15,15 @@ object DepBug {
     val b = a.mkB
   }
 
-  def useDep(d : Dep) {
+  def useDep(d: Dep) {
     import d._
-    a.m(b)         // OK
+    a.m(b) // OK
   }
 
   {
     import dep._
-    a.m(b)           // OK with 2.9.1.final, error on trunk
+    a.m(b) // OK with 2.9.1.final, error on trunk
   }
 
   dep.a.m(dep.b)
-
 }

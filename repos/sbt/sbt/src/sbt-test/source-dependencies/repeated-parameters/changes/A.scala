@@ -1,4 +1,3 @@
-object A
-{
-	def x(i: Seq[String]) = ()
+object A {
+  def x(i: Seq[String]) = ()
 }

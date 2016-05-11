@@ -1,5 +1,3 @@
 package org
 
-package object `package` {
-
-}
+package object `package` {}

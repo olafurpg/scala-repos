@@ -4,5 +4,5 @@ class Test {
     def cast(x: Int) = 1
   }
   implicit def foo(x: Class[Boolean]): RichClass.type = RichClass
-  z./* */cast(false)
+  z. /* */ cast(false)
 }

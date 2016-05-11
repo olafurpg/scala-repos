@@ -37,33 +37,36 @@ import scalafx.scene.image.Image
 import scalafx.scene.image.ImageIncludes.jfxImage2sfx
 
 /**
- * Object companion for [[scalafx.scene.input.Dragboard]].
- */
+  * Object companion for [[scalafx.scene.input.Dragboard]].
+  */
 object Dragboard {
-  implicit def sfxDragboard2jfx(d: Dragboard): jfxsi.Dragboard = if (d != null) d.delegate else null
+  implicit def sfxDragboard2jfx(d: Dragboard): jfxsi.Dragboard =
+    if (d != null) d.delegate else null
 }
 
 /**
- * Wraps a $JFX $URL0 $FC]].
- *
- * @constructor Creates a new $FC from a $JFX one.
- * @param delegate A $JFX $FC to be wrapped. Its default value is a new $JFX $FC.
- *
- * @define FC Dragboard
- * @define URL0 [[http://docs.oracle.com/javase/8/javafx/scene/input/Dragboard.html
- * @define JFX JavaFX
- * @define ORIGINALDOC Original Documentation]].
- */
-class Dragboard(override val delegate: jfxsi.Dragboard) extends Clipboard(delegate) with SFXDelegate[jfxsi.Dragboard] {
+  * Wraps a $JFX $URL0 $FC]].
+  *
+  * @constructor Creates a new $FC from a $JFX one.
+  * @param delegate A $JFX $FC to be wrapped. Its default value is a new $JFX $FC.
+  *
+  * @define FC Dragboard
+  * @define URL0 [[http://docs.oracle.com/javase/8/javafx/scene/input/Dragboard.html
+  * @define JFX JavaFX
+  * @define ORIGINALDOC Original Documentation]].
+  */
+class Dragboard(override val delegate: jfxsi.Dragboard)
+    extends Clipboard(delegate) with SFXDelegate[jfxsi.Dragboard] {
 
   /** The image used as a drag view. */
   def dragView: Image = delegate.getDragView
   def dragView_=(image: Image): Unit = {
     delegate.setDragView(image)
   }
+
   /**
-   * Sets the visual representation of data being transfered in a drag and drop gesture.
-   */
+    * Sets the visual representation of data being transfered in a drag and drop gesture.
+    */
   def dragView_=(image: Image, offsetX: Double, offsetY: Double): Unit = {
     delegate.setDragView(image)
   }
@@ -82,5 +85,4 @@ class Dragboard(override val delegate: jfxsi.Dragboard) extends Clipboard(delega
 
   /** Transport modes supported by source of this drag operation. */
   def transferModes: Set[jfxsi.TransferMode] = delegate.getTransferModes
-
 }

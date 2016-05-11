@@ -15,30 +15,38 @@ import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.{ExtractMethod
 
 import scala.collection.mutable
 
-
 /**
- * Nikolay.Tropin
- * 2014-05-15
- */
-class DuplicateMatch(pattern: DuplicatePattern, val candidates: Seq[PsiElement]) {
-  private val parameterValues = mutable.Map[ExtractMethodParameter, ScExpression]()
-  private val definitionCorrespondence = mutable.Map[ScTypedDefinition, ScTypedDefinition]()
+  * Nikolay.Tropin
+  * 2014-05-15
+  */
+class DuplicateMatch(
+    pattern: DuplicatePattern, val candidates: Seq[PsiElement]) {
+  private val parameterValues =
+    mutable.Map[ExtractMethodParameter, ScExpression]()
+  private val definitionCorrespondence =
+    mutable.Map[ScTypedDefinition, ScTypedDefinition]()
 
   def isDuplicate: Boolean = checkElementSeq(pattern.elements, candidates)
 
-  def parameterText(param: ExtractMethodParameter) = parameterValues.get(param) match {
-    case Some(e) => e.getText
-    case None => throw new IllegalStateException(s"Could not find value of the parameter ${param.newName}")
-  }
+  def parameterText(param: ExtractMethodParameter) =
+    parameterValues.get(param) match {
+      case Some(e) => e.getText
+      case None =>
+        throw new IllegalStateException(
+            s"Could not find value of the parameter ${param.newName}")
+    }
 
-  def outputName(output: ExtractMethodOutput) = definitionCorrespondence.get(output.fromElement) match {
-    case Some(td) => td.name
-    case None => output.paramName
-  }
+  def outputName(output: ExtractMethodOutput) =
+    definitionCorrespondence.get(output.fromElement) match {
+      case Some(td) => td.name
+      case None => output.paramName
+    }
 
-  def textRange = candidates.head.getTextRange.union(candidates.last.getTextRange)
+  def textRange =
+    candidates.head.getTextRange.union(candidates.last.getTextRange)
 
-  private def checkElementSeq(subPatterns: Seq[PsiElement], subCandidates: Seq[PsiElement]): Boolean = {
+  private def checkElementSeq(subPatterns: Seq[PsiElement],
+                              subCandidates: Seq[PsiElement]): Boolean = {
     val filteredP = filtered(subPatterns)
     val filteredC = filtered(subCandidates)
     if (filteredC.size != filteredP.size) return false
@@ -49,11 +57,13 @@ class DuplicateMatch(pattern: DuplicatePattern, val candidates: Seq[PsiElement])
     }
   }
 
-  private def checkChildren(subPattern: PsiElement, subCandidate: PsiElement): Boolean = {
+  private def checkChildren(
+      subPattern: PsiElement, subCandidate: PsiElement): Boolean = {
     checkElementSeq(subPattern.children.toSeq, subCandidate.children.toSeq)
   }
 
-  private def checkElement(subPattern: PsiElement, candidate: PsiElement): Boolean = {
+  private def checkElement(
+      subPattern: PsiElement, candidate: PsiElement): Boolean = {
     if (!canBeEquivalent(subPattern, candidate)) return false
 
     (subPattern, candidate) match {
@@ -62,23 +72,30 @@ class DuplicateMatch(pattern: DuplicatePattern, val candidates: Seq[PsiElement])
           definitionCorrespondence += (td -> tdCand)
           true
         } else false
-      case (ref: ScReferenceExpression, expr: ScExpression) if pattern.paramOccurences.contains(ref) =>
+      case (ref: ScReferenceExpression, expr: ScExpression)
+          if pattern.paramOccurences.contains(ref) =>
         val p = pattern.paramOccurences(ref)
         val paramValue = parameterValues.getOrElseUpdate(p, expr)
-        PsiEquivalenceUtil.areElementsEquivalent(paramValue, expr) && typesEquiv(ref, expr)
-      case Both(
-      (ref1: ScReferenceExpression, ref2: ScReferenceExpression),
-      (ResolvesTo(td1: ScTypedDefinition), ResolvesTo(td2: ScTypedDefinition)))
-        if pattern.definitions.contains(td1) =>
-        definitionCorrespondence.get(td1) == Some(td2) && typesEquiv(ref1, ref2)
-      case Both((ref1: ScReferenceElement, ref2: ScReferenceElement), (ResolvesTo(res1), ResolvesTo(res2)))
-        if res1 != res2 =>
+        PsiEquivalenceUtil.areElementsEquivalent(paramValue, expr) &&
+        typesEquiv(ref, expr)
+      case Both((ref1: ScReferenceExpression, ref2: ScReferenceExpression),
+                (ResolvesTo(td1: ScTypedDefinition),
+                 ResolvesTo(td2: ScTypedDefinition)))
+          if pattern.definitions.contains(td1) =>
+        definitionCorrespondence.get(td1) == Some(td2) &&
+        typesEquiv(ref1, ref2)
+      case Both((ref1: ScReferenceElement, ref2: ScReferenceElement),
+                (ResolvesTo(res1), ResolvesTo(res2))) if res1 != res2 =>
         (res1, res2) match {
-          case (sf1: ScSyntheticFunction, sf2: ScSyntheticFunction) => sf1.isStringPlusMethod && sf2.isStringPlusMethod
+          case (sf1: ScSyntheticFunction, sf2: ScSyntheticFunction) =>
+            sf1.isStringPlusMethod && sf2.isStringPlusMethod
           case _ => false
         }
-      case (intd1: ScInterpolatedStringLiteral, intd2: ScInterpolatedStringLiteral) => checkChildren(intd1, intd2)
-      case (ElementType(ScalaTokenTypes.tINTERPOLATED_STRING), ElementType(ScalaTokenTypes.tINTERPOLATED_STRING)) =>
+      case (intd1: ScInterpolatedStringLiteral,
+            intd2: ScInterpolatedStringLiteral) =>
+        checkChildren(intd1, intd2)
+      case (ElementType(ScalaTokenTypes.tINTERPOLATED_STRING),
+            ElementType(ScalaTokenTypes.tINTERPOLATED_STRING)) =>
         subPattern.getText == candidate.getText
       case (lit1: ScLiteral, lit2: ScLiteral) => lit1.getValue == lit2.getValue
       case _ => checkChildren(subPattern, candidate)
@@ -89,7 +106,8 @@ class DuplicateMatch(pattern: DuplicatePattern, val candidates: Seq[PsiElement])
     (expr1.getType(), expr2.getType()) match {
       case (Success(t1, _), Success(t2, _)) =>
         def extractFromSingletonType(t: ScType) =
-          if (ScType.isSingletonType(t)) ScType.extractDesignatorSingletonType(t)
+          if (ScType.isSingletonType(t))
+            ScType.extractDesignatorSingletonType(t)
           else Some(t)
         val Seq(newTp1, newTp2) = Seq(t1, t2).map(extractFromSingletonType)
         newTp1.zip(newTp2).forall {
@@ -99,5 +117,4 @@ class DuplicateMatch(pattern: DuplicatePattern, val candidates: Seq[PsiElement])
       case _ => false
     }
   }
-
 }

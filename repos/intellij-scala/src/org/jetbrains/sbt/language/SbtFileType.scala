@@ -5,8 +5,8 @@ import com.intellij.openapi.fileTypes.LanguageFileType
 import org.jetbrains.plugins.scala.ScalaFileType
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 object SbtFileType extends LanguageFileType(ScalaFileType.SCALA_LANGUAGE) {
   def getName = Sbt.Name
 

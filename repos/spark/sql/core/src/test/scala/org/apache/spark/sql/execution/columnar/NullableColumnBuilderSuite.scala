@@ -23,12 +23,13 @@ import org.apache.spark.sql.catalyst.expressions.{GenericMutableRow, UnsafeProje
 import org.apache.spark.sql.types._
 
 class TestNullableColumnBuilder[JvmType](columnType: ColumnType[JvmType])
-  extends BasicColumnBuilder[JvmType](new NoopColumnStats, columnType)
-  with NullableColumnBuilder
+    extends BasicColumnBuilder[JvmType](new NoopColumnStats, columnType)
+    with NullableColumnBuilder
 
 object TestNullableColumnBuilder {
-  def apply[JvmType](columnType: ColumnType[JvmType], initialSize: Int = 0)
-    : TestNullableColumnBuilder[JvmType] = {
+  def apply[JvmType](
+      columnType: ColumnType[JvmType],
+      initialSize: Int = 0): TestNullableColumnBuilder[JvmType] = {
     val builder = new TestNullableColumnBuilder(columnType)
     builder.initialize(initialSize)
     builder
@@ -38,12 +39,20 @@ object TestNullableColumnBuilder {
 class NullableColumnBuilderSuite extends SparkFunSuite {
   import org.apache.spark.sql.execution.columnar.ColumnarTestUtils._
 
-  Seq(
-    BOOLEAN, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE,
-    STRING, BINARY, COMPACT_DECIMAL(15, 10), LARGE_DECIMAL(20, 10),
-    STRUCT(StructType(StructField("a", StringType) :: Nil)),
-    ARRAY(ArrayType(IntegerType)), MAP(MapType(IntegerType, StringType)))
-    .foreach {
+  Seq(BOOLEAN,
+      BYTE,
+      SHORT,
+      INT,
+      LONG,
+      FLOAT,
+      DOUBLE,
+      STRING,
+      BINARY,
+      COMPACT_DECIMAL(15, 10),
+      LARGE_DECIMAL(20, 10),
+      STRUCT(StructType(StructField("a", StringType) :: Nil)),
+      ARRAY(ArrayType(IntegerType)),
+      MAP(MapType(IntegerType, StringType))).foreach {
     testNullableColumnBuilder(_)
   }
 
@@ -91,14 +100,16 @@ class NullableColumnBuilderSuite extends SparkFunSuite {
       assertResult(4, "Wrong null count")(buffer.getInt())
 
       // For null positions
-      (1 to 7 by 2).foreach(assertResult(_, "Wrong null position")(buffer.getInt()))
+      (1 to 7 by 2)
+        .foreach(assertResult(_, "Wrong null position")(buffer.getInt()))
 
       // For non-null values
       val actual = new GenericMutableRow(new Array[Any](1))
       (0 until 4).foreach { _ =>
         columnType.extract(buffer, actual, 0)
-        assert(converter(actual.get(0, dataType)) === converter(randomRow.get(0, dataType)),
-          "Extracted value didn't equal to the original one")
+        assert(converter(actual.get(0, dataType)) === converter(
+                   randomRow.get(0, dataType)),
+               "Extracted value didn't equal to the original one")
       }
 
       assert(!buffer.hasRemaining)

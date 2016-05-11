@@ -4,11 +4,10 @@ import akka.actor._
 import com.typesafe.config.Config
 import scala.concurrent.duration._
 
-final class Env(
-    config: Config,
-    val scheduler: lila.common.Scheduler,
-    system: ActorSystem,
-    appPath: String) {
+final class Env(config: Config,
+                val scheduler: lila.common.Scheduler,
+                system: ActorSystem,
+                appPath: String) {
 
   val CliUsername = config getString "cli.username"
 
@@ -19,73 +18,75 @@ final class Env(
   lazy val bus = lila.common.Bus(system)
 
   lazy val preloader = new mashup.Preload(
-    tv = Env.tv.tv,
-    leaderboard = Env.user.cached.topWeek,
-    tourneyWinners = Env.tournament.winners.scheduled,
-    timelineEntries = Env.timeline.entryRepo.userEntries _,
-    dailyPuzzle = Env.puzzle.daily,
-    streamsOnAir = () => Env.tv.streamsOnAir.all,
-    countRounds = Env.round.count,
-    lobbyApi = Env.api.lobbyApi,
-    getPlayban = Env.playban.api.currentBan _,
-    lightUser = Env.user.lightUser)
+      tv = Env.tv.tv,
+      leaderboard = Env.user.cached.topWeek,
+      tourneyWinners = Env.tournament.winners.scheduled,
+      timelineEntries = Env.timeline.entryRepo.userEntries _,
+      dailyPuzzle = Env.puzzle.daily,
+      streamsOnAir = () => Env.tv.streamsOnAir.all,
+      countRounds = Env.round.count,
+      lobbyApi = Env.api.lobbyApi,
+      getPlayban = Env.playban.api.currentBan _,
+      lightUser = Env.user.lightUser)
 
   lazy val userInfo = mashup.UserInfo(
-    countUsers = () => Env.user.countEnabled,
-    bookmarkApi = Env.bookmark.api,
-    relationApi = Env.relation.api,
-    trophyApi = Env.user.trophyApi,
-    gameCached = Env.game.cached,
-    crosstableApi = Env.game.crosstableApi,
-    postApi = Env.forum.postApi,
-    getRatingChart = Env.history.ratingChartApi.apply,
-    getRanks = Env.user.cached.ranking.getAll,
-    isDonor = Env.donation.isDonor,
-    isHostingSimul = Env.simul.isHosting,
-    isStreamer = Env.tv.isStreamer.apply,
-    insightShare = Env.insight.share) _
+      countUsers = () => Env.user.countEnabled,
+      bookmarkApi = Env.bookmark.api,
+      relationApi = Env.relation.api,
+      trophyApi = Env.user.trophyApi,
+      gameCached = Env.game.cached,
+      crosstableApi = Env.game.crosstableApi,
+      postApi = Env.forum.postApi,
+      getRatingChart = Env.history.ratingChartApi.apply,
+      getRanks = Env.user.cached.ranking.getAll,
+      isDonor = Env.donation.isDonor,
+      isHostingSimul = Env.simul.isHosting,
+      isStreamer = Env.tv.isStreamer.apply,
+      insightShare = Env.insight.share) _
 
   system.actorOf(Props(new actor.Renderer), name = RendererName)
 
-  system.actorOf(Props(new actor.Router(
-    baseUrl = Env.api.Net.BaseUrl,
-    protocol = Env.api.Net.Protocol,
-    domain = Env.api.Net.Domain
-  )), name = RouterName)
+  system.actorOf(Props(
+                     new actor.Router(
+                         baseUrl = Env.api.Net.BaseUrl,
+                         protocol = Env.api.Net.Protocol,
+                         domain = Env.api.Net.Domain
+                     )),
+                 name = RouterName)
 
   lila.log.boot.info("Preloading modules")
   List(Env.socket,
-    Env.site,
-    Env.tournament,
-    Env.lobby,
-    Env.game,
-    Env.setup,
-    Env.round,
-    Env.team,
-    Env.message,
-    Env.timeline,
-    Env.gameSearch,
-    Env.teamSearch,
-    Env.forumSearch,
-    Env.relation,
-    Env.report,
-    Env.notification,
-    Env.bookmark,
-    Env.pref,
-    Env.chat,
-    Env.puzzle,
-    Env.tv,
-    Env.blog,
-    Env.video,
-    Env.shutup, // required to load the actor
-    Env.insight, // required to load the actor
-    Env.worldMap, // required to load the actor
-    Env.push, // required to load the actor
-    Env.perfStat, // required to load the actor
-    Env.slack, // required to load the actor
-    Env.challenge, // required to load the actor
-    Env.explorer, // required to load the actor
-    Env.fishnet // required to schedule the cleaner
+       Env.site,
+       Env.tournament,
+       Env.lobby,
+       Env.game,
+       Env.setup,
+       Env.round,
+       Env.team,
+       Env.message,
+       Env.timeline,
+       Env.gameSearch,
+       Env.teamSearch,
+       Env.forumSearch,
+       Env.relation,
+       Env.report,
+       Env.notification,
+       Env.bookmark,
+       Env.pref,
+       Env.chat,
+       Env.puzzle,
+       Env.tv,
+       Env.blog,
+       Env.video,
+       Env.shutup, // required to load the actor
+       Env.insight, // required to load the actor
+       Env.worldMap, // required to load the actor
+       Env.push, // required to load the actor
+       Env.perfStat, // required to load the actor
+       Env.slack, // required to load the actor
+       Env.challenge, // required to load the actor
+       Env.explorer, // required to load the actor
+       Env.fishnet // required to schedule the cleaner
   )
   play.api.Logger("boot").info("Preloading complete")
 
@@ -96,11 +97,12 @@ final class Env(
 
 object Env {
 
-  lazy val current = "app" boot new Env(
-    config = lila.common.PlayApp.loadConfig,
-    scheduler = lila.common.PlayApp.scheduler,
-    system = lila.common.PlayApp.system,
-    appPath = lila.common.PlayApp withApp (_.path.getCanonicalPath))
+  lazy val current =
+    "app" boot new Env(config = lila.common.PlayApp.loadConfig,
+                       scheduler = lila.common.PlayApp.scheduler,
+                       system = lila.common.PlayApp.system,
+                       appPath = lila.common.PlayApp withApp
+                         (_.path.getCanonicalPath))
 
   def api = lila.api.Env.current
   def db = lila.db.Env.current

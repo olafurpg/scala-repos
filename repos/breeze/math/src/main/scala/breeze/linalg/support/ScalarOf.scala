@@ -19,19 +19,17 @@
 package breeze.linalg.support
 
 /**
- * Marker trait indicating that S is the scalar of V. useful for wrangling type inference
- *
- * @author dlwh
- **/
-trait ScalarOf[V, S] {
-
-}
+  * Marker trait indicating that S is the scalar of V. useful for wrangling type inference
+  *
+  * @author dlwh
+  **/
+trait ScalarOf[V, S] {}
 
 object ScalarOf {
   object DummyInstance extends ScalarOf[Any, Any]
-  def dummy[V, S]:ScalarOf[V, S] = DummyInstance.asInstanceOf[ScalarOf[V, S]]
+  def dummy[V, S]: ScalarOf[V, S] = DummyInstance.asInstanceOf[ScalarOf[V, S]]
 
-  implicit def scalarOfArray[T]:ScalarOf[Array[T], T] = dummy
+  implicit def scalarOfArray[T]: ScalarOf[Array[T], T] = dummy
 
 //  @expand
 //  implicit def scalarOf[@expand.args(Int, Float, Long, Double, Complex, Short) T]:ScalarOf[T, T] = dummy

@@ -44,8 +44,7 @@ object EvactorPicklingBench extends scala.pickling.testing.PicklingBenchmark {
     val evts = for (i <- 1 to size) yield
       DataEvent("event" + i, time + Random.nextInt(100), Random.nextString(5))
 
-    val pickles = for (evt <- evts) yield
-      evt.pickle
+    val pickles = for (evt <- evts) yield evt.pickle
 
     var i = 0
     while (i < size) {
@@ -94,7 +93,7 @@ object EvactorJavaBench extends scala.pickling.testing.PicklingBenchmark {
     val bos = new ByteArrayOutputStream()
     val out = new ObjectOutputStream(bos)
 
-        // random events
+    // random events
     val evts = for (i <- 1 to size) yield
       DataEvent("event" + i, time + Random.nextInt(100), Random.nextString(5))
 

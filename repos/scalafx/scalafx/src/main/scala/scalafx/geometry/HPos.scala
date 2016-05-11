@@ -32,12 +32,12 @@ import javafx.{geometry => jfxg}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/geometry/HPos.html javafx.geometry.HPos]] */
-object HPos
-  extends SFXEnumDelegateCompanion[jfxg.HPos, HPos] {
+object HPos extends SFXEnumDelegateCompanion[jfxg.HPos, HPos] {
 
   /** Indicates centered horizontal position. */
   val Center = new HPos(jfxg.HPos.CENTER)
-  @deprecated("Use Center; CENTER will be removed in a future release", "2.2.60")
+  @deprecated(
+      "Use Center; CENTER will be removed in a future release", "2.2.60")
   val CENTER = Center
 
   /** Indicates left horizontal position. */
@@ -50,9 +50,9 @@ object HPos
   @deprecated("Use Right; RIGHT will be removed in a future release", "2.2.60")
   val RIGHT = Right
 
-  protected override def unsortedValues: Array[HPos] = Array(Left, Center, Right)
+  protected override def unsortedValues: Array[HPos] =
+    Array(Left, Center, Right)
 }
 
-
 sealed case class HPos(override val delegate: jfxg.HPos)
-  extends SFXEnumDelegate[jfxg.HPos]
+    extends SFXEnumDelegate[jfxg.HPos]

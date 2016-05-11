@@ -4,9 +4,8 @@ import junit.framework.TestCase
 import org.junit.Assert._
 
 /**
- * @author Pavel Fatin
- */
-
+  * @author Pavel Fatin
+  */
 // An ability of lexer to cycle through its initial state is critically important
 // for incremental highlighting (see LexerEditorHighlighter).
 // However it's very easy to break this functionality and nobody would notice,

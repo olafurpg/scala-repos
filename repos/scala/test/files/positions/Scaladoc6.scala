@@ -1,8 +1,9 @@
 object Scaladoc6 {
   {
+
     /**
-     * Foo
-     */
+      * Foo
+      */
     val i = 23
   }
 

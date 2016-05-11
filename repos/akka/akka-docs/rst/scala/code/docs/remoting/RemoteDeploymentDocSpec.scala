@@ -1,12 +1,12 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.remoting
 
-import akka.actor.{ ExtendedActorSystem, ActorSystem, Actor, ActorRef }
-import akka.testkit.{ AkkaSpec, ImplicitSender }
+import akka.actor.{ExtendedActorSystem, ActorSystem, Actor, ActorRef}
+import akka.testkit.{AkkaSpec, ImplicitSender}
 //#import
-import akka.actor.{ Props, Deploy, Address, AddressFromURIString }
+import akka.actor.{Props, Deploy, Address, AddressFromURIString}
 import akka.remote.RemoteScope
 //#import
 
@@ -15,10 +15,10 @@ object RemoteDeploymentDocSpec {
   class SampleActor extends Actor {
     def receive = { case _ => sender() ! self }
   }
-
 }
 
-class RemoteDeploymentDocSpec extends AkkaSpec("""
+class RemoteDeploymentDocSpec
+    extends AkkaSpec("""
     akka.actor.provider = "akka.remote.RemoteActorRefProvider"
     akka.remote.netty.tcp {
       port = 0
@@ -28,14 +28,18 @@ class RemoteDeploymentDocSpec extends AkkaSpec("""
   import RemoteDeploymentDocSpec._
 
   val other = ActorSystem("remote", system.settings.config)
-  val address = other.asInstanceOf[ExtendedActorSystem].provider.getExternalAddressFor(Address("akka.tcp", "s", "host", 1)).get
+  val address = other
+    .asInstanceOf[ExtendedActorSystem]
+    .provider
+    .getExternalAddressFor(Address("akka.tcp", "s", "host", 1))
+    .get
 
   override def afterTermination() { shutdown(other) }
 
   "demonstrate programmatic deployment" in {
     //#deploy
-    val ref = system.actorOf(Props[SampleActor].
-      withDeploy(Deploy(scope = RemoteScope(address))))
+    val ref = system.actorOf(
+        Props[SampleActor].withDeploy(Deploy(scope = RemoteScope(address))))
     //#deploy
     ref.path.address should be(address)
     ref ! "test"
@@ -57,5 +61,4 @@ class RemoteDeploymentDocSpec extends AkkaSpec("""
     actor ! "Pretty slick"
     //#sample-actor
   }
-
 }

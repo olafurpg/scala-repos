@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import java.lang.reflect.InvocationTargetException
@@ -34,6 +33,7 @@ import scala.reflect.runtime.universe._
   */
 @DeveloperApi
 trait BaseStorageClient {
+
   /** Configuration of the '''StorageClient''' */
   val config: StorageClientConfig
 
@@ -73,9 +73,9 @@ trait BaseStorageClient {
   */
 @DeveloperApi
 case class StorageClientConfig(
-  parallel: Boolean = false, // parallelized access (RDD)?
-  test: Boolean = false, // test mode config
-  properties: Map[String, String] = Map())
+    parallel: Boolean = false, // parallelized access (RDD)?
+    test: Boolean = false, // test mode config
+    properties: Map[String, String] = Map())
 
 /** :: DeveloperApi ::
   * Thrown when a StorageClient runs into an exceptional condition
@@ -86,7 +86,7 @@ case class StorageClientConfig(
   */
 @DeveloperApi
 class StorageClientException(message: String, cause: Throwable)
-  extends RuntimeException(message, cause)
+    extends RuntimeException(message, cause)
 
 @deprecated("Use StorageException", "0.9.2")
 private[prediction] case class StorageError(message: String)
@@ -101,7 +101,7 @@ private[prediction] case class StorageError(message: String)
   */
 @DeveloperApi
 class StorageException(message: String, cause: Throwable)
-  extends Exception(message, cause) {
+    extends Exception(message, cause) {
 
   def this(message: String) = this(message, null)
 }
@@ -112,10 +112,9 @@ class StorageException(message: String, cause: Throwable)
   * @group Storage System
   */
 object Storage extends Logging {
-  private case class ClientMeta(
-    sourceType: String,
-    client: BaseStorageClient,
-    config: StorageClientConfig)
+  private case class ClientMeta(sourceType: String,
+                                client: BaseStorageClient,
+                                config: StorageClientConfig)
 
   private case class DataObjectMeta(sourceName: String, namespace: String)
 
@@ -132,7 +131,8 @@ object Storage extends Logging {
     }
   }
 
-  if (sourceKeys.size == 0) warn("There is no properly configured data source.")
+  if (sourceKeys.size == 0)
+    warn("There is no properly configured data source.")
 
   private val s2cm = scala.collection.mutable.Map[String, Option[ClientMeta]]()
 
@@ -166,26 +166,25 @@ object Storage extends Logging {
     }
   }
   private val repositoriesToDataObjectMeta: Map[String, DataObjectMeta] =
-    repositoryKeys.map(r =>
-      try {
-        val keyedPath = repositoriesPrefixPath(r)
-        val name = sys.env(prefixPath(keyedPath, "NAME"))
-        val sourceName = sys.env(prefixPath(keyedPath, "SOURCE"))
-        if (sourceKeys.contains(sourceName)) {
-          r -> DataObjectMeta(
-            sourceName = sourceName,
-            namespace = name)
-        } else {
-          error(s"$sourceName is not a configured storage source.")
-          r -> DataObjectMeta("", "")
-        }
-      } catch {
-        case e: Throwable =>
-          error(e.getMessage)
-          errors += 1
-          r -> DataObjectMeta("", "")
-      }
-    ).toMap
+    repositoryKeys
+      .map(r =>
+            try {
+          val keyedPath = repositoriesPrefixPath(r)
+          val name = sys.env(prefixPath(keyedPath, "NAME"))
+          val sourceName = sys.env(prefixPath(keyedPath, "SOURCE"))
+          if (sourceKeys.contains(sourceName)) {
+            r -> DataObjectMeta(sourceName = sourceName, namespace = name)
+          } else {
+            error(s"$sourceName is not a configured storage source.")
+            r -> DataObjectMeta("", "")
+          }
+        } catch {
+          case e: Throwable =>
+            error(e.getMessage)
+            errors += 1
+            r -> DataObjectMeta("", "")
+      })
+      .toMap
 
   if (errors > 0) {
     error(s"There were $errors configuration errors. Exiting.")
@@ -202,25 +201,28 @@ object Storage extends Logging {
     prefixPath(repositoriesPrefix, body)
 
   private def sourcesToClientMeta(
-      source: String,
-      parallel: Boolean,
-      test: Boolean): Option[ClientMeta] = {
+      source: String, parallel: Boolean, test: Boolean): Option[ClientMeta] = {
     val sourceName = if (parallel) s"parallel-$source" else source
     s2cm.getOrElseUpdate(sourceName, updateS2CM(source, parallel, test))
   }
 
   private def getClient(
-    clientConfig: StorageClientConfig,
-    pkg: String): BaseStorageClient = {
+      clientConfig: StorageClientConfig, pkg: String): BaseStorageClient = {
     val className = "io.prediction.data.storage." + pkg + ".StorageClient"
     try {
-      Class.forName(className).getConstructors()(0).newInstance(clientConfig).
-        asInstanceOf[BaseStorageClient]
+      Class
+        .forName(className)
+        .getConstructors()(0)
+        .newInstance(clientConfig)
+        .asInstanceOf[BaseStorageClient]
     } catch {
       case e: ClassNotFoundException =>
         val originalClassName = pkg + ".StorageClient"
-        Class.forName(originalClassName).getConstructors()(0).
-          newInstance(clientConfig).asInstanceOf[BaseStorageClient]
+        Class
+          .forName(originalClassName)
+          .getConstructors()(0)
+          .newInstance(clientConfig)
+          .asInstanceOf[BaseStorageClient]
       case e: java.lang.reflect.InvocationTargetException =>
         throw e.getCause
     }
@@ -228,23 +230,22 @@ object Storage extends Logging {
 
   /** Get the StorageClient config data from PIO Framework's environment variables */
   def getConfig(sourceName: String): Option[StorageClientConfig] = {
-    if (s2cm.contains(sourceName) && s2cm.get(sourceName).nonEmpty
-      && s2cm.get(sourceName).get.nonEmpty) {
+    if (s2cm.contains(sourceName) && s2cm.get(sourceName).nonEmpty &&
+        s2cm.get(sourceName).get.nonEmpty) {
       Some(s2cm.get(sourceName).get.get.config)
     } else None
   }
 
-  private def updateS2CM(k: String, parallel: Boolean, test: Boolean):
-  Option[ClientMeta] = {
+  private def updateS2CM(
+      k: String, parallel: Boolean, test: Boolean): Option[ClientMeta] = {
     try {
       val keyedPath = sourcesPrefixPath(k)
       val sourceType = sys.env(prefixPath(keyedPath, "TYPE"))
-      val props = sys.env.filter(t => t._1.startsWith(keyedPath)).map(
-        t => t._1.replace(s"${keyedPath}_", "") -> t._2)
+      val props = sys.env
+        .filter(t => t._1.startsWith(keyedPath))
+        .map(t => t._1.replace(s"${keyedPath}_", "") -> t._2)
       val clientConfig = StorageClientConfig(
-        properties = props,
-        parallel = parallel,
-        test = test)
+          properties = props, parallel = parallel, test = test)
       val client = getClient(clientConfig, sourceType)
       Some(ClientMeta(sourceType, client, clientConfig))
     } catch {
@@ -255,30 +256,30 @@ object Storage extends Logging {
     }
   }
 
-  private[prediction]
-  def getDataObjectFromRepo[T](repo: String, test: Boolean = false)
-    (implicit tag: TypeTag[T]): T = {
+  private[prediction] def getDataObjectFromRepo[T](
+      repo: String, test: Boolean = false)(implicit tag: TypeTag[T]): T = {
     val repoDOMeta = repositoriesToDataObjectMeta(repo)
     val repoDOSourceName = repoDOMeta.sourceName
     getDataObject[T](repoDOSourceName, repoDOMeta.namespace, test = test)
   }
 
-  private[prediction]
-  def getPDataObject[T](repo: String)(implicit tag: TypeTag[T]): T = {
+  private[prediction] def getPDataObject[T](repo: String)(
+      implicit tag: TypeTag[T]): T = {
     val repoDOMeta = repositoriesToDataObjectMeta(repo)
     val repoDOSourceName = repoDOMeta.sourceName
     getPDataObject[T](repoDOSourceName, repoDOMeta.namespace)
   }
 
-  private[prediction] def getDataObject[T](
-      sourceName: String,
-      namespace: String,
-      parallel: Boolean = false,
-      test: Boolean = false)(implicit tag: TypeTag[T]): T = {
-    val clientMeta = sourcesToClientMeta(sourceName, parallel, test) getOrElse {
-      throw new StorageClientException(
-        s"Data source $sourceName was not properly initialized.", null)
-    }
+  private[prediction] def getDataObject[T](sourceName: String,
+                                           namespace: String,
+                                           parallel: Boolean = false,
+                                           test: Boolean = false)(
+      implicit tag: TypeTag[T]): T = {
+    val clientMeta =
+      sourcesToClientMeta(sourceName, parallel, test) getOrElse {
+        throw new StorageClientException(
+            s"Data source $sourceName was not properly initialized.", null)
+      }
     val sourceType = clientMeta.sourceType
     val ctorArgs = dataObjectCtorArgs(clientMeta.client, namespace)
     val classPrefix = clientMeta.client.prefix
@@ -293,27 +294,28 @@ object Storage extends Logging {
           Class.forName(rawClassName)
         } catch {
           case e: ClassNotFoundException =>
-            throw new StorageClientException("No storage backend " +
-              "implementation can be found (tried both " +
-              s"$className and $rawClassName)", e)
+            throw new StorageClientException(
+                "No storage backend " +
+                "implementation can be found (tried both " +
+                s"$className and $rawClassName)",
+                e)
         }
     }
     val constructor = clazz.getConstructors()(0)
     try {
-      constructor.newInstance(ctorArgs: _*).
-        asInstanceOf[T]
+      constructor.newInstance(ctorArgs: _*).asInstanceOf[T]
     } catch {
       case e: IllegalArgumentException =>
-        error(
-          "Unable to instantiate data object with class '" +
-          constructor.getDeclaringClass.getName + " because its constructor" +
-          " does not have the right number of arguments." +
-          " Number of required constructor arguments: " +
-          ctorArgs.size + "." +
-          " Number of existing constructor arguments: " +
-          constructor.getParameterTypes.size + "." +
-          s" Storage source name: ${sourceName}." +
-          s" Exception message: ${e.getMessage}).", e)
+        error("Unable to instantiate data object with class '" +
+              constructor.getDeclaringClass.getName +
+              " because its constructor" +
+              " does not have the right number of arguments." +
+              " Number of required constructor arguments: " + ctorArgs.size +
+              "." + " Number of existing constructor arguments: " +
+              constructor.getParameterTypes.size + "." +
+              s" Storage source name: ${sourceName}." +
+              s" Exception message: ${e.getMessage}).",
+              e)
         errors += 1
         throw e
       case e: java.lang.reflect.InvocationTargetException =>
@@ -321,38 +323,38 @@ object Storage extends Logging {
     }
   }
 
-  private def getPDataObject[T](
-      sourceName: String,
-      databaseName: String)(implicit tag: TypeTag[T]): T =
+  private def getPDataObject[T](sourceName: String, databaseName: String)(
+      implicit tag: TypeTag[T]): T =
     getDataObject[T](sourceName, databaseName, true)
 
   private def dataObjectCtorArgs(
-      client: BaseStorageClient,
-      namespace: String): Seq[AnyRef] = {
+      client: BaseStorageClient, namespace: String): Seq[AnyRef] = {
     Seq(client.client, client.config, namespace)
   }
 
   private[prediction] def verifyAllDataObjects(): Unit = {
-    info("Verifying Meta Data Backend (Source: " +
-      s"${repositoriesToDataObjectMeta(MetaDataRepository).sourceName})...")
+    info(
+        "Verifying Meta Data Backend (Source: " +
+        s"${repositoriesToDataObjectMeta(MetaDataRepository).sourceName})...")
     getMetaDataEngineManifests()
     getMetaDataEngineInstances()
     getMetaDataEvaluationInstances()
     getMetaDataApps()
     getMetaDataAccessKeys()
-    info("Verifying Model Data Backend (Source: " +
-      s"${repositoriesToDataObjectMeta(ModelDataRepository).sourceName})...")
+    info(
+        "Verifying Model Data Backend (Source: " +
+        s"${repositoriesToDataObjectMeta(ModelDataRepository).sourceName})...")
     getModelDataModels()
-    info("Verifying Event Data Backend (Source: " +
-      s"${repositoriesToDataObjectMeta(EventDataRepository).sourceName})...")
+    info(
+        "Verifying Event Data Backend (Source: " +
+        s"${repositoriesToDataObjectMeta(EventDataRepository).sourceName})...")
     val eventsDb = getLEvents(test = true)
     info("Test writing to Event Store (App Id 0)...")
     // use appId=0 for testing purpose
     eventsDb.init(0)
-    eventsDb.insert(Event(
-      event = "test",
-      entityType = "test",
-      entityId = "test"), 0)
+    eventsDb.insert(
+        Event(event = "test", entityType = "test", entityId = "test"),
+        0)
     eventsDb.remove(0)
     eventsDb.close()
   }
@@ -363,7 +365,8 @@ object Storage extends Logging {
   private[prediction] def getMetaDataEngineInstances(): EngineInstances =
     getDataObjectFromRepo[EngineInstances](MetaDataRepository)
 
-  private[prediction] def getMetaDataEvaluationInstances(): EvaluationInstances =
+  private[prediction] def getMetaDataEvaluationInstances(
+      ): EvaluationInstances =
     getDataObjectFromRepo[EvaluationInstances](MetaDataRepository)
 
   private[prediction] def getMetaDataApps(): Apps =
@@ -391,13 +394,16 @@ object Storage extends Logging {
     getPDataObject[PEvents](EventDataRepository)
 
   def config: Map[String, Map[String, Map[String, String]]] = Map(
-    "sources" -> s2cm.toMap.map { case (source, clientMeta) =>
-      source -> clientMeta.map { cm =>
-        Map(
-          "type" -> cm.sourceType,
-          "config" -> cm.config.properties.map(t => s"${t._1} -> ${t._2}").mkString(", ")
-        )
-      }.getOrElse(Map.empty)
-    }
+      "sources" -> s2cm.toMap.map {
+        case (source, clientMeta) =>
+          source -> clientMeta.map { cm =>
+            Map(
+                "type" -> cm.sourceType,
+                "config" -> cm.config.properties
+                  .map(t => s"${t._1} -> ${t._2}")
+                  .mkString(", ")
+              )
+          }.getOrElse(Map.empty)
+      }
   )
 }

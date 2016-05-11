@@ -7,9 +7,8 @@ import com.intellij.psi.stubs.StubElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackageContainer
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 trait ScPackageContainerStub extends StubElement[ScPackageContainer] {
   def prefix: String
   def ownNamePart: String

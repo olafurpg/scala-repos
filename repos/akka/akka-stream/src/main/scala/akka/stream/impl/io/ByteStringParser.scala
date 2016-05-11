@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl.io
 
 import akka.stream._
@@ -11,9 +11,10 @@ import scala.annotation.tailrec
 import scala.util.control.NoStackTrace
 
 /**
- * INTERNAL API
- */
-private[akka] abstract class ByteStringParser[T] extends GraphStage[FlowShape[ByteString, T]] {
+  * INTERNAL API
+  */
+private[akka] abstract class ByteStringParser[T]
+    extends GraphStage[FlowShape[ByteString, T]] {
   import ByteStringParser._
 
   private val bytesIn = Inlet[ByteString]("bytesIn")
@@ -72,33 +73,36 @@ private[akka] abstract class ByteStringParser[T] extends GraphStage[FlowShape[By
 }
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object ByteStringParser {
 
   /**
-   * @param result - parser can return some element for downstream or return None if no element was generated
-   * @param nextStep - next parser
-   * @param acceptUpstreamFinish - if true - stream will complete when received `onUpstreamFinish`, if "false"
-   *                             - onTruncation will be called
-   */
+    * @param result - parser can return some element for downstream or return None if no element was generated
+    * @param nextStep - next parser
+    * @param acceptUpstreamFinish - if true - stream will complete when received `onUpstreamFinish`, if "false"
+    *                             - onTruncation will be called
+    */
   case class ParseResult[+T](result: Option[T],
                              nextStep: ParseStep[T],
                              acceptUpstreamFinish: Boolean = true)
 
   trait ParseStep[+T] {
+
     /**
-     * Must return true when NeedMoreData will clean buffer. If returns false - next pulled
-     * data will be appended to existing data in buffer
-     */
+      * Must return true when NeedMoreData will clean buffer. If returns false - next pulled
+      * data will be appended to existing data in buffer
+      */
     def canWorkWithPartialData: Boolean = false
     def parse(reader: ByteReader): ParseResult[T]
-    def onTruncation(): Unit = throw new IllegalStateException("truncated data in ByteStringParser")
+    def onTruncation(): Unit =
+      throw new IllegalStateException("truncated data in ByteStringParser")
   }
 
   object FinishedParser extends ParseStep[Nothing] {
     override def parse(reader: ByteReader) =
-      throw new IllegalStateException("no initial parser installed: you must use startWith(...)")
+      throw new IllegalStateException(
+          "no initial parser installed: you must use startWith(...)")
   }
 
   val NeedMoreData = new Exception with NoStackTrace
@@ -135,11 +139,13 @@ private[akka] object ByteStringParser {
       } else throw NeedMoreData
     def readShortLE(): Int = readByte() | (readByte() << 8)
     def readIntLE(): Int = readShortLE() | (readShortLE() << 16)
-    def readLongLE(): Long = (readIntLE() & 0xffffffffL) | ((readIntLE() & 0xffffffffL) << 32)
+    def readLongLE(): Long =
+      (readIntLE() & 0xffffffffL) | ((readIntLE() & 0xffffffffL) << 32)
 
     def readShortBE(): Int = (readByte() << 8) | readByte()
     def readIntBE(): Int = (readShortBE() << 16) | readShortBE()
-    def readLongBE(): Long = ((readIntBE() & 0xffffffffL) << 32) | (readIntBE() & 0xffffffffL)
+    def readLongBE(): Long =
+      ((readIntBE() & 0xffffffffL) << 32) | (readIntBE() & 0xffffffffL)
 
     def skip(numBytes: Int): Unit =
       if (off + numBytes <= input.length) off += numBytes

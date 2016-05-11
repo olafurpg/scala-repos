@@ -14,7 +14,7 @@ import doclet._
 class Doclet extends Generator with Universer {
 
   def generateImpl() {
-    new html.HtmlFactory(universe, new ScalaDocReporter(universe.settings)).generate()
+    new html.HtmlFactory(universe, new ScalaDocReporter(universe.settings))
+      .generate()
   }
-
 }

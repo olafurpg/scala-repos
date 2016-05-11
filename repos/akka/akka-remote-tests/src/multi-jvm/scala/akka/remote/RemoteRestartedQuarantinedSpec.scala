@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.remote.transport.AssociationHandle
@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ ForceDisassociateExplicitly, ForceDisassociate, Direction }
+import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociateExplicitly, ForceDisassociate, Direction}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -24,8 +24,7 @@ object RemoteRestartedQuarantinedSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(
-    ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
       akka.loglevel = WARNING
       akka.remote.log-remote-lifecycle-events = WARNING
 
@@ -46,18 +45,20 @@ object RemoteRestartedQuarantinedSpec extends MultiNodeConfig {
   class Subject extends Actor {
     def receive = {
       case "shutdown" ⇒ context.system.terminate()
-      case "identify" ⇒ sender() ! (AddressUidExtension(context.system).addressUid -> self)
+      case "identify" ⇒
+        sender() ! (AddressUidExtension(context.system).addressUid -> self)
     }
   }
-
 }
 
-class RemoteRestartedQuarantinedSpecMultiJvmNode1 extends RemoteRestartedQuarantinedSpec
-class RemoteRestartedQuarantinedSpecMultiJvmNode2 extends RemoteRestartedQuarantinedSpec
+class RemoteRestartedQuarantinedSpecMultiJvmNode1
+    extends RemoteRestartedQuarantinedSpec
+class RemoteRestartedQuarantinedSpecMultiJvmNode2
+    extends RemoteRestartedQuarantinedSpec
 
 abstract class RemoteRestartedQuarantinedSpec
-  extends MultiNodeSpec(RemoteRestartedQuarantinedSpec)
-  with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(RemoteRestartedQuarantinedSpec) with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteRestartedQuarantinedSpec._
 
@@ -80,7 +81,8 @@ abstract class RemoteRestartedQuarantinedSpec
 
         val (uid, ref) = identifyWithUid(second, "subject")
 
-        RARP(system).provider.transport.quarantine(node(second).address, Some(uid))
+        RARP(system).provider.transport
+          .quarantine(node(second).address, Some(uid))
 
         enterBarrier("quarantined")
         enterBarrier("still-quarantined")
@@ -89,18 +91,23 @@ abstract class RemoteRestartedQuarantinedSpec
 
         within(30.seconds) {
           awaitAssert {
-            system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! Identify("subject")
+            system.actorSelection(
+                RootActorPath(secondAddress) / "user" / "subject") ! Identify(
+                "subject")
             expectMsgType[ActorIdentity](1.second).ref.get
           }
         }
 
-        system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
+        system.actorSelection(
+            RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
       }
 
       runOn(second) {
-        val addr = system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
+        val addr =
+          system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         val firstAddress = node(first).address
-        system.eventStream.subscribe(testActor, classOf[ThisActorSystemQuarantinedEvent])
+        system.eventStream.subscribe(testActor,
+                                     classOf[ThisActorSystemQuarantinedEvent])
 
         val (_, ref) = identifyWithUid(first, "subject")
 
@@ -109,9 +116,13 @@ abstract class RemoteRestartedQuarantinedSpec
         // Check that quarantine is intact
         within(10.seconds) {
           awaitAssert {
-            EventFilter.warning(pattern = "The remote system has quarantined this system", occurrences = 1).intercept {
-              ref ! "boo!"
-            }
+            EventFilter
+              .warning(
+                  pattern = "The remote system has quarantined this system",
+                  occurrences = 1)
+              .intercept {
+                ref ! "boo!"
+              }
           }
         }
 
@@ -123,7 +134,8 @@ abstract class RemoteRestartedQuarantinedSpec
 
         Await.result(system.whenTerminated, 10.seconds)
 
-        val freshSystem = ActorSystem(system.name, ConfigFactory.parseString(s"""
+        val freshSystem =
+          ActorSystem(system.name, ConfigFactory.parseString(s"""
                     akka.remote.retry-gate-closed-for = 0.5 s
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}
@@ -133,7 +145,9 @@ abstract class RemoteRestartedQuarantinedSpec
 
         val probe = TestProbe()(freshSystem)
 
-        freshSystem.actorSelection(RootActorPath(firstAddress) / "user" / "subject").tell(Identify("subject"), probe.ref)
+        freshSystem
+          .actorSelection(RootActorPath(firstAddress) / "user" / "subject")
+          .tell(Identify("subject"), probe.ref)
         // TODO sometimes it takes long time until the new connection is established,
         //      It seems like there must first be a transport failure detector timeout, that triggers
         //      "No response from remote. Handshake timed out or transport failure detector triggered".
@@ -144,8 +158,6 @@ abstract class RemoteRestartedQuarantinedSpec
 
         Await.ready(freshSystem.whenTerminated, 10.seconds)
       }
-
     }
-
   }
 }

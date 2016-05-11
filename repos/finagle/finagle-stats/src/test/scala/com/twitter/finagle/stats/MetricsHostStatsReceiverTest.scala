@@ -14,16 +14,16 @@ class MetricsHostStatsReceiverTest extends FunSuite {
   def readUnderlyingStatsReceiver(name: String): Number =
     hostStatsReceiver.self.registry.sample().get(name)
 
-  test("MetricsHostStatsReceiver is a proxy of underlying MetricsStatsReceiver") {
+  test(
+      "MetricsHostStatsReceiver is a proxy of underlying MetricsStatsReceiver") {
     hostStatsReceiver.addGauge("my_cumulative_gauge")(1)
     hostStatsReceiver.addGauge("my_cumulative_gauge")(2)
     hostStatsReceiver.counter("my_counter").incr()
 
     assert(
-      readHostStatsReceiver("my_cumulative_gauge") ==
-        readUnderlyingStatsReceiver("my_cumulative_gauge"))
-    assert(
-      readHostStatsReceiver("my_counter") ==
-        readUnderlyingStatsReceiver("my_counter"))
+        readHostStatsReceiver("my_cumulative_gauge") == readUnderlyingStatsReceiver(
+            "my_cumulative_gauge"))
+    assert(readHostStatsReceiver("my_counter") == readUnderlyingStatsReceiver(
+            "my_counter"))
   }
 }

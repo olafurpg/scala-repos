@@ -9,7 +9,7 @@ import java.io.File
 import java.nio.charset.Charset
 import java.util.Properties
 import org.specs2.mutable.Specification
-import play.api.{ Mode, Play, PlayException }
+import play.api.{Mode, Play, PlayException}
 import play.core.ApplicationProvider
 
 object ProdServerStartSpec extends Specification {
@@ -29,19 +29,23 @@ object ProdServerStartSpec extends Specification {
     }
   }
 
-  case class ExitException(message: String, cause: Option[Throwable] = None, returnCode: Int = -1) extends Exception(s"Exit with $message, $returnCode", cause.orNull)
+  case class ExitException(
+      message: String, cause: Option[Throwable] = None, returnCode: Int = -1)
+      extends Exception(s"Exit with $message, $returnCode", cause.orNull)
 
-  def exitResult[A](f: => A): Either[(String, Option[String]), A] = try Right(f) catch {
-    case ExitException(message, cause, _) =>
-      val causeMessage: Option[String] = cause.flatMap(c => Option(c.getMessage))
-      Left((message, causeMessage))
-  }
+  def exitResult[A](f: => A): Either[(String, Option[String]), A] =
+    try Right(f) catch {
+      case ExitException(message, cause, _) =>
+        val causeMessage: Option[String] =
+          cause.flatMap(c => Option(c.getMessage))
+        Left((message, causeMessage))
+    }
 
   /** A mocked ServerProcess */
-  class FakeServerProcess(
-      val args: Seq[String] = Seq(),
-      propertyMap: Map[String, String] = Map(),
-      val pid: Option[String] = None) extends ServerProcess {
+  class FakeServerProcess(val args: Seq[String] = Seq(),
+                          propertyMap: Map[String, String] = Map(),
+                          val pid: Option[String] = None)
+      extends ServerProcess {
 
     val classLoader: ClassLoader = getClass.getClassLoader
 
@@ -56,14 +60,17 @@ object ProdServerStartSpec extends Specification {
       for (h <- hooks) h.apply()
     }
 
-    def exit(message: String, cause: Option[Throwable] = None, returnCode: Int = -1): Nothing = {
+    def exit(message: String,
+             cause: Option[Throwable] = None,
+             returnCode: Int = -1): Nothing = {
       throw new ExitException(message, cause, returnCode)
     }
   }
 
   // A family of fake servers for us to test
 
-  class FakeServer(context: ServerProvider.Context) extends Server with ServerWithStop {
+  class FakeServer(context: ServerProvider.Context)
+      extends Server with ServerWithStop {
     def config = context.config
     def applicationProvider = context.appProvider
     def mode = config.mode
@@ -78,44 +85,47 @@ object ProdServerStartSpec extends Specification {
   }
 
   class FakeServerProvider extends ServerProvider {
-    override def createServer(context: ServerProvider.Context) = new FakeServer(context)
+    override def createServer(context: ServerProvider.Context) =
+      new FakeServer(context)
   }
 
   "ProdServerStartSpec.start" should {
 
-    "read settings, create custom ServerProvider, create a pid file, start the the server and register shutdown hooks" in withTempDir { tempDir =>
-      val process = new FakeServerProcess(
-        args = Seq(tempDir.getAbsolutePath),
-        propertyMap = Map("play.server.provider" -> classOf[FakeServerProvider].getName),
-        pid = Some("999")
-      )
-      val pidFile = new File(tempDir, "RUNNING_PID")
-      pidFile.exists must beFalse
-      val server = ProdServerStart.start(process)
-      def fakeServer: FakeServer = server.asInstanceOf[FakeServer]
-      try {
-        server.getClass must_== classOf[FakeServer]
-        pidFile.exists must beTrue
-        fakeServer.stopCallCount must_== 0
-        fakeServer.httpPort must_== Some(9000)
-        fakeServer.httpsPort must_== None
-      } finally {
-        process.shutdown()
-      }
-      pidFile.exists must beFalse
-      fakeServer.stopCallCount must_== 1
+    "read settings, create custom ServerProvider, create a pid file, start the the server and register shutdown hooks" in withTempDir {
+      tempDir =>
+        val process = new FakeServerProcess(
+            args = Seq(tempDir.getAbsolutePath),
+            propertyMap = Map("play.server.provider" -> classOf[
+                      FakeServerProvider].getName),
+            pid = Some("999")
+        )
+        val pidFile = new File(tempDir, "RUNNING_PID")
+        pidFile.exists must beFalse
+        val server = ProdServerStart.start(process)
+        def fakeServer: FakeServer = server.asInstanceOf[FakeServer]
+        try {
+          server.getClass must_== classOf[FakeServer]
+          pidFile.exists must beTrue
+          fakeServer.stopCallCount must_== 0
+          fakeServer.httpPort must_== Some(9000)
+          fakeServer.httpsPort must_== None
+        } finally {
+          process.shutdown()
+        }
+        pidFile.exists must beFalse
+        fakeServer.stopCallCount must_== 1
     }
 
     "read configuration for ports" in withTempDir { tempDir =>
       val process = new FakeServerProcess(
-        args = Seq(tempDir.getAbsolutePath),
-        propertyMap = Map(
-          "play.server.provider" -> classOf[FakeServerProvider].getName,
-          "play.server.http.port" -> "disabled",
-          "play.server.https.port" -> "443",
-          "play.server.http.address" -> "localhost"
-        ),
-        pid = Some("123")
+          args = Seq(tempDir.getAbsolutePath),
+          propertyMap = Map(
+                "play.server.provider" -> classOf[FakeServerProvider].getName,
+                "play.server.http.port" -> "disabled",
+                "play.server.https.port" -> "443",
+                "play.server.http.address" -> "localhost"
+            ),
+          pid = Some("123")
       )
       val pidFile = new File(tempDir, "RUNNING_PID")
       pidFile.exists must beFalse
@@ -137,14 +147,14 @@ object ProdServerStartSpec extends Specification {
 
     "read configuration for disabled https port" in withTempDir { tempDir =>
       val process = new FakeServerProcess(
-        args = Seq(tempDir.getAbsolutePath),
-        propertyMap = Map(
-          "play.server.provider" -> classOf[FakeServerProvider].getName,
-          "play.server.http.port" -> "80",
-          "play.server.https.port" -> "disabled",
-          "play.server.http.address" -> "localhost"
-        ),
-        pid = Some("123")
+          args = Seq(tempDir.getAbsolutePath),
+          propertyMap = Map(
+                "play.server.provider" -> classOf[FakeServerProvider].getName,
+                "play.server.http.port" -> "80",
+                "play.server.https.port" -> "disabled",
+                "play.server.http.address" -> "localhost"
+            ),
+          pid = Some("123")
       )
       val pidFile = new File(tempDir, "RUNNING_PID")
       pidFile.exists must beFalse
@@ -170,7 +180,5 @@ object ProdServerStartSpec extends Specification {
         ProdServerStart.start(process)
       } must beLeft
     }
-
   }
-
 }

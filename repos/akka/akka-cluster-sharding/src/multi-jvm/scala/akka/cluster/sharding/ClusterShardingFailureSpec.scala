@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.sharding
 
 import java.io.File
@@ -31,24 +31,24 @@ object ClusterShardingFailureSpec {
     var n = 0
 
     def receive = {
-      case Get(id)    ⇒ sender() ! Value(id, n)
+      case Get(id) ⇒ sender() ! Value(id, n)
       case Add(id, i) ⇒ n += i
     }
   }
 
   val extractEntityId: ShardRegion.ExtractEntityId = {
-    case m @ Get(id)    ⇒ (id, m)
+    case m @ Get(id) ⇒ (id, m)
     case m @ Add(id, _) ⇒ (id, m)
   }
 
   val extractShardId: ShardRegion.ExtractShardId = {
-    case Get(id)    ⇒ id.charAt(0).toString
+    case Get(id) ⇒ id.charAt(0).toString
     case Add(id, _) ⇒ id.charAt(0).toString
   }
-
 }
 
-abstract class ClusterShardingFailureSpecConfig(val mode: String) extends MultiNodeConfig {
+abstract class ClusterShardingFailureSpecConfig(val mode: String)
+    extends MultiNodeConfig {
   val controller = role("controller")
   val first = role("first")
   val second = role("second")
@@ -79,40 +79,56 @@ abstract class ClusterShardingFailureSpecConfig(val mode: String) extends MultiN
   testTransport(on = true)
 }
 
-object PersistentClusterShardingFailureSpecConfig extends ClusterShardingFailureSpecConfig("persistence")
-object DDataClusterShardingFailureSpecConfig extends ClusterShardingFailureSpecConfig("ddata")
+object PersistentClusterShardingFailureSpecConfig
+    extends ClusterShardingFailureSpecConfig("persistence")
+object DDataClusterShardingFailureSpecConfig
+    extends ClusterShardingFailureSpecConfig("ddata")
 
-class PersistentClusterShardingFailureSpec extends ClusterShardingFailureSpec(PersistentClusterShardingFailureSpecConfig)
-class DDataClusterShardingFailureSpec extends ClusterShardingFailureSpec(DDataClusterShardingFailureSpecConfig)
+class PersistentClusterShardingFailureSpec
+    extends ClusterShardingFailureSpec(
+        PersistentClusterShardingFailureSpecConfig)
+class DDataClusterShardingFailureSpec
+    extends ClusterShardingFailureSpec(DDataClusterShardingFailureSpecConfig)
 
-class PersistentClusterShardingFailureMultiJvmNode1 extends PersistentClusterShardingFailureSpec
-class PersistentClusterShardingFailureMultiJvmNode2 extends PersistentClusterShardingFailureSpec
-class PersistentClusterShardingFailureMultiJvmNode3 extends PersistentClusterShardingFailureSpec
+class PersistentClusterShardingFailureMultiJvmNode1
+    extends PersistentClusterShardingFailureSpec
+class PersistentClusterShardingFailureMultiJvmNode2
+    extends PersistentClusterShardingFailureSpec
+class PersistentClusterShardingFailureMultiJvmNode3
+    extends PersistentClusterShardingFailureSpec
 
-class DDataClusterShardingFailureMultiJvmNode1 extends DDataClusterShardingFailureSpec
-class DDataClusterShardingFailureMultiJvmNode2 extends DDataClusterShardingFailureSpec
-class DDataClusterShardingFailureMultiJvmNode3 extends DDataClusterShardingFailureSpec
+class DDataClusterShardingFailureMultiJvmNode1
+    extends DDataClusterShardingFailureSpec
+class DDataClusterShardingFailureMultiJvmNode2
+    extends DDataClusterShardingFailureSpec
+class DDataClusterShardingFailureMultiJvmNode3
+    extends DDataClusterShardingFailureSpec
 
-abstract class ClusterShardingFailureSpec(config: ClusterShardingFailureSpecConfig) extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
+abstract class ClusterShardingFailureSpec(
+    config: ClusterShardingFailureSpecConfig)
+    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
   import ClusterShardingFailureSpec._
   import config._
 
   override def initialParticipants = roles.size
 
-  val storageLocations = List(
-    "akka.persistence.journal.leveldb.dir",
-    "akka.persistence.journal.leveldb-shared.store.dir",
-    "akka.persistence.snapshot-store.local.dir").map(s ⇒ new File(system.settings.config.getString(s)))
+  val storageLocations =
+    List("akka.persistence.journal.leveldb.dir",
+         "akka.persistence.journal.leveldb-shared.store.dir",
+         "akka.persistence.snapshot-store.local.dir").map(
+        s ⇒ new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     runOn(controller) {
-      storageLocations.foreach(dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(
+          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
   override protected def afterTermination() {
     runOn(controller) {
-      storageLocations.foreach(dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(
+          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
@@ -126,11 +142,11 @@ abstract class ClusterShardingFailureSpec(config: ClusterShardingFailureSpecConf
 
   def startSharding(): Unit = {
     ClusterSharding(system).start(
-      typeName = "Entity",
-      entityProps = Props[Entity],
-      settings = ClusterShardingSettings(system).withRememberEntities(true),
-      extractEntityId = extractEntityId,
-      extractShardId = extractShardId)
+        typeName = "Entity",
+        entityProps = Props[Entity],
+        settings = ClusterShardingSettings(system).withRememberEntities(true),
+        extractEntityId = extractEntityId,
+        extractShardId = extractShardId)
   }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")
@@ -146,7 +162,8 @@ abstract class ClusterShardingFailureSpec(config: ClusterShardingFailureSpecConf
       enterBarrier("peristence-started")
 
       runOn(first, second) {
-        system.actorSelection(node(controller) / "user" / "store") ! Identify(None)
+        system.actorSelection(node(controller) / "user" / "store") ! Identify(
+            None)
         val sharedStore = expectMsgType[ActorIdentity].ref.get
         SharedLeveldbJournal.setStore(sharedStore, system)
       }
@@ -243,9 +260,6 @@ abstract class ClusterShardingFailureSpec(config: ClusterShardingFailureSpecConf
       }
 
       enterBarrier("after-3")
-
     }
-
   }
 }
-

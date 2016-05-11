@@ -17,19 +17,27 @@ object Test {
 // int object vs.
 object Moop1 {
   object ob1 {
-    implicit object f1 extends (Int => String) { def apply(x: Int): String = "Int" }
-    implicit object f2 extends (Long => String) { def apply(x: Long): String = "Long" }
+    implicit object f1 extends (Int => String) {
+      def apply(x: Int): String = "Int"
+    }
+    implicit object f2 extends (Long => String) {
+      def apply(x: Long): String = "Long"
+    }
 
     println(5: String)
   }
   object ob2 {
-    implicit object f1 extends (Int => String) { def apply(x: Int): String = "Int" }
+    implicit object f1 extends (Int => String) {
+      def apply(x: Int): String = "Int"
+    }
     implicit def f2(x: Long): String = "Long"
 
     println(5: String)
   }
   object ob3 {
-    implicit object f1 extends (Int => String) { def apply(x: Int): String = "Int" }
+    implicit object f1 extends (Int => String) {
+      def apply(x: Int): String = "Int"
+    }
     implicit val f2: Long => String = _ => "Long"
 
     println(5: String)
@@ -40,7 +48,9 @@ object Moop1 {
 object Moop2 {
   object ob1 {
     implicit def f1(x: Int): String = "Int"
-    implicit object f2 extends (Long => String) { def apply(x: Long): String = "Long" }
+    implicit object f2 extends (Long => String) {
+      def apply(x: Long): String = "Long"
+    }
 
     println(5: String)
   }
@@ -61,22 +71,23 @@ object Moop2 {
 // int val vs.
 object Moop3 {
   object ob1 {
-    implicit val f1: Int => String  = _ => "Int"
-    implicit object f2 extends (Long => String) { def apply(x: Long): String = "Long" }
+    implicit val f1: Int => String = _ => "Int"
+    implicit object f2 extends (Long => String) {
+      def apply(x: Long): String = "Long"
+    }
 
     println(5: String)
   }
   object ob2 {
-    implicit val f1: Int => String  = _ => "Int"
+    implicit val f1: Int => String = _ => "Int"
     implicit def f2(x: Long): String = "Long"
 
     println(5: String)
   }
   object ob3 {
-    implicit val f1: Int => String  = _ => "Int"
+    implicit val f1: Int => String = _ => "Int"
     implicit val f2: Long => String = _ => "Long"
 
     println(5: String)
   }
 }
-

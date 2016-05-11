@@ -1,9 +1,9 @@
 /**
- * Following libs are required to compile and run the benchmark:
- * - jackson-core-asl-1.4.1.jar
- * - jackson-mapper-asl-1.4.1.jar
- * - lift-json-???.jar
- */
+  * Following libs are required to compile and run the benchmark:
+  * - jackson-core-asl-1.4.1.jar
+  * - jackson-mapper-asl-1.4.1.jar
+  * - lift-json-???.jar
+  */
 object Jsonbench extends Benchmark {
   import scala.util.parsing.json.JSON
   import org.codehaus.jackson._
@@ -19,7 +19,8 @@ object Jsonbench extends Benchmark {
 
   def benchmark(name: String)(f: => Any) = run(name, 50000, 50000)(f)
 
-  val json = """
+  val json =
+    """
 {
   "glossary": {
     "title": "example glossary",

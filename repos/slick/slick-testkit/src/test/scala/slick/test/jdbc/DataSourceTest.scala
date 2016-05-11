@@ -17,7 +17,10 @@ class DataSourceTest {
     val dc = DatabaseConfig.forConfig[JdbcProfile]("ds1")
     import dc.profile.api._
     try {
-      assertEquals(1, Await.result(dc.db.run(sql"select lock_mode()".as[Int].head), Duration.Inf))
+      assertEquals(
+          1,
+          Await.result(
+              dc.db.run(sql"select lock_mode()".as[Int].head), Duration.Inf))
     } finally dc.db.close
   }
 
@@ -25,7 +28,10 @@ class DataSourceTest {
     val dc = DatabaseConfig.forConfig[JdbcProfile]("ds2")
     import dc.profile.api._
     try {
-      assertEquals(2, Await.result(dc.db.run(sql"select lock_mode()".as[Int].head), Duration.Inf))
+      assertEquals(
+          2,
+          Await.result(
+              dc.db.run(sql"select lock_mode()".as[Int].head), Duration.Inf))
     } finally dc.db.close
   }
 
@@ -34,8 +40,11 @@ class DataSourceTest {
     MockDriver.reset
     val db = JdbcBackend.Database.forConfig("databaseUrl")
     try {
-      try Await.result(db.run(sqlu"dummy"), Duration.Inf) catch { case ex: SQLException => }
-      val (url, info) = MockDriver.getLast.getOrElse(fail("No connection data recorded").asInstanceOf[Nothing])
+      try Await.result(db.run(sqlu"dummy"), Duration.Inf) catch {
+        case ex: SQLException =>
+      }
+      val (url, info) = MockDriver.getLast.getOrElse(
+          fail("No connection data recorded").asInstanceOf[Nothing])
       assertEquals("jdbc:postgresql://host/dbname", url)
       assertEquals("user", info.getProperty("user"))
       assertEquals("pass", info.getProperty("password"))
@@ -53,9 +62,11 @@ object MockDriver {
 class MockDriver extends Driver {
   def acceptsURL(url: String): Boolean = true
   def jdbcCompliant(): Boolean = false
-  def getPropertyInfo(url: String, info: Properties): Array[DriverPropertyInfo] = Array()
+  def getPropertyInfo(
+      url: String, info: Properties): Array[DriverPropertyInfo] = Array()
   def getMinorVersion: Int = 0
-  def getParentLogger: Logger = throw new SQLException("feature not implemented")
+  def getParentLogger: Logger =
+    throw new SQLException("feature not implemented")
   def connect(url: String, info: Properties): Connection = {
     MockDriver.last = Some((url, info))
     throw new SQLException("Connection data has been recorded")

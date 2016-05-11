@@ -5,5 +5,5 @@ class C1 {
 class C2 extends C1 {
   trait T
 
-  println(classOf[/* line: 6 */ T])
+  println(classOf[ /* line: 6 */ T])
 }

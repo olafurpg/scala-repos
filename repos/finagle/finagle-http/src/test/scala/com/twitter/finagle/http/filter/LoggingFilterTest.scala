@@ -21,8 +21,8 @@ class LoggingFilterTest extends FunSuite {
     val request = Request("/search.json")
     request.method = Method.Get
     request.xForwardedFor = "10.0.0.1"
-    request.referer       = "http://www.example.com/"
-    request.userAgent     = "User Agent"
+    request.referer = "http://www.example.com/"
+    request.userAgent = "User Agent"
     request.version = Version.Http11
 
     val formatter = new CommonLogFormatter
@@ -40,13 +40,14 @@ class LoggingFilterTest extends FunSuite {
       Await.result(filter(request))
     }
 
-    stringHandler.get == ("""127\.0\.0\.1 - - \[06/Apr/2011:20:32:12 \+0000\] "GET /search\.json HTTP/1\.1" 123 5 [0-9]+ "User Agent"""" + "\n")
+    stringHandler.get ==
+    ("""127\.0\.0\.1 - - \[06/Apr/2011:20:32:12 \+0000\] "GET /search\.json HTTP/1\.1" 123 5 [0-9]+ "User Agent"""" +
+        "\n")
   }
 
-  val UnescapedEscaped =
-    Seq(
+  val UnescapedEscaped = Seq(
       // boundaries
-      ("",        ""),
+      ("", ""),
       ("hello\n", "hello\\n"),
       ("\nhello", "\\nhello"),
       // low ascii and special characters
@@ -84,7 +85,7 @@ class LoggingFilterTest extends FunSuite {
       ("\u001f", "\\x1f"),
       ("\u0020", " "),
       ("\u0021", "!"),
-      ("\"",     "\\\""),
+      ("\"", "\\\""),
       ("\u0023", "#"),
       ("\u0024", "$"),
       ("\u0025", "%"),
@@ -142,7 +143,7 @@ class LoggingFilterTest extends FunSuite {
       ("\u0059", "Y"),
       ("\u005a", "Z"),
       ("\u005b", "["),
-      ("\\",     "\\\\"),
+      ("\\", "\\\\"),
       ("\u005d", "]"),
       ("\u005e", "^"),
       ("\u005f", "_"),
@@ -181,11 +182,12 @@ class LoggingFilterTest extends FunSuite {
       ("\u0080", "\\xc2\\x80"),
       ("\u00e9", "\\xc3\\xa9"), // é
       ("\u2603", "\\xe2\\x98\\x83") // snowman
-    )
+  )
 
   test("escape() escapes non-printable, non-ASCII") {
-    UnescapedEscaped.foreach { case (input, escaped) =>
-      assert(LogFormatter.escape(input) == escaped)
+    UnescapedEscaped.foreach {
+      case (input, escaped) =>
+        assert(LogFormatter.escape(input) == escaped)
     }
   }
 }

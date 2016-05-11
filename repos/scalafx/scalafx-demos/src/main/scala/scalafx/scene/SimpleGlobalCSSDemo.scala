@@ -38,7 +38,9 @@ import scalafx.scene.layout.BorderPane
 object SimpleGlobalCSSDemo extends JFXApp {
 
   // Replace global stylesheet.
-  JFXApp.userAgentStylesheet = getClass.getResource("simple2.css").toExternalForm
+  JFXApp.userAgentStylesheet = getClass
+    .getResource("simple2.css")
+    .toExternalForm
 
   stage = new PrimaryStage {
     title = "Simple Global CSS Demo"
@@ -54,5 +56,4 @@ object SimpleGlobalCSSDemo extends JFXApp {
       }
     }
   }
-
 }

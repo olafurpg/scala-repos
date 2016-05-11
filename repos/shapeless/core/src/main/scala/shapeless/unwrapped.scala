@@ -30,11 +30,10 @@ object Unwrapped extends UnwrappedInstances {
 }
 
 trait UnwrappedInstances extends LowPriorityUnwrappedInstances {
-  implicit def unwrapAnyVal[W <: AnyVal, Repr, UI, UF](implicit
-    gen: Generic.Aux[W, Repr],
-    avh: AnyValHelper.Aux[Repr, UI],
-    chain: Strict[Unwrapped.Aux[UI, UF]]
-  ) = new Unwrapped[W] {
+  implicit def unwrapAnyVal[W <: AnyVal, Repr, UI, UF](
+      implicit gen: Generic.Aux[W, Repr],
+      avh: AnyValHelper.Aux[Repr, UI],
+      chain: Strict[Unwrapped.Aux[UI, UF]]) = new Unwrapped[W] {
     type U = UF
     def unwrap(w: W): U = chain.value.unwrap(avh.unwrap(gen.to(w)))
     def wrap(u: U): W = gen.from(avh.wrap(chain.value.wrap(u)))
@@ -56,19 +55,17 @@ trait UnwrappedInstances extends LowPriorityUnwrappedInstances {
     }
   }
 
-  implicit def newtypeUnwrapped[UI, Ops, UF](implicit
-    chain: Strict[Unwrapped.Aux[UI, UF]]
-  ) = chain.value.asInstanceOf[Unwrapped.Aux[Newtype[UI, Ops], UF]]
-
+  implicit def newtypeUnwrapped[UI, Ops, UF](
+      implicit chain: Strict[Unwrapped.Aux[UI, UF]]) =
+    chain.value.asInstanceOf[Unwrapped.Aux[Newtype[UI, Ops], UF]]
 }
 
 trait LowPriorityUnwrappedInstances {
-  val theSelfUnwrapped =
-    new Unwrapped[Any] {
-      type U = Any
-      def unwrap(t: Any) = t
-      def wrap(t: Any) = t
-    }
+  val theSelfUnwrapped = new Unwrapped[Any] {
+    type U = Any
+    def unwrap(t: Any) = t
+    def wrap(t: Any) = t
+  }
   implicit def selfUnwrapped[T] =
     theSelfUnwrapped.asInstanceOf[Unwrapped.Aux[T, T]]
 }

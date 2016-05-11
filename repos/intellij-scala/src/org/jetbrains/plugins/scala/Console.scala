@@ -1,9 +1,8 @@
 package org.jetbrains.plugins.scala
 
 /**
- * Pavel.Fatin, 19.05.2010
- */
-
+  * Pavel.Fatin, 19.05.2010
+  */
 object Console {
   private val Enabled = false
 

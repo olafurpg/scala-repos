@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala Ant Tasks                      **
-**    / __/ __// _ | / /  / _ |    (c) 2005-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala Ant Tasks                      **
+ **    / __/ __// _ | / /  / _ |    (c) 2005-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala.tools.ant
@@ -12,26 +12,26 @@ import java.io.{File, FileWriter}
 import org.apache.tools.ant.types.{Path, Reference}
 
 /** An Ant task that generates a shell or batch script to execute a
- *  Scala program.
- *
- *  This task can take the following parameters as attributes:
- *  - `file` (mandatory),
- *  - `class` (mandatory),
- *  - `platforms`,
- *  - `classpath`,
- *  - `properties`,
- *  - `javaflags`,
- *  - `toolflags`.
- *
- * @author  Gilles Dubochet
- * @version 1.1
- */
+  *  Scala program.
+  *
+  *  This task can take the following parameters as attributes:
+  *  - `file` (mandatory),
+  *  - `class` (mandatory),
+  *  - `platforms`,
+  *  - `classpath`,
+  *  - `properties`,
+  *  - `javaflags`,
+  *  - `toolflags`.
+  *
+  * @author  Gilles Dubochet
+  * @version 1.1
+  */
 class ScalaTool extends ScalaMatchingTask {
 
   private def emptyPath = new Path(getProject)
 
-/*============================================================================*\
-**                             Ant user-properties                            **
+  /*============================================================================*\
+   **                             Ant user-properties                            **
 \*============================================================================*/
 
   abstract class PermissibleValue {
@@ -77,8 +77,8 @@ class ScalaTool extends ScalaMatchingTask {
     * Can only be set when a main class is defined. */
   private var toolFlags: String = ""
 
-/*============================================================================*\
-**                             Properties setters                             **
+  /*============================================================================*\
+   **                             Properties setters                             **
 \*============================================================================*/
 
   /** Sets the file attribute. */
@@ -93,8 +93,7 @@ class ScalaTool extends ScalaMatchingTask {
   def setPlatforms(input: String) = {
     platforms = input.split(",").toList.flatMap { s: String =>
       val st = s.trim
-      if (Platforms.isPermissible(st))
-        (if (input != "") List(st) else Nil)
+      if (Platforms.isPermissible(st)) (if (input != "") List(st) else Nil)
       else {
         buildError("Platform " + st + " does not exist.")
       }
@@ -102,30 +101,30 @@ class ScalaTool extends ScalaMatchingTask {
   }
 
   /** Sets the classpath with which to run the tool.
-   *
-   *  Note that this mechanism of setting the classpath is generally preferred
-   *  for general purpose scripts, as this does not assume all elements are
-   *  relative to the Ant `basedir`.  Additionally, the platform specific
-   *  demarcation of any script variables (e.g. `${SCALA_HOME}` or
-   * `%SCALA_HOME%`) can be specified in a platform independent way (e.g.
-   * `@SCALA_HOME@`) and automatically translated for you.
-   */
+    *
+    *  Note that this mechanism of setting the classpath is generally preferred
+    *  for general purpose scripts, as this does not assume all elements are
+    *  relative to the Ant `basedir`.  Additionally, the platform specific
+    *  demarcation of any script variables (e.g. `${SCALA_HOME}` or
+    * `%SCALA_HOME%`) can be specified in a platform independent way (e.g.
+    * `@SCALA_HOME@`) and automatically translated for you.
+    */
   def setClassPath(input: String) {
     classpath = classpath ::: input.split(",").toList
   }
 
   /**
-   * A special method that allows ant classpath path definitions to be nested
-   * within this ant task.
-   */
+    * A special method that allows ant classpath path definitions to be nested
+    * within this ant task.
+    */
   def createClassPath: Path = classpathPath.createPath()
 
   /**
-   * Adds an Ant Path reference to the tool's classpath.
-   * Note that all entries in the path must exist either relative to the project
-   * basedir or with an absolute path to a file in the filesystem.  As a result,
-   * this is not a mechanism for setting the classpath for more general use scripts.
-   */
+    * Adds an Ant Path reference to the tool's classpath.
+    * Note that all entries in the path must exist either relative to the project
+    * basedir or with an absolute path to a file in the filesystem.  As a result,
+    * this is not a mechanism for setting the classpath for more general use scripts.
+    */
   def setClassPathRef(input: Reference) {
     val tmpPath = emptyPath
     tmpPath.setRefid(input)
@@ -139,9 +138,7 @@ class ScalaTool extends ScalaMatchingTask {
       val stArray = st.split("=", 2)
       if (stArray.length == 2) {
         if (input != "") List((stArray(0), stArray(1))) else Nil
-      }
-      else
-        buildError("Property " + st + " is not formatted properly.")
+      } else buildError("Property " + st + " is not formatted properly.")
     }
   }
 
@@ -153,94 +150,99 @@ class ScalaTool extends ScalaMatchingTask {
   def setToolflags(input: String) =
     toolFlags = input.trim
 
-/*============================================================================*\
-**                             Properties getters                             **
+  /*============================================================================*\
+   **                             Properties getters                             **
 \*============================================================================*/
 
-    /** Gets the value of the classpath attribute in a Scala-friendly form.
-      * @return The class path as a list of files. */
-    private def getUnixclasspath: String =
-      transposeVariableMarkup(classpath.mkString("", ":", "").replace('\\', '/'), "${", "}")
+  /** Gets the value of the classpath attribute in a Scala-friendly form.
+    * @return The class path as a list of files. */
+  private def getUnixclasspath: String =
+    transposeVariableMarkup(
+        classpath.mkString("", ":", "").replace('\\', '/'), "${", "}")
 
-    /** Gets the value of the classpath attribute in a Scala-friendly form.
-      * @return The class path as a list of files. */
-    private def getWinclasspath: String =
-      transposeVariableMarkup(classpath.mkString("", ";", "").replace('/', '\\'), "%", "%")
+  /** Gets the value of the classpath attribute in a Scala-friendly form.
+    * @return The class path as a list of files. */
+  private def getWinclasspath: String =
+    transposeVariableMarkup(
+        classpath.mkString("", ";", "").replace('/', '\\'), "%", "%")
 
-    private def getProperties: String =
-      properties.map({
-        case (name,value) => "-D" + name + "=\"" + value + "\""
-      }).mkString("", " ", "")
+  private def getProperties: String =
+    properties
+      .map({
+        case (name, value) => "-D" + name + "=\"" + value + "\""
+      })
+      .mkString("", " ", "")
 
-/*============================================================================*\
-**                       Compilation and support methods                      **
+  /*============================================================================*\
+   **                       Compilation and support methods                      **
 \*============================================================================*/
 
-    // XXX encoding and generalize
-    private def getResourceAsCharStream(clazz: Class[_], resource: String): Stream[Char] = {
-      val stream = clazz.getClassLoader() getResourceAsStream resource
-      if (stream == null) Stream.empty
-      else Stream continually stream.read() takeWhile (_ != -1) map (_.asInstanceOf[Char])
+  // XXX encoding and generalize
+  private def getResourceAsCharStream(
+      clazz: Class[_], resource: String): Stream[Char] = {
+    val stream = clazz.getClassLoader() getResourceAsStream resource
+    if (stream == null) Stream.empty
+    else
+      Stream continually stream.read() takeWhile (_ != -1) map
+      (_.asInstanceOf[Char])
+  }
+
+  // Converts a variable like @SCALA_HOME@ to ${SCALA_HOME} when pre = "${" and post = "}"
+  private def transposeVariableMarkup(
+      text: String, pre: String, post: String): String = {
+    val chars = scala.io.Source.fromString(text)
+    val builder = new StringBuilder()
+
+    while (chars.hasNext) {
+      val char = chars.next()
+      if (char == '@') {
+        var char = chars.next()
+        val token = new StringBuilder()
+        while (chars.hasNext && char != '@') {
+          token.append(char)
+          char = chars.next()
+        }
+        if (token.toString == "") builder.append('@')
+        else builder.append(pre + token.toString + post)
+      } else builder.append(char)
+    }
+    builder.toString
+  }
+
+  private def readAndPatchResource(
+      resource: String, tokens: Map[String, String]): String = {
+    val chars = getResourceAsCharStream(this.getClass, resource).iterator
+    val builder = new StringBuilder()
+
+    while (chars.hasNext) {
+      val char = chars.next()
+      if (char == '@') {
+        var char = chars.next()
+        val token = new StringBuilder()
+        while (chars.hasNext && char != '@') {
+          token.append(char)
+          char = chars.next()
+        }
+        if (tokens.contains(token.toString))
+          builder.append(tokens(token.toString))
+        else if (token.toString == "") builder.append('@')
+        else builder.append("@" + token.toString + "@")
+      } else builder.append(char)
+    }
+    builder.toString
+  }
+
+  private def writeFile(file: File, content: String) =
+    if (file.exists() && !file.canWrite())
+      buildError("File " + file + " is not writable")
+    else {
+      val writer = new FileWriter(file, false)
+      writer write content
+      writer.close()
     }
 
-    // Converts a variable like @SCALA_HOME@ to ${SCALA_HOME} when pre = "${" and post = "}"
-    private def transposeVariableMarkup(text: String, pre: String, post: String) : String = {
-      val chars = scala.io.Source.fromString(text)
-      val builder = new StringBuilder()
-
-      while (chars.hasNext) {
-        val char = chars.next()
-        if (char == '@') {
-          var char = chars.next()
-          val token = new StringBuilder()
-          while (chars.hasNext && char != '@') {
-            token.append(char)
-            char = chars.next()
-          }
-          if (token.toString == "")
-            builder.append('@')
-          else
-            builder.append(pre + token.toString + post)
-        } else builder.append(char)
-      }
-      builder.toString
-    }
-
-    private def readAndPatchResource(resource: String, tokens: Map[String, String]): String = {
-      val chars = getResourceAsCharStream(this.getClass, resource).iterator
-      val builder = new StringBuilder()
-
-      while (chars.hasNext) {
-        val char = chars.next()
-        if (char == '@') {
-          var char = chars.next()
-          val token = new StringBuilder()
-          while (chars.hasNext && char != '@') {
-            token.append(char)
-            char = chars.next()
-          }
-          if (tokens.contains(token.toString))
-            builder.append(tokens(token.toString))
-          else if (token.toString == "")
-            builder.append('@')
-          else
-            builder.append("@" + token.toString + "@")
-        } else builder.append(char)
-      }
-      builder.toString
-    }
-
-    private def writeFile(file: File, content: String) =
-      if (file.exists() && !file.canWrite())
-        buildError("File " + file + " is not writable")
-      else {
-        val writer = new FileWriter(file, false)
-        writer write content
-        writer.close()
-      }
-
-/*============================================================================*\
-**                           The big execute method                           **
+  /*============================================================================*\
+   **                           The big execute method                           **
 \*============================================================================*/
 
   /** Performs the tool creation. */
@@ -249,11 +251,11 @@ class ScalaTool extends ScalaMatchingTask {
     if (file.isEmpty) buildError("Attribute 'file' is not set.")
     if (mainClass.isEmpty) buildError("Main class must be set.")
     val resourceRoot = "scala/tools/ant/templates/"
-    val patches = Map (
-      ("class", mainClass.get),
-      ("properties", getProperties),
-      ("javaflags", javaFlags),
-      ("toolflags", toolFlags)
+    val patches = Map(
+        ("class", mainClass.get),
+        ("properties", getProperties),
+        ("javaflags", javaFlags),
+        ("toolflags", toolFlags)
     )
     // Consolidate Paths into classpath
     classpath = classpath ::: classpathPath.list.toList
@@ -261,7 +263,8 @@ class ScalaTool extends ScalaMatchingTask {
     if (platforms contains "unix") {
       val unixPatches = patches + (("classpath", getUnixclasspath))
       val unixTemplateResource = resourceRoot + "tool-unix.tmpl"
-      val unixTemplate = readAndPatchResource(unixTemplateResource, unixPatches)
+      val unixTemplate = readAndPatchResource(
+          unixTemplateResource, unixPatches)
       writeFile(file.get, unixTemplate)
     }
     if (platforms contains "windows") {
@@ -271,5 +274,4 @@ class ScalaTool extends ScalaMatchingTask {
       writeFile(new File(file.get.getAbsolutePath() + ".bat"), winTemplate)
     }
   }
-
 }

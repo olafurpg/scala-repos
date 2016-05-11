@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import language.postfixOps
@@ -13,7 +12,8 @@ import akka.routing._
 import scala.concurrent.duration._
 
 object DeployerSpec {
-  val deployerConf = ConfigFactory.parseString("""
+  val deployerConf = ConfigFactory.parseString(
+      """
       akka.actor.deployment {
         /service1 {
         }
@@ -61,12 +61,12 @@ object DeployerSpec {
           router = scatter-gather-pool
         }
       }
-      """, ConfigParseOptions.defaults)
+      """,
+      ConfigParseOptions.defaults)
 
   class RecipeActor extends Actor {
     def receive = { case _ ⇒ }
   }
-
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -75,77 +75,97 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
 
     "be able to parse 'akka.actor.deployment._' with all default values" in {
       val service = "/service1"
-      val deployment = system.asInstanceOf[ActorSystemImpl].provider.deployer.lookup(service.split("/").drop(1))
+      val deployment = system
+        .asInstanceOf[ActorSystemImpl]
+        .provider
+        .deployer
+        .lookup(service.split("/").drop(1))
 
-      deployment should ===(Some(
-        Deploy(
-          service,
-          deployment.get.config,
-          NoRouter,
-          NoScopeGiven,
-          Deploy.NoDispatcherGiven,
-          Deploy.NoMailboxGiven)))
+      deployment should ===(
+          Some(Deploy(service,
+                      deployment.get.config,
+                      NoRouter,
+                      NoScopeGiven,
+                      Deploy.NoDispatcherGiven,
+                      Deploy.NoMailboxGiven)))
     }
 
     "use None deployment for undefined service" in {
       val service = "/undefined"
-      val deployment = system.asInstanceOf[ActorSystemImpl].provider.deployer.lookup(service.split("/").drop(1))
+      val deployment = system
+        .asInstanceOf[ActorSystemImpl]
+        .provider
+        .deployer
+        .lookup(service.split("/").drop(1))
       deployment should ===(None)
     }
 
     "be able to parse 'akka.actor.deployment._' with dispatcher config" in {
       val service = "/service3"
-      val deployment = system.asInstanceOf[ActorSystemImpl].provider.deployer.lookup(service.split("/").drop(1))
+      val deployment = system
+        .asInstanceOf[ActorSystemImpl]
+        .provider
+        .deployer
+        .lookup(service.split("/").drop(1))
 
-      deployment should ===(Some(
-        Deploy(
-          service,
-          deployment.get.config,
-          NoRouter,
-          NoScopeGiven,
-          dispatcher = "my-dispatcher",
-          Deploy.NoMailboxGiven)))
+      deployment should ===(
+          Some(Deploy(service,
+                      deployment.get.config,
+                      NoRouter,
+                      NoScopeGiven,
+                      dispatcher = "my-dispatcher",
+                      Deploy.NoMailboxGiven)))
     }
 
     "be able to parse 'akka.actor.deployment._' with mailbox config" in {
       val service = "/service4"
-      val deployment = system.asInstanceOf[ActorSystemImpl].provider.deployer.lookup(service.split("/").drop(1))
+      val deployment = system
+        .asInstanceOf[ActorSystemImpl]
+        .provider
+        .deployer
+        .lookup(service.split("/").drop(1))
 
-      deployment should ===(Some(
-        Deploy(
-          service,
-          deployment.get.config,
-          NoRouter,
-          NoScopeGiven,
-          Deploy.NoDispatcherGiven,
-          mailbox = "my-mailbox")))
+      deployment should ===(
+          Some(Deploy(service,
+                      deployment.get.config,
+                      NoRouter,
+                      NoScopeGiven,
+                      Deploy.NoDispatcherGiven,
+                      mailbox = "my-mailbox")))
     }
 
     "detect invalid number-of-instances" in {
       intercept[com.typesafe.config.ConfigException.WrongType] {
-        val invalidDeployerConf = ConfigFactory.parseString("""
+        val invalidDeployerConf = ConfigFactory
+          .parseString("""
             akka.actor.deployment {
               /service-invalid-number-of-instances {
                 router = round-robin-pool
                 nr-of-instances = boom
               }
             }
-            """, ConfigParseOptions.defaults).withFallback(AkkaSpec.testConf)
+            """,
+                       ConfigParseOptions.defaults)
+          .withFallback(AkkaSpec.testConf)
 
-        shutdown(ActorSystem("invalid-number-of-instances", invalidDeployerConf))
+        shutdown(
+            ActorSystem("invalid-number-of-instances", invalidDeployerConf))
       }
     }
 
     "detect invalid deployment path" in {
       val e = intercept[InvalidActorNameException] {
-        val invalidDeployerConf = ConfigFactory.parseString("""
+        val invalidDeployerConf = ConfigFactory
+          .parseString("""
             akka.actor.deployment {
               /gul/ubåt {
                 router = round-robin-pool
                 nr-of-instances = 2
               }
             }
-            """, ConfigParseOptions.defaults).withFallback(AkkaSpec.testConf)
+            """,
+                       ConfigParseOptions.defaults)
+          .withFallback(AkkaSpec.testConf)
 
         shutdown(ActorSystem("invalid-path", invalidDeployerConf))
       }
@@ -162,7 +182,8 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
     }
 
     "be able to parse 'akka.actor.deployment._' with round-robin router" in {
-      assertRouting("/service-round-robin", RoundRobinPool(1), "/service-round-robin")
+      assertRouting(
+          "/service-round-robin", RoundRobinPool(1), "/service-round-robin")
     }
 
     "be able to parse 'akka.actor.deployment._' with random router" in {
@@ -170,48 +191,81 @@ class DeployerSpec extends AkkaSpec(DeployerSpec.deployerConf) {
     }
 
     "be able to parse 'akka.actor.deployment._' with scatter-gather router" in {
-      assertRouting("/service-scatter-gather", ScatterGatherFirstCompletedPool(nrOfInstances = 1, within = 2 seconds), "/service-scatter-gather")
+      assertRouting("/service-scatter-gather",
+                    ScatterGatherFirstCompletedPool(nrOfInstances = 1,
+                                                    within = 2 seconds),
+                    "/service-scatter-gather")
     }
 
     "be able to parse 'akka.actor.deployment._' with consistent-hashing router" in {
-      assertRouting("/service-consistent-hashing", ConsistentHashingPool(1), "/service-consistent-hashing")
+      assertRouting("/service-consistent-hashing",
+                    ConsistentHashingPool(1),
+                    "/service-consistent-hashing")
     }
 
     "be able to parse 'akka.actor.deployment._' with router resizer" in {
       val resizer = DefaultResizer()
-      assertRouting("/service-resizer", RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer)), "/service-resizer")
+      assertRouting("/service-resizer",
+                    RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer)),
+                    "/service-resizer")
     }
 
     "be able to use wildcards" in {
       assertRouting("/some/wildcardmatch", RandomPool(1), "/some/*")
-      assertRouting("/somewildcardmatch/some", ScatterGatherFirstCompletedPool(nrOfInstances = 1, within = 2 seconds), "/*/some")
+      assertRouting("/somewildcardmatch/some",
+                    ScatterGatherFirstCompletedPool(nrOfInstances = 1,
+                                                    within = 2 seconds),
+                    "/*/some")
     }
 
     "have correct router mappings" in {
-      val mapping = system.asInstanceOf[ActorSystemImpl].provider.deployer.routerTypeMapping
+      val mapping = system
+        .asInstanceOf[ActorSystemImpl]
+        .provider
+        .deployer
+        .routerTypeMapping
       mapping("from-code") should ===(classOf[akka.routing.NoRouter].getName)
-      mapping("round-robin-pool") should ===(classOf[akka.routing.RoundRobinPool].getName)
-      mapping("round-robin-group") should ===(classOf[akka.routing.RoundRobinGroup].getName)
-      mapping("random-pool") should ===(classOf[akka.routing.RandomPool].getName)
-      mapping("random-group") should ===(classOf[akka.routing.RandomGroup].getName)
-      mapping("balancing-pool") should ===(classOf[akka.routing.BalancingPool].getName)
-      mapping("smallest-mailbox-pool") should ===(classOf[akka.routing.SmallestMailboxPool].getName)
-      mapping("broadcast-pool") should ===(classOf[akka.routing.BroadcastPool].getName)
-      mapping("broadcast-group") should ===(classOf[akka.routing.BroadcastGroup].getName)
-      mapping("scatter-gather-pool") should ===(classOf[akka.routing.ScatterGatherFirstCompletedPool].getName)
-      mapping("scatter-gather-group") should ===(classOf[akka.routing.ScatterGatherFirstCompletedGroup].getName)
-      mapping("consistent-hashing-pool") should ===(classOf[akka.routing.ConsistentHashingPool].getName)
-      mapping("consistent-hashing-group") should ===(classOf[akka.routing.ConsistentHashingGroup].getName)
+      mapping("round-robin-pool") should ===(
+          classOf[akka.routing.RoundRobinPool].getName)
+      mapping("round-robin-group") should ===(
+          classOf[akka.routing.RoundRobinGroup].getName)
+      mapping("random-pool") should ===(
+          classOf[akka.routing.RandomPool].getName)
+      mapping("random-group") should ===(
+          classOf[akka.routing.RandomGroup].getName)
+      mapping("balancing-pool") should ===(
+          classOf[akka.routing.BalancingPool].getName)
+      mapping("smallest-mailbox-pool") should ===(
+          classOf[akka.routing.SmallestMailboxPool].getName)
+      mapping("broadcast-pool") should ===(
+          classOf[akka.routing.BroadcastPool].getName)
+      mapping("broadcast-group") should ===(
+          classOf[akka.routing.BroadcastGroup].getName)
+      mapping("scatter-gather-pool") should ===(
+          classOf[akka.routing.ScatterGatherFirstCompletedPool].getName)
+      mapping("scatter-gather-group") should ===(
+          classOf[akka.routing.ScatterGatherFirstCompletedGroup].getName)
+      mapping("consistent-hashing-pool") should ===(
+          classOf[akka.routing.ConsistentHashingPool].getName)
+      mapping("consistent-hashing-group") should ===(
+          classOf[akka.routing.ConsistentHashingGroup].getName)
     }
 
-    def assertRouting(service: String, expected: RouterConfig, expectPath: String): Unit = {
-      val deployment = system.asInstanceOf[ActorSystemImpl].provider.deployer.lookup(service.split("/").drop(1))
+    def assertRouting(
+        service: String, expected: RouterConfig, expectPath: String): Unit = {
+      val deployment = system
+        .asInstanceOf[ActorSystemImpl]
+        .provider
+        .deployer
+        .lookup(service.split("/").drop(1))
       deployment.map(_.path).getOrElse("NOT FOUND") should ===(expectPath)
       deployment.get.routerConfig.getClass should ===(expected.getClass)
       deployment.get.scope should ===(NoScopeGiven)
       expected match {
-        case pool: Pool ⇒ deployment.get.routerConfig.asInstanceOf[Pool].resizer should ===(pool.resizer)
-        case _          ⇒
+        case pool: Pool ⇒
+          deployment.get.routerConfig.asInstanceOf[Pool].resizer should ===(
+              pool.resizer)
+        case _ ⇒
       }
     }
   }

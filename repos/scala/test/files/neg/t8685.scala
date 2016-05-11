@@ -1,16 +1,14 @@
-
-
-@deprecated("class C is depr", since="now")
+@deprecated("class C is depr", since = "now")
 case class C(i: Int)
 
-case class D @deprecated("ctor D is depr", since="now") (i: Int)
+case class D @deprecated("ctor D is depr", since = "now")(i: Int)
 
-@deprecated("class E is depr", since="now")
+@deprecated("class E is depr", since = "now")
 case class E(i: Int)
-@deprecated("module E is depr", since="now")
+@deprecated("module E is depr", since = "now")
 object E
 
-@deprecated("module F is depr", since="now")
+@deprecated("module F is depr", since = "now")
 object F {
   case class G(i: Int)
 }
@@ -20,14 +18,14 @@ object G {
 }
 
 object Extra {
-  @deprecated("Extra module F is depr", since="now")
+  @deprecated("Extra module F is depr", since = "now")
   object F {
     case class G(i: Int)
   }
 }
 
 object J {
-  @deprecated("Inner K is depr", since="now")
+  @deprecated("Inner K is depr", since = "now")
   case class K(i: Int)
 }
 
@@ -38,7 +36,7 @@ trait Applies {
   def i = F.G(42)
   def j = Extra.F.G(42)
 
-  @deprecated("member gg", since="now")
+  @deprecated("member gg", since = "now")
   val gg = G
   def k = this.gg.H(0)
 

@@ -4,11 +4,11 @@ import scala.language.higherKinds
 
 trait EncoderCompanion {
 
-  type Enc[T, S] <: Encoder[T, S]
+  type Enc [T, S] <: Encoder[T, S]
 
   /**
-   * Encode a value of type T into a serialized value of type S based on the implicit environment.
-   */
+    * Encode a value of type T into a serialized value of type S based on the implicit environment.
+    */
   def encode[T, S](t: T)(implicit enc: Enc[T, S]): S = enc.encode(t)
 }
 
@@ -17,8 +17,8 @@ object Encoder extends EncoderCompanion {
 }
 
 /**
- * A base trait for encoders of type T into a serialized form S
- */
+  * A base trait for encoders of type T into a serialized form S
+  */
 trait Encoder[T, S] extends (T => S) {
   /*
    * Encode a T into an S
@@ -30,11 +30,11 @@ trait Encoder[T, S] extends (T => S) {
 
 trait DecoderCompanion {
 
-  type Dec[T, S] <: Decoder[T, S]
+  type Dec [T, S] <: Decoder[T, S]
 
   /**
-   * Decode a value of type T from a serialized value of type S based on the implicit environment.
-   */
+    * Decode a value of type T from a serialized value of type S based on the implicit environment.
+    */
   def decode[T, S](s: S)(implicit dec: Dec[T, S]): T = dec.decode(s)
 }
 
@@ -43,8 +43,8 @@ object Decoder extends DecoderCompanion {
 }
 
 /**
- * A base trait for decoders for type T from a serialized form S
- */
+  * A base trait for decoders for type T from a serialized form S
+  */
 trait Decoder[T, S] {
   /*
    * Decode a T from an S
@@ -60,12 +60,13 @@ object Codec extends EncoderCompanion with DecoderCompanion {
 }
 
 /**
- * A base trait for all Codecs that translate a type T into a serialized form S
- */
+  * A base trait for all Codecs that translate a type T into a serialized form S
+  */
 trait Codec[T, S] extends Bijection[T, S] with Encoder[T, S] with Decoder[T, S]
 
 object BinaryCodec {
-  def encode[T](t: T)(implicit enc: Codec[T, Array[Byte]]): Array[Byte] = enc.encode(t)
-  def decode[T](a: Array[Byte])(implicit dec: Codec[T, Array[Byte]]): T = dec.decode(a)
+  def encode[T](t: T)(implicit enc: Codec[T, Array[Byte]]): Array[Byte] =
+    enc.encode(t)
+  def decode[T](a: Array[Byte])(implicit dec: Codec[T, Array[Byte]]): T =
+    dec.decode(a)
 }
-

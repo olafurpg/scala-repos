@@ -37,5 +37,4 @@ package object colorselector {
   val insets = Insets(5, 5, 5, 5)
 
   def doubleToInt(d: Double) = (colorselector.Max * d).toInt
-
 }

@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.singleton
 
 import language.postfixOps
@@ -44,9 +43,10 @@ object ClusterSingletonManagerChaosSpec extends MultiNodeConfig {
     """))
 
   case object EchoStarted
+
   /**
-   * The singleton actor
-   */
+    * The singleton actor
+    */
   class Echo(testActor: ActorRef) extends Actor {
     testActor ! EchoStarted
 
@@ -56,15 +56,24 @@ object ClusterSingletonManagerChaosSpec extends MultiNodeConfig {
   }
 }
 
-class ClusterSingletonManagerChaosMultiJvmNode1 extends ClusterSingletonManagerChaosSpec
-class ClusterSingletonManagerChaosMultiJvmNode2 extends ClusterSingletonManagerChaosSpec
-class ClusterSingletonManagerChaosMultiJvmNode3 extends ClusterSingletonManagerChaosSpec
-class ClusterSingletonManagerChaosMultiJvmNode4 extends ClusterSingletonManagerChaosSpec
-class ClusterSingletonManagerChaosMultiJvmNode5 extends ClusterSingletonManagerChaosSpec
-class ClusterSingletonManagerChaosMultiJvmNode6 extends ClusterSingletonManagerChaosSpec
-class ClusterSingletonManagerChaosMultiJvmNode7 extends ClusterSingletonManagerChaosSpec
+class ClusterSingletonManagerChaosMultiJvmNode1
+    extends ClusterSingletonManagerChaosSpec
+class ClusterSingletonManagerChaosMultiJvmNode2
+    extends ClusterSingletonManagerChaosSpec
+class ClusterSingletonManagerChaosMultiJvmNode3
+    extends ClusterSingletonManagerChaosSpec
+class ClusterSingletonManagerChaosMultiJvmNode4
+    extends ClusterSingletonManagerChaosSpec
+class ClusterSingletonManagerChaosMultiJvmNode5
+    extends ClusterSingletonManagerChaosSpec
+class ClusterSingletonManagerChaosMultiJvmNode6
+    extends ClusterSingletonManagerChaosSpec
+class ClusterSingletonManagerChaosMultiJvmNode7
+    extends ClusterSingletonManagerChaosSpec
 
-class ClusterSingletonManagerChaosSpec extends MultiNodeSpec(ClusterSingletonManagerChaosSpec) with STMultiNodeSpec with ImplicitSender {
+class ClusterSingletonManagerChaosSpec
+    extends MultiNodeSpec(ClusterSingletonManagerChaosSpec)
+    with STMultiNodeSpec with ImplicitSender {
   import ClusterSingletonManagerChaosSpec._
 
   override def initialParticipants = roles.size
@@ -78,10 +87,10 @@ class ClusterSingletonManagerChaosSpec extends MultiNodeSpec(ClusterSingletonMan
 
   def createSingleton(): ActorRef = {
     system.actorOf(ClusterSingletonManager.props(
-      singletonProps = Props(classOf[Echo], testActor),
-      terminationMessage = PoisonPill,
-      settings = ClusterSingletonManagerSettings(system)),
-      name = "echo")
+                       singletonProps = Props(classOf[Echo], testActor),
+                       terminationMessage = PoisonPill,
+                       settings = ClusterSingletonManagerSettings(system)),
+                   name = "echo")
   }
 
   def crash(roles: RoleName*): Unit = {
@@ -94,15 +103,19 @@ class ClusterSingletonManagerChaosSpec extends MultiNodeSpec(ClusterSingletonMan
   }
 
   def echo(oldest: RoleName): ActorSelection =
-    system.actorSelection(RootActorPath(node(oldest).address) / "user" / "echo" / "singleton")
+    system.actorSelection(
+        RootActorPath(node(oldest).address) / "user" / "echo" / "singleton")
 
   def awaitMemberUp(memberProbe: TestProbe, nodes: RoleName*): Unit = {
     runOn(nodes.filterNot(_ == nodes.head): _*) {
-      memberProbe.expectMsgType[MemberUp](15.seconds).member.address should ===(node(nodes.head).address)
+      memberProbe.expectMsgType[MemberUp](15.seconds).member.address should ===(
+          node(nodes.head).address)
     }
     runOn(nodes.head) {
-      memberProbe.receiveN(nodes.size, 15.seconds).collect { case MemberUp(m) ⇒ m.address }.toSet should ===(
-        nodes.map(node(_).address).toSet)
+      memberProbe
+        .receiveN(nodes.size, 15.seconds)
+        .collect { case MemberUp(m) ⇒ m.address }
+        .toSet should ===(nodes.map(node(_).address).toSet)
     }
     enterBarrier(nodes.head.name + "-up")
   }
@@ -138,13 +151,14 @@ class ClusterSingletonManagerChaosSpec extends MultiNodeSpec(ClusterSingletonMan
 
       runOn(controller) {
         echo(first) ! "hello"
-        expectMsgType[ActorRef](3.seconds).path.address should ===(node(first).address)
+        expectMsgType[ActorRef](3.seconds).path.address should ===(
+            node(first).address)
       }
       enterBarrier("first-verified")
-
     }
 
-    "take over when three oldest nodes crash in 6 nodes cluster" in within(90 seconds) {
+    "take over when three oldest nodes crash in 6 nodes cluster" in within(
+        90 seconds) {
       // mute logging of deadLetters during shutdown of systems
       if (!log.isDebugEnabled)
         system.eventStream.publish(Mute(DeadLettersFilter[Any]))
@@ -159,10 +173,10 @@ class ClusterSingletonManagerChaosSpec extends MultiNodeSpec(ClusterSingletonMan
 
       runOn(controller) {
         echo(fourth) ! "hello"
-        expectMsgType[ActorRef](3.seconds).path.address should ===(node(fourth).address)
+        expectMsgType[ActorRef](3.seconds).path.address should ===(
+            node(fourth).address)
       }
       enterBarrier("fourth-verified")
-
     }
   }
 }

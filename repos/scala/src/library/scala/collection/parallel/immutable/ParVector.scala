@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -20,27 +20,24 @@ import immutable.VectorBuilder
 import immutable.VectorIterator
 
 /** Immutable parallel vectors, based on vectors.
- *
- *  $paralleliterableinfo
- *
- *  $sideeffects
- *
- *  @tparam T    the element type of the vector
- *
- *  @author Aleksandar Prokopec
- *  @since 2.9
- *  @see  [[http://docs.scala-lang.org/overviews/parallel-collections/concrete-parallel-collections.html#parallel_vector Scala's Parallel Collections Library overview]]
- *  section on `ParVector` for more information.
- *
- *  @define Coll `immutable.ParVector`
- *  @define coll immutable parallel vector
- */
+  *
+  *  $paralleliterableinfo
+  *
+  *  $sideeffects
+  *
+  *  @tparam T    the element type of the vector
+  *
+  *  @author Aleksandar Prokopec
+  *  @since 2.9
+  *  @see  [[http://docs.scala-lang.org/overviews/parallel-collections/concrete-parallel-collections.html#parallel_vector Scala's Parallel Collections Library overview]]
+  *  section on `ParVector` for more information.
+  *
+  *  @define Coll `immutable.ParVector`
+  *  @define coll immutable parallel vector
+  */
 class ParVector[+T](private[this] val vector: Vector[T])
-extends ParSeq[T]
-   with GenericParTemplate[T, ParVector]
-   with ParSeqLike[T, ParVector[T], Vector[T]]
-   with Serializable
-{
+    extends ParSeq[T] with GenericParTemplate[T, ParVector]
+    with ParSeqLike[T, ParVector[T], Vector[T]] with Serializable {
   override def companion = ParVector
 
   def this() = this(Vector())
@@ -59,7 +56,8 @@ extends ParSeq[T]
 
   override def toVector: Vector[T] = vector
 
-  class ParVectorIterator(_start: Int, _end: Int) extends VectorIterator[T](_start, _end) with SeqSplitter[T] {
+  class ParVectorIterator(_start: Int, _end: Int)
+      extends VectorIterator[T](_start, _end) with SeqSplitter[T] {
     def remaining: Int = remainingElementCount
     def dup: SeqSplitter[T] = (new ParVector(remainingVector)).splitter
     def split: Seq[ParVectorIterator] = {
@@ -74,25 +72,28 @@ extends ParSeq[T]
         splitted += remvector.take(sz)
         remvector = remvector.drop(sz)
       }
-      splitted.map(v => new ParVector(v).splitter.asInstanceOf[ParVectorIterator])
+      splitted.map(
+          v => new ParVector(v).splitter.asInstanceOf[ParVectorIterator])
     }
   }
 }
 
 /** $factoryInfo
- *  @define Coll `immutable.ParVector`
- *  @define coll immutable parallel vector
- */
+  *  @define Coll `immutable.ParVector`
+  *  @define coll immutable parallel vector
+  */
 object ParVector extends ParFactory[ParVector] {
   implicit def canBuildFrom[T]: CanCombineFrom[Coll, T, ParVector[T]] =
     new GenericCanCombineFrom[T]
 
   def newBuilder[T]: Combiner[T, ParVector[T]] = newCombiner[T]
 
-  def newCombiner[T]: Combiner[T, ParVector[T]] = new LazyParVectorCombiner[T] // was: with EPC[T, ParVector[T]]
+  def newCombiner[T]: Combiner[T, ParVector[T]] =
+    new LazyParVectorCombiner[T] // was: with EPC[T, ParVector[T]]
 }
 
-private[immutable] class LazyParVectorCombiner[T] extends Combiner[T, ParVector[T]] {
+private[immutable] class LazyParVectorCombiner[T]
+    extends Combiner[T, ParVector[T]] {
 //self: EnvironmentPassingCombiner[T, ParVector[T]] =>
   var sz = 0
   val vectors = new ArrayBuffer[VectorBuilder[T]] += new VectorBuilder[T]
@@ -119,10 +120,12 @@ private[immutable] class LazyParVectorCombiner[T] extends Combiner[T, ParVector[
     new ParVector(rvb.result)
   }
 
-  def combine[U <: T, NewTo >: ParVector[T]](other: Combiner[U, NewTo]) = if (other eq this) this else {
-    val that = other.asInstanceOf[LazyParVectorCombiner[T]]
-    sz += that.sz
-    vectors ++= that.vectors
-    this
-  }
+  def combine[U <: T, NewTo >: ParVector[T]](other: Combiner[U, NewTo]) =
+    if (other eq this) this
+    else {
+      val that = other.asInstanceOf[LazyParVectorCombiner[T]]
+      sz += that.sz
+      vectors ++= that.vectors
+      this
+    }
 }

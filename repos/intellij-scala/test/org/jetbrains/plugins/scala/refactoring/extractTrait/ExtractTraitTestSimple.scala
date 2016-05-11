@@ -2,20 +2,18 @@ package org.jetbrains.plugins.scala
 package refactoring.extractTrait
 
 /**
- * Nikolay.Tropin
- * 2014-06-02
- */
+  * Nikolay.Tropin
+  * 2014-06-02
+  */
 class ExtractTraitTestSimple extends ExtractTraitTestBase {
 
   def testDef() {
-    val text =
-      """
+    val text = """
         |trait A {<caret>
         |  def a() = 1
         |}
         |""".stripMargin
-    val result =
-      """
+    val result = """
         |trait A extends ExtractedTrait
         |
         |trait ExtractedTrait {
@@ -23,8 +21,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
         |  def a() = 1
         |}
       """.stripMargin
-    val resultDecl =
-      """
+    val resultDecl = """
         |trait A extends ExtractedTrait {
         |  override def a() = 1
         |}
@@ -40,14 +37,12 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
   }
 
   def testDef2() {
-    val text =
-      """
+    val text = """
         |trait A {<caret>
         |  def a(i: Int): Int = 1
         |}
         |""".stripMargin
-    val result =
-      """
+    val result = """
         |trait A extends ExtractedTrait
         |
         |trait ExtractedTrait {
@@ -55,8 +50,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
         |  def a(i: Int): Int = 1
         |}
       """.stripMargin
-    val resultDecl =
-      """
+    val resultDecl = """
         |trait A extends ExtractedTrait {
         |  override def a(i: Int): Int = 1
         |}
@@ -72,15 +66,13 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
   }
 
   def testValAndVar() {
-    val text =
-      """
+    val text = """
         |trait A {<caret>
         |  val a = 1
         |  var b = 2
         |}
         |""".stripMargin
-    val result =
-      """
+    val result = """
         |trait A extends ExtractedTrait
         |
         |trait ExtractedTrait {
@@ -89,8 +81,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
         |  var b = 2
         |}
       """.stripMargin
-    val resultDecl =
-      """
+    val resultDecl = """
         |trait A extends ExtractedTrait {
         |  override val a = 1
         |  override var b = 2
@@ -108,16 +99,14 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
   }
 
   def testDeclarations() {
-    val text =
-      """
+    val text = """
         |abstract class A {
         |  val a: Int
         |  protected def foo()
         |}
       """.stripMargin
 
-    val result =
-      """
+    val result = """
         |abstract class A extends ExtractedTrait
         |
         |trait ExtractedTrait {
@@ -131,8 +120,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
   }
 
   def testDontExtractConstructor() {
-    val text =
-      """
+    val text = """
         |class A {<caret>
         |
         |  def this(i: Int) {
@@ -143,8 +131,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
         |  var b = 2
         |}
         |""".stripMargin
-    val result =
-      """
+    val result = """
         |class A extends ExtractedTrait {
         |
         |  def this(i: Int) {
@@ -164,8 +151,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
   }
 
   def testDontExtractPrivateMethods() {
-    val text =
-      """
+    val text = """
         |class A {<caret>
         |  private def foo() {}
         |
@@ -173,8 +159,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
         |  var b = 2
         |}
         |""".stripMargin
-    val result =
-      """
+    val result = """
         |class A extends ExtractedTrait {
         |  private def foo() {}
         |
@@ -191,8 +176,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
   }
 
   def testDontExtractTypeDefs() {
-    val text =
-      """
+    val text = """
         |class A {<caret>
         |
         |  class Inner
@@ -201,8 +185,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
         |  var b = 2
         |}
         |""".stripMargin
-    val result =
-      """
+    val result = """
         |class A extends ExtractedTrait {
         |
         |  class Inner
@@ -220,15 +203,13 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
   }
 
   def testTypeAlias() {
-    val text =
-      """
+    val text = """
         |trait A {<caret>
         |  type T = Int
         |  type S <: String
         |}
         |""".stripMargin
-    val result =
-      """
+    val result = """
         |trait A extends ExtractedTrait
         |
         |trait ExtractedTrait {
@@ -237,8 +218,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
         |  type S <: String
         |}
       """.stripMargin
-    val resultDecl =
-      """
+    val resultDecl = """
         |trait A extends ExtractedTrait {
         |  override type T = Int
         |}
@@ -255,8 +235,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
   }
 
   def testExtractFromAnonymous() {
-    val text =
-      """
+    val text = """
         |class A {
         |  val a = new Any {
         |    def foo() {}<caret>
@@ -265,8 +244,7 @@ class ExtractTraitTestSimple extends ExtractTraitTestBase {
         |}
       """.stripMargin
 
-    val result =
-      """
+    val result = """
         |class A {
         |  val a = new Any with ExtractedTrait
         |

@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -15,16 +15,7 @@ import org.scalajs.testsuite.utils.Platform._
 
 import java.util._
 
-import java.lang.{
-Double  => JDouble,
-Float   => JFloat,
-Integer => JInteger,
-Long    => JLong,
-Byte    => JByte,
-Short   => JShort,
-Boolean => JBoolean,
-String  => JString
-}
+import java.lang.{Double => JDouble, Float => JFloat, Integer => JInteger, Long => JLong, Byte => JByte, Short => JShort, Boolean => JBoolean, String => JString}
 
 class FormatterTest {
 
@@ -36,7 +27,8 @@ class FormatterTest {
     var precision: Int = _
     var calls = 0
 
-    def formatTo(frm: Formatter, flags: Int, width: Int, precision: Int): Unit = {
+    def formatTo(
+        frm: Formatter, flags: Int, width: Int, precision: Int): Unit = {
       this.calls += 1
       this.flags = flags
       this.width = width
@@ -44,33 +36,36 @@ class FormatterTest {
       frm.out().append("foobar")
     }
 
-    def expectCalled(times: Int, flags: Int, width: Int, precision: Int): Unit = {
+    def expectCalled(
+        times: Int, flags: Int, width: Int, precision: Int): Unit = {
       assertEquals(times, this.calls)
       assertEquals(flags, this.flags)
       assertEquals(width, this.width)
       assertEquals(precision, this.precision)
     }
-
   }
 
   def assertF(expected: String, format: String, args: AnyRef*): Unit = {
     val fmt = new Formatter()
-    val res = fmt.format(format, args:_*).toString()
+    val res = fmt.format(format, args: _*).toString()
     fmt.close()
     assertEquals(expected, res)
   }
 
-  def assertFC(expected: String, format: String, flags: Int, width: Int,
-      precision: Int): Unit = {
+  def assertFC(expected: String,
+               format: String,
+               flags: Int,
+               width: Int,
+               precision: Int): Unit = {
     val fc = new FormattableClass
     assertF(expected, format, fc)
     fc.expectCalled(1, flags, width, precision)
   }
 
-  def expectFormatterThrows[T <: Throwable](exeption: Class[T], format: String,
-      args: AnyRef*): Unit = {
+  def expectFormatterThrows[T <: Throwable](
+      exeption: Class[T], format: String, args: AnyRef*): Unit = {
     val fmt = new Formatter()
-    assertThrows(exeption, fmt.format(format, args:_*))
+    assertThrows(exeption, fmt.format(format, args: _*))
   }
 
   // Explicitly define these as `var`'s to avoid any compile-time constant folding
@@ -98,10 +93,16 @@ class FormatterTest {
   @Test def `should_provide_s_conversion`(): Unit = {
     assertFC("foobar", "%s", 0, -1, -1)
     assertFC("foobar", "%-10s", FormattableFlags.LEFT_JUSTIFY, 10, -1)
-    assertFC("foobar", "%#-10.2s",
-        FormattableFlags.LEFT_JUSTIFY | FormattableFlags.ALTERNATE, 10, 2)
-    assertFC("foobar", "%#10.2S",
-        FormattableFlags.UPPERCASE | FormattableFlags.ALTERNATE, 10, 2)
+    assertFC("foobar",
+             "%#-10.2s",
+             FormattableFlags.LEFT_JUSTIFY | FormattableFlags.ALTERNATE,
+             10,
+             2)
+    assertFC("foobar",
+             "%#10.2S",
+             FormattableFlags.UPPERCASE | FormattableFlags.ALTERNATE,
+             10,
+             2)
     assertF("     hello", "%10s", "hello")
     assertF("hello     ", "%-10s", "hello")
     if (!executingInJVMOnJDK6)
@@ -143,7 +144,7 @@ class FormatterTest {
       // expected:<0000[377777]77766> but was:<0000[000001]77766>
       assertF("37777777766", "%5o", new JShort(-10.toShort))
       // expected:<0000[377777]77766> but was:<0000[000001]77766>
-      assertF("000037777777766", "%015o",new JShort(-10.toShort))
+      assertF("000037777777766", "%015o", new JShort(-10.toShort))
     }
   }
 
@@ -251,9 +252,11 @@ class FormatterTest {
 
   @Test def should_fail_with_not_enough_arguments(): Unit = {
     expectFormatterThrows(classOf[MissingFormatArgumentException], "%f")
-    expectFormatterThrows(classOf[MissingFormatArgumentException], "%d%d%d",
-      new JInteger(1), new JInteger(1))
-    expectFormatterThrows(classOf[MissingFormatArgumentException], "%10$d",
-      new JInteger(1))
+    expectFormatterThrows(classOf[MissingFormatArgumentException],
+                          "%d%d%d",
+                          new JInteger(1),
+                          new JInteger(1))
+    expectFormatterThrows(
+        classOf[MissingFormatArgumentException], "%10$d", new JInteger(1))
   }
 }

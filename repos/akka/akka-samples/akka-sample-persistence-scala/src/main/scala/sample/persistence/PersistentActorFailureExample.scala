@@ -11,10 +11,11 @@ object PersistentActorFailureExample extends App {
 
     def receiveCommand: Receive = {
       case "print" => println(s"received ${received.reverse}")
-      case "boom"  => throw new Exception("boom")
+      case "boom" => throw new Exception("boom")
       case payload: String =>
-        persist(payload) { p => received = p :: received }
-
+        persist(payload) { p =>
+          received = p :: received
+        }
     }
 
     def receiveRecover: Receive = {
@@ -23,7 +24,8 @@ object PersistentActorFailureExample extends App {
   }
 
   val system = ActorSystem("example")
-  val persistentActor = system.actorOf(Props(classOf[ExamplePersistentActor]), "persistentActor-2")
+  val persistentActor =
+    system.actorOf(Props(classOf[ExamplePersistentActor]), "persistentActor-2")
 
   persistentActor ! "a"
   persistentActor ! "print"

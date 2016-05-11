@@ -21,14 +21,12 @@ object PlayCommands {
   // ----- Play prompt
 
   val playPrompt = { state: State =>
-
     val extracted = Project.extract(state)
     import extracted._
 
     (name in currentRef get structure.data).map { name =>
       "[" + Colors.cyan(name) + "] $ "
     }.getOrElse("> ")
-
   }
 
   // ----- Play commands
@@ -39,7 +37,8 @@ object PlayCommands {
     val classpath = (dependencyClasspath in Compile).value
     val log = streams.value.log
     lazy val commonJars: PartialFunction[java.io.File, java.net.URL] = {
-      case jar if jar.getName.startsWith("h2-") || jar.getName == "h2.jar" => jar.toURI.toURL
+      case jar if jar.getName.startsWith("h2-") || jar.getName == "h2.jar" =>
+        jar.toURI.toURL
     }
 
     if (commonClassLoader == null) {
@@ -52,8 +51,10 @@ object PlayCommands {
       val parent = ClassLoader.getSystemClassLoader.getParent
       log.debug("Using parent loader for play common classloader: " + parent)
 
-      commonClassLoader = new java.net.URLClassLoader(classpath.map(_.data).collect(commonJars).toArray, parent) {
-        override def toString = "Common ClassLoader: " + getURLs.map(_.toString).mkString(",")
+      commonClassLoader = new java.net.URLClassLoader(
+          classpath.map(_.data).collect(commonJars).toArray, parent) {
+        override def toString =
+          "Common ClassLoader: " + getURLs.map(_.toString).mkString(",")
       }
     }
 
@@ -62,20 +63,24 @@ object PlayCommands {
 
   val playCompileEverythingTask = Def.taskDyn {
     // Run playAssetsWithCompilation, or, if it doesn't exist (because it's not a Play project), just the compile task
-    val compileTask = Def.taskDyn(playAssetsWithCompilation ?? (compile in Compile).value)
+    val compileTask =
+      Def.taskDyn(playAssetsWithCompilation ?? (compile in Compile).value)
 
     compileTask.all(
-      ScopeFilter(
-        inDependencies(thisProjectRef.value)
-      )
+        ScopeFilter(
+            inDependencies(thisProjectRef.value)
+        )
     )
   }
 
   val h2Command = Command.command("h2-browser") { state: State =>
     try {
-      val commonLoader = Project.runTask(playCommonClassloader, state).get._2.toEither.right.get
+      val commonLoader =
+        Project.runTask(playCommonClassloader, state).get._2.toEither.right.get
       val h2ServerClass = commonLoader.loadClass("org.h2.tools.Server")
-      h2ServerClass.getMethod("main", classOf[Array[String]]).invoke(null, Array.empty[String])
+      h2ServerClass
+        .getMethod("main", classOf[Array[String]])
+        .invoke(null, Array.empty[String])
     } catch {
       case e: Exception => e.printStackTrace
     }
@@ -86,15 +91,15 @@ object PlayCommands {
     val projectRef = thisProjectRef.value
 
     def filter = ScopeFilter(
-      inDependencies(projectRef),
-      inConfigurations(Compile, Assets)
+        inDependencies(projectRef),
+        inConfigurations(Compile, Assets)
     )
 
     Def.task {
 
       val allDirectories =
         (unmanagedSourceDirectories ?? Nil).all(filter).value.flatten ++
-          (unmanagedResourceDirectories ?? Nil).all(filter).value.flatten
+        (unmanagedResourceDirectories ?? Nil).all(filter).value.flatten
 
       val existingDirectories = allDirectories.filter(_.exists)
 
@@ -113,5 +118,4 @@ object PlayCommands {
       distinctDirectories.map(_.toFile)
     }
   }
-
 }

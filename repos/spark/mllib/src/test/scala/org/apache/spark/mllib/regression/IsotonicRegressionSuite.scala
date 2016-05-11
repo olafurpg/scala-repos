@@ -24,13 +24,15 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
-class IsotonicRegressionSuite extends SparkFunSuite with MLlibTestSparkContext with Matchers {
+class IsotonicRegressionSuite
+    extends SparkFunSuite with MLlibTestSparkContext with Matchers {
 
   private def round(d: Double) = {
     math.round(d * 100).toDouble / 100
   }
 
-  private def generateIsotonicInput(labels: Seq[Double]): Seq[(Double, Double, Double)] = {
+  private def generateIsotonicInput(
+      labels: Seq[Double]): Seq[(Double, Double, Double)] = {
     Seq.tabulate(labels.size)(i => (labels(i), i.toDouble, 1d))
   }
 
@@ -44,13 +46,13 @@ class IsotonicRegressionSuite extends SparkFunSuite with MLlibTestSparkContext w
       labels: Seq[Double],
       weights: Seq[Double],
       isotonic: Boolean): IsotonicRegressionModel = {
-    val trainRDD = sc.parallelize(generateIsotonicInput(labels, weights)).cache()
+    val trainRDD =
+      sc.parallelize(generateIsotonicInput(labels, weights)).cache()
     new IsotonicRegression().setIsotonic(isotonic).run(trainRDD)
   }
 
   private def runIsotonicRegression(
-      labels: Seq[Double],
-      isotonic: Boolean): IsotonicRegressionModel = {
+      labels: Seq[Double], isotonic: Boolean): IsotonicRegressionModel = {
     runIsotonicRegression(labels, Array.fill(labels.size)(1d), isotonic)
   }
 
@@ -68,7 +70,8 @@ class IsotonicRegressionSuite extends SparkFunSuite with MLlibTestSparkContext w
      */
     val model = runIsotonicRegression(Seq(1, 2, 3, 1, 6, 17, 16, 17, 18), true)
 
-    assert(Array.tabulate(9)(x => model.predict(x)) === Array(1, 2, 2, 2, 6, 16.5, 16.5, 17, 18))
+    assert(Array.tabulate(9)(x => model.predict(x)) === Array(
+            1, 2, 2, 2, 6, 16.5, 16.5, 17, 18))
 
     assert(model.boundaries === Array(0, 1, 3, 4, 5, 6, 7, 8))
     assert(model.predictions === Array(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))
@@ -142,35 +145,41 @@ class IsotonicRegressionSuite extends SparkFunSuite with MLlibTestSparkContext w
   }
 
   test("isotonic regression with unordered input") {
-    val trainRDD = sc.parallelize(generateIsotonicInput(Seq(1, 2, 3, 4, 5)).reverse, 2).cache()
+    val trainRDD = sc
+      .parallelize(generateIsotonicInput(Seq(1, 2, 3, 4, 5)).reverse, 2)
+      .cache()
 
     val model = new IsotonicRegression().run(trainRDD)
     assert(model.predictions === Array(1, 2, 3, 4, 5))
   }
 
   test("weighted isotonic regression") {
-    val model = runIsotonicRegression(Seq(1, 2, 3, 4, 2), Seq(1, 1, 1, 1, 2), true)
+    val model =
+      runIsotonicRegression(Seq(1, 2, 3, 4, 2), Seq(1, 1, 1, 1, 2), true)
 
     assert(model.boundaries === Array(0, 1, 2, 4))
     assert(model.predictions === Array(1, 2, 2.75, 2.75))
   }
 
   test("weighted isotonic regression with weights lower than 1") {
-    val model = runIsotonicRegression(Seq(1, 2, 3, 2, 1), Seq(1, 1, 1, 0.1, 0.1), true)
+    val model =
+      runIsotonicRegression(Seq(1, 2, 3, 2, 1), Seq(1, 1, 1, 0.1, 0.1), true)
 
     assert(model.boundaries === Array(0, 1, 2, 4))
-    assert(model.predictions.map(round) === Array(1, 2, 3.3/1.2, 3.3/1.2))
+    assert(model.predictions.map(round) === Array(1, 2, 3.3 / 1.2, 3.3 / 1.2))
   }
 
   test("weighted isotonic regression with negative weights") {
-    val model = runIsotonicRegression(Seq(1, 2, 3, 2, 1), Seq(-1, 1, -3, 1, -5), true)
+    val model =
+      runIsotonicRegression(Seq(1, 2, 3, 2, 1), Seq(-1, 1, -3, 1, -5), true)
 
     assert(model.boundaries === Array(0.0, 1.0, 4.0))
-    assert(model.predictions === Array(1.0, 10.0/6, 10.0/6))
+    assert(model.predictions === Array(1.0, 10.0 / 6, 10.0 / 6))
   }
 
   test("weighted isotonic regression with zero weights") {
-    val model = runIsotonicRegression(Seq[Double](1, 2, 3, 2, 1), Seq[Double](0, 0, 0, 1, 0), true)
+    val model = runIsotonicRegression(
+        Seq[Double](1, 2, 3, 2, 1), Seq[Double](0, 0, 0, 1, 0), true)
 
     assert(model.boundaries === Array(0.0, 1.0, 4.0))
     assert(model.predictions === Array(1, 2, 2))
@@ -184,14 +193,20 @@ class IsotonicRegressionSuite extends SparkFunSuite with MLlibTestSparkContext w
     assert(model.predict(0.5) === 1.5)
     assert(model.predict(0.75) === 1.75)
     assert(model.predict(1) === 2)
-    assert(model.predict(2) === 10d/3)
-    assert(model.predict(9) === 10d/3)
+    assert(model.predict(2) === 10d / 3)
+    assert(model.predict(9) === 10d / 3)
   }
 
   test("isotonic regression prediction with duplicate features") {
-    val trainRDD = sc.parallelize(
-      Seq[(Double, Double, Double)](
-        (2, 1, 1), (1, 1, 1), (4, 2, 1), (2, 2, 1), (6, 3, 1), (5, 3, 1)), 2).cache()
+    val trainRDD = sc
+      .parallelize(Seq[(Double, Double, Double)]((2, 1, 1),
+                                                 (1, 1, 1),
+                                                 (4, 2, 1),
+                                                 (2, 2, 1),
+                                                 (6, 3, 1),
+                                                 (5, 3, 1)),
+                   2)
+      .cache()
     val model = new IsotonicRegression().run(trainRDD)
 
     assert(model.predict(0) === 1)
@@ -201,9 +216,15 @@ class IsotonicRegressionSuite extends SparkFunSuite with MLlibTestSparkContext w
   }
 
   test("antitonic regression prediction with duplicate features") {
-    val trainRDD = sc.parallelize(
-      Seq[(Double, Double, Double)](
-        (5, 1, 1), (6, 1, 1), (2, 2, 1), (4, 2, 1), (1, 3, 1), (2, 3, 1)), 2).cache()
+    val trainRDD = sc
+      .parallelize(Seq[(Double, Double, Double)]((5, 1, 1),
+                                                 (6, 1, 1),
+                                                 (2, 2, 1),
+                                                 (4, 2, 1),
+                                                 (1, 3, 1),
+                                                 (2, 3, 1)),
+                   2)
+      .cache()
     val model = new IsotonicRegression().setIsotonic(false).run(trainRDD)
 
     assert(model.predict(0) === 6)
@@ -215,9 +236,11 @@ class IsotonicRegressionSuite extends SparkFunSuite with MLlibTestSparkContext w
   test("isotonic regression RDD prediction") {
     val model = runIsotonicRegression(Seq(1, 2, 7, 1, 2), true)
 
-    val testRDD = sc.parallelize(List(-2.0, -1.0, 0.5, 0.75, 1.0, 2.0, 9.0), 2).cache()
-    val predictions = testRDD.map(x => (x, model.predict(x))).collect().sortBy(_._1).map(_._2)
-    assert(predictions === Array(1, 1, 1.5, 1.75, 2, 10.0/3, 10.0/3))
+    val testRDD =
+      sc.parallelize(List(-2.0, -1.0, 0.5, 0.75, 1.0, 2.0, 9.0), 2).cache()
+    val predictions =
+      testRDD.map(x => (x, model.predict(x))).collect().sortBy(_._1).map(_._2)
+    assert(predictions === Array(1, 1, 1.5, 1.75, 2, 10.0 / 3, 10.0 / 3))
   }
 
   test("antitonic regression prediction") {
@@ -233,7 +256,8 @@ class IsotonicRegressionSuite extends SparkFunSuite with MLlibTestSparkContext w
   }
 
   test("model construction") {
-    val model = new IsotonicRegressionModel(Array(0.0, 1.0), Array(1.0, 2.0), isotonic = true)
+    val model = new IsotonicRegressionModel(
+        Array(0.0, 1.0), Array(1.0, 2.0), isotonic = true)
     assert(model.predict(-0.5) === 1.0)
     assert(model.predict(0.0) === 1.0)
     assert(model.predict(0.5) ~== 1.5 absTol 1e-14)
@@ -247,17 +271,20 @@ class IsotonicRegressionSuite extends SparkFunSuite with MLlibTestSparkContext w
 
     intercept[IllegalArgumentException] {
       // unordered boundaries
-      new IsotonicRegressionModel(Array(1.0, 0.0), Array(1.0, 2.0), isotonic = true)
+      new IsotonicRegressionModel(
+          Array(1.0, 0.0), Array(1.0, 2.0), isotonic = true)
     }
 
     intercept[IllegalArgumentException] {
       // unordered predictions (isotonic)
-      new IsotonicRegressionModel(Array(0.0, 1.0), Array(2.0, 1.0), isotonic = true)
+      new IsotonicRegressionModel(
+          Array(0.0, 1.0), Array(2.0, 1.0), isotonic = true)
     }
 
     intercept[IllegalArgumentException] {
       // unordered predictions (antitonic)
-      new IsotonicRegressionModel(Array(0.0, 1.0), Array(1.0, 2.0), isotonic = false)
+      new IsotonicRegressionModel(
+          Array(0.0, 1.0), Array(1.0, 2.0), isotonic = false)
     }
   }
 }

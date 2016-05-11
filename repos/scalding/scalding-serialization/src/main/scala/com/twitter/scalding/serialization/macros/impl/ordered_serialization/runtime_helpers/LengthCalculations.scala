@@ -16,9 +16,9 @@
 package com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers
 
 /**
- * There is a Monoid on MaybeLength, with
- * ConstLen(0) being the zero.
- */
+  * There is a Monoid on MaybeLength, with
+  * ConstLen(0) being the zero.
+  */
 sealed trait MaybeLength {
   def +(that: MaybeLength): MaybeLength
 }

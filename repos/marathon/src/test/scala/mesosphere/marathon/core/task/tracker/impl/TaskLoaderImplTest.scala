@@ -1,16 +1,17 @@
 package mesosphere.marathon.core.task.tracker.impl
 
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.{ MarathonTestHelper, MarathonSpec }
-import mesosphere.marathon.state.{ PathId, TaskRepository }
+import mesosphere.marathon.{MarathonTestHelper, MarathonSpec}
+import mesosphere.marathon.state.{PathId, TaskRepository}
 import mesosphere.marathon.test.Mockito
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ Matchers, GivenWhenThen, FunSuite }
+import org.scalatest.{Matchers, GivenWhenThen, FunSuite}
 
 import scala.concurrent.Future
 
 class TaskLoaderImplTest
-    extends FunSuite with MarathonSpec with Mockito with GivenWhenThen with ScalaFutures with Matchers {
+    extends FunSuite with MarathonSpec with Mockito with GivenWhenThen
+    with ScalaFutures with Matchers {
   test("loading no tasks") {
     val f = new Fixture
 

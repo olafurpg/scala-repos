@@ -30,7 +30,9 @@ class ChannelBufferBufBenchmark extends StdBenchAnnotations {
 
     val byteArrayBuf = Buf.ByteArray.Owned(raw, start, end)
     val byteBufferBuf = Buf.ByteBuffer.Owned(bb)
-    val concatBuf = byteArrayBuf.slice(0, size / 2).concat(byteArrayBuf.slice(size / 2, size))
+    val concatBuf = byteArrayBuf
+      .slice(0, size / 2)
+      .concat(byteArrayBuf.slice(size / 2, size))
     all = Array(byteArrayBuf, byteBufferBuf, concatBuf, channelBufferBuf)
   }
 
@@ -63,5 +65,4 @@ class ChannelBufferBufBenchmark extends StdBenchAnnotations {
   @Benchmark
   def length(): Int =
     channelBufferBuf.length
-
 }

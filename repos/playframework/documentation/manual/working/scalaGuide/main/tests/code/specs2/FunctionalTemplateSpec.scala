@@ -19,5 +19,4 @@ object FunctionalTemplateSpec extends Specification {
     contentAsString(html) must contain("Hello Coco")
   }
   // #scalatest-functionaltemplatespec
-
 }

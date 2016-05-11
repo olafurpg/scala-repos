@@ -11,6 +11,7 @@ class BB extends AA {
 
   def z = foo
 
-  /*start*/foo/*end*/
+  /*start*/
+  foo /*end*/
 }
 //BB

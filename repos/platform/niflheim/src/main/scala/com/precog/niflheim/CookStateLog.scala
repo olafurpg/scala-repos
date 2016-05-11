@@ -36,7 +36,8 @@ object CookStateLog {
   final val logName = "CookStateLog"
 }
 
-class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService) extends Logging {
+class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
+    extends Logging {
   import CookStateLog._
 
   private[this] val workLock = FileLock(baseDir, lockName)
@@ -54,7 +55,8 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService) extends L
 
   def close = {
     if (pendingCookIds0.size > 0) {
-      logger.warn("Closing txLog with pending cooks: " + pendingCookIds0.keys.mkString("[", ", ", "]"))
+      logger.warn("Closing txLog with pending cooks: " +
+          pendingCookIds0.keys.mkString("[", ", ", "]"))
     }
     txLog.close()
     workLock.release
@@ -115,7 +117,8 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService) extends L
   def completeCook(blockId: Long) = {
     assert(pendingCookIds0 contains blockId)
 
-    val completeTxKey = txLog.put(TXLogEntry.toBytes(CompleteCook(blockId)), true)
+    val completeTxKey =
+      txLog.put(TXLogEntry.toBytes(CompleteCook(blockId)), true)
 
     // Remove the entry from pending map and advance the mark to the
     // lowest remaining txKey, or the txKey of the completion if there
@@ -123,13 +126,13 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService) extends L
     // mark if cooks are performed out-of-order.
     pendingCookIds0 -= blockId
 
-    txLog.mark(pendingCookIds0.headOption match {
+    txLog.mark(
+        pendingCookIds0.headOption match {
       case Some((_, txKey)) => txKey
       case None => completeTxKey
     })
   }
 }
-
 
 sealed trait TXLogEntry {
   def blockId: Long
@@ -145,7 +148,13 @@ object TXLogEntry extends Logging {
     buffer.getShort match {
       case 0x1 => StartCook(buffer.getLong)
       case 0x2 => CompleteCook(buffer.getLong)
-      case other => logger.error("Unknown TX log record type = %d, isCTRL = %s, isEOB = %s from %s".format(other, record.isCTRL, record.isEOB, record.data.mkString("[", ", ", "]")))
+      case other =>
+        logger.error(
+            "Unknown TX log record type = %d, isCTRL = %s, isEOB = %s from %s"
+              .format(other,
+                      record.isCTRL,
+                      record.isEOB,
+                      record.data.mkString("[", ", ", "]")))
     }
   }
 
@@ -164,5 +173,3 @@ object TXLogEntry extends Logging {
     Array[Array[Byte]](record)
   }
 }
-
-

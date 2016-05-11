@@ -73,21 +73,18 @@ import scalaz.syntax.comonad._
 
 import java.io.File
 
-trait PlatformConfig extends BaseConfig
-    with IdSourceConfig
-    with EvaluatorConfig
-    with StandaloneShardSystemConfig
-    with ColumnarTableModuleConfig
+trait PlatformConfig
+    extends BaseConfig with IdSourceConfig with EvaluatorConfig
+    with StandaloneShardSystemConfig with ColumnarTableModuleConfig
     with BlockStoreColumnarTableModuleConfig
 
-trait SBTConsolePlatform extends muspelheim.ParseEvalStack[Future]
-    with SecureVFSModule[Future, Slice]
-    with ActorVFSModule
-    with IdSourceScannerModule
-    with VFSColumnarTableModule
-    with StandaloneActorProjectionSystem
-    with XLightWebHttpClientModule[Future]
-    with LongIdMemoryDatasetConsumer[Future] { self =>
+trait SBTConsolePlatform
+    extends muspelheim.ParseEvalStack[Future]
+    with SecureVFSModule[Future, Slice] with ActorVFSModule
+    with IdSourceScannerModule with VFSColumnarTableModule
+    with StandaloneActorProjectionSystem with XLightWebHttpClientModule[Future]
+    with LongIdMemoryDatasetConsumer[Future] {
+  self =>
 
   type YggConfig = PlatformConfig
 
@@ -101,13 +98,18 @@ object SBTConsole {
 
   val platform = new SBTConsolePlatform { console =>
     implicit val actorSystem = ActorSystem("sbtConsoleActorSystem")
-    implicit val asyncContext = ExecutionContext.defaultExecutionContext(actorSystem)
-    implicit val M: Monad[Future] with Comonad[Future] = new UnsafeFutureComonad(asyncContext, yggConfig.maxEvalDuration)
+    implicit val asyncContext =
+      ExecutionContext.defaultExecutionContext(actorSystem)
+    implicit val M: Monad[Future] with Comonad[Future] =
+      new UnsafeFutureComonad(asyncContext, yggConfig.maxEvalDuration)
 
     val yggConfig = new PlatformConfig {
-      val config = Configuration parse {
-        Option(System.getProperty("precog.storage.root")) map { "precog.storage.root = " + _ } getOrElse { "" }
-      }
+      val config =
+        Configuration parse {
+          Option(System.getProperty("precog.storage.root")) map {
+            "precog.storage.root = " + _
+          } getOrElse { "" }
+        }
 
       val sortWorkDir = scratchDir
       val memoizationBufferSize = sortBufferSize
@@ -131,26 +133,46 @@ object SBTConsole {
     val accountFinder = new StaticAccountFinder[Future]("", "")
     val rawAPIKeyFinder = new InMemoryAPIKeyManager[Future](Clock.System)
     val accessControl = new DirectAPIKeyFinder(rawAPIKeyFinder)
-    val permissionsFinder = new PermissionsFinder(accessControl, accountFinder, new org.joda.time.Instant())
+    val permissionsFinder = new PermissionsFinder(
+        accessControl, accountFinder, new org.joda.time.Instant())
 
     val rootAPIKey = rawAPIKeyFinder.rootAPIKey.copoint
-    val rootAccount = AccountDetails("root", "nobody@precog.com",
-      new DateTime, rootAPIKey, Path.Root, AccountPlan.Root)
-    def evaluationContext = EvaluationContext(rootAPIKey, rootAccount, Path.Root, Path.Root, new DateTime)
-
+    val rootAccount = AccountDetails("root",
+                                     "nobody@precog.com",
+                                     new DateTime,
+                                     rootAPIKey,
+                                     Path.Root,
+                                     AccountPlan.Root)
+    def evaluationContext =
+      EvaluationContext(
+          rootAPIKey, rootAccount, Path.Root, Path.Root, new DateTime)
 
     val storageTimeout = yggConfig.storageTimeout
 
-    val masterChef = actorSystem.actorOf(Props(Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)), VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+    val masterChef = actorSystem.actorOf(
+        Props(Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+                   VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
 
-    val resourceBuilder = new ResourceBuilder(actorSystem, yggConfig.clock, masterChef, yggConfig.cookThreshold, yggConfig.storageTimeout)
-    val projectionsActor = actorSystem.actorOf(Props(new PathRoutingActor(yggConfig.dataDir, yggConfig.storageTimeout.duration, yggConfig.quiescenceTimeout, 100, yggConfig.clock)))
+    val resourceBuilder = new ResourceBuilder(actorSystem,
+                                              yggConfig.clock,
+                                              masterChef,
+                                              yggConfig.cookThreshold,
+                                              yggConfig.storageTimeout)
+    val projectionsActor = actorSystem.actorOf(
+        Props(new PathRoutingActor(yggConfig.dataDir,
+                                   yggConfig.storageTimeout.duration,
+                                   yggConfig.quiescenceTimeout,
+                                   100,
+                                   yggConfig.clock)))
 
     val jobManager = new InMemoryJobManager[Future]
-    val actorVFS = new ActorVFS(projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
-    val vfs = new SecureVFS(actorVFS, permissionsFinder, jobManager, Clock.System)
+    val actorVFS = new ActorVFS(
+        projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
+    val vfs = new SecureVFS(
+        actorVFS, permissionsFinder, jobManager, Clock.System)
 
-    def Evaluator[N[+_]](N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] =
+    def Evaluator[N[+ _]](N0: Monad[N])(
+        implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] =
       new Evaluator[N](N0) {
         type YggConfig = PlatformConfig
         val yggConfig = console.yggConfig
@@ -158,7 +180,7 @@ object SBTConsole {
         def freshIdScanner = console.freshIdScanner
       }
 
-    def eval(str: String): Set[SValue] = evalE(str)  match {
+    def eval(str: String): Set[SValue] = evalE(str) match {
       case Success(results) => results.map(_._2)
       case Failure(t) => throw t
     }
@@ -173,9 +195,10 @@ object SBTConsole {
       val validForest = forest filter { _.errors.isEmpty }
 
       if (validForest.isEmpty) {
-        val strs = forest map { tree =>
-          tree.errors map showError mkString ("Set(\"", "\", \"", "\")")
-        }
+        val strs =
+          forest map { tree =>
+            tree.errors map showError mkString ("Set(\"", "\", \"", "\")")
+          }
 
         sys.error(strs mkString " | ")
       }
@@ -195,7 +218,9 @@ object SBTConsole {
 
     def shutdown() {
       // stop storage bifrost
-      Await.result(gracefulStop(projectionsActor, yggConfig.storageTimeout.duration), yggConfig.storageTimeout.duration)
+      Await.result(
+          gracefulStop(projectionsActor, yggConfig.storageTimeout.duration),
+          yggConfig.storageTimeout.duration)
       actorSystem.shutdown()
     }
   }

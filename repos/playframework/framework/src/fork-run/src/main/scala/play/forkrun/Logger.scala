@@ -3,8 +3,8 @@
  */
 package play.forkrun
 
-import java.io.{ PrintStream, PrintWriter, StringWriter }
-import play.runsupport.{ Colors, LoggerProxy }
+import java.io.{PrintStream, PrintWriter, StringWriter}
+import play.runsupport.{Colors, LoggerProxy}
 
 object Logger {
   case class Level(value: Int, name: String, label: String) {
@@ -34,7 +34,8 @@ object Logger {
   val NewLine = sys.props("line.separator")
 
   def apply(level: Level): Logger = new Logger(level)
-  def apply(level: String): Logger = new Logger(Level(level).getOrElse(Level.Info))
+  def apply(level: String): Logger =
+    new Logger(Level(level).getOrElse(Level.Info))
 }
 
 class Logger(out: PrintStream, logLevel: Logger.Level) extends LoggerProxy {
@@ -66,11 +67,12 @@ class Logger(out: PrintStream, logLevel: Logger.Level) extends LoggerProxy {
     for (logLevel <- Logger.Level(level)) log(logLevel, message)
   }
 
-  def printLog(label: String, message: String, separator: String = NewLine): Unit = out.synchronized {
-    for (line <- message.split(separator)) {
-      out.print(label)
-      out.println(line)
+  def printLog(
+      label: String, message: String, separator: String = NewLine): Unit =
+    out.synchronized {
+      for (line <- message.split(separator)) {
+        out.print(label)
+        out.println(line)
+      }
     }
-  }
-
 }

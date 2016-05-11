@@ -2,11 +2,12 @@ package spire
 package algebra
 package free
 
-final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVal { lhs =>
+final class FreeGroup[A] private (val terms: Vector[Either[A, A]])
+    extends AnyVal { lhs =>
 
   /**
-   * Map each term to type `B` and sum them using `B`'s [[Group]].
-   */
+    * Map each term to type `B` and sum them using `B`'s [[Group]].
+    */
   def run[B](f: A => B)(implicit B: Group[B]): B =
     terms.foldLeft(B.id) {
       case (sum, Right(a)) => B.op(sum, f(a))
@@ -68,10 +69,12 @@ object FreeGroup { companion =>
   final def apply[A](a: A): FreeGroup[A] = lift(a)
   final def lift[A](a: A): FreeGroup[A] = new FreeGroup[A](Vector(Right(a)))
 
-  implicit def FreeGroupGroup[A]: Group[FreeGroup[A]] = new Group[FreeGroup[A]] {
-    def id: FreeGroup[A] = companion.id
-    def op(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |+| b
-    def inverse(a: FreeGroup[A]): FreeGroup[A] = a.inverse
-    override def opInverse(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |-| b
-  }
+  implicit def FreeGroupGroup[A]: Group[FreeGroup[A]] =
+    new Group[FreeGroup[A]] {
+      def id: FreeGroup[A] = companion.id
+      def op(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |+| b
+      def inverse(a: FreeGroup[A]): FreeGroup[A] = a.inverse
+      override def opInverse(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] =
+        a |-| b
+    }
 }

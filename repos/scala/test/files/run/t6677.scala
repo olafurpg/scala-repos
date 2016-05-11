@@ -1,9 +1,7 @@
-
 class Test {
   val cm: reflect.runtime.universe.Mirror = reflect.runtime.currentMirror
   def error {
     new cm.universe.Traverser // java.lang.VerifyError: (class: Test, method: error signature: ()V) Incompatible object argument for function call
-
   }
 
   def okay1 {

@@ -26,23 +26,28 @@ private[scheduler] class DAGSchedulerSource(val dagScheduler: DAGScheduler)
   override val metricRegistry = new MetricRegistry()
   override val sourceName = "DAGScheduler"
 
-  metricRegistry.register(MetricRegistry.name("stage", "failedStages"), new Gauge[Int] {
+  metricRegistry.register(
+      MetricRegistry.name("stage", "failedStages"), new Gauge[Int] {
     override def getValue: Int = dagScheduler.failedStages.size
   })
 
-  metricRegistry.register(MetricRegistry.name("stage", "runningStages"), new Gauge[Int] {
+  metricRegistry.register(
+      MetricRegistry.name("stage", "runningStages"), new Gauge[Int] {
     override def getValue: Int = dagScheduler.runningStages.size
   })
 
-  metricRegistry.register(MetricRegistry.name("stage", "waitingStages"), new Gauge[Int] {
+  metricRegistry.register(
+      MetricRegistry.name("stage", "waitingStages"), new Gauge[Int] {
     override def getValue: Int = dagScheduler.waitingStages.size
   })
 
-  metricRegistry.register(MetricRegistry.name("job", "allJobs"), new Gauge[Int] {
+  metricRegistry.register(
+      MetricRegistry.name("job", "allJobs"), new Gauge[Int] {
     override def getValue: Int = dagScheduler.numTotalJobs
   })
 
-  metricRegistry.register(MetricRegistry.name("job", "activeJobs"), new Gauge[Int] {
+  metricRegistry.register(
+      MetricRegistry.name("job", "activeJobs"), new Gauge[Int] {
     override def getValue: Int = dagScheduler.activeJobs.size
   })
 

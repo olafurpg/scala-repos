@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.top.template.TemplateBody
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.02.2008
+  */
 /*
  * TraitTemplateOpt ::= 'extends' TraitTemplate | [['extends'] TemplateBody]
  */
@@ -23,7 +22,8 @@ object TraitTemplateOpt {
     val extendsMarker = builder.mark
     //try to find extends keyword
     builder.getTokenType match {
-      case ScalaTokenTypes.kEXTENDS | ScalaTokenTypes.tUPPER_BOUND => builder.advanceLexer() //Ate extends
+      case ScalaTokenTypes.kEXTENDS | ScalaTokenTypes.tUPPER_BOUND =>
+        builder.advanceLexer() //Ate extends
       case ScalaTokenTypes.tLBRACE =>
         if (builder.twoNewlinesBeforeCurrentToken) {
           extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
@@ -46,32 +46,31 @@ object TraitTemplateOpt {
           //parse template body
           builder.getTokenType match {
             case ScalaTokenTypes.tLBRACE => {
-              if (builder.twoNewlinesBeforeCurrentToken) {
+                if (builder.twoNewlinesBeforeCurrentToken) {
+                  extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+                  return
+                }
+                TemplateBody parse builder
                 extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
                 return
               }
-              TemplateBody parse builder
-              extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-              return
-            }
             case _ => {
-              extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-              return
-            }
+                extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+                return
+              }
           }
-        }
-        else {
+        } else {
           //parse template body
           builder.getTokenType match {
             case ScalaTokenTypes.tLBRACE => {
-              TemplateBody parse builder
-              extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-              return
-            }
+                TemplateBody parse builder
+                extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+                return
+              }
             case _ => {
-              extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-              return
-            }
+                extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+                return
+              }
           }
         }
       //if we find nl => it could be TemplateBody only, but we can't find nl after extends keyword
@@ -81,18 +80,18 @@ object TraitTemplateOpt {
         //parse template body
         builder.getTokenType match {
           case ScalaTokenTypes.tLBRACE => {
-            if (builder.twoNewlinesBeforeCurrentToken) {
+              if (builder.twoNewlinesBeforeCurrentToken) {
+                extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+                return
+              }
+              TemplateBody parse builder
               extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
               return
             }
-            TemplateBody parse builder
-            extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-            return
-          }
           case _ => {
-            extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-            return
-          }
+              extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+              return
+            }
         }
     }
   }

@@ -31,17 +31,16 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.util.Utils
 
-
 /**
- * Test suite for [[GBTClassifier]].
- */
+  * Test suite for [[GBTClassifier]].
+  */
 class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   import GBTClassifierSuite.compareAPIs
 
   // Combinations for estimators, learning rates and subsamplingRate
-  private val testCombinations =
-    Array((10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
+  private val testCombinations = Array(
+      (10, 1.0, 1.0), (10, 0.1, 1.0), (10, 0.5, 0.75), (10, 0.1, 0.75))
 
   private var data: RDD[LabeledPoint] = _
   private var trainData: RDD[LabeledPoint] = _
@@ -49,18 +48,25 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   override def beforeAll() {
     super.beforeAll()
-    data = sc.parallelize(EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 10, 100), 2)
-    trainData =
-      sc.parallelize(EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 120), 2)
-    validationData =
-      sc.parallelize(EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 80), 2)
+    data = sc.parallelize(
+        EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 10, 100),
+        2)
+    trainData = sc.parallelize(
+        EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 120),
+        2)
+    validationData = sc.parallelize(
+        EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 80),
+        2)
   }
 
   test("params") {
     ParamsSuite.checkParams(new GBTClassifier)
-    val model = new GBTClassificationModel("gbtc",
-      Array(new DecisionTreeRegressionModel("dtr", new LeafNode(0.0, 0.0, null), 1)),
-      Array(1.0), 1)
+    val model = new GBTClassificationModel(
+        "gbtc",
+        Array(new DecisionTreeRegressionModel(
+                "dtr", new LeafNode(0.0, 0.0, null), 1)),
+        Array(1.0),
+        1)
     ParamsSuite.checkParams(model)
   }
 
@@ -84,7 +90,8 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
     sc.setCheckpointDir(path)
 
     val categoricalFeatures = Map.empty[Int, Int]
-    val df: DataFrame = TreeTests.setMetadata(data, categoricalFeatures, numClasses = 2)
+    val df: DataFrame =
+      TreeTests.setMetadata(data, categoricalFeatures, numClasses = 2)
     val gbt = new GBTClassifier()
       .setMaxDepth(2)
       .setLossType("logistic")
@@ -116,7 +123,7 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
       compareAPIs(trainData, Some(validationData), gbt, categoricalFeatures)
     }
   }
-  */
+   */
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests of model save/load
@@ -142,30 +149,33 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
       Utils.deleteRecursively(tempDir)
     }
   }
-  */
+ */
 }
 
 private object GBTClassifierSuite extends SparkFunSuite {
 
   /**
-   * Train 2 models on the given dataset, one using the old API and one using the new API.
-   * Convert the old model to the new format, compare them, and fail if they are not exactly equal.
-   */
-  def compareAPIs(
-      data: RDD[LabeledPoint],
-      validationData: Option[RDD[LabeledPoint]],
-      gbt: GBTClassifier,
-      categoricalFeatures: Map[Int, Int]): Unit = {
+    * Train 2 models on the given dataset, one using the old API and one using the new API.
+    * Convert the old model to the new format, compare them, and fail if they are not exactly equal.
+    */
+  def compareAPIs(data: RDD[LabeledPoint],
+                  validationData: Option[RDD[LabeledPoint]],
+                  gbt: GBTClassifier,
+                  categoricalFeatures: Map[Int, Int]): Unit = {
     val numFeatures = data.first().features.size
     val oldBoostingStrategy =
       gbt.getOldBoostingStrategy(categoricalFeatures, OldAlgo.Classification)
     val oldGBT = new OldGBT(oldBoostingStrategy)
     val oldModel = oldGBT.run(data)
-    val newData: DataFrame = TreeTests.setMetadata(data, categoricalFeatures, numClasses = 2)
+    val newData: DataFrame =
+      TreeTests.setMetadata(data, categoricalFeatures, numClasses = 2)
     val newModel = gbt.fit(newData)
     // Use parent from newTree since this is not checked anyways.
     val oldModelAsNew = GBTClassificationModel.fromOld(
-      oldModel, newModel.parent.asInstanceOf[GBTClassifier], categoricalFeatures, numFeatures)
+        oldModel,
+        newModel.parent.asInstanceOf[GBTClassifier],
+        categoricalFeatures,
+        numFeatures)
     TreeTests.checkEqual(oldModelAsNew, newModel)
     assert(newModel.numFeatures === numFeatures)
     assert(oldModelAsNew.numFeatures === numFeatures)

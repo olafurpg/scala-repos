@@ -8,50 +8,60 @@ import scala.reflect.runtime.{SymbolTable => RuntimeSymbolTable}
 import scala.reflect.api.{TypeCreator, Universe}
 
 /** An implementation of [[scala.reflect.api.Universe]] for runtime reflection using JVM classloaders.
- *
- *  Should not be instantiated directly, use [[scala.reflect.runtime.universe]] instead.
- *
- *  @contentDiagram hideNodes "*Api" "*Extractor"
- */
-class JavaUniverse extends InternalSymbolTable with JavaUniverseForce with ReflectSetup with RuntimeSymbolTable { self =>
+  *
+  *  Should not be instantiated directly, use [[scala.reflect.runtime.universe]] instead.
+  *
+  *  @contentDiagram hideNodes "*Api" "*Extractor"
+  */
+class JavaUniverse
+    extends InternalSymbolTable with JavaUniverseForce with ReflectSetup
+    with RuntimeSymbolTable {
+  self =>
   def picklerPhase = SomePhase
   def erasurePhase = SomePhase
   lazy val settings = new Settings
 
   private val isLogging = sys.props contains "scala.debug.reflect"
-  def log(msg: => AnyRef): Unit = if (isLogging) Console.err.println("[reflect] " + msg)
+  def log(msg: => AnyRef): Unit =
+    if (isLogging) Console.err.println("[reflect] " + msg)
 
   // TODO: why put output under isLogging? Calls to inform are already conditional on debug/verbose/...
   import scala.reflect.internal.{Reporter, ReporterImpl}
   override def reporter: Reporter = new ReporterImpl {
-    protected def info0(pos: Position, msg: String, severity: Severity, force: Boolean): Unit = log(msg)
+    protected def info0(
+        pos: Position, msg: String, severity: Severity, force: Boolean): Unit =
+      log(msg)
   }
 
   // minimal Run to get Reporting wired
   def currentRun = new RunReporting {}
   class PerRunReporting extends PerRunReportingBase {
-    def deprecationWarning(pos: Position, msg: String): Unit = reporter.warning(pos, msg)
+    def deprecationWarning(pos: Position, msg: String): Unit =
+      reporter.warning(pos, msg)
   }
   protected def PerRunReporting = new PerRunReporting
 
-
   type TreeCopier = InternalTreeCopierOps
-  implicit val TreeCopierTag: ClassTag[TreeCopier] = ClassTag[TreeCopier](classOf[TreeCopier])
+  implicit val TreeCopierTag: ClassTag[TreeCopier] =
+    ClassTag[TreeCopier](classOf[TreeCopier])
   def newStrictTreeCopier: TreeCopier = new StrictTreeCopier
   def newLazyTreeCopier: TreeCopier = new LazyTreeCopier
 
   def currentFreshNameCreator = globalFreshNameCreator
 
   override lazy val internal: Internal = new SymbolTableInternal {
-    override def typeTagToManifest[T: ClassTag](mirror0: Any, tag: Universe # TypeTag[T]): Manifest[T] = {
+    override def typeTagToManifest[T : ClassTag](
+        mirror0: Any, tag: Universe#TypeTag[T]): Manifest[T] = {
       // SI-6239: make this conversion more precise
       val mirror = mirror0.asInstanceOf[Mirror]
       val runtimeClass = mirror.runtimeClass(tag.in(mirror).tpe)
       Manifest.classType(runtimeClass).asInstanceOf[Manifest[T]]
     }
-    override def manifestToTypeTag[T](mirror0: Any, manifest: Manifest[T]): Universe # TypeTag[T] =
+    override def manifestToTypeTag[T](
+        mirror0: Any, manifest: Manifest[T]): Universe#TypeTag[T] =
       TypeTag(mirror0.asInstanceOf[Mirror], new TypeCreator {
-        def apply[U <: Universe with Singleton](mirror: scala.reflect.api.Mirror[U]): U # Type = {
+        def apply[U <: Universe with Singleton](
+            mirror: scala.reflect.api.Mirror[U]): U#Type = {
           mirror.universe match {
             case ju: JavaUniverse =>
               val jm = mirror.asInstanceOf[ju.Mirror]
@@ -59,12 +69,18 @@ class JavaUniverse extends InternalSymbolTable with JavaUniverseForce with Refle
               val tpe =
                 if (manifest.typeArguments.isEmpty) sym.toType
                 else {
-                  val tags = manifest.typeArguments map (targ => ju.internal.manifestToTypeTag(jm, targ))
-                  ju.appliedType(sym.toTypeConstructor, tags map (_.in(jm).tpe))
+                  val tags =
+                    manifest.typeArguments map
+                    (targ => ju.internal.manifestToTypeTag(jm, targ))
+                  ju.appliedType(
+                      sym.toTypeConstructor, tags map (_.in(jm).tpe))
                 }
-              tpe.asInstanceOf[U # Type]
+              tpe.asInstanceOf[U#Type]
             case u =>
-              u.internal.manifestToTypeTag(mirror.asInstanceOf[u.Mirror], manifest).in(mirror).tpe
+              u.internal
+                .manifestToTypeTag(mirror.asInstanceOf[u.Mirror], manifest)
+                .in(mirror)
+                .tpe
           }
         }
       })

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import akka.actor.Address
@@ -11,32 +11,40 @@ import akka.testkit._
 import scala.concurrent.duration._
 import scala.collection.immutable
 
-final case class SingletonClusterMultiNodeConfig(failureDetectorPuppet: Boolean) extends MultiNodeConfig {
+final case class SingletonClusterMultiNodeConfig(
+    failureDetectorPuppet: Boolean)
+    extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).
-    withFallback(ConfigFactory.parseString("""
+  commonConfig(
+      debugConfig(on = false)
+        .withFallback(ConfigFactory.parseString("""
       akka.cluster {
         auto-down-unreachable-after = 0s
         failure-detector.threshold = 4
       }
-    """)).
-    withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
-
+    """))
+        .withFallback(
+            MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
-class SingletonClusterWithFailureDetectorPuppetMultiJvmNode1 extends SingletonClusterSpec(failureDetectorPuppet = true)
-class SingletonClusterWithFailureDetectorPuppetMultiJvmNode2 extends SingletonClusterSpec(failureDetectorPuppet = true)
+class SingletonClusterWithFailureDetectorPuppetMultiJvmNode1
+    extends SingletonClusterSpec(failureDetectorPuppet = true)
+class SingletonClusterWithFailureDetectorPuppetMultiJvmNode2
+    extends SingletonClusterSpec(failureDetectorPuppet = true)
 
-class SingletonClusterWithAccrualFailureDetectorMultiJvmNode1 extends SingletonClusterSpec(failureDetectorPuppet = false)
-class SingletonClusterWithAccrualFailureDetectorMultiJvmNode2 extends SingletonClusterSpec(failureDetectorPuppet = false)
+class SingletonClusterWithAccrualFailureDetectorMultiJvmNode1
+    extends SingletonClusterSpec(failureDetectorPuppet = false)
+class SingletonClusterWithAccrualFailureDetectorMultiJvmNode2
+    extends SingletonClusterSpec(failureDetectorPuppet = false)
 
-abstract class SingletonClusterSpec(multiNodeConfig: SingletonClusterMultiNodeConfig)
-  extends MultiNodeSpec(multiNodeConfig)
-  with MultiNodeClusterSpec {
+abstract class SingletonClusterSpec(
+    multiNodeConfig: SingletonClusterMultiNodeConfig)
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
 
-  def this(failureDetectorPuppet: Boolean) = this(SingletonClusterMultiNodeConfig(failureDetectorPuppet))
+  def this(failureDetectorPuppet: Boolean) =
+    this(SingletonClusterMultiNodeConfig(failureDetectorPuppet))
 
   import multiNodeConfig._
 
@@ -70,7 +78,9 @@ abstract class SingletonClusterSpec(multiNodeConfig: SingletonClusterMultiNodeCo
 
         markNodeAsUnavailable(secondAddress)
 
-        awaitMembersUp(numberOfMembers = 1, canNotBePartOfMemberRing = Set(secondAddress), 30.seconds)
+        awaitMembersUp(numberOfMembers = 1,
+                       canNotBePartOfMemberRing = Set(secondAddress),
+                       30.seconds)
         clusterView.isSingletonCluster should ===(true)
         awaitCond(clusterView.isLeader)
       }

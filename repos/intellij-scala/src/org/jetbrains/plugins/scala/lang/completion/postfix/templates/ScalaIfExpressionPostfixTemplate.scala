@@ -7,10 +7,12 @@ import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.Se
 import org.jetbrains.plugins.scala.lang.surroundWith.surrounders.expression.ScalaWithIfConditionSurrounder
 
 /**
- * @author Roman.Shein
- * @since 09.09.2015.
- */
-class ScalaIfExpressionPostfixTemplate extends IfPostfixTemplateBase(new ScalaPostfixTemplatePsiInfo,
-  new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, Topmost)) {
+  * @author Roman.Shein
+  * @since 09.09.2015.
+  */
+class ScalaIfExpressionPostfixTemplate
+    extends IfPostfixTemplateBase(
+        new ScalaPostfixTemplatePsiInfo,
+        new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, Topmost)) {
   override def getSurrounder: Surrounder = new ScalaWithIfConditionSurrounder
 }

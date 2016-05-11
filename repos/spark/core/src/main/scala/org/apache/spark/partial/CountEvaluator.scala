@@ -20,13 +20,13 @@ package org.apache.spark.partial
 import org.apache.commons.math3.distribution.NormalDistribution
 
 /**
- * An ApproximateEvaluator for counts.
- *
- * TODO: There's currently a lot of shared code between this and GroupedCountEvaluator. It might
- * be best to make this a special case of GroupedCountEvaluator with one group.
- */
+  * An ApproximateEvaluator for counts.
+  *
+  * TODO: There's currently a lot of shared code between this and GroupedCountEvaluator. It might
+  * be best to make this a special case of GroupedCountEvaluator with one group.
+  */
 private[spark] class CountEvaluator(totalOutputs: Int, confidence: Double)
-  extends ApproximateEvaluator[Long, BoundedDouble] {
+    extends ApproximateEvaluator[Long, BoundedDouble] {
 
   var outputsMerged = 0
   var sum: Long = 0
@@ -40,14 +40,15 @@ private[spark] class CountEvaluator(totalOutputs: Int, confidence: Double)
     if (outputsMerged == totalOutputs) {
       new BoundedDouble(sum, 1.0, sum, sum)
     } else if (outputsMerged == 0) {
-      new BoundedDouble(0, 0.0, Double.NegativeInfinity, Double.PositiveInfinity)
+      new BoundedDouble(
+          0, 0.0, Double.NegativeInfinity, Double.PositiveInfinity)
     } else {
       val p = outputsMerged.toDouble / totalOutputs
       val mean = (sum + 1 - p) / p
       val variance = (sum + 1) * (1 - p) / (p * p)
       val stdev = math.sqrt(variance)
-      val confFactor = new NormalDistribution().
-        inverseCumulativeProbability(1 - (1 - confidence) / 2)
+      val confFactor = new NormalDistribution()
+        .inverseCumulativeProbability(1 - (1 - confidence) / 2)
       val low = mean - confFactor * stdev
       val high = mean + confFactor * stdev
       new BoundedDouble(mean, confidence, low, high)

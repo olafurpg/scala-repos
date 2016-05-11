@@ -18,8 +18,9 @@
 package kafka.common
 
 /**
- * Message was rejected because number of insync replicas for the partition is lower than min.insync.replicas
- */
-class NotEnoughReplicasException(message: String) extends RuntimeException(message) {
-    def this() = this(null)
+  * Message was rejected because number of insync replicas for the partition is lower than min.insync.replicas
+  */
+class NotEnoughReplicasException(message: String)
+    extends RuntimeException(message) {
+  def this() = this(null)
 }

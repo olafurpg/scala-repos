@@ -9,6 +9,7 @@ package util
 import scala.reflect.internal.Chars._
 
 trait CharArrayReaderData {
+
   /** the last read character */
   var ch: Char = _
 
@@ -62,9 +63,9 @@ abstract class CharArrayReader extends CharArrayReaderData { self =>
   }
 
   /** Advance one character, leaving CR;LF pairs intact.
-   *  This is for use in multi-line strings, so there are no
-   *  "potential line ends" here.
-   */
+    *  This is for use in multi-line strings, so there are no
+    *  "potential line ends" here.
+    */
   final def nextRawChar() {
     if (charOffset >= buf.length) {
       ch = SU
@@ -90,17 +91,17 @@ abstract class CharArrayReader extends CharArrayReaderData { self =>
         // we are one past EOF.  This happens with e.g. val x = \ u 1 <EOF>
         error(charOffset - 1, "incomplete unicode escape")
         SU
-      }
-      else {
+      } else {
         val d = digit2int(buf(charOffset), 16)
         if (d >= 0) charOffset += 1
         else error(charOffset, "error in unicode escape")
         d
       }
     }
-    if (charOffset < buf.length && buf(charOffset) == 'u' && decodeUni && evenSlashPrefix) {
-      do charOffset += 1
-      while (charOffset < buf.length && buf(charOffset) == 'u')
+    if (charOffset < buf.length && buf(charOffset) == 'u' && decodeUni &&
+        evenSlashPrefix) {
+      do charOffset += 1 while (charOffset < buf.length &&
+      buf(charOffset) == 'u')
       val code = udigit << 12 | udigit << 8 | udigit << 4 | udigit
       lastUnicodeOffset = charOffset
       ch = code.toChar
@@ -115,8 +116,7 @@ abstract class CharArrayReader extends CharArrayReaderData { self =>
           charOffset += 1
           ch = LF
         case '\\' =>
-          if (lookaheadReader.getu == LF)
-            potentialUnicode()
+          if (lookaheadReader.getu == LF) potentialUnicode()
         case _ =>
       }
 
@@ -137,8 +137,12 @@ abstract class CharArrayReader extends CharArrayReaderData { self =>
     ch = self.ch
     override def decodeUni = self.decodeUni
     def error(offset: Int, msg: String) = self.error(offset, msg)
+
     /** A mystery why CharArrayReader.nextChar() returns Unit */
-    def getc() = { nextChar() ; ch }
-    def getu() = { require(buf(charOffset) == '\\') ; ch = '\\' ; charOffset += 1 ; potentialUnicode() ; ch }
+    def getc() = { nextChar(); ch }
+    def getu() = {
+      require(buf(charOffset) == '\\'); ch = '\\'; charOffset += 1;
+      potentialUnicode(); ch
+    }
   }
 }

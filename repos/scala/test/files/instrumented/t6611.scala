@@ -7,7 +7,6 @@ object Test {
     // tests optimization in Cleanup for varargs reference arrays
     Array("")
 
-
     Array(true)
     Array(true, false)
     Array(1: Byte)
@@ -27,7 +26,7 @@ object Test {
     Array[Int](1, 2) etc
     Array(())
     Array((), ())
-    */
+     */
 
     stopProfiling()
     printStatistics()

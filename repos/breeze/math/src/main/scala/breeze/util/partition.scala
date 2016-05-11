@@ -22,19 +22,21 @@ import breeze.generic.UFunc
 import breeze.linalg.support.CanCopy
 
 /**
- *
- * Creates a copy of the array with its elements rearranged in such a way that the value of the element
- * in kth position is in the position it would be in a sorted array. All elements smaller than the kth element
- * are moved before this element and all equal or greater are moved behind it.
- * The ordering of the elements in the two partitions is undefined.
- *
- * Based on the numpy method of the same name. Docs lifted from numpy
- *
- * @author dlwh
- **/
+  *
+  * Creates a copy of the array with its elements rearranged in such a way that the value of the element
+  * in kth position is in the position it would be in a sorted array. All elements smaller than the kth element
+  * are moved before this element and all equal or greater are moved behind it.
+  * The ordering of the elements in the two partitions is undefined.
+  *
+  * Based on the numpy method of the same name. Docs lifted from numpy
+  *
+  * @author dlwh
+  **/
 object partition extends UFunc {
 
-  implicit def inPlaceFromQSelectImplImpl[Arr, T](implicit qs: quickSelectImpl.Impl2[Arr, Int, T]):InPlaceImpl2[Arr, Int] = {
+  implicit def inPlaceFromQSelectImplImpl[Arr, T](
+      implicit qs: quickSelectImpl.Impl2[Arr, Int, T])
+    : InPlaceImpl2[Arr, Int] = {
     new InPlaceImpl2[Arr, Int] {
       override def apply(v: Arr, v2: Int): Unit = {
         qs(v, v2)
@@ -42,14 +44,15 @@ object partition extends UFunc {
     }
   }
 
-  implicit def implFromInPlaceAndcopy[Arr](implicit qs:InPlaceImpl2[Arr, Int], copy: CanCopy[Arr]):Impl2[Arr, Int, Arr] = {
+  implicit def implFromInPlaceAndcopy[Arr](
+      implicit qs: InPlaceImpl2[Arr, Int],
+      copy: CanCopy[Arr]): Impl2[Arr, Int, Arr] = {
     new Impl2[Arr, Int, Arr] {
-      override def apply(v: Arr, v2: Int):Arr = {
+      override def apply(v: Arr, v2: Int): Arr = {
         val c = copy(v)
         qs(c, v2)
         c
       }
     }
   }
-
 }

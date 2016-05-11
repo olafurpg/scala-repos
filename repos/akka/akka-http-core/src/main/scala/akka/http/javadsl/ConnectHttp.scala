@@ -15,14 +15,17 @@ abstract class ConnectHttp {
   def isHttps: Boolean
   def connectionContext: Optional[HttpsConnectionContext]
 
-  final def effectiveHttpsConnectionContext(fallbackContext: HttpsConnectionContext): HttpsConnectionContext =
+  final def effectiveHttpsConnectionContext(
+      fallbackContext: HttpsConnectionContext): HttpsConnectionContext =
     connectionContext.orElse(fallbackContext)
 
-  final def effectiveConnectionContext(fallbackContext: ConnectionContext): ConnectionContext =
+  final def effectiveConnectionContext(
+      fallbackContext: ConnectionContext): ConnectionContext =
     if (connectionContext.isPresent) connectionContext.get()
     else fallbackContext
 
-  override def toString = s"ConnectHttp($host,$port,$isHttps,$connectionContext)"
+  override def toString =
+    s"ConnectHttp($host,$port,$isHttps,$connectionContext)"
 }
 
 object ConnectHttp {
@@ -32,8 +35,11 @@ object ConnectHttp {
   /** Extracts host data from given Uri. */
   def toHost(uriHost: Uri): ConnectHttp = {
     val s = uriHost.scheme.toLowerCase(Locale.ROOT)
-    if (s == "https") new ConnectHttpsImpl(uriHost.host.address, effectivePort(s, uriHost.port))
-    else new ConnectHttpImpl(uriHost.host.address, effectivePort(s, uriHost.port))
+    if (s == "https")
+      new ConnectHttpsImpl(
+          uriHost.host.address, effectivePort(s, uriHost.port))
+    else
+      new ConnectHttpImpl(uriHost.host.address, effectivePort(s, uriHost.port))
   }
 
   def toHost(host: String): ConnectHttp = {
@@ -48,13 +54,14 @@ object ConnectHttp {
   }
 
   /**
-   * Extracts host data from given Uri.
-   * Forces an HTTPS connection to the given host, using the default HTTPS context and default port.
-   */
+    * Extracts host data from given Uri.
+    * Forces an HTTPS connection to the given host, using the default HTTPS context and default port.
+    */
   @throws(classOf[IllegalArgumentException])
   def toHostHttps(uriHost: Uri): ConnectWithHttps = {
     val s = uriHost.scheme.toLowerCase(Locale.ROOT)
-    require(s == "" || s == "https", "toHostHttps used with non https scheme! Was: " + uriHost)
+    require(s == "" || s == "https",
+            "toHostHttps used with non https scheme! Was: " + uriHost)
     val httpsHost = uriHost.scheme("https") // for effective port calculation
     new ConnectHttpsImpl(httpsHost.host.address, effectivePort(uriHost))
   }
@@ -72,7 +79,8 @@ object ConnectHttp {
     toHostHttps(Uri.create(s"$start").port(port))
   }
 
-  private def isHttpOrHttps(s: String) = s.startsWith("http://") || s.startsWith("https://")
+  private def isHttpOrHttps(s: String) =
+    s.startsWith("http://") || s.startsWith("https://")
 
   private def effectivePort(uri: Uri): Int = {
     val s = uri.scheme.toLowerCase(Locale.ROOT)
@@ -84,9 +92,10 @@ object ConnectHttp {
     if (port > 0) port
     else if (s == "https" || s == "wss") 443
     else if (s == "http" || s == "ws") 80
-    else throw new IllegalArgumentException("Scheme is not http/https/ws/wss and no port given!")
+    else
+      throw new IllegalArgumentException(
+          "Scheme is not http/https/ws/wss and no port given!")
   }
-
 }
 
 abstract class ConnectWithHttps extends ConnectHttp {
@@ -95,23 +104,27 @@ abstract class ConnectWithHttps extends ConnectHttp {
 }
 
 /** INTERNAL API */
-final class ConnectHttpImpl(val host: String, val port: Int) extends ConnectHttp {
+final class ConnectHttpImpl(val host: String, val port: Int)
+    extends ConnectHttp {
   def isHttps: Boolean = false
 
   def connectionContext: Optional[HttpsConnectionContext] = Optional.empty()
 }
 
-final class ConnectHttpsImpl(val host: String, val port: Int, val context: Optional[HttpsConnectionContext] = Optional.empty())
-  extends ConnectWithHttps {
+final class ConnectHttpsImpl(
+    val host: String,
+    val port: Int,
+    val context: Optional[HttpsConnectionContext] = Optional.empty())
+    extends ConnectWithHttps {
 
   override def isHttps: Boolean = true
 
-  override def withCustomHttpsContext(context: HttpsConnectionContext): ConnectWithHttps =
+  override def withCustomHttpsContext(
+      context: HttpsConnectionContext): ConnectWithHttps =
     new ConnectHttpsImpl(host, port, Optional.of(context))
 
   override def withDefaultHttpsContext(): ConnectWithHttps =
     new ConnectHttpsImpl(host, port, Optional.empty())
 
   override def connectionContext: Optional[HttpsConnectionContext] = context
-
 }

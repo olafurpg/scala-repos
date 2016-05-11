@@ -8,19 +8,24 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.typechecker.Analyzer
 
 /** A version of Global that uses reflection to get class
- *  infos, instead of reading class or source files.
- */
-class ReflectGlobal(currentSettings: Settings, reporter: Reporter, override val rootClassLoader: ClassLoader)
-  extends Global(currentSettings, reporter) with scala.tools.reflect.ReflectSetup with scala.reflect.runtime.SymbolTable {
+  *  infos, instead of reading class or source files.
+  */
+class ReflectGlobal(currentSettings: Settings,
+                    reporter: Reporter,
+                    override val rootClassLoader: ClassLoader)
+    extends Global(currentSettings, reporter)
+    with scala.tools.reflect.ReflectSetup
+    with scala.reflect.runtime.SymbolTable {
 
   override lazy val analyzer = new {
     val global: ReflectGlobal.this.type = ReflectGlobal.this
   } with Analyzer {
+
     /** Obtains the classLoader used for runtime macro expansion.
-     *
-     *  Macro expansion can use everything available in [[global.classPath]] or [[rootClassLoader]].
-     *  The [[rootClassLoader]] is used to obtain runtime defined macros.
-     */
+      *
+      *  Macro expansion can use everything available in [[global.classPath]] or [[rootClassLoader]].
+      *  The [[rootClassLoader]] is used to obtain runtime defined macros.
+      */
     override protected def findMacroClassLoader(): ClassLoader = {
       val classpath = global.classPath.asURLs
       ScalaClassLoader.fromURLs(classpath, rootClassLoader)
@@ -28,10 +33,12 @@ class ReflectGlobal(currentSettings: Settings, reporter: Reporter, override val 
   }
 
   override def transformedType(sym: Symbol) =
-    postErasure.transformInfo(sym,
-      erasure.transformInfo(sym,
-        uncurry.transformInfo(sym,
-          refChecks.transformInfo(sym, sym.info))))
+    postErasure.transformInfo(
+        sym,
+        erasure.transformInfo(
+            sym,
+            uncurry.transformInfo(sym,
+                                  refChecks.transformInfo(sym, sym.info))))
 
   override def isCompilerUniverse = true
 
@@ -58,8 +65,9 @@ class ReflectGlobal(currentSettings: Settings, reporter: Reporter, override val 
   // so here the compiler needs an extra push to help decide between those (in favor of the latter)
   import scala.reflect.ClassTag
   override type Mirror = JavaMirror
-  override implicit val MirrorTag: ClassTag[Mirror] = ClassTag[Mirror](classOf[Mirror])
+  override implicit val MirrorTag: ClassTag[Mirror] =
+    ClassTag[Mirror](classOf[Mirror])
   override type RuntimeClass = java.lang.Class[_]
-  override implicit val RuntimeClassTag: ClassTag[RuntimeClass] = ClassTag[RuntimeClass](classOf[RuntimeClass])
+  override implicit val RuntimeClassTag: ClassTag[RuntimeClass] =
+    ClassTag[RuntimeClass](classOf[RuntimeClass])
 }
-

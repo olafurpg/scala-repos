@@ -18,19 +18,20 @@ import grizzled.slf4j.Logger
   Data Source Params : path to data file
  */
 case class DataSourceParams(
-  val graphEdgelistPath: String
-) extends Params
+    val graphEdgelistPath: String
+)
+    extends Params
 
 case class TrainingData(
-  val g:Graph[Int,Int],
-  val identityMatrix:RDD[(VertexId,Double)]
-) extends Serializable
+    val g: Graph[Int, Int],
+    val identityMatrix: RDD[(VertexId, Double)]
+)
+    extends Serializable
 
 class DataSource(val dsp: DataSourceParams)
-  extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double] {
+    extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double] {
 
-  override
-  def readTraining(sc:SparkContext) : TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData = {
     val g = GraphLoader.edgeListFile(sc, dsp.graphEdgelistPath)
     // In the interest of space (since we calculate at most n*n simrank scores),
     // each of the n vertices should have vertexID in the range 0 to n-1
@@ -41,15 +42,15 @@ class DataSource(val dsp: DataSourceParams)
 }
 
 case class NodeSamplingDSParams(
-  val graphEdgelistPath: String,
-  val sampleFraction: Double
-) extends Params
+    val graphEdgelistPath: String,
+    val sampleFraction: Double
+)
+    extends Params
 
 class NodeSamplingDataSource(val dsp: NodeSamplingDSParams)
-  extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double] {
+    extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double] {
 
-  override
-  def readTraining(sc:SparkContext) : TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData = {
     val g = GraphLoader.edgeListFile(sc, dsp.graphEdgelistPath)
     val sampled = Sampling.nodeSampling(sc, g, dsp.sampleFraction)
     val identity = DeltaSimRankRDD.identityMatrix(sc, g.vertices.count())
@@ -58,22 +59,19 @@ class NodeSamplingDataSource(val dsp: NodeSamplingDSParams)
 }
 
 case class FFSamplingDSParams(
-  val graphEdgelistPath: String,
-  val sampleFraction: Double,
-  val geoParam: Double
-) extends Params
+    val graphEdgelistPath: String,
+    val sampleFraction: Double,
+    val geoParam: Double
+)
+    extends Params
 
 class ForestFireSamplingDataSource(val dsp: FFSamplingDSParams)
-  extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double] {
+    extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double] {
 
-  override
-  def readTraining(sc:SparkContext) : TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData = {
     val g = GraphLoader.edgeListFile(sc, dsp.graphEdgelistPath)
     val sampled = Sampling.forestFireSamplingInduced(
-      sc,
-      g,
-      dsp.sampleFraction,
-      dsp.geoParam)
+        sc, g, dsp.sampleFraction, dsp.geoParam)
 
     val identity = DeltaSimRankRDD.identityMatrix(sc, g.vertices.count())
     new TrainingData(sampled, identity)

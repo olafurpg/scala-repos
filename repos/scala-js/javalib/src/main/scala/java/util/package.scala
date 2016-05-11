@@ -2,7 +2,8 @@ package java
 
 package object util {
 
-  implicit private[util] class CompareNullablesOps(val self: Any) extends AnyVal {
+  implicit private[util] class CompareNullablesOps(val self: Any)
+      extends AnyVal {
     @inline
     def ===(that: Any): Boolean =
       if (self.asInstanceOf[AnyRef] eq null) that.asInstanceOf[AnyRef] eq null
@@ -15,7 +16,7 @@ package object util {
     override def equals(o: Any): Boolean = {
       o match {
         case o: Box[_] => inner === o.inner
-        case _         => false
+        case _ => false
       }
     }
 

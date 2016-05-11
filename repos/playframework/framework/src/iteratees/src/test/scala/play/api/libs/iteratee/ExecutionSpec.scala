@@ -6,8 +6,8 @@ package play.api.libs.iteratee
 import scala.language.reflectiveCalls
 
 import org.specs2.mutable._
-import scala.concurrent.{ ExecutionContext, Future, Await }
-import scala.concurrent.duration.{ Duration, SECONDS }
+import scala.concurrent.{ExecutionContext, Future, Await}
+import scala.concurrent.duration.{Duration, SECONDS}
 import scala.util.Try
 
 object ExecutionSpec extends Specification {
@@ -51,7 +51,8 @@ object ExecutionSpec extends Specification {
       }
 
       // Now verify that we don't overflow
-      Try(executeRecursively(trampoline, overflowTimes)) must beSuccessfulTry[Unit]
+      Try(executeRecursively(trampoline, overflowTimes)) must beSuccessfulTry[
+          Unit]
     }
 
     "execute code in the order it was submitted" in {
@@ -64,20 +65,16 @@ object ExecutionSpec extends Specification {
       }
 
       trampoline.execute(
-        TestRunnable(0,
-          TestRunnable(1),
-          TestRunnable(2,
-            TestRunnable(4,
-              TestRunnable(6),
-              TestRunnable(7)),
-            TestRunnable(5,
-              TestRunnable(8))),
-          TestRunnable(3))
+          TestRunnable(
+              0,
+              TestRunnable(1),
+              TestRunnable(2,
+                           TestRunnable(4, TestRunnable(6), TestRunnable(7)),
+                           TestRunnable(5, TestRunnable(8))),
+              TestRunnable(3))
       )
 
       runRecord must equalTo(0 to 8)
     }
-
   }
-
 }

@@ -1,41 +1,44 @@
 /**
- *  Test scaladoc implicits distinguishing -- suppress all members by implicit conversion that are shadowed by the
- *  class' own members
- *
- *  {{{
- *     scala> class A { def foo(t: String) = 4 }
- *     defined class A
- *
- *     scala> class B { def foo(t: Any) = 5 }
- *     defined class B
- *
- *     scala> implicit def AtoB(a:A) = new B
- *     AtoB: (a: A)B
- *
- *     scala> val a = new A
- *     a: A = A@28f553e3
- *
- *     scala> a.foo("T")
- *     res1: Int = 4
- *
- *     scala> a.foo(4)
- *     res2: Int = 5
- *  }}}
- */
+  *  Test scaladoc implicits distinguishing -- suppress all members by implicit conversion that are shadowed by the
+  *  class' own members
+  *
+  *  {{{
+  *     scala> class A { def foo(t: String) = 4 }
+  *     defined class A
+  *
+  *     scala> class B { def foo(t: Any) = 5 }
+  *     defined class B
+  *
+  *     scala> implicit def AtoB(a:A) = new B
+  *     AtoB: (a: A)B
+  *
+  *     scala> val a = new A
+  *     a: A = A@28f553e3
+  *
+  *     scala> a.foo("T")
+  *     res1: Int = 4
+  *
+  *     scala> a.foo(4)
+  *     res2: Int = 5
+  *  }}}
+  */
 package scala.test.scaladoc.implicits.ambiguating
 import language.implicitConversions // according to SIP18
 
 /** - conv1-5 should be ambiguous
- *  - conv6-7 should not be ambiguous
- *  - conv8 should be ambiguous
- *  - conv9 should be ambiguous
- *  - conv10 and conv11 should not be ambiguous */
+  *  - conv6-7 should not be ambiguous
+  *  - conv8 should be ambiguous
+  *  - conv9 should be ambiguous
+  *  - conv10 and conv11 should not be ambiguous */
 class A[T]
+
 /** conv1-9 should be the same, conv10 should be ambiguous, conv11 should be okay */
 class B extends A[Int]
+
 /** conv1-9 should be the same, conv10 and conv11 should not be ambiguous */
 class C extends A[Double]
-    /** conv1-9 should be the same, conv10 should not be ambiguous while conv11 should be ambiguous */
+
+/** conv1-9 should be the same, conv10 should not be ambiguous while conv11 should be ambiguous */
 class D extends A[AnyRef]
 
 class X[T] {

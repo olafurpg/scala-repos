@@ -52,14 +52,17 @@ class EnsembleWebView extends EnsembleExample {
     }
     val webView = new WebView {
       // Update location field is page is redirected
-      engine.location.onChange((_, _, newValue) => locationField.setText(newValue))
+      engine.location.onChange(
+          (_, _, newValue) => locationField.setText(newValue))
       // Load default page
       engine.load(defaultURL)
     }
 
-    def validUrl(url: String) = if (url.startsWith("http://")) url else "http://" + locationField.text()
+    def validUrl(url: String) =
+      if (url.startsWith("http://")) url else "http://" + locationField.text()
 
-    val loadAction = (ae: ActionEvent) => webView.engine.load(validUrl(locationField.text()))
+    val loadAction = (ae: ActionEvent) =>
+      webView.engine.load(validUrl(locationField.text()))
     goButton.onAction = loadAction
     locationField.onAction = loadAction
 

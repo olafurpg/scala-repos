@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js IR                **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js IR                **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.ir
 
@@ -13,7 +12,7 @@ import Types._
 
 object Definitions {
   val ObjectClass = "O"
-  val ClassClass  = "jl_Class"
+  val ClassClass = "jl_Class"
 
   val StringClass = "T"
 
@@ -22,38 +21,40 @@ object Definitions {
   def isPrimitiveClass(encodedName: String): Boolean =
     PrimitiveClasses.contains(encodedName)
 
-  val BoxedUnitClass      = "sr_BoxedUnit"
-  val BoxedBooleanClass   = "jl_Boolean"
+  val BoxedUnitClass = "sr_BoxedUnit"
+  val BoxedBooleanClass = "jl_Boolean"
   val BoxedCharacterClass = "jl_Character"
-  val BoxedByteClass      = "jl_Byte"
-  val BoxedShortClass     = "jl_Short"
-  val BoxedIntegerClass   = "jl_Integer"
-  val BoxedLongClass      = "jl_Long"
-  val BoxedFloatClass     = "jl_Float"
-  val BoxedDoubleClass    = "jl_Double"
+  val BoxedByteClass = "jl_Byte"
+  val BoxedShortClass = "jl_Short"
+  val BoxedIntegerClass = "jl_Integer"
+  val BoxedLongClass = "jl_Long"
+  val BoxedFloatClass = "jl_Float"
+  val BoxedDoubleClass = "jl_Double"
 
   val CharSequenceClass = "jl_CharSequence"
   val SerializableClass = "Ljava_io_Serializable"
-  val CloneableClass    = "jl_Cloneable"
-  val ComparableClass   = "jl_Comparable"
-  val NumberClass       = "jl_Number"
+  val CloneableClass = "jl_Cloneable"
+  val ComparableClass = "jl_Comparable"
+  val NumberClass = "jl_Number"
 
-  val HijackedBoxedClasses = Set(
-      BoxedUnitClass, BoxedBooleanClass, BoxedByteClass, BoxedShortClass,
-      BoxedIntegerClass, BoxedLongClass, BoxedFloatClass, BoxedDoubleClass)
-  val HijackedClasses =
-    HijackedBoxedClasses + StringClass
+  val HijackedBoxedClasses = Set(BoxedUnitClass,
+                                 BoxedBooleanClass,
+                                 BoxedByteClass,
+                                 BoxedShortClass,
+                                 BoxedIntegerClass,
+                                 BoxedLongClass,
+                                 BoxedFloatClass,
+                                 BoxedDoubleClass)
+  val HijackedClasses = HijackedBoxedClasses + StringClass
 
   val AncestorsOfStringClass = Set(
       CharSequenceClass, ComparableClass, SerializableClass)
   val AncestorsOfHijackedNumberClasses = Set(
       NumberClass, ComparableClass, SerializableClass)
-  val AncestorsOfBoxedBooleanClass = Set(
-      ComparableClass, SerializableClass)
+  val AncestorsOfBoxedBooleanClass = Set(ComparableClass, SerializableClass)
 
   val AncestorsOfHijackedClasses =
-    AncestorsOfStringClass ++ AncestorsOfHijackedNumberClasses ++
-    AncestorsOfBoxedBooleanClass
+    AncestorsOfStringClass ++ AncestorsOfHijackedNumberClasses ++ AncestorsOfBoxedBooleanClass
 
   val RuntimeNullClass = "sr_Null$"
   val RuntimeNothingClass = "sr_Nothing$"
@@ -74,7 +75,7 @@ object Definitions {
         case (prefix, compressed) if base.startsWith(prefix) =>
           compressed + base.substring(prefix.length)
       } getOrElse {
-        "L"+base
+        "L" + base
       }
     })
     if (Trees.isKeyword(encoded) || encoded.charAt(0).isDigit ||
@@ -96,32 +97,28 @@ object Definitions {
           decompressed + encoded.substring(prefix.length)
       } getOrElse {
         assert(!encoded.isEmpty && encoded.charAt(0) == 'L',
-            s"Cannot decode invalid encoded name '$encodedName'")
+               s"Cannot decode invalid encoded name '$encodedName'")
         encoded.substring(1)
       }
     })
     base.replace("_", ".").replace("$und", "_")
   }
 
-  private val compressedClasses: Map[String, String] = Map(
-      "java_lang_Object" -> "O",
-      "java_lang_String" -> "T",
-      "scala_Unit" -> "V",
-      "scala_Boolean" -> "Z",
-      "scala_Char" -> "C",
-      "scala_Byte" -> "B",
-      "scala_Short" -> "S",
-      "scala_Int" -> "I",
-      "scala_Long" -> "J",
-      "scala_Float" -> "F",
-      "scala_Double" -> "D"
-  ) ++ (
-      for (index <- 2 to 22)
-        yield s"scala_Tuple$index" -> ("T"+index)
-  ) ++ (
-      for (index <- 0 to 22)
-        yield s"scala_Function$index" -> ("F"+index)
-  )
+  private val compressedClasses: Map[String, String] =
+    Map(
+        "java_lang_Object" -> "O",
+        "java_lang_String" -> "T",
+        "scala_Unit" -> "V",
+        "scala_Boolean" -> "Z",
+        "scala_Char" -> "C",
+        "scala_Byte" -> "B",
+        "scala_Short" -> "S",
+        "scala_Int" -> "I",
+        "scala_Long" -> "J",
+        "scala_Float" -> "F",
+        "scala_Double" -> "D"
+    ) ++ (for (index <- 2 to 22) yield s"scala_Tuple$index" -> ("T" + index)) ++
+    (for (index <- 0 to 22) yield s"scala_Function$index" -> ("F" + index))
 
   private val decompressedClasses: Map[String, String] =
     compressedClasses map { case (a, b) => (b, a) }
@@ -143,25 +140,26 @@ object Definitions {
     compressedPrefixes map { case (a, b) => (b, a) }
 
   /** Decodes a method name into its full signature.
-   *
-   *  This discards the information whether the method is private or not, and
-   *  at which class level it is private. If necessary, you can recover that
-   *  information from `encodedName.indexOf("__p") >= 0`.
-   */
-  def decodeMethodName(
-      encodedName: String): (String, List[ReferenceType], Option[ReferenceType]) = {
-    val (simpleName, privateAndSigString) = if (isConstructorName(encodedName)) {
-      val privateAndSigString =
-        if (encodedName == "init___") ""
-        else encodedName.stripPrefix("init___") + "__"
-      ("<init>", privateAndSigString)
-    } else {
-      val pos = encodedName.indexOf("__")
-      val pos2 =
-        if (!encodedName.substring(pos + 2).startsWith("p")) pos
-        else encodedName.indexOf("__", pos + 2)
-      (encodedName.substring(0, pos), encodedName.substring(pos2 + 2))
-    }
+    *
+    *  This discards the information whether the method is private or not, and
+    *  at which class level it is private. If necessary, you can recover that
+    *  information from `encodedName.indexOf("__p") >= 0`.
+    */
+  def decodeMethodName(encodedName: String)
+    : (String, List[ReferenceType], Option[ReferenceType]) = {
+    val (simpleName, privateAndSigString) =
+      if (isConstructorName(encodedName)) {
+        val privateAndSigString =
+          if (encodedName == "init___") ""
+          else encodedName.stripPrefix("init___") + "__"
+        ("<init>", privateAndSigString)
+      } else {
+        val pos = encodedName.indexOf("__")
+        val pos2 =
+          if (!encodedName.substring(pos + 2).startsWith("p")) pos
+          else encodedName.indexOf("__", pos + 2)
+        (encodedName.substring(0, pos), encodedName.substring(pos2 + 2))
+      }
 
     // -1 preserves trailing empty strings
     val parts = privateAndSigString.split("__", -1).toSeq
@@ -180,13 +178,11 @@ object Definitions {
   }
 
   /** Decodes a [[Types.ReferenceType]], such as in an encoded method signature.
-   */
+    */
   def decodeReferenceType(encodedName: String): ReferenceType = {
     val arrayDepth = encodedName.indexWhere(_ != 'A')
-    if (arrayDepth == 0)
-      ClassType(encodedName)
-    else
-      ArrayType(encodedName.substring(arrayDepth), arrayDepth)
+    if (arrayDepth == 0) ClassType(encodedName)
+    else ArrayType(encodedName.substring(arrayDepth), arrayDepth)
   }
 
   /* Common predicates on encoded names */
@@ -196,5 +192,4 @@ object Definitions {
 
   def isReflProxyName(name: String): Boolean =
     name.endsWith("__") && !isConstructorName(name)
-
 }

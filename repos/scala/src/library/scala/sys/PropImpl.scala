@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -12,10 +12,11 @@ package sys
 import scala.collection.mutable
 
 /** The internal implementation of scala.sys.Prop.
- */
-private[sys] class PropImpl[+T](val key: String, valueFn: String => T) extends Prop[T] {
+  */
+private[sys] class PropImpl[+T](val key: String, valueFn: String => T)
+    extends Prop[T] {
   def value: T = if (isSet) valueFn(get) else zero
-  def isSet    = underlying contains key
+  def isSet = underlying contains key
   def set(newValue: String): String = {
     val old = if (isSet) get else null
     underlying(key) = newValue
@@ -42,7 +43,7 @@ private[sys] class PropImpl[+T](val key: String, valueFn: String => T) extends P
   override def toString = "%s (%s)".format(key, getString)
 }
 
-private[sys] abstract class CreatorImpl[+T](f: String => T) extends Prop.Creator[T] {
+private[sys] abstract class CreatorImpl[+T](f: String => T)
+    extends Prop.Creator[T] {
   def apply(key: String): Prop[T] = new PropImpl[T](key, f)
 }
-

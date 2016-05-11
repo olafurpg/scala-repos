@@ -41,37 +41,47 @@ import slick.util.MacroSupport.macroSupportInterpolation
   */
 trait DB2Profile extends JdbcProfile {
 
-  override protected def computeCapabilities: Set[Capability] = (super.computeCapabilities
-    - RelationalCapabilities.reverse
-    - JdbcCapabilities.insertOrUpdate
-    - JdbcCapabilities.supportsByte
-    - JdbcCapabilities.booleanMetaData
-  )
+  override protected def computeCapabilities: Set[Capability] =
+    (super.computeCapabilities - RelationalCapabilities.reverse -
+        JdbcCapabilities.insertOrUpdate - JdbcCapabilities.supportsByte -
+        JdbcCapabilities.booleanMetaData)
 
   override protected lazy val useServerSideUpsert = true
   override protected lazy val useServerSideUpsertReturning = false
-  override protected val invokerMutateType: ResultSetType = ResultSetType.ScrollSensitive
+  override protected val invokerMutateType: ResultSetType =
+    ResultSetType.ScrollSensitive
 
   override protected def computeQueryCompiler =
-    (super.computeQueryCompiler.addAfter(Phase.removeTakeDrop, Phase.expandSums)
-      + Phase.rewriteBooleans)
+    (super.computeQueryCompiler.addAfter(
+            Phase.removeTakeDrop, Phase.expandSums) + Phase.rewriteBooleans)
   override val columnTypes = new JdbcTypes
-  override def createQueryBuilder(n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
-  override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder = new TableDDLBuilder(table)
-  override def createColumnDDLBuilder(column: FieldSymbol, table: Table[_]): ColumnDDLBuilder = new ColumnDDLBuilder(column)
-  override def createSequenceDDLBuilder(seq: Sequence[_]): SequenceDDLBuilder[_] = new SequenceDDLBuilder(seq)
+  override def createQueryBuilder(
+      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
+    new TableDDLBuilder(table)
+  override def createColumnDDLBuilder(
+      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+    new ColumnDDLBuilder(column)
+  override def createSequenceDDLBuilder(
+      seq: Sequence[_]): SequenceDDLBuilder[_] = new SequenceDDLBuilder(seq)
 
-  override def defaultTables(implicit ec: ExecutionContext): DBIO[Seq[MTable]] =
-    MTable.getTables(None, None, None, Some(Seq("TABLE"))).map(_.filter(_.name.schema.filter(_ == "SYSTOOLS").isEmpty))
+  override def defaultTables(
+      implicit ec: ExecutionContext): DBIO[Seq[MTable]] =
+    MTable
+      .getTables(None, None, None, Some(Seq("TABLE")))
+      .map(_.filter(_.name.schema.filter(_ == "SYSTOOLS").isEmpty))
 
-  override def defaultSqlTypeName(tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
-    case java.sql.Types.TINYINT => "SMALLINT" // DB2 has no smaller binary integer type
+  override def defaultSqlTypeName(
+      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
+    case java.sql.Types.TINYINT =>
+      "SMALLINT" // DB2 has no smaller binary integer type
     case _ => super.defaultSqlTypeName(tmd, sym)
   }
 
   override val scalarFrom = Some("sysibm.sysdummy1")
 
-  class QueryBuilder(tree: Node, state: CompilerState) extends super.QueryBuilder(tree, state) {
+  class QueryBuilder(tree: Node, state: CompilerState)
+      extends super.QueryBuilder(tree, state) {
 
     override protected val hasPiFunction = false
     override protected val hasRadDegConversion = false
@@ -80,13 +90,15 @@ trait DB2Profile extends JdbcProfile {
     override def expr(c: Node, skipParens: Boolean = false): Unit = c match {
       case RowNumber(by) =>
         b += "row_number() over("
-        if(!by.isEmpty) buildOrderByClause(by)
+        if (!by.isEmpty) buildOrderByClause(by)
         b += ")"
       case Library.IfNull(l, r) =>
         /* DB2 does not support IFNULL so we use COALESCE instead */
         b += "coalesce("; expr(l, true); b += ","; expr(r, true); b += ")"
-      case Library.NextValue(SequenceNode(name)) => b += "(next value for " += quoteIdentifier(name) += ")"
-      case Library.CurrentValue(SequenceNode(name)) => b += "(prevval for " += quoteIdentifier(name) += ")"
+      case Library.NextValue(SequenceNode(name)) =>
+        b += "(next value for " += quoteIdentifier(name) += ")"
+      case Library.CurrentValue(SequenceNode(name)) =>
+        b += "(prevval for " += quoteIdentifier(name) += ")"
       case Library.User() => b += "current user"
       case Library.Database() => b += "current server"
       case Library.CountAll(LiteralNode(1)) => b"count(*)"
@@ -96,28 +108,30 @@ trait DB2Profile extends JdbcProfile {
     override protected def buildOrdering(n: Node, o: Ordering) {
       /* DB2 does not have explicit NULLS FIST/LAST clauses. Nulls are
        * sorted after non-null values by default. */
-      if(o.nulls.first && !o.direction.desc) {
+      if (o.nulls.first && !o.direction.desc) {
         b += "case when ("
         expr(n)
         b += ") is null then 0 else 1 end,"
-      } else if(o.nulls.last && o.direction.desc) {
+      } else if (o.nulls.last && o.direction.desc) {
         b += "case when ("
         expr(n)
         b += ") is null then 1 else 0 end,"
       }
       expr(n)
-      if(o.direction.desc) b += " desc"
+      if (o.direction.desc) b += " desc"
     }
   }
 
   class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table) {
     override protected def createIndex(idx: Index) = {
-      if(idx.unique) {
+      if (idx.unique) {
         /* Create a UNIQUE CONSTRAINT (with an automatically generated backing
          * index) because DB2 does not allow a FOREIGN KEY CONSTRAINT to
          * reference columns which have a UNIQUE INDEX but not a nominal UNIQUE
          * CONSTRAINT. */
-        val sb = new StringBuilder append "ALTER TABLE " append quoteIdentifier(table.tableName) append " ADD "
+        val sb =
+          new StringBuilder append "ALTER TABLE " append quoteIdentifier(
+              table.tableName) append " ADD "
         sb append "CONSTRAINT " append quoteIdentifier(idx.name) append " UNIQUE("
         addIndexColumnList(idx.on, sb, idx.table.tableName)
         sb append ")"
@@ -126,27 +140,32 @@ trait DB2Profile extends JdbcProfile {
     }
   }
 
-  class ColumnDDLBuilder(column: FieldSymbol) extends super.ColumnDDLBuilder(column) {
+  class ColumnDDLBuilder(column: FieldSymbol)
+      extends super.ColumnDDLBuilder(column) {
     override def appendColumn(sb: StringBuilder) {
       val qname = quoteIdentifier(column.name)
       sb append qname append ' '
       appendType(sb)
       appendOptions(sb)
-      if(jdbcType.isInstanceOf[JdbcTypes#BooleanJdbcType]) {
-        sb append " constraint "+quoteIdentifier(column.name+"__bool")+" check (" append qname append " in (0, 1))"
+      if (jdbcType.isInstanceOf[JdbcTypes#BooleanJdbcType]) {
+        sb append " constraint " + quoteIdentifier(column.name + "__bool") +
+        " check (" append qname append " in (0, 1))"
       }
     }
   }
 
-  class SequenceDDLBuilder[T](seq: Sequence[T]) extends super.SequenceDDLBuilder(seq) {
+  class SequenceDDLBuilder[T](seq: Sequence[T])
+      extends super.SequenceDDLBuilder(seq) {
     override def buildDDL: DDL = {
-      val b = new StringBuilder append "create sequence " append quoteIdentifier(seq.name)
+      val b =
+        new StringBuilder append "create sequence " append quoteIdentifier(
+            seq.name)
       b append " as " append jdbcTypeFor(seq.tpe).sqlTypeName(None)
       seq._start.foreach { b append " start with " append _ }
       seq._increment.foreach { b append " increment by " append _ }
       seq._minValue.foreach { b append " minvalue " append _ }
       seq._maxValue.foreach { b append " maxvalue " append _ }
-      if(seq._cycle) b append " cycle"
+      if (seq._cycle) b append " cycle"
       DDL(b.toString, "drop sequence " + quoteIdentifier(seq.name))
     }
   }
@@ -157,14 +176,15 @@ trait DB2Profile extends JdbcProfile {
 
     class UUIDJdbcType extends super.UUIDJdbcType {
       override def sqlType = java.sql.Types.CHAR
-      override def sqlTypeName(sym: Option[FieldSymbol]) = "CHAR(16) FOR BIT DATA"
+      override def sqlTypeName(sym: Option[FieldSymbol]) =
+        "CHAR(16) FOR BIT DATA"
     }
 
     /* DB2 does not have a proper BOOLEAN type. The suggested workaround is
      * a constrained CHAR with constants 1 and 0 for TRUE and FALSE. */
     class BooleanJdbcType extends super.BooleanJdbcType {
       override def sqlTypeName(sym: Option[FieldSymbol]) = "CHAR(1)"
-      override def valueToSQLLiteral(value: Boolean) = if(value) "1" else "0"
+      override def valueToSQLLiteral(value: Boolean) = if (value) "1" else "0"
     }
   }
 }

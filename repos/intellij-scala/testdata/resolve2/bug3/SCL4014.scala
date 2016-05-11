@@ -4,4 +4,4 @@ class O protected (s: String) {
   }
 }
 
-class B extends /* line: 1 */O("rwar")
+class B extends /* line: 1 */ O("rwar")

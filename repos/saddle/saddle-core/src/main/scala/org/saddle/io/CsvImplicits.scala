@@ -22,59 +22,65 @@ import org.saddle._
 import scalar.ScalarTag
 
 /**
- * Settings for writing a CsvFile
- *
- * @param separChar Separator; default is comma
- * @param useQuote If true, fields containing separChar will be wrapped in quotes
- * @param quoteChar Quote character; default double-quote
- */
+  * Settings for writing a CsvFile
+  *
+  * @param separChar Separator; default is comma
+  * @param useQuote If true, fields containing separChar will be wrapped in quotes
+  * @param quoteChar Quote character; default double-quote
+  */
 case class CsvSettings(separChar: Char = ',',
                        quoteChar: Char = '"',
                        useQuote: Boolean = true,
                        encoding: String = UTF8)
 
 /**
- * Provides implicit functionality for writing data to CSV file format. Usage:
- *
- * {{{
- *   import CsvImplicits._
- *
- *   val f = Frame(...)
- *   f.writeCsvFile("tmp.csv")
- * }}}
- */
+  * Provides implicit functionality for writing data to CSV file format. Usage:
+  *
+  * {{{
+  *   import CsvImplicits._
+  *
+  *   val f = Frame(...)
+  *   f.writeCsvFile("tmp.csv")
+  * }}}
+  */
 object CsvImplicits {
-  /**
-   * Provides enrichment on Series object for writing to a Csv file.
-   */
-  implicit def series2CsvWriter[X: ST: ORD, T: ST](series: Series[X, T]) = new {
-    def writeCsvFile(path: String,
-                     withColIx: Boolean = false,
-                     withRowIx: Boolean = true,
-                     settings: CsvSettings = new CsvSettings()) {
-      frame2CsvWriter(Frame(series)).writeCsvFile(path, withColIx, withRowIx, settings)
-    }
 
-    def writeCsvStream(stream: OutputStream,
+  /**
+    * Provides enrichment on Series object for writing to a Csv file.
+    */
+  implicit def series2CsvWriter[X : ST : ORD, T : ST](series: Series[X, T]) =
+    new {
+      def writeCsvFile(path: String,
                        withColIx: Boolean = false,
                        withRowIx: Boolean = true,
                        settings: CsvSettings = new CsvSettings()) {
-      frame2CsvWriter(Frame(series)).writeCsvStream(stream, withColIx, withRowIx, settings)
-    }
-  }     // end new
+        frame2CsvWriter(Frame(series))
+          .writeCsvFile(path, withColIx, withRowIx, settings)
+      }
+
+      def writeCsvStream(stream: OutputStream,
+                         withColIx: Boolean = false,
+                         withRowIx: Boolean = true,
+                         settings: CsvSettings = new CsvSettings()) {
+        frame2CsvWriter(Frame(series))
+          .writeCsvStream(stream, withColIx, withRowIx, settings)
+      }
+    } // end new
 
   /**
-   * Provides enrichment on Frame object for writing to a Csv file.
-   */
-  implicit def frame2CsvWriter[RX: ST: ORD, CX: ST: ORD, T: ST](frame: Frame[RX, CX, T]) = new {
+    * Provides enrichment on Frame object for writing to a Csv file.
+    */
+  implicit def frame2CsvWriter[RX : ST : ORD, CX : ST : ORD, T : ST](
+      frame: Frame[RX, CX, T]) = new {
+
     /**
-     * Write a frame in CSV format to a file at the path provided
-     *
-     * @param path File to write
-     * @param withColIx If true, print out headers as first row
-     * @param withRowIx If true, print out index value as first column
-     * @param settings Settings to use in formatting
-     */
+      * Write a frame in CSV format to a file at the path provided
+      *
+      * @param path File to write
+      * @param withColIx If true, print out headers as first row
+      * @param withRowIx If true, print out index value as first column
+      * @param settings Settings to use in formatting
+      */
     def writeCsvFile(path: String,
                      withColIx: Boolean = true,
                      withRowIx: Boolean = true,
@@ -85,21 +91,20 @@ object CsvImplicits {
 
       try {
         writeCsvStream(stream, withColIx, withRowIx, settings)
-      }
-      finally {
+      } finally {
         stream.close()
         file.close()
       }
     }
 
     /**
-     * Write a frame in CSV format to the stream provided
-     *
-     * @param stream Stream to write on
-     * @param withColIx If true, print out headers as first row
-     * @param withRowIx If true, print out index value as first column
-     * @param settings Settings to use in formatting
-     */
+      * Write a frame in CSV format to the stream provided
+      *
+      * @param stream Stream to write on
+      * @param withColIx If true, print out headers as first row
+      * @param withRowIx If true, print out index value as first column
+      * @param settings Settings to use in formatting
+      */
     def writeCsvStream(stream: OutputStream,
                        withColIx: Boolean = true,
                        withRowIx: Boolean = true,
@@ -112,9 +117,9 @@ object CsvImplicits {
 
       def quotify(seq: Seq[String]): Seq[String] = {
         if (settings.useQuote)
-          seq.map { s => if (s.contains(separ)) "%s%s%s".format(quote, s, quote) else s }
-        else
-          seq
+          seq.map { s =>
+            if (s.contains(separ)) "%s%s%s".format(quote, s, quote) else s
+          } else seq
       }
 
       def writeHeader(rsm: ScalarTag[RX], csm: ScalarTag[CX]) {
@@ -132,10 +137,9 @@ object CsvImplicits {
           // for each depth of the column index, write a row
           for (i <- 0 until cDepth) {
             stream write {
-              val seq = if (!withRowIx)
-                colIxSeq.map(csm.strList(_)(i))
-              else
-                lead ++: frame.colIx.toSeq.map(csm.strList(_)(i))
+              val seq =
+                if (!withRowIx) colIxSeq.map(csm.strList(_)(i))
+                else lead ++: frame.colIx.toSeq.map(csm.strList(_)(i))
 
               quotify(seq).mkString(separ).getBytes(settings.encoding)
             }
@@ -147,17 +151,17 @@ object CsvImplicits {
 
       def writeRows(rsm: ScalarTag[RX]) {
         // now write each row of the frame
-        frame.toRowSeq.foreach { case (ridx, row) =>
-          stream write {
-            val seq = if (!withRowIx)
-              row.values.toSeq.map(_.toString)
-            else
-              rsm.strList(ridx) ++: row.values.toSeq.map(_.toString)
+        frame.toRowSeq.foreach {
+          case (ridx, row) =>
+            stream write {
+              val seq =
+                if (!withRowIx) row.values.toSeq.map(_.toString)
+                else rsm.strList(ridx) ++: row.values.toSeq.map(_.toString)
 
-            quotify(seq).mkString(separ).getBytes(settings.encoding)
-          }
+              quotify(seq).mkString(separ).getBytes(settings.encoding)
+            }
 
-          stream.write(newLine)
+            stream.write(newLine)
         }
       }
 
@@ -169,7 +173,5 @@ object CsvImplicits {
         writeRows(rsm)
       }
     }
-
-  }   // end new
-
+  } // end new
 }

@@ -42,10 +42,7 @@ import org.apache.spark.streaming.util._
 import org.apache.spark.util.{ManualClock, Utils}
 
 class ReceivedBlockHandlerSuite
-  extends SparkFunSuite
-  with BeforeAndAfter
-  with Matchers
-  with Logging {
+    extends SparkFunSuite with BeforeAndAfter with Matchers with Logging {
 
   import WriteAheadLogBasedBlockHandler._
   import WriteAheadLogSuite._
@@ -73,8 +70,12 @@ class ReceivedBlockHandlerSuite
     rpcEnv = RpcEnv.create("test", "localhost", 0, conf, securityMgr)
     conf.set("spark.driver.port", rpcEnv.address.port.toString)
 
-    blockManagerMaster = new BlockManagerMaster(rpcEnv.setupEndpoint("blockmanager",
-      new BlockManagerMasterEndpoint(rpcEnv, true, conf, new LiveListenerBus)), conf, true)
+    blockManagerMaster = new BlockManagerMaster(
+        rpcEnv.setupEndpoint("blockmanager",
+                             new BlockManagerMasterEndpoint(
+                                 rpcEnv, true, conf, new LiveListenerBus)),
+        conf,
+        true)
 
     storageLevel = StorageLevel.MEMORY_ONLY_SER
     blockManager = createBlockManager(blockManagerSize, conf)
@@ -84,7 +85,7 @@ class ReceivedBlockHandlerSuite
   }
 
   after {
-    for ( blockManager <- blockManagerBuffer ) {
+    for (blockManager <- blockManagerBuffer) {
       if (blockManager != null) {
         blockManager.stop()
       }
@@ -104,21 +105,24 @@ class ReceivedBlockHandlerSuite
 
   test("BlockManagerBasedBlockHandler - store blocks") {
     withBlockManagerBasedBlockHandler { handler =>
-      testBlockStoring(handler) { case (data, blockIds, storeResults) =>
-        // Verify the data in block manager is correct
-        val storedData = blockIds.flatMap { blockId =>
-          blockManager
-            .getLocalValues(blockId)
-            .map(_.data.map(_.toString).toList)
-            .getOrElse(List.empty)
-        }.toList
-        storedData shouldEqual data
+      testBlockStoring(handler) {
+        case (data, blockIds, storeResults) =>
+          // Verify the data in block manager is correct
+          val storedData = blockIds.flatMap { blockId =>
+            blockManager
+              .getLocalValues(blockId)
+              .map(_.data.map(_.toString).toList)
+              .getOrElse(List.empty)
+          }.toList
+          storedData shouldEqual data
 
-        // Verify that the store results are instances of BlockManagerBasedStoreResult
-        assert(
-          storeResults.forall { _.isInstanceOf[BlockManagerBasedStoreResult] },
-          "Unexpected store result type"
-        )
+          // Verify that the store results are instances of BlockManagerBasedStoreResult
+          assert(
+              storeResults.forall {
+                _.isInstanceOf[BlockManagerBasedStoreResult]
+              },
+              "Unexpected store result type"
+          )
       }
     }
   }
@@ -131,33 +135,39 @@ class ReceivedBlockHandlerSuite
 
   test("WriteAheadLogBasedBlockHandler - store blocks") {
     withWriteAheadLogBasedBlockHandler { handler =>
-      testBlockStoring(handler) { case (data, blockIds, storeResults) =>
-        // Verify the data in block manager is correct
-        val storedData = blockIds.flatMap { blockId =>
-          blockManager
-            .getLocalValues(blockId)
-            .map(_.data.map(_.toString).toList)
-            .getOrElse(List.empty)
-        }.toList
-        storedData shouldEqual data
+      testBlockStoring(handler) {
+        case (data, blockIds, storeResults) =>
+          // Verify the data in block manager is correct
+          val storedData = blockIds.flatMap { blockId =>
+            blockManager
+              .getLocalValues(blockId)
+              .map(_.data.map(_.toString).toList)
+              .getOrElse(List.empty)
+          }.toList
+          storedData shouldEqual data
 
-        // Verify that the store results are instances of WriteAheadLogBasedStoreResult
-        assert(
-          storeResults.forall { _.isInstanceOf[WriteAheadLogBasedStoreResult] },
-          "Unexpected store result type"
-        )
-        // Verify the data in write ahead log files is correct
-        val walSegments = storeResults.map { result =>
-          result.asInstanceOf[WriteAheadLogBasedStoreResult].walRecordHandle
-        }
-        val loggedData = walSegments.flatMap { walSegment =>
-          val fileSegment = walSegment.asInstanceOf[FileBasedWriteAheadLogSegment]
-          val reader = new FileBasedWriteAheadLogRandomReader(fileSegment.path, hadoopConf)
-          val bytes = reader.read(fileSegment)
-          reader.close()
-          blockManager.dataDeserialize(generateBlockId(), bytes).toList
-        }
-        loggedData shouldEqual data
+          // Verify that the store results are instances of WriteAheadLogBasedStoreResult
+          assert(
+              storeResults.forall {
+                _.isInstanceOf[WriteAheadLogBasedStoreResult]
+              },
+              "Unexpected store result type"
+          )
+          // Verify the data in write ahead log files is correct
+          val walSegments = storeResults.map { result =>
+            result.asInstanceOf[WriteAheadLogBasedStoreResult].walRecordHandle
+          }
+          val loggedData = walSegments.flatMap { walSegment =>
+            val fileSegment =
+              walSegment.asInstanceOf[FileBasedWriteAheadLogSegment]
+            val reader =
+              new FileBasedWriteAheadLogRandomReader(fileSegment.path,
+                                                     hadoopConf)
+            val bytes = reader.read(fileSegment)
+            reader.close()
+            blockManager.dataDeserialize(generateBlockId(), bytes).toList
+          }
+          loggedData shouldEqual data
       }
     }
   }
@@ -170,7 +180,9 @@ class ReceivedBlockHandlerSuite
 
   test("WriteAheadLogBasedBlockHandler - clean old blocks") {
     withWriteAheadLogBasedBlockHandler { handler =>
-      val blocks = Seq.tabulate(10) { i => IteratorBlock(Iterator(1 to i)) }
+      val blocks = Seq.tabulate(10) { i =>
+        IteratorBlock(Iterator(1 to i))
+      }
       storeBlocks(handler, blocks)
 
       val preCleanupLogFiles = getWriteAheadLogFiles()
@@ -205,14 +217,22 @@ class ReceivedBlockHandlerSuite
     // there is not enough space to store this block in MEMORY,
     // But BlockManager will be able to serialize this block to WAL
     // and hence count returns correct value.
-     testRecordcount(false, StorageLevel.MEMORY_ONLY,
-      IteratorBlock((List.fill(70)(new Array[Byte](100))).iterator), blockManager, Some(70))
+    testRecordcount(
+        false,
+        StorageLevel.MEMORY_ONLY,
+        IteratorBlock((List.fill(70)(new Array[Byte](100))).iterator),
+        blockManager,
+        Some(70))
 
     // there is not enough space to store this block in MEMORY,
     // But BlockManager will be able to serialize this block to DISK
     // and hence count returns correct value.
-    testRecordcount(true, StorageLevel.MEMORY_AND_DISK,
-      IteratorBlock((List.fill(70)(new Array[Byte](100))).iterator), blockManager, Some(70))
+    testRecordcount(
+        true,
+        StorageLevel.MEMORY_AND_DISK,
+        IteratorBlock((List.fill(70)(new Array[Byte](100))).iterator),
+        blockManager,
+        Some(70))
 
     // there is not enough space to store this block With MEMORY_ONLY StorageLevel.
     // BlockManager will not be able to unroll this block
@@ -220,52 +240,98 @@ class ReceivedBlockHandlerSuite
     storageLevel = StorageLevel.MEMORY_ONLY
     withBlockManagerBasedBlockHandler { handler =>
       val thrown = intercept[SparkException] {
-        storeSingleBlock(handler, IteratorBlock((List.fill(70)(new Array[Byte](100))).iterator))
+        storeSingleBlock(
+            handler,
+            IteratorBlock((List.fill(70)(new Array[Byte](100))).iterator))
       }
     }
   }
 
-  private def testCountWithBlockManagerBasedBlockHandler(isBlockManagerBasedBlockHandler: Boolean) {
+  private def testCountWithBlockManagerBasedBlockHandler(
+      isBlockManagerBasedBlockHandler: Boolean) {
     // ByteBufferBlock-MEMORY_ONLY
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.MEMORY_ONLY,
-      ByteBufferBlock(ByteBuffer.wrap(Array.tabulate(100)(i => i.toByte))), blockManager, None)
+    testRecordcount(
+        isBlockManagerBasedBlockHandler,
+        StorageLevel.MEMORY_ONLY,
+        ByteBufferBlock(ByteBuffer.wrap(Array.tabulate(100)(i => i.toByte))),
+        blockManager,
+        None)
     // ByteBufferBlock-MEMORY_ONLY_SER
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.MEMORY_ONLY_SER,
-      ByteBufferBlock(ByteBuffer.wrap(Array.tabulate(100)(i => i.toByte))), blockManager, None)
+    testRecordcount(
+        isBlockManagerBasedBlockHandler,
+        StorageLevel.MEMORY_ONLY_SER,
+        ByteBufferBlock(ByteBuffer.wrap(Array.tabulate(100)(i => i.toByte))),
+        blockManager,
+        None)
     // ArrayBufferBlock-MEMORY_ONLY
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.MEMORY_ONLY,
-      ArrayBufferBlock(ArrayBuffer.fill(25)(0)), blockManager, Some(25))
+    testRecordcount(isBlockManagerBasedBlockHandler,
+                    StorageLevel.MEMORY_ONLY,
+                    ArrayBufferBlock(ArrayBuffer.fill(25)(0)),
+                    blockManager,
+                    Some(25))
     // ArrayBufferBlock-MEMORY_ONLY_SER
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.MEMORY_ONLY_SER,
-      ArrayBufferBlock(ArrayBuffer.fill(25)(0)), blockManager, Some(25))
+    testRecordcount(isBlockManagerBasedBlockHandler,
+                    StorageLevel.MEMORY_ONLY_SER,
+                    ArrayBufferBlock(ArrayBuffer.fill(25)(0)),
+                    blockManager,
+                    Some(25))
     // ArrayBufferBlock-DISK_ONLY
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.DISK_ONLY,
-      ArrayBufferBlock(ArrayBuffer.fill(50)(0)), blockManager, Some(50))
+    testRecordcount(isBlockManagerBasedBlockHandler,
+                    StorageLevel.DISK_ONLY,
+                    ArrayBufferBlock(ArrayBuffer.fill(50)(0)),
+                    blockManager,
+                    Some(50))
     // ArrayBufferBlock-MEMORY_AND_DISK
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.MEMORY_AND_DISK,
-      ArrayBufferBlock(ArrayBuffer.fill(75)(0)), blockManager, Some(75))
+    testRecordcount(isBlockManagerBasedBlockHandler,
+                    StorageLevel.MEMORY_AND_DISK,
+                    ArrayBufferBlock(ArrayBuffer.fill(75)(0)),
+                    blockManager,
+                    Some(75))
     // IteratorBlock-MEMORY_ONLY
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.MEMORY_ONLY,
-      IteratorBlock((ArrayBuffer.fill(100)(0)).iterator), blockManager, Some(100))
+    testRecordcount(isBlockManagerBasedBlockHandler,
+                    StorageLevel.MEMORY_ONLY,
+                    IteratorBlock((ArrayBuffer.fill(100)(0)).iterator),
+                    blockManager,
+                    Some(100))
     // IteratorBlock-MEMORY_ONLY_SER
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.MEMORY_ONLY_SER,
-      IteratorBlock((ArrayBuffer.fill(100)(0)).iterator), blockManager, Some(100))
+    testRecordcount(isBlockManagerBasedBlockHandler,
+                    StorageLevel.MEMORY_ONLY_SER,
+                    IteratorBlock((ArrayBuffer.fill(100)(0)).iterator),
+                    blockManager,
+                    Some(100))
     // IteratorBlock-DISK_ONLY
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.DISK_ONLY,
-      IteratorBlock((ArrayBuffer.fill(125)(0)).iterator), blockManager, Some(125))
+    testRecordcount(isBlockManagerBasedBlockHandler,
+                    StorageLevel.DISK_ONLY,
+                    IteratorBlock((ArrayBuffer.fill(125)(0)).iterator),
+                    blockManager,
+                    Some(125))
     // IteratorBlock-MEMORY_AND_DISK
-    testRecordcount(isBlockManagerBasedBlockHandler, StorageLevel.MEMORY_AND_DISK,
-      IteratorBlock((ArrayBuffer.fill(150)(0)).iterator), blockManager, Some(150))
+    testRecordcount(isBlockManagerBasedBlockHandler,
+                    StorageLevel.MEMORY_AND_DISK,
+                    IteratorBlock((ArrayBuffer.fill(150)(0)).iterator),
+                    blockManager,
+                    Some(150))
   }
 
   private def createBlockManager(
       maxMem: Long,
       conf: SparkConf,
       name: String = SparkContext.DRIVER_IDENTIFIER): BlockManager = {
-    val memManager = new StaticMemoryManager(conf, Long.MaxValue, maxMem, numCores = 1)
-    val transfer = new NettyBlockTransferService(conf, securityMgr, numCores = 1)
-    val blockManager = new BlockManager(name, rpcEnv, blockManagerMaster, serializer, conf,
-      memManager, mapOutputTracker, shuffleManager, transfer, securityMgr, 0)
+    val memManager = new StaticMemoryManager(
+        conf, Long.MaxValue, maxMem, numCores = 1)
+    val transfer = new NettyBlockTransferService(
+        conf, securityMgr, numCores = 1)
+    val blockManager = new BlockManager(name,
+                                        rpcEnv,
+                                        blockManagerMaster,
+                                        serializer,
+                                        conf,
+                                        memManager,
+                                        mapOutputTracker,
+                                        shuffleManager,
+                                        transfer,
+                                        securityMgr,
+                                        0)
     memManager.setMemoryStore(blockManager.memoryStore)
     blockManager.initialize("app-id")
     blockManagerBuffer += blockManager
@@ -273,15 +339,14 @@ class ReceivedBlockHandlerSuite
   }
 
   /**
-   * Test storing of data using different types of Handler, StorageLevel and ReceivedBlocks
-   * and verify the correct record count
-   */
+    * Test storing of data using different types of Handler, StorageLevel and ReceivedBlocks
+    * and verify the correct record count
+    */
   private def testRecordcount(isBlockManagedBasedBlockHandler: Boolean,
-      sLevel: StorageLevel,
-      receivedBlock: ReceivedBlock,
-      bManager: BlockManager,
-      expectedNumRecords: Option[Long]
-      ) {
+                              sLevel: StorageLevel,
+                              receivedBlock: ReceivedBlock,
+                              bManager: BlockManager,
+                              expectedNumRecords: Option[Long]) {
     blockManager = bManager
     storageLevel = sLevel
     var bId: StreamBlockId = null
@@ -289,36 +354,41 @@ class ReceivedBlockHandlerSuite
       if (isBlockManagedBasedBlockHandler) {
         // test received block with BlockManager based handler
         withBlockManagerBasedBlockHandler { handler =>
-          val (blockId, blockStoreResult) = storeSingleBlock(handler, receivedBlock)
+          val (blockId, blockStoreResult) =
+            storeSingleBlock(handler, receivedBlock)
           bId = blockId
           assert(blockStoreResult.numRecords === expectedNumRecords,
-            "Message count not matches for a " +
-            receivedBlock.getClass.getName +
-            " being inserted using BlockManagerBasedBlockHandler with " + sLevel)
-       }
+                 "Message count not matches for a " +
+                 receivedBlock.getClass.getName +
+                 " being inserted using BlockManagerBasedBlockHandler with " +
+                 sLevel)
+        }
       } else {
         // test received block with WAL based handler
         withWriteAheadLogBasedBlockHandler { handler =>
-          val (blockId, blockStoreResult) = storeSingleBlock(handler, receivedBlock)
+          val (blockId, blockStoreResult) =
+            storeSingleBlock(handler, receivedBlock)
           bId = blockId
           assert(blockStoreResult.numRecords === expectedNumRecords,
-            "Message count not matches for a " +
-            receivedBlock.getClass.getName +
-            " being inserted using WriteAheadLogBasedBlockHandler with " + sLevel)
+                 "Message count not matches for a " +
+                 receivedBlock.getClass.getName +
+                 " being inserted using WriteAheadLogBasedBlockHandler with " +
+                 sLevel)
         }
       }
     } finally {
-     // Removing the Block Id to use same blockManager for next test
-     blockManager.removeBlock(bId, true)
+      // Removing the Block Id to use same blockManager for next test
+      blockManager.removeBlock(bId, true)
     }
   }
 
   /**
-   * Test storing of data using different forms of ReceivedBlocks and verify that they succeeded
-   * using the given verification function
-   */
-  private def testBlockStoring(receivedBlockHandler: ReceivedBlockHandler)
-      (verifyFunc: (Seq[String], Seq[StreamBlockId], Seq[ReceivedBlockStoreResult]) => Unit) {
+    * Test storing of data using different forms of ReceivedBlocks and verify that they succeeded
+    * using the given verification function
+    */
+  private def testBlockStoring(receivedBlockHandler: ReceivedBlockHandler)(
+      verifyFunc: (Seq[String], Seq[StreamBlockId],
+      Seq[ReceivedBlockStoreResult]) => Unit) {
     val data = Seq.tabulate(100) { _.toString }
 
     def storeAndVerify(blocks: Seq[ReceivedBlock]) {
@@ -333,13 +403,23 @@ class ReceivedBlockHandlerSuite
       }
     }
 
-    def dataToByteBuffer(b: Seq[String]) = blockManager.dataSerialize(generateBlockId, b.iterator)
+    def dataToByteBuffer(b: Seq[String]) =
+      blockManager.dataSerialize(generateBlockId, b.iterator)
 
     val blocks = data.grouped(10).toSeq
 
-    storeAndVerify(blocks.map { b => IteratorBlock(b.toIterator) })
-    storeAndVerify(blocks.map { b => ArrayBufferBlock(new ArrayBuffer ++= b) })
-    storeAndVerify(blocks.map { b => ByteBufferBlock(dataToByteBuffer(b).toByteBuffer) })
+    storeAndVerify(
+        blocks.map { b =>
+      IteratorBlock(b.toIterator)
+    })
+    storeAndVerify(
+        blocks.map { b =>
+      ArrayBufferBlock(new ArrayBuffer ++= b)
+    })
+    storeAndVerify(
+        blocks.map { b =>
+      ByteBufferBlock(dataToByteBuffer(b).toByteBuffer)
+    })
   }
 
   /** Test error handling when blocks that cannot be stored */
@@ -347,26 +427,37 @@ class ReceivedBlockHandlerSuite
     // Handle error in iterator (e.g. divide-by-zero error)
     intercept[Exception] {
       val iterator = (10 to (-10, -1)).toIterator.map { _ / 0 }
-      receivedBlockHandler.storeBlock(StreamBlockId(1, 1), IteratorBlock(iterator))
+      receivedBlockHandler.storeBlock(
+          StreamBlockId(1, 1), IteratorBlock(iterator))
     }
 
     // Handler error in block manager storing (e.g. too big block)
     intercept[SparkException] {
       val byteBuffer = ByteBuffer.wrap(new Array[Byte](blockManagerSize + 1))
-      receivedBlockHandler.storeBlock(StreamBlockId(1, 1), ByteBufferBlock(byteBuffer))
+      receivedBlockHandler.storeBlock(
+          StreamBlockId(1, 1), ByteBufferBlock(byteBuffer))
     }
   }
 
   /** Instantiate a BlockManagerBasedBlockHandler and run a code with it */
-  private def withBlockManagerBasedBlockHandler(body: BlockManagerBasedBlockHandler => Unit) {
+  private def withBlockManagerBasedBlockHandler(
+      body: BlockManagerBasedBlockHandler => Unit) {
     body(new BlockManagerBasedBlockHandler(blockManager, storageLevel))
   }
 
   /** Instantiate a WriteAheadLogBasedBlockHandler and run a code with it */
-  private def withWriteAheadLogBasedBlockHandler(body: WriteAheadLogBasedBlockHandler => Unit) {
-    require(WriteAheadLogUtils.getRollingIntervalSecs(conf, isDriver = false) === 1)
-    val receivedBlockHandler = new WriteAheadLogBasedBlockHandler(blockManager, 1,
-      storageLevel, conf, hadoopConf, tempDirectory.toString, manualClock)
+  private def withWriteAheadLogBasedBlockHandler(
+      body: WriteAheadLogBasedBlockHandler => Unit) {
+    require(
+        WriteAheadLogUtils.getRollingIntervalSecs(conf, isDriver = false) === 1)
+    val receivedBlockHandler = new WriteAheadLogBasedBlockHandler(
+        blockManager,
+        1,
+        storageLevel,
+        conf,
+        hadoopConf,
+        tempDirectory.toString,
+        manualClock)
     try {
       body(receivedBlockHandler)
     } finally {
@@ -378,14 +469,17 @@ class ReceivedBlockHandlerSuite
   private def storeBlocks(
       receivedBlockHandler: ReceivedBlockHandler,
       blocks: Seq[ReceivedBlock]
-    ): (Seq[StreamBlockId], Seq[ReceivedBlockStoreResult]) = {
+  ): (Seq[StreamBlockId], Seq[ReceivedBlockStoreResult]) = {
     val blockIds = Seq.fill(blocks.size)(generateBlockId())
-    val storeResults = blocks.zip(blockIds).map {
-      case (block, id) =>
-        manualClock.advance(500) // log rolling interval set to 1000 ms through SparkConf
-        logDebug("Inserting block " + id)
-        receivedBlockHandler.storeBlock(id, block)
-    }.toList
+    val storeResults = blocks
+      .zip(blockIds)
+      .map {
+        case (block, id) =>
+          manualClock.advance(500) // log rolling interval set to 1000 ms through SparkConf
+          logDebug("Inserting block " + id)
+          receivedBlockHandler.storeBlock(id, block)
+      }
+      .toList
     logDebug("Done inserting")
     (blockIds, storeResults)
   }
@@ -394,7 +488,7 @@ class ReceivedBlockHandlerSuite
   private def storeSingleBlock(
       handler: ReceivedBlockHandler,
       block: ReceivedBlock
-    ): (StreamBlockId, ReceivedBlockStoreResult) = {
+  ): (StreamBlockId, ReceivedBlockStoreResult) = {
     val blockId = generateBlockId
     val blockStoreResult = handler.storeBlock(blockId, block)
     logDebug("Done inserting")
@@ -402,9 +496,10 @@ class ReceivedBlockHandlerSuite
   }
 
   private def getWriteAheadLogFiles(): Seq[String] = {
-    getLogFilesInDirectory(checkpointDirToLogDir(tempDirectory.toString, streamId))
+    getLogFilesInDirectory(
+        checkpointDirToLogDir(tempDirectory.toString, streamId))
   }
 
-  private def generateBlockId(): StreamBlockId = StreamBlockId(streamId, scala.util.Random.nextLong)
+  private def generateBlockId(): StreamBlockId =
+    StreamBlockId(streamId, scala.util.Random.nextLong)
 }
-

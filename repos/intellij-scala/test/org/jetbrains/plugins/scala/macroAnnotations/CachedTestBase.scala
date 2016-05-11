@@ -5,9 +5,9 @@ import com.intellij.psi.impl.PsiModificationTrackerImpl
 import org.jetbrains.plugins.scala.base.ScalaFixtureTestCase
 
 /**
- * Author: Svyatoslav Ilinskiy
- * Date: 9/18/15.
- */
+  * Author: Svyatoslav Ilinskiy
+  * Date: 9/18/15.
+  */
 abstract class CachedTestBase extends ScalaFixtureTestCase {
 
   trait Managed {

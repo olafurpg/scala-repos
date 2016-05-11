@@ -12,15 +12,17 @@ import com.intellij.util.containers.HashSet
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 
 /**
- * @author Roman.Shein
- * @since 07.07.2015.
- */
+  * @author Roman.Shein
+  * @since 07.07.2015.
+  */
 class ScalaTestFinder extends JavaTestFinder {
-  override def findTestsForClass(element: PsiElement): java.util.Collection[PsiElement] = {
+  override def findTestsForClass(
+      element: PsiElement): java.util.Collection[PsiElement] = {
     val klass: PsiClass = findSourceElement(element)
     if (klass == null) return Collections.emptySet()
     val klassName = klass.getName.replace("$", "\\$")
-    val pattern = Pattern.compile(".*" + klassName + ".*", Pattern.CASE_INSENSITIVE)
+    val pattern =
+      Pattern.compile(".*" + klassName + ".*", Pattern.CASE_INSENSITIVE)
     val names = new HashSet[String]()
     val frameworks: TestFrameworks = TestFrameworks.getInstance
     val cache = PsiShortNamesCache.getInstance(klass.getProject)
@@ -31,8 +33,12 @@ class ScalaTestFinder extends JavaTestFinder {
     for (testClassName <- names) {
       if (pattern.matcher(testClassName).matches()) {
         for (testClass <- cache.getClassesByName(testClassName, scope)) {
-          if (frameworks.isTestClass(testClass) || frameworks.isPotentialTestClass(testClass)) {
-            res.add(Pair.create(testClass, TestFinderHelper.calcTestNameProximity(klassName, testClassName)))
+          if (frameworks.isTestClass(testClass) ||
+              frameworks.isPotentialTestClass(testClass)) {
+            res.add(
+                Pair.create(testClass,
+                            TestFinderHelper.calcTestNameProximity(
+                                klassName, testClassName)))
           }
         }
       }

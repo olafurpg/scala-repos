@@ -5,8 +5,8 @@ package play.it.action
 
 import play.api.Environment
 import play.api.mvc.Results._
-import play.api.mvc.{ Action, EssentialAction }
-import play.api.test.{ FakeRequest, PlaySpecification }
+import play.api.mvc.{Action, EssentialAction}
+import play.api.test.{FakeRequest, PlaySpecification}
 
 import scala.concurrent.Promise
 
@@ -25,7 +25,9 @@ object EssentialActionSpec extends PlaySpecification {
       // start fake application with its own classloader
       val applicationClassLoader = new ClassLoader() {}
 
-      running(_.in(Environment.simple().copy(classLoader = applicationClassLoader))) { app =>
+      running(_.in(Environment
+                .simple()
+                .copy(classLoader = applicationClassLoader))) { app =>
         import app.materializer
         // run the test with the classloader of the current thread
         Thread.currentThread.getContextClassLoader must not be applicationClassLoader
@@ -34,5 +36,4 @@ object EssentialActionSpec extends PlaySpecification {
       }
     }
   }
-
 }

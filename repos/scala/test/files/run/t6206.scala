@@ -1,28 +1,25 @@
 class Outer {
-  def apply( position : Inner ) {}
+  def apply(position: Inner) {}
   class Inner
 
   this.apply(new Inner)
-  this (new Inner) // error,
+  this(new Inner) // error,
 }
 
+class Outer1 { self =>
 
-class Outer1 {
+  def apply(position: Inner): String = "outer"
 
-  self =>
-
-  def apply( position : Inner ) : String = "outer"
-
-  class Inner( ) {
+  class Inner() {
 
     def apply(arg: Inner): String = "inner"
 
     def testMe = {
       List(
-        self.apply( this ), // a) this works
-        self( this ), // b) this does not work!
-        this apply this,
-        this(this)
+          self.apply(this), // a) this works
+          self(this), // b) this does not work!
+          this apply this,
+          this(this)
       ) foreach println
     }
   }

@@ -1,24 +1,29 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl
 
 import akka.actor._
-import akka.stream.{ AbruptTerminationException, ActorMaterializerSettings }
-import akka.stream.actor.{ ActorSubscriberMessage, ActorSubscriber }
-import org.reactivestreams.{ Subscription, Subscriber }
+import akka.stream.{AbruptTerminationException, ActorMaterializerSettings}
+import akka.stream.actor.{ActorSubscriberMessage, ActorSubscriber}
+import org.reactivestreams.{Subscription, Subscriber}
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object FanIn {
 
-  final case class OnError(id: Int, cause: Throwable) extends DeadLetterSuppression with NoSerializationVerificationNeeded
-  final case class OnComplete(id: Int) extends DeadLetterSuppression with NoSerializationVerificationNeeded
-  final case class OnNext(id: Int, e: Any) extends DeadLetterSuppression with NoSerializationVerificationNeeded
-  final case class OnSubscribe(id: Int, subscription: Subscription) extends DeadLetterSuppression with NoSerializationVerificationNeeded
+  final case class OnError(id: Int, cause: Throwable)
+      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+  final case class OnComplete(id: Int)
+      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+  final case class OnNext(id: Int, e: Any)
+      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+  final case class OnSubscribe(id: Int, subscription: Subscription)
+      extends DeadLetterSuppression with NoSerializationVerificationNeeded
 
-  private[akka] final case class SubInput[T](impl: ActorRef, id: Int) extends Subscriber[T] {
+  private[akka] final case class SubInput[T](impl: ActorRef, id: Int)
+      extends Subscriber[T] {
     override def onError(cause: Throwable): Unit = {
       ReactiveStreamsCompliance.requireNonNullException(cause)
       impl ! OnError(id, cause)
@@ -44,11 +49,13 @@ private[akka] object FanIn {
   abstract class InputBunch(inputCount: Int, bufferSize: Int, pump: Pump) {
     private var allCancelled = false
 
-    private val inputs: Array[BatchingInputBuffer] = Array.tabulate(inputCount) { i ⇒
-      new BatchingInputBuffer(bufferSize, pump) {
-        override protected def onError(e: Throwable): Unit = InputBunch.this.onError(i, e)
+    private val inputs: Array[BatchingInputBuffer] =
+      Array.tabulate(inputCount) { i ⇒
+        new BatchingInputBuffer(bufferSize, pump) {
+          override protected def onError(e: Throwable): Unit =
+            InputBunch.this.onError(i, e)
+        }
       }
-    }
 
     private[this] final val states = Array.ofDim[State](inputCount)
     private var markCount = 0
@@ -60,26 +67,37 @@ private[akka] object FanIn {
 
     private[this] final def hasState(index: Int, flag: Int): Boolean =
       (states(index) & flag) != 0
-    private[this] final def setState(index: Int, flag: Int, on: Boolean): Unit =
-      states(index) = if (on) (states(index) | flag).toByte else (states(index) & ~flag).toByte
+    private[this] final def setState(
+        index: Int, flag: Int, on: Boolean): Unit =
+      states(index) = if (on) (states(index) | flag).toByte
+      else (states(index) & ~flag).toByte
 
-    private[this] final def cancelled(index: Int): Boolean = hasState(index, Cancelled)
-    private[this] final def cancelled(index: Int, on: Boolean): Unit = setState(index, Cancelled, on)
+    private[this] final def cancelled(index: Int): Boolean =
+      hasState(index, Cancelled)
+    private[this] final def cancelled(index: Int, on: Boolean): Unit =
+      setState(index, Cancelled, on)
 
-    private[this] final def completed(index: Int): Boolean = hasState(index, Completed)
+    private[this] final def completed(index: Int): Boolean =
+      hasState(index, Completed)
     private[this] final def registerCompleted(index: Int): Unit = {
       completedCounter += 1
       setState(index, Completed, true)
     }
 
-    private[this] final def depleted(index: Int): Boolean = hasState(index, Depleted)
-    private[this] final def depleted(index: Int, on: Boolean): Unit = setState(index, Depleted, on)
+    private[this] final def depleted(index: Int): Boolean =
+      hasState(index, Depleted)
+    private[this] final def depleted(index: Int, on: Boolean): Unit =
+      setState(index, Depleted, on)
 
-    private[this] final def pending(index: Int): Boolean = hasState(index, Pending)
-    private[this] final def pending(index: Int, on: Boolean): Unit = setState(index, Pending, on)
+    private[this] final def pending(index: Int): Boolean =
+      hasState(index, Pending)
+    private[this] final def pending(index: Int, on: Boolean): Unit =
+      setState(index, Pending, on)
 
-    private[this] final def marked(index: Int): Boolean = hasState(index, Marked)
-    private[this] final def marked(index: Int, on: Boolean): Unit = setState(index, Marked, on)
+    private[this] final def marked(index: Int): Boolean =
+      hasState(index, Marked)
+    private[this] final def marked(index: Int, on: Boolean): Unit =
+      setState(index, Marked, on)
 
     override def toString: String =
       s"""|InputBunch
@@ -165,7 +183,8 @@ private[akka] object FanIn {
       while (!(marked(id) && pending(id))) {
         id += 1
         if (id == inputCount) id = 0
-        require(id != preferredId, "Tried to dequeue without waiting for any input")
+        require(id != preferredId,
+                "Tried to dequeue without waiting for any input")
       }
       id
     }
@@ -209,12 +228,14 @@ private[akka] object FanIn {
     }
 
     val AnyOfMarkedInputs = new TransferState {
-      override def isCompleted: Boolean = markedDepleted == markCount && markedPending == 0
+      override def isCompleted: Boolean =
+        markedDepleted == markCount && markedPending == 0
       override def isReady: Boolean = markedPending > 0
     }
 
     def inputsAvailableFor(id: Int) = new TransferState {
-      override def isCompleted: Boolean = depleted(id) || cancelled(id) || (!pending(id) && completed(id))
+      override def isCompleted: Boolean =
+        depleted(id) || cancelled(id) || (!pending(id) && completed(id))
       override def isReady: Boolean = pending(id)
     }
 
@@ -224,39 +245,41 @@ private[akka] object FanIn {
     }
 
     // FIXME: Eliminate re-wraps
-    def subreceive: SubReceive = new SubReceive({
-      case OnSubscribe(id, subscription) ⇒
-        inputs(id).subreceive(ActorSubscriber.OnSubscribe(subscription))
-      case OnNext(id, elem) ⇒
-        if (marked(id) && !pending(id)) markedPending += 1
-        pending(id, on = true)
-        receivedInput = true
-        inputs(id).subreceive(ActorSubscriberMessage.OnNext(elem))
-      case OnComplete(id) ⇒
-        if (!pending(id)) {
-          if (marked(id) && !depleted(id)) markedDepleted += 1
-          depleted(id, on = true)
-          onDepleted(id)
-        }
-        registerCompleted(id)
-        inputs(id).subreceive(ActorSubscriberMessage.OnComplete)
-        if (!receivedInput && isAllCompleted) onCompleteWhenNoInput()
-      case OnError(id, e) ⇒
-        onError(id, e)
-    })
-
+    def subreceive: SubReceive =
+      new SubReceive({
+        case OnSubscribe(id, subscription) ⇒
+          inputs(id).subreceive(ActorSubscriber.OnSubscribe(subscription))
+        case OnNext(id, elem) ⇒
+          if (marked(id) && !pending(id)) markedPending += 1
+          pending(id, on = true)
+          receivedInput = true
+          inputs(id).subreceive(ActorSubscriberMessage.OnNext(elem))
+        case OnComplete(id) ⇒
+          if (!pending(id)) {
+            if (marked(id) && !depleted(id)) markedDepleted += 1
+            depleted(id, on = true)
+            onDepleted(id)
+          }
+          registerCompleted(id)
+          inputs(id).subreceive(ActorSubscriberMessage.OnComplete)
+          if (!receivedInput && isAllCompleted) onCompleteWhenNoInput()
+        case OnError(id, e) ⇒
+          onError(id, e)
+      })
   }
-
 }
 
 /**
- * INTERNAL API
- */
-private[akka] abstract class FanIn(val settings: ActorMaterializerSettings, val inputCount: Int) extends Actor with ActorLogging with Pump {
+  * INTERNAL API
+  */
+private[akka] abstract class FanIn(
+    val settings: ActorMaterializerSettings, val inputCount: Int)
+    extends Actor with ActorLogging with Pump {
   import FanIn._
 
   protected val primaryOutputs: Outputs = new SimpleOutputs(self, this)
-  protected val inputBunch = new InputBunch(inputCount, settings.maxInputBufferSize, this) {
+  protected val inputBunch = new InputBunch(
+      inputCount, settings.maxInputBufferSize, this) {
     override def onError(input: Int, e: Throwable): Unit = fail(e)
     override def onCompleteWhenNoInput(): Unit = pumpFinished()
   }
@@ -270,8 +293,7 @@ private[akka] abstract class FanIn(val settings: ActorMaterializerSettings, val 
   override def pumpFailed(e: Throwable): Unit = fail(e)
 
   protected def fail(e: Throwable): Unit = {
-    if (settings.debugLogging)
-      log.debug("fail due to: {}", e.getMessage)
+    if (settings.debugLogging) log.debug("fail due to: {}", e.getMessage)
     nextPhase(completedPhase)
     primaryOutputs.error(e)
     pump()
@@ -287,7 +309,6 @@ private[akka] abstract class FanIn(val settings: ActorMaterializerSettings, val 
     throw new IllegalStateException("This actor cannot be restarted")
   }
 
-  def receive = inputBunch.subreceive.orElse[Any, Unit](primaryOutputs.subreceive)
-
+  def receive =
+    inputBunch.subreceive.orElse[Any, Unit](primaryOutputs.subreceive)
 }
-

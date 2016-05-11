@@ -23,7 +23,9 @@ class HoconFormatterTest extends HoconFileSetTestCase("formatter") {
 
     inWriteCommandAction {
       val TextRange(start, end) = psiFile.getTextRange
-      CodeStyleManager.getInstance(getProject).reformatText(psiFile, start, end)
+      CodeStyleManager
+        .getInstance(getProject)
+        .reformatText(psiFile, start, end)
     }
 
     psiFile.getText

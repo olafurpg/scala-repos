@@ -32,13 +32,12 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object Popup {
-  implicit def sfxPopup2jfx(p: Popup): jfxs.Popup = if (p != null) p.delegate else null
+  implicit def sfxPopup2jfx(p: Popup): jfxs.Popup =
+    if (p != null) p.delegate else null
 }
 
 class Popup(override val delegate: jfxs.Popup = new jfxs.Popup)
-  extends PopupWindow(delegate)
-  with SFXDelegate[jfxs.Popup] {
+    extends PopupWindow(delegate) with SFXDelegate[jfxs.Popup] {
 
   def content = delegate.getContent
-
 }

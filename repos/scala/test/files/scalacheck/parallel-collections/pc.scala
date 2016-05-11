@@ -10,46 +10,44 @@ import scala.collection.parallel._
 package scala {
 
   class ParCollProperties extends Properties("Parallel collections") {
-  
+
     def includeAllTestsWith(support: TaskSupport) {
       // parallel arrays with default task support
       include(new mutable.IntParallelArrayCheck(support))
-    
+
       // parallel ranges
       include(new immutable.ParallelRangeCheck(support))
-    
+
       // parallel immutable hash maps (tries)
       include(new immutable.IntIntParallelHashMapCheck(support))
-    
+
       // parallel immutable hash sets (tries)
       include(new immutable.IntParallelHashSetCheck(support))
-    
+
       // parallel mutable hash maps (tables)
       include(new mutable.IntIntParallelHashMapCheck(support))
-    
+
       // parallel ctrie
       include(new mutable.IntIntParallelConcurrentTrieMapCheck(support))
-    
+
       // parallel mutable hash sets (tables)
       include(new mutable.IntParallelHashSetCheck(support))
-    
+
       // parallel vectors
       include(new immutable.IntParallelVectorCheck(support))
     }
-  
+
     includeAllTestsWith(defaultTaskSupport)
-  
-    val ec = scala.concurrent.ExecutionContext.fromExecutorService(java.util.concurrent.Executors.newFixedThreadPool(5))
+
+    val ec = scala.concurrent.ExecutionContext.fromExecutorService(
+        java.util.concurrent.Executors.newFixedThreadPool(5))
     val ectasks = new collection.parallel.ExecutionContextTaskSupport(ec)
     includeAllTestsWith(ectasks)
 
     // no post test hooks in scalacheck, so cannot do:
     // ec.shutdown()
-  
   }
-
 }
-
 
 object Test extends scala.ParCollProperties {
   /*
@@ -67,5 +65,5 @@ object Test extends scala.ParCollProperties {
       pc
     )
   }
-  */
+ */
 }

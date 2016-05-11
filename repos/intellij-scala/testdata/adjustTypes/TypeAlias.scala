@@ -4,7 +4,7 @@ class TypeAlias {
   type AB[T] = ArrayBuffer[T]
   type JInt = java.lang.Integer
 
-  val x: /*start*/ArrayBuffer[java.lang.Integer]/*end*/ = ArrayBuffer(1)
+  val x: /*start*/ ArrayBuffer[java.lang.Integer] /*end*/ = ArrayBuffer(1)
 }
 
 /*
@@ -16,4 +16,4 @@ class TypeAlias {
 
   val x: AB[JInt] = ArrayBuffer(1)
 }
-*/
+ */

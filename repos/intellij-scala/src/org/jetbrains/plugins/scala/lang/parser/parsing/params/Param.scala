@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.{Annotation, 
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.ParamType
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
 /*
  * Param ::= {Annotation} id [':' ParamType] ['=' Expr]
  */

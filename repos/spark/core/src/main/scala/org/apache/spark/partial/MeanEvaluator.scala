@@ -22,10 +22,10 @@ import org.apache.commons.math3.distribution.{NormalDistribution, TDistribution}
 import org.apache.spark.util.StatCounter
 
 /**
- * An ApproximateEvaluator for means.
- */
+  * An ApproximateEvaluator for means.
+  */
 private[spark] class MeanEvaluator(totalOutputs: Int, confidence: Double)
-  extends ApproximateEvaluator[StatCounter, BoundedDouble] {
+    extends ApproximateEvaluator[StatCounter, BoundedDouble] {
 
   var outputsMerged = 0
   var counter = new StatCounter
@@ -39,16 +39,19 @@ private[spark] class MeanEvaluator(totalOutputs: Int, confidence: Double)
     if (outputsMerged == totalOutputs) {
       new BoundedDouble(counter.mean, 1.0, counter.mean, counter.mean)
     } else if (outputsMerged == 0) {
-      new BoundedDouble(0, 0.0, Double.NegativeInfinity, Double.PositiveInfinity)
+      new BoundedDouble(
+          0, 0.0, Double.NegativeInfinity, Double.PositiveInfinity)
     } else {
       val mean = counter.mean
       val stdev = math.sqrt(counter.sampleVariance / counter.count)
       val confFactor = {
         if (counter.count > 100) {
-          new NormalDistribution().inverseCumulativeProbability(1 - (1 - confidence) / 2)
+          new NormalDistribution()
+            .inverseCumulativeProbability(1 - (1 - confidence) / 2)
         } else {
           val degreesOfFreedom = (counter.count - 1).toInt
-          new TDistribution(degreesOfFreedom).inverseCumulativeProbability(1 - (1 - confidence) / 2)
+          new TDistribution(degreesOfFreedom)
+            .inverseCumulativeProbability(1 - (1 - confidence) / 2)
         }
       }
       val low = mean - confFactor * stdev

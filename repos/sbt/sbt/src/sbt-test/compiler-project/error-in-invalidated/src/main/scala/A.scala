@@ -1,3 +1,3 @@
 class A {
-	def initialized: Boolean = false
+  def initialized: Boolean = false
 }

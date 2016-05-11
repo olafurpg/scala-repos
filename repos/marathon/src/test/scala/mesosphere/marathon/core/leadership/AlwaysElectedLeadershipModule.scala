@@ -1,7 +1,7 @@
 package mesosphere.marathon.core.leadership
 
-import akka.actor.{ ActorRef, ActorSystem, Props }
-import mesosphere.marathon.core.base.{ ActorsModule, ShutdownHooks, TestShutdownHooks }
+import akka.actor.{ActorRef, ActorSystem, Props}
+import mesosphere.marathon.core.base.{ActorsModule, ShutdownHooks, TestShutdownHooks}
 import mesosphere.marathon.test.Mockito
 
 /**
@@ -10,6 +10,7 @@ import mesosphere.marathon.test.Mockito
   * This simplifies tests.
   */
 object AlwaysElectedLeadershipModule extends Mockito {
+
   /**
     * Create a leadership module. The caller must ensure that shutdownHooks.shutdown is called so
     * that the underlying actor system is freed.
@@ -26,13 +27,15 @@ object AlwaysElectedLeadershipModule extends Mockito {
     forActorsModule(new ActorsModule(TestShutdownHooks(), actorSystem))
   }
 
-  private[this] def forActorsModule(actorsModule: ActorsModule = new ActorsModule(ShutdownHooks())): LeadershipModule =
-    {
-      new AlwaysElectedLeadershipModule(actorsModule)
-    }
+  private[this] def forActorsModule(
+      actorsModule: ActorsModule = new ActorsModule(ShutdownHooks()))
+    : LeadershipModule = {
+    new AlwaysElectedLeadershipModule(actorsModule)
+  }
 }
 
-private class AlwaysElectedLeadershipModule(actorsModule: ActorsModule) extends LeadershipModule {
+private class AlwaysElectedLeadershipModule(actorsModule: ActorsModule)
+    extends LeadershipModule {
   override def startWhenLeader(props: Props, name: String): ActorRef =
     actorsModule.actorRefFactory.actorOf(props, name)
   override def coordinator(): LeadershipCoordinator = ???

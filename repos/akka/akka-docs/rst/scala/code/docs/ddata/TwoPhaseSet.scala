@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.ddata
 
 import akka.cluster.ddata.ReplicatedData
@@ -8,9 +8,8 @@ import akka.cluster.ddata.GSet
 
 //#twophaseset
 case class TwoPhaseSet(
-  adds: GSet[String] = GSet.empty,
-  removals: GSet[String] = GSet.empty)
-  extends ReplicatedData {
+    adds: GSet[String] = GSet.empty, removals: GSet[String] = GSet.empty)
+    extends ReplicatedData {
   type T = TwoPhaseSet
 
   def add(element: String): TwoPhaseSet =
@@ -22,8 +21,7 @@ case class TwoPhaseSet(
   def elements: Set[String] = adds.elements -- removals.elements
 
   override def merge(that: TwoPhaseSet): TwoPhaseSet =
-    copy(
-      adds = this.adds.merge(that.adds),
-      removals = this.removals.merge(that.removals))
+    copy(adds = this.adds.merge(that.adds),
+         removals = this.removals.merge(that.removals))
 }
 //#twophaseset

@@ -11,13 +11,14 @@ import scala.tools.nsc.util.ClassPath
 import scala.tools.nsc.util.ClassRepresentation
 
 /**
- * A classpath unifying multiple class- and sourcepath entries.
- * Flat classpath can obtain entries for classes and sources independently
- * so it tries to do operations quite optimally - iterating only these collections
- * which are needed in the given moment and only as far as it's necessary.
- * @param aggregates classpath instances containing entries which this class processes
- */
-case class AggregateFlatClassPath(aggregates: Seq[FlatClassPath]) extends FlatClassPath {
+  * A classpath unifying multiple class- and sourcepath entries.
+  * Flat classpath can obtain entries for classes and sources independently
+  * so it tries to do operations quite optimally - iterating only these collections
+  * which are needed in the given moment and only as far as it's necessary.
+  * @param aggregates classpath instances containing entries which this class processes
+  */
+case class AggregateFlatClassPath(aggregates: Seq[FlatClassPath])
+    extends FlatClassPath {
 
   override def findClassFile(className: String): Option[AbstractFile] = {
     @tailrec
@@ -31,14 +32,17 @@ case class AggregateFlatClassPath(aggregates: Seq[FlatClassPath]) extends FlatCl
     find(aggregates)
   }
 
-  override def findClass(className: String): Option[ClassRepresentation[AbstractFile]] = {
-    val (pkg, simpleClassName) = PackageNameUtils.separatePkgAndClassNames(className)
+  override def findClass(
+      className: String): Option[ClassRepresentation[AbstractFile]] = {
+    val (pkg, simpleClassName) =
+      PackageNameUtils.separatePkgAndClassNames(className)
 
     @tailrec
-    def findEntry[T <: ClassRepClassPathEntry](aggregates: Seq[FlatClassPath], getEntries: FlatClassPath => Seq[T]): Option[T] =
+    def findEntry[T <: ClassRepClassPathEntry](
+        aggregates: Seq[FlatClassPath],
+        getEntries: FlatClassPath => Seq[T]): Option[T] =
       if (aggregates.nonEmpty) {
-        val entry = getEntries(aggregates.head)
-          .find(_.name == simpleClassName)
+        val entry = getEntries(aggregates.head).find(_.name == simpleClassName)
         if (entry.isDefined) entry
         else findEntry(aggregates.tail, getEntries)
       } else None
@@ -51,9 +55,11 @@ case class AggregateFlatClassPath(aggregates: Seq[FlatClassPath]) extends FlatCl
 
   override def asURLs: Seq[URL] = aggregates.flatMap(_.asURLs)
 
-  override def asClassPathStrings: Seq[String] = aggregates.map(_.asClassPathString).distinct
+  override def asClassPathStrings: Seq[String] =
+    aggregates.map(_.asClassPathString).distinct
 
-  override def asSourcePathString: String = ClassPath.join(aggregates map (_.asSourcePathString): _*)
+  override def asSourcePathString: String =
+    ClassPath.join(aggregates map (_.asSourcePathString): _*)
 
   override private[nsc] def packages(inPackage: String): Seq[PackageEntry] = {
     val aggregatedPackages = aggregates.flatMap(_.packages(inPackage)).distinct
@@ -69,16 +75,18 @@ case class AggregateFlatClassPath(aggregates: Seq[FlatClassPath]) extends FlatCl
   override private[nsc] def list(inPackage: String): FlatClassPathEntries = {
     val (packages, classesAndSources) = aggregates.map(_.list(inPackage)).unzip
     val distinctPackages = packages.flatten.distinct
-    val distinctClassesAndSources = mergeClassesAndSources(classesAndSources: _*)
+    val distinctClassesAndSources = mergeClassesAndSources(
+        classesAndSources: _*)
     FlatClassPathEntries(distinctPackages, distinctClassesAndSources)
   }
 
   /**
-   * Returns only one entry for each name. If there's both a source and a class entry, it
-   * creates an entry containing both of them. If there would be more than one class or source
-   * entries for the same class it always would use the first entry of each type found on a classpath.
-   */
-  private def mergeClassesAndSources(entries: Seq[ClassRepClassPathEntry]*): Seq[ClassRepClassPathEntry] = {
+    * Returns only one entry for each name. If there's both a source and a class entry, it
+    * creates an entry containing both of them. If there would be more than one class or source
+    * entries for the same class it always would use the first entry of each type found on a classpath.
+    */
+  private def mergeClassesAndSources(
+      entries: Seq[ClassRepClassPathEntry]*): Seq[ClassRepClassPathEntry] = {
     // based on the implementation from MergedClassPath
     var count = 0
     val indices = collection.mutable.HashMap[String, Int]()
@@ -94,11 +102,12 @@ case class AggregateFlatClassPath(aggregates: Seq[FlatClassPath]) extends FlatCl
         val existing = mergedEntries(index)
 
         if (existing.binary.isEmpty && entry.binary.isDefined)
-          mergedEntries(index) = ClassAndSourceFilesEntry(entry.binary.get, existing.source.get)
+          mergedEntries(index) = ClassAndSourceFilesEntry(
+              entry.binary.get, existing.source.get)
         if (existing.source.isEmpty && entry.source.isDefined)
-          mergedEntries(index) = ClassAndSourceFilesEntry(existing.binary.get, entry.source.get)
-      }
-      else {
+          mergedEntries(index) = ClassAndSourceFilesEntry(
+              existing.binary.get, entry.source.get)
+      } else {
         indices(name) = count
         mergedEntries += entry
         count += 1
@@ -107,7 +116,8 @@ case class AggregateFlatClassPath(aggregates: Seq[FlatClassPath]) extends FlatCl
     mergedEntries.toIndexedSeq
   }
 
-  private def getDistinctEntries[EntryType <: ClassRepClassPathEntry](getEntries: FlatClassPath => Seq[EntryType]): Seq[EntryType] = {
+  private def getDistinctEntries[EntryType <: ClassRepClassPathEntry](
+      getEntries: FlatClassPath => Seq[EntryType]): Seq[EntryType] = {
     val seenNames = collection.mutable.HashSet[String]()
     val entriesBuffer = new ArrayBuffer[EntryType](1024)
     for {
@@ -120,6 +130,8 @@ case class AggregateFlatClassPath(aggregates: Seq[FlatClassPath]) extends FlatCl
     entriesBuffer.toIndexedSeq
   }
 
-  private def classesGetter(pkg: String) = (cp: FlatClassPath) => cp.classes(pkg)
-  private def sourcesGetter(pkg: String) = (cp: FlatClassPath) => cp.sources(pkg)
+  private def classesGetter(pkg: String) =
+    (cp: FlatClassPath) => cp.classes(pkg)
+  private def sourcesGetter(pkg: String) =
+    (cp: FlatClassPath) => cp.sources(pkg)
 }

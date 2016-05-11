@@ -9,9 +9,8 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.StableId
 
 /**
-* User: Alexander.Podkhalyuzin
-*/
-
+  * User: Alexander.Podkhalyuzin
+  */
 /*
  *  ImportExpr ::= StableId  '.'  (id | '_'  | ImportSelectors)
  */
@@ -19,7 +18,8 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.StableId
 object ImportExpr {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val importExprMarker = builder.mark
-    if (!StableId.parse(builder, forImport = true, ScalaElementTypes.REFERENCE)) {
+    if (!StableId.parse(
+            builder, forImport = true, ScalaElementTypes.REFERENCE)) {
       builder error ErrMsg("identifier.expected")
       importExprMarker.drop()
       return true

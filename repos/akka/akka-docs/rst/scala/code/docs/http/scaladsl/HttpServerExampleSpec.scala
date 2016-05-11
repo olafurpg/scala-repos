@@ -4,23 +4,23 @@
 
 package docs.http.scaladsl
 
-import akka.actor.{ Props, ActorRef, ActorSystem }
+import akka.actor.{Props, ActorRef, ActorSystem}
 import akka.event.LoggingAdapter
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{ Flow, Sink }
+import akka.stream.scaladsl.{Flow, Sink}
 import akka.testkit.TestActors
 import docs.CompileOnlySpec
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 import scala.io.StdIn
 import scala.language.postfixOps
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
-class HttpServerExampleSpec extends WordSpec with Matchers
-  with CompileOnlySpec {
+class HttpServerExampleSpec
+    extends WordSpec with Matchers with CompileOnlySpec {
 
   // never actually called
   val log: LoggingAdapter = null
@@ -34,13 +34,16 @@ class HttpServerExampleSpec extends WordSpec with Matchers
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
 
-    val serverSource: Source[Http.IncomingConnection, Future[Http.ServerBinding]] =
+    val serverSource: Source[Http.IncomingConnection,
+                             Future[Http.ServerBinding]] =
       Http().bind(interface = "localhost", port = 8080)
-    val bindingFuture: Future[Http.ServerBinding] =
-      serverSource.to(Sink.foreach { connection => // foreach materializes the source
+    val bindingFuture: Future[Http.ServerBinding] = serverSource
+      .to(Sink.foreach { connection =>
+        // foreach materializes the source
         println("Accepted new connection from " + connection.remoteAddress)
         // ... and then actually handle the connection
-      }).run()
+      })
+      .run()
   }
 
   "binding-failure-high-level-example" in compileOnlySpec {
@@ -66,11 +69,11 @@ class HttpServerExampleSpec extends WordSpec with Matchers
       case ex: Exception =>
         log.error(ex, "Failed to bind to {}:{}!", host, port)
     }
-
   }
 
   // mock values:
-  val handleConnections: Sink[Http.IncomingConnection, Future[Http.ServerBinding]] =
+  val handleConnections: Sink[
+      Http.IncomingConnection, Future[Http.ServerBinding]] =
     Sink.ignore.mapMaterializedValue(_ => Future.failed(new Exception("")))
 
   "binding-failure-handling" in compileOnlySpec {
@@ -106,11 +109,13 @@ class HttpServerExampleSpec extends WordSpec with Matchers
     val (host, port) = ("localhost", 8080)
     val serverSource = Http().bind(host, port)
 
-    val failureMonitor: ActorRef = system.actorOf(MyExampleMonitoringActor.props)
+    val failureMonitor: ActorRef =
+      system.actorOf(MyExampleMonitoringActor.props)
 
-    val reactToTopLevelFailures = Flow[IncomingConnection]
-      .watchTermination()((_, termination) => termination.onFailure {
-        case cause => failureMonitor ! cause
+    val reactToTopLevelFailures =
+      Flow[IncomingConnection].watchTermination()((_, termination) =>
+            termination.onFailure {
+          case cause => failureMonitor ! cause
       })
 
     serverSource
@@ -127,24 +132,22 @@ class HttpServerExampleSpec extends WordSpec with Matchers
     val (host, port) = ("localhost", 8080)
     val serverSource = Http().bind(host, port)
 
-    val reactToConnectionFailure = Flow[HttpRequest]
-      .recover[HttpRequest] {
-        case ex =>
-          // handle the failure somehow
-          throw ex
-      }
+    val reactToConnectionFailure = Flow[HttpRequest].recover[HttpRequest] {
+      case ex =>
+        // handle the failure somehow
+        throw ex
+    }
 
-    val httpEcho = Flow[HttpRequest]
-      .via(reactToConnectionFailure)
-      .map { request =>
+    val httpEcho = Flow[HttpRequest].via(reactToConnectionFailure).map {
+      request =>
         // simple text "echo" response:
-        HttpResponse(entity = HttpEntity(ContentTypes.`text/plain(UTF-8)`, request.entity.dataBytes))
-      }
+        HttpResponse(entity = HttpEntity(ContentTypes.`text/plain(UTF-8)`,
+                                         request.entity.dataBytes))
+    }
 
-    serverSource
-      .runForeach { con =>
-        con.handleWith(httpEcho)
-      }
+    serverSource.runForeach { con =>
+      con.handleWith(httpEcho)
+    }
   }
 
   "full-server-example" in compileOnlySpec {
@@ -162,8 +165,9 @@ class HttpServerExampleSpec extends WordSpec with Matchers
 
     val requestHandler: HttpRequest => HttpResponse = {
       case HttpRequest(GET, Uri.Path("/"), _, _, _) =>
-        HttpResponse(entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-          "<html><body>Hello world!</body></html>"))
+        HttpResponse(
+            entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
+                                "<html><body>Hello world!</body></html>"))
 
       case HttpRequest(GET, Uri.Path("/ping"), _, _, _) =>
         HttpResponse(entity = "PONG!")
@@ -175,14 +179,15 @@ class HttpServerExampleSpec extends WordSpec with Matchers
         HttpResponse(404, entity = "Unknown resource!")
     }
 
-    val bindingFuture: Future[Http.ServerBinding] =
-      serverSource.to(Sink.foreach { connection =>
+    val bindingFuture: Future[Http.ServerBinding] = serverSource
+      .to(Sink.foreach { connection =>
         println("Accepted new connection from " + connection.remoteAddress)
 
         connection handleWithSyncHandler requestHandler
-        // this is equivalent to
-        // connection handleWith { Flow[HttpRequest] map requestHandler }
-      }).run()
+      // this is equivalent to
+      // connection handleWith { Flow[HttpRequest] map requestHandler }
+      })
+      .run()
   }
 
   "low-level-server-example" in compileOnlySpec {
@@ -202,8 +207,9 @@ class HttpServerExampleSpec extends WordSpec with Matchers
 
         val requestHandler: HttpRequest => HttpResponse = {
           case HttpRequest(GET, Uri.Path("/"), _, _, _) =>
-            HttpResponse(entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-              "<html><body>Hello world!</body></html>"))
+            HttpResponse(
+                entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
+                                    "<html><body>Hello world!</body></html>"))
 
           case HttpRequest(GET, Uri.Path("/ping"), _, _, _) =>
             HttpResponse(entity = "PONG!")
@@ -215,13 +221,14 @@ class HttpServerExampleSpec extends WordSpec with Matchers
             HttpResponse(404, entity = "Unknown resource!")
         }
 
-        val bindingFuture = Http().bindAndHandleSync(requestHandler, "localhost", 8080)
-        println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
+        val bindingFuture =
+          Http().bindAndHandleSync(requestHandler, "localhost", 8080)
+        println(
+            s"Server online at http://localhost:8080/\nPress RETURN to stop...")
         StdIn.readLine() // let it run until user presses return
         bindingFuture
           .flatMap(_.unbind()) // trigger unbinding from the port
           .onComplete(_ ⇒ system.terminate()) // and shutdown when done
-
       }
     }
   }
@@ -522,6 +529,4 @@ class HttpServerExampleSpec extends WordSpec with Matchers
     }
     //#actor-interaction
   }
-
-
 }

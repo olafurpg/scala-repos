@@ -3,14 +3,14 @@ package java.util
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 
-abstract class AbstractSet[E] protected () extends AbstractCollection[E]
-                                              with Set[E] {
+abstract class AbstractSet[E] protected ()
+    extends AbstractCollection[E] with Set[E] {
   override def equals(that: Any): Boolean = {
     if (that.asInstanceOf[AnyRef] eq this) true
     else {
       that match {
         case that: Collection[_] => that.size == this.size && containsAll(that)
-        case _                   => false
+        case _ => false
       }
     }
   }
@@ -28,10 +28,8 @@ abstract class AbstractSet[E] protected () extends AbstractCollection[E]
           if (c.contains(iter.next())) {
             iter.remove()
             removeAll(iter, true)
-          } else
-            removeAll(iter, modified)
-        } else
-          modified
+          } else removeAll(iter, modified)
+        } else modified
       }
       removeAll(this.iterator, false)
     }

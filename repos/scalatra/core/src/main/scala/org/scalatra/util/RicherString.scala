@@ -24,10 +24,14 @@ class RicherString(orig: String) {
   def urlDecode: String = UrlCodingUtils.urlDecode(orig)
   def formDecode: String = UrlCodingUtils.urlDecode(orig, plusIsSpace = true)
 
-  def urlEncode(charset: Charset): String = UrlCodingUtils.urlEncode(orig, charset)
-  def formEncode(charset: Charset): String = UrlCodingUtils.urlEncode(orig, charset, spaceIsPlus = true)
-  def urlDecode(charset: Charset): String = UrlCodingUtils.urlDecode(orig, charset)
-  def formDecode(charset: Charset): String = UrlCodingUtils.urlDecode(orig, charset, plusIsSpace = true)
+  def urlEncode(charset: Charset): String =
+    UrlCodingUtils.urlEncode(orig, charset)
+  def formEncode(charset: Charset): String =
+    UrlCodingUtils.urlEncode(orig, charset, spaceIsPlus = true)
+  def urlDecode(charset: Charset): String =
+    UrlCodingUtils.urlDecode(orig, charset)
+  def formDecode(charset: Charset): String =
+    UrlCodingUtils.urlDecode(orig, charset, plusIsSpace = true)
 
   def /(path: String): String = {
     (orig.endsWith("/"), path.startsWith("/")) match {
@@ -41,7 +45,9 @@ class RicherString(orig: String) {
 
   def toCheckboxBool: Boolean = {
     orig.toUpperCase match {
-      case "ON" | "TRUE" | "OK" | "1" | "CHECKED" | "YES" | "ENABLE" | "ENABLED" => true
+      case "ON" | "TRUE" | "OK" | "1" | "CHECKED" | "YES" | "ENABLE" |
+          "ENABLED" =>
+        true
       case _ => false
     }
   }
@@ -49,6 +55,6 @@ class RicherString(orig: String) {
 
 object RicherString {
 
-  implicit def stringToRicherString(s: String): RicherString = new RicherString(s)
-
+  implicit def stringToRicherString(s: String): RicherString =
+    new RicherString(s)
 }

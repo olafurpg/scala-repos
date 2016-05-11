@@ -1,10 +1,9 @@
-
 import scala.tools.partest.SessionTest
 
 object Test extends SessionTest {
 
   def session =
-"""
+    """
 scala> val x: Any = 42
 x: Any = 42
 

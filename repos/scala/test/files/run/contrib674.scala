@@ -7,8 +7,7 @@ object Test extends App {
     } catch {
       case e: Throwable =>
     } finally {
-      try {
-      } catch {
+      try {} catch {
         case e: Throwable =>
       }
     }

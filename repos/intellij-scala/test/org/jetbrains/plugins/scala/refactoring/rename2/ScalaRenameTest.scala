@@ -1,14 +1,12 @@
 package org.jetbrains.plugins.scala.refactoring.rename2
 
 /**
- * User: Alefas
- * Date: 04.10.11
- */
-
+  * User: Alefas
+  * Date: 04.10.11
+  */
 class ScalaRenameTest extends ScalaRenameTestBase {
   def testRenameBeanProperty() {
-    val fileText =
-      """
+    val fileText = """
       |import reflect.BeanProperty
       |object X {
       |  @BeanProperty
@@ -20,8 +18,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("y")
 
-    val resultText =
-      """
+    val resultText = """
       |import reflect.BeanProperty
       |object X {
       |  @BeanProperty
@@ -35,8 +32,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
   }
 
   def testRenameBooleanBeanProperty() {
-    val fileText =
-      """
+    val fileText = """
       |import reflect.BooleanBeanProperty
       |object X {
       |  @BooleanBeanProperty
@@ -48,8 +44,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("y")
 
-    val resultText =
-      """
+    val resultText = """
       |import reflect.BooleanBeanProperty
       |object X {
       |  @BooleanBeanProperty
@@ -63,8 +58,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
   }
 
   def testRenameBeanVarProperty() {
-    val fileText =
-      """
+    val fileText = """
       |import reflect.BeanProperty
       |object X {
       |  @BeanProperty
@@ -77,8 +71,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("y")
 
-    val resultText =
-      """
+    val resultText = """
       |import reflect.BeanProperty
       |object X {
       |  @BeanProperty
@@ -93,8 +86,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
   }
 
   def testRenameBooleanBeanVarProperty() {
-    val fileText =
-      """
+    val fileText = """
       |import reflect.BooleanBeanProperty
       |object X {
       |  @BooleanBeanProperty
@@ -107,8 +99,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("y")
 
-    val resultText =
-      """
+    val resultText = """
       |import reflect.BooleanBeanProperty
       |object X {
       |  @BooleanBeanProperty
@@ -121,10 +112,9 @@ class ScalaRenameTest extends ScalaRenameTestBase {
 
     myFixture.checkResult(resultText)
   }
-  
+
   def testRenameNamingParameter() {
-    val fileText =
-      """
+    val fileText = """
       |class Check {
       |  def method(<caret>attrib: String) = {
       |    CaseClass2(attrib = attrib)
@@ -135,8 +125,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("y")
 
-    val resultText =
-      """
+    val resultText = """
       |class Check {
       |  def method(y: String) = {
       |    CaseClass2(attrib = y)
@@ -149,8 +138,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
   }
 
   def testRenameCaseClass() {
-    val fileText =
-      """
+    val fileText = """
       |class A {
       |
       |  case class Index()
@@ -172,8 +160,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("Inde")
 
-    val resultText =
-      """
+    val resultText = """
       |class A {
       |
       |  case class Index()
@@ -195,10 +182,9 @@ class ScalaRenameTest extends ScalaRenameTestBase {
 
     myFixture.checkResult(resultText)
   }
-  
+
   def testRenameInterpolatedStringPrefix() {
-    val fileText =
-      """
+    val fileText = """
         |object AAA {
         |
         |  class BBB {
@@ -209,9 +195,8 @@ class ScalaRenameTest extends ScalaRenameTestBase {
         |
         |  val a = aaa"blah blah"
         |}""".replace("\r", "").stripMargin
-    
-    val resultText =
-      """
+
+    val resultText = """
         |object AAA {
         |
         |  class BBB {
@@ -222,15 +207,14 @@ class ScalaRenameTest extends ScalaRenameTestBase {
         |
         |  val a = bbb"blah blah"
         |}""".replace("\r", "").stripMargin
-    
+
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("bbb")
     myFixture.checkResult(resultText)
   }
 
   def testObjectToCaseClass() {
-    val fileText =
-      """
+    val fileText = """
       |object ObjectToCaseClass {
       |
       |  case class Test1(a: Int)
@@ -242,8 +226,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("I")
 
-    val resultText =
-      """
+    val resultText = """
       |object ObjectToCaseClass {
       |
       |  case class I(a: Int)
@@ -257,8 +240,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
   }
 
   def testCaseClassConstructor() {
-    val fileText =
-      """
+    val fileText = """
         |object CaseClassConstructor {
         |
         |  case class Test1(a: Int)
@@ -273,8 +255,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("I")
 
-    val resultText =
-      """
+    val resultText = """
         |object CaseClassConstructor {
         |
         |  case class I(a: Int)
@@ -291,8 +272,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
   }
 
   def testCaseClassApply() {
-    val fileText =
-      """
+    val fileText = """
         |object CaseClassApply {
         |
         |  case class Test1(a: Int)
@@ -307,8 +287,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("I")
 
-    val resultText =
-      """
+    val resultText = """
         |object CaseClassApply {
         |
         |  case class I(a: Int)
@@ -325,8 +304,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
   }
 
   def testCaseClassUnapply() {
-    val fileText =
-      """
+    val fileText = """
         |object CaseClassUnapply {
         |
         |  case class Test1(a: Int)
@@ -341,8 +319,7 @@ class ScalaRenameTest extends ScalaRenameTestBase {
     myFixture.configureByText("dummy.scala", fileText)
     myFixture.renameElementAtCaret("I")
 
-    val resultText =
-      """
+    val resultText = """
         |object CaseClassUnapply {
         |
         |  case class I(a: Int)

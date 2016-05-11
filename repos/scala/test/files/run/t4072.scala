@@ -1,6 +1,6 @@
 import scala.tools.nsc._
 
-import scala.language.{ reflectiveCalls }
+import scala.language.{reflectiveCalls}
 
 object Test {
   class DryRun {

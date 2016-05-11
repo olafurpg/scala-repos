@@ -22,8 +22,7 @@ package ragnarok
 package test
 
 object Platform868 extends PerfTestSuite {
-  query(
-    """
+  query("""
 billing     := //billing
 conversions := //conversions
 

@@ -1,5 +1,4 @@
-
-import scala.language.{ reflectiveCalls }
+import scala.language.{reflectiveCalls}
 
 object Test extends App {
 
@@ -11,9 +10,7 @@ object Test extends App {
       val v: { def n: Int } = new { val n = 3 }
       v.n
     }
-
   }
 
   new C("foo").f
-
 }

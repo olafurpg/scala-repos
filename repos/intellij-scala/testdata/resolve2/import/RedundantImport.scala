@@ -4,7 +4,8 @@ import scala.collection.mutable.HashMap
 import scala.Some
 
 class A {
-  val map: /* */HashMap[String, /* */Some[String]] = new /* name: this*/HashMap[String, Some[String]]
+  val map: /* */ HashMap[String, /* */ Some[String]] =
+    new /* name: this*/ HashMap[String, Some[String]]
 
-  new /* */Some[String]("test")
+  new /* */ Some[String]("test")
 }

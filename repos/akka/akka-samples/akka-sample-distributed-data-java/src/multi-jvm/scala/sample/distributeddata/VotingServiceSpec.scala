@@ -23,14 +23,15 @@ object VotingServiceSpec extends MultiNodeConfig {
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
     """))
-
 }
 
 class VotingServiceSpecMultiJvmNode1 extends VotingServiceSpec
 class VotingServiceSpecMultiJvmNode2 extends VotingServiceSpec
 class VotingServiceSpecMultiJvmNode3 extends VotingServiceSpec
 
-class VotingServiceSpec extends MultiNodeSpec(VotingServiceSpec) with STMultiNodeSpec with ImplicitSender {
+class VotingServiceSpec
+    extends MultiNodeSpec(VotingServiceSpec) with STMultiNodeSpec
+    with ImplicitSender {
   import VotingServiceSpec._
 
   override def initialParticipants = roles.size
@@ -84,18 +85,17 @@ class VotingServiceSpec extends MultiNodeSpec(VotingServiceSpec) with STMultiNod
         votingService ! VotingService.CLOSE
       }
 
-      val expected = (1 to 20).map(n ⇒ "#" + n -> BigInteger.valueOf(3L * N / 20)).toMap
+      val expected =
+        (1 to 20).map(n ⇒ "#" + n -> BigInteger.valueOf(3L * N / 20)).toMap
       awaitAssert {
         votingService ! VotingService.GET_VOTES
         val votes = expectMsgType[Votes](3.seconds)
-        votes.open should be (false)
+        votes.open should be(false)
         import scala.collection.JavaConverters._
-        votes.result.asScala.toMap should be (expected)
+        votes.result.asScala.toMap should be(expected)
       }
 
       enterBarrier("after-2")
     }
   }
-
 }
-

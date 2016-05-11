@@ -2,10 +2,9 @@ package org.jetbrains.plugins.scala
 package codeInsight.generation
 
 /**
- * Nikolay.Tropin
- * 8/23/13
- */
-
+  * Nikolay.Tropin
+  * 8/23/13
+  */
 class GenerateEqualsTest extends ScalaGenerateTestBase {
   val handler = new ScalaGenerateEqualsHandler
 
@@ -111,7 +110,8 @@ class GenerateEqualsTest extends ScalaGenerateTestBase {
                  |class B (i: Int, val j: Int) extends A {
                  |  val z = 0$CARET_MARKER
                  |}"""
-    val result = """class A {
+    val result =
+      """class A {
                    |  val a = 0
                    |
                    |  def canEqual(other: Any): Boolean = other.isInstanceOf[A]

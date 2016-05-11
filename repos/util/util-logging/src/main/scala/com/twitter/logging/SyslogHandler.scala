@@ -47,8 +47,8 @@ object SyslogHandler {
   private val SEVERITY_DEBUG = 7
 
   /**
-   * Convert the java/scala log level into its closest syslog-ng severity.
-   */
+    * Convert the java/scala log level into its closest syslog-ng severity.
+    */
   private[logging] def severityForLogLevel(level: Int): Int = {
     if (level >= Level.FATAL.value) {
       SEVERITY_ALERT
@@ -69,34 +69,33 @@ object SyslogHandler {
   val OLD_SYSLOG_DATE_FORMAT = TwitterDateFormat("MMM dd HH:mm:ss")
 
   /**
-   * Generates a HandlerFactory that returns a SyslogHandler.
-   *
-   * @param server
-   * Syslog server hostname.
-   *
-   * @param port
-   * Syslog server port.
-   */
+    * Generates a HandlerFactory that returns a SyslogHandler.
+    *
+    * @param server
+    * Syslog server hostname.
+    *
+    * @param port
+    * Syslog server port.
+    */
   def apply(
-    server: String = "localhost",
-    port: Int = SyslogHandler.DEFAULT_PORT,
-    formatter: Formatter = new Formatter(),
-    level: Option[Level] = None
+      server: String = "localhost",
+      port: Int = SyslogHandler.DEFAULT_PORT,
+      formatter: Formatter = new Formatter(),
+      level: Option[Level] = None
   ) = () => new SyslogHandler(server, port, formatter, level)
 }
 
-class SyslogHandler(
-    val server: String,
-    val port: Int,
-    formatter: Formatter,
-    level: Option[Level])
-  extends Handler(formatter, level) {
+class SyslogHandler(val server: String,
+                    val port: Int,
+                    formatter: Formatter,
+                    level: Option[Level])
+    extends Handler(formatter, level) {
 
   private val socket = new DatagramSocket
   private[logging] val dest = new InetSocketAddress(server, port)
 
-  def flush() = { }
-  def close() = { }
+  def flush() = {}
+  def close() = {}
 
   def publish(record: javalog.LogRecord) = {
     val data = formatter.format(record).getBytes
@@ -113,28 +112,28 @@ class SyslogHandler(
 }
 
 /**
- * @param hostname
- * Hostname to prepend to log lines.
- *
- * @param serverName
- * Optional server name to insert before log entries.
- *
- * @param useIsoDateFormat
- * Use new standard ISO-format timestamps instead of old BSD-format?
- *
- * @param priority
- * Priority level in syslog numbers.
- *
- * @param timezone
- * Should dates in log messages be reported in a different time zone rather than local time?
- * If set, the time zone name must be one known by the java `TimeZone` class.
- *
- * @param truncateAt
- * Truncate log messages after N characters. 0 = don't truncate (the default).
- *
- * @param truncateStackTracesAt
- * Truncate stack traces in exception logging (line count).
- */
+  * @param hostname
+  * Hostname to prepend to log lines.
+  *
+  * @param serverName
+  * Optional server name to insert before log entries.
+  *
+  * @param useIsoDateFormat
+  * Use new standard ISO-format timestamps instead of old BSD-format?
+  *
+  * @param priority
+  * Priority level in syslog numbers.
+  *
+  * @param timezone
+  * Should dates in log messages be reported in a different time zone rather than local time?
+  * If set, the time zone name must be one known by the java `TimeZone` class.
+  *
+  * @param truncateAt
+  * Truncate log messages after N characters. 0 = don't truncate (the default).
+  *
+  * @param truncateStackTracesAt
+  * Truncate stack traces in exception logging (line count).
+  */
 class SyslogFormatter(
     val hostname: String = NetUtil.getLocalHostName(),
     val serverName: Option[String] = None,
@@ -143,22 +142,23 @@ class SyslogFormatter(
     timezone: Option[String] = None,
     truncateAt: Int = 0,
     truncateStackTracesAt: Int = Formatter.DefaultStackTraceSizeLimit)
-  extends Formatter(
-    timezone,
-    truncateAt,
-    truncateStackTracesAt,
-    useFullPackageNames = false,
-    prefix = "") {
+    extends Formatter(timezone,
+                      truncateAt,
+                      truncateStackTracesAt,
+                      useFullPackageNames = false,
+                      prefix = "") {
 
-  override def dateFormat = if (useIsoDateFormat) {
-    SyslogHandler.ISO_DATE_FORMAT
-  } else {
-    SyslogHandler.OLD_SYSLOG_DATE_FORMAT
-  }
+  override def dateFormat =
+    if (useIsoDateFormat) {
+      SyslogHandler.ISO_DATE_FORMAT
+    } else {
+      SyslogHandler.OLD_SYSLOG_DATE_FORMAT
+    }
 
   override def lineTerminator = ""
 
-  override def formatPrefix(level: javalog.Level, date: String, name: String): String = {
+  override def formatPrefix(
+      level: javalog.Level, date: String, name: String): String = {
     val syslogLevel = level match {
       case x: Level => SyslogHandler.severityForLogLevel(x.value)
       case x: javalog.Level => SyslogHandler.severityForLogLevel(x.intValue)
@@ -167,19 +167,22 @@ class SyslogFormatter(
       case None =>
         "<%d>%s %s %s: ".format(priority | syslogLevel, date, hostname, name)
       case Some(serverName) =>
-        "<%d>%s %s [%s] %s: ".format(priority | syslogLevel, date, hostname, serverName, name)
+        "<%d>%s %s [%s] %s: ".format(
+            priority | syslogLevel, date, hostname, serverName, name)
     }
   }
 }
 
 object SyslogFuture {
   private val executor = Executors.newSingleThreadExecutor(
-    new NamedPoolThreadFactory("TWITTER-UTIL-SYSLOG", true/*daemon*/))
+      new NamedPoolThreadFactory("TWITTER-UTIL-SYSLOG", true /*daemon*/ ))
   private val noop = new Runnable { def run() {} }
 
-  def apply(action: => Unit) = executor.submit(new Runnable {
-    def run() { action }
-  })
+  def apply(action: => Unit) =
+    executor.submit(
+        new Runnable {
+      def run() { action }
+    })
 
   def sync() {
     val f = executor.submit(noop)

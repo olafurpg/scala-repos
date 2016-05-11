@@ -29,12 +29,12 @@ trait DeepHLister[R <: HList] extends DepFn1[R] { type Out <: HList }
 trait LowPriorityDeepHLister {
   type Aux[R <: HList, Out0 <: HList] = DeepHLister[R] { type Out = Out0 }
 
-  implicit def headNotCaseClassDeepHLister[H, T <: HList](implicit
-    dht: Lazy[DeepHLister[T]]
-  ): Aux[H :: T, H :: dht.value.Out] = new DeepHLister[H :: T] {
-    type Out = H :: dht.value.Out
-    def apply(r: H :: T) = r.head :: dht.value(r.tail)
-  }
+  implicit def headNotCaseClassDeepHLister[H, T <: HList](
+      implicit dht: Lazy[DeepHLister[T]]): Aux[H :: T, H :: dht.value.Out] =
+    new DeepHLister[H :: T] {
+      type Out = H :: dht.value.Out
+      def apply(r: H :: T) = r.head :: dht.value(r.tail)
+    }
 }
 
 object DeepHLister extends LowPriorityDeepHLister {
@@ -43,14 +43,14 @@ object DeepHLister extends LowPriorityDeepHLister {
     def apply(r: HNil) = HNil
   }
 
-  implicit def headCaseClassDeepHLister[H, R <: HList, T <: HList](implicit
-    gen: Generic.Aux[H, R],
-    dhh: Lazy[DeepHLister[R]],
-    dht: Lazy[DeepHLister[T]]
-  ): Aux[H :: T, dhh.value.Out :: dht.value.Out] = new DeepHLister[H :: T] {
-    type Out = dhh.value.Out :: dht.value.Out
-    def apply(r: H :: T) = dhh.value(gen.to(r.head)) :: dht.value(r.tail)
-  }
+  implicit def headCaseClassDeepHLister[H, R <: HList, T <: HList](
+      implicit gen: Generic.Aux[H, R],
+      dhh: Lazy[DeepHLister[R]],
+      dht: Lazy[DeepHLister[T]]): Aux[H :: T, dhh.value.Out :: dht.value.Out] =
+    new DeepHLister[H :: T] {
+      type Out = dhh.value.Out :: dht.value.Out
+      def apply(r: H :: T) = dhh.value(gen.to(r.head)) :: dht.value(r.tail)
+    }
 
   def apply[R <: HList](implicit dh: DeepHLister[R]): Aux[R, dh.Out] = dh
 }

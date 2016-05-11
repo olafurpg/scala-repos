@@ -4,9 +4,9 @@
 
 package akka.http.scaladsl.server.directives
 
-import java.io.{ FileInputStream, File }
+import java.io.{FileInputStream, File}
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.{ MissingFormFieldRejection, RoutingSpec }
+import akka.http.scaladsl.server.{MissingFormFieldRejection, RoutingSpec}
 import akka.util.ByteString
 
 class FileUploadDirectivesSpec extends RoutingSpec {
@@ -17,11 +17,11 @@ class FileUploadDirectivesSpec extends RoutingSpec {
 
       val xml = "<int>42</int>"
 
-      val simpleMultipartUpload =
-        Multipart.FormData(Multipart.FormData.BodyPart.Strict(
-          "fieldName",
-          HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml),
-          Map("filename" -> "age.xml")))
+      val simpleMultipartUpload = Multipart.FormData(
+          Multipart.FormData.BodyPart.Strict(
+              "fieldName",
+              HttpEntity(ContentTypes.`text/xml(UTF-8)`, xml),
+              Map("filename" -> "age.xml")))
 
       @volatile var file: Option[File] = None
 
@@ -34,7 +34,8 @@ class FileUploadDirectivesSpec extends RoutingSpec {
           }
         } ~> check {
           file.isDefined === true
-          responseAs[String] === FileInfo("fieldName", "age.xml", ContentTypes.`text/xml(UTF-8)`).toString
+          responseAs[String] === FileInfo(
+              "fieldName", "age.xml", ContentTypes.`text/xml(UTF-8)`).toString
           read(file.get) === xml
         }
       } finally {
@@ -52,7 +53,9 @@ class FileUploadDirectivesSpec extends RoutingSpec {
         fileUpload("field1") {
           case (info, bytes) ⇒
             // stream the bytes somewhere
-            val allBytesF = bytes.runFold(ByteString()) { (all, bytes) ⇒ all ++ bytes }
+            val allBytesF = bytes.runFold(ByteString()) { (all, bytes) ⇒
+              all ++ bytes
+            }
 
             // sum all individual file sizes
             onSuccess(allBytesF) { allBytes ⇒
@@ -67,17 +70,16 @@ class FileUploadDirectivesSpec extends RoutingSpec {
 
       // tests:
       val str1 = "some data"
-      val multipartForm =
-        Multipart.FormData(Multipart.FormData.BodyPart.Strict(
-          "field1",
-          HttpEntity(ContentTypes.`text/plain(UTF-8)`, str1),
-          Map("filename" -> "data1.txt")))
+      val multipartForm = Multipart.FormData(
+          Multipart.FormData.BodyPart.Strict(
+              "field1",
+              HttpEntity(ContentTypes.`text/plain(UTF-8)`, str1),
+              Map("filename" -> "data1.txt")))
 
       Post("/", multipartForm) ~> route ~> check {
         status shouldEqual StatusCodes.OK
         responseAs[String] shouldEqual str1
       }
-
     }
 
     "stream the first file upload if multiple with the same name are posted" in {
@@ -87,56 +89,53 @@ class FileUploadDirectivesSpec extends RoutingSpec {
       // tests:
       val str1 = "some data"
       val str2 = "other data"
-      val multipartForm =
-        Multipart.FormData(
+      val multipartForm = Multipart.FormData(
           Multipart.FormData.BodyPart.Strict(
-            "field1",
-            HttpEntity(ContentTypes.`text/plain(UTF-8)`, str1),
-            Map("filename" -> "data1.txt")),
+              "field1",
+              HttpEntity(ContentTypes.`text/plain(UTF-8)`, str1),
+              Map("filename" -> "data1.txt")),
           Multipart.FormData.BodyPart.Strict(
-            "field1",
-            HttpEntity(ContentTypes.`text/plain(UTF-8)`, str2),
-            Map("filename" -> "data2.txt")))
+              "field1",
+              HttpEntity(ContentTypes.`text/plain(UTF-8)`, str2),
+              Map("filename" -> "data2.txt")))
 
       Post("/", multipartForm) ~> route ~> check {
         status shouldEqual StatusCodes.OK
         responseAs[String] shouldEqual str1
       }
-
     }
 
     "reject the file upload if the field name is missing" in {
       // byte count as a service ;)
-      val route =
-        extractRequestContext { ctx ⇒
-          implicit val mat = ctx.materializer
+      val route = extractRequestContext { ctx ⇒
+        implicit val mat = ctx.materializer
 
-          fileUpload("missing") {
-            case (info, bytes) ⇒
-              // stream the bytes somewhere
-              val allBytesF = bytes.runFold(ByteString()) { (all, bytes) ⇒ all ++ bytes }
+        fileUpload("missing") {
+          case (info, bytes) ⇒
+            // stream the bytes somewhere
+            val allBytesF = bytes.runFold(ByteString()) { (all, bytes) ⇒
+              all ++ bytes
+            }
 
-              // sum all individual file sizes
-              onSuccess(allBytesF) { allBytes ⇒
-                complete(allBytes)
-              }
-          }
+            // sum all individual file sizes
+            onSuccess(allBytesF) { allBytes ⇒
+              complete(allBytes)
+            }
         }
+      }
 
       // tests:
       val str1 = "some data"
-      val multipartForm =
-        Multipart.FormData(Multipart.FormData.BodyPart.Strict(
-          "field1",
-          HttpEntity(ContentTypes.`text/plain(UTF-8)`, str1),
-          Map("filename" -> "data1.txt")))
+      val multipartForm = Multipart.FormData(
+          Multipart.FormData.BodyPart.Strict(
+              "field1",
+              HttpEntity(ContentTypes.`text/plain(UTF-8)`, str1),
+              Map("filename" -> "data1.txt")))
 
       Post("/", multipartForm) ~> route ~> check {
         rejection === MissingFormFieldRejection("missing")
       }
-
     }
-
   }
 
   private def read(file: File): String = {
@@ -149,5 +148,4 @@ class FileUploadDirectivesSpec extends RoutingSpec {
       in.close()
     }
   }
-
 }

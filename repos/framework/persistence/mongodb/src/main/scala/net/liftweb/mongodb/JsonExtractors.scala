@@ -13,7 +13,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package net.liftweb
 package mongodb
 
@@ -30,7 +29,8 @@ import org.joda.time.DateTime
 object JsonObjectId {
   def unapply(json: JValue): Option[ObjectId] = {
     json match {
-      case JObject(JField("$oid", JString(objectIdString)) :: Nil) if ObjectId.isValid(objectIdString) =>
+      case JObject(JField("$oid", JString(objectIdString)) :: Nil)
+          if ObjectId.isValid(objectIdString) =>
         Some(new ObjectId(objectIdString))
       case _ =>
         None
@@ -40,10 +40,8 @@ object JsonObjectId {
   def apply(objectId: ObjectId): JValue = ("$oid" -> objectId.toString)
 
   def asJValue(objectId: ObjectId, formats: Formats): JValue =
-    if (isObjectIdSerializerUsed(formats))
-      apply(objectId)
-    else
-      JString(objectId.toString)
+    if (isObjectIdSerializerUsed(formats)) apply(objectId)
+    else JString(objectId.toString)
 
   /**
     * Check to see if the ObjectIdSerializer is being used.
@@ -51,20 +49,23 @@ object JsonObjectId {
   private def isObjectIdSerializerUsed(formats: Formats): Boolean =
     formats.customSerializers.exists(_.getClass == objectIdSerializerClass)
 
-  private val objectIdSerializerClass = classOf[net.liftweb.mongodb.ObjectIdSerializer]
+  private val objectIdSerializerClass =
+    classOf[net.liftweb.mongodb.ObjectIdSerializer]
 }
 
 object JsonRegex {
   def unapply(json: JValue): Option[Pattern] = {
     json match {
-      case JObject(JField("$regex", JString(regex)) :: JField("$flags", JInt(f)) :: Nil) =>
+      case JObject(JField("$regex", JString(regex)) :: JField(
+          "$flags", JInt(f)) :: Nil) =>
         Some(Pattern.compile(regex, f.intValue))
       case _ =>
         None
     }
   }
 
-  def apply(p: Pattern): JValue = ("$regex" -> p.pattern) ~ ("$flags" -> p.flags)
+  def apply(p: Pattern): JValue =
+    ("$regex" -> p.pattern) ~ ("$flags" -> p.flags)
 }
 
 object JsonUUID {
@@ -90,7 +91,8 @@ object JsonDate {
     }
   }
 
-  def apply(dt: Date)(implicit formats: Formats): JValue = ("$dt" -> formats.dateFormat.format(dt))
+  def apply(dt: Date)(implicit formats: Formats): JValue =
+    ("$dt" -> formats.dateFormat.format(dt))
 }
 
 object JsonDateTime {
@@ -103,5 +105,6 @@ object JsonDateTime {
     }
   }
 
-  def apply(dt: DateTime)(implicit formats: Formats): JValue = ("$dt" -> formats.dateFormat.format(dt.toDate))
+  def apply(dt: DateTime)(implicit formats: Formats): JValue =
+    ("$dt" -> formats.dateFormat.format(dt.toDate))
 }

@@ -32,19 +32,20 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object VideoTrack {
-  implicit def sfxVideoTrack2jfx(at: VideoTrack): jfxsm.VideoTrack = if (at != null) at.delegate else null
+  implicit def sfxVideoTrack2jfx(at: VideoTrack): jfxsm.VideoTrack =
+    if (at != null) at.delegate else null
 }
 
-class VideoTrack(override val delegate: jfxsm.VideoTrack) extends Track(delegate) with SFXDelegate[jfxsm.VideoTrack] {
+class VideoTrack(override val delegate: jfxsm.VideoTrack)
+    extends Track(delegate) with SFXDelegate[jfxsm.VideoTrack] {
 
   /**
-   * Retrieves the height of the track.
-   */
+    * Retrieves the height of the track.
+    */
   def height = delegate.getHeight
 
   /**
-   * Retrieves the width of the track.
-   */
+    * Retrieves the width of the track.
+    */
   def width = delegate.getWidth
-
 }

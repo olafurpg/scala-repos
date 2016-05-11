@@ -1,3 +1,3 @@
 object Test {
-  Cat.compose[List,Option].Functor
+  Cat.compose[List, Option].Functor
 }

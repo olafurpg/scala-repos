@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.linker.backend
 
@@ -20,44 +19,44 @@ import org.scalajs.core.tools.linker.LinkingUnit
 import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
 
 /** A backend of the Scala.js linker. Produces a
- *  [[org.scalajs.core.tools.io.VirtualJSFile VirtualJSFile]].
- *
- *  You probably want to use an instance of [[linker.Linker]], rather than this
- *  low-level class.
- */
-abstract class LinkerBackend(
-    val semantics: Semantics,
-    val esLevel: ESLevel,
-    val withSourceMap: Boolean,
-    protected val config: LinkerBackend.Config) {
+  *  [[org.scalajs.core.tools.io.VirtualJSFile VirtualJSFile]].
+  *
+  *  You probably want to use an instance of [[linker.Linker]], rather than this
+  *  low-level class.
+  */
+abstract class LinkerBackend(val semantics: Semantics,
+                             val esLevel: ESLevel,
+                             val withSourceMap: Boolean,
+                             protected val config: LinkerBackend.Config) {
 
   /** Symbols this backend needs to be present in the linking unit. */
   val symbolRequirements: SymbolRequirement
 
   /** Emit the given [[LinkingUnit]] to the target output
-   *
-   *  @param unit [[LinkingUnit]] to emit
-   *  @param output File to write to
-   *  @param logger Logger to use
-   */
-  def emit(unit: LinkingUnit, output: WritableVirtualJSFile,
-      logger: Logger): Unit
+    *
+    *  @param unit [[LinkingUnit]] to emit
+    *  @param output File to write to
+    *  @param logger Logger to use
+    */
+  def emit(
+      unit: LinkingUnit, output: WritableVirtualJSFile, logger: Logger): Unit
 
   /** Verify that a [[LinkingUnit]] corresponds to this [[LinkerBackend]]'s
-   *  [[org.scalajs.core.tools.sem.Semantics Semantics]] and
-   *  [[org.scalajs.core.tools.javascript.ESLevel ESLevel]] (specified via the
-   *  [[org.scalajs.core.tools.javascript.OutputMode OutputMode]]).
-   *  @throws java.lang.IllegalArgumentException if there is a mismatch
-   */
+    *  [[org.scalajs.core.tools.sem.Semantics Semantics]] and
+    *  [[org.scalajs.core.tools.javascript.ESLevel ESLevel]] (specified via the
+    *  [[org.scalajs.core.tools.javascript.OutputMode OutputMode]]).
+    *  @throws java.lang.IllegalArgumentException if there is a mismatch
+    */
   protected def verifyUnit(unit: LinkingUnit): Unit = {
     require(unit.semantics == semantics,
-        "LinkingUnit and LinkerBackend must agree on semantics")
+            "LinkingUnit and LinkerBackend must agree on semantics")
     require(unit.esLevel == esLevel,
-        "LinkingUnit and LinkerBackend must agree on esLevel")
+            "LinkingUnit and LinkerBackend must agree on esLevel")
   }
 }
 
 object LinkerBackend {
+
   /** Configurations relevant to the backend */
   final class Config private (
       /** Base path to relativize paths in the source map. */
@@ -67,10 +66,12 @@ object LinkerBackend {
       /** Pretty-print the output. */
       val prettyPrint: Boolean = false
   ) {
-    def withRelativizeSourceMapBase(relativizeSourceMapBase: Option[URI]): Config =
+    def withRelativizeSourceMapBase(
+        relativizeSourceMapBase: Option[URI]): Config =
       copy(relativizeSourceMapBase = relativizeSourceMapBase)
 
-    def withCustomOutputWrapper(customOutputWrapper: (String, String)): Config =
+    def withCustomOutputWrapper(
+        customOutputWrapper: (String, String)): Config =
       copy(customOutputWrapper = customOutputWrapper)
 
     def withPrettyPrint(prettyPrint: Boolean): Config =

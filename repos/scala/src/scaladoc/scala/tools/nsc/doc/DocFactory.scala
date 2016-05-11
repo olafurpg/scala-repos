@@ -29,7 +29,9 @@ import scala.reflect.internal.util.BatchSourceFile
   * @param settings The settings to be used by the documenter and compiler for generating documentation.
   *
   * @author Gilles Dubochet */
-class DocFactory(val reporter: Reporter, val settings: doc.Settings) { processor =>
+class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
+  processor =>
+
   /** The unique compiler instance used by this processor and constructed from its `settings`. */
   object compiler extends ScaladocGlobal(settings, reporter)
 
@@ -43,11 +45,11 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) { processor
       case Left(files) =>
         new compiler.Run() compile files
       case Right(sourceCode) =>
-        new compiler.Run() compileSources List(new BatchSourceFile("newSource", sourceCode))
+        new compiler.Run() compileSources List(
+            new BatchSourceFile("newSource", sourceCode))
     }
 
-    if (reporter.hasErrors)
-      return None
+    if (reporter.hasErrors) return None
 
     val extraTemplatesToDocument: Set[compiler.Symbol] = {
       if (settings.docUncompilable.isDefault) Set()
@@ -55,7 +57,7 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) { processor
         val uncompilable = new {
           val global: compiler.type = compiler
           val settings = processor.settings
-        } with Uncompilable { }
+        } with Uncompilable {}
 
         compiler.docComments ++= uncompilable.comments
         docdbg("" + uncompilable)
@@ -64,24 +66,22 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) { processor
       }
     }
 
-    val modelFactory = (
-      new { override val global: compiler.type = compiler }
-        with model.ModelFactory(compiler, settings)
-        with model.ModelFactoryImplicitSupport
-        with model.ModelFactoryTypeSupport
-        with model.diagram.DiagramFactory
-        with model.CommentFactory
-        with model.TreeFactory
-        with model.MemberLookup {
-          override def templateShouldDocument(sym: compiler.Symbol, inTpl: DocTemplateImpl) =
-            extraTemplatesToDocument(sym) || super.templateShouldDocument(sym, inTpl)
-        }
-    )
+    val modelFactory = (new { override val global: compiler.type = compiler }
+    with model.ModelFactory(compiler, settings)
+    with model.ModelFactoryImplicitSupport with model.ModelFactoryTypeSupport
+    with model.diagram.DiagramFactory with model.CommentFactory
+    with model.TreeFactory with model.MemberLookup {
+      override def templateShouldDocument(
+          sym: compiler.Symbol, inTpl: DocTemplateImpl) =
+        extraTemplatesToDocument(sym) ||
+        super.templateShouldDocument(sym, inTpl)
+    })
 
     modelFactory.makeModel match {
       case Some(madeModel) =>
         if (!settings.scaladocQuietRun)
-          println("model contains " + modelFactory.templatesCount + " documentable templates")
+          println("model contains " + modelFactory.templatesCount +
+              " documentable templates")
         Some(madeModel)
       case None =>
         if (!settings.scaladocQuietRun)
@@ -90,13 +90,20 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) { processor
     }
   }
 
-  object NoCompilerRunException extends ControlThrowable { }
+  object NoCompilerRunException extends ControlThrowable {}
 
   val documentError: PartialFunction[Throwable, Unit] = {
     case NoCompilerRunException =>
-      reporter.info(null, "No documentation generated with unsuccessful compiler run", force = false)
-    case e @ (_:ClassNotFoundException | _:IllegalAccessException | _:InstantiationException | _:SecurityException | _:ClassCastException) =>
-      reporter.error(null, s"Cannot load the doclet class ${settings.docgenerator.value} (specified with ${settings.docgenerator.name}): $e. Leaving the default settings will generate the html version of scaladoc.")
+      reporter.info(
+          null,
+          "No documentation generated with unsuccessful compiler run",
+          force = false)
+    case e @ (_: ClassNotFoundException | _: IllegalAccessException |
+        _: InstantiationException | _: SecurityException |
+        _: ClassCastException) =>
+      reporter.error(
+          null,
+          s"Cannot load the doclet class ${settings.docgenerator.value} (specified with ${settings.docgenerator.name}): $e. Leaving the default settings will generate the html version of scaladoc.")
   }
 
   /** Generate document(s) for all `files` containing scaladoc documentation.
@@ -104,24 +111,26 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) { processor
   def document(files: List[String]) {
     def generate() = {
       import doclet._
-      val docletClass    = Class.forName(settings.docgenerator.value) // default is html.Doclet
+      val docletClass =
+        Class.forName(settings.docgenerator.value) // default is html.Doclet
       val docletInstance = docletClass.newInstance().asInstanceOf[Generator]
 
       docletInstance match {
         case universer: Universer =>
-          val universe = makeUniverse(Left(files)) getOrElse { throw NoCompilerRunException }
+          val universe =
+            makeUniverse(Left(files)) getOrElse {
+              throw NoCompilerRunException
+            }
           universer setUniverse universe
         case _ => ()
       }
       docletInstance.generate()
     }
 
-    try generate()
-    catch documentError
+    try generate() catch documentError
   }
 
   private[doc] def docdbg(msg: String) {
-    if (settings.Ydocdebug)
-      println(msg)
+    if (settings.Ydocdebug) println(msg)
   }
 }

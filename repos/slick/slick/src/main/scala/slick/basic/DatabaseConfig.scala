@@ -16,6 +16,7 @@ import com.typesafe.config.{ConfigFactory, Config}
 
 /** A configuration for a Database plus a matching Profile. */
 trait DatabaseConfig[P <: BasicProfile] {
+
   /** Get the configured Database. It is instantiated lazily when this method is called for the
     * first time, and must be closed after use. */
   def db: P#Backend#Database
@@ -69,9 +70,12 @@ object DatabaseConfig {
     * @param classLoader The ClassLoader to use to load any custom classes from. The default is to
     *                    try the context ClassLoader first and fall back to Slick's ClassLoader.
     */
-  def forConfig[P <: BasicProfile : ClassTag](path: String, config: Config = ConfigFactory.load(),
-                                              classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader): DatabaseConfig[P] = {
-    val basePath = (if(path.isEmpty) "" else path + ".")
+  def forConfig[P <: BasicProfile : ClassTag](
+      path: String,
+      config: Config = ConfigFactory.load(),
+      classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader)
+    : DatabaseConfig[P] = {
+    val basePath = (if (path.isEmpty) "" else path + ".")
     val n = config.getStringOpt(basePath + "profile").getOrElse {
       val nOld = config.getStringOpt(basePath + "driver").map {
         case "slick.driver.DerbyDriver$" => "slick.jdbc.DerbyProfile$"
@@ -83,28 +87,35 @@ object DatabaseConfig {
         case "slick.memory.MemoryDriver$" => "slick.memory.MemoryProfile$"
         case n => n
       }
-      if(nOld.isDefined)
-        logger.warn(s"Use `${basePath}profile` instead of `${basePath}driver`. The latter is deprecated since Slick 3.2 and will be removed.")
-      nOld.getOrElse(config.getString(basePath+"profile")) // trigger the correct error
+      if (nOld.isDefined)
+        logger.warn(
+            s"Use `${basePath}profile` instead of `${basePath}driver`. The latter is deprecated since Slick 3.2 and will be removed.")
+      nOld.getOrElse(config.getString(basePath + "profile")) // trigger the correct error
     }
 
     val untypedP = try {
-      if(n.endsWith("$")) classLoader.loadClass(n).getField("MODULE$").get(null)
+      if (n.endsWith("$"))
+        classLoader.loadClass(n).getField("MODULE$").get(null)
       else classLoader.loadClass(n).newInstance()
-    } catch { case NonFatal(ex) =>
-      throw new SlickException(s"""Error getting instance of profile "$n"""", ex)
+    } catch {
+      case NonFatal(ex) =>
+        throw new SlickException(
+            s"""Error getting instance of profile "$n"""", ex)
     }
     val pClass = implicitly[ClassTag[P]].runtimeClass
-    if(!pClass.isInstance(untypedP))
-      throw new SlickException(s"Configured profile $n does not conform to requested profile ${pClass.getName}")
+    if (!pClass.isInstance(untypedP))
+      throw new SlickException(
+          s"Configured profile $n does not conform to requested profile ${pClass.getName}")
     val root = config
     new DatabaseConfig[P] {
-      lazy val db: P#Backend#Database =
-        profile.backend.createDatabase(root, (if(path.isEmpty) "" else path + ".") + "db")
+      lazy val db: P#Backend#Database = profile.backend.createDatabase(
+          root, (if (path.isEmpty) "" else path + ".") + "db")
       val profile: P = untypedP.asInstanceOf[P]
       val driver: P = untypedP.asInstanceOf[P]
-      lazy val config: Config = if(path.isEmpty) root else root.getConfig(path)
-      def profileName = if(profileIsObject) n.substring(0, n.length-1) else n
+      lazy val config: Config =
+        if (path.isEmpty) root else root.getConfig(path)
+      def profileName =
+        if (profileIsObject) n.substring(0, n.length - 1) else n
       def profileIsObject = n.endsWith("$")
     }
   }
@@ -114,60 +125,80 @@ object DatabaseConfig {
     * the root of the class path), otherwise as a path in the configuration located at the URI
     * without the fragment, which must be a valid URL. Without a fragment, the whole config object
     * is used. */
-  def forURI[P <: BasicProfile : ClassTag](uri: URI, classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader): DatabaseConfig[P] = {
+  def forURI[P <: BasicProfile : ClassTag](
+      uri: URI, classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader)
+    : DatabaseConfig[P] = {
     val (base, path) = {
       val f = uri.getRawFragment
       val s = uri.toString
-      if(s.isEmpty) (null, "")
-      else if(f eq null) (s, "")
-      else if(s.startsWith("#")) (null, uri.getFragment)
-      else (s.substring(0, s.length-f.length-1), uri.getFragment)
+      if (s.isEmpty) (null, "")
+      else if (f eq null) (s, "")
+      else if (s.startsWith("#")) (null, uri.getFragment)
+      else (s.substring(0, s.length - f.length - 1), uri.getFragment)
     }
     val root =
-      if(base eq null) ConfigFactory.load()
+      if (base eq null) ConfigFactory.load()
       else ConfigFactory.parseURL(new URL(base)).resolve()
     forConfig[P](path, root, classLoader)
   }
 
   /** Load a profile and database configuration from the URI specified in a [[StaticDatabaseConfig]]
     * annotation in the static scope of the caller. */
-  def forAnnotation[P <: BasicProfile](classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader)(implicit ct: ClassTag[P]): DatabaseConfig[P] =
-    macro StaticDatabaseConfigMacros.getWithClassLoaderImpl[P]
+  def forAnnotation[P <: BasicProfile](
+      classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader)(
+      implicit ct: ClassTag[P]): DatabaseConfig[P] = macro StaticDatabaseConfigMacros
+    .getWithClassLoaderImpl[P]
 
   /** Load a profile and database configuration from the URI specified in a [[StaticDatabaseConfig]]
     * annotation in the static scope of the caller. */
-  def forAnnotation[P <: BasicProfile](implicit ct: ClassTag[P]): DatabaseConfig[P] =
-    macro StaticDatabaseConfigMacros.getImpl[P]
+  def forAnnotation[P <: BasicProfile](
+      implicit ct: ClassTag[P]): DatabaseConfig[P] = macro StaticDatabaseConfigMacros
+    .getImpl[P]
 }
 
 /** An annotation for injecting a DatabaseConfig at compile time. The URI parameter must be a
   * literal String. This annotation is required for providing a statically scoped database
   * configuration to the `tsql` interpolator. */
-final class StaticDatabaseConfig(val uri: String) extends Annotation with StaticAnnotation
+final class StaticDatabaseConfig(val uri: String)
+    extends Annotation with StaticAnnotation
 
 object StaticDatabaseConfigMacros {
   private[slick] def getURI(c: Context): String = {
     import c.universe._
 
     def findUri(ann: Seq[c.universe.Annotation]): Option[String] =
-      ann.map(a => c.typecheck(a.tree, pt = weakTypeOf[StaticDatabaseConfig], silent = true)).collectFirst {
-        case Apply(Select(_, _), List(Literal(Constant(uri: String)))) => uri
-      }
+      ann
+        .map(a =>
+              c.typecheck(a.tree,
+                          pt = weakTypeOf[StaticDatabaseConfig],
+                          silent = true))
+        .collectFirst {
+          case Apply(Select(_, _), List(Literal(Constant(uri: String)))) => uri
+        }
 
-    val scopes = Iterator.iterate(c.internal.enclosingOwner)(_.owner).takeWhile(_ != NoSymbol)
-    val uriOpt = scopes.map(s => findUri(s.annotations)).find(_.isDefined).flatten
-    uriOpt.getOrElse(c.abort(c.enclosingPosition, "No @StaticDatabaseConfig annotation found in enclosing scope"))
+    val scopes = Iterator
+      .iterate(c.internal.enclosingOwner)(_.owner)
+      .takeWhile(_ != NoSymbol)
+    val uriOpt =
+      scopes.map(s => findUri(s.annotations)).find(_.isDefined).flatten
+    uriOpt.getOrElse(c.abort(
+            c.enclosingPosition,
+            "No @StaticDatabaseConfig annotation found in enclosing scope"))
   }
 
-  def getImpl[P <: BasicProfile : c.WeakTypeTag](c: Context)(ct: c.Expr[ClassTag[P]]): c.Expr[DatabaseConfig[P]] = {
+  def getImpl[P <: BasicProfile : c.WeakTypeTag](c: Context)(
+      ct: c.Expr[ClassTag[P]]): c.Expr[DatabaseConfig[P]] = {
     import c.universe._
     val uri = c.Expr[String](Literal(Constant(getURI(c))))
     reify(DatabaseConfig.forURI[P](new URI(uri.splice))(ct.splice))
   }
 
-  def getWithClassLoaderImpl[P <: BasicProfile : c.WeakTypeTag](c: Context)(classLoader: c.Expr[ClassLoader])(ct: c.Expr[ClassTag[P]]): c.Expr[DatabaseConfig[P]] = {
+  def getWithClassLoaderImpl[P <: BasicProfile : c.WeakTypeTag](c: Context)(
+      classLoader: c.Expr[ClassLoader])(
+      ct: c.Expr[ClassTag[P]]): c.Expr[DatabaseConfig[P]] = {
     import c.universe._
     val uri = c.Expr[String](Literal(Constant(getURI(c))))
-    reify(DatabaseConfig.forURI[P](new URI(uri.splice), classLoader.splice)(ct.splice))
+    reify(DatabaseConfig
+          .forURI[P](new URI(uri.splice), classLoader.splice)(ct.splice))
   }
 }

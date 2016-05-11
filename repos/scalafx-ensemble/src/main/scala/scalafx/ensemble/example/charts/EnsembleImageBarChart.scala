@@ -51,14 +51,15 @@ class EnsembleImageBarChart extends EnsembleExample {
 
   def getContent = new BarChart(new CategoryAxis(), new NumberAxis()) {
     legendVisible = false
-    stylesheets += this.getClass.getResource("ImageBarChart.css").toExternalForm
+    stylesheets +=
+      this.getClass.getResource("ImageBarChart.css").toExternalForm
     data = new XYChart.Series[String, Number]() {
       name = "Sales Per Product"
       data = Seq(
-        XYChart.Data[String, Number]("SUV", 120),
-        XYChart.Data[String, Number]("Sedan", 50),
-        XYChart.Data[String, Number]("Truck", 180),
-        XYChart.Data[String, Number]("Van", 20)
+          XYChart.Data[String, Number]("SUV", 120),
+          XYChart.Data[String, Number]("Sedan", 50),
+          XYChart.Data[String, Number]("Truck", 180),
+          XYChart.Data[String, Number]("Van", 20)
       )
     }
   }

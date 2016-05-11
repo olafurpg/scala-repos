@@ -6,7 +6,7 @@ package docs.http.scaladsl
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.server.Directives
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.Future
 
@@ -89,21 +89,19 @@ class SprayJsonExampleSpec extends WordSpec with Matchers {
 
               onSuccess(maybeItem) {
                 case Some(item) => complete(item)
-                case None       => complete(StatusCodes.NotFound)
+                case None => complete(StatusCodes.NotFound)
               }
             }
-          } ~
-            post {
-              path("create-order") {
-                entity(as[Order]) { order =>
-                  val saved: Future[Done] = saveOrder(order)
-                  onComplete(saved) { done =>
-                    complete("order created")
-                  }
+          } ~ post {
+            path("create-order") {
+              entity(as[Order]) { order =>
+                val saved: Future[Done] = saveOrder(order)
+                onComplete(saved) { done =>
+                  complete("order created")
                 }
               }
             }
-
+          }
       }
     }
     //#second-spray-json-example

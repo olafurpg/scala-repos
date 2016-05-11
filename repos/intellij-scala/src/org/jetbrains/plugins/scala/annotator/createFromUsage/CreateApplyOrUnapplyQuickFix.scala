@@ -18,11 +18,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory._
 
 /**
- * Nikolay.Tropin
- * 2014-08-01
- */
+  * Nikolay.Tropin
+  * 2014-08-01
+  */
 abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
-        extends IntentionAction {
+    extends IntentionAction {
   override val getText = {
     val classKind = td match {
       case _: ScObject => "object"
@@ -63,7 +63,8 @@ abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
 
   protected def methodText: String
 
-  protected def addElementsToTemplate(method: ScFunction, builder: TemplateBuilder): Unit
+  protected def addElementsToTemplate(
+      method: ScFunction, builder: TemplateBuilder): Unit
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     PsiDocumentManager.getInstance(project).commitAllDocuments()
@@ -73,7 +74,8 @@ abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
     IdeDocumentHistory.getInstance(project).includeCurrentPlaceAsChangePlace()
 
     inWriteAction {
-      val entity = createEntity(td.extendsBlock, methodText).asInstanceOf[ScFunction]
+      val entity =
+        createEntity(td.extendsBlock, methodText).asInstanceOf[ScFunction]
 
       ScalaPsiUtil.adjustTypes(entity)
 
@@ -87,9 +89,9 @@ abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
 
       val newEditor = CreateFromUsageUtil.positionCursor(entity.getLastChild)
       val range = entity.getTextRange
-      newEditor.getDocument.deleteString(range.getStartOffset, range.getEndOffset)
+      newEditor.getDocument.deleteString(
+          range.getStartOffset, range.getEndOffset)
       TemplateManager.getInstance(project).startTemplate(newEditor, template)
     }
   }
-
 }

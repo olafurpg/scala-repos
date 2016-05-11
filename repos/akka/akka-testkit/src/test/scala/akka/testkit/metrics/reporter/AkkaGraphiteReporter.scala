@@ -1,35 +1,43 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.testkit.metrics.reporter
 
 import java.text.DateFormat
 import java.util
 import java.util.concurrent.TimeUnit
 import com.codahale.metrics._
-import java.util.{ Locale, Date }
+import java.util.{Locale, Date}
 import akka.testkit.metrics._
 import scala.concurrent.duration._
 
 /**
- * Used to report `com.codahale.metrics.Metric` types that the original `com.codahale.metrics.graphite.GraphiteReporter` is unaware of (cannot re-use directly because of private constructor).
- */
-class AkkaGraphiteReporter(
-  registry: AkkaMetricRegistry,
-  prefix: String,
-  graphite: GraphiteClient,
-  verbose: Boolean = false)
-  extends ScheduledReporter(registry.asInstanceOf[MetricRegistry], "akka-graphite-reporter", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.NANOSECONDS) {
+  * Used to report `com.codahale.metrics.Metric` types that the original `com.codahale.metrics.graphite.GraphiteReporter` is unaware of (cannot re-use directly because of private constructor).
+  */
+class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
+                           prefix: String,
+                           graphite: GraphiteClient,
+                           verbose: Boolean = false)
+    extends ScheduledReporter(registry.asInstanceOf[MetricRegistry],
+                              "akka-graphite-reporter",
+                              MetricFilter.ALL,
+                              TimeUnit.SECONDS,
+                              TimeUnit.NANOSECONDS) {
 
   // todo get rid of ScheduledReporter (would mean removing codahale metrics)?
 
   private final val ConsoleWidth = 80
 
   val locale = Locale.getDefault
-  val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale)
+  val dateFormat =
+    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale)
   val clock = Clock.defaultClock()
 
-  override def report(gauges: util.SortedMap[String, Gauge[_]], counters: util.SortedMap[String, Counter], histograms: util.SortedMap[String, Histogram], meters: util.SortedMap[String, Meter], timers: util.SortedMap[String, Timer]) {
+  override def report(gauges: util.SortedMap[String, Gauge[_]],
+                      counters: util.SortedMap[String, Counter],
+                      histograms: util.SortedMap[String, Histogram],
+                      meters: util.SortedMap[String, Meter],
+                      timers: util.SortedMap[String, Timer]) {
     val dateTime = dateFormat.format(new Date(clock.getTime))
 
     // akka-custom metrics
@@ -37,8 +45,12 @@ class AkkaGraphiteReporter(
     val hdrHistograms = registry.getHdrHistograms
     val averagingGauges = registry.getAveragingGauges
 
-    val metricsCount = List(gauges, counters, histograms, meters, timers).map(_.size).sum + List(knownOpsInTimespanCounters, hdrHistograms).map(_.size).sum
-    sendWithBanner("== AkkaGraphiteReporter @ " + dateTime + " == (" + metricsCount + " metrics)", '=')
+    val metricsCount =
+      List(gauges, counters, histograms, meters, timers).map(_.size).sum +
+      List(knownOpsInTimespanCounters, hdrHistograms).map(_.size).sum
+    sendWithBanner("== AkkaGraphiteReporter @ " + dateTime + " == (" +
+                   metricsCount + " metrics)",
+                   '=')
 
     try {
       // graphite takes timestamps in seconds
@@ -52,19 +64,21 @@ class AkkaGraphiteReporter(
       sendMetrics(now, meters.asScala, sendMetered)
       sendMetrics(now, timers.asScala, sendTimer)
 
-      sendMetrics(now, knownOpsInTimespanCounters, sendKnownOpsInTimespanCounter)
+      sendMetrics(
+          now, knownOpsInTimespanCounters, sendKnownOpsInTimespanCounter)
       sendMetrics(now, hdrHistograms, sendHdrHistogram)
       sendMetrics(now, averagingGauges, sendAveragingGauge)
-
     } catch {
-      case ex: Exception ⇒ throw new RuntimeException("Unable to send metrics to Graphite!", ex)
+      case ex: Exception ⇒
+        throw new RuntimeException("Unable to send metrics to Graphite!", ex)
     }
   }
 
-  def sendMetrics[T <: Metric](now: Long, metrics: Iterable[(String, T)], send: (Long, String, T) ⇒ Unit) {
+  def sendMetrics[T <: Metric](now: Long,
+                               metrics: Iterable[(String, T)],
+                               send: (Long, String, T) ⇒ Unit) {
     for ((key, metric) ← metrics) {
-      if (verbose)
-        println("  " + key)
+      if (verbose) println("  " + key)
       send(now, key, metric)
     }
   }
@@ -115,7 +129,8 @@ class AkkaGraphiteReporter(
     sendNumericOrIgnore(key + ".count", counter.getCount, now)
   }
 
-  private def sendKnownOpsInTimespanCounter(now: Long, key: String, counter: KnownOpsInTimespanTimer) {
+  private def sendKnownOpsInTimespanCounter(
+      now: Long, key: String, counter: KnownOpsInTimespanTimer) {
     send(key + ".ops", counter.getCount, now)
     send(key + ".time", counter.elapsedTime, now)
     send(key + ".opsPerSec", counter.opsPerSecond, now)
@@ -135,38 +150,40 @@ class AkkaGraphiteReporter(
     send(key + ".p999", snapshot.getValueAtPercentile(99.9), now)
   }
 
-  private def sendAveragingGauge(now: Long, key: String, gauge: AveragingGauge) {
+  private def sendAveragingGauge(
+      now: Long, key: String, gauge: AveragingGauge) {
     sendNumericOrIgnore(key + ".avg-gauge", gauge.getValue, now)
   }
 
-  override def stop(): Unit = try {
-    super.stop()
-    graphite.close()
-  } catch {
-    case ex: Exception ⇒ System.err.println("Was unable to close Graphite connection: " + ex.getMessage)
-  }
+  override def stop(): Unit =
+    try {
+      super.stop()
+      graphite.close()
+    } catch {
+      case ex: Exception ⇒
+        System.err.println(
+            "Was unable to close Graphite connection: " + ex.getMessage)
+    }
 
   private def sendNumericOrIgnore(key: String, value: Any, now: Long) {
     // seriously nothing better than this? (without Any => String => Num)
     value match {
-      case v: Int    ⇒ send(key, v, now)
-      case v: Long   ⇒ send(key, v, now)
-      case v: Byte   ⇒ send(key, v, now)
-      case v: Short  ⇒ send(key, v, now)
-      case v: Float  ⇒ send(key, v, now)
+      case v: Int ⇒ send(key, v, now)
+      case v: Long ⇒ send(key, v, now)
+      case v: Byte ⇒ send(key, v, now)
+      case v: Short ⇒ send(key, v, now)
+      case v: Float ⇒ send(key, v, now)
       case v: Double ⇒ send(key, v, now)
-      case _         ⇒ // ignore non-numeric metric...
+      case _ ⇒ // ignore non-numeric metric...
     }
   }
 
   private def send(key: String, value: Double, now: Long) {
-    if (value >= 0)
-      graphite.send(s"$prefix.$key", "%2.2f".format(value), now)
+    if (value >= 0) graphite.send(s"$prefix.$key", "%2.2f".format(value), now)
   }
 
   private def send(key: String, value: Long, now: Long) {
-    if (value >= 0)
-      graphite.send(s"$prefix.$key", value.toString, now)
+    if (value >= 0) graphite.send(s"$prefix.$key", value.toString, now)
   }
 
   private def sendWithBanner(s: String, c: Char) {
@@ -179,6 +196,4 @@ class AkkaGraphiteReporter(
     }
     println()
   }
-
 }
-

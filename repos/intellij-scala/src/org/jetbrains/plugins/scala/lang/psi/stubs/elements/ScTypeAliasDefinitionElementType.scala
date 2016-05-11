@@ -10,12 +10,13 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 18.10.2008
- */
-
-class ScTypeAliasDefinitionElementType extends ScTypeAliasElementType[ScTypeAlias]("type alias definition"){
-  def createElement(node: ASTNode): PsiElement = new ScTypeAliasDefinitionImpl(node)
+  * User: Alexander Podkhalyuzin
+  * Date: 18.10.2008
+  */
+class ScTypeAliasDefinitionElementType
+    extends ScTypeAliasElementType[ScTypeAlias]("type alias definition") {
+  def createElement(node: ASTNode): PsiElement =
+    new ScTypeAliasDefinitionImpl(node)
 
   def createPsi(stub: ScTypeAliasStub) = new ScTypeAliasDefinitionImpl(stub)
 }

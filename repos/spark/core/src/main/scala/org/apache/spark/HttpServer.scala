@@ -32,22 +32,22 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.Utils
 
 /**
- * Exception type thrown by HttpServer when it is in the wrong state for an operation.
- */
-private[spark] class ServerStateException(message: String) extends Exception(message)
+  * Exception type thrown by HttpServer when it is in the wrong state for an operation.
+  */
+private[spark] class ServerStateException(message: String)
+    extends Exception(message)
 
 /**
- * An HTTP server for static content used to allow worker nodes to access JARs added to SparkContext
- * as well as classes created by the interpreter when the user types in code. This is just a wrapper
- * around a Jetty server.
- */
-private[spark] class HttpServer(
-    conf: SparkConf,
-    resourceBase: File,
-    securityManager: SecurityManager,
-    requestedPort: Int = 0,
-    serverName: String = "HTTP server")
-  extends Logging {
+  * An HTTP server for static content used to allow worker nodes to access JARs added to SparkContext
+  * as well as classes created by the interpreter when the user types in code. This is just a wrapper
+  * around a Jetty server.
+  */
+private[spark] class HttpServer(conf: SparkConf,
+                                resourceBase: File,
+                                securityManager: SecurityManager,
+                                requestedPort: Int = 0,
+                                serverName: String = "HTTP server")
+    extends Logging {
 
   private var server: Server = null
   private var port: Int = requestedPort
@@ -62,8 +62,8 @@ private[spark] class HttpServer(
       throw new ServerStateException("Server is already started")
     } else {
       logInfo("Starting HTTP Server")
-      val (actualServer, actualPort) =
-        Utils.startServiceOnPort[Server](requestedPort, doStart, conf, serverName)
+      val (actualServer, actualPort) = Utils.startServiceOnPort[Server](
+          requestedPort, doStart, conf, serverName)
       server = actualServer
       port = actualPort
     }
@@ -78,16 +78,18 @@ private[spark] class HttpServer(
   }
 
   /**
-   * Actually start the HTTP server on the given port.
-   *
-   * Note that this is only best effort in the sense that we may end up binding to a nearby port
-   * in the event of port collision. Return the bound server and the actual port used.
-   */
+    * Actually start the HTTP server on the given port.
+    *
+    * Note that this is only best effort in the sense that we may end up binding to a nearby port
+    * in the event of port collision. Return the bound server and the actual port used.
+    */
   private def doStart(startPort: Int): (Server, Int) = {
     val server = new Server()
 
-    val connector = securityManager.fileServerSSLOptions.createJettySslContextFactory()
-      .map(new SslSocketConnector(_)).getOrElse(new SocketConnector)
+    val connector = securityManager.fileServerSSLOptions
+      .createJettySslContextFactory()
+      .map(new SslSocketConnector(_))
+      .getOrElse(new SocketConnector)
 
     connector.setMaxIdleTime(60 * 1000)
     connector.setSoLingerTime(-1)
@@ -111,17 +113,20 @@ private[spark] class HttpServer(
     }
 
     server.start()
-    val actualPort = server.getConnectors()(0).getLocalPort
+    val actualPort = server
+      .getConnectors()(0)
+      .getLocalPort
 
-    (server, actualPort)
+      (server, actualPort)
   }
 
   /**
-   * Setup Jetty to the HashLoginService using a single user with our
-   * shared secret. Configure it to use DIGEST-MD5 authentication so that the password
-   * isn't passed in plaintext.
-   */
-  private def setupSecurityHandler(securityMgr: SecurityManager): ConstraintSecurityHandler = {
+    * Setup Jetty to the HashLoginService using a single user with our
+    * shared secret. Configure it to use DIGEST-MD5 authentication so that the password
+    * isn't passed in plaintext.
+    */
+  private def setupSecurityHandler(
+      securityMgr: SecurityManager): ConstraintSecurityHandler = {
     val constraint = new Constraint()
     // use DIGEST-MD5 as the authentication mechanism
     constraint.setName(Constraint.__DIGEST_AUTH)
@@ -161,13 +166,14 @@ private[spark] class HttpServer(
   }
 
   /**
-   * Get the URI of this HTTP server (http://host:port or https://host:port)
-   */
+    * Get the URI of this HTTP server (http://host:port or https://host:port)
+    */
   def uri: String = {
     if (server == null) {
       throw new ServerStateException("Server is not started")
     } else {
-      val scheme = if (securityManager.fileServerSSLOptions.enabled) "https" else "http"
+      val scheme =
+        if (securityManager.fileServerSSLOptions.enabled) "https" else "http"
       s"$scheme://${Utils.localHostNameForURI()}:$port"
     }
   }

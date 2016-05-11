@@ -12,12 +12,13 @@ import scala.tools.nsc.util.ClassRepresentation
 import FileUtils._
 
 /**
- * A trait allowing to look for classpath entries of given type in directories.
- * It provides common logic for classes handling class and source files.
- * It makes use of the fact that in the case of nested directories it's easy to find a file
- * when we have a name of a package.
- */
-trait DirectoryFileLookup[FileEntryType <: ClassRepClassPathEntry] extends FlatClassPath {
+  * A trait allowing to look for classpath entries of given type in directories.
+  * It provides common logic for classes handling class and source files.
+  * It makes use of the fact that in the case of nested directories it's easy to find a file
+  * when we have a name of a package.
+  */
+trait DirectoryFileLookup[FileEntryType <: ClassRepClassPathEntry]
+    extends FlatClassPath {
   val dir: File
   assert(dir != null, "Directory file in DirectoryFileLookup cannot be null")
 
@@ -41,12 +42,14 @@ trait DirectoryFileLookup[FileEntryType <: ClassRepClassPathEntry] extends FlatC
     val dirForPackage = getDirectory(inPackage)
     val nestedDirs: Array[File] = dirForPackage match {
       case None => Array.empty
-      case Some(directory) => directory.listFiles(DirectoryFileLookup.packageDirectoryFileFilter)
+      case Some(directory) =>
+        directory.listFiles(DirectoryFileLookup.packageDirectoryFileFilter)
     }
     val prefix = PackageNameUtils.packagePrefix(inPackage)
-    val entries = nestedDirs map { file =>
-      PackageEntryImpl(prefix + file.getName)
-    }
+    val entries =
+      nestedDirs map { file =>
+        PackageEntryImpl(prefix + file.getName)
+      }
     entries
   }
 
@@ -56,10 +59,11 @@ trait DirectoryFileLookup[FileEntryType <: ClassRepClassPathEntry] extends FlatC
       case None => Array.empty
       case Some(directory) => directory.listFiles(fileFilter)
     }
-    val entries = files map { file =>
-      val wrappedFile = new scala.reflect.io.File(file)
-      createFileEntry(new PlainFile(wrappedFile))
-    }
+    val entries =
+      files map { file =>
+        val wrappedFile = new scala.reflect.io.File(file)
+        createFileEntry(new PlainFile(wrappedFile))
+      }
     entries
   }
 
@@ -97,10 +101,11 @@ object DirectoryFileLookup {
 }
 
 case class DirectoryFlatClassPath(dir: File)
-  extends DirectoryFileLookup[ClassFileEntryImpl]
-  with NoSourcePaths {
+    extends DirectoryFileLookup[ClassFileEntryImpl] with NoSourcePaths {
 
-  override def findClass(className: String): Option[ClassRepresentation[AbstractFile]] = findClassFile(className) map ClassFileEntryImpl
+  override def findClass(
+      className: String): Option[ClassRepresentation[AbstractFile]] =
+    findClassFile(className) map ClassFileEntryImpl
 
   override def findClassFile(className: String): Option[AbstractFile] = {
     val relativePath = FileUtils.dirPath(className)
@@ -112,10 +117,13 @@ case class DirectoryFlatClassPath(dir: File)
     } else None
   }
 
-  override protected def createFileEntry(file: AbstractFile): ClassFileEntryImpl = ClassFileEntryImpl(file)
-  override protected def fileFilter: FileFilter = DirectoryFlatClassPath.classFileFilter
+  override protected def createFileEntry(
+      file: AbstractFile): ClassFileEntryImpl = ClassFileEntryImpl(file)
+  override protected def fileFilter: FileFilter =
+    DirectoryFlatClassPath.classFileFilter
 
-  override private[nsc] def classes(inPackage: String): Seq[ClassFileEntry] = files(inPackage)
+  override private[nsc] def classes(inPackage: String): Seq[ClassFileEntry] =
+    files(inPackage)
 }
 
 object DirectoryFlatClassPath {
@@ -126,15 +134,17 @@ object DirectoryFlatClassPath {
 }
 
 case class DirectoryFlatSourcePath(dir: File)
-  extends DirectoryFileLookup[SourceFileEntryImpl]
-  with NoClassPaths {
+    extends DirectoryFileLookup[SourceFileEntryImpl] with NoClassPaths {
 
   override def asSourcePathString: String = asClassPathString
 
-  override protected def createFileEntry(file: AbstractFile): SourceFileEntryImpl = SourceFileEntryImpl(file)
-  override protected def fileFilter: FileFilter = DirectoryFlatSourcePath.sourceFileFilter
+  override protected def createFileEntry(
+      file: AbstractFile): SourceFileEntryImpl = SourceFileEntryImpl(file)
+  override protected def fileFilter: FileFilter =
+    DirectoryFlatSourcePath.sourceFileFilter
 
-  override def findClass(className: String): Option[ClassRepresentation[AbstractFile]] = {
+  override def findClass(
+      className: String): Option[ClassRepresentation[AbstractFile]] = {
     findSourceFile(className) map SourceFileEntryImpl
   }
 
@@ -151,12 +161,14 @@ case class DirectoryFlatSourcePath(dir: File)
     }
   }
 
-  override private[nsc] def sources(inPackage: String): Seq[SourceFileEntry] = files(inPackage)
+  override private[nsc] def sources(inPackage: String): Seq[SourceFileEntry] =
+    files(inPackage)
 }
 
 object DirectoryFlatSourcePath {
 
   private val sourceFileFilter = new FileFilter {
-    override def accept(pathname: File): Boolean = endsScalaOrJava(pathname.getName)
+    override def accept(pathname: File): Boolean =
+      endsScalaOrJava(pathname.getName)
   }
 }

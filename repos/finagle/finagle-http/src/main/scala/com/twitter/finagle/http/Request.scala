@@ -17,41 +17,41 @@ import scala.collection.JavaConverters._
 import Bijections._
 
 /**
- * Rich HttpRequest.
- *
- * Use RequestProxy to create an even richer subclass.
- */
+  * Rich HttpRequest.
+  *
+  * Use RequestProxy to create an even richer subclass.
+  */
 abstract class Request extends Message with HttpRequestProxy {
 
   /**
-   * Arbitrary user-defined context associated with this request object.
-   * [[com.twitter.collection.RecordSchema.Record RecordSchema.Record]] is
-   * used here, rather than [[com.twitter.finagle.context.Context Context]] or similar
-   * out-of-band mechanisms, to make the connection between the request and its
-   * associated context explicit.
-   */
+    * Arbitrary user-defined context associated with this request object.
+    * [[com.twitter.collection.RecordSchema.Record RecordSchema.Record]] is
+    * used here, rather than [[com.twitter.finagle.context.Context Context]] or similar
+    * out-of-band mechanisms, to make the connection between the request and its
+    * associated context explicit.
+    */
   def ctx: Request.Schema.Record = _ctx
   private[this] val _ctx = Request.Schema.newRecord()
 
   def isRequest = true
 
   /**
-   * Returns a [[ParamMap]] instance, which maintains query string and url-encoded
-   * params associated with this request.
-   */
+    * Returns a [[ParamMap]] instance, which maintains query string and url-encoded
+    * params associated with this request.
+    */
   def params: ParamMap = _params
   private[this] lazy val _params: ParamMap = new RequestParamMap(this)
 
   /**
-   * Returns an _optional_ [[Multipart]] instance, which maintains the
-   * `multipart/form-data` content of this non-chunked, POST request. If
-   * this requests is either streaming or non-POST, this method returns
-   * `None`.
-   *
-   * Note: This method is a part of an experimental API for handling
-   * multipart HTTP data and it will likely be changed in future in order
-   * to support streaming requests.
-   */
+    * Returns an _optional_ [[Multipart]] instance, which maintains the
+    * `multipart/form-data` content of this non-chunked, POST request. If
+    * this requests is either streaming or non-POST, this method returns
+    * `None`.
+    *
+    * Note: This method is a part of an experimental API for handling
+    * multipart HTTP data and it will likely be changed in future in order
+    * to support streaming requests.
+    */
   def multipart: Option[Multipart] = _multipart
   private[this] lazy val _multipart: Option[Multipart] =
     if (!isChunked && method == Method.Post)
@@ -59,23 +59,23 @@ abstract class Request extends Message with HttpRequestProxy {
     else None
 
   /**
-   * Returns the HTTP method of this request.
-   */
+    * Returns the HTTP method of this request.
+    */
   def method: Method = from(getMethod())
 
   /**
-   * Sets the HTTP method of this request to the given `method`.
-   */
+    * Sets the HTTP method of this request to the given `method`.
+    */
   def method_=(method: Method) = setMethod(from(method))
 
   /**
-   * Returns the URI of this request.
-   */
+    * Returns the URI of this request.
+    */
   def uri: String = getUri()
 
   /**
-   * Set the URI of this request to the given `uri`.
-   */
+    * Set the URI of this request to the given `uri`.
+    */
   def uri_=(uri: String) = setUri(uri)
 
   /** Path from URI. */
@@ -84,7 +84,7 @@ abstract class Request extends Message with HttpRequestProxy {
     val u = uri
     u.indexOf('?') match {
       case -1 => u
-      case n  => u.substring(0, n)
+      case n => u.substring(0, n)
     }
   }
 
@@ -94,11 +94,11 @@ abstract class Request extends Message with HttpRequestProxy {
     val p = path
     val leaf = p.lastIndexOf('/') match {
       case -1 => p
-      case n  => p.substring(n + 1)
+      case n => p.substring(n + 1)
     }
     leaf.lastIndexOf('.') match {
       case -1 => ""
-      case n  => leaf.substring(n + 1).toLowerCase
+      case n => leaf.substring(n + 1).toLowerCase
     }
   }
 
@@ -153,7 +153,7 @@ abstract class Request extends Message with HttpRequestProxy {
     params.getLongOrElse(name, 0L)
 
   /** Get Long param.  Returns value or default. */
-  def getLongParam(name: String, default: Long=0L): Long =
+  def getLongParam(name: String, default: Long = 0L): Long =
     params.getLongOrElse(name, default)
 
   /** Get Boolean param.  Returns value or false. */
@@ -170,9 +170,11 @@ abstract class Request extends Message with HttpRequestProxy {
 
   /** Get all parameters. */
   def getParams(): JList[JMap.Entry[String, String]] =
-    (params.toList.map { case (k, v) =>
-      // cast to appease asJava
-      (new AbstractMap.SimpleImmutableEntry(k, v)).asInstanceOf[JMap.Entry[String, String]]
+    (params.toList.map {
+      case (k, v) =>
+        // cast to appease asJava
+        (new AbstractMap.SimpleImmutableEntry(k, v))
+          .asInstanceOf[JMap.Entry[String, String]]
     }).asJava
 
   /** Check if parameter exists. */
@@ -208,14 +210,13 @@ abstract class Request extends Message with HttpRequestProxy {
     "Request(\"" + method + " " + uri + "\", from " + remoteSocketAddress + ")"
 }
 
-
 object Request {
 
   /**
-   * [[com.twitter.collection.RecordSchema RecordSchema]] declaration, used
-   * to generate [[com.twitter.collection.RecordSchema.Record Record]] instances
-   * for Request.ctx.
-   */
+    * [[com.twitter.collection.RecordSchema RecordSchema]] declaration, used
+    * to generate [[com.twitter.collection.RecordSchema.Record Record]] instances
+    * for Request.ctx.
+    */
   val Schema: RecordSchema = new RecordSchema
 
   /** Decode a Request from a String */
@@ -226,7 +227,7 @@ object Request {
   /** Decode a Request from Array[Byte] */
   def decodeBytes(b: Array[Byte]): Request = {
     val decoder = new DecoderEmbedder(
-      new HttpRequestDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
+        new HttpRequestDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
     decoder.offer(ChannelBuffers.wrappedBuffer(b))
     val req = decoder.poll().asInstanceOf[HttpRequest]
     assert(req ne null)
@@ -237,42 +238,43 @@ object Request {
   }
 
   /**
-   * Create an HTTP/1.1 GET Request from query string parameters.
-   *
-   * @param params a list of key-value pairs representing the query string.
-   */
+    * Create an HTTP/1.1 GET Request from query string parameters.
+    *
+    * @param params a list of key-value pairs representing the query string.
+    */
   @varargs
   def apply(params: Tuple2[String, String]*): Request =
-    apply("/", params:_*)
+    apply("/", params: _*)
 
   /**
-   * Create an HTTP/1.1 GET Request from URI and query string parameters.
-   *
-   * @param params a list of key-value pairs representing the query string.
-   */
+    * Create an HTTP/1.1 GET Request from URI and query string parameters.
+    *
+    * @param params a list of key-value pairs representing the query string.
+    */
   def apply(uri: String, params: Tuple2[String, String]*): Request = {
     val encoder = new QueryStringEncoder(uri)
-    params.foreach { case (key, value) =>
-      encoder.addParam(key, value)
+    params.foreach {
+      case (key, value) =>
+        encoder.addParam(key, value)
     }
     apply(Method.Get, encoder.toString)
   }
 
   /**
-   * Create an HTTP/1.1 GET Request from URI string.
-   * */
+    * Create an HTTP/1.1 GET Request from URI string.
+    * */
   def apply(uri: String): Request =
     apply(Method.Get, uri)
 
   /**
-   * Create an HTTP/1.1 GET Request from method and URI string.
-   */
+    * Create an HTTP/1.1 GET Request from method and URI string.
+    */
   def apply(method: Method, uri: String): Request =
     apply(Version.Http11, method, uri)
 
   /**
-   * Create an HTTP/1.1 GET Request from version, method, and URI string.
-   */
+    * Create an HTTP/1.1 GET Request from version, method, and URI string.
+    */
   def apply(version: Version, method: Method, uri: String): Request = {
     val reqIn = new DefaultHttpRequest(from(version), from(method), uri)
     new Request {
@@ -282,28 +284,28 @@ object Request {
   }
 
   /**
-   * Create an HTTP/1.1 GET Request from Version, Method, URI, and Reader.
-   *
-   * A [[com.twitter.io.Reader]] is a stream of bytes serialized to HTTP chunks.
-   * `Reader`s are useful for representing streaming data in the body of the
-   * request (e.g. a large file, or long lived computation that produces results
-   * incrementally).
-   *
-   * {{{
-   * val data = Reader.fromStream(File.open("data.txt"))
-   * val post = Request(Http11, Post, "/upload", data)
-   *
-   * client(post) onSuccess {
-   *   case r if r.status == Ok => println("Success!")
-   *   case _                   => println("Something went wrong...")
-   * }
-   * }}}
-   */
+    * Create an HTTP/1.1 GET Request from Version, Method, URI, and Reader.
+    *
+    * A [[com.twitter.io.Reader]] is a stream of bytes serialized to HTTP chunks.
+    * `Reader`s are useful for representing streaming data in the body of the
+    * request (e.g. a large file, or long lived computation that produces results
+    * incrementally).
+    *
+    * {{{
+    * val data = Reader.fromStream(File.open("data.txt"))
+    * val post = Request(Http11, Post, "/upload", data)
+    *
+    * client(post) onSuccess {
+    *   case r if r.status == Ok => println("Success!")
+    *   case _                   => println("Something went wrong...")
+    * }
+    * }}}
+    */
   def apply(
-    version: Version,
-    method: Method,
-    uri: String,
-    reader: Reader
+      version: Version,
+      method: Method,
+      uri: String,
+      reader: Reader
   ): Request = {
     val httpReq = new DefaultHttpRequest(from(version), from(method), uri)
     httpReq.setChunked(true)
@@ -311,9 +313,9 @@ object Request {
   }
 
   private[http] def apply(
-    reqIn: HttpRequest,
-    readerIn: Reader,
-    remoteAddr: InetSocketAddress
+      reqIn: HttpRequest,
+      readerIn: Reader,
+      remoteAddr: InetSocketAddress
   ): Request = new Request {
     override val reader = readerIn
     val httpRequest = reqIn
@@ -321,25 +323,28 @@ object Request {
   }
 
   /** Create Request from HttpRequest and Channel.  Used by Codec. */
-  private[finagle] def apply(httpRequestArg: HttpRequest, channel: Channel): Request =
+  private[finagle] def apply(
+      httpRequestArg: HttpRequest, channel: Channel): Request =
     new Request {
       val httpRequest = httpRequestArg
-      lazy val remoteSocketAddress = channel.getRemoteAddress.asInstanceOf[InetSocketAddress]
+      lazy val remoteSocketAddress =
+        channel.getRemoteAddress.asInstanceOf[InetSocketAddress]
     }
 
   /** Create a query string from URI and parameters. */
   def queryString(uri: String, params: Tuple2[String, String]*): String = {
     val encoder = new QueryStringEncoder(uri)
-    params.foreach { case (key, value) =>
-      encoder.addParam(key, value)
+    params.foreach {
+      case (key, value) =>
+        encoder.addParam(key, value)
     }
     encoder.toString
   }
 
   /**
-   * Create a query string from parameters.  The results begins with "?" only if
-   * params is non-empty.
-   */
+    * Create a query string from parameters.  The results begins with "?" only if
+    * params is non-empty.
+    */
   def queryString(params: Tuple2[String, String]*): String =
     queryString("", params: _*)
 
@@ -348,9 +353,9 @@ object Request {
     queryString(uri, params.toSeq: _*)
 
   /**
-   * Create a query string from parameters.  The results begins with "?" only if
-   * params is non-empty.
-   */
+    * Create a query string from parameters.  The results begins with "?" only if
+    * params is non-empty.
+    */
   def queryString(params: Map[String, String]): String =
     queryString("", params.toSeq: _*)
 }

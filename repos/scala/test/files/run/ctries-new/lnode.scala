@@ -1,8 +1,4 @@
-
-
-
 import collection.concurrent.TrieMap
-
 
 object LNodeSpec extends Spec {
 
@@ -36,8 +32,10 @@ object LNodeSpec extends Spec {
       val ct = new TrieMap[DumbHash, Int]
       for (i <- 0 until initsz) ct.put(new DumbHash(i), i)
       for (i <- 0 until initsz) assert(ct.lookup(new DumbHash(i)) == i)
-      for (i <- 0 until initsz) assert(ct.putIfAbsent(new DumbHash(i), i) == Some(i))
-      for (i <- initsz until secondsz) assert(ct.putIfAbsent(new DumbHash(i), i) == None)
+      for (i <- 0 until initsz) assert(
+          ct.putIfAbsent(new DumbHash(i), i) == Some(i))
+      for (i <- initsz until secondsz) assert(
+          ct.putIfAbsent(new DumbHash(i), i) == None)
       for (i <- initsz until secondsz) assert(ct.lookup(new DumbHash(i)) == i)
     }
 
@@ -45,9 +43,11 @@ object LNodeSpec extends Spec {
       val ct = new TrieMap[DumbHash, Int]
       for (i <- 0 until initsz) assert(ct.put(new DumbHash(i), i) == None)
       for (i <- 0 until initsz) assert(ct.lookup(new DumbHash(i)) == i)
-      for (i <- 0 until initsz) assert(ct.replace(new DumbHash(i), -i) == Some(i))
+      for (i <- 0 until initsz) assert(
+          ct.replace(new DumbHash(i), -i) == Some(i))
       for (i <- 0 until initsz) assert(ct.lookup(new DumbHash(i)) == -i)
-      for (i <- 0 until initsz) assert(ct.replace(new DumbHash(i), -i, i) == true)
+      for (i <- 0 until initsz) assert(
+          ct.replace(new DumbHash(i), -i, i) == true)
     }
 
     "remove elements with the same hash codes if mapped to a specific value" in {
@@ -55,7 +55,5 @@ object LNodeSpec extends Spec {
       for (i <- 0 until initsz) assert(ct.put(new DumbHash(i), i) == None)
       for (i <- 0 until initsz) assert(ct.remove(new DumbHash(i), i) == true)
     }
-
   }
-
 }

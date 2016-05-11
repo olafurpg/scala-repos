@@ -8,7 +8,8 @@ object Test extends InteractiveTest {
     checkErrors(source)
   }
 
-  private def loadSourceAndWaitUntilTypechecked(sourceName: String): SourceFile = {
+  private def loadSourceAndWaitUntilTypechecked(
+      sourceName: String): SourceFile = {
     val sourceFile = sourceFiles.find(_.file.name == sourceName).head
     compiler.askToDoFirst(sourceFile)
     val res = new Response[Unit]
@@ -23,12 +24,14 @@ object Test extends InteractiveTest {
     sourceFile
   }
 
-  private def checkErrors(source: SourceFile): Unit = compiler.getUnitOf(source) match {
-    case Some(unit) =>
-      val problems = unit.problems.toList
-      if(problems.isEmpty) reporter.println("Test OK")
-      else problems.foreach(problem => reporter.println(problem.msg))
+  private def checkErrors(source: SourceFile): Unit =
+    compiler.getUnitOf(source) match {
+      case Some(unit) =>
+        val problems = unit.problems.toList
+        if (problems.isEmpty) reporter.println("Test OK")
+        else problems.foreach(problem => reporter.println(problem.msg))
 
-    case None => reporter.println("No compilation unit found for " + source.file.name)
-  }
+      case None =>
+        reporter.println("No compilation unit found for " + source.file.name)
+    }
 }

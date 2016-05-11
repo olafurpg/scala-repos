@@ -1,7 +1,6 @@
 package org.jetbrains.plugins.scala
 package conversion
 
-
 import java.io.File
 
 import com.intellij.openapi.util.io.FileUtil
@@ -16,9 +15,10 @@ import org.jetbrains.plugins.scala.extensions.inWriteAction
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author Alexander Podkhalyuzin
- */
-abstract class JavaToScalaConversionTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * @author Alexander Podkhalyuzin
+  */
+abstract class JavaToScalaConversionTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   private val startMarker = "/*start*/"
   private val endMarker = "/*end*/"
 
@@ -28,9 +28,11 @@ abstract class JavaToScalaConversionTestBase extends ScalaLightPlatformCodeInsig
     import org.junit.Assert._
 
     val filePath = folderPath + getTestName(false) + ".java"
-    val file = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".java", fileText)
     val javaFile = getFileAdapter
     val offset = fileText.indexOf(startMarker)
@@ -42,8 +44,8 @@ abstract class JavaToScalaConversionTestBase extends ScalaLightPlatformCodeInsig
 
     var elem: PsiElement = javaFile.findElementAt(startOffset)
     assert(elem.getTextRange.getStartOffset == startOffset)
-    while (elem.getParent != null && !elem.getParent.isInstanceOf[PsiFile] && 
-            elem.getParent.getTextRange.getStartOffset == startOffset) {
+    while (elem.getParent != null && !elem.getParent.isInstanceOf[PsiFile] &&
+    elem.getParent.getTextRange.getStartOffset == startOffset) {
       elem = elem.getParent
     }
     val buf = new ArrayBuffer[PsiElement]
@@ -53,8 +55,10 @@ abstract class JavaToScalaConversionTestBase extends ScalaLightPlatformCodeInsig
       buf += elem
     }
     var res = JavaToScala.convertPsisToText(buf.toArray)
-    val newFile = PsiFileFactory.getInstance(getProjectAdapter).createFileFromText("dummyForJavaToScala.scala",
-      ScalaFileType.SCALA_LANGUAGE, res)
+    val newFile = PsiFileFactory
+      .getInstance(getProjectAdapter)
+      .createFileFromText(
+          "dummyForJavaToScala.scala", ScalaFileType.SCALA_LANGUAGE, res)
     res = inWriteAction {
       CodeStyleManager.getInstance(getProjectAdapter).reformat(newFile).getText
     }
@@ -64,7 +68,8 @@ abstract class JavaToScalaConversionTestBase extends ScalaLightPlatformCodeInsig
       case JavaTokenType.END_OF_LINE_COMMENT => text.substring(2).trim
       case JavaTokenType.C_STYLE_COMMENT =>
         text.substring(2, text.length - 2).trim
-      case _ => assertTrue("Test result must be in last comment statement.", false)
+      case _ =>
+        assertTrue("Test result must be in last comment statement.", false)
     }
     assertEquals(output, res.trim)
   }

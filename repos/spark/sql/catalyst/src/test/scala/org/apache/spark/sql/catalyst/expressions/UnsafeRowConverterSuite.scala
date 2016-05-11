@@ -31,7 +31,8 @@ import org.apache.spark.unsafe.types.UTF8String
 
 class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
 
-  private def roundedSize(size: Int) = ByteArrayMethods.roundNumberOfBytesToNearestWord(size)
+  private def roundedSize(size: Int) =
+    ByteArrayMethods.roundNumberOfBytesToNearestWord(size)
 
   test("basic conversion with only primitive types") {
     val fieldTypes: Array[DataType] = Array(LongType, LongType, IntegerType)
@@ -82,8 +83,8 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
 
     val unsafeRow: UnsafeRow = converter.apply(row)
     assert(unsafeRow.getSizeInBytes === 8 + (8 * 3) +
-      roundedSize("Hello".getBytes(StandardCharsets.UTF_8).length) +
-      roundedSize("World".getBytes(StandardCharsets.UTF_8).length))
+        roundedSize("Hello".getBytes(StandardCharsets.UTF_8).length) +
+        roundedSize("World".getBytes(StandardCharsets.UTF_8).length))
 
     assert(unsafeRow.getLong(0) === 0)
     assert(unsafeRow.getString(1) === "Hello")
@@ -91,49 +92,56 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
   }
 
   test("basic conversion with primitive, string, date and timestamp types") {
-    val fieldTypes: Array[DataType] = Array(LongType, StringType, DateType, TimestampType)
+    val fieldTypes: Array[DataType] =
+      Array(LongType, StringType, DateType, TimestampType)
     val converter = UnsafeProjection.create(fieldTypes)
 
     val row = new SpecificMutableRow(fieldTypes)
     row.setLong(0, 0)
     row.update(1, UTF8String.fromString("Hello"))
     row.update(2, DateTimeUtils.fromJavaDate(Date.valueOf("1970-01-01")))
-    row.update(3, DateTimeUtils.fromJavaTimestamp(Timestamp.valueOf("2015-05-08 08:10:25")))
+    row.update(3,
+               DateTimeUtils.fromJavaTimestamp(
+                   Timestamp.valueOf("2015-05-08 08:10:25")))
 
     val unsafeRow: UnsafeRow = converter.apply(row)
-    assert(unsafeRow.getSizeInBytes ===
-      8 + (8 * 4) + roundedSize("Hello".getBytes(StandardCharsets.UTF_8).length))
+    assert(unsafeRow.getSizeInBytes === 8 + (8 * 4) +
+        roundedSize("Hello".getBytes(StandardCharsets.UTF_8).length))
 
     assert(unsafeRow.getLong(0) === 0)
     assert(unsafeRow.getString(1) === "Hello")
     // Date is represented as Int in unsafeRow
-    assert(DateTimeUtils.toJavaDate(unsafeRow.getInt(2)) === Date.valueOf("1970-01-01"))
+    assert(DateTimeUtils.toJavaDate(unsafeRow.getInt(2)) === Date.valueOf(
+            "1970-01-01"))
     // Timestamp is represented as Long in unsafeRow
     DateTimeUtils.toJavaTimestamp(unsafeRow.getLong(3)) should be
     (Timestamp.valueOf("2015-05-08 08:10:25"))
 
     unsafeRow.setInt(2, DateTimeUtils.fromJavaDate(Date.valueOf("2015-06-22")))
-    assert(DateTimeUtils.toJavaDate(unsafeRow.getInt(2)) === Date.valueOf("2015-06-22"))
-    unsafeRow.setLong(3, DateTimeUtils.fromJavaTimestamp(Timestamp.valueOf("2015-06-22 08:10:25")))
+    assert(DateTimeUtils.toJavaDate(unsafeRow.getInt(2)) === Date.valueOf(
+            "2015-06-22"))
+    unsafeRow.setLong(3,
+                      DateTimeUtils.fromJavaTimestamp(
+                          Timestamp.valueOf("2015-06-22 08:10:25")))
     DateTimeUtils.toJavaTimestamp(unsafeRow.getLong(3)) should be
     (Timestamp.valueOf("2015-06-22 08:10:25"))
   }
 
   test("null handling") {
     val fieldTypes: Array[DataType] = Array(
-      NullType,
-      BooleanType,
-      ByteType,
-      ShortType,
-      IntegerType,
-      LongType,
-      FloatType,
-      DoubleType,
-      StringType,
-      BinaryType,
-      DecimalType.USER_DEFAULT,
-      DecimalType.SYSTEM_DEFAULT
-      // ArrayType(IntegerType)
+        NullType,
+        BooleanType,
+        ByteType,
+        ShortType,
+        IntegerType,
+        LongType,
+        FloatType,
+        DoubleType,
+        StringType,
+        BinaryType,
+        DecimalType.USER_DEFAULT,
+        DecimalType.SYSTEM_DEFAULT
+        // ArrayType(IntegerType)
     )
     val converter = UnsafeProjection.create(fieldTypes)
 
@@ -185,20 +193,37 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
     }
 
     val setToNullAfterCreation = converter.apply(rowWithNoNullColumns)
-    assert(setToNullAfterCreation.isNullAt(0) === rowWithNoNullColumns.isNullAt(0))
-    assert(setToNullAfterCreation.getBoolean(1) === rowWithNoNullColumns.getBoolean(1))
-    assert(setToNullAfterCreation.getByte(2) === rowWithNoNullColumns.getByte(2))
-    assert(setToNullAfterCreation.getShort(3) === rowWithNoNullColumns.getShort(3))
+    assert(
+        setToNullAfterCreation.isNullAt(0) === rowWithNoNullColumns.isNullAt(
+            0))
+    assert(setToNullAfterCreation.getBoolean(1) === rowWithNoNullColumns
+          .getBoolean(1))
+    assert(
+        setToNullAfterCreation.getByte(2) === rowWithNoNullColumns.getByte(2))
+    assert(
+        setToNullAfterCreation.getShort(3) === rowWithNoNullColumns.getShort(
+            3))
     assert(setToNullAfterCreation.getInt(4) === rowWithNoNullColumns.getInt(4))
-    assert(setToNullAfterCreation.getLong(5) === rowWithNoNullColumns.getLong(5))
-    assert(setToNullAfterCreation.getFloat(6) === rowWithNoNullColumns.getFloat(6))
-    assert(setToNullAfterCreation.getDouble(7) === rowWithNoNullColumns.getDouble(7))
-    assert(setToNullAfterCreation.getString(8) === rowWithNoNullColumns.getString(8))
-    assert(setToNullAfterCreation.getBinary(9) === rowWithNoNullColumns.getBinary(9))
-    assert(setToNullAfterCreation.getDecimal(10, 10, 0) ===
-      rowWithNoNullColumns.getDecimal(10, 10, 0))
-    assert(setToNullAfterCreation.getDecimal(11, 38, 18) ===
-      rowWithNoNullColumns.getDecimal(11, 38, 18))
+    assert(
+        setToNullAfterCreation.getLong(5) === rowWithNoNullColumns.getLong(5))
+    assert(
+        setToNullAfterCreation.getFloat(6) === rowWithNoNullColumns.getFloat(
+            6))
+    assert(
+        setToNullAfterCreation.getDouble(7) === rowWithNoNullColumns.getDouble(
+            7))
+    assert(
+        setToNullAfterCreation.getString(8) === rowWithNoNullColumns.getString(
+            8))
+    assert(
+        setToNullAfterCreation.getBinary(9) === rowWithNoNullColumns.getBinary(
+            9))
+    assert(
+        setToNullAfterCreation.getDecimal(10, 10, 0) === rowWithNoNullColumns
+          .getDecimal(10, 10, 0))
+    assert(
+        setToNullAfterCreation.getDecimal(11, 38, 18) === rowWithNoNullColumns
+          .getDecimal(11, 38, 18))
 
     for (i <- fieldTypes.indices) {
       // Cann't call setNullAt() on DecimalType
@@ -223,20 +248,33 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
     setToNullAfterCreation.setDecimal(11, Decimal(10.00, 38, 18), 38)
     // setToNullAfterCreation.update(11, Array(11))
 
-    assert(setToNullAfterCreation.isNullAt(0) === rowWithNoNullColumns.isNullAt(0))
-    assert(setToNullAfterCreation.getBoolean(1) === rowWithNoNullColumns.getBoolean(1))
-    assert(setToNullAfterCreation.getByte(2) === rowWithNoNullColumns.getByte(2))
-    assert(setToNullAfterCreation.getShort(3) === rowWithNoNullColumns.getShort(3))
+    assert(
+        setToNullAfterCreation.isNullAt(0) === rowWithNoNullColumns.isNullAt(
+            0))
+    assert(setToNullAfterCreation.getBoolean(1) === rowWithNoNullColumns
+          .getBoolean(1))
+    assert(
+        setToNullAfterCreation.getByte(2) === rowWithNoNullColumns.getByte(2))
+    assert(
+        setToNullAfterCreation.getShort(3) === rowWithNoNullColumns.getShort(
+            3))
     assert(setToNullAfterCreation.getInt(4) === rowWithNoNullColumns.getInt(4))
-    assert(setToNullAfterCreation.getLong(5) === rowWithNoNullColumns.getLong(5))
-    assert(setToNullAfterCreation.getFloat(6) === rowWithNoNullColumns.getFloat(6))
-    assert(setToNullAfterCreation.getDouble(7) === rowWithNoNullColumns.getDouble(7))
+    assert(
+        setToNullAfterCreation.getLong(5) === rowWithNoNullColumns.getLong(5))
+    assert(
+        setToNullAfterCreation.getFloat(6) === rowWithNoNullColumns.getFloat(
+            6))
+    assert(
+        setToNullAfterCreation.getDouble(7) === rowWithNoNullColumns.getDouble(
+            7))
     // assert(setToNullAfterCreation.getString(8) === rowWithNoNullColumns.getString(8))
     // assert(setToNullAfterCreation.get(9) === rowWithNoNullColumns.get(9))
-    assert(setToNullAfterCreation.getDecimal(10, 10, 0) ===
-      rowWithNoNullColumns.getDecimal(10, 10, 0))
-    assert(setToNullAfterCreation.getDecimal(11, 38, 18) ===
-      rowWithNoNullColumns.getDecimal(11, 38, 18))
+    assert(
+        setToNullAfterCreation.getDecimal(10, 10, 0) === rowWithNoNullColumns
+          .getDecimal(10, 10, 0))
+    assert(
+        setToNullAfterCreation.getDecimal(11, 38, 18) === rowWithNoNullColumns
+          .getDecimal(11, 38, 18))
     // assert(setToNullAfterCreation.get(11) === rowWithNoNullColumns.get(11))
   }
 
@@ -257,8 +295,8 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
 
   test("basic conversion with struct type") {
     val fieldTypes: Array[DataType] = Array(
-      new StructType().add("i", IntegerType),
-      new StructType().add("nest", new StructType().add("l", LongType))
+        new StructType().add("i", IntegerType),
+        new StructType().add("nest", new StructType().add("l", LongType))
     )
 
     val converter = UnsafeProjection.create(fieldTypes)
@@ -288,10 +326,12 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
 
     assert(row2.getSizeInBytes == 8 + 1 * 8 + innerRow.getSizeInBytes)
 
-    assert(unsafeRow.getSizeInBytes == 8 + 2 * 8 + row1.getSizeInBytes + row2.getSizeInBytes)
+    assert(unsafeRow.getSizeInBytes == 8 + 2 * 8 + row1.getSizeInBytes +
+        row2.getSizeInBytes)
   }
 
-  private def createArray(values: Any*): ArrayData = new GenericArrayData(values.toArray)
+  private def createArray(values: Any*): ArrayData =
+    new GenericArrayData(values.toArray)
 
   private def createMap(keys: Any*)(values: Any*): MapData = {
     assert(keys.length == values.length)
@@ -306,20 +346,23 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
     }
   }
 
-  private def testMapInt(map: UnsafeMapData, keys: Seq[Int], values: Seq[Int]): Unit = {
+  private def testMapInt(
+      map: UnsafeMapData, keys: Seq[Int], values: Seq[Int]): Unit = {
     assert(keys.length == values.length)
     assert(map.numElements == keys.length)
 
     testArrayInt(map.keyArray, keys)
     testArrayInt(map.valueArray, values)
 
-    assert(map.getSizeInBytes == 4 + map.keyArray.getSizeInBytes + map.valueArray.getSizeInBytes)
+    assert(
+        map.getSizeInBytes == 4 + map.keyArray.getSizeInBytes +
+        map.valueArray.getSizeInBytes)
   }
 
   test("basic conversion with array type") {
     val fieldTypes: Array[DataType] = Array(
-      ArrayType(IntegerType),
-      ArrayType(ArrayType(IntegerType))
+        ArrayType(IntegerType),
+        ArrayType(ArrayType(IntegerType))
     )
     val converter = UnsafeProjection.create(fieldTypes)
 
@@ -348,8 +391,8 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
 
   test("basic conversion with map type") {
     val fieldTypes: Array[DataType] = Array(
-      MapType(IntegerType, IntegerType),
-      MapType(IntegerType, MapType(IntegerType, IntegerType))
+        MapType(IntegerType, IntegerType),
+        MapType(IntegerType, MapType(IntegerType, IntegerType))
     )
     val converter = UnsafeProjection.create(fieldTypes)
 
@@ -385,7 +428,8 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
       assert(valueArray.getSizeInBytes == 4 + 4 + nestedMap.getSizeInBytes)
     }
 
-    assert(unsafeMap2.getSizeInBytes == 4 + keyArray.getSizeInBytes + valueArray.getSizeInBytes)
+    assert(unsafeMap2.getSizeInBytes == 4 + keyArray.getSizeInBytes +
+        valueArray.getSizeInBytes)
 
     val map1Size = roundedSize(unsafeMap1.getSizeInBytes)
     val map2Size = roundedSize(unsafeMap2.getSizeInBytes)
@@ -394,8 +438,8 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
 
   test("basic conversion with struct and array") {
     val fieldTypes: Array[DataType] = Array(
-      new StructType().add("arr", ArrayType(IntegerType)),
-      ArrayType(new StructType().add("l", LongType))
+        new StructType().add("arr", ArrayType(IntegerType)),
+        ArrayType(new StructType().add("l", LongType))
     )
     val converter = UnsafeProjection.create(fieldTypes)
 
@@ -412,7 +456,8 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
     val innerArray = field1.getArray(0)
     testArrayInt(innerArray, Seq(1))
 
-    assert(field1.getSizeInBytes == 8 + 8 + roundedSize(innerArray.getSizeInBytes))
+    assert(field1.getSizeInBytes == 8 + 8 +
+        roundedSize(innerArray.getSizeInBytes))
 
     val field2 = unsafeRow.getArray(1)
     assert(field2.numElements == 1)
@@ -427,14 +472,14 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
 
     assert(field2.getSizeInBytes == 4 + 4 + innerStruct.getSizeInBytes)
 
-    assert(unsafeRow.getSizeInBytes ==
-      8 + 8 * 2 + field1.getSizeInBytes + roundedSize(field2.getSizeInBytes))
+    assert(unsafeRow.getSizeInBytes == 8 + 8 * 2 + field1.getSizeInBytes +
+        roundedSize(field2.getSizeInBytes))
   }
 
   test("basic conversion with struct and map") {
     val fieldTypes: Array[DataType] = Array(
-      new StructType().add("map", MapType(IntegerType, IntegerType)),
-      MapType(IntegerType, new StructType().add("l", LongType))
+        new StructType().add("map", MapType(IntegerType, IntegerType)),
+        MapType(IntegerType, new StructType().add("l", LongType))
     )
     val converter = UnsafeProjection.create(fieldTypes)
 
@@ -451,7 +496,8 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
     val innerMap = field1.getMap(0)
     testMapInt(innerMap, Seq(1), Seq(2))
 
-    assert(field1.getSizeInBytes == 8 + 8 + roundedSize(innerMap.getSizeInBytes))
+    assert(
+        field1.getSizeInBytes == 8 + 8 + roundedSize(innerMap.getSizeInBytes))
 
     val field2 = unsafeRow.getMap(1)
 
@@ -471,16 +517,17 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
       assert(valueArray.getSizeInBytes == 4 + 4 + innerStruct.getSizeInBytes)
     }
 
-    assert(field2.getSizeInBytes == 4 + keyArray.getSizeInBytes + valueArray.getSizeInBytes)
+    assert(field2.getSizeInBytes == 4 + keyArray.getSizeInBytes +
+        valueArray.getSizeInBytes)
 
-    assert(unsafeRow.getSizeInBytes ==
-      8 + 8 * 2 + field1.getSizeInBytes + roundedSize(field2.getSizeInBytes))
+    assert(unsafeRow.getSizeInBytes == 8 + 8 * 2 + field1.getSizeInBytes +
+        roundedSize(field2.getSizeInBytes))
   }
 
   test("basic conversion with array and map") {
     val fieldTypes: Array[DataType] = Array(
-      ArrayType(MapType(IntegerType, IntegerType)),
-      MapType(IntegerType, ArrayType(IntegerType))
+        ArrayType(MapType(IntegerType, IntegerType)),
+        MapType(IntegerType, ArrayType(IntegerType))
     )
     val converter = UnsafeProjection.create(fieldTypes)
 
@@ -516,9 +563,10 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
       assert(valueArray.getSizeInBytes == 4 + (4 + innerArray.getSizeInBytes))
     }
 
-    assert(field2.getSizeInBytes == 4 + keyArray.getSizeInBytes + valueArray.getSizeInBytes)
+    assert(field2.getSizeInBytes == 4 + keyArray.getSizeInBytes +
+        valueArray.getSizeInBytes)
 
-    assert(unsafeRow.getSizeInBytes ==
-      8 + 8 * 2 + roundedSize(field1.getSizeInBytes) + roundedSize(field2.getSizeInBytes))
+    assert(unsafeRow.getSizeInBytes == 8 + 8 * 2 + roundedSize(
+            field1.getSizeInBytes) + roundedSize(field2.getSizeInBytes))
   }
 }

@@ -16,20 +16,20 @@
 
 package com.twitter.summingbird.storm
 
-import backtype.storm.{ Config => BacktypeStormConfig }
+import backtype.storm.{Config => BacktypeStormConfig}
 import scala.collection.JavaConverters._
-import com.twitter.summingbird.{ WrappingConfig, ReadableMap }
+import com.twitter.summingbird.{WrappingConfig, ReadableMap}
 
 object StormConfig {
-  def apply(backingConfig: BacktypeStormConfig) = WrappingConfig(new WrappedBacktypeStormConfig(backingConfig))
+  def apply(backingConfig: BacktypeStormConfig) =
+    WrappingConfig(new WrappedBacktypeStormConfig(backingConfig))
 }
 
-class WrappedBacktypeStormConfig(backingConfig: BacktypeStormConfig) extends ReadableMap {
+class WrappedBacktypeStormConfig(backingConfig: BacktypeStormConfig)
+    extends ReadableMap {
   def get(key: String): Option[AnyRef] =
-    if (backingConfig.containsKey(key))
-      Some(backingConfig.get(key))
-    else
-      None
+    if (backingConfig.containsKey(key)) Some(backingConfig.get(key))
+    else None
 
   val keys: Set[String] = backingConfig.keySet.asScala.toSet
 }

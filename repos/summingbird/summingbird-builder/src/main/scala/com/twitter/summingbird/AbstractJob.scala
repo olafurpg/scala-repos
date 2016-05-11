@@ -12,24 +12,24 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird
 
 import com.twitter.chill.IKryoRegistrar
 
 /**
- * Base class for all Summingbird jobs; all summingbird jobs
- * should extend AbstractJob.
- *
- * @author Oscar Boykin
- * @author Sam Ritchie
- * @author Ashu Singhal
- */
-
+  * Base class for all Summingbird jobs; all summingbird jobs
+  * should extend AbstractJob.
+  *
+  * @author Oscar Boykin
+  * @author Sam Ritchie
+  * @author Ashu Singhal
+  */
 object AbstractJob {
   def apply(jobName: String, env: Env): AbstractJob =
-    Class.forName(jobName)
+    Class
+      .forName(jobName)
       .getConstructor(classOf[Env])
       .newInstance(env)
       .asInstanceOf[AbstractJob]

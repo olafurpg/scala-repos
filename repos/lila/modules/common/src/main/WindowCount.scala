@@ -12,9 +12,11 @@ final class WindowCount(timeout: FiniteDuration) {
   def add {
     val current = nowMillis
     counter.single.transform {
-      case (precedent, (count, millis)) if current > millis + tms       => (0, (1, current))
-      case (precedent, (count, millis)) if current > millis + (tms / 2) => (count, (1, current))
-      case (precedent, (count, millis))                                 => (precedent, (count + 1, millis))
+      case (precedent, (count, millis)) if current > millis + tms =>
+        (0, (1, current))
+      case (precedent, (count, millis)) if current > millis + (tms / 2) =>
+        (count, (1, current))
+      case (precedent, (count, millis)) => (precedent, (count + 1, millis))
     }
   }
 
@@ -25,5 +27,4 @@ final class WindowCount(timeout: FiniteDuration) {
     if (since <= tms) ((count + precedent) * 1000) / (since + tms / 2)
     else 0
   } toInt
-
 }

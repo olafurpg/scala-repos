@@ -3,5 +3,4 @@ package testingSupport
 
 import com.intellij.testIntegration.JavaTestCreator
 
-class ScalaTestCreator extends JavaTestCreator{
-}
+class ScalaTestCreator extends JavaTestCreator {}

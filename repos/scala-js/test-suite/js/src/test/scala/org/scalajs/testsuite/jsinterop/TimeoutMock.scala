@@ -15,10 +15,10 @@ object TimeoutMock {
     val realClearTimeout = global.clearTimeout
 
     val mockTimeouts = new MockTimeouts
-    val mockSetTimeout: js.Function =
-      (fun: js.Function0[_], delay: Int) => mockTimeouts.setTimeout(fun, delay)
-    val mockClearTimeout: js.Function =
-      (timeout: MockTimeout) => mockTimeouts.clearTimeout(timeout)
+    val mockSetTimeout: js.Function = (fun: js.Function0[_], delay: Int) =>
+      mockTimeouts.setTimeout(fun, delay)
+    val mockClearTimeout: js.Function = (timeout: MockTimeout) =>
+      mockTimeouts.clearTimeout(timeout)
 
     try {
       global.setTimeout = mockSetTimeout
@@ -72,8 +72,7 @@ object TimeoutMock {
     }
 
     def execute(): Unit = {
-      if (!cleared)
-        fun()
+      if (!cleared) fun()
     }
   }
 }

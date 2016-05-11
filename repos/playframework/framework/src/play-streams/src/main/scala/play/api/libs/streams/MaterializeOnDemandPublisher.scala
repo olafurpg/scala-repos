@@ -4,53 +4,56 @@
 package play.api.libs.streams
 
 import akka.stream.Materializer
-import akka.stream.scaladsl.{ Sink, Source }
-import org.reactivestreams.{ Publisher, Subscriber, Subscription }
+import akka.stream.scaladsl.{Sink, Source}
+import org.reactivestreams.{Publisher, Subscriber, Subscription}
 import play.api.libs.concurrent.StateMachine
 
 private[play] object MaterializeOnDemandPublisher {
   sealed trait State
 
   /**
-   * The publisher is waiting for demand from the subscriber.
-   */
+    * The publisher is waiting for demand from the subscriber.
+    */
   case object AwaitingDemand extends State
 
   /**
-   * The publisher is caching demand from the subscriber.
-   *
-   * At this point, the source has been materialized with a forwarding subscriber, but it has not
-   * yet invoked the onSubscribe method on that subscriber.
-   */
+    * The publisher is caching demand from the subscriber.
+    *
+    * At this point, the source has been materialized with a forwarding subscriber, but it has not
+    * yet invoked the onSubscribe method on that subscriber.
+    */
   case class CachingDemand(demand: Long) extends State
 
   /**
-   * The subscriber has cancelled.
-   */
+    * The subscriber has cancelled.
+    */
   case object Cancelled extends State
 
   /**
-   * Demand is being forwarded through the subscription obtained by the forwarding subscriber.
-   */
+    * Demand is being forwarded through the subscription obtained by the forwarding subscriber.
+    */
   case class ForwardingDemand(subscription: Subscription) extends State
 }
 
 import MaterializeOnDemandPublisher._
 
 /**
- * A publisher that only materializes a flow to the given source when its subscriber signals demand.
- *
- * If the subscriber never signals demand (ie, it just cancels), the source will never be materialized.
- *
- * This is used to work around https://github.com/akka/akka/issues/18013.
- */
-private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(implicit mat: Materializer) extends StateMachine[State](AwaitingDemand) with Publisher[T] {
+  * A publisher that only materializes a flow to the given source when its subscriber signals demand.
+  *
+  * If the subscriber never signals demand (ie, it just cancels), the source will never be materialized.
+  *
+  * This is used to work around https://github.com/akka/akka/issues/18013.
+  */
+private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(
+    implicit mat: Materializer)
+    extends StateMachine[State](AwaitingDemand) with Publisher[T] {
 
   def subscribe(subscriber: Subscriber[_ >: T]) = {
     subscriber.onSubscribe(new ForwardingSubscription(subscriber))
   }
 
-  class ForwardingSubscription(subscriber: Subscriber[_ >: T]) extends Subscription {
+  class ForwardingSubscription(subscriber: Subscriber[_ >: T])
+      extends Subscription {
     def cancel() = exclusive {
       case ForwardingDemand(subscription) =>
         state = Cancelled
@@ -65,7 +68,8 @@ private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(implic
     def request(n: Long) = exclusive {
       case AwaitingDemand =>
         state = CachingDemand(n)
-        source.runWith(Sink.fromSubscriber(new ForwardingSubscriber(subscriber)))
+        source.runWith(
+            Sink.fromSubscriber(new ForwardingSubscriber(subscriber)))
       case CachingDemand(demand) =>
         state = CachingDemand(n + demand)
       case Cancelled =>
@@ -75,7 +79,8 @@ private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(implic
     }
   }
 
-  class ForwardingSubscriber[S >: T](subscriber: Subscriber[S]) extends Subscriber[S] {
+  class ForwardingSubscriber[S >: T](subscriber: Subscriber[S])
+      extends Subscriber[S] {
 
     def onSubscribe(subscription: Subscription) = exclusive {
       case CachingDemand(demand) =>
@@ -87,7 +92,8 @@ private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(implic
       case ForwardingDemand(_) =>
         throw new IllegalStateException("Subscribe invoked twice")
       case AwaitingDemand =>
-        throw new IllegalStateException("Impossible state: awaiting demand when a forwarding subscriber has already been created")
+        throw new IllegalStateException(
+            "Impossible state: awaiting demand when a forwarding subscriber has already been created")
     }
 
     def onError(t: Throwable) = subscriber.onError(t)

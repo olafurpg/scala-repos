@@ -7,19 +7,21 @@ class AnnotNotFound {
     foo
   }
 
-  () => {
-    @infunction
-    def foo = 0
-    ()
+  () =>
+    {
+      @infunction
+      def foo = 0
+      ()
   }
 
-  () => {
-    val bar: Int = {
-      @nested
-      val bar2: Int = 2
-      2
-    }
-    ()
+  () =>
+    {
+      val bar: Int = {
+        @nested
+        val bar2: Int = 2
+        2
+      }
+      ()
   }
 
   def func(@param x: Int): Int = 0
@@ -38,6 +40,6 @@ class AnnotNotFound {
   class D[@typeparam T]
 
   class E(
-    @valueparam x: Any
+      @valueparam x: Any
   )
 }

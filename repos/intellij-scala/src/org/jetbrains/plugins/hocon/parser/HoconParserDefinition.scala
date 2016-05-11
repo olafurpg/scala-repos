@@ -13,9 +13,11 @@ class HoconParserDefinition extends ParserDefinition {
 
   import org.jetbrains.plugins.hocon.lexer.HoconTokenType._
 
-  def spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): SpaceRequirements =
+  def spaceExistanceTypeBetweenTokens(
+      left: ASTNode, right: ASTNode): SpaceRequirements =
     (left.getElementType, right.getElementType) match {
-      case (Dollar, SubLBrace) | (SubLBrace, QMark) => SpaceRequirements.MUST_NOT
+      case (Dollar, SubLBrace) | (SubLBrace, QMark) =>
+        SpaceRequirements.MUST_NOT
       case _ => SpaceRequirements.MAY
     }
 

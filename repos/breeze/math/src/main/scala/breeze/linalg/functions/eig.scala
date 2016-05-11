@@ -2,28 +2,27 @@ package breeze.linalg
 
 import breeze.generic.UFunc
 import org.netlib.util.intW
-import com.github.fommil.netlib.LAPACK.{getInstance=>lapack}
+import com.github.fommil.netlib.LAPACK.{getInstance => lapack}
 
 /**
- * Eigenvalue decomposition (right eigenvectors)
- *
- * This function returns the real and imaginary parts of the eigenvalues,
- * and the corresponding eigenvectors.  For most (?) interesting matrices,
- * the imaginary part of all eigenvalues will be zero (and the corresponding
- * eigenvectors will be real).  Any complex eigenvalues will appear in
- * complex-conjugate pairs, and the real and imaginary components of the
- * eigenvector for each pair will be in the corresponding columns of the
- * eigenvector matrix.  Take the complex conjugate to find the second
- * eigenvector.
- *
- * Based on EVD.java from MTJ 0.9.12
- */
+  * Eigenvalue decomposition (right eigenvectors)
+  *
+  * This function returns the real and imaginary parts of the eigenvalues,
+  * and the corresponding eigenvectors.  For most (?) interesting matrices,
+  * the imaginary part of all eigenvalues will be zero (and the corresponding
+  * eigenvectors will be real).  Any complex eigenvalues will appear in
+  * complex-conjugate pairs, and the real and imaginary components of the
+  * eigenvector for each pair will be in the corresponding columns of the
+  * eigenvector matrix.  Take the complex conjugate to find the second
+  * eigenvector.
+  *
+  * Based on EVD.java from MTJ 0.9.12
+  */
 object eig extends UFunc {
 
   // TODO: probably we should just return an eigenValues: DV[Complex] ?
   case class Eig[V, M](eigenvalues: V, eigenvaluesComplex: V, eigenvectors: M)
   type DenseEig = Eig[DenseVector[Double], DenseMatrix[Double]]
-
 
   implicit object Eig_DM_Impl extends Impl[DenseMatrix[Double], DenseEig] {
     def apply(m: DenseMatrix[Double]): DenseEig = {
@@ -37,25 +36,31 @@ object eig extends UFunc {
       val Wr = DenseVector.zeros[Double](n)
       val Wi = DenseVector.zeros[Double](n)
 
-      val Vr = DenseMatrix.zeros[Double](n,n)
+      val Vr = DenseMatrix.zeros[Double](n, n)
 
       // Find the needed workspace
       val worksize = Array.ofDim[Double](1)
       val info = new intW(0)
 
-      lapack.dgeev(
-        "N", "V", n,
-        Array.empty[Double], scala.math.max(1,n),
-        Array.empty[Double], Array.empty[Double],
-        Array.empty[Double], scala.math.max(1,n),
-        Array.empty[Double], scala.math.max(1,n),
-        worksize, -1, info)
+      lapack.dgeev("N",
+                   "V",
+                   n,
+                   Array.empty[Double],
+                   scala.math.max(1, n),
+                   Array.empty[Double],
+                   Array.empty[Double],
+                   Array.empty[Double],
+                   scala.math.max(1, n),
+                   Array.empty[Double],
+                   scala.math.max(1, n),
+                   worksize,
+                   -1,
+                   info)
 
       // Allocate the workspace
-      val lwork: Int = if (info.`val` != 0)
-        scala.math.max(1,4*n)
-      else
-        scala.math.max(1,worksize(0).toInt)
+      val lwork: Int =
+        if (info.`val` != 0) scala.math.max(1, 4 * n)
+        else scala.math.max(1, worksize(0).toInt)
 
       val work = Array.ofDim[Double](lwork)
 
@@ -63,54 +68,58 @@ object eig extends UFunc {
 
       val A = DenseMatrix.zeros[Double](n, n)
       A := m
-      lapack.dgeev(
-        "N", "V", n,
-        A.data, scala.math.max(1,n),
-        Wr.data, Wi.data,
-        Array.empty[Double], scala.math.max(1,n),
-        Vr.data, scala.math.max(1,n),
-        work, work.length, info)
+      lapack.dgeev("N",
+                   "V",
+                   n,
+                   A.data,
+                   scala.math.max(1, n),
+                   Wr.data,
+                   Wi.data,
+                   Array.empty[Double],
+                   scala.math.max(1, n),
+                   Vr.data,
+                   scala.math.max(1, n),
+                   work,
+                   work.length,
+                   info)
 
       if (info.`val` > 0)
         throw new NotConvergedException(NotConvergedException.Iterations)
-      else if (info.`val` < 0)
-        throw new IllegalArgumentException()
+      else if (info.`val` < 0) throw new IllegalArgumentException()
 
       Eig(Wr, Wi, Vr)
     }
   }
-
 }
 
-
-
 /**
- * Computes all eigenvalues (and optionally right eigenvectors) of the given
- * real symmetric matrix X.
- */
+  * Computes all eigenvalues (and optionally right eigenvectors) of the given
+  * real symmetric matrix X.
+  */
 object eigSym extends UFunc {
   case class EigSym[V, M](eigenvalues: V, eigenvectors: M)
   type DenseEigSym = EigSym[DenseVector[Double], DenseMatrix[Double]]
-  implicit object EigSym_DM_Impl extends Impl[DenseMatrix[Double], DenseEigSym] {
+  implicit object EigSym_DM_Impl
+      extends Impl[DenseMatrix[Double], DenseEigSym] {
     def apply(X: DenseMatrix[Double]): DenseEigSym = {
       doEigSym(X, true) match {
         case (ev, Some(rev)) => EigSym(ev, rev)
         case _ => throw new RuntimeException("Shouldn't be here!")
       }
-
     }
   }
 
   object justEigenvalues extends UFunc {
-    implicit object EigSym_DM_Impl extends Impl[DenseMatrix[Double], DenseVector[Double]] {
+    implicit object EigSym_DM_Impl
+        extends Impl[DenseMatrix[Double], DenseVector[Double]] {
       def apply(X: DenseMatrix[Double]): DenseVector[Double] = {
         doEigSym(X, false)._1
       }
     }
-
   }
 
-  private def doEigSym(X: Matrix[Double], rightEigenvectors: Boolean): (DenseVector[Double], Option[DenseMatrix[Double]]) = {
+  private def doEigSym(X: Matrix[Double], rightEigenvectors: Boolean)
+    : (DenseVector[Double], Option[DenseMatrix[Double]]) = {
     requireNonEmptyMatrix(X)
 
     // As LAPACK doesn't check if the given matrix is in fact symmetric,
@@ -121,20 +130,24 @@ object eigSym extends UFunc {
     requireSymmetricMatrix(X)
 
     // Copy the lower triangular part of X. LAPACK will store the result in A.
-    val A     = lowerTriangular(X)
+    val A = lowerTriangular(X)
 
-    val N     = X.rows
-    val evs   = DenseVector.zeros[Double](N)
-    val lwork = scala.math.max(1, 3*N-1)
-    val work  = Array.ofDim[Double](lwork)
-    val info  = new intW(0)
+    val N = X.rows
+    val evs = DenseVector.zeros[Double](N)
+    val lwork = scala.math.max(1, 3 * N - 1)
+    val work = Array.ofDim[Double](lwork)
+    val info = new intW(0)
     lapack.dsyev(
-      if (rightEigenvectors) "V" else "N" /* eigenvalues N, eigenvalues & eigenvectors "V" */,
-      "L" /* lower triangular */,
-      N /* number of rows */, A.data, scala.math.max(1, N) /* LDA */,
-      evs.data,
-      work /* workspace */, lwork /* workspace size */,
-      info
+        if (rightEigenvectors)
+          "V" else "N" /* eigenvalues N, eigenvalues & eigenvectors "V" */,
+        "L" /* lower triangular */,
+        N /* number of rows */,
+        A.data,
+        scala.math.max(1, N) /* LDA */,
+        evs.data,
+        work /* workspace */,
+        lwork /* workspace size */,
+        info
     )
     // A value of info.`val` < 0 would tell us that the i-th argument
     // of the call to dsyev was erroneous (where i == |info.`val`|).

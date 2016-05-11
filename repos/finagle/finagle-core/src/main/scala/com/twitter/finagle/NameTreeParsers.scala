@@ -5,8 +5,10 @@ import scala.collection.mutable.{ArrayBuffer, Buffer}
 
 private[finagle] object NameTreeParsers {
   def parsePath(str: String): Path = new NameTreeParsers(str).parseAllPath()
-  def parseNameTree(str: String): NameTree[Path] = new NameTreeParsers(str).parseAllNameTree()
-  def parseDentry(str: String): Dentry = new NameTreeParsers(str).parseAllDentry()
+  def parseNameTree(str: String): NameTree[Path] =
+    new NameTreeParsers(str).parseAllNameTree()
+  def parseDentry(str: String): Dentry =
+    new NameTreeParsers(str).parseAllDentry()
   def parseDtab(str: String): Dtab = new NameTreeParsers(str).parseAllDtab()
 }
 
@@ -23,8 +25,9 @@ private class NameTreeParsers private (str: String) {
   private[this] def illegal(expected: String, found: String): Nothing = {
     val displayStr =
       if (atEnd) s"$str[]"
-      else s"${str.take(idx)}[${str(idx)}]${str.drop(idx+1)}"
-    throw new IllegalArgumentException(s"$expected expected but $found found at '$displayStr'")
+      else s"${str.take(idx)}[${str(idx)}]${str.drop(idx + 1)}"
+    throw new IllegalArgumentException(
+        s"$expected expected but $found found at '$displayStr'")
   }
 
   private[this] def illegal(expected: Char, found: String): Nothing =
@@ -54,21 +57,20 @@ private class NameTreeParsers private (str: String) {
   }
 
   private[this] def eatWhitespace() {
-    while (!atEnd && str(idx).isWhitespace)
-      next()
+    while (!atEnd && str(idx).isWhitespace) next()
   }
 
   private[this] def atEnd() = idx >= size
 
   private[this] def ensureEnd() {
-    if (!atEnd)
-      illegal(EOI, peek)
+    if (!atEnd) illegal(EOI, peek)
   }
 
   private[this] def parseHexChar(): Char =
     peek match {
-      case c@('0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'
-         |'A'|'B'|'C'|'D'|'E'|'F'|'a'|'b'|'c'|'d'|'e'|'f') =>
+      case c @ ('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' |
+          'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'a' | 'b' | 'c' | 'd' | 'e' |
+          'f') =>
         next()
         c
 
@@ -78,7 +80,8 @@ private class NameTreeParsers private (str: String) {
   private[this] def isLabelChar(c: Char) = Path.isShowable(c) || c == '\\'
 
   // extract the underlying buf to avoid a copy in toByteArray
-  private[this] class Baos(size: Int) extends java.io.ByteArrayOutputStream(size) {
+  private[this] class Baos(size: Int)
+      extends java.io.ByteArrayOutputStream(size) {
     def getBuf() = buf
   }
 
@@ -129,9 +132,7 @@ private class NameTreeParsers private (str: String) {
     eatWhitespace()
     eat('/')
 
-    if (!isLabelChar(peek))
-      Path.empty
-
+    if (!isLabelChar(peek)) Path.empty
     else {
       val labels = Buffer[Buf]()
 
@@ -139,7 +140,7 @@ private class NameTreeParsers private (str: String) {
         labels += parseLabel()
       } while (maybeEat('/'))
 
-      Path(labels:_*)
+      Path(labels: _*)
     }
   }
 
@@ -151,10 +152,8 @@ private class NameTreeParsers private (str: String) {
       eatWhitespace()
     } while (maybeEat('|'))
 
-    if (trees.size > 1)
-      NameTree.Alt(trees:_*)
-    else
-      trees(0)
+    if (trees.size > 1) NameTree.Alt(trees: _*)
+    else trees(0)
   }
 
   private[this] def parseTree1(): NameTree[Path] = {
@@ -165,10 +164,8 @@ private class NameTreeParsers private (str: String) {
       eatWhitespace()
     } while (maybeEat('&'))
 
-    if (trees.size > 1)
-      NameTree.Union(trees:_*)
-    else
-      trees(0).tree
+    if (trees.size > 1) NameTree.Union(trees: _*)
+    else trees(0).tree
   }
 
   private[this] def parseSimple(): NameTree[Path] = {

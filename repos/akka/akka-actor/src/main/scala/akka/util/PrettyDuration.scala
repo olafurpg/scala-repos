@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.util
 
 import java.util.Locale
@@ -10,18 +10,21 @@ import scala.concurrent.duration._
 object PrettyDuration {
 
   /**
-   * JAVA API
-   * Selects most apropriate TimeUnit for given duration and formats it accordingly, with 4 digits precision
-   */
+    * JAVA API
+    * Selects most apropriate TimeUnit for given duration and formats it accordingly, with 4 digits precision
+    */
   def format(duration: Duration): String = duration.pretty
 
   /**
-   * JAVA API
-   * Selects most apropriate TimeUnit for given duration and formats it accordingly
-   */
-  def format(duration: Duration, includeNanos: Boolean, precision: Int): String = duration.pretty(includeNanos, precision)
+    * JAVA API
+    * Selects most apropriate TimeUnit for given duration and formats it accordingly
+    */
+  def format(
+      duration: Duration, includeNanos: Boolean, precision: Int): String =
+    duration.pretty(includeNanos, precision)
 
-  implicit class PrettyPrintableDuration(val duration: Duration) extends AnyVal {
+  implicit class PrettyPrintableDuration(val duration: Duration)
+      extends AnyVal {
 
     /** Selects most apropriate TimeUnit for given duration and formats it accordingly, with 4 digits precision **/
     def pretty: String = pretty(includeNanos = false)
@@ -36,11 +39,15 @@ object PrettyDuration {
           val unit = chooseUnit(nanos)
           val value = nanos.toDouble / NANOSECONDS.convert(1, unit)
 
-          s"%.${precision}g %s%s".formatLocal(Locale.ROOT, value, abbreviate(unit), if (includeNanos) s" ($nanos ns)" else "")
+          s"%.${precision}g %s%s".formatLocal(Locale.ROOT,
+                                              value,
+                                              abbreviate(unit),
+                                              if (includeNanos) s" ($nanos ns)"
+                                              else "")
 
         case Duration.MinusInf ⇒ s"-∞ (minus infinity)"
-        case Duration.Inf      ⇒ s"∞ (infinity)"
-        case _                 ⇒ "undefined"
+        case Duration.Inf ⇒ s"∞ (infinity)"
+        case _ ⇒ "undefined"
       }
     }
 
@@ -57,14 +64,13 @@ object PrettyDuration {
     }
 
     def abbreviate(unit: TimeUnit): String = unit match {
-      case NANOSECONDS  ⇒ "ns"
+      case NANOSECONDS ⇒ "ns"
       case MICROSECONDS ⇒ "μs"
       case MILLISECONDS ⇒ "ms"
-      case SECONDS      ⇒ "s"
-      case MINUTES      ⇒ "min"
-      case HOURS        ⇒ "h"
-      case DAYS         ⇒ "d"
+      case SECONDS ⇒ "s"
+      case MINUTES ⇒ "min"
+      case HOURS ⇒ "h"
+      case DAYS ⇒ "d"
     }
   }
-
 }

@@ -1,5 +1,5 @@
 class ParseResult[+T]
-case class MemoEntry[+T](var r: Either[Nothing,ParseResult[_]])
+case class MemoEntry[+T](var r: Either[Nothing, ParseResult[_]])
 
 object Test {
   def grow[T]: ParseResult[T] = (null: MemoEntry[T]) match {

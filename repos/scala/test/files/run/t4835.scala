@@ -12,11 +12,11 @@ object Test {
     print(num)
     // if num == -1, then steram is infinite sequence
     if (num == INFINITE) {
-      for(i <- 0 until 10) {
+      for (i <- 0 until 10) {
         print(" " + iter.next())
       }
     } else {
-      while(iter.hasNext) {
+      while (iter.hasNext) {
         print(" " + iter.next())
       }
     }
@@ -30,9 +30,11 @@ object Test {
     testStreamIterator(1, Stream(1))
     testStreamIterator(2, Stream(1, 2))
     //Stream with side effect
-    testStreamIterator(2, cons(1, cons({ print(" A"); 2}, empty)))
+    testStreamIterator(2, cons(1, cons({ print(" A"); 2 }, empty)))
     testStreamIterator(3, Stream(1, 2, 3))
     //Stream with side effect
-    testStreamIterator(3, cons(1, cons({ print(" A"); 2}, cons({ print(" B"); 3}, Stream.empty))))
+    testStreamIterator(3, cons(1, cons({ print(" A"); 2 }, cons({
+      print(" B"); 3
+    }, Stream.empty))))
   }
 }

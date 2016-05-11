@@ -10,5 +10,6 @@ object HoconElementSets {
   val KeyedField = PrefixedField | ValuedField
   val Literal = Null | Boolean | Number | StringValue
   val Value = Literal | Object | Array | Substitution | Concatenation
-  val ForcedLeafBlock = Key | Path | UnquotedString | Number | Null | Boolean | TokenType.ERROR_ELEMENT
+  val ForcedLeafBlock =
+    Key | Path | UnquotedString | Number | Null | Boolean | TokenType.ERROR_ELEMENT
 }

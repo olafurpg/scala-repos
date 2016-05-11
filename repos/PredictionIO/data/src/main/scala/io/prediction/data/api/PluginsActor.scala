@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.api
 
 import akka.actor.Actor
@@ -29,24 +28,22 @@ class PluginsActor() extends Actor {
       pluginContext.inputSniffers.values.foreach(_.process(e, pluginContext))
     case h: PluginsActor.HandleREST =>
       try {
-        sender() ! pluginContext.inputSniffers(h.pluginName).handleREST(
-          h.appId,
-          h.channelId,
-          h.pluginArgs)
+        sender() ! pluginContext
+          .inputSniffers(h.pluginName)
+          .handleREST(h.appId, h.channelId, h.pluginArgs)
       } catch {
         case e: Exception =>
           sender() ! s"""{"message":"${e.getMessage}"}"""
       }
     case _ =>
-      log.error("Unknown message sent to Event Server input sniffer plugin host.")
+      log.error(
+          "Unknown message sent to Event Server input sniffer plugin host.")
   }
 }
 
 object PluginsActor {
-  case class HandleREST(
-    pluginName: String,
-    appId: Int,
-    channelId: Option[Int],
-    pluginArgs: Seq[String])
+  case class HandleREST(pluginName: String,
+                        appId: Int,
+                        channelId: Option[Int],
+                        pluginArgs: Seq[String])
 }
-

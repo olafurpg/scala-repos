@@ -3,7 +3,7 @@ class T {
 }
 
 class U extends T {
-   private def foo(o: Tuple1[Any]) = ()
+  private def foo(o: Tuple1[Any]) = ()
 }
 
 object Test {

@@ -3,5 +3,5 @@ class Test {
     this()
     def test(xs: List[Int]) = xs map (x => x)
     ()
-  }                                                                              
+  }
 }

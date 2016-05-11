@@ -14,7 +14,7 @@ package breeze.stats.distributions
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. 
-*/
+ */
 
 import org.scalatest._
 import org.scalatest.junit._
@@ -31,18 +31,22 @@ class MultinomialTest extends FunSuite with Checkers with Matchers {
   def NSamples = 1e7.toInt
 
   test("multinomial with naive sampling") {
-    val mult = new Multinomial[DenseVector[Double],Int](TestParams)
+    val mult = new Multinomial[DenseVector[Double], Int](TestParams)
     val accumNaive = DenseVector.zeros[Double](3)
-    (0 until NSamples) foreach { i => accumNaive(mult.drawNaive()) += 1 }
+    (0 until NSamples) foreach { i =>
+      accumNaive(mult.drawNaive()) += 1
+    }
     accumNaive /= NSamples.toDouble
-    accumNaive(2) should be (TestDist(2) +- 1e-3)
+    accumNaive(2) should be(TestDist(2) +- 1e-3)
   }
 
   test("multinomial with alias sampling") {
-    val mult = new Multinomial[DenseVector[Double],Int](TestParams)
+    val mult = new Multinomial[DenseVector[Double], Int](TestParams)
     val accumAlias = DenseVector.zeros[Double](3)
-    (0 until NSamples) foreach { i => accumAlias(mult.draw()) += 1 }
+    (0 until NSamples) foreach { i =>
+      accumAlias(mult.draw()) += 1
+    }
     accumAlias /= NSamples.toDouble
-    accumAlias(2) should be (TestDist(2) +- 1e-3)
+    accumAlias(2) should be(TestDist(2) +- 1e-3)
   }
 }

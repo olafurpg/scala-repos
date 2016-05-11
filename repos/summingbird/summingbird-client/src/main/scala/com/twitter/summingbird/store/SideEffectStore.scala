@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird.store
 
@@ -20,14 +20,14 @@ import com.twitter.storehaus.algebra.MergeableStore
 import com.twitter.util.Future
 
 /**
- * MergeableStore that triggers a side effect on every call to put or
- * merge.
- *
- * @author Sam Ritchie
- * @author Oscar Boykin
- */
-
-class SideEffectStore[K, V](store: MergeableStore[K, V])(sideEffectFn: K => Future[Unit])
+  * MergeableStore that triggers a side effect on every call to put or
+  * merge.
+  *
+  * @author Sam Ritchie
+  * @author Oscar Boykin
+  */
+class SideEffectStore[K, V](store: MergeableStore[K, V])(
+    sideEffectFn: K => Future[Unit])
     extends MergeableStore[K, V] {
 
   override def semigroup = store.semigroup
@@ -37,8 +37,12 @@ class SideEffectStore[K, V](store: MergeableStore[K, V])(sideEffectFn: K => Futu
   def after[T](t: Future[T])(fn: T => Unit): Future[T] = { t.foreach(fn); t }
 
   override def put(pair: (K, Option[V])) =
-    after(store.put(pair)) { _ => sideEffectFn(pair._1) }
+    after(store.put(pair)) { _ =>
+      sideEffectFn(pair._1)
+    }
 
   override def merge(pair: (K, V)) =
-    after(store.merge(pair)) { _ => sideEffectFn(pair._1) }
+    after(store.merge(pair)) { _ =>
+      sideEffectFn(pair._1)
+    }
 }

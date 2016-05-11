@@ -40,20 +40,16 @@ object CachedTestDefns {
   }
 
   object Eq {
-    implicit val eqInt: Eq[Int] =
-      new Eq[Int] {
-        def eqv(x: Int, y: Int): Boolean = x == y
-      }
+    implicit val eqInt: Eq[Int] = new Eq[Int] {
+      def eqv(x: Int, y: Int): Boolean = x == y
+    }
 
-    implicit def eqGeneric[T, R]
-      (implicit
-        gen: Generic.Aux[T, R],
-        eqRepr: Lazy[Eq[R]]
-      ): Eq[T] =
-        new Eq[T] {
-          def eqv(x: T, y: T): Boolean =
-            eqRepr.value.eqv(gen.to(x), gen.to(y))
-        }
+    implicit def eqGeneric[T, R](
+        implicit gen: Generic.Aux[T, R], eqRepr: Lazy[Eq[R]]): Eq[T] =
+      new Eq[T] {
+        def eqv(x: T, y: T): Boolean =
+          eqRepr.value.eqv(gen.to(x), gen.to(y))
+      }
 
     // Base case for products
     implicit val eqHNil: Eq[HNil] = new Eq[HNil] {
@@ -61,15 +57,12 @@ object CachedTestDefns {
     }
 
     // Induction step for products
-    implicit def eqHCons[H, T <: HList]
-      (implicit
-        eqH: Lazy[Eq[H]],
-        eqT: Lazy[Eq[T]]
-      ): Eq[H :: T] =
-        new Eq[H :: T] {
-          def eqv(x: H :: T, y: H :: T): Boolean =
-            eqH.value.eqv(x.head, y.head) && eqT.value.eqv(x.tail, y.tail)
-        }
+    implicit def eqHCons[H, T <: HList](
+        implicit eqH: Lazy[Eq[H]], eqT: Lazy[Eq[T]]): Eq[H :: T] =
+      new Eq[H :: T] {
+        def eqv(x: H :: T, y: H :: T): Boolean =
+          eqH.value.eqv(x.head, y.head) && eqT.value.eqv(x.tail, y.tail)
+      }
   }
 
   implicit class EqOps[T](x: T)(implicit eqT: Eq[T]) {
@@ -115,7 +108,7 @@ class CachedTest {
   @Test
   def testDivergent {
     illTyped(
-      "cachedImplicit[math.Ordering[Ordered[Int]]]"
+        "cachedImplicit[math.Ordering[Ordered[Int]]]"
     )
   }
 
@@ -123,7 +116,7 @@ class CachedTest {
   def testNotFound1 {
     trait T[X]
     illTyped(
-      "cachedImplicit[T[String]]"
+        "cachedImplicit[T[String]]"
     )
   }
 
@@ -132,7 +125,8 @@ class CachedTest {
     @scala.annotation.implicitNotFound("No U[${X}]")
     trait U[X]
     illTyped(
-      "cachedImplicit[U[String]]", "No U\\[String]"
+        "cachedImplicit[U[String]]",
+        "No U\\[String]"
     )
   }
 

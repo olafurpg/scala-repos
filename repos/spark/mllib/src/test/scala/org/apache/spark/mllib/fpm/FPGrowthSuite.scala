@@ -24,24 +24,18 @@ import org.apache.spark.util.Utils
 
 class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
 
-
   test("FP-Growth using String type") {
-    val transactions = Seq(
-      "r z h k p",
-      "z y x w v u t s",
-      "s x o n r",
-      "x z y m t s q e",
-      "z",
-      "x z y r q t p")
-      .map(_.split(" "))
+    val transactions = Seq("r z h k p",
+                           "z y x w v u t s",
+                           "s x o n r",
+                           "x z y m t s q e",
+                           "z",
+                           "x z y r q t p").map(_.split(" "))
     val rdd = sc.parallelize(transactions, 2).cache()
 
     val fpg = new FPGrowth()
 
-    val model6 = fpg
-      .setMinSupport(0.9)
-      .setNumPartitions(1)
-      .run(rdd)
+    val model6 = fpg.setMinSupport(0.9).setNumPartitions(1).run(rdd)
 
     /* Verify results using the `R` code:
        transactions = as(sapply(
@@ -60,10 +54,7 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
      */
     assert(model6.freqItemsets.count() === 0)
 
-    val model3 = fpg
-      .setMinSupport(0.5)
-      .setNumPartitions(2)
-      .run(rdd)
+    val model3 = fpg.setMinSupport(0.5).setNumPartitions(2).run(rdd)
     val freqItemsets3 = model3.freqItemsets.collect().map { itemset =>
       (itemset.items.toSet, itemset.freq)
     }
@@ -94,20 +85,27 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
        17       {s}    3
        18       {r}    3
      */
-    val expected = Set(
-      (Set("s"), 3L), (Set("z"), 5L), (Set("x"), 4L), (Set("t"), 3L), (Set("y"), 3L),
-      (Set("r"), 3L),
-      (Set("x", "z"), 3L), (Set("t", "y"), 3L), (Set("t", "x"), 3L), (Set("s", "x"), 3L),
-      (Set("y", "x"), 3L), (Set("y", "z"), 3L), (Set("t", "z"), 3L),
-      (Set("y", "x", "z"), 3L), (Set("t", "x", "z"), 3L), (Set("t", "y", "z"), 3L),
-      (Set("t", "y", "x"), 3L),
-      (Set("t", "y", "x", "z"), 3L))
+    val expected = Set((Set("s"), 3L),
+                       (Set("z"), 5L),
+                       (Set("x"), 4L),
+                       (Set("t"), 3L),
+                       (Set("y"), 3L),
+                       (Set("r"), 3L),
+                       (Set("x", "z"), 3L),
+                       (Set("t", "y"), 3L),
+                       (Set("t", "x"), 3L),
+                       (Set("s", "x"), 3L),
+                       (Set("y", "x"), 3L),
+                       (Set("y", "z"), 3L),
+                       (Set("t", "z"), 3L),
+                       (Set("y", "x", "z"), 3L),
+                       (Set("t", "x", "z"), 3L),
+                       (Set("t", "y", "z"), 3L),
+                       (Set("t", "y", "x"), 3L),
+                       (Set("t", "y", "x", "z"), 3L))
     assert(freqItemsets3.toSet === expected)
 
-    val model2 = fpg
-      .setMinSupport(0.3)
-      .setNumPartitions(4)
-      .run(rdd)
+    val model2 = fpg.setMinSupport(0.3).setNumPartitions(4).run(rdd)
 
     /* Verify results using the `R` code:
        fp = eclat(transactions, parameter = list(support = 0.3))
@@ -119,10 +117,7 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
      */
     assert(model2.freqItemsets.count() === 54)
 
-    val model1 = fpg
-      .setMinSupport(0.1)
-      .setNumPartitions(8)
-      .run(rdd)
+    val model1 = fpg.setMinSupport(0.1).setNumPartitions(8).run(rdd)
 
     /* Verify results using the `R` code:
        fp = eclat(transactions, parameter = list(support = 0.1))
@@ -136,14 +131,12 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("FP-Growth String type association rule generation") {
-    val transactions = Seq(
-      "r z h k p",
-      "z y x w v u t s",
-      "s x o n r",
-      "x z y m t s q e",
-      "z",
-      "x z y r q t p")
-      .map(_.split(" "))
+    val transactions = Seq("r z h k p",
+                           "z y x w v u t s",
+                           "s x o n r",
+                           "x z y m t s q e",
+                           "z",
+                           "x z y r q t p").map(_.split(" "))
     val rdd = sc.parallelize(transactions, 2).cache()
 
     /* Verify results using the `R` code:
@@ -178,23 +171,18 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("FP-Growth using Int type") {
-    val transactions = Seq(
-      "1 2 3",
-      "1 2 3 4",
-      "5 4 3 2 1",
-      "6 5 4 3 2 1",
-      "2 4",
-      "1 3",
-      "1 7")
-      .map(_.split(" ").map(_.toInt).toArray)
+    val transactions = Seq("1 2 3",
+                           "1 2 3 4",
+                           "5 4 3 2 1",
+                           "6 5 4 3 2 1",
+                           "2 4",
+                           "1 3",
+                           "1 7").map(_.split(" ").map(_.toInt).toArray)
     val rdd = sc.parallelize(transactions, 2).cache()
 
     val fpg = new FPGrowth()
 
-    val model6 = fpg
-      .setMinSupport(0.9)
-      .setNumPartitions(1)
-      .run(rdd)
+    val model6 = fpg.setMinSupport(0.9).setNumPartitions(1).run(rdd)
 
     /* Verify results using the `R` code:
        transactions = as(sapply(
@@ -214,12 +202,9 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
      */
     assert(model6.freqItemsets.count() === 0)
 
-    val model3 = fpg
-      .setMinSupport(0.5)
-      .setNumPartitions(2)
-      .run(rdd)
+    val model3 = fpg.setMinSupport(0.5).setNumPartitions(2).run(rdd)
     assert(model3.freqItemsets.first().items.getClass === Array(1).getClass,
-      "frequent itemsets should use primitive arrays")
+           "frequent itemsets should use primitive arrays")
     val freqItemsets3 = model3.freqItemsets.collect().map { itemset =>
       (itemset.items.toSet, itemset.freq)
     }
@@ -241,16 +226,18 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
       5   {1,2}    4
       9     {4}    4
      */
-    val expected = Set(
-      (Set(1), 6L), (Set(2), 5L), (Set(3), 5L), (Set(4), 4L),
-      (Set(1, 2), 4L), (Set(1, 3), 5L), (Set(2, 3), 4L),
-      (Set(2, 4), 4L), (Set(1, 2, 3), 4L))
+    val expected = Set((Set(1), 6L),
+                       (Set(2), 5L),
+                       (Set(3), 5L),
+                       (Set(4), 4L),
+                       (Set(1, 2), 4L),
+                       (Set(1, 3), 5L),
+                       (Set(2, 3), 4L),
+                       (Set(2, 4), 4L),
+                       (Set(1, 2, 3), 4L))
     assert(freqItemsets3.toSet === expected)
 
-    val model2 = fpg
-      .setMinSupport(0.3)
-      .setNumPartitions(4)
-      .run(rdd)
+    val model2 = fpg.setMinSupport(0.3).setNumPartitions(4).run(rdd)
 
     /* Verify results using the `R` code:
        fp = eclat(transactions, parameter = list(support = 0.3))
@@ -262,10 +249,7 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
      */
     assert(model2.freqItemsets.count() === 15)
 
-    val model1 = fpg
-      .setMinSupport(0.1)
-      .setNumPartitions(8)
-      .run(rdd)
+    val model1 = fpg.setMinSupport(0.1).setNumPartitions(8).run(rdd)
 
     /* Verify results using the `R` code:
        fp = eclat(transactions, parameter = list(support = 0.1))
@@ -279,20 +263,15 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("model save/load with String type") {
-    val transactions = Seq(
-      "r z h k p",
-      "z y x w v u t s",
-      "s x o n r",
-      "x z y m t s q e",
-      "z",
-      "x z y r q t p")
-      .map(_.split(" "))
+    val transactions = Seq("r z h k p",
+                           "z y x w v u t s",
+                           "s x o n r",
+                           "x z y m t s q e",
+                           "z",
+                           "x z y r q t p").map(_.split(" "))
     val rdd = sc.parallelize(transactions, 2).cache()
 
-    val model3 = new FPGrowth()
-      .setMinSupport(0.5)
-      .setNumPartitions(2)
-      .run(rdd)
+    val model3 = new FPGrowth().setMinSupport(0.5).setNumPartitions(2).run(rdd)
     val freqItemsets3 = model3.freqItemsets.collect().map { itemset =>
       (itemset.items.toSet, itemset.freq)
     }
@@ -312,21 +291,16 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("model save/load with Int type") {
-    val transactions = Seq(
-      "1 2 3",
-      "1 2 3 4",
-      "5 4 3 2 1",
-      "6 5 4 3 2 1",
-      "2 4",
-      "1 3",
-      "1 7")
-      .map(_.split(" ").map(_.toInt).toArray)
+    val transactions = Seq("1 2 3",
+                           "1 2 3 4",
+                           "5 4 3 2 1",
+                           "6 5 4 3 2 1",
+                           "2 4",
+                           "1 3",
+                           "1 7").map(_.split(" ").map(_.toInt).toArray)
     val rdd = sc.parallelize(transactions, 2).cache()
 
-    val model3 = new FPGrowth()
-      .setMinSupport(0.5)
-      .setNumPartitions(2)
-      .run(rdd)
+    val model3 = new FPGrowth().setMinSupport(0.5).setNumPartitions(2).run(rdd)
     val freqItemsets3 = model3.freqItemsets.collect().map { itemset =>
       (itemset.items.toSet, itemset.freq)
     }

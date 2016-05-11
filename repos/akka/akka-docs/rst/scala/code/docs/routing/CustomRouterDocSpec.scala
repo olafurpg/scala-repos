@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.routing
 
 import akka.testkit.AkkaSpec
@@ -50,7 +50,8 @@ akka.actor.deployment {
   class RedundancyRoutingLogic(nbrCopies: Int) extends RoutingLogic {
     val roundRobin = RoundRobinRoutingLogic()
     def select(message: Any, routees: immutable.IndexedSeq[Routee]): Routee = {
-      val targets = (1 to nbrCopies).map(_ => roundRobin.select(message, routees))
+      val targets =
+        (1 to nbrCopies).map(_ => roundRobin.select(message, routees))
       SeveralRoutees(targets)
     }
   }
@@ -77,13 +78,16 @@ import akka.routing.Router
 import akka.japi.Util.immutableSeq
 import com.typesafe.config.Config
 
-final case class RedundancyGroup(routeePaths: immutable.Iterable[String], nbrCopies: Int) extends Group {
+final case class RedundancyGroup(
+    routeePaths: immutable.Iterable[String], nbrCopies: Int)
+    extends Group {
 
-  def this(config: Config) = this(
-    routeePaths = immutableSeq(config.getStringList("routees.paths")),
-    nbrCopies = config.getInt("nbr-copies"))
+  def this(config: Config) =
+    this(routeePaths = immutableSeq(config.getStringList("routees.paths")),
+         nbrCopies = config.getInt("nbr-copies"))
 
-  override def paths(system: ActorSystem): immutable.Iterable[String] = routeePaths
+  override def paths(system: ActorSystem): immutable.Iterable[String] =
+    routeePaths
 
   override def createRouter(system: ActorSystem): Router =
     new Router(new RedundancyRoutingLogic(nbrCopies))
@@ -92,7 +96,8 @@ final case class RedundancyGroup(routeePaths: immutable.Iterable[String], nbrCop
 }
 //#group
 
-class CustomRouterDocSpec extends AkkaSpec(CustomRouterDocSpec.config) with ImplicitSender {
+class CustomRouterDocSpec
+    extends AkkaSpec(CustomRouterDocSpec.config) with ImplicitSender {
 
   import CustomRouterDocSpec._
   import akka.routing.SeveralRoutees
@@ -105,17 +110,16 @@ class CustomRouterDocSpec extends AkkaSpec(CustomRouterDocSpec.config) with Impl
 
     val r1 = logic.select("msg", routees)
     r1.asInstanceOf[SeveralRoutees].routees should be(
-      Vector(TestRoutee(1), TestRoutee(2), TestRoutee(3)))
+        Vector(TestRoutee(1), TestRoutee(2), TestRoutee(3)))
 
     val r2 = logic.select("msg", routees)
     r2.asInstanceOf[SeveralRoutees].routees should be(
-      Vector(TestRoutee(4), TestRoutee(5), TestRoutee(6)))
+        Vector(TestRoutee(4), TestRoutee(5), TestRoutee(6)))
 
     val r3 = logic.select("msg", routees)
     r3.asInstanceOf[SeveralRoutees].routees should be(
-      Vector(TestRoutee(7), TestRoutee(1), TestRoutee(2)))
+        Vector(TestRoutee(7), TestRoutee(1), TestRoutee(2)))
     //#unit-test-logic
-
   }
 
   "demonstrate usage of custom router" in {
@@ -123,22 +127,19 @@ class CustomRouterDocSpec extends AkkaSpec(CustomRouterDocSpec.config) with Impl
     for (n <- 1 to 10) system.actorOf(Props[Storage], "s" + n)
 
     val paths = for (n <- 1 to 10) yield ("/user/s" + n)
-    val redundancy1: ActorRef =
-      system.actorOf(RedundancyGroup(paths, nbrCopies = 3).props(),
-        name = "redundancy1")
+    val redundancy1: ActorRef = system.actorOf(
+        RedundancyGroup(paths, nbrCopies = 3).props(), name = "redundancy1")
     redundancy1 ! "important"
     //#usage-1
 
     for (_ <- 1 to 3) expectMsg("important")
 
     //#usage-2
-    val redundancy2: ActorRef = system.actorOf(FromConfig.props(),
-      name = "redundancy2")
+    val redundancy2: ActorRef =
+      system.actorOf(FromConfig.props(), name = "redundancy2")
     redundancy2 ! "very important"
     //#usage-2
 
     for (_ <- 1 to 5) expectMsg("very important")
-
   }
-
 }

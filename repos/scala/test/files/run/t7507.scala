@@ -1,7 +1,7 @@
 trait Cake extends Slice
 
 // Minimization
-trait Slice { self: Cake =>    // must have self type that extends `Slice`
+trait Slice { self: Cake => // must have self type that extends `Slice`
   private[this] val bippy = () // must be private[this]
   locally(bippy)
   class C1 {
@@ -16,7 +16,6 @@ trait Slice1 { self: Cake1 =>
   import java.lang.String // any import will do!
   val Tuple2(x, y) = ((1, 2))
 }
-
 
 // Nesting
 trait Cake3 extends Outer.Slice3

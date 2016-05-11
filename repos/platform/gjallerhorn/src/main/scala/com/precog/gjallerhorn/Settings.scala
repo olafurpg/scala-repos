@@ -21,10 +21,20 @@ package com.precog.gjallerhorn
 
 import java.io._
 
-case class Settings(host: String, id: String, token: String, accountsPort: Int,
-  accountsPath: String, authPort: Int, authPath: String, ingestPort: Int,
-  ingestPath: String, jobsPort: Int, jobsPath: String, shardPort: Int,
-  shardPath: String, secure: Boolean)
+case class Settings(host: String,
+                    id: String,
+                    token: String,
+                    accountsPort: Int,
+                    accountsPath: String,
+                    authPort: Int,
+                    authPath: String,
+                    ingestPort: Int,
+                    ingestPath: String,
+                    jobsPort: Int,
+                    jobsPath: String,
+                    shardPort: Int,
+                    shardPath: String,
+                    secure: Boolean)
 
 object Settings {
   private val HostRegex = """^host (.+)$""".r
@@ -45,65 +55,66 @@ object Settings {
   def fromFile(f: File): Settings = {
     if (!f.canRead) sys.error("Can't read %s. Is bifrost running?" format f)
 
-    case class PartialSettings(
-        host: Option[String] = None,
-        id: Option[String] = None,
-        token: Option[String] = None,
-        accountsPort: Option[Int] = None,
-        accountsPath: Option[String] = None,
-        authPort: Option[Int] = None,
-        authPath: Option[String] = None,
-        ingestPort: Option[Int] = None,
-        ingestPath: Option[String] = None,
-        jobsPort: Option[Int] = None,
-        jobsPath: Option[String] = None,
-        shardPort: Option[Int] = None,
-        shardPath: Option[String] = None,
-        secure: Option[Boolean] = None) {
+    case class PartialSettings(host: Option[String] = None,
+                               id: Option[String] = None,
+                               token: Option[String] = None,
+                               accountsPort: Option[Int] = None,
+                               accountsPath: Option[String] = None,
+                               authPort: Option[Int] = None,
+                               authPath: Option[String] = None,
+                               ingestPort: Option[Int] = None,
+                               ingestPath: Option[String] = None,
+                               jobsPort: Option[Int] = None,
+                               jobsPath: Option[String] = None,
+                               shardPort: Option[Int] = None,
+                               shardPath: Option[String] = None,
+                               secure: Option[Boolean] = None) {
 
       def missing: List[String] = {
         def q(o: Option[_], s: String): List[String] =
           if (o.isDefined) Nil else s :: Nil
 
-        q(host, "host") ++ q(id, "id") ++ q(token, "token") ++
-        q(accountsPort, "accountsPort") ++ q(accountsPath, "accountsPath") ++
-        q(authPort, "authPort") ++ q(authPath, "authPath") ++ 
-        q(ingestPort, "ingestPort") ++ q(ingestPath, "ingestPath") ++ 
-        q(jobsPort, "jobsPort") ++ q(jobsPath, "jobsPath") ++ 
-        q(shardPort, "shardPort") ++ q(shardPath, "shardPath") ++ q(secure, "secure")
+        q(host, "host") ++ q(id, "id") ++ q(token, "token") ++ q(
+            accountsPort,
+            "accountsPort") ++ q(accountsPath, "accountsPath") ++ q(
+            authPort, "authPort") ++ q(authPath, "authPath") ++ q(
+            ingestPort, "ingestPort") ++ q(ingestPath, "ingestPath") ++ q(
+            jobsPort, "jobsPort") ++ q(jobsPath, "jobsPath") ++ q(
+            shardPort, "shardPort") ++ q(shardPath, "shardPath") ++ q(
+            secure, "secure")
       }
 
-      def settings: Option[Settings] = for {
-        h <- host
-        i <- id
-        t <- token
-        ac <- accountsPort
-        acp <- accountsPath
-        au <- authPort
-        aup <- authPath
-        in <- ingestPort
-        inp <- ingestPath
-        j <- jobsPort
-        jp <- jobsPath
-        sh <- shardPort
-        shp <- shardPath
-        sec <- secure
-      } yield {
-        Settings(h, i, t, ac, acp, au, aup, in, inp, j, jp, sh, shp, sec)
-      }
+      def settings: Option[Settings] =
+        for {
+          h <- host
+          i <- id
+          t <- token
+          ac <- accountsPort
+          acp <- accountsPath
+          au <- authPort
+          aup <- authPath
+          in <- ingestPort
+          inp <- ingestPath
+          j <- jobsPort
+          jp <- jobsPath
+          sh <- shardPort
+          shp <- shardPath
+          sec <- secure
+        } yield {
+          Settings(h, i, t, ac, acp, au, aup, in, inp, j, jp, sh, shp, sec)
+        }
     }
 
     val lines = io.Source.fromFile(f).getLines
-    
-    val defaults = PartialSettings(
-      host = Some("localhost"),
-      accountsPath = Some("accounts"),
-      authPath = Some("apikeys"),
-      ingestPath = Some("ingest"),
-      shardPath = Some("meta"),
-      jobsPath = Some("jobs/v1"),
-      secure = Some(false))
-    
+
+    val defaults = PartialSettings(host = Some("localhost"),
+                                   accountsPath = Some("accounts"),
+                                   authPath = Some("apikeys"),
+                                   ingestPath = Some("ingest"),
+                                   shardPath = Some("meta"),
+                                   jobsPath = Some("jobs/v1"),
+                                   secure = Some(false))
+
     val ps = lines.foldLeft(defaults) { (ps, s) =>
       val ps2 = s match {
         case HostRegex(s) => ps.copy(host = Some(s))
@@ -115,7 +126,7 @@ object Settings {
         case AuthPath(p) => ps.copy(authPath = Some(p))
         case _ => ps
       }
-      
+
       // split to avoid a bug in the pattern matcher
       s match {
         case IngestPort(n) => ps2.copy(ingestPort = Some(n.toInt))
@@ -129,7 +140,8 @@ object Settings {
       }
     }
     ps.settings.getOrElse {
-      sys.error("missing settings in %s:\n  %s" format (f, ps.missing.mkString("\n  ")))
+      sys.error("missing settings in %s:\n  %s" format
+          (f, ps.missing.mkString("\n  ")))
     }
   }
 }

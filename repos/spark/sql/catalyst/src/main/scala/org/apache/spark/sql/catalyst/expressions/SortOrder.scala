@@ -37,11 +37,11 @@ case object Descending extends SortDirection {
 }
 
 /**
- * An expression that can be used to sort a tuple.  This class extends expression primarily so that
- * transformations over expression will descend into its child.
- */
+  * An expression that can be used to sort a tuple.  This class extends expression primarily so that
+  * transformations over expression will descend into its child.
+  */
 case class SortOrder(child: Expression, direction: SortDirection)
-  extends UnaryExpression with Unevaluable {
+    extends UnaryExpression with Unevaluable {
 
   /** Sort order is not foldable because we don't have an eval for it. */
   override def foldable: Boolean = false
@@ -50,7 +50,8 @@ case class SortOrder(child: Expression, direction: SortDirection)
     if (RowOrdering.isOrderable(dataType)) {
       TypeCheckResult.TypeCheckSuccess
     } else {
-      TypeCheckResult.TypeCheckFailure(s"cannot sort data type ${dataType.simpleString}")
+      TypeCheckResult.TypeCheckFailure(
+          s"cannot sort data type ${dataType.simpleString}")
     }
   }
 
@@ -64,11 +65,12 @@ case class SortOrder(child: Expression, direction: SortDirection)
 }
 
 /**
- * An expression to generate a 64-bit long prefix used in sorting.
- */
+  * An expression to generate a 64-bit long prefix used in sorting.
+  */
 case class SortPrefix(child: SortOrder) extends UnaryExpression {
 
-  override def eval(input: InternalRow): Any = throw new UnsupportedOperationException
+  override def eval(input: InternalRow): Any =
+    throw new UnsupportedOperationException
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val childCode = child.child.gen(ctx)
@@ -85,27 +87,28 @@ case class SortPrefix(child: SortOrder) extends UnaryExpression {
         (Long.MinValue, s"(long) $input")
       case FloatType | DoubleType =>
         (DoublePrefixComparator.computePrefix(Double.NegativeInfinity),
-          s"$DoublePrefixCmp.computePrefix((double)$input)")
+         s"$DoublePrefixCmp.computePrefix((double)$input)")
       case StringType => (0L, s"$input.getPrefix()")
       case BinaryType => (0L, s"$BinaryPrefixCmp.computePrefix($input)")
-      case dt: DecimalType if dt.precision - dt.scale <= Decimal.MAX_LONG_DIGITS =>
-        val prefix = if (dt.precision <= Decimal.MAX_LONG_DIGITS) {
-          s"$input.toUnscaledLong()"
-        } else {
-          // reduce the scale to fit in a long
-          val p = Decimal.MAX_LONG_DIGITS
-          val s = p - (dt.precision - dt.scale)
-          s"$input.changePrecision($p, $s) ? $input.toUnscaledLong() : ${Long.MinValue}L"
-        }
+      case dt: DecimalType
+          if dt.precision - dt.scale <= Decimal.MAX_LONG_DIGITS =>
+        val prefix =
+          if (dt.precision <= Decimal.MAX_LONG_DIGITS) {
+            s"$input.toUnscaledLong()"
+          } else {
+            // reduce the scale to fit in a long
+            val p = Decimal.MAX_LONG_DIGITS
+            val s = p - (dt.precision - dt.scale)
+            s"$input.changePrecision($p, $s) ? $input.toUnscaledLong() : ${Long.MinValue}L"
+          }
         (Long.MinValue, prefix)
       case dt: DecimalType =>
         (DoublePrefixComparator.computePrefix(Double.NegativeInfinity),
-          s"$DoublePrefixCmp.computePrefix($input.toDouble())")
+         s"$DoublePrefixCmp.computePrefix($input.toDouble())")
       case _ => (0L, "0L")
     }
 
-    childCode.code +
-    s"""
+    childCode.code + s"""
       |long ${ev.value} = ${nullValue}L;
       |boolean ${ev.isNull} = false;
       |if (!${childCode.isNull}) {

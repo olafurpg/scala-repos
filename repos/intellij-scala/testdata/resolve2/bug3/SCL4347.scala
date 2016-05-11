@@ -4,9 +4,8 @@ object SCL4347 {
     def frob(f: Foo): Foo
   }
 
-  trait Derived {
-    self: Base =>
+  trait Derived { self: Base =>
     type Foo = Double
-    def frob(f: /* line: 9 */Foo): Foo = 12
+    def frob(f: /* line: 9 */ Foo): Foo = 12
   }
 }

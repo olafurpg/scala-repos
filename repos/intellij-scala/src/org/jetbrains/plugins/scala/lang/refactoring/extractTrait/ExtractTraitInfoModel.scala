@@ -6,10 +6,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaration
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 
 /**
- * Nikolay.Tropin
- * 2014-05-23
- */
-object ExtractTraitInfoModel extends AbstractMemberInfoModel[ScMember, ScalaExtractMemberInfo] {
+  * Nikolay.Tropin
+  * 2014-05-23
+  */
+object ExtractTraitInfoModel
+    extends AbstractMemberInfoModel[ScMember, ScalaExtractMemberInfo] {
   override def isAbstractEnabled(member: ScalaExtractMemberInfo) = {
     member.getMember match {
       case decl: ScDeclaration => false
@@ -17,15 +18,19 @@ object ExtractTraitInfoModel extends AbstractMemberInfoModel[ScMember, ScalaExtr
     }
   }
 
-  override def memberInfoChanged(event: MemberInfoChange[ScMember, ScalaExtractMemberInfo]) = super.memberInfoChanged(event)
+  override def memberInfoChanged(
+      event: MemberInfoChange[ScMember, ScalaExtractMemberInfo]) =
+    super.memberInfoChanged(event)
 
-  override def isFixedAbstract(member: ScalaExtractMemberInfo) = member.getMember match {
-    case decl: ScDeclaration => true
-    case _ => null
-  }
+  override def isFixedAbstract(member: ScalaExtractMemberInfo) =
+    member.getMember match {
+      case decl: ScDeclaration => true
+      case _ => null
+    }
 
-  override def isAbstractWhenDisabled(member: ScalaExtractMemberInfo) = member.getMember match {
-    case decl: ScDeclaration => true
-    case _ => false
-  }
+  override def isAbstractWhenDisabled(member: ScalaExtractMemberInfo) =
+    member.getMember match {
+      case decl: ScDeclaration => true
+      case _ => false
+    }
 }

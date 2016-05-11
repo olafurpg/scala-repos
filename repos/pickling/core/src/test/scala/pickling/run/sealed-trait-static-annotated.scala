@@ -1,10 +1,10 @@
 package scala.pickling.test.sealedtraitstaticannotated
 
-import scala.pickling.{PicklingException, directSubclasses, Pickler, Unpickler, Defaults }
+import scala.pickling.{PicklingException, directSubclasses, Pickler, Unpickler, Defaults}
 import scala.pickling.static._
 import scala.pickling.json._
-import Defaults.{ stringPickler, intPickler, refUnpickler, nullPickler }
-import Defaults.{ pickleOps, unpickleOps }
+import Defaults.{stringPickler, intPickler, refUnpickler, nullPickler}
+import Defaults.{pickleOps, unpickleOps}
 
 import org.scalatest.FunSuite
 
@@ -48,7 +48,8 @@ class SealedTraitStaticAnnotatedTest extends FunSuite {
     val apple = Apple("Fuji")
     try {
       val pickled = (apple: Fruit).pickle.value
-      throw new Exception(s"We should have failed to pickle Apple but we pickled as: $pickled")
+      throw new Exception(
+          s"We should have failed to pickle Apple but we pickled as: $pickled")
     } catch {
       case PicklingException(message, cause) =>
         if (!message.contains("Apple not recognized"))
@@ -58,14 +59,17 @@ class SealedTraitStaticAnnotatedTest extends FunSuite {
     // if we are only using static (un)picklers, then the Banana
     // unpickler should not know a thing about Cucumber, but duck typing
     // should work anyhow.
-    val b = JSONPickle(bananaString.replace("Banana", "Cucumber")).unpickle[Banana]
+    val b =
+      JSONPickle(bananaString.replace("Banana", "Cucumber")).unpickle[Banana]
     assert(b == banana)
 
     // the Fruit unpickler should not know anything about Cucumber, and
     // it should fail because it doesn't know to duck-type into Banana
     try {
-      val f = JSONPickle(bananaString.replace("Banana", "Cucumber")).unpickle[Fruit]
-      throw new Exception(s"Should have thrown on unpickle but instead parsed $f")
+      val f =
+        JSONPickle(bananaString.replace("Banana", "Cucumber")).unpickle[Fruit]
+      throw new Exception(
+          s"Should have thrown on unpickle but instead parsed $f")
     } catch {
       case PicklingException(message, cause) =>
         if (!message.contains("Cucumber not recognized"))
@@ -76,8 +80,10 @@ class SealedTraitStaticAnnotatedTest extends FunSuite {
     // a thing about Apple either, even though it's a subtype of
     // Fruit.
     try {
-      val f = JSONPickle(bananaString.replace("Banana", "Apple")).unpickle[Fruit]
-      throw new Exception(s"Should have thrown on unpickle but instead parsed $f")
+      val f =
+        JSONPickle(bananaString.replace("Banana", "Apple")).unpickle[Fruit]
+      throw new Exception(
+          s"Should have thrown on unpickle but instead parsed $f")
     } catch {
       case PicklingException(message, cause) =>
         if (!message.contains("Apple not recognized"))

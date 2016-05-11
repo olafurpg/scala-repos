@@ -9,18 +9,19 @@ import org.jetbrains.plugins.scala.console.{ScalaConsoleInfo, ScalaLanguageConso
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 04.05.2008
-*/
+  * @author Alexander Podkhalyuzin
+  * Date: 04.05.2008
+  */
 class ScalaStructureViewFactory extends PsiStructureViewFactory {
-  def getStructureViewBuilder(psiFile: PsiFile): StructureViewBuilder = psiFile match {
-    case sf: ScalaFile =>
-      if (sf.getName == ScalaLanguageConsoleView.SCALA_CONSOLE) {
-        val console = ScalaConsoleInfo.getConsole(sf)
-        new ScalaStructureViewBuilder(sf, console)
-      } else {
-        new ScalaStructureViewBuilder(sf)
-      }
-    case _ => null
-  }
+  def getStructureViewBuilder(psiFile: PsiFile): StructureViewBuilder =
+    psiFile match {
+      case sf: ScalaFile =>
+        if (sf.getName == ScalaLanguageConsoleView.SCALA_CONSOLE) {
+          val console = ScalaConsoleInfo.getConsole(sf)
+          new ScalaStructureViewBuilder(sf, console)
+        } else {
+          new ScalaStructureViewBuilder(sf)
+        }
+      case _ => null
+    }
 }

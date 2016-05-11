@@ -45,4 +45,3 @@ object Test {
     assert(f.get(o) != null) // SI-9365
   }
 }
-

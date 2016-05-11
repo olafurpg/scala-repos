@@ -4,10 +4,10 @@ import scala.collection.immutable.HashMap
 import scala.util.matching.Regex
 
 /**Object encapsulating CODATA2010 constants.
- *
- * @author ktakagaki
- * @date 3/12/14.
- */
+  *
+  * @author ktakagaki
+  * @date 3/12/14.
+  */
 object Database {
 
   /** Return a vector containing all database keys.
@@ -24,10 +24,11 @@ object Database {
     * @param regex enter a regex object (i.e. """regex expression""".r)
     * @return returns a vector of (String, Double) objects, which contain the full entry name (String) and the value (Double)
     */
-  def value(regex: Regex) = databaseHM.collect{
-    case (key: String, (value: Double, _, _)) if regex.findFirstIn(key).nonEmpty => (key, value)
+  def value(regex: Regex) = databaseHM.collect {
+    case (key: String, (value: Double, _, _))
+        if regex.findFirstIn(key).nonEmpty =>
+      (key, value)
   }
-
 
   /** Look up the uncertainty of a specific entry.
     * Name must be an exact match with the entry.
@@ -39,8 +40,10 @@ object Database {
     * @param regex enter a regex object (i.e. """regex expression""".r)
     * @return returns a vector of (String, Double) objects, which contain the full entry name (String) and the uncertainty (Double)
     */
-  def uncertainty(regex: Regex) = databaseHM.collect{
-    case (key: String, (_, uncert: Double, _)) if regex.findFirstIn(key).nonEmpty => (key, uncert)
+  def uncertainty(regex: Regex) = databaseHM.collect {
+    case (key: String, (_, uncert: Double, _))
+        if regex.findFirstIn(key).nonEmpty =>
+      (key, uncert)
   }
 
   /** Look up the unit of a specific entry.
@@ -53,105 +56,157 @@ object Database {
     * @param regex enter a regex object (i.e. """regex expression""".r)
     * @return returns a vector of (String, Double) objects, which contain the full entry name (String) and the uncertainty (Double)
     */
-  def unit(regex: Regex) = databaseHM.collect{
-    case (key: String, (_, _, unit: String)) if regex.findFirstIn(key).nonEmpty => (key, unit)
+  def unit(regex: Regex) = databaseHM.collect {
+    case (key: String, (_, _, unit: String))
+        if regex.findFirstIn(key).nonEmpty =>
+      (key, unit)
   }
-
 
   // <editor-fold defaultstate="collapsed" desc=" CODATA2010 Database HashMap ">
 
   private lazy val databaseHM = HashMap[String, (Double, Double, String)](
-
-    ("""{220} lattice spacing of silicon""",  ( 1.920155714E-10, 3.2E-18, """m""")),
-    ("""alpha particle-electron mass ratio""",  ( 7294.29953610, 2.9E-6, """""")),
-    ("""alpha particle mass""",  ( 6.64465675E-27, 2.9E-34, """kg""")),
-    ("""alpha particle mass energy equivalent""",  ( 5.97191967E-10, 2.6E-17, """J""")),
-    ("""alpha particle mass energy equivalent in MeV""",  ( 3727.379240, 0.000082, """MeV""")),
-    ("""alpha particle mass in u""",  ( 4.0015061791250, 6.2E-11, """u""")),
-    ("""alpha particle molar mass""",  ( 0.0040015061791250, 6.2E-14, """kg mol^-1""")),
-    ("""alpha particle-proton mass ratio""",  ( 3.97259968933, 3.6E-10, """""")),
-    ("""Angstrom star""",  ( 1.00001495E-10, 9.0E-17, """m""")),
-    ("""atomic mass constant""",  ( 1.660538921E-27, 7.3E-35, """kg""")),
-    ("""atomic mass constant energy equivalent""",  ( 1.492417954E-10, 6.6E-18, """J""")),
-    ("""atomic mass constant energy equivalent in MeV""",  ( 931.4940610, 0.000021, """MeV""")),
-    ("""atomic mass unit-electron volt relationship""",  ( 9.31494061E8, 21.0, """eV""")),
-    ("""atomic mass unit-hartree relationship""",  ( 3.4231776845E7, 0.024, """E_h""")),
-    ("""atomic mass unit-hertz relationship""",  ( 2.2523427168E23, 1.6E14, """Hz""")),
-    ("""atomic mass unit-inverse meter relationship""",  ( 7.5130066042E14, 530000.0, """m^-1""")),
-    ("""atomic mass unit-joule relationship""",  ( 1.492417954E-10, 6.6E-18, """J""")),
-    ("""atomic mass unit-kelvin relationship""",  ( 1.08095408E13, 9.8E6, """K""")),
-    ("""atomic mass unit-kilogram relationship""",  ( 1.660538921E-27, 7.3E-35, """kg""")),
-    ("""atomic unit of 1st hyperpolarizability""",  ( 3.206361449E-53, 7.1E-61, """C^3 m^3 J^-2""")),
-    ("""atomic unit of 2nd hyperpolarizability""",  ( 6.23538054E-65, 2.8E-72, """C^4 m^4 J^-3""")),
-    ("""atomic unit of action""",  ( 1.054571726E-34, 4.7E-42, """J s""")),
-    ("""atomic unit of charge""",  ( 1.602176565E-19, 3.5E-27, """C""")),
-    ("""atomic unit of charge density""",  ( 1.081202338E12, 24000.0, """C m^-3""")),
-    ("""atomic unit of current""",  ( 0.006623617950, 1.5E-10, """A""")),
-    ("""atomic unit of electric dipole mom.""",  ( 8.47835326E-30, 1.9E-37, """C m""")),
-    ("""atomic unit of electric field""",  ( 5.14220652E11, 11000.0, """V m^-1""")),
-    ("""atomic unit of electric field gradient""",  ( 9.717362E21, 2.1E14, """V m^-2""")),
-    ("""atomic unit of electric polarizability""",  ( 1.6487772754E-41, 1.6E-50, """C^2 m^2 J^-1""")),
-    ("""atomic unit of electric potential""",  ( 27.21138505, 6.0E-7, """V""")),
-    ("""atomic unit of electric quadrupole mom.""",  ( 4.486551331E-40, 9.9E-48, """C m^2""")),
-    ("""atomic unit of energy""",  ( 4.35974434E-18, 1.9E-25, """J""")),
-    ("""atomic unit of force""",  ( 8.23872278E-8, 3.6E-15, """N""")),
-    ("""atomic unit of length""",  ( 5.2917721092E-11, 1.7E-20, """m""")),
-    ("""atomic unit of mag. dipole mom.""",  ( 1.854801936E-23, 4.1E-31, """J T^-1""")),
-    ("""atomic unit of mag. flux density""",  ( 235051.7464, 0.0052, """T""")),
-    ("""atomic unit of magnetizability""",  ( 7.891036607E-29, 1.3E-37, """J T^-2""")),
-    ("""atomic unit of mass""",  ( 9.10938291E-31, 4.0E-38, """kg""")),
-    ("""atomic unit of mom.um""",  ( 1.99285174E-24, 8.8E-32, """kg m s^-1""")),
-    ("""atomic unit of permittivity""",  ( 1.112650056E-10, 0d, """F m^-1""")),
-    ("""atomic unit of time""",  ( 2.418884326502E-17, 1.2E-28, """s""")),
-    ("""atomic unit of velocity""",  ( 2.18769126379E6, 0.00071, """m s^-1""")),
-    ("""Avogadro constant""",  ( 6.02214129E23, 2.7E16, """mol^-1""")),
-    ("""Bohr magneton""",  ( 9.27400968E-24, 2.0E-31, """J T^-1""")),
-    ("""Bohr magneton in eV/T""",  ( 0.0000578838180660, 3.8E-14, """eV T^-1""")),
-    ("""Bohr magneton in Hz/T""",  ( 1.399624555E10, 310.0, """Hz T^-1""")),
-    ("""Bohr magneton in inverse meters per tesla""",  ( 46.68644980, 1.0E-6, """m^-1 T^-1""")),
-    ("""Bohr magneton in K/T""",  ( 0.67171388, 6.1E-7, """K T^-1""")),
-    ("""Bohr radius""",  ( 5.2917721092E-11, 1.7E-20, """m""")),
-    ("""Boltzmann constant""",  ( 1.3806488E-23, 1.3E-29, """J K^-1""")),
-    ("""Boltzmann constant in eV/K""",  ( 0.000086173324, 7.8E-11, """eV K^-1""")),
-    ("""Boltzmann constant in Hz/K""",  ( 2.0836618E10, 19000.0, """Hz K^-1""")),
-    ("""Boltzmann constant in inverse meters per kelvin""",  ( 69.503476, 0.000063, """m^-1 K^-1""")),
-    ("""characteristic impedance of vacuum""",  ( 376.730313461, 0d, """ohm""")),
-    ("""classical electron radius""",  ( 2.8179403267E-15, 2.7E-24, """m""")),
-    ("""Compton wavelength""",  ( 2.4263102389E-12, 1.6E-21, """m""")),
-    ("""Compton wavelength over 2 pi""",  ( 3.86159268E-13, 2.5E-22, """m""")),
-    ("""conductance quantum""",  ( 0.0000774809173460, 2.5E-14, """S""")),
-    ("""conventional value of Josephson constant""",  ( 4.835979E14, 0d, """Hz V^-1""")),
-    ("""conventional value of von Klitzing constant""",  ( 25812.807, 0d, """ohm""")),
-    ("""Cu x unit""",  ( 1.00207697E-13, 2.8E-20, """m""")),
-    ("""deuteron-electron mag. mom. ratio""",  ( -0.0004664345537, 3.9E-12, """""")),
-    ("""deuteron-electron mass ratio""",  ( 3670.48296520, 1.5E-6, """""")),
-    ("""deuteron g factor""",  ( 0.8574382308, 7.2E-9, """""")),
-    ("""deuteron mag. mom.""",  ( 4.33073489E-27, 1.0E-34, """J T^-1""")),
-    ("""deuteron mag. mom. to Bohr magneton ratio""",  ( 0.0004669754556, 3.9E-12, """""")),
-    ("""deuteron mag. mom. to nuclear magneton ratio""",  ( 0.8574382308, 7.2E-9, """""")),
-    ("""deuteron mass""",  ( 3.34358348E-27, 1.5E-34, """kg""")),
-    ("""deuteron mass energy equivalent""",  ( 3.00506297E-10, 1.3E-17, """J""")),
-    ("""deuteron mass energy equivalent in MeV""",  ( 1875.612859, 0.000041, """MeV""")),
-    ("""deuteron mass in u""",  ( 2.0135532127120, 7.7E-11, """u""")),
-    ("""deuteron molar mass""",  ( 0.0020135532127120, 7.7E-14, """kg mol^-1""")),
-    ("""deuteron-neutron mag. mom. ratio""",  ( -0.44820652, 1.1E-7, """""")),
-    ("""deuteron-proton mag. mom. ratio""",  ( 0.3070122070, 2.4E-9, """""")),
-    ("""deuteron-proton mass ratio""",  ( 1.99900750097, 1.8E-10, """""")),
-    ("""deuteron rms charge radius""",  ( 2.1424E-15, 2.1E-18, """m""")),
-    ("""electric constant""",  ( 8.854187817E-12, 0d, """F m^-1""")),
-    ("""electron charge to mass quotient""",  ( -1.758820088E11, 3900.0, """C kg^-1""")),
-    ("""electron-deuteron mag. mom. ratio""",  ( -2143.923498, 0.000018, """""")),
-    ("""electron-deuteron mass ratio""",  ( 0.000272443710950, 1.1E-13, """""")),
-    ("""electron g factor""",  ( -2.002319304361530, 5.3E-13, """""")),
-    ("""electron gyromag. ratio""",  ( 1.760859708E11, 3900.0, """s^-1 T^-1""")),
-    ("""electron gyromag. ratio over 2 pi""",  ( 28024.95266, 0.00062, """MHz T^-1""")),
-    ("""electron-helion mass ratio""",  ( 0.000181954307610, 1.7E-13, """""")),
-    ("""electron mag. mom.""",  ( -9.2847643E-24, 2.1E-31, """J T^-1""")),
-    ("""electron mag. mom. anomaly""",  ( 0.00115965218076, 2.7E-13, """""")),
-    ("""electron mag. mom. to Bohr magneton ratio""",  ( -1.001159652180760, 2.7E-13, """""")),
-    ("""electron mag. mom. to nuclear magneton ratio""",  ( -1838.28197090, 7.5E-7, """""")),
-    ("""electron mass""",  ( 9.10938291E-31, 4.0E-38, """kg""")),
-    ("""electron mass energy equivalent""",  ( 8.18710506E-14, 3.6E-21, """J""")),
+      ("""{220} lattice spacing of silicon""",
+       (1.920155714E-10, 3.2E-18, """m""")),
+      ("""alpha particle-electron mass ratio""",
+       (7294.29953610, 2.9E-6, """""")),
+      ("""alpha particle mass""", (6.64465675E-27, 2.9E-34, """kg""")),
+      ("""alpha particle mass energy equivalent""",
+       (5.97191967E-10, 2.6E-17, """J""")),
+      ("""alpha particle mass energy equivalent in MeV""",
+       (3727.379240, 0.000082, """MeV""")),
+      ("""alpha particle mass in u""", (4.0015061791250, 6.2E-11, """u""")),
+      ("""alpha particle molar mass""",
+       (0.0040015061791250, 6.2E-14, """kg mol^-1""")),
+      ("""alpha particle-proton mass ratio""",
+       (3.97259968933, 3.6E-10, """""")),
+      ("""Angstrom star""", (1.00001495E-10, 9.0E-17, """m""")),
+      ("""atomic mass constant""", (1.660538921E-27, 7.3E-35, """kg""")),
+      ("""atomic mass constant energy equivalent""",
+       (1.492417954E-10, 6.6E-18, """J""")),
+      ("""atomic mass constant energy equivalent in MeV""",
+       (931.4940610, 0.000021, """MeV""")),
+      ("""atomic mass unit-electron volt relationship""",
+       (9.31494061E8, 21.0, """eV""")),
+      ("""atomic mass unit-hartree relationship""",
+       (3.4231776845E7, 0.024, """E_h""")),
+      ("""atomic mass unit-hertz relationship""",
+       (2.2523427168E23, 1.6E14, """Hz""")),
+      ("""atomic mass unit-inverse meter relationship""",
+       (7.5130066042E14, 530000.0, """m^-1""")),
+      ("""atomic mass unit-joule relationship""",
+       (1.492417954E-10, 6.6E-18, """J""")),
+      ("""atomic mass unit-kelvin relationship""",
+       (1.08095408E13, 9.8E6, """K""")),
+      ("""atomic mass unit-kilogram relationship""",
+       (1.660538921E-27, 7.3E-35, """kg""")),
+      ("""atomic unit of 1st hyperpolarizability""",
+       (3.206361449E-53, 7.1E-61, """C^3 m^3 J^-2""")),
+      ("""atomic unit of 2nd hyperpolarizability""",
+       (6.23538054E-65, 2.8E-72, """C^4 m^4 J^-3""")),
+      ("""atomic unit of action""", (1.054571726E-34, 4.7E-42, """J s""")),
+      ("""atomic unit of charge""", (1.602176565E-19, 3.5E-27, """C""")),
+      ("""atomic unit of charge density""",
+       (1.081202338E12, 24000.0, """C m^-3""")),
+      ("""atomic unit of current""", (0.006623617950, 1.5E-10, """A""")),
+      ("""atomic unit of electric dipole mom.""",
+       (8.47835326E-30, 1.9E-37, """C m""")),
+      ("""atomic unit of electric field""",
+       (5.14220652E11, 11000.0, """V m^-1""")),
+      ("""atomic unit of electric field gradient""",
+       (9.717362E21, 2.1E14, """V m^-2""")),
+      ("""atomic unit of electric polarizability""",
+       (1.6487772754E-41, 1.6E-50, """C^2 m^2 J^-1""")),
+      ("""atomic unit of electric potential""",
+       (27.21138505, 6.0E-7, """V""")),
+      ("""atomic unit of electric quadrupole mom.""",
+       (4.486551331E-40, 9.9E-48, """C m^2""")),
+      ("""atomic unit of energy""", (4.35974434E-18, 1.9E-25, """J""")),
+      ("""atomic unit of force""", (8.23872278E-8, 3.6E-15, """N""")),
+      ("""atomic unit of length""", (5.2917721092E-11, 1.7E-20, """m""")),
+      ("""atomic unit of mag. dipole mom.""",
+       (1.854801936E-23, 4.1E-31, """J T^-1""")),
+      ("""atomic unit of mag. flux density""", (235051.7464, 0.0052, """T""")),
+      ("""atomic unit of magnetizability""",
+       (7.891036607E-29, 1.3E-37, """J T^-2""")),
+      ("""atomic unit of mass""", (9.10938291E-31, 4.0E-38, """kg""")),
+      ("""atomic unit of mom.um""",
+       (1.99285174E-24, 8.8E-32, """kg m s^-1""")),
+      ("""atomic unit of permittivity""", (1.112650056E-10, 0d, """F m^-1""")),
+      ("""atomic unit of time""", (2.418884326502E-17, 1.2E-28, """s""")),
+      ("""atomic unit of velocity""",
+       (2.18769126379E6, 0.00071, """m s^-1""")),
+      ("""Avogadro constant""", (6.02214129E23, 2.7E16, """mol^-1""")),
+      ("""Bohr magneton""", (9.27400968E-24, 2.0E-31, """J T^-1""")),
+      ("""Bohr magneton in eV/T""",
+       (0.0000578838180660, 3.8E-14, """eV T^-1""")),
+      ("""Bohr magneton in Hz/T""", (1.399624555E10, 310.0, """Hz T^-1""")),
+      ("""Bohr magneton in inverse meters per tesla""",
+       (46.68644980, 1.0E-6, """m^-1 T^-1""")),
+      ("""Bohr magneton in K/T""", (0.67171388, 6.1E-7, """K T^-1""")),
+      ("""Bohr radius""", (5.2917721092E-11, 1.7E-20, """m""")),
+      ("""Boltzmann constant""", (1.3806488E-23, 1.3E-29, """J K^-1""")),
+      ("""Boltzmann constant in eV/K""",
+       (0.000086173324, 7.8E-11, """eV K^-1""")),
+      ("""Boltzmann constant in Hz/K""",
+       (2.0836618E10, 19000.0, """Hz K^-1""")),
+      ("""Boltzmann constant in inverse meters per kelvin""",
+       (69.503476, 0.000063, """m^-1 K^-1""")),
+      ("""characteristic impedance of vacuum""",
+       (376.730313461, 0d, """ohm""")),
+      ("""classical electron radius""", (2.8179403267E-15, 2.7E-24, """m""")),
+      ("""Compton wavelength""", (2.4263102389E-12, 1.6E-21, """m""")),
+      ("""Compton wavelength over 2 pi""", (3.86159268E-13, 2.5E-22, """m""")),
+      ("""conductance quantum""", (0.0000774809173460, 2.5E-14, """S""")),
+      ("""conventional value of Josephson constant""",
+       (4.835979E14, 0d, """Hz V^-1""")),
+      ("""conventional value of von Klitzing constant""",
+       (25812.807, 0d, """ohm""")),
+      ("""Cu x unit""", (1.00207697E-13, 2.8E-20, """m""")),
+      ("""deuteron-electron mag. mom. ratio""",
+       (-0.0004664345537, 3.9E-12, """""")),
+      ("""deuteron-electron mass ratio""", (3670.48296520, 1.5E-6, """""")),
+      ("""deuteron g factor""", (0.8574382308, 7.2E-9, """""")),
+      ("""deuteron mag. mom.""", (4.33073489E-27, 1.0E-34, """J T^-1""")),
+      ("""deuteron mag. mom. to Bohr magneton ratio""",
+       (0.0004669754556, 3.9E-12, """""")),
+      ("""deuteron mag. mom. to nuclear magneton ratio""",
+       (0.8574382308, 7.2E-9, """""")),
+      ("""deuteron mass""", (3.34358348E-27, 1.5E-34, """kg""")),
+      ("""deuteron mass energy equivalent""",
+       (3.00506297E-10, 1.3E-17, """J""")),
+      ("""deuteron mass energy equivalent in MeV""",
+       (1875.612859, 0.000041, """MeV""")),
+      ("""deuteron mass in u""", (2.0135532127120, 7.7E-11, """u""")),
+      ("""deuteron molar mass""",
+       (0.0020135532127120, 7.7E-14, """kg mol^-1""")),
+      ("""deuteron-neutron mag. mom. ratio""", (-0.44820652, 1.1E-7, """""")),
+      ("""deuteron-proton mag. mom. ratio""", (0.3070122070, 2.4E-9, """""")),
+      ("""deuteron-proton mass ratio""", (1.99900750097, 1.8E-10, """""")),
+      ("""deuteron rms charge radius""", (2.1424E-15, 2.1E-18, """m""")),
+      ("""electric constant""", (8.854187817E-12, 0d, """F m^-1""")),
+      ("""electron charge to mass quotient""",
+       (-1.758820088E11, 3900.0, """C kg^-1""")),
+      (
+          """electron-deuteron mag. mom. ratio""",
+          (-2143.923498, 0.000018, """""")),
+      (
+          """electron-deuteron mass ratio""",
+          (0.000272443710950, 1.1E-13, """""")),
+      ("""electron g factor""", (-2.002319304361530, 5.3E-13, """""")),
+      ("""electron gyromag. ratio""",
+       (1.760859708E11, 3900.0, """s^-1 T^-1""")),
+      ("""electron gyromag. ratio over 2 pi""",
+       (28024.95266, 0.00062, """MHz T^-1""")),
+      ("""electron-helion mass ratio""", (0.000181954307610, 1.7E-13, """""")),
+      ("""electron mag. mom.""", (-9.2847643E-24, 2.1E-31, """J T^-1""")),
+      ("""electron mag. mom. anomaly""", (0.00115965218076, 2.7E-13, """""")),
+      (
+          """electron mag. mom. to Bohr magneton ratio""",
+          (-1.001159652180760, 2.7E-13, """""")),
+      ("""electron mag. mom. to nuclear magneton ratio""",
+       (-1838.28197090, 7.5E-7, """""")),
+      ("""electron mass""", (9.10938291E-31, 4.0E-38, """kg""")),
+      ("""electron mass energy equivalent""", (8.18710506E-14, 3.6E-21, """J""")),
     ("""electron mass energy equivalent in MeV""",  ( 0.5109989280, 1.1E-8, """MeV""")),
     ("""electron mass in u""",  ( 0.000548579909460, 2.2E-13, """u""")),
     ("""electron molar mass""",  ( 5.4857990946E-7, 2.2E-16, """kg mol^-1""")),

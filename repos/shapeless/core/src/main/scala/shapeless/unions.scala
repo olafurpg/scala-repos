@@ -24,34 +24,35 @@ import scala.reflect.macros.whitebox
 object union {
   import syntax.UnionOps
 
-  implicit def unionOps[C <: Coproduct](u : C) : UnionOps[C] = new UnionOps(u)
+  implicit def unionOps[C <: Coproduct](u: C): UnionOps[C] = new UnionOps(u)
 
   /**
-   * Discriminated unions encoded as `Coproducts` of their value types intersected with
-   * the singleton types of their keys.
-   *
-   * Union types may be written using a relatively concise syntax thanks to a trick
-   * due to Denys Shabalin (@den_sh) and Eugene Burmako (@xeno_by). We use a
-   * combination of `selectDynamic` and backticks to embed a type in a path which
-   * appears to the compiler as stable,
-   *
-   * {{{
-   * type Xyz = Union.`'x -> Int, 'y -> String, 'z -> Boolean`.T
-   * }}}
-   *
-   * The use of singleton-typed `Symbols` as keys would make this type extremely
-   * laborious to write out by hand.
-   *
-   * There is also a mechanism for creating values of union types using Scala's
-   * named argument syntax. Values of the type just defined can be created as follows,
-   *
-   * {{{
-   * val y = Union[Xyz](y = "foo")
-   * y.get('y) // == Some("foo")
-   * }}}
-   */
+    * Discriminated unions encoded as `Coproducts` of their value types intersected with
+    * the singleton types of their keys.
+    *
+    * Union types may be written using a relatively concise syntax thanks to a trick
+    * due to Denys Shabalin (@den_sh) and Eugene Burmako (@xeno_by). We use a
+    * combination of `selectDynamic` and backticks to embed a type in a path which
+    * appears to the compiler as stable,
+    *
+    * {{{
+    * type Xyz = Union.`'x -> Int, 'y -> String, 'z -> Boolean`.T
+    * }}}
+    *
+    * The use of singleton-typed `Symbols` as keys would make this type extremely
+    * laborious to write out by hand.
+    *
+    * There is also a mechanism for creating values of union types using Scala's
+    * named argument syntax. Values of the type just defined can be created as follows,
+    *
+    * {{{
+    * val y = Union[Xyz](y = "foo")
+    * y.get('y) // == Some("foo")
+    * }}}
+    */
   object Union extends Dynamic {
-    def applyDynamicNamed[U <: Coproduct](method: String)(elems: Any*): U = macro UnionMacros.mkUnionNamedImpl[U]
+    def applyDynamicNamed[U <: Coproduct](method: String)(elems: Any*): U = macro UnionMacros
+      .mkUnionNamedImpl[U]
 
     def selectDynamic(tpeSelector: String): Any = macro LabelledMacros.unionTypeImpl
   }
@@ -65,9 +66,10 @@ class UnionMacros(val c: whitebox.Context) {
 
   val fieldTypeTpe = typeOf[FieldType[_, _]].typeConstructor
   val SymTpe = typeOf[scala.Symbol]
-  val atatTpe = typeOf[tag.@@[_,_]].typeConstructor
+  val atatTpe = typeOf[tag.@@[_, _]].typeConstructor
 
-  def mkUnionNamedImpl[U <: Coproduct : WeakTypeTag](method: Tree)(elems: Tree*): Tree = {
+  def mkUnionNamedImpl[U <: Coproduct : WeakTypeTag](method: Tree)(
+      elems: Tree*): Tree = {
     def mkSingletonSymbolType(c: Constant): Type =
       appliedType(atatTpe, List(SymTpe, constantType(c)))
 
@@ -78,21 +80,24 @@ class UnionMacros(val c: whitebox.Context) {
       q"$value.asInstanceOf[${mkFieldTpe(keyTpe, value.tpe)}]"
 
     def promoteElem(elem: Tree): Tree = elem match {
-      case q""" $prefix(${Literal(k: Constant)}, $v) """ => mkElem(mkSingletonSymbolType(k), v)
+      case q""" $prefix(${ Literal(k: Constant) }, $v) """ =>
+        mkElem(mkSingletonSymbolType(k), v)
       case _ =>
-        c.abort(c.enclosingPosition, s"$elem has the wrong shape for a record field")
+        c.abort(c.enclosingPosition,
+                s"$elem has the wrong shape for a record field")
     }
 
-    val q"${methodString: String}" = method
-    if(methodString != "apply")
-      c.abort(c.enclosingPosition, s"this method must be called as 'apply' not '$methodString'")
+    val q"${ methodString: String }" = method
+    if (methodString != "apply")
+      c.abort(c.enclosingPosition,
+              s"this method must be called as 'apply' not '$methodString'")
 
-    val elem =
-      elems match {
-        case Seq(e) => e
-        case _ =>
-          c.abort(c.enclosingPosition, s"only one branch of a union may be inhabited")
-      }
+    val elem = elems match {
+      case Seq(e) => e
+      case _ =>
+        c.abort(c.enclosingPosition,
+                s"only one branch of a union may be inhabited")
+    }
 
     q""" _root_.shapeless.Coproduct[${weakTypeOf[U]}](${promoteElem(elem)}) """
   }

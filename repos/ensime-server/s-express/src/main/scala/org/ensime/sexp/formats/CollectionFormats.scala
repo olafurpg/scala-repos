@@ -4,15 +4,15 @@ package org.ensime.sexp.formats
 
 import collection.generic.CanBuildFrom
 import collection.breakOut
-import collection.{ immutable => im }
+import collection.{immutable => im}
 
 import org.ensime.sexp._
 import scala.collection.GenMap
 import scala.collection.GenTraversable
 
 /**
- * Support for anything with a `CanBuildFrom`.
- */
+  * Support for anything with a `CanBuildFrom`.
+  */
 trait CollectionFormats {
   this: BasicFormats =>
 
@@ -55,10 +55,9 @@ trait CollectionFormats {
    trick under the hood.
    */
   implicit def genTraversableFormat[T[_], E](
-    implicit
-    evidence: T[E] <:< GenTraversable[E],
-    cbf: CanBuildFrom[T[E], E, T[E]],
-    ef: SexpFormat[E]
+      implicit evidence: T[E] <:< GenTraversable[E],
+      cbf: CanBuildFrom[T[E], E, T[E]],
+      ef: SexpFormat[E]
   ): SexpFormat[T[E]] = new SexpFormat[T[E]] {
     def write(t: T[E]) = SexpList(t.map(_.toSexp)(breakOut): List[Sexp])
 
@@ -76,61 +75,62 @@ trait CollectionFormats {
    hierarchy.
    */
   implicit def genMapFormat[M[_, _], K, V](
-    implicit
-    ev: M[K, V] <:< GenMap[K, V],
-    cbf: CanBuildFrom[M[K, V], (K, V), M[K, V]],
-    kf: SexpFormat[K],
-    vf: SexpFormat[V]
+      implicit ev: M[K, V] <:< GenMap[K, V],
+      cbf: CanBuildFrom[M[K, V], (K, V), M[K, V]],
+      kf: SexpFormat[K],
+      vf: SexpFormat[V]
   ): SexpFormat[M[K, V]] = new SexpFormat[M[K, V]] {
     def write(m: M[K, V]) =
-      SexpList(m.map {
+      SexpList(
+          m.map {
         case (k, v) => SexpList(k.toSexp, v.toSexp)
       }(breakOut): List[Sexp])
 
     def read(v: Sexp): M[K, V] = v match {
       case SexpNil => cbf().result()
-      case SexpList(els) => els.map {
-        case SexpList(sk :: sv :: Nil) => (sk.convertTo[K], sv.convertTo[V])
-        case x => deserializationError(x)
-      }(breakOut)
+      case SexpList(els) =>
+        els.map {
+          case SexpList(sk :: sv :: Nil) => (sk.convertTo[K], sv.convertTo[V])
+          case x => deserializationError(x)
+        }(breakOut)
       case x => deserializationError(x)
     }
   }
 
   /**
-   * We only support deserialisation via `im.BitSet` as the general
-   * case requires going through a proxy to convert the bitmask into
-   * elements that can be read via `CanBuildFrom`. If you have your
-   * own (possibly compressed) implementation of `BitSet` you will
-   * need to provide your own format.
-   *
-   * We encode the `BigInt` form as a String using emacs `calc-eval`
-   * notation (radix is part of the string). See `ViaBigDecimalFormat`
-   * for a longer discussion about emacs number formats.
-   *
-   * This can potentially be used in Emacs using the following (which
-   * will parse the strings into big ints every time it is queried, so
-   * it's not particularly efficient):
-   *
-   *   (require 'calc)
-   *   (defmath bitsetAnd (bitset i)
-   *     (logand (lsh 1 i (+ 1 i)) bitset (+ 1 i)))
-   *   (defun bitsetContains (bitset i)
-   *     (not (string= "0"
-   *       (calc-eval "bitsetAnd($, $$)" 'num bitset i))))
-   *
-   *   (bitsetContains "10#3" 0) ; 't
-   *   (bitsetContains "10#3" 1) ; 't
-   *   (bitsetContains "10#3" 2) ; nil
-   *   (bitsetContains "32#10000000000000001" 0) ; t
-   *   (bitsetContains "16#10000000000000001" 64) ; t
-   *   (bitsetContains "16#10000000000000002" 1) ; t
-   *   (bitsetContains "16#10000000000000002" 64) ; t
-   *   (bitsetContains "16#10000000000000002" 0) ; nil
-   */
+    * We only support deserialisation via `im.BitSet` as the general
+    * case requires going through a proxy to convert the bitmask into
+    * elements that can be read via `CanBuildFrom`. If you have your
+    * own (possibly compressed) implementation of `BitSet` you will
+    * need to provide your own format.
+    *
+    * We encode the `BigInt` form as a String using emacs `calc-eval`
+    * notation (radix is part of the string). See `ViaBigDecimalFormat`
+    * for a longer discussion about emacs number formats.
+    *
+    * This can potentially be used in Emacs using the following (which
+    * will parse the strings into big ints every time it is queried, so
+    * it's not particularly efficient):
+    *
+    *   (require 'calc)
+    *   (defmath bitsetAnd (bitset i)
+    *     (logand (lsh 1 i (+ 1 i)) bitset (+ 1 i)))
+    *   (defun bitsetContains (bitset i)
+    *     (not (string= "0"
+    *       (calc-eval "bitsetAnd($, $$)" 'num bitset i))))
+    *
+    *   (bitsetContains "10#3" 0) ; 't
+    *   (bitsetContains "10#3" 1) ; 't
+    *   (bitsetContains "10#3" 2) ; nil
+    *   (bitsetContains "32#10000000000000001" 0) ; t
+    *   (bitsetContains "16#10000000000000001" 64) ; t
+    *   (bitsetContains "16#10000000000000002" 1) ; t
+    *   (bitsetContains "16#10000000000000002" 64) ; t
+    *   (bitsetContains "16#10000000000000002" 0) ; nil
+    */
   implicit object BitSetFormat extends SexpFormat[collection.BitSet] {
     private val Radix = 16
-    private val CalcEval = "(\\d+)#(\\d+)"r
+    private val CalcEval = "(\\d+)#(\\d+)" r
 
     def write(bs: collection.BitSet) =
       if (bs.isEmpty) SexpNil
@@ -160,9 +160,9 @@ trait CollectionFormats {
   private val inclusive = SexpSymbol(":inclusive")
   implicit object RangeFormat extends SexpFormat[im.Range] {
     def write(r: im.Range) = SexpData(
-      start -> SexpNumber(r.start),
-      end -> SexpNumber(r.end),
-      step -> SexpNumber(r.step)
+        start -> SexpNumber(r.start),
+        end -> SexpNumber(r.end),
+        step -> SexpNumber(r.step)
     )
 
     def read(s: Sexp) = s match {
@@ -179,30 +179,32 @@ trait CollectionFormats {
   // note that the type has to be im.NumericRange[E]
   // not im.NumericRange.{Inclusive, Exclusive}[E]
   // (same problem as above, but getting the cons is trickier)
-  implicit def numericRangeFormat[E](implicit
-    nf: SexpFormat[E],
-    n: Numeric[E],
-    int: Integral[E]): SexpFormat[im.NumericRange[E]] = new SexpFormat[im.NumericRange[E]] {
-    def write(r: im.NumericRange[E]) = SexpData(
-      start -> r.start.toSexp,
-      end -> r.end.toSexp,
-      step -> r.step.toSexp,
-      inclusive -> BooleanFormat.write(r.isInclusive)
-    )
+  implicit def numericRangeFormat[E](
+      implicit nf: SexpFormat[E],
+      n: Numeric[E],
+      int: Integral[E]): SexpFormat[im.NumericRange[E]] =
+    new SexpFormat[im.NumericRange[E]] {
+      def write(r: im.NumericRange[E]) = SexpData(
+          start -> r.start.toSexp,
+          end -> r.end.toSexp,
+          step -> r.step.toSexp,
+          inclusive -> BooleanFormat.write(r.isInclusive)
+      )
 
-    def read(s: Sexp): im.NumericRange[E] = s match {
-      case SexpData(data) =>
-        (data(start), data(end), data(step), data(inclusive)) match {
-          case (s, e, st, incl) if BooleanFormat.read(incl) =>
-            im.NumericRange.inclusive(
-              s.convertTo[E], e.convertTo[E], st.convertTo[E]
-            )
-          case (s, e, st, incl) =>
-            im.NumericRange(s.convertTo[E], e.convertTo[E], st.convertTo[E])
-          case _ => deserializationError(s)
-        }
-      case _ => deserializationError(s)
+      def read(s: Sexp): im.NumericRange[E] = s match {
+        case SexpData(data) =>
+          (data(start), data(end), data(step), data(inclusive)) match {
+            case (s, e, st, incl) if BooleanFormat.read(incl) =>
+              im.NumericRange.inclusive(
+                  s.convertTo[E],
+                  e.convertTo[E],
+                  st.convertTo[E]
+              )
+            case (s, e, st, incl) =>
+              im.NumericRange(s.convertTo[E], e.convertTo[E], st.convertTo[E])
+            case _ => deserializationError(s)
+          }
+        case _ => deserializationError(s)
+      }
     }
-  }
-
 }

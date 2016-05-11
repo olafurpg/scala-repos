@@ -49,7 +49,8 @@ object LevenshteinDistance extends MetricSpace[String, Int] with Serializable {
 }
 
 trait StringInstances0 {
-  implicit def levenshteinDistance: MetricSpace[String, Int] = LevenshteinDistance
+  implicit def levenshteinDistance: MetricSpace[String, Int] =
+    LevenshteinDistance
 }
 
 trait StringInstances extends StringInstances0 {

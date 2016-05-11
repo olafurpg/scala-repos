@@ -4,8 +4,8 @@ import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.frame
 
 /**
- * An implementation of a mux framer using netty3 pipelines.
- */
+  * An implementation of a mux framer using netty3 pipelines.
+  */
 private[finagle] object Netty3Framer extends ChannelPipelineFactory {
 
   private val maxFrameLength = 0x7FFFFFFF
@@ -15,22 +15,23 @@ private[finagle] object Netty3Framer extends ChannelPipelineFactory {
   private val initialBytesToStrip = 4
 
   /**
-   * Frame a netty3 ChannelBuffer in accordance to the mux spec.
-   * That is, a mux frame is a 4-byte length encoded set of bytes.
-   */
+    * Frame a netty3 ChannelBuffer in accordance to the mux spec.
+    * That is, a mux frame is a 4-byte length encoded set of bytes.
+    */
   private class Framer extends SimpleChannelHandler {
-    val dec = new frame.LengthFieldBasedFrameDecoder(
-      maxFrameLength,
-      lengthFieldOffset,
-      lengthFieldLength,
-      lengthAdjustment,
-      initialBytesToStrip)
+    val dec = new frame.LengthFieldBasedFrameDecoder(maxFrameLength,
+                                                     lengthFieldOffset,
+                                                     lengthFieldLength,
+                                                     lengthAdjustment,
+                                                     initialBytesToStrip)
     val enc = new frame.LengthFieldPrepender(lengthFieldLength)
 
-    override def handleUpstream(ctx: ChannelHandlerContext, e: ChannelEvent): Unit =
+    override def handleUpstream(
+        ctx: ChannelHandlerContext, e: ChannelEvent): Unit =
       dec.handleUpstream(ctx, e)
 
-    override def handleDownstream(ctx: ChannelHandlerContext, e: ChannelEvent): Unit =
+    override def handleDownstream(
+        ctx: ChannelHandlerContext, e: ChannelEvent): Unit =
       enc.handleDownstream(ctx, e)
   }
 

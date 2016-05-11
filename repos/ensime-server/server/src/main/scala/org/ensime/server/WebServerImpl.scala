@@ -14,12 +14,12 @@ class WebServerImpl(
     project: ActorRef,
     broadcaster: ActorRef
 )(
-    implicit
-    val config: EnsimeConfig,
+    implicit val config: EnsimeConfig,
     val system: ActorSystem,
     val mat: Materializer,
     val timeout: Timeout
-) extends WebServer with DocJarReading {
+)
+    extends WebServer with DocJarReading {
   import system.dispatcher
 
   private def handleRpc(in: Any): Future[EnsimeServerMessage] = in match {
@@ -36,5 +36,4 @@ class WebServerImpl(
   def websocketHandler(target: ActorRef): ActorRef = {
     system.actorOf(ConnectionHandler(project, broadcaster, target))
   }
-
 }

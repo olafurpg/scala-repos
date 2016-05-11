@@ -12,14 +12,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import scala.collection.Seq
 
 /**
- * @author Alexander Podkhalyuzin
- * Date: 06.03.2008
- */
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
+class ScMethodCallImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScMethodCall {
+  def getInvokedExpr: ScExpression =
+    findChildByClassScala(classOf[ScExpression])
 
-class ScMethodCallImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScMethodCall {
-  def getInvokedExpr: ScExpression = findChildByClassScala(classOf[ScExpression])
-
-  def argumentExpressions: Seq[ScExpression] = if (args != null) args.exprs else Nil
+  def argumentExpressions: Seq[ScExpression] =
+    if (args != null) args.exprs else Nil
 
   override def getEffectiveInvokedExpr: ScExpression = {
     findChildByClassScala(classOf[ScExpression]) match {

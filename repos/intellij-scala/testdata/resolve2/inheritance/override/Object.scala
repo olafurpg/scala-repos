@@ -5,5 +5,5 @@ class C1 {
 class C2 extends C1 {
   object O
 
-  println(/* resolved: false */ O.getClass)
+  println( /* resolved: false */ O.getClass)
 }

@@ -11,18 +11,18 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.logging.Logger
 
 /**
- * ClockedDrainer is a thread which keeps track of the garbage collector and
- * guesses when it will pause.
- *
- * @param coord controls how long we sleep for
- * @param forceGc forces a gc on invocation
- * @param space represents the current state of the JVM's heap
- * @param rSnooper keeps track of request rate vis a vis heap allocations
- * @param log is used for logging, will be removed later
- * @param lr is used for logging things in a pretty way
- * @param statsReceiver keeps track of the stats
- * @param verbose whether the logging should be verbose or not
- */
+  * ClockedDrainer is a thread which keeps track of the garbage collector and
+  * guesses when it will pause.
+  *
+  * @param coord controls how long we sleep for
+  * @param forceGc forces a gc on invocation
+  * @param space represents the current state of the JVM's heap
+  * @param rSnooper keeps track of request rate vis a vis heap allocations
+  * @param log is used for logging, will be removed later
+  * @param lr is used for logging things in a pretty way
+  * @param statsReceiver keeps track of the stats
+  * @param verbose whether the logging should be verbose or not
+  */
 // NB: this is a mess, but it's actually fairly straightforward.
 // There are four stages, wrapped in an infinite loop.
 // The stages are:
@@ -31,18 +31,19 @@ import java.util.logging.Logger
 // GC
 // Undrain
 private[finagle] class ClockedDrainer(
-  coord: Coordinator,
-  forceGc: () => Unit,
-  space: MemorySpace,
-  rSnooper: RequestSnooper,
-  log: Logger,
-  lr: LogsReceiver = NullLogsReceiver,
-  statsReceiver: StatsReceiver = NullStatsReceiver,
-  verbose: Boolean = false
-) extends Thread("GcDrainer") with Lessor {
+    coord: Coordinator,
+    forceGc: () => Unit,
+    space: MemorySpace,
+    rSnooper: RequestSnooper,
+    log: Logger,
+    lr: LogsReceiver = NullLogsReceiver,
+    statsReceiver: StatsReceiver = NullStatsReceiver,
+    verbose: Boolean = false
+)
+    extends Thread("GcDrainer") with Lessor {
 
-  private[this] val lessees = Collections.newSetFromMap(
-    new ConcurrentHashMap[Lessee, java.lang.Boolean])
+  private[this] val lessees =
+    Collections.newSetFromMap(new ConcurrentHashMap[Lessee, java.lang.Boolean])
 
   private[this] val requestCount = new AtomicInteger(0)
   private[this] val narrival = new AtomicInteger(0)
@@ -87,14 +88,15 @@ private[finagle] class ClockedDrainer(
       }
     }
 
-    val discountGauge = statsReceiver.addGauge("discount") { space.discount().inBytes.toFloat }
+    val discountGauge = statsReceiver.addGauge("discount") {
+      space.discount().inBytes.toFloat
+    }
   }
 
   def npending() = {
     var s = 0
     val iter = lessees.iterator()
-    while (iter.hasNext)
-      s += iter.next().npending()
+    while (iter.hasNext) s += iter.next().npending()
     s
   }
 
@@ -135,7 +137,8 @@ private[finagle] class ClockedDrainer(
   start()
 
   // READY
-  private[lease] def ready(init: () => Duration) { // private[lease] for testing
+  private[lease] def ready(init: () => Duration) {
+    // private[lease] for testing
     lr.record("gate_open_ms", init().inMilliseconds.toString)
     coord.gateCycle()
 
@@ -143,11 +146,8 @@ private[finagle] class ClockedDrainer(
 
     coord.sleepUntilDiscountRemaining(space, { () =>
       if (verbose) {
-        log.info("AWAIT-DISCOUNT: discount="+space.discount()+
-          "; clock="+coord.counter +
-          "; space="+space
-
-        )
+        log.info("AWAIT-DISCOUNT: discount=" + space.discount() + "; clock=" +
+            coord.counter + "; space=" + space)
       }
 
       // discount (bytes) / rate (bytes / second) == expiry (seconds)
@@ -156,7 +156,8 @@ private[finagle] class ClockedDrainer(
   }
 
   // DRAINING
-  private[lease] def drain() { // private[lease] for testing
+  private[lease] def drain() {
+    // private[lease] for testing
     val sinceClosed = Stopwatch.start()
     startDraining()
     finishDraining()
@@ -175,19 +176,17 @@ private[finagle] class ClockedDrainer(
 
   private[this] def issueAll(duration: Duration) {
     val iter = lessees.iterator()
-    while (iter.hasNext)
-      iter.next().issue(duration)
+    while (iter.hasNext) iter.next().issue(duration)
   }
 
   private[this] def finishDraining() {
     val maxWait = calculateMaxWait
 
     if (verbose) {
-      log.info("AWAIT-DRAIN: n="+npending()+
-        "; clock="+coord.counter+
-        "; space="+space+
-        "; maxWaitMs="+maxWait.inMilliseconds+
-        "; minDiscount="+space.minDiscount)
+      log.info(
+          "AWAIT-DRAIN: n=" + npending() + "; clock=" + coord.counter +
+          "; space=" + space + "; maxWaitMs=" + maxWait.inMilliseconds +
+          "; minDiscount=" + space.minDiscount)
     }
 
     coord.sleepUntilFinishedDraining(space, maxWait, npending, log)
@@ -195,13 +194,16 @@ private[finagle] class ClockedDrainer(
 
   // GC
   // loop until the gc is acknowledged
-  private[lease] def gc(generation: Long, init: () => Duration) { // private[lease] for testing
+  private[lease] def gc(generation: Long, init: () => Duration) {
+    // private[lease] for testing
     val elapsedGc = Stopwatch.start()
 
     forcedGc = 0
     if (coord.counter.info.generation() == generation) {
       val n = npending()
-      if (verbose) log.info("FORCE-GC: n="+n+"; clock="+coord.counter+"; space="+space)
+      if (verbose)
+        log.info("FORCE-GC: n=" + n + "; clock=" + coord.counter + "; space=" +
+            space)
 
       lr.record("byteLeft", coord.counter.info.remaining().inBytes.toString)
 
@@ -226,7 +228,8 @@ private[finagle] class ClockedDrainer(
   }
 
   // UNDRAINING
-  private[lease] def undrain() { // private[lease] for testing
+  private[lease] def undrain() {
+    // private[lease] for testing
     stats.closedTime.add(closedFor().inMilliseconds)
     openFor = Stopwatch.start()
     closedFor = NilStopwatch.start()
@@ -265,57 +268,59 @@ private[finagle] class ClockedDrainer(
   }
 }
 
-
-object drainerDiscountRange extends GlobalFlag(
-  (50.megabytes, 600.megabytes), "Range of discount")
+object drainerDiscountRange
+    extends GlobalFlag((50.megabytes, 600.megabytes), "Range of discount")
 
 object drainerPercentile extends GlobalFlag(95, "GC drainer cutoff percentile")
 
 object drainerDebug extends GlobalFlag(false, "GC drainer debug log (verbose)")
 object drainerEnabled extends GlobalFlag(false, "GC drainer enabled")
 
-object nackOnExpiredLease extends GlobalFlag(false, "nack when the lease has expired")
+object nackOnExpiredLease
+    extends GlobalFlag(false, "nack when the lease has expired")
 
 private[finagle] object ClockedDrainer {
   private[this] val log = Logger.getLogger("ClockedDrainer")
-  private[this] val lr = if (drainerDebug()) new DedupingLogsReceiver(log) else NullLogsReceiver
+  private[this] val lr =
+    if (drainerDebug()) new DedupingLogsReceiver(log) else NullLogsReceiver
 
-  lazy val flagged: Lessor = if (drainerEnabled()) {
-    Coordinator.create() match {
-      case None =>
-        log.warning("Failed to acquire a ParNew+CMS Coordinator; cannot "+
-          "construct drainer")
-        Lessor.nil
-      case Some(coord) =>
-        val rSnooper = new RequestSnooper(
-          coord.counter,
-          drainerPercentile().toDouble / 100.0,
-          lr
-        )
+  lazy val flagged: Lessor =
+    if (drainerEnabled()) {
+      Coordinator.create() match {
+        case None =>
+          log.warning("Failed to acquire a ParNew+CMS Coordinator; cannot " +
+              "construct drainer")
+          Lessor.nil
+        case Some(coord) =>
+          val rSnooper = new RequestSnooper(
+              coord.counter,
+              drainerPercentile().toDouble / 100.0,
+              lr
+          )
 
-        val (min, max) = drainerDiscountRange()
-        assert(min < max)
+          val (min, max) = drainerDiscountRange()
+          assert(min < max)
 
-        val space = new MemorySpace(
-          coord.counter.info,
-          min,
-          max,
-          rSnooper,
-          lr
-        )
+          val space = new MemorySpace(
+              coord.counter.info,
+              min,
+              max,
+              rSnooper,
+              lr
+          )
 
-        new ClockedDrainer(
-          coord,
-          GarbageCollector.forceNewGc,
-          space,
-          rSnooper,
-          log,
-          lr,
-          DefaultStatsReceiver.scope("gcdrainer")
-        )
+          new ClockedDrainer(
+              coord,
+              GarbageCollector.forceNewGc,
+              space,
+              rSnooper,
+              log,
+              lr,
+              DefaultStatsReceiver.scope("gcdrainer")
+          )
+      }
+    } else {
+      log.info("Drainer is disabled; bypassing")
+      Lessor.nil
     }
-  } else {
-    log.info("Drainer is disabled; bypassing")
-    Lessor.nil
-  }
 }

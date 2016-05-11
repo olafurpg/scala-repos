@@ -1,7 +1,7 @@
 import scala.sys.process._
 import scala.util.Try
-import scala.util.Properties.{ javaHome, javaClassPath }
-import java.io.{ File, IOException }
+import scala.util.Properties.{javaHome, javaClassPath}
+import java.io.{File, IOException}
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit._
 import java.util.concurrent.atomic._
@@ -17,27 +17,27 @@ object Test {
     catch { case _ => () }
     println("Success")
   }
-  */
+   */
 
   // Show that no uncaught exceptions are thrown on spawned I/O threads
   // when the process is destroyed.  The default handler will print
   // stack traces in the failing case.
   def main(args: Array[String]) {
-    if (args.nonEmpty && args(0) == "data")
-      data()
-    else
-      test()          // args(0) == "jvm"
+    if (args.nonEmpty && args(0) == "data") data()
+    else test() // args(0) == "jvm"
   }
 
   // fork the data spewer, wait for input, then destroy the process
   def test() {
-    val f = new File(javaHome, "bin").listFiles.sorted filter (_.getName startsWith "java") find (_.canExecute) getOrElse {
-      // todo signal test runner that test is skipped
-      new File("/bin/ls")  // innocuous
-    }
+    val f =
+      new File(javaHome, "bin").listFiles.sorted filter
+      (_.getName startsWith "java") find (_.canExecute) getOrElse {
+        // todo signal test runner that test is skipped
+        new File("/bin/ls") // innocuous
+      }
     //Process(f.getAbsolutePath).run(ProcessLogger { _ => () }).destroy
     val reading = new CountDownLatch(1)
-    val count   = new AtomicInteger
+    val count = new AtomicInteger
     def counted = count.get
     val command = s"${f.getAbsolutePath} -classpath ${javaClassPath} Test data"
     Try {
@@ -58,7 +58,6 @@ object Test {
   // spew something
   def data() {
     def filler = "." * 100
-    for (i <- 1 to 1000)
-      Console println s"Outputting data line $i $filler"
+    for (i <- 1 to 1000) Console println s"Outputting data line $i $filler"
   }
 }

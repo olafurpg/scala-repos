@@ -1,3 +1,3 @@
 object A {
-	def x: List[String] = List("3")
+  def x: List[String] = List("3")
 }

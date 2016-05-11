@@ -14,22 +14,24 @@ package breeze.util
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-*/
-
+ */
 
 import scala.util.hashing.MurmurHash3
 import java.util
 
 /**
- * A BloomFilter is an approximate set that sometimes gives false positives. That is,
- * if bf(x) returns true, then it might have been added to the set. If it returns false, then
- * it definitely has not. This is useful for caching and approximation.
- *
- * @author dlwh
- */
+  * A BloomFilter is an approximate set that sometimes gives false positives. That is,
+  * if bf(x) returns true, then it might have been added to the set. If it returns false, then
+  * it definitely has not. This is useful for caching and approximation.
+  *
+  * @author dlwh
+  */
 @SerialVersionUID(1L)
-class BloomFilter[@specialized(Int, Long) T](val numBuckets: Int, val numHashFunctions: Int, val bits: util.BitSet) extends (T=>Boolean) with Serializable {
-  def this(numBuckets: Int, numHashFunctions: Int) = this(numBuckets, numHashFunctions, new util.BitSet(numBuckets))
+class BloomFilter[@specialized(Int, Long) T](
+    val numBuckets: Int, val numHashFunctions: Int, val bits: util.BitSet)
+    extends (T => Boolean) with Serializable {
+  def this(numBuckets: Int, numHashFunctions: Int) =
+    this(numBuckets, numHashFunctions, new util.BitSet(numBuckets))
   def this(numBuckets: Int) = this(numBuckets, 3)
 
   def activeBuckets(key: T) = {
@@ -52,16 +54,17 @@ class BloomFilter[@specialized(Int, Long) T](val numBuckets: Int, val numHashFun
   def contains(o: T) = apply(o)
 
   /**
-   *
-   * Calculates the load of the bloom filter. If this is near 1, there will be lots of false positives.
-   *
-   * @return the fraction of bits that are set
-   */
+    *
+    * Calculates the load of the bloom filter. If this is near 1, there will be lots of false positives.
+    *
+    * @return the fraction of bits that are set
+    */
   def load: Double = bits.cardinality().toDouble / numBuckets
 
   override def equals(other: Any) = other match {
     case that: BloomFilter[_] =>
-      this.numBuckets == that.numBuckets && this.numHashFunctions == that.numHashFunctions && this.bits == that.bits
+      this.numBuckets == that.numBuckets &&
+      this.numHashFunctions == that.numHashFunctions && this.bits == that.bits
     case _ => false
   }
 
@@ -72,33 +75,36 @@ class BloomFilter[@specialized(Int, Long) T](val numBuckets: Int, val numHashFun
 
   def &(that: BloomFilter[T]) = {
     checkCompatibility(that)
-    new BloomFilter[T](this.numBuckets, this.numHashFunctions, this.bits & that.bits)
+    new BloomFilter[T](
+        this.numBuckets, this.numHashFunctions, this.bits & that.bits)
   }
 
-
   private def checkCompatibility(that: BloomFilter[T]) {
-    require(that.numBuckets == this.numBuckets, "Must have the same number of buckets to intersect")
-    require(that.numHashFunctions == this.numHashFunctions, "Must have the same number of hash functions to intersect")
+    require(that.numBuckets == this.numBuckets,
+            "Must have the same number of buckets to intersect")
+    require(that.numHashFunctions == this.numHashFunctions,
+            "Must have the same number of hash functions to intersect")
   }
 
   def |(that: BloomFilter[T]) = {
     checkCompatibility(that)
-    new BloomFilter[T](this.numBuckets, this.numHashFunctions, this.bits | that.bits)
+    new BloomFilter[T](
+        this.numBuckets, this.numHashFunctions, this.bits | that.bits)
   }
 
-  def |=(that: BloomFilter[T]):this.type = {
+  def |=(that: BloomFilter[T]): this.type = {
     checkCompatibility(that)
     this.bits |= that.bits
     this
   }
 
-  def &=(that: BloomFilter[T]):this.type = {
+  def &=(that: BloomFilter[T]): this.type = {
     checkCompatibility(that)
     this.bits &= that.bits
     this
   }
 
-  def &~=(that: BloomFilter[T]):this.type = {
+  def &~=(that: BloomFilter[T]): this.type = {
     checkCompatibility(that)
     this.bits &~= that.bits
     this
@@ -106,27 +112,28 @@ class BloomFilter[@specialized(Int, Long) T](val numBuckets: Int, val numHashFun
 
   def &~(that: BloomFilter[T]) = {
     checkCompatibility(that)
-    new BloomFilter[T](this.numBuckets, this.numHashFunctions, this.bits &~ that.bits)
+    new BloomFilter[T](
+        this.numBuckets, this.numHashFunctions, this.bits &~ that.bits)
   }
-
 }
 
-
 object BloomFilter {
+
   /**
-   * Returns the optimal number of buckets  (m) and hash functions (k)
-   *
-   * The formula is:
-   * {{{
-   * val m = ceil(-(n * log(p)) / log(pow(2.0, log(2.0))))
-   * val k = round(log(2.0) * m / n)
-   * }}}
-   *
-   * @param expectedNumItems
-   * @param falsePositiveRate
-   * @return
-   */
-  def optimalSize(expectedNumItems: Double, falsePositiveRate: Double): (Int, Int) = {
+    * Returns the optimal number of buckets  (m) and hash functions (k)
+    *
+    * The formula is:
+    * {{{
+    * val m = ceil(-(n * log(p)) / log(pow(2.0, log(2.0))))
+    * val k = round(log(2.0) * m / n)
+    * }}}
+    *
+    * @param expectedNumItems
+    * @param falsePositiveRate
+    * @return
+    */
+  def optimalSize(
+      expectedNumItems: Double, falsePositiveRate: Double): (Int, Int) = {
     val n = expectedNumItems
     val p = falsePositiveRate
     import scala.math._
@@ -136,13 +143,14 @@ object BloomFilter {
   }
 
   /**
-   * Returns a BloomFilter that is optimally sized for the expected number of inputs and false positive rate
-   * @param expectedNumItems
-   * @param falsePositiveRate
-   * @tparam T
-   * @return
-   */
-  def optimallySized[T](expectedNumItems: Double, falsePositiveRate: Double): BloomFilter[T] = {
+    * Returns a BloomFilter that is optimally sized for the expected number of inputs and false positive rate
+    * @param expectedNumItems
+    * @param falsePositiveRate
+    * @tparam T
+    * @return
+    */
+  def optimallySized[T](
+      expectedNumItems: Double, falsePositiveRate: Double): BloomFilter[T] = {
     val (buckets, funs) = optimalSize(expectedNumItems, falsePositiveRate)
     new BloomFilter(buckets, funs)
   }

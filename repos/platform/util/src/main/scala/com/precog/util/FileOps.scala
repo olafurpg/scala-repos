@@ -46,11 +46,14 @@ object FilesystemFileOps extends FileOps {
   def rename(src: File, dest: File) = IO { src.renameTo(dest) }
   def moveDir(src: File, dest: File) = IO {
     if (!src.isDirectory) {
-      throw new IOException("Source for moveDir (%s) is not a directory".format(src))
+      throw new IOException(
+          "Source for moveDir (%s) is not a directory".format(src))
     }
 
     if (!dest.getParentFile.isDirectory) {
-      throw new IOException("Destination parent for moveDir (%s) is not a directory".format(dest))
+      throw new IOException(
+          "Destination parent for moveDir (%s) is not a directory".format(
+              dest))
     }
 
     Files.move(src, dest)
@@ -65,6 +68,4 @@ object FilesystemFileOps extends FileOps {
 
   def mkdir(dir: File): IO[Boolean] = IO { dir.mkdirs() }
 }
-
-
 // vim: set ts=4 sw=4 et:

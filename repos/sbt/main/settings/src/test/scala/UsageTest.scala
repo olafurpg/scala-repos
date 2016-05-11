@@ -2,7 +2,7 @@ package sbt
 package std
 
 import sbt.internal.util.complete
-import sbt.internal.util.complete.{ DefaultParsers, Parsers }
+import sbt.internal.util.complete.{DefaultParsers, Parsers}
 
 /*object UseTask
 {
@@ -20,8 +20,8 @@ import sbt.internal.util.complete.{ DefaultParsers, Parsers }
 }*/
 object Assign {
   import java.io.File
-  import Def.{ inputKey, settingKey, taskKey }
-  import Def.{ Initialize, macroValueT, parserToInput }
+  import Def.{inputKey, settingKey, taskKey}
+  import Def.{Initialize, macroValueT, parserToInput}
   //	import UseTask.{x,y,z,a,set,plain}
 
   val ak = taskKey[Int]("a")
@@ -53,16 +53,19 @@ object Assign {
 		bk ++= Seq(z.value)
 	)*/
 
-  val zz = Def.task { mk.value + tk.value + mk.value + tk.value + mk.value + tk.value + mk.value + tk.value + mk.value + tk.value + mk.value + tk.value }
+  val zz = Def.task {
+    mk.value + tk.value + mk.value + tk.value + mk.value + tk.value +
+    mk.value + tk.value + mk.value + tk.value + mk.value + tk.value
+  }
 
   import DefaultParsers._
   val p = Def.setting { name.value ~> Space ~> ID }
   val is = Seq(
-    mk := 3,
-    name := "asdf",
-    tk := (math.random * 1000).toInt,
-    isk := dummys.value.parsed // should not compile: cannot use a task to define the parser
-  //		ik := { if( tsk.parsed.value == "blue") tk.value else mk.value }
+      mk := 3,
+      name := "asdf",
+      tk := (math.random * 1000).toInt,
+      isk := dummys.value.parsed // should not compile: cannot use a task to define the parser
+      //		ik := { if( tsk.parsed.value == "blue") tk.value else mk.value }
   )
 
   val it1 = Def.inputTask {

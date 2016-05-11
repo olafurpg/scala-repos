@@ -1,7 +1,7 @@
 package lila.qa
 
 import lila.security.Granter
-import lila.user.{ User, UserContext }
+import lila.user.{User, UserContext}
 import org.joda.time.DateTime
 
 object QaAuth {
@@ -16,13 +16,15 @@ object QaAuth {
 
   def canAsk(implicit ctx: UserContext) = noKid(noTroll(isNotN00b))
 
-  def canAnswer(q: Question)(implicit ctx: UserContext) = noKid(noTroll(isNotN00b))
+  def canAnswer(q: Question)(implicit ctx: UserContext) =
+    noKid(noTroll(isNotN00b))
 
   def canVote(implicit ctx: UserContext) = noKid(noTroll(isNotN00b))
 
   def canComment(implicit ctx: UserContext) = noKid(noTroll(isNotN00b))
 
-  private def noKid(res: => Boolean)(implicit ctx: UserContext) = ctx.noKid && res
+  private def noKid(res: => Boolean)(implicit ctx: UserContext) =
+    ctx.noKid && res
 
   private def noTroll(block: User => Boolean)(implicit ctx: UserContext) =
     ctx.me.filterNot(_.troll) ?? block

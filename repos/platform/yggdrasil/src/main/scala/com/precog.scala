@@ -19,7 +19,7 @@
  */
 package com.precog
 
-import scalaz.{Order,Ordering}
+import scalaz.{Order, Ordering}
 import scalaz.effect.IO
 import scalaz.Ordering._
 import scalaz.std.anyVal._
@@ -47,7 +47,8 @@ package object yggdrasil {
     def apply(id: Identities, sv: SValue): SEvent = (id, sv)
   }
 
-  def prefixIdentityOrdering(ids1: Identities, ids2: Identities, prefixLength: Int): Ordering = {
+  def prefixIdentityOrdering(
+      ids1: Identities, ids2: Identities, prefixLength: Int): Ordering = {
     var result: Ordering = EQ
     var i = 0
     while (i < prefixLength && (result eq EQ)) {
@@ -58,15 +59,18 @@ package object yggdrasil {
     result
   }
 
-  def fullIdentityOrdering(ids1: Identities, ids2: Identities) = prefixIdentityOrdering(ids1, ids2, ids1.length min ids2.length)
+  def fullIdentityOrdering(ids1: Identities, ids2: Identities) =
+    prefixIdentityOrdering(ids1, ids2, ids1.length min ids2.length)
 
   object IdentitiesOrder extends Order[Identities] {
-    def order(ids1: Identities, ids2: Identities) = fullIdentityOrdering(ids1, ids2)
+    def order(ids1: Identities, ids2: Identities) =
+      fullIdentityOrdering(ids1, ids2)
   }
 
   def prefixIdentityOrder(prefixLength: Int): Order[Identities] = {
     new Order[Identities] {
-      def order(ids1: Identities, ids2: Identities) = prefixIdentityOrdering(ids1, ids2, prefixLength)
+      def order(ids1: Identities, ids2: Identities) =
+        prefixIdentityOrdering(ids1, ids2, prefixLength)
     }
   }
 
@@ -85,25 +89,29 @@ package object yggdrasil {
     }
   }
 
-  def tupledIdentitiesOrder[A](idOrder: Order[Identities] = IdentitiesOrder): Order[(Identities, A)] =
+  def tupledIdentitiesOrder[A](
+      idOrder: Order[Identities] = IdentitiesOrder): Order[(Identities, A)] =
     idOrder.contramap((_: (Identities, A))._1)
 
-  def identityValueOrder[A](idOrder: Order[Identities] = IdentitiesOrder)(implicit ord: Order[A]): Order[(Identities, A)] = new Order[(Identities, A)] {
-    type IA = (Identities, A)
-    def order(x: IA, y: IA): Ordering = {
-      val idComp = idOrder.order(x._1, y._1)
-      if (idComp == EQ) {
-        ord.order(x._2, y._2)
-      } else idComp
+  def identityValueOrder[A](idOrder: Order[Identities] = IdentitiesOrder)(
+      implicit ord: Order[A]): Order[(Identities, A)] =
+    new Order[(Identities, A)] {
+      type IA = (Identities, A)
+      def order(x: IA, y: IA): Ordering = {
+        val idComp = idOrder.order(x._1, y._1)
+        if (idComp == EQ) {
+          ord.order(x._2, y._2)
+        } else idComp
+      }
     }
-  }
 
-  def valueOrder[A](implicit ord: Order[A]): Order[(Identities, A)] = new Order[(Identities, A)] {
-    type IA = (Identities, A)
-    def order(x: IA, y: IA): Ordering = {
-      ord.order(x._2, y._2)
+  def valueOrder[A](implicit ord: Order[A]): Order[(Identities, A)] =
+    new Order[(Identities, A)] {
+      type IA = (Identities, A)
+      def order(x: IA, y: IA): Ordering = {
+        ord.order(x._2, y._2)
+      }
     }
-  }
 }
 
 // vim: set ts=4 sw=4 et:

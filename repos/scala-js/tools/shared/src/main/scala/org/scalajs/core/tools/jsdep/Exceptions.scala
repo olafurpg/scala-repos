@@ -3,17 +3,18 @@ package org.scalajs.core.tools.jsdep
 abstract class DependencyException(msg: String) extends Exception(msg)
 
 class MissingDependencyException(
-  val originatingLib: FlatJSDependency,
-  val missingLib: String
-) extends DependencyException(
-  s"The JS dependency ${originatingLib.relPath} declared " +
-  s"from ${originatingLib.origin} has an unmet transitive " +
-  s"dependency $missingLib")
+    val originatingLib: FlatJSDependency,
+    val missingLib: String
+)
+    extends DependencyException(
+        s"The JS dependency ${originatingLib.relPath} declared " +
+        s"from ${originatingLib.origin} has an unmet transitive " +
+        s"dependency $missingLib")
 
 class CyclicDependencyException(
-  val participants: List[ResolutionInfo]
-) extends DependencyException(
-  CyclicDependencyException.mkMsg(participants))
+    val participants: List[ResolutionInfo]
+)
+    extends DependencyException(CyclicDependencyException.mkMsg(participants))
 
 private object CyclicDependencyException {
   private def mkMsg(parts: List[ResolutionInfo]) = {
@@ -38,9 +39,9 @@ private object CyclicDependencyException {
 }
 
 class ConflictingNameException(
-  val participants: List[FlatJSDependency]
-) extends DependencyException(
-  ConflictingNameException.mkMsg(participants))
+    val participants: List[FlatJSDependency]
+)
+    extends DependencyException(ConflictingNameException.mkMsg(participants))
 
 private object ConflictingNameException {
   private def mkMsg(parts: List[FlatJSDependency]) = {
@@ -57,9 +58,10 @@ private object ConflictingNameException {
 }
 
 class ConflictingMinifiedJSException(
-  val participants: List[FlatJSDependency]
-) extends DependencyException(
-  ConflictingMinifiedJSException.mkMsg(participants))
+    val participants: List[FlatJSDependency]
+)
+    extends DependencyException(
+        ConflictingMinifiedJSException.mkMsg(participants))
 
 private object ConflictingMinifiedJSException {
   private def mkMsg(parts: List[FlatJSDependency]) = {
@@ -80,7 +82,8 @@ class JSLibResolveException(val problems: List[JSLibResolveException.Problem])
 
 object JSLibResolveException {
   final class Problem(val resourceName: String,
-      val possiblePaths: List[String], val origins: List[Origin]) {
+                      val possiblePaths: List[String],
+                      val origins: List[Origin]) {
     def isMissing: Boolean = possiblePaths.isEmpty
     def isAmbiguous: Boolean = possiblePaths.nonEmpty
   }
@@ -92,10 +95,10 @@ object JSLibResolveException {
       if (p.isMissing) {
         msg.append(s"- Missing JS library: ${p.resourceName}\n")
       } else {
-        msg.append(s"- Ambiguous reference to a JS library: ${p.resourceName}\n")
+        msg.append(
+            s"- Ambiguous reference to a JS library: ${p.resourceName}\n")
         msg.append("  Possible paths found on the classpath:\n")
-        for (relPath <- p.possiblePaths)
-          msg.append(s"  - $relPath\n")
+        for (relPath <- p.possiblePaths) msg.append(s"  - $relPath\n")
       }
       msg.append(s"  originating from: ${p.origins.mkString(", ")}\n")
     }

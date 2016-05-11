@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,9 +33,9 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-
 object Sphere {
-  implicit def sfxSphere2jfx(s: Sphere): jfxss.Sphere = if (s != null) s.delegate else null
+  implicit def sfxSphere2jfx(s: Sphere): jfxss.Sphere =
+    if (s != null) s.delegate else null
 }
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/shape/Sphere.html]].
@@ -43,14 +43,14 @@ object Sphere {
   * Creates a new instance of Sphere of radius of 1.0.
   */
 class Sphere(override val delegate: jfxss.Sphere = new jfxss.Sphere())
-  extends Shape3D(delegate)
-  with SFXDelegate[jfxss.Sphere] {
+    extends Shape3D(delegate) with SFXDelegate[jfxss.Sphere] {
 
   /** Creates a new instance of Sphere of a given radius. */
   def this(radius: Double) = this(new jfxss.Sphere(radius))
 
   /** Creates a new instance of Sphere of a given radius and number of divisions. */
-  def this(radius: Double, divisions: Int) = this(new jfxss.Sphere(radius, divisions))
+  def this(radius: Double, divisions: Int) =
+    this(new jfxss.Sphere(radius, divisions))
 
   def divisions: Int = delegate.getDivisions
 

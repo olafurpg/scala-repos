@@ -7,8 +7,10 @@ package akka.http.impl.util
 import akka.util.ByteString
 
 /**
- * INTERNAL API
- */
-private[http] class EnhancedByteStringTraversableOnce(val byteStrings: TraversableOnce[ByteString]) extends AnyVal {
+  * INTERNAL API
+  */
+private[http] class EnhancedByteStringTraversableOnce(
+    val byteStrings: TraversableOnce[ByteString])
+    extends AnyVal {
   def join: ByteString = byteStrings.foldLeft(ByteString.empty)(_ ++ _)
 }

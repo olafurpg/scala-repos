@@ -11,10 +11,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.Type
 import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.02.2008
+  */
 /*
  *  ValDef ::= PatDef |
  *             ids ':' Type '=' '_'
@@ -38,8 +37,7 @@ object VarDef {
             builder error "type declaration expected"
           }
           hasTypeDcl = true
-        }
-        else {
+        } else {
           valDefMarker.rollbackTo
           return false
         }
@@ -52,9 +50,9 @@ object VarDef {
             case ScalaTokenTypes.tUNDER => builder.advanceLexer
             //Ate _
             case _ => {
-              valDefMarker.rollbackTo
-              return false
-            }
+                valDefMarker.rollbackTo
+                return false
+              }
           }
           valDefMarker.drop
           return true

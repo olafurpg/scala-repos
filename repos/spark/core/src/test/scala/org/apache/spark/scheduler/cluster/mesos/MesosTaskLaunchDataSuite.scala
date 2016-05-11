@@ -27,7 +27,8 @@ class MesosTaskLaunchDataSuite extends SparkFunSuite {
     (Range(100, 110).map(serializedTask.putInt(_)))
     serializedTask.rewind
     val attemptNumber = 100
-    val byteString = MesosTaskLaunchData(serializedTask, attemptNumber).toByteString
+    val byteString =
+      MesosTaskLaunchData(serializedTask, attemptNumber).toByteString
     serializedTask.rewind
     val mesosTaskLaunchData = MesosTaskLaunchData.fromByteString(byteString)
     assert(mesosTaskLaunchData.attemptNumber == attemptNumber)

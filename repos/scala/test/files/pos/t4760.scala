@@ -1,4 +1,3 @@
-
 class Test {
   // parses
   def f1 = {
@@ -12,7 +11,7 @@ class Test {
     import scala._
   }
   def f2b = {
-    import scala.collection.mutable.{ Map => MMap }
+    import scala.collection.mutable.{Map => MMap}
   }
   def f(): Unit = {
     locally {

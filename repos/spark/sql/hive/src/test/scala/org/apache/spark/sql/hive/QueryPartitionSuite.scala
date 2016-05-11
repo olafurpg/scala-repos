@@ -25,41 +25,46 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.util.Utils
 
-class QueryPartitionSuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
+class QueryPartitionSuite
+    extends QueryTest with SQLTestUtils with TestHiveSingleton {
   import hiveContext.implicits._
 
   test("SPARK-5068: query data when path doesn't exist") {
     withSQLConf((SQLConf.HIVE_VERIFY_PARTITION_PATH.key, "true")) {
-      val testData = sparkContext.parallelize(
-        (1 to 10).map(i => TestData(i, i.toString))).toDF()
+      val testData = sparkContext
+        .parallelize((1 to 10).map(i => TestData(i, i.toString)))
+        .toDF()
       testData.registerTempTable("testData")
 
       val tmpDir = Files.createTempDir()
       // create the table for test
       sql(s"CREATE TABLE table_with_partition(key int,value string) " +
-        s"PARTITIONED by (ds string) location '${tmpDir.toURI.toString}' ")
+          s"PARTITIONED by (ds string) location '${tmpDir.toURI.toString}' ")
       sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='1') " +
-        "SELECT key,value FROM testData")
+          "SELECT key,value FROM testData")
       sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='2') " +
-        "SELECT key,value FROM testData")
+          "SELECT key,value FROM testData")
       sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='3') " +
-        "SELECT key,value FROM testData")
+          "SELECT key,value FROM testData")
       sql("INSERT OVERWRITE TABLE table_with_partition  partition (ds='4') " +
-        "SELECT key,value FROM testData")
+          "SELECT key,value FROM testData")
 
       // test for the exist path
-      checkAnswer(sql("select key,value from table_with_partition"),
-        testData.toDF.collect ++ testData.toDF.collect
-          ++ testData.toDF.collect ++ testData.toDF.collect)
+      checkAnswer(
+          sql("select key,value from table_with_partition"),
+          testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect)
 
       // delete the path of one partition
-      tmpDir.listFiles
-        .find { f => f.isDirectory && f.getName().startsWith("ds=") }
-        .foreach { f => Utils.deleteRecursively(f) }
+      tmpDir.listFiles.find { f =>
+        f.isDirectory && f.getName().startsWith("ds=")
+      }.foreach { f =>
+        Utils.deleteRecursively(f)
+      }
 
       // test for after delete the path
-      checkAnswer(sql("select key,value from table_with_partition"),
-        testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect)
+      checkAnswer(
+          sql("select key,value from table_with_partition"),
+          testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect)
 
       sql("DROP TABLE table_with_partition")
       sql("DROP TABLE createAndInsertTest")

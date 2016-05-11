@@ -22,29 +22,31 @@ import scala.reflect.ClassTag
 import org.apache.spark.SparkConf
 
 /**
- * Component that selects which [[Serializer]] to use for shuffles.
- */
-private[spark] class SerializerManager(defaultSerializer: Serializer, conf: SparkConf) {
+  * Component that selects which [[Serializer]] to use for shuffles.
+  */
+private[spark] class SerializerManager(
+    defaultSerializer: Serializer, conf: SparkConf) {
 
   private[this] val kryoSerializer = new KryoSerializer(conf)
 
   private[this] val primitiveAndPrimitiveArrayClassTags: Set[ClassTag[_]] = {
     val primitiveClassTags = Set[ClassTag[_]](
-      ClassTag.Boolean,
-      ClassTag.Byte,
-      ClassTag.Char,
-      ClassTag.Double,
-      ClassTag.Float,
-      ClassTag.Int,
-      ClassTag.Long,
-      ClassTag.Null,
-      ClassTag.Short
+        ClassTag.Boolean,
+        ClassTag.Byte,
+        ClassTag.Char,
+        ClassTag.Double,
+        ClassTag.Float,
+        ClassTag.Int,
+        ClassTag.Long,
+        ClassTag.Null,
+        ClassTag.Short
     )
     val arrayClassTags = primitiveClassTags.map(_.wrap)
     primitiveClassTags ++ arrayClassTags
   }
 
-  private[this] val stringClassTag: ClassTag[String] = implicitly[ClassTag[String]]
+  private[this] val stringClassTag: ClassTag[String] =
+    implicitly[ClassTag[String]]
 
   private def canUseKryo(ct: ClassTag[_]): Boolean = {
     primitiveAndPrimitiveArrayClassTags.contains(ct) || ct == stringClassTag
@@ -59,9 +61,10 @@ private[spark] class SerializerManager(defaultSerializer: Serializer, conf: Spar
   }
 
   /**
-   * Pick the best serializer for shuffling an RDD of key-value pairs.
-   */
-  def getSerializer(keyClassTag: ClassTag[_], valueClassTag: ClassTag[_]): Serializer = {
+    * Pick the best serializer for shuffling an RDD of key-value pairs.
+    */
+  def getSerializer(
+      keyClassTag: ClassTag[_], valueClassTag: ClassTag[_]): Serializer = {
     if (canUseKryo(keyClassTag) && canUseKryo(valueClassTag)) {
       kryoSerializer
     } else {

@@ -8,14 +8,13 @@ import lila.common.PimpedConfig._
 import lila.hub.actorApi.forum._
 import lila.mod.ModlogApi
 
-final class Env(
-    config: Config,
-    db: lila.db.Env,
-    modLog: ModlogApi,
-    shutup: ActorSelection,
-    hub: lila.hub.Env,
-    detectLanguage: DetectLanguage,
-    system: ActorSystem) {
+final class Env(config: Config,
+                db: lila.db.Env,
+                modLog: ModlogApi,
+                shutup: ActorSelection,
+                hub: lila.hub.Env,
+                detectLanguage: DetectLanguage,
+                system: ActorSystem) {
 
   private val settings = new {
     val TopicMaxPerPage = config getInt "topic.max_per_page"
@@ -33,23 +32,21 @@ final class Env(
 
   lazy val categApi = new CategApi(env = this)
 
-  lazy val topicApi = new TopicApi(
-    env = this,
-    indexer = hub.actor.forumSearch,
-    maxPerPage = TopicMaxPerPage,
-    modLog = modLog,
-    shutup = shutup,
-    timeline = hub.actor.timeline,
-    detectLanguage = detectLanguage)
+  lazy val topicApi = new TopicApi(env = this,
+                                   indexer = hub.actor.forumSearch,
+                                   maxPerPage = TopicMaxPerPage,
+                                   modLog = modLog,
+                                   shutup = shutup,
+                                   timeline = hub.actor.timeline,
+                                   detectLanguage = detectLanguage)
 
-  lazy val postApi = new PostApi(
-    env = this,
-    indexer = hub.actor.forumSearch,
-    maxPerPage = PostMaxPerPage,
-    modLog = modLog,
-    shutup = shutup,
-    timeline = hub.actor.timeline,
-    detectLanguage = detectLanguage)
+  lazy val postApi = new PostApi(env = this,
+                                 indexer = hub.actor.forumSearch,
+                                 maxPerPage = PostMaxPerPage,
+                                 modLog = modLog,
+                                 shutup = shutup,
+                                 timeline = hub.actor.timeline,
+                                 detectLanguage = detectLanguage)
 
   lazy val forms = new DataForm(hub.actor.captcher)
   lazy val recent = new Recent(postApi, RecentTtl, RecentNb, PublicCategIds)
@@ -77,12 +74,14 @@ object Env {
 
   private def hub = lila.hub.Env.current
 
-  lazy val current = "forum" boot new Env(
-    config = lila.common.PlayApp loadConfig "forum",
-    db = lila.db.Env.current,
-    modLog = lila.mod.Env.current.logApi,
-    shutup = lila.hub.Env.current.actor.shutup,
-    hub = lila.hub.Env.current,
-    detectLanguage = DetectLanguage(lila.common.PlayApp loadConfig "detectlanguage"),
-    system = lila.common.PlayApp.system)
+  lazy val current =
+    "forum" boot new Env(
+        config = lila.common.PlayApp loadConfig "forum",
+        db = lila.db.Env.current,
+        modLog = lila.mod.Env.current.logApi,
+        shutup = lila.hub.Env.current.actor.shutup,
+        hub = lila.hub.Env.current,
+        detectLanguage = DetectLanguage(
+              lila.common.PlayApp loadConfig "detectlanguage"),
+        system = lila.common.PlayApp.system)
 }

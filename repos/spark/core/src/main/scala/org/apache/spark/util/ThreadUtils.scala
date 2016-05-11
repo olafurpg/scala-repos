@@ -31,68 +31,85 @@ private[spark] object ThreadUtils {
     ExecutionContext.fromExecutorService(MoreExecutors.sameThreadExecutor())
 
   /**
-   * An `ExecutionContextExecutor` that runs each task in the thread that invokes `execute/submit`.
-   * The caller should make sure the tasks running in this `ExecutionContextExecutor` are short and
-   * never block.
-   */
+    * An `ExecutionContextExecutor` that runs each task in the thread that invokes `execute/submit`.
+    * The caller should make sure the tasks running in this `ExecutionContextExecutor` are short and
+    * never block.
+    */
   def sameThread: ExecutionContextExecutor = sameThreadExecutionContext
 
   /**
-   * Create a thread factory that names threads with a prefix and also sets the threads to daemon.
-   */
+    * Create a thread factory that names threads with a prefix and also sets the threads to daemon.
+    */
   def namedThreadFactory(prefix: String): ThreadFactory = {
-    new ThreadFactoryBuilder().setDaemon(true).setNameFormat(prefix + "-%d").build()
+    new ThreadFactoryBuilder()
+      .setDaemon(true)
+      .setNameFormat(prefix + "-%d")
+      .build()
   }
 
   /**
-   * Wrapper over newCachedThreadPool. Thread names are formatted as prefix-ID, where ID is a
-   * unique, sequentially assigned integer.
-   */
+    * Wrapper over newCachedThreadPool. Thread names are formatted as prefix-ID, where ID is a
+    * unique, sequentially assigned integer.
+    */
   def newDaemonCachedThreadPool(prefix: String): ThreadPoolExecutor = {
     val threadFactory = namedThreadFactory(prefix)
-    Executors.newCachedThreadPool(threadFactory).asInstanceOf[ThreadPoolExecutor]
+    Executors
+      .newCachedThreadPool(threadFactory)
+      .asInstanceOf[ThreadPoolExecutor]
   }
 
   /**
-   * Create a cached thread pool whose max number of threads is `maxThreadNumber`. Thread names
-   * are formatted as prefix-ID, where ID is a unique, sequentially assigned integer.
-   */
+    * Create a cached thread pool whose max number of threads is `maxThreadNumber`. Thread names
+    * are formatted as prefix-ID, where ID is a unique, sequentially assigned integer.
+    */
   def newDaemonCachedThreadPool(
-      prefix: String, maxThreadNumber: Int, keepAliveSeconds: Int = 60): ThreadPoolExecutor = {
+      prefix: String,
+      maxThreadNumber: Int,
+      keepAliveSeconds: Int = 60): ThreadPoolExecutor = {
     val threadFactory = namedThreadFactory(prefix)
     val threadPool = new ThreadPoolExecutor(
-      maxThreadNumber, // corePoolSize: the max number of threads to create before queuing the tasks
-      maxThreadNumber, // maximumPoolSize: because we use LinkedBlockingDeque, this one is not used
-      keepAliveSeconds,
-      TimeUnit.SECONDS,
-      new LinkedBlockingQueue[Runnable],
-      threadFactory)
+        maxThreadNumber, // corePoolSize: the max number of threads to create before queuing the tasks
+        maxThreadNumber, // maximumPoolSize: because we use LinkedBlockingDeque, this one is not used
+        keepAliveSeconds,
+        TimeUnit.SECONDS,
+        new LinkedBlockingQueue[Runnable],
+        threadFactory)
     threadPool.allowCoreThreadTimeOut(true)
     threadPool
   }
 
   /**
-   * Wrapper over newFixedThreadPool. Thread names are formatted as prefix-ID, where ID is a
-   * unique, sequentially assigned integer.
-   */
-  def newDaemonFixedThreadPool(nThreads: Int, prefix: String): ThreadPoolExecutor = {
+    * Wrapper over newFixedThreadPool. Thread names are formatted as prefix-ID, where ID is a
+    * unique, sequentially assigned integer.
+    */
+  def newDaemonFixedThreadPool(
+      nThreads: Int, prefix: String): ThreadPoolExecutor = {
     val threadFactory = namedThreadFactory(prefix)
-    Executors.newFixedThreadPool(nThreads, threadFactory).asInstanceOf[ThreadPoolExecutor]
+    Executors
+      .newFixedThreadPool(nThreads, threadFactory)
+      .asInstanceOf[ThreadPoolExecutor]
   }
 
   /**
-   * Wrapper over newSingleThreadExecutor.
-   */
+    * Wrapper over newSingleThreadExecutor.
+    */
   def newDaemonSingleThreadExecutor(threadName: String): ExecutorService = {
-    val threadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat(threadName).build()
+    val threadFactory = new ThreadFactoryBuilder()
+      .setDaemon(true)
+      .setNameFormat(threadName)
+      .build()
     Executors.newSingleThreadExecutor(threadFactory)
   }
 
   /**
-   * Wrapper over ScheduledThreadPoolExecutor.
-   */
-  def newDaemonSingleThreadScheduledExecutor(threadName: String): ScheduledExecutorService = {
-    val threadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat(threadName).build()
+    * Wrapper over ScheduledThreadPoolExecutor.
+    */
+  def newDaemonSingleThreadScheduledExecutor(
+      threadName: String): ScheduledExecutorService = {
+    val threadFactory = new ThreadFactoryBuilder()
+      .setDaemon(true)
+      .setNameFormat(threadName)
+      .build()
     val executor = new ScheduledThreadPoolExecutor(1, threadFactory)
     // By default, a cancelled task is not automatically removed from the work queue until its delay
     // elapses. We have to enable it manually.
@@ -101,19 +118,18 @@ private[spark] object ThreadUtils {
   }
 
   /**
-   * Run a piece of code in a new thread and return the result. Exception in the new thread is
-   * thrown in the caller thread with an adjusted stack trace that removes references to this
-   * method for clarity. The exception stack traces will be like the following
-   *
-   * SomeException: exception-message
-   *   at CallerClass.body-method (sourcefile.scala)
-   *   at ... run in separate thread using org.apache.spark.util.ThreadUtils ... ()
-   *   at CallerClass.caller-method (sourcefile.scala)
-   *   ...
-   */
-  def runInNewThread[T](
-      threadName: String,
-      isDaemon: Boolean = true)(body: => T): T = {
+    * Run a piece of code in a new thread and return the result. Exception in the new thread is
+    * thrown in the caller thread with an adjusted stack trace that removes references to this
+    * method for clarity. The exception stack traces will be like the following
+    *
+    * SomeException: exception-message
+    *   at CallerClass.body-method (sourcefile.scala)
+    *   at ... run in separate thread using org.apache.spark.util.ThreadUtils ... ()
+    *   at CallerClass.caller-method (sourcefile.scala)
+    *   ...
+    */
+  def runInNewThread[T](threadName: String, isDaemon: Boolean = true)(
+      body: => T): T = {
     @volatile var exception: Option[Throwable] = None
     @volatile var result: T = null.asInstanceOf[T]
 
@@ -136,19 +152,25 @@ private[spark] object ThreadUtils {
         // Remove the part of the stack that shows method calls into this helper method
         // This means drop everything from the top until the stack element
         // ThreadUtils.runInNewThread(), and then drop that as well (hence the `drop(1)`).
-        val baseStackTrace = Thread.currentThread().getStackTrace().dropWhile(
-          ! _.getClassName.contains(this.getClass.getSimpleName)).drop(1)
+        val baseStackTrace = Thread
+          .currentThread()
+          .getStackTrace()
+          .dropWhile(!_.getClassName.contains(this.getClass.getSimpleName))
+          .drop(1)
 
         // Remove the part of the new thread stack that shows methods call from this helper method
         val extraStackTrace = realException.getStackTrace.takeWhile(
-          ! _.getClassName.contains(this.getClass.getSimpleName))
+            !_.getClassName.contains(this.getClass.getSimpleName))
 
         // Combine the two stack traces, with a place holder just specifying that there
         // was a helper method used, without any further details of the helper
         val placeHolderStackElem = new StackTraceElement(
-          s"... run in separate thread using ${ThreadUtils.getClass.getName.stripSuffix("$")} ..",
-          " ", "", -1)
-        val finalStackTrace = extraStackTrace ++ Seq(placeHolderStackElem) ++ baseStackTrace
+            s"... run in separate thread using ${ThreadUtils.getClass.getName.stripSuffix("$")} ..",
+            " ",
+            "",
+            -1)
+        val finalStackTrace =
+          extraStackTrace ++ Seq(placeHolderStackElem) ++ baseStackTrace
 
         // Update the stack trace and rethrow the exception in the caller thread
         realException.setStackTrace(finalStackTrace)
@@ -159,8 +181,8 @@ private[spark] object ThreadUtils {
   }
 
   /**
-   * Construct a new Scala ForkJoinPool with a specified max parallelism and name prefix.
-   */
+    * Construct a new Scala ForkJoinPool with a specified max parallelism and name prefix.
+    */
   def newForkJoinPool(prefix: String, maxThreadNumber: Int): SForkJoinPool = {
     // Custom factory to set thread names
     val factory = new SForkJoinPool.ForkJoinWorkerThreadFactory {
@@ -169,9 +191,10 @@ private[spark] object ThreadUtils {
           setName(prefix + "-" + super.getName)
         }
     }
-    new SForkJoinPool(maxThreadNumber, factory,
-      null, // handler
-      false // asyncMode
+    new SForkJoinPool(maxThreadNumber,
+                      factory,
+                      null, // handler
+                      false // asyncMode
     )
   }
 }

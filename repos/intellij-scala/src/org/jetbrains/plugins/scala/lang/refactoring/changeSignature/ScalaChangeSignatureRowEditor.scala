@@ -15,9 +15,11 @@ import com.intellij.util.ui.table.{JBTableRow, JBTableRowEditor}
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author Nikolay.Tropin
- */
-class ScalaChangeSignatureRowEditor(item: ScalaParameterTableModelItem, dialog: ScalaChangeSignatureDialog) extends JBTableRowEditor {
+  * @author Nikolay.Tropin
+  */
+class ScalaChangeSignatureRowEditor(
+    item: ScalaParameterTableModelItem, dialog: ScalaChangeSignatureDialog)
+    extends JBTableRowEditor {
 
   private val project = dialog.project
   private val fileType = dialog.getFileType
@@ -26,13 +28,19 @@ class ScalaChangeSignatureRowEditor(item: ScalaParameterTableModelItem, dialog: 
   private val separatorColor: Color = dialog.clauseSeparatorColor
 
   private val table = dialog.parametersTable
-  val typeDoc = PsiDocumentManager.getInstance(project).getDocument(item.typeCodeFragment)
-  val myTypeEditor: EditorTextField = new EditorTextField(typeDoc, project, fileType)
+  val typeDoc =
+    PsiDocumentManager.getInstance(project).getDocument(item.typeCodeFragment)
+  val myTypeEditor: EditorTextField = new EditorTextField(
+      typeDoc, project, fileType)
 
-  val myNameEditor: EditorTextField = new EditorTextField(item.parameter.getName, project, fileType)
-  val defaultValueDoc = PsiDocumentManager.getInstance(project).getDocument(item.defaultValueCodeFragment)
+  val myNameEditor: EditorTextField = new EditorTextField(
+      item.parameter.getName, project, fileType)
+  val defaultValueDoc = PsiDocumentManager
+    .getInstance(project)
+    .getDocument(item.defaultValueCodeFragment)
 
-  val myDefaultValueEditor = new EditorTextField(defaultValueDoc, project, fileType)
+  val myDefaultValueEditor = new EditorTextField(
+      defaultValueDoc, project, fileType)
 
   def prepareEditor(table: JTable, row: Int) {
     setLayout(new BorderLayout)
@@ -57,7 +65,8 @@ class ScalaChangeSignatureRowEditor(item: ScalaParameterTableModelItem, dialog: 
 
   def addTypeEditor() {
     myTypeEditor.addDocumentListener(signatureUpdater)
-    myTypeEditor.addDocumentListener(new DocumentAdapter {
+    myTypeEditor.addDocumentListener(
+        new DocumentAdapter {
       override def documentChanged(e: DocumentEvent): Unit = {
         item.typeText = myTypeEditor.getText
       }
@@ -67,24 +76,30 @@ class ScalaChangeSignatureRowEditor(item: ScalaParameterTableModelItem, dialog: 
   }
 
   def getColumnWidth(letters: Int): Int = {
-    val editorFont: Font = EditorColorsManager.getInstance.getGlobalScheme.getFont(EditorFontType.PLAIN)
+    val editorFont: Font = EditorColorsManager.getInstance.getGlobalScheme
+      .getFont(EditorFontType.PLAIN)
     val font = new Font(editorFont.getFontName, editorFont.getStyle, 12)
     letters * Toolkit.getDefaultToolkit.getFontMetrics(font).stringWidth("W")
   }
 
-  def getTypesColumnWidth: Int = getColumnWidth(dialog.getNamesMaxLength + 2 + dialog.getTypesMaxLength)
+  def getTypesColumnWidth: Int =
+    getColumnWidth(dialog.getNamesMaxLength + 2 + dialog.getTypesMaxLength)
 
   def getNamesColumnWidth: Int = getColumnWidth(dialog.getNamesMaxLength + 2)
 
   def addDefaultValueEditor(additionalPanel: JPanel) {
     myDefaultValueEditor.setPreferredWidth(table.getWidth / 2)
-    myDefaultValueEditor.addDocumentListener(new this.RowEditorChangeListener(2))
-    myDefaultValueEditor.addDocumentListener(new DocumentAdapter {
+    myDefaultValueEditor.addDocumentListener(
+        new this.RowEditorChangeListener(2))
+    myDefaultValueEditor.addDocumentListener(
+        new DocumentAdapter {
       override def documentChanged(e: DocumentEvent): Unit = {
         item.parameter.defaultValue = myDefaultValueEditor.getText.trim
       }
     })
-    additionalPanel.add(createLabeledPanel("Default value:", myDefaultValueEditor), BorderLayout.WEST)
+    additionalPanel.add(
+        createLabeledPanel("Default value:", myDefaultValueEditor),
+        BorderLayout.WEST)
   }
 
   def getValue: JBTableRow = {
@@ -107,7 +122,8 @@ class ScalaChangeSignatureRowEditor(item: ScalaParameterTableModelItem, dialog: 
     }
     val x: Double = me.getPoint.getX
     if (x <= getNamesColumnWidth) myNameEditor.getFocusTarget
-    else if (myDefaultValueEditor == null || x <= getTypesColumnWidth) myTypeEditor.getFocusTarget
+    else if (myDefaultValueEditor == null || x <= getTypesColumnWidth)
+      myTypeEditor.getFocusTarget
     else myDefaultValueEditor.getFocusTarget
   }
 

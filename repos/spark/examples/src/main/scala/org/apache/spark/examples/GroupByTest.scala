@@ -35,16 +35,19 @@ object GroupByTest {
 
     val sc = new SparkContext(sparkConf)
 
-    val pairs1 = sc.parallelize(0 until numMappers, numMappers).flatMap { p =>
-      val ranGen = new Random
-      var arr1 = new Array[(Int, Array[Byte])](numKVPairs)
-      for (i <- 0 until numKVPairs) {
-        val byteArr = new Array[Byte](valSize)
-        ranGen.nextBytes(byteArr)
-        arr1(i) = (ranGen.nextInt(Int.MaxValue), byteArr)
+    val pairs1 = sc
+      .parallelize(0 until numMappers, numMappers)
+      .flatMap { p =>
+        val ranGen = new Random
+        var arr1 = new Array[(Int, Array[Byte])](numKVPairs)
+        for (i <- 0 until numKVPairs) {
+          val byteArr = new Array[Byte](valSize)
+          ranGen.nextBytes(byteArr)
+          arr1(i) = (ranGen.nextInt(Int.MaxValue), byteArr)
+        }
+        arr1
       }
-      arr1
-    }.cache()
+      .cache()
     // Enforce that everything has been calculated and in cache
     pairs1.count()
 

@@ -9,12 +9,12 @@ object Test extends App {
                      "orange" -> 0xFF8040,
                      "brown" -> 0x804000)
     for (name <- List("red", "green", "blue", "turquoise")) println(
-      colors.get(name) match {
-        case Some(code) =>
-          name + " has code: " + code
-        case None =>
-          "Unknown color: " + name
-      }
+        colors.get(name) match {
+          case Some(code) =>
+            name + " has code: " + code
+          case None =>
+            "Unknown color: " + name
+        }
     )
   }.eval
 }

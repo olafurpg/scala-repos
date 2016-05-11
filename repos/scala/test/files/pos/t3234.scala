@@ -1,5 +1,5 @@
 trait Trait1 {
-  @inline final def foo2(n: Int) = n*n
+  @inline final def foo2(n: Int) = n * n
 }
 
 trait Trait2 {

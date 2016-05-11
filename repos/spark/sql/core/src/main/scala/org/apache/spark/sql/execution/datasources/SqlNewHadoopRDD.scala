@@ -40,10 +40,8 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.{SerializableConfiguration, ShutdownHookManager}
 
 private[spark] class SqlNewHadoopPartition(
-    rddId: Int,
-    val index: Int,
-    rawSplit: InputSplit with Writable)
-  extends SparkPartition {
+    rddId: Int, val index: Int, rawSplit: InputSplit with Writable)
+    extends SparkPartition {
 
   val serializableHadoopSplit = new SerializableWritable(rawSplit)
 
@@ -51,19 +49,19 @@ private[spark] class SqlNewHadoopPartition(
 }
 
 /**
- * An RDD that provides core functionality for reading data stored in Hadoop (e.g., files in HDFS,
- * sources in HBase, or S3), using the new MapReduce API (`org.apache.hadoop.mapreduce`).
- * It is based on [[org.apache.spark.rdd.NewHadoopRDD]]. It has three additions.
- * 1. A shared broadcast Hadoop Configuration.
- * 2. An optional closure `initDriverSideJobFuncOpt` that set configurations at the driver side
- *    to the shared Hadoop Configuration.
- * 3. An optional closure `initLocalJobFuncOpt` that set configurations at both the driver side
- *    and the executor side to the shared Hadoop Configuration.
- *
- * Note: This is RDD is basically a cloned version of [[org.apache.spark.rdd.NewHadoopRDD]] with
- * changes based on [[org.apache.spark.rdd.HadoopRDD]].
- */
-private[spark] class SqlNewHadoopRDD[V: ClassTag](
+  * An RDD that provides core functionality for reading data stored in Hadoop (e.g., files in HDFS,
+  * sources in HBase, or S3), using the new MapReduce API (`org.apache.hadoop.mapreduce`).
+  * It is based on [[org.apache.spark.rdd.NewHadoopRDD]]. It has three additions.
+  * 1. A shared broadcast Hadoop Configuration.
+  * 2. An optional closure `initDriverSideJobFuncOpt` that set configurations at the driver side
+  *    to the shared Hadoop Configuration.
+  * 3. An optional closure `initLocalJobFuncOpt` that set configurations at both the driver side
+  *    and the executor side to the shared Hadoop Configuration.
+  *
+  * Note: This is RDD is basically a cloned version of [[org.apache.spark.rdd.NewHadoopRDD]] with
+  * changes based on [[org.apache.spark.rdd.HadoopRDD]].
+  */
+private[spark] class SqlNewHadoopRDD[V : ClassTag](
     sqlContext: SQLContext,
     broadcastedConf: Broadcast[SerializableConfiguration],
     @transient private val initDriverSideJobFuncOpt: Option[Job => Unit],
@@ -116,36 +114,38 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
     val rawSplits = inputFormat.getSplits(jobContext).toArray
     val result = new Array[SparkPartition](rawSplits.size)
     for (i <- 0 until rawSplits.size) {
-      result(i) =
-        new SqlNewHadoopPartition(id, i, rawSplits(i).asInstanceOf[InputSplit with Writable])
+      result(i) = new SqlNewHadoopPartition(
+          id, i, rawSplits(i).asInstanceOf[InputSplit with Writable])
     }
     result
   }
 
   override def compute(
-    theSplit: SparkPartition,
-    context: TaskContext): Iterator[V] = {
+      theSplit: SparkPartition, context: TaskContext): Iterator[V] = {
     val iter = new Iterator[V] {
       val split = theSplit.asInstanceOf[SqlNewHadoopPartition]
       logInfo("Input split: " + split.serializableHadoopSplit)
       val conf = getConf(isDriverSide = false)
 
-      val inputMetrics = context.taskMetrics().registerInputMetrics(DataReadMethod.Hadoop)
+      val inputMetrics =
+        context.taskMetrics().registerInputMetrics(DataReadMethod.Hadoop)
       val existingBytesRead = inputMetrics.bytesRead
 
       // Sets the thread local variable for the file's name
       split.serializableHadoopSplit.value match {
-        case fs: FileSplit => SqlNewHadoopRDDState.setInputFileName(fs.getPath.toString)
+        case fs: FileSplit =>
+          SqlNewHadoopRDDState.setInputFileName(fs.getPath.toString)
         case _ => SqlNewHadoopRDDState.unsetInputFileName()
       }
 
       // Find a function that will return the FileSystem bytes read by this thread. Do this before
       // creating RecordReader, because RecordReader's constructor might read some bytes
-      val getBytesReadCallback: Option[() => Long] = split.serializableHadoopSplit.value match {
-        case _: FileSplit | _: CombineFileSplit =>
-              SparkHadoopUtil.get.getFSBytesReadOnThreadCallback()
-        case _ => None
-      }
+      val getBytesReadCallback: Option[() => Long] =
+        split.serializableHadoopSplit.value match {
+          case _: FileSplit | _: CombineFileSplit =>
+            SparkHadoopUtil.get.getFSBytesReadOnThreadCallback()
+          case _ => None
+        }
 
       // For Hadoop 2.5+, we get our input bytes from thread-local Hadoop FileSystem statistics.
       // If we do a coalesce, however, we are likely to compute multiple partitions in the same
@@ -163,7 +163,8 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
           configurable.setConf(conf)
         case _ =>
       }
-      val attemptId = new TaskAttemptID(jobTrackerId, id, TaskType.MAP, split.index, 0)
+      val attemptId = new TaskAttemptID(
+          jobTrackerId, id, TaskType.MAP, split.index, 0)
       val hadoopAttemptContext = new TaskAttemptContextImpl(conf, attemptId)
       private[this] var reader: RecordReader[Void, V] = null
 
@@ -173,10 +174,11 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
         * TODO: plumb this through a different way?
         */
       if (enableVectorizedParquetReader &&
-        format.getClass.getName == "org.apache.parquet.hadoop.ParquetInputFormat") {
-        val parquetReader: VectorizedParquetRecordReader = new VectorizedParquetRecordReader()
+          format.getClass.getName == "org.apache.parquet.hadoop.ParquetInputFormat") {
+        val parquetReader: VectorizedParquetRecordReader =
+          new VectorizedParquetRecordReader()
         if (!parquetReader.tryInitialize(
-            split.serializableHadoopSplit.value, hadoopAttemptContext)) {
+                split.serializableHadoopSplit.value, hadoopAttemptContext)) {
           parquetReader.close()
         } else {
           reader = parquetReader.asInstanceOf[RecordReader[Void, V]]
@@ -188,8 +190,9 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
 
       if (reader == null) {
         reader = format.createRecordReader(
-          split.serializableHadoopSplit.value, hadoopAttemptContext)
-        reader.initialize(split.serializableHadoopSplit.value, hadoopAttemptContext)
+            split.serializableHadoopSplit.value, hadoopAttemptContext)
+        reader.initialize(
+            split.serializableHadoopSplit.value, hadoopAttemptContext)
       }
 
       // Register an on-task-completion callback to close the input stream.
@@ -248,15 +251,19 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
           }
           if (getBytesReadCallback.isDefined) {
             updateBytesRead()
-          } else if (split.serializableHadoopSplit.value.isInstanceOf[FileSplit] ||
-            split.serializableHadoopSplit.value.isInstanceOf[CombineFileSplit]) {
+          } else if (split.serializableHadoopSplit.value
+                       .isInstanceOf[FileSplit] ||
+                     split.serializableHadoopSplit.value
+                       .isInstanceOf[CombineFileSplit]) {
             // If we can't get the bytes read from the FS stats, fall back to the split size,
             // which may be inaccurate.
             try {
-              inputMetrics.incBytesReadInternal(split.serializableHadoopSplit.value.getLength)
+              inputMetrics.incBytesReadInternal(
+                  split.serializableHadoopSplit.value.getLength)
             } catch {
               case e: java.io.IOException =>
-                logWarning("Unable to get input size to set InputMetrics for task", e)
+                logWarning(
+                    "Unable to get input size to set InputMetrics for task", e)
             }
           }
         }
@@ -266,14 +273,16 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
   }
 
   override def getPreferredLocations(hsplit: SparkPartition): Seq[String] = {
-    val split = hsplit.asInstanceOf[SqlNewHadoopPartition].serializableHadoopSplit.value
+    val split =
+      hsplit.asInstanceOf[SqlNewHadoopPartition].serializableHadoopSplit.value
     val locs = HadoopRDD.SPLIT_INFO_REFLECTIONS match {
       case Some(c) =>
         try {
-          val infos = c.newGetLocationInfo.invoke(split).asInstanceOf[Array[AnyRef]]
+          val infos =
+            c.newGetLocationInfo.invoke(split).asInstanceOf[Array[AnyRef]]
           Some(HadoopRDD.convertSplitLocationInfo(infos))
         } catch {
-          case e : Exception =>
+          case e: Exception =>
             logDebug("Failed to use InputSplit#getLocationInfo.", e)
             None
         }
@@ -284,28 +293,32 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
 
   override def persist(storageLevel: StorageLevel): this.type = {
     if (storageLevel.deserialized) {
-      logWarning("Caching NewHadoopRDDs as deserialized objects usually leads to undesired" +
-        " behavior because Hadoop's RecordReader reuses the same Writable object for all records." +
-        " Use a map transformation to make copies of the records.")
+      logWarning(
+          "Caching NewHadoopRDDs as deserialized objects usually leads to undesired" +
+          " behavior because Hadoop's RecordReader reuses the same Writable object for all records." +
+          " Use a map transformation to make copies of the records.")
     }
     super.persist(storageLevel)
   }
 
   /**
-   * Analogous to [[org.apache.spark.rdd.MapPartitionsRDD]], but passes in an InputSplit to
-   * the given function rather than the index of the partition.
-   */
-  private[spark] class NewHadoopMapPartitionsWithSplitRDD[U: ClassTag, T: ClassTag](
-      prev: RDD[T],
-      f: (InputSplit, Iterator[T]) => Iterator[U],
-      preservesPartitioning: Boolean = false)
-    extends RDD[U](prev) {
+    * Analogous to [[org.apache.spark.rdd.MapPartitionsRDD]], but passes in an InputSplit to
+    * the given function rather than the index of the partition.
+    */
+  private[spark] class NewHadoopMapPartitionsWithSplitRDD[
+      U : ClassTag, T : ClassTag](prev: RDD[T],
+                                  f: (InputSplit, Iterator[T]) => Iterator[U],
+                                  preservesPartitioning: Boolean = false)
+      extends RDD[U](prev) {
 
-    override val partitioner = if (preservesPartitioning) firstParent[T].partitioner else None
+    override val partitioner =
+      if (preservesPartitioning) firstParent[T].partitioner else None
 
-    override def getPartitions: Array[SparkPartition] = firstParent[T].partitions
+    override def getPartitions: Array[SparkPartition] =
+      firstParent[T].partitions
 
-    override def compute(split: SparkPartition, context: TaskContext): Iterator[U] = {
+    override def compute(
+        split: SparkPartition, context: TaskContext): Iterator[U] = {
       val partition = split.asInstanceOf[SqlNewHadoopPartition]
       val inputSplit = partition.serializableHadoopSplit.value
       f(inputSplit, firstParent[T].iterator(split, context))

@@ -31,32 +31,32 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
   type Alias[A] = Klass[A]
   new Alias("")
   val iAmAScriptFile = ()
-  """ 
-  
+  """
+
   def testEmpty() {
     assertMatches(messages("")) {
       case Nil =>
     }
   }
-  
+
   def testFine() {
     val codes = Seq(
-      "new A(0)",
-      "new A(a = 0)",
-      "new B[Int](0)}",
-      "new B(0)",
-      "new C(0)",
-      "new C()",
-      "new C",
-      "new D(0)",
-      "new D(false)",
-      "new E[Int](new Y[Int])",
-      "new E[Int](new Z[Int])",
-      "new E(new Y[Int])",
-      "new E(new Z[Int])",
-      "new Alias[Int](0)"
+        "new A(0)",
+        "new A(a = 0)",
+        "new B[Int](0)}",
+        "new B(0)",
+        "new C(0)",
+        "new C()",
+        "new C",
+        "new D(0)",
+        "new D(false)",
+        "new E[Int](new Y[Int])",
+        "new E[Int](new Z[Int])",
+        "new E(new Y[Int])",
+        "new E(new Z[Int])",
+        "new Alias[Int](0)"
     )
-    for {code <- codes} {
+    for { code <- codes } {
       assertMatches(messages(code)) {
         case Nil =>
       }
@@ -83,11 +83,11 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
 
   def testNamedDuplicates() {
     assertMatches(messages("new A(a = null, a = Unit)")) {
-      case Error("a", "Parameter specified multiple times") :: 
-              Error("a", "Parameter specified multiple times") :: Nil =>
+      case Error("a", "Parameter specified multiple times") :: Error(
+          "a", "Parameter specified multiple times") :: Nil =>
     }
   }
-  
+
   def testTypeMismatch() {
     assertMatches(messages("new A(false)")) {
       case Error("false", "Type mismatch, expected: Int, actual: Boolean") :: Nil =>
@@ -96,7 +96,7 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
       case Error("false", "Type mismatch, expected: Int, actual: Boolean") :: Nil =>
     }
   }
-  
+
   def testMalformedSignature() {
     assertMatches(messages("class Malformed(a: A*, b: B); new Malformed(0)")) {
       case Error("Malformed", "Constructor has malformed definition") :: Nil =>
@@ -113,12 +113,13 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
   //new BB(0)
   //new AA[Int](0)
 
-  def messages(@Language(value = "Scala", prefix = Header) code: String): List[Message] = {
+  def messages(@Language(value = "Scala", prefix = Header) code: String)
+    : List[Message] = {
     val annotator = new ConstructorAnnotator {}
     val mock = new AnnotatorHolderMock
 
     val file: ScalaFile = (Header + code).parse
-    
+
     val seq = file.depthFirst.findByType(classOf[ScClass])
     Compatibility.seqClass = seq
 
@@ -128,8 +129,7 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
       }
 
       mock.annotations
-    }
-    finally {
+    } finally {
       Compatibility.seqClass = None
     }
   }

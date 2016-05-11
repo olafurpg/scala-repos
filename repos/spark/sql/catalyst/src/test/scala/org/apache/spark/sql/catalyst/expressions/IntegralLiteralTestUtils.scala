@@ -18,8 +18,8 @@
 package org.apache.spark.sql.catalyst.expressions
 
 /**
- * Utilities to make sure we pass the proper numeric ranges
- */
+  * Utilities to make sure we pass the proper numeric ranges
+  */
 object IntegralLiteralTestUtils {
 
   val positiveShort: Short = (Byte.MaxValue + 1).toShort

@@ -8,10 +8,9 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
 trait ScReturnStmt extends ScExpression {
   def expr = findChild(classOf[ScExpression])
 
@@ -19,5 +18,6 @@ trait ScReturnStmt extends ScExpression {
 
   def returnFunction: Option[ScFunctionDefinition]
 
-  override def accept(visitor: ScalaElementVisitor) = visitor.visitReturnStatement(this)
+  override def accept(visitor: ScalaElementVisitor) =
+    visitor.visitReturnStatement(this)
 }

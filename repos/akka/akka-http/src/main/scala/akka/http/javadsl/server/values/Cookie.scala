@@ -4,8 +4,8 @@
 
 package akka.http.javadsl.server.values
 
-import akka.http.impl.server.{ RouteStructure, CookieImpl }
-import akka.http.javadsl.server.{ Directive, RequestVal, Route }
+import akka.http.impl.server.{RouteStructure, CookieImpl}
+import akka.http.javadsl.server.{Directive, RequestVal, Route}
 import java.util.Optional
 
 import scala.annotation.varargs
@@ -26,7 +26,8 @@ abstract class Cookie {
 
   @varargs
   def delete(innerRoute: Route, moreInnerRoutes: Route*): Route =
-    RouteStructure.DeleteCookie(name(), domain().asScala, path().asScala)(innerRoute, moreInnerRoutes.toList)
+    RouteStructure.DeleteCookie(name(), domain().asScala, path().asScala)(
+        innerRoute, moreInnerRoutes.toList)
 }
 object Cookies {
   def create(name: String): Cookie = new CookieImpl(name)

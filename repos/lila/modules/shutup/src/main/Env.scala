@@ -6,12 +6,11 @@ import scala.concurrent.duration._
 
 import lila.common.PimpedConfig._
 
-final class Env(
-    config: Config,
-    reporter: akka.actor.ActorSelection,
-    follows: (String, String) => Fu[Boolean],
-    system: ActorSystem,
-    db: lila.db.Env) {
+final class Env(config: Config,
+                reporter: akka.actor.ActorSelection,
+                follows: (String, String) => Fu[Boolean],
+                system: ActorSystem,
+                db: lila.db.Env) {
 
   private val settings = new {
     val CollectionShutup = config getString "collection.shutup"
@@ -20,9 +19,7 @@ final class Env(
   import settings._
 
   lazy val api = new ShutupApi(
-    coll = coll,
-    follows = follows,
-    reporter = reporter)
+      coll = coll, follows = follows, reporter = reporter)
 
   private lazy val coll = db(CollectionShutup)
 
@@ -46,10 +43,11 @@ final class Env(
 
 object Env {
 
-  lazy val current: Env = "shutup" boot new Env(
-    config = lila.common.PlayApp loadConfig "shutup",
-    reporter = lila.hub.Env.current.actor.report,
-    system = lila.common.PlayApp.system,
-    follows = lila.relation.Env.current.api.fetchFollows _,
-    db = lila.db.Env.current)
+  lazy val current: Env =
+    "shutup" boot new Env(
+        config = lila.common.PlayApp loadConfig "shutup",
+        reporter = lila.hub.Env.current.actor.report,
+        system = lila.common.PlayApp.system,
+        follows = lila.relation.Env.current.api.fetchFollows _,
+        db = lila.db.Env.current)
 }

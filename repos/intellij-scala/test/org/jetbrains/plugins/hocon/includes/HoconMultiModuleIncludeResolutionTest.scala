@@ -14,9 +14,10 @@ import org.jetbrains.plugins.hocon.JavaInterop._
 import org.jetbrains.plugins.scala.extensions._
 
 /**
- * @author ghik
- */
-class HoconMultiModuleIncludeResolutionTest extends UsefulTestCase with HoconIncludeResolutionTest {
+  * @author ghik
+  */
+class HoconMultiModuleIncludeResolutionTest
+    extends UsefulTestCase with HoconIncludeResolutionTest {
   private var fixture: CodeInsightTestFixture = null
   private var modules: Map[String, Module] = null
   private val testdataPath = "testdata/hocon/includes/multimodule"
@@ -29,19 +30,25 @@ class HoconMultiModuleIncludeResolutionTest extends UsefulTestCase with HoconInc
   override def setUp(): Unit = {
     super.setUp()
 
-    val fixtureBuilder = IdeaTestFixtureFactory.getFixtureFactory.createFixtureBuilder(getName)
-    fixture = JavaTestFixtureFactory.getFixtureFactory.createCodeInsightFixture(fixtureBuilder.getFixture)
+    val fixtureBuilder =
+      IdeaTestFixtureFactory.getFixtureFactory.createFixtureBuilder(getName)
+    fixture = JavaTestFixtureFactory.getFixtureFactory
+      .createCodeInsightFixture(fixtureBuilder.getFixture)
 
     val baseDir = new File(testdataPath)
-    val moduleDirs = baseDir.listFiles.sortBy(_.getName).iterator.filter(_.isDirectory)
+    val moduleDirs =
+      baseDir.listFiles.sortBy(_.getName).iterator.filter(_.isDirectory)
     val moduleFixtures = moduleDirs.map { dir =>
-      val builder = fixtureBuilder.addModule(classOf[JavaModuleFixtureBuilder[ModuleFixture]])
+      val builder = fixtureBuilder.addModule(
+          classOf[JavaModuleFixtureBuilder[ModuleFixture]])
       builder.addContentRoot(dir.getPath)
 
       def subpath(name: String) = new File(dir, name).getPath
       def libMapping(lib: String) =
-        Map(OrderRootType.CLASSES -> lib, OrderRootType.SOURCES -> (lib + "src"))
-          .mapValues(s => Array(subpath(s))).asJava
+        Map(OrderRootType.CLASSES -> lib,
+            OrderRootType.SOURCES -> (lib + "src"))
+          .mapValues(s => Array(subpath(s)))
+          .asJava
 
       builder.addLibrary(dir.getName + "lib", libMapping("lib"))
       builder.addLibrary(dir.getName + "testlib", libMapping("testlib"))
@@ -59,18 +66,23 @@ class HoconMultiModuleIncludeResolutionTest extends UsefulTestCase with HoconInc
       modules.values.foreach { mod =>
         val model = ModuleRootManager.getInstance(mod).getModifiableModel
         val contentEntry = model.getContentEntries.head
-        contentEntry.addSourceFolder(contentEntry.getFile.findChild("src"), JavaSourceRootType.SOURCE)
-        contentEntry.addSourceFolder(contentEntry.getFile.findChild("testsrc"), JavaSourceRootType.TEST_SOURCE)
+        contentEntry.addSourceFolder(contentEntry.getFile.findChild("src"),
+                                     JavaSourceRootType.SOURCE)
+        contentEntry.addSourceFolder(contentEntry.getFile.findChild("testsrc"),
+                                     JavaSourceRootType.TEST_SOURCE)
         model.getOrderEntries.foreach {
-          case loe: LibraryOrderEntry if loe.getLibraryName.endsWith("testlib") =>
+          case loe: LibraryOrderEntry
+              if loe.getLibraryName.endsWith("testlib") =>
             loe.setScope(DependencyScope.TEST)
           case _ =>
         }
         model.commit()
       }
 
-      def addDependency(dependingModule: Module, dependencyModule: Module): Unit = {
-        val model = ModuleRootManager.getInstance(dependingModule).getModifiableModel
+      def addDependency(
+          dependingModule: Module, dependencyModule: Module): Unit = {
+        val model =
+          ModuleRootManager.getInstance(dependingModule).getModifiableModel
         model.addModuleOrderEntry(dependencyModule).setExported(true)
         model.commit()
       }

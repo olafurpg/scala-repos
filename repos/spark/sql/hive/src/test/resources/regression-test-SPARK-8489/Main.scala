@@ -19,15 +19,15 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.hive.HiveContext
 
 /**
- * Entry point in test application for SPARK-8489.
- *
- * This file is not meant to be compiled during tests. It is already included
- * in a pre-built "test.jar" located in the same directory as this file.
- * This is included here for reference only and should NOT be modified without
- * rebuilding the test jar itself.
- *
- * This is used in org.apache.spark.sql.hive.HiveSparkSubmitSuite.
- */
+  * Entry point in test application for SPARK-8489.
+  *
+  * This file is not meant to be compiled during tests. It is already included
+  * in a pre-built "test.jar" located in the same directory as this file.
+  * This is included here for reference only and should NOT be modified without
+  * rebuilding the test jar itself.
+  *
+  * This is used in org.apache.spark.sql.hive.HiveSparkSubmitSuite.
+  */
 object Main {
   def main(args: Array[String]) {
     // scalastyle:off println
@@ -43,4 +43,3 @@ object Main {
     sc.stop()
   }
 }
-

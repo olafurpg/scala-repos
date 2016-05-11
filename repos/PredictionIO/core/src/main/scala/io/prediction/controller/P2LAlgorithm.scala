@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import _root_.io.prediction.annotation.DeveloperApi
@@ -40,8 +39,8 @@ import scala.reflect._
   * @tparam P Output prediction class.
   * @group Algorithm
   */
-abstract class P2LAlgorithm[PD, M: ClassTag, Q: ClassTag, P]
-  extends BaseAlgorithm[PD, M, Q, P] {
+abstract class P2LAlgorithm[PD, M : ClassTag, Q : ClassTag, P]
+    extends BaseAlgorithm[PD, M, Q, P] {
 
   def trainBase(sc: SparkContext, pd: PD): M = train(sc, pd)
 
@@ -52,8 +51,9 @@ abstract class P2LAlgorithm[PD, M: ClassTag, Q: ClassTag, P]
     */
   def train(sc: SparkContext, pd: PD): M
 
-  def batchPredictBase(sc: SparkContext, bm: Any, qs: RDD[(Long, Q)])
-  : RDD[(Long, P)] = batchPredict(bm.asInstanceOf[M], qs)
+  def batchPredictBase(
+      sc: SparkContext, bm: Any, qs: RDD[(Long, Q)]): RDD[(Long, P)] =
+    batchPredict(bm.asInstanceOf[M], qs)
 
   /** This is a default implementation to perform batch prediction. Override
     * this method for a custom implementation.
@@ -64,7 +64,9 @@ abstract class P2LAlgorithm[PD, M: ClassTag, Q: ClassTag, P]
     * @return Batch of predicted results
     */
   def batchPredict(m: M, qs: RDD[(Long, Q)]): RDD[(Long, P)] = {
-    qs.mapValues { q => predict(m, q) }
+    qs.mapValues { q =>
+      predict(m, q)
+    }
   }
 
   def predictBase(bm: Any, q: Q): P = predict(bm.asInstanceOf[M], q)
@@ -100,16 +102,12 @@ abstract class P2LAlgorithm[PD, M: ClassTag, Q: ClassTag, P]
     *         persistence, or Unit for re-training on deployment
     */
   @DeveloperApi
-  override
-  def makePersistentModel(
-    sc: SparkContext,
-    modelId: String,
-    algoParams: Params,
-    bm: Any): Any = {
+  override def makePersistentModel(
+      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any = {
     val m = bm.asInstanceOf[M]
     if (m.isInstanceOf[PersistentModel[_]]) {
-      if (m.asInstanceOf[PersistentModel[Params]].save(
-        modelId, algoParams, sc)) {
+      if (m.asInstanceOf[PersistentModel[Params]]
+            .save(modelId, algoParams, sc)) {
         PersistentModelManifest(className = m.getClass.getName)
       } else {
         Unit

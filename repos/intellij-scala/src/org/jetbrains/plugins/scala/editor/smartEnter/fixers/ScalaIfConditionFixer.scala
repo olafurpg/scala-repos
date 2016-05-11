@@ -8,14 +8,17 @@ import org.jetbrains.plugins.scala.editor.smartEnter.ScalaSmartEnterProcessor
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScIfStmt
 
 /**
- * @author Dmitry.Naydanov
- * @author Ksenia.Sautina
- * @since 1/28/13
- */
+  * @author Dmitry.Naydanov
+  * @author Ksenia.Sautina
+  * @since 1/28/13
+  */
 @SuppressWarnings(Array("HardCodedStringLiteral"))
 class ScalaIfConditionFixer extends ScalaFixer {
-  def apply(editor: Editor, processor: ScalaSmartEnterProcessor, psiElement: PsiElement): OperationPerformed = {
-    val ifStatement = PsiTreeUtil.getParentOfType(psiElement, classOf[ScIfStmt], false)
+  def apply(editor: Editor,
+            processor: ScalaSmartEnterProcessor,
+            psiElement: PsiElement): OperationPerformed = {
+    val ifStatement =
+      PsiTreeUtil.getParentOfType(psiElement, classOf[ScIfStmt], false)
     if (ifStatement == null) return NoOperation
 
     val doc = editor.getDocument
@@ -28,7 +31,9 @@ class ScalaIfConditionFixer extends ScalaFixer {
         var stopOffset = doc.getLineEndOffset(doc getLineNumber ifStartOffset)
 
         ifStatement.thenBranch.foreach {
-          case thenBranch => stopOffset = Math.min(stopOffset, thenBranch.getTextRange.getStartOffset)
+          case thenBranch =>
+            stopOffset = Math.min(
+                stopOffset, thenBranch.getTextRange.getStartOffset)
         }
 
         doc.replaceString(ifStartOffset, stopOffset, "if () {\n\n}")
@@ -42,8 +47,10 @@ class ScalaIfConditionFixer extends ScalaFixer {
 
           while (s != null) {
             s match {
-              case error: PsiErrorElement => return error.getTextRange.getEndOffset
-              case sp: PsiWhiteSpace if sp.textContains('\n') => return sp.getTextRange.getStartOffset
+              case error: PsiErrorElement =>
+                return error.getTextRange.getEndOffset
+              case sp: PsiWhiteSpace if sp.textContains('\n') =>
+                return sp.getTextRange.getStartOffset
               case _ =>
             }
 
@@ -67,4 +74,3 @@ class ScalaIfConditionFixer extends ScalaFixer {
     }
   }
 }
-

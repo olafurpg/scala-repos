@@ -30,17 +30,21 @@ import org.apache.spark.sql.Row
 @BeanInfo
 case class DCTTestData(vec: Vector, wantedVec: Vector)
 
-class DCTSuite extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest {
+class DCTSuite
+    extends SparkFunSuite with MLlibTestSparkContext
+    with DefaultReadWriteTest {
 
   test("forward transform of discrete cosine matches jTransforms result") {
-    val data = Vectors.dense((0 until 128).map(_ => 2D * math.random - 1D).toArray)
+    val data =
+      Vectors.dense((0 until 128).map(_ => 2D * math.random - 1D).toArray)
     val inverse = false
 
     testDCT(data, inverse)
   }
 
   test("inverse transform of discrete cosine matches jTransforms result") {
-    val data = Vectors.dense((0 until 128).map(_ => 2D * math.random - 1D).toArray)
+    val data =
+      Vectors.dense((0 until 128).map(_ => 2D * math.random - 1D).toArray)
     val inverse = true
 
     testDCT(data, inverse)
@@ -63,20 +67,23 @@ class DCTSuite extends SparkFunSuite with MLlibTestSparkContext with DefaultRead
     }
     val expectedResult = Vectors.dense(expectedResultBuffer)
 
-    val dataset = sqlContext.createDataFrame(Seq(
-      DCTTestData(data, expectedResult)
-    ))
+    val dataset = sqlContext.createDataFrame(
+        Seq(
+            DCTTestData(data, expectedResult)
+        ))
 
     val transformer = new DCT()
       .setInputCol("vec")
       .setOutputCol("resultVec")
       .setInverse(inverse)
 
-    transformer.transform(dataset)
+    transformer
+      .transform(dataset)
       .select("resultVec", "wantedVec")
       .collect()
-      .foreach { case Row(resultVec: Vector, wantedVec: Vector) =>
-      assert(Vectors.sqdist(resultVec, wantedVec) < 1e-6)
-    }
+      .foreach {
+        case Row(resultVec: Vector, wantedVec: Vector) =>
+          assert(Vectors.sqdist(resultVec, wantedVec) < 1e-6)
+      }
   }
 }

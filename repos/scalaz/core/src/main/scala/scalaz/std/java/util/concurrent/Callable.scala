@@ -3,10 +3,10 @@ package std.java.util.concurrent
 
 import java.util.concurrent.Callable
 
-
 trait CallableInstances {
-  implicit def callableOrder[A: Order] = new Order[Callable[A]] {
-    def order(f1: Callable[A], f2: Callable[A]) = Order[A].order(f1.call, f2.call)
+  implicit def callableOrder[A : Order] = new Order[Callable[A]] {
+    def order(f1: Callable[A], f2: Callable[A]) =
+      Order[A].order(f1.call, f2.call)
   }
 
   implicit val callableMonad: Monad[Callable] = new Monad[Callable] {

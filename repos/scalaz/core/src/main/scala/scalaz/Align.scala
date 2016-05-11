@@ -2,8 +2,8 @@ package scalaz
 
 ////
 /**
- *
- */
+  *
+  */
 ////
 trait Align[F[_]] extends Functor[F] { self =>
   ////
@@ -12,19 +12,22 @@ trait Align[F[_]] extends Functor[F] { self =>
 
   def alignWith[A, B, C](f: A \&/ B => C): (F[A], F[B]) => F[C]
 
-  def product[G[_]](implicit G0: Align[G]): Align[λ[α => (F[α], G[α])]] = new ProductAlign[F, G] {
-    implicit def F = self
+  def product[G[_]](implicit G0: Align[G]): Align[λ[α => (F[α], G[α])]] =
+    new ProductAlign[F, G] {
+      implicit def F = self
 
-    implicit def G = G0
-  }
+      implicit def G = G0
+    }
 
   def align[A, B](a: F[A], b: F[B]): F[A \&/ B] =
     alignWith[A, B, A \&/ B](identity)(a, b)
 
   def padWith[A, B, C](f: (Option[A], Option[B]) => C): (F[A], F[B]) => F[C] =
-    alignWith(t => {
-      val (a, b) = t.pad
-      f(a, b)
+    alignWith(
+        t =>
+          {
+        val (a, b) = t.pad
+        f(a, b)
     })
 
   def pad[A, B]: (F[A], F[B]) => F[(Option[A], Option[B])] =

@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.lang
 
@@ -16,8 +16,9 @@ import org.scalajs.testsuite.utils.Platform._
 class CharacterTest {
 
   @Test def isISOControl(): Unit = {
-    val isoControlChars = (('\u0000' to '\u001F') ++
-        ('\u007F' to '\u009F')).map(_.toInt).toSet
+    val isoControlChars = (('\u0000' to '\u001F') ++ ('\u007F' to '\u009F'))
+      .map(_.toInt)
+      .toSet
     isoControlChars foreach { c =>
       assertEquals(true, Character.isISOControl(c))
     }
@@ -49,12 +50,17 @@ class CharacterTest {
 
   @Test def toChars(): Unit = {
     assertTrue(Character.toChars(0x61) sameElements Array('a'))
-    assertTrue(Character.toChars(0x10000) sameElements Array('\uD800', '\uDC00'))
-    assertTrue(Character.toChars(0x10001) sameElements Array('\uD800', '\uDC01'))
-    assertTrue(Character.toChars(0x10401) sameElements Array('\uD801', '\uDC01'))
-    assertTrue(Character.toChars(0x10FFFF) sameElements Array('\uDBFF', '\uDFFF'))
+    assertTrue(
+        Character.toChars(0x10000) sameElements Array('\uD800', '\uDC00'))
+    assertTrue(
+        Character.toChars(0x10001) sameElements Array('\uD800', '\uDC01'))
+    assertTrue(
+        Character.toChars(0x10401) sameElements Array('\uD801', '\uDC01'))
+    assertTrue(
+        Character.toChars(0x10FFFF) sameElements Array('\uDBFF', '\uDFFF'))
 
-    expectThrows(classOf[IllegalArgumentException], Character.toChars(Integer.MAX_VALUE))
+    expectThrows(classOf[IllegalArgumentException],
+                 Character.toChars(Integer.MAX_VALUE))
   }
 
   @Test def isDigit(): Unit = {
@@ -279,14 +285,14 @@ class CharacterTest {
   }
 
   @Test def isIdentifierIgnorable(): Unit = {
-    for (c <- '\u0000' to '\u0008')
-      assertTrue(Character.isIdentifierIgnorable(c))
+    for (c <- '\u0000' to '\u0008') assertTrue(
+        Character.isIdentifierIgnorable(c))
 
-    for (c <- '\u000E' to '\u001B')
-      assertTrue(Character.isIdentifierIgnorable(c))
+    for (c <- '\u000E' to '\u001B') assertTrue(
+        Character.isIdentifierIgnorable(c))
 
-    for (c <- '\u007F' to '\u009F')
-      assertTrue(Character.isIdentifierIgnorable(c))
+    for (c <- '\u007F' to '\u009F') assertTrue(
+        Character.isIdentifierIgnorable(c))
 
     // Exhaustive list of Cf category. Unicode 7.0.0
     assertTrue(Character.isIdentifierIgnorable('\u00AD'))
@@ -294,8 +300,7 @@ class CharacterTest {
     assertTrue(Character.isIdentifierIgnorable('\u0601'))
     assertTrue(Character.isIdentifierIgnorable('\u0602'))
     assertTrue(Character.isIdentifierIgnorable('\u0603'))
-    if (!executingInJVM)
-      assertTrue(Character.isIdentifierIgnorable('\u0604'))
+    if (!executingInJVM) assertTrue(Character.isIdentifierIgnorable('\u0604'))
     // assertTrue(Character.isIdentifierIgnorable('\u0605')) returns false on JVM
     // assertTrue(Character.isIdentifierIgnorable('\u061C')) returns false on JVM
     assertTrue(Character.isIdentifierIgnorable('\u06DD'))
@@ -457,7 +462,6 @@ class CharacterTest {
     assertFalse(Character.isIdentifierIgnorable('\uffa9'))
     assertFalse(Character.isIdentifierIgnorable('\u37b0'))
     assertFalse(Character.isIdentifierIgnorable('\u3e04'))
-
   }
 
   @Test def isUnicodeIdentifierStart(): Unit = {
@@ -892,39 +896,31 @@ class CharacterTest {
   }
 
   @Test def isUpperCase(): Unit = {
-    for (c <- 'a' to 'z')
-      assertFalse(Character.isUpperCase(c))
-    for (c <- 'A' to 'Z')
-      assertTrue(Character.isUpperCase(c))
-    for (c <- '0' to '9')
-      assertFalse(Character.isUpperCase(c))
+    for (c <- 'a' to 'z') assertFalse(Character.isUpperCase(c))
+    for (c <- 'A' to 'Z') assertTrue(Character.isUpperCase(c))
+    for (c <- '0' to '9') assertFalse(Character.isUpperCase(c))
 
     // example form issue #1646
     assertFalse(Character.isUpperCase('('))
     assertFalse(Character.isUpperCase(')'))
 
     // 100 randomly chosen uppeer cases
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\uA78B'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\uA78B'))
     assertTrue(Character.isUpperCase('\u01D1'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\uA680'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\uA680'))
     assertTrue(Character.isUpperCase('\u01E2'))
     assertTrue(Character.isUpperCase('\u00C1'))
     assertTrue(Character.isUpperCase('\u038F'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u04FC'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u04FC'))
     assertTrue(Character.isUpperCase('\u0232'))
     assertTrue(Character.isUpperCase('\u1E86'))
     assertTrue(Character.isUpperCase('\u1E66'))
     assertTrue(Character.isUpperCase('\u1E12'))
     assertTrue(Character.isUpperCase('\u1F09'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\uA758'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\uA758'))
     assertTrue(Character.isUpperCase('\u01B1'))
     assertTrue(Character.isUpperCase('\u0230'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u2CA2'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u2CA2'))
     assertTrue(Character.isUpperCase('\u0154'))
     if (!executingInJVMOnJDK6) {
       assertTrue(Character.isUpperCase('\uA77E'))
@@ -939,18 +935,15 @@ class CharacterTest {
     assertTrue(Character.isUpperCase('\u0549'))
     assertTrue(Character.isUpperCase('\u00D5'))
     assertTrue(Character.isUpperCase('\u0494'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u2CCC'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u2CCC'))
     assertTrue(Character.isUpperCase('\u0162'))
     assertTrue(Character.isUpperCase('\uFF22'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u24C4'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u24C4'))
     assertTrue(Character.isUpperCase('\u041A'))
     assertTrue(Character.isUpperCase('\u2124'))
     assertTrue(Character.isUpperCase('\u1FBB'))
     assertTrue(Character.isUpperCase('\u1FD9'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\uA662'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\uA662'))
     assertTrue(Character.isUpperCase('\u0504'))
     if (!executingInJVMOnJDK6) {
       assertTrue(Character.isUpperCase('\u2C14'))
@@ -975,18 +968,15 @@ class CharacterTest {
     assertTrue(Character.isUpperCase('\u1F3D'))
     assertTrue(Character.isUpperCase('\u050A'))
     assertTrue(Character.isUpperCase('\uFF23'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u2C01'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u2C01'))
     assertTrue(Character.isUpperCase('\u10C4'))
     assertTrue(Character.isUpperCase('\u1EA2'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u2C72'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u2C72'))
     assertTrue(Character.isUpperCase('\u0554'))
     assertTrue(Character.isUpperCase('\u01E8'))
     assertTrue(Character.isUpperCase('\u10A4'))
     assertTrue(Character.isUpperCase('\u1F0C'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u0520'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u0520'))
     assertTrue(Character.isUpperCase('\u00C5'))
     assertTrue(Character.isUpperCase('\u10AC'))
     if (!executingInJVMOnJDK6) {
@@ -996,8 +986,7 @@ class CharacterTest {
     }
     assertTrue(Character.isUpperCase('\u0049'))
     assertTrue(Character.isUpperCase('\u10A4'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\uA652'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\uA652'))
     assertTrue(Character.isUpperCase('\u1E0E'))
     assertTrue(Character.isUpperCase('\u04E2'))
     assertTrue(Character.isUpperCase('\u0174'))
@@ -1006,28 +995,22 @@ class CharacterTest {
     assertTrue(Character.isUpperCase('\u053F'))
     assertTrue(Character.isUpperCase('\u0222'))
     assertTrue(Character.isUpperCase('\u1F3F'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\uA77E'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\uA77E'))
     assertTrue(Character.isUpperCase('\u01AC'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u2C20'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u2C20'))
     assertTrue(Character.isUpperCase('\u1ECC'))
     assertTrue(Character.isUpperCase('\u04DE'))
     assertTrue(Character.isUpperCase('\u004F'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u2CE2'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u2CE2'))
     assertTrue(Character.isUpperCase('\u0124'))
     assertTrue(Character.isUpperCase('\u1F4A'))
     assertTrue(Character.isUpperCase('\u0112'))
     assertTrue(Character.isUpperCase('\u016E'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\u24B7'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\u24B7'))
     assertTrue(Character.isUpperCase('\u211A'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\uA72A'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\uA72A'))
     assertTrue(Character.isUpperCase('\u0388'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isUpperCase('\uA726'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isUpperCase('\uA726'))
     assertTrue(Character.isUpperCase('\u0052'))
     assertTrue(Character.isUpperCase('\u1EB0'))
     assertTrue(Character.isUpperCase('\u0197'))
@@ -1137,12 +1120,9 @@ class CharacterTest {
   }
 
   @Test def isLowerCase(): Unit = {
-    for (c <- 'a' to 'z')
-      assertTrue(Character.isLowerCase(c))
-    for (c <- 'A' to 'Z')
-      assertFalse(Character.isLowerCase(c))
-    for (c <- '0' to '9')
-      assertFalse(Character.isLowerCase(c))
+    for (c <- 'a' to 'z') assertTrue(Character.isLowerCase(c))
+    for (c <- 'A' to 'Z') assertFalse(Character.isLowerCase(c))
+    for (c <- '0' to '9') assertFalse(Character.isLowerCase(c))
 
     // example form issue #1646
     assertFalse(Character.isLowerCase('('))
@@ -1255,17 +1235,14 @@ class CharacterTest {
   }
 
   @Test def isLetter(): Unit = {
-    for (c <- 'a' to 'z')
-      assertTrue(Character.isLetter(c))
-    for (c <- 'A' to 'Z')
-      assertTrue(Character.isLetter(c))
+    for (c <- 'a' to 'z') assertTrue(Character.isLetter(c))
+    for (c <- 'A' to 'Z') assertTrue(Character.isLetter(c))
 
     // 100 randomly chosen characters that produce true
     assertTrue(Character.isLetter('\u0931'))
     assertTrue(Character.isLetter('\u0E2D'))
     assertTrue(Character.isLetter('\u1E4F'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isLetter('\u2DA5'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isLetter('\u2DA5'))
     assertTrue(Character.isLetter('\u36AF'))
     assertTrue(Character.isLetter('\u38BE'))
     assertTrue(Character.isLetter('\u38DD'))
@@ -1310,8 +1287,7 @@ class CharacterTest {
     assertTrue(Character.isLetter('\uD5C9'))
     assertTrue(Character.isLetter('\uD645'))
     assertTrue(Character.isLetter('\uFEEC'))
-    if (!executingInJVMOnJDK7OrLower)
-      assertTrue(Character.isLetter(126614))
+    if (!executingInJVMOnJDK7OrLower) assertTrue(Character.isLetter(126614))
     assertTrue(Character.isLetter(131284))
     assertTrue(Character.isLetter(132125))
     assertTrue(Character.isLetter(133027))
@@ -1366,8 +1342,7 @@ class CharacterTest {
       assertTrue(Character.isLetter(66253))
       assertTrue(Character.isLetter(74015))
     }
-    if (!executingInJVMOnJDK7OrLower)
-      assertTrue(Character.isLetter(93997))
+    if (!executingInJVMOnJDK7OrLower) assertTrue(Character.isLetter(93997))
 
     // 100 randomly chosen characters that produce false
     assertFalse(Character.isLetter('\uE033'))
@@ -1475,13 +1450,11 @@ class CharacterTest {
   @Test def isLetterOrDigit(): Unit = {
     // 100 randomly chosen characters that produce true
     assertTrue(Character.isLetterOrDigit('\u0209'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isLetterOrDigit('\u0377'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isLetterOrDigit('\u0377'))
     assertTrue(Character.isLetterOrDigit('\u0497'))
     assertTrue(Character.isLetterOrDigit('\u053E'))
     assertTrue(Character.isLetterOrDigit('\u0726'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isLetterOrDigit('\u075A'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isLetterOrDigit('\u075A'))
     assertTrue(Character.isLetterOrDigit('\u0A91'))
     assertTrue(Character.isLetterOrDigit('\u12CB'))
     assertTrue(Character.isLetterOrDigit('\u182B'))
@@ -1489,8 +1462,7 @@ class CharacterTest {
     assertTrue(Character.isLetterOrDigit('\u1F1C'))
     assertTrue(Character.isLetterOrDigit('\u1F74'))
     assertTrue(Character.isLetterOrDigit('\u1F7C'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isLetterOrDigit('\u2D53'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isLetterOrDigit('\u2D53'))
     assertTrue(Character.isLetterOrDigit('\u30DF'))
     assertTrue(Character.isLetterOrDigit('\u3772'))
     assertTrue(Character.isLetterOrDigit('\u3A13'))
@@ -1553,8 +1525,7 @@ class CharacterTest {
     assertTrue(Character.isLetterOrDigit('\u9D66'))
     assertTrue(Character.isLetterOrDigit('\u9ED0'))
     assertTrue(Character.isLetterOrDigit('\uA047'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isLetterOrDigit('\uA65A'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isLetterOrDigit('\uA65A'))
     assertTrue(Character.isLetterOrDigit('\uAEA3'))
     assertTrue(Character.isLetterOrDigit('\uAEC5'))
     assertTrue(Character.isLetterOrDigit('\uB583'))
@@ -1574,8 +1545,7 @@ class CharacterTest {
     assertTrue(Character.isLetterOrDigit('\uD4D3'))
     assertTrue(Character.isLetterOrDigit('\uD64E'))
     assertTrue(Character.isLetterOrDigit('\uD76B'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isLetterOrDigit('\uFA9F'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isLetterOrDigit('\uFA9F'))
     assertTrue(Character.isLetterOrDigit('\uFB7C'))
     assertTrue(Character.isLetterOrDigit('\uFCDD'))
     assertTrue(Character.isLetterOrDigit('\uFEBD'))
@@ -1836,8 +1806,7 @@ class CharacterTest {
     assertTrue(Character.isWhitespace('\u205f'))
     assertTrue(Character.isWhitespace('\u3000'))
 
-    if (!executingInJVMOnJDK6)
-      assertFalse(Character.isWhitespace('\u200b'))
+    if (!executingInJVMOnJDK6) assertFalse(Character.isWhitespace('\u200b'))
 
     // 100 randomly chosen characters that produce false
     assertFalse(Character.isWhitespace(2515))
@@ -2107,8 +2076,7 @@ class CharacterTest {
     assertTrue(Character.isMirrored('\u22F1'))
     assertTrue(Character.isMirrored('\u22F2'))
     assertTrue(Character.isMirrored('\u22F9'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isMirrored('\u27C3'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isMirrored('\u27C3'))
     if (!executingInJVMOnJDK7OrLower)
       assertTrue(Character.isMirrored('\u27CD'))
     assertTrue(Character.isMirrored('\u27EA'))
@@ -2291,8 +2259,7 @@ class CharacterTest {
     assertTrue(Character.isDefined('\uEFD9'))
     assertTrue(Character.isDefined('\uF4E8'))
     assertTrue(Character.isDefined('\uF547'))
-    if (!executingInJVMOnJDK6)
-      assertTrue(Character.isDefined('\uFA7D'))
+    if (!executingInJVMOnJDK6) assertTrue(Character.isDefined('\uFA7D'))
     assertTrue(Character.isDefined('\uFD39'))
     assertTrue(Character.isDefined('\uFF3A'))
 
@@ -2564,12 +2531,10 @@ class CharacterTest {
     assertEquals(26, Character.getType(164))
     assertEquals(26, Character.getType(165))
     assertEquals(28, Character.getType(166))
-    if (!executingInJVMOnJDK7OrLower)
-      assertEquals(24, Character.getType(167))
+    if (!executingInJVMOnJDK7OrLower) assertEquals(24, Character.getType(167))
     assertEquals(27, Character.getType(168))
     assertEquals(28, Character.getType(169))
-    if (!executingInJVMOnJDK7OrLower)
-      assertEquals(5, Character.getType(170))
+    if (!executingInJVMOnJDK7OrLower) assertEquals(5, Character.getType(170))
     assertEquals(29, Character.getType(171))
     assertEquals(25, Character.getType(172))
     assertEquals(16, Character.getType(173))
@@ -2581,13 +2546,11 @@ class CharacterTest {
     assertEquals(11, Character.getType(179))
     assertEquals(27, Character.getType(180))
     assertEquals(2, Character.getType(181))
-    if (!executingInJVMOnJDK7OrLower)
-      assertEquals(24, Character.getType(182))
+    if (!executingInJVMOnJDK7OrLower) assertEquals(24, Character.getType(182))
     assertEquals(24, Character.getType(183))
     assertEquals(27, Character.getType(184))
     assertEquals(11, Character.getType(185))
-    if (!executingInJVMOnJDK7OrLower)
-      assertEquals(5, Character.getType(186))
+    if (!executingInJVMOnJDK7OrLower) assertEquals(5, Character.getType(186))
     assertEquals(30, Character.getType(187))
     assertEquals(11, Character.getType(188))
     assertEquals(11, Character.getType(189))
@@ -2731,8 +2694,7 @@ class CharacterTest {
     assertEquals(5, Character.getType(64622))
     assertEquals(0, Character.getType(67177))
     assertEquals(0, Character.getType(73067))
-    if (!executingInJVMOnJDK6)
-      assertEquals(5, Character.getType(78228))
+    if (!executingInJVMOnJDK6) assertEquals(5, Character.getType(78228))
     assertEquals(0, Character.getType(80656))
     assertEquals(0, Character.getType(81498))
     assertEquals(0, Character.getType(84617))

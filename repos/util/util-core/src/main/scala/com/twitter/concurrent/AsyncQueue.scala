@@ -17,22 +17,22 @@ object AsyncQueue {
 }
 
 /**
- * An asynchronous FIFO queue. In addition to providing [[offer]]
- * and [[poll]], the queue can be [[fail "failed"]], flushing current
- * pollers.
- *
- * @param maxPendingOffers optional limit on the number of pending `offers`.
- * The default is unbounded, but any other positive value can be used to limit
- * the max queue size. Note that `Int.MaxValue` is used to denote unbounded.
- */
+  * An asynchronous FIFO queue. In addition to providing [[offer]]
+  * and [[poll]], the queue can be [[fail "failed"]], flushing current
+  * pollers.
+  *
+  * @param maxPendingOffers optional limit on the number of pending `offers`.
+  * The default is unbounded, but any other positive value can be used to limit
+  * the max queue size. Note that `Int.MaxValue` is used to denote unbounded.
+  */
 class AsyncQueue[T](maxPendingOffers: Int) {
   import AsyncQueue._
 
   /**
-   * An asynchronous, unbounded, FIFO queue. In addition to providing [[offer]]
-   * and [[poll]], the queue can be [[fail "failed"]], flushing current
-   * pollers.
-   */
+    * An asynchronous, unbounded, FIFO queue. In addition to providing [[offer]]
+    * and [[poll]], the queue can be [[fail "failed"]], flushing current
+    * pollers.
+    */
   def this() = this(AsyncQueue.UnboundedCapacity)
 
   require(maxPendingOffers > 0)
@@ -40,8 +40,8 @@ class AsyncQueue[T](maxPendingOffers: Int) {
   private[this] val state = new AtomicReference[State[T]](Idle)
 
   /**
-   * Returns the current number of pending elements.
-   */
+    * Returns the current number of pending elements.
+    */
   def size: Int = state.get match {
     case Offering(q) => q.size
     case _ => 0
@@ -62,20 +62,20 @@ class AsyncQueue[T](maxPendingOffers: Int) {
   }
 
   /**
-   * Retrieves and removes the head of the queue, completing the
-   * returned future when the element is available.
-   */
+    * Retrieves and removes the head of the queue, completing the
+    * returned future when the element is available.
+    */
   @tailrec
   final def poll(): Future[T] = state.get match {
     case Idle =>
       val p = new Promise[T]
       if (state.compareAndSet(Idle, Polling(queueOf(p)))) p else poll()
 
-    case s@Polling(q) =>
+    case s @ Polling(q) =>
       val p = new Promise[T]
       if (state.compareAndSet(s, Polling(q.enqueue(p)))) p else poll()
 
-    case s@Offering(q) =>
+    case s @ Offering(q) =>
       val (elem, nextq) = q.dequeue
       val nextState = if (nextq.nonEmpty) Offering(nextq) else Idle
       if (state.compareAndSet(s, nextState)) Future.value(elem) else poll()
@@ -85,26 +85,24 @@ class AsyncQueue[T](maxPendingOffers: Int) {
   }
 
   /**
-   * Insert the given element at the tail of the queue.
-   *
-   * @return `true` if the item was successfully added, `false` otherwise.
-   */
+    * Insert the given element at the tail of the queue.
+    *
+    * @return `true` if the item was successfully added, `false` otherwise.
+    */
   @tailrec
   final def offer(elem: T): Boolean = state.get match {
     case Idle =>
-      if (!state.compareAndSet(Idle, Offering(queueOf(elem))))
-        offer(elem)
+      if (!state.compareAndSet(Idle, Offering(queueOf(elem)))) offer(elem)
       else true
 
     case Offering(q) if q.size >= maxPendingOffers =>
       false
 
-    case s@Offering(q) =>
-      if (!state.compareAndSet(s, Offering(q.enqueue(elem))))
-        offer(elem)
+    case s @ Offering(q) =>
+      if (!state.compareAndSet(s, Offering(q.enqueue(elem)))) offer(elem)
       else true
 
-    case s@Polling(q) =>
+    case s @ Polling(q) =>
       val (waiter, nextq) = q.dequeue
       val nextState = if (nextq.nonEmpty) Polling(nextq) else Idle
       if (state.compareAndSet(s, nextState)) {
@@ -119,50 +117,50 @@ class AsyncQueue[T](maxPendingOffers: Int) {
   }
 
   /**
-   * Drains any pending elements into a `Try[Queue]`.
-   *
-   * If the queue has been [[fail failed]] and is now empty,
-   * a `Throw` of the exception used to fail will be returned.
-   * Otherwise, return a `Return(Queue)` of the pending elements.
-   */
+    * Drains any pending elements into a `Try[Queue]`.
+    *
+    * If the queue has been [[fail failed]] and is now empty,
+    * a `Throw` of the exception used to fail will be returned.
+    * Otherwise, return a `Return(Queue)` of the pending elements.
+    */
   @tailrec
   final def drain(): Try[Queue[T]] = state.get match {
-    case s@Offering(q) =>
+    case s @ Offering(q) =>
       if (state.compareAndSet(s, Idle)) Return(q)
       else drain()
-    case s@Excepting(q, e) if q.nonEmpty =>
+    case s @ Excepting(q, e) if q.nonEmpty =>
       if (state.compareAndSet(s, Excepting(Queue.empty, e))) Return(q)
       else drain()
-    case s@Excepting(q, e) =>
+    case s @ Excepting(q, e) =>
       Throw(e)
     case _ =>
       Return(Queue.empty)
   }
 
   /**
-   * Fail the queue: current and subsequent pollers will be completed
-   * with the given exception; any outstanding messages are discarded.
-   */
+    * Fail the queue: current and subsequent pollers will be completed
+    * with the given exception; any outstanding messages are discarded.
+    */
   final def fail(exc: Throwable): Unit = fail(exc, discard = true)
 
   /**
-   * Fail the queue. When `discard` is true, the queue contents is discarded
-   * and all pollers are failed immediately. When this flag is false, subsequent
-   * pollers are not failed until the queue becomes empty.
-   *
-   * No new elements are admitted to the queue after it has been failed.
-   */
+    * Fail the queue. When `discard` is true, the queue contents is discarded
+    * and all pollers are failed immediately. When this flag is false, subsequent
+    * pollers are not failed until the queue becomes empty.
+    *
+    * No new elements are admitted to the queue after it has been failed.
+    */
   @tailrec
   final def fail(exc: Throwable, discard: Boolean): Unit = state.get match {
     case Idle =>
       if (!state.compareAndSet(Idle, Excepting(Queue.empty, exc)))
         fail(exc, discard)
 
-    case s@Polling(q) =>
-      if (!state.compareAndSet(s, Excepting(Queue.empty, exc))) fail(exc, discard) else
-        q.foreach(_.setException(exc))
+    case s @ Polling(q) =>
+      if (!state.compareAndSet(s, Excepting(Queue.empty, exc)))
+        fail(exc, discard) else q.foreach(_.setException(exc))
 
-    case s@Offering(q) =>
+    case s @ Offering(q) =>
       val nextq = if (discard) Queue.empty else q
       if (!state.compareAndSet(s, Excepting(nextq, exc))) fail(exc, discard)
 

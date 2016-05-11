@@ -7,9 +7,9 @@ import com.twitter.finagle.tracing.{Trace, Record, Annotation}
 import com.twitter.conversions.time._
 
 /**
- * Given a Jvm, create filters to record GCs (and other JVM events in
- * the future).
- */
+  * Given a Jvm, create filters to record GCs (and other JVM events in
+  * the future).
+  */
 class MkJvmFilter(jvm: Jvm) {
   private[this] val buffer = jvm.monitorGcs(1.minute)
 
@@ -20,14 +20,14 @@ class MkJvmFilter(jvm: Jvm) {
         service(req) ensure {
           buffer(begin) foreach { gc =>
             Trace.record {
-              Record(Trace.id, gc.timestamp, Annotation.Message(gc.toString), Some(gc.duration))
+              Record(Trace.id,
+                     gc.timestamp,
+                     Annotation.Message(gc.toString),
+                     Some(gc.duration))
             }
           }
         }
-      }
-      else
-        service(req)
+      } else service(req)
     }
   }
 }
-

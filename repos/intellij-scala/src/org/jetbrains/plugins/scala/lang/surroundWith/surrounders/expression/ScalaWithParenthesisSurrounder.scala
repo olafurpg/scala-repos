@@ -11,15 +11,13 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 /**
- * @author AlexanderPodkhalyuzin
-* Date: 11.05.2008
- */
-
+  * @author AlexanderPodkhalyuzin
+  * Date: 11.05.2008
+  */
 class ScalaWithParenthesisSurrounder extends ScalaExpressionSurrounder {
   override def isApplicable(elements: Array[PsiElement]): Boolean = {
     if (elements.length > 1) return false
-    for (element <- elements)
-      if (!isApplicable(element)) return false
+    for (element <- elements) if (!isApplicable(element)) return false
     return true
   }
   override def isApplicable(element: PsiElement): Boolean = {
@@ -27,11 +25,11 @@ class ScalaWithParenthesisSurrounder extends ScalaExpressionSurrounder {
       case _: ScBlockExpr => true
       case _: ScBlock => false
       case _: ScExpression | _: PsiWhiteSpace => {
-        true
-      }
+          true
+        }
       case e => {
-        ScalaPsiUtil.isLineTerminator(e)
-      }
+          ScalaPsiUtil.isLineTerminator(e)
+        }
     }
   }
 

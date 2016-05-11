@@ -5,15 +5,17 @@ import breeze.macros.expand
 import spire.syntax.cfor._
 
 /**
- * method for representing scaleAdd(y, a, x) == y + a * x
- *
- * This method is designed to eventually replace [[breeze.linalg.axpy]]
- * @author dlwh
- **/
+  * method for representing scaleAdd(y, a, x) == y + a * x
+  *
+  * This method is designed to eventually replace [[breeze.linalg.axpy]]
+  * @author dlwh
+  **/
 object scaleAdd extends UFunc {
 
   @expand
-  implicit def scaleAddArray[@expand.args(Int, Double, Long, Float) T]:InPlaceImpl3[Array[T], T, Array[T]] = new InPlaceImpl3[Array[T], T, Array[T]] {
+  implicit def scaleAddArray[
+      @expand.args(Int, Double, Long, Float) T]: InPlaceImpl3[
+      Array[T], T, Array[T]] = new InPlaceImpl3[Array[T], T, Array[T]] {
     def apply(v: Array[T], v2: T, v3: Array[T]): Unit = {
       require(v.length == v3.length, "Arrays must have the same length!")
       cfor(0)(_ < v.length, _ + 1) { i =>
@@ -21,5 +23,4 @@ object scaleAdd extends UFunc {
       }
     }
   }
-
 }

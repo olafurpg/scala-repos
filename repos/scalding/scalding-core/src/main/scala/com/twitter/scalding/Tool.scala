@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
 import cascading.flow.hadoop.HadoopFlow
@@ -20,7 +20,7 @@ import cascading.flow.planner.BaseFlowStep
 
 import org.apache.hadoop.conf.Configured
 import org.apache.hadoop.mapred.JobConf
-import org.apache.hadoop.util.{ GenericOptionsParser, Tool => HTool, ToolRunner }
+import org.apache.hadoop.util.{GenericOptionsParser, Tool => HTool, ToolRunner}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -73,56 +73,65 @@ class Tool extends Configured with HTool {
     val onlyPrintGraph = job.args.boolean("tool.graph")
     if (onlyPrintGraph) {
       // TODO use proper logging
-      println("Only printing the job graph, NOT executing. Run without --tool.graph to execute the job")
+      println(
+          "Only printing the job graph, NOT executing. Run without --tool.graph to execute the job")
     }
 
     /*
-    * This is a tail recursive loop that runs all the
-    * jobs spawned from this one
-    */
+     * This is a tail recursive loop that runs all the
+     * jobs spawned from this one
+     */
     val jobName = job.getClass.getName
     @tailrec
     def start(j: Job, cnt: Int) {
-      val successful = if (onlyPrintGraph) {
-        val flow = j.buildFlow
-        /*
-        * This just writes out the graph representing
-        * all the cascading elements that are created for this
-        * flow. Use graphviz to render it as a PDF.
-        * The job is NOT run in this case.
-        */
-        val thisDot = jobName + cnt + ".dot"
-        println("writing DOT: " + thisDot)
+      val successful =
+        if (onlyPrintGraph) {
+          val flow = j.buildFlow
+          /*
+           * This just writes out the graph representing
+           * all the cascading elements that are created for this
+           * flow. Use graphviz to render it as a PDF.
+           * The job is NOT run in this case.
+           */
+          val thisDot = jobName + cnt + ".dot"
+          println("writing DOT: " + thisDot)
 
-        /* We add descriptions if they exist to the stepName so it appears in the .dot file */
-        flow match {
-          case hadoopFlow: HadoopFlow =>
-            val flowSteps = hadoopFlow.getFlowSteps.asScala
-            flowSteps.foreach(step => {
-              val baseFlowStep: BaseFlowStep[JobConf] = step.asInstanceOf[BaseFlowStep[JobConf]]
-              val descriptions = baseFlowStep.getConfig.get(Config.StepDescriptions, "")
-              if (!descriptions.isEmpty) {
-                val stepXofYData = """\(\d+/\d+\)""".r.findFirstIn(baseFlowStep.getName).getOrElse("")
-                // Reflection is only temporary.  Latest cascading has setName public: https://github.com/cwensel/cascading/commit/487a6e9ef#diff-0feab84bc8832b2a39312dbd208e3e69L175
-                // https://github.com/twitter/scalding/issues/1294
-                val x = classOf[BaseFlowStep[JobConf]].getDeclaredMethod("setName", classOf[String])
-                x.setAccessible(true)
-                x.invoke(step, "%s %s".format(stepXofYData, descriptions))
-              }
-            })
-          case _ => // descriptions not yet supported in other modes
+          /* We add descriptions if they exist to the stepName so it appears in the .dot file */
+          flow match {
+            case hadoopFlow: HadoopFlow =>
+              val flowSteps = hadoopFlow.getFlowSteps.asScala
+              flowSteps.foreach(
+                  step =>
+                    {
+                  val baseFlowStep: BaseFlowStep[JobConf] =
+                    step.asInstanceOf[BaseFlowStep[JobConf]]
+                  val descriptions =
+                    baseFlowStep.getConfig.get(Config.StepDescriptions, "")
+                  if (!descriptions.isEmpty) {
+                    val stepXofYData = """\(\d+/\d+\)""".r
+                      .findFirstIn(baseFlowStep.getName)
+                      .getOrElse("")
+                    // Reflection is only temporary.  Latest cascading has setName public: https://github.com/cwensel/cascading/commit/487a6e9ef#diff-0feab84bc8832b2a39312dbd208e3e69L175
+                    // https://github.com/twitter/scalding/issues/1294
+                    val x = classOf[BaseFlowStep[JobConf]]
+                      .getDeclaredMethod("setName", classOf[String])
+                    x.setAccessible(true)
+                    x.invoke(step, "%s %s".format(stepXofYData, descriptions))
+                  }
+              })
+            case _ => // descriptions not yet supported in other modes
+          }
+
+          flow.writeDOT(thisDot)
+
+          val thisStepsDot = jobName + cnt + "_steps.dot"
+          println("writing Steps DOT: " + thisStepsDot)
+          flow.writeStepsDOT(thisStepsDot)
+          true
+        } else {
+          j.validate
+          j.run
         }
-
-        flow.writeDOT(thisDot)
-
-        val thisStepsDot = jobName + cnt + "_steps.dot"
-        println("writing Steps DOT: " + thisStepsDot)
-        flow.writeStepsDOT(thisStepsDot)
-        true
-      } else {
-        j.validate
-        j.run
-      }
       j.clear
       //When we get here, the job is finished
       if (successful) {
@@ -131,9 +140,11 @@ class Tool extends Configured with HTool {
           case None => Unit
         }
       } else {
-        throw new RuntimeException("Job failed to run: " + jobName +
-          (if (cnt > 0) { " child: " + cnt.toString + ", class: " + j.getClass.getName }
-          else { "" }))
+        throw new RuntimeException(
+            "Job failed to run: " + jobName +
+            (if (cnt > 0) {
+           " child: " + cnt.toString + ", class: " + j.getClass.getName
+         } else { "" }))
       }
     }
     //start a counter to see how deep we recurse:
@@ -148,9 +159,9 @@ object Tool {
       ToolRunner.run(new JobConf, new Tool, ExpandLibJarsGlobs(args))
     } catch {
       case t: Throwable => {
-        //re-throw the exception with extra info
-        throw new Throwable(RichXHandler(t), t)
-      }
+          //re-throw the exception with extra info
+          throw new Throwable(RichXHandler(t), t)
+        }
     }
   }
 }

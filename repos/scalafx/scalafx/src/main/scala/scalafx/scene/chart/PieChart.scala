@@ -37,15 +37,19 @@ import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
 object PieChart {
-  implicit def sfxPieChart2jfx(v: PieChart): jfxsc.PieChart = if (v != null) v.delegate else null
+  implicit def sfxPieChart2jfx(v: PieChart): jfxsc.PieChart =
+    if (v != null) v.delegate else null
 
   object Data {
-    implicit def sfxPieChartData2jfx(v: PieChart.Data): jfxsc.PieChart.Data = if (v != null) v.delegate else null
+    implicit def sfxPieChartData2jfx(v: PieChart.Data): jfxsc.PieChart.Data =
+      if (v != null) v.delegate else null
 
-    def apply(name: String, value: Double) = new jfxsc.PieChart.Data(name, value)
+    def apply(name: String, value: Double) =
+      new jfxsc.PieChart.Data(name, value)
   }
 
-  class Data(override val delegate: jfxsc.PieChart.Data) extends SFXDelegate[jfxsc.PieChart.Data] {
+  class Data(override val delegate: jfxsc.PieChart.Data)
+      extends SFXDelegate[jfxsc.PieChart.Data] {
     def chart: ReadOnlyObjectProperty[jfxsc.PieChart] = delegate.chartProperty
 
     def name: StringProperty = delegate.nameProperty
@@ -61,12 +65,12 @@ object PieChart {
     def node: ReadOnlyObjectProperty[jfxs.Node] = delegate.nodeProperty()
   }
 
-  def apply(data: ObservableBuffer[jfxsc.PieChart.Data]) = new PieChart(new jfxsc.PieChart(data))
+  def apply(data: ObservableBuffer[jfxsc.PieChart.Data]) =
+    new PieChart(new jfxsc.PieChart(data))
 }
 
 class PieChart(override val delegate: jfxsc.PieChart = new jfxsc.PieChart())
-  extends Chart(delegate)
-  with SFXDelegate[jfxsc.PieChart] {
+    extends Chart(delegate) with SFXDelegate[jfxsc.PieChart] {
 
   def this(data: ObservableBuffer[jfxsc.PieChart.Data]) {
     this(new jfxsc.PieChart(data))
@@ -84,7 +88,6 @@ class PieChart(override val delegate: jfxsc.PieChart = new jfxsc.PieChart())
   def data_=(v: Seq[jfxsc.PieChart.Data]) {
     data() = ObservableBuffer(v)
   }
-
 
   def labelLineLength: DoubleProperty = delegate.labelLineLengthProperty
   def labelLineLength_=(v: Double) {

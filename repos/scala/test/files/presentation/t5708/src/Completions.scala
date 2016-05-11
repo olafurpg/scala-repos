@@ -14,5 +14,5 @@ object Compat {
 }
 
 class Foo {
-  Compat./*!*/CONST_STRING // its 'accessible' flag is false
+  Compat. /*!*/ CONST_STRING // its 'accessible' flag is false
 }

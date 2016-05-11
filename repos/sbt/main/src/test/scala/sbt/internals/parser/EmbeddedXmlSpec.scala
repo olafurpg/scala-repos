@@ -31,25 +31,30 @@ class EmbeddedXmlSpec extends CheckIfParsedSpec {
 
       split(buildSbt) must throwA[MessageOnlyException].like {
         case exception =>
-          val index = buildSbt.lines.indexWhere(line => line.contains(errorLine)) + 1
+          val index =
+            buildSbt.lines.indexWhere(line => line.contains(errorLine)) + 1
           val numberRegex = """(\d+)""".r
           val message = exception.getMessage
           val list = numberRegex.findAllIn(message).toList
           list must contain(index.toString)
       }
-
     }
-
   }
 
   protected val files = Seq(
-    ("""
+      ("""
         |val p = <a/>
-      """.stripMargin, "Xml modified closing tag at end of file", false, true),
-    ("""
+      """.stripMargin,
+       "Xml modified closing tag at end of file",
+       false,
+       true),
+      ("""
         |val p = <a></a>
-      """.stripMargin, "Xml at end of file", false, true),
-    ("""|
+      """.stripMargin,
+       "Xml at end of file",
+       false,
+       true),
+      ("""|
         |
         |name := "play-html-compressor"
         |
@@ -85,8 +90,11 @@ class EmbeddedXmlSpec extends CheckIfParsedSpec {
         |
         |val tra = "</scm>"
         |
-      """.stripMargin, "Xml in string", false, true),
-    ("""|
+      """.stripMargin,
+       "Xml in string",
+       false,
+       true),
+      ("""|
         |
         |name := "play-html-compressor"
         |
@@ -115,9 +123,11 @@ class EmbeddedXmlSpec extends CheckIfParsedSpec {
         |<aa/>
         | </a></xml:group>
         |
-        | """.stripMargin, "Xml with attributes", false, true),
-    (
-      """
+        | """.stripMargin,
+       "Xml with attributes",
+       false,
+       true),
+      ("""
         |scalaVersion := "2.10.2"
         |
         |libraryDependencies += "org.scala-sbt" %% "sbinary" % "0.4.1" withSources() withJavadoc()
@@ -139,7 +149,9 @@ class EmbeddedXmlSpec extends CheckIfParsedSpec {
         |
         |
         |
-      """.stripMargin, "xml with blank line", false, true)
+      """.stripMargin,
+       "xml with blank line",
+       false,
+       true)
   )
-
 }

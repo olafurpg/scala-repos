@@ -27,9 +27,9 @@ import net.liftweb.http._
 import scala.xml.NodeSeq
 
 /**
-* Allows for the creation of JSON-based JavaScript widgets with very little
-* code
-*/
+  * Allows for the creation of JSON-based JavaScript widgets with very little
+  * code
+  */
 /*
 trait JsonComet {
   self: CometActor =>
@@ -151,9 +151,9 @@ trait JsonComet {
     def renderExp: JsExp = Jx(buildInput).toJs ~> JsFunc("apply", JsRaw("null"), JsRaw("[it]"))
 
     /**
-    * A JavaScript expression that builds an array of Name, Value pairs for valid
-    * select box stuff
-    */
+ * A JavaScript expression that builds an array of Name, Value pairs for valid
+ * select box stuff
+ */
     def buildMapList: JsExp
 
     def buildInput: NodeSeq = <select onchange={AnonFunc(onChangeCmd)}>
@@ -207,4 +207,4 @@ trait JsonComet {
   }
 
 }
-*/
+ */

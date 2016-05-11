@@ -2,8 +2,8 @@ package scalaz
 
 ////
 /**
- *
- */
+  *
+  */
 ////
 trait Cobind[F[_]] extends Functor[F] { self =>
   ////
@@ -19,7 +19,9 @@ trait Cobind[F[_]] extends Functor[F] { self =>
   // derived functions
 
   trait CobindLaws {
-    def cobindAssociative[A, B, C, D](fa: F[A], f: F[A] => B, g: F[B] => C, h: F[C] => D)(implicit F: Equal[D]): Boolean = {
+    def cobindAssociative[A, B, C, D](
+        fa: F[A], f: F[A] => B, g: F[B] => C, h: F[C] => D)(
+        implicit F: Equal[D]): Boolean = {
       implicit val C = self
       val d1 = ((Cokleisli(f) =>= Cokleisli(g)) =>= Cokleisli(h)) run fa
       val d2 = (Cokleisli(f) =>= (Cokleisli(g) =>= Cokleisli(h))) run fa

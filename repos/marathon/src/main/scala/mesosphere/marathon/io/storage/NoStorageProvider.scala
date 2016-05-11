@@ -7,9 +7,8 @@ class NoStorageProvider extends StorageProvider {
 
   def item(path: String): Nothing =
     throw new IllegalArgumentException(
-      "No storage provider available to load/persist artifacts. Configuration problem?"
+        "No storage provider available to load/persist artifacts. Configuration problem?"
     )
 
   def assetURLBase: String = ""
-
 }

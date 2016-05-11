@@ -4,7 +4,6 @@
 
 import collection._
 
-
 // test conversions between collections
 object Test {
 
@@ -90,5 +89,4 @@ object Test {
     assert(xs.toSet.par == xs.toSet)
     assert(xs.par.toSet == xs.toSet)
   }
-
 }

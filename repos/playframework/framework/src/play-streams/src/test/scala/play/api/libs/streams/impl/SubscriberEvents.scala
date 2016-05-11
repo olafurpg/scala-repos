@@ -3,7 +3,7 @@
  */
 package play.api.libs.streams.impl
 
-import org.reactivestreams.{ Subscriber, Subscription }
+import org.reactivestreams.{Subscriber, Subscription}
 
 object SubscriberEvents {
   case object OnComplete
@@ -12,8 +12,7 @@ object SubscriberEvents {
   case class OnNext(t: Int)
 }
 
-trait SubscriberEvents {
-  self: EventRecorder =>
+trait SubscriberEvents { self: EventRecorder =>
 
   import SubscriberEvents._
 

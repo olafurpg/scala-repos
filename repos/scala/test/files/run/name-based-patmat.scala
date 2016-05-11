@@ -29,7 +29,8 @@ package p0 {
 }
 
 package p1 {
-  class Triple(val x: Any) extends AnyRef with Product3[String, String, String] {
+  class Triple(val x: Any)
+      extends AnyRef with Product3[String, String, String] {
     private def s = "" + x
     override def canEqual(x: Any) = this eq x.asInstanceOf[AnyRef]
     def isEmpty = false
@@ -67,11 +68,11 @@ package p3 {
 
   object Bar {
     def f(x: Foo) = x match {
-      case Foo(5, 10, 15, 20, _*) => 1
-      case Foo(5, 10, 15, _*)     => 2
-      case Foo(5, 10, _*)         => 3
-      case Foo(5, 10)             => 4 // should warn unreachable
-      case _                      => 5
+      case Foo(5, 10, 15, 20, _ *) => 1
+      case Foo(5, 10, 15, _ *) => 2
+      case Foo(5, 10, _ *) => 3
+      case Foo(5, 10) => 4 // should warn unreachable
+      case _ => 5
     }
   }
 }
@@ -80,20 +81,20 @@ object Test {
   def main(args: Array[String]): Unit = {
     "catdog" match {
       case p0.Single(x) => println(s"`${x._1}` has ${x._1.length} chars")
-      case x            => println("fail: " + x)
+      case x => println("fail: " + x)
     }
     "catdog" match {
       case p0.SingleNoProduct(x) => println(s"`$x` has ${x.length} chars")
-      case x                     => println("fail: " + x)
+      case x => println("fail: " + x)
     }
     "catdog" match {
       case p1.Triple(x, y, z) => List(x, y, z) foreach println
-      case x                  => println("fail: " + x)
+      case x => println("fail: " + x)
     }
     // TODO
     "catdog" match {
       case p2.Triple(x, y, z) => List(x, y, z) foreach println
-      case x                  => println("fail: " + x)
+      case x => println("fail: " + x)
     }
 
     println(p3.Bar.f(p3.Foo(5, 10, 15, 20, 25)))

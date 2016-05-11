@@ -2,7 +2,7 @@
 // Licence: http://www.gnu.org/licenses/gpl-3.0.en.html
 package org.ensime.util
 
-import Predef.{ any2stringadd => _, _ => _ }
+import Predef.{any2stringadd => _, _ => _}
 
 import org.scalatest._
 
@@ -10,20 +10,20 @@ class MapSpec extends FlatSpec with Matchers {
   import map._
 
   val as = Map(
-    1 -> Set('a, 'b, 'c),
-    2 -> Set('b)
+      1 -> Set('a, 'b, 'c),
+      2 -> Set('b)
   )
 
   val bs = Map(
-    1 -> Set('c, 'd),
-    2 -> Set('a),
-    3 -> Set('e)
+      1 -> Set('c, 'd),
+      2 -> Set('a),
+      3 -> Set('e)
   )
 
   val merged = Map(
-    1 -> Set('a, 'b, 'c, 'd),
-    2 -> Set('a, 'b),
-    3 -> Set('e)
+      1 -> Set('a, 'b, 'c, 'd),
+      2 -> Set('a, 'b),
+      3 -> Set('e)
   )
 
   "map._" should "map values eagerly" in {
@@ -44,5 +44,4 @@ class MapSpec extends FlatSpec with Matchers {
 
     (as merge bs) shouldBe merged
   }
-
 }

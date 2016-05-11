@@ -33,10 +33,7 @@ class PipeliningDispatcherTest extends FunSuite with MockitoSugar {
     val p0, p1, p2 = new Promise[String]()
     val trans = mock[Transport[String, String]]
     when(trans.write(any[String])).thenReturn(Future.Done)
-    when(trans.read())
-      .thenReturn(p0)
-      .thenReturn(p1)
-      .thenReturn(p2)
+    when(trans.read()).thenReturn(p0).thenReturn(p1).thenReturn(p2)
     val closeP = new Promise[Throwable]
     when(trans.onClose).thenReturn(closeP)
     val dispatcher = new PipeliningDispatcher[String, String](trans, stats)

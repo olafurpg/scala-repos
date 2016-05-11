@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.elasticsearch
 
 import grizzled.slf4j.Logging
@@ -30,8 +29,9 @@ import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
-class ESEvaluationInstances(client: Client, config: StorageClientConfig, index: String)
-  extends EvaluationInstances with Logging {
+class ESEvaluationInstances(
+    client: Client, config: StorageClientConfig, index: String)
+    extends EvaluationInstances with Logging {
   implicit val formats = DefaultFormats + new EvaluationInstanceSerializer
   private val estype = "evaluation_instances"
 
@@ -40,34 +40,35 @@ class ESEvaluationInstances(client: Client, config: StorageClientConfig, index: 
   if (!indexExistResponse.isExists) {
     indices.prepareCreate(index).get
   }
-  val typeExistResponse = indices.prepareTypesExists(index).setTypes(estype).get
+  val typeExistResponse =
+    indices.prepareTypesExists(index).setTypes(estype).get
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-        ("properties" ->
-          ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-          ("startTime" -> ("type" -> "date")) ~
-          ("endTime" -> ("type" -> "date")) ~
-          ("evaluationClass" ->
-            ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-          ("engineParamsGeneratorClass" ->
-            ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-          ("batch" ->
-            ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-          ("evaluatorResults" ->
-            ("type" -> "string") ~ ("index" -> "no")) ~
-          ("evaluatorResultsHTML" ->
-            ("type" -> "string") ~ ("index" -> "no")) ~
-          ("evaluatorResultsJSON" ->
-            ("type" -> "string") ~ ("index" -> "no"))))
-    indices.preparePutMapping(index).setType(estype).
-      setSource(compact(render(json))).get
+          ("properties" ->
+              ("status" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+              ("startTime" -> ("type" -> "date")) ~
+              ("endTime" -> ("type" -> "date")) ~
+              ("evaluationClass" -> ("type" -> "string") ~
+                  ("index" -> "not_analyzed")) ~
+              ("engineParamsGeneratorClass" -> ("type" -> "string") ~
+                  ("index" -> "not_analyzed")) ~
+              ("batch" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+              ("evaluatorResults" -> ("type" -> "string") ~ ("index" -> "no")) ~
+              ("evaluatorResultsHTML" -> ("type" -> "string") ~
+                  ("index" -> "no")) ~
+              ("evaluatorResultsJSON" -> ("type" -> "string") ~
+                  ("index" -> "no"))))
+    indices
+      .preparePutMapping(index)
+      .setType(estype)
+      .setSource(compact(render(json)))
+      .get
   }
 
   def insert(i: EvaluationInstance): String = {
     try {
-      val response = client.prepareIndex(index, estype).
-        setSource(write(i)).get
+      val response = client.prepareIndex(index, estype).setSource(write(i)).get
       response.getId
     } catch {
       case e: ElasticsearchException =>
@@ -104,9 +105,11 @@ class ESEvaluationInstances(client: Client, config: StorageClientConfig, index: 
 
   def getCompleted(): Seq[EvaluationInstance] = {
     try {
-      val builder = client.prepareSearch(index).setTypes(estype).setPostFilter(
-        termFilter("status", "EVALCOMPLETED")).
-        addSort("startTime", SortOrder.DESC)
+      val builder = client
+        .prepareSearch(index)
+        .setTypes(estype)
+        .setPostFilter(termFilter("status", "EVALCOMPLETED"))
+        .addSort("startTime", SortOrder.DESC)
       ESUtils.getAll[EvaluationInstance](client, builder)
     } catch {
       case e: ElasticsearchException =>

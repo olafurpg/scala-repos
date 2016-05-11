@@ -31,18 +31,22 @@ import javafx.scene.{control => jfxsc}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[scalafx.scene.control.SelectionMode]] */
-object SelectionMode extends SFXEnumDelegateCompanion[jfxsc.SelectionMode, SelectionMode] {
+object SelectionMode
+    extends SFXEnumDelegateCompanion[jfxsc.SelectionMode, SelectionMode] {
 
   val Multiple = new SelectionMode(jfxsc.SelectionMode.MULTIPLE)
-  @deprecated ("Use Multiple; MULTIPLE will be removed in a future release", "8.0.60-R10")
+  @deprecated("Use Multiple; MULTIPLE will be removed in a future release",
+              "8.0.60-R10")
   val MULTIPLE = Multiple
 
   val Single = new SelectionMode(jfxsc.SelectionMode.SINGLE)
-  @deprecated ("Use Single; SINGLE will be removed in a future release", "8.0.60-R10")
+  @deprecated(
+      "Use Single; SINGLE will be removed in a future release", "8.0.60-R10")
   val SINGLE = Single
 
-  protected override def unsortedValues: Array[SelectionMode] = Array(Single, Multiple)
+  protected override def unsortedValues: Array[SelectionMode] =
+    Array(Single, Multiple)
 }
 
-
-sealed case class SelectionMode(override val delegate: jfxsc.SelectionMode) extends SFXEnumDelegate[jfxsc.SelectionMode]
+sealed case class SelectionMode(override val delegate: jfxsc.SelectionMode)
+    extends SFXEnumDelegate[jfxsc.SelectionMode]

@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -60,14 +60,14 @@ class PriorityQueueTest {
     case class Rect(x: Int, y: Int)
 
     val areaComp = new Comparator[Rect] {
-      def compare(a: Rect, b: Rect): Int = (a.x*a.y) - (b.x*b.y)
+      def compare(a: Rect, b: Rect): Int = (a.x * a.y) - (b.x * b.y)
     }
 
     val pq = new PriorityQueue[Rect](11, areaComp)
 
-    assertTrue(pq.add(Rect(1,2)))
-    assertTrue(pq.add(Rect(2,3)))
-    assertTrue(pq.add(Rect(1,3)))
+    assertTrue(pq.add(Rect(1, 2)))
+    assertTrue(pq.add(Rect(2, 3)))
+    assertTrue(pq.add(Rect(1, 3)))
 
     val first = pq.poll()
     assertEquals(1, first.x)
@@ -230,5 +230,4 @@ class PriorityQueueTest {
     assertTrue(pqDouble.add(-0.987))
     assertEquals(-0.987, pqDouble.poll(), 0.0)
   }
-
 }

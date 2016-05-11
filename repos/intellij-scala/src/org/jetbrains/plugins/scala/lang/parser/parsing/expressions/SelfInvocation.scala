@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
- * @author Alexander Podkhalyuzin
- *  Date: 13.02.2008
- */
-
+  * @author Alexander Podkhalyuzin
+  *  Date: 13.02.2008
+  */
 /*
  * SelfInvocation ::= 'this' ArgumentExprs {ArgumentExprs}
  */
@@ -32,7 +31,8 @@ object SelfInvocation {
       selfMarker.done(ScalaElementTypes.SELF_INVOCATION)
       return true
     }
-    while (!builder.newlineBeforeCurrentToken && ArgumentExprs.parse(builder)) {}
+    while (!builder.newlineBeforeCurrentToken &&
+    ArgumentExprs.parse(builder)) {}
     selfMarker.done(ScalaElementTypes.SELF_INVOCATION)
     true
   }

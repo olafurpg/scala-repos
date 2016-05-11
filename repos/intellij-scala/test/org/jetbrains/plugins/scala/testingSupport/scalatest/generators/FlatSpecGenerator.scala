@@ -12,8 +12,9 @@ trait FlatSpecGenerator extends ScalaTestTestCase {
   def flatSpecFileName = flatSpecClassName + ".scala"
 
   def addFlatSpec() {
-    addFileToProject("FlatSpecTest.scala",
-      """
+    addFileToProject(
+        "FlatSpecTest.scala",
+        """
         |import org.scalatest._
         |
         |class FlatSpecTest extends FlatSpec with GivenWhenThen {
@@ -33,13 +34,13 @@ trait FlatSpecGenerator extends ScalaTestTestCase {
         |   print(">>TEST: FAILED<<")
         | }
         |}
-      """.stripMargin.trim()
-    )
+      """.stripMargin.trim())
   }
 
   def addBehaviorFlatSpec() = {
-    addFileToProject("BehaviorFlatSpec.scala",
-      """
+    addFileToProject(
+        "BehaviorFlatSpec.scala",
+        """
         |import org.scalatest._
         |
         |class BehaviorFlatSpec extends FlatSpec with GivenWhenThen {
@@ -53,7 +54,6 @@ trait FlatSpecGenerator extends ScalaTestTestCase {
         |
         |  }
         |}
-      """.stripMargin.trim()
-    )
+      """.stripMargin.trim())
   }
 }

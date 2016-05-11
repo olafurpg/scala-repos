@@ -11,14 +11,15 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.util.MultilineStringUtil
 
 /**
- * User: Dmitry Naydanov
- * Date: 4/2/12
- */
-
-class AddStripMarginToMLStringIntention extends PsiElementBaseIntentionAction{
-  def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = {
-    if (element == null || element.getNode == null || element.getNode.getElementType != ScalaTokenTypes.tMULTILINE_STRING ||
-            !element.getText.contains("\n")) return false
+  * User: Dmitry Naydanov
+  * Date: 4/2/12
+  */
+class AddStripMarginToMLStringIntention extends PsiElementBaseIntentionAction {
+  def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
+    if (element == null || element.getNode == null ||
+        element.getNode.getElementType != ScalaTokenTypes.tMULTILINE_STRING ||
+        !element.getText.contains("\n")) return false
 
     MultilineStringUtil.needAddStripMargin(element, getMarginChar(project))
   }
@@ -31,10 +32,15 @@ class AddStripMarginToMLStringIntention extends PsiElementBaseIntentionAction{
     val suffix = if (marginChar == "|") "" else "(\'" + marginChar + "\')"
 
     extensions.inWriteAction {
-      editor.getDocument.insertString(element.getTextRange.getEndOffset, ".stripMargin" + suffix)
+      editor.getDocument.insertString(
+          element.getTextRange.getEndOffset, ".stripMargin" + suffix)
     }
   }
 
   private def getMarginChar(project: Project): String =
-    CodeStyleSettingsManager.getInstance(project).getCurrentSettings.getCustomSettings(classOf[ScalaCodeStyleSettings]).MARGIN_CHAR + ""
+    CodeStyleSettingsManager
+      .getInstance(project)
+      .getCurrentSettings
+      .getCustomSettings(classOf[ScalaCodeStyleSettings])
+      .MARGIN_CHAR + ""
 }

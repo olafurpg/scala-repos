@@ -9,16 +9,34 @@ import Flag._
 object Test extends Properties("reflection extractors") {
 
   val genFlag = oneOf(
-    TRAIT, INTERFACE, MUTABLE, MACRO, DEFERRED, ABSTRACT, FINAL, SEALED,
-    IMPLICIT, LAZY, OVERRIDE, PRIVATE, PROTECTED, LOCAL, CASE, ABSOVERRIDE,
-    BYNAMEPARAM, PARAM, COVARIANT, CONTRAVARIANT, DEFAULTPARAM, PRESUPER,
-    DEFAULTINIT
+      TRAIT,
+      INTERFACE,
+      MUTABLE,
+      MACRO,
+      DEFERRED,
+      ABSTRACT,
+      FINAL,
+      SEALED,
+      IMPLICIT,
+      LAZY,
+      OVERRIDE,
+      PRIVATE,
+      PROTECTED,
+      LOCAL,
+      CASE,
+      ABSOVERRIDE,
+      BYNAMEPARAM,
+      PARAM,
+      COVARIANT,
+      CONTRAVARIANT,
+      DEFAULTPARAM,
+      PRESUPER,
+      DEFAULTINIT
   )
-  val genModifiers =
-    for(flag <- genFlag; privateWithin <- genName)
-      yield Modifiers(flag, privateWithin, Nil)
-  val genTermName = for(name <- arbitrary[String]) yield TermName(name)
-  val genTypeName = for(name <- arbitrary[String]) yield TypeName(name)
+  val genModifiers = for (flag <- genFlag; privateWithin <- genName) yield
+    Modifiers(flag, privateWithin, Nil)
+  val genTermName = for (name <- arbitrary[String]) yield TermName(name)
+  val genTypeName = for (name <- arbitrary[String]) yield TypeName(name)
   val genName = oneOf(genTermName, genTypeName)
 
   implicit val arbTermName: Arbitrary[TermName] = Arbitrary(genTermName)
@@ -45,8 +63,7 @@ object Test extends Properties("reflection extractors") {
 
   property("extract modifiers") = forAll { (mods: Modifiers) =>
     val Modifiers(flags, priv, annots) = mods
-    flags == mods.flags &&
-    priv == mods.privateWithin &&
+    flags == mods.flags && priv == mods.privateWithin &&
     annots == mods.annotations
   }
 }

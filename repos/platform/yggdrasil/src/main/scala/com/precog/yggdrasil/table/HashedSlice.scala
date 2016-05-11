@@ -27,10 +27,11 @@ import scala.collection.mutable
 import scala.annotation.tailrec
 
 /**
- * Creates an efficient hash for a slice. From this, when given another slice, we can
- * map rows from that slice to rows in the hashed slice.
- */
-final class HashedSlice private (slice0: Slice, rowMap: scala.collection.Map[Int, IntList]) {
+  * Creates an efficient hash for a slice. From this, when given another slice, we can
+  * map rows from that slice to rows in the hashed slice.
+  */
+final class HashedSlice private (
+    slice0: Slice, rowMap: scala.collection.Map[Int, IntList]) {
   def mapRowsFrom(slice1: Slice): Int => (Int => Unit) => Unit = {
     val hasher = new SliceHasher(slice1)
     val rowComparator: RowComparator = Slice.rowComparatorFor(slice1, slice0) {
@@ -64,17 +65,20 @@ object HashedSlice {
 }
 
 /**
- * Wraps a slice and provides a way to hash its rows efficiently. Given 2
- * equivalent rows in 2 different slices, this should hash both rows to the
- * same value, regardless of whether the slices look similar otherwise.
- */
+  * Wraps a slice and provides a way to hash its rows efficiently. Given 2
+  * equivalent rows in 2 different slices, this should hash both rows to the
+  * same value, regardless of whether the slices look similar otherwise.
+  */
 private final class SliceHasher(slice: Slice) {
-  private val hashers: Array[ColumnHasher] = slice.columns.toArray map { case (ref, col) =>
-    ColumnHasher(ref, col)
-  }
+  private val hashers: Array[ColumnHasher] =
+    slice.columns.toArray map {
+      case (ref, col) =>
+        ColumnHasher(ref, col)
+    }
 
   @tailrec private final def hashOf(row: Int, i: Int = 0, hc: Int = 0): Int = {
-    if (i >= hashers.length) hc else {
+    if (i >= hashers.length) hc
+    else {
       hashOf(row, i + 1, hc ^ hashers(i).hash(row))
     }
   }
@@ -83,41 +87,50 @@ private final class SliceHasher(slice: Slice) {
 }
 
 /**
- * A simple way to hash rows in a column. This should guarantee that equivalent
- * columns have the same hash. For instance, equivalent Double and Longs should
- * hash to the same number.
- */
+  * A simple way to hash rows in a column. This should guarantee that equivalent
+  * columns have the same hash. For instance, equivalent Double and Longs should
+  * hash to the same number.
+  */
 private sealed trait ColumnHasher {
   def columnRef: ColumnRef
   def column: Column
 
-  final def hash(row: Int): Int = if (column isDefinedAt row) hashImpl(row) else 0
+  final def hash(row: Int): Int =
+    if (column isDefinedAt row) hashImpl(row) else 0
 
   protected def hashImpl(row: Int): Int
 }
 
-private final case class StrColumnHasher(columnRef: ColumnRef, column: StrColumn)
+private final case class StrColumnHasher(
+    columnRef: ColumnRef, column: StrColumn)
     extends ColumnHasher {
   private val pathHash = columnRef.selector.hashCode
-  protected final def hashImpl(row: Int): Int = 3 * pathHash + 23 * column(row).hashCode
+  protected final def hashImpl(row: Int): Int =
+    3 * pathHash + 23 * column(row).hashCode
 }
 
-private final case class BoolColumnHasher(columnRef: ColumnRef, column: BoolColumn)
+private final case class BoolColumnHasher(
+    columnRef: ColumnRef, column: BoolColumn)
     extends ColumnHasher {
   private val pathHash = columnRef.selector.hashCode
-  protected final def hashImpl(row: Int): Int = 5 * pathHash + 457 * (if (column(row)) 42 else 21)
+  protected final def hashImpl(row: Int): Int =
+    5 * pathHash + 457 * (if (column(row)) 42 else 21)
 }
 
-private final case class DateColumnHasher(columnRef: ColumnRef, column: DateColumn)
+private final case class DateColumnHasher(
+    columnRef: ColumnRef, column: DateColumn)
     extends ColumnHasher {
   private val pathHash = columnRef.selector.hashCode
-  protected final def hashImpl(row: Int): Int = 7 * pathHash + 17 * column(row).toString().hashCode
+  protected final def hashImpl(row: Int): Int =
+    7 * pathHash + 17 * column(row).toString().hashCode
 }
 
-private final case class PeriodColumnHasher(columnRef: ColumnRef, column: PeriodColumn)
+private final case class PeriodColumnHasher(
+    columnRef: ColumnRef, column: PeriodColumn)
     extends ColumnHasher {
   private val pathHash = columnRef.selector.hashCode
-  protected final def hashImpl(row: Int): Int = 11 * pathHash + 503 * column(row).hashCode
+  protected final def hashImpl(row: Int): Int =
+    11 * pathHash + 503 * column(row).hashCode
 }
 
 private object NumericHash {
@@ -143,28 +156,36 @@ private object NumericHash {
   }
 }
 
-private final case class LongColumnHasher(columnRef: ColumnRef, column: LongColumn)
+private final case class LongColumnHasher(
+    columnRef: ColumnRef, column: LongColumn)
     extends ColumnHasher {
   private val pathHash = columnRef.selector.hashCode
-  protected final def hashImpl(row: Int): Int = 13 * pathHash + 23 * NumericHash(column(row))
+  protected final def hashImpl(row: Int): Int =
+    13 * pathHash + 23 * NumericHash(column(row))
 }
 
-private final case class DoubleColumnHasher(columnRef: ColumnRef, column: DoubleColumn)
+private final case class DoubleColumnHasher(
+    columnRef: ColumnRef, column: DoubleColumn)
     extends ColumnHasher {
   private val pathHash = columnRef.selector.hashCode
-  protected final def hashImpl(row: Int): Int = 13 * pathHash + 23 * NumericHash(column(row))
+  protected final def hashImpl(row: Int): Int =
+    13 * pathHash + 23 * NumericHash(column(row))
 }
 
-private final case class NumColumnHasher(columnRef: ColumnRef, column: NumColumn)
+private final case class NumColumnHasher(
+    columnRef: ColumnRef, column: NumColumn)
     extends ColumnHasher {
   private val pathHash = columnRef.selector.hashCode
-  protected final def hashImpl(row: Int): Int = 13 * pathHash + 23 * NumericHash(column(row))
+  protected final def hashImpl(row: Int): Int =
+    13 * pathHash + 23 * NumericHash(column(row))
 }
 
-private final case class CValueColumnHasher(columnRef: ColumnRef, column: Column)
+private final case class CValueColumnHasher(
+    columnRef: ColumnRef, column: Column)
     extends ColumnHasher {
   private val pathHash = columnRef.selector.hashCode
-  protected final def hashImpl(row: Int): Int = 17 * pathHash + 23 * column.cValue(row).hashCode
+  protected final def hashImpl(row: Int): Int =
+    17 * pathHash + 23 * column.cValue(row).hashCode
 }
 
 private object ColumnHasher {

@@ -29,59 +29,60 @@ class UInt(val signed: Int) extends AnyVal {
 
   override def toString: String = toLong.toString
 
-  def == (that: UInt): Boolean = this.signed == that.signed
-  def != (that: UInt): Boolean = this.signed != that.signed
+  def ==(that: UInt): Boolean = this.signed == that.signed
+  def !=(that: UInt): Boolean = this.signed != that.signed
 
   def ===(that: UInt): Boolean = this.signed == that.signed
   def =!=(that: UInt): Boolean = this.signed != that.signed
 
-  def <= (that: UInt): Boolean = this.toLong <= that.toLong
-  def < (that: UInt): Boolean = this.toLong < that.toLong
-  def >= (that: UInt): Boolean = this.toLong >= that.toLong
-  def > (that: UInt): Boolean = this.toLong > that.toLong
+  def <=(that: UInt): Boolean = this.toLong <= that.toLong
+  def <(that: UInt): Boolean = this.toLong < that.toLong
+  def >=(that: UInt): Boolean = this.toLong >= that.toLong
+  def >(that: UInt): Boolean = this.toLong > that.toLong
 
   def unary_- : UInt = UInt(-this.signed)
 
-  def + (that: UInt): UInt = UInt(this.signed + that.signed)
-  def - (that: UInt): UInt = UInt(this.signed - that.signed)
-  def * (that: UInt): UInt = UInt(this.signed * that.signed)
-  def / (that: UInt): UInt = UInt(this.toLong / that.toLong)
-  def % (that: UInt): UInt = UInt(this.toLong % that.toLong)
+  def +(that: UInt): UInt = UInt(this.signed + that.signed)
+  def -(that: UInt): UInt = UInt(this.signed - that.signed)
+  def *(that: UInt): UInt = UInt(this.signed * that.signed)
+  def /(that: UInt): UInt = UInt(this.toLong / that.toLong)
+  def %(that: UInt): UInt = UInt(this.toLong % that.toLong)
 
   def unary_~ : UInt = UInt(~this.signed)
 
-  def << (shift: Int): UInt = UInt(signed << shift)
-  def >> (shift: Int): UInt = UInt(signed >>> shift)
-  def >>> (shift: Int): UInt = UInt(signed >>> shift)
-  def & (that: UInt): UInt = UInt(this.signed & that.signed)
-  def | (that: UInt): UInt = UInt(this.signed | that.signed)
-  def ^ (that: UInt): UInt = UInt(this.signed ^ that.signed)
+  def <<(shift: Int): UInt = UInt(signed << shift)
+  def >>(shift: Int): UInt = UInt(signed >>> shift)
+  def >>>(shift: Int): UInt = UInt(signed >>> shift)
+  def &(that: UInt): UInt = UInt(this.signed & that.signed)
+  def |(that: UInt): UInt = UInt(this.signed | that.signed)
+  def ^(that: UInt): UInt = UInt(this.signed ^ that.signed)
 
-  def ** (that: UInt): UInt = UInt(pow(this.toLong, that.toLong))
+  def **(that: UInt): UInt = UInt(pow(this.toLong, that.toLong))
 }
 
 trait UIntInstances {
   implicit final val UIntAlgebra = new UIntAlgebra
   implicit final val UIntBitString = new UIntBitString
   import spire.math.NumberTag._
-  implicit final val UIntTag = new UnsignedIntTag[UInt](UInt.MinValue, UInt.MaxValue)
+  implicit final val UIntTag =
+    new UnsignedIntTag[UInt](UInt.MinValue, UInt.MaxValue)
 }
 
 private[math] trait UIntIsRig extends Rig[UInt] {
   def one: UInt = UInt(1)
-  def plus(a:UInt, b:UInt): UInt = a + b
-  override def pow(a:UInt, b:Int): UInt = {
+  def plus(a: UInt, b: UInt): UInt = a + b
+  override def pow(a: UInt, b: Int): UInt = {
     if (b < 0)
       throw new IllegalArgumentException("negative exponent: %s" format b)
     a ** UInt(b)
   }
-  override def times(a:UInt, b:UInt): UInt = a * b
+  override def times(a: UInt, b: UInt): UInt = a * b
   def zero: UInt = UInt(0)
 }
 
 private[math] trait UIntOrder extends Order[UInt] {
-  override def eqv(x:UInt, y:UInt): Boolean = x == y
-  override def neqv(x:UInt, y:UInt): Boolean = x != y
+  override def eqv(x: UInt, y: UInt): Boolean = x == y
+  override def neqv(x: UInt, y: UInt): Boolean = x != y
   override def gt(x: UInt, y: UInt): Boolean = x > y
   override def gteqv(x: UInt, y: UInt): Boolean = x >= y
   override def lt(x: UInt, y: UInt): Boolean = x < y
@@ -105,14 +106,17 @@ private[math] class UIntBitString extends BitString[UInt] with Serializable {
   def bitCount(n: UInt): Int = Integer.bitCount(n.signed)
   def highestOneBit(n: UInt): UInt = UInt(Integer.highestOneBit(n.signed))
   def lowestOneBit(n: UInt): UInt = UInt(Integer.lowestOneBit(n.signed))
-  def numberOfLeadingZeros(n: UInt): Int = Integer.numberOfLeadingZeros(n.signed)
-  def numberOfTrailingZeros(n: UInt): Int = Integer.numberOfTrailingZeros(n.signed)
+  def numberOfLeadingZeros(n: UInt): Int =
+    Integer.numberOfLeadingZeros(n.signed)
+  def numberOfTrailingZeros(n: UInt): Int =
+    Integer.numberOfTrailingZeros(n.signed)
 
   def leftShift(n: UInt, i: Int): UInt = n << i
   def rightShift(n: UInt, i: Int): UInt = n >> i
   def signedRightShift(n: UInt, i: Int): UInt = n >>> i
   def rotateLeft(n: UInt, i: Int): UInt = UInt(Integer.rotateLeft(n.signed, i))
-  def rotateRight(n: UInt, i: Int): UInt = UInt(Integer.rotateRight(n.signed, i))
+  def rotateRight(n: UInt, i: Int): UInt =
+    UInt(Integer.rotateRight(n.signed, i))
 }
 
 private[math] trait UIntIsSigned extends Signed[UInt] {
@@ -120,10 +124,12 @@ private[math] trait UIntIsSigned extends Signed[UInt] {
   def abs(a: UInt): UInt = a
 }
 
-private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntOrder with UIntIsSigned {
+private[math] trait UIntIsReal
+    extends IsIntegral[UInt] with UIntOrder with UIntIsSigned {
   def toDouble(n: UInt): Double = n.toDouble
   def toBigInt(n: UInt): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)
-private[math] class UIntAlgebra extends UIntIsRig with UIntIsReal with Serializable
+private[math] class UIntAlgebra
+    extends UIntIsRig with UIntIsReal with Serializable

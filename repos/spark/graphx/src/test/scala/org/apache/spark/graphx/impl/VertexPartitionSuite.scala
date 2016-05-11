@@ -25,7 +25,10 @@ import org.apache.spark.serializer.KryoSerializer
 class VertexPartitionSuite extends SparkFunSuite {
 
   test("isDefined, filter") {
-    val vp = VertexPartition(Iterator((0L, 1), (1L, 1))).filter { (vid, attr) => vid == 0 }
+    val vp = VertexPartition(Iterator((0L, 1), (1L, 1))).filter {
+      (vid, attr) =>
+        vid == 0
+    }
     assert(vp.isDefined(0))
     assert(!vp.isDefined(1))
     assert(!vp.isDefined(2))
@@ -33,14 +36,20 @@ class VertexPartitionSuite extends SparkFunSuite {
   }
 
   test("map") {
-    val vp = VertexPartition(Iterator((0L, 1), (1L, 1))).map { (vid, attr) => 2 }
+    val vp = VertexPartition(Iterator((0L, 1), (1L, 1))).map { (vid, attr) =>
+      2
+    }
     assert(vp(0) === 2)
   }
 
   test("diff") {
     val vp = VertexPartition(Iterator((0L, 1), (1L, 1), (2L, 1)))
-    val vp2 = vp.filter { (vid, attr) => vid <= 1 }
-    val vp3a = vp.map { (vid, attr) => 2 }
+    val vp2 = vp.filter { (vid, attr) =>
+      vid <= 1
+    }
+    val vp3a = vp.map { (vid, attr) =>
+      2
+    }
     val vp3b = VertexPartition(vp3a.iterator)
     // diff with same index
     val diff1 = vp2.diff(vp3a)
@@ -58,31 +67,51 @@ class VertexPartitionSuite extends SparkFunSuite {
 
   test("leftJoin") {
     val vp = VertexPartition(Iterator((0L, 1), (1L, 1), (2L, 1)))
-    val vp2a = vp.filter { (vid, attr) => vid <= 1 }.map { (vid, attr) => 2 }
+    val vp2a = vp.filter { (vid, attr) =>
+      vid <= 1
+    }.map { (vid, attr) =>
+      2
+    }
     val vp2b = VertexPartition(vp2a.iterator)
     // leftJoin with same index
-    val join1 = vp.leftJoin(vp2a) { (vid, a, bOpt) => bOpt.getOrElse(a) }
+    val join1 = vp.leftJoin(vp2a) { (vid, a, bOpt) =>
+      bOpt.getOrElse(a)
+    }
     assert(join1.iterator.toSet === Set((0L, 2), (1L, 2), (2L, 1)))
     // leftJoin with different indexes
-    val join2 = vp.leftJoin(vp2b) { (vid, a, bOpt) => bOpt.getOrElse(a) }
+    val join2 = vp.leftJoin(vp2b) { (vid, a, bOpt) =>
+      bOpt.getOrElse(a)
+    }
     assert(join2.iterator.toSet === Set((0L, 2), (1L, 2), (2L, 1)))
     // leftJoin an iterator
-    val join3 = vp.leftJoin(vp2a.iterator) { (vid, a, bOpt) => bOpt.getOrElse(a) }
+    val join3 = vp.leftJoin(vp2a.iterator) { (vid, a, bOpt) =>
+      bOpt.getOrElse(a)
+    }
     assert(join3.iterator.toSet === Set((0L, 2), (1L, 2), (2L, 1)))
   }
 
   test("innerJoin") {
     val vp = VertexPartition(Iterator((0L, 1), (1L, 1), (2L, 1)))
-    val vp2a = vp.filter { (vid, attr) => vid <= 1 }.map { (vid, attr) => 2 }
+    val vp2a = vp.filter { (vid, attr) =>
+      vid <= 1
+    }.map { (vid, attr) =>
+      2
+    }
     val vp2b = VertexPartition(vp2a.iterator)
     // innerJoin with same index
-    val join1 = vp.innerJoin(vp2a) { (vid, a, b) => b }
+    val join1 = vp.innerJoin(vp2a) { (vid, a, b) =>
+      b
+    }
     assert(join1.iterator.toSet === Set((0L, 2), (1L, 2)))
     // innerJoin with different indexes
-    val join2 = vp.innerJoin(vp2b) { (vid, a, b) => b }
+    val join2 = vp.innerJoin(vp2b) { (vid, a, b) =>
+      b
+    }
     assert(join2.iterator.toSet === Set((0L, 2), (1L, 2)))
     // innerJoin an iterator
-    val join3 = vp.innerJoin(vp2a.iterator) { (vid, a, b) => b }
+    val join3 = vp.innerJoin(vp2a.iterator) { (vid, a, b) =>
+      b
+    }
     assert(join3.iterator.toSet === Set((0L, 2), (1L, 2)))
   }
 
@@ -111,7 +140,9 @@ class VertexPartitionSuite extends SparkFunSuite {
 
   test("reindex") {
     val vp = VertexPartition(Iterator((0L, 1), (1L, 1), (2L, 1)))
-    val vp2 = vp.filter { (vid, attr) => vid <= 1 }
+    val vp2 = vp.filter { (vid, attr) =>
+      vid <= 1
+    }
     val vp3 = vp2.reindex()
     assert(vp2.iterator.toSet === vp3.iterator.toSet)
     assert(vp2(2) === 1)

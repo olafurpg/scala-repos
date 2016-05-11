@@ -1,5 +1,4 @@
-
-import scala.language.{ postfixOps }
+import scala.language.{postfixOps}
 
 object Test {
 
@@ -44,11 +43,11 @@ object Test {
   def assertEquals(msg: String, a: Any, b: Any) { assert(a == b, msg) }
 
   object SimpleUnapply {
-    def run() { // from sortedmap, old version
+    def run() {
+      // from sortedmap, old version
       List((1, 2)).head match {
-        case kv@(key, _) => kv.toString + " " + key.toString
+        case kv @ (key, _) => kv.toString + " " + key.toString
       }
-
     }
   }
 
@@ -57,7 +56,7 @@ object Test {
     def run() {
       List(1, 2) match {
         case List(1) => assert(false, "wrong case")
-        case List(1, 2, xs@_*) => assert(xs.isEmpty, "not empty")
+        case List(1, 2, xs @ _ *) => assert(xs.isEmpty, "not empty")
         case Nil => assert(false, "wrong case")
       }
       SFB(1, List(1)) match {
@@ -170,10 +169,10 @@ object Test {
   // all ignoring patterns on List
   object TestSequence01 {
     def doMatch(xs: List[String]): String = xs match {
-      case List(_*) => "ok"
+      case List(_ *) => "ok"
     }
     def doMatch2(xs: List[String]): List[String] = xs match {
-      case List(_, rest@_*) => rest.toList
+      case List(_, rest @ _ *) => rest.toList
     }
     def run() {
       val list1 = List()
@@ -188,7 +187,7 @@ object Test {
   // all ignoring patterns on Seq
   object TestSequence02 {
     def doMatch(l: Seq[String]): String = l match {
-      case Seq(_*) => "ok"
+      case Seq(_ *) => "ok"
     }
     def run() {
       val list1 = List()
@@ -205,7 +204,7 @@ object Test {
   // right-ignoring patterns on List, defaults
   object TestSequence03 {
     def doMatch(xs: List[String]): String = xs match {
-      case List(_, _, _, _*) => "ok"
+      case List(_, _, _, _ *) => "ok"
       case _ => "not ok"
     }
     def run() {
@@ -224,13 +223,13 @@ object Test {
 
     def run() {
       val a = Foo(0, 'a') match {
-        case Foo(i, c, chars@_*) => c
+        case Foo(i, c, chars @ _ *) => c
         case _ => null
       }
       assertEquals(a, 'a')
 
       val b = Foo(0, 'a') match {
-        case Foo(i, chars@_*) => 'b'
+        case Foo(i, chars @ _ *) => 'b'
         case _ => null
       }
       assertEquals(b, 'b')
@@ -246,10 +245,15 @@ object Test {
 
     def run() {
       val res = (Bar(Foo()): Con) match {
-        case Bar(xs@_*) => xs // this should be optimized away to a pattern Bar(xs)
+        case Bar(xs @ _ *) =>
+          xs // this should be optimized away to a pattern Bar(xs)
         case _ => Nil
       }
-      assertEquals("res instance" + res.isInstanceOf[Seq[Con] forSome { type Con }] + " res(0)=" + res(0), true, res.isInstanceOf[Seq[Foo] forSome { type Foo }] && res(0) == Foo())
+      assertEquals(
+          "res instance" + res.isInstanceOf[Seq[Con] forSome { type Con }] +
+          " res(0)=" + res(0),
+          true,
+          res.isInstanceOf[Seq[Foo] forSome { type Foo }] && res(0) == Foo())
     }
   }
 
@@ -269,24 +273,23 @@ object Test {
       assertEquals(doMatch(A(1), 2), 1)
       assertEquals(doMatch(A(A(1)), 2), 2)
     }
-
   }
 
   // List of chars
   object TestSequence07 {
     def doMatch1(xs: List[Char]) = xs match {
-      case List(x, y, _*) => x :: y :: Nil
+      case List(x, y, _ *) => x :: y :: Nil
     }
     def doMatch2(xs: List[Char]) = xs match {
       case List(x, y, z, w) => List(z, w)
     }
     def doMatch3(xs: Seq[Char]) = xs match {
-      case Seq(x, y, 'c', w@_*) => x :: y :: Nil
-      case Seq(x, y, z@_*) => z
+      case Seq(x, y, 'c', w @ _ *) => x :: y :: Nil
+      case Seq(x, y, z @ _ *) => z
     }
     def doMatch4(xs: Seq[Char]) = xs match {
       case Seq(x, 'b') => x :: 'b' :: Nil
-      case Seq(x, y, z@_*) => z.toList
+      case Seq(x, y, z @ _ *) => z.toList
     }
 
     def run() {
@@ -363,16 +366,14 @@ object Test {
 
     object PersonFather {
       def unapply(p: Person): Option[Person] =
-        if (p.father == null)
-          None
-        else
-          Some(p.father)
+        if (p.father == null) None
+        else Some(p.father)
     }
     def run() {
       val p1 = new Person("p1", null)
       val p2 = new Person("p2", p1)
       assertEquals((p2.name, p1.name), p2 match {
-        case aPerson@PersonFather(f) => (aPerson.name, f.name)
+        case aPerson @ PersonFather(f) => (aPerson.name, f.name)
         case _ => "No father"
       })
     }
@@ -441,7 +442,8 @@ object Test {
     case FooBar => true
   }
 
-  object Bug1270 { // unapply13
+  object Bug1270 {
+    // unapply13
     class Sync {
       def apply(x: Int): Int = 42
       def unapply(scrut: Any): Option[Int] = None
@@ -450,7 +452,8 @@ object Test {
       object Get extends Sync
 
       var ps: PartialFunction[Any, Any] = {
-        case Get(y) if y > 4 => // y gets a wildcard type for some reason?! hack
+        case Get(y) if y > 4 =>
+        // y gets a wildcard type for some reason?! hack
       }
     }
     def run() {
@@ -468,7 +471,8 @@ object Test {
     class Buffer {
       val Get = new Sync
       val jp: PartialFunction[Any, Any] = {
-        case Get(xs) => // the argDummy <unapply-selector> should have proper arg.tpe (Int in this case)
+        case Get(xs) =>
+        // the argDummy <unapply-selector> should have proper arg.tpe (Int in this case)
       }
     }
     def run() {
@@ -479,7 +483,10 @@ object Test {
 
   object ClassDefInGuard {
     val z: PartialFunction[Any, Any] = {
-      case x :: xs if xs.forall { y => y.hashCode() > 0 } => 1
+      case x :: xs if xs.forall { y =>
+            y.hashCode() > 0
+          } =>
+        1
     }
 
     def run() {
@@ -487,7 +494,10 @@ object Test {
         case List(4 :: xs) => 1
         case List(5 :: xs) => 1
         case _ if false =>
-        case List(3 :: xs) if List(3: Any).forall { g => g.hashCode() > 0 } => 1
+        case List(3 :: xs) if List(3: Any).forall { g =>
+              g.hashCode() > 0
+            } =>
+          1
       }
       z.isDefinedAt(42)
       s.isDefinedAt(42)
@@ -511,19 +521,16 @@ object Test {
     }
 
     def method2(): scala.Boolean = {
-      val x: String = "Hello, world"; val y: scala.Int = 100; {
+      val x: String = "Hello, world"; val y: scala.Int = 100;
+      {
         var temp1: scala.Int = y
         var result: scala.Boolean = false
         if ({
           var result1: scala.Boolean = true;
-          if (y == 100)
-            result1
-          else
-            throw new MatchError("crazybox.scala, line 11")
-        } && (y > 90))
-          result
-        else
-          throw new MatchError("crazybox.scala, line 9")
+          if (y == 100) result1
+          else throw new MatchError("crazybox.scala, line 11")
+        } && (y > 90)) result
+        else throw new MatchError("crazybox.scala, line 9")
       }
     }
 
@@ -556,7 +563,8 @@ object Test {
 
   // bug#789
 
-  object Bug789 { // don't do this at home
+  object Bug789 {
+    // don't do this at home
 
     trait Impl
 
@@ -574,7 +582,8 @@ object Test {
     }
 
     def info2(x: Impl) = x match {
-      case x: SizeImpl with ColorImpl => "size  " + x.size + " color " + x.color // you wish
+      case x: SizeImpl with ColorImpl =>
+        "size  " + x.size + " color " + x.color // you wish
       case x: SizeImpl => "!size " + x.size
       case x: ColorImpl => "color " + x.color
       case _ => "n.a."
@@ -603,7 +612,8 @@ object Test {
 
   object Bug1093 {
     def run() {
-      assert((Some(3): @unchecked) match {
+      assert(
+          (Some(3): @unchecked) match {
         case Some(1 | 2) => false
         case Some(3) => true
       })
@@ -617,7 +627,7 @@ object Test {
     case class X(p: String, ps: String*)
     def bar =
       X("a", "b") match {
-        case X(p, ps@_*) => foo(ps: _*)
+        case X(p, ps @ _ *) => foo(ps: _*)
       }
     def run() { assertEquals("Foo", bar) }
   }
@@ -635,7 +645,8 @@ object Test {
 
   object Ticket2 {
     def run() {
-      val o1 = new Outer_2; val o2 = new Outer_2; val x: Any = o1.Foo(1, 2); val y: Any = o2.Foo(1, 2)
+      val o1 = new Outer_2; val o2 = new Outer_2; val x: Any = o1.Foo(1, 2);
+      val y: Any = o2.Foo(1, 2)
       assert(x != y, "equals test returns true (but should not)")
       assert(x match {
         case o2.Foo(x, y) => false
@@ -658,20 +669,20 @@ object Test {
 
   object Ticket11 {
     def run() {
-      Array[Throwable](new Exception("abc"),
-        new MyException1,
-        new MyException2).foreach { e =>
+      Array[Throwable](
+          new Exception("abc"), new MyException1, new MyException2).foreach {
+        e =>
           try {
             throw e
           } catch {
             case e: SpecialException => {
-              assume(e.isInstanceOf[SpecialException])
-            }
+                assume(e.isInstanceOf[SpecialException])
+              }
             case e => {
-              assume(e.isInstanceOf[Throwable])
-            }
+                assume(e.isInstanceOf[Throwable])
+              }
           }
-        }
+      }
     }
   }
 
@@ -738,11 +749,9 @@ object Test {
     object C {
 
       def unapply(xs: L): Option[(Int, L)] = {
-        if (xs.isEmpty) { println("xs is empty"); None }
-        else
+        if (xs.isEmpty) { println("xs is empty"); None } else
           Some((xs.head, new L(xs.tail)))
       }
-
     }
 
     def empty(xs: L): Boolean = xs match {
@@ -759,7 +768,5 @@ object Test {
       assert(empty(new L(Nil)))
       assert(singleton(new L(List(1))))
     }
-
   } // end Ticket346
-
 }

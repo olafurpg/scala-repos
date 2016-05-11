@@ -16,25 +16,27 @@ package com.twitter.scalding
 package typed
 
 import java.util.Properties
-import java.io.{ InputStream, OutputStream }
+import java.io.{InputStream, OutputStream}
 
 import cascading.scheme.Scheme
 import cascading.scheme.hadoop.TextDelimited
-import cascading.scheme.local.{ TextDelimited => LocalTextDelimited }
-import cascading.tap.{ Tap, SinkMode }
-import cascading.tap.hadoop.{ Hfs, PartitionTap }
-import cascading.tap.local.{ FileTap, PartitionTap => LocalPartitionTap }
+import cascading.scheme.local.{TextDelimited => LocalTextDelimited}
+import cascading.tap.{Tap, SinkMode}
+import cascading.tap.hadoop.{Hfs, PartitionTap}
+import cascading.tap.local.{FileTap, PartitionTap => LocalPartitionTap}
 import cascading.tap.partition.Partition
-import cascading.tuple.{ Fields, Tuple, TupleEntry }
+import cascading.tuple.{Fields, Tuple, TupleEntry}
 
 /**
- * Trait to assist with creating partitioned sources.
- *
- * Apart from the abstract members below, `hdfsScheme` and `localScheme` also need to be set.
- * Note that for both of them the sink fields need to be set to only include the actual fields
- * that should be written to file and not the partition fields.
- */
-trait PartitionSchemed[P, T] extends SchemedSource with TypedSink[(P, T)] with Mappable[(P, T)] with HfsTapProvider {
+  * Trait to assist with creating partitioned sources.
+  *
+  * Apart from the abstract members below, `hdfsScheme` and `localScheme` also need to be set.
+  * Note that for both of them the sink fields need to be set to only include the actual fields
+  * that should be written to file and not the partition fields.
+  */
+trait PartitionSchemed[P, T]
+    extends SchemedSource with TypedSink[(P, T)]
+    with Mappable[(P, T)] with HfsTapProvider {
   def path: String
   def template: String
   def valueSetter: TupleSetter[T]
@@ -45,7 +47,8 @@ trait PartitionSchemed[P, T] extends SchemedSource with TypedSink[(P, T)] with M
 
   // The partition fields, offset by the value arity.
   def partitionFields =
-    PartitionUtil.toFields(valueSetter.arity, valueSetter.arity + partitionSetter.arity)
+    PartitionUtil.toFields(
+        valueSetter.arity, valueSetter.arity + partitionSetter.arity)
 
   /*
    Advertise all the sinkFields, both the value and partition ones, this needs to be like this even
@@ -55,9 +58,9 @@ trait PartitionSchemed[P, T] extends SchemedSource with TypedSink[(P, T)] with M
   override def sinkFields: Fields = fields.append(partitionFields)
 
   /**
-   * Combine both the partition and value converter to extract the data from a flat cascading tuple
-   * into a pair of `P` and `T`.
-   */
+    * Combine both the partition and value converter to extract the data from a flat cascading tuple
+    * into a pair of `P` and `T`.
+    */
   override def converter[U >: (P, T)] =
     PartitionUtil.converter[P, T, U](valueConverter, partitionConverter)
 
@@ -66,23 +69,29 @@ trait PartitionSchemed[P, T] extends SchemedSource with TypedSink[(P, T)] with M
     PartitionUtil.setter[P, T, U](valueSetter, partitionSetter)
 
   /** Creates the taps for local and hdfs mode.*/
-  override def createTap(readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
+  override def createTap(
+      readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
     mode match {
       case Local(_) => {
-        val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
-        new LocalPartitionTap(fileTap, new TemplatePartition(partitionFields, template), SinkMode.UPDATE)
-          .asInstanceOf[Tap[_, _, _]]
-      }
+          val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
+          new LocalPartitionTap(
+              fileTap,
+              new TemplatePartition(partitionFields, template),
+              SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+        }
       case Hdfs(_, _) => {
-        val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
-        new PartitionTap(hfs, new TemplatePartition(partitionFields, template), SinkMode.UPDATE)
-          .asInstanceOf[Tap[_, _, _]]
-      }
+          val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
+          new PartitionTap(hfs,
+                           new TemplatePartition(partitionFields, template),
+                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+        }
       case hdfsTest @ HadoopTest(_, _) => {
-        val hfs = createHfsTap(hdfsScheme, hdfsTest.getWritePathFor(this), SinkMode.REPLACE)
-        new PartitionTap(hfs, new TemplatePartition(partitionFields, template), SinkMode.UPDATE)
-          .asInstanceOf[Tap[_, _, _]]
-      }
+          val hfs = createHfsTap(
+              hdfsScheme, hdfsTest.getWritePathFor(this), SinkMode.REPLACE)
+          new PartitionTap(hfs,
+                           new TemplatePartition(partitionFields, template),
+                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+        }
       case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
     }
 }

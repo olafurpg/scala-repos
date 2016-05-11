@@ -25,7 +25,7 @@ trait C extends B {
   }
 }
 
-class D() extends C  {
+class D() extends C {
   print("-D ")
   override protected def postConstructionCode: Unit = {
     super.postConstructionCode
@@ -40,20 +40,19 @@ class E() extends D() {
   }
 }
 
-
 object Test {
   def p(msg: String) = println("\n\n// " + msg)
 
   def main(args: Array[String]) {
     p("new C { }")
-    new C { }
+    new C {}
     p("new C { 5 }")
     new C { 5 }
 
     p("new D()")
     new D()
     p("new D() { }")
-    new D() { }
+    new D() {}
     p("new D() { val x = 5 }")
     new D() { val x = 5 }
     p("new { val x = 5 } with D()")
@@ -64,7 +63,7 @@ object Test {
     p("new { val x = 5 } with E()")
     new { val x = 5 } with E()
     p("new { val x = 5 } with E() { }")
-    new { val x = 5 } with E() { }
+    new { val x = 5 } with E() {}
     p("new { val x = 5 } with E() { 5 }")
     new { val x = 5 } with E() { 5 }
   }

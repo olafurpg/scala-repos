@@ -1,7 +1,8 @@
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  def code = """
+  def code =
+    """
 :setting -Xsource:2.12
 case class C12(clazz: Class[_])
 val o: Option[Class[T] forSome { type T}] = C12.unapply(C12(classOf[String]))

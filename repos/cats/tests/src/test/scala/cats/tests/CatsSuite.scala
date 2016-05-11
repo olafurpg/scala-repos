@@ -20,8 +20,9 @@ trait TestSettings extends Configuration with Matchers {
 
   lazy val checkConfiguration: PropertyCheckConfiguration =
     PropertyCheckConfiguration(
-      minSuccessful = if (Platform.isJvm) PosInt(100) else PosInt(10),
-      maxDiscardedFactor = if (Platform.isJvm) PosZDouble(5.0) else PosZDouble(50.0))
+        minSuccessful = if (Platform.isJvm) PosInt(100) else PosInt(10),
+        maxDiscardedFactor = if (Platform.isJvm) PosZDouble(5.0)
+          else PosZDouble(50.0))
 
   lazy val slowCheckConfiguration: PropertyCheckConfiguration =
     if (Platform.isJvm) checkConfiguration
@@ -29,16 +30,19 @@ trait TestSettings extends Configuration with Matchers {
 }
 
 /**
- * An opinionated stack of traits to improve consistency and reduce
- * boilerplate in Cats tests.
- */
-trait CatsSuite extends FunSuite with Matchers with GeneratorDrivenPropertyChecks with Discipline with TestSettings with AllInstances with AllSyntax with TestInstances with StrictCatsEquality {
+  * An opinionated stack of traits to improve consistency and reduce
+  * boilerplate in Cats tests.
+  */
+trait CatsSuite
+    extends FunSuite with Matchers with GeneratorDrivenPropertyChecks
+    with Discipline with TestSettings with AllInstances with AllSyntax
+    with TestInstances with StrictCatsEquality {
   implicit override val generatorDrivenConfig: PropertyCheckConfiguration =
     checkConfiguration
 
   // disable Eq syntax (by making `eqSyntax` not implicit), since it collides
   // with scalactic's equality
-  override def eqSyntax[A: Eq](a: A): EqOps[A] = new EqOps[A](a)
+  override def eqSyntax[A : Eq](a: A): EqOps[A] = new EqOps[A](a)
 }
 
 trait SlowCatsSuite extends CatsSuite {
@@ -48,8 +52,8 @@ trait SlowCatsSuite extends CatsSuite {
 
 sealed trait TestInstances {
   // To be replaced by https://github.com/rickynils/scalacheck/pull/170
-  implicit def arbitraryTry[A: Arbitrary]: Arbitrary[Try[A]] =
-    Arbitrary(Gen.oneOf(
-      arbitrary[A].map(Success(_)),
-      arbitrary[Throwable].map(Failure(_))))
+  implicit def arbitraryTry[A : Arbitrary]: Arbitrary[Try[A]] =
+    Arbitrary(
+        Gen.oneOf(arbitrary[A].map(Success(_)),
+                  arbitrary[Throwable].map(Failure(_))))
 }

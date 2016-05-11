@@ -13,7 +13,7 @@ class UnapplySeq {
 
   "text" match {
     case Z(s, l, z) =>
-      /*start*/l/*end*/
+      /*start*/ l /*end*/
   }
 }
 //Int

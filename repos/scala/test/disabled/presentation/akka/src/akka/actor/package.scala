@@ -1,10 +1,9 @@
 /**
- * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
- */
-
+  * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
+  */
 package akka
 
-import actor.{ ScalaActorRef, ActorRef }
+import actor.{ScalaActorRef, ActorRef}
 
 package object actor {
   implicit def actorRef2Scala(ref: ActorRef): ScalaActorRef =
@@ -17,7 +16,8 @@ package object actor {
 
   def newUuid(): Uuid = new Uuid()
 
-  def uuidFrom(time: Long, clockSeqAndNode: Long): Uuid = new Uuid(time, clockSeqAndNode)
+  def uuidFrom(time: Long, clockSeqAndNode: Long): Uuid =
+    new Uuid(time, clockSeqAndNode)
 
   def uuidFrom(uuid: String): Uuid = new Uuid(uuid)
 }

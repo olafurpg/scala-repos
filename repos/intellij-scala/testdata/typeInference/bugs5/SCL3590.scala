@@ -3,7 +3,7 @@ object Test {
   class B
   class C[T]
 
-  val x: Seq[C[_]] = /*start*/Seq(new C[A], new C[B])/*end*/
+  val x: Seq[C[_]] = /*start*/ Seq(new C[A], new C[B]) /*end*/
 }
 /*
 Few variants:

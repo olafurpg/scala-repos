@@ -24,10 +24,13 @@ import org.scalatra.test.specs2.MutableScalatraSpec
 //
 //
 //class JacksonCommandSpec extends JsonCommandSpec("Jackson", new JacksonCommandSpecServlet)
-abstract class JsonCommandSpec(jsonTestTitle: String, servletUnderTest: => ScalatraServlet) extends MutableScalatraSpec {
+abstract class JsonCommandSpec(
+    jsonTestTitle: String, servletUnderTest: => ScalatraServlet)
+    extends MutableScalatraSpec {
 
   val validJson = """{"name":"ihavemorethan5chars","quantity":5}"""
-  val validXml = "<line><name>ihavemorethan5chars</name><quantity>5</quantity></line>"
+  val validXml =
+    "<line><name>ihavemorethan5chars</name><quantity>5</quantity></line>"
   val invalidJson = """{"name":"4cha","quantity":2}"""
   val invalidXml = "<line><name>4cha</name><quantity>2</quantity></line>"
   addServlet(servletUnderTest, "/*")
@@ -35,7 +38,9 @@ abstract class JsonCommandSpec(jsonTestTitle: String, servletUnderTest: => Scala
   (jsonTestTitle + " command support") should {
 
     "read valid json" in {
-      post("/valid", body = validJson, headers = Map("Content-Type" -> "application/json")) {
+      post("/valid",
+           body = validJson,
+           headers = Map("Content-Type" -> "application/json")) {
         status must_== 200
         body must_== "ihavemorethan5chars:5"
       }
@@ -49,14 +54,18 @@ abstract class JsonCommandSpec(jsonTestTitle: String, servletUnderTest: => Scala
     }
 
     "read valid xml" in {
-      post("/valid", body = validXml, headers = Map("Content-Type" -> "application/xml")) {
+      post("/valid",
+           body = validXml,
+           headers = Map("Content-Type" -> "application/xml")) {
         status must_== 200
         body must_== "ihavemorethan5chars:5"
       }
     }
 
     "read invalid json" in {
-      post("/invalid", body = invalidJson, headers = Map("Content-Type" -> "application/json")) {
+      post("/invalid",
+           body = invalidJson,
+           headers = Map("Content-Type" -> "application/json")) {
         status must_== 200
         body must_== "OK"
       }
@@ -70,12 +79,12 @@ abstract class JsonCommandSpec(jsonTestTitle: String, servletUnderTest: => Scala
     }
 
     "read invalid xml" in {
-      post("/invalid", body = invalidXml, headers = Map("Content-Type" -> "application/xml")) {
+      post("/invalid",
+           body = invalidXml,
+           headers = Map("Content-Type" -> "application/xml")) {
         status must_== 200
         body must_== "OK"
       }
-
     }
   }
-
 }

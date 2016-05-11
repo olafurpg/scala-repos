@@ -28,38 +28,44 @@ trait ClusterMetricsCommonConfig extends MultiNodeConfig {
   // Extract individual sigar library for every node.
   nodeList foreach { role ⇒
     nodeConfig(role) {
-      parseString("akka.cluster.metrics.native-library-extract-folder=${user.dir}/target/native/" + role.name)
+      parseString(
+          "akka.cluster.metrics.native-library-extract-folder=${user.dir}/target/native/" +
+          role.name)
     }
   }
 
   // Disable legacy metrics in akka-cluster.
-  def disableMetricsLegacy = parseString("""akka.cluster.metrics.enabled=off""")
+  def disableMetricsLegacy =
+    parseString("""akka.cluster.metrics.enabled=off""")
 
   // Enable metrics extension in akka-cluster-metrics.
-  def enableMetricsExtension = parseString("""
+  def enableMetricsExtension =
+    parseString("""
     akka.extensions=["akka.cluster.metrics.ClusterMetricsExtension"]
     akka.cluster.metrics.collector.enabled = on
     """)
 
   // Disable metrics extension in akka-cluster-metrics.
-  def disableMetricsExtension = parseString("""
+  def disableMetricsExtension =
+    parseString("""
     akka.extensions=["akka.cluster.metrics.ClusterMetricsExtension"]
     akka.cluster.metrics.collector.enabled = off
     """)
 
   // Activate slf4j logging along with test listener.
-  def customLogging = parseString("""akka.loggers=["akka.testkit.TestEventListener","akka.event.slf4j.Slf4jLogger"]""")
+  def customLogging =
+    parseString(
+        """akka.loggers=["akka.testkit.TestEventListener","akka.event.slf4j.Slf4jLogger"]""")
 }
 
 object ClusterMetricsDisabledConfig extends ClusterMetricsCommonConfig {
 
   commonConfig {
-    Seq(
-      customLogging,
-      disableMetricsLegacy,
-      disableMetricsExtension,
-      debugConfig(on = false),
-      MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
+    Seq(customLogging,
+        disableMetricsLegacy,
+        disableMetricsExtension,
+        debugConfig(on = false),
+        MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
       .reduceLeft(_ withFallback _)
   }
 }
@@ -68,15 +74,13 @@ object ClusterMetricsEnabledConfig extends ClusterMetricsCommonConfig {
   import ConfigFactory._
 
   commonConfig {
-    Seq(
-      customLogging,
-      disableMetricsLegacy,
-      enableMetricsExtension,
-      debugConfig(on = false),
-      MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
+    Seq(customLogging,
+        disableMetricsLegacy,
+        enableMetricsExtension,
+        debugConfig(on = false),
+        MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
       .reduceLeft(_ withFallback _)
   }
-
 }
 
 class ClusterMetricsEnabledMultiJvmNode1 extends ClusterMetricsEnabledSpec
@@ -85,11 +89,13 @@ class ClusterMetricsEnabledMultiJvmNode3 extends ClusterMetricsEnabledSpec
 class ClusterMetricsEnabledMultiJvmNode4 extends ClusterMetricsEnabledSpec
 class ClusterMetricsEnabledMultiJvmNode5 extends ClusterMetricsEnabledSpec
 
-abstract class ClusterMetricsEnabledSpec extends MultiNodeSpec(ClusterMetricsEnabledConfig)
-  with MultiNodeClusterSpec with RedirectLogging {
+abstract class ClusterMetricsEnabledSpec
+    extends MultiNodeSpec(ClusterMetricsEnabledConfig)
+    with MultiNodeClusterSpec with RedirectLogging {
   import ClusterMetricsEnabledConfig._
 
-  def isSigar(collector: MetricsCollector): Boolean = collector.isInstanceOf[SigarMetricsCollector]
+  def isSigar(collector: MetricsCollector): Boolean =
+    collector.isInstanceOf[SigarMetricsCollector]
 
   def saveApplicationConf(): Unit = {
     import java.io.File
@@ -97,7 +103,9 @@ abstract class ClusterMetricsEnabledSpec extends MultiNodeSpec(ClusterMetricsEna
     val conf = cluster.system.settings.config
     val text = conf.root.render
     val file = new File(s"target/${myself.name}_application.conf")
-    Some(new PrintWriter(file)) map { p ⇒ p.write(text); p.close }
+    Some(new PrintWriter(file)) map { p ⇒
+      p.write(text); p.close
+    }
   }
 
   saveApplicationConf()
@@ -106,18 +114,21 @@ abstract class ClusterMetricsEnabledSpec extends MultiNodeSpec(ClusterMetricsEna
 
   "Cluster metrics" must {
     "periodically collect metrics on each node, publish to the event stream, " +
-      "and gossip metrics around the node ring" in within(60 seconds) {
-        awaitClusterUp(roles: _*)
-        enterBarrier("cluster-started")
-        awaitAssert(clusterView.members.count(_.status == MemberStatus.Up) should ===(roles.size))
-        // TODO ensure same contract
-        //awaitAssert(clusterView.clusterMetrics.size should ===(roles.size))
-        awaitAssert(metricsView.clusterMetrics.size should ===(roles.size))
-        val collector = MetricsCollector(cluster.system)
-        collector.sample.metrics.size should be > (3)
-        enterBarrier("after")
-      }
-    "reflect the correct number of node metrics in cluster view" in within(30 seconds) {
+    "and gossip metrics around the node ring" in within(60 seconds) {
+      awaitClusterUp(roles: _*)
+      enterBarrier("cluster-started")
+      awaitAssert(
+          clusterView.members.count(_.status == MemberStatus.Up) should ===(
+              roles.size))
+      // TODO ensure same contract
+      //awaitAssert(clusterView.clusterMetrics.size should ===(roles.size))
+      awaitAssert(metricsView.clusterMetrics.size should ===(roles.size))
+      val collector = MetricsCollector(cluster.system)
+      collector.sample.metrics.size should be > (3)
+      enterBarrier("after")
+    }
+    "reflect the correct number of node metrics in cluster view" in within(
+        30 seconds) {
       runOn(node2) {
         cluster.leave(node1)
       }
@@ -139,8 +150,9 @@ class ClusterMetricsDisabledMultiJvmNodv3 extends ClusterMetricsDisabledSpec
 class ClusterMetricsDisabledMultiJvmNode4 extends ClusterMetricsDisabledSpec
 class ClusterMetricsDisabledMultiJvmNode5 extends ClusterMetricsDisabledSpec
 
-abstract class ClusterMetricsDisabledSpec extends MultiNodeSpec(ClusterMetricsDisabledConfig)
-  with MultiNodeClusterSpec with RedirectLogging {
+abstract class ClusterMetricsDisabledSpec
+    extends MultiNodeSpec(ClusterMetricsDisabledConfig)
+    with MultiNodeClusterSpec with RedirectLogging {
   import akka.cluster.ClusterEvent.CurrentClusterState
 
   val metricsView = new ClusterMetricsView(cluster.system)

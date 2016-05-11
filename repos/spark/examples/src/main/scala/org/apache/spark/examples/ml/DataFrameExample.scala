@@ -30,16 +30,16 @@ import org.apache.spark.mllib.stat.MultivariateOnlineSummarizer
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
 /**
- * An example of how to use [[org.apache.spark.sql.DataFrame]] for ML. Run with
- * {{{
- * ./bin/run-example ml.DataFrameExample [options]
- * }}}
- * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
- */
+  * An example of how to use [[org.apache.spark.sql.DataFrame]] for ML. Run with
+  * {{{
+  * ./bin/run-example ml.DataFrameExample [options]
+  * }}}
+  * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
+  */
 object DataFrameExample {
 
   case class Params(input: String = "data/mllib/sample_libsvm_data.txt")
-    extends AbstractParams[Params]
+      extends AbstractParams[Params]
 
   def main(args: Array[String]) {
     val defaultParams = Params()
@@ -54,11 +54,14 @@ object DataFrameExample {
       }
     }
 
-    parser.parse(args, defaultParams).map { params =>
-      run(params)
-    }.getOrElse {
-      sys.exit(1)
-    }
+    parser
+      .parse(args, defaultParams)
+      .map { params =>
+        run(params)
+      }
+      .getOrElse {
+        sys.exit(1)
+      }
   }
 
   def run(params: Params) {
@@ -69,7 +72,8 @@ object DataFrameExample {
 
     // Load input data
     println(s"Loading LIBSVM file with UDT from ${params.input}.")
-    val df: DataFrame = sqlContext.read.format("libsvm").load(params.input).cache()
+    val df: DataFrame =
+      sqlContext.read.format("libsvm").load(params.input).cache()
     println("Schema from LIBSVM:")
     df.printSchema()
     println(s"Loaded training data as a DataFrame with ${df.count()} records.")
@@ -80,10 +84,12 @@ object DataFrameExample {
 
     // Convert features column to an RDD of vectors.
     val features = df.select("features").rdd.map { case Row(v: Vector) => v }
-    val featureSummary = features.aggregate(new MultivariateOnlineSummarizer())(
-      (summary, feat) => summary.add(feat),
-      (sum1, sum2) => sum1.merge(sum2))
-    println(s"Selected features column with average values:\n ${featureSummary.mean.toString}")
+    val featureSummary =
+      features.aggregate(new MultivariateOnlineSummarizer())(
+          (summary, feat) => summary.add(feat),
+          (sum1, sum2) => sum1.merge(sum2))
+    println(
+        s"Selected features column with average values:\n ${featureSummary.mean.toString}")
 
     // Save the records in a parquet file.
     val tmpDir = Files.createTempDir()

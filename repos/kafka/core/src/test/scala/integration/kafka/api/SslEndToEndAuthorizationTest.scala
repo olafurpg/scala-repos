@@ -14,12 +14,10 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package kafka.api
 
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.protocol.SecurityProtocol
-
 
 class SslEndToEndAuthorizationTest extends EndToEndAuthorizationTest {
   override protected def securityProtocol = SecurityProtocol.SSL

@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -11,14 +11,14 @@ package collection
 package mutable
 
 /** An implementation class backing a `HashSet`.
- *
- *  This trait is used internally. It can be mixed in with various collections relying on
- *  hash table as an implementation.
- *
- *  @define coll flat hash table
- *  @since 2.3
- *  @tparam A   the type of the elements contained in the $coll.
- */
+  *
+  *  This trait is used internally. It can be mixed in with various collections relying on
+  *  hash table as an implementation.
+  *
+  *  @define coll flat hash table
+  *  @since 2.3
+  *  @tparam A   the type of the elements contained in the $coll.
+  */
 trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
   import FlatHashTable._
 
@@ -27,29 +27,31 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
   @transient private[collection] var _loadFactor = defaultLoadFactor
 
   /** The actual hash table.
-   */
+    */
   @transient protected var table: Array[AnyRef] = new Array(initialCapacity)
 
   /** The number of mappings contained in this hash table.
-   */
+    */
   @transient protected var tableSize = 0
 
   /** The next size value at which to resize (capacity * load factor).
-   */
-  @transient protected var threshold: Int = newThreshold(_loadFactor, initialCapacity)
+    */
+  @transient protected var threshold: Int = newThreshold(
+      _loadFactor, initialCapacity)
 
   /** The array keeping track of number of elements in 32 element blocks.
-   */
+    */
   @transient protected var sizemap: Array[Int] = null
 
   @transient protected var seedvalue: Int = tableSizeSeed
 
   import HashTable.powerOfTwo
 
-  protected def capacity(expectedSize: Int) = if (expectedSize == 0) 1 else powerOfTwo(expectedSize)
+  protected def capacity(expectedSize: Int) =
+    if (expectedSize == 0) 1 else powerOfTwo(expectedSize)
 
   /** The initial size of the hash table.
-   */
+    */
   def initialSize: Int = 32
 
   private def initialCapacity = capacity(initialSize)
@@ -59,12 +61,12 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
   protected def tableSizeSeed = Integer.bitCount(table.length - 1)
 
   /**
-   * Initializes the collection from the input stream. `f` will be called for each element
-   * read from the input stream in the order determined by the stream. This is useful for
-   * structures where iteration order is important (e.g. LinkedHashSet).
-   *
-   * The serialization format expected is the one produced by `serializeTo`.
-   */
+    * Initializes the collection from the input stream. `f` will be called for each element
+    * read from the input stream in the order determined by the stream. This is useful for
+    * structures where iteration order is important (e.g. LinkedHashSet).
+    *
+    * The serialization format expected is the one produced by `serializeTo`.
+    */
   private[collection] def init(in: java.io.ObjectInputStream, f: A => Unit) {
     in.defaultReadObject
 
@@ -93,10 +95,10 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
   }
 
   /**
-   * Serializes the collection to the output stream by saving the load factor, collection
-   * size and collection elements. `foreach` determines the order in which the elements are saved
-   * to the stream. To deserialize, `init` should be used.
-   */
+    * Serializes the collection to the output stream by saving the load factor, collection
+    * size and collection elements. `foreach` determines the order in which the elements are saved
+    * to the stream. To deserialize, `init` should be used.
+    */
   private[collection] def serializeTo(out: java.io.ObjectOutputStream) {
     out.defaultWriteObject
     out.writeInt(_loadFactor)
@@ -107,16 +109,19 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
   }
 
   /** Finds an entry in the hash table if such an element exists. */
-  @deprecatedOverriding("Internal implementation does not admit sensible overriding of this method.", "2.11.0")
+  @deprecatedOverriding(
+      "Internal implementation does not admit sensible overriding of this method.",
+      "2.11.0")
   protected def findEntry(elem: A): Option[A] =
     findElemImpl(elem) match {
       case null => None
       case entry => Some(entryToElem(entry))
     }
 
-
   /** Checks whether an element is contained in the hash table. */
-  @deprecatedOverriding("Internal implementation does not admit sensible overriding of this method.", "2.11.0")
+  @deprecatedOverriding(
+      "Internal implementation does not admit sensible overriding of this method.",
+      "2.11.0")
   protected def containsElem(elem: A): Boolean = {
     null != findElemImpl(elem)
   }
@@ -133,18 +138,18 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
   }
 
   /** Add elem if not yet in table.
-   *  @return Returns `true` if a new elem was added, `false` otherwise.
-   */
-  protected def addElem(elem: A) : Boolean = {
+    *  @return Returns `true` if a new elem was added, `false` otherwise.
+    */
+  protected def addElem(elem: A): Boolean = {
     addEntry(elemToEntry(elem))
   }
 
   /**
-   * Add an entry (an elem converted to an entry via elemToEntry) if not yet in
-   * table.
-   *  @return Returns `true` if a new elem was added, `false` otherwise.
-   */
-  protected def addEntry(newEntry : AnyRef) : Boolean = {
+    * Add an entry (an elem converted to an entry via elemToEntry) if not yet in
+    * table.
+    *  @return Returns `true` if a new elem was added, `false` otherwise.
+    */
+  protected def addEntry(newEntry: AnyRef): Boolean = {
     var h = index(newEntry.hashCode)
     var curEntry = table(h)
     while (null != curEntry) {
@@ -158,14 +163,13 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
     nnSizeMapAdd(h)
     if (tableSize >= threshold) growTable()
     true
-
   }
 
   /**
-   * Removes an elem from the hash table returning true if the element was found (and thus removed)
-   * or false if it didn't exist.
-   */
-  protected def removeElem(elem: A) : Boolean = {
+    * Removes an elem from the hash table returning true if the element was found (and thus removed)
+    * or false if it didn't exist.
+    */
+  protected def removeElem(elem: A): Boolean = {
     if (tableDebug) checkConsistent()
     def precedes(i: Int, j: Int) = {
       val d = table.length >> 1
@@ -208,8 +212,8 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
       i < table.length
     }
     def next(): A =
-      if (hasNext) { i += 1; entryToElem(table(i - 1)) }
-      else Iterator.empty.next()
+      if (hasNext) { i += 1; entryToElem(table(i - 1)) } else
+        Iterator.empty.next()
   }
 
   private def growTable() {
@@ -229,11 +233,10 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
   }
 
   private def checkConsistent() {
-    for (i <- 0 until table.length)
-      if (table(i) != null && !containsElem(entryToElem(table(i))))
-        assert(assertion = false, i+" "+table(i)+" "+table.mkString)
+    for (i <- 0 until table.length) if (table(i) != null &&
+                                        !containsElem(entryToElem(table(i))))
+      assert(assertion = false, i + " " + table(i) + " " + table.mkString)
   }
-
 
   /* Size map handling code */
 
@@ -250,37 +253,51 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
    * where sizeMapBucketSize == 4.
    *
    */
-  @deprecatedOverriding("Internal implementation does not admit sensible overriding of this method.", "2.11.0")
+  @deprecatedOverriding(
+      "Internal implementation does not admit sensible overriding of this method.",
+      "2.11.0")
   protected def nnSizeMapAdd(h: Int) = if (sizemap ne null) {
     val p = h >> sizeMapBucketBitSize
     sizemap(p) += 1
   }
 
-  @deprecatedOverriding("Internal implementation does not admit sensible overriding of this method.", "2.11.0")
+  @deprecatedOverriding(
+      "Internal implementation does not admit sensible overriding of this method.",
+      "2.11.0")
   protected def nnSizeMapRemove(h: Int) = if (sizemap ne null) {
     sizemap(h >> sizeMapBucketBitSize) -= 1
   }
 
-  @deprecatedOverriding("Internal implementation does not admit sensible overriding of this method.", "2.11.0")
+  @deprecatedOverriding(
+      "Internal implementation does not admit sensible overriding of this method.",
+      "2.11.0")
   protected def nnSizeMapReset(tableLength: Int) = if (sizemap ne null) {
     val nsize = calcSizeMapSize(tableLength)
     if (sizemap.length != nsize) sizemap = new Array[Int](nsize)
     else java.util.Arrays.fill(sizemap, 0)
   }
 
-  private[collection] final def totalSizeMapBuckets = (table.length - 1) / sizeMapBucketSize + 1
+  private[collection] final def totalSizeMapBuckets =
+    (table.length - 1) / sizeMapBucketSize + 1
 
-  @deprecatedOverriding("Internal implementation does not admit sensible overriding of this method.", "2.11.0")
-  protected def calcSizeMapSize(tableLength: Int) = (tableLength >> sizeMapBucketBitSize) + 1
+  @deprecatedOverriding(
+      "Internal implementation does not admit sensible overriding of this method.",
+      "2.11.0")
+  protected def calcSizeMapSize(tableLength: Int) =
+    (tableLength >> sizeMapBucketBitSize) + 1
 
   // discards the previous sizemap and only allocates a new one
-  @deprecatedOverriding("Internal implementation does not admit sensible overriding of this method.", "2.11.0")
+  @deprecatedOverriding(
+      "Internal implementation does not admit sensible overriding of this method.",
+      "2.11.0")
   protected def sizeMapInit(tableLength: Int) {
     sizemap = new Array[Int](calcSizeMapSize(tableLength))
   }
 
   // discards the previous sizemap and populates the new one
-  @deprecatedOverriding("Internal implementation does not admit sensible overriding of this method.", "2.11.0")
+  @deprecatedOverriding(
+      "Internal implementation does not admit sensible overriding of this method.",
+      "2.11.0")
   protected def sizeMapInitAndRebuild() {
     // first allocate
     sizeMapInit(table.length)
@@ -348,12 +365,12 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
   }
 
   private[collection] def hashTableContents = new FlatHashTable.Contents[A](
-    _loadFactor,
-    table,
-    tableSize,
-    threshold,
-    seedvalue,
-    sizemap
+      _loadFactor,
+      table,
+      tableSize,
+      threshold,
+      seedvalue,
+      sizemap
   )
 
   protected def initWithContents(c: FlatHashTable.Contents[A]) = {
@@ -367,18 +384,16 @@ trait FlatHashTable[A] extends FlatHashTable.HashUtils[A] {
     }
     if (alwaysInitSizeMap && sizemap == null) sizeMapInitAndRebuild()
   }
-
 }
-
 
 private[collection] object FlatHashTable {
 
   /** Creates a specific seed to improve hashcode of a hash table instance
-   *  and ensure that iteration order vulnerabilities are not 'felt' in other
-   *  hash tables.
-   *
-   *  See SI-5293.
-   */
+    *  and ensure that iteration order vulnerabilities are not 'felt' in other
+    *  hash tables.
+    *
+    *  See SI-5293.
+    */
   final def seedGenerator = new ThreadLocal[scala.util.Random] {
     override def initialValue = new scala.util.Random
   }
@@ -389,25 +404,26 @@ private[collection] object FlatHashTable {
   }
 
   /** The load factor for the hash table; must be < 500 (0.5)
-   */
+    */
   def defaultLoadFactor: Int = 450
   final def loadFactorDenum = 1000
 
-  def sizeForThreshold(size: Int, _loadFactor: Int) = scala.math.max(32, (size.toLong * loadFactorDenum / _loadFactor).toInt)
+  def sizeForThreshold(size: Int, _loadFactor: Int) =
+    scala.math.max(32, (size.toLong * loadFactorDenum / _loadFactor).toInt)
 
   def newThreshold(_loadFactor: Int, size: Int) = {
     val lf = _loadFactor
     assert(lf < (loadFactorDenum / 2), "loadFactor too large; must be < 0.5")
-    (size.toLong * lf / loadFactorDenum ).toInt
+    (size.toLong * lf / loadFactorDenum).toInt
   }
 
   class Contents[A](
-    val loadFactor: Int,
-    val table: Array[AnyRef],
-    val tableSize: Int,
-    val threshold: Int,
-    val seedvalue: Int,
-    val sizemap: Array[Int]
+      val loadFactor: Int,
+      val table: Array[AnyRef],
+      val tableSize: Int,
+      val threshold: Int,
+      val seedvalue: Int,
+      val sizemap: Array[Int]
   )
 
   trait HashUtils[A] {
@@ -421,7 +437,7 @@ private[collection] object FlatHashTable {
       //h = h + (h << 4)
       //h ^ (h >>> 10)
 
-      val improved= scala.util.hashing.byteswap32(hcode)
+      val improved = scala.util.hashing.byteswap32(hcode)
 
       // for the remainder, see SI-5293
       // to ensure that different bits are used for different hash tables, we have to rotate based on the seed
@@ -431,19 +447,17 @@ private[collection] object FlatHashTable {
     }
 
     /**
-     * Elems have type A, but we store AnyRef in the table. Plus we need to deal with
-     * null elems, which need to be stored as NullSentinel
-     */
-    protected final def elemToEntry(elem : A) : AnyRef =
+      * Elems have type A, but we store AnyRef in the table. Plus we need to deal with
+      * null elems, which need to be stored as NullSentinel
+      */
+    protected final def elemToEntry(elem: A): AnyRef =
       if (null == elem) NullSentinel else elem.asInstanceOf[AnyRef]
 
     /**
-     * Does the inverse translation of elemToEntry
-     */
-    protected final def entryToElem(entry : AnyRef) : A =
-      (if (entry.isInstanceOf[NullSentinel.type]) null else entry).asInstanceOf[A]
+      * Does the inverse translation of elemToEntry
+      */
+    protected final def entryToElem(entry: AnyRef): A =
+      (if (entry.isInstanceOf[NullSentinel.type]) null else entry)
+        .asInstanceOf[A]
   }
-
 }
-
-

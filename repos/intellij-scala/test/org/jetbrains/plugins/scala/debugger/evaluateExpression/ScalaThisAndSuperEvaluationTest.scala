@@ -3,16 +3,18 @@ package org.jetbrains.plugins.scala.debugger.evaluateExpression
 import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12}
 
 /**
- * User: Alefas
- * Date: 20.10.11
- */
+  * User: Alefas
+  * Date: 20.10.11
+  */
+class ScalaThisAndSuperEvaluationTest
+    extends ScalaThisAndSuperEvaluationTestBaseClass with ScalaVersion_2_11
+class ScalaThisAndSuperEvaluationTest_212
+    extends ScalaThisAndSuperEvaluationTestBaseClass with ScalaVersion_2_12
 
-class ScalaThisAndSuperEvaluationTest extends ScalaThisAndSuperEvaluationTestBaseClass with ScalaVersion_2_11
-class ScalaThisAndSuperEvaluationTest_212 extends ScalaThisAndSuperEvaluationTestBaseClass with ScalaVersion_2_12
-
-abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTestCase {
+abstract class ScalaThisAndSuperEvaluationTestBaseClass
+    extends ScalaDebuggerTestCase {
   addFileWithBreakpoints("TraitThis.scala",
-    s"""
+                         s"""
        |object TraitThis {
        |  trait Z {
        |    def foo {
@@ -23,8 +25,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
        |    new Z {}.foo
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testTraitThis() {
     runDebugger() {
       waitForBreakpoint()
@@ -33,7 +34,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
   }
 
   addFileWithBreakpoints("Base.scala",
-    s"""
+                         s"""
        |class BaseClass {
        |  def foo = 1
        |}
@@ -41,17 +42,15 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
        |trait BaseTrait {
        |  def foo = 1
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   addFileWithBreakpoints("SuperInvocation.scala",
-    s"""
+                         s"""
        |object SuperInvocation extends BaseClass {
        |  def main(args: Array[String]) {
        |    ""$bp
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testSuperInvocation() {
     runDebugger() {
       waitForBreakpoint()
@@ -60,7 +59,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
   }
 
   addFileWithBreakpoints("InvocationFromInner.scala",
-    s"""
+                         s"""
        |object InvocationFromInner extends BaseClass {
        |  trait Z {
        |    def goo {
@@ -71,8 +70,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
        |    new Z {}.goo
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testInvocationFromInner() {
     runDebugger() {
       waitForBreakpoint()
@@ -81,7 +79,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
   }
 
   addFileWithBreakpoints("ThisInvocationFromInner.scala",
-    s"""
+                         s"""
        |object ThisInvocationFromInner extends BaseClass {
        |  trait Z {
        |    def foo {
@@ -92,8 +90,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
        |    new Z {}.foo
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testThisInvocationFromInner() {
     runDebugger() {
       waitForBreakpoint()
@@ -102,7 +99,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
   }
 
   addFileWithBreakpoints("ThisInvocationFromInnerClass.scala",
-    s"""
+                         s"""
        |class ThisInvocationFromInnerClass extends BaseClass {
        |  trait Z {
        |    def foo {
@@ -119,8 +116,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
        |    sample.boo(args)
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testThisInvocationFromInnerClass() {
     runDebugger() {
       waitForBreakpoint()
@@ -129,7 +125,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
   }
 
   addFileWithBreakpoints("SuperInvocationFromInner.scala",
-    s"""
+                         s"""
        |object SuperInvocationFromInner extends BaseClass {
        |  trait Z {
        |    def foo {
@@ -140,8 +136,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
        |    new Z {}.foo
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testSuperInvocationFromInner() {
     runDebugger() {
       waitForBreakpoint()
@@ -150,7 +145,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
   }
 
   addFileWithBreakpoints("SuperTraitInvocationFromInner.scala",
-    s"""
+                         s"""
        |class SuperTraitInvocationFromInner extends BaseTrait {
        |  trait Z {
        |    def foo {
@@ -166,8 +161,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
        |    new SuperTraitInvocationFromInner().boo(args)
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testSuperTraitInvocationFromInner() {
     runDebugger() {
       waitForBreakpoint()
@@ -176,14 +170,13 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
   }
 
   addFileWithBreakpoints("SuperTraitInvocation.scala",
-    s"""
+                         s"""
        |object SuperTraitInvocation extends BaseTrait {
        |  def main(args: Array[String]) {
        |    ""$bp
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testSuperTraitInvocation() {
     runDebugger() {
       waitForBreakpoint()
@@ -192,7 +185,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
   }
 
   addFileWithBreakpoints("Sample.scala",
-    s"""
+                         s"""
        |trait IOI {
        |  def ioi = 2
        |}
@@ -214,8 +207,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
        |    new E {}.moo
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testOuterSuperInnerTraitInvocation() {
     runDebugger() {
       waitForBreakpoint()
@@ -224,7 +216,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
   }
 
   addFileWithBreakpoints("InnerOuterEtc.scala",
-    s"""
+                         s"""
        |object InnerOuterEtc {
        |  class Outer extends BaseClass {
        |    trait Z {
@@ -241,8 +233,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass extends ScalaDebuggerTes
        |    new Outer().goo
        |  }
        |}
-      """.stripMargin.trim()
-  )
+      """.stripMargin.trim())
   def testInnerOuterEtc() {
     runDebugger() {
       waitForBreakpoint()

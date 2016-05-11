@@ -10,33 +10,32 @@ trait Tabulator {
   def width: Int
   def marginSize: Int
 
-  protected def fits(items: Seq[String], width: Int): Boolean = (
-    (items map (_.length)).sum + (items.length - 1) * marginSize < width
-  )
-  def tabulate(items: Seq[String]): Seq[Seq[String]] = (
-    if (fits(items, width)) Seq(Seq(items mkString " " * marginSize))
-    else printMultiLineColumns(items)
-  )
-  protected def columnize(ss: Seq[String]): Seq[Seq[String]] = ss map (s => Seq(s))
+  protected def fits(items: Seq[String], width: Int): Boolean = ((items map
+          (_.length)).sum + (items.length - 1) * marginSize < width)
+  def tabulate(items: Seq[String]): Seq[Seq[String]] =
+    (if (fits(items, width)) Seq(Seq(items mkString " " * marginSize))
+     else printMultiLineColumns(items))
+  protected def columnize(ss: Seq[String]): Seq[Seq[String]] =
+    ss map (s => Seq(s))
   protected def printMultiLineColumns(items: Seq[String]): Seq[Seq[String]] = {
     import scala.tools.nsc.interpreter.SimpleMath._
-    val longest     = (items map (_.length)).max
+    val longest = (items map (_.length)).max
     val columnWidth = longest + marginSize
-    val maxcols = (
-      if (columnWidth >= width) 1
-      else 1 max (width / columnWidth)   // make sure it doesn't divide to 0
-    )
-    val nrows       = items.size /% maxcols
-    val ncols       = items.size /% nrows
-    val groupSize   = ncols
-    val padded      = items map (s"%-${columnWidth}s" format _)
-    val xwise       = isAcross || ncols >= items.length
-    val grouped: Seq[Seq[String]]    =
+    val maxcols =
+      (if (columnWidth >= width) 1
+       else 1 max (width / columnWidth) // make sure it doesn't divide to 0
+       )
+    val nrows = items.size /% maxcols
+    val ncols = items.size /% nrows
+    val groupSize = ncols
+    val padded = items map (s"%-${columnWidth}s" format _)
+    val xwise = isAcross || ncols >= items.length
+    val grouped: Seq[Seq[String]] =
       if (groupSize == 1) columnize(items)
       else if (xwise) (padded grouped groupSize).toSeq
       else {
-        val h       = 1 max padded.size /% groupSize
-        val cols    = (padded grouped h).toList
+        val h = 1 max padded.size /% groupSize
+        val cols = (padded grouped h).toList
         for (i <- 0 until h) yield
           for (j <- 0 until groupSize) yield
             if (i < cols(j).size) cols(j)(i) else ""
@@ -47,12 +46,13 @@ trait Tabulator {
 
 /** Adjust the column width and number of columns to minimize the row count. */
 trait VariColumnTabulator extends Tabulator {
-  override protected def printMultiLineColumns(items: Seq[String]): Seq[Seq[String]] = {
+  override protected def printMultiLineColumns(
+      items: Seq[String]): Seq[Seq[String]] = {
     import scala.tools.nsc.interpreter.SimpleMath._
-    val longest  = (items map (_.length)).max
+    val longest = (items map (_.length)).max
     val shortest = (items map (_.length)).min
-    val fattest  = longest + marginSize
-    val skinny   = shortest + marginSize
+    val fattest = longest + marginSize
+    val skinny = shortest + marginSize
 
     // given ncols, calculate nrows and a list of column widths, or none if not possible
     // if ncols > items.size, then columnWidths.size == items.size
@@ -67,7 +67,7 @@ trait VariColumnTabulator extends Tabulator {
         }
       def resulting(rows: Seq[Seq[String]]) = {
         val columnWidths = maxima(rows) map (_ + marginSize)
-        val linelen      = columnWidths.sum
+        val linelen = columnWidths.sum
         if (linelen <= width) Some((nrows, columnWidths, rows))
         else None
       }
@@ -75,10 +75,9 @@ trait VariColumnTabulator extends Tabulator {
       else if (xwise) resulting((items grouped ncols).toSeq)
       else {
         val cols = (items grouped nrows).toList
-        val rows =
-          for (i <- 0 until nrows) yield
-            for (j <- 0 until ncols) yield
-              if (j < cols.size && i < cols(j).size) cols(j)(i) else ""
+        val rows = for (i <- 0 until nrows) yield
+          for (j <- 0 until ncols) yield
+            if (j < cols.size && i < cols(j).size) cols(j)(i) else ""
         resulting(rows)
       }
     }
@@ -97,15 +96,18 @@ trait VariColumnTabulator extends Tabulator {
       val (_, columnWidths, sss) = (possibles find (_._1 == minrows)).get
 
       // format to column width
-      sss map (ss => ss.zipWithIndex map {
-        case (s, i) => s"%-${columnWidths(i)}s" format s
-      })
+      sss map
+      (ss =>
+            ss.zipWithIndex map {
+              case (s, i) => s"%-${columnWidths(i)}s" format s
+          })
     }
   }
 }
 
 private[interpreter] object SimpleMath {
   implicit class DivRem(private val i: Int) extends AnyVal {
+
     /** i/n + if (i % n != 0) 1 else 0 */
     def /%(n: Int): Int = (i + n - 1) / n
   }

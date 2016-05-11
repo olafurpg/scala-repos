@@ -5,8 +5,7 @@ import scala.collection.mutable
 import scala.collection.JavaConversions._
 
 class HashMap[K, V] protected (inner: mutable.Map[Box[K], V])
-    extends AbstractMap[K, V] with Serializable with Cloneable {
-  self =>
+    extends AbstractMap[K, V] with Serializable with Cloneable { self =>
 
   def this() =
     this(mutable.HashMap.empty[Box[K], V])
@@ -69,8 +68,9 @@ class HashMap[K, V] protected (inner: mutable.Map[Box[K], V])
   override def values(): Collection[V] =
     new ValuesView
 
-  private class EntrySet extends AbstractSet[Map.Entry[K, V]]
-                            with AbstractMapView[Map.Entry[K, V]] {
+  private class EntrySet
+      extends AbstractSet[Map.Entry[K, V]]
+      with AbstractMapView[Map.Entry[K, V]] {
     override def iterator(): Iterator[Map.Entry[K, V]] = {
       new AbstractMapViewIterator[Map.Entry[K, V]] {
         override protected def getNextForm(key: Box[K]): Map.Entry[K, V] = {
@@ -89,8 +89,7 @@ class HashMap[K, V] protected (inner: mutable.Map[Box[K], V])
     override def remove(o: Any): Boolean = {
       val boxedKey = Box(o.asInstanceOf[K])
       val contains = inner.contains(boxedKey)
-      if (contains)
-        inner -= boxedKey
+      if (contains) inner -= boxedKey
       contains
     }
 

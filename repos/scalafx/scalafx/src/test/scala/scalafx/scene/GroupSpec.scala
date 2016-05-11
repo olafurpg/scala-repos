@@ -36,13 +36,14 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Group Spec tests.
- *
- *
- */
+  * Group Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class GroupSpec
-  extends SimpleSFXDelegateSpec[jfxs.Group, Group](classOf[jfxs.Group], classOf[Group]) {
+    extends SimpleSFXDelegateSpec[jfxs.Group, Group](
+        classOf[jfxs.Group], classOf[Group]) {
 
   it should "provide scala-like capabilities for the list" in {
     val group = new Group()

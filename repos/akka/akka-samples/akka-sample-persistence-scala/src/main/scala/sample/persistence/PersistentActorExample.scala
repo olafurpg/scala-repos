@@ -25,7 +25,7 @@ class ExamplePersistentActor extends PersistentActor {
     state.size
 
   val receiveRecover: Receive = {
-    case evt: Evt                                 => updateState(evt)
+    case evt: Evt => updateState(evt)
     case SnapshotOffer(_, snapshot: ExampleState) => state = snapshot
   }
 
@@ -36,17 +36,17 @@ class ExamplePersistentActor extends PersistentActor {
         updateState(event)
         context.system.eventStream.publish(event)
       }
-    case "snap"  => saveSnapshot(state)
+    case "snap" => saveSnapshot(state)
     case "print" => println(state)
   }
-
 }
 //#persistent-actor-example
 
 object PersistentActorExample extends App {
 
   val system = ActorSystem("example")
-  val persistentActor = system.actorOf(Props[ExamplePersistentActor], "persistentActor-4-scala")
+  val persistentActor =
+    system.actorOf(Props[ExamplePersistentActor], "persistentActor-4-scala")
 
   persistentActor ! Cmd("foo")
   persistentActor ! Cmd("baz")

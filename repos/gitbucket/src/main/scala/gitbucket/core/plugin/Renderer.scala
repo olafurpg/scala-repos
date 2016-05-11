@@ -6,28 +6,28 @@ import gitbucket.core.view.Markdown
 import play.twirl.api.Html
 
 /**
- * A render engine to render content to HTML.
- */
+  * A render engine to render content to HTML.
+  */
 trait Renderer {
 
   /**
-   * Render the given request to HTML.
-   */
+    * Render the given request to HTML.
+    */
   def render(request: RenderRequest): Html
-
 }
 
 object MarkdownRenderer extends Renderer {
   override def render(request: RenderRequest): Html = {
     import request._
-    Html(Markdown.toHtml(
-      markdown         = fileContent,
-      repository       = repository,
-      enableWikiLink   = enableWikiLink,
-      enableRefsLink   = enableRefsLink,
-      enableAnchor     = enableAnchor,
-      enableLineBreaks = false
-    )(context))
+    Html(
+        Markdown.toHtml(
+            markdown = fileContent,
+            repository = repository,
+            enableWikiLink = enableWikiLink,
+            enableRefsLink = enableRefsLink,
+            enableAnchor = enableAnchor,
+            enableLineBreaks = false
+        )(context))
   }
 }
 
@@ -35,20 +35,18 @@ object DefaultRenderer extends Renderer {
   override def render(request: RenderRequest): Html = {
     import request._
     Html(
-      s"<tt>${
-        fileContent.split("(\\r\\n)|\\n").map(xml.Utility.escape(_)).mkString("<br/>")
-      }</tt>"
+        s"<tt>${fileContent.split("(\\r\\n)|\\n").map(xml.Utility.escape(_)).mkString("<br/>")}</tt>"
     )
   }
 }
 
 case class RenderRequest(
-  filePath: List[String],
-  fileContent: String,
-  branch: String,
-  repository: RepositoryService.RepositoryInfo,
-  enableWikiLink: Boolean,
-  enableRefsLink: Boolean,
-  enableAnchor: Boolean,
-  context: Context
+    filePath: List[String],
+    fileContent: String,
+    branch: String,
+    repository: RepositoryService.RepositoryInfo,
+    enableWikiLink: Boolean,
+    enableRefsLink: Boolean,
+    enableAnchor: Boolean,
+    context: Context
 )

@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js IR                **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js IR                **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2014, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.ir
 
@@ -176,7 +175,9 @@ object Traversers {
         items foreach traverse
 
       case JSObjectConstr(fields) =>
-        fields foreach { f => traverse(f._2) }
+        fields foreach { f =>
+          traverse(f._2)
+        }
 
       // Atomic expressions
 
@@ -201,14 +202,12 @@ object Traversers {
 
       // Trees that need not be traversed
 
-      case _:Skip | _:Continue | _:Debugger | _:LoadModule |
-          _:LoadJSConstructor | _:LoadJSModule | _:JSLinkingInfo | _:Literal |
-          _:UndefinedParam | _:VarRef | _:This | _:FieldDef |
-          _:JSClassExportDef | _:ModuleExportDef | EmptyTree =>
-
+      case _: Skip | _: Continue | _: Debugger | _: LoadModule |
+          _: LoadJSConstructor | _: LoadJSModule | _: JSLinkingInfo |
+          _: Literal | _: UndefinedParam | _: VarRef | _: This |
+          _: FieldDef | _: JSClassExportDef | _: ModuleExportDef | EmptyTree =>
       case _ =>
         sys.error(s"Invalid tree in traverse() of class ${tree.getClass}")
     }
   }
-
 }

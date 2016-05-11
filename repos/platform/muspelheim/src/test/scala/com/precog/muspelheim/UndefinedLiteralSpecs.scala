@@ -75,4 +75,3 @@ trait UndefinedLiteralSpecs extends EvalStackSpecs {
     }
   }
 }
-

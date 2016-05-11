@@ -14,7 +14,8 @@ final class PerfStatStorage(coll: Coll) {
   import lila.db.BSON.BSONJodaDateTimeHandler
   import reactivemongo.bson.Macros
   implicit val PerfTypeBSONHandler = new BSONHandler[BSONInteger, PerfType] {
-    def read(b: BSONInteger) = PerfType.byId get b.value err s"Invalid perf type id ${b.value}"
+    def read(b: BSONInteger) =
+      PerfType.byId get b.value err s"Invalid perf type id ${b.value}"
     def write(p: PerfType) = BSONInteger(p.id)
   }
   implicit val UserIdBSONHandler = new BSONHandler[BSONString, UserId] {
@@ -33,7 +34,9 @@ final class PerfStatStorage(coll: Coll) {
   private implicit val PerfStatBSONHandler = Macros.handler[PerfStat]
 
   def find(userId: String, perfType: PerfType): Fu[Option[PerfStat]] =
-    coll.find(BSONDocument("_id" -> PerfStat.makeId(userId, perfType))).one[PerfStat]
+    coll
+      .find(BSONDocument("_id" -> PerfStat.makeId(userId, perfType)))
+      .one[PerfStat]
 
   def update(perfStat: PerfStat): Funit =
     coll.update(BSONDocument("_id" -> perfStat.id), perfStat).void

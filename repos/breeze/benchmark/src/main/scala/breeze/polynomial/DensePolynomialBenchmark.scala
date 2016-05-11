@@ -8,14 +8,16 @@ import spire.math._
 import spire.math.poly._
 import spire.implicits._
 
-object DensePolynomialBenchmark extends MyRunner(classOf[DensePolynomialBenchmark])
+object DensePolynomialBenchmark
+    extends MyRunner(classOf[DensePolynomialBenchmark])
 
-class DensePolynomialBenchmark extends BreezeBenchmark with BuildsRandomVectors {
+class DensePolynomialBenchmark
+    extends BreezeBenchmark with BuildsRandomVectors {
 
   def randomPoly(order: Int) = {
-    val uniform = Uniform(0,1)
+    val uniform = Uniform(0, 1)
     val array = new Array[Double](order)
-    var i=0
+    var i = 0
     while (i < order) {
       array(i) = uniform.draw()
       i += 1
@@ -23,12 +25,17 @@ class DensePolynomialBenchmark extends BreezeBenchmark with BuildsRandomVectors 
     Polynomial.dense(array)
   }
 
-  def timePolyOnDenseVector(reps: Int) = runWith2(reps, { randomPoly(10) }, {randomArray(1024*4) })( (poly, arr) => {
-    poly(arr)
-  })
+  def timePolyOnDenseVector(reps: Int) =
+    runWith2(reps, { randomPoly(10) }, { randomArray(1024 * 4) })(
+        (poly, arr) =>
+          {
+        poly(arr)
+    })
 
-  def timePolyOnDenseMatrix(reps: Int) = runWith2(reps, { randomPoly(10) }, {randomMatrix(256,256) })( (poly, arr) => {
-    poly(arr)
-  })
-
+  def timePolyOnDenseMatrix(reps: Int) =
+    runWith2(reps, { randomPoly(10) }, { randomMatrix(256, 256) })(
+        (poly, arr) =>
+          {
+        poly(arr)
+    })
 }

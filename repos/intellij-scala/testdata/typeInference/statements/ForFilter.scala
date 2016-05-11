@@ -6,7 +6,8 @@ class ForFilter {
 
   object X {
     for (i <- new O if i != 2) {
-      /*start*/i/*end*/
+      /*start*/
+      i /*end*/
     }
   }
 }

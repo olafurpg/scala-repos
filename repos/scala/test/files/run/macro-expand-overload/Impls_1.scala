@@ -4,7 +4,11 @@ object Impls {
   def impl(c: Context)(tag: String, x: c.Expr[_]) = {
     import c.{prefix => prefix}
     import c.universe._
-    val body = Apply(Select(Ident(definitions.PredefModule), TermName("println")), List(Literal(Constant(tag)), Literal(Constant(prefix.toString)), x.tree))
+    val body = Apply(
+        Select(Ident(definitions.PredefModule), TermName("println")),
+        List(Literal(Constant(tag)),
+             Literal(Constant(prefix.toString)),
+             x.tree))
     c.Expr[Unit](body)
   }
 

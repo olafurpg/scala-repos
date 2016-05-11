@@ -11,14 +11,16 @@ import org.jetbrains.plugins.scala.util.TestUtils
 import org.jetbrains.sbt.project.module.SbtModule
 import org.jetbrains.sbt.resolvers.{SbtResolver, SbtResolverIndexesManager}
 
-
 /**
- * @author Nikolay Obedin
- * @since 8/4/14.
- */
+  * @author Nikolay Obedin
+  * @since 8/4/14.
+  */
 class DependencyAnnotatorTest extends AnnotatorTestBase {
 
-  val testResolver = new SbtResolver(SbtResolver.Kind.Maven, "Test repo", "file:/%s/sbt/resolvers/testRepository" format TestUtils.getTestDataPath)
+  val testResolver = new SbtResolver(
+      SbtResolver.Kind.Maven,
+      "Test repo",
+      "file:/%s/sbt/resolvers/testRepository" format TestUtils.getTestDataPath)
 
   def testDoNotAnnotateIndexedDep() =
     doTest(Seq.empty)
@@ -28,16 +30,18 @@ class DependencyAnnotatorTest extends AnnotatorTestBase {
 
   def testAnnotateUnresolvedDep() = {
     val msg = SbtBundle("sbt.annotation.unresolvedDependency")
-    doTest(Seq(Error("\"org.jetbrains\"", msg),
-      Error("\"unknown-lib\"", msg),
-      Error("\"0.0.0\"", msg)))
+    doTest(
+        Seq(Error("\"org.jetbrains\"", msg),
+            Error("\"unknown-lib\"", msg),
+            Error("\"0.0.0\"", msg)))
   }
 
   def testAnnotateUnresolvedDepWithDynamicVersion() = {
     val msg = SbtBundle("sbt.annotation.unresolvedDependency")
-    doTest(Seq(Error("\"org.jetbrains\"", msg),
-      Error("\"unknown-lib\"", msg),
-      Error("\"latest.release\"", msg)))
+    doTest(
+        Seq(Error("\"org.jetbrains\"", msg),
+            Error("\"unknown-lib\"", msg),
+            Error("\"latest.release\"", msg)))
   }
 
   override def setUp() = {

@@ -20,5 +20,4 @@ class AsyncQueueBenchmark extends StdBenchAnnotations {
     q.offer("hello")
     polled
   }
-
 }

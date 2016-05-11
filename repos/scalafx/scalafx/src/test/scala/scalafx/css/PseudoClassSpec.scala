@@ -35,13 +35,13 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * PseudoClass Spec tests.
- *
- */
+  * PseudoClass Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class PseudoClassSpec
-  extends SimpleSFXDelegateSpec[jfxcss.PseudoClass, PseudoClass](
-    classOf[jfxcss.PseudoClass], classOf[PseudoClass]) {
+    extends SimpleSFXDelegateSpec[jfxcss.PseudoClass, PseudoClass](
+        classOf[jfxcss.PseudoClass], classOf[PseudoClass]) {
 
   override protected def getScalaClassInstance = PseudoClass("test")
 

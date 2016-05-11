@@ -21,16 +21,16 @@ package com.precog.niflheim
 
 import java.io.IOException
 import java.nio.ByteBuffer
-import java.nio.channels.{ ReadableByteChannel, WritableByteChannel }
+import java.nio.channels.{ReadableByteChannel, WritableByteChannel}
 import java.util.zip.Adler32
 
 import scalaz._
 
 /**
- * This class provides some nice method for writing/reading bytes to channels.
- * It does this by writing the data out in chunks. These chunks are fixed and
- * can use a checksum to ensure our data isn't corrupted.
- */
+  * This class provides some nice method for writing/reading bytes to channels.
+  * It does this by writing the data out in chunks. These chunks are fixed and
+  * can use a checksum to ensure our data isn't corrupted.
+  */
 trait Chunker {
   def verify: Boolean
   val ChunkSize = 4096
@@ -65,15 +65,15 @@ trait Chunker {
       checksum.update(bytes)
       val sum0 = checksum.getValue()
       val sum1 = chunk.getLong(ChunkSize - 8)
-      if (sum0 != sum1)
-        throw new IOException("Corrupted chunk.")
+      if (sum0 != sum1) throw new IOException("Corrupted chunk.")
     }
 
     buffer.put(bytes, 0, len)
     remaining - len
   }
 
-  def write[A](channel: WritableByteChannel, maxSize: Int)(f: ByteBuffer => A): Validation[IOException, A] = {
+  def write[A](channel: WritableByteChannel, maxSize: Int)(
+      f: ByteBuffer => A): Validation[IOException, A] = {
     val buffer = allocate(maxSize)
     val result = f(buffer)
     buffer.flip()
@@ -86,8 +86,9 @@ trait Chunker {
         }
       }
       Success(result)
-    } catch { case ex: IOException =>
-      Failure(ex)
+    } catch {
+      case ex: IOException =>
+        Failure(ex)
     }
   }
 
@@ -111,8 +112,9 @@ trait Chunker {
       buffer.flip()
 
       Success(buffer)
-    } catch { case ioe: IOException =>
-      Failure(ioe)
+    } catch {
+      case ioe: IOException =>
+        Failure(ioe)
     }
   }
 }

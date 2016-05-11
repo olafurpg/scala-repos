@@ -5,16 +5,16 @@ import org.jetbrains.plugins.scala.lang.psi.controlFlow.Instruction
 import org.jetbrains.plugins.scala.lang.psi.controlFlow.impl.{DefinitionInstruction, DefinitionType, ReadWriteVariableInstruction}
 
 import scala.collection.Iterable
-/**
- * @author ilyas
- */
 
+/**
+  * @author ilyas
+  */
 object ReachingDefinitions {
 
   /**
-   * Semilattice element type:
-   * the set of assignments
-   */
+    * Semilattice element type:
+    * the set of assignments
+    */
   type RDSet = Set[Instruction]
 
   object ReachingDefinitionsInstance extends DfaInstance[RDSet] {
@@ -22,11 +22,12 @@ object ReachingDefinitions {
 
     override def fun(i: Instruction)(set: RDSet): RDSet = i match {
       case dv: DefinitionInstruction => set + dv
-      case wr@ReadWriteVariableInstruction(_, _, Some(target), true) =>
-
+      case wr @ ReadWriteVariableInstruction(_, _, Some(target), true) =>
         def previousAssignments(i: Instruction) = i match {
-          case DefinitionInstruction(_, named, DefinitionType.VAR) => named == target
-          case ReadWriteVariableInstruction(_, _, Some(target1), true) => target1 == target
+          case DefinitionInstruction(_, named, DefinitionType.VAR) =>
+            named == target
+          case ReadWriteVariableInstruction(_, _, Some(target1), true) =>
+            target1 == target
           case _ => false
         }
 
@@ -42,5 +43,4 @@ object ReachingDefinitions {
 
     def eq(e1: RDSet, e2: RDSet) = e1 == e2 // todo is this correct?
   }
-
 }

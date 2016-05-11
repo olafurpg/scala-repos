@@ -50,41 +50,43 @@ import org.joda.time.Instant
 import scalaz._
 import scalaz.syntax.id._
 
-
 trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
-  case class IngestConfig(
-    bufferSize: Int,
-    maxParallel: Int,
-    batchTimeout: Timeout,
-    failureLogRoot: File,
-    maxConsecutiveFailures: Int)
+  case class IngestConfig(bufferSize: Int,
+                          maxParallel: Int,
+                          batchTimeout: Timeout,
+                          failureLogRoot: File,
+                          maxConsecutiveFailures: Int)
 
   def kafkaHost: String = config[String]("kafka.batch.host")
   def kafkaPort: Int = config[Int]("kafka.batch.port")
   def kafkaTopic: String = config[String]("kafka.batch.topic")
-  def kafkaSocketTimeout: Duration = config[Long]("kafka.socket_timeout", 5000) millis
+  def kafkaSocketTimeout: Duration =
+    config[Long]("kafka.socket_timeout", 5000) millis
   def kafkaBufferSize: Int = config[Int]("kafka.buffer_size", 64 * 1024)
 
   def ingestConfig = config.detach("ingest") |> { config =>
     for {
-      failureLogRoot <- config.get[File]("failure_log_root") if config[Boolean]("enabled", false)
+      failureLogRoot <- config.get[File]("failure_log_root")
+                           if config[Boolean]("enabled", false)
     } yield {
-      IngestConfig(
-        bufferSize = config[Int]("buffer_size", 1024 * 1024),
-        maxParallel = config[Int]("max_parallel", 5),
-        batchTimeout = config[Int]("timeout", 120) seconds,
-        maxConsecutiveFailures = config[Int]("ingest.max_consecutive_failures", 3),
-        failureLogRoot = failureLogRoot)
+      IngestConfig(bufferSize = config[Int]("buffer_size", 1024 * 1024),
+                   maxParallel = config[Int]("max_parallel", 5),
+                   batchTimeout = config[Int]("timeout", 120) seconds,
+                   maxConsecutiveFailures = config[Int](
+                         "ingest.max_consecutive_failures", 3),
+                   failureLogRoot = failureLogRoot)
     }
   }
 
-  def createYggCheckpointFlag = config.get[String]("ingest.createCheckpointFlag")
+  def createYggCheckpointFlag =
+    config.get[String]("ingest.createCheckpointFlag")
 
   def zookeeperHosts: String = config[String]("zookeeper.hosts")
   //def zookeeperBase: List[String] = config[List[String]]("zookeeper.basepath")
   //def zookeeperPrefix: String = config[String]("zookeeper.prefix")
 
-  def serviceUID: ServiceUID = ZookeeperSystemCoordination.extractServiceUID(config)
+  def serviceUID: ServiceUID =
+    ZookeeperSystemCoordination.extractServiceUID(config)
 
   lazy val shardId = {
     val suid = serviceUID
@@ -97,41 +99,57 @@ trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
 trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
   type YggConfig <: KafkaIngestActorProjectionSystemConfig
 
-  def ingestFailureLog(checkpoint: YggCheckpoint, logRoot: File): IngestFailureLog
+  def ingestFailureLog(
+      checkpoint: YggCheckpoint, logRoot: File): IngestFailureLog
 
-  override def initIngestActor(actorSystem: ActorSystem, routingActor: ActorRef, checkpoint: YggCheckpoint, checkpointCoordination: CheckpointCoordination, permissionsFinder: PermissionsFinder[Future]) = {
+  override def initIngestActor(
+      actorSystem: ActorSystem,
+      routingActor: ActorRef,
+      checkpoint: YggCheckpoint,
+      checkpointCoordination: CheckpointCoordination,
+      permissionsFinder: PermissionsFinder[Future]) = {
     yggConfig.ingestConfig map { conf =>
-      val consumer = new SimpleConsumer(yggConfig.kafkaHost,
-                                        yggConfig.kafkaPort,
-                                        yggConfig.kafkaSocketTimeout.toMillis.toInt,
-                                        yggConfig.kafkaBufferSize)
+      val consumer =
+        new SimpleConsumer(yggConfig.kafkaHost,
+                           yggConfig.kafkaPort,
+                           yggConfig.kafkaSocketTimeout.toMillis.toInt,
+                           yggConfig.kafkaBufferSize)
 
-      actorSystem.actorOf(Props(
-        new KafkaShardIngestActor( shardId = yggConfig.shardId,
-                                   initialCheckpoint = checkpoint,
-                                   consumer = consumer,
-                                   topic = yggConfig.kafkaTopic,
-                                   permissionsFinder = permissionsFinder,
-                                   routingActor = routingActor, 
-                                   ingestFailureLog = ingestFailureLog(checkpoint, conf.failureLogRoot),
-                                   fetchBufferSize = conf.bufferSize,
-                                   idleDelay = yggConfig.batchStoreDelay,
-                                   ingestTimeout = conf.batchTimeout,
-                                   maxCacheSize = conf.maxParallel,
-                                   maxConsecutiveFailures = conf.maxConsecutiveFailures) {
+      actorSystem.actorOf(
+          Props(
+              new KafkaShardIngestActor(
+                  shardId = yggConfig.shardId,
+                  initialCheckpoint = checkpoint,
+                  consumer = consumer,
+                  topic = yggConfig.kafkaTopic,
+                  permissionsFinder = permissionsFinder,
+                  routingActor = routingActor,
+                  ingestFailureLog = ingestFailureLog(checkpoint,
+                                                      conf.failureLogRoot),
+                  fetchBufferSize = conf.bufferSize,
+                  idleDelay = yggConfig.batchStoreDelay,
+                  ingestTimeout = conf.batchTimeout,
+                  maxCacheSize = conf.maxParallel,
+                  maxConsecutiveFailures = conf.maxConsecutiveFailures) {
 
-        implicit val M = new FutureMonad(ExecutionContext.defaultExecutionContext(actorSystem))
+            implicit val M = new FutureMonad(
+                ExecutionContext.defaultExecutionContext(actorSystem))
 
-        def handleBatchComplete(ck: YggCheckpoint) {
-          logger.debug("Complete up to " + ck)
-          checkpointCoordination.saveYggCheckpoint(yggConfig.shardId, ck)
-          logger.info("Saved checkpoint: " + ck)
-        }
-      }), "ingest")
+            def handleBatchComplete(ck: YggCheckpoint) {
+              logger.debug("Complete up to " + ck)
+              checkpointCoordination.saveYggCheckpoint(yggConfig.shardId, ck)
+              logger.info("Saved checkpoint: " + ck)
+            }
+          }),
+          "ingest")
     }
   }
 
-  override def checkpointCoordination = ZookeeperSystemCoordination(yggConfig.zookeeperHosts, yggConfig.serviceUID, yggConfig.ingestConfig.isDefined, yggConfig.createYggCheckpointFlag)
+  override def checkpointCoordination =
+    ZookeeperSystemCoordination(yggConfig.zookeeperHosts,
+                                yggConfig.serviceUID,
+                                yggConfig.ingestConfig.isDefined,
+                                yggConfig.createYggCheckpointFlag)
 }
 
 trait StandaloneShardSystemConfig extends ShardConfig {
@@ -141,7 +159,12 @@ trait StandaloneShardSystemConfig extends ShardConfig {
 
 trait StandaloneActorProjectionSystem extends ShardSystemActorModule {
   type YggConfig <: StandaloneShardSystemConfig
-  override def initIngestActor(actorSystem: ActorSystem, routingActor: ActorRef, checkpoint: YggCheckpoint, checkpointCoordination: CheckpointCoordination, permissionsFinder: PermissionsFinder[Future]) = None
+  override def initIngestActor(actorSystem: ActorSystem,
+                               routingActor: ActorRef,
+                               checkpoint: YggCheckpoint,
+                               checkpointCoordination: CheckpointCoordination,
+                               permissionsFinder: PermissionsFinder[Future]) =
+    None
   override def checkpointCoordination = CheckpointCoordination.Noop
 }
 

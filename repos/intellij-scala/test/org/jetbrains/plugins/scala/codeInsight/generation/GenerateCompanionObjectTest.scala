@@ -1,11 +1,10 @@
 package org.jetbrains.plugins.scala
 package codeInsight.generation
 
-
 /**
- * Nikolay.Tropin
- * 8/23/13
- */
+  * Nikolay.Tropin
+  * 8/23/13
+  */
 class GenerateCompanionObjectTest extends ScalaGenerateTestBase {
   val handler = new ScalaGenerateCompanionObjectHandler
 

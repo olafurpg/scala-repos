@@ -6,13 +6,11 @@ import com.intellij.openapi.editor.{Editor, EditorFactory}
 import com.intellij.util.containers.WeakHashMap
 
 /**
- * @author Ksenia.Sautina
- * @since 12/19/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 12/19/12
+  */
 object WorksheetViewerInfo {
-  private val allViewers =
-    new WeakHashMap[Editor, List[(Editor)]]()
+  private val allViewers = new WeakHashMap[Editor, List[(Editor)]]()
 
   def getViewer(editor: Editor): Editor = get(editor)
 
@@ -38,19 +36,20 @@ object WorksheetViewerInfo {
       }
     }
   }
-  
+
   def invalidate() {
     val i = allViewers.values().iterator()
     val factory = EditorFactory.getInstance()
-    
+
     while (i.hasNext) {
       i.next().foreach {
         case e: EditorImpl =>
-          if (!e.isDisposed) try {
-            factory.releaseEditor(e)
-          } catch {
-            case _: Exception => //ignore
-          }
+          if (!e.isDisposed)
+            try {
+              factory.releaseEditor(e)
+            } catch {
+              case _: Exception => //ignore
+            }
         case _ =>
       }
     }

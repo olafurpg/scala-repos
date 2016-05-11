@@ -9,18 +9,20 @@ import com.intellij.psi.{PsiElement, ResolveState}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 trait ScImportableDeclarationsOwner extends ScalaPsiElement {
   self: ScTypedDefinition =>
 
   /**
-   * Declarations may be taken from stable elements only
-   */
-  override def processDeclarations(processor: PsiScopeProcessor, state: ResolveState, lastParent: PsiElement, place: PsiElement) =
+    * Declarations may be taken from stable elements only
+    */
+  override def processDeclarations(processor: PsiScopeProcessor,
+                                   state: ResolveState,
+                                   lastParent: PsiElement,
+                                   place: PsiElement) =
     if (isStable) {
-      ScalaPsiUtil.processImportLastParent(processor, state, place, lastParent, getType(TypingContext.empty))
+      ScalaPsiUtil.processImportLastParent(
+          processor, state, place, lastParent, getType(TypingContext.empty))
     } else true
-
 }

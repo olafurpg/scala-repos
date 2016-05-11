@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import language.postfixOps
@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ ForceDisassociate, Direction }
+import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociate, Direction}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -22,8 +22,7 @@ object RemoteQuarantinePiercingSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(
-    ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
                               """)))
@@ -31,18 +30,20 @@ object RemoteQuarantinePiercingSpec extends MultiNodeConfig {
   class Subject extends Actor {
     def receive = {
       case "shutdown" ⇒ context.system.terminate()
-      case "identify" ⇒ sender() ! (AddressUidExtension(context.system).addressUid -> self)
+      case "identify" ⇒
+        sender() ! (AddressUidExtension(context.system).addressUid -> self)
     }
   }
-
 }
 
-class RemoteQuarantinePiercingMultiJvmNode1 extends RemoteQuarantinePiercingSpec
-class RemoteQuarantinePiercingMultiJvmNode2 extends RemoteQuarantinePiercingSpec
+class RemoteQuarantinePiercingMultiJvmNode1
+    extends RemoteQuarantinePiercingSpec
+class RemoteQuarantinePiercingMultiJvmNode2
+    extends RemoteQuarantinePiercingSpec
 
-abstract class RemoteQuarantinePiercingSpec extends MultiNodeSpec(RemoteQuarantinePiercingSpec)
-  with STMultiNodeSpec
-  with ImplicitSender {
+abstract class RemoteQuarantinePiercingSpec
+    extends MultiNodeSpec(RemoteQuarantinePiercingSpec) with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteQuarantinePiercingSpec._
 
@@ -65,10 +66,12 @@ abstract class RemoteQuarantinePiercingSpec extends MultiNodeSpec(RemoteQuaranti
         enterBarrier("actor-identified")
 
         // Manually Quarantine the other system
-        RARP(system).provider.transport.quarantine(node(second).address, Some(uidFirst))
+        RARP(system).provider.transport
+          .quarantine(node(second).address, Some(uidFirst))
 
         // Quarantine is up -- Cannot communicate with remote system any more
-        system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! "identify"
+        system.actorSelection(
+            RootActorPath(secondAddress) / "user" / "subject") ! "identify"
         expectNoMsg(2.seconds)
 
         // Shut down the other system -- which results in restart (see runOn(second))
@@ -78,8 +81,10 @@ abstract class RemoteQuarantinePiercingSpec extends MultiNodeSpec(RemoteQuaranti
         within(30.seconds) {
           // retry because the Subject actor might not be started yet
           awaitAssert {
-            system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! "identify"
-            val (uidSecond, subjectSecond) = expectMsgType[(Int, ActorRef)](1.second)
+            system.actorSelection(
+                RootActorPath(secondAddress) / "user" / "subject") ! "identify"
+            val (uidSecond, subjectSecond) =
+              expectMsgType[(Int, ActorRef)](1.second)
             uidSecond should not be (uidFirst)
             subjectSecond should not be (subjectFirst)
           }
@@ -87,12 +92,13 @@ abstract class RemoteQuarantinePiercingSpec extends MultiNodeSpec(RemoteQuaranti
 
         // If we got here the Quarantine was successfully pierced since it is configured to last 1 day
 
-        system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
-
+        system.actorSelection(
+            RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
       }
 
       runOn(second) {
-        val addr = system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
+        val addr =
+          system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         system.actorOf(Props[Subject], "subject")
         enterBarrier("actors-started")
 
@@ -100,7 +106,8 @@ abstract class RemoteQuarantinePiercingSpec extends MultiNodeSpec(RemoteQuaranti
 
         Await.ready(system.whenTerminated, 30.seconds)
 
-        val freshSystem = ActorSystem(system.name, ConfigFactory.parseString(s"""
+        val freshSystem =
+          ActorSystem(system.name, ConfigFactory.parseString(s"""
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}
                       port = ${addr.port.get}
@@ -110,8 +117,6 @@ abstract class RemoteQuarantinePiercingSpec extends MultiNodeSpec(RemoteQuaranti
 
         Await.ready(freshSystem.whenTerminated, 30.seconds)
       }
-
     }
-
   }
 }

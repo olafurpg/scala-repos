@@ -4,7 +4,7 @@ abstract class Prova2 extends Dynamic {
 }
 
 object Test extends App {
-  val prova= new Prova2 {
+  val prova = new Prova2 {
     def applyDynamic(m: String)() = println("applyDynamic")
   }
   prova.privateMethod()

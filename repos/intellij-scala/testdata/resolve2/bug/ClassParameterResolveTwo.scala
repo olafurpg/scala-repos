@@ -4,7 +4,7 @@ object ClassParameterResolveTwo {
   }
 
   class Child(name: String) extends Parent {
-    def getThisName = this./* line: 6*/name
+    def getThisName = this. /* line: 6*/ name
   }
 
   object Main {

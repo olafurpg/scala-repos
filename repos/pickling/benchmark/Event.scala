@@ -19,14 +19,13 @@ import scala.Array
 import java.net.URLEncoder
 
 /**
- * The event class all other event's should inherit.
- * 
- * It's identified by the event type (class name) and id. An event
- * can have clones with different paths.
- * 
- */
-
+  * The event class all other event's should inherit.
+  * 
+  * It's identified by the event type (class name) and id. An event
+  * can have clones with different paths.
+  * 
+  */
 trait Event extends Serializable {
-    val id: String
-    val timestamp: Int
+  val id: String
+  val timestamp: Int
 }

@@ -1,7 +1,8 @@
 class IntList(val hd: Int, val tl: IntList)
 object NilIL extends IntList(0, null)
 object IntList {
-  def unapply(il: IntList): Option[(Int, IntList)] = if(il eq NilIL) None else Some(il.hd, il.tl)
+  def unapply(il: IntList): Option[(Int, IntList)] =
+    if (il eq NilIL) None else Some(il.hd, il.tl)
   def apply(x: Int, xs: IntList) = new IntList(x, xs)
 }
 
@@ -29,4 +30,4 @@ object Test extends App {
       Predef.this.implicitly[scala.Predef.MatchingStrategy[Option]](scala.this.Predef.OptionMatching).success[Int](x7._1)))).orElse[Int](
     Predef.this.implicitly[scala.Predef.MatchingStrategy[Option]](scala.this.Predef.OptionMatching).fail)
   ).apply(IntList.apply(1, null))
-*/
+ */

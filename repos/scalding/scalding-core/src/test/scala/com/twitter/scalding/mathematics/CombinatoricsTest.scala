@@ -12,10 +12,10 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding.mathematics
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 import com.twitter.scalding._
 
 class CombinatoricsJob(args: Args) extends Job(args) {
@@ -26,13 +26,13 @@ class CombinatoricsJob(args: Args) extends Job(args) {
 
   // how many ways can you invest $10000 in KR,ABT,DLTR,MNST ?
   val cash = 1000.0
-  val error = 1.0 // max error $1, so its ok if we cannot invest the last dollar
+  val error =
+    1.0 // max error $1, so its ok if we cannot invest the last dollar
   val (kr, abt, dltr, mnst) = (27.0, 64.0, 41.0, 52.0) // share prices
   val stocks = IndexedSeq(kr, abt, dltr, mnst)
 
   C.weightedSum(stocks, cash, error).write(Tsv("invest.txt"))
   C.positiveWeightedSum(stocks, cash, error).write(Tsv("investpos.txt"))
-
 }
 
 class CombinatoricsJobTest extends WordSpec with Matchers {

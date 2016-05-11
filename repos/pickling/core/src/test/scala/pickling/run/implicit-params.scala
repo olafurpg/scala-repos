@@ -3,7 +3,6 @@ package scala.pickling.implicitparams
 import org.scalatest.FunSuite
 import scala.pickling._, scala.pickling.Defaults._, binary._
 
-
 case class Person(implicit name: String, age: Int)
 object Test {
   class SimpleImplParamTest extends FunSuite {

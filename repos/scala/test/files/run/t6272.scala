@@ -20,12 +20,11 @@ object A {
   }
 
   var b = true
-  while(b) {
+  while (b) {
     lazy val x5 = 5
     println(x5)
     b = false
   }
-
 
   def method {
     try {
@@ -47,7 +46,7 @@ object A {
     }
 
     var b = true
-    while(b) {
+    while (b) {
       lazy val x10 = 10
       println(x10)
       b = false

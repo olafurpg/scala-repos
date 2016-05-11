@@ -34,14 +34,20 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 
 /**
- * BigIntegerStringConverter Spec tests.
- *
- *
- */
+  * BigIntegerStringConverter Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class BigIntStringConverterSpec
-  extends AbstractStringConverterDelegateSpec[java.math.BigInteger, jfxuc.BigIntegerStringConverter, BigInt, BigIntStringConverter](classOf[jfxuc.BigIntegerStringConverter], classOf[BigIntStringConverter], classOf[BigInt]) {
+    extends AbstractStringConverterDelegateSpec[
+        java.math.BigInteger,
+        jfxuc.BigIntegerStringConverter,
+        BigInt,
+        BigIntStringConverter](classOf[jfxuc.BigIntegerStringConverter],
+                               classOf[BigIntStringConverter],
+                               classOf[BigInt]) {
 
-  val examples = List((BigInt(0), "0"), (BigInt(12345), "12345"), (BigInt(-12345), "-12345"))
-
+  val examples = List(
+      (BigInt(0), "0"), (BigInt(12345), "12345"), (BigInt(-12345), "-12345"))
 }

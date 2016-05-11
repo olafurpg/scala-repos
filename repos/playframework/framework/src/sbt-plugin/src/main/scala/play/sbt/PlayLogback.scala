@@ -7,8 +7,8 @@ import sbt.Keys._
 import sbt._
 
 /**
- * This plugin enables Play Logback
- */
+  * This plugin enables Play Logback
+  */
 object PlayLogback extends AutoPlugin {
   override def requires = Play
 
@@ -16,8 +16,8 @@ object PlayLogback extends AutoPlugin {
   override def trigger = AllRequirements
 
   override def projectSettings = Seq(
-    libraryDependencies ++= {
-      Seq("com.typesafe.play" %% "play-logback" % play.core.PlayVersion.current)
-    }
+      libraryDependencies ++= {
+        Seq("com.typesafe.play" %% "play-logback" % play.core.PlayVersion.current)
+      }
   )
 }

@@ -1,6 +1,8 @@
 import annotation._
 
-@SerialVersionUID(42) @strictfp class Foo[@specialized(Int) T] extends Serializable {
+@SerialVersionUID(42)
+@strictfp
+class Foo[@specialized(Int) T] extends Serializable {
   def foo(t: T) = t
 }
 
@@ -24,4 +26,3 @@ object Test extends App {
   check(new Foo[String])
   check(new Foo[Int])
 }
-

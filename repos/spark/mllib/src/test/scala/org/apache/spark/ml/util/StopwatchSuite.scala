@@ -70,9 +70,7 @@ class StopwatchSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("MultiStopwatch") {
-    val sw = new MultiStopwatch(sc)
-      .addLocal("local")
-      .addDistributed("spark")
+    val sw = new MultiStopwatch(sc).addLocal("local").addDistributed("spark")
     assert(sw("local").name === "local")
     assert(sw("spark").name === "spark")
     intercept[NoSuchElementException] {
@@ -85,8 +83,8 @@ class StopwatchSuite extends SparkFunSuite with MLlibTestSparkContext {
     val sparkElapsed = sw("spark").elapsed()
     assert(localElapsed === localDuration)
     assert(sparkElapsed === sparkDuration)
-    assert(sw.toString ===
-      s"{\n  local: ${localElapsed}ms,\n  spark: ${sparkElapsed}ms\n}")
+    assert(
+        sw.toString === s"{\n  local: ${localElapsed}ms,\n  spark: ${sparkElapsed}ms\n}")
     val rdd = sc.parallelize(0 until 4, 4)
     val acc = sc.accumulator(0L)
     rdd.foreach { i =>
@@ -105,9 +103,9 @@ class StopwatchSuite extends SparkFunSuite with MLlibTestSparkContext {
 private object StopwatchSuite extends SparkFunSuite {
 
   /**
-   * Checks the input stopwatch on a task that takes a random time (<10ms) to finish. Validates and
-   * returns the duration reported by the stopwatch.
-   */
+    * Checks the input stopwatch on a task that takes a random time (<10ms) to finish. Validates and
+    * returns the duration reported by the stopwatch.
+    */
   def checkStopwatch(sw: Stopwatch): Long = {
     val ubStart = now
     sw.start()

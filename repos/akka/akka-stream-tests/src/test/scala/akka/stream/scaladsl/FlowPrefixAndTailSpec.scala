@@ -1,10 +1,10 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import scala.collection.immutable
-import scala.concurrent.{ Await }
+import scala.concurrent.{Await}
 import scala.concurrent.duration._
 import scala.util.control.NoStackTrace
 import akka.stream._
@@ -14,8 +14,8 @@ import akka.testkit.AkkaSpec
 
 class FlowPrefixAndTailSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system)
-    .withInputBuffer(initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system).withInputBuffer(
+      initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -100,22 +100,25 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
 
       val subscriber2 = TestSubscriber.probe[Int]()
       tail.to(Sink.fromSubscriber(subscriber2)).run()
-      subscriber2.expectSubscriptionAndError().getMessage should ===("Substream Source cannot be materialized more than once")
+      subscriber2.expectSubscriptionAndError().getMessage should ===(
+          "Substream Source cannot be materialized more than once")
 
       subscriber1.requestNext(2).expectComplete()
-
     }
 
     "signal error if substream has been not subscribed in time" in assertAllStagesStopped {
       val ms = 300
 
-      val tightTimeoutMaterializer =
-        ActorMaterializer(ActorMaterializerSettings(system)
-          .withSubscriptionTimeoutSettings(
-            StreamSubscriptionTimeoutSettings(StreamSubscriptionTimeoutTerminationMode.cancel, ms.millisecond)))
+      val tightTimeoutMaterializer = ActorMaterializer(
+          ActorMaterializerSettings(system).withSubscriptionTimeoutSettings(
+              StreamSubscriptionTimeoutSettings(
+                  StreamSubscriptionTimeoutTerminationMode.cancel,
+                  ms.millisecond)))
 
       val futureSink = newHeadSink
-      val fut = Source(1 to 2).prefixAndTail(1).runWith(futureSink)(tightTimeoutMaterializer)
+      val fut = Source(1 to 2)
+        .prefixAndTail(1)
+        .runWith(futureSink)(tightTimeoutMaterializer)
       val (takes, tail) = Await.result(fut, 3.seconds)
       takes should be(Seq(1))
 
@@ -123,16 +126,20 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
       Thread.sleep(1000)
 
       tail.to(Sink.fromSubscriber(subscriber)).run()(tightTimeoutMaterializer)
-      subscriber.expectSubscriptionAndError().getMessage should ===(s"Substream Source has not been materialized in ${ms} milliseconds")
+      subscriber.expectSubscriptionAndError().getMessage should ===(
+          s"Substream Source has not been materialized in ${ms} milliseconds")
     }
     "not fail the stream if substream has not been subscribed in time and configured subscription timeout is noop" in assertAllStagesStopped {
-      val tightTimeoutMaterializer =
-        ActorMaterializer(ActorMaterializerSettings(system)
-          .withSubscriptionTimeoutSettings(
-            StreamSubscriptionTimeoutSettings(StreamSubscriptionTimeoutTerminationMode.noop, 1.millisecond)))
+      val tightTimeoutMaterializer = ActorMaterializer(
+          ActorMaterializerSettings(system).withSubscriptionTimeoutSettings(
+              StreamSubscriptionTimeoutSettings(
+                  StreamSubscriptionTimeoutTerminationMode.noop,
+                  1.millisecond)))
 
       val futureSink = newHeadSink
-      val fut = Source(1 to 2).prefixAndTail(1).runWith(futureSink)(tightTimeoutMaterializer)
+      val fut = Source(1 to 2)
+        .prefixAndTail(1)
+        .runWith(futureSink)(tightTimeoutMaterializer)
       val (takes, tail) = Await.result(fut, 3.seconds)
       takes should be(Seq(1))
 
@@ -153,9 +160,14 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
 
     "handle onError when no substream open" in assertAllStagesStopped {
       val publisher = TestPublisher.manualProbe[Int]()
-      val subscriber = TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
+      val subscriber =
+        TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
 
-      Source.fromPublisher(publisher).prefixAndTail(3).to(Sink.fromSubscriber(subscriber)).run()
+      Source
+        .fromPublisher(publisher)
+        .prefixAndTail(3)
+        .to(Sink.fromSubscriber(subscriber))
+        .run()
 
       val upstream = publisher.expectSubscription()
       val downstream = subscriber.expectSubscription()
@@ -171,9 +183,14 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
 
     "handle onError when substream is open" in assertAllStagesStopped {
       val publisher = TestPublisher.manualProbe[Int]()
-      val subscriber = TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
+      val subscriber =
+        TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
 
-      Source.fromPublisher(publisher).prefixAndTail(1).to(Sink.fromSubscriber(subscriber)).run()
+      Source
+        .fromPublisher(publisher)
+        .prefixAndTail(1)
+        .to(Sink.fromSubscriber(subscriber))
+        .run()
 
       val upstream = publisher.expectSubscription()
       val downstream = subscriber.expectSubscription()
@@ -193,14 +210,18 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
 
       upstream.sendError(testException)
       substreamSubscriber.expectError(testException)
-
     }
 
     "handle master stream cancellation" in assertAllStagesStopped {
       val publisher = TestPublisher.manualProbe[Int]()
-      val subscriber = TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
+      val subscriber =
+        TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
 
-      Source.fromPublisher(publisher).prefixAndTail(3).to(Sink.fromSubscriber(subscriber)).run()
+      Source
+        .fromPublisher(publisher)
+        .prefixAndTail(3)
+        .to(Sink.fromSubscriber(subscriber))
+        .run()
 
       val upstream = publisher.expectSubscription()
       val downstream = subscriber.expectSubscription()
@@ -216,9 +237,14 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
 
     "handle substream cancellation" in assertAllStagesStopped {
       val publisher = TestPublisher.manualProbe[Int]()
-      val subscriber = TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
+      val subscriber =
+        TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
 
-      Source.fromPublisher(publisher).prefixAndTail(1).to(Sink.fromSubscriber(subscriber)).run()
+      Source
+        .fromPublisher(publisher)
+        .prefixAndTail(1)
+        .to(Sink.fromSubscriber(subscriber))
+        .run()
 
       val upstream = publisher.expectSubscription()
       val downstream = subscriber.expectSubscription()
@@ -237,14 +263,18 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
       substreamSubscriber.expectSubscription().cancel()
 
       upstream.expectCancellation()
-
     }
 
     "pass along early cancellation" in assertAllStagesStopped {
       val up = TestPublisher.manualProbe[Int]()
-      val down = TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
+      val down =
+        TestSubscriber.manualProbe[(immutable.Seq[Int], Source[Int, _])]()
 
-      val flowSubscriber = Source.asSubscriber[Int].prefixAndTail(1).to(Sink.fromSubscriber(down)).run()
+      val flowSubscriber = Source
+        .asSubscriber[Int]
+        .prefixAndTail(1)
+        .to(Sink.fromSubscriber(down))
+        .run()
 
       val downstream = down.expectSubscription()
       downstream.cancel()
@@ -269,7 +299,5 @@ class FlowPrefixAndTailSpec extends AkkaSpec {
       tailPub.subscribe(sub)
       sub.expectSubscriptionAndComplete()
     }
-
   }
-
 }

@@ -10,10 +10,9 @@ case class PredictedResult(p: String) extends Serializable
 
 object VanillaEngine extends IEngineFactory {
   def apply() = {
-    new Engine(
-      classOf[DataSource],
-      PIdentityPreparator(classOf[DataSource]),
-      Map("" -> classOf[Algorithm]),
-      classOf[Serving])
+    new Engine(classOf[DataSource],
+               PIdentityPreparator(classOf[DataSource]),
+               Map("" -> classOf[Algorithm]),
+               classOf[Serving])
   }
 }

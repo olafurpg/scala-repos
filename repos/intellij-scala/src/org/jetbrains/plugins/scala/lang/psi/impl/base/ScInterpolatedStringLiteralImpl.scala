@@ -8,22 +8,27 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, TypingContext}
 
 /**
- * User: Dmitry Naydanov
- * Date: 3/17/12
- */
-class ScInterpolatedStringLiteralImpl(node: ASTNode) extends ScLiteralImpl(node) with ScInterpolatedStringLiteral {
-  def getType: InterpolatedStringType.StringType = getNode.getFirstChildNode.getText match {
-    case "s" => InterpolatedStringType.STANDART
-    case "f" => InterpolatedStringType.FORMAT
-    case "id" => InterpolatedStringType.PATTERN
-    case "raw" => InterpolatedStringType.RAW
-    case _ => null
-  }
+  * User: Dmitry Naydanov
+  * Date: 3/17/12
+  */
+class ScInterpolatedStringLiteralImpl(node: ASTNode)
+    extends ScLiteralImpl(node) with ScInterpolatedStringLiteral {
+  def getType: InterpolatedStringType.StringType =
+    getNode.getFirstChildNode.getText match {
+      case "s" => InterpolatedStringType.STANDART
+      case "f" => InterpolatedStringType.FORMAT
+      case "id" => InterpolatedStringType.PATTERN
+      case "raw" => InterpolatedStringType.RAW
+      case _ => null
+    }
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
     getStringContextExpression match {
       case Some(expr) => expr.getNonValueType(ctx)
-      case _ => Failure(s"Cannot find method ${getFirstChild.getText} of StringContext", Some(this))
+      case _ =>
+        Failure(
+            s"Cannot find method ${getFirstChild.getText} of StringContext",
+            Some(this))
     }
   }
 
@@ -38,8 +43,9 @@ class ScInterpolatedStringLiteralImpl(node: ASTNode) extends ScLiteralImpl(node)
 
   override def isString: Boolean = true
 
-  override def getValue: AnyRef = findChildByClassScala(classOf[ScLiteralImpl]) match {
-    case literal: ScLiteralImpl => literal.getValue
-    case _ => "" 
-  }
+  override def getValue: AnyRef =
+    findChildByClassScala(classOf[ScLiteralImpl]) match {
+      case literal: ScLiteralImpl => literal.getValue
+      case _ => ""
+    }
 }

@@ -21,5 +21,4 @@ class RecipeKeepAlive extends RecipeSpec {
       // No need to test, this is a built-in stage with proper tests
     }
   }
-
 }

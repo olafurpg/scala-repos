@@ -3,252 +3,268 @@
  */
 package play.api.libs.crypto
 
-import java.security.{ MessageDigest, SecureRandom }
+import java.security.{MessageDigest, SecureRandom}
 import java.time.Clock
-import javax.crypto.spec.{ IvParameterSpec, SecretKeySpec }
-import javax.crypto.{ Cipher, Mac }
-import javax.inject.{ Inject, Provider, Singleton }
+import javax.crypto.spec.{IvParameterSpec, SecretKeySpec}
+import javax.crypto.{Cipher, Mac}
+import javax.inject.{Inject, Provider, Singleton}
 
-import org.apache.commons.codec.binary.{ Base64, Hex }
+import org.apache.commons.codec.binary.{Base64, Hex}
 import org.apache.commons.codec.digest.DigestUtils
 import play.api._
 import play.api.libs.Codecs
 
 /**
- * Authenticates a cookie by returning a message authentication code (MAC).
- *
- * This trait should not be used as a general purpose MAC utility.
- */
+  * Authenticates a cookie by returning a message authentication code (MAC).
+  *
+  * This trait should not be used as a general purpose MAC utility.
+  */
 trait CookieSigner {
 
   /**
-   * Signs (MAC) the given String using the given secret key.
-   *
-   * By default this uses the platform default JCE provider.  This can be overridden by defining
-   * `play.crypto.provider` in `application.conf`.
-   *
-   * @param message The message to sign.
-   * @param key     The private key to sign with.
-   * @return A hexadecimal encoded signature.
-   */
+    * Signs (MAC) the given String using the given secret key.
+    *
+    * By default this uses the platform default JCE provider.  This can be overridden by defining
+    * `play.crypto.provider` in `application.conf`.
+    *
+    * @param message The message to sign.
+    * @param key     The private key to sign with.
+    * @return A hexadecimal encoded signature.
+    */
   def sign(message: String, key: Array[Byte]): String
 
   /**
-   * Signs (MAC) the given String using the application’s secret key.
-   *
-   * By default this uses the platform default JCE provider.  This can be overridden by defining
-   * `play.crypto.provider` in `application.conf`.
-   *
-   * @param message The message to sign.
-   * @return A hexadecimal encoded signature.
-   */
+    * Signs (MAC) the given String using the application’s secret key.
+    *
+    * By default this uses the platform default JCE provider.  This can be overridden by defining
+    * `play.crypto.provider` in `application.conf`.
+    *
+    * @param message The message to sign.
+    * @return A hexadecimal encoded signature.
+    */
   def sign(message: String): String
 }
 
 /**
- * Cryptographic utilities for generating and validating CSRF tokens.
- *
- * This trait should not be used as a general purpose encryption utility.
- */
+  * Cryptographic utilities for generating and validating CSRF tokens.
+  *
+  * This trait should not be used as a general purpose encryption utility.
+  */
 trait CSRFTokenSigner {
 
   /**
-   * Sign a token.  This produces a new token, that has this token signed with a nonce.
-   *
-   * This primarily exists to defeat the BREACH vulnerability, as it allows the token to effectively be random per
-   * request, without actually changing the value.
-   *
-   * @param token The token to sign
-   * @return The signed token
-   */
+    * Sign a token.  This produces a new token, that has this token signed with a nonce.
+    *
+    * This primarily exists to defeat the BREACH vulnerability, as it allows the token to effectively be random per
+    * request, without actually changing the value.
+    *
+    * @param token The token to sign
+    * @return The signed token
+    */
   def signToken(token: String): String
 
   /**
-   * Generates a cryptographically secure token.
-   */
+    * Generates a cryptographically secure token.
+    */
   def generateToken: String
 
   /**
-   * Generates a signed token.
-   */
+    * Generates a signed token.
+    */
   def generateSignedToken: String
 
   /**
-   * Extract a signed token that was signed by [[play.api.libs.Crypto.signToken]].
-   *
-   * @param token The signed token to extract.
-   * @return The verified raw token, or None if the token isn't valid.
-   */
+    * Extract a signed token that was signed by [[play.api.libs.Crypto.signToken]].
+    *
+    * @param token The signed token to extract.
+    * @return The verified raw token, or None if the token isn't valid.
+    */
   def extractSignedToken(token: String): Option[String]
 
   /**
-   * Compare two signed tokens
-   */
+    * Compare two signed tokens
+    */
   def compareSignedTokens(tokenA: String, tokenB: String): Boolean
 
   /**
-   * Constant time equals method.
-   *
-   * Given a length that both Strings are equal to, this method will always run in constant time.  This prevents
-   * timing attacks.
-   */
+    * Constant time equals method.
+    *
+    * Given a length that both Strings are equal to, this method will always run in constant time.  This prevents
+    * timing attacks.
+    */
   def constantTimeEquals(a: String, b: String): Boolean
 }
 
 /**
- * Encrypts and decrypts strings using AES.
- *
- * Note that the output from AES/CTR is vulnerable to malleability attacks unless signed with a MAC.
- *
- * In addition, because this class is hardcoded to use AES, it cannot be used a general purpose Crypter.
- *
- * It is also not used anywhere internally to the Play code base.
- */
-@deprecated(message = "This method is deprecated and will be removed in future versions.", since = "2.5.0")
+  * Encrypts and decrypts strings using AES.
+  *
+  * Note that the output from AES/CTR is vulnerable to malleability attacks unless signed with a MAC.
+  *
+  * In addition, because this class is hardcoded to use AES, it cannot be used a general purpose Crypter.
+  *
+  * It is also not used anywhere internally to the Play code base.
+  */
+@deprecated(
+    message = "This method is deprecated and will be removed in future versions.",
+    since = "2.5.0")
 trait AESCrypter {
 
   /**
-   * Encrypt a String with the AES encryption standard using the application's secret key.
-   *
-   * The provider used is by default this uses the platform default JSSE provider.  This can be overridden by defining
-   * `play.crypto.provider` in `application.conf`.
-   *
-   * The transformation algorithm used is the provider specific implementation of the `AES` name.  On Oracles JDK,
-   * this is `AES/CTR/NoPadding`.  This algorithm is suitable for small amounts of data, typically less than 32
-   * bytes, hence is useful for encrypting credit card numbers, passwords etc.  For larger blocks of data, this
-   * algorithm may expose patterns and be vulnerable to repeat attacks.
-   *
-   * The transformation algorithm can be configured by defining `play.crypto.aes.transformation` in
-   * `application.conf`.  Although any cipher transformation algorithm can be selected here, the secret key spec used
-   * is always AES, so only AES transformation algorithms will work.
-   *
-   * @deprecated This method is deprecated and will be removed in future versions.
-   * @param value The String to encrypt.
-   * @return An hexadecimal encrypted string.
-   */
-  @deprecated(message = "This method is deprecated and will be removed in future versions.", since = "2.5.0")
+    * Encrypt a String with the AES encryption standard using the application's secret key.
+    *
+    * The provider used is by default this uses the platform default JSSE provider.  This can be overridden by defining
+    * `play.crypto.provider` in `application.conf`.
+    *
+    * The transformation algorithm used is the provider specific implementation of the `AES` name.  On Oracles JDK,
+    * this is `AES/CTR/NoPadding`.  This algorithm is suitable for small amounts of data, typically less than 32
+    * bytes, hence is useful for encrypting credit card numbers, passwords etc.  For larger blocks of data, this
+    * algorithm may expose patterns and be vulnerable to repeat attacks.
+    *
+    * The transformation algorithm can be configured by defining `play.crypto.aes.transformation` in
+    * `application.conf`.  Although any cipher transformation algorithm can be selected here, the secret key spec used
+    * is always AES, so only AES transformation algorithms will work.
+    *
+    * @deprecated This method is deprecated and will be removed in future versions.
+    * @param value The String to encrypt.
+    * @return An hexadecimal encrypted string.
+    */
+  @deprecated(
+      message = "This method is deprecated and will be removed in future versions.",
+      since = "2.5.0")
   def encryptAES(value: String): String
 
   /**
-   * Encrypt a String with the AES encryption standard and the supplied private key.
-   *
-   * The provider used is by default this uses the platform default JSSE provider.  This can be overridden by defining
-   * `play.crypto.provider` in `application.conf`.
-   *
-   * The transformation algorithm used is the provider specific implementation of the `AES` name.  On Oracles JDK,
-   * this is `AES/CTR/NoPadding`.  This algorithm is suitable for small amounts of data, typically less than 32
-   * bytes, hence is useful for encrypting credit card numbers, passwords etc.  For larger blocks of data, this
-   * algorithm may expose patterns and be vulnerable to repeat attacks.
-   *
-   * The transformation algorithm can be configured by defining `play.crypto.aes.transformation` in
-   * `application.conf`.  Although any cipher transformation algorithm can be selected here, the secret key spec used
-   * is always AES, so only AES transformation algorithms will work.
-   *
-   * @deprecated This method is deprecated and will be removed in future versions.
-   * @param value The String to encrypt.
-   * @param privateKey The key used to encrypt.
-   * @return An hexadecimal encrypted string.
-   */
-  @deprecated(message = "This method is deprecated and will be removed in future versions.", since = "2.5.0")
+    * Encrypt a String with the AES encryption standard and the supplied private key.
+    *
+    * The provider used is by default this uses the platform default JSSE provider.  This can be overridden by defining
+    * `play.crypto.provider` in `application.conf`.
+    *
+    * The transformation algorithm used is the provider specific implementation of the `AES` name.  On Oracles JDK,
+    * this is `AES/CTR/NoPadding`.  This algorithm is suitable for small amounts of data, typically less than 32
+    * bytes, hence is useful for encrypting credit card numbers, passwords etc.  For larger blocks of data, this
+    * algorithm may expose patterns and be vulnerable to repeat attacks.
+    *
+    * The transformation algorithm can be configured by defining `play.crypto.aes.transformation` in
+    * `application.conf`.  Although any cipher transformation algorithm can be selected here, the secret key spec used
+    * is always AES, so only AES transformation algorithms will work.
+    *
+    * @deprecated This method is deprecated and will be removed in future versions.
+    * @param value The String to encrypt.
+    * @param privateKey The key used to encrypt.
+    * @return An hexadecimal encrypted string.
+    */
+  @deprecated(
+      message = "This method is deprecated and will be removed in future versions.",
+      since = "2.5.0")
   def encryptAES(value: String, privateKey: String): String
 
   /**
-   * Decrypt a String with the AES encryption standard using the application's secret key.
-   *
-   * The provider used is by default this uses the platform default JSSE provider.  This can be overridden by defining
-   * `play.crypto.provider` in `application.conf`.
-   *
-   * The transformation used is by default `AES/CTR/NoPadding`.  It can be configured by defining
-   * `play.crypto.aes.transformation` in `application.conf`.  Although any cipher transformation algorithm can
-   * be selected here, the secret key spec used is always AES, so only AES transformation algorithms will work.
-   *
-   * @deprecated This method is deprecated and will be removed in future versions.
-   * @param value An hexadecimal encrypted string.
-   * @return The decrypted String.
-   */
-  @deprecated(message = "This method is deprecated and will be removed in future versions.", since = "2.5.0")
+    * Decrypt a String with the AES encryption standard using the application's secret key.
+    *
+    * The provider used is by default this uses the platform default JSSE provider.  This can be overridden by defining
+    * `play.crypto.provider` in `application.conf`.
+    *
+    * The transformation used is by default `AES/CTR/NoPadding`.  It can be configured by defining
+    * `play.crypto.aes.transformation` in `application.conf`.  Although any cipher transformation algorithm can
+    * be selected here, the secret key spec used is always AES, so only AES transformation algorithms will work.
+    *
+    * @deprecated This method is deprecated and will be removed in future versions.
+    * @param value An hexadecimal encrypted string.
+    * @return The decrypted String.
+    */
+  @deprecated(
+      message = "This method is deprecated and will be removed in future versions.",
+      since = "2.5.0")
   def decryptAES(value: String): String
 
   /**
-   * Decrypt a String with the AES encryption standard.
-   *
-   * The private key must have a length of 16 bytes.
-   *
-   * The provider used is by default this uses the platform default JSSE provider.  This can be overridden by defining
-   * `play.crypto.provider` in `application.conf`.
-   *
-   * The transformation used is by default `AES/CTR/NoPadding`.  It can be configured by defining
-   * `play.crypto.aes.transformation` in `application.conf`.  Although any cipher transformation algorithm can
-   * be selected here, the secret key spec used is always AES, so only AES transformation algorithms will work.
-   *
-   * @deprecated This method is deprecated and will be removed in future versions.
-   * @param value An hexadecimal encrypted string.
-   * @param privateKey The key used to encrypt.
-   * @return The decrypted String.
-   */
-  @deprecated(message = "This method is deprecated and will be removed in future versions.", since = "2.5.0")
+    * Decrypt a String with the AES encryption standard.
+    *
+    * The private key must have a length of 16 bytes.
+    *
+    * The provider used is by default this uses the platform default JSSE provider.  This can be overridden by defining
+    * `play.crypto.provider` in `application.conf`.
+    *
+    * The transformation used is by default `AES/CTR/NoPadding`.  It can be configured by defining
+    * `play.crypto.aes.transformation` in `application.conf`.  Although any cipher transformation algorithm can
+    * be selected here, the secret key spec used is always AES, so only AES transformation algorithms will work.
+    *
+    * @deprecated This method is deprecated and will be removed in future versions.
+    * @param value An hexadecimal encrypted string.
+    * @param privateKey The key used to encrypt.
+    * @return The decrypted String.
+    */
+  @deprecated(
+      message = "This method is deprecated and will be removed in future versions.",
+      since = "2.5.0")
   def decryptAES(value: String, privateKey: String): String
-
 }
 
 /**
- * Exception thrown by the Crypto APIs.
- *
- * @param message The error message.
- * @param throwable The Throwable associated with the exception.
- */
-class CryptoException(val message: String = null, val throwable: Throwable = null) extends RuntimeException(message, throwable)
+  * Exception thrown by the Crypto APIs.
+  *
+  * @param message The error message.
+  * @param throwable The Throwable associated with the exception.
+  */
+class CryptoException(
+    val message: String = null, val throwable: Throwable = null)
+    extends RuntimeException(message, throwable)
 
 @Singleton
-class CookieSignerProvider @Inject() (config: CryptoConfig) extends Provider[CookieSigner] {
+class CookieSignerProvider @Inject()(config: CryptoConfig)
+    extends Provider[CookieSigner] {
   lazy val get: CookieSigner = new HMACSHA1CookieSigner(config)
 }
 
 /**
- * Uses an HMAC-SHA1 for signing cookies.
- */
-class HMACSHA1CookieSigner @Inject() (config: CryptoConfig) extends CookieSigner {
+  * Uses an HMAC-SHA1 for signing cookies.
+  */
+class HMACSHA1CookieSigner @Inject()(config: CryptoConfig)
+    extends CookieSigner {
 
   /**
-   * Signs the given String with HMAC-SHA1 using the given key.
-   *
-   * By default this uses the platform default JSSE provider.  This can be overridden by defining
-   * `play.crypto.provider` in `application.conf`.
-   *
-   * @param message The message to sign.
-   * @param key The private key to sign with.
-   * @return A hexadecimal encoded signature.
-   */
+    * Signs the given String with HMAC-SHA1 using the given key.
+    *
+    * By default this uses the platform default JSSE provider.  This can be overridden by defining
+    * `play.crypto.provider` in `application.conf`.
+    *
+    * @param message The message to sign.
+    * @param key The private key to sign with.
+    * @return A hexadecimal encoded signature.
+    */
   def sign(message: String, key: Array[Byte]): String = {
-    val mac = config.provider.fold(Mac.getInstance("HmacSHA1"))(p => Mac.getInstance("HmacSHA1", p))
+    val mac = config.provider.fold(Mac.getInstance("HmacSHA1"))(
+        p => Mac.getInstance("HmacSHA1", p))
     mac.init(new SecretKeySpec(key, "HmacSHA1"))
     Codecs.toHexString(mac.doFinal(message.getBytes("utf-8")))
   }
 
   /**
-   * Signs the given String with HMAC-SHA1 using the application’s secret key.
-   *
-   * By default this uses the platform default JSSE provider.  This can be overridden by defining
-   * `play.crypto.provider` in `application.conf`.
-   *
-   * @param message The message to sign.
-   * @return A hexadecimal encoded signature.
-   */
+    * Signs the given String with HMAC-SHA1 using the application’s secret key.
+    *
+    * By default this uses the platform default JSSE provider.  This can be overridden by defining
+    * `play.crypto.provider` in `application.conf`.
+    *
+    * @param message The message to sign.
+    * @return A hexadecimal encoded signature.
+    */
   def sign(message: String): String = {
     sign(message, config.secret.getBytes("utf-8"))
   }
-
 }
 
 @Singleton
-class CSRFTokenSignerProvider @Inject() (signer: CookieSigner) extends Provider[CSRFTokenSigner] {
-  lazy val get: CSRFTokenSigner = new DefaultCSRFTokenSigner(signer, Clock.systemUTC())
+class CSRFTokenSignerProvider @Inject()(signer: CookieSigner)
+    extends Provider[CSRFTokenSigner] {
+  lazy val get: CSRFTokenSigner = new DefaultCSRFTokenSigner(
+      signer, Clock.systemUTC())
 }
 
 /**
- * This class is used for generating random tokens for CSRF.
- */
-class DefaultCSRFTokenSigner @Inject() (signer: CookieSigner, clock: Clock) extends CSRFTokenSigner {
+  * This class is used for generating random tokens for CSRF.
+  */
+class DefaultCSRFTokenSigner @Inject()(signer: CookieSigner, clock: Clock)
+    extends CSRFTokenSigner {
 
   // If you're running on an older version of Windows, you may be using
   // SHA1PRNG.  So immediately calling nextBytes with a seed length
@@ -258,14 +274,14 @@ class DefaultCSRFTokenSigner @Inject() (signer: CookieSigner, clock: Clock) exte
   random.nextBytes(new Array[Byte](55))
 
   /**
-   * Sign a token.  This produces a new token, that has this token signed with a nonce.
-   *
-   * This primarily exists to defeat the BREACH vulnerability, as it allows the token to effectively be random per
-   * request, without actually changing the value.
-   *
-   * @param token The token to sign
-   * @return The signed token
-   */
+    * Sign a token.  This produces a new token, that has this token signed with a nonce.
+    *
+    * This primarily exists to defeat the BREACH vulnerability, as it allows the token to effectively be random per
+    * request, without actually changing the value.
+    *
+    * @param token The token to sign
+    * @return The signed token
+    */
   def signToken(token: String): String = {
     val nonce = clock.millis()
     val joined = nonce + "-" + token
@@ -273,21 +289,23 @@ class DefaultCSRFTokenSigner @Inject() (signer: CookieSigner, clock: Clock) exte
   }
 
   /**
-   * Extract a signed token that was signed by [[CSRFTokenSigner.signToken]].
-   *
-   * @param token The signed token to extract.
-   * @return The verified raw token, or None if the token isn't valid.
-   */
+    * Extract a signed token that was signed by [[CSRFTokenSigner.signToken]].
+    *
+    * @param token The signed token to extract.
+    * @return The verified raw token, or None if the token isn't valid.
+    */
   def extractSignedToken(token: String): Option[String] = {
     token.split("-", 3) match {
-      case Array(signature, nonce, raw) if constantTimeEquals(signature, signer.sign(nonce + "-" + raw)) => Some(raw)
+      case Array(signature, nonce, raw)
+          if constantTimeEquals(signature, signer.sign(nonce + "-" + raw)) =>
+        Some(raw)
       case _ => None
     }
   }
 
   /**
-   * Generate a cryptographically secure token
-   */
+    * Generate a cryptographically secure token
+    */
   def generateToken: String = {
     val bytes = new Array[Byte](12)
     random.nextBytes(bytes)
@@ -295,13 +313,13 @@ class DefaultCSRFTokenSigner @Inject() (signer: CookieSigner, clock: Clock) exte
   }
 
   /**
-   * Generate a signed token
-   */
+    * Generate a signed token
+    */
   def generateSignedToken: String = signToken(generateToken)
 
   /**
-   * Compare two signed tokens
-   */
+    * Compare two signed tokens
+    */
   def compareSignedTokens(tokenA: String, tokenB: String): Boolean = {
     (for {
       rawA <- extractSignedToken(tokenA)
@@ -310,22 +328,23 @@ class DefaultCSRFTokenSigner @Inject() (signer: CookieSigner, clock: Clock) exte
   }
 
   /**
-   * Constant time equals method.
-   *
-   * Given a length that both Strings are equal to, this method will always run in constant time.  This prevents
-   * timing attacks.
-   */
-  override def constantTimeEquals(a: String, b: String): Boolean = CSRFTokenSigner.constantTimeEquals(a, b)
+    * Constant time equals method.
+    *
+    * Given a length that both Strings are equal to, this method will always run in constant time.  This prevents
+    * timing attacks.
+    */
+  override def constantTimeEquals(a: String, b: String): Boolean =
+    CSRFTokenSigner.constantTimeEquals(a, b)
 }
 
 object CSRFTokenSigner {
 
   /**
-   * Constant time equals method.
-   *
-   * Given a length that both Strings are equal to, this method will always run in constant time.  This prevents
-   * timing attacks.
-   */
+    * Constant time equals method.
+    *
+    * Given a length that both Strings are equal to, this method will always run in constant time.  This prevents
+    * timing attacks.
+    */
   def constantTimeEquals(a: String, b: String): Boolean = {
     if (a.length != b.length) {
       false
@@ -340,14 +359,15 @@ object CSRFTokenSigner {
 }
 
 @Singleton
-class AESCrypterProvider @Inject() (config: CryptoConfig) extends Provider[AESCrypter] {
+class AESCrypterProvider @Inject()(config: CryptoConfig)
+    extends Provider[AESCrypter] {
   lazy val get = new AESCTRCrypter(config)
 }
 
 /**
- * Symmetric encryption using AES/CTR/NoPadding.
- */
-class AESCTRCrypter @Inject() (config: CryptoConfig) extends AESCrypter {
+  * Symmetric encryption using AES/CTR/NoPadding.
+  */
+class AESCTRCrypter @Inject()(config: CryptoConfig) extends AESCrypter {
 
   def encryptAES(value: String): String = {
     encryptAES(value, config.secret)
@@ -369,8 +389,8 @@ class AESCTRCrypter @Inject() (config: CryptoConfig) extends AESCrypter {
   }
 
   /**
-   * Generates the SecretKeySpec, given the private key and the algorithm.
-   */
+    * Generates the SecretKeySpec, given the private key and the algorithm.
+    */
   private def secretKeyWithSha256(privateKey: String, algorithm: String) = {
     val messageDigest = MessageDigest.getInstance("SHA-256")
     messageDigest.update(privateKey.getBytes("utf-8"))
@@ -381,8 +401,8 @@ class AESCTRCrypter @Inject() (config: CryptoConfig) extends AESCrypter {
   }
 
   /**
-   * Gets a Cipher with a configured provider, and a configurable AES transformation method.
-   */
+    * Gets a Cipher with a configured provider, and a configurable AES transformation method.
+    */
   private def getCipherWithConfiguredProvider(transformation: String): Cipher = {
     config.provider.fold(Cipher.getInstance(transformation)) { p =>
       Cipher.getInstance(transformation, p)
@@ -405,14 +425,14 @@ class AESCTRCrypter @Inject() (config: CryptoConfig) extends AESCrypter {
       val data = value.substring(sepIndex + 1, value.length())
       version match {
         case "1" => {
-          decryptAESVersion1(data, privateKey)
-        }
+            decryptAESVersion1(data, privateKey)
+          }
         case "2" => {
-          decryptAESVersion2(data, privateKey)
-        }
+            decryptAESVersion2(data, privateKey)
+          }
         case _ => {
-          throw new CryptoException("Unknown version")
-        }
+            throw new CryptoException("Unknown version")
+          }
       }
     }
   }
@@ -449,18 +469,23 @@ class AESCTRCrypter @Inject() (config: CryptoConfig) extends AESCrypter {
 }
 
 /**
- * Configuration for Crypto
- *
- * @param secret The application secret
- * @param aesTransformation The AES transformation to use
- * @param provider The crypto provider to use
- */
-case class CryptoConfig(secret: String,
-  provider: Option[String] = None,
-  @deprecated("This field is deprecated and will be removed in future versions", "2.5.0") aesTransformation: String = "AES/CTR/NoPadding")
+  * Configuration for Crypto
+  *
+  * @param secret The application secret
+  * @param aesTransformation The AES transformation to use
+  * @param provider The crypto provider to use
+  */
+case class CryptoConfig(
+    secret: String,
+    provider: Option[String] = None,
+    @deprecated(
+        "This field is deprecated and will be removed in future versions",
+        "2.5.0") aesTransformation: String = "AES/CTR/NoPadding")
 
 @Singleton
-class CryptoConfigParser @Inject() (environment: Environment, configuration: Configuration) extends Provider[CryptoConfig] {
+class CryptoConfigParser @Inject()(
+    environment: Environment, configuration: Configuration)
+    extends Provider[CryptoConfig] {
 
   lazy val get = {
 
@@ -491,20 +516,27 @@ class CryptoConfigParser @Inject() (environment: Environment, configuration: Con
      *
      * To achieve 4, using the location of application.conf to generate the secret should ensure this.
      */
-    val secret = config.getDeprecated[Option[String]]("play.crypto.secret", "application.secret") match {
-      case (Some("changeme") | Some(Blank()) | None) if environment.mode == Mode.Prod =>
-        logger.error("The application secret has not been set, and we are in prod mode. Your application is not secure.")
-        logger.error("To set the application secret, please read http://playframework.com/documentation/latest/ApplicationSecret")
-        throw new PlayException("Configuration error", "Application secret not set")
+    val secret = config.getDeprecated[Option[String]](
+        "play.crypto.secret", "application.secret") match {
+      case (Some("changeme") | Some(Blank()) | None)
+          if environment.mode == Mode.Prod =>
+        logger.error(
+            "The application secret has not been set, and we are in prod mode. Your application is not secure.")
+        logger.error(
+            "To set the application secret, please read http://playframework.com/documentation/latest/ApplicationSecret")
+        throw new PlayException(
+            "Configuration error", "Application secret not set")
       case Some("changeme") | Some(Blank()) | None =>
         val appConfLocation = environment.resource("application.conf")
         // Try to generate a stable secret. Security is not the issue here, since this is just for tests and dev mode.
         val secret = appConfLocation.fold(
-          // No application.conf?  Oh well, just use something hard coded.
-          "she sells sea shells on the sea shore"
+            // No application.conf?  Oh well, just use something hard coded.
+            "she sells sea shells on the sea shore"
         )(_.toString)
         val md5Secret = DigestUtils.md5Hex(secret)
-        logger.debug(s"Generated dev mode secret $md5Secret for app at ${appConfLocation.getOrElse("unknown location")}")
+        logger.debug(
+            s"Generated dev mode secret $md5Secret for app at ${appConfLocation
+          .getOrElse("unknown location")}")
         md5Secret
       case Some(s) => s
     }

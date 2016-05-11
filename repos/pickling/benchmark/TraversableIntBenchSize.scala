@@ -7,7 +7,8 @@ import scala.pickling.binary._
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream, ObjectInputStream}
 
-object TraversableIntBenchSize extends scala.pickling.testing.PicklingBenchmark {
+object TraversableIntBenchSize
+    extends scala.pickling.testing.PicklingBenchmark {
   override val enableOutput = false
 
   val coll = (1 to size).toVector
@@ -18,7 +19,8 @@ object TraversableIntBenchSize extends scala.pickling.testing.PicklingBenchmark 
   }
 }
 
-object TraversableJavaIntBenchSize extends scala.pickling.testing.PicklingBenchmark {
+object TraversableJavaIntBenchSize
+    extends scala.pickling.testing.PicklingBenchmark {
   override val enableOutput = false
 
   val coll = (1 to size).toVector
@@ -32,7 +34,8 @@ object TraversableJavaIntBenchSize extends scala.pickling.testing.PicklingBenchm
   }
 }
 
-object TraversableKryoIntBenchSize extends scala.pickling.testing.PicklingBenchmark {
+object TraversableKryoIntBenchSize
+    extends scala.pickling.testing.PicklingBenchmark {
   override val enableOutput = false
 
   var ser: KryoSerializer = _

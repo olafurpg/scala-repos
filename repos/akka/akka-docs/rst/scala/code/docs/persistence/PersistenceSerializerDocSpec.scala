@@ -1,14 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.persistence
 
 import com.typesafe.config._
 import scala.concurrent.duration._
 import org.scalatest.WordSpec
 import akka.actor.ActorSystem
-import akka.serialization.{ Serializer, SerializationExtension }
+import akka.serialization.{Serializer, SerializationExtension}
 import akka.testkit.TestKit
 
 class PersistenceSerializerDocSpec extends WordSpec {
@@ -29,7 +28,8 @@ class PersistenceSerializerDocSpec extends WordSpec {
       //#custom-serializer-config
     """
 
-  val system = ActorSystem("PersistenceSerializerDocSpec", ConfigFactory.parseString(customSerializerConfig))
+  val system = ActorSystem("PersistenceSerializerDocSpec",
+                           ConfigFactory.parseString(customSerializerConfig))
   try {
     SerializationExtension(system)
   } finally {

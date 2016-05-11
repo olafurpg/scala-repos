@@ -33,7 +33,8 @@ case object CsvType {
     case (_, _) => CsvString
   }
 
-  val Number = """\s*(-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?)\s*""".r
+  val Number =
+    """\s*(-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?)\s*""".r
   val Whitespace = """(\s*)""".r
 
   def infer(x: String): CsvType = x match {
@@ -76,4 +77,3 @@ case object CsvNum extends CsvType {
 case object CsvNothing extends CsvType {
   def apply(s: String) = JNull
 }
-

@@ -4,7 +4,7 @@ trait Base {
     trait Ti0;
   }
   abstract class Arrow extends AssignArrow;
-  val arrow : Arrow;
+  val arrow: Arrow;
 }
 
 trait Ext0 extends Base {
@@ -19,11 +19,11 @@ trait Ext1 extends Base {
     trait Ti2 extends super.Ti0;
     trait TiXX extends Ti2;
   }
-  val arrow : Arrow;
+  val arrow: Arrow;
 }
 trait Composition extends Ext0 with Ext1 {
   object arrow0 extends Arrow with AssignArrow {
     type T = TiC
-    trait TiC extends super[Arrow].Ti2 with super[AssignArrow].Ti1;
+    trait TiC extends super [Arrow].Ti2 with super [AssignArrow].Ti1;
   }
 }

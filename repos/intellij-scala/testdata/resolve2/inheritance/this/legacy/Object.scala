@@ -3,5 +3,5 @@ class P {
 }
 
 object C extends P {
-  println(this./* offset: 16 */f)
+  println(this. /* offset: 16 */ f)
 }

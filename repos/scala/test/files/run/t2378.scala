@@ -1,5 +1,4 @@
-object Test
-{
+object Test {
   val f1 = -0.0
   val f2 = -(0.0)
   def main(args: Array[String]): Unit = {

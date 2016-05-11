@@ -19,13 +19,14 @@ object SCL4559B {
     type A = AA
     type B = BB
 
-    foo(new BB{}, new ZZ2)
+    foo(new BB {}, new ZZ2)
   }
 
   import Z._
 
-  val b : BB = new BB {}
+  val b: BB = new BB {}
 
-  /*start*/b.contains("text")/*end*/
+  /*start*/
+  b.contains("text") /*end*/
 }
 //Boolean

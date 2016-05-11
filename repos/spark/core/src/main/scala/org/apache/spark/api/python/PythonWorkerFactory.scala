@@ -29,8 +29,9 @@ import org.apache.spark._
 import org.apache.spark.internal.Logging
 import org.apache.spark.util.{RedirectThread, Utils}
 
-private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String, String])
-  extends Logging {
+private[spark] class PythonWorkerFactory(
+    pythonExec: String, envVars: Map[String, String])
+    extends Logging {
 
   import PythonWorkerFactory._
 
@@ -51,9 +52,9 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
   var simpleWorkers = new mutable.WeakHashMap[Socket, Process]()
 
   val pythonPath = PythonUtils.mergePythonPaths(
-    PythonUtils.sparkPythonPath,
-    envVars.getOrElse("PYTHONPATH", ""),
-    sys.env.getOrElse("PYTHONPATH", ""))
+      PythonUtils.sparkPythonPath,
+      envVars.getOrElse("PYTHONPATH", ""),
+      sys.env.getOrElse("PYTHONPATH", ""))
 
   def create(): Socket = {
     if (useDaemon) {
@@ -69,16 +70,17 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
   }
 
   /**
-   * Connect to a worker launched through pyspark/daemon.py, which forks python processes itself
-   * to avoid the high cost of forking from Java. This currently only works on UNIX-based systems.
-   */
+    * Connect to a worker launched through pyspark/daemon.py, which forks python processes itself
+    * to avoid the high cost of forking from Java. This currently only works on UNIX-based systems.
+    */
   private def createThroughDaemon(): Socket = {
 
     def createSocket(): Socket = {
       val socket = new Socket(daemonHost, daemonPort)
       val pid = new DataInputStream(socket.getInputStream).readInt()
       if (pid < 0) {
-        throw new IllegalStateException("Python daemon failed to launch worker with code " + pid)
+        throw new IllegalStateException(
+            "Python daemon failed to launch worker with code " + pid)
       }
       daemonWorkers.put(socket, pid)
       socket
@@ -94,7 +96,8 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
       } catch {
         case exc: SocketException =>
           logWarning("Failed to open socket to Python daemon:", exc)
-          logWarning("Assuming that daemon unexpectedly quit, attempting to restart")
+          logWarning(
+              "Assuming that daemon unexpectedly quit, attempting to restart")
           stopDaemon()
           startDaemon()
           createSocket()
@@ -103,15 +106,17 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
   }
 
   /**
-   * Launch a worker by executing worker.py directly and telling it to connect to us.
-   */
+    * Launch a worker by executing worker.py directly and telling it to connect to us.
+    */
   private def createSimpleWorker(): Socket = {
     var serverSocket: ServerSocket = null
     try {
-      serverSocket = new ServerSocket(0, 1, InetAddress.getByAddress(Array(127, 0, 0, 1)))
+      serverSocket = new ServerSocket(
+          0, 1, InetAddress.getByAddress(Array(127, 0, 0, 1)))
 
       // Create and start the worker
-      val pb = new ProcessBuilder(Arrays.asList(pythonExec, "-m", "pyspark.worker"))
+      val pb = new ProcessBuilder(
+          Arrays.asList(pythonExec, "-m", "pyspark.worker"))
       val workerEnv = pb.environment()
       workerEnv.putAll(envVars.asJava)
       workerEnv.put("PYTHONPATH", pythonPath)
@@ -123,7 +128,8 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
       redirectStreamsToStderr(worker.getInputStream, worker.getErrorStream)
 
       // Tell the worker our port
-      val out = new  OutputStreamWriter(worker.getOutputStream, StandardCharsets.UTF_8)
+      val out = new OutputStreamWriter(
+          worker.getOutputStream, StandardCharsets.UTF_8)
       out.write(serverSocket.getLocalPort + "\n")
       out.flush()
 
@@ -135,7 +141,8 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
         return socket
       } catch {
         case e: Exception =>
-          throw new SparkException("Python worker did not connect back in time", e)
+          throw new SparkException(
+              "Python worker did not connect back in time", e)
       }
     } finally {
       if (serverSocket != null) {
@@ -154,7 +161,8 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
 
       try {
         // Create and start the daemon
-        val pb = new ProcessBuilder(Arrays.asList(pythonExec, "-m", "pyspark.daemon"))
+        val pb =
+          new ProcessBuilder(Arrays.asList(pythonExec, "-m", "pyspark.daemon"))
         val workerEnv = pb.environment()
         workerEnv.putAll(envVars.asJava)
         workerEnv.put("PYTHONPATH", pythonPath)
@@ -167,14 +175,12 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
 
         // Redirect daemon stdout and stderr
         redirectStreamsToStderr(in, daemon.getErrorStream)
-
       } catch {
         case e: Exception =>
-
           // If the daemon exists, wait for it to finish and get its stderr
-          val stderr = Option(daemon)
-            .flatMap { d => Utils.getStderr(d, PROCESS_WAIT_TIMEOUT_MS) }
-            .getOrElse("")
+          val stderr = Option(daemon).flatMap { d =>
+            Utils.getStderr(d, PROCESS_WAIT_TIMEOUT_MS)
+          }.getOrElse("")
 
           stopDaemon()
 
@@ -202,12 +208,15 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
   }
 
   /**
-   * Redirect the given streams to our stderr in separate threads.
-   */
-  private def redirectStreamsToStderr(stdout: InputStream, stderr: InputStream) {
+    * Redirect the given streams to our stderr in separate threads.
+    */
+  private def redirectStreamsToStderr(
+      stdout: InputStream, stderr: InputStream) {
     try {
-      new RedirectThread(stdout, System.err, "stdout reader for " + pythonExec).start()
-      new RedirectThread(stderr, System.err, "stderr reader for " + pythonExec).start()
+      new RedirectThread(stdout, System.err, "stdout reader for " + pythonExec)
+        .start()
+      new RedirectThread(stderr, System.err, "stderr reader for " + pythonExec)
+        .start()
     } catch {
       case e: Exception =>
         logError("Exception in redirecting streams", e)
@@ -215,16 +224,18 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
   }
 
   /**
-   * Monitor all the idle workers, kill them after timeout.
-   */
-  private class MonitorThread extends Thread(s"Idle Worker Monitor for $pythonExec") {
+    * Monitor all the idle workers, kill them after timeout.
+    */
+  private class MonitorThread
+      extends Thread(s"Idle Worker Monitor for $pythonExec") {
 
     setDaemon(true)
 
     override def run() {
       while (true) {
         synchronized {
-          if (lastActivity + IDLE_WORKER_TIMEOUT_MS < System.currentTimeMillis()) {
+          if (lastActivity + IDLE_WORKER_TIMEOUT_MS < System.currentTimeMillis(
+                  )) {
             cleanupIdleWorkers()
             lastActivity = System.currentTimeMillis()
           }
@@ -308,5 +319,5 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
 
 private object PythonWorkerFactory {
   val PROCESS_WAIT_TIMEOUT_MS = 10000
-  val IDLE_WORKER_TIMEOUT_MS = 60000  // kill idle workers after 1 minute
+  val IDLE_WORKER_TIMEOUT_MS = 60000 // kill idle workers after 1 minute
 }

@@ -6,11 +6,13 @@ import org.jetbrains.plugins.scala.ScalaFileType
 import org.jetbrains.plugins.scala.lang.rearranger.ScalaArrangementPanel
 
 /**
- * User: Alefas
- * Date: 23.09.11
- */
-class ScalaTabbedCodeStylePanel(currentSettings: CodeStyleSettings, settings: CodeStyleSettings)
-  extends TabbedLanguageCodeStylePanel(ScalaFileType.SCALA_LANGUAGE, currentSettings, settings) {
+  * User: Alefas
+  * Date: 23.09.11
+  */
+class ScalaTabbedCodeStylePanel(
+    currentSettings: CodeStyleSettings, settings: CodeStyleSettings)
+    extends TabbedLanguageCodeStylePanel(
+        ScalaFileType.SCALA_LANGUAGE, currentSettings, settings) {
   protected override def initTabs(settings: CodeStyleSettings) {
     super.initTabs(settings)
     addTab(new ScalaDocFormattingPanel(settings))

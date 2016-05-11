@@ -1,15 +1,18 @@
 import org.scalacheck._, Prop._, Gen._, Arbitrary._
 import scala.tools.reflect.{ToolBox, ToolBoxError}
 import scala.reflect.runtime.currentMirror
-import scala.reflect.runtime.universe._, Flag._, internal.reificationSupport.setSymbol
+import scala.reflect.runtime.universe._, Flag._,
+internal.reificationSupport.setSymbol
 
-class QuasiquoteProperties(name: String) extends Properties(name) with ArbitraryTreesAndNames with Helpers
+class QuasiquoteProperties(name: String)
+    extends Properties(name) with ArbitraryTreesAndNames with Helpers
 
 trait Helpers {
+
   /** Runs a code block and returns proof confirmation
-   *  if no exception has been thrown while executing code
-   *  block. This is useful for simple one-off tests.
-   */
+    *  if no exception has been thrown while executing code
+    *  block. This is useful for simple one-off tests.
+    */
   def test[T](block: => T) =
     Prop { params =>
       block
@@ -18,18 +21,23 @@ trait Helpers {
 
   object simplify extends Transformer {
     object SimplifiedName {
-      val st = scala.reflect.runtime.universe.asInstanceOf[scala.reflect.internal.SymbolTable]
+      val st = scala.reflect.runtime.universe
+        .asInstanceOf[scala.reflect.internal.SymbolTable]
       val FreshName = new st.FreshNameExtractor
-      def unapply[T <: Name](name: T): Option[T] = name.asInstanceOf[st.Name] match {
-        case FreshName(prefix) =>
-          Some((if (name.isTermName) TermName(prefix) else TypeName(prefix)).asInstanceOf[T])
-      }
+      def unapply[T <: Name](name: T): Option[T] =
+        name.asInstanceOf[st.Name] match {
+          case FreshName(prefix) =>
+            Some(
+                (if (name.isTermName)
+                   TermName(prefix) else TypeName(prefix)).asInstanceOf[T])
+        }
     }
 
     override def transform(tree: Tree): Tree = tree match {
-      case Ident(SimplifiedName(name))                  => Ident(name)
-      case ValDef(mods, SimplifiedName(name), tpt, rhs) => ValDef(mods, name, transform(tpt), transform(rhs))
-      case Bind(SimplifiedName(name), rhs)              => Bind(name, rhs)
+      case Ident(SimplifiedName(name)) => Ident(name)
+      case ValDef(mods, SimplifiedName(name), tpt, rhs) =>
+        ValDef(mods, name, transform(tpt), transform(rhs))
+      case Bind(SimplifiedName(name), rhs) => Bind(name, rhs)
       case _ =>
         super.transform(tree)
     }
@@ -42,11 +50,15 @@ trait Helpers {
   }
 
   implicit class TestSimilarListTree(lst: List[Tree]) {
-    def ≈(other: List[Tree]) = (lst.length == other.length) && lst.zip(other).forall { case (t1, t2) => t1 ≈ t2 }
+    def ≈(other: List[Tree]) =
+      (lst.length == other.length) &&
+      lst.zip(other).forall { case (t1, t2) => t1 ≈ t2 }
   }
 
   implicit class TestSimilarListListTree(lst: List[List[Tree]]) {
-    def ≈(other: List[List[Tree]]) = (lst.length == other.length) && lst.zip(other).forall { case (l1, l2) => l1 ≈ l2 }
+    def ≈(other: List[List[Tree]]) =
+      (lst.length == other.length) &&
+      lst.zip(other).forall { case (l1, l2) => l1 ≈ l2 }
   }
 
   implicit class TestSimilarName(name: Name) {
@@ -54,23 +66,24 @@ trait Helpers {
   }
 
   implicit class TestSimilarMods(mods: Modifiers) {
-    def ≈(other: Modifiers) = (mods.flags == other.flags) && (mods.privateWithin ≈ other.privateWithin) && (mods.annotations ≈ other.annotations)
+    def ≈(other: Modifiers) =
+      (mods.flags == other.flags) && (mods.privateWithin ≈ other.privateWithin) &&
+      (mods.annotations ≈ other.annotations)
   }
 
-  def assertThrows[T <: AnyRef](f: => Any)(implicit manifest: Manifest[T]): Unit = {
+  def assertThrows[T <: AnyRef](f: => Any)(
+      implicit manifest: Manifest[T]): Unit = {
     val clazz = manifest.runtimeClass.asInstanceOf[Class[T]]
-    val thrown =
-      try {
-        f
-        false
-      } catch {
-        case u: Throwable =>
-          if (!clazz.isAssignableFrom(u.getClass))
-            assert(false, s"wrong exception: $u")
-          true
-      }
-    if(!thrown)
-      assert(false, "exception wasn't thrown")
+    val thrown = try {
+      f
+      false
+    } catch {
+      case u: Throwable =>
+        if (!clazz.isAssignableFrom(u.getClass))
+          assert(false, s"wrong exception: $u")
+        true
+    }
+    if (!thrown) assert(false, "exception wasn't thrown")
   }
 
   def assertEqAst(tree: Tree, code: String) = assert(eqAst(tree, code))
@@ -89,14 +102,16 @@ trait Helpers {
   }
 
   def typecheckPat(tree: Tree) = {
-    val q"$_ match { case $res => }" = typecheck(q"((): Any) match { case $tree => }")
+    val q"$_ match { case $res => }" = typecheck(
+        q"((): Any) match { case $tree => }")
     res
   }
 
   def fails(msg: String, block: String) = {
     def result(ok: Boolean, description: String = "") = {
       val status = if (ok) Prop.Proof else Prop.False
-      val labels = if (description != "") Set(description) else Set.empty[String]
+      val labels =
+        if (description != "") Set(description) else Set.empty[String]
       Prop { new Prop.Result(status, Nil, Set.empty, labels) }
     }
     try {
@@ -110,9 +125,9 @@ trait Helpers {
     } catch {
       case ToolBoxError(emsg, _) =>
         if (!emsg.contains(msg))
-          result(false, s"error message '${emsg}' is not the same as expected '$msg'")
-        else
-          result(true)
+          result(false,
+                 s"error message '${emsg}' is not the same as expected '$msg'")
+        else result(true)
     }
   }
 

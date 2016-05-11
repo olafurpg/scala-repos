@@ -1,7 +1,7 @@
 // exercise coevolveSym: ThisType
 trait HasA { type A }
 class AA[T] {
-  type HasAT[T] = HasA{ type A = T }
+  type HasAT[T] = HasA { type A = T }
   val x: HasAT[T] = ???
   def foo: x.A = ???
 }

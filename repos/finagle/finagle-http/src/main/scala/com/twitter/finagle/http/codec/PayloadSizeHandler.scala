@@ -4,13 +4,16 @@ import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.http._
 
 private[http] class PayloadSizeHandler(maxRequestPayloadSize: Int)
-  extends SimpleChannelUpstreamHandler {
+    extends SimpleChannelUpstreamHandler {
 
-  require(maxRequestPayloadSize > -1, s"maxRequestPayloadSize must not be negative, was $maxRequestPayloadSize")
+  require(
+      maxRequestPayloadSize > -1,
+      s"maxRequestPayloadSize must not be negative, was $maxRequestPayloadSize")
 
-  override def messageReceived(ctx: ChannelHandlerContext, m: MessageEvent): Unit = m.getMessage match {
-    case request: HttpRequest if HttpHeaders.getContentLength(request, -1) > maxRequestPayloadSize =>
-
+  override def messageReceived(
+      ctx: ChannelHandlerContext, m: MessageEvent): Unit = m.getMessage match {
+    case request: HttpRequest
+        if HttpHeaders.getContentLength(request, -1) > maxRequestPayloadSize =>
       val tooLargeResponse =
         PayloadSizeHandler.mkTooLargeResponse(request.getProtocolVersion)
       val writeF = Channels.future(ctx.getChannel)
@@ -26,7 +29,8 @@ private[http] class PayloadSizeHandler(maxRequestPayloadSize: Int)
 
 private[codec] object PayloadSizeHandler {
   def mkTooLargeResponse(version: HttpVersion): HttpResponse = {
-    val resp = new DefaultHttpResponse(version, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE)
+    val resp = new DefaultHttpResponse(
+        version, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE)
     HttpHeaders.setHeader(resp, HttpHeaders.Names.CONNECTION, "close")
     resp
   }

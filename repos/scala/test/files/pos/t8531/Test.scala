@@ -3,7 +3,7 @@ package test
 // takes > 50s and > 800M heap to compile under 2.11.0
 import foobar._
 class `SI-8531` {
-    //https://issues.scala-lang.org/browse/SI-8531
+  //https://issues.scala-lang.org/browse/SI-8531
 
   import MyEnum._
   def foo(e1: MyEnum, e2: MyEnum) = (e1, e2) match {
@@ -19,6 +19,6 @@ class `SI-8531` {
     case (x, A5) => "a5"
     case (A6, x) => "a6"
     case (x, A6) => "a6"
-    case (a, b)  => "ab"
+    case (a, b) => "ab"
   }
 }

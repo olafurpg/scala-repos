@@ -16,7 +16,9 @@ private object JerkConversions extends DefaultJsonProtocol with FamilyFormats {
   //
   // Lack of definition in scalac's implicit resolution rules means
   // that we have to redefine some things here.
-  implicit override def eitherFormat[A: JsonFormat, B: JsonFormat]: JsonFormat[Either[A, B]] = super.eitherFormat[A, B]
+  implicit override def eitherFormat[
+      A : JsonFormat, B : JsonFormat]: JsonFormat[Either[A, B]] =
+    super.eitherFormat[A, B]
   // Note that its not possible to override an object in scala, so we
   // just define a new one that wins the race.
   implicit val symbolFormat = SymbolJsonFormat
@@ -40,11 +42,12 @@ private object JerkConversions extends DefaultJsonProtocol with FamilyFormats {
   }
 
   // some of the case classes use the keyword `type`, so we need a better default
-  override implicit def coproductHint[T: Typeable]: CoproductHint[T] = new FlatCoproductHint[T]("typehint")
+  override implicit def coproductHint[T : Typeable]: CoproductHint[T] =
+    new FlatCoproductHint[T]("typehint")
 
   val RpcRequestFormat: RootJsonFormat[RpcRequest] = cachedImplicit
-  val EnsimeServerMessageFormat: RootJsonFormat[EnsimeServerMessage] = cachedImplicit
-
+  val EnsimeServerMessageFormat: RootJsonFormat[EnsimeServerMessage] =
+    cachedImplicit
 }
 
 object JerkFormats {
@@ -61,5 +64,4 @@ object JerkEnvelopeFormats {
   // for the transitional SWANK (avoid derivations)
   implicit val RpcRequestEnvelopeFormat = jsonFormat2(RpcRequestEnvelope)
   implicit val RpcResponseEnvelopeFormat = jsonFormat2(RpcResponseEnvelope)
-
 }

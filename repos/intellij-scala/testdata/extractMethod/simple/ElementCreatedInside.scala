@@ -1,9 +1,9 @@
 class A {
   def foo {
-/*start*/
+    /*start*/
 
     val j = 77
-/*end*/
+    /*end*/
 
     val i = j
   }
@@ -24,4 +24,4 @@ class A {
     j
   }
 }
-*/
+ */

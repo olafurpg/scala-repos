@@ -8,13 +8,12 @@ import org.ensime.util.EnsimeSpec
 import org.ensime.util.file._
 
 /**
- * This is a reproduction of https://github.com/ensime/ensime-server/issues/1176
- * which might be caused by https://github.com/scala/scala/pull/4777
- */
-class ImplicitsWildcardImports extends EnsimeSpec
-    with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture
-    with IsolatedProjectFixture {
+  * This is a reproduction of https://github.com/ensime/ensime-server/issues/1176
+  * which might be caused by https://github.com/scala/scala/pull/4777
+  */
+class ImplicitsWildcardImports
+    extends EnsimeSpec with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.ImplicitsTestProject
 

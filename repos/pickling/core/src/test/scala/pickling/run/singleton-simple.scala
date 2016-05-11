@@ -10,7 +10,8 @@ object D {
 class SingletonSimpleTest extends FunSuite {
   test("main") {
     val pickle = D.pickle
-    assert(pickle.toString === """
+    assert(
+        pickle.toString === """
       |JSONPickle({
       |  "$type": "scala.pickling.singleton.simple.D.type"
       |})

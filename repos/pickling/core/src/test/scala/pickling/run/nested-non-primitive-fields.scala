@@ -13,7 +13,8 @@ class NestedNonPrimitiveFieldsTest extends FunSuite {
     val pckl = Philipp(gudrun).pickle
     // Note:  Previously pickling would consider non-final case classes as final, and would elide the types.
     //        We no longer do this for correctness, so this test ensures the case classes are final.
-    assert(pckl.value.toString === """
+    assert(
+        pckl.value.toString === """
       |{
       |  "$type": "scala.pickling.nested.non.primitive.fields.Philipp",
       |  "mother": {

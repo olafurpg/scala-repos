@@ -14,7 +14,7 @@ package breeze.stats.distributions
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. 
-*/
+ */
 
 import org.scalatest._;
 import org.scalatest.junit._;
@@ -22,15 +22,15 @@ import org.scalatest.prop._;
 import org.scalacheck._;
 import org.junit.runner.RunWith
 import breeze.linalg.{softmax, DenseVector, SparseVector}
-import math.{ abs, exp }
-
+import math.{abs, exp}
 
 @RunWith(classOf[JUnitRunner])
 class DirichletTest extends FunSuite with Checkers {
 
   test("logDraw for small values") {
     val g = new Dirichlet(DenseVector(1E-5, 5.0, 50.0))
-    assert(Array.fill(1000)(g.logDraw()).forall(_(0) > Double.NegativeInfinity))
+    assert(
+        Array.fill(1000)(g.logDraw()).forall(_ (0) > Double.NegativeInfinity))
   }
 
   test("logDraw of SparseVector") {
@@ -41,5 +41,4 @@ class DirichletTest extends FunSuite with Checkers {
       assert(abs(exp(softmax(d.activeValuesIterator)) - 1.0) < 0.0000001, d)
     }
   }
-
-}  
+}

@@ -1,8 +1,8 @@
 object SimpleDuplicate {
   def foo(i: Int) {
-/*start*/
+    /*start*/
     println(i + 1)
-/*end*/
+    /*end*/
     println(2 + 1)
   }
 }
@@ -19,4 +19,4 @@ object SimpleDuplicate {
     println(i + 1)
   }
 }
-*/
+ */

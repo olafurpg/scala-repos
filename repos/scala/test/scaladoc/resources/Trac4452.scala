@@ -1,17 +1,18 @@
 /**
- * @define MacroWithNewLine
- * This macro should not include "*".
- *
- * @define MacroWithoutNewLine This macro
- * should
- * include "*".
- */
+  * @define MacroWithNewLine
+  * This macro should not include "*".
+  *
+  * @define MacroWithoutNewLine This macro
+  * should
+  * include "*".
+  */
 class Test
 
 /**
- * TestA class
- */
+  * TestA class
+  */
 class Trac4452 extends Test {
+
   /** $MacroWithNewLine */
   def a = 1
 
@@ -19,12 +20,12 @@ class Trac4452 extends Test {
   def b = 2
 
   /**
-   * $MacroWithNewLine
-   */
+    * $MacroWithNewLine
+    */
   def c = 3
 
   /**
-   * $MacroWithoutNewLine
-   */
+    * $MacroWithoutNewLine
+    */
   def d = 4
 }

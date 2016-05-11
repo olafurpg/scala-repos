@@ -32,16 +32,18 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object Border {
-  implicit def sfxBorder2jfx(v: Border): jfxsl.Border = if (v != null) v.delegate else null
+  implicit def sfxBorder2jfx(v: Border): jfxsl.Border =
+    if (v != null) v.delegate else null
 
   /** An empty Border, useful to use instead of null. */
   val Empty = jfxsl.Border.EMPTY
-  @deprecated ("Use Empty; EMPTY will be removed in a future release", "8.0.60-R10")
+  @deprecated(
+      "Use Empty; EMPTY will be removed in a future release", "8.0.60-R10")
   val EMPTY = Empty
 }
 
 class Border(override val delegate: jfxsl.Border)
-  extends SFXDelegate[jfxsl.Border] {
+    extends SFXDelegate[jfxsl.Border] {
   //FIXME implement constructors
   //  /** Creates a new Border by supplying an array of BorderImages. */
   //  def this(BorderImage... images)

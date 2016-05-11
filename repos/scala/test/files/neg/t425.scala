@@ -1,4 +1,4 @@
-object Temp{
+object Temp {
   case class A(x: Int)
   case class B(override val x: Int, y: Double) extends A(x)
 
@@ -8,4 +8,3 @@ object Temp{
     case A(x) => Console.println(x)
   }
 }
-

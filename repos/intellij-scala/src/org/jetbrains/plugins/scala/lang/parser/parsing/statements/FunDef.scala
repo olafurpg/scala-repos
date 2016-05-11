@@ -12,17 +12,15 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.Type
 import org.jetbrains.plugins.scala.lang.parser.util.ParserPatcher
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 13.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 13.02.2008
+  */
 /*
  * FunDef ::= FunSig [':' Type] '=' Expr
  *          | FunSig [nl] '{' Block '}'
  *          | 'this' ParamClause ParamClauses
  *            ('=' ConstrExpr | [nl] ConstrBlock)
  */
-
 
 object FunDef {
   def parse(builder: ScalaPsiBuilder): Boolean = {
@@ -46,8 +44,7 @@ object FunDef {
                   if (Expr.parse(builder)) {
                     faultMarker.drop()
                     true
-                  }
-                  else {
+                  } else {
                     builder error ScalaBundle.message("wrong.expression")
                     faultMarker.drop()
                     true
@@ -56,8 +53,7 @@ object FunDef {
                   faultMarker.rollbackTo()
                   false
               }
-            }
-            else {
+            } else {
               faultMarker.rollbackTo()
               false
             }
@@ -67,8 +63,7 @@ object FunDef {
             if (Expr parse builder) {
               faultMarker.drop()
               true
-            }
-            else {
+            } else {
               builder error ScalaBundle.message("wrong.expression")
               faultMarker.drop()
               true

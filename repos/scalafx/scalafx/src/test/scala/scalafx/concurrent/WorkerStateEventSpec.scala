@@ -35,14 +35,15 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * WorkerStateEvent Spec tests.
- *
- *
- */
+  * WorkerStateEvent Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class WorkerStateEventSpec
-  extends SimpleSFXDelegateSpec[jfxc.WorkerStateEvent, WorkerStateEvent](classOf[jfxc.WorkerStateEvent], classOf[WorkerStateEvent]) {
+    extends SimpleSFXDelegateSpec[jfxc.WorkerStateEvent, WorkerStateEvent](
+        classOf[jfxc.WorkerStateEvent], classOf[WorkerStateEvent]) {
 
-  override protected def getJavaClassInstance = new jfxc.WorkerStateEvent(null, null)
-
+  override protected def getJavaClassInstance =
+    new jfxc.WorkerStateEvent(null, null)
 }

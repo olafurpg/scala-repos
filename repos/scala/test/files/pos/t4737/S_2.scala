@@ -7,4 +7,3 @@ class ScalaSubClass extends J_1 {
     println("world")
   }
 }
-

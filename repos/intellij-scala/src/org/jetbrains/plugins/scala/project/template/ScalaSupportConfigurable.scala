@@ -6,8 +6,8 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.{ModifiableModelsProvider, ModifiableRootModel}
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class ScalaSupportConfigurable extends FrameworkSupportInModuleConfigurable {
   override def createComponent() = null
 
@@ -15,6 +15,8 @@ class ScalaSupportConfigurable extends FrameworkSupportInModuleConfigurable {
 
   override def isOnlyLibraryAdded = true
 
-  override def addSupport(module: Module, rootModel: ModifiableRootModel,
-                          modifiableModelsProvider: ModifiableModelsProvider) {}
+  override def addSupport(
+      module: Module,
+      rootModel: ModifiableRootModel,
+      modifiableModelsProvider: ModifiableModelsProvider) {}
 }

@@ -6,21 +6,22 @@ import com.intellij.util.containers.ConcurrentWeakHashMap
 import org.jetbrains.plugins.scala.compiler.CompilationProcess
 
 /**
- * User: Dmitry Naydanov
- * Date: 2/20/14
- */
+  * User: Dmitry Naydanov
+  * Date: 2/20/14
+  */
 object WorksheetProcessManager {
-  private val processes = new ConcurrentWeakHashMap[VirtualFile, CompilationProcess]()
+  private val processes =
+    new ConcurrentWeakHashMap[VirtualFile, CompilationProcess]()
 
   def add(file: VirtualFile, process: CompilationProcess) {
-    process.addTerminationCallback({remove(file)})
+    process.addTerminationCallback({ remove(file) })
     processes.put(file, process)
   }
 
   def remove(file: VirtualFile) {
     processes.remove(file)
   }
-  
+
   def stop(file: VirtualFile) {
     val p = processes.get(file)
     if (p != null) p.stop()

@@ -12,15 +12,18 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 
 /**
- * Nikolay.Tropin
- * 8/17/13
- */
+  * Nikolay.Tropin
+  * 8/17/13
+  */
 abstract class ScalaBaseGenerateAction(val handler: CodeInsightActionHandler)
-        extends BaseGenerateAction(handler) {
+    extends BaseGenerateAction(handler) {
 
-  override protected def isValidForFile(project: Project, editor: Editor, file: PsiFile): Boolean = {
+  override protected def isValidForFile(
+      project: Project, editor: Editor, file: PsiFile): Boolean = {
     lazy val classOk = {
-      PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
+      PsiDocumentManager
+        .getInstance(project)
+        .commitDocument(editor.getDocument)
       val targetClass: PsiClass = getTargetClass(editor, file)
       targetClass != null && isValidForClass(targetClass)
     }
@@ -28,15 +31,16 @@ abstract class ScalaBaseGenerateAction(val handler: CodeInsightActionHandler)
       case l: LanguageCodeInsightActionHandler => l.isValidFor(editor, file)
       case _ => true
     }
-    file.isInstanceOf[ScalaFile] && file.isWritable && classOk && handlerIsValid
+    file.isInstanceOf[ScalaFile] && file.isWritable && classOk &&
+    handlerIsValid
   }
 
   override protected def isValidForClass(targetClass: PsiClass): Boolean = true
 
-  override protected def getTargetClass(editor: Editor, file: PsiFile): PsiClass = {
+  override protected def getTargetClass(
+      editor: Editor, file: PsiFile): PsiClass = {
     val offset: Int = editor.getCaretModel.getOffset
     val element: PsiElement = file.findElementAt(offset)
     PsiTreeUtil.getParentOfType(element, classOf[ScTemplateDefinition])
   }
-
 }

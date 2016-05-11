@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl
 
 import scala.concurrent.duration._
@@ -22,17 +21,22 @@ class FormDataSpec extends AkkaSpec {
 
   "The FormData infrastructure" should {
     "properly round-trip the fields of www-urlencoded forms" in {
-      Marshal(formData).to[HttpEntity]
-        .flatMap(Unmarshal(_).to[FormData]).futureValue shouldEqual formData
+      Marshal(formData)
+        .to[HttpEntity]
+        .flatMap(Unmarshal(_).to[FormData])
+        .futureValue shouldEqual formData
     }
 
     "properly marshal www-urlencoded forms containing special chars" in {
-      Marshal(FormData(Map("name" -> "Smith&Wesson"))).to[HttpEntity]
-        .flatMap(Unmarshal(_).to[String]).futureValue shouldEqual "name=Smith%26Wesson"
+      Marshal(FormData(Map("name" -> "Smith&Wesson")))
+        .to[HttpEntity]
+        .flatMap(Unmarshal(_).to[String])
+        .futureValue shouldEqual "name=Smith%26Wesson"
 
-      Marshal(FormData(Map("name" -> "Smith+Wesson; hopefully!"))).to[HttpEntity]
-        .flatMap(Unmarshal(_).to[String]).futureValue shouldEqual "name=Smith%2BWesson%3B+hopefully%21"
+      Marshal(FormData(Map("name" -> "Smith+Wesson; hopefully!")))
+        .to[HttpEntity]
+        .flatMap(Unmarshal(_).to[String])
+        .futureValue shouldEqual "name=Smith%2BWesson%3B+hopefully%21"
     }
   }
-
 }

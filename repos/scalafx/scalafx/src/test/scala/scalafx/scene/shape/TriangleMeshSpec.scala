@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 /** TriangleMesh Spec tests. */
 @RunWith(classOf[JUnitRunner])
 class TriangleMeshSpec
-  extends SimpleSFXDelegateSpec[jfxss.TriangleMesh, TriangleMesh](classOf[jfxss.TriangleMesh], classOf[TriangleMesh]) {
+    extends SimpleSFXDelegateSpec[jfxss.TriangleMesh, TriangleMesh](
+        classOf[jfxss.TriangleMesh], classOf[TriangleMesh]) {
 
   trait TestData {
     val mesh = new TriangleMesh()
@@ -52,11 +53,11 @@ class TriangleMeshSpec
   }
 
   /**
-   * Test integer array contents.
-   *
-   * @param ao Observable array
-   * @param a Basic array.
-   */
+    * Test integer array contents.
+    *
+    * @param ao Observable array
+    * @param a Basic array.
+    */
   def testIntArray(oa: ObservableIntegerArray, a: Array[Int]) {
     assert(oa.isEmpty === a.isEmpty)
     assert(oa.length === a.length)
@@ -69,11 +70,11 @@ class TriangleMeshSpec
   }
 
   /**
-   * Test integer array contents.
-   *
-   * @param ao Observable array
-   * @param a Basic array.
-   */
+    * Test integer array contents.
+    *
+    * @param ao Observable array
+    * @param a Basic array.
+    */
   def testFloatArray(oa: ObservableFloatArray, a: Array[Float]) {
     assert(oa.isEmpty === a.isEmpty)
     assert(oa.length === a.length)

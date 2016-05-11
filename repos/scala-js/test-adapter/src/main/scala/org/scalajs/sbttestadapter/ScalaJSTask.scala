@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js sbt plugin        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js sbt plugin        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.testadapter
 
@@ -27,7 +26,8 @@ final class ScalaJSTask private (
     val taskDef: TaskDef,
     val tags: Array[String],
     serializedTask: String
-) extends Task {
+)
+    extends Task {
 
   def execute(handler: EventHandler, loggers: Array[Logger]): Array[Task] = {
     val slave = runner.getSlave()
@@ -51,11 +51,9 @@ final class ScalaJSTask private (
       case ("ok", msg) => Some(fromJSON[List[TaskInfo]](readJSON(msg)))
     }
 
-    val handlerChain = (
-        eventHandler(handler) orElse
-        loggerHandler(logBuffer) orElse
-        runner.msgHandler(slave) orElse
-        doneHandler)
+    val handlerChain =
+      (eventHandler(handler) orElse loggerHandler(logBuffer) orElse runner
+            .msgHandler(slave) orElse doneHandler)
 
     // Wait for result
     val taskInfos = ComUtils.receiveLoop(slave)(handlerChain)
@@ -95,8 +93,8 @@ final class ScalaJSTask private (
 
     val pf: LoopHandler[Nothing] = {
       case ("error", data) => log(_.error, data)
-      case ("warn",  data) => log(_.warn,  data)
-      case ("info",  data) => log(_.info,  data)
+      case ("warn", data) => log(_.warn, data)
+      case ("info", data) => log(_.info, data)
       case ("debug", data) => log(_.debug, data)
       case ("trace", data) =>
         val (index, innerData) = processData(data)
@@ -107,16 +105,15 @@ final class ScalaJSTask private (
 
     pf
   }
-
 }
 
 object ScalaJSTask {
-  private final class LogElement[T](index: Int,
-      log: Logger => (T => Unit), data: T) {
+  private final class LogElement[T](
+      index: Int, log: Logger => (T => Unit), data: T) {
     def call(arr: Array[Logger]): Unit = log(arr(index))(data)
   }
 
-  private[testadapter] def fromInfo(runner: ScalaJSRunner,
-      info: TaskInfo): ScalaJSTask =
+  private[testadapter] def fromInfo(
+      runner: ScalaJSRunner, info: TaskInfo): ScalaJSTask =
     new ScalaJSTask(runner, info.taskDef, info.tags, info.serializedTask)
 }

@@ -6,16 +6,17 @@ import com.twitter.util.{Future, Duration, Promise, Time}
 import scala.util.Random
 
 /**
- * A filter that forwards thrift requests to a specified service. It enables a smooth
- * start of processing the requests by slowly increasing the percentage of requests
- * that are being processed and lowering the amount of requests that are being
- * forwarded.
- */
+  * A filter that forwards thrift requests to a specified service. It enables a smooth
+  * start of processing the requests by slowly increasing the percentage of requests
+  * that are being processed and lowering the amount of requests that are being
+  * forwarded.
+  */
 abstract class ForwardingWarmUpFilter[Req, Rep](
-  warmupPeriod: Duration,
-  forwardTo: Service[Req, Rep],
-  statsReceiver: StatsReceiver = DefaultStatsReceiver
-) extends SimpleFilter[Req, Rep] {
+    warmupPeriod: Duration,
+    forwardTo: Service[Req, Rep],
+    statsReceiver: StatsReceiver = DefaultStatsReceiver
+)
+    extends SimpleFilter[Req, Rep] {
 
   @volatile private[this] var warmupComplete = false
 
@@ -38,9 +39,9 @@ abstract class ForwardingWarmUpFilter[Req, Rep](
   val onWarm: Future[Unit] = onWarmp
 
   /**
-   * Indicates whether the request may be forwarded (i.e. in the case where
-   * `bypassForward` is false) or must be handled locally (`bypassForward` is true).
-   */
+    * Indicates whether the request may be forwarded (i.e. in the case where
+    * `bypassForward` is false) or must be handled locally (`bypassForward` is true).
+    */
   def bypassForward: Boolean
 
   final override def apply(request: Req, service: Service[Req, Rep]) = {

@@ -15,7 +15,12 @@ object Test extends ScaladocModelTest {
     import access._
 
     // SEE THE test/resources/implicits-chaining-res.scala FOR THE EXPLANATION OF WHAT'S CHECKED HERE:
-    val base = root._package("scala")._package("test")._package("scaladoc")._package("implicits")._object("chaining")
+    val base = root
+      ._package("scala")
+      ._package("test")
+      ._package("scaladoc")
+      ._package("implicits")
+      ._object("chaining")
     var conv: ImplicitConversion = null
 
 //// class A ///////////////////////////////////////////////////////////////////////////////////////////////////////////

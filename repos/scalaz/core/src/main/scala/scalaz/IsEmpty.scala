@@ -2,9 +2,9 @@ package scalaz
 
 ////
 /**
- * Typeclass that permits testing whether some type with an empty representation
- * is in fact empty.
- */
+  * Typeclass that permits testing whether some type with an empty representation
+  * is in fact empty.
+  */
 ////
 trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
   ////
@@ -22,7 +22,9 @@ trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
   def isEmptyLaw = new IsEmptyLaw {}
 
   ////
-  val isEmptySyntax = new scalaz.syntax.IsEmptySyntax[F] { def F = IsEmpty.this }
+  val isEmptySyntax = new scalaz.syntax.IsEmptySyntax[F] {
+    def F = IsEmpty.this
+  }
 }
 
 object IsEmpty {

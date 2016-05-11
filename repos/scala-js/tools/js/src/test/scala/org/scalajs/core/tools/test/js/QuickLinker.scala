@@ -20,7 +20,8 @@ object QuickLinker {
   /** Link the Scala.js test suite on Node.js */
   @JSExport
   def linkTestSuiteNode(irFilesAndJars: String*): String = {
-    val semantics = Semantics.Defaults.withRuntimeClassName(_.fullName match {
+    val semantics = Semantics.Defaults.withRuntimeClassName(
+        _.fullName match {
       case "org.scalajs.testsuite.compiler.ReflectionTest$RenamedTestClass" =>
         "renamed.test.Class"
       case fullName =>
@@ -30,8 +31,8 @@ object QuickLinker {
   }
 
   /** Link a Scala.js application on Node.js */
-  def linkNodeInternal(semantics: Semantics,
-      irFilesAndJars: Seq[String]): String = {
+  def linkNodeInternal(
+      semantics: Semantics, irFilesAndJars: Seq[String]): String = {
     val cache = (new IRFileCache).newCache
     val linker = Linker(semantics)
 
@@ -57,5 +58,4 @@ object QuickLinker {
 
     out.content
   }
-
 }

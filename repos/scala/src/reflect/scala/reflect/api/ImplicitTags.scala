@@ -3,11 +3,10 @@ package reflect
 package api
 
 /** Tags which preserve the identity of abstract types in the face of erasure.
- *  Can be used for pattern matching, instance tests, serialization and the like.
- *  @group Tags
- */
-trait ImplicitTags {
-  self: Universe =>
+  *  Can be used for pattern matching, instance tests, serialization and the like.
+  *  @group Tags
+  */
+trait ImplicitTags { self: Universe =>
 
   // Tags for Types.
   implicit val AnnotatedTypeTag: ClassTag[AnnotatedType]

@@ -26,32 +26,31 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.rdd.RDD
 
 /**
- * :: DeveloperApi ::
- * Generate test data for LogisticRegression. This class chooses positive labels
- * with probability `probOne` and scales features for positive examples by `eps`.
- */
+  * :: DeveloperApi ::
+  * Generate test data for LogisticRegression. This class chooses positive labels
+  * with probability `probOne` and scales features for positive examples by `eps`.
+  */
 @DeveloperApi
 @Since("0.8.0")
 object LogisticRegressionDataGenerator {
 
   /**
-   * Generate an RDD containing test data for LogisticRegression.
-   *
-   * @param sc SparkContext to use for creating the RDD.
-   * @param nexamples Number of examples that will be contained in the RDD.
-   * @param nfeatures Number of features to generate for each example.
-   * @param eps Epsilon factor by which positive examples are scaled.
-   * @param nparts Number of partitions of the generated RDD. Default value is 2.
-   * @param probOne Probability that a label is 1 (and not 0). Default value is 0.5.
-   */
+    * Generate an RDD containing test data for LogisticRegression.
+    *
+    * @param sc SparkContext to use for creating the RDD.
+    * @param nexamples Number of examples that will be contained in the RDD.
+    * @param nfeatures Number of features to generate for each example.
+    * @param eps Epsilon factor by which positive examples are scaled.
+    * @param nparts Number of partitions of the generated RDD. Default value is 2.
+    * @param probOne Probability that a label is 1 (and not 0). Default value is 0.5.
+    */
   @Since("0.8.0")
-  def generateLogisticRDD(
-    sc: SparkContext,
-    nexamples: Int,
-    nfeatures: Int,
-    eps: Double,
-    nparts: Int = 2,
-    probOne: Double = 0.5): RDD[LabeledPoint] = {
+  def generateLogisticRDD(sc: SparkContext,
+                          nexamples: Int,
+                          nfeatures: Int,
+                          eps: Double,
+                          nparts: Int = 2,
+                          probOne: Double = 0.5): RDD[LabeledPoint] = {
     val data = sc.parallelize(0 until nexamples, nparts).map { idx =>
       val rnd = new Random(42 + idx)
 
@@ -68,8 +67,9 @@ object LogisticRegressionDataGenerator {
   def main(args: Array[String]) {
     if (args.length != 5) {
       // scalastyle:off println
-      println("Usage: LogisticRegressionGenerator " +
-        "<master> <output_dir> <num_examples> <num_features> <num_partitions>")
+      println(
+          "Usage: LogisticRegressionGenerator " +
+          "<master> <output_dir> <num_examples> <num_features> <num_partitions>")
       // scalastyle:on println
       System.exit(1)
     }

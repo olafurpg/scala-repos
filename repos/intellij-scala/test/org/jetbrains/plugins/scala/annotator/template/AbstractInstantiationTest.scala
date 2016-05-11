@@ -2,12 +2,11 @@ package org.jetbrains.plugins.scala.annotator.template
 
 import org.jetbrains.plugins.scala.annotator.{AnnotatorTestBase, Error}
 
-
 /**
- * Pavel Fatin
- */
-
-class AbstractInstantiationTest extends AnnotatorTestBase(AbstractInstantiation.THIS) {
+  * Pavel Fatin
+  */
+class AbstractInstantiationTest
+    extends AnnotatorTestBase(AbstractInstantiation.THIS) {
   private val Message = "(\\w+\\s\\w+) is abstract; cannot be instantiated".r
 
   def testOrdinaryClass() {
@@ -40,9 +39,11 @@ class AbstractInstantiationTest extends AnnotatorTestBase(AbstractInstantiation.
     assertNothing(messages("abstract class C; class X extends C"))
     assertNothing(messages("abstract class C; class X extends C {}"))
     assertNothing(messages("abstract class C; class X extends C with Object"))
-    assertNothing(messages("abstract class C; class X extends C with Object {}"))
+    assertNothing(
+        messages("abstract class C; class X extends C with Object {}"))
     assertNothing(messages("abstract class C; class X extends Object with C"))
-    assertNothing(messages("abstract class C; class X extends Object with C {}"))
+    assertNothing(
+        messages("abstract class C; class X extends Object with C {}"))
   }
 
   def testAbstractClassEarlyDefinition() {

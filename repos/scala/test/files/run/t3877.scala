@@ -21,8 +21,7 @@ object Test {
       i += 1
       println("test2: " + d)
 
-      if (d >= LIMIT || i >= LIMIT)
-        return
+      if (d >= LIMIT || i >= LIMIT) return
     }
   }
 
@@ -45,8 +44,7 @@ object Test {
       d = b
       i += 1
       println("test4: " + d)
-      if (d >= LIMIT || i >= LIMIT)
-        return
+      if (d >= LIMIT || i >= LIMIT) return
     } while (true)
   }
 
@@ -69,7 +67,6 @@ object Test {
       }
     }
   }
-
 
   def main(args: Array[String]) {
     test1

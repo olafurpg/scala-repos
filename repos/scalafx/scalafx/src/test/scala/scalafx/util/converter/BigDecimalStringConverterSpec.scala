@@ -34,15 +34,22 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 
 /**
- * BigDecimalStringConverter Spec tests.
- *
- *
- */
+  * BigDecimalStringConverter Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class BigDecimalStringConverterSpec
-  extends AbstractStringConverterDelegateSpec[java.math.BigDecimal, jfxuc.BigDecimalStringConverter, BigDecimal, BigDecimalStringConverter](classOf[jfxuc.BigDecimalStringConverter], classOf[BigDecimalStringConverter], classOf[BigDecimal]) {
+    extends AbstractStringConverterDelegateSpec[
+        java.math.BigDecimal,
+        jfxuc.BigDecimalStringConverter,
+        BigDecimal,
+        BigDecimalStringConverter](classOf[jfxuc.BigDecimalStringConverter],
+                                   classOf[BigDecimalStringConverter],
+                                   classOf[BigDecimal]) {
 
-  val examples = List((BigDecimal(0), "0"), (BigDecimal(12345), "12345"),
-    (BigDecimal(-12345), "-12345"), (BigDecimal(12.345), "12.345"))
-
+  val examples = List((BigDecimal(0), "0"),
+                      (BigDecimal(12345), "12345"),
+                      (BigDecimal(-12345), "-12345"),
+                      (BigDecimal(12.345), "12.345"))
 }

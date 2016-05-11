@@ -2,7 +2,6 @@ package org.jetbrains.plugins.scala
 package codeInspection
 package unusedInspections
 
-
 import com.intellij.codeInsight.FileModificationService
 import com.intellij.codeInsight.daemon.QuickFixBundle
 import com.intellij.codeInsight.intention.{HighPriorityAction, IntentionAction, LowPriorityAction}
@@ -19,24 +18,26 @@ import org.jetbrains.plugins.scala.util.ScalaLanguageDerivative
 import scala.collection.JavaConversions._
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 02.07.2009
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 02.07.2009
+  */
 class ScalaOptimizeImportsFix extends IntentionAction with HighPriorityAction {
   def getText: String = QuickFixBundle.message("optimize.imports.fix")
 
   def startInWriteAction: Boolean = true
 
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = {
-    file.getManager.isInProject(file) && (file.isInstanceOf[ScalaFile] || ScalaLanguageDerivative.hasDerivativeOnFile(file))
+    file.getManager.isInProject(file) &&
+    (file.isInstanceOf[ScalaFile] ||
+        ScalaLanguageDerivative.hasDerivativeOnFile(file))
   }
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
 
     file match {
-      case scalaPsi: ScalaFile => ScalaImportOptimizer.runOptimizerUnsafe(scalaPsi)
+      case scalaPsi: ScalaFile =>
+        ScalaImportOptimizer.runOptimizerUnsafe(scalaPsi)
       case _ =>
     }
   }
@@ -45,7 +46,8 @@ class ScalaOptimizeImportsFix extends IntentionAction with HighPriorityAction {
 }
 
 class ScalaEnableOptimizeImportsOnTheFlyFix extends IntentionAction {
-  def getText: String = QuickFixBundle.message("enable.optimize.imports.on.the.fly")
+  def getText: String =
+    QuickFixBundle.message("enable.optimize.imports.on.the.fly")
 
   def startInWriteAction: Boolean = true
 
@@ -55,31 +57,39 @@ class ScalaEnableOptimizeImportsOnTheFlyFix extends IntentionAction {
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     ScalaApplicationSettings.getInstance().OPTIMIZE_IMPORTS_ON_THE_FLY = true
-    if (file.getManager.isInProject(file) && (file.isInstanceOf[ScalaFile] || ScalaLanguageDerivative.hasDerivativeOnFile(file))) {
-      if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
+    if (file.getManager.isInProject(file) &&
+        (file.isInstanceOf[ScalaFile] ||
+            ScalaLanguageDerivative.hasDerivativeOnFile(file))) {
+      if (!FileModificationService.getInstance.prepareFileForWrite(file))
+        return
 
       file match {
-        case scalaFile: ScalaFile => ScalaImportOptimizer.runOptimizerUnsafe(scalaFile)
+        case scalaFile: ScalaFile =>
+          ScalaImportOptimizer.runOptimizerUnsafe(scalaFile)
         case _ =>
       }
     }
   }
 
-  def getFamilyName: String = QuickFixBundle.message("enable.optimize.imports.on.the.fly")
+  def getFamilyName: String =
+    QuickFixBundle.message("enable.optimize.imports.on.the.fly")
 }
 
-class MarkImportAsAlwaysUsed(importText: String) extends IntentionAction with LowPriorityAction {
+class MarkImportAsAlwaysUsed(importText: String)
+    extends IntentionAction with LowPriorityAction {
   def getText: String = "Mark import as always used in this project"
 
   def startInWriteAction: Boolean = true
 
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = {
-    importText.contains(".") && !ScalaCodeStyleSettings.getInstance(project).isAlwaysUsedImport(importText)
+    importText.contains(".") &&
+    !ScalaCodeStyleSettings.getInstance(project).isAlwaysUsedImport(importText)
   }
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     val settings = ScalaCodeStyleSettings.getInstance(project)
-    settings.setAlwaysUsedImports((settings.getAlwaysUsedImports ++ Array(importText)).sorted)
+    settings.setAlwaysUsedImports(
+        (settings.getAlwaysUsedImports ++ Array(importText)).sorted)
     FileContentUtil.reparseFiles(project, Seq(file.getVirtualFile), true)
   }
 

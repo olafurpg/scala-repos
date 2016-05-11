@@ -2,7 +2,6 @@ package org.jetbrains.plugins.scala
 package lang
 package refactoring
 
-
 import com.intellij.lang.refactoring.RefactoringSupportProvider
 import com.intellij.psi.PsiElement
 import com.intellij.refactoring.RefactoringActionHandler
@@ -18,29 +17,37 @@ import org.jetbrains.plugins.scala.lang.refactoring.introduceParameter.ScalaIntr
 import org.jetbrains.plugins.scala.lang.refactoring.introduceVariable.ScalaIntroduceVariableHandler
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 29.03.2009
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 29.03.2009
+  */
 class ScalaRefactoringSupportProvider extends RefactoringSupportProvider {
-  override def isInplaceRenameAvailable(element: PsiElement, context: PsiElement) = {
+  override def isInplaceRenameAvailable(
+      element: PsiElement, context: PsiElement) = {
     false // handled by ScalaInplaceRenameHandler
   }
 
   override def getIntroduceConstantHandler: RefactoringActionHandler = null
 
-  override def getIntroduceVariableHandler: RefactoringActionHandler = new ScalaIntroduceVariableHandler
+  override def getIntroduceVariableHandler: RefactoringActionHandler =
+    new ScalaIntroduceVariableHandler
 
-  override def getIntroduceFieldHandler: RefactoringActionHandler = new ScalaIntroduceFieldFromExpressionHandler
+  override def getIntroduceFieldHandler: RefactoringActionHandler =
+    new ScalaIntroduceFieldFromExpressionHandler
 
-  override def getIntroduceParameterHandler: RefactoringActionHandler = new ScalaIntroduceParameterHandler
+  override def getIntroduceParameterHandler: RefactoringActionHandler =
+    new ScalaIntroduceParameterHandler
 
-  override def isSafeDeleteAvailable(element: PsiElement): Boolean = element match {
-    case _: ScTypeDefinition | _: ScFunction | _: ScFieldId | _: ScReferencePattern => true
-    case _ => false
-  }
+  override def isSafeDeleteAvailable(element: PsiElement): Boolean =
+    element match {
+      case _: ScTypeDefinition | _: ScFunction | _: ScFieldId |
+          _: ScReferencePattern =>
+        true
+      case _ => false
+    }
 
-  override def getExtractMethodHandler: RefactoringActionHandler = new ScalaExtractMethodHandler
+  override def getExtractMethodHandler: RefactoringActionHandler =
+    new ScalaExtractMethodHandler
 
-  override def getChangeSignatureHandler: ChangeSignatureHandler = new ScalaChangeSignatureHandler
+  override def getChangeSignatureHandler: ChangeSignatureHandler =
+    new ScalaChangeSignatureHandler
 }

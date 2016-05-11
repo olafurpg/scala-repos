@@ -20,8 +20,8 @@ package org.apache.spark
 import org.apache.spark.annotation.DeveloperApi
 
 /**
- * :: DeveloperApi ::
- * Exception thrown when a task is explicitly killed (i.e., task failure is expected).
- */
+  * :: DeveloperApi ::
+  * Exception thrown when a task is explicitly killed (i.e., task failure is expected).
+  */
 @DeveloperApi
 class TaskKilledException extends RuntimeException

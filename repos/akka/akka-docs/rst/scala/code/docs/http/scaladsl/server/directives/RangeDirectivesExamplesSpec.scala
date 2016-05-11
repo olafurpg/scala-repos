@@ -5,7 +5,7 @@
 package docs.http.scaladsl.server.directives
 
 import akka.http.scaladsl.model._
-import com.typesafe.config.{ ConfigFactory, Config }
+import com.typesafe.config.{ConfigFactory, Config}
 import akka.util.ByteString
 
 import headers._
@@ -16,13 +16,14 @@ import docs.http.scaladsl.server.RoutingSpec
 class RangeDirectivesExamplesSpec extends RoutingSpec {
 
   override def testConfig: Config =
-    ConfigFactory.parseString("akka.http.routing.range-coalescing-threshold=2").withFallback(super.testConfig)
+    ConfigFactory
+      .parseString("akka.http.routing.range-coalescing-threshold=2")
+      .withFallback(super.testConfig)
 
   "withRangeSupport" in {
-    val route =
-      withRangeSupport {
-        complete("ABCDEFGH")
-      }
+    val route = withRangeSupport {
+      complete("ABCDEFGH")
+    }
 
     Get() ~> addHeader(Range(ByteRange(3, 4))) ~> route ~> check {
       headers should contain(`Content-Range`(ContentRange(3, 4, 8)))
@@ -32,10 +33,13 @@ class RangeDirectivesExamplesSpec extends RoutingSpec {
 
     // we set "akka.http.routing.range-coalescing-threshold = 2"
     // above to make sure we get two BodyParts
-    Get() ~> addHeader(Range(ByteRange(0, 1), ByteRange(1, 2), ByteRange(6, 7))) ~> route ~> check {
+    Get() ~> addHeader(Range(ByteRange(0, 1),
+                             ByteRange(1, 2),
+                             ByteRange(6, 7))) ~> route ~> check {
       headers.collectFirst { case `Content-Range`(_, _) => true } shouldBe None
       val responseF = responseAs[Multipart.ByteRanges].parts
-        .runFold[List[Multipart.ByteRanges.BodyPart]](Nil)((acc, curr) => curr :: acc)
+        .runFold[List[Multipart.ByteRanges.BodyPart]](Nil)((acc,
+          curr) => curr :: acc)
 
       val response = Await.result(responseF, 3.seconds).reverse
 
@@ -54,5 +58,4 @@ class RangeDirectivesExamplesSpec extends RoutingSpec {
       }
     }
   }
-
 }

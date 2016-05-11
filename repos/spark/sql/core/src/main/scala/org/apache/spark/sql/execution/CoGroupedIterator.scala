@@ -22,18 +22,18 @@ import org.apache.spark.sql.catalyst.expressions.{Ascending, Attribute, SortOrde
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateOrdering
 
 /**
- * Iterates over [[GroupedIterator]]s and returns the cogrouped data, i.e. each record is a
- * grouping key with its associated values from all [[GroupedIterator]]s.
- * Note: we assume the output of each [[GroupedIterator]] is ordered by the grouping key.
- */
-class CoGroupedIterator(
-    left: Iterator[(InternalRow, Iterator[InternalRow])],
-    right: Iterator[(InternalRow, Iterator[InternalRow])],
-    groupingSchema: Seq[Attribute])
-  extends Iterator[(InternalRow, Iterator[InternalRow], Iterator[InternalRow])] {
+  * Iterates over [[GroupedIterator]]s and returns the cogrouped data, i.e. each record is a
+  * grouping key with its associated values from all [[GroupedIterator]]s.
+  * Note: we assume the output of each [[GroupedIterator]] is ordered by the grouping key.
+  */
+class CoGroupedIterator(left: Iterator[(InternalRow, Iterator[InternalRow])],
+                        right: Iterator[(InternalRow, Iterator[InternalRow])],
+                        groupingSchema: Seq[Attribute])
+    extends Iterator[
+        (InternalRow, Iterator[InternalRow], Iterator[InternalRow])] {
 
-  private val keyOrdering =
-    GenerateOrdering.generate(groupingSchema.map(SortOrder(_, Ascending)), groupingSchema)
+  private val keyOrdering = GenerateOrdering.generate(
+      groupingSchema.map(SortOrder(_, Ascending)), groupingSchema)
 
   private var currentLeftData: (InternalRow, Iterator[InternalRow]) = _
   private var currentRightData: (InternalRow, Iterator[InternalRow]) = _
@@ -49,7 +49,8 @@ class CoGroupedIterator(
     currentLeftData != null || currentRightData != null
   }
 
-  override def next(): (InternalRow, Iterator[InternalRow], Iterator[InternalRow]) = {
+  override def next(
+      ): (InternalRow, Iterator[InternalRow], Iterator[InternalRow]) = {
     assert(hasNext)
 
     if (currentLeftData.eq(null)) {
@@ -60,12 +61,14 @@ class CoGroupedIterator(
       leftOnly()
     } else if (currentLeftData._1 == currentRightData._1) {
       // left and right have the same grouping key, consume both of them.
-      val result = (currentLeftData._1, currentLeftData._2, currentRightData._2)
+      val result =
+        (currentLeftData._1, currentLeftData._2, currentRightData._2)
       currentLeftData = null
       currentRightData = null
       result
     } else {
-      val compare = keyOrdering.compare(currentLeftData._1, currentRightData._1)
+      val compare =
+        keyOrdering.compare(currentLeftData._1, currentRightData._1)
       assert(compare != 0)
       if (compare < 0) {
         // the grouping key of left is smaller, consume the left data.
@@ -77,13 +80,15 @@ class CoGroupedIterator(
     }
   }
 
-  private def leftOnly(): (InternalRow, Iterator[InternalRow], Iterator[InternalRow]) = {
+  private def leftOnly(
+      ): (InternalRow, Iterator[InternalRow], Iterator[InternalRow]) = {
     val result = (currentLeftData._1, currentLeftData._2, Iterator.empty)
     currentLeftData = null
     result
   }
 
-  private def rightOnly(): (InternalRow, Iterator[InternalRow], Iterator[InternalRow]) = {
+  private def rightOnly(
+      ): (InternalRow, Iterator[InternalRow], Iterator[InternalRow]) = {
     val result = (currentRightData._1, Iterator.empty, currentRightData._2)
     currentRightData = null
     result

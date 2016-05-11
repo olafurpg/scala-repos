@@ -4,7 +4,8 @@ trait ObjectGraphMatchers {
   case class Zoo[-T](x: T)
   def foo[T](x: Zoo[T], y: Zoo[T]): T = x.x
 
-  /*start*/foo(Zoo[A](new A {}), Zoo[B](new B {}))/*end*/
+  /*start*/
+  foo(Zoo[A](new A {}), Zoo[B](new B {})) /*end*/
 }
 /*
 Few variants:

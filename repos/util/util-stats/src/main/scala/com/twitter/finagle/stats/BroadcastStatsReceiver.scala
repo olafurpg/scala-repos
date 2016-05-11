@@ -1,43 +1,45 @@
 package com.twitter.finagle.stats
 
 /**
- * Marker for a [[StatsReceiver]] that broadcasts metrics to more
- * than one underlying [[StatsReceiver]].
- */
+  * Marker for a [[StatsReceiver]] that broadcasts metrics to more
+  * than one underlying [[StatsReceiver]].
+  */
 trait BroadcastStatsReceiver {
+
   /**
-   * The underlying [[StatsReceiver StatsReceivers]] that are being
-   * broadcast to.
-   */
+    * The underlying [[StatsReceiver StatsReceivers]] that are being
+    * broadcast to.
+    */
   def statsReceivers: Seq[StatsReceiver]
 }
 
 /**
- * BroadcastStatsReceiver is a helper object that create a StatsReceiver wrapper around multiple
- * StatsReceivers (n).
- */
+  * BroadcastStatsReceiver is a helper object that create a StatsReceiver wrapper around multiple
+  * StatsReceivers (n).
+  */
 object BroadcastStatsReceiver {
-  def apply(receivers: Seq[StatsReceiver]): StatsReceiver = receivers.filterNot(_.isNull) match {
-    case Seq() => NullStatsReceiver
-    case Seq(fst) => fst
-    case Seq(first, second) => new Two(first, second)
-    case more => new N(more)
-  }
+  def apply(receivers: Seq[StatsReceiver]): StatsReceiver =
+    receivers.filterNot(_.isNull) match {
+      case Seq() => NullStatsReceiver
+      case Seq(fst) => fst
+      case Seq(first, second) => new Two(first, second)
+      case more => new N(more)
+    }
 
-  private class Two(first: StatsReceiver, second: StatsReceiver) extends StatsReceiver
-    with BroadcastStatsReceiver
-  {
+  private class Two(first: StatsReceiver, second: StatsReceiver)
+      extends StatsReceiver with BroadcastStatsReceiver {
     val repr = this
 
     def counter(names: String*): Counter =
-      new BroadcastCounter.Two(first.counter(names:_*), second.counter(names:_*))
+      new BroadcastCounter.Two(
+          first.counter(names: _*), second.counter(names: _*))
 
     def stat(names: String*): Stat =
-      new BroadcastStat.Two(first.stat(names:_*), second.stat(names:_*))
+      new BroadcastStat.Two(first.stat(names: _*), second.stat(names: _*))
 
     def addGauge(names: String*)(f: => Float): Gauge = new Gauge {
-      val firstGauge = first.addGauge(names:_*)(f)
-      val secondGauge = second.addGauge(names:_*)(f)
+      val firstGauge = first.addGauge(names: _*)(f)
+      val secondGauge = second.addGauge(names: _*)(f)
       def remove(): Unit = {
         firstGauge.remove()
         secondGauge.remove()
@@ -50,19 +52,18 @@ object BroadcastStatsReceiver {
       s"Broadcast($first, $second)"
   }
 
-  private class N(srs: Seq[StatsReceiver]) extends StatsReceiver
-    with BroadcastStatsReceiver
-  {
+  private class N(srs: Seq[StatsReceiver])
+      extends StatsReceiver with BroadcastStatsReceiver {
     val repr = this
 
     def counter(names: String*): Counter =
-      BroadcastCounter(srs.map { _.counter(names:_*) })
+      BroadcastCounter(srs.map { _.counter(names: _*) })
 
     def stat(names: String*): Stat =
-      BroadcastStat(srs.map { _.stat(names:_*) })
+      BroadcastStat(srs.map { _.stat(names: _*) })
 
     def addGauge(names: String*)(f: => Float): Gauge = new Gauge {
-      val gauges = srs.map { _.addGauge(names:_*)(f) }
+      val gauges = srs.map { _.addGauge(names: _*)(f) }
       def remove(): Unit = gauges.foreach { _.remove() }
     }
 
@@ -74,10 +75,10 @@ object BroadcastStatsReceiver {
 }
 
 /**
- * BroadcastCounter is a helper object that create a Counter wrapper around multiple
- * Counters (n).
- * For performance reason, we have specialized cases if n == (0, 1, 2, 3 or 4)
- */
+  * BroadcastCounter is a helper object that create a Counter wrapper around multiple
+  * Counters (n).
+  * For performance reason, we have specialized cases if n == (0, 1, 2, 3 or 4)
+  */
 object BroadcastCounter {
   def apply(counters: Seq[Counter]): Counter = counters match {
     case Seq() => NullCounter
@@ -107,7 +108,8 @@ object BroadcastCounter {
     }
   }
 
-  private class Four(a: Counter, b: Counter, c: Counter, d: Counter) extends Counter {
+  private class Four(a: Counter, b: Counter, c: Counter, d: Counter)
+      extends Counter {
     def incr(delta: Int): Unit = {
       a.incr(delta)
       b.incr(delta)
@@ -122,10 +124,10 @@ object BroadcastCounter {
 }
 
 /**
- * BroadcastStat is a helper object that create a Counter wrapper around multiple
- * Stats (n).
- * For performance reason, we have specialized cases if n == (0, 1, 2, 3 or 4)
- */
+  * BroadcastStat is a helper object that create a Counter wrapper around multiple
+  * Stats (n).
+  * For performance reason, we have specialized cases if n == (0, 1, 2, 3 or 4)
+  */
 object BroadcastStat {
   def apply(stats: Seq[Stat]): Stat = stats match {
     case Seq() => NullStat

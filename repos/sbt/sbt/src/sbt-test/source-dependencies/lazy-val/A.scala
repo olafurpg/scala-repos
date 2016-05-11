@@ -1,4 +1,3 @@
-class A
-{
-	val x = 3
+class A {
+  val x = 3
 }

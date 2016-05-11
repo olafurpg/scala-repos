@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.Type
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 03.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 03.03.2008
+  */
 object Ascription {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val ascriptionMarker = builder.mark

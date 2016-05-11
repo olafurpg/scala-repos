@@ -37,9 +37,12 @@ object MenuSpec extends Specification {
 
   def mockSiteMap[T](f: (SiteMap => T)): T = {
     val siteMap = SiteMap(
-      sitemap.Menu.i("foobar") / "foo" / "bar",
-      sitemap.Menu.i("foobaz") / "foo" / "baz",
-      sitemap.Menu.param[Param]("foobiz", "foobiz", s => Full(Param(s)), p => p.s) / "foo" / "biz" / *
+        sitemap.Menu.i("foobar") / "foo" / "bar",
+        sitemap.Menu.i("foobaz") / "foo" / "baz",
+        sitemap.Menu.param[Param]("foobiz",
+                                  "foobiz",
+                                  s => Full(Param(s)),
+                                  p => p.s) / "foo" / "biz" / *
     )
 
     f(siteMap)
@@ -121,4 +124,3 @@ object MenuSpec extends Specification {
     // }
   }
 }
-

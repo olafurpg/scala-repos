@@ -35,32 +35,42 @@ import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
 object BarChart {
-  implicit def sfxBarChart2jfx[X, Y](v: BarChart[X, Y]): jfxsc.BarChart[X, Y] = if (v != null) v.delegate else null
+  implicit def sfxBarChart2jfx[X, Y](v: BarChart[X, Y]): jfxsc.BarChart[X, Y] =
+    if (v != null) v.delegate else null
 
   def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y]) =
     new BarChart[X, Y](new jfxsc.BarChart[X, Y](xAxis, yAxis))
 
-  def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y], data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
+  def apply[X, Y](xAxis: Axis[X],
+                  yAxis: Axis[Y],
+                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new BarChart[X, Y](new jfxsc.BarChart[X, Y](xAxis, yAxis, data))
 
-  def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y],
-                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]], categoryGap: Double) =
-    new BarChart[X, Y](new jfxsc.BarChart[X, Y](xAxis, yAxis, data, categoryGap))
+  def apply[X, Y](xAxis: Axis[X],
+                  yAxis: Axis[Y],
+                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]],
+                  categoryGap: Double) =
+    new BarChart[X, Y](
+        new jfxsc.BarChart[X, Y](xAxis, yAxis, data, categoryGap))
 }
 
 class BarChart[X, Y](override val delegate: jfxsc.BarChart[X, Y])
-  extends XYChart[X, Y](delegate)
-  with SFXDelegate[jfxsc.BarChart[X, Y]] {
+    extends XYChart[X, Y](delegate) with SFXDelegate[jfxsc.BarChart[X, Y]] {
 
   def this(xAxis: Axis[X], yAxis: Axis[Y]) {
     this(new jfxsc.BarChart[X, Y](xAxis, yAxis))
   }
 
-  def this(xAxis: Axis[X], yAxis: Axis[Y], data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+  def this(xAxis: Axis[X],
+           yAxis: Axis[Y],
+           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
     this(new jfxsc.BarChart[X, Y](xAxis, yAxis, data))
   }
 
-  def this(xAxis: Axis[X], yAxis: Axis[Y], data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]], categoryGap: Double) {
+  def this(xAxis: Axis[X],
+           yAxis: Axis[Y],
+           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]],
+           categoryGap: Double) {
     this(new jfxsc.BarChart[X, Y](xAxis, yAxis, data, categoryGap))
   }
 

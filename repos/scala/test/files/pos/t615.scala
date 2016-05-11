@@ -8,4 +8,3 @@ object test {
     def bar = ()
   }.bar
 }
-

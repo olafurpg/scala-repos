@@ -35,9 +35,10 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * TreeItem Spec tests.
- *
- */
+  * TreeItem Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class TreeItemSpec[T <: AnyRef]
-  extends SimpleSFXDelegateSpec[jfxsc.TreeItem[T], TreeItem[T]](classOf[jfxsc.TreeItem[T]], classOf[TreeItem[T]])
+    extends SimpleSFXDelegateSpec[jfxsc.TreeItem[T], TreeItem[T]](
+        classOf[jfxsc.TreeItem[T]], classOf[TreeItem[T]])

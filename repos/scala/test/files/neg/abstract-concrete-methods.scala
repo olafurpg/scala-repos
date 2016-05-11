@@ -1,5 +1,4 @@
-trait Outer[This <: Outer[This]] {
-  self: This =>
+trait Outer[This <: Outer[This]] { self: This =>
 
   trait Inner
   def score(i: This#Inner): Double

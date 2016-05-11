@@ -12,14 +12,15 @@ import org.jboss.netty.channel.{Channels, ChannelPipelineFactory}
 import org.jboss.netty.handler.codec.frame.FrameDecoder
 
 /**
- * Decodes logical MySQL packets that could be fragmented across
- * frames. MySQL packets are a length encoded set of bytes written
- * in little endian byte order.
- */
+  * Decodes logical MySQL packets that could be fragmented across
+  * frames. MySQL packets are a length encoded set of bytes written
+  * in little endian byte order.
+  */
 class PacketFrameDecoder extends FrameDecoder {
-  override def decode(ctx: ChannelHandlerContext, channel: Channel, buffer: ChannelBuffer): Packet = {
-    if (buffer.readableBytes < Packet.HeaderSize)
-      return null
+  override def decode(ctx: ChannelHandlerContext,
+                      channel: Channel,
+                      buffer: ChannelBuffer): Packet = {
+    if (buffer.readableBytes < Packet.HeaderSize) return null
 
     buffer.markReaderIndex()
 
@@ -28,7 +29,7 @@ class PacketFrameDecoder extends FrameDecoder {
     val br = BufferReader(header)
 
     val length = br.readUnsignedInt24()
-    val seq  = br.readUnsignedByte()
+    val seq = br.readUnsignedByte()
 
     if (buffer.readableBytes < length) {
       buffer.resetReaderIndex()
@@ -55,15 +56,16 @@ class PacketEncoder extends SimpleChannelDownstreamHandler {
         }
 
       case unknown =>
-        evt.getFuture.setFailure(new ChannelException(
-          "Unsupported request type %s".format(unknown.getClass.getName)))
+        evt.getFuture.setFailure(
+            new ChannelException("Unsupported request type %s".format(
+                    unknown.getClass.getName)))
     }
 }
 
 /**
- * A Netty3 pipeline that is responsible for framing network
- * traffic in terms of mysql logical packets.
- */
+  * A Netty3 pipeline that is responsible for framing network
+  * traffic in terms of mysql logical packets.
+  */
 object MysqlClientPipelineFactory extends ChannelPipelineFactory {
   def getPipeline = {
     val pipeline = Channels.pipeline()
@@ -74,10 +76,10 @@ object MysqlClientPipelineFactory extends ChannelPipelineFactory {
 }
 
 /**
- * Responsible for the transport layer plumbing required to produce
- * a Transporter[Packet, Packet]. The current implementation uses
- * Netty3.
- */
+  * Responsible for the transport layer plumbing required to produce
+  * a Transporter[Packet, Packet]. The current implementation uses
+  * Netty3.
+  */
 object MysqlTransporter {
   def apply(params: Stack.Params): Transporter[Packet, Packet] =
     Netty3Transporter(MysqlClientPipelineFactory, params)

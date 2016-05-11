@@ -2,14 +2,15 @@ package mesosphere.marathon.api
 
 import java.io.ByteArrayOutputStream
 import java.util
-import javax.servlet.{ WriteListener, ServletOutputStream, ServletConfig, ServletContext }
-import javax.servlet.http.{ HttpServletResponse, HttpServletRequest }
+import javax.servlet.{WriteListener, ServletOutputStream, ServletConfig, ServletContext}
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.test.Mockito
-import org.scalatest.{ Matchers, GivenWhenThen }
+import org.scalatest.{Matchers, GivenWhenThen}
 
-class WebJarServletTest extends MarathonSpec with Mockito with GivenWhenThen with Matchers {
+class WebJarServletTest
+    extends MarathonSpec with Mockito with GivenWhenThen with Matchers {
 
   test("Get the / will send a redirect") {
     Given("A request response mock")
@@ -20,7 +21,8 @@ class WebJarServletTest extends MarathonSpec with Mockito with GivenWhenThen wit
     servlet.doGet(request, response)
 
     Then("A redirect response is send")
-    verify(response, atLeastOnce).setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY)
+    verify(response, atLeastOnce).setStatus(
+        HttpServletResponse.SC_MOVED_TEMPORARILY)
     verify(response, atLeastOnce).setHeader("Location", "ui/")
   }
 
@@ -33,11 +35,12 @@ class WebJarServletTest extends MarathonSpec with Mockito with GivenWhenThen wit
     servlet.doGet(request, response)
 
     Then("A redirect response is send")
-    verify(response, atLeastOnce).setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY)
+    verify(response, atLeastOnce).setStatus(
+        HttpServletResponse.SC_MOVED_TEMPORARILY)
     verify(response, atLeastOnce).setHeader("Location", "/some/directory/")
   }
 
-  test("Get a non existing path will return 404"){
+  test("Get a non existing path will return 404") {
     Given("A request response mock")
     val request = req("/", "not/existing.html")
     val response = mock[HttpServletResponse]

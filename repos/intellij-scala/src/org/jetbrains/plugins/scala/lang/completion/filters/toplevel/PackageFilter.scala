@@ -12,20 +12,22 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging._
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 21.05.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 21.05.2008
+  */
 class PackageFilter extends ElementFilter {
   def isAcceptable(element: Object, context: PsiElement): Boolean = {
     if (context.isInstanceOf[PsiComment]) return false
-    val (leaf, _) = processPsiLeafForFilter(getLeafByOffset(context.getTextRange.getStartOffset, context))
-    
+    val (leaf, _) = processPsiLeafForFilter(
+        getLeafByOffset(context.getTextRange.getStartOffset, context))
+
     if (leaf != null) {
       val parent = leaf.getParent
       if (parent.isInstanceOf[ScalaFile] || parent.isInstanceOf[ScPackaging]) {
-        if (leaf.getNextSibling != null && leaf.getNextSibling.getNextSibling.isInstanceOf[ScPackaging] &&
-                leaf.getNextSibling.getNextSibling.getText.indexOf('{') == -1) return false
+        if (leaf.getNextSibling != null &&
+            leaf.getNextSibling.getNextSibling.isInstanceOf[ScPackaging] &&
+            leaf.getNextSibling.getNextSibling.getText.indexOf('{') == -1)
+          return false
         else {
           var node = leaf.getPrevSibling
           if (node.isInstanceOf[PsiWhiteSpace]) node = node.getPrevSibling
@@ -41,7 +43,7 @@ class PackageFilter extends ElementFilter {
         }
       }
     }
-    
+
     false
   }
 

@@ -8,14 +8,14 @@ import scala.util.Random
 class RationalTest extends FunSuite {
 
   test("rational canonical construction") {
-    val r = Rational(5,6)
+    val r = Rational(5, 6)
     assert(r.numerator === BigInt(5))
     assert(r.denominator === BigInt(6))
     intercept[IllegalArgumentException] {
-      Rational(1,0)
+      Rational(1, 0)
     }
     intercept[IllegalArgumentException] {
-      Rational(BigInt(1),0)
+      Rational(BigInt(1), 0)
     }
   }
   test("rational degenerate construction") {
@@ -31,7 +31,7 @@ class RationalTest extends FunSuite {
 
   test("RationalIsFractional implicit exists") {
     import spire.implicits._
-    def doStuff[NT:Fractional](a: NT, b: NT):NT = a / b
+    def doStuff[NT : Fractional](a: NT, b: NT): NT = a / b
 
     assertResult(Rational(1, 2)) {
       doStuff(Rational(1), Rational(2))
@@ -206,27 +206,27 @@ class RationalTest extends FunSuite {
     }
   }
 
-    test("longValue") { assert(Rational("5000000000").toLong === 5000000000L) }
-    test("intValue") {
-        assert(Rational(3).toInt === 3)
-        assert(Rational(-5, 2).toInt === -2)
-    }
-    test("shortValue") {
-        assert(Rational(65535).toShort === -1)
-        assert(Rational(65536).toShort === 0)
-        assert(Rational(-5).toShort === -5)
-    }
-    test("byteValue") {
-        assert(Rational(-1).toByte === -1)
-        assert(Rational(256).toByte === 0)
-    }
-    test("toDouble and tFloat") {
-        assert(Rational(1, 2).toFloat === 0.5f)
-        val a = Rational("10000000000000002/10000000000000000")
-        assert(a.toDouble === 1.0000000000000002)
-        assert(a.toFloat === 1.0f)
+  test("longValue") { assert(Rational("5000000000").toLong === 5000000000L) }
+  test("intValue") {
+    assert(Rational(3).toInt === 3)
+    assert(Rational(-5, 2).toInt === -2)
+  }
+  test("shortValue") {
+    assert(Rational(65535).toShort === -1)
+    assert(Rational(65536).toShort === 0)
+    assert(Rational(-5).toShort === -5)
+  }
+  test("byteValue") {
+    assert(Rational(-1).toByte === -1)
+    assert(Rational(256).toByte === 0)
+  }
+  test("toDouble and tFloat") {
+    assert(Rational(1, 2).toFloat === 0.5f)
+    val a = Rational("10000000000000002/10000000000000000")
+    assert(a.toDouble === 1.0000000000000002)
+    assert(a.toFloat === 1.0f)
     assert(Rational(2, 3).toDouble === 2 / 3.0)
-    }
+  }
 
   test("toString") {
     assert(Rational(1, 2).toString === "1/2")
@@ -262,12 +262,12 @@ class RationalTest extends FunSuite {
   }
 
   /**
-   * Finds the closest `Rational` to `a` whose denominator is no greater than
-   * `limit` by brute-force. This is used to compare with the version used by
-   * `Rational` which is a little harder to reason about. This just literally
-   * tries every denominator between 1 and `limit` and returns the `Rational`
-   * that was closest to `a`.
-   */
+    * Finds the closest `Rational` to `a` whose denominator is no greater than
+    * `limit` by brute-force. This is used to compare with the version used by
+    * `Rational` which is a little harder to reason about. This just literally
+    * tries every denominator between 1 and `limit` and returns the `Rational`
+    * that was closest to `a`.
+    */
   def bruteForceLimitDen(a: Rational, limit: Int): Rational =
     (1 to limit) map (BigInt(_)) flatMap { d =>
       val ln = (a * d).toBigInt
@@ -300,11 +300,13 @@ class RationalTest extends FunSuite {
 
   test("limitToInt makes rationals fit in Ints") {
     val rng = new Random(2919234)
-    val rationals = List.fill(100)(Rational(BigInt(128, rng), BigInt(128, rng).abs + 1))
+    val rationals =
+      List.fill(100)(Rational(BigInt(128, rng), BigInt(128, rng).abs + 1))
     rationals foreach { a =>
       val b = a.limitToInt
-      assert(b.numerator.isValidInt && b.denominator.isValidInt,
-        "%s (from %s) doesn't fit in Ints" format (b.toString, a.toString))
+      assert(
+          b.numerator.isValidInt && b.denominator.isValidInt,
+          "%s (from %s) doesn't fit in Ints" format (b.toString, a.toString))
     }
   }
 
@@ -319,7 +321,7 @@ class RationalTest extends FunSuite {
     val z = Rational("1/287380324068203382157064120376241062")
     assert(x.gcd(y) === z) // As confirmed by Wolfram Alpha
     // test gcd special cases (0 and 1)
-    for(w ← Seq(Rational(Int.MaxValue), Rational(BigInt(2).pow(100)))) {
+    for (w ← Seq(Rational(Int.MaxValue), Rational(BigInt(2).pow(100)))) {
       val n = -w
       assert(Rational.zero.gcd(w) === w)
       assert(w.gcd(Rational.zero) === w)
@@ -346,8 +348,8 @@ class RationalTest extends FunSuite {
     // assert((Rational.one + d).limitToLong == Rational.one)
   }
   test("numeratorAndDenominatorAsLong") {
-    assert(Rational(2,3).numeratorAsLong === 2L)
-    assert(Rational(2,3).denominatorAsLong === 3L)
+    assert(Rational(2, 3).numeratorAsLong === 2L)
+    assert(Rational(2, 3).denominatorAsLong === 3L)
 
     assert((Rational(1, Long.MaxValue) / 2).numeratorAsLong === 1L)
     assert((Rational(Long.MaxValue) * 2).denominatorAsLong === 1L)
@@ -361,7 +363,13 @@ class RationalTest extends FunSuite {
     }
   }
   test("isValidFlags") {
-    def check(x:Rational, whole:Boolean, char:Boolean, byte:Boolean, short:Boolean, int:Boolean, long:Boolean): Unit = {
+    def check(x: Rational,
+              whole: Boolean,
+              char: Boolean,
+              byte: Boolean,
+              short: Boolean,
+              int: Boolean,
+              long: Boolean): Unit = {
       assert(x.isWhole == whole)
       assert(x.isValidChar == char)
       assert(x.isValidByte == byte)
@@ -371,7 +379,7 @@ class RationalTest extends FunSuite {
     }
 
     check(Rational.one, true, true, true, true, true, true)
-    check(Rational(1,2), false, false, false, false, false, false)
+    check(Rational(1, 2), false, false, false, false, false, false)
 
     check(Rational(Byte.MaxValue), true, true, true, true, true, true)
     check(Rational(Byte.MaxValue) + 1, true, true, false, true, true, true)
@@ -399,10 +407,10 @@ class RationalTest extends FunSuite {
     check(Rational(Long.MinValue) - 1, true, false, false, false, false, false)
   }
   test("applyNumber") {
-    def rationalFromNumber(x:Number) = Rational(x)
+    def rationalFromNumber(x: Number) = Rational(x)
     assert(rationalFromNumber(1) == 1)
     assert(rationalFromNumber(1.0) == 1)
     assert(rationalFromNumber(Rational.one) == 1)
-    assert(rationalFromNumber(1:BigDecimal) == 1)
+    assert(rationalFromNumber(1: BigDecimal) == 1)
   }
 }

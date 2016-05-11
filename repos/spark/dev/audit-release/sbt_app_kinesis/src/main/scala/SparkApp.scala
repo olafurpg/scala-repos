@@ -25,7 +25,8 @@ import org.apache.spark.SparkContext._
 
 object SimpleApp {
   def main(args: Array[String]) {
-    val foundKinesis = Try(Class.forName("org.apache.spark.streaming.kinesis.KinesisUtils")).isSuccess
+    val foundKinesis = Try(Class.forName(
+            "org.apache.spark.streaming.kinesis.KinesisUtils")).isSuccess
     if (!foundKinesis) {
       println("Kinesis not loaded via kinesis-asl")
       System.exit(-1)

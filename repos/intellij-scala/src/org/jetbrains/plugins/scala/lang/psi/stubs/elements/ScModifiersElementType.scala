@@ -12,12 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScModifierList
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScModifiersStubImpl
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 21.01.2009
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 21.01.2009
+  */
 class ScModifiersElementType(debugName: String)
-        extends ScStubElementType[ScModifiersStub, ScModifierList](debugName) {
+    extends ScStubElementType[ScModifiersStub, ScModifierList](debugName) {
   def serialize(stub: ScModifiersStub, dataStream: StubOutputStream) {
     dataStream.writeBoolean(stub.hasExplicitModifiers)
     dataStream.writeInt(stub.getModifiers.length)
@@ -28,12 +27,19 @@ class ScModifiersElementType(debugName: String)
     new ScModifierListImpl(stub)
   }
 
-  def createStubImpl[ParentPsi <: PsiElement](psi: ScModifierList, parentStub: StubElement[ParentPsi]): ScModifiersStub = {
+  def createStubImpl[ParentPsi <: PsiElement](
+      psi: ScModifierList,
+      parentStub: StubElement[ParentPsi]): ScModifiersStub = {
     val modifiers: Array[String] = psi.getModifiersStrings
-    new ScModifiersStubImpl(parentStub, this, if (modifiers.isEmpty) ArrayUtil.EMPTY_STRING_ARRAY else modifiers, psi.hasExplicitModifiers)
+    new ScModifiersStubImpl(
+        parentStub,
+        this,
+        if (modifiers.isEmpty) ArrayUtil.EMPTY_STRING_ARRAY else modifiers,
+        psi.hasExplicitModifiers)
   }
 
-  def deserializeImpl(dataStream: StubInputStream, parentStub: Any): ScModifiersStub = {
+  def deserializeImpl(
+      dataStream: StubInputStream, parentStub: Any): ScModifiersStub = {
     val explicitModifiers = dataStream.readBoolean()
     val num = dataStream.readInt
     val modifiers =
@@ -43,7 +49,10 @@ class ScModifiersElementType(debugName: String)
         for (i <- 0 until num) mods(i) = dataStream.readName.toString
         mods
       }
-    new ScModifiersStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]], this, modifiers, explicitModifiers)
+    new ScModifiersStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
+                            this,
+                            modifiers,
+                            explicitModifiers)
   }
 
   def indexStub(stub: ScModifiersStub, sink: IndexSink) {}

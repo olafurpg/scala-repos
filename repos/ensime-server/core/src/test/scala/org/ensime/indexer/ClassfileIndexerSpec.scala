@@ -14,8 +14,9 @@ class ClassfileIndexerSpec extends EnsimeSpec with IsolatedEnsimeVFSFixture {
 
   // TODO: some assertions (currently we're just checking that no exceptions are raised!)
 
-  "ClassfileIndexer" should "support Java 6 class files" in withVFS { implicit vfs =>
-    indexClassfile(vfs.vres("jdk6/Test.class"))
+  "ClassfileIndexer" should "support Java 6 class files" in withVFS {
+    implicit vfs =>
+      indexClassfile(vfs.vres("jdk6/Test.class"))
   }
 
   it should "support Java 8 class files" in withVFS { implicit vfs =>

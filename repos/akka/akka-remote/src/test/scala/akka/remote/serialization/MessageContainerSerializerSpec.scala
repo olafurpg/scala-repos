@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote.serialization
 
 import akka.serialization.SerializationExtension
@@ -19,19 +18,24 @@ class MessageContainerSerializerSpec extends AkkaSpec {
   "DaemonMsgCreateSerializer" must {
 
     "resolve serializer for ActorSelectionMessage" in {
-      ser.serializerFor(classOf[ActorSelectionMessage]).getClass should ===(classOf[MessageContainerSerializer])
+      ser.serializerFor(classOf[ActorSelectionMessage]).getClass should ===(
+          classOf[MessageContainerSerializer])
     }
 
     "serialize and de-serialize ActorSelectionMessage" in {
-      verifySerialization(ActorSelectionMessage("hello", Vector(
-        SelectChildName("user"), SelectChildName("a"), SelectChildName("b"), SelectParent,
-        SelectChildPattern("*"), SelectChildName("c")), wildcardFanOut = true))
+      verifySerialization(
+          ActorSelectionMessage("hello",
+                                Vector(SelectChildName("user"),
+                                       SelectChildName("a"),
+                                       SelectChildName("b"),
+                                       SelectParent,
+                                       SelectChildPattern("*"),
+                                       SelectChildName("c")),
+                                wildcardFanOut = true))
     }
 
     def verifySerialization(msg: AnyRef): Unit = {
       ser.deserialize(ser.serialize(msg).get, msg.getClass).get should ===(msg)
     }
-
   }
 }
-

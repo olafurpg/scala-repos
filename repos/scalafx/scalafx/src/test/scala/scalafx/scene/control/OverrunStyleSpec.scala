@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.control.OverrunStyle]]. */
 @RunWith(classOf[JUnitRunner])
-class OverrunStyleSpec extends SFXEnumDelegateSpec[jfxsc.OverrunStyle, OverrunStyle](
-  javaClass = classOf[jfxsc.OverrunStyle],
-  scalaClass = classOf[OverrunStyle],
-  companion = OverrunStyle)
+class OverrunStyleSpec
+    extends SFXEnumDelegateSpec[jfxsc.OverrunStyle, OverrunStyle](
+        javaClass = classOf[jfxsc.OverrunStyle],
+        scalaClass = classOf[OverrunStyle],
+        companion = OverrunStyle)

@@ -7,22 +7,30 @@ import org.jetbrains.plugins.scala.overrideImplement.ScalaOIUtil
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 
 /**
- * @author Alefas
- * @since 14.05.12
- */
-class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * @author Alefas
+  * @since 14.05.12
+  */
+class ScalaOverrideImplementTest
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
 
-  def runTest(methodName: String, fileText: String, expectedText: String, isImplement: Boolean,
+  def runTest(methodName: String,
+              fileText: String,
+              expectedText: String,
+              isImplement: Boolean,
               needsInferType: Boolean = true) {
-    configureFromFileTextAdapter("dummy.scala", fileText.replace("\r", "").stripMargin.trim)
+    configureFromFileTextAdapter(
+        "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = needsInferType
-    ScalaOIUtil.invokeOverrideImplement(getProjectAdapter, getEditorAdapter, getFileAdapter, isImplement, methodName)
+    ScalaOIUtil.invokeOverrideImplement(getProjectAdapter,
+                                        getEditorAdapter,
+                                        getFileAdapter,
+                                        isImplement,
+                                        methodName)
     checkResultByText(expectedText.replace("\r", "").stripMargin.trim)
   }
 
   def testFoo() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class Foo extends b {
@@ -32,8 +40,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  def foo(x: b): b
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |class Foo extends b {
@@ -50,8 +57,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testEmptyLinePos() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |class Empty extends b {
         |  def foo(): Int = 3
@@ -65,8 +71,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  def too: b
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |class Empty extends b {
         |  def foo(): Int = 3
@@ -84,8 +89,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testNewLineBetweenMethods() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class MethodsNewLine extends b {
@@ -95,8 +99,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  def too: b
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |class MethodsNewLine extends b {
@@ -115,8 +118,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testNewLineUpper() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class UpperNewLine extends b {
@@ -127,8 +129,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  def too: b
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |class UpperNewLine extends b {
@@ -148,8 +149,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testOverrideFunction() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class A {
@@ -182,8 +182,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testImplementTypeAlias() {
-    val fileText =
-      """
+    val fileText = """
         |package Y
         |trait Aa {
         |  type K
@@ -194,8 +193,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  def y(): Int = 3
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package Y
         |trait Aa {
         |  type K
@@ -215,8 +213,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testOverrideValue() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class A {
@@ -227,8 +224,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  <caret>
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |class A {
@@ -246,8 +242,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testOverrideVar() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class A {
@@ -259,8 +254,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  def y(): Int = 3
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |class A {
@@ -281,8 +275,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testImplementFromSelfType() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |trait A {
@@ -293,8 +286,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  <caret>
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |trait A {
@@ -312,8 +304,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testOverrideFromSelfType() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |trait A {
@@ -343,8 +334,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testTypeAlias() {
-    val fileText =
-      """
+    val fileText = """
         |class ImplementTypeAlias extends b {
         |  <caret>
         |}
@@ -352,8 +342,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  type L
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |class ImplementTypeAlias extends b {
         |  type L = <selection>this.type</selection>
         |}
@@ -368,8 +357,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testVal() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class Val extends b {
@@ -379,8 +367,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  val too: b
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |class Val extends b {
@@ -397,8 +384,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testVar() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class Var extends b {
@@ -408,8 +394,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  var too: b
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |class Var extends b {
@@ -426,8 +411,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testMap() {
-    val fileText =
-      """
+    val fileText = """
         |class ExtendsMap[K, V] extends java.util.Map[K, V] {
         |  <caret>
         |}
@@ -447,8 +431,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testClassTypeParam() {
-    val fileText =
-      """
+    val fileText = """
         |class A[T] {
         |  def foo: T = new T
         |}
@@ -474,8 +457,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testHardSubstituting() {
-    val fileText =
-      """
+    val fileText = """
         |class A[T] {
         |  def foo(x: (T) => T, y: (T, Int) => T): Double = 1.0
         |}
@@ -501,8 +483,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSimpleTypeParam() {
-    val fileText =
-      """
+    val fileText = """
         |abstract class A {
         |  def foo[T](x: T): T
         |}
@@ -510,8 +491,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  <caret>
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |abstract class A {
         |  def foo[T](x: T): T
         |}
@@ -526,8 +506,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSCL1997() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |trait Foo {
@@ -538,8 +517,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  <caret>
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |trait Foo {
@@ -557,8 +535,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSCL1999() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |trait Parent {
@@ -588,8 +565,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSCL2540() {
-    val fileText =
-      """
+    val fileText = """
         |class A {
         |  def foo(x_ : Int) = 1
         |}
@@ -615,8 +591,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSCL2010() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class Parent {
@@ -646,8 +621,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSCL2052A() {
-    val fileText =
-      """
+    val fileText = """
         |class A {
         |  type ID[X] = X
         |  def foo(in: ID[String]): ID[Int] = null
@@ -675,8 +649,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSCL2052B() {
-    val fileText =
-      """
+    val fileText = """
         |class A {
         |  type ID[X] = X
         |  val foo: ID[Int] = null
@@ -686,8 +659,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  <caret>
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |class A {
         |  type ID[X] = X
         |  val foo: ID[Int] = null
@@ -704,8 +676,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSCL2052C() {
-    val fileText =
-      """
+    val fileText = """
         |class A {
         |  type F = (Int => String)
         |  def foo(f: F): Any = null
@@ -733,8 +704,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSCL3808() {
-    val fileText =
-      """
+    val fileText = """
         |trait TC[_]
         |
         |class A {
@@ -764,8 +734,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testSCL3305() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |object A {
@@ -817,8 +786,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testUnitReturn() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class Foo extends b {
@@ -828,8 +796,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  def foo(x: b): Unit
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |package test
         |
         |class Foo extends b {
@@ -846,8 +813,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testUnitInferredReturn() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class Foo extends b {
@@ -875,8 +841,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testInferredReturn() {
-    val fileText =
-      """
+    val fileText = """
         |package test
         |
         |class Foo extends b {
@@ -904,8 +869,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testNoExplicitReturn() {
-    val fileText =
-      """
+    val fileText = """
         |class A {
         |  def foo(x : Int): Int = 1
         |}
@@ -931,8 +895,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testImplicitParams() {
-    val fileText =
-      """
+    val fileText = """
         |trait A {
         |  def foo(x : Int)(implicit name: String): Int = name + x
         |}
@@ -958,8 +921,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testProtectedMethod() {
-    val fileText =
-      """
+    val fileText = """
         |abstract class A {
         |  protected def foo(): Unit
         |}
@@ -968,8 +930,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
         |  <caret>
         |}
       """
-    val expectedText =
-      """
+    val expectedText = """
         |abstract class A {
         |  protected def foo(): Unit
         |}
@@ -985,16 +946,14 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testProtectedMethodNoBody() {
-    val fileText =
-      """
+    val fileText = """
         |abstract class A {
         |  protected def foo(): Unit
         |}
         |
         |class B<caret> extends A
       """
-    val expectedText =
-      """
+    val expectedText = """
         |abstract class A {
         |  protected def foo(): Unit
         |}
@@ -1010,8 +969,7 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testOverrideProtectedMethodNoBody() {
-    val fileText =
-      """
+    val fileText = """
         |abstract class A {
         |  protected def foo(): Unit = {}
         |}
@@ -1033,5 +991,4 @@ class ScalaOverrideImplementTest extends ScalaLightPlatformCodeInsightTestCaseAd
     val needsInferType = true
     runTest(methodName, fileText, expectedText, isImplement, needsInferType)
   }
-
 }

@@ -80,11 +80,10 @@ object CometActorSpec extends Specification {
 
       comet ! TestMessage
 
-      val matchingMessage =
-        comet.receivedMessages.collect {
-          case PartialUpdateMsg(update) =>
-            update()
-        }
+      val matchingMessage = comet.receivedMessages.collect {
+        case PartialUpdateMsg(update) =>
+          update()
+      }
 
       matchingMessage must beLike {
         case List(RedirectTo(redirectUri)) =>

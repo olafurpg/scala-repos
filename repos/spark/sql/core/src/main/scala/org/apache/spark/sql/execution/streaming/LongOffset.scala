@@ -18,14 +18,15 @@
 package org.apache.spark.sql.execution.streaming
 
 /**
- * A simple offset for sources that produce a single linear stream of data.
- */
+  * A simple offset for sources that produce a single linear stream of data.
+  */
 case class LongOffset(offset: Long) extends Offset {
 
   override def compareTo(other: Offset): Int = other match {
     case l: LongOffset => offset.compareTo(l.offset)
     case _ =>
-      throw new IllegalArgumentException(s"Invalid comparison of $getClass with ${other.getClass}")
+      throw new IllegalArgumentException(
+          s"Invalid comparison of $getClass with ${other.getClass}")
   }
 
   def +(increment: Long): LongOffset = new LongOffset(offset + increment)

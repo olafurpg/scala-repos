@@ -6,11 +6,11 @@ import com.sun.jdi.BooleanValue
 import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
 
 /**
- * User: Alefas
- * Date: 20.10.11
- */
-
-class ScalaDoStmtEvaluator(cond: Evaluator, expr: Evaluator) extends Evaluator {
+  * User: Alefas
+  * Date: 20.10.11
+  */
+class ScalaDoStmtEvaluator(cond: Evaluator, expr: Evaluator)
+    extends Evaluator {
   def evaluate(context: EvaluationContextImpl): AnyRef = {
     expr.evaluate(context)
     var condition: Boolean = cond.evaluate(context) match {

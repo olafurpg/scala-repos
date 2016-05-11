@@ -19,8 +19,11 @@ object BasicCommandStrings {
   /** The command name to terminate the program.*/
   val TerminateAction: String = Exit
 
-  def helpBrief = (HelpCommand, s"Displays this help message or prints detailed help on requested commands (run '$HelpCommand <command>').")
-  def helpDetailed = HelpCommand + """
+  def helpBrief =
+    (HelpCommand,
+     s"Displays this help message or prints detailed help on requested commands (run '$HelpCommand <command>').")
+  def helpDetailed =
+    HelpCommand + """
 
 	Prints a help summary.
 
@@ -28,27 +31,34 @@ object BasicCommandStrings {
 
 	Prints detailed help for command <command>.
 
-""" + HelpCommand + """ <regular expression>
+""" + HelpCommand +
+    """ <regular expression>
 
 	Searches the help according to the provided regular expression.
 """
 
-  def CompletionsDetailed = "Displays a list of completions for the given argument string (run 'completions <string>')."
+  def CompletionsDetailed =
+    "Displays a list of completions for the given argument string (run 'completions <string>')."
   def CompletionsBrief = (CompletionsCommand, CompletionsDetailed)
 
-  def HistoryHelpBrief = (HistoryCommands.Start -> "History command help.  Lists and describes all history commands.")
-  def historyHelp = Help(Nil, (HistoryHelpBrief +: HistoryCommands.descriptions).toMap, Set(HistoryCommands.Start))
+  def HistoryHelpBrief =
+    (HistoryCommands.Start -> "History command help.  Lists and describes all history commands.")
+  def historyHelp =
+    Help(Nil,
+         (HistoryHelpBrief +: HistoryCommands.descriptions).toMap,
+         Set(HistoryCommands.Start))
 
   def exitBrief = "Terminates the build."
 
-  def logLevelHelp =
-    {
-      val levels = Level.values.toSeq
-      val levelList = levels.mkString(", ")
-      val brief = ("<log-level>", "Sets the logging level to 'log-level'.  Valid levels: " + levelList)
-      val detailed = levels.map(l => (l.toString, logLevelDetail(l))).toMap
-      Help(brief, detailed)
-    }
+  def logLevelHelp = {
+    val levels = Level.values.toSeq
+    val levelList = levels.mkString(", ")
+    val brief =
+      ("<log-level>",
+       "Sets the logging level to 'log-level'.  Valid levels: " + levelList)
+    val detailed = levels.map(l => (l.toString, logLevelDetail(l))).toMap
+    Help(brief, detailed)
+  }
   private[this] def logLevelDetail(level: Level.Value): String =
     s"""$level
 
@@ -65,17 +75,20 @@ ${runEarly(level.toString)}
 """
 
   def runEarly(command: String) = {
-    val sep = if (command.isEmpty || Character.isLetter(command.charAt(0))) "" else " "
+    val sep =
+      if (command.isEmpty || Character.isLetter(command.charAt(0))) "" else " "
     s"$EarlyCommand$sep$command"
   }
   private[sbt] def isEarlyCommand(s: String): Boolean = {
-    s.startsWith(EarlyCommand) && s != Compat.FailureWall && s != Compat.ClearOnFailure
+    s.startsWith(EarlyCommand) && s != Compat.FailureWall &&
+    s != Compat.ClearOnFailure
   }
 
   val EarlyCommand = "--"
-  val EarlyCommandBrief = (s"$EarlyCommand<command>", "Schedules a command to run before other commands on startup.")
-  val EarlyCommandDetailed =
-    s"""$EarlyCommand<command>
+  val EarlyCommandBrief =
+    (s"$EarlyCommand<command>",
+     "Schedules a command to run before other commands on startup.")
+  val EarlyCommandDetailed = s"""$EarlyCommand<command>
 
 	Schedules an early command, which will be run before other commands on the command line.
 	The order is preserved between all early commands, so `sbt --a --b` executes `a` and `b` in order.
@@ -84,7 +97,8 @@ ${runEarly(level.toString)}
   def ReadCommand = "<"
   def ReadFiles = " file1 file2 ..."
   def ReadDetailed =
-    ReadCommand + ReadFiles + """
+    ReadCommand + ReadFiles +
+    """
 
 	Reads the lines from the given files and inserts them as commands.
 	All empty lines and lines that start with '#' are ignored.
@@ -98,7 +112,8 @@ ${runEarly(level.toString)}
 
   def ApplyCommand = "apply"
   def ApplyDetailed =
-    ApplyCommand + """ [-cp|-classpath <classpath>] <module-name>*
+    ApplyCommand +
+    """ [-cp|-classpath <classpath>] <module-name>*
 	Transforms the current State by calling <module-name>.apply(currentState) for each listed module name.
 	Here, currentState is of type sbt.State.
    If a classpath is provided, modules are loaded from a new class loader for this classpath.
@@ -106,7 +121,8 @@ ${runEarly(level.toString)}
 
   def RebootCommand = "reboot"
   def RebootDetailed =
-    RebootCommand + """ [full]
+    RebootCommand +
+    """ [full]
 
 	This command is equivalent to exiting sbt, restarting, and running the
 	  remaining commands with the exception that the JVM is not shut down.
@@ -116,7 +132,9 @@ ${runEarly(level.toString)}
 	  and is useful when working with development versions of sbt or Scala."""
 
   def Multi = ";"
-  def MultiBrief = (Multi + " <command> (" + Multi + " <command>)*", "Runs the provided semicolon-separated commands.")
+  def MultiBrief =
+    (Multi + " <command> (" + Multi + " <command>)*",
+     "Runs the provided semicolon-separated commands.")
   def MultiDetailed =
     Multi + " command1 " + Multi + """ command2 ...
 
@@ -134,25 +152,24 @@ ${runEarly(level.toString)}
 
 	Prints a list of defined aliases.
 
-""" +
-      AliasCommand + """ name
+""" + AliasCommand + """ name
 
 	Prints the alias defined for `name`.
 
-""" +
-      AliasCommand + """ name=value
+""" + AliasCommand +
+    """ name=value
 
 	Sets the alias `name` to `value`, replacing any existing alias with that name.
 	Whenever `name` is entered, the corresponding `value` is run.
 	If any argument is provided to `name`, it is appended as argument to `value`.
 
-""" +
-      AliasCommand + """ name=
+""" + AliasCommand + """ name=
 
 	Removes the alias for `name`."""
 
   def Shell = "shell"
-  def ShellDetailed = "Provides an interactive prompt from which commands can be run."
+  def ShellDetailed =
+    "Provides an interactive prompt from which commands can be run."
 
   def StashOnFailure = "sbtStashOnFailure"
   def PopOnFailure = "sbtPopOnFailure"
@@ -163,10 +180,14 @@ ${runEarly(level.toString)}
     def OnFailure = "-"
     def ClearOnFailure = "--"
     def FailureWall = "---"
-    def OnFailureDeprecated = deprecatedAlias(OnFailure, BasicCommandStrings.OnFailure)
-    def ClearOnFailureDeprecated = deprecatedAlias(ClearOnFailure, BasicCommandStrings.ClearOnFailure)
-    def FailureWallDeprecated = deprecatedAlias(FailureWall, BasicCommandStrings.FailureWall)
-    private[this] def deprecatedAlias(oldName: String, newName: String): String =
+    def OnFailureDeprecated =
+      deprecatedAlias(OnFailure, BasicCommandStrings.OnFailure)
+    def ClearOnFailureDeprecated =
+      deprecatedAlias(ClearOnFailure, BasicCommandStrings.ClearOnFailure)
+    def FailureWallDeprecated =
+      deprecatedAlias(FailureWall, BasicCommandStrings.FailureWall)
+    private[this] def deprecatedAlias(
+        oldName: String, newName: String): String =
       s"The `$oldName` command is deprecated in favor of `$newName` and will be removed in 0.14.0"
   }
 
@@ -175,7 +196,8 @@ ${runEarly(level.toString)}
   def ClearOnFailure = "sbtClearOnFailure"
   def OnFailure = "onFailure"
   def OnFailureDetailed =
-    OnFailure + """ command
+    OnFailure +
+    """ command
 
 	Registers 'command' to run when a command fails to complete normally.
 
@@ -186,13 +208,16 @@ ${runEarly(level.toString)}
 	  again if desired."""
 
   def IfLast = "iflast"
-  def IfLastCommon = "If there are no more commands after this one, 'command' is run."
+  def IfLastCommon =
+    "If there are no more commands after this one, 'command' is run."
   def IfLastDetailed =
     IfLast + """ <command>
 
 	""" + IfLastCommon
 
   val ContinuousExecutePrefix = "~"
-  def continuousDetail = "Executes the specified command whenever source files change."
-  def continuousBriefHelp = (ContinuousExecutePrefix + " <command>", continuousDetail)
+  def continuousDetail =
+    "Executes the specified command whenever source files change."
+  def continuousBriefHelp =
+    (ContinuousExecutePrefix + " <command>", continuousDetail)
 }

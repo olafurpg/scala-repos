@@ -3,6 +3,6 @@ class C1 {
 }
 
 class C2 extends C1 {
-  println(/* line: 2 */ CO.getClass)
-  println(classOf[/* resolved: false */ CO])
+  println( /* line: 2 */ CO.getClass)
+  println(classOf[ /* resolved: false */ CO])
 }

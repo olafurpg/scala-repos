@@ -1,6 +1,6 @@
 package scala
 
-import java.lang.reflect.{ AccessibleObject => jAccessibleObject }
+import java.lang.reflect.{AccessibleObject => jAccessibleObject}
 
 package object reflect {
 
@@ -15,29 +15,29 @@ package object reflect {
   // because its Byte, Short and so on factory fields are incompatible with ClassTag's
 
   /** A `ClassManifest[T]` is an opaque descriptor for type `T`.
-   *  It is used by the compiler to preserve information necessary
-   *  for instantiating `Arrays` in those cases where the element type
-   *  is unknown at compile time.
-   *
-   *  The type-relation operators make an effort to present a more accurate
-   *  picture than can be realized with erased types, but they should not be
-   *  relied upon to give correct answers. In particular they are likely to
-   *  be wrong when variance is involved or when a subtype has a different
-   *  number of type arguments than a supertype.
-   */
+    *  It is used by the compiler to preserve information necessary
+    *  for instantiating `Arrays` in those cases where the element type
+    *  is unknown at compile time.
+    *
+    *  The type-relation operators make an effort to present a more accurate
+    *  picture than can be realized with erased types, but they should not be
+    *  relied upon to give correct answers. In particular they are likely to
+    *  be wrong when variance is involved or when a subtype has a different
+    *  number of type arguments than a supertype.
+    */
   @deprecated("Use scala.reflect.ClassTag instead", "2.10.0")
   @annotation.implicitNotFound(msg = "No ClassManifest available for ${T}.")
-  type ClassManifest[T]  = scala.reflect.ClassTag[T]
+  type ClassManifest[T] = scala.reflect.ClassTag[T]
 
   /** The object `ClassManifest` defines factory methods for manifests.
-   *  It is intended for use by the compiler and should not be used in client code.
-   */
+    *  It is intended for use by the compiler and should not be used in client code.
+    */
   @deprecated("Use scala.reflect.ClassTag instead", "2.10.0")
   val ClassManifest = ClassManifestFactory
 
   /** The object `Manifest` defines factory methods for manifests.
-   *  It is intended for use by the compiler and should not be used in client code.
-   */
+    *  It is intended for use by the compiler and should not be used in client code.
+    */
   // TODO undeprecated until Scala reflection becomes non-experimental
   // @deprecated("Use scala.reflect.ClassTag (to capture erasures), scala.reflect.runtime.universe.TypeTag (to capture types) or both instead", "2.10.0")
   val Manifest = ManifestFactory
@@ -45,13 +45,12 @@ package object reflect {
   def classTag[T](implicit ctag: ClassTag[T]) = ctag
 
   /** Make a java reflection object accessible, if it is not already
-   *  and it is possible to do so. If a SecurityException is thrown in the
-   *  attempt, it is caught and discarded.
-   */
+    *  and it is possible to do so. If a SecurityException is thrown in the
+    *  attempt, it is caught and discarded.
+    */
   def ensureAccessible[T <: jAccessibleObject](m: T): T = {
     if (!m.isAccessible) {
-      try m setAccessible true
-      catch { case _: SecurityException => } // does nothing
+      try m setAccessible true catch { case _: SecurityException => } // does nothing
     }
     m
   }

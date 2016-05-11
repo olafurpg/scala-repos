@@ -1,9 +1,9 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
-import akka.actor.{ Actor, ActorRef, Props }
+import akka.actor.{Actor, ActorRef, Props}
 import akka.stream.ActorMaterializer
 import akka.stream.Attributes.inputBuffer
 import akka.stream.testkit.Utils._
@@ -45,7 +45,6 @@ object ActorRefBackpressureSinkSpec {
         ref forward msg
     }
   }
-
 }
 
 class ActorRefBackpressureSinkSpec extends AkkaSpec {
@@ -53,14 +52,15 @@ class ActorRefBackpressureSinkSpec extends AkkaSpec {
   implicit val mat = ActorMaterializer()
 
   def createActor[T](c: Class[T]) =
-    system.actorOf(Props(c, testActor).withDispatcher("akka.test.stream-dispatcher"))
+    system.actorOf(
+        Props(c, testActor).withDispatcher("akka.test.stream-dispatcher"))
 
   "An ActorRefBackpressureSink" must {
 
     "send the elements to the ActorRef" in assertAllStagesStopped {
       val fw = createActor(classOf[Fw])
-      Source(List(1, 2, 3)).runWith(Sink.actorRefWithAck(fw,
-        initMessage, ackMessage, completeMessage))
+      Source(List(1, 2, 3)).runWith(
+          Sink.actorRefWithAck(fw, initMessage, ackMessage, completeMessage))
       expectMsg("start")
       expectMsg(1)
       expectMsg(2)
@@ -70,8 +70,10 @@ class ActorRefBackpressureSinkSpec extends AkkaSpec {
 
     "send the elements to the ActorRef2" in assertAllStagesStopped {
       val fw = createActor(classOf[Fw])
-      val probe = TestSource.probe[Int].to(Sink.actorRefWithAck(fw,
-        initMessage, ackMessage, completeMessage)).run()
+      val probe = TestSource
+        .probe[Int]
+        .to(Sink.actorRefWithAck(fw, initMessage, ackMessage, completeMessage))
+        .run()
       probe.sendNext(1)
       expectMsg("start")
       expectMsg(1)
@@ -85,8 +87,11 @@ class ActorRefBackpressureSinkSpec extends AkkaSpec {
 
     "cancel stream when actor terminates" in assertAllStagesStopped {
       val fw = createActor(classOf[Fw])
-      val publisher = TestSource.probe[Int].to(Sink.actorRefWithAck(fw,
-        initMessage, ackMessage, completeMessage)).run().sendNext(1)
+      val publisher = TestSource
+        .probe[Int]
+        .to(Sink.actorRefWithAck(fw, initMessage, ackMessage, completeMessage))
+        .run()
+        .sendNext(1)
       expectMsg(initMessage)
       expectMsg(1)
       system.stop(fw)
@@ -95,8 +100,10 @@ class ActorRefBackpressureSinkSpec extends AkkaSpec {
 
     "send message only when backpressure received" in assertAllStagesStopped {
       val fw = createActor(classOf[Fw2])
-      val publisher = TestSource.probe[Int].to(Sink.actorRefWithAck(fw,
-        initMessage, ackMessage, completeMessage)).run()
+      val publisher = TestSource
+        .probe[Int]
+        .to(Sink.actorRefWithAck(fw, initMessage, ackMessage, completeMessage))
+        .run()
       expectMsg(initMessage)
 
       publisher.sendNext(1)
@@ -119,10 +126,14 @@ class ActorRefBackpressureSinkSpec extends AkkaSpec {
       val bufferSize = 16
       val streamElementCount = bufferSize + 4
       val fw = createActor(classOf[Fw2])
-      val sink = Sink.actorRefWithAck(fw, initMessage, ackMessage, completeMessage)
+      val sink = Sink
+        .actorRefWithAck(fw, initMessage, ackMessage, completeMessage)
         .withAttributes(inputBuffer(bufferSize, bufferSize))
       val probe = Source(1 to streamElementCount)
-        .alsoToMat(Flow[Int].take(bufferSize).watchTermination()(Keep.right).to(Sink.ignore))(Keep.right)
+        .alsoToMat(Flow[Int]
+              .take(bufferSize)
+              .watchTermination()(Keep.right)
+              .to(Sink.ignore))(Keep.right)
         .to(sink)
         .run()
       probe.futureValue should ===(akka.Done)
@@ -137,10 +148,12 @@ class ActorRefBackpressureSinkSpec extends AkkaSpec {
 
     "work with one element buffer" in assertAllStagesStopped {
       val fw = createActor(classOf[Fw2])
-      val publisher =
-        TestSource.probe[Int].to(Sink.actorRefWithAck(fw,
-          initMessage, ackMessage, completeMessage)
-          .withAttributes(inputBuffer(1, 1))).run()
+      val publisher = TestSource
+        .probe[Int]
+        .to(Sink
+              .actorRefWithAck(fw, initMessage, ackMessage, completeMessage)
+              .withAttributes(inputBuffer(1, 1)))
+        .run()
 
       expectMsg(initMessage)
       fw ! TriggerAckMessage
@@ -168,7 +181,5 @@ class ActorRefBackpressureSinkSpec extends AkkaSpec {
         Source.single(()).runWith(badSink)
       }
     }
-
   }
-
 }

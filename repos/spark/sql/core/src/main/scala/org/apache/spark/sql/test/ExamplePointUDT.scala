@@ -21,12 +21,13 @@ import org.apache.spark.sql.catalyst.util.{ArrayData, GenericArrayData}
 import org.apache.spark.sql.types._
 
 /**
- * An example class to demonstrate UDT in Scala, Java, and Python.
- * @param x x coordinate
- * @param y y coordinate
- */
+  * An example class to demonstrate UDT in Scala, Java, and Python.
+  * @param x x coordinate
+  * @param y y coordinate
+  */
 @SQLUserDefinedType(udt = classOf[ExamplePointUDT])
-private[sql] class ExamplePoint(val x: Double, val y: Double) extends Serializable {
+private[sql] class ExamplePoint(val x: Double, val y: Double)
+    extends Serializable {
   override def equals(other: Any): Boolean = other match {
     case that: ExamplePoint => this.x == that.x && this.y == that.y
     case _ => false
@@ -34,8 +35,8 @@ private[sql] class ExamplePoint(val x: Double, val y: Double) extends Serializab
 }
 
 /**
- * User-defined type for [[ExamplePoint]].
- */
+  * User-defined type for [[ExamplePoint]].
+  */
 private[sql] class ExamplePointUDT extends UserDefinedType[ExamplePoint] {
 
   override def sqlType: DataType = ArrayType(DoubleType, false)

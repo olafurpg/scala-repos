@@ -28,5 +28,4 @@ class SaslSslEndToEndAuthorizationTest extends EndToEndAuthorizationTest {
   // client doesn't have a keystore. We want to cover the scenario where a broker requires either SSL client
   // authentication or SASL authentication with SSL as the transport layer (but not both).
   serverConfig.put(KafkaConfig.SslClientAuthProp, "required")
-
 }

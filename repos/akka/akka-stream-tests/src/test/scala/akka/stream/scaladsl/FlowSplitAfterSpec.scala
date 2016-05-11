@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import akka.NotUsed
@@ -18,10 +18,11 @@ import akka.stream.StreamSubscriptionTimeoutTerminationMode
 
 object FlowSplitAfterSpec {
 
-  implicit class Lift[M](val f: SubFlow[Int, M, Source[Int, M]#Repr, RunnableGraph[M]]) extends AnyVal {
+  implicit class Lift[M](
+      val f: SubFlow[Int, M, Source[Int, M]#Repr, RunnableGraph[M]])
+      extends AnyVal {
     def lift = f.prefixAndTail(0).map(_._2).concatSubstreams
   }
-
 }
 
 class FlowSplitAfterSpec extends AkkaSpec {
@@ -29,7 +30,8 @@ class FlowSplitAfterSpec extends AkkaSpec {
 
   val settings = ActorMaterializerSettings(system)
     .withInputBuffer(initialSize = 2, maxSize = 2)
-    .withSubscriptionTimeoutSettings(StreamSubscriptionTimeoutSettings(StreamSubscriptionTimeoutTerminationMode.cancel, 1.second))
+    .withSubscriptionTimeoutSettings(StreamSubscriptionTimeoutSettings(
+            StreamSubscriptionTimeoutTerminationMode.cancel, 1.second))
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -47,12 +49,15 @@ class FlowSplitAfterSpec extends AkkaSpec {
   }
 
   class SubstreamsSupport(
-    splitAfter: Int = 3,
-    elementCount: Int = 6,
-    substreamCancelStrategy: SubstreamCancelStrategy = SubstreamCancelStrategy.drain) {
+      splitAfter: Int = 3,
+      elementCount: Int = 6,
+      substreamCancelStrategy: SubstreamCancelStrategy = SubstreamCancelStrategy.drain) {
 
     val source = Source(1 to elementCount)
-    val groupStream = source.splitAfter(substreamCancelStrategy)(_ == splitAfter).lift.runWith(Sink.asPublisher(false))
+    val groupStream = source
+      .splitAfter(substreamCancelStrategy)(_ == splitAfter)
+      .lift
+      .runWith(Sink.asPublisher(false))
     val masterSubscriber = TestSubscriber.manualProbe[Source[Int, _]]()
 
     groupStream.subscribe(masterSubscriber)
@@ -67,7 +72,6 @@ class FlowSplitAfterSpec extends AkkaSpec {
       val substream = masterSubscriber.expectNext()
       substream
     }
-
   }
 
   "splitAfter" must {
@@ -120,10 +124,13 @@ class FlowSplitAfterSpec extends AkkaSpec {
 
     "work with single elem splits" in assertAllStagesStopped {
       Await.result(
-        Source(1 to 10).splitAfter(_ ⇒ true).lift
-          .mapAsync(1)(_.runWith(Sink.head)) // Please note that this line *also* implicitly asserts nonempty substreams
-          .grouped(10).runWith(Sink.head),
-        3.second) should ===(1 to 10)
+          Source(1 to 10)
+            .splitAfter(_ ⇒ true)
+            .lift
+            .mapAsync(1)(_.runWith(Sink.head)) // Please note that this line *also* implicitly asserts nonempty substreams
+            .grouped(10)
+            .runWith(Sink.head),
+          3.second) should ===(1 to 10)
     }
 
     "support cancelling substreams" in assertAllStagesStopped {
@@ -161,7 +168,8 @@ class FlowSplitAfterSpec extends AkkaSpec {
     "fail stream when splitAfter function throws" in assertAllStagesStopped {
       val publisherProbeProbe = TestPublisher.manualProbe[Int]()
       val exc = TE("test")
-      val publisher = Source.fromPublisher(publisherProbeProbe)
+      val publisher = Source
+        .fromPublisher(publisherProbeProbe)
         .splitAfter(elem ⇒ if (elem == 3) throw exc else elem % 3 == 0)
         .lift
         .runWith(Sink.asPublisher(false))
@@ -176,7 +184,8 @@ class FlowSplitAfterSpec extends AkkaSpec {
       upstreamSubscription.sendNext(1)
 
       val substream = subscriber.expectNext()
-      val substreamPuppet = StreamPuppet(substream.runWith(Sink.asPublisher(false)))
+      val substreamPuppet =
+        StreamPuppet(substream.runWith(Sink.asPublisher(false)))
 
       substreamPuppet.request(10)
       substreamPuppet.expectNext(1)
@@ -196,7 +205,8 @@ class FlowSplitAfterSpec extends AkkaSpec {
       pending
       val publisherProbeProbe = TestPublisher.manualProbe[Int]()
       val exc = TE("test")
-      val publisher = Source.fromPublisher(publisherProbeProbe)
+      val publisher = Source
+        .fromPublisher(publisherProbeProbe)
         .splitAfter(elem ⇒ if (elem == 3) throw exc else elem % 3 == 0)
         .lift
         .withAttributes(ActorAttributes.supervisionStrategy(resumingDecider))
@@ -212,7 +222,8 @@ class FlowSplitAfterSpec extends AkkaSpec {
       upstreamSubscription.sendNext(1)
 
       val substream1 = subscriber.expectNext()
-      val substreamPuppet1 = StreamPuppet(substream1.runWith(Sink.asPublisher(false)))
+      val substreamPuppet1 =
+        StreamPuppet(substream1.runWith(Sink.asPublisher(false)))
 
       substreamPuppet1.request(10)
       substreamPuppet1.expectNext(1)
@@ -231,7 +242,8 @@ class FlowSplitAfterSpec extends AkkaSpec {
       substreamPuppet1.expectNext(6)
       substreamPuppet1.expectComplete()
       val substream2 = subscriber.expectNext()
-      val substreamPuppet2 = StreamPuppet(substream2.runWith(Sink.asPublisher(false)))
+      val substreamPuppet2 =
+        StreamPuppet(substream2.runWith(Sink.asPublisher(false)))
       substreamPuppet2.request(10)
       upstreamSubscription.sendNext(7)
       substreamPuppet2.expectNext(7)
@@ -245,7 +257,12 @@ class FlowSplitAfterSpec extends AkkaSpec {
       val up = TestPublisher.manualProbe[Int]()
       val down = TestSubscriber.manualProbe[Source[Int, NotUsed]]()
 
-      val flowSubscriber = Source.asSubscriber[Int].splitAfter(_ % 3 == 0).lift.to(Sink.fromSubscriber(down)).run()
+      val flowSubscriber = Source
+        .asSubscriber[Int]
+        .splitAfter(_ % 3 == 0)
+        .lift
+        .to(Sink.fromSubscriber(down))
+        .run()
 
       val downstream = down.expectSubscription()
       downstream.cancel()
@@ -255,13 +272,13 @@ class FlowSplitAfterSpec extends AkkaSpec {
     }
 
     "support eager cancellation of master stream on cancelling substreams" in assertAllStagesStopped {
-      new SubstreamsSupport(splitAfter = 5, elementCount = 8, SubstreamCancelStrategy.propagate) {
+      new SubstreamsSupport(splitAfter = 5,
+                            elementCount = 8,
+                            SubstreamCancelStrategy.propagate) {
         val s1 = StreamPuppet(expectSubFlow().runWith(Sink.asPublisher(false)))
         s1.cancel()
         masterSubscriber.expectComplete()
       }
     }
-
   }
-
 }

@@ -31,11 +31,14 @@ private[datasources] object ParseModes {
     }
   }
 
-  def isDropMalformedMode(mode: String): Boolean = mode.toUpperCase == DROP_MALFORMED_MODE
-  def isFailFastMode(mode: String): Boolean = mode.toUpperCase == FAIL_FAST_MODE
-  def isPermissiveMode(mode: String): Boolean = if (isValidMode(mode))  {
-    mode.toUpperCase == PERMISSIVE_MODE
-  } else {
-    true // We default to permissive is the mode string is not valid
-  }
+  def isDropMalformedMode(mode: String): Boolean =
+    mode.toUpperCase == DROP_MALFORMED_MODE
+  def isFailFastMode(mode: String): Boolean =
+    mode.toUpperCase == FAIL_FAST_MODE
+  def isPermissiveMode(mode: String): Boolean =
+    if (isValidMode(mode)) {
+      mode.toUpperCase == PERMISSIVE_MODE
+    } else {
+      true // We default to permissive is the mode string is not valid
+    }
 }

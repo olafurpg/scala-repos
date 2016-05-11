@@ -10,28 +10,35 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScMethodCall, ScReferenceE
 import org.jetbrains.plugins.scala.lang.resolve.processor.CollectMethodsProcessor
 
 /**
- * Pavel Fatin
- */
-
-class JavaAccessorMethodCalledAsEmptyParenInspection extends AbstractMethodSignatureInspection(
-  "ScalaJavaAccessorMethodCalledAsEmptyParen", "Java accessor method called as empty-paren") {
+  * Pavel Fatin
+  */
+class JavaAccessorMethodCalledAsEmptyParenInspection
+    extends AbstractMethodSignatureInspection(
+        "ScalaJavaAccessorMethodCalledAsEmptyParen",
+        "Java accessor method called as empty-paren") {
 
   def actionFor(holder: ProblemsHolder) = {
-    case e: ScReferenceExpression => e.getParent match {
-      case call: ScMethodCall =>
-        call.getParent match {
-          case callParent: ScMethodCall => // do nothing
-          case _ => if (call.argumentExpressions.isEmpty) {
-            e.resolve() match {
-              case _: ScalaPsiElement => // do nothing
-              case (m: PsiMethod) if m.isAccessor && !isOverloadedMethod(e) && hasSameType(call, e) =>
-                holder.registerProblem(e.nameId, getDisplayName, new RemoveCallParentheses(call))
-              case _ =>
-            }
+    case e: ScReferenceExpression =>
+      e.getParent match {
+        case call: ScMethodCall =>
+          call.getParent match {
+            case callParent: ScMethodCall => // do nothing
+            case _ =>
+              if (call.argumentExpressions.isEmpty) {
+                e.resolve() match {
+                  case _: ScalaPsiElement => // do nothing
+                  case (m: PsiMethod)
+                      if m.isAccessor && !isOverloadedMethod(e) &&
+                      hasSameType(call, e) =>
+                    holder.registerProblem(e.nameId,
+                                           getDisplayName,
+                                           new RemoveCallParentheses(call))
+                  case _ =>
+                }
+              }
           }
-        }
-      case _ =>
-    }
+        case _ =>
+      }
   }
 
   private def isOverloadedMethod(ref: ScReferenceExpression) = {
@@ -42,8 +49,10 @@ class JavaAccessorMethodCalledAsEmptyParenInspection extends AbstractMethodSigna
 
   private def hasSameType(call: ScMethodCall, ref: ScReferenceExpression) = {
     val callType = call.getType().toOption
-    val refType = ref.getType().toOption
-    (callType, refType) match {
+    val refType = ref
+      .getType()
+      .toOption
+      (callType, refType) match {
       case (Some(t1), Some(t2)) => t1.equiv(t2)
       case _ => false
     }

@@ -1,7 +1,7 @@
 package mesosphere.marathon.integration.setup
 
 import mesosphere.marathon.integration.facades.MarathonFacade
-import org.scalatest.{ ConfigMap, Suite }
+import org.scalatest.{ConfigMap, Suite}
 import org.slf4j.LoggerFactory
 
 object MarathonClusterIntegrationTest {
@@ -13,12 +13,16 @@ object MarathonClusterIntegrationTest {
   *
   * The cluster sized is determined by [[IntegrationTestConfig.clusterSize]].
   */
-trait MarathonClusterIntegrationTest extends SingleMarathonIntegrationTest { self: Suite =>
-  lazy val marathonFacades: Seq[MarathonFacade] = config.marathonUrls.map(url => new MarathonFacade(url, testBasePath))
+trait MarathonClusterIntegrationTest extends SingleMarathonIntegrationTest {
+  self: Suite =>
+  lazy val marathonFacades: Seq[MarathonFacade] =
+    config.marathonUrls.map(url => new MarathonFacade(url, testBasePath))
 
   override protected def beforeAll(configMap: ConfigMap): Unit = {
     super.beforeAll(configMap)
-    val parameters = List("--master", config.master, "--event_subscriber", "http_callback") ++ extraMarathonParameters
-    config.marathonPorts.tail.foreach(port => startMarathon(port, parameters: _*))
+    val parameters =
+      List("--master", config.master, "--event_subscriber", "http_callback") ++ extraMarathonParameters
+    config.marathonPorts.tail
+      .foreach(port => startMarathon(port, parameters: _*))
   }
 }

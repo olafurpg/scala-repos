@@ -18,6 +18,7 @@ object Test extends App {
   try {
     val v: A.x.I = A.code.eval
   } catch {
-    case ex: InvocationTargetException if ex.getCause.isInstanceOf[NotImplementedError] =>
+    case ex: InvocationTargetException
+        if ex.getCause.isInstanceOf[NotImplementedError] =>
   }
 }

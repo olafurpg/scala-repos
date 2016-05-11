@@ -26,16 +26,17 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK
 
 /** Holds a cached logical plan and its data */
-private[sql] case class CachedData(plan: LogicalPlan, cachedRepresentation: InMemoryRelation)
+private[sql] case class CachedData(
+    plan: LogicalPlan, cachedRepresentation: InMemoryRelation)
 
 /**
- * Provides support in a SQLContext for caching query results and automatically using these cached
- * results when subsequent queries are executed.  Data is cached using byte buffers stored in an
- * InMemoryRelation.  This relation is automatically substituted query plans that return the
- * `sameResult` as the originally cached query.
- *
- * Internal to Spark SQL.
- */
+  * Provides support in a SQLContext for caching query results and automatically using these cached
+  * results when subsequent queries are executed.  Data is cached using byte buffers stored in an
+  * InMemoryRelation.  This relation is automatically substituted query plans that return the
+  * `sameResult` as the originally cached query.
+  *
+  * Internal to Spark SQL.
+  */
 private[sql] class CacheManager extends Logging {
 
   @transient
@@ -74,10 +75,10 @@ private[sql] class CacheManager extends Logging {
   }
 
   /**
-   * Caches the data produced by the logical representation of the given [[Queryable]].
-   * Unlike `RDD.cache()`, the default storage level is set to be `MEMORY_AND_DISK` because
-   * recomputing the in-memory columnar representation of the underlying table is expensive.
-   */
+    * Caches the data produced by the logical representation of the given [[Queryable]].
+    * Unlike `RDD.cache()`, the default storage level is set to be `MEMORY_AND_DISK` because
+    * recomputing the in-memory columnar representation of the underlying table is expensive.
+    */
   private[sql] def cacheQuery(
       query: Queryable,
       tableName: Option[String] = None,
@@ -87,22 +88,22 @@ private[sql] class CacheManager extends Logging {
       logWarning("Asked to cache already cached data.")
     } else {
       val sqlContext = query.sqlContext
-      cachedData +=
-        CachedData(
+      cachedData += CachedData(
           planToCache,
-          InMemoryRelation(
-            sqlContext.conf.useCompression,
-            sqlContext.conf.columnBatchSize,
-            storageLevel,
-            sqlContext.executePlan(planToCache).executedPlan,
-            tableName))
+          InMemoryRelation(sqlContext.conf.useCompression,
+                           sqlContext.conf.columnBatchSize,
+                           storageLevel,
+                           sqlContext.executePlan(planToCache).executedPlan,
+                           tableName))
     }
   }
 
   /** Removes the data for the given [[Queryable]] from the cache */
-  private[sql] def uncacheQuery(query: Queryable, blocking: Boolean = true): Unit = writeLock {
+  private[sql] def uncacheQuery(
+      query: Queryable, blocking: Boolean = true): Unit = writeLock {
     val planToCache = query.queryExecution.analyzed
-    val dataIndex = cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))
+    val dataIndex =
+      cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))
     require(dataIndex >= 0, s"Table $query is not cached.")
     cachedData(dataIndex).cachedRepresentation.uncache(blocking)
     cachedData.remove(dataIndex)
@@ -112,27 +113,30 @@ private[sql] class CacheManager extends Logging {
     * if it's cached
     */
   private[sql] def tryUncacheQuery(
-      query: Queryable,
-      blocking: Boolean = true): Boolean = writeLock {
+      query: Queryable, blocking: Boolean = true): Boolean = writeLock {
     val planToCache = query.queryExecution.analyzed
-    val dataIndex = cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))
+    val dataIndex =
+      cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))
     val found = dataIndex >= 0
     if (found) {
-      cachedData(dataIndex).cachedRepresentation.cachedColumnBuffers.unpersist(blocking)
+      cachedData(dataIndex).cachedRepresentation.cachedColumnBuffers
+        .unpersist(blocking)
       cachedData.remove(dataIndex)
     }
     found
   }
 
   /** Optionally returns cached data for the given [[Queryable]] */
-  private[sql] def lookupCachedData(query: Queryable): Option[CachedData] = readLock {
-    lookupCachedData(query.queryExecution.analyzed)
-  }
+  private[sql] def lookupCachedData(query: Queryable): Option[CachedData] =
+    readLock {
+      lookupCachedData(query.queryExecution.analyzed)
+    }
 
   /** Optionally returns cached data for the given [[LogicalPlan]]. */
-  private[sql] def lookupCachedData(plan: LogicalPlan): Option[CachedData] = readLock {
-    cachedData.find(cd => plan.sameResult(cd.plan))
-  }
+  private[sql] def lookupCachedData(plan: LogicalPlan): Option[CachedData] =
+    readLock {
+      cachedData.find(cd => plan.sameResult(cd.plan))
+    }
 
   /** Replaces segments of the given logical plan with cached versions where possible. */
   private[sql] def useCachedData(plan: LogicalPlan): LogicalPlan = {
@@ -145,12 +149,13 @@ private[sql] class CacheManager extends Logging {
   }
 
   /**
-   * Invalidates the cache of any data that contains `plan`. Note that it is possible that this
-   * function will over invalidate.
-   */
+    * Invalidates the cache of any data that contains `plan`. Note that it is possible that this
+    * function will over invalidate.
+    */
   private[sql] def invalidateCache(plan: LogicalPlan): Unit = writeLock {
     cachedData.foreach {
-      case data if data.plan.collect { case p if p.sameResult(plan) => p }.nonEmpty =>
+      case data
+          if data.plan.collect { case p if p.sameResult(plan) => p }.nonEmpty =>
         data.cachedRepresentation.recache()
       case _ =>
     }

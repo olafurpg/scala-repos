@@ -8,8 +8,9 @@ class TestParsers extends JavaTokenParsers {
   lazy val coords: Parser[Coords] = {
     "[" ~> number ~ "," ~ number <~ "]" ^^ {
       case ~(~(x, ","), y) =>
-        /*start*/(x, y)/*end*/
-        Coords(x, y)   // <== wrong type mismatch for x and y
+        /*start*/
+        (x, y) /*end*/
+        Coords(x, y) // <== wrong type mismatch for x and y
     }
   }
 }

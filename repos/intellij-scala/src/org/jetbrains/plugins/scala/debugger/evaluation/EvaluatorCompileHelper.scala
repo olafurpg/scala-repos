@@ -6,11 +6,12 @@ import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.module.Module
 
 /**
- * Nikolay.Tropin
- * 2014-11-27
- */
+  * Nikolay.Tropin
+  * 2014-11-27
+  */
 object EvaluatorCompileHelper {
-  val EP_NAME = ExtensionPointName.create[EvaluatorCompileHelper]("org.intellij.scala.evaluatorCompileHelper")
+  val EP_NAME = ExtensionPointName.create[EvaluatorCompileHelper](
+      "org.intellij.scala.evaluatorCompileHelper")
 
   def needCompileServer = EP_NAME.getExtensions.isEmpty
 }
@@ -18,8 +19,8 @@ object EvaluatorCompileHelper {
 trait EvaluatorCompileHelper {
 
   /**
-   * @return Array of all classfiles generated from a given source with corresponding dot-separated full qualified names
-   *         (like "java.lang.Object" or "scala.None$")
-   */
+    * @return Array of all classfiles generated from a given source with corresponding dot-separated full qualified names
+    *         (like "java.lang.Object" or "scala.None$")
+    */
   def compile(fileText: String, module: Module): Array[(File, String)]
 }

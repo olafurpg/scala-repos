@@ -1,5 +1,3 @@
 package com
 
-package object `package` {
-
-}
+package object `package` {}

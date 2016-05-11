@@ -9,49 +9,52 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.HashMap
 
 /**
- * An ActivitySource provides access to observerable named variables.
- */
+  * An ActivitySource provides access to observerable named variables.
+  */
 trait ActivitySource[+T] {
+
   /**
-   * Returns an [[com.twitter.util.Activity]] for a named T-typed variable.
-   */
+    * Returns an [[com.twitter.util.Activity]] for a named T-typed variable.
+    */
   def get(name: String): Activity[T]
 
   /**
-   * Produces an ActivitySource which queries this ActivitySource, falling back to
-   * a secondary ActivitySource only when the primary result is ActivitySource.Failed.
-   *
-   * @param that the secondary ActivitySource
-   */
+    * Produces an ActivitySource which queries this ActivitySource, falling back to
+    * a secondary ActivitySource only when the primary result is ActivitySource.Failed.
+    *
+    * @param that the secondary ActivitySource
+    */
   def orElse[U >: T](that: ActivitySource[U]): ActivitySource[U] =
     new ActivitySource.OrElse(this, that)
 }
 
 object ActivitySource {
+
   /**
-   * A Singleton exception to indicate that an ActivitySource failed to find
-   * a named variable.
-   */
+    * A Singleton exception to indicate that an ActivitySource failed to find
+    * a named variable.
+    */
   object NotFound extends IllegalStateException
 
   /**
-   * An ActivitySource for observing file contents. Once observed,
-   * each file will be polled once per period.
-   */
-  def forFiles(period: Duration = 1.minute)(implicit timer: Timer): ActivitySource[Buf] =
+    * An ActivitySource for observing file contents. Once observed,
+    * each file will be polled once per period.
+    */
+  def forFiles(period: Duration = 1.minute)(
+      implicit timer: Timer): ActivitySource[Buf] =
     new CachingActivitySource(new FilePollingActivitySource(period)(timer))
 
   /**
-   * Create an ActivitySource for ClassLoader resources.
-   */
+    * Create an ActivitySource for ClassLoader resources.
+    */
   def forClassLoaderResources(
-    cl: ClassLoader = ClassLoader.getSystemClassLoader
+      cl: ClassLoader = ClassLoader.getSystemClassLoader
   ): ActivitySource[Buf] =
     new CachingActivitySource(new ClassLoaderActivitySource(cl))
 
   private[ActivitySource] class OrElse[T, U >: T](
       primary: ActivitySource[T], failover: ActivitySource[U])
-    extends ActivitySource[U] {
+      extends ActivitySource[U] {
     def get(name: String): Activity[U] = {
       primary.get(name) transform {
         case Activity.Failed(_) => failover.get(name)
@@ -62,10 +65,11 @@ object ActivitySource {
 }
 
 /**
- * A convenient wrapper for caching the results returned by the
- * underlying ActivitySource.
- */
-class CachingActivitySource[T](underlying: ActivitySource[T]) extends ActivitySource[T] {
+  * A convenient wrapper for caching the results returned by the
+  * underlying ActivitySource.
+  */
+class CachingActivitySource[T](underlying: ActivitySource[T])
+    extends ActivitySource[T] {
   import com.twitter.io.exp.ActivitySource._
 
   private[this] val refq = new ReferenceQueue[Activity[T]]
@@ -73,9 +77,9 @@ class CachingActivitySource[T](underlying: ActivitySource[T]) extends ActivitySo
   private[this] val reverse = new HashMap[WeakReference[Activity[T]], String]
 
   /**
-   * A caching proxy to the underlying ActivitySource. Vars are cached by
-   * name, and are tracked with WeakReferences.
-   */
+    * A caching proxy to the underlying ActivitySource. Vars are cached by
+    * name, and are tracked with WeakReferences.
+    */
   def get(name: String): Activity[T] = synchronized {
     gc()
     Option(forward.get(name)) flatMap { wr =>
@@ -92,14 +96,13 @@ class CachingActivitySource[T](underlying: ActivitySource[T]) extends ActivitySo
   }
 
   /**
-   * Remove garbage collected cache entries.
-   */
+    * Remove garbage collected cache entries.
+    */
   def gc(): Unit = synchronized {
     var ref = refq.poll()
     while (ref != null) {
       val key = reverse.remove(ref)
-      if (key != null)
-        forward.remove(key)
+      if (key != null) forward.remove(key)
 
       ref = refq.poll()
     }
@@ -107,12 +110,13 @@ class CachingActivitySource[T](underlying: ActivitySource[T]) extends ActivitySo
 }
 
 /**
- * An ActivitySource for observing the contents of a file with periodic polling.
- */
+  * An ActivitySource for observing the contents of a file with periodic polling.
+  */
 class FilePollingActivitySource private[exp](
-  period: Duration,
-  pool: FuturePool
-)(implicit timer: Timer) extends ActivitySource[Buf] {
+    period: Duration,
+    pool: FuturePool
+)(implicit timer: Timer)
+    extends ActivitySource[Buf] {
 
   private[exp] def this(period: Duration)(implicit timer: Timer) =
     this(period, FuturePool.unboundedPool)
@@ -126,8 +130,10 @@ class FilePollingActivitySource private[exp](
 
         if (file.exists()) {
           pool {
-            val reader = new InputStreamReader(
-              new FileInputStream(file), InputStreamReader.DefaultMaxBufferSize, pool)
+            val reader =
+              new InputStreamReader(new FileInputStream(file),
+                                    InputStreamReader.DefaultMaxBufferSize,
+                                    pool)
             Reader.readAll(reader) respond {
               case Return(buf) =>
                 value() = Activity.Ok(buf)
@@ -153,14 +159,16 @@ class FilePollingActivitySource private[exp](
 }
 
 /**
- * An ActivitySource for ClassLoader resources.
- */
-class ClassLoaderActivitySource private[exp](classLoader: ClassLoader, pool: FuturePool)
-  extends ActivitySource[Buf] {
+  * An ActivitySource for ClassLoader resources.
+  */
+class ClassLoaderActivitySource private[exp](
+    classLoader: ClassLoader, pool: FuturePool)
+    extends ActivitySource[Buf] {
 
   import com.twitter.io.exp.ActivitySource._
 
-  private[exp] def this(classLoader: ClassLoader) = this(classLoader, FuturePool.unboundedPool)
+  private[exp] def this(classLoader: ClassLoader) =
+    this(classLoader, FuturePool.unboundedPool)
 
   def get(name: String): Activity[Buf] = {
     // This Var is updated at most once since ClassLoader
@@ -175,8 +183,8 @@ class ClassLoaderActivitySource private[exp](classLoader: ClassLoader, pool: Fut
           classLoader.getResourceAsStream(name) match {
             case null => p.setValue(Activity.Failed(NotFound))
             case stream =>
-              val reader =
-                new InputStreamReader(stream, InputStreamReader.DefaultMaxBufferSize, pool)
+              val reader = new InputStreamReader(
+                  stream, InputStreamReader.DefaultMaxBufferSize, pool)
               Reader.readAll(reader) respond {
                 case Return(buf) =>
                   p.setValue(Activity.Ok(buf))

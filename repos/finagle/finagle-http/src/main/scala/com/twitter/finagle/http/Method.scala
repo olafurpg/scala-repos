@@ -1,10 +1,10 @@
 package com.twitter.finagle.http
 
 /**
- * Represents the HTTP method.
- *
- * For Java-friendly enums, see [[com.twitter.finagle.http.Methods]].
- */
+  * Represents the HTTP method.
+  *
+  * For Java-friendly enums, see [[com.twitter.finagle.http.Methods]].
+  */
 sealed abstract class Method(name: String) {
   override def toString: String = name
 }
@@ -23,13 +23,13 @@ object Method {
   private case class Custom(name: String) extends Method(name)
 
   /**
-   * Construct a Method.
-   *
-   * Note: We are conservative here and ignore the case of `name` for the
-   * common method types. This makes it impossible to construct a GET method,
-   * for example, accidentally with the wrong case. For other names, not part
-   * of the common methods, we observe the case.
-   */
+    * Construct a Method.
+    *
+    * Note: We are conservative here and ignore the case of `name` for the
+    * common method types. This makes it impossible to construct a GET method,
+    * for example, accidentally with the wrong case. For other names, not part
+    * of the common methods, we observe the case.
+    */
   def apply(name: String): Method = name.toUpperCase match {
     case "GET" => Get
     case "POST" => Post

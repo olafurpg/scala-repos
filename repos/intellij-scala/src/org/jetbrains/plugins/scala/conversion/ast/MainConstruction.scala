@@ -11,5 +11,6 @@ case class MainConstruction() extends IntermediateNode {
 
   def addChild(child: IntermediateNode) = children += child
 
-  def addChildren(inChildren: Array[IntermediateNode]) = children ++= inChildren
+  def addChildren(inChildren: Array[IntermediateNode]) =
+    children ++= inChildren
 }

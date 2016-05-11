@@ -11,12 +11,13 @@ object PublisherEvents {
   case object Cancel
 }
 
-trait PublisherEvents[T] {
-  self: EventRecorder =>
+trait PublisherEvents[T] { self: EventRecorder =>
 
   import PublisherEvents._
 
-  case class BoundedSubscription[T, U >: T](pr: Publisher[T], sr: Subscriber[U]) extends Subscription {
+  case class BoundedSubscription[T, U >: T](
+      pr: Publisher[T], sr: Subscriber[U])
+      extends Subscription {
     def cancel(): Unit = {
       record(Cancel)
     }
@@ -33,7 +34,8 @@ trait PublisherEvents[T] {
     }
   }
 
-  private def forSubscription(f: BoundedSubscription[T, _] => Any)(implicit ec: ExecutionContext): Future[Unit] = {
+  private def forSubscription(f: BoundedSubscription[T, _] => Any)(
+      implicit ec: ExecutionContext): Future[Unit] = {
     publisher.subscription.future.map { sn =>
       f(sn)
       ()

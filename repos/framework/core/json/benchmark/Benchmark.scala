@@ -11,7 +11,8 @@ trait Benchmark {
   }
 
   def repeat(count: Int)(f: => Any) = {
-    var i = 0; while (i < count) {
+    var i = 0;
+    while (i < count) {
       f
       i += 1
     }

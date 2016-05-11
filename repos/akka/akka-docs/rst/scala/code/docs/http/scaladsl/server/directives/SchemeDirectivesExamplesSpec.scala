@@ -7,10 +7,9 @@ import docs.http.scaladsl.server.RoutingSpec
 
 class SchemeDirectivesExamplesSpec extends RoutingSpec {
   "example-1" in {
-    val route =
-      extractScheme { scheme =>
-        complete(s"The scheme is '${scheme}'")
-      }
+    val route = extractScheme { scheme =>
+      complete(s"The scheme is '${scheme}'")
+    }
 
     // tests:
     Get("https://www.example.com/") ~> route ~> check {
@@ -28,15 +27,15 @@ class SchemeDirectivesExamplesSpec extends RoutingSpec {
         extract(_.request.uri) { uri ⇒
           redirect(uri.copy(scheme = "https"), MovedPermanently)
         }
-      } ~
-        scheme("https") {
-          complete(s"Safe and secure!")
-        }
+      } ~ scheme("https") {
+        complete(s"Safe and secure!")
+      }
 
     // tests:
     Get("http://www.example.com/hello") ~> route ~> check {
       status shouldEqual MovedPermanently
-      header[Location] shouldEqual Some(Location(Uri("https://www.example.com/hello")))
+      header[Location] shouldEqual Some(
+          Location(Uri("https://www.example.com/hello")))
     }
 
     Get("https://www.example.com/hello") ~> route ~> check {

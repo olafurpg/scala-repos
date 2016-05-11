@@ -32,54 +32,62 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 
 /**
- * Params for [[Word2Vec]] and [[Word2VecModel]].
- */
-private[feature] trait Word2VecBase extends Params
-  with HasInputCol with HasOutputCol with HasMaxIter with HasStepSize with HasSeed {
+  * Params for [[Word2Vec]] and [[Word2VecModel]].
+  */
+private[feature] trait Word2VecBase
+    extends Params with HasInputCol with HasOutputCol with HasMaxIter
+    with HasStepSize with HasSeed {
 
   /**
-   * The dimension of the code that you want to transform from words.
-   * Default: 100
-   * @group param
-   */
+    * The dimension of the code that you want to transform from words.
+    * Default: 100
+    * @group param
+    */
   final val vectorSize = new IntParam(
-    this, "vectorSize", "the dimension of codes after transforming from words")
+      this,
+      "vectorSize",
+      "the dimension of codes after transforming from words")
   setDefault(vectorSize -> 100)
 
   /** @group getParam */
   def getVectorSize: Int = $(vectorSize)
 
   /**
-   * The window size (context words from [-window, window]) default 5.
-   * @group expertParam
-   */
+    * The window size (context words from [-window, window]) default 5.
+    * @group expertParam
+    */
   final val windowSize = new IntParam(
-    this, "windowSize", "the window size (context words from [-window, window])")
+      this,
+      "windowSize",
+      "the window size (context words from [-window, window])")
   setDefault(windowSize -> 5)
 
   /** @group expertGetParam */
   def getWindowSize: Int = $(windowSize)
 
   /**
-   * Number of partitions for sentences of words.
-   * Default: 1
-   * @group param
-   */
+    * Number of partitions for sentences of words.
+    * Default: 1
+    * @group param
+    */
   final val numPartitions = new IntParam(
-    this, "numPartitions", "number of partitions for sentences of words")
+      this, "numPartitions", "number of partitions for sentences of words")
   setDefault(numPartitions -> 1)
 
   /** @group getParam */
   def getNumPartitions: Int = $(numPartitions)
 
   /**
-   * The minimum number of times a token must appear to be included in the word2vec model's
-   * vocabulary.
-   * Default: 5
-   * @group param
-   */
-  final val minCount = new IntParam(this, "minCount", "the minimum number of times a token must " +
-    "appear to be included in the word2vec model's vocabulary")
+    * The minimum number of times a token must appear to be included in the word2vec model's
+    * vocabulary.
+    * Default: 5
+    * @group param
+    */
+  final val minCount = new IntParam(
+      this,
+      "minCount",
+      "the minimum number of times a token must " +
+      "appear to be included in the word2vec model's vocabulary")
   setDefault(minCount -> 5)
 
   /** @group getParam */
@@ -89,22 +97,24 @@ private[feature] trait Word2VecBase extends Params
   setDefault(maxIter -> 1)
 
   /**
-   * Validate and transform the input schema.
-   */
+    * Validate and transform the input schema.
+    */
   protected def validateAndTransformSchema(schema: StructType): StructType = {
-    SchemaUtils.checkColumnType(schema, $(inputCol), new ArrayType(StringType, true))
+    SchemaUtils.checkColumnType(
+        schema, $(inputCol), new ArrayType(StringType, true))
     SchemaUtils.appendColumn(schema, $(outputCol), new VectorUDT)
   }
 }
 
 /**
- * :: Experimental ::
- * Word2Vec trains a model of `Map(String, Vector)`, i.e. transforms a word into a code for further
- * natural language processing or machine learning process.
- */
+  * :: Experimental ::
+  * Word2Vec trains a model of `Map(String, Vector)`, i.e. transforms a word into a code for further
+  * natural language processing or machine learning process.
+  */
 @Experimental
-final class Word2Vec(override val uid: String) extends Estimator[Word2VecModel] with Word2VecBase
-  with DefaultParamsWritable {
+final class Word2Vec(override val uid: String)
+    extends Estimator[Word2VecModel] with Word2VecBase
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("w2v"))
 
@@ -165,48 +175,50 @@ object Word2Vec extends DefaultParamsReadable[Word2Vec] {
 }
 
 /**
- * :: Experimental ::
- * Model fitted by [[Word2Vec]].
- */
+  * :: Experimental ::
+  * Model fitted by [[Word2Vec]].
+  */
 @Experimental
-class Word2VecModel private[ml] (
+class Word2VecModel private[ml](
     override val uid: String,
     @transient private val wordVectors: feature.Word2VecModel)
-  extends Model[Word2VecModel] with Word2VecBase with MLWritable {
+    extends Model[Word2VecModel] with Word2VecBase with MLWritable {
 
   import Word2VecModel._
 
   /**
-   * Returns a dataframe with two fields, "word" and "vector", with "word" being a String and
-   * and the vector the DenseVector that it is mapped to.
-   */
+    * Returns a dataframe with two fields, "word" and "vector", with "word" being a String and
+    * and the vector the DenseVector that it is mapped to.
+    */
   @transient lazy val getVectors: DataFrame = {
     val sc = SparkContext.getOrCreate()
     val sqlContext = SQLContext.getOrCreate(sc)
     import sqlContext.implicits._
-    val wordVec = wordVectors.getVectors.mapValues(vec => Vectors.dense(vec.map(_.toDouble)))
+    val wordVec = wordVectors.getVectors.mapValues(
+        vec => Vectors.dense(vec.map(_.toDouble)))
     sc.parallelize(wordVec.toSeq).toDF("word", "vector")
   }
 
   /**
-   * Find "num" number of words closest in similarity to the given word.
-   * Returns a dataframe with the words and the cosine similarities between the
-   * synonyms and the given word.
-   */
+    * Find "num" number of words closest in similarity to the given word.
+    * Returns a dataframe with the words and the cosine similarities between the
+    * synonyms and the given word.
+    */
   def findSynonyms(word: String, num: Int): DataFrame = {
     findSynonyms(wordVectors.transform(word), num)
   }
 
   /**
-   * Find "num" number of words closest to similarity to the given vector representation
-   * of the word. Returns a dataframe with the words and the cosine similarities between the
-   * synonyms and the given word vector.
-   */
+    * Find "num" number of words closest to similarity to the given vector representation
+    * of the word. Returns a dataframe with the words and the cosine similarities between the
+    * synonyms and the given word vector.
+    */
   def findSynonyms(word: Vector, num: Int): DataFrame = {
     val sc = SparkContext.getOrCreate()
     val sqlContext = SQLContext.getOrCreate(sc)
     import sqlContext.implicits._
-    sc.parallelize(wordVectors.findSynonyms(word, num)).toDF("word", "similarity")
+    sc.parallelize(wordVectors.findSynonyms(word, num))
+      .toDF("word", "similarity")
   }
 
   /** @group setParam */
@@ -216,9 +228,9 @@ class Word2VecModel private[ml] (
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
   /**
-   * Transform a sentence column to a vector column to represent the whole sentence. The transform
-   * is performed by averaging all word vectors it contains.
-   */
+    * Transform a sentence column to a vector column to represent the whole sentence. The transform
+    * is performed by averaging all word vectors it contains.
+    */
   override def transform(dataset: DataFrame): DataFrame = {
     transformSchema(dataset.schema, logging = true)
     val vectors = wordVectors.getVectors
@@ -259,16 +271,22 @@ class Word2VecModel private[ml] (
 @Since("1.6.0")
 object Word2VecModel extends MLReadable[Word2VecModel] {
 
-  private[Word2VecModel]
-  class Word2VecModelWriter(instance: Word2VecModel) extends MLWriter {
+  private[Word2VecModel] class Word2VecModelWriter(instance: Word2VecModel)
+      extends MLWriter {
 
-    private case class Data(wordIndex: Map[String, Int], wordVectors: Seq[Float])
+    private case class Data(
+        wordIndex: Map[String, Int], wordVectors: Seq[Float])
 
     override protected def saveImpl(path: String): Unit = {
       DefaultParamsWriter.saveMetadata(instance, path, sc)
-      val data = Data(instance.wordVectors.wordIndex, instance.wordVectors.wordVectors.toSeq)
+      val data = Data(instance.wordVectors.wordIndex,
+                      instance.wordVectors.wordVectors.toSeq)
       val dataPath = new Path(path, "data").toString
-      sqlContext.createDataFrame(Seq(data)).repartition(1).write.parquet(dataPath)
+      sqlContext
+        .createDataFrame(Seq(data))
+        .repartition(1)
+        .write
+        .parquet(dataPath)
     }
   }
 
@@ -279,7 +297,8 @@ object Word2VecModel extends MLReadable[Word2VecModel] {
     override def load(path: String): Word2VecModel = {
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val dataPath = new Path(path, "data").toString
-      val data = sqlContext.read.parquet(dataPath)
+      val data = sqlContext.read
+        .parquet(dataPath)
         .select("wordIndex", "wordVectors")
         .head()
       val wordIndex = data.getAs[Map[String, Int]](0)

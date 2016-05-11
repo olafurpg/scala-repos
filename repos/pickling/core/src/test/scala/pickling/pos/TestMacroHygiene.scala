@@ -4,9 +4,10 @@ import scala.pickling.{Unpickler, Pickler, PicklerUnpickler}
 import scala.reflect.runtime.universe.WeakTypeTag
 
 final case class HygieneTester(x: Option[Boolean], y: Seq[String])
+
 /**
- * Ensures we have pickling hygiene
- */
+  * Ensures we have pickling hygiene
+  */
 class TestMacroHygiene {
   import _root_.scala.pickling.Defaults._
   import _root_.scala.pickling.json._
@@ -24,7 +25,7 @@ class TestMacroHygiene {
   def hygiene(): Any = {
     val scala, Any, String, FastTypeTag, Unit = ()
     trait scala; trait Any; trait String; trait FastTypeTag; trait Unit;
-    implicit val hgt = PicklerUnpickler.generate[HygieneTester  ]
+    implicit val hgt = PicklerUnpickler.generate[HygieneTester]
     HygieneTester(Option(false), Seq("hi")).pickle.unpickle[HygieneTester]
   }
 }

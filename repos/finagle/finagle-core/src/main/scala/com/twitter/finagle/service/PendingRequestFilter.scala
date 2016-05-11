@@ -6,9 +6,9 @@ import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * A module which allows clients to limit the number of pending
- * requests per connection.
- */
+  * A module which allows clients to limit the number of pending
+  * requests per connection.
+  */
 object PendingRequestFilter {
 
   val role = Stack.Role("PendingRequestLimit")
@@ -35,21 +35,25 @@ object PendingRequestFilter {
       }
     }
 
-  val PendingRequestsLimitExceeded =
-    new RejectedExecutionException("Pending request limit exceeded")
+  val PendingRequestsLimitExceeded = new RejectedExecutionException(
+      "Pending request limit exceeded")
 }
 
 /**
- * A filter which limits the number of pending requests to a service.
- */
-private[finagle] class PendingRequestFilter[Req, Rep](limit: Int) extends SimpleFilter[Req, Rep] {
+  * A filter which limits the number of pending requests to a service.
+  */
+private[finagle] class PendingRequestFilter[Req, Rep](limit: Int)
+    extends SimpleFilter[Req, Rep] {
   import PendingRequestFilter._
 
   if (limit < 1)
-    throw new IllegalArgumentException(s"request limit must be greater than zero, saw $limit")
+    throw new IllegalArgumentException(
+        s"request limit must be greater than zero, saw $limit")
 
   private[this] val pending = new AtomicInteger(0)
-  private[this] val decFn: Any => Unit = { _: Any => pending.decrementAndGet() }
+  private[this] val decFn: Any => Unit = { _: Any =>
+    pending.decrementAndGet()
+  }
 
   def apply(req: Req, service: Service[Req, Rep]): Future[Rep] =
     // N.B. There's a race on the sad path of this filter when we increment and

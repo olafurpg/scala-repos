@@ -43,9 +43,9 @@ object WebDemo extends JFXApp {
     onAlert = (e: WebEvent[_]) => println("onAlert: " + e)
     onStatusChanged = (e: WebEvent[_]) => println("onStatusChanged: " + e)
     onResized = (e: WebEvent[_]) => println("onResized: " + e)
-    onVisibilityChanged = (e: WebEvent[_]) => println("onVisibilityChanged: " + e)
+    onVisibilityChanged = (e: WebEvent[_]) =>
+      println("onVisibilityChanged: " + e)
   }
-
 
   val engine = browser.engine
   engine.load("http://www.scalafx.org/")
@@ -55,7 +55,7 @@ object WebDemo extends JFXApp {
     hgrow = Priority.Always
     vgrow = Priority.Never
   }
-  txfUrl.onAction = handle {engine.load(txfUrl.text.get)}
+  txfUrl.onAction = handle { engine.load(txfUrl.text.get) }
 
   stage = new PrimaryStage {
     title = "ScalaFX Web Demo"
@@ -71,5 +71,4 @@ object WebDemo extends JFXApp {
       }
     }
   }
-
 }

@@ -5,8 +5,8 @@ import android.telephony.TelephonyManager
 import org.scaloid.common._
 
 /**
- * A general abstraction of something that can be start and stop.
- */
+  * A general abstraction of something that can be start and stop.
+  */
 trait Playable {
   protected var _running: Boolean = false
   protected var _startTime = 0L
@@ -28,8 +28,8 @@ trait Playable {
 }
 
 /**
- * Pause the running during the incoming call.
- */
+  * Pause the running during the incoming call.
+  */
 trait PauseOnCall extends Playable {
   implicit def ctx: Context
 
@@ -55,13 +55,13 @@ trait PauseOnCall extends Playable {
 }
 
 /**
- * Pause the running during the incoming call.
- */
+  * Pause the running during the incoming call.
+  */
 trait StopOnCall extends PauseOnCall {
   override protected def paused = false
 }
 
-import java.util.{ TimerTask, Timer }
+import java.util.{TimerTask, Timer}
 
 object UpdateEvent extends Enumeration {
   type UpdateEvent = Value
@@ -71,8 +71,8 @@ object UpdateEvent extends Enumeration {
 import UpdateEvent._
 
 /**
- * Provides event notifications of a Playable.
- */
+  * Provides event notifications of a Playable.
+  */
 abstract class PlayableConnector(activity: SActivity) {
   def playable: Option[Playable]
 

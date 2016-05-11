@@ -1,18 +1,18 @@
 class Outer {
-	class Inner
+  class Inner
 }
 
 object Obj {
- val outer = new Outer
- val inner = new outer.Inner
+  val outer = new Outer
+  val inner = new outer.Inner
 }
 
 object O {
- val o = new Outer
- val i = new o.Inner
- def m {
   val o = new Outer
-  val i = /*start*/new o.Inner/*end*/
- }
+  val i = new o.Inner
+  def m {
+    val o = new Outer
+    val i = /*start*/ new o.Inner /*end*/
+  }
 }
 //o.Inner

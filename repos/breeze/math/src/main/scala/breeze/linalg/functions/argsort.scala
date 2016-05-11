@@ -6,13 +6,15 @@ import breeze.macros.expand
 import breeze.util.{quickSelect, Sorting}
 
 /**
- * Returns a sequence of keys sorted by value
- *
- * @author dlwh
- **/
+  * Returns a sequence of keys sorted by value
+  *
+  * @author dlwh
+  **/
 object argsort extends UFunc with LowPriorityArgSort {
   @expand
-  implicit def argsortDenseVector[@expand.args(Int, Double, Float, Long) T]: Impl[DenseVector[T], IndexedSeq[Int]] = {
+  implicit def argsortDenseVector[
+      @expand.args(Int, Double, Float, Long) T]: Impl[
+      DenseVector[T], IndexedSeq[Int]] = {
     new Impl[DenseVector[T], IndexedSeq[Int]] {
       override def apply(v: DenseVector[T]): IndexedSeq[Int] = {
         val arr = VectorBuilder.range(v.length)
@@ -24,23 +26,25 @@ object argsort extends UFunc with LowPriorityArgSort {
   }
 }
 
-
 /**
- * Returns a sequence of keys sorted by value
- *
- * @author dlwh
- **/
+  * Returns a sequence of keys sorted by value
+  *
+  * @author dlwh
+  **/
 object argtopk extends UFunc with LowPriorityArgTopK {
 
-  implicit def argtopkDenseVector[T:Ordering]: Impl2[DenseVector[T], Int, IndexedSeq[Int]] = {
+  implicit def argtopkDenseVector[T : Ordering]: Impl2[
+      DenseVector[T], Int, IndexedSeq[Int]] = {
     new Impl2[DenseVector[T], Int, IndexedSeq[Int]] {
       override def apply(v: DenseVector[T], k: Int): IndexedSeq[Int] = {
-        implicit val orderingInt: Ordering[Int] = Ordering[T].on((x: Int) => v(x)).reverse
+        implicit val orderingInt: Ordering[Int] =
+          Ordering[T].on((x: Int) => v(x)).reverse
         val ints = VectorBuilder.range(v.length)
-        quickSelect.implFromOrdering[Int, collection.mutable.IndexedSeq[Int]].apply(ints:collection.mutable.IndexedSeq[Int], k)
+        quickSelect
+          .implFromOrdering[Int, collection.mutable.IndexedSeq[Int]]
+          .apply(ints: collection.mutable.IndexedSeq[Int], k)
         ints.take(k)
       }
     }
   }
-
 }

@@ -5,7 +5,7 @@ package play.api.libs.streams.impl
 
 import org.reactivestreams._
 import org.specs2.mutable.Specification
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -47,7 +47,6 @@ class FuturePublisherSpec extends Specification {
         s.cancel()
       }
     }
-
   }
 
   "FuturePublisher" should {
@@ -99,5 +98,4 @@ class FuturePublisherSpec extends Specification {
       testEnv.isEmptyAfterDelay() must beTrue
     }
   }
-
 }

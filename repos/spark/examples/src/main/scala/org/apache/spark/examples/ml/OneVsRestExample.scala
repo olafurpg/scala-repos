@@ -34,31 +34,31 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.SQLContext
 
 /**
- * An example runner for Multiclass to Binary Reduction with One Vs Rest.
- * The example uses Logistic Regression as the base classifier. All parameters that
- * can be specified on the base classifier can be passed in to the runner options.
- * Run with
- * {{{
- * ./bin/run-example ml.OneVsRestExample [options]
- * }}}
- * For local mode, run
- * {{{
- * ./bin/spark-submit --class org.apache.spark.examples.ml.OneVsRestExample --driver-memory 1g
- *   [examples JAR path] [options]
- * }}}
- * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
- */
+  * An example runner for Multiclass to Binary Reduction with One Vs Rest.
+  * The example uses Logistic Regression as the base classifier. All parameters that
+  * can be specified on the base classifier can be passed in to the runner options.
+  * Run with
+  * {{{
+  * ./bin/run-example ml.OneVsRestExample [options]
+  * }}}
+  * For local mode, run
+  * {{{
+  * ./bin/spark-submit --class org.apache.spark.examples.ml.OneVsRestExample --driver-memory 1g
+  *   [examples JAR path] [options]
+  * }}}
+  * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
+  */
 object OneVsRestExample {
 
-  case class Params private[ml] (
-      input: String = null,
-      testInput: Option[String] = None,
-      maxIter: Int = 100,
-      tol: Double = 1E-6,
-      fitIntercept: Boolean = true,
-      regParam: Option[Double] = None,
-      elasticNetParam: Option[Double] = None,
-      fracTest: Double = 0.2) extends AbstractParams[Params]
+  case class Params private[ml](input: String = null,
+                                testInput: Option[String] = None,
+                                maxIter: Int = 100,
+                                tol: Double = 1E-6,
+                                fitIntercept: Boolean = true,
+                                regParam: Option[Double] = None,
+                                elasticNetParam: Option[Double] = None,
+                                fracTest: Double = 0.2)
+      extends AbstractParams[Params]
 
   def main(args: Array[String]) {
     val defaultParams = Params()
@@ -71,22 +71,24 @@ object OneVsRestExample {
         .action((x, c) => c.copy(input = x))
       opt[Double]("fracTest")
         .text(s"fraction of data to hold out for testing.  If given option testInput, " +
-        s"this option is ignored. default: ${defaultParams.fracTest}")
+            s"this option is ignored. default: ${defaultParams.fracTest}")
         .action((x, c) => c.copy(fracTest = x))
       opt[String]("testInput")
-        .text("input path to test dataset.  If given, option fracTest is ignored")
+        .text(
+            "input path to test dataset.  If given, option fracTest is ignored")
         .action((x, c) => c.copy(testInput = Some(x)))
       opt[Int]("maxIter")
         .text(s"maximum number of iterations for Logistic Regression." +
-          s" default: ${defaultParams.maxIter}")
+            s" default: ${defaultParams.maxIter}")
         .action((x, c) => c.copy(maxIter = x))
       opt[Double]("tol")
-        .text(s"the convergence tolerance of iterations for Logistic Regression." +
-          s" default: ${defaultParams.tol}")
+        .text(
+            s"the convergence tolerance of iterations for Logistic Regression." +
+            s" default: ${defaultParams.tol}")
         .action((x, c) => c.copy(tol = x))
       opt[Boolean]("fitIntercept")
         .text(s"fit intercept for Logistic Regression." +
-        s" default: ${defaultParams.fitIntercept}")
+            s" default: ${defaultParams.fitIntercept}")
         .action((x, c) => c.copy(fitIntercept = x))
       opt[Double]("regParam")
         .text(s"the regularization parameter for Logistic Regression.")
@@ -96,17 +98,21 @@ object OneVsRestExample {
         .action((x, c) => c.copy(elasticNetParam = Some(x)))
       checkConfig { params =>
         if (params.fracTest < 0 || params.fracTest >= 1) {
-          failure(s"fracTest ${params.fracTest} value incorrect; should be in [0,1).")
+          failure(
+              s"fracTest ${params.fracTest} value incorrect; should be in [0,1).")
         } else {
           success
         }
       }
     }
-    parser.parse(args, defaultParams).map { params =>
-      run(params)
-    }.getOrElse {
-      sys.exit(1)
-    }
+    parser
+      .parse(args, defaultParams)
+      .map { params =>
+        run(params)
+      }
+      .getOrElse {
+        sys.exit(1)
+      }
   }
 
   private def run(params: Params) {
@@ -119,16 +125,18 @@ object OneVsRestExample {
     // compute the train/test split: if testInput is not provided use part of input.
     val data = params.testInput match {
       case Some(t) => {
-        // compute the number of features in the training set.
-        val numFeatures = inputData.first().getAs[Vector](1).size
-        val testData = sqlContext.read.option("numFeatures", numFeatures.toString)
-          .format("libsvm").load(t)
-        Array[DataFrame](inputData, testData)
-      }
+          // compute the number of features in the training set.
+          val numFeatures = inputData.first().getAs[Vector](1).size
+          val testData = sqlContext.read
+            .option("numFeatures", numFeatures.toString)
+            .format("libsvm")
+            .load(t)
+          Array[DataFrame](inputData, testData)
+        }
       case None => {
-        val f = params.fracTest
-        inputData.randomSplit(Array(1 - f, f), seed = 12345)
-      }
+          val f = params.fracTest
+          inputData.randomSplit(Array(1 - f, f), seed = 12345)
+        }
     }
     val Array(train, test) = data.map(_.cache())
 
@@ -154,8 +162,10 @@ object OneVsRestExample {
     val (predictionDuration, predictions) = time(ovrModel.transform(test))
 
     // evaluate the model
-    val predictionsAndLabels = predictions.select("prediction", "label")
-      .rdd.map(row => (row.getDouble(0), row.getDouble(1)))
+    val predictionsAndLabels = predictions
+      .select("prediction", "label")
+      .rdd
+      .map(row => (row.getDouble(0), row.getDouble(1)))
 
     val metrics = new MulticlassMetrics(predictionsAndLabels)
 
@@ -164,7 +174,8 @@ object OneVsRestExample {
     // compute the false positive rate per label
     val predictionColSchema = predictions.schema("prediction")
     val numClasses = MetadataUtils.getNumClasses(predictionColSchema).get
-    val fprs = Range(0, numClasses).map(p => (p, metrics.falsePositiveRate(p.toDouble)))
+    val fprs =
+      Range(0, numClasses).map(p => (p, metrics.falsePositiveRate(p.toDouble)))
 
     println(s" Training Time ${trainingDuration} sec\n")
 
@@ -174,7 +185,8 @@ object OneVsRestExample {
 
     println("label\tfpr")
 
-    println(fprs.map {case (label, fpr) => label + "\t" + fpr}.mkString("\n"))
+    println(
+        fprs.map { case (label, fpr) => label + "\t" + fpr }.mkString("\n"))
     // $example off$
 
     sc.stop()
@@ -182,7 +194,7 @@ object OneVsRestExample {
 
   private def time[R](block: => R): (Long, R) = {
     val t0 = System.nanoTime()
-    val result = block    // call-by-name
+    val result = block // call-by-name
     val t1 = System.nanoTime()
     (NANO.toSeconds(t1 - t0), result)
   }

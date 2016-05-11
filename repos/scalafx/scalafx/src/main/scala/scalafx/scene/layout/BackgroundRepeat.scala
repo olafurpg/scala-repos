@@ -32,7 +32,8 @@ import javafx.scene.{layout => jfxsl}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/BackgroundRepeat.html javafx.scene.layout.BackgroundRepeat]] */
-object BackgroundRepeat extends SFXEnumDelegateCompanion[jfxsl.BackgroundRepeat, BackgroundRepeat] {
+object BackgroundRepeat
+    extends SFXEnumDelegateCompanion[jfxsl.BackgroundRepeat, BackgroundRepeat] {
 
   /** The image is placed once and not repeated.     */
   val NoRepeat = new BackgroundRepeat(jfxsl.BackgroundRepeat.NO_REPEAT)
@@ -49,12 +50,16 @@ object BackgroundRepeat extends SFXEnumDelegateCompanion[jfxsl.BackgroundRepeat,
   val Space = new BackgroundRepeat(jfxsl.BackgroundRepeat.SPACE)
 
   protected override def unsortedValues: Array[BackgroundRepeat] = Array(
-    NoRepeat, Repeat, Round, Space
+      NoRepeat,
+      Repeat,
+      Round,
+      Space
   )
 }
 
 /**
- * Enumeration of options for repeating images in backgrounds
- */
-sealed case class BackgroundRepeat(override val delegate: jfxsl.BackgroundRepeat)
-  extends SFXEnumDelegate[jfxsl.BackgroundRepeat]
+  * Enumeration of options for repeating images in backgrounds
+  */
+sealed case class BackgroundRepeat(
+    override val delegate: jfxsl.BackgroundRepeat)
+    extends SFXEnumDelegate[jfxsl.BackgroundRepeat]

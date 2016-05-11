@@ -51,40 +51,42 @@ object Test1 extends TestUtil {
   println()
 
   print(new Bar[String] { def f = "abc" });
-  {print(new Bar[String] { def f = "abc" })}
+  { print(new Bar[String] { def f = "abc" }) }
   println()
 }
 
 object Test2 {
   import Marshal._
-  println("()="+load[Unit](dump(())))
-  println("true="+load[Boolean](dump(true)))
-  println("a="+load[Char](dump('a')))
-  println("1="+load[Int](dump(1)))
-  println("'abc="+load[scala.Symbol](dump('abc)))
+  println("()=" + load[Unit](dump(())))
+  println("true=" + load[Boolean](dump(true)))
+  println("a=" + load[Char](dump('a')))
+  println("1=" + load[Int](dump(1)))
+  println("'abc=" + load[scala.Symbol](dump('abc)))
   println()
 
-  println("List(())="+load[List[Unit]](dump(List(()))))
-  println("List(true)="+load[List[Boolean]](dump(List(true))))
-  println("List('abc)="+load[List[scala.Symbol]](dump(List('abc))))
+  println("List(())=" + load[List[Unit]](dump(List(()))))
+  println("List(true)=" + load[List[Boolean]](dump(List(true))))
+  println("List('abc)=" + load[List[scala.Symbol]](dump(List('abc))))
   println()
 
   def loadArray[T](x: Array[Byte])(implicit t: reflect.ClassTag[Array[T]]) =
     load[Array[T]](x)(t).deep.toString
-  println("Array()="+loadArray[Int](dump(Array(): Array[Int])))
-  println("Array(true)="+loadArray[Boolean](dump(Array(true))))
-  println("Array(a)="+loadArray[Char](dump(Array('a'))))
-  println("Array(1)="+loadArray[Int](dump(Array(1))))
+  println("Array()=" + loadArray[Int](dump(Array(): Array[Int])))
+  println("Array(true)=" + loadArray[Boolean](dump(Array(true))))
+  println("Array(a)=" + loadArray[Char](dump(Array('a'))))
+  println("Array(1)=" + loadArray[Int](dump(Array(1))))
   println()
 
-  println("((),())="+load[(Unit, Unit)](dump(((), ()))))
-  println("(true,false)="+load[(Boolean, Boolean)](dump((true, false))))
+  println("((),())=" + load[(Unit, Unit)](dump(((), ()))))
+  println("(true,false)=" + load[(Boolean, Boolean)](dump((true, false))))
   println()
 
-  println("List(List(1), List(2))="+load[List[List[Int]]](dump(List(List(1), List(2)))))
+  println("List(List(1), List(2))=" +
+      load[List[List[Int]]](dump(List(List(1), List(2)))))
   println()
 
-  println("Array(Array(1), Array(2))="+loadArray[Array[Int]](dump(Array(Array(1), Array(2)))))
+  println("Array(Array(1), Array(2))=" +
+      loadArray[Array[Int]](dump(Array(Array(1), Array(2)))))
   println()
 }
 
@@ -113,9 +115,9 @@ object Marshal {
     } catch {
       case _: ClassCastException =>
         in.close()
-        throw new ClassCastException("type mismatch;"+
-          "\n found : "+found+
-          "\n required: "+expected)
+        throw new ClassCastException(
+            "type mismatch;" + "\n found : " + found + "\n required: " +
+            expected)
     }
   }
 }
@@ -138,6 +140,9 @@ trait TestUtil {
 //    val t1: TypeTag[T] = read(write(t))
     val t1: TypeTag[T] = t
     val x1 = x.toString.replaceAll("@[0-9a-z]+$", "")
-    println("x="+x1+", t="+t1+", k="+t1.tpe.asInstanceOf[Product].productPrefix+", s="+t1.tpe.typeSymbol.toString)
+    println(
+        "x=" + x1 + ", t=" + t1 + ", k=" +
+        t1.tpe.asInstanceOf[Product].productPrefix + ", s=" +
+        t1.tpe.typeSymbol.toString)
   }
 }

@@ -2,7 +2,8 @@ package scalaz
 package std
 
 trait SetInstances {
-  implicit val setInstance: Foldable[Set] with IsEmpty[Set] = new Foldable[Set] with IsEmpty[Set] with Foldable.FromFoldr[Set] {
+  implicit val setInstance: Foldable[Set] with IsEmpty[Set] = new Foldable[Set]
+  with IsEmpty[Set] with Foldable.FromFoldr[Set] {
     override def length[A](fa: Set[A]) = fa.size
     def empty[A] = Set()
     def plus[A](a: Set[A], b: => Set[A]) = a ++ b
@@ -31,12 +32,12 @@ trait SetInstances {
   import Ordering._
 
   /**
-   * We could derive set equality from `Equal[A]`, but it would be `O(n^2)`.
-   * Instead, we require `Order[A]`, reducing the complexity to `O(log n)`
-   *
-   * If `Equal[A].equalIsNatural == true`, than `Any#==` is used.
-   */
-  implicit def setOrder[A: Order]: Order[Set[A]] = new Order[Set[A]] {
+    * We could derive set equality from `Equal[A]`, but it would be `O(n^2)`.
+    * Instead, we require `Order[A]`, reducing the complexity to `O(log n)`
+    *
+    * If `Equal[A].equalIsNatural == true`, than `Any#==` is used.
+    */
+  implicit def setOrder[A : Order]: Order[Set[A]] = new Order[Set[A]] {
     def order(a1: Set[A], a2: Set[A]) = {
       import anyVal._
       import scala.math.Ordering.Implicits._
@@ -66,10 +67,10 @@ trait SetInstances {
     def zero: Set[A] = Set[A]()
   }
 
-  implicit def setShow[A: Show]: Show[Set[A]] = new Show[Set[A]] {
-    override def show(as: Set[A]) = Cord("Set(", Cord.mkCord(",", as.map(Show[A].show).toSeq:_*), ")")
+  implicit def setShow[A : Show]: Show[Set[A]] = new Show[Set[A]] {
+    override def show(as: Set[A]) =
+      Cord("Set(", Cord.mkCord(",", as.map(Show[A].show).toSeq: _*), ")")
   }
-
 }
 
 trait SetFunctions

@@ -8,8 +8,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler
 import org.scalatra.servlet.ScalatraListener
 
 /**
- * Runs a Servlet or a Filter on an embedded Jetty server.
- */
+  * Runs a Servlet or a Filter on an embedded Jetty server.
+  */
 class JettyServer(
     socketAddress: InetSocketAddress = new InetSocketAddress(8080),
     resourceBase: String = "src/main/webapp") {

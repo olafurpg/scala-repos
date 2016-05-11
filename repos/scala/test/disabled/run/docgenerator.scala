@@ -2,11 +2,11 @@ object Test {
   import java.io.{File, FileReader, FileWriter}
 
   /** Tests the generation of the HTML documentation for some Scala
-   *  code samples (see value 'code' below) with different scaladoc
-   *  options (currently -access:<value>).
-   *
-   *  @author Stephane Micheloud
-   */
+    *  code samples (see value 'code' below) with different scaladoc
+    *  options (currently -access:<value>).
+    *
+    *  @author Stephane Micheloud
+    */
   def main(args: Array[String]) {
     // overwrites value of UrlContext.generator in file DocUtil.scala
     System.setProperty("doc.generator", "scaladoc")
@@ -21,7 +21,8 @@ object Test {
   private def test1(tmpDir: File) {
     def testOptions(inFile: File, outDirName: String, opts: String*) {
       val outDir = createDir(tmpDir, outDirName)
-      val args = Array.concat(Array("-d", outDir.getPath, inFile.getPath), opts.toArray:Array[String])
+      val args = Array.concat(Array("-d", outDir.getPath, inFile.getPath),
+                              opts.toArray: Array[String])
       if (MainDoc.main0(args)) {
         for (name <- List("all-classes.html", "index.html")) {
           val outFile = new File(outDir, name)
@@ -48,7 +49,7 @@ object Test {
   }
 
   private def test2(tmpDir: File) {
-    val code ="""
+    val code = """
 package annots
 
 @deprecated("msg")
@@ -119,13 +120,13 @@ object Foo2 {
       val command = new CompilerCommand(args.toList, docSettings)
       try {
         object compiler extends Global(command.settings, reporter) {
-	  override protected def computeInternalPhases() : Unit = {
-	    phasesSet += syntaxAnalyzer
-	    phasesSet += analyzer.namerFactory
-	    phasesSet += analyzer.typerFactory
-	  }
-	  override def forScaladoc = true
-	}
+          override protected def computeInternalPhases(): Unit = {
+            phasesSet += syntaxAnalyzer
+            phasesSet += analyzer.namerFactory
+            phasesSet += analyzer.typerFactory
+          }
+          override def forScaladoc = true
+        }
         if (reporter.hasErrors) {
           reporter.flush()
           return
@@ -140,9 +141,8 @@ object Foo2 {
         reporter.printSummary()
       } catch {
         case ex @ FatalError(msg) =>
-          if (command.settings.debug.value)
-            ex.printStackTrace();
-        reporter.error(null, "fatal error: " + msg)
+          if (command.settings.debug.value) ex.printStackTrace();
+          reporter.error(null, "fatal error: " + msg)
       }
     }
     def main(args: Array[String]) {

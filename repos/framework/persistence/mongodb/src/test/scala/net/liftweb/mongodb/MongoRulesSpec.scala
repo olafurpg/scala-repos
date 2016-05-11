@@ -13,7 +13,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package net.liftweb
 package mongodb
 
@@ -24,7 +23,8 @@ import org.specs2.mutable._
 
 import org.bson.types.ObjectId
 
-case class CollectionNameTestDoc(_id: ObjectId) extends MongoDocument[CollectionNameTestDoc] {
+case class CollectionNameTestDoc(_id: ObjectId)
+    extends MongoDocument[CollectionNameTestDoc] {
   def meta = CollectionNameTestDoc
 }
 object CollectionNameTestDoc extends MongoDocumentMeta[CollectionNameTestDoc]
@@ -41,7 +41,7 @@ object MongoRulesSpec extends Specification {
       CollectionNameTestDoc.collectionName must_== "collectionnametestdocs"
     }
     "snakify collection name" in {
-      MongoRules.collectionName.doWith((_, name) => snakify(name)+"s") {
+      MongoRules.collectionName.doWith((_, name) => snakify(name) + "s") {
         CollectionNameTestDoc.collectionName must_== "net.liftweb.mongodb.collection_name_test_docs"
       }
     }

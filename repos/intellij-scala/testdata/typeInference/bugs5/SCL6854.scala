@@ -8,7 +8,7 @@ object SCL6854 {
   case class FooAny[T](value: T) extends Foo[T]
 
   // LEVEL 2
-  case class FooNumberAny[T: Numeric](value: T) extends Foo[T]
+  case class FooNumberAny[T : Numeric](value: T) extends Foo[T]
 
   // Constructor
   object Foo {
@@ -30,12 +30,12 @@ object SCL6854 {
 
     // removing the FooNumberAny builder also fixes the error highlighting
     object Builder extends Level1 {
-      implicit def FooNumberAnyBuilder[T](implicit p: Numeric[T]) = new Builder[T, FooNumberAny[T]] {
-        def buildInstance(value: T) =
-          FooNumberAny(value)
-      }
+      implicit def FooNumberAnyBuilder[T](implicit p: Numeric[T]) =
+        new Builder[T, FooNumberAny[T]] {
+          def buildInstance(value: T) =
+            FooNumberAny(value)
+        }
     }
-
   }
 
   object Main extends App {
@@ -46,11 +46,13 @@ object SCL6854 {
 
     // Implicits guided type inference does not work in IntelliJ IDEA:
 
-    val anyRef = Foo("hello, world!") // <-- ERROR HERE (View -> Type Info shows "Nothing", when it should be FooAny)
+    val anyRef =
+      Foo("hello, world!") // <-- ERROR HERE (View -> Type Info shows "Nothing", when it should be FooAny)
     log("anyRef", anyRef, anyRef.value)
     // <-- manifested here (syntax highlighting error)
 
-    val anyRefExp: FooAny[String] = Foo("hello, world! (explicit)") // <-- specifying the type explicitly works
+    val anyRefExp: FooAny[String] =
+      Foo("hello, world! (explicit)") // <-- specifying the type explicitly works
     log("anyRefExp", anyRefExp, anyRefExp.value)
 
     val someBoolean = Foo(true) // <-- ERROR here too
@@ -62,8 +64,8 @@ object SCL6854 {
 
     println()
 
-    /*start*/(anyRef, anyRefExp, someBoolean, anyNumber)/*end*/
+    /*start*/
+    (anyRef, anyRefExp, someBoolean, anyNumber) /*end*/
   }
-
 }
 //(SCL6854.FooAny[String], SCL6854.FooAny[String], SCL6854.FooAny[Boolean], SCL6854.FooNumberAny[Long])

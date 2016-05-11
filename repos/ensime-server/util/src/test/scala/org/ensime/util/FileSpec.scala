@@ -2,10 +2,10 @@
 // Licence: http://www.gnu.org/licenses/gpl-3.0.en.html
 package org.ensime.util
 
-import Predef.{ any2stringadd => _ }
+import Predef.{any2stringadd => _}
 import com.google.common.base.Charsets
 import com.google.common.io.Files
-import java.io.{ File => JFile }
+import java.io.{File => JFile}
 
 import org.scalatest._
 
@@ -69,18 +69,20 @@ class FileSpec extends FlatSpec with Matchers {
   val windows = Array[Byte](0x61, 0x0d, 0x0a, 0x62, 0x0d, 0x0a, 0x63)
   val abc = List("a", "b", "c")
 
-  it should "read lines from a File with UNIX line endings" in withTempFile { file =>
-    val out = file.outputStream()
-    out.write(unix)
-    out.close()
-    file.readLines shouldBe abc
+  it should "read lines from a File with UNIX line endings" in withTempFile {
+    file =>
+      val out = file.outputStream()
+      out.write(unix)
+      out.close()
+      file.readLines shouldBe abc
   }
 
-  it should "read lines from a File with Windows line endings" in withTempFile { file =>
-    val out = file.outputStream()
-    out.write(windows)
-    out.close
-    file.readLines shouldBe abc
+  it should "read lines from a File with Windows line endings" in withTempFile {
+    file =>
+      val out = file.outputStream()
+      out.write(windows)
+      out.close
+      file.readLines shouldBe abc
   }
 
   it should "write lines" in withTempFile { file =>

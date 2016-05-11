@@ -8,7 +8,8 @@ object HelloMacro {
 
     annottees match {
       case (classDecl: ClassDef) :: Nil =>
-        val q"$mods class $name[..$tparams] $ctorMods(...$paramss) extends { ..$earlydefns } with ..$bases { $self => ..$body }" = classDecl
+        val q"$mods class $name[..$tparams] $ctorMods(...$paramss) extends { ..$earlydefns } with ..$bases { $self => ..$body }" =
+          classDecl
         q"""
         case class $name(...$paramss) extends ..$bases {
           ..$body

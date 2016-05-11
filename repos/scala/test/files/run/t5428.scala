@@ -1,14 +1,8 @@
-
-
-
 import collection.mutable.{Stack, StackProxy}
-
-
 
 class A extends StackProxy[Int] {
   val self = Stack[Int]()
 }
-
 
 object Test {
 
@@ -25,5 +19,4 @@ object Test {
 
     a.pop
   }
-
 }

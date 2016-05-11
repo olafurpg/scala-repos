@@ -12,10 +12,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
 
 /**
-* @author Alexander Podkhalyuzin, ilyas
-*/
-
-class ScParenthesisedTypeElementImpl(node: ASTNode) extends ScalaPsiElementImpl (node) with ScParenthesisedTypeElement{
+  * @author Alexander Podkhalyuzin, ilyas
+  */
+class ScParenthesisedTypeElementImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScParenthesisedTypeElement {
   override def toString: String = "TypeInParenthesis: " + getText
 
   protected def innerType(ctx: TypingContext) = {
@@ -25,14 +25,14 @@ class ScParenthesisedTypeElementImpl(node: ASTNode) extends ScalaPsiElementImpl 
     }
   }
 
-    override def accept(visitor: ScalaElementVisitor) {
-        visitor.visitParenthesisedTypeElement(this)
-      }
+  override def accept(visitor: ScalaElementVisitor) {
+    visitor.visitParenthesisedTypeElement(this)
+  }
 
-      override def accept(visitor: PsiElementVisitor) {
-        visitor match {
-          case s: ScalaElementVisitor => s.visitParenthesisedTypeElement(this)
-          case _ => super.accept(visitor)
-        }
-      }
+  override def accept(visitor: PsiElementVisitor) {
+    visitor match {
+      case s: ScalaElementVisitor => s.visitParenthesisedTypeElement(this)
+      case _ => super.accept(visitor)
+    }
+  }
 }

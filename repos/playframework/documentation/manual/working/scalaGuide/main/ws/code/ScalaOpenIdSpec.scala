@@ -16,11 +16,8 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.openid._
 
-class Application @Inject() (openIdClient: OpenIdClient) extends Controller {
-
-}
+class Application @Inject()(openIdClient: OpenIdClient) extends Controller {}
 //#dependency
-
 
 object ScalaOpenIdSpec extends PlaySpecification {
 
@@ -41,33 +38,36 @@ object ScalaOpenIdSpec extends PlaySpecification {
 
   def loginPost = Action.async { implicit request =>
     Form(single(
-      "openid" -> nonEmptyText
-    )).bindFromRequest.fold({ error =>
+            "openid" -> nonEmptyText
+        )).bindFromRequest.fold({ error =>
       Logger.info(s"bad request ${error.toString}")
       Future.successful(BadRequest(error.toString))
     }, { openId =>
-      openIdClient.redirectURL(openId, routes.Application.openIdCallback.absoluteURL())
+      openIdClient
+        .redirectURL(openId, routes.Application.openIdCallback.absoluteURL())
         .map(url => Redirect(url))
-        .recover { case t: Throwable => Redirect(routes.Application.login)}
+        .recover { case t: Throwable => Redirect(routes.Application.login) }
     })
   }
 
   def openIdCallback = Action.async { implicit request =>
-    openIdClient.verifiedId(request).map(info => Ok(info.id + "\n" + info.attributes))
+    openIdClient
+      .verifiedId(request)
+      .map(info => Ok(info.id + "\n" + info.attributes))
       .recover {
-      case t: Throwable =>
-        // Here you should look at the error, and give feedback to the user
-        Redirect(routes.Application.login)
-    }
+        case t: Throwable =>
+          // Here you should look at the error, and give feedback to the user
+          Redirect(routes.Application.login)
+      }
   }
   //#flow
 
   def extended(openId: String)(implicit request: RequestHeader) = {
     //#extended
     openIdClient.redirectURL(
-      openId,
-      routes.Application.openIdCallback.absoluteURL(),
-      Seq("email" -> "http://schema.openid.net/contact/email")
+        openId,
+        routes.Application.openIdCallback.absoluteURL(),
+        Seq("email" -> "http://schema.openid.net/contact/email")
     )
     //#extended
   }
@@ -81,7 +81,7 @@ object routes {
 }
 
 package views {
-object html {
-  def login() = "loginpage"
-}
+  object html {
+    def login() = "loginpage"
+  }
 }

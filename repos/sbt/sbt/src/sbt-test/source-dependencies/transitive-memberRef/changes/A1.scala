@@ -1,5 +1,5 @@
 package test
 
 class A {
-	def foo: Int = 23
+  def foo: Int = 23
 }

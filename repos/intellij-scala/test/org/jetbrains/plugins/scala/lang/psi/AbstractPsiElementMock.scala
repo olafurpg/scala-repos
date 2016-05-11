@@ -5,9 +5,8 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.{PsiElement, PsiElementVisitor, ResolveState}
 
 /**
- * Pavel.Fatin, 11.05.2010
- */
-
+  * Pavel.Fatin, 11.05.2010
+  */
 abstract class AbstractPsiElementMock extends PsiElement {
   def getIcon(flags: Int) = null
 
@@ -25,7 +24,10 @@ abstract class AbstractPsiElementMock extends PsiElement {
 
   def isPhysical = false
 
-  def processDeclarations(processor: PsiScopeProcessor, state: ResolveState, lastParent: PsiElement, place: PsiElement) = false
+  def processDeclarations(processor: PsiScopeProcessor,
+                          state: ResolveState,
+                          lastParent: PsiElement,
+                          place: PsiElement) = false
 
   def putCopyableUserData[T](key: Key[T], value: T) = {}
 
@@ -47,9 +49,11 @@ abstract class AbstractPsiElementMock extends PsiElement {
 
   def delete() = {}
 
-  def addRangeAfter(first: PsiElement, last: PsiElement, anchor: PsiElement) = null
+  def addRangeAfter(first: PsiElement, last: PsiElement, anchor: PsiElement) =
+    null
 
-  def addRangeBefore(first: PsiElement, last: PsiElement, anchor: PsiElement) = null
+  def addRangeBefore(first: PsiElement, last: PsiElement, anchor: PsiElement) =
+    null
 
   def addRange(first: PsiElement, last: PsiElement) = null
 

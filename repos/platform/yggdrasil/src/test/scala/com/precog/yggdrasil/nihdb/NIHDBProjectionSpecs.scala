@@ -49,22 +49,34 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
-class NIHDBProjectionSpecs extends Specification with ScalaCheck with FutureMatchers {
+class NIHDBProjectionSpecs
+    extends Specification with ScalaCheck with FutureMatchers {
   val actorSystem = ActorSystem("NIHDBActorSystem")
 
-  val chef = actorSystem.actorOf(Props(new Chef(
-    VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-    VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))
-  ))
+  val chef = actorSystem.actorOf(
+      Props(new Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+                     VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
 
-  val txLogScheduler = new ScheduledThreadPoolExecutor(10, (new ThreadFactoryBuilder()).setNameFormat("HOWL-sched-%03d").build())
+  val txLogScheduler = new ScheduledThreadPoolExecutor(
+      10,
+      (new ThreadFactoryBuilder()).setNameFormat("HOWL-sched-%03d").build())
 
   implicit val M = new FutureMonad(actorSystem.dispatcher)
 
   val authorities = Authorities("test")
 
   def newNihdb(workDir: File, threshold: Int = 1000): NIHDB =
-    NIHDB.create(chef, authorities, workDir, threshold, Duration(60, "seconds"), txLogScheduler)(actorSystem).unsafePerformIO.valueOr { e => throw new Exception(e.message) }
+    NIHDB
+      .create(chef,
+              authorities,
+              workDir,
+              threshold,
+              Duration(60, "seconds"),
+              txLogScheduler)(actorSystem)
+      .unsafePerformIO
+      .valueOr { e =>
+        throw new Exception(e.message)
+      }
 
   val maxDuration = Duration(60, "seconds")
 
@@ -77,7 +89,8 @@ class NIHDBProjectionSpecs extends Specification with ScalaCheck with FutureMatc
   assert(baseDir.isDirectory && baseDir.canWrite)
 
   trait TempContext {
-    val workDir = new File(baseDir, "nihdbspec%03d".format(dirSeq.getAndIncrement))
+    val workDir = new File(
+        baseDir, "nihdbspec%03d".format(dirSeq.getAndIncrement))
 
     if (!workDir.mkdirs) {
       throw new Exception("Failed to create work directory! " + workDir)
@@ -85,7 +98,8 @@ class NIHDBProjectionSpecs extends Specification with ScalaCheck with FutureMatc
 
     var nihdb = newNihdb(workDir)
 
-    def fromFuture[A](f: Future[A]): A = Await.result(f, Duration(60, "seconds"))
+    def fromFuture[A](f: Future[A]): A =
+      Await.result(f, Duration(60, "seconds"))
 
     def projection = fromFuture(NIHDBProjection.wrap(nihdb))
 
@@ -106,63 +120,75 @@ class NIHDBProjectionSpecs extends Specification with ScalaCheck with FutureMatc
 
       val results = projection.getBlockAfter(None, None)
 
-      results.onComplete { _ => ctxt.stop } must awaited(maxDuration) { beNone }
+      results.onComplete { _ =>
+        ctxt.stop
+      } must awaited(maxDuration) { beNone }
     }
 
-    "Insert and retrieve values below the cook threshold" in check { (discard: Int) =>
-      val ctxt = new TempContext {}
-      import ctxt._
+    "Insert and retrieve values below the cook threshold" in check {
+      (discard: Int) =>
+        val ctxt = new TempContext {}
+        import ctxt._
 
-      val expected: Seq[JValue] = Seq(JNum(0L), JNum(1L), JNum(2L))
+        val expected: Seq[JValue] = Seq(JNum(0L), JNum(1L), JNum(2L))
 
-      val toInsert = (0L to 2L).toSeq.map { i =>
-        NIHDB.Batch(i, Seq(JNum(i)))
-      }
+        val toInsert = (0L to 2L).toSeq.map { i =>
+          NIHDB.Batch(i, Seq(JNum(i)))
+        }
 
-      val results =
-        for {
+        val results = for {
           _ <- nihdb.insertVerified(toInsert)
           result <- projection.getBlockAfter(None, None)
         } yield result
 
-      results.onComplete { _ => ctxt.stop }  must awaited(maxDuration) (beLike {
-        case Some(BlockProjectionData(min, max, data)) =>
-          min mustEqual 0L
-          max mustEqual 0L
-          data.size mustEqual 3
-          data.toJsonElements.map(_("value")) must containAllOf(expected).only.inOrder
-      })
-    }
-
-    "Insert, close and re-read values below the cook threshold" in check { (discard: Int) =>
-      val ctxt = new TempContext {}
-      import ctxt._
-
-      val expected: Seq[JValue] = Seq(JNum(0L), JNum(1L), JNum(2L), JNum(3L), JNum(4L))
-
-      val io = 
-        nihdb.insert((0L to 2L).toSeq.map { i => NIHDB.Batch(i, Seq(JNum(i))) }) >>
-        // Ensure we handle skips/overlap properly. First tests a complete skip, second tests partial
-        nihdb.insert((0L to 2L).toSeq.map { i => NIHDB.Batch(i, Seq(JNum(i))) }) >>
-        nihdb.insert((0L to 4L).toSeq.map { i => NIHDB.Batch(i, Seq(JNum(i))) })
-
-      val result = for {
-        _ <- Future(io.unsafePerformIO)(actorSystem.dispatcher)
-        _ <- nihdb.close(actorSystem)
-        _ <- Future(nihdb = newNihdb(workDir))(actorSystem.dispatcher)
-        status <- nihdb.status
-        r <- projection.getBlockAfter(None, None)
-      } yield r
-
-      result.onComplete { _ => ctxt.stop } must awaited(maxDuration) {
-        beLike {
+        results.onComplete { _ =>
+          ctxt.stop
+        } must awaited(maxDuration)(beLike {
           case Some(BlockProjectionData(min, max, data)) =>
             min mustEqual 0L
             max mustEqual 0L
-            data.size mustEqual 5
-            data.toJsonElements.map(_("value")) must containAllOf(expected).only.inOrder
+            data.size mustEqual 3
+            data.toJsonElements.map(_ ("value")) must containAllOf(expected).only.inOrder
+        })
+    }
+
+    "Insert, close and re-read values below the cook threshold" in check {
+      (discard: Int) =>
+        val ctxt = new TempContext {}
+        import ctxt._
+
+        val expected: Seq[JValue] =
+          Seq(JNum(0L), JNum(1L), JNum(2L), JNum(3L), JNum(4L))
+
+        val io =
+          nihdb.insert((0L to 2L).toSeq.map { i =>
+            NIHDB.Batch(i, Seq(JNum(i)))
+          }) >> // Ensure we handle skips/overlap properly. First tests a complete skip, second tests partial
+          nihdb.insert((0L to 2L).toSeq.map { i =>
+            NIHDB.Batch(i, Seq(JNum(i)))
+          }) >> nihdb.insert((0L to 4L).toSeq.map { i =>
+            NIHDB.Batch(i, Seq(JNum(i)))
+          })
+
+        val result = for {
+          _ <- Future(io.unsafePerformIO)(actorSystem.dispatcher)
+          _ <- nihdb.close(actorSystem)
+          _ <- Future(nihdb = newNihdb(workDir))(actorSystem.dispatcher)
+          status <- nihdb.status
+          r <- projection.getBlockAfter(None, None)
+        } yield r
+
+        result.onComplete { _ =>
+          ctxt.stop
+        } must awaited(maxDuration) {
+          beLike {
+            case Some(BlockProjectionData(min, max, data)) =>
+              min mustEqual 0L
+              max mustEqual 0L
+              data.size mustEqual 5
+              data.toJsonElements.map(_ ("value")) must containAllOf(expected).only.inOrder
+          }
         }
-      }
     }
 
     "Properly filter on constrainted columns" in todo
@@ -171,10 +197,13 @@ class NIHDBProjectionSpecs extends Specification with ScalaCheck with FutureMatc
       val ctxt = new TempContext {}
       import ctxt._
 
-      val expected: Seq[JValue] = (0L to 1950L).map(JNum(_)).toSeq
+      val expected: Seq[JValue] = (0L to 1950L)
+        .map(JNum(_))
+        .toSeq
 
-      (0L to 1950L).map(JNum(_)).grouped(400).zipWithIndex foreach { 
-        case (values, id) => nihdb.insert(Seq(NIHDB.Batch(id.toLong, values))).unsafePerformIO 
+        (0L to 1950L).map(JNum(_)).grouped(400).zipWithIndex foreach {
+        case (values, id) =>
+          nihdb.insert(Seq(NIHDB.Batch(id.toLong, values))).unsafePerformIO
       }
 
       var waits = 10
@@ -198,20 +227,22 @@ class NIHDBProjectionSpecs extends Specification with ScalaCheck with FutureMatc
         (firstBlock, secondBlock)
       }
 
-      result must awaited(maxDuration) (beLike {
-        case (Some(BlockProjectionData(min1, max1, data1)), Some(BlockProjectionData(min2, max2, data2))) =>
+      result must awaited(maxDuration)(beLike {
+        case (Some(BlockProjectionData(min1, max1, data1)),
+              Some(BlockProjectionData(min2, max2, data2))) =>
           min1 mustEqual 0L
           max1 mustEqual 0L
           data1.size mustEqual 1200
-          data1.toJsonElements.map(_("value")) must containAllOf(expected.take(1200)).only.inOrder
+          data1.toJsonElements.map(_ ("value")) must containAllOf(
+              expected.take(1200)).only.inOrder
 
           min2 mustEqual 1L
           max2 mustEqual 1L
           data2.size mustEqual 751
-          data2.toJsonElements.map(_("value")) must containAllOf(expected.drop(1200)).only.inOrder
+          data2.toJsonElements.map(_ ("value")) must containAllOf(
+              expected.drop(1200)).only.inOrder
       })
     }
-
   }
 
   def shutdown = {

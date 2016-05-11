@@ -23,15 +23,16 @@ import java.nio.ByteBuffer
 import scala.reflect.ClassTag
 
 /**
- * A serializer implementation that always returns two elements in a deserialization stream.
- */
+  * A serializer implementation that always returns two elements in a deserialization stream.
+  */
 class TestSerializer extends Serializer {
-  override def newInstance(): TestSerializerInstance = new TestSerializerInstance
+  override def newInstance(): TestSerializerInstance =
+    new TestSerializerInstance
 }
 
-
 class TestSerializerInstance extends SerializerInstance {
-  override def serialize[T: ClassTag](t: T): ByteBuffer = throw new UnsupportedOperationException
+  override def serialize[T : ClassTag](t: T): ByteBuffer =
+    throw new UnsupportedOperationException
 
   override def serializeStream(s: OutputStream): SerializationStream =
     throw new UnsupportedOperationException
@@ -39,19 +40,19 @@ class TestSerializerInstance extends SerializerInstance {
   override def deserializeStream(s: InputStream): TestDeserializationStream =
     new TestDeserializationStream
 
-  override def deserialize[T: ClassTag](bytes: ByteBuffer): T =
+  override def deserialize[T : ClassTag](bytes: ByteBuffer): T =
     throw new UnsupportedOperationException
 
-  override def deserialize[T: ClassTag](bytes: ByteBuffer, loader: ClassLoader): T =
+  override def deserialize[T : ClassTag](
+      bytes: ByteBuffer, loader: ClassLoader): T =
     throw new UnsupportedOperationException
 }
-
 
 class TestDeserializationStream extends DeserializationStream {
 
   private var count = 0
 
-  override def readObject[T: ClassTag](): T = {
+  override def readObject[T : ClassTag](): T = {
     count += 1
     if (count == 3) {
       throw new EOFException

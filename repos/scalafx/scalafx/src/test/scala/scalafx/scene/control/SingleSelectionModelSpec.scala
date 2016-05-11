@@ -35,22 +35,25 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * SingleSelectionModel[T] Spec tests.
- *
- */
+  * SingleSelectionModel[T] Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class SingleSelectionModelSpec[T]
-  extends SimpleSFXDelegateSpec[jfxsc.SingleSelectionModel[T], SingleSelectionModel[T]](classOf[jfxsc.SingleSelectionModel[T]], classOf[SingleSelectionModel[T]]) {
+    extends SimpleSFXDelegateSpec[
+        jfxsc.SingleSelectionModel[T], SingleSelectionModel[T]](
+        classOf[jfxsc.SingleSelectionModel[T]],
+        classOf[SingleSelectionModel[T]]) {
 
-  override protected def getScalaClassInstance = new SingleSelectionModel[T](getJavaClassInstance) {}
+  override protected def getScalaClassInstance =
+    new SingleSelectionModel[T](getJavaClassInstance) {}
 
   // How SingleSelectionModel is a abstract class, it is done a basic implementation
-  override protected def getJavaClassInstance = new jfxsc.SingleSelectionModel[T] {
-    def clearSingleSelection() {}
-    def clearSingleSelection(index: Int) {}
-    def getItemCount = { 0 }
-    def getModelItem(index: Int) = { null.asInstanceOf[T] }
-
-  }
-
+  override protected def getJavaClassInstance =
+    new jfxsc.SingleSelectionModel[T] {
+      def clearSingleSelection() {}
+      def clearSingleSelection(index: Int) {}
+      def getItemCount = { 0 }
+      def getModelItem(index: Int) = { null.asInstanceOf[T] }
+    }
 }

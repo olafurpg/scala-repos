@@ -12,10 +12,9 @@ import org.jetbrains.plugins.scala.lang.parser._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 28.05.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 28.05.2008
+  */
 class IfFilter extends ElementFilter {
   def isAcceptable(element: Object, context: PsiElement): Boolean = {
     if (context.isInstanceOf[PsiComment]) return false
@@ -26,10 +25,11 @@ class IfFilter extends ElementFilter {
         if (parent.getNode.getElementType == ScalaElementTypes.FOR_STMT) {
           import org.jetbrains.plugins.scala.extensions._
           if (leaf.getParent != null && //reference
-              leaf.getParent.getParent != null &&  //pattern
-              leaf.getParent.getParent.getPrevSiblingNotWhitespace != null && //case keyword
-              leaf.getParent.getParent.getPrevSiblingNotWhitespace.
-                getNode.getElementType == ScalaTokenTypes.kCASE) return false
+              leaf.getParent.getParent != null && //pattern
+              leaf.getParent.getParent.getPrevSiblingNotWhitespace != null &&
+              //case keyword
+              leaf.getParent.getParent.getPrevSiblingNotWhitespace.getNode.getElementType == ScalaTokenTypes.kCASE)
+            return false
           return true
         }
         parent match {
@@ -41,7 +41,8 @@ class IfFilter extends ElementFilter {
             }
             val text = clause.getText
             while (text(position - 1).isWhitespace) position -= 1
-            return leaf.getTextRange.getEndOffset == clause.getTextRange.getStartOffset + position
+            return leaf.getTextRange.getEndOffset == clause.getTextRange.getStartOffset +
+            position
           case _ =>
         }
         parent = parent.getParent

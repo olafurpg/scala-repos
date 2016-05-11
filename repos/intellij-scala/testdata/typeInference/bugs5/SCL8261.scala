@@ -14,6 +14,6 @@ object SCL8261 {
   // This works fine
   def concrete(a: Foo): Foo = a.op
   // IDEA says it cannot find op
-  def generic[A <: Foo](a: A): A = /*start*/a.op/*end*/
+  def generic[A <: Foo](a: A): A = /*start*/ a.op /*end*/
 }
 //A

@@ -23,56 +23,66 @@ import scala.collection.JavaConverters._
 import scala.util.control.Exception._
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class CompileServerLauncher extends ApplicationComponent {
-   private var serverInstance: Option[ServerInstance] = None
+  private var serverInstance: Option[ServerInstance] = None
 
-   def initComponent() {}
+  def initComponent() {}
 
-   def disposeComponent() {
-     if (running) stop()
-   }
+  def disposeComponent() {
+    if (running) stop()
+  }
 
   def tryToStart(project: Project): Boolean = {
     if (!running) {
       val started = start(project)
       if (started) {
-        try new RemoteServerRunner(project).send("addDisconnectListener", Seq.empty, null)
-        catch {
+        try new RemoteServerRunner(project)
+          .send("addDisconnectListener", Seq.empty, null) catch {
           case e: Exception =>
         }
       }
       started
-    }
-    else true
+    } else true
   }
 
   private def start(project: Project): Boolean = {
-     val applicationSettings = ScalaCompileServerSettings.getInstance
+    val applicationSettings = ScalaCompileServerSettings.getInstance
 
-     if (applicationSettings.COMPILE_SERVER_SDK == null) {
-       // Try to find a suitable JDK
-       val choice = Option(ProjectRootManager.getInstance(project).getProjectSdk).orElse {
-         val all = ProjectJdkTable.getInstance.getSdksOfType(JavaSdk.getInstance()).asScala
-         all.headOption
-       }
+    if (applicationSettings.COMPILE_SERVER_SDK == null) {
+      // Try to find a suitable JDK
+      val choice =
+        Option(ProjectRootManager.getInstance(project).getProjectSdk).orElse {
+          val all = ProjectJdkTable.getInstance
+            .getSdksOfType(JavaSdk.getInstance())
+            .asScala
+          all.headOption
+        }
 
-       choice.foreach(sdk => applicationSettings.COMPILE_SERVER_SDK = sdk.getName)
+      choice.foreach(
+          sdk => applicationSettings.COMPILE_SERVER_SDK = sdk.getName)
 
 //       val message = "JVM SDK is automatically selected: " + name +
 //               "\n(can be changed in Application Settings / Scala)"
 //       Notifications.Bus.notify(new Notification("scala", "Scala compile server",
 //         message, NotificationType.INFORMATION))
-     }
+    }
 
-    findJdkByName(applicationSettings.COMPILE_SERVER_SDK)
-            .left.map(_ + "\nPlease either disable Scala compile server or configure a valid JVM SDK for it.")
-            .right.flatMap(start(project, _)) match {
+    findJdkByName(applicationSettings.COMPILE_SERVER_SDK).left
+      .map(_ + "\nPlease either disable Scala compile server or configure a valid JVM SDK for it.")
+      .right
+      .flatMap(start(project, _)) match {
       case Left(error) =>
         val title = "Cannot start Scala compile server"
-        val content = s"<html><body>${error.replace("\n", "<br>")} <a href=''>Configure</a></body></html>"
-        Notifications.Bus.notify(new Notification("scala", title, content, NotificationType.ERROR, ConfigureLinkListener))
+        val content =
+          s"<html><body>${error.replace("\n", "<br>")} <a href=''>Configure</a></body></html>"
+        Notifications.Bus.notify(
+            new Notification("scala",
+                             title,
+                             content,
+                             NotificationType.ERROR,
+                             ConfigureLinkListener))
         false
       case Right(_) =>
         ApplicationManager.getApplication invokeLater new Runnable {
@@ -94,8 +104,13 @@ class CompileServerLauncher extends ApplicationComponent {
         val bootClassPathLibs = bootCp.map(_.getAbsolutePath)
         val bootclasspathArg =
           if (bootClassPathLibs.isEmpty) Nil
-          else Seq("-Xbootclasspath/a:" + bootClassPathLibs.mkString(File.pathSeparator))
-        val classpath = (jdk.tools +: presentFiles).map(_.canonicalPath).mkString(File.pathSeparator)
+          else
+            Seq(
+                "-Xbootclasspath/a:" +
+                bootClassPathLibs.mkString(File.pathSeparator))
+        val classpath = (jdk.tools +: presentFiles)
+          .map(_.canonicalPath)
+          .mkString(File.pathSeparator)
         val settings = ScalaCompileServerSettings.getInstance
 
         val freePort = CompileServerLauncher.findFreePort
@@ -109,12 +124,13 @@ class CompileServerLauncher extends ApplicationComponent {
         val id = settings.COMPILE_SERVER_ID
 
         val shutdownDelay = settings.COMPILE_SERVER_SHUTDOWN_DELAY
-        val shutdownDelayArg = if (settings.COMPILE_SERVER_SHUTDOWN_IDLE && shutdownDelay >= 0) {
-          Seq(s"-Dshutdown.delay=$shutdownDelay")
-        } else Nil
+        val shutdownDelayArg =
+          if (settings.COMPILE_SERVER_SHUTDOWN_IDLE && shutdownDelay >= 0) {
+            Seq(s"-Dshutdown.delay=$shutdownDelay")
+          } else Nil
 
-        val commands = jdk.executable.canonicalPath +: bootclasspathArg ++: "-cp" +: classpath +: jvmParameters ++: shutdownDelayArg ++:
-                ngRunnerFqn +: freePort.toString +: id.toString +: Nil
+        val commands =
+          jdk.executable.canonicalPath +: bootclasspathArg ++: "-cp" +: classpath +: jvmParameters ++: shutdownDelayArg ++: ngRunnerFqn +: freePort.toString +: id.toString +: Nil
 
         val builder = new ProcessBuilder(commands.asJava)
 
@@ -122,14 +138,20 @@ class CompileServerLauncher extends ApplicationComponent {
           projectHome(project).foreach(dir => builder.directory(dir))
         }
 
-        catching(classOf[IOException]).either(builder.start())
-                .left.map(_.getMessage)
-                .right.map { process =>
-          val watcher = new ProcessWatcher(process, "scalaCompileServer")
-          serverInstance = Some(ServerInstance(watcher, freePort, builder.directory(), withTimestamps(bootCp)))
-          watcher.startNotify()
-          process
-        }
+        catching(classOf[IOException])
+          .either(builder.start())
+          .left
+          .map(_.getMessage)
+          .right
+          .map { process =>
+            val watcher = new ProcessWatcher(process, "scalaCompileServer")
+            serverInstance = Some(ServerInstance(watcher,
+                                                 freePort,
+                                                 builder.directory(),
+                                                 withTimestamps(bootCp)))
+            watcher.startNotify()
+            process
+          }
       case (_, absentFiles) =>
         val paths = absentFiles.map(_.getPath).mkString(", ")
         Left("Required file(s) not found: " + paths)
@@ -155,7 +177,8 @@ class CompileServerLauncher extends ApplicationComponent {
 
   def running: Boolean = serverInstance.exists(_.running)
 
-  def errors(): Seq[String] = serverInstance.map(_.errors()).getOrElse(Seq.empty)
+  def errors(): Seq[String] =
+    serverInstance.map(_.errors()).getOrElse(Seq.empty)
 
   def port: Option[Int] = serverInstance.map(_.port)
 
@@ -163,33 +186,38 @@ class CompileServerLauncher extends ApplicationComponent {
 }
 
 object CompileServerLauncher {
-  def instance: CompileServerLauncher = ApplicationManager.getApplication.getComponent(classOf[CompileServerLauncher])
+  def instance: CompileServerLauncher =
+    ApplicationManager.getApplication.getComponent(
+        classOf[CompileServerLauncher])
 
   def compilerJars: Seq[File] = {
-    val jpsBuildersJar = new File(PathUtil.getJarPathForClass(classOf[BuilderService]))
+    val jpsBuildersJar = new File(
+        PathUtil.getJarPathForClass(classOf[BuilderService]))
     val utilJar = new File(PathUtil.getJarPathForClass(classOf[FileUtil]))
-    val trove4jJar = new File(PathUtil.getJarPathForClass(classOf[TByteArrayList]))
+    val trove4jJar = new File(
+        PathUtil.getJarPathForClass(classOf[TByteArrayList]))
 
     val pluginRoot = pluginPath
     val jpsRoot = new File(pluginRoot, "jps")
 
     Seq(
-      jpsBuildersJar,
-      utilJar,
-      trove4jJar,
-      new File(pluginRoot, "scala-library.jar"),
-      new File(pluginRoot, "scala-nailgun-runner.jar"),
-      new File(pluginRoot, "compiler-settings.jar"),
-      new File(jpsRoot, "nailgun.jar"),
-      new File(jpsRoot, "sbt-interface.jar"),
-      new File(jpsRoot, "incremental-compiler.jar"),
-      new File(jpsRoot, "scala-jps-plugin.jar"),
-      dottyInterfacesJar
+        jpsBuildersJar,
+        utilJar,
+        trove4jJar,
+        new File(pluginRoot, "scala-library.jar"),
+        new File(pluginRoot, "scala-nailgun-runner.jar"),
+        new File(pluginRoot, "compiler-settings.jar"),
+        new File(jpsRoot, "nailgun.jar"),
+        new File(jpsRoot, "sbt-interface.jar"),
+        new File(jpsRoot, "incremental-compiler.jar"),
+        new File(jpsRoot, "scala-jps-plugin.jar"),
+        dottyInterfacesJar
     )
   }
 
   def pluginPath: String = {
-    if (ApplicationManager.getApplication.isUnitTestMode) new File(System.getProperty("plugin.path"), "lib").getCanonicalPath
+    if (ApplicationManager.getApplication.isUnitTestMode)
+      new File(System.getProperty("plugin.path"), "lib").getCanonicalPath
     else new File(PathUtil.getJarPathForClass(getClass)).getParent
   }
 
@@ -209,15 +237,20 @@ object CompileServerLauncher {
 
   def jvmParameters: Seq[String] = {
     val settings = ScalaCompileServerSettings.getInstance
-    val xmx = settings.COMPILE_SERVER_MAXIMUM_HEAP_SIZE |> { size =>
-      if (size.isEmpty) Nil else List("-Xmx%sm".format(size))
-    }
+    val xmx =
+      settings.COMPILE_SERVER_MAXIMUM_HEAP_SIZE |> { size =>
+        if (size.isEmpty) Nil else List("-Xmx%sm".format(size))
+      }
 
-    val (userMaxPermSize, otherParams) = settings.COMPILE_SERVER_JVM_PARAMETERS.split(" ").partition(_.contains("-XX:MaxPermSize"))
+    val (userMaxPermSize, otherParams) = settings.COMPILE_SERVER_JVM_PARAMETERS
+      .split(" ")
+      .partition(_.contains("-XX:MaxPermSize"))
 
     val defaultMaxPermSize = Some("-XX:MaxPermSize=256m")
     val needMaxPermSize = settings.COMPILE_SERVER_SDK < "1.8"
-    val maxPermSize = if (needMaxPermSize) userMaxPermSize.headOption.orElse(defaultMaxPermSize) else None
+    val maxPermSize =
+      if (needMaxPermSize)
+        userMaxPermSize.headOption.orElse(defaultMaxPermSize) else None
 
     xmx ++ otherParams ++ maxPermSize
   }
@@ -235,9 +268,14 @@ object CompileServerLauncher {
     serverInstance match {
       case None => true
       case Some(instance) =>
-        val useProjectHome = ScalaCompileServerSettings.getInstance().USE_PROJECT_HOME_AS_WORKING_DIR
-        val workingDirChanged = useProjectHome && projectHome(project) != serverInstance.map(_.workingDir)
-        workingDirChanged || instance.bootClasspath != withTimestamps(bootClasspath(project))
+        val useProjectHome = ScalaCompileServerSettings
+          .getInstance()
+          .USE_PROJECT_HOME_AS_WORKING_DIR
+        val workingDirChanged =
+          useProjectHome &&
+          projectHome(project) != serverInstance.map(_.workingDir)
+        workingDirChanged ||
+        instance.bootClasspath != withTimestamps(bootClasspath(project))
     }
   }
 
@@ -257,14 +295,15 @@ object CompileServerLauncher {
     for {
       dir <- Option(project.getBaseDir)
       path <- Option(dir.getCanonicalPath)
-      file = new File(path)
-      if file.exists()
+      file = new File(path) if file.exists()
     } yield file
   }
-
 }
 
-private case class ServerInstance(watcher: ProcessWatcher, port: Int, workingDir: File, bootClasspath: Set[(File, Long)]) {
+private case class ServerInstance(watcher: ProcessWatcher,
+                                  port: Int,
+                                  workingDir: File,
+                                  bootClasspath: Set[(File, Long)]) {
   private var stopped = false
 
   def running: Boolean = !stopped && watcher.running

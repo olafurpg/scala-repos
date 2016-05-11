@@ -23,8 +23,8 @@ import org.apache.spark.sql.execution.command.RunnableCommand
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.types.StringType
 
-private[hive]
-case class HiveNativeCommand(sql: String) extends RunnableCommand {
+private[hive] case class HiveNativeCommand(sql: String)
+    extends RunnableCommand {
 
   override def output: Seq[AttributeReference] =
     Seq(AttributeReference("result", StringType, nullable = false)())

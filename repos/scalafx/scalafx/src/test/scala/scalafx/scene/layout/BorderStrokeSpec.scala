@@ -37,21 +37,21 @@ import scalafx.scene.paint.Color
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- *
- * Test for [[scalafx.scene.layout.BorderStrokeSpec]].
- */
+  *
+  * Test for [[scalafx.scene.layout.BorderStrokeSpec]].
+  */
 @RunWith(classOf[JUnitRunner])
 class BorderStrokeSpec
-  extends SimpleSFXDelegateSpec[jfxsl.BorderStroke, BorderStroke](
-    classOf[jfxsl.BorderStroke], classOf[BorderStroke]) {
+    extends SimpleSFXDelegateSpec[jfxsl.BorderStroke, BorderStroke](
+        classOf[jfxsl.BorderStroke], classOf[BorderStroke]) {
 
-  override protected def getScalaClassInstance = new BorderStroke(getJavaClassInstance) {}
+  override protected def getScalaClassInstance =
+    new BorderStroke(getJavaClassInstance) {}
 
   override protected def getJavaClassInstance = new jfxsl.BorderStroke(
-    Color.Blue,
-    BorderStrokeStyle.None,
-    CornerRadii.Empty,
-    BorderWidths.Default
+      Color.Blue,
+      BorderStrokeStyle.None,
+      CornerRadii.Empty,
+      BorderWidths.Default
   )
-
 }

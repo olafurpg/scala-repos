@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.io
 
 import java.net.InetSocketAddress
@@ -10,9 +9,9 @@ import scala.concurrent.duration.DurationInt
 
 import com.typesafe.config.ConfigFactory
 
-import akka.actor.{ Actor, ActorDSL, ActorLogging, ActorRef, ActorSystem, Props, SupervisorStrategy }
+import akka.actor.{Actor, ActorDSL, ActorLogging, ActorRef, ActorSystem, Props, SupervisorStrategy}
 import akka.actor.ActorDSL.inbox
-import akka.io.{ IO, Tcp }
+import akka.io.{IO, Tcp}
 import akka.util.ByteString
 
 object EchoServer extends App {
@@ -21,19 +20,19 @@ object EchoServer extends App {
   implicit val system = ActorSystem("EchoServer", config)
 
   // make sure to stop the system so that the application stops
-  try run()
-  finally system.terminate()
+  try run() finally system.terminate()
 
   def run(): Unit = {
     import ActorDSL._
 
     // create two EchoManager and stop the application once one dies
     val watcher = inbox()
-    watcher.watch(system.actorOf(Props(classOf[EchoManager], classOf[EchoHandler]), "echo"))
-    watcher.watch(system.actorOf(Props(classOf[EchoManager], classOf[SimpleEchoHandler]), "simple"))
+    watcher.watch(system.actorOf(
+            Props(classOf[EchoManager], classOf[EchoHandler]), "echo"))
+    watcher.watch(system.actorOf(
+            Props(classOf[EchoManager], classOf[SimpleEchoHandler]), "simple"))
     watcher.receive(10.minutes)
   }
-
 }
 
 class EchoManager(handlerClass: Class[_]) extends Actor with ActorLogging {
@@ -67,7 +66,6 @@ class EchoManager(handlerClass: Class[_]) extends Actor with ActorLogging {
       sender() ! Register(handler, keepOpenOnPeerClosed = true)
     //#echo-manager
   }
-
 }
 
 //#echo-handler
@@ -79,7 +77,7 @@ object EchoHandler {
 }
 
 class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
-  extends Actor with ActorLogging {
+    extends Actor with ActorLogging {
 
   import Tcp._
   import EchoHandler._
@@ -115,9 +113,9 @@ class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
     var peerClosed = false
 
     {
-      case Received(data)         => buffer(data)
-      case WritingResumed         => writeFirst()
-      case PeerClosed             => peerClosed = true
+      case Received(data) => buffer(data)
+      case WritingResumed => writeFirst()
+      case PeerClosed => peerClosed = true
       case Ack(ack) if ack < nack => acknowledge(ack)
       case Ack(ack) =>
         acknowledge(ack)
@@ -148,7 +146,6 @@ class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
           context.unbecome()
 
         case ack: Int => acknowledge(ack)
-
       }, discardOld = false)
 
     case Ack(ack) =>
@@ -182,7 +179,6 @@ class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
     if (stored > maxStored) {
       log.warning(s"drop connection to [$remote] (buffer overrun)")
       context stop self
-
     } else if (stored > highWatermark) {
       log.debug(s"suspending reading at $currentOffset")
       connection ! SuspendReading
@@ -225,7 +221,7 @@ class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
 
 //#simple-echo-handler
 class SimpleEchoHandler(connection: ActorRef, remote: InetSocketAddress)
-  extends Actor with ActorLogging {
+    extends Actor with ActorLogging {
 
   import Tcp._
 
@@ -241,8 +237,8 @@ class SimpleEchoHandler(connection: ActorRef, remote: InetSocketAddress)
 
       context.become({
         case Received(data) => buffer(data)
-        case Ack            => acknowledge()
-        case PeerClosed     => closing = true
+        case Ack => acknowledge()
+        case PeerClosed => closing = true
       }, discardOld = false)
 
     case PeerClosed => context stop self
@@ -271,7 +267,6 @@ class SimpleEchoHandler(connection: ActorRef, remote: InetSocketAddress)
     if (stored > maxStored) {
       log.warning(s"drop connection to [$remote] (buffer overrun)")
       context stop self
-
     } else if (stored > highWatermark) {
       log.debug(s"suspending reading")
       connection ! SuspendReading

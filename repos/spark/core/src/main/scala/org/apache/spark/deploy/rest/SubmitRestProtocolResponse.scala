@@ -20,9 +20,10 @@ package org.apache.spark.deploy.rest
 import java.lang.Boolean
 
 /**
- * An abstract response sent from the server in the REST application submission protocol.
- */
-private[rest] abstract class SubmitRestProtocolResponse extends SubmitRestProtocolMessage {
+  * An abstract response sent from the server in the REST application submission protocol.
+  */
+private[rest] abstract class SubmitRestProtocolResponse
+    extends SubmitRestProtocolMessage {
   var serverSparkVersion: String = null
   var success: Boolean = null
   var unknownFields: Array[String] = null
@@ -33,9 +34,10 @@ private[rest] abstract class SubmitRestProtocolResponse extends SubmitRestProtoc
 }
 
 /**
- * A response to a [[CreateSubmissionRequest]] in the REST application submission protocol.
- */
-private[spark] class CreateSubmissionResponse extends SubmitRestProtocolResponse {
+  * A response to a [[CreateSubmissionRequest]] in the REST application submission protocol.
+  */
+private[spark] class CreateSubmissionResponse
+    extends SubmitRestProtocolResponse {
   var submissionId: String = null
   protected override def doValidate(): Unit = {
     super.doValidate()
@@ -44,9 +46,10 @@ private[spark] class CreateSubmissionResponse extends SubmitRestProtocolResponse
 }
 
 /**
- * A response to a kill request in the REST application submission protocol.
- */
-private[spark] class KillSubmissionResponse extends SubmitRestProtocolResponse {
+  * A response to a kill request in the REST application submission protocol.
+  */
+private[spark] class KillSubmissionResponse
+    extends SubmitRestProtocolResponse {
   var submissionId: String = null
   protected override def doValidate(): Unit = {
     super.doValidate()
@@ -56,9 +59,10 @@ private[spark] class KillSubmissionResponse extends SubmitRestProtocolResponse {
 }
 
 /**
- * A response to a status request in the REST application submission protocol.
- */
-private[spark] class SubmissionStatusResponse extends SubmitRestProtocolResponse {
+  * A response to a status request in the REST application submission protocol.
+  */
+private[spark] class SubmissionStatusResponse
+    extends SubmitRestProtocolResponse {
   var submissionId: String = null
   var driverState: String = null
   var workerId: String = null
@@ -72,8 +76,8 @@ private[spark] class SubmissionStatusResponse extends SubmitRestProtocolResponse
 }
 
 /**
- * An error response message used in the REST application submission protocol.
- */
+  * An error response message used in the REST application submission protocol.
+  */
 private[rest] class ErrorResponse extends SubmitRestProtocolResponse {
   // The highest protocol version that the server knows about
   // This is set when the client specifies an unknown version

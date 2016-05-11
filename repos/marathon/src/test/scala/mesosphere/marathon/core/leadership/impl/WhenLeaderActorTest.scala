@@ -1,7 +1,7 @@
 package mesosphere.marathon.core.leadership.impl
 
-import akka.actor.{ ActorSystem, PoisonPill, Props, Status }
-import akka.testkit.{ TestActorRef, TestProbe }
+import akka.actor.{ActorSystem, PoisonPill, Props, Status}
+import akka.testkit.{TestActorRef, TestProbe}
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.core.leadership.PreparationMessages
 
@@ -35,7 +35,8 @@ class WhenLeaderActorTest extends MarathonSpec {
   test("when active, answer PrepareForStart immediately") {
     val probe = TestProbe()
     val ref = whenLeaderRef()
-    ref.underlying.become(ref.underlyingActor.active(childRef = childProbe.ref))
+    ref.underlying.become(
+        ref.underlyingActor.active(childRef = childProbe.ref))
     probe.send(ref, PreparationMessages.PrepareForStart)
     probe.expectMsg(PreparationMessages.Prepared(ref))
   }
@@ -43,7 +44,8 @@ class WhenLeaderActorTest extends MarathonSpec {
   test("when starting, stop") {
     val probe = TestProbe()
     val ref = whenLeaderRef()
-    ref.underlying.become(ref.underlyingActor.starting(coordinatorRef = probe.ref, childRef = childProbe.ref))
+    ref.underlying.become(ref.underlyingActor.starting(
+            coordinatorRef = probe.ref, childRef = childProbe.ref))
     probe.send(ref, WhenLeaderActor.Stop)
     val failure = probe.expectMsgClass(classOf[Status.Failure])
     assert(failure.cause.getMessage.contains("starting aborted due to stop"))
@@ -64,7 +66,8 @@ class WhenLeaderActorTest extends MarathonSpec {
 
     val dyingProbe = TestProbe()
 
-    ref.underlying.become(ref.underlyingActor.dying(stopAckRef = probe.ref, childRef = dyingProbe.ref))
+    ref.underlying.become(ref.underlyingActor.dying(stopAckRef = probe.ref,
+                                                    childRef = dyingProbe.ref))
     ref.underlying.watch(dyingProbe.ref)
 
     val stashMeThenFail: String = "Stash me, then respond with fail"

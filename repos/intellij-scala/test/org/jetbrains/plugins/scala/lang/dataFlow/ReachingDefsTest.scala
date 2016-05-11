@@ -16,11 +16,11 @@ import scala.collection.immutable.Set
 import scala.collection.mutable
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 class ReachingDefsTest extends LightCodeInsightFixtureTestCase {
-  protected override def getBasePath = TestUtils.getTestDataPath + "/dataFlow/reachingDefs/"
+  protected override def getBasePath =
+    TestUtils.getTestDataPath + "/dataFlow/reachingDefs/"
 
   override def setUp() = {
     super.setUp()
@@ -28,26 +28,35 @@ class ReachingDefsTest extends LightCodeInsightFixtureTestCase {
   }
 
   def doTest() {
-    val input: java.util.List[String] = TestUtils.readInput(getBasePath + getTestName(true) + ".test")
+    val input: java.util.List[String] =
+      TestUtils.readInput(getBasePath + getTestName(true) + ".test")
     myFixture.configureByText(ScalaFileType.SCALA_FILE_TYPE, input.get(0))
     val file: ScalaFile = myFixture.getFile.asInstanceOf[ScalaFile]
     val model: SelectionModel = myFixture.getEditor.getSelectionModel
-    val start: PsiElement = file.findElementAt(if (model.hasSelection) model.getSelectionStart else 0)
-    val end: PsiElement = file.findElementAt(if (model.hasSelection) model.getSelectionEnd - 1 else file.getTextLength - 1)
-    val owner: ScControlFlowOwner = PsiTreeUtil.getParentOfType(PsiTreeUtil.findCommonParent(start, end), classOf[ScControlFlowOwner], false)
-    val builder: ScalaControlFlowBuilder = new ScalaControlFlowBuilder(null, null)
+    val start: PsiElement = file.findElementAt(
+        if (model.hasSelection) model.getSelectionStart else 0)
+    val end: PsiElement = file.findElementAt(if (model.hasSelection)
+          model.getSelectionEnd - 1 else file.getTextLength - 1)
+    val owner: ScControlFlowOwner = PsiTreeUtil.getParentOfType(
+        PsiTreeUtil.findCommonParent(start, end),
+        classOf[ScControlFlowOwner],
+        false)
+    val builder: ScalaControlFlowBuilder = new ScalaControlFlowBuilder(
+        null, null)
     val instructions = builder.buildControlflow(owner)
 
     import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.ReachingDefinitions._
 
-    val engine = new DfaEngine(instructions, ReachingDefinitionsInstance, ReachingDefinitionsLattice)
+    val engine = new DfaEngine(
+        instructions, ReachingDefinitionsInstance, ReachingDefinitionsLattice)
     val markup: mutable.Map[Instruction, Set[Instruction]] = engine.performDFA
 
     val cf: String = dumpDataFlow(markup)
     Assert.assertEquals(input.get(1).trim, cf.trim)
   }
 
-  protected def dumpDataFlow(markup: mutable.Map[Instruction, Set[Instruction]]): String = {
+  protected def dumpDataFlow(
+      markup: mutable.Map[Instruction, Set[Instruction]]): String = {
     var builder: StringBuilder = new StringBuilder
     for (instruction <- markup.keySet.toSeq.sortBy(_.num)) {
       builder.append(instruction.toString)
@@ -63,5 +72,4 @@ class ReachingDefsTest extends LightCodeInsightFixtureTestCase {
 
   def testFirst() = doTest
   def testSecond() = doTest
-
 }

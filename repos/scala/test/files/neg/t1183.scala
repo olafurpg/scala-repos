@@ -2,20 +2,19 @@
 
 object Test {
 
-  class Foo(j:Int) {
+  class Foo(j: Int) {
     object Baz
     class Bam
     object Bar
-    case class Bar(i:Int)
+    case class Bar(i: Int)
   }
-
 
   class Test717 {
     val foo1 = new Foo(1)
 
     def runTest() = {
-      val res = (foo1.Bar(2):Any) match {
-        case foo1.Bar(2) => true   // (1)
+      val res = (foo1.Bar(2): Any) match {
+        case foo1.Bar(2) => true // (1)
       }
       require(res)
     }
@@ -23,12 +22,11 @@ object Test {
 
   // (2)
   object Foo {
-    class Bar(val x : String)
+    class Bar(val x: String)
     class Baz
     object Bam
     object Bar
 
-    def unapply(s : String) : Option[Bar] = Some(new Bar(s))
+    def unapply(s: String): Option[Bar] = Some(new Bar(s))
   }
-
 }

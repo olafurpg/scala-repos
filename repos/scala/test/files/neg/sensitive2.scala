@@ -4,5 +4,4 @@ object Test {
   implicit def foo2(a: Any): Foo[String] = new Foo("123")
 
   val a: Foo[_] = "abc"
-
 }

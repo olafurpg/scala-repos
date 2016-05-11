@@ -5,7 +5,7 @@
 package akka.http.scaladsl.server
 
 import akka.event.LoggingAdapter
-import akka.actor.{ ActorSystem, ActorContext }
+import akka.actor.{ActorSystem, ActorContext}
 import akka.http.scaladsl.model.HttpRequest
 
 trait RoutingLog {
@@ -20,8 +20,10 @@ object RoutingLog extends LowerPriorityRoutingLogImplicits {
       def requestLog(request: HttpRequest) = defaultLog
     }
 
-  implicit def fromActorContext(implicit ac: ActorContext): RoutingLog = RoutingLog(ac.system.log)
+  implicit def fromActorContext(implicit ac: ActorContext): RoutingLog =
+    RoutingLog(ac.system.log)
 }
 sealed abstract class LowerPriorityRoutingLogImplicits {
-  implicit def fromActorSystem(implicit system: ActorSystem): RoutingLog = RoutingLog(system.log)
+  implicit def fromActorSystem(implicit system: ActorSystem): RoutingLog =
+    RoutingLog(system.log)
 }

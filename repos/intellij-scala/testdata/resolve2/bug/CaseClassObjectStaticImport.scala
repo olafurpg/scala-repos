@@ -1,10 +1,10 @@
 package a {
-case class CaseClassObjectStaticImport
-object CaseClassObjectStaticImport {
-  class H
-}
+  case class CaseClassObjectStaticImport
+  object CaseClassObjectStaticImport {
+    class H
+  }
 
-class F {
-  import /* */CaseClassObjectStaticImport./* */H
-}
+  class F {
+    import /* */ CaseClassObjectStaticImport. /* */ H
+  }
 }

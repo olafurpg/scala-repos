@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.persistence
 
 import java.io.File
@@ -9,7 +9,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import akka.actor._
 import akka.persistence.journal.AsyncWriteTarget._
-import akka.persistence.journal.leveldb.{ SharedLeveldbJournal, SharedLeveldbStore }
+import akka.persistence.journal.leveldb.{SharedLeveldbJournal, SharedLeveldbStore}
 import akka.testkit.TestProbe
 import org.apache.commons.io.FileUtils
 import org.openjdk.jmh.annotations._
@@ -40,12 +40,18 @@ class LevelDbBatchingBenchmark {
   var store: ActorRef = _
 
   val batch_1 = List.fill(1) { AtomicWrite(PersistentRepr("data", 12, "pa")) }
-  val batch_10 = List.fill(10) { AtomicWrite(PersistentRepr("data", 12, "pa")) }
-  val batch_100 = List.fill(100) { AtomicWrite(PersistentRepr("data", 12, "pa")) }
-  val batch_200 = List.fill(200) { AtomicWrite(PersistentRepr("data", 12, "pa")) }
+  val batch_10 = List.fill(10) {
+    AtomicWrite(PersistentRepr("data", 12, "pa"))
+  }
+  val batch_100 = List.fill(100) {
+    AtomicWrite(PersistentRepr("data", 12, "pa"))
+  }
+  val batch_200 = List.fill(200) {
+    AtomicWrite(PersistentRepr("data", 12, "pa"))
+  }
 
   @Setup(Level.Trial)
-  def setup():Unit = {
+  def setup(): Unit = {
     sys = ActorSystem("sys")
     deleteStorage(sys)
     SharedLeveldbJournal.setStore(store, sys)
@@ -55,7 +61,7 @@ class LevelDbBatchingBenchmark {
   }
 
   @TearDown(Level.Trial)
-  def tearDown():Unit = {
+  def tearDown(): Unit = {
     store ! PoisonPill
     Thread.sleep(500)
 
@@ -66,7 +72,7 @@ class LevelDbBatchingBenchmark {
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MICROSECONDS)
   @OperationsPerInvocation(1)
-  def write_1():Unit = {
+  def write_1(): Unit = {
     probe.send(store, WriteMessages(batch_1))
     probe.expectMsgType[Any]
   }
@@ -74,7 +80,7 @@ class LevelDbBatchingBenchmark {
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MICROSECONDS)
   @OperationsPerInvocation(10)
-  def writeBatch_10():Unit = {
+  def writeBatch_10(): Unit = {
     probe.send(store, WriteMessages(batch_10))
     probe.expectMsgType[Any]
   }
@@ -82,7 +88,7 @@ class LevelDbBatchingBenchmark {
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MICROSECONDS)
   @OperationsPerInvocation(100)
-  def writeBatch_100():Unit = {
+  def writeBatch_100(): Unit = {
     probe.send(store, WriteMessages(batch_100))
     probe.expectMsgType[Any]
   }
@@ -90,7 +96,7 @@ class LevelDbBatchingBenchmark {
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MICROSECONDS)
   @OperationsPerInvocation(200)
-  def writeBatch_200():Unit = {
+  def writeBatch_200(): Unit = {
     probe.send(store, WriteMessages(batch_200))
     probe.expectMsgType[Any]
   }
@@ -98,12 +104,12 @@ class LevelDbBatchingBenchmark {
   // TOOLS
 
   private def deleteStorage(sys: ActorSystem) {
-    val storageLocations = List(
-      "akka.persistence.journal.leveldb.dir",
-      "akka.persistence.journal.leveldb-shared.store.dir",
-      "akka.persistence.snapshot-store.local.dir").map(s ⇒ new File(sys.settings.config.getString(s)))
+    val storageLocations =
+      List("akka.persistence.journal.leveldb.dir",
+           "akka.persistence.journal.leveldb-shared.store.dir",
+           "akka.persistence.snapshot-store.local.dir").map(
+          s ⇒ new File(sys.settings.config.getString(s)))
 
     storageLocations.foreach(FileUtils.deleteDirectory)
   }
-
 }

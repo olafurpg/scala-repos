@@ -13,15 +13,15 @@ object test {
 import test._;
 
 trait S extends ooo.I[D] {
-    def bar: E = foo(c,d);
+  def bar: E = foo(c, d);
 }
 
 class O[X]() {
-    trait I[Y] {
-        def foo(x: X, y: Y): E = e;
-    }
-    val i:I[E] = null;
-    val j:I[X] = null;
+  trait I[Y] {
+    def foo(x: X, y: Y): E = e;
+  }
+  val i: I[E] = null;
+  val j: I[X] = null;
 }
 
 object ooo extends O[C]() {
@@ -29,9 +29,9 @@ object ooo extends O[C]() {
   def main = {
     val s: S = null;
     import s._;
-    foo(c,d);
-    ooo.i.foo(c,e);
-    ooo.j.foo(c,c);
+    foo(c, d);
+    ooo.i.foo(c, e);
+    ooo.j.foo(c, c);
     bar
   }
 }
@@ -39,9 +39,8 @@ object ooo extends O[C]() {
 class Main() {
   val s: S = null;
   import s._;
-  foo(c,d);
-  ooo.i.foo(c,e);
-  ooo.j.foo(c,c);
+  foo(c, d);
+  ooo.i.foo(c, e);
+  ooo.j.foo(c, c);
   bar;
 }
-

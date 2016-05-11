@@ -34,19 +34,21 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.StackPane
 
 /**
- * A sample that demonstrates reflection effect.
- *
- * @see scalafx.scene.effect.Reflection
- * @see scalafx.scene.effect.Effect
- * @resource /scalafx/ensemble/images/boat.jpg
- */
+  * A sample that demonstrates reflection effect.
+  *
+  * @see scalafx.scene.effect.Reflection
+  * @see scalafx.scene.effect.Effect
+  * @resource /scalafx/ensemble/images/boat.jpg
+  */
 class EnsembleReflection extends EnsembleExample {
 
   def getContent = {
     new StackPane {
       padding = Insets(20, 20, 170, 20)
       children = new ImageView {
-        image = new Image(this.getClass.getResourceAsStream("/scalafx/ensemble/images/boat.jpg"))
+        image = new Image(
+            this.getClass
+              .getResourceAsStream("/scalafx/ensemble/images/boat.jpg"))
         fitHeight = 150
         preserveRatio = true
         effect = new Reflection()

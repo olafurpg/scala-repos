@@ -3,7 +3,7 @@
  */
 package play.it.i18n
 
-import play.api.i18n.{ Lang, Langs }
+import play.api.i18n.{Lang, Langs}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test._
 
@@ -16,7 +16,9 @@ class LangSpec extends PlaySpecification {
       val de = Lang("de")
       val enUs = Lang("en-US")
 
-      implicit val app = GuiceApplicationBuilder().configure("play.i18n.langs" -> Seq(enUs, esEs, de).map(_.code)).build()
+      implicit val app = GuiceApplicationBuilder()
+        .configure("play.i18n.langs" -> Seq(enUs, esEs, de).map(_.code))
+        .build()
       val langs = app.injector.instanceOf[Langs]
 
       "with exact match" in {
@@ -58,7 +60,6 @@ class LangSpec extends PlaySpecification {
       "even with locales with different caseness" in trLocaleContext {
         Lang.get("ii-ii") must_== Lang.get("ii-II")
       }
-
     }
 
     "forbid instantiation of language code" in {
@@ -87,7 +88,9 @@ class LangSpec extends PlaySpecification {
         val astES = Lang("ast-ES")
         val ast = Lang("ast")
 
-        implicit val app = GuiceApplicationBuilder().configure("play.i18n.langs" -> Seq(crhUA, ber, astES).map(_.code)).build()
+        implicit val app = GuiceApplicationBuilder()
+          .configure("play.i18n.langs" -> Seq(crhUA, ber, astES).map(_.code))
+          .build()
         val langs = app.injector.instanceOf[Langs]
 
         "with exact match" in {
@@ -113,7 +116,6 @@ class LangSpec extends PlaySpecification {
         "in order" in {
           langs.preferred(Seq(astES, crhUA)) must_== astES
         }
-
       }
     }
 
@@ -132,7 +134,10 @@ class LangSpec extends PlaySpecification {
         val zhHans = Lang("zh-Hans")
         val zhHant = Lang("zh-Hant")
 
-        implicit val app = GuiceApplicationBuilder().configure("play.i18n.langs" -> Seq(zhHans, zh, azCyrl, enUS).map(_.code)).build()
+        implicit val app = GuiceApplicationBuilder()
+          .configure(
+              "play.i18n.langs" -> Seq(zhHans, zh, azCyrl, enUS).map(_.code))
+          .build()
         val langs = app.injector.instanceOf[Langs]
 
         "with exact match" in {
@@ -150,15 +155,13 @@ class LangSpec extends PlaySpecification {
         "in order" in {
           langs.preferred(Seq(azCyrl, zhHans, enUS)) must_== azCyrl
         }
-
       }
     }
-
   }
 }
 
 object trLocaleContext extends org.specs2.mutable.Around {
-  def around[T: org.specs2.execute.AsResult](t: => T) = {
+  def around[T : org.specs2.execute.AsResult](t: => T) = {
     val defaultLocale = java.util.Locale.getDefault
     java.util.Locale.setDefault(new java.util.Locale("tr"))
     val result = org.specs2.execute.AsResult(t)
@@ -166,4 +169,3 @@ object trLocaleContext extends org.specs2.mutable.Around {
     result
   }
 }
-

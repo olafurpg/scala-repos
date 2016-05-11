@@ -8,7 +8,8 @@ object Vendor {
 }
 
 trait Factory {
-  abstract class FactoryMaker[T](s: Vendor[T])(implicit m: Manifest[T]) extends Vendor[T] {
+  abstract class FactoryMaker[T](s: Vendor[T])(implicit m: Manifest[T])
+      extends Vendor[T] {
     implicit def vend = s.apply()
   }
 }
@@ -21,6 +22,7 @@ object ServiceFactory extends Factory {
 object Login {
   import ServiceFactory._
 
-  /*start*/login()/*end*/
+  /*start*/
+  login() /*end*/
 }
 //Int

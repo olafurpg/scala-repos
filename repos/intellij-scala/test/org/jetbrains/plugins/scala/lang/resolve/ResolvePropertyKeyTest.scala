@@ -6,9 +6,9 @@ import com.intellij.psi.{PsiElement, PsiReference}
 import org.junit.Assert
 
 /**
- * Nikolay.Tropin
- * 2014-09-26
- */
+  * Nikolay.Tropin
+  * 2014-09-26
+  */
 class ResolvePropertyKeyTest extends ScalaResolveTestCase {
   override def folderPath: String = {
     super.folderPath + "resolve/propertyKey/"

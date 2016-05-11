@@ -1,3 +1,3 @@
 trait B extends A {
-	override def x = super.x * 2
+  override def x = super.x * 2
 }

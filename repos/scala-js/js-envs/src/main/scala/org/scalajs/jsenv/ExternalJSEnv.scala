@@ -4,15 +4,16 @@ import org.scalajs.core.tools.io._
 import org.scalajs.core.tools.logging.Logger
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 
-import java.io.{ Console => _, _ }
+import java.io.{Console => _, _}
 import scala.io.Source
 
 import scala.concurrent.{Future, Promise}
 import scala.util.Try
 
 abstract class ExternalJSEnv(
-  final protected val additionalArgs: Seq[String],
-  final protected val additionalEnv:  Map[String, String]) extends AsyncJSEnv {
+    final protected val additionalArgs: Seq[String],
+    final protected val additionalEnv: Map[String, String])
+    extends AsyncJSEnv {
 
   import ExternalJSEnv._
 
@@ -54,14 +55,14 @@ abstract class ExternalJSEnv(
     protected def sendVMStdin(out: OutputStream): Unit = {}
 
     /** VM arguments excluding executable. Override to adapt.
-     *  Overrider is responsible to add additionalArgs.
-     */
+      *  Overrider is responsible to add additionalArgs.
+      */
     protected def getVMArgs(): Seq[String] = additionalArgs
 
     /** VM environment. Override to adapt.
-     *
-     *  Default is `sys.env` and [[additionalEnv]]
-     */
+      *
+      *  Default is `sys.env` and [[additionalEnv]]
+      */
     protected def getVMEnv(): Map[String, String] =
       sys.env ++ additionalEnv
 
@@ -84,42 +85,40 @@ abstract class ExternalJSEnv(
     final protected def pipeVMData(vmInst: Process): Unit = {
       // Send stdin to VM.
       val out = vmInst.getOutputStream()
-      try { sendVMStdin(out) }
-      finally { out.close() }
+      try { sendVMStdin(out) } finally { out.close() }
 
       // Pipe stdout to console
       pipeToConsole(vmInst.getInputStream(), console)
 
       // We are probably done (stdin is closed). Report any errors
       val errSrc = Source.fromInputStream(vmInst.getErrorStream(), "UTF-8")
-      try { errSrc.getLines.foreach(err => logger.error(err)) }
-      finally { errSrc.close }
+      try { errSrc.getLines.foreach(err => logger.error(err)) } finally {
+        errSrc.close
+      }
     }
 
     /** Wait for the VM to terminate, verify exit code
-     *
-     *  @throws ExternalJSEnv.NonZeroExitException if VM returned a non-zero code
-     */
+      *
+      *  @throws ExternalJSEnv.NonZeroExitException if VM returned a non-zero code
+      */
     final protected def waitForVM(vmInst: Process): Unit = {
       // Make sure we are done.
       vmInst.waitFor()
 
       // Get return value and return
       val retVal = vmInst.exitValue
-      if (retVal != 0)
-        throw new NonZeroExitException(vmName, retVal)
+      if (retVal != 0) throw new NonZeroExitException(vmName, retVal)
     }
 
     protected def startVM(): Process = {
       val vmArgs = getVMArgs()
-      val vmEnv  = getVMEnv()
+      val vmEnv = getVMEnv()
 
       val allArgs = executable +: vmArgs
       val pBuilder = new ProcessBuilder(allArgs: _*)
 
       pBuilder.environment().clear()
-      for ((name, value) <- vmEnv)
-        pBuilder.environment().put(name, value)
+      for ((name, value) <- vmEnv) pBuilder.environment().put(name, value)
 
       logger.debug("Starting process: " + allArgs.mkString(" "))
 
@@ -127,11 +126,10 @@ abstract class ExternalJSEnv(
     }
 
     /** send a bunch of JS files to an output stream */
-    final protected def sendJS(files: Seq[VirtualJSFile],
-        out: OutputStream): Unit = {
+    final protected def sendJS(
+        files: Seq[VirtualJSFile], out: OutputStream): Unit = {
       val writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"))
-      try sendJS(files, writer)
-      finally writer.close()
+      try sendJS(files, writer) finally writer.close()
     }
 
     /** send a bunch of JS files to a writer */
@@ -141,13 +139,12 @@ abstract class ExternalJSEnv(
     /** pipe lines from input stream to JSConsole */
     final protected def pipeToConsole(in: InputStream, console: JSConsole) = {
       val source = Source.fromInputStream(in, "UTF-8")
-      try { source.getLines.foreach(console.log _) }
-      finally { source.close() }
+      try { source.getLines.foreach(console.log _) } finally { source.close() }
     }
-
   }
 
-  protected class ExtRunner(libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
+  protected class ExtRunner(
+      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
       extends AbstractExtRunner(libs, code) with JSRunner {
 
     def run(logger: Logger, console: JSConsole): Unit = {
@@ -160,7 +157,8 @@ abstract class ExternalJSEnv(
     }
   }
 
-  protected class AsyncExtRunner(libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
+  protected class AsyncExtRunner(
+      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
       extends AbstractExtRunner(libs, code) with AsyncJSRunner {
 
     private[this] var vmInst: Process = null
@@ -192,11 +190,11 @@ abstract class ExternalJSEnv(
     }
 
     /** Core functionality of [[start]].
-     *
-     *  Same as [[start]] but without a call to [[setupLoggerAndConsole]] and
-     *  not returning [[future]].
-     *  Useful to be called in overrides of [[start]].
-     */
+      *
+      *  Same as [[start]] but without a call to [[setupLoggerAndConsole]] and
+      *  not returning [[future]].
+      *  Useful to be called in overrides of [[start]].
+      */
     protected def startExternalJSEnv(): Unit = {
       require(vmInst == null, "start() may only be called once")
       vmInst = startVM()
@@ -208,7 +206,6 @@ abstract class ExternalJSEnv(
       vmInst.destroy()
     }
   }
-
 }
 
 object ExternalJSEnv {

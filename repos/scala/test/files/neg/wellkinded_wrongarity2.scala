@@ -2,8 +2,8 @@
 
 // expecting types of kind *->*
 class Monad[m[x]]
-trait ms1 extends Monad[String]        // wrong
-trait ms2[t] extends Monad[t]          // wrong
+trait ms1 extends Monad[String] // wrong
+trait ms2[t] extends Monad[t] // wrong
 trait ms3[m[_], t] extends Monad[m[t]] // wrong -- added to check regression on bug
 
 // expecting types of kind *

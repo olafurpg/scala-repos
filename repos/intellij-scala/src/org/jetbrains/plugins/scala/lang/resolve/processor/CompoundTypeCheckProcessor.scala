@@ -13,12 +13,13 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.resolve.{ResolveTargets, StdKinds}
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
-class CompoundTypeCheckSignatureProcessor(s: Signature, retType: ScType,
-                                 undefSubst: ScUndefinedSubstitutor, substitutor: ScSubstitutor)
-        extends BaseProcessor(StdKinds.methodRef + ResolveTargets.CLASS) {
+  * @author Alexander Podkhalyuzin
+  */
+class CompoundTypeCheckSignatureProcessor(s: Signature,
+                                          retType: ScType,
+                                          undefSubst: ScUndefinedSubstitutor,
+                                          substitutor: ScSubstitutor)
+    extends BaseProcessor(StdKinds.methodRef + ResolveTargets.CLASS) {
 
   private val name = s.name
 
@@ -38,7 +39,9 @@ class CompoundTypeCheckSignatureProcessor(s: Signature, retType: ScType,
 
     var undef = undefSubst
 
-    def checkTypeParameters(tp1: PsiTypeParameter, tp2: TypeParameter, variance: Int = 1): Boolean = {
+    def checkTypeParameters(tp1: PsiTypeParameter,
+                            tp2: TypeParameter,
+                            variance: Int = 1): Boolean = {
       tp1 match {
         case tp1: ScTypeParam =>
           if (tp1.typeParameters.length != tp2.typeParams.length) return false
@@ -50,21 +53,23 @@ class CompoundTypeCheckSignatureProcessor(s: Signature, retType: ScType,
           //lower type
           val lower1 = tp1.lowerBound.getOrNothing
           val lower2 = substitutor.subst(tp2.lowerType())
-          var t = Conformance.conformsInner(
-            if (variance == 1) lower2
-            else lower1,
-            if (variance == 1) lower1
-            else lower2, Set.empty, undef)
+          var t = Conformance.conformsInner(if (variance == 1) lower2
+                                            else lower1,
+                                            if (variance == 1) lower1
+                                            else lower2,
+                                            Set.empty,
+                                            undef)
           if (!t._1) return false
           undef = t._2
 
           val upper1 = tp1.upperBound.getOrAny
           val upper2 = substitutor.subst(tp2.upperType())
-          t = Conformance.conformsInner(
-            if (variance == 1) upper1
-            else upper2,
-            if (variance == 1) upper2
-            else upper1, Set.empty, undef)
+          t = Conformance.conformsInner(if (variance == 1) upper1
+                                        else upper2,
+                                        if (variance == 1) upper2
+                                        else upper1,
+                                        Set.empty,
+                                        undef)
           if (!t._1) return false
           undef = t._2
 
@@ -96,7 +101,9 @@ class CompoundTypeCheckSignatureProcessor(s: Signature, retType: ScType,
       case _ => if (s.typeParams.length > 0) return true
     }
 
-    def checkSignature(sign1: Signature, typeParams: Array[PsiTypeParameter], returnType: ScType): Boolean = {
+    def checkSignature(sign1: Signature,
+                       typeParams: Array[PsiTypeParameter],
+                       returnType: ScType): Boolean = {
       import org.jetbrains.plugins.scala.lang.psi.types.Signature.unify
 
       val sign2 = s
@@ -128,29 +135,40 @@ class CompoundTypeCheckSignatureProcessor(s: Signature, retType: ScType,
     element match {
       case _: ScBindingPattern | _: ScFieldId | _: ScParameter =>
         val rt = subst.subst(element match {
-          case b: ScBindingPattern => b.getType(TypingContext.empty).getOrNothing
+          case b: ScBindingPattern =>
+            b.getType(TypingContext.empty).getOrNothing
           case f: ScFieldId => f.getType(TypingContext.empty).getOrNothing
-          case param: ScParameter => param.getType(TypingContext.empty).getOrNothing
+          case param: ScParameter =>
+            param.getType(TypingContext.empty).getOrNothing
         })
         val dcl: ScTypedDefinition = element.asInstanceOf[ScTypedDefinition]
         val isVar = dcl.isVar
-        if (!checkSignature(new Signature(dcl.name, Seq.empty, 0, subst, dcl), Array.empty, rt)) return false
-        if (isVar && !checkSignature(new Signature(dcl.name + "_=", Seq(() => rt), 1, subst, dcl),
-          Array.empty, Unit)) return false
+        if (!checkSignature(new Signature(dcl.name, Seq.empty, 0, subst, dcl),
+                            Array.empty,
+                            rt)) return false
+        if (isVar && !checkSignature(
+                new Signature(dcl.name + "_=", Seq(() => rt), 1, subst, dcl),
+                Array.empty,
+                Unit)) return false
       case method: PsiMethod =>
         val sign1 = new PhysicalSignature(method, subst)
         if (!checkSignature(sign1, method.getTypeParameters, method match {
-          case fun: ScFunction => fun.returnType.getOrNothing
-          case method: PsiMethod => ScType.create(method.getReturnType, method.getProject, method.getResolveScope)
-        })) return false
+              case fun: ScFunction => fun.returnType.getOrNothing
+              case method: PsiMethod =>
+                ScType.create(method.getReturnType,
+                              method.getProject,
+                              method.getResolveScope)
+            })) return false
       case _ =>
     }
     true
   }
 }
 
-class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature, undefSubst: ScUndefinedSubstitutor, substitutor: ScSubstitutor)
-  extends BaseProcessor(StdKinds.methodRef + ResolveTargets.CLASS) {
+class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature,
+                                          undefSubst: ScUndefinedSubstitutor,
+                                          substitutor: ScSubstitutor)
+    extends BaseProcessor(StdKinds.methodRef + ResolveTargets.CLASS) {
   private val name = sign.name
 
   private var trueResult = false
@@ -169,7 +187,9 @@ class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature, undefSubst: 
 
     var undef = undefSubst
 
-    def checkTypeParameters(tp1: PsiTypeParameter, tp2: TypeParameter, variance: Int = 1): Boolean = {
+    def checkTypeParameters(tp1: PsiTypeParameter,
+                            tp2: TypeParameter,
+                            variance: Int = 1): Boolean = {
       tp1 match {
         case tp1: ScTypeParam =>
           if (tp1.typeParameters.length != tp2.typeParams.length) return false
@@ -181,21 +201,23 @@ class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature, undefSubst: 
           //lower type
           val lower1 = tp1.lowerBound.getOrNothing
           val lower2 = substitutor.subst(tp2.lowerType())
-          var t = Conformance.conformsInner(
-            if (variance == 1) lower2
-            else lower1,
-            if (variance == 1) lower1
-            else lower2, Set.empty, undef)
+          var t = Conformance.conformsInner(if (variance == 1) lower2
+                                            else lower1,
+                                            if (variance == 1) lower1
+                                            else lower2,
+                                            Set.empty,
+                                            undef)
           if (!t._1) return false
           undef = t._2
 
           val upper1 = tp1.upperBound.getOrAny
           val upper2 = substitutor.subst(tp2.upperType())
-          t = Conformance.conformsInner(
-            if (variance == 1) upper1
-            else upper2,
-            if (variance == 1) upper2
-            else upper1, Set.empty, undef)
+          t = Conformance.conformsInner(if (variance == 1) upper1
+                                        else upper2,
+                                        if (variance == 1) upper2
+                                        else upper1,
+                                        Set.empty,
+                                        undef)
           if (!t._1) return false
           undef = t._2
 
@@ -230,11 +252,16 @@ class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature, undefSubst: 
     def checkDeclarationForTypeAlias(tp: ScTypeAlias): Boolean = {
       sign.ta match {
         case _: ScTypeAliasDeclaration =>
-          var t = Conformance.conformsInner(subst.subst(tp.lowerBound.getOrNothing),
-            substitutor.subst(sign.lowerBound), Set.empty, undef)
+          var t = Conformance.conformsInner(
+              subst.subst(tp.lowerBound.getOrNothing),
+              substitutor.subst(sign.lowerBound),
+              Set.empty,
+              undef)
           if (t._1) {
             t = Conformance.conformsInner(substitutor.subst(sign.upperBound),
-              subst.subst(tp.upperBound.getOrAny), Set.empty, t._2)
+                                          subst.subst(tp.upperBound.getOrAny),
+                                          Set.empty,
+                                          t._2)
             if (t._1) {
               trueResult = true
               undef = t._2
@@ -251,18 +278,23 @@ class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature, undefSubst: 
       case tp: ScTypeAliasDefinition =>
         sign.ta match {
           case _: ScTypeAliasDefinition =>
-            val t = Equivalence.equivInner(subst.subst(tp.aliasedType.getOrNothing),
-              substitutor.subst(sign.lowerBound), undef, falseUndef = false)
+            val t = Equivalence.equivInner(
+                subst.subst(tp.aliasedType.getOrNothing),
+                substitutor.subst(sign.lowerBound),
+                undef,
+                falseUndef = false)
             if (t._1) {
               undef = t._2
               trueResult = true
               innerUndefinedSubstitutor = undef
               return false
             }
-          case _: ScTypeAliasDeclaration => if (checkDeclarationForTypeAlias(tp)) return false
+          case _: ScTypeAliasDeclaration =>
+            if (checkDeclarationForTypeAlias(tp)) return false
           case _ =>
         }
-      case tp: ScTypeAliasDeclaration => if (checkDeclarationForTypeAlias(tp)) return false
+      case tp: ScTypeAliasDeclaration =>
+        if (checkDeclarationForTypeAlias(tp)) return false
       case _ =>
     }
     true

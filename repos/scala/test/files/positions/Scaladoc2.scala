@@ -1,14 +1,15 @@
 object Scaladoc2 {
   def f {
+
     /**
-     * Foo
-     */
+      * Foo
+      */
     def g {}
 
     /*
      * Blah blah
      */
-    def h{}
+    def h {}
     h
   }
 

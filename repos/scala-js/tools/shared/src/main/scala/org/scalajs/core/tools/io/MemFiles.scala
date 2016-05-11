@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.io
 
@@ -27,8 +26,8 @@ class MemVirtualFile(val path: String) extends VirtualFile {
 }
 
 /** A simple in-memory mutable virtual text file. */
-class MemVirtualTextFile(p: String) extends MemVirtualFile(p)
-                                       with VirtualTextFile {
+class MemVirtualTextFile(p: String)
+    extends MemVirtualFile(p) with VirtualTextFile {
   private[this] var _content: String = ""
 
   override def content: String = _content
@@ -40,8 +39,8 @@ class MemVirtualTextFile(p: String) extends MemVirtualFile(p)
   }
 }
 
-trait WritableMemVirtualTextFile extends MemVirtualTextFile
-                                    with WritableVirtualTextFile {
+trait WritableMemVirtualTextFile
+    extends MemVirtualTextFile with WritableVirtualTextFile {
   def contentWriter: Writer = new StringWriter {
     override def close(): Unit = {
       super.close()
@@ -56,8 +55,8 @@ object WritableMemVirtualTextFile {
 }
 
 /** A simple in-memory mutable virtual binary file. */
-class MemVirtualBinaryFile(p: String) extends MemVirtualFile(p)
-                                         with VirtualBinaryFile {
+class MemVirtualBinaryFile(p: String)
+    extends MemVirtualFile(p) with VirtualBinaryFile {
   private[this] var _content: Array[Byte] = new Array[Byte](0)
 
   override def content: Array[Byte] = _content
@@ -70,8 +69,8 @@ class MemVirtualBinaryFile(p: String) extends MemVirtualFile(p)
 }
 
 /** A simple in-memory mutable virtual JS file. */
-class MemVirtualJSFile(p: String) extends MemVirtualTextFile(p)
-                                     with VirtualJSFile {
+class MemVirtualJSFile(p: String)
+    extends MemVirtualTextFile(p) with VirtualJSFile {
   private[this] var _sourceMap: Option[String] = None
 
   override def sourceMap: Option[String] = _sourceMap
@@ -83,9 +82,9 @@ class MemVirtualJSFile(p: String) extends MemVirtualTextFile(p)
   }
 }
 
-trait WritableMemVirtualJSFile extends MemVirtualJSFile
-                                  with WritableVirtualJSFile
-                                  with WritableMemVirtualTextFile {
+trait WritableMemVirtualJSFile
+    extends MemVirtualJSFile with WritableVirtualJSFile
+    with WritableMemVirtualTextFile {
 
   def sourceMapWriter: Writer = new StringWriter {
     override def close(): Unit = {
@@ -101,5 +100,5 @@ object WritableMemVirtualJSFile {
 }
 
 /** A simple in-memory mutable virtual serialized Scala.js IR file. */
-class MemVirtualSerializedScalaJSIRFile(p: String) extends MemVirtualBinaryFile(p)
-                                                      with VirtualSerializedScalaJSIRFile
+class MemVirtualSerializedScalaJSIRFile(p: String)
+    extends MemVirtualBinaryFile(p) with VirtualSerializedScalaJSIRFile

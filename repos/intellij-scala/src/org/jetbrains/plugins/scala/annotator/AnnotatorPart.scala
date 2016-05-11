@@ -7,9 +7,8 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTrait}
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 trait AnnotatorPart[T <: ScalaPsiElement] {
   def kind: Class[T]
 

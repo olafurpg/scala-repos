@@ -1,7 +1,7 @@
 import scala.reflect.{ClassTag, classTag}
 
 object Test extends App {
-  class X[T: ClassTag] {
+  class X[T : ClassTag] {
     val a = Array.ofDim[T](3, 4)
   }
   val x = new X[String]

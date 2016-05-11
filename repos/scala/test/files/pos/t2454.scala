@@ -1,11 +1,11 @@
 package am;
 
 trait One[M[_]] {
-  val x : Int
+  val x: Int
 }
 
-trait Two[M[_,_]] {
-  val x : Int
+trait Two[M[_, _]] {
+  val x: Int
 }
 
 object Test {

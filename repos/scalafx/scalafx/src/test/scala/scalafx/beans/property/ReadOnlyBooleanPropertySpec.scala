@@ -37,10 +37,10 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import scalafx.Includes._
 
 /**
- * ReadOnlyBooleanProperty Spec tests.
- *
- *
- */
+  * ReadOnlyBooleanProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ReadOnlyBooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
   val bean = new Object()
@@ -49,7 +49,8 @@ class ReadOnlyBooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
   var booleanProperty2: jfxbp.BooleanProperty = null
 
   override def beforeEach() {
-    readOnlyBooleanProperty = new ReadOnlyBooleanProperty(bean, "Test Read-only Boolean", true)
+    readOnlyBooleanProperty = new ReadOnlyBooleanProperty(
+        bean, "Test Read-only Boolean", true)
     booleanProperty1 = new BooleanProperty(bean, "Test Boolean 2")
     booleanProperty2 = new BooleanProperty(bean, "Test Boolean 3")
   }

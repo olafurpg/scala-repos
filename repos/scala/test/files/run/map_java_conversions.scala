@@ -1,8 +1,3 @@
-
-
-
-
-
 object Test {
 
   def main(args: Array[String]) {
@@ -50,11 +45,4 @@ object Test {
     for (i <- 0 until 10) m += (("key" + i, "value" + i))
     for ((k, v) <- m) assert(k.startsWith("key"))
   }
-
 }
-
-
-
-
-
-

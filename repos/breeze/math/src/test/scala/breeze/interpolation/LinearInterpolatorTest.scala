@@ -6,10 +6,9 @@ import breeze.linalg._
 import breeze.interpolation._
 
 /**
- *
- * @author chrismedrela
- **/
-
+  *
+  * @author chrismedrela
+  **/
 class LinearInterpolatorTest extends FunSuite {
   test("basics") {
     val x = DenseVector(1.0, 2.0, 3.0)
@@ -33,7 +32,8 @@ class LinearInterpolatorTest extends FunSuite {
     val y = DenseVector(2.0, 5.0, 6.0)
     val f = LinearInterpolator(x, y)
     assert(f(DenseVector(1.5, 2.5)) == DenseVector(3.5, 5.5))
-    assert(f(DenseMatrix((1.5, 2.5), (2.0, 1.0))) == DenseMatrix((3.5, 5.5), (5.0, 2.0)))
+    assert(f(DenseMatrix((1.5, 2.5), (2.0, 1.0))) == DenseMatrix((3.5, 5.5),
+                                                                 (5.0, 2.0)))
   }
 
   test("edge cases") {

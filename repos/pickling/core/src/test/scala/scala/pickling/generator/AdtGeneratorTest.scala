@@ -2,8 +2,6 @@ package scala.pickling.generator
 
 import org.scalatest.FunSuite
 
-
-
 // Case #1 - Everything sealed and together.
 object SimpleAdt {
   import scala.pickling.Defaults._
@@ -22,7 +20,8 @@ object SimpleAdt {
 
 object NestedAdt {
   import scala.pickling.Defaults._
-  @scala.pickling.directSubclasses(value = Array(classOf[Foo], classOf[NestedAdt]))
+  @scala.pickling.directSubclasses(
+      value = Array(classOf[Foo], classOf[NestedAdt]))
   sealed trait Adt
   final case class Foo(x: Int) extends Adt
   @scala.pickling.directSubclasses(value = Array(classOf[Bar]))
@@ -38,9 +37,7 @@ object NestedAdt {
   }
 }
 
-
-
-class AdtGeneratorTest  extends FunSuite {
+class AdtGeneratorTest extends FunSuite {
   import scala.pickling.Defaults._
   import scala.pickling.json._
   test("simpleAdt") {

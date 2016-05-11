@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.util
 
 import org.scalatest.Matchers
@@ -56,7 +56,7 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       //Remove key
       index.remove("s2") match {
         case Some(iter) ⇒ iter.toSet should ===(Set(1, 2))
-        case None       ⇒ fail()
+        case None ⇒ fail()
       }
       index.remove("s2") should ===(None)
       index.valueIterator("s2").toSet should ===(Set.empty[Int])
@@ -79,9 +79,10 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       val index = indexWithValues
 
       var valueCount = 0
-      index.foreach((key, value) ⇒ {
-        valueCount = valueCount + 1
-        index.findValue(key)(_ == value) should ===(Some(value))
+      index.foreach((key, value) ⇒
+            {
+          valueCount = valueCount + 1
+          index.findValue(key)(_ == value) should ===(Some(value))
       })
       valueCount should ===(6)
     }
@@ -97,8 +98,8 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       val nrOfKeys = 10
       val nrOfValues = 10
       //Fill index
-      for (key ← 0 until nrOfKeys; value ← 0 until nrOfValues)
-        index.put(key, value)
+      for (key ← 0 until nrOfKeys; value ← 0 until nrOfValues) index.put(key,
+                                                                         value)
       //Tasks to be executed in parallel
       def putTask() = Future {
         index.put(Random.nextInt(nrOfKeys), Random.nextInt(nrOfValues))

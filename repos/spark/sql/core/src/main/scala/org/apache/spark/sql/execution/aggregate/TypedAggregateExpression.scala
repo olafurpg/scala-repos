@@ -32,21 +32,21 @@ object TypedAggregateExpression {
   def apply[A, B : Encoder, C : Encoder](
       aggregator: Aggregator[A, B, C]): TypedAggregateExpression = {
     new TypedAggregateExpression(
-      aggregator.asInstanceOf[Aggregator[Any, Any, Any]],
-      None,
-      encoderFor[B].asInstanceOf[ExpressionEncoder[Any]],
-      encoderFor[C].asInstanceOf[ExpressionEncoder[Any]],
-      Nil,
-      0,
-      0)
+        aggregator.asInstanceOf[Aggregator[Any, Any, Any]],
+        None,
+        encoderFor[B].asInstanceOf[ExpressionEncoder[Any]],
+        encoderFor[C].asInstanceOf[ExpressionEncoder[Any]],
+        Nil,
+        0,
+        0)
   }
 }
 
 /**
- * This class is a rough sketch of how to hook `Aggregator` into the Aggregation system.  It has
- * the following limitations:
- *  - It assumes the aggregator has a zero, `0`.
- */
+  * This class is a rough sketch of how to hook `Aggregator` into the Aggregation system.  It has
+  * the following limitations:
+  *  - It assumes the aggregator has a zero, `0`.
+  */
 case class TypedAggregateExpression(
     aggregator: Aggregator[Any, Any, Any],
     aEncoder: Option[ExpressionEncoder[Any]], // Should be bound.
@@ -55,21 +55,24 @@ case class TypedAggregateExpression(
     children: Seq[Attribute],
     mutableAggBufferOffset: Int,
     inputAggBufferOffset: Int)
-  extends ImperativeAggregate with Logging {
+    extends ImperativeAggregate with Logging {
 
-  override def withNewMutableAggBufferOffset(newMutableAggBufferOffset: Int): ImperativeAggregate =
+  override def withNewMutableAggBufferOffset(
+      newMutableAggBufferOffset: Int): ImperativeAggregate =
     copy(mutableAggBufferOffset = newMutableAggBufferOffset)
 
-  override def withNewInputAggBufferOffset(newInputAggBufferOffset: Int): ImperativeAggregate =
+  override def withNewInputAggBufferOffset(
+      newInputAggBufferOffset: Int): ImperativeAggregate =
     copy(inputAggBufferOffset = newInputAggBufferOffset)
 
   override def nullable: Boolean = true
 
-  override def dataType: DataType = if (cEncoder.flat) {
-    cEncoder.schema.head.dataType
-  } else {
-    cEncoder.schema
-  }
+  override def dataType: DataType =
+    if (cEncoder.flat) {
+      cEncoder.schema.head.dataType
+    } else {
+      cEncoder.schema
+    }
 
   override def deterministic: Boolean = true
 
@@ -79,7 +82,8 @@ case class TypedAggregateExpression(
 
   override val aggBufferSchema: StructType = unresolvedBEncoder.schema
 
-  override val aggBufferAttributes: Seq[AttributeReference] = aggBufferSchema.toAttributes
+  override val aggBufferAttributes: Seq[AttributeReference] =
+    aggBufferSchema.toAttributes
 
   val bEncoder = unresolvedBEncoder
     .resolve(aggBufferAttributes, OuterScopes.outerScopes)

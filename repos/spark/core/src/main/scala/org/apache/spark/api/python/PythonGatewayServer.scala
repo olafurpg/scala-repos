@@ -26,11 +26,11 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.Utils
 
 /**
- * Process that starts a Py4J GatewayServer on an ephemeral port and communicates the bound port
- * back to its caller via a callback port specified by the caller.
- *
- * This process is launched (via SparkSubmit) by the PySpark driver (see java_gateway.py).
- */
+  * Process that starts a Py4J GatewayServer on an ephemeral port and communicates the bound port
+  * back to its caller via a callback port specified by the caller.
+  *
+  * This process is launched (via SparkSubmit) by the PySpark driver (see java_gateway.py).
+  */
 private[spark] object PythonGatewayServer extends Logging {
   def main(args: Array[String]): Unit = Utils.tryOrExit {
     // Start a GatewayServer on an ephemeral port
@@ -47,7 +47,8 @@ private[spark] object PythonGatewayServer extends Logging {
     // Communicate the bound port back to the caller via the caller-specified callback port
     val callbackHost = sys.env("_PYSPARK_DRIVER_CALLBACK_HOST")
     val callbackPort = sys.env("_PYSPARK_DRIVER_CALLBACK_PORT").toInt
-    logDebug(s"Communicating GatewayServer port to Python driver at $callbackHost:$callbackPort")
+    logDebug(
+        s"Communicating GatewayServer port to Python driver at $callbackHost:$callbackPort")
     val callbackSocket = new Socket(callbackHost, callbackPort)
     val dos = new DataOutputStream(callbackSocket.getOutputStream)
     dos.writeInt(boundPort)

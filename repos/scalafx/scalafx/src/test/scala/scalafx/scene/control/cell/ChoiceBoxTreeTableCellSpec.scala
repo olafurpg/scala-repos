@@ -35,9 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * ChoiceBoxTreeTableCell Spec tests.
- */
+  * ChoiceBoxTreeTableCell Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class ChoiceBoxTreeTableCellSpec[S, T]
-  extends SimpleSFXDelegateSpec[jfxscc.ChoiceBoxTreeTableCell[S, T], ChoiceBoxTreeTableCell[S, T]](
-    classOf[jfxscc.ChoiceBoxTreeTableCell[S, T]], classOf[ChoiceBoxTreeTableCell[S, T]])
+    extends SimpleSFXDelegateSpec[
+        jfxscc.ChoiceBoxTreeTableCell[S, T], ChoiceBoxTreeTableCell[S, T]](
+        classOf[jfxscc.ChoiceBoxTreeTableCell[S, T]],
+        classOf[ChoiceBoxTreeTableCell[S, T]])

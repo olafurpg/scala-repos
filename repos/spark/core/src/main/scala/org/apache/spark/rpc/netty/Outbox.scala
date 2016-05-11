@@ -33,11 +33,10 @@ private[netty] sealed trait OutboxMessage {
   def sendWith(client: TransportClient): Unit
 
   def onFailure(e: Throwable): Unit
-
 }
 
-private[netty] case class OneWayOutboxMessage(content: ByteBuffer) extends OutboxMessage
-  with Logging {
+private[netty] case class OneWayOutboxMessage(content: ByteBuffer)
+    extends OutboxMessage with Logging {
 
   override def sendWith(client: TransportClient): Unit = {
     client.send(content)
@@ -49,14 +48,13 @@ private[netty] case class OneWayOutboxMessage(content: ByteBuffer) extends Outbo
       case e1: Throwable => logWarning(s"Failed to send one-way RPC.", e1)
     }
   }
-
 }
 
-private[netty] case class RpcOutboxMessage(
-    content: ByteBuffer,
-    _onFailure: (Throwable) => Unit,
-    _onSuccess: (TransportClient, ByteBuffer) => Unit)
-  extends OutboxMessage with RpcResponseCallback {
+private[netty] case class RpcOutboxMessage(content: ByteBuffer,
+                                           _onFailure: (Throwable) => Unit,
+                                           _onSuccess: (TransportClient,
+                                           ByteBuffer) => Unit)
+    extends OutboxMessage with RpcResponseCallback {
 
   private var client: TransportClient = _
   private var requestId: Long = _
@@ -78,7 +76,6 @@ private[netty] case class RpcOutboxMessage(
   override def onSuccess(response: ByteBuffer): Unit = {
     _onSuccess(client, response)
   }
-
 }
 
 private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
@@ -92,9 +89,9 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
   private var client: TransportClient = null
 
   /**
-   * connectFuture points to the connect task. If there is no connect task, connectFuture will be
-   * null.
-   */
+    * connectFuture points to the connect task. If there is no connect task, connectFuture will be
+    * null.
+    */
   @GuardedBy("this")
   private var connectFuture: java.util.concurrent.Future[Unit] = null
 
@@ -102,15 +99,15 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
   private var stopped = false
 
   /**
-   * If there is any thread draining the message queue
-   */
+    * If there is any thread draining the message queue
+    */
   @GuardedBy("this")
   private var draining = false
 
   /**
-   * Send a message. If there is no active connection, cache it and launch a new connection. If
-   * [[Outbox]] is stopped, the sender will be notified with a [[SparkException]].
-   */
+    * Send a message. If there is no active connection, cache it and launch a new connection. If
+    * [[Outbox]] is stopped, the sender will be notified with a [[SparkException]].
+    */
   def send(message: OutboxMessage): Unit = {
     val dropped = synchronized {
       if (stopped) {
@@ -121,17 +118,18 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
       }
     }
     if (dropped) {
-      message.onFailure(new SparkException("Message is dropped because Outbox is stopped"))
+      message.onFailure(
+          new SparkException("Message is dropped because Outbox is stopped"))
     } else {
       drainOutbox()
     }
   }
 
   /**
-   * Drain the message queue. If there is other draining thread, just exit. If the connection has
-   * not been established, launch a task in the `nettyEnv.clientConnectionExecutor` to setup the
-   * connection.
-   */
+    * Drain the message queue. If there is other draining thread, just exit. If the connection has
+    * not been established, launch a task in the `nettyEnv.clientConnectionExecutor` to setup the
+    * connection.
+    */
   private def drainOutbox(): Unit = {
     var message: OutboxMessage = null
     synchronized {
@@ -184,7 +182,8 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
   }
 
   private def launchConnectTask(): Unit = {
-    connectFuture = nettyEnv.clientConnectionExecutor.submit(new Callable[Unit] {
+    connectFuture = nettyEnv.clientConnectionExecutor.submit(
+        new Callable[Unit] {
 
       override def call(): Unit = {
         try {
@@ -213,8 +212,8 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
   }
 
   /**
-   * Stop [[Inbox]] and notify the waiting messages with the cause.
-   */
+    * Stop [[Inbox]] and notify the waiting messages with the cause.
+    */
   private def handleNetworkFailure(e: Throwable): Unit = {
     synchronized {
       assert(connectFuture == null)
@@ -249,9 +248,9 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
   }
 
   /**
-   * Stop [[Outbox]]. The remaining messages in the [[Outbox]] will be notified with a
-   * [[SparkException]].
-   */
+    * Stop [[Outbox]]. The remaining messages in the [[Outbox]] will be notified with a
+    * [[SparkException]].
+    */
   def stop(): Unit = {
     synchronized {
       if (stopped) {
@@ -268,7 +267,8 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
     // update messages and it's safe to just drain the queue.
     var message = messages.poll()
     while (message != null) {
-      message.onFailure(new SparkException("Message is dropped because Outbox is stopped"))
+      message.onFailure(
+          new SparkException("Message is dropped because Outbox is stopped"))
       message = messages.poll()
     }
   }

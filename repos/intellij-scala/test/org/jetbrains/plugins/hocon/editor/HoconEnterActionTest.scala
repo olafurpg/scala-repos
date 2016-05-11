@@ -6,9 +6,10 @@ import org.junit.runner.RunWith
 import org.junit.runners.AllTests
 
 /**
- * @author ghik
- */
+  * @author ghik
+  */
 object HoconEnterActionTest extends TestSuiteCompanion[HoconEnterActionTest]
 
 @RunWith(classOf[AllTests])
-class HoconEnterActionTest extends HoconEditorActionTest(IdeActions.ACTION_EDITOR_ENTER, "enter")
+class HoconEnterActionTest
+    extends HoconEditorActionTest(IdeActions.ACTION_EDITOR_ENTER, "enter")

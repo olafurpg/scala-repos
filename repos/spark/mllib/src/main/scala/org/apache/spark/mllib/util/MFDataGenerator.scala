@@ -28,29 +28,29 @@ import org.apache.spark.mllib.linalg.{BLAS, DenseMatrix}
 import org.apache.spark.rdd.RDD
 
 /**
- * :: DeveloperApi ::
- * Generate RDD(s) containing data for Matrix Factorization.
- *
- * This method samples training entries according to the oversampling factor
- * 'trainSampFact', which is a multiplicative factor of the number of
- * degrees of freedom of the matrix: rank*(m+n-rank).
- *
- * It optionally samples entries for a testing matrix using
- * 'testSampFact', the percentage of the number of training entries
- * to use for testing.
- *
- * This method takes the following inputs:
- *   sparkMaster    (String) The master URL.
- *   outputPath     (String) Directory to save output.
- *   m              (Int) Number of rows in data matrix.
- *   n              (Int) Number of columns in data matrix.
- *   rank           (Int) Underlying rank of data matrix.
- *   trainSampFact  (Double) Oversampling factor.
- *   noise          (Boolean) Whether to add gaussian noise to training data.
- *   sigma          (Double) Standard deviation of added gaussian noise.
- *   test           (Boolean) Whether to create testing RDD.
- *   testSampFact   (Double) Percentage of training data to use as test data.
- */
+  * :: DeveloperApi ::
+  * Generate RDD(s) containing data for Matrix Factorization.
+  *
+  * This method samples training entries according to the oversampling factor
+  * 'trainSampFact', which is a multiplicative factor of the number of
+  * degrees of freedom of the matrix: rank*(m+n-rank).
+  *
+  * It optionally samples entries for a testing matrix using
+  * 'testSampFact', the percentage of the number of training entries
+  * to use for testing.
+  *
+  * This method takes the following inputs:
+  *   sparkMaster    (String) The master URL.
+  *   outputPath     (String) Directory to save output.
+  *   m              (Int) Number of rows in data matrix.
+  *   n              (Int) Number of columns in data matrix.
+  *   rank           (Int) Underlying rank of data matrix.
+  *   trainSampFact  (Double) Oversampling factor.
+  *   noise          (Boolean) Whether to add gaussian noise to training data.
+  *   sigma          (Double) Standard deviation of added gaussian noise.
+  *   test           (Boolean) Whether to create testing RDD.
+  *   testSampFact   (Double) Percentage of training data to use as test data.
+  */
 @DeveloperApi
 @Since("0.8.0")
 object MFDataGenerator {
@@ -58,8 +58,9 @@ object MFDataGenerator {
   def main(args: Array[String]) {
     if (args.length < 2) {
       // scalastyle:off println
-      println("Usage: MFDataGenerator " +
-        "<master> <outputDir> [m] [n] [rank] [trainSampFact] [noise] [sigma] [test] [testSampFact]")
+      println(
+          "Usage: MFDataGenerator " +
+          "<master> <outputDir> [m] [n] [rank] [trainSampFact] [noise] [sigma] [test] [testSampFact]")
       // scalastyle:on println
       System.exit(1)
     }
@@ -86,34 +87,40 @@ object MFDataGenerator {
     BLAS.gemm(z, A, B, 1.0, fullData)
 
     val df = rank * (m + n - rank)
-    val sampSize = math.min(math.round(trainSampFact * df), math.round(.99 * m * n)).toInt
+    val sampSize =
+      math.min(math.round(trainSampFact * df), math.round(.99 * m * n)).toInt
     val rand = new Random()
     val mn = m * n
     val shuffled = rand.shuffle((0 until mn).toList)
 
     val omega = shuffled.slice(0, sampSize)
     val ordered = omega.sortWith(_ < _).toArray
-    val trainData: RDD[(Int, Int, Double)] = sc.parallelize(ordered)
-      .map(x => (x % m, x / m, fullData.values(x)))
+    val trainData: RDD[(Int, Int, Double)] =
+      sc.parallelize(ordered).map(x => (x % m, x / m, fullData.values(x)))
 
     // optionally add gaussian noise
     if (noise) {
       trainData.map(x => (x._1, x._2, x._3 + rand.nextGaussian * sigma))
     }
 
-    trainData.map(x => x._1 + "," + x._2 + "," + x._3).saveAsTextFile(outputPath)
+    trainData
+      .map(x => x._1 + "," + x._2 + "," + x._3)
+      .saveAsTextFile(outputPath)
 
     // optionally generate testing data
     if (test) {
-      val testSampSize = math.min(math.round(sampSize * testSampFact).toInt, mn - sampSize)
+      val testSampSize =
+        math.min(math.round(sampSize * testSampFact).toInt, mn - sampSize)
       val testOmega = shuffled.slice(sampSize, sampSize + testSampSize)
       val testOrdered = testOmega.sortWith(_ < _).toArray
-      val testData: RDD[(Int, Int, Double)] = sc.parallelize(testOrdered)
+      val testData: RDD[(Int, Int, Double)] = sc
+        .parallelize(testOrdered)
         .map(x => (x % m, x / m, fullData.values(x)))
-      testData.map(x => x._1 + "," + x._2 + "," + x._3).saveAsTextFile(outputPath)
+      testData
+        .map(x => x._1 + "," + x._2 + "," + x._3)
+        .saveAsTextFile(outputPath)
     }
 
     sc.stop()
-
   }
 }

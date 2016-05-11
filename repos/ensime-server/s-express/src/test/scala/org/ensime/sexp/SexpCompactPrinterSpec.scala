@@ -23,7 +23,8 @@ class SexpCompactPrinterSpec extends EnsimeSpec {
   }
 
   it should "output lists of lists" in {
-    assertPrinter(SexpList(SexpList(foo), SexpList(foo)), """(("foo") ("foo"))""")
+    assertPrinter(
+        SexpList(SexpList(foo), SexpList(foo)), """(("foo") ("foo"))""")
   }
 
   it should "output cons" in {
@@ -33,5 +34,4 @@ class SexpCompactPrinterSpec extends EnsimeSpec {
   it should "output escaped characters" in {
     assertPrinter(SexpString("""C:\my\folder"""), """"C:\\my\\folder"""")
   }
-
 }

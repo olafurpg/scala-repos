@@ -3,15 +3,15 @@ package mesosphere.marathon.state
 import com.wix.accord.dsl._
 import com.wix.accord._
 import mesosphere.marathon.api.v2.Validation._
-import org.apache.mesos.{ Protos => Mesos }
+import org.apache.mesos.{Protos => Mesos}
 import scala.collection.immutable.Seq
 
 // TODO: trait Container and specializations?
 // Current implementation with type defaulting to DOCKER and docker to NONE makes no sense
 case class Container(
-  `type`: Mesos.ContainerInfo.Type = Mesos.ContainerInfo.Type.DOCKER,
-  volumes: Seq[Volume] = Nil,
-  docker: Option[Container.Docker] = None)
+    `type`: Mesos.ContainerInfo.Type = Mesos.ContainerInfo.Type.DOCKER,
+    volumes: Seq[Volume] = Nil,
+    docker: Option[Container.Docker] = None)
 
 object Container {
 
@@ -21,12 +21,12 @@ object Container {
     * Docker-specific container parameters.
     */
   case class Docker(
-    image: String = "",
-    network: Option[Mesos.ContainerInfo.DockerInfo.Network] = None,
-    portMappings: Option[Seq[Docker.PortMapping]] = None,
-    privileged: Boolean = false,
-    parameters: Seq[Parameter] = Nil,
-    forcePullImage: Boolean = false)
+      image: String = "",
+      network: Option[Mesos.ContainerInfo.DockerInfo.Network] = None,
+      portMappings: Option[Seq[Docker.PortMapping]] = None,
+      privileged: Boolean = false,
+      parameters: Seq[Parameter] = Nil,
+      forcePullImage: Boolean = false)
 
   object Docker {
 
@@ -47,7 +47,8 @@ object Container {
         name: Option[String] = None,
         labels: Map[String, String] = Map.empty[String, String]) {
 
-      require(protocol == "tcp" || protocol == "udp", "protocol can only be 'tcp' or 'udp'")
+      require(protocol == "tcp" || protocol == "udp",
+              "protocol can only be 'tcp' or 'udp'")
     }
 
     object PortMapping {
@@ -70,7 +71,8 @@ object Container {
 
     implicit val dockerValidator = validator[Docker] { docker =>
       docker.image is notEmpty
-      docker.portMappings is optional(every(PortMapping.portMappingValidator)) and optional(uniquePortNames)
+      docker.portMappings is optional(every(PortMapping.portMappingValidator)) and optional(
+          uniquePortNames)
     }
   }
 
@@ -81,20 +83,23 @@ object Container {
       container.volumes is every(valid)
     }
 
-    val validDockerContainer: Validator[Container] = validator[Container] { container =>
-      container.docker is notEmpty
-      container.docker.each is valid
+    val validDockerContainer: Validator[Container] = validator[Container] {
+      container =>
+        container.docker is notEmpty
+        container.docker.each is valid
     }
 
-    val validMesosContainer: Validator[Container] = validator[Container] { container =>
-      container.docker is empty
+    val validMesosContainer: Validator[Container] = validator[Container] {
+      container =>
+        container.docker is empty
     }
 
     new Validator[Container] {
       override def apply(c: Container): Result = c.`type` match {
-        case Mesos.ContainerInfo.Type.MESOS  => validate(c)(validMesosContainer)
-        case Mesos.ContainerInfo.Type.DOCKER => validate(c)(validDockerContainer)
-        case _                               => Failure(Set(RuleViolation(c.`type`, "unknown", None)))
+        case Mesos.ContainerInfo.Type.MESOS => validate(c)(validMesosContainer)
+        case Mesos.ContainerInfo.Type.DOCKER =>
+          validate(c)(validDockerContainer)
+        case _ => Failure(Set(RuleViolation(c.`type`, "unknown", None)))
       }
     } and validGeneralContainer
   }

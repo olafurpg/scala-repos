@@ -20,9 +20,9 @@ import scala.collection.mutable
 import scala.util.Try
 
 /**
- * @author Roman.Shein
- *         Date: 03.03.14
- */
+  * @author Roman.Shein
+  *         Date: 03.03.14
+  */
 abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   protected def checksumsFileName = "checksums.dat"
 
@@ -42,10 +42,11 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
       if (testDataProjectPath.exists()) FileUtil.delete(testDataProjectPath)
     }
 
-    UsefulTestCase.edt(new Runnable {
+    UsefulTestCase.edt(
+        new Runnable {
 
       def run() {
-        ScalaDebuggerTestBase.super.setUp()
+        ScalaDebuggerTestBase. super.setUp()
         checkOrAddAllSourceFiles()
         addScalaSdk()
         addOtherLibraries()
@@ -54,11 +55,12 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   }
 
   /**
-   * Intended for loading libraries different from scala-compiler.
-   */
+    * Intended for loading libraries different from scala-compiler.
+    */
   protected def addOtherLibraries()
 
-  protected def addIvyCacheLibrary(libraryName: String, libraryPath: String, jarNames: String*) {
+  protected def addIvyCacheLibrary(
+      libraryName: String, libraryPath: String, jarNames: String*) {
     val libsPath = TestUtils.getIvyCachePath
     val pathExtended = s"$libsPath/$libraryPath/"
     VfsRootAccess.allowRootAccess(pathExtended)
@@ -73,15 +75,20 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   }
 
   override def getIprFile: File = {
-    val file = new File(testDataBasePath, testClassName + ProjectFileType.DOT_DEFAULT_EXTENSION)
+    val file = new File(testDataBasePath,
+                        testClassName + ProjectFileType.DOT_DEFAULT_EXTENSION)
     FileUtil.createIfDoesntExist(file)
     file
   }
 
   protected def getImlFile: File = {
-    if (testDataBasePath.exists()) testDataBasePath.listFiles().find {
-      _.getName.endsWith(ModuleFileType.DOT_DEFAULT_EXTENSION)
-    }.orNull
+    if (testDataBasePath.exists())
+      testDataBasePath
+        .listFiles()
+        .find {
+          _.getName.endsWith(ModuleFileType.DOT_DEFAULT_EXTENSION)
+        }
+        .orNull
     else null
   }
 
@@ -90,7 +97,8 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   override def invokeTestRunnable(runnable: Runnable): Unit = runnable.run()
 
   protected def getRunProfile(module: Module, className: String) = {
-    val configuration: ApplicationConfiguration = new ApplicationConfiguration("app", module.getProject, ApplicationConfigurationType.getInstance)
+    val configuration: ApplicationConfiguration = new ApplicationConfiguration(
+        "app", module.getProject, ApplicationConfigurationType.getInstance)
     configuration.setModule(module)
     configuration.setMainClassName(className)
     configuration
@@ -107,8 +115,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
       if (file.exists() || virtualFileExists(file)) {
         val vFile = getVirtualFile(file)
         inWriteAction(VfsUtil.saveText(vFile, fileText))
-      }
-      else super.addFileToProject(fileName, fileText)
+      } else super.addFileToProject(fileName, fileText)
     }
   }
 
@@ -118,17 +125,16 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
 
   def checkOrAddAllSourceFiles() = {
     if (sourceFiles.exists {
-      case (path, text) => !fileWithTextExists(new File(path), text)
-    }) {
-
-    }
+          case (path, text) => !fileWithTextExists(new File(path), text)
+        }) {}
     sourceFiles.foreach {
       case (path, text) => addFileToProject(path, text)
     }
   }
 
   protected def addFileToProject(fileText: String) {
-    Assert.assertTrue(s"File should start with `object $mainClassName`", fileText.startsWith(s"object $mainClassName"))
+    Assert.assertTrue(s"File should start with `object $mainClassName`",
+                      fileText.startsWith(s"object $mainClassName"))
     addFileToProject(mainFileName, fileText)
   }
 
@@ -137,7 +143,8 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
     new File(srcDir, fileName)
   }
 
-  protected def testClassName: String = this.getClass.getSimpleName.stripSuffix("Test")
+  protected def testClassName: String =
+    this.getClass.getSimpleName.stripSuffix("Test")
 
   protected def testDataBasePath(dataPath: String): File = {
     val testDataDir = new File(TestUtils.getTestDataPath, dataPath)
@@ -155,13 +162,16 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
 
   private def testDataBasePath: File = testDataBasePath(testDataBasePrefix)
 
-  def getVirtualFile(file: File) = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(file)
+  def getVirtualFile(file: File) =
+    LocalFileSystem.getInstance.refreshAndFindFileByIoFile(file)
 
   def md5(file: File): Array[Byte] = {
     val md = MessageDigest.getInstance("MD5")
-    val isSource = file.getName.endsWith(".java") || file.getName.endsWith(".scala")
+    val isSource =
+      file.getName.endsWith(".java") || file.getName.endsWith(".scala")
     if (isSource) {
-      val text = scala.io.Source.fromFile(file, "UTF-8").mkString.replace("\r", "")
+      val text =
+        scala.io.Source.fromFile(file, "UTF-8").mkString.replace("\r", "")
       md.digest(text.getBytes("UTF8"))
     } else {
       md.digest(FileUtil.loadBytes(new FileInputStream(file)))
@@ -171,18 +181,19 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   private def computeChecksums(): mutable.HashMap[String, Array[Byte]] = {
     val result = new mutable.HashMap[String, Array[Byte]]
     def computeForDir(dir: File) {
-      if (dir.exists) dir.listFiles().foreach { f =>
-        if (f.isDirectory) computeForDir(f)
-        else {
-          result += (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
+      if (dir.exists)
+        dir.listFiles().foreach { f =>
+          if (f.isDirectory) computeForDir(f)
+          else {
+            result +=
+            (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
+          }
         }
-      }
     }
     computeForDir(srcDir)
     computeForDir(outDir)
     result
   }
-
 
   protected def outDir: File = new File(testDataBasePath, "out")
 
@@ -195,8 +206,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
     val oos = new ObjectOutputStream(new FileOutputStream(file))
     try {
       oos.writeObject(checksums)
-    }
-    finally {
+    } finally {
       oos.close()
     }
   }
@@ -210,16 +220,17 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
     val result = try {
       val obj = ois.readObject()
       obj match {
-        case map: mutable.HashMap[String, Array[Byte]]@unchecked => checksums = map; true
+        case map: mutable.HashMap[String, Array[Byte]] @unchecked =>
+          checksums = map; true
         case _ => false
       }
-    }
-    finally ois.close()
+    } finally ois.close()
     result
   }
 
   private def testDataProjectIsValid(): Boolean = {
-    sameSourceFiles() && loadChecksums() && checksums.keys.forall(checkFile) && getImlFile != null
+    sameSourceFiles() && loadChecksums() && checksums.keys.forall(checkFile) &&
+    getImlFile != null
   }
 
   private def sameSourceFiles(): Boolean = {
@@ -229,7 +240,8 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
     }
     val existingFilesNumber = numberOfFiles(srcDir)
     sourceFiles.size == existingFilesNumber && sourceFiles.forall {
-      case (relPath, text) => fileWithTextExists(new File(srcDir, relPath), text)
+      case (relPath, text) =>
+        fileWithTextExists(new File(srcDir, relPath), text)
     }
   }
 

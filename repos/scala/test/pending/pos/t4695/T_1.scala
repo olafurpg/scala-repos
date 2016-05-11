@@ -1,4 +1,4 @@
 package foo
 
-class Bar { }
-package object Bar { }
+class Bar {}
+package object Bar {}

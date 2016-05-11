@@ -2,10 +2,10 @@
 package test;
 
 /** The main class for NSC, a compiler for the programming
- *  language Scala.
- */
+  *  language Scala.
+  */
 object Test {
-/*
+  /*
   def process(): AnyRef = {
     class Compiler;
     var compiler$module: Compiler = new Compiler;
@@ -17,7 +17,7 @@ object Test {
     def generator() = generator$module;
     generator()
   }
-*/
+   */
   def process1(): AnyRef = {
     object generator {
       val c = compiler
@@ -25,6 +25,4 @@ object Test {
     object compiler;
     generator
   }
-
-
 }

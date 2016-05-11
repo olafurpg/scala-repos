@@ -36,52 +36,64 @@ import scalafx.collections.ObservableBuffer
 import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 object LineChart {
-  implicit def sfxLineChart2jfx[X, Y](v: LineChart[X, Y]): jfxsc.LineChart[X, Y] = if (v != null) v.delegate else null
+  implicit def sfxLineChart2jfx[X, Y](
+      v: LineChart[X, Y]): jfxsc.LineChart[X, Y] =
+    if (v != null) v.delegate else null
 
   def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y]) =
     new LineChart[X, Y](new jfxsc.LineChart[X, Y](xAxis, yAxis))
 
-  def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y], data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
+  def apply[X, Y](xAxis: Axis[X],
+                  yAxis: Axis[Y],
+                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new LineChart[X, Y](new jfxsc.LineChart[X, Y](xAxis, yAxis, data))
 
-  object SortingPolicy extends SFXEnumDelegateCompanion[jfxsc.LineChart.SortingPolicy, SortingPolicy] {
+  object SortingPolicy
+      extends SFXEnumDelegateCompanion[
+          jfxsc.LineChart.SortingPolicy, SortingPolicy] {
+
     /**
-     * The data should be left in the order defined by the list in [[scalafx.scene.chart.LineChart.data]] property.
-     */
+      * The data should be left in the order defined by the list in [[scalafx.scene.chart.LineChart.data]] property.
+      */
     val None = new SortingPolicy(jfxsc.LineChart.SortingPolicy.NONE)
+
     /**
-     * The data is ordered by x axis.
-     */
+      * The data is ordered by x axis.
+      */
     val XAxis = new SortingPolicy(jfxsc.LineChart.SortingPolicy.X_AXIS)
+
     /**
-     * The data is ordered by y axis.
-     */
+      * The data is ordered by y axis.
+      */
     val YAxis = new SortingPolicy(jfxsc.LineChart.SortingPolicy.Y_AXIS)
 
-    protected override def unsortedValues: Array[SortingPolicy] = Array(None, XAxis, YAxis)
+    protected override def unsortedValues: Array[SortingPolicy] =
+      Array(None, XAxis, YAxis)
   }
 
-  sealed case class SortingPolicy(override val delegate: jfxsc.LineChart.SortingPolicy)
-    extends SFXEnumDelegate[jfxsc.LineChart.SortingPolicy]
-
+  sealed case class SortingPolicy(
+      override val delegate: jfxsc.LineChart.SortingPolicy)
+      extends SFXEnumDelegate[jfxsc.LineChart.SortingPolicy]
 }
 
 class LineChart[X, Y](override val delegate: jfxsc.LineChart[X, Y])
-  extends XYChart[X, Y](delegate)
-  with SFXDelegate[jfxsc.LineChart[X, Y]] {
+    extends XYChart[X, Y](delegate) with SFXDelegate[jfxsc.LineChart[X, Y]] {
 
   def this(xAxis: Axis[X], yAxis: Axis[Y]) {
     this(new jfxsc.LineChart[X, Y](xAxis, yAxis))
   }
 
-  def this(xAxis: Axis[X], yAxis: Axis[Y], data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+  def this(xAxis: Axis[X],
+           yAxis: Axis[Y],
+           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
     this(new jfxsc.LineChart[X, Y](xAxis, yAxis, data))
   }
 
   /**
-   * Indicates whether the data passed to LineChart should be sorted by natural order of one of the axes.
-   */
-  def axisSortingPolicy: ObjectProperty[jfxsc.LineChart.SortingPolicy] = delegate.axisSortingPolicyProperty
+    * Indicates whether the data passed to LineChart should be sorted by natural order of one of the axes.
+    */
+  def axisSortingPolicy: ObjectProperty[jfxsc.LineChart.SortingPolicy] =
+    delegate.axisSortingPolicyProperty
   def axisSortingPolicy_=(v: LineChart.SortingPolicy) {
     ObjectProperty.fillProperty(axisSortingPolicy, v)
   }

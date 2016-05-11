@@ -1,4 +1,3 @@
-
 import tools.partest.DirectTest
 
 // verify that only languageFeature names are accepted by -language
@@ -12,4 +11,3 @@ object Test extends DirectTest {
     compile(s"-language:noob")
   }
 }
-

@@ -1,5 +1,4 @@
-trait C {
-  self: Z =>
+trait C { self: Z =>
   case class I(i: Int)
   case class F(j: Int) extends I(j)
 
@@ -11,8 +10,7 @@ trait C {
   }
 }
 
-trait K {
-  self : Z =>
+trait K { self: Z =>
 
   S(F(1))
 
@@ -20,18 +18,13 @@ trait K {
 
   x match {
     case U(u) =>
-      /* line: 26 */foo(u)
+      /* line: 26 */ foo(u)
   }
 
   def foo(t: T) = 1
   def foo(u: Int) = 2
 
-  case class S(a: I) {
-  }
-
-
+  case class S(a: I) {}
 }
 
-trait Z extends K with C {
-
-}
+trait Z extends K with C {}

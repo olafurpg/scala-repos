@@ -1,5 +1,4 @@
-
-import scala.language.{ implicitConversions }
+import scala.language.{implicitConversions}
 
 object Test extends App {
   case class Node(x: Int)

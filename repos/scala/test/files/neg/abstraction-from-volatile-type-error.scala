@@ -5,7 +5,7 @@ class A {
 
 object Test {
   type B = a.type forSome {
-    val a : A
-    val tv : a.Tv
+    val a: A
+    val tv: a.Tv
   }
 }

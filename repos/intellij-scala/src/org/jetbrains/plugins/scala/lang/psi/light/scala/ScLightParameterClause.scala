@@ -11,16 +11,18 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 
 /**
- * @author Alefas
- * @since 03/04/14.
- */
+  * @author Alefas
+  * @since 03/04/14.
+  */
 class ScLightParameterClause(types: List[ScType], clause: ScParameterClause)
-  extends LightElement(clause.getManager, clause.getLanguage) with ScParameterClause {
+    extends LightElement(clause.getManager, clause.getLanguage)
+    with ScParameterClause {
   override def isImplicit: Boolean = clause.isImplicit
 
-  override def parameters: Seq[ScParameter] = clause.parameters.zip(types).zipWithIndex.map {
-    case ((param, tp), i) => new ScLightParameter(param, tp, i)
-  }
+  override def parameters: Seq[ScParameter] =
+    clause.parameters.zip(types).zipWithIndex.map {
+      case ((param, tp), i) => new ScLightParameter(param, tp, i)
+    }
 
   override def effectiveParameters: Seq[ScParameter] = parameters
 
@@ -29,13 +31,19 @@ class ScLightParameterClause(types: List[ScType], clause: ScParameterClause)
   override def addParameter(param: ScParameter): ScParameterClause =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[
+      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](clazz: Class[T]): T =
+  override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): T =
     throw new UnsupportedOperationException("Operation on light element")
 
   override def owner: PsiElement = {
-    ScalaPsiUtil.getContextOfType(this, true, classOf[ScFunctionExpr], classOf[ScFunction], classOf[ScPrimaryConstructor])
+    ScalaPsiUtil.getContextOfType(this,
+                                  true,
+                                  classOf[ScFunctionExpr],
+                                  classOf[ScFunction],
+                                  classOf[ScPrimaryConstructor])
   }
 }

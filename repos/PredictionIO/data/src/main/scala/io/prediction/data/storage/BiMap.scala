@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import scala.collection.immutable.HashMap
@@ -22,16 +21,17 @@ import org.apache.spark.rdd.RDD
 /** Immutable Bi-directional Map
   *
   */
-class BiMap[K, V] private[prediction] (
-  private val m: Map[K, V],
-  private val i: Option[BiMap[V, K]] = None
-  ) extends Serializable {
+class BiMap[K, V] private[prediction](
+    private val m: Map[K, V],
+    private val i: Option[BiMap[V, K]] = None
+)
+    extends Serializable {
 
   // NOTE: make inverse's inverse point back to current BiMap
   val inverse: BiMap[V, K] = i.getOrElse {
     val rev = m.map(_.swap)
     require((rev.size == m.size),
-      s"Failed to create reversed map. Cannot have duplicated values.")
+            s"Failed to create reversed map. Cannot have duplicated values.")
     new BiMap(rev, Some(this))
   }
 
@@ -70,7 +70,7 @@ object BiMap {
     * @return a String to Long BiMap
     */
   def stringLong(keys: Set[String]): BiMap[String, Long] = {
-    val hm = HashMap(keys.toSeq.zipWithIndex.map(t => (t._1, t._2.toLong)) : _*)
+    val hm = HashMap(keys.toSeq.zipWithIndex.map(t => (t._1, t._2.toLong)): _*)
     new BiMap(hm)
   }
 
@@ -81,7 +81,7 @@ object BiMap {
     * @return a String to Long BiMap
     */
   def stringLong(keys: Array[String]): BiMap[String, Long] = {
-    val hm = HashMap(keys.zipWithIndex.map(t => (t._1, t._2.toLong)) : _*)
+    val hm = HashMap(keys.zipWithIndex.map(t => (t._1, t._2.toLong)): _*)
     new BiMap(hm)
   }
 
@@ -100,7 +100,7 @@ object BiMap {
     * @return a String to Int BiMap
     */
   def stringInt(keys: Set[String]): BiMap[String, Int] = {
-    val hm = HashMap(keys.toSeq.zipWithIndex : _*)
+    val hm = HashMap(keys.toSeq.zipWithIndex: _*)
     new BiMap(hm)
   }
 
@@ -111,7 +111,7 @@ object BiMap {
     * @return a String to Int BiMap
     */
   def stringInt(keys: Array[String]): BiMap[String, Int] = {
-    val hm = HashMap(keys.zipWithIndex : _*)
+    val hm = HashMap(keys.zipWithIndex: _*)
     new BiMap(hm)
   }
 
@@ -124,10 +124,10 @@ object BiMap {
     stringInt(keys.distinct.collect)
   }
 
-  private[this] def stringDoubleImpl(keys: Seq[String])
-  : BiMap[String, Double] = {
+  private[this] def stringDoubleImpl(
+      keys: Seq[String]): BiMap[String, Double] = {
     val ki = keys.zipWithIndex.map(e => (e._1, e._2.toDouble))
-    new BiMap(HashMap(ki : _*))
+    new BiMap(HashMap(ki: _*))
   }
 
   /** Create a BiMap[String, Double] from a set of String. The Double index 

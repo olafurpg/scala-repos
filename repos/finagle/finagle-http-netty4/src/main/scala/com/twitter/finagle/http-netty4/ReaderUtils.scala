@@ -7,9 +7,10 @@ import com.twitter.util.{Future, Return}
 import io.netty.handler.codec.{http => NettyHttp}
 
 private[http4] object ReaderUtils {
+
   /**
-   * Serialize a http chunk into a Buf.
-   */
+    * Serialize a http chunk into a Buf.
+    */
   def readChunk(chunk: Any): Future[Option[Buf]] = chunk match {
     case chunk: NettyHttp.LastHttpContent =>
       Future.None
@@ -19,25 +20,26 @@ private[http4] object ReaderUtils {
 
     case invalid =>
       Future.exception(
-        new IllegalArgumentException("invalid message \"%s\"".format(invalid))
+          new IllegalArgumentException(
+              "invalid message \"%s\"".format(invalid))
       )
   }
 
   /**
-   * Translates a Buf into HttpContent. Beware: an empty buffer indicates end
-   * of stream.
-   */
+    * Translates a Buf into HttpContent. Beware: an empty buffer indicates end
+    * of stream.
+    */
   def chunkOfBuf(buf: Buf): NettyHttp.HttpContent =
     new NettyHttp.DefaultHttpContent(BufAsByteBuf.Owned(buf))
 
   /**
-   * Continuously read from a Reader, writing everything to a Transport.
-   */
+    * Continuously read from a Reader, writing everything to a Transport.
+    */
   def streamChunks(
-    trans: Transport[Any, Any],
-    r: Reader,
-    // TODO Find a better number for bufSize, e.g. 32KiB - Buf overhead
-    bufSize: Int = Int.MaxValue
+      trans: Transport[Any, Any],
+      r: Reader,
+      // TODO Find a better number for bufSize, e.g. 32KiB - Buf overhead
+      bufSize: Int = Int.MaxValue
   ): Future[Unit] = {
     r.read(bufSize).flatMap {
       case None =>

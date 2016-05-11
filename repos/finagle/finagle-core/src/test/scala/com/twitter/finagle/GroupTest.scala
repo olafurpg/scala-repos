@@ -10,10 +10,11 @@ class GroupTest extends FunSuite {
   class Ctx {
     val group = Group.mutable[Int]()
     var mapped = mutable.Buffer[Int]()
-    val derived = group map { i =>
-      mapped += i
-      i+1
-    }
+    val derived =
+      group map { i =>
+        mapped += i
+        i + 1
+      }
   }
 
   test("map each value once, lazily and persistently") {
@@ -24,12 +25,12 @@ class GroupTest extends FunSuite {
     group() = Set(1, 2)
     assert(mapped.isEmpty)
     assert(derived() == Set(2, 3))
-    assert(Set(mapped:_*) == Set(1, 2))
+    assert(Set(mapped: _*) == Set(1, 2))
     assert(derived() eq derived())
 
     group() = Set(1, 2, 3)
     assert(derived() == Set(2, 3, 4))
-    assert(Set(mapped:_*) == Set(1, 2, 3))
+    assert(Set(mapped: _*) == Set(1, 2, 3))
     assert(derived() eq derived())
   }
 
@@ -43,7 +44,7 @@ class GroupTest extends FunSuite {
     assert(derived() == Set(3))
     group() = Set(1, 2)
     assert(derived() == Set(2, 3))
-    assert(Set(mapped:_*) == Set(1, 2))
+    assert(Set(mapped: _*) == Set(1, 2))
   }
 
   test("collect") {

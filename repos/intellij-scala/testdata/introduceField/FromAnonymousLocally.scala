@@ -6,7 +6,8 @@ class Test {
 
   new A() {
     def foo() {
-      /*start*/1/*end*/
+      /*start*/
+      1 /*end*/
     }
   }
 }
@@ -26,4 +27,4 @@ class Test {
     }
   }
 }
-*/
+ */

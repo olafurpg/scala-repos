@@ -16,7 +16,9 @@ class FactorialBackend extends Actor with ActorLogging {
 
   def receive = {
     case (n: Int) =>
-      Future(factorial(n)) map { result => (n, result) } pipeTo sender()
+      Future(factorial(n)) map { result =>
+        (n, result)
+      } pipeTo sender()
   }
 
   def factorial(n: Int): BigInt = {
@@ -26,7 +28,6 @@ class FactorialBackend extends Actor with ActorLogging {
     }
     factorialAcc(BigInt(1), n)
   }
-
 }
 //#backend
 
@@ -34,9 +35,11 @@ object FactorialBackend {
   def main(args: Array[String]): Unit = {
     // Override the configuration of the port when specified as program argument
     val port = if (args.isEmpty) "0" else args(0)
-    val config = ConfigFactory.parseString(s"akka.remote.netty.tcp.port=$port").
-      withFallback(ConfigFactory.parseString("akka.cluster.roles = [backend]")).
-      withFallback(ConfigFactory.load("factorial"))
+    val config = ConfigFactory
+      .parseString(s"akka.remote.netty.tcp.port=$port")
+      .withFallback(
+          ConfigFactory.parseString("akka.cluster.roles = [backend]"))
+      .withFallback(ConfigFactory.load("factorial"))
 
     val system = ActorSystem("ClusterSystem", config)
     system.actorOf(Props[FactorialBackend], name = "factorialBackend")

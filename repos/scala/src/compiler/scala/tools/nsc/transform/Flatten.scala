@@ -18,7 +18,7 @@ abstract class Flatten extends InfoTransform {
   val phaseName: String = "flatten"
 
   /** Updates the owning scope with the given symbol, unlinking any others.
-   */
+    */
   private def replaceSymbolInCurrentScope(sym: Symbol): Unit = exitingFlatten {
     removeSymbolInCurrentScope(sym)
     sym.owner.info.decls enter sym
@@ -26,7 +26,7 @@ abstract class Flatten extends InfoTransform {
 
   private def removeSymbolInCurrentScope(sym: Symbol): Unit = exitingFlatten {
     val scope = sym.owner.info.decls
-    val old   = (scope lookupUnshadowedEntries sym.name).toList
+    val old = (scope lookupUnshadowedEntries sym.name).toList
     old foreach (scope unlink _)
     def old_s = old map (_.sym) mkString ", "
     if (old.nonEmpty) debuglog(s"In scope of ${sym.owner}, unlinked $old_s")
@@ -57,7 +57,8 @@ abstract class Flatten extends InfoTransform {
   private val flattened = new TypeMap {
     def apply(tp: Type): Type = tp match {
       case TypeRef(pre, sym, args) if isFlattenablePrefix(pre) =>
-        assert(args.isEmpty && sym.enclosingTopLevelClass != NoSymbol, sym.ownerChain)
+        assert(args.isEmpty && sym.enclosingTopLevelClass != NoSymbol,
+               sym.ownerChain)
         typeRef(sym.enclosingTopLevelClass.owner.thisType, sym, Nil)
       case ClassInfoType(parents, decls, clazz) =>
         var parents1 = parents
@@ -65,8 +66,7 @@ abstract class Flatten extends InfoTransform {
           val decls1 = newScope
           if (clazz.isPackageClass) {
             exitingFlatten { decls foreach (decls1 enter _) }
-          }
-          else {
+          } else {
             val oldowner = clazz.owner
             exitingFlatten { oldowner.info }
             parents1 = parents mapConserve (this)
@@ -88,8 +88,7 @@ abstract class Flatten extends InfoTransform {
                   // currently they don't get the flag, even though they are lifted to the package
                   sym.moduleClass setFlag LIFTED
                 }
-              } else if (sym.isClass)
-                liftSymbol(sym)
+              } else if (sym.isClass) liftSymbol(sym)
             }
           }
           decls1
@@ -108,9 +107,11 @@ abstract class Flatten extends InfoTransform {
 
   def transformInfo(sym: Symbol, tp: Type): Type = flattened(tp)
 
-  protected def newTransformer(unit: CompilationUnit): Transformer = new Flattener
+  protected def newTransformer(unit: CompilationUnit): Transformer =
+    new Flattener
 
   class Flattener extends Transformer {
+
     /** Buffers for lifted out classes */
     private val liftedDefs = perRunCaches.newMap[Symbol, ListBuffer[Tree]]()
 
@@ -132,7 +133,8 @@ abstract class Flatten extends InfoTransform {
           //            - create the private[this] accessors eagerly in Namer (but would this cover private[this] fields
           //              added later phases in compilation?)
           //            - move the accessor creation to the Mixin info transformer
-          val liftedBuffer = liftedDefs(tree.symbol.enclosingTopLevelClass.owner)
+          val liftedBuffer =
+            liftedDefs(tree.symbol.enclosingTopLevelClass.owner)
           val index = liftedBuffer.length
           liftedBuffer.insert(index, super.transform(tree))
           if (tree.symbol.sourceModule.isStaticModule)
@@ -151,7 +153,8 @@ abstract class Flatten extends InfoTransform {
             atPos(tree.pos) {
               val ref = gen.mkAttributedRef(sym)
               if (isQualifierSafeToElide(qual)) ref
-              else Block(List(qual), ref).setType(tree.tpe) // need to execute the qualifier but refer directly to the lifted module.
+              else
+                Block(List(qual), ref).setType(tree.tpe) // need to execute the qualifier but refer directly to the lifted module.
             }
           }
         case _ =>
@@ -161,13 +164,13 @@ abstract class Flatten extends InfoTransform {
     }
 
     /** Transform statements and add lifted definitions to them. */
-    override def transformStats(stats: List[Tree], exprOwner: Symbol): List[Tree] = {
+    override def transformStats(
+        stats: List[Tree], exprOwner: Symbol): List[Tree] = {
       val stats1 = super.transformStats(stats, exprOwner)
       if (currentOwner.isPackageClass) {
         val lifted = liftedDefs.remove(currentOwner).toList.flatten
         stats1 ::: lifted
-      }
-      else stats1
+      } else stats1
     }
   }
 }

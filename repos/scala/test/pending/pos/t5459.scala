@@ -6,8 +6,8 @@ trait L1 extends A1 with A2 with A3
 object Test {
   trait T1[-A <: A1]
   trait T2[-A >: L1]
-  trait T3[ A <: A1]
-  trait T4[ A >: L1]
+  trait T3[A <: A1]
+  trait T4[A >: L1]
   trait T5[+A <: A1]
   trait T6[+A >: L1]
 

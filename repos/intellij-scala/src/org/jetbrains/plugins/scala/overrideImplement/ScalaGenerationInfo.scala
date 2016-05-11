@@ -26,42 +26,56 @@ import org.jetbrains.plugins.scala.project._
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 
 /**
- * Nikolay.Tropin
- * 12/25/13
- */
+  * Nikolay.Tropin
+  * 12/25/13
+  */
 class ScalaGenerationInfo(classMember: ClassMember)
-        extends GenerationInfoBase {
+    extends GenerationInfoBase {
 
   private var myMember: PsiMember = classMember.getElement
 
   override def getPsiMember: PsiMember = myMember
 
-  override def insert(aClass: PsiClass, anchor: PsiElement, before: Boolean): Unit = {
+  override def insert(
+      aClass: PsiClass, anchor: PsiElement, before: Boolean): Unit = {
     val templDef = aClass match {
       case td: ScTemplateDefinition => td
       case _ => return
     }
 
     classMember match {
-      case member: ScMethodMember => myMember = insertMethod(member, templDef, anchor)
+      case member: ScMethodMember =>
+        myMember = insertMethod(member, templDef, anchor)
       case member: ScAliasMember =>
         val alias = member.getElement
         val substitutor = member.substitutor
         val needsOverride = member.isOverride || toAddOverrideToImplemented
-        val m = ScalaPsiElementFactory.createOverrideImplementType(alias, substitutor, alias.getManager, needsOverride)
+        val m = ScalaPsiElementFactory.createOverrideImplementType(
+            alias, substitutor, alias.getManager, needsOverride)
         val added = templDef.addMember(m, Option(anchor))
         myMember = added
         TypeAdjuster.markToAdjust(added)
       case _: ScValueMember | _: ScVariableMember =>
-        val isVal = classMember match {case _: ScValueMember => true case _: ScVariableMember => false}
-        val value = classMember match {case x: ScValueMember => x.element case x: ScVariableMember => x.element}
+        val isVal = classMember match {
+          case _: ScValueMember => true
+          case _: ScVariableMember => false
+        }
+        val value = classMember match {
+          case x: ScValueMember => x.element
+          case x: ScVariableMember => x.element
+        }
         val (substitutor, needsOverride) = classMember match {
           case x: ScValueMember => (x.substitutor, x.isOverride)
           case x: ScVariableMember => (x.substitutor, x.isOverride)
         }
         val addOverride = needsOverride || toAddOverrideToImplemented
-        val m = ScalaPsiElementFactory.createOverrideImplementVariable(value, substitutor, value.getManager,
-          addOverride, isVal, needsInferType)
+        val m = ScalaPsiElementFactory.createOverrideImplementVariable(
+            value,
+            substitutor,
+            value.getManager,
+            addOverride,
+            isVal,
+            needsInferType)
         val added = templDef.addMember(m, Option(anchor))
         myMember = added
         TypeAdjuster.markToAdjust(added)
@@ -69,9 +83,11 @@ class ScalaGenerationInfo(classMember: ClassMember)
     }
   }
 
-  override def findInsertionAnchor(aClass: PsiClass, leaf: PsiElement): PsiElement = {
+  override def findInsertionAnchor(
+      aClass: PsiClass, leaf: PsiElement): PsiElement = {
     aClass match {
-      case td: ScTemplateDefinition => ScalaOIUtil.getAnchor(leaf.getTextRange.getStartOffset, td).orNull
+      case td: ScTemplateDefinition =>
+        ScalaOIUtil.getAnchor(leaf.getTextRange.getStartOffset, td).orNull
       case _ => super.findInsertionAnchor(aClass, leaf)
     }
   }
@@ -86,26 +102,30 @@ object ScalaGenerationInfo {
   def defaultValue(returnType: ScType, file: PsiFile) = {
     val standardValue = ScalaPsiElementFactory.getStandardValue(returnType)
 
-    if (file.scalaLanguageLevel.exists(_ < Scala_2_10)) standardValue else "???"
+    if (file.scalaLanguageLevel.exists(_ < Scala_2_10)) standardValue
+    else "???"
   }
 
   def positionCaret(editor: Editor, element: PsiMember) {
     //hack for postformatting IDEA bug.
-    val member = CodeStyleManager.getInstance(element.getProject).reformat(element)
+    val member =
+      CodeStyleManager.getInstance(element.getProject).reformat(element)
     //Setting selection
     val body: PsiElement = member match {
       case ta: ScTypeAliasDefinition => ta.aliasedTypeElement
       case ScPatternDefinition.expr(expr) => expr
       case ScVariableDefinition.expr(expr) => expr
-      case method: ScFunctionDefinition => method.body match {
-        case Some(x) => x
-        case None => return
-      }
+      case method: ScFunctionDefinition =>
+        method.body match {
+          case Some(x) => x
+          case None => return
+        }
       case _ => return
     }
 
     val offset = member.getTextRange.getStartOffset
-    val point = editor.visualPositionToXY(editor.offsetToVisualPosition(offset))
+    val point =
+      editor.visualPositionToXY(editor.offsetToVisualPosition(offset))
     if (!editor.getScrollingModel.getVisibleArea.contains(point)) {
       member match {
         case n: Navigatable => n.navigate(true)
@@ -117,24 +137,32 @@ object ScalaGenerationInfo {
       case e: ScBlockExpr =>
         val statements = e.statements
         if (statements.length == 0) {
-          editor.getCaretModel.moveToOffset(body.getTextRange.getStartOffset + 1)
+          editor.getCaretModel.moveToOffset(
+              body.getTextRange.getStartOffset + 1)
         } else {
-          val range = new TextRange(statements(0).getTextRange.getStartOffset, statements(statements.length - 1).getTextRange.getEndOffset)
+          val range = new TextRange(
+              statements(0).getTextRange.getStartOffset,
+              statements(statements.length - 1).getTextRange.getEndOffset)
           editor.getCaretModel.moveToOffset(range.getStartOffset)
-          editor.getSelectionModel.setSelection(range.getStartOffset, range.getEndOffset)
+          editor.getSelectionModel.setSelection(
+              range.getStartOffset, range.getEndOffset)
         }
       case _ =>
         val range = body.getTextRange
         editor.getCaretModel.moveToOffset(range.getStartOffset)
-        editor.getSelectionModel.setSelection(range.getStartOffset, range.getEndOffset)
+        editor.getSelectionModel.setSelection(
+            range.getStartOffset, range.getEndOffset)
     }
   }
 
-  private def callSuperText(td: ScTemplateDefinition, method: PsiMethod): String = {
+  private def callSuperText(
+      td: ScTemplateDefinition, method: PsiMethod): String = {
     val superOrSelfQual: String = td.selfType match {
       case None => "super."
       case Some(st: ScType) =>
-        val psiClass = ScType.extractClass(st, Option(td.getProject)).getOrElse(return "super.")
+        val psiClass = ScType
+          .extractClass(st, Option(td.getProject))
+          .getOrElse(return "super.")
 
         def nonStrictInheritor(base: PsiClass, inheritor: PsiClass): Boolean = {
           if (base == null || inheritor == null) false
@@ -146,7 +174,8 @@ object ScalaGenerationInfo {
         else "super."
     }
     def paramText(param: PsiParameter) = {
-      val name = ScalaNamesUtil.changeKeyword(param.name).toOption.getOrElse("")
+      val name =
+        ScalaNamesUtil.changeKeyword(param.name).toOption.getOrElse("")
       val whitespace = if (name.endsWith("_")) " " else ""
       name + (if (param.isVarArgs) whitespace + ": _*" else "")
     }
@@ -155,21 +184,30 @@ object ScalaGenerationInfo {
       method match {
         case fun: ScFunction =>
           val clauses = fun.paramClauses.clauses.filter(!_.isImplicit)
-          clauses.map(_.parameters.map(_.name).mkString("(", ", ", ")")).mkString
+          clauses
+            .map(_.parameters.map(_.name).mkString("(", ", ", ")"))
+            .mkString
         case method: PsiMethod =>
-          if (method.isAccessor && method.getParameterList.getParametersCount == 0) ""
-          else method.getParameterList.getParameters.map(paramText).mkString("(", ", ", ")")
+          if (method.isAccessor &&
+              method.getParameterList.getParametersCount == 0) ""
+          else
+            method.getParameterList.getParameters
+              .map(paramText)
+              .mkString("(", ", ", ")")
       }
     }
     superOrSelfQual + methodName + parametersText
   }
 
-  def getMethodBody(member: ScMethodMember, td: ScTemplateDefinition, isImplement: Boolean):String = {
+  def getMethodBody(member: ScMethodMember,
+                    td: ScTemplateDefinition,
+                    isImplement: Boolean): String = {
     val templateName =
       if (isImplement) ScalaFileTemplateUtil.SCALA_IMPLEMENTED_METHOD_TEMPLATE
       else ScalaFileTemplateUtil.SCALA_OVERRIDDEN_METHOD_TEMPLATE
 
-    val template = FileTemplateManager.getInstance().getCodeTemplate(templateName)
+    val template =
+      FileTemplateManager.getInstance().getCodeTemplate(templateName)
 
     val properties = new Properties()
 
@@ -179,17 +217,25 @@ object ScalaGenerationInfo {
 
     val method = member.getElement
 
-    properties.setProperty(FileTemplate.ATTRIBUTE_RETURN_TYPE, ScType.presentableText(returnType))
-    properties.setProperty(FileTemplate.ATTRIBUTE_DEFAULT_RETURN_VALUE, standardValue)
-    properties.setProperty(FileTemplate.ATTRIBUTE_CALL_SUPER, callSuperText(td, method))
-    properties.setProperty("Q_MARK", ScalaGenerationInfo.defaultValue(returnType, td.getContainingFile))
+    properties.setProperty(
+        FileTemplate.ATTRIBUTE_RETURN_TYPE, ScType.presentableText(returnType))
+    properties.setProperty(
+        FileTemplate.ATTRIBUTE_DEFAULT_RETURN_VALUE, standardValue)
+    properties.setProperty(
+        FileTemplate.ATTRIBUTE_CALL_SUPER, callSuperText(td, method))
+    properties.setProperty(
+        "Q_MARK",
+        ScalaGenerationInfo.defaultValue(returnType, td.getContainingFile))
 
-    ScalaFileTemplateUtil.setClassAndMethodNameProperties(properties, method.containingClass, method)
+    ScalaFileTemplateUtil.setClassAndMethodNameProperties(
+        properties, method.containingClass, method)
 
     template.getText(properties)
   }
 
-  def insertMethod(member: ScMethodMember, td: ScTemplateDefinition, anchor: PsiElement): ScFunction = {
+  def insertMethod(member: ScMethodMember,
+                   td: ScTemplateDefinition,
+                   anchor: PsiElement): ScFunction = {
     val method: PsiMethod = member.getElement
     val sign = member.sign
 
@@ -198,7 +244,8 @@ object ScalaGenerationInfo {
     val body = getMethodBody(member, td, isImplement)
 
     val needsOverride = !isImplement || toAddOverrideToImplemented
-    val m = ScalaPsiElementFactory.createOverrideImplementMethod(sign, method.getManager, needsOverride, needsInferType, body)
+    val m = ScalaPsiElementFactory.createOverrideImplementMethod(
+        sign, method.getManager, needsOverride, needsInferType, body)
     val added = td.addMember(m, Option(anchor))
     TypeAdjuster.markToAdjust(added)
     added.asInstanceOf[ScFunction]
@@ -208,5 +255,6 @@ object ScalaGenerationInfo {
     if (ApplicationManager.getApplication.isUnitTestMode) false
     else ScalaApplicationSettings.getInstance.ADD_OVERRIDE_TO_IMPLEMENTED
 
-  def needsInferType = ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY
+  def needsInferType =
+    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY
 }

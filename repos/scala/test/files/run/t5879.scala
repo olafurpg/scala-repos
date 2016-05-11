@@ -1,6 +1,5 @@
 import collection.immutable.HashMap
 
-
 object Test {
 
   def main(args: Array[String]) {
@@ -55,5 +54,4 @@ object Test {
     val r = a.merged(b) { collision }
     for ((k, v) <- r) assert(v == 100 + 2 * k, (k, v))
   }
-
 }

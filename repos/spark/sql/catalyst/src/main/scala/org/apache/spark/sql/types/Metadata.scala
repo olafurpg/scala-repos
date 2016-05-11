@@ -24,22 +24,21 @@ import org.json4s.jackson.JsonMethods._
 
 import org.apache.spark.annotation.DeveloperApi
 
-
 /**
- * :: DeveloperApi ::
- *
- * Metadata is a wrapper over Map[String, Any] that limits the value type to simple ones: Boolean,
- * Long, Double, String, Metadata, Array[Boolean], Array[Long], Array[Double], Array[String], and
- * Array[Metadata]. JSON is used for serialization.
- *
- * The default constructor is private. User should use either [[MetadataBuilder]] or
- * [[Metadata.fromJson()]] to create Metadata instances.
- *
- * @param map an immutable map that stores the data
- */
+  * :: DeveloperApi ::
+  *
+  * Metadata is a wrapper over Map[String, Any] that limits the value type to simple ones: Boolean,
+  * Long, Double, String, Metadata, Array[Boolean], Array[Long], Array[Double], Array[String], and
+  * Array[Metadata]. JSON is used for serialization.
+  *
+  * The default constructor is private. User should use either [[MetadataBuilder]] or
+  * [[Metadata.fromJson()]] to create Metadata instances.
+  *
+  * @param map an immutable map that stores the data
+  */
 @DeveloperApi
-sealed class Metadata private[types] (private[types] val map: Map[String, Any])
-  extends Serializable {
+sealed class Metadata private[types](private[types] val map: Map[String, Any])
+    extends Serializable {
 
   /** No-arg constructor for kryo. */
   protected def this() = this(null)
@@ -142,18 +141,25 @@ object Metadata {
         } else {
           value.head match {
             case _: JInt =>
-              builder.putLongArray(key, value.asInstanceOf[List[JInt]].map(_.num.toLong).toArray)
+              builder.putLongArray(
+                  key,
+                  value.asInstanceOf[List[JInt]].map(_.num.toLong).toArray)
             case _: JDouble =>
-              builder.putDoubleArray(key, value.asInstanceOf[List[JDouble]].map(_.num).toArray)
+              builder.putDoubleArray(
+                  key, value.asInstanceOf[List[JDouble]].map(_.num).toArray)
             case _: JBool =>
-              builder.putBooleanArray(key, value.asInstanceOf[List[JBool]].map(_.value).toArray)
+              builder.putBooleanArray(
+                  key, value.asInstanceOf[List[JBool]].map(_.value).toArray)
             case _: JString =>
-              builder.putStringArray(key, value.asInstanceOf[List[JString]].map(_.s).toArray)
+              builder.putStringArray(
+                  key, value.asInstanceOf[List[JString]].map(_.s).toArray)
             case _: JObject =>
               builder.putMetadataArray(
-                key, value.asInstanceOf[List[JObject]].map(fromJObject).toArray)
+                  key,
+                  value.asInstanceOf[List[JObject]].map(fromJObject).toArray)
             case other =>
-              throw new RuntimeException(s"Do not support array of type ${other.getClass}.")
+              throw new RuntimeException(
+                  s"Do not support array of type ${other.getClass}.")
           }
         }
       case (key, JNull) =>
@@ -168,7 +174,9 @@ object Metadata {
   private def toJsonValue(obj: Any): JValue = {
     obj match {
       case map: Map[_, _] =>
-        val fields = map.toList.map { case (k: String, v) => (k, toJsonValue(v)) }
+        val fields = map.toList.map {
+          case (k: String, v) => (k, toJsonValue(v))
+        }
         JObject(fields)
       case arr: Array[_] =>
         val values = arr.toList.map(toJsonValue)
@@ -213,10 +221,10 @@ object Metadata {
 }
 
 /**
- * :: DeveloperApi ::
- *
- * Builder for [[Metadata]]. If there is a key collision, the latter will overwrite the former.
- */
+  * :: DeveloperApi ::
+  *
+  * Builder for [[Metadata]]. If there is a key collision, the latter will overwrite the former.
+  */
 @DeveloperApi
 class MetadataBuilder {
 
@@ -250,19 +258,24 @@ class MetadataBuilder {
   def putMetadata(key: String, value: Metadata): this.type = put(key, value)
 
   /** Puts a Long array. */
-  def putLongArray(key: String, value: Array[Long]): this.type = put(key, value)
+  def putLongArray(key: String, value: Array[Long]): this.type =
+    put(key, value)
 
   /** Puts a Double array. */
-  def putDoubleArray(key: String, value: Array[Double]): this.type = put(key, value)
+  def putDoubleArray(key: String, value: Array[Double]): this.type =
+    put(key, value)
 
   /** Puts a Boolean array. */
-  def putBooleanArray(key: String, value: Array[Boolean]): this.type = put(key, value)
+  def putBooleanArray(key: String, value: Array[Boolean]): this.type =
+    put(key, value)
 
   /** Puts a String array. */
-  def putStringArray(key: String, value: Array[String]): this.type = put(key, value)
+  def putStringArray(key: String, value: Array[String]): this.type =
+    put(key, value)
 
   /** Puts a [[Metadata]] array. */
-  def putMetadataArray(key: String, value: Array[Metadata]): this.type = put(key, value)
+  def putMetadataArray(key: String, value: Array[Metadata]): this.type =
+    put(key, value)
 
   /** Builds the [[Metadata]] instance. */
   def build(): Metadata = {

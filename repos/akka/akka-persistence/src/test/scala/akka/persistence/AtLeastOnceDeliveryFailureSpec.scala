@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.persistence
 
 import scala.concurrent.duration._
@@ -14,8 +13,7 @@ import akka.actor._
 import akka.testkit._
 
 object AtLeastOnceDeliveryFailureSpec {
-  val config = ConfigFactory.parseString(
-    s"""
+  val config = ConfigFactory.parseString(s"""
       akka.persistence.sender.chaos.live-processing-failure-rate = 0.3
       akka.persistence.sender.chaos.replay-processing-failure-rate = 0.1
       akka.persistence.destination.chaos.confirm-failure-rate = 0.3
@@ -44,7 +42,8 @@ object AtLeastOnceDeliveryFailureSpec {
   case class MsgSent(i: Int) extends Evt
   case class MsgConfirmed(deliveryId: Long, i: Int) extends Evt
 
-  trait ChaosSupport { this: Actor ⇒
+  trait ChaosSupport {
+    this: Actor ⇒
     def random = ThreadLocalRandom.current
 
     def probe: ActorRef
@@ -63,10 +62,15 @@ object AtLeastOnceDeliveryFailureSpec {
       random.nextDouble() < rate
   }
 
-  class ChaosSender(destination: ActorRef, val probe: ActorRef) extends PersistentActor with ChaosSupport with ActorLogging with AtLeastOnceDelivery {
-    val config = context.system.settings.config.getConfig("akka.persistence.sender.chaos")
-    val liveProcessingFailureRate = config.getDouble("live-processing-failure-rate")
-    val replayProcessingFailureRate = config.getDouble("replay-processing-failure-rate")
+  class ChaosSender(destination: ActorRef, val probe: ActorRef)
+      extends PersistentActor with ChaosSupport with ActorLogging
+      with AtLeastOnceDelivery {
+    val config =
+      context.system.settings.config.getConfig("akka.persistence.sender.chaos")
+    val liveProcessingFailureRate =
+      config.getDouble("live-processing-failure-rate")
+    val replayProcessingFailureRate =
+      config.getDouble("replay-processing-failure-rate")
 
     override def redeliverInterval = 500.milliseconds
 
@@ -83,13 +87,12 @@ object AtLeastOnceDeliveryFailureSpec {
             sender() ! Ack(i)
             if (shouldFail(liveProcessingFailureRate))
               throw new TestException(debugMessage(s"failed at payload $i"))
-            else
-              log.debug(debugMessage(s"processed payload $i"))
+            else log.debug(debugMessage(s"processed payload $i"))
           }
-
         }
 
-      case Confirm(deliveryId, i) ⇒ persist(MsgConfirmed(deliveryId, i))(updateState)
+      case Confirm(deliveryId, i) ⇒
+        persist(MsgConfirmed(deliveryId, i))(updateState)
     }
 
     def receiveRecover: Receive = {
@@ -97,8 +100,7 @@ object AtLeastOnceDeliveryFailureSpec {
         updateState(evt)
         if (shouldFail(replayProcessingFailureRate))
           throw new TestException(debugMessage(s"replay failed at event $evt"))
-        else
-          log.debug(debugMessage(s"replayed event $evt"))
+        else log.debug(debugMessage(s"replayed event $evt"))
     }
 
     def updateState(evt: Evt): Unit = evt match {
@@ -113,17 +115,21 @@ object AtLeastOnceDeliveryFailureSpec {
     private def debugMessage(msg: String): String =
       s"[sender] ${msg} (mode = ${if (recoveryRunning) "replay" else "live"} snr = ${lastSequenceNr} state = ${state.sorted})"
 
-    override protected def onRecoveryFailure(cause: Throwable, event: Option[Any]): Unit = {
+    override protected def onRecoveryFailure(
+        cause: Throwable, event: Option[Any]): Unit = {
       // mute logging
     }
 
-    override protected def onPersistFailure(cause: Throwable, event: Any, seqNr: Long): Unit = {
+    override protected def onPersistFailure(
+        cause: Throwable, event: Any, seqNr: Long): Unit = {
       // mute logging
     }
   }
 
-  class ChaosDestination(val probe: ActorRef) extends Actor with ChaosSupport with ActorLogging {
-    val config = context.system.settings.config.getConfig("akka.persistence.destination.chaos")
+  class ChaosDestination(val probe: ActorRef)
+      extends Actor with ChaosSupport with ActorLogging {
+    val config = context.system.settings.config
+      .getConfig("akka.persistence.destination.chaos")
     val confirmFailureRate = config.getDouble("confirm-failure-rate")
 
     def receive = {
@@ -145,15 +151,17 @@ object AtLeastOnceDeliveryFailureSpec {
   }
 
   class ChaosApp(probe: ActorRef) extends Actor with ActorLogging {
-    val destination = context.actorOf(Props(classOf[ChaosDestination], probe), "destination")
+    val destination =
+      context.actorOf(Props(classOf[ChaosDestination], probe), "destination")
     var snd = createSender()
     var acks = Set.empty[Int]
 
     def createSender(): ActorRef =
-      context.watch(context.actorOf(Props(classOf[ChaosSender], destination, probe), "sender"))
+      context.watch(context.actorOf(
+              Props(classOf[ChaosSender], destination, probe), "sender"))
 
     def receive = {
-      case Start  ⇒ 1 to numMessages foreach (snd ! _)
+      case Start ⇒ 1 to numMessages foreach (snd ! _)
       case Ack(i) ⇒ acks += i
       case Terminated(_) ⇒
         // snd will be stopped if recovery or persist fails
@@ -164,7 +172,9 @@ object AtLeastOnceDeliveryFailureSpec {
   }
 }
 
-class AtLeastOnceDeliveryFailureSpec extends AkkaSpec(AtLeastOnceDeliveryFailureSpec.config) with Cleanup with ImplicitSender {
+class AtLeastOnceDeliveryFailureSpec
+    extends AkkaSpec(AtLeastOnceDeliveryFailureSpec.config) with Cleanup
+    with ImplicitSender {
   import AtLeastOnceDeliveryFailureSpec._
 
   muteDeadLetters(classOf[AnyRef])(system)

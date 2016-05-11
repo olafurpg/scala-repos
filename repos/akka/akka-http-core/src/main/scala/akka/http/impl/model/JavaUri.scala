@@ -1,15 +1,14 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.impl.model
 
 import java.nio.charset.Charset
 import java.util.Optional
-import java.{ lang ⇒ jl }
+import java.{lang ⇒ jl}
 import akka.http.scaladsl.model.Uri.ParsingMode
-import akka.http.javadsl.{ model ⇒ jm }
-import akka.http.scaladsl.{ model ⇒ sm }
+import akka.http.javadsl.{model ⇒ jm}
+import akka.http.scaladsl.{model ⇒ sm}
 import akka.http.impl.util.JavaMapping.Implicits._
 import scala.compat.java8.OptionConverters._
 
@@ -29,18 +28,20 @@ case class JavaUri(uri: sm.Uri) extends jm.Uri {
   def pathSegments(): jl.Iterable[String] = {
     import sm.Uri.Path._
     def gatherSegments(path: sm.Uri.Path): List[String] = path match {
-      case Empty               ⇒ Nil
+      case Empty ⇒ Nil
       case Segment(head, tail) ⇒ head :: gatherSegments(tail)
-      case Slash(tail)         ⇒ gatherSegments(tail)
+      case Slash(tail) ⇒ gatherSegments(tail)
     }
     import collection.JavaConverters._
     gatherSegments(uri.path).asJava
   }
 
   def rawQueryString: Optional[String] = uri.rawQueryString.asJava
-  def queryString(charset: Charset): Optional[String] = uri.queryString(charset).asJava
+  def queryString(charset: Charset): Optional[String] =
+    uri.queryString(charset).asJava
   def query: jm.Query = uri.query().asJava
-  def query(charset: Charset, mode: ParsingMode): jm.Query = uri.query(charset, mode).asJava
+  def query(charset: Charset, mode: ParsingMode): jm.Query =
+    uri.query(charset, mode).asJava
 
   def fragment: Optional[String] = uri.fragment.asJava
 
@@ -59,7 +60,8 @@ case class JavaUri(uri: sm.Uri) extends jm.Uri {
 
   def toRelative: jm.Uri = t(_.toRelative)
 
-  def rawQueryString(rawQuery: String): jm.Uri = t(_.withRawQueryString(rawQuery))
+  def rawQueryString(rawQuery: String): jm.Uri =
+    t(_.withRawQueryString(rawQuery))
   def query(query: jm.Query): jm.Uri = t(_.withQuery(query.asScala))
 
   def addPathSegment(segment: String): jm.Uri = t { u ⇒
@@ -70,7 +72,8 @@ case class JavaUri(uri: sm.Uri) extends jm.Uri {
     u.withPath(newPath)
   }
 
-  def fragment(fragment: Optional[String]): jm.Uri = t(_.copy(fragment = fragment.asScala))
+  def fragment(fragment: Optional[String]): jm.Uri =
+    t(_.copy(fragment = fragment.asScala))
   def fragment(fragment: String): jm.Uri = t(_.withFragment(fragment))
 
   override def toString: String = uri.toString

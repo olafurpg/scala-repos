@@ -21,31 +21,34 @@ import backtype.storm.topology.TopologyBuilder
 import backtype.storm.tuple.Fields
 import backtype.storm.tuple.Tuple
 
-import com.twitter.algebird.{ Semigroup, Monoid }
+import com.twitter.algebird.{Semigroup, Monoid}
 import com.twitter.storehaus.ReadableStore
 import com.twitter.summingbird._
 import com.twitter.summingbird.chill._
-import com.twitter.summingbird.batch.{ BatchID, Batcher, Timestamp }
-import com.twitter.summingbird.storm.option.{ AckOnEntry, AnchorTuples }
+import com.twitter.summingbird.batch.{BatchID, Batcher, Timestamp}
+import com.twitter.summingbird.storm.option.{AckOnEntry, AnchorTuples}
 import com.twitter.summingbird.online.executor.InputState
-import com.twitter.summingbird.online.option.{ IncludeSuccessHandler, MaxWaitingFutures, MaxFutureWaitTime, SummerBuilder }
-import com.twitter.summingbird.option.{ CacheSize, JobId }
+import com.twitter.summingbird.online.option.{IncludeSuccessHandler, MaxWaitingFutures, MaxFutureWaitTime, SummerBuilder}
+import com.twitter.summingbird.option.{CacheSize, JobId}
 import com.twitter.summingbird.planner._
 import com.twitter.summingbird.online.executor
 import com.twitter.summingbird.online.FlatMapOperation
 import com.twitter.summingbird.storm.planner._
 import org.slf4j.LoggerFactory
 
-import scala.collection.{ Map => CMap }
+import scala.collection.{Map => CMap}
 
 /**
- * These are helper functions for building a bolt from a Node[Storm] element.
- * There are two main codepaths here, for intermediate flat maps and final flat maps.
- * The primary difference between those two being the the presents of map side aggreagtion in a final flatmap.
- */
+  * These are helper functions for building a bolt from a Node[Storm] element.
+  * There are two main codepaths here, for intermediate flat maps and final flat maps.
+  * The primary difference between those two being the the presents of map side aggreagtion in a final flatmap.
+  */
 object FlatMapBoltProvider {
-  @transient private val logger = LoggerFactory.getLogger(FlatMapBoltProvider.getClass)
-  private def wrapTimeBatchIDKV[T, K, V](existingOp: FlatMapOperation[T, (K, V)])(batcher: Batcher): FlatMapOperation[(Timestamp, T), ((K, BatchID), (Timestamp, V))] =
+  @transient private val logger =
+    LoggerFactory.getLogger(FlatMapBoltProvider.getClass)
+  private def wrapTimeBatchIDKV[T, K, V](
+      existingOp: FlatMapOperation[T, (K, V)])(batcher: Batcher)
+    : FlatMapOperation[(Timestamp, T), ((K, BatchID), (Timestamp, V))] =
     FlatMapOperation.generic[(Timestamp, T), ((K, BatchID), (Timestamp, V))]({
       case (ts, data) =>
         existingOp.apply(data).map { vals =>
@@ -56,7 +59,8 @@ object FlatMapBoltProvider {
         }
     })
 
-  def wrapTime[T, U](existingOp: FlatMapOperation[T, U]): FlatMapOperation[(Timestamp, T), (Timestamp, U)] = {
+  def wrapTime[T, U](existingOp: FlatMapOperation[T, U])
+    : FlatMapOperation[(Timestamp, T), (Timestamp, U)] = {
     FlatMapOperation.generic({ x: (Timestamp, T) =>
       existingOp.apply(x._2).map { vals =>
         vals.map((x._1, _))
@@ -65,11 +69,15 @@ object FlatMapBoltProvider {
   }
 }
 
-case class FlatMapBoltProvider(storm: Storm, jobID: JobId, stormDag: Dag[Storm], node: StormNode)(implicit topologyBuilder: TopologyBuilder) {
+case class FlatMapBoltProvider(
+    storm: Storm, jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
+    implicit topologyBuilder: TopologyBuilder) {
   import FlatMapBoltProvider._
   import Producer2FlatMapOperation._
 
-  def getOrElse[T <: AnyRef: Manifest](default: T, queryNode: StormNode = node) = storm.getOrElse(stormDag, queryNode, default)
+  def getOrElse[T <: AnyRef : Manifest](
+      default: T, queryNode: StormNode = node) =
+    storm.getOrElse(stormDag, queryNode, default)
 
   // Boilerplate extracting of the options from the DAG
   private val nodeName = stormDag.getNodeName(node)
@@ -95,7 +103,9 @@ case class FlatMapBoltProvider(storm: Storm, jobID: JobId, stormDag: Dag[Storm],
     type ExecutorKey = Int
     type InnerValue = (Timestamp, V)
     type ExecutorValue = CMap[(K, BatchID), InnerValue]
-    val summerProducer = summer.members.collect { case s: Summer[_, _, _] => s }.head.asInstanceOf[Summer[Storm, K, V]]
+    val summerProducer = summer.members.collect {
+      case s: Summer[_, _, _] => s
+    }.head.asInstanceOf[Summer[Storm, K, V]]
     // When emitting tuples between the Final Flat Map and the summer we encode the timestamp in the value
     // The monoid we use in aggregation is timestamp max.
     val batcher = summerProducer.store.mergeableBatcher
@@ -104,10 +114,12 @@ case class FlatMapBoltProvider(storm: Storm, jobID: JobId, stormDag: Dag[Storm],
     // Query to get the summer paralellism of the summer down stream of us we are emitting to
     // to ensure no edge case between what we might see for its parallelism and what it would see/pass to storm.
     val summerParalellism = getOrElse(DEFAULT_SUMMER_PARALLELISM, summer)
-    val summerBatchMultiplier = getOrElse(DEFAULT_SUMMER_BATCH_MULTIPLIER, summer)
+    val summerBatchMultiplier = getOrElse(
+        DEFAULT_SUMMER_BATCH_MULTIPLIER, summer)
 
     // This option we report its value here, but its not user settable.
-    val keyValueShards = executor.KeyValueShards(summerParalellism.parHint * summerBatchMultiplier.get)
+    val keyValueShards = executor.KeyValueShards(
+        summerParalellism.parHint * summerBatchMultiplier.get)
     logger.info(s"[$nodeName] keyValueShards : ${keyValueShards.get}")
 
     val operation = foldOperations[T, (K, V)](node.members.reverse)
@@ -116,23 +128,23 @@ case class FlatMapBoltProvider(storm: Storm, jobID: JobId, stormDag: Dag[Storm],
     val builder = BuildSummer(storm, stormDag, node, jobID)
 
     BaseBolt(
-      jobID,
-      metrics.metrics,
-      anchorTuples,
-      true,
-      new Fields(AGG_KEY, AGG_VALUE),
-      ackOnEntry,
-      maxExecutePerSec,
-      new executor.FinalFlatMap(
-        wrappedOperation,
-        builder,
-        maxWaiting,
-        maxWaitTime,
-        maxEmitPerExecute,
-        keyValueShards,
-        new SingleItemInjection[ExecutorInput],
-        new KeyValueInjection[ExecutorKey, ExecutorValue]
-      )(implicitly[Semigroup[InnerValue]])
+        jobID,
+        metrics.metrics,
+        anchorTuples,
+        true,
+        new Fields(AGG_KEY, AGG_VALUE),
+        ackOnEntry,
+        maxExecutePerSec,
+        new executor.FinalFlatMap(
+            wrappedOperation,
+            builder,
+            maxWaiting,
+            maxWaitTime,
+            maxEmitPerExecute,
+            keyValueShards,
+            new SingleItemInjection[ExecutorInput],
+            new KeyValueInjection[ExecutorKey, ExecutorValue]
+        )(implicitly[Semigroup[InnerValue]])
     )
   }
 
@@ -144,29 +156,34 @@ case class FlatMapBoltProvider(storm: Storm, jobID: JobId, stormDag: Dag[Storm],
     val wrappedOperation = wrapTime(operation)
 
     BaseBolt(
-      jobID,
-      metrics.metrics,
-      anchorTuples,
-      stormDag.dependantsOf(node).size > 0,
-      new Fields(VALUE_FIELD),
-      ackOnEntry,
-      maxExecutePerSec,
-      new executor.IntermediateFlatMap(
-        wrappedOperation,
-        maxWaiting,
-        maxWaitTime,
-        maxEmitPerExecute,
-        new SingleItemInjection[ExecutorInput],
-        new SingleItemInjection[ExecutorOutput]
-      )
+        jobID,
+        metrics.metrics,
+        anchorTuples,
+        stormDag.dependantsOf(node).size > 0,
+        new Fields(VALUE_FIELD),
+        ackOnEntry,
+        maxExecutePerSec,
+        new executor.IntermediateFlatMap(
+            wrappedOperation,
+            maxWaiting,
+            maxWaitTime,
+            maxEmitPerExecute,
+            new SingleItemInjection[ExecutorInput],
+            new SingleItemInjection[ExecutorOutput]
+        )
     )
   }
 
   def apply: BaseBolt[Any, Any] = {
-    val summerOpt: Option[SummerNode[Storm]] = stormDag.dependantsOf(node).collect { case s: SummerNode[Storm] => s }.headOption
+    val summerOpt: Option[SummerNode[Storm]] = stormDag
+      .dependantsOf(node)
+      .collect { case s: SummerNode[Storm] => s }
+      .headOption
     summerOpt match {
-      case Some(s) => getFFMBolt[Any, Any, Any](s).asInstanceOf[BaseBolt[Any, Any]]
-      case None => getIntermediateFMBolt[Any, Any].asInstanceOf[BaseBolt[Any, Any]]
+      case Some(s) =>
+        getFFMBolt[Any, Any, Any](s).asInstanceOf[BaseBolt[Any, Any]]
+      case None =>
+        getIntermediateFMBolt[Any, Any].asInstanceOf[BaseBolt[Any, Any]]
     }
   }
 }

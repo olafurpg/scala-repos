@@ -4,14 +4,14 @@ import fastparse.parsers.Intrinsics
 import acyclic.file
 
 /**
- * This is basically a trait which contains
- * the "public" API to fastparse packages
- */
-trait Api{
+  * This is basically a trait which contains
+  * the "public" API to fastparse packages
+  */
+trait Api {
 
   val Parsed = core.Parsed
   type Parsed[+T] = core.Parsed[T]
-  
+
   val Pass = parsers.Terminals.Pass
   val Fail = parsers.Terminals.Fail
   val Start = parsers.Terminals.Start
@@ -44,8 +44,9 @@ trait Api{
   val ParseError = core.ParseError
   type ParseError = core.ParseError
 }
-object all extends Api{
-  implicit def parserApi[T, V](p: T)(implicit c: T => core.Parser[V]): ParserApi[V] =
+object all extends Api {
+  implicit def parserApi[T, V](p: T)(
+      implicit c: T => core.Parser[V]): ParserApi[V] =
     new ParserApiImpl[V](p)
 }
 object noApi extends Api

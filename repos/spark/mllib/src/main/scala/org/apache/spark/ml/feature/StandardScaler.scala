@@ -31,30 +31,31 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{StructField, StructType}
 
 /**
- * Params for [[StandardScaler]] and [[StandardScalerModel]].
- */
-private[feature] trait StandardScalerParams extends Params with HasInputCol with HasOutputCol {
+  * Params for [[StandardScaler]] and [[StandardScalerModel]].
+  */
+private[feature] trait StandardScalerParams
+    extends Params with HasInputCol with HasOutputCol {
 
   /**
-   * Whether to center the data with mean before scaling.
-   * It will build a dense output, so this does not work on sparse input
-   * and will raise an exception.
-   * Default: false
-   * @group param
-   */
-  val withMean: BooleanParam = new BooleanParam(this, "withMean",
-    "Whether to center data with mean")
+    * Whether to center the data with mean before scaling.
+    * It will build a dense output, so this does not work on sparse input
+    * and will raise an exception.
+    * Default: false
+    * @group param
+    */
+  val withMean: BooleanParam = new BooleanParam(
+      this, "withMean", "Whether to center data with mean")
 
   /** @group getParam */
   def getWithMean: Boolean = $(withMean)
 
   /**
-   * Whether to scale the data to unit standard deviation.
-   * Default: true
-   * @group param
-   */
-  val withStd: BooleanParam = new BooleanParam(this, "withStd",
-    "Whether to scale the data to unit standard deviation")
+    * Whether to scale the data to unit standard deviation.
+    * Default: true
+    * @group param
+    */
+  val withStd: BooleanParam = new BooleanParam(
+      this, "withStd", "Whether to scale the data to unit standard deviation")
 
   /** @group getParam */
   def getWithStd: Boolean = $(withStd)
@@ -63,13 +64,14 @@ private[feature] trait StandardScalerParams extends Params with HasInputCol with
 }
 
 /**
- * :: Experimental ::
- * Standardizes features by removing the mean and scaling to unit variance using column summary
- * statistics on the samples in the training set.
- */
+  * :: Experimental ::
+  * Standardizes features by removing the mean and scaling to unit variance using column summary
+  * statistics on the samples in the training set.
+  */
 @Experimental
-class StandardScaler(override val uid: String) extends Estimator[StandardScalerModel]
-  with StandardScalerParams with DefaultParamsWritable {
+class StandardScaler(override val uid: String)
+    extends Estimator[StandardScalerModel] with StandardScalerParams
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("stdScal"))
 
@@ -87,19 +89,24 @@ class StandardScaler(override val uid: String) extends Estimator[StandardScalerM
 
   override def fit(dataset: DataFrame): StandardScalerModel = {
     transformSchema(dataset.schema, logging = true)
-    val input = dataset.select($(inputCol)).rdd.map { case Row(v: Vector) => v }
-    val scaler = new feature.StandardScaler(withMean = $(withMean), withStd = $(withStd))
+    val input =
+      dataset.select($(inputCol)).rdd.map { case Row(v: Vector) => v }
+    val scaler =
+      new feature.StandardScaler(withMean = $(withMean), withStd = $(withStd))
     val scalerModel = scaler.fit(input)
-    copyValues(new StandardScalerModel(uid, scalerModel.std, scalerModel.mean).setParent(this))
+    copyValues(
+        new StandardScalerModel(uid, scalerModel.std, scalerModel.mean)
+          .setParent(this))
   }
 
   override def transformSchema(schema: StructType): StructType = {
     val inputType = schema($(inputCol)).dataType
     require(inputType.isInstanceOf[VectorUDT],
-      s"Input column ${$(inputCol)} must be a vector column")
+            s"Input column ${$(inputCol)} must be a vector column")
     require(!schema.fieldNames.contains($(outputCol)),
-      s"Output column ${$(outputCol)} already exists.")
-    val outputFields = schema.fields :+ StructField($(outputCol), new VectorUDT, false)
+            s"Output column ${$(outputCol)} already exists.")
+    val outputFields =
+      schema.fields :+ StructField($(outputCol), new VectorUDT, false)
     StructType(outputFields)
   }
 
@@ -114,18 +121,17 @@ object StandardScaler extends DefaultParamsReadable[StandardScaler] {
 }
 
 /**
- * :: Experimental ::
- * Model fitted by [[StandardScaler]].
- *
- * @param std Standard deviation of the StandardScalerModel
- * @param mean Mean of the StandardScalerModel
- */
+  * :: Experimental ::
+  * Model fitted by [[StandardScaler]].
+  *
+  * @param std Standard deviation of the StandardScalerModel
+  * @param mean Mean of the StandardScalerModel
+  */
 @Experimental
-class StandardScalerModel private[ml] (
-    override val uid: String,
-    val std: Vector,
-    val mean: Vector)
-  extends Model[StandardScalerModel] with StandardScalerParams with MLWritable {
+class StandardScalerModel private[ml](
+    override val uid: String, val std: Vector, val mean: Vector)
+    extends Model[StandardScalerModel] with StandardScalerParams
+    with MLWritable {
 
   import StandardScalerModel._
 
@@ -137,7 +143,8 @@ class StandardScalerModel private[ml] (
 
   override def transform(dataset: DataFrame): DataFrame = {
     transformSchema(dataset.schema, logging = true)
-    val scaler = new feature.StandardScalerModel(std, mean, $(withStd), $(withMean))
+    val scaler =
+      new feature.StandardScalerModel(std, mean, $(withStd), $(withMean))
     val scale = udf { scaler.transform _ }
     dataset.withColumn($(outputCol), scale(col($(inputCol))))
   }
@@ -145,10 +152,11 @@ class StandardScalerModel private[ml] (
   override def transformSchema(schema: StructType): StructType = {
     val inputType = schema($(inputCol)).dataType
     require(inputType.isInstanceOf[VectorUDT],
-      s"Input column ${$(inputCol)} must be a vector column")
+            s"Input column ${$(inputCol)} must be a vector column")
     require(!schema.fieldNames.contains($(outputCol)),
-      s"Output column ${$(outputCol)} already exists.")
-    val outputFields = schema.fields :+ StructField($(outputCol), new VectorUDT, false)
+            s"Output column ${$(outputCol)} already exists.")
+    val outputFields =
+      schema.fields :+ StructField($(outputCol), new VectorUDT, false)
     StructType(outputFields)
   }
 
@@ -164,8 +172,9 @@ class StandardScalerModel private[ml] (
 @Since("1.6.0")
 object StandardScalerModel extends MLReadable[StandardScalerModel] {
 
-  private[StandardScalerModel]
-  class StandardScalerModelWriter(instance: StandardScalerModel) extends MLWriter {
+  private[StandardScalerModel] class StandardScalerModelWriter(
+      instance: StandardScalerModel)
+      extends MLWriter {
 
     private case class Data(std: Vector, mean: Vector)
 
@@ -173,20 +182,24 @@ object StandardScalerModel extends MLReadable[StandardScalerModel] {
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val data = Data(instance.std, instance.mean)
       val dataPath = new Path(path, "data").toString
-      sqlContext.createDataFrame(Seq(data)).repartition(1).write.parquet(dataPath)
+      sqlContext
+        .createDataFrame(Seq(data))
+        .repartition(1)
+        .write
+        .parquet(dataPath)
     }
   }
 
-  private class StandardScalerModelReader extends MLReader[StandardScalerModel] {
+  private class StandardScalerModelReader
+      extends MLReader[StandardScalerModel] {
 
     private val className = classOf[StandardScalerModel].getName
 
     override def load(path: String): StandardScalerModel = {
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val dataPath = new Path(path, "data").toString
-      val Row(std: Vector, mean: Vector) = sqlContext.read.parquet(dataPath)
-        .select("std", "mean")
-        .head()
+      val Row(std: Vector, mean: Vector) =
+        sqlContext.read.parquet(dataPath).select("std", "mean").head()
       val model = new StandardScalerModel(metadata.uid, std, mean)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
@@ -194,7 +207,8 @@ object StandardScalerModel extends MLReadable[StandardScalerModel] {
   }
 
   @Since("1.6.0")
-  override def read: MLReader[StandardScalerModel] = new StandardScalerModelReader
+  override def read: MLReader[StandardScalerModel] =
+    new StandardScalerModelReader
 
   @Since("1.6.0")
   override def load(path: String): StandardScalerModel = super.load(path)

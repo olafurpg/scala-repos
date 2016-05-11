@@ -14,6 +14,7 @@ object SCL8079 {
 
   val users = new TQ[U]
 
-  /*start*/foo(users)/*end*/
+  /*start*/
+  foo(users) /*end*/
 }
 //Int

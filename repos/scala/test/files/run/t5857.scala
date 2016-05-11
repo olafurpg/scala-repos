@@ -1,9 +1,6 @@
-
-
-
 object Test {
 
-  def time[U](b: =>U): Long = {
+  def time[U](b: => U): Long = {
     val start = System.currentTimeMillis
     b
     val end = System.currentTimeMillis
@@ -31,7 +28,7 @@ object Test {
     check { assert(numdesc.max == sz.toDouble) }
   }
 
-  def check[U](b: =>U) {
+  def check[U](b: => U) {
     val exectime = time {
       b
     }
@@ -41,5 +38,4 @@ object Test {
     //println(exectime)
     assert(exectime < 250, exectime)
   }
-
 }

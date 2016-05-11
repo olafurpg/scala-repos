@@ -20,17 +20,17 @@ import org.specs2.mutable.Specification
 
 import json.JsonDSL._
 
-
 /**
- * System under specification for MockHttpRequest.
- */
-object MockHttpRequestSpec extends Specification  {
+  * System under specification for MockHttpRequest.
+  */
+object MockHttpRequestSpec extends Specification {
   "MockHttpRequest Specification".title
 
   val IF_MODIFIED_HEADER = "If-Modified-Since"
   val TEST_URL = "https://foo.com/test/this/page?a=b&b=a&a=c"
   val TEST_URL_BLANK_PARAMETER = "https://foo.com/test/this/page?a=b&b=a&c=&d"
-  val TEST_URL_BLANK_PARAMETER_SERIALIZED = "https://foo.com/test/this/page?a=b&b=a&c=&d="
+  val TEST_URL_BLANK_PARAMETER_SERIALIZED =
+    "https://foo.com/test/this/page?a=b&b=a&c=&d="
 
   "MockHttpRequest" should {
 
@@ -44,12 +44,13 @@ object MockHttpRequestSpec extends Specification  {
       testRequest.getRequestURI must_== "/test/this/page"
       testRequest.getRequestURL.toString must_== TEST_URL
       testRequest.getQueryString must_== "a=b&b=a&a=c"
-      testRequest.getParameterValues("a").toList must_== List("b","c")
+      testRequest.getParameterValues("a").toList must_== List("b", "c")
       testRequest.getParameter("b") must_== "a"
     }
 
     "parse parameters with empty values" in {
-      val testRequest = new MockHttpServletRequest(TEST_URL_BLANK_PARAMETER, "/test")
+      val testRequest =
+        new MockHttpServletRequest(TEST_URL_BLANK_PARAMETER, "/test")
 
       testRequest.getScheme must_== "https"
       testRequest.isSecure must_== true
@@ -75,22 +76,26 @@ object MockHttpRequestSpec extends Specification  {
     "throw an IllegalArgumentException for an invalid date header" in {
       val testRequest = new MockHttpServletRequest(TEST_URL, "/test")
 
-      testRequest.headers += IF_MODIFIED_HEADER -> List("this is not a valid date")
+      testRequest.headers +=
+        IF_MODIFIED_HEADER -> List("this is not a valid date")
 
-      testRequest.getDateHeader(IF_MODIFIED_HEADER) must throwA[IllegalArgumentException]
+      testRequest.getDateHeader(IF_MODIFIED_HEADER) must throwA[
+          IllegalArgumentException]
     }
 
     "throw an IllegalArgumentException for an invalid context path" in {
-      (new MockHttpServletRequest(TEST_URL, "foo")) must throwA[IllegalArgumentException]
-      (new MockHttpServletRequest(TEST_URL, "/foo/")) must throwA[IllegalArgumentException]
-     }
+      (new MockHttpServletRequest(TEST_URL, "foo")) must throwA[
+          IllegalArgumentException]
+      (new MockHttpServletRequest(TEST_URL, "/foo/")) must throwA[
+          IllegalArgumentException]
+    }
 
     "throw an IllegalArgumentException for an invalid query string" in {
       val testRequest = new MockHttpServletRequest(TEST_URL, "/test")
-      
-      (testRequest.queryString ="this=a&&that=b") must throwA[IllegalArgumentException]
-     }
 
+      (testRequest.queryString = "this=a&&that=b") must throwA[
+          IllegalArgumentException]
+    }
 
     "properly set a default content type for JSON" in {
       val testRequest = new MockHttpServletRequest(TEST_URL, "/test")
@@ -121,7 +126,7 @@ object MockHttpRequestSpec extends Specification  {
 
       testRequest.body_=(<test/>, "application/xml")
 
-      testRequest.contentType must_== "application/xml"  
+      testRequest.contentType must_== "application/xml"
     }
 
     "properly set a default content type for a String" in {
@@ -139,6 +144,5 @@ object MockHttpRequestSpec extends Specification  {
 
       testRequest.contentType must_== "text/csv"
     }
-    
   }
 }

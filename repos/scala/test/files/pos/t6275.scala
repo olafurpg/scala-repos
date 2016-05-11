@@ -1,4 +1,3 @@
-
 sealed trait A[T]
 final class B[T] extends A[T]
 

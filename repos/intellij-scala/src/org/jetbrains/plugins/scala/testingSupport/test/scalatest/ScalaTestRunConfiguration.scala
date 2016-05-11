@@ -13,27 +13,30 @@ import org.jetbrains.plugins.scala.testingSupport.ScalaTestingConfiguration
 import org.jetbrains.plugins.scala.testingSupport.test._
 
 /**
- * @author Ksenia.Sautina
- * @since 5/17/12
- */
-
-class ScalaTestRunConfiguration(override val project: Project,
-                                override val configurationFactory: ConfigurationFactory,
-                                override val name: String)
+  * @author Ksenia.Sautina
+  * @since 5/17/12
+  */
+class ScalaTestRunConfiguration(
+    override val project: Project,
+    override val configurationFactory: ConfigurationFactory,
+    override val name: String)
     extends AbstractTestRunConfiguration(project, configurationFactory, name)
     with ScalaTestingConfiguration {
 
   override def suitePaths = List("org.scalatest.Suite")
 
-  override def mainClass = "org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestRunner"
+  override def mainClass =
+    "org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestRunner"
 
-  override def reporterClass = "org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestReporter"
+  override def reporterClass =
+    "org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestReporter"
 
   override def errorMessage: String = "ScalaTest is not specified"
 
   override def currentConfiguration = ScalaTestRunConfiguration.this
 
-  protected[test] override def isInvalidSuite(clazz: PsiClass): Boolean = ScalaTestRunConfiguration.isInvalidSuite(clazz)
+  protected[test] override def isInvalidSuite(clazz: PsiClass): Boolean =
+    ScalaTestRunConfiguration.isInvalidSuite(clazz)
 }
 
 object ScalaTestRunConfiguration extends SuiteValidityChecker {
@@ -43,7 +46,8 @@ object ScalaTestRunConfiguration extends SuiteValidityChecker {
   protected[test] def lackConfigMapConstructor(clazz: PsiClass): Boolean = {
     val project = clazz.getProject
     val constructors = clazz match {
-      case c: ScClass => c.secondaryConstructors.filter(_.isConstructor).toList ::: c.constructor.toList
+      case c: ScClass =>
+        c.secondaryConstructors.filter(_.isConstructor).toList ::: c.constructor.toList
       case _ => clazz.getConstructors.toList
     }
     for (con <- constructors) {
@@ -54,15 +58,18 @@ object ScalaTestRunConfiguration extends SuiteValidityChecker {
               val params = con.getParameterList.getParameters
               val firstParam = params(0)
               val psiManager = ScalaPsiManager.instance(project)
-              val mapPsiClass = psiManager.getCachedClass(ProjectScope.getAllScope(project), "scala.collection.immutable.Map").orNull
+              val mapPsiClass = psiManager
+                .getCachedClass(ProjectScope.getAllScope(project),
+                                "scala.collection.immutable.Map")
+                .orNull
               val mapClass = ScType.designator(mapPsiClass)
               val paramClass = ScType.create(firstParam.getType, project)
               val conformanceType = paramClass match {
-                case parameterizedType: ScParameterizedType => parameterizedType.designator
+                case parameterizedType: ScParameterizedType =>
+                  parameterizedType.designator
                 case _ => paramClass
               }
-              if (Conformance.conforms(mapClass, conformanceType))
-                return false
+              if (Conformance.conforms(mapClass, conformanceType)) return false
             }
           case _ =>
         }
@@ -71,7 +78,8 @@ object ScalaTestRunConfiguration extends SuiteValidityChecker {
     true
   }
 
-  override protected[test] def lackSuitableConstructor(clazz: PsiClass): Boolean = {
+  override protected[test] def lackSuitableConstructor(
+      clazz: PsiClass): Boolean = {
     val hasConfigMapAnnotation = clazz match {
       case classDef: ScTypeDefinition =>
         val annotation = classDef.hasAnnotation(wrapWithAnnotationFqn)

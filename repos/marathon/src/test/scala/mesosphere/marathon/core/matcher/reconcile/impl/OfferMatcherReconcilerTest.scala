@@ -9,12 +9,14 @@ import mesosphere.marathon.core.task.tracker.TaskTracker.TasksByApp
 import mesosphere.marathon.state._
 import mesosphere.marathon.test.Mockito
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ FunSuite, GivenWhenThen, Matchers }
+import org.scalatest.{FunSuite, GivenWhenThen, Matchers}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class OfferMatcherReconcilerTest extends FunSuite with GivenWhenThen with Mockito with Matchers with ScalaFutures {
+class OfferMatcherReconcilerTest
+    extends FunSuite with GivenWhenThen with Mockito with Matchers
+    with ScalaFutures {
   import scala.collection.JavaConverters._
 
   test("offer without reservations leads to no task ops") {
@@ -22,7 +24,8 @@ class OfferMatcherReconcilerTest extends FunSuite with GivenWhenThen with Mockit
     Given("an offer without reservations")
     val offer = MarathonTestHelper.makeBasicOffer().build()
     When("reconciling")
-    val matchedTaskOps = f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
+    val matchedTaskOps =
+      f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
     Then("no task ops are generated")
     matchedTaskOps.ops should be(empty)
   }
@@ -32,8 +35,10 @@ class OfferMatcherReconcilerTest extends FunSuite with GivenWhenThen with Mockit
     Given("an offer with volume")
     val appId = PathId("/test")
     val taskId = Task.Id.forApp(appId)
-    val localVolumeIdLaunched = LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
-    val offer = MarathonTestHelper.offerWithVolumes(taskId.idString, localVolumeIdLaunched)
+    val localVolumeIdLaunched =
+      LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
+    val offer = MarathonTestHelper.offerWithVolumes(
+        taskId.idString, localVolumeIdLaunched)
 
     And("no groups")
     f.groupRepository.rootGroupOrEmpty() returns Future.successful(Group.empty)
@@ -41,17 +46,18 @@ class OfferMatcherReconcilerTest extends FunSuite with GivenWhenThen with Mockit
     f.taskTracker.tasksByApp()(any) returns Future.successful(TasksByApp.empty)
 
     When("reconciling")
-    val matchedTaskOps = f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
+    val matchedTaskOps =
+      f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
 
     Then("all resources are destroyed and unreserved")
-    val expectedOps =
-      Iterable(
+    val expectedOps = Iterable(
         TaskOp.UnreserveAndDestroyVolumes(
-          taskId,
-          oldTask = None, maybeNewTask = None,
-          resources = offer.getResourcesList.asScala.to[Seq]
+            taskId,
+            oldTask = None,
+            maybeNewTask = None,
+            resources = offer.getResourcesList.asScala.to[Seq]
         )
-      )
+    )
 
     // for the nicer error message with diff indication
     matchedTaskOps.ops.mkString("\n") should be(expectedOps.mkString("\n"))
@@ -63,25 +69,30 @@ class OfferMatcherReconcilerTest extends FunSuite with GivenWhenThen with Mockit
     Given("an offer with volume")
     val appId = PathId("/test")
     val taskId = Task.Id.forApp(appId)
-    val localVolumeIdLaunched = LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
-    val offer = MarathonTestHelper.offerWithVolumes(taskId.idString, localVolumeIdLaunched)
+    val localVolumeIdLaunched =
+      LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
+    val offer = MarathonTestHelper.offerWithVolumes(
+        taskId.idString, localVolumeIdLaunched)
 
     And("a bogus app")
     val app = AppDefinition(appId)
-    f.groupRepository.rootGroupOrEmpty() returns Future.successful(Group.empty.copy(apps = Set(app)))
+    f.groupRepository.rootGroupOrEmpty() returns Future.successful(
+        Group.empty.copy(apps = Set(app)))
     And("no tasks")
     f.taskTracker.tasksByApp()(any) returns Future.successful(TasksByApp.empty)
 
     When("reconciling")
-    val matchedTaskOps = f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
+    val matchedTaskOps =
+      f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
 
     Then("all resources are destroyed and unreserved")
     val expectedOps = Iterable(
-      TaskOp.UnreserveAndDestroyVolumes(
-        taskId,
-        oldTask = None, maybeNewTask = None,
-        resources = offer.getResourcesList.asScala.to[Seq]
-      )
+        TaskOp.UnreserveAndDestroyVolumes(
+            taskId,
+            oldTask = None,
+            maybeNewTask = None,
+            resources = offer.getResourcesList.asScala.to[Seq]
+        )
     )
 
     // for the nicer error message with diff
@@ -94,25 +105,30 @@ class OfferMatcherReconcilerTest extends FunSuite with GivenWhenThen with Mockit
     Given("an offer with volume")
     val appId = PathId("/test")
     val taskId = Task.Id.forApp(appId)
-    val localVolumeIdLaunched = LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
-    val offer = MarathonTestHelper.offerWithVolumes(taskId.idString, localVolumeIdLaunched)
+    val localVolumeIdLaunched =
+      LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
+    val offer = MarathonTestHelper.offerWithVolumes(
+        taskId.idString, localVolumeIdLaunched)
 
     And("no groups")
     f.groupRepository.rootGroupOrEmpty() returns Future.successful(Group.empty)
     And("a matching bogus task")
     val bogusTask = MarathonTestHelper.mininimalTask(taskId.idString)
-    f.taskTracker.tasksByApp()(any) returns Future.successful(TasksByApp.forTasks(bogusTask))
+    f.taskTracker.tasksByApp()(any) returns Future.successful(
+        TasksByApp.forTasks(bogusTask))
 
     When("reconciling")
-    val matchedTaskOps = f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
+    val matchedTaskOps =
+      f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
 
     Then("all resources are destroyed and unreserved")
     val expectedOps = Iterable(
-      TaskOp.UnreserveAndDestroyVolumes(
-        taskId,
-        oldTask = Some(bogusTask), maybeNewTask = None,
-        resources = offer.getResourcesList.asScala.to[Seq]
-      )
+        TaskOp.UnreserveAndDestroyVolumes(
+            taskId,
+            oldTask = Some(bogusTask),
+            maybeNewTask = None,
+            resources = offer.getResourcesList.asScala.to[Seq]
+        )
     )
 
     // for the nicer error message with diff
@@ -120,24 +136,29 @@ class OfferMatcherReconcilerTest extends FunSuite with GivenWhenThen with Mockit
     matchedTaskOps.ops should be(expectedOps)
   }
 
-  test("offer with volume for known tasks/apps DOES NOT lead to unreserve/destroy") {
+  test(
+      "offer with volume for known tasks/apps DOES NOT lead to unreserve/destroy") {
     val f = new Fixture
     Given("an offer with volume")
     val appId = PathId("/test")
     val taskId = Task.Id.forApp(appId)
-    val localVolumeIdLaunched = LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
-    val offer = MarathonTestHelper.offerWithVolumes(taskId.idString, localVolumeIdLaunched)
+    val localVolumeIdLaunched =
+      LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
+    val offer = MarathonTestHelper.offerWithVolumes(
+        taskId.idString, localVolumeIdLaunched)
 
     And("a matching bogus app")
     val app = AppDefinition(appId)
-    f.groupRepository.rootGroupOrEmpty() returns Future.successful(Group.empty.copy(apps = Set(app)))
+    f.groupRepository.rootGroupOrEmpty() returns Future.successful(
+        Group.empty.copy(apps = Set(app)))
     And("a matching bogus task")
     f.taskTracker.tasksByApp()(any) returns Future.successful(
-      TasksByApp.forTasks(MarathonTestHelper.mininimalTask(taskId.idString))
+        TasksByApp.forTasks(MarathonTestHelper.mininimalTask(taskId.idString))
     )
 
     When("reconciling")
-    val matchedTaskOps = f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
+    val matchedTaskOps =
+      f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
 
     Then("no resources are destroyed and unreserved")
     matchedTaskOps.ops should be(empty)
@@ -146,6 +167,7 @@ class OfferMatcherReconcilerTest extends FunSuite with GivenWhenThen with Mockit
   class Fixture {
     lazy val taskTracker = mock[TaskTracker]
     lazy val groupRepository = mock[GroupRepository]
-    lazy val reconciler = new OfferMatcherReconciler(taskTracker, groupRepository)
+    lazy val reconciler = new OfferMatcherReconciler(
+        taskTracker, groupRepository)
   }
 }

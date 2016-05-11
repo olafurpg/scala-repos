@@ -8,12 +8,16 @@ package slick.dbio
 trait Effect
 
 object Effect {
+
   /** Effect for DBIOActions that read from the database ("DQL") */
   trait Read extends Effect
+
   /** Effect for DBIOActions that write to the database ("DML") */
   trait Write extends Effect
+
   /** Effect for DBIOActions that manipulate a database schema ("DDL") */
   trait Schema extends Effect
+
   /** Effect for transactional DBIOActions ("DTL") */
   trait Transactional extends Effect
 

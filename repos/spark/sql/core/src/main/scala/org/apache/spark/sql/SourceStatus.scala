@@ -21,14 +21,13 @@ import org.apache.spark.annotation.Experimental
 import org.apache.spark.sql.execution.streaming.{Offset, Source}
 
 /**
- * :: Experimental ::
- * Status and metrics of a streaming [[Source]].
- *
- * @param description     Description of the source corresponding to this status
- * @param offset          Current offset of the source, if known
- * @since 2.0.0
- */
+  * :: Experimental ::
+  * Status and metrics of a streaming [[Source]].
+  *
+  * @param description     Description of the source corresponding to this status
+  * @param offset          Current offset of the source, if known
+  * @since 2.0.0
+  */
 @Experimental
-class SourceStatus private[sql] (
-    val description: String,
-    val offset: Option[Offset])
+class SourceStatus private[sql](
+    val description: String, val offset: Option[Offset])

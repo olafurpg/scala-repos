@@ -23,7 +23,7 @@ object Rank {
 }
 
 /** Defines abstractions that provide support for splicing into Scala syntax.
- */
+  */
 trait Holes { self: Quasiquotes =>
   import global._
   import Rank._
@@ -31,9 +31,12 @@ trait Holes { self: Quasiquotes =>
   import universeTypes._
 
   private lazy val IterableTParam = IterableClass.typeParams(0).asType.toType
-  private def inferParamImplicit(tfun: Type, targ: Type) = c.inferImplicitValue(appliedType(tfun, List(targ)), silent = true)
-  private def inferLiftable(tpe: Type): Tree = inferParamImplicit(liftableType, tpe)
-  private def inferUnliftable(tpe: Type): Tree = inferParamImplicit(unliftableType, tpe)
+  private def inferParamImplicit(tfun: Type, targ: Type) =
+    c.inferImplicitValue(appliedType(tfun, List(targ)), silent = true)
+  private def inferLiftable(tpe: Type): Tree =
+    inferParamImplicit(liftableType, tpe)
+  private def inferUnliftable(tpe: Type): Tree =
+    inferParamImplicit(unliftableType, tpe)
   private def isLiftableType(tpe: Type) = inferLiftable(tpe) != EmptyTree
   private def isNativeType(tpe: Type) =
     (tpe <:< treeType) || (tpe <:< nameType) || (tpe <:< modsType) ||
@@ -53,13 +56,15 @@ trait Holes { self: Quasiquotes =>
     }
   private def iterableTypeFromRank(n: Rank, tpe: Type): Type = {
     if (n == NoDot) tpe
-    else appliedType(IterableClass.toType, List(iterableTypeFromRank(n.pred, tpe)))
+    else
+      appliedType(
+          IterableClass.toType, List(iterableTypeFromRank(n.pred, tpe)))
   }
 
   /** Hole encapsulates information about unquotees in quasiquotes.
-   *  It packs together a rank, pre-reified tree representation
-   *  (possibly preprocessed) and position.
-   */
+    *  It packs together a rank, pre-reified tree representation
+    *  (possibly preprocessed) and position.
+    */
   abstract class Hole {
     val tree: Tree
     val pos: Position
@@ -75,12 +80,15 @@ trait Holes { self: Quasiquotes =>
 
   class ApplyHole(annotatedRank: Rank, unquotee: Tree) extends Hole {
     val (strippedTpe, tpe): (Type, Type) = {
-      val (strippedRank, strippedTpe) = stripIterable(unquotee.tpe, limit = annotatedRank)
+      val (strippedRank, strippedTpe) = stripIterable(
+          unquotee.tpe, limit = annotatedRank)
       if (isBottomType(strippedTpe)) cantSplice()
       else if (isNativeType(strippedTpe)) {
-        if (strippedRank != NoDot && !(strippedTpe <:< treeType) && !isLiftableType(strippedTpe)) cantSplice()
+        if (strippedRank != NoDot && !(strippedTpe <:< treeType) &&
+            !isLiftableType(strippedTpe)) cantSplice()
         else (strippedTpe, iterableTypeFromRank(annotatedRank, strippedTpe))
-      } else if (isLiftableType(strippedTpe)) (strippedTpe, iterableTypeFromRank(annotatedRank, treeType))
+      } else if (isLiftableType(strippedTpe))
+        (strippedTpe, iterableTypeFromRank(annotatedRank, treeType))
       else cantSplice()
     }
 
@@ -99,17 +107,28 @@ trait Holes { self: Quasiquotes =>
 
     private def cantSplice(): Nothing = {
       val (iterableRank, iterableType) = stripIterable(unquotee.tpe)
-      val holeRankMsg = if (annotatedRank != NoDot) s" with $annotatedRank" else ""
+      val holeRankMsg =
+        if (annotatedRank != NoDot) s" with $annotatedRank" else ""
       val action = "unquote " + unquotee.tpe + holeRankMsg
       val suggestRank = annotatedRank != iterableRank || annotatedRank != NoDot
-      val unquoteeRankMsg = if (annotatedRank != iterableRank && iterableRank != NoDot) s"using $iterableRank" else "omitting the dots"
+      val unquoteeRankMsg =
+        if (annotatedRank != iterableRank && iterableRank != NoDot)
+          s"using $iterableRank" else "omitting the dots"
       val rankSuggestion = if (suggestRank) unquoteeRankMsg else ""
-      val suggestLifting = (annotatedRank == NoDot || iterableRank != NoDot) && !(iterableType <:< treeType) && !isLiftableType(iterableType)
-      val liftedTpe = if (annotatedRank != NoDot) iterableType else unquotee.tpe
-      val liftSuggestion = if (suggestLifting) s"providing an implicit instance of Liftable[$liftedTpe]" else ""
+      val suggestLifting =
+        (annotatedRank == NoDot || iterableRank != NoDot) &&
+        !(iterableType <:< treeType) && !isLiftableType(iterableType)
+      val liftedTpe =
+        if (annotatedRank != NoDot) iterableType else unquotee.tpe
+      val liftSuggestion =
+        if (suggestLifting)
+          s"providing an implicit instance of Liftable[$liftedTpe]" else ""
       val advice =
-        if (isBottomType(iterableType)) "bottom type values often indicate programmer mistake"
-        else "consider " + List(rankSuggestion, liftSuggestion).filter(_ != "").mkString(" or ")
+        if (isBottomType(iterableType))
+          "bottom type values often indicate programmer mistake"
+        else
+          "consider " +
+          List(rankSuggestion, liftSuggestion).filter(_ != "").mkString(" or ")
       c.abort(unquotee.pos, s"Can't $action, $advice")
     }
 
@@ -122,7 +141,9 @@ trait Holes { self: Quasiquotes =>
 
     private def toStats(tree: Tree): Tree =
       // q"$u.internal.reificationSupport.toStats($tree)"
-      Apply(Select(Select(Select(u, nme.internal), nme.reificationSupport), nme.toStats), tree :: Nil)
+      Apply(Select(Select(Select(u, nme.internal), nme.reificationSupport),
+                   nme.toStats),
+            tree :: Nil)
 
     private def toList(tree: Tree, tpe: Type): Tree =
       if (isListType(tpe)) tree
@@ -133,9 +154,10 @@ trait Holes { self: Quasiquotes =>
       else {
         val x = TermName(c.freshName())
         // q"$tree.map { $x => ${f(Ident(x))} }"
-        Apply(Select(tree, nme.map),
-          Function(ValDef(Modifiers(PARAM), x, TypeTree(), EmptyTree) :: Nil,
-            f(Ident(x))) :: Nil)
+        Apply(
+            Select(tree, nme.map),
+            Function(ValDef(Modifiers(PARAM), x, TypeTree(), EmptyTree) :: Nil,
+                     f(Ident(x))) :: Nil)
       }
 
     private object IterableType {
@@ -151,66 +173,79 @@ trait Holes { self: Quasiquotes =>
     }
 
     /** Map high-rank unquotee onto an expression that evaluates as a list of given rank.
-     *
-     *  All possible combinations of representations are given in the table below:
-     *
-     *    input                          output for T <: Tree          output for T: Liftable
-     *
-     *    ..${x: Iterable[T]}            x.toList                      x.toList.map(lift)
-     *    ..${x: T}                      toStats(x)                    toStats(lift(x))
-     *
-     *    ...${x: Iterable[Iterable[T]]} x.toList { _.toList }         x.toList.map { _.toList.map(lift) }
-     *    ...${x: Iterable[T]}           x.toList.map { toStats(_) }   x.toList.map { toStats(lift(_)) }
-     *    ...${x: T}                     toStats(x).map { toStats(_) } toStats(lift(x)).map { toStats(_) }
-     *
-     *  For optimization purposes `x.toList` is represented as just `x` if it is statically known that
-     *  x is not just an Iterable[T] but a List[T]. Similarly no mapping is performed if mapping function is
-     *  known to be an identity.
-     */
-    private def iterated(rank: Rank, tree: Tree, tpe: Type): Tree = (rank, tpe) match {
-      case (DotDot, tpe @ IterableType(LiftedType(lift))) => mapF(toList(tree, tpe), lift)
-      case (DotDot, LiftedType(lift))                     => toStats(lift(tree))
-      case (DotDotDot, tpe @ IterableType(inner))         => mapF(toList(tree, tpe), t => iterated(DotDot, t, inner))
-      case (DotDotDot, LiftedType(lift))                  => mapF(toStats(lift(tree)), toStats)
-      case _                                              => global.abort("unreachable")
-    }
+      *
+      *  All possible combinations of representations are given in the table below:
+      *
+      *    input                          output for T <: Tree          output for T: Liftable
+      *
+      *    ..${x: Iterable[T]}            x.toList                      x.toList.map(lift)
+      *    ..${x: T}                      toStats(x)                    toStats(lift(x))
+      *
+      *    ...${x: Iterable[Iterable[T]]} x.toList { _.toList }         x.toList.map { _.toList.map(lift) }
+      *    ...${x: Iterable[T]}           x.toList.map { toStats(_) }   x.toList.map { toStats(lift(_)) }
+      *    ...${x: T}                     toStats(x).map { toStats(_) } toStats(lift(x)).map { toStats(_) }
+      *
+      *  For optimization purposes `x.toList` is represented as just `x` if it is statically known that
+      *  x is not just an Iterable[T] but a List[T]. Similarly no mapping is performed if mapping function is
+      *  known to be an identity.
+      */
+    private def iterated(rank: Rank, tree: Tree, tpe: Type): Tree =
+      (rank, tpe) match {
+        case (DotDot, tpe @ IterableType(LiftedType(lift))) =>
+          mapF(toList(tree, tpe), lift)
+        case (DotDot, LiftedType(lift)) => toStats(lift(tree))
+        case (DotDotDot, tpe @ IterableType(inner)) =>
+          mapF(toList(tree, tpe), t => iterated(DotDot, t, inner))
+        case (DotDotDot, LiftedType(lift)) =>
+          mapF(toStats(lift(tree)), toStats)
+        case _ => global.abort("unreachable")
+      }
   }
 
   class UnapplyHole(val rank: Rank, pat: Tree) extends Hole {
     val (placeholderName, pos, tptopt) = pat match {
-      case Bind(pname, inner @ Bind(_, Typed(Ident(nme.WILDCARD), tpt))) => (pname, inner.pos, Some(tpt))
-      case Bind(pname, inner @ Typed(Ident(nme.WILDCARD), tpt))          => (pname, inner.pos, Some(tpt))
-      case Bind(pname, inner)                                            => (pname, inner.pos, None)
+      case Bind(pname, inner @ Bind(_, Typed(Ident(nme.WILDCARD), tpt))) =>
+        (pname, inner.pos, Some(tpt))
+      case Bind(pname, inner @ Typed(Ident(nme.WILDCARD), tpt)) =>
+        (pname, inner.pos, Some(tpt))
+      case Bind(pname, inner) => (pname, inner.pos, None)
     }
     val treeNoUnlift = Bind(placeholderName, Ident(nme.WILDCARD))
-    lazy val tree =
-      tptopt.map { tpt =>
-        val TypeDef(_, _, _, typedTpt) =
-          try c.typecheck(TypeDef(NoMods, TypeName("T"), Nil, tpt))
-          catch { case TypecheckException(pos, msg) => c.abort(pos.asInstanceOf[c.Position], msg) }
-        val tpe = typedTpt.tpe
-        val (iterableRank, _) = stripIterable(tpe)
-        if (iterableRank.value < rank.value)
-          c.abort(pat.pos, s"Can't extract $tpe with $rank, consider using $iterableRank")
-        val (_, strippedTpe) = stripIterable(tpe, limit = rank)
-        if (strippedTpe <:< treeType) treeNoUnlift
-        else
-          unlifters.spawn(strippedTpe, rank).map {
+    lazy val tree = tptopt.map { tpt =>
+      val TypeDef(_, _, _, typedTpt) =
+        try c.typecheck(TypeDef(NoMods, TypeName("T"), Nil, tpt)) catch {
+          case TypecheckException(pos, msg) =>
+            c.abort(pos.asInstanceOf[c.Position], msg)
+        }
+      val tpe = typedTpt.tpe
+      val (iterableRank, _) = stripIterable(tpe)
+      if (iterableRank.value < rank.value)
+        c.abort(pat.pos,
+                s"Can't extract $tpe with $rank, consider using $iterableRank")
+      val (_, strippedTpe) = stripIterable(tpe, limit = rank)
+      if (strippedTpe <:< treeType) treeNoUnlift
+      else
+        unlifters
+          .spawn(strippedTpe, rank)
+          .map {
             Apply(_, treeNoUnlift :: Nil)
-          }.getOrElse {
-            c.abort(pat.pos, s"Can't find $unliftableType[$strippedTpe], consider providing it")
           }
-      }.getOrElse { treeNoUnlift }
+          .getOrElse {
+            c.abort(
+                pat.pos,
+                s"Can't find $unliftableType[$strippedTpe], consider providing it")
+          }
+    }.getOrElse { treeNoUnlift }
   }
 
   /** Full support for unliftable implies that it's possible to interleave
-   *  deconstruction with higher rank and unlifting of the values.
-   *  In particular extraction of List[Tree] as List[T: Unliftable] requires
-   *  helper extractors that would do the job: UnliftListElementwise[T]. Similarly
-   *  List[List[Tree]] needs UnliftListOfListsElementwise[T].
-   *
-   *  See also "unlift list" tests in UnapplyProps.scala
-   */
+    *  deconstruction with higher rank and unlifting of the values.
+    *  In particular extraction of List[Tree] as List[T: Unliftable] requires
+    *  helper extractors that would do the job: UnliftListElementwise[T]. Similarly
+    *  List[List[Tree]] needs UnliftListOfListsElementwise[T].
+    *
+    *  See also "unlift list" tests in UnapplyProps.scala
+    */
   object unlifters {
     private var records = List.empty[(Type, Rank)]
     // Materialize unlift helper that does elementwise
@@ -220,25 +255,37 @@ trait Holes { self: Quasiquotes =>
       if (unlifter == EmptyTree) None
       else if (rank == NoDot) Some(unlifter)
       else {
-        val idx = records.indexWhere { p => p._1 =:= tpe && p._2 == rank }
-        val resIdx = if (idx != -1) idx else { records +:= ((tpe, rank)); records.length - 1}
+        val idx = records.indexWhere { p =>
+          p._1 =:= tpe && p._2 == rank
+        }
+        val resIdx =
+          if (idx != -1) idx
+          else { records +:= ((tpe, rank)); records.length - 1 }
         Some(Ident(TermName(nme.QUASIQUOTE_UNLIFT_HELPER + resIdx)))
       }
     }
     // Returns a list of vals that will defined required unlifters
     def preamble(): List[Tree] =
-      records.zipWithIndex.map { case ((tpe, rank), idx) =>
-        val name = TermName(nme.QUASIQUOTE_UNLIFT_HELPER + idx)
-        val helperName = rank match {
-          case DotDot    => nme.UnliftListElementwise
-          case DotDotDot => nme.UnliftListOfListsElementwise
-        }
-        val lifter = inferUnliftable(tpe)
-        assert(helperName.isTermName)
-        // q"val $name: $u.internal.reificationSupport.${helperName.toTypeName} = $u.internal.reificationSupport.$helperName($lifter)"
-        ValDef(NoMods, name,
-          AppliedTypeTree(Select(Select(Select(u, nme.internal), nme.reificationSupport), helperName.toTypeName), List(TypeTree(tpe))),
-          Apply(Select(Select(Select(u, nme.internal), nme.reificationSupport), helperName), lifter :: Nil))
+      records.zipWithIndex.map {
+        case ((tpe, rank), idx) =>
+          val name = TermName(nme.QUASIQUOTE_UNLIFT_HELPER + idx)
+          val helperName = rank match {
+            case DotDot => nme.UnliftListElementwise
+            case DotDotDot => nme.UnliftListOfListsElementwise
+          }
+          val lifter = inferUnliftable(tpe)
+          assert(helperName.isTermName)
+          // q"val $name: $u.internal.reificationSupport.${helperName.toTypeName} = $u.internal.reificationSupport.$helperName($lifter)"
+          ValDef(NoMods,
+                 name,
+                 AppliedTypeTree(Select(Select(Select(u, nme.internal),
+                                               nme.reificationSupport),
+                                        helperName.toTypeName),
+                                 List(TypeTree(tpe))),
+                 Apply(Select(Select(Select(u, nme.internal),
+                                     nme.reificationSupport),
+                              helperName),
+                       lifter :: Nil))
       }
   }
 }

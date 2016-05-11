@@ -22,24 +22,33 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 class AssociationRulesSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("association rules using String type") {
-    val freqItemsets = sc.parallelize(Seq(
-      (Set("s"), 3L), (Set("z"), 5L), (Set("x"), 4L), (Set("t"), 3L), (Set("y"), 3L),
-      (Set("r"), 3L),
-      (Set("x", "z"), 3L), (Set("t", "y"), 3L), (Set("t", "x"), 3L), (Set("s", "x"), 3L),
-      (Set("y", "x"), 3L), (Set("y", "z"), 3L), (Set("t", "z"), 3L),
-      (Set("y", "x", "z"), 3L), (Set("t", "x", "z"), 3L), (Set("t", "y", "z"), 3L),
-      (Set("t", "y", "x"), 3L),
-      (Set("t", "y", "x", "z"), 3L)
-    ).map {
+    val freqItemsets = sc.parallelize(
+        Seq(
+            (Set("s"), 3L),
+            (Set("z"), 5L),
+            (Set("x"), 4L),
+            (Set("t"), 3L),
+            (Set("y"), 3L),
+            (Set("r"), 3L),
+            (Set("x", "z"), 3L),
+            (Set("t", "y"), 3L),
+            (Set("t", "x"), 3L),
+            (Set("s", "x"), 3L),
+            (Set("y", "x"), 3L),
+            (Set("y", "z"), 3L),
+            (Set("t", "z"), 3L),
+            (Set("y", "x", "z"), 3L),
+            (Set("t", "x", "z"), 3L),
+            (Set("t", "y", "z"), 3L),
+            (Set("t", "y", "x"), 3L),
+            (Set("t", "y", "x", "z"), 3L)
+        ).map {
       case (items, freq) => new FPGrowth.FreqItemset(items.toArray, freq)
     })
 
     val ar = new AssociationRules()
 
-    val results1 = ar
-      .setMinConfidence(0.9)
-      .run(freqItemsets)
-      .collect()
+    val results1 = ar.setMinConfidence(0.9).run(freqItemsets).collect()
 
     /* Verify results using the `R` code:
        library(arules)
@@ -63,12 +72,10 @@ class AssociationRulesSuite extends SparkFunSuite with MLlibTestSparkContext {
        [1] 23
      */
     assert(results1.size === 23)
-    assert(results1.count(rule => math.abs(rule.confidence - 1.0D) < 1e-6) == 23)
+    assert(
+        results1.count(rule => math.abs(rule.confidence - 1.0D) < 1e-6) == 23)
 
-    val results2 = ar
-      .setMinConfidence(0)
-      .run(freqItemsets)
-      .collect()
+    val results2 = ar.setMinConfidence(0).run(freqItemsets).collect()
 
     /* Verify results using the `R` code:
        ars = apriori(transactions,
@@ -84,7 +91,7 @@ class AssociationRulesSuite extends SparkFunSuite with MLlibTestSparkContext {
        [1] 23
      */
     assert(results2.size === 30)
-    assert(results2.count(rule => math.abs(rule.confidence - 1.0D) < 1e-6) == 23)
+    assert(
+        results2.count(rule => math.abs(rule.confidence - 1.0D) < 1e-6) == 23)
   }
 }
-

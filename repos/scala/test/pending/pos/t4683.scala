@@ -1,7 +1,3 @@
-
-
-
-
 class DelayedInitTest {
   def a = ()
   class B extends DelayedInit {

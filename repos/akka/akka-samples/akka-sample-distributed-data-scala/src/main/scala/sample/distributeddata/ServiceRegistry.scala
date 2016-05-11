@@ -20,29 +20,32 @@ object ServiceRegistry {
   val props: Props = Props[ServiceRegistry]
 
   /**
-   * Register a `service` with a `name`. Several services
-   * can be registered with the same `name`.
-   * It will be removed when it is terminated.
-   */
+    * Register a `service` with a `name`. Several services
+    * can be registered with the same `name`.
+    * It will be removed when it is terminated.
+    */
   final case class Register(name: String, service: ActorRef)
+
   /**
-   * Lookup services registered for a `name`. [[Bindings]] will
-   * be sent to `sender()`.
-   */
+    * Lookup services registered for a `name`. [[Bindings]] will
+    * be sent to `sender()`.
+    */
   final case class Lookup(name: String)
+
   /**
-   * Reply for [[Lookup]]
-   */
+    * Reply for [[Lookup]]
+    */
   final case class Bindings(name: String, services: Set[ActorRef])
+
   /**
-   * Published to `ActorSystem.eventStream` when services are changed.
-   */
+    * Published to `ActorSystem.eventStream` when services are changed.
+    */
   final case class BindingChanged(name: String, services: Set[ActorRef])
 
-  final case class ServiceKey(serviceName: String) extends Key[ORSet[ActorRef]](serviceName)
+  final case class ServiceKey(serviceName: String)
+      extends Key[ORSet[ActorRef]](serviceName)
 
   private val AllServicesKey = GSetKey[ServiceKey]("service-keys")
-
 }
 
 class ServiceRegistry extends Actor with ActorLogging {
@@ -61,7 +64,9 @@ class ServiceRegistry extends Actor with ActorLogging {
 
   override def preStart(): Unit = {
     replicator ! Subscribe(AllServicesKey, self)
-    cluster.subscribe(self, ClusterEvent.InitialStateAsEvents, classOf[ClusterEvent.LeaderChanged])
+    cluster.subscribe(self,
+                      ClusterEvent.InitialStateAsEvents,
+                      classOf[ClusterEvent.LeaderChanged])
   }
 
   override def postStop(): Unit = {
@@ -83,7 +88,8 @@ class ServiceRegistry extends Actor with ActorLogging {
 
     case c @ Changed(AllServicesKey) ⇒
       val newKeys = c.get(AllServicesKey).elements
-      log.debug("Services changed, added: {}, all: {}", (newKeys -- keys), newKeys)
+      log.debug(
+          "Services changed, added: {}, all: {}", (newKeys -- keys), newKeys)
       (newKeys -- keys).foreach { dKey ⇒
         // subscribe to get notifications of when services with this name are added or removed
         replicator ! Subscribe(dKey, self)
@@ -96,8 +102,7 @@ class ServiceRegistry extends Actor with ActorLogging {
       log.debug("Services changed for name [{}]: {}", name, newServices)
       services = services.updated(name, newServices)
       context.system.eventStream.publish(BindingChanged(name, newServices))
-      if (leader)
-        newServices.foreach(context.watch) // watch is idempotent
+      if (leader) newServices.foreach(context.watch) // watch is idempotent
 
     case LeaderChanged(node) ⇒
       // Let one node (the leader) be responsible for removal of terminated services
@@ -108,14 +113,14 @@ class ServiceRegistry extends Actor with ActorLogging {
       // when used with many (> 500) services you must increase the system message buffer
       // `akka.remote.system-message-buffer-size`
       if (!wasLeader && leader)
-        for (refs ← services.valuesIterator; ref ← refs)
-          context.watch(ref)
+        for (refs ← services.valuesIterator; ref ← refs) context.watch(ref)
       else if (wasLeader && !leader)
-        for (refs ← services.valuesIterator; ref ← refs)
-          context.unwatch(ref)
+        for (refs ← services.valuesIterator; ref ← refs) context.unwatch(ref)
 
     case Terminated(ref) ⇒
-      val names = services.collect { case (name, refs) if refs.contains(ref) ⇒ name }
+      val names = services.collect {
+        case (name, refs) if refs.contains(ref) ⇒ name
+      }
       names.foreach { name ⇒
         log.debug("Service with name [{}] terminated: {}", name, ref)
         replicator ! Update(serviceKey(name), ORSet(), WriteLocal)(_ - ref)
@@ -123,5 +128,4 @@ class ServiceRegistry extends Actor with ActorLogging {
 
     case _: UpdateResponse[_] ⇒ // ok
   }
-
 }

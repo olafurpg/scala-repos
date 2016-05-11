@@ -1,14 +1,14 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl
 
 import scala.util.control.NonFatal
-import org.reactivestreams.{ Subscriber, Subscription }
+import org.reactivestreams.{Subscriber, Subscription}
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[stream] object ReactiveStreamsCompliance {
 
   final val CanNotSubscribeTheSameSubscriberMultipleTimes =
@@ -20,13 +20,15 @@ private[stream] object ReactiveStreamsCompliance {
   final val NumberOfElementsInRequestMustBePositiveMsg =
     "The number of requested elements must be > 0 (see reactive-streams specification, rule 3.9)"
 
-  final val SubscriberMustNotBeNullMsg = "Subscriber must not be null, rule 1.9"
+  final val SubscriberMustNotBeNullMsg =
+    "Subscriber must not be null, rule 1.9"
 
   final val ExceptionMustNotBeNullMsg = "Exception must not be null, rule 2.13"
 
   final val ElementMustNotBeNullMsg = "Element must not be null, rule 2.13"
 
-  final val SubscriptionMustNotBeNullMsg = "Subscription must not be null, rule 2.13"
+  final val SubscriptionMustNotBeNullMsg =
+    "Subscription must not be null, rule 2.13"
 
   final def numberOfElementsInRequestMustBePositiveException: Throwable =
     new IllegalArgumentException(NumberOfElementsInRequestMustBePositiveMsg)
@@ -49,12 +51,16 @@ private[stream] object ReactiveStreamsCompliance {
   final def rejectDuplicateSubscriber[T](subscriber: Subscriber[T]): Unit = {
     // since it is already subscribed it has received the subscription first
     // and we can emit onError immediately
-    tryOnError(subscriber, canNotSubscribeTheSameSubscriberMultipleTimesException)
+    tryOnError(
+        subscriber, canNotSubscribeTheSameSubscriberMultipleTimesException)
   }
 
-  final def rejectAdditionalSubscriber[T](subscriber: Subscriber[T], rejector: String): Unit = {
+  final def rejectAdditionalSubscriber[T](
+      subscriber: Subscriber[T], rejector: String): Unit = {
     tryOnSubscribe(subscriber, CancelledSubscription)
-    tryOnError(subscriber, new IllegalStateException(s"$rejector $SupportsOnlyASingleSubscriber"))
+    tryOnError(
+        subscriber,
+        new IllegalStateException(s"$rejector $SupportsOnlyASingleSubscriber"))
   }
 
   final def rejectDueToNonPositiveDemand[T](subscriber: Subscriber[T]): Unit =
@@ -76,46 +82,58 @@ private[stream] object ReactiveStreamsCompliance {
   sealed trait SpecViolation extends Throwable
 
   @SerialVersionUID(1L)
-  final class SignalThrewException(message: String, cause: Throwable) extends IllegalStateException(message, cause) with SpecViolation
+  final class SignalThrewException(message: String, cause: Throwable)
+      extends IllegalStateException(message, cause) with SpecViolation
 
   final def tryOnError[T](subscriber: Subscriber[T], error: Throwable): Unit =
     error match {
-      case sv: SpecViolation ⇒ throw new IllegalStateException("It is not legal to try to signal onError with a SpecViolation", sv)
+      case sv: SpecViolation ⇒
+        throw new IllegalStateException(
+            "It is not legal to try to signal onError with a SpecViolation",
+            sv)
       case other ⇒
         try subscriber.onError(other) catch {
-          case NonFatal(t) ⇒ throw new SignalThrewException(subscriber + ".onError", t)
+          case NonFatal(t) ⇒
+            throw new SignalThrewException(subscriber + ".onError", t)
         }
     }
 
   final def tryOnNext[T](subscriber: Subscriber[T], element: T): Unit = {
     requireNonNullElement(element)
     try subscriber.onNext(element) catch {
-      case NonFatal(t) ⇒ throw new SignalThrewException(subscriber + ".onNext", t)
+      case NonFatal(t) ⇒
+        throw new SignalThrewException(subscriber + ".onNext", t)
     }
   }
 
-  final def tryOnSubscribe[T](subscriber: Subscriber[T], subscription: Subscription): Unit = {
+  final def tryOnSubscribe[T](
+      subscriber: Subscriber[T], subscription: Subscription): Unit = {
     try subscriber.onSubscribe(subscription) catch {
-      case NonFatal(t) ⇒ throw new SignalThrewException(subscriber + ".onSubscribe", t)
+      case NonFatal(t) ⇒
+        throw new SignalThrewException(subscriber + ".onSubscribe", t)
     }
   }
 
   final def tryOnComplete[T](subscriber: Subscriber[T]): Unit = {
     try subscriber.onComplete() catch {
-      case NonFatal(t) ⇒ throw new SignalThrewException(subscriber + ".onComplete", t)
+      case NonFatal(t) ⇒
+        throw new SignalThrewException(subscriber + ".onComplete", t)
     }
   }
 
   final def tryRequest(subscription: Subscription, demand: Long): Unit = {
     try subscription.request(demand) catch {
-      case NonFatal(t) ⇒ throw new SignalThrewException("It is illegal to throw exceptions from request(), rule 3.16", t)
+      case NonFatal(t) ⇒
+        throw new SignalThrewException(
+            "It is illegal to throw exceptions from request(), rule 3.16", t)
     }
   }
 
   final def tryCancel(subscription: Subscription): Unit = {
     try subscription.cancel() catch {
-      case NonFatal(t) ⇒ throw new SignalThrewException("It is illegal to throw exceptions from cancel(), rule 3.15", t)
+      case NonFatal(t) ⇒
+        throw new SignalThrewException(
+            "It is illegal to throw exceptions from cancel(), rule 3.15", t)
     }
   }
-
 }

@@ -1,6 +1,6 @@
 package org.scalatra
 
-import org.scalatest.{ FunSuite, Matchers }
+import org.scalatest.{FunSuite, Matchers}
 
 class RailsLikeUrlGeneratorTest extends FunSuite with Matchers {
 
@@ -10,7 +10,9 @@ class RailsLikeUrlGeneratorTest extends FunSuite with Matchers {
   def url(path: String, splat: String, moreSplats: String*): String =
     url(path, Map[String, String](), splat +: moreSplats)
 
-  def url(path: String, params: Map[String, String] = Map(), splats: Iterable[String] = Seq()): String =
+  def url(path: String,
+          params: Map[String, String] = Map(),
+          splats: Iterable[String] = Seq()): String =
     new RailsRouteMatcher(path).reverse(params, splats.toList)
 
   test("static string") {
@@ -18,11 +20,13 @@ class RailsLikeUrlGeneratorTest extends FunSuite with Matchers {
   }
 
   test("dynamic segment") {
-    url(":foo.example.com", "foo" -> "vanilla") should equal("vanilla.example.com")
+    url(":foo.example.com", "foo" -> "vanilla") should equal(
+        "vanilla.example.com")
   }
 
   test("dynamic segment with leading underscore") {
-    url(":_foo.example.com", "_foo" -> "vanilla") should equal("vanilla.example.com")
+    url(":_foo.example.com", "_foo" -> "vanilla") should equal(
+        "vanilla.example.com")
   }
 
   test("skip invalid group names: 123") {
@@ -44,7 +48,8 @@ class RailsLikeUrlGeneratorTest extends FunSuite with Matchers {
   }
 
   test("static string and dynamic segment inside optional segment") {
-    url("foo(/bar.:extension)", "extension" -> "json") should equal("foo/bar.json")
+    url("foo(/bar.:extension)", "extension" -> "json") should equal(
+        "foo/bar.json")
     url("foo(/bar.:extension)") should equal("foo")
   }
 
@@ -53,15 +58,19 @@ class RailsLikeUrlGeneratorTest extends FunSuite with Matchers {
   }
 
   test("glob segment at the beginning") {
-    url("*files/foo.txt", "files" -> "/home/thib") should equal("/home/thib/foo.txt")
+    url("*files/foo.txt", "files" -> "/home/thib") should equal(
+        "/home/thib/foo.txt")
   }
 
   test("glob segment in the middle") {
-    url("src/*files/foo.txt", "files" -> "a/b/c") should equal("src/a/b/c/foo.txt")
+    url("src/*files/foo.txt", "files" -> "a/b/c") should equal(
+        "src/a/b/c/foo.txt")
   }
 
   test("multiple glob segments") {
-    url("src/*files/dir/*morefiles/foo.txt", "files" -> "a/b", "morefiles" -> "c/d") should equal("src/a/b/dir/c/d/foo.txt")
+    url("src/*files/dir/*morefiles/foo.txt",
+        "files" -> "a/b",
+        "morefiles" -> "c/d") should equal("src/a/b/dir/c/d/foo.txt")
   }
 
   test("escaped glob segment") {

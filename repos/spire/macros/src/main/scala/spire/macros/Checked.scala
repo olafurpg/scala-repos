@@ -5,69 +5,74 @@ import scala.language.existentials
 import language.experimental.macros
 import spire.macros.compat.{resetLocalAttrs, termName, freshTermName, Context}
 
-class ArithmeticOverflowException() extends ArithmeticException("arithmetic overflow detected")
+class ArithmeticOverflowException()
+    extends ArithmeticException("arithmetic overflow detected")
 
 object Checked {
 
   /**
-   * Performs overflow checking for Int/Long operations.
-   *
-   * If no errors are detected, the expected result will be
-   * returned. If there are errors, the 'orElse' block will be
-   * evaluated and returned.
-   */
+    * Performs overflow checking for Int/Long operations.
+    *
+    * If no errors are detected, the expected result will be
+    * returned. If there are errors, the 'orElse' block will be
+    * evaluated and returned.
+    */
   def tryOrElse[A](n: A)(orElse: A): A = macro tryOrElseImpl[A]
 
   /**
-   * Performs overflow checking for Int/Long operations.
-   *
-   * If no errors are detected, the expected result will be
-   * returned. If an error is detected, an ArithmeticOverflowException
-   * will be thrown.
-   */
+    * Performs overflow checking for Int/Long operations.
+    *
+    * If no errors are detected, the expected result will be
+    * returned. If an error is detected, an ArithmeticOverflowException
+    * will be thrown.
+    */
   def checked[A](n: A): A = macro checkedImpl[A]
 
   /**
-   * Performs overflow checking for Int/Long operations.
-   *
-   * If no errors are detected, the expected result will be returned
-   * in a Some wrapper. If an error is detected, None will be
-   * returned.
-   */
+    * Performs overflow checking for Int/Long operations.
+    *
+    * If no errors are detected, the expected result will be returned
+    * in a Some wrapper. If an error is detected, None will be
+    * returned.
+    */
   def option[A](n: A): Option[A] = macro optionImpl[A]
 
   /**
-   * Performs overflow checking for Int/Long operations.
-   *
-   * If no errors are detected, the expected result will be
-   * returned. If there are errors, the 'orElse' block will be
-   * evaluated and returned.
-   *
-   * In the error case, this macro will actually evaluate a return
-   * statement in the outer method context. Thus, it should only be
-   * called from within a method that you would like to "return out
-   * of" in the case of an overflow.
-   */
+    * Performs overflow checking for Int/Long operations.
+    *
+    * If no errors are detected, the expected result will be
+    * returned. If there are errors, the 'orElse' block will be
+    * evaluated and returned.
+    *
+    * In the error case, this macro will actually evaluate a return
+    * statement in the outer method context. Thus, it should only be
+    * called from within a method that you would like to "return out
+    * of" in the case of an overflow.
+    */
   def tryOrReturn[A](n: A)(orElse: A): A = macro tryOrReturnImpl[A]
 
-
-  def tryOrElseImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A])(orElse: c.Expr[A]): c.Expr[A] = {
+  def tryOrElseImpl[A : c.WeakTypeTag](c: Context)(n: c.Expr[A])(
+      orElse: c.Expr[A]): c.Expr[A] = {
     val tree = CheckedRewriter[c.type](c).rewriteSafe[A](n.tree, orElse.tree)
     val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
     c.Expr[A](resetTree)
   }
 
-  def checkedImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[A] = {
+  def checkedImpl[A : c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[A] = {
     import c.universe._
-    tryOrElseImpl[A](c)(n)(c.Expr[A](q"throw new spire.macros.ArithmeticOverflowException()"))
+    tryOrElseImpl[A](c)(n)(
+        c.Expr[A](q"throw new spire.macros.ArithmeticOverflowException()"))
   }
 
-  def optionImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[Option[A]] = {
+  def optionImpl[A : c.WeakTypeTag](c: Context)(
+      n: c.Expr[A]): c.Expr[Option[A]] = {
     import c.universe._
-    tryOrElseImpl[Option[A]](c)(c.Expr[Option[A]](q"Option(${n.tree})"))(c.Expr[Option[A]](q"None"))
+    tryOrElseImpl[Option[A]](c)(c.Expr[Option[A]](q"Option(${n.tree})"))(
+        c.Expr[Option[A]](q"None"))
   }
 
-  def tryOrReturnImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A])(orElse: c.Expr[A]): c.Expr[A] = {
+  def tryOrReturnImpl[A : c.WeakTypeTag](c: Context)(n: c.Expr[A])(
+      orElse: c.Expr[A]): c.Expr[A] = {
     val tree = CheckedRewriter[c.type](c).rewriteFast[A](n.tree, orElse.tree)
     val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
     c.Expr[A](resetTree)
@@ -77,7 +82,7 @@ object Checked {
 private[macros] case class CheckedRewriter[C <: Context](c: C) {
   import c.universe._
 
-  def rewriteSafe[A: c.WeakTypeTag](tree: Tree, fallback: Tree): Tree = {
+  def rewriteSafe[A : c.WeakTypeTag](tree: Tree, fallback: Tree): Tree = {
     warnOnSimpleTree(tree)
     val A = weakTypeOf[A]
     val aname = freshTermName(c)("checked$attempt$")
@@ -86,7 +91,7 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
     q"""{ def $fname: $A = $fallback; def $aname: $A = $attempt; $aname }"""
   }
 
-  def rewriteFast[A: c.WeakTypeTag](tree: Tree, fallback: Tree): Tree = {
+  def rewriteFast[A : c.WeakTypeTag](tree: Tree, fallback: Tree): Tree = {
     warnOnSimpleTree(tree)
     val A = weakTypeOf[A]
     val fname = freshTermName(c)("checked$fallback$")
@@ -97,7 +102,8 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
   def warnOnSimpleTree(tree: Tree): Unit =
     tree match {
       case Literal(_) => c.warning(tree.pos, "checked used with literal")
-      case Ident(_) => c.warning(tree.pos, "checked used with simple identifier")
+      case Ident(_) =>
+        c.warning(tree.pos, "checked used with simple identifier")
       case _ =>
     }
 
@@ -113,7 +119,8 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
     }
   }
 
-  class Rewriter[A](val minValue: Tree, val fallback: TermName)(implicit typeTag: c.WeakTypeTag[A]) {
+  class Rewriter[A](val minValue: Tree, val fallback: TermName)(
+      implicit typeTag: c.WeakTypeTag[A]) {
     val tpe: Type = typeTag.tpe
 
     // unops
@@ -130,7 +137,8 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
       case Apply(Select(lhs, method), rhs :: Nil) =>
         val lt = lhs.tpe.widen
         val rt = rhs.tpe.widen
-        ((lt weak_<:< tpe) && (rt <:< tpe)) || ((lt <:< tpe) && (rt weak_<:< tpe))
+        ((lt weak_<:< tpe) && (rt <:< tpe)) ||
+        ((lt <:< tpe) && (rt weak_<:< tpe))
       case _ =>
         false
     }
@@ -142,12 +150,14 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
       }
 
     def runWithX(rewrite: Tree => Tree, sub: Tree)(f: Tree => Tree): Tree =
-      if (isSimple(sub)) q"""{ ${f(sub)} }""" else {
+      if (isSimple(sub)) q"""{ ${f(sub)} }"""
+      else {
         val x = freshTermName(c)("x$")
         q"""{ val $x = ${rewrite(sub)}; ${f(q"$x")} }"""
       }
 
-    def runWithXYZ(rewrite: Tree => Tree, lhs: Tree, rhs: Tree)(f: (Tree, Tree, Tree) => Tree): Tree = {
+    def runWithXYZ(rewrite: Tree => Tree, lhs: Tree, rhs: Tree)(
+        f: (Tree, Tree, Tree) => Tree): Tree = {
       val z = freshTermName(c)("z$")
       if (isSimple(lhs) && isSimple(rhs)) {
         val t = f(lhs, rhs, q"$z")

@@ -29,34 +29,34 @@ import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.types._
 
 /**
- * A collection of implicit conversions that create a DSL for constructing catalyst data structures.
- *
- * {{{
- *  scala> import org.apache.spark.sql.catalyst.dsl.expressions._
- *
- *  // Standard operators are added to expressions.
- *  scala> import org.apache.spark.sql.catalyst.expressions.Literal
- *  scala> Literal(1) + Literal(1)
- *  res0: org.apache.spark.sql.catalyst.expressions.Add = (1 + 1)
- *
- *  // There is a conversion from 'symbols to unresolved attributes.
- *  scala> 'a.attr
- *  res1: org.apache.spark.sql.catalyst.analysis.UnresolvedAttribute = 'a
- *
- *  // These unresolved attributes can be used to create more complicated expressions.
- *  scala> 'a === 'b
- *  res2: org.apache.spark.sql.catalyst.expressions.EqualTo = ('a = 'b)
- *
- *  // SQL verbs can be used to construct logical query plans.
- *  scala> import org.apache.spark.sql.catalyst.plans.logical._
- *  scala> import org.apache.spark.sql.catalyst.dsl.plans._
- *  scala> LocalRelation('key.int, 'value.string).where('key === 1).select('value).analyze
- *  res3: org.apache.spark.sql.catalyst.plans.logical.LogicalPlan =
- *  Project [value#3]
- *   Filter (key#2 = 1)
- *    LocalRelation [key#2,value#3], []
- * }}}
- */
+  * A collection of implicit conversions that create a DSL for constructing catalyst data structures.
+  *
+  * {{{
+  *  scala> import org.apache.spark.sql.catalyst.dsl.expressions._
+  *
+  *  // Standard operators are added to expressions.
+  *  scala> import org.apache.spark.sql.catalyst.expressions.Literal
+  *  scala> Literal(1) + Literal(1)
+  *  res0: org.apache.spark.sql.catalyst.expressions.Add = (1 + 1)
+  *
+  *  // There is a conversion from 'symbols to unresolved attributes.
+  *  scala> 'a.attr
+  *  res1: org.apache.spark.sql.catalyst.analysis.UnresolvedAttribute = 'a
+  *
+  *  // These unresolved attributes can be used to create more complicated expressions.
+  *  scala> 'a === 'b
+  *  res2: org.apache.spark.sql.catalyst.expressions.EqualTo = ('a = 'b)
+  *
+  *  // SQL verbs can be used to construct logical query plans.
+  *  scala> import org.apache.spark.sql.catalyst.plans.logical._
+  *  scala> import org.apache.spark.sql.catalyst.dsl.plans._
+  *  scala> LocalRelation('key.int, 'value.string).where('key === 1).select('value).analyze
+  *  res3: org.apache.spark.sql.catalyst.plans.logical.LogicalPlan =
+  *  Project [value#3]
+  *   Filter (key#2 = 1)
+  *    LocalRelation [key#2,value#3], []
+  * }}}
+  */
 package object dsl {
   trait ImplicitOperators {
     def expr: Expression
@@ -65,25 +65,25 @@ package object dsl {
     def unary_! : Predicate = Not(expr)
     def unary_~ : Expression = BitwiseNot(expr)
 
-    def + (other: Expression): Expression = Add(expr, other)
-    def - (other: Expression): Expression = Subtract(expr, other)
-    def * (other: Expression): Expression = Multiply(expr, other)
-    def / (other: Expression): Expression = Divide(expr, other)
-    def % (other: Expression): Expression = Remainder(expr, other)
-    def & (other: Expression): Expression = BitwiseAnd(expr, other)
-    def | (other: Expression): Expression = BitwiseOr(expr, other)
-    def ^ (other: Expression): Expression = BitwiseXor(expr, other)
+    def +(other: Expression): Expression = Add(expr, other)
+    def -(other: Expression): Expression = Subtract(expr, other)
+    def *(other: Expression): Expression = Multiply(expr, other)
+    def /(other: Expression): Expression = Divide(expr, other)
+    def %(other: Expression): Expression = Remainder(expr, other)
+    def &(other: Expression): Expression = BitwiseAnd(expr, other)
+    def |(other: Expression): Expression = BitwiseOr(expr, other)
+    def ^(other: Expression): Expression = BitwiseXor(expr, other)
 
-    def && (other: Expression): Predicate = And(expr, other)
-    def || (other: Expression): Predicate = Or(expr, other)
+    def &&(other: Expression): Predicate = And(expr, other)
+    def ||(other: Expression): Predicate = Or(expr, other)
 
-    def < (other: Expression): Predicate = LessThan(expr, other)
-    def <= (other: Expression): Predicate = LessThanOrEqual(expr, other)
-    def > (other: Expression): Predicate = GreaterThan(expr, other)
-    def >= (other: Expression): Predicate = GreaterThanOrEqual(expr, other)
-    def === (other: Expression): Predicate = EqualTo(expr, other)
-    def <=> (other: Expression): Predicate = EqualNullSafe(expr, other)
-    def =!= (other: Expression): Predicate = Not(EqualTo(expr, other))
+    def <(other: Expression): Predicate = LessThan(expr, other)
+    def <=(other: Expression): Predicate = LessThanOrEqual(expr, other)
+    def >(other: Expression): Predicate = GreaterThan(expr, other)
+    def >=(other: Expression): Predicate = GreaterThanOrEqual(expr, other)
+    def ===(other: Expression): Predicate = EqualTo(expr, other)
+    def <=>(other: Expression): Predicate = EqualNullSafe(expr, other)
+    def =!=(other: Expression): Predicate = Not(EqualTo(expr, other))
 
     def in(list: Expression*): Expression = In(expr, list)
 
@@ -92,15 +92,18 @@ package object dsl {
     def contains(other: Expression): Expression = Contains(expr, other)
     def startsWith(other: Expression): Expression = StartsWith(expr, other)
     def endsWith(other: Expression): Expression = EndsWith(expr, other)
-    def substr(pos: Expression, len: Expression = Literal(Int.MaxValue)): Expression =
+    def substr(
+        pos: Expression, len: Expression = Literal(Int.MaxValue)): Expression =
       Substring(expr, pos, len)
-    def substring(pos: Expression, len: Expression = Literal(Int.MaxValue)): Expression =
+    def substring(
+        pos: Expression, len: Expression = Literal(Int.MaxValue)): Expression =
       Substring(expr, pos, len)
 
     def isNull: Predicate = IsNull(expr)
     def isNotNull: Predicate = IsNotNull(expr)
 
-    def getItem(ordinal: Expression): UnresolvedExtractValue = UnresolvedExtractValue(expr, ordinal)
+    def getItem(ordinal: Expression): UnresolvedExtractValue =
+      UnresolvedExtractValue(expr, ordinal)
     def getField(fieldName: String): UnresolvedExtractValue =
       UnresolvedExtractValue(expr, Literal(fieldName))
 
@@ -127,13 +130,16 @@ package object dsl {
     implicit def doubleToLiteral(d: Double): Literal = Literal(d)
     implicit def stringToLiteral(s: String): Literal = Literal(s)
     implicit def dateToLiteral(d: Date): Literal = Literal(d)
-    implicit def bigDecimalToLiteral(d: BigDecimal): Literal = Literal(d.underlying())
-    implicit def bigDecimalToLiteral(d: java.math.BigDecimal): Literal = Literal(d)
+    implicit def bigDecimalToLiteral(d: BigDecimal): Literal =
+      Literal(d.underlying())
+    implicit def bigDecimalToLiteral(d: java.math.BigDecimal): Literal =
+      Literal(d)
     implicit def decimalToLiteral(d: Decimal): Literal = Literal(d)
     implicit def timestampToLiteral(t: Timestamp): Literal = Literal(t)
     implicit def binaryToLiteral(a: Array[Byte]): Literal = Literal(a)
 
-    implicit def symbolToUnresolvedAttribute(s: Symbol): analysis.UnresolvedAttribute =
+    implicit def symbolToUnresolvedAttribute(
+        s: Symbol): analysis.UnresolvedAttribute =
       analysis.UnresolvedAttribute(s.name)
 
     /** Converts $"col name" into an [[analysis.UnresolvedAttribute]]. */
@@ -141,12 +147,13 @@ package object dsl {
       // Note that if we make ExpressionConversions an object rather than a trait, we can
       // then make this a value class to avoid the small penalty of runtime instantiation.
       def $(args: Any*): analysis.UnresolvedAttribute = {
-        analysis.UnresolvedAttribute(sc.s(args : _*))
+        analysis.UnresolvedAttribute(sc.s(args: _*))
       }
     }
 
     def sum(e: Expression): Expression = Sum(e).toAggregateExpression()
-    def sumDistinct(e: Expression): Expression = Sum(e).toAggregateExpression(isDistinct = true)
+    def sumDistinct(e: Expression): Expression =
+      Sum(e).toAggregateExpression(isDistinct = true)
     def count(e: Expression): Expression = Count(e).toAggregateExpression()
     def countDistinct(e: Expression*): Expression =
       Count(e).toAggregateExpression(isDistinct = true)
@@ -162,7 +169,9 @@ package object dsl {
     def sqrt(e: Expression): Expression = Sqrt(e)
     def abs(e: Expression): Expression = Abs(e)
 
-    implicit class DslSymbol(sym: Symbol) extends ImplicitAttribute { def s: String = sym.name }
+    implicit class DslSymbol(sym: Symbol) extends ImplicitAttribute {
+      def s: String = sym.name
+    }
     // TODO more implicit class for literal?
     implicit class DslString(val s: String) extends ImplicitOperators {
       override def expr: Expression = Literal(s)
@@ -175,31 +184,40 @@ package object dsl {
       def attr: UnresolvedAttribute = analysis.UnresolvedAttribute(s)
 
       /** Creates a new AttributeReference of type boolean */
-      def boolean: AttributeReference = AttributeReference(s, BooleanType, nullable = true)()
+      def boolean: AttributeReference =
+        AttributeReference(s, BooleanType, nullable = true)()
 
       /** Creates a new AttributeReference of type byte */
-      def byte: AttributeReference = AttributeReference(s, ByteType, nullable = true)()
+      def byte: AttributeReference =
+        AttributeReference(s, ByteType, nullable = true)()
 
       /** Creates a new AttributeReference of type short */
-      def short: AttributeReference = AttributeReference(s, ShortType, nullable = true)()
+      def short: AttributeReference =
+        AttributeReference(s, ShortType, nullable = true)()
 
       /** Creates a new AttributeReference of type int */
-      def int: AttributeReference = AttributeReference(s, IntegerType, nullable = true)()
+      def int: AttributeReference =
+        AttributeReference(s, IntegerType, nullable = true)()
 
       /** Creates a new AttributeReference of type long */
-      def long: AttributeReference = AttributeReference(s, LongType, nullable = true)()
+      def long: AttributeReference =
+        AttributeReference(s, LongType, nullable = true)()
 
       /** Creates a new AttributeReference of type float */
-      def float: AttributeReference = AttributeReference(s, FloatType, nullable = true)()
+      def float: AttributeReference =
+        AttributeReference(s, FloatType, nullable = true)()
 
       /** Creates a new AttributeReference of type double */
-      def double: AttributeReference = AttributeReference(s, DoubleType, nullable = true)()
+      def double: AttributeReference =
+        AttributeReference(s, DoubleType, nullable = true)()
 
       /** Creates a new AttributeReference of type string */
-      def string: AttributeReference = AttributeReference(s, StringType, nullable = true)()
+      def string: AttributeReference =
+        AttributeReference(s, StringType, nullable = true)()
 
       /** Creates a new AttributeReference of type date */
-      def date: AttributeReference = AttributeReference(s, DateType, nullable = true)()
+      def date: AttributeReference =
+        AttributeReference(s, DateType, nullable = true)()
 
       /** Creates a new AttributeReference of type decimal */
       def decimal: AttributeReference =
@@ -210,10 +228,12 @@ package object dsl {
         AttributeReference(s, DecimalType(precision, scale), nullable = true)()
 
       /** Creates a new AttributeReference of type timestamp */
-      def timestamp: AttributeReference = AttributeReference(s, TimestampType, nullable = true)()
+      def timestamp: AttributeReference =
+        AttributeReference(s, TimestampType, nullable = true)()
 
       /** Creates a new AttributeReference of type binary */
-      def binary: AttributeReference = AttributeReference(s, BinaryType, nullable = true)()
+      def binary: AttributeReference =
+        AttributeReference(s, BinaryType, nullable = true)()
 
       /** Creates a new AttributeReference of type array */
       def array(dataType: DataType): AttributeReference =
@@ -236,31 +256,38 @@ package object dsl {
     implicit class DslAttribute(a: AttributeReference) {
       def notNull: AttributeReference = a.withNullability(false)
       def canBeNull: AttributeReference = a.withNullability(true)
-      def at(ordinal: Int): BoundReference = BoundReference(ordinal, a.dataType, a.nullable)
+      def at(ordinal: Int): BoundReference =
+        BoundReference(ordinal, a.dataType, a.nullable)
     }
   }
 
-  object expressions extends ExpressionConversions  // scalastyle:ignore
+  object expressions extends ExpressionConversions // scalastyle:ignore
 
-  object plans {  // scalastyle:ignore
+  object plans {
+    // scalastyle:ignore
     implicit class DslLogicalPlan(val logicalPlan: LogicalPlan) {
-      def select(exprs: NamedExpression*): LogicalPlan = Project(exprs, logicalPlan)
+      def select(exprs: NamedExpression*): LogicalPlan =
+        Project(exprs, logicalPlan)
 
-      def where(condition: Expression): LogicalPlan = Filter(condition, logicalPlan)
+      def where(condition: Expression): LogicalPlan =
+        Filter(condition, logicalPlan)
 
-      def limit(limitExpr: Expression): LogicalPlan = Limit(limitExpr, logicalPlan)
+      def limit(limitExpr: Expression): LogicalPlan =
+        Limit(limitExpr, logicalPlan)
 
-      def join(
-        otherPlan: LogicalPlan,
-        joinType: JoinType = Inner,
-        condition: Option[Expression] = None): LogicalPlan =
+      def join(otherPlan: LogicalPlan,
+               joinType: JoinType = Inner,
+               condition: Option[Expression] = None): LogicalPlan =
         Join(logicalPlan, otherPlan, joinType, condition)
 
-      def orderBy(sortExprs: SortOrder*): LogicalPlan = Sort(sortExprs, true, logicalPlan)
+      def orderBy(sortExprs: SortOrder*): LogicalPlan =
+        Sort(sortExprs, true, logicalPlan)
 
-      def sortBy(sortExprs: SortOrder*): LogicalPlan = Sort(sortExprs, false, logicalPlan)
+      def sortBy(sortExprs: SortOrder*): LogicalPlan =
+        Sort(sortExprs, false, logicalPlan)
 
-      def groupBy(groupingExprs: Expression*)(aggregateExprs: Expression*): LogicalPlan = {
+      def groupBy(groupingExprs: Expression*)(
+          aggregateExprs: Expression*): LogicalPlan = {
         val aliasedExprs = aggregateExprs.map {
           case ne: NamedExpression => ne
           case e => Alias(e, e.toString)()
@@ -268,33 +295,43 @@ package object dsl {
         Aggregate(groupingExprs, aliasedExprs, logicalPlan)
       }
 
-      def window(
-          windowExpressions: Seq[NamedExpression],
-          partitionSpec: Seq[Expression],
-          orderSpec: Seq[SortOrder]): LogicalPlan =
+      def window(windowExpressions: Seq[NamedExpression],
+                 partitionSpec: Seq[Expression],
+                 orderSpec: Seq[SortOrder]): LogicalPlan =
         Window(windowExpressions, partitionSpec, orderSpec, logicalPlan)
 
-      def subquery(alias: Symbol): LogicalPlan = SubqueryAlias(alias.name, logicalPlan)
+      def subquery(alias: Symbol): LogicalPlan =
+        SubqueryAlias(alias.name, logicalPlan)
 
-      def except(otherPlan: LogicalPlan): LogicalPlan = Except(logicalPlan, otherPlan)
+      def except(otherPlan: LogicalPlan): LogicalPlan =
+        Except(logicalPlan, otherPlan)
 
-      def intersect(otherPlan: LogicalPlan): LogicalPlan = Intersect(logicalPlan, otherPlan)
+      def intersect(otherPlan: LogicalPlan): LogicalPlan =
+        Intersect(logicalPlan, otherPlan)
 
-      def unionAll(otherPlan: LogicalPlan): LogicalPlan = Union(logicalPlan, otherPlan)
+      def unionAll(otherPlan: LogicalPlan): LogicalPlan =
+        Union(logicalPlan, otherPlan)
 
-      def generate(
-        generator: Generator,
-        join: Boolean = false,
-        outer: Boolean = false,
-        alias: Option[String] = None,
-        outputNames: Seq[String] = Nil): LogicalPlan =
-        Generate(generator, join = join, outer = outer, alias,
-          outputNames.map(UnresolvedAttribute(_)), logicalPlan)
+      def generate(generator: Generator,
+                   join: Boolean = false,
+                   outer: Boolean = false,
+                   alias: Option[String] = None,
+                   outputNames: Seq[String] = Nil): LogicalPlan =
+        Generate(generator,
+                 join = join,
+                 outer = outer,
+                 alias,
+                 outputNames.map(UnresolvedAttribute(_)),
+                 logicalPlan)
 
-      def insertInto(tableName: String, overwrite: Boolean = false): LogicalPlan =
+      def insertInto(
+          tableName: String, overwrite: Boolean = false): LogicalPlan =
         InsertIntoTable(
-          analysis.UnresolvedRelation(TableIdentifier(tableName)),
-          Map.empty, logicalPlan, overwrite, false)
+            analysis.UnresolvedRelation(TableIdentifier(tableName)),
+            Map.empty,
+            logicalPlan,
+            overwrite,
+            false)
 
       def analyze: LogicalPlan =
         EliminateSubqueryAliases(analysis.SimpleAnalyzer.execute(logicalPlan))

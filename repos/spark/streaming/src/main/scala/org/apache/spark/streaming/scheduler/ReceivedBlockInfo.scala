@@ -27,9 +27,10 @@ private[streaming] case class ReceivedBlockInfo(
     numRecords: Option[Long],
     metadataOption: Option[Any],
     blockStoreResult: ReceivedBlockStoreResult
-  ) {
+) {
 
-  require(numRecords.isEmpty || numRecords.get >= 0, "numRecords must not be negative")
+  require(numRecords.isEmpty || numRecords.get >= 0,
+          "numRecords must not be negative")
 
   @volatile private var _isBlockIdValid = true
 
@@ -37,7 +38,8 @@ private[streaming] case class ReceivedBlockInfo(
 
   def walRecordHandleOption: Option[WriteAheadLogRecordHandle] = {
     blockStoreResult match {
-      case walStoreResult: WriteAheadLogBasedStoreResult => Some(walStoreResult.walRecordHandle)
+      case walStoreResult: WriteAheadLogBasedStoreResult =>
+        Some(walStoreResult.walRecordHandle)
       case _ => None
     }
   }
@@ -46,11 +48,10 @@ private[streaming] case class ReceivedBlockInfo(
   def isBlockIdValid(): Boolean = _isBlockIdValid
 
   /**
-   * Set the block ID as invalid. This is useful when it is known that the block is not present
-   * in the Spark executors.
-   */
+    * Set the block ID as invalid. This is useful when it is known that the block is not present
+    * in the Spark executors.
+    */
   def setBlockIdInvalid(): Unit = {
     _isBlockIdValid = false
   }
 }
-

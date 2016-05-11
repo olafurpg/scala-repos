@@ -3,14 +3,15 @@ package com.twitter.io
 import java.io.InputStream
 
 class BufInputStream(val buf: Buf) extends InputStream {
+
   /**
-   * The slice of `buf` that hasn't been consumed.
-   */
+    * The slice of `buf` that hasn't been consumed.
+    */
   private[this] var rest: Buf = buf
 
   /**
-   * A saved version of `rest`
-   */
+    * A saved version of `rest`
+    */
   private[this] var mrk: Buf = buf
 
   // Returns an estimate of the number of bytes that can be read (or
@@ -29,8 +30,7 @@ class BufInputStream(val buf: Buf) extends InputStream {
 
   // Reads the next byte of data from the input stream.
   def read(): Int = synchronized {
-    if (rest.length <= 0)
-      return -1
+    if (rest.length <= 0) return -1
 
     val b = new Array[Byte](1)
     rest.slice(0, 1).write(b, 0)
@@ -39,15 +39,13 @@ class BufInputStream(val buf: Buf) extends InputStream {
   }
 
   /**
-   *  Reads up to len bytes of data from the input stream into an
-   *  array of bytes.
-   */
+    *  Reads up to len bytes of data from the input stream into an
+    *  array of bytes.
+    */
   override def read(b: Array[Byte], off: Int, len: Int): Int = synchronized {
-    if (rest.length <= 0)
-      return -1
+    if (rest.length <= 0) return -1
 
-    if (len == 0)
-      return 0
+    if (len == 0) return 0
 
     val n = len min rest.length
     rest.slice(0, n).write(b, off)
@@ -56,17 +54,16 @@ class BufInputStream(val buf: Buf) extends InputStream {
   }
 
   /**
-   * Repositions this stream to the position at the time the mark
-   * method was last called on this input stream.
-   */
+    * Repositions this stream to the position at the time the mark
+    * method was last called on this input stream.
+    */
   override def reset() = synchronized { rest = mrk }
 
   /**
-   * Skips over and discards n bytes of data from this input stream.
-   */
+    * Skips over and discards n bytes of data from this input stream.
+    */
   override def skip(n: Long): Long = synchronized {
-    if (n <= 0)
-      return 0
+    if (n <= 0) return 0
 
     val skipped = n min rest.length
     rest = rest.slice(skipped.toInt, rest.length)

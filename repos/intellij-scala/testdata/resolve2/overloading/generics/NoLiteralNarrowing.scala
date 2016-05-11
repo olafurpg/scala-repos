@@ -6,5 +6,5 @@ object Test extends Application {
 
   val a = new A
 
-  a./* line: 3 */foo(2)
+  a. /* line: 3 */ foo(2)
 }

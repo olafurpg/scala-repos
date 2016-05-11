@@ -7,9 +7,10 @@ class AnnotNotFound {
     foo
   }
 
-  () => {
-    @infunction
-    def foo = 0
-    ()
+  () =>
+    {
+      @infunction
+      def foo = 0
+      ()
   }
 }

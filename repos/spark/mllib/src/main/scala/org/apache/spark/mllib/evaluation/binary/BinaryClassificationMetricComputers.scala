@@ -18,14 +18,16 @@
 package org.apache.spark.mllib.evaluation.binary
 
 /**
- * Trait for a binary classification evaluation metric computer.
- */
-private[evaluation] trait BinaryClassificationMetricComputer extends Serializable {
+  * Trait for a binary classification evaluation metric computer.
+  */
+private[evaluation] trait BinaryClassificationMetricComputer
+    extends Serializable {
   def apply(c: BinaryConfusionMatrix): Double
 }
 
 /** Precision. Defined as 1.0 when there are no positive examples. */
-private[evaluation] object Precision extends BinaryClassificationMetricComputer {
+private[evaluation] object Precision
+    extends BinaryClassificationMetricComputer {
   override def apply(c: BinaryConfusionMatrix): Double = {
     val totalPositives = c.numTruePositives + c.numFalsePositives
     if (totalPositives == 0) {
@@ -37,7 +39,8 @@ private[evaluation] object Precision extends BinaryClassificationMetricComputer 
 }
 
 /** False positive rate. Defined as 0.0 when there are no negative examples. */
-private[evaluation] object FalsePositiveRate extends BinaryClassificationMetricComputer {
+private[evaluation] object FalsePositiveRate
+    extends BinaryClassificationMetricComputer {
   override def apply(c: BinaryConfusionMatrix): Double = {
     if (c.numNegatives == 0) {
       0.0
@@ -59,12 +62,13 @@ private[evaluation] object Recall extends BinaryClassificationMetricComputer {
 }
 
 /**
- * F-Measure. Defined as 0 if both precision and recall are 0. EG in the case that all examples
- * are false positives.
- * @param beta the beta constant in F-Measure
- * @see http://en.wikipedia.org/wiki/F1_score
- */
-private[evaluation] case class FMeasure(beta: Double) extends BinaryClassificationMetricComputer {
+  * F-Measure. Defined as 0 if both precision and recall are 0. EG in the case that all examples
+  * are false positives.
+  * @param beta the beta constant in F-Measure
+  * @see http://en.wikipedia.org/wiki/F1_score
+  */
+private[evaluation] case class FMeasure(beta: Double)
+    extends BinaryClassificationMetricComputer {
   private val beta2 = beta * beta
   override def apply(c: BinaryConfusionMatrix): Double = {
     val precision = Precision(c)

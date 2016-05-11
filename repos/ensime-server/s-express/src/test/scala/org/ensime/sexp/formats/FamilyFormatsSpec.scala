@@ -59,18 +59,30 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
       }
 
       def read(hint: SexpSymbol, value: Sexp): TokenTree = hint match {
-        case s if s == implicitly[TypeHint[FieldTerm]].hint => value.convertTo[FieldTerm]
-        case s if s == implicitly[TypeHint[BoundedTerm]].hint => value.convertTo[BoundedTerm]
-        case s if s == implicitly[TypeHint[Unparsed]].hint => value.convertTo[Unparsed]
-        case s if s == implicitly[TypeHint[Ignored]].hint => value.convertTo[Ignored]
-        case s if s == implicitly[TypeHint[Unclear]].hint => value.convertTo[Unclear]
-        case s if s == implicitly[TypeHint[InTerm]].hint => value.convertTo[InTerm]
-        case s if s == implicitly[TypeHint[LikeTerm]].hint => value.convertTo[LikeTerm]
-        case s if s == implicitly[TypeHint[AndCondition]].hint => value.convertTo[AndCondition]
-        case s if s == implicitly[TypeHint[OrCondition]].hint => value.convertTo[OrCondition]
-        case s if s == implicitly[TypeHint[PreferToken]].hint => value.convertTo[PreferToken]
-        case s if s == implicitly[TypeHint[QualifierToken]].hint => value.convertTo[QualifierToken]
-        case s if s == implicitly[TypeHint[SpecialToken.type]].hint => value.convertTo[SpecialToken.type]
+        case s if s == implicitly[TypeHint[FieldTerm]].hint =>
+          value.convertTo[FieldTerm]
+        case s if s == implicitly[TypeHint[BoundedTerm]].hint =>
+          value.convertTo[BoundedTerm]
+        case s if s == implicitly[TypeHint[Unparsed]].hint =>
+          value.convertTo[Unparsed]
+        case s if s == implicitly[TypeHint[Ignored]].hint =>
+          value.convertTo[Ignored]
+        case s if s == implicitly[TypeHint[Unclear]].hint =>
+          value.convertTo[Unclear]
+        case s if s == implicitly[TypeHint[InTerm]].hint =>
+          value.convertTo[InTerm]
+        case s if s == implicitly[TypeHint[LikeTerm]].hint =>
+          value.convertTo[LikeTerm]
+        case s if s == implicitly[TypeHint[AndCondition]].hint =>
+          value.convertTo[AndCondition]
+        case s if s == implicitly[TypeHint[OrCondition]].hint =>
+          value.convertTo[OrCondition]
+        case s if s == implicitly[TypeHint[PreferToken]].hint =>
+          value.convertTo[PreferToken]
+        case s if s == implicitly[TypeHint[QualifierToken]].hint =>
+          value.convertTo[QualifierToken]
+        case s if s == implicitly[TypeHint[SpecialToken.type]].hint =>
+          value.convertTo[SpecialToken.type]
         // SAD FACE --- compiler doesn't catch typos on matches or missing impls
         case _ => deserializationError(hint)
       }
@@ -78,15 +90,16 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
     /////////////////// END OF BOILERPLATE /////////////////
 
     assertFormat(SpecialToken, SexpNil)
-    assertFormat(SpecialToken: TokenTree, SexpList(SexpSymbol(":SpecialToken")))
+    assertFormat(
+        SpecialToken: TokenTree, SexpList(SexpSymbol(":SpecialToken")))
 
     val fieldTerm = FieldTerm("thing is ten", DatabaseField("THING"), "10")
     val expectField = SexpData(
-      SexpSymbol(":text") -> SexpString("thing is ten"),
-      SexpSymbol(":field") -> SexpData(
-        SexpSymbol(":column") -> SexpString("THING")
-      ),
-      SexpSymbol(":value") -> SexpString("10")
+        SexpSymbol(":text") -> SexpString("thing is ten"),
+        SexpSymbol(":field") -> SexpData(
+            SexpSymbol(":column") -> SexpString("THING")
+        ),
+        SexpSymbol(":value") -> SexpString("10")
     )
 
     // confirm that the wrapper is picked up for a specific case class
@@ -100,9 +113,9 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
     // confirm recursive works
     val and = AndCondition(fieldTerm, fieldTerm, "wibble")
     val expectAnd = SexpData(
-      SexpSymbol(":left") -> expectFieldTree,
-      SexpSymbol(":right") -> expectFieldTree,
-      SexpSymbol(":text") -> SexpString("wibble")
+        SexpSymbol(":left") -> expectFieldTree,
+        SexpSymbol(":right") -> expectFieldTree,
+        SexpSymbol(":text") -> SexpString("wibble")
     )
     assertFormat(and, expectAnd)
 

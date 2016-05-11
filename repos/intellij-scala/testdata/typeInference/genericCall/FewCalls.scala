@@ -6,6 +6,7 @@ class FewCalls {
     }
   }
 
-  /*start*/new X[Int][String][Boolean]/*end*/
+  /*start*/
+  new X[Int][String][Boolean] /*end*/
 }
 //(Int, String, Boolean)

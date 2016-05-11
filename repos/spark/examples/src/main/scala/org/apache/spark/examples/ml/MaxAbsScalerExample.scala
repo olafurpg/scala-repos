@@ -31,10 +31,11 @@ object MaxAbsScalerExample {
     val sqlContext = new SQLContext(sc)
 
     // $example on$
-    val dataFrame = sqlContext.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
-    val scaler = new MaxAbsScaler()
-      .setInputCol("features")
-      .setOutputCol("scaledFeatures")
+    val dataFrame = sqlContext.read
+      .format("libsvm")
+      .load("data/mllib/sample_libsvm_data.txt")
+    val scaler =
+      new MaxAbsScaler().setInputCol("features").setOutputCol("scaledFeatures")
 
     // Compute summary statistics and generate MaxAbsScalerModel
     val scalerModel = scaler.fit(dataFrame)

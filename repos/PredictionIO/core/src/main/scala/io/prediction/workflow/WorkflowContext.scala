@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.workflow
 
 import grizzled.slf4j.Logging
@@ -28,7 +27,7 @@ object WorkflowContext extends Logging {
       executorEnv: Map[String, String] = Map(),
       sparkEnv: Map[String, String] = Map(),
       mode: String = ""
-    ): SparkContext = {
+  ): SparkContext = {
     val conf = new SparkConf()
     val prefix = if (mode == "") "PredictionIO" else s"PredictionIO ${mode}"
     conf.setAppName(s"${prefix}: ${batch}")
@@ -42,4 +41,3 @@ object WorkflowContext extends Logging {
     new SparkContext(conf)
   }
 }
-

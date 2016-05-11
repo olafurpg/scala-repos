@@ -34,5 +34,4 @@ object Test extends App {
   } catch {
     case e: MatchError => println(e)
   }
-
 }

@@ -2,7 +2,7 @@
 // Licence: http://www.gnu.org/licenses/gpl-3.0.en.html
 package org.ensime.core
 
-import java.io.{ File, IOException }
+import java.io.{File, IOException}
 import java.util.jar.JarFile
 import java.util.regex.Pattern
 import org.apache.commons.lang.StringEscapeUtils
@@ -29,12 +29,16 @@ trait DocUsecaseHandling { self: DocResolver =>
           try {
             val jarFile = new JarFile(jar)
             try {
-              val is = jarFile.getInputStream(jarFile.getEntry(scalaFqnToPath(sig.fqn)))
+              val is = jarFile.getInputStream(
+                  jarFile.getEntry(scalaFqnToPath(sig.fqn)))
               val html = Source.fromInputStream(is).mkString
               val re = s"""<a id="(${Pattern.quote(prefix)}.+?)"""".r
-              re.findFirstMatchIn(html).map { m =>
-                sig.copy(member = Some(StringEscapeUtils.unescapeHtml(m.group(1))))
-              }.getOrElse(sig)
+              re.findFirstMatchIn(html)
+                .map { m =>
+                  sig.copy(member = Some(
+                            StringEscapeUtils.unescapeHtml(m.group(1))))
+                }
+                .getOrElse(sig)
             } finally jarFile.close()
           } catch { case e: IOException => sig }
         case _ => sig
@@ -43,48 +47,47 @@ trait DocUsecaseHandling { self: DocResolver =>
   }
 
   private val UseCasePrefixes = Set(
-    "+",
-    "+",
-    "++",
-    "++:",
-    "+:",
-    "-",
-    ":+",
-    "::",
-    ":::",
-    "collect",
-    "copyToArray",
-    "diff",
-    "filterMap",
-    "flatMap",
-    "flatten",
-    "foreach",
-    "getOrElse",
-    "indexOf",
-    "intersect",
-    "lastIndexOf",
-    "map",
-    "mapConserve",
-    "max",
-    "maxBy",
-    "min",
-    "minBy",
-    "padTo",
-    "patch",
-    "product",
-    "reverseMap",
-    "reverse_:::",
-    "sameElements",
-    "scan",
-    "sum",
-    "to",
-    "toArray",
-    "toMap",
-    "union",
-    "updated",
-    "zip",
-    "zipAll",
-    "zipWithIndex"
+      "+",
+      "+",
+      "++",
+      "++:",
+      "+:",
+      "-",
+      ":+",
+      "::",
+      ":::",
+      "collect",
+      "copyToArray",
+      "diff",
+      "filterMap",
+      "flatMap",
+      "flatten",
+      "foreach",
+      "getOrElse",
+      "indexOf",
+      "intersect",
+      "lastIndexOf",
+      "map",
+      "mapConserve",
+      "max",
+      "maxBy",
+      "min",
+      "minBy",
+      "padTo",
+      "patch",
+      "product",
+      "reverseMap",
+      "reverse_:::",
+      "sameElements",
+      "scan",
+      "sum",
+      "to",
+      "toArray",
+      "toMap",
+      "union",
+      "updated",
+      "zip",
+      "zipAll",
+      "zipWithIndex"
   )
-
 }

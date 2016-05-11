@@ -102,8 +102,7 @@ object SliderControlDemo extends JFXApp {
   pnlControls.columnConstraints = List(ccOdd, ccEven, ccOdd, ccEven)
 
   val box = new VBox(5.0) {
-    children = List(sliderControl,
-      pnlControls)
+    children = List(sliderControl, pnlControls)
   }
   VBox.setVgrow(sliderControl, Priority.Never)
   VBox.setVgrow(pnlControls, Priority.Always)
@@ -124,5 +123,4 @@ object SliderControlDemo extends JFXApp {
     scene = mainScene
   }
   AnchorPane.setAnchors(box, 0, 0, 0, 0)
-
 }

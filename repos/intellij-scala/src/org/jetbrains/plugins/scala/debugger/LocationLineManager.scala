@@ -21,12 +21,12 @@ import scala.util.Try
 /**
   * @author Nikolay.Tropin
   */
-trait LocationLineManager {
-  self: ScalaPositionManager =>
+trait LocationLineManager { self: ScalaPositionManager =>
 
   import self.caches._
 
-  private val syntheticProvider = SyntheticTypeComponentProvider.EP_NAME.findExtension(classOf[ScalaSyntheticProvider])
+  private val syntheticProvider = SyntheticTypeComponentProvider.EP_NAME
+    .findExtension(classOf[ScalaSyntheticProvider])
 
   def clearLocationLineCaches(): Unit = {
     customizedLocationsCache.clear()
@@ -36,39 +36,45 @@ trait LocationLineManager {
 
   def exactLineNumber(location: Location): Int = {
     checkAndUpdateCaches(location.declaringType())
-    customizedLocationsCache.getOrElse(location, ScalaPositionManager.checkedLineNumber(location))
+    customizedLocationsCache.getOrElse(
+        location, ScalaPositionManager.checkedLineNumber(location))
   }
 
   def shouldSkip(location: Location): Boolean = {
-    if (!DebuggerUtil.isScala(location.declaringType(), default = false)) return false
+    if (!DebuggerUtil.isScala(location.declaringType(), default = false))
+      return false
 
-    val synth = DebuggerSettings.getInstance().SKIP_SYNTHETIC_METHODS && syntheticProvider.isSynthetic(location.method())
+    val synth =
+      DebuggerSettings.getInstance().SKIP_SYNTHETIC_METHODS &&
+      syntheticProvider.isSynthetic(location.method())
     synth || exactLineNumber(location) < 0
   }
 
   def locationsOfLine(refType: ReferenceType, line: Int): Seq[Location] = {
-    val jvmLocations: util.List[Location] =
-      try {
-        if (debugProcess.getVirtualMachineProxy.versionHigher("1.4"))
-          refType.locationsOfLine(DebugProcess.JAVA_STRATUM, null, line + 1)
-        else refType.locationsOfLine(line + 1)
-      } catch {
-        case aie: AbsentInformationException => return Seq.empty
-      }
+    val jvmLocations: util.List[Location] = try {
+      if (debugProcess.getVirtualMachineProxy.versionHigher("1.4"))
+        refType.locationsOfLine(DebugProcess.JAVA_STRATUM, null, line + 1)
+      else refType.locationsOfLine(line + 1)
+    } catch {
+      case aie: AbsentInformationException => return Seq.empty
+    }
 
     checkAndUpdateCaches(refType)
 
-    val nonCustomized = jvmLocations.asScala.filterNot(customizedLocationsCache.contains)
+    val nonCustomized =
+      jvmLocations.asScala.filterNot(customizedLocationsCache.contains)
     val customized = customizedLocations(refType, line)
     (nonCustomized ++ customized).filter(!shouldSkip(_))
   }
 
-  private def customizedLocations(refType: ReferenceType, line: Int): Seq[Location] = {
+  private def customizedLocations(
+      refType: ReferenceType, line: Int): Seq[Location] = {
     lineToCustomizedLocationCache.getOrElse((refType, line), Seq.empty)
   }
 
   private def checkAndUpdateCaches(refType: ReferenceType) = {
-    if (!seenRefTypes.contains(refType)) inReadAction(computeCustomizedLocationsFor(refType))
+    if (!seenRefTypes.contains(refType))
+      inReadAction(computeCustomizedLocationsFor(refType))
   }
 
   private def cacheCustomLine(location: Location, customLine: Int): Unit = {
@@ -76,7 +82,8 @@ trait LocationLineManager {
 
     val key = (location.declaringType(), customLine)
     val old = lineToCustomizedLocationCache.getOrElse(key, Seq.empty)
-    lineToCustomizedLocationCache.update(key, (old :+ location).sortBy(_.codeIndex()))
+    lineToCustomizedLocationCache.update(
+        key, (old :+ location).sortBy(_.codeIndex()))
   }
 
   private def computeCustomizedLocationsFor(refType: ReferenceType): Unit = {
@@ -86,11 +93,15 @@ trait LocationLineManager {
     if (generatingElem == null) return
     val containingFile = generatingElem.getContainingFile
     if (containingFile == null) return
-    val document = PsiDocumentManager.getInstance(debugProcess.getProject).getDocument(containingFile)
+    val document = PsiDocumentManager
+      .getInstance(debugProcess.getProject)
+      .getDocument(containingFile)
     if (document == null) return
 
-    def elementStartLine(e: PsiElement) = document.getLineNumber(e.getTextOffset)
-    def locationsOfLine(m: Method, line: Int) = Try(m.locationsOfLine(line + 1).asScala).getOrElse(Seq.empty)
+    def elementStartLine(e: PsiElement) =
+      document.getLineNumber(e.getTextOffset)
+    def locationsOfLine(m: Method, line: Int) =
+      Try(m.locationsOfLine(line + 1).asScala).getOrElse(Seq.empty)
 
     //scalac sometimes generates very strange line numbers for <init> method
     def customizeLineForConstructors(): Unit = {
@@ -111,23 +122,29 @@ trait LocationLineManager {
         val lineNumber = ScalaPositionManager.checkedLineNumber(location)
         if (lineNumber < 0) return true
 
-        val linePosition = SourcePosition.createFromLine(containingFile, lineNumber)
+        val linePosition =
+          SourcePosition.createFromLine(containingFile, lineNumber)
         val elem = nonWhitespaceElement(linePosition)
-        val parent = PsiTreeUtil.getParentOfType(elem, classOf[ScBlockStatement], classOf[ScEarlyDefinitions])
-        parent == null || !PsiTreeUtil.isAncestor(generatingElem, parent, false)
+        val parent = PsiTreeUtil.getParentOfType(
+            elem, classOf[ScBlockStatement], classOf[ScEarlyDefinitions])
+        parent == null ||
+        !PsiTreeUtil.isAncestor(generatingElem, parent, false)
       }
 
-      val methods = refType.methodsByName("<init>").asScala.filter(_.declaringType() == refType)
+      val methods = refType
+        .methodsByName("<init>")
+        .asScala
+        .filter(_.declaringType() == refType)
       for {
         location <- methods.flatMap(_.allLineLocations().asScala)
       } {
         if (shouldPointAtStartLine(location)) {
-          val significantElem = DebuggerUtil.getSignificantElement(generatingElem)
+          val significantElem =
+            DebuggerUtil.getSignificantElement(generatingElem)
           val lineNumber = elementStartLine(significantElem)
           if (lineNumber != ScalaPositionManager.checkedLineNumber(location))
             cacheCustomLine(location, lineNumber)
-        }
-        else if (isReturnInstr(location)) {
+        } else if (isReturnInstr(location)) {
           cacheCustomLine(location, -1)
         }
       }
@@ -135,27 +152,31 @@ trait LocationLineManager {
 
     def customizeCaseClauses(): Unit = {
 
-      def skipTypeCheckOptimization(method: Method, caseLineLocations: Seq[Location]): Unit = {
-        val bytecodes =
-          try method.bytecodes()
-          catch {case t: Throwable => return }
+      def skipTypeCheckOptimization(
+          method: Method, caseLineLocations: Seq[Location]): Unit = {
+        val bytecodes = try method.bytecodes() catch {
+          case t: Throwable => return
+        }
 
         def cacheCorrespondingIloadLocations(iconst_0Loc: Location): Unit = {
           val codeIndex = iconst_0Loc.codeIndex().toInt
-          val iloadCode = BytecodeUtil.readIstore(codeIndex + 1, bytecodes) match {
-            case Seq() => Nil
-            case istoreCode => BytecodeUtil.iloadCode(istoreCode)
-          }
+          val iloadCode =
+            BytecodeUtil.readIstore(codeIndex + 1, bytecodes) match {
+              case Seq() => Nil
+              case istoreCode => BytecodeUtil.iloadCode(istoreCode)
+            }
           if (iloadCode.isEmpty) return
 
           method.allLineLocations().asScala.foreach {
-            case loc if BytecodeUtil.readIload(loc.codeIndex().toInt, bytecodes) == iloadCode =>
+            case loc
+                if BytecodeUtil.readIload(loc.codeIndex().toInt, bytecodes) == iloadCode =>
               cacheCustomLine(loc, -1)
             case _ =>
           }
         }
 
-        val iconst_0Locations = caseLineLocations.filter(l => BytecodeUtil.isIconst_0(l.codeIndex().toInt, bytecodes))
+        val iconst_0Locations = caseLineLocations.filter(
+            l => BytecodeUtil.isIconst_0(l.codeIndex().toInt, bytecodes))
 
         iconst_0Locations.foreach { l =>
           cacheCustomLine(l, -1)
@@ -163,10 +184,11 @@ trait LocationLineManager {
         }
       }
 
-      def skipReturnValueAssignment(method: Method, caseLinesLocations: Seq[Seq[Location]]): Unit = {
-        val bytecodes =
-          try method.bytecodes()
-          catch {case t: Throwable => return }
+      def skipReturnValueAssignment(
+          method: Method, caseLinesLocations: Seq[Seq[Location]]): Unit = {
+        val bytecodes = try method.bytecodes() catch {
+          case t: Throwable => return
+        }
 
         def storeCode(location: Location): Option[Seq[Byte]] = {
           val codeIndex = location.codeIndex().toInt
@@ -174,10 +196,12 @@ trait LocationLineManager {
           if (code.nonEmpty) Some(code) else None
         }
 
-        val notCustomizedYet = caseLinesLocations.map(_.filter(!customizedLocationsCache.contains(_)))
+        val notCustomizedYet = caseLinesLocations.map(
+            _.filter(!customizedLocationsCache.contains(_)))
         val repeating = notCustomizedYet.filter(_.size > 1)
         val lastLocations = repeating.map(_.last)
-        val withStoreCode = for (loc <- lastLocations; code <- storeCode(loc)) yield (loc, code)
+        val withStoreCode = for (loc <- lastLocations; code <- storeCode(loc)) yield
+          (loc, code)
         val (locationsToSkip, codes) = withStoreCode.unzip
         if (codes.distinct.size != 1) return
 
@@ -193,14 +217,13 @@ trait LocationLineManager {
       }
 
       def skipBaseLineExtraLocations(method: Method, baseLine: Int): Unit = {
-        val locations = locationsOfLine(method, baseLine).filter(!customizedLocationsCache.contains(_))
+        val locations = locationsOfLine(method, baseLine).filter(
+            !customizedLocationsCache.contains(_))
         if (locations.size <= 1) return
 
-        val bytecodes =
-          try method.bytecodes()
-          catch {
-            case t: Throwable => return
-          }
+        val bytecodes = try method.bytecodes() catch {
+          case t: Throwable => return
+        }
 
         val tail: Seq[Location] = locations.tail
 
@@ -212,20 +235,21 @@ trait LocationLineManager {
           BytecodeUtil.returnCodes.contains(bytecodes(l.codeIndex().toInt))
         }
 
-        (loadExpressionValueLocations ++ returnLocations).foreach(cacheCustomLine(_, -1))
+        (loadExpressionValueLocations ++ returnLocations).foreach(
+            cacheCustomLine(_, -1))
       }
 
       def customizeFor(caseClauses: ScCaseClauses): Unit = {
         def tooSmall(m: Method) = {
-          try m.allLineLocations().size() <= 3
-          catch {
+          try m.allLineLocations().size() <= 3 catch {
             case ae: AbsentInformationException => true
           }
         }
 
         val baseLine = caseClauses.getParent match {
           case ms: ScMatchStmt => ms.expr.map(elementStartLine)
-          case (b: ScBlock) childOf (tr: ScTryStmt) => return //todo: handle try statements
+          case (b: ScBlock) childOf (tr: ScTryStmt) =>
+            return //todo: handle try statements
           case (b: ScBlock) => Some(elementStartLine(b))
           case _ => None
         }
@@ -235,7 +259,7 @@ trait LocationLineManager {
         for {
           m <- methods
           caseLinesLocations = caseLines.map(locationsOfLine(m, _))
-          if caseLinesLocations.exists(_.nonEmpty)
+              if caseLinesLocations.exists(_.nonEmpty)
         } {
           skipTypeCheckOptimization(m, caseLinesLocations.flatten)
           skipReturnValueAssignment(m, caseLinesLocations)
@@ -243,8 +267,7 @@ trait LocationLineManager {
 
         for {
           m <- methods
-          line <- baseLine
-          if locationsOfLine(m, line).size > 1
+          line <- baseLine if locationsOfLine(m, line).size > 1
         } {
           skipBaseLineExtraLocations(m, line)
         }

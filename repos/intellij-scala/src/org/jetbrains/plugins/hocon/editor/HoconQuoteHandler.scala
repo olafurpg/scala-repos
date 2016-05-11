@@ -6,10 +6,14 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.{IElementType, TokenSet}
 import org.jetbrains.plugins.hocon.lexer.HoconTokenType
 
-class HoconQuoteHandler extends SimpleTokenSetQuoteHandler(HoconTokenType.QuotedString) with JavaLikeQuoteHandler {
+class HoconQuoteHandler
+    extends SimpleTokenSetQuoteHandler(HoconTokenType.QuotedString)
+    with JavaLikeQuoteHandler {
 
-  override protected def isNonClosedLiteral(iterator: HighlighterIterator, chars: CharSequence) =
-    iterator.getStart >= iterator.getEnd - 1 || chars.charAt(iterator.getEnd - 1) != '\"'
+  override protected def isNonClosedLiteral(
+      iterator: HighlighterIterator, chars: CharSequence) =
+    iterator.getStart >= iterator.getEnd - 1 ||
+    chars.charAt(iterator.getEnd - 1) != '\"'
 
   def getConcatenatableStringTokenTypes = TokenSet.EMPTY
 
@@ -20,5 +24,4 @@ class HoconQuoteHandler extends SimpleTokenSetQuoteHandler(HoconTokenType.Quoted
   def needParenthesesAroundConcatenation(element: PsiElement) = false
 
   def isAppropriateElementTypeForLiteral(tokenType: IElementType) = true
-
 }

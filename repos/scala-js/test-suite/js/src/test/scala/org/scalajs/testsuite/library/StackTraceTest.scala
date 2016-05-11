@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.library
 
@@ -18,8 +18,8 @@ import org.scalajs.testsuite.utils.Platform._
 class StackTraceTest {
   import StackTraceTest._
 
-  private def verifyClassMethodNames(
-      places: (String, String)*)(body: => Any): Unit = {
+  private def verifyClassMethodNames(places: (String, String)*)(
+      body: => Any): Unit = {
     try {
       body
       throw new AssertionError("body should have thrown an exception")
@@ -27,7 +27,8 @@ class StackTraceTest {
       case e: IllegalArgumentException =>
         val trace = e.getStackTrace()
         for ((className, methodName) <- places) {
-          assertTrue(trace exists { elem =>
+          assertTrue(
+              trace exists { elem =>
             /* We use startsWith for class name because some VMs will add
              * additional information at the end of the class name, for some
              * reason + there can be a '$class' suffix for methods in impl
@@ -62,20 +63,21 @@ class StackTraceTest {
         new Foo().h(78)
       }
 
-      verifyClassMethodNames("Foo" -> "f", "FooTrait" -> "h",
-          "Baz" -> "<init>") {
+      verifyClassMethodNames(
+          "Foo" -> "f", "FooTrait" -> "h", "Baz" -> "<init>") {
         new Baz()
       }
 
-      verifyClassMethodNames("Foo" -> "f", "Bar" -> "g",
-          "Foobar$" -> "<clinit>", "Foobar$" -> "<init>") {
+      verifyClassMethodNames("Foo" -> "f",
+                             "Bar" -> "g",
+                             "Foobar$" -> "<clinit>",
+                             "Foobar$" -> "<init>") {
         Foobar.z
       }
     } finally {
       Error.stackTraceLimit = oldStackTraceLimit
     }
   }
-
 }
 
 object StackTraceTest {
@@ -90,10 +92,8 @@ object StackTraceTest {
   class Foo extends FooTrait {
     @noinline
     def f(x: Int): Int = {
-      if (x > 10)
-        throw new IllegalArgumentException(x.toString)
-      else
-        x + 4
+      if (x > 10) throw new IllegalArgumentException(x.toString)
+      else x + 4
     }
   }
 

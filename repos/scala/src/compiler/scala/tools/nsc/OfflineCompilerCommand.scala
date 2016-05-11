@@ -10,10 +10,11 @@ import io.Directory
 import Properties.isWin
 
 /** A compiler command for the offline compiler.
- *
- * @author Martin Odersky and Lex Spoon
- */
-class OfflineCompilerCommand(arguments: List[String], settings: FscSettings) extends CompilerCommand(arguments, settings) {
+  *
+  * @author Martin Odersky and Lex Spoon
+  */
+class OfflineCompilerCommand(arguments: List[String], settings: FscSettings)
+    extends CompilerCommand(arguments, settings) {
   import settings.currentDir
   def extraFscArgs = List(currentDir.name, currentDir.value)
 
@@ -30,17 +31,17 @@ class OfflineCompilerCommand(arguments: List[String], settings: FscSettings) ext
         else Directory(pwd)
       }
       currentDir.value = baseDirectory.path
-    }
-    else {
+    } else {
       // Otherwise we're on the server and will use it to absolutize the paths.
       settings.absolutize()
     }
   }
 
   override def cmdName = "fsc"
-  override def usageMsg = (
-    createUsageMsg("where possible fsc", shouldExplain = false, x => x.isStandard && settings.isFscSpecific(x.name)) +
-    "\n\nStandard scalac options also available:" +
-    createUsageMsg(x => x.isStandard && !settings.isFscSpecific(x.name))
-  )
+  override def usageMsg =
+    (createUsageMsg("where possible fsc",
+                    shouldExplain = false,
+                    x => x.isStandard && settings.isFscSpecific(x.name)) +
+        "\n\nStandard scalac options also available:" + createUsageMsg(
+            x => x.isStandard && !settings.isFscSpecific(x.name)))
 }

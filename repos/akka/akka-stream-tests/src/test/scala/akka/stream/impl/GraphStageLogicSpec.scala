@@ -1,9 +1,9 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl
 
-import akka.stream.stage.GraphStageLogic.{ EagerTerminateOutput, EagerTerminateInput }
+import akka.stream.stage.GraphStageLogic.{EagerTerminateOutput, EagerTerminateInput}
 import akka.testkit.AkkaSpec
 import akka.stream._
 import akka.stream.Fusing.aggressive
@@ -71,64 +71,84 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
   object emitEmptyIterable extends GraphStage[SourceShape[Int]] {
     val out = Outlet[Int]("out")
     override val shape = SourceShape(out)
-    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = new GraphStageLogic(shape) {
-
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = emitMultiple(out, Iterator.empty, () ⇒ emit(out, 42, () ⇒ completeStage()))
-      })
-
-    }
-  }
-
-  final case class ReadNEmitN(n: Int) extends GraphStage[FlowShape[Int, Int]] {
-    override val shape = FlowShape(Inlet[Int]("readN.in"), Outlet[Int]("readN.out"))
-
-    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(
+        inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
-        setHandler(shape.in, EagerTerminateInput)
-        setHandler(shape.out, EagerTerminateOutput)
-        override def preStart(): Unit = readN(shape.in, n)(e ⇒ emitMultiple(shape.out, e.iterator, () ⇒ completeStage()), (_) ⇒ ())
+
+        setHandler(out, new OutHandler {
+          override def onPull(): Unit =
+            emitMultiple(
+                out, Iterator.empty, () ⇒ emit(out, 42, () ⇒ completeStage()))
+        })
       }
   }
 
-  final case class ReadNEmitRestOnComplete(n: Int) extends GraphStage[FlowShape[Int, Int]] {
-    override val shape = FlowShape(Inlet[Int]("readN.in"), Outlet[Int]("readN.out"))
+  final case class ReadNEmitN(n: Int) extends GraphStage[FlowShape[Int, Int]] {
+    override val shape = FlowShape(
+        Inlet[Int]("readN.in"), Outlet[Int]("readN.out"))
 
-    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(
+        inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
         setHandler(shape.in, EagerTerminateInput)
         setHandler(shape.out, EagerTerminateOutput)
         override def preStart(): Unit =
           readN(shape.in, n)(
-            _ ⇒ failStage(new IllegalStateException("Shouldn't happen!")),
-            e ⇒ emitMultiple(shape.out, e.iterator, () ⇒ completeStage()))
+              e ⇒ emitMultiple(shape.out, e.iterator, () ⇒ completeStage()),
+              (_) ⇒ ())
+      }
+  }
+
+  final case class ReadNEmitRestOnComplete(n: Int)
+      extends GraphStage[FlowShape[Int, Int]] {
+    override val shape = FlowShape(
+        Inlet[Int]("readN.in"), Outlet[Int]("readN.out"))
+
+    override def createLogic(
+        inheritedAttributes: Attributes): GraphStageLogic =
+      new GraphStageLogic(shape) {
+        setHandler(shape.in, EagerTerminateInput)
+        setHandler(shape.out, EagerTerminateOutput)
+        override def preStart(): Unit =
+          readN(shape.in, n)(
+              _ ⇒ failStage(new IllegalStateException("Shouldn't happen!")),
+              e ⇒ emitMultiple(shape.out, e.iterator, () ⇒ completeStage()))
       }
   }
 
   "A GraphStageLogic" must {
 
     "read N and emit N before completing" in assertAllStagesStopped {
-      Source(1 to 10).via(ReadNEmitN(2)).runWith(TestSink.probe)
+      Source(1 to 10)
+        .via(ReadNEmitN(2))
+        .runWith(TestSink.probe)
         .request(10)
         .expectNext(1, 2)
         .expectComplete()
     }
 
     "read N should not emit if upstream completes before N is sent" in assertAllStagesStopped {
-      Source(1 to 5).via(ReadNEmitN(6)).runWith(TestSink.probe)
+      Source(1 to 5)
+        .via(ReadNEmitN(6))
+        .runWith(TestSink.probe)
         .request(10)
         .expectComplete()
     }
 
     "read N should not emit if upstream fails before N is sent" in assertAllStagesStopped {
       val error = new IllegalArgumentException("Don't argue like that!")
-      Source(1 to 5).map(x ⇒ if (x > 3) throw error else x).via(ReadNEmitN(6)).runWith(TestSink.probe)
+      Source(1 to 5)
+        .map(x ⇒ if (x > 3) throw error else x)
+        .via(ReadNEmitN(6))
+        .runWith(TestSink.probe)
         .request(10)
         .expectError(error)
     }
 
     "read N should provide elements read if onComplete happens before N elements have been seen" in assertAllStagesStopped {
-      Source(1 to 5).via(ReadNEmitRestOnComplete(6)).runWith(TestSink.probe)
+      Source(1 to 5)
+        .via(ReadNEmitRestOnComplete(6))
+        .runWith(TestSink.probe)
         .request(10)
         .expectNext(1, 2, 3, 4, 5)
         .expectComplete()
@@ -136,26 +156,32 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
     "emit all things before completing" in assertAllStagesStopped {
 
-      Source.empty.via(emit1234.named("testStage")).runWith(TestSink.probe)
+      Source.empty
+        .via(emit1234.named("testStage"))
+        .runWith(TestSink.probe)
         .request(5)
         .expectNext(1, 2, 3, 4)
         .expectComplete()
-
     }
 
     "emit all things before completing with two fused stages" in assertAllStagesStopped {
       val g = aggressive(Flow[Int].via(emit1234).via(emit5678))
 
-      Source.empty.via(g).runWith(TestSink.probe)
+      Source.empty
+        .via(g)
+        .runWith(TestSink.probe)
         .request(9)
         .expectNextN(1 to 8)
         .expectComplete()
     }
 
     "emit all things before completing with three fused stages" in assertAllStagesStopped {
-      val g = aggressive(Flow[Int].via(emit1234).via(passThrough).via(emit5678))
+      val g =
+        aggressive(Flow[Int].via(emit1234).via(passThrough).via(emit5678))
 
-      Source.empty.via(g).runWith(TestSink.probe)
+      Source.empty
+        .via(g)
+        .runWith(TestSink.probe)
         .request(9)
         .expectNextN(1 to 8)
         .expectComplete()
@@ -163,8 +189,8 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
     "emit properly after empty iterable" in assertAllStagesStopped {
 
-      Source.fromGraph(emitEmptyIterable).runWith(Sink.seq).futureValue should ===(List(42))
-
+      Source.fromGraph(emitEmptyIterable).runWith(Sink.seq).futureValue should ===(
+          List(42))
     }
 
     "invoke lifecycle hooks in the right order" in assertAllStagesStopped {
@@ -172,17 +198,18 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
         val in = Inlet[Int]("in")
         val out = Outlet[Int]("out")
         override val shape = FlowShape(in, out)
-        override def createLogic(attr: Attributes) = new GraphStageLogic(shape) {
-          setHandler(in, eagerTerminateInput)
-          setHandler(out, new OutHandler {
-            override def onPull(): Unit = {
-              completeStage()
-              testActor ! "pulled"
-            }
-          })
-          override def preStart(): Unit = testActor ! "preStart"
-          override def postStop(): Unit = testActor ! "postStop"
-        }
+        override def createLogic(attr: Attributes) =
+          new GraphStageLogic(shape) {
+            setHandler(in, eagerTerminateInput)
+            setHandler(out, new OutHandler {
+              override def onPull(): Unit = {
+                completeStage()
+                testActor ! "pulled"
+              }
+            })
+            override def preStart(): Unit = testActor ! "preStart"
+            override def postStop(): Unit = testActor ! "postStop"
+          }
       }
       Source.single(1).via(g).runWith(Sink.ignore)
       expectMsg("preStart")
@@ -195,11 +222,12 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
         val in = Inlet[Int]("in")
         val out = Outlet[Int]("out")
         override val shape = FlowShape(in, out)
-        override def createLogic(attr: Attributes) = new GraphStageLogic(shape) {
-          setHandler(in, eagerTerminateInput)
-          setHandler(out, eagerTerminateOutput)
-          override def postStop(): Unit = testActor ! "postStop2"
-        }
+        override def createLogic(attr: Attributes) =
+          new GraphStageLogic(shape) {
+            setHandler(in, eagerTerminateInput)
+            setHandler(out, eagerTerminateOutput)
+            override def postStop(): Unit = testActor ! "postStop2"
+          }
       }
 
       builder(g, passThrough)
@@ -220,7 +248,5 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
       interpreter.isStageCompleted(interpreter.logics(0)) should ===(true)
       interpreter.isStageCompleted(interpreter.logics(1)) should ===(false)
     }
-
   }
-
 }

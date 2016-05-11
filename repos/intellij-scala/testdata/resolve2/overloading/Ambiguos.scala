@@ -11,5 +11,6 @@ object Test extends Application {
 
   import A._, B._
 
-  /* resolved: false */foo(3)
+  /* resolved: false */
+  foo(3)
 }

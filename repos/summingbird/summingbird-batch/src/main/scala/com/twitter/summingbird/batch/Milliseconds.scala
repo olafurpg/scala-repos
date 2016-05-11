@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird.batch
 
@@ -25,5 +25,6 @@ case class Milliseconds(toLong: Long) extends Ordered[Milliseconds] {
 object Milliseconds {
   val Max = Milliseconds(Long.MaxValue)
   val Min = Milliseconds(Long.MinValue)
-  implicit val orderingOnTimestamp: Ordering[Milliseconds] = Ordering.by(_.toLong)
+  implicit val orderingOnTimestamp: Ordering[Milliseconds] =
+    Ordering.by(_.toLong)
 }

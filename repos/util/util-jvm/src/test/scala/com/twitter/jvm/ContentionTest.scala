@@ -25,8 +25,8 @@ class Philosopher {
 @RunWith(classOf[JUnitRunner])
 class ContentionTest extends FunSuite with Eventually {
 
-  implicit override val patienceConfig =
-    PatienceConfig(timeout = scaled(Span(15, Seconds)), interval = scaled(Span(5, Millis)))
+  implicit override val patienceConfig = PatienceConfig(
+      timeout = scaled(Span(15, Seconds)), interval = scaled(Span(5, Millis)))
 
   test("Deadlocks") {
     val c = new ContentionSnapshot()
@@ -34,12 +34,14 @@ class ContentionTest extends FunSuite with Eventually {
     val descartes = new Philosopher()
     val plato = new Philosopher()
 
-    val d = new Thread(new Runnable() {
+    val d = new Thread(
+        new Runnable() {
       def run() { descartes.dine(plato) }
     })
     d.start()
 
-    val p = new Thread(new Runnable() {
+    val p = new Thread(
+        new Runnable() {
       def run() { plato.dine(descartes) }
     })
     p.start()

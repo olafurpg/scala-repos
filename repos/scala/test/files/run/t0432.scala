@@ -1,4 +1,3 @@
-
 import scala.language.reflectiveCalls
 
 object Test {

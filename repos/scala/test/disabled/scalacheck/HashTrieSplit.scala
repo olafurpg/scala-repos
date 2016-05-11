@@ -1,12 +1,4 @@
-
-
-
-
-
 import collection._
-
-
-
 
 // checks whether hash tries split their iterators correctly
 // even after some elements have been traversed
@@ -14,7 +6,7 @@ object Test {
   def main(args: Array[String]) {
     doesSplitOk
   }
-  
+
   def doesSplitOk = {
     val sz = 2000
     var ht = new parallel.immutable.ParHashMap[Int, Int]

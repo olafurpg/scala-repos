@@ -18,7 +18,8 @@ import org.scalacheck.Arbitrary.arbitrary
 // https://issues.scala-lang.org/browse/SI-7934
 @deprecated("", "")
 class DeprecatedForwarder {
-  implicit def runNow = scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+  implicit def runNow =
+    scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
 }
 object DeprecatedForwarder extends DeprecatedForwarder
 import DeprecatedForwarder.runNow
@@ -29,7 +30,7 @@ class FutureTests extends CatsSuite {
   def futureXor[A](f: Future[A]): Future[Xor[Throwable, A]] =
     f.map(Xor.right[Throwable, A]).recover { case t => Xor.left(t) }
 
-  implicit def eqfa[A: Eq]: Eq[Future[A]] =
+  implicit def eqfa[A : Eq]: Eq[Future[A]] =
     new Eq[Future[A]] {
       def eqv(fx: Future[A], fy: Future[A]): Boolean = {
         val fz = futureXor(fx) zip futureXor(fy)
@@ -37,15 +38,15 @@ class FutureTests extends CatsSuite {
       }
     }
 
-  implicit val throwableEq: Eq[Throwable] =
-    Eq.fromUniversalEquals
+  implicit val throwableEq: Eq[Throwable] = Eq.fromUniversalEquals
 
   implicit val comonad: Comonad[Future] = futureComonad(timeout)
 
   // Need non-fatal Throwables for Future recoverWith/handleError
-  implicit val nonFatalArbitrary: Arbitrary[Throwable] =
-    Arbitrary(arbitrary[Exception].map(identity))
+  implicit val nonFatalArbitrary: Arbitrary[Throwable] = Arbitrary(
+      arbitrary[Exception].map(identity))
 
-  checkAll("Future[Int]", MonadErrorTests[Future, Throwable].monadError[Int, Int, Int])
+  checkAll("Future[Int]",
+           MonadErrorTests[Future, Throwable].monadError[Int, Int, Int])
   checkAll("Future[Int]", ComonadTests[Future].comonad[Int, Int, Int])
 }

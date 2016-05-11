@@ -14,20 +14,21 @@ final class Search(collection: Coll) {
 
   private type Result = List[BSONDocument]
 
-  private case class Search(
-      collectionName: String,
-      search: String,
-      filter: Option[BSONDocument] = None) extends Command[Result] {
+  private case class Search(collectionName: String,
+                            search: String,
+                            filter: Option[BSONDocument] = None)
+      extends Command[Result] {
 
-    override def makeDocuments = BSONDocument(
-      "text" -> collectionName,
-      "search" -> search,
-      "filter" -> filter)
+    override def makeDocuments =
+      BSONDocument("text" -> collectionName,
+                   "search" -> search,
+                   "filter" -> filter)
 
     val ResultMaker = new BSONCommandResultMaker[Result] {
+
       /**
-       * Deserializes the given response into an instance of Result.
-       */
+        * Deserializes the given response into an instance of Result.
+        */
       def apply(document: BSONDocument): Either[CommandError, Result] =
         CommandError.checkOk(document, Some("search")) toLeft {
           document.getAs[List[BSONDocument]]("results") getOrElse Nil
@@ -36,8 +37,10 @@ final class Search(collection: Coll) {
   }
 
   def apply(q: String): Fu[List[Question]] =
-    collection.find(BSONDocument(
-      "$text" -> BSONDocument("$search" -> q)
-    )).cursor[Question]().collect[List]()
+    collection
+      .find(BSONDocument(
+              "$text" -> BSONDocument("$search" -> q)
+          ))
+      .cursor[Question]()
+      .collect[List]()
 }
-

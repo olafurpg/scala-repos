@@ -12,11 +12,13 @@ class AbstractFileClassLoaderTest {
   import scala.io.Source
   import scala.io.Codec.UTF8
   import scala.reflect.io.Streamable
-  import java.net.{ URLClassLoader, URL }
+  import java.net.{URLClassLoader, URL}
 
   implicit def `we love utf8` = UTF8
   implicit class `abs file ops`(f: AbstractFile) {
-    def writeContent(s: String): Unit = Streamable.closing(f.bufferedOutput)(os => os write s.getBytes(UTF8.charSet))
+    def writeContent(s: String): Unit =
+      Streamable.closing(f.bufferedOutput)(
+          os => os write s.getBytes(UTF8.charSet))
   }
   implicit class `url slurp`(url: URL) {
     def slurp(): String = Streamable.slurp(url)
@@ -111,7 +113,9 @@ class AbstractFileClassLoaderTest {
     val x = new AbstractFileClassLoader(fuzz, NoClassLoader)
     val r = x.getResourceAsStream("buzz/booz.class")
     assertNotNull(r)
-    assertEquals("hello, world", Streamable.closing(r)(is => Source.fromInputStream(is).mkString))
+    assertEquals(
+        "hello, world",
+        Streamable.closing(r)(is => Source.fromInputStream(is).mkString))
   }
 
   @Test

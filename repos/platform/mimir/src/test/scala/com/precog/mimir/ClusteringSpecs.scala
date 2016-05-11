@@ -33,10 +33,10 @@ import blueeyes.json._
 
 import scalaz._
 
-trait ClusteringLibSpecs[M[+_]] extends Specification
-    with EvaluatorTestSupport[M]
-    with ClusteringTestSupport
-    with LongIdMemoryDatasetConsumer[M]{ self =>
+trait ClusteringLibSpecs[M[+ _]]
+    extends Specification with EvaluatorTestSupport[M]
+    with ClusteringTestSupport with LongIdMemoryDatasetConsumer[M] {
+  self =>
 
   import dag._
   import instructions._
@@ -51,17 +51,27 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
     }
   }
 
-  implicit def arrayOps[@specialized(Double) A](lhs: Array[A]) = new ArrayOps(lhs)
+  implicit def arrayOps[@specialized(Double) A](lhs: Array[A]) =
+    new ArrayOps(lhs)
 
-  def kMediansCost(points: Array[Array[Double]], centers: Array[Array[Double]]): Double = {
+  def kMediansCost(
+      points: Array[Array[Double]], centers: Array[Array[Double]]): Double = {
     points.foldLeft(0.0) { (cost, p) =>
-      cost + centers.map({ c => (p - c).norm }).qmin
+      cost + centers
+        .map({ c =>
+          (p - c).norm
+        })
+        .qmin
     }
   }
 
   val ClusterIdPattern = """cluster\d+""".r
 
-  def isGoodCluster(clusterMap: Map[String, SValue], points: Array[Array[Double]], centers: Array[Array[Double]], k: Int, dimension: Int) = {
+  def isGoodCluster(clusterMap: Map[String, SValue],
+                    points: Array[Array[Double]],
+                    centers: Array[Array[Double]],
+                    k: Int,
+                    dimension: Int) = {
     val targetCost = kMediansCost(points, centers)
 
     clusterMap must haveSize(k)
@@ -77,22 +87,23 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
       case _ => sys.error("not supported")
     }
 
-    val clusters: Array[Array[Double]] = clusterMap.values.map({ sval =>
-      val arr = getPoint(sval)
-      arr must haveSize(dimension)
-      arr.toArray
-    }).toArray
+    val clusters: Array[Array[Double]] = clusterMap.values
+      .map({ sval =>
+        val arr = getPoint(sval)
+        arr must haveSize(dimension)
+        arr.toArray
+      })
+      .toArray
 
     val cost = kMediansCost(points, clusters)
-    
+
     cost must be_<(3 * targetCost)
   }
 
   def clusterInput(dataset: String, k: Long) = {
     dag.Morph2(KMediansClustering,
-      dag.AbsoluteLoad(Const(CString(dataset))(line))(line),
-      dag.Const(CLong(k))(line)
-    )(line)
+               dag.AbsoluteLoad(Const(CString(dataset))(line))(line),
+               dag.Const(CLong(k))(line))(line)
   }
 
   "k-medians clustering" should {
@@ -107,11 +118,13 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
         result must haveSize(1)
 
-        result must haveAllElementsLike { case (ids, SObject(obj)) if ids.size == 0 => 
-          obj.keys mustEqual Set("model1")
-          obj("model1") must beLike {
-            case SObject(clusterMap) => isGoodCluster(clusterMap, points, centers, k, dimension)
-          }
+        result must haveAllElementsLike {
+          case (ids, SObject(obj)) if ids.size == 0 =>
+            obj.keys mustEqual Set("model1")
+            obj("model1") must beLike {
+              case SObject(clusterMap) =>
+                isGoodCluster(clusterMap, points, centers, k, dimension)
+            }
         }
       }
     }
@@ -121,23 +134,23 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
       val clusterIds = (1 to k).map("cluster" + _).toSet
 
       val input = dag.Morph2(KMediansClustering,
-        dag.Const(CNum(4.4))(line),
-        dag.Const(CLong(k))(line)
-      )(line)
+                             dag.Const(CNum(4.4))(line),
+                             dag.Const(CLong(k))(line))(line)
 
       val result = testEval(input)
 
       result must haveSize(1)
 
-      result must haveAllElementsLike { case (ids, SObject(obj)) if ids.size == 0 => 
-        obj.keys mustEqual Set("model1")
-        obj("model1") must beLike { 
-          case SObject(clusterMap) => 
-            clusterMap.keys mustEqual clusterIds
-            clusterIds.map(clusterMap(_)) must haveAllElementsLike { 
-              case SDecimal(d) => d mustEqual(4.4)
-            } 
-        }
+      result must haveAllElementsLike {
+        case (ids, SObject(obj)) if ids.size == 0 =>
+          obj.keys mustEqual Set("model1")
+          obj("model1") must beLike {
+            case SObject(clusterMap) =>
+              clusterMap.keys mustEqual clusterIds
+              clusterIds.map(clusterMap(_)) must haveAllElementsLike {
+                case SDecimal(d) => d mustEqual (4.4)
+              }
+          }
       }
     }
 
@@ -157,18 +170,20 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
       val expected = resultNumbers collect { case (_, SDecimal(num)) => num }
 
-      result must haveAllElementsLike { case (ids, SObject(obj)) if ids.size == 0 => 
-        obj.keys mustEqual Set("model1")
-        obj("model1") must beLike { 
-          case SObject(clusterMap) => 
-            clusterMap.keys mustEqual clusterIds
-            clusterIds.map(clusterMap(_)) must haveAllElementsLike { 
-              case SDecimal(d) => expected must contain(d)
-            } 
+      result must haveAllElementsLike {
+        case (ids, SObject(obj)) if ids.size == 0 =>
+          obj.keys mustEqual Set("model1")
+          obj("model1") must beLike {
+            case SObject(clusterMap) =>
+              clusterMap.keys mustEqual clusterIds
+              clusterIds.map(clusterMap(_)) must haveAllElementsLike {
+                case SDecimal(d) => expected must contain(d)
+              }
 
-            val actual = clusterIds.map(clusterMap(_)) collect { case SDecimal(d) => d }
-            actual.toSet mustEqual expected
-        }
+              val actual =
+                clusterIds.map(clusterMap(_)) collect { case SDecimal(d) => d }
+              actual.toSet mustEqual expected
+          }
       }
     }
 
@@ -188,18 +203,22 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
       val expected = resultData collect { case (_, SObject(obj)) => obj }
 
-      result must haveAllElementsLike { case (ids, SObject(obj)) if ids.size == 0 => 
-        obj.keys mustEqual Set("model1")
-        obj("model1") must beLike { 
-          case SObject(clusterMap) => 
-            clusterMap.keys mustEqual clusterIds
-            clusterIds.map(clusterMap(_)) must haveAllElementsLike { 
-              case SObject(obj) => expected must contain(obj)
-            } 
+      result must haveAllElementsLike {
+        case (ids, SObject(obj)) if ids.size == 0 =>
+          obj.keys mustEqual Set("model1")
+          obj("model1") must beLike {
+            case SObject(clusterMap) =>
+              clusterMap.keys mustEqual clusterIds
+              clusterIds.map(clusterMap(_)) must haveAllElementsLike {
+                case SObject(obj) => expected must contain(obj)
+              }
 
-            val actual = clusterIds.map(clusterMap(_)) collect { case SObject(obj) => obj }
-            actual.toSet mustEqual expected
-        }
+              val actual =
+                clusterIds.map(clusterMap(_)) collect {
+                  case SObject(obj) => obj
+                }
+              actual.toSet mustEqual expected
+          }
       }
     }
 
@@ -211,8 +230,14 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
       val GeneratedPointSet(pointsA, centersA) = genPoints(5000, dimensionA, k)
       val GeneratedPointSet(pointsB, centersB) = genPoints(5000, dimensionB, k)
 
-      val jvalsA = pointsToJson(pointsA) map { v => RObject(Map("a" -> v)) }
-      val jvalsB = pointsToJson(pointsB) map { v => RObject(Map("b" -> v)) }
+      val jvalsA =
+        pointsToJson(pointsA) map { v =>
+          RObject(Map("a" -> v))
+        }
+      val jvalsB =
+        pointsToJson(pointsB) map { v =>
+          RObject(Map("b" -> v))
+        }
       val jvals = Random.shuffle(jvalsA ++ jvalsB)
 
       writeRValuesToDataset(jvals) { dataset =>
@@ -222,22 +247,32 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
         result must haveSize(1)
 
-        result must haveAllElementsLike { case (ids, SObject(obj)) if ids.size == 0 => 
-          obj.keys mustEqual Set("model1", "model2")
-          
-          def checkmodel(model: SValue) = model must beLike {
-            case SObject(clusterMap) =>
-              clusterMap("cluster1") must beLike { case SObject(schemadCluster) =>
-                if (schemadCluster contains "a") {
-                  isGoodCluster(clusterMap, pointsA, centersA, k, dimensionA)
-                } else {
-                  isGoodCluster(clusterMap, pointsB, centersB, k, dimensionB)
-                }
-              }
-          }
+        result must haveAllElementsLike {
+          case (ids, SObject(obj)) if ids.size == 0 =>
+            obj.keys mustEqual Set("model1", "model2")
 
-          checkmodel(obj("model1"))
-          checkmodel(obj("model2"))
+            def checkmodel(model: SValue) = model must beLike {
+              case SObject(clusterMap) =>
+                clusterMap("cluster1") must beLike {
+                  case SObject(schemadCluster) =>
+                    if (schemadCluster contains "a") {
+                      isGoodCluster(clusterMap,
+                                    pointsA,
+                                    centersA,
+                                    k,
+                                    dimensionA)
+                    } else {
+                      isGoodCluster(clusterMap,
+                                    pointsB,
+                                    centersB,
+                                    k,
+                                    dimensionB)
+                    }
+                }
+            }
+
+            checkmodel(obj("model1"))
+            checkmodel(obj("model2"))
         }
       }
     }
@@ -248,10 +283,11 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
       val GeneratedPointSet(pointsA, centersA) = genPoints(5000, dimension, k)
 
-      val points = pointsA.zipWithIndex map {
-        case (p, i) if i % 3 == 2 => p ++ Array.fill(3)(Random.nextDouble)
-        case (p, _) => p
-      }
+      val points =
+        pointsA.zipWithIndex map {
+          case (p, i) if i % 3 == 2 => p ++ Array.fill(3)(Random.nextDouble)
+          case (p, _) => p
+        }
 
       writePointsToDataset(points) { dataset =>
         val input = clusterInput(dataset, k)
@@ -260,72 +296,86 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
         result must haveSize(1)
 
-        result must haveAllElementsLike { case (ids, SObject(obj)) if ids.size == 0 => 
-          obj.keys mustEqual Set("model1", "model2")
-          
-          def checkmodel(model: SValue) = model must beLike {
-            case SObject(clusterMap) =>
-              clusterMap("cluster1") must beLike {
-                case SArray(arr) if arr.size == 6 =>
-                  isGoodCluster(clusterMap, pointsA, centersA, k, dimension)
-                case SArray(arr) if arr.size == 9 =>
-                  ok
-              }
-          }
+        result must haveAllElementsLike {
+          case (ids, SObject(obj)) if ids.size == 0 =>
+            obj.keys mustEqual Set("model1", "model2")
 
-          checkmodel(obj("model1"))
-          checkmodel(obj("model2"))
+            def checkmodel(model: SValue) = model must beLike {
+              case SObject(clusterMap) =>
+                clusterMap("cluster1") must beLike {
+                  case SArray(arr) if arr.size == 6 =>
+                    isGoodCluster(clusterMap, pointsA, centersA, k, dimension)
+                  case SArray(arr) if arr.size == 9 =>
+                    ok
+                }
+            }
+
+            checkmodel(obj("model1"))
+            checkmodel(obj("model2"))
         }
       }
     }
   }
 
-  def assign(points: Array[Array[Double]], centers: Array[Array[Double]]): Map[RValue, String] = {
+  def assign(points: Array[Array[Double]],
+             centers: Array[Array[Double]]): Map[RValue, String] = {
     points.map { p =>
-      val id = (0 until centers.length) minBy { i => (p - centers(i)).norm }
-      pointToJson(p) -> ("cluster" + (id +  1))
+      val id =
+        (0 until centers.length) minBy { i =>
+          (p - centers(i)).norm
+        }
+      pointToJson(p) -> ("cluster" + (id + 1))
     }.toMap
   }
 
   def makeClusters(centers: Array[Array[Double]]) = {
-    RObject(pointsToJson(centers).zipWithIndex.map { case (ctr, idx) => 
-      ("cluster" + (idx + 1), ctr)
+    RObject(
+        pointsToJson(centers).zipWithIndex.map {
+      case (ctr, idx) =>
+        ("cluster" + (idx + 1), ctr)
     }.toMap)
   }
 
   def createDAG(pointsDataSet: String, modelDataSet: String) = {
     val points = dag.AbsoluteLoad(Const(CString(pointsDataSet))(line))(line)
 
-    val input = dag.Morph2(AssignClusters,
-      points,
-      dag.AbsoluteLoad(Const(CString(modelDataSet))(line))(line)
-    )(line)
+    val input = dag.Morph2(
+        AssignClusters,
+        points,
+        dag.AbsoluteLoad(Const(CString(modelDataSet))(line))(line))(line)
 
-    dag.Join(JoinObject, IdentitySort,
-      input,
-      dag.Join(WrapObject, Cross(Some(TableModule.CrossOrder.CrossRight)),
-        Const(CString("point"))(line),
-        points)(line))(line)
+    dag.Join(JoinObject,
+             IdentitySort,
+             input,
+             dag.Join(WrapObject,
+                      Cross(Some(TableModule.CrossOrder.CrossRight)),
+                      Const(CString("point"))(line),
+                      points)(line))(line)
   }
 
-  def testCluster(model: Map[String, SValue], clusterMap: Map[String, RValue], assignments: Map[RValue, String], point: RValue) = {
+  def testCluster(model: Map[String, SValue],
+                  clusterMap: Map[String, RValue],
+                  assignments: Map[RValue, String],
+                  point: RValue) = {
     model.keySet mustEqual Set("clusterId", "clusterCenter")
 
-    model("clusterId") must beLike { case SString(clusterId) =>
-      clusterId must_== assignments(point)
+    model("clusterId") must beLike {
+      case SString(clusterId) =>
+        clusterId must_== assignments(point)
     }
 
-    model("clusterCenter") must beLike { case SArray(arr0) =>
-      val arr = arr0 collect { case SDecimal(d) => d } 
+    model("clusterCenter") must beLike {
+      case SArray(arr0) =>
+        val arr = arr0 collect { case SDecimal(d) => d }
 
-      val rvalue = clusterMap((model("clusterId"): @unchecked) match {
-        case SString(s) => s
-      })
-      val res = (rvalue: @unchecked) match {
-        case RArray(values) => values collect { case CNum(x) => x }
-      }
+        val rvalue = clusterMap((model("clusterId"): @unchecked) match {
+          case SString(s) => s
+        })
+        val res = (rvalue: @unchecked) match {
+          case RArray(values) => values collect { case CNum(x) => x }
+        }
 
-      arr must_== res
+        arr must_== res
     }
   }
 
@@ -340,7 +390,7 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
       val clusters = makeClusters(centers)
 
       val clusterMap = clusters match { case RObject(xs) => xs }
-      
+
       val model1 = RObject(Map("model1" -> clusters))
       val assignments = assign(points, centers)
 
@@ -351,15 +401,17 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
           result must haveSize(size)
 
-          result must haveAllElementsLike { case (ids, SObject(obj)) =>
-            ids.length mustEqual 2
-            obj.keySet mustEqual Set("point", "model1")
+          result must haveAllElementsLike {
+            case (ids, SObject(obj)) =>
+              ids.length mustEqual 2
+              obj.keySet mustEqual Set("point", "model1")
 
-            val point = obj("point")
+              val point = obj("point")
 
-            obj("model1") must beLike { case SObject(model) =>
-              testCluster(model, clusterMap, assignments, point.toRValue)
-            }
+              obj("model1") must beLike {
+                case SObject(model) =>
+                  testCluster(model, clusterMap, assignments, point.toRValue)
+              }
           }
         }
       }
@@ -394,30 +446,37 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
           result must haveSize(points.size)
 
-          result must haveAllElementsLike { case (ids, SObject(obj)) =>
-            ids.length mustEqual 2
+          result must haveAllElementsLike {
+            case (ids, SObject(obj)) =>
+              ids.length mustEqual 2
 
-            (obj.keySet mustEqual Set("point", "model1")) or 
+              (obj.keySet mustEqual Set("point", "model1")) or
               (obj.keySet mustEqual Set("point", "model1", "model2"))
 
-            val point = obj("point")
+              val point = obj("point")
 
-            point must beLike { case SArray(arr) =>
-              (arr must haveSize(dimensionA)) or
-                (arr must haveSize(dimensionB))
-            }
-
-            obj("model1") must beLike { case SObject(model) =>
-              testCluster(model, clusterMapA, assignmentsA, point.toRValue)
-            }
-
-            if (obj.contains("model2")) {
-              obj("model2") must beLike { case SObject(model) =>
-                testCluster(model, clusterMapB, assignmentsB, point.toRValue)
+              point must beLike {
+                case SArray(arr) =>
+                  (arr must haveSize(dimensionA)) or
+                  (arr must haveSize(dimensionB))
               }
-            } else {
-              ok
-            }
+
+              obj("model1") must beLike {
+                case SObject(model) =>
+                  testCluster(model, clusterMapA, assignmentsA, point.toRValue)
+              }
+
+              if (obj.contains("model2")) {
+                obj("model2") must beLike {
+                  case SObject(model) =>
+                    testCluster(model,
+                                clusterMapB,
+                                assignmentsB,
+                                point.toRValue)
+                }
+              } else {
+                ok
+              }
           }
         }
       }
@@ -430,10 +489,11 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
       val GeneratedPointSet(points0, centers) = genPoints(size, dimension, k)
 
-      val points = points0.zipWithIndex map {
-        case (p, i) if i % 3 == 2 => p ++ Array.fill(3)(Random.nextDouble)
-        case (p, _) => p
-      }
+      val points =
+        points0.zipWithIndex map {
+          case (p, i) if i % 3 == 2 => p ++ Array.fill(3)(Random.nextDouble)
+          case (p, _) => p
+        }
 
       val clusters = makeClusters(centers)
 
@@ -450,41 +510,68 @@ trait ClusteringLibSpecs[M[+_]] extends Specification
 
           result must haveSize(size)
 
-          result must haveAllElementsLike { case (ids, SObject(obj)) =>
-            ids.length mustEqual 2
+          result must haveAllElementsLike {
+            case (ids, SObject(obj)) =>
+              ids.length mustEqual 2
 
-            (obj.keySet mustEqual Set("point", "model1"))
+              (obj.keySet mustEqual Set("point", "model1"))
 
-            val point = obj("point")
+              val point = obj("point")
 
-            obj("model1") must beLike { case SObject(model) =>
-              testCluster(model, clusterMap, assignments, point.toRValue)
-            }
+              obj("model1") must beLike {
+                case SObject(model) =>
+                  testCluster(model, clusterMap, assignments, point.toRValue)
+              }
           }
         }
       }
     }
 
     "assign correctly with multiple rows of schema with overlapping modelIds" in {
-      val input = dag.Morph2(AssignClusters,
-        dag.AbsoluteLoad(Const(CString("/hom/clusteringData"))(line))(line),
-        dag.AbsoluteLoad(Const(CString("/hom/clusteringModel"))(line))(line)
-      )(line)
+      val input = dag.Morph2(
+          AssignClusters,
+          dag.AbsoluteLoad(Const(CString("/hom/clusteringData"))(line))(line),
+          dag.AbsoluteLoad(Const(CString("/hom/clusteringModel"))(line))(
+              line))(line)
 
       val result0 = testEval(input)
 
       result0 must haveSize(7)
 
-      val result = result0 collect { case (ids, value) if ids.size == 2 => value }
+      val result =
+        result0 collect { case (ids, value) if ids.size == 2 => value }
 
       result mustEqual Set(
-        SObject(Map("model1" -> SObject(Map("clusterId" -> SString("cluster2"), "clusterCenter" -> SObject(Map("bar" -> SDecimal(9.0), "foo" -> SDecimal(4.4))))))), 
-        SObject(Map("model2" -> SObject(Map("clusterId" -> SString("cluster1"), "clusterCenter" -> SObject(Map("baz" -> SDecimal(4.0))))))), 
-        SObject(Map("model1" -> SObject(Map("clusterId" -> SString("cluster2"), "clusterCenter" -> SArray(Vector(SDecimal(6.0), SDecimal(3.0), SDecimal(2.0))))))), 
-        SObject(Map("model1" -> SObject(Map("clusterId" -> SString("cluster3"), "clusterCenter" -> SArray(Vector(SDecimal(0.0), SDecimal(3.2), SDecimal(5.1))))))), 
-        SObject(Map("model1" -> SObject(Map("clusterId" -> SString("cluster1"), "clusterCenter" -> SArray(Vector(SDecimal(2.1), SDecimal(3.3), SDecimal(4.0))))))))
+          SObject(
+              Map("model1" -> SObject(Map("clusterId" -> SString("cluster2"),
+                                          "clusterCenter" -> SObject(
+                                              Map("bar" -> SDecimal(9.0),
+                                                  "foo" -> SDecimal(4.4))))))),
+          SObject(Map("model2" -> SObject(Map("clusterId" -> SString("cluster1"),
+                                              "clusterCenter" -> SObject(
+                                                  Map("baz" -> SDecimal(
+                                                          4.0))))))),
+          SObject(
+              Map(
+                  "model1" -> SObject(
+                      Map("clusterId" -> SString("cluster2"),
+                          "clusterCenter" -> SArray(
+                              Vector(SDecimal(6.0),
+                                     SDecimal(3.0),
+                                     SDecimal(2.0))))))),
+          SObject(Map("model1" -> SObject(
+                      Map("clusterId" -> SString("cluster3"),
+                          "clusterCenter" -> SArray(Vector(SDecimal(0.0),
+                                                           SDecimal(3.2),
+                                                           SDecimal(5.1))))))),
+          SObject(Map("model1" -> SObject(
+                      Map("clusterId" -> SString("cluster1"),
+                          "clusterCenter" -> SArray(Vector(SDecimal(2.1),
+                                                           SDecimal(3.3),
+                                                           SDecimal(4.0))))))))
     }
   }
 }
 
-object ClusteringLibSpecs extends ClusteringLibSpecs[test.YId] with test.YIdInstances
+object ClusteringLibSpecs
+    extends ClusteringLibSpecs[test.YId] with test.YIdInstances

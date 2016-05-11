@@ -7,8 +7,8 @@ import scala.concurrent.duration._
 // http://www.dalnefre.com/wp/2010/08/dining-philosophers-in-humus/
 
 /*
-* First we define our messages, they basically speak for themselves
-*/
+ * First we define our messages, they basically speak for themselves
+ */
 sealed trait DiningHakkerMessage
 final case class Busy(chopstick: ActorRef) extends DiningHakkerMessage
 final case class Put(hakker: ActorRef) extends DiningHakkerMessage
@@ -18,8 +18,8 @@ object Eat extends DiningHakkerMessage
 object Think extends DiningHakkerMessage
 
 /*
-* A Chopstick is an actor, it can be taken, and put back
-*/
+ * A Chopstick is an actor, it can be taken, and put back
+ */
 class Chopstick extends Actor {
 
   import context._
@@ -46,8 +46,8 @@ class Chopstick extends Actor {
 }
 
 /*
-* A hakker is an awesome dude or dudette who either thinks about hacking or has to eat ;-)
-*/
+ * A hakker is an awesome dude or dudette who either thinks about hacking or has to eat ;-)
+ */
 class Hakker(name: String, left: ActorRef, right: ActorRef) extends Actor {
 
   import context._
@@ -77,9 +77,12 @@ class Hakker(name: String, left: ActorRef, right: ActorRef) extends Actor {
   //When a hakker is waiting for the last chopstick it can either obtain it
   //and start eating, or the other chopstick was busy, and the hakker goes
   //back to think about how he should obtain his chopsticks :-)
-  def waiting_for(chopstickToWaitFor: ActorRef, otherChopstick: ActorRef): Receive = {
+  def waiting_for(
+      chopstickToWaitFor: ActorRef, otherChopstick: ActorRef): Receive = {
     case Taken(`chopstickToWaitFor`) =>
-      println("%s has picked up %s and %s and starts to eat".format(name, left.path.name, right.path.name))
+      println(
+          "%s has picked up %s and %s and starts to eat".format(
+              name, left.path.name, right.path.name))
       become(eating)
       system.scheduler.scheduleOnce(5.seconds, self, Think)
 
@@ -123,8 +126,8 @@ class Hakker(name: String, left: ActorRef, right: ActorRef) extends Actor {
 }
 
 /*
-* Alright, here's our test-harness
-*/
+ * Alright, here's our test-harness
+ */
 object DiningHakkersOnBecome {
   val system = ActorSystem()
 
@@ -132,12 +135,15 @@ object DiningHakkersOnBecome {
 
   def run(): Unit = {
     //Create 5 chopsticks
-    val chopsticks = for (i <- 1 to 5) yield system.actorOf(Props[Chopstick], "Chopstick" + i)
+    val chopsticks = for (i <- 1 to 5) yield
+      system.actorOf(Props[Chopstick], "Chopstick" + i)
 
     //Create 5 awesome hakkers and assign them their left and right chopstick
     val hakkers = for {
       (name, i) <- List("Ghosh", "Boner", "Klang", "Krasser", "Manie").zipWithIndex
-    } yield system.actorOf(Props(classOf[Hakker], name, chopsticks(i), chopsticks((i + 1) % 5)))
+    } yield
+      system.actorOf(
+          Props(classOf[Hakker], name, chopsticks(i), chopsticks((i + 1) % 5)))
 
     //Signal all hakkers that they should start thinking, and watch the show
     hakkers.foreach(_ ! Think)

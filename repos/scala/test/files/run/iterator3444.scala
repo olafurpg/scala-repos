@@ -1,5 +1,3 @@
-
-
 // ticked #3444
 object Test {
 
@@ -19,5 +17,4 @@ object Test {
     val mt = (1 until 5).toSeq.iterator
     assert(mt.take(50).toList == List(1, 2, 3, 4))
   }
-
 }

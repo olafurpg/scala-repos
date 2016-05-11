@@ -26,7 +26,7 @@ class VarModel[T](getter: => T, setter: T => Unit) extends Serializable {
   def getObject: AnyRef = getter.asInstanceOf[AnyRef]
 
   def setObject(v: AnyRef) = {
-    if(setter==null)
+    if (setter == null)
       throw new RuntimeException("Tried to set readonly model!")
     setter(v.asInstanceOf[T])
   }
@@ -39,9 +39,9 @@ class Printer(p: VarModel[String]) extends Serializable {
   def print = println(p.getObject)
 }
 
-class Component extends Marker { }
+class Component extends Marker {}
 
-class Form extends Component { }
+class Form extends Component {}
 
 @SerialVersionUID(1L)
 class Main extends Serializable {

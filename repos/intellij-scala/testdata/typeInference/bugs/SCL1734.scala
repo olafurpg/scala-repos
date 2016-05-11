@@ -1,6 +1,6 @@
 object TypedUnderscore {
   class A {
-    val p = /*start*/_: B/*end*/
+    val p = /*start*/ _: B /*end*/
   }
   class B
 }

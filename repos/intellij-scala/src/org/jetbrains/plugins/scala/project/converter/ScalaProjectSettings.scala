@@ -11,8 +11,8 @@ import org.jdom.Element
 import scala.xml.Elem
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class ScalaProjectSettings(basePackages: Seq[String]) extends XmlConversion {
   def createOrUpdateIn(context: ConversionContext): Option[File] = {
     if (basePackages.isEmpty) return None
@@ -40,17 +40,19 @@ class ScalaProjectSettings(basePackages: Seq[String]) extends XmlConversion {
     }
   }
 
-  private def addDirectoryBasedOptions(options: Elem, context: ConversionContext): Option[File] = {
+  private def addDirectoryBasedOptions(
+      options: Elem, context: ConversionContext): Option[File] = {
     val file = getDirectorySettingsFileIn(context)
 
     if (file.exists()) {
       val rootElement = parseXml(FileUtil.loadFile(file))
-      val componentElement = Option(rootElement.getChild("component")).getOrElse {
-        val element = new Element("component")
-        element.setAttribute("name", "ScalaProjectSettings")
-        rootElement.addContent(element)
-        element
-      }
+      val componentElement =
+        Option(rootElement.getChild("component")).getOrElse {
+          val element = new Element("component")
+          element.setAttribute("name", "ScalaProjectSettings")
+          rootElement.addContent(element)
+          element
+        }
       componentElement.addContent(asJava(options))
       Files.write(formatXml(rootElement).getBytes, file)
       None
@@ -62,13 +64,15 @@ class ScalaProjectSettings(basePackages: Seq[String]) extends XmlConversion {
   }
 
   private def getDirectorySettingsFileIn(context: ConversionContext): File = {
-    val base = Option(context.getSettingsBaseDir).getOrElse(
-      throw new CannotConvertException("Only directory-based IDEA projects are supported"))
+    val base = Option(context.getSettingsBaseDir)
+      .getOrElse(throw new CannotConvertException(
+            "Only directory-based IDEA projects are supported"))
 
     new File(base, "scala_settings.xml")
   }
 
-  private def addProjectBasedOptions(options: Elem, context: ConversionContext) {
+  private def addProjectBasedOptions(
+      options: Elem, context: ConversionContext) {
     val rootElement = context.getProjectSettings.getRootElement
     rootElement.addContent(asJava(options))
   }

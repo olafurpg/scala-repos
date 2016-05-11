@@ -33,13 +33,13 @@ import org.apache.spark.rdd.HadoopRDD
 import org.apache.spark.util.SerializableJobConf
 
 /**
- * Internal helper class that saves an RDD using a Hadoop OutputFormat.
- *
- * Saves the RDD using a JobConf, which should contain an output key class, an output value class,
- * a filename to write to, etc, exactly like in a Hadoop MapReduce job.
- */
-private[spark]
-class SparkHadoopWriter(jobConf: JobConf) extends Logging with Serializable {
+  * Internal helper class that saves an RDD using a Hadoop OutputFormat.
+  *
+  * Saves the RDD using a JobConf, which should contain an output key class, an output value class,
+  * a filename to write to, etc, exactly like in a Hadoop MapReduce job.
+  */
+private[spark] class SparkHadoopWriter(jobConf: JobConf)
+    extends Logging with Serializable {
 
   private val now = new Date()
   private val conf = new SerializableJobConf(jobConf)
@@ -64,11 +64,14 @@ class SparkHadoopWriter(jobConf: JobConf) extends Logging with Serializable {
     getOutputCommitter().setupJob(jCtxt)
   }
 
-
   def setup(jobid: Int, splitid: Int, attemptid: Int) {
     setIDs(jobid, splitid, attemptid)
-    HadoopRDD.addLocalConfiguration(new SimpleDateFormat("yyyyMMddHHmm").format(now),
-      jobid, splitID, attemptID, conf.value)
+    HadoopRDD.addLocalConfiguration(
+        new SimpleDateFormat("yyyyMMddHHmm").format(now),
+        jobid,
+        splitID,
+        attemptID,
+        conf.value)
   }
 
   def open() {
@@ -76,7 +79,7 @@ class SparkHadoopWriter(jobConf: JobConf) extends Logging with Serializable {
     numfmt.setMinimumIntegerDigits(5)
     numfmt.setGroupingUsed(false)
 
-    val outputName = "part-"  + numfmt.format(splitID)
+    val outputName = "part-" + numfmt.format(splitID)
     val path = FileOutputFormat.getOutputPath(conf.value)
     val fs: FileSystem = {
       if (path != null) {
@@ -87,7 +90,8 @@ class SparkHadoopWriter(jobConf: JobConf) extends Logging with Serializable {
     }
 
     getOutputCommitter().setupTask(getTaskContext())
-    writer = getOutputFormat().getRecordWriter(fs, conf.value, outputName, Reporter.NULL)
+    writer = getOutputFormat().getRecordWriter(
+        fs, conf.value, outputName, Reporter.NULL)
   }
 
   def write(key: AnyRef, value: AnyRef) {
@@ -103,7 +107,8 @@ class SparkHadoopWriter(jobConf: JobConf) extends Logging with Serializable {
   }
 
   def commit() {
-    SparkHadoopMapRedUtil.commitTask(getOutputCommitter(), getTaskContext(), jobID, splitID)
+    SparkHadoopMapRedUtil.commitTask(
+        getOutputCommitter(), getTaskContext(), jobID, splitID)
   }
 
   def commitJob() {
@@ -115,7 +120,8 @@ class SparkHadoopWriter(jobConf: JobConf) extends Logging with Serializable {
 
   private def getOutputFormat(): OutputFormat[AnyRef, AnyRef] = {
     if (format == null) {
-      format = conf.value.getOutputFormat()
+      format = conf.value
+        .getOutputFormat()
         .asInstanceOf[OutputFormat[AnyRef, AnyRef]]
     }
     format
@@ -143,8 +149,7 @@ class SparkHadoopWriter(jobConf: JobConf) extends Logging with Serializable {
   }
 
   protected def newTaskAttemptContext(
-      conf: JobConf,
-      attemptId: TaskAttemptID): TaskAttemptContext = {
+      conf: JobConf, attemptId: TaskAttemptID): TaskAttemptContext = {
     new TaskAttemptContextImpl(conf, attemptId)
   }
 
@@ -153,14 +158,14 @@ class SparkHadoopWriter(jobConf: JobConf) extends Logging with Serializable {
     splitID = splitid
     attemptID = attemptid
 
-    jID = new SerializableWritable[JobID](SparkHadoopWriter.createJobID(now, jobid))
-    taID = new SerializableWritable[TaskAttemptID](
-        new TaskAttemptID(new TaskID(jID.value, TaskType.MAP, splitID), attemptID))
+    jID = new SerializableWritable[JobID](
+        SparkHadoopWriter.createJobID(now, jobid))
+    taID = new SerializableWritable[TaskAttemptID](new TaskAttemptID(
+            new TaskID(jID.value, TaskType.MAP, splitID), attemptID))
   }
 }
 
-private[spark]
-object SparkHadoopWriter {
+private[spark] object SparkHadoopWriter {
   def createJobID(time: Date, id: Int): JobID = {
     val formatter = new SimpleDateFormat("yyyyMMddHHmm")
     val jobtrackerID = formatter.format(time)

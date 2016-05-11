@@ -25,7 +25,7 @@ import com.precog.common.client._
 import com.precog.common.security._
 import com.precog.util._
 
-import akka.dispatch.{ ExecutionContext, Future, Promise }
+import akka.dispatch.{ExecutionContext, Future, Promise}
 
 import blueeyes.bkka._
 import blueeyes.core.data.DefaultBijections._
@@ -36,8 +36,8 @@ import blueeyes.core.http.HttpStatusCodes._
 import blueeyes.core.service._
 import blueeyes.core.service.engines.HttpClientXLightWeb
 import blueeyes.json._
-import blueeyes.json.serialization.{ Extractor, Decomposer }
-import blueeyes.json.serialization.DefaultSerialization.{ DateTimeDecomposer => _, DateTimeExtractor => _, _ }
+import blueeyes.json.serialization.{Extractor, Decomposer}
+import blueeyes.json.serialization.DefaultSerialization.{DateTimeDecomposer => _, DateTimeExtractor => _, _}
 import blueeyes.json.serialization.Extractor._
 
 import org.apache.commons.codec.binary.Base64
@@ -54,85 +54,123 @@ import scalaz.syntax.validation._
 import scalaz.syntax.std.option._
 
 object WebAccountFinder extends Logging {
-  def apply(config: Configuration)(implicit executor: ExecutionContext): Validation[NonEmptyList[String], AccountFinder[Response]] = {
+  def apply(config: Configuration)(implicit executor: ExecutionContext)
+    : Validation[NonEmptyList[String], AccountFinder[Response]] = {
     val serviceConfig = config.detach("service")
     serviceConfig.get[String]("hardcoded_account") map { accountId =>
       implicit val M = ResponseMonad(new FutureMonad(executor))
-      success(new StaticAccountFinder[Response](accountId, serviceConfig[String]("hardcoded_rootKey", ""), serviceConfig.get[String]("hardcoded_rootPath")))
+      success(
+          new StaticAccountFinder[Response](
+              accountId,
+              serviceConfig[String]("hardcoded_rootKey", ""),
+              serviceConfig.get[String]("hardcoded_rootPath")))
     } getOrElse {
-      (serviceConfig.get[String]("protocol").toSuccess(nels("Configuration property service.protocol is required")) |@|
-       serviceConfig.get[String]("host").toSuccess(nels("Configuration property service.host is required")) |@|
-       serviceConfig.get[Int]("port").toSuccess(nels("Configuration property service.port is required")) |@|
-       serviceConfig.get[String]("path").toSuccess(nels("Configuration property service.path is required")) |@|
-       serviceConfig.get[String]("user").toSuccess(nels("Configuration property service.user is required")) |@|
-       serviceConfig.get[String]("password").toSuccess(nels("Configuration property service.password is required"))) {
+      (serviceConfig
+            .get[String]("protocol")
+            .toSuccess(nels(
+                    "Configuration property service.protocol is required")) |@| serviceConfig
+            .get[String]("host")
+            .toSuccess(nels("Configuration property service.host is required")) |@| serviceConfig
+            .get[Int]("port")
+            .toSuccess(nels("Configuration property service.port is required")) |@| serviceConfig
+            .get[String]("path")
+            .toSuccess(nels("Configuration property service.path is required")) |@| serviceConfig
+            .get[String]("user")
+            .toSuccess(nels("Configuration property service.user is required")) |@| serviceConfig
+            .get[String]("password")
+            .toSuccess(
+                nels("Configuration property service.password is required"))) {
         (protocol, host, port, path, user, password) =>
-          logger.info("Creating new WebAccountFinder with properties %s://%s:%s/%s %s:%s".format(protocol, host, port.toString, path, user, password))
+          logger.info(
+              "Creating new WebAccountFinder with properties %s://%s:%s/%s %s:%s"
+                .format(protocol, host, port.toString, path, user, password))
           new WebAccountFinder(protocol, host, port, path, user, password)
       }
     }
   }
 }
 
-class WebAccountFinder(protocol: String, host: String, port: Int, path: String, user: String, password: String)(implicit executor: ExecutionContext) extends WebClient(protocol, host, port, path) with AccountFinder[Response] with Logging {
+class WebAccountFinder(protocol: String,
+                       host: String,
+                       port: Int,
+                       path: String,
+                       user: String,
+                       password: String)(implicit executor: ExecutionContext)
+    extends WebClient(protocol, host, port, path)
+    with AccountFinder[Response] with Logging {
   import scalaz.syntax.monad._
-  import EitherT.{ left => leftT, right => rightT, _ }
-  import \/.{ left, right }
+  import EitherT.{left => leftT, right => rightT, _}
+  import \/.{left, right}
   import blueeyes.core.data.DefaultBijections._
   import blueeyes.json.serialization.DefaultSerialization._
 
   implicit val M: Monad[Future] = new FutureMonad(executor)
 
-  def findAccountByAPIKey(apiKey: APIKey) : Response[Option[AccountId]] = {
-    logger.debug("Finding account for API key " + apiKey + " with " + (protocol, host, port, path, user, password).toString)
+  def findAccountByAPIKey(apiKey: APIKey): Response[Option[AccountId]] = {
+    logger.debug("Finding account for API key " + apiKey + " with " +
+        (protocol, host, port, path, user, password).toString)
     invoke { client =>
       logger.info("Querying accounts service for API key %s".format(apiKey))
       eitherT(client.query("apiKey", apiKey).get[JValue]("/accounts/") map {
         case HttpResponse(HttpStatus(OK, _), _, Some(jaccountId), _) =>
           logger.info("Got response for apiKey " + apiKey)
-            (((_:Extractor.Error).message) <-: jaccountId.validated[WrappedAccountId] :-> { wid =>
-              Some(wid.accountId)
-            }).disjunction
+          (((_: Extractor.Error).message) <-: jaccountId
+                .validated[WrappedAccountId] :-> { wid =>
+                Some(wid.accountId)
+              }).disjunction
 
         case HttpResponse(HttpStatus(OK, _), _, None, _) =>
           logger.warn("No account found for apiKey: " + apiKey)
           right(None)
 
         case res =>
-          logger.error("Unexpected response from accounts service for findAccountByAPIKey: " + res)
-          left("Unexpected response from accounts service; unable to proceed: " + res)
+          logger.error(
+              "Unexpected response from accounts service for findAccountByAPIKey: " +
+              res)
+          left("Unexpected response from accounts service; unable to proceed: " +
+              res)
       } recoverWith {
         case ex =>
           logger.error("findAccountByAPIKey for " + apiKey + "failed.", ex)
-          Promise.successful(left("Client error accessing accounts service; unable to proceed: " + ex.getMessage))
+          Promise.successful(
+              left("Client error accessing accounts service; unable to proceed: " +
+                  ex.getMessage))
       })
     }
   }
 
-  def findAccountDetailsById(accountId: AccountId): Response[Option[AccountDetails]] = {
+  def findAccountDetailsById(
+      accountId: AccountId): Response[Option[AccountDetails]] = {
     logger.debug("Finding accoung for id: " + accountId)
     invoke { client =>
       eitherT(client.get[JValue]("/accounts/" + accountId) map {
         case HttpResponse(HttpStatus(OK, _), _, Some(jaccount), _) =>
           logger.info("Got response for AccountId " + accountId)
-          (((_:Extractor.Error).message) <-: jaccount.validated[Option[AccountDetails]]).disjunction
+          (((_: Extractor.Error).message) <-: jaccount
+                .validated[Option[AccountDetails]]).disjunction
 
         case res =>
-          logger.error("Unexpected response from accounts serviceon findAccountDetailsById: " + res)
-          left("Unexpected response from accounts service; unable to proceed: " + res)
+          logger.error(
+              "Unexpected response from accounts serviceon findAccountDetailsById: " +
+              res)
+          left("Unexpected response from accounts service; unable to proceed: " +
+              res)
       } recoverWith {
         case ex =>
           logger.error("findAccountById for " + accountId + "failed.", ex)
-          Promise.successful(left("Client error accessing accounts service; unable to proceed: " + ex.getMessage))
+          Promise.successful(
+              left("Client error accessing accounts service; unable to proceed: " +
+                  ex.getMessage))
       })
     }
   }
 
   def invoke[A](f: HttpClient[ByteChunk] => A): A = {
-    val auth = HttpHeaders.Authorization("Basic "+new String(Base64.encodeBase64((user+":"+password).getBytes("UTF-8")), "UTF-8"))
+    val auth = HttpHeaders.Authorization("Basic " + new String(
+            Base64.encodeBase64((user + ":" + password).getBytes("UTF-8")),
+            "UTF-8"))
     withJsonClient { client =>
       f(client.header(auth))
     }
   }
 }
-

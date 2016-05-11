@@ -26,10 +26,14 @@ object BooleanInduction extends App {
   type True = wTrue.T
   type False = wFalse.T
 
-  trait If[C <: Boolean, A, B] { type T ; def apply(a: A, b: B): T }
+  trait If[C <: Boolean, A, B] { type T; def apply(a: A, b: B): T }
   object If {
-    implicit def ifTrue[A, B]  = new If[True, A, B]  { type T = A ; def apply(a: A, b: B) = a }
-    implicit def ifFalse[A, B] = new If[False, A, B] { type T = B ; def apply(a: A, b: B) = b }
+    implicit def ifTrue[A, B] = new If[True, A, B] {
+      type T = A; def apply(a: A, b: B) = a
+    }
+    implicit def ifFalse[A, B] = new If[False, A, B] {
+      type T = B; def apply(a: A, b: B) = b
+    }
   }
 
   // Scala translation of:
@@ -38,19 +42,20 @@ object BooleanInduction extends App {
   // bool-induction P pt pf true = pt
   // bool-induction P pt pf false = pf
 
-  def boolInduction[P <: { type Case[_ <: Boolean] <: { type T }}, PT, PF]
-    (p: P)(t: PT)(f: PF)(x: Witness.Lt[Boolean])
-      (implicit pt: p.Case[True] { type T = PT }, pf: p.Case[False] { type T = PF }, sel: If[x.T, PT, PF]): sel.T = sel(t, f)
+  def boolInduction[P <: { type Case [_ <: Boolean] <: { type T } }, PT, PF](
+      p: P)(t: PT)(f: PF)(x: Witness.Lt[Boolean])(implicit pt: p.Case[True] {
+    type T = PT
+  }, pf: p.Case[False] { type T = PF }, sel: If[x.T, PT, PF]): sel.T =
+    sel(t, f)
 
   // In use ...
 
   object si {
     trait Case[B <: Boolean] { type T }
-    implicit val sit  = new Case[True]  { type T = String }
-    implicit val sif  = new Case[False] { type T = Int }
+    implicit val sit = new Case[True] { type T = String }
+    implicit val sif = new Case[False] { type T = Int }
   }
 
-  val bt: String = boolInduction(si)("foo")(23)(true) 
-  val bf: Int    = boolInduction(si)("foo")(23)(false)
+  val bt: String = boolInduction(si)("foo")(23)(true)
+  val bf: Int = boolInduction(si)("foo")(23)(false)
 }
-

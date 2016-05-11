@@ -4,10 +4,11 @@ package codeInspection.booleans
 import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
 
 /**
- * Nikolay.Tropin
- * 4/24/13
- */
-class DoubleNegationInspectionTest extends ScalaLightCodeInsightFixtureTestAdapter{
+  * Nikolay.Tropin
+  * 4/24/13
+  */
+class DoubleNegationInspectionTest
+    extends ScalaLightCodeInsightFixtureTestAdapter {
   val s = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_START
   val e = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_END
   val annotation = "Double negation"
@@ -18,7 +19,10 @@ class DoubleNegationInspectionTest extends ScalaLightCodeInsightFixtureTestAdapt
   }
 
   private def testFix(text: String, result: String) {
-    testQuickFix(text.replace("\r", ""), result.replace("\r", ""), hint, classOf[DoubleNegationInspection])
+    testQuickFix(text.replace("\r", ""),
+                 result.replace("\r", ""),
+                 hint,
+                 classOf[DoubleNegationInspection])
   }
 
   def test_NotNotTrue() {
@@ -65,5 +69,4 @@ class DoubleNegationInspectionTest extends ScalaLightCodeInsightFixtureTestAdapt
     val result = "a != b"
     testFix(text, result)
   }
-
 }

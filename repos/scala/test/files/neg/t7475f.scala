@@ -3,8 +3,7 @@ class C[T] extends D[T] {
   private[this] def c2 = 0
 }
 
-trait D[T] {
-  self: C[T] =>
+trait D[T] { self: C[T] =>
 
   private def d1 = 0
   private[this] def d2 = 0
@@ -14,7 +13,6 @@ trait D[T] {
 
   d1 // okay
   d2 // okay
-
 
   class C {
     d1

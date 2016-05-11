@@ -7,10 +7,12 @@ import scala.collection.mutable
 import scala.runtime.NonLocalReturnControl
 
 object Promise {
+
   /**
-   * A continuation stored from a promise.
-   */
+    * A continuation stored from a promise.
+    */
   private[util] trait K[-A] extends (Try[A] => Unit) {
+
     /** Depth tag used for scheduling */
     protected[util] def depth: Short
   }
@@ -20,25 +22,26 @@ object Promise {
   }
 
   /**
-   * A template trait for [[com.twitter.util.Promise Promises]] that are derived
-   * and capable of being detached from other Promises.
-   */
-  trait Detachable { _: Promise[_] =>
+    * A template trait for [[com.twitter.util.Promise Promises]] that are derived
+    * and capable of being detached from other Promises.
+    */
+  trait Detachable {
+    _: Promise[_] =>
+
     /**
-     * Returns true if successfully detached, will return true at most once.
-     *
-     * The contract is that non-idempotent side effects should only be done after the
-     * successful detach.
-     */
+      * Returns true if successfully detached, will return true at most once.
+      *
+      * The contract is that non-idempotent side effects should only be done after the
+      * successful detach.
+      */
     def detach(): Boolean
   }
 
   /**
-   * A detachable [[com.twitter.util.Promise]].
-   */
+    * A detachable [[com.twitter.util.Promise]].
+    */
   private class DetachablePromise[A](underlying: Promise[_ <: A])
-    extends Promise[A] with Promise.K[A] with Detachable
-  {
+      extends Promise[A] with Promise.K[A] with Detachable {
     underlying.continue(this)
 
     def detach(): Boolean = underlying.detach(this)
@@ -49,7 +52,8 @@ object Promise {
     }
   }
 
-  private class DetachableFuture[A] extends Promise[A] with Promise.Detachable {
+  private class DetachableFuture[A]
+      extends Promise[A] with Promise.Detachable {
     private[this] var detached: Boolean = false
 
     def detach(): Boolean = synchronized {
@@ -63,68 +67,61 @@ object Promise {
   }
 
   /**
-   * A monitored continuation.
-   *
-   * @param saved The saved local context of the invocation site
-   *
-   * @param k the closure to invoke in the saved context, with the
-   * provided result
-   *
-   * @param depth a tag used to store the chain depth of this context
-   * for scheduling purposes.
-   */
+    * A monitored continuation.
+    *
+    * @param saved The saved local context of the invocation site
+    *
+    * @param k the closure to invoke in the saved context, with the
+    * provided result
+    *
+    * @param depth a tag used to store the chain depth of this context
+    * for scheduling purposes.
+    */
   private class Monitored[A](
-      saved: Local.Context,
-      k: Try[A] => Unit,
-      val depth: Short)
-    extends K[A]
-  {
+      saved: Local.Context, k: Try[A] => Unit, val depth: Short)
+      extends K[A] {
     def apply(result: Try[A]) {
       val current = Local.save()
       Local.restore(saved)
-      try k(result)
-      catch Monitor.catcher
-      finally Local.restore(current)
+      try k(result) catch Monitor.catcher finally Local.restore(current)
     }
   }
 
   /**
-   * A transforming continuation.
-   *
-   * @param saved The saved local context of the invocation site
-   *
-   * @param promise The Promise for the transformed value
-   *
-   * @param f The closure to invoke to produce the Future of the transformed value.
-   *
-   * @param depth a tag used to store the chain depth of this context
-   * for scheduling purposes.
-   */
-  private class Transformer[A, B](
-      saved: Local.Context,
-      promise: Promise[B],
-      f: Try[A] => Future[B],
-      val depth: Short)
-    extends K[A]
-  {
+    * A transforming continuation.
+    *
+    * @param saved The saved local context of the invocation site
+    *
+    * @param promise The Promise for the transformed value
+    *
+    * @param f The closure to invoke to produce the Future of the transformed value.
+    *
+    * @param depth a tag used to store the chain depth of this context
+    * for scheduling purposes.
+    */
+  private class Transformer[A, B](saved: Local.Context,
+                                  promise: Promise[B],
+                                  f: Try[A] => Future[B],
+                                  val depth: Short)
+      extends K[A] {
     private[this] def k(r: Try[A]) = {
       promise.become(
-        try f(r) catch {
-          case e: NonLocalReturnControl[_] => Future.exception(new FutureNonLocalReturnControl(e))
-          case NonFatal(e) => Future.exception(e)
-        }
+          try f(r) catch {
+            case e: NonLocalReturnControl[_] =>
+              Future.exception(new FutureNonLocalReturnControl(e))
+            case NonFatal(e) => Future.exception(e)
+          }
       )
     }
 
     def apply(result: Try[A]) {
       val current = Local.save()
       Local.restore(saved)
-      try k(result)
-      catch { case t: Throwable =>
-        Monitor.handle(t)
-        throw t
-      }
-      finally Local.restore(current)
+      try k(result) catch {
+        case t: Throwable =>
+          Monitor.handle(t)
+          throw t
+      } finally Local.restore(current)
     }
   }
 
@@ -153,32 +150,38 @@ object Promise {
    */
   private sealed trait State[A]
   private case class Waiting[A](first: K[A], rest: List[K[A]]) extends State[A]
-  private case class Interruptible[A](waitq: List[K[A]], handler: PartialFunction[Throwable, Unit]) extends State[A]
-  private case class Transforming[A](waitq: List[K[A]], other: Future[_]) extends State[A]
-  private case class Interrupted[A](waitq: List[K[A]], signal: Throwable) extends State[A]
+  private case class Interruptible[A](
+      waitq: List[K[A]], handler: PartialFunction[Throwable, Unit])
+      extends State[A]
+  private case class Transforming[A](waitq: List[K[A]], other: Future[_])
+      extends State[A]
+  private case class Interrupted[A](waitq: List[K[A]], signal: Throwable)
+      extends State[A]
   private case class Done[A](result: Try[A]) extends State[A]
   private case class Linked[A](p: Promise[A]) extends State[A]
 
   private def initState[A]: State[A] = emptyState.asInstanceOf[State[A]]
   private val emptyState: State[Nothing] = Waiting(null, Nil)
   private val unsafe = Unsafe()
-  private val stateOff = unsafe.objectFieldOffset(classOf[Promise[_]].getDeclaredField("state"))
+  private val stateOff =
+    unsafe.objectFieldOffset(classOf[Promise[_]].getDeclaredField("state"))
   private val AlwaysUnit: Any => Unit = scala.Function.const(()) _
 
-  sealed trait Responder[A] { this: Future[A] =>
+  sealed trait Responder[A] {
+    this: Future[A] =>
     protected[util] def depth: Short
     protected def parent: Promise[A]
     protected[util] def continue(k: K[A])
 
     /**
-     * Note: exceptions in responds are monitored.  That is, if the
-     * computation `k` throws a raw (ie.  not encoded in a Future)
-     * exception, it is handled by the current monitor, see
-     * [[Monitor]] for details.
-     */
+      * Note: exceptions in responds are monitored.  That is, if the
+      * computation `k` throws a raw (ie.  not encoded in a Future)
+      * exception, it is handled by the current monitor, see
+      * [[Monitor]] for details.
+      */
     def respond(k: Try[A] => Unit): Future[A] = {
       continue(new Monitored(Local.save(), k, depth))
-      new Chained(parent, (depth+1).toShort)
+      new Chained(parent, (depth + 1).toShort)
     }
 
     def transform[B](f: Try[A] => Future[B]): Future[B] = {
@@ -192,16 +195,15 @@ object Promise {
 
   /** A future that is chained from a parent promise with a certain depth. */
   private class Chained[A](val parent: Promise[A], val depth: Short)
-    extends Future[A]
-    with Responder[A]
-  {
+      extends Future[A] with Responder[A] {
     if (depth == Short.MaxValue)
       throw new AssertionError("Future chains cannot be longer than 32766!")
 
     // Awaitable
     @throws(classOf[TimeoutException])
     @throws(classOf[InterruptedException])
-    def ready(timeout: Duration)(implicit permit: Awaitable.CanAwait): this.type = {
+    def ready(timeout: Duration)(
+        implicit permit: Awaitable.CanAwait): this.type = {
       parent.ready(timeout)
       this
     }
@@ -221,24 +223,25 @@ object Promise {
 
     protected[util] def continue(k: K[A]) = parent.continue(k)
 
-    override def toString = "Future@%s(depth=%s,parent=%s)".format(hashCode, depth, parent)
+    override def toString =
+      "Future@%s(depth=%s,parent=%s)".format(hashCode, depth, parent)
   }
 
   // PUBLIC API
 
   /**
-   * Indicates that an attempt to satisfy a [[com.twitter.util.Promise]] was made
-   * after that promise had already been satisfied.
-   */
+    * Indicates that an attempt to satisfy a [[com.twitter.util.Promise]] was made
+    * after that promise had already been satisfied.
+    */
   case class ImmutableResult(message: String) extends Exception(message)
 
   /** Create a new, empty, promise of type {{A}}. */
   def apply[A](): Promise[A] = new Promise[A]
 
   /**
-   * Create a promise that interrupts all of ''fs''. In particular:
-   * the returned promise handles an interrupt when any of ''fs'' do.
-   */
+    * Create a promise that interrupts all of ''fs''. In particular:
+    * the returned promise handles an interrupt when any of ''fs'' do.
+    */
   def interrupts[A](fs: Future[_]*): Promise[A] = {
     val handler: PartialFunction[Throwable, Unit] = {
       case intr => for (f <- fs) f.raise(intr)
@@ -247,8 +250,8 @@ object Promise {
   }
 
   /**
-   * Single-arg version to avoid object creation and take advantage of `forwardInterruptsTo`.
-   */
+    * Single-arg version to avoid object creation and take advantage of `forwardInterruptsTo`.
+    */
   def interrupts[A](f: Future[_]): Promise[A] = {
     val p = new Promise[A]
     p.forwardInterruptsTo(f)
@@ -256,74 +259,73 @@ object Promise {
   }
 
   /**
-   * Create a derivative promise that will be satisfied with the result of the
-   * parent.
-   *
-   * If the derivative promise is detached before the parent is satisfied, then
-   * it becomes disconnected from the parent and can be used as a normal,
-   * unlinked Promise.
-   *
-   * By the contract of `Detachable`, satisfaction of the Promise must occur
-   * ''after'' detachment. Promises should only ever be satisfied after they are
-   * successfully detached (thus satisfaction is the responsibility of the
-   * detacher).
-   *
-   * Ex:
-   *
-   * {{{
-   * val f: Future[Unit]
-   * val p: Promise[Unit] with Detachable = Promise.attached(f)
-   * ...
-   * if (p.detach()) p.setValue(())
-   * }}}
-   */
-  def attached[A](parent: Future[A]): Promise[A] with Detachable = parent match {
-    case p: Promise[_] =>
-      new DetachablePromise[A](p.asInstanceOf[Promise[A]])
-    case _ =>
-      val p = new DetachableFuture[A]()
-      parent.respond { t =>
-        if (p.detach()) p.update(t)
-      }
-      p
-  }
+    * Create a derivative promise that will be satisfied with the result of the
+    * parent.
+    *
+    * If the derivative promise is detached before the parent is satisfied, then
+    * it becomes disconnected from the parent and can be used as a normal,
+    * unlinked Promise.
+    *
+    * By the contract of `Detachable`, satisfaction of the Promise must occur
+    * ''after'' detachment. Promises should only ever be satisfied after they are
+    * successfully detached (thus satisfaction is the responsibility of the
+    * detacher).
+    *
+    * Ex:
+    *
+    * {{{
+    * val f: Future[Unit]
+    * val p: Promise[Unit] with Detachable = Promise.attached(f)
+    * ...
+    * if (p.detach()) p.setValue(())
+    * }}}
+    */
+  def attached[A](parent: Future[A]): Promise[A] with Detachable =
+    parent match {
+      case p: Promise[_] =>
+        new DetachablePromise[A](p.asInstanceOf[Promise[A]])
+      case _ =>
+        val p = new DetachableFuture[A]()
+        parent.respond { t =>
+          if (p.detach()) p.update(t)
+        }
+        p
+    }
 }
 
 /**
- * A writeable [[com.twitter.util.Future]] that supports merging.
- * Callbacks (responders) of Promises are scheduled with
- * [[com.twitter.concurrent.Scheduler]].
- *
- * =Implementation details=
- *
- * A Promise is in one of five states: `Waiting`, `Interruptible`,
- * `Interrupted`, `Done` and `Linked` where `Interruptible` and
- * `Interrupted` are variants of `Waiting` to deal with future
- * interrupts. Promises are concurrency-safe, using lock-free operations
- * throughout. Callback dispatch is scheduled with
- * [[com.twitter.concurrent.Scheduler]].
- *
- * Waiters are stored as a [[com.twitter.util.Promise.K]]. `K`s
- * (mnemonic: continuation) specifies a `depth`. This is used to
- * implement Promise chaining: a callback with depth `d` is invoked only
- * after all callbacks with depth < `d` have already been invoked.
- *
- * `Promise.become` merges two promises: they are declared equivalent.
- * `become` merges the states of the two promises, and links one to the
- * other. Thus promises support the analog to tail-call elimination: no
- * space leak is incurred from `flatMap` in the tail position since
- * intermediate promises are merged into the root promise.
- *
- * A number of optimizations are employed to conserve ''space'': we pay
- * particular heed to the JVM's object representation, in particular for
- * OpenJDK (HotSpot) version 7 running on 64-bit architectures with
- * compressed OOPS. See comments on [[com.twitter.util.Promise.State]]
- * for details.
- */
+  * A writeable [[com.twitter.util.Future]] that supports merging.
+  * Callbacks (responders) of Promises are scheduled with
+  * [[com.twitter.concurrent.Scheduler]].
+  *
+  * =Implementation details=
+  *
+  * A Promise is in one of five states: `Waiting`, `Interruptible`,
+  * `Interrupted`, `Done` and `Linked` where `Interruptible` and
+  * `Interrupted` are variants of `Waiting` to deal with future
+  * interrupts. Promises are concurrency-safe, using lock-free operations
+  * throughout. Callback dispatch is scheduled with
+  * [[com.twitter.concurrent.Scheduler]].
+  *
+  * Waiters are stored as a [[com.twitter.util.Promise.K]]. `K`s
+  * (mnemonic: continuation) specifies a `depth`. This is used to
+  * implement Promise chaining: a callback with depth `d` is invoked only
+  * after all callbacks with depth < `d` have already been invoked.
+  *
+  * `Promise.become` merges two promises: they are declared equivalent.
+  * `become` merges the states of the two promises, and links one to the
+  * other. Thus promises support the analog to tail-call elimination: no
+  * space leak is incurred from `flatMap` in the tail position since
+  * intermediate promises are merged into the root promise.
+  *
+  * A number of optimizations are employed to conserve ''space'': we pay
+  * particular heed to the JVM's object representation, in particular for
+  * OpenJDK (HotSpot) version 7 running on 64-bit architectures with
+  * compressed OOPS. See comments on [[com.twitter.util.Promise.State]]
+  * for details.
+  */
 class Promise[A]
-  extends Future[A]
-  with Promise.Responder[A]
-  with Updatable[Try[A]] {
+    extends Future[A] with Promise.Responder[A] with Updatable[Try[A]] {
   import Promise._
 
   protected[util] final def depth = 0
@@ -344,17 +346,17 @@ class Promise[A]
 
   override def toString = "Promise@%s(state=%s)".format(hashCode, state)
 
-  @inline private[this] def cas(oldState: State[A], newState: State[A]): Boolean =
+  @inline private[this] def cas(
+      oldState: State[A], newState: State[A]): Boolean =
     unsafe.compareAndSwapObject(this, stateOff, oldState, newState)
 
-  private[this] def runq(first: K[A], rest: List[K[A]], result: Try[A]) = Scheduler.submit(
-    new Runnable {
+  private[this] def runq(first: K[A], rest: List[K[A]], result: Try[A]) =
+    Scheduler.submit(new Runnable {
       def run(): Unit = {
         // It's always safe to run `first` ahead of everything else
         // since the only way to get a chainer is to register a
         // callback (which would always have depth 0).
-        if (first ne null)
-          first(result)
+        if (first ne null) first(result)
         var k: K[A] = null
         var moreDepth = false
 
@@ -362,36 +364,30 @@ class Promise[A]
         var ks = rest
         while (ks ne Nil) {
           k = ks.head
-          if (k.depth == 0)
-            k(result)
-          else
-            moreDepth = true
+          if (k.depth == 0) k(result)
+          else moreDepth = true
           ks = ks.tail
         }
 
         // depth >= 1, about 23%
-        if (!moreDepth)
-          return
+        if (!moreDepth) return
 
         var maxDepth = 1
         ks = rest
         while (ks ne Nil) {
           k = ks.head
-          if (k.depth == 1)
-            k(result)
-          else if (k.depth > maxDepth)
-            maxDepth = k.depth
+          if (k.depth == 1) k(result)
+          else if (k.depth > maxDepth) maxDepth = k.depth
           ks = ks.tail
         }
         // Depth > 1, about 7%
-        if (maxDepth > 1)
-          runDepth2Plus(rest, result, maxDepth)
+        if (maxDepth > 1) runDepth2Plus(rest, result, maxDepth)
       }
 
       private[this] def runDepth2Plus(
-        rest: List[K[A]],
-        result: Try[A],
-        maxDepth: Int
+          rest: List[K[A]],
+          result: Try[A],
+          maxDepth: Int
       ): Unit = {
         // empirically via JMH `FutureBenchmark.runqSize` the performance
         // is better once the the list gets larger. that cutoff point
@@ -406,8 +402,7 @@ class Promise[A]
           var ks = rest
           while (ks ne Nil) {
             val k = ks.head
-            if (k.depth > 1)
-              rem += k
+            if (k.depth > 1) rem += k
             ks = ks.tail
           }
 
@@ -423,8 +418,7 @@ class Promise[A]
             var ks = rest
             while (ks ne Nil) {
               val k = ks.head
-              if (k.depth == depth)
-                k(result)
+              if (k.depth == depth) k(result)
               ks = ks.tail
             }
             depth += 1
@@ -434,28 +428,25 @@ class Promise[A]
     })
 
   /**
-   * (Re)sets the interrupt handler. There is only
-   * one active interrupt handler.
-   *
-   * @param f the new interrupt handler
-   */
+    * (Re)sets the interrupt handler. There is only
+    * one active interrupt handler.
+    *
+    * @param f the new interrupt handler
+    */
   @tailrec
   final def setInterruptHandler(f: PartialFunction[Throwable, Unit]): Unit = {
     state match {
       case Linked(p) => p.setInterruptHandler(f)
 
-      case s@Waiting(first, rest) =>
+      case s @ Waiting(first, rest) =>
         val waitq = if (first eq null) rest else first :: rest
-        if (!cas(s, Interruptible(waitq, f)))
-          setInterruptHandler(f)
+        if (!cas(s, Interruptible(waitq, f))) setInterruptHandler(f)
 
-      case s@Interruptible(waitq, _) =>
-        if (!cas(s, Interruptible(waitq, f)))
-          setInterruptHandler(f)
+      case s @ Interruptible(waitq, _) =>
+        if (!cas(s, Interruptible(waitq, f))) setInterruptHandler(f)
 
-      case s@Transforming(waitq, _) =>
-        if (!cas(s, Interruptible(waitq, f)))
-          setInterruptHandler(f)
+      case s @ Transforming(waitq, _) =>
+        if (!cas(s, Interruptible(waitq, f))) setInterruptHandler(f)
 
       case Interrupted(_, signal) =>
         f.applyOrElse(signal, Promise.AlwaysUnit)
@@ -475,32 +466,28 @@ class Promise[A]
   }
 
   /**
-   * Forward interrupts to another future.
-   * If the other future is fulfilled, this is a no-op.
-   * Calling this multiple times is not recommended as
-   * the resulting state may not be as expected.
-   *
-   * @param other the Future to which interrupts are forwarded.
-   */
-  @tailrec final
-  def forwardInterruptsTo(other: Future[_]): Unit = {
+    * Forward interrupts to another future.
+    * If the other future is fulfilled, this is a no-op.
+    * Calling this multiple times is not recommended as
+    * the resulting state may not be as expected.
+    *
+    * @param other the Future to which interrupts are forwarded.
+    */
+  @tailrec final def forwardInterruptsTo(other: Future[_]): Unit = {
     // This reduces allocations in the common case.
     if (other.isDefined) return
     state match {
       case Linked(p) => p.forwardInterruptsTo(other)
 
-      case s@Waiting(first, rest) =>
+      case s @ Waiting(first, rest) =>
         val waitq = if (first eq null) rest else first :: rest
-        if (!cas(s, Transforming(waitq, other)))
-          forwardInterruptsTo(other)
+        if (!cas(s, Transforming(waitq, other))) forwardInterruptsTo(other)
 
-      case s@Interruptible(waitq, _) =>
-        if (!cas(s, Transforming(waitq, other)))
-          forwardInterruptsTo(other)
+      case s @ Interruptible(waitq, _) =>
+        if (!cas(s, Transforming(waitq, other))) forwardInterruptsTo(other)
 
-      case s@Transforming(waitq, _) =>
-        if (!cas(s, Transforming(waitq, other)))
-          forwardInterruptsTo(other)
+      case s @ Transforming(waitq, _) =>
+        if (!cas(s, Transforming(waitq, other))) forwardInterruptsTo(other)
 
       case Interrupted(_, signal) =>
         other.raise(signal)
@@ -509,27 +496,26 @@ class Promise[A]
     }
   }
 
-  @tailrec final
-  def raise(intr: Throwable): Unit = state match {
+  @tailrec final def raise(intr: Throwable): Unit = state match {
     case Linked(p) => p.raise(intr)
-    case s@Interruptible(waitq, handler) =>
-      if (!cas(s, Interrupted(waitq, intr))) raise(intr) else {
+    case s @ Interruptible(waitq, handler) =>
+      if (!cas(s, Interrupted(waitq, intr))) raise(intr)
+      else {
         handler.applyOrElse(intr, Promise.AlwaysUnit)
       }
 
-    case s@Transforming(waitq, other) =>
-      if (!cas(s, Interrupted(waitq, intr))) raise(intr) else {
+    case s @ Transforming(waitq, other) =>
+      if (!cas(s, Interrupted(waitq, intr))) raise(intr)
+      else {
         other.raise(intr)
       }
 
-    case s@Interrupted(waitq, _) =>
-      if (!cas(s, Interrupted(waitq, intr)))
-        raise(intr)
+    case s @ Interrupted(waitq, _) =>
+      if (!cas(s, Interrupted(waitq, intr))) raise(intr)
 
-    case s@Waiting(first, rest)  =>
+    case s @ Waiting(first, rest) =>
       val waitq = if (first eq null) rest else first :: rest
-      if (!cas(s, Interrupted(waitq, intr)))
-        raise(intr)
+      if (!cas(s, Interrupted(waitq, intr))) raise(intr)
 
     case Done(_) =>
   }
@@ -539,25 +525,20 @@ class Promise[A]
       case Linked(p) =>
         p.detach(k)
 
-      case s@Interruptible(waitq, handler) =>
+      case s @ Interruptible(waitq, handler) =>
         if (!cas(s, Interruptible(waitq filterNot (_ eq k), handler)))
           detach(k)
-        else
-          waitq.contains(k)
+        else waitq.contains(k)
 
-      case s@Transforming(waitq, other) =>
-        if (!cas(s, Transforming(waitq filterNot (_ eq k), other)))
-          detach(k)
-        else
-          waitq.contains(k)
+      case s @ Transforming(waitq, other) =>
+        if (!cas(s, Transforming(waitq filterNot (_ eq k), other))) detach(k)
+        else waitq.contains(k)
 
-      case s@Interrupted(waitq, intr) =>
-        if (!cas(s, Interrupted(waitq filterNot (_ eq k), intr)))
-          detach(k)
-        else
-          waitq.contains(k)
+      case s @ Interrupted(waitq, intr) =>
+        if (!cas(s, Interrupted(waitq filterNot (_ eq k), intr))) detach(k)
+        else waitq.contains(k)
 
-      case s@Waiting(first, rest)  =>
+      case s @ Waiting(first, rest) =>
         val waitq = if (first eq null) rest else first :: rest
         val next = (waitq filterNot (_ eq k)) match {
           case Nil => initState[A]
@@ -573,16 +554,20 @@ class Promise[A]
   // Awaitable
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
-  def ready(timeout: Duration)(implicit permit: Awaitable.CanAwait): this.type =
+  def ready(timeout: Duration)(
+      implicit permit: Awaitable.CanAwait): this.type =
     state match {
       case Linked(p) =>
         p.ready(timeout)
         this
       case Done(res) =>
         this
-      case Waiting(_, _) | Interruptible(_, _) | Interrupted(_, _) | Transforming(_, _) =>
+      case Waiting(_, _) | Interruptible(_, _) | Interrupted(_, _) |
+          Transforming(_, _) =>
         val condition = new java.util.concurrent.CountDownLatch(1)
-        respond { _ => condition.countDown() }
+        respond { _ =>
+          condition.countDown()
+        }
         Scheduler.flush()
         if (condition.await(timeout.inNanoseconds, TimeUnit.NANOSECONDS)) this
         else throw new TimeoutException(timeout.toString)
@@ -598,60 +583,62 @@ class Promise[A]
     isDefined
 
   /**
-   * Returns this promise's interrupt if it is interrupted.
-   */
+    * Returns this promise's interrupt if it is interrupted.
+    */
   def isInterrupted: Option[Throwable] = state match {
     case Linked(p) => p.isInterrupted
     case Interrupted(_, intr) => Some(intr)
-    case Done(_) | Waiting(_, _) | Interruptible(_, _) | Transforming(_, _) => None
+    case Done(_) | Waiting(_, _) | Interruptible(_, _) | Transforming(_, _) =>
+      None
   }
 
   /**
-   * Become the other promise. `become` declares an equivalence
-   * relation: `this` and `other` are the ''same''.
-   *
-   * By becoming `other`, its waitlists are now merged into `this`'s,
-   * and `this` becomes canonical. The same is true of interrupt
-   * handlers: `other`'s interrupt handler is overwritten with the
-   * handlers installed for `this`.
-   *
-   * Note: Using `become` and `setInterruptHandler` on the same
-   * promise is not recommended. Consider the following, which
-   * demonstrates unexpected behavior related to this usage.
-   *
-   * {{{
-   * val a, b = new Promise[Unit]
-   * a.setInterruptHandler { case _ => println("A") }
-   * b.become(a)
-   * b.setInterruptHandler { case _ => println("B") }
-   * a.raise(new Exception)
-   * }}}
-   *
-   * This prints "B", the action in the interrupt handler for `b`,
-   * which is unexpected because we raised on `a`. In this case and
-   * others, using [[com.twitter.util.Future.proxyTo]] may be more
-   * appropriate.
-   *
-   * Note that `this` must be unsatisfied at the time of the call,
-   * and not race with any other setters. `become` is a form of
-   * satisfying the promise.
-   *
-   * This has the combined effect of compressing the `other` into
-   * `this`, effectively providing a form of tail-call elimination
-   * when used in recursion constructs. `transform` (and thus any
-   * other combinator) use this to compress Futures, freeing them
-   * from space leaks when used with recursive constructions.
-   *
-   * '''Note:''' do not use become with cyclic graphs of futures: the
-   * behavior of racing `a.become(b)` with `b.become(a)` is undefined
-   * (where `a` and `b` may resolve as such transitively).
-   *
-   * @see [[com.twitter.util.Future.proxyTo]]
-   */
+    * Become the other promise. `become` declares an equivalence
+    * relation: `this` and `other` are the ''same''.
+    *
+    * By becoming `other`, its waitlists are now merged into `this`'s,
+    * and `this` becomes canonical. The same is true of interrupt
+    * handlers: `other`'s interrupt handler is overwritten with the
+    * handlers installed for `this`.
+    *
+    * Note: Using `become` and `setInterruptHandler` on the same
+    * promise is not recommended. Consider the following, which
+    * demonstrates unexpected behavior related to this usage.
+    *
+    * {{{
+    * val a, b = new Promise[Unit]
+    * a.setInterruptHandler { case _ => println("A") }
+    * b.become(a)
+    * b.setInterruptHandler { case _ => println("B") }
+    * a.raise(new Exception)
+    * }}}
+    *
+    * This prints "B", the action in the interrupt handler for `b`,
+    * which is unexpected because we raised on `a`. In this case and
+    * others, using [[com.twitter.util.Future.proxyTo]] may be more
+    * appropriate.
+    *
+    * Note that `this` must be unsatisfied at the time of the call,
+    * and not race with any other setters. `become` is a form of
+    * satisfying the promise.
+    *
+    * This has the combined effect of compressing the `other` into
+    * `this`, effectively providing a form of tail-call elimination
+    * when used in recursion constructs. `transform` (and thus any
+    * other combinator) use this to compress Futures, freeing them
+    * from space leaks when used with recursive constructions.
+    *
+    * '''Note:''' do not use become with cyclic graphs of futures: the
+    * behavior of racing `a.become(b)` with `b.become(a)` is undefined
+    * (where `a` and `b` may resolve as such transitively).
+    *
+    * @see [[com.twitter.util.Future.proxyTo]]
+    */
   def become(other: Future[A]): Unit = {
     if (isDefined) {
       val current = Await.result(liftToTry)
-      throw new IllegalStateException(s"cannot become() on an already satisfied promise: $current")
+      throw new IllegalStateException(
+          s"cannot become() on an already satisfied promise: $current")
     }
     if (other.isInstanceOf[Promise[_]]) {
       val that = other.asInstanceOf[Promise[A]]
@@ -663,71 +650,76 @@ class Promise[A]
   }
 
   /**
-   * Populate the Promise with the given result.
-   *
-   * @throws ImmutableResult if the Promise is already populated
-   */
+    * Populate the Promise with the given result.
+    *
+    * @throws ImmutableResult if the Promise is already populated
+    */
   def setValue(result: A): Unit = update(Return(result))
 
   /**
-   * Populate the Promise with the given exception.
-   *
-   * @throws ImmutableResult if the Promise is already populated
-   */
+    * Populate the Promise with the given exception.
+    *
+    * @throws ImmutableResult if the Promise is already populated
+    */
   def setException(throwable: Throwable): Unit = update(Throw(throwable))
 
   /**
-   * Sets a Unit-typed future. By convention, futures of type
-   * Future[Unit] are used for signalling.
-   */
+    * Sets a Unit-typed future. By convention, futures of type
+    * Future[Unit] are used for signalling.
+    */
   def setDone()(implicit ev: this.type <:< Promise[Unit]): Boolean =
     ev(this).updateIfEmpty(Return.Unit)
 
   /**
-   * Populate the Promise with the given Try. The try can either be a
-   * value or an exception. setValue and setException are generally
-   * more readable methods to use.
-   *
-   * @throws ImmutableResult if the Promise is already populated
-   */
+    * Populate the Promise with the given Try. The try can either be a
+    * value or an exception. setValue and setException are generally
+    * more readable methods to use.
+    *
+    * @throws ImmutableResult if the Promise is already populated
+    */
   def update(result: Try[A]): Unit = {
     updateIfEmpty(result) || {
       val current = Await.result(liftToTry)
-      throw new ImmutableResult(s"Result set multiple times. Value='$current', New='$result'")
+      throw new ImmutableResult(
+          s"Result set multiple times. Value='$current', New='$result'")
     }
   }
 
   /**
-   * Populate the Promise with the given Try. The Try can either be a
-   * value or an exception. `setValue` and `setException` are generally
-   * more readable methods to use.
-   *
-   * @note Invoking `updateIfEmpty` without checking the boolean result is almost
-   * never the right approach. Doing so is generally unsafe unless race
-   * conditions are acceptable.
-   *
-   * @return true only if the result is updated, false if it was already set.
-   */
+    * Populate the Promise with the given Try. The Try can either be a
+    * value or an exception. `setValue` and `setException` are generally
+    * more readable methods to use.
+    *
+    * @note Invoking `updateIfEmpty` without checking the boolean result is almost
+    * never the right approach. Doing so is generally unsafe unless race
+    * conditions are acceptable.
+    *
+    * @return true only if the result is updated, false if it was already set.
+    */
   @tailrec
   final def updateIfEmpty(result: Try[A]): Boolean = state match {
     case Done(_) => false
-    case s@Waiting(first, rest) =>
-      if (!cas(s, Done(result))) updateIfEmpty(result) else {
+    case s @ Waiting(first, rest) =>
+      if (!cas(s, Done(result))) updateIfEmpty(result)
+      else {
         runq(first, rest, result)
         true
       }
-    case s@Interruptible(waitq, _) =>
-      if (!cas(s, Done(result))) updateIfEmpty(result) else {
+    case s @ Interruptible(waitq, _) =>
+      if (!cas(s, Done(result))) updateIfEmpty(result)
+      else {
         runq(null, waitq, result)
         true
       }
-    case s@Transforming(waitq, _) =>
-      if (!cas(s, Done(result))) updateIfEmpty(result) else {
+    case s @ Transforming(waitq, _) =>
+      if (!cas(s, Done(result))) updateIfEmpty(result)
+      else {
         runq(null, waitq, result)
         true
       }
-    case s@Interrupted(waitq, _) =>
-      if (!cas(s, Done(result))) updateIfEmpty(result) else {
+    case s @ Interrupted(waitq, _) =>
+      if (!cas(s, Done(result))) updateIfEmpty(result)
+      else {
         runq(null, waitq, result)
         true
       }
@@ -738,37 +730,33 @@ class Promise[A]
   protected[util] final def continue(k: K[A]): Unit = {
     state match {
       case Done(v) =>
-        Scheduler.submit(new Runnable {
+        Scheduler.submit(
+            new Runnable {
           def run() {
             k(v)
           }
         })
-      case s@Waiting(first, rest) if first == null =>
-        if (!cas(s, Waiting(k, rest)))
-          continue(k)
-      case s@Waiting(first, rest) =>
-        if (!cas(s, Waiting(first, k :: rest)))
-          continue(k)
-      case s@Interruptible(waitq, handler) =>
-        if (!cas(s, Interruptible(k :: waitq, handler)))
-          continue(k)
-      case s@Transforming(waitq, other) =>
-        if (!cas(s, Transforming(k :: waitq, other)))
-          continue(k)
-      case s@Interrupted(waitq, signal) =>
-        if (!cas(s, Interrupted(k :: waitq, signal)))
-          continue(k)
+      case s @ Waiting(first, rest) if first == null =>
+        if (!cas(s, Waiting(k, rest))) continue(k)
+      case s @ Waiting(first, rest) =>
+        if (!cas(s, Waiting(first, k :: rest))) continue(k)
+      case s @ Interruptible(waitq, handler) =>
+        if (!cas(s, Interruptible(k :: waitq, handler))) continue(k)
+      case s @ Transforming(waitq, other) =>
+        if (!cas(s, Transforming(k :: waitq, other))) continue(k)
+      case s @ Interrupted(waitq, signal) =>
+        if (!cas(s, Interrupted(k :: waitq, signal))) continue(k)
       case Linked(p) =>
         p.continue(k)
     }
   }
 
   /**
-   * Should only be called when this Promise has already been fulfilled
-   * or it is becoming another Future via `become`.
-   */
+    * Should only be called when this Promise has already been fulfilled
+    * or it is becoming another Future via `become`.
+    */
   protected final def compress(): Promise[A] = state match {
-    case s@Linked(p) =>
+    case s @ Linked(p) =>
       val target = p.compress()
       // due to the assumptions stated above regarding when this can be called,
       // there should never be a `cas` fail.
@@ -783,22 +771,20 @@ class Promise[A]
     if (this eq target) return
 
     state match {
-      case s@Linked(p) =>
-        if (cas(s, Linked(target)))
-          p.link(target)
-        else
-          link(target)
+      case s @ Linked(p) =>
+        if (cas(s, Linked(target))) p.link(target)
+        else link(target)
 
-      case s@Done(value) =>
+      case s @ Done(value) =>
         if (!target.updateIfEmpty(value) && value != Await.result(target)) {
           throw new IllegalArgumentException(
-            "Cannot link two Done Promises with differing values")
+              "Cannot link two Done Promises with differing values")
         }
 
-      case s@Waiting(first, rest) =>
-        if (!cas(s, Linked(target))) link(target) else {
-          if (first != null)
-            target.continue(first)
+      case s @ Waiting(first, rest) =>
+        if (!cas(s, Linked(target))) link(target)
+        else {
+          if (first != null) target.continue(first)
           var ks = rest
           while (ks ne Nil) {
             target.continue(ks.head)
@@ -806,8 +792,9 @@ class Promise[A]
           }
         }
 
-      case s@Interruptible(waitq, handler) =>
-        if (!cas(s, Linked(target))) link(target) else {
+      case s @ Interruptible(waitq, handler) =>
+        if (!cas(s, Linked(target))) link(target)
+        else {
           var ks = waitq
           while (ks ne Nil) {
             target.continue(ks.head)
@@ -816,8 +803,9 @@ class Promise[A]
           target.setInterruptHandler(handler)
         }
 
-      case s@Transforming(waitq, other) =>
-        if (!cas(s, Linked(target))) link(target) else {
+      case s @ Transforming(waitq, other) =>
+        if (!cas(s, Linked(target))) link(target)
+        else {
           var ks = waitq
           while (ks ne Nil) {
             target.continue(ks.head)
@@ -826,8 +814,9 @@ class Promise[A]
           target.forwardInterruptsTo(other)
         }
 
-      case s@Interrupted(waitq, signal) =>
-        if (!cas(s, Linked(target))) link(target) else {
+      case s @ Interrupted(waitq, signal) =>
+        if (!cas(s, Linked(target))) link(target)
+        else {
           var ks = waitq
           while (ks ne Nil) {
             target.continue(ks.head)
@@ -841,7 +830,9 @@ class Promise[A]
   def poll: Option[Try[A]] = state match {
     case Linked(p) => p.poll
     case Done(res) => Some(res)
-    case Waiting(_, _) | Interruptible(_, _) | Interrupted(_, _) | Transforming(_, _) => None
+    case Waiting(_, _) | Interruptible(_, _) |
+        Interrupted(_, _) | Transforming(_, _) =>
+      None
   }
 
   override def isDefined: Boolean = state match {
@@ -849,6 +840,8 @@ class Promise[A]
     // object allocations for `Some`s when the caller does not need the result.
     case Linked(p) => p.isDefined
     case Done(res) => true
-    case Waiting(_, _) | Interruptible(_, _) | Interrupted(_, _) | Transforming(_, _) => false
+    case Waiting(_, _) | Interruptible(_, _) |
+        Interrupted(_, _) | Transforming(_, _) =>
+      false
   }
 }

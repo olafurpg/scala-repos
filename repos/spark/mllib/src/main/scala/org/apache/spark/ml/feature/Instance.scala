@@ -20,10 +20,11 @@ package org.apache.spark.ml.feature
 import org.apache.spark.mllib.linalg.Vector
 
 /**
- * Class that represents an instance of weighted data point with label and features.
- *
- * @param label Label for this data point.
- * @param weight The weight of this instance.
- * @param features The vector of features for this data point.
- */
-private[ml] case class Instance(label: Double, weight: Double, features: Vector)
+  * Class that represents an instance of weighted data point with label and features.
+  *
+  * @param label Label for this data point.
+  * @param weight The weight of this instance.
+  * @param features The vector of features for this data point.
+  */
+private[ml] case class Instance(
+    label: Double, weight: Double, features: Vector)

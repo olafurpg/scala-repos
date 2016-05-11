@@ -54,17 +54,16 @@ class A {
 
 object Scalatest {
   private val outputdir = System.getProperty("partest.output", "inner.obj")
-  private val scalalib  = System.getProperty("partest.lib", "")
+  private val scalalib = System.getProperty("partest.lib", "")
   private val classpath = outputdir + File.pathSeparator + scalalib
-  private val javabin  = {
+  private val javabin = {
     val jhome = new File(System.getProperty("java.home"))
     if (jhome.getName == "jre")
       new File(jhome.getParent, "bin").getAbsolutePath
-    else
-      new File(jhome, "bin").getAbsolutePath
+    else new File(jhome, "bin").getAbsolutePath
   }
-  private val javacmd   = javabin + File.separator + "java"
-  private val javac     = javabin + File.separator + "javac"
+  private val javacmd = javabin + File.separator + "java"
+  private val javac = javabin + File.separator + "javac"
 
   def javac(src: String, fname: String) {
     val tmpfilename = outputdir + File.separator + fname

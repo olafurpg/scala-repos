@@ -19,11 +19,9 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 
 @RunWith(classOf[JUnitRunner])
-class ClientBuilderTest extends FunSuite
-  with Eventually
-  with IntegrationPatience
-  with MockitoSugar
-  with IntegrationBase {
+class ClientBuilderTest
+    extends FunSuite with Eventually with IntegrationPatience with MockitoSugar
+    with IntegrationBase {
 
   trait ClientBuilderHelper {
     val preparedFactory = mock[ServiceFactory[String, String]]
@@ -31,11 +29,12 @@ class ClientBuilderTest extends FunSuite
     when(preparedFactory.status) thenReturn Status.Open
     when(preparedFactory()) thenReturn preparedServicePromise
     when(preparedFactory.close(any[Time])) thenReturn Future.Done
-    when(preparedFactory.map(Matchers.any())) thenReturn
-      preparedFactory.asInstanceOf[ServiceFactory[Any, Nothing]]
+    when(preparedFactory.map(Matchers.any())) thenReturn preparedFactory
+      .asInstanceOf[ServiceFactory[Any, Nothing]]
 
     val m = new MockChannel
-    when(m.codec.prepareConnFactory(any[ServiceFactory[String, String]], any[Stack.Params]))
+    when(m.codec.prepareConnFactory(any[ServiceFactory[String, String]],
+                                    any[Stack.Params]))
       .thenReturn(preparedFactory)
   }
 
@@ -44,7 +43,8 @@ class ClientBuilderTest extends FunSuite
       val client = m.build()
       val requestFuture = client("123")
 
-      verify(m.codec).prepareConnFactory(any[ServiceFactory[String, String]], any[Stack.Params])
+      verify(m.codec).prepareConnFactory(
+          any[ServiceFactory[String, String]], any[Stack.Params])
       verify(preparedFactory)()
 
       assert(!requestFuture.isDefined)
@@ -58,17 +58,20 @@ class ClientBuilderTest extends FunSuite
     }
   }
 
-
-  def verifyProtocolRegistry(name: String, expected: String)(build: => Service[String, String]) = {
+  def verifyProtocolRegistry(name: String, expected: String)(
+      build: => Service[String, String]) = {
     test(name + " registers protocol library") {
       val simple = new SimpleRegistry()
       GlobalRegistry.withRegistry(simple) {
         build
 
         val entries = GlobalRegistry.get.toSet
-        val unspecified = entries.count(_.key.startsWith(Seq("client", "not-specified")))
-        assert(unspecified == 0, "saw registry keys with 'not-specified' protocol")
-        val specified = entries.count(_.key.startsWith(Seq("client", expected)))
+        val unspecified =
+          entries.count(_.key.startsWith(Seq("client", "not-specified")))
+        assert(unspecified == 0,
+               "saw registry keys with 'not-specified' protocol")
+        val specified =
+          entries.count(_.key.startsWith(Seq("client", expected)))
         assert(specified > 0, "did not see expected protocol registry keys")
       }
     }
@@ -106,8 +109,10 @@ class ClientBuilderTest extends FunSuite
     val ctx = new ClientBuilderHelper {}
     when(ctx.m.codec.protocolLibraryName).thenReturn("fancy")
 
-    val cfClient: CodecFactory[String, String]#Client =
-      { (_: ClientCodecConfig) => ctx.m.codec }
+    val cfClient: CodecFactory[String, String]#Client = {
+      (_: ClientCodecConfig) =>
+        ctx.m.codec
+    }
 
     ClientBuilder()
       .name("test")
@@ -121,8 +126,10 @@ class ClientBuilderTest extends FunSuite
     val ctx = new ClientBuilderHelper {}
     when(ctx.m.codec.protocolLibraryName).thenReturn("fancy")
 
-    val cfClient: CodecFactory[String, String]#Client =
-      { (_: ClientCodecConfig) => ctx.m.codec }
+    val cfClient: CodecFactory[String, String]#Client = {
+      (_: ClientCodecConfig) =>
+        ctx.m.codec
+    }
 
     val stk = ClientBuilder.stackClientOfCodec(cfClient)
     ClientBuilder()
@@ -133,10 +140,10 @@ class ClientBuilderTest extends FunSuite
       .build()
   }
 
-
   test("ClientBuilder should close properly") {
     new ClientBuilderHelper {
-      val svc = ClientBuilder().hostConnectionLimit(1).codec(m.codec).hosts("").build()
+      val svc =
+        ClientBuilder().hostConnectionLimit(1).codec(m.codec).hosts("").build()
       val f = svc.close()
       eventually {
         f.isDefined
@@ -147,8 +154,8 @@ class ClientBuilderTest extends FunSuite
   private class MyException extends Exception
 
   private val retryMyExceptionOnce = RetryPolicy.tries[Try[Nothing]](
-    2, // 2 tries == 1 attempt + 1 retry
-    { case Throw(_: MyException) => true })
+      2, // 2 tries == 1 attempt + 1 retry
+      { case Throw(_: MyException) => true })
 
   test("ClientBuilder should collect stats on 'tries' for retrypolicy") {
     new ClientBuilderHelper {
@@ -173,8 +180,8 @@ class ClientBuilderTest extends FunSuite
       eventually { assert(f.isDefined) }
       assert(inMemory.counters(Seq("test", "tries", "requests")) == 1)
       assert(
-        // 1 request and 1 retry
-        inMemory.counters(Seq("test", "requests")) == 2
+          // 1 request and 1 retry
+          inMemory.counters(Seq("test", "requests")) == 2
       )
     }
   }
@@ -194,7 +201,8 @@ class ClientBuilderTest extends FunSuite
       val numFailures = 5
 
       val service = mock[Service[String, String]]
-      when(service("123")) thenReturn Future.exception(WriteException(new Exception()))
+      when(service("123")) thenReturn Future.exception(
+          WriteException(new Exception()))
       when(service.close(any[Time])) thenReturn Future.Done
       preparedServicePromise() = Return(service)
 
@@ -209,7 +217,8 @@ class ClientBuilderTest extends FunSuite
     }
   }
 
-  test("ClientBuilder with stack should collect stats on 'tries' for retrypolicy") {
+  test(
+      "ClientBuilder with stack should collect stats on 'tries' for retrypolicy") {
     new ClientBuilderHelper {
       val inMemory = new InMemoryStatsReceiver
       val builder = ClientBuilder()
@@ -237,10 +246,11 @@ class ClientBuilderTest extends FunSuite
     }
   }
 
-  test("ClientBuilder with stack should collect stats on 'tries' with no retrypolicy") {
+  test(
+      "ClientBuilder with stack should collect stats on 'tries' with no retrypolicy") {
     new ClientBuilderHelper {
       val inMemory = new InMemoryStatsReceiver
-      val numFailures = 21  // There will be 20 requeues by default
+      val numFailures = 21 // There will be 20 requeues by default
       val builder = ClientBuilder()
         .name("test")
         .hostConnectionLimit(1)
@@ -253,7 +263,8 @@ class ClientBuilderTest extends FunSuite
       val client = builder.build()
 
       val service = mock[Service[String, String]]
-      when(service("123")) thenReturn Future.exception(WriteException(new Exception()))
+      when(service("123")) thenReturn Future.exception(
+          WriteException(new Exception()))
       when(service.close(any[Time])) thenReturn Future.Done
       preparedServicePromise() = Return(service)
 

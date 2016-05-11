@@ -8,9 +8,8 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.util.IntentionUtils
 
 /**
- * Jason Zaugg
- */
-
+  * Jason Zaugg
+  */
 object AddNameToArgumentIntention {
   def familyName = "Use named arguments"
 }
@@ -18,10 +17,13 @@ object AddNameToArgumentIntention {
 class AddNameToArgumentIntention extends PsiElementBaseIntentionAction {
   def getFamilyName = AddNameToArgumentIntention.familyName
 
-  override def getText = "Use named arguments for current and subsequent arguments"
+  override def getText =
+    "Use named arguments for current and subsequent arguments"
 
   def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
-     IntentionUtils.addNameToArgumentsFix(element, onlyBoolean = false).isDefined
+    IntentionUtils
+      .addNameToArgumentsFix(element, onlyBoolean = false)
+      .isDefined
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {

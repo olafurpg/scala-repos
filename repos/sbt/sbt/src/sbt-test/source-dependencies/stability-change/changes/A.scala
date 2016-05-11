@@ -1,4 +1,3 @@
-object A
-{
-	def x = new C
+object A {
+  def x = new C
 }

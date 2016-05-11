@@ -14,25 +14,30 @@ import org.jetbrains.annotations.{NotNull, Nullable}
 
 import scala.collection.JavaConverters._
 
-
 /**
- * @author Pavel Fatin
- *
- * Common adapter for legacy interface implementations.
- */
-abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData] extends CopyPastePostProcessor[T] {
+  * @author Pavel Fatin
+  *
+  * Common adapter for legacy interface implementations.
+  */
+abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData]
+    extends CopyPastePostProcessor[T] {
   @NotNull
-  override final def collectTransferableData(file: PsiFile, editor: Editor,
-                                             startOffsets: Array[Int], endOffsets: Array[Int]) = {
+  override final def collectTransferableData(file: PsiFile,
+                                             editor: Editor,
+                                             startOffsets: Array[Int],
+                                             endOffsets: Array[Int]) = {
 
-    val result = collectTransferableData0(file, editor, startOffsets, endOffsets)
+    val result = collectTransferableData0(
+        file, editor, startOffsets, endOffsets)
 
     if (result == null) emptyList() else singletonList(result)
   }
 
   @Nullable
-  protected def collectTransferableData0(file: PsiFile, editor: Editor,
-                                         startOffsets: Array[Int], endOffsets: Array[Int]): T
+  protected def collectTransferableData0(file: PsiFile,
+                                         editor: Editor,
+                                         startOffsets: Array[Int],
+                                         endOffsets: Array[Int]): T
 
   @NotNull
   override final def extractTransferableData(content: Transferable) = {
@@ -44,15 +49,23 @@ abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData] ex
   @Nullable
   protected def extractTransferableData0(content: Transferable): T
 
-
-  override final def processTransferableData(project: Project, editor: Editor, bounds: RangeMarker,
-                                             caretOffset: Int, ref: Ref[lang.Boolean], values: util.List[T]) {
+  override final def processTransferableData(project: Project,
+                                             editor: Editor,
+                                             bounds: RangeMarker,
+                                             caretOffset: Int,
+                                             ref: Ref[lang.Boolean],
+                                             values: util.List[T]) {
 
     values.asScala.foreach { value =>
-      processTransferableData0(project, editor, bounds, caretOffset, ref, value)
+      processTransferableData0(
+          project, editor, bounds, caretOffset, ref, value)
     }
   }
 
-  protected def processTransferableData0(project: Project, editor: Editor, bounds: RangeMarker,
-                                         caretOffset: Int, ref: Ref[lang.Boolean], value: T)
+  protected def processTransferableData0(project: Project,
+                                         editor: Editor,
+                                         bounds: RangeMarker,
+                                         caretOffset: Int,
+                                         ref: Ref[lang.Boolean],
+                                         value: T)
 }

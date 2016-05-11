@@ -2,7 +2,6 @@ package org.jetbrains.plugins.scala
 package refactoring
 package inline
 
-
 import java.io.File
 
 import com.intellij.ide.DataManager
@@ -20,11 +19,11 @@ import org.jetbrains.plugins.scala.lang.refactoring.inline.ScalaInlineHandler
 import org.jetbrains.plugins.scala.util.ScalaUtils
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 16.06.2009
- */
-
-abstract class InlineRefactoringTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * User: Alexander Podkhalyuzin
+  * Date: 16.06.2009
+  */
+abstract class InlineRefactoringTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   val caretMarker = "/*caret*/"
 
   protected def folderPath = baseRootPath() + "inline/"
@@ -32,26 +31,33 @@ abstract class InlineRefactoringTestBase extends ScalaLightPlatformCodeInsightTe
   protected def doTest() {
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
-    val file = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
 
     val offset = fileText.indexOf(caretMarker) + caretMarker.length
-    assert(offset != -1, "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
-    val editor = CommonDataKeys.EDITOR.getData(DataManager.getInstance().getDataContextFromFocus.getResult)
+    assert(
+        offset != -1,
+        "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
+    val editor = CommonDataKeys.EDITOR.getData(
+        DataManager.getInstance().getDataContextFromFocus.getResult)
     editor.getCaretModel.moveToOffset(offset)
 
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
-    var element = CommonDataKeys.PSI_ELEMENT.getData(DataManager.getInstance().getDataContextFromFocus.getResult)
-    if (element == null){
+    var element = CommonDataKeys.PSI_ELEMENT.getData(
+        DataManager.getInstance().getDataContextFromFocus.getResult)
+    if (element == null) {
       element = BaseRefactoringAction.getElementAtCaret(editor, scalaFile)
     }
 
     var res: String = null
     val firstPsi = scalaFile.findElementAt(0)
     val warning = firstPsi.getNode.getElementType match {
-      case ScalaTokenTypes.tLINE_COMMENT => ScalaBundle.message(firstPsi.getText.substring(2).trim)
+      case ScalaTokenTypes.tLINE_COMMENT =>
+        ScalaBundle.message(firstPsi.getText.substring(2).trim)
       case _ => null
     }
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
@@ -63,12 +69,14 @@ abstract class InlineRefactoringTestBase extends ScalaLightPlatformCodeInsightTe
         }
       }, getProjectAdapter, "Test")
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
-    }
-    catch {
+    } catch {
       case e: RefactoringErrorHintException =>
-        assert(e.getMessage == warning, s"Warning should be: $warning, but is: ${e.getMessage}")
+        assert(e.getMessage == warning,
+               s"Warning should be: $warning, but is: ${e.getMessage}")
         return
-      case e: Exception => assert(assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+      case e: Exception =>
+        assert(
+            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

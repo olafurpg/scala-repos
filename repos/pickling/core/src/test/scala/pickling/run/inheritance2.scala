@@ -13,14 +13,16 @@ abstract class Person extends Creature {
   val age: Int
 }
 
-case class Firefighter(val name: String, val age: Int, val salary: Int) extends Person
+case class Firefighter(val name: String, val age: Int, val salary: Int)
+    extends Person
 
 class Inheritance2Test extends FunSuite {
   test("case class") {
     val f = new Firefighter("Josephine", 48, 40000)
 
     val pickleF = (f: Firefighter).pickle
-    assert(pickleF.value === """
+    assert(
+        pickleF.value === """
       |{
       |  "$type": "scala.pickling.inheritance2.Firefighter",
       |  "name": "Josephine",
@@ -38,7 +40,8 @@ class Inheritance2Test extends FunSuite {
     val f = new Firefighter("Josephine", 48, 40000)
 
     val pickleP = (f: Person).pickle
-    assert(pickleP.value === """
+    assert(
+        pickleP.value === """
       |{
       |  "$type": "scala.pickling.inheritance2.Firefighter",
       |  "name": "Josephine",
@@ -56,7 +59,8 @@ class Inheritance2Test extends FunSuite {
     val f = new Firefighter("Josephine", 48, 40000)
 
     val pickleC = (f: Creature).pickle
-    assert(pickleC.value === """
+    assert(
+        pickleC.value === """
       |{
       |  "$type": "scala.pickling.inheritance2.Firefighter",
       |  "name": "Josephine",

@@ -11,16 +11,14 @@ import org.jboss.netty.channel._
 import org.jboss.netty.handler.ssl.SslHandler
 
 class ChannelTransport[In, Out](ch: Channel)
-  extends Transport[In, Out] with ChannelUpstreamHandler
-{
+    extends Transport[In, Out] with ChannelUpstreamHandler {
   private[this] var nneed = 0
   private[this] def need(n: Int): Unit = synchronized {
     nneed += n
     // Note: we buffer 1 message here so that we receive socket
     // closes proactively.
     val r = nneed >= 0
-    if (ch.isReadable != r && ch.isOpen)
-      ch.setReadable(r)
+    if (ch.isReadable != r && ch.isOpen) ch.setReadable(r)
   }
 
   ch.getPipeline.addLast("finagleTransportBridge", this)
@@ -33,8 +31,7 @@ class ChannelTransport[In, Out](ch: Channel)
   }
 
   private[this] def fail(exc: Throwable) {
-    if (!failed.compareAndSet(false, true))
-      return
+    if (!failed.compareAndSet(false, true)) return
 
     // Do not discard existing queue items. Doing so causes a race
     // between reading off of the transport and a peer closing it.
@@ -56,11 +53,11 @@ class ChannelTransport[In, Out](ch: Channel)
         need(-1)
 
       case e: ChannelStateEvent
-      if e.getState == ChannelState.OPEN && e.getValue != java.lang.Boolean.TRUE =>
+          if e.getState == ChannelState.OPEN &&
+          e.getValue != java.lang.Boolean.TRUE =>
         fail(new ChannelClosedException(ch.getRemoteAddress))
 
-      case e: ChannelStateEvent
-      if e.getState == ChannelState.INTEREST_OPS =>
+      case e: ChannelStateEvent if e.getState == ChannelState.INTEREST_OPS =>
         // Make sure we have the right interest ops. This allows us to fix
         // up any races that may occur when setting interest ops without
         // having to explicitly serialize them -- it guarantees convergence
@@ -76,14 +73,14 @@ class ChannelTransport[In, Out](ch: Channel)
         need(0)
 
       case e: ChannelStateEvent
-      if e.getState == ChannelState.CONNECTED
-          && e.getValue == java.lang.Boolean.TRUE =>
+          if e.getState == ChannelState.CONNECTED &&
+          e.getValue == java.lang.Boolean.TRUE =>
         need(0)
 
       case e: ExceptionEvent =>
         fail(ChannelException(e.getCause, ch.getRemoteAddress))
 
-      case _ =>  // drop.
+      case _ => // drop.
     }
 
     // We terminate the upstream here on purpose: this must always
@@ -96,10 +93,11 @@ class ChannelTransport[In, Out](ch: Channel)
     // This is not cancellable because write operations in netty3
     // are note cancellable. That is, there is no way to interrupt or
     // preempt them once the write event has been sent into the pipeline.
-    val writeFuture = new DefaultChannelFuture(ch, false /* cancellable */)
+    val writeFuture = new DefaultChannelFuture(ch, false /* cancellable */ )
     writeFuture.addListener(new ChannelFutureListener {
       def operationComplete(f: ChannelFuture): Unit = {
-        if (f.isSuccess) p.setDone() else {
+        if (f.isSuccess) p.setDone()
+        else {
           // since we can't cancel, `f` must be an exception.
           p.setException(ChannelException(f.getCause, ch.getRemoteAddress))
         }
@@ -112,8 +110,8 @@ class ChannelTransport[In, Out](ch: Channel)
     // if the target future is complete. This allows us to present a
     // more consistent threading model where callbacks are invoked
     // on the event loop thread.
-    ch.getPipeline().sendDownstream(
-      new DownstreamMessageEvent(ch, writeFuture, msg, null));
+    ch.getPipeline()
+      .sendDownstream(new DownstreamMessageEvent(ch, writeFuture, msg, null));
 
     // We avoid setting an interrupt handler on the future exposed
     // because the backing opertion isn't interruptible.
@@ -146,8 +144,7 @@ class ChannelTransport[In, Out](ch: Channel)
     else Status.Open
 
   def close(deadline: Time): Future[Unit] = {
-    if (ch.isOpen)
-      Channels.close(ch)
+    if (ch.isOpen) Channels.close(ch)
     closep.unit
   }
 

@@ -2,24 +2,21 @@
 
 // Many thanks to all at LAMP for the work that goes into Scala.
 
-
 class A {}
 
-trait B[T <: B[T]] { self: T => }
-
-abstract class C extends A with B[C]
-{
-    protected val data: List[Int]
+trait B[T <: B[T]] { self: T =>
 }
 
-class E extends D
-{
-    val data = Nil
+abstract class C extends A with B[C] {
+  protected val data: List[Int]
 }
 
-class F extends D
-{
-    val data = Nil
+class E extends D {
+  val data = Nil
+}
+
+class F extends D {
+  val data = Nil
 }
 
 abstract class D extends C with B[D] {}

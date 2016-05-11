@@ -3,8 +3,8 @@ package effect
 
 ////
 /**
- *
- */
+  *
+  */
 ////
 trait MonadIO[F[_]] extends LiftIO[F] with Monad[F] { self =>
   ////
@@ -12,7 +12,9 @@ trait MonadIO[F[_]] extends LiftIO[F] with Monad[F] { self =>
   // derived functions
 
   ////
-  val monadIOSyntax = new scalaz.syntax.effect.MonadIOSyntax[F] { def F = MonadIO.this }
+  val monadIOSyntax = new scalaz.syntax.effect.MonadIOSyntax[F] {
+    def F = MonadIO.this
+  }
 }
 
 object MonadIO {
@@ -22,7 +24,8 @@ object MonadIO {
 
   // TODO for some reason, putting this in RegionTInstances causes scalac to blow the stack
   implicit def regionTMonadIO[S, M[_]](implicit M0: MonadIO[M]) =
-    new MonadIO[RegionT[S, M, ?]] with RegionTLiftIO[S, M] with RegionTMonad[S, M] {
+    new MonadIO[RegionT[S, M, ?]] with RegionTLiftIO[S, M]
+    with RegionTMonad[S, M] {
       implicit def M = M0
       implicit def L = M0
     }
@@ -35,10 +38,11 @@ object MonadIO {
     def liftIO[A](ioa: IO[A]) = FLO.liftIO(ioa)
   }
 
-  private[scalaz] def fromLiftIO[F[_]: LiftIO: Monad]: MonadIO[F] = new FromLiftIO[F] {
-    def FM = Monad[F]
-    def FLO = LiftIO[F]
-  }
+  private[scalaz] def fromLiftIO[F[_]: LiftIO : Monad]: MonadIO[F] =
+    new FromLiftIO[F] {
+      def FM = Monad[F]
+      def FLO = LiftIO[F]
+    }
 
   implicit def idTMonadIO[F[_]: MonadIO] = fromLiftIO[IdT[F, ?]]
 
@@ -48,11 +52,13 @@ object MonadIO {
 
   implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[EitherT[F, E, ?]]
 
-  implicit def streamTMonadIO[F[_]: MonadIO: Applicative] = fromLiftIO[StreamT[F, ?]]
+  implicit def streamTMonadIO[F[_]: MonadIO : Applicative] =
+    fromLiftIO[StreamT[F, ?]]
 
   implicit def kleisliMonadIO[F[_]: MonadIO, E] = fromLiftIO[Kleisli[F, E, ?]]
 
-  implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[WriterT[F, W, ?]]
+  implicit def writerTMonadIO[F[_]: MonadIO, W : Monoid] =
+    fromLiftIO[WriterT[F, W, ?]]
 
   implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[StateT[F, S, ?]]
 

@@ -16,7 +16,12 @@ object Test extends ScaladocModelTest {
     var conv: ImplicitConversion = null
 
     // SEE THE test/resources/implicits-chaining-res.scala FOR THE EXPLANATION OF WHAT'S CHECKED HERE:
-    val base = root._package("scala")._package("test")._package("scaladoc")._package("implicits")._package("scopes")
+    val base = root
+      ._package("scala")
+      ._package("test")
+      ._package("scaladoc")
+      ._package("implicits")
+      ._package("scopes")
 
 //// test1 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

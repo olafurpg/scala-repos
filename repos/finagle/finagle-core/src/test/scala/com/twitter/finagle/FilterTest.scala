@@ -32,8 +32,11 @@ class FilterTest extends FunSuite {
     verify(spied).apply(any[Int], any[Service[Int, Int]])
   }
 
-  test("Filter.andThen(Filter): lifts synchronous exceptions into Future.exception") {
-    val fail = Filter.mk[Int, Int, Int, Int] { (_, _) => throw new Exception }
+  test(
+      "Filter.andThen(Filter): lifts synchronous exceptions into Future.exception") {
+    val fail = Filter.mk[Int, Int, Int, Int] { (_, _) =>
+      throw new Exception
+    }
     val svc = (new PassThruFilter).andThen(fail).andThen(constSvc)
     val result = Await.result(svc(4).liftToTry)
     assert(result.isThrow)
@@ -46,7 +49,8 @@ class FilterTest extends FunSuite {
     verify(spied).apply(any[Int])
   }
 
-  test("Filter.andThen(Service): lifts synchronous exceptions into Future.exception") {
+  test(
+      "Filter.andThen(Service): lifts synchronous exceptions into Future.exception") {
     val svc = (new PassThruFilter).andThen(NilService)
     val result = Await.result(svc(4).liftToTry)
     assert(result.isThrow)
@@ -82,9 +86,11 @@ class FilterTest extends FunSuite {
 
   test("Filter.choose: apply the underlying filter to certain requests") {
     val spied = spy(new PassThruFilter)
-    val svc = Filter.choose[Int, Int] {
-      case req if req > 0 => spied
-    }.andThen(constSvc)
+    val svc = Filter
+      .choose[Int, Int] {
+        case req if req > 0 => spied
+      }
+      .andThen(constSvc)
 
     assert(Await.result(svc(100)) == 2)
     verify(spied, times(1)).apply(any[Int], any[Service[Int, Int]])
@@ -93,7 +99,8 @@ class FilterTest extends FunSuite {
     verify(spied, times(1)).apply(any[Int], any[Service[Int, Int]])
   }
 
-  test("Filter.TypeAgnostic.toFilter distributes over Filter.TypeAgnostic.andThen") {
+  test(
+      "Filter.TypeAgnostic.toFilter distributes over Filter.TypeAgnostic.andThen") {
     val calls = List.newBuilder[(Any, Any)]
     class TestFilter extends Filter.TypeAgnostic {
       def toFilter[Req, Rep] =

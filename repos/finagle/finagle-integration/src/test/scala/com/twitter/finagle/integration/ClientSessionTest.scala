@@ -16,14 +16,14 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 /**
- * We want client session statuses to reflect the status of their underlying transports.
- */
+  * We want client session statuses to reflect the status of their underlying transports.
+  */
 @RunWith(classOf[JUnitRunner])
 class ClientSessionTest extends FunSuite with MockitoSugar {
 
   def testSessionStatus[Req, Rep](
-    name: String,
-    sessionFac: (Transport[Req, Rep]) => () => Status
+      name: String,
+      sessionFac: (Transport[Req, Rep]) => () => Status
   ): Unit = {
 
     test(s"$name: session status reflects underlying transport") {
@@ -42,58 +42,62 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
   }
 
   testSessionStatus[mux.transport.Message, mux.transport.Message](
-    "mux-transport",
-    { tr: Transport[mux.transport.Message, mux.transport.Message] =>
-      val session: mux.ClientSession =
-        new mux.ClientSession(tr, mux.FailureDetector.NullConfig, "test", NullStatsReceiver)
-      () => session.status
-    }
+      "mux-transport", {
+        tr: Transport[mux.transport.Message, mux.transport.Message] =>
+          val session: mux.ClientSession = new mux.ClientSession(
+              tr, mux.FailureDetector.NullConfig, "test", NullStatsReceiver)
+          () =>
+            session.status
+      }
   )
 
   testSessionStatus[mux.transport.Message, mux.transport.Message](
-    "mux-dispatcher",
-    { tr: Transport[mux.transport.Message, mux.transport.Message] =>
-      val dispatcher = mux.ClientDispatcher.newRequestResponse(tr)
-      () => dispatcher.status
-    }
+      "mux-dispatcher", {
+        tr: Transport[mux.transport.Message, mux.transport.Message] =>
+          val dispatcher = mux.ClientDispatcher.newRequestResponse(tr)
+          () =>
+            dispatcher.status
+      }
   )
 
   testSessionStatus(
-    "http-transport",
-    { tr: Transport[Any, Any] =>
-      val manager = mock[http.codec.ConnectionManager]
-      when(manager.shouldClose).thenReturn(false)
-      val wrappedT = new http.HttpTransport(tr, manager)
-      () => wrappedT.status
-    }
+      "http-transport", { tr: Transport[Any, Any] =>
+        val manager = mock[http.codec.ConnectionManager]
+        when(manager.shouldClose).thenReturn(false)
+        val wrappedT = new http.HttpTransport(tr, manager)
+        () =>
+          wrappedT.status
+      }
   )
 
   testSessionStatus(
-    "http-dispatcher",
-    { tr: Transport[Any, Any] =>
-      val dispatcher = new HttpClientDispatcher(tr)
-      () => dispatcher.status
-    }
+      "http-dispatcher", { tr: Transport[Any, Any] =>
+        val dispatcher = new HttpClientDispatcher(tr)
+        () =>
+          dispatcher.status
+      }
   )
 
   class MyClient extends com.twitter.finagle.Memcached.Client {
-    def newDisp(transport: Transport[In, Out]): Service[In, Out] = super.newDispatcher(transport)
+    def newDisp(transport: Transport[In, Out]): Service[In, Out] =
+      super.newDispatcher(transport)
   }
 
   testSessionStatus(
-    "memcached-dispatcher",
-    { tr: Transport[memcached.protocol.Command, memcached.protocol.Response] =>
-      val cl: MyClient = new MyClient
-      val svc = cl.newDisp(tr)
-      () => svc.status
-    }
+      "memcached-dispatcher", {
+        tr: Transport[memcached.protocol.Command, memcached.protocol.Response] =>
+          val cl: MyClient = new MyClient
+          val svc = cl.newDisp(tr)
+          () =>
+            svc.status
+      }
   )
 
-  testSessionStatus(
-    "mysql-dispatcher",
-    { tr: Transport[mysql.transport.Packet, mysql.transport.Packet] =>
+  testSessionStatus("mysql-dispatcher", {
+    tr: Transport[mysql.transport.Packet, mysql.transport.Packet] =>
       val handshake = mysql.Handshake(Some("username"), Some("password"))
       val dispatcher = new mysql.ClientDispatcher(tr, handshake)
-      () => dispatcher.status
-    })
+      () =>
+        dispatcher.status
+  })
 }

@@ -29,13 +29,12 @@ import org.apache.spark.streaming.api.java.{JavaDStreamLike, JavaDStream, JavaSt
 trait JavaTestBase extends TestSuiteBase {
 
   /**
-   * Create a [[org.apache.spark.streaming.TestInputStream]] and attach it to the supplied context.
-   * The stream will be derived from the supplied lists of Java objects.
-   */
-  def attachTestInputStream[T](
-      ssc: JavaStreamingContext,
-      data: JList[JList[T]],
-      numPartitions: Int) = {
+    * Create a [[org.apache.spark.streaming.TestInputStream]] and attach it to the supplied context.
+    * The stream will be derived from the supplied lists of Java objects.
+    */
+  def attachTestInputStream[T](ssc: JavaStreamingContext,
+                               data: JList[JList[T]],
+                               numPartitions: Int) = {
     val seqData = data.asScala.map(_.asScala)
 
     implicit val cm: ClassTag[T] =
@@ -45,10 +44,11 @@ trait JavaTestBase extends TestSuiteBase {
   }
 
   /**
-   * Attach a provided stream to it's associated StreamingContext as a
-   * [[org.apache.spark.streaming.TestOutputStream]].
-   **/
-  def attachTestOutputStream[T, This <: JavaDStreamLike[T, This, R], R <: JavaRDDLike[T, R]](
+    * Attach a provided stream to it's associated StreamingContext as a
+    * [[org.apache.spark.streaming.TestOutputStream]].
+    **/
+  def attachTestOutputStream[
+      T, This <: JavaDStreamLike[T, This, R], R <: JavaRDDLike[T, R]](
       dstream: JavaDStreamLike[T, This, R]) = {
     implicit val cm: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]
@@ -57,14 +57,15 @@ trait JavaTestBase extends TestSuiteBase {
   }
 
   /**
-   * Process all registered streams for a numBatches batches, failing if
-   * numExpectedOutput RDD's are not generated. Generated RDD's are collected
-   * and returned, represented as a list for each batch interval.
-   *
-   * Returns a list of items for each RDD.
-   */
-  def runStreams[V](
-      ssc: JavaStreamingContext, numBatches: Int, numExpectedOutput: Int): JList[JList[V]] = {
+    * Process all registered streams for a numBatches batches, failing if
+    * numExpectedOutput RDD's are not generated. Generated RDD's are collected
+    * and returned, represented as a list for each batch interval.
+    *
+    * Returns a list of items for each RDD.
+    */
+  def runStreams[V](ssc: JavaStreamingContext,
+                    numBatches: Int,
+                    numExpectedOutput: Int): JList[JList[V]] = {
     implicit val cm: ClassTag[V] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[V]]
     ssc.getState()
@@ -73,25 +74,27 @@ trait JavaTestBase extends TestSuiteBase {
   }
 
   /**
-   * Process all registered streams for a numBatches batches, failing if
-   * numExpectedOutput RDD's are not generated. Generated RDD's are collected
-   * and returned, represented as a list for each batch interval.
-   *
-   * Returns a sequence of RDD's. Each RDD is represented as several sequences of items, each
-   * representing one partition.
-   */
-  def runStreamsWithPartitions[V](ssc: JavaStreamingContext, numBatches: Int,
+    * Process all registered streams for a numBatches batches, failing if
+    * numExpectedOutput RDD's are not generated. Generated RDD's are collected
+    * and returned, represented as a list for each batch interval.
+    *
+    * Returns a sequence of RDD's. Each RDD is represented as several sequences of items, each
+    * representing one partition.
+    */
+  def runStreamsWithPartitions[V](
+      ssc: JavaStreamingContext,
+      numBatches: Int,
       numExpectedOutput: Int): JList[JList[JList[V]]] = {
     implicit val cm: ClassTag[V] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[V]]
-    val res = runStreamsWithPartitions[V](ssc.ssc, numBatches, numExpectedOutput)
+    val res =
+      runStreamsWithPartitions[V](ssc.ssc, numBatches, numExpectedOutput)
     res.map(entry => entry.map(_.asJava).asJava).toSeq.asJava
   }
 }
 
 object JavaTestUtils extends JavaTestBase {
   override def maxWaitTimeMillis = 20000
-
 }
 
 object JavaCheckpointTestUtils extends JavaTestBase {

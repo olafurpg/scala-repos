@@ -64,25 +64,28 @@ object LevenshteinSpecs extends Specification with ScalaCheck {
       Levenshtein.distance(s, t) must beLessThanOrEqualTo(x)
     }
 
-    "with equal lengths, be at most the hamming distance" in check { (u: String, v: String) =>
-      // make s and t the same length by padding with spaces
-      val x = u.length - v.length
-      val p = " " * abs(x)
-      val (s, t) = if (x == 0) (u, v) else if (x > 0) (u, v + p)  else (u + p, v)
+    "with equal lengths, be at most the hamming distance" in check {
+      (u: String, v: String) =>
+        // make s and t the same length by padding with spaces
+        val x = u.length - v.length
+        val p = " " * abs(x)
+        val (s, t) =
+          if (x == 0) (u, v) else if (x > 0) (u, v + p) else (u + p, v)
 
-      // find hammming distance
-      var h = 0
-      for (i <- 0 until s.length) {
-        if (s.charAt(i) != t.charAt(i)) h += 1
-      }
-      Levenshtein.distance(s, t) must beLessThanOrEqualTo(h)
+        // find hammming distance
+        var h = 0
+        for (i <- 0 until s.length) {
+          if (s.charAt(i) != t.charAt(i)) h += 1
+        }
+        Levenshtein.distance(s, t) must beLessThanOrEqualTo(h)
     }
 
-    "satisfy triangle inequality" in check { (s: String, t: String, u: String) =>
-      val d = Levenshtein.distance(s, t)
-      val d1 = Levenshtein.distance(s, u)
-      val d2 = Levenshtein.distance(t, u)
-      d must beLessThanOrEqualTo(d1 + d2)
+    "satisfy triangle inequality" in check {
+      (s: String, t: String, u: String) =>
+        val d = Levenshtein.distance(s, t)
+        val d1 = Levenshtein.distance(s, u)
+        val d2 = Levenshtein.distance(t, u)
+        d must beLessThanOrEqualTo(d1 + d2)
     }
   }
-} 
+}

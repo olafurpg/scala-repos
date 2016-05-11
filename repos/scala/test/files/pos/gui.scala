@@ -3,14 +3,15 @@ object Geom {
   case class Point(x: Int, y: Int) extends Shape
   case class Rectangle(ll: Point, ur: Point) extends Shape {
     def inset(delta: Int) =
-      Rectangle(Point(ll.x - delta, ll.y - delta), Point(ur.x + delta, ur.y + delta));
+      Rectangle(Point(ll.x - delta, ll.y - delta),
+                Point(ur.x + delta, ur.y + delta));
   }
 }
 
 object Color {
   type Color = Int
   val black = 0x000000
-  val grey  = 0x808080
+  val grey = 0x808080
 }
 
 trait Screen {
@@ -56,7 +57,7 @@ object GUI {
   }
 
   abstract class Button(scr: Screen, p: Geom.Point, name: String)
-  extends Glyph with MouseCtl {
+      extends Glyph with MouseCtl {
     var enabled: Boolean = false
     val label = new Label(scr, p, name)
 
@@ -86,16 +87,14 @@ object GUIClient {
     def quit() { Console.println("application exited") }
   }
 
-  class QuitButton (scr: Screen, p: Geom.Point, name: String, a: App)
-  extends GUI.Button(scr, p, name) {
+  class QuitButton(scr: Screen, p: Geom.Point, name: String, a: App)
+      extends GUI.Button(scr, p, name) {
     def doit() { a.quit() }
   }
 
   def main(args: Array[String]) {
-    val b = new QuitButton(
-      DummyScreen, Geom.Point(1, 1), "quit", new App);
+    val b = new QuitButton(DummyScreen, Geom.Point(1, 1), "quit", new App);
     b.draw();
     b.enable(true).mouseDown(Geom.Point(1, 2));
   }
 }
-

@@ -28,7 +28,6 @@ import java.io.File
 
 import blueeyes.json._
 
-
 object IngestTest {
 
   private def time[A](f: => Any): Long = {
@@ -38,15 +37,18 @@ object IngestTest {
   }
 
   private def dataDirs(runner: NIHDBPerfTestRunner[_]): List[File] =
-    List(runner.yggConfig.dataDir, runner.yggConfig.archiveDir,
-      runner.yggConfig.cacheDir, runner.yggConfig.scratchDir)
+    List(runner.yggConfig.dataDir,
+         runner.yggConfig.archiveDir,
+         runner.yggConfig.cacheDir,
+         runner.yggConfig.scratchDir)
 
   private def ensureDataDirsAreEmpty(runner: NIHDBPerfTestRunner[_]) {
     dataDirs(runner) foreach { dir =>
       if (!dir.exists()) {
         dir.mkdirs()
       } else if (!dir.list().isEmpty) {
-        sys.error("Cannot run ingest performance tests on non-empty directory '%s'." format dir)
+        sys.error(
+            "Cannot run ingest performance tests on non-empty directory '%s'." format dir)
       }
     }
   }
@@ -62,15 +64,15 @@ object IngestTest {
 
   def run(config: RunConfig) {
     import akka.actor.ActorSystem
-    import akka.dispatch.{ Future, ExecutionContext, Await }
+    import akka.dispatch.{Future, ExecutionContext, Await}
     import PerfTestPrettyPrinters._
     import RunConfig.OutputFormat
 
     try {
       val runner = new NIHDBPerfTestRunner(SimpleTimer,
-        optimize = config.optimize,
-        apiKey = "dummyAPIKey",
-        _rootDir = config.rootDir)
+                                           optimize = config.optimize,
+                                           apiKey = "dummyAPIKey",
+                                           _rootDir = config.rootDir)
 
       runner.startup()
       try {
@@ -88,19 +90,25 @@ object IngestTest {
         def run(n: Int): Map[String, Option[Statistics]] = {
           import scalaz.syntax.monoid._
 
-          (0 until n).foldLeft(Map.empty[String, Option[Statistics]]) { (stats, _) =>
-            config.ingest.foldLeft(stats) { case (stats, (path, file)) =>
-              stats + (path -> (stats.getOrElse(path, None) |+| Some(timeIngest(path, file))))
-            }
+          (0 until n).foldLeft(Map.empty[String, Option[Statistics]]) {
+            (stats, _) =>
+              config.ingest.foldLeft(stats) {
+                case (stats, (path, file)) =>
+                  stats +
+                  (path ->
+                      (stats.getOrElse(path, None) |+| Some(
+                              timeIngest(path, file))))
+              }
           }
         }
 
         run(config.dryRuns)
         val stats = run(config.runs)
-        println(JObject(stats.toList collect { case (path, Some(s)) =>
-          JField(path, s.toJson)
+        println(
+            JObject(stats.toList collect {
+          case (path, Some(s)) =>
+            JField(path, s.toJson)
         }))
-
       } finally {
         runner.shutdown()
       }
@@ -111,7 +119,9 @@ object IngestTest {
     RunConfig.fromCommandLine(args.toList) match {
       case Failure(errors) =>
         System.err.println("Error parsing command lines:")
-        errors.list foreach { msg => System.err.println("\t" + msg) }
+        errors.list foreach { msg =>
+          System.err.println("\t" + msg)
+        }
         System.err.println()
 
       case Success(config) =>
@@ -119,4 +129,3 @@ object IngestTest {
     }
   }
 }
-

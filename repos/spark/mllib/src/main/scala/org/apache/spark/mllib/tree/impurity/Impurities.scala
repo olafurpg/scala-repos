@@ -18,15 +18,16 @@
 package org.apache.spark.mllib.tree.impurity
 
 /**
- * Factory for Impurity instances.
- */
+  * Factory for Impurity instances.
+  */
 private[mllib] object Impurities {
 
   def fromString(name: String): Impurity = name match {
     case "gini" => Gini
     case "entropy" => Entropy
     case "variance" => Variance
-    case _ => throw new IllegalArgumentException(s"Did not recognize Impurity name: $name")
+    case _ =>
+      throw new IllegalArgumentException(
+          s"Did not recognize Impurity name: $name")
   }
-
 }

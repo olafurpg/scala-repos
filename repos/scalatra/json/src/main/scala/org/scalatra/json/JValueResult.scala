@@ -8,13 +8,14 @@ import org.json4s._
 import scala.xml.NodeSeq
 
 /**
- * Responsible for passing a JValue further in the render pipeline.
- */
+  * Responsible for passing a JValue further in the render pipeline.
+  */
 trait JValueResult extends ScalatraBase { self: JsonSupport[_] =>
 
   implicit protected def jsonFormats: Formats
 
-  override protected def renderPipeline: RenderPipeline = renderToJson orElse super.renderPipeline
+  override protected def renderPipeline: RenderPipeline =
+    renderToJson orElse super.renderPipeline
 
   private[this] def isJValueResponse = format == "json" || format == "xml"
 
@@ -47,5 +48,4 @@ trait JValueResult extends ScalatraBase { self: JsonSupport[_] =>
     case p: Product if isJValueResponse => Extraction.decompose(p)
     case p: TraversableOnce[_] if isJValueResponse => Extraction.decompose(p)
   }
-
 }

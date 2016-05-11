@@ -28,17 +28,17 @@ abstract class Comment {
         case Chain(list) =>
           list foreach scan
         case tag: HtmlTag => {
-          if (stack.length > 0 && tag.canClose(stack.last)) {
-            stack.remove(stack.length-1)
-          } else {
-            tag.close match {
-              case Some(t) =>
-                stack += t
-              case None =>
-                ;
+            if (stack.length > 0 && tag.canClose(stack.last)) {
+              stack.remove(stack.length - 1)
+            } else {
+              tag.close match {
+                case Some(t) =>
+                  stack += t
+                case None =>
+                  ;
+              }
             }
           }
-        }
         case _ =>
           ;
       }
@@ -48,7 +48,7 @@ abstract class Comment {
   }
 
   /** A shorter version of the body. Either from `@shortDescription` or the
-   *  first sentence of the body. */
+    *  first sentence of the body. */
   def short: Inline = {
     shortDescription orElse body.summary match {
       case Some(s) =>
@@ -116,13 +116,13 @@ abstract class Comment {
   def group: Option[String]
 
   /** Member group descriptions */
-  def groupDesc: Map[String,Body]
+  def groupDesc: Map[String, Body]
 
   /** Member group names (overriding the short tag) */
-  def groupNames: Map[String,String]
+  def groupNames: Map[String, String]
 
   /** Member group priorities */
-  def groupPrio: Map[String,Int]
+  def groupPrio: Map[String, Int]
 
   /** A list of implicit conversions to hide */
   def hideImplicitConversions: List[String]
@@ -131,8 +131,7 @@ abstract class Comment {
   def shortDescription: Option[Text]
 
   override def toString =
-    body.toString + "\n" +
-    (authors map ("@author " + _.toString)).mkString("\n") +
-    (result map ("@return " + _.toString)).mkString("\n") +
+    body.toString + "\n" + (authors map ("@author " + _.toString))
+      .mkString("\n") + (result map ("@return " + _.toString)).mkString("\n") +
     (version map ("@version " + _.toString)).mkString
 }

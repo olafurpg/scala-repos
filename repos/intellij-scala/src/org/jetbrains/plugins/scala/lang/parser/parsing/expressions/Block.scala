@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
 /*
  * Block ::= {BlockStat semi}[ResultExpr]
  */
@@ -74,14 +73,18 @@ object Block {
         }
       }
     }
-    if (tts.drop(1).headOption.contains(ScalaTokenTypes.tSEMICOLON)) i -= 1  // See unit_to_unit.test
+    if (tts.drop(1).headOption.contains(ScalaTokenTypes.tSEMICOLON))
+      i -= 1 // See unit_to_unit.test
 
     i
   }
 
-  def parse(builder: ScalaPsiBuilder, hasBrace: Boolean): Boolean = parse(builder, hasBrace, needNode = false)
+  def parse(builder: ScalaPsiBuilder, hasBrace: Boolean): Boolean =
+    parse(builder, hasBrace, needNode = false)
 
-  def parse(builder: ScalaPsiBuilder, hasBrace: Boolean, needNode: Boolean): Boolean = {
+  def parse(builder: ScalaPsiBuilder,
+            hasBrace: Boolean,
+            needNode: Boolean): Boolean = {
     if (hasBrace) {
       val blockMarker = builder.mark
       builder.getTokenType match {
@@ -95,8 +98,7 @@ object Block {
       ParserUtils.parseLoopUntilRBrace(builder, () => parse(builder))
       builder.restoreNewlinesState
       blockMarker.done(ScalaElementTypes.BLOCK_EXPR)
-    }
-    else {
+    } else {
       val bm = builder.mark()
       val count = parseImpl(builder)
       if (count > 1) {

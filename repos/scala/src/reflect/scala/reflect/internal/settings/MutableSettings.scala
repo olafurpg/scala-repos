@@ -9,7 +9,7 @@ package reflect.internal
 package settings
 
 /** A mutable Settings object.
- */
+  */
 abstract class MutableSettings extends AbsSettings {
 
   type Setting <: SettingValue
@@ -62,6 +62,8 @@ abstract class MutableSettings extends AbsSettings {
 
 object MutableSettings {
   import scala.language.implicitConversions
+
   /** Support the common use case, `if (settings.debug) println("Hello, martin.")` */
-  @inline implicit def reflectSettingToBoolean(s: MutableSettings#BooleanSetting): Boolean = s.value
+  @inline implicit def reflectSettingToBoolean(
+      s: MutableSettings#BooleanSetting): Boolean = s.value
 }

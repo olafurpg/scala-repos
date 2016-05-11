@@ -24,26 +24,25 @@ object StorageUnit {
 
   private def factor(s: String) = {
     var lower = s.toLowerCase
-    if (lower endsWith "s")
-      lower = lower dropRight 1
+    if (lower endsWith "s") lower = lower dropRight 1
 
     lower match {
       case "byte" => 1L
-      case "kilobyte" => 1L<<10
-      case "megabyte" => 1L<<20
-      case "gigabyte" => 1L<<30
-      case "terabyte" => 1L<<40
-      case "petabyte" => 1L<<50
-      case "exabyte" => 1L<<60
-      case badUnit => throw new NumberFormatException(
-        "Unrecognized unit %s".format(badUnit))
+      case "kilobyte" => 1L << 10
+      case "megabyte" => 1L << 20
+      case "gigabyte" => 1L << 30
+      case "terabyte" => 1L << 40
+      case "petabyte" => 1L << 50
+      case "exabyte" => 1L << 60
+      case badUnit =>
+        throw new NumberFormatException("Unrecognized unit %s".format(badUnit))
     }
   }
 
   /**
-   * Note, this can cause overflows of the Long used to represent the
-   * number of bytes.
-   */
+    * Note, this can cause overflows of the Long used to represent the
+    * number of bytes.
+    */
   def parse(s: String): StorageUnit = s.split("\\.") match {
     case Array(v, u) =>
       val vv = v.toLong
@@ -51,31 +50,35 @@ object StorageUnit {
       new StorageUnit(vv * uu)
 
     case _ =>
-      throw new NumberFormatException("invalid storage unit string: %s".format(s))
+      throw new NumberFormatException(
+          "invalid storage unit string: %s".format(s))
   }
 }
 
 /**
- * Representation of storage units.
- *
- * If you import the [[com.twitter.conversions.storage]] implicits you can
- * write human-readable values such as `1.gigabyte` or `50.megabytes`.
- *
- * Note: operations can cause overflows of the Long used to represent the
- * number of bytes.
- */
+  * Representation of storage units.
+  *
+  * If you import the [[com.twitter.conversions.storage]] implicits you can
+  * write human-readable values such as `1.gigabyte` or `50.megabytes`.
+  *
+  * Note: operations can cause overflows of the Long used to represent the
+  * number of bytes.
+  */
 class StorageUnit(val bytes: Long) extends Ordered[StorageUnit] {
-  def inBytes     = bytes
+  def inBytes = bytes
   def inKilobytes = bytes / (1024L)
   def inMegabytes = bytes / (1024L * 1024)
   def inGigabytes = bytes / (1024L * 1024 * 1024)
   def inTerabytes = bytes / (1024L * 1024 * 1024 * 1024)
   def inPetabytes = bytes / (1024L * 1024 * 1024 * 1024 * 1024)
-  def inExabytes  = bytes / (1024L * 1024 * 1024 * 1024 * 1024 * 1024)
+  def inExabytes = bytes / (1024L * 1024 * 1024 * 1024 * 1024 * 1024)
 
-  def +(that: StorageUnit): StorageUnit = new StorageUnit(this.bytes + that.bytes)
-  def -(that: StorageUnit): StorageUnit = new StorageUnit(this.bytes - that.bytes)
-  def *(scalar: Double): StorageUnit = new StorageUnit((this.bytes.toDouble*scalar).toLong)
+  def +(that: StorageUnit): StorageUnit =
+    new StorageUnit(this.bytes + that.bytes)
+  def -(that: StorageUnit): StorageUnit =
+    new StorageUnit(this.bytes - that.bytes)
+  def *(scalar: Double): StorageUnit =
+    new StorageUnit((this.bytes.toDouble * scalar).toLong)
   def *(scalar: Long): StorageUnit = new StorageUnit(this.bytes * scalar)
   def /(scalar: Long): StorageUnit = new StorageUnit(this.bytes / scalar)
 
@@ -112,7 +115,8 @@ class StorageUnit(val bytes: Long) extends Ordered[StorageUnit] {
     if (prefixIndex < 0) {
       "%d B".format(bytes)
     } else {
-      "%.1f %ciB".formatLocal(Locale.ENGLISH, display*bytes.signum, prefix.charAt(prefixIndex))
+      "%.1f %ciB".formatLocal(
+          Locale.ENGLISH, display * bytes.signum, prefix.charAt(prefixIndex))
     }
   }
 }

@@ -28,7 +28,7 @@ trait Phases {
 
   type ConditionTree
   type GroupTree
-  
+
   type Phase = Expr => Set[Error]
 
   type Sigma = Map[Formal, Expr]
@@ -41,27 +41,26 @@ trait Phases {
 
     def safeCopy(trace: Trace, node: (Sigma, Expr), indices: BitSet) =
       trace.copy(
-        nodes = trace.nodes :+ node,
-        indices = trace.indices :+ indices) 
+          nodes = trace.nodes :+ node, indices = trace.indices :+ indices)
   }
-  
+
   private val Phases: List[Phase] =
     bindNames _ :: checkProvenance _ :: inferBuckets _ :: Nil
-  
+
   protected def LoadId: Identifier
   protected def RelLoadId: Identifier
   protected def ExpandGlobId: Identifier
   protected def DistinctId: Identifier
-  
+
   def bindNames(expr: Expr): Set[Error]
   def checkProvenance(expr: Expr): Set[Error]
   def inferBuckets(expr: Expr): Set[Error]
-  
+
   def buildTrace(sigma: Sigma)(expr: Expr): Trace
-  
+
   private[quirrel] def runPhasesInSequence(tree: Expr): Set[Error] =
-    Phases.foldLeft(Set[Error]()) { _ ++ _(tree) }
-  
+    Phases.foldLeft(Set[Error]()) { _ ++ _ (tree) }
+
   val Error: ErrorCompanion
 
   def showError(error: Error): String

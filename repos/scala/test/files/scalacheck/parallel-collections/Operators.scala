@@ -1,8 +1,5 @@
 package scala.collection.parallel
 
-
-
-
 trait Operators[T] {
   def reduceOperators: List[(T, T) => T]
   def countPredicates: List[T => Boolean]
@@ -23,8 +20,6 @@ trait Operators[T] {
   def newArray(sz: Int): Array[T]
   def groupByFunctions: List[T => T]
 }
-
-
 
 trait SeqOperators[T] extends Operators[T] {
   def segmentLengthPredicates: List[T => Boolean]

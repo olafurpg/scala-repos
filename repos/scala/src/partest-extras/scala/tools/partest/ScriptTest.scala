@@ -7,8 +7,8 @@ package scala.tools.partest
 import scala.reflect.internal.util.ScalaClassLoader
 
 /** A `ScriptTest` is a `DirectTest` for which the code
- *  is the contents of a script file.
- */
+  *  is the contents of a script file.
+  */
 abstract class ScriptTest extends DirectTest {
   def testmain = "TestMain"
   override def extraSettings = s"-usejavacp -Xscript $testmain"

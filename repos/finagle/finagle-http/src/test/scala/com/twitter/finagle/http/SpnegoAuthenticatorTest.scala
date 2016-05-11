@@ -38,7 +38,7 @@ class SpnegoAuthenticatorTest extends FunSuite with MockitoSugar {
 
   test("success") {
     val credentials = mock[GSSContext]
-    val clientToken: Token = Array[Byte](1,3,3,7)
+    val clientToken: Token = Array[Byte](1, 3, 3, 7)
     val credSrc = new Credentials.ClientSource with Credentials.ServerSource {
       def load() = Future(credentials)
       def init(c: GSSContext, t: Option[Token]) = Future(clientToken)
@@ -52,7 +52,7 @@ class SpnegoAuthenticatorTest extends FunSuite with MockitoSugar {
     val (client, server, service) = serve(credSrc, Some(credSrc))
     val req = builder.buildGet()
     stub(service.apply(anyAuthenticated)).toReturn(
-      Future(Response(req.version, Status.Ok))
+        Future(Response(req.version, Status.Ok))
     )
     try {
       // should succeed with exactly one authenticated request
@@ -65,11 +65,12 @@ class SpnegoAuthenticatorTest extends FunSuite with MockitoSugar {
   }
 
   /**
-   * An unauthorized request to the server (no ClientFilter in place.)
-   */
+    * An unauthorized request to the server (no ClientFilter in place.)
+    */
   def negative(req: Request): Response = {
     // negative tests will not reach the credential source
-    val serverSrc = new Credentials.JAASServerSource("test-authenticated-service")
+    val serverSrc =
+      new Credentials.JAASServerSource("test-authenticated-service")
     val (client, server, _) = serve(serverSrc)
     try {
       val rsp = Await.result(client.apply(req))
@@ -81,21 +82,20 @@ class SpnegoAuthenticatorTest extends FunSuite with MockitoSugar {
   }
 
   def serve(
-    serverSrc: Credentials.ServerSource,
-    clientSrc: Option[Credentials.ClientSource] = None
+      serverSrc: Credentials.ServerSource,
+      clientSrc: Option[Credentials.ClientSource] = None
   ) = {
     val service = mock[Service[Authenticated[Request], Response]]
-    val server = com.twitter.finagle.Http.serve(
-      "localhost:*", new ServerFilter(serverSrc) andThen service)
+    val server = com.twitter.finagle.Http
+      .serve("localhost:*", new ServerFilter(serverSrc) andThen service)
     val port = server.boundAddress.asInstanceOf[InetSocketAddress].getPort
     val rawClient = com.twitter.finagle.Http.newService(s"localhost:$port")
 
-    val client =
-      clientSrc.map { src =>
-        new ClientFilter(src) andThen rawClient
-      }.getOrElse {
-        rawClient
-      }
+    val client = clientSrc.map { src =>
+      new ClientFilter(src) andThen rawClient
+    }.getOrElse {
+      rawClient
+    }
     (client, server, service)
   }
 }

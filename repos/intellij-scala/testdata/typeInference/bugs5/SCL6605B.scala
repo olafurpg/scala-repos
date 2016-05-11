@@ -10,6 +10,7 @@ trait SCL6605B {
   val a2: A2 with A5
   val a3: A3 with A4
   val zz = if (true) a2 else a3
-  /*start*/zz/*end*/
+  /*start*/
+  zz /*end*/
 }
 //SCL6605B.this.A2

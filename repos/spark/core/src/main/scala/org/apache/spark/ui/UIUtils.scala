@@ -36,12 +36,14 @@ private[spark] object UIUtils extends Logging {
 
   // SimpleDateFormat is not thread-safe. Don't expose it to avoid improper use.
   private val dateFormat = new ThreadLocal[SimpleDateFormat]() {
-    override def initialValue(): SimpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+    override def initialValue(): SimpleDateFormat =
+      new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
   }
 
   def formatDate(date: Date): String = dateFormat.get.format(date)
 
-  def formatDate(timestamp: Long): String = dateFormat.get.format(new Date(timestamp))
+  def formatDate(timestamp: Long): String =
+    dateFormat.get.format(new Date(timestamp))
 
   def formatDuration(milliseconds: Long): String = {
     if (milliseconds < 100) {
@@ -84,7 +86,8 @@ private[spark] object UIUtils extends Logging {
         }
       }
 
-      val millisecondsString = if (ms >= second && ms % second == 0) "" else s"${ms % second} ms"
+      val millisecondsString =
+        if (ms >= second && ms % second == 0) "" else s"${ms % second} ms"
       val secondString = toString((ms % minute) / second, "second")
       val minuteString = toString((ms % hour) / minute, "minute")
       val hourString = toString((ms % day) / hour, "hour")
@@ -93,17 +96,18 @@ private[spark] object UIUtils extends Logging {
       val yearString = toString(ms / year, "year")
 
       Seq(
-        second -> millisecondsString,
-        minute -> s"$secondString $millisecondsString",
-        hour -> s"$minuteString $secondString",
-        day -> s"$hourString $minuteString $secondString",
-        week -> s"$dayString $hourString $minuteString",
-        year -> s"$weekString $dayString $hourString"
-      ).foreach { case (durationLimit, durationString) =>
-        if (ms < durationLimit) {
-          // if time is less than the limit (upto year)
-          return durationString
-        }
+          second -> millisecondsString,
+          minute -> s"$secondString $millisecondsString",
+          hour -> s"$minuteString $secondString",
+          day -> s"$hourString $minuteString $secondString",
+          week -> s"$dayString $hourString $minuteString",
+          year -> s"$weekString $dayString $hourString"
+      ).foreach {
+        case (durationLimit, durationString) =>
+          if (ms < durationLimit) {
+            // if time is less than the limit (upto year)
+            return durationString
+          }
       }
       // if time is more than a year
       return s"$yearString $weekString $dayString"
@@ -123,13 +127,13 @@ private[spark] object UIUtils extends Logging {
     val thousand = 1e3
 
     val (value, unit) = {
-      if (records >= 2*trillion) {
+      if (records >= 2 * trillion) {
         (records / trillion, " T")
-      } else if (records >= 2*billion) {
+      } else if (records >= 2 * billion) {
         (records / billion, " B")
-      } else if (records >= 2*million) {
+      } else if (records >= 2 * million) {
         (records / million, " M")
-      } else if (records >= 2*thousand) {
+      } else if (records >= 2 * thousand) {
         (records / thousand, " K")
       } else {
         (records, "")
@@ -145,7 +149,8 @@ private[spark] object UIUtils extends Logging {
   // Yarn has to go through a proxy so the base uri is provided and has to be on all links
   def uiRoot: String = {
     // SPARK-11484 - Use the proxyBase set by the AM, if not found then use env.
-    sys.props.get("spark.ui.proxyBase")
+    sys.props
+      .get("spark.ui.proxyBase")
       .orElse(sys.env.get("APPLICATION_WEB_PROXY_BASE"))
       .getOrElse("")
   }
@@ -193,22 +198,23 @@ private[spark] object UIUtils extends Logging {
   }
 
   /** Returns a spark page with correctly formatted headers */
-  def headerSparkPage(
-      title: String,
-      content: => Seq[Node],
-      activeTab: SparkUITab,
-      refreshInterval: Option[Int] = None,
-      helpText: Option[String] = None,
-      showVisualization: Boolean = false): Seq[Node] = {
+  def headerSparkPage(title: String,
+                      content: => Seq[Node],
+                      activeTab: SparkUITab,
+                      refreshInterval: Option[Int] = None,
+                      helpText: Option[String] = None,
+                      showVisualization: Boolean = false): Seq[Node] = {
 
     val appName = activeTab.appName
-    val shortAppName = if (appName.length < 36) appName else appName.take(32) + "..."
+    val shortAppName =
+      if (appName.length < 36) appName else appName.take(32) + "..."
     val header = activeTab.headerTabs.map { tab =>
       <li class={if (tab == activeTab) "active" else ""}>
         <a href={prependBaseUri(activeTab.basePath, "/" + tab.prefix + "/")}>{tab.name}</a>
       </li>
     }
-    val helpButton: Seq[Node] = helpText.map(tooltip(_, "bottom")).getOrElse(Seq.empty)
+    val helpButton: Seq[Node] =
+      helpText.map(tooltip(_, "bottom")).getOrElse(Seq.empty)
 
     <html>
       <head>
@@ -247,10 +253,9 @@ private[spark] object UIUtils extends Logging {
   }
 
   /** Returns a page with the spark css/js and a simple format. Used for scheduler UI. */
-  def basicSparkPage(
-      content: => Seq[Node],
-      title: String,
-      useDataTables: Boolean = false): Seq[Node] = {
+  def basicSparkPage(content: => Seq[Node],
+                     title: String,
+                     useDataTables: Boolean = false): Seq[Node] = {
     <html>
       <head>
         {commonHeaderNodes}
@@ -278,18 +283,18 @@ private[spark] object UIUtils extends Logging {
   }
 
   /** Returns an HTML table constructed by generating a row for each object in a sequence. */
-  def listingTable[T](
-      headers: Seq[String],
-      generateDataRow: T => Seq[Node],
-      data: Iterable[T],
-      fixedWidth: Boolean = false,
-      id: Option[String] = None,
-      headerClasses: Seq[String] = Seq.empty,
-      stripeRowsWithCss: Boolean = true,
-      sortable: Boolean = true): Seq[Node] = {
+  def listingTable[T](headers: Seq[String],
+                      generateDataRow: T => Seq[Node],
+                      data: Iterable[T],
+                      fixedWidth: Boolean = false,
+                      id: Option[String] = None,
+                      headerClasses: Seq[String] = Seq.empty,
+                      stripeRowsWithCss: Boolean = true,
+                      sortable: Boolean = true): Seq[Node] = {
 
     val listingTableClass = {
-      val _tableClass = if (stripeRowsWithCss) TABLE_CLASS_STRIPED else TABLE_CLASS_NOT_STRIPED
+      val _tableClass =
+        if (stripeRowsWithCss) TABLE_CLASS_STRIPED else TABLE_CLASS_NOT_STRIPED
       if (sortable) {
         _tableClass + " sortable"
       } else {
@@ -331,16 +336,17 @@ private[spark] object UIUtils extends Logging {
     </table>
   }
 
-  def makeProgressBar(
-      started: Int,
-      completed: Int,
-      failed: Int,
-      skipped: Int,
-      total: Int): Seq[Node] = {
-    val completeWidth = "width: %s%%".format((completed.toDouble/total)*100)
+  def makeProgressBar(started: Int,
+                      completed: Int,
+                      failed: Int,
+                      skipped: Int,
+                      total: Int): Seq[Node] = {
+    val completeWidth =
+      "width: %s%%".format((completed.toDouble / total) * 100)
     // started + completed can be > total when there are speculative tasks
     val boundedStarted = math.min(started, total - completed)
-    val startWidth = "width: %s%%".format((boundedStarted.toDouble/total)*100)
+    val startWidth =
+      "width: %s%%".format((boundedStarted.toDouble / total) * 100)
 
     <div class="progress">
       <span style="text-align:center; position:absolute; width:100%; left:0;">
@@ -354,7 +360,8 @@ private[spark] object UIUtils extends Logging {
   }
 
   /** Return a "DAG visualization" DOM element that expands into a visualization for a stage. */
-  def showDagVizForStage(stageId: Int, graph: Option[RDDOperationGraph]): Seq[Node] = {
+  def showDagVizForStage(
+      stageId: Int, graph: Option[RDDOperationGraph]): Seq[Node] = {
     showDagViz(graph.toSeq, forJob = false)
   }
 
@@ -364,13 +371,14 @@ private[spark] object UIUtils extends Logging {
   }
 
   /**
-   * Return a "DAG visualization" DOM element that expands into a visualization on the UI.
-   *
-   * This populates metadata necessary for generating the visualization on the front-end in
-   * a format that is expected by spark-dag-viz.js. Any changes in the format here must be
-   * reflected there.
-   */
-  private def showDagViz(graphs: Seq[RDDOperationGraph], forJob: Boolean): Seq[Node] = {
+    * Return a "DAG visualization" DOM element that expands into a visualization on the UI.
+    *
+    * This populates metadata necessary for generating the visualization on the front-end in
+    * a format that is expected by spark-dag-viz.js. Any changes in the format here must be
+    * reflected there.
+    */
+  private def showDagViz(
+      graphs: Seq[RDDOperationGraph], forJob: Boolean): Seq[Node] = {
     <div>
       <span id={if (forJob) "job-dag-viz" else "stage-dag-viz"}
             class="expand-dag-viz" onclick={s"toggleDagViz($forJob);"}>
@@ -409,14 +417,14 @@ private[spark] object UIUtils extends Logging {
   }
 
   /**
-   * Returns HTML rendering of a job or stage description. It will try to parse the string as HTML
-   * and make sure that it only contains anchors with root-relative links. Otherwise,
-   * the whole string will rendered as a simple escaped text.
-   *
-   * Note: In terms of security, only anchor tags with root relative links are supported. So any
-   * attempts to embed links outside Spark UI, or other tags like <script> will cause in the whole
-   * description to be treated as plain text.
-   */
+    * Returns HTML rendering of a job or stage description. It will try to parse the string as HTML
+    * and make sure that it only contains anchors with root-relative links. Otherwise,
+    * the whole string will rendered as a simple escaped text.
+    *
+    * Note: In terms of security, only anchor tags with root relative links are supported. So any
+    * attempts to embed links outside Spark UI, or other tags like <script> will cause in the whole
+    * description to be treated as plain text.
+    */
   def makeDescription(desc: String, basePathUri: String): NodeSeq = {
     import scala.language.postfixOps
 
@@ -424,25 +432,33 @@ private[spark] object UIUtils extends Logging {
     // as HTML, otherwise render as escaped string
     try {
       // Try to load the description as unescaped HTML
-      val xml = XML.loadString(s"""<span class="description-input">$desc</span>""")
+      val xml =
+        XML.loadString(s"""<span class="description-input">$desc</span>""")
 
       // Verify that this has only anchors and span (we are wrapping in span)
       val allowedNodeLabels = Set("a", "span")
-      val illegalNodes = xml \\ "_"  filterNot { case node: Node =>
-        allowedNodeLabels.contains(node.label)
-      }
+      val illegalNodes =
+        xml \\ "_" filterNot {
+          case node: Node =>
+            allowedNodeLabels.contains(node.label)
+        }
       if (illegalNodes.nonEmpty) {
         throw new IllegalArgumentException(
-          "Only HTML anchors allowed in job descriptions\n" +
-            illegalNodes.map { n => s"${n.label} in $n"}.mkString("\n\t"))
+            "Only HTML anchors allowed in job descriptions\n" +
+            illegalNodes.map { n =>
+          s"${n.label} in $n"
+        }.mkString("\n\t"))
       }
 
       // Verify that all links are relative links starting with "/"
       val allLinks =
-        xml \\ "a" flatMap { _.attributes } filter { _.key == "href" } map { _.value.toString }
-      if (allLinks.exists { ! _.startsWith ("/") }) {
+        xml \\ "a" flatMap { _.attributes } filter { _.key == "href" } map {
+          _.value.toString
+        }
+      if (allLinks.exists { !_.startsWith("/") }) {
         throw new IllegalArgumentException(
-          "Links in job descriptions must be root-relative:\n" + allLinks.mkString("\n\t"))
+            "Links in job descriptions must be root-relative:\n" +
+            allLinks.mkString("\n\t"))
       }
 
       // Prepend the relative links with basePathUri
@@ -451,7 +467,8 @@ private[spark] object UIUtils extends Logging {
           n match {
             case e: Elem if e \ "@href" nonEmpty =>
               val relativePath = e.attribute("href").get.toString
-              val fullUri = s"${basePathUri.stripSuffix("/")}/${relativePath.stripPrefix("/")}"
+              val fullUri =
+                s"${basePathUri.stripSuffix("/")}/${relativePath.stripPrefix("/")}"
               e % Attribute(null, "href", fullUri, Null)
             case _ => n
           }
@@ -465,10 +482,10 @@ private[spark] object UIUtils extends Logging {
   }
 
   /**
-   * Decode URLParameter if URL is encoded by YARN-WebAppProxyServlet.
-   * Due to YARN-2844: WebAppProxyServlet cannot handle urls which contain encoded characters
-   * Therefore we need to decode it until we get the real URLParameter.
-   */
+    * Decode URLParameter if URL is encoded by YARN-WebAppProxyServlet.
+    * Due to YARN-2844: WebAppProxyServlet cannot handle urls which contain encoded characters
+    * Therefore we need to decode it until we get the real URLParameter.
+    */
   def decodeURLParameter(urlParam: String): String = {
     var param = urlParam
     var decodedParam = URLDecoder.decode(param, "UTF-8")

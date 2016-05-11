@@ -12,24 +12,36 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScValueStubImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 17.10.2008
- */
+  * User: Alexander Podkhalyuzin
+  * Date: 17.10.2008
+  */
 abstract class ScValueElementType[Value <: ScValue](debugName: String)
-extends ScStubElementType[ScValueStub, ScValue](debugName) {
-  def createStubImpl[ParentPsi <: PsiElement](psi: ScValue, parentStub: StubElement[ParentPsi]): ScValueStub = {
+    extends ScStubElementType[ScValueStub, ScValue](debugName) {
+  def createStubImpl[ParentPsi <: PsiElement](
+      psi: ScValue, parentStub: StubElement[ParentPsi]): ScValueStub = {
     val isDecl = psi.isInstanceOf[ScValueDeclaration]
     val typeText = psi.typeElement match {
       case Some(te) => te.getText
       case None => ""
     }
-    val bodyText = if (!isDecl) psi.asInstanceOf[ScPatternDefinition].expr.map(_.getText).getOrElse("") else ""
-    val containerText = if (isDecl) psi.asInstanceOf[ScValueDeclaration].getIdList.getText
+    val bodyText =
+      if (!isDecl)
+        psi.asInstanceOf[ScPatternDefinition].expr.map(_.getText).getOrElse("")
+      else ""
+    val containerText =
+      if (isDecl) psi.asInstanceOf[ScValueDeclaration].getIdList.getText
       else psi.asInstanceOf[ScPatternDefinition].pList.getText
     val isImplicit = psi.hasModifierProperty("implicit")
-    new ScValueStubImpl[ParentPsi](parentStub, this,
-      (for (elem <- psi.declaredElements) yield elem.name).toArray, isDecl, typeText, bodyText, containerText,
-      isImplicit, psi.containingClass == null)
+    new ScValueStubImpl[ParentPsi](
+        parentStub,
+        this,
+        (for (elem <- psi.declaredElements) yield elem.name).toArray,
+        isDecl,
+        typeText,
+        bodyText,
+        containerText,
+        isImplicit,
+        psi.containingClass == null)
   }
 
   def serialize(stub: ScValueStub, dataStream: StubOutputStream) {
@@ -44,7 +56,8 @@ extends ScStubElementType[ScValueStub, ScValue](debugName) {
     dataStream.writeBoolean(stub.isLocal)
   }
 
-  def deserializeImpl(dataStream: StubInputStream, parentStub: Any): ScValueStub = {
+  def deserializeImpl(
+      dataStream: StubInputStream, parentStub: Any): ScValueStub = {
     val isDecl = dataStream.readBoolean
     val namesLength = dataStream.readInt
     val names = new Array[StringRef](namesLength)
@@ -55,15 +68,24 @@ extends ScStubElementType[ScValueStub, ScValue](debugName) {
     val bindingsText = dataStream.readName
     val isImplicit = dataStream.readBoolean()
     val isLocal = dataStream.readBoolean()
-    new ScValueStubImpl(parent, this, names, isDecl, typeText, bodyText, bindingsText, isImplicit, isLocal)
+    new ScValueStubImpl(parent,
+                        this,
+                        names,
+                        isDecl,
+                        typeText,
+                        bodyText,
+                        bindingsText,
+                        isImplicit,
+                        isLocal)
   }
 
   def indexStub(stub: ScValueStub, sink: IndexSink) {
     val names = stub.getNames
-    
+
     for (name <- names if name != null) {
       sink.occurrence(ScalaIndexKeys.VALUE_NAME_KEY, name)
     }
-    if (stub.isImplicit) sink.occurrence(ScalaIndexKeys.IMPLICITS_KEY, "implicit")
+    if (stub.isImplicit)
+      sink.occurrence(ScalaIndexKeys.IMPLICITS_KEY, "implicit")
   }
 }

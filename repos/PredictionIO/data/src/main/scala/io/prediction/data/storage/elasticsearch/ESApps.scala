@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.elasticsearch
 
 import grizzled.slf4j.Logging
@@ -30,7 +29,7 @@ import org.json4s.native.Serialization.write
 
 /** Elasticsearch implementation of Items. */
 class ESApps(client: Client, config: StorageClientConfig, index: String)
-  extends Apps with Logging {
+    extends Apps with Logging {
   implicit val formats = DefaultFormats.lossless
   private val estype = "apps"
   private val seq = new ESSequences(client, config, index)
@@ -40,14 +39,18 @@ class ESApps(client: Client, config: StorageClientConfig, index: String)
   if (!indexExistResponse.isExists) {
     indices.prepareCreate(index).get
   }
-  val typeExistResponse = indices.prepareTypesExists(index).setTypes(estype).get
+  val typeExistResponse =
+    indices.prepareTypesExists(index).setTypes(estype).get
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-        ("properties" ->
-          ("name" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
-    indices.preparePutMapping(index).setType(estype).
-      setSource(compact(render(json))).get
+          ("properties" ->
+              ("name" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
+    indices
+      .preparePutMapping(index)
+      .setType(estype)
+      .setSource(compact(render(json)))
+      .get
   }
 
   def insert(app: App): Option[Int] = {
@@ -56,8 +59,7 @@ class ESApps(client: Client, config: StorageClientConfig, index: String)
         var roll = seq.genNext("apps")
         while (!get(roll).isEmpty) roll = seq.genNext("apps")
         roll
-      }
-      else app.id
+      } else app.id
     val realapp = app.copy(id = id)
     update(realapp)
     Some(id)
@@ -65,10 +67,7 @@ class ESApps(client: Client, config: StorageClientConfig, index: String)
 
   def get(id: Int): Option[App] = {
     try {
-      val response = client.prepareGet(
-        index,
-        estype,
-        id.toString).get()
+      val response = client.prepareGet(index, estype, id.toString).get()
       Some(read[App](response.getSourceAsString))
     } catch {
       case e: ElasticsearchException =>
@@ -80,8 +79,11 @@ class ESApps(client: Client, config: StorageClientConfig, index: String)
 
   def getByName(name: String): Option[App] = {
     try {
-      val response = client.prepareSearch(index).setTypes(estype).
-        setPostFilter(termFilter("name", name)).get
+      val response = client
+        .prepareSearch(index)
+        .setTypes(estype)
+        .setPostFilter(termFilter("name", name))
+        .get
       val hits = response.getHits().hits()
       if (hits.size > 0) {
         Some(read[App](hits.head.getSourceAsString))
@@ -108,8 +110,10 @@ class ESApps(client: Client, config: StorageClientConfig, index: String)
 
   def update(app: App): Unit = {
     try {
-      val response = client.prepareIndex(index, estype, app.id.toString).
-        setSource(write(app)).get()
+      val response = client
+        .prepareIndex(index, estype, app.id.toString)
+        .setSource(write(app))
+        .get()
     } catch {
       case e: ElasticsearchException =>
         error(e.getMessage)

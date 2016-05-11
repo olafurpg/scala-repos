@@ -3,4 +3,3 @@ class ScalaClassOne extends ClassTwo.Child {
     func2
   }
 }
-

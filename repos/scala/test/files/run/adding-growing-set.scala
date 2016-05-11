@@ -1,6 +1,6 @@
 /** This will run a loooong time if Set's builder copies a
- *  complete new Set for every element.
- */
+  *  complete new Set for every element.
+  */
 object Test {
   def main(args: Array[String]): Unit = {
     val a = new Array[Long](1000000)

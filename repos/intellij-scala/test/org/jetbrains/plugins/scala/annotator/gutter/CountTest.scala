@@ -1,9 +1,8 @@
 package org.jetbrains.plugins.scala.annotator.gutter
 
 /**
- * Pavel.Fatin, 21.01.2010
- */
-
+  * Pavel.Fatin, 21.01.2010
+  */
 class CountTest extends LineMarkerTestBase {
   protected override def getBasePath = super.getBasePath + "/count/"
 

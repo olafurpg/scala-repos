@@ -1,15 +1,14 @@
- trait Base[@specialized(Double) B] {
+trait Base[@specialized(Double) B] {
   def default: B;
- }
+}
 
- trait D1 extends Base[Double] {
+trait D1 extends Base[Double] {
   override def default = 0.0;
- }
+}
 
- class D2 extends D1  {
+class D2 extends D1 {
   override def default: Double = 1.0;
- }
-
+}
 
 object Test extends App {
   val d2 = new D2

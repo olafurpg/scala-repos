@@ -6,23 +6,27 @@ import scala.collection.mutable
 import scala.reflect.runtime.universe.Mirror
 import scala.pickling.spi.{PicklerRegistry, RuntimePicklerGenerator}
 
-
-
 /** Default pickle registry just uses TrieMaps and delgates behavior to a runtime pickler generator. */
-final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator) extends PicklerRegistry with RuntimePicklerRegistryHelper {
+final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator)
+    extends PicklerRegistry with RuntimePicklerRegistryHelper {
   type PicklerGenerator = AppliedType => Pickler[_]
   type UnpicklerGenerator = AppliedType => Unpickler[_]
   // TODO - We need to move the special encoding for runtime classes into here, rather than in magical traits.
 
-  private val picklerMap: mutable.Map[String, Pickler[_]] = new TrieMap[String, Pickler[_]]
-  private val picklerGenMap: mutable.Map[String, PicklerGenerator] = new TrieMap[String, PicklerGenerator]
-  private val unpicklerMap: mutable.Map[String, Unpickler[_]] = new TrieMap[String, Unpickler[_]]
-  private val unpicklerGenMap: mutable.Map[String, UnpicklerGenerator] = new TrieMap[String, UnpicklerGenerator]
+  private val picklerMap: mutable.Map[String, Pickler[_]] =
+    new TrieMap[String, Pickler[_]]
+  private val picklerGenMap: mutable.Map[String, PicklerGenerator] =
+    new TrieMap[String, PicklerGenerator]
+  private val unpicklerMap: mutable.Map[String, Unpickler[_]] =
+    new TrieMap[String, Unpickler[_]]
+  private val unpicklerGenMap: mutable.Map[String, UnpicklerGenerator] =
+    new TrieMap[String, UnpicklerGenerator]
 
   // During constrcution, we can now register the default picklers against our cache of picklers.
   autoRegisterDefaults()
 
-  override def genUnpickler(mirror: Mirror, tagKey: String)(implicit share: refs.Share): Unpickler[_] = {
+  override def genUnpickler(mirror: Mirror, tagKey: String)(
+      implicit share: refs.Share): Unpickler[_] = {
     lookupUnpickler(tagKey) match {
       case Some(p) => p
       case None =>
@@ -33,7 +37,9 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator) extends P
         p
     }
   }
-  def genPickler(classLoader: ClassLoader, clazz: Class[_], tag: FastTypeTag[_])(implicit share: refs.Share): Pickler[_] = {
+  def genPickler(
+      classLoader: ClassLoader, clazz: Class[_], tag: FastTypeTag[_])(
+      implicit share: refs.Share): Pickler[_] = {
     lookupPickler(tag.key) match {
       case Some(p) => p
       case None =>
@@ -92,7 +98,6 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator) extends P
           case None => None // This key is not an applied type.
         }
     }
-
   }
 
   /** Registers a function which can generate picklers for a given type constructor.
@@ -101,9 +106,10 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator) extends P
     * @param generator  A function which takes an applied type string (your type + arguments) and returns a pickler for
     *                   this type.
     */
-  override def registerUnpicklerGenerator[T](typeConstructorKey: String, generator: (AppliedType) => Unpickler[T]): Unit =
+  override def registerUnpicklerGenerator[T](
+      typeConstructorKey: String,
+      generator: (AppliedType) => Unpickler[T]): Unit =
     unpicklerGenMap.put(typeConstructorKey, generator)
-
 
   /** Registers a function which can generate picklers for a given type constructor.
     *
@@ -111,7 +117,9 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator) extends P
     * @param generator  A function which takes an applied type string (your type + arguments) and returns a pickler for
     *                   this type.
     */
-  override def registerPicklerGenerator[T](typeConstructorKey: String, generator: (AppliedType) => Pickler[T]): Unit =
+  override def registerPicklerGenerator[T](
+      typeConstructorKey: String,
+      generator: (AppliedType) => Pickler[T]): Unit =
     picklerGenMap.put(typeConstructorKey, generator)
 
   /** Registers a pickler and unpickler for a type with this registry for future use.
@@ -119,7 +127,8 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator) extends P
     *             In those situations, the pickler should be able to handle arbitrary (existential) type parameters.
     * @param p  The unpickler to register.
     */
-  override def registerPicklerUnpickler[T](key: String, p: (Pickler[T] with Unpickler[T])): Unit = {
+  override def registerPicklerUnpickler[T](
+      key: String, p: (Pickler[T] with Unpickler[T])): Unit = {
     // TODO - Should we lock or something here?
     registerPickler(key, p)
     registerUnpickler(key, p)
@@ -131,7 +140,9 @@ final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator) extends P
     * @param generator  A function which takes an applied type string (your type + arguments) and returns a pickler for
     *                   this type.
     */
-  override def registerPicklerUnpicklerGenerator[T](typeConstructorKey: String, generator: (AppliedType) => (Pickler[T] with Unpickler[T])): Unit = {
+  override def registerPicklerUnpicklerGenerator[T](
+      typeConstructorKey: String,
+      generator: (AppliedType) => (Pickler[T] with Unpickler[T])): Unit = {
     // TODO - Should we lock or something here?
     registerPicklerGenerator(typeConstructorKey, generator)
     registerUnpicklerGenerator(typeConstructorKey, generator)

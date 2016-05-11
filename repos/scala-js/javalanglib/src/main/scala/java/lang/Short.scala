@@ -28,7 +28,6 @@ final class Short private () extends Number with Comparable[Short] {
 
   @inline override def toString(): String =
     Short.toString(shortValue)
-
 }
 
 object Short {
@@ -58,8 +57,7 @@ object Short {
     val r = Integer.parseInt(s, radix)
     if (r < MIN_VALUE || r > MAX_VALUE)
       throw new NumberFormatException(s"""For input string: "$s"""")
-    else
-      r.toShort
+    else r.toShort
   }
 
   @inline def toString(s: scala.Short): String =

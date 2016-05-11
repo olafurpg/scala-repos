@@ -30,14 +30,16 @@ import com.mongodb.util.JSON
 import org.bson.types.ObjectId
 
 /*
-* Field for storing a DBRef
-*/
-class DBRefField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](rec: OwnerType, ref: RefType)
-  extends Field[DBRef, OwnerType] with MandatoryTypedField[DBRef] {
+ * Field for storing a DBRef
+ */
+class DBRefField[
+    OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
+    rec: OwnerType, ref: RefType)
+    extends Field[DBRef, OwnerType] with MandatoryTypedField[DBRef] {
 
   /*
-  * get the referenced object
-  */
+   * get the referenced object
+   */
   def obj = synchronized {
     if (!_calcedObj) {
       _calcedObj = true
@@ -83,7 +85,8 @@ class DBRefField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefT
     val dbo = JSON.parse(in).asInstanceOf[BasicDBObject]
     val id = dbo.get("$id").toString
     ObjectId.isValid(id) match {
-      case true => Full(set(new DBRef(dbo.get("$ref").toString, new ObjectId(id))))
+      case true =>
+        Full(set(new DBRef(dbo.get("$ref").toString, new ObjectId(id))))
       case false => Full(set(new DBRef(dbo.get("$ref").toString, id)))
     }
   }
@@ -92,4 +95,3 @@ class DBRefField[OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefT
 
   def owner = rec
 }
-

@@ -1,8 +1,4 @@
-
-
-
 import scala.collection.immutable._
-
 
 // ticket #3511
 object Test {
@@ -32,5 +28,4 @@ object Test {
     val spatch = s.view.patch(1, List(5, 5, 5), 5).force.take(5)
     assert(spatch == List(0, 5, 5, 5, 6))
   }
-
 }

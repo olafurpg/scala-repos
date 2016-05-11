@@ -9,9 +9,9 @@ import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import docs.http.scaladsl.server.RoutingSpec
 
 import scala.concurrent.Future
-import scala.util.{ Success, Failure }
+import scala.util.{Success, Failure}
 import akka.http.scaladsl.server.ExceptionHandler
-import akka.actor.{ Actor, Props }
+import akka.actor.{Actor, Props}
 import akka.util.Timeout
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route

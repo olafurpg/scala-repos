@@ -1,7 +1,6 @@
 // #266, yee ha
 
-trait O {
-  self: Test.type =>
+trait O { self: Test.type =>
 
   Nil foreach identity
 

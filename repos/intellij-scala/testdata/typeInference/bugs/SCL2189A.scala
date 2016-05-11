@@ -1,6 +1,6 @@
-trait A[X] {
-  self =>
+trait A[X] { self =>
 
-  /*start*/self/*end*/
+  /*start*/
+  self /*end*/
 }
 //A[X]

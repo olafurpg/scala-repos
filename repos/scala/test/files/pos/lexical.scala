@@ -1,6 +1,6 @@
 // #2081
 class RichInt(n: Int) {
-  def days = 1000*60*60*24*n
+  def days = 1000 * 60 * 60 * 24 * n
 }
 
 object Test extends App {

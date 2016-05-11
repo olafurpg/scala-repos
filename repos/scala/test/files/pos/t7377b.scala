@@ -1,5 +1,5 @@
 object Test {
-  List(1) match { case Nil => 0; case (x::xs) => x }
+  List(1) match { case Nil => 0; case (x :: xs) => x }
 
   case class Foo(a: Int)
   val FooAlias: Foo.type = Foo

@@ -1,4 +1,3 @@
-
 object Macros {
   import scala.language.experimental.macros
   import scala.language.implicitConversions

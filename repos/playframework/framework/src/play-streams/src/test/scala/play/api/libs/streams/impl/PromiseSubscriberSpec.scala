@@ -4,9 +4,9 @@
 package play.api.libs.streams.impl
 
 import org.specs2.mutable.Specification
-import scala.concurrent.duration.{ FiniteDuration => ScalaFiniteDuration, SECONDS }
+import scala.concurrent.duration.{FiniteDuration => ScalaFiniteDuration, SECONDS}
 import scala.concurrent.Promise
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -15,12 +15,15 @@ class PromiseSubscriberSpec extends Specification {
   import PublisherEvents._
   case class OnComplete(result: Try[Any])
 
-  class TestEnv[T] extends EventRecorder(ScalaFiniteDuration(2, SECONDS)) with PublisherEvents[T] {
+  class TestEnv[T]
+      extends EventRecorder(ScalaFiniteDuration(2, SECONDS))
+      with PublisherEvents[T] {
 
     val prom = Promise[T]()
     val subr = new PromiseSubscriber(prom)
-    prom.future.onComplete { result => record(OnComplete(result)) }
-
+    prom.future.onComplete { result =>
+      record(OnComplete(result))
+    }
   }
 
   "PromiseSubscriber" should {
@@ -64,9 +67,10 @@ class PromiseSubscriberSpec extends Specification {
       isEmptyAfterDelay() must beTrue
 
       onComplete()
-      next must beLike { case OnComplete(Failure(_: IllegalStateException)) => ok }
+      next must beLike {
+        case OnComplete(Failure(_: IllegalStateException)) => ok
+      }
       isEmptyAfterDelay() must beTrue
     }
   }
-
 }

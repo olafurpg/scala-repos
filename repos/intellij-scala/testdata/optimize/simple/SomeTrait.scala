@@ -7,7 +7,7 @@ class Test[T <: SomeTrait] {
   }
 }
 trait SomeTrait {
-  def some : String
+  def some: String
 }
 /*package someTrait
 

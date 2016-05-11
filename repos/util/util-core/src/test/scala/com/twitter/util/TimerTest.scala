@@ -13,11 +13,9 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class TimerTest extends FunSuite
-  with MockitoSugar
-  with Eventually
-  with IntegrationPatience
-{
+class TimerTest
+    extends FunSuite with MockitoSugar with Eventually
+    with IntegrationPatience {
 
   private def testTimerRunsWithLocals(timer: Timer): Unit = {
     val timerLocal = new AtomicInteger(0)
@@ -55,12 +53,13 @@ class TimerTest extends FunSuite
 
     val refcounted = new ReferenceCountingTimer(factory)
 
-      verify(factory, never()).apply()
-      refcounted.acquire()
-      verify(factory).apply()
+    verify(factory, never()).apply()
+    refcounted.acquire()
+    verify(factory).apply()
   }
 
-  test("ReferenceCountingTimer stops the underlying timer when acquire count reaches 0") {
+  test(
+      "ReferenceCountingTimer stops the underlying timer when acquire count reaches 0") {
 
     val underlying = mock[Timer]
     val factory = mock[() => Timer]
@@ -264,7 +263,8 @@ class TimerTest extends FunSuite
       timer.tick()
       assert {
         f.poll match {
-          case Some(Throw(e: CancellationException)) if e.getCause eq exc => true
+          case Some(Throw(e: CancellationException)) if e.getCause eq exc =>
+            true
           case _ => false
         }
       }
@@ -309,8 +309,8 @@ class TimerTest extends FunSuite
   }
 
   private def mockTimerLocalPropagation(
-    timer: MockTimer,
-    localValue: Int
+      timer: MockTimer,
+      localValue: Int
   ): Int = {
     Time.withCurrentTimeFrozen { tc =>
       val timerLocal = new AtomicInteger(0)
@@ -335,9 +335,10 @@ class TimerTest extends FunSuite
 
   private def testTimerUsesLocalMonitor(timer: Timer): Unit = {
     val seen = new AtomicInteger(0)
-    val monitor = Monitor.mk { case _: SomeEx =>
-      seen.incrementAndGet()
-      true
+    val monitor = Monitor.mk {
+      case _: SomeEx =>
+        seen.incrementAndGet()
+        true
     }
     Monitor.using(monitor) {
       timer.schedule(Time.now + 10.millis) { throw new SomeEx }
@@ -358,5 +359,4 @@ class TimerTest extends FunSuite
     val timer = new ScheduledThreadPoolTimer()
     testTimerUsesLocalMonitor(timer)
   }
-
 }

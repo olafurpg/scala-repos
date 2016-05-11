@@ -4,7 +4,6 @@ package psi
 package stubs
 package impl
 
-
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.{IStubElementType, StubElement}
 import com.intellij.util.SofterReference
@@ -14,22 +13,30 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelecto
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 20.06.2009
- */
-
-class ScImportSelectorStubImpl[ParentPsi <: PsiElement](parent: StubElement[ParentPsi],
-                                                  elemType: IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-  extends StubBaseWrapper[ScImportSelector](parent, elemType) with ScImportSelectorStub {
+  * User: Alexander Podkhalyuzin
+  * Date: 20.06.2009
+  */
+class ScImportSelectorStubImpl[ParentPsi <: PsiElement](
+    parent: StubElement[ParentPsi],
+    elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    extends StubBaseWrapper[ScImportSelector](parent, elemType)
+    with ScImportSelectorStub {
   var referenceText: StringRef = _
   var name: StringRef = _
   private var myReference: SofterReference[ScStableCodeReferenceElement] = null
   var aliasImport: Boolean = false
 
-  def this(parent : StubElement[ParentPsi],
-          elemType : IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement], refText: String,
-          importedName: String, isAliasedImport: Boolean) {
-    this (parent, elemType.asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+  def this(parent: StubElement[ParentPsi],
+           elemType: IStubElementType[
+               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           refText: String,
+           importedName: String,
+           isAliasedImport: Boolean) {
+    this(
+        parent,
+        elemType
+          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.referenceText = StringRef.fromString(refText)
     this.name = StringRef.fromString(importedName)
     this.aliasImport = isAliasedImport
@@ -40,11 +47,14 @@ class ScImportSelectorStubImpl[ParentPsi <: PsiElement](parent: StubElement[Pare
   def reference: ScStableCodeReferenceElement = {
     if (myReference != null) {
       val referenceElement = myReference.get
-      if (referenceElement != null && (referenceElement.getContext eq getPsi)) return myReference.get
+      if (referenceElement != null && (referenceElement.getContext eq getPsi))
+        return myReference.get
     }
     val res =
       if (referenceText == StringRef.fromString("")) null
-      else ScalaPsiElementFactory.createReferenceFromText(StringRef.toString(referenceText), getPsi, null)
+      else
+        ScalaPsiElementFactory.createReferenceFromText(
+            StringRef.toString(referenceText), getPsi, null)
     myReference = new SofterReference[ScStableCodeReferenceElement](res)
     res
   }

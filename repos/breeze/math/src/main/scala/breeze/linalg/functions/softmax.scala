@@ -6,13 +6,12 @@ import breeze.linalg.support.CanTraverseValues.ValuesVisitor
 import breeze.macros.expand
 import spire.syntax.cfor._
 
-
 /**
- * Computes the softmax (a.k.a. logSum) of an object. Softmax is defined as \log \sum_i \exp(x(i)), but
- * implemented in a more numerically stable way. Softmax is so-called because it is
- * a differentiable function that tends to look quite a lot like max. Consider
- * log(exp(30) + exp(10)). That's basically 30. We use softmax a lot in machine learning.
- */
+  * Computes the softmax (a.k.a. logSum) of an object. Softmax is defined as \log \sum_i \exp(x(i)), but
+  * implemented in a more numerically stable way. Softmax is so-called because it is
+  * a differentiable function that tends to look quite a lot like max. Consider
+  * log(exp(30) + exp(10)). That's basically 30. We use softmax a lot in machine learning.
+  */
 object softmax extends UFunc {
 
   implicit object implDoubleDouble extends Impl2[Double, Double, Double] {
@@ -25,20 +24,20 @@ object softmax extends UFunc {
   }
 
   /**
-   * Method for computing the max of the first length elements of an array. Arrays
-   * of size 0 give Double.NegativeInfinity
-   * @param arr
-   * @param length
-   * @return
-   */
+    * Method for computing the max of the first length elements of an array. Arrays
+    * of size 0 give Double.NegativeInfinity
+    * @param arr
+    * @param length
+    * @return
+    */
   def array(arr: Array[Double], length: Int) = {
     val m = max.array(arr, length)
-    if(m.isInfinite) {
+    if (m.isInfinite) {
       m
     } else {
       var accum = 0.0
       var i = 0
-      while(i < length) {
+      while (i < length) {
         accum += scala.math.exp(arr(i) - m)
         i += 1
       }
@@ -46,10 +45,12 @@ object softmax extends UFunc {
     }
   }
 
-  implicit def reduceDouble[T](implicit iter: CanTraverseValues[T, Double], maxImpl: max.Impl[T, Double]): Impl[T, Double] = new Impl[T, Double] {
+  implicit def reduceDouble[T](
+      implicit iter: CanTraverseValues[T, Double],
+      maxImpl: max.Impl[T, Double]): Impl[T, Double] = new Impl[T, Double] {
     def apply(v: T): Double = {
 
-      val max = if(!iter.isTraversableAgain(v)) 0.0 else maxImpl(v)
+      val max = if (!iter.isTraversableAgain(v)) 0.0 else maxImpl(v)
 
       if (max.isInfinite) {
         return Double.NegativeInfinity
@@ -62,20 +63,22 @@ object softmax extends UFunc {
         }
 
         def zeros(numZero: Int, zeroValue: Double): Unit = {
-          if(numZero != 0) {
+          if (numZero != 0) {
             accum += (numZero * scala.math.exp(zeroValue - max))
           }
         }
 
-        override def visitArray(arr: Array[Double], offset: Int, length: Int, stride: Int): Unit = {
+        override def visitArray(arr: Array[Double],
+                                offset: Int,
+                                length: Int,
+                                stride: Int): Unit = {
           var i = 0
           var off = offset
-          while(i < length) {
+          while (i < length) {
             accum += scala.math.exp(arr(off) - max)
             i += 1
             off += stride
           }
-
         }
       }
 
@@ -83,13 +86,14 @@ object softmax extends UFunc {
 
       max + scala.math.log(visit.accum)
     }
-
   }
 
-  implicit def reduceFloat[T](implicit iter: CanTraverseValues[T, Float], maxImpl: max.Impl[T, Float]): Impl[T, Float] = new Impl[T, Float] {
+  implicit def reduceFloat[T](
+      implicit iter: CanTraverseValues[T, Float],
+      maxImpl: max.Impl[T, Float]): Impl[T, Float] = new Impl[T, Float] {
     def apply(v: T): Float = {
 
-      val max = if(!iter.isTraversableAgain(v)) 0.0f else maxImpl(v)
+      val max = if (!iter.isTraversableAgain(v)) 0.0f else maxImpl(v)
 
       if (max.isInfinite) {
         return Float.NegativeInfinity
@@ -102,12 +106,13 @@ object softmax extends UFunc {
         }
 
         def zeros(numZero: Int, zeroValue: Float): Unit = {
-          if(numZero != 0) {
+          if (numZero != 0) {
             accum += (numZero * scala.math.exp(zeroValue - max)).toFloat
           }
         }
 
-        override def visitArray(arr: Array[Float], offset: Int, length: Int, stride: Int): Unit = {
+        override def visitArray(
+            arr: Array[Float], offset: Int, length: Int, stride: Int): Unit = {
           var i = 0
           var off = offset
           var cur = 0.0f
@@ -125,7 +130,6 @@ object softmax extends UFunc {
 
       max + scala.math.log(visit.accum).toFloat
     }
-
   }
 }
 
@@ -133,7 +137,7 @@ object logDiff extends UFunc {
   implicit object implDoubleDouble extends Impl2[Double, Double, Double] {
     def apply(a: Double, b: Double): Double = {
       require(a >= b, s"a should be greater than b, but got $a and $b")
-      if (a > b) a + scala.math.log1p(- scala.math.exp(b-a))
+      if (a > b) a + scala.math.log1p(-scala.math.exp(b - a))
       else Double.NegativeInfinity
     }
   }

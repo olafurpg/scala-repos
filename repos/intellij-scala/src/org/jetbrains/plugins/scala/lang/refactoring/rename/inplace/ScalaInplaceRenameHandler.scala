@@ -22,30 +22,40 @@ import org.jetbrains.plugins.scala.lang.refactoring.rename.ScalaRenameUtil
 import org.jetbrains.plugins.scala.util.JListCompatibility
 
 /**
- * Nikolay.Tropin
- * 1/20/14
- */
+  * Nikolay.Tropin
+  * 1/20/14
+  */
 trait ScalaInplaceRenameHandler {
 
   def renameProcessor(element: PsiElement): RenamePsiElementProcessor = {
     val isScalaElement = element match {
       case null => false
       case _: LightScalaMethod | _: PsiClassWrapper => true
-      case _  => element.getLanguage.isInstanceOf[ScalaLanguage]
+      case _ => element.getLanguage.isInstanceOf[ScalaLanguage]
     }
-    val processor = if (isScalaElement) RenamePsiElementProcessor.forElement(element) else null
+    val processor =
+      if (isScalaElement) RenamePsiElementProcessor.forElement(element)
+      else null
     if (processor != RenamePsiElementProcessor.DEFAULT) processor else null
   }
 
-  protected def doDialogRename(element: PsiElement, project: Project, nameSuggestionContext: PsiElement, editor: Editor): Unit = {
-    PsiElementRenameHandler.rename(element, project, nameSuggestionContext, editor)
+  protected def doDialogRename(element: PsiElement,
+                               project: Project,
+                               nameSuggestionContext: PsiElement,
+                               editor: Editor): Unit = {
+    PsiElementRenameHandler.rename(
+        element, project, nameSuggestionContext, editor)
   }
 
-  def afterElementSubstitution(elementToRename: PsiElement, editor: Editor, dataContext: DataContext)(inplaceRename: PsiElement => InplaceRefactoring): InplaceRefactoring = {
-    def showSubstitutePopup(title: String, positive: String, subst: => PsiNamedElement): Unit = {
+  def afterElementSubstitution(
+      elementToRename: PsiElement, editor: Editor, dataContext: DataContext)(
+      inplaceRename: PsiElement => InplaceRefactoring): InplaceRefactoring = {
+    def showSubstitutePopup(
+        title: String, positive: String, subst: => PsiNamedElement): Unit = {
       val cancel = ScalaBundle.message("rename.cancel")
       val list = JListCompatibility.createJBListFromListData(positive, cancel)
-      JBPopupFactory.getInstance.createListPopupBuilder(list)
+      JBPopupFactory.getInstance
+        .createListPopupBuilder(list)
         .setTitle(title)
         .setMovable(false)
         .setResizable(false)
@@ -64,7 +74,9 @@ trait ScalaInplaceRenameHandler {
               case s: String if s == cancel =>
             }
           }
-        }).createPopup.showInBestPositionFor(editor)
+        })
+        .createPopup
+        .showInBestPositionFor(editor)
     }
 
     def specialMethodPopup(fun: ScFunction): Unit = {
@@ -76,33 +88,44 @@ trait ScalaInplaceRenameHandler {
         case _: ScNewTemplateDefinition => "instance"
       }
       val title = ScalaBundle.message("rename.special.method.title")
-      val positive = ScalaBundle.message("rename.special.method.rename.class", clazzType)
-      showSubstitutePopup(title, positive, ScalaRenameUtil.findSubstituteElement(elementToRename))
+      val positive =
+        ScalaBundle.message("rename.special.method.rename.class", clazzType)
+      showSubstitutePopup(
+          title,
+          positive,
+          ScalaRenameUtil.findSubstituteElement(elementToRename))
     }
     def aliasedElementPopup(ref: ScReferenceElement): Unit = {
       val title = ScalaBundle.message("rename.aliased.title")
       val positive = ScalaBundle.message("rename.aliased.rename.actual")
-      showSubstitutePopup(title, positive, ScalaRenameUtil.findSubstituteElement(elementToRename))
+      showSubstitutePopup(
+          title,
+          positive,
+          ScalaRenameUtil.findSubstituteElement(elementToRename))
     }
 
     val atCaret = PsiUtilBase.getElementAtCaret(editor)
-    val selected = ScalaPsiUtil.getParentOfType(atCaret, classOf[ScReferenceElement], classOf[ScNamedElement])
+    val selected = ScalaPsiUtil.getParentOfType(
+        atCaret, classOf[ScReferenceElement], classOf[ScNamedElement])
     val nameId = selected match {
       case ref: ScReferenceElement => ref.nameId
       case named: ScNamedElement => named.nameId
       case _ => null
     }
     elementToRename match {
-      case Both(`selected`, fun: ScFunction) if Seq("apply", "unapply", "unapplySeq").contains(fun.name) || fun.isConstructor =>
+      case Both(`selected`, fun: ScFunction)
+          if Seq("apply", "unapply", "unapplySeq").contains(fun.name) ||
+          fun.isConstructor =>
         specialMethodPopup(fun)
         null
       case elem =>
-        if (nameId != null) nameId.getParent match {
-          case ref: ScReferenceElement if ScalaRenameUtil.isAliased(ref) =>
-            aliasedElementPopup(ref)
-            return null
-          case _ =>
-        }
+        if (nameId != null)
+          nameId.getParent match {
+            case ref: ScReferenceElement if ScalaRenameUtil.isAliased(ref) =>
+              aliasedElementPopup(ref)
+              return null
+            case _ =>
+          }
         inplaceRename(ScalaRenameUtil.findSubstituteElement(elementToRename))
     }
   }

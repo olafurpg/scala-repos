@@ -14,5 +14,6 @@ object ReflectMain extends Driver {
     ScalaClassLoader.fromURLs(classPathURLs, getClass.getClassLoader)
   }
 
-  override def newCompiler(): Global = new ReflectGlobal(settings, reporter, classloaderFromSettings(settings))
+  override def newCompiler(): Global =
+    new ReflectGlobal(settings, reporter, classloaderFromSettings(settings))
 }

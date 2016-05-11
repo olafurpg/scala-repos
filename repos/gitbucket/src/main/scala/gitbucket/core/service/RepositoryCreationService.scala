@@ -13,16 +13,20 @@ import profile.simple._
 trait RepositoryCreationService {
   self: AccountService with RepositoryService with LabelsService with WikiService with ActivityService =>
 
-  def createRepository(loginAccount: Account, owner: String, name: String, description: Option[String], isPrivate: Boolean, createReadme: Boolean)
-                      (implicit s: Session) {
-    val ownerAccount  = getAccountByUserName(owner).get
+  def createRepository(loginAccount: Account,
+                       owner: String,
+                       name: String,
+                       description: Option[String],
+                       isPrivate: Boolean,
+                       createReadme: Boolean)(implicit s: Session) {
+    val ownerAccount = getAccountByUserName(owner).get
     val loginUserName = loginAccount.userName
 
     // Insert to the database at first
     insertRepository(name, owner, description, isPrivate)
 
     // Add collaborators for group repository
-    if(ownerAccount.isGroupAccount){
+    if (ownerAccount.isGroupAccount) {
       getGroupMembers(owner).foreach { member =>
         addCollaborator(owner, name, member.userName)
       }
@@ -35,27 +39,34 @@ trait RepositoryCreationService {
     val gitdir = getRepositoryDir(owner, name)
     JGitUtil.initRepository(gitdir)
 
-    if(createReadme){
-      using(Git.open(gitdir)){ git =>
-        val builder  = DirCache.newInCore.builder()
+    if (createReadme) {
+      using(Git.open(gitdir)) { git =>
+        val builder = DirCache.newInCore.builder()
         val inserter = git.getRepository.newObjectInserter()
-        val headId   = git.getRepository.resolve(Constants.HEAD + "^{commit}")
-        val content  = if(description.nonEmpty){
-          name + "\n" +
-            "===============\n" +
-            "\n" +
-            description.get
-        } else {
-          name + "\n" +
-            "===============\n"
-        }
+        val headId = git.getRepository.resolve(Constants.HEAD + "^{commit}")
+        val content =
+          if (description.nonEmpty) {
+            name + "\n" + "===============\n" + "\n" + description.get
+          } else {
+            name + "\n" + "===============\n"
+          }
 
-        builder.add(JGitUtil.createDirCacheEntry("README.md", FileMode.REGULAR_FILE,
-          inserter.insert(Constants.OBJ_BLOB, content.getBytes("UTF-8"))))
+        builder.add(
+            JGitUtil.createDirCacheEntry(
+                "README.md",
+                FileMode.REGULAR_FILE,
+                inserter.insert(Constants.OBJ_BLOB,
+                                content.getBytes("UTF-8"))))
         builder.finish()
 
-        JGitUtil.createNewCommit(git, inserter, headId, builder.getDirCache.writeTree(inserter),
-          Constants.HEAD, loginAccount.fullName, loginAccount.mailAddress, "Initial commit")
+        JGitUtil.createNewCommit(git,
+                                 inserter,
+                                 headId,
+                                 builder.getDirCache.writeTree(inserter),
+                                 Constants.HEAD,
+                                 loginAccount.fullName,
+                                 loginAccount.mailAddress,
+                                 "Initial commit")
       }
     }
 
@@ -66,7 +77,8 @@ trait RepositoryCreationService {
     recordCreateRepositoryActivity(owner, name, loginUserName)
   }
 
-  def insertDefaultLabels(userName: String, repositoryName: String)(implicit s: Session): Unit = {
+  def insertDefaultLabels(userName: String, repositoryName: String)(
+      implicit s: Session): Unit = {
     createLabel(userName, repositoryName, "bug", "fc2929")
     createLabel(userName, repositoryName, "duplicate", "cccccc")
     createLabel(userName, repositoryName, "enhancement", "84b6eb")
@@ -74,6 +86,4 @@ trait RepositoryCreationService {
     createLabel(userName, repositoryName, "question", "cc317c")
     createLabel(userName, repositoryName, "wontfix", "ffffff")
   }
-
-
 }

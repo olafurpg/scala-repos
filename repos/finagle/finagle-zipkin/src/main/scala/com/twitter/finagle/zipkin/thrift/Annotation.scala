@@ -5,12 +5,12 @@ import com.twitter.util.Time
 import java.nio.ByteBuffer
 
 /**
- * Annotation for a span. An event that happened at a particular time at a particular node.
- */
+  * Annotation for a span. An event that happened at a particular time at a particular node.
+  */
 case class ZipkinAnnotation(
-  timestamp: Time,
-  value:     String,
-  endpoint:  Endpoint
+    timestamp: Time,
+    value: String,
+    endpoint: Endpoint
 ) {
 
   def toThrift: thrift.Annotation = {
@@ -25,10 +25,10 @@ case class ZipkinAnnotation(
 }
 
 case class BinaryAnnotation(
-  key: String,
-  value: ByteBuffer,
-  annotationType: thrift.AnnotationType,
-  endpoint: Endpoint
+    key: String,
+    value: ByteBuffer,
+    annotationType: thrift.AnnotationType,
+    endpoint: Endpoint
 ) {
   def toThrift: thrift.BinaryAnnotation = {
     val thriftAnnotation = new thrift.BinaryAnnotation

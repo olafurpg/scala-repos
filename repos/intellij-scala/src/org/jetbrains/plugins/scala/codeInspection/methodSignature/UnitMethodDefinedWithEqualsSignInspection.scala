@@ -6,16 +6,20 @@ import org.jetbrains.plugins.scala.codeInspection.methodSignature.quickfix.Remov
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 
 /**
- * Pavel Fatin
- */
-
-class UnitMethodDefinedWithEqualsSignInspection extends AbstractMethodSignatureInspection(
-  "ScalaUnitMethodDefinedWithEqualsSign", "Method with Unit result type defined with equals sign") {
+  * Pavel Fatin
+  */
+class UnitMethodDefinedWithEqualsSignInspection
+    extends AbstractMethodSignatureInspection(
+        "ScalaUnitMethodDefinedWithEqualsSign",
+        "Method with Unit result type defined with equals sign") {
 
   def actionFor(holder: ProblemsHolder) = {
-    case f: ScFunctionDefinition if !f.hasExplicitType && f.hasUnitResultType && !f.isSecondaryConstructor =>
+    case f: ScFunctionDefinition
+        if !f.hasExplicitType && f.hasUnitResultType &&
+        !f.isSecondaryConstructor =>
       f.assignment.foreach { assignment =>
-        holder.registerProblem(assignment, getDisplayName, new RemoveEqualsSign(f))
+        holder.registerProblem(
+            assignment, getDisplayName, new RemoveEqualsSign(f))
       }
   }
 }

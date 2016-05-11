@@ -6,16 +6,15 @@ import com.typesafe.config.Config
 
 import lila.common.PimpedConfig._
 
-final class Env(
-    config: Config,
-    db: lila.db.Env,
-    mongoCache: lila.memo.MongoCache.Builder,
-    system: ActorSystem,
-    hub: lila.hub.Env,
-    getLightUser: String => Option[lila.common.LightUser],
-    appPath: String,
-    isProd: Boolean,
-    scheduler: lila.common.Scheduler) {
+final class Env(config: Config,
+                db: lila.db.Env,
+                mongoCache: lila.memo.MongoCache.Builder,
+                system: ActorSystem,
+                hub: lila.hub.Env,
+                getLightUser: String => Option[lila.common.LightUser],
+                appPath: String,
+                isProd: Boolean,
+                scheduler: lila.common.Scheduler) {
 
   private val settings = new {
     val CachedNbTtl = config duration "cached.nb.ttl"
@@ -40,12 +39,10 @@ final class Env(
   lazy val pngExport = PngExport(PngExecPath) _
 
   lazy val cached = new Cached(
-    mongoCache = mongoCache,
-    defaultTtl = CachedNbTtl)
+      mongoCache = mongoCache, defaultTtl = CachedNbTtl)
 
   lazy val paginator = new PaginatorBuilder(
-    cached = cached,
-    maxPerPage = PaginatorMaxPerPage)
+      cached = cached, maxPerPage = PaginatorMaxPerPage)
 
   lazy val rewind = Rewind
 
@@ -54,13 +51,13 @@ final class Env(
   lazy val uciMemo = new UciMemo(UciMemoTtl)
 
   lazy val pgnDump = new PgnDump(
-    netBaseUrl = netBaseUrl,
-    getLightUser = getLightUser)
+      netBaseUrl = netBaseUrl, getLightUser = getLightUser)
 
   lazy val crosstableApi = new CrosstableApi(db(CollectionCrosstable))
 
   // load captcher actor
-  private val captcher = system.actorOf(Props(new Captcher), name = CaptcherName)
+  private val captcher =
+    system.actorOf(Props(new Captcher), name = CaptcherName)
 
   scheduler.message(CaptcherDuration) {
     captcher -> actorApi.NewCaptcha
@@ -72,9 +69,8 @@ final class Env(
     _ foreach { game =>
       system.lilaBus.publish(actorApi.StartGame(game), 'startGame)
       game.userIds foreach { userId =>
-        system.lilaBus.publish(
-          actorApi.UserStartGame(userId, game),
-          Symbol(s"userStartGame:$userId"))
+        system.lilaBus.publish(actorApi.UserStartGame(userId, game),
+                               Symbol(s"userStartGame:$userId"))
       }
     }
   }
@@ -85,14 +81,14 @@ final class Env(
 
 object Env {
 
-  lazy val current = "game" boot new Env(
-    config = lila.common.PlayApp loadConfig "game",
-    db = lila.db.Env.current,
-    mongoCache = lila.memo.Env.current.mongoCache,
-    system = lila.common.PlayApp.system,
-    hub = lila.hub.Env.current,
-    getLightUser = lila.user.Env.current.lightUser,
-    appPath = play.api.Play.current.path.getCanonicalPath,
-    isProd = lila.common.PlayApp.isProd,
-    scheduler = lila.common.PlayApp.scheduler)
+  lazy val current =
+    "game" boot new Env(config = lila.common.PlayApp loadConfig "game",
+                        db = lila.db.Env.current,
+                        mongoCache = lila.memo.Env.current.mongoCache,
+                        system = lila.common.PlayApp.system,
+                        hub = lila.hub.Env.current,
+                        getLightUser = lila.user.Env.current.lightUser,
+                        appPath = play.api.Play.current.path.getCanonicalPath,
+                        isProd = lila.common.PlayApp.isProd,
+                        scheduler = lila.common.PlayApp.scheduler)
 }

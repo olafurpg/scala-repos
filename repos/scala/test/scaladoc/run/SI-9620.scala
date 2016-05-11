@@ -2,7 +2,8 @@ import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
 object Test extends ScaladocModelTest {
-  override def code = """
+  override def code =
+    """
     package a
 
     trait Foo[S] {
@@ -28,7 +29,9 @@ object Test extends ScaladocModelTest {
 
     // Assert Boo only has one implicit conversion
     val boo = rootPackage._package("a")._trait("Boo")
-    val conversions = boo._conversions("a.Boo.BooShouldNotAppearIsFoo") ++ boo._conversions("a.Boo.BooLongIsFoo")
+    val conversions =
+      boo._conversions("a.Boo.BooShouldNotAppearIsFoo") ++ boo._conversions(
+          "a.Boo.BooLongIsFoo")
     assert(conversions.length == 1, conversions.length + " == 1")
 
     // Assert that the implicit conversion is not "BooShouldNotAppearIsFoo"

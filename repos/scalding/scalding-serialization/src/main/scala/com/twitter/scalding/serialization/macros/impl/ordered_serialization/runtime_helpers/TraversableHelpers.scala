@@ -21,7 +21,8 @@ import scala.collection.mutable.Buffer
 object TraversableHelpers {
   import com.twitter.scalding.serialization.JavaStreamEnrichments._
 
-  final def rawCompare(inputStreamA: InputStream, inputStreamB: InputStream)(consume: (InputStream, InputStream) => Int): Int = {
+  final def rawCompare(inputStreamA: InputStream, inputStreamB: InputStream)(
+      consume: (InputStream, InputStream) => Int): Int = {
     val lenA = inputStreamA.readPosVarInt
     val lenB = inputStreamB.readPosVarInt
 
@@ -37,7 +38,8 @@ object TraversableHelpers {
     else java.lang.Integer.compare(lenA, lenB)
   }
 
-  final def iteratorCompare[T](iteratorA: Iterator[T], iteratorB: Iterator[T])(implicit ord: Ordering[T]): Int = {
+  final def iteratorCompare[T](iteratorA: Iterator[T], iteratorB: Iterator[T])(
+      implicit ord: Ordering[T]): Int = {
     @annotation.tailrec
     def result: Int =
       if (iteratorA.isEmpty) {
@@ -55,7 +57,8 @@ object TraversableHelpers {
     result
   }
 
-  final def iteratorEquiv[T](iteratorA: Iterator[T], iteratorB: Iterator[T])(implicit eq: Equiv[T]): Boolean = {
+  final def iteratorEquiv[T](iteratorA: Iterator[T], iteratorB: Iterator[T])(
+      implicit eq: Equiv[T]): Boolean = {
     @annotation.tailrec
     def result: Boolean =
       if (iteratorA.isEmpty) iteratorB.isEmpty
@@ -64,25 +67,36 @@ object TraversableHelpers {
 
     result
   }
+
   /**
-   * This returns the same result as
-   *
-   * implicit val o = ord
-   * Ordering[Iterable[T]].compare(travA.toList.sorted, travB.toList.sorted)
-   *
-   * but it does not do a full sort. Instead it uses a partial quicksort approach
-   * the complexity should be O(N + M) rather than O(N log N + M log M) for the full
-   * sort case
-   */
-  final def sortedCompare[T](travA: Iterable[T], travB: Iterable[T])(implicit ord: Ordering[T]): Int = {
-    def compare(startA: Int, endA: Int, a: Buffer[T], startB: Int, endB: Int, b: Buffer[T]): Int =
+    * This returns the same result as
+    *
+    * implicit val o = ord
+    * Ordering[Iterable[T]].compare(travA.toList.sorted, travB.toList.sorted)
+    *
+    * but it does not do a full sort. Instead it uses a partial quicksort approach
+    * the complexity should be O(N + M) rather than O(N log N + M log M) for the full
+    * sort case
+    */
+  final def sortedCompare[T](travA: Iterable[T], travB: Iterable[T])(
+      implicit ord: Ordering[T]): Int = {
+    def compare(startA: Int,
+                endA: Int,
+                a: Buffer[T],
+                startB: Int,
+                endB: Int,
+                b: Buffer[T]): Int =
       if (startA == endA) {
         if (startB == endB) 0 // both empty
         else -1 // empty is smaller than non-empty
       } else if (startB == endB) 1 // non-empty is bigger than empty
       else {
         @annotation.tailrec
-        def partition(pivot: T, pivotStart: Int, pivotEnd: Int, endX: Int, x: Buffer[T]): (Int, Int) = {
+        def partition(pivot: T,
+                      pivotStart: Int,
+                      pivotEnd: Int,
+                      endX: Int,
+                      x: Buffer[T]): (Int, Int) = {
           if (pivotEnd >= endX) (pivotStart, pivotEnd)
           else {
             val t = x(pivotEnd)
@@ -100,7 +114,8 @@ object TraversableHelpers {
               partition(pivot, pivotStart, pivotEnd, newEnd, x)
             } else {
               // t < pivot so we need to push this value below the pivots:
-              val ps = x(pivotStart) // might not be pivot if the pivot size is 0
+              val ps =
+                x(pivotStart) // might not be pivot if the pivot size is 0
               x(pivotStart) = t
               x(pivotEnd) = ps
               partition(pivot, pivotStart + 1, pivotEnd + 1, endX, x)
@@ -124,14 +139,24 @@ object TraversableHelpers {
              * We can safely recurse because startA does not hold pivot, so we won't
              * do the same algorithm
              */
-            compare(startA, extend(startA, endA), a, startB, extend(startB, endB), b)
+            compare(startA,
+                    extend(startA, endA),
+                    a,
+                    startB,
+                    extend(startB, endB),
+                    b)
           } else {
             /*
              * We know that startB does not have the pivot, because if it did, bsublen == 0
              * and both are equal, which is not true in this branch.
              * we can reverse the recursion to ensure we get a different pivot
              */
-            -compare(startB, extend(startB, endB), b, startA, extend(startA, endA), a)
+            -compare(startB,
+                     extend(startB, endB),
+                     b,
+                     startA,
+                     extend(startA, endA),
+                     a)
           }
         } else {
           // the prefixes are the same size
@@ -145,9 +170,7 @@ object TraversableHelpers {
             val minpsize = math.min(apsize, bpsize)
             val acheck = aps + minpsize
             val bcheck = bps + minpsize
-            if (apsize != bpsize &&
-              acheck < endA &&
-              bcheck < endB) {
+            if (apsize != bpsize && acheck < endA && bcheck < endB) {
               // exactly one of them has a pivot value
               ord.compare(a(acheck), b(bcheck))
             } else {
@@ -159,10 +182,10 @@ object TraversableHelpers {
       }
 
     /**
-     * If we are equal unsorted, we are equal.
-     * this is useful because often scala will build identical sets
-     * exactly the same way, so this fast check will work.
-     */
+      * If we are equal unsorted, we are equal.
+      * this is useful because often scala will build identical sets
+      * exactly the same way, so this fast check will work.
+      */
     if (iteratorEquiv(travA.iterator, travB.iterator)(ord)) 0
     else {
       // Let's do the more expensive, potentially full sort, algorithm

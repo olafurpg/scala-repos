@@ -6,21 +6,20 @@ package play.api.routing.sird
 import play.api.mvc.PathBindable
 
 /**
- * An extractor that extracts from a String using a [[play.api.mvc.PathBindable]].
- */
-class PathBindableExtractor[T](implicit pb: PathBindable[T]) {
-  self =>
+  * An extractor that extracts from a String using a [[play.api.mvc.PathBindable]].
+  */
+class PathBindableExtractor[T](implicit pb: PathBindable[T]) { self =>
 
   /**
-   * Extract s to T if it can be bound, otherwise don't match.
-   */
+    * Extract s to T if it can be bound, otherwise don't match.
+    */
   def unapply(s: String): Option[T] = {
     pb.bind("anon", s).right.toOption
   }
 
   /**
-   * Extract Option[T] only if s is None, Some value that can be bound, otherwise don't match.
-   */
+    * Extract Option[T] only if s is None, Some value that can be bound, otherwise don't match.
+    */
   def unapply(s: Option[String]): Option[Option[T]] = {
     s match {
       case None => Some(None)
@@ -30,8 +29,8 @@ class PathBindableExtractor[T](implicit pb: PathBindable[T]) {
   }
 
   /**
-   * Extract Seq[T] only if ever element of s can be bound, otherwise don't match.
-   */
+    * Extract Seq[T] only if ever element of s can be bound, otherwise don't match.
+    */
   def unapply(s: Seq[String]): Option[Seq[T]] = {
     val bound = s.collect {
       case self(value) => value
@@ -45,31 +44,32 @@ class PathBindableExtractor[T](implicit pb: PathBindable[T]) {
 }
 
 /**
- * Extractors that bind types from paths using [[play.api.mvc.PathBindable]].
- */
+  * Extractors that bind types from paths using [[play.api.mvc.PathBindable]].
+  */
 trait PathBindableExtractors {
+
   /**
-   * An int extractor.
-   */
+    * An int extractor.
+    */
   val int = new PathBindableExtractor[Int]
 
   /**
-   * A long extractor.
-   */
+    * A long extractor.
+    */
   val long = new PathBindableExtractor[Long]
 
   /**
-   * A boolean extractor.
-   */
+    * A boolean extractor.
+    */
   val bool = new PathBindableExtractor[Boolean]
 
   /**
-   * A float extractor.
-   */
+    * A float extractor.
+    */
   val float = new PathBindableExtractor[Float]
 
   /**
-   * A double extractor.
-   */
+    * A double extractor.
+    */
   val double = new PathBindableExtractor[Double]
 }

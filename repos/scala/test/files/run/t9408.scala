@@ -15,7 +15,7 @@ class Outer {
     assertNoFields(classOf[C])
     class D
     assertNoFields(classOf[D])
-    (() => {class E; assertNoFields(classOf[E])}).apply()
+    (() => { class E; assertNoFields(classOf[E]) }).apply()
 
     // The outer reference elision currently runs on a class-by-class basis. If it cannot rule out that a class has
     // subclasses, it will not remove the outer reference. A smarter analysis here could detect if no members of

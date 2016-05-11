@@ -39,10 +39,10 @@ import scalafx.beans.property._
 import scalafx.testutil.PropertyComparator
 
 /**
- * FadeTransition Spec tests.
- *
- * @todo When Interpolator is converted to SFXEnumDelegate, this test should be converted to a SFXEnumDelegateSpec
- */
+  * FadeTransition Spec tests.
+  *
+  * @todo When Interpolator is converted to SFXEnumDelegate, this test should be converted to a SFXEnumDelegateSpec
+  */
 @RunWith(classOf[JUnitRunner])
 class InterpolatorSpec extends FlatSpec with PropertyComparator {
   "Interpolators" should "support all the built-in interpolators" in {
@@ -63,16 +63,21 @@ class InterpolatorSpec extends FlatSpec with PropertyComparator {
     val doubleProperty = new DoubleProperty(null, "test")
     val kv1 = doubleProperty -> 50 tween Interpolator.SPLINE(.2, .2, .8, .8)
     // equals method doesn't work, so the best we can do is test the class type
-    kv1.interpolator.getClass should equal(Interpolator.SPLINE(.2, .2, .8, .8).getClass)
+    kv1.interpolator.getClass should equal(
+        Interpolator.SPLINE(.2, .2, .8, .8).getClass)
   }
 
   it should "support tangent interpolations" in {
     val doubleProperty = new DoubleProperty(null, "test")
     val kv1 = doubleProperty -> 50 tween Interpolator.TANGENT((100 ms), .3)
     // equals method doesn't work, so the best we can do is test the class type
-    kv1.interpolator.getClass should equal(Interpolator.TANGENT((100 ms), .3).getClass)
-    val kv2 = doubleProperty -> 50 tween Interpolator.TANGENT((50 ms), .5, (100 ms), .3)
+    kv1.interpolator.getClass should equal(
+        Interpolator.TANGENT((100 ms), .3).getClass)
+    val kv2 =
+      doubleProperty -> 50 tween Interpolator.TANGENT(
+          (50 ms), .5, (100 ms), .3)
     // equals method doesn't work, so the best we can do is test the class type
-    kv2.interpolator.getClass should equal(Interpolator.TANGENT((50 ms), .5, (100 ms), .3).getClass)
+    kv2.interpolator.getClass should equal(
+        Interpolator.TANGENT((50 ms), .5, (100 ms), .3).getClass)
   }
 }

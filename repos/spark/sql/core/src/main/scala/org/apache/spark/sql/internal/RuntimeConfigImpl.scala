@@ -20,23 +20,25 @@ package org.apache.spark.sql.internal
 import org.apache.spark.sql.RuntimeConfig
 
 /**
- * Implementation for [[RuntimeConfig]].
- */
+  * Implementation for [[RuntimeConfig]].
+  */
 class RuntimeConfigImpl extends RuntimeConfig {
 
   private val conf = new SQLConf
 
-  private val hadoopConf = java.util.Collections.synchronizedMap(
-    new java.util.HashMap[String, String]())
+  private val hadoopConf = java.util.Collections
+    .synchronizedMap(new java.util.HashMap[String, String]())
 
   override def set(key: String, value: String): RuntimeConfig = {
     conf.setConfString(key, value)
     this
   }
 
-  override def set(key: String, value: Boolean): RuntimeConfig = set(key, value.toString)
+  override def set(key: String, value: Boolean): RuntimeConfig =
+    set(key, value.toString)
 
-  override def set(key: String, value: Long): RuntimeConfig = set(key, value.toString)
+  override def set(key: String, value: Long): RuntimeConfig =
+    set(key, value.toString)
 
   @throws[NoSuchElementException]("if the key is not set")
   override def get(key: String): String = conf.getConfString(key)

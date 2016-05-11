@@ -2,18 +2,17 @@ package lila.puzzle
 
 import org.joda.time.DateTime
 
-case class Attempt(
-    id: String, // userId/puzzleId
-    puzzleId: PuzzleId,
-    userId: String,
-    date: DateTime,
-    win: Boolean,
-    time: Int, // millis
-    puzzleRating: Int,
-    puzzleRatingDiff: Int,
-    userRating: Int,
-    userRatingDiff: Int,
-    vote: Option[Boolean]) {
+case class Attempt(id: String, // userId/puzzleId
+                   puzzleId: PuzzleId,
+                   userId: String,
+                   date: DateTime,
+                   win: Boolean,
+                   time: Int, // millis
+                   puzzleRating: Int,
+                   puzzleRatingDiff: Int,
+                   userRating: Int,
+                   userRatingDiff: Int,
+                   vote: Option[Boolean]) {
 
   def seconds = time / 1000
 
@@ -49,30 +48,30 @@ object Attempt {
 
     import BSONFields._
 
-    def reads(r: BSON.Reader): Attempt = Attempt(
-      id = r str id,
-      puzzleId = r int puzzleId,
-      userId = r str userId,
-      date = r.get[DateTime](date),
-      win = r bool win,
-      time = r int time,
-      puzzleRating = r int puzzleRating,
-      puzzleRatingDiff = r int puzzleRatingDiff,
-      userRating = r int userRating,
-      userRatingDiff = r int userRatingDiff,
-      vote = r boolO vote)
+    def reads(r: BSON.Reader): Attempt =
+      Attempt(id = r str id,
+              puzzleId = r int puzzleId,
+              userId = r str userId,
+              date = r.get[DateTime](date),
+              win = r bool win,
+              time = r int time,
+              puzzleRating = r int puzzleRating,
+              puzzleRatingDiff = r int puzzleRatingDiff,
+              userRating = r int userRating,
+              userRatingDiff = r int userRatingDiff,
+              vote = r boolO vote)
 
-    def writes(w: BSON.Writer, o: Attempt) = BSONDocument(
-      id -> o.id,
-      puzzleId -> o.puzzleId,
-      userId -> o.userId,
-      date -> o.date,
-      win -> o.win,
-      time -> w.int(o.time),
-      puzzleRating -> w.int(o.puzzleRating),
-      puzzleRatingDiff -> w.int(o.puzzleRatingDiff),
-      userRating -> w.int(o.userRating),
-      userRatingDiff -> w.int(o.userRatingDiff),
-      vote -> o.vote)
+    def writes(w: BSON.Writer, o: Attempt) =
+      BSONDocument(id -> o.id,
+                   puzzleId -> o.puzzleId,
+                   userId -> o.userId,
+                   date -> o.date,
+                   win -> o.win,
+                   time -> w.int(o.time),
+                   puzzleRating -> w.int(o.puzzleRating),
+                   puzzleRatingDiff -> w.int(o.puzzleRatingDiff),
+                   userRating -> w.int(o.userRating),
+                   userRatingDiff -> w.int(o.userRatingDiff),
+                   vote -> o.vote)
   }
 }

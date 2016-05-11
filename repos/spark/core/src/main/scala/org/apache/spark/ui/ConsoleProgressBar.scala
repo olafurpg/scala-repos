@@ -23,11 +23,11 @@ import org.apache.spark._
 import org.apache.spark.internal.Logging
 
 /**
- * ConsoleProgressBar shows the progress of stages in the next line of the console. It poll the
- * status of active stages from `sc.statusTracker` periodically, the progress bar will be showed
- * up after the stage has ran at least 500ms. If multiple stages run in the same time, the status
- * of them will be combined together, showed in one line.
- */
+  * ConsoleProgressBar shows the progress of stages in the next line of the console. It poll the
+  * status of active stages from `sc.statusTracker` periodically, the progress bar will be showed
+  * up after the stage has ran at least 500ms. If multiple stages run in the same time, the status
+  * of them will be combined together, showed in one line.
+  */
 private[spark] class ConsoleProgressBar(sc: SparkContext) extends Logging {
   // Carriage return
   val CR = '\r'
@@ -37,11 +37,12 @@ private[spark] class ConsoleProgressBar(sc: SparkContext) extends Logging {
   val FIRST_DELAY = 500L
 
   // The width of terminal
-  val TerminalWidth = if (!sys.env.getOrElse("COLUMNS", "").isEmpty) {
-    sys.env.get("COLUMNS").get.toInt
-  } else {
-    80
-  }
+  val TerminalWidth =
+    if (!sys.env.getOrElse("COLUMNS", "").isEmpty) {
+      sys.env.get("COLUMNS").get.toInt
+    } else {
+      80
+    }
 
   var lastFinishTime = 0L
   var lastUpdateTime = 0L
@@ -49,48 +50,53 @@ private[spark] class ConsoleProgressBar(sc: SparkContext) extends Logging {
 
   // Schedule a refresh thread to run periodically
   private val timer = new Timer("refresh progress", true)
-  timer.schedule(new TimerTask{
+  timer.schedule(new TimerTask {
     override def run() {
       refresh()
     }
   }, FIRST_DELAY, UPDATE_PERIOD)
 
   /**
-   * Try to refresh the progress bar in every cycle
-   */
+    * Try to refresh the progress bar in every cycle
+    */
   private def refresh(): Unit = synchronized {
     val now = System.currentTimeMillis()
     if (now - lastFinishTime < FIRST_DELAY) {
       return
     }
     val stageIds = sc.statusTracker.getActiveStageIds()
-    val stages = stageIds.flatMap(sc.statusTracker.getStageInfo).filter(_.numTasks() > 1)
-      .filter(now - _.submissionTime() > FIRST_DELAY).sortBy(_.stageId())
+    val stages = stageIds
+      .flatMap(sc.statusTracker.getStageInfo)
+      .filter(_.numTasks() > 1)
+      .filter(now - _.submissionTime() > FIRST_DELAY)
+      .sortBy(_.stageId())
     if (stages.length > 0) {
-      show(now, stages.take(3))  // display at most 3 stages in same time
+      show(now, stages.take(3)) // display at most 3 stages in same time
     }
   }
 
   /**
-   * Show progress bar in console. The progress bar is displayed in the next line
-   * after your last output, keeps overwriting itself to hold in one line. The logging will follow
-   * the progress bar, then progress bar will be showed in next line without overwrite logs.
-   */
+    * Show progress bar in console. The progress bar is displayed in the next line
+    * after your last output, keeps overwriting itself to hold in one line. The logging will follow
+    * the progress bar, then progress bar will be showed in next line without overwrite logs.
+    */
   private def show(now: Long, stages: Seq[SparkStageInfo]) {
     val width = TerminalWidth / stages.size
     val bar = stages.map { s =>
       val total = s.numTasks()
       val header = s"[Stage ${s.stageId()}:"
-      val tailer = s"(${s.numCompletedTasks()} + ${s.numActiveTasks()}) / $total]"
+      val tailer =
+        s"(${s.numCompletedTasks()} + ${s.numActiveTasks()}) / $total]"
       val w = width - header.length - tailer.length
-      val bar = if (w > 0) {
-        val percent = w * s.numCompletedTasks() / total
-        (0 until w).map { i =>
-          if (i < percent) "=" else if (i == percent) ">" else " "
-        }.mkString("")
-      } else {
-        ""
-      }
+      val bar =
+        if (w > 0) {
+          val percent = w * s.numCompletedTasks() / total
+          (0 until w).map { i =>
+            if (i < percent) "=" else if (i == percent) ">" else " "
+          }.mkString("")
+        } else {
+          ""
+        }
       header + bar + tailer
     }.mkString("")
 
@@ -104,8 +110,8 @@ private[spark] class ConsoleProgressBar(sc: SparkContext) extends Logging {
   }
 
   /**
-   * Clear the progress bar if showed.
-   */
+    * Clear the progress bar if showed.
+    */
   private def clear() {
     if (!lastProgressBar.isEmpty) {
       System.err.printf(CR + " " * TerminalWidth + CR)
@@ -114,17 +120,17 @@ private[spark] class ConsoleProgressBar(sc: SparkContext) extends Logging {
   }
 
   /**
-   * Mark all the stages as finished, clear the progress bar if showed, then the progress will not
-   * interweave with output of jobs.
-   */
+    * Mark all the stages as finished, clear the progress bar if showed, then the progress will not
+    * interweave with output of jobs.
+    */
   def finishAll(): Unit = synchronized {
     clear()
     lastFinishTime = System.currentTimeMillis()
   }
 
   /**
-   * Tear down the timer thread.  The timer thread is a GC root, and it retains the entire
-   * SparkContext if it's not terminated.
-   */
+    * Tear down the timer thread.  The timer thread is a GC root, and it retains the entire
+    * SparkContext if it's not terminated.
+    */
   def stop(): Unit = timer.cancel()
 }

@@ -23,21 +23,24 @@ import scala.reflect.ClassTag
 import org.apache.spark.streaming.dstream.ReceiverInputDStream
 
 /**
- * A Java-friendly interface to [[org.apache.spark.streaming.dstream.ReceiverInputDStream]], the
- * abstract class for defining any input stream that receives data over the network.
- */
-class JavaPairReceiverInputDStream[K, V](val receiverInputDStream: ReceiverInputDStream[(K, V)])
-    (implicit override val kClassTag: ClassTag[K], override implicit val vClassTag: ClassTag[V])
-  extends JavaPairInputDStream[K, V](receiverInputDStream) {
-}
+  * A Java-friendly interface to [[org.apache.spark.streaming.dstream.ReceiverInputDStream]], the
+  * abstract class for defining any input stream that receives data over the network.
+  */
+class JavaPairReceiverInputDStream[K, V](
+    val receiverInputDStream: ReceiverInputDStream[(K, V)])(
+    implicit override val kClassTag: ClassTag[K],
+    override implicit val vClassTag: ClassTag[V])
+    extends JavaPairInputDStream[K, V](receiverInputDStream) {}
 
 object JavaPairReceiverInputDStream {
+
   /**
-   * Convert a scala [[org.apache.spark.streaming.dstream.ReceiverInputDStream]] to a Java-friendly
-   * [[org.apache.spark.streaming.api.java.JavaReceiverInputDStream]].
-   */
-  implicit def fromReceiverInputDStream[K: ClassTag, V: ClassTag](
-      receiverInputDStream: ReceiverInputDStream[(K, V)]): JavaPairReceiverInputDStream[K, V] = {
+    * Convert a scala [[org.apache.spark.streaming.dstream.ReceiverInputDStream]] to a Java-friendly
+    * [[org.apache.spark.streaming.api.java.JavaReceiverInputDStream]].
+    */
+  implicit def fromReceiverInputDStream[K : ClassTag, V : ClassTag](
+      receiverInputDStream: ReceiverInputDStream[(K, V)])
+    : JavaPairReceiverInputDStream[K, V] = {
     new JavaPairReceiverInputDStream[K, V](receiverInputDStream)
   }
 }

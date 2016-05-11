@@ -15,6 +15,4 @@ object MimeTypesSpec extends Specification {
       MimeTypes.forFileName("image.PNG") must be equalTo Some("image/png")
     }
   }
-
 }
-

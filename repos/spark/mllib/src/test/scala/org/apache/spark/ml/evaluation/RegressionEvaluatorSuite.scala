@@ -25,40 +25,49 @@ import org.apache.spark.mllib.util.{LinearDataGenerator, MLlibTestSparkContext}
 import org.apache.spark.mllib.util.TestingUtils._
 
 class RegressionEvaluatorSuite
-  extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest {
+    extends SparkFunSuite with MLlibTestSparkContext
+    with DefaultReadWriteTest {
 
   test("params") {
     ParamsSuite.checkParams(new RegressionEvaluator)
   }
 
   test("Regression Evaluator: default params") {
-    /**
-     * Here is the instruction describing how to export the test data into CSV format
-     * so we can validate the metrics compared with R's mmetric package.
-     *
-     * import org.apache.spark.mllib.util.LinearDataGenerator
-     * val data = sc.parallelize(LinearDataGenerator.generateLinearInput(6.3,
-     *   Array(4.7, 7.2), Array(0.9, -1.3), Array(0.7, 1.2), 100, 42, 0.1))
-     * data.map(x=> x.label + ", " + x.features(0) + ", " + x.features(1))
-     *   .saveAsTextFile("path")
-     */
-    val dataset = sqlContext.createDataFrame(
-      sc.parallelize(LinearDataGenerator.generateLinearInput(
-        6.3, Array(4.7, 7.2), Array(0.9, -1.3), Array(0.7, 1.2), 100, 42, 0.1), 2))
 
     /**
-     * Using the following R code to load the data, train the model and evaluate metrics.
-     *
-     * > library("glmnet")
-     * > library("rminer")
-     * > data <- read.csv("path", header=FALSE, stringsAsFactors=FALSE)
-     * > features <- as.matrix(data.frame(as.numeric(data$V2), as.numeric(data$V3)))
-     * > label <- as.numeric(data$V1)
-     * > model <- glmnet(features, label, family="gaussian", alpha = 0, lambda = 0)
-     * > rmse <- mmetric(label, predict(model, features), metric='RMSE')
-     * > mae <- mmetric(label, predict(model, features), metric='MAE')
-     * > r2 <- mmetric(label, predict(model, features), metric='R2')
-     */
+      * Here is the instruction describing how to export the test data into CSV format
+      * so we can validate the metrics compared with R's mmetric package.
+      *
+      * import org.apache.spark.mllib.util.LinearDataGenerator
+      * val data = sc.parallelize(LinearDataGenerator.generateLinearInput(6.3,
+      *   Array(4.7, 7.2), Array(0.9, -1.3), Array(0.7, 1.2), 100, 42, 0.1))
+      * data.map(x=> x.label + ", " + x.features(0) + ", " + x.features(1))
+      *   .saveAsTextFile("path")
+      */
+    val dataset = sqlContext.createDataFrame(
+        sc.parallelize(
+            LinearDataGenerator.generateLinearInput(6.3,
+                                                    Array(4.7, 7.2),
+                                                    Array(0.9, -1.3),
+                                                    Array(0.7, 1.2),
+                                                    100,
+                                                    42,
+                                                    0.1),
+            2))
+
+    /**
+      * Using the following R code to load the data, train the model and evaluate metrics.
+      *
+      * > library("glmnet")
+      * > library("rminer")
+      * > data <- read.csv("path", header=FALSE, stringsAsFactors=FALSE)
+      * > features <- as.matrix(data.frame(as.numeric(data$V2), as.numeric(data$V3)))
+      * > label <- as.numeric(data$V1)
+      * > model <- glmnet(features, label, family="gaussian", alpha = 0, lambda = 0)
+      * > rmse <- mmetric(label, predict(model, features), metric='RMSE')
+      * > mae <- mmetric(label, predict(model, features), metric='MAE')
+      * > r2 <- mmetric(label, predict(model, features), metric='R2')
+      */
     val trainer = new LinearRegression
     val model = trainer.fit(dataset)
     val predictions = model.transform(dataset)

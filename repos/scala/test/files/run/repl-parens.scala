@@ -1,7 +1,8 @@
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  def code = """
+  def code =
+    """
 (2)
 (2 + 2)
 ((2 + 2))

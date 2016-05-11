@@ -4,10 +4,11 @@ package org.ensime.core.debug
 
 import akka.actor.ActorRef
 import com.sun.jdi.VMDisconnectedException
-import com.sun.jdi.event.{ ClassPrepareEvent, VMDisconnectEvent, EventQueue }
+import com.sun.jdi.event.{ClassPrepareEvent, VMDisconnectEvent, EventQueue}
 import org.slf4j.LoggerFactory
 
-class VMEventManager(val eventQueue: EventQueue, debugManager: ActorRef) extends Thread {
+class VMEventManager(val eventQueue: EventQueue, debugManager: ActorRef)
+    extends Thread {
 
   val log = LoggerFactory.getLogger("VMEventManager")
 

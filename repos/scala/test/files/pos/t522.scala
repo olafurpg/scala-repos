@@ -8,7 +8,6 @@ object Util {
 
 import imptwice.Util._
 
-
 object User {
   def main(args: Array[String]) = {
     foo("blah")

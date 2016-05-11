@@ -38,39 +38,43 @@ private[csv] object CSVInferSchema {
     *     2. Merge row types to find common type
     *     3. Replace any null types with string type
     */
-  def infer(
-      tokenRdd: RDD[Array[String]],
-      header: Array[String],
-      nullValue: String = ""): StructType = {
+  def infer(tokenRdd: RDD[Array[String]],
+            header: Array[String],
+            nullValue: String = ""): StructType = {
 
-    val startType: Array[DataType] = Array.fill[DataType](header.length)(NullType)
+    val startType: Array[DataType] =
+      Array.fill[DataType](header.length)(NullType)
     val rootTypes: Array[DataType] =
       tokenRdd.aggregate(startType)(inferRowType(nullValue), mergeRowTypes)
 
-    val structFields = header.zip(rootTypes).map { case (thisHeader, rootType) =>
-      val dType = rootType match {
-        case _: NullType => StringType
-        case other => other
-      }
-      StructField(thisHeader, dType, nullable = true)
+    val structFields = header.zip(rootTypes).map {
+      case (thisHeader, rootType) =>
+        val dType = rootType match {
+          case _: NullType => StringType
+          case other => other
+        }
+        StructField(thisHeader, dType, nullable = true)
     }
 
     StructType(structFields)
   }
 
-  private def inferRowType(nullValue: String)
-      (rowSoFar: Array[DataType], next: Array[String]): Array[DataType] = {
+  private def inferRowType(nullValue: String)(
+      rowSoFar: Array[DataType], next: Array[String]): Array[DataType] = {
     var i = 0
-    while (i < math.min(rowSoFar.length, next.length)) {  // May have columns on right missing.
+    while (i < math.min(rowSoFar.length, next.length)) {
+      // May have columns on right missing.
       rowSoFar(i) = inferField(rowSoFar(i), next(i), nullValue)
-      i+=1
+      i += 1
     }
     rowSoFar
   }
 
-  def mergeRowTypes(first: Array[DataType], second: Array[DataType]): Array[DataType] = {
-    first.zipAll(second, NullType, NullType).map { case (a, b) =>
-      findTightestCommonType(a, b).getOrElse(NullType)
+  def mergeRowTypes(
+      first: Array[DataType], second: Array[DataType]): Array[DataType] = {
+    first.zipAll(second, NullType, NullType).map {
+      case (a, b) =>
+        findTightestCommonType(a, b).getOrElse(NullType)
     }
   }
 
@@ -78,7 +82,8 @@ private[csv] object CSVInferSchema {
     * Infer type of string field. Given known type Double, and a string "1", there is no
     * point checking if it is an Int, as the final type must be Double or higher.
     */
-  def inferField(typeSoFar: DataType, field: String, nullValue: String = ""): DataType = {
+  def inferField(
+      typeSoFar: DataType, field: String, nullValue: String = ""): DataType = {
     if (field == null || field.isEmpty || field == nullValue) {
       typeSoFar
     } else {
@@ -91,22 +96,25 @@ private[csv] object CSVInferSchema {
         case BooleanType => tryParseBoolean(field)
         case StringType => StringType
         case other: DataType =>
-          throw new UnsupportedOperationException(s"Unexpected data type $other")
+          throw new UnsupportedOperationException(
+              s"Unexpected data type $other")
       }
     }
   }
 
-  private def tryParseInteger(field: String): DataType = if ((allCatch opt field.toInt).isDefined) {
-    IntegerType
-  } else {
-    tryParseLong(field)
-  }
+  private def tryParseInteger(field: String): DataType =
+    if ((allCatch opt field.toInt).isDefined) {
+      IntegerType
+    } else {
+      tryParseLong(field)
+    }
 
-  private def tryParseLong(field: String): DataType = if ((allCatch opt field.toLong).isDefined) {
-    LongType
-  } else {
-    tryParseDouble(field)
-  }
+  private def tryParseLong(field: String): DataType =
+    if ((allCatch opt field.toLong).isDefined) {
+      LongType
+    } else {
+      tryParseDouble(field)
+    }
 
   private def tryParseDouble(field: String): DataType = {
     if ((allCatch opt field.toDouble).isDefined) {
@@ -139,7 +147,8 @@ private[csv] object CSVInferSchema {
     StringType
   }
 
-  private val numericPrecedence: IndexedSeq[DataType] = HiveTypeCoercion.numericPrecedence
+  private val numericPrecedence: IndexedSeq[DataType] =
+    HiveTypeCoercion.numericPrecedence
 
   /**
     * Copied from internal Spark api
@@ -164,20 +173,19 @@ private[csv] object CSVInferSchema {
 private[csv] object CSVTypeCast {
 
   /**
-   * Casts given string datum to specified type.
-   * Currently we do not support complex types (ArrayType, MapType, StructType).
-   *
-   * For string types, this is simply the datum. For other types.
-   * For other nullable types, this is null if the string datum is empty.
-   *
-   * @param datum string value
-   * @param castType SparkSQL type
-   */
-  def castTo(
-      datum: String,
-      castType: DataType,
-      nullable: Boolean = true,
-      nullValue: String = ""): Any = {
+    * Casts given string datum to specified type.
+    * Currently we do not support complex types (ArrayType, MapType, StructType).
+    *
+    * For string types, this is simply the datum. For other types.
+    * For other nullable types, this is null if the string datum is empty.
+    *
+    * @param datum string value
+    * @param castType SparkSQL type
+    */
+  def castTo(datum: String,
+             castType: DataType,
+             nullable: Boolean = true,
+             nullValue: String = ""): Any = {
 
     if (datum == nullValue && nullable && (!castType.isInstanceOf[StringType])) {
       null
@@ -187,10 +195,16 @@ private[csv] object CSVTypeCast {
         case _: ShortType => datum.toShort
         case _: IntegerType => datum.toInt
         case _: LongType => datum.toLong
-        case _: FloatType => Try(datum.toFloat)
-          .getOrElse(NumberFormat.getInstance(Locale.getDefault).parse(datum).floatValue())
-        case _: DoubleType => Try(datum.toDouble)
-          .getOrElse(NumberFormat.getInstance(Locale.getDefault).parse(datum).doubleValue())
+        case _: FloatType =>
+          Try(datum.toFloat).getOrElse(NumberFormat
+                .getInstance(Locale.getDefault)
+                .parse(datum)
+                .floatValue())
+        case _: DoubleType =>
+          Try(datum.toDouble).getOrElse(NumberFormat
+                .getInstance(Locale.getDefault)
+                .parse(datum)
+                .doubleValue())
         case _: BooleanType => datum.toBoolean
         case dt: DecimalType =>
           val value = new BigDecimal(datum.replaceAll(",", ""))
@@ -199,40 +213,43 @@ private[csv] object CSVTypeCast {
         case _: TimestampType =>
           // This one will lose microseconds parts.
           // See https://issues.apache.org/jira/browse/SPARK-10681.
-          DateTimeUtils.stringToTime(datum).getTime  * 1000L
+          DateTimeUtils.stringToTime(datum).getTime * 1000L
         // TODO(hossein): would be good to support other common date formats
         case _: DateType =>
           DateTimeUtils.millisToDays(DateTimeUtils.stringToTime(datum).getTime)
         case _: StringType => UTF8String.fromString(datum)
-        case _ => throw new RuntimeException(s"Unsupported type: ${castType.typeName}")
+        case _ =>
+          throw new RuntimeException(s"Unsupported type: ${castType.typeName}")
       }
     }
   }
 
   /**
-   * Helper method that converts string representation of a character to actual character.
-   * It handles some Java escaped strings and throws exception if given string is longer than one
-   * character.
-   */
+    * Helper method that converts string representation of a character to actual character.
+    * It handles some Java escaped strings and throws exception if given string is longer than one
+    * character.
+    */
   @throws[IllegalArgumentException]
   def toChar(str: String): Char = {
     if (str.charAt(0) == '\\') {
-      str.charAt(1)
-      match {
+      str.charAt(1) match {
         case 't' => '\t'
         case 'r' => '\r'
         case 'b' => '\b'
         case 'f' => '\f'
-        case '\"' => '\"' // In case user changes quote char and uses \" as delimiter in options
+        case '\"' =>
+          '\"' // In case user changes quote char and uses \" as delimiter in options
         case '\'' => '\''
         case 'u' if str == """\u0000""" => '\u0000'
         case _ =>
-          throw new IllegalArgumentException(s"Unsupported special character for delimiter: $str")
+          throw new IllegalArgumentException(
+              s"Unsupported special character for delimiter: $str")
       }
     } else if (str.length == 1) {
       str.charAt(0)
     } else {
-      throw new IllegalArgumentException(s"Delimiter cannot be more than one character: $str")
+      throw new IllegalArgumentException(
+          s"Delimiter cannot be more than one character: $str")
     }
   }
 }

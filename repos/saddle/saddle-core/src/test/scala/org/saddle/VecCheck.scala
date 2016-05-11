@@ -1,19 +1,18 @@
 /**
- * Copyright (c) 2013 Saddle Development Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
-
+  * Copyright (c) 2013 Saddle Development Team
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  *     http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  **/
 package org.saddle
 
 import org.specs2.mutable.Specification
@@ -23,10 +22,9 @@ import org.scalacheck.Prop._
 import org.saddle.scalar.Value
 import Serde.serializedCopy
 
-
 /**
- * Test on properties of Vec
- */
+  * Test on properties of Vec
+  */
 class VecCheck extends Specification with ScalaCheck {
 
   "Double Vec Tests" in {
@@ -54,11 +52,11 @@ class VecCheck extends Specification with ScalaCheck {
         val idx = Gen.choose(0, v.length - 2)
         val data = v.contents
         forAll(idx) { i =>
-          v(i, i+1) must_== Vec(data(i), data(i + 1))
-          v(i -> (i+1)) must_== Vec(data(i), data(i + 1))
-          v((i+1) -> i) must_== Vec.empty[Double]
-          v(i -> *) must_== Vec(Range(i, v.length).map(data(_)) : _*)
-          v(* -> i) must_== Vec(Range(0, i+1).map(data(_)) : _*)
+          v(i, i + 1) must_== Vec(data(i), data(i + 1))
+          v(i -> (i + 1)) must_== Vec(data(i), data(i + 1))
+          v((i + 1) -> i) must_== Vec.empty[Double]
+          v(i -> *) must_== Vec(Range(i, v.length).map(data(_)): _*)
+          v(* -> i) must_== Vec(Range(0, i + 1).map(data(_)): _*)
           v(*) must_== v
         }
       }
@@ -66,19 +64,15 @@ class VecCheck extends Specification with ScalaCheck {
 
     "first works" in {
       forAll { (v: Vec[Double]) =>
-        if (v.isEmpty)
-          v.first must_== scalar.NA
-        else
-          v.first must_== v.at(0)
+        if (v.isEmpty) v.first must_== scalar.NA
+        else v.first must_== v.at(0)
       }
     }
 
     "last works" in {
       forAll { (v: Vec[Double]) =>
-        if (v.isEmpty)
-          v.last must_== scalar.NA
-        else
-          v.last must_== v.at(v.length - 1)
+        if (v.isEmpty) v.last must_== scalar.NA
+        else v.last must_== v.at(v.length - 1)
       }
     }
 
@@ -93,8 +87,10 @@ class VecCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Double]) =>
         val data = v.contents
         v.map(_ + 1.0) must_== Vec(data.map(_ + 1.0))
-        v.map(d => 5.0) must_== Vec(data.map(d => if (d.isNaN) na.to[Double] else 5.0))
-        v.map(d => 5) must_== Vec[Int](data.map(d => if (d.isNaN) na.to[Int] else 5))
+        v.map(d => 5.0) must_==
+          Vec(data.map(d => if (d.isNaN) na.to[Double] else 5.0))
+        v.map(d => 5) must_==
+          Vec[Int](data.map(d => if (d.isNaN) na.to[Int] else 5))
       }
     }
 
@@ -176,7 +172,9 @@ class VecCheck extends Specification with ScalaCheck {
     "forall works" in {
       forAll { (v: Vec[Double]) =>
         var c = 0
-        v.forall(_ > 0.5) { i => if (!i.isNaN) c += 1 }
+        v.forall(_ > 0.5) { i =>
+          if (!i.isNaN) c += 1
+        }
         val exp = v.filter(_ > 0.5).count
         c must_== exp
       }
@@ -185,7 +183,9 @@ class VecCheck extends Specification with ScalaCheck {
     "foreach works" in {
       forAll { (v: Vec[Double]) =>
         var c = 0
-        v.foreach { i => if (!i.isNaN) c += 1 }
+        v.foreach { i =>
+          if (!i.isNaN) c += 1
+        }
         val exp = v.count
         c must_== exp
       }
@@ -202,7 +202,7 @@ class VecCheck extends Specification with ScalaCheck {
     "fillNA works" in {
       forAll { (v: Vec[Double]) =>
         val res = v.fillNA(_ => 5.0)
-        val exp = Vec(v.contents.map(x => if(x.isNaN) 5.0 else x))
+        val exp = Vec(v.contents.map(x => if (x.isNaN) 5.0 else x))
         res.hasNA must beFalse
         res must_== exp
       }
@@ -221,7 +221,8 @@ class VecCheck extends Specification with ScalaCheck {
 
     "foldLeft works" in {
       forAll { (v: Vec[Double]) =>
-        val res = v.foldLeft(0)((c: Int, x: Double) => c + { if (x.isNaN) 0 else 1 } )
+        val res =
+          v.foldLeft(0)((c: Int, x: Double) => c + { if (x.isNaN) 0 else 1 })
         val exp = v.count
         res must_== exp
       }
@@ -237,9 +238,12 @@ class VecCheck extends Specification with ScalaCheck {
 
     "foldLeftWhile works" in {
       forAll { (v: Vec[Double]) =>
-        val res = v.foldLeftWhile(0)((c: Int, x: Double) => c + 1)((c: Int, x: Double) => c < 3)
+        val res = v.foldLeftWhile(0)((c: Int, x: Double) => c + 1)((c: Int,
+            x: Double) => c < 3)
         var c = 0
-        val exp = v.contents.takeWhile { (v: Double) => v.isNaN || { c += 1; c <= 3 } }
+        val exp = v.contents.takeWhile { (v: Double) =>
+          v.isNaN || { c += 1; c <= 3 }
+        }
         res must_== Vec(exp).count
       }
     }
@@ -256,7 +260,8 @@ class VecCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Double]) =>
         val res = v.filterScanLeft(_ > 0.5)(0)((c: Int, x: Double) => c + 1)
         res.length must_== v.length
-        (res.last.isNA must beTrue) or (res.last must_== Value(v.filter(_ > 0.5).count))
+        (res.last.isNA must beTrue) or
+        (res.last must_== Value(v.filter(_ > 0.5).count))
       }
     }
 
@@ -283,7 +288,7 @@ class VecCheck extends Specification with ScalaCheck {
           val res = v.take(i.toArray)
           val exp = Vec(i.toArray.map(v.raw(_)))
           res must_== exp
-          res must_== v(i : _*)
+          res must_== v(i: _*)
         }
       }
     }
@@ -330,7 +335,7 @@ class VecCheck extends Specification with ScalaCheck {
         forAll(idx) { i =>
           val res = v.without(i.toArray)
           val tmp = Buffer[Double]()
-          for (k <- 0 until v.length if !i.toSet.contains(k) ) tmp.add(v.raw(k))
+          for (k <- 0 until v.length if !i.toSet.contains(k)) tmp.add(v.raw(k))
           res must_== Vec(tmp.toArray)
         }
       }
@@ -340,12 +345,10 @@ class VecCheck extends Specification with ScalaCheck {
       forAll { (v: Vec[Double]) =>
         val res = v.rolling(2, _.sum)
 
-        if (v.length == 0)
-          res must_== Vec.empty[Double]
+        if (v.length == 0) res must_== Vec.empty[Double]
         else if (v.length == 1) {
           res.raw(0) must_== v.sum
-        }
-        else {
+        } else {
           val dat = v.contents
           val exp = for {
             i <- 0 until v.length - 1
@@ -353,28 +356,25 @@ class VecCheck extends Specification with ScalaCheck {
             b = dat(i + 1)
           } yield (if (a.isNaN) 0 else a) + (if (b.isNaN) 0 else b)
 
-          res must_== Vec(exp : _*)
+          res must_== Vec(exp: _*)
         }
       }
     }
 
     "pad works" in {
       Vec[Double](1d, na, na, 2d).pad must_== Vec[Double](1d, 1d, 1d, 2d)
-      Vec[Double](1d, na, na, 2d).padAtMost(1) must_== Vec[Double](1d, 1d, na, 2d)
+      Vec[Double](1d, na, na, 2d).padAtMost(1) must_==
+        Vec[Double](1d, 1d, na, 2d)
 
       forAll { (v: Vec[Double]) =>
         (v.length > 0 && v.at(0).isNA) || (v.pad.hasNA must beFalse)
       }
     }
 
-    "serialization works" in  {
-      forAll { v:Vec[Double] =>
+    "serialization works" in {
+      forAll { v: Vec[Double] =>
         v must_== serializedCopy(v)
       }
     }
-
   }
-
-
-
 }

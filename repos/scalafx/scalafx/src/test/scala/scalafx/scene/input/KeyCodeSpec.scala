@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.input.KeyCode]]. */
 @RunWith(classOf[JUnitRunner])
-class KeyCodeSpec extends SFXEnumDelegateSpec[jfxsi.KeyCode, KeyCode](
-  javaClass = classOf[jfxsi.KeyCode],
-  scalaClass = classOf[KeyCode],
-  companion = KeyCode)
+class KeyCodeSpec
+    extends SFXEnumDelegateSpec[jfxsi.KeyCode, KeyCode](
+        javaClass = classOf[jfxsi.KeyCode],
+        scalaClass = classOf[KeyCode],
+        companion = KeyCode)

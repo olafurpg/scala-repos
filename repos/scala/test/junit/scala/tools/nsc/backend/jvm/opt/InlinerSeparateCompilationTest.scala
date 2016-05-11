@@ -25,8 +25,7 @@ class InlinerSeparateCompilationTest {
 
   @Test
   def inlnieMixedinMember(): Unit = {
-    val codeA =
-      """trait T {
+    val codeA = """trait T {
         |  @inline def f = 0
         |}
         |object O extends T {
@@ -34,8 +33,7 @@ class InlinerSeparateCompilationTest {
         |}
       """.stripMargin
 
-    val codeB =
-      """class C {
+    val codeB = """class C {
         |  def t1(t: T) = t.f
         |  def t2 = O.f
         |  def t3 = O.g
@@ -43,12 +41,15 @@ class InlinerSeparateCompilationTest {
       """.stripMargin
 
     val warns = Set(
-      "T::f()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
-      // TODO SD-85
-      """O$::f()I is annotated @inline but could not be inlined:
+        "T::f()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
+        // TODO SD-85
+        """O$::f()I is annotated @inline but could not be inlined:
         |The callee O$::f()I contains the instruction INVOKESPECIAL T.f ()I
         |that would cause an IllegalAccessError when inlined into class C""".stripMargin)
-    val List(c, o, oMod, t) = compileClassesSeparately(List(codeA, codeB), args + " -Yopt-warnings", i => warns.exists(i.msg contains _))
+    val List(c, o, oMod, t) = compileClassesSeparately(
+        List(codeA, codeB),
+        args + " -Yopt-warnings",
+        i => warns.exists(i.msg contains _))
     assertInvoke(getSingleMethod(c, "t1"), "T", "f")
 //    assertNoInvoke(getSingleMethod(c, "t2")) // SD-85
     assertNoInvoke(getSingleMethod(c, "t3"))
@@ -56,14 +57,12 @@ class InlinerSeparateCompilationTest {
 
   @Test
   def inlineSealedMember(): Unit = {
-    val codeA =
-      """sealed trait T {
+    val codeA = """sealed trait T {
         |  @inline def f = 1
         |}
       """.stripMargin
 
-    val codeB =
-      """class C {
+    val codeB = """class C {
         |  def t1(t: T) = t.f
         |}
       """.stripMargin
@@ -74,8 +73,7 @@ class InlinerSeparateCompilationTest {
 
   @Test
   def inlineInheritedMember(): Unit = {
-    val codeA =
-      """trait T {
+    val codeA = """trait T {
         |  @inline final def f = 1
         |}
         |trait U extends T {
@@ -83,8 +81,7 @@ class InlinerSeparateCompilationTest {
         |}
       """.stripMargin
 
-    val codeB =
-      """class C extends U {
+    val codeB = """class C extends U {
         |  def t1 = this.f
         |  def t2 = this.g
         |  def t3(t: T) = t.f
@@ -97,15 +94,13 @@ class InlinerSeparateCompilationTest {
 
   @Test
   def inlineWithSelfType(): Unit = {
-    val assembly =
-      """trait Assembly extends T {
+    val assembly = """trait Assembly extends T {
         |  @inline final def g = 1
         |  @inline final def n = m
         |}
       """.stripMargin
 
-    val codeA =
-      s"""trait T { self: Assembly =>
+    val codeA = s"""trait T { self: Assembly =>
          |  @inline final def f = g
          |  @inline final def m = 1
          |}

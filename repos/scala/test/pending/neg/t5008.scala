@@ -72,30 +72,32 @@ package foo {
     def fpriv3(x: FooPriv3) = x
     def fpriv4(x: FooPriv4) = x
 
-    val yprot1 = new FooProt1 { }
-    val yprot2 = new FooProt2 { }
-    val yprot3 = new FooProt3 { }
-    val yprot4 = new FooProt4 { }
+    val yprot1 = new FooProt1 {}
+    val yprot2 = new FooProt2 {}
+    val yprot3 = new FooProt3 {}
+    val yprot4 = new FooProt4 {}
 
     // val ypriv1 = new FooPriv1 { }
     // val ypriv2 = new FooPriv2 { }
-    val ypriv3 = new FooPriv3 { }
-    val ypriv4 = new FooPriv4 { }
+    val ypriv3 = new FooPriv3 {}
+    val ypriv4 = new FooPriv4 {}
 
-    def fpriv_alt1(x: FooPriv1) = 0 // !!! isn't the private type now in the signature of the (public) method?
-    def fpriv_alt2(x: FooPriv2) = 0 // !!! isn't the private[this] type now in the signature of the (public) method?
+    def fpriv_alt1(x: FooPriv1) =
+      0 // !!! isn't the private type now in the signature of the (public) method?
+    def fpriv_alt2(x: FooPriv2) =
+      0 // !!! isn't the private[this] type now in the signature of the (public) method?
   }
   // Same package, subclass
   class B extends A {
-    val xprot1 = new BarProt1 { }
-    val xprot2 = new BarProt2 { }
-    val xprot3 = new BarProt3 { }
-    val xprot4 = new BarProt4 { }
+    val xprot1 = new BarProt1 {}
+    val xprot2 = new BarProt2 {}
+    val xprot3 = new BarProt3 {}
+    val xprot4 = new BarProt4 {}
 
     // val xpriv1 = new BarPriv1 { }
     // val xpriv2 = new BarPriv2 { }
-    val xpriv3 = new BarPriv3 { }
-    val xpriv4 = new BarPriv4 { }
+    val xpriv3 = new BarPriv3 {}
+    val xpriv4 = new BarPriv4 {}
 
     override def fprot1(x: BarProt1) = x
     override def fprot2(x: BarProt2) = x
@@ -112,30 +114,30 @@ package foo {
     val a = new A
     import a._
 
-    val xprot1 = new BarProt1 { }
-    val xprot2 = new BarProt2 { }
-    val xprot3 = new BarProt3 { }
-    val xprot4 = new BarProt4 { }
+    val xprot1 = new BarProt1 {}
+    val xprot2 = new BarProt2 {}
+    val xprot3 = new BarProt3 {}
+    val xprot4 = new BarProt4 {}
 
     // val xpriv1 = new BarPriv1 { }
     // val xpriv2 = new BarPriv2 { }
-    val xpriv3 = new BarPriv3 { }
-    val xpriv4 = new BarPriv4 { }
+    val xpriv3 = new BarPriv3 {}
+    val xpriv4 = new BarPriv4 {}
   }
 }
 
 package bar {
   // Different package, subclass
   class B extends foo.A {
-    val xprot1 = new BarProt1 { }
-    val xprot2 = new BarProt2 { }
-    val xprot3 = new BarProt3 { }
-    val xprot4 = new BarProt4 { }
+    val xprot1 = new BarProt1 {}
+    val xprot2 = new BarProt2 {}
+    val xprot3 = new BarProt3 {}
+    val xprot4 = new BarProt4 {}
 
     // val xpriv1 = new BarPriv1 { }
     // val xpriv2 = new BarPriv2 { }
-    val xpriv3 = new BarPriv3 { }
-    val xpriv4 = new BarPriv4 { }
+    val xpriv3 = new BarPriv3 {}
+    val xpriv4 = new BarPriv4 {}
 
     override def fprot1(x: BarProt1) = x
     override def fprot2(x: BarProt2) = x
@@ -152,14 +154,14 @@ package bar {
     val a = new foo.A
     import a._
 
-    val xprot1 = new BarProt1 { }
-    val xprot2 = new BarProt2 { }
-    val xprot3 = new BarProt3 { }
-    val xprot4 = new BarProt4 { }
+    val xprot1 = new BarProt1 {}
+    val xprot2 = new BarProt2 {}
+    val xprot3 = new BarProt3 {}
+    val xprot4 = new BarProt4 {}
 
     // val xpriv1 = new BarPriv1 { }
     // val xpriv2 = new BarPriv2 { }
-    val xpriv3 = new BarPriv3 { }
-    val xpriv4 = new BarPriv4 { }
+    val xpriv3 = new BarPriv3 {}
+    val xpriv4 = new BarPriv4 {}
   }
 }

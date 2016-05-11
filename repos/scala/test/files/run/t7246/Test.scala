@@ -12,5 +12,4 @@ class SubOuter extends Outer {
   class SubInner extends Inner {
     def bar = foo
   }
-
 }

@@ -22,8 +22,9 @@ class ReaderUtilsTest extends FunSuite {
   import ReaderUtils._
 
   test("readChunk: returned bufs have same content as http chunk") {
-    val input = Array[Byte](1,2,3)
-    val output = readChunk(new DefaultHttpContent(Unpooled.wrappedBuffer(input)))
+    val input = Array[Byte](1, 2, 3)
+    val output =
+      readChunk(new DefaultHttpContent(Unpooled.wrappedBuffer(input)))
     assert(Await.result(output, 2.seconds) == Some(Buf.ByteArray.Owned(input)))
   }
 
@@ -33,7 +34,7 @@ class ReaderUtilsTest extends FunSuite {
   }
 
   test("chunkOfBuf: wraps buf in http chunk") {
-    val input = Array[Byte](1,2,3)
+    val input = Array[Byte](1, 2, 3)
     val chunk = chunkOfBuf(Buf.ByteArray.Owned(input))
 
     val output = new Array[Byte](chunk.content.readableBytes)
@@ -45,7 +46,7 @@ class ReaderUtilsTest extends FunSuite {
     val rw = Reader.writable()
 
     val (write, read) = (new AsyncQueue[Any], new AsyncQueue[Any])
-    val tr = new QueueTransport[Any,Any](write, read)
+    val tr = new QueueTransport[Any, Any](write, read)
 
     rw.write(Buf.Utf8("msg1"))
 
@@ -58,22 +59,21 @@ class ReaderUtilsTest extends FunSuite {
 
     assert(chunk.content.toString(UTF_8) == "msg1")
 
-
     val chunk2F = write.poll()
 
     rw.write(Buf.Utf8("msg2"))
 
-    val chunk2 = Await.result(chunk2F, 2.seconds).asInstanceOf[NettyHttp.HttpContent]
+    val chunk2 =
+      Await.result(chunk2F, 2.seconds).asInstanceOf[NettyHttp.HttpContent]
     assert(chunk2.content.toString(UTF_8) == "msg2")
 
     Await.ready(rw.close(), 2.seconds)
 
-
-    val lastChunk = Await.result(write.poll(), 2.seconds).asInstanceOf[NettyHttp.HttpContent]
+    val lastChunk =
+      Await.result(write.poll(), 2.seconds).asInstanceOf[NettyHttp.HttpContent]
 
     assert(lastChunk.isInstanceOf[NettyHttp.LastHttpContent])
   }
-
 
   val failingT = new Transport[Any, Any] {
     def write(req: Any): Future[Unit] = Future.exception(new Exception("nop"))

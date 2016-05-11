@@ -19,13 +19,16 @@ object ScalaEditorFileSwapper {
     }
     val fqn: String = getFQN(psiFile)
     if (fqn == null) return null
-    val classes = ScalaPsiManager.instance(project).getCachedClasses(psiFile.getResolveScope, fqn)
+    val classes = ScalaPsiManager
+      .instance(project)
+      .getCachedClasses(psiFile.getResolveScope, fqn)
     var clazz: PsiClass = null
     for (cl <- classes if clazz == null) {
       if (cl.getContainingFile == psiFile) clazz = cl
     }
     if (!clazz.isInstanceOf[ScTypeDefinition]) return null
-    val sourceClass: PsiClass = clazz.asInstanceOf[ScTypeDefinition].getSourceMirrorClass
+    val sourceClass: PsiClass =
+      clazz.asInstanceOf[ScTypeDefinition].getSourceMirrorClass
     if (sourceClass == null || (sourceClass eq clazz)) return null
     val result: VirtualFile = sourceClass.getContainingFile.getVirtualFile
     assert(result != null)
@@ -44,7 +47,10 @@ object ScalaEditorFileSwapper {
 
 class ScalaEditorFileSwapper extends EditorFileSwapper {
   def getFileToSwapTo(project: Project,
-                      editorWithProviderComposite: EditorWithProviderComposite): Pair[VirtualFile, Integer] = {
-    Pair.create(ScalaEditorFileSwapper.findSourceFile(project, editorWithProviderComposite.getFile), null)
+                      editorWithProviderComposite: EditorWithProviderComposite)
+    : Pair[VirtualFile, Integer] = {
+    Pair.create(ScalaEditorFileSwapper.findSourceFile(
+                    project, editorWithProviderComposite.getFile),
+                null)
   }
 }

@@ -4,20 +4,17 @@ package parser
 package parsing
 package expressions
 
-
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.ParamType
 
 /**
- * @author Aleksander Podkhalyuzin
- * @date 05.04.2009
- */
-
+  * @author Aleksander Podkhalyuzin
+  * @date 05.04.2009
+  */
 /**
- * Binding ::= (id | '_') [':' Type]
- */
-
+  * Binding ::= (id | '_') [':' Type]
+  */
 object Binding {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val paramMarker = builder.mark

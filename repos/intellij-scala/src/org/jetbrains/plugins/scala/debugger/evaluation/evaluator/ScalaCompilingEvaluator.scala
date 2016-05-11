@@ -30,20 +30,22 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 /**
- * Nikolay.Tropin
- * 2014-10-09
- */
-
-class ScalaCompilingExpressionEvaluator(evaluator: ScalaCompilingEvaluator) extends ExpressionEvaluator {
-  override def evaluate(context: EvaluationContext): Value = evaluator.evaluate(context.asInstanceOf[EvaluationContextImpl])
+  * Nikolay.Tropin
+  * 2014-10-09
+  */
+class ScalaCompilingExpressionEvaluator(evaluator: ScalaCompilingEvaluator)
+    extends ExpressionEvaluator {
+  override def evaluate(context: EvaluationContext): Value =
+    evaluator.evaluate(context.asInstanceOf[EvaluationContextImpl])
 
   override def getValue: Value = null
 
   override def getModifier: Modifier = evaluator.getModifier
 }
 
-class ScalaCompilingEvaluator(psiContext: PsiElement, fragment: ScalaCodeFragment)
-        extends Evaluator {
+class ScalaCompilingEvaluator(
+    psiContext: PsiElement, fragment: ScalaCodeFragment)
+    extends Evaluator {
 
   import org.jetbrains.plugins.scala.debugger.evaluation.evaluator.ScalaCompilingEvaluator._
 
@@ -57,52 +59,68 @@ class ScalaCompilingEvaluator(psiContext: PsiElement, fragment: ScalaCodeFragmen
     val process: DebugProcess = context.getDebugProcess
 
     try {
-      if (classLoader == null || classLoader.isCollected) classLoader = getClassLoader(context)
-    }
-    catch {
+      if (classLoader == null || classLoader.isCollected)
+        classLoader = getClassLoader(context)
+    } catch {
       case e: Exception =>
-        throw new EvaluateException("Error creating evaluation class loader:\n " + e, e)
+        throw new EvaluateException(
+            "Error creating evaluation class loader:\n " + e, e)
     }
 
     try {
-      defineClasses(generatedClass.compiledClasses, context, process, classLoader)
-    }
-    catch {
+      defineClasses(
+          generatedClass.compiledClasses, context, process, classLoader)
+    } catch {
       case e: Exception =>
-        throw new EvaluateException("Error during classes definition:\n " + e, e)
+        throw new EvaluateException(
+            "Error during classes definition:\n " + e, e)
     }
 
     try {
       val evaluator = callEvaluator(context)
       context.asInstanceOf[EvaluationContextImpl].setClassLoader(classLoader)
       evaluator.evaluate(context)
-    }
-    catch {
+    } catch {
       case e: Exception =>
-        throw new EvaluateException("Error during generated code invocation:\n " + e, e)
+        throw new EvaluateException(
+            "Error during generated code invocation:\n " + e, e)
     }
   }
 
-  private def callEvaluator(evaluationContext: EvaluationContext): ExpressionEvaluator = {
-    DebuggerInvocationUtil.commitAndRunReadAction(project, new EvaluatingComputable[ExpressionEvaluator] {
+  private def callEvaluator(
+      evaluationContext: EvaluationContext): ExpressionEvaluator = {
+    DebuggerInvocationUtil.commitAndRunReadAction(
+        project, new EvaluatingComputable[ExpressionEvaluator] {
       override def compute(): ExpressionEvaluator = {
-        val callCode = new TextWithImportsImpl(CodeFragmentKind.CODE_BLOCK, generatedClass.callText)
-        val codeFragment = new ScalaCodeFragmentFactory().createCodeFragment(callCode, generatedClass.getAnchor, project)
-        ScalaEvaluatorBuilder.build(codeFragment, SourcePosition.createFromElement(generatedClass.getAnchor))
+        val callCode = new TextWithImportsImpl(
+            CodeFragmentKind.CODE_BLOCK, generatedClass.callText)
+        val codeFragment = new ScalaCodeFragmentFactory()
+          .createCodeFragment(callCode, generatedClass.getAnchor, project)
+        ScalaEvaluatorBuilder.build(
+            codeFragment,
+            SourcePosition.createFromElement(generatedClass.getAnchor))
       }
     })
   }
 
-  private def defineClasses(classes: Seq[OutputFileObject], context: EvaluationContext,
-                            process: DebugProcess, classLoader: ClassLoaderReference): Unit = {
-    if (classes.isEmpty) throw EvaluationException("Could not compile generated class")
-    val proxy: VirtualMachineProxyImpl = process.getVirtualMachineProxy.asInstanceOf[VirtualMachineProxyImpl]
+  private def defineClasses(classes: Seq[OutputFileObject],
+                            context: EvaluationContext,
+                            process: DebugProcess,
+                            classLoader: ClassLoaderReference): Unit = {
+    if (classes.isEmpty)
+      throw EvaluationException("Could not compile generated class")
+    val proxy: VirtualMachineProxyImpl =
+      process.getVirtualMachineProxy.asInstanceOf[VirtualMachineProxyImpl]
     def alreadyDefined(clsName: String) = {
-      proxy.classesByName(clsName).asScala.exists(refType => refType.isPrepared)
+      proxy
+        .classesByName(clsName)
+        .asScala
+        .exists(refType => refType.isPrepared)
     }
 
     val classLoaderType = classLoader.referenceType.asInstanceOf[ClassType]
-    val defineMethod: Method = classLoaderType.concreteMethodByName("defineClass", "(Ljava/lang/String;[BII)Ljava/lang/Class;")
+    val defineMethod: Method = classLoaderType.concreteMethodByName(
+        "defineClass", "(Ljava/lang/String;[BII)Ljava/lang/Class;")
     for (cls <- classes if !alreadyDefined(cls.origName)) {
       val bytes: Array[Byte] = cls.toByteArray
       val args: util.ArrayList[Value] = new util.ArrayList[Value]
@@ -117,24 +135,32 @@ class ScalaCompilingEvaluator(psiContext: PsiElement, fragment: ScalaCodeFragmen
     }
   }
 
-  private def getClassLoader(context: EvaluationContext): ClassLoaderReference = {
+  private def getClassLoader(
+      context: EvaluationContext): ClassLoaderReference = {
     val process = context.getDebugProcess
-    val loaderClass = process.findClass(context, "java.net.URLClassLoader", context.getClassLoader).asInstanceOf[ClassType]
-    val ctorMethod = loaderClass.concreteMethodByName("<init>", "([Ljava/net/URL;Ljava/lang/ClassLoader;)V")
-    val threadReference: ThreadReference = context.getSuspendContext.getThread.getThreadReference
-    val args = util.Arrays.asList(createURLArray(context), context.getClassLoader)
-    val reference = loaderClass.newInstance(threadReference, ctorMethod, args, ClassType.INVOKE_SINGLE_THREADED)
-            .asInstanceOf[ClassLoaderReference]
+    val loaderClass = process
+      .findClass(context, "java.net.URLClassLoader", context.getClassLoader)
+      .asInstanceOf[ClassType]
+    val ctorMethod = loaderClass.concreteMethodByName(
+        "<init>", "([Ljava/net/URL;Ljava/lang/ClassLoader;)V")
+    val threadReference: ThreadReference =
+      context.getSuspendContext.getThread.getThreadReference
+    val args =
+      util.Arrays.asList(createURLArray(context), context.getClassLoader)
+    val reference = loaderClass
+      .newInstance(
+          threadReference, ctorMethod, args, ClassType.INVOKE_SINGLE_THREADED)
+      .asInstanceOf[ClassLoaderReference]
     keep(reference, context)
     reference
   }
-
 }
 
 object ScalaCompilingEvaluator {
 
   val classNameKey = Key.create[String]("generated.class.name")
-  val originalFileKey = Key.create[PsiFile]("compiling.evaluator.original.file")
+  val originalFileKey =
+    Key.create[PsiFile]("compiling.evaluator.original.file")
 
   private def keep(reference: ObjectReference, context: EvaluationContext) {
     context.getSuspendContext.asInstanceOf[SuspendContextImpl].keep(reference)
@@ -142,27 +168,46 @@ object ScalaCompilingEvaluator {
 
   private def createURLArray(context: EvaluationContext): ArrayReference = {
     val process = context.getDebugProcess
-    val arrayType = process.findClass(context, "java.net.URL[]", context.getClassLoader).asInstanceOf[ArrayType]
+    val arrayType = process
+      .findClass(context, "java.net.URL[]", context.getClassLoader)
+      .asInstanceOf[ArrayType]
     val arrayRef = arrayType.newInstance(1)
     keep(arrayRef, context)
-    val classType = process.findClass(context, "java.net.URL", context.getClassLoader).asInstanceOf[ClassType]
-    val proxy: VirtualMachineProxyImpl = process.getVirtualMachineProxy.asInstanceOf[VirtualMachineProxyImpl]
-    val threadReference: ThreadReference = context.getSuspendContext.getThread.getThreadReference
+    val classType = process
+      .findClass(context, "java.net.URL", context.getClassLoader)
+      .asInstanceOf[ClassType]
+    val proxy: VirtualMachineProxyImpl =
+      process.getVirtualMachineProxy.asInstanceOf[VirtualMachineProxyImpl]
+    val threadReference: ThreadReference =
+      context.getSuspendContext.getThread.getThreadReference
     val url = proxy.mirrorOf("file:a")
     keep(url, context)
-    val ctorMethod = classType.concreteMethodByName("<init>", "(Ljava/lang/String;)V")
-    val reference = classType.newInstance(threadReference, ctorMethod, util.Arrays.asList(url), ClassType.INVOKE_SINGLE_THREADED)
+    val ctorMethod =
+      classType.concreteMethodByName("<init>", "(Ljava/lang/String;)V")
+    val reference = classType.newInstance(threadReference,
+                                          ctorMethod,
+                                          util.Arrays.asList(url),
+                                          ClassType.INVOKE_SINGLE_THREADED)
     keep(reference, context)
     arrayRef.setValues(util.Arrays.asList(reference))
     arrayRef
   }
 
-  private def mirrorOf(bytes: Array[Byte], context: EvaluationContext, process: DebugProcess): ArrayReference = {
-    val arrayClass: ArrayType = process.findClass(context, "byte[]", context.getClassLoader).asInstanceOf[ArrayType]
-    val reference: ArrayReference = process.newInstance(arrayClass, bytes.length)
+  private def mirrorOf(bytes: Array[Byte],
+                       context: EvaluationContext,
+                       process: DebugProcess): ArrayReference = {
+    val arrayClass: ArrayType = process
+      .findClass(context, "byte[]", context.getClassLoader)
+      .asInstanceOf[ArrayType]
+    val reference: ArrayReference =
+      process.newInstance(arrayClass, bytes.length)
     keep(reference, context)
     bytes.zipWithIndex.foreach {
-      case (b, i) => reference.setValue(i, process.getVirtualMachineProxy.asInstanceOf[VirtualMachineProxyImpl].mirrorOf(bytes(i)))
+      case (b, i) =>
+        reference.setValue(i,
+                           process.getVirtualMachineProxy
+                             .asInstanceOf[VirtualMachineProxyImpl]
+                             .mirrorOf(bytes(i)))
       case _ =>
     }
     reference
@@ -178,7 +223,8 @@ class OutputFileObject(file: File, val origName: String) {
   def toByteArray: Array[Byte] = FileUtil.loadFileBytes(file)
 }
 
-private class GeneratedClass(fragment: ScalaCodeFragment, context: PsiElement, id: Int) {
+private class GeneratedClass(
+    fragment: ScalaCodeFragment, context: PsiElement, id: Int) {
 
   private val project: Project = context.getProject
 
@@ -188,7 +234,7 @@ private class GeneratedClass(fragment: ScalaCodeFragment, context: PsiElement, i
   var compiledClasses: Seq[OutputFileObject] = null
 
   private var anchorRange: TextRange = null
-  
+
   private var anchor: PsiElement = null
   def getAnchor = anchor
 
@@ -200,34 +246,61 @@ private class GeneratedClass(fragment: ScalaCodeFragment, context: PsiElement, i
     //create and modify non-physical copy first to avoid write action
     val textWithLocalClass = createFileTextWithLocalClass(context)
     //create physical file to work with source positions
-    val copy = PsiFileFactory.getInstance(project).createFileFromText(file.getName, file.getFileType, textWithLocalClass, file.getModificationStamp, true)
+    val copy = PsiFileFactory
+      .getInstance(project)
+      .createFileFromText(file.getName,
+                          file.getFileType,
+                          textWithLocalClass,
+                          file.getModificationStamp,
+                          true)
     copy.putUserData(ScalaCompilingEvaluator.classNameKey, generatedClassName)
     copy.putUserData(ScalaCompilingEvaluator.originalFileKey, file)
-    anchor = CodeInsightUtilCore.findElementInRange(copy, anchorRange.getStartOffset, anchorRange.getEndOffset, classOf[ScBlockStatement], file.getLanguage)
+    anchor = CodeInsightUtilCore.findElementInRange(copy,
+                                                    anchorRange.getStartOffset,
+                                                    anchorRange.getEndOffset,
+                                                    classOf[ScBlockStatement],
+                                                    file.getLanguage)
     compileGeneratedClass(copy.getText)
   }
-  
+
   private def compileGeneratedClass(fileText: String): Unit = {
     val module = inReadAction(ModuleUtilCore.findModuleForPsiElement(context))
 
-    if (module == null) throw EvaluationException("Could not evaluate due to a change in a source file")
+    if (module == null)
+      throw EvaluationException(
+          "Could not evaluate due to a change in a source file")
 
-    val helper = EvaluatorCompileHelper.EP_NAME.getExtensions.headOption.getOrElse {
-      ScalaEvaluatorCompileHelper.instance(project)
-    }
+    val helper =
+      EvaluatorCompileHelper.EP_NAME.getExtensions.headOption.getOrElse {
+        ScalaEvaluatorCompileHelper.instance(project)
+      }
     val compiled = helper.compile(fileText, module)
     compiledClasses = compiled.collect {
-      case (f, name) if name.contains(generatedClassName) => new OutputFileObject(f, name)
+      case (f, name) if name.contains(generatedClassName) =>
+        new OutputFileObject(f, name)
     }
   }
 
   private def createFileTextWithLocalClass(context: PsiElement): String = {
     val file = context.getContainingFile
-    val copy = PsiFileFactory.getInstance(project).createFileFromText(file.getName, file.getFileType, file.getText, file.getModificationStamp, false)
+    val copy = PsiFileFactory
+      .getInstance(project)
+      .createFileFromText(file.getName,
+                          file.getFileType,
+                          file.getText,
+                          file.getModificationStamp,
+                          false)
     val range = context.getTextRange
-    val copyContext: PsiElement = CodeInsightUtilCore.findElementInRange(copy, range.getStartOffset, range.getEndOffset, context.getClass, file.getLanguage)
+    val copyContext: PsiElement = CodeInsightUtilCore.findElementInRange(
+        copy,
+        range.getStartOffset,
+        range.getEndOffset,
+        context.getClass,
+        file.getLanguage)
 
-    if (copyContext == null) throw EvaluationException("Could not evaluate due to a change in a source file")
+    if (copyContext == null)
+      throw EvaluationException(
+          "Could not evaluate due to a change in a source file")
 
     val clazz = localClass(fragment, copyContext)
     addLocalClass(copyContext, clazz)
@@ -236,15 +309,22 @@ private class GeneratedClass(fragment: ScalaCodeFragment, context: PsiElement, i
 
   private def addLocalClass(context: PsiElement, scClass: ScClass): Unit = {
     @tailrec
-    def findAnchorAndParent(elem: PsiElement): (ScBlockStatement, PsiElement) = elem match {
-      case (stmt: ScBlockStatement) childOf (b: ScBlock) => (stmt, b)
-      case (stmt: ScBlockStatement) childOf (funDef: ScFunctionDefinition) if funDef.body.contains(stmt) => (stmt, funDef)
-      case (stmt: ScBlockStatement) childOf (nonExpr: PsiElement) => (stmt, nonExpr)
-      case _ =>
-        val blockStmt = PsiTreeUtil.getParentOfType(elem, classOf[ScBlockStatement], true)
-        if (blockStmt == null) throw EvaluationException("Could not compile local class in this context")
-        else findAnchorAndParent(blockStmt)
-    }
+    def findAnchorAndParent(elem: PsiElement): (ScBlockStatement, PsiElement) =
+      elem match {
+        case (stmt: ScBlockStatement) childOf (b: ScBlock) => (stmt, b)
+        case (stmt: ScBlockStatement) childOf (funDef: ScFunctionDefinition)
+            if funDef.body.contains(stmt) =>
+          (stmt, funDef)
+        case (stmt: ScBlockStatement) childOf (nonExpr: PsiElement) =>
+          (stmt, nonExpr)
+        case _ =>
+          val blockStmt =
+            PsiTreeUtil.getParentOfType(elem, classOf[ScBlockStatement], true)
+          if (blockStmt == null)
+            throw EvaluationException(
+                "Could not compile local class in this context")
+          else findAnchorAndParent(blockStmt)
+      }
 
     var (prevParent, parent) = findAnchorAndParent(context)
 
@@ -255,38 +335,50 @@ private class GeneratedClass(fragment: ScalaCodeFragment, context: PsiElement, i
 
     val anchor =
       if (needBraces) {
-        val newBlock = ScalaPsiElementFactory.createExpressionWithContextFromText(s"{\n${prevParent.getText}\n}", prevParent.getContext, prevParent)
+        val newBlock = ScalaPsiElementFactory
+          .createExpressionWithContextFromText(
+            s"{\n${prevParent.getText}\n}", prevParent.getContext, prevParent)
         parent = prevParent.replace(newBlock)
         parent match {
           case bl: ScBlock =>
             bl.statements.head
-          case _ => throw EvaluationException("Could not compile local class in this context")
+          case _ =>
+            throw EvaluationException(
+                "Could not compile local class in this context")
         }
-      }
-      else prevParent
+      } else prevParent
 
-    val newInstance = ScalaPsiElementFactory.createExpressionWithContextFromText(s"new $generatedClassName()", anchor.getContext, anchor)
+    val newInstance =
+      ScalaPsiElementFactory.createExpressionWithContextFromText(
+          s"new $generatedClassName()", anchor.getContext, anchor)
 
     parent.addBefore(scClass, anchor)
-    parent.addBefore(ScalaPsiElementFactory.createNewLine(context.getManager), anchor)
+    parent.addBefore(
+        ScalaPsiElementFactory.createNewLine(context.getManager), anchor)
     parent.addBefore(newInstance, anchor)
-    parent.addBefore(ScalaPsiElementFactory.createNewLine(context.getManager), anchor)
+    parent.addBefore(
+        ScalaPsiElementFactory.createNewLine(context.getManager), anchor)
     anchorRange = anchor.getTextRange
   }
 
   private def localClass(fragment: ScalaCodeFragment, context: PsiElement) = {
-    val fragmentImports = fragment.importsToString().split(",").filter(!_.isEmpty).map("import _root_." + _)
+    val fragmentImports = fragment
+      .importsToString()
+      .split(",")
+      .filter(!_.isEmpty)
+      .map("import _root_." + _)
     val importsText = fragmentImports.mkString("\n")
     //todo type parameters?
-    val text =
-     s"""|class $generatedClassName {
+    val text = s"""|class $generatedClassName {
          |  def $generatedMethodName() = {
          |    $importsText
          |    
          |    ${fragment.getText}
          |  }
          |}""".stripMargin
-    ScalaPsiElementFactory.createTemplateDefinitionFromText(text, context.getContext, context).asInstanceOf[ScClass]
+    ScalaPsiElementFactory
+      .createTemplateDefinitionFromText(text, context.getContext, context)
+      .asInstanceOf[ScClass]
   }
 }
 

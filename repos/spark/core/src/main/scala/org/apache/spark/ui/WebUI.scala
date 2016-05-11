@@ -32,26 +32,27 @@ import org.apache.spark.ui.JettyUtils._
 import org.apache.spark.util.Utils
 
 /**
- * The top level component of the UI hierarchy that contains the server.
- *
- * Each WebUI represents a collection of tabs, each of which in turn represents a collection of
- * pages. The use of tabs is optional, however; a WebUI may choose to include pages directly.
- */
-private[spark] abstract class WebUI(
-    val securityManager: SecurityManager,
-    val sslOptions: SSLOptions,
-    port: Int,
-    conf: SparkConf,
-    basePath: String = "",
-    name: String = "")
-  extends Logging {
+  * The top level component of the UI hierarchy that contains the server.
+  *
+  * Each WebUI represents a collection of tabs, each of which in turn represents a collection of
+  * pages. The use of tabs is optional, however; a WebUI may choose to include pages directly.
+  */
+private[spark] abstract class WebUI(val securityManager: SecurityManager,
+                                    val sslOptions: SSLOptions,
+                                    port: Int,
+                                    conf: SparkConf,
+                                    basePath: String = "",
+                                    name: String = "")
+    extends Logging {
 
   protected val tabs = ArrayBuffer[WebUITab]()
   protected val handlers = ArrayBuffer[ServletContextHandler]()
-  protected val pageToHandlers = new HashMap[WebUIPage, ArrayBuffer[ServletContextHandler]]
+  protected val pageToHandlers =
+    new HashMap[WebUIPage, ArrayBuffer[ServletContextHandler]]
   protected var serverInfo: Option[ServerInfo] = None
   protected val localHostName = Utils.localHostNameForURI()
-  protected val publicHostName = Option(conf.getenv("SPARK_PUBLIC_DNS")).getOrElse(localHostName)
+  protected val publicHostName =
+    Option(conf.getenv("SPARK_PUBLIC_DNS")).getOrElse(localHostName)
   private val className = Utils.getFormattedClassName(this)
 
   def getBasePath: String = basePath
@@ -77,13 +78,22 @@ private[spark] abstract class WebUI(
   /** Attach a page to this UI. */
   def attachPage(page: WebUIPage) {
     val pagePath = "/" + page.prefix
-    val renderHandler = createServletHandler(pagePath,
-      (request: HttpServletRequest) => page.render(request), securityManager, conf, basePath)
-    val renderJsonHandler = createServletHandler(pagePath.stripSuffix("/") + "/json",
-      (request: HttpServletRequest) => page.renderJson(request), securityManager, conf, basePath)
+    val renderHandler = createServletHandler(
+        pagePath,
+        (request: HttpServletRequest) => page.render(request),
+        securityManager,
+        conf,
+        basePath)
+    val renderJsonHandler = createServletHandler(
+        pagePath.stripSuffix("/") + "/json",
+        (request: HttpServletRequest) => page.renderJson(request),
+        securityManager,
+        conf,
+        basePath)
     attachHandler(renderHandler)
     attachHandler(renderJsonHandler)
-    pageToHandlers.getOrElseUpdate(page, ArrayBuffer[ServletContextHandler]())
+    pageToHandlers
+      .getOrElseUpdate(page, ArrayBuffer[ServletContextHandler]())
       .append(renderHandler)
   }
 
@@ -110,20 +120,20 @@ private[spark] abstract class WebUI(
   }
 
   /**
-   * Add a handler for static content.
-   *
-   * @param resourceBase Root of where to find resources to serve.
-   * @param path Path in UI where to mount the resources.
-   */
+    * Add a handler for static content.
+    *
+    * @param resourceBase Root of where to find resources to serve.
+    * @param path Path in UI where to mount the resources.
+    */
   def addStaticHandler(resourceBase: String, path: String): Unit = {
     attachHandler(JettyUtils.createStaticHandler(resourceBase, path))
   }
 
   /**
-   * Remove a static content handler.
-   *
-   * @param path Path in UI to unmount.
-   */
+    * Remove a static content handler.
+    *
+    * @param path Path in UI to unmount.
+    */
   def removeStaticHandler(path: String): Unit = {
     handlers.find(_.getContextPath() == path).foreach(detachHandler)
   }
@@ -133,12 +143,15 @@ private[spark] abstract class WebUI(
 
   /** Bind to the HTTP server behind this web interface. */
   def bind() {
-    assert(!serverInfo.isDefined, "Attempted to bind %s more than once!".format(className))
+    assert(!serverInfo.isDefined,
+           "Attempted to bind %s more than once!".format(className))
     try {
       var host = Option(conf.getenv("SPARK_LOCAL_IP")).getOrElse("0.0.0.0")
-      serverInfo = Some(startJettyServer(host, port, sslOptions, handlers, conf, name))
-      logInfo("Bound %s to %s, and started at http://%s:%d".format(className, host,
-        publicHostName, boundPort))
+      serverInfo = Some(
+          startJettyServer(host, port, sslOptions, handlers, conf, name))
+      logInfo(
+          "Bound %s to %s, and started at http://%s:%d".format(
+              className, host, publicHostName, boundPort))
     } catch {
       case e: Exception =>
         logError("Failed to bind %s".format(className), e)
@@ -151,17 +164,17 @@ private[spark] abstract class WebUI(
 
   /** Stop the server behind this web interface. Only valid after bind(). */
   def stop() {
-    assert(serverInfo.isDefined,
-      "Attempted to stop %s before binding to a server!".format(className))
+    assert(
+        serverInfo.isDefined,
+        "Attempted to stop %s before binding to a server!".format(className))
     serverInfo.get.server.stop()
   }
 }
 
-
 /**
- * A tab that represents a collection of pages.
- * The prefix is appended to the parent address to form a full path, and must not contain slashes.
- */
+  * A tab that represents a collection of pages.
+  * The prefix is appended to the parent address to form a full path, and must not contain slashes.
+  */
 private[spark] abstract class WebUITab(parent: WebUI, val prefix: String) {
   val pages = ArrayBuffer[WebUIPage]()
   val name = prefix.capitalize
@@ -178,15 +191,14 @@ private[spark] abstract class WebUITab(parent: WebUI, val prefix: String) {
   def basePath: String = parent.getBasePath
 }
 
-
 /**
- * A page that represents the leaf node in the UI hierarchy.
- *
- * The direct parent of a WebUIPage is not specified as it can be either a WebUI or a WebUITab.
- * If the parent is a WebUI, the prefix is appended to the parent's address to form a full path.
- * Else, if the parent is a WebUITab, the prefix is appended to the super prefix of the parent
- * to form a relative path. The prefix must not contain slashes.
- */
+  * A page that represents the leaf node in the UI hierarchy.
+  *
+  * The direct parent of a WebUIPage is not specified as it can be either a WebUI or a WebUITab.
+  * If the parent is a WebUI, the prefix is appended to the parent's address to form a full path.
+  * Else, if the parent is a WebUITab, the prefix is appended to the super prefix of the parent
+  * to form a relative path. The prefix must not contain slashes.
+  */
 private[spark] abstract class WebUIPage(var prefix: String) {
   def render(request: HttpServletRequest): Seq[Node]
   def renderJson(request: HttpServletRequest): JValue = JNothing

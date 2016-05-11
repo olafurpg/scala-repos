@@ -22,31 +22,32 @@ import java.util.NoSuchElementException
 import org.apache.spark.sql.catalyst.InternalRow
 
 /**
- * An internal iterator interface which presents a more restrictive API than
- * [[scala.collection.Iterator]].
- *
- * One major departure from the Scala iterator API is the fusing of the `hasNext()` and `next()`
- * calls: Scala's iterator allows users to call `hasNext()` without immediately advancing the
- * iterator to consume the next row, whereas RowIterator combines these calls into a single
- * [[advanceNext()]] method.
- */
+  * An internal iterator interface which presents a more restrictive API than
+  * [[scala.collection.Iterator]].
+  *
+  * One major departure from the Scala iterator API is the fusing of the `hasNext()` and `next()`
+  * calls: Scala's iterator allows users to call `hasNext()` without immediately advancing the
+  * iterator to consume the next row, whereas RowIterator combines these calls into a single
+  * [[advanceNext()]] method.
+  */
 private[sql] abstract class RowIterator {
+
   /**
-   * Advance this iterator by a single row. Returns `false` if this iterator has no more rows
-   * and `true` otherwise. If this returns `true`, then the new row can be retrieved by calling
-   * [[getRow]].
-   */
+    * Advance this iterator by a single row. Returns `false` if this iterator has no more rows
+    * and `true` otherwise. If this returns `true`, then the new row can be retrieved by calling
+    * [[getRow]].
+    */
   def advanceNext(): Boolean
 
   /**
-   * Retrieve the row from this iterator. This method is idempotent. It is illegal to call this
-   * method after [[advanceNext()]] has returned `false`.
-   */
+    * Retrieve the row from this iterator. This method is idempotent. It is illegal to call this
+    * method after [[advanceNext()]] has returned `false`.
+    */
   def getRow: InternalRow
 
   /**
-   * Convert this RowIterator into a [[scala.collection.Iterator]].
-   */
+    * Convert this RowIterator into a [[scala.collection.Iterator]].
+    */
   def toScala: Iterator[InternalRow] = new RowIteratorToScala(this)
 }
 
@@ -59,9 +60,10 @@ object RowIterator {
   }
 }
 
-private final class RowIteratorToScala(val rowIter: RowIterator) extends Iterator[InternalRow] {
-  private [this] var hasNextWasCalled: Boolean = false
-  private [this] var _hasNext: Boolean = false
+private final class RowIteratorToScala(val rowIter: RowIterator)
+    extends Iterator[InternalRow] {
+  private[this] var hasNextWasCalled: Boolean = false
+  private[this] var _hasNext: Boolean = false
   override def hasNext: Boolean = {
     // Idempotency:
     if (!hasNextWasCalled) {
@@ -77,7 +79,8 @@ private final class RowIteratorToScala(val rowIter: RowIterator) extends Iterato
   }
 }
 
-private final class RowIteratorFromScala(scalaIter: Iterator[InternalRow]) extends RowIterator {
+private final class RowIteratorFromScala(scalaIter: Iterator[InternalRow])
+    extends RowIterator {
   private[this] var _next: InternalRow = null
   override def advanceNext(): Boolean = {
     if (scalaIter.hasNext) {

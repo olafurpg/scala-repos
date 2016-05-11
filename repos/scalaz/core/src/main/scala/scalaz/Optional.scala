@@ -8,7 +8,7 @@ package scalaz
   * @see [[syntax.OptionalOps]]
   */
 ////
-trait Optional[F[_]]  { self =>
+trait Optional[F[_]] { self =>
   ////
 
   /** If `fa` has an `a`, return it; otherwise it must be universally
@@ -28,14 +28,14 @@ trait Optional[F[_]]  { self =>
   final def nonEmpty[A](fa: F[A]): Boolean = isDefined(fa)
 
   /** Returns `true` if no value is defined within the context. */
-  final def isEmpty[A](fa: F[A]): Boolean = ! isDefined(fa)
+  final def isEmpty[A](fa: F[A]): Boolean = !isDefined(fa)
 
   /** Returns given context if it is defined or else the value of the `alternative`. */
   def orElse[A](fa: F[A])(alternative: => F[A]): F[A] =
     if (isDefined(fa)) fa else alternative
 
   /** Returns `some` if this context is defined, otherwise `none`. */
-  def ?[A,X](fa: F[A])(some: => X, none: => X): X =
+  def ?[A, X](fa: F[A])(some: => X, none: => X): X =
     if (isDefined(fa)) some else none
 
   // conversions
@@ -47,7 +47,9 @@ trait Optional[F[_]]  { self =>
   def toMaybe[A](fa: F[A]): Maybe[A] = pextract(fa).toMaybe
 
   ////
-  val optionalSyntax = new scalaz.syntax.OptionalSyntax[F] { def F = Optional.this }
+  val optionalSyntax = new scalaz.syntax.OptionalSyntax[F] {
+    def F = Optional.this
+  }
 }
 
 object Optional {

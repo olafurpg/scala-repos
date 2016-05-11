@@ -29,7 +29,6 @@ import org.apache.avro.Schema.Type._
 import org.apache.spark.api.python.Converter
 import org.apache.spark.SparkException
 
-
 object AvroConversionUtil extends Serializable {
   def fromAvro(obj: Any, schema: Schema): Any = {
     if (obj == null) {
@@ -50,7 +49,8 @@ object AvroConversionUtil extends Serializable {
       case FLOAT => obj
       case INT => obj
       case LONG => obj
-      case other => throw new SparkException(s"Unknown Avro schema type ${other.getName}")
+      case other =>
+        throw new SparkException(s"Unknown Avro schema type ${other.getName}")
     }
   }
 
@@ -58,19 +58,26 @@ object AvroConversionUtil extends Serializable {
     val map = new java.util.HashMap[String, Any]
     obj match {
       case record: IndexedRecord =>
-        record.getSchema.getFields.asScala.zipWithIndex.foreach { case (f, i) =>
-          map.put(f.name, fromAvro(record.get(i), f.schema))
+        record.getSchema.getFields.asScala.zipWithIndex.foreach {
+          case (f, i) =>
+            map.put(f.name, fromAvro(record.get(i), f.schema))
         }
-      case other => throw new SparkException(
-        s"Unsupported RECORD type ${other.getClass.getName}")
+      case other =>
+        throw new SparkException(
+            s"Unsupported RECORD type ${other.getClass.getName}")
     }
     map
   }
 
   def unpackMap(obj: Any, schema: Schema): JMap[String, Any] = {
-    obj.asInstanceOf[JMap[_, _]].asScala.map { case (key, value) =>
-      (key.toString, fromAvro(value, schema.getValueType))
-    }.asJava
+    obj
+      .asInstanceOf[JMap[_, _]]
+      .asScala
+      .map {
+        case (key, value) =>
+          (key.toString, fromAvro(value, schema.getValueType))
+      }
+      .asJava
   }
 
   def unpackFixed(obj: Any, schema: Schema): Array[Byte] = {
@@ -84,8 +91,9 @@ object AvroConversionUtil extends Serializable {
         buf.get(arr)
         arr
       case arr: Array[Byte] => arr
-      case other => throw new SparkException(
-        s"Unknown BYTES type ${other.getClass.getName}")
+      case other =>
+        throw new SparkException(
+            s"Unknown BYTES type ${other.getClass.getName}")
     }
     val bytearray = new Array[Byte](bytes.length)
     System.arraycopy(bytes, 0, bytearray, 0, bytes.length)
@@ -99,8 +107,8 @@ object AvroConversionUtil extends Serializable {
       arr.toSeq.asJava.asInstanceOf[JCollection[Any]]
     case arr: Array[_] =>
       arr.map(fromAvro(_, schema.getElementType)).toSeq.asJava
-    case other => throw new SparkException(
-      s"Unknown ARRAY type ${other.getClass.getName}")
+    case other =>
+      throw new SparkException(s"Unknown ARRAY type ${other.getClass.getName}")
   }
 
   def unpackUnion(obj: Any, schema: Schema): Any = {
@@ -108,17 +116,19 @@ object AvroConversionUtil extends Serializable {
       case List(s) => fromAvro(obj, s)
       case List(n, s) if n.getType == NULL => fromAvro(obj, s)
       case List(s, n) if n.getType == NULL => fromAvro(obj, s)
-      case _ => throw new SparkException(
-        "Unions may only consist of a concrete type and null")
+      case _ =>
+        throw new SparkException(
+            "Unions may only consist of a concrete type and null")
     }
   }
 }
 
 /**
- * Implementation of [[org.apache.spark.api.python.Converter]] that converts
- * an Avro IndexedRecord (e.g., derived from AvroParquetInputFormat) to a Java Map.
- */
-class IndexedRecordToJavaConverter extends Converter[IndexedRecord, JMap[String, Any]]{
+  * Implementation of [[org.apache.spark.api.python.Converter]] that converts
+  * an Avro IndexedRecord (e.g., derived from AvroParquetInputFormat) to a Java Map.
+  */
+class IndexedRecordToJavaConverter
+    extends Converter[IndexedRecord, JMap[String, Any]] {
   override def convert(record: IndexedRecord): JMap[String, Any] = {
     if (record == null) {
       return null
@@ -129,10 +139,10 @@ class IndexedRecordToJavaConverter extends Converter[IndexedRecord, JMap[String,
 }
 
 /**
- * Implementation of [[org.apache.spark.api.python.Converter]] that converts
- * an Avro Record wrapped in an AvroKey (or AvroValue) to a Java Map. It tries
- * to work with all 3 Avro data mappings (Generic, Specific and Reflect).
- */
+  * Implementation of [[org.apache.spark.api.python.Converter]] that converts
+  * an Avro Record wrapped in an AvroKey (or AvroValue) to a Java Map. It tries
+  * to work with all 3 Avro data mappings (Generic, Specific and Reflect).
+  */
 class AvroWrapperToJavaConverter extends Converter[Any, Any] {
   override def convert(obj: Any): Any = {
     if (obj == null) {
@@ -141,8 +151,9 @@ class AvroWrapperToJavaConverter extends Converter[Any, Any] {
     obj.asInstanceOf[AvroWrapper[_]].datum() match {
       case null => null
       case record: IndexedRecord => AvroConversionUtil.unpackRecord(record)
-      case other => throw new SparkException(
-        s"Unsupported top-level Avro data type ${other.getClass.getName}")
+      case other =>
+        throw new SparkException(
+            s"Unsupported top-level Avro data type ${other.getClass.getName}")
     }
   }
 }

@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import scala.language.implicitConversions
@@ -37,7 +36,7 @@ trait EngineParamsGenerator {
   /** Sets the list of [[EngineParams]] of this [[EngineParamsGenerator]]. */
   def engineParamsList_=(l: Seq[EngineParams]) {
     assert(!epListSet, "EngineParamsList can bet set at most once")
-    epList = Seq(l:_*)
+    epList = Seq(l: _*)
     epListSet = true
   }
 }

@@ -17,8 +17,7 @@ object Codegen {
     val runner = new Codegen(args0.toList)
     import runner._
 
-    if (args0.isEmpty)
-      return println (CodegenSpec.helpMsg)
+    if (args0.isEmpty) return println(CodegenSpec.helpMsg)
 
     val out = outDir getOrElse { return println("--out is required.") }
     val all = genall || !anyvals
@@ -26,14 +25,14 @@ object Codegen {
     echo("Generating sources into " + out)
 
     if (anyvals || all) {
-      val av = new AnyVals { }
+      val av = new AnyVals {}
 
-      av.make() foreach { case (name, code ) =>
-        val file = (out / (name + ".scala")).toFile
-        echo("Writing: " + file)
-        file writeAll code
+      av.make() foreach {
+        case (name, code) =>
+          val file = (out / (name + ".scala")).toFile
+          echo("Writing: " + file)
+          file writeAll code
       }
     }
   }
 }
-

@@ -1,25 +1,26 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.impl.engine.client
 
 import java.net.InetSocketAddress
 import akka.NotUsed
 import akka.http.scaladsl.settings.ConnectionPoolSettings
 
-import scala.concurrent.{ Promise, Future }
+import scala.concurrent.{Promise, Future}
 import scala.util.Try
 import akka.event.LoggingAdapter
 import akka.actor._
-import akka.stream.{ FlowShape, Materializer }
+import akka.stream.{FlowShape, Materializer}
 import akka.stream.scaladsl._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.Http
 
 private object PoolFlow {
 
-  case class RequestContext(request: HttpRequest, responsePromise: Promise[HttpResponse], retriesLeft: Int) {
+  case class RequestContext(request: HttpRequest,
+                            responsePromise: Promise[HttpResponse],
+                            retriesLeft: Int) {
     require(retriesLeft >= 0)
   }
   case class ResponseContext(rc: RequestContext, response: Try[HttpResponse])
@@ -67,27 +68,36 @@ private object PoolFlow {
     Response Merge:
     - Simple merge of the Connection Slots' outputs
 
-  */
-  def apply(connectionFlow: Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]],
-            remoteAddress: InetSocketAddress, settings: ConnectionPoolSettings, log: LoggingAdapter)(
-              implicit system: ActorSystem, fm: Materializer): Flow[RequestContext, ResponseContext, NotUsed] =
-    Flow.fromGraph(GraphDSL.create[FlowShape[RequestContext, ResponseContext]]() { implicit b ⇒
-      import settings._
-      import GraphDSL.Implicits._
+   */
+  def apply(connectionFlow: Flow[
+                HttpRequest, HttpResponse, Future[Http.OutgoingConnection]],
+            remoteAddress: InetSocketAddress,
+            settings: ConnectionPoolSettings,
+            log: LoggingAdapter)(
+      implicit system: ActorSystem,
+      fm: Materializer): Flow[RequestContext, ResponseContext, NotUsed] =
+    Flow.fromGraph(
+        GraphDSL.create[FlowShape[RequestContext, ResponseContext]]() {
+      implicit b ⇒
+        import settings._
+        import GraphDSL.Implicits._
 
-      val conductor = b.add(PoolConductor(maxConnections, pipeliningLimit, log))
-      val slots = Vector
-        .tabulate(maxConnections)(PoolSlot(_, connectionFlow, remoteAddress, settings))
-        .map(b.add(_))
-      val responseMerge = b.add(Merge[ResponseContext](maxConnections))
-      val slotEventMerge = b.add(Merge[PoolSlot.RawSlotEvent](maxConnections))
+        val conductor =
+          b.add(PoolConductor(maxConnections, pipeliningLimit, log))
+        val slots = Vector
+          .tabulate(maxConnections)(
+              PoolSlot(_, connectionFlow, remoteAddress, settings))
+          .map(b.add(_))
+        val responseMerge = b.add(Merge[ResponseContext](maxConnections))
+        val slotEventMerge =
+          b.add(Merge[PoolSlot.RawSlotEvent](maxConnections))
 
-      slotEventMerge.out ~> conductor.slotEventIn
-      for ((slot, ix) ← slots.zipWithIndex) {
-        conductor.slotOuts(ix) ~> slot.in
-        slot.out0 ~> responseMerge.in(ix)
-        slot.out1 ~> slotEventMerge.in(ix)
-      }
-      FlowShape(conductor.requestIn, responseMerge.out)
+        slotEventMerge.out ~> conductor.slotEventIn
+        for ((slot, ix) ← slots.zipWithIndex) {
+          conductor.slotOuts(ix) ~> slot.in
+          slot.out0 ~> responseMerge.in(ix)
+          slot.out1 ~> slotEventMerge.in(ix)
+        }
+        FlowShape(conductor.requestIn, responseMerge.out)
     })
 }

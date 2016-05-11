@@ -26,21 +26,21 @@ object Timing {
   private final val m: Double = 1000000.0
 
   /**
-   * Intended to be used like so:
-   * 
-   *   def mycode() {
-   *     val a = foo()
-   *     val b = bar()
-   *     val c = Timing.time("crazy calculation") {
-   *       crazyCalculation(a, b)
-   *     }
-   *     if (c > 0) c else a
-   *   }
-   * 
-   * This would print:
-   * 
-   *   crazy calculation took 45.12ms
-   */
+    * Intended to be used like so:
+    * 
+    *   def mycode() {
+    *     val a = foo()
+    *     val b = bar()
+    *     val c = Timing.time("crazy calculation") {
+    *       crazyCalculation(a, b)
+    *     }
+    *     if (c > 0) c else a
+    *   }
+    * 
+    * This would print:
+    * 
+    *   crazy calculation took 45.12ms
+    */
   def time[A](s: String)(thunk: => A): A = {
     val t0 = System.nanoTime()
     val result = thunk
@@ -57,7 +57,7 @@ object Timing {
     result
   }
 
-  def timeM[M[+_]: Monad, A](s: String)(ma: => M[A]): M[A] = {
+  def timeM[M[+ _]: Monad, A](s: String)(ma: => M[A]): M[A] = {
     val t0 = System.nanoTime()
     ma map { a =>
       val t = System.nanoTime() - t0
@@ -66,7 +66,7 @@ object Timing {
     }
   }
 
-  def timeM[M[+_]: Monad, A](f: A => String)(ma: => M[A]): M[A] = {
+  def timeM[M[+ _]: Monad, A](f: A => String)(ma: => M[A]): M[A] = {
     val t0 = System.nanoTime()
     ma map { a =>
       val t = System.nanoTime() - t0
@@ -75,9 +75,11 @@ object Timing {
     }
   }
 
-  def timeStreamT[M[+_]: Monad, A](s: String)(stream: => StreamT[M, A]): StreamT[M, A] = {
+  def timeStreamT[M[+ _]: Monad, A](s: String)(
+      stream: => StreamT[M, A]): StreamT[M, A] = {
     val t0 = System.nanoTime()
-    val end = StreamT((StreamT.Skip {
+    val end = StreamT(
+        (StreamT.Skip {
       val t = System.nanoTime() - t0
       System.err.println("%s took %.2fms" format (s, t / m))
       StreamT.empty[M, A]
@@ -85,10 +87,12 @@ object Timing {
     stream ++ end
   }
 
-  def timeStreamTElem[M[+_]: Monad, A](s: String)(stream0: => StreamT[M, A]): StreamT[M, A] = {
+  def timeStreamTElem[M[+ _]: Monad, A](s: String)(
+      stream0: => StreamT[M, A]): StreamT[M, A] = {
     def timeElem(stream: StreamT[M, A]): StreamT[M, A] = {
       val t0 = System.nanoTime()
-      StreamT(stream.uncons map {
+      StreamT(
+          stream.uncons map {
         case Some((a, tail)) =>
           val t = System.nanoTime() - t0
           System.err.println("%s took %.2fms" format (s, t / m))

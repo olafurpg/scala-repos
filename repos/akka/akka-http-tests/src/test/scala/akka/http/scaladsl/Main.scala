@@ -1,5 +1,3 @@
 package akka.http.scaladsl
 
-class Main {
-
-}
+class Main {}

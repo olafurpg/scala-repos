@@ -3,18 +3,19 @@ package mesosphere.util.state
 import mesosphere.marathon.StoreCommandFailedException
 import mesosphere.marathon.integration.setup.IntegrationFunSuite
 import mesosphere.FutureTestSupport._
-import org.scalatest.time.{ Seconds, Span }
-import org.scalatest.{ BeforeAndAfter, Matchers }
+import org.scalatest.time.{Seconds, Span}
+import org.scalatest.{BeforeAndAfter, Matchers}
 
 /**
   * Common  tests for all persistent stores.
   */
-trait PersistentStoreTest extends IntegrationFunSuite with Matchers with BeforeAndAfter {
+trait PersistentStoreTest
+    extends IntegrationFunSuite with Matchers with BeforeAndAfter {
 
   //this parameter is used for futureValue timeouts
   implicit val patienceConfig = PatienceConfig(Span(10, Seconds))
 
-  test("Root node gets read"){
+  test("Root node gets read") {
     val store = persistentStore
     store.allIds().futureValue should be(Seq.empty)
   }
@@ -36,8 +37,11 @@ trait PersistentStoreTest extends IntegrationFunSuite with Matchers with BeforeA
   test("Multiple creates should create only the first time") {
     val entity = fetch("foo2")
     entity should be('empty)
-    persistentStore.create("foo", "Hello".getBytes).futureValue.bytes should be("Hello".getBytes)
-    whenReady(persistentStore.create("foo", "Hello again".getBytes).failed) { _ shouldBe a[StoreCommandFailedException] }
+    persistentStore.create("foo", "Hello".getBytes).futureValue.bytes should be(
+        "Hello".getBytes)
+    whenReady(persistentStore.create("foo", "Hello again".getBytes).failed) {
+      _ shouldBe a[StoreCommandFailedException]
+    }
   }
 
   test("Update node is successful") {
@@ -63,8 +67,13 @@ trait PersistentStoreTest extends IntegrationFunSuite with Matchers with BeforeA
     read2 should be('defined)
     read.get.bytes should be("Hello".getBytes)
     read2.get.bytes should be("Hello".getBytes)
-    persistentStore.update(read.get.withNewContent("Hello again".getBytes)).futureValue.bytes should be("Hello again".getBytes)
-    whenReady(persistentStore.update(read2.get.withNewContent("Will be None".getBytes)).failed) { _ shouldBe a[StoreCommandFailedException] }
+    persistentStore
+      .update(read.get.withNewContent("Hello again".getBytes))
+      .futureValue
+      .bytes should be("Hello again".getBytes)
+    whenReady(persistentStore
+          .update(read2.get.withNewContent("Will be None".getBytes))
+          .failed) { _ shouldBe a[StoreCommandFailedException] }
     val readAgain = fetch("foo")
     readAgain.get.bytes should be("Hello again".getBytes)
   }
@@ -86,15 +95,16 @@ trait PersistentStoreTest extends IntegrationFunSuite with Matchers with BeforeA
   }
 
   test("All ids in namespace can be listed") {
-    persistentStore.allIds().futureValue should be ('empty)
+    persistentStore.allIds().futureValue should be('empty)
     persistentStore.create("foo", "Hello".getBytes).futureValue
-    persistentStore.allIds().futureValue should be (Seq("foo"))
+    persistentStore.allIds().futureValue should be(Seq("foo"))
   }
 
   before {
     persistentStore match {
-      case manager: PersistentStoreManagement => manager.initialize().futureValue
-      case _                                  => //ignore
+      case manager: PersistentStoreManagement =>
+        manager.initialize().futureValue
+      case _ => //ignore
     }
     persistentStore.allIds().futureValue.foreach { entry =>
       persistentStore.delete(entry).futureValue
@@ -102,6 +112,8 @@ trait PersistentStoreTest extends IntegrationFunSuite with Matchers with BeforeA
   }
 
   def persistentStore: PersistentStore
-  def store(entity: PersistentEntity): PersistentEntity = persistentStore.update(entity).futureValue
-  def fetch(key: String): Option[PersistentEntity] = persistentStore.load(key).futureValue
+  def store(entity: PersistentEntity): PersistentEntity =
+    persistentStore.update(entity).futureValue
+  def fetch(key: String): Option[PersistentEntity] =
+    persistentStore.load(key).futureValue
 }

@@ -44,7 +44,9 @@ class EnsembleSimpleLabel extends EnsembleExample {
     children = new Label {
       text = "A simple label with a graphic on the left."
       graphic = new ImageView {
-        image = new Image(this.getClass.getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+        image = new Image(
+            this.getClass
+              .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
       }
       contentDisplay = ContentDisplay.Left
     }

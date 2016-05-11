@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import language.postfixOps
@@ -19,7 +18,8 @@ class FSMTimingSpec extends AkkaSpec with ImplicitSender {
   expectMsg(1 second, CurrentState(fsm, Initial))
 
   ignoreMsg {
-    case Transition(_, bs: FSMTimingSpec.State, _) if bs eq Initial ⇒ true // SI-5900 workaround
+    case Transition(_, bs: FSMTimingSpec.State, _) if bs eq Initial ⇒
+      true // SI-5900 workaround
   }
 
   "A Finite State Machine" must {
@@ -110,11 +110,15 @@ class FSMTimingSpec extends AkkaSpec with ImplicitSender {
       expectMsg(500 millis, Tick)
       Thread.sleep(200) // this is ugly: need to wait for StateTimeout to be queued
       resume(fsm)
-      expectMsg(500 millis, Transition(fsm, TestCancelStateTimerInNamedTimerMessage, TestCancelStateTimerInNamedTimerMessage2))
+      expectMsg(500 millis,
+                Transition(fsm,
+                           TestCancelStateTimerInNamedTimerMessage,
+                           TestCancelStateTimerInNamedTimerMessage2))
       fsm ! Cancel
       within(500 millis) {
         expectMsg(Cancel) // if this is not received, that means StateTimeout was not properly discarded
-        expectMsg(Transition(fsm, TestCancelStateTimerInNamedTimerMessage2, Initial))
+        expectMsg(
+            Transition(fsm, TestCancelStateTimerInNamedTimerMessage2, Initial))
       }
     }
 
@@ -130,35 +134,39 @@ class FSMTimingSpec extends AkkaSpec with ImplicitSender {
     }
 
     "notify unhandled messages" taggedAs TimingTest in {
-      filterEvents(EventFilter.warning("unhandled event Tick in state TestUnhandled", source = fsm.path.toString, occurrences = 1),
-        EventFilter.warning("unhandled event Unhandled(test) in state TestUnhandled", source = fsm.path.toString, occurrences = 1)) {
-          fsm ! TestUnhandled
-          within(3 second) {
-            fsm ! Tick
-            fsm ! SetHandler
-            fsm ! Tick
-            expectMsg(Unhandled(Tick))
-            fsm ! Unhandled("test")
-            fsm ! Cancel
-            expectMsg(Transition(fsm, TestUnhandled, Initial))
-          }
+      filterEvents(
+          EventFilter.warning("unhandled event Tick in state TestUnhandled",
+                              source = fsm.path.toString,
+                              occurrences = 1),
+          EventFilter.warning(
+              "unhandled event Unhandled(test) in state TestUnhandled",
+              source = fsm.path.toString,
+              occurrences = 1)) {
+        fsm ! TestUnhandled
+        within(3 second) {
+          fsm ! Tick
+          fsm ! SetHandler
+          fsm ! Tick
+          expectMsg(Unhandled(Tick))
+          fsm ! Unhandled("test")
+          fsm ! Cancel
+          expectMsg(Transition(fsm, TestUnhandled, Initial))
         }
+      }
     }
-
   }
-
 }
 
 object FSMTimingSpec {
 
   def suspend(actorRef: ActorRef): Unit = actorRef match {
     case l: ActorRefWithCell ⇒ l.suspend()
-    case _                   ⇒
+    case _ ⇒
   }
 
   def resume(actorRef: ActorRef): Unit = actorRef match {
     case l: ActorRefWithCell ⇒ l.resume(causedByFailure = null)
-    case _                   ⇒
+    case _ ⇒
   }
 
   trait State
@@ -201,7 +209,7 @@ object FSMTimingSpec {
     }
     when(TestStateTimeout, stateTimeout = 800.millis.dilated) {
       case Event(StateTimeout, _) ⇒ goto(Initial)
-      case Event(Cancel, _)       ⇒ goto(Initial) replying (Cancel)
+      case Event(Cancel, _) ⇒ goto(Initial) replying (Cancel)
     }
     when(TestSingleTimer) {
       case Event(Tick, _) ⇒
@@ -209,7 +217,8 @@ object FSMTimingSpec {
         goto(Initial)
     }
     onTransition {
-      case Initial -> TestSingleTimerResubmit ⇒ setTimer("blah", Tick, 500.millis.dilated)
+      case Initial -> TestSingleTimerResubmit ⇒
+        setTimer("blah", Tick, 500.millis.dilated)
     }
     when(TestSingleTimerResubmit) {
       case Event(Tick, _) ⇒
@@ -223,7 +232,8 @@ object FSMTimingSpec {
     when(TestCancelTimer) {
       case Event(Tick, _) ⇒
         setTimer("hallo", Tock, 1.milli.dilated)
-        TestKit.awaitCond(context.asInstanceOf[ActorCell].mailbox.hasMessages, 1.second.dilated)
+        TestKit.awaitCond(context.asInstanceOf[ActorCell].mailbox.hasMessages,
+                          1.second.dilated)
         cancelTimer("hallo")
         sender() ! Tick
         setTimer("hallo", Tock, 500.millis.dilated)
@@ -250,7 +260,8 @@ object FSMTimingSpec {
       case Event(Tick, _) ⇒
         suspend(self)
         setTimer("named", Tock, 1.millis.dilated)
-        TestKit.awaitCond(context.asInstanceOf[ActorCell].mailbox.hasMessages, 1.second.dilated)
+        TestKit.awaitCond(context.asInstanceOf[ActorCell].mailbox.hasMessages,
+                          1.second.dilated)
         stay forMax (1.millis.dilated) replying Tick
       case Event(Tock, _) ⇒
         goto(TestCancelStateTimerInNamedTimerMessage2)
@@ -284,6 +295,4 @@ object FSMTimingSpec {
         stay
     }
   }
-
 }
-

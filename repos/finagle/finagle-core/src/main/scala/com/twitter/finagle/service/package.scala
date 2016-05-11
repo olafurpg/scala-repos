@@ -3,35 +3,35 @@ package com.twitter.finagle
 package object service {
 
   /**
-   * A response classifier allows developers to give Finagle the additional
-   * application specific knowledge necessary in order to properly classify them.
-   * Without this, Finagle can only safely make judgements about transport
-   * level failures.
-   *
-   * As an example take an HTTP client that receives a response with a 500 status
-   * code back from a server. To Finagle this is a successful request/response
-   * based solely on the transport level. The application developer may want to
-   * treat all 500 status codes as failures and can do so via a
-   * [[com.twitter.finagle.service.ResponseClassifier]].
-   *
-   * It is a [[PartialFunction]] from a request/response pair to a
-   * [[ResponseClass]] and as such multiple classifiers can be composed
-   * together via [[PartialFunction.orElse]].
-   *
-   * @see `com.twitter.finagle.http.service.HttpResponseClassifier` for some
-   * HTTP classification tools.
-   *
-   * @note Java does not understand the type alias and must be used as
-   * `PartialFunction` in Java.
-   *
-   * @note Finagle's default classifier is
-   * [[com.twitter.finagle.service.ResponseClassifier.Default]]
-   * which is a total function fully covering the input domain.
-   *
-   * @note it is a good practice for users of `ResponseClassifier.apply` to
-   * instead use `theClassifier.applyOrElse(input, ResponseClassifier.Default)`
-   * in order to ensure that the PartialFunction will be fully covering.
-   */
+    * A response classifier allows developers to give Finagle the additional
+    * application specific knowledge necessary in order to properly classify them.
+    * Without this, Finagle can only safely make judgements about transport
+    * level failures.
+    *
+    * As an example take an HTTP client that receives a response with a 500 status
+    * code back from a server. To Finagle this is a successful request/response
+    * based solely on the transport level. The application developer may want to
+    * treat all 500 status codes as failures and can do so via a
+    * [[com.twitter.finagle.service.ResponseClassifier]].
+    *
+    * It is a [[PartialFunction]] from a request/response pair to a
+    * [[ResponseClass]] and as such multiple classifiers can be composed
+    * together via [[PartialFunction.orElse]].
+    *
+    * @see `com.twitter.finagle.http.service.HttpResponseClassifier` for some
+    * HTTP classification tools.
+    *
+    * @note Java does not understand the type alias and must be used as
+    * `PartialFunction` in Java.
+    *
+    * @note Finagle's default classifier is
+    * [[com.twitter.finagle.service.ResponseClassifier.Default]]
+    * which is a total function fully covering the input domain.
+    *
+    * @note it is a good practice for users of `ResponseClassifier.apply` to
+    * instead use `theClassifier.applyOrElse(input, ResponseClassifier.Default)`
+    * in order to ensure that the PartialFunction will be fully covering.
+    */
   type ResponseClassifier = PartialFunction[ReqRep, ResponseClass]
 
   //
@@ -61,5 +61,4 @@ package object service {
   //    original response outside of the Finagle stack would likely lead to
   //    confusion and the abstraction would leak out in places like
   //    `StatsFilter`.
-
 }

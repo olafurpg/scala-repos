@@ -14,4 +14,3 @@ class TypeInferenceSlickTest extends TypeInferenceTestBase {
 
   def testSCL9261(): Unit = { doTest() }
 }
-

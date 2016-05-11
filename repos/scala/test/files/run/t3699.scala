@@ -1,7 +1,7 @@
 object Test {
   def act: Int => Int = {
     case _ =>
-      lazy val (a, b) = (3,9)
+      lazy val (a, b) = (3, 9)
       a
       b
   }

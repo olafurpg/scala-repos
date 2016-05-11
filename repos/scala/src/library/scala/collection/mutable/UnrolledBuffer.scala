@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -16,42 +16,43 @@ import scala.annotation.tailrec
 import scala.reflect.ClassTag
 
 /** A buffer that stores elements in an unrolled linked list.
- *
- *  Unrolled linked lists store elements in linked fixed size
- *  arrays.
- *
- *  Unrolled buffers retain locality and low memory overhead
- *  properties of array buffers, but offer much more efficient
- *  element addition, since they never reallocate and copy the
- *  internal array.
- *
- *  However, they provide `O(n/m)` complexity random access,
- *  where `n` is the number of elements, and `m` the size of
- *  internal array chunks.
- *
- *  Ideal to use when:
- *  - elements are added to the buffer and then all of the
- *    elements are traversed sequentially
- *  - two unrolled buffers need to be concatenated (see `concat`)
- *
- *  Better than singly linked lists for random access, but
- *  should still be avoided for such a purpose.
- *
- *  @define coll unrolled buffer
- *  @define Coll `UnrolledBuffer`
- *  @author Aleksandar Prokopec
- *
- */
+  *
+  *  Unrolled linked lists store elements in linked fixed size
+  *  arrays.
+  *
+  *  Unrolled buffers retain locality and low memory overhead
+  *  properties of array buffers, but offer much more efficient
+  *  element addition, since they never reallocate and copy the
+  *  internal array.
+  *
+  *  However, they provide `O(n/m)` complexity random access,
+  *  where `n` is the number of elements, and `m` the size of
+  *  internal array chunks.
+  *
+  *  Ideal to use when:
+  *  - elements are added to the buffer and then all of the
+  *    elements are traversed sequentially
+  *  - two unrolled buffers need to be concatenated (see `concat`)
+  *
+  *  Better than singly linked lists for random access, but
+  *  should still be avoided for such a purpose.
+  *
+  *  @define coll unrolled buffer
+  *  @define Coll `UnrolledBuffer`
+  *  @author Aleksandar Prokopec
+  *
+  */
 @SerialVersionUID(1L)
-@deprecatedInheritance("UnrolledBuffer is not designed to enable meaningful subclassing.", "2.11.0")
+@deprecatedInheritance(
+    "UnrolledBuffer is not designed to enable meaningful subclassing.",
+    "2.11.0")
 class UnrolledBuffer[T](implicit val tag: ClassTag[T])
-extends scala.collection.mutable.AbstractBuffer[T]
-   with scala.collection.mutable.Buffer[T]
-   with scala.collection.mutable.BufferLike[T, UnrolledBuffer[T]]
-   with GenericClassTagTraversableTemplate[T, UnrolledBuffer]
-   with scala.collection.mutable.Builder[T, UnrolledBuffer[T]]
-   with Serializable
-{
+    extends scala.collection.mutable.AbstractBuffer[T]
+    with scala.collection.mutable.Buffer[T]
+    with scala.collection.mutable.BufferLike[T, UnrolledBuffer[T]]
+    with GenericClassTagTraversableTemplate[T, UnrolledBuffer]
+    with scala.collection.mutable.Builder[T, UnrolledBuffer[T]]
+    with Serializable {
   import UnrolledBuffer.Unrolled
 
   @transient private var headptr = newUnrolled
@@ -86,12 +87,12 @@ extends scala.collection.mutable.AbstractBuffer[T]
   def classTagCompanion = UnrolledBuffer
 
   /** Concatenates the target unrolled buffer to this unrolled buffer.
-   *
-   *  The specified buffer `that` is cleared after this operation. This is
-   *  an O(1) operation.
-   *
-   *  @param that    the unrolled buffer whose elements are added to this buffer
-   */
+    *
+    *  The specified buffer `that` is cleared after this operation. This is
+    *  an O(1) operation.
+    *
+    *  @param that    the unrolled buffer whose elements are added to this buffer
+    */
   def concat(that: UnrolledBuffer[T]) = {
     // bind the two together
     if (!lastptr.bind(that.headptr)) lastptr = that.lastPtr
@@ -134,11 +135,12 @@ extends scala.collection.mutable.AbstractBuffer[T]
       }
     }
     def hasNext = node ne null
-    def next = if (hasNext) {
-      val r = node.array(pos)
-      scan()
-      r
-    } else Iterator.empty.next()
+    def next =
+      if (hasNext) {
+        val r = node.array(pos)
+        scan()
+        r
+      } else Iterator.empty.next()
   }
 
   // this should be faster than the iterator
@@ -200,34 +202,45 @@ extends scala.collection.mutable.AbstractBuffer[T]
   override def stringPrefix = "UnrolledBuffer"
 }
 
-
 object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
+
   /** $genericCanBuildFromInfo */
-  implicit def canBuildFrom[T](implicit t: ClassTag[T]): CanBuildFrom[Coll, T, UnrolledBuffer[T]] =
+  implicit def canBuildFrom[T](
+      implicit t: ClassTag[T]): CanBuildFrom[Coll, T, UnrolledBuffer[T]] =
     new GenericCanBuildFrom[T]
-  def newBuilder[T](implicit t: ClassTag[T]): Builder[T, UnrolledBuffer[T]] = new UnrolledBuffer[T]
+  def newBuilder[T](implicit t: ClassTag[T]): Builder[T, UnrolledBuffer[T]] =
+    new UnrolledBuffer[T]
 
   val waterline = 50
-  val waterlineDelim = 100    // TODO -- fix this name!  It's a denominator, not a delimiter.  (But it's part of the API so we can't just change it.)
+  val waterlineDelim =
+    100 // TODO -- fix this name!  It's a denominator, not a delimiter.  (But it's part of the API so we can't just change it.)
   private[collection] val unrolledlength = 32
 
   /** Unrolled buffer node.
-   */
-  class Unrolled[T: ClassTag] private[collection] (var size: Int, var array: Array[T], var next: Unrolled[T], val buff: UnrolledBuffer[T] = null) {
-    private[collection] def this() = this(0, new Array[T](unrolledlength), null, null)
-    private[collection] def this(b: UnrolledBuffer[T]) = this(0, new Array[T](unrolledlength), null, b)
+    */
+  class Unrolled[T : ClassTag] private[collection](
+      var size: Int,
+      var array: Array[T],
+      var next: Unrolled[T],
+      val buff: UnrolledBuffer[T] = null) {
+    private[collection] def this() =
+      this(0, new Array[T](unrolledlength), null, null)
+    private[collection] def this(b: UnrolledBuffer[T]) =
+      this(0, new Array[T](unrolledlength), null, b)
 
-    private def nextlength = if (buff eq null) unrolledlength else buff.calcNextLength(array.length)
+    private def nextlength =
+      if (buff eq null) unrolledlength else buff.calcNextLength(array.length)
 
     // adds and returns itself or the new unrolled if full
-    @tailrec final def append(elem: T): Unrolled[T] = if (size < array.length) {
-      array(size) = elem
-      size += 1
-      this
-    } else {
-      next = new Unrolled[T](0, new Array[T](nextlength), null, buff)
-      next append elem
-    }
+    @tailrec final def append(elem: T): Unrolled[T] =
+      if (size < array.length) {
+        array(size) = elem
+        size += 1
+        this
+      } else {
+        next = new Unrolled[T](0, new Array[T](nextlength), null, buff)
+        next append elem
+      }
     def foreach[U](f: T => U) {
       var unrolled = this
       var i = 0
@@ -246,24 +259,26 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
     @tailrec final def apply(idx: Int): T =
       if (idx < size) array(idx) else next.apply(idx - size)
     @tailrec final def update(idx: Int, newelem: T): Unit =
-      if (idx < size) array(idx) = newelem else next.update(idx - size, newelem)
+      if (idx < size) array(idx) = newelem
+      else next.update(idx - size, newelem)
     @tailrec final def locate(idx: Int): Unrolled[T] =
       if (idx < size) this else next.locate(idx - size)
-    def prepend(elem: T) = if (size < array.length) {
-      // shift the elements of the array right
-      // then insert the element
-      shiftright()
-      array(0) = elem
-      size += 1
-      this
-    } else {
-      // allocate a new node and store element
-      // then make it point to this
-      val newhead = new Unrolled[T](buff)
-      newhead append elem
-      newhead.next = this
-      newhead
-    }
+    def prepend(elem: T) =
+      if (size < array.length) {
+        // shift the elements of the array right
+        // then insert the element
+        shiftright()
+        array(0) = elem
+        size += 1
+        this
+      } else {
+        // allocate a new node and store element
+        // then make it point to this
+        val newhead = new Unrolled[T](buff)
+        newhead append elem
+        newhead.next = this
+        newhead
+      }
     // shifts right assuming enough space
     private def shiftright() {
       var i = size - 1
@@ -292,42 +307,45 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
       }
       nullout(i, i + 1)
     }
-    protected def tryMergeWithNext() = if (next != null && (size + next.size) < (array.length * waterline / waterlineDelim)) {
-      // copy the next array, then discard the next node
-      Array.copy(next.array, 0, array, size, next.size)
-      size = size + next.size
-      next = next.next
-      if (next eq null) true else false // checks if last node was thrown out
-    } else false
+    protected def tryMergeWithNext() =
+      if (next != null && (size + next.size) <
+          (array.length * waterline / waterlineDelim)) {
+        // copy the next array, then discard the next node
+        Array.copy(next.array, 0, array, size, next.size)
+        size = size + next.size
+        next = next.next
+        if (next eq null) true else false // checks if last node was thrown out
+      } else false
 
-    @tailrec final def insertAll(idx: Int, t: scala.collection.Traversable[T], buffer: UnrolledBuffer[T]): Unit = {
+    @tailrec final def insertAll(idx: Int,
+                                 t: scala.collection.Traversable[T],
+                                 buffer: UnrolledBuffer[T]): Unit = {
       if (idx < size) {
-	// divide this node at the appropriate position and insert all into head
-	// update new next
-	val newnextnode = new Unrolled[T](0, new Array(array.length), null, buff)
-	Array.copy(array, idx, newnextnode.array, 0, size - idx)
-	newnextnode.size = size - idx
-	newnextnode.next = next
+        // divide this node at the appropriate position and insert all into head
+        // update new next
+        val newnextnode =
+          new Unrolled[T](0, new Array(array.length), null, buff)
+        Array.copy(array, idx, newnextnode.array, 0, size - idx)
+        newnextnode.size = size - idx
+        newnextnode.next = next
 
-	// update this
-	nullout(idx, size)
-	size = idx
-	next = null
+        // update this
+        nullout(idx, size)
+        size = idx
+        next = null
 
-	// insert everything from iterable to this
-	var curr = this
-	for (elem <- t) curr = curr append elem
-	curr.next = newnextnode
+        // insert everything from iterable to this
+        var curr = this
+        for (elem <- t) curr = curr append elem
+        curr.next = newnextnode
 
-	// try to merge the last node of this with the newnextnode and fix tail pointer if needed
-	if (curr.tryMergeWithNext()) buffer.lastPtr = curr
-	else if (newnextnode.next eq null) buffer.lastPtr = newnextnode
-      }
-      else if (idx == size || (next eq null)) {
-	var curr = this
-	for (elem <- t) curr = curr append elem
-      }
-      else next.insertAll(idx - size, t, buffer)
+        // try to merge the last node of this with the newnextnode and fix tail pointer if needed
+        if (curr.tryMergeWithNext()) buffer.lastPtr = curr
+        else if (newnextnode.next eq null) buffer.lastPtr = newnextnode
+      } else if (idx == size || (next eq null)) {
+        var curr = this
+        for (elem <- t) curr = curr append elem
+      } else next.insertAll(idx - size, t, buffer)
     }
     private def nullout(from: Int, until: Int) {
       var idx = from
@@ -346,7 +364,12 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
       tryMergeWithNext()
     }
 
-    override def toString = array.take(size).mkString("Unrolled@%08x".format(System.identityHashCode(this)) + "[" + size + "/" + array.length + "](", ", ", ")") + " -> " + (if (next ne null) next.toString else "")
+    override def toString =
+      array
+        .take(size)
+        .mkString("Unrolled@%08x".format(System.identityHashCode(this)) + "[" +
+                  size + "/" + array.length + "](",
+                  ", ",
+                  ")") + " -> " + (if (next ne null) next.toString else "")
   }
-
 }

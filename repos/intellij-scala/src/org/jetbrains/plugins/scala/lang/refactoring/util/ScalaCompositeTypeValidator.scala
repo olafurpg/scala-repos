@@ -10,8 +10,8 @@ import org.jetbrains.plugins.scala.ScalaBundle
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by Kate Ustyuzhanina on 8/25/15.
- */
+  * Created by Kate Ustyuzhanina on 8/25/15.
+  */
 object ScalaCompositeTypeValidator {
   def apply(validators: List[ScalaValidator],
             conflictsReporter: ConflictsReporter,
@@ -20,11 +20,15 @@ object ScalaCompositeTypeValidator {
             noOccurrences: Boolean,
             enclosingContainerAll: PsiElement,
             enclosingOne: PsiElement): ScalaCompositeTypeValidator = {
-    new ScalaCompositeTypeValidator(conflictsReporter, myProject,
-      selectedElement, noOccurrences, enclosingContainerAll, enclosingOne, validators)
+    new ScalaCompositeTypeValidator(conflictsReporter,
+                                    myProject,
+                                    selectedElement,
+                                    noOccurrences,
+                                    enclosingContainerAll,
+                                    enclosingOne,
+                                    validators)
   }
 }
-
 
 class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
                                   myProject: Project,
@@ -33,19 +37,23 @@ class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
                                   enclosingContainerAll: PsiElement,
                                   enclosingOne: PsiElement,
                                   validators: List[ScalaValidator])
-  extends ScalaTypeValidator(conflictsReporter, myProject, selectedElement, noOccurrences, enclosingContainerAll, enclosingOne) {
+    extends ScalaTypeValidator(conflictsReporter,
+                               myProject,
+                               selectedElement,
+                               noOccurrences,
+                               enclosingContainerAll,
+                               enclosingOne) {
 
-  override def findConflicts(name: String, allOcc: Boolean): Array[(PsiNamedElement, String)] = {
+  override def findConflicts(
+      name: String, allOcc: Boolean): Array[(PsiNamedElement, String)] = {
     //returns declaration and message
     val buf = new ArrayBuffer[(PsiNamedElement, String)]
-
 
     val filesToSearchIn = enclosingContainerAll match {
       case directory: PsiDirectory =>
         findFilesForDownConflictFindings(directory, name)
       case _ => null
     }
-
 
     for (file <- filesToSearchIn) {
       if (buf.isEmpty) {
@@ -63,7 +71,8 @@ class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
   }
 
   //TODO iliminate duplication
-  private def findFilesForDownConflictFindings(directory: PsiDirectory, name: String): Array[PsiFile] = {
+  private def findFilesForDownConflictFindings(
+      directory: PsiDirectory, name: String): Array[PsiFile] = {
     def oneRound(word: String) = {
       val buffer = new ArrayBuffer[PsiFile]()
 
@@ -74,8 +83,13 @@ class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
         }
       }
 
-      val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(directory.getProject)
-      helper.processAllFilesWithWord(word, GlobalSearchScopesCore.directoryScope(directory, true), processor, true)
+      val helper: PsiSearchHelper =
+        PsiSearchHelper.SERVICE.getInstance(directory.getProject)
+      helper.processAllFilesWithWord(
+          word,
+          GlobalSearchScopesCore.directoryScope(directory, true),
+          processor,
+          true)
 
       buffer
     }
@@ -90,9 +104,10 @@ class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
   }
 
   private def messageForTypeAliasMember(name: String) =
-    ScalaBundle.message("introduced.typealias.will.conflict.with.type.name", name)
+    ScalaBundle.message(
+        "introduced.typealias.will.conflict.with.type.name", name)
 
   private def messageForClassMember(name: String) =
-    ScalaBundle.message("introduced.typealias.will.conflict.with.class.name", name)
+    ScalaBundle.message(
+        "introduced.typealias.will.conflict.with.class.name", name)
 }
-

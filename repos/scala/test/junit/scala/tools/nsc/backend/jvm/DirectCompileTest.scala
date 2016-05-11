@@ -22,8 +22,7 @@ class DirectCompileTest extends ClearAfterClass {
 
   @Test
   def testCompile(): Unit = {
-    val List(("C.class", bytes)) = compile(compiler)(
-      """class C {
+    val List(("C.class", bytes)) = compile(compiler)("""class C {
         |  def f = 1
         |}
       """.stripMargin)
@@ -33,7 +32,8 @@ class DirectCompileTest extends ClearAfterClass {
 
   @Test
   def testCompileClasses(): Unit = {
-    val List(cClass, cModuleClass) = compileClasses(compiler)("class C; object C")
+    val List(cClass, cModuleClass) =
+      compileClasses(compiler)("class C; object C")
 
     assertTrue(cClass.name == "C")
     assertTrue(cModuleClass.name == "C$")
@@ -46,37 +46,39 @@ class DirectCompileTest extends ClearAfterClass {
 
   @Test
   def testCompileMethods(): Unit = {
-    val List(f, g) = compileMethods(compiler)(
-      """def f = 10
+    val List(f, g) = compileMethods(compiler)("""def f = 10
         |def g = f
       """.stripMargin)
     assertTrue(f.name == "f")
     assertTrue(g.name == "g")
 
     assertSameCode(instructionsFromMethod(f).dropNonOp,
-      List(IntOp(BIPUSH, 10), Op(IRETURN)))
+                   List(IntOp(BIPUSH, 10), Op(IRETURN)))
 
     assertSameCode(instructionsFromMethod(g).dropNonOp,
-      List(VarOp(ALOAD, 0), Invoke(INVOKEVIRTUAL, "C", "f", "()I", itf = false), Op(IRETURN)))
+                   List(VarOp(ALOAD, 0),
+                        Invoke(INVOKEVIRTUAL, "C", "f", "()I", itf = false),
+                        Op(IRETURN)))
   }
 
   @Test
   def testDropNonOpAliveLabels(): Unit = {
     // makes sure that dropNoOp doesn't drop labels that are being used
-    val List(f) = compileMethods(compiler)("""def f(x: Int) = if (x == 0) "a" else "b"""")
-    assertSameCode(instructionsFromMethod(f).dropLinesFrames, List(
-      Label(0),
-      VarOp(ILOAD, 1),
-      Op(ICONST_0),
-      Jump(IF_ICMPNE,
-      Label(7)),
-      Ldc(LDC, "a"),
-      Op(ARETURN),
-      Label(7),
-      Ldc(LDC, "b"),
-      Op(ARETURN),
-      Label(11)
-    ))
+    val List(f) =
+      compileMethods(compiler)("""def f(x: Int) = if (x == 0) "a" else "b"""")
+    assertSameCode(instructionsFromMethod(f).dropLinesFrames,
+                   List(
+                       Label(0),
+                       VarOp(ILOAD, 1),
+                       Op(ICONST_0),
+                       Jump(IF_ICMPNE, Label(7)),
+                       Ldc(LDC, "a"),
+                       Op(ARETURN),
+                       Label(7),
+                       Ldc(LDC, "b"),
+                       Op(ARETURN),
+                       Label(11)
+                   ))
   }
 
   @Test
@@ -93,6 +95,7 @@ class DirectCompileTest extends ClearAfterClass {
 
   @Test
   def compileErroneous(): Unit = {
-    compileClasses(compiler)("class C { def f: String = 1 }", allowMessage = _.msg contains "type mismatch")
+    compileClasses(compiler)("class C { def f: String = 1 }",
+                             allowMessage = _.msg contains "type mismatch")
   }
 }

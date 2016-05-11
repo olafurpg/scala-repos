@@ -11,18 +11,25 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObj
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
 /**
- * @author Nikolay.Tropin
- */
-class FieldFromDelayedInitInspection extends AbstractInspection("FieldFromDelayedInit", "Field from DelayedInit"){
-  override def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+  * @author Nikolay.Tropin
+  */
+class FieldFromDelayedInitInspection
+    extends AbstractInspection(
+        "FieldFromDelayedInit", "Field from DelayedInit") {
+  override def actionFor(
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case ref: ScReferenceExpression =>
       ref.bind() match {
         case Some(FieldInDelayedInit(delayedInitClass)) =>
           val classContainers = ref.parentsInFile.collect {
             case td: ScTemplateDefinition => td
           }
-          if (!classContainers.exists(c => c == delayedInitClass || c.isInheritor(delayedInitClass, deep = true)))
-            holder.registerProblem(ref.nameId, "Field defined in DelayedInit is likely to be null")
+          if (!classContainers.exists(c =>
+                    c == delayedInitClass ||
+                    c.isInheritor(delayedInitClass, deep = true)))
+            holder.registerProblem(
+                ref.nameId,
+                "Field defined in DelayedInit is likely to be null")
         case _ =>
       }
   }
@@ -31,8 +38,10 @@ class FieldFromDelayedInitInspection extends AbstractInspection("FieldFromDelaye
     def unapply(srr: ScalaResolveResult): Option[PsiClass] = {
       ScalaPsiUtil.nameContext(srr.getElement) match {
         case LazyVal(_) => None
-        case Both((_: ScPatternDefinition | _: ScVariableDefinition), ContainingClass(clazz @ (_: ScClass | _: ScObject))) =>
-          if (srr.fromType.exists(InspectionsUtil.conformsToTypeFromClass(_, "scala.DelayedInit", clazz.getProject))) Some(clazz)
+        case Both((_: ScPatternDefinition | _: ScVariableDefinition),
+                  ContainingClass(clazz @ (_: ScClass | _: ScObject))) =>
+          if (srr.fromType.exists(InspectionsUtil.conformsToTypeFromClass(
+                      _, "scala.DelayedInit", clazz.getProject))) Some(clazz)
           else None
         case _ => None
       }

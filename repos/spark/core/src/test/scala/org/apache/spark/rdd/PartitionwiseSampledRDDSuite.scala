@@ -36,12 +36,14 @@ class MockSampler extends RandomSampler[Long, Long] {
   override def clone: MockSampler = new MockSampler
 }
 
-class PartitionwiseSampledRDDSuite extends SparkFunSuite with SharedSparkContext {
+class PartitionwiseSampledRDDSuite
+    extends SparkFunSuite with SharedSparkContext {
 
   test("seed distribution") {
     val rdd = sc.makeRDD(Array(1L, 2L, 3L, 4L), 2)
     val sampler = new MockSampler
-    val sample = new PartitionwiseSampledRDD[Long, Long](rdd, sampler, false, 0L)
+    val sample =
+      new PartitionwiseSampledRDD[Long, Long](rdd, sampler, false, 0L)
     assert(sample.distinct().count == 2, "Seeds must be different.")
   }
 
@@ -49,10 +51,10 @@ class PartitionwiseSampledRDDSuite extends SparkFunSuite with SharedSparkContext
     // SPARK-2251: zip with self computes each partition twice.
     // We want to make sure there are no concurrency issues.
     val rdd = sc.parallelize(0 until 111, 10)
-    for (sampler <- Seq(new BernoulliSampler[Int](0.5), new PoissonSampler[Int](0.5))) {
+    for (sampler <- Seq(
+        new BernoulliSampler[Int](0.5), new PoissonSampler[Int](0.5))) {
       val sampled = new PartitionwiseSampledRDD[Int, Int](rdd, sampler, true)
       sampled.zip(sampled).count()
     }
   }
 }
-

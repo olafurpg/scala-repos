@@ -7,8 +7,8 @@ import lila.team.Team
 import play.api.libs.json._
 
 final class TeamSearchApi(
-    client: ESClient,
-    fetcher: Seq[String] => Fu[List[Team]]) extends SearchReadApi[Team, Query] {
+    client: ESClient, fetcher: Seq[String] => Fu[List[Team]])
+    extends SearchReadApi[Team, Query] {
 
   def search(query: Query, from: From, size: Size) =
     client.search(query, from, size) flatMap { res =>
@@ -19,21 +19,23 @@ final class TeamSearchApi(
 
   def store(team: Team) = client.store(Id(team.id), toDoc(team))
 
-  private def toDoc(team: Team) = Json.obj(
-    Fields.name -> team.name,
-    Fields.description -> team.description.take(10000),
-    Fields.location -> team.location,
-    Fields.nbMembers -> team.nbMembers)
+  private def toDoc(team: Team) =
+    Json.obj(Fields.name -> team.name,
+             Fields.description -> team.description.take(10000),
+             Fields.location -> team.location,
+             Fields.nbMembers -> team.nbMembers)
 
   def reset = client match {
-    case c: ESClientHttp => c.putMapping >> {
-      lila.log("teamSearch").info(s"Index to ${c.index.name}")
-      import lila.db.api._
-      import lila.team.tube.teamTube
-      $enumerate.bulk[Option[Team]]($query[Team](Json.obj("enabled" -> true)), 300) { teamOptions =>
-        c.storeBulk(teamOptions.flatten map (t => Id(t.id) -> toDoc(t)))
+    case c: ESClientHttp =>
+      c.putMapping >> {
+        lila.log("teamSearch").info(s"Index to ${c.index.name}")
+        import lila.db.api._
+        import lila.team.tube.teamTube
+        $enumerate.bulk[Option[Team]](
+            $query[Team](Json.obj("enabled" -> true)), 300) { teamOptions =>
+          c.storeBulk(teamOptions.flatten map (t => Id(t.id) -> toDoc(t)))
+        }
       }
-    }
     case _ => funit
   }
 }

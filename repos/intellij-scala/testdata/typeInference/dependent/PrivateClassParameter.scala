@@ -7,6 +7,7 @@ class C {
 
 class A(f: C) {
   private val w = new f.W
-  /*start*/f.getZ(w)/*end*/
+  /*start*/
+  f.getZ(w) /*end*/
 }
 //Int

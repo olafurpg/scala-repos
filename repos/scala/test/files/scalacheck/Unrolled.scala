@@ -21,6 +21,4 @@ object Test extends Properties("UnrolledBuffer") {
     u ++= l
     u == l
   }
-
 }
-

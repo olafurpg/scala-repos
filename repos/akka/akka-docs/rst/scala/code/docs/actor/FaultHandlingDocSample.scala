@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.actor
 
 import language.postfixOps
@@ -12,13 +12,13 @@ import akka.actor.SupervisorStrategy._
 import scala.concurrent.duration._
 import akka.util.Timeout
 import akka.event.LoggingReceive
-import akka.pattern.{ ask, pipe }
+import akka.pattern.{ask, pipe}
 import com.typesafe.config.ConfigFactory
 //#imports
 
 /**
- * Runs the sample
- */
+  * Runs the sample
+  */
 object FaultHandlingDocSample extends App {
   import Worker._
 
@@ -40,9 +40,9 @@ object FaultHandlingDocSample extends App {
 }
 
 /**
- * Listens on progress from the worker and shuts down the system when enough
- * work has been done.
- */
+  * Listens on progress from the worker and shuts down the system when enough
+  * work has been done.
+  */
 class Listener extends Actor with ActorLogging {
   import Worker._
   // If we don't get any progress within 15 seconds then the service is unavailable
@@ -72,10 +72,10 @@ object Worker {
 //#messages
 
 /**
- * Worker performs some work when it receives the `Start` message.
- * It will continuously notify the sender of the `Start` message
- * of current ``Progress``. The `Worker` supervise the `CounterService`.
- */
+  * Worker performs some work when it receives the `Start` message.
+  * It will continuously notify the sender of the `Start` message
+  * of current ``Progress``. The `Worker` supervise the `CounterService`.
+  */
 class Worker extends Actor with ActorLogging {
   import Worker._
   import CounterService._
@@ -123,10 +123,10 @@ object CounterService {
 //#messages
 
 /**
- * Adds the value received in `Increment` message to a persistent
- * counter. Replies with `CurrentCount` when it is asked for `CurrentCount`.
- * `CounterService` supervise `Storage` and `Counter`.
- */
+  * Adds the value received in `Increment` message to a persistent
+  * counter. Replies with `CurrentCount` when it is asked for `CurrentCount`.
+  * `CounterService` supervise `Storage` and `Counter`.
+  */
 class CounterService extends Actor {
   import CounterService._
   import Counter._
@@ -134,8 +134,8 @@ class CounterService extends Actor {
 
   // Restart the storage child when StorageException is thrown.
   // After 3 restarts within 5 seconds it will be stopped.
-  override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3,
-    withinTimeRange = 5 seconds) {
+  override val supervisorStrategy =
+    OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 5 seconds) {
       case _: Storage.StorageException => Restart
     }
 
@@ -152,13 +152,14 @@ class CounterService extends Actor {
   }
 
   /**
-   * The child storage is restarted in case of failure, but after 3 restarts,
-   * and still failing it will be stopped. Better to back-off than continuously
-   * failing. When it has been stopped we will schedule a Reconnect after a delay.
-   * Watch the child so we receive Terminated message when it has been terminated.
-   */
+    * The child storage is restarted in case of failure, but after 3 restarts,
+    * and still failing it will be stopped. Better to back-off than continuously
+    * failing. When it has been stopped we will schedule a Reconnect after a delay.
+    * Watch the child so we receive Terminated message when it has been terminated.
+    */
   def initStorage() {
-    storage = Some(context.watch(context.actorOf(Props[Storage], name = "storage")))
+    storage = Some(
+        context.watch(context.actorOf(Props[Storage], name = "storage")))
     // Tell the counter, if any, to use the new storage
     counter foreach { _ ! UseStorage(storage) }
     // We need the initial value to be able to operate
@@ -177,7 +178,7 @@ class CounterService extends Actor {
       for ((replyTo, msg) <- backlog) c.tell(msg, sender = replyTo)
       backlog = IndexedSeq.empty
 
-    case msg: Increment       => forwardOrPlaceInBacklog(msg)
+    case msg: Increment => forwardOrPlaceInBacklog(msg)
 
     case msg: GetCurrentCount => forwardOrPlaceInBacklog(msg)
 
@@ -204,11 +205,10 @@ class CounterService extends Actor {
       case None =>
         if (backlog.size >= MaxBacklog)
           throw new ServiceUnavailable(
-            "CounterService not available, lack of initial value")
+              "CounterService not available, lack of initial value")
         backlog :+= (sender() -> msg)
     }
   }
-
 }
 
 //#messages
@@ -218,10 +218,10 @@ object Counter {
 //#messages
 
 /**
- * The in memory count variable that will send current
- * value to the `Storage`, if there is any storage
- * available at the moment.
- */
+  * The in memory count variable that will send current
+  * value to the `Storage`, if there is any storage
+  * available at the moment.
+  */
 class Counter(key: String, initialValue: Long) extends Actor {
   import Counter._
   import CounterService._
@@ -241,7 +241,6 @@ class Counter(key: String, initialValue: Long) extends Actor {
 
     case GetCurrentCount =>
       sender() ! CurrentCount(key, count)
-
   }
 
   def storeCount() {
@@ -249,7 +248,6 @@ class Counter(key: String, initialValue: Long) extends Actor {
     // We can continue without storage.
     storage foreach { _ ! Store(Entry(key, count)) }
   }
-
 }
 
 //#messages
@@ -262,10 +260,10 @@ object Storage {
 //#messages
 
 /**
- * Saves key/value pairs to persistent storage when receiving `Store` message.
- * Replies with current value when receiving `Get` message.
- * Will throw StorageException if the underlying data store is out of order.
- */
+  * Saves key/value pairs to persistent storage when receiving `Store` message.
+  * Replies with current value when receiving `Get` message.
+  * Will throw StorageException if the underlying data store is out of order.
+  */
 class Storage extends Actor {
   import Storage._
 
@@ -273,7 +271,7 @@ class Storage extends Actor {
 
   def receive = LoggingReceive {
     case Store(Entry(key, count)) => db.save(key, count)
-    case Get(key)                 => sender() ! Entry(key, db.load(key).getOrElse(0L))
+    case Get(key) => sender() ! Entry(key, db.load(key).getOrElse(0L))
   }
 }
 

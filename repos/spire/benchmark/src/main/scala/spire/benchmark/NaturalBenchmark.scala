@@ -1,7 +1,6 @@
 package spire
 package benchmark
 
-
 import scala.util.Random
 
 import spire.math._
@@ -45,16 +44,20 @@ class NaturalBenchmarks extends MyBenchmark {
   def timeSafeLongSums(reps: Int) = run(reps)(safes.qsum)
 
   def timeNaturalSumDoubles(reps: Int) = run(reps)(nats.map(n => n << 1).qsum)
-  def timeBigIntSumDoubles(reps: Int) = run(reps)(bigints.map(n => n << 1).qsum)
+  def timeBigIntSumDoubles(reps: Int) =
+    run(reps)(bigints.map(n => n << 1).qsum)
   def timeSafeLongSumDoubles(reps: Int) = run(reps)(safes.map(n => n * 2).qsum)
 
   def timeNaturalSumSquares(reps: Int) = run(reps)(nats.map(n => n * n).qsum)
   def timeBigIntSumSquares(reps: Int) = run(reps)(bigints.map(n => n * n).qsum)
   def timeSafeLongSumSquares(reps: Int) = run(reps)(safes.map(n => n * n).qsum)
 
-  def timeNaturalSumNormalized(reps: Int) = run(reps)(nats.map(n => n / UInt(10)).qsum)
-  def timeBigIntSumNormalized(reps: Int) = run(reps)(bigints.map(n => n / 10).qsum)
-  def timeSafeLongSumNormalized(reps: Int) = run(reps)(safes.map(n => n / 10).qsum)
+  def timeNaturalSumNormalized(reps: Int) =
+    run(reps)(nats.map(n => n / UInt(10)).qsum)
+  def timeBigIntSumNormalized(reps: Int) =
+    run(reps)(bigints.map(n => n / 10).qsum)
+  def timeSafeLongSumNormalized(reps: Int) =
+    run(reps)(safes.map(n => n / 10).qsum)
 
   def timeNaturalMin(reps: Int) = run(reps)(nats.qmin)
   def timeBigIntMin(reps: Int) = run(reps)(bigints.qmin)

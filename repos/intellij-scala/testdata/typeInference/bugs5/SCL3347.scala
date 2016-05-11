@@ -4,7 +4,8 @@ object IPTest {
       number == 5
     }
 
-    /*start*/List(1, 2, 3, 4, 5).toStream.takeWhile(returnBool)/*end*/
+    /*start*/
+    List(1, 2, 3, 4, 5).toStream.takeWhile(returnBool) /*end*/
   }
 }
 //Stream[Int]

@@ -4,9 +4,8 @@ package format
 import com.intellij.psi.PsiElement
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 trait StringParser {
   def parse(element: PsiElement): Option[Seq[StringPart]]
 }

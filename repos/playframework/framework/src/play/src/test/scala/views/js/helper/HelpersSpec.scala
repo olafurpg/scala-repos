@@ -28,5 +28,4 @@ object HelpersSpec extends Specification {
       json(List("foo", "bar")).toString must equalTo("[\"foo\",\"bar\"]")
     }
   }
-
 }

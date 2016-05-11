@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 08.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 08.02.2008
+  */
 /*
  * ClassParamClause ::= [nl] '(' [ClassParam {',' ClassParam}] ')'
  */
@@ -30,10 +29,10 @@ object ClassParamClause {
         builder.disableNewlines
         builder.getTokenType match {
           case ScalaTokenTypes.kIMPLICIT => {
-            classParamMarker.rollbackTo
-            builder.restoreNewlinesState
-            return false
-          }
+              classParamMarker.rollbackTo
+              builder.restoreNewlinesState
+              return false
+            }
           case _ => {}
         }
         //ok, let's parse parameters

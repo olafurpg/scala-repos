@@ -1,16 +1,16 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl.model
 
-import java.net.{ InetSocketAddress, UnknownHostException, InetAddress }
+import java.net.{InetSocketAddress, UnknownHostException, InetAddress}
 import java.util.Optional
 import akka.http.impl.util._
-import akka.http.javadsl.{ model ⇒ jm }
+import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util.JavaMapping.Implicits._
 
-sealed abstract class RemoteAddress extends jm.RemoteAddress with ValueRenderable {
+sealed abstract class RemoteAddress
+    extends jm.RemoteAddress with ValueRenderable {
   def toOption: Option[InetAddress]
   def toIP: Option[RemoteAddress.IP]
   def isUnknown: Boolean
@@ -32,7 +32,8 @@ object RemoteAddress {
     def isUnknown = true
   }
 
-  final case class IP(ip: InetAddress, port: Option[Int] = None) extends RemoteAddress {
+  final case class IP(ip: InetAddress, port: Option[Int] = None)
+      extends RemoteAddress {
     def toOption: Option[InetAddress] = Some(ip)
     def toIP = Some(this)
     def render[R <: Rendering](r: R): r.type = {
@@ -51,6 +52,8 @@ object RemoteAddress {
 
   def apply(bytes: Array[Byte]): RemoteAddress = {
     require(bytes.length == 4 || bytes.length == 16)
-    try IP(InetAddress.getByAddress(bytes)) catch { case _: UnknownHostException ⇒ Unknown }
+    try IP(InetAddress.getByAddress(bytes)) catch {
+      case _: UnknownHostException ⇒ Unknown
+    }
   }
 }

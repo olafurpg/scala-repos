@@ -11,22 +11,23 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 
 /**
- *  User: Alexander Podkhalyuzin
- *  Date: 27.09.2008
- */
-
+  *  User: Alexander Podkhalyuzin
+  *  Date: 27.09.2008
+  */
 class ImplicitFilter extends ElementFilter {
   def isAcceptable(element: Object, context: PsiElement): Boolean = {
     if (context.isInstanceOf[PsiComment]) return false
-    val (leaf, _) = processPsiLeafForFilter(getLeafByOffset(context.getTextRange.getStartOffset, context))
-    
+    val (leaf, _) = processPsiLeafForFilter(
+        getLeafByOffset(context.getTextRange.getStartOffset, context))
+
     if (leaf != null) {
       val parent = leaf.getParent
       parent match {
         case _: ScParameter =>
           val prev = parent.getPrevSibling
           if (prev != null && prev.getNode != null &&
-            prev.getNode.getElementType == ScalaTokenTypes.tLPARENTHESIS) return true
+              prev.getNode.getElementType == ScalaTokenTypes.tLPARENTHESIS)
+            return true
         case _ =>
       }
     }

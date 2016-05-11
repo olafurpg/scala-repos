@@ -6,9 +6,8 @@ package toplevel
 package typedef
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 import javax.swing.Icon
 
 import com.intellij.lang.ASTNode
@@ -44,17 +43,24 @@ import scala.annotation.tailrec
 import scala.collection.Seq
 import scala.reflect.NameTransformer
 
-abstract class ScTypeDefinitionImpl protected (stub: StubElement[ScTemplateDefinition], nodeType: IElementType, node: ASTNode)
-extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition with PsiClassFake {
+abstract class ScTypeDefinitionImpl protected (
+    stub: StubElement[ScTemplateDefinition],
+    nodeType: IElementType,
+    node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScTypeDefinition with PsiClassFake {
   override def hasTypeParameters: Boolean = typeParameters.nonEmpty
 
   override def add(element: PsiElement): PsiElement = {
     element match {
-      case member: PsiMember if member.getLanguage.isKindOf(JavaLanguage.INSTANCE) =>
+      case member: PsiMember
+          if member.getLanguage.isKindOf(JavaLanguage.INSTANCE) =>
         val newMemberText = JavaToScala.convertPsiToText(member).trim()
         val mem: Option[ScMember] = member match {
           case method: PsiMethod =>
-            Some(ScalaPsiElementFactory.createMethodFromText(newMemberText, getManager))
+            Some(
+                ScalaPsiElementFactory.createMethodFromText(
+                    newMemberText, getManager))
           case _ => None
         }
         mem match {
@@ -78,49 +84,76 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
   }
 
   override def isAnnotationType: Boolean = {
-    val annotation = ScalaPsiManager.instance(getProject).getCachedClass("scala.annotation.Annotation",getResolveScope, ScalaPsiManager.ClassCategory.TYPE)
+    val annotation = ScalaPsiManager
+      .instance(getProject)
+      .getCachedClass("scala.annotation.Annotation",
+                      getResolveScope,
+                      ScalaPsiManager.ClassCategory.TYPE)
     if (annotation == null) return false
-    ScalaPsiManager.instance(getProject).cachedDeepIsInheritor(this, annotation)
+    ScalaPsiManager
+      .instance(getProject)
+      .cachedDeepIsInheritor(this, annotation)
   }
 
-  def getType(ctx: TypingContext)  = {
+  def getType(ctx: TypingContext) = {
     val parentClass: ScTemplateDefinition = containingClass
     if (typeParameters.isEmpty) {
       if (parentClass != null) {
-        Success(ScProjectionType(ScThisType(parentClass), this, superReference = false), Some(this))
+        Success(ScProjectionType(
+                    ScThisType(parentClass), this, superReference = false),
+                Some(this))
       } else {
         Success(ScType.designator(this), Some(this))
       }
     } else {
       if (parentClass != null) {
-        Success(ScParameterizedType(ScProjectionType(ScThisType(parentClass), this, superReference = false),
-          typeParameters.map(new ScTypeParameterType(_, ScSubstitutor.empty))), Some(this))
+        Success(ScParameterizedType(
+                    ScProjectionType(
+                        ScThisType(parentClass), this, superReference = false),
+                    typeParameters.map(
+                        new ScTypeParameterType(_, ScSubstitutor.empty))),
+                Some(this))
       } else {
-        Success(ScParameterizedType(ScType.designator(this),
-          typeParameters.map(new ScTypeParameterType(_, ScSubstitutor.empty))), Some(this))
+        Success(ScParameterizedType(
+                    ScType.designator(this),
+                    typeParameters.map(
+                        new ScTypeParameterType(_, ScSubstitutor.empty))),
+                Some(this))
       }
     }
   }
 
-  def getTypeWithProjections(ctx: TypingContext, thisProjections: Boolean = false): TypeResult[ScType] = {
-    def args: Seq[ScTypeParameterType] = typeParameters.map(new ScTypeParameterType(_, ScSubstitutor.empty))
-    def innerType = if (typeParameters.isEmpty) ScType.designator(this)
-                    else ScParameterizedType(ScType.designator(this), args)
+  def getTypeWithProjections(
+      ctx: TypingContext,
+      thisProjections: Boolean = false): TypeResult[ScType] = {
+    def args: Seq[ScTypeParameterType] =
+      typeParameters.map(new ScTypeParameterType(_, ScSubstitutor.empty))
+    def innerType =
+      if (typeParameters.isEmpty) ScType.designator(this)
+      else ScParameterizedType(ScType.designator(this), args)
     val parentClazz = containingClass
     if (parentClazz != null) {
-      val tpe: ScType = if (!thisProjections) parentClazz.getTypeWithProjections(TypingContext.empty, thisProjections = false).
-        getOrElse(return Failure("Cannot resolve parent class", Some(this)))
-      else ScThisType(parentClazz)
+      val tpe: ScType =
+        if (!thisProjections)
+          parentClazz
+            .getTypeWithProjections(
+                TypingContext.empty, thisProjections = false)
+            .getOrElse(
+                return Failure("Cannot resolve parent class", Some(this)))
+        else ScThisType(parentClazz)
 
       val innerProjection = ScProjectionType(tpe, this, superReference = false)
       Success(if (typeParameters.isEmpty) innerProjection
-              else ScParameterizedType(innerProjection, args), Some(this))
+              else ScParameterizedType(innerProjection, args),
+              Some(this))
     } else Success(innerType, Some(this))
   }
 
-  override def getModifierList: ScModifierList = super[ScTypeDefinition].getModifierList
+  override def getModifierList: ScModifierList =
+    super [ScTypeDefinition].getModifierList
 
-  override def hasModifierProperty(name: String): Boolean = super[ScTypeDefinition].hasModifierProperty(name)
+  override def hasModifierProperty(name: String): Boolean =
+    super [ScTypeDefinition].hasModifierProperty(name)
 
   override def getNavigationElement = getContainingFile match {
     case s: ScalaFileImpl if s.isCompiled => getSourceMirrorClass
@@ -128,30 +161,34 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
   }
 
   private def hasSameScalaKind(other: PsiClass) = (this, other) match {
-    case (_: ScTrait, _: ScTrait)
-            | (_: ScObject, _: ScObject)
-            | (_: ScClass, _: ScClass) => true
+    case (_: ScTrait, _: ScTrait) | (_: ScObject, _: ScObject) |
+        (_: ScClass, _: ScClass) =>
+      true
     case _ => false
   }
 
   def getSourceMirrorClass: PsiClass = {
-    val classParent = PsiTreeUtil.getParentOfType(this, classOf[ScTypeDefinition], true)
+    val classParent =
+      PsiTreeUtil.getParentOfType(this, classOf[ScTypeDefinition], true)
     val name = this.name
     if (classParent == null) {
-      val classes: Array[PsiClass] = getContainingFile.getNavigationElement match {
-        case o: ScalaFile => o.typeDefinitions.toArray
-        case o: PsiClassOwner => o.getClasses
-      }
+      val classes: Array[PsiClass] =
+        getContainingFile.getNavigationElement match {
+          case o: ScalaFile => o.typeDefinitions.toArray
+          case o: PsiClassOwner => o.getClasses
+        }
       val classesIterator = classes.iterator
       while (classesIterator.hasNext) {
         val c = classesIterator.next()
         if (name == c.name && hasSameScalaKind(c)) return c
       }
     } else {
-      val parentSourceMirror = classParent.asInstanceOf[ScTypeDefinitionImpl].getSourceMirrorClass
+      val parentSourceMirror =
+        classParent.asInstanceOf[ScTypeDefinitionImpl].getSourceMirrorClass
       parentSourceMirror match {
-        case td: ScTypeDefinitionImpl => for (i <- td.typeDefinitions if name == i.name && hasSameScalaKind(i))
-          return i
+        case td: ScTypeDefinitionImpl =>
+          for (i <- td.typeDefinitions if name == i.name &&
+                   hasSameScalaKind(i)) return i
         case _ => this
       }
     }
@@ -168,15 +205,17 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
         return memberOrLocal.isLocal
       case _ =>
     }
-    containingClass == null && PsiTreeUtil.getParentOfType(this, classOf[ScTemplateDefinition]) != null
+    containingClass == null &&
+    PsiTreeUtil.getParentOfType(this, classOf[ScTemplateDefinition]) != null
   }
 
-  def nameId: PsiElement = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
+  def nameId: PsiElement =
+    findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
 
   override def getTextOffset: Int = nameId.getTextRange.getStartOffset
 
   override def getContainingClass: PsiClass = {
-    super[ScTypeDefinition].getContainingClass match {
+    super [ScTypeDefinition].getContainingClass match {
       case o: ScObject => o.fakeCompanionClassOrCompanionClass
       case containingClass => containingClass
     }
@@ -190,10 +229,14 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
   private def javaQualName(): String = {
-    var res = qualifiedName(".", encodeName = true).split('.').map { s =>
-      if (s.startsWith("`") && s.endsWith("`") && s.length > 2) s.drop(1).dropRight(1)
-      else s
-    }.mkString(".")
+    var res = qualifiedName(".", encodeName = true)
+      .split('.')
+      .map { s =>
+        if (s.startsWith("`") && s.endsWith("`") && s.length > 2)
+          s.drop(1).dropRight(1)
+        else s
+      }
+      .mkString(".")
     this match {
       case o: ScObject =>
         if (o.isPackageObject) res = res + ".package$"
@@ -214,15 +257,19 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
 
   override def getExtendsListTypes: Array[PsiClassType] = innerExtendsListTypes
 
-  override def getImplementsListTypes: Array[PsiClassType] = innerExtendsListTypes
+  override def getImplementsListTypes: Array[PsiClassType] =
+    innerExtendsListTypes
 
   def getTruncedQualifiedName: String = qualifiedName(".", trunced = true)
 
   def getQualifiedNameForDebugger: String = {
     containingClass match {
-      case td: ScTypeDefinition => td.getQualifiedNameForDebugger + "$" + transformName(encodeName = true, name)
+      case td: ScTypeDefinition =>
+        td.getQualifiedNameForDebugger + "$" + transformName(
+            encodeName = true, name)
       case _ =>
-        if (this.isPackageObject) qualifiedName("", encodeName = true) + ".package"
+        if (this.isPackageObject)
+          qualifiedName("", encodeName = true) + ".package"
         else qualifiedName("$", encodeName = true)
     }
   }
@@ -238,26 +285,36 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
     }
   }
 
-  protected def qualifiedName(classSeparator: String, trunced: Boolean = false,
+  protected def qualifiedName(classSeparator: String,
+                              trunced: Boolean = false,
                               encodeName: Boolean = false): String = {
     // Returns prefix with convenient separator sep
     @tailrec
-    def _packageName(e: PsiElement, sep: String, k: (String) => String): String = e.getContext match {
-      case o: ScObject if o.isPackageObject && o.name == "`package`" => _packageName(o, sep, k)
-      case _: ScClass | _: ScTrait if trunced => k("")
-      case t: ScTypeDefinition => _packageName(t, sep, (s) => {
-        val name = t.name
-        k(s + transformName(encodeName, name) + sep)
-      })
-      case p: ScPackaging => _packageName(p, ".", (s) => k(s + p.getPackageName + "."))
-      case f: ScalaFile => val pn = ""; k(if (pn.length > 0) pn + "." else "")
-      case _: PsiFile | null => k("")
-      case _: ScBlock => k("")
-      case parent: ScTemplateBody => _packageName(parent, sep, k)
-      case parent: ScExtendsBlock => _packageName(parent, sep, k)
-      case parent: ScTemplateParents => _packageName(parent, sep, k)
-      case parent => _packageName(parent, sep, identity)
-    }
+    def _packageName(
+        e: PsiElement, sep: String, k: (String) => String): String =
+      e.getContext match {
+        case o: ScObject if o.isPackageObject && o.name == "`package`" =>
+          _packageName(o, sep, k)
+        case _: ScClass | _: ScTrait if trunced => k("")
+        case t: ScTypeDefinition =>
+          _packageName(t,
+                       sep,
+                       (s) =>
+                         {
+                           val name = t.name
+                           k(s + transformName(encodeName, name) + sep)
+                       })
+        case p: ScPackaging =>
+          _packageName(p, ".", (s) => k(s + p.getPackageName + "."))
+        case f: ScalaFile =>
+          val pn = ""; k(if (pn.length > 0) pn + "." else "")
+        case _: PsiFile | null => k("")
+        case _: ScBlock => k("")
+        case parent: ScTemplateBody => _packageName(parent, sep, k)
+        case parent: ScExtendsBlock => _packageName(parent, sep, k)
+        case parent: ScTemplateParents => _packageName(parent, sep, k)
+        case parent => _packageName(parent, sep, identity)
+      }
 
     val packageName = _packageName(this, classSeparator, identity)
     packageName + transformName(encodeName, name)
@@ -268,7 +325,8 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
       case o: ScObject if o.isPackageObject && o.name == "`package`" =>
         val packageName = o.qualifiedName.stripSuffix(".`package`")
         val index = packageName.lastIndexOf('.')
-        if (index < 0) packageName else packageName.substring(index + 1, packageName.length)
+        if (index < 0) packageName
+        else packageName.substring(index + 1, packageName.length)
       case _ => name
     }
 
@@ -282,51 +340,57 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
         case p => '(' + p + ')'
       }
 
-      override def getIcon(open: Boolean) = ScTypeDefinitionImpl.this.getIcon(0)
+      override def getIcon(open: Boolean) =
+        ScTypeDefinitionImpl.this.getIcon(0)
     }
   }
 
-
-  override def findMethodBySignature(patternMethod: PsiMethod, checkBases: Boolean): PsiMethod = {
-    super[ScTypeDefinition].findMethodBySignature(patternMethod, checkBases)
+  override def findMethodBySignature(
+      patternMethod: PsiMethod, checkBases: Boolean): PsiMethod = {
+    super [ScTypeDefinition].findMethodBySignature(patternMethod, checkBases)
   }
 
-  override def findMethodsBySignature(patternMethod: PsiMethod, checkBases: Boolean): Array[PsiMethod] = {
-    super[ScTypeDefinition].findMethodsBySignature(patternMethod, checkBases)
+  override def findMethodsBySignature(
+      patternMethod: PsiMethod, checkBases: Boolean): Array[PsiMethod] = {
+    super [ScTypeDefinition].findMethodsBySignature(patternMethod, checkBases)
   }
 
   import _root_.java.util.{Collection => JCollection, List => JList}
 
   import com.intellij.openapi.util.{Pair => IPair}
 
-  override def findMethodsAndTheirSubstitutorsByName(name: String,
-                                                     checkBases: Boolean): JList[IPair[PsiMethod, PsiSubstitutor]] = {
-    super[ScTypeDefinition].findMethodsAndTheirSubstitutorsByName(name, checkBases)
+  override def findMethodsAndTheirSubstitutorsByName(
+      name: String,
+      checkBases: Boolean): JList[IPair[PsiMethod, PsiSubstitutor]] = {
+    super [ScTypeDefinition].findMethodsAndTheirSubstitutorsByName(
+        name, checkBases)
   }
 
-  override def getAllMethodsAndTheirSubstitutors: JList[IPair[PsiMethod, PsiSubstitutor]] = {
-    super[ScTypeDefinition].getAllMethodsAndTheirSubstitutors
+  override def getAllMethodsAndTheirSubstitutors: JList[IPair[
+          PsiMethod, PsiSubstitutor]] = {
+    super [ScTypeDefinition].getAllMethodsAndTheirSubstitutors
   }
 
   override def getVisibleSignatures: JCollection[HierarchicalMethodSignature] = {
-    super[ScTypeDefinition].getVisibleSignatures
+    super [ScTypeDefinition].getVisibleSignatures
   }
 
-  override def findMethodsByName(name: String, checkBases: Boolean): Array[PsiMethod] = {
-    super[ScTypeDefinition].findMethodsByName(name, checkBases)
+  override def findMethodsByName(
+      name: String, checkBases: Boolean): Array[PsiMethod] = {
+    super [ScTypeDefinition].findMethodsByName(name, checkBases)
   }
 
   override def findFieldByName(name: String, checkBases: Boolean): PsiField = {
-    super[ScTypeDefinition].findFieldByName(name, checkBases)
+    super [ScTypeDefinition].findFieldByName(name, checkBases)
   }
 
-  override def checkDelete() {
-  }
+  override def checkDelete() {}
 
   override def delete() {
     var toDelete: PsiElement = this
     var parent: PsiElement = getParent
-    while (parent.isInstanceOf[ScToplevelElement] && parent.asInstanceOf[ScToplevelElement].typeDefinitions.length == 1) {
+    while (parent.isInstanceOf[ScToplevelElement] &&
+    parent.asInstanceOf[ScToplevelElement].typeDefinitions.length == 1) {
       toDelete = parent
       parent = toDelete.getParent
     }
@@ -348,16 +412,21 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
   }
 
   override def isInheritor(baseClass: PsiClass, deep: Boolean): Boolean =
-    super[ScTypeDefinition].isInheritor(baseClass, deep)
-
+    super [ScTypeDefinition].isInheritor(baseClass, deep)
 
   def signaturesByName(name: String): Seq[PhysicalSignature] = {
-    (for ((s: PhysicalSignature, _) <- TypeDefinitionMembers.getSignatures(this).forName(name)._1) yield s) ++
-            syntheticMethodsNoOverride.filter(_.name == name).map(new PhysicalSignature(_, ScSubstitutor.empty))
+    (for ((s: PhysicalSignature, _) <- TypeDefinitionMembers
+      .getSignatures(this)
+      .forName(name)
+      ._1) yield s) ++ syntheticMethodsNoOverride
+      .filter(_.name == name)
+      .map(new PhysicalSignature(_, ScSubstitutor.empty))
   }
 
   override def getNameIdentifier: PsiIdentifier = {
-    Predef.assert(nameId != null, "Class hase null nameId. Class text: " + getText) //diagnostic for EA-20122
+    Predef.assert(nameId != null,
+                  "Class hase null nameId. Class text: " +
+                  getText) //diagnostic for EA-20122
     new JavaIdentifier(nameId)
   }
 
@@ -366,11 +435,13 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
     return icon //todo: remove, when performance issues will be fixed
     if (!this.isValid) return icon //to prevent Invalid access: EA: 13535
     val isLocked = (flags & Iconable.ICON_FLAG_READ_STATUS) != 0 && !isWritable
-    val rowIcon = ElementBase.createLayeredIcon(this, icon, ElementPresentationUtil.getFlags(this, isLocked))
+    val rowIcon = ElementBase.createLayeredIcon(
+        this, icon, ElementPresentationUtil.getFlags(this, isLocked))
     if ((flags & Iconable.ICON_FLAG_VISIBILITY) != 0) {
       val accessLevel = {
         if (hasModifierProperty("private")) PsiUtil.ACCESS_LEVEL_PRIVATE
-        else if (hasModifierProperty("protected")) PsiUtil.ACCESS_LEVEL_PROTECTED
+        else if (hasModifierProperty("protected"))
+          PsiUtil.ACCESS_LEVEL_PROTECTED
         else PsiUtil.ACCESS_LEVEL_PUBLIC
       }
       VisibilityIcons.setVisibilityIcon(accessLevel, rowIcon)
@@ -380,19 +451,24 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
 
   protected def getIconInner: Icon
 
-  override def getDocComment: PsiDocComment = super[ScTypeDefinition].getDocComment
-
+  override def getDocComment: PsiDocComment =
+    super [ScTypeDefinition].getDocComment
 
   override def isDeprecated: Boolean = {
     val stub = getStub
     if (stub != null) {
       return stub.asInstanceOf[ScTemplateDefinitionStub].isDeprecated
     }
-    hasAnnotation("scala.deprecated").isDefined || hasAnnotation("java.lang.Deprecated").isDefined
+    hasAnnotation("scala.deprecated").isDefined ||
+    hasAnnotation("java.lang.Deprecated").isDefined
   }
 
   override def getInnerClasses: Array[PsiClass] = {
-    def ownInnerClasses = members.filter(_.isInstanceOf[PsiClass]).map(_.asInstanceOf[PsiClass]).toArray
+    def ownInnerClasses =
+      members
+        .filter(_.isInstanceOf[PsiClass])
+        .map(_.asInstanceOf[PsiClass])
+        .toArray
 
     ScalaPsiUtil.getBaseCompanionModule(this) match {
       case Some(o: ScObject) =>
@@ -400,13 +476,14 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
         val innerClasses = ownInnerClasses
         res ++= innerClasses
         o.members.foreach {
-          case o: ScObject => o.fakeCompanionClass match {
-            case Some(clazz) =>
-              res += o
-              res += clazz
-            case None =>
-              res += o
-          }
+          case o: ScObject =>
+            o.fakeCompanionClass match {
+              case Some(clazz) =>
+                res += o
+                res += clazz
+              case None =>
+                res += o
+            }
           case t: ScTrait =>
             res += t
             res += t.fakeCompanionClass
@@ -422,12 +499,13 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTypeDefinition wi
     PsiClassImplUtil.getAllInnerClasses(this)
   }
 
-  override def findInnerClassByName(name: String, checkBases: Boolean): PsiClass = {
-    super[ScTypeDefinition].findInnerClassByName(name, checkBases)
+  override def findInnerClassByName(
+      name: String, checkBases: Boolean): PsiClass = {
+    super [ScTypeDefinition].findInnerClassByName(name, checkBases)
   }
 
   override def getAllFields: Array[PsiField] = {
-    super[ScTypeDefinition].getAllFields
+    super [ScTypeDefinition].getAllFields
   }
 
   override def getOriginalElement: PsiElement = {

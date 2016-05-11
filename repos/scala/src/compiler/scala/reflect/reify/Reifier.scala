@@ -6,16 +6,13 @@ import scala.reflect.macros.UnexpectedReificationException
 import scala.reflect.reify.utils.Utils
 
 /** Given a tree or a type, generate a tree that when executed at runtime produces the original tree or type.
- *  See more info in the comments to `reify` in scala.reflect.api.Universe.
- *
- *  @author   Martin Odersky
- *  @version  2.10
- *  @since    2.10
- */
-abstract class Reifier extends States
-                          with Phases
-                          with Errors
-                          with Utils {
+  *  See more info in the comments to `reify` in scala.reflect.api.Universe.
+  *
+  *  @author   Martin Odersky
+  *  @version  2.10
+  *  @since    2.10
+  */
+abstract class Reifier extends States with Phases with Errors with Utils {
 
   val global: Global
   import global._
@@ -34,24 +31,24 @@ abstract class Reifier extends States
   override def hasReifier = true
 
   /** For `reifee` and other reification parameters, generate a tree of the form
-   *  {{{
-   *    {
-   *      val \$u: universe.type = <[ universe ]>
-   *      val \$m: \$u.Mirror = <[ mirror ]>
-   *      \$u.Expr[T](rtree)       // if data is a Tree
-   *      \$u.TypeTag[T](rtree)    // if data is a Type
-   *    }
-   *  }}}
-   *
-   *  where
-   *
-   *    - `universe` is the tree that represents the universe the result will be bound to.
-   *    - `mirror` is the tree that represents the mirror the result will be initially bound to.
-   *    - `rtree` is code that generates `reifee` at runtime.
-   *    - `T` is the type that corresponds to `data`.
-   *
-   *  This is not a method, but a value to indicate the fact that Reifier instances are a one-off.
-   */
+    *  {{{
+    *    {
+    *      val \$u: universe.type = <[ universe ]>
+    *      val \$m: \$u.Mirror = <[ mirror ]>
+    *      \$u.Expr[T](rtree)       // if data is a Tree
+    *      \$u.TypeTag[T](rtree)    // if data is a Type
+    *    }
+    *  }}}
+    *
+    *  where
+    *
+    *    - `universe` is the tree that represents the universe the result will be bound to.
+    *    - `mirror` is the tree that represents the mirror the result will be initially bound to.
+    *    - `rtree` is code that generates `reifee` at runtime.
+    *    - `T` is the type that corresponds to `data`.
+    *
+    *  This is not a method, but a value to indicate the fact that Reifier instances are a one-off.
+    */
   lazy val reification: Tree = {
     try {
       if (universe exists (_.isErroneous)) CannotReifyErroneousPrefix(universe)
@@ -59,7 +56,10 @@ abstract class Reifier extends States
 
       val result = reifee match {
         case tree: Tree =>
-          reifyTrace("reifying = ")(if (settings.Xshowtrees || settings.XshowtreesCompact || settings.XshowtreesStringified) "\n" + nodePrinters.nodeToString(tree).trim else tree.toString)
+          reifyTrace("reifying = ")(
+              if (settings.Xshowtrees || settings.XshowtreesCompact ||
+                  settings.XshowtreesStringified)
+                "\n" + nodePrinters.nodeToString(tree).trim else tree.toString)
           reifyTrace("reifee is located at: ")(tree.pos)
           reifyTrace("universe = ")(universe)
           reifyTrace("mirror = ")(mirror)
@@ -69,20 +69,32 @@ abstract class Reifier extends States
           val rtree = pipeline(tree)
 
           val tpe = typer.packedType(tree, NoSymbol)
-          val ReifiedType(_, _, tpeSymtab, _, rtpe, tpeReificationIsConcrete) = `package`.reifyType(global)(typer, universe, mirror, tpe, concrete = false)
+          val ReifiedType(_, _, tpeSymtab, _, rtpe, tpeReificationIsConcrete) =
+            `package`.reifyType(global)(
+                typer, universe, mirror, tpe, concrete = false)
           state.reificationIsConcrete &= tpeReificationIsConcrete
           state.symtab ++= tpeSymtab
-          ReifiedTree(universe, mirror, symtab, rtree, tpe, rtpe, reificationIsConcrete)
+          ReifiedTree(universe,
+                      mirror,
+                      symtab,
+                      rtree,
+                      tpe,
+                      rtpe,
+                      reificationIsConcrete)
 
         case tpe: Type =>
           reifyTrace("reifying = ")(tpe.toString)
           reifyTrace("universe = ")(universe)
           reifyTrace("mirror = ")(mirror)
           val rtree = reify(tpe)
-          ReifiedType(universe, mirror, symtab, tpe, rtree, reificationIsConcrete)
+          ReifiedType(
+              universe, mirror, symtab, tpe, rtree, reificationIsConcrete)
 
         case _ =>
-          throw new Error("reifee %s of type %s is not supported".format(reifee, if (reifee == null) "null" else reifee.getClass.toString))
+          throw new Error(
+              "reifee %s of type %s is not supported".format(
+                  reifee,
+                  if (reifee == null) "null" else reifee.getClass.toString))
       }
 
       // todo. why do we reset attrs?
@@ -110,12 +122,23 @@ abstract class Reifier extends States
       // needs to be solved some day
       // upd. a new hope: https://groups.google.com/forum/#!topic/scala-internals/TtCTPlj_qcQ
       var importantSymbols = Set[Symbol](
-        NothingClass, AnyClass, SingletonClass, PredefModule, ScalaRunTimeModule, TypeCreatorClass, TreeCreatorClass, MirrorClass,
-        ApiUniverseClass, JavaUniverseClass, ReflectRuntimePackage, runDefinitions.ReflectRuntimeCurrentMirror)
+          NothingClass,
+          AnyClass,
+          SingletonClass,
+          PredefModule,
+          ScalaRunTimeModule,
+          TypeCreatorClass,
+          TreeCreatorClass,
+          MirrorClass,
+          ApiUniverseClass,
+          JavaUniverseClass,
+          ReflectRuntimePackage,
+          runDefinitions.ReflectRuntimeCurrentMirror)
       importantSymbols ++= importantSymbols map (_.companionSymbol)
       importantSymbols ++= importantSymbols map (_.moduleClass)
       importantSymbols ++= importantSymbols map (_.linkedClassOfClass)
-      def isImportantSymbol(sym: Symbol): Boolean = sym != null && sym != NoSymbol && importantSymbols(sym)
+      def isImportantSymbol(sym: Symbol): Boolean =
+        sym != null && sym != NoSymbol && importantSymbols(sym)
       val untyped = brutallyResetAttrs(result, leaveAlone = {
         case ValDef(_, u, _, _) if u == nme.UNIVERSE_SHORT => true
         case ValDef(_, m, _, _) if m == nme.MIRROR_SHORT => true
@@ -139,7 +162,8 @@ abstract class Reifier extends States
       case ex: UnexpectedReificationException =>
         throw ex
       case ex: Throwable =>
-        throw new UnexpectedReificationException(defaultErrorPosition, "reification crashed", ex)
+        throw new UnexpectedReificationException(
+            defaultErrorPosition, "reification crashed", ex)
     }
   }
 }

@@ -2,9 +2,11 @@ package com.typesafe.slick.docs
 
 import slick.jdbc.H2Profile.api._
 
-object JoinsUnions extends App{
+object JoinsUnions extends App {
 
-  class Suppliers(tag: Tag) extends Table[(Int, String, String, String, String, String)](tag, "SUPPLIERS") {
+  class Suppliers(tag: Tag)
+      extends Table[(Int, String, String, String, String, String)](
+          tag, "SUPPLIERS") {
     def id = column[Int]("SUP_ID", O.PrimaryKey)
     def name = column[String]("SUP_NAME")
     def street = column[String]("STREET")
@@ -15,7 +17,8 @@ object JoinsUnions extends App{
   }
   val suppliers = TableQuery[Suppliers]
 
-  class Coffees(tag: Tag) extends Table[(String, Int, Double, Int, Int)](tag, "COFFEES") {
+  class Coffees(tag: Tag)
+      extends Table[(String, Int, Double, Int, Int)](tag, "COFFEES") {
     def name = column[String]("COF_NAME", O.PrimaryKey)
     def supID = column[Int]("SUP_ID")
     def price = column[Double]("PRICE")
@@ -101,7 +104,8 @@ object JoinsUnions extends App{
   } yield (c.name, s.name)
 
   val zipWithJoin = for {
-    res <- coffees.zipWith(suppliers, (c: Coffees, s: Suppliers) => (c.name, s.name))
+    res <- coffees.zipWith(
+        suppliers, (c: Coffees, s: Suppliers) => (c.name, s.name))
   } yield res
   //#zip
   //println(zipJoinQuery.result.statements.head)

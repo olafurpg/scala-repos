@@ -7,11 +7,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 30.03.2010
- */
-
-case class ExtractMethodParameter(oldName: String, newName: String, fromElement: ScTypedDefinition, tp: ScType,
+  * User: Alexander Podkhalyuzin
+  * Date: 30.03.2010
+  */
+case class ExtractMethodParameter(oldName: String,
+                                  newName: String,
+                                  fromElement: ScTypedDefinition,
+                                  tp: ScType,
                                   passAsParameter: Boolean) {
 
   val isEmptyParamFunction = fromElement match {
@@ -31,13 +33,11 @@ object ExtractMethodParameter {
   def from(variableData: ScalaVariableData): ExtractMethodParameter = {
     val element = variableData.element
     ExtractMethodParameter(
-      oldName = element.name,
-      newName = variableData.name,
-      fromElement = element,
-      tp = variableData.scType,
-      passAsParameter = variableData.passAsParameter
+        oldName = element.name,
+        newName = variableData.name,
+        fromElement = element,
+        tp = variableData.scType,
+        passAsParameter = variableData.passAsParameter
     )
   }
-
 }
-

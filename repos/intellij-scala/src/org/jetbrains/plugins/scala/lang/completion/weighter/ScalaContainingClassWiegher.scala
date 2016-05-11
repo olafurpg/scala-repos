@@ -9,9 +9,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
 /**
   * @author Alexander Podkhalyuzin
   */
-
 class ScalaContainingClassWiegher extends CompletionWeigher {
-  def weigh(element: LookupElement, location: CompletionLocation): Comparable[_] = {
+  def weigh(
+      element: LookupElement, location: CompletionLocation): Comparable[_] = {
     import KindWeights._
     ScalaLookupItem.original(element) match {
       case si: ScalaLookupItem if si.isLocalVariable => local
@@ -22,7 +22,9 @@ class ScalaContainingClassWiegher extends CompletionWeigher {
       case si: ScalaLookupItem =>
         si.element match {
           case func: ScFunction if func.getContainingClass == null => localFunc
-          case withImplicit: ScModifierListOwner if withImplicit.hasModifierPropertyScala("implicit") => underlined
+          case withImplicit: ScModifierListOwner
+              if withImplicit.hasModifierPropertyScala("implicit") =>
+            underlined
           case _ => normal
         }
       case _ => normal
@@ -32,5 +34,4 @@ class ScalaContainingClassWiegher extends CompletionWeigher {
   object KindWeights extends Enumeration {
     val deprecated, underlined, normal, nparam, bold, localFunc, local = Value
   }
-
 }

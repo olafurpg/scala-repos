@@ -3,7 +3,7 @@ package mesosphere.marathon.state
 import com.codahale.metrics.MetricRegistry
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.metrics.Metrics
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import org.mockito.Mockito._
 import org.scalatest.Matchers
@@ -26,7 +26,8 @@ class GroupRepositoryTest extends MarathonSpec with Matchers {
     val repo = new GroupRepository(store, None, metrics)
     val res = repo.store("root", group)
 
-    assert(group == Await.result(res, 5 seconds), "Should return the correct Group")
+    assert(group == Await.result(res, 5 seconds),
+           "Should return the correct Group")
     verify(store).store(versionedKey, group)
     verify(store).store(s"root", group)
   }

@@ -37,10 +37,12 @@ import scalafx.geometry.Side
 import scalafx.scene.layout.Region
 
 object Chart {
-  implicit def sfxChart2jfx(v: Chart): jfxsc.Chart = if (v != null) v.delegate else null
+  implicit def sfxChart2jfx(v: Chart): jfxsc.Chart =
+    if (v != null) v.delegate else null
 }
 
-abstract class Chart(override val delegate: jfxsc.Chart) extends Region(delegate) with SFXDelegate[jfxsc.Chart] {
+abstract class Chart(override val delegate: jfxsc.Chart)
+    extends Region(delegate) with SFXDelegate[jfxsc.Chart] {
   def animated: BooleanProperty = delegate.animatedProperty
   def animated_=(v: Boolean) {
     animated() = v
@@ -65,5 +67,4 @@ abstract class Chart(override val delegate: jfxsc.Chart) extends Region(delegate
   def titleSide_=(v: Side) {
     titleSide() = v
   }
-
 }

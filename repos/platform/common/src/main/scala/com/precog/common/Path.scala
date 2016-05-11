@@ -43,19 +43,24 @@ class Path private (val elements: String*) {
     parentList ++ parentList.flatMap(_.ancestors)
   }
 
-  def / (that: Path) = new Path(elements ++ that.elements: _*)
-  def - (that: Path): Option[Path] = elements.startsWith(that.elements).option(new Path(elements.drop(that.elements.length): _*))
+  def /(that: Path) = new Path(elements ++ that.elements: _*)
+  def -(that: Path): Option[Path] =
+    elements
+      .startsWith(that.elements)
+      .option(new Path(elements.drop(that.elements.length): _*))
 
   def isEqualOrParentOf(that: Path) = that.elements.startsWith(this.elements)
 
-  def isChildOf(that: Path) = elements.startsWith(that.elements) && length > that.length
+  def isChildOf(that: Path) =
+    elements.startsWith(that.elements) && length > that.length
 
   def isDirectChildOf(that: Path) =
     elements.startsWith(that.elements) && (length - 1) == that.length
 
   def rollups(depth: Int): List[Path] = this :: ancestors.take(depth)
 
-  def urlEncode: Path = new Path(elements.map(java.net.URLEncoder.encode(_, "UTF-8")): _*)
+  def urlEncode: Path =
+    new Path(elements.map(java.net.URLEncoder.encode(_, "UTF-8")): _*)
 
   def prefix: Option[Path] = elements.nonEmpty.option(Path(components.init))
 
@@ -69,16 +74,18 @@ class Path private (val elements: String*) {
   override def toString = path
 }
 
-
 object Path {
-  implicit val PathDecomposer: Decomposer[Path] = StringDecomposer contramap { (_:Path).toString }
+  implicit val PathDecomposer: Decomposer[Path] =
+    StringDecomposer contramap { (_: Path).toString }
   implicit val PathExtractor: Extractor[Path] = StringExtractor map { Path(_) }
 
   val Root = new Path()
 
-  private def cleanPath(string: String): String = string.replaceAll("^/|/$", "").replaceAll("/+", "/")
+  private def cleanPath(string: String): String =
+    string.replaceAll("^/|/$", "").replaceAll("/+", "/")
 
-  def apply(path: String): Path = new Path(cleanPath(path).split("/").filterNot(_.trim.isEmpty): _*)
+  def apply(path: String): Path =
+    new Path(cleanPath(path).split("/").filterNot(_.trim.isEmpty): _*)
 
   def apply(elements: List[String]): Path = apply(elements.mkString("/"))
 

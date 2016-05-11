@@ -9,5 +9,4 @@ case class Bippy(x: Int)
 val x = Bippy(1)
 $$intp.showDirectory
   """
-
 }

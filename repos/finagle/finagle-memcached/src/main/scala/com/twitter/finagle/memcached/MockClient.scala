@@ -7,15 +7,19 @@ import scala.collection.mutable
 import _root_.java.lang.{Boolean => JBoolean, Long => JLong}
 
 /**
- * Map-based mock client for testing
- *
- * Note: expiry and flags are ignored on update operations.
- */
+  * Map-based mock client for testing
+  *
+  * Note: expiry and flags are ignored on update operations.
+  */
 class MockClient(val map: mutable.Map[String, Buf]) extends Client {
   def this() = this(mutable.Map[String, Buf]())
 
   def this(contents: Map[String, Array[Byte]]) =
-    this(mutable.Map[String, Buf]() ++ (contents mapValues { v => Buf.ByteArray.Owned(v) }))
+    this(
+        mutable.Map[String, Buf]() ++
+        (contents mapValues { v =>
+          Buf.ByteArray.Owned(v)
+        }))
 
   def this(contents: Map[String, String])(implicit m: Manifest[String]) =
     this(contents mapValues { _.getBytes })
@@ -28,7 +32,10 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
       keys foreach { key =>
         map.get(key) match {
           case Some(v: Buf) =>
-            hits += (key -> Value(Buf.Utf8(key), v, Some(Interpreter.generateCasUnique(v))))
+            hits +=
+            (key -> Value(Buf.Utf8(key),
+                          v,
+                          Some(Interpreter.generateCasUnique(v))))
           case _ =>
             misses += key
         }
@@ -46,131 +53,137 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
     Future.value(GetsResult(_get(keys)))
 
   /**
-   * Note: expiry and flags are ignored.
-   */
+    * Note: expiry and flags are ignored.
+    */
   def set(key: String, flags: Int, expiry: Time, value: Buf) = {
     map.synchronized { map(key) = value }
     Future.Unit
   }
 
   /**
-   * Note: expiry and flags are ignored.
-   */
-  def add(key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
+    * Note: expiry and flags are ignored.
+    */
+  def add(
+      key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
     Future.value(
-      map.synchronized {
-        if (!map.contains(key)) {
-          map(key) = value
-          true
-        } else {
-          false
-        }
-      }
-    )
-
-  /**
-   * Note: expiry and flags are ignored.
-   */
-  def append(key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
-    Future.value(
-      map.synchronized {
-        map.get(key) match {
-          case Some(previousValue) =>
-            map(key) = previousValue.concat(value)
+        map.synchronized {
+          if (!map.contains(key)) {
+            map(key) = value
             true
-          case None =>
+          } else {
             false
+          }
         }
-      }
     )
 
   /**
-   * Note: expiry and flags are ignored.
-   */
-  def prepend(key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
+    * Note: expiry and flags are ignored.
+    */
+  def append(
+      key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
     Future.value(
-      map.synchronized {
-        map.get(key) match {
-          case Some(previousValue) =>
-            map(key) = value.concat(previousValue)
+        map.synchronized {
+          map.get(key) match {
+            case Some(previousValue) =>
+              map(key) = previousValue.concat(value)
+              true
+            case None =>
+              false
+          }
+        }
+    )
+
+  /**
+    * Note: expiry and flags are ignored.
+    */
+  def prepend(
+      key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
+    Future.value(
+        map.synchronized {
+          map.get(key) match {
+            case Some(previousValue) =>
+              map(key) = value.concat(previousValue)
+              true
+            case None =>
+              false
+          }
+        }
+    )
+
+  /**
+    * Note: expiry and flags are ignored.
+    */
+  def replace(
+      key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
+    Future.value(
+        map.synchronized {
+          if (map.contains(key)) {
+            map(key) = value
             true
-          case None =>
+          } else {
             false
+          }
         }
-      }
     )
 
   /**
-   * Note: expiry and flags are ignored.
-   */
-  def replace(key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
-    Future.value(
-      map.synchronized {
-        if (map.contains(key)) {
-          map(key) = value
-          true
-        } else {
-          false
-        }
-      }
-    )
-
-  /**
-   * Checks if value is same as previous value, if not, do a swap and return true.
-   *
-   * Note: expiry and flags are ignored.
-   */
+    * Checks if value is same as previous value, if not, do a swap and return true.
+    *
+    * Note: expiry and flags are ignored.
+    */
   def checkAndSet(
-    key: String,
-    flags: Int,
-    expiry: Time,
-    value: Buf,
-    casUnique: Buf
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf,
+      casUnique: Buf
   ): Future[CasResult] =
     Future.value(
-      map.synchronized {
-        map.get(key) match {
-          case Some(previousValue) if Interpreter.generateCasUnique(previousValue) == casUnique =>
-            map(key) = value
-            CasResult.Stored
+        map.synchronized {
+          map.get(key) match {
+            case Some(previousValue)
+                if Interpreter.generateCasUnique(previousValue) == casUnique =>
+              map(key) = value
+              CasResult.Stored
 
-          case Some(_) => CasResult.Exists
-          case None    => CasResult.NotFound
+            case Some(_) => CasResult.Exists
+            case None => CasResult.NotFound
+          }
         }
-      }
     )
 
   def delete(key: String): Future[JBoolean] =
     Future.value(
-      map.synchronized {
-        if (map.contains(key)) {
-          map.remove(key)
-          true
-        } else {
-          false
+        map.synchronized {
+          if (map.contains(key)) {
+            map.remove(key)
+            true
+          } else {
+            false
+          }
         }
-      }
     )
 
   def incr(key: String, delta: Long): Future[Option[JLong]] =
     Future.value(
-      map.synchronized {
-        map.get(key) match {
-          case Some(value: Buf) =>
-            try {
-              val Buf.Utf8(valStr) = value
-              val newValue = math.max(valStr.toLong + delta, 0L)
-              map(key) = Buf.Utf8(newValue.toString)
-              Some(newValue)
-            } catch {
-              case _: NumberFormatException =>
-                throw new ClientError("cannot increment or decrement non-numeric value")
-            }
+        map.synchronized {
+          map.get(key) match {
+            case Some(value: Buf) =>
+              try {
+                val Buf.Utf8(valStr) = value
+                val newValue = math.max(valStr.toLong + delta, 0L)
+                map(key) = Buf.Utf8(newValue.toString)
+                Some(newValue)
+              } catch {
+                case _: NumberFormatException =>
+                  throw new ClientError(
+                      "cannot increment or decrement non-numeric value")
+              }
 
-          case None =>
-            None
+            case None =>
+              None
+          }
         }
-      }
     )
 
   def decr(key: String, delta: Long): Future[Option[JLong]] =

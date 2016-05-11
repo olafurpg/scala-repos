@@ -3,7 +3,7 @@ package a {
   abstract class DeliteCollection[A]
   abstract class Exp[T] { def Type: T }
 
-  trait DeliteOpMap[A,B,C[X] <: DeliteCollection[X]] extends DeliteOp[C[B]] {
+  trait DeliteOpMap[A, B, C[X] <: DeliteCollection[X]] extends DeliteOp[C[B]] {
     val in: Exp[C[A]]
     val func: Exp[B]
     val alloc: Exp[C[B]]
@@ -11,7 +11,7 @@ package a {
 
   object Test {
     def f(x: DeliteOp[_]) = x match {
-      case map: DeliteOpMap[_,_,_] => map.alloc.Type
+      case map: DeliteOpMap[_, _, _] => map.alloc.Type
     }
   }
 }
@@ -19,7 +19,7 @@ package a {
 package b {
   object Test {
     def f(x: DeliteOp[_]) = x match {
-      case map: DeliteOpMap[_,_,_] => map.alloc.Type
+      case map: DeliteOpMap[_, _, _] => map.alloc.Type
     }
   }
 
@@ -27,7 +27,7 @@ package b {
   abstract class DeliteCollection[A]
   abstract class Exp[T] { def Type: T }
 
-  trait DeliteOpMap[A,B,C[X] <: DeliteCollection[X]] extends DeliteOp[C[B]] {
+  trait DeliteOpMap[A, B, C[X] <: DeliteCollection[X]] extends DeliteOp[C[B]] {
     val in: Exp[C[A]]
     val func: Exp[B]
     val alloc: Exp[C[B]]

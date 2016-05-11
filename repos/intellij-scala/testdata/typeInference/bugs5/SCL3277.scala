@@ -1,8 +1,8 @@
 class AA {
-  def + (x: AA) = 0
+  def +(x: AA) = 0
 }
 
 class BB {
-  override def toString = /*start*/new AA + "abc"/*end*/
+  override def toString = /*start*/ new AA + "abc" /*end*/
 }
 //String

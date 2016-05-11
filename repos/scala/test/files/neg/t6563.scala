@@ -1,8 +1,8 @@
-class A{
-  def b(c: => Unit){}
-  b{
+class A {
+  def b(c: => Unit) {}
+  b {
     e("f")
-    new G()(){}
- }
+    new G()() {}
+  }
 }
-class G(h:String="i")()
+class G(h: String = "i")()

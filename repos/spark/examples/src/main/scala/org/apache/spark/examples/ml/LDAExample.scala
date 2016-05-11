@@ -27,12 +27,12 @@ import org.apache.spark.sql.types.{StructField, StructType}
 // $example off$
 
 /**
- * An example demonstrating a LDA of ML pipeline.
- * Run with
- * {{{
- * bin/run-example ml.LDAExample
- * }}}
- */
+  * An example demonstrating a LDA of ML pipeline.
+  * Run with
+  * {{{
+  * bin/run-example ml.LDAExample
+  * }}}
+  */
 object LDAExample {
 
   final val FEATURES_COL = "features"
@@ -47,16 +47,18 @@ object LDAExample {
 
     // $example on$
     // Loads data
-    val rowRDD = sc.textFile(input).filter(_.nonEmpty)
-      .map(_.split(" ").map(_.toDouble)).map(Vectors.dense).map(Row(_))
-    val schema = StructType(Array(StructField(FEATURES_COL, new VectorUDT, false)))
+    val rowRDD = sc
+      .textFile(input)
+      .filter(_.nonEmpty)
+      .map(_.split(" ").map(_.toDouble))
+      .map(Vectors.dense)
+      .map(Row(_))
+    val schema = StructType(
+        Array(StructField(FEATURES_COL, new VectorUDT, false)))
     val dataset = sqlContext.createDataFrame(rowRDD, schema)
 
     // Trains a LDA model
-    val lda = new LDA()
-      .setK(10)
-      .setMaxIter(10)
-      .setFeaturesCol(FEATURES_COL)
+    val lda = new LDA().setK(10).setMaxIter(10).setFeaturesCol(FEATURES_COL)
     val model = lda.fit(dataset)
     val transformed = model.transform(dataset)
 

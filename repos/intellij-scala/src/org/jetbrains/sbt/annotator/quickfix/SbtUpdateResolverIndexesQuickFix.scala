@@ -8,9 +8,9 @@ import com.intellij.psi.PsiFile
 import org.jetbrains.sbt.resolvers.{SbtResolverIndexesManager, SbtResolverUtils}
 
 /**
- * @author Nikolay Obedin
- * @since 8/5/14.
- */
+  * @author Nikolay Obedin
+  * @since 8/5/14.
+  */
 class SbtUpdateResolverIndexesQuickFix extends AbstractIntentionAction {
 
   def getText = SbtBundle("sbt.fix.updateIndexes")

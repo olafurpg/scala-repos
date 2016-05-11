@@ -26,7 +26,8 @@ package ProductTypeClassAux {
 
   case class Atom[T](id: String) extends Image[T]
 
-  case class Product[H, T <: HList](h: Image[H], name: String, t: Image[T]) extends Image[H :: T]
+  case class Product[H, T <: HList](h: Image[H], name: String, t: Image[T])
+      extends Image[H :: T]
   case object EmptyProduct extends Image[HNil]
 
   case class Project[F, G](instance: Image[G]) extends Image[F]
@@ -40,11 +41,13 @@ package ProductTypeClassAux {
     }
 
     object typeClass extends LabelledProductTypeClass[Image] {
-      def product[H, T <: HList](name: String, h: Image[H], t: Image[T]) = Product(h, name, t)
+      def product[H, T <: HList](name: String, h: Image[H], t: Image[T]) =
+        Product(h, name, t)
 
       def emptyProduct = EmptyProduct
 
-      def project[F, G](instance: => Image[G], to: F => G, from: G => F) = Project[F, G](instance)
+      def project[F, G](instance: => Image[G], to: F => G, from: G => F) =
+        Project[F, G](instance)
     }
   }
 }
@@ -54,10 +57,12 @@ package TypeClassAux {
 
   case class Atom[T](id: String) extends Image[T]
 
-  case class Sum[L, R <: Coproduct](l: Image[L], name: String, r: Image[R]) extends Image[L :+: R]
+  case class Sum[L, R <: Coproduct](l: Image[L], name: String, r: Image[R])
+      extends Image[L :+: R]
   case object EmptyCoproduct extends Image[CNil]
 
-  case class Product[H, T <: HList](h: Image[H], name: String, t: Image[T]) extends Image[H :: T]
+  case class Product[H, T <: HList](h: Image[H], name: String, t: Image[T])
+      extends Image[H :: T]
   case object EmptyProduct extends Image[HNil]
 
   case class Project[F, G](instance: Image[G]) extends Image[F]
@@ -71,15 +76,18 @@ package TypeClassAux {
     }
 
     object typeClass extends LabelledTypeClass[Image] {
-      def product[H, T <: HList](name: String, h: Image[H], t: Image[T]) = Product(h, name, t)
+      def product[H, T <: HList](name: String, h: Image[H], t: Image[T]) =
+        Product(h, name, t)
 
       def emptyProduct = EmptyProduct
 
-      def coproduct[L, R <: Coproduct](name: String, l: => Image[L], r: => Image[R]) = Sum(l, name, r)
+      def coproduct[L, R <: Coproduct](
+          name: String, l: => Image[L], r: => Image[R]) = Sum(l, name, r)
 
       def emptyCoproduct = EmptyCoproduct
 
-      def project[F, G](instance: => Image[G], to: F => G, from: G => F) = Project[F, G](instance)
+      def project[F, G](instance: => Image[G], to: F => G, from: G => F) =
+        Project[F, G](instance)
     }
   }
 }
@@ -89,12 +97,14 @@ class ProductTypeClassTests {
   import Image.Syntax
 
   case class Foo(i: Int, s: String)
-  val fooResult = Project(Product(Atom("int"), "i", Product(Atom("string"), "s", EmptyProduct)))
+  val fooResult = Project(
+      Product(Atom("int"), "i", Product(Atom("string"), "s", EmptyProduct)))
 
   case class Bar()
   val barResult = Project(EmptyProduct)
 
-  val tupleResult = Project(Product(Atom("int"), "_1", Product(Atom("string"), "_2", EmptyProduct)))
+  val tupleResult = Project(
+      Product(Atom("int"), "_1", Product(Atom("string"), "_2", EmptyProduct)))
   val unitResult = Project(EmptyProduct)
 
   sealed trait Cases[A, B]
@@ -154,30 +164,33 @@ class TypeClassTests {
   import Image.Syntax
 
   case class Foo(i: Int, s: String)
-  val fooResult = Project(Product(Atom("int"), "i", Product(Atom("string"), "s", EmptyProduct)))
+  val fooResult = Project(
+      Product(Atom("int"), "i", Product(Atom("string"), "s", EmptyProduct)))
 
   case class Bar()
   val barResult = Project(EmptyProduct)
 
-  val tupleResult = Project(Product(Atom("int"), "_1", Product(Atom("string"), "_2", EmptyProduct)))
+  val tupleResult = Project(
+      Product(Atom("int"), "_1", Product(Atom("string"), "_2", EmptyProduct)))
   val unitResult = Project(EmptyProduct)
 
   sealed trait Cases[A, B]
   case class CaseA[A, B](a: A) extends Cases[A, B]
   case class CaseB[A, B](b1: B, b2: B) extends Cases[A, B]
 
-  val casesResult =
-    Project(
+  val casesResult = Project(
       Sum(
-        Project(Product(Atom("int"), "a", EmptyProduct)),
-        "CaseA",
-        Sum(
-          Project(Product(Atom("string"), "b1", Product(Atom("string"), "b2", EmptyProduct))),
-          "CaseB",
-          EmptyCoproduct
-        )
+          Project(Product(Atom("int"), "a", EmptyProduct)),
+          "CaseA",
+          Sum(
+              Project(Product(Atom("string"),
+                              "b1",
+                              Product(Atom("string"), "b2", EmptyProduct))),
+              "CaseB",
+              EmptyCoproduct
+          )
       )
-    )
+  )
 
   @Test
   def testManualSingle {

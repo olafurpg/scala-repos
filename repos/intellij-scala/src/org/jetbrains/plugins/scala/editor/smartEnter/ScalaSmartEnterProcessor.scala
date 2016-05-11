@@ -22,26 +22,35 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 
 /**
- * @author Dmitry.Naydanov
- * @author Ksenia.Sautina
- * @since 1/28/13
- */
+  * @author Dmitry.Naydanov
+  * @author Ksenia.Sautina
+  * @since 1/28/13
+  */
 object ScalaSmartEnterProcessor {
   private val LOG = Logger.getInstance(getClass)
 
-  val myFixers = Seq(new ScalaMethodCallFixer, new ScalaIfConditionFixer, new ScalaForStatementFixer,
-    new ScalaWhileConditionFixer, new ScalaMissingWhileBodyFixer, new ScalaMissingIfBranchesFixer, new ScalaMissingForBodyFixer)
+  val myFixers = Seq(new ScalaMethodCallFixer,
+                     new ScalaIfConditionFixer,
+                     new ScalaForStatementFixer,
+                     new ScalaWhileConditionFixer,
+                     new ScalaMissingWhileBodyFixer,
+                     new ScalaMissingIfBranchesFixer,
+                     new ScalaMissingForBodyFixer)
   val myEnterProcessors = Seq.empty[EnterProcessor] //Can plug in later
 }
 
 class ScalaSmartEnterProcessor extends SmartEnterProcessor {
-  private final val SMART_ENTER_TIMESTAMP: Key[Long]  = Key.create("smartEnterOriginalTimestamp")
+  private final val SMART_ENTER_TIMESTAMP: Key[Long] =
+    Key.create("smartEnterOriginalTimestamp")
 
   def process(project: Project, editor: Editor, psiFile: PsiFile) = {
-    FeatureUsageTracker.getInstance.triggerFeatureUsed("codeassists.complete.statement")
+    FeatureUsageTracker.getInstance.triggerFeatureUsed(
+        "codeassists.complete.statement")
 
     try {
-      editor.putUserData(SMART_ENTER_TIMESTAMP, editor.getDocument.getModificationStamp.asInstanceOf[Long])
+      editor.putUserData(
+          SMART_ENTER_TIMESTAMP,
+          editor.getDocument.getModificationStamp.asInstanceOf[Long])
       processImpl(project, editor, psiFile)
     } finally {
       editor.putUserData(SMART_ENTER_TIMESTAMP, null)
@@ -61,7 +70,8 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
         for (fixer <- ScalaSmartEnterProcessor.myFixers) {
           val go = fixer.apply(editor, this, psiElement)
 
-          if (LookupManager.getInstance(project).getActiveLookup != null) return //Lets dont spoil autocomplete
+          if (LookupManager.getInstance(project).getActiveLookup != null)
+            return //Lets dont spoil autocomplete
 
           go match {
             case fixer.WithEnter(inserted) =>
@@ -80,8 +90,7 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
       }
 
       doEnter(atCaret, editor)
-    }
-    catch {
+    } catch {
       case e: IncorrectOperationException =>
         ScalaSmartEnterProcessor.LOG.error(e.getMessage)
     }
@@ -94,7 +103,8 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
     val parent = atCaret.getParent
 
     parent match {
-      case block: ScBlockExpr if block.exprs.headOption contains atCaret => atCaret = block
+      case block: ScBlockExpr if block.exprs.headOption contains atCaret =>
+        atCaret = block
       case forStmt: ScForStatement => atCaret = forStmt
       case _ =>
     }
@@ -110,13 +120,18 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
     reformat(atCaret)
     commit(editor)
 
-    atCaret = CodeInsightUtil.findElementInRange(psiFile, rangeMarker.getStartOffset, rangeMarker.getEndOffset, atCaret.getClass)
+    atCaret = CodeInsightUtil.findElementInRange(psiFile,
+                                                 rangeMarker.getStartOffset,
+                                                 rangeMarker.getEndOffset,
+                                                 atCaret.getClass)
 
     for (processor <- ScalaSmartEnterProcessor.myEnterProcessors) {
-      if (atCaret != null && processor.doEnter(editor, atCaret, isModified(editor))) return
+      if (atCaret != null &&
+          processor.doEnter(editor, atCaret, isModified(editor))) return
     }
 
-    if (!isModified(editor)) plainEnter(editor) else editor.getCaretModel.moveToOffset(rangeMarker.getEndOffset)
+    if (!isModified(editor)) plainEnter(editor)
+    else editor.getCaretModel.moveToOffset(rangeMarker.getEndOffset)
   }
 
   private def collectAllAtCaret(caret: PsiElement): Iterable[PsiElement] = {
@@ -125,14 +140,16 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
       case _ => false
     }
 
-    val buffer = scala.collection.mutable.ArrayBuffer((caret, doNotVisit(caret)))
+    val buffer =
+      scala.collection.mutable.ArrayBuffer((caret, doNotVisit(caret)))
     var idx = 0
 
     while (idx < buffer.size) {
       val (e, nonOk) = buffer(idx)
       val eNonOK = doNotVisit(e)
 
-      if (e != null && (!eNonOK || !nonOk) && e.getChildren.nonEmpty) buffer ++= e.getChildren.zip(Stream continually eNonOK&&nonOk)
+      if (e != null && (!eNonOK || !nonOk) && e.getChildren.nonEmpty)
+        buffer ++= e.getChildren.zip(Stream continually eNonOK && nonOk)
 
       idx += 1
     }
@@ -140,25 +157,36 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
     buffer.result().unzip._1
   }
 
-  protected override def getStatementAtCaret(editor: Editor, psiFile: PsiFile): PsiElement = {
+  protected override def getStatementAtCaret(
+      editor: Editor, psiFile: PsiFile): PsiElement = {
     val atCaret: PsiElement = super.getStatementAtCaret(editor, psiFile)
     if (atCaret.isInstanceOf[PsiWhiteSpace] || atCaret == null) return null
-    if (("}" == atCaret.getText) && !atCaret.getParent.isInstanceOf[PsiArrayInitializerExpression]) return null
+    if (("}" == atCaret.getText) &&
+        !atCaret.getParent.isInstanceOf[PsiArrayInitializerExpression])
+      return null
 
-    var statementAtCaret: PsiElement =
-      PsiTreeUtil.getParentOfType(atCaret, classOf[ScPatternDefinition], classOf[ScIfStmt], classOf[ScWhileStmt],
-        classOf[ScForStatement], classOf[ScCatchBlock], classOf[ScMethodCall])
+    var statementAtCaret: PsiElement = PsiTreeUtil.getParentOfType(
+        atCaret,
+        classOf[ScPatternDefinition],
+        classOf[ScIfStmt],
+        classOf[ScWhileStmt],
+        classOf[ScForStatement],
+        classOf[ScCatchBlock],
+        classOf[ScMethodCall])
 
     if (statementAtCaret.isInstanceOf[PsiBlockStatement]) return null
 
-    if (statementAtCaret != null && statementAtCaret.getParent.isInstanceOf[ScForStatement]) {
+    if (statementAtCaret != null &&
+        statementAtCaret.getParent.isInstanceOf[ScForStatement]) {
       if (!PsiTreeUtil.hasErrorElements(statementAtCaret)) {
         statementAtCaret = statementAtCaret.getParent
       }
     }
 
     statementAtCaret match {
-      case _: ScPatternDefinition | _: ScIfStmt | _: ScWhileStmt | _: ScForStatement | _: ScCatchBlock | _: ScMethodCall => statementAtCaret
+      case _: ScPatternDefinition | _: ScIfStmt | _: ScWhileStmt |
+          _: ScForStatement | _: ScCatchBlock | _: ScMethodCall =>
+        statementAtCaret
       case _ => null
     }
   }
@@ -167,13 +195,18 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
     editor.getCaretModel.moveToOffset(editor.getCaretModel.getOffset + by)
   }
 
-  protected def isUncommited(project: Project) = PsiDocumentManager.getInstance(project).hasUncommitedDocuments
+  protected def isUncommited(project: Project) =
+    PsiDocumentManager.getInstance(project).hasUncommitedDocuments
 
   protected def plainEnter(editor: Editor) {
-    getEnterHandler.execute(editor, editor.getCaretModel.getCurrentCaret, editor.asInstanceOf[EditorEx].getDataContext)
+    getEnterHandler.execute(editor,
+                            editor.getCaretModel.getCurrentCaret,
+                            editor.asInstanceOf[EditorEx].getDataContext)
   }
 
-  protected def getEnterHandler = EditorActionManager.getInstance.getActionHandler(IdeActions.ACTION_EDITOR_ENTER)
+  protected def getEnterHandler =
+    EditorActionManager.getInstance.getActionHandler(
+        IdeActions.ACTION_EDITOR_ENTER)
 
   protected def isModified(editor: Editor): Boolean = {
     val timestamp: Long = editor.getUserData(SMART_ENTER_TIMESTAMP)

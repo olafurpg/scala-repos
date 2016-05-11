@@ -1,4 +1,3 @@
-
 object NegativeId extends Enumeration {
   val Negative = Value(-1, "minus")
   val Zero = Value(0, "zero")

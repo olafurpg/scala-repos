@@ -13,6 +13,7 @@ trait SCL6605C {
   val h: H
 
   val u = if (true) x else h
-  /*start*/u/*end*/
+  /*start*/
+  u /*end*/
 }
 //SCL6605C.this.Z

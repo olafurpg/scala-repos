@@ -1,7 +1,6 @@
 package org.jetbrains.plugins.scala
 package hierarchy
 
-
 import com.intellij.ide.hierarchy.HierarchyBrowser
 import com.intellij.ide.hierarchy.`type`.JavaTypeHierarchyProvider
 import com.intellij.psi.PsiElement
@@ -10,9 +9,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinitio
 import scala.collection.immutable.HashSet
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 09.06.2009
- */
+  * User: Alexander Podkhalyuzin
+  * Date: 09.06.2009
+  */
 class ScalaTypeHierarchyProvider extends JavaTypeHierarchyProvider {
   override def createHierarchyBrowser(target: PsiElement): HierarchyBrowser = {
     target match {
@@ -23,7 +22,8 @@ class ScalaTypeHierarchyProvider extends JavaTypeHierarchyProvider {
     super.createHierarchyBrowser(target)
   }
 
-  def collectSupers(clazz: ScTypeDefinition, visited: HashSet[ScTypeDefinition]) {
+  def collectSupers(
+      clazz: ScTypeDefinition, visited: HashSet[ScTypeDefinition]) {
     clazz.supers.foreach {
       case clazz: ScTypeDefinition =>
         if (visited.contains(clazz)) {

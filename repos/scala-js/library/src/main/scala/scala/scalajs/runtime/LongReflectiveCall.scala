@@ -3,9 +3,9 @@ package scala.scalajs.runtime
 import java.lang.{Long => JLong}
 
 /** Explicit box for longs when doing a reflective call.
- *  This class and its methods are only here to properly support reflective
- *  calls on longs.
- */
+  *  This class and its methods are only here to properly support reflective
+  *  calls on longs.
+  */
 class LongReflectiveCall(value: Long) {
 
   // Methods of java.lang.Long
@@ -150,5 +150,4 @@ class LongReflectiveCall(value: Long) {
   def %(y: Long): Long = value % y
   def %(y: Float): Float = value % y
   def %(y: Double): Double = value % y
-
 }

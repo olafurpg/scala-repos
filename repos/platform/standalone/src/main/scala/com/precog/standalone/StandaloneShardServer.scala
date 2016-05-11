@@ -54,38 +54,42 @@ import com.precog.yggdrasil.vfs.NoopVFS
 import java.awt.Desktop
 import java.net.URI
 
-
-trait StandaloneShardServer
-    extends BlueEyesServer
-    with ShardService {
+trait StandaloneShardServer extends BlueEyesServer with ShardService {
   val clock = Clock.System
 
   implicit def executionContext: ExecutionContext
 
   def caveatMessage: Option[String]
 
-  def platformFor(config: Configuration, apiKeyManager: APIKeyFinder[Future], jobManager: JobManager[Future]): (ManagedPlatform, Stoppable)
+  def platformFor(config: Configuration,
+                  apiKeyManager: APIKeyFinder[Future],
+                  jobManager: JobManager[Future]): (ManagedPlatform, Stoppable)
 
   def configureShardState(config: Configuration) = M.point {
     val apiKey = config[String]("security.masterAccount.apiKey")
     val apiKeyFinder = new StaticAPIKeyFinder[Future](apiKey)
-    val accountFinder = new StaticAccountFinder[Future]("root", apiKey, Some("/"))
+    val accountFinder =
+      new StaticAccountFinder[Future]("root", apiKey, Some("/"))
 
-    val jobManager = config.get[String]("jobs.jobdir").map { jobdir =>
-      val dir = new File(jobdir)
+    val jobManager =
+      config.get[String]("jobs.jobdir").map { jobdir =>
+        val dir = new File(jobdir)
 
-      if (!dir.isDirectory) {
-        throw new Exception("Configured job dir %s is not a directory".format(dir))
+        if (!dir.isDirectory) {
+          throw new Exception(
+              "Configured job dir %s is not a directory".format(dir))
+        }
+
+        if (!dir.canWrite) {
+          throw new Exception(
+              "Configured job dir %s is not writeable".format(dir))
+        }
+
+        FileJobManager(dir, M)
+      } getOrElse {
+        new ExpiringJobManager(
+            Duration(config[Int]("jobs.ttl", 300), TimeUnit.SECONDS))
       }
-
-      if (!dir.canWrite) {
-        throw new Exception("Configured job dir %s is not writeable".format(dir))
-      }
-
-      FileJobManager(dir, M)
-    } getOrElse {
-      new ExpiringJobManager(Duration(config[Int]("jobs.ttl", 300), TimeUnit.SECONDS))
-    }
 
     val (platform, stoppable) = platformFor(config, apiKeyFinder, jobManager)
 
@@ -121,10 +125,14 @@ trait StandaloneShardServer
       resourceHandler.setMimeTypes(mimeTypes)
       resourceHandler.setDirectoriesListed(false)
       resourceHandler.setWelcomeFiles(new Array[String](0))
-      resourceHandler.setResourceBase(this.getClass.getClassLoader.getResource("web").toString)
+      resourceHandler.setResourceBase(
+          this.getClass.getClassLoader.getResource("web").toString)
 
       val corsHandler = new HandlerWrapper {
-        override def handle(target: String, baseRequest: Request, request: HttpServletRequest, response: HttpServletResponse): Unit = {
+        override def handle(target: String,
+                            baseRequest: Request,
+                            request: HttpServletRequest,
+                            response: HttpServletResponse): Unit = {
           response.addHeader("Access-Control-Allow-Origin", "*")
           _handler.handle(target, baseRequest, request, response)
         }
@@ -138,28 +146,31 @@ trait StandaloneShardServer
                    request: HttpServletRequest,
                    response: HttpServletResponse): Unit = {
           if (target == "/") {
-            val requestedHost = Option(request.getHeader("Host")).map(_.toLowerCase.split(':').head).getOrElse("localhost")
-            response.sendRedirect("http://%1$s:%2$d/index.html?apiKey=%3$s&analyticsService=http://%1$s:%4$d/&version=2".format(requestedHost, serverPort, rootKey, quirrelPort))
+            val requestedHost = Option(request.getHeader("Host"))
+              .map(_.toLowerCase.split(':').head)
+              .getOrElse("localhost")
+            response.sendRedirect(
+                "http://%1$s:%2$d/index.html?apiKey=%3$s&analyticsService=http://%1$s:%4$d/&version=2"
+                  .format(requestedHost, serverPort, rootKey, quirrelPort))
           }
         }
       }
 
       val handlers = new HandlerList
 
-      handlers.setHandlers(Array[Handler](rootHandler, resourceHandler, new DefaultHandler))
+      handlers.setHandlers(
+          Array[Handler](rootHandler, resourceHandler, new DefaultHandler))
       corsHandler.setHandler(handlers)
 
       server.setHandler(corsHandler)
       server.start()
 
       Future(server)(executionContext)
-    } ->
-    request { (server: Server) =>
-      get {
-        (req: HttpRequest[ByteChunk]) => Promise.successful(HttpResponse[ByteChunk]())(executionContext)
+    } -> request { (server: Server) =>
+      get { (req: HttpRequest[ByteChunk]) =>
+        Promise.successful(HttpResponse[ByteChunk]())(executionContext)
       }
-    } ->
-    shutdown { (server: Server) =>
+    } -> shutdown { (server: Server) =>
       Future(server.stop())(executionContext)
     }
   }

@@ -3,7 +3,7 @@
  */
 package play.it.i18n
 
-import play.api.test.{ PlaySpecification, WithApplication }
+import play.api.test.{PlaySpecification, WithApplication}
 import play.api.mvc.Controller
 import play.api.i18n._
 import play.api.Mode
@@ -53,4 +53,3 @@ object MessagesSpec extends PlaySpecification with Controller {
     }
   }
 }
-

@@ -31,13 +31,8 @@ import parser._
 import typer._
 
 object QuirrelConsole {
-  val compiler = new Parser
-      with StubPhases
-      with ProvenanceChecker
-      with Binder
-      with Compiler
-      with Emitter
-      with LineErrors {
+  val compiler = new Parser with StubPhases with ProvenanceChecker with Binder
+  with Compiler with Emitter with LineErrors {
 
     class Lib extends Library {
       type Morphism1 = Morphism1Like
@@ -51,7 +46,7 @@ object QuirrelConsole {
       def lib1 = Set()
       def lib2 = Set()
       def libReduction = Set()
-      
+
       lazy val expandGlob = new Morphism1Like {
         val namespace = Vector("std", "fs")
         val name = "expandGlob"
@@ -69,10 +64,11 @@ object QuirrelConsole {
     protected def RelLoadId = Identifier(Vector(), "relativeLoad")
     protected def ExpandGlobId = Identifier(Vector("std", "fs"), "expandGlob")
     protected def DistinctId = Identifier(Vector(), "distinct")
-    
+
     def bindNames(tree: Expr) = Set()
     def checkProvenance(tree: Expr) = Set()
-    def findCriticalConditions(expr: Expr): Map[String, Set[ConditionTree]] = Map()
+    def findCriticalConditions(expr: Expr): Map[String, Set[ConditionTree]] =
+      Map()
     def inferBuckets(expr: Expr) = Set()
     def buildTrace(sigma: Sigma)(expr: Expr): Trace = Trace.empty
   }

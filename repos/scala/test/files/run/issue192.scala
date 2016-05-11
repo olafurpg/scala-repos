@@ -2,47 +2,47 @@ import scala.language.reflectiveCalls
 
 object Test extends App {
 
-  def f1(p: Any{def unary_+ : Int}) = +p
-  def f2(p: Any{def unary_- : Int}) = -p
-  def f3(p: Any{def unary_~ : Int}) = ~p
-  def f4(p: Any{def unary_! : Boolean}) = !p
+  def f1(p: Any { def unary_+ : Int }) = +p
+  def f2(p: Any { def unary_- : Int }) = -p
+  def f3(p: Any { def unary_~ : Int }) = ~p
+  def f4(p: Any { def unary_! : Boolean }) = !p
 
-  def f5(p: Any{def +(q: Int): Int}) = p + 7
-  def f6(p: Any{def -(q: Int): Int}) = p - 7
-  def f7(p: Any{def *(q: Int): Int}) = p * 7
-  def f8(p: Any{def /(q: Int): Int}) = p / 7
-  def f9(p: Any{def %(q: Int): Int}) = p % 7
+  def f5(p: Any { def +(q: Int): Int }) = p + 7
+  def f6(p: Any { def -(q: Int): Int }) = p - 7
+  def f7(p: Any { def *(q: Int): Int }) = p * 7
+  def f8(p: Any { def /(q: Int): Int }) = p / 7
+  def f9(p: Any { def %(q: Int): Int }) = p % 7
 
-  def f10(p: Any{def |(q: Int): Int}) = p | 7
-  def f11(p: Any{def |(q: Boolean): Boolean}) = p | true
-  def f12(p: Any{def ^(q: Int): Int}) = p ^ 7
-  def f13(p: Any{def ^(q: Boolean): Boolean}) = p ^ true
-  def f14(p: Any{def &(q: Int): Int}) = p & 7
-  def f15(p: Any{def &(q: Boolean): Boolean}) = p & true
-  def f16(p: Any{def ||(q: Boolean): Boolean}) = p || true
-  def f17(p: Any{def &&(q: Boolean): Boolean}) = p && true
+  def f10(p: Any { def |(q: Int): Int }) = p | 7
+  def f11(p: Any { def |(q: Boolean): Boolean }) = p | true
+  def f12(p: Any { def ^(q: Int): Int }) = p ^ 7
+  def f13(p: Any { def ^(q: Boolean): Boolean }) = p ^ true
+  def f14(p: Any { def &(q: Int): Int }) = p & 7
+  def f15(p: Any { def &(q: Boolean): Boolean }) = p & true
+  def f16(p: Any { def ||(q: Boolean): Boolean }) = p || true
+  def f17(p: Any { def &&(q: Boolean): Boolean }) = p && true
 
-  def f18(p: Any{def <<(q: Int): Int}) = p << 7
-  def f19(p: Any{def >>(q: Int): Int}) = p >> 7
-  def f20(p: Any{def >>>(q: Int): Int}) = p >>> 7
+  def f18(p: Any { def <<(q: Int): Int }) = p << 7
+  def f19(p: Any { def >>(q: Int): Int }) = p >> 7
+  def f20(p: Any { def >>>(q: Int): Int }) = p >>> 7
 
-  def f21(p: Any{def toByte: Byte}) = p.toByte
-  def f22(p: Any{def toShort: Short}) = p.toShort
-  def f23(p: Any{def toChar: Char}) = p.toChar
-  def f24(p: Any{def toInt: Int}) = p.toInt
-  def f25(p: Any{def toLong: Long}) = p.toLong
-  def f26(p: Any{def toFloat: Float}) = p.toFloat
-  def f27(p: Any{def toDouble: Double}) = p.toDouble
+  def f21(p: Any { def toByte: Byte }) = p.toByte
+  def f22(p: Any { def toShort: Short }) = p.toShort
+  def f23(p: Any { def toChar: Char }) = p.toChar
+  def f24(p: Any { def toInt: Int }) = p.toInt
+  def f25(p: Any { def toLong: Long }) = p.toLong
+  def f26(p: Any { def toFloat: Float }) = p.toFloat
+  def f27(p: Any { def toDouble: Double }) = p.toDouble
 
-  def f28(p: Any{def ==(q: Int): Boolean}) = p == 7
-  def f29(p: Any{def !=(q: Int): Boolean}) = p != 7
-  def f30(p: Any{def ==(q: Boolean): Boolean}) = p == true
-  def f31(p: Any{def !=(q: Boolean): Boolean}) = p != true
+  def f28(p: Any { def ==(q: Int): Boolean }) = p == 7
+  def f29(p: Any { def !=(q: Int): Boolean }) = p != 7
+  def f30(p: Any { def ==(q: Boolean): Boolean }) = p == true
+  def f31(p: Any { def !=(q: Boolean): Boolean }) = p != true
 
-  def f32(p: Any{def <(q: Int): Boolean}) = p < 7
-  def f33(p: Any{def <=(q: Int): Boolean}) = p <= 7
-  def f34(p: Any{def >=(q: Int): Boolean}) = p >= 7
-  def f35(p: Any{def >(q: Int): Boolean}) = p > 7
+  def f32(p: Any { def <(q: Int): Boolean }) = p < 7
+  def f33(p: Any { def <=(q: Int): Boolean }) = p <= 7
+  def f34(p: Any { def >=(q: Int): Boolean }) = p >= 7
+  def f35(p: Any { def >(q: Int): Boolean }) = p > 7
 
   print("f1 =  "); println(f1(1) == +1)
   print("f2 =  "); println(f2(1) == -1)
@@ -87,5 +87,4 @@ object Test extends App {
   print("f35 = "); println(f35(4) == (4 > 7))
 
   println("ok")
-
 }

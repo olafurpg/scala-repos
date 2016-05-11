@@ -8,13 +8,13 @@ import spire.std.int._
 class LiteralsTest extends FunSuite {
   test("byte literals") {
     import spire.syntax.literals._
-    assert(b"-128" === (-128:Byte))
-    assert(b"-100" === (-100:Byte))
-    assert(b"0" === (0:Byte))
-    assert(b"100" === (100:Byte))
-    assert(b"127" === (127:Byte))
-    assert(b"128" === (-128:Byte))
-    assert(b"255" === (-1:Byte))
+    assert(b"-128" === (-128: Byte))
+    assert(b"-100" === (-100: Byte))
+    assert(b"0" === (0: Byte))
+    assert(b"100" === (100: Byte))
+    assert(b"127" === (127: Byte))
+    assert(b"128" === (-128: Byte))
+    assert(b"255" === (-1: Byte))
   }
 
   test("illegal byte literals") {
@@ -28,13 +28,13 @@ class LiteralsTest extends FunSuite {
 
   test("short literals") {
     import spire.syntax.literals._
-    assert(h"-32768" === (-32768:Short))
-    assert(h"-10000" === (-10000:Short))
-    assert(h"0" === (0:Short))
-    assert(h"10012" === (10012:Short))
-    assert(h"32767" === (32767:Short))
-    assert(h"32768" === (-32768:Short))
-    assert(h"65535" === (-1:Short))
+    assert(h"-32768" === (-32768: Short))
+    assert(h"-10000" === (-10000: Short))
+    assert(h"0" === (0: Short))
+    assert(h"10012" === (10012: Short))
+    assert(h"32767" === (32767: Short))
+    assert(h"32768" === (-32768: Short))
+    assert(h"65535" === (-1: Short))
   }
 
   test("int operators") {

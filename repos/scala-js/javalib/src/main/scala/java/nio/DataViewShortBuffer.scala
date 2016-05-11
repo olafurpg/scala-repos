@@ -4,7 +4,9 @@ import scala.scalajs.js.typedarray._
 
 private[nio] final class DataViewShortBuffer private (
     override private[nio] val _dataView: DataView,
-    _initialPosition: Int, _initialLimit: Int, _readOnly: Boolean,
+    _initialPosition: Int,
+    _initialLimit: Int,
+    _readOnly: Boolean,
     override private[nio] val isBigEndian: Boolean)
     extends ShortBuffer(_dataView.byteLength / 2, null, -1) {
 
@@ -80,13 +82,13 @@ private[nio] final class DataViewShortBuffer private (
     _dataView.setInt16(2 * index, elem, !isBigEndian)
 
   @inline
-  override private[nio] def load(startIndex: Int,
-      dst: Array[Short], offset: Int, length: Int): Unit =
+  override private[nio] def load(
+      startIndex: Int, dst: Array[Short], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
-  override private[nio] def store(startIndex: Int,
-      src: Array[Short], offset: Int, length: Int): Unit =
+  override private[nio] def store(
+      startIndex: Int, src: Array[Short], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }
 
@@ -96,10 +98,12 @@ private[nio] object DataViewShortBuffer {
     def bytesPerElem: Int = 2
 
     def apply(dataView: DataView,
-        initialPosition: Int, initialLimit: Int,
-        readOnly: Boolean, isBigEndian: Boolean): ShortBuffer = {
-      new DataViewShortBuffer(dataView,
-          initialPosition, initialLimit, readOnly, isBigEndian)
+              initialPosition: Int,
+              initialLimit: Int,
+              readOnly: Boolean,
+              isBigEndian: Boolean): ShortBuffer = {
+      new DataViewShortBuffer(
+          dataView, initialPosition, initialLimit, readOnly, isBigEndian)
     }
   }
 

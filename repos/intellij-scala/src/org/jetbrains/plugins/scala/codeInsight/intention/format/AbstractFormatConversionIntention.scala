@@ -12,18 +12,19 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.util.MultilineStringUtil
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 abstract class AbstractFormatConversionIntention(name: String,
                                                  parser: StringParser,
                                                  formatter: StringFormatter,
-                                                 eager: Boolean = false) extends PsiElementBaseIntentionAction {
+                                                 eager: Boolean = false)
+    extends PsiElementBaseIntentionAction {
   setText(name)
 
   override def getFamilyName = name
 
-  private def findTargetIn(element: PsiElement): Option[(PsiElement, Seq[StringPart])] = {
+  private def findTargetIn(
+      element: PsiElement): Option[(PsiElement, Seq[StringPart])] = {
     val candidates = {
       val list = element :: element.parentsInFile.toList
       if (eager) list.reverse else list
@@ -34,7 +35,8 @@ abstract class AbstractFormatConversionIntention(name: String,
     }
   }
 
-  override def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = {
+  override def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
     findTargetIn(element).isDefined
   }
 
@@ -48,7 +50,8 @@ abstract class AbstractFormatConversionIntention(name: String,
 
     target.replace(result) match {
       case lit: ScLiteral if lit.isMultiLineString =>
-        MultilineStringUtil.addMarginsAndFormatMLString(lit, editor.getDocument)
+        MultilineStringUtil.addMarginsAndFormatMLString(
+            lit, editor.getDocument)
       case _ =>
     }
   }

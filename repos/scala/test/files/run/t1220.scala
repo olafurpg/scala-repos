@@ -1,7 +1,7 @@
 object Test extends App {
 
   class QSRichIterable[A](self: Iterable[A]) {
-    def filterMap[R](f: PartialFunction[A,R]) =
+    def filterMap[R](f: PartialFunction[A, R]) =
       self filter (f.isDefinedAt) map f
   }
 
@@ -11,5 +11,5 @@ object Test extends App {
 
   val richIter = new QSRichIterable(List(0, 1, 2, 3, 4))
 
-  assert((richIter filterMap {case Un(3) => 7}) == List(7))
+  assert((richIter filterMap { case Un(3) => 7 }) == List(7))
 }

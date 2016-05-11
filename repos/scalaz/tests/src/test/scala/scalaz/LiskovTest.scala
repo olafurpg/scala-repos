@@ -33,6 +33,5 @@ object LiskovTest extends SpecLite {
     }
 
     foo[String, AnyRef]
-
   }
 }

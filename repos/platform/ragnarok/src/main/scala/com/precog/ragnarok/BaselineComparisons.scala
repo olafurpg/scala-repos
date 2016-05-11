@@ -28,48 +28,50 @@ sealed trait PerfDelta
 object PerfDelta {
   case class Faster(baseline: Statistics, stats: Statistics) extends PerfDelta
   case class Slower(baseline: Statistics, stats: Statistics) extends PerfDelta
-  case class NoChange(baseline: Statistics, stats: Statistics) extends PerfDelta
+  case class NoChange(baseline: Statistics, stats: Statistics)
+      extends PerfDelta
 
   case class MissingBaseline(stats: Statistics) extends PerfDelta
   case class MissingStats(baseline: Statistics) extends PerfDelta
 
   case object Missing extends PerfDelta
 
-  def apply(baseline: Option[Statistics], stats: Option[Statistics]): PerfDelta = (baseline, stats) match {
-    case (Some(baseline), Some(stats)) =>
-      val q1 = baseline.variance / baseline.count
-      val q2 = stats.variance / stats.count
-      val qsum = q1 + q2
-      val t = math.abs((baseline.mean - stats.mean) / math.sqrt(qsum))
+  def apply(
+      baseline: Option[Statistics], stats: Option[Statistics]): PerfDelta =
+    (baseline, stats) match {
+      case (Some(baseline), Some(stats)) =>
+        val q1 = baseline.variance / baseline.count
+        val q2 = stats.variance / stats.count
+        val qsum = q1 + q2
+        val t = math.abs((baseline.mean - stats.mean) / math.sqrt(qsum))
 
-      // TODO Calculate DoF and use table lookup.
-      // val df = (qsum * qsum) / ((q1 * q1) / (baseline.count - 1) + (q2 * q2) / (stats.count - 1))
+        // TODO Calculate DoF and use table lookup.
+        // val df = (qsum * qsum) / ((q1 * q1) / (baseline.count - 1) + (q2 * q2) / (stats.count - 1))
 
-      if (t > 2.0) {
-        if (stats.mean > baseline.mean) {
-          Slower(baseline, stats)
+        if (t > 2.0) {
+          if (stats.mean > baseline.mean) {
+            Slower(baseline, stats)
+          } else {
+            Faster(baseline, stats)
+          }
         } else {
-          Faster(baseline, stats)
+          NoChange(baseline, stats)
         }
-      } else {
-        NoChange(baseline, stats)
-      }
 
-    case (Some(baseline), None) =>
-      MissingStats(baseline)
+      case (Some(baseline), None) =>
+        MissingStats(baseline)
 
-    case (None, Some(stats)) =>
-      MissingBaseline(stats)
+      case (None, Some(stats)) =>
+        MissingBaseline(stats)
 
-    case (None, None) =>
-      Missing
-  }
+      case (None, None) =>
+        Missing
+    }
 }
 
-
 /**
- * Provides methods to read in a baseline JSON file.
- */
+  * Provides methods to read in a baseline JSON file.
+  */
 trait BaselineComparisons {
   import java.io.{Reader, BufferedReader}
 
@@ -78,15 +80,21 @@ trait BaselineComparisons {
 
   type TestPath = (List[String], Option[String])
 
-  def compareWithBaseline(results: Tree[(PerfTest, Option[Statistics])], baseline: Map[TestPath, Statistics]): Tree[(PerfTest, PerfDelta)] = {
-    def rec(results: Tree[(PerfTest, Option[Statistics])], path: List[String]): Tree[(PerfTest, PerfDelta)] =
+  def compareWithBaseline(
+      results: Tree[(PerfTest, Option[Statistics])],
+      baseline: Map[TestPath, Statistics]): Tree[(PerfTest, PerfDelta)] = {
+    def rec(results: Tree[(PerfTest, Option[Statistics])],
+            path: List[String]): Tree[(PerfTest, PerfDelta)] =
       results match {
         case Tree.Node((RunQuery(query), stats), _) =>
-          Tree.leaf(RunQuery(query) -> PerfDelta(baseline get ((path, Some(query))), stats))
+          Tree.leaf(RunQuery(query) -> PerfDelta(
+                  baseline get ((path, Some(query))), stats))
 
         case Tree.Node((Group(name), stats), kids) =>
           val newPath = path :+ name
-          Tree.node(Group(name) -> PerfDelta(baseline get ((newPath, None)), stats), kids map (rec(_, newPath)))
+          Tree.node(
+              Group(name) -> PerfDelta(baseline get ((newPath, None)), stats),
+              kids map (rec(_, newPath)))
 
         case Tree.Node((test, stats), kids) =>
           Tree.node(test -> PerfDelta(None, stats), kids map (rec(_, path)))
@@ -107,58 +115,71 @@ trait BaselineComparisons {
 
     JParser.parseUnsafe(str) match {
       case JArray(tests) =>
-        tests.foldLeft(Map[(List[String], Option[String]), Statistics]()) { case (acc, obj) =>
-          (obj \? "stats") match {
-            case Some(stats) =>
-              (for {
-                JArray(jpath) <- obj \? "path" flatMap (_ -->? classOf[JArray])
-                JNum(mean) <- stats \? "mean" flatMap (_ -->? classOf[JNum])
-                JNum(variance) <- stats \? "variance" flatMap (_ -->? classOf[JNum])
-                JNum(stdDev) <- stats \? "stdDev" flatMap (_ -->? classOf[JNum])
-                JNum(min) <- stats \? "min" flatMap (_ -->? classOf[JNum])
-                JNum(max) <- stats \? "max" flatMap (_ -->? classOf[JNum])
-                JNum(count) <- stats \? "count" flatMap (_ -->? classOf[JNum])
-              } yield {
-                val path = (jpath collect { case JString(p) => p },
-                  (obj \? "query") collect { case JString(query) => query })
-                val n = count.toInt
-                path -> Statistics(0, List(min.toDouble), List(max.toDouble), mean.toDouble, (n - 1) * variance.toDouble, n)
-              }) map (acc + _) getOrElse {
-                // TODO: Replace these errors with something more useful.
-                sys.error("Error parsing: %s" format obj.toString)
-              }
+        tests.foldLeft(Map[(List[String], Option[String]), Statistics]()) {
+          case (acc, obj) =>
+            (obj \? "stats") match {
+              case Some(stats) =>
+                (for {
+                  JArray(jpath) <- obj \? "path" flatMap
+                  (_ -->? classOf[JArray])
+                  JNum(mean) <- stats \? "mean" flatMap (_ -->? classOf[JNum])
+                  JNum(variance) <- stats \? "variance" flatMap
+                  (_ -->? classOf[JNum])
+                  JNum(stdDev) <- stats \? "stdDev" flatMap
+                  (_ -->? classOf[JNum])
+                  JNum(min) <- stats \? "min" flatMap (_ -->? classOf[JNum])
+                  JNum(max) <- stats \? "max" flatMap (_ -->? classOf[JNum])
+                  JNum(count) <- stats \? "count" flatMap
+                  (_ -->? classOf[JNum])
+                } yield {
+                  val path =
+                    (jpath collect { case JString(p) => p },
+                     (obj \? "query") collect { case JString(query) => query })
+                  val n = count.toInt
+                  path -> Statistics(0,
+                                     List(min.toDouble),
+                                     List(max.toDouble),
+                                     mean.toDouble,
+                                     (n - 1) * variance.toDouble,
+                                     n)
+                }) map (acc + _) getOrElse {
+                  // TODO: Replace these errors with something more useful.
+                  sys.error("Error parsing: %s" format obj.toString)
+                }
 
-            // Stats will be misssing when the Option[Statistics] is None.
-            case None =>
-              acc
-          }
+              // Stats will be misssing when the Option[Statistics] is None.
+              case None =>
+                acc
+            }
         }
 
       case _ =>
-        sys.error("Top level JSON element in a baseline file must be an array.")
+        sys.error(
+            "Top level JSON element in a baseline file must be an array.")
     }
   }
 
-
   def createBaseline(result: Tree[(PerfTest, Option[Statistics])]): JValue = {
 
-    def statsJson(stats: Statistics): List[JField] = List(
-      JField("mean", JNum(stats.mean)),
-      JField("variance", JNum(stats.variance)),
-      JField("stdDev", JNum(stats.stdDev)),
-      JField("min", JNum(stats.min)),
-      JField("max", JNum(stats.max)),
-      JField("count", JNum(stats.count)))
- 
-    def values(path: List[JString], test: Tree[(PerfTest, Option[Statistics])]): List[JValue] = {
+    def statsJson(stats: Statistics): List[JField] =
+      List(JField("mean", JNum(stats.mean)),
+           JField("variance", JNum(stats.variance)),
+           JField("stdDev", JNum(stats.stdDev)),
+           JField("min", JNum(stats.min)),
+           JField("max", JNum(stats.max)),
+           JField("count", JNum(stats.count)))
+
+    def values(path: List[JString],
+               test: Tree[(PerfTest, Option[Statistics])]): List[JValue] = {
       test match {
         case Tree.Node((RunQuery(query), Some(stats)), _) =>
-          JObject(JField("path", JArray(path)) ::
-            JField("query", JString(query)) :: statsJson(stats)) :: Nil
+          JObject(JField("path", JArray(path)) :: JField(
+                  "query", JString(query)) :: statsJson(stats)) :: Nil
 
         case Tree.Node((Group(name), Some(stats)), kids) =>
           val newPath = path :+ JString(name)
-          val row = JObject(JField("path", JArray(newPath)) :: statsJson(stats))
+          val row = JObject(
+              JField("path", JArray(newPath)) :: statsJson(stats))
           row :: kids.toList.flatMap(values(newPath, _))
 
         case Tree.Node(_, kids) =>
@@ -169,6 +190,5 @@ trait BaselineComparisons {
     JArray(values(Nil, result))
   }
 }
-
 
 object BaselineComparisons extends BaselineComparisons

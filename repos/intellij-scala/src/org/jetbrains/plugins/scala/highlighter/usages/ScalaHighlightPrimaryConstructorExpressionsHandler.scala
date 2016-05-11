@@ -16,9 +16,12 @@ import scala.collection.JavaConversions._
 /**
   * Highlights the expressions that will be evaluated during construction.
   */
-class ScalaHighlightPrimaryConstructorExpressionsHandler(templateDef: ScTemplateDefinition, editor: Editor,
-                                                         file: PsiFile, keyword: PsiElement)
-  extends HighlightUsagesHandlerBase[PsiElement](editor, file) {
+class ScalaHighlightPrimaryConstructorExpressionsHandler(
+    templateDef: ScTemplateDefinition,
+    editor: Editor,
+    file: PsiFile,
+    keyword: PsiElement)
+    extends HighlightUsagesHandlerBase[PsiElement](editor, file) {
   def computeUsages(targets: util.List[PsiElement]) {
     val iterator = targets.listIterator
     while (iterator.hasNext) {
@@ -27,18 +30,22 @@ class ScalaHighlightPrimaryConstructorExpressionsHandler(templateDef: ScTemplate
     }
   }
 
-  def selectTargets(targets: util.List[PsiElement], selectionConsumer: Consumer[util.List[PsiElement]]) {
+  def selectTargets(targets: util.List[PsiElement],
+                    selectionConsumer: Consumer[util.List[PsiElement]]) {
     selectionConsumer.consume(targets)
   }
 
   def getTargets: util.List[PsiElement] = {
     val eb = templateDef.extendsBlock
     val varAndValDefsExprs = eb.members.flatMap {
-      case p: ScPatternDefinition => p.expr // we include lazy vals, perhaps they could be excluded.
+      case p: ScPatternDefinition =>
+        p.expr // we include lazy vals, perhaps they could be excluded.
       case v: ScVariableDefinition => v.expr
       case _ => None
     }
-    val constructorExprs = varAndValDefsExprs ++ eb.templateBody.toList.flatMap(_.exprs) ++ Seq(keyword)
+    val constructorExprs =
+      varAndValDefsExprs ++ eb.templateBody.toList.flatMap(_.exprs) ++ Seq(
+          keyword)
     constructorExprs.toBuffer[PsiElement]
   }
 }

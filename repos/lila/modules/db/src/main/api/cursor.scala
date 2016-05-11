@@ -8,9 +8,9 @@ import reactivemongo.bson._
 
 object $cursor {
 
-  def apply[A: TubeInColl](q: JsObject): Cursor[Option[A]] =
+  def apply[A : TubeInColl](q: JsObject): Cursor[Option[A]] =
     apply($query(q))
 
-  def apply[A: TubeInColl](b: QueryBuilder): Cursor[Option[A]] =
+  def apply[A : TubeInColl](b: QueryBuilder): Cursor[Option[A]] =
     b.cursor[Option[A]]()
 }

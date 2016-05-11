@@ -2,7 +2,7 @@ package lila.socket
 
 import akka.actor._
 
-import actorApi.{ SocketEnter, SocketLeave, PopulationTell, NbMembers }
+import actorApi.{SocketEnter, SocketLeave, PopulationTell, NbMembers}
 
 private[socket] final class Population extends Actor {
 

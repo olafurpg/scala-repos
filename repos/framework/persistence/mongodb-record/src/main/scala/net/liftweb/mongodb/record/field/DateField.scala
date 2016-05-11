@@ -1,15 +1,15 @@
 /*
-* Copyright 2010-2014 WorldWide Conferencing, LLC
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2010-2014 WorldWide Conferencing, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package net.liftweb
 package mongodb
@@ -41,24 +41,25 @@ trait DateTypedField extends TypedField[Date] {
     case s: String => setFromString(s)
     case Some(s: String) => setFromString(s)
     case Full(s: String) => setFromString(s)
-    case null|None|Empty => setBox(defaultValueBox)
+    case null | None | Empty => setBox(defaultValueBox)
     case f: Failure => setBox(f)
     case o => setFromString(o.toString)
   }
 
-  def setFromString(in: String): Box[Date] = formats.dateFormat.parse(in) match {
-    case Some(d: Date) => setBox(Full(d))
-    case other => setBox(Failure("Invalid Date string: "+in))
-  }
+  def setFromString(in: String): Box[Date] =
+    formats.dateFormat.parse(in) match {
+      case Some(d: Date) => setBox(Full(d))
+      case other => setBox(Failure("Invalid Date string: " + in))
+    }
 
   def setFromJValue(jvalue: JValue): Box[Date] = jvalue match {
-    case JNothing|JNull if optional_? => setBox(Empty)
+    case JNothing | JNull if optional_? => setBox(Empty)
     case JObject(JField("$dt", JString(s)) :: Nil) => setFromString(s)
     case other => setBox(FieldHelpers.expectedA("JObject", other))
   }
 
   private def elem =
-    S.fmapFunc(S.SFuncHolder(this.setFromAny(_))){funcName =>
+    S.fmapFunc(S.SFuncHolder(this.setFromAny(_))) { funcName =>
       <input type="text"
         name={funcName}
         value={valueBox.map(v => formats.dateFormat.format(v)) openOr ""}
@@ -76,11 +77,13 @@ trait DateTypedField extends TypedField[Date] {
     case jv => JsRaw(compactRender(jv))
   }
 
-  def asJValue: JValue = valueBox.map(v => JsonDate(v)(formats)) openOr (JNothing: JValue)
+  def asJValue: JValue =
+    valueBox.map(v => JsonDate(v)(formats)) openOr (JNothing: JValue)
 }
 
 class DateField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-  extends Field[Date, OwnerType] with MandatoryTypedField[Date] with DateTypedField {
+    extends Field[Date, OwnerType] with MandatoryTypedField[Date]
+    with DateTypedField {
 
   def owner = rec
 
@@ -95,14 +98,16 @@ class DateField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
 
   override def toString = value match {
     case null => "null"
-    case d => valueBox.map {
-      v => formats.dateFormat.format(v)
-    } openOr ""
+    case d =>
+      valueBox.map { v =>
+        formats.dateFormat.format(v)
+      } openOr ""
   }
 }
 
 class OptionalDateField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-  extends Field[Date, OwnerType] with OptionalTypedField[Date] with DateTypedField {
+    extends Field[Date, OwnerType] with OptionalTypedField[Date]
+    with DateTypedField {
 
   def owner = rec
 

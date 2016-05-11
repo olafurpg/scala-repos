@@ -21,9 +21,12 @@ package controllers {
 
     // #show-client-action
     def show(id: Long) = Action {
-      Client.findById(id).map { client =>
-        Ok(views.html.Clients.display(client))
-      }.getOrElse(NotFound)
+      Client
+        .findById(id)
+        .map { client =>
+          Ok(views.html.Clients.display(client))
+        }
+        .getOrElse(NotFound)
     }
     // #show-client-action
 
@@ -76,16 +79,15 @@ package defaultvalue.controllers {
 // ###replace: package controllers
 package reverse.controllers {
 
-import play.api._
-import play.api.mvc._
+  import play.api._
+  import play.api.mvc._
 
-class Application extends Controller {
+  class Application extends Controller {
 
-  def hello(name: String) = Action {
-    Ok("Hello " + name + "!")
+    def hello(name: String) = Action {
+      Ok("Hello " + name + "!")
+    }
   }
-
-}
 // #reverse-controller
 }
 
@@ -118,7 +120,8 @@ object ScalaRoutingSpec extends Specification {
     }
     "support default values for parameters" in {
       contentOf(FakeRequest("GET", "/clients"), classOf[defaultvalue.Routes]) must_== "clients page 1"
-      contentOf(FakeRequest("GET", "/clients?page=2"), classOf[defaultvalue.Routes]) must_== "clients page 2"
+      contentOf(FakeRequest("GET", "/clients?page=2"),
+                classOf[defaultvalue.Routes]) must_== "clients page 2"
     }
     "support optional values for parameters" in {
       contentOf(FakeRequest("GET", "/api/list-all")) must_== "version None"
@@ -136,10 +139,10 @@ object ScalaRoutingSpec extends Specification {
       val result = helloBob(FakeRequest())
       header(LOCATION, result) must beSome("/hello/Bob")
     }
-
   }
 
-  def contentOf(rh: RequestHeader, router: Class[_ <: Router] = classOf[Routes]) = {
+  def contentOf(
+      rh: RequestHeader, router: Class[_ <: Router] = classOf[Routes]) = {
     running() { app =>
       implicit val mat = ActorMaterializer()(app.actorSystem)
       contentAsString(app.injector.instanceOf(router).routes(rh) match {

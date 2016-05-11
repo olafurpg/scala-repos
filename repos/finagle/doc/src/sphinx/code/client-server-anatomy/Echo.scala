@@ -14,15 +14,15 @@ import java.net.SocketAddress
 object Echo extends Client[String, String] with Server[String, String] {
   //#client
   case class Client(
-    stack: Stack[ServiceFactory[String, String]] = StackClient.newStack,
-    params: Stack.Params = StackClient.defaultParams
-  ) extends StdStackClient[String, String, Client] {
+      stack: Stack[ServiceFactory[String, String]] = StackClient.newStack,
+      params: Stack.Params = StackClient.defaultParams
+  )
+      extends StdStackClient[String, String, Client] {
     protected type In = String
     protected type Out = String
 
-    protected def copy1(
-        stack: Stack[ServiceFactory[String, String]],
-        params: Stack.Params): Client =
+    protected def copy1(stack: Stack[ServiceFactory[String, String]],
+                        params: Stack.Params): Client =
       copy(stack, params)
 
     //#transporter
@@ -44,18 +44,18 @@ object Echo extends Client[String, String] with Server[String, String] {
   def newClient(dest: Name, label: String): ServiceFactory[String, String] =
     client.newClient(dest, label)
 
-
   //#server
   case class Server(
-    stack: Stack[ServiceFactory[String, String]] = StackServer.newStack,
-    params: Stack.Params = StackServer.defaultParams
-  ) extends StdStackServer[String, String, Server] {
+      stack: Stack[ServiceFactory[String, String]] = StackServer.newStack,
+      params: Stack.Params = StackServer.defaultParams
+  )
+      extends StdStackServer[String, String, Server] {
     protected type In = String
     protected type Out = String
 
     protected def copy1(
-      stack: Stack[ServiceFactory[String, String]] = this.stack,
-      params: Stack.Params = this.params
+        stack: Stack[ServiceFactory[String, String]] = this.stack,
+        params: Stack.Params = this.params
     ): Server = copy(stack, params)
 
     //#serverlistener
@@ -63,9 +63,8 @@ object Echo extends Client[String, String] with Server[String, String] {
       Netty3Listener(StringServerPipeline, params)
     //#serverlistener
 
-    protected def newDispatcher(
-        transport: Transport[String, String],
-        service: Service[String, String]) =
+    protected def newDispatcher(transport: Transport[String, String],
+                                service: Service[String, String]) =
       new SerialServerDispatcher(transport, service)
   }
   //#server
@@ -73,10 +72,9 @@ object Echo extends Client[String, String] with Server[String, String] {
   val server = Server()
 
   def serve(addr: SocketAddress,
-      service: ServiceFactory[String, String]): ListeningServer =
+            service: ServiceFactory[String, String]): ListeningServer =
     server.serve(addr, service)
 }
-
 
 object SimpleListenerExample {
   def main(args: Array[String]): Unit = {
@@ -88,7 +86,7 @@ object SimpleListenerExample {
     val serveTransport = (t: Transport[String, String]) =>
       new SerialServerDispatcher(t, service)
     val listener = Netty3Listener[String, String](
-      StringServerPipeline, StackServer.defaultParams)
+        StringServerPipeline, StackServer.defaultParams)
     val server = listener.listen(address) { serveTransport(_) }
     //#simplelisten
 
@@ -112,7 +110,7 @@ object BasicClient {
   //#explicitbridge
   val addr = new java.net.InetSocketAddress("localhost", 8080)
   val transporter = Netty3Transporter[String, String](
-    StringClientPipeline, StackClient.defaultParams)
+      StringClientPipeline, StackClient.defaultParams)
 
   val bridge: Future[Service[String, String]] =
     transporter(addr) map { transport =>
@@ -139,13 +137,13 @@ object BasicClientExample extends App {
 object Filters {
   //#filters
   val retry = new RetryExceptionsFilter[String, String](
-    retryPolicy = RetryPolicy.tries(3),
-    timer = DefaultTimer.twitter
+      retryPolicy = RetryPolicy.tries(3),
+      timer = DefaultTimer.twitter
   )
 
   val timeout = new TimeoutFilter[String, String](
-    timeout = 3.seconds,
-    timer = DefaultTimer.twitter
+      timeout = 3.seconds,
+      timer = DefaultTimer.twitter
   )
 
   val maskCancel = new MaskCancelFilter[String, String]
@@ -157,10 +155,7 @@ object RobustClientExample extends App {
   import Filters._
 
   //#robustclient
-  val newClient =
-    retry andThen
-    timeout andThen
-    maskCancel andThen client
+  val newClient = retry andThen timeout andThen maskCancel andThen client
 
   val result = newClient("hello")
   println(Await.result(result))

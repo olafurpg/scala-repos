@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -52,9 +52,7 @@ class TreeSetWithNullTest extends TreeSetTest(new TreeSetWithNullFactory) {
 }
 
 abstract class TreeSetTest(val factory: TreeSetFactory)
-    extends AbstractSetTest
-    with SortedSetTest
-    with NavigableSetTest {
+    extends AbstractSetTest with SortedSetTest with NavigableSetTest {
 
   @Test def should_store_and_remove_ordered_integers(): Unit = {
     val ts = factory.empty[Int]
@@ -242,7 +240,9 @@ abstract class TreeSetTest(val factory: TreeSetFactory)
     assertTrue(ts.contains(-0.0))
   }
 
-  @Test def should_throws_exception_in_case_of_null_elements_and_default_ordering(): Unit = {
+  @Test
+  def should_throws_exception_in_case_of_null_elements_and_default_ordering(
+      ): Unit = {
     val hs = factory.empty[String]
 
     assertTrue(hs.add("ONE"))
@@ -343,12 +343,12 @@ object TreeSetFactory extends TreeSetFactory {
     Iterator(new TreeSetFactory, new TreeSetWithNullFactory)
 }
 
-class TreeSetFactory extends AbstractSetFactory with NavigableSetFactory
-    with SortedSetFactory {
+class TreeSetFactory
+    extends AbstractSetFactory with NavigableSetFactory with SortedSetFactory {
   def implementationName: String =
     "java.util.TreeSet"
 
-  def empty[E: ClassTag]: ju.TreeSet[E] =
+  def empty[E : ClassTag]: ju.TreeSet[E] =
     new TreeSet[E]
 
   def empty[E](cmp: ju.Comparator[E]): ju.TreeSet[E] =
@@ -370,14 +370,15 @@ class TreeSetWithNullFactory extends TreeSetFactory {
   case class EvenNullComp[E]() extends Comparator[E] {
     def compare(a: E, b: E): Int =
       (Option(a), Option(b)) match {
-        case (Some(e1), Some(e2)) => e1.asInstanceOf[Comparable[E]].compareTo(e2)
+        case (Some(e1), Some(e2)) =>
+          e1.asInstanceOf[Comparable[E]].compareTo(e2)
         case (Some(e1), None) => -1
         case (None, Some(e2)) => 1
         case (None, None) => 0
       }
-    }
+  }
 
-  override def empty[E: ClassTag]: ju.TreeSet[E] =
+  override def empty[E : ClassTag]: ju.TreeSet[E] =
     new TreeSet[E](EvenNullComp[E]())
 
   override def allowsNullElement: Boolean = true

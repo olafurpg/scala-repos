@@ -2,11 +2,12 @@ package mesosphere.marathon.tasks
 
 import mesosphere.marathon.core.launcher.impl.TaskOpFactoryHelper
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{ MarathonSpec, MarathonTestHelper }
-import org.apache.mesos.{ Protos => Mesos }
-import org.scalatest.{ GivenWhenThen, Matchers }
+import mesosphere.marathon.{MarathonSpec, MarathonTestHelper}
+import org.apache.mesos.{Protos => Mesos}
+import org.scalatest.{GivenWhenThen, Matchers}
 
-class TaskOpFactoryHelperTest extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+class TaskOpFactoryHelperTest
+    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
 
   test("exception when newTask.taskId and taskInfo.id don't match") {
     val f = new Fixture
@@ -29,7 +30,8 @@ class TaskOpFactoryHelperTest extends MarathonSpec with GivenWhenThen with Mocki
 
     Given("a task and a taskInfo")
     val task = MarathonTestHelper.mininimalTask("123")
-    val taskInfo = MarathonTestHelper.makeOneCPUTask(task.taskId.idString).build()
+    val taskInfo =
+      MarathonTestHelper.makeOneCPUTask(task.taskId.idString).build()
 
     When("We create a launch operation")
     val launch = f.helper.launch(taskInfo, task)

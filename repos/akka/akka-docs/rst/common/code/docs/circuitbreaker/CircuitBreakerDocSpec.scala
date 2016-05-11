@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.circuitbreaker
 
 //#imports1
@@ -23,16 +22,18 @@ class DangerousActor extends Actor with ActorLogging {
 
   val breaker =
     new CircuitBreaker(context.system.scheduler,
-      maxFailures = 5,
-      callTimeout = 10.seconds,
-      resetTimeout = 1.minute).onOpen(notifyMeOnOpen())
+                       maxFailures = 5,
+                       callTimeout = 10.seconds,
+                       resetTimeout = 1.minute).onOpen(notifyMeOnOpen())
 
   def notifyMeOnOpen(): Unit =
-    log.warning("My CircuitBreaker is now open, and will not close for one minute")
+    log.warning(
+        "My CircuitBreaker is now open, and will not close for one minute")
   //#circuit-breaker-initialization
 
   //#circuit-breaker-usage
-  def dangerousCall: String = "This really isn't that dangerous of a call after all"
+  def dangerousCall: String =
+    "This really isn't that dangerous of a call after all"
 
   def receive = {
     case "is my middle name" =>
@@ -41,6 +42,4 @@ class DangerousActor extends Actor with ActorLogging {
       sender() ! breaker.withSyncCircuitBreaker(dangerousCall)
   }
   //#circuit-breaker-usage
-
 }
-

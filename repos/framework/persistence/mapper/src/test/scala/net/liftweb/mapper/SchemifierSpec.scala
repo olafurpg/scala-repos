@@ -21,15 +21,14 @@ import org.specs2.mutable.Specification
 
 import common._
 
-
 /**
- * Systems under specification for Schemifier.
- */
-object SchemifierSpec extends Specification  {
+  * Systems under specification for Schemifier.
+  */
+object SchemifierSpec extends Specification {
   "Schemifier Specification".title
 
   val provider = DbProviders.H2MemoryProvider
-  
+
   "Schemifier" should {
     "not crash in readonly if table doesn't exist" in {
       provider.setupDB
@@ -38,4 +37,3 @@ object SchemifierSpec extends Specification  {
     }
   }
 }
-

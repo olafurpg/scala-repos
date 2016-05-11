@@ -11,27 +11,38 @@ import org.jetbrains.plugins.scala.lang.psi.light.{ScFunctionWrapper, StaticPsiM
 import scala.collection.mutable
 
 /**
- * @author Alefas
- * @since 28.02.12
- */
-class JavaFunctionUsagesSearcher extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
-  def execute(queryParameters: ReferencesSearch.SearchParameters, consumer: Processor[PsiReference]): Boolean = {
+  * @author Alefas
+  * @since 28.02.12
+  */
+class JavaFunctionUsagesSearcher
+    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
+  def execute(queryParameters: ReferencesSearch.SearchParameters,
+              consumer: Processor[PsiReference]): Boolean = {
     val scope = inReadAction(queryParameters.getEffectiveSearchScope)
     val element = queryParameters.getElementToSearch
     element match {
       case scalaOrNonStatic(method) =>
         val name: String = method.getName
-        val collectedReferences: mutable.HashSet[PsiReference] = new mutable.HashSet[PsiReference]
+        val collectedReferences: mutable.HashSet[PsiReference] =
+          new mutable.HashSet[PsiReference]
         val processor = new TextOccurenceProcessor {
           def execute(element: PsiElement, offsetInElement: Int): Boolean = {
             val references = inReadAction(element.getReferences)
-            for (ref <- references if ref.getRangeInElement.contains(offsetInElement) && !collectedReferences.contains(ref)) {
+            for (ref <- references if ref.getRangeInElement
+                         .contains(offsetInElement) &&
+                       !collectedReferences.contains(ref)) {
               inReadAction {
                 ref match {
                   case refElement: PsiReferenceExpression =>
                     refElement.resolve match {
-                      case f: ScFunctionWrapper if f.function == method && !consumer.process(refElement) => return false
-                      case t: StaticPsiMethodWrapper if t.getNavigationElement == method && !consumer.process(refElement) => return false
+                      case f: ScFunctionWrapper
+                          if f.function == method &&
+                          !consumer.process(refElement) =>
+                        return false
+                      case t: StaticPsiMethodWrapper
+                          if t.getNavigationElement == method &&
+                          !consumer.process(refElement) =>
+                        return false
                       case _ =>
                     }
                   case _ =>
@@ -41,13 +52,14 @@ class JavaFunctionUsagesSearcher extends QueryExecutor[PsiReference, ReferencesS
             true
           }
         }
-        val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
+        val helper: PsiSearchHelper =
+          PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
         if (name == "") return true
-        helper.processElementsWithWord(processor, scope, name, UsageSearchContext.IN_CODE, true)
+        helper.processElementsWithWord(
+            processor, scope, name, UsageSearchContext.IN_CODE, true)
       case _ =>
     }
     true
-
   }
 
   private object scalaOrNonStatic {
@@ -56,7 +68,8 @@ class JavaFunctionUsagesSearcher extends QueryExecutor[PsiReference, ReferencesS
         if (!method.isValid) return None
         method match {
           case f: ScFunction => Some(f)
-          case m: PsiMethod if !m.hasModifierProperty(PsiModifier.STATIC) => Some(m)
+          case m: PsiMethod if !m.hasModifierProperty(PsiModifier.STATIC) =>
+            Some(m)
           case _ => None
         }
       }

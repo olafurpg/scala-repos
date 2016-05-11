@@ -1,3 +1,3 @@
 abstract class A() {
-  val v : Int
+  val v: Int
 }

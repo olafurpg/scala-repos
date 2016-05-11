@@ -33,11 +33,12 @@ object PolynomialExpansionExample {
 
     // $example on$
     val data = Array(
-      Vectors.dense(-2.0, 2.3),
-      Vectors.dense(0.0, 0.0),
-      Vectors.dense(0.6, -1.1)
+        Vectors.dense(-2.0, 2.3),
+        Vectors.dense(0.0, 0.0),
+        Vectors.dense(0.6, -1.1)
     )
-    val df = sqlContext.createDataFrame(data.map(Tuple1.apply)).toDF("features")
+    val df =
+      sqlContext.createDataFrame(data.map(Tuple1.apply)).toDF("features")
     val polynomialExpansion = new PolynomialExpansion()
       .setInputCol("features")
       .setOutputCol("polyFeatures")

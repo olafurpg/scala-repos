@@ -1,19 +1,19 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote.transport
 
 import akka.remote.transport.ThrottlerTransportAdapter._
 import akka.testkit.TimingTest
 import akka.testkit.DefaultTimeout
 import akka.testkit.ImplicitSender
-import akka.testkit.{ TimingTest, DefaultTimeout, ImplicitSender, AkkaSpec }
-import com.typesafe.config.{ Config, ConfigFactory }
+import akka.testkit.{TimingTest, DefaultTimeout, ImplicitSender, AkkaSpec}
+import com.typesafe.config.{Config, ConfigFactory}
 import akka.actor._
 import scala.concurrent.duration._
 import akka.testkit._
-import akka.remote.{ QuarantinedEvent, EndpointException, RARP }
-import akka.remote.transport.FailureInjectorTransportAdapter.{ One, Drop }
+import akka.remote.{QuarantinedEvent, EndpointException, RARP}
+import akka.remote.transport.FailureInjectorTransportAdapter.{One, Drop}
 import scala.concurrent.Await
 import akka.actor.ActorRef
 import akka.actor.Actor
@@ -26,7 +26,7 @@ import akka.remote.transport.FailureInjectorTransportAdapter.One
 import akka.remote.transport.FailureInjectorTransportAdapter.Drop
 import akka.testkit.TestEvent
 import akka.testkit.EventFilter
-import akka.dispatch.sysmsg.{ Failed, SystemMessage }
+import akka.dispatch.sysmsg.{Failed, SystemMessage}
 
 object SystemMessageDeliveryStressTest {
   val msgCount = 5000
@@ -60,7 +60,9 @@ object SystemMessageDeliveryStressTest {
     }
                                                    """)
 
-  private[akka] class SystemMessageSequenceVerifier(system: ActorSystem, testActor: ActorRef) extends MinimalActorRef {
+  private[akka] class SystemMessageSequenceVerifier(
+      system: ActorSystem, testActor: ActorRef)
+      extends MinimalActorRef {
     val provider = RARP(system).provider
     val path = provider.tempPath()
 
@@ -71,12 +73,16 @@ object SystemMessageDeliveryStressTest {
     override def sendSystemMessage(message: SystemMessage): Unit = {
       message match {
         case Failed(_, _, seq) ⇒ testActor ! seq
-        case _                 ⇒
+        case _ ⇒
       }
     }
   }
 
-  class SystemMessageSender(val msgCount: Int, val burstSize: Int, val burstDelay: FiniteDuration, val target: ActorRef) extends Actor {
+  class SystemMessageSender(val msgCount: Int,
+                            val burstSize: Int,
+                            val burstDelay: FiniteDuration,
+                            val target: ActorRef)
+      extends Actor {
     import context.dispatcher
 
     var counter = 0
@@ -100,13 +106,14 @@ object SystemMessageDeliveryStressTest {
         }
     }
   }
-
 }
 
 abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
-  extends AkkaSpec(ConfigFactory.parseString(cfg).withFallback(SystemMessageDeliveryStressTest.baseConfig))
-  with ImplicitSender
-  with DefaultTimeout {
+    extends AkkaSpec(
+        ConfigFactory
+          .parseString(cfg)
+          .withFallback(SystemMessageDeliveryStressTest.baseConfig))
+    with ImplicitSender with DefaultTimeout {
   import SystemMessageDeliveryStressTest._
 
   override def expectedTestDuration: FiniteDuration = 120.seconds
@@ -120,22 +127,26 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
   val sysMsgVerifierA = new SystemMessageSequenceVerifier(systemA, probeA.ref)
   val sysMsgVerifierB = new SystemMessageSequenceVerifier(systemB, probeB.ref)
 
-  val addressA = systemA.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
-  val addressB = systemB.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
+  val addressA =
+    systemA.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
+  val addressB =
+    systemB.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
 
   // We test internals here (system message delivery) so we are allowed to cheat
-  val targetForA = RARP(systemA).provider.resolveActorRef(RootActorPath(addressB) / "temp" / sysMsgVerifierB.path.name)
-  val targetForB = RARP(systemB).provider.resolveActorRef(RootActorPath(addressA) / "temp" / sysMsgVerifierA.path.name)
+  val targetForA = RARP(systemA).provider.resolveActorRef(
+      RootActorPath(addressB) / "temp" / sysMsgVerifierB.path.name)
+  val targetForB = RARP(systemB).provider.resolveActorRef(
+      RootActorPath(addressA) / "temp" / sysMsgVerifierA.path.name)
 
   override def atStartup() = {
-    systemA.eventStream.publish(TestEvent.Mute(
-      EventFilter[EndpointException](),
-      EventFilter.error(start = "AssociationError"),
-      EventFilter.warning(pattern = "received dead .*")))
-    systemB.eventStream.publish(TestEvent.Mute(
-      EventFilter[EndpointException](),
-      EventFilter.error(start = "AssociationError"),
-      EventFilter.warning(pattern = "received dead .*")))
+    systemA.eventStream.publish(
+        TestEvent.Mute(EventFilter[EndpointException](),
+                       EventFilter.error(start = "AssociationError"),
+                       EventFilter.warning(pattern = "received dead .*")))
+    systemB.eventStream.publish(
+        TestEvent.Mute(EventFilter[EndpointException](),
+                       EventFilter.error(start = "AssociationError"),
+                       EventFilter.warning(pattern = "received dead .*")))
 
     systemA.eventStream.subscribe(probeA.ref, classOf[QuarantinedEvent])
     systemB.eventStream.subscribe(probeB.ref, classOf[QuarantinedEvent])
@@ -148,20 +159,34 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
       val transportA = RARP(systemA).provider.transport
       val transportB = RARP(systemB).provider.transport
 
-      Await.result(transportA.managementCommand(One(addressB, Drop(0.1, 0.1))), 3.seconds.dilated)
-      Await.result(transportB.managementCommand(One(addressA, Drop(0.1, 0.1))), 3.seconds.dilated)
+      Await.result(transportA.managementCommand(One(addressB, Drop(0.1, 0.1))),
+                   3.seconds.dilated)
+      Await.result(transportB.managementCommand(One(addressA, Drop(0.1, 0.1))),
+                   3.seconds.dilated)
 
       // Schedule peridodic disassociates
       systemA.scheduler.schedule(3.second, 8.seconds) {
-        transportA.managementCommand(ForceDisassociateExplicitly(addressB, reason = AssociationHandle.Unknown))
+        transportA.managementCommand(ForceDisassociateExplicitly(
+                addressB, reason = AssociationHandle.Unknown))
       }
 
       systemB.scheduler.schedule(7.seconds, 8.seconds) {
-        transportB.managementCommand(ForceDisassociateExplicitly(addressA, reason = AssociationHandle.Unknown))
+        transportB.managementCommand(ForceDisassociateExplicitly(
+                addressA, reason = AssociationHandle.Unknown))
       }
 
-      systemB.actorOf(Props(classOf[SystemMessageSender], msgCount, burstSize, burstDelay, targetForB))
-      systemA.actorOf(Props(classOf[SystemMessageSender], msgCount, burstSize, burstDelay, targetForA))
+      systemB.actorOf(
+          Props(classOf[SystemMessageSender],
+                msgCount,
+                burstSize,
+                burstDelay,
+                targetForB))
+      systemA.actorOf(
+          Props(classOf[SystemMessageSender],
+                msgCount,
+                burstSize,
+                burstDelay,
+                targetForA))
 
       val toSend = (0 until msgCount).toList
       var maxDelay = 0L
@@ -170,29 +195,38 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
         val start = System.currentTimeMillis()
         probeB.expectMsg(10.minutes, m)
         probeA.expectMsg(10.minutes, m)
-        maxDelay = math.max(maxDelay, (System.currentTimeMillis() - start) / 1000)
+        maxDelay = math.max(maxDelay,
+                            (System.currentTimeMillis() - start) / 1000)
       }
     }
   }
 
   override def beforeTermination() {
-    system.eventStream.publish(TestEvent.Mute(
-      EventFilter.warning(source = "akka://AkkaProtocolStressTest/user/$a", start = "received dead letter"),
-      EventFilter.warning(pattern = "received dead letter.*(InboundPayload|Disassociate)")))
-    systemB.eventStream.publish(TestEvent.Mute(
-      EventFilter[EndpointException](),
-      EventFilter.error(start = "AssociationError"),
-      EventFilter.warning(pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+    system.eventStream.publish(
+        TestEvent.Mute(
+            EventFilter.warning(
+                source = "akka://AkkaProtocolStressTest/user/$a",
+                start = "received dead letter"),
+            EventFilter.warning(
+                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+    systemB.eventStream.publish(
+        TestEvent.Mute(
+            EventFilter[EndpointException](),
+            EventFilter.error(start = "AssociationError"),
+            EventFilter.warning(
+                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
   }
 
   override def afterTermination(): Unit = shutdown(systemB)
-
 }
 
-class SystemMessageDeliveryRetryGate extends SystemMessageDeliveryStressTest("passive connections on",
-  "akka.remote.retry-gate-closed-for = 0.5 s")
-class SystemMessageDeliveryNoPassiveRetryGate extends SystemMessageDeliveryStressTest("passive connections off",
-  """
+class SystemMessageDeliveryRetryGate
+    extends SystemMessageDeliveryStressTest(
+        "passive connections on", "akka.remote.retry-gate-closed-for = 0.5 s")
+class SystemMessageDeliveryNoPassiveRetryGate
+    extends SystemMessageDeliveryStressTest(
+        "passive connections off",
+        """
     akka.remote.use-passive-connections = off
     akka.remote.retry-gate-closed-for = 0.5 s
   """)

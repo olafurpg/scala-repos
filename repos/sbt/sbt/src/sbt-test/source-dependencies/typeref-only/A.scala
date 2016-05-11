@@ -1,5 +1,5 @@
 class A[T]
 
 abstract class C {
-	def foo: A[B]
+  def foo: A[B]
 }

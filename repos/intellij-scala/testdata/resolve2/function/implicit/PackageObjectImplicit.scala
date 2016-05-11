@@ -3,11 +3,9 @@ package object holder {
 }
 
 package holder {
-	class C {
-  	def f(implicit i: Int) = {}
+  class C {
+    def f(implicit i: Int) = {}
 
-  	println(/* line: 7 */ f)
-	}
+    println( /* line: 7 */ f)
+  }
 }
-
-

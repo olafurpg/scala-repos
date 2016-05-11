@@ -28,31 +28,31 @@ import scala.annotation.tailrec
 private[math] object Multiplication {
 
   /** An array of powers of ten.
-   *
-   *  An array with powers of ten that fit in the type
-   *  {@code int}.({@code 10^0,10^1,...,10^9})
-   */
+    *
+    *  An array with powers of ten that fit in the type
+    *  {@code int}.({@code 10^0,10^1,...,10^9})
+    */
   private val TenPows = newArrayOfPows(10, 10)
 
   /** An array of powers of five.
-   *
-   *  An array with powers of five that fit in the type
-   *  {@code int}.({@code 5^0,5^1,...,5^13})
-   */
+    *
+    *  An array with powers of five that fit in the type
+    *  {@code int}.({@code 5^0,5^1,...,5^13})
+    */
   private val FivePows = newArrayOfPows(14, 5)
 
   /** An array of {@code BigInteger} of powers of ten.
-   *
-   *  An array with the first powers of ten in {@code BigInteger} version.
-   *  ({@code 10^0,10^1,...,10^31})
-   */
+    *
+    *  An array with the first powers of ten in {@code BigInteger} version.
+    *  ({@code 10^0,10^1,...,10^31})
+    */
   private[math] val BigTenPows = new Array[BigInteger](32)
 
   /** An array of {@code BigInteger} of powers of five.
-   *
-   *  An array with the first powers of five in {@code BigInteger} version.
-   *  ({@code 5^0,5^1,...,5^31})
-   */
+    *
+    *  An array with the first powers of five in {@code BigInteger} version.
+    *  ({@code 5^0,5^1,...,5^31})
+    */
   private[math] val BigFivePows = new Array[BigInteger](32)
 
   private final val whenUseKaratsuba = 63
@@ -60,21 +60,21 @@ private[math] object Multiplication {
   initialiseArrays()
 
   /** Multiplies an array of integers by an integer value.
-   *
-   *  @param a the array of integers
-   *  @param aSize the number of elements of intArray to be multiplied
-   *  @param factor the multiplier
-   *  @return the top digit of production
-   */
+    *
+    *  @param a the array of integers
+    *  @param aSize the number of elements of intArray to be multiplied
+    *  @param factor the multiplier
+    *  @return the top digit of production
+    */
   def multiplyByInt(a: Array[Int], aSize: Int, factor: Int): Int =
     multiplyByInt(a, a, aSize, factor)
 
   /** Multiplies a number by a positive integer.
-   *
-   *  @param bi an arbitrary {@code BigInteger}
-   *  @param factor a positive {@code int} number
-   *  @return {@code val * factor}
-   */
+    *
+    *  @param bi an arbitrary {@code BigInteger}
+    *  @param factor a positive {@code int} number
+    *  @return {@code val * factor}
+    */
   def multiplyByPosInt(bi: BigInteger, factor: Int): BigInteger = {
     val resSign: Int = bi.sign
     val aNumberLength = bi.numberLength
@@ -91,7 +91,8 @@ private[math] object Multiplication {
     } else {
       val resLength = aNumberLength + 1
       val resDigits = new Array[Int](resLength)
-      resDigits(aNumberLength) = multiplyByInt(resDigits, aDigits, aNumberLength, factor)
+      resDigits(aNumberLength) = multiplyByInt(
+          resDigits, aDigits, aNumberLength, factor)
       val result = new BigInteger(resSign, resLength, resDigits)
       result.cutOffLeadingZeroes()
       result
@@ -99,23 +100,23 @@ private[math] object Multiplication {
   }
 
   /** Multiplies a number by a power of ten.
-   *
-   *  This method is used in {@code BigDecimal} class.
-   *
-   *  @param bi the number to be multiplied
-   *  @param exp a positive {@code long} exponent
-   *  @return {@code val * 10<sup>exp</sup>}
-   */
+    *
+    *  This method is used in {@code BigDecimal} class.
+    *
+    *  @param bi the number to be multiplied
+    *  @param exp a positive {@code long} exponent
+    *  @return {@code val * 10<sup>exp</sup>}
+    */
   def multiplyByTenPow(bi: BigInteger, exp: Long): BigInteger = {
     if (exp < TenPows.length) multiplyByPosInt(bi, TenPows(exp.toInt))
     else bi.multiply(powerOf10(exp))
   }
 
   /** Performs a<sup>2</sup>.
-   *
-   *  @param a The number to square.
-   *  @param aLen The length of the number to square.
-   */
+    *
+    *  @param a The number to square.
+    *  @param aLen The length of the number to square.
+    */
   def square(a: Array[Int], aLen: Int, res: Array[Int]): Array[Int] = {
     var carry = 0
 
@@ -146,33 +147,34 @@ private[math] object Multiplication {
   }
 
   /** Computes the value unsigned ((uint)a*(uint)b + (uint)c + (uint)d).
-   *
-   *  @param a parameter 1
-   *  @param b parameter 2
-   *  @param c parameter 3
-   *  @param d parameter 4
-   *  @return value of expression
-   */
+    *
+    *  @param a parameter 1
+    *  @param b parameter 2
+    *  @param c parameter 3
+    *  @param d parameter 4
+    *  @return value of expression
+    */
   def unsignedMultAddAdd(a: Int, b: Int, c: Int, d: Int): Long =
-    (a & 0xFFFFFFFFL) * (b & 0xFFFFFFFFL) + (c & 0xFFFFFFFFL) + (d & 0xFFFFFFFFL)
+    (a & 0xFFFFFFFFL) * (b & 0xFFFFFFFFL) + (c & 0xFFFFFFFFL) +
+    (d & 0xFFFFFFFFL)
 
   /** Performs the multiplication with the Karatsuba's algorithm.
-   *
-   *  <b>Karatsuba's algorithm:</b> <tt>
-   *              u = u<sub>1</sub> * B + u<sub>0</sub><br>
-   *              v = v<sub>1</sub> * B + v<sub>0</sub><br>
-   *
-   *   u*v = (u<sub>1</sub> * v<sub>1</sub>) * B<sub>2</sub> +
-   *     ((u<sub>1</sub> - u<sub>0</sub>) * (v<sub>0</sub> - v<sub>1</sub>) +
-   *       u<sub>1</sub> * v<sub>1</sub> + u<sub>0</sub> * v<sub>0</sub>) * B +
-   *     u<sub>0</sub> * v<sub>0</sub><br>
-   *  </tt>
-   *
-   *  @param op1 first factor of the product
-   *  @param op2 second factor of the product
-   *  @return {@code op1 * op2}
-   *  @see #multiply(BigInteger, BigInteger)
-   */
+    *
+    *  <b>Karatsuba's algorithm:</b> <tt>
+    *              u = u<sub>1</sub> * B + u<sub>0</sub><br>
+    *              v = v<sub>1</sub> * B + v<sub>0</sub><br>
+    *
+    *   u*v = (u<sub>1</sub> * v<sub>1</sub>) * B<sub>2</sub> +
+    *     ((u<sub>1</sub> - u<sub>0</sub>) * (v<sub>0</sub> - v<sub>1</sub>) +
+    *       u<sub>1</sub> * v<sub>1</sub> + u<sub>0</sub> * v<sub>0</sub>) * B +
+    *     u<sub>0</sub> * v<sub>0</sub><br>
+    *  </tt>
+    *
+    *  @param op1 first factor of the product
+    *  @param op2 second factor of the product
+    *  @return {@code op1 * op2}
+    *  @see #multiply(BigInteger, BigInteger)
+    */
   def karatsuba(val1: BigInteger, val2: BigInteger): BigInteger = {
     val (op1, op2) =
       if (val2.numberLength > val1.numberLength) (val2, val1)
@@ -193,7 +195,8 @@ private[math] object Multiplication {
 
       var upper = karatsuba(upperOp1, upperOp2)
       val lower = karatsuba(lowerOp1, lowerOp2)
-      var middle = karatsuba(upperOp1.subtract(lowerOp1), lowerOp2.subtract(upperOp2))
+      var middle = karatsuba(
+          upperOp1.subtract(lowerOp1), lowerOp2.subtract(upperOp2))
       middle = middle.add(upper).add(lower)
       middle = middle.shiftLeft(ndiv2)
       upper = upper.shiftLeft(ndiv2 << 1)
@@ -201,108 +204,110 @@ private[math] object Multiplication {
     }
   }
 
-  def multArraysPAP(aDigits: Array[Int], aLen: Int, bDigits: Array[Int],
-      bLen: Int, resDigits: Array[Int]): Unit = {
+  def multArraysPAP(aDigits: Array[Int],
+                    aLen: Int,
+                    bDigits: Array[Int],
+                    bLen: Int,
+                    resDigits: Array[Int]): Unit = {
     if (!(aLen == 0 || bLen == 0)) {
       if (aLen == 1)
         resDigits(bLen) = multiplyByInt(resDigits, bDigits, bLen, aDigits(0))
       else if (bLen == 1)
         resDigits(aLen) = multiplyByInt(resDigits, aDigits, aLen, bDigits(0))
-      else
-        multPAP(aDigits, bDigits, resDigits, aLen, bLen)
+      else multPAP(aDigits, bDigits, resDigits, aLen, bLen)
     }
   }
 
   def multiply(x: BigInteger, y: BigInteger): BigInteger = karatsuba(x, y)
 
   /** Multiplies two BigIntegers.
-   *
-   *  Implements traditional scholar algorithmdescribed by Knuth.
-   *
-   *  <br>
-   *  <tt>
-   *          <table border="0">
-   *  <tbody>
-   *
-   *
-   *  <tr>
-   *  <td align="center">A=</td>
-   *  <td>a<sub>3</sub></td>
-   *  <td>a<sub>2</sub></td>
-   *  <td>a<sub>1</sub></td>
-   *  <td>a<sub>0</sub></td>
-   *  <td></td>
-   *  <td></td>
-   *  </tr>
-   *
-   *  <tr>
-   *  <td align="center">B=</td>
-   *  <td></td>
-   *  <td>b<sub>2</sub></td>
-   *  <td>b<sub>1</sub></td>
-   *  <td>b<sub>1</sub></td>
-   *  <td></td>
-   *  <td></td>
-   *  </tr>
-   *
-   *  <tr>
-   *  <td></td>
-   *  <td></td>
-   *  <td></td>
-   *  <td>b<sub>0</sub>*a<sub>3</sub></td>
-   *  <td>b<sub>0</sub>*a<sub>2</sub></td>
-   *  <td>b<sub>0</sub>*a<sub>1</sub></td>
-   *  <td>b<sub>0</sub>*a<sub>0</sub></td>
-   *  </tr>
-   *
-   *  <tr>
-   *  <td></td>
-   *  <td></td>
-   *  <td>b<sub>1</sub>*a<sub>3</sub></td>
-   *  <td>b<sub>1</sub>*a<sub>2</sub></td>
-   *  <td>b<sub>1</sub>*a1</td>
-   *  <td>b<sub>1</sub>*a0</td>
-   *  </tr>
-   *
-   *  <tr>
-   *  <td>+</td>
-   *  <td>b<sub>2</sub>*a<sub>3</sub></td>
-   *  <td>b<sub>2</sub>*a<sub>2</sub></td>
-   *  <td>b<sub>2</sub>*a<sub>1</sub></td>
-   *  <td>b<sub>2</sub>*a<sub>0</sub></td>
-   *  </tr>
-   *
-   *  <tr>
-   *  <td></td>
-   *  <td>______</td>
-   *  <td>______</td>
-   *  <td>______</td>
-   *  <td>______</td>
-   *  <td>______</td>
-   *  <td>______</td>
-   *  </tr>
-   *
-   *  <tr>
-   *
-   *  <td align="center">A*B=R=</td>
-   *  <td align="center">r<sub>5</sub></td>
-   *  <td align="center">r<sub>4</sub></td>
-   *  <td align="center">r<sub>3</sub></td>
-   *  <td align="center">r<sub>2</sub></td>
-   *  <td align="center">r<sub>1</sub></td>
-   *  <td align="center">r<sub>0</sub></td>
-   *  <td></td>
-   *  </tr>
-   *
-   *  </tbody>
-   *  </table>
-   *
-   * </tt>
-   *
-   *  @param op1 first factor of the multiplication {@code op1 >= 0}
-   *  @param op2 second factor of the multiplication {@code op2 >= 0}
-   *  @return a {@code BigInteger} of value {@code op1 * op2}
-   */
+    *
+    *  Implements traditional scholar algorithmdescribed by Knuth.
+    *
+    *  <br>
+    *  <tt>
+    *          <table border="0">
+    *  <tbody>
+    *
+    *
+    *  <tr>
+    *  <td align="center">A=</td>
+    *  <td>a<sub>3</sub></td>
+    *  <td>a<sub>2</sub></td>
+    *  <td>a<sub>1</sub></td>
+    *  <td>a<sub>0</sub></td>
+    *  <td></td>
+    *  <td></td>
+    *  </tr>
+    *
+    *  <tr>
+    *  <td align="center">B=</td>
+    *  <td></td>
+    *  <td>b<sub>2</sub></td>
+    *  <td>b<sub>1</sub></td>
+    *  <td>b<sub>1</sub></td>
+    *  <td></td>
+    *  <td></td>
+    *  </tr>
+    *
+    *  <tr>
+    *  <td></td>
+    *  <td></td>
+    *  <td></td>
+    *  <td>b<sub>0</sub>*a<sub>3</sub></td>
+    *  <td>b<sub>0</sub>*a<sub>2</sub></td>
+    *  <td>b<sub>0</sub>*a<sub>1</sub></td>
+    *  <td>b<sub>0</sub>*a<sub>0</sub></td>
+    *  </tr>
+    *
+    *  <tr>
+    *  <td></td>
+    *  <td></td>
+    *  <td>b<sub>1</sub>*a<sub>3</sub></td>
+    *  <td>b<sub>1</sub>*a<sub>2</sub></td>
+    *  <td>b<sub>1</sub>*a1</td>
+    *  <td>b<sub>1</sub>*a0</td>
+    *  </tr>
+    *
+    *  <tr>
+    *  <td>+</td>
+    *  <td>b<sub>2</sub>*a<sub>3</sub></td>
+    *  <td>b<sub>2</sub>*a<sub>2</sub></td>
+    *  <td>b<sub>2</sub>*a<sub>1</sub></td>
+    *  <td>b<sub>2</sub>*a<sub>0</sub></td>
+    *  </tr>
+    *
+    *  <tr>
+    *  <td></td>
+    *  <td>______</td>
+    *  <td>______</td>
+    *  <td>______</td>
+    *  <td>______</td>
+    *  <td>______</td>
+    *  <td>______</td>
+    *  </tr>
+    *
+    *  <tr>
+    *
+    *  <td align="center">A*B=R=</td>
+    *  <td align="center">r<sub>5</sub></td>
+    *  <td align="center">r<sub>4</sub></td>
+    *  <td align="center">r<sub>3</sub></td>
+    *  <td align="center">r<sub>2</sub></td>
+    *  <td align="center">r<sub>1</sub></td>
+    *  <td align="center">r<sub>0</sub></td>
+    *  <td></td>
+    *  </tr>
+    *
+    *  </tbody>
+    *  </table>
+    *
+    * </tt>
+    *
+    *  @param op1 first factor of the multiplication {@code op1 >= 0}
+    *  @param op2 second factor of the multiplication {@code op2 >= 0}
+    *  @return a {@code BigInteger} of value {@code op1 * op2}
+    */
   def multiplyPAP(a: BigInteger, b: BigInteger): BigInteger = {
     val aLen = a.numberLength
     val bLen = b.numberLength
@@ -355,21 +360,23 @@ private[math] object Multiplication {
   }
 
   /** Calculates a power of ten, which exponent could be out of 32-bit range.
-   *
-   *  Note that internally this method will be used in the worst case with
-   *  an exponent equals to: {@code Integer.MAX_VALUE - Integer.MIN_VALUE}.
-   *  @param exp the exponent of power of ten, it must be positive.
-   *  @return a {@code BigInteger} with value {@code 10<sup>exp</sup>}.
-   */
+    *
+    *  Note that internally this method will be used in the worst case with
+    *  an exponent equals to: {@code Integer.MAX_VALUE - Integer.MIN_VALUE}.
+    *  @param exp the exponent of power of ten, it must be positive.
+    *  @return a {@code BigInteger} with value {@code 10<sup>exp</sup>}.
+    */
   def powerOf10(exp: Long): BigInteger = {
     // "SMALL POWERS"
     if (exp < BigTenPows.length) {
       BigTenPows(exp.toInt)
     } else if (exp <= 50) {
       BigInteger.TEN.pow(exp.toInt)
-    } else if (exp <= Int.MaxValue) { // "LARGE POWERS"
+    } else if (exp <= Int.MaxValue) {
+      // "LARGE POWERS"
       BigFivePows(1).pow(exp.toInt).shiftLeft(exp.toInt)
-    } else { //"HUGE POWERS"
+    } else {
+      //"HUGE POWERS"
       val powerOfFive = BigFivePows(1).pow(Integer.MAX_VALUE)
       var res: BigInteger = powerOfFive
       var longExp = exp - Int.MaxValue
@@ -390,12 +397,12 @@ private[math] object Multiplication {
   }
 
   /** Multiplies a number by a power of five.
-   *
-   *  This method is used in {@code BigDecimal} class.
-   *  @param val the number to be multiplied
-   *  @param exp a positive {@code int} exponent
-   *  @return {@code val * 5<sup>exp</sup>}
-   */
+    *
+    *  This method is used in {@code BigDecimal} class.
+    *  @param val the number to be multiplied
+    *  @param exp a positive {@code int} exponent
+    *  @return {@code val * 5<sup>exp</sup>}
+    */
   def multiplyByFivePow(bi: BigInteger, exp: Int): BigInteger = {
     if (exp < FivePows.length) multiplyByPosInt(bi, FivePows(exp))
     else if (exp < BigFivePows.length) bi.multiply(BigFivePows(exp))
@@ -416,8 +423,8 @@ private[math] object Multiplication {
     }
   }
 
-  private def multiplyByInt(res: Array[Int], a: Array[Int], aSize: Int,
-      factor: Int): Int = {
+  private def multiplyByInt(
+      res: Array[Int], a: Array[Int], aSize: Int, factor: Int): Int = {
     var carry = 0
     for (i <- 0 until aSize) {
       val t = unsignedMultAddAdd(a(i), factor, carry, 0)
@@ -427,8 +434,11 @@ private[math] object Multiplication {
     carry
   }
 
-  private def multPAP(a: Array[Int], b: Array[Int], t: Array[Int],
-      aLen: Int, bLen: Int): Unit = {
+  private def multPAP(a: Array[Int],
+                      b: Array[Int],
+                      t: Array[Int],
+                      aLen: Int,
+                      bLen: Int): Unit = {
     if (a == b && aLen == bLen) {
       square(a, aLen, t)
     } else {

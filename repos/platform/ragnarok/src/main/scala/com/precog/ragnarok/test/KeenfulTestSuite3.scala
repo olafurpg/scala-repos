@@ -22,8 +22,7 @@ package ragnarok
 package test
 
 object KeenfulTestSuite3 extends PerfTestSuite {
-  query(
-    """
+  query("""
 import std::stats::rank
 data := //keenful
 

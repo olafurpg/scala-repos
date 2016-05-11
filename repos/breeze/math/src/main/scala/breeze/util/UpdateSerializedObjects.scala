@@ -21,17 +21,18 @@ package breeze.util
 import java.io.File
 
 /**
- * Class that reads in objects serialized with [[breeze.util.writeObject]], ignoring their serialversionuids,
- * and then writes them to the same file.
- *
- * @author dlwh
- */
+  * Class that reads in objects serialized with [[breeze.util.writeObject]], ignoring their serialversionuids,
+  * and then writes them to the same file.
+  *
+  * @author dlwh
+  */
 object UpdateSerializedObjects {
 
   def main(args: Array[String]): Unit = {
-    for(a <- args) {
-      breeze.util.writeObject[AnyRef](new File(a), breeze.util.readObject(new File(a), ignoreSerialVersionUID = true))
+    for (a <- args) {
+      breeze.util.writeObject[AnyRef](
+          new File(a),
+          breeze.util.readObject(new File(a), ignoreSerialVersionUID = true))
     }
   }
-
 }

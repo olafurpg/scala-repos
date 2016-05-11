@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.metrics
 
 import language.postfixOps
@@ -22,13 +21,15 @@ class ClusterMetricsSettingsSpec extends AkkaSpec {
       // Extension.
       MetricsDispatcher should ===(Dispatchers.DefaultDispatcherId)
       PeriodicTasksInitialDelay should ===(1 second)
-      NativeLibraryExtractFolder should ===(System.getProperty("user.dir") + "/native")
+      NativeLibraryExtractFolder should ===(
+          System.getProperty("user.dir") + "/native")
 
       // Supervisor.
       SupervisorName should ===("cluster-metrics")
-      SupervisorStrategyProvider should ===(classOf[ClusterMetricsStrategy].getName)
-      SupervisorStrategyConfiguration should ===(
-        ConfigFactory.parseString("loggingEnabled=true,maxNrOfRetries=3,withinTimeRange=3s"))
+      SupervisorStrategyProvider should ===(
+          classOf[ClusterMetricsStrategy].getName)
+      SupervisorStrategyConfiguration should ===(ConfigFactory.parseString(
+              "loggingEnabled=true,maxNrOfRetries=3,withinTimeRange=3s"))
 
       // Collector.
       CollectorEnabled should ===(true)

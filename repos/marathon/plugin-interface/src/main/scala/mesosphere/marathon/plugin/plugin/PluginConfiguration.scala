@@ -15,5 +15,4 @@ trait PluginConfiguration { self: Plugin =>
     * @param configuration the json configuration from the plugin descriptor.
     */
   def initialize(marathonInfo: Map[String, Any], configuration: JsObject): Unit
-
 }

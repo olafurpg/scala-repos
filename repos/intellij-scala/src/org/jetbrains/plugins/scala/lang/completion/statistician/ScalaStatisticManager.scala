@@ -8,12 +8,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScVariable, ScValue,
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTrait, ScClass, ScObject}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
-
 object ScalaStatisticManager {
   def memberKey(element: PsiElement): Option[String] = {
     val value = element match {
-      case f: ScFunction => s"function#${f.name}" +
-        f.parameters.map(p => "#" + p.getType(TypingContext.empty).getOrAny.presentableText).mkString
+      case f: ScFunction =>
+        s"function#${f.name}" + f.parameters
+          .map(p =>
+                "#" + p.getType(TypingContext.empty).getOrAny.presentableText)
+          .mkString
       case o: ScObject => s"object#${o.qualifiedName}"
       case c: ScClass => s"class#${c.qualifiedName}"
       case t: ScTrait => s"trait#${t.qualifiedName}"

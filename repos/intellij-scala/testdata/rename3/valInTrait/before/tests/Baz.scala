@@ -1,11 +1,11 @@
 package tests
 
 trait Baz {
-  val bar/*caret*/ = 0
+  val bar /*caret*/ = 0
 
   def foo() = {
-    bar/*caret*/ match {
-      case `bar`/*caret*/ =>
+    bar /*caret*/ match {
+      case `bar` /*caret*/ =>
       case _ =>
     }
   }
@@ -22,6 +22,6 @@ object BazInst extends Baz {
 object Test {
   def foo(i: Int = BazInst.bar) = {
     BazInst.bar.toString
-    (new BazClass)./*caret*/bar_=(3)
+    (new BazClass). /*caret*/ bar_=(3)
   }
 }

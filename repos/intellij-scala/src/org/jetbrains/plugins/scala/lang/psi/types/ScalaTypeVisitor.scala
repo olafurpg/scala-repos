@@ -4,10 +4,9 @@ package types
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue._
 
 /**
- * User: Alefas
- * Date: 28.09.11
- */
-
+  * User: Alefas
+  * Date: 28.09.11
+  */
 trait ScalaTypeVisitor {
   def visitStdType(x: StdType) {}
   def visitCompoundType(c: ScCompoundType) {}

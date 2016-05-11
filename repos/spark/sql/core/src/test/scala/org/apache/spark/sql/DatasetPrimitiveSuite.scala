@@ -32,32 +32,24 @@ class DatasetPrimitiveSuite extends QueryTest with SharedSQLContext {
 
   test("toDS") {
     val data = Seq(1, 2, 3, 4, 5, 6)
-    checkDataset(
-      data.toDS(),
-      data: _*)
+    checkDataset(data.toDS(), data: _*)
   }
 
   test("as case class / collect") {
     val ds = Seq(1, 2, 3).toDS().as[IntClass]
-    checkDataset(
-      ds,
-      IntClass(1), IntClass(2), IntClass(3))
+    checkDataset(ds, IntClass(1), IntClass(2), IntClass(3))
 
     assert(ds.collect().head == IntClass(1))
   }
 
   test("map") {
     val ds = Seq(1, 2, 3).toDS()
-    checkDataset(
-      ds.map(_ + 1),
-      2, 3, 4)
+    checkDataset(ds.map(_ + 1), 2, 3, 4)
   }
 
   test("filter") {
     val ds = Seq(1, 2, 3, 4).toDS()
-    checkDataset(
-      ds.filter(_ % 2 == 0),
-      2, 4)
+    checkDataset(ds.filter(_ % 2 == 0), 2, 4)
   }
 
   test("foreach") {
@@ -82,32 +74,29 @@ class DatasetPrimitiveSuite extends QueryTest with SharedSQLContext {
   test("groupBy function, keys") {
     val ds = Seq(1, 2, 3, 4, 5).toDS()
     val grouped = ds.groupByKey(_ % 2)
-    checkDataset(
-      grouped.keys,
-      0, 1)
+    checkDataset(grouped.keys, 0, 1)
   }
 
   test("groupBy function, map") {
     val ds = Seq(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11).toDS()
     val grouped = ds.groupByKey(_ % 2)
-    val agged = grouped.mapGroups { case (g, iter) =>
-      val name = if (g == 0) "even" else "odd"
-      (name, iter.size)
+    val agged = grouped.mapGroups {
+      case (g, iter) =>
+        val name = if (g == 0) "even" else "odd"
+        (name, iter.size)
     }
 
-    checkDataset(
-      agged,
-      ("even", 5), ("odd", 6))
+    checkDataset(agged, ("even", 5), ("odd", 6))
   }
 
   test("groupBy function, flatMap") {
     val ds = Seq("a", "b", "c", "xyz", "hello").toDS()
     val grouped = ds.groupByKey(_.length)
-    val agged = grouped.flatMapGroups { case (g, iter) => Iterator(g.toString, iter.mkString) }
+    val agged = grouped.flatMapGroups {
+      case (g, iter) => Iterator(g.toString, iter.mkString)
+    }
 
-    checkDataset(
-      agged,
-      "1", "abc", "3", "xyz", "5", "hello")
+    checkDataset(agged, "1", "abc", "3", "xyz", "5", "hello")
   }
 
   test("Arrays and Lists") {
@@ -136,5 +125,4 @@ class DatasetPrimitiveSuite extends QueryTest with SharedSQLContext {
     import packageobject._
     checkDataset(Seq(PackageClass(1)).toDS(), PackageClass(1))
   }
-
 }

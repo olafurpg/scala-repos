@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data
 
 import org.joda.time.DateTime
@@ -38,13 +37,12 @@ private[prediction] object Utils {
       dateTimeFormatter.parseDateTime(dt)
     } catch {
       case e: IllegalArgumentException => {
-        // handle when the datetime string doesn't specify milliseconds.
-        dateTimeNoMillisFormatter.parseDateTime(dt)
-      }
+          // handle when the datetime string doesn't specify milliseconds.
+          dateTimeNoMillisFormatter.parseDateTime(dt)
+        }
     }
   }
 
   def dateTimeToString(dt: DateTime): String = dateTimeFormatter.print(dt)
-    // dt.toString
-
+  // dt.toString
 }

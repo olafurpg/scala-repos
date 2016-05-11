@@ -25,19 +25,22 @@ class DefaultMethodTest extends ClearAfterClass {
     val code = "package pack { trait T { def foo: Int }}"
     object makeFooDefaultMethod extends Transformer {
       val Foo = TermName("foo")
+
       /** Transforms a single tree. */
       override def transform(tree: compiler.Tree): compiler.Tree = tree match {
         case dd @ DefDef(_, Foo, _, _, _, _) =>
           dd.symbol.setFlag(reflect.internal.Flags.JAVA_DEFAULTMETHOD)
-          copyDefDef(dd)(rhs = Literal(Constant(1)).setType(definitions.IntTpe))
+          copyDefDef(dd)(
+              rhs = Literal(Constant(1)).setType(definitions.IntTpe))
         case _ => super.transform(tree)
       }
     }
-    val asmClasses: List[ClassNode] = readAsmClasses(compileTransformed(compiler)(code, Nil, makeFooDefaultMethod.transform(_)))
+    val asmClasses: List[ClassNode] = readAsmClasses(
+        compileTransformed(compiler)(
+            code, Nil, makeFooDefaultMethod.transform(_)))
     val foo = asmClasses.head.methods.iterator.asScala.toList.last
-    assertTrue("default method should not be abstract", (foo.access & Opcodes.ACC_ABSTRACT) == 0)
+    assertTrue("default method should not be abstract",
+               (foo.access & Opcodes.ACC_ABSTRACT) == 0)
     assertTrue("default method body emitted", foo.instructions.size() > 0)
   }
-
-
 }

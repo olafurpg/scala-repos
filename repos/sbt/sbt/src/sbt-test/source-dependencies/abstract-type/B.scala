@@ -1,3 +1,3 @@
 trait B extends A {
-	type F = S[Int]
+  type F = S[Int]
 }

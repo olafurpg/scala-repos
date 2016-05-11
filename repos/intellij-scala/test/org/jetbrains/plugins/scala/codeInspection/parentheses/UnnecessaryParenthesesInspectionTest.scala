@@ -5,15 +5,16 @@ import com.intellij.codeInspection.LocalInspectionTool
 import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTestAdapter
 
 /**
- * Nikolay.Tropin
- * 4/29/13
- */
-class UnnecessaryParenthesesInspectionTest extends ScalaLightInspectionFixtureTestAdapter{
+  * Nikolay.Tropin
+  * 4/29/13
+  */
+class UnnecessaryParenthesesInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
 
   val annotation = "Unnecessary parentheses"
   val hintBeginning = "Remove unnecessary parentheses"
-  protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[ScalaUnnecessaryParenthesesInspection]
-
+  protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[ScalaUnnecessaryParenthesesInspection]
 
   def test_1(): Unit = {
     val selected = START + "(1 + 1)" + END
@@ -31,7 +32,7 @@ class UnnecessaryParenthesesInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def test_3(): Unit = {
-    val selected  = s"""
+    val selected = s"""
                   |def f(n: Int): Int = n match {
                   |  case even if $START(<caret>even % 2 == 0)$END => (even + 1)
                   |  case odd => 1 + (odd * 3)
@@ -39,7 +40,7 @@ class UnnecessaryParenthesesInspectionTest extends ScalaLightInspectionFixtureTe
                 """
     check(selected)
 
-    val text  = """
+    val text = """
                   |def f(n: Int): Int = n match {
                   |  case even if (<caret>even % 2 == 0) => (even + 1)
                   |  case odd => 1 + (odd * 3)
@@ -56,7 +57,7 @@ class UnnecessaryParenthesesInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def test_4(): Unit = {
-    val selected  = s"""
+    val selected = s"""
                   |def f(n: Int): Int = n match {
                   |  case even if (even % 2 == 0) => $START(even + 1<caret>)$END
                   |  case odd => 1 + (odd * 3)
@@ -64,7 +65,7 @@ class UnnecessaryParenthesesInspectionTest extends ScalaLightInspectionFixtureTe
                 """
     check(selected)
 
-    val text  = """
+    val text = """
                   |def f(n: Int): Int = n match {
                   |  case even if (even % 2 == 0) => (even + 1<caret>)
                   |  case odd => 1 + (odd * 3)
@@ -81,7 +82,7 @@ class UnnecessaryParenthesesInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def test_5(): Unit = {
-    val text  = "1 :: (2 :: Nil)"
+    val text = "1 :: (2 :: Nil)"
     checkTextHasNoErrors(text)
   }
 
@@ -96,13 +97,14 @@ class UnnecessaryParenthesesInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def test_7(): Unit = {
-    val text  = """def a(x: Any): Boolean = true
+    val text = """def a(x: Any): Boolean = true
                       |List() count (a(_))"""
-    checkTextHasNoErrors(text, annotation, classOf[ScalaUnnecessaryParenthesesInspection])
+    checkTextHasNoErrors(
+        text, annotation, classOf[ScalaUnnecessaryParenthesesInspection])
   }
 
   def test_8(): Unit = {
-    val selected = "1 to " + START +"((1, 2))" + END
+    val selected = "1 to " + START + "((1, 2))" + END
     check(selected)
 
     val text = "1 to ((1, 2))"

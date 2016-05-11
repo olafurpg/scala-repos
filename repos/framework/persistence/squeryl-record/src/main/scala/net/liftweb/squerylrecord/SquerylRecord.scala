@@ -26,40 +26,39 @@ import RecordTypeMode._
 object SquerylRecord extends Loggable {
 
   /**
-   * We have to remember the default Squeryl metadata factory before
-   * we override it with our own implementation, so that we can use
-   * the original factory for non-record classes.
-   */
+    * We have to remember the default Squeryl metadata factory before
+    * we override it with our own implementation, so that we can use
+    * the original factory for non-record classes.
+    */
   private[squerylrecord] val posoMetaDataFactory = FieldMetaData.factory
-  
 
   /**
-   * Initialize the Squeryl/Record integration. This must be called somewhere during your Boot before you use any
-   * Records with Squeryl.  When using this method, configure your Session separately
-   * (see [[http://squeryl.org/sessions-and-tx.html]] for details) or you can use initWithSquerylSession to do both at once.
-   */
+    * Initialize the Squeryl/Record integration. This must be called somewhere during your Boot before you use any
+    * Records with Squeryl.  When using this method, configure your Session separately
+    * (see [[http://squeryl.org/sessions-and-tx.html]] for details) or you can use initWithSquerylSession to do both at once.
+    */
   def init() {
     FieldMetaData.factory = new RecordMetaDataFactory
   }
 
   /**
-   * Initialize the Squeryl/Record integration and configure a default Session at the same time.
-   */
+    * Initialize the Squeryl/Record integration and configure a default Session at the same time.
+    */
   def initWithSquerylSession(sessionFactory: => Session) {
     init()
     SessionFactory.concreteFactory = Some(() => sessionFactory)
   }
-  
+
   def buildLoanWrapper() = new LoanWrapper {
     override def apply[T](f: => T): T = inTransaction {
       f
     }
   }
-  
+
   /** 
-   * 
-   * NOTE: Remove this along with the deprecated method below
-   * Keep track of the current Squeryl Session we've created using DB 
-   * */
+    * 
+    * NOTE: Remove this along with the deprecated method below
+    * Keep track of the current Squeryl Session we've created using DB 
+    * */
   private object currentSession extends DynoVar[Session]
 }

@@ -1,26 +1,26 @@
 package org.template.recommendation
 
-import io.prediction.{Event, EventClient
-}
+import io.prediction.{Event, EventClient}
 import scala.collection.JavaConverters._
 
 import scala.io.Source
 
 /**
- * @author Maxim Korolyov.
- */
+  * @author Maxim Korolyov.
+  */
 object ImportDataScript extends App {
 
   /**
-   * Imports users, movies and rate events if movielens database to pio.
-   * first arg is mandatory - it is app access key
-   * second arg is optional - it is pio engine url (default is `localhost:7070`)
-   * @param args
-   */
+    * Imports users, movies and rate events if movielens database to pio.
+    * first arg is mandatory - it is app access key
+    * second arg is optional - it is pio engine url (default is `localhost:7070`)
+    * @param args
+    */
   override def main(args: Array[String]): Unit = {
-    val accessKey = if (args.length == 0) {
-      throw new IllegalArgumentException("access key should be passed")
-    } else args(0)
+    val accessKey =
+      if (args.length == 0) {
+        throw new IllegalArgumentException("access key should be passed")
+      } else args(0)
 
     val engineUrl = if (args.length > 1) args(1) else "http://localhost:7070"
     implicit val client = new EventClient(accessKey, engineUrl)
@@ -30,9 +30,9 @@ object ImportDataScript extends App {
   }
 
   /**
-   * imports events to the pio server.
-   * @return the events id list.
-   */
+    * imports events to the pio server.
+    * @return the events id list.
+    */
   def importRateEvents(implicit client: EventClient): Iterator[_] =
     readCSV("data/u.data", "\t").flatMap { event =>
       val eventObj = event.lift
@@ -40,14 +40,14 @@ object ImportDataScript extends App {
         entityId ← eventObj(0)
         targetEntityId ← eventObj(1)
         rating ← eventObj(2)
-      } yield new Event()
+      } yield
+        new Event()
           .event("rate")
           .entityId(entityId)
           .entityType("user")
           .properties(javaMap("rating" → new java.lang.Double(rating)))
           .targetEntityId(targetEntityId)
-          .targetEntityType("movie")
-        ).map(client.createEvent)
+          .targetEntityType("movie")).map(client.createEvent)
     }
 
   def importUsers(implicit ec: EventClient): Iterator[_] =
@@ -60,9 +60,9 @@ object ImportDataScript extends App {
     }
 
   /**
-   * imports movies to pio server
-   * @return the number if movies where imported
-   */
+    * imports movies to pio server
+    * @return the number if movies where imported
+    */
   def importMovies(implicit client: EventClient): Iterator[Unit] = {
     readCSV("data/u.item").map { movie ⇒
       val movieObj = movie.lift
@@ -80,15 +80,15 @@ object ImportDataScript extends App {
   private def javaMap(pair: (String, AnyRef)*) = Map(pair: _*).asJava
 
   /**
-   * reads csv file into list of string arrays each of them represents splitted
-   * with specified delimeter line
-   * @param filename path to csv file
-   * @param delimiter delimiter of the properties in the file
-   * @return the list of string arrays made from every file line
-   */
-  private def readCSV(filename: String,
-                      delimiter: String = "\\|") =
-    Source.fromFile(filename, "UTF-8")
+    * reads csv file into list of string arrays each of them represents splitted
+    * with specified delimeter line
+    * @param filename path to csv file
+    * @param delimiter delimiter of the properties in the file
+    * @return the list of string arrays made from every file line
+    */
+  private def readCSV(filename: String, delimiter: String = "\\|") =
+    Source
+      .fromFile(filename, "UTF-8")
       .getLines()
       .map(_.split(delimiter).toVector)
 }

@@ -3,8 +3,9 @@ object SameInterpolatedStringLiterals {
   def log(message: String, level: Int) {
     level match {
       case 0 =>
-        /*start*/println(s"info: $level")
-        println(message)/*end*/
+        /*start*/
+        println(s"info: $level")
+        println(message) /*end*/
       case 1 =>
         val level2 = level
         println(s"info: $level2")
@@ -30,4 +31,4 @@ object SameInterpolatedStringLiterals {
     println(message)
   }
 }
-*/
+ */

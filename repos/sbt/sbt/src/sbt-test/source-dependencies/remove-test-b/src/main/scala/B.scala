@@ -1,5 +1,3 @@
 package test
 
-object B
-{
-}
+object B {}

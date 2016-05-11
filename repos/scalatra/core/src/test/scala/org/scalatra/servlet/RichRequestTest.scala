@@ -4,10 +4,10 @@ package servlet
 import java.io.ByteArrayInputStream
 import java.util.Locale
 import javax.servlet.http.HttpServletRequest
-import javax.servlet.{ ReadListener, ServletInputStream }
+import javax.servlet.{ReadListener, ServletInputStream}
 
 import org.mockito.Mockito._
-import org.scalatest.{ FunSuite, Matchers }
+import org.scalatest.{FunSuite, Matchers}
 
 class RichRequestTest extends FunSuite with Matchers {
   implicit def requestWrapper(r: HttpServletRequest) = RichRequest(r)
@@ -21,9 +21,11 @@ class RichRequestTest extends FunSuite with Matchers {
     request.body should equal(message)
   }
 
-  def createStubRequestWithContent(content: Array[Byte], encoding: String): HttpServletRequest = {
+  def createStubRequestWithContent(
+      content: Array[Byte], encoding: String): HttpServletRequest = {
     val request = mock(classOf[HttpServletRequest])
-    when(request.getInputStream).thenReturn(new FakeServletInputStream(content))
+    when(request.getInputStream)
+      .thenReturn(new FakeServletInputStream(content))
     when(request.getCharacterEncoding).thenReturn(encoding)
     request
   }
@@ -44,7 +46,8 @@ class RichRequestTest extends FunSuite with Matchers {
   }
 }
 
-private[scalatra] class FakeServletInputStream(data: Array[Byte]) extends ServletInputStream {
+private[scalatra] class FakeServletInputStream(data: Array[Byte])
+    extends ServletInputStream {
   private[this] val backend = new ByteArrayInputStream(data)
   def read = backend.read
 

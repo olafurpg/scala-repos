@@ -6,10 +6,9 @@ import com.intellij.openapi.application.ApplicationManager
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author Alefas
- * @since 02.04.12
- */
-
+  * @author Alefas
+  * @since 02.04.12
+  */
 class ScalaInternalInspectionsProvider extends InspectionToolProvider {
   def getInspectionClasses: Array[Class[_]] = {
     if (ApplicationManager.getApplication.isInternal) {

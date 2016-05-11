@@ -1,4 +1,4 @@
-class A(/*caret*/)
+class A( /*caret*/ )
 /*
 abstract
 final
@@ -10,4 +10,4 @@ protected
 sealed
 val
 var
-*/
+ */

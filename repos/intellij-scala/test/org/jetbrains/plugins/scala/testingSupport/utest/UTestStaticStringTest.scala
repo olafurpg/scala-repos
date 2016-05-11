@@ -10,14 +10,19 @@ trait UTestStaticStringTest extends UTestTestCase {
 
   protected def staticStringTestFileName = staticStringTestName + ".scala"
 
-  protected def checkTest(lineNumber: Int, position: Int, expectedName: String) = {
-    assert(checkConfigAndSettings(createTestFromLocation(lineNumber, position, staticStringTestFileName),
-      staticStringTestName, "tests" + (if (expectedName.isEmpty) "" else "\\" + expectedName)))
+  protected def checkTest(
+      lineNumber: Int, position: Int, expectedName: String) = {
+    assert(
+        checkConfigAndSettings(
+            createTestFromLocation(
+                lineNumber, position, staticStringTestFileName),
+            staticStringTestName,
+            "tests" + (if (expectedName.isEmpty) "" else "\\" + expectedName)))
   }
 
   protected def addTest(): Unit = {
     addFileToProject(staticStringTestFileName,
-      """
+                     """
         |import utest._
         |import utest.framework.TestSuite
         |
@@ -61,8 +66,10 @@ trait UTestStaticStringTest extends UTestTestCase {
 
   def testNonConst(): Unit = {
     addTest()
-    assert(checkConfigAndSettings(createTestFromLocation(11, 10, staticStringTestFileName),
-      staticStringTestName))
+    assert(
+        checkConfigAndSettings(
+            createTestFromLocation(11, 10, staticStringTestFileName),
+            staticStringTestName))
   }
 
   def testTrim() = {

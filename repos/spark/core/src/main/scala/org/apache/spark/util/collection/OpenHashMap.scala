@@ -22,19 +22,18 @@ import scala.reflect.ClassTag
 import org.apache.spark.annotation.DeveloperApi
 
 /**
- * :: DeveloperApi ::
- * A fast hash map implementation for nullable keys. This hash map supports insertions and updates,
- * but not deletions. This map is about 5X faster than java.util.HashMap, while using much less
- * space overhead.
- *
- * Under the hood, it uses our OpenHashSet implementation.
- */
+  * :: DeveloperApi ::
+  * A fast hash map implementation for nullable keys. This hash map supports insertions and updates,
+  * but not deletions. This map is about 5X faster than java.util.HashMap, while using much less
+  * space overhead.
+  *
+  * Under the hood, it uses our OpenHashSet implementation.
+  */
 @DeveloperApi
-private[spark]
-class OpenHashMap[K : ClassTag, @specialized(Long, Int, Double) V: ClassTag](
+private[spark] class OpenHashMap[
+    K : ClassTag, @specialized(Long, Int, Double) V : ClassTag](
     initialCapacity: Int)
-  extends Iterable[(K, V)]
-  with Serializable {
+    extends Iterable[(K, V)] with Serializable {
 
   def this() = this(64)
 
@@ -51,7 +50,8 @@ class OpenHashMap[K : ClassTag, @specialized(Long, Int, Double) V: ClassTag](
   private var haveNullValue = false
   private var nullValue: V = null.asInstanceOf[V]
 
-  override def size: Int = if (haveNullValue) _keySet.size + 1 else _keySet.size
+  override def size: Int =
+    if (haveNullValue) _keySet.size + 1 else _keySet.size
 
   /** Tests whether this map contains a binding for a key. */
   def contains(k: K): Boolean = {
@@ -90,11 +90,11 @@ class OpenHashMap[K : ClassTag, @specialized(Long, Int, Double) V: ClassTag](
   }
 
   /**
-   * If the key doesn't exist yet in the hash map, set its value to defaultValue; otherwise,
-   * set its value to mergeValue(oldValue).
-   *
-   * @return the newly updated value.
-   */
+    * If the key doesn't exist yet in the hash map, set its value to defaultValue; otherwise,
+    * set its value to mergeValue(oldValue).
+    *
+    * @return the newly updated value.
+    */
   def changeValue(k: K, defaultValue: => V, mergeValue: (V) => V): V = {
     if (k == null) {
       if (haveNullValue) {
@@ -124,7 +124,8 @@ class OpenHashMap[K : ClassTag, @specialized(Long, Int, Double) V: ClassTag](
 
     /** Get the next value we should return from next(), or null if we're finished iterating */
     def computeNextPair(): (K, V) = {
-      if (pos == -1) {    // Treat position -1 as looking at the null value
+      if (pos == -1) {
+        // Treat position -1 as looking at the null value
         if (haveNullValue) {
           pos += 1
           return (null.asInstanceOf[K], nullValue)
@@ -155,12 +156,14 @@ class OpenHashMap[K : ClassTag, @specialized(Long, Int, Double) V: ClassTag](
   // to the "private" variables).
   // They also should have been val's. We use var's because there is a Scala compiler bug that
   // would throw illegal access error at runtime if they are declared as val's.
-  protected var grow = (newCapacity: Int) => {
-    _oldValues = _values
-    _values = new Array[V](newCapacity)
+  protected var grow = (newCapacity: Int) =>
+    {
+      _oldValues = _values
+      _values = new Array[V](newCapacity)
   }
 
-  protected var move = (oldPos: Int, newPos: Int) => {
-    _values(newPos) = _oldValues(oldPos)
+  protected var move = (oldPos: Int, newPos: Int) =>
+    {
+      _values(newPos) = _oldValues(oldPos)
   }
 }

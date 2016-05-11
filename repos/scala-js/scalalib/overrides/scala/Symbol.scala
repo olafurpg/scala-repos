@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -11,20 +11,21 @@ package scala
 import scala.scalajs.js
 
 /** This class provides a simple way to get unique objects for equal strings.
- *  Since symbols are interned, they can be compared using reference equality.
- *  Instances of `Symbol` can be created easily with Scala's built-in quote
- *  mechanism.
- *
- *  For instance, the [[http://scala-lang.org/#_top Scala]] term `'mysym` will
- *  invoke the constructor of the `Symbol` class in the following way:
- *  `Symbol("mysym")`.
- *
- *  @author  Martin Odersky, Iulian Dragos
- *  @version 1.8
- */
+  *  Since symbols are interned, they can be compared using reference equality.
+  *  Instances of `Symbol` can be created easily with Scala's built-in quote
+  *  mechanism.
+  *
+  *  For instance, the [[http://scala-lang.org/#_top Scala]] term `'mysym` will
+  *  invoke the constructor of the `Symbol` class in the following way:
+  *  `Symbol("mysym")`.
+  *
+  *  @author  Martin Odersky, Iulian Dragos
+  *  @version 1.8
+  */
 final class Symbol private (val name: String) extends Serializable {
+
   /** Converts this symbol to a string.
-   */
+    */
   override def toString(): String = "'" + name
 
   @throws(classOf[java.io.ObjectStreamException])
@@ -40,8 +41,7 @@ object Symbol extends JSUniquenessCache[Symbol] {
   protected def keyFromValue(sym: Symbol): Option[String] = Some(sym.name)
 }
 
-private[scala] abstract class JSUniquenessCache[V]
-{
+private[scala] abstract class JSUniquenessCache[V] {
   private val cache = js.Dictionary.empty[V]
 
   protected def valueFromKey(k: String): V
@@ -106,4 +106,4 @@ private[scala] abstract class UniquenessCache[K >: js.String, V >: Null]
   }
   def unapply(other: V): Option[K] = keyFromValue(other)
 }
-*/
+ */

@@ -1,7 +1,8 @@
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  override def code = """
+  override def code =
+    """
 import scala.language.experimental.macros, scala.reflect.macros.blackbox.Context
 def macroImpl[T: c.WeakTypeTag](c: Context)(t: c.Expr[T]): c.Expr[List[T]] = {
   val r = c.universe.reify { List(t.splice) }

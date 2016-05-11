@@ -5,7 +5,7 @@
 package akka.http.scaladsl.server
 package directives
 
-import akka.http.scaladsl.model.{ StatusCodes, HttpMethod }
+import akka.http.scaladsl.model.{StatusCodes, HttpMethod}
 import akka.http.scaladsl.model.HttpMethods._
 
 trait MethodDirectives {
@@ -15,71 +15,71 @@ trait MethodDirectives {
   import MethodDirectives._
 
   /**
-   * Rejects all non-DELETE requests.
-   */
+    * Rejects all non-DELETE requests.
+    */
   def delete: Directive0 = _delete
 
   /**
-   * Rejects all non-GET requests.
-   */
+    * Rejects all non-GET requests.
+    */
   def get: Directive0 = _get
 
   /**
-   * Rejects all non-HEAD requests.
-   */
+    * Rejects all non-HEAD requests.
+    */
   def head: Directive0 = _head
 
   /**
-   * Rejects all non-OPTIONS requests.
-   */
+    * Rejects all non-OPTIONS requests.
+    */
   def options: Directive0 = _options
 
   /**
-   * Rejects all non-PATCH requests.
-   */
+    * Rejects all non-PATCH requests.
+    */
   def patch: Directive0 = _patch
 
   /**
-   * Rejects all non-POST requests.
-   */
+    * Rejects all non-POST requests.
+    */
   def post: Directive0 = _post
 
   /**
-   * Rejects all non-PUT requests.
-   */
+    * Rejects all non-PUT requests.
+    */
   def put: Directive0 = _put
 
   /**
-   * Extracts the request method.
-   */
+    * Extracts the request method.
+    */
   def extractMethod: Directive1[HttpMethod] = _extractMethod
 
   //#method
   /**
-   * Rejects all requests whose HTTP method does not match the given one.
-   */
+    * Rejects all requests whose HTTP method does not match the given one.
+    */
   def method(httpMethod: HttpMethod): Directive0 =
     extractMethod.flatMap[Unit] {
       case `httpMethod` ⇒ pass
-      case _            ⇒ reject(MethodRejection(httpMethod))
+      case _ ⇒ reject(MethodRejection(httpMethod))
     } & cancelRejections(classOf[MethodRejection])
   //#
 
   /**
-   * Changes the HTTP method of the request to the value of the specified query string parameter. If the query string
-   * parameter is not specified this directive has no effect. If the query string is specified as something that is not
-   * a HTTP method, then this directive completes the request with a `501 Not Implemented` response.
-   *
-   * This directive is useful for:
-   *  - Use in combination with JSONP (JSONP only supports GET)
-   *  - Supporting older browsers that lack support for certain HTTP methods. E.g. IE8 does not support PATCH
-   */
+    * Changes the HTTP method of the request to the value of the specified query string parameter. If the query string
+    * parameter is not specified this directive has no effect. If the query string is specified as something that is not
+    * a HTTP method, then this directive completes the request with a `501 Not Implemented` response.
+    *
+    * This directive is useful for:
+    *  - Use in combination with JSONP (JSONP only supports GET)
+    *  - Supporting older browsers that lack support for certain HTTP methods. E.g. IE8 does not support PATCH
+    */
   def overrideMethodWithParameter(paramName: String): Directive0 =
-    parameter(paramName?) flatMap {
+    parameter(paramName ?) flatMap {
       case Some(method) ⇒
         getForKey(method.toUpperCase) match {
           case Some(m) ⇒ mapRequest(_.copy(method = m))
-          case _       ⇒ complete(StatusCodes.NotImplemented)
+          case _ ⇒ complete(StatusCodes.NotImplemented)
         }
       case None ⇒ pass
     }

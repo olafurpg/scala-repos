@@ -24,11 +24,11 @@ import org.apache.mesos.protobuf.ByteString
 import org.apache.spark.internal.Logging
 
 /**
- * Wrapper for serializing the data sent when launching Mesos tasks.
- */
+  * Wrapper for serializing the data sent when launching Mesos tasks.
+  */
 private[spark] case class MesosTaskLaunchData(
-  serializedTask: ByteBuffer,
-  attemptNumber: Int) extends Logging {
+    serializedTask: ByteBuffer, attemptNumber: Int)
+    extends Logging {
 
   def toByteString: ByteString = {
     val dataBuffer = ByteBuffer.allocate(4 + serializedTask.limit)
@@ -45,7 +45,8 @@ private[spark] object MesosTaskLaunchData extends Logging {
     val byteBuffer = byteString.asReadOnlyByteBuffer()
     logDebug(s"ByteBuffer size: [${byteBuffer.remaining}]")
     val attemptNumber = byteBuffer.getInt // updates the position by 4 bytes
-    val serializedTask = byteBuffer.slice() // subsequence starting at the current position
+    val serializedTask =
+      byteBuffer.slice() // subsequence starting at the current position
     MesosTaskLaunchData(serializedTask, attemptNumber)
   }
 }

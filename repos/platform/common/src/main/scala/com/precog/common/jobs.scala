@@ -37,4 +37,3 @@ package object jobs {
   object StatusId extends IdExtractor
   object MessageId extends IdExtractor
 }
-

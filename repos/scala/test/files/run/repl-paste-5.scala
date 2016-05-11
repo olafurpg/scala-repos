@@ -1,9 +1,8 @@
-
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
   //def code = ":paste < EOF\n" + (
-  def code = 
+  def code =
     """
 :paste < EOF
 class C { def c = 42 }

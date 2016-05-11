@@ -13,24 +13,26 @@ import org.scalatest.mock.MockitoSugar
 @RunWith(classOf[JUnitRunner])
 class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
 
-  def mkAttr(ai: AtomicInteger): Attribute[AtomicInteger] = new Attribute[AtomicInteger] {
-    def set(value: AtomicInteger): Unit = ai.set(value.get())
-    def get(): AtomicInteger = ai
+  def mkAttr(ai: AtomicInteger): Attribute[AtomicInteger] =
+    new Attribute[AtomicInteger] {
+      def set(value: AtomicInteger): Unit = ai.set(value.get())
+      def get(): AtomicInteger = ai
 
-    def key(): AttributeKey[AtomicInteger] = ???
-    def getAndRemove(): AtomicInteger = ???
-    def remove(): Unit = ???
-    def compareAndSet(oldValue: AtomicInteger, newValue: AtomicInteger): Boolean = ???
-    def setIfAbsent(value: AtomicInteger): AtomicInteger = ???
-    def getAndSet(value: AtomicInteger): AtomicInteger = ???
-  }
+      def key(): AttributeKey[AtomicInteger] = ???
+      def getAndRemove(): AtomicInteger = ???
+      def remove(): Unit = ???
+      def compareAndSet(
+          oldValue: AtomicInteger, newValue: AtomicInteger): Boolean = ???
+      def setIfAbsent(value: AtomicInteger): AtomicInteger = ???
+      def getAndSet(value: AtomicInteger): AtomicInteger = ???
+    }
 
   test("ChannelRequestStatsHandler counts messages") {
     val sr = new InMemoryStatsReceiver()
 
     def requestsEqual(requests: Seq[Float]) =
       assert(
-        sr.stat("connection_requests")() == requests
+          sr.stat("connection_requests")() == requests
       )
 
     val handler = new ChannelRequestStatsHandler(sr)
@@ -38,8 +40,8 @@ class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
 
     val ctx = mock[ChannelHandlerContext]
     val reqAttr = mkAttr(new AtomicInteger(0))
-    when(ctx.attr(ChannelRequestStatsHandler.ConnectionRequestsKey)).thenReturn(reqAttr)
-
+    when(ctx.attr(ChannelRequestStatsHandler.ConnectionRequestsKey))
+      .thenReturn(reqAttr)
 
     val msg = new Object
 

@@ -28,9 +28,9 @@ import nat._
 import ops.function._
 import ops.nat._
 import ops.traversable._
-import poly.{ ~>> }
+import poly.{~>>}
 import record._
-import syntax.{ CoproductOps, GenericZipperOps, HListOps, HListZipperOps, NatOps, RecordOps, TypeableOps, UnionOps }
+import syntax.{CoproductOps, GenericZipperOps, HListOps, HListZipperOps, NatOps, RecordOps, TypeableOps, UnionOps}
 import syntax.std.TupleOps
 import syntax.singleton._
 import syntax.zipper._
@@ -69,27 +69,29 @@ object SerializationTestDefns {
   }
 
   object isDefined extends (Option ~>> Boolean) {
-    def apply[T](o : Option[T]) = o.isDefined
+    def apply[T](o: Option[T]) = o.isDefined
   }
 
   object combineL extends Poly2 {
-    implicit def ci = at[Int, Int]((acc, i) => acc+i)
-    implicit def cs = at[Int, String]((acc, s) => acc+s.length)
-    implicit def cb = at[Int, Boolean]((acc, b) => acc+(if(b) 1 else 0))
+    implicit def ci = at[Int, Int]((acc, i) => acc + i)
+    implicit def cs = at[Int, String]((acc, s) => acc + s.length)
+    implicit def cb = at[Int, Boolean]((acc, b) => acc + (if (b) 1 else 0))
   }
 
   object combineR extends Poly2 {
-    implicit def ci = at[Int, Int]((i, acc) => acc+i)
-    implicit def cs = at[String, Int]((s, acc) => acc+s.length)
-    implicit def cb = at[Boolean, Int]((b, acc) => acc+(if(b) 1 else 0))
+    implicit def ci = at[Int, Int]((i, acc) => acc + i)
+    implicit def cs = at[String, Int]((s, acc) => acc + s.length)
+    implicit def cb = at[Boolean, Int]((b, acc) => acc + (if (b) 1 else 0))
   }
 
   object selInt extends Poly1 {
-    implicit def ci = at[Int] { x => x }
+    implicit def ci = at[Int] { x =>
+      x
+    }
   }
 
   object smear extends Poly {
-    implicit val caseIntInt    = use((x: Int, y: Int) => x + y)
+    implicit val caseIntInt = use((x: Int, y: Int) => x + y)
     implicit val caseStringInt = use((x: String, y: Int) => x.toInt + y)
     implicit val caseIntString = use((x: Int, y: String) => x + y.toInt)
   }
@@ -150,13 +152,13 @@ object SerializationTestDefns {
   object Functor extends Functor0 {
     def apply[F[_]](implicit f: Lazy[Functor[F]]): Functor[F] = f.value
 
-    implicit val idFunctor: Functor[Id] =
-      new Functor[Id] {
-        def map[A, B](a: A)(f: A => B): B = f(a)
-      }
+    implicit val idFunctor: Functor[Id] = new Functor[Id] {
+      def map[A, B](a: A)(f: A => B): B = f(a)
+    }
 
     // Induction step for products
-    implicit def hcons[F[_]](implicit ihc: IsHCons1[F, Functor, Functor]): Functor[F] =
+    implicit def hcons[F[_]](
+        implicit ihc: IsHCons1[F, Functor, Functor]): Functor[F] =
       new Functor[F] {
         def map[A, B](fa: F[A])(f: A => B): F[B] = {
           val (hd, tl) = ihc.unpack(fa)
@@ -165,13 +167,19 @@ object SerializationTestDefns {
       }
 
     // Induction step for coproducts
-    implicit def ccons[F[_]](implicit icc: IsCCons1[F, Functor, Functor]): Functor[F] =
+    implicit def ccons[F[_]](
+        implicit icc: IsCCons1[F, Functor, Functor]): Functor[F] =
       new Functor[F] {
         def map[A, B](fa: F[A])(f: A => B): F[B] =
-          icc.pack(icc.unpack(fa).fold(hd => Left(icc.fh.map(hd)(f)), tl => Right(icc.ft.map(tl)(f))))
+          icc.pack(
+              icc
+                .unpack(fa)
+                .fold(hd => Left(icc.fh.map(hd)(f)),
+                      tl => Right(icc.ft.map(tl)(f))))
       }
 
-    implicit def generic[F[_]](implicit gen: Generic1[F, Functor]): Functor[F] =
+    implicit def generic[F[_]](
+        implicit gen: Generic1[F, Functor]): Functor[F] =
       new Functor[F] {
         def map[A, B](fa: F[A])(f: A => B): F[B] =
           gen.from(gen.fr.map(gen.to(fa))(f))
@@ -203,43 +211,44 @@ object SerializationTestDefns {
         def show(t: HNil) = ""
       }
 
-      def product[F, T <: HList](name: String, sh: Show[F], st: Show[T]) = new Show[F :: T] {
-        def show(ft: F :: T) = {
-          val head = sh.show(ft.head)
-          val tail = st.show(ft.tail)
-          if (tail.isEmpty)
-            s"$name = $head"
-          else
-            s"$name = $head, $tail"
+      def product[F, T <: HList](name: String, sh: Show[F], st: Show[T]) =
+        new Show[F :: T] {
+          def show(ft: F :: T) = {
+            val head = sh.show(ft.head)
+            val tail = st.show(ft.tail)
+            if (tail.isEmpty) s"$name = $head"
+            else s"$name = $head, $tail"
+          }
         }
-      }
 
       def emptyCoproduct = new Show[CNil] {
         def show(t: CNil) = ""
       }
 
-      def coproduct[L, R <: Coproduct](name: String, sl: => Show[L], sr: => Show[R]) = new Show[L :+: R] {
+      def coproduct[L, R <: Coproduct](
+          name: String, sl: => Show[L], sr: => Show[R]) = new Show[L :+: R] {
         def show(lr: L :+: R) = lr match {
           case Inl(l) => s"$name(${sl.show(l)})"
           case Inr(r) => s"${sr.show(r)}"
         }
       }
 
-      def project[F, G](instance: => Show[G], to: F => G, from: G => F) = new Show[F] {
-        def show(f: F) = instance.show(to(f))
-      }
+      def project[F, G](instance: => Show[G], to: F => G, from: G => F) =
+        new Show[F] {
+          def show(f: F) = instance.show(to(f))
+        }
     }
   }
 
   /**
-   * A `CanBuildFrom` for `List` implementing `Serializable`, unlike the one provided by the standard library.
-   */
-  implicit def listSerializableCanBuildFrom[T]: CanBuildFrom[List[T], T, List[T]] =
+    * A `CanBuildFrom` for `List` implementing `Serializable`, unlike the one provided by the standard library.
+    */
+  implicit def listSerializableCanBuildFrom[T]: CanBuildFrom[
+      List[T], T, List[T]] =
     new CanBuildFrom[List[T], T, List[T]] with Serializable {
       def apply(from: List[T]) = from.genericBuilder[T]
       def apply() = List.newBuilder[T]
     }
-
 }
 
 class SerializationTests {
@@ -905,7 +914,6 @@ class SerializationTests {
     import scala.collection.generic.IsTraversableLike
     implicit val hack: IsTraversableLike[List[Int]] { type A = Int } = null
     assertSerializable(ToSizedHList[List, Int, _4])
-
   }
 
   @Test
@@ -942,7 +950,8 @@ class SerializationTests {
 
   @Test
   def testHMap {
-    assertSerializable(HMap[(Set ~?> Option)#λ](Set("foo") -> Option("bar"), Set(23) -> Option(13)))
+    assertSerializable(HMap[(Set ~?> Option)#λ](
+            Set("foo") -> Option("bar"), Set(23) -> Option(13)))
     assertSerializable(new (Set ~?> Option))
     assertSerializable(implicitly[(Set ~?> Option)#λ[Set[Int], Option[Int]]])
   }
@@ -952,10 +961,14 @@ class SerializationTests {
     assertSerializable(Lazy(23))
 
     assertSerializableBeforeAfter(implicitly[Lazy[Generic[Wibble]]])(_.value)
-    assertSerializableBeforeAfter(implicitly[Lazy[Generic1[Box, TC1]]])(_.value)
+    assertSerializableBeforeAfter(implicitly[Lazy[Generic1[Box, TC1]]])(
+        _.value)
 
-    assertSerializableBeforeAfter(implicitly[Lazy[Lazy.Values[Generic[Wibble] :: HNil]]])(_.value)
-    assertSerializableBeforeAfter(implicitly[Lazy[Lazy.Values[Generic[Wibble] :: Generic1[Box, TC1] :: HNil]]])(_.value)
+    assertSerializableBeforeAfter(
+        implicitly[Lazy[Lazy.Values[Generic[Wibble] :: HNil]]])(_.value)
+    assertSerializableBeforeAfter(implicitly[Lazy[
+                Lazy.Values[Generic[Wibble] :: Generic1[Box, TC1] :: HNil]]])(
+        _.value)
   }
 
   @Test
@@ -1073,14 +1086,18 @@ class SerializationTests {
     assertSerializable(DataT[poly.identity.type, List[CNil]])
     assertSerializable(DataT[poly.identity.type, List[C]])
 
-    assertSerializableBeforeAfter(implicitly[Everything[gsize.type, plus.type, Wibble]])(_(Wibble(2, "a")))
-    assertSerializableBeforeAfter(implicitly[Everywhere[poly.identity.type, Wibble]])(_(Wibble(2, "a")))
+    assertSerializableBeforeAfter(
+        implicitly[Everything[gsize.type, plus.type, Wibble]])(
+        _ (Wibble(2, "a")))
+    assertSerializableBeforeAfter(
+        implicitly[Everywhere[poly.identity.type, Wibble]])(_ (Wibble(2, "a")))
   }
 
   @Test
   def testFunctor {
     assertSerializableBeforeAfter(Functor[Some])(_.map(Some(2))(_.toString))
-    assertSerializableBeforeAfter(Functor[Option])(_.map(Option(2))(_.toString))
+    assertSerializableBeforeAfter(Functor[Option])(
+        _.map(Option(2))(_.toString))
     assertSerializableBeforeAfter(Functor[Tree])(_.map(Leaf(2))(_.toString))
     assertSerializableBeforeAfter(Functor[List])(_.map(List(2))(_.toString))
   }
@@ -1109,9 +1126,12 @@ class SerializationTests {
     val l6 = optic[Tree[Int]][Node[Int]].l[Node[Int]].r[Leaf[Int]].t
     val l7 = l3 ~ l4
     val l8 = optic.hlistSelectLens[Int :: String :: Boolean :: HNil, String]
-    val l9 = optic.coproductSelectPrism[Int :+: String :+: Boolean :+: CNil, String]
+    val l9 =
+      optic.coproductSelectPrism[Int :+: String :+: Boolean :+: CNil, String]
     val l10 = optic.hlistNthLens[Int :: String :: Boolean :: HNil, _1]
-    val l11 = optic.recordLens[Record.`'foo -> Int, 'bar -> String, 'baz -> Boolean`.T]('bar)
+    val l11 = optic
+      .recordLens[Record.`'foo -> Int, 'bar -> String, 'baz -> Boolean`.T](
+        'bar)
     val l12 = optic[Tree[Int]].l.r.l.t
     val l13 = optic[Node[Int]] >> 'r
     val l14 = optic[Node[Int]] >> _1

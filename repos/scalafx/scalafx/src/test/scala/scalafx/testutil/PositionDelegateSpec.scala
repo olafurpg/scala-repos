@@ -33,13 +33,14 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.PositionDelegate
 
 /**
- * Trait to test PositionDelegate subclasses
- */
+  * Trait to test PositionDelegate subclasses
+  */
 trait PositionDelegateSpec[D <: PositionDelegate[_]] extends FlatSpec {
 
   val positionDelegate: D
 
-  private def testDoublePropertyUpdate(testedProperty: DoubleProperty, propertyName: String) {
+  private def testDoublePropertyUpdate(
+      testedProperty: DoubleProperty, propertyName: String) {
     var moved = false
     val observerDouble = new DoubleProperty(positionDelegate, propertyName)
 
@@ -61,5 +62,4 @@ trait PositionDelegateSpec[D <: PositionDelegate[_]] extends FlatSpec {
   it should "have its Y Coordinate observed when it is changed" in {
     testDoublePropertyUpdate(positionDelegate.y, "Y Property")
   }
-
 }

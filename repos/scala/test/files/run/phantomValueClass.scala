@@ -1,5 +1,5 @@
 final class Phantom[A](val s: String) extends AnyVal {
-  def compose(p: Phantom[A]): Phantom[A] = new Phantom[A](s+p.s)
+  def compose(p: Phantom[A]): Phantom[A] = new Phantom[A](s + p.s)
 }
 
 object Test extends App {

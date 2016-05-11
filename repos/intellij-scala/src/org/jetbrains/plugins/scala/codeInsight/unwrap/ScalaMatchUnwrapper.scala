@@ -9,32 +9,38 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScC
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMatchStmt
 
 /**
- * Nikolay.Tropin
- * 2014-06-27
- */
+  * Nikolay.Tropin
+  * 2014-06-27
+  */
 class ScalaMatchUnwrapper extends ScalaUnwrapper {
-  
-  override def isApplicableTo(e: PsiElement) = forCaseClauseInMatch(e)((_, _) => true)(false)
 
-  override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) = forCaseClauseInMatch(element) { (cl, m) =>
-    context.extractBlockOrSingleStatement(cl.expr.get, m)
-    context.delete(m)
-  } {}
+  override def isApplicableTo(e: PsiElement) =
+    forCaseClauseInMatch(e)((_, _) => true)(false)
 
-  override def collectAffectedElements(e: PsiElement, toExtract: util.List[PsiElement]) = forCaseClauseInMatch[PsiElement](e) { (cl, m) =>
-    super.collectAffectedElements(e, toExtract)
-    m
-  }(e)
+  override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) =
+    forCaseClauseInMatch(element) { (cl, m) =>
+      context.extractBlockOrSingleStatement(cl.expr.get, m)
+      context.delete(m)
+    } {}
 
-  override def getDescription(e: PsiElement) = ScalaBundle.message("unwrap.case.clause")
+  override def collectAffectedElements(
+      e: PsiElement, toExtract: util.List[PsiElement]) =
+    forCaseClauseInMatch[PsiElement](e) { (cl, m) =>
+      super.collectAffectedElements(e, toExtract)
+      m
+    }(e)
 
-  private def forCaseClauseInMatch[T](e: PsiElement)(ifInClause: (ScCaseClause, ScMatchStmt) => T)(ifNot: => T): T = {
+  override def getDescription(e: PsiElement) =
+    ScalaBundle.message("unwrap.case.clause")
+
+  private def forCaseClauseInMatch[T](e: PsiElement)(
+      ifInClause: (ScCaseClause, ScMatchStmt) => T)(ifNot: => T): T = {
     e match {
-      case (cl: ScCaseClause) childOf ((_: ScCaseClauses) childOf (matchStmt: ScMatchStmt)) if cl.expr.nonEmpty =>
+      case (cl: ScCaseClause) childOf ((_: ScCaseClauses) childOf (matchStmt: ScMatchStmt))
+          if cl.expr.nonEmpty =>
         ifInClause(cl, matchStmt)
       case _ =>
         ifNot
     }
   }
-
 }

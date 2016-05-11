@@ -24,8 +24,8 @@ import scala.util.Random
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
- * Transitive closure on a graph.
- */
+  * Transitive closure on a graph.
+  */
 object SparkTC {
   val numEdges = 200
   val numVertices = 100
@@ -62,7 +62,10 @@ object SparkTC {
       oldCount = nextCount
       // Perform the join, obtaining an RDD of (y, (z, x)) pairs,
       // then project the result to obtain the new (x, z) paths.
-      tc = tc.union(tc.join(edges).map(x => (x._2._2, x._2._1))).distinct().cache()
+      tc = tc
+        .union(tc.join(edges).map(x => (x._2._2, x._2._1)))
+        .distinct()
+        .cache()
       nextCount = tc.count()
     } while (nextCount != oldCount)
 

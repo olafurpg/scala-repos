@@ -14,9 +14,9 @@ package breeze.stats;
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. 
-*/
+ */
 import breeze.stats.distributions._;
 
 package object sampling {
-  implicit val standardBasis:RandBasis = Rand;
+  implicit val standardBasis: RandBasis = Rand;
 }

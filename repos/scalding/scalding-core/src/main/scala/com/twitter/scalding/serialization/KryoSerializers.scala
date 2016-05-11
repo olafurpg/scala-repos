@@ -12,18 +12,18 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding.serialization
 
 import com.esotericsoftware.kryo.Kryo
-import com.esotericsoftware.kryo.{ Serializer => KSerializer }
-import com.esotericsoftware.kryo.io.{ Input, Output }
+import com.esotericsoftware.kryo.{Serializer => KSerializer}
+import com.esotericsoftware.kryo.io.{Input, Output}
 
 import com.twitter.scalding._
 
 /**
- * This is a runtime check for types we should never be serializing
- */
+  * This is a runtime check for types we should never be serializing
+  */
 class ThrowingSerializer[T] extends KSerializer[T] {
   override def write(kryo: Kryo, output: Output, t: T) {
     sys.error(s"Kryo should never be used to serialize an instance: $t")
@@ -33,9 +33,9 @@ class ThrowingSerializer[T] extends KSerializer[T] {
 }
 
 /**
- * *
- * Below are some serializers for objects in the scalding project.
- */
+  * *
+  * Below are some serializers for objects in the scalding project.
+  */
 class RichDateSerializer extends KSerializer[RichDate] {
   // RichDates are immutable, no need to copy them
   setImmutable(true)
@@ -101,4 +101,3 @@ class StringFieldSerializer extends KSerializer[StringField[_]] {
     StringField[Any](id)(ord, mf)
   }
 }
-

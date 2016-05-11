@@ -8,12 +8,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPathElement, ScStableCod
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
 trait ScThisReference extends ScExpression with ScPathElement {
   def reference = findChild(classOf[ScStableCodeReferenceElement])
 
-  def refTemplate : Option[ScTemplateDefinition]
+  def refTemplate: Option[ScTemplateDefinition]
 }

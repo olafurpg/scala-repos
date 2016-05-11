@@ -1,4 +1,3 @@
-
 package outer
 
 package inner {

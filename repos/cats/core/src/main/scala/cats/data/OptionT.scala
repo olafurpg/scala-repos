@@ -2,23 +2,23 @@ package cats
 package data
 
 /**
- * `OptionT[F[_], A` is a light wrapper on an `F[Option[A]]` with some
- * convenient methods for working with this nested structure.
- *
- * It may also be said that `OptionT` is a monad transformer for `Option`.
- *
- * For more information, see the [[http://non.github.io/cats/tut/optiont.html documentation]].
- */
+  * `OptionT[F[_], A` is a light wrapper on an `F[Option[A]]` with some
+  * convenient methods for working with this nested structure.
+  *
+  * It may also be said that `OptionT` is a monad transformer for `Option`.
+  *
+  * For more information, see the [[http://non.github.io/cats/tut/optiont.html documentation]].
+  */
 final case class OptionT[F[_], A](value: F[Option[A]]) {
 
   def fold[B](default: => B)(f: A => B)(implicit F: Functor[F]): F[B] =
     F.map(value)(_.fold(default)(f))
 
   /**
-   * Catamorphism on the Option. This is identical to [[fold]], but it only has
-   * one parameter list, which can result in better type inference in some
-   * contexts.
-   */
+    * Catamorphism on the Option. This is identical to [[fold]], but it only has
+    * one parameter list, which can result in better type inference in some
+    * contexts.
+    */
   def cata[B](default: => B, f: A => B)(implicit F: Functor[F]): F[B] =
     fold(default)(f)
 
@@ -30,12 +30,13 @@ final case class OptionT[F[_], A](value: F[Option[A]]) {
 
   def flatMapF[B](f: A => F[Option[B]])(implicit F: Monad[F]): OptionT[F, B] =
     OptionT(
-      F.flatMap(value){
-        case Some(a) => f(a)
-        case None => F.pure(None)
-      })
+        F.flatMap(value) {
+      case Some(a) => f(a)
+      case None => F.pure(None)
+    })
 
-  def transform[B](f: Option[A] => Option[B])(implicit F: Functor[F]): OptionT[F, B] =
+  def transform[B](f: Option[A] => Option[B])(
+      implicit F: Functor[F]): OptionT[F, B] =
     OptionT(F.map(value)(f))
 
   def subflatMap[B](f: A => Option[B])(implicit F: Functor[F]): OptionT[F, B] =
@@ -45,12 +46,13 @@ final case class OptionT[F[_], A](value: F[Option[A]]) {
     F.map(value)(_.getOrElse(default))
 
   def getOrElseF(default: => F[A])(implicit F: Monad[F]): F[A] =
-    F.flatMap(value){
+    F.flatMap(value) {
       case Some(a) => F.pure(a)
       case None => default
     }
 
-  def collect[B](f: PartialFunction[A, B])(implicit F: Functor[F]): OptionT[F, B] =
+  def collect[B](f: PartialFunction[A, B])(
+      implicit F: Functor[F]): OptionT[F, B] =
     OptionT(F.map(value)(_.collect(f)))
 
   def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] =
@@ -76,10 +78,10 @@ final case class OptionT[F[_], A](value: F[Option[A]]) {
 
   def orElseF(default: => F[Option[A]])(implicit F: Monad[F]): OptionT[F, A] =
     OptionT(
-      F.flatMap(value) {
-        case s @ Some(_) => F.pure(s)
-        case None => default
-      })
+        F.flatMap(value) {
+      case s @ Some(_) => F.pure(s)
+      case None => default
+    })
 
   def toRight[L](left: => L)(implicit F: Functor[F]): XorT[F, L, A] =
     XorT(cata(Xor.Left(left), Xor.Right.apply))
@@ -95,20 +97,21 @@ object OptionT extends OptionTInstances {
     OptionT(F.pure(Some(a)))
 
   /**
-   * Transforms an `Option` into an `OptionT`, lifted into the specified `Applicative`.
-   *
-   * Note: The return type is a FromOptionPartiallyApplied[F], which has an apply method
-   * on it, allowing you to call fromOption like this:
-   * {{{
-   * scala> import cats.std.list._
-   * scala> val o: Option[Int] = Some(2)
-   * scala> OptionT.fromOption[List](o)
-   * res0: OptionT[List, Int] = OptionT(List(Some(2)))
-   * }}}
-   *
-   * The reason for the indirection is to emulate currying type parameters.
-   */
-  def fromOption[F[_]]: FromOptionPartiallyApplied[F] = new FromOptionPartiallyApplied
+    * Transforms an `Option` into an `OptionT`, lifted into the specified `Applicative`.
+    *
+    * Note: The return type is a FromOptionPartiallyApplied[F], which has an apply method
+    * on it, allowing you to call fromOption like this:
+    * {{{
+    * scala> import cats.std.list._
+    * scala> val o: Option[Int] = Some(2)
+    * scala> OptionT.fromOption[List](o)
+    * res0: OptionT[List, Int] = OptionT(List(Some(2)))
+    * }}}
+    *
+    * The reason for the indirection is to emulate currying type parameters.
+    */
+  def fromOption[F[_]]: FromOptionPartiallyApplied[F] =
+    new FromOptionPartiallyApplied
 
   final class FromOptionPartiallyApplied[F[_]] private[OptionT] {
     def apply[A](value: Option[A])(implicit F: Applicative[F]): OptionT[F, A] =
@@ -119,11 +122,12 @@ object OptionT extends OptionTInstances {
     * Lifts the `F[A]` Functor into an `OptionT[F, A]`.
     *
     */
-  def liftF[F[_], A](fa: F[A])(implicit F: Functor[F]): OptionT[F, A] = OptionT(F.map(fa)(Some(_)))
+  def liftF[F[_], A](fa: F[A])(implicit F: Functor[F]): OptionT[F, A] =
+    OptionT(F.map(fa)(Some(_)))
 }
 
 private[data] sealed trait OptionTInstances1 {
-  implicit def optionTFunctor[F[_]:Functor]: Functor[OptionT[F, ?]] =
+  implicit def optionTFunctor[F[_]: Functor]: Functor[OptionT[F, ?]] =
     new Functor[OptionT[F, ?]] {
       override def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] =
         fa.map(f)
@@ -141,16 +145,19 @@ private[data] sealed trait OptionTInstances extends OptionTInstances1 {
     new Monad[OptionT[F, ?]] {
       def pure[A](a: A): OptionT[F, A] = OptionT.pure(a)
 
-      def flatMap[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] =
+      def flatMap[A, B](fa: OptionT[F, A])(
+          f: A => OptionT[F, B]): OptionT[F, B] =
         fa.flatMap(f)
 
       override def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] =
         fa.map(f)
     }
 
-  implicit def optionTEq[F[_], A](implicit FA: Eq[F[Option[A]]]): Eq[OptionT[F, A]] =
+  implicit def optionTEq[F[_], A](
+      implicit FA: Eq[F[Option[A]]]): Eq[OptionT[F, A]] =
     FA.on(_.value)
 
-  implicit def optionTShow[F[_], A](implicit F: Show[F[Option[A]]]): Show[OptionT[F, A]] =
+  implicit def optionTShow[F[_], A](
+      implicit F: Show[F[Option[A]]]): Show[OptionT[F, A]] =
     functor.Contravariant[Show].contramap(F)(_.value)
 }

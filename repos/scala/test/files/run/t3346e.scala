@@ -35,14 +35,16 @@ class QuickSort[Coll](a: Coll) {
 }
 
 class FilterMap[Repr](a: Repr) {
-  def filterMap[A, B, That](f: A => Option[B])(implicit ev0: Repr => TraversableLike[A, Repr],
-                                               cbf: CanBuildFrom[Repr, B, That]): That = {
+  def filterMap[A, B, That](f: A => Option[B])(
+      implicit ev0: Repr => TraversableLike[A, Repr],
+      cbf: CanBuildFrom[Repr, B, That]): That = {
     a.flatMap(e => f(e).toSeq)
   }
 }
 
 class FilterMapFixed[A, Repr <% TraversableLike[A, Repr]](a: Repr) {
-  def filterMap2[B, That](f: A => Option[B])(implicit cbf: CanBuildFrom[Repr, B, That]): That = {
+  def filterMap2[B, That](f: A => Option[B])(
+      implicit cbf: CanBuildFrom[Repr, B, That]): That = {
     a.flatMap(e => f(e).toSeq)
   }
 }
@@ -50,7 +52,8 @@ class FilterMapFixed[A, Repr <% TraversableLike[A, Repr]](a: Repr) {
 object MyEnhancements {
   implicit def toQS[Coll](a: Coll) = new QuickSort(a)
   implicit def toFM[Coll](a: Coll) = new FilterMap(a)
-  implicit def toFM2[A, Repr <% TraversableLike[A, Repr]](a: Repr) = new FilterMapFixed(a)
+  implicit def toFM2[A, Repr <% TraversableLike[A, Repr]](a: Repr) =
+    new FilterMapFixed(a)
 }
 
 object Test extends App {
@@ -70,8 +73,8 @@ object Test extends App {
   println("qwe".filterMap((c: Char) => Some(c)))
   println(Array(2, 0).filterMap((c: Int) => Some(c.toInt)).toList)
   println(Seq(2, 0).filterMap((c: Int) => if (c < 2) Some(c + "!") else None))
-  def test(i:Int) = Option(i)
-  println(BitSet(2,0).filterMap(test))
+  def test(i: Int) = Option(i)
+  println(BitSet(2, 0).filterMap(test))
 
   println(toFM2("qwe").filterMap2(c => Some(c)))
   println(toFM2(Array(2, 0)).filterMap2(c => Some(c.toInt)).toList)

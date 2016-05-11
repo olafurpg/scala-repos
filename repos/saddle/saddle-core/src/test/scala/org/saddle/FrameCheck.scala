@@ -1,24 +1,23 @@
 /**
- * Copyright (c) 2013 Saddle Development Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
-
+  * Copyright (c) 2013 Saddle Development Team
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  *     http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  **/
 package org.saddle
 
 import org.specs2.mutable.Specification
 import org.specs2.ScalaCheck
-import org.scalacheck.{ Gen, Arbitrary }
+import org.scalacheck.{Gen, Arbitrary}
 import org.scalacheck.Prop._
 import Serde.serializedCopy
 
@@ -28,21 +27,21 @@ class FrameCheck extends Specification with ScalaCheck {
     implicit val frame = Arbitrary(FrameArbitraries.frameDoubleWithNA)
 
     "frame equality" in {
-       forAll { (f: Frame[Int, Int, Double]) =>
-          (f must_== f.col(*)) and (f must_== f)
-       }
+      forAll { (f: Frame[Int, Int, Double]) =>
+        (f must_== f.col(*)) and (f must_== f)
+      }
     }
 
     "frame sortedRowsBy" in {
       forAll { (f: Frame[Int, Int, Double]) =>
         if (f.numCols > 0) {
-          val res = f.sortedRowsBy { x => x.at(0) }
+          val res = f.sortedRowsBy { x =>
+            x.at(0)
+          }
           val ord = array.argsort(f.colAt(0).toVec)
           val exp = f.rowAt(ord)
           res must_== exp
-        }
-        else
-          f must_== Frame.empty[Int, Int, Double]
+        } else f must_== Frame.empty[Int, Int, Double]
       }
     }
 
@@ -71,7 +70,7 @@ class FrameCheck extends Specification with ScalaCheck {
     }
 
     "Stringify works for one col, zero rows" in {
-      val f = Frame(Array(Vec.empty[Double]) : _*)
+      val f = Frame(Array(Vec.empty[Double]): _*)
       f.toString must throwAn[RuntimeException].not
     }
 
@@ -80,14 +79,10 @@ class FrameCheck extends Specification with ScalaCheck {
       f.T must_== Frame(Vec("a", "d"), Vec("b", "e"), Vec("c", "f"))
     }
 
-    "serialization works" in  {
+    "serialization works" in {
       forAll { f: Frame[Int, Int, Double] =>
         f must_== serializedCopy(f)
       }
     }
-
-
-
   }
-
 }

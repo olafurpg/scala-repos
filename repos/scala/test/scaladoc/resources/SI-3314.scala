@@ -32,42 +32,60 @@ package scala.test.scaladoc {
     }
 
     object UserObject {
-      def isWorkingDay1(d: scala.test.scaladoc.test2.WeekDayClass#Value) = false
-      def isWorkingDay2(d: scala.test.scaladoc.test2.WeekDayClass#WeekDay) = false
-      def isWorkingDay3(d: scala.test.scaladoc.test2.WeekDayTrait#Value) = false
-      def isWorkingDay4(d: scala.test.scaladoc.test2.WeekDayTrait#WeekDay) = false
-      def isWorkingDay5(d: scala.test.scaladoc.test2.WeekDayObject.Value) = false
-      def isWorkingDay6(d: scala.test.scaladoc.test2.WeekDayObject.WeekDay) = false
+      def isWorkingDay1(d: scala.test.scaladoc.test2.WeekDayClass#Value) =
+        false
+      def isWorkingDay2(d: scala.test.scaladoc.test2.WeekDayClass#WeekDay) =
+        false
+      def isWorkingDay3(d: scala.test.scaladoc.test2.WeekDayTrait#Value) =
+        false
+      def isWorkingDay4(d: scala.test.scaladoc.test2.WeekDayTrait#WeekDay) =
+        false
+      def isWorkingDay5(d: scala.test.scaladoc.test2.WeekDayObject.Value) =
+        false
+      def isWorkingDay6(d: scala.test.scaladoc.test2.WeekDayObject.WeekDay) =
+        false
       import WeekDayObject._
-      def isWorkingDay7(d: Value) = ! (d == Sat || d == Sun)
-      def isWorkingDay8(d: WeekDay) = ! (d == Sat || d == Sun)
-      def isWorkingDay9(d: WeekDayObject.Value) = ! (d == Sat || d == Sun)
+      def isWorkingDay7(d: Value) = !(d == Sat || d == Sun)
+      def isWorkingDay8(d: WeekDay) = !(d == Sat || d == Sun)
+      def isWorkingDay9(d: WeekDayObject.Value) = !(d == Sat || d == Sun)
     }
 
     class UserClass {
-      def isWorkingDay1(d: scala.test.scaladoc.test2.WeekDayClass#Value) = false
-      def isWorkingDay2(d: scala.test.scaladoc.test2.WeekDayClass#WeekDay) = false
-      def isWorkingDay3(d: scala.test.scaladoc.test2.WeekDayTrait#Value) = false
-      def isWorkingDay4(d: scala.test.scaladoc.test2.WeekDayTrait#WeekDay) = false
-      def isWorkingDay5(d: scala.test.scaladoc.test2.WeekDayObject.Value) = false
-      def isWorkingDay6(d: scala.test.scaladoc.test2.WeekDayObject.WeekDay) = false
+      def isWorkingDay1(d: scala.test.scaladoc.test2.WeekDayClass#Value) =
+        false
+      def isWorkingDay2(d: scala.test.scaladoc.test2.WeekDayClass#WeekDay) =
+        false
+      def isWorkingDay3(d: scala.test.scaladoc.test2.WeekDayTrait#Value) =
+        false
+      def isWorkingDay4(d: scala.test.scaladoc.test2.WeekDayTrait#WeekDay) =
+        false
+      def isWorkingDay5(d: scala.test.scaladoc.test2.WeekDayObject.Value) =
+        false
+      def isWorkingDay6(d: scala.test.scaladoc.test2.WeekDayObject.WeekDay) =
+        false
       import WeekDayObject._
-      def isWorkingDay7(d: Value) = ! (d == Sat || d == Sun)
-      def isWorkingDay8(d: WeekDay) = ! (d == Sat || d == Sun)
-      def isWorkingDay9(d: WeekDayObject.Value) = ! (d == Sat || d == Sun)
+      def isWorkingDay7(d: Value) = !(d == Sat || d == Sun)
+      def isWorkingDay8(d: WeekDay) = !(d == Sat || d == Sun)
+      def isWorkingDay9(d: WeekDayObject.Value) = !(d == Sat || d == Sun)
     }
 
     trait UserTrait {
-      def isWorkingDay1(d: scala.test.scaladoc.test2.WeekDayClass#Value) = false
-      def isWorkingDay2(d: scala.test.scaladoc.test2.WeekDayClass#WeekDay) = false
-      def isWorkingDay3(d: scala.test.scaladoc.test2.WeekDayTrait#Value) = false
-      def isWorkingDay4(d: scala.test.scaladoc.test2.WeekDayTrait#WeekDay) = false
-      def isWorkingDay5(d: scala.test.scaladoc.test2.WeekDayObject.Value) = false
-      def isWorkingDay6(d: scala.test.scaladoc.test2.WeekDayObject.WeekDay) = false
+      def isWorkingDay1(d: scala.test.scaladoc.test2.WeekDayClass#Value) =
+        false
+      def isWorkingDay2(d: scala.test.scaladoc.test2.WeekDayClass#WeekDay) =
+        false
+      def isWorkingDay3(d: scala.test.scaladoc.test2.WeekDayTrait#Value) =
+        false
+      def isWorkingDay4(d: scala.test.scaladoc.test2.WeekDayTrait#WeekDay) =
+        false
+      def isWorkingDay5(d: scala.test.scaladoc.test2.WeekDayObject.Value) =
+        false
+      def isWorkingDay6(d: scala.test.scaladoc.test2.WeekDayObject.WeekDay) =
+        false
       import WeekDayObject._
-      def isWorkingDay7(d: Value) = ! (d == Sat || d == Sun)
-      def isWorkingDay8(d: WeekDay) = ! (d == Sat || d == Sun)
-      def isWorkingDay9(d: WeekDayObject.Value) = ! (d == Sat || d == Sun)
+      def isWorkingDay7(d: Value) = !(d == Sat || d == Sun)
+      def isWorkingDay8(d: WeekDay) = !(d == Sat || d == Sun)
+      def isWorkingDay9(d: WeekDayObject.Value) = !(d == Sat || d == Sun)
     }
   }
 
@@ -79,7 +97,7 @@ package scala.test.scaladoc {
       trait A
       trait X
       def foo[T](x: T) = 7
-      def bar[A](x: ({type Lambda[X] <: Either[A, X]})#Lambda[String]) = 5
+      def bar[A](x: ({ type Lambda [X] <: Either[A, X] })#Lambda[String]) = 5
     }
   }
 }

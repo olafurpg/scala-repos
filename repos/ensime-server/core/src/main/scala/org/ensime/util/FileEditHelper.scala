@@ -7,7 +7,7 @@ import org.ensime.api._
 
 object FileEditHelper {
 
-  import scala.tools.refactoring.common.{ Change, TextChange }
+  import scala.tools.refactoring.common.{Change, TextChange}
 
   def fromChange(ch: Change): FileEdit = {
     ch match {
@@ -22,9 +22,13 @@ object FileEditHelper {
     }
   }
 
-  def diffFromTextEdits(ch: List[TextEdit], source: String, originalFile: File, revisedFile: File): String = {
+  def diffFromTextEdits(ch: List[TextEdit],
+                        source: String,
+                        originalFile: File,
+                        revisedFile: File): String = {
     val newContents = applyEdits(ch, source)
-    DiffUtil.compareContents(source.lines.toSeq, newContents.lines.toSeq, originalFile, revisedFile)
+    DiffUtil.compareContents(
+        source.lines.toSeq, newContents.lines.toSeq, originalFile, revisedFile)
   }
 
   //TODO: add diffFromNewFile and diffFromDeleteFile

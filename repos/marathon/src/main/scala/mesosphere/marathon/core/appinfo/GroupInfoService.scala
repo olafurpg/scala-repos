@@ -1,6 +1,6 @@
 package mesosphere.marathon.core.appinfo
 
-import mesosphere.marathon.state.{ Timestamp, PathId }
+import mesosphere.marathon.state.{Timestamp, PathId}
 
 import scala.concurrent.Future
 
@@ -17,8 +17,9 @@ trait GroupInfoService extends AppInfoService {
                   appEmbed: Set[AppInfo.Embed],
                   groupEmbed: Set[GroupInfo.Embed]): Future[Option[GroupInfo]]
 
-  def selectGroupVersion(groupId: PathId,
-                         version: Timestamp,
-                         groupSelector: GroupSelector,
-                         groupEmbed: Set[GroupInfo.Embed]): Future[Option[GroupInfo]]
+  def selectGroupVersion(
+      groupId: PathId,
+      version: Timestamp,
+      groupSelector: GroupSelector,
+      groupEmbed: Set[GroupInfo.Embed]): Future[Option[GroupInfo]]
 }

@@ -4,7 +4,8 @@ import scala.reflect.runtime.{currentMirror => cm}
 
 package scala {
   object ExceptionUtils {
-    def unwrapThrowable(ex: Throwable): Throwable = scala.reflect.runtime.ReflectionUtils.unwrapThrowable(ex)
+    def unwrapThrowable(ex: Throwable): Throwable =
+      scala.reflect.runtime.ReflectionUtils.unwrapThrowable(ex)
   }
 }
 
@@ -36,7 +37,8 @@ object Test extends App {
 
   println("============\nAny")
   println("it's important to print the list of Any's members")
-  println("if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
+  println(
+      "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
   typeOf[Any].members.toList.sortBy(key).foreach(sym => println(key(sym)))
   test(typeOf[Any], "2", "!=", "2")
   test(typeOf[Any], "2", "##")
@@ -52,14 +54,16 @@ object Test extends App {
 
   println("============\nAnyVal")
   println("it's important to print the list of AnyVal's members")
-  println("if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
+  println(
+      "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
   typeOf[AnyVal].decls.toList.sortBy(key).foreach(sym => println(key(sym)))
   test(typeOf[AnyVal], null, termNames.CONSTRUCTOR.toString)
   test(typeOf[AnyVal], 2, "getClass")
 
   println("============\nAnyRef")
   println("it's important to print the list of AnyRef's members")
-  println("if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
+  println(
+      "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
   typeOf[AnyRef].members.toList.sortBy(key).foreach(sym => println(key(sym)))
   test(typeOf[AnyRef], "2", "!=", "2")
   test(typeOf[AnyRef], "2", "##")
@@ -83,7 +87,8 @@ object Test extends App {
 
   println("============\nArray")
   println("it's important to print the list of Array's members")
-  println("if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
+  println(
+      "if some of them change (possibly, adding and/or removing magic symbols), we must update this test")
   ArrayClass.info.members.toList.sortBy(key).foreach(sym => println(key(sym)))
   test(ArrayClass.info, Array(1, 2), "length")
   test(ArrayClass.info, Array(1, 2), "apply", 0)
@@ -96,5 +101,8 @@ object Test extends App {
   println("============\nCTM")
   test(PredefModule.moduleClass.info, Predef, "classOf")
   test(PredefModule.moduleClass.info, Predef, "classOf", typeOf[String])
-  test(typeOf[scala.reflect.api.Universe], scala.reflect.runtime.universe, "reify", "2")
+  test(typeOf[scala.reflect.api.Universe],
+       scala.reflect.runtime.universe,
+       "reify",
+       "2")
 }

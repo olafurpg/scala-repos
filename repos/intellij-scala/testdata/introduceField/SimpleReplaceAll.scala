@@ -1,6 +1,7 @@
 /*replaceAll*/
 class Test {
-  /*start*/1/*end*/
+  /*start*/
+  1 /*end*/
   1
 }
 /*
@@ -10,4 +11,4 @@ class Test {
   i
   i
 }
-*/
+ */

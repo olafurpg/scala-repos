@@ -11,7 +11,8 @@ import org.scalatest.FunSuite
 class GaussianTest extends FunSuite {
   import AndersonDarlingTest._
 
-  def checkGaussian[A: Field: Trig: NRoot: IsReal: ClassTag](nextGaussian: (A, A) => A): Unit = {
+  def checkGaussian[A : Field : Trig : NRoot : IsReal : ClassTag](
+      nextGaussian: (A, A) => A): Unit = {
     val mean = Field[A].zero
     val stdDev = Field[A].one
     val xs = Array.fill(20)(nextGaussian(mean, stdDev))
@@ -23,7 +24,8 @@ class GaussianTest extends FunSuite {
     checkGaussian[Double](gen.nextGaussian(_, _))
   }
 
-  def checkMarsagliaGaussian[A: Field: NRoot: Trig: IsReal: Uniform: ClassTag] = {
+  def checkMarsagliaGaussian[
+      A : Field : NRoot : Trig : IsReal : Uniform : ClassTag] = {
     val gen = rng.Cmwc5.fromTime(42L)
     val gaussian = new MarsagliaGaussian[A]
     checkGaussian[A] { (mean, stdDev) =>
@@ -33,7 +35,8 @@ class GaussianTest extends FunSuite {
 
   test("MarsagliaGaussian[Float] is normal")(checkMarsagliaGaussian[Float])
   test("MarsagliaGaussian[Double] is normal")(checkMarsagliaGaussian[Double])
-  test("MarsagliaGaussian[BigDecimal] is normal")(checkMarsagliaGaussian[BigDecimal])
+  test("MarsagliaGaussian[BigDecimal] is normal")(
+      checkMarsagliaGaussian[BigDecimal])
 }
 
 object AndersonDarlingTest {
@@ -44,13 +47,15 @@ object AndersonDarlingTest {
   import spire.syntax.std.array._
 
   // Anderson-Darling test.
-  def isGaussian[A: Field: Trig: NRoot: IsReal: ClassTag](xs: Array[A], mean: A, stdDev: A): Boolean = {
-    @tailrec def loop(sum: A, i: Int, a: A, b: A): A = if (i < xs.length) {
-      // val y = cdf((xs(i) - mean) / stdDev, mean, stdDev)
-      val y = cdf(xs(i), mean, stdDev)
-      val k = a * y.log + b * (1 - y).log
-      loop(sum + k, i + 1, a + 2, b - 2)
-    } else sum
+  def isGaussian[A : Field : Trig : NRoot : IsReal : ClassTag](
+      xs: Array[A], mean: A, stdDev: A): Boolean = {
+    @tailrec def loop(sum: A, i: Int, a: A, b: A): A =
+      if (i < xs.length) {
+        // val y = cdf((xs(i) - mean) / stdDev, mean, stdDev)
+        val y = cdf(xs(i), mean, stdDev)
+        val k = a * y.log + b * (1 - y).log
+        loop(sum + k, i + 1, a + 2, b - 2)
+      } else sum
 
     xs.qsort
     val n = Field[A].fromInt(xs.length)
@@ -59,16 +64,21 @@ object AndersonDarlingTest {
     score < Field[A].fromDouble(2.492) // 5% significance.
   }
 
-  def cdf[A: Field: Trig: NRoot: IsReal](x: A, mean: A, stdDev: A): A =
+  def cdf[A : Field : Trig : NRoot : IsReal](x: A, mean: A, stdDev: A): A =
     0.5 * erfc((mean - x) / (Field[A].fromInt(2).sqrt * stdDev))
 
   // Approximation from: http://en.wikipedia.org/wiki/Error_function#Approximation_with_elementary_functions
   // which listed Abramowitz and Stegun as teh source.
-  def erfc[A: Field: Trig: IsReal](x: A): A = if (x.signum < 0) {
-    2 - erfc(-x)
-  } else {
-    val t = 1 / (1 + 0.3275911 * x)
-    val y = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429))))
-    (-x * x).exp() * y
-  }
+  def erfc[A : Field : Trig : IsReal](x: A): A =
+    if (x.signum < 0) {
+      2 - erfc(-x)
+    } else {
+      val t = 1 / (1 + 0.3275911 * x)
+      val y =
+        t *
+        (0.254829592 + t *
+            (-0.284496736 + t *
+                (1.421413741 + t * (-1.453152027 + t * 1.061405429))))
+      (-x * x).exp() * y
+    }
 }

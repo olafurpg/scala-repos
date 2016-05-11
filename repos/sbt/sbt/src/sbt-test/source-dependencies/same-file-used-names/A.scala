@@ -1,8 +1,8 @@
 object A {
-   def x = 3
+  def x = 3
 
-   def y = {
-     import B._
-     x
-   }
+  def y = {
+    import B._
+    x
+  }
 }

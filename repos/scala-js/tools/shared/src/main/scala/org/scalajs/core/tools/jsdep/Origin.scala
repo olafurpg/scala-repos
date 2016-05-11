@@ -32,7 +32,7 @@ object Origin {
   implicit object OriginJSONSerializer extends JSONSerializer[Origin] {
     def serialize(x: Origin): JSON = {
       new JSONObjBuilder()
-        .fld("moduleName",    x.moduleName)
+        .fld("moduleName", x.moduleName)
         .fld("configuration", x.configuration)
         .toJSON
     }
@@ -41,9 +41,8 @@ object Origin {
   implicit object OriginDeserializer extends JSONDeserializer[Origin] {
     def deserialize(x: JSON): Origin = {
       val obj = new JSONObjExtractor(x)
-      new Origin(
-          obj.fld[String]("moduleName"),
-          obj.fld[String]("configuration"))
+      new Origin(obj.fld[String]("moduleName"),
+                 obj.fld[String]("configuration"))
     }
   }
 }

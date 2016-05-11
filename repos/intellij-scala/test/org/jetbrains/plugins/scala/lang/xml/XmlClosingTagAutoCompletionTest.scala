@@ -4,17 +4,17 @@ package lang.xml
 import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
 
 /**
- * User: Dmitry Naydanov
- * Date: 3/3/12
- */
+  * User: Dmitry Naydanov
+  * Date: 3/3/12
+  */
+class XmlClosingTagAutoCompletionTest
+    extends ScalaLightCodeInsightFixtureTestAdapter {
 
-class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAdapter {
-  
-  private def checkGeneratedTextGt(text: String,  assumedStub: String) {
+  private def checkGeneratedTextGt(text: String, assumedStub: String) {
     checkGeneratedTextAfterTyping(text, assumedStub, '>')
   }
 
-  private def checkGeneratedTextSlash(text: String,  assumedStub: String) {
+  private def checkGeneratedTextSlash(text: String, assumedStub: String) {
     checkGeneratedTextAfterTyping(text, assumedStub, '/')
   }
 
@@ -33,14 +33,16 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
   }
 
   def testComplicatedTag() {
-    val text = "class A { val xml = <a>blah blah <blah/> <b" + CARET_MARKER + "</a> }"
+    val text =
+      "class A { val xml = <a>blah blah <blah/> <b" + CARET_MARKER + "</a> }"
     val assumedStub = "class A { val xml = <a>blah blah <blah/> <b></b></a> }"
 
     checkGeneratedTextGt(text, assumedStub)
   }
 
   def testComplicatedEmptyTag() {
-    val text = "class A { val xml = <a>blah blah <blah/> <abc" + CARET_MARKER + "</a> }"
+    val text =
+      "class A { val xml = <a>blah blah <blah/> <abc" + CARET_MARKER + "</a> }"
     val assumedStub = "class A { val xml = <a>blah blah <blah/> <abc/></a> }"
 
     checkGeneratedTextSlash(text, assumedStub)
@@ -61,8 +63,7 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
   }
 
   def testBigXml() {
-    val text =
-      ("""
+    val text = ("""
       |<lift:TD.list all_id="all_todos">
       |  <div id="all_todos">
       |    <div>Exclude done
@@ -88,8 +89,7 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
       |</lift:TD.list>
       """).stripMargin.replace("\r", "")
 
-    val assumedStub =
-      """
+    val assumedStub = """
       |<lift:TD.list all_id="all_todos">
       |  <div id="all_todos">
       |    <div>Exclude done
@@ -115,20 +115,17 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
       |</lift:TD.list>
       """.stripMargin.replace("\r", "")
 
-
     checkGeneratedTextGt(text, assumedStub)
   }
 
   def testXmlPattern1() {
-    val text =
-      ("""
+    val text = ("""
       | xml match {
       |   case <aaa""" + CARET_MARKER + """
       |}
       """).stripMargin.replace("\r", "")
 
-    val assumedStub =
-      """
+    val assumedStub = """
         | xml match {
         |   case <aaa></aaa>
         |}
@@ -138,15 +135,13 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
   }
 
   def testXmlPaternWithEmptyTag1() {
-    val text =
-      ("""
+    val text = ("""
       | xml match {
       |   case <aaa""" + CARET_MARKER + """
       |}
       """).stripMargin.replace("\r", "")
 
-    val assumedStub =
-      """
+    val assumedStub = """
         | xml match {
         |   case <aaa/>
         |}
@@ -156,16 +151,14 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
   }
 
   def testXmlPattern2() {
-    val text =
-      ("""
+    val text = ("""
       | xml match {
       |   case <a></a> =>
       |   case <aaa""" + CARET_MARKER + """
       | }
       """).stripMargin.replace("\r", "")
 
-    val assumedStub =
-      """
+    val assumedStub = """
         | xml match {
         |   case <a></a> =>
         |   case <aaa></aaa>
@@ -176,16 +169,14 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
   }
 
   def testXmlPatternWithEmpryTag2() {
-    val text =
-      ("""
+    val text = ("""
       | xml match {
       |   case <a></a> =>
       |   case <aaa""" + CARET_MARKER + """
       | }
       """).stripMargin.replace("\r", "")
 
-    val assumedStub =
-      """
+    val assumedStub = """
         | xml match {
         |   case <a></a> =>
         |   case <aaa/>
@@ -202,14 +193,13 @@ class XmlClosingTagAutoCompletionTest extends ScalaLightCodeInsightFixtureTestAd
   }
 
   def testSwallowGtAfterEmptyTagEndInXmlPattern() {
-    val header = 
-      """
+    val header = """
         |val xml = <aaa attr="<aaa//>" />
         |xml match { 
-        |   case <aaa/""".stripMargin.replace("\r", "") 
-    
+        |   case <aaa/""".stripMargin.replace("\r", "")
+
     val text = header + CARET_MARKER + ">  => 1  }"
-    
+
     val stub = header + ">" + CARET_MARKER + "  => 1  }"
 
     checkGeneratedTextGt(text, stub)

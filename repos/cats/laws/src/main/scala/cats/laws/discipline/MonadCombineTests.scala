@@ -7,27 +7,29 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
 import Prop._
 
-trait MonadCombineTests[F[_]] extends MonadFilterTests[F] with AlternativeTests[F] {
+trait MonadCombineTests[F[_]]
+    extends MonadFilterTests[F] with AlternativeTests[F] {
   def laws: MonadCombineLaws[F]
 
-  def monadCombine[A: Arbitrary: Eq, B: Arbitrary: Eq, C: Arbitrary: Eq](implicit
-    ArbFA: Arbitrary[F[A]],
-    ArbFB: Arbitrary[F[B]],
-    ArbFC: Arbitrary[F[C]],
-    ArbFAtoB: Arbitrary[F[A => B]],
-    ArbFBtoC: Arbitrary[F[B => C]],
-    EqFA: Eq[F[A]],
-    EqFB: Eq[F[B]],
-    EqFC: Eq[F[C]],
-    EqFABC: Eq[F[(A, B, C)]],
-    iso: Isomorphisms[F]
-  ): RuleSet = {
+  def monadCombine[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
+      implicit ArbFA: Arbitrary[F[A]],
+      ArbFB: Arbitrary[F[B]],
+      ArbFC: Arbitrary[F[C]],
+      ArbFAtoB: Arbitrary[F[A => B]],
+      ArbFBtoC: Arbitrary[F[B => C]],
+      EqFA: Eq[F[A]],
+      EqFB: Eq[F[B]],
+      EqFC: Eq[F[C]],
+      EqFABC: Eq[F[(A, B, C)]],
+      iso: Isomorphisms[F]): RuleSet = {
     new RuleSet {
       def name: String = "monadCombine"
       def bases: Seq[(String, RuleSet)] = Nil
-      def parents: Seq[RuleSet] = Seq(monadFilter[A, B, C], alternative[A,B,C])
+      def parents: Seq[RuleSet] =
+        Seq(monadFilter[A, B, C], alternative[A, B, C])
       def props: Seq[(String, Prop)] = Seq(
-        "monadCombine left distributivity" -> forAll(laws.monadCombineLeftDistributivity[A, B] _)
+          "monadCombine left distributivity" -> forAll(
+              laws.monadCombineLeftDistributivity[A, B] _)
       )
     }
   }

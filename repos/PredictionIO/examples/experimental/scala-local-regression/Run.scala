@@ -24,27 +24,29 @@ import scala.io.Source
 import java.io.File
 
 case class DataSourceParams(val filepath: String, val seed: Int = 9527)
-  extends Params
+    extends Params
 
 case class TrainingData(x: Vector[Vector[Double]], y: Vector[Double])
-  extends Serializable {
+    extends Serializable {
   val r = x.length
   val c = x.head.length
 }
 
 case class LocalDataSource(val dsp: DataSourceParams)
-  extends LDataSource[
-    DataSourceParams, String, TrainingData, Vector[Double], Double] {
-  override
-  def read(): Seq[(String, TrainingData, Seq[(Vector[Double], Double)])] = {
-    val lines = Source.fromFile(dsp.filepath).getLines
-      .toSeq.map(_.split(" ", 2))
+    extends LDataSource[
+        DataSourceParams, String, TrainingData, Vector[Double], Double] {
+  override def read(
+      ): Seq[(String, TrainingData, Seq[(Vector[Double], Double)])] = {
+    val lines =
+      Source.fromFile(dsp.filepath).getLines.toSeq.map(_.split(" ", 2))
 
     // FIXME: Use different training / testing data.
-    val x = lines.map{ _(1).split(' ').map{_.toDouble} }.map{ e => Vector(e:_*)}
-    val y = lines.map{ _(0).toDouble }
+    val x = lines.map { _ (1).split(' ').map { _.toDouble } }.map { e =>
+      Vector(e: _*)
+    }
+    val y = lines.map { _ (0).toDouble }
 
-    val td = TrainingData(Vector(x:_*), Vector(y:_*))
+    val td = TrainingData(Vector(x: _*), Vector(y: _*))
 
     val oneData = ("The One", td, x.zip(y))
     return Seq(oneData)
@@ -56,19 +58,24 @@ case class LocalDataSource(val dsp: DataSourceParams)
 case class PreparatorParams(n: Int = 0, k: Int = 0) extends Params
 
 case class LocalPreparator(val pp: PreparatorParams = PreparatorParams())
-  extends LPreparator[PreparatorParams, TrainingData, TrainingData] {
+    extends LPreparator[PreparatorParams, TrainingData, TrainingData] {
   def prepare(td: TrainingData): TrainingData = {
-    val xyi: Vector[(Vector[Double], Double)] = td.x.zip(td.y)
+    val xyi: Vector[(Vector[Double], Double)] = td.x
+      .zip(td.y)
       .zipWithIndex
-      .filter{ e => (e._2 % pp.n) != pp.k}
-      .map{ e => (e._1._1, e._1._2) }
+      .filter { e =>
+        (e._2 % pp.n) != pp.k
+      }
+      .map { e =>
+        (e._1._1, e._1._2)
+      }
     TrainingData(xyi.map(_._1), xyi.map(_._2))
   }
 }
 
 case class LocalAlgorithm()
-  extends LAlgorithm[
-      EmptyParams, TrainingData, Array[Double], Vector[Double], Double] {
+    extends LAlgorithm[
+        EmptyParams, TrainingData, Array[Double], Vector[Double], Double] {
 
   def train(td: TrainingData): Array[Double] = {
     val xArray: Array[Double] = td.x.foldLeft(Vector[Double]())(_ ++ _).toArray
@@ -87,35 +94,32 @@ case class LocalAlgorithm()
     Utils.json4sDefaultFormats + new VectorSerializer
 }
 
-class VectorSerializer extends CustomSerializer[Vector[Double]](format => (
-  {
-    case JArray(s) =>
-      s.map {
-        case JDouble(x) => x
-        case _ => 0
-      }.toVector
-  },
-  {
-    case x: Vector[Double] =>
-      JArray(x.toList.map(y => JDouble(y)))
-  }
-))
+class VectorSerializer
+    extends CustomSerializer[Vector[Double]](
+        format =>
+          ({
+        case JArray(s) =>
+          s.map {
+            case JDouble(x) => x
+            case _ => 0
+          }.toVector
+      }, {
+        case x: Vector[Double] =>
+          JArray(x.toList.map(y => JDouble(y)))
+      }))
 
 object RegressionEngineFactory extends IEngineFactory {
   def apply() = {
-    new Engine(
-      classOf[LocalDataSource],
-      classOf[LocalPreparator],
-      Map("" -> classOf[LocalAlgorithm]),
-      classOf[LFirstServing[Vector[Double], Double]])
+    new Engine(classOf[LocalDataSource],
+               classOf[LocalPreparator],
+               Map("" -> classOf[LocalAlgorithm]),
+               classOf[LFirstServing[Vector[Double], Double]])
   }
 }
 
 object Run {
   val workflowParams = WorkflowParams(
-    batch = "Imagine: Local Regression",
-    verbose = 3,
-    saveModel = true)
+      batch = "Imagine: Local Regression", verbose = 3, saveModel = true)
 
   def runComponents() {
     val filepath = new File("../data/lr_data.txt").getCanonicalPath
@@ -123,31 +127,29 @@ object Run {
     val preparatorParams = new PreparatorParams(n = 2, k = 0)
 
     Workflow.run(
-      params = workflowParams,
-      dataSourceClassOpt = Some(classOf[LocalDataSource]),
-      dataSourceParams = dataSourceParams,
-      preparatorClassOpt = Some(classOf[LocalPreparator]),
-      preparatorParams = preparatorParams,
-      algorithmClassMapOpt = Some(Map("" -> classOf[LocalAlgorithm])),
-      algorithmParamsList = Seq(
-        ("", EmptyParams())),
-      servingClassOpt = Some(classOf[LFirstServing[Vector[Double], Double]]),
-      evaluatorClassOpt = Some(classOf[MeanSquareError]))
+        params = workflowParams,
+        dataSourceClassOpt = Some(classOf[LocalDataSource]),
+        dataSourceParams = dataSourceParams,
+        preparatorClassOpt = Some(classOf[LocalPreparator]),
+        preparatorParams = preparatorParams,
+        algorithmClassMapOpt = Some(Map("" -> classOf[LocalAlgorithm])),
+        algorithmParamsList = Seq(("", EmptyParams())),
+        servingClassOpt = Some(classOf[LFirstServing[Vector[Double], Double]]),
+        evaluatorClassOpt = Some(classOf[MeanSquareError]))
   }
 
   def runEngine() {
     val filepath = new File("../data/lr_data.txt").getCanonicalPath
     val engine = RegressionEngineFactory()
     val engineParams = new EngineParams(
-      dataSourceParams = DataSourceParams(filepath),
-      preparatorParams = PreparatorParams(n = 2, k = 0),
-      algorithmParamsList = Seq(("", EmptyParams())))
+        dataSourceParams = DataSourceParams(filepath),
+        preparatorParams = PreparatorParams(n = 2, k = 0),
+        algorithmParamsList = Seq(("", EmptyParams())))
 
-    Workflow.runEngine(
-      params = workflowParams,
-      engine = engine,
-      engineParams = engineParams,
-      evaluatorClassOpt = Some(classOf[MeanSquareError]))
+    Workflow.runEngine(params = workflowParams,
+                       engine = engine,
+                       engineParams = engineParams,
+                       evaluatorClassOpt = Some(classOf[MeanSquareError]))
   }
 
   def main(args: Array[String]) {

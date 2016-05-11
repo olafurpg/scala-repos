@@ -9,13 +9,11 @@ trait Output[T] {
   def result(): T
 
   def put(obj: T): this.type
-
 }
 
 class StringOutput extends Output[String] {
 
-  private val buf =
-    new StringBuilder()
+  private val buf = new StringBuilder()
 
   def result(): String =
     buf.toString

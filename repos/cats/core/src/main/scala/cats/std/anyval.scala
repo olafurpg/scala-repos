@@ -5,30 +5,21 @@ import algebra.CommutativeGroup
 import algebra.ring.AdditiveCommutativeGroup
 
 trait AnyValInstances
-  extends IntInstances
-  with    ByteInstances
-  with    CharInstances
-  with    LongInstances
-  with    ShortInstances
-  with    FloatInstances
-  with    DoubleInstances
-  with    BooleanInstances
-  with    UnitInstances
+    extends IntInstances with ByteInstances with CharInstances
+    with LongInstances with ShortInstances with FloatInstances
+    with DoubleInstances with BooleanInstances with UnitInstances
 
 trait IntInstances extends algebra.std.IntInstances {
 
-  implicit val intShow: Show[Int] =
-    Show.fromToString[Int]
+  implicit val intShow: Show[Int] = Show.fromToString[Int]
 
   implicit val intGroup: CommutativeGroup[Int] =
     AdditiveCommutativeGroup[Int].additive
-
 }
 
 trait ByteInstances /* missing algebra type classes */ {
 
-  implicit val byteShow: Show[Byte] =
-    Show.fromToString[Byte]
+  implicit val byteShow: Show[Byte] = Show.fromToString[Byte]
 
   // TODO: replace this minimal algebra with one from the algebra project
   implicit val byteAlgebra: CommutativeGroup[Byte] with Order[Byte] =
@@ -43,20 +34,17 @@ trait ByteInstances /* missing algebra type classes */ {
 
 trait CharInstances /* missing algebra type classes */ {
 
-  implicit val charShow: Show[Char] =
-    Show.fromToString[Char]
+  implicit val charShow: Show[Char] = Show.fromToString[Char]
 
-  implicit val charOrder: Order[Char] =
-    new Order[Char] {
-      def compare(x: Char, y: Char): Int =
-        if (x < y) -1 else if (y < x) 1 else 0
-    }
+  implicit val charOrder: Order[Char] = new Order[Char] {
+    def compare(x: Char, y: Char): Int =
+      if (x < y) -1 else if (y < x) 1 else 0
+  }
 }
 
 trait ShortInstances /* missing algebra type classes */ {
 
-  implicit val shortShow: Show[Short] =
-    Show.fromToString[Short]
+  implicit val shortShow: Show[Short] = Show.fromToString[Short]
 
   // TODO: replace this minimal algebra with one from the algebra project
   implicit val shortAlgebra: CommutativeGroup[Short] with Order[Short] =
@@ -67,13 +55,11 @@ trait ShortInstances /* missing algebra type classes */ {
       def compare(x: Short, y: Short): Int =
         if (x < y) -1 else if (y < x) 1 else 0
     }
-
 }
 
 trait LongInstances /* missing algebra type classes */ {
 
-  implicit val longShow: Show[Long] =
-    Show.fromToString[Long]
+  implicit val longShow: Show[Long] = Show.fromToString[Long]
 
   // TODO: replace this minimal algebra with one from the algebra project
   implicit val longAlgebra: CommutativeGroup[Long] with Order[Long] =
@@ -88,8 +74,7 @@ trait LongInstances /* missing algebra type classes */ {
 
 trait FloatInstances /* missing algebra type classes */ {
 
-  implicit val floatShow: Show[Float] =
-    Show.fromToString[Float]
+  implicit val floatShow: Show[Float] = Show.fromToString[Float]
 
   // TODO: replace this minimal algebra with one from the algebra project
   implicit val floatAlgebra: CommutativeGroup[Float] with Order[Float] =
@@ -100,13 +85,11 @@ trait FloatInstances /* missing algebra type classes */ {
       def compare(x: Float, y: Float): Int =
         java.lang.Float.compare(x, y)
     }
-
 }
 
 trait DoubleInstances /* missing algebra type classes */ {
 
-  implicit val doubleShow: Show[Double] =
-    Show.fromToString[Double]
+  implicit val doubleShow: Show[Double] = Show.fromToString[Double]
 
   // TODO: replace this minimal algebra with one from the algebra project
   implicit val doubleAlgebra: CommutativeGroup[Double] with Order[Double] =
@@ -117,20 +100,16 @@ trait DoubleInstances /* missing algebra type classes */ {
       def compare(x: Double, y: Double): Int =
         java.lang.Double.compare(x, y)
     }
-
 }
 
 trait BooleanInstances extends algebra.std.BooleanInstances {
 
-  implicit val booleanShow: Show[Boolean] =
-    Show.fromToString[Boolean]
-
+  implicit val booleanShow: Show[Boolean] = Show.fromToString[Boolean]
 }
 
 trait UnitInstances /* missing algebra type classes */ {
 
-  implicit val unitShow: Show[Unit] =
-    Show.fromToString[Unit]
+  implicit val unitShow: Show[Unit] = Show.fromToString[Unit]
 
   implicit val unitAlgebra: CommutativeGroup[Unit] with Order[Unit] =
     new CommutativeGroup[Unit] with Order[Unit] {
@@ -139,5 +118,4 @@ trait UnitInstances /* missing algebra type classes */ {
       def inverse(x: Unit): Unit = ()
       def compare(x: Unit, y: Unit): Int = 0
     }
-
 }

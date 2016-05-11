@@ -17,7 +17,8 @@ abstract class AbsArray[T] {
   def applyDouble(idx: Int): Double = apply(idx).asInstanceOf[Double]
   def updateDouble(idx: Int, elem: Double) = update(idx, elem.asInstanceOf[T])
   def applyBoolean(idx: Int): Boolean = apply(idx).asInstanceOf[Boolean]
-  def updateBoolean(idx: Int, elem: Boolean) = update(idx, elem.asInstanceOf[T])
+  def updateBoolean(idx: Int, elem: Boolean) =
+    update(idx, elem.asInstanceOf[T])
   def applyObject(idx: Int): Object = apply(idx).asInstanceOf[Object]
   def updateObject(idx: Int, elem: Object) = update(idx, elem.asInstanceOf[T])
 }

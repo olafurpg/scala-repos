@@ -8,8 +8,8 @@ import org.jetbrains.jps.incremental.scala.local.JavacOutputParsing._
 import xsbti.{F0, Logger}
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 trait JavacOutputParsing extends Logger {
   private case class Header(file: File, line: Long, kind: Kind)
 
@@ -30,17 +30,24 @@ trait JavacOutputParsing extends Logger {
   private def process(line: String, kind: Kind) {
     line match {
       case HeaderPattern(path, row, modifier, message) =>
-        header = Some(Header(new File(path), row.toLong, if (modifier == null) kind else Kind.WARNING))
+        header = Some(
+            Header(new File(path),
+                   row.toLong,
+                   if (modifier == null) kind else Kind.WARNING))
         lines :+= message
       case PointerPattern(prefix) if header.isDefined =>
         val text = (lines :+ line).mkString("\n")
-        client.message(header.get.kind, text, header.map(_.file), header.map(_.line), Some(1L + prefix.length))
+        client.message(header.get.kind,
+                       text,
+                       header.map(_.file),
+                       header.map(_.line),
+                       Some(1L + prefix.length))
         header = None
         lines = Vector.empty
       case NotePattern(message) =>
         client.message(Kind.WARNING, message)
       case TotalsPattern() =>
-        // do nothing
+      // do nothing
       case _ =>
         if (header.isDefined) {
           lines :+= line

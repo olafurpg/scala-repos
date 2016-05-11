@@ -20,7 +20,8 @@ object ActorTest extends SpecLite {
 
   "code errors are catched and can be handled" in {
     val latch = new CountDownLatch(1)
-    val actor = Actor[Int]((i: Int) => 100 / i, (ex: Throwable) => latch.countDown())
+    val actor =
+      Actor[Int]((i: Int) => 100 / i, (ex: Throwable) => latch.countDown())
     actor ! 0
     assertCountDown(latch, "Should catch an exception")
   }
@@ -29,13 +30,12 @@ object ActorTest extends SpecLite {
     val latch = new CountDownLatch(NumOfMessages)
     var actor1: Actor[Int] = null
     val actor2 = Actor[Int]((i: Int) => actor1 ! i - 1)
-    actor1 = Actor[Int] {
-      (i: Int) =>
-        if (i == latch.getCount) {
-          latch.countDown()
-          latch.countDown()
-          if (i != 0) actor2 ! i - 1
-        }
+    actor1 = Actor[Int] { (i: Int) =>
+      if (i == latch.getCount) {
+        latch.countDown()
+        latch.countDown()
+        if (i != 0) actor2 ! i - 1
+      }
     }
     actor1 ! NumOfMessages
     assertCountDown(latch, "Should exchange " + NumOfMessages + " messages")
@@ -52,14 +52,15 @@ object ActorTest extends SpecLite {
     assertCountDown(latch, "Should process " + NumOfMessages + " messages")
   }
 
-  def countingDownActor(latch: CountDownLatch): Actor[(Int, Int)] = Actor[(Int, Int)] {
-    val ms = mutable.Map[Int, Int]()
+  def countingDownActor(latch: CountDownLatch): Actor[(Int, Int)] =
+    Actor[(Int, Int)] {
+      val ms = mutable.Map[Int, Int]()
 
-    (m: (Int, Int)) =>
-      val (j, i) = m
-      if (ms.getOrElse(j, 0) + 1 == i) {
-        ms.put(j, i)
-        latch.countDown()
-      }
-  }
+      (m: (Int, Int)) =>
+        val (j, i) = m
+        if (ms.getOrElse(j, 0) + 1 == i) {
+          ms.put(j, i)
+          latch.countDown()
+        }
+    }
 }

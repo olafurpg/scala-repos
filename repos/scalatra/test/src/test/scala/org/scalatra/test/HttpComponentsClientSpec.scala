@@ -1,7 +1,7 @@
 package org.scalatra.test
 
-import java.io.{ InputStream, OutputStream }
-import javax.servlet.http.{ HttpServlet, HttpServletRequest, HttpServletResponse }
+import java.io.{InputStream, OutputStream}
+import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeAfterAll
@@ -10,9 +10,7 @@ import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 
 class HttpComponentsClientSpec
-    extends Specification
-    with HttpComponentsClient
-    with EmbeddedJettyContainer
+    extends Specification with HttpComponentsClient with EmbeddedJettyContainer
     with BeforeAfterAll {
 
   def beforeAll = start()
@@ -36,11 +34,13 @@ class HttpComponentsClientSpec
       resp.setHeader("Request-Method", req.getMethod.toUpperCase)
       resp.setHeader("Request-URI", req.getRequestURI)
       req.getHeaderNames.foreach(headerName =>
-        resp.setHeader("Request-Header-%s".format(headerName), req.getHeader(headerName)))
+            resp.setHeader("Request-Header-%s".format(headerName),
+                           req.getHeader(headerName)))
 
       req.getParameterMap.foreach {
         case (name, values) =>
-          resp.setHeader("Request-Param-%s".format(name), values.mkString(", "))
+          resp.setHeader("Request-Param-%s".format(name),
+                         values.mkString(", "))
       }
 
       resp.getOutputStream.write("received: ".getBytes)
@@ -51,19 +51,19 @@ class HttpComponentsClientSpec
   "client" should {
     "support all HTTP methods" in {
       (doVerbGetActual("PUT") must equalTo("PUT")) and
-        (doVerbGetActual("POST") must equalTo("POST")) and
-        (doVerbGetActual("TRACE") must equalTo("TRACE")) and
-        (doVerbGetActual("GET") must equalTo("GET")) and
-        (doVerbGetActual("HEAD") must equalTo("HEAD")) and
-        (doVerbGetActual("OPTIONS") must equalTo("OPTIONS")) and
-        (doVerbGetActual("DELETE") must equalTo("DELETE")) and
-        (doVerbGetActual("PATCH") must equalTo("PATCH"))
+      (doVerbGetActual("POST") must equalTo("POST")) and
+      (doVerbGetActual("TRACE") must equalTo("TRACE")) and
+      (doVerbGetActual("GET") must equalTo("GET")) and
+      (doVerbGetActual("HEAD") must equalTo("HEAD")) and
+      (doVerbGetActual("OPTIONS") must equalTo("OPTIONS")) and
+      (doVerbGetActual("DELETE") must equalTo("DELETE")) and
+      (doVerbGetActual("PATCH") must equalTo("PATCH"))
     }
 
     "submit query string parameters" in {
       get("/", Map("param1" -> "value1", "param2" -> "value2")) {
         (header("Request-Param-param1") must equalTo("value1")) and
-          (header("Request-Param-param2") must equalTo("value2"))
+        (header("Request-Param-param2") must equalTo("value2"))
       }
     }
 
@@ -75,8 +75,9 @@ class HttpComponentsClientSpec
 
     "submit body for POST/PUT/PATCH requests" in {
       (doReqWithBody("POST", "post test") must equalTo("received: post test")) and
-        (doReqWithBody("PUT", "put test") must equalTo("received: put test")) and
-        (doReqWithBody("PATCH", "patch test") must equalTo("received: patch test"))
+      (doReqWithBody("PUT", "put test") must equalTo("received: put test")) and
+      (doReqWithBody("PATCH", "patch test") must equalTo(
+              "received: patch test"))
     }
   }
 

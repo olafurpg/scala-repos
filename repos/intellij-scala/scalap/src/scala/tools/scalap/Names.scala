@@ -1,13 +1,11 @@
 /*     ___ ____ ___   __   ___   ___
-**    / _// __// _ | / /  / _ | / _ \    Scala classfile decoder
-**  __\ \/ /__/ __ |/ /__/ __ |/ ___/    (c) 2003-2010, LAMP/EPFL
-** /____/\___/_/ |_/____/_/ |_/_/        http://scala-lang.org/
-**
-*/
-
+ **    / _// __// _ | / /  / _ | / _ \    Scala classfile decoder
+ **  __\ \/ /__/ __ |/ /__/ __ |/ ___/    (c) 2003-2010, LAMP/EPFL
+ ** /____/\___/_/ |_/____/_/ |_/_/        http://scala-lang.org/
+ **
+ */
 
 package scala.tools.scalap
-
 
 object Names {
 
@@ -31,7 +29,7 @@ object Names {
   operatorName(':') = "$colon"
 
   /** Replace operator symbols by corresponding "$op_name" in names.
-   */
+    */
   def encode(name: String): String = {
     var i = 0
     val len = name.length()
@@ -40,19 +38,16 @@ object Names {
       val c = name.charAt(i)
       if (c < 128) {
         val nop = operatorName(c)
-        if (nop == null)
-          res.append(c)
-        else
-          res.append(nop)
-      } else
-        res.append(c)
+        if (nop == null) res.append(c)
+        else res.append(nop)
+      } else res.append(c)
       i = i + 1
-     }
-     res.toString()
+    }
+    res.toString()
   }
 
   /** Replace "$op_name" by corresponding operator symbols in names.
-   */
+    */
   def decode(name: String): String = {
     var i = 0
     val len = name.length()
@@ -67,8 +62,7 @@ object Names {
           if (c != null) {
             i = j
             res.append(c)
-          } else
-            j = j - 1
+          } else j = j - 1
         }
       } else {
         i = i + 1
@@ -79,7 +73,7 @@ object Names {
   }
 
   /** Looks up the array entry for the operator name.
-   */
+    */
   def lookup(string: String): String = {
     var i = 0
     var res: String = null
@@ -92,5 +86,4 @@ object Names {
     }
     res
   }
-
 }

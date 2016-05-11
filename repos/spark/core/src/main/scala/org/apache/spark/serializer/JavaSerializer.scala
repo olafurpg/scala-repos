@@ -28,17 +28,17 @@ import org.apache.spark.util.{ByteBufferInputStream, ByteBufferOutputStream, Uti
 
 private[spark] class JavaSerializationStream(
     out: OutputStream, counterReset: Int, extraDebugInfo: Boolean)
-  extends SerializationStream {
+    extends SerializationStream {
   private val objOut = new ObjectOutputStream(out)
   private var counter = 0
 
   /**
-   * Calling reset to avoid memory leak:
-   * http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
-   * But only call it every 100th time to avoid bloated serialization streams (when
-   * the stream 'resets' object class descriptions have to be re-written)
-   */
-  def writeObject[T: ClassTag](t: T): SerializationStream = {
+    * Calling reset to avoid memory leak:
+    * http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
+    * But only call it every 100th time to avoid bloated serialization streams (when
+    * the stream 'resets' object class descriptions have to be re-written)
+    */
+  def writeObject[T : ClassTag](t: T): SerializationStream = {
     try {
       objOut.writeObject(t)
     } catch {
@@ -57,8 +57,9 @@ private[spark] class JavaSerializationStream(
   def close() { objOut.close() }
 }
 
-private[spark] class JavaDeserializationStream(in: InputStream, loader: ClassLoader)
-  extends DeserializationStream {
+private[spark] class JavaDeserializationStream(
+    in: InputStream, loader: ClassLoader)
+    extends DeserializationStream {
 
   private val objIn = new ObjectInputStream(in) {
     override def resolveClass(desc: ObjectStreamClass): Class[_] =
@@ -68,33 +69,35 @@ private[spark] class JavaDeserializationStream(in: InputStream, loader: ClassLoa
         // scalastyle:on classforname
       } catch {
         case e: ClassNotFoundException =>
-          JavaDeserializationStream.primitiveMappings.getOrElse(desc.getName, throw e)
+          JavaDeserializationStream.primitiveMappings.getOrElse(
+              desc.getName, throw e)
       }
   }
 
-  def readObject[T: ClassTag](): T = objIn.readObject().asInstanceOf[T]
+  def readObject[T : ClassTag](): T = objIn.readObject().asInstanceOf[T]
   def close() { objIn.close() }
 }
 
 private object JavaDeserializationStream {
   val primitiveMappings = Map[String, Class[_]](
-    "boolean" -> classOf[Boolean],
-    "byte" -> classOf[Byte],
-    "char" -> classOf[Char],
-    "short" -> classOf[Short],
-    "int" -> classOf[Int],
-    "long" -> classOf[Long],
-    "float" -> classOf[Float],
-    "double" -> classOf[Double],
-    "void" -> classOf[Void]
+      "boolean" -> classOf[Boolean],
+      "byte" -> classOf[Byte],
+      "char" -> classOf[Char],
+      "short" -> classOf[Short],
+      "int" -> classOf[Int],
+      "long" -> classOf[Long],
+      "float" -> classOf[Float],
+      "double" -> classOf[Double],
+      "void" -> classOf[Void]
   )
 }
 
-private[spark] class JavaSerializerInstance(
-    counterReset: Int, extraDebugInfo: Boolean, defaultClassLoader: ClassLoader)
-  extends SerializerInstance {
+private[spark] class JavaSerializerInstance(counterReset: Int,
+                                            extraDebugInfo: Boolean,
+                                            defaultClassLoader: ClassLoader)
+    extends SerializerInstance {
 
-  override def serialize[T: ClassTag](t: T): ByteBuffer = {
+  override def serialize[T : ClassTag](t: T): ByteBuffer = {
     val bos = new ByteBufferOutputStream()
     val out = serializeStream(bos)
     out.writeObject(t)
@@ -102,13 +105,14 @@ private[spark] class JavaSerializerInstance(
     bos.toByteBuffer
   }
 
-  override def deserialize[T: ClassTag](bytes: ByteBuffer): T = {
+  override def deserialize[T : ClassTag](bytes: ByteBuffer): T = {
     val bis = new ByteBufferInputStream(bytes)
     val in = deserializeStream(bis)
     in.readObject()
   }
 
-  override def deserialize[T: ClassTag](bytes: ByteBuffer, loader: ClassLoader): T = {
+  override def deserialize[T : ClassTag](
+      bytes: ByteBuffer, loader: ClassLoader): T = {
     val bis = new ByteBufferInputStream(bytes)
     val in = deserializeStream(bis, loader)
     in.readObject()
@@ -122,35 +126,40 @@ private[spark] class JavaSerializerInstance(
     new JavaDeserializationStream(s, defaultClassLoader)
   }
 
-  def deserializeStream(s: InputStream, loader: ClassLoader): DeserializationStream = {
+  def deserializeStream(
+      s: InputStream, loader: ClassLoader): DeserializationStream = {
     new JavaDeserializationStream(s, loader)
   }
 }
 
 /**
- * :: DeveloperApi ::
- * A Spark serializer that uses Java's built-in serialization.
- *
- * Note that this serializer is not guaranteed to be wire-compatible across different versions of
- * Spark. It is intended to be used to serialize/de-serialize data within a single
- * Spark application.
- */
+  * :: DeveloperApi ::
+  * A Spark serializer that uses Java's built-in serialization.
+  *
+  * Note that this serializer is not guaranteed to be wire-compatible across different versions of
+  * Spark. It is intended to be used to serialize/de-serialize data within a single
+  * Spark application.
+  */
 @DeveloperApi
 class JavaSerializer(conf: SparkConf) extends Serializer with Externalizable {
-  private var counterReset = conf.getInt("spark.serializer.objectStreamReset", 100)
-  private var extraDebugInfo = conf.getBoolean("spark.serializer.extraDebugInfo", true)
+  private var counterReset =
+    conf.getInt("spark.serializer.objectStreamReset", 100)
+  private var extraDebugInfo =
+    conf.getBoolean("spark.serializer.extraDebugInfo", true)
 
-  protected def this() = this(new SparkConf())  // For deserialization only
+  protected def this() = this(new SparkConf()) // For deserialization only
 
   override def newInstance(): SerializerInstance = {
-    val classLoader = defaultClassLoader.getOrElse(Thread.currentThread.getContextClassLoader)
+    val classLoader =
+      defaultClassLoader.getOrElse(Thread.currentThread.getContextClassLoader)
     new JavaSerializerInstance(counterReset, extraDebugInfo, classLoader)
   }
 
-  override def writeExternal(out: ObjectOutput): Unit = Utils.tryOrIOException {
-    out.writeInt(counterReset)
-    out.writeBoolean(extraDebugInfo)
-  }
+  override def writeExternal(out: ObjectOutput): Unit =
+    Utils.tryOrIOException {
+      out.writeInt(counterReset)
+      out.writeBoolean(extraDebugInfo)
+    }
 
   override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException {
     counterReset = in.readInt()

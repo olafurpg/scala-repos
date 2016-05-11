@@ -32,7 +32,7 @@ class Application extends Controller {
     Ok(`b[]`.mkString(","))
   }
   def takeTickedParams(`b[]`: List[Int], `b%%`: String) = Action {
-    Ok(`b[]`mkString(",") + " " + `b%%`)
+    Ok(`b[]` mkString (",") + " " + `b%%`)
   }
   def takeJavaList(x: java.util.List[Integer]) = Action {
     Ok(x.mkString(","))

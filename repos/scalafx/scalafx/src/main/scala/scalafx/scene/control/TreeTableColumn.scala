@@ -25,14 +25,16 @@ object TreeTableColumn {
     * @param v ScalaFX TreeTableColumn
     * @return JavaFX TreeTableColumn
     */
-  implicit def sfxTreeTableColumn2jfx[S, T](v: TreeTableColumn[S, T]): jfxsc.TreeTableColumn[S, T] =
+  implicit def sfxTreeTableColumn2jfx[S, T](
+      v: TreeTableColumn[S, T]): jfxsc.TreeTableColumn[S, T] =
     if (v != null) v.delegate else null
 
   /**
     * Object companion for [[scalafx.scene.control.TreeTableColumn.CellDataFeatures]]
     */
   object CellDataFeatures {
-    implicit def sfxCellDataFeatures2jfx[S, T](v: CellDataFeatures[S, T]): jfxsc.TreeTableColumn.CellDataFeatures[S, T] =
+    implicit def sfxCellDataFeatures2jfx[S, T](v: CellDataFeatures[S, T])
+      : jfxsc.TreeTableColumn.CellDataFeatures[S, T] =
       if (v != null) v.delegate else null
   }
 
@@ -46,8 +48,9 @@ object TreeTableColumn {
     * @since 8.0
     *
     */
-  class CellDataFeatures[S, T](override val delegate: jfxsc.TreeTableColumn.CellDataFeatures[S, T])
-    extends SFXDelegate[jfxsc.TreeTableColumn.CellDataFeatures[S, T]] {
+  class CellDataFeatures[S, T](
+      override val delegate: jfxsc.TreeTableColumn.CellDataFeatures[S, T])
+      extends SFXDelegate[jfxsc.TreeTableColumn.CellDataFeatures[S, T]] {
 
     /**
       * Instantiates a CellDataFeatures instance with the given properties set as read-only values of this instance.
@@ -57,8 +60,11 @@ object TreeTableColumn {
       * @param value The value for a row in the TreeTableView.
       * @return
       */
-    def this(treeTableView: TreeTableView[S], treeTableColumn: TreeTableColumn[S, T], value: S) =
-      this(new jfxsc.TreeTableColumn.CellDataFeatures[S, T](treeTableView, treeTableColumn, new TreeItem[S](value)))
+    def this(treeTableView: TreeTableView[S],
+             treeTableColumn: TreeTableColumn[S, T],
+             value: S) =
+      this(new jfxsc.TreeTableColumn.CellDataFeatures[S, T](
+              treeTableView, treeTableColumn, new TreeItem[S](value)))
 
     /**
       * Returns the TreeTableColumn passed in to the constructor.
@@ -76,17 +82,17 @@ object TreeTableColumn {
     def value: TreeItem[S] = delegate.getValue
   }
 
-
   object CellEditEvent {
+
     /**
       * Converts a ScalaFX CellEditEvent instance to its JavaFX counterpart.
       *
       * @param cee ScalaFX CellEditEvent
       * @return JavaFX CellEditEvent
       */
-    implicit def sfxCellEditEvent2jfx[S, T](cee: CellEditEvent[S, T]): jfxsc.TreeTableColumn.CellEditEvent[S, T] =
+    implicit def sfxCellEditEvent2jfx[S, T](
+        cee: CellEditEvent[S, T]): jfxsc.TreeTableColumn.CellEditEvent[S, T] =
       if (cee != null) cee.delegate else null
-
   }
 
   /**
@@ -99,9 +105,10 @@ object TreeTableColumn {
     * @since 8.0
     *
     */
-  class CellEditEvent[S, T](override val delegate: jfxsc.TreeTableColumn.CellEditEvent[S, T])
-    extends Event(delegate)
-    with SFXDelegate[jfxsc.TreeTableColumn.CellEditEvent[S, T]] {
+  class CellEditEvent[S, T](
+      override val delegate: jfxsc.TreeTableColumn.CellEditEvent[S, T])
+      extends Event(delegate)
+      with SFXDelegate[jfxsc.TreeTableColumn.CellEditEvent[S, T]] {
 
     /**
       * Creates a new event that can be subsequently fired to the relevant listeners.
@@ -111,11 +118,13 @@ object TreeTableColumn {
       * @param eventType The type of event that occurred.
       * @param newValue The value input by the end user.
       */
-    def this(table: TreeTableView[S],
-             pos: TreeTablePosition[S, T],
-             eventType: jfxe.EventType[jfxsc.TreeTableColumn.CellEditEvent[S, T]],
-             newValue: T) =
-      this(new jfxsc.TreeTableColumn.CellEditEvent(table, pos, eventType, newValue))
+    def this(
+        table: TreeTableView[S],
+        pos: TreeTablePosition[S, T],
+        eventType: jfxe.EventType[jfxsc.TreeTableColumn.CellEditEvent[S, T]],
+        newValue: T) =
+      this(new jfxsc.TreeTableColumn.CellEditEvent(
+              table, pos, eventType, newValue))
 
     /**
       * Returns the TreeTableView upon which this event occurred.
@@ -130,7 +139,8 @@ object TreeTableColumn {
     /**
       * Returns the position upon which this event occurred.
       */
-    def treeTablePosition: TreeTablePosition[S, T] = delegate.getTreeTablePosition
+    def treeTablePosition: TreeTablePosition[S, T] =
+      delegate.getTreeTablePosition
 
     /**
       * Returns the new value input by the end user.
@@ -147,12 +157,11 @@ object TreeTableColumn {
       * contained within the TablePosition returned in `tablePosition`.
       */
     def rowValue: TreeItem[S] = delegate.getRowValue
-
   }
 
-
   object SortType
-    extends SFXEnumDelegateCompanion[jfxsc.TreeTableColumn.SortType, SortType] {
+      extends SFXEnumDelegateCompanion[
+          jfxsc.TreeTableColumn.SortType, SortType] {
 
     /** Column will be sorted in an ascending order. */
     val Ascending = new SortType(jfxsc.TreeTableColumn.SortType.ASCENDING)
@@ -160,20 +169,21 @@ object TreeTableColumn {
     /** Column will be sorted in a descending order. */
     val Descending = new SortType(jfxsc.TreeTableColumn.SortType.DESCENDING)
 
-    protected override def unsortedValues: Array[SortType] = Array(Ascending, Descending)
-
+    protected override def unsortedValues: Array[SortType] =
+      Array(Ascending, Descending)
   }
 
   /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TreeTableColumn.SortType.html]] */
-  sealed case class SortType(override val delegate: jfxsc.TreeTableColumn.SortType)
-    extends SFXEnumDelegate[jfxsc.TreeTableColumn.SortType]
-
+  sealed case class SortType(
+      override val delegate: jfxsc.TreeTableColumn.SortType)
+      extends SFXEnumDelegate[jfxsc.TreeTableColumn.SortType]
 
   /**
     * If no cellFactory is specified on a TreeTableColumn instance, then this one will be used by default.
     */
   val DefaultCellFactory: (TreeTableColumn[_, _] => TreeTableCell[_, _]) =
-    (column: TreeTableColumn[_, _]) => jfxsc.TreeTableColumn.DEFAULT_CELL_FACTORY.call(column)
+    (column: TreeTableColumn[_, _]) =>
+      jfxsc.TreeTableColumn.DEFAULT_CELL_FACTORY.call(column)
 
   /**
     * Parent event for any TreeTableColumn edit event.
@@ -200,10 +210,9 @@ object TreeTableColumn {
   /**
     * The CssMetaData of this Styleable. This may be returned as an unmodifiable list.
     */
-  def classCssMetaData: Seq[jfxcss.CssMetaData[_ <: jfxcss.Styleable, _]] = jfxsc.TreeTableColumn.getClassCssMetaData
-
+  def classCssMetaData: Seq[jfxcss.CssMetaData[_ <: jfxcss.Styleable, _]] =
+    jfxsc.TreeTableColumn.getClassCssMetaData
 }
-
 
 /**
   * Wraps a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TreeTableColumn.html]]
@@ -215,9 +224,11 @@ object TreeTableColumn {
   * @since 8.0
   *
   */
-class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] = new jfxsc.TreeTableColumn[S, T]())
-  extends TableColumnBase[jfxsc.TreeItem[S], T](delegate)
-  with SFXDelegate[jfxsc.TreeTableColumn[S, T]] {
+class TreeTableColumn[S, T](
+    override val delegate: jfxsc.TreeTableColumn[S, T] = new jfxsc.TreeTableColumn[
+          S, T]())
+    extends TableColumnBase[jfxsc.TreeItem[S], T](delegate)
+    with SFXDelegate[jfxsc.TreeTableColumn[S, T]] {
 
   /**
     * Creates a TreeTableColumn with the text set to the provided string, with default cell factory, comparator,
@@ -238,22 +249,26 @@ class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] =
     * Finally, there are a number of pre-built cell factories available in the javafx.scene.control.cell package.
     */
   def cellFactory: ObjectProperty[TreeTableColumn[S, T] => TreeTableCell[S, T]] =
-    ObjectProperty((column: TreeTableColumn[S, T]) => new TreeTableCell(delegate.cellFactoryProperty.getValue.call(column)))
+    ObjectProperty(
+        (column: TreeTableColumn[S, T]) =>
+          new TreeTableCell(
+              delegate.cellFactoryProperty.getValue.call(column)))
 
   def cellFactory_=(f: TreeTableColumn[S, T] => TreeTableCell[S, T]) {
     delegate.cellFactoryProperty.setValue(
-      new jfxu.Callback[jfxsc.TreeTableColumn[S, T], jfxsc.TreeTableCell[S, T]] {
-        def call(v: jfxsc.TreeTableColumn[S, T]): jfxsc.TreeTableCell[S, T] = {
-          f(v)
-        }
-      })
+        new jfxu.Callback[
+            jfxsc.TreeTableColumn[S, T], jfxsc.TreeTableCell[S, T]] {
+      def call(v: jfxsc.TreeTableColumn[S, T]): jfxsc.TreeTableCell[S, T] = {
+        f(v)
+      }
+    })
   }
 
   /**
     * The TreeTableView that this TreeTableColumn belongs to.
     */
-  def treeTableView: ReadOnlyObjectProperty[jfxsc.TreeTableView[S]] = delegate.treeTableViewProperty
-
+  def treeTableView: ReadOnlyObjectProperty[jfxsc.TreeTableView[S]] =
+    delegate.treeTableViewProperty
 
   /**
     * The cell value factory needs to be set to specify how to populate all cells within a single TreeTableColumn. A cell
@@ -275,25 +290,31 @@ class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] =
     *
     * firstNameCol.cellValueFactory = new TreeItemPropertyValueFactory[Person,String]("firstName"))
     */
-  def cellValueFactory: ObjectProperty[TreeTableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]] =
+  def cellValueFactory: ObjectProperty[
+      TreeTableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]] =
     ObjectProperty(
-      (features: TreeTableColumn.CellDataFeatures[S, T]) =>
-        jfxObservableValue2sfx[T](delegate.cellValueFactoryProperty.getValue.call(features)))
+        (features: TreeTableColumn.CellDataFeatures[S, T]) =>
+          jfxObservableValue2sfx[T](
+              delegate.cellValueFactoryProperty.getValue.call(features)))
 
-  def cellValueFactory_=(f: TreeTableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]) {
+  def cellValueFactory_=(
+      f: TreeTableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]) {
     delegate.cellValueFactoryProperty.setValue(
-      new jfxu.Callback[jfxsc.TreeTableColumn.CellDataFeatures[S, T], jfxbv.ObservableValue[T]] {
-        def call(v: jfxsc.TreeTableColumn.CellDataFeatures[S, T]): jfxbv.ObservableValue[T] = {
-          f(v).delegate
-        }
-      })
+        new jfxu.Callback[jfxsc.TreeTableColumn.CellDataFeatures[S, T],
+                          jfxbv.ObservableValue[T]] {
+      def call(v: jfxsc.TreeTableColumn.CellDataFeatures[S, T])
+        : jfxbv.ObservableValue[T] = {
+        f(v).delegate
+      }
+    })
   }
 
   /**
     * Used to state whether this column, if it is part of the TableView.sortOrder ObservableList, should be sorted in
     * ascending or descending order.
     */
-  def sortType: ObjectProperty[jfxsc.TreeTableColumn.SortType] = delegate.sortTypeProperty
+  def sortType: ObjectProperty[jfxsc.TreeTableColumn.SortType] =
+    delegate.sortTypeProperty
 
   def sortType_=(v: TreeTableColumn.SortType) {
     sortType() = v
@@ -304,7 +325,8 @@ class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] =
     */
   def onEditStart = delegate.onEditCommitProperty
 
-  def onEditStart_=(v: jfxe.EventHandler[jfxsc.TreeTableColumn.CellEditEvent[S, T]]) {
+  def onEditStart_=(
+      v: jfxe.EventHandler[jfxsc.TreeTableColumn.CellEditEvent[S, T]]) {
     onEditStart() = v
   }
 
@@ -313,7 +335,8 @@ class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] =
     */
   def onEditCommit = delegate.onEditCommitProperty
 
-  def onEditCommit_=(v: jfxe.EventHandler[jfxsc.TreeTableColumn.CellEditEvent[S, T]]) {
+  def onEditCommit_=(
+      v: jfxe.EventHandler[jfxsc.TreeTableColumn.CellEditEvent[S, T]]) {
     onEditCommit() = v
   }
 
@@ -322,10 +345,10 @@ class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] =
     */
   def onEditCancel = delegate.onEditCancelProperty
 
-  def onEditCancel_=(v: jfxe.EventHandler[jfxsc.TreeTableColumn.CellEditEvent[S, T]]) {
+  def onEditCancel_=(
+      v: jfxe.EventHandler[jfxsc.TreeTableColumn.CellEditEvent[S, T]]) {
     onEditCancel() = v
   }
-
 
   /**
     * This enables support for nested columns, which can be useful to group together related data. For example, we may
@@ -338,7 +361,8 @@ class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] =
     *         TableColumnBase. If these children TableColumnBase instances are set as visible, they will appear
     *         beneath this table column.
     */
-  def columns: ObservableBuffer[jfxsc.TreeTableColumn[S, _]] = delegate.getColumns
+  def columns: ObservableBuffer[jfxsc.TreeTableColumn[S, _]] =
+    delegate.getColumns
 
   /**
     * Attempts to return an ObservableValue<T> for the item in the given index (which is of type S). In other words,
@@ -353,7 +377,8 @@ class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] =
     * @param index The index of the item (of type S) for which an ObservableValue<T> is sought.
     * @return An ObservableValue<T> for this specific table column.
     */
-  def cellObservableValue(index: Int): ObservableValue[T, T] = delegate.getCellObservableValue(index)
+  def cellObservableValue(index: Int): ObservableValue[T, T] =
+    delegate.getCellObservableValue(index)
 
   /**
     * Attempts to return an ObservableValue<T> for the given item (which is of type S). In other words, this method
@@ -367,7 +392,8 @@ class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] =
     * @param item The item (of type S) for which an ObservableValue<T> is sought.
     * @return An ObservableValue<T> for this specific table column.
     */
-  def cellObservableValue(item: TreeItem[S]): ObservableValue[T, T] = delegate.getCellObservableValue(item)
+  def cellObservableValue(item: TreeItem[S]): ObservableValue[T, T] =
+    delegate.getCellObservableValue(item)
 
   /**
     * The type of this Styleable that is to be used in selector matching. This is analogous to an "element" in HTML.
@@ -387,6 +413,6 @@ class TreeTableColumn[S, T](override val delegate: jfxsc.TreeTableColumn[S, T] =
   /**
     * The CssMetaData of this Styleable. This may be returned as an unmodifiable list.
     */
-  override def cssMetaData: Seq[jfxcss.CssMetaData[_ <: jfxcss.Styleable, _]] = delegate.getCssMetaData
-
+  override def cssMetaData: Seq[jfxcss.CssMetaData[_ <: jfxcss.Styleable, _]] =
+    delegate.getCssMetaData
 }

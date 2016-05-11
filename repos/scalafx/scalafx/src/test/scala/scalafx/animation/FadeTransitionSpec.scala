@@ -35,9 +35,9 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * FadeTransition Spec tests.
- */
+  * FadeTransition Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class FadeTransitionSpec
-  extends SimpleSFXDelegateSpec[jfxa.FadeTransition, FadeTransition](
-    classOf[jfxa.FadeTransition], classOf[FadeTransition])
+    extends SimpleSFXDelegateSpec[jfxa.FadeTransition, FadeTransition](
+        classOf[jfxa.FadeTransition], classOf[FadeTransition])

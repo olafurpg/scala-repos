@@ -9,17 +9,24 @@ import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, Abst
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeBoundsOwner
 
 /**
-* Nikolay.Tropin
-* 2014-11-18
-*/
-class DeprecatedViewBoundInspection extends AbstractInspection(id, description) {
-  override def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
-    case boundsOwner: ScTypeBoundsOwner if boundsOwner.viewBound.nonEmpty && canBeConverted(boundsOwner) =>
-      holder.registerProblem(boundsOwner, description, new ConvertToImplicitParametersQuickFix(boundsOwner))
+  * Nikolay.Tropin
+  * 2014-11-18
+  */
+class DeprecatedViewBoundInspection
+    extends AbstractInspection(id, description) {
+  override def actionFor(
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+    case boundsOwner: ScTypeBoundsOwner
+        if boundsOwner.viewBound.nonEmpty && canBeConverted(boundsOwner) =>
+      holder.registerProblem(
+          boundsOwner,
+          description,
+          new ConvertToImplicitParametersQuickFix(boundsOwner))
   }
 }
 
-class ConvertToImplicitParametersQuickFix(owner: ScTypeBoundsOwner) extends AbstractFixOnPsiElement(fixDescription, owner) {
+class ConvertToImplicitParametersQuickFix(owner: ScTypeBoundsOwner)
+    extends AbstractFixOnPsiElement(fixDescription, owner) {
   override def doApplyFix(project: Project): Unit = {
     val boundOwner = getElement
     val addedParams = doConversion(boundOwner)

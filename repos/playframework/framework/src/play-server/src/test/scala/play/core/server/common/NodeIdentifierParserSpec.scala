@@ -6,7 +6,7 @@ package play.core.server.common
 import java.net.InetAddress.getByName
 import org.specs2.mutable.Specification
 
-import ForwardedHeaderHandler.{ ForwardedHeaderVersion, Rfc7239, Xforwarded }
+import ForwardedHeaderHandler.{ForwardedHeaderVersion, Rfc7239, Xforwarded}
 import NodeIdentifierParser._
 
 class NodeIdentifierParserSpec extends Specification {
@@ -19,7 +19,8 @@ class NodeIdentifierParserSpec extends Specification {
   "NodeIdentifierParser" should {
 
     "parse an ip v6 address with port" in {
-      parseNode(Rfc7239, "[8F:F3B::FF]:9000") must beRight(Ip(getByName("8F:F3B::FF")) -> Some(PortNumber(9000)))
+      parseNode(Rfc7239, "[8F:F3B::FF]:9000") must beRight(
+          Ip(getByName("8F:F3B::FF")) -> Some(PortNumber(9000)))
     }
 
     "not parse unescaped ip v6 address in rfc7239 header" in {
@@ -27,19 +28,23 @@ class NodeIdentifierParserSpec extends Specification {
     }
 
     "parse unescaped ip v6 address in x-forwarded-for header" in {
-      parseNode(Xforwarded, "8F:F3B::FF") must beRight(Ip(getByName("8F:F3B::FF")) -> None)
+      parseNode(Xforwarded, "8F:F3B::FF") must beRight(
+          Ip(getByName("8F:F3B::FF")) -> None)
     }
 
     "parse an ip v6 address with obfuscated port" in {
-      parseNode(Rfc7239, "[::FF]:_obf") must beRight(Ip(getByName("::FF")) -> Some(ObfuscatedPort("_obf")))
+      parseNode(Rfc7239, "[::FF]:_obf") must beRight(
+          Ip(getByName("::FF")) -> Some(ObfuscatedPort("_obf")))
     }
 
     "parse an ip v4 address with port" in {
-      parseNode(Rfc7239, "127.0.0.1:8080") must beRight(Ip(getByName("127.0.0.1")) -> Some(PortNumber(8080)))
+      parseNode(Rfc7239, "127.0.0.1:8080") must beRight(
+          Ip(getByName("127.0.0.1")) -> Some(PortNumber(8080)))
     }
 
     "parse an ip v4 address without port" in {
-      parseNode(Rfc7239, "192.168.0.1") must beRight(Ip(getByName("192.168.0.1")) -> None)
+      parseNode(Rfc7239, "192.168.0.1") must beRight(
+          Ip(getByName("192.168.0.1")) -> None)
     }
 
     "parse an unknown ip address without port" in {

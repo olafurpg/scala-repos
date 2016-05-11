@@ -11,40 +11,52 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 
 /**
- * @author Alefas
- * @since 06.07.12
- */
-
+  * @author Alefas
+  * @since 06.07.12
+  */
 class ScalaCompletionStatistician extends CompletionStatistician {
-  def serialize(element: LookupElement, location: CompletionLocation): StatisticsInfo = {
-    val currentElement = Option(element.as(LookupItem.CLASS_CONDITION_KEY)).getOrElse(return null)
+  def serialize(
+      element: LookupElement, location: CompletionLocation): StatisticsInfo = {
+    val currentElement =
+      Option(element.as(LookupItem.CLASS_CONDITION_KEY)).getOrElse(return null)
 
     ScalaLookupItem.original(currentElement) match {
-      case s: ScalaLookupItem if s.isLocalVariable || s.isNamedParameter || s.isDeprecated => StatisticsInfo.EMPTY
+      case s: ScalaLookupItem
+          if s.isLocalVariable || s.isNamedParameter || s.isDeprecated =>
+        StatisticsInfo.EMPTY
       case s: ScalaLookupItem =>
         s.element match {
-          case withImplicit: ScModifierListOwner if withImplicit.hasModifierPropertyScala("implicit") =>
+          case withImplicit: ScModifierListOwner
+              if withImplicit.hasModifierPropertyScala("implicit") =>
             StatisticsInfo.EMPTY
           case _ => helper(s.element, location)
         }
       // return empty statistic when using  scala completion but ScalaLookupItem didn't use.
       // otherwise will be computed java statistic that may lead to ClassCastError
-      case e if location.getCompletionParameters.getOriginalFile.isInstanceOf[ScalaFile] => StatisticsInfo.EMPTY
-      case _ => null //don't impact on java Lookups, no statistics for scala keyword elements
+      case e
+          if location.getCompletionParameters.getOriginalFile
+            .isInstanceOf[ScalaFile] =>
+        StatisticsInfo.EMPTY
+      case _ =>
+        null //don't impact on java Lookups, no statistics for scala keyword elements
     }
   }
 
-  def helper(element: PsiNamedElement, location: CompletionLocation): StatisticsInfo = {
+  def helper(element: PsiNamedElement,
+             location: CompletionLocation): StatisticsInfo = {
     element match {
       case member: PsiMember =>
-        val key = ScalaStatisticManager.memberKey(member).getOrElse(return StatisticsInfo.EMPTY)
+        val key = ScalaStatisticManager
+          .memberKey(member)
+          .getOrElse(return StatisticsInfo.EMPTY)
         member match {
           case (_: ScTypeAlias) | (_: ScTypeDefinition) | (_: PsiClass) =>
             new StatisticsInfo("scalaMember", key)
           case _ =>
             val containingClass = member.getContainingClass
             if (containingClass != null) {
-              val context = ScalaStatisticManager.memberKey(containingClass).getOrElse("")
+              val context =
+                ScalaStatisticManager.memberKey(containingClass).getOrElse("")
               new StatisticsInfo("scalaMember#" + context, key)
             } else {
               StatisticsInfo.EMPTY

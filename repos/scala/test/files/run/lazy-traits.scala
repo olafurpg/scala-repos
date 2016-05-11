@@ -74,39 +74,17 @@ class OverflownLazyFields extends Object with A {
   lazy val zc31 = { println("<forced zc31>"); "lazy zc31" }
 
   override def toString =
-    "\nzc00 = " + zc00 +
-    "\nzc01 = " + zc01 +
-    "\nzc02 = " + zc02 +
-    "\nzc03 = " + zc03 +
-    "\nzc04 = " + zc04 +
-    "\nzc05 = " + zc05 +
-    "\nzc06 = " + zc06 +
-    "\nzc07 = " + zc07 +
-    "\nzc08 = " + zc08 +
-    "\nzc09 = " + zc09 +
-    "\nzc10 = " + zc10 +
-    "\nzc11 = " + zc11 +
-    "\nzc12 = " + zc12 +
-    "\nzc13 = " + zc13 +
-    "\nzc14 = " + zc14 +
-    "\nzc15 = " + zc15 +
-    "\nzc16 = " + zc16 +
-    "\nzc17 = " + zc17 +
-    "\nzc18 = " + zc18 +
-    "\nzc19 = " + zc19 +
-    "\nzc20 = " + zc20 +
-    "\nzc21 = " + zc21 +
-    "\nzc22 = " + zc22 +
-    "\nzc23 = " + zc23 +
-    "\nzc24 = " + zc24 +
-    "\nzc25 = " + zc25 +
-    "\nzc26 = " + zc26 +
-    "\nzc27 = " + zc27 +
-    "\nzc28 = " + zc28 +
-    "\nzc29 = " + zc29 +
-    "\nzc30 = " + zc30 +
-    "\nzc31 = " + zc31 +
-    "\nz1 = " + z1
+    "\nzc00 = " + zc00 + "\nzc01 = " + zc01 + "\nzc02 = " + zc02 +
+    "\nzc03 = " + zc03 + "\nzc04 = " + zc04 + "\nzc05 = " + zc05 +
+    "\nzc06 = " + zc06 + "\nzc07 = " + zc07 + "\nzc08 = " + zc08 +
+    "\nzc09 = " + zc09 + "\nzc10 = " + zc10 + "\nzc11 = " + zc11 +
+    "\nzc12 = " + zc12 + "\nzc13 = " + zc13 + "\nzc14 = " + zc14 +
+    "\nzc15 = " + zc15 + "\nzc16 = " + zc16 + "\nzc17 = " + zc17 +
+    "\nzc18 = " + zc18 + "\nzc19 = " + zc19 + "\nzc20 = " + zc20 +
+    "\nzc21 = " + zc21 + "\nzc22 = " + zc22 + "\nzc23 = " + zc23 +
+    "\nzc24 = " + zc24 + "\nzc25 = " + zc25 + "\nzc26 = " + zc26 +
+    "\nzc27 = " + zc27 + "\nzc28 = " + zc28 + "\nzc29 = " + zc29 +
+    "\nzc30 = " + zc30 + "\nzc31 = " + zc31 + "\nz1 = " + z1
 }
 
 trait PrivateLazy {

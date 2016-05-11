@@ -10,11 +10,10 @@ class MapCache extends Cache {
     case None => None
   }
 
-  override def put[V](key: String, value: V, ttl: Option[Duration]): V =
-    {
-      cache.put(key, value.asInstanceOf[Object])
-      value
-    }
+  override def put[V](key: String, value: V, ttl: Option[Duration]): V = {
+    cache.put(key, value.asInstanceOf[Object])
+    value
+  }
 
   override def remove(key: String): Unit = cache.remove(key)
 

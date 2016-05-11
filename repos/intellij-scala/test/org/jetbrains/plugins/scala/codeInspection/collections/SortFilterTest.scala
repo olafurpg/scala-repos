@@ -4,9 +4,9 @@ package codeInspection.collections
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 
 /**
- * Nikolay.Tropin
- * 1/24/14
- */
+  * Nikolay.Tropin
+  * 1/24/14
+  */
 class SortFilterTest extends OperationsOnCollectionInspectionTest {
   override def hint: String = InspectionBundle.message("sort.filter.hint")
 
@@ -20,7 +20,8 @@ class SortFilterTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testWithParameter() {
-    val selected = s"List(0, 1).${START}sortWith((x, y) => x < y).filter(_ => true)$END"
+    val selected =
+      s"List(0, 1).${START}sortWith((x, y) => x < y).filter(_ => true)$END"
     check(selected)
 
     val text = "List(0, 1).sortWith((x, y) => x < y).filter(_ => true)"
@@ -29,7 +30,8 @@ class SortFilterTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testWithGenericParameter() {
-    val selected = s"List(0, 1).${START}sortBy[String](_.toString).filter(_ => true)$END"
+    val selected =
+      s"List(0, 1).${START}sortBy[String](_.toString).filter(_ => true)$END"
     check(selected)
 
     val text = "List(0, 1).sortBy[String](_.toString).filter(_ => true)"
@@ -38,7 +40,8 @@ class SortFilterTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testInfix() {
-    val selected = s"List(0, 1).${START}sortBy[String](_.toString) filter (_ => true)$END"
+    val selected =
+      s"List(0, 1).${START}sortBy[String](_.toString) filter (_ => true)$END"
     check(selected)
 
     val text = "List(0, 1).sortBy[String](_.toString) filter (_ => true)"
@@ -47,8 +50,7 @@ class SortFilterTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testWithSideEffect(): Unit = {
-    checkTextHasNoErrors(
-      """
+    checkTextHasNoErrors("""
         |var q = 1
         |Seq(3, 1, 2).sorted.filter {
         |  i =>

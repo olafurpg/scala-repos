@@ -4,9 +4,8 @@ package format
 import org.jetbrains.plugins.scala.base.SimpleTestCase
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class StringConcatenationParserTest extends SimpleTestCase {
   def testEmpty() {
 //    assertMatches(parse("")) {

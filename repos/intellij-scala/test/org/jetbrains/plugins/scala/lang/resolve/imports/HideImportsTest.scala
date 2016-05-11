@@ -3,13 +3,13 @@ package lang
 package resolve
 package imports
 
-
 import com.intellij.psi.PsiPolyVariantReference
 import org.jetbrains.plugins.scala.extensions.PsiNamedElementExt
 import org.junit.Assert
 
 class HideImportsTest extends ScalaResolveTestCase {
-  override def folderPath: String = super.folderPath() + "resolve/imports/simple/"
+  override def folderPath: String =
+    super.folderPath() + "resolve/imports/simple/"
 
   def testHidePredefImplicit() {
     findReferenceAtCaret() match {

@@ -13,13 +13,12 @@ import lila.game.Event
 import lila.socket.actorApi.GetVersion
 
 /**
- * NOT THREAD SAFE
- * Designed for use within a sequential actor
- */
-private[round] final class History(
-    load: Fu[VersionedEvents],
-    persist: VersionedEvents => Unit,
-    withPersistence: Boolean) {
+  * NOT THREAD SAFE
+  * Designed for use within a sequential actor
+  */
+private[round] final class History(load: Fu[VersionedEvents],
+                                   persist: VersionedEvents => Unit,
+                                   withPersistence: Boolean) {
 
   private var events: VersionedEvents = _
 
@@ -35,17 +34,20 @@ private[round] final class History(
     val version = getVersion
     if (v > version) None
     else if (v == version) Some(Nil)
-    else events.takeWhile(_.version > v).reverse.some filter {
-      case first :: rest => first.version == v + 1
-      case _             => true
-    }
+    else
+      events.takeWhile(_.version > v).reverse.some filter {
+        case first :: rest => first.version == v + 1
+        case _ => true
+      }
   }
 
   def addEvents(xs: List[Event]): VersionedEvents = {
     waitForLoadedEvents
-    val vevs = xs.foldLeft(List.empty[VersionedEvent] -> getVersion) {
-      case ((vevs, v), e) => (VersionedEvent(e, v + 1) :: vevs, v + 1)
-    }._1
+    val vevs = xs
+      .foldLeft(List.empty[VersionedEvent] -> getVersion) {
+        case ((vevs, v), e) => (VersionedEvent(e, v + 1) :: vevs, v + 1)
+      }
+      ._1
     events = (vevs ::: events) take History.size
     if (persistenceEnabled) persist(events)
     vevs.reverse
@@ -71,27 +73,30 @@ private[round] object History {
 
   val size = 30
 
-  def apply(coll: Coll)(gameId: String, withPersistence: Boolean): History = new History(
-    load = serverStarting ?? load(coll, gameId, withPersistence),
-    persist = persist(coll, gameId) _,
-    withPersistence = withPersistence)
+  def apply(coll: Coll)(gameId: String, withPersistence: Boolean): History =
+    new History(load = serverStarting ?? load(coll, gameId, withPersistence),
+                persist = persist(coll, gameId) _,
+                withPersistence = withPersistence)
 
   private def serverStarting = !lila.common.PlayApp.startedSinceMinutes(5)
 
-  private def load(coll: Coll, gameId: String, withPersistence: Boolean): Fu[VersionedEvents] =
+  private def load(coll: Coll,
+                   gameId: String,
+                   withPersistence: Boolean): Fu[VersionedEvents] =
     coll.find(BSONDocument("_id" -> gameId)).one[BSONDocument].map {
       _.flatMap(_.getAs[VersionedEvents]("e")) ?? (_.reverse)
     } addEffect {
-      case events if events.nonEmpty && !withPersistence => coll.remove(BSONDocument("_id" -> gameId)).void
+      case events if events.nonEmpty && !withPersistence =>
+        coll.remove(BSONDocument("_id" -> gameId)).void
       case _ =>
     }
 
   private def persist(coll: Coll, gameId: String)(vevs: List[VersionedEvent]) {
-    if (vevs.nonEmpty) coll.uncheckedUpdate(
-      BSONDocument("_id" -> gameId),
-      BSONDocument(
-        "$set" -> BSONDocument("e" -> vevs.reverse),
-        "$setOnInsert" -> BSONDocument("d" -> DateTime.now)),
-      upsert = true)
+    if (vevs.nonEmpty)
+      coll.uncheckedUpdate(
+          BSONDocument("_id" -> gameId),
+          BSONDocument("$set" -> BSONDocument("e" -> vevs.reverse),
+                       "$setOnInsert" -> BSONDocument("d" -> DateTime.now)),
+          upsert = true)
   }
 }

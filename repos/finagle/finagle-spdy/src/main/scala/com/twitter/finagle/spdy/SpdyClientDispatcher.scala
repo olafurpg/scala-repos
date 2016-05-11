@@ -10,11 +10,11 @@ import org.jboss.netty.handler.codec.spdy.SpdyHttpHeaders
 import scala.collection.JavaConverters._
 
 class SpdyClientDispatcher(trans: Transport[HttpRequest, HttpResponse])
-  extends Service[HttpRequest, HttpResponse]
-{
+    extends Service[HttpRequest, HttpResponse] {
   private[this] val readFailure = new AtomicReference[Throwable]()
 
-  private[this] val promiseMap = new ConcurrentHashMap[java.lang.Integer, Promise[HttpResponse]]()
+  private[this] val promiseMap =
+    new ConcurrentHashMap[java.lang.Integer, Promise[HttpResponse]]()
 
   private[this] def readLoop(): Future[_] = {
     trans.read() flatMap { resp =>
@@ -48,9 +48,10 @@ class SpdyClientDispatcher(trans: Transport[HttpRequest, HttpResponse])
       } else {
         promiseMap.put(streamId, p)
 
-        p.setInterruptHandler { case cause =>
-          promiseMap.remove(streamId)
-          p.updateIfEmpty(Throw(cause))
+        p.setInterruptHandler {
+          case cause =>
+            promiseMap.remove(streamId)
+            p.updateIfEmpty(Throw(cause))
         }
 
         trans.write(req) onFailure { cause =>

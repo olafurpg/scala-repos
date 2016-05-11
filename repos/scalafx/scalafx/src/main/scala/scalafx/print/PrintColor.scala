@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,27 +31,27 @@ import javafx.{print => jfxp}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /**
- * Companion Object for [[scalafx.print.PrintColor]].
- */
+  * Companion Object for [[scalafx.print.PrintColor]].
+  */
 object PrintColor
-  extends SFXEnumDelegateCompanion[jfxp.PrintColor, PrintColor] {
+    extends SFXEnumDelegateCompanion[jfxp.PrintColor, PrintColor] {
 
   /**
-   * Specifies color printing.
-   */
+    * Specifies color printing.
+    */
   val Color = new PrintColor(jfxp.PrintColor.COLOR)
 
   /**
-   * Specifies monochrome or grey scale printing.
-   */
+    * Specifies monochrome or grey scale printing.
+    */
   val Monochrome = new PrintColor(jfxp.PrintColor.MONOCHROME)
 
-  protected override def unsortedValues: Array[PrintColor] = Array(Color, Monochrome)
-
+  protected override def unsortedValues: Array[PrintColor] =
+    Array(Color, Monochrome)
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintColor.html JavaFX PrintColor]].
- */
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintColor.html JavaFX PrintColor]].
+  */
 sealed case class PrintColor(override val delegate: jfxp.PrintColor)
-  extends SFXEnumDelegate[jfxp.PrintColor]
+    extends SFXEnumDelegate[jfxp.PrintColor]

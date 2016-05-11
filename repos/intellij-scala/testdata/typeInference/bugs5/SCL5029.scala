@@ -1,7 +1,7 @@
 object SCL5029 {
 
   object Tag {
-    type Tagged[U] = {type Tag = U}
+    type Tagged[U] = { type Tag = U }
     type @@[T, U] = T with Tagged[U] with Object
 
     @inline def apply[A, T](a: A): A @@ T = a.asInstanceOf[A @@ T]
@@ -20,8 +20,8 @@ object SCL5029 {
     def foo(x: MyId): Int = 1
     def foo(s: String): String = s
 
-    /*start*/foo(Tag[Long, _MyId](1))/*end*/
+    /*start*/
+    foo(Tag[Long, _MyId](1)) /*end*/
   }
-
 }
 //Int

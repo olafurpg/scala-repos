@@ -23,7 +23,8 @@ object singleton {
   implicit def mkSingletonOps(t: Any): SingletonOps = macro SingletonTypeMacros.mkSingletonOps
 
   import tag._
-  implicit def narrowSymbol[S <: String](t: Symbol): Symbol @@ S = macro SingletonTypeMacros.narrowSymbol[S]
+  implicit def narrowSymbol[S <: String](t: Symbol): Symbol @@ S = macro SingletonTypeMacros
+    .narrowSymbol[S]
 }
 
 trait SingletonOps {
@@ -32,17 +33,17 @@ trait SingletonOps {
   type T
 
   /**
-   * Returns a Witness of the singleton type of this value.
-   */
+    * Returns a Witness of the singleton type of this value.
+    */
   val witness: Witness.Aux[T]
 
   /**
-   * Narrows this value to its singleton type.
-   */
+    * Narrows this value to its singleton type.
+    */
   def narrow: T {} = witness.value
 
   /**
-   * Returns the provided value tagged with the singleton type of this value as its key in a record-like structure.
-   */
+    * Returns the provided value tagged with the singleton type of this value as its key in a record-like structure.
+    */
   def ->>[V](v: V): FieldType[T, V] = field[T](v)
 }

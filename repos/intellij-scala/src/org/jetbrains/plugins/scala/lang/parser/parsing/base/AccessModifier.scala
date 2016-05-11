@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 15.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 15.02.2008
+  */
 /*
  *  AccessModifier ::= private [ '[' (id | 'this') ']' ]
  *                   | protected [ '[' (id | 'this') ']' ]
@@ -21,8 +20,8 @@ object AccessModifier {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val accessMarker = builder.mark
     builder.getTokenType match {
-      case ScalaTokenTypes.kPRIVATE |
-           ScalaTokenTypes.kPROTECTED => builder.advanceLexer() //Ate modifier
+      case ScalaTokenTypes.kPRIVATE | ScalaTokenTypes.kPROTECTED =>
+        builder.advanceLexer() //Ate modifier
       case _ =>
         accessMarker.drop
         return false
@@ -32,8 +31,8 @@ object AccessModifier {
         builder.advanceLexer //Ate [
         builder.disableNewlines
         builder.getTokenType match {
-          case ScalaTokenTypes.tIDENTIFIER |
-               ScalaTokenTypes.kTHIS => builder.advanceLexer //Ate identifier or this
+          case ScalaTokenTypes.tIDENTIFIER | ScalaTokenTypes.kTHIS =>
+            builder.advanceLexer //Ate identifier or this
           case _ => builder error ErrMsg("identifier.expected")
         }
         builder.getTokenType match {

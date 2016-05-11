@@ -5,7 +5,7 @@
 package akka.http.scaladsl.testkit
 
 import scala.util.Try
-import scala.concurrent.{ ExecutionContext, Future, Await }
+import scala.concurrent.{ExecutionContext, Future, Await}
 import scala.concurrent.duration._
 import org.scalatest.Suite
 import org.scalatest.matchers.Matcher
@@ -21,11 +21,17 @@ trait ScalatestUtils extends MarshallingTestUtils {
   def haveFailedWith(t: Throwable): Matcher[Future[_]] =
     equal(t).matcher[Throwable] compose (x ⇒ Await.result(x.failed, 1.second))
 
-  def unmarshalToValue[T: FromEntityUnmarshaller](value: T)(implicit ec: ExecutionContext, mat: Materializer): Matcher[HttpEntity] =
+  def unmarshalToValue[T : FromEntityUnmarshaller](value: T)(
+      implicit ec: ExecutionContext, mat: Materializer): Matcher[HttpEntity] =
     equal(value).matcher[T] compose (unmarshalValue(_))
 
-  def unmarshalTo[T: FromEntityUnmarshaller](value: Try[T])(implicit ec: ExecutionContext, mat: Materializer): Matcher[HttpEntity] =
+  def unmarshalTo[T : FromEntityUnmarshaller](value: Try[T])(
+      implicit ec: ExecutionContext, mat: Materializer): Matcher[HttpEntity] =
     equal(value).matcher[Try[T]] compose (unmarshal(_))
 }
 
-trait ScalatestRouteTest extends RouteTest with TestFrameworkInterface.Scalatest with ScalatestUtils { this: Suite ⇒ }
+trait ScalatestRouteTest
+    extends RouteTest with TestFrameworkInterface.Scalatest
+    with ScalatestUtils {
+  this: Suite ⇒
+}

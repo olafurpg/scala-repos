@@ -13,9 +13,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import scala.reflect.NameTransformer
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 24.06.2008
- */
+  * User: Alexander Podkhalyuzin
+  * Date: 24.06.2008
+  */
 object ScalaNamesUtil {
   val keywordNames = ScalaTokenTypes.KEYWORDS.getTypes.map(_.toString).toSet
 
@@ -23,10 +23,11 @@ object ScalaNamesUtil {
     override def initialValue(): ScalaLexer = new ScalaLexer()
   }
 
-  private def checkGeneric(text: String, predicate: ScalaLexer => Boolean): Boolean = {
+  private def checkGeneric(
+      text: String, predicate: ScalaLexer => Boolean): Boolean = {
 //    ApplicationManager.getApplication.assertReadAccessAllowed() - looks like we don't need it
     if (text == null || text == "") return false
-    
+
     val lexer = lexerCache.get()
     lexer.start(text, 0, text.length(), 0)
     if (!predicate(lexer)) return false
@@ -34,22 +35,26 @@ object ScalaNamesUtil {
     lexer.getTokenType == null
   }
 
-  def isOpCharacter(c : Char) : Boolean = {
+  def isOpCharacter(c: Char): Boolean = {
     c match {
-      case '~' | '!' | '@' | '#' | '%' | '^' | '*' | '+' | '-' | '<' | '>' | '?' | ':' | '=' | '&' | '|' | '/' | '\\' =>
+      case '~' | '!' | '@' | '#' | '%' | '^' | '*' | '+' | '-' | '<' | '>' |
+          '?' | ':' | '=' | '&' | '|' | '/' | '\\' =>
         true
       case ch =>
-        Character.getType(ch) == Character.MATH_SYMBOL.toInt || Character.getType(ch) == Character.OTHER_SYMBOL.toInt
+        Character.getType(ch) == Character.MATH_SYMBOL.toInt ||
+        Character.getType(ch) == Character.OTHER_SYMBOL.toInt
     }
   }
 
   def isIdentifier(text: String): Boolean = {
-    checkGeneric(text, lexer => lexer.getTokenType == ScalaTokenTypes.tIDENTIFIER)
+    checkGeneric(
+        text, lexer => lexer.getTokenType == ScalaTokenTypes.tIDENTIFIER)
   }
 
   def isKeyword(text: String): Boolean = keywordNames.contains(text)
-  
-  def isOperatorName(text: String): Boolean = isIdentifier(text) && isOpCharacter(text(0))
+
+  def isOperatorName(text: String): Boolean =
+    isIdentifier(text) && isOpCharacter(text(0))
 
   def scalaName(element: PsiElement) = element match {
     case scNamed: ScNamedElement => scNamed.name
@@ -62,8 +67,12 @@ object ScalaNamesUtil {
       case clazz: PsiClass => Some(clazz.qualifiedName)
       case memb: PsiMember =>
         val containingClass = memb.containingClass
-        if (containingClass != null && containingClass.qualifiedName != null && memb.hasModifierProperty(PsiModifier.STATIC)) {
-          Some(Seq(containingClass.qualifiedName, named.name).filter(_ != "").mkString("."))
+        if (containingClass != null && containingClass.qualifiedName != null &&
+            memb.hasModifierProperty(PsiModifier.STATIC)) {
+          Some(
+              Seq(containingClass.qualifiedName, named.name)
+                .filter(_ != "")
+                .mkString("."))
         } else None
       case _ => None
     }
@@ -78,7 +87,8 @@ object ScalaNamesUtil {
 
   object isBacktickedName {
     def unapply(name: String): Option[String] = {
-      if (name.startsWith("`") && name.endsWith("`")) Some(name.substring(1, name.length - 1))
+      if (name.startsWith("`") && name.endsWith("`"))
+        Some(name.substring(1, name.length - 1))
       else None
     }
   }

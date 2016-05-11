@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -35,6 +35,7 @@ object Searching {
   case class InsertionPoint(insertionPoint: Int) extends SearchResult
 
   class SearchImpl[A, Repr](val coll: SeqLike[A, Repr]) {
+
     /** Search the sorted sequence for a specific element. If the sequence is an
       * `IndexedSeqLike`, a binary search is used. Otherwise, a linear search is used.
       *
@@ -52,9 +53,11 @@ object Searching {
       *         sequence, or the `InsertionPoint` where the element would be inserted if
       *         the element is not in the sequence.
       */
-    final def search[B >: A](elem: B)(implicit ord: Ordering[B]): SearchResult =
+    final def search[B >: A](elem: B)(
+        implicit ord: Ordering[B]): SearchResult =
       coll match {
-        case _: IndexedSeqLike[A, Repr] => binarySearch(elem, 0, coll.length)(ord)
+        case _: IndexedSeqLike[A, Repr] =>
+          binarySearch(elem, 0, coll.length)(ord)
         case _ => linearSearch(coll.view, elem, 0)(ord)
       }
 
@@ -78,28 +81,30 @@ object Searching {
       *         sequence, or the `InsertionPoint` where the element would be inserted if
       *         the element is not in the sequence.
       */
-    final def search[B >: A](elem: B, from: Int, to: Int)
-    (implicit ord: Ordering[B]): SearchResult =
+    final def search[B >: A](elem: B, from: Int, to: Int)(
+        implicit ord: Ordering[B]): SearchResult =
       coll match {
         case _: IndexedSeqLike[A, Repr] => binarySearch(elem, from, to)(ord)
         case _ => linearSearch(coll.view(from, to), elem, from)(ord)
       }
 
     @tailrec
-    private def binarySearch[B >: A](elem: B, from: Int, to: Int)
-    (implicit ord: Ordering[B]): SearchResult = {
-      if (to == from) InsertionPoint(from) else {
-        val idx = from+(to-from-1)/2
+    private def binarySearch[B >: A](elem: B, from: Int, to: Int)(
+        implicit ord: Ordering[B]): SearchResult = {
+      if (to == from) InsertionPoint(from)
+      else {
+        val idx = from + (to - from - 1) / 2
         math.signum(ord.compare(elem, coll(idx))) match {
           case -1 => binarySearch(elem, from, idx)(ord)
-          case  1 => binarySearch(elem, idx + 1, to)(ord)
-          case  _ => Found(idx)
+          case 1 => binarySearch(elem, idx + 1, to)(ord)
+          case _ => Found(idx)
         }
       }
     }
 
-    private def linearSearch[B >: A](c: SeqView[A, Repr], elem: B, offset: Int)
-    (implicit ord: Ordering[B]): SearchResult = {
+    private def linearSearch[B >: A](
+        c: SeqView[A, Repr], elem: B, offset: Int)(
+        implicit ord: Ordering[B]): SearchResult = {
       var idx = offset
       val it = c.iterator
       while (it.hasNext) {
@@ -110,9 +115,9 @@ object Searching {
       }
       InsertionPoint(idx)
     }
-
   }
 
-  implicit def search[Repr, A](coll: Repr)
-  (implicit fr: IsSeqLike[Repr]): SearchImpl[fr.A, Repr] = new SearchImpl(fr.conversion(coll))
+  implicit def search[Repr, A](coll: Repr)(
+      implicit fr: IsSeqLike[Repr]): SearchImpl[fr.A, Repr] =
+    new SearchImpl(fr.conversion(coll))
 }

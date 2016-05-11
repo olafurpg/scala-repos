@@ -42,7 +42,7 @@ object Test {
 object Functions {
   object Set1 {
     def f[T, R](x: FF1[T, R]) = ()
-    def h[T, R] : FF1[T, R] = sys.error("")
+    def h[T, R]: FF1[T, R] = sys.error("")
 
     def ff1 = f[B, B](h[A, A]) // fail
     def ff2 = f[B, B](h[B, A]) // fail
@@ -56,7 +56,7 @@ object Functions {
   }
   object Set2 {
     def f[T, R](x: FF2[T, R]) = ()
-    def h[T, R] : FF2[T, R] = sys.error("")
+    def h[T, R]: FF2[T, R] = sys.error("")
 
     def ff1 = f[B, B](h[A, A]) // suggest
     def ff2 = f[B, B](h[B, A]) // suggest
@@ -83,14 +83,14 @@ object Javas {
   def f[T](x: java.util.List[T]) = ()
   def g[T](x: java.util.Comparator[T]) = ()
 
-  def g1 = f[AnyRef](new java.util.ArrayList[String] { })
+  def g1 = f[AnyRef](new java.util.ArrayList[String] {})
   def g2 = g[String](Ordering.fromLessThan[AnyRef](_.toString < _.toString))
 }
 
 object Misc {
   // original motivation
   class Data[A <: AnyVal]
-  class MyData extends Data[Int] { }
+  class MyData extends Data[Int] {}
   def f1 = Set[Data[AnyVal]]() + new MyData
 
   // from stackoverflow
@@ -101,6 +101,7 @@ object Misc {
   }
 
   class Trippy[+T1, T2, +T3]
-  def g1 = Set[Trippy[AnyRef, AnyRef, AnyRef]]() + new Trippy[String, String, String]
+  def g1 =
+    Set[Trippy[AnyRef, AnyRef, AnyRef]]() + new Trippy[String, String, String]
   def g2 = Set[Map[String, String]]() + Map[AnyRef, String]()
 }

@@ -37,47 +37,51 @@ import org.apache.spark.storage.BlockManagerId
 import org.apache.spark.util.{ThreadUtils, Utils}
 
 /**
- * Schedules tasks for multiple types of clusters by acting through a SchedulerBackend.
- * It can also work with a local setup by using a LocalBackend and setting isLocal to true.
- * It handles common logic, like determining a scheduling order across jobs, waking up to launch
- * speculative tasks, etc.
- *
- * Clients should first call initialize() and start(), then submit task sets through the
- * runTasks method.
- *
- * THREADING: SchedulerBackends and task-submitting clients can call this class from multiple
- * threads, so it needs locks in public API methods to maintain its state. In addition, some
- * SchedulerBackends synchronize on themselves when they want to send events here, and then
- * acquire a lock on us, so we need to make sure that we don't try to lock the backend while
- * we are holding a lock on ourselves.
- */
-private[spark] class TaskSchedulerImpl(
-    val sc: SparkContext,
-    val maxTaskFailures: Int,
-    isLocal: Boolean = false)
-  extends TaskScheduler with Logging
-{
-  def this(sc: SparkContext) = this(sc, sc.conf.getInt("spark.task.maxFailures", 4))
+  * Schedules tasks for multiple types of clusters by acting through a SchedulerBackend.
+  * It can also work with a local setup by using a LocalBackend and setting isLocal to true.
+  * It handles common logic, like determining a scheduling order across jobs, waking up to launch
+  * speculative tasks, etc.
+  *
+  * Clients should first call initialize() and start(), then submit task sets through the
+  * runTasks method.
+  *
+  * THREADING: SchedulerBackends and task-submitting clients can call this class from multiple
+  * threads, so it needs locks in public API methods to maintain its state. In addition, some
+  * SchedulerBackends synchronize on themselves when they want to send events here, and then
+  * acquire a lock on us, so we need to make sure that we don't try to lock the backend while
+  * we are holding a lock on ourselves.
+  */
+private[spark] class TaskSchedulerImpl(val sc: SparkContext,
+                                       val maxTaskFailures: Int,
+                                       isLocal: Boolean = false)
+    extends TaskScheduler with Logging {
+  def this(sc: SparkContext) =
+    this(sc, sc.conf.getInt("spark.task.maxFailures", 4))
 
   val conf = sc.conf
 
   // How often to check for speculative tasks
-  val SPECULATION_INTERVAL_MS = conf.getTimeAsMs("spark.speculation.interval", "100ms")
+  val SPECULATION_INTERVAL_MS =
+    conf.getTimeAsMs("spark.speculation.interval", "100ms")
 
   private val speculationScheduler =
-    ThreadUtils.newDaemonSingleThreadScheduledExecutor("task-scheduler-speculation")
+    ThreadUtils.newDaemonSingleThreadScheduledExecutor(
+        "task-scheduler-speculation")
 
   // Threshold above which we warn user initial TaskSet may be starved
-  val STARVATION_TIMEOUT_MS = conf.getTimeAsMs("spark.starvation.timeout", "15s")
+  val STARVATION_TIMEOUT_MS =
+    conf.getTimeAsMs("spark.starvation.timeout", "15s")
 
   // CPUs to request per task
   val CPUS_PER_TASK = conf.getInt("spark.task.cpus", 1)
 
   // TaskSetManagers are not thread safe, so any access to one should be synchronized
   // on this class.
-  private val taskSetsByStageIdAndAttempt = new HashMap[Int, HashMap[Int, TaskSetManager]]
+  private val taskSetsByStageIdAndAttempt =
+    new HashMap[Int, HashMap[Int, TaskSetManager]]
 
-  private[scheduler] val taskIdToTaskSetManager = new HashMap[Long, TaskSetManager]
+  private[scheduler] val taskIdToTaskSetManager =
+    new HashMap[Long, TaskSetManager]
   val taskIdToExecutorId = new HashMap[Long, String]
 
   @volatile private var hasReceivedTask = false
@@ -113,7 +117,8 @@ private[spark] class TaskSchedulerImpl(
     SchedulingMode.withName(schedulingModeConf.toUpperCase)
   } catch {
     case e: java.util.NoSuchElementException =>
-      throw new SparkException(s"Unrecognized spark.scheduler.mode: $schedulingModeConf")
+      throw new SparkException(
+          s"Unrecognized spark.scheduler.mode: $schedulingModeConf")
   }
 
   // This is a var so that we can reset it for testing purposes.
@@ -145,11 +150,15 @@ private[spark] class TaskSchedulerImpl(
 
     if (!isLocal && conf.getBoolean("spark.speculation", false)) {
       logInfo("Starting speculative execution thread")
-      speculationScheduler.scheduleAtFixedRate(new Runnable {
-        override def run(): Unit = Utils.tryOrStopSparkContext(sc) {
-          checkSpeculatableTasks()
-        }
-      }, SPECULATION_INTERVAL_MS, SPECULATION_INTERVAL_MS, TimeUnit.MILLISECONDS)
+      speculationScheduler.scheduleAtFixedRate(
+          new Runnable {
+            override def run(): Unit = Utils.tryOrStopSparkContext(sc) {
+              checkSpeculatableTasks()
+            }
+          },
+          SPECULATION_INTERVAL_MS,
+          SPECULATION_INTERVAL_MS,
+          TimeUnit.MILLISECONDS)
     }
   }
 
@@ -159,19 +168,22 @@ private[spark] class TaskSchedulerImpl(
 
   override def submitTasks(taskSet: TaskSet) {
     val tasks = taskSet.tasks
-    logInfo("Adding task set " + taskSet.id + " with " + tasks.length + " tasks")
+    logInfo(
+        "Adding task set " + taskSet.id + " with " + tasks.length + " tasks")
     this.synchronized {
       val manager = createTaskSetManager(taskSet, maxTaskFailures)
       val stage = taskSet.stageId
-      val stageTaskSets =
-        taskSetsByStageIdAndAttempt.getOrElseUpdate(stage, new HashMap[Int, TaskSetManager])
+      val stageTaskSets = taskSetsByStageIdAndAttempt.getOrElseUpdate(
+          stage, new HashMap[Int, TaskSetManager])
       stageTaskSets(taskSet.stageAttemptId) = manager
-      val conflictingTaskSet = stageTaskSets.exists { case (_, ts) =>
-        ts.taskSet != taskSet && !ts.isZombie
+      val conflictingTaskSet = stageTaskSets.exists {
+        case (_, ts) =>
+          ts.taskSet != taskSet && !ts.isZombie
       }
       if (conflictingTaskSet) {
-        throw new IllegalStateException(s"more than one active taskSet for stage $stage:" +
-          s" ${stageTaskSets.toSeq.map{_._2.taskSet.id}.mkString(",")}")
+        throw new IllegalStateException(
+            s"more than one active taskSet for stage $stage:" +
+            s" ${stageTaskSets.toSeq.map { _._2.taskSet.id }.mkString(",")}")
       }
       schedulableBuilder.addTaskSetManager(manager, manager.taskSet.properties)
 
@@ -180,8 +192,8 @@ private[spark] class TaskSchedulerImpl(
           override def run() {
             if (!hasLaunchedTask) {
               logWarning("Initial job has not accepted any resources; " +
-                "check your cluster UI to ensure that workers are registered " +
-                "and have sufficient resources")
+                  "check your cluster UI to ensure that workers are registered " +
+                  "and have sufficient resources")
             } else {
               this.cancel()
             }
@@ -195,46 +207,48 @@ private[spark] class TaskSchedulerImpl(
 
   // Label as private[scheduler] to allow tests to swap in different task set managers if necessary
   private[scheduler] def createTaskSetManager(
-      taskSet: TaskSet,
-      maxTaskFailures: Int): TaskSetManager = {
+      taskSet: TaskSet, maxTaskFailures: Int): TaskSetManager = {
     new TaskSetManager(this, taskSet, maxTaskFailures)
   }
 
-  override def cancelTasks(stageId: Int, interruptThread: Boolean): Unit = synchronized {
-    logInfo("Cancelling stage " + stageId)
-    taskSetsByStageIdAndAttempt.get(stageId).foreach { attempts =>
-      attempts.foreach { case (_, tsm) =>
-        // There are two possible cases here:
-        // 1. The task set manager has been created and some tasks have been scheduled.
-        //    In this case, send a kill signal to the executors to kill the task and then abort
-        //    the stage.
-        // 2. The task set manager has been created but no tasks has been scheduled. In this case,
-        //    simply abort the stage.
-        tsm.runningTasksSet.foreach { tid =>
-          val execId = taskIdToExecutorId(tid)
-          backend.killTask(tid, execId, interruptThread)
+  override def cancelTasks(stageId: Int, interruptThread: Boolean): Unit =
+    synchronized {
+      logInfo("Cancelling stage " + stageId)
+      taskSetsByStageIdAndAttempt.get(stageId).foreach { attempts =>
+        attempts.foreach {
+          case (_, tsm) =>
+            // There are two possible cases here:
+            // 1. The task set manager has been created and some tasks have been scheduled.
+            //    In this case, send a kill signal to the executors to kill the task and then abort
+            //    the stage.
+            // 2. The task set manager has been created but no tasks has been scheduled. In this case,
+            //    simply abort the stage.
+            tsm.runningTasksSet.foreach { tid =>
+              val execId = taskIdToExecutorId(tid)
+              backend.killTask(tid, execId, interruptThread)
+            }
+            tsm.abort("Stage %s cancelled".format(stageId))
+            logInfo("Stage %d was cancelled".format(stageId))
         }
-        tsm.abort("Stage %s cancelled".format(stageId))
-        logInfo("Stage %d was cancelled".format(stageId))
       }
     }
-  }
 
   /**
-   * Called to indicate that all task attempts (including speculated tasks) associated with the
-   * given TaskSetManager have completed, so state associated with the TaskSetManager should be
-   * cleaned up.
-   */
+    * Called to indicate that all task attempts (including speculated tasks) associated with the
+    * given TaskSetManager have completed, so state associated with the TaskSetManager should be
+    * cleaned up.
+    */
   def taskSetFinished(manager: TaskSetManager): Unit = synchronized {
-    taskSetsByStageIdAndAttempt.get(manager.taskSet.stageId).foreach { taskSetsForStage =>
-      taskSetsForStage -= manager.taskSet.stageAttemptId
-      if (taskSetsForStage.isEmpty) {
-        taskSetsByStageIdAndAttempt -= manager.taskSet.stageId
-      }
+    taskSetsByStageIdAndAttempt.get(manager.taskSet.stageId).foreach {
+      taskSetsForStage =>
+        taskSetsForStage -= manager.taskSet.stageAttemptId
+        if (taskSetsForStage.isEmpty) {
+          taskSetsByStageIdAndAttempt -= manager.taskSet.stageId
+        }
     }
     manager.parent.removeSchedulable(manager)
     logInfo("Removed TaskSet %s, whose tasks have all completed, from pool %s"
-      .format(manager.taskSet.id, manager.parent.name))
+          .format(manager.taskSet.id, manager.parent.name))
   }
 
   private def resourceOfferSingleTaskSet(
@@ -242,7 +256,7 @@ private[spark] class TaskSchedulerImpl(
       maxLocality: TaskLocality,
       shuffledOffers: Seq[WorkerOffer],
       availableCpus: Array[Int],
-      tasks: Seq[ArrayBuffer[TaskDescription]]) : Boolean = {
+      tasks: Seq[ArrayBuffer[TaskDescription]]): Boolean = {
     var launchedTask = false
     for (i <- 0 until shuffledOffers.size) {
       val execId = shuffledOffers(i).executorId
@@ -262,7 +276,8 @@ private[spark] class TaskSchedulerImpl(
           }
         } catch {
           case e: TaskNotSerializableException =>
-            logError(s"Resource offer failed, task set ${taskSet.name} was not serializable")
+            logError(
+                s"Resource offer failed, task set ${taskSet.name} was not serializable")
             // Do not offer resources for this task, but don't throw an error to allow other
             // task sets to be submitted.
             return launchedTask
@@ -273,57 +288,59 @@ private[spark] class TaskSchedulerImpl(
   }
 
   /**
-   * Called by cluster manager to offer resources on slaves. We respond by asking our active task
-   * sets for tasks in order of priority. We fill each node with tasks in a round-robin manner so
-   * that tasks are balanced across the cluster.
-   */
-  def resourceOffers(offers: Seq[WorkerOffer]): Seq[Seq[TaskDescription]] = synchronized {
-    // Mark each slave as alive and remember its hostname
-    // Also track if new executor is added
-    var newExecAvail = false
-    for (o <- offers) {
-      executorIdToHost(o.executorId) = o.host
-      executorIdToTaskCount.getOrElseUpdate(o.executorId, 0)
-      if (!executorsByHost.contains(o.host)) {
-        executorsByHost(o.host) = new HashSet[String]()
-        executorAdded(o.executorId, o.host)
-        newExecAvail = true
+    * Called by cluster manager to offer resources on slaves. We respond by asking our active task
+    * sets for tasks in order of priority. We fill each node with tasks in a round-robin manner so
+    * that tasks are balanced across the cluster.
+    */
+  def resourceOffers(offers: Seq[WorkerOffer]): Seq[Seq[TaskDescription]] =
+    synchronized {
+      // Mark each slave as alive and remember its hostname
+      // Also track if new executor is added
+      var newExecAvail = false
+      for (o <- offers) {
+        executorIdToHost(o.executorId) = o.host
+        executorIdToTaskCount.getOrElseUpdate(o.executorId, 0)
+        if (!executorsByHost.contains(o.host)) {
+          executorsByHost(o.host) = new HashSet[String]()
+          executorAdded(o.executorId, o.host)
+          newExecAvail = true
+        }
+        for (rack <- getRackForHost(o.host)) {
+          hostsByRack.getOrElseUpdate(rack, new HashSet[String]()) += o.host
+        }
       }
-      for (rack <- getRackForHost(o.host)) {
-        hostsByRack.getOrElseUpdate(rack, new HashSet[String]()) += o.host
+
+      // Randomly shuffle offers to avoid always placing tasks on the same set of workers.
+      val shuffledOffers = Random.shuffle(offers)
+      // Build a list of tasks to assign to each worker.
+      val tasks =
+        shuffledOffers.map(o => new ArrayBuffer[TaskDescription](o.cores))
+      val availableCpus = shuffledOffers.map(o => o.cores).toArray
+      val sortedTaskSets = rootPool.getSortedTaskSetQueue
+      for (taskSet <- sortedTaskSets) {
+        logDebug("parentName: %s, name: %s, runningTasks: %s".format(
+                taskSet.parent.name, taskSet.name, taskSet.runningTasks))
+        if (newExecAvail) {
+          taskSet.executorAdded()
+        }
       }
-    }
 
-    // Randomly shuffle offers to avoid always placing tasks on the same set of workers.
-    val shuffledOffers = Random.shuffle(offers)
-    // Build a list of tasks to assign to each worker.
-    val tasks = shuffledOffers.map(o => new ArrayBuffer[TaskDescription](o.cores))
-    val availableCpus = shuffledOffers.map(o => o.cores).toArray
-    val sortedTaskSets = rootPool.getSortedTaskSetQueue
-    for (taskSet <- sortedTaskSets) {
-      logDebug("parentName: %s, name: %s, runningTasks: %s".format(
-        taskSet.parent.name, taskSet.name, taskSet.runningTasks))
-      if (newExecAvail) {
-        taskSet.executorAdded()
+      // Take each TaskSet in our scheduling order, and then offer it each node in increasing order
+      // of locality levels so that it gets a chance to launch local tasks on all of them.
+      // NOTE: the preferredLocality order: PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY
+      var launchedTask = false
+      for (taskSet <- sortedTaskSets; maxLocality <- taskSet.myLocalityLevels) {
+        do {
+          launchedTask = resourceOfferSingleTaskSet(
+              taskSet, maxLocality, shuffledOffers, availableCpus, tasks)
+        } while (launchedTask)
       }
-    }
 
-    // Take each TaskSet in our scheduling order, and then offer it each node in increasing order
-    // of locality levels so that it gets a chance to launch local tasks on all of them.
-    // NOTE: the preferredLocality order: PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY
-    var launchedTask = false
-    for (taskSet <- sortedTaskSets; maxLocality <- taskSet.myLocalityLevels) {
-      do {
-        launchedTask = resourceOfferSingleTaskSet(
-            taskSet, maxLocality, shuffledOffers, availableCpus, tasks)
-      } while (launchedTask)
+      if (tasks.size > 0) {
+        hasLaunchedTask = true
+      }
+      return tasks
     }
-
-    if (tasks.size > 0) {
-      hasLaunchedTask = true
-    }
-    return tasks
-  }
 
   def statusUpdate(tid: Long, state: TaskState, serializedData: ByteBuffer) {
     var failedExecutor: Option[String] = None
@@ -334,8 +351,10 @@ private[spark] class TaskSchedulerImpl(
           val execId = taskIdToExecutorId(tid)
 
           if (executorIdToTaskCount.contains(execId)) {
-            removeExecutor(execId,
-              SlaveLost(s"Task $tid was lost, so marking the executor as lost as well."))
+            removeExecutor(
+                execId,
+                SlaveLost(
+                    s"Task $tid was lost, so marking the executor as lost as well."))
             failedExecutor = Some(execId)
           }
         }
@@ -351,16 +370,19 @@ private[spark] class TaskSchedulerImpl(
             }
             if (state == TaskState.FINISHED) {
               taskSet.removeRunningTask(tid)
-              taskResultGetter.enqueueSuccessfulTask(taskSet, tid, serializedData)
-            } else if (Set(TaskState.FAILED, TaskState.KILLED, TaskState.LOST).contains(state)) {
+              taskResultGetter.enqueueSuccessfulTask(
+                  taskSet, tid, serializedData)
+            } else if (Set(TaskState.FAILED, TaskState.KILLED, TaskState.LOST)
+                         .contains(state)) {
               taskSet.removeRunningTask(tid)
-              taskResultGetter.enqueueFailedTask(taskSet, tid, state, serializedData)
+              taskResultGetter.enqueueFailedTask(
+                  taskSet, tid, state, serializedData)
             }
           case None =>
             logError(
-              ("Ignoring update with state %s for TID %s because its task set is gone (this is " +
-                "likely the result of receiving duplicate task finished status updates)")
-                .format(state, tid))
+                ("Ignoring update with state %s for TID %s because its task set is gone (this is " +
+                    "likely the result of receiving duplicate task finished status updates)")
+                  .format(state, tid))
         }
       } catch {
         case e: Exception => logError("Exception in statusUpdate", e)
@@ -374,26 +396,33 @@ private[spark] class TaskSchedulerImpl(
   }
 
   /**
-   * Update metrics for in-progress tasks and let the master know that the BlockManager is still
-   * alive. Return true if the driver knows about the given block manager. Otherwise, return false,
-   * indicating that the block manager should re-register.
-   */
+    * Update metrics for in-progress tasks and let the master know that the BlockManager is still
+    * alive. Return true if the driver knows about the given block manager. Otherwise, return false,
+    * indicating that the block manager should re-register.
+    */
   override def executorHeartbeatReceived(
       execId: String,
       accumUpdates: Array[(Long, Seq[AccumulableInfo])],
       blockManagerId: BlockManagerId): Boolean = {
     // (taskId, stageId, stageAttemptId, accumUpdates)
-    val accumUpdatesWithTaskIds: Array[(Long, Int, Int, Seq[AccumulableInfo])] = synchronized {
-      accumUpdates.flatMap { case (id, updates) =>
-        taskIdToTaskSetManager.get(id).map { taskSetMgr =>
-          (id, taskSetMgr.stageId, taskSetMgr.taskSet.stageAttemptId, updates)
+    val accumUpdatesWithTaskIds: Array[(Long, Int, Int, Seq[AccumulableInfo])] =
+      synchronized {
+        accumUpdates.flatMap {
+          case (id, updates) =>
+            taskIdToTaskSetManager.get(id).map { taskSetMgr =>
+              (id,
+               taskSetMgr.stageId,
+               taskSetMgr.taskSet.stageAttemptId,
+               updates)
+            }
         }
       }
-    }
-    dagScheduler.executorHeartbeatReceived(execId, accumUpdatesWithTaskIds, blockManagerId)
+    dagScheduler.executorHeartbeatReceived(
+        execId, accumUpdatesWithTaskIds, blockManagerId)
   }
 
-  def handleTaskGettingResult(taskSetManager: TaskSetManager, tid: Long): Unit = synchronized {
+  def handleTaskGettingResult(
+      taskSetManager: TaskSetManager, tid: Long): Unit = synchronized {
     taskSetManager.handleTaskGettingResult(tid)
   }
 
@@ -404,11 +433,10 @@ private[spark] class TaskSchedulerImpl(
     taskSetManager.handleSuccessfulTask(tid, taskResult)
   }
 
-  def handleFailedTask(
-      taskSetManager: TaskSetManager,
-      tid: Long,
-      taskState: TaskState,
-      reason: TaskEndReason): Unit = synchronized {
+  def handleFailedTask(taskSetManager: TaskSetManager,
+                       tid: Long,
+                       taskState: TaskState,
+                       reason: TaskEndReason): Unit = synchronized {
     taskSetManager.handleFailedTask(tid, taskState, reason)
     if (!taskSetManager.isZombie && taskState != TaskState.KILLED) {
       // Need to revive offers again now that the task set manager state has been updated to
@@ -435,7 +463,8 @@ private[spark] class TaskSchedulerImpl(
         // No task sets are active but we still got an error. Just exit since this
         // must mean the error is during registration.
         // It might be good to do something smarter here in the future.
-        throw new SparkException(s"Exiting due to error from cluster scheduler: $message")
+        throw new SparkException(
+            s"Exiting due to error from cluster scheduler: $message")
       }
     }
   }
@@ -464,7 +493,8 @@ private[spark] class TaskSchedulerImpl(
     }
   }
 
-  override def executorLost(executorId: String, reason: ExecutorLossReason): Unit = {
+  override def executorLost(
+      executorId: String, reason: ExecutorLossReason): Unit = {
     var failedExecutor: Option[String] = None
 
     synchronized {
@@ -487,7 +517,8 @@ private[spark] class TaskSchedulerImpl(
             // one may be triggered by a dropped connection from the slave while another may be a
             // report of executor termination from Mesos. We produce log messages for both so we
             // eventually report the termination reason.
-            logError(s"Lost an executor $executorId (already removed): $reason")
+            logError(
+                s"Lost an executor $executorId (already removed): $reason")
         }
       }
     }
@@ -503,7 +534,8 @@ private[spark] class TaskSchedulerImpl(
       hostPort: String,
       reason: ExecutorLossReason): Unit = reason match {
     case LossReasonPending =>
-      logDebug(s"Executor $executorId on $hostPort lost, but reason not yet known.")
+      logDebug(
+          s"Executor $executorId on $hostPort lost, but reason not yet known.")
     case ExecutorKilled =>
       logInfo(s"Executor $executorId on $hostPort killed by driver.")
     case _ =>
@@ -511,10 +543,10 @@ private[spark] class TaskSchedulerImpl(
   }
 
   /**
-   * Remove an executor from all our data structures and mark it as lost. If the executor's loss
-   * reason is not yet known, do not yet remove its association with its host nor update the status
-   * of any running tasks, since the loss reason defines whether we'll fail those tasks.
-   */
+    * Remove an executor from all our data structures and mark it as lost. If the executor's loss
+    * reason is not yet known, do not yet remove its association with its host nor update the status
+    * of any running tasks, since the loss reason defines whether we'll fail those tasks.
+    */
   private def removeExecutor(executorId: String, reason: ExecutorLossReason) {
     executorIdToTaskCount -= executorId
 
@@ -541,9 +573,10 @@ private[spark] class TaskSchedulerImpl(
     dagScheduler.executorAdded(execId, host)
   }
 
-  def getExecutorsAliveOnHost(host: String): Option[Set[String]] = synchronized {
-    executorsByHost.get(host).map(_.toSet)
-  }
+  def getExecutorsAliveOnHost(host: String): Option[Set[String]] =
+    synchronized {
+      executorsByHost.get(host).map(_.toSet)
+    }
 
   def hasExecutorsAliveOnHost(host: String): Boolean = synchronized {
     executorsByHost.contains(host)
@@ -577,11 +610,11 @@ private[spark] class TaskSchedulerImpl(
 
   override def applicationId(): String = backend.applicationId()
 
-  override def applicationAttemptId(): Option[String] = backend.applicationAttemptId()
+  override def applicationAttemptId(): Option[String] =
+    backend.applicationAttemptId()
 
   private[scheduler] def taskSetManagerForAttempt(
-      stageId: Int,
-      stageAttemptId: Int): Option[TaskSetManager] = {
+      stageId: Int, stageAttemptId: Int): Option[TaskSetManager] = {
     for {
       attempts <- taskSetsByStageIdAndAttempt.get(stageId)
       manager <- attempts.get(stageAttemptId)
@@ -589,29 +622,28 @@ private[spark] class TaskSchedulerImpl(
       manager
     }
   }
-
 }
 
-
 private[spark] object TaskSchedulerImpl {
+
   /**
-   * Used to balance containers across hosts.
-   *
-   * Accepts a map of hosts to resource offers for that host, and returns a prioritized list of
-   * resource offers representing the order in which the offers should be used.  The resource
-   * offers are ordered such that we'll allocate one container on each host before allocating a
-   * second container on any host, and so on, in order to reduce the damage if a host fails.
-   *
-   * For example, given <h1, [o1, o2, o3]>, <h2, [o4]>, <h1, [o5, o6]>, returns
-   * [o1, o5, o4, 02, o6, o3]
-   */
-  def prioritizeContainers[K, T] (map: HashMap[K, ArrayBuffer[T]]): List[T] = {
+    * Used to balance containers across hosts.
+    *
+    * Accepts a map of hosts to resource offers for that host, and returns a prioritized list of
+    * resource offers representing the order in which the offers should be used.  The resource
+    * offers are ordered such that we'll allocate one container on each host before allocating a
+    * second container on any host, and so on, in order to reduce the damage if a host fails.
+    *
+    * For example, given <h1, [o1, o2, o3]>, <h2, [o4]>, <h1, [o5, o6]>, returns
+    * [o1, o5, o4, 02, o6, o3]
+    */
+  def prioritizeContainers[K, T](map: HashMap[K, ArrayBuffer[T]]): List[T] = {
     val _keyList = new ArrayBuffer[K](map.size)
     _keyList ++= map.keys
 
     // order keyList based on population of value in map
     val keyList = _keyList.sortWith(
-      (left, right) => map(left).size > map(right).size
+        (left, right) => map(left).size > map(right).size
     )
 
     val retval = new ArrayBuffer[T](keyList.size * 2)
@@ -634,5 +666,4 @@ private[spark] object TaskSchedulerImpl {
 
     retval.toList
   }
-
 }

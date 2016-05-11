@@ -27,7 +27,8 @@ import org.junit.Assert
   * Author: Svyatoslav Ilinskiy
   * Date: 11/17/2015
   */
-abstract class DownloadingAndImportingTestCase extends ExternalSystemImportingTestCase with SbtStructureSetup {
+abstract class DownloadingAndImportingTestCase
+    extends ExternalSystemImportingTestCase with SbtStructureSetup {
 
   implicit class IntExt(val i: Int) {
     def seconds: Int = i * 1000
@@ -36,14 +37,16 @@ abstract class DownloadingAndImportingTestCase extends ExternalSystemImportingTe
   override protected def getCurrentExternalProjectSettings: ExternalProjectSettings = {
     val settings = new SbtProjectSettings
     val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
-    val sdk = if (internalSdk == null) IdeaTestUtil.getMockJdk18
-    else internalSdk
+    val sdk =
+      if (internalSdk == null) IdeaTestUtil.getMockJdk18
+      else internalSdk
     settings.setJdk(sdk.getName)
     settings.setCreateEmptyContentRootDirectories(true)
     settings
   }
 
-  override protected def getExternalSystemId: ProjectSystemId = SbtProjectSystem.Id
+  override protected def getExternalSystemId: ProjectSystemId =
+    SbtProjectSystem.Id
 
   override protected def getTestsTempDir: String = ""
 
@@ -51,9 +54,11 @@ abstract class DownloadingAndImportingTestCase extends ExternalSystemImportingTe
 
   def projectDirPath: String = s"$rootDirPath/$githubRepoName"
 
-  def downloadURL: String = s"https://github.com/$githubUsername/$githubRepoName/archive/$revision.zip"
+  def downloadURL: String =
+    s"https://github.com/$githubUsername/$githubRepoName/archive/$revision.zip"
 
-  def outputZipFileName = s"$rootDirPath/zipFiles/$githubRepoName-$githubUsername-$revision"
+  def outputZipFileName =
+    s"$rootDirPath/zipFiles/$githubRepoName-$githubUsername-$revision"
 
   override def setUpInWriteAction(): Unit = {
     super.setUpInWriteAction()
@@ -61,19 +66,24 @@ abstract class DownloadingAndImportingTestCase extends ExternalSystemImportingTe
     val projectDir = new File(projectDirPath)
     if (!outputZipFile.exists() && !projectDir.exists()) {
       //don't download if zip file is already there
-      GithubDownloadUtil.downloadAtomically(null, downloadURL, outputZipFile, githubUsername, githubRepoName)
+      GithubDownloadUtil.downloadAtomically(
+          null, downloadURL, outputZipFile, githubUsername, githubRepoName)
     }
     if (!projectDir.exists()) {
       //don't unpack if the project is already unpacked
       ZipUtil.unzip(null, projectDir, outputZipFile, null, null, true)
     }
-    Assert.assertTrue("Project dir does not exist. Download or unpack failed!", projectDir.exists())
-    myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(projectDir)
+    Assert.assertTrue("Project dir does not exist. Download or unpack failed!",
+                      projectDir.exists())
+    myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(
+        projectDir)
     setUpSbtLauncherAndStructure(myProject)
     extensions.inWriteAction {
-      val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
-      val sdk = if (internalSdk == null) IdeaTestUtil.getMockJdk17
-      else internalSdk
+      val internalSdk =
+        JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
+      val sdk =
+        if (internalSdk == null) IdeaTestUtil.getMockJdk17
+        else internalSdk
 
       if (ProjectJdkTable.getInstance().findJdk(sdk.getName) == null) {
         ProjectJdkTable.getInstance().addJdk(sdk)
@@ -90,22 +100,30 @@ abstract class DownloadingAndImportingTestCase extends ExternalSystemImportingTe
 
   def findFile(filename: String): VirtualFile = {
     import scala.collection.JavaConversions._
-    val searchScope =
-      new SourceFilterScope(GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.projectScope(myProject),
-        ScalaFileType.SCALA_FILE_TYPE, JavaFileType.INSTANCE), myProject)
+    val searchScope = new SourceFilterScope(
+        GlobalSearchScope.getScopeRestrictedByFileTypes(
+            GlobalSearchScope.projectScope(myProject),
+            ScalaFileType.SCALA_FILE_TYPE,
+            JavaFileType.INSTANCE),
+        myProject)
 
-    val files: util.Collection[VirtualFile] = FileTypeIndex.getFiles(ScalaFileType.SCALA_FILE_TYPE, searchScope)
+    val files: util.Collection[VirtualFile] =
+      FileTypeIndex.getFiles(ScalaFileType.SCALA_FILE_TYPE, searchScope)
     val file = files.filter(_.getName == filename).toList match {
       case vf :: Nil => vf
       case Nil => //is this a filepath?
         files.find(_.getCanonicalPath == s"$projectDirPath/$filename") match {
           case Some(vf) => vf
           case _ =>
-            Assert.assertTrue(s"Could not find file: $filename.\nConsider providing relative path from project root", false)
+            Assert.assertTrue(
+                s"Could not find file: $filename.\nConsider providing relative path from project root",
+                false)
             null
         }
       case list =>
-        Assert.assertTrue(s"There are ${list.size} files with name $filename.\nProvide full path from project root", false)
+        Assert.assertTrue(
+            s"There are ${list.size} files with name $filename.\nProvide full path from project root",
+            false)
         null
     }
     LocalFileSystem.getInstance().refreshFiles(files)

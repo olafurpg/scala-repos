@@ -7,19 +7,20 @@ import com.twitter.finagle.{Addr, Name, Stack, Stackable, ServiceFactory}
 import com.twitter.util.{Future, Return, Try}
 
 /**
- * Extraction of [[com.twitter.finagle.Addr.Metadata]] from a
- * [[com.twitter.finagle.factory.LoadBalancerFactory.Dest]]
- */
+  * Extraction of [[com.twitter.finagle.Addr.Metadata]] from a
+  * [[com.twitter.finagle.factory.LoadBalancerFactory.Dest]]
+  */
 object AddrMetadataExtraction {
   object Role extends Stack.Role("AddrMetadataExtraction")
 
   /**
-   * A class that may be configured by a [[com.twitter.finagle.Stackable]]
-   * [[com.twitter.finagle.client.AddrMetadataExtraction]] with bound address
-   * metadata.
-   */
+    * A class that may be configured by a [[com.twitter.finagle.Stackable]]
+    * [[com.twitter.finagle.client.AddrMetadataExtraction]] with bound address
+    * metadata.
+    */
   case class AddrMetadata(metadata: Addr.Metadata) {
-    def mk(): (AddrMetadata, Stack.Param[AddrMetadata]) = (this, AddrMetadata.param)
+    def mk(): (AddrMetadata, Stack.Param[AddrMetadata]) =
+      (this, AddrMetadata.param)
   }
   object AddrMetadata {
     implicit val param = Stack.Param(AddrMetadata(Addr.Metadata.empty))
@@ -28,10 +29,10 @@ object AddrMetadataExtraction {
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module[ServiceFactory[Req, Rep]] {
       val role = Role
-      val description = "May extract metadata from the destination address and name"
-      val parameters = Seq(
-        implicitly[Stack.Param[LoadBalancerFactory.Dest]],
-        implicitly[Stack.Param[BindingFactory.Dest]])
+      val description =
+        "May extract metadata from the destination address and name"
+      val parameters = Seq(implicitly[Stack.Param[LoadBalancerFactory.Dest]],
+                           implicitly[Stack.Param[BindingFactory.Dest]])
 
       def make(params: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
         val LoadBalancerFactory.Dest(addr) = params[LoadBalancerFactory.Dest]

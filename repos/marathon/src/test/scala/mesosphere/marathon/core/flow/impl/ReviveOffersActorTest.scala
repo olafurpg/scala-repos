@@ -1,21 +1,22 @@
 package mesosphere.marathon.core.flow.impl
 
 import akka.actor._
-import akka.testkit.{ TestActorRef, TestProbe }
+import akka.testkit.{TestActorRef, TestProbe}
 import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.flow.ReviveOffersConfig
 import mesosphere.marathon.core.flow.impl.ReviveOffersActor.TimedCheck
-import mesosphere.marathon.event.{ SchedulerRegisteredEvent, SchedulerReregisteredEvent }
-import mesosphere.marathon.{ MarathonSchedulerDriverHolder, MarathonSpec }
+import mesosphere.marathon.event.{SchedulerRegisteredEvent, SchedulerReregisteredEvent}
+import mesosphere.marathon.{MarathonSchedulerDriverHolder, MarathonSpec}
 import org.apache.mesos.SchedulerDriver
 import org.mockito.Mockito
-import org.scalatest.{ Matchers, GivenWhenThen }
+import org.scalatest.{Matchers, GivenWhenThen}
 import rx.lang.scala.Subject
 import rx.lang.scala.subjects.PublishSubject
 
 import scala.concurrent.duration._
 
-class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matchers {
+class ReviveOffersActorTest
+    extends MarathonSpec with GivenWhenThen with Matchers {
   test("do not do anything") {
     val f = new Fixture()
     When("the actor starts")
@@ -55,12 +56,10 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
     f.verifyNoMoreInteractions()
   }
 
-  for (
-    reviveEvent <- Seq(
+  for (reviveEvent <- Seq(
       SchedulerReregisteredEvent("somemaster"),
       SchedulerRegisteredEvent("frameworkid", "somemaster")
-    )
-  ) {
+  )) {
     test(s"revive if offers wanted and we receive $reviveEvent") {
       val f = new Fixture()
       Given("a started actor that wants offers")
@@ -109,18 +108,18 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
     Mockito.verify(f.driver, Mockito.timeout(1000)).reviveOffers()
 
     And("any scheduled timers are canceled")
-    Mockito.verify(f.actorRef.underlyingActor.cancellable, Mockito.timeout(1000)).cancel()
+    Mockito
+      .verify(f.actorRef.underlyingActor.cancellable, Mockito.timeout(1000))
+      .cancel()
 
     f.verifyNoMoreInteractions()
   }
 
-  for (
-    reviveEvent <- Seq(
+  for (reviveEvent <- Seq(
       SchedulerReregisteredEvent("somemaster"),
       SchedulerRegisteredEvent("frameworkid", "somemaster"),
       ReviveOffersActor.TimedCheck
-    )
-  ) {
+  )) {
     test(s"DO NOT revive if offers NOT wanted and we receive $reviveEvent") {
       val f = new Fixture()
       Given("a started actor that wants offers")
@@ -173,7 +172,8 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
 
   test("Revive timer is cancelled if offers not wanted anymore") {
     val f = new Fixture()
-    Given("we received offersWanted = true two times and thus scheduled a timer")
+    Given(
+        "we received offersWanted = true two times and thus scheduled a timer")
     f.actorRef.start()
     f.offersWanted.onNext(true)
     f.offersWanted.onNext(true)
@@ -185,11 +185,14 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
     f.offersWanted.onNext(false)
 
     Then("we cancel the timer")
-    Mockito.verify(f.actorRef.underlyingActor.cancellable, Mockito.timeout(1000)).cancel()
+    Mockito
+      .verify(f.actorRef.underlyingActor.cancellable, Mockito.timeout(1000))
+      .cancel()
     f.verifyNoMoreInteractions()
   }
 
-  test("Check revives if last offersWanted == true and more than 5.seconds ago") {
+  test(
+      "Check revives if last offersWanted == true and more than 5.seconds ago") {
     val f = new Fixture()
     Given("that we received various flipping offers wanted requests")
     f.actorRef.start()
@@ -207,13 +210,16 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
     f.actorRef ! ReviveOffersActor.TimedCheck
 
     Then("we cancel our now unnecessary timer (which has send this message)")
-    Mockito.verify(f.actorRef.underlyingActor.cancellable, Mockito.timeout(1000)).cancel()
+    Mockito
+      .verify(f.actorRef.underlyingActor.cancellable, Mockito.timeout(1000))
+      .cancel()
     And("we revive the offers")
     Mockito.verify(f.driver, Mockito.timeout(1000)).reviveOffers()
     f.verifyNoMoreInteractions()
   }
 
-  test("Check does not revives if last offersWanted == false and more than 5.seconds ago") {
+  test(
+      "Check does not revives if last offersWanted == false and more than 5.seconds ago") {
     val f = new Fixture()
     Given("that we received various flipping offers wanted requests")
     f.actorRef.start()
@@ -246,7 +252,7 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
     Mockito.verify(f.driver, Mockito.timeout(1000)).reviveOffers()
     And("we scheduled the first of many revives")
     f.actorRef.underlyingActor.scheduled should have size (1)
-    f.actorRef.underlyingActor.revivesNeeded should be (f.repetitions - 1)
+    f.actorRef.underlyingActor.revivesNeeded should be(f.repetitions - 1)
 
     Mockito.reset(f.driver)
 
@@ -267,7 +273,7 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
 
       And("we have scheduled the next revive")
       f.actorRef.underlyingActor.scheduled should have size i
-      f.actorRef.underlyingActor.revivesNeeded should be (f.repetitions - i)
+      f.actorRef.underlyingActor.revivesNeeded should be(f.repetitions - i)
     }
 
     When("the min_revive_offers_interval has passed and we receive our last TimedCheck")
@@ -285,8 +291,9 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
     Mockito.reset(f.actorRef.underlyingActor.cancellable)
 
     And("we have NOT scheduled the next revive")
-    f.actorRef.underlyingActor.scheduled should have size (f.repetitions.toLong - 1)
-    f.actorRef.underlyingActor.revivesNeeded should be (0)
+    f.actorRef.underlyingActor.scheduled should have size
+    (f.repetitions.toLong - 1)
+    f.actorRef.underlyingActor.revivesNeeded should be(0)
 
     f.verifyNoMoreInteractions()
   }
@@ -305,9 +312,10 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
   class Fixture(val repetitions: Int = 1) {
     lazy val conf: ReviveOffersConfig = {
       val conf = new ReviveOffersConfig {
-        override lazy val reviveOffersRepetitions = opt[Int]("revive_offers_repetitions",
-          descr = "Repeat every reviveOffer request this many times, delayed by the --min_revive_offers_interval.",
-          default = Some(repetitions))
+        override lazy val reviveOffersRepetitions = opt[Int](
+            "revive_offers_repetitions",
+            descr = "Repeat every reviveOffer request this many times, delayed by the --min_revive_offers_interval.",
+            default = Some(repetitions))
       }
       conf.afterInit()
       conf
@@ -339,17 +347,22 @@ class ReviveOffersActorTest extends MarathonSpec with GivenWhenThen with Matcher
       Mockito.verifyNoMoreInteractions(mockScheduler)
     }
 
-    class TestableActor extends ReviveOffersActor(
-      clock, conf, actorSystem.eventStream, offersWanted, driverHolder
-    ) {
+    class TestableActor
+        extends ReviveOffersActor(
+            clock,
+            conf,
+            actorSystem.eventStream,
+            offersWanted,
+            driverHolder
+        ) {
       var scheduled = Vector.empty[FiniteDuration]
       var cancellable = mock[Cancellable]
 
-      override protected def schedulerCheck(duration: FiniteDuration): Cancellable = {
+      override protected def schedulerCheck(
+          duration: FiniteDuration): Cancellable = {
         scheduled :+= duration
         cancellable
       }
     }
-
   }
 }

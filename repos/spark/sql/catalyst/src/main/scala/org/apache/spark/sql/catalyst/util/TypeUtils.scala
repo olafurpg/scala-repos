@@ -22,14 +22,15 @@ import org.apache.spark.sql.catalyst.expressions.RowOrdering
 import org.apache.spark.sql.types._
 
 /**
- * Helper functions to check for valid data types.
- */
+  * Helper functions to check for valid data types.
+  */
 object TypeUtils {
   def checkForNumericExpr(dt: DataType, caller: String): TypeCheckResult = {
     if (dt.isInstanceOf[NumericType] || dt == NullType) {
       TypeCheckResult.TypeCheckSuccess
     } else {
-      TypeCheckResult.TypeCheckFailure(s"$caller requires numeric types, not $dt")
+      TypeCheckResult.TypeCheckFailure(
+          s"$caller requires numeric types, not $dt")
     }
   }
 
@@ -37,14 +38,16 @@ object TypeUtils {
     if (RowOrdering.isOrderable(dt)) {
       TypeCheckResult.TypeCheckSuccess
     } else {
-      TypeCheckResult.TypeCheckFailure(s"$caller does not support ordering on type $dt")
+      TypeCheckResult.TypeCheckFailure(
+          s"$caller does not support ordering on type $dt")
     }
   }
 
-  def checkForSameTypeInputExpr(types: Seq[DataType], caller: String): TypeCheckResult = {
+  def checkForSameTypeInputExpr(
+      types: Seq[DataType], caller: String): TypeCheckResult = {
     if (types.distinct.size > 1) {
       TypeCheckResult.TypeCheckFailure(
-        s"input to $caller should all be the same type, but it's " +
+          s"input to $caller should all be the same type, but it's " +
           types.map(_.simpleString).mkString("[", ", ", "]"))
     } else {
       TypeCheckResult.TypeCheckSuccess

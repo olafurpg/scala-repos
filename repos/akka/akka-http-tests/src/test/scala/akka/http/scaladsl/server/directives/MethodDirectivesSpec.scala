@@ -4,7 +4,7 @@
 
 package akka.http.scaladsl.server.directives
 
-import akka.http.scaladsl.model.{ StatusCodes, HttpMethods }
+import akka.http.scaladsl.model.{StatusCodes, HttpMethods}
 import akka.http.scaladsl.server._
 
 class MethodDirectivesSpec extends RoutingSpec {
@@ -26,8 +26,7 @@ class MethodDirectivesSpec extends RoutingSpec {
   "two failed `get` directives" should {
     "only result in a single Rejection" in {
       Put() ~> {
-        get { completeOk } ~
-          get { completeOk }
+        get { completeOk } ~ get { completeOk }
       } ~> check {
         rejections shouldEqual List(MethodRejection(HttpMethods.GET))
       }
@@ -37,20 +36,17 @@ class MethodDirectivesSpec extends RoutingSpec {
   "overrideMethodWithParameter" should {
     "change the request method" in {
       Get("/?_method=put") ~> overrideMethodWithParameter("_method") {
-        get { complete("GET") } ~
-          put { complete("PUT") }
+        get { complete("GET") } ~ put { complete("PUT") }
       } ~> check { responseAs[String] shouldEqual "PUT" }
     }
     "not affect the request when not specified" in {
       Get() ~> overrideMethodWithParameter("_method") {
-        get { complete("GET") } ~
-          put { complete("PUT") }
+        get { complete("GET") } ~ put { complete("PUT") }
       } ~> check { responseAs[String] shouldEqual "GET" }
     }
     "complete with 501 Not Implemented when not a valid method" in {
       Get("/?_method=hallo") ~> overrideMethodWithParameter("_method") {
-        get { complete("GET") } ~
-          put { complete("PUT") }
+        get { complete("GET") } ~ put { complete("PUT") }
       } ~> check { status shouldEqual StatusCodes.NotImplemented }
     }
   }
@@ -58,8 +54,7 @@ class MethodDirectivesSpec extends RoutingSpec {
   "MethodRejections under a successful match" should {
     "be cancelled if the match happens after the rejection" in {
       Put() ~> {
-        get { completeOk } ~
-          put { reject(RequestEntityExpectedRejection) }
+        get { completeOk } ~ put { reject(RequestEntityExpectedRejection) }
       } ~> check {
         rejections shouldEqual List(RequestEntityExpectedRejection)
       }

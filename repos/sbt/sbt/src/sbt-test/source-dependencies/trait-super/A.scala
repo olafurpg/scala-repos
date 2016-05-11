@@ -1,6 +1,6 @@
 trait A {
-	def x: Int
+  def x: Int
 }
 class E extends A {
-	def x = 19
+  def x = 19
 }

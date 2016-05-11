@@ -49,7 +49,7 @@ class FixedInetResolverTest extends FunSuite {
       // make the same request n-times
       val hostname = "1.2.3.4:100"
       val iterations = 10
-      for(i <- 1 to iterations) {
+      for (i <- 1 to iterations) {
         val request = resolver.bind(hostname).changes.filter(_ != Addr.Pending)
 
         Await.result(request.toFuture(), 2.milliseconds) match {
@@ -70,7 +70,7 @@ class FixedInetResolverTest extends FunSuite {
       val hostname = "1.2.3.4:100"
       shouldFail = true
       val iterations = 10
-      for(i <- 1 to iterations) {
+      for (i <- 1 to iterations) {
         val request = resolver.bind(hostname).changes.filter(_ != Addr.Pending)
 
         Await.result(request.toFuture(), 2.milliseconds) match {

@@ -12,7 +12,8 @@ import spire.util._
 
 final class MapIntIntIntAction extends Action[Int, Map[Int, Int]] {
   def actr(k: Int, perm: Map[Int, Int]): Int = perm.getOrElse(k, k)
-  def actl(perm: Map[Int, Int], k: Int): Int = perm.find(_._2 == k).fold(k)(_._1)
+  def actl(perm: Map[Int, Int], k: Int): Int =
+    perm.find(_._2 == k).fold(k)(_._1)
 }
 
 final class MapIntIntGroup extends Group[Map[Int, Int]] {
@@ -30,7 +31,9 @@ final class MapIntIntGroup extends Group[Map[Int, Int]] {
   def inverse(a: Map[Int, Int]): Map[Int, Int] = a.map(_.swap).toMap
 }
 
-final class MapIntIntSeqPartialAction[A, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA, A, SA]) extends PartialAction[SA, Map[Int, Int]] {
+final class MapIntIntSeqPartialAction[A, SA <: SeqLike[A, SA]](
+    implicit cbf: CanBuildFrom[SA, A, SA])
+    extends PartialAction[SA, Map[Int, Int]] {
   import mapIntIntPermutation._
   def partialActl(perm: Map[Int, Int], sa: SA): Opt[SA] = {
     if (perm.isEmpty) return Opt(sa)
@@ -46,7 +49,11 @@ final class MapIntIntSeqPartialAction[A, SA <: SeqLike[A, SA]](implicit cbf: Can
 }
 
 object mapIntIntPermutation {
-  implicit val MapIntIntIntAction: Action[Int, Map[Int, Int]] = new MapIntIntIntAction
+  implicit val MapIntIntIntAction: Action[Int, Map[Int, Int]] =
+    new MapIntIntIntAction
   implicit val MapIntIntGroup: Group[Map[Int, Int]] = new MapIntIntGroup
-  implicit def MapIntIntSeqPartialAction[A, CC[A] <: SeqLike[A, CC[A]]](implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): PartialAction[CC[A], Map[Int, Int]] = new MapIntIntSeqPartialAction[A, CC[A]]
+  implicit def MapIntIntSeqPartialAction[A, CC[A] <: SeqLike[A, CC[A]]](
+      implicit cbf: CanBuildFrom[CC[A], A, CC[A]])
+    : PartialAction[CC[A], Map[Int, Int]] =
+    new MapIntIntSeqPartialAction[A, CC[A]]
 }

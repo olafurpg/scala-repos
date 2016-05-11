@@ -2,7 +2,6 @@
 object test {
 
   def f() = "hello".concat("world");
-
 }
 // #1000
 object A {

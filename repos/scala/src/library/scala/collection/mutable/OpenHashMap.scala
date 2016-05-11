@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -11,60 +11,61 @@ package collection
 package mutable
 
 /**
- *  @define Coll `OpenHashMap`
- *  @define coll open hash map
- *
- *  @since 2.7
- */
+  *  @define Coll `OpenHashMap`
+  *  @define coll open hash map
+  *
+  *  @since 2.7
+  */
 object OpenHashMap {
 
-  def apply[K, V](elems : (K, V)*) = new OpenHashMap[K, V] ++= elems
+  def apply[K, V](elems: (K, V)*) = new OpenHashMap[K, V] ++= elems
   def empty[K, V] = new OpenHashMap[K, V]
 
   final private class OpenEntry[Key, Value](val key: Key,
                                             val hash: Int,
                                             var value: Option[Value])
-                extends HashEntry[Key, OpenEntry[Key, Value]]
+      extends HashEntry[Key, OpenEntry[Key, Value]]
 
-  private[mutable] def nextPositivePowerOfTwo(i : Int) = 1 << (32 - Integer.numberOfLeadingZeros(i - 1))
+  private[mutable] def nextPositivePowerOfTwo(i: Int) =
+    1 << (32 - Integer.numberOfLeadingZeros(i - 1))
 }
 
 /** A mutable hash map based on an open hashing scheme. The precise scheme is
- *  undefined, but it should make a reasonable effort to ensure that an insert
- *  with consecutive hash codes is not unnecessarily penalised. In particular,
- *  mappings of consecutive integer keys should work without significant
- *  performance loss.
- *
- *  @tparam Key          type of the keys in this map.
- *  @tparam Value        type of the values in this map.
- *  @param initialSize   the initial size of the internal hash table.
- *
- *  @author David MacIver
- *  @since  2.7
- *
- *  @define Coll `OpenHashMap`
- *  @define coll open hash map
- *  @define mayNotTerminateInf
- *  @define willNotTerminateInf
- */
-class OpenHashMap[Key, Value](initialSize : Int)
-extends AbstractMap[Key, Value]
-   with Map[Key, Value]
-   with MapLike[Key, Value, OpenHashMap[Key, Value]] {
+  *  undefined, but it should make a reasonable effort to ensure that an insert
+  *  with consecutive hash codes is not unnecessarily penalised. In particular,
+  *  mappings of consecutive integer keys should work without significant
+  *  performance loss.
+  *
+  *  @tparam Key          type of the keys in this map.
+  *  @tparam Value        type of the values in this map.
+  *  @param initialSize   the initial size of the internal hash table.
+  *
+  *  @author David MacIver
+  *  @since  2.7
+  *
+  *  @define Coll `OpenHashMap`
+  *  @define coll open hash map
+  *  @define mayNotTerminateInf
+  *  @define willNotTerminateInf
+  */
+class OpenHashMap[Key, Value](initialSize: Int)
+    extends AbstractMap[Key, Value] with Map[Key, Value]
+    with MapLike[Key, Value, OpenHashMap[Key, Value]] {
 
   import OpenHashMap.OpenEntry
   private type Entry = OpenEntry[Key, Value]
 
   /** A default constructor creates a hashmap with initial size `8`.
-   */
+    */
   def this() = this(8)
 
   override def empty: OpenHashMap[Key, Value] = OpenHashMap.empty[Key, Value]
 
-  private[this] val actualInitialSize = OpenHashMap.nextPositivePowerOfTwo(initialSize)
+  private[this] val actualInitialSize =
+    OpenHashMap.nextPositivePowerOfTwo(initialSize)
 
   private var mask = actualInitialSize - 1
-  private var table : Array[Entry] = new Array[Entry](actualInitialSize)
+  private var table: Array[Entry] = new Array[Entry](actualInitialSize)
   private var _size = 0
   private var deleted = 0
 
@@ -72,7 +73,7 @@ extends AbstractMap[Key, Value]
   private[this] var modCount = 0
 
   override def size = _size
-  private[this] def size_=(s : Int) { _size = s }
+  private[this] def size_=(s: Int) { _size = s }
 
   /** Returns a mangled hash code of the provided key. */
   protected def hashOf(key: Key) = {
@@ -90,15 +91,15 @@ extends AbstractMap[Key, Value]
     val oldTable = table
     table = new Array[Entry](newSize)
     mask = newSize - 1
-    oldTable.foreach( entry =>
-      if (entry != null && entry.value != None) addEntry(entry))
+    oldTable.foreach(
+        entry => if (entry != null && entry.value != None) addEntry(entry))
     deleted = 0
   }
 
   /** Return the index of the first slot in the hash table (in probe order)
     * that either is empty, or is or was last occupied by the given key.
     */
-  private[this] def findIndex(key: Key) : Int = findIndex(key, hashOf(key))
+  private[this] def findIndex(key: Key): Int = findIndex(key, hashOf(key))
 
   /** Return the index of the first slot in the hash table (in probe order)
     * that either is empty, or is or was last occupied by the given key.
@@ -112,9 +113,8 @@ extends AbstractMap[Key, Value]
 
     var index = hash & mask
     var perturb = index
-    while(table(index) != null &&
-          !(table(index).hash == hash &&
-            table(index).key == key)){
+    while (table(index) != null && !(table(index).hash == hash &&
+        table(index).key == key)) {
       j = 5 * j + 1 + perturb
       perturb >>= 5
       index = j & mask
@@ -129,11 +129,15 @@ extends AbstractMap[Key, Value]
     put(key, hashOf(key), value)
   }
 
-  @deprecatedOverriding("+= should not be overridden in order to maintain consistency with put.", "2.11.0")
-  def += (kv: (Key, Value)): this.type = { put(kv._1, kv._2); this }
-  
-  @deprecatedOverriding("-= should not be overridden in order to maintain consistency with remove.", "2.11.0")
-  def -= (key: Key): this.type = { remove(key); this }
+  @deprecatedOverriding(
+      "+= should not be overridden in order to maintain consistency with put.",
+      "2.11.0")
+  def +=(kv: (Key, Value)): this.type = { put(kv._1, kv._2); this }
+
+  @deprecatedOverriding(
+      "-= should not be overridden in order to maintain consistency with remove.",
+      "2.11.0")
+  def -=(key: Key): this.type = { remove(key); this }
 
   override def put(key: Key, value: Value): Option[Value] =
     put(key, hashOf(key), value)
@@ -159,9 +163,9 @@ extends AbstractMap[Key, Value]
     }
   }
 
-  override def remove(key : Key): Option[Value] = {
+  override def remove(key: Key): Option[Value] = {
     val index = findIndex(key)
-    if (table(index) != null && table(index).value != None){
+    if (table(index) != null && table(index).value != None) {
       val res = table(index).value
       table(index).value = None
       size -= 1
@@ -170,16 +174,15 @@ extends AbstractMap[Key, Value]
     } else None
   }
 
-  def get(key : Key) : Option[Value] = {
+  def get(key: Key): Option[Value] = {
     val hash = hashOf(key)
 
     var j = hash
     var index = hash & mask
     var perturb = index
     var entry = table(index)
-    while(entry != null){
-      if (entry.hash == hash &&
-          entry.key == key){
+    while (entry != null) {
+      if (entry.hash == hash && entry.key == key) {
         return entry.value
       }
 
@@ -192,20 +195,21 @@ extends AbstractMap[Key, Value]
   }
 
   /** An iterator over the elements of this map. Use of this iterator follows
-   *  the same contract for concurrent modification as the foreach method.
-   *
-   *  @return   the iterator
-   */
+    *  the same contract for concurrent modification as the foreach method.
+    *
+    *  @return   the iterator
+    */
   def iterator: Iterator[(Key, Value)] = new AbstractIterator[(Key, Value)] {
     var index = 0
     val initialModCount = modCount
 
     private[this] def advance() {
       if (initialModCount != modCount) sys.error("Concurrent modification")
-      while((index <= mask) && (table(index) == null || table(index).value == None)) index+=1
+      while ( (index <= mask) &&
+      (table(index) == null || table(index).value == None)) index += 1
     }
 
-    def hasNext = {advance(); index <= mask }
+    def hasNext = { advance(); index <= mask }
 
     def next = {
       advance()
@@ -217,39 +221,47 @@ extends AbstractMap[Key, Value]
 
   override def clone() = {
     val it = new OpenHashMap[Key, Value]
-    foreachUndeletedEntry(entry => it.put(entry.key, entry.hash, entry.value.get))
+    foreachUndeletedEntry(
+        entry => it.put(entry.key, entry.hash, entry.value.get))
     it
   }
 
   /** Loop over the key, value mappings of this map.
-   *
-   *  The behaviour of modifying the map during an iteration is as follows:
-   *  - Deleting a mapping is always permitted.
-   *  - Changing the value of mapping which is already present is permitted.
-   *  - Anything else is not permitted. It will usually, but not always, throw an exception.
-   *
-   *  @tparam U  The return type of the specified function `f`, return result of which is ignored.
-   *  @param f   The function to apply to each key, value mapping.
-   */
-  override def foreach[U](f : ((Key, Value)) => U) {
+    *
+    *  The behaviour of modifying the map during an iteration is as follows:
+    *  - Deleting a mapping is always permitted.
+    *  - Changing the value of mapping which is already present is permitted.
+    *  - Anything else is not permitted. It will usually, but not always, throw an exception.
+    *
+    *  @tparam U  The return type of the specified function `f`, return result of which is ignored.
+    *  @param f   The function to apply to each key, value mapping.
+    */
+  override def foreach[U](f: ((Key, Value)) => U) {
     val startModCount = modCount
-    foreachUndeletedEntry(entry => {
-      if (modCount != startModCount) sys.error("Concurrent Modification")
-      f((entry.key, entry.value.get))}
-    )
+    foreachUndeletedEntry(
+        entry =>
+          {
+        if (modCount != startModCount) sys.error("Concurrent Modification")
+        f((entry.key, entry.value.get))
+    })
   }
 
-  private[this] def foreachUndeletedEntry(f : Entry => Unit){
+  private[this] def foreachUndeletedEntry(f: Entry => Unit) {
     table.foreach(entry => if (entry != null && entry.value != None) f(entry))
   }
 
-  override def transform(f : (Key, Value) => Value) = {
-    foreachUndeletedEntry(entry => entry.value = Some(f(entry.key, entry.value.get)))
+  override def transform(f: (Key, Value) => Value) = {
+    foreachUndeletedEntry(
+        entry => entry.value = Some(f(entry.key, entry.value.get)))
     this
   }
 
-  override def retain(f : (Key, Value) => Boolean) = {
-    foreachUndeletedEntry(entry => if (!f(entry.key, entry.value.get)) {entry.value = None; size -= 1; deleted += 1} )
+  override def retain(f: (Key, Value) => Boolean) = {
+    foreachUndeletedEntry(
+        entry =>
+          if (!f(entry.key, entry.value.get)) {
+        entry.value = None; size -= 1; deleted += 1
+    })
     this
   }
 

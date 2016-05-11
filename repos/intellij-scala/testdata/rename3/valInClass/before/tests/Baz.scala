@@ -1,10 +1,10 @@
 package tests
 
 class Baz {
-  val bar/*caret*/ = 0
+  val bar /*caret*/ = 0
 
   def foo() = {
-    ba/*caret*/r match {
+    ba /*caret*/ r match {
       case `bar/*caret*/` =>
       case _ =>
     }
@@ -23,6 +23,6 @@ object Test {
   def foo(i: Int = BazInst.bar) = {
     BazInst.bar.toString
     BazInst2.bar = 1
-    (new Baz).bar/*caret*/.toString
+    (new Baz).bar /*caret*/ .toString
   }
 }

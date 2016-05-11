@@ -1,7 +1,6 @@
 package spire
 package benchmark
 
-
 import scala.util.Random
 import Random._
 
@@ -15,8 +14,8 @@ import com.google.caliper.Param
 object Mo5Benchmarks extends MyRunner(classOf[Mo5Benchmarks])
 
 class Mo5Benchmarks extends MyBenchmark {
-  val mo5_hb = new HighBranchingMedianOf5 { }
-  val mo5_m = new MutatingMedianOf5 { }
+  val mo5_hb = new HighBranchingMedianOf5 {}
+  val mo5_m = new MutatingMedianOf5 {}
 
   var as: Array[Int] = null
 
@@ -26,7 +25,7 @@ class Mo5Benchmarks extends MyBenchmark {
     as = init(len)(nextInt)
   }
 
-  def timeHBMo5(reps:Int) = run(reps) {
+  def timeHBMo5(reps: Int) = run(reps) {
     val a = as.clone()
     var i = 0
     while (i <= len - 5) {
@@ -36,7 +35,7 @@ class Mo5Benchmarks extends MyBenchmark {
     a.length
   }
 
-  def timeMMo5(reps:Int) = run(reps) {
+  def timeMMo5(reps: Int) = run(reps) {
     val a = as.clone()
     var i = 0
     while (i <= len - 5) {

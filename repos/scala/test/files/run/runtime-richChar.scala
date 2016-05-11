@@ -1,9 +1,7 @@
 object Test extends App {
   def testSeq(name: String, expected: Seq[Char], got: Seq[Char]) {
-    if (expected.toList == got.toList)
-      println(name + " ok")
-    else
-      println(name + " failed: " + expected + " differs from " + got)
+    if (expected.toList == got.toList) println(name + " ok")
+    else println(name + " failed: " + expected + " differs from " + got)
   }
 
   testSeq("'a' to 'c'", List('a', 'b', 'c'), 'a' to 'c')

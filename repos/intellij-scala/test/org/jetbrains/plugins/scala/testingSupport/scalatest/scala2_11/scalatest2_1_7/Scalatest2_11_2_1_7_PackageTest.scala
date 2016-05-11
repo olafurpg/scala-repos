@@ -6,6 +6,5 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestPackageTest
   * @author Roman.Shein
   * @since 05.09.2015.
   */
-class Scalatest2_11_2_1_7_PackageTest extends Scalatest2_11_2_1_7_Base with ScalaTestPackageTest {
-
- }
+class Scalatest2_11_2_1_7_PackageTest
+    extends Scalatest2_11_2_1_7_Base with ScalaTestPackageTest {}

@@ -23,7 +23,9 @@ class CompletionIteratorSuite extends SparkFunSuite {
   test("basic test") {
     var numTimesCompleted = 0
     val iter = List(1, 2, 3).iterator
-    val completionIter = CompletionIterator[Int, Iterator[Int]](iter, { numTimesCompleted += 1 })
+    val completionIter = CompletionIterator[Int, Iterator[Int]](iter, {
+      numTimesCompleted += 1
+    })
 
     assert(completionIter.hasNext)
     assert(completionIter.next() === 1)

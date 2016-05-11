@@ -1,8 +1,8 @@
 package dingus {
   class Foo1() { protected def this(name: String) = this() }
-  class Foo2 protected (name: String) { }
+  class Foo2 protected (name: String) {}
   object Ding {
-    protected class Foo3(name: String) { }
+    protected class Foo3(name: String) {}
   }
 }
 

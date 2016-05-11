@@ -35,15 +35,17 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * StyleConverter Spec tests. It is being used Conversion from String to String (stringConverter)  
- */
+  * StyleConverter Spec tests. It is being used Conversion from String to String (stringConverter)  
+  */
 @RunWith(classOf[JUnitRunner])
 class StyleConverterSpec
-  extends SimpleSFXDelegateSpec[jfxcss.StyleConverter[String, String], StyleConverter[String, String]](
-    classOf[jfxcss.StyleConverter[String, String]], classOf[StyleConverter[String, String]]) {
+    extends SimpleSFXDelegateSpec[
+        jfxcss.StyleConverter[String, String], StyleConverter[String, String]](
+        classOf[jfxcss.StyleConverter[String, String]],
+        classOf[StyleConverter[String, String]]) {
 
   override protected def getScalaClassInstance = StyleConverter.stringConverter
 
-  override protected def getJavaClassInstance = jfxcss.StyleConverter.getStringConverter
-
+  override protected def getJavaClassInstance =
+    jfxcss.StyleConverter.getStringConverter
 }

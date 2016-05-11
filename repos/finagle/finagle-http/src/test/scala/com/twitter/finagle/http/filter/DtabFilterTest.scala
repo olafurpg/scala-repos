@@ -14,12 +14,13 @@ class DtabFilterTest extends FunSuite with AssertionsForJUnit {
   test("parses X-Dtab headers") {
     val dtab = Dtab.read("/foo=>/bar;/bah=>/baz")
     val service =
-      new DtabFilter.Finagle[Request] andThen
-      Service.mk[Request, Response] { req =>
-        val xDtabHeaders = req.headerMap.keys.filter(_.toLowerCase startsWith "x-dtab")
-        assert(xDtabHeaders.isEmpty, "x-dtab headers not cleared")
-        assert(Dtab.local == dtab)
-        Future.value(Response())
+      new DtabFilter.Finagle[Request] andThen Service.mk[Request, Response] {
+        req =>
+          val xDtabHeaders =
+            req.headerMap.keys.filter(_.toLowerCase startsWith "x-dtab")
+          assert(xDtabHeaders.isEmpty, "x-dtab headers not cleared")
+          assert(Dtab.local == dtab)
+          Future.value(Response())
       }
 
     val req = Request()
@@ -33,10 +34,10 @@ class DtabFilterTest extends FunSuite with AssertionsForJUnit {
 
   test("responds with an error on invalid dtab headers") {
     val service =
-      new DtabFilter.Finagle[Request] andThen
-      Service.mk[Request, Response] { _ =>
-        fail("request should not have reached service")
-        Future.value(Response())
+      new DtabFilter.Finagle[Request] andThen Service.mk[Request, Response] {
+        _ =>
+          fail("request should not have reached service")
+          Future.value(Response())
       }
 
     val req = Request()

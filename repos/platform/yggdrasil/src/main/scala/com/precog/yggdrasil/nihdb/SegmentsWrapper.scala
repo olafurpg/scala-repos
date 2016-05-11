@@ -27,10 +27,13 @@ import com.precog.util._
 import com.precog.yggdrasil.table._
 import com.precog.niflheim._
 
-case class SegmentsWrapper(segments: Seq[Segment], projectionId: Int, blockId: Long) extends Slice {
+case class SegmentsWrapper(
+    segments: Seq[Segment], projectionId: Int, blockId: Long)
+    extends Slice {
   import TransSpecModule.paths
 
-  val logger = LoggerFactory.getLogger("com.precog.yggdrasil.table.SegmentsWrapper")
+  val logger =
+    LoggerFactory.getLogger("com.precog.yggdrasil.table.SegmentsWrapper")
 
   // FIXME: This should use an identity of Array[Long](projectionId,
   // blockId), but the evaluator will cry if we do that right now
@@ -54,7 +57,7 @@ case class SegmentsWrapper(segments: Seq[Segment], projectionId: Int, blockId: L
     }
 
     Set((ColumnRef(CPath(paths.Key) \ 0 \ 0, CLong), loKey),
-      (ColumnRef(CPath(paths.Key) \ 0 \ 1, CLong), hoKey))
+        (ColumnRef(CPath(paths.Key) \ 0 \ 1, CLong), hoKey))
   }
 
   private def buildKeyColumn(length: Int): (ColumnRef, Column) = {
@@ -67,7 +70,8 @@ case class SegmentsWrapper(segments: Seq[Segment], projectionId: Int, blockId: L
     (ColumnRef(CPath(paths.Key) \ 0, CLong), ArrayLongColumn(keys))
   }
 
-  private def buildColumnRef(seg: Segment) = ColumnRef(CPath(paths.Value) \ seg.cpath, seg.ctype)
+  private def buildColumnRef(seg: Segment) =
+    ColumnRef(CPath(paths.Value) \ seg.cpath, seg.ctype)
 
   private def buildColumn(seg: Segment): Column = seg match {
     case segment: ArraySegment[a] =>
@@ -81,34 +85,39 @@ case class SegmentsWrapper(segments: Seq[Segment], projectionId: Int, blockId: L
         case CNum => new ArrayNumColumn(defined, values)
         case CDouble => new ArrayDoubleColumn(defined, values)
         case CLong => new ArrayLongColumn(defined, values)
-        case cat: CArrayType[_] => new ArrayHomogeneousArrayColumn(defined, values)(cat)
+        case cat: CArrayType[_] =>
+          new ArrayHomogeneousArrayColumn(defined, values)(cat)
         case CBoolean => sys.error("impossible")
       }
 
     case BooleanSegment(_, _, defined, values, _) =>
       new ArrayBoolColumn(defined, values)
 
-    case NullSegment(_, _, ctype, defined, _) => ctype match {
-      case CNull =>
-        NullColumn(defined)
-      case CEmptyObject =>
-        new MutableEmptyObjectColumn(defined)
-      case CEmptyArray =>
-        new MutableEmptyArrayColumn(defined)
-      case CUndefined =>
-        sys.error("also impossible")
-    }
+    case NullSegment(_, _, ctype, defined, _) =>
+      ctype match {
+        case CNull =>
+          NullColumn(defined)
+        case CEmptyObject =>
+          new MutableEmptyObjectColumn(defined)
+        case CEmptyArray =>
+          new MutableEmptyArrayColumn(defined)
+        case CUndefined =>
+          sys.error("also impossible")
+      }
   }
 
   private def buildMap(segments: Seq[Segment]): Map[ColumnRef, Column] =
     segments.map(seg => (buildColumnRef(seg), buildColumn(seg))).toMap
 
-  private val cols: Map[ColumnRef, Column] = buildMap(segments) + buildKeyColumn(segments.headOption map (_.length) getOrElse 0)
+  private val cols: Map[ColumnRef, Column] =
+    buildMap(segments) + buildKeyColumn(
+        segments.headOption map (_.length) getOrElse 0)
 
   val size: Int = {
     val sz = segments.foldLeft(0)(_ max _.length)
     if (logger.isTraceEnabled) {
-      logger.trace("Computed size %d from:\n  %s".format(sz, segments.mkString("\n  ")))
+      logger.trace(
+          "Computed size %d from:\n  %s".format(sz, segments.mkString("\n  ")))
     }
     sz
   }

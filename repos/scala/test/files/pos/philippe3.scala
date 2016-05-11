@@ -1,12 +1,9 @@
-
 class Foo(x: Int) {}
 case class Bar(y: Int) extends Foo(y);
-
 
 trait T {}
 trait U {}
 class C() {}
-
 
 trait T1;
 trait T2 {}
@@ -35,6 +32,3 @@ object M5 extends C();
 object M6 extends C() {}
 object M7 extends C() with U;
 object M8 extends C() with U {}
-
-
-

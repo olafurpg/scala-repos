@@ -19,21 +19,24 @@ import org.jetbrains.plugins.scala.project._
 import scala.collection.mutable
 
 /**
- * @author Alefas
- * @since 03.03.14
- */
-class ScalaApplicationUsagesCollector extends AbstractApplicationUsagesCollector {
+  * @author Alefas
+  * @since 03.03.14
+  */
+class ScalaApplicationUsagesCollector
+    extends AbstractApplicationUsagesCollector {
   override def getProjectUsages(project: Project): util.Set[UsageDescriptor] = {
     extensions.inReadAction {
-      val set: mutable.HashSet[UsageDescriptor] = new mutable.HashSet[UsageDescriptor]
+      val set: mutable.HashSet[UsageDescriptor] =
+        new mutable.HashSet[UsageDescriptor]
 
-      if (ScalaPsiUtil.kindProjectorPluginEnabled(project)) set += new UsageDescriptor("Compiler plugin: Kind Projector", 1)
+      if (ScalaPsiUtil.kindProjectorPluginEnabled(project))
+        set += new UsageDescriptor("Compiler plugin: Kind Projector", 1)
 
       //collecting Scala version
       var scala_version: Option[String] = None
       var java_version: Option[String] = None
       for (module <- ModuleManager.getInstance(project).getModules) {
-        module.scalaSdk.flatMap(_.compilerVersion).foreach { version => 
+        module.scalaSdk.flatMap(_.compilerVersion).foreach { version =>
           scala_version = Some(version)
         }
 
@@ -44,7 +47,8 @@ class ScalaApplicationUsagesCollector extends AbstractApplicationUsagesCollector
       }
 
       scala_version.foreach {
-        case version: String => set += new UsageDescriptor(s"Scala: $version", 1)
+        case version: String =>
+          set += new UsageDescriptor(s"Scala: $version", 1)
       }
 
       def checkLibrary(qual: String, library: String) {
@@ -52,7 +56,6 @@ class ScalaApplicationUsagesCollector extends AbstractApplicationUsagesCollector
           set += new UsageDescriptor("Library: " + library, 1)
         }
       }
-
 
       val isPlayInstalled = PlatformUtils.isIdeaUltimate
 
@@ -70,7 +73,8 @@ class ScalaApplicationUsagesCollector extends AbstractApplicationUsagesCollector
         checkLibrary("com.sksamuel.elastic4s", "Elastic4s")
         checkLibrary("securesocial", "SecureSocial")
         checkLibrary("com.github.dwhjames.awswrap", "AWSWrap")
-        checkLibrary("com.github.mauricio.async.db.postgresql", "postgresql-async")
+        checkLibrary(
+            "com.github.mauricio.async.db.postgresql", "postgresql-async")
         checkLibrary("com.netflix.edda", "Edda")
         checkLibrary("redis", "Rediscala")
         checkLibrary("scalaz", "Scalaz")
@@ -99,7 +103,8 @@ class ScalaApplicationUsagesCollector extends AbstractApplicationUsagesCollector
         checkLibrary("monocle", "Monocle")
 
         java_version.foreach {
-          case version: String => set += new UsageDescriptor(s"Java version: $version", 1)
+          case version: String =>
+            set += new UsageDescriptor(s"Java version: $version", 1)
         }
       } else {
         checkLibrary("play.api.mvc", s"Play2 for Java|$isPlayInstalled")

@@ -1,3 +1,3 @@
 object B {
-	def x(i: Int) = 3
+  def x(i: Int) = 3
 }

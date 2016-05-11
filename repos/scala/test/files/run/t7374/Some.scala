@@ -1,3 +1,3 @@
 object SomeScala {
-  def list = List(1, 2, 3) 
+  def list = List(1, 2, 3)
 }

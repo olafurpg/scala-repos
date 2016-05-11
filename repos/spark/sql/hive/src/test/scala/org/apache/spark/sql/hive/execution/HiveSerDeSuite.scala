@@ -22,13 +22,13 @@ import org.scalatest.BeforeAndAfterAll
 import org.apache.spark.sql.hive.test.TestHive
 
 /**
- * A set of tests that validates support for Hive SerDe.
- */
+  * A set of tests that validates support for Hive SerDe.
+  */
 class HiveSerDeSuite extends HiveComparisonTest with BeforeAndAfterAll {
   override def beforeAll(): Unit = {
     import TestHive._
     import org.apache.hadoop.hive.serde2.RegexSerDe
-      super.beforeAll()
+    super.beforeAll()
     TestHive.cacheTables = false
     sql(s"""CREATE TABLE IF NOT EXISTS sales (key STRING, value INT)
        |ROW FORMAT SERDE '${classOf[RegexSerDe].getCanonicalName}'
@@ -40,11 +40,11 @@ class HiveSerDeSuite extends HiveComparisonTest with BeforeAndAfterAll {
   // table sales is not a cache table, and will be clear after reset
   createQueryTest("Read with RegexSerDe", "SELECT * FROM sales", false)
 
-  createQueryTest(
-    "Read and write with LazySimpleSerDe (tab separated)",
-    "SELECT * from serdeins")
+  createQueryTest("Read and write with LazySimpleSerDe (tab separated)",
+                  "SELECT * from serdeins")
 
   createQueryTest("Read with AvroSerDe", "SELECT * FROM episodes")
 
-  createQueryTest("Read Partitioned with AvroSerDe", "SELECT * FROM episodes_part")
+  createQueryTest(
+      "Read Partitioned with AvroSerDe", "SELECT * FROM episodes_part")
 }

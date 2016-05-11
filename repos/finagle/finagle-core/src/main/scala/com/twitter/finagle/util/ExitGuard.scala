@@ -1,10 +1,9 @@
 package com.twitter.finagle.util
 
-
 /**
- * ExitGuard prevents the process from exiting normally by use of a
- * nondaemon thread whenever there is at least one guarder.
- */
+  * ExitGuard prevents the process from exiting normally by use of a
+  * nondaemon thread whenever there is at least one guarder.
+  */
 object ExitGuard {
   @volatile private[util] var guards: Option[(Thread, List[Guard])] = None
 
@@ -26,14 +25,14 @@ object ExitGuard {
   }
 
   private def updateName() {
-    for ((t, gs) <- guards)
-      t.setName("Finagle ExitGuard count=%d".format(gs.size))
+    for ((t, gs) <- guards) t.setName(
+        "Finagle ExitGuard count=%d".format(gs.size))
   }
 
-/**
- * Prevent the process from exiting normally. You must retain the returned ExitGuard and call
- * `release` to remove the guard.
- */
+  /**
+    * Prevent the process from exiting normally. You must retain the returned ExitGuard and call
+    * `release` to remove the guard.
+    */
   private[finagle] def guard(reason: String): Guard = {
     val guard = Guard(reason)
     addGuard(guard)
@@ -54,13 +53,14 @@ object ExitGuard {
 
   def explainGuards(): String = {
     val snap = synchronized {
-      guards.collect { case((_, gs)) => gs }.getOrElse(Nil)
+      guards.collect { case ((_, gs)) => gs }.getOrElse(Nil)
     }
 
     if (snap.isEmpty) {
       "There are no active guards."
     } else {
-      s"${snap.size} active guard(s):" + snap.map(_.reason).mkString(start="\n", sep="\n", end="")
+      s"${snap.size} active guard(s):" +
+      snap.map(_.reason).mkString(start = "\n", sep = "\n", end = "")
     }
   }
 

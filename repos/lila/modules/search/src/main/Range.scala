@@ -17,9 +17,12 @@ object Range {
 
   def apply[A](a: Option[A], b: Option[A])(implicit o: Ordering[A]): Range[A] =
     (a, b) match {
-      case (Some(aa), Some(bb)) => o.lt(aa, bb).fold(
-        new Range(a, b), new Range(b, a)
-      )
+      case (Some(aa), Some(bb)) =>
+        o.lt(aa, bb)
+          .fold(
+              new Range(a, b),
+              new Range(b, a)
+          )
       case (x, y) => new Range(x, y)
     }
 

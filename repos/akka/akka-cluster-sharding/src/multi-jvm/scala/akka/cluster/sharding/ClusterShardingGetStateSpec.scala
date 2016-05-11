@@ -1,13 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.sharding
 
 import akka.actor._
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent.CurrentClusterState
 import akka.remote.testconductor.RoleName
-import akka.remote.testkit.{ MultiNodeConfig, MultiNodeSpec, STMultiNodeSpec }
+import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, STMultiNodeSpec}
 import akka.testkit.TestProbe
 import com.typesafe.config.ConfigFactory
 
@@ -21,7 +21,7 @@ object ClusterShardingGetStateSpec {
   class ShardedActor extends Actor with ActorLogging {
     log.info(self.path.toString)
     def receive = {
-      case Stop    ⇒ context.stop(self)
+      case Stop ⇒ context.stop(self)
       case _: Ping ⇒ sender() ! Pong
     }
   }
@@ -57,16 +57,20 @@ object ClusterShardingGetStateSpecConfig extends MultiNodeConfig {
     }
     """))
 
-  nodeConfig(first, second)(ConfigFactory.parseString(
-    """akka.cluster.roles=["shard"]"""))
-
+  nodeConfig(first, second)(
+      ConfigFactory.parseString("""akka.cluster.roles=["shard"]"""))
 }
 
-class ClusterShardingGetStateSpecMultiJvmNode1 extends ClusterShardingGetStateSpec
-class ClusterShardingGetStateSpecMultiJvmNode2 extends ClusterShardingGetStateSpec
-class ClusterShardingGetStateSpecMultiJvmNode3 extends ClusterShardingGetStateSpec
+class ClusterShardingGetStateSpecMultiJvmNode1
+    extends ClusterShardingGetStateSpec
+class ClusterShardingGetStateSpecMultiJvmNode2
+    extends ClusterShardingGetStateSpec
+class ClusterShardingGetStateSpecMultiJvmNode3
+    extends ClusterShardingGetStateSpec
 
-abstract class ClusterShardingGetStateSpec extends MultiNodeSpec(ClusterShardingGetStateSpecConfig) with STMultiNodeSpec {
+abstract class ClusterShardingGetStateSpec
+    extends MultiNodeSpec(ClusterShardingGetStateSpecConfig)
+    with STMultiNodeSpec {
 
   import ClusterShardingGetStateSpec._
   import ClusterShardingGetStateSpecConfig._
@@ -75,19 +79,18 @@ abstract class ClusterShardingGetStateSpec extends MultiNodeSpec(ClusterSharding
 
   def startShard(): ActorRef = {
     ClusterSharding(system).start(
-      typeName = shardTypeName,
-      entityProps = Props(new ShardedActor),
-      settings = ClusterShardingSettings(system).withRole("shard"),
-      extractEntityId = extractEntityId,
-      extractShardId = extractShardId)
+        typeName = shardTypeName,
+        entityProps = Props(new ShardedActor),
+        settings = ClusterShardingSettings(system).withRole("shard"),
+        extractEntityId = extractEntityId,
+        extractShardId = extractShardId)
   }
 
   def startProxy(): ActorRef = {
-    ClusterSharding(system).startProxy(
-      typeName = shardTypeName,
-      role = Some("shard"),
-      extractEntityId = extractEntityId,
-      extractShardId = extractShardId)
+    ClusterSharding(system).startProxy(typeName = shardTypeName,
+                                       role = Some("shard"),
+                                       extractEntityId = extractEntityId,
+                                       extractShardId = extractShardId)
   }
 
   def join(from: RoleName): Unit = {
@@ -149,7 +152,6 @@ abstract class ClusterShardingGetStateSpec extends MultiNodeSpec(ClusterSharding
       }
 
       enterBarrier("sharded actors started")
-
     }
 
     "get shard state" in {
@@ -161,9 +163,12 @@ abstract class ClusterShardingGetStateSpec extends MultiNodeSpec(ClusterSharding
           val regions = probe.expectMsgType[ShardRegion.CurrentRegions].regions
           regions.size === 2
           regions.foreach { region ⇒
-            val path = RootActorPath(region) / "system" / "sharding" / shardTypeName
+            val path =
+              RootActorPath(region) / "system" / "sharding" / shardTypeName
 
-            system.actorSelection(path).tell(ShardRegion.GetShardRegionState, probe.ref)
+            system
+              .actorSelection(path)
+              .tell(ShardRegion.GetShardRegionState, probe.ref)
           }
           val states = probe.receiveWhile(messages = regions.size) {
             case msg: ShardRegion.CurrentShardRegionState ⇒ msg
@@ -179,7 +184,6 @@ abstract class ClusterShardingGetStateSpec extends MultiNodeSpec(ClusterSharding
       }
 
       enterBarrier("done")
-
     }
   }
 }

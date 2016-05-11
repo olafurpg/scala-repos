@@ -11,8 +11,8 @@ class JUnitNamesTest {
 
 class JUnitNamesTestCheck {
   @Test def jUnitNamesTest(): Unit = {
-    val boot = JUnitUtil.loadBootstrapper(
-        "org.scalajs.testsuite.junit.JUnitNamesTest")
+    val boot =
+      JUnitUtil.loadBootstrapper("org.scalajs.testsuite.junit.JUnitNamesTest")
     try {
       boot.invoke(boot.newInstance(), "$plus")
       boot.invoke(boot.newInstance(), "$times")

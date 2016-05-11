@@ -13,9 +13,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 /**
- * @author Alexander Podkhalyuzin
- * @since 22.05.2008
- */
+  * @author Alexander Podkhalyuzin
+  * @since 22.05.2008
+  */
 class ElseFilter extends ElementFilter {
   def isAcceptable(element: Object, context: PsiElement): Boolean = {
     if (context.isInstanceOf[PsiComment]) return false
@@ -26,7 +26,9 @@ class ElseFilter extends ElementFilter {
           parent.getPrevSibling.getPrevSibling != null) {
         val ifStmt = parent.getPrevSibling match {
           case x: ScIfStmt => x
-          case x if x.isInstanceOf[PsiWhiteSpace] || x.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE =>
+          case x
+              if x.isInstanceOf[PsiWhiteSpace] ||
+              x.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE =>
             x.getPrevSibling match {
               case x: ScIfStmt => x
               case _ => null
@@ -35,11 +37,14 @@ class ElseFilter extends ElementFilter {
         }
         var text = ""
         if (ifStmt == null) {
-          while (parent != null && !parent.isInstanceOf[ScIfStmt]) parent = parent.getParent
+          while (parent != null &&
+          !parent.isInstanceOf[ScIfStmt]) parent = parent.getParent
           if (parent == null) return false
           text = parent.getText
-          text = Pattern.compile(DUMMY_IDENTIFIER, Pattern.LITERAL).matcher(
-            text).replaceAll(Matcher.quoteReplacement(" else true"))
+          text = Pattern
+            .compile(DUMMY_IDENTIFIER, Pattern.LITERAL)
+            .matcher(text)
+            .replaceAll(Matcher.quoteReplacement(" else true"))
         } else {
           text = ifStmt.getText + " else true"
         }

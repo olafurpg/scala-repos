@@ -32,12 +32,13 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object PasswordField {
-  implicit def sfxPasswordField2jfx(v: PasswordField): jfxsc.PasswordField = if (v != null) v.delegate else null
+  implicit def sfxPasswordField2jfx(v: PasswordField): jfxsc.PasswordField =
+    if (v != null) v.delegate else null
 }
 
-class PasswordField(override val delegate: jfxsc.PasswordField = new jfxsc.PasswordField())
-  extends TextField(delegate)
-  with SFXDelegate[jfxsc.PasswordField] {
+class PasswordField(
+    override val delegate: jfxsc.PasswordField = new jfxsc.PasswordField())
+    extends TextField(delegate) with SFXDelegate[jfxsc.PasswordField] {
 
   def cut() {
     delegate.cut()
@@ -46,5 +47,4 @@ class PasswordField(override val delegate: jfxsc.PasswordField = new jfxsc.Passw
   def copy() {
     delegate.copy()
   }
-
 }

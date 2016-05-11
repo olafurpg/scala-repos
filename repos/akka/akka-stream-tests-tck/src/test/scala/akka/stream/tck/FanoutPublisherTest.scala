@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.tck
 
 import scala.collection.immutable
@@ -12,10 +12,10 @@ class FanoutPublisherTest extends AkkaPublisherVerification[Int] {
 
   def createPublisher(elements: Long): Publisher[Int] = {
     val iterable: immutable.Iterable[Int] =
-      if (elements == 0) new immutable.Iterable[Int] { override def iterator = Iterator from 0 }
-      else 0 until elements.toInt
+      if (elements == 0)
+        new immutable.Iterable[Int] { override def iterator = Iterator from 0 } else
+        0 until elements.toInt
 
     Source(iterable).runWith(Sink.asPublisher(true))
   }
-
 }

@@ -8,11 +8,10 @@ import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.replay.{ReplayingDecoder, VoidEnum}
 
 /**
- * Translate ThriftCalls to their wire representation
- */
+  * Translate ThriftCalls to their wire representation
+  */
 private[thrift] class ThriftClientEncoder(protocolFactory: TProtocolFactory)
-    extends SimpleChannelDownstreamHandler
-{
+    extends SimpleChannelDownstreamHandler {
   protected var seqid = 0
 
   override def writeRequested(ctx: ChannelHandlerContext, e: MessageEvent) =
@@ -24,19 +23,20 @@ private[thrift] class ThriftClientEncoder(protocolFactory: TProtocolFactory)
         seqid += 1
         call.seqid = seqid
         call.writeRequest(seqid, protocol)
-        Channels.write(ctx, Channels.succeededFuture(e.getChannel()),
-                       buffer, e.getRemoteAddress)
+        Channels.write(ctx,
+                       Channels.succeededFuture(e.getChannel()),
+                       buffer,
+                       e.getRemoteAddress)
       case _: Throwable =>
         Channels.fireExceptionCaught(ctx, new IllegalArgumentException)
     }
 }
 
 /**
- * Translate wire representation to ThriftReply
- */
+  * Translate wire representation to ThriftReply
+  */
 private[thrift] class ThriftClientDecoder(protocolFactory: TProtocolFactory)
-    extends ReplayingDecoder[VoidEnum]
-{
+    extends ReplayingDecoder[VoidEnum] {
   def decodeThriftReply(ctx: ChannelHandlerContext,
                         channel: Channel,
                         buffer: ChannelBuffer): Object = {
@@ -57,8 +57,10 @@ private[thrift] class ThriftClientDecoder(protocolFactory: TProtocolFactory)
         val result = call.readResponse(protocol).asInstanceOf[AnyRef]
         call.reply(result)
       case _ =>
-        Channels.fireExceptionCaught(ctx, new TApplicationException(
-          TApplicationException.INVALID_MESSAGE_TYPE))
+        Channels.fireExceptionCaught(
+            ctx,
+            new TApplicationException(
+                TApplicationException.INVALID_MESSAGE_TYPE))
         null
     }
   }
@@ -69,8 +71,6 @@ private[thrift] class ThriftClientDecoder(protocolFactory: TProtocolFactory)
                       state: VoidEnum) =
     // TProtocol assumes a read of zero bytes is an error, so treat empty buffers
     // as no-ops. This only happens with the ReplayingDecoder.
-    if (buffer.readable)
-      decodeThriftReply(ctx, channel, buffer)
-    else
-      null
+    if (buffer.readable) decodeThriftReply(ctx, channel, buffer)
+    else null
 }

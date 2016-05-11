@@ -8,6 +8,7 @@ import scala.concurrent.Future
   * Process offer by matching tasks and launching them when appropriate.
   */
 trait OfferProcessor {
+
   /**
     * Process offer by matching tasks and launching them when appropriate.
     *

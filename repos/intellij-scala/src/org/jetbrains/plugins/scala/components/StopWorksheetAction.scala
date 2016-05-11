@@ -9,10 +9,11 @@ import org.jetbrains.plugins.scala.compiler.CompilationProcess
 import org.jetbrains.plugins.scala.worksheet.actions.TopComponentAction
 
 /**
- * User: Dmitry Naydanov
- * Date: 2/17/14
- */
-class StopWorksheetAction(exec: CompilationProcess) extends AnAction with TopComponentAction {
+  * User: Dmitry Naydanov
+  * Date: 2/17/14
+  */
+class StopWorksheetAction(exec: CompilationProcess)
+    extends AnAction with TopComponentAction {
   override def actionPerformed(e: AnActionEvent) {
     exec.stop()
   }

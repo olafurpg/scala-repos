@@ -31,16 +31,17 @@ import S._
 import Helpers._
 import JE._
 
-
-trait EnumNameTypedField[EnumType <: Enumeration] extends TypedField[EnumType#Value] {
+trait EnumNameTypedField[EnumType <: Enumeration]
+    extends TypedField[EnumType#Value] {
   protected val enum: EnumType
   protected val valueManifest: Manifest[EnumType#Value]
 
-  def setFromAny(in: Any): Box[EnumType#Value] = genericSetFromAny(in)(valueManifest)
+  def setFromAny(in: Any): Box[EnumType#Value] =
+    genericSetFromAny(in)(valueManifest)
 
   def setFromString(s: String): Box[EnumType#Value] = s match {
-    case null|"" if optional_? => setBox(Empty)
-    case null|"" => setBox(Failure(notOptionalErrorMessage))
+    case null | "" if optional_? => setBox(Empty)
+    case null | "" => setBox(Failure(notOptionalErrorMessage))
     case _ => setBox(enum.values.find(_.toString == s))
   }
 
@@ -48,17 +49,20 @@ trait EnumNameTypedField[EnumType <: Enumeration] extends TypedField[EnumType#Va
   def emptyOptionLabel: String = ""
 
   /**
-   * Build a list of (value, label) options for a select list.  Return a tuple of (Box[String], String) where the first string
-   * is the value of the field and the second string is the Text name of the Value.
-   */
+    * Build a list of (value, label) options for a select list.  Return a tuple of (Box[String], String) where the first string
+    * is the value of the field and the second string is the Text name of the Value.
+    */
   def buildDisplayList: List[(Box[EnumType#Value], String)] = {
     val options = enum.values.toList.map(a => (Full(a), a.toString))
-    if (optional_?) (Empty, emptyOptionLabel)::options else options
+    if (optional_?) (Empty, emptyOptionLabel) :: options else options
   }
 
-  private def elem = SHtml.selectObj[Box[EnumType#Value]](buildDisplayList, Full(valueBox), setBox(_)) % ("tabindex" -> tabIndex.toString)
+  private def elem =
+    SHtml.selectObj[Box[EnumType#Value]](
+        buildDisplayList, Full(valueBox), setBox(_)) %
+    ("tabindex" -> tabIndex.toString)
 
-  def toForm: Box[NodeSeq]  =
+  def toForm: Box[NodeSeq] =
     uniqueFieldId match {
       case Full(id) => Full(elem % ("id" -> id))
       case _ => Full(elem)
@@ -68,21 +72,29 @@ trait EnumNameTypedField[EnumType <: Enumeration] extends TypedField[EnumType#Va
 
   def asJs = valueBox.map(_ => Str(toString)) openOr JsNull
 
-  def asJStringName: JValue = valueBox.map(v => JString(v.toString)) openOr (JNothing: JValue)
+  def asJStringName: JValue =
+    valueBox.map(v => JString(v.toString)) openOr (JNothing: JValue)
   def setFromJStringName(jvalue: JValue): Box[EnumType#Value] = jvalue match {
-    case JNothing|JNull if optional_? => setBox(Empty)
-    case JString(s)                   => setBox(enum.values.find(_.toString == s) ?~ ("Unknown value \"" + s + "\""))
-    case other                        => setBox(FieldHelpers.expectedA("JString", other))
+    case JNothing | JNull if optional_? => setBox(Empty)
+    case JString(s) =>
+      setBox(
+          enum.values.find(_.toString == s) ?~ ("Unknown value \"" + s + "\""))
+    case other => setBox(FieldHelpers.expectedA("JString", other))
   }
 
   def asJValue: JValue = asJStringName
-  def setFromJValue(jvalue: JValue): Box[EnumType#Value] = setFromJStringName(jvalue)
+  def setFromJValue(jvalue: JValue): Box[EnumType#Value] =
+    setFromJStringName(jvalue)
 }
 
-class EnumNameField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](rec: OwnerType, protected val enum: EnumType)(implicit m: Manifest[EnumType#Value])
-  extends Field[EnumType#Value, OwnerType] with MandatoryTypedField[EnumType#Value] with EnumNameTypedField[EnumType]
-{
-  def this(rec: OwnerType, enum: EnumType, value: EnumType#Value)(implicit m: Manifest[EnumType#Value]) = {
+class EnumNameField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](
+    rec: OwnerType, protected val enum: EnumType)(
+    implicit m: Manifest[EnumType#Value])
+    extends Field[EnumType#Value, OwnerType]
+    with MandatoryTypedField[EnumType#Value]
+    with EnumNameTypedField[EnumType] {
+  def this(rec: OwnerType, enum: EnumType, value: EnumType#Value)(
+      implicit m: Manifest[EnumType#Value]) = {
     this(rec, enum)
     set(value)
   }
@@ -91,10 +103,14 @@ class EnumNameField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](rec
   protected val valueManifest = m
 }
 
-class OptionalEnumNameField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](rec: OwnerType, protected val enum: EnumType)(implicit m: Manifest[EnumType#Value])
-  extends Field[EnumType#Value, OwnerType] with OptionalTypedField[EnumType#Value] with EnumNameTypedField[EnumType]
-{
-  def this(rec: OwnerType, enum: EnumType, value: Box[EnumType#Value])(implicit m: Manifest[EnumType#Value]) = {
+class OptionalEnumNameField[
+    OwnerType <: Record[OwnerType], EnumType <: Enumeration](
+    rec: OwnerType, protected val enum: EnumType)(
+    implicit m: Manifest[EnumType#Value])
+    extends Field[EnumType#Value, OwnerType]
+    with OptionalTypedField[EnumType#Value] with EnumNameTypedField[EnumType] {
+  def this(rec: OwnerType, enum: EnumType, value: Box[EnumType#Value])(
+      implicit m: Manifest[EnumType#Value]) = {
     this(rec, enum)
     setBox(value)
   }
@@ -102,4 +118,3 @@ class OptionalEnumNameField[OwnerType <: Record[OwnerType], EnumType <: Enumerat
   def owner = rec
   protected val valueManifest = m
 }
-

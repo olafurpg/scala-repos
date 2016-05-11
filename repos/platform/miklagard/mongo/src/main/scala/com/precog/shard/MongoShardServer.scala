@@ -34,7 +34,8 @@ import com.precog.common.security.APIKeyFinder
 import com.precog.standalone.StandaloneShardServer
 
 object MongoShardServer extends StandaloneShardServer {
-  val caveatMessage = Some("""
+  val caveatMessage =
+    Some("""
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Precog for MongoDB is a free product that Precog provides to the
 MongoDB community for doing data analysis on MongoDB.
@@ -54,7 +55,12 @@ Please note that path globs are not yet supported in Precog for MongoDB
   implicit val executionContext = actorSystem.dispatcher
   implicit val M: Monad[Future] = new FutureMonad(executionContext)
 
-  def platformFor(config: Configuration, apiKeyfinder: APIKeyFinder[Future], jobManager: JobManager[Future]) =
-    (new MongoQueryExecutor(new MongoQueryExecutorConfig(config.detach("queryExecutor")), jobManager, actorSystem),
+  def platformFor(config: Configuration,
+                  apiKeyfinder: APIKeyFinder[Future],
+                  jobManager: JobManager[Future]) =
+    (new MongoQueryExecutor(
+         new MongoQueryExecutorConfig(config.detach("queryExecutor")),
+         jobManager,
+         actorSystem),
      Stoppable.fromFuture(Future(())))
 }

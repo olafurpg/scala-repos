@@ -2,12 +2,12 @@ package scalaz
 
 ////
 /**
- * A [[scalaz.Compose]] (semigroupoid) permitting products.
- */
+  * A [[scalaz.Compose]] (semigroupoid) permitting products.
+  */
 ////
 trait Split[=>:[_, _]] extends Compose[=>:] { self =>
   ////
-  def split[A, B, C, D](f: A =>: B, g: C =>: D): (A,  C) =>: (B, D)
+  def split[A, B, C, D](f: A =>: B, g: C =>: D): (A, C) =>: (B, D)
 
   // derived functions
 

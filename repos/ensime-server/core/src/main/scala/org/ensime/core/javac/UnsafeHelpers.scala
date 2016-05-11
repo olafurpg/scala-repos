@@ -10,21 +10,22 @@ import com.sun.tools.javac.tree.JCTree
 import com.sun.tools.javac.tree.JCTree._
 
 /**
- * This trait provides behavior missing from jdk 1.6, 1.7, see:
- * http://hg.openjdk.java.net/jdk8/jdk8/langtools/rev/8dd528992c15 and
- * sadly depends on unsupported implementation classes,
- * (com.sun.tools.javac.*). As a result, this may stop working on on
- * Java 9. At that point we can either:
- * 1) Take the long way around and find Elements ourselves by searching the
- *   scope/target for the selected name (see my older version of JavaDocFinding).
- * 2) Use reflection here.
- * 3) Convince Java 9 to let us import these unsafe libs.
- *
- * -aemon
- */
+  * This trait provides behavior missing from jdk 1.6, 1.7, see:
+  * http://hg.openjdk.java.net/jdk8/jdk8/langtools/rev/8dd528992c15 and
+  * sadly depends on unsupported implementation classes,
+  * (com.sun.tools.javac.*). As a result, this may stop working on on
+  * Java 9. At that point we can either:
+  * 1) Take the long way around and find Elements ourselves by searching the
+  *   scope/target for the selected name (see my older version of JavaDocFinding).
+  * 2) Use reflection here.
+  * 3) Convince Java 9 to let us import these unsafe libs.
+  *
+  * -aemon
+  */
 trait UnsafeHelpers extends SLF4JLogging {
 
-  protected def unsafeGetElement(info: CompilationInfo, t: Tree): Option[Element] = {
+  protected def unsafeGetElement(
+      info: CompilationInfo, t: Tree): Option[Element] = {
     t match {
       case t: JCCompilationUnit => Some(t.packge)
       case t: JCClassDecl => Some(t.sym)
@@ -41,5 +42,4 @@ trait UnsafeHelpers extends SLF4JLogging {
       case _ => None
     }
   }
-
 }

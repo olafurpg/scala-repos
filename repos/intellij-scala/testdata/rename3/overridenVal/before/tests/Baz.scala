@@ -5,14 +5,14 @@ class Baz {
 }
 
 object Baz2 extends Baz {
-  override val baz/*caret*/ = 3
+  override val baz /*caret*/ = 3
 }
 
 object Baz3 extends {
-  override val /*caret*/baz = 1
+  override val /*caret*/ baz = 1
 } with Baz
 
 object Test {
-  Baz2.baz/*caret*/
-  Baz3.baz/*caret*/
+  Baz2.baz /*caret*/
+  Baz3.baz /*caret*/
 }

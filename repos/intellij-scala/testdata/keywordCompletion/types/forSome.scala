@@ -4,4 +4,4 @@ class a {
 /*
 forSome
 with
-*/
+ */

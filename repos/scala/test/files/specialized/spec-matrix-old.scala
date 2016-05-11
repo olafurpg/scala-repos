@@ -1,8 +1,7 @@
 /** Test matrix multiplication with specialization.
- */
-
-@deprecated("Suppress warnings", since="2.11")
-class Matrix[@specialized A: ClassManifest](val rows: Int, val cols: Int) {
+  */
+@deprecated("Suppress warnings", since = "2.11")
+class Matrix[@specialized A : ClassManifest](val rows: Int, val cols: Int) {
   private val arr: Array[Array[A]] = Array.ofDim[A](rows, cols)
 
   def apply(i: Int, j: Int): A = {
@@ -26,7 +25,7 @@ class Matrix[@specialized A: ClassManifest](val rows: Int, val cols: Int) {
   }
 }
 
-@deprecated("Suppress warnings", since="2.11")
+@deprecated("Suppress warnings", since = "2.11")
 object Test {
   def main(args: Array[String]) {
     val m = randomMatrix(200, 100)
@@ -41,42 +40,37 @@ object Test {
   def randomMatrix(n: Int, m: Int) = {
     val r = new util.Random(10)
     val x = new Matrix[Double](n, m)
-    for (i <- 0 until n; j <- 0 until m)
-      x(i, j) = (r.nextInt % 1000).toDouble
+    for (i <- 0 until n; j <- 0 until m) x(i, j) = (r.nextInt % 1000).toDouble
     x
   }
 
   def printMatrix[Double](m: Matrix[Double]) {
     for (i <- 0 until m.rows) {
-      for (j <- 0 until m.cols)
-        print("%5.3f ".format(m(i, j)))
+      for (j <- 0 until m.cols) print("%5.3f ".format(m(i, j)))
       println
     }
   }
 
-  def multManifest[@specialized(Int) T](m: Matrix[T], n: Matrix[T])(implicit cm: ClassManifest[T], num: Numeric[T]) {
+  def multManifest[@specialized(Int) T](m: Matrix[T], n: Matrix[T])(
+      implicit cm: ClassManifest[T], num: Numeric[T]) {
     val p = new Matrix[T](m.rows, n.cols)
     import num._
 
-    for (i <- 0 until m.rows)
-      for (j <- 0 until n.cols) {
-        var sum = num.zero
-        for (k <- 0 until n.rows)
-          sum += m(i, k) * n(k, j)
-        p(i, j) = sum
-      }
+    for (i <- 0 until m.rows) for (j <- 0 until n.cols) {
+      var sum = num.zero
+      for (k <- 0 until n.rows) sum += m(i, k) * n(k, j)
+      p(i, j) = sum
+    }
   }
 
   def mult(m: Matrix[Double], n: Matrix[Double]) = {
     val p = new Matrix[Double](m.rows, n.cols)
 
-    for (i <- 0 until m.rows)
-      for (j <- 0 until n.cols) {
-        var sum = 0.0
-        for (k <- 0 until n.rows)
-          sum += m(i, k) * n(k, j)
-        p(i, j) = sum
-      }
+    for (i <- 0 until m.rows) for (j <- 0 until n.cols) {
+      var sum = 0.0
+      for (k <- 0 until n.rows) sum += m(i, k) * n(k, j)
+      p(i, j) = sum
+    }
     p
   }
 }

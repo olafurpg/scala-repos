@@ -31,9 +31,12 @@ import javafx.util.{converter => jfxuc}
 import scala.language.implicitConversions
 
 object CharStringConverter {
-  implicit def sfxCharStringConverter2jfx(c: CharStringConverter): jfxuc.CharacterStringConverter =
+  implicit def sfxCharStringConverter2jfx(
+      c: CharStringConverter): jfxuc.CharacterStringConverter =
     if (c != null) c.delegate else null
 }
 
-class CharStringConverter(delegate: jfxuc.CharacterStringConverter = new jfxuc.CharacterStringConverter)
-  extends StringConverterDelegate[java.lang.Character, Char, jfxuc.CharacterStringConverter](delegate)
+class CharStringConverter(
+    delegate: jfxuc.CharacterStringConverter = new jfxuc.CharacterStringConverter)
+    extends StringConverterDelegate[
+        java.lang.Character, Char, jfxuc.CharacterStringConverter](delegate)

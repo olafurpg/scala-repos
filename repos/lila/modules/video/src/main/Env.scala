@@ -1,16 +1,15 @@
 package lila.video
 
-import akka.actor.{ ActorSelection, ActorSystem }
+import akka.actor.{ActorSelection, ActorSystem}
 import com.typesafe.config.Config
 import scala.concurrent.duration._
 
 import lila.common.PimpedConfig._
 
-final class Env(
-    config: Config,
-    scheduler: lila.common.Scheduler,
-    db: lila.db.Env,
-    isDev: Boolean) {
+final class Env(config: Config,
+                scheduler: lila.common.Scheduler,
+                db: lila.db.Env,
+                isDev: Boolean) {
 
   private val settings = new {
     val CollectionVideo = config getString "collection.video"
@@ -24,19 +23,14 @@ final class Env(
   }
   import settings._
 
-  lazy val api = new VideoApi(
-    videoColl = videoColl,
-    viewColl = viewColl)
+  lazy val api = new VideoApi(videoColl = videoColl, viewColl = viewColl)
 
-  private lazy val sheet = new Sheet(
-    url = SheetUrl,
-    api = api)
+  private lazy val sheet = new Sheet(url = SheetUrl, api = api)
 
-  private lazy val youtube = new Youtube(
-    url = YoutubeUrl,
-    apiKey = YoutubeApiKey,
-    max = YoutubeMax,
-    api = api)
+  private lazy val youtube = new Youtube(url = YoutubeUrl,
+                                         apiKey = YoutubeApiKey,
+                                         max = YoutubeMax,
+                                         api = api)
 
   if (!isDev) {
     scheduler.effect(SheetDelay, "video update from sheet") {
@@ -54,9 +48,9 @@ final class Env(
 
 object Env {
 
-  lazy val current: Env = "video" boot new Env(
-    config = lila.common.PlayApp loadConfig "video",
-    scheduler = lila.common.PlayApp.scheduler,
-    isDev = lila.common.PlayApp.isDev,
-    db = lila.db.Env.current)
+  lazy val current: Env =
+    "video" boot new Env(config = lila.common.PlayApp loadConfig "video",
+                         scheduler = lila.common.PlayApp.scheduler,
+                         isDev = lila.common.PlayApp.isDev,
+                         db = lila.db.Env.current)
 }

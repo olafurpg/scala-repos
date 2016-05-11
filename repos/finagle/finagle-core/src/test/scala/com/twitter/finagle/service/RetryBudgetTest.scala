@@ -7,9 +7,7 @@ import org.scalatest.{Matchers, FunSuite}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class RetryBudgetTest extends FunSuite
-  with Matchers
-{
+class RetryBudgetTest extends FunSuite with Matchers {
 
   test("Empty") {
     val rb = RetryBudget.Empty
@@ -32,16 +30,16 @@ class RetryBudgetTest extends FunSuite
   }
 
   def newRetryBudget(
-    ttl: Duration = 60.seconds,
-    minRetriesPerSec: Int = 0,
-    maxPercentOver: Double = 0.0
+      ttl: Duration = 60.seconds,
+      minRetriesPerSec: Int = 0,
+      maxPercentOver: Double = 0.0
   ): RetryBudget =
     RetryBudget(ttl, minRetriesPerSec, maxPercentOver, Stopwatch.timeMillis)
 
   def testBudget(
-    ttl: Duration = 60.seconds,
-    minRetriesPerSec: Int = 0,
-    percentCanRetry: Double = 0.0
+      ttl: Duration = 60.seconds,
+      minRetriesPerSec: Int = 0,
+      percentCanRetry: Double = 0.0
   ): Unit = withClue(s"percentCanRetry=$percentCanRetry:") {
     // freeze time to simplify the tests
     Time.withCurrentTimeFrozen { _ =>
@@ -50,8 +48,7 @@ class RetryBudgetTest extends FunSuite
       // check initial conditions
       val minRetries = ttl.inSeconds * minRetriesPerSec
       assert(minRetries == rb.balance)
-      if (minRetries == 0)
-        assert(!rb.tryWithdraw())
+      if (minRetries == 0) assert(!rb.tryWithdraw())
 
       // use a decent sized number so we see less effects from fractions
       val nReqs = 10000
@@ -59,17 +56,15 @@ class RetryBudgetTest extends FunSuite
       0.until(nReqs).foreach { i =>
         withClue(s"request $i:") {
           rb.deposit()
-          if (rb.tryWithdraw())
-            retried += 1
-          else
-            assert(0 == rb.balance)
+          if (rb.tryWithdraw()) retried += 1
+          else assert(0 == rb.balance)
         }
       }
 
       // because TokenRetryBudget.ScaleFactor doesn't give us
       // perfect precision, we give ourselves a small error margin.
       val expectedRetries = (nReqs * percentCanRetry).toInt + minRetries
-      expectedRetries should be (retried +- 1)
+      expectedRetries should be(retried +- 1)
     }
   }
 
@@ -149,5 +144,4 @@ class RetryBudgetTest extends FunSuite
     testBudget(ttl = 1.second, minRetriesPerSec = 10, percentCanRetry = 0.1)
     testBudget(ttl = 2.second, minRetriesPerSec = 5, percentCanRetry = 0.5)
   }
-
 }

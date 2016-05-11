@@ -14,10 +14,8 @@ class JsonpFilterTest extends FunSuite {
     def apply(request: Request): Future[Response] = {
       val response = request.response
       response.status = Status.Ok
-      if (request.params.contains("not_json"))
-        response.mediaType = "not_json"
-      else
-        response.mediaType = MediaType.Json
+      if (request.params.contains("not_json")) response.mediaType = "not_json"
+      else response.mediaType = MediaType.Json
       response.write("{}")
       Future.value(response)
     }
@@ -27,17 +25,18 @@ class JsonpFilterTest extends FunSuite {
     val request = Request("/test.json", "callback" -> "mycallback")
     val response = Await.result(JsonpFilter(request, dummyService))
 
-    assert(response.contentType   == Some("application/javascript"))
+    assert(response.contentType == Some("application/javascript"))
     assert(response.contentString == "/**/mycallback({});")
   }
 
   test("ignore non-json") {
-    val request = Request("/test.json", "callback" -> "mycallback", "not_json" -> "t")
+    val request =
+      Request("/test.json", "callback" -> "mycallback", "not_json" -> "t")
     val response = Await.result(JsonpFilter(request, dummyService))
 
-    assert(response.mediaType     == Some("not_json"))
+    assert(response.mediaType == Some("not_json"))
     assert(response.contentString == "{}")
-    assert(response.contentType   == Some("not_json"))
+    assert(response.contentType == Some("not_json"))
   }
 
   test("ignore HEAD") {
@@ -45,7 +44,7 @@ class JsonpFilterTest extends FunSuite {
     request.method = Method.Head
 
     val response = Await.result(JsonpFilter(request, dummyService))
-    assert(response.contentType   == Some("application/json"))
+    assert(response.contentType == Some("application/json"))
     assert(response.contentString == "{}")
   }
 
@@ -54,7 +53,7 @@ class JsonpFilterTest extends FunSuite {
     val request = Request("/test.json", "callback" -> "")
 
     val response = Await.result(JsonpFilter(request, dummyService))
-    assert(response.contentType   == Some("application/json"))
+    assert(response.contentType == Some("application/json"))
     assert(response.contentString == "{}")
   }
 }

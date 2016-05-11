@@ -18,37 +18,47 @@ import org.jetbrains.plugins.scala.project.notification.SetupScalaSdkNotificatio
 import org.jetbrains.plugins.scala.project.template.ScalaSupportProvider
 
 /**
- * @author Pavel Fatin
- */
-class SetupScalaSdkNotificationProvider(project: Project, notifications: EditorNotifications)
-        extends EditorNotifications.Provider[EditorNotificationPanel] {
+  * @author Pavel Fatin
+  */
+class SetupScalaSdkNotificationProvider(
+    project: Project, notifications: EditorNotifications)
+    extends EditorNotifications.Provider[EditorNotificationPanel] {
 
-  project.getMessageBus.connect(project).subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter {
-    override def rootsChanged(event: ModuleRootEvent) {
-      notifications.updateAllNotifications()
-    }
-  })
+  project.getMessageBus
+    .connect(project)
+    .subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter {
+      override def rootsChanged(event: ModuleRootEvent) {
+        notifications.updateAllNotifications()
+      }
+    })
 
   override def getKey = ProviderKey
 
-  override def createNotificationPanel(file: VirtualFile, fileEditor: FileEditor) = {
+  override def createNotificationPanel(
+      file: VirtualFile, fileEditor: FileEditor) = {
     val hasSdk = Option(PsiManager.getInstance(project).findFile(file))
-            .filter(_.getLanguage == ScalaLanguage.Instance)
-            .filter(!_.getName.endsWith(".sbt")) // root SBT files belong to main (not *-build) modules
-            .filter(_.isWritable)
-            .flatMap(psiFile => Option(ModuleUtilCore.findModuleForPsiElement(psiFile)))
-            .filter(module => ModuleUtil.getModuleType(module) == JavaModuleType.getModuleType)
-            .filter(!_.getName.endsWith("-build")) // gen-idea doesn't use the SBT module type
-            .map(module => module.hasScala)
+      .filter(_.getLanguage == ScalaLanguage.Instance)
+      .filter(!_.getName.endsWith(".sbt")) // root SBT files belong to main (not *-build) modules
+      .filter(_.isWritable)
+      .flatMap(psiFile =>
+            Option(ModuleUtilCore.findModuleForPsiElement(psiFile)))
+      .filter(module =>
+            ModuleUtil.getModuleType(module) == JavaModuleType.getModuleType)
+      .filter(!_.getName.endsWith("-build")) // gen-idea doesn't use the SBT module type
+      .map(module => module.hasScala)
 
-    if (hasSdk.contains(false)) createPanel(project, PsiManager.getInstance(project).findFile(file)) else null
+    if (hasSdk.contains(false))
+      createPanel(project, PsiManager.getInstance(project).findFile(file))
+    else null
   }
 }
 
 object SetupScalaSdkNotificationProvider {
-  private val ProviderKey = Key.create[EditorNotificationPanel]("Setup Scala SDK")
+  private val ProviderKey =
+    Key.create[EditorNotificationPanel]("Setup Scala SDK")
 
-  private def createPanel(project: Project, file: PsiFile): EditorNotificationPanel = {
+  private def createPanel(
+      project: Project, file: PsiFile): EditorNotificationPanel = {
     val panel = new EditorNotificationPanel()
     panel.setText("No Scala SDK in module")
     panel.createActionLabel("Setup Scala SDK", new Runnable {
@@ -61,7 +71,8 @@ object SetupScalaSdkNotificationProvider {
 
   private def setupSdk(parent: JComponent, project: Project, file: PsiFile) {
     Option(ModuleUtilCore.findModuleForPsiElement(file)).foreach { module =>
-      val dialog = AddSupportForSingleFrameworkDialog.createDialog(module, new ScalaSupportProvider())
+      val dialog = AddSupportForSingleFrameworkDialog.createDialog(
+          module, new ScalaSupportProvider())
       dialog.showAndGet()
     }
   }

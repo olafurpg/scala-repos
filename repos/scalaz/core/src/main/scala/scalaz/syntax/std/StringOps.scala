@@ -5,26 +5,29 @@ package std
 import scalaz.std.{string => s}
 
 final class StringOps(val self: String) extends AnyVal {
+
   /**
-   * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
-   * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
-   * is appended.
-   */
+    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
+    * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
+    * is appended.
+    */
   def plural(n: Long): String = s.plural(self, n)
 
   /**
-   * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
-   */
-  def charsNel : Option[NonEmptyList[Char]] = s.charsNel(self)
+    * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
+    */
+  def charsNel: Option[NonEmptyList[Char]] = s.charsNel(self)
 
   /**
-   * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
-   */
-  def charsNel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = s.charsNel(self, e)
+    * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
+    */
+  def charsNel(e: => NonEmptyList[Char]): NonEmptyList[Char] =
+    s.charsNel(self, e)
 
   // Parsing functions.
 
-  def parseBoolean: Validation[IllegalArgumentException, Boolean] = s.parseBoolean(self)
+  def parseBoolean: Validation[IllegalArgumentException, Boolean] =
+    s.parseBoolean(self)
 
   def parseByte: Validation[NumberFormatException, Byte] = s.parseByte(self)
 
@@ -36,9 +39,10 @@ final class StringOps(val self: String) extends AnyVal {
 
   def parseFloat: Validation[NumberFormatException, Float] = s.parseFloat(self)
 
-  def parseDouble: Validation[NumberFormatException, Double] = s.parseDouble(self)
+  def parseDouble: Validation[NumberFormatException, Double] =
+    s.parseDouble(self)
 }
 
 trait ToStringOps {
-  implicit def ToStringOpsFromString(a:String): StringOps = new StringOps(a)
+  implicit def ToStringOpsFromString(a: String): StringOps = new StringOps(a)
 }

@@ -4,24 +4,21 @@ import org.jetbrains.plugins.scala.codeInsight.intention.controlflow.SplitIfInte
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 /**
- * @author Ksenia.Sautina
- * @since 6/8/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 6/8/12
+  */
 class SplitIfIntentionTest extends ScalaIntentionTestBase {
   val familyName = SplitIfIntention.familyName
 
   def testSplitIf() {
-    val text =
-      """
+    val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (a &<caret>& b) return
         |  }
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (<caret>a)
@@ -34,8 +31,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testSplitIf2() {
-    val text =
-      """
+    val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (a &<caret>& b) {
@@ -46,8 +42,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
         |  }
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (<caret>a)
@@ -67,8 +62,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testSplitIf3() {
-    val text =
-      """
+    val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (a &<caret>& b) {
@@ -77,8 +71,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
         |  }
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (<caret>a)
@@ -93,8 +86,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testSplitIf4() {
-    val text =
-      """
+    val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (a &<caret>& b)
@@ -104,8 +96,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
         |  }
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (<caret>a)
@@ -120,8 +111,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testSplitIf5() {
-    val text =
-      """
+    val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (a &<caret>& b) {
@@ -131,8 +121,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
         |  }
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (<caret>a)
@@ -148,8 +137,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testSplitIf6() {
-    val text =
-      """
+    val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (a &<caret>& b) System.out.println("if")
@@ -159,8 +147,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
         |  }
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (<caret>a)
@@ -179,8 +166,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testSplitIf7() {
-    val text =
-      """
+    val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if ((a || b) &<caret>& b) System.out.println("if")
@@ -190,8 +176,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
         |  }
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (<caret>a || b)
@@ -210,8 +195,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
   }
 
   def testSplitIf8() {
-    val text =
-      """
+    val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if ((a || b) &<caret>& (b && a)) System.out.println("if")
@@ -221,8 +205,7 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
         |  }
         |}
       """
-    val resultText =
-      """
+    val resultText = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
         |    if (<caret>a || b)

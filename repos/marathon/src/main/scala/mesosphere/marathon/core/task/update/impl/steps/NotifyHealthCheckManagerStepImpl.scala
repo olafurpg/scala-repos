@@ -12,13 +12,17 @@ import scala.concurrent.Future
 /**
   * Notify the health check manager of this update.
   */
-class NotifyHealthCheckManagerStepImpl @Inject() (
-    healthCheckManager: HealthCheckManager) extends TaskStatusUpdateStep {
+class NotifyHealthCheckManagerStepImpl @Inject()(
+    healthCheckManager: HealthCheckManager)
+    extends TaskStatusUpdateStep {
   override def name: String = "notifyHealthCheckManager"
 
-  override def processUpdate(timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
+  override def processUpdate(
+      timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
     // forward health changes to the health check manager
-    task.launched.foreach { launched => healthCheckManager.update(status, launched.appVersion) }
+    task.launched.foreach { launched =>
+      healthCheckManager.update(status, launched.appVersion)
+    }
 
     Future.successful(())
   }

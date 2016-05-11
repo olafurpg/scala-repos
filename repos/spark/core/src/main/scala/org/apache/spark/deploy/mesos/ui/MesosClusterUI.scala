@@ -23,24 +23,26 @@ import org.apache.spark.ui.{SparkUI, WebUI}
 import org.apache.spark.ui.JettyUtils._
 
 /**
- * UI that displays driver results from the [[org.apache.spark.deploy.mesos.MesosClusterDispatcher]]
- */
-private[spark] class MesosClusterUI(
-    securityManager: SecurityManager,
-    port: Int,
-    conf: SparkConf,
-    dispatcherPublicAddress: String,
-    val scheduler: MesosClusterScheduler)
-  extends WebUI(securityManager, securityManager.getSSLOptions("mesos"), port, conf) {
+  * UI that displays driver results from the [[org.apache.spark.deploy.mesos.MesosClusterDispatcher]]
+  */
+private[spark] class MesosClusterUI(securityManager: SecurityManager,
+                                    port: Int,
+                                    conf: SparkConf,
+                                    dispatcherPublicAddress: String,
+                                    val scheduler: MesosClusterScheduler)
+    extends WebUI(
+        securityManager, securityManager.getSSLOptions("mesos"), port, conf) {
 
   initialize()
 
-  def activeWebUiUrl: String = "http://" + dispatcherPublicAddress + ":" + boundPort
+  def activeWebUiUrl: String =
+    "http://" + dispatcherPublicAddress + ":" + boundPort
 
   override def initialize() {
     attachPage(new MesosClusterPage(this))
     attachPage(new DriverPage(this))
-    attachHandler(createStaticHandler(MesosClusterUI.STATIC_RESOURCE_DIR, "/static"))
+    attachHandler(
+        createStaticHandler(MesosClusterUI.STATIC_RESOURCE_DIR, "/static"))
   }
 }
 

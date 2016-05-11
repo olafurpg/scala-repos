@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.core
 
 import io.prediction.annotation.DeveloperApi
@@ -33,6 +32,7 @@ import org.json4s.JValue
   */
 @DeveloperApi
 abstract class BaseEngine[EI, Q, P, A] extends Serializable {
+
   /** :: DeveloperApi ::
     * Implement this method so that training this engine would return a list of
     * models.
@@ -43,11 +43,10 @@ abstract class BaseEngine[EI, Q, P, A] extends Serializable {
     * @return A list of models.
     */
   @DeveloperApi
-  def train(
-    sc: SparkContext, 
-    engineParams: EngineParams,
-    engineInstanceId: String,
-    params: WorkflowParams): Seq[Any]
+  def train(sc: SparkContext,
+            engineParams: EngineParams,
+            engineInstanceId: String,
+            params: WorkflowParams): Seq[Any]
 
   /** :: DeveloperApi ::
     * Implement this method so that [[io.prediction.controller.Evaluation]] can
@@ -60,10 +59,9 @@ abstract class BaseEngine[EI, Q, P, A] extends Serializable {
     *         result, and actual result tuple tuple.
     */
   @DeveloperApi
-  def eval(
-    sc: SparkContext, 
-    engineParams: EngineParams,
-    params: WorkflowParams): Seq[(EI, RDD[(Q, P, A)])]
+  def eval(sc: SparkContext,
+           engineParams: EngineParams,
+           params: WorkflowParams): Seq[(EI, RDD[(Q, P, A)])]
 
   /** :: DeveloperApi ::
     * Override this method to further optimize the process that runs multiple
@@ -76,12 +74,11 @@ abstract class BaseEngine[EI, Q, P, A] extends Serializable {
     * @return A list of engine parameters and evaluation result (from [[eval]]) tuples.
     */
   @DeveloperApi
-  def batchEval(
-    sc: SparkContext, 
-    engineParamsList: Seq[EngineParams],
-    params: WorkflowParams)
-  : Seq[(EngineParams, Seq[(EI, RDD[(Q, P, A)])])] = {
-    engineParamsList.map { engineParams => 
+  def batchEval(sc: SparkContext,
+                engineParamsList: Seq[EngineParams],
+                params: WorkflowParams)
+    : Seq[(EngineParams, Seq[(EI, RDD[(Q, P, A)])])] = {
+    engineParamsList.map { engineParams =>
       (engineParams, eval(sc, engineParams, params))
     }
   }
@@ -95,6 +92,7 @@ abstract class BaseEngine[EI, Q, P, A] extends Serializable {
     * @return An instance of [[EngineParams]] converted from JSON.
     */
   @DeveloperApi
-  def jValueToEngineParams(variantJson: JValue, jsonExtractor: JsonExtractorOption): EngineParams =
+  def jValueToEngineParams(
+      variantJson: JValue, jsonExtractor: JsonExtractorOption): EngineParams =
     throw new NotImplementedError("JSON to EngineParams is not implemented.")
 }

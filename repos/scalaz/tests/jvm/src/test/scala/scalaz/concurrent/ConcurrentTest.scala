@@ -4,7 +4,7 @@ package concurrent
 import java.util.concurrent._
 import org.scalacheck.Prop
 
-object ConcurrentTest extends SpecLite{
+object ConcurrentTest extends SpecLite {
 
   "Current test tools" should {
     "succeed on exhaused CountDownLatch" in {
@@ -35,9 +35,11 @@ object ConcurrentTest extends SpecLite{
     }
   }
 
-  def assertCountDown(latch: CountDownLatch, hint: String, timeout: Long = 1000) : Prop = {
+  def assertCountDown(
+      latch: CountDownLatch, hint: String, timeout: Long = 1000): Prop = {
     if (latch.await(timeout, TimeUnit.MILLISECONDS)) ()
-    else sys.error("Failed to count down within " + timeout + " millis: " + hint)
+    else
+      sys.error("Failed to count down within " + timeout + " millis: " + hint)
   }
 
   def fork(f: => Unit) {

@@ -5,11 +5,10 @@ import java.util.concurrent.locks.ReentrantLock
 
 import org.junit.Assert
 
-
 /**
- * Author: Svyatoslav Ilinskiy
- * Date: 9/17/15.
- */
+  * Author: Svyatoslav Ilinskiy
+  * Date: 9/17/15.
+  */
 class CachedTest extends CachedTestBase {
   def testNoParametersSingleThread(): Unit = {
     class Foo extends Managed {
@@ -22,9 +21,11 @@ class CachedTest extends CachedTestBase {
     Thread.sleep(1)
     Assert.assertEquals(firstRes, foo.currentTime())
     Thread.sleep(1)
-    val oldModCount = foo.getManager.getModificationTracker.getModificationCount
+    val oldModCount =
+      foo.getManager.getModificationTracker.getModificationCount
     foo.getManager.getModificationTracker.incCounter()
-    val newModCount = foo.getManager.getModificationTracker.getModificationCount
+    val newModCount =
+      foo.getManager.getModificationTracker.getModificationCount
     Assert.assertTrue(oldModCount < newModCount)
     val secondRes: Long = foo.currentTime()
     Assert.assertTrue(firstRes < secondRes)
@@ -57,18 +58,21 @@ class CachedTest extends CachedTestBase {
 
     def setUpThreads(): (Thread, Thread) = {
       Foo.allThreadsStartedLock.lock()
-      val thread1 = new Thread(new Runnable {
+      val thread1 = new Thread(
+          new Runnable {
         override def run(): Unit = Foo.runSynchronized()
       })
-      val thread2 = new Thread(new Runnable {
+      val thread2 = new Thread(
+          new Runnable {
         override def run(): Unit = Foo.runSynchronized()
       })
 
       val eh = new UncaughtExceptionHandler {
-        override def uncaughtException(t: Thread, e: Throwable): Unit = e match {
-          case _: AssertionError => Foo.assertsFailed += 1
-          case _ =>
-        }
+        override def uncaughtException(t: Thread, e: Throwable): Unit =
+          e match {
+            case _: AssertionError => Foo.assertsFailed += 1
+            case _ =>
+          }
       }
       thread1.setUncaughtExceptionHandler(eh)
       thread2.setUncaughtExceptionHandler(eh)
@@ -77,7 +81,8 @@ class CachedTest extends CachedTestBase {
       thread2.start() //this thread should be waiting outside synchronized block
       //NOTE: we are not guaranteed which thread will be waiting where. They might switch, but that's still fine
 
-      while (thread1.getState != Thread.State.WAITING && thread2.getState != Thread.State.WAITING) {
+      while (thread1.getState != Thread.State.WAITING &&
+      thread2.getState != Thread.State.WAITING) {
         //busy waiting is bad, but this is in a test, so it is fine. Should put a timeout here?
         Thread.`yield`()
       }
@@ -93,7 +98,9 @@ class CachedTest extends CachedTestBase {
 
   def testModificationTrackers(): Unit = {
     object Foo extends Managed {
-      @Cached(synchronized = false, modificationCount = ModCount.getModificationCount, this)
+      @Cached(synchronized = false,
+              modificationCount = ModCount.getModificationCount,
+              this)
       def currentTime: Long = System.currentTimeMillis()
 
       def getProject = myFixture.getProject

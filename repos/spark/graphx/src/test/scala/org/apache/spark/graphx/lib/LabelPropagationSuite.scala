@@ -26,16 +26,19 @@ class LabelPropagationSuite extends SparkFunSuite with LocalSparkContext {
       // Construct a graph with two cliques connected by a single edge
       val n = 5
       val clique1 = for (u <- 0L until n; v <- 0L until n) yield Edge(u, v, 1)
-      val clique2 = for (u <- 0L to n; v <- 0L to n) yield Edge(u + n, v + n, 1)
+      val clique2 = for (u <- 0L to n; v <- 0L to n) yield
+        Edge(u + n, v + n, 1)
       val twoCliques = sc.parallelize(clique1 ++ clique2 :+ Edge(0L, n, 1))
       val graph = Graph.fromEdges(twoCliques, 1)
       // Run label propagation
       val labels = LabelPropagation.run(graph, n * 4).cache()
 
       // All vertices within a clique should have the same label
-      val clique1Labels = labels.vertices.filter(_._1 < n).map(_._2).collect.toArray
+      val clique1Labels =
+        labels.vertices.filter(_._1 < n).map(_._2).collect.toArray
       assert(clique1Labels.forall(_ == clique1Labels(0)))
-      val clique2Labels = labels.vertices.filter(_._1 >= n).map(_._2).collect.toArray
+      val clique2Labels =
+        labels.vertices.filter(_._1 >= n).map(_._2).collect.toArray
       assert(clique2Labels.forall(_ == clique2Labels(0)))
       // The two cliques should have different labels
       assert(clique1Labels(0) != clique2Labels(0))

@@ -18,21 +18,21 @@
 package org.apache.spark
 
 /**
- * Spark Streaming functionality. [[org.apache.spark.streaming.StreamingContext]] serves as the main
- * entry point to Spark Streaming, while [[org.apache.spark.streaming.dstream.DStream]] is the data
- * type representing a continuous sequence of RDDs, representing a continuous stream of data.
- *
- * In addition, [[org.apache.spark.streaming.dstream.PairDStreamFunctions]] contains operations
- * available only on DStreams
- * of key-value pairs, such as `groupByKey` and `reduceByKey`. These operations are automatically
- * available on any DStream of the right type (e.g. DStream[(Int, Int)] through implicit
- * conversions.
- *
- * For the Java API of Spark Streaming, take a look at the
- * [[org.apache.spark.streaming.api.java.JavaStreamingContext]] which serves as the entry point, and
- * the [[org.apache.spark.streaming.api.java.JavaDStream]] and the
- * [[org.apache.spark.streaming.api.java.JavaPairDStream]] which have the DStream functionality.
- */
+  * Spark Streaming functionality. [[org.apache.spark.streaming.StreamingContext]] serves as the main
+  * entry point to Spark Streaming, while [[org.apache.spark.streaming.dstream.DStream]] is the data
+  * type representing a continuous sequence of RDDs, representing a continuous stream of data.
+  *
+  * In addition, [[org.apache.spark.streaming.dstream.PairDStreamFunctions]] contains operations
+  * available only on DStreams
+  * of key-value pairs, such as `groupByKey` and `reduceByKey`. These operations are automatically
+  * available on any DStream of the right type (e.g. DStream[(Int, Int)] through implicit
+  * conversions.
+  *
+  * For the Java API of Spark Streaming, take a look at the
+  * [[org.apache.spark.streaming.api.java.JavaStreamingContext]] which serves as the entry point, and
+  * the [[org.apache.spark.streaming.api.java.JavaDStream]] and the
+  * [[org.apache.spark.streaming.api.java.JavaPairDStream]] which have the DStream functionality.
+  */
 package object streaming {
   // For package docs only
 }

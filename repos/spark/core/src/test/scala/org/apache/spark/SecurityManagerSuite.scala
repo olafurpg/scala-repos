@@ -122,7 +122,6 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.checkUIViewPermissions("user1") === false)
     assert(securityManager.checkUIViewPermissions("user3") === false)
     assert(securityManager.checkUIViewPermissions(null) === true)
-
   }
 
   test("set security with * in acls") {
@@ -168,17 +167,16 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
 
   test("ssl on setup") {
     val conf = SSLSampleConfigs.sparkSSLConfig()
-    val expectedAlgorithms = Set(
-    "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
-    "TLS_RSA_WITH_AES_256_CBC_SHA256",
-    "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
-    "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-    "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
-    "SSL_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
-    "SSL_RSA_WITH_AES_256_CBC_SHA256",
-    "SSL_DHE_RSA_WITH_AES_256_CBC_SHA256",
-    "SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
-    "SSL_DHE_RSA_WITH_AES_128_CBC_SHA256")
+    val expectedAlgorithms = Set("TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+                                 "TLS_RSA_WITH_AES_256_CBC_SHA256",
+                                 "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
+                                 "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+                                 "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
+                                 "SSL_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+                                 "SSL_RSA_WITH_AES_256_CBC_SHA256",
+                                 "SSL_DHE_RSA_WITH_AES_256_CBC_SHA256",
+                                 "SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+                                 "SSL_DHE_RSA_WITH_AES_128_CBC_SHA256")
 
     val securityManager = new SecurityManager(conf)
 
@@ -188,18 +186,25 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.hostnameVerifier.isDefined === true)
 
     assert(securityManager.fileServerSSLOptions.trustStore.isDefined === true)
-    assert(securityManager.fileServerSSLOptions.trustStore.get.getName === "truststore")
+    assert(
+        securityManager.fileServerSSLOptions.trustStore.get.getName === "truststore")
     assert(securityManager.fileServerSSLOptions.keyStore.isDefined === true)
-    assert(securityManager.fileServerSSLOptions.keyStore.get.getName === "keystore")
-    assert(securityManager.fileServerSSLOptions.trustStorePassword === Some("password"))
-    assert(securityManager.fileServerSSLOptions.keyStorePassword === Some("password"))
-    assert(securityManager.fileServerSSLOptions.keyPassword === Some("password"))
+    assert(
+        securityManager.fileServerSSLOptions.keyStore.get.getName === "keystore")
+    assert(securityManager.fileServerSSLOptions.trustStorePassword === Some(
+            "password"))
+    assert(securityManager.fileServerSSLOptions.keyStorePassword === Some(
+            "password"))
+    assert(
+        securityManager.fileServerSSLOptions.keyPassword === Some("password"))
     assert(securityManager.fileServerSSLOptions.protocol === Some("TLSv1.2"))
-    assert(securityManager.fileServerSSLOptions.enabledAlgorithms === expectedAlgorithms)
+    assert(
+        securityManager.fileServerSSLOptions.enabledAlgorithms === expectedAlgorithms)
   }
 
   test("ssl off setup") {
-    val file = File.createTempFile("SSLOptionsSuite", "conf", Utils.createTempDir())
+    val file =
+      File.createTempFile("SSLOptionsSuite", "conf", Utils.createTempDir())
 
     System.setProperty("spark.ssl.configFile", file.getAbsolutePath)
     val conf = new SparkConf()
@@ -226,11 +231,10 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(key === new SecurityManager(conf).getSecretKey())
 
     val keyFromEnv = "very secret key from env"
-    val conf2 = new SparkConfWithEnv(Map(SecurityManager.ENV_AUTH_SECRET -> keyFromEnv))
-      .set(SecurityManager.SPARK_AUTH_CONF, "true")
-      .set(SecurityManager.SPARK_AUTH_SECRET_CONF, key)
+    val conf2 =
+      new SparkConfWithEnv(Map(SecurityManager.ENV_AUTH_SECRET -> keyFromEnv))
+        .set(SecurityManager.SPARK_AUTH_CONF, "true")
+        .set(SecurityManager.SPARK_AUTH_SECRET_CONF, key)
     assert(keyFromEnv === new SecurityManager(conf2).getSecretKey())
   }
-
 }
-

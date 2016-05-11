@@ -22,8 +22,11 @@ class ScalaSafeDeleteProcessorDelegate extends JavaSafeDeleteProcessor {
     element.containingScalaFile.isDefined && super.handlesElement(element)
 
   @Nullable
-  override def findUsages(element: PsiElement, allElementsToDelete: Array[PsiElement], usages: JList[UsageInfo]): NonCodeUsageSearchInfo = {
-    var insideDeletedCondition: Condition[PsiElement] = getUsageInsideDeletedFilter(allElementsToDelete)
+  override def findUsages(element: PsiElement,
+                          allElementsToDelete: Array[PsiElement],
+                          usages: JList[UsageInfo]): NonCodeUsageSearchInfo = {
+    var insideDeletedCondition: Condition[PsiElement] =
+      getUsageInsideDeletedFilter(allElementsToDelete)
 
     insideDeletedCondition = element match {
       case c: PsiTypeParameter =>
@@ -33,7 +36,8 @@ class ScalaSafeDeleteProcessorDelegate extends JavaSafeDeleteProcessor {
       case c: ScTypeDefinition =>
         findClassUsages(c, allElementsToDelete, usages)
         insideDeletedCondition
-      case m: ScFunction => // TODO Scala specific override/implements, extend to vals, members, type aliases etc.
+      case m: ScFunction =>
+        // TODO Scala specific override/implements, extend to vals, members, type aliases etc.
         findMethodUsages(m, allElementsToDelete, usages)
       case p: ScParameter =>
         findParameterUsages(element.asInstanceOf[PsiParameter], usages)

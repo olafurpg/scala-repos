@@ -17,6 +17,6 @@
 package org.apache.spark.sql
 
 /**
- * A set of APIs for adding data sources to Spark SQL.
- */
+  * A set of APIs for adding data sources to Spark SQL.
+  */
 package object sources

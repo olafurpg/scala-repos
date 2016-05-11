@@ -21,44 +21,44 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types._
 
 /**
- * A parent class for mutable container objects that are reused when the values are changed,
- * resulting in less garbage.  These values are held by a [[SpecificMutableRow]].
- *
- * The following code was roughly used to generate these objects:
- * {{{
- * val types = "Int,Float,Boolean,Double,Short,Long,Byte,Any".split(",")
- * types.map {tpe =>
- * s"""
- * final class Mutable$tpe extends MutableValue {
- *   var value: $tpe = 0
- *   def boxed = if (isNull) null else value
- *   def update(v: Any) = value = {
- *     isNull = false
- *     v.asInstanceOf[$tpe]
- *   }
- *   def copy() = {
- *     val newCopy = new Mutable$tpe
- *     newCopy.isNull = isNull
- *     newCopy.value = value
- *     newCopy
- *   }
- * }"""
- * }.foreach(println)
- *
- * types.map { tpe =>
- * s"""
- *   override def set$tpe(ordinal: Int, value: $tpe): Unit = {
- *     val currentValue = values(ordinal).asInstanceOf[Mutable$tpe]
- *     currentValue.isNull = false
- *     currentValue.value = value
- *   }
- *
- *   override def get$tpe(i: Int): $tpe = {
- *     values(i).asInstanceOf[Mutable$tpe].value
- *   }"""
- * }.foreach(println)
- * }}}
- */
+  * A parent class for mutable container objects that are reused when the values are changed,
+  * resulting in less garbage.  These values are held by a [[SpecificMutableRow]].
+  *
+  * The following code was roughly used to generate these objects:
+  * {{{
+  * val types = "Int,Float,Boolean,Double,Short,Long,Byte,Any".split(",")
+  * types.map {tpe =>
+  * s"""
+  * final class Mutable$tpe extends MutableValue {
+  *   var value: $tpe = 0
+  *   def boxed = if (isNull) null else value
+  *   def update(v: Any) = value = {
+  *     isNull = false
+  *     v.asInstanceOf[$tpe]
+  *   }
+  *   def copy() = {
+  *     val newCopy = new Mutable$tpe
+  *     newCopy.isNull = isNull
+  *     newCopy.value = value
+  *     newCopy
+  *   }
+  * }"""
+  * }.foreach(println)
+  *
+  * types.map { tpe =>
+  * s"""
+  *   override def set$tpe(ordinal: Int, value: $tpe): Unit = {
+  *     val currentValue = values(ordinal).asInstanceOf[Mutable$tpe]
+  *     currentValue.isNull = false
+  *     currentValue.value = value
+  *   }
+  *
+  *   override def get$tpe(i: Int): $tpe = {
+  *     values(i).asInstanceOf[Mutable$tpe].value
+  *   }"""
+  * }.foreach(println)
+  * }}}
+  */
 abstract class MutableValue extends Serializable {
   var isNull: Boolean = true
   def boxed: Any
@@ -187,27 +187,26 @@ final class MutableAny extends MutableValue {
 }
 
 /**
- * A row type that holds an array specialized container objects, of type [[MutableValue]], chosen
- * based on the dataTypes of each column.  The intent is to decrease garbage when modifying the
- * values of primitive columns.
- */
+  * A row type that holds an array specialized container objects, of type [[MutableValue]], chosen
+  * based on the dataTypes of each column.  The intent is to decrease garbage when modifying the
+  * values of primitive columns.
+  */
 final class SpecificMutableRow(val values: Array[MutableValue])
-  extends MutableRow with BaseGenericInternalRow {
+    extends MutableRow with BaseGenericInternalRow {
 
   def this(dataTypes: Seq[DataType]) =
-    this(
-      dataTypes.map {
-        case BooleanType => new MutableBoolean
-        case ByteType => new MutableByte
-        case ShortType => new MutableShort
-        // We use INT for DATE internally
-        case IntegerType | DateType => new MutableInt
-        // We use Long for Timestamp internally
-        case LongType | TimestampType => new MutableLong
-        case FloatType => new MutableFloat
-        case DoubleType => new MutableDouble
-        case _ => new MutableAny
-      }.toArray)
+    this(dataTypes.map {
+      case BooleanType => new MutableBoolean
+      case ByteType => new MutableByte
+      case ShortType => new MutableShort
+      // We use INT for DATE internally
+      case IntegerType | DateType => new MutableInt
+      // We use Long for Timestamp internally
+      case LongType | TimestampType => new MutableLong
+      case FloatType => new MutableFloat
+      case DoubleType => new MutableDouble
+      case _ => new MutableAny
+    }.toArray)
 
   def this() = this(Seq.empty)
 

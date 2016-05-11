@@ -2,9 +2,8 @@ package org.jetbrains.plugins.scala
 package lang.dependency
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 sealed trait DependencyKind
 
 object DependencyKind {

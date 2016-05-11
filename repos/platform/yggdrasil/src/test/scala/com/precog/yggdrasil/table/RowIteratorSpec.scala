@@ -193,6 +193,6 @@ object JoinRowIteratorSpec extends Specification with ScalaCheck with RowIterato
     }
   }
 }
-    */
+ */
 
 // vim: set ts=4 sw=4 et:

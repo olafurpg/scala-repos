@@ -28,12 +28,11 @@ import org.apache.spark.sql.execution.{SparkPlan, SQLExecution}
 import org.apache.spark.util.ThreadUtils
 
 /**
- * A [[BroadcastExchange]] collects, transforms and finally broadcasts the result of a transformed
- * SparkPlan.
- */
-case class BroadcastExchange(
-    mode: BroadcastMode,
-    child: SparkPlan) extends Exchange {
+  * A [[BroadcastExchange]] collects, transforms and finally broadcasts the result of a transformed
+  * SparkPlan.
+  */
+case class BroadcastExchange(mode: BroadcastMode, child: SparkPlan)
+    extends Exchange {
 
   override def outputPartitioning: Partitioning = BroadcastPartitioning(mode)
 
@@ -56,7 +55,8 @@ case class BroadcastExchange(
   @transient
   private lazy val relationFuture: Future[broadcast.Broadcast[Any]] = {
     // broadcastFuture is used in "doExecute". Therefore we can get the execution id correctly here.
-    val executionId = sparkContext.getLocalProperty(SQLExecution.EXECUTION_ID_KEY)
+    val executionId =
+      sparkContext.getLocalProperty(SQLExecution.EXECUTION_ID_KEY)
     Future {
       // This will run in another thread. Set the execution id so that we can connect these jobs
       // with the correct execution.
@@ -77,7 +77,7 @@ case class BroadcastExchange(
 
   override protected def doExecute(): RDD[InternalRow] = {
     throw new UnsupportedOperationException(
-      "BroadcastExchange does not support the execute() code path.")
+        "BroadcastExchange does not support the execute() code path.")
   }
 
   override protected[sql] def doExecuteBroadcast[T](): broadcast.Broadcast[T] = {
@@ -87,6 +87,7 @@ case class BroadcastExchange(
 }
 
 object BroadcastExchange {
-  private[execution] val executionContext = ExecutionContext.fromExecutorService(
-    ThreadUtils.newDaemonCachedThreadPool("broadcast-exchange", 128))
+  private[execution] val executionContext =
+    ExecutionContext.fromExecutorService(
+        ThreadUtils.newDaemonCachedThreadPool("broadcast-exchange", 128))
 }

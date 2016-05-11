@@ -49,15 +49,15 @@ object BarChartWithTableViewDemo extends JFXApp {
   }
 
   val data1 = ObservableBuffer[Position](
-    new Position("A", 26),
-    new Position("B", 35),
-    new Position("C", 18)
+      new Position("A", 26),
+      new Position("B", 35),
+      new Position("C", 18)
   )
 
   val data2 = ObservableBuffer[Position](
-    new Position("P", 61),
-    new Position("Q", 56),
-    new Position("R", 78)
+      new Position("P", 61),
+      new Position("Q", 56),
+      new Position("R", 78)
   )
 
   stage = new PrimaryStage {
@@ -71,38 +71,39 @@ object BarChartWithTableViewDemo extends JFXApp {
         }
         center = new HBox {
           children = Seq(
-            createBarChart("Speculations", data1),
-            createBarChart("Predictions", data2)
+              createBarChart("Speculations", data1),
+              createBarChart("Predictions", data2)
           )
         }
       }
     }
   }
 
-
-  def createBarChart(chartTitle: String, chartData: ObservableBuffer[Position]): BarChart[String, Number] =
+  def createBarChart(
+      chartTitle: String,
+      chartData: ObservableBuffer[Position]): BarChart[String, Number] =
     new BarChart(CategoryAxis(), NumberAxis()) {
       title = chartTitle
-      data = XYChart.Series(chartData.map(d => XYChart.Data[String, Number](d.name(), d.value())))
+      data = XYChart.Series(chartData.map(
+              d => XYChart.Data[String, Number](d.name(), d.value())))
       legendVisible = false
-      onMouseClicked = handle {showAsTable(title(), chartData)}
+      onMouseClicked = handle { showAsTable(title(), chartData) }
     }
-
 
   private def showAsTable(name: String, data: ObservableBuffer[Position]) {
 
     val tableView = new TableView[Position](data) {
       columns ++= List(
-        new TableColumn[Position, String] {
-          text = "Position"
-          cellValueFactory = {_.value.name}
-          prefWidth = 180
-        },
-        new TableColumn[Position, Int] {
-          text = "Value"
-          cellValueFactory = {_.value.value}
-          prefWidth = 180
-        }
+          new TableColumn[Position, String] {
+            text = "Position"
+            cellValueFactory = { _.value.name }
+            prefWidth = 180
+          },
+          new TableColumn[Position, Int] {
+            text = "Value"
+            cellValueFactory = { _.value.value }
+            prefWidth = 180
+          }
       )
     }
 
@@ -119,5 +120,3 @@ object BarChartWithTableViewDemo extends JFXApp {
     }.showAndWait()
   }
 }
-
-

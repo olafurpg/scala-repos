@@ -12,7 +12,8 @@ import akka.cluster.StandardMetrics._
 import scala.util.Failure
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class MetricNumericConverterSpec extends WordSpec with Matchers with MetricNumericConverter {
+class MetricNumericConverterSpec
+    extends WordSpec with Matchers with MetricNumericConverter {
 
   "MetricNumericConverter" must {
 
@@ -24,7 +25,8 @@ class MetricNumericConverterSpec extends WordSpec with Matchers with MetricNumer
     }
 
     "define a new metric" in {
-      val Some(metric) = Metric.create(HeapMemoryUsed, 256L, decayFactor = Some(0.18))
+      val Some(metric) =
+        Metric.create(HeapMemoryUsed, 256L, decayFactor = Some(0.18))
       metric.name should ===(HeapMemoryUsed)
       metric.value should ===(256L)
       metric.isSmooth should ===(true)
@@ -33,8 +35,10 @@ class MetricNumericConverterSpec extends WordSpec with Matchers with MetricNumer
 
     "define an undefined value with a None " in {
       Metric.create("x", -1, None).isDefined should ===(false)
-      Metric.create("x", java.lang.Double.NaN, None).isDefined should ===(false)
-      Metric.create("x", Failure(new RuntimeException), None).isDefined should ===(false)
+      Metric.create("x", java.lang.Double.NaN, None).isDefined should ===(
+          false)
+      Metric.create("x", Failure(new RuntimeException), None).isDefined should ===(
+          false)
     }
 
     "recognize whether a metric value is defined" in {

@@ -1,16 +1,16 @@
 // Soundness bug, at #963 and dup at #2079.
 trait A {
   type T
-  var v : T
+  var v: T
 }
 
 object B {
-  def f(x : { val y : A }) { x.y.v = x.y.v }
+  def f(x: { val y: A }) { x.y.v = x.y.v }
 
-  var a : A = _
-  var b : Boolean = false
-  def y : A = {
-    if(b) {
+  var a: A = _
+  var b: Boolean = false
+  def y: A = {
+    if (b) {
       a = new A { type T = Int; var v = 1 }
       a
     } else {

@@ -8,8 +8,8 @@ object Test {
     private object B6 extends B2
 
     val classes1 = this.getClass.getDeclaredClasses
-    val classes2 = C.getClass   .getDeclaredClasses
-    val classes3 = getClass     .getDeclaredClasses
+    val classes2 = C.getClass.getDeclaredClasses
+    val classes3 = getClass.getDeclaredClasses
   }
 
   // sortBy(_.getName) introduces additional classes which we don't want to see in C,
@@ -28,7 +28,4 @@ object Test {
     println("Try 3: (" + TestHelper.valuesTry3.length + " classes)")
     TestHelper.valuesTry3.foreach(println)
   }
-
-
 }
-

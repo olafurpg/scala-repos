@@ -7,10 +7,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiElement, PsiFile}
 
 /**
- * Pavel Fatin
- */
-
-class RemoveElementQuickFix(element: PsiElement, description: String) extends IntentionAction {
+  * Pavel Fatin
+  */
+class RemoveElementQuickFix(element: PsiElement, description: String)
+    extends IntentionAction {
   def getText = description
 
   def getFamilyName = ""

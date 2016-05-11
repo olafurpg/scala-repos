@@ -5,5 +5,6 @@ object Test {
   implicit def str2int(x: String): Int = x.length
   implicit def str2bool(x: String): Boolean = false
 
-  /* resolved: false */foo("")
+  /* resolved: false */
+  foo("")
 }

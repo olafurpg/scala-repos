@@ -27,7 +27,8 @@ class UrlGeneratorTestServlet extends ScalatraServlet {
 
   val literalDotInPath = get("/literal.dot.in.path") {}
 
-  val stringAndBoolean = get("/conditional", params.getOrElse("condition", "false") == "true") {}
+  val stringAndBoolean =
+    get("/conditional", params.getOrElse("condition", "false") == "true") {}
 
   val regex1 = get("""^\/fo(.*)/ba(.*)""".r) {}
 
@@ -37,7 +38,10 @@ class UrlGeneratorTestServlet extends ScalatraServlet {
 
   val pathPattern = get(new PathPattern(".".r, Nil)) {}
 
-  val customMatcher = get(new RouteMatcher { def apply(requestPath: String) = None }) {}
+  val customMatcher =
+    get(new RouteMatcher { def apply(requestPath: String) = None }) {}
 
-  val stringAndCustomMatcher = get("/fail", new RouteMatcher { def apply(requestPath: String) = None }) {}
+  val stringAndCustomMatcher = get("/fail", new RouteMatcher {
+    def apply(requestPath: String) = None
+  }) {}
 }

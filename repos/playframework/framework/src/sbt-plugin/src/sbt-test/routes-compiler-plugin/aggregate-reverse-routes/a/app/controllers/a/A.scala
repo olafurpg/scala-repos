@@ -13,5 +13,4 @@ class A extends Controller {
     controllers.c.routes.C.index
     Ok
   }
-
 }

@@ -28,8 +28,8 @@ import org.apache.spark.sql.types.{DataType, IntegerType}
 class HyperLogLogPlusPlusSuite extends SparkFunSuite {
 
   /** Create a HLL++ instance and an input and output buffer. */
-  def createEstimator(rsd: Double, dt: DataType = IntegerType):
-      (HyperLogLogPlusPlus, MutableRow, MutableRow) = {
+  def createEstimator(rsd: Double, dt: DataType = IntegerType)
+    : (HyperLogLogPlusPlus, MutableRow, MutableRow) = {
     val input = new SpecificMutableRow(Seq(dt))
     val hll = new HyperLogLogPlusPlus(new BoundReference(0, dt, true), rsd)
     val buffer = createBuffer(hll)
@@ -37,13 +37,15 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
   }
 
   def createBuffer(hll: HyperLogLogPlusPlus): MutableRow = {
-    val buffer = new SpecificMutableRow(hll.aggBufferAttributes.map(_.dataType))
+    val buffer = new SpecificMutableRow(
+        hll.aggBufferAttributes.map(_.dataType))
     hll.initialize(buffer)
     buffer
   }
 
   /** Evaluate the estimate. It should be within 3*SD's of the given true rsd. */
-  def evaluateEstimate(hll: HyperLogLogPlusPlus, buffer: MutableRow, cardinality: Int): Unit = {
+  def evaluateEstimate(
+      hll: HyperLogLogPlusPlus, buffer: MutableRow, cardinality: Int): Unit = {
     val estimate = hll.eval(buffer).asInstanceOf[Long].toDouble
     val error = math.abs((estimate / cardinality.toDouble) - 1.0d)
     assert(error < hll.trueRsd * 3.0d, "Error should be within 3 std. errors.")
@@ -58,11 +60,10 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
     assert(estimate == 0L, "Nothing meaningful added; estimate should be 0.")
   }
 
-  def testCardinalityEstimates(
-      rsds: Seq[Double],
-      ns: Seq[Int],
-      f: Int => Int,
-      c: Int => Int): Unit = {
+  def testCardinalityEstimates(rsds: Seq[Double],
+                               ns: Seq[Int],
+                               f: Int => Int,
+                               c: Int => Int): Unit = {
     rsds.flatMap(rsd => ns.map(n => (rsd, n))).foreach {
       case (rsd, n) =>
         val (hll, input, buffer) = createEstimator(rsd)
@@ -75,37 +76,38 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
         val estimate = hll.eval(buffer).asInstanceOf[Long].toDouble
         val cardinality = c(n)
         val error = math.abs((estimate / cardinality.toDouble) - 1.0d)
-        assert(error < hll.trueRsd * 3.0d, "Error should be within 3 std. errors.")
+        assert(error < hll.trueRsd * 3.0d,
+               "Error should be within 3 std. errors.")
     }
   }
 
   test("deterministic cardinality estimation") {
     val repeats = 10
     testCardinalityEstimates(
-      Seq(0.1, 0.05, 0.025, 0.01),
-      Seq(100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000).map(_ * repeats),
-      i => i / repeats,
-      i => i / repeats)
+        Seq(0.1, 0.05, 0.025, 0.01),
+        Seq(100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000)
+          .map(_ * repeats),
+        i => i / repeats,
+        i => i / repeats)
   }
 
   test("random cardinality estimation") {
     val srng = new Random(323981238L)
     val seen = mutable.HashSet.empty[Int]
-    val update = (i: Int) => {
-      val value = srng.nextInt()
-      seen += value
-      value
+    val update = (i: Int) =>
+      {
+        val value = srng.nextInt()
+        seen += value
+        value
     }
-    val eval = (n: Int) => {
-      val cardinality = seen.size
-      seen.clear()
-      cardinality
+    val eval = (n: Int) =>
+      {
+        val cardinality = seen.size
+        seen.clear()
+        cardinality
     }
     testCardinalityEstimates(
-      Seq(0.05, 0.01),
-      Seq(100, 10000, 500000),
-      update,
-      eval)
+        Seq(0.05, 0.01), Seq(100, 10000, 500000), update, eval)
   }
 
   // Test merging

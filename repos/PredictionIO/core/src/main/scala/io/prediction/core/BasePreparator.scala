@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.core
 
 import io.prediction.annotation.DeveloperApi
@@ -27,8 +26,8 @@ import org.apache.spark.SparkContext
   * @tparam PD Prepared data class
   */
 @DeveloperApi
-abstract class BasePreparator[TD, PD]
-  extends AbstractDoer {
+abstract class BasePreparator[TD, PD] extends AbstractDoer {
+
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. This is called by training
     * workflow to prepare data before handing it over to algorithm

@@ -35,15 +35,15 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Reflection Spec tests.
- *
- *
- */
+  * Reflection Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ReflectionSpec
-  extends SimpleSFXDelegateSpec[jfxse.Reflection, Reflection](classOf[jfxse.Reflection], classOf[Reflection])
-  with InputDelegateSpec[Reflection] {
+    extends SimpleSFXDelegateSpec[jfxse.Reflection, Reflection](
+        classOf[jfxse.Reflection], classOf[Reflection])
+    with InputDelegateSpec[Reflection] {
 
   val inputDelegate = getScalaClassInstance
-
 }

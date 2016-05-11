@@ -12,12 +12,12 @@ import org.jetbrains.plugins.scala.lang.structureView.itemsPresentations.impl._
 import _root_.scala.collection.mutable._
 
 /**
- * @author Alexander Podkhalyuzin
- * @deprecated
- * Date : 05.05.2008
- */
-
-class ScalaPackagingStructureViewElement(private val element: ScPackaging) extends ScalaStructureViewElement(element, false) {
+  * @author Alexander Podkhalyuzin
+  * @deprecated
+  * Date : 05.05.2008
+  */
+class ScalaPackagingStructureViewElement(private val element: ScPackaging)
+    extends ScalaStructureViewElement(element, false) {
   def getPresentation: ItemPresentation = {
     new ScalaPackagingItemPresentation(element);
   }

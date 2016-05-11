@@ -1,6 +1,6 @@
-class Klass[@specialized(Long) A]( val a: A )
+class Klass[@specialized(Long) A](val a: A)
 
-class LongKlass( override val a: Long ) extends Klass[Long](a)
+class LongKlass(override val a: Long) extends Klass[Long](a)
 
 object Test {
   def main(args: Array[String]) {

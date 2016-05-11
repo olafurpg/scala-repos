@@ -1,19 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.server
 
 import java.util.Properties
@@ -32,12 +32,14 @@ import kafka.admin.{AdminOperationException, AdminUtils}
 import scala.collection.Map
 
 class DynamicConfigChangeTest extends KafkaServerTestHarness {
-  def generateConfigs() = List(KafkaConfig.fromProps(TestUtils.createBrokerConfig(0, zkConnect)))
+  def generateConfigs() =
+    List(KafkaConfig.fromProps(TestUtils.createBrokerConfig(0, zkConnect)))
 
   @Test
   def testConfigChange() {
-    assertTrue("Should contain a ConfigHandler for topics",
-               this.servers(0).dynamicConfigHandlers.contains(ConfigType.Topic))
+    assertTrue(
+        "Should contain a ConfigHandler for topics",
+        this.servers(0).dynamicConfigHandlers.contains(ConfigType.Topic))
     val oldVal: java.lang.Long = 100000L
     val newVal: java.lang.Long = 200000L
     val tp = TopicAndPartition("test", 0)
@@ -52,14 +54,17 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     logProps.put(LogConfig.FlushMessagesProp, newVal.toString)
     AdminUtils.changeTopicConfig(zkUtils, tp.topic, logProps)
     TestUtils.retry(10000) {
-      assertEquals(newVal, this.servers(0).logManager.getLog(tp).get.config.flushInterval)
+      assertEquals(
+          newVal,
+          this.servers(0).logManager.getLog(tp).get.config.flushInterval)
     }
   }
 
   @Test
   def testClientQuotaConfigChange() {
-    assertTrue("Should contain a ConfigHandler for topics",
-               this.servers(0).dynamicConfigHandlers.contains(ConfigType.Client))
+    assertTrue(
+        "Should contain a ConfigHandler for topics",
+        this.servers(0).dynamicConfigHandlers.contains(ConfigType.Client))
     val clientId = "testClient"
     val props = new Properties()
     props.put(ClientConfigOverride.ProducerOverride, "1000")
@@ -67,15 +72,25 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     AdminUtils.changeClientIdConfig(zkUtils, clientId, props)
 
     TestUtils.retry(10000) {
-      val configHandler = this.servers(0).dynamicConfigHandlers(ConfigType.Client).asInstanceOf[ClientIdConfigHandler]
-      val quotaManagers: Map[Short, ClientQuotaManager] = servers(0).apis.quotaManagers
-      val overrideProducerQuota = quotaManagers.get(ApiKeys.PRODUCE.id).get.quota(clientId)
-      val overrideConsumerQuota = quotaManagers.get(ApiKeys.FETCH.id).get.quota(clientId)
+      val configHandler = this
+        .servers(0)
+        .dynamicConfigHandlers(ConfigType.Client)
+        .asInstanceOf[ClientIdConfigHandler]
+      val quotaManagers: Map[Short, ClientQuotaManager] =
+        servers(0).apis.quotaManagers
+      val overrideProducerQuota =
+        quotaManagers.get(ApiKeys.PRODUCE.id).get.quota(clientId)
+      val overrideConsumerQuota =
+        quotaManagers.get(ApiKeys.FETCH.id).get.quota(clientId)
 
-      assertEquals(s"ClientId $clientId must have overridden producer quota of 1000",
-        Quota.upperBound(1000), overrideProducerQuota)
-        assertEquals(s"ClientId $clientId must have overridden consumer quota of 2000",
-        Quota.upperBound(2000), overrideConsumerQuota)
+      assertEquals(
+          s"ClientId $clientId must have overridden producer quota of 1000",
+          Quota.upperBound(1000),
+          overrideProducerQuota)
+      assertEquals(
+          s"ClientId $clientId must have overridden consumer quota of 2000",
+          Quota.upperBound(2000),
+          overrideConsumerQuota)
     }
   }
 
@@ -102,47 +117,61 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     val propertiesArgument = EasyMock.newCapture[Properties]
     val handler = EasyMock.createNiceMock(classOf[ConfigHandler])
     handler.processConfigChanges(
-      EasyMock.and(EasyMock.capture(entityArgument), EasyMock.isA(classOf[String])),
-      EasyMock.and(EasyMock.capture(propertiesArgument), EasyMock.isA(classOf[Properties])))
+        EasyMock.and(
+            EasyMock.capture(entityArgument), EasyMock.isA(classOf[String])),
+        EasyMock.and(EasyMock.capture(propertiesArgument),
+                     EasyMock.isA(classOf[Properties])))
     EasyMock.expectLastCall().once()
     EasyMock.replay(handler)
 
-    val configManager = new DynamicConfigManager(zkUtils, Map(ConfigType.Topic -> handler))
+    val configManager = new DynamicConfigManager(
+        zkUtils, Map(ConfigType.Topic -> handler))
     // Notifications created using the old TopicConfigManager are ignored.
-    configManager.ConfigChangedNotificationHandler.processNotification("not json")
+    configManager.ConfigChangedNotificationHandler.processNotification(
+        "not json")
 
     // Incorrect Map. No version
     try {
       val jsonMap = Map("v" -> 1, "x" -> 2)
-      configManager.ConfigChangedNotificationHandler.processNotification(Json.encode(jsonMap))
-      fail("Should have thrown an Exception while parsing incorrect notification " + jsonMap)
-    }
-    catch {
+      configManager.ConfigChangedNotificationHandler.processNotification(
+          Json.encode(jsonMap))
+      fail(
+          "Should have thrown an Exception while parsing incorrect notification " +
+          jsonMap)
+    } catch {
       case t: Throwable =>
     }
     // Version is provided. EntityType is incorrect
     try {
-      val jsonMap = Map("version" -> 1, "entity_type" -> "garbage", "entity_name" -> "x")
-      configManager.ConfigChangedNotificationHandler.processNotification(Json.encode(jsonMap))
-      fail("Should have thrown an Exception while parsing incorrect notification " + jsonMap)
-    }
-    catch {
+      val jsonMap = Map(
+          "version" -> 1, "entity_type" -> "garbage", "entity_name" -> "x")
+      configManager.ConfigChangedNotificationHandler.processNotification(
+          Json.encode(jsonMap))
+      fail(
+          "Should have thrown an Exception while parsing incorrect notification " +
+          jsonMap)
+    } catch {
       case t: Throwable =>
     }
 
     // EntityName isn't provided
     try {
       val jsonMap = Map("version" -> 1, "entity_type" -> ConfigType.Topic)
-      configManager.ConfigChangedNotificationHandler.processNotification(Json.encode(jsonMap))
-      fail("Should have thrown an Exception while parsing incorrect notification " + jsonMap)
-    }
-    catch {
+      configManager.ConfigChangedNotificationHandler.processNotification(
+          Json.encode(jsonMap))
+      fail(
+          "Should have thrown an Exception while parsing incorrect notification " +
+          jsonMap)
+    } catch {
       case t: Throwable =>
     }
 
     // Everything is provided
-    val jsonMap = Map("version" -> 1, "entity_type" -> ConfigType.Topic, "entity_name" -> "x")
-    configManager.ConfigChangedNotificationHandler.processNotification(Json.encode(jsonMap))
+    val jsonMap = Map("version" -> 1,
+                      "entity_type" -> ConfigType.Topic,
+                      "entity_name" -> "x")
+    configManager.ConfigChangedNotificationHandler.processNotification(
+        Json.encode(jsonMap))
 
     // Verify that processConfigChanges was only called once
     EasyMock.verify(handler)

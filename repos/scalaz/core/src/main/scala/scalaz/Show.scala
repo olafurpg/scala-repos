@@ -2,11 +2,11 @@ package scalaz
 
 ////
 /**
- * A typeclass for conversion to textual representation, done via
- * [[scalaz.Cord]] for efficiency.
- */
+  * A typeclass for conversion to textual representation, done via
+  * [[scalaz.Cord]] for efficiency.
+  */
 ////
-trait Show[F]  { self =>
+trait Show[F] { self =>
   ////
   def show(f: F): Cord = Cord(shows(f))
   def shows(f: F): String = show(f).toString
@@ -36,11 +36,12 @@ object Show {
     override def shows(a: A): String = f(a)
   }
 
-  implicit val showContravariant: Contravariant[Show] = new Contravariant[Show] {
-    def contramap[A, B](r: Show[A])(f: B => A): Show[B] = new Show[B] {
-      override def show(b: B): Cord = r.show(f(b))
+  implicit val showContravariant: Contravariant[Show] =
+    new Contravariant[Show] {
+      def contramap[A, B](r: Show[A])(f: B => A): Show[B] = new Show[B] {
+        override def show(b: B): Cord = r.show(f(b))
+      }
     }
-  }
 
   ////
 }

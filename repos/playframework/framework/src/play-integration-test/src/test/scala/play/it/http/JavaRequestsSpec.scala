@@ -10,17 +10,18 @@ import play.api.mvc._
 
 import play.core.j.JavaHelpers
 import play.mvc.Http
-import play.mvc.Http.{ Context, RequestBody, RequestImpl }
+import play.mvc.Http.{Context, RequestBody, RequestImpl}
 
 /**
- *
- */
+  *
+  */
 class JavaRequestsSpec extends PlaySpecification with Mockito {
 
   "JavaHelpers" should {
 
     "create a request with case insensitive headers" in {
-      val requestHeader: RequestHeader = FakeRequest().withHeaders("Content-type" -> "application/json")
+      val requestHeader: RequestHeader =
+        FakeRequest().withHeaders("Content-type" -> "application/json")
       val javaRequest: Http.Request = new RequestImpl(requestHeader)
 
       val ct = javaRequest.getHeader("Content-Type")
@@ -51,7 +52,8 @@ class JavaRequestsSpec extends PlaySpecification with Mockito {
 
       val cookie1 = Cookie("name1", "value1")
 
-      val requestHeader: Request[Http.RequestBody] = Request[Http.RequestBody](FakeRequest().withCookies(cookie1), new RequestBody())
+      val requestHeader: Request[Http.RequestBody] = Request[Http.RequestBody](
+          FakeRequest().withCookies(cookie1), new RequestBody())
       val javaContext: Context = JavaHelpers.createJavaContext(requestHeader)
       val javaRequest = javaContext.request()
 
@@ -62,7 +64,5 @@ class JavaRequestsSpec extends PlaySpecification with Mockito {
       cookieList(0).name must be equalTo "name1"
       cookieList(0).value must be equalTo "value1"
     }
-
   }
-
 }

@@ -3,14 +3,14 @@ package example
 
 import collection.immutable.Stream
 
-
-object FingerTreeUsage extends App{
+object FingerTreeUsage extends App {
   import FingerTree._
   import std.anyVal._
 
-  def streamToTree[A](stream: Stream[A]): FingerTree[Int, A] = stream.foldLeft(empty(SizeReducer[A])) {
-    case (t, x) => (t :+ x)
-  }
+  def streamToTree[A](stream: Stream[A]): FingerTree[Int, A] =
+    stream.foldLeft(empty(SizeReducer[A])) {
+      case (t, x) => (t :+ x)
+    }
 
   val intStream = Stream.from(1)
 
@@ -22,7 +22,7 @@ object FingerTreeUsage extends App{
 
   //prepending
   assert((2 +: 3 +: 4 +: emptyTree).toList == List(2, 3, 4))
-  
+
   //appending
   assert((emptyTree :+ 2 :+ 3 :+ 4).toList == List(2, 3, 4))
 
@@ -36,13 +36,19 @@ object FingerTreeUsage extends App{
   assert((streamToTree(intStream.take(3)) :-| 5).toList == List(1, 2, 5))
 
   //appending two trees
-  assert((streamToTree(intStream.take(5)) <++> streamToTree(Stream.from(6).take(5))).toStream == intStream.take(10))
+  assert((streamToTree(intStream.take(5)) <++> streamToTree(
+              Stream.from(6).take(5))).toStream == intStream.take(10))
 
   import std.option._
 
   //traversing the tree
-  val traversedTree = streamToTree(intStream.take(10)).traverseTree[Option, Int, Int](i => Some(i * 2))
-  assert(traversedTree.map(_.toStream).getOrElse(Stream.empty) == intStream.map(_ * 2).take(10))
+  val traversedTree = streamToTree(intStream.take(10))
+    .traverseTree[Option, Int, Int](i => Some(i * 2))
+  assert(
+      traversedTree.map(_.toStream).getOrElse(Stream.empty) == intStream
+        .map(_ * 2)
+        .take(10))
 
-  println(streamToTree(intStream.take(10)).traverseTree[Option, Int, Int](i => Some(i + 1)))
+  println(streamToTree(intStream.take(10))
+        .traverseTree[Option, Int, Int](i => Some(i + 1)))
 }

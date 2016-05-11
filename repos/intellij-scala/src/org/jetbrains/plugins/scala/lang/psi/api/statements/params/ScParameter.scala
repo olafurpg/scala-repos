@@ -27,12 +27,12 @@ import scala.annotation.tailrec
 import scala.collection.immutable.HashSet
 
 /**
- * @author Alexander Podkhalyuzin
- * Date: 22.02.2008
- */
-
-trait ScParameter extends ScTypedDefinition with ScModifierListOwner with
-        PsiParameter with ScAnnotationsHolder with ScImportableDeclarationsOwner {
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
+trait ScParameter
+    extends ScTypedDefinition with ScModifierListOwner with PsiParameter
+    with ScAnnotationsHolder with ScImportableDeclarationsOwner {
   def getTypeElement: PsiTypeElement
 
   def isWildcard: Boolean = "_" == name
@@ -63,11 +63,16 @@ trait ScParameter extends ScTypedDefinition with ScModifierListOwner with
 
   def getActualDefaultExpression: Option[ScExpression]
 
-  def getRealParameterType(ctx: TypingContext = TypingContext.empty): TypeResult[ScType] = {
+  def getRealParameterType(
+      ctx: TypingContext = TypingContext.empty): TypeResult[ScType] = {
     if (!isRepeatedParameter) return getType(ctx)
     getType(ctx) match {
-      case f@Success(tp: ScType, elem) =>
-        val seq = ScalaPsiManager.instance(getProject).getCachedClass("scala.collection.Seq", getResolveScope, ScalaPsiManager.ClassCategory.TYPE)
+      case f @ Success(tp: ScType, elem) =>
+        val seq = ScalaPsiManager
+          .instance(getProject)
+          .getCachedClass("scala.collection.Seq",
+                          getResolveScope,
+                          ScalaPsiManager.ClassCategory.TYPE)
         if (seq != null) {
           Success(ScParameterizedType(ScType.designator(seq), Seq(tp)), elem)
         } else f
@@ -75,13 +80,18 @@ trait ScParameter extends ScTypedDefinition with ScModifierListOwner with
     }
   }
 
-  def getDeclarationScope = PsiTreeUtil.getParentOfType(this, classOf[ScParameterOwner], classOf[ScFunctionExpr])
+  def getDeclarationScope =
+    PsiTreeUtil.getParentOfType(
+        this, classOf[ScParameterOwner], classOf[ScFunctionExpr])
 
   def deprecatedName: Option[String]
 
   def owner: PsiElement = {
-    ScalaPsiUtil.getContextOfType(this, true, classOf[ScFunctionExpr],
-      classOf[ScFunction], classOf[ScPrimaryConstructor])
+    ScalaPsiUtil.getContextOfType(this,
+                                  true,
+                                  classOf[ScFunctionExpr],
+                                  classOf[ScFunction],
+                                  classOf[ScPrimaryConstructor])
   }
 
   def remove()
@@ -94,7 +104,8 @@ trait ScParameter extends ScTypedDefinition with ScModifierListOwner with
 
   def index = getParent.getParent match {
     case parameters: ScParameters => parameters.params.indexOf(this)
-    case _ => getParent.asInstanceOf[ScParameterClause].parameters.indexOf(this)
+    case _ =>
+      getParent.asInstanceOf[ScParameterClause].parameters.indexOf(this)
   }
 
   override def getName: String = {
@@ -108,56 +119,66 @@ trait ScParameter extends ScTypedDefinition with ScModifierListOwner with
       case null => GlobalSearchScope.EMPTY_SCOPE
       case expr: ScFunctionExpr => new LocalSearchScope(expr)
       case clazz: ScClass if clazz.isCase => clazz.getUseScope
-      case clazz: ScClass if this.isInstanceOf[ScClassParameter] => clazz.getUseScope //for named parameters
+      case clazz: ScClass if this.isInstanceOf[ScClassParameter] =>
+        clazz.getUseScope //for named parameters
       case d => d.getUseScope
     }
     specificScope.intersectWith(super.getUseScope)
   }
 
-  def getType: PsiType = ScType.toPsi(getRealParameterType(TypingContext.empty).getOrNothing, getProject, getResolveScope)
+  def getType: PsiType =
+    ScType.toPsi(getRealParameterType(TypingContext.empty).getOrNothing,
+                 getProject,
+                 getResolveScope)
 
   def isAnonymousParameter: Boolean = getContext match {
-    case clause: ScParameterClause => clause.getContext.getContext match {
-      case f: ScFunctionExpr => true
-      case _ => false
-    }
+    case clause: ScParameterClause =>
+      clause.getContext.getContext match {
+        case f: ScFunctionExpr => true
+        case _ => false
+      }
     case _ => false
   }
 
   def expectedParamType: Option[ScType] = getContext match {
-    case clause: ScParameterClause => clause.getContext.getContext match {
-      // For parameter of anonymous functions to infer parameter's type from an appropriate
-      // an. fun's type
-      case f: ScFunctionExpr =>
-        var flag = false
-        var result: Option[ScType] = None //strange logic to handle problems with detecting type
-        for (tp <- f.expectedTypes(fromUnderscore = false) if !flag) {
-          @tailrec
-          def applyForFunction(tp: ScType, checkDeep: Boolean) {
-            tp.removeAbstracts match {
-              case ScFunctionType(ret, _) if checkDeep => applyForFunction(ret, checkDeep = false)
-              case ScFunctionType(_, params) if params.length == f.parameters.length =>
-                val i = clause.parameters.indexOf(this)
-                if (result.isDefined) {
-                  result = None
-                  flag = true
-                } else result = Some(params(i))
-              case any if ScalaPsiUtil.isSAMEnabled(f)=>
-                //infer type if it's a Single Abstract Method
-                ScalaPsiUtil.toSAMType(any, f.getResolveScope) match {
-                  case Some(ScFunctionType(_, params)) =>
-                    val i = clause.parameters.indexOf(this)
-                    if (i < params.length) result = Some(params(i))
-                  case _ =>
-                }
-              case _ =>
+    case clause: ScParameterClause =>
+      clause.getContext.getContext match {
+        // For parameter of anonymous functions to infer parameter's type from an appropriate
+        // an. fun's type
+        case f: ScFunctionExpr =>
+          var flag = false
+          var result: Option[ScType] =
+            None //strange logic to handle problems with detecting type
+          for (tp <- f.expectedTypes(fromUnderscore = false) if !flag) {
+            @tailrec
+            def applyForFunction(tp: ScType, checkDeep: Boolean) {
+              tp.removeAbstracts match {
+                case ScFunctionType(ret, _) if checkDeep =>
+                  applyForFunction(ret, checkDeep = false)
+                case ScFunctionType(_, params)
+                    if params.length == f.parameters.length =>
+                  val i = clause.parameters.indexOf(this)
+                  if (result.isDefined) {
+                    result = None
+                    flag = true
+                  } else result = Some(params(i))
+                case any if ScalaPsiUtil.isSAMEnabled(f) =>
+                  //infer type if it's a Single Abstract Method
+                  ScalaPsiUtil.toSAMType(any, f.getResolveScope) match {
+                    case Some(ScFunctionType(_, params)) =>
+                      val i = clause.parameters.indexOf(this)
+                      if (i < params.length) result = Some(params(i))
+                    case _ =>
+                  }
+                case _ =>
+              }
             }
+            applyForFunction(
+                tp, ScUnderScoreSectionUtil.underscores(f).nonEmpty)
           }
-          applyForFunction(tp, ScUnderScoreSectionUtil.underscores(f).nonEmpty)
-        }
-        result
-      case _ => None
-    }
+          result
+        case _ => None
+      }
   }
 
   def getTypeNoResolve: PsiType = PsiType.VOID
@@ -165,9 +186,9 @@ trait ScParameter extends ScTypedDefinition with ScModifierListOwner with
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
   def isDefaultParam: Boolean = calcIsDefaultParam(this, HashSet.empty)
 
-
   @tailrec
-  private def calcIsDefaultParam(param: ScParameter, visited: HashSet[ScParameter]): Boolean = {
+  private def calcIsDefaultParam(
+      param: ScParameter, visited: HashSet[ScParameter]): Boolean = {
     if (param.baseDefaultParam) return true
     if (visited.contains(param)) return false
     getSuperParameter match {
@@ -192,10 +213,12 @@ trait ScParameter extends ScTypedDefinition with ScModifierListOwner with
       getContainingFile match {
         case file: ScalaFile =>
           if (file.isCompiled) {
-            val containingMember = PsiTreeUtil.getContextOfType(this, true, classOf[ScMember])
+            val containingMember =
+              PsiTreeUtil.getContextOfType(this, true, classOf[ScMember])
             if (containingMember == null) res
             else {
-              def extractFromParameterOwner(owner: ScParameterOwner): Option[ScExpression] = {
+              def extractFromParameterOwner(
+                  owner: ScParameterOwner): Option[ScExpression] = {
                 owner.parameters.find(_.name == name) match {
                   case Some(param) => param.getDefaultExpression
                   case _ => res
@@ -232,9 +255,11 @@ trait ScParameter extends ScTypedDefinition with ScModifierListOwner with
               case fun: ScFunction =>
                 fun.superMethod match {
                   case Some(method: ScFunction) =>
-                    val clauses: Seq[ScParameterClause] = method.paramClauses.clauses
+                    val clauses: Seq[ScParameterClause] =
+                      method.paramClauses.clauses
                     if (j >= clauses.length) return None
-                    val parameters: Seq[ScParameter] = clauses.apply(j).parameters
+                    val parameters: Seq[ScParameter] =
+                      clauses.apply(j).parameters
                     if (i >= parameters.length) return None
                     Some(parameters.apply(i))
                   case _ => None

@@ -1,7 +1,9 @@
 import scala.tools.nsc.interactive.tests.InteractiveTest
 
 object Test extends InteractiveTest {
-  override protected def loadSources() { /* don't parse or typecheck sources */ }
+  override protected def loadSources() {
+    /* don't parse or typecheck sources */
+  }
 
   import compiler._
 
@@ -10,7 +12,8 @@ object Test extends InteractiveTest {
     val pos = compiler.rangePos(sourceFiles.head, 191, 191, 191) // +
     compiler.askTypeAt(pos, res)
     res.get match {
-      case Left(tree) => compiler.ask(() => reporter.println(s"$tree: ${tree.tpe}"))
+      case Left(tree) =>
+        compiler.ask(() => reporter.println(s"$tree: ${tree.tpe}"))
       case Right(ex) => reporter.println(ex)
     }
   }

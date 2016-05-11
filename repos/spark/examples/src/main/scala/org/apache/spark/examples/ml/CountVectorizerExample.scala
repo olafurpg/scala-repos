@@ -31,10 +31,12 @@ object CountVectorizerExample {
     val sqlContext = new SQLContext(sc)
 
     // $example on$
-    val df = sqlContext.createDataFrame(Seq(
-      (0, Array("a", "b", "c")),
-      (1, Array("a", "b", "b", "c", "a"))
-    )).toDF("id", "words")
+    val df = sqlContext
+      .createDataFrame(Seq(
+              (0, Array("a", "b", "c")),
+              (1, Array("a", "b", "b", "c", "a"))
+          ))
+      .toDF("id", "words")
 
     // fit a CountVectorizerModel from the corpus
     val cvModel: CountVectorizerModel = new CountVectorizer()
@@ -54,5 +56,3 @@ object CountVectorizerExample {
   }
 }
 // scalastyle:on println
-
-

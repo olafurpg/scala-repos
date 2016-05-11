@@ -32,14 +32,19 @@ import javafx.util.{converter => jfxuc}
 import scala.language.implicitConversions
 
 object BigDecimalStringConverter {
-  implicit def sfxBigDecimalStringConverter2jfx(c: BigDecimalStringConverter): jfxuc.BigDecimalStringConverter = if (c != null) c.delegate else null
+  implicit def sfxBigDecimalStringConverter2jfx(
+      c: BigDecimalStringConverter): jfxuc.BigDecimalStringConverter =
+    if (c != null) c.delegate else null
 }
 
-class BigDecimalStringConverter(delegate: jfxuc.BigDecimalStringConverter = new jfxuc.BigDecimalStringConverter)
-  extends StringConverterDelegate[jm.BigDecimal, BigDecimal, jfxuc.BigDecimalStringConverter](delegate) {
+class BigDecimalStringConverter(
+    delegate: jfxuc.BigDecimalStringConverter = new jfxuc.BigDecimalStringConverter)
+    extends StringConverterDelegate[
+        jm.BigDecimal, BigDecimal, jfxuc.BigDecimalStringConverter](delegate) {
 
-  override def toString(b: BigDecimal): String = delegate.toString(b.bigDecimal)
+  override def toString(b: BigDecimal): String =
+    delegate.toString(b.bigDecimal)
 
-  override def fromString(s: String): BigDecimal = BigDecimal(delegate.fromString(s))
-
+  override def fromString(s: String): BigDecimal =
+    BigDecimal(delegate.fromString(s))
 }

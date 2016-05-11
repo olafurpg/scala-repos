@@ -15,19 +15,26 @@ object Test extends ScaladocModelTest {
     import access._
 
     /** Tests the "known type classes" feature of scaladoc implicits
-     *  if the test fails, please update the correct qualified name of
-     *  the type class in src/compiler/scala/tools/nsc/doc/Settings.scala
-     *  in the knownTypeClasses map. Thank you! */
-
-    val base = root._package("scala")._package("test")._package("scaladoc")._package("implicits")._package("typeclasses")
+      *  if the test fails, please update the correct qualified name of
+      *  the type class in src/compiler/scala/tools/nsc/doc/Settings.scala
+      *  in the knownTypeClasses map. Thank you! */
+    val base = root
+      ._package("scala")
+      ._package("test")
+      ._package("scaladoc")
+      ._package("implicits")
+      ._package("typeclasses")
     var conv: ImplicitConversion = null
 
     val A = base._class("A")
 
     for (conversion <- A.conversions if !conversion.isHiddenConversion) {
-      assert(conversion.constraints.length == 1, conversion.constraints.length + " == 1 (in " + conversion + ")")
-      assert(conversion.constraints.head.isInstanceOf[KnownTypeClassConstraint],
-             conversion.constraints.head + " is not a known type class constraint!")
+      assert(conversion.constraints.length == 1,
+             conversion.constraints.length + " == 1 (in " + conversion + ")")
+      assert(
+          conversion.constraints.head.isInstanceOf[KnownTypeClassConstraint],
+          conversion.constraints.head +
+          " is not a known type class constraint!")
     }
   }
 }

@@ -5,42 +5,41 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * An Updater processes updates in sequence. At most one one
- * update is processed at time; pending updates may be collapsed.
- * 
- * When an update is in progress, new updates are enqueued to 
- * be handled by the thread currently processing updates; the
- * control is returned to the caller thread immediately. Thus
- * the thread issuing the first update will process all updates 
- * until the queue of updates has been drained.
- *
- * Fairness is not guaranteed. Provided a sufficiently high rate of
- * updates, the hapless handler thread may be stuck with the job
- * indefinitely.
- */
+  * An Updater processes updates in sequence. At most one one
+  * update is processed at time; pending updates may be collapsed.
+  * 
+  * When an update is in progress, new updates are enqueued to 
+  * be handled by the thread currently processing updates; the
+  * control is returned to the caller thread immediately. Thus
+  * the thread issuing the first update will process all updates 
+  * until the queue of updates has been drained.
+  *
+  * Fairness is not guaranteed. Provided a sufficiently high rate of
+  * updates, the hapless handler thread may be stuck with the job
+  * indefinitely.
+  */
 private[finagle] trait Updater[T] extends (T => Unit) {
   private[this] val n = new AtomicInteger(0)
   private[this] val q = new ConcurrentLinkedQueue[T]
-  
+
   /**
-   * Preprocess a nonempty batch of updates. This allows the updater
-   * to collapse, expand, or otherwise manipulate updates before they
-   * are handled.
-   */
+    * Preprocess a nonempty batch of updates. This allows the updater
+    * to collapse, expand, or otherwise manipulate updates before they
+    * are handled.
+    */
   protected def preprocess(elems: Seq[T]): Seq[T]
 
   /**
-   * Handle a single update.
-   */
+    * Handle a single update.
+    */
   protected def handle(elem: T): Unit
 
   def apply(t: T) {
     q.offer(t)
-    if (n.getAndIncrement() > 0)
-      return
+    if (n.getAndIncrement() > 0) return
 
     do {
-      val elems = new ArrayBuffer[T](1+n.get)
+      val elems = new ArrayBuffer[T](1 + n.get)
       while (n.get > 1) {
         n.decrementAndGet()
         elems += q.poll()
@@ -48,8 +47,7 @@ private[finagle] trait Updater[T] extends (T => Unit) {
 
       elems += q.poll()
 
-      for (elem <- preprocess(elems.result))
-        handle(elem)
+      for (elem <- preprocess(elems.result)) handle(elem)
     } while (n.decrementAndGet() > 0)
   }
 }

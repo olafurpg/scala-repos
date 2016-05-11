@@ -20,15 +20,17 @@ package org.apache.spark.partial
 import org.apache.commons.math3.distribution.{NormalDistribution, TDistribution}
 
 /**
- * A utility class for caching Student's T distribution values for a given confidence level
- * and various sample sizes. This is used by the MeanEvaluator to efficiently calculate
- * confidence intervals for many keys.
- */
+  * A utility class for caching Student's T distribution values for a given confidence level
+  * and various sample sizes. This is used by the MeanEvaluator to efficiently calculate
+  * confidence intervals for many keys.
+  */
 private[spark] class StudentTCacher(confidence: Double) {
 
-  val NORMAL_APPROX_SAMPLE_SIZE = 100  // For samples bigger than this, use Gaussian approximation
+  val NORMAL_APPROX_SAMPLE_SIZE =
+    100 // For samples bigger than this, use Gaussian approximation
 
-  val normalApprox = new NormalDistribution().inverseCumulativeProbability(1 - (1 - confidence) / 2)
+  val normalApprox = new NormalDistribution()
+    .inverseCumulativeProbability(1 - (1 - confidence) / 2)
   val cache = Array.fill[Double](NORMAL_APPROX_SAMPLE_SIZE)(-1.0)
 
   def get(sampleSize: Long): Double = {
@@ -38,7 +40,8 @@ private[spark] class StudentTCacher(confidence: Double) {
       val size = sampleSize.toInt
       if (cache(size) < 0) {
         val tDist = new TDistribution(size - 1)
-        cache(size) = tDist.inverseCumulativeProbability(1 - (1 - confidence) / 2)
+        cache(size) = tDist.inverseCumulativeProbability(
+            1 - (1 - confidence) / 2)
       }
       cache(size)
     }

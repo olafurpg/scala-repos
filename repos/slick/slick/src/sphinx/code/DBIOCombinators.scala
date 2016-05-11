@@ -9,8 +9,8 @@ object DBIOCombinators extends App {
     def price = column[Double]("PRICE")
     def * = (name, price)
   }
-  val coffees = TableQuery[Coffees]
-  ;{
+  val coffees = TableQuery[Coffees];
+  {
     //#combinators1
     val ins1: DBIO[Int] = coffees += ("Colombian", 7.99)
     val ins2: DBIO[Int] = coffees += ("French_Roast", 8.99)

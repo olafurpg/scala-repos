@@ -1,6 +1,5 @@
-class BipClass { }
-trait BipTrait {
-  self: BipClass =>
+class BipClass {}
+trait BipTrait { self: BipClass =>
 
   private[this] def foo() = 5
   def bar() = this.foo()

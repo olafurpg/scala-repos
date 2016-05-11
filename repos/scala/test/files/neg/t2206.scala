@@ -2,7 +2,7 @@ object o {
   class A
 
   class AX {
-      def f() { }
+    def f() {}
   }
 
   import Implicits._
@@ -10,6 +10,6 @@ object o {
   a.f()
 
   object Implicits {
-      implicit def ax(a: A) = new AX
+    implicit def ax(a: A) = new AX
   }
 }

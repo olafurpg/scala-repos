@@ -2,7 +2,6 @@ package org.jetbrains.plugins.scala
 package annotator
 package importsTracker
 
-
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
@@ -12,10 +11,8 @@ import scala.collection.Set
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
-
+  * @author Alexander Podkhalyuzin
+  */
 class ImportTracker {
   def registerUsedImports(file: ScalaFile, used: Set[ImportUsed]) {
     val refHolder = ScalaRefCountHolder.getInstance(file)
@@ -36,7 +33,7 @@ class ImportTracker {
         }
       }
     }
-    
+
     refHolder retrieveUnusedReferencesInfo runnable
     buff.toArray
   }

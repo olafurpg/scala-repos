@@ -26,21 +26,21 @@ import org.apache.spark.sql.catalyst.plans.physical.{Partitioning, UnknownPartit
 import org.apache.spark.sql.execution.metric.SQLMetrics
 
 /**
- * Apply the all of the GroupExpressions to every input row, hence we will get
- * multiple output rows for a input row.
- * @param projections The group of expressions, all of the group expressions should
- *                    output the same schema specified bye the parameter `output`
- * @param output      The output Schema
- * @param child       Child operator
- */
-case class Expand(
-    projections: Seq[Seq[Expression]],
-    output: Seq[Attribute],
-    child: SparkPlan)
-  extends UnaryNode with CodegenSupport {
+  * Apply the all of the GroupExpressions to every input row, hence we will get
+  * multiple output rows for a input row.
+  * @param projections The group of expressions, all of the group expressions should
+  *                    output the same schema specified bye the parameter `output`
+  * @param output      The output Schema
+  * @param child       Child operator
+  */
+case class Expand(projections: Seq[Seq[Expression]],
+                  output: Seq[Attribute],
+                  child: SparkPlan)
+    extends UnaryNode with CodegenSupport {
 
   private[sql] override lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext, "number of output rows"))
+      "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
+                                                     "number of output rows"))
 
   // The GroupExpressions can output data with arbitrary partitioning, so set it
   // as UNKNOWN partitioning
@@ -49,41 +49,43 @@ case class Expand(
   override def references: AttributeSet =
     AttributeSet(projections.flatten.flatMap(_.references))
 
-  private[this] val projection =
-    (exprs: Seq[Expression]) => UnsafeProjection.create(exprs, child.output)
+  private[this] val projection = (exprs: Seq[Expression]) =>
+    UnsafeProjection.create(exprs, child.output)
 
-  protected override def doExecute(): RDD[InternalRow] = attachTree(this, "execute") {
-    val numOutputRows = longMetric("numOutputRows")
+  protected override def doExecute(): RDD[InternalRow] =
+    attachTree(this, "execute") {
+      val numOutputRows = longMetric("numOutputRows")
 
-    child.execute().mapPartitions { iter =>
-      val groups = projections.map(projection).toArray
-      new Iterator[InternalRow] {
-        private[this] var result: InternalRow = _
-        private[this] var idx = -1  // -1 means the initial state
-        private[this] var input: InternalRow = _
+      child.execute().mapPartitions { iter =>
+        val groups = projections.map(projection).toArray
+        new Iterator[InternalRow] {
+          private[this] var result: InternalRow = _
+          private[this] var idx = -1 // -1 means the initial state
+          private[this] var input: InternalRow = _
 
-        override final def hasNext: Boolean = (-1 < idx && idx < groups.length) || iter.hasNext
+          override final def hasNext: Boolean =
+            (-1 < idx && idx < groups.length) || iter.hasNext
 
-        override final def next(): InternalRow = {
-          if (idx <= 0) {
-            // in the initial (-1) or beginning(0) of a new input row, fetch the next input tuple
-            input = iter.next()
-            idx = 0
+          override final def next(): InternalRow = {
+            if (idx <= 0) {
+              // in the initial (-1) or beginning(0) of a new input row, fetch the next input tuple
+              input = iter.next()
+              idx = 0
+            }
+
+            result = groups(idx)(input)
+            idx += 1
+
+            if (idx == groups.length && iter.hasNext) {
+              idx = 0
+            }
+
+            numOutputRows += 1
+            result
           }
-
-          result = groups(idx)(input)
-          idx += 1
-
-          if (idx == groups.length && iter.hasNext) {
-            idx = 0
-          }
-
-          numOutputRows += 1
-          result
         }
       }
     }
-  }
 
   override def upstreams(): Seq[RDD[InternalRow]] = {
     child.asInstanceOf[CodegenSupport].upstreams()
@@ -93,7 +95,8 @@ case class Expand(
     child.asInstanceOf[CodegenSupport].produce(ctx, this)
   }
 
-  override def doConsume(ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(
+      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
     /*
      * When the projections list looks like:
      *   expr1A, exprB, expr1C
@@ -155,28 +158,30 @@ case class Expand(
         val value = ctx.freshName("value")
         val code = s"""
           |boolean $isNull = true;
-          |${ctx.javaType(firstExpr.dataType)} $value = ${ctx.defaultValue(firstExpr.dataType)};
+          |${ctx.javaType(firstExpr.dataType)} $value = ${ctx.defaultValue(
+                          firstExpr.dataType)};
          """.stripMargin
         ExprCode(code, isNull, value)
       }
     }
 
     // Part 2: switch/case statements
-    val cases = projections.zipWithIndex.map { case (exprs, row) =>
-      var updateCode = ""
-      for (col <- exprs.indices) {
-        if (!sameOutput(col)) {
-          val ev = BindReferences.bindReference(exprs(col), child.output).gen(ctx)
-          updateCode +=
-            s"""
+    val cases = projections.zipWithIndex.map {
+      case (exprs, row) =>
+        var updateCode = ""
+        for (col <- exprs.indices) {
+          if (!sameOutput(col)) {
+            val ev =
+              BindReferences.bindReference(exprs(col), child.output).gen(ctx)
+            updateCode += s"""
                |${ev.code}
                |${outputColumns(col).isNull} = ${ev.isNull};
                |${outputColumns(col).value} = ${ev.value};
             """.stripMargin
+          }
         }
-      }
 
-      s"""
+        s"""
          |case $row:
          |  ${updateCode.trim}
          |  break;

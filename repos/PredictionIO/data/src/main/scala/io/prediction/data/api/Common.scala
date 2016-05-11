@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.api
 
 import io.prediction.data.webhooks.ConnectorException
@@ -41,16 +40,17 @@ object Common {
       complete(StatusCodes.BadRequest, Map("message" -> msg))
     case MissingQueryParamRejection(msg) :: _ =>
       complete(StatusCodes.NotFound,
-        Map("message" -> s"missing required query parameter ${msg}."))
+               Map("message" -> s"missing required query parameter ${msg}."))
     case AuthenticationFailedRejection(cause, challengeHeaders) :: _ => {
-      val msg = cause match {
-        case AuthenticationFailedRejection.CredentialsRejected =>
-          "Invalid accessKey."
-        case AuthenticationFailedRejection.CredentialsMissing =>
-          "Missing accessKey."
+        val msg = cause match {
+          case AuthenticationFailedRejection.CredentialsRejected =>
+            "Invalid accessKey."
+          case AuthenticationFailedRejection.CredentialsMissing =>
+            "Missing accessKey."
+        }
+        complete(
+            StatusCodes.Unauthorized, challengeHeaders, Map("message" -> msg))
       }
-      complete(StatusCodes.Unauthorized, challengeHeaders, Map("message" -> msg))
-    }
     case ChannelRejection(msg) :: _ =>
       complete(StatusCodes.Unauthorized, Map("message" -> msg))
     case NonExistentAppRejection(msg) :: _ =>
@@ -59,17 +59,17 @@ object Common {
 
   val exceptionHandler = ExceptionHandler {
     case e: ConnectorException => {
-      val msg = s"${e.getMessage()}"
-      complete(StatusCodes.BadRequest, Map("message" -> msg))
-    }
+        val msg = s"${e.getMessage()}"
+        complete(StatusCodes.BadRequest, Map("message" -> msg))
+      }
     case e: StorageException => {
-      val msg = s"${e.getMessage()}"
-      complete(StatusCodes.InternalServerError, Map("message" -> msg))
-    }
+        val msg = s"${e.getMessage()}"
+        complete(StatusCodes.InternalServerError, Map("message" -> msg))
+      }
     case e: Exception => {
-      val msg = s"${e.getMessage()}"
-      complete(StatusCodes.InternalServerError, Map("message" -> msg))
-    }
+        val msg = s"${e.getMessage()}"
+        complete(StatusCodes.InternalServerError, Map("message" -> msg))
+      }
   }
 }
 

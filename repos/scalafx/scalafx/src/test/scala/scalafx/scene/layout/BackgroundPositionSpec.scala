@@ -36,14 +36,16 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * BackgroundPosition Spec tests.
- */
+  * BackgroundPosition Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class BackgroundPositionSpec
-  extends SimpleSFXDelegateSpec[jfxsl.BackgroundPosition, BackgroundPosition](
-    classOf[jfxsl.BackgroundPosition], classOf[BackgroundPosition]) {
+    extends SimpleSFXDelegateSpec[
+        jfxsl.BackgroundPosition, BackgroundPosition](
+        classOf[jfxsl.BackgroundPosition], classOf[BackgroundPosition]) {
 
-  override protected def getScalaClassInstance = new BackgroundPosition(getJavaClassInstance) {}
+  override protected def getScalaClassInstance =
+    new BackgroundPosition(getJavaClassInstance) {}
 
   override protected def getJavaClassInstance = BackgroundPosition.Center
 }

@@ -1,9 +1,4 @@
-
-
-
 import scala.collection._
-
-
 
 object Test {
 
@@ -32,5 +27,4 @@ object Test {
     assert(tree.size == 7)
     assert(projection.size == 3)
   }
-
 }

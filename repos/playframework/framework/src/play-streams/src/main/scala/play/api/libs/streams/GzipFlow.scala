@@ -6,24 +6,25 @@ package play.api.libs.streams
 import java.util.zip.GZIPOutputStream
 
 import akka.stream.scaladsl.Flow
-import akka.stream.stage.{ Context, PushPullStage }
+import akka.stream.stage.{Context, PushPullStage}
 import akka.util.ByteString
 
 /**
- * A simple Gzip Flow
- *
- * GZIPs each chunk separately using the JDK7 syncFlush feature.
- */
+  * A simple Gzip Flow
+  *
+  * GZIPs each chunk separately using the JDK7 syncFlush feature.
+  */
 object GzipFlow {
 
   /**
-   * Create a Gzip Flow with the given buffer size.
-   */
+    * Create a Gzip Flow with the given buffer size.
+    */
   def gzip(bufferSize: Int = 512): Flow[ByteString, ByteString, _] = {
     Flow[ByteString].transform(() => new GzipStage(bufferSize))
   }
 
-  private class GzipStage(bufferSize: Int) extends PushPullStage[ByteString, ByteString] {
+  private class GzipStage(bufferSize: Int)
+      extends PushPullStage[ByteString, ByteString] {
 
     val builder = ByteString.newBuilder
     // Uses syncFlush mode
@@ -61,5 +62,4 @@ object GzipFlow {
       builder.clear()
     }
   }
-
 }

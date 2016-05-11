@@ -6,7 +6,7 @@ package a {
   }
   import b.BBB
 
-  class C extends /*caret*/BBB
+  class C extends /*caret*/ BBB
 }
 /*
 package a {
@@ -19,4 +19,4 @@ package a {
 
   class C extends /*caret*/NameAfterRename
 }
-*/
+ */

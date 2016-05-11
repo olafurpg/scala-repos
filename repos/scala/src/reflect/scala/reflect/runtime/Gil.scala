@@ -1,8 +1,7 @@
 package scala.reflect
 package runtime
 
-private[reflect] trait Gil {
-  self: SymbolTable =>
+private[reflect] trait Gil { self: SymbolTable =>
 
   // fixme... please...
   // there are the following avenues of optimization we discussed with Roland:

@@ -15,19 +15,25 @@ class FlagsTest {
 
   def sym = NoSymbol.newTermSymbol(nme.EMPTY)
 
-  def withFlagMask[A](mask: Long)(body: => A): A = enteringPhase(new Phase(NoPhase) {
-    override def flagMask = mask
-    def name = ""
-    def run() = ()
-  })(body)
+  def withFlagMask[A](mask: Long)(body: => A): A =
+    enteringPhase(
+        new Phase(NoPhase) {
+      override def flagMask = mask
+      def name = ""
+      def run() = ()
+    })(body)
 
   def testTimedFlag(flag: Long, test: Symbol => Boolean, enabling: Boolean) = {
-    assertEquals(withFlagMask(InitialFlags)(test(sym.setFlag(flag))), !enabling)
-    assertEquals(withFlagMask(InitialFlags | flag)(test(sym.setFlag(flag))), enabling)
+    assertEquals(
+        withFlagMask(InitialFlags)(test(sym.setFlag(flag))), !enabling)
+    assertEquals(
+        withFlagMask(InitialFlags | flag)(test(sym.setFlag(flag))), enabling)
   }
 
-  def testLate(flag: Long, test: Symbol => Boolean) = testTimedFlag(flag, test, enabling = true)
-  def testNot(flag: Long, test: Symbol => Boolean) = testTimedFlag(flag, test, enabling = false)
+  def testLate(flag: Long, test: Symbol => Boolean) =
+    testTimedFlag(flag, test, enabling = true)
+  def testNot(flag: Long, test: Symbol => Boolean) =
+    testTimedFlag(flag, test, enabling = false)
 
   @Test
   def testTimedFlags(): Unit = {
@@ -39,10 +45,15 @@ class FlagsTest {
     testNot(OVERRIDE | notOVERRIDE, _.isOverride)
     testNot(PRIVATE | notPRIVATE, _.isPrivate)
 
-    assertFalse(withFlagMask(AllFlags)(sym.setFlag(PRIVATE | notPRIVATE).isPrivate))
+    assertFalse(
+        withFlagMask(AllFlags)(sym.setFlag(PRIVATE | notPRIVATE).isPrivate))
 
-    assertEquals(withFlagMask(InitialFlags)(sym.setFlag(PRIVATE | notPRIVATE).flags & PRIVATE), PRIVATE)
-    assertEquals(withFlagMask(AllFlags)(sym.setFlag(PRIVATE | notPRIVATE).flags & PRIVATE), 0)
+    assertEquals(withFlagMask(InitialFlags)(
+                     sym.setFlag(PRIVATE | notPRIVATE).flags & PRIVATE),
+                 PRIVATE)
+    assertEquals(withFlagMask(AllFlags)(
+                     sym.setFlag(PRIVATE | notPRIVATE).flags & PRIVATE),
+                 0)
   }
 
   @Test
@@ -53,11 +64,15 @@ class FlagsTest {
 
     for (i <- 0 to 3) {
       val f = 1L << i
-      assertEquals(withFlagMask(AllFlags)(sym.setFlag(f << LateShift).flags & f), 0) // not treated as late flag
+      assertEquals(
+          withFlagMask(AllFlags)(sym.setFlag(f << LateShift).flags & f),
+          0) // not treated as late flag
     }
     for (i <- 4 to 8) {
       val f = 1L << i
-      assertEquals(withFlagMask(AllFlags)(sym.setFlag(f << LateShift).flags & f), f) // treated as late flag
+      assertEquals(
+          withFlagMask(AllFlags)(sym.setFlag(f << LateShift).flags & f),
+          f) // treated as late flag
     }
   }
 
@@ -65,25 +80,32 @@ class FlagsTest {
   def normalAnti(): Unit = {
     for (i <- 0 to 2) {
       val f = 1L << i
-      assertEquals(withFlagMask(AllFlags)(sym.setFlag(f | (f << AntiShift)).flags & f), 0) // negated flags
+      assertEquals(
+          withFlagMask(AllFlags)(sym.setFlag(f | (f << AntiShift)).flags & f),
+          0) // negated flags
     }
     for (i <- 3 to 7) {
       val f = 1L << i
-      assertEquals(withFlagMask(AllFlags)(sym.setFlag(f | (f << AntiShift)).flags & f), f) // not negated
+      assertEquals(
+          withFlagMask(AllFlags)(sym.setFlag(f | (f << AntiShift)).flags & f),
+          f) // not negated
     }
   }
 
   @Test
   def lateAntiCrossCheck(): Unit = {
     val allButNegatable = AllFlags & ~(PROTECTED | OVERRIDE | PRIVATE)
-    val lateable        = 0L | DEFERRED | FINAL | INTERFACE | METHOD | MODULE
-    val lateFlags       = lateable << LateShift
-    val allButLateable  = AllFlags & ~lateable
+    val lateable = 0L | DEFERRED | FINAL | INTERFACE | METHOD | MODULE
+    val lateFlags = lateable << LateShift
+    val allButLateable = AllFlags & ~lateable
 
-    assertEquals(withFlagMask(AllFlags)(sym.setFlag(AllFlags).flags), allButNegatable)
-    assertEquals(withFlagMask(AllFlags)(sym.setFlag(allButLateable).flags), allButNegatable)
+    assertEquals(
+        withFlagMask(AllFlags)(sym.setFlag(AllFlags).flags), allButNegatable)
+    assertEquals(withFlagMask(AllFlags)(sym.setFlag(allButLateable).flags),
+                 allButNegatable)
 
-    assertEquals(withFlagMask(AllFlags)(sym.setFlag(lateFlags).flags), lateFlags | lateable)
+    assertEquals(withFlagMask(AllFlags)(sym.setFlag(lateFlags).flags),
+                 lateFlags | lateable)
   }
 
   @Test

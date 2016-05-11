@@ -9,7 +9,7 @@ import scala.reflect.internal.util.SourceFile
 /** Deterministically interrupts typechecking of `code` when a definition named
   * `MagicInterruptionMarker` is typechecked, and then performs a targeted
   * typecheck of the tree at the special comment marker marker
-  */  
+  */
 abstract class IdempotencyTest { self =>
   private val settings = new Settings
   settings.usejavacp.value = true
@@ -21,11 +21,11 @@ abstract class IdempotencyTest { self =>
   }
 
   object compiler extends Global(settings, compilerReporter) {
-    override def checkForMoreWork(pos: Position) {
-    }
+    override def checkForMoreWork(pos: Position) {}
     override def signalDone(context: Context, old: Tree, result: Tree) {
       // println("signalDone: " + old.toString.take(50).replaceAll("\n", "\\n"))
-      if (!interrupted && analyzer.lockedCount == 0 && interruptsEnabled && shouldInterrupt(result)) {
+      if (!interrupted && analyzer.lockedCount == 0 && interruptsEnabled &&
+          shouldInterrupt(result)) {
         interrupted = true
         val typed = typedTreeAt(markerPosition)
         checkTypedTree(typed)
@@ -45,10 +45,10 @@ abstract class IdempotencyTest { self =>
   // Extension points
   protected def code: String
   protected def shouldInterrupt(tree: Tree): Boolean = {
-    tree.symbol != null && tree.symbol.name.toString == "MagicInterruptionMarker"
+    tree.symbol != null &&
+    tree.symbol.name.toString == "MagicInterruptionMarker"
   }
   protected def checkTypedTree(tree: Tree): Unit = {}
-  
 
   private val source: SourceFile = newSourceFile(code)
   private def markerPosition: Position = source.position(code.indexOf("/*?*/"))

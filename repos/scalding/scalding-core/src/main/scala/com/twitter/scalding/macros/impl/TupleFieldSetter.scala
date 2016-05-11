@@ -20,8 +20,8 @@ import scala.reflect.macros.Context
 import scala.util.Try
 
 /**
- * Helper class for setting case class fields in cascading Tuple
- */
+  * Helper class for setting case class fields in cascading Tuple
+  */
 object TupleFieldSetter extends CaseClassFieldSetter {
 
   override def absent(c: Context)(idx: Int, container: c.TermName): c.Tree = {
@@ -34,19 +34,24 @@ object TupleFieldSetter extends CaseClassFieldSetter {
     q"""()"""
   }
 
-  override def default(c: Context)(idx: Int, container: c.TermName, fieldValue: c.Tree): c.Tree = {
+  override def default(c: Context)(
+      idx: Int, container: c.TermName, fieldValue: c.Tree): c.Tree = {
     import c.universe._
     q"""$container.set($idx, $fieldValue)"""
   }
 
-  override def from(c: Context)(fieldType: c.Type, idx: Int, container: c.TermName, fieldValue: c.Tree): Try[c.Tree] = Try {
+  override def from(c: Context)(fieldType: c.Type,
+                                idx: Int,
+                                container: c.TermName,
+                                fieldValue: c.Tree): Try[c.Tree] = Try {
     import c.universe._
 
     def simpleType(accessor: Tree) = q"""${accessor}(${idx}, $fieldValue)"""
 
     fieldType match {
       case tpe if tpe =:= typeOf[String] => simpleType(q"$container.setString")
-      case tpe if tpe =:= typeOf[Boolean] => simpleType(q"$container.setBoolean")
+      case tpe if tpe =:= typeOf[Boolean] =>
+        simpleType(q"$container.setBoolean")
       case tpe if tpe =:= typeOf[Short] => simpleType(q"$container.setShort")
       case tpe if tpe =:= typeOf[Int] => simpleType(q"$container.setInteger")
       case tpe if tpe =:= typeOf[Long] => simpleType(q"$container.setLong")

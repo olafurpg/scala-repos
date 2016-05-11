@@ -19,9 +19,8 @@ package com.twitter.summingbird
 import com.twitter.summingbird._
 
 /**
- * @author Ian O Connell
- */
-
+  * @author Ian O Connell
+  */
 trait ExecutionConfig[P <: Platform[P]] {
   // User supplied name for this job
   def name: String
@@ -34,4 +33,3 @@ trait ExecutionConfig[P <: Platform[P]] {
 
   def graph: TailProducer[P, Any]
 }
-

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,18 +38,19 @@ import scalafx.collections.ObservableArray.Change
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * ObservableIntegerArray Spec tests.
- */
+  * ObservableIntegerArray Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class ObservableIntegerArraySpec
-  extends SimpleSFXDelegateSpec[jfxc.ObservableIntegerArray, ObservableIntegerArray](
-    classOf[jfxc.ObservableIntegerArray], classOf[ObservableIntegerArray]
-  ) {
+    extends SimpleSFXDelegateSpec[
+        jfxc.ObservableIntegerArray, ObservableIntegerArray](
+        classOf[jfxc.ObservableIntegerArray],
+        classOf[ObservableIntegerArray]
+    ) {
 
   /**
-   * Test trait for instance testing.
-   */
-
+    * Test trait for instance testing.
+    */
   trait InstanceTests {
     val array0: Array[Int] = Array.empty
     val array1 = Array(4, 5, 6, 7)
@@ -71,7 +72,11 @@ class ObservableIntegerArraySpec
     instance1.onChange(onChangeBrief)
     instance2.onChange(onChangeFull(_, _))
     instance2.onChange(onChangeBrief)
-    def verifyChange(n: Int, array: ObservableIntegerArray, sizeChanged: Boolean, start: Int, end: Int) {
+    def verifyChange(n: Int,
+                     array: ObservableIntegerArray,
+                     sizeChanged: Boolean,
+                     start: Int,
+                     end: Int) {
       val (a, c) = change(n)
       assert(a eq array)
       assert(c.sizeChanged === sizeChanged)
@@ -81,15 +86,16 @@ class ObservableIntegerArraySpec
   }
 
   /**
-   * @inheritdoc
-   *
-   * Overridden to create empty JFX ObservableIntegerArray (inherited method fails).
-   */
-  override protected def getJavaClassInstance = jfxc.FXCollections.observableIntegerArray()
+    * @inheritdoc
+    *
+    * Overridden to create empty JFX ObservableIntegerArray (inherited method fails).
+    */
+  override protected def getJavaClassInstance =
+    jfxc.FXCollections.observableIntegerArray()
 
   /**
-   * Test that a function to access/change an array element with an invalid index yields an out of bounds exception.
-   */
+    * Test that a function to access/change an array element with an invalid index yields an out of bounds exception.
+    */
   def testOutOfBoundsExceptionThrown(f: => Unit) {
     intercept[ArrayIndexOutOfBoundsException] {
       f
@@ -97,8 +103,8 @@ class ObservableIntegerArraySpec
   }
 
   /**
-   * Test that a function results in an NegativeArraySizeException being thrown.
-   */
+    * Test that a function results in an NegativeArraySizeException being thrown.
+    */
   def testNegativeArraySizeExceptionThrown(f: => Unit) {
     intercept[NegativeArraySizeException] {
       f
@@ -106,16 +112,17 @@ class ObservableIntegerArraySpec
   }
 
   /**
-   * Test that a function results in an IllegalArgumentException being thrown.
-   */
+    * Test that a function results in an IllegalArgumentException being thrown.
+    */
   def testIllegalArgumentExceptionThrown(f: => Unit) {
     intercept[IllegalArgumentException] {
       f
     }
   }
+
   /**
-   * Common tests for an empty array.
-   */
+    * Common tests for an empty array.
+    */
   def testEmpty(oa: ObservableIntegerArray) {
     assert(oa.length === 0)
     assert(oa.size === 0)
@@ -126,8 +133,8 @@ class ObservableIntegerArraySpec
   }
 
   /**
-   * Common tests for a non-empty array with known contents.
-   */
+    * Common tests for a non-empty array with known contents.
+    */
   def testNonEmpty(oa: ObservableIntegerArray, expected: Array[Int]) {
     assert(oa.length === expected.length)
     assert(oa.size === expected.length)
@@ -140,8 +147,8 @@ class ObservableIntegerArraySpec
   }
 
   /**
-   * Class tests.
-   */
+    * Class tests.
+    */
   it should "allow construct an empty array by default" in {
     testEmpty(new ObservableIntegerArray())
   }
@@ -266,8 +273,8 @@ class ObservableIntegerArraySpec
   }
 
   /**
-   * Companion tests.
-   */
+    * Companion tests.
+    */
   it should "return an empty observable array from companion's empty()" in {
     testEmpty(ObservableIntegerArray.empty())
   }
@@ -321,7 +328,8 @@ class ObservableIntegerArraySpec
     testEmpty(ObservableIntegerArray.iterate(0, -1)(_ + 1))
     testEmpty(ObservableIntegerArray.iterate(0, 0)(_ + 1))
     testNonEmpty(ObservableIntegerArray.iterate(0, 1)(_ + 1), Array(0))
-    testNonEmpty(ObservableIntegerArray.iterate(0, 5)(_ + 1), Array(0, 1, 2, 3, 4))
+    testNonEmpty(
+        ObservableIntegerArray.iterate(0, 5)(_ + 1), Array(0, 1, 2, 3, 4))
   }
   it should "return valid initialized array from companion's range(start, end)" in {
     testIllegalArgumentExceptionThrown(ObservableIntegerArray.range(1, 2, 0))

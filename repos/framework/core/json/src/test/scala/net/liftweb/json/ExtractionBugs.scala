@@ -30,7 +30,8 @@ object ExtractionBugs extends Specification {
 
   case class PMap(m: Map[String, List[String]])
 
-  case class ManyConstructors(id: Long, name: String, lastName: String, email: String) {
+  case class ManyConstructors(
+      id: Long, name: String, lastName: String, email: String) {
     def this() = this(0, "John", "Doe", "")
     def this(name: String) = this(0, name, "Doe", "")
     def this(name: String, email: String) = this(0, name, "Doe", email)
@@ -56,44 +57,53 @@ object ExtractionBugs extends Specification {
   }
 
   "Extraction should always choose constructor with the most arguments if more than one constructor exists" in {
-    val args = Meta.Reflection.primaryConstructorArgs(classOf[ManyConstructors])
+    val args =
+      Meta.Reflection.primaryConstructorArgs(classOf[ManyConstructors])
     args.size mustEqual 4
   }
 
   "Extraction should handle AnyRef" in {
-    implicit val formats = DefaultFormats.withHints(FullTypeHints(classOf[ExtractWithAnyRef] :: Nil))
-    val json = JObject(JField("jsonClass", JString(classOf[ExtractWithAnyRef].getName)) :: Nil)
+    implicit val formats = DefaultFormats.withHints(
+        FullTypeHints(classOf[ExtractWithAnyRef] :: Nil))
+    val json = JObject(JField(
+            "jsonClass", JString(classOf[ExtractWithAnyRef].getName)) :: Nil)
     val extracted = Extraction.extract[AnyRef](json)
     extracted mustEqual ExtractWithAnyRef()
   }
 
   "Extraction should work with unicode encoded field names (issue 1075)" in {
-    parse("""{"foo.bar,baz":"x"}""").extract[UnicodeFieldNames] mustEqual UnicodeFieldNames("x")
+    parse("""{"foo.bar,baz":"x"}""").extract[UnicodeFieldNames] mustEqual UnicodeFieldNames(
+        "x")
   }
 
   "Extraction should not fail if case class has a companion object" in {
-    parse("""{"nums":[10]}""").extract[HasCompanion] mustEqual HasCompanion(List(10))
+    parse("""{"nums":[10]}""").extract[HasCompanion] mustEqual HasCompanion(
+        List(10))
   }
 
   "Issue 1169" in {
     val json = JsonParser.parse("""{"data":[{"one":1, "two":2}]}""")
-    json.extract[Response] mustEqual Response(List(Map("one" -> 1, "two" -> 2)))
+    json.extract[Response] mustEqual Response(
+        List(Map("one" -> 1, "two" -> 2)))
   }
 
   "Extraction should handle List[Option[String]]" in {
     val json = JsonParser.parse("""["one", "two", null]""")
-    json.extract[List[Option[String]]] mustEqual List(Some("one"), Some("two"), None)
+    json.extract[List[Option[String]]] mustEqual List(
+        Some("one"), Some("two"), None)
   }
 
   "Extraction should fail if you're attempting to extract an option and you're given data of the wrong type" in {
     val json = JsonParser.parse("""{"opt": "hi"}""")
     json.extract[OptionOfInt] must throwA[MappingException].like {
-      case e => e.getMessage mustEqual "No usable value for opt\nDo not know how to convert JString(hi) into int"
+      case e =>
+        e.getMessage mustEqual "No usable value for opt\nDo not know how to convert JString(hi) into int"
     }
 
     val json2 = JString("hi")
     json2.extract[Option[Int]] must throwA[MappingException].like {
-      case e => e.getMessage mustEqual "Do not know how to convert JString(hi) into int"
+      case e =>
+        e.getMessage mustEqual "Do not know how to convert JString(hi) into int"
     }
   }
 }

@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Framework    **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Framework    **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.jasminetest
 
@@ -18,20 +17,22 @@ import scala.scalajs.js.annotation.JSExport
 
 import org.scalajs.testinterface.TestUtils
 
-final class JasmineTask(private val runner: JasmineRunner,
-    _taskDef: TaskDef) extends Task {
+final class JasmineTask(private val runner: JasmineRunner, _taskDef: TaskDef)
+    extends Task {
 
   def tags(): Array[String] = Array()
 
-  def execute(eventHandler: EventHandler, loggers: Array[Logger]): Array[Task] =
+  def execute(
+      eventHandler: EventHandler, loggers: Array[Logger]): Array[Task] =
     throw new UnsupportedOperationException("Jasmine only supports JavaScript")
 
-  def execute(eventHandler: EventHandler, loggers: Array[Logger],
-      continuation: Array[Task] => Unit): Unit = {
+  def execute(eventHandler: EventHandler,
+              loggers: Array[Logger],
+              continuation: Array[Task] => Unit): Unit = {
     val doneCont = () => continuation(Array())
     val jasmine = global.jasmine
-    val reporter =
-      new JasmineTestReporter(taskDef, eventHandler, loggers, doneCont)
+    val reporter = new JasmineTestReporter(
+        taskDef, eventHandler, loggers, doneCont)
 
     try {
       // Reset JasmineEnv
@@ -48,12 +49,13 @@ final class JasmineTask(private val runner: JasmineRunner,
     } catch {
       case t: Throwable =>
         // Jasmine itself failed. Issue a failure
-        eventHandler.handle(new JasmineEvent(
-            taskDef   = taskDef,
-            status    = Status.Failure,
-            selector  = new SuiteSelector,
-            throwable = new OptionalThrowable(t)
-        ))
+        eventHandler.handle(
+            new JasmineEvent(
+                taskDef = taskDef,
+                status = Status.Failure,
+                selector = new SuiteSelector,
+                throwable = new OptionalThrowable(t)
+            ))
         for (log <- loggers) {
           log.error("Problem executing code in tests: " + t.toString)
           log.trace(t)
@@ -65,5 +67,4 @@ final class JasmineTask(private val runner: JasmineRunner,
   }
 
   def taskDef(): TaskDef = _taskDef
-
 }

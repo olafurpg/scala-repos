@@ -23,12 +23,10 @@ import org.apache.spark.sql.Column
 import org.apache.spark.sql.types.DataType
 
 /**
- * A user-defined Python function. This is used by the Python API.
- */
+  * A user-defined Python function. This is used by the Python API.
+  */
 case class UserDefinedPythonFunction(
-    name: String,
-    func: PythonFunction,
-    dataType: DataType) {
+    name: String, func: PythonFunction, dataType: DataType) {
 
   def builder(e: Seq[Expression]): PythonUDF = {
     PythonUDF(name, func, dataType, e)

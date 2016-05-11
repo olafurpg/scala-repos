@@ -23,7 +23,7 @@ class Person(val id: Int) {
   def initDetails(data: Map[Int, (String, Int)]) {
     val details = data(id)
     _name = details._1
-    _age  = details._2
+    _age = details._2
   }
   override def toString =
     "Person(" + name + ", " + age + ")"
@@ -41,10 +41,12 @@ class CombinatorPickleIntoTest extends FunSuite {
           // then we can make use of a size hint, so that a fixed-size array can be used for pickling
           builder.hintKnownSize(100) // FIXME: if the value is too small, we can get java.lang.ArrayIndexOutOfBoundsException
           builder.beginEntry(p, implicitly[FastTypeTag[Person]])
-          builder.putField("id", b => {
-            b.hintElidedType(FastTypeTag.Int)
-            intp.pickle(p.id, b)
-          })
+          builder.putField("id",
+                           b =>
+                             {
+                               b.hintElidedType(FastTypeTag.Int)
+                               intp.pickle(p.id, b)
+                           })
           builder.endEntry()
         }
       }
@@ -65,8 +67,10 @@ class CombinatorPickleIntoTest extends FunSuite {
 
     val bart = new Person(2)
     val pickle = bart.pickle
-    val expected0 = "[0,0,0,43,115,99,97,108,97,46,112,105,99,107,108,105,110,103,46,99,111,109,98,105,110,97,116,111,114,46,112,105,99,107,108,101,105,110,116,111,46,80,101,114,115,111,110,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]"
-    val expected = "[0,0,0,43,115,99,97,108,97,46,112,105,99,107,108,105,110,103,46,99,111,109,98,105,110,97,116,111,114,46,112,105,99,107,108,101,105,110,116,111,46,80,101,114,115,111,110,0,0,0,2]"
+    val expected0 =
+      "[0,0,0,43,115,99,97,108,97,46,112,105,99,107,108,105,110,103,46,99,111,109,98,105,110,97,116,111,114,46,112,105,99,107,108,101,105,110,116,111,46,80,101,114,115,111,110,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]"
+    val expected =
+      "[0,0,0,43,115,99,97,108,97,46,112,105,99,107,108,105,110,103,46,99,111,109,98,105,110,97,116,111,114,46,112,105,99,107,108,101,105,110,116,111,46,80,101,114,115,111,110,0,0,0,2]"
     assert(pickle.value.mkString("[", ",", "]") === expected0)
 
     val p = pickle.unpickle[Person]

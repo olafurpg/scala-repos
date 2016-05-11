@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.jsinterop
 
@@ -74,7 +74,7 @@ class UndefOrTest {
   }
 
   @Test def flatMap(): Unit = {
-    def f(x: Int): js.UndefOr[Int] = if (x > 0) x+3 else js.undefined
+    def f(x: Int): js.UndefOr[Int] = if (x > 0) x + 3 else js.undefined
     assertEquals(9, some(6).flatMap(f))
     assertJSUndefined(some(-6).flatMap(f))
     assertJSUndefined(none[Int].flatMap(f))
@@ -127,10 +127,12 @@ class UndefOrTest {
     assertEquals("ok", some("hello") collect {
       case "hello" => "ok"
     })
-    assertTrue(js.isUndefined(some("hello") collect {
+    assertTrue(
+        js.isUndefined(some("hello") collect {
       case "notthis" => "ko"
     }))
-    assertTrue(js.isUndefined(none[String] collect {
+    assertTrue(
+        js.isUndefined(none[String] collect {
       case "hello" => "ko"
     }))
   }
@@ -184,5 +186,4 @@ class UndefOrTest {
     assertJSUndefined((None: Option[String]).orUndefined)
     assertJSUndefined(None.orUndefined)
   }
-
 }

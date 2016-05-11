@@ -12,17 +12,19 @@ import com.intellij.psi.{PsiElement, PsiFile}
 import org.jetbrains.plugins.scala.extensions._
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class NotImplementedCodeInspection extends AbstractInspection {
   def actionFor(holder: ProblemsHolder) = {
     case reference @ ReferenceTarget(Member("???", "scala.Predef")) =>
-      holder.registerProblem(reference, "Not implemented",
-        ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new ImplementQuickFix(reference))
+      holder.registerProblem(reference,
+                             "Not implemented",
+                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                             new ImplementQuickFix(reference))
   }
 
-  private class ImplementQuickFix(e: PsiElement) extends AbstractFixOnPsiElement("Implement", e) {
+  private class ImplementQuickFix(e: PsiElement)
+      extends AbstractFixOnPsiElement("Implement", e) {
     def doApplyFix(project: Project) {
       val elem = getElement
       val builder = new TemplateBuilderImpl(elem)
@@ -36,10 +38,12 @@ class NotImplementedCodeInspection extends AbstractInspection {
     }
   }
 
-  private def positionCursor(project: Project, targetFile: PsiFile, element: PsiElement): Editor = {
+  private def positionCursor(
+      project: Project, targetFile: PsiFile, element: PsiElement): Editor = {
     val range = element.getTextRange
     val textOffset = range.getStartOffset
-    val descriptor = new OpenFileDescriptor(project, targetFile.getVirtualFile, textOffset)
+    val descriptor = new OpenFileDescriptor(
+        project, targetFile.getVirtualFile, textOffset)
     FileEditorManager.getInstance(project).openTextEditor(descriptor, true)
   }
 }

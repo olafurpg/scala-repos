@@ -5,12 +5,12 @@ import com.twitter.finagle.util.AsyncLatch
 import com.twitter.util.{Future, Promise, Time}
 
 /**
- * A [[com.twitter.finagle.Service]] that delays closure until all outstanding
- * requests have been completed.
- */
-private[finagle] class RefcountedService[Req, Rep](underlying: Service[Req, Rep])
-  extends ServiceProxy[Req, Rep](underlying)
-{
+  * A [[com.twitter.finagle.Service]] that delays closure until all outstanding
+  * requests have been completed.
+  */
+private[finagle] class RefcountedService[Req, Rep](
+    underlying: Service[Req, Rep])
+    extends ServiceProxy[Req, Rep](underlying) {
   protected[this] val replyLatch = new AsyncLatch
 
   override def apply(request: Req) = {

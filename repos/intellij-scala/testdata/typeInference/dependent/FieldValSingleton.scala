@@ -17,7 +17,8 @@ trait Evals {
 
   def eval[T]: T = {
     val imported: ru.Tree = null
-    /*start*/evalToolBox.eval(imported)/*end*/
+    /*start*/
+    evalToolBox.eval(imported) /*end*/
     null.asInstanceOf[T]
   }
 }

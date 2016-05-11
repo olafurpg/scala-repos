@@ -10,17 +10,16 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.Annotation
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.02.2008
+  */
 /*
  * PatVarDef ::= {Annotation} {Modifier} 'val' PatDef |
  *               {Annotation} {Modifier} 'var' VarDef
  */
 
 object PatVarDef {
-  def parse(builder: ScalaPsiBuilder):Boolean = {
+  def parse(builder: ScalaPsiBuilder): Boolean = {
     val patVarMarker = builder.mark
     val annotationsMarker = builder.mark
     while (Annotation.parse(builder)) {}
@@ -35,8 +34,7 @@ object PatVarDef {
         if (PatDef parse builder) {
           patVarMarker.done(ScalaElementTypes.PATTERN_DEFINITION)
           return true
-        }
-        else {
+        } else {
           patVarMarker.rollbackTo
           return false
         }
@@ -45,8 +43,7 @@ object PatVarDef {
         if (VarDef parse builder) {
           patVarMarker.done(ScalaElementTypes.VARIABLE_DEFINITION)
           return true
-        }
-        else {
+        } else {
           patVarMarker.rollbackTo
           return false
         }

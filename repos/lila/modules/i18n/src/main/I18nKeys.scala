@@ -24,7 +24,8 @@ final class I18nKeys(translator: Translator) {
 
   val `playWithAFriend` = new Key("playWithAFriend")
   val `playWithTheMachine` = new Key("playWithTheMachine")
-  val `toInviteSomeoneToPlayGiveThisUrl` = new Key("toInviteSomeoneToPlayGiveThisUrl")
+  val `toInviteSomeoneToPlayGiveThisUrl` = new Key(
+      "toInviteSomeoneToPlayGiveThisUrl")
   val `gameOver` = new Key("gameOver")
   val `waitingForOpponent` = new Key("waitingForOpponent")
   val `waiting` = new Key("waiting")
@@ -48,16 +49,19 @@ final class I18nKeys(translator: Translator) {
   val `raceFinished` = new Key("raceFinished")
   val `variantEnding` = new Key("variantEnding")
   val `newOpponent` = new Key("newOpponent")
-  val `yourOpponentWantsToPlayANewGameWithYou` = new Key("yourOpponentWantsToPlayANewGameWithYou")
+  val `yourOpponentWantsToPlayANewGameWithYou` = new Key(
+      "yourOpponentWantsToPlayANewGameWithYou")
   val `joinTheGame` = new Key("joinTheGame")
   val `whitePlays` = new Key("whitePlays")
   val `blackPlays` = new Key("blackPlays")
-  val `theOtherPlayerHasLeftTheGameYouCanForceResignationOrWaitForHim` = new Key("theOtherPlayerHasLeftTheGameYouCanForceResignationOrWaitForHim")
+  val `theOtherPlayerHasLeftTheGameYouCanForceResignationOrWaitForHim` =
+    new Key("theOtherPlayerHasLeftTheGameYouCanForceResignationOrWaitForHim")
   val `makeYourOpponentResign` = new Key("makeYourOpponentResign")
   val `forceResignation` = new Key("forceResignation")
   val `forceDraw` = new Key("forceDraw")
   val `talkInChat` = new Key("talkInChat")
-  val `theFirstPersonToComeOnThisUrlWillPlayWithYou` = new Key("theFirstPersonToComeOnThisUrlWillPlayWithYou")
+  val `theFirstPersonToComeOnThisUrlWillPlayWithYou` = new Key(
+      "theFirstPersonToComeOnThisUrlWillPlayWithYou")
   val `whiteCreatesTheGame` = new Key("whiteCreatesTheGame")
   val `blackCreatesTheGame` = new Key("blackCreatesTheGame")
   val `whiteJoinsTheGame` = new Key("whiteJoinsTheGame")
@@ -66,7 +70,8 @@ final class I18nKeys(translator: Translator) {
   val `blackResigned` = new Key("blackResigned")
   val `whiteLeftTheGame` = new Key("whiteLeftTheGame")
   val `blackLeftTheGame` = new Key("blackLeftTheGame")
-  val `shareThisUrlToLetSpectatorsSeeTheGame` = new Key("shareThisUrlToLetSpectatorsSeeTheGame")
+  val `shareThisUrlToLetSpectatorsSeeTheGame` = new Key(
+      "shareThisUrlToLetSpectatorsSeeTheGame")
   val `theComputerAnalysisHasFailed` = new Key("theComputerAnalysisHasFailed")
   val `viewTheComputerAnalysis` = new Key("viewTheComputerAnalysis")
   val `requestAComputerAnalysis` = new Key("requestAComputerAnalysis")
@@ -176,9 +181,12 @@ final class I18nKeys(translator: Translator) {
   val `exportGames` = new Key("exportGames")
   val `ratingRange` = new Key("ratingRange")
   val `giveNbSeconds` = new Key("giveNbSeconds")
-  val `premoveEnabledClickAnywhereToCancel` = new Key("premoveEnabledClickAnywhereToCancel")
-  val `thisPlayerUsesChessComputerAssistance` = new Key("thisPlayerUsesChessComputerAssistance")
-  val `thisPlayerArtificiallyIncreasesTheirRating` = new Key("thisPlayerArtificiallyIncreasesTheirRating")
+  val `premoveEnabledClickAnywhereToCancel` = new Key(
+      "premoveEnabledClickAnywhereToCancel")
+  val `thisPlayerUsesChessComputerAssistance` = new Key(
+      "thisPlayerUsesChessComputerAssistance")
+  val `thisPlayerArtificiallyIncreasesTheirRating` = new Key(
+      "thisPlayerArtificiallyIncreasesTheirRating")
   val `opening` = new Key("opening")
   val `openingExplorer` = new Key("openingExplorer")
   val `takeback` = new Key("takeback")
@@ -187,7 +195,8 @@ final class I18nKeys(translator: Translator) {
   val `takebackPropositionDeclined` = new Key("takebackPropositionDeclined")
   val `takebackPropositionAccepted` = new Key("takebackPropositionAccepted")
   val `takebackPropositionCanceled` = new Key("takebackPropositionCanceled")
-  val `yourOpponentProposesATakeback` = new Key("yourOpponentProposesATakeback")
+  val `yourOpponentProposesATakeback` = new Key(
+      "yourOpponentProposesATakeback")
   val `bookmarkThisGame` = new Key("bookmarkThisGame")
   val `search` = new Key("search")
   val `advancedSearch` = new Key("advancedSearch")
@@ -197,7 +206,9 @@ final class I18nKeys(translator: Translator) {
   val `viewTournament` = new Key("viewTournament")
   val `backToTournament` = new Key("backToTournament")
   val `backToGame` = new Key("backToGame")
-  val `freeOnlineChessGamePlayChessNowInACleanInterfaceNoRegistrationNoAdsNoPluginRequiredPlayChessWithComputerFriendsOrRandomOpponents` = new Key("freeOnlineChessGamePlayChessNowInACleanInterfaceNoRegistrationNoAdsNoPluginRequiredPlayChessWithComputerFriendsOrRandomOpponents")
+  val `freeOnlineChessGamePlayChessNowInACleanInterfaceNoRegistrationNoAdsNoPluginRequiredPlayChessWithComputerFriendsOrRandomOpponents` =
+    new Key(
+        "freeOnlineChessGamePlayChessNowInACleanInterfaceNoRegistrationNoAdsNoPluginRequiredPlayChessWithComputerFriendsOrRandomOpponents")
   val `teams` = new Key("teams")
   val `nbMembers` = new Key("nbMembers")
   val `allTeams` = new Key("allTeams")
@@ -207,7 +218,8 @@ final class I18nKeys(translator: Translator) {
   val `joinTeam` = new Key("joinTeam")
   val `quitTeam` = new Key("quitTeam")
   val `anyoneCanJoin` = new Key("anyoneCanJoin")
-  val `aConfirmationIsRequiredToJoin` = new Key("aConfirmationIsRequiredToJoin")
+  val `aConfirmationIsRequiredToJoin` = new Key(
+      "aConfirmationIsRequiredToJoin")
   val `joiningPolicy` = new Key("joiningPolicy")
   val `teamLeader` = new Key("teamLeader")
   val `teamBestPlayers` = new Key("teamBestPlayers")
@@ -228,7 +240,8 @@ final class I18nKeys(translator: Translator) {
   val `importGame` = new Key("importGame")
   val `nbImportedGames` = new Key("nbImportedGames")
   val `thisIsAChessCaptcha` = new Key("thisIsAChessCaptcha")
-  val `clickOnTheBoardToMakeYourMove` = new Key("clickOnTheBoardToMakeYourMove")
+  val `clickOnTheBoardToMakeYourMove` = new Key(
+      "clickOnTheBoardToMakeYourMove")
   val `notACheckmate` = new Key("notACheckmate")
   val `colorPlaysCheckmateInOne` = new Key("colorPlaysCheckmateInOne")
   val `retry` = new Key("retry")
@@ -292,7 +305,8 @@ final class I18nKeys(translator: Translator) {
   val `onlinePlayers` = new Key("onlinePlayers")
   val `activeToday` = new Key("activeToday")
   val `activePlayers` = new Key("activePlayers")
-  val `bewareTheGameIsRatedButHasNoClock` = new Key("bewareTheGameIsRatedButHasNoClock")
+  val `bewareTheGameIsRatedButHasNoClock` = new Key(
+      "bewareTheGameIsRatedButHasNoClock")
   val `training` = new Key("training")
   val `yourPuzzleRatingX` = new Key("yourPuzzleRatingX")
   val `findTheBestMoveForWhite` = new Key("findTheBestMoveForWhite")
@@ -323,14 +337,17 @@ final class I18nKeys(translator: Translator) {
   val `retryThisPuzzle` = new Key("retryThisPuzzle")
   val `thisPuzzleIsCorrect` = new Key("thisPuzzleIsCorrect")
   val `thisPuzzleIsWrong` = new Key("thisPuzzleIsWrong")
-  val `youHaveNbSecondsToMakeYourFirstMove` = new Key("youHaveNbSecondsToMakeYourFirstMove")
+  val `youHaveNbSecondsToMakeYourFirstMove` = new Key(
+      "youHaveNbSecondsToMakeYourFirstMove")
   val `nbGamesInPlay` = new Key("nbGamesInPlay")
-  val `automaticallyProceedToNextGameAfterMoving` = new Key("automaticallyProceedToNextGameAfterMoving")
+  val `automaticallyProceedToNextGameAfterMoving` = new Key(
+      "automaticallyProceedToNextGameAfterMoving")
   val `autoSwitch` = new Key("autoSwitch")
   val `openingId` = new Key("openingId")
   val `yourOpeningRatingX` = new Key("yourOpeningRatingX")
   val `findNbStrongMoves` = new Key("findNbStrongMoves")
-  val `thisMoveGivesYourOpponentTheAdvantage` = new Key("thisMoveGivesYourOpponentTheAdvantage")
+  val `thisMoveGivesYourOpponentTheAdvantage` = new Key(
+      "thisMoveGivesYourOpponentTheAdvantage")
   val `openingFailed` = new Key("openingFailed")
   val `openingSolved` = new Key("openingSolved")
   val `recentlyPlayedOpenings` = new Key("recentlyPlayedOpenings")
@@ -391,19 +408,24 @@ final class I18nKeys(translator: Translator) {
   val `chessClock` = new Key("chessClock")
   val `tenthsOfSeconds` = new Key("tenthsOfSeconds")
   val `never` = new Key("never")
-  val `whenTimeRemainingLessThanTenSeconds` = new Key("whenTimeRemainingLessThanTenSeconds")
+  val `whenTimeRemainingLessThanTenSeconds` = new Key(
+      "whenTimeRemainingLessThanTenSeconds")
   val `horizontalGreenProgressBars` = new Key("horizontalGreenProgressBars")
   val `soundWhenTimeGetsCritical` = new Key("soundWhenTimeGetsCritical")
   val `gameBehavior` = new Key("gameBehavior")
-  val `premovesPlayingDuringOpponentTurn` = new Key("premovesPlayingDuringOpponentTurn")
-  val `takebacksWithOpponentApproval` = new Key("takebacksWithOpponentApproval")
+  val `premovesPlayingDuringOpponentTurn` = new Key(
+      "premovesPlayingDuringOpponentTurn")
+  val `takebacksWithOpponentApproval` = new Key(
+      "takebacksWithOpponentApproval")
   val `promoteToQueenAutomatically` = new Key("promoteToQueenAutomatically")
-  val `claimDrawOnThreefoldRepetitionAutomatically` = new Key("claimDrawOnThreefoldRepetitionAutomatically")
+  val `claimDrawOnThreefoldRepetitionAutomatically` = new Key(
+      "claimDrawOnThreefoldRepetitionAutomatically")
   val `privacy` = new Key("privacy")
   val `letOtherPlayersFollowYou` = new Key("letOtherPlayersFollowYou")
   val `letOtherPlayersChallengeYou` = new Key("letOtherPlayersChallengeYou")
   val `sound` = new Key("sound")
-  val `soundControlInTheTopBarOfEveryPage` = new Key("soundControlInTheTopBarOfEveryPage")
+  val `soundControlInTheTopBarOfEveryPage` = new Key(
+      "soundControlInTheTopBarOfEveryPage")
   val `yourPreferencesHaveBeenSaved` = new Key("yourPreferencesHaveBeenSaved")
   val `none` = new Key("none")
   val `fast` = new Key("fast")
@@ -415,7 +437,8 @@ final class I18nKeys(translator: Translator) {
   val `always` = new Key("always")
   val `inCasualGamesOnly` = new Key("inCasualGamesOnly")
   val `whenPremoving` = new Key("whenPremoving")
-  val `whenTimeRemainingLessThanThirtySeconds` = new Key("whenTimeRemainingLessThanThirtySeconds")
+  val `whenTimeRemainingLessThanThirtySeconds` = new Key(
+      "whenTimeRemainingLessThanThirtySeconds")
   val `difficultyEasy` = new Key("difficultyEasy")
   val `difficultyNormal` = new Key("difficultyNormal")
   val `difficultyHard` = new Key("difficultyHard")
@@ -427,7 +450,8 @@ final class I18nKeys(translator: Translator) {
   val `timeline` = new Key("timeline")
   val `seeAllTournaments` = new Key("seeAllTournaments")
   val `starting` = new Key("starting")
-  val `allInformationIsPublicAndOptional` = new Key("allInformationIsPublicAndOptional")
+  val `allInformationIsPublicAndOptional` = new Key(
+      "allInformationIsPublicAndOptional")
   val `yourCityRegionOrDepartment` = new Key("yourCityRegionOrDepartment")
   val `biographyDescription` = new Key("biographyDescription")
   val `maximumNbCharacters` = new Key("maximumNbCharacters")
@@ -512,21 +536,530 @@ final class I18nKeys(translator: Translator) {
   val `keyGoToStartOrEnd` = new Key("keyGoToStartOrEnd")
   val `keyShowOrHideComments` = new Key("keyShowOrHideComments")
   val `keyEnterOrExitVariation` = new Key("keyEnterOrExitVariation")
-  val `keyYouCanDrawArrowsCirclesAndScrollToMove` = new Key("keyYouCanDrawArrowsCirclesAndScrollToMove")
+  val `keyYouCanDrawArrowsCirclesAndScrollToMove` = new Key(
+      "keyYouCanDrawArrowsCirclesAndScrollToMove")
   val `newTournament` = new Key("newTournament")
   val `tournamentHomeTitle` = new Key("tournamentHomeTitle")
   val `tournamentHomeDescription` = new Key("tournamentHomeDescription")
   val `tournamentNotFound` = new Key("tournamentNotFound")
   val `tournamentDoesNotExist` = new Key("tournamentDoesNotExist")
-  val `tournamentMayHaveBeenCanceled` = new Key("tournamentMayHaveBeenCanceled")
+  val `tournamentMayHaveBeenCanceled` = new Key(
+      "tournamentMayHaveBeenCanceled")
   val `returnToTournamentsHomepage` = new Key("returnToTournamentsHomepage")
-  val `weeklyPerfTypeRatingDistribution` = new Key("weeklyPerfTypeRatingDistribution")
+  val `weeklyPerfTypeRatingDistribution` = new Key(
+      "weeklyPerfTypeRatingDistribution")
   val `nbPerfTypePlayersThisWeek` = new Key("nbPerfTypePlayersThisWeek")
   val `yourPerfTypeRatingisRating` = new Key("yourPerfTypeRatingisRating")
-  val `youAreBetterThanPercentOfPerfTypePlayers` = new Key("youAreBetterThanPercentOfPerfTypePlayers")
-  val `youDoNotHaveAnEstablishedPerfTypeRating` = new Key("youDoNotHaveAnEstablishedPerfTypeRating")
+  val `youAreBetterThanPercentOfPerfTypePlayers` = new Key(
+      "youAreBetterThanPercentOfPerfTypePlayers")
+  val `youDoNotHaveAnEstablishedPerfTypeRating` = new Key(
+      "youDoNotHaveAnEstablishedPerfTypeRating")
 
-  def keys = List(`playWithAFriend`, `playWithTheMachine`, `toInviteSomeoneToPlayGiveThisUrl`, `gameOver`, `waitingForOpponent`, `waiting`, `yourTurn`, `aiNameLevelAiLevel`, `level`, `toggleTheChat`, `toggleSound`, `chat`, `resign`, `checkmate`, `stalemate`, `white`, `black`, `randomColor`, `createAGame`, `whiteIsVictorious`, `blackIsVictorious`, `kingInTheCenter`, `threeChecks`, `raceFinished`, `variantEnding`, `newOpponent`, `yourOpponentWantsToPlayANewGameWithYou`, `joinTheGame`, `whitePlays`, `blackPlays`, `theOtherPlayerHasLeftTheGameYouCanForceResignationOrWaitForHim`, `makeYourOpponentResign`, `forceResignation`, `forceDraw`, `talkInChat`, `theFirstPersonToComeOnThisUrlWillPlayWithYou`, `whiteCreatesTheGame`, `blackCreatesTheGame`, `whiteJoinsTheGame`, `blackJoinsTheGame`, `whiteResigned`, `blackResigned`, `whiteLeftTheGame`, `blackLeftTheGame`, `shareThisUrlToLetSpectatorsSeeTheGame`, `theComputerAnalysisHasFailed`, `viewTheComputerAnalysis`, `requestAComputerAnalysis`, `computerAnalysis`, `analysis`, `blunders`, `mistakes`, `inaccuracies`, `moveTimes`, `flipBoard`, `threefoldRepetition`, `claimADraw`, `offerDraw`, `draw`, `nbConnectedPlayers`, `gamesBeingPlayedRightNow`, `viewAllNbGames`, `viewNbCheckmates`, `nbBookmarks`, `nbPopularGames`, `nbAnalysedGames`, `bookmarkedByNbPlayers`, `viewInFullSize`, `logOut`, `signIn`, `newToLichess`, `youNeedAnAccountToDoThat`, `signUp`, `computersAreNotAllowedToPlay`, `games`, `forum`, `xPostedInForumY`, `latestForumPosts`, `players`, `minutesPerSide`, `variant`, `variants`, `timeControl`, `realTime`, `correspondence`, `daysPerTurn`, `oneDay`, `nbDays`, `nbHours`, `time`, `rating`, `ratingStats`, `username`, `usernameOrEmail`, `password`, `haveAnAccount`, `changePassword`, `changeEmail`, `email`, `emailIsOptional`, `passwordReset`, `forgotPassword`, `rank`, `gamesPlayed`, `nbGamesWithYou`, `declineInvitation`, `cancel`, `timeOut`, `drawOfferSent`, `drawOfferDeclined`, `drawOfferAccepted`, `drawOfferCanceled`, `whiteOffersDraw`, `blackOffersDraw`, `whiteDeclinesDraw`, `blackDeclinesDraw`, `yourOpponentOffersADraw`, `accept`, `decline`, `playingRightNow`, `finished`, `abortGame`, `gameAborted`, `standard`, `unlimited`, `mode`, `casual`, `rated`, `thisGameIsRated`, `rematch`, `rematchOfferSent`, `rematchOfferAccepted`, `rematchOfferCanceled`, `rematchOfferDeclined`, `cancelRematchOffer`, `viewRematch`, `play`, `inbox`, `chatRoom`, `spectatorRoom`, `composeMessage`, `noNewMessages`, `subject`, `recipient`, `send`, `incrementInSeconds`, `freeOnlineChess`, `spectators`, `nbWins`, `nbLosses`, `nbDraws`, `exportGames`, `ratingRange`, `giveNbSeconds`, `premoveEnabledClickAnywhereToCancel`, `thisPlayerUsesChessComputerAssistance`, `thisPlayerArtificiallyIncreasesTheirRating`, `opening`, `openingExplorer`, `takeback`, `proposeATakeback`, `takebackPropositionSent`, `takebackPropositionDeclined`, `takebackPropositionAccepted`, `takebackPropositionCanceled`, `yourOpponentProposesATakeback`, `bookmarkThisGame`, `search`, `advancedSearch`, `tournament`, `tournaments`, `tournamentPoints`, `viewTournament`, `backToTournament`, `backToGame`, `freeOnlineChessGamePlayChessNowInACleanInterfaceNoRegistrationNoAdsNoPluginRequiredPlayChessWithComputerFriendsOrRandomOpponents`, `teams`, `nbMembers`, `allTeams`, `newTeam`, `myTeams`, `noTeamFound`, `joinTeam`, `quitTeam`, `anyoneCanJoin`, `aConfirmationIsRequiredToJoin`, `joiningPolicy`, `teamLeader`, `teamBestPlayers`, `teamRecentMembers`, `xJoinedTeamY`, `xCreatedTeamY`, `averageElo`, `location`, `settings`, `filterGames`, `reset`, `apply`, `leaderboard`, `pasteTheFenStringHere`, `pasteThePgnStringHere`, `fromPosition`, `continueFromHere`, `importGame`, `nbImportedGames`, `thisIsAChessCaptcha`, `clickOnTheBoardToMakeYourMove`, `notACheckmate`, `colorPlaysCheckmateInOne`, `retry`, `reconnecting`, `onlineFriends`, `noFriendsOnline`, `findFriends`, `favoriteOpponents`, `follow`, `following`, `unfollow`, `block`, `blocked`, `unblock`, `followsYou`, `xStartedFollowingY`, `nbFollowers`, `nbFollowing`, `more`, `memberSince`, `lastLogin`, `challengeToPlay`, `player`, `list`, `graph`, `lessThanNbMinutes`, `xToYMinutes`, `textIsTooShort`, `textIsTooLong`, `required`, `openTournaments`, `duration`, `winner`, `standing`, `createANewTournament`, `join`, `withdraw`, `points`, `wins`, `losses`, `winStreak`, `createdBy`, `tournamentIsStarting`, `membersOnly`, `boardEditor`, `startPosition`, `clearBoard`, `savePosition`, `loadPosition`, `isPrivate`, `reportXToModerators`, `profile`, `editProfile`, `firstName`, `lastName`, `biography`, `country`, `preferences`, `watchLichessTV`, `previouslyOnLichessTV`, `onlinePlayers`, `activeToday`, `activePlayers`, `bewareTheGameIsRatedButHasNoClock`, `training`, `yourPuzzleRatingX`, `findTheBestMoveForWhite`, `findTheBestMoveForBlack`, `toTrackYourProgress`, `trainingSignupExplanation`, `recentlyPlayedPuzzles`, `puzzleId`, `puzzleOfTheDay`, `clickToSolve`, `goodMove`, `butYouCanDoBetter`, `bestMove`, `keepGoing`, `puzzleFailed`, `butYouCanKeepTrying`, `victory`, `giveUp`, `puzzleSolvedInXSeconds`, `wasThisPuzzleAnyGood`, `pleaseVotePuzzle`, `thankYou`, `ratingX`, `playedXTimes`, `fromGameLink`, `startTraining`, `continueTraining`, `retryThisPuzzle`, `thisPuzzleIsCorrect`, `thisPuzzleIsWrong`, `youHaveNbSecondsToMakeYourFirstMove`, `nbGamesInPlay`, `automaticallyProceedToNextGameAfterMoving`, `autoSwitch`, `openingId`, `yourOpeningRatingX`, `findNbStrongMoves`, `thisMoveGivesYourOpponentTheAdvantage`, `openingFailed`, `openingSolved`, `recentlyPlayedOpenings`, `puzzles`, `coordinates`, `openings`, `latestUpdates`, `tournamentWinners`, `name`, `description`, `no`, `yes`, `help`, `createANewTopic`, `topics`, `posts`, `lastPost`, `views`, `replies`, `replyToThisTopic`, `reply`, `message`, `createTheTopic`, `reportAUser`, `user`, `reason`, `whatIsIheMatter`, `cheat`, `insult`, `troll`, `other`, `reportDescriptionHelp`, `by`, `thisTopicIsNowClosed`, `theming`, `donate`, `blog`, `questionsAndAnswers`, `notes`, `typePrivateNotesHere`, `gameDisplay`, `pieceAnimation`, `materialDifference`, `closeAccount`, `closeYourAccount`, `changedMindDoNotCloseAccount`, `closeAccountExplanation`, `thisAccountIsClosed`, `invalidUsernameOrPassword`, `emailMeALink`, `currentPassword`, `newPassword`, `newPasswordAgain`, `boardHighlights`, `pieceDestinations`, `boardCoordinates`, `moveListWhilePlaying`, `chessClock`, `tenthsOfSeconds`, `never`, `whenTimeRemainingLessThanTenSeconds`, `horizontalGreenProgressBars`, `soundWhenTimeGetsCritical`, `gameBehavior`, `premovesPlayingDuringOpponentTurn`, `takebacksWithOpponentApproval`, `promoteToQueenAutomatically`, `claimDrawOnThreefoldRepetitionAutomatically`, `privacy`, `letOtherPlayersFollowYou`, `letOtherPlayersChallengeYou`, `sound`, `soundControlInTheTopBarOfEveryPage`, `yourPreferencesHaveBeenSaved`, `none`, `fast`, `normal`, `slow`, `insideTheBoard`, `outsideTheBoard`, `onSlowGames`, `always`, `inCasualGamesOnly`, `whenPremoving`, `whenTimeRemainingLessThanThirtySeconds`, `difficultyEasy`, `difficultyNormal`, `difficultyHard`, `xLeftANoteOnY`, `xCompetesInY`, `xAskedY`, `xAnsweredY`, `xCommentedY`, `timeline`, `seeAllTournaments`, `starting`, `allInformationIsPublicAndOptional`, `yourCityRegionOrDepartment`, `biographyDescription`, `maximumNbCharacters`, `blocks`, `listBlockedPlayers`, `human`, `computer`, `side`, `clock`, `unauthorizedError`, `noInternetConnection`, `connectedToLichess`, `signedOut`, `loginSuccessful`, `playOnTheBoardOffline`, `playOfflineComputer`, `opponent`, `learn`, `community`, `tools`, `increment`, `board`, `pieces`, `sharePGN`, `playOnline`, `playOffline`, `allowAnalytics`, `shareGameURL`, `error.required`, `error.email`, `error.email_acceptable`, `error.email_unique`, `blindfoldChess`, `moveConfirmation`, `inCorrespondenceGames`, `ifRatingIsPlusMinusX`, `onlyFriends`, `menu`, `castling`, `whiteCastlingKingside`, `whiteCastlingQueenside`, `blackCastlingKingside`, `blackCastlingQueenside`, `nbForumPosts`, `tpTimeSpentPlaying`, `watchGames`, `tpTimeSpentOnTV`, `watch`, `internationalEvents`, `videoLibrary`, `mobileApp`, `webmasters`, `contribute`, `contact`, `termsOfService`, `sourceCode`, `simultaneousExhibitions`, `host`, `createdSimuls`, `hostANewSimul`, `noSimulFound`, `noSimulExplanation`, `returnToSimulHomepage`, `aboutSimul`, `aboutSimulImage`, `aboutSimulRealLife`, `aboutSimulRules`, `aboutSimulSettings`, `create`, `whenCreateSimul`, `simulVariantsHint`, `simulClockHint`, `simulAddExtraTime`, `simulHostExtraTime`, `lichessTournaments`, `tournamentFAQ`, `tournamentOfficial`, `timeBeforeTournamentStarts`, `averageCentipawnLoss`, `keyboardShortcuts`, `keyMoveBackwardOrForward`, `keyGoToStartOrEnd`, `keyShowOrHideComments`, `keyEnterOrExitVariation`, `keyYouCanDrawArrowsCirclesAndScrollToMove`, `newTournament`, `tournamentHomeTitle`, `tournamentHomeDescription`, `tournamentNotFound`, `tournamentDoesNotExist`, `tournamentMayHaveBeenCanceled`, `returnToTournamentsHomepage`, `weeklyPerfTypeRatingDistribution`, `nbPerfTypePlayersThisWeek`, `yourPerfTypeRatingisRating`, `youAreBetterThanPercentOfPerfTypePlayers`, `youDoNotHaveAnEstablishedPerfTypeRating`)
+  def keys =
+    List(
+        `playWithAFriend`,
+        `playWithTheMachine`,
+        `toInviteSomeoneToPlayGiveThisUrl`,
+        `gameOver`,
+        `waitingForOpponent`,
+        `waiting`,
+        `yourTurn`,
+        `aiNameLevelAiLevel`,
+        `level`,
+        `toggleTheChat`,
+        `toggleSound`,
+        `chat`,
+        `resign`,
+        `checkmate`,
+        `stalemate`,
+        `white`,
+        `black`,
+        `randomColor`,
+        `createAGame`,
+        `whiteIsVictorious`,
+        `blackIsVictorious`,
+        `kingInTheCenter`,
+        `threeChecks`,
+        `raceFinished`,
+        `variantEnding`,
+        `newOpponent`,
+        `yourOpponentWantsToPlayANewGameWithYou`,
+        `joinTheGame`,
+        `whitePlays`,
+        `blackPlays`,
+        `theOtherPlayerHasLeftTheGameYouCanForceResignationOrWaitForHim`,
+        `makeYourOpponentResign`,
+        `forceResignation`,
+        `forceDraw`,
+        `talkInChat`,
+        `theFirstPersonToComeOnThisUrlWillPlayWithYou`,
+        `whiteCreatesTheGame`,
+        `blackCreatesTheGame`,
+        `whiteJoinsTheGame`,
+        `blackJoinsTheGame`,
+        `whiteResigned`,
+        `blackResigned`,
+        `whiteLeftTheGame`,
+        `blackLeftTheGame`,
+        `shareThisUrlToLetSpectatorsSeeTheGame`,
+        `theComputerAnalysisHasFailed`,
+        `viewTheComputerAnalysis`,
+        `requestAComputerAnalysis`,
+        `computerAnalysis`,
+        `analysis`,
+        `blunders`,
+        `mistakes`,
+        `inaccuracies`,
+        `moveTimes`,
+        `flipBoard`,
+        `threefoldRepetition`,
+        `claimADraw`,
+        `offerDraw`,
+        `draw`,
+        `nbConnectedPlayers`,
+        `gamesBeingPlayedRightNow`,
+        `viewAllNbGames`,
+        `viewNbCheckmates`,
+        `nbBookmarks`,
+        `nbPopularGames`,
+        `nbAnalysedGames`,
+        `bookmarkedByNbPlayers`,
+        `viewInFullSize`,
+        `logOut`,
+        `signIn`,
+        `newToLichess`,
+        `youNeedAnAccountToDoThat`,
+        `signUp`,
+        `computersAreNotAllowedToPlay`,
+        `games`,
+        `forum`,
+        `xPostedInForumY`,
+        `latestForumPosts`,
+        `players`,
+        `minutesPerSide`,
+        `variant`,
+        `variants`,
+        `timeControl`,
+        `realTime`,
+        `correspondence`,
+        `daysPerTurn`,
+        `oneDay`,
+        `nbDays`,
+        `nbHours`,
+        `time`,
+        `rating`,
+        `ratingStats`,
+        `username`,
+        `usernameOrEmail`,
+        `password`,
+        `haveAnAccount`,
+        `changePassword`,
+        `changeEmail`,
+        `email`,
+        `emailIsOptional`,
+        `passwordReset`,
+        `forgotPassword`,
+        `rank`,
+        `gamesPlayed`,
+        `nbGamesWithYou`,
+        `declineInvitation`,
+        `cancel`,
+        `timeOut`,
+        `drawOfferSent`,
+        `drawOfferDeclined`,
+        `drawOfferAccepted`,
+        `drawOfferCanceled`,
+        `whiteOffersDraw`,
+        `blackOffersDraw`,
+        `whiteDeclinesDraw`,
+        `blackDeclinesDraw`,
+        `yourOpponentOffersADraw`,
+        `accept`,
+        `decline`,
+        `playingRightNow`,
+        `finished`,
+        `abortGame`,
+        `gameAborted`,
+        `standard`,
+        `unlimited`,
+        `mode`,
+        `casual`,
+        `rated`,
+        `thisGameIsRated`,
+        `rematch`,
+        `rematchOfferSent`,
+        `rematchOfferAccepted`,
+        `rematchOfferCanceled`,
+        `rematchOfferDeclined`,
+        `cancelRematchOffer`,
+        `viewRematch`,
+        `play`,
+        `inbox`,
+        `chatRoom`,
+        `spectatorRoom`,
+        `composeMessage`,
+        `noNewMessages`,
+        `subject`,
+        `recipient`,
+        `send`,
+        `incrementInSeconds`,
+        `freeOnlineChess`,
+        `spectators`,
+        `nbWins`,
+        `nbLosses`,
+        `nbDraws`,
+        `exportGames`,
+        `ratingRange`,
+        `giveNbSeconds`,
+        `premoveEnabledClickAnywhereToCancel`,
+        `thisPlayerUsesChessComputerAssistance`,
+        `thisPlayerArtificiallyIncreasesTheirRating`,
+        `opening`,
+        `openingExplorer`,
+        `takeback`,
+        `proposeATakeback`,
+        `takebackPropositionSent`,
+        `takebackPropositionDeclined`,
+        `takebackPropositionAccepted`,
+        `takebackPropositionCanceled`,
+        `yourOpponentProposesATakeback`,
+        `bookmarkThisGame`,
+        `search`,
+        `advancedSearch`,
+        `tournament`,
+        `tournaments`,
+        `tournamentPoints`,
+        `viewTournament`,
+        `backToTournament`,
+        `backToGame`,
+        `freeOnlineChessGamePlayChessNowInACleanInterfaceNoRegistrationNoAdsNoPluginRequiredPlayChessWithComputerFriendsOrRandomOpponents`,
+        `teams`,
+        `nbMembers`,
+        `allTeams`,
+        `newTeam`,
+        `myTeams`,
+        `noTeamFound`,
+        `joinTeam`,
+        `quitTeam`,
+        `anyoneCanJoin`,
+        `aConfirmationIsRequiredToJoin`,
+        `joiningPolicy`,
+        `teamLeader`,
+        `teamBestPlayers`,
+        `teamRecentMembers`,
+        `xJoinedTeamY`,
+        `xCreatedTeamY`,
+        `averageElo`,
+        `location`,
+        `settings`,
+        `filterGames`,
+        `reset`,
+        `apply`,
+        `leaderboard`,
+        `pasteTheFenStringHere`,
+        `pasteThePgnStringHere`,
+        `fromPosition`,
+        `continueFromHere`,
+        `importGame`,
+        `nbImportedGames`,
+        `thisIsAChessCaptcha`,
+        `clickOnTheBoardToMakeYourMove`,
+        `notACheckmate`,
+        `colorPlaysCheckmateInOne`,
+        `retry`,
+        `reconnecting`,
+        `onlineFriends`,
+        `noFriendsOnline`,
+        `findFriends`,
+        `favoriteOpponents`,
+        `follow`,
+        `following`,
+        `unfollow`,
+        `block`,
+        `blocked`,
+        `unblock`,
+        `followsYou`,
+        `xStartedFollowingY`,
+        `nbFollowers`,
+        `nbFollowing`,
+        `more`,
+        `memberSince`,
+        `lastLogin`,
+        `challengeToPlay`,
+        `player`,
+        `list`,
+        `graph`,
+        `lessThanNbMinutes`,
+        `xToYMinutes`,
+        `textIsTooShort`,
+        `textIsTooLong`,
+        `required`,
+        `openTournaments`,
+        `duration`,
+        `winner`,
+        `standing`,
+        `createANewTournament`,
+        `join`,
+        `withdraw`,
+        `points`,
+        `wins`,
+        `losses`,
+        `winStreak`,
+        `createdBy`,
+        `tournamentIsStarting`,
+        `membersOnly`,
+        `boardEditor`,
+        `startPosition`,
+        `clearBoard`,
+        `savePosition`,
+        `loadPosition`,
+        `isPrivate`,
+        `reportXToModerators`,
+        `profile`,
+        `editProfile`,
+        `firstName`,
+        `lastName`,
+        `biography`,
+        `country`,
+        `preferences`,
+        `watchLichessTV`,
+        `previouslyOnLichessTV`,
+        `onlinePlayers`,
+        `activeToday`,
+        `activePlayers`,
+        `bewareTheGameIsRatedButHasNoClock`,
+        `training`,
+        `yourPuzzleRatingX`,
+        `findTheBestMoveForWhite`,
+        `findTheBestMoveForBlack`,
+        `toTrackYourProgress`,
+        `trainingSignupExplanation`,
+        `recentlyPlayedPuzzles`,
+        `puzzleId`,
+        `puzzleOfTheDay`,
+        `clickToSolve`,
+        `goodMove`,
+        `butYouCanDoBetter`,
+        `bestMove`,
+        `keepGoing`,
+        `puzzleFailed`,
+        `butYouCanKeepTrying`,
+        `victory`,
+        `giveUp`,
+        `puzzleSolvedInXSeconds`,
+        `wasThisPuzzleAnyGood`,
+        `pleaseVotePuzzle`,
+        `thankYou`,
+        `ratingX`,
+        `playedXTimes`,
+        `fromGameLink`,
+        `startTraining`,
+        `continueTraining`,
+        `retryThisPuzzle`,
+        `thisPuzzleIsCorrect`,
+        `thisPuzzleIsWrong`,
+        `youHaveNbSecondsToMakeYourFirstMove`,
+        `nbGamesInPlay`,
+        `automaticallyProceedToNextGameAfterMoving`,
+        `autoSwitch`,
+        `openingId`,
+        `yourOpeningRatingX`,
+        `findNbStrongMoves`,
+        `thisMoveGivesYourOpponentTheAdvantage`,
+        `openingFailed`,
+        `openingSolved`,
+        `recentlyPlayedOpenings`,
+        `puzzles`,
+        `coordinates`,
+        `openings`,
+        `latestUpdates`,
+        `tournamentWinners`,
+        `name`,
+        `description`,
+        `no`,
+        `yes`,
+        `help`,
+        `createANewTopic`,
+        `topics`,
+        `posts`,
+        `lastPost`,
+        `views`,
+        `replies`,
+        `replyToThisTopic`,
+        `reply`,
+        `message`,
+        `createTheTopic`,
+        `reportAUser`,
+        `user`,
+        `reason`,
+        `whatIsIheMatter`,
+        `cheat`,
+        `insult`,
+        `troll`,
+        `other`,
+        `reportDescriptionHelp`,
+        `by`,
+        `thisTopicIsNowClosed`,
+        `theming`,
+        `donate`,
+        `blog`,
+        `questionsAndAnswers`,
+        `notes`,
+        `typePrivateNotesHere`,
+        `gameDisplay`,
+        `pieceAnimation`,
+        `materialDifference`,
+        `closeAccount`,
+        `closeYourAccount`,
+        `changedMindDoNotCloseAccount`,
+        `closeAccountExplanation`,
+        `thisAccountIsClosed`,
+        `invalidUsernameOrPassword`,
+        `emailMeALink`,
+        `currentPassword`,
+        `newPassword`,
+        `newPasswordAgain`,
+        `boardHighlights`,
+        `pieceDestinations`,
+        `boardCoordinates`,
+        `moveListWhilePlaying`,
+        `chessClock`,
+        `tenthsOfSeconds`,
+        `never`,
+        `whenTimeRemainingLessThanTenSeconds`,
+        `horizontalGreenProgressBars`,
+        `soundWhenTimeGetsCritical`,
+        `gameBehavior`,
+        `premovesPlayingDuringOpponentTurn`,
+        `takebacksWithOpponentApproval`,
+        `promoteToQueenAutomatically`,
+        `claimDrawOnThreefoldRepetitionAutomatically`,
+        `privacy`,
+        `letOtherPlayersFollowYou`,
+        `letOtherPlayersChallengeYou`,
+        `sound`,
+        `soundControlInTheTopBarOfEveryPage`,
+        `yourPreferencesHaveBeenSaved`,
+        `none`,
+        `fast`,
+        `normal`,
+        `slow`,
+        `insideTheBoard`,
+        `outsideTheBoard`,
+        `onSlowGames`,
+        `always`,
+        `inCasualGamesOnly`,
+        `whenPremoving`,
+        `whenTimeRemainingLessThanThirtySeconds`,
+        `difficultyEasy`,
+        `difficultyNormal`,
+        `difficultyHard`,
+        `xLeftANoteOnY`,
+        `xCompetesInY`,
+        `xAskedY`,
+        `xAnsweredY`,
+        `xCommentedY`,
+        `timeline`,
+        `seeAllTournaments`,
+        `starting`,
+        `allInformationIsPublicAndOptional`,
+        `yourCityRegionOrDepartment`,
+        `biographyDescription`,
+        `maximumNbCharacters`,
+        `blocks`,
+        `listBlockedPlayers`,
+        `human`,
+        `computer`,
+        `side`,
+        `clock`,
+        `unauthorizedError`,
+        `noInternetConnection`,
+        `connectedToLichess`,
+        `signedOut`,
+        `loginSuccessful`,
+        `playOnTheBoardOffline`,
+        `playOfflineComputer`,
+        `opponent`,
+        `learn`,
+        `community`,
+        `tools`,
+        `increment`,
+        `board`,
+        `pieces`,
+        `sharePGN`,
+        `playOnline`,
+        `playOffline`,
+        `allowAnalytics`,
+        `shareGameURL`,
+        `error.required`,
+        `error.email`,
+        `error.email_acceptable`,
+        `error.email_unique`,
+        `blindfoldChess`,
+        `moveConfirmation`,
+        `inCorrespondenceGames`,
+        `ifRatingIsPlusMinusX`,
+        `onlyFriends`,
+        `menu`,
+        `castling`,
+        `whiteCastlingKingside`,
+        `whiteCastlingQueenside`,
+        `blackCastlingKingside`,
+        `blackCastlingQueenside`,
+        `nbForumPosts`,
+        `tpTimeSpentPlaying`,
+        `watchGames`,
+        `tpTimeSpentOnTV`,
+        `watch`,
+        `internationalEvents`,
+        `videoLibrary`,
+        `mobileApp`,
+        `webmasters`,
+        `contribute`,
+        `contact`,
+        `termsOfService`,
+        `sourceCode`,
+        `simultaneousExhibitions`,
+        `host`,
+        `createdSimuls`,
+        `hostANewSimul`,
+        `noSimulFound`,
+        `noSimulExplanation`,
+        `returnToSimulHomepage`,
+        `aboutSimul`,
+        `aboutSimulImage`,
+        `aboutSimulRealLife`,
+        `aboutSimulRules`,
+        `aboutSimulSettings`,
+        `create`,
+        `whenCreateSimul`,
+        `simulVariantsHint`,
+        `simulClockHint`,
+        `simulAddExtraTime`,
+        `simulHostExtraTime`,
+        `lichessTournaments`,
+        `tournamentFAQ`,
+        `tournamentOfficial`,
+        `timeBeforeTournamentStarts`,
+        `averageCentipawnLoss`,
+        `keyboardShortcuts`,
+        `keyMoveBackwardOrForward`,
+        `keyGoToStartOrEnd`,
+        `keyShowOrHideComments`,
+        `keyEnterOrExitVariation`,
+        `keyYouCanDrawArrowsCirclesAndScrollToMove`,
+        `newTournament`,
+        `tournamentHomeTitle`,
+        `tournamentHomeDescription`,
+        `tournamentNotFound`,
+        `tournamentDoesNotExist`,
+        `tournamentMayHaveBeenCanceled`,
+        `returnToTournamentsHomepage`,
+        `weeklyPerfTypeRatingDistribution`,
+        `nbPerfTypePlayersThisWeek`,
+        `yourPerfTypeRatingisRating`,
+        `youAreBetterThanPercentOfPerfTypePlayers`,
+        `youDoNotHaveAnEstablishedPerfTypeRating`)
 
   lazy val count = keys.size
 }

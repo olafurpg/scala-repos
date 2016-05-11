@@ -10,10 +10,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObj
   * User: Alefas
   * Date: 27.03.12
   */
-
 class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
   def withRelativeImports(body: => Unit): Unit = {
-    val settings: ScalaCodeStyleSettings = ScalaCodeStyleSettings.getInstance(getProjectAdapter)
+    val settings: ScalaCodeStyleSettings =
+      ScalaCodeStyleSettings.getInstance(getProjectAdapter)
     val oldValue = settings.isAddFullQualifiedImports
     settings.setAddFullQualifiedImports(false)
     try {
@@ -24,8 +24,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
   }
 
   def testClassNameRenamed() {
-    val fileText =
-      """
+    val fileText = """
         |import java.util.{ArrayList => BLLLL}
         |object Test extends App {
         |  val al: java.util.List[Int] = new BL<caret>
@@ -34,21 +33,20 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.BASIC)
 
-    val resultText =
-      """
+    val resultText = """
         |import java.util.{ArrayList => BLLLL}
         |object Test extends App {
         |  val al: java.util.List[Int] = new BLLLL[Int](<caret>)
         |}
       """.stripMargin.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "BLLLL").get, '\t')
+    completeLookupItem(
+        activeLookup.find(le => le.getLookupString == "BLLLL").get, '\t')
     checkResultByText(resultText)
   }
 
   def testExpressionSameName() {
-    val fileText =
-      """
+    val fileText = """
         |import collection.immutable.HashSet
         |
         |object Sandbox extends App {
@@ -59,8 +57,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.BASIC)
 
-    val resultText =
-      """
+    val resultText = """
         |import collection.immutable.HashSet
         |import scala.collection.mutable
         |
@@ -73,7 +70,9 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(activeLookup.find {
       case le: ScalaLookupItem =>
         le.element match {
-          case c: ScObject if c.qualifiedName == "scala.collection.mutable.HashSet" => true
+          case c: ScObject
+              if c.qualifiedName == "scala.collection.mutable.HashSet" =>
+            true
           case _ => false
         }
       case _ => false
@@ -82,8 +81,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
   }
 
   def testClassSameName() {
-    val fileText =
-      """
+    val fileText = """
         |import collection.immutable.HashSet
         |
         |object Sandbox extends App {
@@ -94,8 +92,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.BASIC)
 
-    val resultText =
-      """
+    val resultText = """
         |import collection.immutable.HashSet
         |import scala.collection.mutable
         |
@@ -108,7 +105,9 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(activeLookup.find {
       case le: ScalaLookupItem =>
         le.element match {
-          case c: ScClass if c.qualifiedName == "scala.collection.mutable.HashSet" => true
+          case c: ScClass
+              if c.qualifiedName == "scala.collection.mutable.HashSet" =>
+            true
           case _ => false
         }
       case _ => false
@@ -121,8 +120,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     val oldValue = settings.getImportsWithPrefix
     settings.setImportsWithPrefix(Array.empty)
     try {
-      val fileText =
-        """
+      val fileText = """
           |import collection.mutable.{Builder, Queue}
           |import scala.collection.immutable.HashMap
           |import collection.mutable.ArrayBuffer
@@ -147,14 +145,15 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(activeLookup.find {
         case le: ScalaLookupItem =>
           le.element match {
-            case c: ScClass if c.qualifiedName == "scala.collection.mutable.ListMap" => true
+            case c: ScClass
+                if c.qualifiedName == "scala.collection.mutable.ListMap" =>
+              true
             case _ => false
           }
         case _ => false
       }.get, '\t')
       checkResultByText(resultText)
-    }
-    catch {
+    } catch {
       case t: Exception => settings.setImportsWithPrefix(oldValue)
     }
   }
@@ -173,8 +172,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.BASIC)
 
-    val resultText =
-      """
+    val resultText = """
         |import scala.collection.immutable.{HashMap => _, _}
         |import scala.collection.mutable._
         |
@@ -187,7 +185,9 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(activeLookup.find {
       case le: ScalaLookupItem =>
         le.element match {
-          case c: ScClass if c.qualifiedName == "scala.collection.immutable.ListSet" => true
+          case c: ScClass
+              if c.qualifiedName == "scala.collection.immutable.ListSet" =>
+            true
           case _ => false
         }
       case _ => false
@@ -196,8 +196,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
   }
 
   def testImplicitClass() {
-    val fileText =
-      """
+    val fileText = """
         |package a
         |
         |object A {
@@ -215,8 +214,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.BASIC)
 
-    val resultText =
-      """
+    val resultText = """
         |package a
         |
         |import a.A.B
@@ -240,8 +238,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
 
   def testSCL4087() {
     withRelativeImports {
-      val fileText =
-        """
+      val fileText = """
           |package a.b {
           |
           |  class XXXX
@@ -257,8 +254,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
       configureFromFileTextAdapter("dummy.scala", fileText)
       val (activeLookup, _) = complete(2, CompletionType.BASIC)
 
-      val resultText =
-        """
+      val resultText = """
           |package a.b {
           |
           |  class XXXX
@@ -273,15 +269,15 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           |}
         """.stripMargin.replaceAll("\r", "").trim()
 
-      completeLookupItem(activeLookup.find(_.getLookupString == "XXXX").get, '\t')
+      completeLookupItem(
+          activeLookup.find(_.getLookupString == "XXXX").get, '\t')
       checkResultByText(resultText)
     }
   }
 
   def testSCL4087_2() {
     withRelativeImports {
-      val fileText =
-        """
+      val fileText = """
           |package a.b.z {
           |
           |  class XXXX
@@ -297,8 +293,7 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
       configureFromFileTextAdapter("dummy.scala", fileText)
       val (activeLookup, _) = complete(2, CompletionType.BASIC)
 
-      val resultText =
-        """
+      val resultText = """
           |package a.b.z {
           |
           |  class XXXX
@@ -313,9 +308,9 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           |}
         """.stripMargin.replaceAll("\r", "").trim()
 
-      completeLookupItem(activeLookup.find(_.getLookupString == "XXXX").get, '\t')
+      completeLookupItem(
+          activeLookup.find(_.getLookupString == "XXXX").get, '\t')
       checkResultByText(resultText)
     }
   }
-
 }

@@ -34,32 +34,31 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.util.DockerUtils
 
 abstract class DatabaseOnDocker {
+
   /**
-   * The docker image to be pulled.
-   */
+    * The docker image to be pulled.
+    */
   val imageName: String
 
   /**
-   * Environment variables to set inside of the Docker container while launching it.
-   */
+    * Environment variables to set inside of the Docker container while launching it.
+    */
   val env: Map[String, String]
 
   /**
-   * The container-internal JDBC port that the database listens on.
-   */
+    * The container-internal JDBC port that the database listens on.
+    */
   val jdbcPort: Int
 
   /**
-   * Return a JDBC URL that connects to the database running at the given IP address and port.
-   */
+    * Return a JDBC URL that connects to the database running at the given IP address and port.
+    */
   def getJdbcUrl(ip: String, port: Int): String
 }
 
 abstract class DockerJDBCIntegrationSuite
-  extends SparkFunSuite
-  with BeforeAndAfterAll
-  with Eventually
-  with SharedSQLContext {
+    extends SparkFunSuite with BeforeAndAfterAll with Eventually
+    with SharedSQLContext {
 
   val db: DatabaseOnDocker
 
@@ -76,7 +75,8 @@ abstract class DockerJDBCIntegrationSuite
         docker.ping()
       } catch {
         case NonFatal(e) =>
-          log.error("Exception while connecting to Docker. Check whether Docker is running.")
+          log.error(
+              "Exception while connecting to Docker. Check whether Docker is running.")
           throw e
       }
       // Ensure that the Docker image is installed:
@@ -84,7 +84,8 @@ abstract class DockerJDBCIntegrationSuite
         docker.inspectImage(db.imageName)
       } catch {
         case e: ImageNotFoundException =>
-          log.warn(s"Docker image ${db.imageName} not found; pulling image from registry")
+          log.warn(
+              s"Docker image ${db.imageName} not found; pulling image from registry")
           docker.pull(db.imageName)
       }
       // Configure networking (necessary for boot2docker / Docker Machine)
@@ -95,13 +96,15 @@ abstract class DockerJDBCIntegrationSuite
         port
       }
       val dockerIp = DockerUtils.getDockerIp()
-      val hostConfig: HostConfig = HostConfig.builder()
+      val hostConfig: HostConfig = HostConfig
+        .builder()
         .networkMode("bridge")
-        .portBindings(
-          Map(s"${db.jdbcPort}/tcp" -> List(PortBinding.of(dockerIp, externalPort)).asJava).asJava)
+        .portBindings(Map(s"${db.jdbcPort}/tcp" -> List(
+                    PortBinding.of(dockerIp, externalPort)).asJava).asJava)
         .build()
       // Create the database container:
-      val config = ContainerConfig.builder()
+      val config = ContainerConfig
+        .builder()
         .image(db.imageName)
         .networkDisabled(false)
         .env(db.env.map { case (k, v) => s"$k=$v" }.toSeq.asJava)
@@ -154,7 +157,7 @@ abstract class DockerJDBCIntegrationSuite
   }
 
   /**
-   * Prepare databases and tables for testing.
-   */
+    * Prepare databases and tables for testing.
+    */
   def dataPreparation(connection: Connection): Unit
 }

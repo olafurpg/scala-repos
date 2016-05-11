@@ -39,13 +39,11 @@ import org.apache.spark.storage.BlockManagerId
 import org.apache.spark.util.ManualClock
 
 /**
- * A test suite for the heartbeating behavior between the driver and the executors.
- */
+  * A test suite for the heartbeating behavior between the driver and the executors.
+  */
 class HeartbeatReceiverSuite
-  extends SparkFunSuite
-  with BeforeAndAfterEach
-  with PrivateMethodTester
-  with LocalSparkContext {
+    extends SparkFunSuite with BeforeAndAfterEach with PrivateMethodTester
+    with LocalSparkContext {
 
   private val executorId1 = "executor-1"
   private val executorId2 = "executor-2"
@@ -57,14 +55,16 @@ class HeartbeatReceiverSuite
   private var heartbeatReceiverClock: ManualClock = null
 
   // Helper private method accessors for HeartbeatReceiver
-  private val _executorLastSeen = PrivateMethod[collection.Map[String, Long]]('executorLastSeen)
+  private val _executorLastSeen =
+    PrivateMethod[collection.Map[String, Long]]('executorLastSeen)
   private val _executorTimeoutMs = PrivateMethod[Long]('executorTimeoutMs)
-  private val _killExecutorThread = PrivateMethod[ExecutorService]('killExecutorThread)
+  private val _killExecutorThread =
+    PrivateMethod[ExecutorService]('killExecutorThread)
 
   /**
-   * Before each test, set up the SparkContext and a custom [[HeartbeatReceiver]]
-   * that uses a manual clock.
-   */
+    * Before each test, set up the SparkContext and a custom [[HeartbeatReceiver]]
+    * that uses a manual clock.
+    */
   override def beforeEach(): Unit = {
     super.beforeEach()
     val conf = new SparkConf()
@@ -77,13 +77,15 @@ class HeartbeatReceiverSuite
     when(scheduler.sc).thenReturn(sc)
     heartbeatReceiverClock = new ManualClock
     heartbeatReceiver = new HeartbeatReceiver(sc, heartbeatReceiverClock)
-    heartbeatReceiverRef = sc.env.rpcEnv.setupEndpoint("heartbeat", heartbeatReceiver)
-    when(scheduler.executorHeartbeatReceived(any(), any(), any())).thenReturn(true)
+    heartbeatReceiverRef = sc.env.rpcEnv
+      .setupEndpoint("heartbeat", heartbeatReceiver)
+    when(scheduler.executorHeartbeatReceived(any(), any(), any()))
+      .thenReturn(true)
   }
 
   /**
-   * After each test, clean up all state and stop the [[SparkContext]].
-   */
+    * After each test, clean up all state and stop the [[SparkContext]].
+    */
   override def afterEach(): Unit = {
     super.afterEach()
     scheduler = null
@@ -163,8 +165,10 @@ class HeartbeatReceiverSuite
     // Set up a fake backend and cluster manager to simulate killing executors
     val rpcEnv = sc.env.rpcEnv
     val fakeClusterManager = new FakeClusterManager(rpcEnv)
-    val fakeClusterManagerRef = rpcEnv.setupEndpoint("fake-cm", fakeClusterManager)
-    val fakeSchedulerBackend = new FakeSchedulerBackend(scheduler, rpcEnv, fakeClusterManagerRef)
+    val fakeClusterManagerRef =
+      rpcEnv.setupEndpoint("fake-cm", fakeClusterManager)
+    val fakeSchedulerBackend =
+      new FakeSchedulerBackend(scheduler, rpcEnv, fakeClusterManagerRef)
     when(sc.schedulerBackend).thenReturn(fakeSchedulerBackend)
 
     // Register fake executors with our fake scheduler backend
@@ -172,12 +176,14 @@ class HeartbeatReceiverSuite
     fakeSchedulerBackend.start()
     val dummyExecutorEndpoint1 = new FakeExecutorEndpoint(rpcEnv)
     val dummyExecutorEndpoint2 = new FakeExecutorEndpoint(rpcEnv)
-    val dummyExecutorEndpointRef1 = rpcEnv.setupEndpoint("fake-executor-1", dummyExecutorEndpoint1)
-    val dummyExecutorEndpointRef2 = rpcEnv.setupEndpoint("fake-executor-2", dummyExecutorEndpoint2)
+    val dummyExecutorEndpointRef1 =
+      rpcEnv.setupEndpoint("fake-executor-1", dummyExecutorEndpoint1)
+    val dummyExecutorEndpointRef2 =
+      rpcEnv.setupEndpoint("fake-executor-2", dummyExecutorEndpoint2)
     fakeSchedulerBackend.driverEndpoint.askWithRetry[RegisterExecutorResponse](
-      RegisterExecutor(executorId1, dummyExecutorEndpointRef1, 0, Map.empty))
+        RegisterExecutor(executorId1, dummyExecutorEndpointRef1, 0, Map.empty))
     fakeSchedulerBackend.driverEndpoint.askWithRetry[RegisterExecutorResponse](
-      RegisterExecutor(executorId2, dummyExecutorEndpointRef2, 0, Map.empty))
+        RegisterExecutor(executorId2, dummyExecutorEndpointRef2, 0, Map.empty))
     heartbeatReceiverRef.askWithRetry[Boolean](TaskSchedulerIsSet)
     addExecutorAndVerify(executorId1)
     addExecutorAndVerify(executorId2)
@@ -205,70 +211,74 @@ class HeartbeatReceiverSuite
     // executor means we permanently adjust the target number downwards until we
     // explicitly request new executors. For more detail, see SPARK-8119.
     assert(fakeClusterManager.getTargetNumExecutors === 2)
-    assert(fakeClusterManager.getExecutorIdsToKill === Set(executorId1, executorId2))
+    assert(fakeClusterManager.getExecutorIdsToKill === Set(executorId1,
+                                                           executorId2))
   }
 
   /** Manually send a heartbeat and return the response. */
   private def triggerHeartbeat(
-      executorId: String,
-      executorShouldReregister: Boolean): Unit = {
+      executorId: String, executorShouldReregister: Boolean): Unit = {
     val metrics = new TaskMetrics
     val blockManagerId = BlockManagerId(executorId, "localhost", 12345)
     val response = heartbeatReceiverRef.askWithRetry[HeartbeatResponse](
-      Heartbeat(executorId, Array(1L -> metrics.accumulatorUpdates()), blockManagerId))
+        Heartbeat(executorId,
+                  Array(1L -> metrics.accumulatorUpdates()),
+                  blockManagerId))
     if (executorShouldReregister) {
       assert(response.reregisterBlockManager)
     } else {
       assert(!response.reregisterBlockManager)
       // Additionally verify that the scheduler callback is called with the correct parameters
       verify(scheduler).executorHeartbeatReceived(
-        Matchers.eq(executorId),
-        Matchers.eq(Array(1L -> metrics.accumulatorUpdates())),
-        Matchers.eq(blockManagerId))
+          Matchers.eq(executorId),
+          Matchers.eq(Array(1L -> metrics.accumulatorUpdates())),
+          Matchers.eq(blockManagerId))
     }
   }
 
   private def addExecutorAndVerify(executorId: String): Unit = {
     assert(
-      heartbeatReceiver.addExecutor(executorId).map { f =>
-        Await.result(f, 10.seconds)
-      } === Some(true))
+        heartbeatReceiver.addExecutor(executorId).map { f =>
+      Await.result(f, 10.seconds)
+    } === Some(true))
   }
 
   private def removeExecutorAndVerify(executorId: String): Unit = {
     assert(
-      heartbeatReceiver.removeExecutor(executorId).map { f =>
-        Await.result(f, 10.seconds)
-      } === Some(true))
+        heartbeatReceiver.removeExecutor(executorId).map { f =>
+      Await.result(f, 10.seconds)
+    } === Some(true))
   }
 
   private def getTrackedExecutors: Map[String, Long] = {
     // We may receive undesired SparkListenerExecutorAdded from LocalBackend, so exclude it from
     // the map. See SPARK-10800.
-    heartbeatReceiver.invokePrivate(_executorLastSeen()).
-      filterKeys(_ != SparkContext.DRIVER_IDENTIFIER)
+    heartbeatReceiver
+      .invokePrivate(_executorLastSeen())
+      .filterKeys(_ != SparkContext.DRIVER_IDENTIFIER)
   }
 }
 
 // TODO: use these classes to add end-to-end tests for dynamic allocation!
 
 /**
- * Dummy RPC endpoint to simulate executors.
- */
-private class FakeExecutorEndpoint(override val rpcEnv: RpcEnv) extends RpcEndpoint
+  * Dummy RPC endpoint to simulate executors.
+  */
+private class FakeExecutorEndpoint(override val rpcEnv: RpcEnv)
+    extends RpcEndpoint
 
 /**
- * Dummy scheduler backend to simulate executor allocation requests to the cluster manager.
- */
-private class FakeSchedulerBackend(
-    scheduler: TaskSchedulerImpl,
-    rpcEnv: RpcEnv,
-    clusterManagerEndpoint: RpcEndpointRef)
-  extends CoarseGrainedSchedulerBackend(scheduler, rpcEnv) {
+  * Dummy scheduler backend to simulate executor allocation requests to the cluster manager.
+  */
+private class FakeSchedulerBackend(scheduler: TaskSchedulerImpl,
+                                   rpcEnv: RpcEnv,
+                                   clusterManagerEndpoint: RpcEndpointRef)
+    extends CoarseGrainedSchedulerBackend(scheduler, rpcEnv) {
 
-  protected override def doRequestTotalExecutors(requestedTotal: Int): Boolean = {
-    clusterManagerEndpoint.askWithRetry[Boolean](
-      RequestExecutors(requestedTotal, localityAwareTasks, hostToLocalTaskCount))
+  protected override def doRequestTotalExecutors(
+      requestedTotal: Int): Boolean = {
+    clusterManagerEndpoint.askWithRetry[Boolean](RequestExecutors(
+            requestedTotal, localityAwareTasks, hostToLocalTaskCount))
   }
 
   protected override def doKillExecutors(executorIds: Seq[String]): Boolean = {
@@ -277,16 +287,18 @@ private class FakeSchedulerBackend(
 }
 
 /**
- * Dummy cluster manager to simulate responses to executor allocation requests.
- */
-private class FakeClusterManager(override val rpcEnv: RpcEnv) extends RpcEndpoint {
+  * Dummy cluster manager to simulate responses to executor allocation requests.
+  */
+private class FakeClusterManager(override val rpcEnv: RpcEnv)
+    extends RpcEndpoint {
   private var targetNumExecutors = 0
   private val executorIdsToKill = new mutable.HashSet[String]
 
   def getTargetNumExecutors: Int = targetNumExecutors
   def getExecutorIdsToKill: Set[String] = executorIdsToKill.toSet
 
-  override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
+  override def receiveAndReply(
+      context: RpcCallContext): PartialFunction[Any, Unit] = {
     case RequestExecutors(requestedTotal, _, _) =>
       targetNumExecutors = requestedTotal
       context.reply(true)

@@ -5,7 +5,7 @@ package play.core
 
 import java.util.concurrent.atomic.AtomicInteger
 import org.specs2.mutable.Specification
-import scala.concurrent.{ Await, Future, Promise }
+import scala.concurrent.{Await, Future, Promise}
 import scala.concurrent.duration._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -50,7 +50,6 @@ object ClosableLazySpec extends Specification {
       closeCount.get must_== 1
       cl.close() must_== -1
       closeCount.get must_== 1
-
     }
 
     "be closable before the first call to get" in {
@@ -69,7 +68,6 @@ object ClosableLazySpec extends Specification {
       closeCount.get must_== 0
       cl.close() must_== -1
       closeCount.get must_== 0
-
     }
 
     "throw an exception when accessed after being closed" in {
@@ -86,18 +84,19 @@ object ClosableLazySpec extends Specification {
 
       val getResultPromise = Promise[String]
       val test = Future {
-        lazy val cl: ClosableLazy[String, Unit] = new ClosableLazy[String, Unit] {
-          protected def create() = {
-            ("banana", { () =>
-              val getResult = Future[String] {
-                cl.get()
-              }
-              getResultPromise.completeWith(getResult)
-              Await.result(getResult, Duration(2, MINUTES))
-            })
+        lazy val cl: ClosableLazy[String, Unit] =
+          new ClosableLazy[String, Unit] {
+            protected def create() = {
+              ("banana", { () =>
+                val getResult = Future[String] {
+                  cl.get()
+                }
+                getResultPromise.completeWith(getResult)
+                Await.result(getResult, Duration(2, MINUTES))
+              })
+            }
+            protected def closeNotNeeded = ()
           }
-          protected def closeNotNeeded = ()
-        }
         cl.get must_== "banana"
         cl.close() must_== (())
       }
@@ -105,9 +104,8 @@ object ClosableLazySpec extends Specification {
       // Our get result should happen immediately and throw an IllegalStateException
       // because the ClosableLazy is closed. Use a long duration so this will work
       // on slow machines.
-      Await.result(getResultPromise.future, Duration(1, MINUTES)) must throwAn[IllegalStateException]
+      Await.result(getResultPromise.future, Duration(1, MINUTES)) must throwAn[
+          IllegalStateException]
     }
-
   }
-
 }

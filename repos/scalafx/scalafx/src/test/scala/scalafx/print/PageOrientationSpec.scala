@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 
 /** Tests for [[scalafx.print.PageOrientation]]. */
 @RunWith(classOf[JUnitRunner])
-class PageOrientationSpec extends SFXEnumDelegateSpec[jfxp.PageOrientation, PageOrientation](
-  javaClass = classOf[jfxp.PageOrientation],
-  scalaClass = classOf[PageOrientation],
-  companion = PageOrientation)
+class PageOrientationSpec
+    extends SFXEnumDelegateSpec[jfxp.PageOrientation, PageOrientation](
+        javaClass = classOf[jfxp.PageOrientation],
+        scalaClass = classOf[PageOrientation],
+        companion = PageOrientation)

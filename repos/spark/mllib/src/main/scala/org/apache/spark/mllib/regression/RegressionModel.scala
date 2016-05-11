@@ -26,32 +26,33 @@ import org.apache.spark.rdd.RDD
 
 @Since("0.8.0")
 trait RegressionModel extends Serializable {
+
   /**
-   * Predict values for the given data set using the model trained.
-   *
-   * @param testData RDD representing data points to be predicted
-   * @return RDD[Double] where each entry contains the corresponding prediction
-   *
-   */
+    * Predict values for the given data set using the model trained.
+    *
+    * @param testData RDD representing data points to be predicted
+    * @return RDD[Double] where each entry contains the corresponding prediction
+    *
+    */
   @Since("1.0.0")
   def predict(testData: RDD[Vector]): RDD[Double]
 
   /**
-   * Predict values for a single data point using the model trained.
-   *
-   * @param testData array representing a single data point
-   * @return Double prediction from the trained model
-   *
-   */
+    * Predict values for a single data point using the model trained.
+    *
+    * @param testData array representing a single data point
+    * @return Double prediction from the trained model
+    *
+    */
   @Since("1.0.0")
   def predict(testData: Vector): Double
 
   /**
-   * Predict values for examples stored in a JavaRDD.
-   * @param testData JavaRDD representing data points to be predicted
-   * @return a JavaRDD[java.lang.Double] where each entry contains the corresponding prediction
-   *
-   */
+    * Predict values for examples stored in a JavaRDD.
+    * @param testData JavaRDD representing data points to be predicted
+    * @return a JavaRDD[java.lang.Double] where each entry contains the corresponding prediction
+    *
+    */
   @Since("1.0.0")
   def predict(testData: JavaRDD[Vector]): JavaRDD[java.lang.Double] =
     predict(testData.rdd).toJavaRDD().asInstanceOf[JavaRDD[java.lang.Double]]
@@ -60,9 +61,9 @@ trait RegressionModel extends Serializable {
 private[mllib] object RegressionModel {
 
   /**
-   * Helper method for loading GLM regression model metadata.
-   * @return numFeatures
-   */
+    * Helper method for loading GLM regression model metadata.
+    * @return numFeatures
+    */
   def getNumFeatures(metadata: JValue): Int = {
     implicit val formats = DefaultFormats
     (metadata \ "numFeatures").extract[Int]

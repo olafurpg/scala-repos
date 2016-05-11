@@ -12,25 +12,28 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird.storm
 
 import backtype.storm.task.TopologyContext
 import backtype.storm.metric.api.CountMetric
 import org.slf4j.LoggerFactory
-import com.twitter.storehaus.algebra.reporting.{ StoreReporter, MergeableReporter }
-import com.twitter.storehaus.algebra.{ Mergeable, MergeableProxy }
-import com.twitter.storehaus.{ Store, StoreProxy }
-import com.twitter.util.{ Promise, Future }
+import com.twitter.storehaus.algebra.reporting.{StoreReporter, MergeableReporter}
+import com.twitter.storehaus.algebra.{Mergeable, MergeableProxy}
+import com.twitter.storehaus.{Store, StoreProxy}
+import com.twitter.util.{Promise, Future}
 
 /**
- *
- * @author Ian O Connell
- */
-
-class MergeableStatReporter[K, V](context: TopologyContext, val self: Mergeable[K, V]) extends MergeableProxy[K, V] with MergeableReporter[Mergeable[K, V], K, V] {
-  private def buildMetric(s: String) = context.registerMetric("store/%s".format(s), new CountMetric, 10)
+  *
+  * @author Ian O Connell
+  */
+class MergeableStatReporter[K, V](
+    context: TopologyContext, val self: Mergeable[K, V])
+    extends MergeableProxy[K, V]
+    with MergeableReporter[Mergeable[K, V], K, V] {
+  private def buildMetric(s: String) =
+    context.registerMetric("store/%s".format(s), new CountMetric, 10)
   val mergeMetric = buildMetric("merge")
   val multiMergeMetric = buildMetric("multiMerge")
   val multiMergeTupleFailedMetric = buildMetric("multiMergeTupleFailed")
@@ -44,7 +47,8 @@ class MergeableStatReporter[K, V](context: TopologyContext, val self: Mergeable[
     }.unit
   }
 
-  override def traceMultiMerge[K1 <: K](kvs: Map[K1, V], request: Map[K1, Future[Option[V]]]) = {
+  override def traceMultiMerge[K1 <: K](
+      kvs: Map[K1, V], request: Map[K1, Future[Option[V]]]) = {
     multiMergeMetric.incr()
     multiMergeTuplesMetric.incrBy(request.size)
     request.map {
@@ -57,8 +61,10 @@ class MergeableStatReporter[K, V](context: TopologyContext, val self: Mergeable[
   }
 }
 
-class StoreStatReporter[K, V](context: TopologyContext, val self: Store[K, V]) extends StoreProxy[K, V] with StoreReporter[Store[K, V], K, V] {
-  private def buildMetric(s: String) = context.registerMetric("store/%s".format(s), new CountMetric, 10)
+class StoreStatReporter[K, V](context: TopologyContext, val self: Store[K, V])
+    extends StoreProxy[K, V] with StoreReporter[Store[K, V], K, V] {
+  private def buildMetric(s: String) =
+    context.registerMetric("store/%s".format(s), new CountMetric, 10)
   val putMetric = buildMetric("put")
   val multiPutMetric = buildMetric("multiPut")
   val multiPutTuplesMetric = buildMetric("multiPutTuples")
@@ -71,7 +77,8 @@ class StoreStatReporter[K, V](context: TopologyContext, val self: Store[K, V]) e
   val getFailedMetric = buildMetric("getFailed")
   val multiGetTupleFailedMetric = buildMetric("multiGetTupleFailed")
 
-  override def traceMultiGet[K1 <: K](ks: Set[K1], request: Map[K1, Future[Option[V]]]) = {
+  override def traceMultiGet[K1 <: K](
+      ks: Set[K1], request: Map[K1, Future[Option[V]]]) = {
     multiGetMetric.incr()
     multiGetTuplesMetric.incrBy(request.size)
 
@@ -98,7 +105,8 @@ class StoreStatReporter[K, V](context: TopologyContext, val self: Store[K, V]) e
     }.unit
   }
 
-  override def traceMultiPut[K1 <: K](kvs: Map[K1, Option[V]], request: Map[K1, Future[Unit]]) = {
+  override def traceMultiPut[K1 <: K](
+      kvs: Map[K1, Option[V]], request: Map[K1, Future[Unit]]) = {
     multiPutMetric.incr()
     multiPutTuplesMetric.incrBy(request.size)
 

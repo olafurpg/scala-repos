@@ -36,10 +36,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Polygon Spec tests.
- *
- *
- */
+  * Polygon Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class PolygonSpec
-  extends SimpleSFXDelegateSpec[jfxss.Polygon, Polygon](classOf[jfxss.Polygon], classOf[Polygon])
+    extends SimpleSFXDelegateSpec[jfxss.Polygon, Polygon](
+        classOf[jfxss.Polygon], classOf[Polygon])

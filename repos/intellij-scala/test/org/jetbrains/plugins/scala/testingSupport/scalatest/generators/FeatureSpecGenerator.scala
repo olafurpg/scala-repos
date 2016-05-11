@@ -12,8 +12,9 @@ trait FeatureSpecGenerator extends ScalaTestTestCase {
   def featureSpecFileName = featureSpecClassName + ".scala"
 
   def addFeatureSpec() {
-    addFileToProject(featureSpecFileName,
-      """
+    addFileToProject(
+        featureSpecFileName,
+        """
         |import org.scalatest._
         |
         |class FeatureSpecTest extends FeatureSpec with GivenWhenThen {
@@ -37,7 +38,6 @@ trait FeatureSpecGenerator extends ScalaTestTestCase {
         |
         | feature("empty") {}
         |}
-      """.stripMargin.trim()
-    )
+      """.stripMargin.trim())
   }
 }

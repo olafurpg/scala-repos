@@ -1,5 +1,5 @@
-object Test{
-  def main(args : Array[String]){
+object Test {
+  def main(args: Array[String]) {
     import scala.collection.immutable._
     assert(IntMap.empty == HashMap.empty);
     assert(HashMap.empty == IntMap.empty);

@@ -27,7 +27,8 @@ class BreezeMatrixConversionSuite extends SparkFunSuite {
     val breeze = mat.toBreeze.asInstanceOf[BDM[Double]]
     assert(breeze.rows === mat.numRows)
     assert(breeze.cols === mat.numCols)
-    assert(breeze.data.eq(mat.asInstanceOf[DenseMatrix].values), "should not copy data")
+    assert(breeze.data.eq(mat.asInstanceOf[DenseMatrix].values),
+           "should not copy data")
   }
 
   test("dense breeze matrix to matrix") {
@@ -51,7 +52,8 @@ class BreezeMatrixConversionSuite extends SparkFunSuite {
     val breeze = mat.toBreeze.asInstanceOf[BSM[Double]]
     assert(breeze.rows === mat.numRows)
     assert(breeze.cols === mat.numCols)
-    assert(breeze.data.eq(mat.asInstanceOf[SparseMatrix].values), "should not copy data")
+    assert(breeze.data.eq(mat.asInstanceOf[SparseMatrix].values),
+           "should not copy data")
   }
 
   test("sparse breeze matrix to sparse matrix") {
@@ -63,7 +65,8 @@ class BreezeMatrixConversionSuite extends SparkFunSuite {
     assert(mat.numRows === breeze.rows)
     assert(mat.numCols === breeze.cols)
     assert(mat.values.eq(breeze.data), "should not copy data")
-    val matTransposed = Matrices.fromBreeze(breeze.t).asInstanceOf[SparseMatrix]
+    val matTransposed =
+      Matrices.fromBreeze(breeze.t).asInstanceOf[SparseMatrix]
     assert(matTransposed.numRows === breeze.cols)
     assert(matTransposed.numCols === breeze.rows)
     assert(!matTransposed.values.eq(breeze.data), "has to copy data")

@@ -1,6 +1,6 @@
 class Gox {
-  object Zed { }
-  class Zed  { }
+  object Zed {}
+  class Zed {}
 }
 
 object Test {

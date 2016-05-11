@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.params.{FunTypeParamClaus
 import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 11.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 11.02.2008
+  */
 //TODO: rewrite this
 object FunSig {
   def parse(builder: ScalaPsiBuilder): Boolean = {
@@ -26,6 +25,5 @@ object FunSig {
       builder error "identifier expected"
       false
     }
-
   }
 }

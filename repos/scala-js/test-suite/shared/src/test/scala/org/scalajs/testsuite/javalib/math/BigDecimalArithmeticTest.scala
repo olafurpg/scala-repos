@@ -15,14 +15,15 @@ import org.junit.Assert._
 import org.scalajs.testsuite.utils.AssertThrows._
 import org.scalajs.testsuite.utils.Platform.executingInJVM
 
-class  BigDecimalArithmeticTest {
+class BigDecimalArithmeticTest {
 
   @Test def testAddDiffScaleNegPos(): Unit = {
     val a = "1231212478987482988429808779810457634781384756794987"
     val aScale = -15
     val b = "747233429293018787918347987234564568"
     val bScale = 10
-    val c = "1231212478987482988429808779810457634781459480137916301878791834798.7234564568"
+    val c =
+      "1231212478987482988429808779810457634781459480137916301878791834798.7234564568"
     val cScale = 10
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
@@ -186,9 +187,9 @@ class  BigDecimalArithmeticTest {
     val aScale = -45
     val b = "134432345432345748766876876723342238476237823787879183470"
     val bScale = 70
-    val res = "2779231855146903674747706830969461168692256919247547952" +
-      "2608549363170374005512836303475980101168105698072946555" +
-      "6862849"
+    val res =
+      "2779231855146903674747706830969461168692256919247547952" +
+      "2608549363170374005512836303475980101168105698072946555" + "6862849"
     val resScale = 0
     val rem = "3.4935796954060524114470681810486417234751682675102093970E-15"
     val remScale = 70
@@ -472,7 +473,8 @@ class  BigDecimalArithmeticTest {
     val bScale = 45
     val newScale = 3
     val rm = RoundingMode.HALF_UP
-    val c = "50000260373164286401361913262100972218038099522752460421" +
+    val c =
+      "50000260373164286401361913262100972218038099522752460421" +
       "05959924024355721031761947728703598332749334086415670525" +
       "3761096961.670"
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
@@ -512,7 +514,8 @@ class  BigDecimalArithmeticTest {
     val bScale = 10
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
-    expectThrows(classOf[IllegalArgumentException], aNumber.divide(bNumber, 100))
+    expectThrows(
+        classOf[IllegalArgumentException], aNumber.divide(bNumber, 100))
   }
 
   @Test def testDivideExceptionRM(): Unit = {
@@ -523,7 +526,7 @@ class  BigDecimalArithmeticTest {
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
     expectThrows(classOf[ArithmeticException],
-        aNumber.divide(bNumber, BigDecimal.ROUND_UNNECESSARY))
+                 aNumber.divide(bNumber, BigDecimal.ROUND_UNNECESSARY))
   }
 
   @Test def testDivideExpEqualsZero(): Unit = {
@@ -572,7 +575,7 @@ class  BigDecimalArithmeticTest {
     val arg1 = new BigDecimal("320.0E+2147483647")
     val arg2 = new BigDecimal("6E-2147483647")
     expectThrows(classOf[ArithmeticException],
-        arg1.divide(arg2, Int.MaxValue, RoundingMode.CEILING))
+                 arg1.divide(arg2, Int.MaxValue, RoundingMode.CEILING))
   }
 
   @Test def testDivideRemainderIsZero(): Unit = {
@@ -590,7 +593,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundCeilingNeg(): Unit = {
-    val a = "-92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "-92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -604,7 +608,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundCeilingPos(): Unit = {
-    val a = "92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -618,7 +623,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundDownNeg(): Unit = {
-    val a = "-92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "-92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -632,7 +638,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundDownPos(): Unit = {
-    val a = "92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -646,7 +653,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundFloorNeg(): Unit = {
-    val a = "-92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "-92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -660,7 +668,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundFloorPos(): Unit = {
-    val a = "92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -674,7 +683,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfDownNeg(): Unit = {
-    val a = "-92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "-92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -688,7 +698,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfDownNeg1(): Unit = {
-    val a = "-92948782094488478231212478987482988798104576347813847567949855464535634534563456"
+    val a =
+      "-92948782094488478231212478987482988798104576347813847567949855464535634534563456"
     val aScale = -24
     val b = "74723342238476237823754692930187879183479"
     val bScale = 13
@@ -716,7 +727,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfDownPos(): Unit = {
-    val a = "92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -730,7 +742,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfDownPos1(): Unit = {
-    val a = "92948782094488478231212478987482988798104576347813847567949855464535634534563456"
+    val a =
+      "92948782094488478231212478987482988798104576347813847567949855464535634534563456"
     val aScale = -24
     val b = "74723342238476237823754692930187879183479"
     val bScale = 13
@@ -744,7 +757,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfEvenNeg(): Unit = {
-    val a = "-92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "-92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -758,7 +772,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfEvenNeg1(): Unit = {
-    val a = "-92948782094488478231212478987482988798104576347813847567949855464535634534563456"
+    val a =
+      "-92948782094488478231212478987482988798104576347813847567949855464535634534563456"
     val aScale = -24
     val b = "74723342238476237823754692930187879183479"
     val bScale = 13
@@ -786,7 +801,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfEvenPos(): Unit = {
-    val a = "92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -800,7 +816,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfEvenPos1(): Unit = {
-    val a = "92948782094488478231212478987482988798104576347813847567949855464535634534563456"
+    val a =
+      "92948782094488478231212478987482988798104576347813847567949855464535634534563456"
     val aScale = -24
     val b = "74723342238476237823754692930187879183479"
     val bScale = 13
@@ -814,7 +831,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfUpNeg(): Unit = {
-    val a = "-92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "-92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -828,7 +846,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfUpNeg1(): Unit = {
-    val a = "-92948782094488478231212478987482988798104576347813847567949855464535634534563456"
+    val a =
+      "-92948782094488478231212478987482988798104576347813847567949855464535634534563456"
     val aScale = -24
     val b = "74723342238476237823754692930187879183479"
     val bScale = 13
@@ -856,7 +875,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfUpPos(): Unit = {
-    val a = "92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -870,7 +890,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundHalfUpPos1(): Unit = {
-    val a = "92948782094488478231212478987482988798104576347813847567949855464535634534563456"
+    val a =
+      "92948782094488478231212478987482988798104576347813847567949855464535634534563456"
     val aScale = -24
     val b = "74723342238476237823754692930187879183479"
     val bScale = 13
@@ -884,7 +905,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundUpNeg(): Unit = {
-    val a = "-92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "-92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -898,7 +920,8 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideRoundUpPos(): Unit = {
-    val a = "92948782094488478231212478987482988429808779810457634781384756794987"
+    val a =
+      "92948782094488478231212478987482988429808779810457634781384756794987"
     val aScale = -24
     val b = "7472334223847623782375469293018787918347987234564568"
     val bScale = 13
@@ -939,14 +962,16 @@ class  BigDecimalArithmeticTest {
   }
 
   @Test def testDivideToIntegralValueMathContextDOWN(): Unit = {
-    val a = "3736186567876876578956958769675785435673453453653543654354365435675671119238118911893939591735"
+    val a =
+      "3736186567876876578956958769675785435673453453653543654354365435675671119238118911893939591735"
     val aScale = 45
     val b = "134432345432345748766876876723342238476237823787879183470"
     val bScale = 70
     val precision = 75
     val rm = RoundingMode.DOWN
     val mc = new MathContext(precision, rm)
-    val c = "2.7792318551469036747477068339450205874992634417590178670822889E+62"
+    val c =
+      "2.7792318551469036747477068339450205874992634417590178670822889E+62"
     val resScale = -1
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
@@ -977,9 +1002,12 @@ class  BigDecimalArithmeticTest {
     assertTrue(BigDecimal.ZERO == quotient)
     quotient = BigDecimal.ZERO.negate().divide(BigDecimal.ONE)
     assertTrue(BigDecimal.ZERO == quotient)
-    expectThrows(classOf[ArithmeticException], BigDecimal.ZERO.divide(BigDecimal.ZERO))
-    expectThrows(classOf[ArithmeticException], BigDecimal.ONE.divide(BigDecimal.ZERO))
-    expectThrows(classOf[ArithmeticException], BigDecimal.ONE.divideToIntegralValue(BigDecimal.ZERO))
+    expectThrows(
+        classOf[ArithmeticException], BigDecimal.ZERO.divide(BigDecimal.ZERO))
+    expectThrows(
+        classOf[ArithmeticException], BigDecimal.ONE.divide(BigDecimal.ZERO))
+    expectThrows(classOf[ArithmeticException],
+                 BigDecimal.ONE.divideToIntegralValue(BigDecimal.ZERO))
   }
 
   @Test def testDivideToIntegralValue_on_floating_points__issue_1979(): Unit = {
@@ -1008,7 +1036,8 @@ class  BigDecimalArithmeticTest {
     val aScale = -15
     val b = "747233429293018787918347987234564568"
     val bScale = 10
-    val c = "9.20003122862175749786430095741145455670101391569026662845893091880727173060570190220616E+91"
+    val c =
+      "9.20003122862175749786430095741145455670101391569026662845893091880727173060570190220616E+91"
     val cScale = -5
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
@@ -1022,7 +1051,8 @@ class  BigDecimalArithmeticTest {
     val aScale = 10
     val b = "747233429293018787918347987234564568"
     val bScale = -10
-    val c = "920003122862175749786430095741145455670101391569026662845893091880727173060570190220616"
+    val c =
+      "920003122862175749786430095741145455670101391569026662845893091880727173060570190220616"
     val cScale = 0
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
@@ -1036,7 +1066,8 @@ class  BigDecimalArithmeticTest {
     val aScale = -15
     val b = "747233429293018787918347987234564568"
     val bScale = -10
-    val c = "9.20003122862175749786430095741145455670101391569026662845893091880727173060570190220616E+111"
+    val c =
+      "9.20003122862175749786430095741145455670101391569026662845893091880727173060570190220616E+111"
     val cScale = -25
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
@@ -1095,7 +1126,8 @@ class  BigDecimalArithmeticTest {
     val aScale = 15
     val b = "747233429293018787918347987234564568"
     val bScale = 10
-    val c = "92000312286217574978643009574114545567010139156902666284589309.1880727173060570190220616"
+    val c =
+      "92000312286217574978643009574114545567010139156902666284589309.1880727173060570190220616"
     val cScale = 25
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
@@ -1108,7 +1140,8 @@ class  BigDecimalArithmeticTest {
     val a = "123121247898748298842980"
     val aScale = 10
     val exp = 10
-    val c = "8004424019039195734129783677098845174704975003788210729597" +
+    val c =
+      "8004424019039195734129783677098845174704975003788210729597" +
       "4875206425711159855030832837132149513512555214958035390490" +
       "798520842025826.594316163502809818340013610490541783276343" +
       "6514490899700151256484355936102754469438371850240000000000"
@@ -1213,13 +1246,16 @@ class  BigDecimalArithmeticTest {
     assertEquals(result.scale(), 0)
     assertEquals(result.precision(), 1)
     `val` = BigDecimal.valueOf(5.43445663479765)
-    `val` = `val`.setScale(`val`.scale() + 1, RoundingMode.CEILING)
+    `val` = `val`
+      .setScale(`val`.scale() + 1, RoundingMode.CEILING)
       .round(new MathContext(1, RoundingMode.CEILING))
     `val` = BigDecimal.valueOf(5.4344566347976)
-    `val` = `val`.setScale(`val`.scale() + 2, RoundingMode.CEILING)
+    `val` = `val`
+      .setScale(`val`.scale() + 2, RoundingMode.CEILING)
       .round(new MathContext(1, RoundingMode.CEILING))
     var test = BigDecimal.valueOf(12.4344566347976)
-    test = test.setScale(test.scale() + 1, RoundingMode.CEILING)
+    test = test
+      .setScale(test.scale() + 1, RoundingMode.CEILING)
       .round(new MathContext(1, RoundingMode.CEILING))
   }
 
@@ -1229,7 +1265,8 @@ class  BigDecimalArithmeticTest {
     val precision = 75
     val rm = RoundingMode.HALF_DOWN
     val mc = new MathContext(precision, rm)
-    val res = "3.736186567876876578956958765675671119238118911893939591735E+102"
+    val res =
+      "3.736186567876876578956958765675671119238118911893939591735E+102"
     val resScale = -45
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val result = aNumber.round(mc)
@@ -1269,7 +1306,8 @@ class  BigDecimalArithmeticTest {
     val aScale = -15
     val b = "747233429293018787918347987234564568"
     val bScale = 10
-    val c = "1231212478987482988429808779810457634781310033452057698121208165201.2765435432"
+    val c =
+      "1231212478987482988429808779810457634781310033452057698121208165201.2765435432"
     val cScale = 10
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
@@ -1325,7 +1363,8 @@ class  BigDecimalArithmeticTest {
     val aScale = -15
     val b = "747233429293018787918347987234564568"
     val bScale = 40
-    val c = "9.867986566767897666787678760787798104576347813847567949870000000000000E+71"
+    val c =
+      "9.867986566767897666787678760787798104576347813847567949870000000000000E+71"
     val cScale = -2
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)

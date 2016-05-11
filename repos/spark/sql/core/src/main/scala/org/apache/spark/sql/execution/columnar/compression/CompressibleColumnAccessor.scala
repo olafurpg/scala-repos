@@ -21,14 +21,16 @@ import org.apache.spark.sql.catalyst.expressions.MutableRow
 import org.apache.spark.sql.execution.columnar.{ColumnAccessor, NativeColumnAccessor}
 import org.apache.spark.sql.types.AtomicType
 
-private[columnar] trait CompressibleColumnAccessor[T <: AtomicType] extends ColumnAccessor {
+private[columnar] trait CompressibleColumnAccessor[T <: AtomicType]
+    extends ColumnAccessor {
   this: NativeColumnAccessor[T] =>
 
   private var decoder: Decoder[T] = _
 
   abstract override protected def initialize(): Unit = {
     super.initialize()
-    decoder = CompressionScheme(underlyingBuffer.getInt()).decoder(buffer, columnType)
+    decoder = CompressionScheme(underlyingBuffer.getInt())
+      .decoder(buffer, columnType)
   }
 
   abstract override def hasNext: Boolean = super.hasNext || decoder.hasNext

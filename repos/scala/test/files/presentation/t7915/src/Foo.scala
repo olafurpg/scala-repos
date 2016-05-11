@@ -4,8 +4,8 @@ class Bar {
 
 class Foo {
   def foo() {
-    new Bar/*#*/().bar/*#*/()
-    new Bar/*#*/().baz/*#*/[Any]()
-    new Bar/*#*/().baz/*#*/()
+    new Bar /*#*/ ().bar /*#*/ ()
+    new Bar /*#*/ ().baz /*#*/ [Any]()
+    new Bar /*#*/ ().baz /*#*/ ()
   }
 }

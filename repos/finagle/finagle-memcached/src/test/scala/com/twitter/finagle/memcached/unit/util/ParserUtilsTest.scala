@@ -32,36 +32,39 @@ class ParserUtilsTest extends FunSuite {
     override def write(output: Array[Byte], off: Int): Unit =
       System.arraycopy(bytes, 0, output, off, length)
     override def length: Int = bytes.length
-    override def slice(i: Int, j: Int): Buf = new TestBuf(bytes.drop(i).take(j))
+    override def slice(i: Int, j: Int): Buf =
+      new TestBuf(bytes.drop(i).take(j))
     protected def unsafeByteArrayBuf = None
   }
 
-  val strings =
-    Seq(
+  val strings = Seq(
       "123" -> true,
-      "1"   -> true,
-      ""    -> false,
-      " "   -> false,
-      "x"   -> false,
-      " 9"  -> false,
-      "9 "  -> false
-    )
+      "1" -> true,
+      "" -> false,
+      " " -> false,
+      "x" -> false,
+      " 9" -> false,
+      "9 " -> false
+  )
 
   test("isDigits: Buf") {
-    strings foreach { case (str, expected) =>
-      assert(isDigitsBuf(str) == expected)
+    strings foreach {
+      case (str, expected) =>
+        assert(isDigitsBuf(str) == expected)
     }
   }
 
   test("isDigits: Buf.ByteBuffer") {
-    strings foreach { case (str, expected) =>
-      assert(isDigitsBB(str) == expected)
+    strings foreach {
+      case (str, expected) =>
+        assert(isDigitsBB(str) == expected)
     }
   }
 
   test("isDigits: Buf.ByteArray") {
-    strings foreach { case (str, expected) =>
-      assert(isDigitsBA(str) == expected)
+    strings foreach {
+      case (str, expected) =>
+        assert(isDigitsBA(str) == expected)
     }
   }
 }

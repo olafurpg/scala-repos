@@ -5,12 +5,15 @@ import com.intellij.codeInspection.LocalInspectionTool
 import org.jetbrains.plugins.scala.codeInspection.{InspectionBundle, ScalaLightInspectionFixtureTestAdapter}
 
 /**
- * Nikolay.Tropin
- * 6/25/13
- */
-class DeclarationHasNoExplicitTypeInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
-  protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[DeclarationHasNoExplicitTypeInspection]
-  protected def annotation: String = InspectionBundle.message("declaration.has.no.explicit.type.name")
+  * Nikolay.Tropin
+  * 6/25/13
+  */
+class DeclarationHasNoExplicitTypeInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
+  protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[DeclarationHasNoExplicitTypeInspection]
+  protected def annotation: String =
+    InspectionBundle.message("declaration.has.no.explicit.type.name")
   private val hint = InspectionBundle.message("add.unit.type.to.declaration")
 
   def test1(): Unit = {

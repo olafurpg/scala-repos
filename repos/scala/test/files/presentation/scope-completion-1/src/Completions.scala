@@ -9,4 +9,3 @@ class Completion1 {
 object Completion2 {
   /*_*/
 }
-

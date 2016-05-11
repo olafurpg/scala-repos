@@ -9,18 +9,18 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.top.template.{ClassParents, TemplateBody}
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-* Time: 9:31:16
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  * Time: 9:31:16
+  */
 /*
  * ClassTemplate ::= [EarlyDefs] ClassParents [TemplateBody]
  *                 | TemplateBody (for 'new' statement)
  */
 
 object ClassTemplate {
-  def parse(builder: ScalaPsiBuilder): Boolean = parse(builder, nonEmpty = false)
+  def parse(builder: ScalaPsiBuilder): Boolean =
+    parse(builder, nonEmpty = false)
   def parse(builder: ScalaPsiBuilder, nonEmpty: Boolean): Boolean = {
     val extendsMarker = builder.mark
     var empty = true
@@ -34,21 +34,20 @@ object ClassTemplate {
           //parse template body
           builder.getTokenType match {
             case ScalaTokenTypes.tLBRACE => {
-              if (builder.twoNewlinesBeforeCurrentToken) {
+                if (builder.twoNewlinesBeforeCurrentToken) {
+                  extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+                  return !nonEmpty || !empty
+                }
+                TemplateBody parse builder
                 extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-                return !nonEmpty || !empty
+                !nonEmpty || !empty
               }
-              TemplateBody parse builder
-              extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-              !nonEmpty || !empty
-            }
             case _ => {
-              extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-              !nonEmpty || !empty
-            }
+                extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+                !nonEmpty || !empty
+              }
           }
-        }
-        else {
+        } else {
           //parse template body
           TemplateBody parse builder
           extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
@@ -65,18 +64,18 @@ object ClassTemplate {
         //parse template body
         builder.getTokenType match {
           case ScalaTokenTypes.tLBRACE => {
-            if (builder.twoNewlinesBeforeCurrentToken) {
+              if (builder.twoNewlinesBeforeCurrentToken) {
+                extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+                return !nonEmpty || !empty
+              }
+              TemplateBody parse builder
               extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-              return !nonEmpty || !empty
+              !nonEmpty || !empty
             }
-            TemplateBody parse builder
-            extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-            !nonEmpty || !empty
-          }
           case _ => {
-            extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
-            !nonEmpty || !empty
-          }
+              extendsMarker.done(ScalaElementTypes.EXTENDS_BLOCK)
+              !nonEmpty || !empty
+            }
         }
     }
   }

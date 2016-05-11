@@ -1,6 +1,5 @@
 package org.jetbrains.plugins.scala.lang.psi.impl.statements
 
-
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi._
@@ -20,30 +19,35 @@ import org.jetbrains.plugins.scala.lang.psi.types.{Any, ScType}
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
 
 /**
- * @author Jason Zaugg
- */
-class ScMacroDefinitionImpl private (stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-  extends ScFunctionImpl(stub, nodeType, node) with ScMacroDefinition {
-  def this(node: ASTNode) = {this(null, null, node)}
+  * @author Jason Zaugg
+  */
+class ScMacroDefinitionImpl private (
+    stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
+    extends ScFunctionImpl(stub, nodeType, node) with ScMacroDefinition {
+  def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScFunctionStub) = {this(stub, ScalaElementTypes.MACRO_DEFINITION, null)}
+  def this(stub: ScFunctionStub) = {
+    this(stub, ScalaElementTypes.MACRO_DEFINITION, null)
+  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
     //process function's parameters for dependent method types, and process type parameters
-    if (!super[ScFunctionImpl].processDeclarations(processor, state, lastParent, place)) return false
+    if (!super [ScFunctionImpl].processDeclarations(
+            processor, state, lastParent, place)) return false
 
     //do not process parameters for default parameters, only for function body
     //processing parameters for default parameters in ScParameters
-    val parameterIncludingSynthetic: Seq[ScParameter] = effectiveParameterClauses.flatMap(_.parameters)
+    val parameterIncludingSynthetic: Seq[ScParameter] =
+      effectiveParameterClauses.flatMap(_.parameters)
     if (getStub == null) {
       body match {
         case Some(x)
-          if lastParent != null &&
+            if lastParent != null &&
             (!needCheckProcessingDeclarationsForBody ||
-            x.startOffsetInParent == lastParent.startOffsetInParent) =>
+                x.startOffsetInParent == lastParent.startOffsetInParent) =>
           for (p <- parameterIncludingSynthetic) {
             ProgressManager.checkCanceled()
             if (!processor.execute(p, state)) return false
@@ -51,7 +55,8 @@ class ScMacroDefinitionImpl private (stub: StubElement[ScFunction], nodeType: IE
         case _ =>
       }
     } else {
-      if (lastParent != null && lastParent.getContext != lastParent.getParent) {
+      if (lastParent != null &&
+          lastParent.getContext != lastParent.getParent) {
         for (p <- parameterIncludingSynthetic) {
           ProgressManager.checkCanceled()
           if (!processor.execute(p, state)) return false
@@ -66,13 +71,15 @@ class ScMacroDefinitionImpl private (stub: StubElement[ScFunction], nodeType: IE
   override def toString: String = "ScMacroDefinition: " + name
 
   def returnTypeInner: TypeResult[ScType] = returnTypeElement match {
-    case None => Success(doGetType(), Some(this)) // TODO look up type from the macro impl.
+    case None =>
+      Success(doGetType(), Some(this)) // TODO look up type from the macro impl.
     case Some(rte: ScTypeElement) => rte.getType(TypingContext.empty)
   }
 
   def body: Option[ScExpression] = {
     val stub = getStub
-    if (stub != null) stub.asInstanceOf[ScFunctionStub].getBodyExpression else findChild(classOf[ScExpression])
+    if (stub != null) stub.asInstanceOf[ScFunctionStub].getBodyExpression
+    else findChild(classOf[ScExpression])
   }
 
   override def hasAssign: Boolean = true
@@ -88,7 +95,10 @@ class ScMacroDefinitionImpl private (stub: StubElement[ScFunction], nodeType: IE
   def doGetType() = {
     name match {
       case "doMacro" =>
-        ScalaPsiElementFactory.createTypeElementFromText("(Int, String)", getManager).getType().get
+        ScalaPsiElementFactory
+          .createTypeElementFromText("(Int, String)", getManager)
+          .getType()
+          .get
       case _ => Any
     }
   }

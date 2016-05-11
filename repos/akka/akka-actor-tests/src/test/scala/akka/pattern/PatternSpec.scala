@@ -1,14 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.pattern
 
 import language.postfixOps
 
-import akka.testkit.{ TestLatch, AkkaSpec }
-import akka.actor.{ Props, Actor }
-import scala.concurrent.{ Future, Promise, Await }
+import akka.testkit.{TestLatch, AkkaSpec}
+import akka.actor.{Props, Actor}
+import scala.concurrent.{Future, Promise, Await}
 import scala.concurrent.duration._
 
 object PatternSpec {
@@ -44,7 +43,9 @@ class PatternSpec extends AkkaSpec("akka.actor.serialize-messages = off") {
       val target = system.actorOf(Props[TargetActor])
       val latch = TestLatch()
       target ! ((latch, remainingOrDefault))
-      intercept[AskTimeoutException] { Await.result(gracefulStop(target, 500 millis), remainingOrDefault) }
+      intercept[AskTimeoutException] {
+        Await.result(gracefulStop(target, 500 millis), remainingOrDefault)
+      }
       latch.open()
     }
   }
@@ -52,7 +53,8 @@ class PatternSpec extends AkkaSpec("akka.actor.serialize-messages = off") {
   "pattern.after" must {
     "be completed successfully eventually" in {
       // TODO after is unfortunately shadowed by ScalaTest, fix as part of #3759
-      val f = akka.pattern.after(1 second, using = system.scheduler)(Promise.successful(5).future)
+      val f = akka.pattern.after(1 second, using = system.scheduler)(
+          Promise.successful(5).future)
 
       val r = Future.firstCompletedOf(Seq(Promise[Int]().future, f))
       Await.result(r, remainingOrDefault) should ===(5)
@@ -60,10 +62,12 @@ class PatternSpec extends AkkaSpec("akka.actor.serialize-messages = off") {
 
     "be completed abnormally eventually" in {
       // TODO after is unfortunately shadowed by ScalaTest, fix as part of #3759
-      val f = akka.pattern.after(1 second, using = system.scheduler)(Promise.failed(new IllegalStateException("Mexico")).future)
+      val f = akka.pattern.after(1 second, using = system.scheduler)(
+          Promise.failed(new IllegalStateException("Mexico")).future)
 
       val r = Future.firstCompletedOf(Seq(Promise[Int]().future, f))
-      intercept[IllegalStateException] { Await.result(r, remainingOrDefault) }.getMessage should ===("Mexico")
+      intercept[IllegalStateException] { Await.result(r, remainingOrDefault) }.getMessage should ===(
+          "Mexico")
     }
   }
 }

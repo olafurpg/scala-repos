@@ -1,7 +1,6 @@
 import scala.tools.partest.Util.trace
 import scala.util.control.Exception.allCatch
 
-
 object Test extends App {
   def intercept = allCatch.withApply(_.getClass)
   val t: Boolean = true

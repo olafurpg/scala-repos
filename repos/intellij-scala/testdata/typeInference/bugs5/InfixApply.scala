@@ -3,8 +3,9 @@ object InfixApply {
     def apply(x: T): T = x
   }
 
-  def foo[A] : Query[A] = null
+  def foo[A]: Query[A] = null
 
-  /*start*/InfixApply foo 1/*end*/
+  /*start*/
+  InfixApply foo 1 /*end*/
 }
 //Int

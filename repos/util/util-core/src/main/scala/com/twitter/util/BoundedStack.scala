@@ -3,10 +3,10 @@ package com.twitter.util
 import scala.reflect.ClassTag
 
 /**
- * A "stack" with a bounded size.  If you push a new element on the top
- * when the stack is full, the oldest element gets dropped off the bottom.
- */
-class BoundedStack[A: ClassTag](val maxSize: Int) extends Seq[A] {
+  * A "stack" with a bounded size.  If you push a new element on the top
+  * when the stack is full, the oldest element gets dropped off the bottom.
+  */
+class BoundedStack[A : ClassTag](val maxSize: Int) extends Seq[A] {
   private val array = new Array[A](maxSize)
   private var top = 0
   private var count_ = 0
@@ -20,16 +20,16 @@ class BoundedStack[A: ClassTag](val maxSize: Int) extends Seq[A] {
   }
 
   /**
-   * Gets the element from the specified index in constant time.
-   */
+    * Gets the element from the specified index in constant time.
+    */
   def apply(i: Int): A = {
     if (i >= count_) throw new IndexOutOfBoundsException(i.toString)
     else array((top + i) % maxSize)
   }
 
   /**
-   * Pushes an element, possibly forcing out the oldest element in the stack.
-   */
+    * Pushes an element, possibly forcing out the oldest element in the stack.
+    */
   def +=(elem: A) {
     top = if (top == 0) maxSize - 1 else top - 1
     array(top) = elem
@@ -37,10 +37,10 @@ class BoundedStack[A: ClassTag](val maxSize: Int) extends Seq[A] {
   }
 
   /**
-   * Inserts an element 'i' positions down in the stack.  An 'i' value
-   * of 0 is the same as calling this += elem.  This is a O(n) operation
-   * as elements need to be shifted around.
-   */
+    * Inserts an element 'i' positions down in the stack.  An 'i' value
+    * of 0 is the same as calling this += elem.  This is a O(n) operation
+    * as elements need to be shifted around.
+    */
   def insert(i: Int, elem: A) {
     if (i == 0) this += elem
     else if (i > count_) throw new IndexOutOfBoundsException(i.toString)
@@ -55,25 +55,25 @@ class BoundedStack[A: ClassTag](val maxSize: Int) extends Seq[A] {
   }
 
   /**
-   * Replaces an element in the stack.
-   */
+    * Replaces an element in the stack.
+    */
   def update(index: Int, elem: A) {
     array((top + index) % maxSize) = elem
   }
 
   /**
-   * Adds multiple elements, possibly overwriting the oldest elements in
-   * the stack.  If the given iterable contains more elements that this
-   * stack can hold, then only the last maxSize elements will end up in
-   * the stack.
-   */
+    * Adds multiple elements, possibly overwriting the oldest elements in
+    * the stack.  If the given iterable contains more elements that this
+    * stack can hold, then only the last maxSize elements will end up in
+    * the stack.
+    */
   def ++=(iter: Iterable[A]) {
     for (elem <- iter) this += elem
   }
 
   /**
-   * Removes the top element in the stack.
-   */
+    * Removes the top element in the stack.
+    */
   def pop: A = {
     if (count_ == 0) throw new NoSuchElementException
     else {

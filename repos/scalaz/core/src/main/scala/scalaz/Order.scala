@@ -4,15 +4,15 @@ package scalaz
 import scala.math.{Ordering => SOrdering}
 
 /**
- * Safer version of [[scala.math.Ordering]].
- */
+  * Safer version of [[scala.math.Ordering]].
+  */
 ////
 trait Order[F] extends Equal[F] { self =>
   ////
   def apply(x: F, y: F): Ordering = order(x, y)
 
-  def order(x: F, y: F): Ordering 
-  
+  def order(x: F, y: F): Ordering
+
   def equal(x: F, y: F): Boolean = order(x, y) == Ordering.EQ
 
   // derived functions
@@ -83,7 +83,7 @@ object Order {
     override def conquer[A] = order((_, _) => Ordering.EQ)
 
     override def divide[A, B, C](fa: Order[A], fb: Order[B])(f: C => (A, B)) =
-      order[C]{ (c1, c2) =>
+      order[C] { (c1, c2) =>
         val (a1, b1) = f(c1)
         val (a2, b2) = f(c2)
         fa.order(a1, a2) match {
@@ -94,11 +94,12 @@ object Order {
   }
 
   def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {
-    def order(a1: A, a2: A) = std.anyVal.intInstance.order(O.compare(a1, a2), 0)
+    def order(a1: A, a2: A) =
+      std.anyVal.intInstance.order(O.compare(a1, a2), 0)
   }
 
   /** Alias for `Order[B] contramap f`, with inferred `B`. */
-  def orderBy[A, B: Order](f: A => B): Order[A] = Order[B] contramap f
+  def orderBy[A, B : Order](f: A => B): Order[A] = Order[B] contramap f
 
   /** Derive from an `order` function. */
   def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
@@ -110,7 +111,8 @@ object Order {
       def order(x: A, y: A): Ordering = Monoid[Ordering].zero
     }
     def append(f1: Order[A], f2: => Order[A]): Order[A] = new Order[A] {
-      def order(x: A, y: A): Ordering = Semigroup[Ordering].append(f1.order(x, y), f2.order(x, y))
+      def order(x: A, y: A): Ordering =
+        Semigroup[Ordering].append(f1.order(x, y), f2.order(x, y))
     }
   }
 

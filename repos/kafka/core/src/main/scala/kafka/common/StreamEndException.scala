@@ -17,7 +17,6 @@
 package kafka.common
 
 /**
- * An exception that indicates KafkaStream has ended.
- */
-class StreamEndException() extends RuntimeException {
-}
+  * An exception that indicates KafkaStream has ended.
+  */
+class StreamEndException() extends RuntimeException {}

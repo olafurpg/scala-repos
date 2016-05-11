@@ -1,1 +1,1 @@
-class Sub extends Raw_2 { }
+class Sub extends Raw_2 {}

@@ -17,8 +17,8 @@ import spire.syntax.nroot._
 package object math {
 
   /**
-   * abs
-   */
+    * abs
+    */
   final def abs(n: Byte): Byte = Math.abs(n).toByte
   final def abs(n: Short): Short = Math.abs(n).toShort
   final def abs(n: Int): Int = Math.abs(n)
@@ -28,16 +28,16 @@ package object math {
   final def abs[A](a: A)(implicit ev: Signed[A]): A = ev.abs(a)
 
   /**
-   * ceil
-   */
+    * ceil
+    */
   final def ceil(n: Float): Float = Math.ceil(n).toFloat
   final def ceil(n: Double): Double = Math.ceil(n)
   final def ceil(n: BigDecimal): BigDecimal = n.setScale(0, CEILING)
   final def ceil[A](a: A)(implicit ev: IsReal[A]): A = ev.ceil(a)
 
   /**
-   * choose (binomial coefficient)
-   */
+    * choose (binomial coefficient)
+    */
   def choose(n: Long, k: Long): BigInt = {
     if (n < 0 || k < 0) throw new IllegalArgumentException(s"n=$n, k=$k")
     if (k == 0L || k == n) return BigInt(1)
@@ -48,15 +48,13 @@ package object math {
       if (lo > hi) prod
       else loop(lo + 1L, hi - 1L, BigInt(lo) * BigInt(hi) * prod)
 
-    if (((n - k) & 1) == 1)
-      loop(k + 1, n - 1L, BigInt(n)) / fact(n - k)
-    else
-      loop(k + 1, n, BigInt(1)) / fact(n - k)
+    if (((n - k) & 1) == 1) loop(k + 1, n - 1L, BigInt(n)) / fact(n - k)
+    else loop(k + 1, n, BigInt(1)) / fact(n - k)
   }
 
   /**
-   * factorial
-   */
+    * factorial
+    */
   def fact(n: Long): BigInt = {
     @tailrec def loop(lo: Long, hi: Long, prod: BigInt): BigInt =
       if (lo > hi) prod
@@ -68,12 +66,12 @@ package object math {
   }
 
   /**
-   * fibonacci
-   */
+    * fibonacci
+    */
   def fib(n: Long): BigInt = {
     if (n < 0) throw new IllegalArgumentException(n.toString)
     var i = 63
-    while (((n >>> i) & 1) == 0 && i >= 0) i -= 1
+    while ( ((n >>> i) & 1) == 0 && i >= 0) i -= 1
     @tailrec def loop(a: BigInt, b: BigInt, i: Int): BigInt = {
       val c = a + b
       if (i < 0) b
@@ -84,16 +82,16 @@ package object math {
   }
 
   /**
-   * floor
-   */
+    * floor
+    */
   final def floor(n: Float): Float = Math.floor(n).toFloat
   final def floor(n: Double): Double = Math.floor(n)
   final def floor(n: BigDecimal): BigDecimal = n.setScale(0, FLOOR)
   final def floor[A](a: A)(implicit ev: IsReal[A]): A = ev.floor(a)
 
   /**
-   * round
-   */
+    * round
+    */
   final def round(a: Float): Float =
     if (Math.abs(a) >= 16777216.0F) a else Math.round(a).toFloat
   final def round(a: Double): Double =
@@ -103,8 +101,8 @@ package object math {
   final def round[A](a: A)(implicit ev: IsReal[A]): A = ev.round(a)
 
   /**
-   * exp
-   */
+    * exp
+    */
   final def exp(n: Double): Double = Math.exp(n)
 
   final def exp(k: Int, precision: Int): BigDecimal = {
@@ -126,9 +124,11 @@ package object math {
   final def exp(k: BigDecimal): BigDecimal = {
     // take a BigDecimal to a BigInt power
     @tailrec
-    def power(result: BigDecimal, base: BigDecimal, exponent: BigInt): BigDecimal =
+    def power(
+        result: BigDecimal, base: BigDecimal, exponent: BigInt): BigDecimal =
       if (exponent.signum == 0) result
-      else if (exponent.testBit(0)) power(result * base, base * base, exponent >> 1)
+      else if (exponent.testBit(0))
+        power(result * base, base * base, exponent >> 1)
       else power(result, base * base, exponent >> 1)
 
     if (k.signum == 0) return BigDecimal(1)
@@ -175,8 +175,8 @@ package object math {
   final def exp[A](a: A)(implicit t: Trig[A]): A = t.exp(a)
 
   /**
-   * log
-   */
+    * log
+    */
   final def log(n: Double): Double = Math.log(n)
 
   final def log(n: Double, base: Int): Double =
@@ -198,8 +198,7 @@ package object math {
       loop(n.setScale(scale2, HALF_UP)).setScale(scale, HALF_UP)
     }
 
-    if (n.signum < 1)
-      throw new IllegalArgumentException("argument <= 0")
+    if (n.signum < 1) throw new IllegalArgumentException("argument <= 0")
 
     @tailrec def rescale(x: BigDecimal, n: Int): (BigDecimal, Int) =
       if (x < 64) (x, n) else rescale(x.sqrt, n + 1)
@@ -219,16 +218,13 @@ package object math {
     f.div(t.log(a), t.log(f.fromInt(base)))
 
   /**
-   * pow
-   */
-
+    * pow
+    */
   // TODO: figure out how much precision we need from log(base) to
   // make the exp() have the right precision
   final def pow(base: BigDecimal, exponent: BigDecimal): BigDecimal =
-    if (exponent.abs <= 99999999 && exponent.isWhole)
-      base.pow(exponent.toInt)
-    else
-      exp(log(base) * exponent)
+    if (exponent.abs <= 99999999 && exponent.isWhole) base.pow(exponent.toInt)
+    else exp(log(base) * exponent)
 
   final def pow(base: BigInt, ex: BigInt): BigInt = {
     @tailrec def bigIntPow(t: BigInt, b: BigInt, e: BigInt): BigInt =
@@ -237,7 +233,8 @@ package object math {
       else bigIntPow(t, b * b, e >> 1)
 
     if (ex.signum < 0) {
-      if (base.signum == 0) throw new ArithmeticException("zero can't be raised to negative power")
+      if (base.signum == 0)
+        throw new ArithmeticException("zero can't be raised to negative power")
       else if (base == 1) base
       else if (base == -1) if (ex.testBit(0)) BigInt(1) else base
       else BigInt(0)
@@ -249,11 +246,11 @@ package object math {
   }
 
   /**
-   * Exponentiation function, e.g. x^y
-   *
-   * If base^ex doesn't fit in a Long, the result will overflow (unlike
-   * Math.pow which will return +/- Infinity).
-   */
+    * Exponentiation function, e.g. x^y
+    *
+    * If base^ex doesn't fit in a Long, the result will overflow (unlike
+    * Math.pow which will return +/- Infinity).
+    */
   final def pow(base: Long, exponent: Long): Long = {
     @tailrec def longPow(t: Long, b: Long, e: Long): Long =
       if (e == 0L) t
@@ -261,7 +258,8 @@ package object math {
       else longPow(t, b * b, e >> 1L)
 
     if (exponent < 0L) {
-      if(base == 0L) throw new ArithmeticException("zero can't be raised to negative power")
+      if (base == 0L)
+        throw new ArithmeticException("zero can't be raised to negative power")
       else if (base == 1L) 1L
       else if (base == -1L) if ((exponent & 1L) == 0L) -1L else 1L
       else 0L
@@ -270,11 +268,12 @@ package object math {
     }
   }
 
-  final def pow(base: Double, exponent: Double): Double = Math.pow(base, exponent)
+  final def pow(base: Double, exponent: Double): Double =
+    Math.pow(base, exponent)
 
   /**
-   * gcd
-   */
+    * gcd
+    */
   final def gcd(_x: Long, _y: Long): Long = {
     if (_x == 0L) return Math.abs(_y)
     if (_x == 1L) return 1L
@@ -305,20 +304,23 @@ package object math {
   final def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
   final def gcd[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.gcd(x, y)
   final def gcd[A](xs: Seq[A])(implicit ev: EuclideanRing[A]): A =
-    xs.foldLeft(ev.zero) { (x, y) => gcd(y, x) }
-  final def gcd[A](x: A, y: A, z: A, rest: A*)(implicit ev: EuclideanRing[A]): A =
+    xs.foldLeft(ev.zero) { (x, y) =>
+      gcd(y, x)
+    }
+  final def gcd[A](x: A, y: A, z: A, rest: A*)(
+      implicit ev: EuclideanRing[A]): A =
     gcd(gcd(gcd(x, y), z), gcd(rest))
 
   /**
-   * lcm
-   */
+    * lcm
+    */
   final def lcm(x: Long, y: Long): Long = (x / gcd(x, y)) * y
   final def lcm(a: BigInt, b: BigInt): BigInt = (a / a.gcd(b)) * b
   final def lcm[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.lcm(x, y)
 
   /**
-   * min
-   */
+    * min
+    */
   final def min(x: Byte, y: Byte): Byte = Math.min(x, y).toByte
   final def min(x: Short, y: Short): Short = Math.min(x, y).toShort
   final def min(x: Int, y: Int): Int = Math.min(x, y)
@@ -328,8 +330,8 @@ package object math {
   final def min[A](x: A, y: A)(implicit ev: Order[A]): A = ev.min(x, y)
 
   /**
-   * max
-   */
+    * max
+    */
   final def max(x: Byte, y: Byte): Byte = Math.max(x, y).toByte
   final def max(x: Short, y: Short): Short = Math.max(x, y).toShort
   final def max(x: Int, y: Int): Int = Math.max(x, y)
@@ -339,42 +341,52 @@ package object math {
   final def max[A](x: A, y: A)(implicit ev: Order[A]): A = ev.max(x, y)
 
   /**
-   * signum
-   */
+    * signum
+    */
   final def signum(x: Double): Double = Math.signum(x)
   final def signum(x: Float): Float = Math.signum(x)
   final def signum[A](a: A)(implicit ev: Signed[A]): Int = ev.signum(a)
 
   /**
-   * sqrt
-   */
+    * sqrt
+    */
   final def sqrt(x: Double): Double = Math.sqrt(x)
   final def sqrt[A](a: A)(implicit ev: NRoot[A]): A = ev.sqrt(a)
 
   /**
-   * e
-   */
+    * e
+    */
   final def e: Double = Math.E
   final def e[@sp(Float, Double) A](implicit ev: Trig[A]): A = ev.e
 
   /**
-   * pi
-   */
+    * pi
+    */
   final def pi: Double = Math.PI
   final def pi[@sp(Float, Double) A](implicit ev: Trig[A]): A = ev.pi
 
-  final def sin[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.sin(a)
-  final def cos[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.cos(a)
-  final def tan[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.tan(a)
+  final def sin[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A =
+    ev.sin(a)
+  final def cos[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A =
+    ev.cos(a)
+  final def tan[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A =
+    ev.tan(a)
 
-  final def asin[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.asin(a)
-  final def acos[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.acos(a)
-  final def atan[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.atan(a)
-  final def atan2[@sp(Float, Double) A](y: A, x: A)(implicit ev: Trig[A]): A = ev.atan2(y, x)
+  final def asin[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A =
+    ev.asin(a)
+  final def acos[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A =
+    ev.acos(a)
+  final def atan[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A =
+    ev.atan(a)
+  final def atan2[@sp(Float, Double) A](y: A, x: A)(implicit ev: Trig[A]): A =
+    ev.atan2(y, x)
 
-  final def sinh[@sp(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.sinh(x)
-  final def cosh[@sp(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.cosh(x)
-  final def tanh[@sp(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.tanh(x)
+  final def sinh[@sp(Float, Double) A](x: A)(implicit ev: Trig[A]): A =
+    ev.sinh(x)
+  final def cosh[@sp(Float, Double) A](x: A)(implicit ev: Trig[A]): A =
+    ev.cosh(x)
+  final def tanh[@sp(Float, Double) A](x: A)(implicit ev: Trig[A]): A =
+    ev.tanh(x)
 
   // java.lang.Math/scala.math.compatibility
   final def cbrt(x: Double): Double = Math.cbrt(x)
@@ -384,7 +396,8 @@ package object math {
   final def expm1(x: Double): Double = Math.expm1(x)
   final def getExponent(x: Double): Int = Math.getExponent(x)
   final def getExponent(x: Float): Int = Math.getExponent(x)
-  final def IEEEremainder(x: Double, d: Double): Double = Math.IEEEremainder(x, d)
+  final def IEEEremainder(x: Double, d: Double): Double =
+    Math.IEEEremainder(x, d)
   final def log10(x: Double): Double = Math.log10(x)
   final def log1p(x: Double): Double = Math.log1p(x)
   final def nextAfter(x: Double, y: Double): Double = Math.nextAfter(x, y)
@@ -400,11 +413,11 @@ package object math {
   final def ulp(x: Double): Double = Math.ulp(x)
   final def ulp(x: Float): Double = Math.ulp(x)
 
-  final def hypot[@sp(Float, Double) A](x: A, y: A)
-    (implicit f: Field[A], n: NRoot[A], o: Order[A]): A = {
+  final def hypot[@sp(Float, Double) A](x: A, y: A)(
+      implicit f: Field[A], n: NRoot[A], o: Order[A]): A = {
     import spire.implicits._
-    if (x > y) x.abs * (1 + (y/x)**2).sqrt
-    else y.abs * (1 + (x/y)**2).sqrt
+    if (x > y) x.abs * (1 + (y / x) ** 2).sqrt
+    else y.abs * (1 + (x / y) ** 2).sqrt
   }
 
   // ugly internal scala.math.ScalaNumber utilities follow
@@ -426,7 +439,8 @@ package object math {
       case n: Float => n.toDouble
       case n: Double => n
       case c: ScalaNumericConversions => c.toDouble
-      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+      case _ =>
+        throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
     }
 
   private[spire] def anyToLong(n: Any): Long =
@@ -439,7 +453,8 @@ package object math {
       case n: Float => n.toLong
       case n: Double => n.toLong
       case c: ScalaNumericConversions => c.toLong
-      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+      case _ =>
+        throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
     }
 
   private[spire] def anyIsWhole(n: Any): Boolean =
@@ -452,7 +467,8 @@ package object math {
       case n: Float => n.isWhole
       case n: Double => n.isWhole
       case c: ScalaNumericConversions => c.isWhole
-      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+      case _ =>
+        throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
     }
 
   private[spire] def anyIsValidInt(n: Any): Boolean =
@@ -465,6 +481,7 @@ package object math {
       case n: Float => n.isValidInt
       case n: Double => n.isValidInt
       case c: ScalaNumericConversions => c.isValidInt
-      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+      case _ =>
+        throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
     }
 }

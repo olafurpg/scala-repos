@@ -9,10 +9,9 @@ import org.ensime.util.file._
 import scala.concurrent._
 import scala.concurrent.duration._
 
-class SearchServiceSpec extends EnsimeSpec
-    with SharedTestKitFixture
-    with SharedSearchServiceFixture
-    with SearchServiceTestUtils {
+class SearchServiceSpec
+    extends EnsimeSpec with SharedTestKitFixture
+    with SharedSearchServiceFixture with SearchServiceTestUtils {
 
   def original = EnsimeConfigFixture.SimpleTestProject
 
@@ -52,7 +51,8 @@ class SearchServiceSpec extends EnsimeSpec
   it should "remove classfiles that have been deleted" in {
     withSearchService { (config, service) =>
       implicit val s = service
-      val classfile = config.subprojects.head.targetDirs.head / "org/example/Foo.class"
+      val classfile =
+        config.subprojects.head.targetDirs.head / "org/example/Foo.class"
 
       classfile shouldBe 'exists
 
@@ -61,115 +61,136 @@ class SearchServiceSpec extends EnsimeSpec
     }
   }
 
-  "class searching" should "return results from J2SE" in withSearchService { implicit service =>
-    searchesClasses(
-      "java.lang.String",
-      "String", "string",
-      "j.l.str", "j l str"
-    )
+  "class searching" should "return results from J2SE" in withSearchService {
+    implicit service =>
+      searchesClasses(
+          "java.lang.String",
+          "String",
+          "string",
+          "j.l.str",
+          "j l str"
+      )
   }
 
-  it should "return results from dependencies" in withSearchService { implicit service =>
-    searchesClasses(
-      "org.scalatest.FunSuite",
-      "FunSuite", "funsuite", "funsu",
-      "o s Fun"
-    )
+  it should "return results from dependencies" in withSearchService {
+    implicit service =>
+      searchesClasses(
+          "org.scalatest.FunSuite",
+          "FunSuite",
+          "funsuite",
+          "funsu",
+          "o s Fun"
+      )
   }
 
-  it should "return results from the project" in withSearchService { implicit service =>
-    searchesClasses(
-      "org.example.Bloo",
-      "o e bloo"
-    )
+  it should "return results from the project" in withSearchService {
+    implicit service =>
+      searchesClasses(
+          "org.example.Bloo",
+          "o e bloo"
+      )
 
-    searchesClasses(
-      "org.example.Blue$",
-      "o e blue"
-    )
+      searchesClasses(
+          "org.example.Blue$",
+          "o e blue"
+      )
 
-    searchesClasses(
-      "org.example.CaseClassWithCamelCaseName",
-      "CaseClassWith", "caseclasswith",
-      "o e Case", "o.e.caseclasswith",
-      "CCWC" // <= CamelCaseAwesomeNess
-    )
+      searchesClasses(
+          "org.example.CaseClassWithCamelCaseName",
+          "CaseClassWith",
+          "caseclasswith",
+          "o e Case",
+          "o.e.caseclasswith",
+          "CCWC" // <= CamelCaseAwesomeNess
+      )
   }
 
-  it should "return results from package objects" in withSearchService { implicit service =>
-    searchClasses(
-      "org.example.Blip$",
-      "Blip"
-    )
+  it should "return results from package objects" in withSearchService {
+    implicit service =>
+      searchClasses(
+          "org.example.Blip$",
+          "Blip"
+      )
 
-    searchClasses(
-      "org.example.Blop",
-      "Blop"
-    )
+      searchClasses(
+          "org.example.Blop",
+          "Blop"
+      )
   }
 
   "class and method searching" should "return results from classes" in {
     withSearchService { implicit service =>
       searchesClassesAndMethods(
-        "java.lang.String",
-        "String", "string",
-        "j.l.str", "j l str"
+          "java.lang.String",
+          "String",
+          "string",
+          "j.l.str",
+          "j l str"
       )
     }
   }
 
-  it should "return results from static fields" in withSearchService { implicit service =>
-    searchesEmpty(
-      "CASE_INSENSITIVE", "case_insensitive",
-      "case_"
-    )
+  it should "return results from static fields" in withSearchService {
+    implicit service =>
+      searchesEmpty(
+          "CASE_INSENSITIVE",
+          "case_insensitive",
+          "case_"
+      )
   }
 
-  it should "not return results from instance fields" in withSearchService { implicit service =>
-    searchesEmpty(
-      "java.awt.Point.x"
-    )
+  it should "not return results from instance fields" in withSearchService {
+    implicit service =>
+      searchesEmpty(
+          "java.awt.Point.x"
+      )
   }
 
-  it should "return results from static methods" in withSearchService { implicit service =>
-    searchesClassesAndMethods(
-      "java.lang.Runtime.addShutdownHook",
-      "addShutdownHook"
-    )
+  it should "return results from static methods" in withSearchService {
+    implicit service =>
+      searchesClassesAndMethods(
+          "java.lang.Runtime.addShutdownHook",
+          "addShutdownHook"
+      )
   }
 
-  it should "return results from instance methods" in withSearchService { implicit service =>
-    searchesClassesAndMethods(
-      "java.lang.Runtime.availableProcessors",
-      "availableProcessors", "availableP"
-    )
+  it should "return results from instance methods" in withSearchService {
+    implicit service =>
+      searchesClassesAndMethods(
+          "java.lang.Runtime.availableProcessors",
+          "availableProcessors",
+          "availableP"
+      )
   }
 
-  it should "not prioritise noisy inner classes" in withSearchService { implicit service =>
-    val hits = service.searchClasses("Baz", 10).map(_.fqn)
-    hits should contain theSameElementsAs (Seq(
-      "org.example2.Baz",
-      "org.example2.Baz$Wibble$baz",
-      "org.example2.Baz$Wibble$baz$",
-      "org.example2.Baz$Wibble$",
-      "org.example2.Baz$",
-      "org.example2.Baz$Wibble"
-    ))
-    hits.head shouldBe "org.example2.Baz"
+  it should "not prioritise noisy inner classes" in withSearchService {
+    implicit service =>
+      val hits = service.searchClasses("Baz", 10).map(_.fqn)
+      hits should contain theSameElementsAs
+      (Seq(
+              "org.example2.Baz",
+              "org.example2.Baz$Wibble$baz",
+              "org.example2.Baz$Wibble$baz$",
+              "org.example2.Baz$Wibble$",
+              "org.example2.Baz$",
+              "org.example2.Baz$Wibble"
+          ))
+      hits.head shouldBe "org.example2.Baz"
   }
 
-  "exact searches" should "find type aliases" in withSearchService { implicit service =>
-    service.findUnique("org.scalatest.fixture.ConfigMapFixture$FixtureParam") shouldBe defined
+  "exact searches" should "find type aliases" in withSearchService {
+    implicit service =>
+      service.findUnique("org.scalatest.fixture.ConfigMapFixture$FixtureParam") shouldBe defined
   }
 }
 
-trait SearchServiceTestUtils {
-  self: EnsimeSpec =>
+trait SearchServiceTestUtils { self: EnsimeSpec =>
 
   def refresh()(implicit service: SearchService): (Int, Int) =
     Await.result(service.refresh(), Duration.Inf)
 
-  def searchClasses(expect: String, query: String)(implicit service: SearchService) = {
+  def searchClasses(expect: String, query: String)(
+      implicit service: SearchService) = {
     val max = 10
     val info = s"'$query' expected '$expect')"
     val results = service.searchClasses(query, max)
@@ -183,10 +204,12 @@ trait SearchServiceTestUtils {
     results
   }
 
-  def searchesClasses(expect: String, queries: String*)(implicit service: SearchService) =
+  def searchesClasses(expect: String, queries: String*)(
+      implicit service: SearchService) =
     (expect :: queries.toList).foreach(searchClasses(expect, _))
 
-  def searchClassesAndMethods(expect: String, query: String)(implicit service: SearchService) = {
+  def searchClassesAndMethods(expect: String, query: String)(
+      implicit service: SearchService) = {
     val max = 10
     val info = s"'$query' expected '$expect')"
     val results = service.searchClassesMethods(List(query), max)
@@ -202,14 +225,15 @@ trait SearchServiceTestUtils {
   def searchExpectEmpty(query: String)(implicit service: SearchService) = {
     val max = 1
     val results = service.searchClassesMethods(List(query), max)
-    withClue("expected empty results from %s".format(query))(results shouldBe empty)
+    withClue("expected empty results from %s".format(query))(
+        results shouldBe empty)
     results
   }
 
   def searchesEmpty(queries: String*)(implicit service: SearchService) =
     queries.toList.foreach(searchExpectEmpty)
 
-  def searchesClassesAndMethods(expect: String, queries: String*)(implicit service: SearchService) =
+  def searchesClassesAndMethods(expect: String, queries: String*)(
+      implicit service: SearchService) =
     (expect :: queries.toList).foreach(searchClassesAndMethods(expect, _))
-
 }

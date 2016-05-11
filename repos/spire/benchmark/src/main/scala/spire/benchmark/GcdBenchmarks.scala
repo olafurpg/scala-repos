@@ -1,7 +1,6 @@
 package spire
 package benchmark
 
-
 import scala.util.Random
 import Random._
 
@@ -27,11 +26,11 @@ class GcdBenchmarks extends MyBenchmark {
     bigs = init(200000)(new BigInteger(nextLong.toString))
   }
 
-  def timeXorEuclidGcdLong(reps:Int) = run(reps)(xorEuclidGcdLong(longs))
-  def timeXorBinaryGcdLong(reps:Int) = run(reps)(xorBinaryGcdLong(longs))
+  def timeXorEuclidGcdLong(reps: Int) = run(reps)(xorEuclidGcdLong(longs))
+  def timeXorBinaryGcdLong(reps: Int) = run(reps)(xorBinaryGcdLong(longs))
   //def timeXorBuiltinGcdBigInteger(reps:Int) = run(reps)(xorBuiltinGcdBigInteger(bigs))
 
-  def xorEuclidGcdLong(data:Array[Long]):Long = {
+  def xorEuclidGcdLong(data: Array[Long]): Long = {
     var t = 0L
     var i = 0
     val len = data.length - 1
@@ -42,7 +41,7 @@ class GcdBenchmarks extends MyBenchmark {
     t
   }
 
-  def xorBinaryGcdLong(data:Array[Long]):Long = {
+  def xorBinaryGcdLong(data: Array[Long]): Long = {
     var t = 0L
     var i = 0
     val len = data.length - 1
@@ -53,7 +52,7 @@ class GcdBenchmarks extends MyBenchmark {
     t
   }
 
-  def xorBuiltinGcdBigInteger(data:Array[BigInteger]):BigInteger = {
+  def xorBuiltinGcdBigInteger(data: Array[BigInteger]): BigInteger = {
     var t = BigInteger.ZERO
     var i = 0
     val len = data.length - 1
@@ -94,4 +93,3 @@ class GcdBenchmarks extends MyBenchmark {
     if (xz < yz) x << xz else x << yz
   }
 }
-

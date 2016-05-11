@@ -15,32 +15,36 @@ import org.jetbrains.plugins.scala.lang.refactoring.introduceParameter.ScalaIntr
 import scala.beans.BeanProperty
 
 /**
- * Nikolay.Tropin
- * 2014-08-28
- */
+  * Nikolay.Tropin
+  * 2014-08-28
+  */
 case class ScalaChangeInfo(newVisibility: String,
                            function: ScMethodLike,
                            @BeanProperty newName: String,
                            newType: ScType,
                            newParams: Seq[Seq[ScalaParameterInfo]],
                            isAddDefaultArgs: Boolean)
-        extends ScalaChangeInfoBase(newParams.flatten.toArray)
-        with UnsupportedJavaInfo with VisibilityChangeInfo with ParametersChangeInfo {
+    extends ScalaChangeInfoBase(newParams.flatten.toArray)
+    with UnsupportedJavaInfo with VisibilityChangeInfo
+    with ParametersChangeInfo {
 
   val project = function.getProject
   private var myMethod: PsiMethod = function
   private def psiType = {
-    if (newType != null) ScType.toPsi(newType, project, GlobalSearchScope.allScope(project))
+    if (newType != null)
+      ScType.toPsi(newType, project, GlobalSearchScope.allScope(project))
     else null
   }
 
   //used in introduce parameter refactoring
   var introducedParameterData: Option[ScalaIntroduceParameterData] = None
 
-  override def getValue(i: Int, callExpression: PsiCallExpression): PsiExpression =
+  override def getValue(
+      i: Int, callExpression: PsiCallExpression): PsiExpression =
     getNewParameters()(i).getValue(callExpression)
 
-  override def getNewReturnType: Type = if (newType != null) CanonicalTypes.createTypeWrapper(psiType) else null
+  override def getNewReturnType: Type =
+    if (newType != null) CanonicalTypes.createTypeWrapper(psiType) else null
 
   override val getOldName: String = function match {
     case fun: ScFunction =>
@@ -50,7 +54,8 @@ case class ScalaChangeInfo(newVisibility: String,
     case _ => newName
   }
 
-  override def getNewNameIdentifier = JavaPsiFacade.getElementFactory(project).createIdentifier(newName)
+  override def getNewNameIdentifier =
+    JavaPsiFacade.getElementFactory(project).createIdentifier(newName)
 
   override def getMethod: PsiMethod = myMethod
 
@@ -65,7 +70,9 @@ case class ScalaChangeInfo(newVisibility: String,
   override val getLanguage: Language = ScalaFileType.SCALA_LANGUAGE
 
   override val isReturnTypeChanged: Boolean = function match {
-    case f: ScFunction => f.returnType.toOption.map(_.canonicalText) != Option(newType).map(_.canonicalText)
+    case f: ScFunction =>
+      f.returnType.toOption.map(_.canonicalText) != Option(newType).map(
+          _.canonicalText)
     case _ => false
   }
 }

@@ -1,6 +1,6 @@
 package lila.game
 
-import lila.user.{ User, UserRepo }
+import lila.user.{User, UserRepo}
 
 object BestOpponents {
 

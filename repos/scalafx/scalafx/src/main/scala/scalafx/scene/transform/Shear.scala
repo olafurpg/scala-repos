@@ -34,41 +34,41 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.{PositionDelegate, SFXDelegate}
 
 object Shear {
-  implicit def sfxShear2jfx(v: Shear): jfxst.Shear = if (v != null) v.delegate else null
+  implicit def sfxShear2jfx(v: Shear): jfxst.Shear =
+    if (v != null) v.delegate else null
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/scene/transform/Shear.html]]
- */
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/scene/transform/Shear.html]]
+  */
 class Shear(override val delegate: jfxst.Shear = new jfxst.Shear)
-  extends Transform(delegate)
-  with PositionDelegate[jfxst.Shear]
-  with SFXDelegate[jfxst.Shear] {
+    extends Transform(delegate) with PositionDelegate[jfxst.Shear]
+    with SFXDelegate[jfxst.Shear] {
 
   /**
-   * Creates a new instance of Shear.
-   */
+    * Creates a new instance of Shear.
+    */
   def this(x: Double, y: Double) = this(new jfxst.Shear(x, y))
 
   /**
-   * Creates a new instance of Shear with pivot.
-   */
-  def this(x: Double, y: Double, pivotX: Double, pivotY: Double) = this(new jfxst.Shear(x, y, pivotX, pivotY))
+    * Creates a new instance of Shear with pivot.
+    */
+  def this(x: Double, y: Double, pivotX: Double, pivotY: Double) =
+    this(new jfxst.Shear(x, y, pivotX, pivotY))
 
   /**
-   * Defines the X coordinate of the shear pivot point.
-   */
+    * Defines the X coordinate of the shear pivot point.
+    */
   def pivotX: DoubleProperty = delegate.pivotXProperty()
   def pivotX_=(v: Double) {
     pivotX() = v
   }
 
   /**
-   * Defines the Y coordinate of the shear pivot point.
-   */
+    * Defines the Y coordinate of the shear pivot point.
+    */
   def pivotY: DoubleProperty = delegate.pivotYProperty()
   def pivotY_=(v: Double) {
     pivotY() = v
   }
-
 }

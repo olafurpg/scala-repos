@@ -1,1 +1,1 @@
-class Foo[T] extends java.util.concurrent.BlockingQueue[T] { }
+class Foo[T] extends java.util.concurrent.BlockingQueue[T] {}

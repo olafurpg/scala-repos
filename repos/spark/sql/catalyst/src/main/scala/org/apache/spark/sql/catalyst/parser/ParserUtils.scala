@@ -22,10 +22,9 @@ import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.trees.CurrentOrigin
 import org.apache.spark.sql.types._
 
-
 /**
- * A collection of utility methods and patterns for parsing query texts.
- */
+  * A collection of utility methods and patterns for parsing query texts.
+  */
 // TODO: merge with ParseUtils
 object ParserUtils {
 
@@ -61,8 +60,8 @@ object ParserUtils {
   val DECIMAL = "[+-]?((\\d+(\\.\\d*)?)|(\\.\\d+))".r
 
   /**
-   * Strip quotes, if any, from the string.
-   */
+    * Strip quotes, if any, from the string.
+    */
   def unquoteString(str: String): String = {
     str match {
       case singleQuotedString(s) => s
@@ -72,8 +71,8 @@ object ParserUtils {
   }
 
   /**
-   * Strip backticks, if any, from the string.
-   */
+    * Strip backticks, if any, from the string.
+    */
   def cleanIdentifier(ident: String): String = {
     ident match {
       case escapedIdentifier(i) => i
@@ -81,19 +80,21 @@ object ParserUtils {
     }
   }
 
-  def getClauses(
-      clauseNames: Seq[String],
-      nodeList: Seq[ASTNode]): Seq[Option[ASTNode]] = {
+  def getClauses(clauseNames: Seq[String],
+                 nodeList: Seq[ASTNode]): Seq[Option[ASTNode]] = {
     var remainingNodes = nodeList
     val clauses = clauseNames.map { clauseName =>
-      val (matches, nonMatches) = remainingNodes.partition(_.text.toUpperCase == clauseName)
-      remainingNodes = nonMatches ++ (if (matches.nonEmpty) matches.tail else Nil)
+      val (matches, nonMatches) =
+        remainingNodes.partition(_.text.toUpperCase == clauseName)
+      remainingNodes = nonMatches ++
+      (if (matches.nonEmpty) matches.tail else Nil)
       matches.headOption
     }
 
     if (remainingNodes.nonEmpty) {
-      sys.error(
-        s"""Unhandled clauses: ${remainingNodes.map(_.treeString).mkString("\n")}.
+      sys.error(s"""Unhandled clauses: ${remainingNodes
+                 .map(_.treeString)
+                 .mkString("\n")}.
             |You are likely trying to use an unsupported Hive feature."""".stripMargin)
     }
     clauses
@@ -101,10 +102,11 @@ object ParserUtils {
 
   def getClause(clauseName: String, nodeList: Seq[ASTNode]): ASTNode = {
     getClauseOption(clauseName, nodeList).getOrElse(sys.error(
-      s"Expected clause $clauseName missing from ${nodeList.map(_.treeString).mkString("\n")}"))
+            s"Expected clause $clauseName missing from ${nodeList.map(_.treeString).mkString("\n")}"))
   }
 
-  def getClauseOption(clauseName: String, nodeList: Seq[ASTNode]): Option[ASTNode] = {
+  def getClauseOption(
+      clauseName: String, nodeList: Seq[ASTNode]): Option[ASTNode] = {
     nodeList.filter { case ast: ASTNode => ast.text == clauseName } match {
       case Seq(oneMatch) => Some(oneMatch)
       case Seq() => None
@@ -117,9 +119,11 @@ object ParserUtils {
       case Token(part, Nil) => cleanIdentifier(part)
     } match {
       case Seq(tableOnly) => TableIdentifier(tableOnly)
-      case Seq(databaseName, table) => TableIdentifier(table, Some(databaseName))
-      case other => sys.error("Hive only supports tables names like 'tableName' " +
-        s"or 'databaseName.tableName', found '$other'")
+      case Seq(databaseName, table) =>
+        TableIdentifier(table, Some(databaseName))
+      case other =>
+        sys.error("Hive only supports tables names like 'tableName' " +
+            s"or 'databaseName.tableName', found '$other'")
     }
   }
 
@@ -142,7 +146,8 @@ object ParserUtils {
     case Token("TOK_DATE", Nil) => DateType
     case Token("TOK_TIMESTAMP", Nil) => TimestampType
     case Token("TOK_BINARY", Nil) => BinaryType
-    case Token("TOK_LIST", elementType :: Nil) => ArrayType(nodeToDataType(elementType))
+    case Token("TOK_LIST", elementType :: Nil) =>
+      ArrayType(nodeToDataType(elementType))
     case Token("TOK_STRUCT", Token("TOK_TABCOLLIST", fields) :: Nil) =>
       StructType(fields.map(nodeToStructField))
     case Token("TOK_MAP", keyType :: valueType :: Nil) =>
@@ -153,27 +158,34 @@ object ParserUtils {
 
   def nodeToStructField(node: ASTNode): StructField = node match {
     case Token("TOK_TABCOL", Token(fieldName, Nil) :: dataType :: Nil) =>
-      StructField(cleanIdentifier(fieldName), nodeToDataType(dataType), nullable = true)
-    case Token("TOK_TABCOL", Token(fieldName, Nil) :: dataType :: comment :: Nil) =>
-      val meta = new MetadataBuilder().putString("comment", unquoteString(comment.text)).build()
-      StructField(cleanIdentifier(fieldName), nodeToDataType(dataType), nullable = true, meta)
+      StructField(cleanIdentifier(fieldName),
+                  nodeToDataType(dataType),
+                  nullable = true)
+    case Token(
+        "TOK_TABCOL", Token(fieldName, Nil) :: dataType :: comment :: Nil) =>
+      val meta = new MetadataBuilder()
+        .putString("comment", unquoteString(comment.text))
+        .build()
+      StructField(cleanIdentifier(fieldName),
+                  nodeToDataType(dataType),
+                  nullable = true,
+                  meta)
     case _ =>
       noParseRule("StructField", node)
   }
 
   /**
-   * Throw an exception because we cannot parse the given node for some unexpected reason.
-   */
+    * Throw an exception because we cannot parse the given node for some unexpected reason.
+    */
   def parseFailed(msg: String, node: ASTNode): Nothing = {
     throw new AnalysisException(s"$msg: '${node.source}")
   }
 
   /**
-   * Throw an exception because there are no rules to parse the node.
-   */
+    * Throw an exception because there are no rules to parse the node.
+    */
   def noParseRule(msg: String, node: ASTNode): Nothing = {
     throw new NotImplementedError(
-      s"[$msg]: No parse rules for ASTNode type: ${node.tokenType}, tree:\n${node.treeString}")
+        s"[$msg]: No parse rules for ASTNode type: ${node.tokenType}, tree:\n${node.treeString}")
   }
-
 }

@@ -1,10 +1,9 @@
-
 import scala.tools.partest.SessionTest
 
 // Handy hamburger helper for repl resources
 object Test extends SessionTest {
   def session =
-"""
+    """
 scala> $intp.isettings.unwrapStrings = false
 $intp.isettings.unwrapStrings: Boolean = false
 
@@ -28,4 +27,3 @@ res4: java.net.URL = null
 
 scala> :quit"""
 }
-

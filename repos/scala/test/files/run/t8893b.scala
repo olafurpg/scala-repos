@@ -2,7 +2,7 @@
 // jumps, even though the method contains recursive calls outside
 // of the tail position.
 object Test {
-  def tick(i : Int): Unit =
+  def tick(i: Int): Unit =
     if (i == 0) ()
     else if (i == 42) {
       tick(0) /*not in tail position*/

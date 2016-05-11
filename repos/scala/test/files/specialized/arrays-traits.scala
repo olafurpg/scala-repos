@@ -6,7 +6,7 @@ trait SuperS[@specialized(AnyRef) T] {
   def bar(b: Array[T]) = b(0) = arr(0)
 }
 
-class BaseS[@specialized(AnyRef) T](val arr: Array[T]) extends SuperS[T] { }
+class BaseS[@specialized(AnyRef) T](val arr: Array[T]) extends SuperS[T] {}
 
 trait SuperG[T] {
   def arr: Array[T]
@@ -14,7 +14,7 @@ trait SuperG[T] {
   def bar(b: Array[T]) = b(0) = arr(0)
 }
 
-class BaseG[T](val arr: Array[T]) extends SuperG[T] { }
+class BaseG[T](val arr: Array[T]) extends SuperG[T] {}
 
 object Test {
   def main(args: Array[String]) {

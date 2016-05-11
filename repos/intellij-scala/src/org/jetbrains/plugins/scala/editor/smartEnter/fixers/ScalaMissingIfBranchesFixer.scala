@@ -8,13 +8,16 @@ import org.jetbrains.plugins.scala.editor.smartEnter.ScalaSmartEnterProcessor
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScIfStmt}
 
 /**
- * @author Dmitry.Naydanov
- * @author Ksenia.Sautina
- * @since 1/31/13
- */
+  * @author Dmitry.Naydanov
+  * @author Ksenia.Sautina
+  * @since 1/31/13
+  */
 class ScalaMissingIfBranchesFixer extends ScalaFixer {
-  def apply(editor: Editor, processor: ScalaSmartEnterProcessor, psiElement: PsiElement): OperationPerformed = {
-    val ifStatement = PsiTreeUtil.getParentOfType(psiElement, classOf[ScIfStmt], false)
+  def apply(editor: Editor,
+            processor: ScalaSmartEnterProcessor,
+            psiElement: PsiElement): OperationPerformed = {
+    val ifStatement =
+      PsiTreeUtil.getParentOfType(psiElement, classOf[ScIfStmt], false)
     if (ifStatement == null) return NoOperation
 
     val doc = editor.getDocument
@@ -25,10 +28,13 @@ class ScalaMissingIfBranchesFixer extends ScalaFixer {
       case Some(block: ScBlockExpr) =>
         ifStatement.condition.foreach {
           case cond =>
-            if (cond.getTextRange.containsOffset(editor.getCaretModel.getOffset)) return placeInWholeBlock(block, editor)
+            if (cond.getTextRange.containsOffset(
+                    editor.getCaretModel.getOffset))
+              return placeInWholeBlock(block, editor)
         }
         return NoOperation
-      case Some(branch) if startLine(doc, branch) == startLine(doc, ifStatement) =>
+      case Some(branch)
+          if startLine(doc, branch) == startLine(doc, ifStatement) =>
         if (ifStatement.condition.isDefined) return NoOperation
         transformingOneLiner = true
       case _ =>
@@ -39,7 +45,8 @@ class ScalaMissingIfBranchesFixer extends ScalaFixer {
 
     val rParenthOffset = rParenth.getTextRange.getEndOffset
 
-    if (ifStatement.elseBranch.isEmpty && !transformingOneLiner || ifStatement.thenBranch.isEmpty) {
+    if (ifStatement.elseBranch.isEmpty && !transformingOneLiner ||
+        ifStatement.thenBranch.isEmpty) {
       doc.insertString(rParenthOffset, " {}")
     } else {
       doc.insertString(rParenthOffset, " {")
@@ -51,4 +58,3 @@ class ScalaMissingIfBranchesFixer extends ScalaFixer {
     WithEnter(2)
   }
 }
-

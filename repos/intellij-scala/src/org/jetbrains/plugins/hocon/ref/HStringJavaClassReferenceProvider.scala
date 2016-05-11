@@ -15,16 +15,20 @@ class HStringJavaClassReferenceProvider extends JavaClassReferenceProvider {
   private def isEligible(element: HString) = {
     val settings = HoconProjectSettings.getInstance(element.getProject)
     (element.getNode.getElementType, element.stringType) match {
-      case (StringValue, UnquotedString) => settings.classReferencesOnUnquotedStrings
-      case (StringValue | KeyPart, QuotedString) => settings.classReferencesOnQuotedStrings
+      case (StringValue, UnquotedString) =>
+        settings.classReferencesOnUnquotedStrings
+      case (StringValue | KeyPart, QuotedString) =>
+        settings.classReferencesOnQuotedStrings
       case _ => false
     }
   }
 
-  override def getReferencesByString(str: String, position: PsiElement, offsetInPosition: Int) = position match {
-    case hstr: HString if isEligible(hstr) =>
-      super.getReferencesByString(str, position, offsetInPosition)
-    case _ =>
-      PsiReference.EMPTY_ARRAY
-  }
+  override def getReferencesByString(
+      str: String, position: PsiElement, offsetInPosition: Int) =
+    position match {
+      case hstr: HString if isEligible(hstr) =>
+        super.getReferencesByString(str, position, offsetInPosition)
+      case _ =>
+        PsiReference.EMPTY_ARRAY
+    }
 }

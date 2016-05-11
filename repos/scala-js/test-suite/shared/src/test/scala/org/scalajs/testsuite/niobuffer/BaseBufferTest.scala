@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.niobuffer
 
@@ -46,10 +46,8 @@ abstract class BaseBufferTest {
 
   @Test def isReadOnly()(): Unit = {
     val buf = allocBuffer(10)
-    if (createsReadOnly)
-      assertTrue(buf.isReadOnly())
-    else
-      assertFalse(buf.isReadOnly())
+    if (createsReadOnly) assertTrue(buf.isReadOnly())
+    else assertFalse(buf.isReadOnly())
   }
 
   @Test def position(): Unit = {
@@ -270,25 +268,31 @@ abstract class BaseBufferTest {
     val buf = allocBuffer(10)
     if (!createsReadOnly) {
       buf.put(Array[ElementType](6, 7, 12))
-      assertArrayEquals(boxedElemsFromInt(6, 7, 12, 0), boxed((0 to 3).map(buf.get).toArray))
+      assertArrayEquals(
+          boxedElemsFromInt(6, 7, 12, 0), boxed((0 to 3).map(buf.get).toArray))
       assertEquals(3, buf.position())
 
       buf.position(2)
       buf.put(Array[ElementType](44, 55, 66, 77, 88), 2, 2)
-      assertArrayEquals(boxedElemsFromInt(6, 7, 66, 77, 0), boxed((0 to 4).map(buf.get).toArray))
+      assertArrayEquals(boxedElemsFromInt(6, 7, 66, 77, 0),
+                        boxed((0 to 4).map(buf.get).toArray))
       assertEquals(4, buf.position())
 
-      expectThrows(classOf[BufferOverflowException], buf.put(Array.fill[ElementType](10)(0)))
+      expectThrows(classOf[BufferOverflowException],
+                   buf.put(Array.fill[ElementType](10)(0)))
       assertEquals(4, buf.position())
-      assertArrayEquals(boxedElemsFromInt(6, 7, 66, 77, 0), boxed((0 to 4).map(buf.get).toArray))
+      assertArrayEquals(boxedElemsFromInt(6, 7, 66, 77, 0),
+                        boxed((0 to 4).map(buf.get).toArray))
     } else {
-      expectThrows(classOf[ReadOnlyBufferException], buf.put(Array[ElementType](6, 7, 12)))
+      expectThrows(classOf[ReadOnlyBufferException],
+                   buf.put(Array[ElementType](6, 7, 12)))
       assertEquals(0, buf.position())
       assertEquals(elemFromInt(0), buf.get(0))
 
       buf.position(8)
       if (!executingInJVM) // throws BufferOverflowException on JVM
-        expectThrows(classOf[ReadOnlyBufferException], buf.put(Array[ElementType](6, 7, 12)))
+        expectThrows(classOf[ReadOnlyBufferException],
+                     buf.put(Array[ElementType](6, 7, 12)))
       assertEquals(8, buf.position())
       assertEquals(elemFromInt(0), buf.get(8))
     }
@@ -307,8 +311,7 @@ abstract class BaseBufferTest {
         assertEquals(10, buf.limit())
         expectThrows(classOf[InvalidMarkException], buf.reset())
 
-        for (i <- 0 until 4)
-          assertEquals(elemFromInt(i + 6), buf.get(i))
+        for (i <- 0 until 4) assertEquals(elemFromInt(i + 6), buf.get(i))
       }
     } else {
       val buf = allocBuffer(10)
@@ -327,8 +330,7 @@ abstract class BaseBufferTest {
     assertEquals(4, buf2.capacity())
     expectThrows(classOf[InvalidMarkException], buf2.reset())
 
-    if (!executingInJVMOnJDK6)
-      assertEquals(elemFromInt(4), buf2.get(1))
+    if (!executingInJVMOnJDK6) assertEquals(elemFromInt(4), buf2.get(1))
 
     buf2.position(2)
     assertEquals(3, buf1.position())

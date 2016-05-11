@@ -4,9 +4,9 @@ package lang.adjustTypes.tests
 import org.jetbrains.plugins.scala.lang.adjustTypes.AdjustTypesTestBase
 
 /**
- * Nikolay.Tropin
- * 7/11/13
- */
+  * Nikolay.Tropin
+  * 7/11/13
+  */
 class AdjustTypesTests extends AdjustTypesTestBase {
 
   def testSimpleJava() = doTest()

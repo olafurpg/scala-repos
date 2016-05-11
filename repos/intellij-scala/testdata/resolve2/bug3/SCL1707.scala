@@ -5,26 +5,32 @@ object Test {
   }
   {
     def $qmark = "?"
-    /* name: $qmark, line: 7 */?
+    /* name: $qmark, line: 7 */
+    ?
   }
   {
     def ? = "?"
-    /* line: 11, name: ?*/$qmark
+    /* line: 11, name: ?*/
+    $qmark
   }
   {
     def ? = "?"
-    /* line: 15, name: ?*/$u003F
+    /* line: 15, name: ?*/
+    $u003F
   }
   {
     def ? = "?"
-    /* line: 19, name: ?*/`$u003F`
+    /* line: 19, name: ?*/
+    `$u003F`
   }
   {
     def $u003F = "$u003F"
-    /* line: 23, name: $u003F*/?
+    /* line: 23, name: $u003F*/
+    ?
   }
   {
     def $u003F = "$u003F"
-    /* line: 27, name: $u003F*/`?`
+    /* line: 27, name: $u003F*/
+    `?`
   }
 }

@@ -14,12 +14,15 @@ import scala.reflect.macros.whitebox
   * Author: Svyatoslav Ilinskiy
   * Date: 9/23/15.
   */
-class CachedMappedWithRecursionGuard(psiElement: Any, defaultValue: => Any, dependencyItem: Object) extends StaticAnnotation {
+class CachedMappedWithRecursionGuard(
+    psiElement: Any, defaultValue: => Any, dependencyItem: Object)
+    extends StaticAnnotation {
   def macroTransform(annottees: Any*) = macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
 }
 
 object CachedMappedWithRecursionGuard {
-  def cachedMappedWithRecursionGuardImpl(c: whitebox.Context)(annottees: c.Tree*): c.Expr[Any] = {
+  def cachedMappedWithRecursionGuardImpl(c: whitebox.Context)(
+      annottees: c.Tree*): c.Expr[Any] = {
     import CachedMacroUtil._
     import c.universe._
     implicit val x: c.type = c
@@ -31,8 +34,11 @@ object CachedMappedWithRecursionGuard {
 
     //noinspection ZeroIndexToHead
     def parameters: (Tree, Tree, Tree) = c.prefix.tree match {
-      case q"new CachedMappedWithRecursionGuard(..$params)" if params.length == 3 =>
-        (params(0), params(1), modCountParamToModTracker(c)(params(2), params(0)))
+      case q"new CachedMappedWithRecursionGuard(..$params)"
+          if params.length == 3 =>
+        (params(0),
+         params(1),
+         modCountParamToModTracker(c)(params(2), params(0)))
       case _ => abort("Wrong annotation parameters!")
     }
 
@@ -48,7 +54,8 @@ object CachedMappedWithRecursionGuard {
         //some more generated names
         val keyId: String = c.freshName(name + "cacheKey")
         val key: c.universe.TermName = generateTermName(name + "Key")
-        val cacheStatsName: c.universe.TermName = generateTermName(name + "cacheStats")
+        val cacheStatsName: c.universe.TermName = generateTermName(
+            name + "cacheStats")
         val defdefFQN = thisFunctionFQN(name.toString)
         val analyzeCaches = analyzeCachesEnabled(c)
 
@@ -57,13 +64,20 @@ object CachedMappedWithRecursionGuard {
         val parameterTypes = flatParams.map(_.tpt)
         val parameterNames: List[c.universe.TermName] = flatParams.map(_.name)
         val parameterDefinitions: List[c.universe.Tree] = flatParams match {
-          case param :: Nil => List(ValDef(NoMods, param.name, param.tpt, q"$dataName"))
-          case _ => flatParams.zipWithIndex.map {
-            case (param, i) => ValDef(NoMods, param.name, param.tpt, q"$dataName.${TermName("_" + (i + 1))}")
-          }
+          case param :: Nil =>
+            List(ValDef(NoMods, param.name, param.tpt, q"$dataName"))
+          case _ =>
+            flatParams.zipWithIndex.map {
+              case (param, i) =>
+                ValDef(NoMods,
+                       param.name,
+                       param.tpt,
+                       q"$dataName.${TermName("_" + (i + 1))}")
+            }
         }
 
-        val actualCalculation = transformRhsToAnalyzeCaches(c)(cacheStatsName, retTp, rhs)
+        val actualCalculation =
+          transformRhsToAnalyzeCaches(c)(cacheStatsName, retTp, rhs)
         val builder = q"""
           def $cachedFunName(${generateTermName()}: _root_.scala.Any, $dataName: $dataTypeName): $retTp = {
             ..$parameterDefinitions
@@ -73,7 +87,8 @@ object CachedMappedWithRecursionGuard {
           """
 
         val updatedRhs = q"""
-          ${if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()" else EmptyTree}
+          ${if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
+        else EmptyTree}
           type $dataTypeName = (..$parameterTypes)
           val $dataName = (..$parameterNames)
           $cachesUtilFQN.incrementModCountForFunsWithModifiedReturn()
@@ -162,7 +177,8 @@ object CachedMappedWithRecursionGuard {
             q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
           } else EmptyTree
 
-        val updatedDef = DefDef(mods, name, tpParams, paramss, retTp, updatedRhs)
+        val updatedDef = DefDef(
+            mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           private val $key = $cachesUtilFQN.getOrCreateKey[$mappedKeyTypeFQN[(..$parameterTypes), $retTp]]($keyId)
           ..$cacheStatsField

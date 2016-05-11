@@ -6,23 +6,24 @@ import com.intellij.ide.fileTemplates.{FileTemplate, TemplatePackagePropertyProv
 import com.intellij.psi.PsiDirectory
 
 /**
- * Pavel Fatin
- */
-
-class ScalaDefaultTemplatePropertiesProvider extends TemplatePackagePropertyProvider {
+  * Pavel Fatin
+  */
+class ScalaDefaultTemplatePropertiesProvider
+    extends TemplatePackagePropertyProvider {
   private val QualifiedPackagePattern = "(.+)\\.(.+?)".r
 
   override def fillProperties(directory: PsiDirectory, props: Properties) {
     super.fillProperties(directory, props)
 
-    val attributePackageName = props.get(FileTemplate.ATTRIBUTE_PACKAGE_NAME) match {
-      case name: String => name
-      case _ => return
-    }
+    val attributePackageName =
+      props.get(FileTemplate.ATTRIBUTE_PACKAGE_NAME) match {
+        case name: String => name
+        case _ => return
+      }
 
     val (packageQualifier, packageSimpleName) = attributePackageName match {
       case QualifiedPackagePattern(prefix, suffix) => (prefix, suffix)
-      case name =>("", name)
+      case name => ("", name)
     }
 
     props.put("PACKAGE_QUALIFIER", packageQualifier)

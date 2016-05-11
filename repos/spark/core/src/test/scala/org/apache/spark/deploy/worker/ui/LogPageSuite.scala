@@ -51,13 +51,17 @@ class LogPageSuite extends SparkFunSuite with PrivateMethodTester {
     // Get the logs. All log types other than "stderr" or "stdout" will be rejected
     val getLog = PrivateMethod[(String, Long, Long, Long)]('getLog)
     val (stdout, _, _, _) =
-      logPage invokePrivate getLog(workDir.getAbsolutePath, "stdout", None, 100)
+      logPage invokePrivate getLog(
+          workDir.getAbsolutePath, "stdout", None, 100)
     val (stderr, _, _, _) =
-      logPage invokePrivate getLog(workDir.getAbsolutePath, "stderr", None, 100)
+      logPage invokePrivate getLog(
+          workDir.getAbsolutePath, "stderr", None, 100)
     val (error1, _, _, _) =
-      logPage invokePrivate getLog(workDir.getAbsolutePath, "random", None, 100)
+      logPage invokePrivate getLog(
+          workDir.getAbsolutePath, "random", None, 100)
     val (error2, _, _, _) =
-      logPage invokePrivate getLog(workDir.getAbsolutePath, "does-not-exist.txt", None, 100)
+      logPage invokePrivate getLog(
+          workDir.getAbsolutePath, "does-not-exist.txt", None, 100)
     // These files exist, but live outside the working directory
     val (error3, _, _, _) =
       logPage invokePrivate getLog(tmpDir.getAbsolutePath, "stderr", None, 100)
@@ -80,5 +84,4 @@ class LogPageSuite extends SparkFunSuite with PrivateMethodTester {
       writer.close()
     }
   }
-
 }

@@ -36,11 +36,9 @@ import org.scalatest.mock.MockitoSugar
 import org.apache.spark.streaming.{Duration, TestSuiteBase}
 import org.apache.spark.util.ManualClock
 
-class KinesisCheckpointerSuite extends TestSuiteBase
-  with MockitoSugar
-  with BeforeAndAfterEach
-  with PrivateMethodTester
-  with Eventually {
+class KinesisCheckpointerSuite
+    extends TestSuiteBase with MockitoSugar with BeforeAndAfterEach
+    with PrivateMethodTester with Eventually {
 
   private val workerId = "dummyWorkerId"
   private val shardId = "dummyShardId"
@@ -61,11 +59,13 @@ class KinesisCheckpointerSuite extends TestSuiteBase
     receiverMock = mock[KinesisReceiver[Array[Byte]]]
     checkpointerMock = mock[IRecordProcessorCheckpointer]
     clock = new ManualClock()
-    kinesisCheckpointer = new KinesisCheckpointer(receiverMock, checkpointInterval, workerId, clock)
+    kinesisCheckpointer = new KinesisCheckpointer(
+        receiverMock, checkpointInterval, workerId, clock)
   }
 
   test("checkpoint is not called twice for the same sequence number") {
-    when(receiverMock.getLatestSeqNumToCheckpoint(shardId)).thenReturn(someSeqNum)
+    when(receiverMock.getLatestSeqNumToCheckpoint(shardId))
+      .thenReturn(someSeqNum)
     kinesisCheckpointer.invokePrivate(checkpoint(shardId, checkpointerMock))
     kinesisCheckpointer.invokePrivate(checkpoint(shardId, checkpointerMock))
 
@@ -74,7 +74,8 @@ class KinesisCheckpointerSuite extends TestSuiteBase
 
   test("checkpoint is called after sequence number increases") {
     when(receiverMock.getLatestSeqNumToCheckpoint(shardId))
-      .thenReturn(someSeqNum).thenReturn(someOtherSeqNum)
+      .thenReturn(someSeqNum)
+      .thenReturn(someOtherSeqNum)
     kinesisCheckpointer.invokePrivate(checkpoint(shardId, checkpointerMock))
     kinesisCheckpointer.invokePrivate(checkpoint(shardId, checkpointerMock))
 
@@ -84,7 +85,8 @@ class KinesisCheckpointerSuite extends TestSuiteBase
 
   test("should checkpoint if we have exceeded the checkpoint interval") {
     when(receiverMock.getLatestSeqNumToCheckpoint(shardId))
-      .thenReturn(someSeqNum).thenReturn(someOtherSeqNum)
+      .thenReturn(someSeqNum)
+      .thenReturn(someOtherSeqNum)
 
     kinesisCheckpointer.setCheckpointer(shardId, checkpointerMock)
     clock.advance(5 * checkpointInterval.milliseconds)
@@ -96,7 +98,8 @@ class KinesisCheckpointerSuite extends TestSuiteBase
   }
 
   test("shouldn't checkpoint if we have not exceeded the checkpoint interval") {
-    when(receiverMock.getLatestSeqNumToCheckpoint(shardId)).thenReturn(someSeqNum)
+    when(receiverMock.getLatestSeqNumToCheckpoint(shardId))
+      .thenReturn(someSeqNum)
 
     kinesisCheckpointer.setCheckpointer(shardId, checkpointerMock)
     clock.advance(checkpointInterval.milliseconds / 2)
@@ -105,7 +108,8 @@ class KinesisCheckpointerSuite extends TestSuiteBase
   }
 
   test("should not checkpoint for the same sequence number") {
-    when(receiverMock.getLatestSeqNumToCheckpoint(shardId)).thenReturn(someSeqNum)
+    when(receiverMock.getLatestSeqNumToCheckpoint(shardId))
+      .thenReturn(someSeqNum)
 
     kinesisCheckpointer.setCheckpointer(shardId, checkpointerMock)
 
@@ -116,18 +120,22 @@ class KinesisCheckpointerSuite extends TestSuiteBase
   }
 
   test("removing checkpointer checkpoints one last time") {
-    when(receiverMock.getLatestSeqNumToCheckpoint(shardId)).thenReturn(someSeqNum)
+    when(receiverMock.getLatestSeqNumToCheckpoint(shardId))
+      .thenReturn(someSeqNum)
 
     kinesisCheckpointer.removeCheckpointer(shardId, checkpointerMock)
     verify(checkpointerMock, times(1)).checkpoint(anyString())
   }
 
-  test("if checkpointing is going on, wait until finished before removing and checkpointing") {
+  test(
+      "if checkpointing is going on, wait until finished before removing and checkpointing") {
     when(receiverMock.getLatestSeqNumToCheckpoint(shardId))
-      .thenReturn(someSeqNum).thenReturn(someOtherSeqNum)
+      .thenReturn(someSeqNum)
+      .thenReturn(someOtherSeqNum)
     when(checkpointerMock.checkpoint(anyString)).thenAnswer(new Answer[Unit] {
       override def answer(invocations: InvocationOnMock): Unit = {
-        clock.waitTillTime(clock.getTimeMillis() + checkpointInterval.milliseconds / 2)
+        clock.waitTillTime(
+            clock.getTimeMillis() + checkpointInterval.milliseconds / 2)
       }
     })
 
@@ -137,8 +145,9 @@ class KinesisCheckpointerSuite extends TestSuiteBase
       verify(checkpointerMock, times(1)).checkpoint(anyString())
     }
     // don't block test thread
-    val f = Future(kinesisCheckpointer.removeCheckpointer(shardId, checkpointerMock))(
-      ExecutionContext.global)
+    val f = Future(
+        kinesisCheckpointer.removeCheckpointer(shardId, checkpointerMock))(
+        ExecutionContext.global)
 
     intercept[TimeoutException] {
       Await.ready(f, 50 millis)

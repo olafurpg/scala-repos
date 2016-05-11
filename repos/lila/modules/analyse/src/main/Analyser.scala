@@ -3,14 +3,13 @@ package lila.analyse
 import akka.actor.ActorSelection
 
 import lila.game.actorApi.InsertGame
-import lila.game.{ Game, GameRepo }
+import lila.game.{Game, GameRepo}
 import lila.hub.actorApi.map.Tell
 import lila.hub.actorApi.round.AnalysisAvailable
 
-final class Analyser(
-    indexer: ActorSelection,
-    roundSocket: ActorSelection,
-    bus: lila.common.Bus) {
+final class Analyser(indexer: ActorSelection,
+                     roundSocket: ActorSelection,
+                     bus: lila.common.Bus) {
 
   def get(id: String): Fu[Option[Analysis]] = AnalysisRepo byId id
 

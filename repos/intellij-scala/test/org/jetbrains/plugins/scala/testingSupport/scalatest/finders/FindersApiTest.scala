@@ -10,13 +10,20 @@ import org.scalatest.finders.Selection
   * @author Roman.Shein
   * @since 10.02.2015.
   */
-trait FindersApiTest extends FeatureSpecGenerator with FlatSpecGenerator with FreeSpecGenerator
-with FreeSpecPathGenerator with FunSpecGenerator with FunSuiteGenerator with PropSpecGenerator with WordSpecGenerator {
-  def checkSelection(lineNumber: Int, offset: Int, fileName: String, testNames: Set[String]) = {
+trait FindersApiTest
+    extends FeatureSpecGenerator with FlatSpecGenerator with FreeSpecGenerator
+    with FreeSpecPathGenerator with FunSpecGenerator with FunSuiteGenerator
+    with PropSpecGenerator with WordSpecGenerator {
+  def checkSelection(lineNumber: Int,
+                     offset: Int,
+                     fileName: String,
+                     testNames: Set[String]) = {
     val location = createLocation(lineNumber, offset, fileName)
     var selection: Selection = null
-    UsefulTestCase.edt(new Runnable(){
-      override def run(): Unit = selection = new ScalaTestAstTransformer().testSelection(location)
+    UsefulTestCase.edt(
+        new Runnable() {
+      override def run(): Unit =
+        selection = new ScalaTestAstTransformer().testSelection(location)
     })
     assert(selection != null)
     assert(selection.testNames().map(_.trim).toSet == testNames)
@@ -38,7 +45,8 @@ with FreeSpecPathGenerator with FunSpecGenerator with FunSuiteGenerator with Pro
     //on 'feature' word
     checkSelection(3, 7, fileName, Set(scenarioA, scenarioB))
     //on feature name
-    checkSelection(14, 15, fileName, Set("Feature: Feature 2 Scenario: Scenario C"))
+    checkSelection(
+        14, 15, fileName, Set("Feature: Feature 2 Scenario: Scenario C"))
     //inside scenario
     checkSelection(5, 8, fileName, Set(scenarioA))
   }
@@ -66,7 +74,8 @@ with FreeSpecPathGenerator with FunSpecGenerator with FunSuiteGenerator with Pro
   def testBehaviorFlatSpec() {
     addBehaviorFlatSpec()
 
-    val testNames = Set("FlatSpec should run scopes", "FlatSpec should do other stuff")
+    val testNames = Set(
+        "FlatSpec should run scopes", "FlatSpec should do other stuff")
     val fileName = "BehaviorFlatSpec.scala"
 
     //'behavior' word
@@ -81,8 +90,9 @@ with FreeSpecPathGenerator with FunSpecGenerator with FunSuiteGenerator with Pro
 
   def testItFlatSpec(): Unit = {
     val fileName = "TestItFlatSpec.scala"
-    addFileToProject(fileName,
-      """
+    addFileToProject(
+        fileName,
+        """
         |import org.scalatest._
         |
         |class TestItFlatSpec extends FlatSpec with GivenWhenThen {
@@ -109,8 +119,10 @@ with FreeSpecPathGenerator with FunSpecGenerator with FunSuiteGenerator with Pro
     val fileName = "ComplexFreeSpec.scala"
     val testName1 = "A ComplexFreeSpec Outer scope 1 Inner scope 1"
     val testName2 = "A ComplexFreeSpec Outer scope 2 Inner test"
-    val testName3 = "A ComplexFreeSpec Outer scope 2 Inner scope 2 Another innermost scope"
-    val ignoredTestName = "A ComplexFreeSpec Outer scope 2 Inner scope 2 Innermost scope"
+    val testName3 =
+      "A ComplexFreeSpec Outer scope 2 Inner scope 2 Another innermost scope"
+    val ignoredTestName =
+      "A ComplexFreeSpec Outer scope 2 Inner scope 2 Innermost scope"
 
     //outermost close
     checkSelection(3, 10, fileName, Set(testName1, testName2, testName3))

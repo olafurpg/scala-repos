@@ -1,4 +1,5 @@
 object a {
-  /*start*/this/*end*/
+  /*start*/
+  this /*end*/
 }
 // a.type

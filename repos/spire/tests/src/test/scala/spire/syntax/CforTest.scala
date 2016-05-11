@@ -21,7 +21,7 @@ class CforTest extends SpireProperties {
     val s = mutable.Set.empty[Int]
     cfor(0)(_ < 10, _ + 1) { x =>
       cfor(10)(_ < 100, _ + 10) { y =>
-        s.add(x+y)
+        s.add(x + y)
       }
     }
     s shouldBe (10 to 99).toSet
@@ -41,11 +41,12 @@ class CforTest extends SpireProperties {
   property("functions with side effects in cfor") {
     val b = mutable.ArrayBuffer.empty[Int]
     var v = 0
-    cfor(0)({ v += 1; _ < 3 }, { v += 10; _ + 1})({
+    cfor(0)({ v += 1; _ < 3 }, { v += 10; _ + 1 })({
       v += 100
-      x => {
-        b += x
-      }
+      x =>
+        {
+          b += x
+        }
     })
     v shouldBe 111
     b.toList shouldBe List(0, 1, 2)
@@ -55,12 +56,13 @@ class CforTest extends SpireProperties {
     val b = mutable.ArrayBuffer.empty[Int]
     var v = 0
     def test: Int => Boolean = { v += 1; _ < 3 }
-    def incr: Int => Int = { v += 10; _ + 1}
+    def incr: Int => Int = { v += 10; _ + 1 }
     def body: Int => Unit = {
       v += 100
-      x => {
-        b += x
-      }
+      x =>
+        {
+          b += x
+        }
     }
     cfor(0)(test, incr)(body)
     v shouldBe 111
@@ -70,22 +72,18 @@ class CforTest extends SpireProperties {
   property("functions with side effects function by-value params in cfor") {
     val b = mutable.ArrayBuffer.empty[Int]
     var v = 0
-    def run(
-        test: => (Int => Boolean),
-        incr: => (Int => Int),
-        body: => (Int => Unit)): Unit = {
+    def run(test: => (Int => Boolean),
+            incr: => (Int => Int),
+            body: => (Int => Unit)): Unit = {
       cfor(0)(test, incr)(body)
     }
-    run(
-      { v += 1; _ < 3 },
-      { v += 10; _ + 1},
-      {
-        v += 100
-        x => {
+    run({ v += 1; _ < 3 }, { v += 10; _ + 1 }, {
+      v += 100
+      x =>
+        {
           b += x
         }
-      }
-    )
+    })
     v shouldBe 111
     b.toList shouldBe List(0, 1, 2)
   }
@@ -106,15 +104,17 @@ class CforTest extends SpireProperties {
 
   property("capture value in inner class") {
     val b = collection.mutable.ArrayBuffer[Int]()
-    cfor(0)(_ < 3, _ + 1) { x => {
+    cfor(0)(_ < 3, _ + 1) { x =>
+      {
         class A { def f = x }
         b += (new A().f)
-    }}
+      }
+    }
     b.toList shouldBe List(0, 1, 2)
   }
 
   property("type tree bug fixed") {
-    val arr = Array((1,2), (2,3), (4,5))
+    val arr = Array((1, 2), (2, 3), (4, 5))
     var t = 0
     cfor(0)(_ < arr.length, _ + 1) { i =>
       val (a, b) = arr(i)
@@ -125,8 +125,9 @@ class CforTest extends SpireProperties {
 
   property("destructure tuples") {
     var t = 0
-    cfor((0, 0))(_._1 < 3, t => (t._1 + 1, t._2 + 2)) { case (a, b) =>
-      t += 3 * a + b
+    cfor((0, 0))(_._1 < 3, t => (t._1 + 1, t._2 + 2)) {
+      case (a, b) =>
+        t += 3 * a + b
     }
     t shouldBe 15
   }

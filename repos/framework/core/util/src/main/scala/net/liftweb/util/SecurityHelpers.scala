@@ -32,18 +32,18 @@ import org.apache.xerces.impl.Constants
 
 import common._
 
-object SecurityHelpers extends StringHelpers with IoHelpers with SecurityHelpers
+object SecurityHelpers
+    extends StringHelpers with IoHelpers with SecurityHelpers
 
 /**
- * The SecurityHelpers trait provides functions to:<ul>
- * <li> generate random numbers
- * <li> generate keys
- * <li> encrypt/decrypt keys
- * <li> create SHA, SHA-256, MD5 hashes (can be hex encoded)
- * </ul>
- */
-trait SecurityHelpers {
-  self: StringHelpers with IoHelpers =>
+  * The SecurityHelpers trait provides functions to:<ul>
+  * <li> generate random numbers
+  * <li> generate keys
+  * <li> encrypt/decrypt keys
+  * <li> create SHA, SHA-256, MD5 hashes (can be hex encoded)
+  * </ul>
+  */
+trait SecurityHelpers { self: StringHelpers with IoHelpers =>
 
   /** short alias for java.security.SecureRandom */
   private val _random = new SecureRandom
@@ -52,53 +52,62 @@ trait SecurityHelpers {
     _random.synchronized(f(_random))
 
   /** return a random Long modulo a number */
-  def randomLong(mod: Long): Long = withRandom(random => math.abs(random.nextLong) % mod)
+  def randomLong(mod: Long): Long =
+    withRandom(random => math.abs(random.nextLong) % mod)
 
   /** return a random int modulo a number */
-  def randomInt(mod: Int): Int = withRandom(random => math.abs(random.nextInt) % mod)
+  def randomInt(mod: Int): Int =
+    withRandom(random => math.abs(random.nextInt) % mod)
 
   /**
-   * return true only 'percent' times when asked repeatedly.
-   * This function is used in the Skittr example to get a random set of users
-   * @param percent percentage as a double number <= 1.0
-   */
-  def shouldShow(percent: Double): Boolean = withRandom(_.nextDouble <= percent)
+    * return true only 'percent' times when asked repeatedly.
+    * This function is used in the Skittr example to get a random set of users
+    * @param percent percentage as a double number <= 1.0
+    */
+  def shouldShow(percent: Double): Boolean =
+    withRandom(_.nextDouble <= percent)
 
-  private final def cleanArray(in: Array[Byte]): Array[Byte] = in.filter(a => a >= 32 && a <= 127)
+  private final def cleanArray(in: Array[Byte]): Array[Byte] =
+    in.filter(a => a >= 32 && a <= 127)
 
   /** encode a Byte array in Base 64 */
-  def base64Encode(in: Array[Byte]): String = new String(cleanArray((new Base64).encode(in)))
+  def base64Encode(in: Array[Byte]): String =
+    new String(cleanArray((new Base64).encode(in)))
 
   /** encode a Byte array in Base 64 in a way that's safe for use in URLs */
-  def base64EncodeURLSafe(in: Array[Byte]): String = new String(Base64.encodeBase64URLSafe(in))
+  def base64EncodeURLSafe(in: Array[Byte]): String =
+    new String(Base64.encodeBase64URLSafe(in))
 
   /** decode a String in Base 64 */
-  def base64Decode(in: String): Array[Byte] = (new Base64).decode(in.getBytes("UTF-8"))
+  def base64Decode(in: String): Array[Byte] =
+    (new Base64).decode(in.getBytes("UTF-8"))
 
   /** create a MD5 digest from a Byte array */
-  def md5(in: Array[Byte]): Array[Byte] = MessageDigest.getInstance("MD5").digest(in)
+  def md5(in: Array[Byte]): Array[Byte] =
+    MessageDigest.getInstance("MD5").digest(in)
 
   /** create a MD5 digest from a String */
   def md5(in: String): String = base64Encode(md5(in.getBytes("UTF-8")))
 
   /** create a SHA hash from a Byte array */
-  def hash(in : Array[Byte]) : Array[Byte] = {
+  def hash(in: Array[Byte]): Array[Byte] = {
     MessageDigest.getInstance("SHA").digest(in)
   }
 
   /** create a SHA hash from a String */
-  def hash(in: String) : String = {
+  def hash(in: String): String = {
     base64Encode(MessageDigest.getInstance("SHA").digest(in.getBytes("UTF-8")))
   }
 
-   /** create a SHA hash from a String */
-  def hashHex(in: String) : String = {
-    Helpers.hexEncode(MessageDigest.getInstance("SHA").digest(in.getBytes("UTF-8")))
+  /** create a SHA hash from a String */
+  def hashHex(in: String): String = {
+    Helpers.hexEncode(
+        MessageDigest.getInstance("SHA").digest(in.getBytes("UTF-8")))
   }
 
   /** Compare two strings in a way that does not vary if the strings
-   * are determined to be not equal early (test every byte... avoids
-   * timing attacks */
+    * are determined to be not equal early (test every byte... avoids
+    * timing attacks */
   def secureEquals(s1: String, s2: String): Boolean = (s1, s2) match {
     case (null, null) => true
     case (null, _) => false
@@ -107,34 +116,35 @@ trait SecurityHelpers {
   }
 
   /** Compare two byte arrays in a way that does not vary if the arrays
-   * are determined to be not equal early (test every byte... avoids
-   * timing attacks */
-  def secureEquals(s1: Array[Byte], s2: Array[Byte]): Boolean = (s1, s2) match {
-    case (null, null) => true
-    case (null, _) => false
-    case (_, null) => false
-    case (a, b) => {
-      val la = a.length
-      val lb = b.length
-      var ret = true
-      var pos = 0
-      while (pos < la && pos < lb) {
-        ret &= (a(pos) == b(pos))
-        pos += 1
-      }
-      ret && la == lb
+    * are determined to be not equal early (test every byte... avoids
+    * timing attacks */
+  def secureEquals(s1: Array[Byte], s2: Array[Byte]): Boolean =
+    (s1, s2) match {
+      case (null, null) => true
+      case (null, _) => false
+      case (_, null) => false
+      case (a, b) => {
+          val la = a.length
+          val lb = b.length
+          var ret = true
+          var pos = 0
+          while (pos < la && pos < lb) {
+            ret &= (a(pos) == b(pos))
+            pos += 1
+          }
+          ret && la == lb
+        }
     }
-  }
-
 
   /** create a SHA-256 hash from a Byte array */
-  def hash256(in : Array[Byte]) : Array[Byte] = {
+  def hash256(in: Array[Byte]): Array[Byte] = {
     MessageDigest.getInstance("SHA-256").digest(in)
   }
 
   /** create a SHA-256 hash from a String */
-  def hash256(in : String): String = {
-    base64Encode(MessageDigest.getInstance("SHA-256").digest(in.getBytes("UTF-8")))
+  def hash256(in: String): String = {
+    base64Encode(
+        MessageDigest.getInstance("SHA-256").digest(in.getBytes("UTF-8")))
   }
 
   /** create a hex encoded SHA hash from a Byte array */
@@ -171,7 +181,7 @@ trait SecurityHelpers {
       case 'd' | 'D' => 13
       case 'e' | 'E' => 14
       case 'f' | 'F' => 15
-        case _ => 0
+      case _ => 0
     }
 
     while (pos < max) {
@@ -194,8 +204,10 @@ trait SecurityHelpers {
         val b: Int = in(pos)
         val msb = (b & 0xf0) >> 4
         val lsb = (b & 0x0f)
-        sb.append((if (msb < 10) ('0' + msb).asInstanceOf[Char] else ('a' + (msb - 10)).asInstanceOf[Char]))
-        sb.append((if (lsb < 10) ('0' + lsb).asInstanceOf[Char] else ('a' + (lsb - 10)).asInstanceOf[Char]))
+        sb.append((if (msb < 10) ('0' + msb).asInstanceOf[Char]
+                   else ('a' + (msb - 10)).asInstanceOf[Char]))
+        sb.append((if (lsb < 10) ('0' + lsb).asInstanceOf[Char]
+                   else ('a' + (lsb - 10)).asInstanceOf[Char]))
 
         addDigit(in, pos + 1, len, sb)
       }
@@ -205,28 +217,32 @@ trait SecurityHelpers {
   }
 
   /**
-   * Provides a secure XML parser, similar to the one provided by
-   * `scala.xml.XML`, but with external entities and doctypes disabled and
-   * secure XML processing enabled. This prevents XXE (XML External Entities)
-   * attacks, billion laughs attacks, quadratic blowup attacks, and others. It
-   * is used internally throughout Lift, and should be used by anyone who is
-   * parsing XML from an untrusted source.
-   */
+    * Provides a secure XML parser, similar to the one provided by
+    * `scala.xml.XML`, but with external entities and doctypes disabled and
+    * secure XML processing enabled. This prevents XXE (XML External Entities)
+    * attacks, billion laughs attacks, quadratic blowup attacks, and others. It
+    * is used internally throughout Lift, and should be used by anyone who is
+    * parsing XML from an untrusted source.
+    */
   def secureXML: XMLLoader[Elem] = {
-    val parserFactory =
-      SAXParserFactory.newInstance(
+    val parserFactory = SAXParserFactory.newInstance(
         "org.apache.xerces.jaxp.SAXParserFactoryImpl",
         SecurityHelpers.getClass.getClassLoader
-      )
+    )
 
     parserFactory.setNamespaceAware(false)
-    parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false)
-    parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false)
-    parserFactory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.DISALLOW_DOCTYPE_DECL_FEATURE, true)
+    parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
+                             Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
+                             false)
+    parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
+                             Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
+                             false)
+    parserFactory.setFeature(Constants.XERCES_FEATURE_PREFIX +
+                             Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+                             true)
     parserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
 
     val saxParser = parserFactory.newSAXParser();
     XML.withSAXParser(saxParser)
   }
 }
-

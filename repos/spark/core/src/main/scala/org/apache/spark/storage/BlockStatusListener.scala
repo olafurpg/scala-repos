@@ -21,27 +21,23 @@ import scala.collection.mutable
 
 import org.apache.spark.scheduler._
 
-private[spark] case class BlockUIData(
-    blockId: BlockId,
-    location: String,
-    storageLevel: StorageLevel,
-    memSize: Long,
-    diskSize: Long)
+private[spark] case class BlockUIData(blockId: BlockId,
+                                      location: String,
+                                      storageLevel: StorageLevel,
+                                      memSize: Long,
+                                      diskSize: Long)
 
 /**
- * The aggregated status of stream blocks in an executor
- */
+  * The aggregated status of stream blocks in an executor
+  */
 private[spark] case class ExecutorStreamBlockStatus(
-    executorId: String,
-    location: String,
-    blocks: Seq[BlockUIData]) {
+    executorId: String, location: String, blocks: Seq[BlockUIData]) {
 
   def totalMemSize: Long = blocks.map(_.memSize).sum
 
   def totalDiskSize: Long = blocks.map(_.diskSize).sum
 
   def numStreamBlocks: Int = blocks.size
-
 }
 
 private[spark] class BlockStatusListener extends SparkListener {
@@ -65,13 +61,11 @@ private[spark] class BlockStatusListener extends SparkListener {
       blockManagers.get(blockManagerId).foreach { blocksInBlockManager =>
         if (storageLevel.isValid) {
           blocksInBlockManager.put(blockId,
-            BlockUIData(
-              blockId,
-              blockManagerId.hostPort,
-              storageLevel,
-              memSize,
-              diskSize)
-          )
+                                   BlockUIData(blockId,
+                                               blockManagerId.hostPort,
+                                               storageLevel,
+                                               memSize,
+                                               diskSize))
         } else {
           // If isValid is not true, it means we should drop the block.
           blocksInBlockManager -= blockId
@@ -80,21 +74,26 @@ private[spark] class BlockStatusListener extends SparkListener {
     }
   }
 
-  override def onBlockManagerAdded(blockManagerAdded: SparkListenerBlockManagerAdded): Unit = {
+  override def onBlockManagerAdded(
+      blockManagerAdded: SparkListenerBlockManagerAdded): Unit = {
     synchronized {
       blockManagers.put(blockManagerAdded.blockManagerId, mutable.HashMap())
     }
   }
 
   override def onBlockManagerRemoved(
-      blockManagerRemoved: SparkListenerBlockManagerRemoved): Unit = synchronized {
-    blockManagers -= blockManagerRemoved.blockManagerId
-  }
+      blockManagerRemoved: SparkListenerBlockManagerRemoved): Unit =
+    synchronized {
+      blockManagers -= blockManagerRemoved.blockManagerId
+    }
 
-  def allExecutorStreamBlockStatus: Seq[ExecutorStreamBlockStatus] = synchronized {
-    blockManagers.map { case (blockManagerId, blocks) =>
-      ExecutorStreamBlockStatus(
-        blockManagerId.executorId, blockManagerId.hostPort, blocks.values.toSeq)
-    }.toSeq
-  }
+  def allExecutorStreamBlockStatus: Seq[ExecutorStreamBlockStatus] =
+    synchronized {
+      blockManagers.map {
+        case (blockManagerId, blocks) =>
+          ExecutorStreamBlockStatus(blockManagerId.executorId,
+                                    blockManagerId.hostPort,
+                                    blocks.values.toSeq)
+      }.toSeq
+    }
 }

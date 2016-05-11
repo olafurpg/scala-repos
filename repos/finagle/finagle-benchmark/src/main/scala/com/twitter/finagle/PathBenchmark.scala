@@ -12,5 +12,4 @@ class PathBenchmark extends StdBenchAnnotations {
   @Benchmark
   def read(): Path =
     Path.read(path)
-
 }

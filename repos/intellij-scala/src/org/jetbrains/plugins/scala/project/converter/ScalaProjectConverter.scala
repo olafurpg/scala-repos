@@ -8,24 +8,31 @@ import collection.JavaConverters._
 import ScalaProjectConverter._
 
 /**
- * @author Pavel Fatin
- */
-class ScalaProjectConverter(context: ConversionContext) extends ProjectConverter {
-  private val scalaModuleConverter = new ScalaModuleConversionProcessor(context)
+  * @author Pavel Fatin
+  */
+class ScalaProjectConverter(context: ConversionContext)
+    extends ProjectConverter {
+  private val scalaModuleConverter = new ScalaModuleConversionProcessor(
+      context)
 
-  private val scalaCompilerSettings: Map[String, ScalaCompilerSettings] = scalaCompilerSettingsIn(context)
-  private val scalaProjectSettings: ScalaProjectSettings = new ScalaProjectSettings(basePackagesIn(context))
-  private val obsoleteProjectLibraries: Set[LibraryReference] = obsoleteLibrariesIn(context).filter(_.level == ProjectLevel)
+  private val scalaCompilerSettings: Map[String, ScalaCompilerSettings] =
+    scalaCompilerSettingsIn(context)
+  private val scalaProjectSettings: ScalaProjectSettings =
+    new ScalaProjectSettings(basePackagesIn(context))
+  private val obsoleteProjectLibraries: Set[LibraryReference] =
+    obsoleteLibrariesIn(context).filter(_.level == ProjectLevel)
 
   private var createdSettingsFiles: Seq[File] = Seq.empty
 
   override def getAdditionalAffectedFiles = {
-    val filesToDelete = obsoleteProjectLibraries.flatMap(_.libraryStorageFileIn(context))
+    val filesToDelete =
+      obsoleteProjectLibraries.flatMap(_.libraryStorageFileIn(context))
     val filesToUpdate = scalaProjectSettings.getFilesToUpdate(context)
     (filesToDelete ++ filesToUpdate).asJava
   }
 
-  override def createModuleFileConverter(): ConversionProcessor[ModuleSettings] = scalaModuleConverter
+  override def createModuleFileConverter(
+      ): ConversionProcessor[ModuleSettings] = scalaModuleConverter
 
   override def processingFinished() {
     updateScalaCompilerSettings()
@@ -48,19 +55,29 @@ class ScalaProjectConverter(context: ConversionContext) extends ProjectConverter
     obsoleteProjectLibraries.foreach(_.deleteIn(context))
   }
 
-  override def getCreatedFiles = (scalaModuleConverter.createdFiles ++ createdSettingsFiles).asJava
+  override def getCreatedFiles =
+    (scalaModuleConverter.createdFiles ++ createdSettingsFiles).asJava
 }
 
 private object ScalaProjectConverter {
-  def findStandardScalaLibraryIn(module: ModuleSettings): Option[LibraryReference] =
+  def findStandardScalaLibraryIn(
+      module: ModuleSettings): Option[LibraryReference] =
     LibraryReference.findAllIn(module).find(_.name.contains("scala-library"))
 
-  private def findScalaCompilerLibraryIn(module: ModuleSettings): Option[LibraryReference] =
+  private def findScalaCompilerLibraryIn(
+      module: ModuleSettings): Option[LibraryReference] =
     ScalaFacetData.findIn(module).flatMap(_.compilerLibrary)
 
-  private def scalaCompilerSettingsIn(context: ConversionContext): Map[String, ScalaCompilerSettings] =
-    modulesIn(context).flatMap(module => ScalaFacetData.findIn(module).toSeq
-            .map(facet => (module.getModuleName, facet.compilerSettings)).toSeq).toMap
+  private def scalaCompilerSettingsIn(
+      context: ConversionContext): Map[String, ScalaCompilerSettings] =
+    modulesIn(context)
+      .flatMap(module =>
+            ScalaFacetData
+              .findIn(module)
+              .toSeq
+              .map(facet => (module.getModuleName, facet.compilerSettings))
+              .toSeq)
+      .toMap
 
   private def basePackagesIn(context: ConversionContext): Seq[String] =
     scalaFacetsIn(context).flatMap(_.basePackage.toSeq)
@@ -71,7 +88,8 @@ private object ScalaProjectConverter {
   private def modulesIn(context: ConversionContext): Seq[ModuleSettings] =
     context.getModuleFiles.map(context.getModuleSettings).toSeq
 
-  private def obsoleteLibrariesIn(context: ConversionContext): Set[LibraryReference] = {
+  private def obsoleteLibrariesIn(
+      context: ConversionContext): Set[LibraryReference] = {
     val modules = modulesIn(context)
 
     val referencedLibraries = modules.flatMap(LibraryReference.findAllIn).toSet
@@ -82,16 +100,22 @@ private object ScalaProjectConverter {
     standardLibraries ++ (compilerLibraries -- referencedLibraries)
   }
 
-  private def merge(moduleSettings: Map[String, ScalaCompilerSettings]): ScalaCompilerConfiguration = {
-    val settingsToModules = moduleSettings.groupBy(_._2).mapValues(_.keys.toSet).toSeq
+  private def merge(moduleSettings: Map[String, ScalaCompilerSettings])
+    : ScalaCompilerConfiguration = {
+    val settingsToModules =
+      moduleSettings.groupBy(_._2).mapValues(_.keys.toSet).toSeq
 
-    val sortedSettingsToModules = settingsToModules.sortBy(p => (p._2.size, p._1.isDefault)).reverse
+    val sortedSettingsToModules =
+      settingsToModules.sortBy(p => (p._2.size, p._1.isDefault)).reverse
 
     val profiles = sortedSettingsToModules.zipWithIndex.map {
-      case ((settings, modules), i) => new ScalaCompilerSettingsProfile("Profile " + i, modules.toSeq, settings)
+      case ((settings, modules), i) =>
+        new ScalaCompilerSettingsProfile(
+            "Profile " + i, modules.toSeq, settings)
     }
 
-    val defaultSettings = profiles.headOption.fold(ScalaCompilerSettings.Default)(_.settings)
+    val defaultSettings =
+      profiles.headOption.fold(ScalaCompilerSettings.Default)(_.settings)
     val customProfiles = profiles.drop(1)
 
     new ScalaCompilerConfiguration(defaultSettings, customProfiles)

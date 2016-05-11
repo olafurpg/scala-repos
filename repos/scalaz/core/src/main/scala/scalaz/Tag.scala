@@ -3,6 +3,7 @@ package scalaz
 import Id._
 
 object Tag {
+
   /** `subst` specialized to `Id`.
     *
     * @todo According to Miles, @specialized doesn't help here. Maybe manually specialize.
@@ -32,14 +33,15 @@ object Tag {
   def subst[A, F[_], T](fa: F[A]): F[A @@ T] = fa.asInstanceOf[F[A @@ T]]
 
   /** Add a tag `T` to `G[_]` */
-  def subst1[G[_], F[_[_]], T](fa: F[G]): F[λ[α => G[α] @@ T]] = fa.asInstanceOf[F[λ[α => G[α] @@ T]]]
+  def subst1[G[_], F[_ [_]], T](fa: F[G]): F[λ[α => G[α] @@ T]] =
+    fa.asInstanceOf[F[λ[α => G[α] @@ T]]]
 
   /** Remove the tag `T`, leaving `A`. */
   def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = fa.asInstanceOf[F[A]]
 
   /** @see `Tag.of` */
-  final class TagOf[T] private[Tag]()
-      extends (Id.Id ~> (? @@ T)) {
+  final class TagOf[T] private[Tag]() extends (Id.Id ~> (? @@ T)) {
+
     /** Like `Tag.apply`, but specify only the `T`. */
     def apply[A](a: A): A @@ T = Tag.apply(a)
 
@@ -50,7 +52,8 @@ object Tag {
     def subst[F[_], A](fa: F[A]): F[A @@ T] = Tag.subst(fa)
 
     /** Like `Tag.subst1`, but specify only the `T`. */
-    def subst1[F[_[_]], G[_]](fa: F[G]): F[λ[α => G[α] @@ T]] = Tag.subst1[G, F, T](fa)
+    def subst1[F[_ [_]], G[_]](fa: F[G]): F[λ[α => G[α] @@ T]] =
+      Tag.subst1[G, F, T](fa)
 
     /** Tag `fa`'s return type.  Allows inference of `A` to "flow through" from
       * the enclosing context.
@@ -63,7 +66,8 @@ object Tag {
       subst(U(fa))
 
     /** One variant of `subst` with different inference. */
-    def onContra[FA](fa: FA)(implicit U: Unapply[Contravariant, FA]): U.M[U.A @@ T] =
+    def onContra[FA](fa: FA)(
+        implicit U: Unapply[Contravariant, FA]): U.M[U.A @@ T] =
       subst(U(fa))
 
     /** Like `Tag.unsubst`, but specify only the `T`. */

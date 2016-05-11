@@ -7,9 +7,8 @@ import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.psi.types.{ScDesignatorType, ScType}
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 object FormattedStringFormatter extends StringFormatter {
   def format(parts: Seq[StringPart]) = {
     val bindings = parts.collect {
@@ -19,9 +18,12 @@ object FormattedStringFormatter extends StringFormatter {
           if (injection.value == "%") ("%%", None)
           else (injection.value, None)
         else {
-          val format = specifier.map(_.format)
-                  .getOrElse("%" + injection.expressionType.map(letterFor).getOrElse('s'))
-          val argument = if (injection.isComplexBlock) injection.text else injection.value
+          val format = specifier
+            .map(_.format)
+            .getOrElse(
+                "%" + injection.expressionType.map(letterFor).getOrElse('s'))
+          val argument =
+            if (injection.isComplexBlock) injection.text else injection.value
           (format, Some(argument))
         }
     }
@@ -42,13 +44,14 @@ object FormattedStringFormatter extends StringFormatter {
     case types.Char => 'c'
     case types.Byte | types.Short | types.Int | types.Long => 'd'
     case types.Float | types.Double => 'f'
-    case ScDesignatorType(element) => element.name match {
-      case "String" => 's'
-      case "BigInt" => 'd'
-      case "BigDecimal" => 'f'
-      case "Calendar" | "Date" => 't'
-      case _ => 's'
-    }
+    case ScDesignatorType(element) =>
+      element.name match {
+        case "String" => 's'
+        case "BigInt" => 'd'
+        case "BigDecimal" => 'f'
+        case "Calendar" | "Date" => 't'
+        case _ => 's'
+      }
     case _ => 's'
   }
 }

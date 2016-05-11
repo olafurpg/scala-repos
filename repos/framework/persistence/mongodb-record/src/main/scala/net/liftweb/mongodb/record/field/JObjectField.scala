@@ -30,16 +30,15 @@ import scala.xml.NodeSeq
 import com.mongodb._
 
 class JObjectField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-extends Field[JObject, OwnerType]
-with MandatoryTypedField[JObject]
-with MongoFieldFlavor[JObject] {
+    extends Field[JObject, OwnerType] with MandatoryTypedField[JObject]
+    with MongoFieldFlavor[JObject] {
 
   def owner = rec
 
   def asJValue: JValue = valueBox openOr (JNothing: JValue)
 
   def setFromJValue(jvalue: JValue): Box[JObject] = jvalue match {
-    case JNothing|JNull if optional_? => setBox(Empty)
+    case JNothing | JNull if optional_? => setBox(Empty)
     case jo: JObject => setBox(Full(jo))
     case other => setBox(FieldHelpers.expectedA("JObject", other))
   }
@@ -67,10 +66,12 @@ with MongoFieldFlavor[JObject] {
 
   def toForm: Box[NodeSeq] = Empty
 
-  def asDBObject: DBObject = valueBox
-    .map { v => JObjectParser.parse(v)(owner.meta.formats) }
-    .openOr(new BasicDBObject)
+  def asDBObject: DBObject =
+    valueBox.map { v =>
+      JObjectParser.parse(v)(owner.meta.formats)
+    }.openOr(new BasicDBObject)
 
   def setFromDBObject(obj: DBObject): Box[JObject] =
-    Full(JObjectParser.serialize(obj)(owner.meta.formats).asInstanceOf[JObject])
+    Full(
+        JObjectParser.serialize(obj)(owner.meta.formats).asInstanceOf[JObject])
 }

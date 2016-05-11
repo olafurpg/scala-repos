@@ -7,19 +7,19 @@ object O extends App with T {
   lazy val lazyy = ""
   def deff = ""
 
-  println(vall)       // no warn
+  println(vall) // no warn
   new {
-    println(vall)     // no warn
+    println(vall) // no warn
   }
 }
 
 object Client {
-  println(O.vall)     // warn
+  println(O.vall) // warn
   import O.vall
-  println(vall)       // warn
+  println(vall) // warn
 
-  println(O.lazyy)    // no warn
-  println(O.deff)     // no warn
+  println(O.lazyy) // no warn
+  println(O.deff) // no warn
   println(O.traitVal) // no warn
 }
 
@@ -35,8 +35,8 @@ object Spec {
     val foo = "foo"
   }
   new UserContext {
-    println(foo)                      // no warn
-    println(this.foo)                 // no warn
-    println({locally(()); this}.foo)  // warn (spurious, but we can't discriminate)
+    println(foo) // no warn
+    println(this.foo) // no warn
+    println({ locally(()); this }.foo) // warn (spurious, but we can't discriminate)
   }
 }

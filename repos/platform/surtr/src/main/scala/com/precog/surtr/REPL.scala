@@ -80,13 +80,15 @@ trait Lifecycle {
   def shutdown: IO[PrecogUnit]
 }
 
-class REPLConfig(dataDir: Option[String]) extends BaseConfig
-    with IdSourceConfig
-    with EvaluatorConfig
-    with ColumnarTableModuleConfig
-    with BlockStoreColumnarTableModuleConfig {
-  val defaultConfig = Configuration.loadResource("/default_ingest.conf", BlockFormat)
-  val config = dataDir map { defaultConfig.set("precog.storage.root", _) } getOrElse { defaultConfig }
+class REPLConfig(dataDir: Option[String])
+    extends BaseConfig with IdSourceConfig with EvaluatorConfig
+    with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig {
+  val defaultConfig =
+    Configuration.loadResource("/default_ingest.conf", BlockFormat)
+  val config =
+    dataDir map { defaultConfig.set("precog.storage.root", _) } getOrElse {
+      defaultConfig
+    }
 
   val sortWorkDir = scratchDir
   val memoizationBufferSize = sortBufferSize
@@ -107,16 +109,21 @@ class REPLConfig(dataDir: Option[String]) extends BaseConfig
   val idSource = new FreshAtomicIdSource
 }
 
-trait REPL extends ParseEvalStack[Future]
-    with ActorVFSModule
-    with SecureVFSModule[Future, Slice]
-    with VFSColumnarTableModule
+trait REPL
+    extends ParseEvalStack[Future] with ActorVFSModule
+    with SecureVFSModule[Future, Slice] with VFSColumnarTableModule
     with XLightWebHttpClientModule[Future]
     with LongIdMemoryDatasetConsumer[Future] {
 
-  val dummyAccount = AccountDetails("dummyAccount", "nobody@precog.com",
-    new DateTime, "dummyAPIKey", Path.Root, AccountPlan.Free)
-  def dummyEvaluationContext = EvaluationContext("dummyAPIKey", dummyAccount, Path.Root, Path.Root, new DateTime)
+  val dummyAccount = AccountDetails("dummyAccount",
+                                    "nobody@precog.com",
+                                    new DateTime,
+                                    "dummyAPIKey",
+                                    Path.Root,
+                                    AccountPlan.Free)
+  def dummyEvaluationContext =
+    EvaluationContext(
+        "dummyAPIKey", dummyAccount, Path.Root, Path.Root, new DateTime)
 
   val Prompt = "quirrel> "
   val Follow = "       | "
@@ -125,7 +132,7 @@ trait REPL extends ParseEvalStack[Future]
     val terminal = TerminalFactory.getFlavor(TerminalFactory.Flavor.UNIX)
     terminal.init()
 
-    val color = new Color(true)       // TODO
+    val color = new Color(true) // TODO
 
     val reader = new ConsoleReader
     // val out = new PrintWriter(reader.getTerminal.wrapOutIfNeeded(System.out))
@@ -141,57 +148,56 @@ trait REPL extends ParseEvalStack[Future]
         out.println(color.red(strs mkString "\n"))
       }
 
-      if (tree.errors filterNot isWarning isEmpty)
-        Some(tree)
-      else
-        None
+      if (tree.errors filterNot isWarning isEmpty) Some(tree)
+      else None
     }
 
     def handle(c: Command) = c match {
       case Eval(tree) => {
-        val optTree = compile(tree)
+          val optTree = compile(tree)
 
-        for (tree <- optTree) {
-          val bytecode = emit(tree)
-          val eitherGraph = decorate(bytecode)
+          for (tree <- optTree) {
+            val bytecode = emit(tree)
+            val eitherGraph = decorate(bytecode)
 
-          // TODO decoration errors
+            // TODO decoration errors
 
-          for (graph <- eitherGraph.right) {
-            val result = {
-              consumeEval(graph, dummyEvaluationContext) fold (
-                error   => "An error occurred processing your query: " + error.getMessage,
-                results => JArray(results.toList.map(_._2.toJValue)).renderPretty
-              )
+            for (graph <- eitherGraph.right) {
+              val result = {
+                consumeEval(graph, dummyEvaluationContext) fold
+                (error =>
+                      "An error occurred processing your query: " +
+                      error.getMessage, results =>
+                      JArray(results.toList.map(_._2.toJValue)).renderPretty)
+              }
+
+              out.println()
+              out.println(color.cyan(result))
             }
-
-            out.println()
-            out.println(color.cyan(result))
           }
+
+          true
         }
 
-        true
-      }
-
       case PrintTree(tree) => {
-        bindRoot(tree, tree)
-        val tree2 = shakeTree(tree)
+          bindRoot(tree, tree)
+          val tree2 = shakeTree(tree)
 
-        out.println()
-        out.println(prettyPrint(tree2))
+          out.println()
+          out.println(prettyPrint(tree2))
 
-        true
-      }
+          true
+        }
 
       case Help => {
-        printHelp(out)
-        true
-      }
+          printHelp(out)
+          true
+        }
 
       case Quit => {
-        terminal.restore()
-        false
-      }
+          terminal.restore()
+          false
+        }
     }
 
     def loop() {
@@ -204,17 +210,18 @@ trait REPL extends ParseEvalStack[Future]
           handleFailures(failures)
         } catch {
           case pe: ParseException => {
-            out.println()
-            out.println(color.red(pe.mkString))
-          }
+              out.println()
+              out.println(color.red(pe.mkString))
+            }
         }
         println()
         loop()
       } else {
-        val command = if ((successes lengthCompare 1) > 0)
-          throw new AssertionError("Fatal error: ambiguous parse results: " + results.mkString(", "))
-        else
-          successes.head
+        val command =
+          if ((successes lengthCompare 1) > 0)
+            throw new AssertionError("Fatal error: ambiguous parse results: " +
+                results.mkString(", "))
+          else successes.head
 
         if (handle(command)) {
           out.println()
@@ -223,8 +230,7 @@ trait REPL extends ParseEvalStack[Future]
       }
     }
 
-
-    out.println("Welcome to Quirrel early access preview.")       // TODO we should try to get this string from a file
+    out.println("Welcome to Quirrel early access preview.") // TODO we should try to get this string from a file
     out.println("Type in expressions to have them evaluated.")
     out.println("Press Ctrl-D on a new line to evaluate an expression.")
     out.println("Type in :help for more information.")
@@ -251,8 +257,7 @@ trait REPL extends ParseEvalStack[Future]
   }
 
   def printHelp(out: PrintStream) {
-    val str =
-      """Note: command abbreviations are not yet supported!
+    val str = """Note: command abbreviations are not yet supported!
         |
         |<expr>        Evaluate the expression
         |:help         Print this help message
@@ -264,12 +269,12 @@ trait REPL extends ParseEvalStack[Future]
 
   // %%
 
-  lazy val prompt: Parser[Command] = (
-    expr           ^^ { t => Eval(t) }
-      | ":tree" ~ expr ^^ { (_, t) => PrintTree(t) }
-      | ":help"        ^^^ Help
-      | ":quit"        ^^^ Quit
-  )
+  lazy val prompt: Parser[Command] =
+    (expr ^^ { t =>
+          Eval(t)
+        } | ":tree" ~ expr ^^ { (_, t) =>
+          PrintTree(t)
+        } | ":help" ^^^ Help | ":quit" ^^^ Quit)
 
   sealed trait Command
 
@@ -284,17 +289,19 @@ object Console extends App {
     new REPLConfig(dataDir)
   }
 
-  val repl: IO[scalaz.Validation[blueeyes.json.serialization.Extractor.Error, Lifecycle]] = for {
+  val repl: IO[scalaz.Validation[
+          blueeyes.json.serialization.Extractor.Error, Lifecycle]] = for {
     replConfig <- loadConfig(args.headOption)
   } yield {
     scalaz.Success[blueeyes.json.serialization.Extractor.Error, Lifecycle] {
-      new REPL
-          with Lifecycle { self =>
+      new REPL with Lifecycle { self =>
         val storageTimeout = yggConfig.storageTimeout
 
         implicit val actorSystem = ActorSystem("replActorSystem")
-        implicit val asyncContext = ExecutionContext.defaultExecutionContext(actorSystem)
-        implicit val M = new blueeyes.bkka.UnsafeFutureComonad(asyncContext, yggConfig.maxEvalDuration)
+        implicit val asyncContext =
+          ExecutionContext.defaultExecutionContext(actorSystem)
+        implicit val M = new blueeyes.bkka.UnsafeFutureComonad(
+            asyncContext, yggConfig.maxEvalDuration)
 
         type YggConfig = REPLConfig
         val yggConfig = replConfig
@@ -304,22 +311,40 @@ object Console extends App {
 
         val accessControl = new DirectAPIKeyFinder(apiKeyManager)
 
-        val masterChef = actorSystem.actorOf(Props(Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)), VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+        val masterChef = actorSystem.actorOf(Props(
+                Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+                     VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
 
         val jobManager = new InMemoryJobManager[Future]
-        val permissionsFinder = new PermissionsFinder(accessControl, new StaticAccountFinder[Future]("", ""), new org.joda.time.Instant())
-        val resourceBuilder = new ResourceBuilder(actorSystem, yggConfig.clock, masterChef, yggConfig.cookThreshold, storageTimeout)
+        val permissionsFinder =
+          new PermissionsFinder(accessControl,
+                                new StaticAccountFinder[Future]("", ""),
+                                new org.joda.time.Instant())
+        val resourceBuilder = new ResourceBuilder(actorSystem,
+                                                  yggConfig.clock,
+                                                  masterChef,
+                                                  yggConfig.cookThreshold,
+                                                  storageTimeout)
 
-        val projectionsActor = actorSystem.actorOf(Props(new PathRoutingActor(yggConfig.dataDir, Duration(300, "seconds"), Duration(300, "seconds"), 100, yggConfig.clock)))
+        val projectionsActor = actorSystem.actorOf(
+            Props(new PathRoutingActor(yggConfig.dataDir,
+                                       Duration(300, "seconds"),
+                                       Duration(300, "seconds"),
+                                       100,
+                                       yggConfig.clock)))
 
-        val actorVFS = new ActorVFS(projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
-        val vfs = new SecureVFS(actorVFS, permissionsFinder, jobManager, Clock.System)
+        val actorVFS = new ActorVFS(projectionsActor,
+                                    yggConfig.storageTimeout,
+                                    yggConfig.storageTimeout)
+        val vfs =
+          new SecureVFS(actorVFS, permissionsFinder, jobManager, Clock.System)
 
         trait TableCompanion extends VFSColumnarTableCompanion
 
         object Table extends TableCompanion
 
-        def Evaluator[N[+_]](N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] =
+        def Evaluator[N[+ _]](N0: Monad[N])(
+            implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] =
           new Evaluator[N](N0) {
             type YggConfig = REPLConfig
             val yggConfig = replConfig
@@ -330,7 +355,9 @@ object Console extends App {
         def startup = IO { PrecogUnit }
 
         def shutdown = IO {
-          Await.result(gracefulStop(projectionsActor, yggConfig.controlTimeout), yggConfig.controlTimeout)
+          Await.result(
+              gracefulStop(projectionsActor, yggConfig.controlTimeout),
+              yggConfig.controlTimeout)
           actorSystem.shutdown()
           PrecogUnit
         }
@@ -347,7 +374,8 @@ object Console extends App {
       } yield PrecogUnit
 
     case scalaz.Failure(error) =>
-      IO(sys.error("An error occurred deserializing a database descriptor: " + error))
+      IO(sys.error("An error occurred deserializing a database descriptor: " +
+              error))
   }
 
   run.unsafePerformIO

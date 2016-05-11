@@ -9,11 +9,11 @@ import com.intellij.psi.{PsiElement, PsiNamedElement, PsiReference}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * User: Dmitry Naydanov
- * Date: 11/23/11
- */
-
-trait ScDocTagValue extends PsiDocTagValue with PsiReference with PsiNamedElement {
+  * User: Dmitry Naydanov
+  * Date: 11/23/11
+  */
+trait ScDocTagValue
+    extends PsiDocTagValue with PsiReference with PsiNamedElement {
   def getValue: String
 
 //  def getName: String = getText

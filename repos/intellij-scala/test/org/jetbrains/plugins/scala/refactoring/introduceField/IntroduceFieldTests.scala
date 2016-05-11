@@ -2,9 +2,9 @@ package org.jetbrains.plugins.scala
 package refactoring.introduceField
 
 /**
- * Nikolay.Tropin
- * 7/17/13
- */
+  * Nikolay.Tropin
+  * 7/17/13
+  */
 class IntroduceFieldTests extends IntroduceFieldTestBase {
   def testSimple() = doTest()
   def testSimpleReplaceAll() = doTest()

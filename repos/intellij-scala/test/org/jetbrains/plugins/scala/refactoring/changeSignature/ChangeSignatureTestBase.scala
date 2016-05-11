@@ -21,10 +21,11 @@ import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaChange
 import org.junit.Assert._
 
 /**
- * Nikolay.Tropin
- * 2014-08-14
- */
-abstract class ChangeSignatureTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * Nikolay.Tropin
+  * 2014-08-14
+  */
+abstract class ChangeSignatureTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   var targetMethod: PsiMember = null
   protected var isAddDefaultValue = false
 
@@ -37,10 +38,11 @@ abstract class ChangeSignatureTestBase extends ScalaLightPlatformCodeInsightTest
   def secondFileName(testName: String): String
   def secondFileAfterName(testName: String): String
 
-  def processor(newVisibility: String,
-                newName: String,
-                newReturnType: String,
-                newParams: => Seq[Seq[ParameterInfo]]): ChangeSignatureProcessorBase
+  def processor(
+      newVisibility: String,
+      newName: String,
+      newReturnType: String,
+      newParams: => Seq[Seq[ParameterInfo]]): ChangeSignatureProcessorBase
 
   def findTargetElement: PsiMember
 
@@ -53,10 +55,11 @@ abstract class ChangeSignatureTestBase extends ScalaLightPlatformCodeInsightTest
     val secondName = secondFileName(testName)
     val checkSecond = secondName != null
 
-    val secondFile = if (checkSecond) {
-      val secondFileText = getTextFromTestData(secondName)
-      addFileToProject(secondName, secondFileText)
-    } else null
+    val secondFile =
+      if (checkSecond) {
+        val secondFileText = getTextFromTestData(secondName)
+        addFileToProject(secondName, secondFileText)
+      } else null
 
     val fileName = mainFileName(testName)
     configureByFile(fileName)
@@ -64,7 +67,9 @@ abstract class ChangeSignatureTestBase extends ScalaLightPlatformCodeInsightTest
 
     processor(newVisibility, newName, newReturnType, newParams).run()
 
-    PostprocessReformattingAspect.getInstance(getProjectAdapter).doPostponedFormatting()
+    PostprocessReformattingAspect
+      .getInstance(getProjectAdapter)
+      .doPostponedFormatting()
 
     val mainAfterText = getTextFromTestData(mainFileAfterName(testName))
     assertEquals(mainAfterText, getFileAdapter.getText)
@@ -77,10 +82,13 @@ abstract class ChangeSignatureTestBase extends ScalaLightPlatformCodeInsightTest
 
   protected def addFileToProject(fileName: String, text: String): PsiFile = {
     inWriteAction {
-      val vFile = LightPlatformTestCase.getSourceRoot.createChildData(null, fileName)
+      val vFile =
+        LightPlatformTestCase.getSourceRoot.createChildData(null, fileName)
       VfsUtil.saveText(vFile, text)
       val psiFile = LightPlatformTestCase.getPsiManager.findFile(vFile)
-      assertNotNull("Can't create PsiFile for '" + fileName + "'. Unknown file type most probably.", vFile)
+      assertNotNull("Can't create PsiFile for '" + fileName +
+                    "'. Unknown file type most probably.",
+                    vFile)
       assertTrue(psiFile.isPhysical)
       vFile.setCharset(CharsetToolkit.UTF8_CHARSET)
       PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
@@ -93,42 +101,59 @@ abstract class ChangeSignatureTestBase extends ScalaLightPlatformCodeInsightTest
     FileUtilRt.loadFile(file, CharsetToolkit.UTF8, true)
   }
 
-  protected def getPsiTypeFromText(typeText: String, context: PsiElement): PsiType = {
-    val factory: JavaCodeFragmentFactory = JavaCodeFragmentFactory.getInstance(getProjectAdapter)
+  protected def getPsiTypeFromText(
+      typeText: String, context: PsiElement): PsiType = {
+    val factory: JavaCodeFragmentFactory =
+      JavaCodeFragmentFactory.getInstance(getProjectAdapter)
     factory.createTypeCodeFragment(typeText, context, false).getType
   }
 
-  protected def javaProcessor(newVisibility: String,
-                              newName: String,
-                              newReturnType: String,
-                              newParams: => Seq[Seq[ParameterInfo]]): ChangeSignatureProcessorBase = {
+  protected def javaProcessor(
+      newVisibility: String,
+      newName: String,
+      newReturnType: String,
+      newParams: => Seq[Seq[ParameterInfo]]): ChangeSignatureProcessorBase = {
 
     val psiMethod = targetMethod.asInstanceOf[PsiMethod]
     val retType =
-      if (newReturnType != null) getPsiTypeFromText(newReturnType, psiMethod) else psiMethod.getReturnType
+      if (newReturnType != null) getPsiTypeFromText(newReturnType, psiMethod)
+      else psiMethod.getReturnType
 
-    val params = newParams.flatten.map(_.asInstanceOf[ParameterInfoImpl]).toArray
+    val params =
+      newParams.flatten.map(_.asInstanceOf[ParameterInfoImpl]).toArray
 
-    new ChangeSignatureProcessor(getProjectAdapter, psiMethod, /*generateDelegate = */ false,
-      newVisibility, newName, retType, params, Array.empty)
+    new ChangeSignatureProcessor(getProjectAdapter,
+                                 psiMethod, /*generateDelegate = */ false,
+                                 newVisibility,
+                                 newName,
+                                 retType,
+                                 params,
+                                 Array.empty)
   }
 
-  protected def scalaProcessor(newVisibility: String,
-                               newName: String,
-                               newReturnType: String,
-                               newParams: => Seq[Seq[ParameterInfo]],
-                               isAddDefaultValue: Boolean): ChangeSignatureProcessorBase = {
+  protected def scalaProcessor(
+      newVisibility: String,
+      newName: String,
+      newReturnType: String,
+      newParams: => Seq[Seq[ParameterInfo]],
+      isAddDefaultValue: Boolean): ChangeSignatureProcessorBase = {
     val retType = targetMethod match {
       case fun: ScFunction =>
-        if (newReturnType != null) ScalaPsiElementFactory.createTypeFromText(newReturnType, fun, fun)
+        if (newReturnType != null)
+          ScalaPsiElementFactory.createTypeFromText(newReturnType, fun, fun)
         else fun.returnType.getOrAny
       case _ => types.Any
     }
 
     val params = newParams.map(_.map(_.asInstanceOf[ScalaParameterInfo]))
 
-    val changeInfo =
-      new ScalaChangeInfo(newVisibility, targetMethod.asInstanceOf[ScMethodLike], newName, retType, params, isAddDefaultValue)
+    val changeInfo = new ScalaChangeInfo(
+        newVisibility,
+        targetMethod.asInstanceOf[ScMethodLike],
+        newName,
+        retType,
+        params,
+        isAddDefaultValue)
 
     new ScalaChangeSignatureProcessor(getProjectAdapter, changeInfo)
   }

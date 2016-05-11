@@ -5,7 +5,6 @@ trait OuterTrait {
   }
 
   val Inner: InnerTrait
-
 }
 
 object OuterObject extends OuterTrait {

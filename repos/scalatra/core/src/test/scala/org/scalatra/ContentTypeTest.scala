@@ -2,7 +2,7 @@ package org.scalatra
 
 import java.nio.charset.Charset
 
-import _root_.akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import _root_.akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import _root_.akka.pattern.ask
 import _root_.akka.util.Timeout
 import org.eclipse.jetty.servlet.ServletHolder
@@ -48,7 +48,9 @@ class ContentTypeTestServlet(system: ActorSystem) extends ScalatraServlet {
 
   implicit val timeout: Timeout = 5 seconds
 
-  val conductor = system.actorOf(Props(new Actor {
+  val conductor = system.actorOf(
+      Props(
+          new Actor {
 
     var firstSender: ActorRef = _
 
@@ -118,7 +120,8 @@ class ContentTypeTest extends ScalatraFunSuite with BeforeAndAfterAll {
     }
   }
 
-  test("contentType of a byte array with text content detects text/plain; charset=iso-8859-5") {
+  test(
+      "contentType of a byte array with text content detects text/plain; charset=iso-8859-5") {
     get("/implicit/byte-array-text") {
       response.charset should equal(Some("ISO-8859-5"))
       response.mediaType should equal(Some("text/plain"))
@@ -146,9 +149,12 @@ class ContentTypeTest extends ScalatraFunSuite with BeforeAndAfterAll {
       }
     }
 
-    val futures = for (i <- 1 to 2) yield { system.actorOf(Props(new RequestActor)) ? i }
+    val futures = for (i <- 1 to 2) yield {
+      system.actorOf(Props(new RequestActor)) ? i
+    }
     for (future <- futures) {
-      val (i: Int, mediaType: Option[String]) = Await.result(future.mapTo[(Int, Option[String])], 5 seconds)
+      val (i: Int, mediaType: Option[String]) =
+        Await.result(future.mapTo[(Int, Option[String])], 5 seconds)
       mediaType should be(Some(i.toString))
     }
   }
@@ -163,12 +169,11 @@ class ContentTypeTest extends ScalatraFunSuite with BeforeAndAfterAll {
     val charset = "iso-8859-5"
     val message = "Здравствуйте!"
 
-    post(
-      "/echo",
-      headers = Map("Content-Type" -> ("application/x-www-form-urlencoded; charset=" + charset)),
-      body = ("echo=" + message.urlEncode(Charset.forName(charset)))) {
-        body should equal(message)
-      }
+    post("/echo",
+         headers = Map("Content-Type" ->
+               ("application/x-www-form-urlencoded; charset=" + charset)),
+         body = ("echo=" + message.urlEncode(Charset.forName(charset)))) {
+      body should equal(message)
+    }
   }
 }
-

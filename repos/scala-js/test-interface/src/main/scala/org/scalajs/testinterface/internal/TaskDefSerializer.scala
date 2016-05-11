@@ -16,14 +16,14 @@ object TaskDefSerializer {
   }
 
   def deserialize(obj: js.Dynamic): TaskDef = {
-    val selectors = obj.selectors.asInstanceOf[js.Array[js.Dynamic]]
-      .map(SelectorSerializer.deserialize _).toArray
+    val selectors = obj.selectors
+      .asInstanceOf[js.Array[js.Dynamic]]
+      .map(SelectorSerializer.deserialize _)
+      .toArray
 
-    new TaskDef(
-        obj.fullyQualifiedName.asInstanceOf[String],
-        FingerprintSerializer.deserialize(obj.fingerprint),
-        obj.explicitlySpecified.asInstanceOf[Boolean],
-        selectors)
+    new TaskDef(obj.fullyQualifiedName.asInstanceOf[String],
+                FingerprintSerializer.deserialize(obj.fingerprint),
+                obj.explicitlySpecified.asInstanceOf[Boolean],
+                selectors)
   }
-
 }

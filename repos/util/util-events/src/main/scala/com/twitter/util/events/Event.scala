@@ -4,8 +4,8 @@ import com.twitter.util.{Time, Return, Try}
 import com.twitter.io.Buf
 
 /**
- * Note: There is a Java-friendly API for this object: [[com.twitter.util.events.Events]].
- */
+  * Note: There is a Java-friendly API for this object: [[com.twitter.util.events.Events]].
+  */
 object Event {
 
   val NoObject: AnyRef = new Object()
@@ -15,30 +15,32 @@ object Event {
   val NoSpanId: Long = Long.MinValue
 
   /**
-   * Represents a type of event that can be recorded.
-   *
-   * A recommended usage pattern is to create a singleton
-   * in the companion object and use that for all events
-   * of that type.
-   */
+    * Represents a type of event that can be recorded.
+    *
+    * A recommended usage pattern is to create a singleton
+    * in the companion object and use that for all events
+    * of that type.
+    */
   abstract class Type {
+
     /**
-     * An identifier for this Type construction. These should be unique across
-     * types for any given sink, though no efforts are made to ensure this.
-     */
+      * An identifier for this Type construction. These should be unique across
+      * types for any given sink, though no efforts are made to ensure this.
+      */
     def id: String
 
     /**
-     * A serializer for events of this type.
-     */
+      * A serializer for events of this type.
+      */
     def serialize(event: Event): Try[Buf]
 
     /**
-     * A deserializer for Events.
-     */
+      * A deserializer for Events.
+      */
     def deserialize(buf: Buf): Try[Event]
 
-    protected def serializeTrace(traceId: Long, spanId: Long): (Option[Long], Option[Long]) = {
+    protected def serializeTrace(
+        traceId: Long, spanId: Long): (Option[Long], Option[Long]) = {
       val sid = if (spanId == NoSpanId) None else Some(spanId)
       val tid = if (traceId == NoTraceId) None else Some(traceId)
       (tid, sid)
@@ -56,23 +58,22 @@ object Event {
 }
 
 /**
- * A somewhat flexible schema representing various event types.
- *
- * @param when when the event happened.
- * @param longVal should be `Event.NoLong` if there is no supplied value.
- * @param objectVal should be `Event.NoObject` if there is no supplied value.
- * @param doubleVal should be `Event.NoDouble` if there is no supplied value.
- * @param traceIdVal should be `Event.NoTraceId` if there is no supplied value.
- * @param spanIdVal should be `Event.NoSpanId` if there is no supplied value.
- */
-case class Event(
-    etype: Event.Type,
-    when: Time,
-    longVal: Long = Event.NoLong,
-    objectVal: Object = Event.NoObject,
-    doubleVal: Double = Event.NoDouble,
-    traceIdVal: Long = Event.NoTraceId,
-    spanIdVal: Long = Event.NoSpanId) {
+  * A somewhat flexible schema representing various event types.
+  *
+  * @param when when the event happened.
+  * @param longVal should be `Event.NoLong` if there is no supplied value.
+  * @param objectVal should be `Event.NoObject` if there is no supplied value.
+  * @param doubleVal should be `Event.NoDouble` if there is no supplied value.
+  * @param traceIdVal should be `Event.NoTraceId` if there is no supplied value.
+  * @param spanIdVal should be `Event.NoSpanId` if there is no supplied value.
+  */
+case class Event(etype: Event.Type,
+                 when: Time,
+                 longVal: Long = Event.NoLong,
+                 objectVal: Object = Event.NoObject,
+                 doubleVal: Double = Event.NoDouble,
+                 traceIdVal: Long = Event.NoTraceId,
+                 spanIdVal: Long = Event.NoSpanId) {
 
   def getLong: Option[Long] =
     if (Event.NoLong == longVal) None else Some(longVal)

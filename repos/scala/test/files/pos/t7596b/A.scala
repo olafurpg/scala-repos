@@ -1,9 +1,9 @@
-trait H2Driver{
-    abstract class Table[T]
+trait H2Driver {
+  abstract class Table[T]
 }
 
 object Config {
-  val driver : H2Driver = ???
+  val driver: H2Driver = ???
   def driver(app: Any): H2Driver = ???
 }
 

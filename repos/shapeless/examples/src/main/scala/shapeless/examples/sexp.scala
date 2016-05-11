@@ -16,7 +16,7 @@
 
 package shapeless.examples
 
-import shapeless._, labelled.{ field, FieldType }, syntax.singleton._
+import shapeless._, labelled.{field, FieldType}, syntax.singleton._
 
 /*
  * This example shows how to write a simple serialiser/deserialiser
@@ -63,8 +63,8 @@ package sexp.examples {
 }
 
 /**
- * An example Abstract Syntax Tree / family.
- */
+  * An example Abstract Syntax Tree / family.
+  */
 package sexp.ast {
   sealed trait Token {
     def text: String
@@ -84,8 +84,10 @@ package sexp.ast {
   sealed trait ContextualToken extends TokenTree
   sealed trait CompressedToken extends TokenTree
   case class Unparsed(text: String) extends TokenTree
-  case class AndCondition(left: TokenTree, right: TokenTree, text: String) extends TokenTree
-  case class OrCondition(left: TokenTree, right: TokenTree, text: String) extends TokenTree
+  case class AndCondition(left: TokenTree, right: TokenTree, text: String)
+      extends TokenTree
+  case class OrCondition(left: TokenTree, right: TokenTree, text: String)
+      extends TokenTree
 
   case class Ignored(text: String = "") extends TokenTree
   case class Unclear(text: String = "") extends TokenTree
@@ -100,22 +102,27 @@ package sexp.ast {
   }
 
   case class DatabaseField(column: String)
-  case class FieldTerm(text: String, field: DatabaseField, value: String) extends Term
-  case class BoundedTerm(
-    text: String,
-    field: DatabaseField,
-    low: Option[String] = None,
-    high: Option[String] = None,
-    inclusive: Boolean = false) extends Term
+  case class FieldTerm(text: String, field: DatabaseField, value: String)
+      extends Term
+  case class BoundedTerm(text: String,
+                         field: DatabaseField,
+                         low: Option[String] = None,
+                         high: Option[String] = None,
+                         inclusive: Boolean = false)
+      extends Term
   case class LikeTerm(term: FieldTerm, like: Option[Like]) extends Term {
     val text = like.map(_.text).getOrElse("")
     val field = term.field
   }
-  case class PreferToken(tree: TokenTree, before: Option[Prefer], after: Option[Prefer]) extends TokenTree {
+  case class PreferToken(
+      tree: TokenTree, before: Option[Prefer], after: Option[Prefer])
+      extends TokenTree {
     val text = before.getOrElse("") + tree.text + after.getOrElse("")
   }
-  case class InTerm(field: DatabaseField, value: String, text: String = "") extends CompressedToken
-  case class QualifierToken(text: String, field: DatabaseField) extends ContextualToken with Term
+  case class InTerm(field: DatabaseField, value: String, text: String = "")
+      extends CompressedToken
+  case class QualifierToken(text: String, field: DatabaseField)
+      extends ContextualToken with Term
 }
 
 /** Example AST with performance problems */
@@ -172,12 +179,11 @@ package sexp.big {
   case object Foo48 extends Base
   case object Foo49 extends Base
   case object Foo50 extends Base
-
 }
 
 /**
- * examples/runMain shapeless.examples.SexpExamples
- */
+  * examples/runMain shapeless.examples.SexpExamples
+  */
 object SexpExamples extends App {
   import sexp.examples._
   import SexpUserConvert._
@@ -185,26 +191,26 @@ object SexpExamples extends App {
   // example instances and expected forms
   val foo = Foo(13)
   val fooSexp = SexpCons(
-    SexpAtom("Foo"),
-    SexpProp("i", SexpAtom("13"))
+      SexpAtom("Foo"),
+      SexpProp("i", SexpAtom("13"))
   )
   val bar = Bar("blah")
   val barSexp = SexpCons(
-    SexpAtom("Bar"),
-    SexpProp("s", SexpAtom("blah"))
+      SexpAtom("Bar"),
+      SexpProp("s", SexpAtom("blah"))
   )
   val baz = Baz(13, "blah")
-  val bazSexp = SexpCons(SexpAtom("Baz"), SexpCons(
-    // order is important --- how can we address this?
-    SexpProp("i", SexpAtom("13")),
-    SexpProp("s", SexpAtom("blah"))
-  ))
+  val bazSexp = SexpCons(SexpAtom("Baz"),
+                         SexpCons(
+                             // order is important --- how can we address this?
+                             SexpProp("i", SexpAtom("13")),
+                             SexpProp("s", SexpAtom("blah"))
+                         ))
   val wibble = Wibble(Foo(13))
-  val wibbleSexp =
-    SexpCons(SexpAtom("Wibble"),
-      SexpProp("foo",
-        SexpCons(SexpAtom("Foo"),
-          SexpProp("i", SexpAtom("13")))))
+  val wibbleSexp = SexpCons(
+      SexpAtom("Wibble"),
+      SexpProp(
+          "foo", SexpCons(SexpAtom("Foo"), SexpProp("i", SexpAtom("13")))))
 
   // SETUP
   val creator = SexpConvert[Super]
@@ -222,26 +228,23 @@ object SexpExamples extends App {
   assert(creator.ser(baz) == bazSexp)
   assert(creator.ser(wibble) == wibbleSexp)
 
-
   // a less trivial example
   import sexp.ast._
   val complex = SexpConvert[TokenTree]
 
   val token = QualifierToken("thing", DatabaseField("Source.THING"))
-  val tokenSexp =
-    SexpCons(SexpAtom("QualifierToken"),
-      SexpCons(SexpProp("text", SexpAtom("thing")),
-        SexpProp("field",
-          SexpProp("column", SexpAtom("Source.THING")))))
+  val tokenSexp = SexpCons(
+      SexpAtom("QualifierToken"),
+      SexpCons(
+          SexpProp("text", SexpAtom("thing")),
+          SexpProp("field", SexpProp("column", SexpAtom("Source.THING")))))
 
   assert(complex.deser(tokenSexp) == Some(token))
   assert(complex.ser(token) == tokenSexp)
 
-
   // a performance bottleneck example
   import sexp.big._
   val slow = SexpConvert[Base]
-
 }
 
 trait SexpConvert[T] {
@@ -251,13 +254,14 @@ trait SexpConvert[T] {
 
 // define serialisation of "primitive" types
 object SexpUserConvert {
-  implicit def stringSexpConvert: SexpConvert[String] = new SexpConvert[String] {
-    def deser(s: Sexp) = s match {
-      case SexpAtom(s) => Some(s)
-      case _ => None
+  implicit def stringSexpConvert: SexpConvert[String] =
+    new SexpConvert[String] {
+      def deser(s: Sexp) = s match {
+        case SexpAtom(s) => Some(s)
+        case _ => None
+      }
+      def ser(s: String) = SexpAtom(s)
     }
-    def ser(s: String) = SexpAtom(s)
-  }
   implicit def intSexpConvert: SexpConvert[Int] = new SexpConvert[Int] {
     def deser(s: Sexp) = s match {
       case SexpAtom(s) => util.Try(s.toInt).toOption
@@ -265,23 +269,26 @@ object SexpUserConvert {
     }
     def ser(i: Int) = SexpAtom(i.toString)
   }
-  implicit def boolSexpConvert: SexpConvert[Boolean] = new SexpConvert[Boolean] {
-    def deser(s: Sexp) = s match {
-      case SexpNil => Some(false)
-      case other => Some(true)
+  implicit def boolSexpConvert: SexpConvert[Boolean] =
+    new SexpConvert[Boolean] {
+      def deser(s: Sexp) = s match {
+        case SexpNil => Some(false)
+        case other => Some(true)
+      }
+      def ser(b: Boolean) = if (b) SexpAtom("t") else SexpNil
     }
-    def ser(b: Boolean) = if (b) SexpAtom("t") else SexpNil
-  }
-  implicit def optSexpConvert[T](c: Lazy[SexpConvert[T]]): SexpConvert[Option[T]] = new SexpConvert[Option[T]] {
-    def deser(s: Sexp) = s match {
-      case SexpNil => None
-      case other => Some(c.value.deser(other))
+  implicit def optSexpConvert[T](
+      c: Lazy[SexpConvert[T]]): SexpConvert[Option[T]] =
+    new SexpConvert[Option[T]] {
+      def deser(s: Sexp) = s match {
+        case SexpNil => None
+        case other => Some(c.value.deser(other))
+      }
+      def ser(o: Option[T]) = o match {
+        case None => SexpNil
+        case Some(t) => c.value.ser(t)
+      }
     }
-    def ser(o: Option[T]) = o match {
-      case None => SexpNil
-      case Some(t) => c.value.ser(t)
-    }
-  }
 }
 
 object SexpConvert {
@@ -293,66 +300,62 @@ object SexpConvert {
       def ser(n: HNil) = SexpNil
     }
 
-  implicit def deriveHCons[K <: Symbol, V, T <: HList]
-    (implicit
-      key: Witness.Aux[K],
+  implicit def deriveHCons[K <: Symbol, V, T <: HList](
+      implicit key: Witness.Aux[K],
       scv: Lazy[SexpConvert[V]],
-      sct: Lazy[SexpConvert[T]]
-    ): SexpConvert[FieldType[K, V] :: T] =
-      new SexpConvert[FieldType[K, V] :: T] {
-        def deser(s: Sexp): Option[FieldType[K, V] :: T] = s match {
-          case SexpProp((label, car), cdr) if label == key.value.name =>
-            for {
-              front <- scv.value.deser(car)
-              back <- sct.value.deser(cdr)
-            } yield field[K](front) :: back
+      sct: Lazy[SexpConvert[T]]): SexpConvert[FieldType[K, V] :: T] =
+    new SexpConvert[FieldType[K, V] :: T] {
+      def deser(s: Sexp): Option[FieldType[K, V] :: T] = s match {
+        case SexpProp((label, car), cdr) if label == key.value.name =>
+          for {
+            front <- scv.value.deser(car)
+            back <- sct.value.deser(cdr)
+          } yield field[K](front) :: back
 
-          case _ =>
-            println("PRODUCT MISS = " + s)
-            None
-        }
+        case _ =>
+          println("PRODUCT MISS = " + s)
+          None
+      }
 
-        def ser(ft: FieldType[K, V] :: T): Sexp = {
-          val car = SexpProp(key.value.name, scv.value.ser(ft.head))
-          sct.value.ser(ft.tail) match {
-            case SexpNil => car
-            case cdr => SexpCons(car, cdr)
-          }
+      def ser(ft: FieldType[K, V] :: T): Sexp = {
+        val car = SexpProp(key.value.name, scv.value.ser(ft.head))
+        sct.value.ser(ft.tail) match {
+          case SexpNil => car
+          case cdr => SexpCons(car, cdr)
         }
       }
+    }
 
   implicit def deriveCNil: SexpConvert[CNil] = new SexpConvert[CNil] {
     def deser(s: Sexp): Option[CNil] = None
     def ser(t: CNil) = SexpNil
   }
 
-  implicit def deriveCCons[K <: Symbol, V, T <: Coproduct]
-    (implicit
-      key: Witness.Aux[K],
+  implicit def deriveCCons[K <: Symbol, V, T <: Coproduct](
+      implicit key: Witness.Aux[K],
       scv: Lazy[SexpConvert[V]],
-      sct: Lazy[SexpConvert[T]]
-    ): SexpConvert[FieldType[K, V] :+: T] =
-      new SexpConvert[FieldType[K, V] :+: T] {
-        def deser(s: Sexp): Option[FieldType[K, V] :+: T] = s match {
-          case SexpCons(SexpAtom(impl), cdr) if impl == key.value.name =>
-            scv.value.deser(cdr).map(v => Inl(field[K](v)))
-          case SexpCons(SexpAtom(impl), cdr) =>
-            sct.value.deser(s).map(Inr(_))
-          case _ =>
-            println("COPRODUCT MISS " + s)
-            None
-        }
-
-        def ser(lr: FieldType[K, V] :+: T): Sexp = lr match {
-          case Inl(l) => SexpCons(SexpAtom(key.value.name), scv.value.ser(l))
-          case Inr(r) => sct.value.ser(r)
-        }
+      sct: Lazy[SexpConvert[T]]): SexpConvert[FieldType[K, V] :+: T] =
+    new SexpConvert[FieldType[K, V] :+: T] {
+      def deser(s: Sexp): Option[FieldType[K, V] :+: T] = s match {
+        case SexpCons(SexpAtom(impl), cdr) if impl == key.value.name =>
+          scv.value.deser(cdr).map(v => Inl(field[K](v)))
+        case SexpCons(SexpAtom(impl), cdr) =>
+          sct.value.deser(s).map(Inr(_))
+        case _ =>
+          println("COPRODUCT MISS " + s)
+          None
       }
 
-  implicit def deriveInstance[F, G]
-    (implicit gen: LabelledGeneric.Aux[F, G], sg: Lazy[SexpConvert[G]]): SexpConvert[F] =
-      new SexpConvert[F] {
-        def deser(s: Sexp): Option[F] = sg.value.deser(s).map(gen.from)
-        def ser(t: F): Sexp = sg.value.ser(gen.to(t))
+      def ser(lr: FieldType[K, V] :+: T): Sexp = lr match {
+        case Inl(l) => SexpCons(SexpAtom(key.value.name), scv.value.ser(l))
+        case Inr(r) => sct.value.ser(r)
       }
+    }
+
+  implicit def deriveInstance[F, G](implicit gen: LabelledGeneric.Aux[F, G],
+                                    sg: Lazy[SexpConvert[G]]): SexpConvert[F] =
+    new SexpConvert[F] {
+      def deser(s: Sexp): Option[F] = sg.value.deser(s).map(gen.from)
+      def ser(t: F): Sexp = sg.value.ser(gen.to(t))
+    }
 }

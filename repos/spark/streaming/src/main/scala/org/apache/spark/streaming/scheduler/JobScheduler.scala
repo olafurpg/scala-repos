@@ -28,25 +28,29 @@ import org.apache.spark.streaming._
 import org.apache.spark.streaming.ui.UIUtils
 import org.apache.spark.util.{EventLoop, ThreadUtils}
 
-
 private[scheduler] sealed trait JobSchedulerEvent
-private[scheduler] case class JobStarted(job: Job, startTime: Long) extends JobSchedulerEvent
-private[scheduler] case class JobCompleted(job: Job, completedTime: Long) extends JobSchedulerEvent
-private[scheduler] case class ErrorReported(msg: String, e: Throwable) extends JobSchedulerEvent
+private[scheduler] case class JobStarted(job: Job, startTime: Long)
+    extends JobSchedulerEvent
+private[scheduler] case class JobCompleted(job: Job, completedTime: Long)
+    extends JobSchedulerEvent
+private[scheduler] case class ErrorReported(msg: String, e: Throwable)
+    extends JobSchedulerEvent
 
 /**
- * This class schedules jobs to be run on Spark. It uses the JobGenerator to generate
- * the jobs and runs them using a thread pool.
- */
-private[streaming]
-class JobScheduler(val ssc: StreamingContext) extends Logging {
+  * This class schedules jobs to be run on Spark. It uses the JobGenerator to generate
+  * the jobs and runs them using a thread pool.
+  */
+private[streaming] class JobScheduler(val ssc: StreamingContext)
+    extends Logging {
 
   // Use of ConcurrentHashMap.keySet later causes an odd runtime problem due to Java 7/8 diff
   // https://gist.github.com/AlainODea/1375759b8720a3f9f094
-  private val jobSets: java.util.Map[Time, JobSet] = new ConcurrentHashMap[Time, JobSet]
-  private val numConcurrentJobs = ssc.conf.getInt("spark.streaming.concurrentJobs", 1)
-  private val jobExecutor =
-    ThreadUtils.newDaemonFixedThreadPool(numConcurrentJobs, "streaming-job-executor")
+  private val jobSets: java.util.Map[Time, JobSet] =
+    new ConcurrentHashMap[Time, JobSet]
+  private val numConcurrentJobs =
+    ssc.conf.getInt("spark.streaming.concurrentJobs", 1)
+  private val jobExecutor = ThreadUtils.newDaemonFixedThreadPool(
+      numConcurrentJobs, "streaming-job-executor")
   private val jobGenerator = new JobGenerator(this)
   val clock = jobGenerator.clock
   val listenerBus = new StreamingListenerBus(ssc.sparkContext.listenerBus)
@@ -64,9 +68,11 @@ class JobScheduler(val ssc: StreamingContext) extends Logging {
 
     logDebug("Starting JobScheduler")
     eventLoop = new EventLoop[JobSchedulerEvent]("JobScheduler") {
-      override protected def onReceive(event: JobSchedulerEvent): Unit = processEvent(event)
+      override protected def onReceive(event: JobSchedulerEvent): Unit =
+        processEvent(event)
 
-      override protected def onError(e: Throwable): Unit = reportError("Error in job scheduler", e)
+      override protected def onError(e: Throwable): Unit =
+        reportError("Error in job scheduler", e)
     }
     eventLoop.start()
 
@@ -102,11 +108,12 @@ class JobScheduler(val ssc: StreamingContext) extends Logging {
     jobExecutor.shutdown()
 
     // Wait for the queued jobs to complete if indicated
-    val terminated = if (processAllReceivedData) {
-      jobExecutor.awaitTermination(1, TimeUnit.HOURS)  // just a very large period of time
-    } else {
-      jobExecutor.awaitTermination(2, TimeUnit.SECONDS)
-    }
+    val terminated =
+      if (processAllReceivedData) {
+        jobExecutor.awaitTermination(1, TimeUnit.HOURS) // just a very large period of time
+      } else {
+        jobExecutor.awaitTermination(2, TimeUnit.SECONDS)
+      }
     if (!terminated) {
       jobExecutor.shutdownNow()
     }
@@ -146,7 +153,8 @@ class JobScheduler(val ssc: StreamingContext) extends Logging {
     try {
       event match {
         case JobStarted(job, startTime) => handleJobStart(job, startTime)
-        case JobCompleted(job, completedTime) => handleJobCompletion(job, completedTime)
+        case JobCompleted(job, completedTime) =>
+          handleJobCompletion(job, completedTime)
         case ErrorReported(m, e) => handleError(m, e)
       }
     } catch {
@@ -165,7 +173,8 @@ class JobScheduler(val ssc: StreamingContext) extends Logging {
       listenerBus.post(StreamingListenerBatchStarted(jobSet.toBatchInfo))
     }
     job.setStartTime(startTime)
-    listenerBus.post(StreamingListenerOutputOperationStarted(job.toOutputOperationInfo))
+    listenerBus.post(
+        StreamingListenerOutputOperationStarted(job.toOutputOperationInfo))
     logInfo("Starting job " + job.id + " from job set of time " + jobSet.time)
   }
 
@@ -173,15 +182,18 @@ class JobScheduler(val ssc: StreamingContext) extends Logging {
     val jobSet = jobSets.get(job.time)
     jobSet.handleJobCompletion(job)
     job.setEndTime(completedTime)
-    listenerBus.post(StreamingListenerOutputOperationCompleted(job.toOutputOperationInfo))
+    listenerBus.post(
+        StreamingListenerOutputOperationCompleted(job.toOutputOperationInfo))
     logInfo("Finished job " + job.id + " from job set of time " + jobSet.time)
     if (jobSet.hasCompleted) {
       jobSets.remove(jobSet.time)
       jobGenerator.onBatchCompletion(jobSet.time)
-      logInfo("Total delay: %.3f s for time %s (execution: %.3f s)".format(
-        jobSet.totalDelay / 1000.0, jobSet.time.toString,
-        jobSet.processingDelay / 1000.0
-      ))
+      logInfo(
+          "Total delay: %.3f s for time %s (execution: %.3f s)".format(
+              jobSet.totalDelay / 1000.0,
+              jobSet.time.toString,
+              jobSet.processingDelay / 1000.0
+          ))
       listenerBus.post(StreamingListenerBatchCompleted(jobSet.toBatchInfo))
     }
     job.result match {
@@ -202,17 +214,23 @@ class JobScheduler(val ssc: StreamingContext) extends Logging {
     def run() {
       try {
         val formattedTime = UIUtils.formatBatchTime(
-          job.time.milliseconds, ssc.graph.batchDuration.milliseconds, showYYYYMMSS = false)
+            job.time.milliseconds,
+            ssc.graph.batchDuration.milliseconds,
+            showYYYYMMSS = false)
         val batchUrl = s"/streaming/batch/?id=${job.time.milliseconds}"
-        val batchLinkText = s"[output operation ${job.outputOpId}, batch time ${formattedTime}]"
+        val batchLinkText =
+          s"[output operation ${job.outputOpId}, batch time ${formattedTime}]"
 
         ssc.sc.setJobDescription(
-          s"""Streaming job from <a href="$batchUrl">$batchLinkText</a>""")
-        ssc.sc.setLocalProperty(BATCH_TIME_PROPERTY_KEY, job.time.milliseconds.toString)
-        ssc.sc.setLocalProperty(OUTPUT_OP_ID_PROPERTY_KEY, job.outputOpId.toString)
+            s"""Streaming job from <a href="$batchUrl">$batchLinkText</a>""")
+        ssc.sc.setLocalProperty(
+            BATCH_TIME_PROPERTY_KEY, job.time.milliseconds.toString)
+        ssc.sc.setLocalProperty(
+            OUTPUT_OP_ID_PROPERTY_KEY, job.outputOpId.toString)
         // Checkpoint all RDDs marked for checkpointing to ensure their lineages are
         // truncated periodically. Otherwise, we may run into stack overflows (SPARK-6847).
-        ssc.sparkContext.setLocalProperty(RDD.CHECKPOINT_ALL_MARKED_ANCESTORS, "true")
+        ssc.sparkContext.setLocalProperty(
+            RDD.CHECKPOINT_ALL_MARKED_ANCESTORS, "true")
 
         // We need to assign `eventLoop` to a temp variable. Otherwise, because
         // `JobScheduler.stop(false)` may set `eventLoop` to null when this method is running, then

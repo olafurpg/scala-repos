@@ -20,6 +20,7 @@
 package com.precog.common.backport.lang
 
 object Boolean {
+
   /** Backport of Java 7's java.lang.Boolean's static compare method */
   @inline
   def compare(x: Boolean, y: Boolean): Int = {

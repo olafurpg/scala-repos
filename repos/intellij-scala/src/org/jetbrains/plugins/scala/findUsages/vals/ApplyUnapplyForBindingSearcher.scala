@@ -16,37 +16,46 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceElement, ResolvableReferenceExpression, ScalaResolveResult}
 
 /**
- * Nikolay.Tropin
- * 8/29/13
- */
-class ApplyUnapplyForBindingSearcher extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
-  def execute(queryParameters: SearchParameters, consumer: Processor[PsiReference]): Boolean = {
+  * Nikolay.Tropin
+  * 8/29/13
+  */
+class ApplyUnapplyForBindingSearcher
+    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
+  def execute(queryParameters: SearchParameters,
+              consumer: Processor[PsiReference]): Boolean = {
     val scope = inReadAction(queryParameters.getEffectiveSearchScope)
     val element = queryParameters.getElementToSearch
     element match {
       case _ if inReadAction(!element.isValid) => true
       case binding: ScBindingPattern =>
-        val processor = createProcessor(consumer, binding, checkApply = true, checkUnapply = true)
+        val processor = createProcessor(
+            consumer, binding, checkApply = true, checkUnapply = true)
         processBinding(processor, scope, binding, queryParameters.getProject)
       case inAnonClassWithBinding((binding, checkApply, checkUnapply)) =>
-        val processor = createProcessor(consumer, binding, checkApply, checkUnapply)
+        val processor = createProcessor(
+            consumer, binding, checkApply, checkUnapply)
         processBinding(processor, scope, binding, queryParameters.getProject)
       case _ => true
     }
   }
 
-
-  private def createProcessor(consumer: Processor[PsiReference], binding: ScBindingPattern, checkApply: Boolean, checkUnapply: Boolean) =
+  private def createProcessor(consumer: Processor[PsiReference],
+                              binding: ScBindingPattern,
+                              checkApply: Boolean,
+                              checkUnapply: Boolean) =
     new TextOccurenceProcessor {
       def execute(element: PsiElement, offsetInElement: Int): Boolean = {
         val references = inReadAction(element.getReferences)
         val IsApply = new Apply(binding)
         val IsUnapply = new Unapply(binding)
-        for (ref <- references if ref.getRangeInElement.contains(offsetInElement)) {
+        for (ref <- references
+                       if ref.getRangeInElement.contains(offsetInElement)) {
           inReadAction {
             ref match {
-              case IsApply(reference) if checkApply => if (!consumer.process(reference)) return false
-              case IsUnapply(reference) if checkUnapply => if (!consumer.process(reference)) return false
+              case IsApply(reference) if checkApply =>
+                if (!consumer.process(reference)) return false
+              case IsUnapply(reference) if checkUnapply =>
+                if (!consumer.process(reference)) return false
               case _ =>
             }
           }
@@ -55,13 +64,16 @@ class ApplyUnapplyForBindingSearcher extends QueryExecutor[PsiReference, Referen
       }
     }
 
-  private def processBinding(processor: TextOccurenceProcessor, scope: SearchScope, binding: ScBindingPattern, project: Project): Boolean = {
+  private def processBinding(processor: TextOccurenceProcessor,
+                             scope: SearchScope,
+                             binding: ScBindingPattern,
+                             project: Project): Boolean = {
     val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(project)
     try {
       val name = inReadAction(binding.name)
-      helper.processElementsWithWord(processor, scope, name, UsageSearchContext.IN_CODE, true)
-    }
-    catch {
+      helper.processElementsWithWord(
+          processor, scope, name, UsageSearchContext.IN_CODE, true)
+    } catch {
       case ignore: IndexNotReadyException => true
     }
   }
@@ -71,16 +83,18 @@ class ApplyUnapplyForBindingSearcher extends QueryExecutor[PsiReference, Referen
       (ref, ref.getElement.getContext) match {
         case (sref: ScStableCodeReferenceElement, x: ScConstructorPattern) =>
           sref.bind() match {
-            case Some(resolve@ScalaResolveResult(fun: ScFunctionDefinition, _))
-              if Set("unapply", "unapplySeq").contains(fun.name) =>
+            case Some(
+                resolve @ ScalaResolveResult(fun: ScFunctionDefinition, _))
+                if Set("unapply", "unapplySeq").contains(fun.name) =>
               resolve.innerResolveResult match {
                 case Some(ScalaResolveResult(`binding`, _)) => Some(sref)
                 case _ => None
               }
-            case Some(resolve@ScalaResolveResult(`binding`, _)) =>
+            case Some(resolve @ ScalaResolveResult(`binding`, _)) =>
               resolve.innerResolveResult match {
                 case Some(ScalaResolveResult(fun: ScFunctionDefinition, _))
-                  if Set("unapply", "unapplySeq").contains(fun.name) => Some(sref)
+                    if Set("unapply", "unapplySeq").contains(fun.name) =>
+                  Some(sref)
                 case _ => None
               }
             case _ => None
@@ -93,13 +107,17 @@ class ApplyUnapplyForBindingSearcher extends QueryExecutor[PsiReference, Referen
   private class Apply(binding: ScBindingPattern) {
     def unapply(ref: PsiReference): Option[ResolvableReferenceElement] = {
       (ref, ref.getElement.getContext) match {
-        case (sref: ResolvableReferenceExpression, x: ScMethodCall) if x.getInvokedExpr == ref.getElement =>
+        case (sref: ResolvableReferenceExpression, x: ScMethodCall)
+            if x.getInvokedExpr == ref.getElement =>
           sref.bind() match {
             case Some(ScalaResolveResult(fun: ScFunctionDefinition, _))
-              if fun.name == "apply" && sref.isReferenceTo(binding) => Some(sref)
-            case Some(resolve@ScalaResolveResult(`binding`, _)) =>
+                if fun.name == "apply" && sref.isReferenceTo(binding) =>
+              Some(sref)
+            case Some(resolve @ ScalaResolveResult(`binding`, _)) =>
               resolve.innerResolveResult match {
-                case Some(ScalaResolveResult(fun: ScFunctionDefinition, _)) if fun.name == "apply" => Some(sref)
+                case Some(ScalaResolveResult(fun: ScFunctionDefinition, _))
+                    if fun.name == "apply" =>
+                  Some(sref)
                 case _ => None
               }
             case _ => None
@@ -110,7 +128,8 @@ class ApplyUnapplyForBindingSearcher extends QueryExecutor[PsiReference, Referen
   }
 
   private object inAnonClassWithBinding {
-    def unapply(fun: ScFunctionDefinition): Option[(ScBindingPattern, Boolean, Boolean)] =
+    def unapply(fun: ScFunctionDefinition)
+      : Option[(ScBindingPattern, Boolean, Boolean)] =
       inReadAction {
         val (checkApply, checkUnapply) = fun.name match {
           case "apply" => (true, false)
@@ -119,13 +138,13 @@ class ApplyUnapplyForBindingSearcher extends QueryExecutor[PsiReference, Referen
         }
         if (checkApply || checkUnapply) {
           fun.containingClass match {
-            case anon: ScNewTemplateDefinition => ScalaPsiUtil.findInstanceBinding(anon).flatMap(Some(_, checkApply, checkUnapply))
+            case anon: ScNewTemplateDefinition =>
+              ScalaPsiUtil
+                .findInstanceBinding(anon)
+                .flatMap(Some(_, checkApply, checkUnapply))
             case _ => None
           }
-        }
-        else None
+        } else None
       }
   }
-
 }
-

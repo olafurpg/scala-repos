@@ -27,8 +27,9 @@ object SCL6660 {
     def foo(s: String) = ""
 
     {
-      import Problematic.Conversions.{int2jvalue,double2jvalue}
-      /*start*/foo(5)/*end*/
+      import Problematic.Conversions.{int2jvalue, double2jvalue}
+      /*start*/
+      foo(5) /*end*/
     }
   }
 }

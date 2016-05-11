@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import io.prediction.annotation.DeveloperApi
@@ -41,7 +40,7 @@ object DateTimeJson4sSupport {
   }
 
   /** Custom JSON4S serializer for Joda-Time */
-  class Serializer extends CustomSerializer[DateTime](format => (
-    deserializeFromJValue, serializeToJValue))
-
+  class Serializer
+      extends CustomSerializer[DateTime](
+          format => (deserializeFromJValue, serializeToJValue))
 }

@@ -5,6 +5,6 @@ object LocalBeforeNamedParams {
       print(nameParam)
     }
 
-    printName(name<caret>)
+    printName(name < caret >)
   }
 }

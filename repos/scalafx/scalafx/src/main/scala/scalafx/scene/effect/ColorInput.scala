@@ -35,27 +35,27 @@ import scalafx.delegate.{DimensionDelegate, PositionDelegate, SFXDelegate}
 import scalafx.scene.paint._
 
 object ColorInput {
-  implicit def sfxColorInput2jfx(ci: ColorInput): jfxse.ColorInput = if (ci != null) ci.delegate else null
+  implicit def sfxColorInput2jfx(ci: ColorInput): jfxse.ColorInput =
+    if (ci != null) ci.delegate else null
 }
 
-class ColorInput(override val delegate: jfxse.ColorInput = new jfxse.ColorInput)
-  extends Effect(delegate)
-  with PositionDelegate[jfxse.ColorInput]
-  with DimensionDelegate[jfxse.ColorInput]
-  with SFXDelegate[jfxse.ColorInput] {
+class ColorInput(
+    override val delegate: jfxse.ColorInput = new jfxse.ColorInput)
+    extends Effect(delegate) with PositionDelegate[jfxse.ColorInput]
+    with DimensionDelegate[jfxse.ColorInput]
+    with SFXDelegate[jfxse.ColorInput] {
 
   /**
-   * Creates a new instance of ColorInput with the specified x, y, width, height, and paint.
-   */
+    * Creates a new instance of ColorInput with the specified x, y, width, height, and paint.
+    */
   def this(x: Double, y: Double, width: Double, height: Double, paint: Paint) =
     this(new jfxse.ColorInput(x, y, width, height, paint))
 
   /**
-   * The Paint used to flood the region.
-   */
+    * The Paint used to flood the region.
+    */
   def paint: ObjectProperty[jfxsp.Paint] = delegate.paintProperty
   def paint_=(v: Paint) {
     paint() = v
   }
-
 }

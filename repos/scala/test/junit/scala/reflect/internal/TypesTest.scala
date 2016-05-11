@@ -29,15 +29,18 @@ class TypesTest {
     // Two narrowings of the same refinement end up =:=. This was the root
     // cause of SI-8611. See `narrowUniquely` in `Logic` for the workaround.
     assert(boolWithString1narrow1 =:= boolWithString1narrow2)
-    val uniquelyNarrowed1 = refinedType(boolWithString1narrow1 :: Nil, NoSymbol)
-    val uniquelyNarrowed2 = refinedType(boolWithString1narrow2 :: Nil, NoSymbol)
+    val uniquelyNarrowed1 = refinedType(
+        boolWithString1narrow1 :: Nil, NoSymbol)
+    val uniquelyNarrowed2 = refinedType(
+        boolWithString1narrow2 :: Nil, NoSymbol)
     assert(uniquelyNarrowed1 =:= uniquelyNarrowed2)
   }
 
   @Test
   def testTransitivityWithModuleTypeRef(): Unit = {
     import rootMirror.EmptyPackageClass
-    val (module, moduleClass) = EmptyPackageClass.newModuleAndClassSymbol(TermName("O"), NoPosition, 0L)
+    val (module, moduleClass) =
+      EmptyPackageClass.newModuleAndClassSymbol(TermName("O"), NoPosition, 0L)
     val minfo = ClassInfoType(List(ObjectTpe), newScope, moduleClass)
     module.moduleClass setInfo minfo
     module setInfo module.moduleClass.tpe
@@ -49,8 +52,10 @@ class TypesTest {
     tps.permutations.foreach {
       case ts @ List(a, b, c) =>
         def tsShownRaw = ts.map(t => showRaw(t)).mkString(", ")
-        if (a <:< b && b <:< c && !(a <:< c)) results += s"<:< intransitive: $tsShownRaw"
-        if (a =:= b && b =:= c && !(a =:= c)) results += s"=:= intransitive: $tsShownRaw"
+        if (a <:< b && b <:< c && !(a <:< c))
+          results += s"<:< intransitive: $tsShownRaw"
+        if (a =:= b && b =:= c && !(a =:= c))
+          results += s"=:= intransitive: $tsShownRaw"
     }
     results.toList match {
       case Nil => // okay

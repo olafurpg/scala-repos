@@ -10,11 +10,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScParenthesi
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 class ScalaConstantExpressionEvaluator extends ConstantExpressionEvaluator {
-  def computeExpression(expression: PsiElement, throwExceptionOnOverflow: Boolean,
+  def computeExpression(expression: PsiElement,
+                        throwExceptionOnOverflow: Boolean,
                         auxEvaluator: AuxEvaluator): AnyRef = {
     expression match {
       case expr: ScExpression => evaluate(expr)
@@ -22,13 +22,18 @@ class ScalaConstantExpressionEvaluator extends ConstantExpressionEvaluator {
     }
   }
 
-  def computeConstantExpression(expression: PsiElement, throwExceptionOnOverflow: Boolean): AnyRef = {
+  def computeConstantExpression(
+      expression: PsiElement, throwExceptionOnOverflow: Boolean): AnyRef = {
     expression match {
-      case ref: ScReferenceExpression => computeConstantExpression(ref.resolve(), throwExceptionOnOverflow)
-      case refPattern: ScReferencePattern => computeConstantExpression(ScalaPsiUtil nameContext refPattern, throwExceptionOnOverflow)
-      case deff: ScPatternDefinition => deff.expr.map{
-        case e => computeConstantExpression(e, throwExceptionOnOverflow)
-      }.orNull
+      case ref: ScReferenceExpression =>
+        computeConstantExpression(ref.resolve(), throwExceptionOnOverflow)
+      case refPattern: ScReferencePattern =>
+        computeConstantExpression(
+            ScalaPsiUtil nameContext refPattern, throwExceptionOnOverflow)
+      case deff: ScPatternDefinition =>
+        deff.expr.map {
+          case e => computeConstantExpression(e, throwExceptionOnOverflow)
+        }.orNull
       case expr: ScExpression => evaluate(expr)
       case _ => null
     }
@@ -37,10 +42,11 @@ class ScalaConstantExpressionEvaluator extends ConstantExpressionEvaluator {
   private def evaluate(expr: ScExpression): AnyRef = {
     expr match {
       case l: ScLiteral => l.getValue
-      case p: ScParenthesisedExpr => p.expr match {
-        case Some(e) => evaluate(e)
-        case _ => null
-      }
+      case p: ScParenthesisedExpr =>
+        p.expr match {
+          case Some(e) => evaluate(e)
+          case _ => null
+        }
       case _ => null
     }
   }

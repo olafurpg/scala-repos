@@ -38,10 +38,10 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import scalafx.Includes._
 
 /**
- * ReadOnlyObjectProperty Spec tests.
- *
- *
- */
+  * ReadOnlyObjectProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ReadOnlyObjectPropertySpec extends FlatSpec with BeforeAndAfterEach {
   val bean = new Object()
@@ -52,7 +52,8 @@ class ReadOnlyObjectPropertySpec extends FlatSpec with BeforeAndAfterEach {
   var booleanProperty: jfxbp.BooleanProperty = null
 
   override def beforeEach() {
-    readOnlyObjectProperty = new ReadOnlyObjectProperty[jfxsp.Paint](bean, "Test Read-only Object", jfxsp.Color.BLACK)
+    readOnlyObjectProperty = new ReadOnlyObjectProperty[jfxsp.Paint](
+        bean, "Test Read-only Object", jfxsp.Color.BLACK)
     objectProperty1 = ObjectProperty[jfxsp.Paint](bean, "Test Object 1")
     objectProperty2 = ObjectProperty[jfxsp.Paint](bean, "Test Object 2")
     sfxObjectProperty = ObjectProperty[jfxsp.Paint](bean, "SFX Test Object")

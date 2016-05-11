@@ -15,5 +15,4 @@ object LibTest extends JasmineTest {
       expect(Lib.sq(10)).toEqual(100)
     }
   }
-
 }

@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition, ScTrait}
 
 /**
-*@author ilyas
-*/
+  *@author ilyas
+  */
 class ScalaJVMNameMapper extends NameMapper {
   def getQualifiedName(@NotNull clazz: PsiClass): String = {
     ApplicationManager.getApplication.runReadAction(new Computable[String] {

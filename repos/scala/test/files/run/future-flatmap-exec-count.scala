@@ -34,14 +34,17 @@ object Test {
 
     {
       println("recovering")
-      val recovered = Future.failed(new Throwable()).recoverWith {
-        case _ => Future.successful(2)
-      }(ec)
+      val recovered = Future
+        .failed(new Throwable())
+        .recoverWith {
+          case _ => Future.successful(2)
+        }(ec)
       await(recovered)
     }
   }
 
-  class TestExecutionContext(delegate: ExecutionContext) extends ExecutionContext {
+  class TestExecutionContext(delegate: ExecutionContext)
+      extends ExecutionContext {
     def execute(runnable: Runnable): Unit = ???
 
     def reportFailure(t: Throwable): Unit = ???

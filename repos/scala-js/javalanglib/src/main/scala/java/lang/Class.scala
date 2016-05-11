@@ -22,8 +22,8 @@ private trait ScalaJSClassData[A] extends js.Object {
 final class Class[A] private (data: ScalaJSClassData[A]) extends Object {
 
   override def toString(): String = {
-    (if (isInterface()) "interface " else
-        if (isPrimitive()) "" else "class ")+getName()
+    (if (isInterface()) "interface " else if (isPrimitive()) "" else "class ") +
+    getName()
   }
 
   def isInstance(obj: Object): scala.Boolean =
@@ -35,8 +35,7 @@ final class Class[A] private (data: ScalaJSClassData[A]) extends Object {
        * runtime type tests of primitive numeric types.
        */
       (this eq that) || {
-        if (this eq classOf[scala.Short])
-          (that eq classOf[scala.Byte])
+        if (this eq classOf[scala.Short]) (that eq classOf[scala.Byte])
         else if (this eq classOf[scala.Int])
           (that eq classOf[scala.Byte]) || (that eq classOf[scala.Short])
         else if (this eq classOf[scala.Float])
@@ -44,9 +43,8 @@ final class Class[A] private (data: ScalaJSClassData[A]) extends Object {
           (that eq classOf[scala.Int])
         else if (this eq classOf[scala.Double])
           (that eq classOf[scala.Byte]) || (that eq classOf[scala.Short]) ||
-          (that eq classOf[scala.Int])  || (that eq classOf[scala.Float])
-        else
-          false
+          (that eq classOf[scala.Int]) || (that eq classOf[scala.Float])
+        else false
       }
     } else {
       this.isInstance(that.getFakeInstance())

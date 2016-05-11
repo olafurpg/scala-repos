@@ -8,5 +8,5 @@ import org.jetbrains.plugins.scala.testingSupport.test.utest.{UTestRunConfigurat
   * @author Roman.Shein
   * @since 13.05.2015.
   */
-abstract class UTestTestCase extends ScalaTestingTestCase(new UTestConfigurationProducer) {
-}
+abstract class UTestTestCase
+    extends ScalaTestingTestCase(new UTestConfigurationProducer) {}

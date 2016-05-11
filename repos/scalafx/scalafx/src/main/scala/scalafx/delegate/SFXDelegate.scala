@@ -47,7 +47,6 @@ object SFXDelegate {
   def delegateOrNull[J <: Object](wrapper: SFXDelegate[J]): J = {
     if (wrapper != null) wrapper.delegate else null.asInstanceOf[J]
   }
-
 }
 
 /**
@@ -76,7 +75,7 @@ trait SFXDelegate[+D <: Object] extends AnyRef {
   override def equals(ref: Any): Boolean = {
     ref match {
       case sfxd: SFXDelegate[_] => delegate.equals(sfxd.delegate)
-      case _                    => delegate.equals(ref)
+      case _ => delegate.equals(ref)
     }
   }
 

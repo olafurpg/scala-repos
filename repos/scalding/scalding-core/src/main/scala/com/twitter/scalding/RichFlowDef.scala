@@ -12,19 +12,19 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
 import cascading.flow.FlowDef
 import cascading.pipe.Pipe
 
-import java.util.{ Map => JMap, List => JList }
+import java.util.{Map => JMap, List => JList}
 
 /**
- * This is an enrichment-pattern class for cascading.flow.FlowDef.
- * The rule is to never use this class directly in input or return types, but
- * only to add methods to FlowDef.
- */
+  * This is an enrichment-pattern class for cascading.flow.FlowDef.
+  * The rule is to never use this class directly in input or return types, but
+  * only to add methods to FlowDef.
+  */
 class RichFlowDef(val fd: FlowDef) {
   // allow .asScala conversions
   import collection.JavaConverters._
@@ -39,8 +39,8 @@ class RichFlowDef(val fd: FlowDef) {
   }
 
   /**
-   * Merge state from FlowDef excluding Sources/Sinks/Tails (sometimes we don't want both)
-   */
+    * Merge state from FlowDef excluding Sources/Sinks/Tails (sometimes we don't want both)
+    */
   private[scalding] def mergeMiscFrom(o: FlowDef): Unit = {
     // See the cascading code that this string is a "," separated set.
     StringUtility.fastSplit(o.getTags, ",").foreach(fd.addTag)
@@ -65,14 +65,12 @@ class RichFlowDef(val fd: FlowDef) {
   }
   private[this] def appendLeft[T](left: JList[T], right: JList[T]) {
     val existing = left.asScala.toSet
-    right.asScala
-      .filterNot(existing)
-      .foreach(left.add)
+    right.asScala.filterNot(existing).foreach(left.add)
   }
 
   /**
-   * Mutate current flow def to add all sources/sinks/etc from given FlowDef
-   */
+    * Mutate current flow def to add all sources/sinks/etc from given FlowDef
+    */
   def mergeFrom(o: FlowDef): Unit = {
     mergeLeft(fd.getSources, o.getSources)
     mergeLeft(fd.getSinks, o.getSinks)
@@ -80,27 +78,30 @@ class RichFlowDef(val fd: FlowDef) {
 
     fd.mergeMiscFrom(o)
     // Merge the FlowState
-    FlowStateMap.get(o)
-      .foreach { oFS =>
-        FlowStateMap.mutate(fd) { current =>
-          // overwrite the items from o with current
-          (current.copy(sourceMap = oFS.sourceMap ++ current.sourceMap, flowConfigUpdates = oFS.flowConfigUpdates ++ current.flowConfigUpdates), ())
-        }
+    FlowStateMap.get(o).foreach { oFS =>
+      FlowStateMap.mutate(fd) { current =>
+        // overwrite the items from o with current
+        (current.copy(
+             sourceMap = oFS.sourceMap ++ current.sourceMap,
+             flowConfigUpdates = oFS.flowConfigUpdates ++ current.flowConfigUpdates),
+         ())
       }
+    }
   }
 
   /**
-   * find all heads reachable from the tails (as a set of names)
-   */
+    * find all heads reachable from the tails (as a set of names)
+    */
   def heads: Set[Pipe] = fd.getTails.asScala.flatMap(_.getHeads).toSet
 
   /**
-   * New flow def with only sources upstream from tails.
-   */
+    * New flow def with only sources upstream from tails.
+    */
   def withoutUnusedSources: FlowDef = {
 
     // add taps associated with heads to localFlow
-    val filteredSources = fd.getSources.asScala.filterKeys(heads.map(p => p.getName)).asJava
+    val filteredSources =
+      fd.getSources.asScala.filterKeys(heads.map(p => p.getName)).asJava
 
     val newFd = fd.copy
     newFd.getSources.clear()
@@ -110,8 +111,8 @@ class RichFlowDef(val fd: FlowDef) {
   }
 
   /**
-   * FlowDef that only includes things upstream from the given Pipe
-   */
+    * FlowDef that only includes things upstream from the given Pipe
+    */
   def onlyUpstreamFrom(pipe: Pipe): FlowDef = {
     val newFd = new FlowDef
     // don't copy any sources/sinks
@@ -126,29 +127,31 @@ class RichFlowDef(val fd: FlowDef) {
       .map(_.getName)
       .toSet
 
-    headNames
-      .foreach { head =>
-        // TODO: make sure we handle checkpoints correctly
-        if (!newSrcs.containsKey(head)) {
-          newFd.addSource(head, sourceTaps.get(head))
-        }
+    headNames.foreach { head =>
+      // TODO: make sure we handle checkpoints correctly
+      if (!newSrcs.containsKey(head)) {
+        newFd.addSource(head, sourceTaps.get(head))
       }
+    }
 
     val sinks = fd.getSinks
     if (sinks.containsKey(pipe.getName)) {
       newFd.addTailSink(pipe, sinks.get(pipe.getName))
     }
     // Update the FlowState:
-    FlowStateMap.get(fd)
-      .foreach { thisFS =>
-        val subFlowState = thisFS.sourceMap
-          .foldLeft(Map[String, Source]()) {
-            case (newfs, kv @ (name, source)) =>
-              if (headNames(name)) newfs + kv
-              else newfs
-          }
-        FlowStateMap.mutate(newFd) { oldFS => (oldFS.copy(sourceMap = subFlowState, flowConfigUpdates = thisFS.flowConfigUpdates ++ oldFS.flowConfigUpdates), ()) }
+    FlowStateMap.get(fd).foreach { thisFS =>
+      val subFlowState = thisFS.sourceMap.foldLeft(Map[String, Source]()) {
+        case (newfs, kv @ (name, source)) =>
+          if (headNames(name)) newfs + kv
+          else newfs
       }
+      FlowStateMap.mutate(newFd) { oldFS =>
+        (oldFS.copy(
+             sourceMap = subFlowState,
+             flowConfigUpdates = thisFS.flowConfigUpdates ++ oldFS.flowConfigUpdates),
+         ())
+      }
+    }
     newFd
   }
 }

@@ -1,4 +1,3 @@
-object B
-{
-	val y = A.x(5)
+object B {
+  val y = A.x(5)
 }

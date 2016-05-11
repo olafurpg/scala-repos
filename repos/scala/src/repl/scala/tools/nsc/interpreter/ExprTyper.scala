@@ -10,12 +10,12 @@ trait ExprTyper {
   val repl: IMain
 
   import repl._
-  import global.{ reporter => _, Import => _, _ }
+  import global.{reporter => _, Import => _, _}
   import naming.freshInternalVarName
 
   def symbolOfLine(code: String): Symbol = {
     def asExpr(): Symbol = {
-      val name  = freshInternalVarName()
+      val name = freshInternalVarName()
       // Typing it with a lazy val would give us the right type, but runs
       // into compiler bugs with things like existentials, so we compile it
       // behind a def and strip the NullaryMethodType which wraps the expr.
@@ -26,7 +26,7 @@ trait ExprTyper {
           val sym0 = symbolOfTerm(name)
           // drop NullaryMethodType
           sym0.cloneSymbol setInfo exitingTyper(sym0.tpe_*.finalResultType)
-        case _          => NoSymbol
+        case _ => NoSymbol
       }
     }
     def asDefn(): Symbol = {
@@ -35,9 +35,9 @@ trait ExprTyper {
       interpretSynthetic(code) match {
         case IR.Success =>
           repl.definedSymbolList filterNot old match {
-            case Nil        => NoSymbol
+            case Nil => NoSymbol
             case sym :: Nil => sym
-            case syms       => NoSymbol.newOverloaded(NoPrefix, syms)
+            case syms => NoSymbol.newOverloaded(NoPrefix, syms)
           }
         case _ => NoSymbol
       }
@@ -62,9 +62,8 @@ trait ExprTyper {
     // to induce the error message.
     try beSilentDuring(symbolOfLine(expr).tpe) match {
       case NoType if !silent => symbolOfLine(expr).tpe // generate error
-      case tpe               => tpe
-    }
-    finally typeOfExpressionDepth -= 1
+      case tpe => tpe
+    } finally typeOfExpressionDepth -= 1
   }
 
   // This only works for proper types.
@@ -76,7 +75,7 @@ trait ExprTyper {
         case IR.Success =>
           val sym0 = symbolOfTerm(name)
           Some(sym0.asMethod.returnType)
-        case _          => None
+        case _ => None
       }
     }
     beSilentDuring(asProperType()) getOrElse NoType

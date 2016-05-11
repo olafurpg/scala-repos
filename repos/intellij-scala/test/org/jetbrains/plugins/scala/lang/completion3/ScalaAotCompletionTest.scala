@@ -7,20 +7,18 @@ import org.jetbrains.plugins.scala.lang.completion3.ScalaAotCompletionTest._
 import org.junit.Assert
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class ScalaAotCompletionTest extends ScalaCodeInsightTestBase {
   def testParameterName() {
-    val before =
-      """
+    val before = """
       |object Dummy {
       |  class Foo
       |  def f(f<caret>)
       |}
       """
 
-    val after =
-      """
+    val after = """
         |object Dummy {
         |  class Foo
         |  def f(foo: Foo<caret>)
@@ -35,16 +33,14 @@ class ScalaAotCompletionTest extends ScalaCodeInsightTestBase {
   }
 
   def testValueName() {
-    val before =
-      """
+    val before = """
       |object Dummy {
       |  class Foo
       |  val f<caret>
       |}
       """
 
-    val after =
-      """
+    val after = """
         |object Dummy {
         |  class Foo
         |  val foo<caret>
@@ -59,14 +55,12 @@ class ScalaAotCompletionTest extends ScalaCodeInsightTestBase {
   }
 
   def testVariableName() {
-    val before =
-      """
+    val before = """
       |class Foo
       |var f<caret>
       """
 
-    val after =
-      """
+    val after = """
         |class Foo
         |var foo<caret>
       """
@@ -79,14 +73,12 @@ class ScalaAotCompletionTest extends ScalaCodeInsightTestBase {
   }
 
   def testPartialName() {
-    val before =
-      """
+    val before = """
         |class FooBarMoo
         |def f(ba<caret>)
       """
 
-    val after =
-      """
+    val after = """
         |class FooBarMoo
         |def f(barMoo: FooBarMoo<caret>)
       """
@@ -99,13 +91,11 @@ class ScalaAotCompletionTest extends ScalaCodeInsightTestBase {
   }
 
   def testImport() {
-    val before =
-      """
+    val before = """
         |def f(rectangle<caret>)
       """
 
-    val after =
-      """
+    val after = """
         |import java.awt.Rectangle
         |
         |def f(rectangle: Rectangle<caret>)
@@ -119,7 +109,8 @@ class ScalaAotCompletionTest extends ScalaCodeInsightTestBase {
   }
 
   private def test(before: String, after: String)(actions: => Unit) {
-    configureFromFileTextAdapter("dummy.scala", before.stripMargin('|').replaceAll("\r", "").trim())
+    configureFromFileTextAdapter(
+        "dummy.scala", before.stripMargin('|').replaceAll("\r", "").trim())
     actions
     checkResultByText(after.stripMargin('|').replaceAll("\r", "").trim())
   }
@@ -133,7 +124,8 @@ object ScalaAotCompletionTest {
     }
   }
 
-  def findByText0(elements: Array[LookupElement], text: String): Option[LookupElement] = {
+  def findByText0(
+      elements: Array[LookupElement], text: String): Option[LookupElement] = {
     elements.find { element =>
       val presentation = new LookupElementPresentation()
       element.renderElement(presentation)

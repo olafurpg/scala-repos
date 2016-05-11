@@ -4,4 +4,5 @@ object conv {
 import conv._
 
 class annot(value: String) extends annotation.ClassfileAnnotation
-@annot(101) class C
+@annot(101)
+class C

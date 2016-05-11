@@ -32,12 +32,13 @@ import com.precog.util.IdGen
 import org.joda.time._
 import org.joda.time.format._
 
-trait TimeParsingSpecs[M[+_]] extends Specification
-    with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] { self =>
-      
+trait TimeParsingSpecs[M[+ _]]
+    extends Specification with EvaluatorTestSupport[M]
+    with LongIdMemoryDatasetConsumer[M] {
+  self =>
+
   import Function._
-  
+
   import dag._
   import instructions._
   import library._
@@ -53,13 +54,15 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
   "parse a time string into an ISO801 string, given its format" should {
     "time zone not specified" in {
-      val input = Join(BuiltInFunction2Op(ParseDateTime), Cross(None),
-        Const(CString("Jun 3, 2020 3:12:33 AM"))(line),
-        Const(CString("MMM d, yyyy h:mm:ss a"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+      val input = Join(BuiltInFunction2Op(ParseDateTime),
+                       Cross(None),
+                       Const(CString("Jun 3, 2020 3:12:33 AM"))(line),
+                       Const(CString("MMM d, yyyy h:mm:ss a"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -67,13 +70,15 @@ trait TimeParsingSpecs[M[+_]] extends Specification
     }
 
     "time zone specified" in {
-      val input = Join(BuiltInFunction2Op(ParseDateTime), Cross(None),
-        Const(CString("Jun 3, 2020 3:12:33 AM -08:00"))(line),
-        Const(CString("MMM d, yyyy h:mm:ss a Z"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+      val input = Join(BuiltInFunction2Op(ParseDateTime),
+                       Cross(None),
+                       Const(CString("Jun 3, 2020 3:12:33 AM -08:00"))(line),
+                       Const(CString("MMM d, yyyy h:mm:ss a Z"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -81,54 +86,69 @@ trait TimeParsingSpecs[M[+_]] extends Specification
     }
 
     "malformed string" in {
-      val input = Join(BuiltInFunction2Op(ParseDateTime), Cross(None),
-        Const(CString("Jun 3, 2020 3:12:33 AM -08:00 asteroid"))(line),
-        Const(CString("MMM d, yyyy h:mm:ss a Z"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
-      
+      val input =
+        Join(BuiltInFunction2Op(ParseDateTime),
+             Cross(None),
+             Const(CString("Jun 3, 2020 3:12:33 AM -08:00 asteroid"))(line),
+             Const(CString("MMM d, yyyy h:mm:ss a Z"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
+
       result must beEmpty
     }
 
     "results used in another time function from homogeneous set" in {
-      val input = dag.Operate(BuiltInFunction1Op(Date),
-        Join(BuiltInFunction2Op(ParseDateTime), Cross(None),
-          dag.AbsoluteLoad(Const(CString("/hom/timeString"))(line))(line),
-          Const(CString("MMM dd yyyy k:mm:ss.SSS"))(line))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 1 => d.toString
-      }
+      val input = dag.Operate(
+          BuiltInFunction1Op(Date),
+          Join(BuiltInFunction2Op(ParseDateTime),
+               Cross(None),
+               dag.AbsoluteLoad(Const(CString("/hom/timeString"))(line))(line),
+               Const(CString("MMM dd yyyy k:mm:ss.SSS"))(line))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 1 => d.toString
+        }
 
       result must haveSize(4)
 
-      result must contain("2010-06-03", "2010-06-04", "2011-08-12", "2010-10-09")
+      result must contain(
+          "2010-06-03", "2010-06-04", "2011-08-12", "2010-10-09")
     }
 
     "from heterogeneous set" in {
-      val input = Join(BuiltInFunction2Op(ParseDateTime), Cross(None),
-          dag.AbsoluteLoad(Const(CString("/het/timeString"))(line))(line),
-          Const(CString("MMM dd yyyy k:mm:ss.SSS"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 1 => d.toString
-      }
+      val input =
+        Join(BuiltInFunction2Op(ParseDateTime),
+             Cross(None),
+             dag.AbsoluteLoad(Const(CString("/het/timeString"))(line))(line),
+             Const(CString("MMM dd yyyy k:mm:ss.SSS"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 1 => d.toString
+        }
 
       result must haveSize(4)
 
-      result must contain("2010-06-03T04:12:33.323Z", "2010-06-04T13:31:49.002Z", "2011-08-12T22:42:33.310Z", "2010-10-09T09:27:31.953Z")
+      result must contain("2010-06-03T04:12:33.323Z",
+                          "2010-06-04T13:31:49.002Z",
+                          "2011-08-12T22:42:33.310Z",
+                          "2010-10-09T09:27:31.953Z")
     }
 
     "ChangeTimeZone function with not fully formed string without tz" in {
-      val input = Join(BuiltInFunction2Op(ChangeTimeZone), Cross(None),
-          Const(CString("2010-06-04"))(line),
-          Const(CString("-10:00"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+      val input = Join(BuiltInFunction2Op(ChangeTimeZone),
+                       Cross(None),
+                       Const(CString("2010-06-04"))(line),
+                       Const(CString("-10:00"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -136,13 +156,15 @@ trait TimeParsingSpecs[M[+_]] extends Specification
     }
 
     "ChangeTimeZone function with not fully formed string with tz" in {
-      val input = Join(BuiltInFunction2Op(ChangeTimeZone), Cross(None),
-          Const(CString("2010-06-04T+05:00"))(line),
-          Const(CString("-10:00"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+      val input = Join(BuiltInFunction2Op(ChangeTimeZone),
+                       Cross(None),
+                       Const(CString("2010-06-04T+05:00"))(line),
+                       Const(CString("-10:00"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -150,13 +172,15 @@ trait TimeParsingSpecs[M[+_]] extends Specification
     }
 
     "Plus function with not fully formed string without tz" in {
-      val input = Join(BuiltInFunction2Op(MinutesPlus), Cross(None),
-          Const(CString("2010-06-04T05:04:01"))(line),
-          Const(CLong(10))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+      val input = Join(BuiltInFunction2Op(MinutesPlus),
+                       Cross(None),
+                       Const(CString("2010-06-04T05:04:01"))(line),
+                       Const(CLong(10))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -164,13 +188,15 @@ trait TimeParsingSpecs[M[+_]] extends Specification
     }
 
     "Plus function with not fully formed string with tz" in {
-      val input = Join(BuiltInFunction2Op(MinutesPlus), Cross(None),
-          Const(CString("2010-06-04T05:04:01.000+05:00"))(line),
-          Const(CLong(10))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+      val input = Join(BuiltInFunction2Op(MinutesPlus),
+                       Cross(None),
+                       Const(CString("2010-06-04T05:04:01.000+05:00"))(line),
+                       Const(CLong(10))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -178,26 +204,30 @@ trait TimeParsingSpecs[M[+_]] extends Specification
     }
 
     "Plus function with space instead of T" in {
-      val input = Join(BuiltInFunction2Op(MinutesPlus), Cross(None),
-          Const(CString("2010-06-04 05:04:01"))(line),
-          Const(CLong(10))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+      val input = Join(BuiltInFunction2Op(MinutesPlus),
+                       Cross(None),
+                       Const(CString("2010-06-04 05:04:01"))(line),
+                       Const(CLong(10))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
       result must contain("2010-06-04T05:14:01.000Z")
     }
     "Between function with not fully formed string without tz" in {
-      val input = Join(BuiltInFunction2Op(HoursBetween), Cross(None),
-          Const(CString("2010-06-04T05:04:01"))(line),
-          Const(CString("2010-06-04T07:04:01+00:00"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
-      }
+      val input = Join(BuiltInFunction2Op(HoursBetween),
+                       Cross(None),
+                       Const(CString("2010-06-04T05:04:01"))(line),
+                       Const(CString("2010-06-04T07:04:01+00:00"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
+        }
 
       result must haveSize(1)
 
@@ -205,13 +235,15 @@ trait TimeParsingSpecs[M[+_]] extends Specification
     }
 
     "Between function with not fully formed string with tz" in {
-      val input = Join(BuiltInFunction2Op(HoursBetween), Cross(None),
-          Const(CString("2010-06-04T05:04:01+05:00"))(line),
-          Const(CString("2010-06-04T05:04:01+01:00"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
-      }
+      val input = Join(BuiltInFunction2Op(HoursBetween),
+                       Cross(None),
+                       Const(CString("2010-06-04T05:04:01+05:00"))(line),
+                       Const(CString("2010-06-04T05:04:01+01:00"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
+        }
 
       result must haveSize(1)
 
@@ -220,11 +252,12 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
     "GetMillis function with not fully formed string without tz" in {
       val input = Operate(BuiltInFunction1Op(GetMillis),
-          Const(CString("2010-06-04T05"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SDecimal(d)) if ids.length == 0 => d.toLong
-      }
+                          Const(CString("2010-06-04T05"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SDecimal(d)) if ids.length == 0 => d.toLong
+        }
 
       result must haveSize(1)
 
@@ -233,11 +266,12 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
     "GetMillis function with not fully formed string with tz" in {
       val input = Operate(BuiltInFunction1Op(GetMillis),
-          Const(CString("2010-06-04T03-02:00"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SDecimal(d)) if ids.length == 0 => d.toLong
-      }
+                          Const(CString("2010-06-04T03-02:00"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SDecimal(d)) if ids.length == 0 => d.toLong
+        }
 
       result must haveSize(1)
 
@@ -246,11 +280,12 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
     "TimeZone function with not fully formed string without tz" in {
       val input = Operate(BuiltInFunction1Op(TimeZone),
-          Const(CString("2010-06-04T05"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+                          Const(CString("2010-06-04T05"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -259,11 +294,12 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
     "TimeZone function with not fully formed string with tz" in {
       val input = Operate(BuiltInFunction1Op(TimeZone),
-          Const(CString("2010-06-04T03-02:00"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+                          Const(CString("2010-06-04T03-02:00"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -272,11 +308,12 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
     "Season function with not fully formed string without tz" in {
       val input = Operate(BuiltInFunction1Op(Season),
-          Const(CString("2010-01-04"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+                          Const(CString("2010-01-04"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -285,11 +322,12 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
     "Season function with not fully formed string with tz" in {
       val input = Operate(BuiltInFunction1Op(Season),
-          Const(CString("2010-01-04T-02:00"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+                          Const(CString("2010-01-04T-02:00"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
 
       result must haveSize(1)
 
@@ -298,11 +336,12 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
     "TimeFraction function with not fully formed string without tz" in {
       val input = Operate(BuiltInFunction1Op(HourOfDay),
-          Const(CString("2010-01-04"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
-      }
+                          Const(CString("2010-01-04"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
+        }
 
       result must haveSize(1)
 
@@ -311,11 +350,12 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
     "TimeFraction function with not fully formed string with tz" in {
       val input = Operate(BuiltInFunction1Op(HourOfDay),
-        Const(CString("2010-01-04T03-02:00"))(line))(line)
-        
-      val result = testEval(input) collect {
-        case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
-      }
+                          Const(CString("2010-01-04T03-02:00"))(line))(line)
+
+      val result =
+        testEval(input) collect {
+          case (ids, SDecimal(d)) if ids.length == 0 => d.toInt
+        }
 
       result must haveSize(1)
 
@@ -325,10 +365,12 @@ trait TimeParsingSpecs[M[+_]] extends Specification
 
   "\"flexible\" parsing" should {
     def testParseFuzzy(s: String, r: String) {
-      val input = Operate(BuiltInFunction1Op(ParseDateTimeFuzzy), Const(CString(s))(line))(line)
-      val result = testEval(input) collect {
-        case (ids, SString(d)) if ids.length == 0 => d.toString
-      }
+      val input = Operate(BuiltInFunction1Op(ParseDateTimeFuzzy),
+                          Const(CString(s))(line))(line)
+      val result =
+        testEval(input) collect {
+          case (ids, SString(d)) if ids.length == 0 => d.toString
+        }
       result must haveSize(1)
       result must contain(r)
     }
@@ -356,4 +398,5 @@ trait TimeParsingSpecs[M[+_]] extends Specification
   }
 }
 
-object TimeParsingSpecs extends TimeParsingSpecs[test.YId] with test.YIdInstances
+object TimeParsingSpecs
+    extends TimeParsingSpecs[test.YId] with test.YIdInstances

@@ -19,23 +19,23 @@ package org.apache.spark.streaming
 
 import org.apache.spark.util.Utils
 
-case class Duration (private val millis: Long) {
+case class Duration(private val millis: Long) {
 
-  def < (that: Duration): Boolean = (this.millis < that.millis)
+  def <(that: Duration): Boolean = (this.millis < that.millis)
 
-  def <= (that: Duration): Boolean = (this.millis <= that.millis)
+  def <=(that: Duration): Boolean = (this.millis <= that.millis)
 
-  def > (that: Duration): Boolean = (this.millis > that.millis)
+  def >(that: Duration): Boolean = (this.millis > that.millis)
 
-  def >= (that: Duration): Boolean = (this.millis >= that.millis)
+  def >=(that: Duration): Boolean = (this.millis >= that.millis)
 
-  def + (that: Duration): Duration = new Duration(millis + that.millis)
+  def +(that: Duration): Duration = new Duration(millis + that.millis)
 
-  def - (that: Duration): Duration = new Duration(millis - that.millis)
+  def -(that: Duration): Duration = new Duration(millis - that.millis)
 
-  def * (times: Int): Duration = new Duration(millis * times)
+  def *(times: Int): Duration = new Duration(millis * times)
 
-  def / (that: Duration): Double = millis.toDouble / that.millis.toDouble
+  def /(that: Duration): Double = millis.toDouble / that.millis.toDouble
 
   // Java-friendlier versions of the above.
 
@@ -71,29 +71,28 @@ case class Duration (private val millis: Long) {
   def milliseconds: Long = millis
 
   def prettyPrint: String = Utils.msDurationToString(millis)
-
 }
 
 /**
- * Helper object that creates instance of [[org.apache.spark.streaming.Duration]] representing
- * a given number of milliseconds.
- */
+  * Helper object that creates instance of [[org.apache.spark.streaming.Duration]] representing
+  * a given number of milliseconds.
+  */
 object Milliseconds {
   def apply(milliseconds: Long): Duration = new Duration(milliseconds)
 }
 
 /**
- * Helper object that creates instance of [[org.apache.spark.streaming.Duration]] representing
- * a given number of seconds.
- */
+  * Helper object that creates instance of [[org.apache.spark.streaming.Duration]] representing
+  * a given number of seconds.
+  */
 object Seconds {
   def apply(seconds: Long): Duration = new Duration(seconds * 1000)
 }
 
 /**
- * Helper object that creates instance of [[org.apache.spark.streaming.Duration]] representing
- * a given number of minutes.
- */
+  * Helper object that creates instance of [[org.apache.spark.streaming.Duration]] representing
+  * a given number of minutes.
+  */
 object Minutes {
   def apply(minutes: Long): Duration = new Duration(minutes * 60000)
 }
@@ -104,18 +103,17 @@ object Minutes {
 object Durations {
 
   /**
-   * @return [[org.apache.spark.streaming.Duration]] representing given number of milliseconds.
-   */
+    * @return [[org.apache.spark.streaming.Duration]] representing given number of milliseconds.
+    */
   def milliseconds(milliseconds: Long): Duration = Milliseconds(milliseconds)
 
   /**
-   * @return [[org.apache.spark.streaming.Duration]] representing given number of seconds.
-   */
+    * @return [[org.apache.spark.streaming.Duration]] representing given number of seconds.
+    */
   def seconds(seconds: Long): Duration = Seconds(seconds)
 
   /**
-   * @return [[org.apache.spark.streaming.Duration]] representing given number of minutes.
-   */
+    * @return [[org.apache.spark.streaming.Duration]] representing given number of minutes.
+    */
   def minutes(minutes: Long): Duration = Minutes(minutes)
-
 }

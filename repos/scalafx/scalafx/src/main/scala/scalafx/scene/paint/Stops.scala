@@ -29,5 +29,7 @@ package scalafx.scene.paint
 import javafx.scene.{paint => jfxsp}
 
 object Stops {
-  def apply(colors: Color*) = colors.toSeq.map(c => new jfxsp.Stop(colors.indexOf(c).toDouble / (colors.length-1), c))
+  def apply(colors: Color*) =
+    colors.toSeq.map(c =>
+          new jfxsp.Stop(colors.indexOf(c).toDouble / (colors.length - 1), c))
 }

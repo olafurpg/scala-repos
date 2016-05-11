@@ -15,12 +15,10 @@ abstract class InputStream extends Closeable {
       var next = 0
 
       while (bytesWritten < len && next != -1) {
-        next =
-          if (bytesWritten == 0) read()
-          else {
-            try read()
-            catch { case _: IOException => -1 }
-          }
+        next = if (bytesWritten == 0) read()
+        else {
+          try read() catch { case _: IOException => -1 }
+        }
         if (next != -1) {
           b(off + bytesWritten) = next.toByte
           bytesWritten += 1
@@ -34,8 +32,7 @@ abstract class InputStream extends Closeable {
 
   def skip(n: Long): Long = {
     var skipped = 0
-    while (skipped < n && read() != -1)
-      skipped += 1
+    while (skipped < n && read() != -1) skipped += 1
     skipped
   }
 
@@ -49,5 +46,4 @@ abstract class InputStream extends Closeable {
     throw new IOException("Reset not supported")
 
   def markSupported(): Boolean = false
-
 }

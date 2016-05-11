@@ -8,9 +8,8 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class PackageSplitLinesProcessor extends SmartEnterProcessor {
   private val Package = "(\\s*)package .+".r
 
@@ -28,9 +27,11 @@ class PackageSplitLinesProcessor extends SmartEnterProcessor {
       case Package(prefix) =>
         val i = offset - start
         val dotIndex = line.indexOf('.', i)
-        if (dotIndex == -1) false else {
+        if (dotIndex == -1) false
+        else {
           val tail = line.substring(dotIndex + 1)
-          document.replaceString(start + dotIndex, end, "\n%spackage %s".format(prefix, tail))
+          document.replaceString(
+              start + dotIndex, end, "\n%spackage %s".format(prefix, tail))
           true
         }
       case _ => false

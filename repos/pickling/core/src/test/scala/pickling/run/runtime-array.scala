@@ -13,8 +13,7 @@ class RuntimeArrayTest extends FunSuite {
       assert(arr.mkString(",") == "5,6")
     }
 
-    val arr: Array[Int] =
-      Array(5, 6)
+    val arr: Array[Int] = Array(5, 6)
 
     testIt(arr)
   }
@@ -27,10 +26,8 @@ class RuntimeArrayTest extends FunSuite {
       assert(arr.mkString(",") == "(5,0.5),(6,0.6)")
     }
 
-    val arr: Array[(Int, Double)] =
-      Array(5 -> 0.5d, 6 -> 0.6d)
+    val arr: Array[(Int, Double)] = Array(5 -> 0.5d, 6 -> 0.6d)
 
     testIt(arr)
   }
-
 }

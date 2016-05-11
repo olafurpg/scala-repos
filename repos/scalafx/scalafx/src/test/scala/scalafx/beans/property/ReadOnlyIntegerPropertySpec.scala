@@ -37,10 +37,10 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import scalafx.Includes._
 
 /**
- * ReadOnlyIntegerProperty Spec tests.
- *
- *
- */
+  * ReadOnlyIntegerProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ReadOnlyIntegerPropertySpec extends FlatSpec with BeforeAndAfterEach {
   val bean = new Object()
@@ -50,7 +50,8 @@ class ReadOnlyIntegerPropertySpec extends FlatSpec with BeforeAndAfterEach {
   var booleanProperty: jfxbp.BooleanProperty = null
 
   override def beforeEach() {
-    readOnlyIntegerProperty = new ReadOnlyIntegerProperty(bean, "Test Read-only Integer", 50)
+    readOnlyIntegerProperty = new ReadOnlyIntegerProperty(
+        bean, "Test Read-only Integer", 50)
     integerProperty1 = new IntegerProperty(bean, "Test Integer 1")
     integerProperty2 = new IntegerProperty(bean, "Test Integer 2")
     booleanProperty = new BooleanProperty(bean, "Test Boolean")

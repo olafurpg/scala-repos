@@ -21,35 +21,34 @@ import java.util.UUID
 
 import org.apache.spark.annotation.DeveloperApi
 
-
 /**
- * :: DeveloperApi ::
- *
- * Trait for an object with an immutable unique ID that identifies itself and its derivatives.
- *
- * WARNING: There have not yet been final discussions on this API, so it may be broken in future
- *          releases.
- */
+  * :: DeveloperApi ::
+  *
+  * Trait for an object with an immutable unique ID that identifies itself and its derivatives.
+  *
+  * WARNING: There have not yet been final discussions on this API, so it may be broken in future
+  *          releases.
+  */
 @DeveloperApi
 trait Identifiable {
 
   /**
-   * An immutable unique ID for the object and its derivatives.
-   */
+    * An immutable unique ID for the object and its derivatives.
+    */
   val uid: String
 
   override def toString: String = uid
 }
 
 /**
- * :: DeveloperApi ::
- */
+  * :: DeveloperApi ::
+  */
 @DeveloperApi
 object Identifiable {
 
   /**
-   * Returns a random UID that concatenates the given prefix, "_", and 12 random hex chars.
-   */
+    * Returns a random UID that concatenates the given prefix, "_", and 12 random hex chars.
+    */
   def randomUID(prefix: String): String = {
     prefix + "_" + UUID.randomUUID().toString.takeRight(12)
   }

@@ -13,7 +13,7 @@ trait WordSpecGenerator extends ScalaTestTestCase {
 
   def addWordSpec() {
     addFileToProject("WordSpecTest.scala",
-      """
+                     """
         |import org.scalatest._
         |
         |class WordSpecTest extends WordSpec {
@@ -33,7 +33,6 @@ trait WordSpecGenerator extends ScalaTestTestCase {
         |    "inner" in {}
         |  }
         |}
-      """.stripMargin.trim()
-    )
+      """.stripMargin.trim())
   }
 }

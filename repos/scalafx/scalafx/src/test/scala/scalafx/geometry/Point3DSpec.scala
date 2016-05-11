@@ -35,12 +35,13 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Point3D Spec tests.
- *
- */
+  * Point3D Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class Point3DSpec
-  extends SimpleSFXDelegateSpec[jfxg.Point3D, Point3D](classOf[jfxg.Point3D], classOf[Point3D]) {
+    extends SimpleSFXDelegateSpec[jfxg.Point3D, Point3D](
+        classOf[jfxg.Point3D], classOf[Point3D]) {
 
   override protected def getScalaClassInstance = new Point3D(0, 0, 0)
 

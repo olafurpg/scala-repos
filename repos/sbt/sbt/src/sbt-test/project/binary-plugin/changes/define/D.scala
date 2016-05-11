@@ -7,5 +7,4 @@ object D extends AutoPlugin {
   object autoImport {
     lazy val dKey = settingKey[String]("Test key")
   }
-
 }

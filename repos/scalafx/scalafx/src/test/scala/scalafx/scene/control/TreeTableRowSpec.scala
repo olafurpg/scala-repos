@@ -35,9 +35,10 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * TreeTableRow Spec tests.
- *
- */
+  * TreeTableRow Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class TreeTableRowSpec[T]
-  extends SimpleSFXDelegateSpec[jfxsc.TreeTableRow[T], TreeTableRow[T]](classOf[jfxsc.TreeTableRow[T]], classOf[TreeTableRow[T]])
+    extends SimpleSFXDelegateSpec[jfxsc.TreeTableRow[T], TreeTableRow[T]](
+        classOf[jfxsc.TreeTableRow[T]], classOf[TreeTableRow[T]])

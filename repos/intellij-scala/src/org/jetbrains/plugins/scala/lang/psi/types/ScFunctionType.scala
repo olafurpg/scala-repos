@@ -16,12 +16,15 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
 import scala.annotation.tailrec
 
 /**
-* @author ilyas
-*/
+  * @author ilyas
+  */
 object ScFunctionType {
-  def apply(returnType: ScType, params: Seq[ScType])(project: Project, scope: GlobalSearchScope): ValueType = {
-    def findClass(fullyQualifiedName: String) : Option[PsiClass] = {
-      ScalaPsiManager.instance(project).getCachedClass(scope, fullyQualifiedName)
+  def apply(returnType: ScType, params: Seq[ScType])(
+      project: Project, scope: GlobalSearchScope): ValueType = {
+    def findClass(fullyQualifiedName: String): Option[PsiClass] = {
+      ScalaPsiManager
+        .instance(project)
+        .getCachedClass(scope, fullyQualifiedName)
     }
     findClass("scala.Function" + params.length) match {
       case Some(t: ScTrait) =>
@@ -44,9 +47,12 @@ object ScFunctionType {
 }
 
 object ScPartialFunctionType {
-  def apply(returnType: ScType, param: ScType)(project: Project, scope: GlobalSearchScope): ValueType = {
-    def findClass(fullyQualifiedName: String) : Option[PsiClass] = {
-      ScalaPsiManager.instance(project).getCachedClass(scope, fullyQualifiedName)
+  def apply(returnType: ScType, param: ScType)(
+      project: Project, scope: GlobalSearchScope): ValueType = {
+    def findClass(fullyQualifiedName: String): Option[PsiClass] = {
+      ScalaPsiManager
+        .instance(project)
+        .getCachedClass(scope, fullyQualifiedName)
     }
     findClass("scala.PartialFunction") match {
       case Some(t: ScTrait) =>
@@ -68,9 +74,12 @@ object ScPartialFunctionType {
 }
 
 object ScTupleType {
-  def apply(components: Seq[ScType])(project: Project, scope: GlobalSearchScope): ValueType = {
-    def findClass(fullyQualifiedName: String) : Option[PsiClass] = {
-      ScalaPsiManager.instance(project).getCachedClass(scope, fullyQualifiedName)
+  def apply(components: Seq[ScType])(
+      project: Project, scope: GlobalSearchScope): ValueType = {
+    def findClass(fullyQualifiedName: String): Option[PsiClass] = {
+      ScalaPsiManager
+        .instance(project)
+        .getCachedClass(scope, fullyQualifiedName)
     }
     findClass("scala.Tuple" + components.length) match {
       case Some(t: ScClass) =>
@@ -90,23 +99,32 @@ object ScTupleType {
 
 object ScSynteticSugarClassesUtil {
   @tailrec
-  def extractForPrefix(tp: ScType, prefix: String, depth: Int = 100): Option[(ScTypeDefinition, Seq[ScType])] = {
-    if (depth == 0) return None //hack for http://youtrack.jetbrains.com/issue/SCL-6880 to avoid infinite loop.
+  def extractForPrefix(
+      tp: ScType,
+      prefix: String,
+      depth: Int = 100): Option[(ScTypeDefinition, Seq[ScType])] = {
+    if (depth == 0)
+      return None //hack for http://youtrack.jetbrains.com/issue/SCL-6880 to avoid infinite loop.
     tp.isAliasType match {
-      case Some(AliasType(t: ScTypeAliasDefinition, Success(lower, _), _)) => extractForPrefix(lower, prefix, depth - 1)
+      case Some(AliasType(t: ScTypeAliasDefinition, Success(lower, _), _)) =>
+        extractForPrefix(lower, prefix, depth - 1)
       case _ =>
         tp match {
           case p: ScParameterizedType =>
-            def startsWith(clazz: PsiClass, qualNamePrefix: String) = clazz.qualifiedName != null && clazz.qualifiedName.startsWith(qualNamePrefix)
+            def startsWith(clazz: PsiClass, qualNamePrefix: String) =
+              clazz.qualifiedName != null &&
+              clazz.qualifiedName.startsWith(qualNamePrefix)
 
             ScType.extractClassType(p.designator) match {
-              case Some((clazz: ScTypeDefinition, sub)) if startsWith(clazz, prefix) =>
+              case Some((clazz: ScTypeDefinition, sub))
+                  if startsWith(clazz, prefix) =>
                 val result = clazz.getType(TypingContext.empty)
                 result match {
                   case Success(t, _) =>
                     val substituted = (sub followed p.substitutor).subst(t)
                     substituted match {
-                      case pt: ScParameterizedType => Some((clazz, pt.typeArgs))
+                      case pt: ScParameterizedType =>
+                        Some((clazz, pt.typeArgs))
                       case _ => None
                     }
                   case _ => None

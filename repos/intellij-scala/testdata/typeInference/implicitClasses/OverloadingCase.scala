@@ -3,6 +3,7 @@ object OverloadingCase {
 
   def foo(x: Boolean) = 23
 
-  /*start*/foo(1)/*end*/
+  /*start*/
+  foo(1) /*end*/
 }
 //OverloadingCase.foo

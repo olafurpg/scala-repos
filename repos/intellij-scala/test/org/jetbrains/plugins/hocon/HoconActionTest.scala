@@ -11,11 +11,12 @@ import com.intellij.testFramework.TestActionEvent
   * @author ghik
   */
 abstract class HoconActionTest(actionId: String, subpath: String)
-  extends HoconFileSetTestCase("actions/" + subpath) {
+    extends HoconFileSetTestCase("actions/" + subpath) {
 
   // Code based on AbstractEnterActionTestBase
 
-  private class MockDataContext(file: PsiFile, editor: Editor) extends DataContext with DataProvider {
+  private class MockDataContext(file: PsiFile, editor: Editor)
+      extends DataContext with DataProvider {
     def getData(dataId: String): AnyRef =
       if (LangDataKeys.LANGUAGE is dataId) file.getLanguage
       else if (CommonDataKeys.PROJECT is dataId) file.getProject
@@ -25,10 +26,12 @@ abstract class HoconActionTest(actionId: String, subpath: String)
 
   protected def transform(data: Seq[String]): String = {
     val (fileText, offset) = extractCaret(data.head)
-    val psiFile = HoconTestUtils.createPseudoPhysicalHoconFile(getProject, fileText)
+    val psiFile =
+      HoconTestUtils.createPseudoPhysicalHoconFile(getProject, fileText)
 
     val editorManager = FileEditorManager.getInstance(getProject)
-    val editor = editorManager.openTextEditor(new OpenFileDescriptor(getProject, psiFile.getVirtualFile, 0), false)
+    val editor = editorManager.openTextEditor(
+        new OpenFileDescriptor(getProject, psiFile.getVirtualFile, 0), false)
     assert(editor != null)
     editor.getCaretModel.moveToOffset(offset)
 

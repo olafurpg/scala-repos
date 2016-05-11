@@ -80,7 +80,8 @@ class ResolverTest extends FunSuite {
     assert(binding._2 == label)
   }
 
-  test("Resolver.evalLabeled: Resolve empty string as label for unlabeled addresses") {
+  test(
+      "Resolver.evalLabeled: Resolve empty string as label for unlabeled addresses") {
     val binding = Resolver.evalLabeled("test!xyz")
     assert(binding._2.isEmpty)
   }
@@ -91,7 +92,8 @@ class ResolverTest extends FunSuite {
   }
 
   test("throw when registering multiple resolvers for the same scheme") {
-    object TestResolver extends BaseResolver(() => Seq(new TestResolver, new TestResolver))
+    object TestResolver
+        extends BaseResolver(() => Seq(new TestResolver, new TestResolver))
 
     intercept[MultipleResolversPerSchemeException] {
       TestResolver.get(classOf[TestResolver])

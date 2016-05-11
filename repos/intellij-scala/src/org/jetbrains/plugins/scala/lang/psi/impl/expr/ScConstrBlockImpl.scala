@@ -10,10 +10,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 /**
-* @author Alexander.Podkhalyuzin 
-*/
-
-class ScConstrBlockImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScConstrBlock {
+  * @author Alexander.Podkhalyuzin 
+  */
+class ScConstrBlockImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScConstrBlock {
   override def toString: String = "ConstructorBlock"
 
   override def accept(visitor: ScalaElementVisitor) {
@@ -28,6 +28,7 @@ class ScConstrBlockImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with Sc
   }
 
   override def createMirror(text: String): PsiElement = {
-    ScalaPsiElementFactory.createConstructorBodyWithContextFromText(text, getContext, this)
+    ScalaPsiElementFactory.createConstructorBodyWithContextFromText(
+        text, getContext, this)
   }
 }

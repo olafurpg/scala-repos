@@ -23,16 +23,16 @@ import org.apache.spark.sql.catalyst.expressions.{Expression, NonSQLExpression, 
 import org.apache.spark.sql.types.DataType
 
 /**
- * A serialized version of a Python lambda function.
- */
-case class PythonUDF(
-    name: String,
-    func: PythonFunction,
-    dataType: DataType,
-    children: Seq[Expression])
-  extends Expression with Unevaluable with NonSQLExpression with Logging {
+  * A serialized version of a Python lambda function.
+  */
+case class PythonUDF(name: String,
+                     func: PythonFunction,
+                     dataType: DataType,
+                     children: Seq[Expression])
+    extends Expression with Unevaluable with NonSQLExpression with Logging {
 
-  override def toString: String = s"PythonUDF#$name(${children.mkString(", ")})"
+  override def toString: String =
+    s"PythonUDF#$name(${children.mkString(", ")})"
 
   override def nullable: Boolean = true
 

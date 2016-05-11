@@ -23,17 +23,17 @@ package p1 {
     }
 
     class Main1[A <: Node](v: NodeAlias[A]) {
-      private[this] def f1 = new Main1(v.prepend)                        // fail
-      private[this] def f2 = new Main1[NodeAlias[A]](v.prepend)          // fail
-      private[this] def f3 = new Main1[Node { type T = A }](v.prepend)   // fail
-      private[this] def f4 = new Main1[v.type](v.prepend)                // ok
+      private[this] def f1 = new Main1(v.prepend) // fail
+      private[this] def f2 = new Main1[NodeAlias[A]](v.prepend) // fail
+      private[this] def f3 = new Main1[Node { type T = A }](v.prepend) // fail
+      private[this] def f4 = new Main1[v.type](v.prepend) // ok
     }
 
     class Main2[A <: Node](v: Node { type T = A }) {
-      private[this] def f1 = new Main2(v.prepend)                        // fail
-      private[this] def f2 = new Main2[NodeAlias[A]](v.prepend)          // fail
-      private[this] def f3 = new Main2[Node { type T = A }](v.prepend)   // fail
-      private[this] def f4 = new Main2[v.type](v.prepend)                // ok
+      private[this] def f1 = new Main2(v.prepend) // fail
+      private[this] def f2 = new Main2[NodeAlias[A]](v.prepend) // fail
+      private[this] def f3 = new Main2[Node { type T = A }](v.prepend) // fail
+      private[this] def f4 = new Main2[v.type](v.prepend) // ok
     }
   }
 }
@@ -47,17 +47,17 @@ package p2 {
     }
 
     class Main1[A <: Node](v: NodeAlias[A]) {
-      private[this] def f1 = new Main1(v.prepend)                        // ok!  <<========== WOT
-      private[this] def f2 = new Main1[NodeAlias[A]](v.prepend)          // fail
-      private[this] def f3 = new Main1[Node { type T = A }](v.prepend)   // fail
-      private[this] def f4 = new Main1[v.type](v.prepend)                // ok
+      private[this] def f1 = new Main1(v.prepend) // ok!  <<========== WOT
+      private[this] def f2 = new Main1[NodeAlias[A]](v.prepend) // fail
+      private[this] def f3 = new Main1[Node { type T = A }](v.prepend) // fail
+      private[this] def f4 = new Main1[v.type](v.prepend) // ok
     }
 
     class Main2[A <: Node](v: Node { type T = A }) {
-      private[this] def f1 = new Main2(v.prepend)                        // fail
-      private[this] def f2 = new Main2[NodeAlias[A]](v.prepend)          // fail
-      private[this] def f3 = new Main2[Node { type T = A }](v.prepend)   // fail
-      private[this] def f4 = new Main2[v.type](v.prepend)                // ok
+      private[this] def f1 = new Main2(v.prepend) // fail
+      private[this] def f2 = new Main2[NodeAlias[A]](v.prepend) // fail
+      private[this] def f3 = new Main2[Node { type T = A }](v.prepend) // fail
+      private[this] def f4 = new Main2[v.type](v.prepend) // ok
     }
   }
 }

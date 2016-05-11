@@ -4,9 +4,9 @@ package lang.refactoring.changeSignature.changeInfo
 import com.intellij.psi.PsiModifier
 
 /**
- * Nikolay.Tropin
- * 2014-08-29
- */
+  * Nikolay.Tropin
+  * 2014-08-29
+  */
 private[changeInfo] trait VisibilityChangeInfo {
   this: ScalaChangeInfo =>
 
@@ -21,7 +21,8 @@ private[changeInfo] trait VisibilityChangeInfo {
     function.getModifierList.accessModifier.fold("")(_.getText)
   }
 
-  private def scalaToJavaVisibility(scalaModifier: String): String = { //todo more correct transformation
+  private def scalaToJavaVisibility(scalaModifier: String): String = {
+    //todo more correct transformation
     if (scalaModifier == "") PsiModifier.PUBLIC
     else if (scalaModifier.startsWith("protected")) PsiModifier.PROTECTED
     else PsiModifier.PRIVATE

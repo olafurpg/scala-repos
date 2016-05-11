@@ -1,18 +1,11 @@
 package scala.collection.parallel.ops
 
-
-
-
-
 import org.scalacheck._
 import org.scalacheck.Gen
 import org.scalacheck.Gen._
 import org.scalacheck.Prop._
 import org.scalacheck.Properties
 import org.scalacheck.Arbitrary._
-
-
-
 
 trait IntValues {
   def values = Seq(
@@ -25,5 +18,5 @@ trait IntValues {
       choose(0, 1000) suchThat (_ % 2 == 0),
       choose(0, 1000) suchThat (_ % 2 != 0),
       choose(0, 1000) suchThat (n => (n % 2 == 0) || (n % 3 == 0))
-      )
+  )
 }

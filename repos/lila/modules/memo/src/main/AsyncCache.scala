@@ -2,7 +2,7 @@ package lila.memo
 
 import scala.concurrent.duration._
 
-import spray.caching.{ LruCache, Cache }
+import spray.caching.{LruCache, Cache}
 
 final class AsyncCache[K, V] private (cache: Cache[V], f: K => Fu[V]) {
 
@@ -17,18 +17,16 @@ final class AsyncCache[K, V] private (cache: Cache[V], f: K => Fu[V]) {
 
 object AsyncCache {
 
-  def apply[K, V](
-    f: K => Fu[V],
-    maxCapacity: Int = 500,
-    initialCapacity: Int = 16,
-    timeToLive: Duration = Duration.Inf,
-    timeToIdle: Duration = Duration.Inf) = new AsyncCache(
-    cache = LruCache(maxCapacity, initialCapacity, timeToLive, timeToIdle),
-    f = f)
+  def apply[K, V](f: K => Fu[V],
+                  maxCapacity: Int = 500,
+                  initialCapacity: Int = 16,
+                  timeToLive: Duration = Duration.Inf,
+                  timeToIdle: Duration = Duration.Inf) =
+    new AsyncCache(
+        cache = LruCache(maxCapacity, initialCapacity, timeToLive, timeToIdle),
+        f = f)
 
-  def single[V](
-    f: => Fu[V],
-    timeToLive: Duration = Duration.Inf) = new AsyncCache[Boolean, V](
-    cache = LruCache(timeToLive = timeToLive),
-    f = _ => f)
+  def single[V](f: => Fu[V], timeToLive: Duration = Duration.Inf) =
+    new AsyncCache[Boolean, V](
+        cache = LruCache(timeToLive = timeToLive), f = _ => f)
 }

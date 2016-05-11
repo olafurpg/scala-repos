@@ -19,11 +19,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.util.ScalaUtils
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 15.03.2009
- */
-abstract class AutoImportTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
-  private val refMarker =  "/*ref*/"
+  * User: Alexander Podkhalyuzin
+  * Date: 15.03.2009
+  */
+abstract class AutoImportTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  private val refMarker = "/*ref*/"
 
   protected def folderPath = baseRootPath() + "autoImport/"
 
@@ -32,24 +33,31 @@ abstract class AutoImportTestBase extends ScalaLightPlatformCodeInsightTestCaseA
   protected def doTest() {
     import org.junit.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
-    val file = LocalFileSystem.getInstance.refreshAndFindFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.refreshAndFindFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     val offset = fileText.indexOf(refMarker)
     fileText = fileText.replace(refMarker, "")
 
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
-    assert(offset != -1, "Not specified ref marker in test case. Use /*ref*/ in scala file for this.")
-    val ref: ScReferenceElement = PsiTreeUtil.
-            getParentOfType(scalaFile.findElementAt(offset), classOf[ScReferenceElement])
+    assert(
+        offset != -1,
+        "Not specified ref marker in test case. Use /*ref*/ in scala file for this.")
+    val ref: ScReferenceElement = PsiTreeUtil.getParentOfType(
+        scalaFile.findElementAt(offset), classOf[ScReferenceElement])
     assert(ref != null, "Not specified reference at marker.")
 
     ref.resolve() match {
       case null =>
-      case _ => assert(assertion = false, message = "Reference must be unresolved.")
+      case _ =>
+        assert(assertion = false, message = "Reference must be unresolved.")
     }
-    val refPointer = SmartPointerManager.getInstance(getProjectAdapter).createSmartPsiElementPointer(ref)
+    val refPointer = SmartPointerManager
+      .getInstance(getProjectAdapter)
+      .createSmartPsiElementPointer(ref)
 
     val classes = ScalaImportTypeFix.getTypesToImport(ref, getProjectAdapter)
     assert(classes.length > 0, "Haven't classes to import")
@@ -60,22 +68,25 @@ abstract class AutoImportTestBase extends ScalaLightPlatformCodeInsightTestCaseA
         def run() {
           classes(0) match {
             case ClassTypeToImport(clazz) =>
-              org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.
-                getImportHolder(ref, getProjectAdapter).addImportForClass(clazz)
+              org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix
+                .getImportHolder(ref, getProjectAdapter)
+                .addImportForClass(clazz)
             case ta =>
-              org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.
-                getImportHolder(ref, getProjectAdapter).addImportForPath(ta.qualifiedName, ref)
+              org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix
+                .getImportHolder(ref, getProjectAdapter)
+                .addImportForPath(ta.qualifiedName, ref)
           }
           UsefulTestCase.doPostponedFormatting(getProjectAdapter)
         }
       }, getProjectAdapter, "Test")
-      res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim//getImportStatements.map(_.getText()).mkString("\n")
-      assert(refPointer.getElement.resolve != null, "reference is unresolved after import action")
-    }
-    catch {
+      res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
+      assert(refPointer.getElement.resolve != null,
+             "reference is unresolved after import action")
+    } catch {
       case e: Exception =>
         println(e)
-        assert(assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+        assert(
+            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

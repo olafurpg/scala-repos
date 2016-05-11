@@ -34,7 +34,9 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 
-class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest {
+class PipelineSuite
+    extends SparkFunSuite with MLlibTestSparkContext
+    with DefaultReadWriteTest {
 
   abstract class MyModel extends Model[MyModel]
 
@@ -85,8 +87,7 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
 
   test("pipeline with duplicate stages") {
     val estimator = mock[Estimator[MyModel]]
-    val pipeline = new Pipeline()
-      .setStages(Array(estimator, estimator))
+    val pipeline = new Pipeline().setStages(Array(estimator, estimator))
     val dataset = mock[DataFrame]
     intercept[IllegalArgumentException] {
       pipeline.fit(dataset)
@@ -94,12 +95,11 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
   }
 
   test("PipelineModel.copy") {
-    val hashingTF = new HashingTF()
-      .setNumFeatures(100)
+    val hashingTF = new HashingTF().setNumFeatures(100)
     val model = new PipelineModel("pipeline", Array[Transformer](hashingTF))
     val copied = model.copy(ParamMap(hashingTF.numFeatures -> 10))
     require(copied.stages(0).asInstanceOf[HashingTF].getNumFeatures === 10,
-      "copy should handle extra stage params")
+            "copy should handle extra stage params")
   }
 
   test("pipeline model constructors") {
@@ -131,7 +131,8 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
   test("Pipeline read/write with non-Writable stage") {
     val unWritableStage = new UnWritableStage("unwritableStage")
     val unWritablePipeline = new Pipeline().setStages(Array(unWritableStage))
-    withClue("Pipeline.write should fail when Pipeline contains non-Writable stage") {
+    withClue(
+        "Pipeline.write should fail when Pipeline contains non-Writable stage") {
       intercept[UnsupportedOperationException] {
         unWritablePipeline.write
       }
@@ -140,8 +141,8 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
 
   test("PipelineModel read/write") {
     val writableStage = new WritableStage("writableStage").setIntParam(56)
-    val pipeline =
-      new PipelineModel("pipeline_89329327", Array(writableStage.asInstanceOf[Transformer]))
+    val pipeline = new PipelineModel(
+        "pipeline_89329327", Array(writableStage.asInstanceOf[Transformer]))
 
     val pipeline2 = testDefaultReadWrite(pipeline, testParams = false)
     assert(pipeline2.stages.length === 1)
@@ -153,9 +154,12 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
   test("PipelineModel read/write: getStagePath") {
     val stageUid = "myStage"
     val stagesDir = new Path("pipeline", "stages").toString
-    def testStage(stageIdx: Int, numStages: Int, expectedPrefix: String): Unit = {
-      val path = SharedReadWrite.getStagePath(stageUid, stageIdx, numStages, stagesDir)
-      val expected = new Path(stagesDir, expectedPrefix + "_" + stageUid).toString
+    def testStage(
+        stageIdx: Int, numStages: Int, expectedPrefix: String): Unit = {
+      val path =
+        SharedReadWrite.getStagePath(stageUid, stageIdx, numStages, stagesDir)
+      val expected =
+        new Path(stagesDir, expectedPrefix + "_" + stageUid).toString
       assert(path === expected)
     }
     testStage(0, 1, "0")
@@ -167,9 +171,10 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
 
   test("PipelineModel read/write with non-Writable stage") {
     val unWritableStage = new UnWritableStage("unwritableStage")
-    val unWritablePipeline =
-      new PipelineModel("pipeline_328957", Array(unWritableStage.asInstanceOf[Transformer]))
-    withClue("PipelineModel.write should fail when PipelineModel contains non-Writable stage") {
+    val unWritablePipeline = new PipelineModel(
+        "pipeline_328957", Array(unWritableStage.asInstanceOf[Transformer]))
+    withClue(
+        "PipelineModel.write should fail when PipelineModel contains non-Writable stage") {
       intercept[UnsupportedOperationException] {
         unWritablePipeline.write
       }
@@ -177,29 +182,30 @@ class PipelineSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
   }
 
   test("pipeline validateParams") {
-    val df = sqlContext.createDataFrame(
-      Seq(
-        (1, Vectors.dense(0.0, 1.0, 4.0), 1.0),
-        (2, Vectors.dense(1.0, 0.0, 4.0), 2.0),
-        (3, Vectors.dense(1.0, 0.0, 5.0), 3.0),
-        (4, Vectors.dense(0.0, 0.0, 5.0), 4.0))
-    ).toDF("id", "features", "label")
+    val df = sqlContext
+      .createDataFrame(
+          Seq((1, Vectors.dense(0.0, 1.0, 4.0), 1.0),
+              (2, Vectors.dense(1.0, 0.0, 4.0), 2.0),
+              (3, Vectors.dense(1.0, 0.0, 5.0), 3.0),
+              (4, Vectors.dense(0.0, 0.0, 5.0), 4.0))
+      )
+      .toDF("id", "features", "label")
 
     intercept[IllegalArgumentException] {
-       val scaler = new MinMaxScaler()
-         .setInputCol("features")
-         .setOutputCol("features_scaled")
-         .setMin(10)
-         .setMax(0)
-       val pipeline = new Pipeline().setStages(Array(scaler))
-       pipeline.fit(df)
+      val scaler = new MinMaxScaler()
+        .setInputCol("features")
+        .setOutputCol("features_scaled")
+        .setMin(10)
+        .setMax(0)
+      val pipeline = new Pipeline().setStages(Array(scaler))
+      pipeline.fit(df)
     }
   }
 }
 
-
 /** Used to test [[Pipeline]] with [[MLWritable]] stages */
-class WritableStage(override val uid: String) extends Transformer with MLWritable {
+class WritableStage(override val uid: String)
+    extends Transformer with MLWritable {
 
   final val intParam: IntParam = new IntParam(this, "intParam", "doc")
 
@@ -220,7 +226,8 @@ class WritableStage(override val uid: String) extends Transformer with MLWritabl
 
 object WritableStage extends MLReadable[WritableStage] {
 
-  override def read: MLReader[WritableStage] = new DefaultParamsReader[WritableStage]
+  override def read: MLReader[WritableStage] =
+    new DefaultParamsReader[WritableStage]
 
   override def load(path: String): WritableStage = super.load(path)
 }

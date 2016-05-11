@@ -30,20 +30,20 @@ import org.apache.spark.sql.catalyst.trees.TreeNodeRef
 import org.apache.spark.sql.internal.SQLConf
 
 /**
- * Contains methods for debugging query execution.
- *
- * Usage:
- * {{{
- *   import org.apache.spark.sql.execution.debug._
- *   sql("SELECT key FROM src").debug()
- *   dataFrame.typeCheck()
- * }}}
- */
+  * Contains methods for debugging query execution.
+  *
+  * Usage:
+  * {{{
+  *   import org.apache.spark.sql.execution.debug._
+  *   sql("SELECT key FROM src").debug()
+  *   dataFrame.typeCheck()
+  * }}}
+  */
 package object debug {
 
   /**
-   * Augments [[SQLContext]] with debug methods.
-   */
+    * Augments [[SQLContext]] with debug methods.
+    */
   implicit class DebugSQLContext(sqlContext: SQLContext) {
     def debug(): Unit = {
       sqlContext.setConf(SQLConf.DATAFRAME_EAGER_ANALYSIS, false)
@@ -51,17 +51,18 @@ package object debug {
   }
 
   /**
-   * Augments [[DataFrame]]s with debug methods.
-   */
+    * Augments [[DataFrame]]s with debug methods.
+    */
   implicit class DebugQuery(query: DataFrame) extends Logging {
     def debug(): Unit = {
       val plan = query.queryExecution.executedPlan
       val visited = new collection.mutable.HashSet[TreeNodeRef]()
-      val debugPlan = plan transform {
-        case s: SparkPlan if !visited.contains(new TreeNodeRef(s)) =>
-          visited += new TreeNodeRef(s)
-          DebugNode(s)
-      }
+      val debugPlan =
+        plan transform {
+          case s: SparkPlan if !visited.contains(new TreeNodeRef(s)) =>
+            visited += new TreeNodeRef(s)
+            DebugNode(s)
+        }
       logDebug(s"Results returned: ${debugPlan.execute().count()}")
       debugPlan.foreach {
         case d: DebugNode => d.dumpStats()
@@ -70,40 +71,47 @@ package object debug {
     }
   }
 
-  private[sql] case class DebugNode(child: SparkPlan) extends UnaryNode with CodegenSupport {
+  private[sql] case class DebugNode(child: SparkPlan)
+      extends UnaryNode with CodegenSupport {
     def output: Seq[Attribute] = child.output
 
-    implicit object SetAccumulatorParam extends AccumulatorParam[HashSet[String]] {
+    implicit object SetAccumulatorParam
+        extends AccumulatorParam[HashSet[String]] {
       def zero(initialValue: HashSet[String]): HashSet[String] = {
         initialValue.clear()
         initialValue
       }
 
-      def addInPlace(v1: HashSet[String], v2: HashSet[String]): HashSet[String] = {
+      def addInPlace(
+          v1: HashSet[String], v2: HashSet[String]): HashSet[String] = {
         v1 ++= v2
         v1
       }
     }
 
     /**
-     * A collection of metrics for each column of output.
-     * @param elementTypes the actual runtime types for the output.  Useful when there are bugs
-     *                     causing the wrong data to be projected.
-     */
+      * A collection of metrics for each column of output.
+      * @param elementTypes the actual runtime types for the output.  Useful when there are bugs
+      *                     causing the wrong data to be projected.
+      */
     case class ColumnMetrics(
-      elementTypes: Accumulator[HashSet[String]] = sparkContext.accumulator(HashSet.empty))
+        elementTypes: Accumulator[HashSet[String]] = sparkContext.accumulator(
+              HashSet.empty))
 
     val tupleCount: Accumulator[Int] = sparkContext.accumulator[Int](0)
 
     val numColumns: Int = child.output.size
-    val columnStats: Array[ColumnMetrics] = Array.fill(child.output.size)(new ColumnMetrics())
+    val columnStats: Array[ColumnMetrics] =
+      Array.fill(child.output.size)(new ColumnMetrics())
 
     def dumpStats(): Unit = {
       logDebug(s"== ${child.simpleString} ==")
       logDebug(s"Tuples output: ${tupleCount.value}")
-      child.output.zip(columnStats).foreach { case (attr, metric) =>
-        val actualDataTypes = metric.elementTypes.value.mkString("{", ",", "}")
-        logDebug(s" ${attr.name} ${attr.dataType}: $actualDataTypes")
+      child.output.zip(columnStats).foreach {
+        case (attr, metric) =>
+          val actualDataTypes =
+            metric.elementTypes.value.mkString("{", ",", "}")
+          logDebug(s" ${attr.name} ${attr.dataType}: $actualDataTypes")
       }
     }
 
@@ -137,7 +145,8 @@ package object debug {
       child.asInstanceOf[CodegenSupport].produce(ctx, this)
     }
 
-    override def doConsume(ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+    override def doConsume(
+        ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
       consume(ctx, input)
     }
   }

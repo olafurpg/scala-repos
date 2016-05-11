@@ -24,15 +24,16 @@ import org.dmg.pmml._
 import org.apache.spark.mllib.clustering.KMeansModel
 
 /**
- * PMML Model Export for KMeansModel class
- */
-private[mllib] class KMeansPMMLModelExport(model: KMeansModel) extends PMMLModelExport{
+  * PMML Model Export for KMeansModel class
+  */
+private[mllib] class KMeansPMMLModelExport(model: KMeansModel)
+    extends PMMLModelExport {
 
   populateKMeansPMML(model)
 
   /**
-   * Export the input KMeansModel model to PMML format.
-   */
+    * Export the input KMeansModel model to PMML format.
+    */
   private def populateKMeansPMML(model: KMeansModel): Unit = {
     pmml.getHeader.setDescription("k-means clustering")
 
@@ -54,12 +55,12 @@ private[mllib] class KMeansPMMLModelExport(model: KMeansModel) extends PMMLModel
 
       for (i <- 0 until clusterCenter.size) {
         fields(i) = FieldName.create("field_" + i)
-        dataDictionary.addDataFields(new DataField(fields(i), OpType.CONTINUOUS, DataType.DOUBLE))
-        miningSchema
-          .addMiningFields(new MiningField(fields(i))
-          .setUsageType(FieldUsageType.ACTIVE))
-        clusteringModel.addClusteringFields(
-          new ClusteringField(fields(i)).setCompareFunction(CompareFunctionType.ABS_DIFF))
+        dataDictionary.addDataFields(
+            new DataField(fields(i), OpType.CONTINUOUS, DataType.DOUBLE))
+        miningSchema.addMiningFields(
+            new MiningField(fields(i)).setUsageType(FieldUsageType.ACTIVE))
+        clusteringModel.addClusteringFields(new ClusteringField(fields(i))
+              .setCompareFunction(CompareFunctionType.ABS_DIFF))
       }
 
       dataDictionary.setNumberOfFields(dataDictionary.getDataFields.size)
@@ -68,9 +69,9 @@ private[mllib] class KMeansPMMLModelExport(model: KMeansModel) extends PMMLModel
         val cluster = new Cluster()
           .setName("cluster_" + i)
           .setArray(new org.dmg.pmml.Array()
-          .setType(Array.Type.REAL)
-          .setN(clusterCenter.size)
-          .setValue(model.clusterCenters(i).toArray.mkString(" ")))
+                .setType(Array.Type.REAL)
+                .setN(clusterCenter.size)
+                .setValue(model.clusterCenters(i).toArray.mkString(" ")))
         // we don't have the size of the single cluster but only the centroids (withValue)
         // .withSize(value)
         clusteringModel.addClusters(cluster)

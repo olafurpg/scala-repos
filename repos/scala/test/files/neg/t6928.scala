@@ -1,4 +1,4 @@
-abstract class A( val someAs: A* )
+abstract class A(val someAs: A*)
 object B extends A(B)
 object C extends A(null, null, C)
 

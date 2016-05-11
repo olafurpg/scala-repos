@@ -8,9 +8,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.types.ScType.ExtractClass
 
 /**
- * Nikolay.Tropin
- * 2014-10-02
- */
+  * Nikolay.Tropin
+  * 2014-10-02
+  */
 object ValueClassType {
   def unapply(tp: ScType): Option[ScType] = {
     tp match {
@@ -28,7 +28,8 @@ object ValueClassType {
   def isValueType(tp: ScType): Boolean = unapply(tp).isDefined
 
   def isValueClass(cl: PsiClass) = cl match {
-    case scClass: ScClass => scClass.supers.map(_.qualifiedName).contains("scala.AnyVal")
+    case scClass: ScClass =>
+      scClass.supers.map(_.qualifiedName).contains("scala.AnyVal")
     case _ => false
   }
 }

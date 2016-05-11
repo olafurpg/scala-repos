@@ -9,15 +9,16 @@ import org.ensime.core._
 //import shapeless._
 
 /**
- * Accepts RpcRequestEnvelope and responds with an RpcResponseEnvelope to target.
- * Also sends asynchronous RpcResponseEnvelopes to target.
- * Ensures that everything in and out is canonised.
- */
+  * Accepts RpcRequestEnvelope and responds with an RpcResponseEnvelope to target.
+  * Also sends asynchronous RpcResponseEnvelopes to target.
+  * Ensures that everything in and out is canonised.
+  */
 class ConnectionHandler(
     project: ActorRef,
     broadcaster: ActorRef,
     target: ActorRef
-) extends Actor with ActorLogging {
+)
+    extends Actor with ActorLogging {
 
   override def preStart(): Unit = {
     broadcaster ! Broadcaster.Register
@@ -45,12 +46,11 @@ class ConnectionHandler(
     case outgoing: EnsimeEvent =>
       target forward RpcResponseEnvelope(None, Canonised(outgoing))
   }
-
 }
 object ConnectionHandler {
   def apply(
-    project: ActorRef,
-    broadcaster: ActorRef,
-    target: ActorRef
+      project: ActorRef,
+      broadcaster: ActorRef,
+      target: ActorRef
   ): Props = Props(classOf[ConnectionHandler], project, broadcaster, target)
 }

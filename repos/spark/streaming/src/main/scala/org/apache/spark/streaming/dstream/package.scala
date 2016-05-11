@@ -18,7 +18,7 @@
 package org.apache.spark.streaming
 
 /**
- * Various implementations of DStream's.
- * @see [[org.apache.spark.streaming.dstream.DStream]]
- */
+  * Various implementations of DStream's.
+  * @see [[org.apache.spark.streaming.dstream.DStream]]
+  */
 package object dstream

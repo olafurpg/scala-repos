@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.routing
 
 import com.typesafe.config.ConfigFactory
@@ -12,7 +11,8 @@ import akka.routing.ActorSelectionRoutee
 import akka.routing.ActorRefRoutee
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class WeightedRouteesSpec extends AkkaSpec(ConfigFactory.parseString("""
+class WeightedRouteesSpec
+    extends AkkaSpec(ConfigFactory.parseString("""
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.remote.netty.tcp.port = 0
       """)) {
@@ -22,9 +22,12 @@ class WeightedRouteesSpec extends AkkaSpec(ConfigFactory.parseString("""
   val c1 = Address("akka.tcp", "sys", "c1", 2551)
   val d1 = Address("akka.tcp", "sys", "d1", 2551)
 
-  val routeeA = ActorSelectionRoutee(system.actorSelection(RootActorPath(a1) / "user" / "a"))
-  val routeeB = ActorSelectionRoutee(system.actorSelection(RootActorPath(b1) / "user" / "b"))
-  val routeeC = ActorSelectionRoutee(system.actorSelection(RootActorPath(c1) / "user" / "c"))
+  val routeeA = ActorSelectionRoutee(
+      system.actorSelection(RootActorPath(a1) / "user" / "a"))
+  val routeeB = ActorSelectionRoutee(
+      system.actorSelection(RootActorPath(b1) / "user" / "b"))
+  val routeeC = ActorSelectionRoutee(
+      system.actorSelection(RootActorPath(c1) / "user" / "c"))
   val routees = Vector(routeeA, routeeB, routeeC)
   val testActorRoutee = ActorRefRoutee(testActor)
 
@@ -83,7 +86,9 @@ class WeightedRouteesSpec extends AkkaSpec(ConfigFactory.parseString("""
       val weighted = new WeightedRoutees(routees2, a1, weights)
 
       1 to 2 foreach { weighted(_) should ===(testActorRoutee) }
-      3 to weighted.total foreach { weighted(_) should not be (testActorRoutee) }
+      3 to weighted.total foreach {
+        weighted(_) should not be (testActorRoutee)
+      }
     }
 
     "not allocate ref with weight zero" in {
@@ -92,6 +97,5 @@ class WeightedRouteesSpec extends AkkaSpec(ConfigFactory.parseString("""
 
       1 to weighted.total foreach { weighted(_) should not be (routeeA) }
     }
-
   }
 }

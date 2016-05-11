@@ -19,7 +19,6 @@ package org.apache.spark.sql.catalyst.expressions.codegen
 
 import org.apache.spark.SparkFunSuite
 
-
 class CodeFormatterSuite extends SparkFunSuite {
 
   def testCase(name: String)(input: String)(expected: String): Unit = {
@@ -32,7 +31,7 @@ class CodeFormatterSuite extends SparkFunSuite {
     """class A {
       |blahblah;
       |}""".stripMargin
-  }{
+  } {
     """
       |/* 001 */ class A {
       |/* 002 */   blahblah;
@@ -60,7 +59,7 @@ class CodeFormatterSuite extends SparkFunSuite {
     """class A {
       | if (c) {duh;}
       |}""".stripMargin
-  }{
+  } {
     """
       |/* 001 */ class A {
       |/* 002 */   if (c) {duh;}
@@ -72,7 +71,7 @@ class CodeFormatterSuite extends SparkFunSuite {
     """class A {
       | if (c) {duh;} else {boo;}
       |}""".stripMargin
-  }{
+  } {
     """
       |/* 001 */ class A {
       |/* 002 */   if (c) {duh;} else {boo;}
@@ -85,7 +84,7 @@ class CodeFormatterSuite extends SparkFunSuite {
       |a,
       |b,
       |c)""".stripMargin
-  }{
+  } {
     """
       |/* 001 */ foo(
       |/* 002 */   a,

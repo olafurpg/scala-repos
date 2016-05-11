@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import akka.event.Logging
@@ -16,7 +16,6 @@ object DeadLetterSupressionSpec {
   case object NormalMsg
 
   case object SuppressedMsg extends DeadLetterSuppression
-
 }
 
 class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
@@ -27,12 +26,14 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
   deadActor ! PoisonPill
   expectTerminated(deadActor)
 
-  s"must suppress message from default dead-letters logging (sent to dead: ${Logging.simpleName(deadActor)})" in {
+  s"must suppress message from default dead-letters logging (sent to dead: ${Logging
+    .simpleName(deadActor)})" in {
     val deadListener = TestProbe()
     system.eventStream.subscribe(deadListener.ref, classOf[DeadLetter])
 
     val suppressedListener = TestProbe()
-    system.eventStream.subscribe(suppressedListener.ref, classOf[SuppressedDeadLetter])
+    system.eventStream.subscribe(
+        suppressedListener.ref, classOf[SuppressedDeadLetter])
 
     val allListener = TestProbe()
     system.eventStream.subscribe(allListener.ref, classOf[AllDeadLetters])
@@ -43,20 +44,24 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     deadListener.expectMsg(DeadLetter(NormalMsg, testActor, deadActor))
     deadListener.expectNoMsg(200.millis)
 
-    suppressedListener.expectMsg(SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
+    suppressedListener.expectMsg(
+        SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
     suppressedListener.expectNoMsg(200.millis)
 
-    allListener.expectMsg(SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
+    allListener.expectMsg(
+        SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
     allListener.expectMsg(DeadLetter(NormalMsg, testActor, deadActor))
     allListener.expectNoMsg(200.millis)
   }
 
-  s"must suppress message from default dead-letters logging (sent to dead: ${Logging.simpleName(system.deadLetters)})" in {
+  s"must suppress message from default dead-letters logging (sent to dead: ${Logging
+    .simpleName(system.deadLetters)})" in {
     val deadListener = TestProbe()
     system.eventStream.subscribe(deadListener.ref, classOf[DeadLetter])
 
     val suppressedListener = TestProbe()
-    system.eventStream.subscribe(suppressedListener.ref, classOf[SuppressedDeadLetter])
+    system.eventStream.subscribe(
+        suppressedListener.ref, classOf[SuppressedDeadLetter])
 
     val allListener = TestProbe()
     system.eventStream.subscribe(allListener.ref, classOf[AllDeadLetters])
@@ -64,12 +69,18 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     system.deadLetters ! SuppressedMsg
     system.deadLetters ! NormalMsg
 
-    deadListener.expectMsg(200.millis, DeadLetter(NormalMsg, testActor, system.deadLetters))
+    deadListener.expectMsg(
+        200.millis, DeadLetter(NormalMsg, testActor, system.deadLetters))
 
-    suppressedListener.expectMsg(200.millis, SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
+    suppressedListener.expectMsg(
+        200.millis,
+        SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
 
-    allListener.expectMsg(200.millis, SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
-    allListener.expectMsg(200.millis, DeadLetter(NormalMsg, testActor, system.deadLetters))
+    allListener.expectMsg(
+        200.millis,
+        SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
+    allListener.expectMsg(
+        200.millis, DeadLetter(NormalMsg, testActor, system.deadLetters))
 
     Thread.sleep(200)
     deadListener.expectNoMsg(Duration.Zero)
@@ -77,4 +88,3 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     allListener.expectNoMsg(Duration.Zero)
   }
 }
-

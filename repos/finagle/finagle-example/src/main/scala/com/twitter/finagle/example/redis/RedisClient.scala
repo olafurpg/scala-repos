@@ -27,5 +27,4 @@ object RedisClient {
     RedisCluster.stop()
     println("Done!")
   }
-
 }

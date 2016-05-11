@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import language.postfixOps
@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ ForceDisassociate, Direction }
+import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociate, Direction}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -22,8 +22,7 @@ object RemoteNodeShutdownAndComesBackSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(
-    ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       ## Keep it tight, otherwise reestablishing a connection takes too much time
@@ -37,25 +36,27 @@ object RemoteNodeShutdownAndComesBackSpec extends MultiNodeConfig {
   class Subject extends Actor {
     def receive = {
       case "shutdown" ⇒ context.system.terminate()
-      case msg        ⇒ sender() ! msg
+      case msg ⇒ sender() ! msg
     }
   }
-
 }
 
-class RemoteNodeShutdownAndComesBackMultiJvmNode1 extends RemoteNodeShutdownAndComesBackSpec
-class RemoteNodeShutdownAndComesBackMultiJvmNode2 extends RemoteNodeShutdownAndComesBackSpec
+class RemoteNodeShutdownAndComesBackMultiJvmNode1
+    extends RemoteNodeShutdownAndComesBackSpec
+class RemoteNodeShutdownAndComesBackMultiJvmNode2
+    extends RemoteNodeShutdownAndComesBackSpec
 
 abstract class RemoteNodeShutdownAndComesBackSpec
-  extends MultiNodeSpec(RemoteNodeShutdownAndComesBackSpec)
-  with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(RemoteNodeShutdownAndComesBackSpec)
+    with STMultiNodeSpec with ImplicitSender {
 
   import RemoteNodeShutdownAndComesBackSpec._
 
   override def initialParticipants = roles.size
 
   def identify(role: RoleName, actorName: String): ActorRef = {
-    system.actorSelection(node(role) / "user" / actorName) ! Identify(actorName)
+    system.actorSelection(node(role) / "user" / actorName) ! Identify(
+        actorName)
     expectMsgType[ActorIdentity].ref.get
   }
 
@@ -83,7 +84,9 @@ abstract class RemoteNodeShutdownAndComesBackSpec
         // Drop all messages from this point so no SHUTDOWN is ever received
         testConductor.blackhole(second, first, Direction.Send).await
         // Shut down all existing connections so that the system can enter recovery mode (association attempts)
-        Await.result(RARP(system).provider.transport.managementCommand(ForceDisassociate(node(second).address)), 3.seconds)
+        Await.result(RARP(system).provider.transport.managementCommand(
+                         ForceDisassociate(node(second).address)),
+                     3.seconds)
 
         // Trigger reconnect attempt and also queue up a system message to be in limbo state (UID of remote system
         // is unknown, and system message is pending)
@@ -100,7 +103,10 @@ abstract class RemoteNodeShutdownAndComesBackSpec
           // retry because the Subject actor might not be started yet
           awaitAssert {
             val p = TestProbe()
-            system.actorSelection(RootActorPath(secondAddress) / "user" / "subject").tell(Identify("subject"), p.ref)
+            system
+              .actorSelection(
+                  RootActorPath(secondAddress) / "user" / "subject")
+              .tell(Identify("subject"), p.ref)
             p.expectMsgPF(1 second) {
               case ActorIdentity("subject", Some(ref)) ⇒ true
             }
@@ -112,7 +118,9 @@ abstract class RemoteNodeShutdownAndComesBackSpec
         // Establish watch with the new system. This triggers additional system message traffic. If buffers are out
         // of sync the remote system will be quarantined and the rest of the test will fail (or even in earlier
         // stages depending on circumstances).
-        system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! Identify("subject")
+        system.actorSelection(
+            RootActorPath(secondAddress) / "user" / "subject") ! Identify(
+            "subject")
         val subjectNew = expectMsgType[ActorIdentity].ref.get
         watch(subjectNew)
 
@@ -124,7 +132,8 @@ abstract class RemoteNodeShutdownAndComesBackSpec
       }
 
       runOn(second) {
-        val addr = system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
+        val addr =
+          system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         system.actorOf(Props[Subject], "subject")
         system.actorOf(Props[Subject], "sysmsgBarrier")
         val path = node(first)
@@ -134,7 +143,8 @@ abstract class RemoteNodeShutdownAndComesBackSpec
 
         Await.ready(system.whenTerminated, 30.seconds)
 
-        val freshSystem = ActorSystem(system.name, ConfigFactory.parseString(s"""
+        val freshSystem =
+          ActorSystem(system.name, ConfigFactory.parseString(s"""
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}
                       port = ${addr.port.get}
@@ -144,8 +154,6 @@ abstract class RemoteNodeShutdownAndComesBackSpec
 
         Await.ready(freshSystem.whenTerminated, 30.seconds)
       }
-
     }
-
   }
 }

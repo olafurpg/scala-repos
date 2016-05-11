@@ -11,18 +11,22 @@ import akka.testkit.AkkaSpec
 import akka.cluster.StandardMetrics._
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class MetricValuesSpec extends AkkaSpec(MetricsEnabledSpec.config) with MetricsCollectorFactory {
+class MetricValuesSpec
+    extends AkkaSpec(MetricsEnabledSpec.config) with MetricsCollectorFactory {
 
   val collector = createMetricsCollector
 
-  val node1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554), 1, collector.sample.metrics)
-  val node2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555), 1, collector.sample.metrics)
+  val node1 = NodeMetrics(
+      Address("akka.tcp", "sys", "a", 2554), 1, collector.sample.metrics)
+  val node2 = NodeMetrics(
+      Address("akka.tcp", "sys", "a", 2555), 1, collector.sample.metrics)
 
   val nodes: Seq[NodeMetrics] = {
     (1 to 100).foldLeft(List(node1, node2)) { (nodes, _) ⇒
       nodes map { n ⇒
-        n.copy(metrics = collector.sample.metrics.flatMap(latest ⇒ n.metrics.collect {
-          case streaming if latest sameAs streaming ⇒ streaming :+ latest
+        n.copy(metrics = collector.sample.metrics.flatMap(latest ⇒
+                    n.metrics.collect {
+            case streaming if latest sameAs streaming ⇒ streaming :+ latest
         }))
       }
     }
@@ -49,7 +53,11 @@ class MetricValuesSpec extends AkkaSpec(MetricsEnabledSpec.config) with MetricsC
         }
 
         node match {
-          case Cpu(address, _, systemLoadAverageOption, cpuCombinedOption, processors) ⇒
+          case Cpu(address,
+                   _,
+                   systemLoadAverageOption,
+                   cpuCombinedOption,
+                   processors) ⇒
             processors should be > (0)
             if (systemLoadAverageOption.isDefined)
               systemLoadAverageOption.get should be >= (0.0)
@@ -63,5 +71,4 @@ class MetricValuesSpec extends AkkaSpec(MetricsEnabledSpec.config) with MetricsC
       }
     }
   }
-
 }

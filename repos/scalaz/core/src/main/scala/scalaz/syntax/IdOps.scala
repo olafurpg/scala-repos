@@ -4,6 +4,7 @@ package syntax
 import annotation.tailrec
 
 final class IdOps[A](val self: A) extends AnyVal {
+
   /**Returns `self` if it is non-null, otherwise returns `d`. */
   final def ??(d: => A)(implicit ev: Null <:< A): A =
     if (self == null) d else self
@@ -20,11 +21,11 @@ final class IdOps[A](val self: A) extends AnyVal {
     (self, self)
 
   /**
-   * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
-   */
-  def matchOrZero[B: Monoid](pf: PartialFunction[A, B]): B =
+    * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
+    */
+  def matchOrZero[B : Monoid](pf: PartialFunction[A, B]): B =
     pf.lift(self) match {
-      case None    => Monoid[B].zero
+      case None => Monoid[B].zero
       case Some(x) => x
     }
 
@@ -48,10 +49,10 @@ final class IdOps[A](val self: A) extends AnyVal {
   }
 
   /**
-   * If the provided partial function is defined for `self` run this,
-   * otherwise lift `self` into `F` with the provided [[scalaz.Applicative]].
-   */
-  def visit[F[_] : Applicative](p: PartialFunction[A, F[A]]): F[A] =
+    * If the provided partial function is defined for `self` run this,
+    * otherwise lift `self` into `F` with the provided [[scalaz.Applicative]].
+    */
+  def visit[F[_]: Applicative](p: PartialFunction[A, F[A]]): F[A] =
     if (p isDefinedAt self) p(self)
     else Applicative[F].point(self)
 }

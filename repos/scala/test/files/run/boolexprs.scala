@@ -40,7 +40,7 @@ object Test {
       if (actual == expected) {
         Console.print(" was successful");
       } else {
-        Console.print(" failed: expected "+ expected +", found "+ actual);
+        Console.print(" failed: expected " + expected + ", found " + actual);
       }
     } catch {
       case exception: Throwable =>

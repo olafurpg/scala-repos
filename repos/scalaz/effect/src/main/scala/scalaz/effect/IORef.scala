@@ -4,9 +4,9 @@ package effect
 import ST._
 
 /**
- * A mutable reference in the IO monad. Note that unsafePerformIO will allow leaking
- * such a reference out of the monad, but any operations on a leaked reference are still monadic.
- */
+  * A mutable reference in the IO monad. Note that unsafePerformIO will allow leaking
+  * such a reference out of the monad, but any operations on a leaked reference are still monadic.
+  */
 sealed abstract class IORef[A] {
   val value: STRef[IvoryTower, A]
 
@@ -20,7 +20,8 @@ sealed abstract class IORef[A] {
 object IORef extends IORefs
 
 trait IORefs {
-  private[effect] def ioRef[A](v: STRef[IvoryTower, A]): IORef[A] = new IORef[A] {
-    val value = v
-  }
+  private[effect] def ioRef[A](v: STRef[IvoryTower, A]): IORef[A] =
+    new IORef[A] {
+      val value = v
+    }
 }

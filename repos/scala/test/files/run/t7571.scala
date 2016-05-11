@@ -1,5 +1,5 @@
 class Foo(val a: Int) extends AnyVal {
-  def foo = { {case x => x + a}: PartialFunction[Int, Int]}
+  def foo = { { case x => x + a }: PartialFunction[Int, Int] }
 
   def bar = (new {}).toString
 }

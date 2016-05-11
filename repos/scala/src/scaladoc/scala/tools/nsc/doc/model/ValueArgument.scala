@@ -7,7 +7,6 @@ package scala.tools.nsc
 package doc
 package model
 
-
 /** A value that is passed as an argument to a value parameter. */
 trait ValueArgument {
 
@@ -16,5 +15,4 @@ trait ValueArgument {
 
   /** The expression that calculates the value. */
   def value: TreeEntity
-
 }

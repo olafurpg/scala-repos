@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.core.BaseDataSource
@@ -32,8 +31,8 @@ import scala.reflect._
   * @tparam A Actual value class.
   * @group Data Source
   */
-abstract class LDataSource[TD: ClassTag, EI, Q, A]
-  extends BaseDataSource[RDD[TD], EI, Q, A] {
+abstract class LDataSource[TD : ClassTag, EI, Q, A]
+    extends BaseDataSource[RDD[TD], EI, Q, A] {
 
   def readTrainingBase(sc: SparkContext): RDD[TD] = {
     sc.parallelize(Seq(None)).map(_ => readTraining())
@@ -45,11 +44,13 @@ abstract class LDataSource[TD: ClassTag, EI, Q, A]
   def readEvalBase(sc: SparkContext): Seq[(RDD[TD], EI, RDD[(Q, A)])] = {
     val localEvalData: Seq[(TD, EI, Seq[(Q, A)])] = readEval()
 
-    localEvalData.map { case (td, ei, qaSeq) => {
-      val tdRDD = sc.parallelize(Seq(None)).map(_ => td)
-      val qaRDD = sc.parallelize(qaSeq)
-      (tdRDD, ei, qaRDD)
-    }}
+    localEvalData.map {
+      case (td, ei, qaSeq) => {
+          val tdRDD = sc.parallelize(Seq(None)).map(_ => td)
+          val qaRDD = sc.parallelize(qaSeq)
+          (tdRDD, ei, qaRDD)
+        }
+    }
   }
 
   /** To provide evaluation feature for your engine, your must override this

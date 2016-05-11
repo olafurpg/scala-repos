@@ -4,7 +4,8 @@ import scala.tools.partest.ScaladocModelTest
 
 object Test extends ScaladocModelTest {
 
-  override def code = """
+  override def code =
+    """
         class cbf[A, B, C]
 
         /**
@@ -43,10 +44,12 @@ object Test extends ScaladocModelTest {
 
     // check correct expansion of the use case signature
     val map = rootPackage._class("Collection")._method("map")
-    assert(map.resultType.name == "Collection[B]", map.resultType.name + " == Traversable[B]")
+    assert(map.resultType.name == "Collection[B]",
+           map.resultType.name + " == Traversable[B]")
 
     val foo = rootPackage._class("SR704")._method("foo")
-    assert(extractCommentText(foo.comment.get).contains("Hello Mister John."),
-           extractCommentText(foo.comment.get) + ".contains(Hello Mister John.)")
+    assert(
+        extractCommentText(foo.comment.get).contains("Hello Mister John."),
+        extractCommentText(foo.comment.get) + ".contains(Hello Mister John.)")
   }
 }

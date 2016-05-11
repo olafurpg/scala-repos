@@ -31,11 +31,10 @@ object SessionInfo {
   object requestMemo extends RequestMemoize[Int, Int]
 }
 
-
 /**
- * System under specification for Memoize.
- */
-object MemoizeSpec extends Specification  {
+  * System under specification for Memoize.
+  */
+object MemoizeSpec extends Specification {
   "Memoize Specification".title
   sequential
 
@@ -81,7 +80,5 @@ object MemoizeSpec extends Specification  {
         requestMemo(3) must_== Empty
       }
     }
-
   }
 }
-

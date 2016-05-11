@@ -26,9 +26,12 @@ class ScalaExplicitlyImportedWeigher extends ProximityWeigher {
     if (position == null) return None
     val index = qual.lastIndexOf('.')
     val qualNoPoint = if (index < 0) null else qual.substring(0, index)
-    val tuple: (ArrayBuffer[ScImportStmt], Long) = position.getUserData(ScalaExplicitlyImportedWeigher.key)
-    var buffer: ArrayBuffer[ScImportStmt] = if (tuple != null) tuple._1 else null
-    val currentModCount = position.getManager.getModificationTracker.getModificationCount
+    val tuple: (ArrayBuffer[ScImportStmt], Long) =
+      position.getUserData(ScalaExplicitlyImportedWeigher.key)
+    var buffer: ArrayBuffer[ScImportStmt] =
+      if (tuple != null) tuple._1 else null
+    val currentModCount =
+      position.getManager.getModificationTracker.getModificationCount
     if (buffer == null || tuple._2 != currentModCount) {
       @tailrec
       def treeWalkup(place: PsiElement, lastParent: PsiElement) {
@@ -43,7 +46,8 @@ class ScalaExplicitlyImportedWeigher extends ProximityWeigher {
       }
       buffer = new ArrayBuffer[ScImportStmt]()
       treeWalkup(position.getContext, position)
-      position.putUserData(ScalaExplicitlyImportedWeigher.key, (buffer, currentModCount))
+      position.putUserData(
+          ScalaExplicitlyImportedWeigher.key, (buffer, currentModCount))
     }
     val iter = buffer.iterator
     while (iter.hasNext) {
@@ -52,14 +56,13 @@ class ScalaExplicitlyImportedWeigher extends ProximityWeigher {
       while (exprIter.hasNext) {
         val expr = exprIter.next()
         if (expr.singleWildcard && qualNoPoint != null) {
-          for (resolve <- expr.qualifier.multiResolve(false))
-            resolve match {
-              case ScalaResolveResult(pack: PsiPackage, _) =>
-                if (qualNoPoint == pack.getQualifiedName) return Some(3)
-              case ScalaResolveResult(clazz: PsiClass, _) =>
-                if (qualNoPoint == clazz.qualifiedName) return Some(3)
-              case _ =>
-            }
+          for (resolve <- expr.qualifier.multiResolve(false)) resolve match {
+            case ScalaResolveResult(pack: PsiPackage, _) =>
+              if (qualNoPoint == pack.getQualifiedName) return Some(3)
+            case ScalaResolveResult(clazz: PsiClass, _) =>
+              if (qualNoPoint == clazz.qualifiedName) return Some(3)
+            case _ =>
+          }
         } else if (expr.selectorSet.isDefined) {
           for (selector <- expr.selectors) {
             for (resolve <- selector.reference.multiResolve(false)) {
@@ -73,19 +76,18 @@ class ScalaExplicitlyImportedWeigher extends ProximityWeigher {
         } else {
           expr.reference match {
             case Some(ref) =>
-              for (resolve <- ref.multiResolve(false))
-                resolve match {
-                  case ScalaResolveResult(clazz: PsiClass, _) =>
-                    if (qual == clazz.qualifiedName) return Some(3)
-                  case _ =>
-                }
+              for (resolve <- ref.multiResolve(false)) resolve match {
+                case ScalaResolveResult(clazz: PsiClass, _) =>
+                  if (qual == clazz.qualifiedName) return Some(3)
+                case _ =>
+              }
             case None =>
           }
         }
       }
     }
     if (qualNoPoint != null && qualNoPoint == "scala" ||
-      qualNoPoint == "java.lang" || qualNoPoint == "scala.Predef") {
+        qualNoPoint == "java.lang" || qualNoPoint == "scala.Predef") {
       if (qualNoPoint == "java.lang") return Some(1)
       else return Some(2)
     }
@@ -125,7 +127,8 @@ class ScalaExplicitlyImportedWeigher extends ProximityWeigher {
     val elementFile: PsiFile = element.getContainingFile
     val positionFile: PsiFile = position.getContainingFile
     if (!positionFile.isInstanceOf[ScalaFile]) return 0
-    if (positionFile != null && elementFile != null && positionFile.getOriginalFile == elementFile.getOriginalFile) {
+    if (positionFile != null && elementFile != null &&
+        positionFile.getOriginalFile == elementFile.getOriginalFile) {
       return 3
     }
     element match {
@@ -175,5 +178,6 @@ class ScalaExplicitlyImportedWeigher extends ProximityWeigher {
 }
 
 object ScalaExplicitlyImportedWeigher {
-  private[weighter] val key: Key[(ArrayBuffer[ScImportStmt], Long)] = Key.create("scala.explicitly.imported.weigher.key")
+  private[weighter] val key: Key[(ArrayBuffer[ScImportStmt], Long)] =
+    Key.create("scala.explicitly.imported.weigher.key")
 }

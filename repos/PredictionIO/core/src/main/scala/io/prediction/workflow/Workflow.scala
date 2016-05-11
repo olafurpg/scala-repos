@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.workflow
 
 import io.prediction.annotation.Experimental
@@ -75,7 +74,7 @@ object Workflow {
       env = env,
       params = params)
   }
-  */
+   */
 
   def runEvaluation(
       evaluation: Evaluation,
@@ -84,13 +83,13 @@ object Workflow {
       evaluationInstance: EvaluationInstance = EvaluationInstance(),
       params: WorkflowParams = WorkflowParams()) {
     runEvaluationTypeless(
-      evaluation = evaluation,
-      engine = evaluation.engine,
-      engineParamsList = engineParamsGenerator.engineParamsList,
-      evaluationInstance = evaluationInstance,
-      evaluator = evaluation.evaluator,
-      env = env,
-      params = params
+        evaluation = evaluation,
+        engine = evaluation.engine,
+        engineParamsList = engineParamsGenerator.engineParamsList,
+        evaluationInstance = evaluationInstance,
+        evaluator = evaluation.evaluator,
+        env = env,
+        params = params
     )
   }
 
@@ -104,13 +103,13 @@ object Workflow {
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
       params: WorkflowParams = WorkflowParams()) {
     runEvaluationViaCoreWorkflow(
-      evaluation = evaluation,
-      engine = engine,
-      engineParamsList = engineParamsList,
-      evaluationInstance = evaluationInstance,
-      evaluator = evaluator.asInstanceOf[BaseEvaluator[EI, Q, P, A, ER]],
-      env = env,
-      params = params)
+        evaluation = evaluation,
+        engine = engine,
+        engineParamsList = engineParamsList,
+        evaluationInstance = evaluationInstance,
+        evaluator = evaluator.asInstanceOf[BaseEvaluator[EI, Q, P, A, ER]],
+        env = env,
+        params = params)
   }
 
   /** :: Experimental :: */
@@ -123,13 +122,12 @@ object Workflow {
       evaluator: BaseEvaluator[EI, Q, P, A, R],
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
       params: WorkflowParams = WorkflowParams()) {
-    CoreWorkflow.runEvaluation(
-      evaluation = evaluation,
-      engine = engine,
-      engineParamsList = engineParamsList,
-      evaluationInstance = evaluationInstance,
-      evaluator = evaluator,
-      env = env,
-      params = params)
+    CoreWorkflow.runEvaluation(evaluation = evaluation,
+                               engine = engine,
+                               engineParamsList = engineParamsList,
+                               evaluationInstance = evaluationInstance,
+                               evaluator = evaluator,
+                               env = env,
+                               params = params)
   }
 }

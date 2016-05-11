@@ -1,7 +1,7 @@
 class A() {
-  def f : Int = 2
+  def f: Int = 2
 }
 
 class B() extends A() {
-  override val f : Int = super.f
+  override val f: Int = super.f
 }

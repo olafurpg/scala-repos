@@ -3,19 +3,19 @@ import language.reflectiveCalls
 package test {
   class C1 {
     object O {
-      def struct(s: {def foo: Any}) = s.foo
+      def struct(s: { def foo: Any }) = s.foo
     }
   }
   trait T {
     object O {
-      def struct(s: {def foo: Any}) = s.foo
+      def struct(s: { def foo: Any }) = s.foo
     }
   }
   object O1 extends T
 
   object O2 {
     object O {
-      def struct(s: {def foo: Any}) = s.foo
+      def struct(s: { def foo: Any }) = s.foo
     }
   }
 }

@@ -3,7 +3,7 @@
 // It lives in the future-spec directory simply because it requires a specs-like
 // DSL which has already been minimally implemented for the future spec tests.
 
-import scala.util.{Try,Success,Failure}
+import scala.util.{Try, Success, Failure}
 
 class TryTests extends MinimalScalaTest {
   class MyException extends Exception
@@ -36,15 +36,15 @@ class TryTests extends MinimalScalaTest {
 
     "map" in {
       "when there is no exception" in {
-        Success(1) map(1+) mustEqual Success(2)
-        Failure[Int](e) map(1+) mustEqual Failure(e)
+        Success(1) map (1 +) mustEqual Success(2)
+        Failure[Int](e) map (1 +) mustEqual Failure(e)
       }
 
       "when there is an exception" in {
-        Success(1) map(_ => throw e) mustEqual Failure(e)
+        Success(1) map (_ => throw e) mustEqual Failure(e)
 
         val e2 = new Exception
-        Failure[Int](e) map(_ => throw e2) mustEqual Failure(e)
+        Failure[Int](e) map (_ => throw e2) mustEqual Failure(e)
       }
       "when there is a fatal exception" in {
         val e3 = new ThreadDeath
@@ -56,8 +56,8 @@ class TryTests extends MinimalScalaTest {
 
     "flatMap" in {
       "when there is no exception" in {
-        Success(1) flatMap(x => Success(1 + x)) mustEqual Success(2)
-        Failure[Int](e) flatMap(x => Success(1 + x)) mustEqual Failure(e)
+        Success(1) flatMap (x => Success(1 + x)) mustEqual Success(2)
+        Failure[Int](e) flatMap (x => Success(1 + x)) mustEqual Failure(e)
       }
 
       "when there is an exception" in {

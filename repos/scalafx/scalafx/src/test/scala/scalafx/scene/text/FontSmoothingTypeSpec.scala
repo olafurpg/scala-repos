@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Test for [[scalafx.scene.text.FontSmoothingType]] */
 @RunWith(classOf[JUnitRunner])
-class FontSmoothingTypeSpec extends SFXEnumDelegateSpec[jfxst.FontSmoothingType, FontSmoothingType](
-  javaClass = classOf[jfxst.FontSmoothingType],
-  scalaClass = classOf[FontSmoothingType],
-  companion = FontSmoothingType)
+class FontSmoothingTypeSpec
+    extends SFXEnumDelegateSpec[jfxst.FontSmoothingType, FontSmoothingType](
+        javaClass = classOf[jfxst.FontSmoothingType],
+        scalaClass = classOf[FontSmoothingType],
+        companion = FontSmoothingType)

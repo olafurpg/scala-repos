@@ -13,13 +13,18 @@ object Test extends DirectTest {
   override def code = ""
 
   def show {
-    val classpath = List(sys.props("partest.lib"), testOutput.path) mkString sys.props("path.separator")
+    val classpath =
+      List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
+          "path.separator")
     val compiler = newCompiler("-cp", classpath, "-d", testOutput.path)
     import compiler._, definitions._
     new compiler.Run
 
     for {
-      name <- Seq("Outer", "Outer$PrivateInner", "Outer$PrivateStaticInner", "Outer$PublicInner")
+      name <- Seq("Outer",
+                  "Outer$PrivateInner",
+                  "Outer$PrivateStaticInner",
+                  "Outer$PublicInner")
       clazz = compiler.rootMirror.staticClass(name)
       constr <- clazz.info.member(termNames.CONSTRUCTOR).alternatives
     } {

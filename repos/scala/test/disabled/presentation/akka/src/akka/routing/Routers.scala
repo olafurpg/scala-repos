@@ -1,15 +1,15 @@
 /**
- * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
- */
-
+  * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
+  */
 package akka.routing
 
-import akka.actor.{ UntypedActor, Actor, ActorRef }
+import akka.actor.{UntypedActor, Actor, ActorRef}
 
 /**
- * A Dispatcher is a trait whose purpose is to route incoming messages to actors.
- */
-trait Dispatcher { this: Actor =>
+  * A Dispatcher is a trait whose purpose is to route incoming messages to actors.
+  */
+trait Dispatcher {
+  this: Actor =>
 
   protected def transform(msg: Any): Any = msg
 
@@ -27,12 +27,13 @@ trait Dispatcher { this: Actor =>
 
   def receive = dispatch
 
-  private def isSenderDefined = self.senderFuture.isDefined || self.sender.isDefined
+  private def isSenderDefined =
+    self.senderFuture.isDefined || self.sender.isDefined
 }
 
 /**
- * An UntypedDispatcher is an abstract class whose purpose is to route incoming messages to actors.
- */
+  * An UntypedDispatcher is an abstract class whose purpose is to route incoming messages to actors.
+  */
 abstract class UntypedDispatcher extends UntypedActor {
   protected def transform(msg: Any): Any = msg
 
@@ -40,14 +41,17 @@ abstract class UntypedDispatcher extends UntypedActor {
 
   protected def broadcast(message: Any) {}
 
-  private def isSenderDefined = self.senderFuture.isDefined || self.sender.isDefined
+  private def isSenderDefined =
+    self.senderFuture.isDefined || self.sender.isDefined
 
   @throws(classOf[Exception])
   def onReceive(msg: Any): Unit = {
-    if (msg.isInstanceOf[Routing.Broadcast]) broadcast(msg.asInstanceOf[Routing.Broadcast].message)
+    if (msg.isInstanceOf[Routing.Broadcast])
+      broadcast(msg.asInstanceOf[Routing.Broadcast].message)
     else {
       val r = route(msg)
-      if (r eq null) throw new IllegalStateException("No route for " + msg + " defined!")
+      if (r eq null)
+        throw new IllegalStateException("No route for " + msg + " defined!")
       if (isSenderDefined) r.forward(transform(msg))(someSelf)
       else r.!(transform(msg))(None)
     }
@@ -55,9 +59,9 @@ abstract class UntypedDispatcher extends UntypedActor {
 }
 
 /**
- * A LoadBalancer is a specialized kind of Dispatcher, that is supplied an InfiniteIterator of targets
- * to dispatch incoming messages to.
- */
+  * A LoadBalancer is a specialized kind of Dispatcher, that is supplied an InfiniteIterator of targets
+  * to dispatch incoming messages to.
+  */
 trait LoadBalancer extends Dispatcher { self: Actor =>
   protected def seq: InfiniteIterator[ActorRef]
 
@@ -71,9 +75,9 @@ trait LoadBalancer extends Dispatcher { self: Actor =>
 }
 
 /**
- * A UntypedLoadBalancer is a specialized kind of UntypedDispatcher, that is supplied an InfiniteIterator of targets
- * to dispatch incoming messages to.
- */
+  * A UntypedLoadBalancer is a specialized kind of UntypedDispatcher, that is supplied an InfiniteIterator of targets
+  * to dispatch incoming messages to.
+  */
 abstract class UntypedLoadBalancer extends UntypedDispatcher {
   protected def seq: InfiniteIterator[ActorRef]
 

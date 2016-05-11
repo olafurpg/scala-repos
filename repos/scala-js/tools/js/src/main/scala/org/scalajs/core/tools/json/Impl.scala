@@ -32,5 +32,4 @@ private[json] object Impl extends AbstractJSONImpl {
 
   def deserialize(reader: Reader): Repr =
     deserialize(IO.readReaderToString(reader))
-
 }

@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.lang
 
@@ -76,7 +76,7 @@ class FloatTest {
     // represented by doubles (but the literal is emitted as
     // float). Therefore there may be some imprecision. This is
     // documented as semantic difference.
-    assertEquals("1.2", 1.2f.toString.substring(0,3))
+    assertEquals("1.2", 1.2f.toString.substring(0, 3))
   }
 
   @Test def should_parse_strings(): Unit = {
@@ -153,8 +153,8 @@ class FloatTest {
   @Test def `isInfinite_- #515`(): Unit = {
     assertTrue(Float.PositiveInfinity.isInfinite)
     assertTrue(Float.NegativeInfinity.isInfinite)
-    assertTrue((1f/0).isInfinite)
-    assertTrue((-1f/0).isInfinite)
+    assertTrue((1f / 0).isInfinite)
+    assertTrue((-1f / 0).isInfinite)
     assertFalse(0f.isInfinite)
   }
 
@@ -177,9 +177,10 @@ class FloatTest {
 
   @Test def intBitsToFloat(): Unit = {
     def isZero(v: Float, neg: Boolean): Boolean = {
-      (v == 0.0f) && (1 / v == (
-          if (neg) Float.NegativeInfinity
-          else Float.PositiveInfinity))
+      (v == 0.0f) &&
+      (1 / v ==
+          (if (neg) Float.NegativeInfinity
+           else Float.PositiveInfinity))
     }
 
     import JFloat.{intBitsToFloat => f}
@@ -200,20 +201,20 @@ class FloatTest {
     assertTrue(f(0xffffffff).isNaN) // largest negative NaN
 
     // Normal forms
-    assertEquals(1.17549435e-38f, f(0x00800000), 0.0f)  // smallest pos normal form
-    assertEquals(3.4028234e38f, f(0x7f7fffff), 0.0f)    // largest pos normal form
-    assertEquals(1.53376384e8f, f(0x4d124568), 0.0f)    // an arbitrary pos normal form
+    assertEquals(1.17549435e-38f, f(0x00800000), 0.0f) // smallest pos normal form
+    assertEquals(3.4028234e38f, f(0x7f7fffff), 0.0f) // largest pos normal form
+    assertEquals(1.53376384e8f, f(0x4d124568), 0.0f) // an arbitrary pos normal form
     assertEquals(-1.17549435e-38f, f(0x80800000), 0.0f) // smallest neg normal form
-    assertEquals(-3.4028234e38f, f(0xff7fffff), 0.0f)   // largest neg normal form
-    assertEquals(-1.53376384e8f, f(0xcd124568), 0.0f)   // an arbitrary neg normal form
+    assertEquals(-3.4028234e38f, f(0xff7fffff), 0.0f) // largest neg normal form
+    assertEquals(-1.53376384e8f, f(0xcd124568), 0.0f) // an arbitrary neg normal form
 
     // Subnormal forms
-    assertEquals(Float.MinPositiveValue, f(0x00000001), 0.0f)  // smallest pos subnormal form
-    assertEquals(1.1754942e-38f, f(0x007fffff), 0.0f)          // largest pos subnormal form
-    assertEquals(1.1421059e-38f, f(0x007c5d44), 0.0f)          // an arbitrary pos subnormal form
+    assertEquals(Float.MinPositiveValue, f(0x00000001), 0.0f) // smallest pos subnormal form
+    assertEquals(1.1754942e-38f, f(0x007fffff), 0.0f) // largest pos subnormal form
+    assertEquals(1.1421059e-38f, f(0x007c5d44), 0.0f) // an arbitrary pos subnormal form
     assertEquals(-Float.MinPositiveValue, f(0x80000001), 0.0f) // smallest neg subnormal form
-    assertEquals(-1.1754942e-38f, f(0x807fffff), 0.0f)         // largest neg subnormal form
-    assertEquals(-1.1421059e-38f, f(0x807c5d44), 0.0f)         // an arbitrary neg subnormal form
+    assertEquals(-1.1754942e-38f, f(0x807fffff), 0.0f) // largest neg subnormal form
+    assertEquals(-1.1421059e-38f, f(0x807c5d44), 0.0f) // an arbitrary neg subnormal form
   }
 
   @Test def floatToIntBits(): Unit = {
@@ -227,19 +228,19 @@ class FloatTest {
     assertEquals(0x7fc00000, f(Float.NaN)) // canonical NaN
 
     // Normal forms
-    assertEquals(0x00800000, f(1.17549435e-38f))  // smallest pos normal form
-    assertEquals(0x7f7fffff, f(3.4028234e38f))    // largest pos normal form
-    assertEquals(0x4d124568, f(1.53376384e8f))    // an arbitrary pos normal form
+    assertEquals(0x00800000, f(1.17549435e-38f)) // smallest pos normal form
+    assertEquals(0x7f7fffff, f(3.4028234e38f)) // largest pos normal form
+    assertEquals(0x4d124568, f(1.53376384e8f)) // an arbitrary pos normal form
     assertEquals(0x80800000, f(-1.17549435e-38f)) // smallest neg normal form
-    assertEquals(0xff7fffff, f(-3.4028234e38f))   // largest neg normal form
-    assertEquals(0xcd124568, f(-1.53376384e8f))   // an arbitrary neg normal form
+    assertEquals(0xff7fffff, f(-3.4028234e38f)) // largest neg normal form
+    assertEquals(0xcd124568, f(-1.53376384e8f)) // an arbitrary neg normal form
 
     // Subnormal forms
-    assertEquals(0x00000001, f(Float.MinPositiveValue))  // smallest pos subnormal form
-    assertEquals(0x007fffff, f(1.1754942e-38f))          // largest pos subnormal form
-    assertEquals(0x007c5d44, f(1.1421059e-38f))          // an arbitrary pos subnormal form
+    assertEquals(0x00000001, f(Float.MinPositiveValue)) // smallest pos subnormal form
+    assertEquals(0x007fffff, f(1.1754942e-38f)) // largest pos subnormal form
+    assertEquals(0x007c5d44, f(1.1421059e-38f)) // an arbitrary pos subnormal form
     assertEquals(0x80000001, f(-Float.MinPositiveValue)) // smallest neg subnormal form
-    assertEquals(0x807fffff, f(-1.1754942e-38f))         // largest neg subnormal form
-    assertEquals(0x807c5d44, f(-1.1421059e-38f))         // an arbitrary neg subnormal form
+    assertEquals(0x807fffff, f(-1.1754942e-38f)) // largest neg subnormal form
+    assertEquals(0x807c5d44, f(-1.1421059e-38f)) // an arbitrary neg subnormal form
   }
 }

@@ -5,51 +5,51 @@ import org.jetbrains.plugins.scala.codeInsight.intention.expression.IntroduceImp
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 /**
- * @author Ksenia.Sautina
- * @since 4/18/12
- */
-
-class IntroduceImplicitParameterIntentionTest  extends ScalaIntentionTestBase{
+  * @author Ksenia.Sautina
+  * @since 4/18/12
+  */
+class IntroduceImplicitParameterIntentionTest extends ScalaIntentionTestBase {
   def familyName = IntroduceImplicitParameterIntention.familyName
 
   def testIntroduceImplicitParameter() {
     val text = "some.map(<caret>x => x > 5)"
-    val resultText= "some.map(<caret>_ > 5)"
+    val resultText = "some.map(<caret>_ > 5)"
 
     doTest(text, resultText)
   }
 
   def testIntroduceImplicitParameter2() {
     val text = "this.myFun(<caret>x1 => x1 > 6, x2 => x2 > 9)"
-    val resultText= "this.myFun(<caret>_ > 6, x2 => x2 > 9)"
+    val resultText = "this.myFun(<caret>_ > 6, x2 => x2 > 9)"
 
     doTest(text, resultText)
   }
 
   def testIntroduceImplicitParameter3() {
     val text = "some.foreach(<caret>x => println(x))"
-    val resultText= "some.foreach(<caret>println(_))"
+    val resultText = "some.foreach(<caret>println(_))"
 
     doTest(text, resultText)
   }
 
   def testIntroduceImplicitParameter4() {
     val text = "val nameHasUpperCase = name.exists(<caret>x => x.isUpper)"
-    val resultText= "val nameHasUpperCase = name.exists(<caret>_.isUpper)"
+    val resultText = "val nameHasUpperCase = name.exists(<caret>_.isUpper)"
 
     doTest(text, resultText)
   }
 
   def testIntroduceImplicitParameter5() {
     val text = "this.myFun2(<caret>x1 => x1.isEmpty, _.isEmpty)"
-    val resultText= "this.myFun2(<caret>_.isEmpty, _.isEmpty)"
+    val resultText = "this.myFun2(<caret>_.isEmpty, _.isEmpty)"
 
     doTest(text, resultText)
   }
 
   def testIntroduceImplicitParameter6() {
-    val text = "val a: ((Int, Int, Int) => Int) = (i, i1, i2) <caret>=> i + i1 + i2 + 5"
-    val resultText= "val a: ((Int, Int, Int) => Int) = <caret>_ + _ + _ + 5"
+    val text =
+      "val a: ((Int, Int, Int) => Int) = (i, i1, i2) <caret>=> i + i1 + i2 + 5"
+    val resultText = "val a: ((Int, Int, Int) => Int) = <caret>_ + _ + _ + 5"
 
     doTest(text, resultText)
   }
@@ -64,7 +64,7 @@ class IntroduceImplicitParameterIntentionTest  extends ScalaIntentionTestBase{
     |   }
     | }
     """
-    val resultText= """
+    val resultText = """
     | val x: Int => Int = i => {
     |   i + {
     |     1 + {
@@ -83,7 +83,7 @@ class IntroduceImplicitParameterIntentionTest  extends ScalaIntentionTestBase{
 
   def testIntroduceImplicitParameter8() {
     val text = "val a: (Int => Int) = i =<caret>> i + i + i + 5"
-    val resultText= "val a: (Int => Int) = i => i + i + i + 5"
+    val resultText = "val a: (Int => Int) = i => i + i + i + 5"
 
     try {
       doTest(text, resultText)
@@ -93,8 +93,10 @@ class IntroduceImplicitParameterIntentionTest  extends ScalaIntentionTestBase{
   }
 
   def testIntroduceImplicitParameter9() {
-    val text = "val a: ((Int, Int, Int) => Int) = (i, i1, i2) =><caret> i + i2 + i1 + 5"
-    val resultText= "val a: ((Int, Int, Int) => Int) = (i, i1, i2) => i + i2 + i1 + 5"
+    val text =
+      "val a: ((Int, Int, Int) => Int) = (i, i1, i2) =><caret> i + i2 + i1 + 5"
+    val resultText =
+      "val a: ((Int, Int, Int) => Int) = (i, i1, i2) => i + i2 + i1 + 5"
 
     try {
       doTest(text, resultText)
@@ -142,6 +144,4 @@ class IntroduceImplicitParameterIntentionTest  extends ScalaIntentionTestBase{
 
     doTest(text, resultText)
   }
-
-
 }

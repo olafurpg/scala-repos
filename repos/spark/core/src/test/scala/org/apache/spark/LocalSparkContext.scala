@@ -23,7 +23,8 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.Suite
 
 /** Manages a local `sc` {@link SparkContext} variable, correctly stopping it after each test. */
-trait LocalSparkContext extends BeforeAndAfterEach with BeforeAndAfterAll { self: Suite =>
+trait LocalSparkContext extends BeforeAndAfterEach with BeforeAndAfterAll {
+  self: Suite =>
 
   @transient var sc: SparkContext = _
 
@@ -44,7 +45,6 @@ trait LocalSparkContext extends BeforeAndAfterEach with BeforeAndAfterAll { self
     LocalSparkContext.stop(sc)
     sc = null
   }
-
 }
 
 object LocalSparkContext {
@@ -64,5 +64,4 @@ object LocalSparkContext {
       stop(sc)
     }
   }
-
 }

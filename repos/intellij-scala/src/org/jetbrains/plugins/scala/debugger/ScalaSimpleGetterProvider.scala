@@ -8,13 +8,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFuncti
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class ScalaSimpleGetterProvider extends SimplePropertyGetterProvider {
   override def isInsideSimpleGetter(element: PsiElement): Boolean = {
     PsiTreeUtil.getParentOfType(element, classOf[ScFunctionDefinition]) match {
       case fun: ScFunction if fun.name == "unapply" => false
-      case ScFunctionDefinition.withBody(ScBlock(e: ScExpression)) => isSimpleEnough(e)
+      case ScFunctionDefinition.withBody(ScBlock(e: ScExpression)) =>
+        isSimpleEnough(e)
       case ScFunctionDefinition.withBody(b: ScBlock) => false
       case ScFunctionDefinition.withBody(e: ScExpression) => isSimpleEnough(e)
       case _ => false

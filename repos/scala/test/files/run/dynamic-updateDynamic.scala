@@ -25,4 +25,3 @@ class D extends Dynamic {
   def selectDynamic(name: String): Any = ???
   def updateDynamic(name: String)(value: Any): Unit = ???
 }
-

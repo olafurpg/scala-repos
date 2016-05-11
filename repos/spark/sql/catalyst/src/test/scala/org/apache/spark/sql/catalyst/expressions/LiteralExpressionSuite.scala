@@ -25,7 +25,6 @@ import org.apache.spark.sql.catalyst.util.DateTimeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.CalendarInterval
 
-
 class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("null") {
@@ -43,7 +42,8 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Literal.create(null, TimestampType), null)
     checkEvaluation(Literal.create(null, CalendarIntervalType), null)
     checkEvaluation(Literal.create(null, ArrayType(ByteType, true)), null)
-    checkEvaluation(Literal.create(null, MapType(StringType, IntegerType)), null)
+    checkEvaluation(
+        Literal.create(null, MapType(StringType, IntegerType)), null)
     checkEvaluation(Literal.create(null, StructType(Seq.empty)), null)
   }
 
@@ -56,15 +56,20 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Literal.default(FloatType), 0.0f)
     checkEvaluation(Literal.default(DoubleType), 0.0)
     checkEvaluation(Literal.default(StringType), "")
-    checkEvaluation(Literal.default(BinaryType), "".getBytes(StandardCharsets.UTF_8))
+    checkEvaluation(
+        Literal.default(BinaryType), "".getBytes(StandardCharsets.UTF_8))
     checkEvaluation(Literal.default(DecimalType.USER_DEFAULT), Decimal(0))
     checkEvaluation(Literal.default(DecimalType.SYSTEM_DEFAULT), Decimal(0))
     checkEvaluation(Literal.default(DateType), DateTimeUtils.toJavaDate(0))
-    checkEvaluation(Literal.default(TimestampType), DateTimeUtils.toJavaTimestamp(0L))
-    checkEvaluation(Literal.default(CalendarIntervalType), new CalendarInterval(0, 0L))
+    checkEvaluation(
+        Literal.default(TimestampType), DateTimeUtils.toJavaTimestamp(0L))
+    checkEvaluation(
+        Literal.default(CalendarIntervalType), new CalendarInterval(0, 0L))
     checkEvaluation(Literal.default(ArrayType(StringType)), Array())
     checkEvaluation(Literal.default(MapType(IntegerType, StringType)), Map())
-    checkEvaluation(Literal.default(StructType(StructField("a", StringType) :: Nil)), Row(""))
+    checkEvaluation(
+        Literal.default(StructType(StructField("a", StringType) :: Nil)),
+        Row(""))
   }
 
   test("boolean literals") {
@@ -84,15 +89,15 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("double literals") {
-    List(0.0, -0.0, Double.NegativeInfinity, Double.PositiveInfinity).foreach { d =>
-      checkEvaluation(Literal(d), d)
-      checkEvaluation(Literal(d.toFloat), d.toFloat)
+    List(0.0, -0.0, Double.NegativeInfinity, Double.PositiveInfinity).foreach {
+      d =>
+        checkEvaluation(Literal(d), d)
+        checkEvaluation(Literal(d.toFloat), d.toFloat)
     }
     checkEvaluation(Literal(Double.MinValue), Double.MinValue)
     checkEvaluation(Literal(Double.MaxValue), Double.MaxValue)
     checkEvaluation(Literal(Float.MinValue), Float.MinValue)
     checkEvaluation(Literal(Float.MaxValue), Float.MaxValue)
-
   }
 
   test("string literals") {
@@ -106,8 +111,10 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("binary literals") {
-    checkEvaluation(Literal.create(new Array[Byte](0), BinaryType), new Array[Byte](0))
-    checkEvaluation(Literal.create(new Array[Byte](2), BinaryType), new Array[Byte](2))
+    checkEvaluation(
+        Literal.create(new Array[Byte](0), BinaryType), new Array[Byte](0))
+    checkEvaluation(
+        Literal.create(new Array[Byte](2), BinaryType), new Array[Byte](2))
   }
 
   test("decimal") {
@@ -116,9 +123,10 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
       checkEvaluation(Literal(Decimal(d.toInt)), Decimal(d.toInt))
       checkEvaluation(Literal(Decimal(d.toLong)), Decimal(d.toLong))
       checkEvaluation(Literal(Decimal((d * 1000L).toLong, 10, 3)),
-        Decimal((d * 1000L).toLong, 10, 3))
+                      Decimal((d * 1000L).toLong, 10, 3))
       checkEvaluation(Literal(BigDecimal(d.toString)), Decimal(d))
-      checkEvaluation(Literal(new java.math.BigDecimal(d.toString)), Decimal(d))
+      checkEvaluation(Literal(new java.math.BigDecimal(d.toString)),
+                      Decimal(d))
     }
   }
 

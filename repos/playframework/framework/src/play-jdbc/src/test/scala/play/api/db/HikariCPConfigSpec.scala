@@ -4,7 +4,7 @@
 package play.api.db
 
 import com.zaxxer.hikari.HikariConfig
-import play.api.{ PlayConfig, Configuration }
+import play.api.{PlayConfig, Configuration}
 
 import org.specs2.specification.Scope
 import org.specs2.mutable.Specification
@@ -15,29 +15,35 @@ class HikariCPConfigSpec extends Specification {
   "When reading configuration" should {
 
     "set dataSourceClassName when present" in new Configs {
-      val config = from("hikaricp.dataSourceClassName" -> "org.postgresql.ds.PGPoolingDataSource")
-      new HikariCPConfig(DatabaseConfig(None, None, None, None, None), config)
-        .toHikariConfig.getDataSourceClassName must beEqualTo("org.postgresql.ds.PGPoolingDataSource")
+      val config = from(
+          "hikaricp.dataSourceClassName" -> "org.postgresql.ds.PGPoolingDataSource")
+      new HikariCPConfig(DatabaseConfig(None, None, None, None, None), config).toHikariConfig.getDataSourceClassName must beEqualTo(
+          "org.postgresql.ds.PGPoolingDataSource")
     }
 
     "set dataSource sub properties" in new Configs {
       val config = from(
-        "hikaricp.dataSource.user" -> "user",
-        "hikaricp.dataSource.password" -> "password"
+          "hikaricp.dataSource.user" -> "user",
+          "hikaricp.dataSource.password" -> "password"
       )
-      val hikariConfig: HikariConfig = new HikariCPConfig(dbConfig, config).toHikariConfig
+      val hikariConfig: HikariConfig =
+        new HikariCPConfig(dbConfig, config).toHikariConfig
 
-      hikariConfig.getDataSourceProperties.getProperty("user") must beEqualTo("user")
-      hikariConfig.getDataSourceProperties.getProperty("password") must beEqualTo("password")
+      hikariConfig.getDataSourceProperties.getProperty("user") must beEqualTo(
+          "user")
+      hikariConfig.getDataSourceProperties.getProperty("password") must beEqualTo(
+          "password")
     }
 
     "set database url" in new Configs {
-      new HikariCPConfig(dbConfig, reference).toHikariConfig.getJdbcUrl must beEqualTo("jdbc:h2:mem:")
+      new HikariCPConfig(dbConfig, reference).toHikariConfig.getJdbcUrl must beEqualTo(
+          "jdbc:h2:mem:")
     }
 
     "set connectionInitSql config" in new Configs {
       val config = from("hikaricp.connectionInitSql" -> "SELECT 1")
-      new HikariCPConfig(dbConfig, config).toHikariConfig.getConnectionInitSql must beEqualTo("SELECT 1")
+      new HikariCPConfig(dbConfig, config).toHikariConfig.getConnectionInitSql must beEqualTo(
+          "SELECT 1")
     }
 
     "respect the defaults as" in {
@@ -46,27 +52,33 @@ class HikariCPConfigSpec extends Specification {
       }
 
       "connectionTimeout to 30 seconds" in new Configs {
-        new HikariCPConfig(dbConfig, reference).toHikariConfig.getConnectionTimeout must beEqualTo(30.seconds.toMillis)
+        new HikariCPConfig(dbConfig, reference).toHikariConfig.getConnectionTimeout must beEqualTo(
+            30.seconds.toMillis)
       }
 
       "idleTimeout to 10 minutes" in new Configs {
-        new HikariCPConfig(dbConfig, reference).toHikariConfig.getIdleTimeout must beEqualTo(10.minutes.toMillis)
+        new HikariCPConfig(dbConfig, reference).toHikariConfig.getIdleTimeout must beEqualTo(
+            10.minutes.toMillis)
       }
 
       "maxLifetime to 30 minutes" in new Configs {
-        new HikariCPConfig(dbConfig, reference).toHikariConfig.getMaxLifetime must beEqualTo(30.minutes.toMillis)
+        new HikariCPConfig(dbConfig, reference).toHikariConfig.getMaxLifetime must beEqualTo(
+            30.minutes.toMillis)
       }
 
       "validationTimeout to 5 seconds" in new Configs {
-        new HikariCPConfig(dbConfig, reference).toHikariConfig.getValidationTimeout must beEqualTo(5.seconds.toMillis)
+        new HikariCPConfig(dbConfig, reference).toHikariConfig.getValidationTimeout must beEqualTo(
+            5.seconds.toMillis)
       }
 
       "minimumIdle to 10" in new Configs {
-        new HikariCPConfig(dbConfig, reference).toHikariConfig.getMinimumIdle must beEqualTo(10)
+        new HikariCPConfig(dbConfig, reference).toHikariConfig.getMinimumIdle must beEqualTo(
+            10)
       }
 
       "maximumPoolSize to 10" in new Configs {
-        new HikariCPConfig(dbConfig, reference).toHikariConfig.getMaximumPoolSize must beEqualTo(10)
+        new HikariCPConfig(dbConfig, reference).toHikariConfig.getMaximumPoolSize must beEqualTo(
+            10)
       }
 
       "initializationFailFast to true" in new Configs {
@@ -90,7 +102,8 @@ class HikariCPConfigSpec extends Specification {
       }
 
       "leakDetectionThreshold to 0 (zero)" in new Configs {
-        new HikariCPConfig(dbConfig, reference).toHikariConfig.getLeakDetectionThreshold must beEqualTo(0)
+        new HikariCPConfig(dbConfig, reference).toHikariConfig.getLeakDetectionThreshold must beEqualTo(
+            0)
       }
     }
 
@@ -102,35 +115,41 @@ class HikariCPConfigSpec extends Specification {
 
       "connectionTimeout" in new Configs {
         val config = from("hikaricp.connectionTimeout" -> "40 seconds")
-        new HikariCPConfig(dbConfig, config).toHikariConfig.getConnectionTimeout must beEqualTo(40.seconds.toMillis)
+        new HikariCPConfig(dbConfig, config).toHikariConfig.getConnectionTimeout must beEqualTo(
+            40.seconds.toMillis)
       }
 
       "idleTimeout" in new Configs {
         val config = from("hikaricp.idleTimeout" -> "5 minutes")
-        new HikariCPConfig(dbConfig, config).toHikariConfig.getIdleTimeout must beEqualTo(5.minutes.toMillis)
+        new HikariCPConfig(dbConfig, config).toHikariConfig.getIdleTimeout must beEqualTo(
+            5.minutes.toMillis)
       }
 
       "maxLifetime" in new Configs {
         val config = from("hikaricp.maxLifetime" -> "15 minutes")
-        new HikariCPConfig(dbConfig, config).toHikariConfig.getMaxLifetime must beEqualTo(15.minutes.toMillis)
+        new HikariCPConfig(dbConfig, config).toHikariConfig.getMaxLifetime must beEqualTo(
+            15.minutes.toMillis)
       }
 
       "validationTimeout" in new Configs {
         val config = from("hikaricp.validationTimeout" -> "10 seconds")
-        new HikariCPConfig(dbConfig, config).toHikariConfig.getValidationTimeout must beEqualTo(10.seconds.toMillis)
+        new HikariCPConfig(dbConfig, config).toHikariConfig.getValidationTimeout must beEqualTo(
+            10.seconds.toMillis)
       }
 
       "minimumIdle" in new Configs {
         val config = from(
-          "hikaricp.minimumIdle" -> "20",
-          "hikaricp.maximumPoolSize" -> "40"
+            "hikaricp.minimumIdle" -> "20",
+            "hikaricp.maximumPoolSize" -> "40"
         )
-        new HikariCPConfig(dbConfig, config).toHikariConfig.getMinimumIdle must beEqualTo(20)
+        new HikariCPConfig(dbConfig, config).toHikariConfig.getMinimumIdle must beEqualTo(
+            20)
       }
 
       "maximumPoolSize" in new Configs {
         val config = from("hikaricp.maximumPoolSize" -> "20")
-        new HikariCPConfig(dbConfig, config).toHikariConfig.getMaximumPoolSize must beEqualTo(20)
+        new HikariCPConfig(dbConfig, config).toHikariConfig.getMaximumPoolSize must beEqualTo(
+            20)
       }
 
       "initializationFailFast" in new Configs {
@@ -155,14 +174,19 @@ class HikariCPConfigSpec extends Specification {
 
       "leakDetectionThreshold" in new Configs {
         val config = from("hikaricp.leakDetectionThreshold" -> "3 seconds")
-        new HikariCPConfig(dbConfig, config).toHikariConfig.getLeakDetectionThreshold must beEqualTo(3000L)
+        new HikariCPConfig(dbConfig, config).toHikariConfig.getLeakDetectionThreshold must beEqualTo(
+            3000L)
       }
     }
   }
 }
 
 trait Configs extends Scope {
-  val dbConfig = DatabaseConfig(Some("org.h2.Driver"), Some("jdbc:h2:mem:"), None, None, None)
-  val reference = PlayConfig(Configuration.reference).get[PlayConfig]("play.db.prototype")
-  def from(props: (String, String)*) = PlayConfig(Configuration(reference.underlying) ++ Configuration.from(props.toMap))
+  val dbConfig = DatabaseConfig(
+      Some("org.h2.Driver"), Some("jdbc:h2:mem:"), None, None, None)
+  val reference =
+    PlayConfig(Configuration.reference).get[PlayConfig]("play.db.prototype")
+  def from(props: (String, String)*) =
+    PlayConfig(
+        Configuration(reference.underlying) ++ Configuration.from(props.toMap))
 }

@@ -1,4 +1,4 @@
-object Foo { def eq(x:Int) = x }
+object Foo { def eq(x: Int) = x }
 
 class X { def ==(other: String) = true }
 

@@ -24,46 +24,50 @@ import org.apache.spark.ml.param.{Param, ParamMap, Params}
 import org.apache.spark.sql.types.StructType
 
 /**
- * :: DeveloperApi ::
- * Common params for [[TrainValidationSplitParams]] and [[CrossValidatorParams]].
- */
+  * :: DeveloperApi ::
+  * Common params for [[TrainValidationSplitParams]] and [[CrossValidatorParams]].
+  */
 @DeveloperApi
 private[ml] trait ValidatorParams extends Params {
 
   /**
-   * param for the estimator to be validated
-   *
-   * @group param
-   */
-  val estimator: Param[Estimator[_]] = new Param(this, "estimator", "estimator for selection")
+    * param for the estimator to be validated
+    *
+    * @group param
+    */
+  val estimator: Param[Estimator[_]] = new Param(
+      this, "estimator", "estimator for selection")
 
   /** @group getParam */
   def getEstimator: Estimator[_] = $(estimator)
 
   /**
-   * param for estimator param maps
-   *
-   * @group param
-   */
-  val estimatorParamMaps: Param[Array[ParamMap]] =
-    new Param(this, "estimatorParamMaps", "param maps for the estimator")
+    * param for estimator param maps
+    *
+    * @group param
+    */
+  val estimatorParamMaps: Param[Array[ParamMap]] = new Param(
+      this, "estimatorParamMaps", "param maps for the estimator")
 
   /** @group getParam */
   def getEstimatorParamMaps: Array[ParamMap] = $(estimatorParamMaps)
 
   /**
-   * param for the evaluator used to select hyper-parameters that maximize the validated metric
-   *
-   * @group param
-   */
-  val evaluator: Param[Evaluator] = new Param(this, "evaluator",
-    "evaluator used to select hyper-parameters that maximize the validated metric")
+    * param for the evaluator used to select hyper-parameters that maximize the validated metric
+    *
+    * @group param
+    */
+  val evaluator: Param[Evaluator] = new Param(
+      this,
+      "evaluator",
+      "evaluator used to select hyper-parameters that maximize the validated metric")
 
   /** @group getParam */
   def getEvaluator: Evaluator = $(evaluator)
 
   protected def transformSchemaImpl(schema: StructType): StructType = {
-    require($(estimatorParamMaps).nonEmpty, s"Validator requires non-empty estimatorParamMaps")
+    require($(estimatorParamMaps).nonEmpty,
+            s"Validator requires non-empty estimatorParamMaps")
     val firstEstimatorParamMap = $(estimatorParamMaps).head
     val est = $(estimator)
     for (paramMap <- $(estimatorParamMaps).tail) {

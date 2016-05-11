@@ -21,13 +21,13 @@ package breeze.linalg
 import org.scalatest.FunSuite
 
 /**
- * TODO
- *
- * @author dlwh
- **/
+  * TODO
+  *
+  * @author dlwh
+  **/
 class softmaxTest extends FunSuite {
   test("softmax on negative infinities works") {
-    assert(softmax(Array(Double.NegativeInfinity, Double.NegativeInfinity)) === Double.NegativeInfinity)
+    assert(
+        softmax(Array(Double.NegativeInfinity, Double.NegativeInfinity)) === Double.NegativeInfinity)
   }
-
 }

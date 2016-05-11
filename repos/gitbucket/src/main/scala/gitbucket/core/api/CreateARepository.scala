@@ -1,9 +1,9 @@
 package gitbucket.core.api
 
 /**
- * https://developer.github.com/v3/repos/#create
- * api form
- */
+  * https://developer.github.com/v3/repos/#create
+  * api form
+  */
 case class CreateARepository(
     name: String,
     description: Option[String],
@@ -11,9 +11,7 @@ case class CreateARepository(
     auto_init: Boolean = false
 ) {
   def isValid: Boolean = {
-    name.length<=40 &&
-        name.matches("[a-zA-Z0-9\\-\\+_.]+") &&
-        !name.startsWith("_") &&
-        !name.startsWith("-")
+    name.length <= 40 && name.matches("[a-zA-Z0-9\\-\\+_.]+") &&
+    !name.startsWith("_") && !name.startsWith("-")
   }
 }

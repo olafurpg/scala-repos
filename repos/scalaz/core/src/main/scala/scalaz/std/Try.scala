@@ -20,10 +20,10 @@ trait TryFunctions {
   def toValidation[A](t: Try[A]): Validation[Throwable, A] =
     cata(t)(Validation.success, Validation.failure)
 
-  def toValidationNel[A](t: Try[A]) : ValidationNel[Throwable, A] =
+  def toValidationNel[A](t: Try[A]): ValidationNel[Throwable, A] =
     cata(t)(Validation.success, Validation.failureNel)
 
-  def fromValidation[T <: Throwable, A](v: Validation[T, A]) : Try[A] =
+  def fromValidation[T <: Throwable, A](v: Validation[T, A]): Try[A] =
     v.fold(Failure.apply, Success.apply)
 }
 

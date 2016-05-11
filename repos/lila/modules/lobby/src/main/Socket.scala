@@ -16,30 +16,32 @@ import lila.game.AnonCookie
 import lila.hub.actorApi.game.ChangeFeatured
 import lila.hub.actorApi.lobby._
 import lila.hub.actorApi.timeline._
-import lila.socket.actorApi.{ Connected => _, _ }
-import lila.socket.{ SocketActor, History, Historical }
+import lila.socket.actorApi.{Connected => _, _}
+import lila.socket.{SocketActor, History, Historical}
 import makeTimeout.short
 
-private[lobby] final class Socket(
-    val history: History[Messadata],
-    router: akka.actor.ActorSelection,
-    uidTtl: FiniteDuration) extends SocketActor[Member](uidTtl) with Historical[Member, Messadata] {
+private[lobby] final class Socket(val history: History[Messadata],
+                                  router: akka.actor.ActorSelection,
+                                  uidTtl: FiniteDuration)
+    extends SocketActor[Member](uidTtl) with Historical[Member, Messadata] {
 
   override val startsOnApplicationBoot = true
 
   override def preStart {
     super.preStart
-    context.system.lilaBus.subscribe(self, 'changeFeaturedGame, 'streams, 'nbMembers, 'nbRounds)
+    context.system.lilaBus
+      .subscribe(self, 'changeFeaturedGame, 'streams, 'nbMembers, 'nbRounds)
   }
 
   def receiveSpecific = {
 
-    case PingVersion(uid, v) => Future {
-      ping(uid)
-      withMember(uid) { m =>
-        history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+    case PingVersion(uid, v) =>
+      Future {
+        ping(uid)
+        withMember(uid) { m =>
+          history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+        }
       }
-    }
 
     case Join(uid, user, blocks, mobile) =>
       val (enumerator, channel) = Concurrent.broadcast[JsValue]
@@ -47,11 +49,12 @@ private[lobby] final class Socket(
       addMember(uid, member)
       sender ! Connected(enumerator, member)
 
-    case ReloadTournaments(html) => notifyAllAsync(makeMessage("tournaments", html))
+    case ReloadTournaments(html) =>
+      notifyAllAsync(makeMessage("tournaments", html))
 
-    case ReloadSimuls(html)      => notifyAllAsync(makeMessage("simuls", html))
+    case ReloadSimuls(html) => notifyAllAsync(makeMessage("simuls", html))
 
-    case NewForumPost            => notifyAllAsync("reload_forum")
+    case NewForumPost => notifyAllAsync("reload_forum")
 
     case ReloadTimeline(userId) =>
       membersByUserId(userId) foreach (_ push makeMessage("reload_timeline"))
@@ -59,25 +62,27 @@ private[lobby] final class Socket(
     case AddHook(hook) =>
       notifyVersion("had", hook.render, Messadata(hook = hook.some))
 
-    case AddSeek(_)         => notifySeeks
+    case AddSeek(_) => notifySeeks
 
     case RemoveHook(hookId) => notifyVersion("hrm", hookId, Messadata())
 
-    case RemoveSeek(_)      => notifySeeks
+    case RemoveSeek(_) => notifySeeks
 
     case JoinHook(uid, hook, game, creatorColor) =>
       withMember(hook.uid)(notifyPlayerStart(game, creatorColor))
       withMember(uid)(notifyPlayerStart(game, !creatorColor))
 
     case JoinSeek(userId, seek, game, creatorColor) =>
-      membersByUserId(seek.user.id) foreach notifyPlayerStart(game, creatorColor)
+      membersByUserId(seek.user.id) foreach notifyPlayerStart(
+          game, creatorColor)
       membersByUserId(userId) foreach notifyPlayerStart(game, !creatorColor)
 
-    case HookIds(ids)                         => notifyVersion("hli", ids mkString ",", Messadata())
+    case HookIds(ids) => notifyVersion("hli", ids mkString ",", Messadata())
 
-    case lila.hub.actorApi.StreamsOnAir(html) => notifyAllAsync(makeMessage("streams", html))
+    case lila.hub.actorApi.StreamsOnAir(html) =>
+      notifyAllAsync(makeMessage("streams", html))
 
-    case NbMembers(nb)                        => pong = pong + ("d" -> JsNumber(nb))
+    case NbMembers(nb) => pong = pong + ("d" -> JsNumber(nb))
     case lila.hub.actorApi.round.NbRounds(nb) =>
       pong = pong + ("r" -> JsNumber(nb))
 
@@ -85,11 +90,14 @@ private[lobby] final class Socket(
   }
 
   private def notifyPlayerStart(game: lila.game.Game, color: chess.Color) =
-    notifyMember("redirect", Json.obj(
-      "id" -> (game fullIdOf color),
-      "url" -> playerUrl(game fullIdOf color),
-      "cookie" -> AnonCookie.json(game, color)
-    ).noNull) _
+    notifyMember("redirect",
+                 Json
+                   .obj(
+                       "id" -> (game fullIdOf color),
+                       "url" -> playerUrl(game fullIdOf color),
+                       "cookie" -> AnonCookie.json(game, color)
+                   )
+                   .noNull) _
 
   protected def shouldSkipMessageFor(message: Message, member: Member) =
     message.metadata.hook ?? { hook =>

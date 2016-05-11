@@ -9,9 +9,9 @@ import org.jetbrains.plugins.scala.lang.psi.controlFlow.ScControlFlowPolicy
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.SyntheticNamedElement
 
 /**
- * Nikolay.Tropin
- * 2014-04-14
- */
+  * Nikolay.Tropin
+  * 2014-04-14
+  */
 object ExtractMethodControlFlowPolicy extends ScControlFlowPolicy {
   override def isElementAccepted(named: PsiNamedElement): Boolean = {
     if (named.isInstanceOf[SyntheticNamedElement]) return false

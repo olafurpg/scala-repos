@@ -7,5 +7,5 @@ object Test {
 
   val a = new A
   implicit def c2fun = (c: C) => (x: String) => ""
-  a.foo("")./* resolved: true */substring(1)
+  a.foo(""). /* resolved: true */ substring(1)
 }

@@ -10,10 +10,10 @@ import scala.collection.mutable
 import scala.tools.nsc._
 
 /** Hacks to have our source code compatible with 2.10 and 2.11.
- *  It exposes 2.11 API in a 2.10 compiler.
- *
- *  @author Sébastien Doeraene
- */
+  *  It exposes 2.11 API in a 2.10 compiler.
+  *
+  *  @author Sébastien Doeraene
+  */
 trait Compat210Component {
 
   val global: Global
@@ -43,14 +43,15 @@ trait Compat210Component {
     global.exitingPhase(ph)(op)
   }
 
-  implicit final class GlobalCompat(
-      self: Compat210Component.this.global.type) {
+  implicit final class GlobalCompat(self: Compat210Component.this.global.type) {
 
     def enteringPhase[T](ph: Phase)(op: => T): T = self.beforePhase(ph)(op)
-    def beforePhase[T](ph: Phase)(op: => T): T = sys.error("infinite loop in Compat")
+    def beforePhase[T](ph: Phase)(op: => T): T =
+      sys.error("infinite loop in Compat")
 
     def exitingPhase[T](ph: Phase)(op: => T): T = self.afterPhase(ph)(op)
-    def afterPhase[T](ph: Phase)(op: => T): T = sys.error("infinite loop in Compat")
+    def afterPhase[T](ph: Phase)(op: => T): T =
+      sys.error("infinite loop in Compat")
 
     def delambdafy: DelambdafyCompat.type = DelambdafyCompat
   }
@@ -68,13 +69,15 @@ trait Compat210Component {
     definitions.SeqClass.implClass != NoSymbol // a trait we know has an impl class
 
   implicit final class StdTermNamesCompat(self: global.nme.type) {
-    def IMPL_CLASS_SUFFIX: String = sys.error("No impl classes in this version")
+    def IMPL_CLASS_SUFFIX: String =
+      sys.error("No impl classes in this version")
 
     def isImplClassName(name: Name): Boolean = false
   }
 
   implicit final class StdTypeNamesCompat(self: global.tpnme.type) {
-    def IMPL_CLASS_SUFFIX: String = sys.error("No impl classes in this version")
+    def IMPL_CLASS_SUFFIX: String =
+      sys.error("No impl classes in this version")
 
     def interfaceName(implname: Name): TypeName =
       sys.error("No impl classes in this version")
@@ -93,8 +96,10 @@ trait Compat210Component {
    */
 
   object LowPrioGenBCodeCompat {
-    object genBCode { // scalastyle:ignore
-      object bTypes { // scalastyle:ignore
+    object genBCode {
+      // scalastyle:ignore
+      object bTypes {
+        // scalastyle:ignore
         def initializeCoreBTypes(): Unit = ()
       }
     }
@@ -138,14 +143,13 @@ trait Compat210Component {
       }
 
       private def skipIgnoredEntries(): Unit = {
-        while (cursor.hasNext && ignoreNextEntry)
-          cursor.next()
+        while (cursor.hasNext && ignoreNextEntry) cursor.next()
       }
 
       /** In 2.10 the overridingPairs.Cursor returns some false positives
-       *  on overriding members. The known false positives are always trying to
-       *  override the `isInstanceOf` method.
-       */
+        *  on overriding members. The known false positives are always trying to
+        *  override the `isInstanceOf` method.
+        */
       private def ignoreNextEntry: Boolean =
         cursor.overriding.name == nme.isInstanceOf_
     }
@@ -153,8 +157,8 @@ trait Compat210Component {
     class SymbolPair(val low: Symbol, val high: Symbol)
 
     /** To make this compat code compile in 2.11 as the fields `overriding` and
-     *  `overridden` are only present in 2.10.
-     */
+      *  `overridden` are only present in 2.10.
+      */
     private implicit class Cursor210toCursor211(cursor: overridingPairs.Cursor) {
       def overriding: Symbol = sys.error("infinite loop in Compat")
       def overridden: Symbol = sys.error("infinite loop in Compat")
@@ -183,7 +187,6 @@ trait Compat210Component {
       case TypeRef(_, self.RepeatedParamClass, arg :: Nil) => arg
       case _ => t
     }
-
   }
 
   // run.runDefinitions bundles methods and state related to the run
@@ -210,8 +213,10 @@ object Compat210Component {
     }
   }
 
-  private implicit final class AnalyzerCompat(self: scala.tools.nsc.typechecker.Analyzer) {
-    def FUNmode = { // scalastyle:ignore
+  private implicit final class AnalyzerCompat(
+      self: scala.tools.nsc.typechecker.Analyzer) {
+    def FUNmode = {
+      // scalastyle:ignore
       import Compat210Component.LowPriorityMode._
       {
         import scala.reflect.internal._

@@ -1,17 +1,19 @@
 package fastparse.core
 import acyclic.file
+
 /**
- * Something which contains an operator precedence, which can be used
- * to correctly wrap other things which contain lower precedences in 
- * parentheses when stringifying.
- */
-trait Precedence{
+  * Something which contains an operator precedence, which can be used
+  * to correctly wrap other things which contain lower precedences in 
+  * parentheses when stringifying.
+  */
+trait Precedence {
   protected def opPred: Int
   protected def opWrap(s: Precedence) = Precedence.opWrap(s, opPred)
 }
+
 /**
- * All the level of operator precedence in Scala
- */
+  * All the level of operator precedence in Scala
+  */
 object Precedence {
   def opWrap(s: Precedence, selfOpPred: Int) = {
     if (s.opPred >= selfOpPred) s.toString
@@ -29,5 +31,4 @@ object Precedence {
   val OtherOp = 9
   val PrefixOp = 10
   val Max = 11
-
 }

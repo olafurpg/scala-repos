@@ -12,24 +12,25 @@ import org.scalatest.concurrent.{IntegrationPatience, Conductors}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
-private class BalancerTest extends FunSuite
-  with Conductors
-  with IntegrationPatience
-  with GeneratorDrivenPropertyChecks {
+private class BalancerTest
+    extends FunSuite with Conductors with IntegrationPatience
+    with GeneratorDrivenPropertyChecks {
 
   private class TestBalancer(
       protected val statsReceiver: InMemoryStatsReceiver = new InMemoryStatsReceiver)
-    extends Balancer[Unit, Unit] {
+      extends Balancer[Unit, Unit] {
     def maxEffort: Int = 5
     def emptyException: Throwable = ???
 
     def stats: InMemoryStatsReceiver = statsReceiver
-    protected[this] val maxEffortExhausted = statsReceiver.counter("max_effort_exhausted")
+    protected[this] val maxEffortExhausted =
+      statsReceiver.counter("max_effort_exhausted")
 
     def nodes: Vector[Node] = dist.vector
     def factories: Set[ServiceFactory[Unit, Unit]] = nodes.map(_.factory).toSet
 
-    def nodeOf(fac: ServiceFactory[Unit, Unit]) = nodes.find(_.factory == fac).get
+    def nodeOf(fac: ServiceFactory[Unit, Unit]) =
+      nodes.find(_.factory == fac).get
 
     def _dist() = dist
     def _rebuild() = rebuild()
@@ -37,35 +38,38 @@ private class BalancerTest extends FunSuite
     def rebuildDistributor() {}
 
     case class Distributor(vector: Vector[Node], gen: Int = 1)
-      extends DistributorT[Node] {
+        extends DistributorT[Node] {
       type This = Distributor
       def pick(): Node = vector.head
       def needsRebuild = false
       def rebuild(): This = {
         rebuildDistributor()
-        copy(gen=gen+1)
+        copy(gen = gen + 1)
       }
       def rebuild(vector: Vector[Node]): This = {
         rebuildDistributor()
-        copy(vector, gen=gen+1)
+        copy(vector, gen = gen + 1)
       }
     }
 
-    class Node(val factory: ServiceFactory[Unit, Unit]) extends NodeT[Unit, Unit] {
+    class Node(val factory: ServiceFactory[Unit, Unit])
+        extends NodeT[Unit, Unit] {
       type This = Node
       def load: Double = ???
       def pending: Int = ???
       def token: Int = ???
-      def close(deadline: Time): Future[Unit] = TestBalancer.this.synchronized {
-        factory.close()
-        Future.Done
-      }
-      def apply(conn: ClientConnection): Future[Service[Unit,Unit]] = Future.never
+      def close(deadline: Time): Future[Unit] =
+        TestBalancer.this.synchronized {
+          factory.close()
+          Future.Done
+        }
+      def apply(conn: ClientConnection): Future[Service[Unit, Unit]] =
+        Future.never
     }
 
     protected def newNode(
-      factory: ServiceFactory[Unit, Unit],
-      statsReceiver: StatsReceiver
+        factory: ServiceFactory[Unit, Unit],
+        statsReceiver: StatsReceiver
     ): Node = new Node(factory)
 
     protected def failingNode(cause: Throwable): Node = ???
@@ -88,8 +92,9 @@ private class BalancerTest extends FunSuite
 
   val genStatus = Gen.oneOf(Status.Open, Status.Busy, Status.Closed)
   val genSvcFac = genStatus.map(newFac)
-  val genLoadedNode = for(fac  <- genSvcFac) yield fac
-  val genNodes = Gen.containerOf[List, ServiceFactory[Unit,Unit]](genLoadedNode)
+  val genLoadedNode = for (fac <- genSvcFac) yield fac
+  val genNodes =
+    Gen.containerOf[List, ServiceFactory[Unit, Unit]](genLoadedNode)
 
   test("status: balancer with no nodes is Closed") {
     val bal = new TestBalancer
@@ -101,7 +106,8 @@ private class BalancerTest extends FunSuite
     forAll(genNodes) { loadedNodes =>
       val bal = new TestBalancer
       bal.update(loadedNodes)
-      val best = Status.bestOf[ServiceFactory[Unit,Unit]](loadedNodes, _.status)
+      val best =
+        Status.bestOf[ServiceFactory[Unit, Unit]](loadedNodes, _.status)
       assert(bal.status == best)
     }
   }
@@ -158,8 +164,7 @@ private class BalancerTest extends FunSuite
     assert(size() == 3)
     assert(adds() == 3)
     assert(rems() == 0)
-    for (f <- Seq(f1, f2, f3))
-      assert(f.ncloses == 0)
+    for (f <- Seq(f1, f2, f3)) assert(f.ncloses == 0)
 
     bal.update(Seq(f1, f3))
     assert(size() == 2)
@@ -178,46 +183,46 @@ private class BalancerTest extends FunSuite
   }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1685
-  test("Coalesces updates") {
-    val conductor = new Conductor
-    import conductor._
+    test("Coalesces updates") {
+      val conductor = new Conductor
+      import conductor._
 
-    val bal = new TestBalancer {
-      val beat = new AtomicInteger(1)
-      @volatile var updateThreads: Set[Long] = Set.empty
+      val bal = new TestBalancer {
+        val beat = new AtomicInteger(1)
+        @volatile var updateThreads: Set[Long] = Set.empty
 
-      override def rebuildDistributor() {
-        synchronized { updateThreads += Thread.currentThread.getId() }
-        waitForBeat(beat.getAndIncrement())
-        waitForBeat(beat.getAndIncrement())
+        override def rebuildDistributor() {
+          synchronized { updateThreads += Thread.currentThread.getId() }
+          waitForBeat(beat.getAndIncrement())
+          waitForBeat(beat.getAndIncrement())
+        }
+      }
+      val f1, f2, f3 = newFac()
+
+      @volatile var thread1Id: Long = -1
+
+      thread("updater1") {
+        thread1Id = Thread.currentThread.getId()
+        bal.update(Seq.empty) // waits for 1, 2
+        // (then waits for 3, 4, in this thread)
+      }
+
+      thread("updater2") {
+        waitForBeat(1)
+        bal._rebuild()
+        bal.update(Seq(f1))
+        bal.update(Seq(f2))
+        bal._rebuild()
+        bal.update(Seq(f3))
+        bal._rebuild()
+        assert(beat == 1)
+        waitForBeat(2)
+      }
+
+      whenFinished {
+        assert(bal.factories == Set(f3))
+        assert(bal._dist().gen == 3)
+        assert(bal.updateThreads == Set(thread1Id))
       }
     }
-    val f1, f2, f3 = newFac()
-
-    @volatile var thread1Id: Long = -1
-
-    thread("updater1") {
-      thread1Id = Thread.currentThread.getId()
-      bal.update(Seq.empty) // waits for 1, 2
-      // (then waits for 3, 4, in this thread)
-    }
-
-    thread("updater2") {
-      waitForBeat(1)
-      bal._rebuild()
-      bal.update(Seq(f1))
-      bal.update(Seq(f2))
-      bal._rebuild()
-      bal.update(Seq(f3))
-      bal._rebuild()
-      assert(beat == 1)
-      waitForBeat(2)
-    }
-
-    whenFinished {
-      assert(bal.factories == Set(f3))
-      assert(bal._dist().gen == 3)
-      assert(bal.updateThreads == Set(thread1Id))
-    }
-  }
 }

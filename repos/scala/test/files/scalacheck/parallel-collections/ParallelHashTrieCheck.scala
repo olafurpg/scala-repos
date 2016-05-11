@@ -1,8 +1,6 @@
 package scala.collection.parallel
 package immutable
 
-
-
 import org.scalacheck._
 import org.scalacheck.Gen
 import org.scalacheck.Gen._
@@ -13,8 +11,8 @@ import org.scalacheck.Arbitrary._
 import scala.collection._
 import scala.collection.parallel.ops._
 
-
-abstract class ParallelHashMapCheck[K, V](tp: String) extends ParallelMapCheck[K, V]("immutable.ParHashMap[" + tp + "]") {
+abstract class ParallelHashMapCheck[K, V](tp: String)
+    extends ParallelMapCheck[K, V]("immutable.ParHashMap[" + tp + "]") {
   // ForkJoinTasks.defaultForkJoinPool.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
   // ForkJoinTasks.defaultForkJoinPool.setParallelism(Runtime.getRuntime.availableProcessors * 2)
 
@@ -43,14 +41,11 @@ abstract class ParallelHashMapCheck[K, V](tp: String) extends ParallelMapCheck[K
     }
     phm
   }
-
 }
 
-
-class IntIntParallelHashMapCheck(val tasksupport: TaskSupport) extends ParallelHashMapCheck[Int, Int]("Int, Int")
-with PairOperators[Int, Int]
-with PairValues[Int, Int]
-{
+class IntIntParallelHashMapCheck(val tasksupport: TaskSupport)
+    extends ParallelHashMapCheck[Int, Int]("Int, Int")
+    with PairOperators[Int, Int] with PairValues[Int, Int] {
   def intvalues = new IntValues {}
   def kvalues = intvalues.values
   def vvalues = intvalues.values
@@ -67,9 +62,8 @@ with PairValues[Int, Int]
   }
 }
 
-
-
-abstract class ParallelHashSetCheck[T](tp: String) extends ParallelSetCheck[T]("immutable.ParHashSet[" + tp + "]") {
+abstract class ParallelHashSetCheck[T](tp: String)
+    extends ParallelSetCheck[T]("immutable.ParHashSet[" + tp + "]") {
   // ForkJoinTasks.defaultForkJoinPool.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
   // ForkJoinTasks.defaultForkJoinPool.setParallelism(Runtime.getRuntime.availableProcessors * 2)
 
@@ -105,14 +99,10 @@ abstract class ParallelHashSetCheck[T](tp: String) extends ParallelSetCheck[T]("
     case _ =>
       println("could not match data structure type: " + ds.getClass)
   }
-
 }
 
-
-class IntParallelHashSetCheck(val tasksupport: TaskSupport) extends ParallelHashSetCheck[Int]("Int")
-with IntOperators
-with IntValues
-{
+class IntParallelHashSetCheck(val tasksupport: TaskSupport)
+    extends ParallelHashSetCheck[Int]("Int") with IntOperators with IntValues {
   def intvalues = new IntValues {}
   def kvalues = intvalues.values
   def vvalues = intvalues.values
@@ -124,21 +114,3 @@ with IntValues
       println("could not match data structure type: " + ds.getClass)
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

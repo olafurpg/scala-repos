@@ -2,8 +2,7 @@ package t1
 
 import scala.reflect.{ClassTag, classTag}
 
-trait Element[T] {
-}
+trait Element[T] {}
 
 trait Config {
   type T <: Element[T]

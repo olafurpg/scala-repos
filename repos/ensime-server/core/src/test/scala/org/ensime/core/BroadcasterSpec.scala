@@ -60,5 +60,4 @@ class BroadcasterSpec extends EnsimeSpec with SharedTestKitFixture {
     sub1.expectMsg(ping)
     sub1.lastSender shouldBe self
   }
-
 }

@@ -9,6 +9,7 @@ import scala.concurrent.Future
   * Notifies the [[TaskTracker]] of task updates.
   */
 trait TaskUpdater {
+
   /**
     * Process a status update for an existing task and either updates the tasks or removes
     * it from the TaskTracker.

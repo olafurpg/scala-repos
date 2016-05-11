@@ -27,15 +27,15 @@ object Test extends ScaladocModelTest {
     import access._
 
     def inlineToStr(inl: Inline): String = inl match {
-      case Chain(items)              => items flatMap (inlineToStr(_)) mkString ""
-      case Italic(in)                => inlineToStr(in)
-      case Bold(in)                  => inlineToStr(in)
-      case Underline(in)             => inlineToStr(in)
-      case Monospace(in)             => inlineToStr(in)
-      case Text(text)                => text
-      case Summary(in)               => inlineToStr(in)
+      case Chain(items) => items flatMap (inlineToStr(_)) mkString ""
+      case Italic(in) => inlineToStr(in)
+      case Bold(in) => inlineToStr(in)
+      case Underline(in) => inlineToStr(in)
+      case Monospace(in) => inlineToStr(in)
+      case Text(text) => text
+      case Summary(in) => inlineToStr(in)
       case EntityLink(Text(text), _) => text
-      case _                         => inl.toString
+      case _ => inl.toString
     }
 
     val foo = rootPackage._package("a")._class("Foo")

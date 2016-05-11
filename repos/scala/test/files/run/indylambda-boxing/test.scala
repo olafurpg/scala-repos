@@ -4,13 +4,37 @@ class Test {
   def test2 = (i: VC) => i
   def test3 = (i: Int) => i
 
-  def test4 = {val c = new Capture; (i: Int) => {(c, Test.this.toString); 42} }
-  def test5 = {val c = new Capture; (i: VC) => (c, Test.this.toString) }
-  def test6 = {val c = new Capture; (i: Int) => (c, Test.this.toString) }
+  def test4 = {
+    val c = new Capture;
+    (i: Int) =>
+      { (c, Test.this.toString); 42 }
+  }
+  def test5 = {
+    val c = new Capture;
+    (i: VC) =>
+      (c, Test.this.toString)
+  }
+  def test6 = {
+    val c = new Capture;
+    (i: Int) =>
+      (c, Test.this.toString)
+  }
 
-  def test7 = {val vc = new Capture; (i: Int) => vc }
-  def test8 = {val c = 42; (s: String) => (s, c)}
-  def test9 = {val c = 42; (s: String) => ()}
+  def test7 = {
+    val vc = new Capture;
+    (i: Int) =>
+      vc
+  }
+  def test8 = {
+    val c = 42;
+    (s: String) =>
+      (s, c)
+  }
+  def test9 = {
+    val c = 42;
+    (s: String) =>
+      ()
+  }
 }
 
 object Test {

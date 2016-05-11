@@ -4,7 +4,7 @@ class Test {}
 
 object O {
   def m() {
-    val test: Test = /*start*/new Test()/*end*/
+    val test: Test = /*start*/ new Test() /*end*/
   }
 }
 /*
@@ -17,4 +17,4 @@ object O {
     val test: Test = /*start*/param/*end*/
   }
 }
-*/
+ */

@@ -45,5 +45,5 @@ class StaticOnlyTest extends FunSuite {
     val pkl: JSONPickle = pickle(x)
     assert(unpickle[C](pkl).fld == 1)
   }
-  */
+ */
 }

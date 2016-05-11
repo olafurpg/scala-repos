@@ -16,10 +16,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.util.ScalaUtils
 
 /**
- * Nikolay.Tropin
- * 7/11/13
- */
-abstract class AdjustTypesTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * Nikolay.Tropin
+  * 7/11/13
+  */
+abstract class AdjustTypesTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   private val startMarker = "/*start*/"
   private val endMarker = "/*end*/"
 
@@ -30,22 +31,29 @@ abstract class AdjustTypesTestBase extends ScalaLightPlatformCodeInsightTestCase
   protected def doTest() {
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
-    val file = LocalFileSystem.getInstance.refreshAndFindFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.refreshAndFindFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
 
-    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
 
     val startOffset = fileText.indexOf(startMarker)
-    assert(startOffset != -1, "Not specified start marker in test case. Use /*start*/ in scala file for this.")
+    assert(
+        startOffset != -1,
+        "Not specified start marker in test case. Use /*start*/ in scala file for this.")
     fileText = fileText.replace(startMarker, "")
 
     val endOffset = fileText.indexOf(endMarker)
-    assert(endOffset != -1, "Not specified end marker in test case. Use /*end*/ in scala file for this.")
+    assert(
+        endOffset != -1,
+        "Not specified end marker in test case. Use /*end*/ in scala file for this.")
     fileText = fileText.replace(endMarker, "")
 
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
-    val element = PsiTreeUtil.findElementOfClassAtRange(scalaFile, startOffset, endOffset, classOf[PsiElement])
+    val element = PsiTreeUtil.findElementOfClassAtRange(
+        scalaFile, startOffset, endOffset, classOf[PsiElement])
 
     var res: String = null
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
@@ -58,11 +66,11 @@ abstract class AdjustTypesTestBase extends ScalaLightPlatformCodeInsightTestCase
         }
       }, getProjectAdapter, "Test")
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
-    }
-    catch {
+    } catch {
       case e: Exception =>
         println(e)
-        assert(assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+        assert(
+            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

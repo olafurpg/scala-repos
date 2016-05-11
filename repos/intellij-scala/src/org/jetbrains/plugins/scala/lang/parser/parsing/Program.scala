@@ -15,9 +15,9 @@ object Program {
   def parse(builder: ScalaPsiBuilder): Int = {
     var parseState = 0
     // Debug print mode off
-    DebugPrint.displayLog = false  
+    DebugPrint.displayLog = false
 
-    if ( !builder.eof() ){
+    if (!builder.eof()) {
       parseState = CompilationUnit.parse(builder)
     }
 
@@ -29,6 +29,5 @@ object Program {
     }
 
     return parseState
-
   }
 }

@@ -33,22 +33,23 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object WritablePixelFormat {
-  implicit def sfxWritablePixelFormat2jfx[B <: Buffer](wpf: WritablePixelFormat[B]): jfxsi.WritablePixelFormat[B] =
+  implicit def sfxWritablePixelFormat2jfx[B <: Buffer](
+      wpf: WritablePixelFormat[B]): jfxsi.WritablePixelFormat[B] =
     if (null == wpf) null else wpf.delegate
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/WritablePixelFormat.html]]
- */
-abstract class WritablePixelFormat[B <: Buffer](override val delegate: jfxsi.WritablePixelFormat[B])
-  extends PixelFormat(delegate)
-  with SFXDelegate[jfxsi.WritablePixelFormat[B]] {
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/WritablePixelFormat.html]]
+  */
+abstract class WritablePixelFormat[B <: Buffer](
+    override val delegate: jfxsi.WritablePixelFormat[B])
+    extends PixelFormat(delegate)
+    with SFXDelegate[jfxsi.WritablePixelFormat[B]] {
 
   /**
-   * Stores a 32-bit integer representation of the color in the buffer at the specified coordinates.
-   */
+    * Stores a 32-bit integer representation of the color in the buffer at the specified coordinates.
+    */
   def setArgb(buf: B, x: Int, y: Int, scanlineStride: Int, argb: Int) {
     delegate.setArgb(buf, x, y, scanlineStride, argb)
   }
-
 }

@@ -30,8 +30,9 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
   private val listener = parent.listener
 
   def render(request: HttpServletRequest): Seq[Node] = {
-    val content = rddTable(listener.rddInfoList) ++
-      receiverBlockTables(listener.allExecutorStreamBlockStatus.sortBy(_.executorId))
+    val content =
+      rddTable(listener.rddInfoList) ++ receiverBlockTables(
+          listener.allExecutorStreamBlockStatus.sortBy(_.executorId))
     UIUtils.headerSparkPage("Storage", content, parent)
   }
 
@@ -48,13 +49,12 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
   }
 
   /** Header fields for the RDD table */
-  private val rddHeader = Seq(
-    "RDD Name",
-    "Storage Level",
-    "Cached Partitions",
-    "Fraction Cached",
-    "Size in Memory",
-    "Size on Disk")
+  private val rddHeader = Seq("RDD Name",
+                              "Storage Level",
+                              "Cached Partitions",
+                              "Fraction Cached",
+                              "Size in Memory",
+                              "Size on Disk")
 
   /** Render an HTML row representing an RDD */
   private def rddRow(rdd: RDDInfo): Seq[Node] = {
@@ -75,12 +75,17 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     // scalastyle:on
   }
 
-  private[storage] def receiverBlockTables(statuses: Seq[ExecutorStreamBlockStatus]): Seq[Node] = {
+  private[storage] def receiverBlockTables(
+      statuses: Seq[ExecutorStreamBlockStatus]): Seq[Node] = {
     if (statuses.map(_.numStreamBlocks).sum == 0) {
       // Don't show the tables if there is no stream block
       Nil
     } else {
-      val blocks = statuses.flatMap(_.blocks).groupBy(_.blockId).toSeq.sortBy(_._1.toString)
+      val blocks = statuses
+        .flatMap(_.blocks)
+        .groupBy(_.blockId)
+        .toSeq
+        .sortBy(_._1.toString)
 
       <div>
         <h4>Receiver Blocks</h4>
@@ -90,7 +95,8 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     }
   }
 
-  private def executorMetricsTable(statuses: Seq[ExecutorStreamBlockStatus]): Seq[Node] = {
+  private def executorMetricsTable(
+      statuses: Seq[ExecutorStreamBlockStatus]): Seq[Node] = {
     <div>
       <h5>Aggregated Block Metrics by Executor</h5>
       {UIUtils.listingTable(executorMetricsTableHeader, executorMetricsTableRow, statuses,
@@ -98,14 +104,14 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     </div>
   }
 
-  private val executorMetricsTableHeader = Seq(
-    "Executor ID",
-    "Address",
-    "Total Size in Memory",
-    "Total Size on Disk",
-    "Stream Blocks")
+  private val executorMetricsTableHeader = Seq("Executor ID",
+                                               "Address",
+                                               "Total Size in Memory",
+                                               "Total Size on Disk",
+                                               "Stream Blocks")
 
-  private def executorMetricsTableRow(status: ExecutorStreamBlockStatus): Seq[Node] = {
+  private def executorMetricsTableRow(
+      status: ExecutorStreamBlockStatus): Seq[Node] = {
     <tr>
       <td>
         {status.executorId}
@@ -125,7 +131,8 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     </tr>
   }
 
-  private def streamBlockTable(blocks: Seq[(BlockId, Seq[BlockUIData])]): Seq[Node] = {
+  private def streamBlockTable(
+      blocks: Seq[(BlockId, Seq[BlockUIData])]): Seq[Node] = {
     if (blocks.isEmpty) {
       Nil
     } else {
@@ -141,27 +148,33 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     }
   }
 
-  private val streamBlockTableHeader = Seq(
-    "Block ID",
-    "Replication Level",
-    "Location",
-    "Storage Level",
-    "Size")
+  private val streamBlockTableHeader = Seq("Block ID",
+                                           "Replication Level",
+                                           "Location",
+                                           "Storage Level",
+                                           "Size")
 
   /** Render a stream block */
-  private def streamBlockTableRow(block: (BlockId, Seq[BlockUIData])): Seq[Node] = {
+  private def streamBlockTableRow(
+      block: (BlockId, Seq[BlockUIData])): Seq[Node] = {
     val replications = block._2
     assert(replications.size > 0) // This must be true because it's the result of "groupBy"
     if (replications.size == 1) {
-      streamBlockTableSubrow(block._1, replications.head, replications.size, true)
+      streamBlockTableSubrow(
+          block._1, replications.head, replications.size, true)
     } else {
-      streamBlockTableSubrow(block._1, replications.head, replications.size, true) ++
-        replications.tail.flatMap(streamBlockTableSubrow(block._1, _, replications.size, false))
+      streamBlockTableSubrow(block._1,
+                             replications.head,
+                             replications.size,
+                             true) ++ replications.tail.flatMap(
+          streamBlockTableSubrow(block._1, _, replications.size, false))
     }
   }
 
-  private def streamBlockTableSubrow(
-      blockId: BlockId, block: BlockUIData, replication: Int, firstSubrow: Boolean): Seq[Node] = {
+  private def streamBlockTableSubrow(blockId: BlockId,
+                                     block: BlockUIData,
+                                     replication: Int,
+                                     firstSubrow: Boolean): Seq[Node] = {
     val (storageLevel, size) = streamBlockStorageLevelDescriptionAndSize(block)
 
     <tr>
@@ -185,13 +198,15 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
       block: BlockUIData): (String, Long) = {
     if (block.storageLevel.useDisk) {
       ("Disk", block.diskSize)
-    } else if (block.storageLevel.useMemory && block.storageLevel.deserialized) {
+    } else if (block.storageLevel.useMemory &&
+               block.storageLevel.deserialized) {
       ("Memory", block.memSize)
-    } else if (block.storageLevel.useMemory && !block.storageLevel.deserialized) {
+    } else if (block.storageLevel.useMemory &&
+               !block.storageLevel.deserialized) {
       ("Memory Serialized", block.memSize)
     } else {
-      throw new IllegalStateException(s"Invalid Storage Level: ${block.storageLevel}")
+      throw new IllegalStateException(
+          s"Invalid Storage Level: ${block.storageLevel}")
     }
   }
-
 }

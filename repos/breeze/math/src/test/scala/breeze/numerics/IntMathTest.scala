@@ -14,16 +14,16 @@ package breeze.numerics
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-*/
+ */
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
 /**
- *
- * @author dlwh
- */
+  *
+  * @author dlwh
+  */
 @RunWith(classOf[JUnitRunner])
 class IntMathTest extends FunSuite {
   test("ipow") {
@@ -34,5 +34,4 @@ class IntMathTest extends FunSuite {
     assert(ipow(3, 3) === 27)
     assert(ipow(3, 12) === 531441)
   }
-
 }

@@ -5,11 +5,11 @@ import org.jetbrains.plugins.scala.codeInsight.intention.booleans.FlipComparison
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 /**
- * @author Ksenia.Sautina
- * @since 4/20/12
- */
-
-class FlipComparisonInMethodCallExprIntentionTest extends ScalaIntentionTestBase {
+  * @author Ksenia.Sautina
+  * @since 4/20/12
+  */
+class FlipComparisonInMethodCallExprIntentionTest
+    extends ScalaIntentionTestBase {
   def familyName = FlipComparisonInMethodCallExprIntention.familyName
 
   def testFlip() {
@@ -76,8 +76,10 @@ class FlipComparisonInMethodCallExprIntentionTest extends ScalaIntentionTestBase
   }
 
   def testFlip10() {
-    val text = "if (sourceClass == null || sourceClass.e<caret>q(clazz)) return null"
-    val resultText = "if (sourceClass == null || clazz.e<caret>q(sourceClass)) return null"
+    val text =
+      "if (sourceClass == null || sourceClass.e<caret>q(clazz)) return null"
+    val resultText =
+      "if (sourceClass == null || clazz.e<caret>q(sourceClass)) return null"
 
     doTest(text, resultText)
   }
@@ -88,5 +90,4 @@ class FlipComparisonInMethodCallExprIntentionTest extends ScalaIntentionTestBase
 
     doTest(text, resultText)
   }
-
 }

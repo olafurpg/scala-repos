@@ -8,16 +8,18 @@ import com.intellij.openapi.options.Configurable
 import com.intellij.psi.codeStyle.{CodeStyleSettings, CodeStyleSettingsProvider, DisplayPriority}
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 28.07.2008
- */
- 
+  * User: Alexander Podkhalyuzin
+  * Date: 28.07.2008
+  */
 class ScalaCodeStyleSettingsProvider extends CodeStyleSettingsProvider {
-  override def getConfigurableDisplayName: String = ScalaBundle.message("title.scala.settings")
+  override def getConfigurableDisplayName: String =
+    ScalaBundle.message("title.scala.settings")
 
-  def createSettingsPage(settings: CodeStyleSettings, originalSettings: CodeStyleSettings): Configurable = {
+  def createSettingsPage(settings: CodeStyleSettings,
+                         originalSettings: CodeStyleSettings): Configurable = {
     new CodeStyleAbstractConfigurable(settings, originalSettings, "Scala") {
-      protected def createPanel(settings: CodeStyleSettings): CodeStyleAbstractPanel = {
+      protected def createPanel(
+          settings: CodeStyleSettings): CodeStyleAbstractPanel = {
         new ScalaTabbedCodeStylePanel(getCurrentSettings, settings)
       }
 
@@ -33,5 +35,6 @@ class ScalaCodeStyleSettingsProvider extends CodeStyleSettingsProvider {
 
   override def getLanguage = ScalaFileType.SCALA_LANGUAGE
 
-  override def createCustomSettings(settings: CodeStyleSettings) = new ScalaCodeStyleSettings(settings)
+  override def createCustomSettings(settings: CodeStyleSettings) =
+    new ScalaCodeStyleSettings(settings)
 }

@@ -5,10 +5,9 @@ import mesosphere.marathon.upgrade.DeploymentPlan
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 
-class DeploymentRepository(
-  val store: EntityStore[DeploymentPlan],
-  val maxVersions: Option[Int] = None,
-  val metrics: Metrics)
+class DeploymentRepository(val store: EntityStore[DeploymentPlan],
+                           val maxVersions: Option[Int] = None,
+                           val metrics: Metrics)
     extends EntityRepository[DeploymentPlan] with StateMetrics {
 
   import scala.concurrent.ExecutionContext.Implicits.global

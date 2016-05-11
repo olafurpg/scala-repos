@@ -7,22 +7,23 @@ import com.intellij.execution.configurations.{ConfigurationFactory, Configuratio
 import org.jetbrains.plugins.scala.icons.Icons
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 22.02.2009
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 22.02.2009
+  */
 class ScalaTestConfigurationType extends ConfigurationType {
 
   val confFactory = new ScalaTestRunConfigurationFactory(this)
 
-  def getConfigurationFactories: Array[ConfigurationFactory] = Array[ConfigurationFactory](confFactory)
+  def getConfigurationFactories: Array[ConfigurationFactory] =
+    Array[ConfigurationFactory](confFactory)
 
   def getDisplayName: String = "ScalaTest"
 
-  def getConfigurationTypeDescription: String = "ScalaTest testing framework run configuration"
+  def getConfigurationTypeDescription: String =
+    "ScalaTest testing framework run configuration"
 
-  def getId: String = "ScalaTestRunConfiguration" //if you want to change id, change it in Android plugin too
+  def getId: String =
+    "ScalaTestRunConfiguration" //if you want to change id, change it in Android plugin too
 
   def getIcon: Icon = Icons.SCALA_TEST
-
 }

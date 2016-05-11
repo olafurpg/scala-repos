@@ -12,10 +12,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.Annotation
 import org.jetbrains.plugins.scala.lang.parser.parsing.top.params.ClassParamClauses
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.02.2008
+  */
 /*
  * ClassDef ::= id [TypeParamClause] {Annotation} [AcessModifier] [ClassParamClauses] ClassTemplateOpt
  */
@@ -23,7 +22,8 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.top.params.ClassParamClau
 object ClassDef {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     builder.getTokenType match {
-      case ScalaTokenTypes.tIDENTIFIER => builder.advanceLexer() //Ate identifier
+      case ScalaTokenTypes.tIDENTIFIER =>
+        builder.advanceLexer() //Ate identifier
       case _ =>
         builder error ErrMsg("identifier.expected")
         return false
@@ -44,11 +44,10 @@ object ClassDef {
     if (!builder.newlineBeforeCurrentToken) {
       //parse AccessModifier
       builder.getTokenType match {
-        case ScalaTokenTypes.kPRIVATE
-             | ScalaTokenTypes.kPROTECTED =>
+        case ScalaTokenTypes.kPRIVATE | ScalaTokenTypes.kPROTECTED =>
           AccessModifier parse builder
         case _ =>
-          /*it could be without acces modifier*/
+        /*it could be without acces modifier*/
       }
     }
     modifierMareker.done(ScalaElementTypes.MODIFIERS)

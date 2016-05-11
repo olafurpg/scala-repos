@@ -16,23 +16,25 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScParameterizedType
 import org.jetbrains.plugins.scala.lang.psi.types.result.Success
 
 /**
- * Author: Svyatoslav Ilinskiy
- * Date: 7/3/15
- *
- * Simplifies types, so that they use Kind Projector plugin (if Kind Projector is enabled)
- * @see https://github.com/non/kind-projector
- */
-class KindProjectorSimplifyTypeProjectionInspection extends LocalInspectionTool {
+  * Author: Svyatoslav Ilinskiy
+  * Date: 7/3/15
+  *
+  * Simplifies types, so that they use Kind Projector plugin (if Kind Projector is enabled)
+  * @see https://github.com/non/kind-projector
+  */
+class KindProjectorSimplifyTypeProjectionInspection
+    extends LocalInspectionTool {
 
-  override def buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
     def boundsDefined(param: ScTypeParam) = {
       param.lowerTypeElement.isDefined || param.upperTypeElement.isDefined
     }
 
     /**
-     * Kind projector currently supports only very basic type bounds
-     * @see https://github.com/non/kind-projector/pull/6
-     */
+      * Kind projector currently supports only very basic type bounds
+      * @see https://github.com/non/kind-projector/pull/6
+      */
     def canConvertBounds(param: ScTypeParam): Boolean = {
       param.lowerTypeElement match {
         case Some(_: ScSimpleTypeElement) | None =>
@@ -44,7 +46,8 @@ class KindProjectorSimplifyTypeProjectionInspection extends LocalInspectionTool 
       }
     }
 
-    def tryConvertToInlineSyntax(alias: ScTypeAliasDefinition): Option[String] = {
+    def tryConvertToInlineSyntax(
+        alias: ScTypeAliasDefinition): Option[String] = {
       def hasNoBounds(p: ScTypeParam): Boolean = {
         (p.lowerTypeElement, p.upperTypeElement) match {
           case (None, None) => true
@@ -52,10 +55,16 @@ class KindProjectorSimplifyTypeProjectionInspection extends LocalInspectionTool 
         }
       }
 
-      def occursInsideParameterized(tp: ScTypeParam, param: ScParameterizedType, isInsideParam: Boolean): Boolean = {
+      def occursInsideParameterized(tp: ScTypeParam,
+                                    param: ScParameterizedType,
+                                    isInsideParam: Boolean): Boolean = {
         param.typeArgs.exists {
-          case p: ScParameterizedType if isInsideParam && p.designator.presentableText == tp.name => true
-          case p: ScParameterizedType if occursInsideParameterized(tp, p, isInsideParam = true) => true
+          case p: ScParameterizedType
+              if isInsideParam && p.designator.presentableText == tp.name =>
+            true
+          case p: ScParameterizedType
+              if occursInsideParameterized(tp, p, isInsideParam = true) =>
+            true
           case ta if isInsideParam && ta.presentableText == tp.name => true
           case _ => false
         }
@@ -65,29 +74,31 @@ class KindProjectorSimplifyTypeProjectionInspection extends LocalInspectionTool 
         case Success(paramType: ScParameterizedType, _) =>
           val typeParam: Seq[ScTypeParam] = alias.typeParameters
           val valid =
-            typeParam.nonEmpty &&
-            typeParam.forall(hasNoBounds) &&
-            !typeParam.exists(occursInsideParameterized(_, paramType, isInsideParam = false)) &&
-            typeParam.forall {
+            typeParam.nonEmpty && typeParam.forall(hasNoBounds) &&
+            !typeParam.exists(occursInsideParameterized(
+                    _, paramType, isInsideParam = false)) && typeParam.forall {
               tpt =>
                 paramType.typeArgs.count(tpt.name == _.presentableText) == 1
             }
 
           if (valid) {
             val typeParamIt = typeParam.iterator
-            var currentTypeParam: Option[ScTypeParam] = Some(typeParamIt.next())
+            var currentTypeParam: Option[ScTypeParam] = Some(
+                typeParamIt.next())
             val newTypeArgs = paramType.typeArgs.map { ta =>
               currentTypeParam match {
                 case Some(tpt) if ta.presentableText == tpt.name =>
-                  currentTypeParam =
-                    if (typeParamIt.hasNext) Some(typeParamIt.next())
-                    else None
+                  currentTypeParam = if (typeParamIt.hasNext)
+                    Some(typeParamIt.next())
+                  else None
                   tpt.getText.replace(tpt.name, "?")
                 case _ => ta.presentableText
               }
             }
             if (!typeParamIt.hasNext && currentTypeParam.isEmpty) {
-              Some(s"${paramType.designator}${newTypeArgs.mkString(start = "[", sep = ",", end = "]")}")
+              Some(
+                  s"${paramType.designator}${newTypeArgs.mkString(
+                  start = "[", sep = ",", end = "]")}")
             } else None
           } else None
         case _ => None
@@ -97,58 +108,80 @@ class KindProjectorSimplifyTypeProjectionInspection extends LocalInspectionTool 
     holder.getFile match {
       case _: ScalaFile =>
         new ScalaElementVisitor {
-          override def visitTypeProjection(projection: ScTypeProjection): Unit = {
+          override def visitTypeProjection(
+              projection: ScTypeProjection): Unit = {
             if (ScalaPsiUtil.kindProjectorPluginEnabled(projection)) {
               projection.typeElement match {
-                case parenType: ScParenthesisedTypeElement => parenType.typeElement match {
-                  case Some(ct: ScCompoundTypeElement) =>
-                    ct.refinement match {
-                      case Some(refinement) =>
-                        refinement.types match {
-                          case Seq(alias: ScTypeAliasDefinition) if alias.nameId.getText == projection.nameId.getText =>
-                            val aliasParam = alias.typeParameters
-                            projection.parent match {
-                              case Some(p: ScParameterizedTypeElement) if p.typeArgList.typeArgs.size == aliasParam.size =>
-                              //should be handled by AppliedTypeLambdaCanBeSimplifiedInspection
-                              case _ if aliasParam.nonEmpty =>
-                                if (alias.typeParameters.forall(canConvertBounds)) {
-                                  def simplified(): String = {
-                                    tryConvertToInlineSyntax(alias) match {
-                                      case Some(inline) => inline
-                                      case _ => //convert to function syntax
-                                        val builder = new StringBuilder
-                                        val styleSettings = ScalaCodeStyleSettings.getInstance(projection.getProject)
-                                        if (styleSettings.REPLACE_LAMBDA_WITH_GREEK_LETTER) {
-                                          builder.append("λ")
-                                        } else {
-                                          builder.append("Lambda")
-                                        }
-                                        builder.append("[")
-                                        val parameters = aliasParam.map { param: ScTypeParam =>
-                                          if (param.isCovariant || param.isContravariant || boundsDefined(param)) {
-                                            s"`${param.getText}`"
-                                          } else param.getText
-                                        }
-                                        if (parameters.length > 1) {
-                                          builder.append(parameters.mkString(start = "(", sep = ",", end = ")"))
-                                        } else builder.append(parameters.mkString(start = "", sep = "", end = ""))
-                                        builder.append(" => ")
-                                        builder.append(alias.aliasedType.getOrAny)
-                                        builder.append("]")
-                                        builder.toString()
+                case parenType: ScParenthesisedTypeElement =>
+                  parenType.typeElement match {
+                    case Some(ct: ScCompoundTypeElement) =>
+                      ct.refinement match {
+                        case Some(refinement) =>
+                          refinement.types match {
+                            case Seq(alias: ScTypeAliasDefinition)
+                                if alias.nameId.getText == projection.nameId.getText =>
+                              val aliasParam = alias.typeParameters
+                              projection.parent match {
+                                case Some(p: ScParameterizedTypeElement)
+                                    if p.typeArgList.typeArgs.size == aliasParam.size =>
+                                //should be handled by AppliedTypeLambdaCanBeSimplifiedInspection
+                                case _ if aliasParam.nonEmpty =>
+                                  if (alias.typeParameters.forall(
+                                          canConvertBounds)) {
+                                    def simplified(): String = {
+                                      tryConvertToInlineSyntax(alias) match {
+                                        case Some(inline) => inline
+                                        case _ => //convert to function syntax
+                                          val builder = new StringBuilder
+                                          val styleSettings =
+                                            ScalaCodeStyleSettings.getInstance(
+                                                projection.getProject)
+                                          if (styleSettings.REPLACE_LAMBDA_WITH_GREEK_LETTER) {
+                                            builder.append("λ")
+                                          } else {
+                                            builder.append("Lambda")
+                                          }
+                                          builder.append("[")
+                                          val parameters = aliasParam.map {
+                                            param: ScTypeParam =>
+                                              if (param.isCovariant ||
+                                                  param.isContravariant ||
+                                                  boundsDefined(param)) {
+                                                s"`${param.getText}`"
+                                              } else param.getText
+                                          }
+                                          if (parameters.length > 1) {
+                                            builder.append(
+                                                parameters.mkString(
+                                                    start = "(",
+                                                    sep = ",",
+                                                    end = ")"))
+                                          } else
+                                            builder.append(
+                                                parameters.mkString(start = "",
+                                                                    sep = "",
+                                                                    end = ""))
+                                          builder.append(" => ")
+                                          builder.append(
+                                              alias.aliasedType.getOrAny)
+                                          builder.append("]")
+                                          builder.toString()
+                                      }
                                     }
+                                    val fix =
+                                      new KindProjectorSimplifyTypeProjectionQuickFix(
+                                          projection, simplified())
+                                    holder.registerProblem(
+                                        projection, inspectionName, fix)
                                   }
-                                  val fix = new KindProjectorSimplifyTypeProjectionQuickFix(projection, simplified())
-                                  holder.registerProblem(projection, inspectionName, fix)
-                                }
-                              case _ =>
-                            }
-                          case _ =>
-                        }
-                      case _ =>
-                    }
-                  case _ =>
-                }
+                                case _ =>
+                              }
+                            case _ =>
+                          }
+                        case _ =>
+                      }
+                    case _ =>
+                  }
                 case _ =>
               }
             }
@@ -163,13 +196,15 @@ class KindProjectorSimplifyTypeProjectionInspection extends LocalInspectionTool 
   override def getID: String = inspectionId
 }
 
-class KindProjectorSimplifyTypeProjectionQuickFix(e: PsiElement, replacement: => String) extends
-AbstractFixOnPsiElement(inspectionName, e) {
+class KindProjectorSimplifyTypeProjectionQuickFix(
+    e: PsiElement, replacement: => String)
+    extends AbstractFixOnPsiElement(inspectionName, e) {
   override def doApplyFix(project: Project): Unit = {
     val elem = getElement
     if (!elem.isValid) return
 
-    val te = ScalaPsiElementFactory.createTypeElementFromText(replacement, elem.getManager)
+    val te = ScalaPsiElementFactory.createTypeElementFromText(
+        replacement, elem.getManager)
     elem.replace(te)
   }
 }

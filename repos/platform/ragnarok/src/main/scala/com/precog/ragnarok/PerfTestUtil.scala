@@ -28,10 +28,9 @@ import scalaz.std.option._
 import akka.util.Duration
 
 import akka.actor.ActorSystem
-import akka.dispatch.{ Future, ExecutionContext, Await }
+import akka.dispatch.{Future, ExecutionContext, Await}
 import PerfTestPrettyPrinters._
 import RunConfig.OutputFormat
-
 
 class PerfTestUtil(rootDir: File, runs: Int = 30) {
   val config = RunConfig(rootDir = Some(rootDir), runs = runs)
@@ -41,11 +40,10 @@ class PerfTestUtil(rootDir: File, runs: Int = 30) {
   def withRunner[A](config: RunConfig)(f: NIHDBPerfTestRunner[Long] => A): A = {
     val result = try {
       val runner = new NIHDBPerfTestRunner(SimpleTimer,
-        optimize = config.optimize,
-        apiKey = "dummyAPIKey",
-        _rootDir = config.rootDir,
-        testTimeout = timeout
-      )
+                                           optimize = config.optimize,
+                                           apiKey = "dummyAPIKey",
+                                           _rootDir = config.rootDir,
+                                           testTimeout = timeout)
 
       runner.startup()
       try {
@@ -65,16 +63,17 @@ class PerfTestUtil(rootDir: File, runs: Int = 30) {
   def test(query: String): String = withRunner(config) { runner =>
     val tails = (runs * (config.outliers / 2)).toInt
     val test = Tree.leaf[PerfTest](RunQuery(query))
-    val result = runner.runAll(test, config.runs) {
-      case None => None
-      case Some((a, b)) =>
-        Some(Statistics(MetricSpace[Long].distance(a, b), tails = tails))
-    } map {
-      case (t, stats) => (t, stats map (_ * (1 / 1000000.0))) // Convert to ms.
-    }
+    val result =
+      runner.runAll(test, config.runs) {
+        case None => None
+        case Some((a, b)) =>
+          Some(Statistics(MetricSpace[Long].distance(a, b), tails = tails))
+      } map {
+        case (t, stats) =>
+          (t, stats map (_ * (1 / 1000000.0))) // Convert to ms.
+      }
 
     // result.toJson.toString
     result.toPrettyString
   }
 }
-

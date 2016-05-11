@@ -27,10 +27,12 @@ trait KMap[K[_], V[_]] {
 }
 
 object KMap {
-  private case class CastMap[K[_], V[_]](delegate: Map[Any, Any]) extends KMap[K, V] {
+  private case class CastMap[K[_], V[_]](delegate: Map[Any, Any])
+      extends KMap[K, V] {
     def +[A](kv: (K[A], V[A])): KMap[K, V] = CastMap(delegate + kv)
     def -[A](k: K[A]): KMap[K, V] = CastMap(delegate - k)
-    def get[A](k: K[A]): Option[V[A]] = delegate.get(k).map(_.asInstanceOf[V[A]])
+    def get[A](k: K[A]): Option[V[A]] =
+      delegate.get(k).map(_.asInstanceOf[V[A]])
     def isDefinedAt[A](k: K[A]): Boolean = delegate.isDefinedAt(k)
   }
 

@@ -5,12 +5,12 @@ import asm.{Opcodes => Flags}
 import scala.collection.JavaConverters._
 
 class C {
-  def f1: A_1.A1N_FINAL    = A_1.A1N_FINAL.A1N_FINAL_VAL
-  def f2: A_1.A1N          = A_1.A1N.A1N_VAL
+  def f1: A_1.A1N_FINAL = A_1.A1N_FINAL.A1N_FINAL_VAL
+  def f2: A_1.A1N = A_1.A1N.A1N_VAL
   def f3: A_1.A1N_ABSTRACT = A_1.A1N_ABSTRACT.A1N_ABSTRACT_VAL
 
-  def f4: B_2.A1N_FINAL    = B_2.A1N_FINAL.A1N_FINAL_VAL
-  def f5: B_2.A1N          = B_2.A1N.A1N_VAL
+  def f4: B_2.A1N_FINAL = B_2.A1N_FINAL.A1N_FINAL_VAL
+  def f5: B_2.A1N = B_2.A1N.A1N_VAL
   def f6: B_2.A1N_ABSTRACT = B_2.A1N_ABSTRACT.A1N_ABSTRACT_VAL
 }
 

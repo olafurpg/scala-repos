@@ -1,13 +1,12 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl.model
 
 import java.util.TimeZone
 import scala.util.Random
-import org.scalatest.{ Matchers, WordSpec }
-import org.scalatest.matchers.{ Matcher, MatchResult }
+import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.{Matcher, MatchResult}
 
 class DateTimeSpec extends WordSpec with Matchers {
 
@@ -27,16 +26,17 @@ class DateTimeSpec extends WordSpec with Matchers {
     }
     "behave exactly as a corresponding formatting via SimpleDateFormat" in {
       val Rfc1123Format = {
-        val fmt = new java.text.SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", java.util.Locale.US)
+        val fmt = new java.text.SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z",
+                                                 java.util.Locale.US)
         fmt.setTimeZone(GMT)
         fmt
       }
-      def rfc1123Format(dt: DateTime) = Rfc1123Format.format(new java.util.Date(dt.clicks))
+      def rfc1123Format(dt: DateTime) =
+        Rfc1123Format.format(new java.util.Date(dt.clicks))
       val matchSimpleDateFormat: Matcher[DateTime] = Matcher { dt: DateTime ⇒
-        MatchResult(
-          dt.toRfc1123DateTimeString == rfc1123Format(dt),
-          dt.toRfc1123DateTimeString + " != " + rfc1123Format(dt),
-          dt.toRfc1123DateTimeString + " == " + rfc1123Format(dt))
+        MatchResult(dt.toRfc1123DateTimeString == rfc1123Format(dt),
+                    dt.toRfc1123DateTimeString + " != " + rfc1123Format(dt),
+                    dt.toRfc1123DateTimeString + " == " + rfc1123Format(dt))
       }
       all(httpDateTimes.take(10000)) should matchSimpleDateFormat
     }
@@ -50,10 +50,12 @@ class DateTimeSpec extends WordSpec with Matchers {
 
   "DateTime.fromIsoDateTimeString" should {
     "properly parse a legal string" in {
-      DateTime.fromIsoDateTimeString("2011-07-12T14:08:12") shouldBe Some(DateTime(specificClicks))
+      DateTime.fromIsoDateTimeString("2011-07-12T14:08:12") shouldBe Some(
+          DateTime(specificClicks))
     }
     "properly parse a legal extended string" in {
-      DateTime.fromIsoDateTimeString("2011-07-12T14:08:12.123Z") shouldBe Some(DateTime(specificClicks))
+      DateTime.fromIsoDateTimeString("2011-07-12T14:08:12.123Z") shouldBe Some(
+          DateTime(specificClicks))
     }
     "fail on an illegal string" in {
       DateTime.fromIsoDateTimeString("2011-07-12T14:08:12x") shouldBe None
@@ -77,12 +79,14 @@ class DateTimeSpec extends WordSpec with Matchers {
 
   "The two DateTime implementations" should {
     "allow for transparent round-trip conversions" in {
-      def roundTrip(dt: DateTime) = DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+      def roundTrip(dt: DateTime) =
+        DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
       val roundTripOk: Matcher[DateTime] = Matcher { dt: DateTime ⇒
-        MatchResult(
-          { val rt = roundTrip(dt); dt == rt && dt.weekday == rt.weekday },
-          dt.toRfc1123DateTimeString + " != " + roundTrip(dt).toRfc1123DateTimeString,
-          dt.toRfc1123DateTimeString + " == " + roundTrip(dt).toRfc1123DateTimeString)
+        MatchResult({
+          val rt = roundTrip(dt); dt == rt && dt.weekday == rt.weekday
+        }, dt.toRfc1123DateTimeString + " != " +
+        roundTrip(dt).toRfc1123DateTimeString, dt.toRfc1123DateTimeString +
+        " == " + roundTrip(dt).toRfc1123DateTimeString)
       }
       all(httpDateTimes.take(10000)) should roundTripOk
     }

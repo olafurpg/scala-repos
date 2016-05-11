@@ -18,10 +18,10 @@
 package org.apache.spark.scheduler
 
 /**
- * An interface for sort algorithm
- * FIFO: FIFO algorithm between TaskSetManagers
- * FS: FS algorithm between Pools, and FIFO or FS within Pools
- */
+  * An interface for sort algorithm
+  * FIFO: FIFO algorithm between TaskSetManagers
+  * FS: FS algorithm between Pools, and FIFO or FS within Pools
+  */
 private[spark] trait SchedulingAlgorithm {
   def comparator(s1: Schedulable, s2: Schedulable): Boolean
 }
@@ -52,8 +52,10 @@ private[spark] class FairSchedulingAlgorithm extends SchedulingAlgorithm {
     val runningTasks2 = s2.runningTasks
     val s1Needy = runningTasks1 < minShare1
     val s2Needy = runningTasks2 < minShare2
-    val minShareRatio1 = runningTasks1.toDouble / math.max(minShare1, 1.0).toDouble
-    val minShareRatio2 = runningTasks2.toDouble / math.max(minShare2, 1.0).toDouble
+    val minShareRatio1 =
+      runningTasks1.toDouble / math.max(minShare1, 1.0).toDouble
+    val minShareRatio2 =
+      runningTasks2.toDouble / math.max(minShare2, 1.0).toDouble
     val taskToWeightRatio1 = runningTasks1.toDouble / s1.weight.toDouble
     val taskToWeightRatio2 = runningTasks2.toDouble / s2.weight.toDouble
     var compare: Int = 0
@@ -77,4 +79,3 @@ private[spark] class FairSchedulingAlgorithm extends SchedulingAlgorithm {
     }
   }
 }
-

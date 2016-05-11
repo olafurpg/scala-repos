@@ -10,7 +10,7 @@ object Test {
     assert(r1 forall (r3 contains _))
     assert(r2.size == 1)
     assert(r4.isEmpty)
-    assert(List(1,3,5,97,99) forall (r5 contains _))
-    assert(List(2,4,6,98,100) forall (x => !r5.contains(x)))
+    assert(List(1, 3, 5, 97, 99) forall (r5 contains _))
+    assert(List(2, 4, 6, 98, 100) forall (x => !r5.contains(x)))
   }
 }

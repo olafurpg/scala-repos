@@ -1,10 +1,10 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import akka.stream.testkit.Utils._
-import akka.stream.testkit.{ BaseTwoStreamsSetup, TestSubscriber }
+import akka.stream.testkit.{BaseTwoStreamsSetup, TestSubscriber}
 import org.reactivestreams.Publisher
 
 class FlowZipSpec extends BaseTwoStreamsSetup {
@@ -13,7 +13,10 @@ class FlowZipSpec extends BaseTwoStreamsSetup {
 
   override def setup(p1: Publisher[Int], p2: Publisher[Int]) = {
     val subscriber = TestSubscriber.probe[Outputs]()
-    Source.fromPublisher(p1).zip(Source.fromPublisher(p2)).runWith(Sink.fromSubscriber(subscriber))
+    Source
+      .fromPublisher(p1)
+      .zip(Source.fromPublisher(p2))
+      .runWith(Sink.fromSubscriber(subscriber))
     subscriber
   }
 
@@ -21,7 +24,9 @@ class FlowZipSpec extends BaseTwoStreamsSetup {
 
     "work in the happy case" in assertAllStagesStopped {
       val probe = TestSubscriber.manualProbe[(Int, String)]()
-      Source(1 to 4).zip(Source(List("A", "B", "C", "D", "E", "F"))).runWith(Sink.fromSubscriber(probe))
+      Source(1 to 4)
+        .zip(Source(List("A", "B", "C", "D", "E", "F")))
+        .runWith(Sink.fromSubscriber(probe))
       val subscription = probe.expectSubscription()
 
       subscription.request(2)
@@ -46,10 +51,12 @@ class FlowZipSpec extends BaseTwoStreamsSetup {
     }
 
     "work with one delayed completed and one nonempty publisher" in assertAllStagesStopped {
-      val subscriber1 = setup(soonToCompletePublisher, nonemptyPublisher(1 to 4))
+      val subscriber1 =
+        setup(soonToCompletePublisher, nonemptyPublisher(1 to 4))
       subscriber1.expectSubscriptionAndComplete()
 
-      val subscriber2 = setup(nonemptyPublisher(1 to 4), soonToCompletePublisher)
+      val subscriber2 =
+        setup(nonemptyPublisher(1 to 4), soonToCompletePublisher)
       subscriber2.expectSubscriptionAndComplete()
     }
 

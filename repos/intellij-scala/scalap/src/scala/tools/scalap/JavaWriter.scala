@@ -1,33 +1,29 @@
 /*     ___ ____ ___   __   ___   ___
-**    / _// __// _ | / /  / _ | / _ \    Scala classfile decoder
-**  __\ \/ /__/ __ |/ /__/ __ |/ ___/    (c) 2003-2010, LAMP/EPFL
-** /____/\___/_/ |_/____/_/ |_/_/        http://scala-lang.org/
-**
-*/
-
+ **    / _// __// _ | / /  / _ | / _ \    Scala classfile decoder
+ **  __\ \/ /__/ __ |/ /__/ __ |/ ___/    (c) 2003-2010, LAMP/EPFL
+ ** /____/\___/_/ |_/____/_/ |_/_/        http://scala-lang.org/
+ **
+ */
 
 package scala.tools.scalap
 
 import java.io._
 
-
-class JavaWriter(classfile: Classfile, writer: Writer) extends CodeWriter(writer) {
+class JavaWriter(classfile: Classfile, writer: Writer)
+    extends CodeWriter(writer) {
 
   val cf = classfile
 
   def flagsToStr(clazz: Boolean, flags: Int): String = {
     val buffer = new StringBuffer()
     var x: StringBuffer = buffer
-    if (((flags & 0x0007) == 0) &&
-      ((flags & 0x0002) != 0))
+    if (((flags & 0x0007) == 0) && ((flags & 0x0002) != 0))
       x = buffer.append("private ")
-    if ((flags & 0x0004) != 0)
-      x = buffer.append("protected ")
-    if ((flags & 0x0010) != 0)
-      x = buffer.append("final ")
+    if ((flags & 0x0004) != 0) x = buffer.append("protected ")
+    if ((flags & 0x0010) != 0) x = buffer.append("final ")
     if ((flags & 0x0400) != 0)
       x = if (clazz) buffer.append("abstract ")
-          else buffer.append("/*deferred*/ ")
+      else buffer.append("/*deferred*/ ")
     buffer.toString()
   }
 
@@ -78,8 +74,7 @@ class JavaWriter(classfile: Classfile, writer: Writer) extends CodeWriter(writer
   }
 
   def sigToType0(str: String, i: Int): (String, Int) =
-    if (str.charAt(i) == ')')
-      sigToType(str, i)
+    if (str.charAt(i) == ')') sigToType(str, i)
     else {
       val (tpe, j) = sigToType(str, i)
       if (str.charAt(j) == ')') {
@@ -93,7 +88,7 @@ class JavaWriter(classfile: Classfile, writer: Writer) extends CodeWriter(writer
 
   def getName(n: Int): String = {
     import cf.pool._
-    
+
     cf.pool(n) match {
       case UTF8(str) => str
       case StringConst(m) => getName(m)
@@ -116,24 +111,23 @@ class JavaWriter(classfile: Classfile, writer: Writer) extends CodeWriter(writer
 
   def isConstr(name: String) = (name == "<init>")
 
-  def printField(flags: Int, name: Int, tpe: Int, attribs: List[cf.Attribute]) {
+  def printField(
+      flags: Int, name: Int, tpe: Int, attribs: List[cf.Attribute]) {
     print(flagsToStr(false, flags))
-    if ((flags & 0x0010) != 0)
-      print("val " + Names.decode(getName(name)))
-    else
-      print("final var " + Names.decode(getName(name)))
+    if ((flags & 0x0010) != 0) print("val " + Names.decode(getName(name)))
+    else print("final var " + Names.decode(getName(name)))
     print(": " + getType(tpe) + ";").newline
   }
 
-  def printMethod(flags: Int, name: Int, tpe: Int, attribs: List[cf.Attribute]) {
-    if (getName(name) == "<init>")
-    print(flagsToStr(false, flags))
+  def printMethod(
+      flags: Int, name: Int, tpe: Int, attribs: List[cf.Attribute]) {
+    if (getName(name) == "<init>") print(flagsToStr(false, flags))
     attribs find {
       case cf.Attribute(name, _) => getName(name) == "JacoMeta"
     } match {
       case Some(cf.Attribute(_, data)) =>
-        val mp = new MetaParser(getName(
-          ((data(0) & 0xff) << 8) + (data(1) & 0xff)).trim())
+        val mp = new MetaParser(
+            getName(((data(0) & 0xff) << 8) + (data(1) & 0xff)).trim())
         mp.parse match {
           case None =>
             if (getName(name) == "<init>") {
@@ -154,7 +148,7 @@ class JavaWriter(classfile: Classfile, writer: Writer) extends CodeWriter(writer
         } else {
           print("def " + Names.decode(getName(name)))
           print(getType(tpe) + ";").newline
-      }
+        }
     }
     attribs find {
       case cf.Attribute(name, _) => getName(name) == "Exceptions"
@@ -162,8 +156,10 @@ class JavaWriter(classfile: Classfile, writer: Writer) extends CodeWriter(writer
       case Some(cf.Attribute(_, data)) =>
         val n = ((data(0) & 0xff) << 8) + (data(1) & 0xff)
         indent.print("throws ")
-        for (i <- Iterator.range(0, n) map {x => 2 * (x + 1)}) {
-          val inx = ((data(i) & 0xff) << 8) + (data(i+1) & 0xff)
+        for (i <- Iterator.range(0, n) map { x =>
+          2 * (x + 1)
+        }) {
+          val inx = ((data(i) & 0xff) << 8) + (data(i + 1) & 0xff)
           if (i > 2) print(", ")
           print(getClassName(inx).trim())
         }
@@ -180,15 +176,14 @@ class JavaWriter(classfile: Classfile, writer: Writer) extends CodeWriter(writer
       if (cf.pool(cf.superclass) != null)
         print(" extends " + nameToClass0(getName(cf.superclass)))
     }
-    cf.interfaces foreach {
-      n => print(" with " + getClassName(n))
+    cf.interfaces foreach { n =>
+      print(" with " + getClassName(n))
     }
   }
 
   def printClass {
     val pck = getPackage(cf.classname);
-    if (pck.length() > 0)
-      println("package " + pck + ";")
+    if (pck.length() > 0) println("package " + pck + ";")
     print(flagsToStr(true, cf.flags))
     cf.attribs find {
       case cf.Attribute(name, _) => getName(name) == "JacoMeta"
@@ -196,32 +191,27 @@ class JavaWriter(classfile: Classfile, writer: Writer) extends CodeWriter(writer
       case None =>
         printClassHeader;
       case Some(cf.Attribute(_, data)) =>
-        val mp = new MetaParser(getName(
-          ((data(0) & 0xff) << 8) + (data(1) & 0xff)).trim());
+        val mp = new MetaParser(
+            getName(((data(0) & 0xff) << 8) + (data(1) & 0xff)).trim());
         mp.parse match {
           case None => printClassHeader;
           case Some(str) =>
             if (isInterface(cf.flags))
               print("trait " + getSimpleClassName(cf.classname) + str);
-            else
-              print("class " + getSimpleClassName(cf.classname) + str);
+            else print("class " + getSimpleClassName(cf.classname) + str);
         }
     }
     var statics: List[cf.Member] = Nil
     print(" {").indent.newline
     cf.fields foreach {
-      case m@cf.Member(_, flags, name, tpe, attribs) =>
-        if (isStatic(flags))
-          statics = m :: statics
-        else
-          printField(flags, name, tpe, attribs)
+      case m @ cf.Member(_, flags, name, tpe, attribs) =>
+        if (isStatic(flags)) statics = m :: statics
+        else printField(flags, name, tpe, attribs)
     }
     cf.methods foreach {
-      case m@cf.Member(_, flags, name, tpe, attribs) =>
-        if (isStatic(flags))
-          statics = m :: statics
-        else
-          printMethod(flags, name, tpe, attribs)
+      case m @ cf.Member(_, flags, name, tpe, attribs) =>
+        if (isStatic(flags)) statics = m :: statics
+        else printMethod(flags, name, tpe, attribs)
     }
     undent.print("}").newline
     if (!statics.isEmpty) {
@@ -237,5 +227,4 @@ class JavaWriter(classfile: Classfile, writer: Writer) extends CodeWriter(writer
       undent.print("}").newline
     }
   }
-
 }

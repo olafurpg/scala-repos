@@ -3,13 +3,15 @@
 
 object ZipFun {
   //just compilation
-  def zipFun[a, b](xs: List[a], ys: List[b]): List[Tuple2[a, b]] = ((xs, ys): @unchecked) match {
-    // !!! case (List(), _), (_, List()) => List()
-    case (x :: xs1, y :: ys1) => (x, y) :: zipFun(xs1, ys1)
-  }
+  def zipFun[a, b](xs: List[a], ys: List[b]): List[Tuple2[a, b]] =
+    ((xs, ys): @unchecked) match {
+      // !!! case (List(), _), (_, List()) => List()
+      case (x :: xs1, y :: ys1) => (x, y) :: zipFun(xs1, ys1)
+    }
 }
 
-object Test1253 { // compile-only
+object Test1253 {
+  // compile-only
   def foo(t: (Int, String)) = t match {
     case (1, "") => throw new Exception
     case (r, _) => throw new Exception(r.toString)
@@ -48,7 +50,8 @@ sealed abstract class Tree
 case class Node(l: Tree, v: Int, r: Tree) extends Tree
 case object EmptyTree extends Tree
 
-object Ticket335 { // compile-only
+object Ticket335 {
+  // compile-only
   def runTest() {
     (EmptyTree: Tree @unchecked) match {
       case Node(_, v, _) if (v == 0) => 0
@@ -57,21 +60,24 @@ object Ticket335 { // compile-only
   }
 }
 
-object TestIfOpt { //compile-only "test EqualsPatternClass in combination with MixTypes opt, bug #1278"
+object TestIfOpt {
+  //compile-only "test EqualsPatternClass in combination with MixTypes opt, bug #1278"
   trait Token {
     val offset: Int
     def matching: Option[Token]
   }
   def go(tok: Token) = (tok.matching: @unchecked) match {
     case Some(other) if true => Some(other)
-    case _ if true => tok.matching match {
-      case Some(other) => Some(other)
-      case _ => None
-    }
+    case _ if true =>
+      tok.matching match {
+        case Some(other) => Some(other)
+        case _ => None
+      }
   }
 }
 
-object Go { // bug #1277 compile-only
+object Go {
+  // bug #1277 compile-only
   trait Core { def next: Position = null }
   trait Dir
   val NEXT = new Dir {}
@@ -79,12 +85,14 @@ object Go { // bug #1277 compile-only
   trait Position extends Core
 
   (null: Core, null: Dir) match {
-    case (_, NEXT) if true => false // no matter whether NEXT test succeed, cannot throw column because of guard
+    case (_, NEXT) if true =>
+      false // no matter whether NEXT test succeed, cannot throw column because of guard
     case (at2: Position, dir) => true
   }
 }
 
-trait Outer { // bug #1282 compile-only
+trait Outer {
+  // bug #1282 compile-only
   object No
   trait File {
     (null: AnyRef) match {
@@ -93,7 +101,8 @@ trait Outer { // bug #1282 compile-only
   }
 }
 
-class Test806_818 { // #806, #811 compile only -- type of bind
+class Test806_818 {
+  // #806, #811 compile only -- type of bind
   // t811
   trait Core {
     trait NodeImpl
@@ -139,14 +148,17 @@ object Ticket522 {
     def apply[Y, Z](fun: Y => Z, arg: Y): Term[Z] =
       new InternalApply[Y, Z](fun, arg)
 
-    def unapply[X](arg: Term[X]): Option[(Y => Z, Y)] forSome { type Y; type Z } =
+    def unapply[X](
+        arg: Term[X]): Option[(Y => Z, Y)] forSome { type Y; type Z } =
       arg match {
         case i: InternalApply[y, z] => Some(i.fun, i.arg)
         case _ => None
       }
   }
 
-  App({ x: Int => x }, 5) match {
+  App({ x: Int =>
+    x
+  }, 5) match {
     case App(arg, a) =>
   }
 }

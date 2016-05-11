@@ -36,18 +36,20 @@ import scalafx.scene.shape.Polyline
 class EnsemblePolyline extends EnsembleExample {
   def getContent = {
     //Set polyline fill color using literal
-    val polyObj = (poly: Polyline, color: Paint) => {
-      poly.setFill(color)
-      poly.setStroke(Color.Blue)
-      poly.setStrokeWidth(1d)
-      poly
+    val polyObj = (poly: Polyline, color: Paint) =>
+      {
+        poly.setFill(color)
+        poly.setStroke(Color.Blue)
+        poly.setStrokeWidth(1d)
+        poly
     }
     new HBox {
       spacing = 25
       padding = Insets(20)
       children = List(
-        polyObj(Polyline(45, 10, 10, 80, 45, 80), Color.Azure),
-        polyObj(Polyline(135, 15, 160, 30, 160, 60, 135, 110, 110, 30), Color.White)
+          polyObj(Polyline(45, 10, 10, 80, 45, 80), Color.Azure),
+          polyObj(Polyline(135, 15, 160, 30, 160, 60, 135, 110, 110, 30),
+                  Color.White)
       )
     }
   }

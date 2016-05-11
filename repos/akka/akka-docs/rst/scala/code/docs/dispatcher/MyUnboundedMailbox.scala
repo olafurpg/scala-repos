@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.dispatcher
 
 //#mailbox-implementation-example
@@ -20,8 +19,8 @@ trait MyUnboundedMessageQueueSemantics
 
 object MyUnboundedMailbox {
   // This is the MessageQueue implementation
-  class MyMessageQueue extends MessageQueue
-    with MyUnboundedMessageQueueSemantics {
+  class MyMessageQueue
+      extends MessageQueue with MyUnboundedMessageQueueSemantics {
 
     private final val queue = new ConcurrentLinkedQueue[Envelope]()
 
@@ -40,8 +39,9 @@ object MyUnboundedMailbox {
 }
 
 // This is the Mailbox implementation
-class MyUnboundedMailbox extends MailboxType
-  with ProducesMessageQueue[MyUnboundedMailbox.MyMessageQueue] {
+class MyUnboundedMailbox
+    extends MailboxType
+    with ProducesMessageQueue[MyUnboundedMailbox.MyMessageQueue] {
 
   import MyUnboundedMailbox._
 
@@ -52,8 +52,8 @@ class MyUnboundedMailbox extends MailboxType
   }
 
   // The create method is called to create the MessageQueue
-  final override def create(owner: Option[ActorRef],
-                            system: Option[ActorSystem]): MessageQueue =
+  final override def create(
+      owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new MyMessageQueue()
 }
 //#mailbox-implementation-example

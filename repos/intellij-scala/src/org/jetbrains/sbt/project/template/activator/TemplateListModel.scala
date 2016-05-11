@@ -4,15 +4,18 @@ import org.jetbrains.sbt.project.template.activator.ActivatorRepoProcessor.DocDa
 import org.jetbrains.sbt.project.template.activator.TemplateListModel.FullTemplateData
 
 /**
- * User: Dmitry.Naydanov
- * Date: 21.01.15.
- */
-class TemplateListModel(val items: Array[(String, ActivatorRepoProcessor.DocData)]) extends JavaAbstractListModel {
+  * User: Dmitry.Naydanov
+  * Date: 21.01.15.
+  */
+class TemplateListModel(
+    val items: Array[(String, ActivatorRepoProcessor.DocData)])
+    extends JavaAbstractListModel {
   private val temp = 12
-  
-  private val dumbData = ActivatorRepoProcessor.DocData("", "", "", "", "", "", "")
+
+  private val dumbData =
+    ActivatorRepoProcessor.DocData("", "", "", "", "", "", "")
   private val dumbFullData = FullTemplateData("", dumbData)
-  
+
   /**
     * We have to preserve both index and id in order to
     * be able extract any item in correct order (for display in the list, in lex order) and 
@@ -22,7 +25,7 @@ class TemplateListModel(val items: Array[(String, ActivatorRepoProcessor.DocData
     */
   private val (indexedItems, idToItem) = {
     val a1 = items.sortBy(a => a._2.title)
-    (a1.map{case (a, b) => FullTemplateData(a, b)}, a1.toMap)
+    (a1.map { case (a, b) => FullTemplateData(a, b) }, a1.toMap)
   }
 
   override def getSize: Int = Math.max(indexedItems.length, temp)
@@ -39,8 +42,9 @@ class TemplateListModel(val items: Array[(String, ActivatorRepoProcessor.DocData
 
   def getTagsAt(id: String) = getData(id).tags
 
-  private def getItem(i: Int): FullTemplateData = if (i < indexedItems.length && i > -1) indexedItems(i) else dumbFullData
-  
+  private def getItem(i: Int): FullTemplateData =
+    if (i < indexedItems.length && i > -1) indexedItems(i) else dumbFullData
+
   private def getData(id: String) = idToItem.getOrElse(id, dumbData)
 }
 

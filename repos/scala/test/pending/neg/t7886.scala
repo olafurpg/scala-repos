@@ -8,10 +8,11 @@ object Test extends Covariant[Any] {
   def g(m: Contra[Any]): Unit = m accept 5
   def f(x: Any): Unit = x match {
     case Unravel(m, msg) => g(m)
-    case _               =>
+    case _ =>
   }
   def main(args: Array[String]) {
-    f(Unravel[String](new Contra[String] { def accept(x: String) = x.length }, ""))
+    f(Unravel[String](
+            new Contra[String] { def accept(x: String) = x.length }, ""))
   }
 }
 // java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.String

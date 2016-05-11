@@ -29,20 +29,23 @@ import yggdrasil._
 import com.precog.yggdrasil.execution.EvaluationContext
 import yggdrasil.test._
 
-trait PredicatePullupSpecs[M[+_]] extends Specification with EvaluatorTestSupport[M] {
+trait PredicatePullupSpecs[M[+ _]]
+    extends Specification with EvaluatorTestSupport[M] {
   import dag._
   import library._
 
   val ctx = defaultEvaluationContext
 
   object pullups extends PredicatePullups with StdLibOpFinder {
-    def MorphContext(ctx: EvaluationContext, node: DepGraph): MorphContext = new MorphContext(ctx, null)
+    def MorphContext(ctx: EvaluationContext, node: DepGraph): MorphContext =
+      new MorphContext(ctx, null)
   }
   import pullups._
-  
+
   "Predicate pullups optimization" should {
     "pull a predicate out of a solve with a single ticvar" in {
-      val rawInput = """
+      val rawInput =
+        """
         | clicks := //clicks
         |
         | upperBound := 1329643873628
@@ -55,96 +58,107 @@ trait PredicatePullupSpecs[M[+_]] extends Specification with EvaluatorTestSuppor
         | """.stripMargin
 
       val loc = instructions.Line(1, 1, "")
-      
+
       val load = AbsoluteLoad(Const(CString("/clicks"))(loc))(loc)
-      
+
       val id = new Identifier
-      
-      val split =
-        Split(
+
+      val split = Split(
           Group(0,
-            load,
-            IntersectBucketSpec(
-              IntersectBucketSpec(
-                Extra(
-                  Join(instructions.LtEq,Cross(None),
-                    Join(instructions.DerefObject,Cross(None), load, Const(CString("time"))(loc))(loc),
-                    Const(CLong(1329643873628L))(loc)
-                  )(loc)
-                ),
-                Extra(
-                  Join(instructions.GtEq,Cross(None),
-                    Join(instructions.DerefObject,Cross(None), load, Const(CString("time"))(loc))(loc),
-                    Const(CLong(1328779873610L))(loc)
-                  )(loc)
-                )
-              ),
-              UnfixedSolution(1,
-                Join(instructions.DerefObject,Cross(None), load, Const(CString("userId"))(loc))(loc)
-              )
-            )
-          ),
-          Join(instructions.JoinObject,Cross(None),
-            Join(instructions.WrapObject,Cross(None),
-              Const(CString("userId"))(loc),
-              SplitParam(1, id)(loc)
-            )(loc),
-            Join(instructions.WrapObject,Cross(None),
-              Const(CString("time"))(loc),
-              Join(instructions.DerefObject,Cross(None),
-                SplitGroup(0, load.identities, id)(loc),
-                Const(CString("time"))(loc)
-              )(loc)
-            )(loc)
-          )(loc), id
-        )(loc)
-        
+                load,
+                IntersectBucketSpec(
+                    IntersectBucketSpec(
+                        Extra(
+                            Join(instructions.LtEq,
+                                 Cross(None),
+                                 Join(instructions.DerefObject,
+                                      Cross(None),
+                                      load,
+                                      Const(CString("time"))(loc))(loc),
+                                 Const(CLong(1329643873628L))(loc))(loc)
+                        ),
+                        Extra(
+                            Join(instructions.GtEq,
+                                 Cross(None),
+                                 Join(instructions.DerefObject,
+                                      Cross(None),
+                                      load,
+                                      Const(CString("time"))(loc))(loc),
+                                 Const(CLong(1328779873610L))(loc))(loc)
+                        )
+                    ),
+                    UnfixedSolution(1,
+                                    Join(instructions.DerefObject,
+                                         Cross(None),
+                                         load,
+                                         Const(CString("userId"))(loc))(loc))
+                )),
+          Join(instructions.JoinObject,
+               Cross(None),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("userId"))(loc),
+                    SplitParam(1, id)(loc))(loc),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("time"))(loc),
+                    Join(instructions.DerefObject,
+                         Cross(None),
+                         SplitGroup(0, load.identities, id)(loc),
+                         Const(CString("time"))(loc))(loc))(loc))(loc),
+          id
+      )(loc)
+
       val filteredLoad =
         Filter(IdentitySort,
-          load,
-          Join(instructions.And,IdentitySort,
-            Join(instructions.LtEq,Cross(None),
-              Join(instructions.DerefObject,Cross(None), load, Const(CString("time"))(loc))(loc),
-              Const(CLong(1329643873628L))(loc)
-            )(loc),
-            Join(instructions.GtEq,Cross(None),
-              Join(instructions.DerefObject,Cross(None), load, Const(CString("time"))(loc))(loc),
-              Const(CLong(1328779873610L))(loc)
-            )(loc)
-          )(loc)
-        )(loc)
-            
-      val expected =
-        Split(
+               load,
+               Join(instructions.And,
+                    IdentitySort,
+                    Join(instructions.LtEq,
+                         Cross(None),
+                         Join(instructions.DerefObject,
+                              Cross(None),
+                              load,
+                              Const(CString("time"))(loc))(loc),
+                         Const(CLong(1329643873628L))(loc))(loc),
+                    Join(instructions.GtEq,
+                         Cross(None),
+                         Join(instructions.DerefObject,
+                              Cross(None),
+                              load,
+                              Const(CString("time"))(loc))(loc),
+                         Const(CLong(1328779873610L))(loc))(loc))(loc))(loc)
+
+      val expected = Split(
           Group(0,
-            filteredLoad,
-            UnfixedSolution(1,
-              Join(instructions.DerefObject,Cross(None),
                 filteredLoad,
-                Const(CString("userId"))(loc)
-              )(loc)
-            )
-          ),
-          Join(instructions.JoinObject,Cross(None),
-            Join(instructions.WrapObject,Cross(None),
-              Const(CString("userId"))(loc),
-              SplitParam(1, id)(loc)
-            )(loc),
-            Join(instructions.WrapObject,Cross(None),
-              Const(CString("time"))(loc),
-              Join(instructions.DerefObject,Cross(None),
-                SplitGroup(0, load.identities, id)(loc),
-                Const(CString("time"))(loc)
-              )(loc)
-            )(loc)
-          )(loc), id
-        )(loc)
+                UnfixedSolution(1,
+                                Join(instructions.DerefObject,
+                                     Cross(None),
+                                     filteredLoad,
+                                     Const(CString("userId"))(loc))(loc))),
+          Join(instructions.JoinObject,
+               Cross(None),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("userId"))(loc),
+                    SplitParam(1, id)(loc))(loc),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("time"))(loc),
+                    Join(instructions.DerefObject,
+                         Cross(None),
+                         SplitGroup(0, load.identities, id)(loc),
+                         Const(CString("time"))(loc))(loc))(loc))(loc),
+          id
+      )(loc)
 
       predicatePullups(split, ctx) mustEqual expected
     }
 
     "pull a predicate out of a solve with more than one ticvar" in {
-      val rawInput = """
+      val rawInput =
+        """
         | clicks := //clicks
         |
         | upperBound := 1329643873628
@@ -155,111 +169,124 @@ trait PredicatePullupSpecs[M[+_]] extends Specification with EvaluatorTestSuppor
         |   clicks' := clicks where clicks.time <= upperBound & clicks.time >= extraLB & clicks.userId = 'userId & clicks.pageId = 'pageId
         |   {userId: 'userId, time: clicks'.time}
         | """.stripMargin
-        
+
       val id = new Identifier
 
       val loc = instructions.Line(1, 1, "")
 
-      val load = AbsoluteLoad(Const(CString("/clicks"))(loc))(loc) 
-      
-      val split =
-        Split(
-          Group(0,
-            load,
-            IntersectBucketSpec(
+      val load = AbsoluteLoad(Const(CString("/clicks"))(loc))(loc)
+
+      val split = Split(
+          Group(
+              0,
+              load,
               IntersectBucketSpec(
-                IntersectBucketSpec(
-                  Extra(
-                    Join(instructions.LtEq,Cross(None),
-                      Join(instructions.DerefObject,Cross(None), load, Const(CString("time"))(loc))(loc),
-                      Const(CLong(1329643873628L))(loc)
-                    )(loc)
+                  IntersectBucketSpec(
+                      IntersectBucketSpec(
+                          Extra(
+                              Join(instructions.LtEq,
+                                   Cross(None),
+                                   Join(instructions.DerefObject,
+                                        Cross(None),
+                                        load,
+                                        Const(CString("time"))(loc))(loc),
+                                   Const(CLong(1329643873628L))(loc))(loc)
+                          ),
+                          Extra(
+                              Join(instructions.GtEq,
+                                   Cross(None),
+                                   Join(instructions.DerefObject,
+                                        Cross(None),
+                                        load,
+                                        Const(CString("time"))(loc))(loc),
+                                   Const(CLong(1328779873610L))(loc))(loc)
+                          )
+                      ),
+                      UnfixedSolution(1,
+                                      Join(instructions.DerefObject,
+                                           Cross(None),
+                                           load,
+                                           Const(CString("userId"))(loc))(loc))
                   ),
-                  Extra(
-                    Join(instructions.GtEq,Cross(None),
-                      Join(instructions.DerefObject,Cross(None), load, Const(CString("time"))(loc))(loc),
-                      Const(CLong(1328779873610L))(loc)
-                    )(loc)
-                  )
-                ),
-                UnfixedSolution(1,
-                  Join(instructions.DerefObject,Cross(None), load, Const(CString("userId"))(loc))(loc)
-                )
-              ),
-              UnfixedSolution(2,
-                Join(instructions.DerefObject,Cross(None), load, Const(CString("pageId"))(loc))(loc)
-              )
-            )
-          ),
-          Join(instructions.JoinObject,Cross(None),
-            Join(instructions.WrapObject,Cross(None),
-              Const(CString("userId"))(loc),
-              SplitParam(1, id)(loc)
-            )(loc),
-            Join(instructions.WrapObject,Cross(None),
-              Const(CString("time"))(loc),
-              Join(instructions.DerefObject,Cross(None),
-                SplitGroup(0, load.identities, id)(loc),
-                Const(CString("time"))(loc)
-              )(loc)
-            )(loc)
-          )(loc), id
-        )(loc)
-        
-        val filteredLoad =
-          Filter(IdentitySort,
-            load,
-            Join(instructions.And,IdentitySort,
-              Join(instructions.LtEq,Cross(None),
-                Join(instructions.DerefObject,Cross(None), load, Const(CString("time"))(loc))(loc),
-                Const(CLong(1329643873628L))(loc)
-              )(loc),
-              Join(instructions.GtEq,Cross(None),
-                Join(instructions.DerefObject,Cross(None), load, Const(CString("time"))(loc))(loc),
-                Const(CLong(1328779873610L))(loc)
-              )(loc)
-            )(loc)
-          )(loc)
-              
-        val expected = 
-          Split(
-            Group(0,
-              filteredLoad,
-              IntersectBucketSpec(
-                UnfixedSolution(1,
-                  Join(instructions.DerefObject,Cross(None),
-                    filteredLoad,
-                    Const(CString("userId"))(loc)
-                  )(loc)
-                ),
-                UnfixedSolution(2,
-                  Join(instructions.DerefObject,Cross(None),
-                    filteredLoad,
-                    Const(CString("pageId"))(loc)
-                  )(loc)
-                )
-              )
-            ),
-            Join(instructions.JoinObject,Cross(None),
-              Join(instructions.WrapObject,Cross(None),
-                Const(CString("userId"))(loc),
-                SplitParam(1, id)(loc)
-              )(loc),
-              Join(instructions.WrapObject,Cross(None),
-                Const(CString("time"))(loc),
-                Join(instructions.DerefObject,Cross(None),
-                  SplitGroup(0, load.identities, id)(loc),
-                  Const(CString("time"))(loc)
-                )(loc)
-              )(loc)
-            )(loc), id
-          )(loc)
+                  UnfixedSolution(2,
+                                  Join(instructions.DerefObject,
+                                       Cross(None),
+                                       load,
+                                       Const(CString("pageId"))(loc))(loc))
+              )),
+          Join(instructions.JoinObject,
+               Cross(None),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("userId"))(loc),
+                    SplitParam(1, id)(loc))(loc),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("time"))(loc),
+                    Join(instructions.DerefObject,
+                         Cross(None),
+                         SplitGroup(0, load.identities, id)(loc),
+                         Const(CString("time"))(loc))(loc))(loc))(loc),
+          id
+      )(loc)
+
+      val filteredLoad =
+        Filter(IdentitySort,
+               load,
+               Join(instructions.And,
+                    IdentitySort,
+                    Join(instructions.LtEq,
+                         Cross(None),
+                         Join(instructions.DerefObject,
+                              Cross(None),
+                              load,
+                              Const(CString("time"))(loc))(loc),
+                         Const(CLong(1329643873628L))(loc))(loc),
+                    Join(instructions.GtEq,
+                         Cross(None),
+                         Join(instructions.DerefObject,
+                              Cross(None),
+                              load,
+                              Const(CString("time"))(loc))(loc),
+                         Const(CLong(1328779873610L))(loc))(loc))(loc))(loc)
+
+      val expected = Split(
+          Group(0,
+                filteredLoad,
+                IntersectBucketSpec(
+                    UnfixedSolution(1,
+                                    Join(instructions.DerefObject,
+                                         Cross(None),
+                                         filteredLoad,
+                                         Const(CString("userId"))(loc))(loc)),
+                    UnfixedSolution(2,
+                                    Join(instructions.DerefObject,
+                                         Cross(None),
+                                         filteredLoad,
+                                         Const(CString("pageId"))(loc))(loc))
+                )),
+          Join(instructions.JoinObject,
+               Cross(None),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("userId"))(loc),
+                    SplitParam(1, id)(loc))(loc),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("time"))(loc),
+                    Join(instructions.DerefObject,
+                         Cross(None),
+                         SplitGroup(0, load.identities, id)(loc),
+                         Const(CString("time"))(loc))(loc))(loc))(loc),
+          id
+      )(loc)
 
       predicatePullups(split, ctx) mustEqual expected
     }
 
     "pull a predicate out of the top level of a nested solve" in {
-      val rawInput = """
+      val rawInput =
+        """
         | medals := //summer_games/london_medals
         | 
         | solve 'gender
@@ -268,196 +295,197 @@ trait PredicatePullupSpecs[M[+_]] extends Specification with EvaluatorTestSuppor
         |   solve 'weight
         |     medals' where medals'.Weight = 'weight
         | """.stripMargin
-        
+
       val id1 = new Identifier
       val id2 = new Identifier
-        
+
       val loc = instructions.Line(1, 1, "")
-      
-      val load = AbsoluteLoad(Const(CString("/summer_games/london_medals"))(loc))(loc)
-      
-      lazy val split =
-        Split(
+
+      val load =
+        AbsoluteLoad(Const(CString("/summer_games/london_medals"))(loc))(loc)
+
+      lazy val split = Split(
           Group(0,
-            load,
-            IntersectBucketSpec(
-              UnfixedSolution(1,
-                Join(instructions.DerefObject,Cross(None), load, Const(CString("Gender"))(loc))(loc)
-              ),
-              Extra(
-                Join(instructions.Eq,Cross(None),
-                  Join(instructions.DerefObject,Cross(None), load, Const(CString("Edition"))(loc))(loc),
-                  Const(CLong(2000))(loc)
-                )(loc)
-              )
-            )
-          ),
+                load,
+                IntersectBucketSpec(
+                    UnfixedSolution(1,
+                                    Join(instructions.DerefObject,
+                                         Cross(None),
+                                         load,
+                                         Const(CString("Gender"))(loc))(loc)),
+                    Extra(
+                        Join(instructions.Eq,
+                             Cross(None),
+                             Join(instructions.DerefObject,
+                                  Cross(None),
+                                  load,
+                                  Const(CString("Edition"))(loc))(loc),
+                             Const(CLong(2000))(loc))(loc)
+                    )
+                )),
           innerSplit,
           id1
-        )(loc)
-        
-      lazy val innerSplit =
-        Split(
+      )(loc)
+
+      lazy val innerSplit = Split(
           Group(2,
-            SplitGroup(0, load.identities, id1)(loc),
-            UnfixedSolution(3,
-              Join(instructions.DerefObject,Cross(None),
                 SplitGroup(0, load.identities, id1)(loc),
-                Const(CString("Weight"))(loc)
-              )(loc)
-            )
-          ),
+                UnfixedSolution(3,
+                                Join(instructions.DerefObject,
+                                     Cross(None),
+                                     SplitGroup(0, load.identities, id1)(loc),
+                                     Const(CString("Weight"))(loc))(loc))),
           SplitGroup(2, load.identities, id2)(loc),
           id2
-        )(loc)
-      
-      val filteredLoad =
-        Filter(IdentitySort,
-          load,
-          Join(instructions.Eq,Cross(None),
-            Join(instructions.DerefObject,Cross(None), load, Const(CString("Edition"))(loc))(loc),
-            Const(CLong(2000))(loc)
-          )(loc)
-        )(loc)
+      )(loc)
 
-      lazy val expected =  
-        Split(
+      val filteredLoad = Filter(IdentitySort,
+                                load,
+                                Join(instructions.Eq,
+                                     Cross(None),
+                                     Join(instructions.DerefObject,
+                                          Cross(None),
+                                          load,
+                                          Const(CString("Edition"))(loc))(loc),
+                                     Const(CLong(2000))(loc))(loc))(loc)
+
+      lazy val expected = Split(
           Group(0,
-            filteredLoad,
-            UnfixedSolution(1,
-              Join(instructions.DerefObject,Cross(None),
                 filteredLoad,
-                Const(CString("Gender"))(loc)
-              )(loc)
-            )
-          ),
+                UnfixedSolution(1,
+                                Join(instructions.DerefObject,
+                                     Cross(None),
+                                     filteredLoad,
+                                     Const(CString("Gender"))(loc))(loc))),
           expectedInner,
           id1
-        )(loc)
-        
-      lazy val expectedInner =  
-        Split(
+      )(loc)
+
+      lazy val expectedInner = Split(
           Group(2,
-            SplitGroup(0,
-              load.identities,
-              id1
-            )(loc),
-            UnfixedSolution(3,
-              Join(instructions.DerefObject,Cross(None),
                 SplitGroup(0, load.identities, id1)(loc),
-                Const(CString("Weight"))(loc)
-              )(loc)
-            )
-          ),
+                UnfixedSolution(3,
+                                Join(instructions.DerefObject,
+                                     Cross(None),
+                                     SplitGroup(0, load.identities, id1)(loc),
+                                     Const(CString("Weight"))(loc))(loc))),
           SplitGroup(2, load.identities, id2)(loc),
           id2
-        )(loc)
-        
+      )(loc)
+
       predicatePullups(split, ctx) mustEqual expected
     }
 
     "pull a predicate out of a solve where both the filtered and the unfiltered set occur in the body" in {
-      val rawInput = """
+      val rawInput =
+        """
         | medals := //summer_games/london_medals
         | 
         | solve 'gender
         |   medals' := medals where medals.Gender = 'gender & medals.Edition = 2000
         |   { gender1: 'gender, gender2: medals.Gender, gender3: medals'.Gender }
         | """.stripMargin
-        
+
       val id = new Identifier
-      
+
       val loc = instructions.Line(1, 1, "")
 
-      val load = AbsoluteLoad(Const(CString("/summer_games/london_medals"))(loc))(loc) 
-        
-      val split =
-        Split(
+      val load =
+        AbsoluteLoad(Const(CString("/summer_games/london_medals"))(loc))(loc)
+
+      val split = Split(
           Group(0,
-            load,
-            IntersectBucketSpec(
-              UnfixedSolution(1,
-                Join(instructions.DerefObject,Cross(None), load, Const(CString("Gender"))(loc))(loc)
-              ),
-              Extra(
-                Join(instructions.Eq,Cross(None),
-                  Join(instructions.DerefObject,Cross(None), load, Const(CString("Edition"))(loc))(loc),
-                  Const(CLong(2000))(loc)
-                )(loc)
-              )
-            )
-          ),
-          Join(instructions.JoinObject,Cross(None),
-            Join(instructions.WrapObject,Cross(None),
-              Const(CString("gender1"))(loc),
-              SplitParam(1, id)(loc)
-            )(loc),
-            Join(instructions.JoinObject,IdentitySort,
-              Join(instructions.WrapObject,Cross(None),
-                Const(CString("gender2"))(loc),
-                Join(instructions.DerefObject,Cross(None),
-                  load,
-                  Const(CString("Gender"))(loc)
-                )(loc)
-              )(loc),
-              Join(instructions.WrapObject,Cross(None),
-                Const(CString("gender3"))(loc),
-                Join(instructions.DerefObject,Cross(None),
-                  SplitGroup(0,load.identities, id)(loc),
-                  Const(CString("Gender"))(loc)
-                )(loc)
-              )(loc)
-            )(loc)
-          )(loc), id
-        )(loc)
-      
-      val filteredLoad =
-        Filter(IdentitySort,
-          load,
-          Join(instructions.Eq,Cross(None),
-            Join(instructions.DerefObject,Cross(None), load, Const(CString("Edition"))(loc))(loc),
-            Const(CLong(2000))(loc)
-          )(loc)
-        )(loc)
-        
-      val expected =
-        Split(
+                load,
+                IntersectBucketSpec(
+                    UnfixedSolution(1,
+                                    Join(instructions.DerefObject,
+                                         Cross(None),
+                                         load,
+                                         Const(CString("Gender"))(loc))(loc)),
+                    Extra(
+                        Join(instructions.Eq,
+                             Cross(None),
+                             Join(instructions.DerefObject,
+                                  Cross(None),
+                                  load,
+                                  Const(CString("Edition"))(loc))(loc),
+                             Const(CLong(2000))(loc))(loc)
+                    )
+                )),
+          Join(instructions.JoinObject,
+               Cross(None),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("gender1"))(loc),
+                    SplitParam(1, id)(loc))(loc),
+               Join(instructions.JoinObject,
+                    IdentitySort,
+                    Join(instructions.WrapObject,
+                         Cross(None),
+                         Const(CString("gender2"))(loc),
+                         Join(instructions.DerefObject,
+                              Cross(None),
+                              load,
+                              Const(CString("Gender"))(loc))(loc))(loc),
+                    Join(instructions.WrapObject,
+                         Cross(None),
+                         Const(CString("gender3"))(loc),
+                         Join(instructions.DerefObject,
+                              Cross(None),
+                              SplitGroup(0, load.identities, id)(loc),
+                              Const(CString("Gender"))(loc))(loc))(loc))(loc))(
+              loc),
+          id
+      )(loc)
+
+      val filteredLoad = Filter(IdentitySort,
+                                load,
+                                Join(instructions.Eq,
+                                     Cross(None),
+                                     Join(instructions.DerefObject,
+                                          Cross(None),
+                                          load,
+                                          Const(CString("Edition"))(loc))(loc),
+                                     Const(CLong(2000))(loc))(loc))(loc)
+
+      val expected = Split(
           Group(0,
-            filteredLoad,
-            UnfixedSolution(1,
-              Join(instructions.DerefObject,Cross(None),
                 filteredLoad,
-                Const(CString("Gender"))(loc)
-              )(loc)
-            )
-          ),
-          Join(instructions.JoinObject,Cross(None),
-            Join(instructions.WrapObject,Cross(None),
-              Const(CString("gender1"))(loc),
-              SplitParam(1, id)(loc)
-            )(loc),
-            Join(instructions.JoinObject,IdentitySort,
-              Join(instructions.WrapObject,Cross(None),
-                Const(CString("gender2"))(loc),
-                Join(instructions.DerefObject,Cross(None),
-                  filteredLoad,
-                  Const(CString("Gender"))(loc)
-                )(loc)
-              )(loc),
-              Join(instructions.WrapObject,Cross(None),
-                Const(CString("gender3"))(loc),
-                Join(instructions.DerefObject,Cross(None),
-                  SplitGroup(0, load.identities, id)(loc),
-                  Const(CString("Gender"))(loc)
-                )(loc)
-              )(loc)
-            )(loc)
-          )(loc), id
-        )(loc)
-        
+                UnfixedSolution(1,
+                                Join(instructions.DerefObject,
+                                     Cross(None),
+                                     filteredLoad,
+                                     Const(CString("Gender"))(loc))(loc))),
+          Join(instructions.JoinObject,
+               Cross(None),
+               Join(instructions.WrapObject,
+                    Cross(None),
+                    Const(CString("gender1"))(loc),
+                    SplitParam(1, id)(loc))(loc),
+               Join(instructions.JoinObject,
+                    IdentitySort,
+                    Join(instructions.WrapObject,
+                         Cross(None),
+                         Const(CString("gender2"))(loc),
+                         Join(instructions.DerefObject,
+                              Cross(None),
+                              filteredLoad,
+                              Const(CString("Gender"))(loc))(loc))(loc),
+                    Join(instructions.WrapObject,
+                         Cross(None),
+                         Const(CString("gender3"))(loc),
+                         Join(instructions.DerefObject,
+                              Cross(None),
+                              SplitGroup(0, load.identities, id)(loc),
+                              Const(CString("Gender"))(loc))(loc))(loc))(loc))(
+              loc),
+          id
+      )(loc)
+
       predicatePullups(split, ctx) mustEqual expected
     }
   }
 }
 
-object PredicatePullupSpecs extends PredicatePullupSpecs[YId] with yggdrasil.test.YIdInstances 
+object PredicatePullupSpecs
+    extends PredicatePullupSpecs[YId] with yggdrasil.test.YIdInstances

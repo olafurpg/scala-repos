@@ -9,13 +9,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
 import org.jetbrains.plugins.scala.lang.psi.types.ValueClassType
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 object FinalClassInheritance extends AnnotatorPart[ScTemplateDefinition] {
   def kind = classOf[ScTemplateDefinition]
 
-  def annotate(definition: ScTemplateDefinition, holder: AnnotationHolder, typeAware: Boolean) {
+  def annotate(definition: ScTemplateDefinition,
+               holder: AnnotationHolder,
+               typeAware: Boolean) {
     val newInstance = definition.isInstanceOf[ScNewTemplateDefinition]
     val hasBody = definition.extendsBlock.templateBody.isDefined
 
@@ -23,10 +24,15 @@ object FinalClassInheritance extends AnnotatorPart[ScTemplateDefinition] {
 
     definition.refs.foreach {
       case (refElement, Some((psiClass, _))) if psiClass.hasFinalModifier =>
-        holder.createErrorAnnotation(refElement,
-          "Illegal inheritance from final %s %s".format(kindOf(psiClass).toLowerCase, psiClass.name))
+        holder.createErrorAnnotation(
+            refElement,
+            "Illegal inheritance from final %s %s".format(
+                kindOf(psiClass).toLowerCase, psiClass.name))
       case (refElement, Some((cl, _))) if ValueClassType.isValueClass(cl) =>
-        holder.createErrorAnnotation(refElement, ScalaBundle.message("illegal.inheritance.from.value.class", cl.name))
+        holder.createErrorAnnotation(
+            refElement,
+            ScalaBundle.message("illegal.inheritance.from.value.class",
+                                cl.name))
       case _ =>
     }
   }

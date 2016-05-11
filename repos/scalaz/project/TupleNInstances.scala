@@ -4,9 +4,10 @@ object TupleNInstances {
 
   def apply(outputDir: File): File = {
     val header = "package scalaz\npackage std\n\n"
-    val source = header + (2 to 8).map{ n =>
-      tupleNTraverse(n) + tupleNBindRec(n) + tupleNMonad(n)
-    }.mkString("\n")
+    val source =
+      header + (2 to 8).map { n =>
+        tupleNTraverse(n) + tupleNBindRec(n) + tupleNMonad(n)
+      }.mkString("\n")
 
     val file = outputDir / "scalaz" / "std" / "TupleNInstances.scala"
     IO.write(file, source)
@@ -32,7 +33,7 @@ private[std] trait Tuple${n}Functor[$tparams] extends Traverse[($tparams, ?)] {
     val xs = (1 until n).map("x" + _).mkString(", ")
     val zs = (1 until n).map("z" + _).mkString(", ")
 
-s"""
+    s"""
 private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] with Tuple${n}Functor[$tparams] {
   ${(1 until n).map(i => s"def _$i : Semigroup[A$i]").mkString("; ")}
 
@@ -46,7 +47,9 @@ private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] wit
     def go(${(1 until n).map(i => s"s$i: A$i").mkString(", ")})(z: A): ($tparams, B) =
       f(z) match {
         case (${(1 until n).map("a" + _).mkString(", ")}, b0) =>
-          ${(1 until n).map(i => s"val x$i = _$i.append(s$i, a$i)").mkString("; ")}
+          ${(1 until n)
+      .map(i => s"val x$i = _$i.append(s$i, a$i)")
+      .mkString("; ")}
           b0 match {
             case -\\/(a0) => go($xs)(a0)
             case \\/-(b1) => ($xs, b1)
@@ -65,7 +68,7 @@ private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] wit
   def tupleNMonad(n: Int): String = {
     val tparams = (1 until n).map("A" + _).mkString(", ")
 
-s"""
+    s"""
 private[std] abstract class Tuple${n}Monad[$tparams] extends Monad[($tparams, ?)] with Tuple${n}BindRec[$tparams] {
   ${(1 until n).map(i => s"override def _$i : Monoid[A$i]").mkString("; ")}
   def point[A](a: => A) = (${(1 until n).map(i => s"_$i.zero").mkString(", ")}, a)

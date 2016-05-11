@@ -2,7 +2,7 @@
 package scala.reflect
 package runtime
 
-trait JavaUniverseForce { self: runtime.JavaUniverse  =>
+trait JavaUniverseForce { self: runtime.JavaUniverse =>
   def force() {
     Literal(Constant(42)).duplicate
     nme.flattenedName()

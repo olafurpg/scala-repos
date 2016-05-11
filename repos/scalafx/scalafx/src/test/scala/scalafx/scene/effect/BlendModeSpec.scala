@@ -35,11 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.effect.BlendMode]]. */
 @RunWith(classOf[JUnitRunner])
-class BlendModeSpec extends SFXEnumDelegateSpec[jfxse.BlendMode, BlendMode](
-  javaClass = classOf[jfxse.BlendMode],
-  scalaClass = classOf[BlendMode],
-  companion = BlendMode)
-
+class BlendModeSpec
+    extends SFXEnumDelegateSpec[jfxse.BlendMode, BlendMode](
+        javaClass = classOf[jfxse.BlendMode],
+        scalaClass = classOf[BlendMode],
+        companion = BlendMode)

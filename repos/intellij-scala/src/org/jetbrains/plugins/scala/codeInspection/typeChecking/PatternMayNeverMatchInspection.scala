@@ -13,14 +13,18 @@ import org.jetbrains.plugins.scala.lang.psi.types.{Conformance, ScType, ScTypePr
   * Author: Svyatoslav Ilinskiy
   * Date: 21.12.15.
   */
-class PatternMayNeverMatchInspection extends AbstractInspection(inspectionId, inspectionName) {
-  override def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
-    case pat@ScPatternExpectedAndPatternType(exTp, patType)
-      if !PatternAnnotatorUtil.matchesPattern(exTp, patType) && !Conformance.conforms(exTp, patType) =>
+class PatternMayNeverMatchInspection
+    extends AbstractInspection(inspectionId, inspectionName) {
+  override def actionFor(
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+    case pat @ ScPatternExpectedAndPatternType(exTp, patType)
+        if !PatternAnnotatorUtil.matchesPattern(exTp, patType) &&
+        !Conformance.conforms(exTp, patType) =>
       if (!isNeverSubType(exTp, patType)) {
         //need to check so inspection highlighting doesn't interfere with PatterAnnotator's
         val message = PatternMayNeverMatchInspection.message(exTp, patType)
-        holder.registerProblem(pat, message, ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+        holder.registerProblem(
+            pat, message, ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
   }
 }
@@ -32,7 +36,7 @@ object PatternMayNeverMatchInspection {
     val (expected, found) = ScTypePresentation.different(_expected, _found)
     InspectionBundle.message("pattern.may.never.match", expected, found)
   }
-  
+
   object ScPatternExpectedAndPatternType {
     def unapply(pat: ScPattern): Option[(ScType, ScType)] = {
       (pat.expectedType, PatternAnnotatorUtil.patternType(pat)) match {

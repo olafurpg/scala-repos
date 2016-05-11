@@ -1,25 +1,27 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2007-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2007-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
 package math
 
 /** A slightly more specific conversion trait for classes which
- *  extend ScalaNumber (which excludes value classes.)
- */
-trait ScalaNumericConversions extends ScalaNumber with ScalaNumericAnyConversions {
+  *  extend ScalaNumber (which excludes value classes.)
+  */
+trait ScalaNumericConversions
+    extends ScalaNumber with ScalaNumericAnyConversions {
   def underlying(): Object
 }
 
 /** Conversions which present a consistent conversion interface
- *  across all the numeric types, suitable for use in value classes.
- */
+  *  across all the numeric types, suitable for use in value classes.
+  */
 trait ScalaNumericAnyConversions extends Any {
+
   /** @return `'''true'''` if this number has no decimal component, `'''false'''` otherwise. */
   def isWhole(): Boolean
   def underlying(): Any
@@ -69,7 +71,7 @@ trait ScalaNumericAnyConversions extends Any {
   /** Returns `true` iff this has a zero fractional part, and is within the
     * range of [[scala.Byte]] MinValue and MaxValue; otherwise returns `false`.
     */
-  def isValidByte  = isWhole && (toInt == toByte)
+  def isValidByte = isWhole && (toInt == toByte)
 
   /** Returns `true` iff this has a zero fractional part, and is within the
     * range of [[scala.Short]] MinValue and MaxValue; otherwise returns `false`.
@@ -79,12 +81,13 @@ trait ScalaNumericAnyConversions extends Any {
   /** Returns `true` iff this has a zero fractional part, and is within the
     * range of [[scala.Int]] MinValue and MaxValue; otherwise returns `false`.
     */
-  def isValidInt   = isWhole && (toLong == toInt)
+  def isValidInt = isWhole && (toLong == toInt)
 
   /** Returns `true` iff this has a zero fractional part, and is within the
     * range of [[scala.Char]] MinValue and MaxValue; otherwise returns `false`.
     */
-  def isValidChar  = isWhole && (toInt >= Char.MinValue && toInt <= Char.MaxValue)
+  def isValidChar =
+    isWhole && (toInt >= Char.MinValue && toInt <= Char.MaxValue)
 
   protected def unifiedPrimitiveHashcode() = {
     val lv = toLong
@@ -93,27 +96,27 @@ trait ScalaNumericAnyConversions extends Any {
   }
 
   /** Should only be called after all known non-primitive
-   *  types have been excluded.  This method won't dispatch
-   *  anywhere else after checking against the primitives
-   *  to avoid infinite recursion between equals and this on
-   *  unknown "Number" variants.
-   *
-   *  Additionally, this should only be called if the numeric
-   *  type is happy to be converted to Long, Float, and Double.
-   *  If for instance a BigInt much larger than the Long range is
-   *  sent here, it will claim equality with whatever Long is left
-   *  in its lower 64 bits.  Or a BigDecimal with more precision
-   *  than Double can hold: same thing.  There's no way given the
-   *  interface available here to prevent this error.
-   */
+    *  types have been excluded.  This method won't dispatch
+    *  anywhere else after checking against the primitives
+    *  to avoid infinite recursion between equals and this on
+    *  unknown "Number" variants.
+    *
+    *  Additionally, this should only be called if the numeric
+    *  type is happy to be converted to Long, Float, and Double.
+    *  If for instance a BigInt much larger than the Long range is
+    *  sent here, it will claim equality with whatever Long is left
+    *  in its lower 64 bits.  Or a BigDecimal with more precision
+    *  than Double can hold: same thing.  There's no way given the
+    *  interface available here to prevent this error.
+    */
   protected def unifiedPrimitiveEquals(x: Any) = x match {
-    case x: Char    => isValidChar && (toInt == x.toInt)
-    case x: Byte    => isValidByte && (toByte == x)
-    case x: Short   => isValidShort && (toShort == x)
-    case x: Int     => isValidInt && (toInt == x)
-    case x: Long    => toLong == x
-    case x: Float   => toFloat == x
-    case x: Double  => toDouble == x
-    case _          => false
+    case x: Char => isValidChar && (toInt == x.toInt)
+    case x: Byte => isValidByte && (toByte == x)
+    case x: Short => isValidShort && (toShort == x)
+    case x: Int => isValidInt && (toInt == x)
+    case x: Long => toLong == x
+    case x: Float => toFloat == x
+    case x: Double => toDouble == x
+    case _ => false
   }
 }

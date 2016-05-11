@@ -21,10 +21,11 @@ object Tags {
   val ForkedTestGroup = Tag("forked-test-group")
 
   /**
-   * Describes a restriction on concurrently executing tasks.
-   * A Rule is constructed using one of the Tags.limit* methods.
-   */
-  sealed trait Rule { // TODO: make this an abstract class for 0.14
+    * Describes a restriction on concurrently executing tasks.
+    * A Rule is constructed using one of the Tags.limit* methods.
+    */
+  sealed trait Rule {
+    // TODO: make this an abstract class for 0.14
     def apply(m: TagMap): Boolean
     def ||(r: Rule): Rule = new Or(this, r)
     def &&(r: Rule): Rule = new And(this, r)
@@ -53,27 +54,30 @@ object Tags {
     def apply(m: TagMap) = !a(m)
   }
 
-  private[this] def checkMax(max: Int): Unit = assert(max >= 1, "Limit must be at least 1.")
+  private[this] def checkMax(max: Int): Unit =
+    assert(max >= 1, "Limit must be at least 1.")
 
   /** Converts a sequence of rules into a function that identifies whether a set of tasks are allowed to execute concurrently based on their merged tags. */
-  def predicate(rules: Seq[Rule]): TagMap => Boolean = m => {
-    @tailrec def loop(rules: List[Rule]): Boolean =
-      rules match {
-        case x :: xs => x(m) && loop(xs)
-        case Nil     => true
-      }
-    loop(rules.toList)
-  }
+  def predicate(rules: Seq[Rule]): TagMap => Boolean =
+    m =>
+      {
+        @tailrec def loop(rules: List[Rule]): Boolean =
+          rules match {
+            case x :: xs => x(m) && loop(xs)
+            case Nil => true
+          }
+        loop(rules.toList)
+    }
 
   def getInt(m: TagMap, tag: Tag): Int = m.getOrElse(tag, 0)
 
   /**
-   * Constructs a custom Rule from the predicate `f`.
-   * The input represents the weighted tags of a set of tasks.
-   * The function `f` should return true if those tasks are allowed to execute concurrently and false if they are not.
-   *
-   * If there is only one task represented by the map, it must be allowed to execute.
-   */
+    * Constructs a custom Rule from the predicate `f`.
+    * The input represents the weighted tags of a set of tasks.
+    * The function `f` should return true if those tasks are allowed to execute concurrently and false if they are not.
+    *
+    * If there is only one task represented by the map, it must be allowed to execute.
+    */
   def customLimit(f: TagMap => Boolean): Rule = new Custom(f)
 
   /** Returns a Rule that limits the maximum number of concurrently executing tasks to `max`, regardless of tags. */
@@ -86,20 +90,23 @@ object Tags {
   def limit(tag: Tag, max: Int): Rule = new Single(tag, max)
 
   def limitSum(max: Int, tags: Tag*): Rule = new Sum(tags, max)
+
   /** Ensure that a task with the given tag always executes in isolation.*/
-  def exclusive(exclusiveTag: Tag): Rule = customLimit { (tags: Map[Tag, Int]) =>
-    // if there are no exclusive tasks in this group, this rule adds no restrictions
-    tags.getOrElse(exclusiveTag, 0) == 0 ||
+  def exclusive(exclusiveTag: Tag): Rule = customLimit {
+    (tags: Map[Tag, Int]) =>
+      // if there are no exclusive tasks in this group, this rule adds no restrictions
+      tags.getOrElse(exclusiveTag, 0) == 0 ||
       // If there is only one task, allow it to execute.
       tags.getOrElse(Tags.All, 0) == 1
   }
 
   /** Ensure that a task with the given tag only executes with tasks also tagged with the given tag.*/
-  def exclusiveGroup(exclusiveTag: Tag): Rule = customLimit { (tags: Map[Tag, Int]) =>
-    val exclusiveCount = tags.getOrElse(exclusiveTag, 0)
-    val allCount = tags.getOrElse(Tags.All, 0)
-    // If there are no exclusive tasks in this group, this rule adds no restrictions.
-    exclusiveCount == 0 ||
+  def exclusiveGroup(exclusiveTag: Tag): Rule = customLimit {
+    (tags: Map[Tag, Int]) =>
+      val exclusiveCount = tags.getOrElse(exclusiveTag, 0)
+      val allCount = tags.getOrElse(Tags.All, 0)
+      // If there are no exclusive tasks in this group, this rule adds no restrictions.
+      exclusiveCount == 0 ||
       // If all tasks have this tag, allow them to execute.
       exclusiveCount == allCount ||
       // Always allow a group containing only one task to execute (fallthrough case).
@@ -107,8 +114,9 @@ object Tags {
   }
 
   /** A task tagged with one of `exclusiveTags` will not execute with another task with any of the other tags in `exclusiveTags`.*/
-  def exclusiveGroups(exclusiveTags: Tag*): Rule = customLimit { (tags: Map[Tag, Int]) =>
-    val groups = exclusiveTags.count(tag => tags.getOrElse(tag, 0) > 0)
-    groups <= 1
+  def exclusiveGroups(exclusiveTags: Tag*): Rule = customLimit {
+    (tags: Map[Tag, Int]) =>
+      val groups = exclusiveTags.count(tag => tags.getOrElse(tag, 0) > 0)
+      groups <= 1
   }
 }

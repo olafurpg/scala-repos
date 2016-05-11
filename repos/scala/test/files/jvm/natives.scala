@@ -6,10 +6,8 @@ object Test {
   val sysType = System.getProperty("os.name")
 
   val libName =
-    if (sysType == "Mac OS X")
-      "natives"
-    else
-      "natives-" + sysWordSize
+    if (sysType == "Mac OS X") "natives"
+    else "natives-" + sysWordSize
 
   System.loadLibrary(libName)
 

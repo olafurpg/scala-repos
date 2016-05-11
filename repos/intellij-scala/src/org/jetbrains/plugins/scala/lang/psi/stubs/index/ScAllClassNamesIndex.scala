@@ -4,10 +4,9 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.stubs.StringStubIndexExtension
 
 /**
- * User: Alefas
- * Date: 10.02.12
- */
-
+  * User: Alefas
+  * Date: 10.02.12
+  */
 class ScAllClassNamesIndex extends StringStubIndexExtension[PsiClass] {
   def getKey = ScAllClassNamesIndex.KEY
 }

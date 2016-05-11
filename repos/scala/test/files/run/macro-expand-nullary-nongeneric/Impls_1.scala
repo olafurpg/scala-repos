@@ -4,7 +4,9 @@ import scala.reflect.macros.blackbox.Context
 object Impls {
   def impl(c: Context)(meth: String) = {
     import c.universe._
-    val body = Apply(Select(Ident(definitions.PredefModule), TermName("println")), List(Literal(Constant(meth))))
+    val body = Apply(
+        Select(Ident(definitions.PredefModule), TermName("println")),
+        List(Literal(Constant(meth))))
     c.Expr[Unit](body)
   }
 

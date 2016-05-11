@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013--2015, LAMP/EPFL  **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013--2015, LAMP/EPFL  **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.scalalib
 
@@ -23,17 +23,17 @@ class ArrayBuilderTest {
   def erase(x: Any): Any = x
 
   @inline
-  def makeNoInline[T: ClassTag](): ArrayBuilder[T] = {
+  def makeNoInline[T : ClassTag](): ArrayBuilder[T] = {
     @noinline def ct = implicitly[ClassTag[T]]
     ArrayBuilder.make[T]()(ct)
   }
 
   @inline
-  def zerosInline[T: ClassTag](length: Int): Array[T] =
+  def zerosInline[T : ClassTag](length: Int): Array[T] =
     Array.fill(length)(null.asInstanceOf[T])
 
   @noinline
-  def zerosNoInline[T: ClassTag](length: Int): Array[T] =
+  def zerosNoInline[T : ClassTag](length: Int): Array[T] =
     Array.fill(length)(null.asInstanceOf[T])
 
   @noinline def someInt: Int = 53
@@ -256,10 +256,13 @@ class ArrayBuilderTest {
   }
 
   @Test def Nothing_and_Null(): Unit = {
-    assertSame(classOf[Array[Nothing]], ArrayBuilder.make[Nothing]().result().getClass)
-    assertSame(classOf[Array[Null]], ArrayBuilder.make[Null]().result().getClass)
+    assertSame(classOf[Array[Nothing]],
+               ArrayBuilder.make[Nothing]().result().getClass)
+    assertSame(
+        classOf[Array[Null]], ArrayBuilder.make[Null]().result().getClass)
 
-    assertSame(classOf[Array[Nothing]], makeNoInline[Nothing]().result().getClass)
+    assertSame(
+        classOf[Array[Nothing]], makeNoInline[Nothing]().result().getClass)
     assertSame(classOf[Array[Null]], makeNoInline[Null]().result().getClass)
   }
 }

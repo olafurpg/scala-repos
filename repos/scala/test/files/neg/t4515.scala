@@ -1,20 +1,20 @@
 import scala.collection.mutable.HashMap
 
 object Main {
-  trait Target { }
+  trait Target {}
 
   trait PushEventContext[EventType] {
     def getEvent: EventType
   }
-  trait PushNode[EventType] { }
-  trait DerivedPushNode[EventType] extends PushNode[EventType] { }
+  trait PushNode[EventType] {}
+  trait DerivedPushNode[EventType] extends PushNode[EventType] {}
 
   trait HandlerBase[EventType] {
     def onEvent(target: Target,
                 event: EventType,
                 node: PushNode[EventType],
                 ctx: PushEventContext[EventType]): Unit
-                                            }
+  }
   val handlers = new HashMap[DerivedPushNode[_], HandlerBase[_]]
 
   object TimerPushService {
@@ -26,7 +26,8 @@ object Main {
     def add[EventType](node: DerivedPushNode[EventType],
                        context: PushEventContext[EventType]): Unit = {}
 
-    def pollEvents[EventType](node: DerivedPushNode[EventType]): List[PushEventContext[EventType]] =
+    def pollEvents[EventType](
+        node: DerivedPushNode[EventType]): List[PushEventContext[EventType]] =
       Nil
   }
 

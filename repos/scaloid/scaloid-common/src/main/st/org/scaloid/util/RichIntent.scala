@@ -17,7 +17,7 @@ object MacroImpl {
 
   def put_impl(c: MacroCtx)(values: c.Expr[Any]*): c.Expr[Intent] = {
     import c.universe._
-    var result:c.Tree = q"\${c.prefix.tree}.intent"
+    var result: c.Tree = q"\${c.prefix.tree}.intent"
     values.foreach { value =>
       result = q"\$result.putExtra(\${toName(c)(value)}, \$value)"
     }

@@ -2,7 +2,8 @@ package cats
 package laws
 
 // Taken from http://functorial.com/psc-pages/docs/Control/Monad/Error/Class/index.html
-trait MonadErrorLaws[F[_], E] extends ApplicativeErrorLaws[F, E] with MonadLaws[F] {
+trait MonadErrorLaws[F[_], E]
+    extends ApplicativeErrorLaws[F, E] with MonadLaws[F] {
   implicit override def F: MonadError[F, E]
 
   def monadErrorLeftZero[A, B](e: E, f: A => F[B]): IsEq[F[B]] =

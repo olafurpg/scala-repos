@@ -2,10 +2,10 @@ package scalaz
 
 ////
 /**
- *
- */
+  *
+  */
 ////
-trait Compose[=>:[_, _]]  { self =>
+trait Compose[=>:[_, _]] { self =>
   ////
 
   /** Associative `=>:` binary operator. */
@@ -20,13 +20,15 @@ trait Compose[=>:[_, _]]  { self =>
 
   /** `semigroup`, but universally quantified. */
   def plus: Plus[λ[α => α =>: α]] = new ComposePlus {}
+
   /** The endomorphism semigroup, where `append`=`compose`. */
   def semigroup[A]: Semigroup[A =>: A] = new ComposeSemigroup[A] {}
 
   trait ComposeLaw {
+
     /** `compose` is associative. */
-    def associative[A, B, C, D](ab: (A =>: B), bc: (B =>: C), cd: (C =>: D))
-                               (implicit E: Equal[A =>: D]): Boolean = {
+    def associative[A, B, C, D](ab: (A =>: B), bc: (B =>: C), cd: (C =>: D))(
+        implicit E: Equal[A =>: D]): Boolean = {
       val ad1 = compose(cd, compose(bc, ab))
       val ad2 = compose(compose(cd, bc), ab)
       E.equal(ad1, ad2)
@@ -36,7 +38,9 @@ trait Compose[=>:[_, _]]  { self =>
   def composeLaw = new ComposeLaw {}
 
   ////
-  val composeSyntax = new scalaz.syntax.ComposeSyntax[=>:] { def F = Compose.this }
+  val composeSyntax = new scalaz.syntax.ComposeSyntax[=>:] {
+    def F = Compose.this
+  }
 }
 
 object Compose {

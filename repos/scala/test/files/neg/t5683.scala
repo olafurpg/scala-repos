@@ -6,10 +6,16 @@ object Test {
 
   def k[M[_], B](f: Int => M[B]): K[M, Int, B] = null
 
-  val okay1: K[StringW,Int,Int] = k{ (y: Int) => null: StringW[Int] }
-  val okay2 = k[StringW,Int]{ (y: Int) => null: W[String, Int] }
+  val okay1: K[StringW, Int, Int] = k { (y: Int) =>
+    null: StringW[Int]
+  }
+  val okay2 = k[StringW, Int] { (y: Int) =>
+    null: W[String, Int]
+  }
 
-  val crash: K[StringW,Int,Int] = k{ (y: Int) => null: W[String, Int] }
+  val crash: K[StringW, Int, Int] = k { (y: Int) =>
+    null: W[String, Int]
+  }
 
   // remove `extends NT[Int]`, and the last line gives an inference error
   // rather than a crash.

@@ -44,5 +44,4 @@ class CounterDeltasTest extends FunSuite {
     cd.update(metrics.sampleCounters())
     assert(counterDelta == 1)
   }
-
 }

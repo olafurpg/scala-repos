@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.store
 
 import io.prediction.data.storage.Storage
@@ -25,12 +24,13 @@ private[prediction] object Common {
   @transient lazy private val channelsDb = Storage.getMetaDataChannels()
 
   /* throw exception if invalid app name or channel name */
-  def appNameToId(appName: String, channelName: Option[String]): (Int, Option[Int]) = {
+  def appNameToId(
+      appName: String, channelName: Option[String]): (Int, Option[Int]) = {
     val appOpt = appsDb.getByName(appName)
 
     appOpt.map { app =>
-      val channelMap: Map[String, Int] = channelsDb.getByAppid(app.id)
-        .map(c => (c.name, c.id)).toMap
+      val channelMap: Map[String, Int] =
+        channelsDb.getByAppid(app.id).map(c => (c.name, c.id)).toMap
 
       val channelId: Option[Int] = channelName.map { ch =>
         if (channelMap.contains(ch)) {

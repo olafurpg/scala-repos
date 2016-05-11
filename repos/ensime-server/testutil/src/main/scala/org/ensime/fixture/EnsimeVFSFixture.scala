@@ -3,7 +3,7 @@
 package org.ensime.fixture
 
 import org.ensime.vfs._
-import org.scalatest.{ BeforeAndAfterAll, Suite }
+import org.scalatest.{BeforeAndAfterAll, Suite}
 
 trait EnsimeVFSFixture {
 
@@ -23,11 +23,11 @@ trait IsolatedEnsimeVFSFixture extends Suite with EnsimeVFSFixture {
 }
 
 /**
- * Provides the basic building blocks to build custom fixtures around
- * a project that is cloned once for the test suite.
- */
-trait SharedEnsimeVFSFixture extends Suite
-    with EnsimeVFSFixture with BeforeAndAfterAll {
+  * Provides the basic building blocks to build custom fixtures around
+  * a project that is cloned once for the test suite.
+  */
+trait SharedEnsimeVFSFixture
+    extends Suite with EnsimeVFSFixture with BeforeAndAfterAll {
   private[fixture] implicit var _vfs: EnsimeVFS = _
 
   override def beforeAll(): Unit = {

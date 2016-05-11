@@ -4,7 +4,7 @@ import java.util.UUID
 
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.state.PathId._
-import mesosphere.marathon.state.{ AppDefinition, Group, Timestamp }
+import mesosphere.marathon.state.{AppDefinition, Group, Timestamp}
 import mesosphere.marathon.upgrade._
 import org.scalatest.Matchers._
 import play.api.libs.json._
@@ -16,7 +16,8 @@ class DeploymentFormatsTest extends MarathonSpec {
   import Formats._
 
   test("Can read GroupUpdate json") {
-    val json = """
+    val json =
+      """
       |{
       |  "id": "a",
       |  "apps": [{ "id": "b", "version": "2015-06-03T13:00:52.883Z" }],
@@ -28,10 +29,10 @@ class DeploymentFormatsTest extends MarathonSpec {
       |""".stripMargin
     val update = Json.parse(json).as[GroupUpdate]
     update.id should be(Some("a".toPath))
-    update.apps should be ('defined)
+    update.apps should be('defined)
     update.apps.get should have size 1
     update.apps.get.head.id should be("b".toPath)
-    update.groups should be ('defined)
+    update.groups should be('defined)
     update.groups.get should have size 1
     update.groups.get.head.id should be(Some("c".toPath))
     update.dependencies should be('defined)
@@ -44,7 +45,8 @@ class DeploymentFormatsTest extends MarathonSpec {
 
   test("Can write/read GroupUpdate") {
     marshalUnmarshal(genGroupUpdate())
-    marshalUnmarshal(genGroupUpdate(Set(genGroupUpdate(), genGroupUpdate(Set(genGroupUpdate())))))
+    marshalUnmarshal(genGroupUpdate(
+            Set(genGroupUpdate(), genGroupUpdate(Set(genGroupUpdate())))))
   }
 
   test("Will read from no given value") {
@@ -58,8 +60,7 @@ class DeploymentFormatsTest extends MarathonSpec {
   }
 
   test("Can read Group json") {
-    val json =
-      """
+    val json = """
         |{
         |  "id": "a",
         |  "apps": [
@@ -94,15 +95,16 @@ class DeploymentFormatsTest extends MarathonSpec {
 
   test("DeploymentPlan can be serialized") {
     val plan = DeploymentPlan(
-      genId.toString,
-      genGroup(),
-      genGroup(Set(genGroup(), genGroup())),
-      Seq(genStep),
-      Timestamp.now()
+        genId.toString,
+        genGroup(),
+        genGroup(Set(genGroup(), genGroup())),
+        Seq(genStep),
+        Timestamp.now()
     )
     val json = Json.toJson(plan)
     val fieldMap = json.as[JsObject].fields.toMap
-    fieldMap.keySet should be(Set("version", "id", "target", "original", "steps"))
+    fieldMap.keySet should be(
+        Set("version", "id", "target", "original", "steps"))
   }
 
   // regression test for #1176
@@ -114,7 +116,7 @@ class DeploymentFormatsTest extends MarathonSpec {
   def marshalUnmarshal[T](original: T)(implicit format: Format[T]): JsValue = {
     val json = Json.toJson(original)
     val read = json.as[T]
-    read should be (original)
+    read should be(original)
     json
   }
 
@@ -126,25 +128,26 @@ class DeploymentFormatsTest extends MarathonSpec {
 
   def genApp = AppDefinition(id = genId)
 
-  def genStep = DeploymentStep(actions = Seq(
-    StartApplication(genApp, genInt),
-    ScaleApplication(genApp, genInt),
-    StopApplication(genApp),
-    RestartApplication(genApp),
-    ResolveArtifacts(genApp, Map.empty)
-  ))
+  def genStep =
+    DeploymentStep(
+        actions = Seq(
+              StartApplication(genApp, genInt),
+              ScaleApplication(genApp, genInt),
+              StopApplication(genApp),
+              RestartApplication(genApp),
+              ResolveArtifacts(genApp, Map.empty)
+          ))
 
   def genGroup(children: Set[Group] = Set.empty) =
     Group(genId, Set(genApp, genApp), children, Set(genId), genTimestamp)
 
   def genGroupUpdate(children: Set[GroupUpdate] = Set.empty) =
     GroupUpdate(
-      Some(genId),
-      Some(Set(genApp, genApp)),
-      Some(children),
-      Some(Set(genId)),
-      Some(23),
-      Some(genTimestamp)
+        Some(genId),
+        Some(Set(genApp, genApp)),
+        Some(children),
+        Some(Set(genId)),
+        Some(23),
+        Some(genTimestamp)
     )
-
 }

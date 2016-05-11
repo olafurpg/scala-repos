@@ -5,10 +5,10 @@ import org.jetbrains.plugins.scala.codeInspection.AbstractFixOnPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDeclaration
 
 /**
- * Pavel Fatin
- */
-
-class RemoveTypeAnnotation(f: ScFunctionDeclaration) extends AbstractFixOnPsiElement("Remove redundant type annotation", f) {
+  * Pavel Fatin
+  */
+class RemoveTypeAnnotation(f: ScFunctionDeclaration)
+    extends AbstractFixOnPsiElement("Remove redundant type annotation", f) {
   def doApplyFix(project: Project) {
     getElement.removeExplicitType()
   }

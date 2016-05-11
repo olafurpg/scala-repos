@@ -1,3 +1,3 @@
 object U {
-	val x = D.x
+  val x = D.x
 }

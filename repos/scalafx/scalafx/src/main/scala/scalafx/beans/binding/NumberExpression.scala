@@ -26,7 +26,6 @@
  */
 package scalafx.beans.binding
 
-
 import javafx.beans.value.ObservableNumberValue
 import javafx.beans.{binding => jfxbb}
 
@@ -34,7 +33,9 @@ import scala.language.implicitConversions
 import scalafx.beans.binding.NumberExpression.VariablePrecisionNumber
 
 object NumberExpression {
-  implicit def sfxNumberExpression2jfx(ne: NumberExpression): jfxbb.NumberExpression = if (ne != null) ne.delegate else null
+  implicit def sfxNumberExpression2jfx(
+      ne: NumberExpression): jfxbb.NumberExpression =
+    if (ne != null) ne.delegate else null
 
   case class VariablePrecisionNumber(number: Double, var precision: Double = 0) {
     def +-(p: Double): VariablePrecisionNumber = {
@@ -42,7 +43,6 @@ object NumberExpression {
       this
     }
   }
-
 }
 
 class NumberExpression(val delegate: jfxbb.NumberExpression) {
@@ -74,14 +74,16 @@ class NumberExpression(val delegate: jfxbb.NumberExpression) {
   def ===(v: Long) = delegate.isEqualTo(v)
   def ===(v: Float) = delegate.isEqualTo(v, 0)
   def ===(v: Double) = delegate.isEqualTo(v, 0)
-  def ===(v: VariablePrecisionNumber) = delegate.isEqualTo(v.number, v.precision)
+  def ===(v: VariablePrecisionNumber) =
+    delegate.isEqualTo(v.number, v.precision)
   def ===(v: ObservableNumberValue) = delegate.isEqualTo(v)
 
   def =!=(v: Int) = delegate.isNotEqualTo(v)
   def =!=(v: Long) = delegate.isNotEqualTo(v)
   def =!=(v: Float) = delegate.isNotEqualTo(v, 0)
   def =!=(v: Double) = delegate.isNotEqualTo(v, 0)
-  def =!=(v: VariablePrecisionNumber) = delegate.isNotEqualTo(v.number, v.precision)
+  def =!=(v: VariablePrecisionNumber) =
+    delegate.isNotEqualTo(v.number, v.precision)
   def =!=(v: ObservableNumberValue) = delegate.isNotEqualTo(v)
 
   def <(v: Int) = delegate.lessThan(v)

@@ -3,6 +3,7 @@ class A {
 }
 object Test {
   new A {
-    /* */foo
+    /* */
+    foo
   }
 }

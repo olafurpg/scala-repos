@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import language.postfixOps
@@ -19,10 +19,11 @@ object InitialHeartbeatMultiJvmSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).
-    withFallback(ConfigFactory.parseString("""
-      akka.cluster.failure-detector.threshold = 4""")).
-    withFallback(MultiNodeClusterSpec.clusterConfig))
+  commonConfig(
+      debugConfig(on = false)
+        .withFallback(ConfigFactory.parseString("""
+      akka.cluster.failure-detector.threshold = 4"""))
+        .withFallback(MultiNodeClusterSpec.clusterConfig))
 
   testTransport(on = true)
 }
@@ -32,8 +33,8 @@ class InitialHeartbeatMultiJvmNode2 extends InitialHeartbeatSpec
 class InitialHeartbeatMultiJvmNode3 extends InitialHeartbeatSpec
 
 abstract class InitialHeartbeatSpec
-  extends MultiNodeSpec(InitialHeartbeatMultiJvmSpec)
-  with MultiNodeClusterSpec {
+    extends MultiNodeSpec(InitialHeartbeatMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import InitialHeartbeatMultiJvmSpec._
 
@@ -50,7 +51,8 @@ abstract class InitialHeartbeatSpec
         within(10 seconds) {
           awaitAssert({
             cluster.sendCurrentClusterState(testActor)
-            expectMsgType[CurrentClusterState].members.map(_.address) should contain(secondAddress)
+            expectMsgType[CurrentClusterState].members.map(_.address) should contain(
+                secondAddress)
           }, interval = 50.millis)
         }
       }
@@ -59,7 +61,8 @@ abstract class InitialHeartbeatSpec
         within(10 seconds) {
           awaitAssert({
             cluster.sendCurrentClusterState(testActor)
-            expectMsgType[CurrentClusterState].members.map(_.address) should contain(firstAddress)
+            expectMsgType[CurrentClusterState].members.map(_.address) should contain(
+                firstAddress)
           }, interval = 50.millis)
         }
       }

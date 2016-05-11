@@ -3,7 +3,7 @@ object Test {
   val a: Id[Option[Int]] = None
 
   a match {
-     case Some(x) => println(x)
-     case None    =>
+    case Some(x) => println(x)
+    case None =>
   }
 }

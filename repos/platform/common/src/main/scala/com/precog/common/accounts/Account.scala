@@ -21,7 +21,7 @@ package com.precog.common
 package accounts
 
 import com.precog.common.Path
-import com.precog.common.security.{ APIKey, Permission, ReadPermission, WritePermission, DeletePermission }
+import com.precog.common.security.{APIKey, Permission, ReadPermission, WritePermission, DeletePermission}
 import Permission._
 
 import blueeyes.json._
@@ -49,7 +49,8 @@ object AccountPlan {
 
   implicit val iso = Iso.hlist(AccountPlan.apply _, AccountPlan.unapply _)
   val schema = "type" :: HNil
-  implicit val (decomposer, extractor) = serializationV[AccountPlan](schema, None)
+  implicit val (decomposer, extractor) =
+    serializationV[AccountPlan](schema, None)
 }
 
 case class Account(accountId: AccountId,
@@ -66,7 +67,8 @@ case class Account(accountId: AccountId,
 
 object Account {
   implicit val iso = Iso.hlist(Account.apply _, Account.unapply _)
-  val schemaV1     = "accountId" :: "email" :: "passwordHash" :: "passwordSalt" :: "accountCreationDate" :: "apiKey" :: "rootPath" :: "plan" :: "parentId" :: "lastPasswordChangeTime" :: "profile" :: HNil
+  val schemaV1 =
+    "accountId" :: "email" :: "passwordHash" :: "passwordSalt" :: "accountCreationDate" :: "apiKey" :: "rootPath" :: "plan" :: "parentId" :: "lastPasswordChangeTime" :: "profile" :: HNil
 
   val extractorPreV = extractorV[Account](schemaV1, None)
   val extractorV1 = extractorV[Account](schemaV1, Some("1.1".v))
@@ -79,7 +81,8 @@ object Account {
   def randomSalt() = {
     val saltBytes = new Array[Byte](256)
     randomSource.nextBytes(saltBytes)
-    saltBytes.flatMap(byte => Integer.toHexString(0xFF & byte))(collection.breakOut) : String
+    saltBytes.flatMap(byte => Integer.toHexString(0xFF & byte))(
+        collection.breakOut): String
   }
 
   // FIXME: Remove when there are no SHA1 hashes in the accounts db
@@ -98,16 +101,18 @@ object Account {
     md.update(dataBytes, 0, dataBytes.length)
     val hashBytes = md.digest()
 
-    hashBytes.flatMap(byte => Integer.toHexString(0xFF & byte))(collection.breakOut) : String
+    hashBytes.flatMap(byte => Integer.toHexString(0xFF & byte))(
+        collection.breakOut): String
   }
 
-  def newAccountPermissions(accountId: AccountId, accountPath: Path): Set[Permission] = {
+  def newAccountPermissions(
+      accountId: AccountId, accountPath: Path): Set[Permission] = {
     // Path is "/" so that an account may read data it wrote no matter what path it exists under. 
     // See AccessControlSpec, NewGrantRequest
     Set[Permission](
-      WritePermission(accountPath, WriteAsAny),
-      DeletePermission(accountPath, WrittenByAny),
-      ReadPermission(Path.Root, WrittenByAccount(accountId))
+        WritePermission(accountPath, WriteAsAny),
+        DeletePermission(accountPath, WrittenByAny),
+        ReadPermission(Path.Root, WrittenByAccount(accountId))
     )
   }
 }
@@ -115,10 +120,11 @@ object Account {
 case class WrappedAccountId(accountId: AccountId)
 
 object WrappedAccountId {
-  implicit val wrappedAccountIdIso = Iso.hlist(WrappedAccountId.apply _, WrappedAccountId.unapply _)
+  implicit val wrappedAccountIdIso =
+    Iso.hlist(WrappedAccountId.apply _, WrappedAccountId.unapply _)
 
   val schema = "accountId" :: HNil
 
-  implicit val (wrappedAccountIdDecomposer, wrappedAccountIdExtractor) = serializationV[WrappedAccountId](schema, None)
+  implicit val (wrappedAccountIdDecomposer, wrappedAccountIdExtractor) =
+    serializationV[WrappedAccountId](schema, None)
 }
-

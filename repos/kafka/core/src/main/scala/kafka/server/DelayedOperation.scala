@@ -1,20 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.server
 
 import kafka.utils._
@@ -33,20 +32,19 @@ import scala.collection._
 
 import com.yammer.metrics.core.Gauge
 
-
 /**
- * An operation whose processing needs to be delayed for at most the given delayMs. For example
- * a delayed produce operation could be waiting for specified number of acks; or
- * a delayed fetch operation could be waiting for a given number of bytes to accumulate.
- *
- * The logic upon completing a delayed operation is defined in onComplete() and will be called exactly once.
- * Once an operation is completed, isCompleted() will return true. onComplete() can be triggered by either
- * forceComplete(), which forces calling onComplete() after delayMs if the operation is not yet completed,
- * or tryComplete(), which first checks if the operation can be completed or not now, and if yes calls
- * forceComplete().
- *
- * A subclass of DelayedOperation needs to provide an implementation of both onComplete() and tryComplete().
- */
+  * An operation whose processing needs to be delayed for at most the given delayMs. For example
+  * a delayed produce operation could be waiting for specified number of acks; or
+  * a delayed fetch operation could be waiting for a given number of bytes to accumulate.
+  *
+  * The logic upon completing a delayed operation is defined in onComplete() and will be called exactly once.
+  * Once an operation is completed, isCompleted() will return true. onComplete() can be triggered by either
+  * forceComplete(), which forces calling onComplete() after delayMs if the operation is not yet completed,
+  * or tryComplete(), which first checks if the operation can be completed or not now, and if yes calls
+  * forceComplete().
+  *
+  * A subclass of DelayedOperation needs to provide an implementation of both onComplete() and tryComplete().
+  */
 abstract class DelayedOperation(delayMs: Long) extends TimerTask with Logging {
 
   override val expirationMs = delayMs + System.currentTimeMillis()
@@ -77,19 +75,19 @@ abstract class DelayedOperation(delayMs: Long) extends TimerTask with Logging {
   }
 
   /**
-   * Check if the delayed operation is already completed
-   */
+    * Check if the delayed operation is already completed
+    */
   def isCompleted(): Boolean = completed.get()
 
   /**
-   * Call-back to execute when a delayed operation gets expired and hence forced to complete.
-   */
+    * Call-back to execute when a delayed operation gets expired and hence forced to complete.
+    */
   def onExpiration(): Unit
 
   /**
-   * Process for completing an operation; This function needs to be defined
-   * in subclasses and will be called exactly once in forceComplete()
-   */
+    * Process for completing an operation; This function needs to be defined
+    * in subclasses and will be called exactly once in forceComplete()
+    */
   def onComplete(): Unit
 
   /*
@@ -105,26 +103,28 @@ abstract class DelayedOperation(delayMs: Long) extends TimerTask with Logging {
    * run() method defines a task that is executed on timeout
    */
   override def run(): Unit = {
-    if (forceComplete())
-      onExpiration()
+    if (forceComplete()) onExpiration()
   }
 }
 
 /**
- * A helper purgatory class for bookkeeping delayed operations with a timeout, and expiring timed out operations.
- */
-class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String, brokerId: Int = 0, purgeInterval: Int = 1000)
-        extends Logging with KafkaMetricsGroup {
+  * A helper purgatory class for bookkeeping delayed operations with a timeout, and expiring timed out operations.
+  */
+class DelayedOperationPurgatory[T <: DelayedOperation](
+    purgatoryName: String, brokerId: Int = 0, purgeInterval: Int = 1000)
+    extends Logging with KafkaMetricsGroup {
 
   // timeout timer
-  private[this] val executor = Executors.newFixedThreadPool(1, new ThreadFactory() {
-    def newThread(runnable: Runnable): Thread =
-      Utils.newThread("executor-"+purgatoryName, runnable, false)
-  })
+  private[this] val executor =
+    Executors.newFixedThreadPool(1, new ThreadFactory() {
+      def newThread(runnable: Runnable): Thread =
+        Utils.newThread("executor-" + purgatoryName, runnable, false)
+    })
   private[this] val timeoutTimer = new Timer(executor)
 
   /* a list of operation watching keys */
-  private val watchersForKey = new Pool[Any, Watchers](Some((key: Any) => new Watchers(key)))
+  private val watchersForKey =
+    new Pool[Any, Watchers](Some((key: Any) => new Watchers(key)))
 
   private val removeWatchersLock = new ReentrantReadWriteLock()
 
@@ -137,36 +137,36 @@ class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String, br
   private val metricsTags = Map("delayedOperation" -> purgatoryName)
 
   newGauge(
-    "PurgatorySize",
-    new Gauge[Int] {
-      def value = watched()
-    },
-    metricsTags
+      "PurgatorySize",
+      new Gauge[Int] {
+        def value = watched()
+      },
+      metricsTags
   )
 
   newGauge(
-    "NumDelayedOperations",
-    new Gauge[Int] {
-      def value = delayed()
-    },
-    metricsTags
+      "NumDelayedOperations",
+      new Gauge[Int] {
+        def value = delayed()
+      },
+      metricsTags
   )
 
   expirationReaper.start()
 
   /**
-   * Check if the operation can be completed, if not watch it based on the given watch keys
-   *
-   * Note that a delayed operation can be watched on multiple keys. It is possible that
-   * an operation is completed after it has been added to the watch list for some, but
-   * not all of the keys. In this case, the operation is considered completed and won't
-   * be added to the watch list of the remaining keys. The expiration reaper thread will
-   * remove this operation from any watcher list in which the operation exists.
-   *
-   * @param operation the delayed operation to be checked
-   * @param watchKeys keys for bookkeeping the operation
-   * @return true iff the delayed operations can be completed by the caller
-   */
+    * Check if the operation can be completed, if not watch it based on the given watch keys
+    *
+    * Note that a delayed operation can be watched on multiple keys. It is possible that
+    * an operation is completed after it has been added to the watch list for some, but
+    * not all of the keys. In this case, the operation is considered completed and won't
+    * be added to the watch list of the remaining keys. The expiration reaper thread will
+    * remove this operation from any watcher list in which the operation exists.
+    *
+    * @param operation the delayed operation to be checked
+    * @param watchKeys keys for bookkeeping the operation
+    * @return true iff the delayed operations can be completed by the caller
+    */
   def tryCompleteElseWatch(operation: T, watchKeys: Seq[Any]): Boolean = {
     assert(watchKeys.size > 0, "The watch key list can't be empty")
 
@@ -181,14 +181,12 @@ class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String, br
     // expire reaper will clean it up periodically.
 
     var isCompletedByMe = operation synchronized operation.tryComplete()
-    if (isCompletedByMe)
-      return true
+    if (isCompletedByMe) return true
 
     var watchCreated = false
-    for(key <- watchKeys) {
+    for (key <- watchKeys) {
       // If the operation is already completed, stop adding it to the rest of the watcher list.
-      if (operation.isCompleted())
-        return false
+      if (operation.isCompleted()) return false
       watchForOperation(key, operation)
 
       if (!watchCreated) {
@@ -198,11 +196,10 @@ class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String, br
     }
 
     isCompletedByMe = operation synchronized operation.tryComplete()
-    if (isCompletedByMe)
-      return true
+    if (isCompletedByMe) return true
 
     // if it cannot be completed by now and hence is watched, add to the expire queue also
-    if (! operation.isCompleted()) {
+    if (!operation.isCompleted()) {
       timeoutTimer.add(operation)
       if (operation.isCompleted()) {
         // cancel the timer task
@@ -214,36 +211,36 @@ class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String, br
   }
 
   /**
-   * Check if some some delayed operations can be completed with the given watch key,
-   * and if yes complete them.
-   *
-   * @return the number of completed operations during this process
-   */
+    * Check if some some delayed operations can be completed with the given watch key,
+    * and if yes complete them.
+    *
+    * @return the number of completed operations during this process
+    */
   def checkAndComplete(key: Any): Int = {
     val watchers = inReadLock(removeWatchersLock) { watchersForKey.get(key) }
-    if(watchers == null)
-      0
-    else
-      watchers.tryCompleteWatched()
+    if (watchers == null) 0
+    else watchers.tryCompleteWatched()
   }
 
   /**
-   * Return the total size of watch lists the purgatory. Since an operation may be watched
-   * on multiple lists, and some of its watched entries may still be in the watch lists
-   * even when it has been completed, this number may be larger than the number of real operations watched
-   */
+    * Return the total size of watch lists the purgatory. Since an operation may be watched
+    * on multiple lists, and some of its watched entries may still be in the watch lists
+    * even when it has been completed, this number may be larger than the number of real operations watched
+    */
   def watched() = allWatchers.map(_.watched).sum
 
   /**
-   * Return the number of delayed operations in the expiry queue
-   */
+    * Return the number of delayed operations in the expiry queue
+    */
   def delayed() = timeoutTimer.size
 
   /*
    * Return all the current watcher lists,
    * note that the returned watchers may be removed from the list by other threads
    */
-  private def allWatchers = inReadLock(removeWatchersLock) { watchersForKey.values }
+  private def allWatchers = inReadLock(removeWatchersLock) {
+    watchersForKey.values
+  }
 
   /*
    * Return the watch list of the given key, note that we need to
@@ -262,8 +259,7 @@ class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String, br
   private def removeKeyIfEmpty(key: Any, watchers: Watchers) {
     inWriteLock(removeWatchersLock) {
       // if the current key is no longer correlated to the watchers to remove, skip
-      if (watchersForKey.get(key) != watchers)
-        return
+      if (watchersForKey.get(key) != watchers) return
 
       if (watchers != null && watchers.watched == 0) {
         watchersForKey.remove(key)
@@ -272,16 +268,16 @@ class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String, br
   }
 
   /**
-   * Shutdown the expire reaper thread
-   */
+    * Shutdown the expire reaper thread
+    */
   def shutdown() {
     expirationReaper.shutdown()
     executor.shutdown()
   }
 
   /**
-   * A linked list of watched delayed operations based on some key
-   */
+    * A linked list of watched delayed operations based on some key
+    */
   private class Watchers(val key: Any) {
 
     private[this] val operations = new LinkedList[T]()
@@ -311,8 +307,7 @@ class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String, br
         }
       }
 
-      if (operations.size == 0)
-        removeKeyIfEmpty(key, this)
+      if (operations.size == 0) removeKeyIfEmpty(key, this)
 
       completed
     }
@@ -331,19 +326,17 @@ class DelayedOperationPurgatory[T <: DelayedOperation](purgatoryName: String, br
         }
       }
 
-      if (operations.size == 0)
-        removeKeyIfEmpty(key, this)
+      if (operations.size == 0) removeKeyIfEmpty(key, this)
 
       purged
     }
   }
 
   /**
-   * A background reaper to expire delayed operations that have timed out
-   */
-  private class ExpiredOperationReaper extends ShutdownableThread(
-    "ExpirationReaper-%d".format(brokerId),
-    false) {
+    * A background reaper to expire delayed operations that have timed out
+    */
+  private class ExpiredOperationReaper
+      extends ShutdownableThread("ExpirationReaper-%d".format(brokerId), false) {
 
     override def doWork() {
       timeoutTimer.advanceClock(200L)

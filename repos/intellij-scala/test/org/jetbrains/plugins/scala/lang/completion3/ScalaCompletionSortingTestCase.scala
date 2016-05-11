@@ -14,16 +14,19 @@ import org.jetbrains.plugins.scala.util.TestUtils
   * on 2/10/16
   */
 abstract class ScalaCompletionSortingTestCase(completionType: CompletionType,
-                                     relativePath: String) extends LightFixtureCompletionTestCase {
+                                              relativePath: String)
+    extends LightFixtureCompletionTestCase {
 
   def this(relativePath: String) {
     this(CompletionType.BASIC, relativePath)
   }
 
   @throws[Exception]
-  override protected def setUp():Unit =  {
+  override protected def setUp(): Unit = {
     super.setUp()
-    StatisticsManager.getInstance.asInstanceOf[StatisticsManagerImpl].enableStatistics(getTestRootDisposable)
+    StatisticsManager.getInstance
+      .asInstanceOf[StatisticsManagerImpl]
+      .enableStatistics(getTestRootDisposable)
   }
 
   def baseRootPath: String = {
@@ -46,8 +49,9 @@ abstract class ScalaCompletionSortingTestCase(completionType: CompletionType,
   }
 
   def configureNoCompletion(path: String) {
-    myFixture.configureFromExistingVirtualFile(
-      myFixture.copyFileToProject(path, com.intellij.openapi.util.text.StringUtil.getShortName(path, '/')))
+    myFixture.configureFromExistingVirtualFile(myFixture.copyFileToProject(
+            path,
+            com.intellij.openapi.util.text.StringUtil.getShortName(path, '/')))
   }
 
   def incUseCount(lookup: LookupImpl, index: Int): Unit = {

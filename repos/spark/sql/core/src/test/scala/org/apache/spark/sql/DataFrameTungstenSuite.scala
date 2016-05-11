@@ -22,11 +22,11 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
 /**
- * An end-to-end test suite specifically for testing Tungsten (Unsafe/CodeGen) mode.
- *
- * This is here for now so I can make sure Tungsten project is tested without refactoring existing
- * end-to-end test infra. In the long run this should just go away.
- */
+  * An end-to-end test suite specifically for testing Tungsten (Unsafe/CodeGen) mode.
+  *
+  * This is here for now so I can make sure Tungsten project is tested without refactoring existing
+  * end-to-end test infra. In the long run this should just go away.
+  */
 class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
   import testImplicits._
 
@@ -42,11 +42,11 @@ class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
     val schema = new StructType()
       .add("a", IntegerType)
       .add("b",
-        new StructType()
-          .add("b1", IntegerType)
-          .add("b2", LongType)
-          .add("b3", FloatType)
-          .add("b4", DoubleType))
+           new StructType()
+             .add("b1", IntegerType)
+             .add("b2", LongType)
+             .add("b3", FloatType)
+             .add("b4", DoubleType))
 
     val df = sqlContext.createDataFrame(data, schema)
     assert(df.select("b").first() === Row(struct))
@@ -60,15 +60,16 @@ class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
     val schema = new StructType()
       .add("a", IntegerType)
       .add("b",
-        new StructType()
-          .add("b1", IntegerType)
-          .add("b2", LongType)
-          .add("b3", FloatType)
-          .add("b4", DoubleType)
-          .add("b5", new StructType()
-          .add("b5a", IntegerType)
-          .add("b5b", StringType))
-          .add("b6", StringType))
+           new StructType()
+             .add("b1", IntegerType)
+             .add("b2", LongType)
+             .add("b3", FloatType)
+             .add("b4", DoubleType)
+             .add("b5",
+                  new StructType()
+                    .add("b5a", IntegerType)
+                    .add("b5b", StringType))
+             .add("b6", StringType))
 
     val df = sqlContext.createDataFrame(data, schema)
     assert(df.select("b").first() === Row(outerStruct))

@@ -43,10 +43,11 @@ import scalafx.scene.control._
 import scalafx.testutil.RunOnApplicationThread
 
 /**
- * Spec tests for Collection methods in package object.
- */
+  * Spec tests for Collection methods in package object.
+  */
 @RunWith(classOf[JUnitRunner])
-class PackageCollectionFillerSpec extends FlatSpec with RunOnApplicationThread {
+class PackageCollectionFillerSpec
+    extends FlatSpec with RunOnApplicationThread {
 
   private case class Analyzer[T](originalList: jfxc.ObservableList[T]) {
     val originalElements = originalList.toList
@@ -67,7 +68,6 @@ class PackageCollectionFillerSpec extends FlatSpec with RunOnApplicationThread {
         secondChange = change.next
       }
     })
-
   }
 
   def emptyEvaluation(analyzer: Analyzer[_], list: jfxc.ObservableList[_]) {
@@ -76,7 +76,10 @@ class PackageCollectionFillerSpec extends FlatSpec with RunOnApplicationThread {
     analyzer.addedElements.size should be(0)
   }
 
-  def filledEvaluation(analyzer: Analyzer[_], list: jfxc.ObservableList[_], fillingIterable: Iterable[_], extraEval: (Analyzer[_], Iterable[_]) => Unit) {
+  def filledEvaluation(analyzer: Analyzer[_],
+                       list: jfxc.ObservableList[_],
+                       fillingIterable: Iterable[_],
+                       extraEval: (Analyzer[_], Iterable[_]) => Unit) {
     list.toList should be(fillingIterable)
     analyzer.wasAdded should be(true)
     extraEval(analyzer, fillingIterable)
@@ -88,7 +91,8 @@ class PackageCollectionFillerSpec extends FlatSpec with RunOnApplicationThread {
     analyzer.secondChange should be(false)
   }
 
-  private def executeAndTestChanges[T](originalList: jfxc.ObservableList[T], newContent: Iterable[T]) {
+  private def executeAndTestChanges[T](
+      originalList: jfxc.ObservableList[T], newContent: Iterable[T]) {
     val analyzer = Analyzer(originalList)
 
     fillCollection(originalList, newContent)
@@ -96,12 +100,18 @@ class PackageCollectionFillerSpec extends FlatSpec with RunOnApplicationThread {
     if (newContent == null || newContent.isEmpty) {
       this.emptyEvaluation(analyzer, originalList)
     } else {
-      this.filledEvaluation(analyzer, originalList, newContent, (an, li) => an.addedElements.toList should be(li.toList))
+      this.filledEvaluation(
+          analyzer,
+          originalList,
+          newContent,
+          (an, li) => an.addedElements.toList should be(li.toList))
     }
     this.finalEvaluation(analyzer)
   }
 
-  private def executeAndTestChangesFX[T <: Object](originalList: jfxc.ObservableList[T], newContent: Iterable[SFXDelegate[T]]) {
+  private def executeAndTestChangesFX[T <: Object](
+      originalList: jfxc.ObservableList[T],
+      newContent: Iterable[SFXDelegate[T]]) {
     val analyzer = Analyzer(originalList)
 
     fillSFXCollection(originalList, newContent)
@@ -109,22 +119,29 @@ class PackageCollectionFillerSpec extends FlatSpec with RunOnApplicationThread {
     if (newContent == null || newContent.isEmpty) {
       this.emptyEvaluation(analyzer, originalList)
     } else {
-      this.filledEvaluation(analyzer, originalList, newContent.map(_.delegate), (an, li) => ())
-      analyzer.addedElements.toList should be(newContent.map(_.delegate).toList)
+      this.filledEvaluation(
+          analyzer, originalList, newContent.map(_.delegate), (an, li) => ())
+      analyzer.addedElements.toList should be(
+          newContent.map(_.delegate).toList)
     }
     this.finalEvaluation(analyzer)
   }
 
-  private def getOriginalStringObservableList: jfxc.ObservableList[String] = jfxc.FXCollections.observableArrayList("A", "B", "C")
+  private def getOriginalStringObservableList: jfxc.ObservableList[String] =
+    jfxc.FXCollections.observableArrayList("A", "B", "C")
 
-  private def getOriginalNodeObservableList: jfxc.ObservableList[jfxs.Node] = jfxc.FXCollections.observableArrayList(new jfxsc.Button("Button 1"), new jfxsc.TextField("TextField 2"), new jfxsc.Hyperlink("Hyperlink 3"))
+  private def getOriginalNodeObservableList: jfxc.ObservableList[jfxs.Node] =
+    jfxc.FXCollections.observableArrayList(new jfxsc.Button("Button 1"),
+                                           new jfxsc.TextField("TextField 2"),
+                                           new jfxsc.Hyperlink("Hyperlink 3"))
 
   "fillCollection" should "clean originalCollection if receives null" in {
     executeAndTestChanges(getOriginalStringObservableList, null)
   }
 
   it should "clean originalCollection if receives a empty Iterable" in {
-    executeAndTestChanges(getOriginalStringObservableList, Iterable.empty[String])
+    executeAndTestChanges(
+        getOriginalStringObservableList, Iterable.empty[String])
   }
 
   it should "replace new content" in {
@@ -148,7 +165,10 @@ class PackageCollectionFillerSpec extends FlatSpec with RunOnApplicationThread {
     val newValue = "1"
     fillCollectionWithOne(originalList, newValue)
 
-    this.filledEvaluation(analyzer, originalList, List(newValue), (an, li) => an.addedElements.size should be(1))
+    this.filledEvaluation(analyzer,
+                          originalList,
+                          List(newValue),
+                          (an, li) => an.addedElements.size should be(1))
     this.finalEvaluation(analyzer)
   }
 
@@ -157,11 +177,13 @@ class PackageCollectionFillerSpec extends FlatSpec with RunOnApplicationThread {
   }
 
   it should "clean originalCollection if receives a empty Iterable" in {
-    executeAndTestChangesFX(getOriginalNodeObservableList, Iterable.empty[Node])
+    executeAndTestChangesFX(
+        getOriginalNodeObservableList, Iterable.empty[Node])
   }
 
   it should "replace new content" in {
-    executeAndTestChangesFX(getOriginalNodeObservableList, List(new ChoiceBox, new Slider))
+    executeAndTestChangesFX(
+        getOriginalNodeObservableList, List(new ChoiceBox, new Slider))
   }
 
   "fillSFXCollectionWithOne" should "clean originalCollection if receives null" in {
@@ -181,8 +203,10 @@ class PackageCollectionFillerSpec extends FlatSpec with RunOnApplicationThread {
     val newValue = new Slider
     fillSFXCollectionWithOne(originalList, newValue)
 
-    this.filledEvaluation(analyzer, originalList, List(newValue.delegate), (an, li) => an.addedElements.size should be(1))
+    this.filledEvaluation(analyzer,
+                          originalList,
+                          List(newValue.delegate),
+                          (an, li) => an.addedElements.size should be(1))
     this.finalEvaluation(analyzer)
   }
-
 }

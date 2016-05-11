@@ -12,7 +12,8 @@ object typerep extends App {
 
   implicit def intRep: TypeRep[Int] = IntRep
   implicit def booleanRep: TypeRep[Boolean] = BooleanRep
-  implicit def listRep[T](implicit elemrep: TypeRep[T]): TypeRep[List[T]] = ListRep(elemrep)
+  implicit def listRep[T](implicit elemrep: TypeRep[T]): TypeRep[List[T]] =
+    ListRep(elemrep)
 
   def getType[T](x: T)(implicit rep: TypeRep[T]): TypeRep[T] = rep
 

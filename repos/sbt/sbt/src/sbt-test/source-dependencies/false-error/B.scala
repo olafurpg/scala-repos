@@ -1,3 +1,3 @@
 object B {
-	val y = A.x
+  val y = A.x
 }

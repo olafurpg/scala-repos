@@ -2,15 +2,16 @@ package mesosphere.marathon.integration.setup
 
 import java.lang.management.ManagementFactory
 
-import org.eclipse.jetty.server.{ Request, Server }
+import org.eclipse.jetty.server.{Request, Server}
 import org.eclipse.jetty.server.handler.AbstractHandler
-import javax.servlet.http.{ HttpServletResponse, HttpServletRequest }
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import akka.actor.ActorSystem
 import spray.client.pipelining._
 import scala.concurrent.Await._
 import scala.concurrent.duration._
 
-class AppMock(appId: String, version: String, url: String) extends AbstractHandler {
+class AppMock(appId: String, version: String, url: String)
+    extends AbstractHandler {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   implicit val system = ActorSystem()
@@ -24,7 +25,8 @@ class AppMock(appId: String, version: String, url: String) extends AbstractHandl
     server.setHandler(this)
     server.start()
     val taskId = System.getenv().getOrDefault("MESOS_TASK_ID", "<UNKNOWN>")
-    println(s"AppMock[$appId $version]: $taskId has taken the stage at port $port. Will query $url for health status.")
+    println(
+        s"AppMock[$appId $version]: $taskId has taken the stage at port $port. Will query $url for health status.")
     server.join()
     println(s"AppMock[$appId $version]: says goodbye")
   }
@@ -37,10 +39,10 @@ class AppMock(appId: String, version: String, url: String) extends AbstractHandl
     if (request.getMethod == "GET" && request.getPathInfo == "/ping") {
       response.setStatus(200)
       baseRequest.setHandled(true)
-      val marathonId = sys.env.getOrElse("MARATHON_APP_ID", "NO_MARATHON_APP_ID_SET")
+      val marathonId =
+        sys.env.getOrElse("MARATHON_APP_ID", "NO_MARATHON_APP_ID_SET")
       response.getWriter.println(s"Pong $marathonId")
-    }
-    else {
+    } else {
       val res = result(pipeline(Get(url)), waitTime)
       println(s"AppMock[$appId $version]: current health is $res")
       response.setStatus(res.status.intValue)
@@ -59,4 +61,3 @@ object AppMock {
     new AppMock(appId, version, url).start(port)
   }
 }
-

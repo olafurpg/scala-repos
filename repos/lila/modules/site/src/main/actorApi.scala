@@ -6,9 +6,8 @@ import play.api.libs.json._
 import lila.socket.SocketMember
 
 case class Member(
-  channel: JsChannel,
-  userId: Option[String],
-  flag: Option[String]) extends SocketMember {
+    channel: JsChannel, userId: Option[String], flag: Option[String])
+    extends SocketMember {
 
   val troll = false
 

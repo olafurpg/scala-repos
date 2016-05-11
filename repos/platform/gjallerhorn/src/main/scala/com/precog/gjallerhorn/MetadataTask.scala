@@ -33,7 +33,8 @@ import specs2._
 
 import scalaz._
 
-class MetadataTask(settings: Settings) extends Task(settings: Settings) with Specification {
+class MetadataTask(settings: Settings)
+    extends Task(settings: Settings) with Specification {
 
   val simpleData = """
     {"a":1,"b":"Tom"}
@@ -55,13 +56,17 @@ class MetadataTask(settings: Settings) extends Task(settings: Settings) with Spe
       // 4. Ensure metadata returns what we expect.
 
       val account = createAccount
-      ingestString(account, simpleData, "application/json")(_ / account.bareRootPath / "foo" / "")
+      ingestString(account, simpleData, "application/json")(
+          _ / account.bareRootPath / "foo" / "")
 
       EventuallyResults.eventually(10, 1.second) {
-        val json = metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
+        val json =
+          metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
         (json \ "size").deserialize[Long] must_== 5
         (json \ "children").children map (_.deserialize[String]) must_== Nil
-        val cPathChildren = (json \ "structure" \ "children").children map (_.deserialize[String])
+        val cPathChildren =
+          (json \ "structure" \ "children").children map
+          (_.deserialize[String])
         cPathChildren must haveTheSameElementsAs(List(".a", ".b", ".c"))
         (json \ "strucutre" \ "types").children must_== Nil
       }
@@ -77,10 +82,12 @@ class MetadataTask(settings: Settings) extends Task(settings: Settings) with Spe
       // 4. We should get { "structure": { "types": { "Number": 5 } } } back.
 
       val account = createAccount
-      ingestString(account, simpleData, "application/json")(_ / account.bareRootPath / "")
+      ingestString(account, simpleData, "application/json")(
+          _ / account.bareRootPath / "")
 
       EventuallyResults.eventually(10, 1.second) {
-        val json = metadataFor(account.apiKey, Some("structure"), Some("a"))(_ / account.bareRootPath / "")
+        val json = metadataFor(account.apiKey, Some("structure"), Some("a"))(
+            _ / account.bareRootPath / "")
         val types = json \ "structure" \ "types"
         (types \ "Number").deserialize[Long] must_== 5L
       }
@@ -102,12 +109,16 @@ class MetadataTask(settings: Settings) extends Task(settings: Settings) with Spe
       // 5. Ensure we can see 'accountId/ from /
 
       val account = createAccount
-      ingestString(account, simpleData, "application/json")(_ / account.bareRootPath / "foo" / "")
-      ingestString(account, simpleData, "application/json")(_ / account.bareRootPath / "bar" / "")
-      ingestString(account, simpleData, "application/json")(_ / account.bareRootPath / "foo" / "bar" / "")
+      ingestString(account, simpleData, "application/json")(
+          _ / account.bareRootPath / "foo" / "")
+      ingestString(account, simpleData, "application/json")(
+          _ / account.bareRootPath / "bar" / "")
+      ingestString(account, simpleData, "application/json")(
+          _ / account.bareRootPath / "foo" / "bar" / "")
 
       val account2 = createAccount
-      ingestString(account2, simpleData, "application/json")(_ / account2.bareRootPath / "")
+      ingestString(account2, simpleData, "application/json")(
+          _ / account2.bareRootPath / "")
 
       EventuallyResults.eventually(10, 1.second) {
         val json = metadataFor(account.apiKey)(_ / "")
@@ -115,7 +126,8 @@ class MetadataTask(settings: Settings) extends Task(settings: Settings) with Spe
         subpaths must haveTheSameElementsAs(List(account.bareRootPath + "/"))
 
         val json2 = metadataFor(account2.apiKey)(_ / "")
-        val subpaths2 = (json2 \ "children").children map (_.deserialize[String])
+        val subpaths2 =
+          (json2 \ "children").children map (_.deserialize[String])
         subpaths2 must haveTheSameElementsAs(List(account2.bareRootPath + "/"))
       }
 
@@ -126,7 +138,8 @@ class MetadataTask(settings: Settings) extends Task(settings: Settings) with Spe
       }
 
       EventuallyResults.eventually(10, 1.second) {
-        val json = metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
+        val json =
+          metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
         val subpaths = (json \ "children").children map (_.deserialize[String])
         subpaths must haveTheSameElementsAs(List("bar/"))
       }
@@ -146,7 +159,8 @@ class MetadataTask(settings: Settings) extends Task(settings: Settings) with Spe
 
       val adam = createAccount
       val eve = createAccount
-      ingestString(adam, simpleData, "application/json")(_ / adam.bareRootPath / "")
+      ingestString(adam, simpleData, "application/json")(
+          _ / adam.bareRootPath / "")
 
       EventuallyResults.eventually(10, 1.second) {
         val json1 = metadataFor(adam.apiKey)(_ / adam.bareRootPath / "")
@@ -169,17 +183,20 @@ class MetadataTask(settings: Settings) extends Task(settings: Settings) with Spe
       // 5. Wait and see if the metadata eventually sees the deletion.
 
       val account = createAccount
-      ingestString(account, simpleData, "application/json")(_ / account.bareRootPath / "foo" / "")
+      ingestString(account, simpleData, "application/json")(
+          _ / account.bareRootPath / "foo" / "")
 
       EventuallyResults.eventually(10, 1.second) {
-        val json = metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
+        val json =
+          metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
         (json \ "size").deserialize[Long] must_== 5
       }
 
       deletePath(account.apiKey)(_ / account.bareRootPath / "foo" / "")
 
       EventuallyResults.eventually(10, 1.second) {
-        val json = metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
+        val json =
+          metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
         (json \ "size").deserialize[Long] must_== 0
       }
     }

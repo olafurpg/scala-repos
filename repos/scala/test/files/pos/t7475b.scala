@@ -1,5 +1,4 @@
-trait U {
-}
+trait U {}
 
 trait T {
   type TT = Any with T with U

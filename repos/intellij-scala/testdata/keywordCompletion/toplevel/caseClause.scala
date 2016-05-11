@@ -34,4 +34,4 @@ type
 val
 var
 while
-*/
+ */

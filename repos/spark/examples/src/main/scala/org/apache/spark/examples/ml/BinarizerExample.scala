@@ -31,7 +31,8 @@ object BinarizerExample {
     val sqlContext = new SQLContext(sc)
     // $example on$
     val data = Array((0, 0.1), (1, 0.8), (2, 0.2))
-    val dataFrame: DataFrame = sqlContext.createDataFrame(data).toDF("label", "feature")
+    val dataFrame: DataFrame =
+      sqlContext.createDataFrame(data).toDF("label", "feature")
 
     val binarizer: Binarizer = new Binarizer()
       .setInputCol("feature")

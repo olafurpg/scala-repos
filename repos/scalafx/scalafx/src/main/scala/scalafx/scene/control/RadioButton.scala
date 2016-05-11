@@ -32,16 +32,16 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object RadioButton {
-  implicit def sfxRadioButton2jfx(rb: RadioButton): jfxsc.RadioButton = if (rb != null) rb.delegate else null
+  implicit def sfxRadioButton2jfx(rb: RadioButton): jfxsc.RadioButton =
+    if (rb != null) rb.delegate else null
 }
 
-class RadioButton(override val delegate: jfxsc.RadioButton = new jfxsc.RadioButton)
-  extends ToggleButton(delegate)
-  with SFXDelegate[jfxsc.RadioButton] {
+class RadioButton(
+    override val delegate: jfxsc.RadioButton = new jfxsc.RadioButton)
+    extends ToggleButton(delegate) with SFXDelegate[jfxsc.RadioButton] {
 
   /**
-   * Creates a radio button with the specified text as its label.
-   */
+    * Creates a radio button with the specified text as its label.
+    */
   def this(text: String) = this(new jfxsc.RadioButton(text))
-
 }

@@ -20,13 +20,16 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.JavaIdentifier
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
-trait ScNamedElement extends ScalaPsiElement with PsiNameIdentifierOwner with NavigatablePsiElement {
+trait ScNamedElement
+    extends ScalaPsiElement with PsiNameIdentifierOwner
+    with NavigatablePsiElement {
   def name: String = {
     this match {
-      case st: StubBasedPsiElement[_] =>  st.getStub match {
-        case namedStub: NamedStub[_] => namedStub.getName
-        case _ => nameInner
-      }
+      case st: StubBasedPsiElement[_] =>
+        st.getStub match {
+          case namedStub: NamedStub[_] => namedStub.getName
+          case _ => nameInner
+        }
       case _ => nameInner
     }
   }
@@ -43,7 +46,8 @@ trait ScNamedElement extends ScalaPsiElement with PsiNameIdentifierOwner with Na
 
   def nameId: PsiElement
 
-  override def getNameIdentifier: PsiIdentifier = if (nameId != null) new JavaIdentifier(nameId) else null
+  override def getNameIdentifier: PsiIdentifier =
+    if (nameId != null) new JavaIdentifier(nameId) else null
 
   override def setName(name: String): PsiElement = {
     val id = nameId.getNode
@@ -54,16 +58,16 @@ trait ScNamedElement extends ScalaPsiElement with PsiNameIdentifierOwner with Na
   }
 
   override def getPresentation: ItemPresentation = {
-    val clazz: ScTemplateDefinition =
-      getParent match {
-        case _: ScTemplateBody | _: ScEarlyDefinitions =>
-          PsiTreeUtil.getParentOfType(this, classOf[ScTemplateDefinition], true)
-        case _ if this.isInstanceOf[ScClassParameter]  =>
-          PsiTreeUtil.getParentOfType(this, classOf[ScTemplateDefinition], true)
-        case _ => null
-      }
+    val clazz: ScTemplateDefinition = getParent match {
+      case _: ScTemplateBody | _: ScEarlyDefinitions =>
+        PsiTreeUtil.getParentOfType(this, classOf[ScTemplateDefinition], true)
+      case _ if this.isInstanceOf[ScClassParameter] =>
+        PsiTreeUtil.getParentOfType(this, classOf[ScTemplateDefinition], true)
+      case _ => null
+    }
 
-    val parentMember: ScMember = PsiTreeUtil.getParentOfType(this, classOf[ScMember], false)
+    val parentMember: ScMember =
+      PsiTreeUtil.getParentOfType(this, classOf[ScMember], false)
     new ItemPresentation {
       def getPresentableText: String = name
       def getTextAttributesKey: TextAttributesKey = null
@@ -72,7 +76,10 @@ trait ScNamedElement extends ScalaPsiElement with PsiNameIdentifierOwner with Na
         case x: ScNewTemplateDefinition => "(<anonymous>)"
         case _ => ""
       }
-      override def getIcon(open: Boolean) = parentMember match {case mem: ScMember => mem.getIcon(0) case _ => null}
+      override def getIcon(open: Boolean) = parentMember match {
+        case mem: ScMember => mem.getIcon(0)
+        case _ => null
+      }
     }
   }
 
@@ -84,13 +91,16 @@ trait ScNamedElement extends ScalaPsiElement with PsiNameIdentifierOwner with Na
     }
 
   abstract override def getUseScope: SearchScope = {
-    ScalaPsiUtil.intersectScopes(super.getUseScope, ScalaPsiUtil.nameContext(this) match {
+    ScalaPsiUtil.intersectScopes(
+        super.getUseScope, ScalaPsiUtil.nameContext(this) match {
       case member: ScMember if member != this => Some(member.getUseScope)
       case caseClause: ScCaseClause => Some(new LocalSearchScope(caseClause))
       case elem @ (_: ScEnumerator | _: ScGenerator) =>
-        Option(PsiTreeUtil.getContextOfType(elem, true, classOf[ScForStatement]))
-                .orElse(Option(PsiTreeUtil.getContextOfType(elem, true, classOf[ScBlock], classOf[ScMember])))
-                .map(new LocalSearchScope(_))
+        Option(
+            PsiTreeUtil.getContextOfType(elem, true, classOf[ScForStatement]))
+          .orElse(Option(PsiTreeUtil.getContextOfType(
+                      elem, true, classOf[ScBlock], classOf[ScMember])))
+          .map(new LocalSearchScope(_))
       case _ => None
     })
   }

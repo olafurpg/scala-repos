@@ -16,7 +16,7 @@ class ValidateNaiveTimeoutFilter extends FunSuite {
   def getRealData(n: Int): Iterator[Long] = {
     val cl: ClassLoader = getClass().getClassLoader();
     val input: InputStreamReader = new InputStreamReader(
-      cl.getResourceAsStream("resources/real_latencies.data"));
+        cl.getResourceAsStream("resources/real_latencies.data"));
 
     val reader: BufferedReader = new BufferedReader(input);
 
@@ -42,24 +42,26 @@ class ValidateNaiveTimeoutFilter extends FunSuite {
     val data = getRealData(total).toSeq
     val median = data.sorted.apply(total / 2)
     val timeout = median.milliseconds - 1.nanosecond
-    val filter = new TimeoutFilter[Event[Boolean, Boolean], Boolean](timeout, timer)
-    val gen =
-      new LoadGenerator(
+    val filter =
+      new TimeoutFilter[Event[Boolean, Boolean], Boolean](timeout, timer)
+    val gen = new LoadGenerator(
         data.map { latency =>
-          new Event(now, latency.milliseconds, true, { b: Boolean => Try(true) })
-        },
-        {
-          case (duration: Duration, f: Future[Boolean]) => f onSuccess { _ =>
-            assert(duration <= timeout)
-          } onFailure { _ =>
-            assert(duration > timeout)
-          } ensure {
-            num += 1
-          }
+          new Event(now, latency.milliseconds, true, { b: Boolean =>
+            Try(true)
+          })
+        }, {
+          case (duration: Duration, f: Future[Boolean]) =>
+            f onSuccess { _ =>
+              assert(duration <= timeout)
+            } onFailure { _ =>
+              assert(duration > timeout)
+            } ensure {
+              num += 1
+            }
         }: (Duration, Future[Boolean]) => Unit,
         filter,
         timer
-      )
+    )
     gen.execute()
     assert(num == total)
   }

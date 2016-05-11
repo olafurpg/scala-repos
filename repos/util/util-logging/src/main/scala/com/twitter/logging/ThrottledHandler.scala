@@ -26,56 +26,59 @@ import com.twitter.conversions.time._
 import com.twitter.util.{Duration, Time}
 
 object ThrottledHandler {
+
   /**
-   * Generates a HandlerFactory that returns a ThrottledHandler
-   * NOTE: ThrottledHandler emits plain-text messages regarding any throttling it does.
-   * This means that using it to wrap any logger which you expect to produce easily parseable,
-   * well-structured logs (as opposed to just plain text logs) will break your format. 
-   * Specifically, wrapping ScribeHandler with ThrottledHandler is usually a bug.
-   *
-   * @param handler
-   * Wrapped handler.
-   *
-   * @param duration
-   * Timespan to consider duplicates. After this amount of time, duplicate entries will be logged
-   * again.
-   *
-   * @param maxToDisplay
-   * Maximum duplicate log entries to pass before suppressing them.
-   */
+    * Generates a HandlerFactory that returns a ThrottledHandler
+    * NOTE: ThrottledHandler emits plain-text messages regarding any throttling it does.
+    * This means that using it to wrap any logger which you expect to produce easily parseable,
+    * well-structured logs (as opposed to just plain text logs) will break your format. 
+    * Specifically, wrapping ScribeHandler with ThrottledHandler is usually a bug.
+    *
+    * @param handler
+    * Wrapped handler.
+    *
+    * @param duration
+    * Timespan to consider duplicates. After this amount of time, duplicate entries will be logged
+    * again.
+    *
+    * @param maxToDisplay
+    * Maximum duplicate log entries to pass before suppressing them.
+    */
   def apply(
-    handler: HandlerFactory,
-    duration: Duration = 0.seconds,
-    maxToDisplay: Int = Int.MaxValue
+      handler: HandlerFactory,
+      duration: Duration = 0.seconds,
+      maxToDisplay: Int = Int.MaxValue
   ) = () => new ThrottledHandler(handler(), duration, maxToDisplay)
 }
 
 /**
- * NOTE: ThrottledHandler emits plain-text messages regarding any throttling it does.
- * This means that using it to wrap any logger which you expect to produce easily parseable,
- * well-structured logs (as opposed to just plain text logs) will break your format. 
- * Specifically, DO NOT wrap Thrift Scribing loggers with ThrottledHandler.
- * @param handler
- * Wrapped handler.
- *
- * @param duration
- * Timespan to consider duplicates. After this amount of time, duplicate entries will be logged
- * again.
- *
- * @param maxToDisplay
- * Maximum duplicate log entries to pass before suppressing them.
- */
+  * NOTE: ThrottledHandler emits plain-text messages regarding any throttling it does.
+  * This means that using it to wrap any logger which you expect to produce easily parseable,
+  * well-structured logs (as opposed to just plain text logs) will break your format. 
+  * Specifically, DO NOT wrap Thrift Scribing loggers with ThrottledHandler.
+  * @param handler
+  * Wrapped handler.
+  *
+  * @param duration
+  * Timespan to consider duplicates. After this amount of time, duplicate entries will be logged
+  * again.
+  *
+  * @param maxToDisplay
+  * Maximum duplicate log entries to pass before suppressing them.
+  */
 class ThrottledHandler(
-  handler: Handler,
-  val duration: Duration,
-  val maxToDisplay: Int
-) extends ProxyHandler(handler) {
+    handler: Handler,
+    val duration: Duration,
+    val maxToDisplay: Int
+)
+    extends ProxyHandler(handler) {
 
   private class Throttle(startTime: Time, name: String, level: javalog.Level) {
     private[this] var expired = false
     private[this] var count = 0
 
-    override def toString = "Throttle: startTime=" + startTime + " count=" + count
+    override def toString =
+      "Throttle: startTime=" + startTime + " count=" + count
 
     final def add(record: javalog.LogRecord, now: Time): Boolean = {
       val (shouldPublish, added) = synchronized {
@@ -104,7 +107,8 @@ class ThrottledHandler(
 
     private[this] def publishSwallowed() {
       val throttledRecord = new javalog.LogRecord(
-        level, "(swallowed %d repeating messages)".format(count - maxToDisplay))
+          level,
+          "(swallowed %d repeating messages)".format(count - maxToDisplay))
       throttledRecord.setLoggerName(name)
       doPublish(throttledRecord)
     }
@@ -119,8 +123,8 @@ class ThrottledHandler(
   }
 
   /**
-   * Force printing any "swallowed" messages.
-   */
+    * Force printing any "swallowed" messages.
+    */
   def flushThrottled() {
     synchronized {
       val now = Time.now
@@ -131,9 +135,9 @@ class ThrottledHandler(
   }
 
   /**
-   * Log a message, with sprintf formatting, at the desired level, and
-   * attach an exception and stack trace.
-   */
+    * Log a message, with sprintf formatting, at the desired level, and
+    * attach an exception and stack trace.
+    */
   override def publish(record: javalog.LogRecord) {
     val now = Time.now
     val last = lastFlushCheck.get
@@ -146,11 +150,12 @@ class ThrottledHandler(
       case r: LazyLogRecordUnformatted => r.preformatted
       case _ => record.getMessage
     }
-    @tailrec def tryPublish() {
+    @tailrec
+    def tryPublish() {
       val throttle = synchronized {
         throttleMap.getOrElseUpdate(
-          key,
-          new Throttle(now, record.getLoggerName(), record.getLevel())
+            key,
+            new Throttle(now, record.getLoggerName(), record.getLevel())
         )
       }
 

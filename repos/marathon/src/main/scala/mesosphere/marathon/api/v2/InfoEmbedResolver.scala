@@ -1,6 +1,6 @@
 package mesosphere.marathon.api.v2
 
-import mesosphere.marathon.core.appinfo.{ GroupInfo, AppInfo }
+import mesosphere.marathon.core.appinfo.{GroupInfo, AppInfo}
 import org.slf4j.LoggerFactory
 
 /**
@@ -30,35 +30,43 @@ private[v2] object InfoEmbedResolver {
     * to avoid subtle user errors confusing the two.
     */
   def resolveApp(embed: Set[String]): Set[AppInfo.Embed] = {
-    def mapEmbedStrings(prefix: String, withoutPrefix: String): Set[AppInfo.Embed] = withoutPrefix match {
-      case EmbedTasks => Set(AppInfo.Embed.Tasks, /* deprecated */ AppInfo.Embed.Deployments)
-      case EmbedTasksAndFailures =>
-        log.warn(s"Using deprecated embed=s$prefix$withoutPrefix. " +
-          s"Use ${prefix}tasks, ${prefix}lastTaskFailure, ${prefix}deployments instead.")
-        Set(AppInfo.Embed.Tasks, AppInfo.Embed.LastTaskFailure, AppInfo.Embed.Deployments)
-      case EmbedDeployments     => Set(AppInfo.Embed.Deployments)
-      case EmbedLastTaskFailure => Set(AppInfo.Embed.LastTaskFailure)
-      case EmbedCounts          => Set(AppInfo.Embed.Counts)
-      case EmbedTaskStats       => Set(AppInfo.Embed.TaskStats)
-      case unknown: String =>
-        log.warn(s"unknown app embed argument: $prefix$unknown")
-        Set.empty
-    }
+    def mapEmbedStrings(
+        prefix: String, withoutPrefix: String): Set[AppInfo.Embed] =
+      withoutPrefix match {
+        case EmbedTasks =>
+          Set(AppInfo.Embed.Tasks, /* deprecated */ AppInfo.Embed.Deployments)
+        case EmbedTasksAndFailures =>
+          log.warn(s"Using deprecated embed=s$prefix$withoutPrefix. " +
+              s"Use ${prefix}tasks, ${prefix}lastTaskFailure, ${prefix}deployments instead.")
+          Set(AppInfo.Embed.Tasks,
+              AppInfo.Embed.LastTaskFailure,
+              AppInfo.Embed.Deployments)
+        case EmbedDeployments => Set(AppInfo.Embed.Deployments)
+        case EmbedLastTaskFailure => Set(AppInfo.Embed.LastTaskFailure)
+        case EmbedCounts => Set(AppInfo.Embed.Counts)
+        case EmbedTaskStats => Set(AppInfo.Embed.TaskStats)
+        case unknown: String =>
+          log.warn(s"unknown app embed argument: $prefix$unknown")
+          Set.empty
+      }
 
     def separatePrefix(embedMe: String): (String, String) = {
-      val removablePrefix = EmbedAppsPrefixes.find(embedMe.startsWith).getOrElse("")
+      val removablePrefix =
+        EmbedAppsPrefixes.find(embedMe.startsWith).getOrElse("")
       val withoutPrefix = embedMe.substring(removablePrefix.length)
       (removablePrefix, withoutPrefix)
     }
 
     val embedWithSeparatedPrefixes = embed.map(separatePrefix)
-    embedWithSeparatedPrefixes.flatMap { case (prefix, withoutPrefix) => mapEmbedStrings(prefix, withoutPrefix) }
+    embedWithSeparatedPrefixes.flatMap {
+      case (prefix, withoutPrefix) => mapEmbedStrings(prefix, withoutPrefix)
+    }
   }
 
   def resolveGroup(embeds: Set[String]): Set[GroupInfo.Embed] = {
     embeds.flatMap {
       case EmbedGroups => Some(GroupInfo.Embed.Groups)
-      case EmbedApps   => Some(GroupInfo.Embed.Apps)
+      case EmbedApps => Some(GroupInfo.Embed.Apps)
       case unknown: String =>
         log.warn(s"unknown group embed argument: $unknown")
         None
@@ -68,7 +76,8 @@ private[v2] object InfoEmbedResolver {
   /**
     * Resolve apps and groups embed parameter into distinct sets.
     */
-  def resolveAppGroup(embeds: Set[String]): (Set[AppInfo.Embed], Set[GroupInfo.Embed]) = {
+  def resolveAppGroup(
+      embeds: Set[String]): (Set[AppInfo.Embed], Set[GroupInfo.Embed]) = {
     val (apps, groups) = embeds.partition(_.startsWith("group.apps."))
     (resolveApp(apps), resolveGroup(groups))
   }

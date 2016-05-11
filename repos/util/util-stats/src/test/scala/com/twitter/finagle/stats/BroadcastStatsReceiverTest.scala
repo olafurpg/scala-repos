@@ -7,9 +7,7 @@ import org.scalatest.{Matchers, FunSuite}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class BroadcastStatsReceiverTest extends FunSuite
-  with Matchers
-{
+class BroadcastStatsReceiverTest extends FunSuite with Matchers {
 
   test("counter") {
     val recv1 = new InMemoryStatsReceiver
@@ -79,7 +77,8 @@ class BroadcastStatsReceiverTest extends FunSuite
   test("scope") {
     val base = new InMemoryStatsReceiver
     val scoped = base.scope("scoped")
-    val subscoped = BroadcastStatsReceiver(Seq(base, scoped)).scope("subscoped")
+    val subscoped =
+      BroadcastStatsReceiver(Seq(base, scoped)).scope("subscoped")
 
     val counter = subscoped.counter("yolo")
     counter.incr(9)
@@ -139,5 +138,4 @@ class BroadcastStatsReceiverTest extends FunSuite
     recv1.stats(statName).size should be(2)
     recv2.stats(statName).size should be(2)
   }
-
 }

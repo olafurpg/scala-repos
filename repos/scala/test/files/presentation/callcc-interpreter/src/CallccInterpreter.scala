@@ -3,11 +3,11 @@ object callccInterpreter {
   type Answer = Value
 
   /**
-   * A continuation monad.
-   */
+    * A continuation monad.
+    */
   case class M[A](in: (A => Answer) => Answer) {
-    def bind[B](k: A => M[B])          = M[B](c => in (a => k(a) in c))
-    def map[B](f: A => B): M[B]        = bind(x => unitM(f(x)))
+    def bind[B](k: A => M[B]) = M[B](c => in(a => k(a) in c))
+    def map[B](f: A => B): M[B] = bind(x => unitM(f(x)))
     def flatMap[B](f: A => M[B]): M[B] = bind(f)
   }
 
@@ -31,7 +31,7 @@ object callccInterpreter {
 
   trait Value
   case object Wrong extends Value {
-   override def toString() = "wrong"
+    override def toString() = "wrong"
   }
   case class Num(n: Int) extends Value {
     override def toString() = n.toString()
@@ -48,7 +48,7 @@ object callccInterpreter {
   }
 
   def add(a: Value, b: Value) /*?*/ = (a, b) match {
-    case (Num(m), Num(n)) => this./*!*/unitM(Num(m + n))
+    case (Num(m), Num(n)) => this. /*!*/ unitM(Num(m + n))
     case _ => unitM(Wrong)
   }
 

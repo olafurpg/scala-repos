@@ -1,11 +1,9 @@
-
 /** Test inheritance. See #3085.
- *  Anonymous functions extend AbstractFunction1[SpecializedPair[Int], Unit]. The
- *  specialized type SpecializedPair$mcI$sp should not leak into the superclass because
- *  the definition of apply would vary covariantly, and erasure won't consider it an
- *  override of the abstract apply, leading to an AbstractMethodError at runtime.
- */
-
+  *  Anonymous functions extend AbstractFunction1[SpecializedPair[Int], Unit]. The
+  *  specialized type SpecializedPair$mcI$sp should not leak into the superclass because
+  *  the definition of apply would vary covariantly, and erasure won't consider it an
+  *  override of the abstract apply, leading to an AbstractMethodError at runtime.
+  */
 object Test {
 
   private val Max = 1000
@@ -19,15 +17,20 @@ object Test {
   def notSpecialized() {
     val pairs = for { i <- 1 to Max; j <- 1 to i } yield new Pair(i, j)
     val time0 = System.nanoTime
-    pairs foreach { p => p.first * p.second }
+    pairs foreach { p =>
+      p.first * p.second
+    }
     val time1 = System.nanoTime
 //    println(time1 - time0)
   }
 
   def specialized() {
-    val pairs = for { i <- 1 to Max; j <- 1 to i } yield new SpecializedPair(i, j)
+    val pairs = for { i <- 1 to Max; j <- 1 to i } yield
+      new SpecializedPair(i, j)
     val time0 = System.nanoTime
-    pairs foreach { p => p.first * p.second }
+    pairs foreach { p =>
+      p.first * p.second
+    }
     val time1 = System.nanoTime
 //    println(time1 - time0)
   }

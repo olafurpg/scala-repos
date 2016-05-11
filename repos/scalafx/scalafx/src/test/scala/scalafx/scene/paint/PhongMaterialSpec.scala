@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,13 +35,14 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Stop Spec tests.
- *
- *
- */
+  * Stop Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class PhongMaterialSpec
-  extends SimpleSFXDelegateSpec[jfxsp.PhongMaterial, PhongMaterial](classOf[jfxsp.PhongMaterial], classOf[PhongMaterial]) {
+    extends SimpleSFXDelegateSpec[jfxsp.PhongMaterial, PhongMaterial](
+        classOf[jfxsp.PhongMaterial], classOf[PhongMaterial]) {
 
   override protected def getJavaClassInstance = new jfxsp.PhongMaterial()
 

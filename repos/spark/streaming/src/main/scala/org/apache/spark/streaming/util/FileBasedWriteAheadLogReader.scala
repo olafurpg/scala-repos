@@ -24,16 +24,18 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.spark.internal.Logging
 
 /**
- * A reader for reading write ahead log files written using
- * [[org.apache.spark.streaming.util.FileBasedWriteAheadLogWriter]]. This reads
- * the records (bytebuffers) in the log file sequentially and return them as an
- * iterator of bytebuffers.
- */
-private[streaming] class FileBasedWriteAheadLogReader(path: String, conf: Configuration)
-  extends Iterator[ByteBuffer] with Closeable with Logging {
+  * A reader for reading write ahead log files written using
+  * [[org.apache.spark.streaming.util.FileBasedWriteAheadLogWriter]]. This reads
+  * the records (bytebuffers) in the log file sequentially and return them as an
+  * iterator of bytebuffers.
+  */
+private[streaming] class FileBasedWriteAheadLogReader(
+    path: String, conf: Configuration)
+    extends Iterator[ByteBuffer] with Closeable with Logging {
 
   private val instream = HdfsUtils.getInputStream(path, conf)
-  private var closed = (instream == null) // the file may be deleted as we're opening the stream
+  private var closed =
+    (instream == null) // the file may be deleted as we're opening the stream
   private var nextItem: Option[ByteBuffer] = None
 
   override def hasNext: Boolean = synchronized {
@@ -41,7 +43,8 @@ private[streaming] class FileBasedWriteAheadLogReader(path: String, conf: Config
       return false
     }
 
-    if (nextItem.isDefined) { // handle the case where hasNext is called without calling next
+    if (nextItem.isDefined) {
+      // handle the case where hasNext is called without calling next
       true
     } else {
       try {
@@ -57,8 +60,10 @@ private[streaming] class FileBasedWriteAheadLogReader(path: String, conf: Config
           close()
           false
         case e: IOException =>
-          logWarning("Error while trying to read data. If the file was deleted, " +
-            "this should be okay.", e)
+          logWarning(
+              "Error while trying to read data. If the file was deleted, " +
+              "this should be okay.",
+              e)
           close()
           if (HdfsUtils.checkFileExists(path, conf)) {
             // If file exists, this could be a legitimate error
@@ -81,7 +86,7 @@ private[streaming] class FileBasedWriteAheadLogReader(path: String, conf: Config
     val data = nextItem.getOrElse {
       close()
       throw new IllegalStateException(
-        "next called without calling hasNext or after hasNext returned false")
+          "next called without calling hasNext or after hasNext returned false")
     }
     nextItem = None // Ensure the next hasNext call loads new data.
     data

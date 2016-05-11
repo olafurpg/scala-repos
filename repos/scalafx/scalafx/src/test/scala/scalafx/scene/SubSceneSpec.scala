@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,16 +36,18 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * Shape Spec tests.
- *
- *
- */
+  * Shape Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class SubSceneSpec
-  extends SimpleSFXDelegateSpec[jfxs.SubScene, SubScene](classOf[jfxs.SubScene], classOf[SubScene])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[jfxs.SubScene, SubScene](
+        classOf[jfxs.SubScene], classOf[SubScene])
+    with RunOnApplicationThread {
 
-  override protected def getScalaClassInstance = new SubScene(new Group(), 300, 300)
+  override protected def getScalaClassInstance =
+    new SubScene(new Group(), 300, 300)
 
   override def getJavaClassInstance = new jfxs.SubScene(new Group(), 300, 300)
 }

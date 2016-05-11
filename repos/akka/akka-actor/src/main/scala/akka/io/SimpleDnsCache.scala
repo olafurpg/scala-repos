@@ -13,9 +13,9 @@ private[io] sealed trait PeriodicCacheCleanup {
 class SimpleDnsCache extends Dns with PeriodicCacheCleanup {
   import akka.io.SimpleDnsCache._
 
-  private val cache = new AtomicReference(new Cache(
-    immutable.SortedSet()(ExpiryEntryOrdering),
-    immutable.Map(), clock))
+  private val cache = new AtomicReference(
+      new Cache(
+          immutable.SortedSet()(ExpiryEntryOrdering), immutable.Map(), clock))
 
   private val nanoBase = System.nanoTime()
 
@@ -32,34 +32,32 @@ class SimpleDnsCache extends Dns with PeriodicCacheCleanup {
   @tailrec
   private[io] final def put(r: Resolved, ttlMillis: Long): Unit = {
     val c = cache.get()
-    if (!cache.compareAndSet(c, c.put(r, ttlMillis)))
-      put(r, ttlMillis)
+    if (!cache.compareAndSet(c, c.put(r, ttlMillis))) put(r, ttlMillis)
   }
 
   @tailrec
   override final def cleanup(): Unit = {
     val c = cache.get()
-    if (!cache.compareAndSet(c, c.cleanup()))
-      cleanup()
+    if (!cache.compareAndSet(c, c.cleanup())) cleanup()
   }
 }
 
 object SimpleDnsCache {
-  private class Cache(queue: immutable.SortedSet[ExpiryEntry], cache: immutable.Map[String, CacheEntry], clock: () ⇒ Long) {
+  private class Cache(queue: immutable.SortedSet[ExpiryEntry],
+                      cache: immutable.Map[String, CacheEntry],
+                      clock: () ⇒ Long) {
     def get(name: String): Option[Resolved] = {
       for {
-        e ← cache.get(name)
-        if e.isValid(clock())
+        e ← cache.get(name) if e.isValid(clock())
       } yield e.answer
     }
 
     def put(answer: Resolved, ttlMillis: Long): Cache = {
       val until = clock() + ttlMillis
 
-      new Cache(
-        queue + new ExpiryEntry(answer.name, until),
-        cache + (answer.name -> CacheEntry(answer, until)),
-        clock)
+      new Cache(queue + new ExpiryEntry(answer.name, until),
+                cache + (answer.name -> CacheEntry(answer, until)),
+                clock)
     }
 
     def cleanup(): Cache = {
@@ -70,8 +68,7 @@ object SimpleDnsCache {
         val minEntry = q.head
         val name = minEntry.name
         q -= minEntry
-        if (c.get(name).filterNot(_.isValid(now)).isDefined)
-          c -= name
+        if (c.get(name).filterNot(_.isValid(now)).isDefined) c -= name
       }
       new Cache(q, c, clock)
     }
@@ -81,7 +78,8 @@ object SimpleDnsCache {
     def isValid(clock: Long): Boolean = clock < until
   }
 
-  private class ExpiryEntry(val name: String, val until: Long) extends Ordered[ExpiryEntry] {
+  private class ExpiryEntry(val name: String, val until: Long)
+      extends Ordered[ExpiryEntry] {
     def isValid(clock: Long): Boolean = clock < until
     override def compare(that: ExpiryEntry): Int = -until.compareTo(that.until)
   }

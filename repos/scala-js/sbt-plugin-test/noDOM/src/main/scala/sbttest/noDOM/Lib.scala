@@ -7,5 +7,4 @@ object Lib {
 
   /** squares a number */
   def sq(x: Int): Int = x * x
-
 }

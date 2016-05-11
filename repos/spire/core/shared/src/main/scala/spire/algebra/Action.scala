@@ -1,15 +1,14 @@
 package spire
 package algebra
 
-
 /**
- * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of
- * a method `actl(g, p)`, or `g |+|> p`, such that:
- *
- * 1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.
- *
- * 2. `id |+|> p === p` for all `p` in `P` (if `id` is defined)
- */
+  * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of
+  * a method `actl(g, p)`, or `g |+|> p`, such that:
+  *
+  * 1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.
+  *
+  * 2. `id |+|> p === p` for all `p` in `P` (if `id` is defined)
+  */
 trait LeftAction[@sp(Int) P, G] extends Any {
   def actl(g: G, p: P): P
 }
@@ -19,13 +18,13 @@ object LeftAction {
 }
 
 /**
- * A (right) semigroup/monoid/group action of `G` on `P` is simply the implementation of
- * a method `actr(p, g)`, or `p <|+| g`, such that:
- *
- * 1. `p <|+| (g |+| h) === (p <|+| g) <|+| h` for all `g`, `h` in `G` and `p` in `P`.
- *
- * 2. `p <|+| id === p` for all `p` in `P` (if `id` is defined)
- */
+  * A (right) semigroup/monoid/group action of `G` on `P` is simply the implementation of
+  * a method `actr(p, g)`, or `p <|+| g`, such that:
+  *
+  * 1. `p <|+| (g |+| h) === (p <|+| g) <|+| h` for all `g`, `h` in `G` and `p` in `P`.
+  *
+  * 2. `p <|+| id === p` for all `p` in `P` (if `id` is defined)
+  */
 trait RightAction[@sp(Int) P, G] extends Any {
   def actr(p: P, g: G): P
 }
@@ -54,12 +53,16 @@ object RightAction {
   *
   * 5. `g |+|> p === p <|+| g.inverse`.
   */
-trait Action[@sp(Int) P, G] extends Any with LeftAction[P, G] with RightAction[P, G]
+trait Action[@sp(Int) P, G]
+    extends Any with LeftAction[P, G] with RightAction[P, G]
 
 object Action {
   @inline def apply[P, G](G: Action[P, G]): Action[P, G] = G
-  @inline def additive[P, G](G: AdditiveAction[P, G]): Action[P, G] = G.additive
-  @inline def multiplicative[P, G](G: MultiplicativeAction[P, G]): Action[P, G] = G.multiplicative
+  @inline def additive[P, G](G: AdditiveAction[P, G]): Action[P, G] =
+    G.additive
+  @inline
+  def multiplicative[P, G](G: MultiplicativeAction[P, G]): Action[P, G] =
+    G.multiplicative
 }
 
 trait AdditiveAction[@sp(Int) P, G] extends Any { self =>

@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.apache.spark.sql.execution.joins
 
@@ -27,18 +27,18 @@ import org.apache.spark.sql.execution.exchange.EnsureRequirements
 import org.apache.spark.sql.functions._
 
 /**
- * Test various broadcast join operators.
- *
- * Tests in this suite we need to run Spark in local-cluster mode. In particular, the use of
- * unsafe map in [[org.apache.spark.sql.execution.joins.UnsafeHashedRelation]] is not triggered
- * without serializing the hashed relation, which does not happen in local mode.
- */
+  * Test various broadcast join operators.
+  *
+  * Tests in this suite we need to run Spark in local-cluster mode. In particular, the use of
+  * unsafe map in [[org.apache.spark.sql.execution.joins.UnsafeHashedRelation]] is not triggered
+  * without serializing the hashed relation, which does not happen in local mode.
+  */
 class BroadcastJoinSuite extends QueryTest with BeforeAndAfterAll {
   protected var sqlContext: SQLContext = null
 
   /**
-   * Create a new [[SQLContext]] running in local-cluster mode with unsafe and codegen enabled.
-   */
+    * Create a new [[SQLContext]] running in local-cluster mode with unsafe and codegen enabled.
+    */
   override def beforeAll(): Unit = {
     super.beforeAll()
     val conf = new SparkConf()
@@ -54,17 +54,24 @@ class BroadcastJoinSuite extends QueryTest with BeforeAndAfterAll {
   }
 
   /**
-   * Test whether the specified broadcast join updates the peak execution memory accumulator.
-   */
-  private def testBroadcastJoin[T: ClassTag](name: String, joinType: String): Unit = {
-    AccumulatorSuite.verifyPeakExecutionMemorySet(sqlContext.sparkContext, name) {
-      val df1 = sqlContext.createDataFrame(Seq((1, "4"), (2, "2"))).toDF("key", "value")
-      val df2 = sqlContext.createDataFrame(Seq((1, "1"), (2, "2"))).toDF("key", "value")
+    * Test whether the specified broadcast join updates the peak execution memory accumulator.
+    */
+  private def testBroadcastJoin[T : ClassTag](
+      name: String, joinType: String): Unit = {
+    AccumulatorSuite.verifyPeakExecutionMemorySet(
+        sqlContext.sparkContext, name) {
+      val df1 = sqlContext
+        .createDataFrame(Seq((1, "4"), (2, "2")))
+        .toDF("key", "value")
+      val df2 = sqlContext
+        .createDataFrame(Seq((1, "1"), (2, "2")))
+        .toDF("key", "value")
       // Comparison at the end is for broadcast left semi join
-      val joinExpression = df1("key") === df2("key") && df1("value") > df2("value")
+      val joinExpression =
+        df1("key") === df2("key") && df1("value") > df2("value")
       val df3 = df1.join(broadcast(df2), joinExpression, joinType)
-      val plan =
-        EnsureRequirements(sqlContext.sessionState.conf).apply(df3.queryExecution.sparkPlan)
+      val plan = EnsureRequirements(sqlContext.sessionState.conf)
+        .apply(df3.queryExecution.sparkPlan)
       assert(plan.collect { case p: T => p }.size === 1)
       plan.executeCollect()
     }
@@ -75,11 +82,12 @@ class BroadcastJoinSuite extends QueryTest with BeforeAndAfterAll {
   }
 
   test("unsafe broadcast hash outer join updates peak execution memory") {
-    testBroadcastJoin[BroadcastHashJoin]("unsafe broadcast hash outer join", "left_outer")
+    testBroadcastJoin[BroadcastHashJoin](
+        "unsafe broadcast hash outer join", "left_outer")
   }
 
   test("unsafe broadcast left semi join updates peak execution memory") {
-    testBroadcastJoin[BroadcastHashJoin]("unsafe broadcast left semi join", "leftsemi")
+    testBroadcastJoin[BroadcastHashJoin](
+        "unsafe broadcast left semi join", "leftsemi")
   }
-
 }

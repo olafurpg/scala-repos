@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala Ant Tasks                      **
-**    / __/ __// _ | / /  / _ |    (c) 2005-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala Ant Tasks                      **
+ **    / __/ __// _ | / /  / _ |    (c) 2005-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
-
 
 package scala.tools.ant.sabbus
 
@@ -42,7 +41,9 @@ trait TaskArgs extends CompilationPathProperty {
   }
 
   def setParams(input: String) {
-    extraArgs ++= input.split(' ').map { s => val a = new Argument; a.setValue(s); a }
+    extraArgs ++= input.split(' ').map { s =>
+      val a = new Argument; a.setValue(s); a
+    }
   }
 
   def createCompilerArg(): Argument = {
@@ -96,6 +97,6 @@ trait TaskArgs extends CompilationPathProperty {
 
   def extraArgsFlat: Seq[String] = extraArgs flatMap { a =>
     val parts = a.getParts
-    if(parts eq null) Seq[String]() else parts.toSeq
+    if (parts eq null) Seq[String]() else parts.toSeq
   }
 }

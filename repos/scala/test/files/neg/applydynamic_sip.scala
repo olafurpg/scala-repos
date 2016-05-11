@@ -13,7 +13,6 @@ object Test extends App {
     def applyDynamic(n: Int) = n
     def applyDynamicNamed(n: Int) = n
     def updateDynamic(n: Int) = n
-
   }
   bad1.sel
   bad1.sel(1)

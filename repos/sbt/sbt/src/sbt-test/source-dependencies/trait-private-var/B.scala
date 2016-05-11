@@ -1,3 +1,3 @@
 object B extends A {
-	def main(args: Array[String]): Unit = println(bar)
+  def main(args: Array[String]): Unit = println(bar)
 }

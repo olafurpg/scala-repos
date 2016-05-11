@@ -24,9 +24,15 @@ object XsrfTokenSpec extends MutableScalatraSpec {
   addServlet(classOf[XsrfTokenServlet], "/*")
 
   def tokenFromCookie = {
-    response.getHeaderValues("Set-Cookie").asScala.flatMap { s =>
-      HttpCookie.parse(s).asScala.toList
-    }.find(_.getName == "XSRF-TOKEN").map(_.getValue).getOrElse("")
+    response
+      .getHeaderValues("Set-Cookie")
+      .asScala
+      .flatMap { s =>
+        HttpCookie.parse(s).asScala.toList
+      }
+      .find(_.getName == "XSRF-TOKEN")
+      .map(_.getValue)
+      .getOrElse("")
   }
 
   "the get request should include the CSRF token" in {
@@ -44,7 +50,8 @@ object XsrfTokenSpec extends MutableScalatraSpec {
         token = tokenFromCookie
         body must beMatching("GO")
       }
-      post("/renderForm", headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
+      post("/renderForm",
+           headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
         body must be_==("SUCCESS")
       }
     }
@@ -55,7 +62,9 @@ object XsrfTokenSpec extends MutableScalatraSpec {
       get("/renderForm") {
         body must beMatching("GO")
       }
-      post("/renderForm", headers = Map(XsrfTokenSupport.HeaderNames.head -> "Hey I'm different")) {
+      post("/renderForm",
+           headers = Map(
+                 XsrfTokenSupport.HeaderNames.head -> "Hey I'm different")) {
         status must be_==(403)
         body must not be_== ("SUCCESS")
       }
@@ -72,16 +81,16 @@ object XsrfTokenSpec extends MutableScalatraSpec {
       get("/renderForm") {
         body must beMatching("GO")
       }
-      post("/renderForm", headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
+      post("/renderForm",
+           headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
         body must be_==("SUCCESS")
       }
-      post("/renderForm", headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
+      post("/renderForm",
+           headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
         body must be_==("SUCCESS")
       }
     }
-
   }
-
 }
 
 // vim: set si ts=2 sw=2 sts=2 et:

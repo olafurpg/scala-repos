@@ -10,51 +10,65 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScModifierListOwner, S
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
 
 /**
- * User: Alefas
- * Date: 18.02.12
- */
-class PsiTypedDefinitionWrapper(val typedDefinition: ScTypedDefinition, isStatic: Boolean, isInterface: Boolean,
-                                role: PsiTypedDefinitionWrapper.DefinitionRole.DefinitionRole,
-                                cClass: Option[PsiClass] = None) extends {
-  val elementFactory = JavaPsiFacade.getInstance(typedDefinition.getProject).getElementFactory
+  * User: Alefas
+  * Date: 18.02.12
+  */
+class PsiTypedDefinitionWrapper(
+    val typedDefinition: ScTypedDefinition,
+    isStatic: Boolean,
+    isInterface: Boolean,
+    role: PsiTypedDefinitionWrapper.DefinitionRole.DefinitionRole,
+    cClass: Option[PsiClass] = None)
+    extends {
+  val elementFactory =
+    JavaPsiFacade.getInstance(typedDefinition.getProject).getElementFactory
   val containingClass = {
-    val result = if (cClass != None) cClass.get
-    else
-      typedDefinition.nameContext match {
-        case s: ScMember =>
-          val res = s.containingClass
-          if (isStatic) {
-            res match {
-              case o: ScObject => o.fakeCompanionClassOrCompanionClass
-              case _ => res
-            }
-          } else res
-        case _ => null
-      }
+    val result =
+      if (cClass != None) cClass.get
+      else
+        typedDefinition.nameContext match {
+          case s: ScMember =>
+            val res = s.containingClass
+            if (isStatic) {
+              res match {
+                case o: ScObject => o.fakeCompanionClassOrCompanionClass
+                case _ => res
+              }
+            } else res
+          case _ => null
+        }
     if (result == null) {
-      val message = "Containing class is null: " + typedDefinition.getContainingFile.getText + "\n" +
+      val message =
+        "Containing class is null: " +
+        typedDefinition.getContainingFile.getText + "\n" +
         "typed Definition: " + typedDefinition.getTextRange.getStartOffset
       throw new RuntimeException(message)
     }
     result
   }
-  val methodText = PsiTypedDefinitionWrapper.methodText(typedDefinition, isStatic, isInterface, role)
+  val methodText = PsiTypedDefinitionWrapper.methodText(
+      typedDefinition, isStatic, isInterface, role)
   val method: PsiMethod = {
     try {
       elementFactory.createMethodFromText(methodText, containingClass)
     } catch {
-      case e: Exception => elementFactory.createMethodFromText("public void FAILED_TO_DECOMPILE_METHOD() {}", containingClass)
+      case e: Exception =>
+        elementFactory.createMethodFromText(
+            "public void FAILED_TO_DECOMPILE_METHOD() {}", containingClass)
     }
   }
-} with LightMethodAdapter(typedDefinition.getManager, method, containingClass) with LightScalaMethod {
+} with LightMethodAdapter(typedDefinition.getManager, method, containingClass)
+with LightScalaMethod {
 
   override def getNavigationElement: PsiElement = this
 
   override def canNavigate: Boolean = typedDefinition.canNavigate
 
-  override def canNavigateToSource: Boolean = typedDefinition.canNavigateToSource
+  override def canNavigateToSource: Boolean =
+    typedDefinition.canNavigateToSource
 
-  override def navigate(requestFocus: Boolean): Unit = typedDefinition.navigate(requestFocus)
+  override def navigate(requestFocus: Boolean): Unit =
+    typedDefinition.navigate(requestFocus)
 
   override def getTextRange: TextRange = typedDefinition.getTextRange
 
@@ -73,12 +87,14 @@ class PsiTypedDefinitionWrapper(val typedDefinition: ScTypedDefinition, isStatic
 
   override def getNextSibling: PsiElement = typedDefinition.getNextSibling
 
-  override def getNameIdentifier: PsiIdentifier = typedDefinition.getNameIdentifier
+  override def getNameIdentifier: PsiIdentifier =
+    typedDefinition.getNameIdentifier
 
   override def isWritable: Boolean = getContainingFile.isWritable
 
   override def setName(name: String) = {
-    if (role == PsiTypedDefinitionWrapper.DefinitionRole.SIMPLE_ROLE) typedDefinition.setName(name)
+    if (role == PsiTypedDefinitionWrapper.DefinitionRole.SIMPLE_ROLE)
+      typedDefinition.setName(name)
     else this
   }
 }
@@ -90,7 +106,10 @@ object PsiTypedDefinitionWrapper {
   }
   import org.jetbrains.plugins.scala.lang.psi.light.PsiTypedDefinitionWrapper.DefinitionRole._
 
-  def methodText(b: ScTypedDefinition, isStatic: Boolean, isInterface: Boolean, role: DefinitionRole): String = {
+  def methodText(b: ScTypedDefinition,
+                 isStatic: Boolean,
+                 isInterface: Boolean,
+                 role: DefinitionRole): String = {
     val builder = new StringBuilder
 
     ScalaPsiUtil.nameContext(b) match {
@@ -102,7 +121,9 @@ object PsiTypedDefinitionWrapper {
     val result = b.getType(TypingContext.empty)
     result match {
       case _ if role == SETTER || role == EQ => builder.append("void")
-      case Success(tp, _) => builder.append(JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
+      case Success(tp, _) =>
+        builder.append(
+            JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
       case _ => builder.append("java.lang.Object")
     }
 
@@ -120,7 +141,9 @@ object PsiTypedDefinitionWrapper {
     } else {
       builder.append("(")
       result match {
-        case Success(tp, _) => builder.append(JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
+        case Success(tp, _) =>
+          builder.append(
+              JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
         case _ => builder.append("java.lang.Object")
       }
       builder.append(" ").append(b.getName).append(")")
@@ -131,21 +154,28 @@ object PsiTypedDefinitionWrapper {
       builder.append(LightUtil.getThrowsSection(holder))
     }
 
-    if (!isInterface)
-      builder.append(" {}")
-    else
-      builder.append(";")
+    if (!isInterface) builder.append(" {}")
+    else builder.append(";")
 
     builder.toString()
   }
 
-  def processWrappersFor(t: ScTypedDefinition, cClass: Option[PsiClass], nodeName: String, isStatic: Boolean, isInterface: Boolean,
-                 processMethod: PsiMethod => Unit, processName: String => Unit = _ => ()): Unit  = {
+  def processWrappersFor(t: ScTypedDefinition,
+                         cClass: Option[PsiClass],
+                         nodeName: String,
+                         isStatic: Boolean,
+                         isInterface: Boolean,
+                         processMethod: PsiMethod => Unit,
+                         processName: String => Unit = _ => ()): Unit = {
     if (nodeName == t.name) {
-      processMethod(t.getTypedDefinitionWrapper(isStatic, isInterface, role = SIMPLE_ROLE, cClass))
+      processMethod(
+          t.getTypedDefinitionWrapper(
+              isStatic, isInterface, role = SIMPLE_ROLE, cClass))
       processName(t.name)
       if (t.isVar) {
-        processMethod(t.getTypedDefinitionWrapper(isStatic, isInterface, role = EQ, cClass))
+        processMethod(
+            t.getTypedDefinitionWrapper(
+                isStatic, isInterface, role = EQ, cClass))
         processName(t.name + "_eq")
       }
     }
@@ -155,20 +185,28 @@ object PsiTypedDefinitionWrapper {
         val booleanBeanProperty = ScalaPsiUtil.isBooleanBeanProperty(s)
         if (beanProperty) {
           if (nodeName == "get" + t.name.capitalize) {
-            processMethod(t.getTypedDefinitionWrapper(isStatic, isInterface, role = GETTER, cClass))
+            processMethod(
+                t.getTypedDefinitionWrapper(
+                    isStatic, isInterface, role = GETTER, cClass))
             processName("get" + t.getName.capitalize)
           }
           if (t.isVar && nodeName == "set" + t.name.capitalize) {
-            processMethod(t.getTypedDefinitionWrapper(isStatic, isInterface, role = SETTER, cClass))
+            processMethod(
+                t.getTypedDefinitionWrapper(
+                    isStatic, isInterface, role = SETTER, cClass))
             processName("set" + t.getName.capitalize)
           }
         } else if (booleanBeanProperty) {
           if (nodeName == "is" + t.name.capitalize) {
-            processMethod(t.getTypedDefinitionWrapper(isStatic, isInterface, role = IS_GETTER, cClass))
+            processMethod(
+                t.getTypedDefinitionWrapper(
+                    isStatic, isInterface, role = IS_GETTER, cClass))
             processName("is" + t.getName.capitalize)
           }
           if (t.isVar && nodeName == "set" + t.name.capitalize) {
-            processMethod(t.getTypedDefinitionWrapper(isStatic, isInterface, role = SETTER, cClass))
+            processMethod(
+                t.getTypedDefinitionWrapper(
+                    isStatic, isInterface, role = SETTER, cClass))
             processName("set" + t.getName.capitalize)
           }
         }

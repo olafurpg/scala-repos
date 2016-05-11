@@ -50,38 +50,56 @@ import scalaz.syntax.std.option._
 import scala.collection.immutable.SortedMap
 import scala.collection.immutable.TreeMap
 
-class StubVFSMetadata[M[+_]](projectionMetadata: Map[Path, Map[ColumnRef, Long]])(implicit M: Monad[M]) extends VFSMetadata[M]{
-  def findDirectChildren(apiKey: APIKey, path: Path): EitherT[M, ResourceError, Set[PathMetadata]] = EitherT.right {
-    import PathMetadata._
-    M point {
-      projectionMetadata.keySet collect {
-        case key if key.isChildOf(path) => 
-          PathMetadata(
-            Path(key.components(path.length)), 
-            if (key.length == path.length + 1) DataOnly(FileContent.XQuirrelData) else PathOnly
-          )
+class StubVFSMetadata[M[+ _]](
+    projectionMetadata: Map[Path, Map[ColumnRef, Long]])(implicit M: Monad[M])
+    extends VFSMetadata[M] {
+  def findDirectChildren(
+      apiKey: APIKey,
+      path: Path): EitherT[M, ResourceError, Set[PathMetadata]] =
+    EitherT.right {
+      import PathMetadata._
+      M point {
+        projectionMetadata.keySet collect {
+          case key if key.isChildOf(path) =>
+            PathMetadata(
+                Path(key.components(path.length)),
+                if (key.length == path.length + 1)
+                  DataOnly(FileContent.XQuirrelData) else PathOnly
+            )
+        }
       }
     }
+
+  private def getPathMeta(
+      path: Path): EitherT[M, ResourceError, Map[ColumnRef, Long]] = EitherT {
+    M.point(projectionMetadata.get(path) \/> NotFound(
+            "No metadata found for path %s".format(path.path)))
   }
 
-  private def getPathMeta(path: Path): EitherT[M, ResourceError, Map[ColumnRef, Long]] = EitherT {
-    M.point(projectionMetadata.get(path) \/> NotFound("No metadata found for path %s".format(path.path)))
-  }
-
-  def pathStructure(apiKey: APIKey, path: Path, property: CPath, version: Version): EitherT[M, ResourceError, PathStructure] = {
+  def pathStructure(
+      apiKey: APIKey,
+      path: Path,
+      property: CPath,
+      version: Version): EitherT[M, ResourceError, PathStructure] = {
     for {
-      types <- getPathMeta(path) map { _ collect {
-        case (ColumnRef(`property`, ctype), count) => (ctype, count)
-      } }
+      types <- getPathMeta(path) map {
+        _ collect {
+          case (ColumnRef(`property`, ctype), count) => (ctype, count)
+        }
+      }
 
-      children <- getPathMeta(path) map { _ flatMap {
-        case t @ (ColumnRef(s, ctype), count) =>
-          if (s.hasPrefix(property)) s.take(property.length + 1) else None
-      } }
+      children <- getPathMeta(path) map {
+        _ flatMap {
+          case t @ (ColumnRef(s, ctype), count) =>
+            if (s.hasPrefix(property)) s.take(property.length + 1) else None
+        }
+      }
     } yield PathStructure(types, children.toSet)
   }
 
-  def size(apiKey: APIKey, path: Path, version: Version): EitherT[M, ResourceError, Long] = {
-    getPathMeta(path) map(_.values.max)
+  def size(apiKey: APIKey,
+           path: Path,
+           version: Version): EitherT[M, ResourceError, Long] = {
+    getPathMeta(path) map (_.values.max)
   }
 }

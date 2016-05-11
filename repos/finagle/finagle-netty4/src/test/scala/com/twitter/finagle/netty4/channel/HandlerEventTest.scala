@@ -14,17 +14,17 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
-
 @RunWith(classOf[JUnitRunner])
 class HandlerEventTest extends FunSuite with MockitoSugar {
 
   // verify that custom channel handlers don't swallow pipeline events.
   val handlers = List(
-    new ChannelRequestStatsHandler(new InMemoryStatsReceiver),
-    new ChannelStatsHandler(new InMemoryStatsReceiver),
-    new SimpleChannelSnooper("test"),
-    new ByteBufSnooper("test"),
-    new WriteCompletionTimeoutHandler(DefaultTimer.twitter, Duration.fromSeconds(10))
+      new ChannelRequestStatsHandler(new InMemoryStatsReceiver),
+      new ChannelStatsHandler(new InMemoryStatsReceiver),
+      new SimpleChannelSnooper("test"),
+      new ByteBufSnooper("test"),
+      new WriteCompletionTimeoutHandler(
+          DefaultTimer.twitter, Duration.fromSeconds(10))
   )
   val loop = new NioEventLoopGroup()
 
@@ -54,22 +54,26 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
 
     test(s"$name doesn't suppress ChannelReadComplete event") {
       pipeline.fireChannelReadComplete()
-      assert(handler.channelReadCompleteFired, "suppressed ChannelReadComplete event")
+      assert(handler.channelReadCompleteFired,
+             "suppressed ChannelReadComplete event")
     }
 
     test(s"$name doesn't suppress ChannelRegistered event") {
       pipeline.fireChannelRegistered()
-      assert(handler.channelRegisteredFired, "suppressed ChannelRegistered event")
+      assert(
+          handler.channelRegisteredFired, "suppressed ChannelRegistered event")
     }
 
     test(s"$name doesn't suppress ChannelUnregistered event") {
       pipeline.fireChannelUnregistered()
-      assert(handler.channelUnregisteredFired, "suppressed ChannelUnregistered event")
+      assert(handler.channelUnregisteredFired,
+             "suppressed ChannelUnregistered event")
     }
 
     test(s"$name doesn't suppress ChannelWritabilityChanged event") {
       pipeline.fireChannelWritabilityChanged()
-      assert(handler.channelWritabilityChangedFired, "suppressed ChannelWritabilityChanged event")
+      assert(handler.channelWritabilityChangedFired,
+             "suppressed ChannelWritabilityChanged event")
     }
 
     test(s"$name doesn't suppress ExceptionCaught event") {
@@ -79,7 +83,8 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
 
     test(s"$name doesn't suppress UserEventTriggered event") {
       pipeline.fireUserEventTriggered(new Object)
-      assert(handler.userEventTriggeredFired, "suppressed UserEventTriggered event")
+      assert(handler.userEventTriggeredFired,
+             "suppressed UserEventTriggered event")
     }
 
     // outbound actions
@@ -125,8 +130,8 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
   }
 
   /**
-   * a channel duplex handler which records which events have fired
-   */
+    * a channel duplex handler which records which events have fired
+    */
   class TestDuplexHandler extends ChannelDuplexHandler {
 
     // outbound events
@@ -137,19 +142,23 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
     }
 
     var writeFired = false
-    override def write(ctx: ChannelHandlerContext, msg: scala.Any, promise: ChannelPromise): Unit = {
+    override def write(ctx: ChannelHandlerContext,
+                       msg: scala.Any,
+                       promise: ChannelPromise): Unit = {
       writeFired = true
       super.write(ctx, msg, promise)
     }
 
     var closeFired = false
-    override def close(ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
+    override def close(
+        ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
       closeFired = true
       super.close(ctx, future)
     }
 
     var deregisterFired = false
-    override def deregister(ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
+    override def deregister(
+        ctx: ChannelHandlerContext, future: ChannelPromise): Unit = {
       deregisterFired = true
       super.deregister(ctx, future)
     }
@@ -161,21 +170,26 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
     }
 
     var connectFired = false
-    override def connect(ctx: ChannelHandlerContext, remoteAddress: SocketAddress, localAddress: SocketAddress, future: ChannelPromise): Unit = {
+    override def connect(ctx: ChannelHandlerContext,
+                         remoteAddress: SocketAddress,
+                         localAddress: SocketAddress,
+                         future: ChannelPromise): Unit = {
       connectFired = true
       super.connect(ctx, remoteAddress, localAddress, future)
     }
 
     var bindFired = false
-    override def bind(ctx: ChannelHandlerContext, localAddress: SocketAddress, future: ChannelPromise): Unit = {
+    override def bind(ctx: ChannelHandlerContext,
+                      localAddress: SocketAddress,
+                      future: ChannelPromise): Unit = {
       bindFired = true
       super.bind(ctx, localAddress, future)
     }
 
-
     // inbound events
     var exceptionCaughtFired = false
-    override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+    override def exceptionCaught(
+        ctx: ChannelHandlerContext, cause: Throwable): Unit = {
       exceptionCaughtFired = true
       super.exceptionCaught(ctx, cause)
     }
@@ -187,7 +201,8 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
     }
 
     var channelReadFired = false
-    override def channelRead(ctx: ChannelHandlerContext, msg: scala.Any): Unit = {
+    override def channelRead(
+        ctx: ChannelHandlerContext, msg: scala.Any): Unit = {
       channelReadFired = true
       super.channelRead(ctx, msg)
     }
@@ -211,7 +226,8 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
     }
 
     var userEventTriggeredFired = false
-    override def userEventTriggered(ctx: ChannelHandlerContext, evt: scala.Any): Unit = {
+    override def userEventTriggered(
+        ctx: ChannelHandlerContext, evt: scala.Any): Unit = {
       userEventTriggeredFired = true
       super.userEventTriggered(ctx, evt)
     }

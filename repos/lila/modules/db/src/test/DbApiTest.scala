@@ -15,8 +15,7 @@ class DbApiTest extends Specification {
   "operators" should {
 
     "$set" in {
-      $set("foo" -> "bar") must_== Json.obj(
-        "$set" -> Json.obj("foo" -> "bar"))
+      $set("foo" -> "bar") must_== Json.obj("$set" -> Json.obj("foo" -> "bar"))
     }
     // "$set DateTime" in new WithApplication {
     //   $set("foo" -> date) must_== Json.obj(

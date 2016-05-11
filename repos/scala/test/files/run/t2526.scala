@@ -1,7 +1,7 @@
 /**
- * Checks that various foreach methods overridden in mutable.HashMap as part of ticket #2526
- * still work correctly.
- */
+  * Checks that various foreach methods overridden in mutable.HashMap as part of ticket #2526
+  * still work correctly.
+  */
 object Test {
   import collection._
 
@@ -27,13 +27,15 @@ object Test {
   }
 
   /* Checks foreach of `actual` goes over all the elements in `expected` */
-  private def assertForeach[E](expected: Traversable[E], actual: Iterator[E]): Unit = {
+  private def assertForeach[E](
+      expected: Traversable[E], actual: Iterator[E]): Unit = {
     val notYetFound = new mutable.ArrayBuffer[E]() ++= expected
     actual.foreach { e =>
       assert(notYetFound.contains(e))
       notYetFound -= e
     }
-    assert(notYetFound.size == 0, "mutable.HashMap.foreach should have iterated over: " + notYetFound)
+    assert(notYetFound.size == 0,
+           "mutable.HashMap.foreach should have iterated over: " + notYetFound)
   }
 
   /*
@@ -42,12 +44,14 @@ object Test {
    * Iterator and we want to avoid converting between collections to ensure that we test what
    * we mean to test.
    */
-  private def assertForeach[E](expected: Traversable[E], actual: Traversable[E]): Unit = {
+  private def assertForeach[E](
+      expected: Traversable[E], actual: Traversable[E]): Unit = {
     val notYetFound = new mutable.ArrayBuffer[E]() ++= expected
     actual.foreach { e =>
       assert(notYetFound.contains(e))
       notYetFound -= e
     }
-    assert(notYetFound.size == 0, "mutable.HashMap.foreach should have iterated over: " + notYetFound)
+    assert(notYetFound.size == 0,
+           "mutable.HashMap.foreach should have iterated over: " + notYetFound)
   }
 }

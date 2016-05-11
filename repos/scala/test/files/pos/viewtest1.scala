@@ -1,17 +1,18 @@
 package test
 
 trait Ordered[a] {
-  def < (x: a): Boolean
+  def <(x: a): Boolean
 }
 
 object O {
-  implicit def view (x: String): Ordered[String] = new Ordered[String] {
-    def < (y: String) = x.compareTo(y) < 0
+  implicit def view(x: String): Ordered[String] = new Ordered[String] {
+    def <(y: String) = x.compareTo(y) < 0
   }
 }
 
 object Empty extends Tree[Nothing]
-case class Node[c <% Ordered[c]](elem: c, l: Tree[c], r: Tree[c]) extends Tree[c]
+case class Node[c <% Ordered[c]](elem: c, l: Tree[c], r: Tree[c])
+    extends Tree[c]
 
 abstract class Tree[+a <% Ordered[a]] {
   def insert[b >: a <% Ordered[b]](x: b): Tree[b] = this match {

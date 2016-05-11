@@ -21,9 +21,9 @@ import scala.collection.mutable
 import scala.language.implicitConversions
 
 /**
- * You can import Config._ if you want the auto-conversions in a class
- * that does not inherit from trait Config.
- */
+  * You can import Config._ if you want the auto-conversions in a class
+  * that does not inherit from trait Config.
+  */
 @deprecated("use a Plain Old Scala Object", "")
 object Config {
   sealed trait Required[+A] extends Serializable {
@@ -46,13 +46,14 @@ object Config {
     def isSpecified = false
   }
 
-  class RequiredValuesMissing(names: Seq[String]) extends Exception(names.mkString(","))
+  class RequiredValuesMissing(names: Seq[String])
+      extends Exception(names.mkString(","))
 
   /**
-   * Config classes that don't produce anything via an apply() method
-   * can extends Config.Nothing, and still get access to the Required
-   * classes and methods.
-   */
+    * Config classes that don't produce anything via an apply() method
+    * can extends Config.Nothing, and still get access to the Required
+    * classes and methods.
+    */
   class Nothing extends Config[scala.Nothing] {
     def apply() = throw new UnsupportedOperationException
   }
@@ -65,47 +66,48 @@ object Config {
 }
 
 /**
- * A config object contains vars for configuring an object of type T, and an apply() method
- * which turns this config into an object of type T.
- *
- * The trait also contains a few useful implicits.
- *
- * You can define fields that are required but that don't have a default value with:
- *     class BotConfig extends Config[Bot] {
- *       var botName = required[String]
- *       var botPort = required[Int]
- *       ....
- *     }
- *
- * Optional fields can be defined with:
- *    var something = optional[Duration]
- *
- * Fields that are dependent on other fields and have a default value computed
- * from an expression should be marked as computed:
- *
- *    var level = required[Int]
- *    var nextLevel = computed { level + 1 }
- */
+  * A config object contains vars for configuring an object of type T, and an apply() method
+  * which turns this config into an object of type T.
+  *
+  * The trait also contains a few useful implicits.
+  *
+  * You can define fields that are required but that don't have a default value with:
+  *     class BotConfig extends Config[Bot] {
+  *       var botName = required[String]
+  *       var botPort = required[Int]
+  *       ....
+  *     }
+  *
+  * Optional fields can be defined with:
+  *    var something = optional[Duration]
+  *
+  * Fields that are dependent on other fields and have a default value computed
+  * from an expression should be marked as computed:
+  *
+  *    var level = required[Int]
+  *    var nextLevel = computed { level + 1 }
+  */
 @deprecated("use a Plain Old Scala Object", "")
 trait Config[T] extends (() => T) {
   import Config.{Required, Specified, Unspecified, RequiredValuesMissing}
 
   /**
-   * a lazy singleton of the configured class. Allows one to pass
-   * the Config around to multiple classes without producing multiple
-   * configured instances
-   */
+    * a lazy singleton of the configured class. Allows one to pass
+    * the Config around to multiple classes without producing multiple
+    * configured instances
+    */
   lazy val memoized: T = apply()
 
   def required[A]: Required[A] = Unspecified
   def required[A](default: => A): Required[A] = new Specified(default)
   def optional[A]: Required[Option[A]] = new Specified(None)
-  def optional[A](default: => A): Required[Option[A]] = new Specified(Some(default))
+  def optional[A](default: => A): Required[Option[A]] =
+    new Specified(Some(default))
 
   /**
-   * The same as specifying required[A] with a default value, but the intent to the
-   * use is slightly different.
-   */
+    * The same as specifying required[A] with a default value, but the intent to the
+    * use is slightly different.
+    */
   def computed[A](f: => A): Required[A] = new Specified(f)
 
   /** a non-lazy way to create a Specified that can be called from java */
@@ -118,24 +120,27 @@ trait Config[T] extends (() => T) {
   implicit def intoList[A](item: A): List[A] = List(item)
 
   /**
-   * Looks for any fields that are Required but currently Unspecified, in
-   * this object and in any child Config objects, and returns the names
-   * of those missing values.  For missing values in child Config objects,
-   * the name is the dot-separated path down to that value.
-   */
+    * Looks for any fields that are Required but currently Unspecified, in
+    * this object and in any child Config objects, and returns the names
+    * of those missing values.  For missing values in child Config objects,
+    * the name is the dot-separated path down to that value.
+    */
   def missingValues: Seq[String] = {
     val alreadyVisited = mutable.Set[AnyRef]()
-    val interestingReturnTypes = Seq(classOf[Required[_]], classOf[Config[_]], classOf[Option[_]])
+    val interestingReturnTypes = Seq(
+        classOf[Required[_]], classOf[Config[_]], classOf[Option[_]])
     val buf = new mutable.ListBuffer[String]
     def collect(prefix: String, config: Config[_]) {
       if (!alreadyVisited.contains(config)) {
         alreadyVisited += config
-        val nullaryMethods = config.getClass.getMethods.toSeq filter { _.getParameterTypes.isEmpty }
+        val nullaryMethods =
+          config.getClass.getMethods.toSeq filter {
+            _.getParameterTypes.isEmpty
+          }
         for (method <- nullaryMethods) {
           val name = method.getName
           val rt = method.getReturnType
-          if (name != "required" &&
-              name != "optional" &&
+          if (name != "required" && name != "optional" &&
               !name.endsWith("$outer") && // no loops!
               interestingReturnTypes.exists(_.isAssignableFrom(rt))) {
             method.invoke(config) match {
@@ -164,8 +169,8 @@ trait Config[T] extends (() => T) {
   }
 
   /**
-   * @throws RequiredValuesMissing if there are any missing values.
-   */
+    * @throws RequiredValuesMissing if there are any missing values.
+    */
   def validate() {
     val missing = missingValues
     if (!missing.isEmpty) throw new RequiredValuesMissing(missing)

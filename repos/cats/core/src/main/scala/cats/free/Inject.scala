@@ -3,7 +3,6 @@ package cats.free
 import cats.Functor
 import cats.data.Coproduct
 
-
 /**
   * Inject type class as described in "Data types a la carte" (Swierstra 2008).
   *
@@ -27,22 +26,27 @@ private[free] sealed abstract class InjectInstances {
     new Inject[F, Coproduct[F, G, ?]] {
       def inj[A](fa: F[A]): Coproduct[F, G, A] = Coproduct.leftc(fa)
 
-      def prj[A](ga: Coproduct[F, G, A]): Option[F[A]] = ga.run.fold(Option(_), _ => None)
+      def prj[A](ga: Coproduct[F, G, A]): Option[F[A]] =
+        ga.run.fold(Option(_), _ => None)
     }
 
-  implicit def rightInjectInstance[F[_], G[_], H[_]](implicit I: Inject[F, G]) =
+  implicit def rightInjectInstance[F[_], G[_], H[_]](
+      implicit I: Inject[F, G]) =
     new Inject[F, Coproduct[H, G, ?]] {
       def inj[A](fa: F[A]): Coproduct[H, G, A] = Coproduct.rightc(I.inj(fa))
 
-      def prj[A](ga: Coproduct[H, G, A]): Option[F[A]] = ga.run.fold(_ => None, I.prj(_))
+      def prj[A](ga: Coproduct[H, G, A]): Option[F[A]] =
+        ga.run.fold(_ => None, I.prj(_))
     }
 }
 
 object Inject extends InjectInstances {
-  def inject[F[_], G[_], A](ga: G[Free[F, A]])(implicit I: Inject[G, F]): Free[F, A] =
+  def inject[F[_], G[_], A](ga: G[Free[F, A]])(
+      implicit I: Inject[G, F]): Free[F, A] =
     Free.liftF(I.inj(ga)) flatMap identity
 
-  def match_[F[_], G[_], A](fa: Free[F, A])(implicit F: Functor[F], I: Inject[G, F]): Option[G[Free[F, A]]] =
+  def match_[F[_], G[_], A](fa: Free[F, A])(
+      implicit F: Functor[F], I: Inject[G, F]): Option[G[Free[F, A]]] =
     fa.resume.fold(I.prj, _ => None)
 
   def apply[F[_], G[_]](implicit I: Inject[F, G]): Inject[F, G] = I

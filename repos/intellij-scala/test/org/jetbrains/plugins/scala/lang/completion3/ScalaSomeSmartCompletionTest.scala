@@ -4,13 +4,11 @@ import com.intellij.codeInsight.completion.CompletionType
 import org.jetbrains.plugins.scala.codeInsight.ScalaCodeInsightTestBase
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 class ScalaSomeSmartCompletionTest extends ScalaCodeInsightTestBase {
   def testSomeSmart1() {
-    val fileText =
-"""
+    val fileText = """
 class TUI {
   class A
   def foo(x: Option[A]) = 1
@@ -21,8 +19,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 class TUI {
   class A
   def foo(x: Option[A]) = 1
@@ -36,8 +33,7 @@ class TUI {
   }
 
   def testSomeSmart2() {
-    val fileText =
-"""
+    val fileText = """
 class TUI {
   class A
   def foo(x: Option[A]) = 1
@@ -48,8 +44,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 class TUI {
   class A
   def foo(x: Option[A]) = 1
@@ -58,13 +53,13 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "z").get, ',')
+    completeLookupItem(
+        activeLookup.find(le => le.getLookupString == "z").get, ',')
     checkResultByText(resultText)
   }
 
   def testSomeSmart3() {
-    val fileText =
-"""
+    val fileText = """
 class TUI {
   class A
   def foo(x: Option[A]) = 1
@@ -75,8 +70,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 class TUI {
   class A
   def foo(x: Option[A]) = 1
@@ -90,8 +84,7 @@ class TUI {
   }
 
   def testSomeSmart4() {
-    val fileText =
-"""
+    val fileText = """
 class TUI {
   class A
   def foo(x: Option[A]) = 1
@@ -102,8 +95,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 class TUI {
   class A
   def foo(x: Option[A]) = 1
@@ -113,15 +105,15 @@ class TUI {
 """.replaceAll("\r", "").trim()
 
     if (activeLookup != null) {
-      completeLookupItem(activeLookup.find(le => le.getLookupString == "z").get)
+      completeLookupItem(
+          activeLookup.find(le => le.getLookupString == "z").get)
     }
 
     checkResultByText(resultText)
   }
 
   def testSomeSmart5() {
-    val fileText =
-"""
+    val fileText = """
 class TUI {
   class A
   class B {def z(x: Int): A = new A}
@@ -132,8 +124,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 class TUI {
   class A
   class B {def z(x: Int): A = new A}
@@ -143,15 +134,15 @@ class TUI {
 """.replaceAll("\r", "").trim()
 
     if (activeLookup != null) {
-      completeLookupItem(activeLookup.find(le => le.getLookupString == "z").get)
+      completeLookupItem(
+          activeLookup.find(le => le.getLookupString == "z").get)
     }
 
     checkResultByText(resultText)
   }
 
   def testOuterThis() {
-    val fileText =
-      """
+    val fileText = """
       |class TT {
       |  class GG {
       |    val al: Option[TT] = <caret>
@@ -161,8 +152,7 @@ class TUI {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(2, CompletionType.SMART)
 
-    val resultText =
-      """
+    val resultText = """
       |class TT {
       |  class GG {
       |    val al: Option[TT] = Some(TT.this)<caret>
@@ -170,7 +160,9 @@ class TUI {
       |}
       """.stripMargin.replaceAll("\r", "").trim()
 
-    if (activeLookup != null) completeLookupItem(activeLookup.find(le => le.getLookupString == "TT.this").get, '\t')
+    if (activeLookup != null)
+      completeLookupItem(
+          activeLookup.find(le => le.getLookupString == "TT.this").get, '\t')
     checkResultByText(resultText)
   }
 
@@ -193,7 +185,9 @@ class TUI {
       |}
       """.stripMargin.replaceAll("\r", "").trim()
 
-    if (activeLookup != null) completeLookupItem(activeLookup.find(le => le.getLookupString == "aaa").get, '\t')
+    if (activeLookup != null)
+      completeLookupItem(
+          activeLookup.find(le => le.getLookupString == "aaa").get, '\t')
     checkResultByText(resultText)
   }
 }

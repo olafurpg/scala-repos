@@ -16,48 +16,65 @@ import scala.language.implicitConversions
 /**
   * @author Nikolay.Tropin
   */
-class DottyCompiler(scalaInstance: ScalaInstance, compilerJars: CompilerJars) extends Compiler {
-  override def compile(compilationData: CompilationData, client: Client): Unit = {
-    val cArgs = new CompilerArguments(scalaInstance, ClasspathOptions.javac(compiler = false))
+class DottyCompiler(scalaInstance: ScalaInstance, compilerJars: CompilerJars)
+    extends Compiler {
+  override def compile(
+      compilationData: CompilationData, client: Client): Unit = {
+    val cArgs = new CompilerArguments(
+        scalaInstance, ClasspathOptions.javac(compiler = false))
     val scalaOptions = compilationData.scalaOptions.flatMap(splitArg)
-    val args: Array[String] =
-      cArgs(compilationData.sources, compilationData.classpath,
-        Some(compilationData.output), scalaOptions).toArray
+    val args: Array[String] = cArgs(compilationData.sources,
+                                    compilationData.classpath,
+                                    Some(compilationData.output),
+                                    scalaOptions).toArray
 
     val oldOut = System.out
 
     try {
       System.setOut(emptyPrintStream)
 
-      val mainObj = Class.forName("dotty.tools.dotc.Main$", true, scalaInstance.loader)
+      val mainObj =
+        Class.forName("dotty.tools.dotc.Main$", true, scalaInstance.loader)
       mainObj.getClassLoader
       val moduleField = mainObj.getField("MODULE$")
       val mainInstance = moduleField.get(null)
 
       client.progress("compiling")
 
-      val process = mainObj.getMethod("process", classOf[Array[String]], classOf[SimpleReporter], classOf[CompilerCallback])
-      process.invoke(mainInstance, args, new ClientDottyReporter(client), new ClientDottyCallback(client))
-    }
-    finally {
+      val process = mainObj.getMethod("process",
+                                      classOf[Array[String]],
+                                      classOf[SimpleReporter],
+                                      classOf[CompilerCallback])
+      process.invoke(mainInstance,
+                     args,
+                     new ClientDottyReporter(client),
+                     new ClientDottyCallback(client))
+    } finally {
       System.setOut(oldOut)
     }
   }
 
-
-  private val emptyPrintStream = new PrintStream(new OutputStream {
+  private val emptyPrintStream = new PrintStream(
+      new OutputStream {
     override def write(b: Int): Unit = {}
   })
 
   //options for these settings should be in the separate entry in the array of compiler arguments
-  val argsToSplit = Set("-target:", "-g:", "-Yresolve-term-conflict:", "-Ylinearizer:", "-Ystruct-dispatch:", "-Ybuilder-debug:")
+  val argsToSplit = Set("-target:",
+                        "-g:",
+                        "-Yresolve-term-conflict:",
+                        "-Ylinearizer:",
+                        "-Ystruct-dispatch:",
+                        "-Ybuilder-debug:")
 
   private def splitArg(arg: String): Seq[String] = {
     if (!argsToSplit.exists(arg.startsWith)) return Seq(arg)
 
     val colonIdx = arg.indexOf(':')
-    if (colonIdx > 0 && colonIdx < arg.length - 1 && !arg.charAt(colonIdx + 1).isWhitespace)
-      Seq(arg.substring(0, colonIdx + 1).trim, arg.substring(colonIdx + 1).trim)
+    if (colonIdx > 0 && colonIdx < arg.length - 1 &&
+        !arg.charAt(colonIdx + 1).isWhitespace)
+      Seq(arg.substring(0, colonIdx + 1).trim,
+          arg.substring(colonIdx + 1).trim)
     else Seq(arg)
   }
 }
@@ -68,7 +85,8 @@ class ClientDottyCallback(client: Client) extends CompilerCallback {
     else new File(f.path())
   }
 
-  override def onClassGenerated(sourceFile: SourceFile, abstractFile: AbstractFile, s: String): Unit = {
+  override def onClassGenerated(
+      sourceFile: SourceFile, abstractFile: AbstractFile, s: String): Unit = {
     val source = toJFile(sourceFile)
     val classFile = toJFile(abstractFile)
     client.generated(source, classFile, sourceFile.name())
@@ -81,7 +99,8 @@ class ClientDottyCallback(client: Client) extends CompilerCallback {
 }
 
 class ClientDottyReporter(client: Client) extends SimpleReporter {
-  private def toOption[T](x: Optional[T]): Option[T] = if (x.isPresent) Some(x.get()) else None
+  private def toOption[T](x: Optional[T]): Option[T] =
+    if (x.isPresent) Some(x.get()) else None
 
   private val seenMessageHashes = mutable.HashMap[Int, Int]()
 

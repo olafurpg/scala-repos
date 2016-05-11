@@ -4,11 +4,12 @@ package codeInsight.generation
 import com.intellij.lang.LanguageCodeInsightActionHandler
 
 /**
- * Nikolay.Tropin
- * 2014-09-22
- */
+  * Nikolay.Tropin
+  * 2014-09-22
+  */
 class GeneratePropertyTest extends ScalaGenerateTestBase {
-  override val handler: LanguageCodeInsightActionHandler = new ScalaGeneratePropertyHandler
+  override val handler: LanguageCodeInsightActionHandler =
+    new ScalaGeneratePropertyHandler
 
   def testSimple() {
     val text = s"""class A {

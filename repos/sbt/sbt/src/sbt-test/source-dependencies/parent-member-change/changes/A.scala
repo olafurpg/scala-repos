@@ -1,3 +1,3 @@
 class A {
-	def x(i: String) = i+"3"
+  def x(i: String) = i + "3"
 }

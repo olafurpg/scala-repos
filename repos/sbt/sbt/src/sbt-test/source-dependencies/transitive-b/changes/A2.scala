@@ -1,4 +1,3 @@
-trait A
-{
-	val x = 5
+trait A {
+  val x = 5
 }

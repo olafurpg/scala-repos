@@ -14,7 +14,7 @@ object FromDependentObject {
 
   object Main {
     import AA._
-    goo(/*start*/""/*end*/)
+    goo( /*start*/ "" /*end*/ )
   }
 }
 /*
@@ -26,4 +26,4 @@ Seq(any2ArrowAssoc,
     srt2E,
     wrapString),
 Some(srt2E)
-*/
+ */

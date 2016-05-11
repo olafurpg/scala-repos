@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 08.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 08.02.2008
+  */
 /*
  * ClassParamClause ::= [nl] '(' 'implicit' ClassParam {',' ClassParam} ')'
  */
@@ -31,12 +30,12 @@ object ImplicitClassParamClause {
         //Look for implicit
         builder.getTokenType match {
           case ScalaTokenTypes.kIMPLICIT => {
-            //It's ok
-            builder.advanceLexer //Ate implicit
-          }
+              //It's ok
+              builder.advanceLexer //Ate implicit
+            }
           case _ => {
-            builder error ErrMsg("wrong.parameter")
-          }
+              builder error ErrMsg("wrong.parameter")
+            }
         }
         //ok, let's parse parameters
         if (!(ClassParam parse builder)) {

@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.Type
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 11.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 11.02.2008
+  */
 /*
  * ValDcl ::= ids ':' Type
  */
@@ -35,30 +34,29 @@ object ValDcl {
         //Look for :
         builder.getTokenType match {
           case ScalaTokenTypes.tCOLON => {
-            builder.advanceLexer //Ate :
-            if (Type.parse(builder)) {
-              returnMarker.drop
+              builder.advanceLexer //Ate :
+              if (Type.parse(builder)) {
+                returnMarker.drop
+              } else {
+                builder error ErrMsg("wrong.type")
+                returnMarker.drop
+              }
             }
-            else {
-              builder error ErrMsg("wrong.type")
-              returnMarker.drop
-            }
-          }
           case _ => {
-            builder error ErrMsg("wrong.val.declaration")
-            returnMarker.drop
-          }
+              builder error ErrMsg("wrong.val.declaration")
+              returnMarker.drop
+            }
         }
 
         builder.getTokenType match {
           case ScalaTokenTypes.tASSIGN => {
-            builder.advanceLexer
-            builder.error("Expected expression")
-            return true
-          }
+              builder.advanceLexer
+              builder.error("Expected expression")
+              return true
+            }
           case _ => {
-            return true
-          }
+              return true
+            }
         }
       case _ =>
         builder error ErrMsg("identifier.expected")

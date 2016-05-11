@@ -23,11 +23,11 @@ import org.apache.commons.math3.linear._
 import org.apache.spark._
 
 /**
- * Alternating least squares matrix factorization.
- *
- * This is an example implementation for learning how to use Spark. For more conventional use,
- * please refer to org.apache.spark.mllib.recommendation.ALS
- */
+  * Alternating least squares matrix factorization.
+  *
+  * This is an example implementation for learning how to use Spark. For more conventional use,
+  * please refer to org.apache.spark.mllib.recommendation.ALS
+  */
 object SparkALS {
 
   // Parameters set through command line arguments
@@ -43,7 +43,9 @@ object SparkALS {
     mh.multiply(uh.transpose())
   }
 
-  def rmse(targetR: RealMatrix, ms: Array[RealVector], us: Array[RealVector]): Double = {
+  def rmse(targetR: RealMatrix,
+           ms: Array[RealVector],
+           us: Array[RealVector]): Double = {
     val r = new Array2DRowRealMatrix(M, U)
     for (i <- 0 until M; j <- 0 until U) {
       r.setEntry(i, j, ms(i).dotProduct(us(j)))
@@ -57,7 +59,10 @@ object SparkALS {
     math.sqrt(sumSqs / (M.toDouble * U.toDouble))
   }
 
-  def update(i: Int, m: RealVector, us: Array[RealVector], R: RealMatrix) : RealVector = {
+  def update(i: Int,
+             m: RealVector,
+             us: Array[RealVector],
+             R: RealMatrix): RealVector = {
     val U = us.length
     val F = us(0).getDimension
     var XtX: RealMatrix = new Array2DRowRealMatrix(F, F)
@@ -79,8 +84,7 @@ object SparkALS {
   }
 
   def showWarning() {
-    System.err.println(
-      """WARN: This is a naive implementation of ALS and is given as an example!
+    System.err.println("""WARN: This is a naive implementation of ALS and is given as an example!
         |Please use the ALS method found in org.apache.spark.mllib.recommendation
         |for more conventional use.
       """.stripMargin)
@@ -90,7 +94,8 @@ object SparkALS {
 
     var slices = 0
 
-    val options = (0 to 4).map(i => if (i < args.length) Some(args(i)) else None)
+    val options =
+      (0 to 4).map(i => if (i < args.length) Some(args(i)) else None)
 
     options.toArray match {
       case Array(m, u, f, iters, slices_) =>
@@ -123,13 +128,15 @@ object SparkALS {
     var usb = sc.broadcast(us)
     for (iter <- 1 to ITERATIONS) {
       println(s"Iteration $iter:")
-      ms = sc.parallelize(0 until M, slices)
-                .map(i => update(i, msb.value(i), usb.value, Rc.value))
-                .collect()
+      ms = sc
+        .parallelize(0 until M, slices)
+        .map(i => update(i, msb.value(i), usb.value, Rc.value))
+        .collect()
       msb = sc.broadcast(ms) // Re-broadcast ms because it was updated
-      us = sc.parallelize(0 until U, slices)
-                .map(i => update(i, usb.value(i), msb.value, Rc.value.transpose()))
-                .collect()
+      us = sc
+        .parallelize(0 until U, slices)
+        .map(i => update(i, usb.value(i), msb.value, Rc.value.transpose()))
+        .collect()
       usb = sc.broadcast(us) // Re-broadcast us because it was updated
       println("RMSE = " + rmse(R, ms, us))
       println()
@@ -143,6 +150,5 @@ object SparkALS {
 
   private def randomMatrix(rows: Int, cols: Int): RealMatrix =
     new Array2DRowRealMatrix(Array.fill(rows, cols)(math.random))
-
 }
 // scalastyle:on println

@@ -4,13 +4,13 @@ import org.apache.thrift.TBase
 import org.apache.thrift.protocol.{TBinaryProtocol, TCompactProtocol, TProtocolFactory}
 
 object ThriftCodec {
-  def apply[T <: TBase[_, _]: Manifest, P <: TProtocolFactory: Manifest]: ThriftCodec[T, P] =
+  def apply[T <: TBase[_, _]: Manifest,
+            P <: TProtocolFactory : Manifest]: ThriftCodec[T, P] =
     new ThriftCodec[T, P]
 }
 
-class ThriftCodec[T <: TBase[_, _]: Manifest, P <: TProtocolFactory: Manifest]
-  extends Codec[T, Array[Byte]]
-  with ThriftSerializer {
+class ThriftCodec[T <: TBase[_, _]: Manifest, P <: TProtocolFactory : Manifest]
+    extends Codec[T, Array[Byte]] with ThriftSerializer {
 
   protected lazy val prototype: T =
     manifest[T].runtimeClass.asInstanceOf[Class[T]].newInstance
@@ -28,7 +28,7 @@ class ThriftCodec[T <: TBase[_, _]: Manifest, P <: TProtocolFactory: Manifest]
 }
 
 class BinaryThriftCodec[T <: TBase[_, _]: Manifest]
-  extends ThriftCodec[T, TBinaryProtocol.Factory]
+    extends ThriftCodec[T, TBinaryProtocol.Factory]
 
 class CompactThriftCodec[T <: TBase[_, _]: Manifest]
-  extends ThriftCodec[T, TCompactProtocol.Factory]
+    extends ThriftCodec[T, TCompactProtocol.Factory]

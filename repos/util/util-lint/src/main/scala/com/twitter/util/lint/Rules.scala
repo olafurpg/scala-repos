@@ -3,27 +3,28 @@ package com.twitter.util.lint
 import scala.collection.immutable.{Iterable, List}
 
 /**
- * A collection of [[Rule rules]].
- *
- * Implementations must be thread-safe for clients to use.
- *
- * Most usage will be via the implementation provided
- * by [[GlobalRules.get]].
- */
+  * A collection of [[Rule rules]].
+  *
+  * Implementations must be thread-safe for clients to use.
+  *
+  * Most usage will be via the implementation provided
+  * by [[GlobalRules.get]].
+  */
 trait Rules {
+
   /**
-   * Return all rules [[add added]].
-   *
-   * No guarantees are given with regards to the ordering of the
-   * returned rules.
-   */
+    * Return all rules [[add added]].
+    *
+    * No guarantees are given with regards to the ordering of the
+    * returned rules.
+    */
   def iterable: Iterable[Rule]
 
   /**
-   * Add the given rule.
-   *
-   * Duplicates are allowed.
-   */
+    * Add the given rule.
+    *
+    * Duplicates are allowed.
+    */
   def add(rule: Rule): Unit
 }
 
@@ -39,7 +40,6 @@ class RulesImpl extends Rules {
   def add(rule: Rule): Unit = synchronized {
     rules = rule :: rules
   }
-
 }
 
 object GlobalRules {
@@ -47,8 +47,7 @@ object GlobalRules {
   private[this] val rules = new RulesImpl()
 
   /**
-   * Gets the global [[Rules]] implementation.
-   */
+    * Gets the global [[Rules]] implementation.
+    */
   def get: Rules = rules
-
 }

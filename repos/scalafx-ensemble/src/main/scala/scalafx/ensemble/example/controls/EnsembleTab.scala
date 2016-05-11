@@ -34,7 +34,6 @@ import scalafx.scene.control.{Tab, TabPane}
 import scalafx.scene.layout.{Priority, VBox}
 import scalafx.scene.text.{Font, Text}
 
-
 class EnsembleTab extends EnsembleExample {
 
   def getContent = new VBox {
@@ -43,48 +42,47 @@ class EnsembleTab extends EnsembleExample {
     spacing = 10
     padding = Insets(20)
     children = List(
-      new Text {
-        text = "Ensemble Tabs"
-        font = new Font("Verdana", 20)
-      },
-      new TabPane {
-        minWidth = 400
-        tabs = Seq(
-          new Tab {
-            text = "Tab1 - NonClosable"
-            closable = false
-          },
-          new Tab {
-            text = "Tab2 - NonClosable"
-            closable = false
-          },
-          new Tab {
-            text = "Tab3 - Closable"
-            closable = true
-          }
-        )
-      },
-      new Text {
-        text = "Ensemble Tabs - Non Closable"
-        font = new Font("Verdana", 20)
-      },
-      new TabPane {
-        minWidth = 400
-        tabs = Seq(
-          new Tab {
-            text = "Tab 1"
-          },
-          new Tab {
-            text = "Tab 2"
-          },
-          new Tab {
-            text = "Tab 3"
-          }
-        )
-        tabClosingPolicy = TabClosingPolicy.UNAVAILABLE
-        side = Side.TOP
-      }
+        new Text {
+          text = "Ensemble Tabs"
+          font = new Font("Verdana", 20)
+        },
+        new TabPane {
+          minWidth = 400
+          tabs = Seq(
+              new Tab {
+                text = "Tab1 - NonClosable"
+                closable = false
+              },
+              new Tab {
+                text = "Tab2 - NonClosable"
+                closable = false
+              },
+              new Tab {
+                text = "Tab3 - Closable"
+                closable = true
+              }
+          )
+        },
+        new Text {
+          text = "Ensemble Tabs - Non Closable"
+          font = new Font("Verdana", 20)
+        },
+        new TabPane {
+          minWidth = 400
+          tabs = Seq(
+              new Tab {
+                text = "Tab 1"
+              },
+              new Tab {
+                text = "Tab 2"
+              },
+              new Tab {
+                text = "Tab 3"
+              }
+          )
+          tabClosingPolicy = TabClosingPolicy.UNAVAILABLE
+          side = Side.TOP
+        }
     )
   }
-
 }

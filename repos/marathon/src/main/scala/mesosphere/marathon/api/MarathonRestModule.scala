@@ -4,7 +4,7 @@ import javax.inject.Named
 import javax.net.ssl.SSLContext
 
 import com.google.inject.servlet.ServletModule
-import com.google.inject.{ Provides, Scopes, Singleton }
+import com.google.inject.{Provides, Scopes, Singleton}
 import mesosphere.chaos.http.HttpConf
 import mesosphere.marathon.MarathonConf
 import mesosphere.marathon.event.http.HttpEventStreamServlet
@@ -16,7 +16,9 @@ import mesosphere.marathon.io.SSLContextUtil
   */
 class LeaderProxyFilterModule extends ServletModule {
   protected override def configureServlets() {
-    bind(classOf[RequestForwarder]).to(classOf[JavaUrlConnectionRequestForwarder]).in(Scopes.SINGLETON)
+    bind(classOf[RequestForwarder])
+      .to(classOf[JavaUrlConnectionRequestForwarder])
+      .in(Scopes.SINGLETON)
     bind(classOf[LeaderProxyFilter]).asEagerSingleton()
     filter("/*").through(classOf[LeaderProxyFilter])
   }
@@ -29,7 +31,8 @@ class LeaderProxyFilterModule extends ServletModule {
   @Singleton
   @Named(JavaUrlConnectionRequestForwarder.NAMED_LEADER_PROXY_SSL_CONTEXT)
   def provideSSLContext(httpConf: HttpConf): SSLContext = {
-    SSLContextUtil.createSSLContext(httpConf.sslKeystorePath.get, httpConf.sslKeystorePassword.get)
+    SSLContextUtil.createSSLContext(
+        httpConf.sslKeystorePath.get, httpConf.sslKeystorePassword.get)
   }
 }
 
@@ -66,7 +69,8 @@ class MarathonRestModule extends BaseRestModule {
     serve("/v2/events").`with`(classOf[HttpEventStreamServlet])
 
     bind(classOf[WebJarServlet]).in(Scopes.SINGLETON)
-    serve("/", "/ui", "/ui/*", "/help", "/api-console", "/api-console/*").`with`(classOf[WebJarServlet])
+    serve("/", "/ui", "/ui/*", "/help", "/api-console", "/api-console/*")
+      .`with`(classOf[WebJarServlet])
 
     bind(classOf[PublicServlet]).in(Scopes.SINGLETON)
     serve("/public/*").`with`(classOf[PublicServlet])
@@ -76,7 +80,8 @@ class MarathonRestModule extends BaseRestModule {
 
   @Provides
   @Singleton
-  def provideRequestsLimiter(conf: MarathonConf): LimitConcurrentRequestsFilter = {
+  def provideRequestsLimiter(
+      conf: MarathonConf): LimitConcurrentRequestsFilter = {
     new LimitConcurrentRequestsFilter(conf.maxConcurrentHttpConnections.get)
   }
 }

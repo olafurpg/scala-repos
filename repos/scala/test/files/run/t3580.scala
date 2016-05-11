@@ -1,8 +1,3 @@
-
-
-
-
-
 object Test {
 
   class Empty extends Traversable[Nothing] {
@@ -13,5 +8,4 @@ object Test {
     val t = new Empty
     t.toStream
   }
-
 }

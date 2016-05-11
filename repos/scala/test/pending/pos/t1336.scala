@@ -1,10 +1,10 @@
 object Foo {
-  def foreach( f : ((Int,Int)) => Unit ) {
+  def foreach(f: ((Int, Int)) => Unit) {
     println("foreach")
-    f(1,2)
+    f(1, 2)
   }
 
-  for( (a,b) <- this ) {
-    println((a,b))
+  for ((a, b) <- this) {
+    println((a, b))
   }
 }

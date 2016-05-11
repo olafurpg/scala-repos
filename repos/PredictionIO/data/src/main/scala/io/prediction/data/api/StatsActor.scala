@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.api
 
 import io.prediction.data.storage.Event
@@ -35,10 +34,10 @@ class StatsActor extends Actor {
   val log = Logging(system, this)
 
   def getCurrent: DateTime = {
-    DateTime.now.
-      withMinuteOfHour(0).
-      withSecondOfMinute(0).
-      withMillisOfSecond(0)
+    DateTime.now
+      .withMinuteOfHour(0)
+      .withSecondOfMinute(0)
+      .withMillisOfSecond(0)
   }
 
   var longLiveStats = new Stats(DateTime.now)
@@ -64,11 +63,11 @@ class StatsActor extends Actor {
   def receive: Actor.Receive = {
     case Bookkeeping(appId, statusCode, event) =>
       bookkeeping(appId, statusCode, event)
-    case GetStats(appId) => sender() ! Map(
-      "time" -> DateTime.now,
-      "currentHour" -> hourlyStats.get(appId),
-      "prevHour" -> prevHourlyStats.get(appId),
-      "longLive" -> longLiveStats.get(appId))
+    case GetStats(appId) =>
+      sender() ! Map("time" -> DateTime.now,
+                     "currentHour" -> hourlyStats.get(appId),
+                     "prevHour" -> prevHourlyStats.get(appId),
+                     "longLive" -> longLiveStats.get(appId))
     case _ => log.error("Unknown message.")
   }
 }

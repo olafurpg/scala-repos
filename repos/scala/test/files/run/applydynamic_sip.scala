@@ -1,18 +1,31 @@
 object Test extends App {
   object stubUpdate {
-    def update(as: Any*) = println(".update"+as.toList.mkString("(",", ", ")"))
+    def update(as: Any*) =
+      println(".update" + as.toList.mkString("(", ", ", ")"))
   }
 
   object stub {
-    def apply = {println(".apply"); stubUpdate}
-    def apply(as: Any*) = println(".apply"+as.toList.mkString("(",", ", ")"))
-    def update(as: Any*) = println(".update"+as.toList.mkString("(",", ", ")"))
+    def apply = { println(".apply"); stubUpdate }
+    def apply(as: Any*) =
+      println(".apply" + as.toList.mkString("(", ", ", ")"))
+    def update(as: Any*) =
+      println(".update" + as.toList.mkString("(", ", ", ")"))
   }
   class MyDynamic extends Dynamic {
-    def applyDynamic[T](n: String)(as: Any*) = {println("qual.applyDynamic("+ n +")"+ as.toList.mkString("(",", ", ")")); stub}
-    def applyDynamicNamed[T](n: String)(as: (String, Any)*) = {println("qual.applyDynamicNamed("+ n +")"+ as.toList.mkString("(",", ", ")")); stub}
-    def selectDynamic[T](n: String) = {println("qual.selectDynamic("+ n +")"); stub}
-    def updateDynamic(n: String)(x: Any): Unit = {println("qual.updateDynamic("+ n +")("+ x +")")}
+    def applyDynamic[T](n: String)(as: Any*) = {
+      println(
+          "qual.applyDynamic(" + n + ")" + as.toList.mkString("(", ", ", ")")); stub
+    }
+    def applyDynamicNamed[T](n: String)(as: (String, Any)*) = {
+      println("qual.applyDynamicNamed(" + n + ")" +
+          as.toList.mkString("(", ", ", ")")); stub
+    }
+    def selectDynamic[T](n: String) = {
+      println("qual.selectDynamic(" + n + ")"); stub
+    }
+    def updateDynamic(n: String)(x: Any): Unit = {
+      println("qual.updateDynamic(" + n + ")(" + x + ")")
+    }
   }
   val qual = new MyDynamic
   val expr = "expr"
@@ -52,7 +65,7 @@ object Test extends App {
   qual.sel[T]
 
   qual.sel(1) = expr // parser turns this into qual.sel.update(1, expr)
-  qual.sel() = expr  // parser turns this into qual.sel.update(expr)
+  qual.sel() = expr // parser turns this into qual.sel.update(expr)
   qual.sel.apply(1)
   qual.sel.apply(1) = 1
 

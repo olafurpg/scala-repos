@@ -18,26 +18,27 @@ class ResolutionRaceTest extends FunSuite with AssertionsForJUnit {
    * If this test fails intermittently, IT IS NOT FLAKY, it's broken.
    * Or maybe its flakey in terms of port allocations.
    */
-   // Fails in CI, see CSL-1307 and CSL-1358
-   if (!sys.props.contains("SKIP_FLAKY")) test("resolution raciness") {
-    val socketAddr = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
-    val server = Echo.serve(socketAddr, Echoer)
-    val addr = server.boundAddress.asInstanceOf[InetSocketAddress]
-    val dest = "asyncinet!localhost:%d".format(addr.getPort)
-    try {
-      1 to 1000 foreach { i =>
-        val phrase = "%03d [%s]".format(i, dest)
-        val echo = Echo.newService(dest)
-        try {
-          val echoed = Await.result(echo(phrase))
-          assert(echoed == phrase)
-        } finally Await.ready(echo.close())
+  // Fails in CI, see CSL-1307 and CSL-1358
+  if (!sys.props.contains("SKIP_FLAKY"))
+    test("resolution raciness") {
+      val socketAddr = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
+      val server = Echo.serve(socketAddr, Echoer)
+      val addr = server.boundAddress.asInstanceOf[InetSocketAddress]
+      val dest = "asyncinet!localhost:%d".format(addr.getPort)
+      try {
+        1 to 1000 foreach { i =>
+          val phrase = "%03d [%s]".format(i, dest)
+          val echo = Echo.newService(dest)
+          try {
+            val echoed = Await.result(echo(phrase))
+            assert(echoed == phrase)
+          } finally Await.ready(echo.close())
+        }
+      } catch {
+        case _: NoBrokersAvailableException =>
+          fail("resolution is racy")
+      } finally {
+        Await.result(server.close())
       }
-    } catch {
-      case _: NoBrokersAvailableException =>
-        fail("resolution is racy")
-    } finally {
-      Await.result(server.close())
     }
-  }
 }

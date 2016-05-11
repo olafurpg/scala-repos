@@ -15,7 +15,9 @@ object Messages {
     }
   }
 
-  def format(key: String, args: List[String], customMessage: Option[String]): String = {
+  def format(key: String,
+             args: List[String],
+             customMessage: Option[String]): String = {
     try {
       val rawMessage = messages.getProperty(s"$key.message")
       val message = rawMessage.substring(0, rawMessage.length - 1).substring(1)
@@ -24,5 +26,4 @@ object Messages {
       case _: Throwable => customMessage.getOrElse("")
     }
   }
-
 }

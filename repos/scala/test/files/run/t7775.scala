@@ -8,11 +8,12 @@ object Test extends App {
   val barrier = new CyclicBarrier(2)
 
   val probe = Future {
-    val attempts     = 1024          // previously, failed after a few
+    val attempts = 1024 // previously, failed after a few
     def fail(i: Int) = s"Failed at $i"
     barrier.await()
-    for (i <- 1 to attempts ; p <- systemProperties)
-      p match { case (k, v) => assert (k != null && v != null, fail(i)) }
+    for (i <- 1 to attempts; p <- systemProperties) p match {
+      case (k, v) => assert(k != null && v != null, fail(i))
+    }
   }
   probe onComplete {
     case _ => done = true
@@ -20,7 +21,7 @@ object Test extends App {
 
   System.setProperty("foo", "fooz")
   System.setProperty("bar", "barz")
-  barrier.await()   // just for fun, wait to start mucking with properties
+  barrier.await() // just for fun, wait to start mucking with properties
 
   // continually modify properties trying to break live iteration over sys props
   // hint: don't iterate lively over sys props
@@ -57,4 +58,4 @@ object Test {
     Await.result(compiler, duration.Duration.Inf)
   }
 }
-*/
+ */

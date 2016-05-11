@@ -7,7 +7,9 @@ object ForumCateg extends LilaController with ForumController {
 
   def index = Open { implicit ctx =>
     NotForKids {
-      categApi.list(ctx.userId ?? teamCache.teamIds, ctx.troll) map { html.forum.categ.index(_) }
+      categApi.list(ctx.userId ?? teamCache.teamIds, ctx.troll) map {
+        html.forum.categ.index(_)
+      }
     }
   }
 

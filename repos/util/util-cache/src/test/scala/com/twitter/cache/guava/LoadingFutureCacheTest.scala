@@ -15,20 +15,20 @@ class LoadingFutureCacheTest extends FunSuite {
   // loading cache semantics are sufficiently unique
   // to merit distinct tests.
 
-  trait Ctx  {
+  trait Ctx {
     var cacheLoaderCount = 0
     val cache = new LoadingFutureCache(
-      CacheBuilder
-        .newBuilder()
-        .build(
-          new CacheLoader[String,Future[Int]] {
-            override def load(k: String): Future[Int] = {
-              cacheLoaderCount += 1
-              Future.value(k.hashCode)
-            }
-          }
-        )
-    )
+        CacheBuilder
+          .newBuilder()
+          .build(
+              new CacheLoader[String, Future[Int]] {
+                override def load(k: String): Future[Int] = {
+                  cacheLoaderCount += 1
+                  Future.value(k.hashCode)
+                }
+              }
+          )
+      )
   }
 
   test("return CacheLoader result for unset keys") {

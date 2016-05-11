@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js sbt plugin        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js sbt plugin        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.jsenv
 
@@ -21,35 +20,35 @@ import scala.util.control.NonFatal
 import scala.util.{Try, Failure, Success}
 
 /** A RetryingComJSEnv allows to automatically retry if a call to the underlying
- *  ComJSRunner fails.
- *
- *  While it protects the JVM side from observing state that differs inbetween
- *  runs that have been retried, it assumes that the executed JavaScript code
- *  does not have side-effects other than the ones visible through the channel
- *  (e.g. writing to a file). It is the users responsibility to ensure this
- *  property.
- *
- *  No retrying is performed for synchronous, or normal asynchronous runs.
- */
-final class RetryingComJSEnv(val baseEnv: ComJSEnv,
-    val maxRetries: Int) extends ComJSEnv {
+  *  ComJSRunner fails.
+  *
+  *  While it protects the JVM side from observing state that differs inbetween
+  *  runs that have been retried, it assumes that the executed JavaScript code
+  *  does not have side-effects other than the ones visible through the channel
+  *  (e.g. writing to a file). It is the users responsibility to ensure this
+  *  property.
+  *
+  *  No retrying is performed for synchronous, or normal asynchronous runs.
+  */
+final class RetryingComJSEnv(val baseEnv: ComJSEnv, val maxRetries: Int)
+    extends ComJSEnv {
 
   def this(baseEnv: ComJSEnv) = this(baseEnv, 5)
 
   def name: String = s"Retrying ${baseEnv.name}"
 
-  def jsRunner(libs: Seq[ResolvedJSDependency],
-      code: VirtualJSFile): JSRunner = {
+  def jsRunner(
+      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner = {
     baseEnv.jsRunner(libs, code)
   }
 
-  def asyncRunner(libs: Seq[ResolvedJSDependency],
-      code: VirtualJSFile): AsyncJSRunner = {
+  def asyncRunner(
+      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner = {
     baseEnv.asyncRunner(libs, code)
   }
 
-  def comRunner(libs: Seq[ResolvedJSDependency],
-      code: VirtualJSFile): ComJSRunner = {
+  def comRunner(
+      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
     new RetryingComJSRunner(libs, code)
   }
 
@@ -58,8 +57,9 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv,
     def stop(): Unit = ()
   }
 
-  private class RetryingComJSRunner(libs: Seq[ResolvedJSDependency],
-      code: VirtualJSFile) extends DummyJSRunner with ComJSRunner {
+  private class RetryingComJSRunner(
+      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
+      extends DummyJSRunner with ComJSRunner {
 
     private[this] val promise = Promise[Unit]
 
@@ -132,7 +132,7 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv,
           throw cause
 
         _logger.warn("Retrying to launch a " + baseEnv.getClass.getName +
-          " after " + cause.toString)
+            " after " + cause.toString)
 
         val oldRunner = curRunner
 
@@ -141,7 +141,7 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv,
         } catch {
           case NonFatal(t) =>
             _logger.error("Could not retry: creating an new runner failed: " +
-              t.toString)
+                t.toString)
             throw cause
         }
 
@@ -161,8 +161,7 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv,
 
     private def logAndDo(task: LogItem) = {
       log += task
-      try executeTask(task)
-      catch {
+      try executeTask(task) catch {
         case NonFatal(t) => retry(t)
       }
     }
@@ -174,8 +173,7 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv,
         runner.start(_logger, _console) onComplete { result =>
           // access to curRunner and promise must be synchronized
           synchronized {
-            if (curRunner eq runner)
-              promise.complete(result)
+            if (curRunner eq runner) promise.complete(result)
           }
         }
       case Send(msg) =>
@@ -191,7 +189,5 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv,
     private case class Send(msg: String) extends LogItem
     private case object Stop extends LogItem
     private case object Close extends LogItem
-
   }
-
 }

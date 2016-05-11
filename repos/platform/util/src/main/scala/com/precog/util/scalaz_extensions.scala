@@ -33,5 +33,5 @@ package object scalaz_extensions {
 
   private def stepBind[M[_], A, B](stream: StreamT[M, A])(f: Step[A, StreamT[M, A]] => M[Step[B, StreamT[M, B]]])(implicit M: Monad[M]): StreamT[M, B] = 
     StreamT(M.bind(stream.step)(f))
-    */
+ */
 }

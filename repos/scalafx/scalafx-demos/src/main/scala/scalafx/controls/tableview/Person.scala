@@ -30,7 +30,10 @@ package scalafx.controls.tableview
 import scalafx.beans.property.{ObjectProperty, StringProperty}
 import scalafx.scene.paint.Color
 
-class Person(firstName_ : String, lastName_ : String, phone_ : String, favoriteColor_ : Color = Color.Blue) {
+class Person(firstName_ : String,
+             lastName_ : String,
+             phone_ : String,
+             favoriteColor_ : Color = Color.Blue) {
 
   val firstName = new StringProperty(this, "firstName", firstName_)
   val lastName = new StringProperty(this, "lastName", lastName_)

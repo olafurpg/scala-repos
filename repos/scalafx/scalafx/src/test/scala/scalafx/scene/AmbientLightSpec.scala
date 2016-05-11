@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,9 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Node Spec tests.
- */
+  * Node Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class AmbientLightSpec
-  extends SimpleSFXDelegateSpec[jfxs.AmbientLight, AmbientLight](classOf[jfxs.AmbientLight], classOf[AmbientLight])
+    extends SimpleSFXDelegateSpec[jfxs.AmbientLight, AmbientLight](
+        classOf[jfxs.AmbientLight], classOf[AmbientLight])

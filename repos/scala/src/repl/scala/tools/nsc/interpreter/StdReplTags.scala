@@ -2,7 +2,7 @@ package scala.tools.nsc
 package interpreter
 
 import scala.tools.reflect.StdTags
-import scala.reflect.runtime.{ universe => ru }
+import scala.reflect.runtime.{universe => ru}
 
 trait StdReplTags extends StdTags {
   lazy val tagOfStdReplVals = tagOfStaticClass[StdReplVals]

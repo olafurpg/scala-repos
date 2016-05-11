@@ -8,5 +8,4 @@ trait TestScalaProjectSettings {
 
   def scalaProjectSettings: ScalaProjectSettings =
     ScalaProjectSettings.getInstance(getProjectAdapter)
-
 }

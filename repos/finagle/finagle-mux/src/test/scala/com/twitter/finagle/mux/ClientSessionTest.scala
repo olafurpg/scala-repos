@@ -21,10 +21,12 @@ private class ClientSessionTest extends FunSuite {
     val clientToServer = new AsyncQueue[Message]
     val serverToClient = new AsyncQueue[Message]
 
-    val transport = new QueueTransport(writeq=clientToServer, readq=serverToClient)
+    val transport = new QueueTransport(
+        writeq = clientToServer, readq = serverToClient)
 
     val stats = new InMemoryStatsReceiver
-    val session = new ClientSession(transport, FailureDetector.NullConfig, "test", stats)
+    val session = new ClientSession(
+        transport, FailureDetector.NullConfig, "test", stats)
 
     def send(msg: Message) = {
       Await.result(session.write(msg))
@@ -98,7 +100,8 @@ private class ClientSessionTest extends FunSuite {
 
     session.ping().poll match {
       case Some(Throw(f: Failure)) =>
-        assert(f.getMessage == "A ping is already outstanding on this session.")
+        assert(
+            f.getMessage == "A ping is already outstanding on this session.")
       case _ => fail()
     }
 

@@ -10,20 +10,23 @@ import org.jetbrains.plugins.scala.project._
 import org.jetbrains.plugins.scala.icons.Icons
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class ScalaSupportProvider extends FrameworkSupportInModuleProvider {
   override def getIcon = Icons.SCALA_SMALL_LOGO
 
   override def getFrameworkType = ScalaFrameworkType.Instance
 
-  override def isEnabledForModuleType(moduleType: ModuleType[_ <: ModuleBuilder]) = {
+  override def isEnabledForModuleType(
+      moduleType: ModuleType[_ <: ModuleBuilder]) = {
     val id = moduleType.getId
-    id == ModuleTypeId.JAVA_MODULE || id == "PLUGIN_MODULE" // PluginModuleType.getInstance.getId
+    id == ModuleTypeId.JAVA_MODULE ||
+    id == "PLUGIN_MODULE" // PluginModuleType.getInstance.getId
   }
 
-  override def isSupportAlreadyAdded(module: Module, facetsProvider: FacetsProvider) = module.hasScala
+  override def isSupportAlreadyAdded(
+      module: Module, facetsProvider: FacetsProvider) = module.hasScala
 
-  override def createConfigurable(model: FrameworkSupportModel) = new ScalaSupportConfigurable()
+  override def createConfigurable(model: FrameworkSupportModel) =
+    new ScalaSupportConfigurable()
 }
-

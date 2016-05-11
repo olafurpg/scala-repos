@@ -26,8 +26,10 @@ import org.apache.spark.SparkContext._
 object SimpleApp {
   def main(args: Array[String]) {
     // Regression test for SPARK-1167: Remove metrics-ganglia from default build due to LGPL issue
-    val foundConsole = Try(Class.forName("org.apache.spark.metrics.sink.ConsoleSink")).isSuccess
-    val foundGanglia = Try(Class.forName("org.apache.spark.metrics.sink.GangliaSink")).isSuccess
+    val foundConsole = Try(
+        Class.forName("org.apache.spark.metrics.sink.ConsoleSink")).isSuccess
+    val foundGanglia = Try(
+        Class.forName("org.apache.spark.metrics.sink.GangliaSink")).isSuccess
     if (!foundConsole) {
       println("Console sink not loaded via spark-core")
       System.exit(-1)

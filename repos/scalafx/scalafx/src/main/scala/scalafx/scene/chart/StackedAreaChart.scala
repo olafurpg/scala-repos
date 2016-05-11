@@ -35,24 +35,32 @@ import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
 object StackedAreaChart {
-  implicit def sfxStackedAreaChart2jfx[X, Y](v: StackedAreaChart[X, Y]): jfxsc.StackedAreaChart[X, Y] = if (v != null) v.delegate else null
+  implicit def sfxStackedAreaChart2jfx[X, Y](
+      v: StackedAreaChart[X, Y]): jfxsc.StackedAreaChart[X, Y] =
+    if (v != null) v.delegate else null
 
   def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y]) =
     new StackedAreaChart[X, Y](new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis))
 
-  def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y], data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
-    new StackedAreaChart[X, Y](new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
+  def apply[X, Y](xAxis: Axis[X],
+                  yAxis: Axis[Y],
+                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
+    new StackedAreaChart[X, Y](
+        new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
 }
 
-class StackedAreaChart[X, Y](override val delegate: jfxsc.StackedAreaChart[X, Y])
-  extends XYChart[X, Y](delegate)
-  with SFXDelegate[jfxsc.StackedAreaChart[X, Y]] {
+class StackedAreaChart[X, Y](
+    override val delegate: jfxsc.StackedAreaChart[X, Y])
+    extends XYChart[X, Y](delegate)
+    with SFXDelegate[jfxsc.StackedAreaChart[X, Y]] {
 
   def this(xAxis: Axis[X], yAxis: Axis[Y]) {
     this(new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis))
   }
 
-  def this(xAxis: Axis[X], yAxis: Axis[Y], data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+  def this(xAxis: Axis[X],
+           yAxis: Axis[Y],
+           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
     this(new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
   }
 

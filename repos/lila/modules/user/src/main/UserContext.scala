@@ -1,6 +1,6 @@
 package lila.user
 
-import play.api.mvc.{ Request, RequestHeader }
+import play.api.mvc.{Request, RequestHeader}
 
 sealed trait UserContext {
 
@@ -28,20 +28,22 @@ sealed trait UserContext {
   def noKid = !kid
 }
 
-sealed abstract class BaseUserContext(val req: RequestHeader, val me: Option[User]) extends UserContext {
+sealed abstract class BaseUserContext(
+    val req: RequestHeader, val me: Option[User])
+    extends UserContext {
 
   override def toString = "%s %s %s".format(
-    me.fold("Anonymous")(_.username),
-    req.remoteAddress,
-    req.headers.get("User-Agent") | "?"
+      me.fold("Anonymous")(_.username),
+      req.remoteAddress,
+      req.headers.get("User-Agent") | "?"
   )
 }
 
 final class BodyUserContext[A](val body: Request[A], m: Option[User])
-  extends BaseUserContext(body, m)
+    extends BaseUserContext(body, m)
 
 final class HeaderUserContext(r: RequestHeader, m: Option[User])
-  extends BaseUserContext(r, m)
+    extends BaseUserContext(r, m)
 
 trait UserContextWrapper extends UserContext {
   val userContext: UserContext

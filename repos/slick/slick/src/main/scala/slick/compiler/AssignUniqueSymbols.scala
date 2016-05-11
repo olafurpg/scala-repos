@@ -22,17 +22,20 @@ class AssignUniqueSymbols extends Phase {
   type State = UsedFeatures
 
   def apply(state: CompilerState) = {
-    var hasDistinct, hasTypeMapping, hasAggregate, hasNonPrimitiveOption = false
+    var hasDistinct, hasTypeMapping, hasAggregate, hasNonPrimitiveOption =
+      false
     val s2 = state.map { tree =>
       val replace = new HashMap[TermSymbol, AnonSymbol]
       def checkFeatures(n: Node): Unit = n match {
         case _: Distinct => hasDistinct = true
         case _: TypeMapping => hasTypeMapping = true
         case n: Apply =>
-          if(n.sym.isInstanceOf[AggregateFunctionSymbol]) hasAggregate = true
-        case (_: OptionFold | _: OptionApply | _: GetOrElse) => hasNonPrimitiveOption = true
+          if (n.sym.isInstanceOf[AggregateFunctionSymbol]) hasAggregate = true
+        case (_: OptionFold | _: OptionApply | _: GetOrElse) =>
+          hasNonPrimitiveOption = true
         case j: Join =>
-          if(j.jt == JoinType.LeftOption || j.jt == JoinType.RightOption || j.jt == JoinType.OuterOption) hasNonPrimitiveOption = true
+          if (j.jt == JoinType.LeftOption || j.jt == JoinType.RightOption ||
+              j.jt == JoinType.OuterOption) hasNonPrimitiveOption = true
         case _ =>
       }
       def tr(n: Node): Node = {
@@ -40,14 +43,18 @@ class AssignUniqueSymbols extends Phase {
           case Select(in, s) => Select(tr(in), s) :@ n.nodeType
           case r @ Ref(a: AnonSymbol) =>
             val s = replace.getOrElse(a, a)
-            if(s eq a) r else Ref(s)
-          case t: TableNode => t.copy(identity = new AnonTableIdentitySymbol)(t.profileTable)
+            if (s eq a) r else Ref(s)
+          case t: TableNode =>
+            t.copy(identity = new AnonTableIdentitySymbol)(t.profileTable)
           case Pure(value, _) => Pure(tr(value))
           case g: GroupBy =>
             val d = g.copy(identity = new AnonTypeSymbol)
             val a = new AnonSymbol
             replace += g.fromGen -> a
-            g.copy(fromGen = a, tr(g.from), tr(g.by), identity = new AnonTypeSymbol)
+            g.copy(fromGen = a,
+                   tr(g.from),
+                   tr(g.by),
+                   identity = new AnonTypeSymbol)
           case n: StructNode => n.mapChildren(tr)
           case d: DefNode =>
             checkFeatures(d)
@@ -58,12 +65,13 @@ class AssignUniqueSymbols extends Phase {
             n.mapChildren(tr)
         }
         // Remove all NominalTypes (which might have changed)
-        if(n3.hasType && hasNominalType(n3.nodeType)) n3.untyped else n3
+        if (n3.hasType && hasNominalType(n3.nodeType)) n3.untyped else n3
       }
       tr(tree)
     }
-    val features = UsedFeatures(hasDistinct, hasTypeMapping, hasAggregate, hasNonPrimitiveOption)
-    logger.debug("Detected features: "+features)
+    val features = UsedFeatures(
+        hasDistinct, hasTypeMapping, hasAggregate, hasNonPrimitiveOption)
+    logger.debug("Detected features: " + features)
     s2 + (this -> features)
   }
 
@@ -74,4 +82,7 @@ class AssignUniqueSymbols extends Phase {
   }
 }
 
-case class UsedFeatures(distinct: Boolean, typeMapping: Boolean, aggregate: Boolean, nonPrimitiveOption: Boolean)
+case class UsedFeatures(distinct: Boolean,
+                        typeMapping: Boolean,
+                        aggregate: Boolean,
+                        nonPrimitiveOption: Boolean)

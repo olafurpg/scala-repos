@@ -1,5 +1,4 @@
 package test;
 class Foo {
-    val xxx = something ||
-        something_else;
+  val xxx = something || something_else;
 }

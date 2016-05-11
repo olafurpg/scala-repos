@@ -4,13 +4,14 @@ package algebra
 import spire.algebra.lattice.Heyting
 
 /**
- * A boolean algebra is a structure that defines a few basic operations, namely
- * as conjunction (&), disjunction (|), and negation (~). Both conjunction and
- * disjunction must be associative, commutative and should distribute over each
- * other. Also, both have an identity and they obey the absorption law; that
- * is `x & (y | x) == x` and `x | (x & y) == x`.
- */
-trait Bool[@sp(Boolean, Byte, Short, Int, Long) A] extends Any with Heyting[A] {
+  * A boolean algebra is a structure that defines a few basic operations, namely
+  * as conjunction (&), disjunction (|), and negation (~). Both conjunction and
+  * disjunction must be associative, commutative and should distribute over each
+  * other. Also, both have an identity and they obey the absorption law; that
+  * is `x & (y | x) == x` and `x | (x & y) == x`.
+  */
+trait Bool[@sp(Boolean, Byte, Short, Int, Long) A]
+    extends Any with Heyting[A] {
   def xor(a: A, b: A): A = or(and(a, complement(b)), and(complement(a), b))
   def imp(a: A, b: A): A = or(complement(a), b)
   def nand(a: A, b: A): A = complement(and(a, b))
@@ -20,7 +21,8 @@ trait Bool[@sp(Boolean, Byte, Short, Int, Long) A] extends Any with Heyting[A] {
   def dual: Bool[A] = new DualBool(this)
 }
 
-class DualBool[@sp(Boolean, Byte, Short, Int, Long) A](orig: Bool[A]) extends Bool[A] {
+class DualBool[@sp(Boolean, Byte, Short, Int, Long) A](orig: Bool[A])
+    extends Bool[A] {
   def one: A = orig.zero
   def zero: A = orig.one
   def and(a: A, b: A): A = orig.or(a, b)
@@ -37,5 +39,6 @@ class DualBool[@sp(Boolean, Byte, Short, Int, Long) A](orig: Bool[A]) extends Bo
 }
 
 object Bool {
-  @inline final def apply[@sp(Boolean, Byte, Short, Int, Long) A](implicit ev: Bool[A]): Bool[A] = ev
+  @inline final def apply[@sp(Boolean, Byte, Short, Int, Long) A](
+      implicit ev: Bool[A]): Bool[A] = ev
 }

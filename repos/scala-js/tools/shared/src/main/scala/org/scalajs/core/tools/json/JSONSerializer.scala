@@ -28,5 +28,4 @@ object JSONSerializer {
         Impl.fromMap(x.mapValues(_.toJSON))
     }
   }
-
 }

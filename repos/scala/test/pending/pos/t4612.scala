@@ -6,8 +6,7 @@ class CyclicReferenceCompilerBug {
   class Class extends Trait[Class] {
     def foo = new Class
 
-    trait OtherTrait extends Trait[OtherTrait] {
-      self: Class =>
+    trait OtherTrait extends Trait[OtherTrait] { self: Class =>
 
       def foo = new Class
     }

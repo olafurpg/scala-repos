@@ -44,10 +44,13 @@ object Macros {
       implicit def ttag: WeakTypeTag[T] = {
         val tpe = ttag0.tpe
         val sym = tpe.typeSymbol.asType
-        if (sym.isParameter && !isSkolem(sym)) TypeTag.Nothing.asInstanceOf[TypeTag[T]]
+        if (sym.isParameter && !isSkolem(sym))
+          TypeTag.Nothing.asInstanceOf[TypeTag[T]]
         else ttag0
       }
-      reify(C[T](c.Expr[String](Literal(Constant(weakTypeOf[T].toString))).splice))
+      reify(
+          C[T](c.Expr[String](Literal(Constant(weakTypeOf[T].toString)))
+                .splice))
     }
   }
 }

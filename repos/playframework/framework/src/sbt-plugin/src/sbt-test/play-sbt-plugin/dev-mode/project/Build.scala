@@ -30,40 +30,47 @@ object DevModeBuild {
   val ReadTimeout = 10000
 
   @tailrec
-  def verifyResourceContains(path: String, status: Int, assertions: Seq[String], attempts: Int): Unit = {
+  def verifyResourceContains(path: String,
+                             status: Int,
+                             assertions: Seq[String],
+                             attempts: Int): Unit = {
     println(s"Attempt $attempts at $path")
     val messages = ListBuffer.empty[String]
     try {
       val url = new java.net.URL("http://localhost:9000" + path)
       val conn = url.openConnection().asInstanceOf[java.net.HttpURLConnection]
       conn.setConnectTimeout(ConnectTimeout)
-      conn.setReadTimeout(ReadTimeout)      
+      conn.setReadTimeout(ReadTimeout)
 
       if (status == conn.getResponseCode) {
         messages += s"Resource at $path returned $status as expected"
       } else {
-        throw new RuntimeException(s"Resource at $path returned ${conn.getResponseCode} instead of $status")
+        throw new RuntimeException(
+            s"Resource at $path returned ${conn.getResponseCode} instead of $status")
       }
 
-      val is = if (conn.getResponseCode >= 400) {
-        conn.getErrorStream
-      } else {
-        conn.getInputStream
-      }
+      val is =
+        if (conn.getResponseCode >= 400) {
+          conn.getErrorStream
+        } else {
+          conn.getInputStream
+        }
 
       // The input stream may be null if there's no body
-      val contents = if (is != null) {
-        val c = IO.readStream(is)
-        is.close()
-        c
-      } else ""
+      val contents =
+        if (is != null) {
+          val c = IO.readStream(is)
+          is.close()
+          c
+        } else ""
       conn.disconnect()
 
       assertions.foreach { assertion =>
         if (contents.contains(assertion)) {
           messages += s"Resource at $path contained $assertion"
         } else {
-          throw new RuntimeException(s"Resource at $path didn't contain '$assertion':\n$contents")
+          throw new RuntimeException(
+              s"Resource at $path didn't contain '$assertion':\n$contents")
         }
       }
 

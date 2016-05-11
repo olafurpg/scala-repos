@@ -3,7 +3,7 @@ package i18n
 
 import java.util.MissingResourceException
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 class MessagesSpec extends WordSpec with Matchers {
   val messages = Messages()

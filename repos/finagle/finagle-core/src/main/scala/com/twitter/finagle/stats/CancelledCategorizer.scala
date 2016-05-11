@@ -4,8 +4,8 @@ import com.twitter.finagle.{CancelledConnectionException, CancelledRequestExcept
 import com.twitter.util.Throwables.RootCause
 
 /**
- * Matcher for Throwables caused by some form of cancellation.
- */
+  * Matcher for Throwables caused by some form of cancellation.
+  */
 object CancelledCategorizer {
   val Cancelled = "cancelled"
 

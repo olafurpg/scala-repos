@@ -26,7 +26,8 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.util.Utils
 
-class DiskBlockManagerSuite extends SparkFunSuite with BeforeAndAfterEach with BeforeAndAfterAll {
+class DiskBlockManagerSuite
+    extends SparkFunSuite with BeforeAndAfterEach with BeforeAndAfterAll {
   private val testConf = new SparkConf(false)
   private var rootDir0: File = _
   private var rootDir1: File = _

@@ -24,41 +24,41 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
-
 object LDASuite {
   def generateLDAData(
-      sql: SQLContext,
-      rows: Int,
-      k: Int,
-      vocabSize: Int): DataFrame = {
-    val avgWC = 1  // average instances of each word in a doc
+      sql: SQLContext, rows: Int, k: Int, vocabSize: Int): DataFrame = {
+    val avgWC = 1 // average instances of each word in a doc
     val sc = sql.sparkContext
     val rng = new java.util.Random()
     rng.setSeed(1)
-    val rdd = sc.parallelize(1 to rows).map { i =>
-      Vectors.dense(Array.fill(vocabSize)(rng.nextInt(2 * avgWC).toDouble))
-    }.map(v => new TestRow(v))
+    val rdd = sc
+      .parallelize(1 to rows)
+      .map { i =>
+        Vectors.dense(Array.fill(vocabSize)(rng.nextInt(2 * avgWC).toDouble))
+      }
+      .map(v => new TestRow(v))
     sql.createDataFrame(rdd)
   }
 
   /**
-   * Mapping from all Params to valid settings which differ from the defaults.
-   * This is useful for tests which need to exercise all Params, such as save/load.
-   * This excludes input columns to simplify some tests.
-   */
+    * Mapping from all Params to valid settings which differ from the defaults.
+    * This is useful for tests which need to exercise all Params, such as save/load.
+    * This excludes input columns to simplify some tests.
+    */
   val allParamSettings: Map[String, Any] = Map(
-    "k" -> 3,
-    "maxIter" -> 2,
-    "checkpointInterval" -> 30,
-    "learningOffset" -> 1023.0,
-    "learningDecay" -> 0.52,
-    "subsamplingRate" -> 0.051,
-    "docConcentration" -> Array(2.0)
+      "k" -> 3,
+      "maxIter" -> 2,
+      "checkpointInterval" -> 30,
+      "learningOffset" -> 1023.0,
+      "learningDecay" -> 0.52,
+      "subsamplingRate" -> 0.051,
+      "docConcentration" -> Array(2.0)
   )
 }
 
-
-class LDASuite extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest {
+class LDASuite
+    extends SparkFunSuite with MLlibTestSparkContext
+    with DefaultReadWriteTest {
 
   val k: Int = 5
   val vocabSize: Int = 30
@@ -105,7 +105,6 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext with DefaultRead
     assert(lda.getTopicConcentration === 0.56)
     assert(lda.getTopicDistributionCol === "myOutput")
 
-
     // setOptimizer
     lda.setOptimizer("em")
     assert(lda.getOptimizer === "em")
@@ -138,8 +137,9 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext with DefaultRead
       new LDA().setTopicConcentration(-1.1)
     }
 
-    val dummyDF = sqlContext.createDataFrame(Seq(
-      (1, Vectors.dense(1.0, 2.0)))).toDF("id", "features")
+    val dummyDF = sqlContext
+      .createDataFrame(Seq((1, Vectors.dense(1.0, 2.0))))
+      .toDF("id", "features")
     // validate parameters
     lda.transformSchema(dummyDF.schema)
     lda.setDocConcentration(1.1)
@@ -202,14 +202,19 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext with DefaultRead
     // describeTopics
     val topics = model.describeTopics(3)
     assert(topics.count() === k)
-    assert(topics.select("topic").rdd.map(_.getInt(0)).collect().toSet === Range(0, k).toSet)
-    topics.select("termIndices").collect().foreach { case r: Row =>
-      val termIndices = r.getAs[Seq[Int]](0)
-      assert(termIndices.length === 3 && termIndices.toSet.size === 3)
+    assert(
+        topics.select("topic").rdd.map(_.getInt(0)).collect().toSet === Range(
+            0, k).toSet)
+    topics.select("termIndices").collect().foreach {
+      case r: Row =>
+        val termIndices = r.getAs[Seq[Int]](0)
+        assert(termIndices.length === 3 && termIndices.toSet.size === 3)
     }
-    topics.select("termWeights").collect().foreach { case r: Row =>
-      val termWeights = r.getAs[Seq[Double]](0)
-      assert(termWeights.length === 3 && termWeights.forall(w => w >= 0.0 && w <= 1.0))
+    topics.select("termWeights").collect().foreach {
+      case r: Row =>
+        val termWeights = r.getAs[Seq[Double]](0)
+        assert(termWeights.length === 3 &&
+            termWeights.forall(w => w >= 0.0 && w <= 1.0))
     }
   }
 
@@ -241,24 +246,28 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext with DefaultRead
     def checkModelData(model: LDAModel, model2: LDAModel): Unit = {
       assert(model.vocabSize === model2.vocabSize)
       assert(Vectors.dense(model.topicsMatrix.toArray) ~==
-        Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
+            Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
       assert(Vectors.dense(model.getDocConcentration) ~==
-        Vectors.dense(model2.getDocConcentration) absTol 1e-6)
+            Vectors.dense(model2.getDocConcentration) absTol 1e-6)
     }
     val lda = new LDA()
-    testEstimatorAndModelReadWrite(lda, dataset, LDASuite.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(
+        lda, dataset, LDASuite.allParamSettings, checkModelData)
   }
 
   test("read/write DistributedLDAModel") {
     def checkModelData(model: LDAModel, model2: LDAModel): Unit = {
       assert(model.vocabSize === model2.vocabSize)
       assert(Vectors.dense(model.topicsMatrix.toArray) ~==
-        Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
+            Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
       assert(Vectors.dense(model.getDocConcentration) ~==
-        Vectors.dense(model2.getDocConcentration) absTol 1e-6)
+            Vectors.dense(model2.getDocConcentration) absTol 1e-6)
     }
     val lda = new LDA()
-    testEstimatorAndModelReadWrite(lda, dataset,
-      LDASuite.allParamSettings ++ Map("optimizer" -> "em"), checkModelData)
+    testEstimatorAndModelReadWrite(
+        lda,
+        dataset,
+        LDASuite.allParamSettings ++ Map("optimizer" -> "em"),
+        checkModelData)
   }
 }

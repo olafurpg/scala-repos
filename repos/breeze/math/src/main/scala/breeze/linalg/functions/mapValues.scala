@@ -27,41 +27,48 @@ import scala.reflect.ClassTag
 import scala.{specialized => spec}
 
 /**
- * UFunc for being able to map the keys and values in a value collection
- * to new values.
- *
- * @author dramage
- * @author dlwh
- */
+  * UFunc for being able to map the keys and values in a value collection
+  * to new values.
+  *
+  * @author dramage
+  * @author dlwh
+  */
 object mapValues extends UFunc with mapValuesLowPrio {
 
-  implicit def canMapSelfDouble[V2]: Impl2[Double, Double => V2, V2] = canMapSelf[Double, V2]
-  implicit def canMapSelfInt[V2]: Impl2[Int, Int => V2, V2] = canMapSelf[Int, V2]
-  implicit def canMapSelfFloat[V2]: Impl2[Float, Float => V2, V2] = canMapSelf[Float, V2]
-  implicit def canMapSelfLong[V2]: Impl2[Long, Long => V2, V2] = canMapSelf[Long, V2]
-  implicit def canMapSelfShort[V2]: Impl2[Short, Short => V2, V2] = canMapSelf[Short, V2]
-  implicit def canMapSelfByte[V2]: Impl2[Byte, Byte => V2, V2] = canMapSelf[Byte, V2]
-  implicit def canMapSelfChar[V2]: Impl2[Char, Char => V2, V2] = canMapSelf[Char, V2]
+  implicit def canMapSelfDouble[V2]: Impl2[Double, Double => V2, V2] =
+    canMapSelf[Double, V2]
+  implicit def canMapSelfInt[V2]: Impl2[Int, Int => V2, V2] =
+    canMapSelf[Int, V2]
+  implicit def canMapSelfFloat[V2]: Impl2[Float, Float => V2, V2] =
+    canMapSelf[Float, V2]
+  implicit def canMapSelfLong[V2]: Impl2[Long, Long => V2, V2] =
+    canMapSelf[Long, V2]
+  implicit def canMapSelfShort[V2]: Impl2[Short, Short => V2, V2] =
+    canMapSelf[Short, V2]
+  implicit def canMapSelfByte[V2]: Impl2[Byte, Byte => V2, V2] =
+    canMapSelf[Byte, V2]
+  implicit def canMapSelfChar[V2]: Impl2[Char, Char => V2, V2] =
+    canMapSelf[Char, V2]
 
   //
   // Arrays
   //
 
-  class OpArray[@spec(Double, Int, Float, Long)  A, @spec(Double, Int, Float, Long) B: ClassTag]
-    extends Impl2[Array[A], A => B, Array[B]] {
+  class OpArray[@spec(Double, Int, Float, Long) A,
+                @spec(Double, Int, Float, Long) B : ClassTag]
+      extends Impl2[Array[A], A => B, Array[B]] {
 
     /**Maps all values from the given collection. */
     def apply(from: Array[A], fn: (A) => B): Array[B] = {
       val arr = new Array[B](from.length)
-      cforRange(0 until from.length){ i =>
+      cforRange(0 until from.length) { i =>
         arr(i) = fn(from(i))
       }
       arr
     }
   }
 
-
-  implicit def opArray[@spec A, @spec B: ClassTag]: OpArray[A, B] =
+  implicit def opArray[@spec A, @spec B : ClassTag]: OpArray[A, B] =
     new OpArray[A, B]
 
   implicit object OpArrayII extends OpArray[Int, Int]
@@ -83,26 +90,25 @@ object mapValues extends UFunc with mapValuesLowPrio {
   implicit object OpArrayLD extends OpArray[Long, Double]
 
   implicit object OpArrayFD extends OpArray[Float, Double]
-
 }
 
+sealed trait mapValuesLowPrio {
+  this: mapValues.type =>
 
-sealed trait mapValuesLowPrio { this: mapValues.type =>
-
-  /*implicit*/ def canMapSelf[V, V2]: Impl2[V, V => V2, V2] = {
+  /*implicit*/
+  def canMapSelf[V, V2]: Impl2[V, V => V2, V2] = {
     new Impl2[V, V => V2, V2] {
       def apply(from: V, fn: (V) => V2) = fn(from)
       def mapActive(from: V, fn: (V) => V2) = fn(from)
     }
   }
-
 }
 
 object mapActiveValues extends UFunc {
 
-  implicit def implFromCanMapValues[T, V, V2, R](implicit cmv: CanMapValues[T, V, V2, R]): Impl2[T, V=>V2, R] = new Impl2[T, V=>V2, R] {
-    override def apply(v: T, v2: (V) => V2): R = cmv(v, v2)
-  }
-
-
+  implicit def implFromCanMapValues[T, V, V2, R](
+      implicit cmv: CanMapValues[T, V, V2, R]): Impl2[T, V => V2, R] =
+    new Impl2[T, V => V2, R] {
+      override def apply(v: T, v2: (V) => V2): R = cmv(v, v2)
+    }
 }

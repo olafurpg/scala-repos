@@ -13,4 +13,3 @@ object Test extends App {
   new LM().g(new CC(new LM()))
 }
 case class CC(n: LM)
-

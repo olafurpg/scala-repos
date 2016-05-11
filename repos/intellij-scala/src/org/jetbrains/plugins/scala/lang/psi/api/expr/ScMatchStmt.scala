@@ -8,23 +8,25 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScC
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * @author Alexander Podkhalyuzin, ilyas
- */
-
+  * @author Alexander Podkhalyuzin, ilyas
+  */
 trait ScMatchStmt extends ScExpression {
   def expr: Option[ScExpression] = findChild(classOf[ScExpression])
 
   def getBranches: Seq[ScExpression] = getCaseClauses match {
     case null => Seq.empty
-    case c => c.caseClauses.map {
-      (clause: ScCaseClause) => clause.expr match {
-        case Some(expr) => expr
-        case None => ScalaPsiElementFactory.createExpressionFromText("{}", getManager)
+    case c =>
+      c.caseClauses.map { (clause: ScCaseClause) =>
+        clause.expr match {
+          case Some(expr) => expr
+          case None =>
+            ScalaPsiElementFactory.createExpressionFromText("{}", getManager)
+        }
       }
-    }
   }
 
-  def getCaseClauses: ScCaseClauses = findChildByClassScala(classOf[ScCaseClauses])
+  def getCaseClauses: ScCaseClauses =
+    findChildByClassScala(classOf[ScCaseClauses])
 
   def caseClauses: Seq[ScCaseClause] = {
     val cc = getCaseClauses
@@ -32,7 +34,8 @@ trait ScMatchStmt extends ScExpression {
     else cc.caseClauses
   }
 
-  override def accept(visitor: ScalaElementVisitor) = visitor.visitMatchStatement(this)
+  override def accept(visitor: ScalaElementVisitor) =
+    visitor.visitMatchStatement(this)
 }
 
 object ScMatchStmt {

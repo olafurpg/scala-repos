@@ -18,12 +18,12 @@
 package org.apache.sparktest
 
 /**
- * A test suite to make sure all `implicit` functions work correctly.
- * Please don't `import org.apache.spark.SparkContext._` in this class.
- *
- * As `implicit` is a compiler feature, we don't need to run this class.
- * What we need to do is making the compiler happy.
- */
+  * A test suite to make sure all `implicit` functions work correctly.
+  * Please don't `import org.apache.spark.SparkContext._` in this class.
+  *
+  * As `implicit` is a compiler feature, we don't need to run this class.
+  * What we need to do is making the compiler happy.
+  */
 class ImplicitSuite {
 
   // We only want to test if `implicit` works well with the compiler, so we don't need a real
@@ -49,8 +49,9 @@ class ImplicitSuite {
   }
 
   def testRddToSequenceFileRDDFunctionsWithWritable(): Unit = {
-    val rdd: org.apache.spark.rdd.RDD[(org.apache.hadoop.io.IntWritable, org.apache.hadoop.io.Text)]
-      = mockRDD
+    val rdd: org.apache.spark.rdd.RDD[
+        (org.apache.hadoop.io.IntWritable, org.apache.hadoop.io.Text)] =
+      mockRDD
     rdd.saveAsSequenceFile("/a/test/path")
   }
 
@@ -131,6 +132,7 @@ class ImplicitSuite {
 
   def testWritableWritableConverter(): Unit = {
     val sc = mockSparkContext
-    sc.sequenceFile[org.apache.hadoop.io.Text, org.apache.hadoop.io.Text]("/a/test/path")
+    sc.sequenceFile[org.apache.hadoop.io.Text, org.apache.hadoop.io.Text](
+        "/a/test/path")
   }
 }

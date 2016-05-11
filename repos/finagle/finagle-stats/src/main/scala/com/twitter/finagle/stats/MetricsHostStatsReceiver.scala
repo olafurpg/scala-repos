@@ -6,7 +6,8 @@ import com.twitter.finagle.loadbalancer.perHostStats
 import com.twitter.io.Buf
 import com.twitter.util.Future
 
-class MetricsHostStatsReceiver(val registry: Metrics) extends HostStatsReceiver {
+class MetricsHostStatsReceiver(val registry: Metrics)
+    extends HostStatsReceiver {
   def this() = this(MetricsStatsReceiver.defaultHostRegistry)
 
   private[this] val _self = new MetricsStatsReceiver(registry)
@@ -14,9 +15,7 @@ class MetricsHostStatsReceiver(val registry: Metrics) extends HostStatsReceiver 
 }
 
 class HostMetricsExporter(val registry: Metrics)
-  extends JsonExporter(registry)
-  with HttpMuxHandler
-{
+    extends JsonExporter(registry) with HttpMuxHandler {
   def this() = this(MetricsStatsReceiver.defaultHostRegistry)
   val pattern = "/admin/per_host_metrics.json"
 
@@ -26,8 +25,7 @@ class HostMetricsExporter(val registry: Metrics)
     } else {
       val response = Response()
       response.contentType = MediaType.Json
-      response.content = Buf.Utf8(
-        s"""{
+      response.content = Buf.Utf8(s"""{
         |  "com.twitter.finagle.loadbalancer.perHostStats": {
         |    "enabled": "false",
         |    "to enable": "run with -${perHostStats.name} and configure LoadBalancerFactory.HostStats"
@@ -36,5 +34,4 @@ class HostMetricsExporter(val registry: Metrics)
       Future.value(response)
     }
   }
-
 }

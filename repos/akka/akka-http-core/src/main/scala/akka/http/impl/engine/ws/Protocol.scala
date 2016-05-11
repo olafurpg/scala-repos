@@ -5,10 +5,10 @@
 package akka.http.impl.engine.ws
 
 /**
- * Contains WebSocket protocol constants
- *
- * INTERNAL API
- */
+  * Contains WebSocket protocol constants
+  *
+  * INTERNAL API
+  */
 private[http] object Protocol {
   val FIN_MASK = 0x80
   val RSV1_MASK = 0x40
@@ -27,19 +27,22 @@ private[http] object Protocol {
   }
   object Opcode {
     def forCode(code: Byte): Opcode = code match {
-      case 0x0                  ⇒ Continuation
-      case 0x1                  ⇒ Text
-      case 0x2                  ⇒ Binary
+      case 0x0 ⇒ Continuation
+      case 0x1 ⇒ Text
+      case 0x2 ⇒ Binary
 
-      case 0x8                  ⇒ Close
-      case 0x9                  ⇒ Ping
-      case 0xA                  ⇒ Pong
+      case 0x8 ⇒ Close
+      case 0x9 ⇒ Ping
+      case 0xA ⇒ Pong
 
       case b if (b & 0xf0) == 0 ⇒ Other(code)
-      case _                    ⇒ throw new IllegalArgumentException(f"Opcode must be 4bit long but was 0x$code%02X")
+      case _ ⇒
+        throw new IllegalArgumentException(
+            f"Opcode must be 4bit long but was 0x$code%02X")
     }
 
-    sealed abstract class AbstractOpcode private[Opcode] (val code: Byte) extends Opcode {
+    sealed abstract class AbstractOpcode private[Opcode](val code: Byte)
+        extends Opcode {
       def isControl: Boolean = (code & 0x8) != 0
     }
 
@@ -55,14 +58,13 @@ private[http] object Protocol {
   }
 
   /**
-   * Close status codes as defined at http://tools.ietf.org/html/rfc6455#section-7.4.1
-   */
+    * Close status codes as defined at http://tools.ietf.org/html/rfc6455#section-7.4.1
+    */
   object CloseCodes {
     def isError(code: Int): Boolean = !(code == Regular || code == GoingAway)
     def isValid(code: Int): Boolean =
-      ((code >= 1000) && (code <= 1003)) ||
-        (code >= 1007) && (code <= 1011) ||
-        (code >= 3000) && (code <= 4999)
+      ((code >= 1000) && (code <= 1003)) || (code >= 1007) && (code <= 1011) ||
+      (code >= 3000) && (code <= 4999)
 
     val Regular = 1000
     val GoingAway = 1001
@@ -81,4 +83,5 @@ private[http] object Protocol {
 }
 
 /** INTERNAL API */
-private[http] case class ProtocolException(cause: String) extends RuntimeException(cause)
+private[http] case class ProtocolException(cause: String)
+    extends RuntimeException(cause)

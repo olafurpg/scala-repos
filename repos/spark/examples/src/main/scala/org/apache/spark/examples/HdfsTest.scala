@@ -20,7 +20,6 @@ package org.apache.spark.examples
 
 import org.apache.spark._
 
-
 object HdfsTest {
 
   /** Usage: HdfsTest [file] */
@@ -37,7 +36,7 @@ object HdfsTest {
       val start = System.currentTimeMillis()
       for (x <- mapped) { x + 2 }
       val end = System.currentTimeMillis()
-      println("Iteration " + iter + " took " + (end-start) + " ms")
+      println("Iteration " + iter + " took " + (end - start) + " ms")
     }
     sc.stop()
   }

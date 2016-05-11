@@ -1,8 +1,8 @@
 package scala
 package tools.nsc
 
-import scala.tools.nsc.reporters.{ ConsoleReporter, Reporter }
-import Properties.{ versionMsg, residentPromptString }
+import scala.tools.nsc.reporters.{ConsoleReporter, Reporter}
+import Properties.{versionMsg, residentPromptString}
 import scala.reflect.internal.util.FakePos
 
 abstract class Driver {
@@ -15,13 +15,14 @@ abstract class Driver {
 
   /** Forward errors to the (current) reporter. */
   protected def scalacError(msg: String): Unit = {
-    reporter.error(FakePos("scalac"), msg + "\n  scalac -help  gives more information")
+    reporter.error(
+        FakePos("scalac"), msg + "\n  scalac -help  gives more information")
   }
 
   /** True to continue compilation. */
   protected def processSettingsHook(): Boolean = {
-    if (settings.version) { reporter echo versionMsg ; false }
-    else !reporter.hasErrors
+    if (settings.version) { reporter echo versionMsg; false } else
+      !reporter.hasErrors
   }
 
   protected def newCompiler(): Global
@@ -38,27 +39,25 @@ abstract class Driver {
   }
 
   def process(args: Array[String]): Boolean = {
-    val ss   = new Settings(scalacError)
-    reporter = new ConsoleReporter(ss)    // for reporting early config errors, before compiler is constructed
-    command  = new CompilerCommand(args.toList, ss)
+    val ss = new Settings(scalacError)
+    reporter = new ConsoleReporter(ss) // for reporting early config errors, before compiler is constructed
+    command = new CompilerCommand(args.toList, ss)
     settings = command.settings
 
     if (processSettingsHook()) {
       val compiler = newCompiler()
-      reporter     = compiler.reporter    // adopt the configured reporter
+      reporter = compiler.reporter // adopt the configured reporter
       try {
-        if (reporter.hasErrors)
-          reporter.flush()
+        if (reporter.hasErrors) reporter.flush()
         else if (command.shouldStopWithInfo)
           reporter.echo(command.getInfoMessage(compiler))
-        else
-          doCompile(compiler)
+        else doCompile(compiler)
       } catch {
         case ex: Throwable =>
           compiler.reportThrowable(ex)
           ex match {
-            case FatalError(msg)  => // signals that we should fail compilation.
-            case _                => throw ex // unexpected error, tell the outside world.
+            case FatalError(msg) => // signals that we should fail compilation.
+            case _ => throw ex // unexpected error, tell the outside world.
           }
       }
     } else if (reporter.hasErrors) reporter.flush()

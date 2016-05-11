@@ -1,9 +1,9 @@
- package x 
- import a._ 
- class f 
- class g( /*caret*/) extends k {
-   def foo( ) = return true 
- } 
+package x
+import a._
+class f
+class g( /*caret*/ ) extends k {
+  def foo() = return true
+}
 /*
 abstract
 final
@@ -15,4 +15,4 @@ protected
 sealed
 val
 var
-*/
+ */

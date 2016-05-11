@@ -23,7 +23,6 @@ import scala.annotation.tailrec
 
 import java.util.Arrays.fill
 
-
 object RawBitSet {
   final def create(size: Int): RawBitSet = new Array[Int]((size >>> 5) + 1)
 
@@ -62,17 +61,19 @@ object RawBitSet {
       n += java.lang.Integer.bitCount(bits(i))
       i += 1
     }
-    
+
     val ints = new Array[Int](n)
-    
-    @inline @tailrec
+
+    @inline
+    @tailrec
     def loopInts(bitsIndex: Int, intsIndex: Int) {
       if (bitsIndex < len) {
         loopInts(bitsIndex + 1, loopBits(bits(bitsIndex), 0, 0, intsIndex))
       }
     }
-    
-    @inline @tailrec
+
+    @inline
+    @tailrec
     def loopBits(bits: Int, shift: Int, value: Int, intsIndex: Int): Int = {
       if (((bits >> shift) & 1) == 1) {
         ints(intsIndex) = value
@@ -83,14 +84,15 @@ object RawBitSet {
         else intsIndex
       }
     }
-    
+
     loopInts(0, 0)
     ints
   }
 
   final def toList(bits: Array[Int]): List[Int] = {
 
-    @inline @tailrec
+    @inline
+    @tailrec
     def rec0(n: Int, hi: Int, lo: Int, bs: List[Int]): List[Int] = {
       if (lo >= 0) {
         if ((n & (1 << lo)) != 0) {
@@ -103,7 +105,8 @@ object RawBitSet {
       }
     }
 
-    @inline @tailrec
+    @inline
+    @tailrec
     def rec(i: Int, bs: List[Int]): List[Int] = {
       if (i >= 0) {
         rec(i - 1, rec0(bits(i), i << 5, 31, bs))
@@ -115,4 +118,3 @@ object RawBitSet {
     rec(bits.length - 1, Nil)
   }
 }
-

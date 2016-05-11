@@ -14,13 +14,16 @@ import scala.util.Failure
 /**
   * @author Nikolay.Tropin
   */
-class DottyLibraryPropertiesEditor(editorComponent: LibraryEditorComponent[ScalaLibraryProperties]) extends LibraryPropertiesEditor {
+class DottyLibraryPropertiesEditor(
+    editorComponent: LibraryEditorComponent[ScalaLibraryProperties])
+    extends LibraryPropertiesEditor {
 
   private val updateSnapshotAction = new ActionListener {
 
     override def actionPerformed(e: ActionEvent): Unit = {
       val version: String = ScalaLanguageLevel.Dotty.version
-      val result = extensions.withProgressSynchronouslyTry(s"Downloading Dotty $version (via SBT)") {
+      val result = extensions.withProgressSynchronouslyTry(
+          s"Downloading Dotty $version (via SBT)") {
         case listener =>
           DottyDownloader.downloadDotty(version, s => listener(s))
           BoxedUnit.UNIT
@@ -28,7 +31,9 @@ class DottyLibraryPropertiesEditor(editorComponent: LibraryEditorComponent[Scala
 
       result match {
         case Failure(exc) =>
-          Messages.showErrorDialog(editorComponent.getProject, exc.getMessage, s"Error downloading Dotty $version")
+          Messages.showErrorDialog(editorComponent.getProject,
+                                   exc.getMessage,
+                                   s"Error downloading Dotty $version")
         case _ =>
       }
     }

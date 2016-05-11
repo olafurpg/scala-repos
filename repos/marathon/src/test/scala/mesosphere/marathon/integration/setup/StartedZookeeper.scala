@@ -3,9 +3,10 @@ package mesosphere.marathon.integration.setup
 import java.io.File
 
 import org.apache.commons.io.FileUtils
-import org.scalatest.{ BeforeAndAfterAllConfigMap, ConfigMap }
+import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap}
 
-trait StartedZookeeper extends BeforeAndAfterAllConfigMap { self: IntegrationFunSuite =>
+trait StartedZookeeper extends BeforeAndAfterAllConfigMap {
+  self: IntegrationFunSuite =>
 
   private var configOption: Option[IntegrationTestConfig] = None
   def config: IntegrationTestConfig = configOption.get

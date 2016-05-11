@@ -2,7 +2,7 @@ class A {
   def f1 = {
     val x = 5
 
-"""
+    """
 hi"""
   }
   def f2 = {

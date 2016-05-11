@@ -24,4 +24,4 @@ class TypeAliasInput {
     y
   }
 }
-*/
+ */

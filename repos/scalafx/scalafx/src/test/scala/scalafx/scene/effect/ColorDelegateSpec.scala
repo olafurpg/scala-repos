@@ -34,8 +34,8 @@ import org.scalatest.Matchers._
 import scalafx.scene.paint.Color
 
 /**
- * Trait to test ColorDelegate subclasses
- */
+  * Trait to test ColorDelegate subclasses
+  */
 trait ColorDelegateSpec[D <: ColorDelegate[_]] extends FlatSpec {
 
   protected val colorDelegate: D
@@ -47,10 +47,12 @@ trait ColorDelegateSpec[D <: ColorDelegate[_]] extends FlatSpec {
 
     colorDelegate.color = initialColor
 
-    colorDelegate.color.onChange((ov, oldColor, newColor) => {
-      oldColor should be(initialColor.delegate)
-      newColor should be(finalColor.delegate)
-      changed = true
+    colorDelegate.color.onChange(
+        (ov, oldColor, newColor) =>
+          {
+        oldColor should be(initialColor.delegate)
+        newColor should be(finalColor.delegate)
+        changed = true
     })
 
     colorDelegate.color = finalColor
@@ -58,5 +60,4 @@ trait ColorDelegateSpec[D <: ColorDelegate[_]] extends FlatSpec {
     changed should be(true)
     colorDelegate.color.value should be(finalColor.delegate)
   }
-
 }

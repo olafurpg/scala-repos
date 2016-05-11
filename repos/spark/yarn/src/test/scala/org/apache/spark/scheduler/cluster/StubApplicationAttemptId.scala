@@ -20,11 +20,12 @@ package org.apache.spark.scheduler.cluster
 import org.apache.hadoop.yarn.api.records.{ApplicationAttemptId, ApplicationId}
 
 /**
- * A stub application ID; can be set in constructor and/or updated later.
- * @param applicationId application ID
- * @param attempt an attempt counter
- */
-class StubApplicationAttemptId(var applicationId: ApplicationId, var attempt: Int)
+  * A stub application ID; can be set in constructor and/or updated later.
+  * @param applicationId application ID
+  * @param attempt an attempt counter
+  */
+class StubApplicationAttemptId(
+    var applicationId: ApplicationId, var attempt: Int)
     extends ApplicationAttemptId {
 
   override def setApplicationId(appID: ApplicationId): Unit = {
@@ -43,6 +44,5 @@ class StubApplicationAttemptId(var applicationId: ApplicationId, var attempt: In
     applicationId
   }
 
-  override def build(): Unit = {
-  }
+  override def build(): Unit = {}
 }

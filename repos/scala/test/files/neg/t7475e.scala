@@ -1,5 +1,4 @@
-trait U {
-}
+trait U {}
 
 trait Base {
   private val priv = 0
@@ -8,5 +7,4 @@ trait Base {
   (??? : TT).priv
 }
 
-trait T extends Base {
-}
+trait T extends Base {}

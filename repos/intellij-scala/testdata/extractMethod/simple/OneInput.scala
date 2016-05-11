@@ -19,4 +19,4 @@ class OneInput {
     i * i
   }
 }
-*/
+ */

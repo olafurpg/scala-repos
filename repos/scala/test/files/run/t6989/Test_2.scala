@@ -29,7 +29,8 @@ package object foo {
       case tpe => tpe.toString
     }
     println("============")
-    println(s"sym = $sym, signature = ${stableSignature(sym)}, owner = ${sym.owner}")
+    println(
+        s"sym = $sym, signature = ${stableSignature(sym)}, owner = ${sym.owner}")
     println(s"isPrivate = ${sym.isPrivate}")
     println(s"isProtected = ${sym.isProtected}")
     println(s"isPublic = ${sym.isPublic}")

@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.statements.{Dcl, EmptyDcl}
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 28.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 28.02.2008
+  */
 /*
  * ExistentialDclSeq ::= ExistentialDcl {semi ExistentialDcl}
  *
@@ -31,8 +30,10 @@ object ExistentialDclSeq {
         //builder error ScalaBundle.message("wrong.existential.declaration")
         return
     }
-    while (builder.getTokenType == ScalaTokenTypes.tSEMICOLON || builder.newlineBeforeCurrentToken) {
-      if (builder.getTokenType == ScalaTokenTypes.tSEMICOLON) builder.advanceLexer() //Ate semi
+    while (builder.getTokenType == ScalaTokenTypes.tSEMICOLON ||
+    builder.newlineBeforeCurrentToken) {
+      if (builder.getTokenType == ScalaTokenTypes.tSEMICOLON)
+        builder.advanceLexer() //Ate semi
       builder.getTokenType match {
         case ScalaTokenTypes.kTYPE | ScalaTokenTypes.kVAL =>
           if (!Dcl.parse(builder, isMod = false)) {

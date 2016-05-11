@@ -1,4 +1,3 @@
-object S
-{
-	val y: Int = J.x
+object S {
+  val y: Int = J.x
 }

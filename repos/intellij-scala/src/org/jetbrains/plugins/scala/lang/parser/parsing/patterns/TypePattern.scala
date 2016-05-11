@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.{ExistentialClause, InfixType, Type}
 
 /**
- * @author Alexander Podkhalyuzin
- *         Date: 29.02.2008
- */
-
+  * @author Alexander Podkhalyuzin
+  *         Date: 29.02.2008
+  */
 /*
  * TypePattern ::= Type (but it can't be InfixType => Type (because case A => B => C?))
  */

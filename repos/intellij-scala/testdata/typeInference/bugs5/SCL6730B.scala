@@ -5,7 +5,8 @@ object SCL6730B {
     def foo(x: Int => Any) = 1
     def foo(x: Any) = "text"
 
-    /*start*/foo(A)/*end*/
+    /*start*/
+    foo(A) /*end*/
   }
 }
 //String

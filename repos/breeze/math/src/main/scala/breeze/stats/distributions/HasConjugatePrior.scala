@@ -14,26 +14,27 @@ package breeze.stats.distributions
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. 
-*/
-
+ */
 
 /**
- * Trait representing conjugate priors. See Dirichlet for an example.
- *
- * @author dlwh
- */
-trait HasConjugatePrior[Likelihood <: Density[T], T] extends ExponentialFamily[Likelihood,T] {
+  * Trait representing conjugate priors. See Dirichlet for an example.
+  *
+  * @author dlwh
+  */
+trait HasConjugatePrior[Likelihood <: Density[T], T]
+    extends ExponentialFamily[Likelihood, T] {
 
   type ConjugatePrior <: Density[Parameter]
-  val conjugateFamily: ExponentialFamily[ConjugatePrior,Parameter]
+  val conjugateFamily: ExponentialFamily[ConjugatePrior, Parameter]
 
   /**
-   * Returns a distribtution over T's after integrating out the intermediate distributions.
-   */
-  def predictive(parameter: conjugateFamily.Parameter) : Density[T]
+    * Returns a distribtution over T's after integrating out the intermediate distributions.
+    */
+  def predictive(parameter: conjugateFamily.Parameter): Density[T]
 
   /**
-   * Gives a new parameter for this conjugate prior after observing the evidence. See Dirichlet for an example.
-   */
-  def posterior(prior: conjugateFamily.Parameter, evidence : TraversableOnce[T]): conjugateFamily.Parameter
+    * Gives a new parameter for this conjugate prior after observing the evidence. See Dirichlet for an example.
+    */
+  def posterior(prior: conjugateFamily.Parameter,
+                evidence: TraversableOnce[T]): conjugateFamily.Parameter
 }

@@ -1,4 +1,3 @@
-
 import scala.language.higherKinds
 
 trait Base[A] { type B = A; }
@@ -15,7 +14,6 @@ class CHK extends BaseHK[BaseHK.Id, String] {
     def foo[B1 <: B](b: B1) = 0
   }
 }
-
 
 object Test extends App {
   val c = new C

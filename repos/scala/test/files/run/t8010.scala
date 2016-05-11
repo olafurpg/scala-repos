@@ -1,14 +1,14 @@
 trait Base {
-  def t          = 1
-  def t(n: Int)  = n
-  def bt         = 2
+  def t = 1
+  def t(n: Int) = n
+  def bt = 2
   def bt(n: Int) = n
 }
 trait Derived extends Base {
   // was: double definition error
-  override def t          = 1 + super.t
-  override def t(n: Int)  = 1 + super.t(n)
-  override def bt         = 1 + super.bt
+  override def t = 1 + super.t
+  override def t(n: Int) = 1 + super.t(n)
+  override def bt = 1 + super.bt
   override def bt(n: Int) = 1 + super.bt(n)
 }
 

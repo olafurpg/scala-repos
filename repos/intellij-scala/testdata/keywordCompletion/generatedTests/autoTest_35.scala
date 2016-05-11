@@ -1,9 +1,10 @@
- package x 
- import a._ 
- class f 
- /*caret*/class g( ) extends k {
-   def foo( ) = return true 
- } 
+package x
+import a._
+class f
+/*caret*/
+class g() extends k {
+  def foo() = return true
+}
 /*
 abstract
 case
@@ -20,4 +21,4 @@ private
 protected
 sealed
 trait
-*/
+ */

@@ -25,25 +25,31 @@ import scala.collection.Set
 import scala.collection.mutable.ArrayBuilder
 
 /**
- * User: Dmitry Naydanov
- * Date: 11/23/11
- */
-
-class ScDocTagValueImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScDocTagValue with ScDocReferenceElement {
+  * User: Dmitry Naydanov
+  * Date: 11/23/11
+  */
+class ScDocTagValueImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScDocTagValue
+    with ScDocReferenceElement {
   def nameId: PsiElement = this
 
   override def getName = getText
 
   def qualifier: Option[ScalaPsiElement] = None
 
-  def getKinds(incomplete: Boolean, completion: Boolean): Set[ResolveTargets.Value] = Set(ResolveTargets.VAL)
+  def getKinds(
+      incomplete: Boolean, completion: Boolean): Set[ResolveTargets.Value] =
+    Set(ResolveTargets.VAL)
 
   def getSameNameVariants: Array[ResolveResult] = Array.empty
 
   def multiResolve(incompleteCode: Boolean): Array[ResolveResult] =
-    getParametersVariants.filter(a =>
-      a.name == refName || ScalaPsiUtil.convertMemberName(a.name) == ScalaPsiUtil.convertMemberName(refName)).
-            map(new ScalaResolveResult(_))
+    getParametersVariants
+      .filter(a =>
+            a.name == refName ||
+            ScalaPsiUtil.convertMemberName(a.name) == ScalaPsiUtil
+              .convertMemberName(refName))
+      .map(new ScalaResolveResult(_))
 
   override def toString = "ScalaDocTagValue: " + getText
 
@@ -51,15 +57,17 @@ class ScDocTagValueImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with Sc
 
   def bindToElement(element: PsiElement): PsiElement = {
     element match {
-      case _ : ScParameter => this
-      case _ : ScTypeParam =>
+      case _: ScParameter => this
+      case _: ScTypeParam =>
         handleElementRename(element.getText)
         this
-      case _ => throw new UnsupportedOperationException("Can't bind to this element")
+      case _ =>
+        throw new UnsupportedOperationException("Can't bind to this element")
     }
   }
 
-  override  def getCanonicalText: String = if (getFirstChild == null) null else getFirstChild.getText
+  override def getCanonicalText: String =
+    if (getFirstChild == null) null else getFirstChild.getText
 
   override def isReferenceTo(element: PsiElement) = {
     if (resolve() == null || resolve() != element) false else true
@@ -67,8 +75,12 @@ class ScDocTagValueImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with Sc
 
   override def handleElementRename(newElementName: String): PsiElement = {
     if (!ScalaNamesUtil.isIdentifier(newElementName)) return this
-    val doc = FileDocumentManager.getInstance().getDocument(getContainingFile.getVirtualFile)
-    PsiDocumentManager.getInstance(getProject).doPostponedOperationsAndUnblockDocument(doc)
+    val doc = FileDocumentManager
+      .getInstance()
+      .getDocument(getContainingFile.getVirtualFile)
+    PsiDocumentManager
+      .getInstance(getProject)
+      .doPostponedOperationsAndUnblockDocument(doc)
     val range: TextRange = getFirstChild.getTextRange
     doc.replaceString(range.getStartOffset, range.getEndOffset, newElementName)
     PsiDocumentManager.getInstance(getProject).commitAllDocuments()
@@ -82,15 +94,14 @@ class ScDocTagValueImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with Sc
     if (parameters == null) {
       return Array[AnyRef]()
     }
-    parameters.foreach {
-      param =>
-        result += new ScalaLookupItem(param, param.name, None)
+    parameters.foreach { param =>
+      result += new ScalaLookupItem(param, param.name, None)
     }
     result.result()
   }
 
-
-  override def isSoft: Boolean = getParent.asInstanceOf[ScDocTag].name == MyScaladocParsing.THROWS_TAG
+  override def isSoft: Boolean =
+    getParent.asInstanceOf[ScDocTag].name == MyScaladocParsing.THROWS_TAG
 
   def getParametersVariants: Array[ScNamedElement] = {
     import org.jetbrains.plugins.scala.lang.scaladoc.parser.parsing.MyScaladocParsing.{PARAM_TAG, TYPE_PARAM_TAG}
@@ -103,17 +114,22 @@ class ScDocTagValueImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with Sc
       parent = parent.getParent
     }
 
-    if (parent == null || (parentTagType != PARAM_TAG && parentTagType != TYPE_PARAM_TAG))
+    if (parent == null ||
+        (parentTagType != PARAM_TAG && parentTagType != TYPE_PARAM_TAG))
       return Array.empty[ScNamedElement]
 
-    def filterParamsByName(tagName: String, params: Seq[ScNamedElement]): Array[ScNamedElement] = {
+    def filterParamsByName(
+        tagName: String,
+        params: Seq[ScNamedElement]): Array[ScNamedElement] = {
       val paramsSet =
-        (for (tag <- parent.asInstanceOf[ScDocComment].findTagsByName(tagName) if tag.getValueElement != null &&
-                tag != getParent)
-        yield tag.getValueElement.getText).toSet
+        (for (tag <- parent.asInstanceOf[ScDocComment].findTagsByName(tagName)
+                        if tag.getValueElement != null &&
+                    tag != getParent) yield tag.getValueElement.getText).toSet
 
       val result = ArrayBuilder.make[ScNamedElement]()
-      params.filter(param => !paramsSet.contains(param.name)).foreach(result += _)
+      params
+        .filter(param => !paramsSet.contains(param.name))
+        .foreach(result += _)
       result.result()
     }
 
@@ -126,7 +142,7 @@ class ScDocTagValueImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with Sc
         }
       case clazz: ScClass =>
         val constr = clazz.constructor
-        
+
         constr match {
           case primaryConstr: Some[ScPrimaryConstructor] =>
             if (parentTagType == PARAM_TAG) {
@@ -140,7 +156,7 @@ class ScDocTagValueImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with Sc
             }
           case None => Array.empty[ScNamedElement]
         }
-      case traitt: ScTrait => 
+      case traitt: ScTrait =>
         if (parentTagType == TYPE_PARAM_TAG) {
           filterParamsByName(TYPE_PARAM_TAG, traitt.typeParameters)
         } else {

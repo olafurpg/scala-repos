@@ -11,8 +11,10 @@ class HoconIncludeResolutionInspection extends LocalInspectionTool {
         case hit: HIncludeTarget =>
           hit.getFileReferences.foreach { ref =>
             if (!ref.isSoft && ref.multiResolve(false).isEmpty) {
-              holder.registerProblem(ref, ProblemsHolder.unresolvedReferenceMessage(ref),
-                ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+              holder.registerProblem(
+                  ref,
+                  ProblemsHolder.unresolvedReferenceMessage(ref),
+                  ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
             }
           }
         case _ =>

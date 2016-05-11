@@ -1,4 +1,3 @@
-
 package scala.reflect
 
 import org.junit.Test
@@ -16,7 +15,8 @@ class QTest {
   @Test def qConstantsNotHomogenized() = {
     //Apply(Select(Literal(Constant(1.0)), TermName("$plus")), List(Literal(Constant(1.0))))
     val t = q"${1} + ${1.0}"
-    val Apply(Select(Literal(Constant(i)), TermName("$plus")), List(Literal(Constant(j)))) = t
+    val Apply(Select(Literal(Constant(i)), TermName("$plus")),
+              List(Literal(Constant(j)))) = t
     assertEquals(1, i)
     assertEquals(1.0, j)
   }

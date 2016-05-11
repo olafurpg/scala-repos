@@ -7,6 +7,6 @@ object ImplicitScope {
       implicit def ab = new A[B]
     }
 
-    implicitly[A[B]]  // Error
+    implicitly[A[B]] // Error
   }
 }

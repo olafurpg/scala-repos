@@ -1,7 +1,3 @@
-
-
-
-
 object Test {
   def main(args: Array[String]) {
     val r = 'a' to 'z'

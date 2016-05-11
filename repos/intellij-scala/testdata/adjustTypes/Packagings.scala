@@ -1,13 +1,13 @@
 package testing.a {
-trait AAA {}
+  trait AAA {}
 }
 
 package testing.b {
-import testing.a.{AAA => BBB}
+  import testing.a.{AAA => BBB}
 
-class B {
-  val aaa: /*start*/testing.a.AAA/*end*/ = null
-}
+  class B {
+    val aaa: /*start*/ testing.a.AAA /*end*/ = null
+  }
 }
 
 /*
@@ -23,4 +23,4 @@ class B {
 }
 }
 
-*/
+ */

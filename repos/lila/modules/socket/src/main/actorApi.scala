@@ -4,9 +4,7 @@ package actorApi
 import play.api.libs.json.JsObject
 import akka.actor.ActorRef
 
-case class Connected[M <: SocketMember](
-  enumerator: JsEnumerator,
-  member: M)
+case class Connected[M <: SocketMember](enumerator: JsEnumerator, member: M)
 case class Sync(uid: String, friends: List[String])
 case class Ping(uid: String)
 case class PingVersion(uid: String, version: Int)
@@ -25,4 +23,5 @@ case class SendToFlag(flag: String, message: JsObject)
 case object PopulationTell
 case class NbMembers(nb: Int)
 
-case class StartWatching(uid: String, member: SocketMember, gameIds: Set[String])
+case class StartWatching(
+    uid: String, member: SocketMember, gameIds: Set[String])

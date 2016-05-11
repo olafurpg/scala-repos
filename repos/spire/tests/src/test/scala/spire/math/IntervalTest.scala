@@ -28,22 +28,38 @@ class IntervalTest extends FunSuite {
   val e = Interval.empty[Double]
   val all = Interval.all[Double]
 
-  test("[2, inf] is a superset of empty") { assert(Interval.atOrAbove(2).isSupersetOf(Interval.empty[Int])) }
+  test("[2, inf] is a superset of empty") {
+    assert(Interval.atOrAbove(2).isSupersetOf(Interval.empty[Int]))
+  }
   test("empty is empty") { assert(e.isEmpty) }
   test("point is point") { assert(Interval.point(2).isPoint) }
   test("[2,2] is point") { assert(Interval.closed(2, 2).isPoint) }
   test("[3,2] is empty") { assert(Interval.closed(3, 2).isEmpty) }
-  test("empty interval is not above -1") { assert(!Interval.empty[Int].hasAbove(-1)) }
-  test("empty interval is not below 1") { assert(!Interval.empty[Int].hasBelow(1)) }
+  test("empty interval is not above -1") {
+    assert(!Interval.empty[Int].hasAbove(-1))
+  }
+  test("empty interval is not below 1") {
+    assert(!Interval.empty[Int].hasBelow(1))
+  }
   test("[2] has above 0") { assert(Interval.point(2).hasAbove(0)) }
   test("[-2] has below 0") { assert(Interval.point(-2).hasBelow(0)) }
-  test("[0, 1] has at or above 1") { assert(Interval.closed(0, 1).hasAtOrAbove(1)) }
-  test("[1, 2] has at or above 1") { assert(Interval.closed(1, 2).hasAtOrAbove(1)) }
+  test("[0, 1] has at or above 1") {
+    assert(Interval.closed(0, 1).hasAtOrAbove(1))
+  }
+  test("[1, 2] has at or above 1") {
+    assert(Interval.closed(1, 2).hasAtOrAbove(1))
+  }
   test("[1, 2] has above 1") { assert(Interval.closed(1, 2).hasAtOrAbove(1)) }
-  test("(1, 2] has above 1") { assert(Interval.openLower(1, 2).hasAtOrAbove(1)) }
+  test("(1, 2] has above 1") {
+    assert(Interval.openLower(1, 2).hasAtOrAbove(1))
+  }
 
-  test("Interval.point(2).toString == [2]") { assert(Interval.point(2).toString === "[2]") }
-  test("Interval.empty.toString == (Ø)") { assert(Interval.empty[Int].toString === "(Ø)") }
+  test("Interval.point(2).toString == [2]") {
+    assert(Interval.point(2).toString === "[2]")
+  }
+  test("Interval.empty.toString == (Ø)") {
+    assert(Interval.empty[Int].toString === "(Ø)")
+  }
 
   val a = cc(0.0, 4.0)
   test("a.contains(0.0) is true") { assert(a.contains(0.0) === true) }
@@ -60,10 +76,16 @@ class IntervalTest extends FunSuite {
   test("c.crosses(0.0) is false") { assert(c.crosses(0.0) === false) }
 
   test("[3, 6] -- [3, 6] = nil") { assert(cc(3D, 6D) -- cc(3D, 6D) === Nil) }
-  test("[3, 6] -- empty = [3, 6]") { assert(cc(3D, 6D) -- e === List(cc(3D, 6D))) }
+  test("[3, 6] -- empty = [3, 6]") {
+    assert(cc(3D, 6D) -- e === List(cc(3D, 6D)))
+  }
   test("[3, 6] -- all = nil") { assert(cc(3D, 6D) -- all === Nil) }
-  test("[3, 6] -- [4, 6] = [3, 4)") { assert(cc(3D, 6D) -- cc(4D, 6D) === List(co(3D, 4D))) }
-  test("[3, 6] -- [4, 5] = [3, 4), (5, 6]") { assert(cc(3D, 6D) -- cc(4D, 5D) === List(co(3D, 4D), oc(5D, 6D))) }
+  test("[3, 6] -- [4, 6] = [3, 4)") {
+    assert(cc(3D, 6D) -- cc(4D, 6D) === List(co(3D, 4D)))
+  }
+  test("[3, 6] -- [4, 5] = [3, 4), (5, 6]") {
+    assert(cc(3D, 6D) -- cc(4D, 5D) === List(co(3D, 4D), oc(5D, 6D)))
+  }
 }
 
 class RingIntervalTest extends FunSuite {
@@ -82,53 +104,54 @@ class RingIntervalTest extends FunSuite {
   import interval.{Open, Unbound, Closed}
   val c = 4.0
   test("-(c, ∞) =  (-∞, -c)") {
-    assert( -Interval.fromBounds(Open(c), Unbound()) ===
-      Interval.fromBounds(Unbound(), Open(-c)) )
+    assert(-Interval.fromBounds(Open(c), Unbound()) === Interval.fromBounds(
+            Unbound(), Open(-c)))
   }
   test("-(-∞, c] =  [-c, ∞)") {
-    assert( -Interval.fromBounds(Unbound(), Closed(c)) ===
-      Interval.fromBounds(Closed(-c), Unbound()) )
+    assert(-Interval.fromBounds(Unbound(), Closed(c)) === Interval.fromBounds(
+            Closed(-c), Unbound()))
   }
   test("(c, ∞) * (-c) =  (-∞, -c * c), c > 0") {
-    assert( Interval.fromBounds(Open(c), Unbound()) * (-c) ===
-      Interval.fromBounds(Unbound(), Open(-c*c)) )
+    assert(
+        Interval.fromBounds(Open(c), Unbound()) * (-c) === Interval.fromBounds(
+            Unbound(), Open(-c * c)))
   }
   test("(-∞, c] * (-c) =  [-c * c, ∞), c > 0") {
-    assert( Interval.fromBounds(Unbound(), Closed(c)) * (-c) ===
-      Interval.fromBounds(Closed(-c*c), Unbound()) )
+    assert(Interval.fromBounds(Unbound(), Closed(c)) * (-c) === Interval
+          .fromBounds(Closed(-c * c), Unbound()))
   }
-  test("Interval multiplication bug #372")   {
+  test("Interval multiplication bug #372") {
     val a = Interval(-1, 1)
     val b = Interval.above(1)
     val x = -1
     val y = 10
     assert(a.contains(x))
     assert(b.contains(y))
-    assert((a*b).contains(x*y))
+    assert((a * b).contains(x * y))
   }
-  test("Interval multiplication bug 1")   {
+  test("Interval multiplication bug 1") {
     val a = Interval(-3, -2)
     val b = Interval.above(-10)
     val x = -3
     val y = -9
     assert(a.contains(x))
     assert(b.contains(y))
-    assert((a*b).contains(x*y))
+    assert((a * b).contains(x * y))
   }
   test("Interval multiplication bug 2") {
     val a = Interval.atOrBelow(0)
     val b = Interval.below(-1)
-    assert((a*b).contains(0))
+    assert((a * b).contains(0))
   }
   test("Interval multiplication bug 3") {
     val a = Interval.atOrBelow(0)
     val b = Interval.open(-2, -1)
-    assert((a*b).contains(0))
+    assert((a * b).contains(0))
   }
   test("Interval multiplication bug 4") {
     val a = Interval.above(2)
     val b = Interval.closed(0, 1)
-    assert((a*b).contains(0))
+    assert((a * b).contains(0))
   }
 }
 
@@ -136,10 +159,14 @@ class IntervalGeometricPartialOrderTest extends FunSuite {
   import spire.optional.intervalGeometricPartialOrder._
 
   import Interval.{openUpper, openLower, closed, open, point}
-  test("[2, 3) === [2, 3)") { assert(openUpper(2, 3).partialCompare(openUpper(2, 3)) == 0.0) }
+  test("[2, 3) === [2, 3)") {
+    assert(openUpper(2, 3).partialCompare(openUpper(2, 3)) == 0.0)
+  }
   test("[2, 3) < [3, 4]") { assert(openUpper(2, 3) < closed(3, 4)) }
   test("[2, 3] < (3, 4]") { assert(closed(2, 3) < openLower(3, 4)) }
-  test("[2, 3] cannot be compared to [3, 4]") { assert(closed(2, 3).partialCompare(closed(3, 4)).isNaN) }
+  test("[2, 3] cannot be compared to [3, 4]") {
+    assert(closed(2, 3).partialCompare(closed(3, 4)).isNaN)
+  }
   test("[3, 4] > [2, 3)") { assert(closed(3, 4) > openUpper(2, 3)) }
   test("[2, 3) <= [3, 4]") { assert(openUpper(2, 3) <= closed(3, 4)) }
   test("[3, 4] >= [2, 3)") { assert(closed(3, 4) >= openUpper(2, 3)) }
@@ -147,9 +174,15 @@ class IntervalGeometricPartialOrderTest extends FunSuite {
   test("not [2, 3] <= [3, 4]") { assert(!(closed(2, 3) <= closed(3, 4))) }
   test("not [3, 4] > [3, 4]") { assert(!(closed(2, 3) > closed(3, 4))) }
   test("not [3, 4] >= [3, 4]") { assert(!(closed(2, 3) >= closed(3, 4))) }
-  test("empty.partialCompare(empty) == 0.0") { assert(open(2, 2).partialCompare(open(3, 3)) == 0.0) }
-  test("empty cannot be compared to [2, 3]") { assert(open(2, 2).partialCompare(closed(2, 3)).isNaN) }
-  test("[2, 3] cannot be compared to empty") { assert(closed(2, 3).partialCompare(open(2, 2)).isNaN) }
+  test("empty.partialCompare(empty) == 0.0") {
+    assert(open(2, 2).partialCompare(open(3, 3)) == 0.0)
+  }
+  test("empty cannot be compared to [2, 3]") {
+    assert(open(2, 2).partialCompare(closed(2, 3)).isNaN)
+  }
+  test("[2, 3] cannot be compared to empty") {
+    assert(closed(2, 3).partialCompare(open(2, 2)).isNaN)
+  }
   test("Minimal and maximal elements of {[1], [2, 3], [2, 4]}") {
     val intervals = Seq(point(1), closed(2, 3), closed(2, 4))
     assert(intervals.pmin.toSet == Set(point(1)))
@@ -162,7 +195,8 @@ class IntervalSubsetPartialOrderTest extends FunSuite {
 
   import Interval.{openUpper, openLower, closed, open, point}
 
-  test("Minimal and maximal elements of {[1, 3], [3], [2], [1]} by subset partial order") {
+  test(
+      "Minimal and maximal elements of {[1, 3], [3], [2], [1]} by subset partial order") {
     val intervals = Seq(closed(1, 3), point(3), point(2), point(1))
     assert(intervals.pmin.toSet == Set(point(1), point(2), point(3)))
     assert(intervals.pmax.toSet == Set(closed(1, 3)))
@@ -181,15 +215,23 @@ class ContinuousIntervalTest extends FunSuite {
 
   // numerator interval crosses zero
   test("[-a,b] / [c,d]") { assert(cc(-a, b) / cc(c, d) === cc(-a / c, b / c)) }
-  test("[-a,b] / [-d,-c]") { assert(cc(-a, b) / cc(-d, -c) === cc(b / -c, -a / -c)) }
+  test("[-a,b] / [-d,-c]") {
+    assert(cc(-a, b) / cc(-d, -c) === cc(b / -c, -a / -c))
+  }
 
   // numerator interval is positive
-  test("[a,b] / [-d,-c]") { assert(cc(a, b) / cc(-d, -c) === cc(b / -c, a / -d)) }
+  test("[a,b] / [-d,-c]") {
+    assert(cc(a, b) / cc(-d, -c) === cc(b / -c, a / -d))
+  }
   test("[a,b] / [c,d]") { assert(cc(a, b) / cc(c, d) === cc(a / d, b / c)) }
 
   // numerator interval is negative
-  test("[-b,-a] / [-d,-c]") { assert(cc(-b, -a) / cc(-d, -c) === cc(-a / -d, -b / -c)) }
-  test("[-b,-a] / [c,d]") { assert(cc(-b, -a) / cc(c, d) === cc(-b / c, -a / d)) }
+  test("[-b,-a] / [-d,-c]") {
+    assert(cc(-b, -a) / cc(-d, -c) === cc(-a / -d, -b / -c))
+  }
+  test("[-b,-a] / [c,d]") {
+    assert(cc(-b, -a) / cc(c, d) === cc(-b / c, -a / d))
+  }
 }
 
 class IntervalReciprocalTest extends FunSuite {
@@ -256,11 +298,13 @@ class IntervalReciprocalTest extends FunSuite {
   t(Interval.atOrBelow(r"-2"), Interval.openUpper(r"-1/2", r"0")) //fixme
 }
 
-class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-
+class IntervalCheck
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   property("x ⊆ x") {
-    forAll { (x: Interval[Rational]) => (x isSupersetOf x) shouldBe true }
+    forAll { (x: Interval[Rational]) =>
+      (x isSupersetOf x) shouldBe true
+    }
   }
 
   property("x ⊆ (x | y) && y ⊆ (x | y)") {
@@ -312,25 +356,34 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 
   def sample(int: Interval[Rational], n: Int): Array[Rational] =
     if (int.isEmpty) {
-       Array.empty[Rational]
+      Array.empty[Rational]
     } else {
       import spire.math.interval.ValueBound
-      val underlyingf: () => Rational = (int.lowerBound, int.upperBound) match {
-        case (ValueBound(x) , ValueBound(y)) => () => rng.nextInt(10) match {
-          case 0 => x
-          case 9 => y
-          case _ => x + Rational(rng.nextDouble) * (y - x)
+      val underlyingf: () => Rational =
+        (int.lowerBound, int.upperBound) match {
+          case (ValueBound(x), ValueBound(y)) =>
+            () =>
+              rng.nextInt(10) match {
+                case 0 => x
+                case 9 => y
+                case _ => x + Rational(rng.nextDouble) * (y - x)
+              }
+            case (ValueBound(x), _) =>
+            () =>
+              rng.nextInt(5) match {
+                case 0 => x
+                case _ => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
+              }
+            case (_, ValueBound(y)) =>
+            () =>
+              rng.nextInt(5) match {
+                case 4 => y
+                case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
+              }
+            case (_, _) =>
+            () =>
+              Rational(rng.nextGaussian) * Long.MaxValue
         }
-        case (ValueBound(x) , _) => () => rng.nextInt(5) match {
-          case 0 => x
-          case _ => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
-        }
-        case (_, ValueBound(y)) => () => rng.nextInt(5) match {
-          case 4 => y
-          case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
-        }
-        case (_ , _) => () => Rational(rng.nextGaussian) * Long.MaxValue
-      }
 
       def nextf(): Rational = {
         val r = underlyingf()
@@ -342,7 +395,8 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 
   val tries = 100
 
-  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational): Unit = {
+  def testUnop(f: Interval[Rational] => Interval[Rational])(
+      g: Rational => Rational): Unit = {
     forAll { (a: Interval[Rational]) =>
       val c: Interval[Rational] = f(a)
       sample(a, tries).foreach { x =>
@@ -353,15 +407,20 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
-  def testBinop(f: (Interval[Rational], Interval[Rational]) => Interval[Rational])(g: (Rational, Rational) => Rational): Unit = {
+  def testBinop(
+      f: (Interval[Rational], Interval[Rational]) => Interval[Rational])(
+      g: (Rational, Rational) => Rational): Unit = {
     forAll { (a: Interval[Rational], b: Interval[Rational]) =>
       val c: Interval[Rational] = f(a, b)
-      sample(a, tries).zip(sample(b, tries)).foreach { case (x, y) =>
-        if (!a.contains(x)) println("%s does not contain %s" format (a, x))
-        if (!b.contains(y)) println("%s does not contain %s" format (b, y))
-        val ok = c.contains(g(x, y))
-        if (!ok) println("(%s, %s) failed on (%s, %s)" format (a, b, x.toString, y.toString))
-        ok shouldBe true
+      sample(a, tries).zip(sample(b, tries)).foreach {
+        case (x, y) =>
+          if (!a.contains(x)) println("%s does not contain %s" format (a, x))
+          if (!b.contains(y)) println("%s does not contain %s" format (b, y))
+          val ok = c.contains(g(x, y))
+          if (!ok)
+            println("(%s, %s) failed on (%s, %s)" format
+                (a, b, x.toString, y.toString))
+          ok shouldBe true
       }
     }
   }
@@ -390,7 +449,8 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     forAll { (x: Rational, y: Rational) =>
       val a = Interval.point(x)
       val b = Interval.point(y)
-      PartialOrder[Interval[Rational]].tryCompare(a, b).get shouldBe Order[Rational].compare(x, y)
+      PartialOrder[Interval[Rational]].tryCompare(a, b).get shouldBe Order[
+          Rational].compare(x, y)
       val Some(Point(vmin)) = a.pmin(b)
       vmin shouldBe x.min(y)
       val Some(Point(vmax)) = a.pmax(b)
@@ -463,7 +523,8 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   }
 }
 
-class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class IntervalIteratorCheck
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   property("bounded intervals are ok") {
     forAll { (n1: Rational, n2: Rational, num0: Byte) =>
@@ -471,18 +532,22 @@ class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenP
 
       val num = ((num0 & 255) % 13) + 1
 
-      def testEndpoints(interval: Interval[Rational], step: Rational, hasLower: Boolean, hasUpper: Boolean): Unit = {
+      def testEndpoints(interval: Interval[Rational],
+                        step: Rational,
+                        hasLower: Boolean,
+                        hasUpper: Boolean): Unit = {
         val ns = interval.iterator(step).toSet
         ns(x) shouldBe hasLower
         ns(y) shouldBe hasUpper
-        val extra = if (hasLower && hasUpper) 2 else if (hasLower || hasUpper) 1 else 0
+        val extra =
+          if (hasLower && hasUpper) 2 else if (hasLower || hasUpper) 1 else 0
         ns.size shouldBe (num - 1 + extra)
       }
 
-      val cc = Interval.closed(x, y)     // [x, y]
-      val oo = Interval.open(x, y)       // (x, y)
-      val oc = Interval.openLower(x, y)  // (x, y]
-      val co = Interval.openUpper(x, y)  // [x, y)
+      val cc = Interval.closed(x, y) // [x, y]
+      val oo = Interval.open(x, y) // (x, y)
+      val oc = Interval.openLower(x, y) // (x, y]
+      val co = Interval.openUpper(x, y) // [x, y)
 
       val step = (y - x) / num
 
@@ -491,10 +556,14 @@ class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenP
           Try(xs.iterator(0)).isFailure shouldBe true
         }
       } else {
-        val triples = List((cc, true, true), (oo, false, false), (oc, false, true), (co, true, false))
-        triples.foreach { case (interval, hasLower, hasUpper) =>
-          testEndpoints(interval, step, hasLower, hasUpper)
-          testEndpoints(interval, -step, hasLower, hasUpper)
+        val triples = List((cc, true, true),
+                           (oo, false, false),
+                           (oc, false, true),
+                           (co, true, false))
+        triples.foreach {
+          case (interval, hasLower, hasUpper) =>
+            testEndpoints(interval, step, hasLower, hasUpper)
+            testEndpoints(interval, -step, hasLower, hasUpper)
         }
       }
     }
@@ -502,26 +571,27 @@ class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenP
 
   property("half-unbound intervals are ok") {
     forAll { (n: Rational, s: Rational) =>
-
       val step0 = s.abs
 
       val cu = Interval.atOrAbove(n) // [n, ∞)
-      val ou = Interval.above(n)     // (n, ∞)
+      val ou = Interval.above(n) // (n, ∞)
       val uc = Interval.atOrBelow(n) // (-∞, n]
-      val uo = Interval.below(n)     // (-∞, n)
+      val uo = Interval.below(n) // (-∞, n)
 
       if (step0.isZero) {
         List(cu, ou, uc, uo).foreach { xs =>
           Try(xs.iterator(0)).isFailure shouldBe true
         }
       } else {
-        val triples = List((cu, true, 1), (ou, false, 1), (uc, true, -1), (uo, false, -1))
-        triples.foreach { case (interval, hasN, mult) =>
-          val step = step0 * mult
-          val it = interval.iterator(step)
-          val expected = if (hasN) n else n + step
-          it.next() shouldBe expected
-          Try(interval.iterator(-step)).isFailure shouldBe true
+        val triples =
+          List((cu, true, 1), (ou, false, 1), (uc, true, -1), (uo, false, -1))
+        triples.foreach {
+          case (interval, hasN, mult) =>
+            val step = step0 * mult
+            val it = interval.iterator(step)
+            val expected = if (hasN) n else n + step
+            it.next() shouldBe expected
+            Try(interval.iterator(-step)).isFailure shouldBe true
         }
       }
     }

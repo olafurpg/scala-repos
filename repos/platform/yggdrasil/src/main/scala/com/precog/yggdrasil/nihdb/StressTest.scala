@@ -53,29 +53,45 @@ class StressTest {
   val actorSystem = ActorSystem("NIHDBActorSystem")
 
   def makechef = new Chef(
-    VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-    VersionedSegmentFormat(Map(1 -> V1SegmentFormat))
+      VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+      VersionedSegmentFormat(Map(1 -> V1SegmentFormat))
   )
 
-  val chefs = (1 to 4).map { _ => actorSystem.actorOf(Props(makechef)) }
+  val chefs = (1 to 4).map { _ =>
+    actorSystem.actorOf(Props(makechef))
+  }
 
-  val chef = actorSystem.actorOf(Props[Chef].withRouter(RoundRobinRouter(chefs)))
+  val chef =
+    actorSystem.actorOf(Props[Chef].withRouter(RoundRobinRouter(chefs)))
 
   val owner: AccountId = "account999"
 
   val authorities = Authorities(NonEmptyList(owner))
 
-  val txLogScheduler = new ScheduledThreadPoolExecutor(10, (new ThreadFactoryBuilder()).setNameFormat("HOWL-sched-%03d").build())
+  val txLogScheduler = new ScheduledThreadPoolExecutor(
+      10,
+      (new ThreadFactoryBuilder()).setNameFormat("HOWL-sched-%03d").build())
 
   def newNihdb(workDir: File, threshold: Int = 1000): NIHDB =
-    NIHDB.create(chef, authorities, workDir, threshold, Duration(60, "seconds"), txLogScheduler)(actorSystem).unsafePerformIO.valueOr { e => throw new Exception(e.message) }
+    NIHDB
+      .create(chef,
+              authorities,
+              workDir,
+              threshold,
+              Duration(60, "seconds"),
+              txLogScheduler)(actorSystem)
+      .unsafePerformIO
+      .valueOr { e =>
+        throw new Exception(e.message)
+      }
 
   implicit val M = new FutureMonad(actorSystem.dispatcher)
 
   def shutdown() = actorSystem.shutdown()
 
   class TempContext {
-    def fromFuture[A](f: Future[A]): A = Await.result(f, Duration(60, "seconds"))
+    def fromFuture[A](f: Future[A]): A =
+      Await.result(f, Duration(60, "seconds"))
 
     val workDir = IOUtils.createTmpDir("nihdbspecs").unsafePerformIO
     val nihdb = newNihdb(workDir)
@@ -83,10 +99,10 @@ class StressTest {
     def close(proj: NIHDB) = fromFuture(proj.close(actorSystem))
 
     def finish() = {
-        (for {
-          _ <- IO { close(nihdb) }
-          _ <- IOUtils.recursiveDelete(workDir)
-        } yield ()).unsafePerformIO
+      (for {
+        _ <- IO { close(nihdb) }
+        _ <- IOUtils.recursiveDelete(workDir)
+      } yield ()).unsafePerformIO
     }
 
     def runNihAsync(i: Int, f: File, bufSize: Int, _eventid: Long): Long = {
@@ -113,7 +129,8 @@ class StressTest {
       val ch = new FileInputStream(f).getChannel
       val bb = ByteBuffer.allocate(bufSize)
 
-      @tailrec def loop(p: AsyncParser) {
+      @tailrec
+      def loop(p: AsyncParser) {
         val n = ch.read(bb)
         bb.flip()
 
@@ -123,7 +140,6 @@ class StressTest {
         //projection.insert(Array(eventid), results)
         val eventidobj = EventId.fromLong(eventid)
         nihdb.insert(Seq(NIHDB.Batch(eventid, results)))
-
 
         eventid += 1L
         bb.flip()
@@ -143,7 +159,11 @@ class StressTest {
       import scalaz._
       val length = NIHDBProjection.wrap(nihdb).flatMap { projection =>
         val stream = StreamT.unfoldM[Future, Unit, Option[Long]](None) { key =>
-          projection.getBlockAfter(key, None).map(_.map { case BlockProjectionData(_, maxKey, _) => ((), Some(maxKey)) })
+          projection
+            .getBlockAfter(key, None)
+            .map(_.map {
+              case BlockProjectionData(_, maxKey, _) => ((), Some(maxKey))
+            })
         }
         stream.length
       }
@@ -155,7 +175,7 @@ class StressTest {
     }
   }
 
- def main(args: Array[String]) {
+  def main(args: Array[String]) {
     var eventid: Long = 1L
     val ctxt = new TempContext()
     val f = new File("yggdrasil/src/test/resources/z1m_nl.json")
@@ -169,7 +189,9 @@ class StressTest {
           println("iteration %d" format i)
           eventid = ctxt.runNihAsync(i, f, 8 * 1024 * 1024, eventid)
           val t = System.currentTimeMillis()
-          println("total rows: %dM, total time: %.3fs" format (i, (t - t0) / 1000.0))
+          println(
+              "total rows: %dM, total time: %.3fs" format
+              (i, (t - t0) / 1000.0))
         }
       } finally {
         ctxt.finish()

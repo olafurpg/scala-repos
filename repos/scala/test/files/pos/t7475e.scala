@@ -4,10 +4,6 @@ trait U {
   (??? : TT).priv
 }
 
-trait Base {
+trait Base {}
 
-}
-
-trait T extends Base {
-
-}
+trait T extends Base {}

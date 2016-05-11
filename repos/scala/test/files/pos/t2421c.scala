@@ -6,7 +6,7 @@ object Test {
 
   def f(implicit aa: F[A]) = println(aa)
 
-  implicit def a : F[A] = new F[A]()
+  implicit def a: F[A] = new F[A]()
 
   // generalised from t2421b to verify we check enough
   class G[X]

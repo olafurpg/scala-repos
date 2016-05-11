@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala Ant Tasks                      **
-**    / __/ __// _ | / /  / _ |    (c) 2005-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala Ant Tasks                      **
+ **    / __/ __// _ | / /  / _ |    (c) 2005-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala.tools.ant
@@ -13,23 +13,23 @@ import java.util.jar.{JarFile, JarOutputStream, Pack200}
 import java.util.jar.Pack200.Packer._
 
 /** An [[http://ant.apache.org Ant]] task that applies the pack200 encoding
- *  to a JAR file.
- *
- *  - `destdir` (mandatory),
- *  - `dir` (defaults to project's basedir),
- *  - `effort` (default 9),
- *  - `keepFileOrder` (default `'''false'''`),
- *  - `keepModificationTime` (default `'''false'''`),
- *  - `repack` (default false),
- *  - `segmentLimit` (default `-1` for no limit),
- *  - `suffix` (default ".pack")
- *
- * @author  James Matlik
- */
+  *  to a JAR file.
+  *
+  *  - `destdir` (mandatory),
+  *  - `dir` (defaults to project's basedir),
+  *  - `effort` (default 9),
+  *  - `keepFileOrder` (default `'''false'''`),
+  *  - `keepModificationTime` (default `'''false'''`),
+  *  - `repack` (default false),
+  *  - `segmentLimit` (default `-1` for no limit),
+  *  - `suffix` (default ".pack")
+  *
+  * @author  James Matlik
+  */
 class Pack200Task extends ScalaMatchingTask {
 
-/*============================================================================*\
-**                             Ant user-properties                            **
+  /*============================================================================*\
+   **                             Ant user-properties                            **
 \*============================================================================*/
 
   var destdir: Option[File] = None
@@ -43,14 +43,15 @@ class Pack200Task extends ScalaMatchingTask {
 
   var packFileSuffix = ".pack"
 
-
-/*============================================================================*\
-**                             Properties setters                             **
+  /*============================================================================*\
+   **                             Properties setters                             **
 \*============================================================================*/
 
   def setDir(dir: File) {
     if (dir.exists && dir.isDirectory) srcdir = Some(dir)
-    else buildError("Please specify a valid directory with Jar files for packing.")
+    else
+      buildError(
+          "Please specify a valid directory with Jar files for packing.")
   }
 
   /** A level from 0 (none) to 9 (max) of effort for applying Pack200 */
@@ -75,19 +76,20 @@ class Pack200Task extends ScalaMatchingTask {
     */
   def setRepack(r: Boolean) { repack = r }
 
-
   def setSegmentLimit(size: Int) { segmentLimit = size }
 
   /** Set the output directory */
   def setDestdir(file: File) {
     if (file != null && file.exists && file.isDirectory) destdir = Some(file)
-    else buildError("The destination directory is invalid: " + file.getAbsolutePath)
+    else
+      buildError(
+          "The destination directory is invalid: " + file.getAbsolutePath)
   }
 
   def setSuffix(s: String) { packFileSuffix = s }
 
-/*============================================================================*\
-**                             Properties getters                             **
+  /*============================================================================*\
+   **                             Properties getters                             **
 \*============================================================================*/
 
   /** Gets the list of individual JAR files for processing.
@@ -98,15 +100,15 @@ class Pack200Task extends ScalaMatchingTask {
     val ds = fs.getDirectoryScanner(getProject())
     val dir = fs.getDir(getProject())
     for (filename <- ds.getIncludedFiles()
-         if filename.toLowerCase.endsWith(".jar")) {
+                        if filename.toLowerCase.endsWith(".jar")) {
       val file = new File(dir, filename)
-      if(files.exists(file.equals(_)) == false) files = file :: files
+      if (files.exists(file.equals(_)) == false) files = file :: files
     }
     files.reverse
   }
 
-/*============================================================================*\
-**                       Compilation and support methods                      **
+  /*============================================================================*\
+   **                       Compilation and support methods                      **
 \*============================================================================*/
 
   private def makeJarOutputStream(file: File) =
@@ -115,14 +117,15 @@ class Pack200Task extends ScalaMatchingTask {
   private def makeOutputStream(file: File) =
     new BufferedOutputStream(new FileOutputStream(file))
 
-/*============================================================================*\
-**                           The big execute method                           **
+  /*============================================================================*\
+   **                           The big execute method                           **
 \*============================================================================*/
 
   /** Performs the tool creation. */
   override def execute() = {
     // Audits
-    val packDir = destdir.getOrElse(buildError("No output directory specified"))
+    val packDir =
+      destdir.getOrElse(buildError("No output directory specified"))
 
     // Setup the inherited fileset for further processing
     fileset.setDir(srcdir.getOrElse(getProject.getBaseDir))
@@ -135,14 +138,15 @@ class Pack200Task extends ScalaMatchingTask {
     val p = packer.properties
     p.put(EFFORT, effort.toString)
     p.put(SEGMENT_LIMIT, segmentLimit.toString)
-    p.put(KEEP_FILE_ORDER, if(keepFileOrder) TRUE else FALSE)
-    p.put(MODIFICATION_TIME, if(keepModificationTime) LATEST else KEEP)
+    p.put(KEEP_FILE_ORDER, if (keepFileOrder) TRUE else FALSE)
+    p.put(MODIFICATION_TIME, if (keepModificationTime) LATEST else KEEP)
 
     for (file <- files) {
       if (repack) {
         val repackedFile = new File(packDir, file.getName)
         if (file.lastModified > repackedFile.lastModified) {
-          println("Repacking " + file.toString + " to " + repackedFile.toString)
+          println(
+              "Repacking " + file.toString + " to " + repackedFile.toString)
           val tmpFile = new File(packDir, file.getName + ".tmp")
           val os = makeOutputStream(tmpFile)
           packer.pack(new JarFile(file), os)
@@ -152,13 +156,12 @@ class Pack200Task extends ScalaMatchingTask {
           jos.close()
           tmpFile.delete()
         }
-      }
-      else {
+      } else {
         val packFile: File = {
           val name = file.getName.substring(0, file.getName.lastIndexOf("."))
           new File(packDir, name + packFileSuffix)
         }
-        if(file.lastModified > packFile.lastModified) {
+        if (file.lastModified > packFile.lastModified) {
           println("Packing " + file.toString + " to " + packFile.toString)
           val os = makeOutputStream(packFile)
           packer.pack(new JarFile(file), os)

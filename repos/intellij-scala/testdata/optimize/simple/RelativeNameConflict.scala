@@ -38,4 +38,4 @@ package test {
 
   object test
 }
-*/
+ */

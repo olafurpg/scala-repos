@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.workflow
 
 import akka.actor.Actor
@@ -28,16 +27,20 @@ class PluginsActor(engineVariant: String) extends Actor {
 
   def receive: PartialFunction[Any, Unit] = {
     case (ei: EngineInstance, q: JValue, p: JValue) =>
-      pluginContext.outputSniffers.values.foreach(_.process(ei, q, p, pluginContext))
+      pluginContext.outputSniffers.values
+        .foreach(_.process(ei, q, p, pluginContext))
     case h: PluginsActor.HandleREST =>
       try {
-        sender() ! pluginContext.outputSniffers(h.pluginName).handleREST(h.pluginArgs)
+        sender() ! pluginContext
+          .outputSniffers(h.pluginName)
+          .handleREST(h.pluginArgs)
       } catch {
         case e: Exception =>
           sender() ! s"""{"message":"${e.getMessage}"}"""
       }
     case _ =>
-      log.error("Unknown message sent to the Engine Server output sniffer plugin host.")
+      log.error(
+          "Unknown message sent to the Engine Server output sniffer plugin host.")
   }
 }
 

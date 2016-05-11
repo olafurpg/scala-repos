@@ -22,37 +22,37 @@ import scala.annotation.tailrec
 import scala.reflect.macros.whitebox
 
 /**
- * Base trait for type level natural numbers.
- *
- * @author Miles Sabin
- */
+  * Base trait for type level natural numbers.
+  *
+  * @author Miles Sabin
+  */
 trait Nat {
   type N <: Nat
 }
 
 /**
- * Encoding of successor.
- *
- * @author Miles Sabin
- */
+  * Encoding of successor.
+  *
+  * @author Miles Sabin
+  */
 case class Succ[P <: Nat]() extends Nat {
   type N = Succ[P]
 }
 
 /**
- * Encoding of zero.
- *
- * @author Miles Sabin
- */
+  * Encoding of zero.
+  *
+  * @author Miles Sabin
+  */
 class _0 extends Nat with Serializable {
   type N = _0
 }
 
 /**
- * Type level encoding of the natural numbers.
- *
- * @author Miles Sabin
- */
+  * Type level encoding of the natural numbers.
+  *
+  * @author Miles Sabin
+  */
 object Nat extends Nats {
   import ops.nat._
   import syntax.NatOps
@@ -63,11 +63,11 @@ object Nat extends Nats {
   type _0 = shapeless._0
   val _0: _0 = new _0
 
-  def toInt[N <: Nat](implicit toIntN : ToInt[N]) = toIntN()
+  def toInt[N <: Nat](implicit toIntN: ToInt[N]) = toIntN()
 
-  def toInt(n : Nat)(implicit toIntN : ToInt[n.N]) = toIntN()
+  def toInt(n: Nat)(implicit toIntN: ToInt[n.N]) = toIntN()
 
-  implicit def natOps[N <: Nat](n : N) : NatOps[N] = new NatOps(n)
+  implicit def natOps[N <: Nat](n: N): NatOps[N] = new NatOps(n)
 }
 
 @macrocompat.bundle
@@ -78,7 +78,9 @@ class NatMacros(val c: whitebox.Context) extends NatMacroDefns {
     i match {
       case NatLiteral(n) => mkNatValue(n)
       case _ =>
-        c.abort(c.enclosingPosition, s"Expression $i does not evaluate to a non-negative Int literal")
+        c.abort(
+            c.enclosingPosition,
+            s"Expression $i does not evaluate to a non-negative Int literal")
     }
 }
 
@@ -101,8 +103,8 @@ trait NatMacroDefns {
 
     @tailrec
     def loop(i: Int, acc: Tree): Tree = {
-      if(i == 0) acc
-      else loop(i-1, AppliedTypeTree(Ident(succSym), List(acc)))
+      if (i == 0) acc
+      else loop(i - 1, AppliedTypeTree(Ident(succSym), List(acc)))
     }
 
     loop(i, Ident(_0Sym))
@@ -114,8 +116,8 @@ trait NatMacroDefns {
 
     @tailrec
     def loop(i: Int, acc: Type): Type = {
-      if(i == 0) acc
-      else loop(i-1, appliedType(succTpe, acc))
+      if (i == 0) acc
+      else loop(i - 1, appliedType(succTpe, acc))
     }
 
     loop(i, _0Tpe)

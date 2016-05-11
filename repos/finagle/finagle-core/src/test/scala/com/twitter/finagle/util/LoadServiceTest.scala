@@ -36,7 +36,6 @@ class LoadServiceMultipleImpls1 extends LoadServiceMultipleImpls
 class LoadServiceMultipleImpls2 extends LoadServiceMultipleImpls
 class LoadServiceMultipleImpls3 extends LoadServiceMultipleImpls
 
-
 @RunWith(classOf[JUnitRunner])
 class LoadServiceTest extends FunSuite with MockitoSugar {
   test("LoadService should apply[T] and return a set of instances of T") {
@@ -48,12 +47,14 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
     GlobalRegistry.withRegistry(simple) {
       assert(LoadService[Resolver]().nonEmpty)
       assert(GlobalRegistry.get.toSet == Set(
-        Entry(Seq("loadservice", "com.twitter.finagle.Resolver"), "com.twitter.finagle.TestResolver,com.twitter.finagle.TestAsyncInetResolver")
-      ))
+              Entry(Seq("loadservice", "com.twitter.finagle.Resolver"),
+                    "com.twitter.finagle.TestResolver,com.twitter.finagle.TestAsyncInetResolver")
+          ))
     }
   }
 
-  test("LoadService should only load 1 instance of T, even when there's multiple occurence of T") {
+  test(
+      "LoadService should only load 1 instance of T, even when there's multiple occurence of T") {
     val randomIfaces = LoadService[LoadServiceRandomInterface]()
     assert(randomIfaces.size == 1)
   }
@@ -67,9 +68,12 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
     val simple = new SimpleRegistry
     GlobalRegistry.withRegistry(simple) {
       val randomIfaces = LoadService[LoadServiceMaybeInterface]()
-      assert(GlobalRegistry.get.toSet == Set(
-        Entry(Seq("loadservice", "com.twitter.finagle.util.LoadServiceMaybeInterface"), "com.twitter.finagle.util.LoadServiceGoodClass")
-      ))
+      assert(
+          GlobalRegistry.get.toSet == Set(
+              Entry(Seq("loadservice",
+                        "com.twitter.finagle.util.LoadServiceMaybeInterface"),
+                    "com.twitter.finagle.util.LoadServiceGoodClass")
+          ))
     }
   }
 
@@ -78,7 +82,8 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
     val buf = mutable.Buffer.empty[ClassPath.Info]
     val rand = new Random()
 
-    val f = File.createTempFile("tmp", "__finagle_loadservice" + rand.nextInt(10000))
+    val f =
+      File.createTempFile("tmp", "__finagle_loadservice" + rand.nextInt(10000))
     f.delete
     if (f.mkdir()) {
       f.setReadable(false)
@@ -93,7 +98,8 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
     val buf = mutable.Buffer.empty[ClassPath.Info]
     val rand = new Random()
 
-    val f = File.createTempFile("tmp", "__finagle_loadservice" + rand.nextInt(10000))
+    val f =
+      File.createTempFile("tmp", "__finagle_loadservice" + rand.nextInt(10000))
     f.delete
     if (f.mkdir()) {
       val subDir = new File(f.getAbsolutePath, "subdir")
@@ -112,15 +118,16 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
   test("LoadService should find services on non URLClassloader") {
     val loader = new MetaInfCodedClassloader(getClass.getClassLoader)
     // Run LoadService in a different thread from the custom classloader
-    val clazz: Class[_] = loader.loadClass("com.twitter.finagle.util.LoadServiceCallable")
+    val clazz: Class[_] =
+      loader.loadClass("com.twitter.finagle.util.LoadServiceCallable")
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
-    val future: concurrent.Future[Seq[Any]] = executor.submit(clazz.newInstance().asInstanceOf[Callable[Seq[Any]]])
+    val future: concurrent.Future[Seq[Any]] =
+      executor.submit(clazz.newInstance().asInstanceOf[Callable[Seq[Any]]])
 
     // Get the result
     val announcers: Seq[Any] = future.get()
     assert(announcers.exists(_.getClass.getName.endsWith("FooAnnouncer")),
-      "Non-URLClassloader found announcer was not discovered"
-    )
+           "Non-URLClassloader found announcer was not discovered")
     executor.shutdown()
   }
 
@@ -167,7 +174,8 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
     }
   }
 
-  test("LoadService should ignore packages according to ignoredPaths GlobalFlag") {
+  test(
+      "LoadService should ignore packages according to ignoredPaths GlobalFlag") {
     loadServiceIgnoredPaths.let(Seq("foo/", "/bar")) {
       assert(ClassPath.ignoredPackages.takeRight(2) == Seq("foo/", "/bar"))
     }
@@ -175,8 +183,8 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
 
   test("LoadService should respect Denied if provided") {
     val denied1and2 = Set(
-      "com.twitter.finagle.util.LoadServiceMultipleImpls1",
-      "com.twitter.finagle.util.LoadServiceMultipleImpls2"
+        "com.twitter.finagle.util.LoadServiceMultipleImpls1",
+        "com.twitter.finagle.util.LoadServiceMultipleImpls2"
     )
     loadServiceDenied.let(denied1and2) {
       val loaded = LoadService[LoadServiceMultipleImpls]()
@@ -184,16 +192,16 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
       assert(classOf[LoadServiceMultipleImpls3] == loaded.head.getClass)
     }
   }
-
 }
 
 class LoadServiceCallable extends Callable[Seq[Any]] {
   override def call(): Seq[Any] = LoadService[Announcer]()
 }
 
-class MetaInfCodedClassloader(parent: ClassLoader) extends ClassLoader(parent) {
+class MetaInfCodedClassloader(parent: ClassLoader)
+    extends ClassLoader(parent) {
   override def loadClass(name: String): Class[_] = {
-    if (name.startsWith("com.twitter.finagle" )) {
+    if (name.startsWith("com.twitter.finagle")) {
       try {
         val path = name.replaceAll("\\.", "/") + ".class"
         val is: InputStream = getClass.getClassLoader.getResourceAsStream(path)
@@ -201,7 +209,8 @@ class MetaInfCodedClassloader(parent: ClassLoader) extends ClassLoader(parent) {
 
         defineClass(name, buf, 0, buf.length)
       } catch {
-        case e: Exception => throw new ClassNotFoundException("Couldn't load class " + name, e)
+        case e: Exception =>
+          throw new ClassNotFoundException("Couldn't load class " + name, e)
       }
     } else {
       parent.loadClass(name)
@@ -212,7 +221,8 @@ class MetaInfCodedClassloader(parent: ClassLoader) extends ClassLoader(parent) {
     // Totally contrived example classloader that stores "META-INF" as "HIDDEN-INF"
     // Not a good example of real-world issues, but it does the job at hiding the service definition from the
     // com.twitter.finagle.util.ClassPath code
-    val resources: util.Enumeration[URL] = super.getResources(p1.replace("META-INF", "HIDDEN-INF"))
+    val resources: util.Enumeration[URL] =
+      super.getResources(p1.replace("META-INF", "HIDDEN-INF"))
     if (resources == null) {
       super.getResources(p1)
     } else {
@@ -224,6 +234,6 @@ class MetaInfCodedClassloader(parent: ClassLoader) extends ClassLoader(parent) {
 class FooAnnouncer extends Announcer {
   override val scheme: String = "foo"
 
-  override def announce(addr: InetSocketAddress, name: String): Future[Announcement] = null
+  override def announce(
+      addr: InetSocketAddress, name: String): Future[Announcement] = null
 }
-

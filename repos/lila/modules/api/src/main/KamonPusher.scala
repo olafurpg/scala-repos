@@ -7,8 +7,7 @@ import scala.concurrent.duration._
 import lila.hub.actorApi.round.NbRounds
 import lila.socket.actorApi.NbMembers
 
-private final class KamonPusher(
-    countUsers: () => Int) extends Actor {
+private final class KamonPusher(countUsers: () => Int) extends Actor {
 
   import KamonPusher._
 
@@ -46,18 +45,19 @@ object KamonPusher {
 }
 
 import com.typesafe.config.Config
-import kamon.metric.{ MetricKey, Entity }
+import kamon.metric.{MetricKey, Entity}
 import kamon.statsd._
 
 // don't replace . with _
 // replace / with .
-class KeepDotsMetricKeyGenerator(config: Config) extends SimpleMetricKeyGenerator(config) {
+class KeepDotsMetricKeyGenerator(config: Config)
+    extends SimpleMetricKeyGenerator(config) {
 
-  override def createNormalizer(strategy: String): Normalizer = strategy match {
-    case "keep-dots" => (s: String) ⇒ s
-      .replace(": ", "-")
-      .replace(" ", "_")
-      .replace("/", ".")
-    case _ => super.createNormalizer(strategy)
-  }
+  override def createNormalizer(strategy: String): Normalizer =
+    strategy match {
+      case "keep-dots" =>
+        (s: String) ⇒
+          s.replace(": ", "-").replace(" ", "_").replace("/", ".")
+        case _ => super.createNormalizer(strategy)
+    }
 }

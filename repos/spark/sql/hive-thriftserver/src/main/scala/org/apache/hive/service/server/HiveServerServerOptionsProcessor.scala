@@ -19,11 +19,11 @@ package org.apache.hive.service.server
 import org.apache.hive.service.server.HiveServer2.{ServerOptionsProcessor, StartOptionExecutor}
 
 /**
- * Class to upgrade a package-private class to public, and
- * implement a `process()` operation consistent with
- * the behavior of older Hive versions
- * @param serverName name of the hive server
- */
+  * Class to upgrade a package-private class to public, and
+  * implement a `process()` operation consistent with
+  * the behavior of older Hive versions
+  * @param serverName name of the hive server
+  */
 private[apache] class HiveServerServerOptionsProcessor(serverName: String)
     extends ServerOptionsProcessor(serverName) {
 

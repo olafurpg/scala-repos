@@ -24,14 +24,16 @@ import org.apache.spark.sql.types._
 import org.apache.spark.util.Benchmark
 
 /**
- * Benchmark [[UnsafeProjection]] for fixed-length/primitive-type fields.
- */
+  * Benchmark [[UnsafeProjection]] for fixed-length/primitive-type fields.
+  */
 object UnsafeProjectionBenchmark {
 
   def generateRows(schema: StructType, numRows: Int): Array[InternalRow] = {
     val generator = RandomDataGenerator.forType(schema, nullable = false).get
     val encoder = RowEncoder(schema)
-    (1 to numRows).map(_ => encoder.toRow(generator().asInstanceOf[Row]).copy()).toArray
+    (1 to numRows)
+      .map(_ => encoder.toRow(generator().asInstanceOf[Row]).copy())
+      .toArray
   }
 
   def main(args: Array[String]) {
@@ -39,7 +41,6 @@ object UnsafeProjectionBenchmark {
     val numRows = 1024 * 16
 
     val benchmark = new Benchmark("unsafe projection", iters * numRows)
-
 
     val schema1 = new StructType().add("l", LongType, false)
     val attrs1 = schema1.toAttributes
@@ -73,7 +74,6 @@ object UnsafeProjectionBenchmark {
       }
     }
 
-
     val schema3 = new StructType()
       .add("boolean", BooleanType, false)
       .add("byte", ByteType, false)
@@ -97,7 +97,6 @@ object UnsafeProjectionBenchmark {
       }
     }
 
-
     val schema4 = new StructType()
       .add("boolean", BooleanType, true)
       .add("byte", ByteType, true)
@@ -120,7 +119,6 @@ object UnsafeProjectionBenchmark {
         }
       }
     }
-
 
     /*
     Intel(R) Core(TM) i7-4960HQ CPU @ 2.60GHz

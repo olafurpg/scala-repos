@@ -3,20 +3,26 @@
  */
 package play.api.routing.sird
 
-import java.net.{ URI, URL }
+import java.net.{URI, URL}
 
 import play.api.mvc.RequestHeader
 
-class RequiredQueryStringParameter(paramName: String) extends QueryStringParameterExtractor[String] {
-  def unapply(qs: QueryString): Option[String] = qs.get(paramName).flatMap(_.headOption)
+class RequiredQueryStringParameter(paramName: String)
+    extends QueryStringParameterExtractor[String] {
+  def unapply(qs: QueryString): Option[String] =
+    qs.get(paramName).flatMap(_.headOption)
 }
 
-class OptionalQueryStringParameter(paramName: String) extends QueryStringParameterExtractor[Option[String]] {
-  def unapply(qs: QueryString): Option[Option[String]] = Some(qs.get(paramName).flatMap(_.headOption))
+class OptionalQueryStringParameter(paramName: String)
+    extends QueryStringParameterExtractor[Option[String]] {
+  def unapply(qs: QueryString): Option[Option[String]] =
+    Some(qs.get(paramName).flatMap(_.headOption))
 }
 
-class SeqQueryStringParameter(paramName: String) extends QueryStringParameterExtractor[Seq[String]] {
-  def unapply(qs: QueryString): Option[Seq[String]] = Some(qs.getOrElse(paramName, Nil))
+class SeqQueryStringParameter(paramName: String)
+    extends QueryStringParameterExtractor[Seq[String]] {
+  def unapply(qs: QueryString): Option[Seq[String]] =
+    Some(qs.getOrElse(paramName, Nil))
 }
 
 trait QueryStringParameterExtractor[T] {
@@ -29,12 +35,13 @@ trait QueryStringParameterExtractor[T] {
 
 object QueryStringParameterExtractor {
   private def parse(query: String): QueryString = {
-    Option(query).map(_.split("&").toSeq.map { keyValue =>
-      keyValue.split("=", 2) match {
-        case Array(key, value) => key -> value
-        case Array(key) => key -> ""
-      }
-    }.groupBy(_._1).mapValues(_.map(_._2)).toMap)
+    Option(query)
+      .map(_.split("&").toSeq.map { keyValue =>
+        keyValue.split("=", 2) match {
+          case Array(key, value) => key -> value
+          case Array(key) => key -> ""
+        }
+      }.groupBy(_._1).mapValues(_.map(_._2)).toMap)
       .getOrElse(Map.empty)
   }
 
@@ -42,4 +49,3 @@ object QueryStringParameterExtractor {
   def optional(name: String) = new OptionalQueryStringParameter(name)
   def seq(name: String) = new SeqQueryStringParameter(name)
 }
-

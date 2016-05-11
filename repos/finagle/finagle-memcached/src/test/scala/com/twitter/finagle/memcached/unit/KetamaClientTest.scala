@@ -33,7 +33,7 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
         expected += segments
       }
     } while (line != null)
-      assert(expected.size == 99)
+    assert(expected.size == 99)
 
     // Build Ketama client
     def newMock() = {
@@ -42,28 +42,32 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
       s
     }
     val clients = Map(
-      CacheNode("10.0.1.1", 11211, 600)  -> newMock(),
-      CacheNode("10.0.1.2", 11211, 300)  -> newMock(),
-      CacheNode("10.0.1.3", 11211, 200)  -> newMock(),
-      CacheNode("10.0.1.4", 11211, 350)  -> newMock(),
-      CacheNode("10.0.1.5", 11211, 1000) -> newMock(),
-      CacheNode("10.0.1.6", 11211, 800)  -> newMock(),
-      CacheNode("10.0.1.7", 11211, 950)  -> newMock(),
-      CacheNode("10.0.1.8", 11211, 100)  -> newMock()
+        CacheNode("10.0.1.1", 11211, 600) -> newMock(),
+        CacheNode("10.0.1.2", 11211, 300) -> newMock(),
+        CacheNode("10.0.1.3", 11211, 200) -> newMock(),
+        CacheNode("10.0.1.4", 11211, 350) -> newMock(),
+        CacheNode("10.0.1.5", 11211, 1000) -> newMock(),
+        CacheNode("10.0.1.6", 11211, 800) -> newMock(),
+        CacheNode("10.0.1.7", 11211, 950) -> newMock(),
+        CacheNode("10.0.1.8", 11211, 100) -> newMock()
     )
 
     def newService(node: CacheNode) = clients.get(node).get
-    val ketamaClient = new KetamaPartitionedClient(Group(clients.keys.toSeq:_*), newService)
+    val ketamaClient =
+      new KetamaPartitionedClient(Group(clients.keys.toSeq: _*), newService)
 
     info("pick the correct node")
-    val ipToService = clients.map { case (key, service) => key.host -> service }.toMap
+    val ipToService = clients.map {
+      case (key, service) => key.host -> service
+    }.toMap
     val rng = new scala.util.Random
     for (testcase <- expected) {
       val mockClient = ketamaClient.clientOf(testcase(0))
       val expectedService = ipToService(testcase(3))
       val randomResponse = Number(rng.nextLong)
 
-      when(expectedService.apply(any[Incr])) thenReturn Future.value(randomResponse)
+      when(expectedService.apply(any[Incr])) thenReturn Future.value(
+          randomResponse)
 
       assert(Await.result(mockClient.incr("foo")).get == randomResponse.value)
     }
@@ -107,17 +111,17 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
 
   test("ejects dead clients") {
     trait KetamaClientBuilder {
-      val serviceA = mock[Service[Command,Response]](RETURNS_SMART_NULLS)
-      val serviceB = mock[Service[Command,Response]](RETURNS_SMART_NULLS)
+      val serviceA = mock[Service[Command, Response]](RETURNS_SMART_NULLS)
+      val serviceB = mock[Service[Command, Response]](RETURNS_SMART_NULLS)
       val nodeA = CacheNode("10.0.1.1", 11211, 100)
       val nodeB = CacheNode("10.0.1.2", 11211, 100)
       val nodeKeyA = KetamaClientKey(nodeA.host, nodeA.port, nodeA.weight)
       val nodeKeyB = KetamaClientKey(nodeB.host, nodeB.port, nodeB.weight)
       val services = Map(
-        nodeA -> serviceA,
-        nodeB -> serviceB
+          nodeA -> serviceA,
+          nodeB -> serviceB
       )
-      val mutableGroup = Group.mutable(services.keys.toSeq:_*)
+      val mutableGroup = Group.mutable(services.keys.toSeq: _*)
 
       val key = Buf.Utf8("foo")
       val value = mock[Value](RETURNS_SMART_NULLS)
@@ -126,7 +130,8 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
 
       val broker = new Broker[NodeHealth]
       def newService(node: CacheNode) = services.get(node).get
-      val ketamaClient = new KetamaPartitionedClient(mutableGroup, newService, broker)
+      val ketamaClient =
+        new KetamaPartitionedClient(mutableGroup, newService, broker)
 
       Await.result(ketamaClient.get("foo"))
       verify(serviceA, times(1)).apply(any())

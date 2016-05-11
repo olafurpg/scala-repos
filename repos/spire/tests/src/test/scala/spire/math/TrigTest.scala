@@ -7,16 +7,16 @@ import spire.implicits.{eqOps => _, _}
 
 class TrigTest extends FunSuite {
 
-  val epsilon:Double = 1e-15
+  val epsilon: Double = 1e-15
 
-  final class RelativeOps(lhs:Double) {
-    def within(rhs:Double) = {
+  final class RelativeOps(lhs: Double) {
+    def within(rhs: Double) = {
       val ok = abs(lhs - rhs) < epsilon
       if (!ok) println("failed: abs(%s - %s) < %s" format (lhs, rhs, epsilon))
       assert(ok)
     }
   }
-  implicit def relativeOps(lhs:Double) = new RelativeOps(lhs)
+  implicit def relativeOps(lhs: Double) = new RelativeOps(lhs)
 
   test("Trig[Double]") {
     val t = implicitly[Trig[Double]]

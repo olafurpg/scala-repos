@@ -11,7 +11,7 @@ class LAFutureSpec extends Specification {
 
   "LAFuture" should {
     val futureSpecScheduler = new LAScheduler {
-      override def execute(f: ()=>Unit): Unit = f()
+      override def execute(f: () => Unit): Unit = f()
     }
 
     "map to failing future if transforming function throws an Exception" in {
@@ -72,7 +72,8 @@ class LAFutureSpec extends Specification {
       val givenTwoResult = 234
       val one = LAFuture(() => givenOneResult)
       val two = LAFuture(() => givenTwoResult)
-      LAFuture.collect(one, two).get(timeout) shouldEqual List(givenOneResult, givenTwoResult)
+      LAFuture.collect(one, two).get(timeout) shouldEqual List(givenOneResult,
+                                                               givenTwoResult)
     }
 
     "collect empty list immediately" in {
@@ -82,10 +83,9 @@ class LAFutureSpec extends Specification {
     }
 
     "collectAll empty list immediately" in {
-      val collectResult = LAFuture.collectAll(Nil : _*)
+      val collectResult = LAFuture.collectAll(Nil: _*)
       collectResult.isSatisfied shouldEqual true
       collectResult.get(timeout) shouldEqual Nil
     }
   }
-
 }

@@ -6,11 +6,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScDocCommentOwn
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
 
 /**
- * @author Nikolay.Tropin
- */
-
-trait ScCommentOwner {
-  self: ScalaPsiElement =>
+  * @author Nikolay.Tropin
+  */
+trait ScCommentOwner { self: ScalaPsiElement =>
 
   def simpleComment: Option[PsiComment] = {
     self.children.collectFirst {

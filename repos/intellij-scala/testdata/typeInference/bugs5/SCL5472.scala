@@ -7,6 +7,7 @@ object SCL5472 {
   implicit def a[T]: AA[T, List[T]] = new AA
   implicit def b[T]: BB[T, List[T]] = new BB
 
-  /*start*/foo("")/*end*/
+  /*start*/
+  foo("") /*end*/
 }
 //List[List[String]]

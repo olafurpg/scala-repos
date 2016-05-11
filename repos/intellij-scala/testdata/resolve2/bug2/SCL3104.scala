@@ -1,3 +1,4 @@
 class C(var a: Any) {
-  /*resolved: true*/a = 0
+  /*resolved: true*/
+  a = 0
 }

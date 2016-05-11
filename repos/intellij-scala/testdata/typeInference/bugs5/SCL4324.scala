@@ -1,18 +1,21 @@
 object SCL4324 {
-trait Category[~>[_, _]] {
-  def identity[A]: A ~> A
-}
-
-object Category {
-  implicit def fCat: Category[Function1] = new Category[Function1] {
-    def identity[A]: A => A = { x => x }
+  trait Category[~>[_, _]] {
+    def identity[A]: A ~> A
   }
-}
 
-object Main extends App {
-  import Category._
+  object Category {
+    implicit def fCat: Category[Function1] = new Category[Function1] {
+      def identity[A]: A => A = { x =>
+        x
+      }
+    }
+  }
 
-  /*start*/fCat.identity(3)/*end*/ // Type mismatch: expected Nothing actual Int
-}
+  object Main extends App {
+    import Category._
+
+    /*start*/
+    fCat.identity(3) /*end*/ // Type mismatch: expected Nothing actual Int
+  }
 }
 //Int

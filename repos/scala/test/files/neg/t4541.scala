@@ -1,9 +1,3 @@
-
-
-
-
-
-
 @SerialVersionUID(1L)
 final class Sparse[@specialized(Int) T](d: Array[T]) extends Serializable {
   protected var data: Array[T] = d
@@ -11,6 +5,3 @@ final class Sparse[@specialized(Int) T](d: Array[T]) extends Serializable {
     that.data
   }
 }
-
-
-

@@ -22,20 +22,24 @@ import java.util.Properties
 import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkFunSuite}
 
 /**
- * Tests that pools and the associated scheduling algorithms for FIFO and fair scheduling work
- * correctly.
- */
+  * Tests that pools and the associated scheduling algorithms for FIFO and fair scheduling work
+  * correctly.
+  */
 class PoolSuite extends SparkFunSuite with LocalSparkContext {
 
-  def createTaskSetManager(stageId: Int, numTasks: Int, taskScheduler: TaskSchedulerImpl)
-    : TaskSetManager = {
+  def createTaskSetManager(
+      stageId: Int,
+      numTasks: Int,
+      taskScheduler: TaskSchedulerImpl): TaskSetManager = {
     val tasks = Array.tabulate[Task[_]](numTasks) { i =>
       new FakeTask(i, Nil)
     }
-    new TaskSetManager(taskScheduler, new TaskSet(tasks, stageId, 0, 0, null), 0)
+    new TaskSetManager(
+        taskScheduler, new TaskSet(tasks, stageId, 0, 0, null), 0)
   }
 
-  def scheduleTaskAndVerifyId(taskId: Int, rootPool: Pool, expectedStageId: Int) {
+  def scheduleTaskAndVerifyId(
+      taskId: Int, rootPool: Pool, expectedStageId: Int) {
     val taskSetQueue = rootPool.getSortedTaskSetQueue
     val nextTaskSetToSchedule =
       taskSetQueue.find(t => (t.runningTasks + t.tasksSuccessful) < t.numTasks)
@@ -68,12 +72,13 @@ class PoolSuite extends SparkFunSuite with LocalSparkContext {
   }
 
   /**
-   * This test creates three scheduling pools, and creates task set managers in the first
-   * two scheduling pools. The test verifies that as tasks are scheduled, the fair scheduling
-   * algorithm properly orders the two scheduling pools.
-   */
+    * This test creates three scheduling pools, and creates task set managers in the first
+    * two scheduling pools. The test verifies that as tasks are scheduled, the fair scheduling
+    * algorithm properly orders the two scheduling pools.
+    */
   test("Fair Scheduler Test") {
-    val xmlPath = getClass.getClassLoader.getResource("fairscheduler.xml").getFile()
+    val xmlPath =
+      getClass.getClassLoader.getResource("fairscheduler.xml").getFile()
     val conf = new SparkConf().set("spark.scheduler.allocation.file", xmlPath)
     sc = new SparkContext("local", "TaskSchedulerImplSuite", conf)
     val taskScheduler = new TaskSchedulerImpl(sc)

@@ -8,7 +8,8 @@ package b {
   case class B(x: A)
 
   object Main {
-    /*start*/B.unapply(new B(new A))/*end*/
+    /*start*/
+    B.unapply(new B(new A)) /*end*/
   }
 }
 //Option[A]

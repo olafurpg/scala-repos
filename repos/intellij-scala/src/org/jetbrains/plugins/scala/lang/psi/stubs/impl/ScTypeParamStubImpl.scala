@@ -4,7 +4,6 @@ package psi
 package stubs
 package impl
 
-
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.{IStubElementType, StubElement}
 import com.intellij.util.SofterReference
@@ -14,13 +13,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 17.06.2009
- */
-
-class ScTypeParamStubImpl[ParentPsi <: PsiElement](parent: StubElement[ParentPsi],
-                                                  elemType: IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-        extends StubBaseWrapper[ScTypeParam](parent, elemType) with ScTypeParamStub {
+  * User: Alexander Podkhalyuzin
+  * Date: 17.06.2009
+  */
+class ScTypeParamStubImpl[ParentPsi <: PsiElement](
+    parent: StubElement[ParentPsi],
+    elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    extends StubBaseWrapper[ScTypeParam](parent, elemType)
+    with ScTypeParamStub {
   private var name: StringRef = _
   private var upperText: StringRef = _
   private var lowerText: StringRef = _
@@ -39,10 +40,22 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](parent: StubElement[ParentPsi
   def getName: String = StringRef.toString(name)
 
   def this(parent: StubElement[ParentPsi],
-          elemType: IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-          name: StringRef, upperText: StringRef, lowerText: StringRef, viewText: Seq[StringRef], contextBoundText: Seq[StringRef],
-          covariant: Boolean, contravariant: Boolean, position: Int, fileName: StringRef, typeParameterText: StringRef) {
-    this(parent, elemType.asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+           elemType: IStubElementType[
+               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           name: StringRef,
+           upperText: StringRef,
+           lowerText: StringRef,
+           viewText: Seq[StringRef],
+           contextBoundText: Seq[StringRef],
+           covariant: Boolean,
+           contravariant: Boolean,
+           position: Int,
+           fileName: StringRef,
+           typeParameterText: StringRef) {
+    this(
+        parent,
+        elemType
+          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.name = name
     this.upperText = upperText
     this.lowerText = lowerText
@@ -68,12 +81,17 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](parent: StubElement[ParentPsi
   def getLowerTypeElement: Option[ScTypeElement] = {
     if (lowerElement != null) {
       val lowerTypeElement = lowerElement.get
-      if (lowerTypeElement != null && (lowerTypeElement.isEmpty || (lowerTypeElement.get.getContext eq getPsi))) {
+      if (lowerTypeElement != null &&
+          (lowerTypeElement.isEmpty ||
+              (lowerTypeElement.get.getContext eq getPsi))) {
         return lowerTypeElement
       }
     }
     val res: Option[ScTypeElement] =
-      if (getLowerText != "") Some(ScalaPsiElementFactory.createTypeElementFromText(getLowerText, getPsi, null))
+      if (getLowerText != "")
+        Some(
+            ScalaPsiElementFactory.createTypeElementFromText(
+                getLowerText, getPsi, null))
       else None
     lowerElement = new SofterReference[Option[ScTypeElement]](res)
     res
@@ -82,12 +100,17 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](parent: StubElement[ParentPsi
   def getUpperTypeElement: Option[ScTypeElement] = {
     if (upperElement != null) {
       val upperTypeElement = upperElement.get
-      if (upperTypeElement != null && (upperTypeElement.isEmpty || (upperTypeElement.get.getContext eq getPsi))) {
+      if (upperTypeElement != null &&
+          (upperTypeElement.isEmpty ||
+              (upperTypeElement.get.getContext eq getPsi))) {
         return upperTypeElement
       }
     }
     val res: Option[ScTypeElement] =
-      if (getUpperText != "") Some(ScalaPsiElementFactory.createTypeElementFromText(getUpperText, getPsi, null))
+      if (getUpperText != "")
+        Some(
+            ScalaPsiElementFactory.createTypeElementFromText(
+                getUpperText, getPsi, null))
       else None
     upperElement = new SofterReference[Option[ScTypeElement]](res)
     res
@@ -102,9 +125,12 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](parent: StubElement[ParentPsi
   def getViewTypeElement: Seq[ScTypeElement] = {
     if (viewElement != null) {
       val viewTypeElements = viewElement.get
-      if (viewTypeElements != null && viewTypeElements.forall(_.getContext.eq(getPsi))) return viewTypeElements
+      if (viewTypeElements != null &&
+          viewTypeElements.forall(_.getContext.eq(getPsi)))
+        return viewTypeElements
     }
-    val res: Seq[ScTypeElement] = getViewText.map(ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
+    val res: Seq[ScTypeElement] = getViewText.map(
+        ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
     viewElement = new SofterReference(res)
     res
   }
@@ -112,9 +138,12 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](parent: StubElement[ParentPsi
   def getContextBoundTypeElement: Seq[ScTypeElement] = {
     if (contextBoundElement != null) {
       val contextTypeElements = contextBoundElement.get
-      if (contextTypeElements != null && contextTypeElements.forall(_.getContext.eq(getPsi))) return contextTypeElements
+      if (contextTypeElements != null &&
+          contextTypeElements.forall(_.getContext.eq(getPsi)))
+        return contextTypeElements
     }
-    val res: Seq[ScTypeElement] = getContextBoundText.map(ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
+    val res: Seq[ScTypeElement] = getContextBoundText.map(
+        ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
     contextBoundElement = new SofterReference(res)
     res
   }

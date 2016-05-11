@@ -25,7 +25,7 @@ import com.twitter.scalding.serialization.macros.impl.ordered_serialization._
 /*
   A fall back ordered bufferable to look for the user to have an implicit in scope to satisfy the missing
   type. This is for the case where its an opaque class to our macros where we can't figure out the fields
-*/
+ */
 object ImplicitOrderedBuf {
   val macroMarker = "MACROASKEDORDEREDSER"
 
@@ -33,7 +33,8 @@ object ImplicitOrderedBuf {
     import c.universe._
 
     val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
-      case tpe if !tpe.toString.contains(macroMarker) => ImplicitOrderedBuf(c)(tpe)
+      case tpe if !tpe.toString.contains(macroMarker) =>
+        ImplicitOrderedBuf(c)(tpe)
     }
     pf
   }
@@ -42,7 +43,8 @@ object ImplicitOrderedBuf {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
-    val variableID = (outerType.typeSymbol.fullName.hashCode.toLong + Int.MaxValue.toLong).toString
+    val variableID = (outerType.typeSymbol.fullName.hashCode.toLong +
+        Int.MaxValue.toLong).toString
     val variableNameStr = s"orderedSer_$variableID"
     val variableName = newTermName(variableNameStr)
     val typeAlias = newTypeName(c.fresh("MACROASKEDORDEREDSER"))
@@ -53,9 +55,11 @@ object ImplicitOrderedBuf {
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
-      override def compareBinary(inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+      override def compareBinary(
+          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
         q"$variableName.compareBinary($inputStreamA, $inputStreamB).unsafeToInt"
-      override def hash(element: ctx.TermName): ctx.Tree = q"$variableName.hash($element)"
+      override def hash(element: ctx.TermName): ctx.Tree =
+        q"$variableName.hash($element)"
 
       override def put(inputStream: ctx.TermName, element: ctx.TermName) =
         q"$variableName.write($inputStream, $element)"
@@ -77,10 +81,11 @@ object ImplicitOrderedBuf {
       override def get(inputStream: ctx.TermName): ctx.Tree =
         q"$variableName.read($inputStream).get"
 
-      override def compare(elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+      override def compare(
+          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
         q"$variableName.compare($elementA, $elementB)"
-      override val lazyOuterVariables = Map(variableNameStr -> implicitInstanciator)
+      override val lazyOuterVariables = Map(
+          variableNameStr -> implicitInstanciator)
     }
   }
 }
-

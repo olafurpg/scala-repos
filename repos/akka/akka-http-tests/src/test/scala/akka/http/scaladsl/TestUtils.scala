@@ -4,7 +4,7 @@
 
 package akka.http.scaladsl
 
-import java.io.{ FileOutputStream, File }
+import java.io.{FileOutputStream, File}
 import java.net.InetSocketAddress
 import java.nio.channels.ServerSocketChannel
 
@@ -17,7 +17,8 @@ object TestUtils {
   }
 
   // TODO duplicated code from akka-http-core-tests
-  def temporaryServerAddress(interface: String = "127.0.0.1"): InetSocketAddress = {
+  def temporaryServerAddress(
+      interface: String = "127.0.0.1"): InetSocketAddress = {
     val serverSocket = ServerSocketChannel.open()
     try {
       serverSocket.socket.bind(new InetSocketAddress(interface, 0))
@@ -27,7 +28,8 @@ object TestUtils {
   }
 
   // TODO duplicated code from akka-http-core-tests
-  def temporaryServerHostnameAndPort(interface: String = "127.0.0.1"): (InetSocketAddress, String, Int) = {
+  def temporaryServerHostnameAndPort(
+      interface: String = "127.0.0.1"): (InetSocketAddress, String, Int) = {
     val socketAddress = temporaryServerAddress(interface)
     (socketAddress, socketAddress.getHostName, socketAddress.getPort)
   }

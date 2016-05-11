@@ -1,4 +1,3 @@
-
 trait Base {
   private val secure_# = 10l
 }

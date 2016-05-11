@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.remote.transport.AssociationHandle
@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ ForceDisassociateExplicitly, ForceDisassociate, Direction }
+import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociateExplicitly, ForceDisassociate, Direction}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -24,8 +24,7 @@ object RemoteNodeRestartGateSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(
-    ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       akka.remote.retry-gate-closed-for  = 1d # Keep it long
@@ -36,25 +35,25 @@ object RemoteNodeRestartGateSpec extends MultiNodeConfig {
   class Subject extends Actor {
     def receive = {
       case "shutdown" ⇒ context.system.terminate()
-      case msg        ⇒ sender() ! msg
+      case msg ⇒ sender() ! msg
     }
   }
-
 }
 
 class RemoteNodeRestartGateSpecMultiJvmNode1 extends RemoteNodeRestartGateSpec
 class RemoteNodeRestartGateSpecMultiJvmNode2 extends RemoteNodeRestartGateSpec
 
 abstract class RemoteNodeRestartGateSpec
-  extends MultiNodeSpec(RemoteNodeRestartGateSpec)
-  with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(RemoteNodeRestartGateSpec) with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteNodeRestartGateSpec._
 
   override def initialParticipants = 2
 
   def identify(role: RoleName, actorName: String): ActorRef = {
-    system.actorSelection(node(role) / "user" / actorName) ! Identify(actorName)
+    system.actorSelection(node(role) / "user" / actorName) ! Identify(
+        actorName)
     expectMsgType[ActorIdentity].ref.get
   }
 
@@ -70,10 +69,15 @@ abstract class RemoteNodeRestartGateSpec
 
         identify(second, "subject")
 
-        EventFilter.warning(pattern = "address is now gated", occurrences = 1).intercept {
-          Await.result(RARP(system).provider.transport.managementCommand(
-            ForceDisassociateExplicitly(node(second).address, AssociationHandle.Unknown)), 3.seconds)
-        }
+        EventFilter
+          .warning(pattern = "address is now gated", occurrences = 1)
+          .intercept {
+            Await.result(
+                RARP(system).provider.transport.managementCommand(
+                    ForceDisassociateExplicitly(node(second).address,
+                                                AssociationHandle.Unknown)),
+                3.seconds)
+          }
 
         enterBarrier("gated")
 
@@ -81,23 +85,28 @@ abstract class RemoteNodeRestartGateSpec
 
         within(10.seconds) {
           awaitAssert {
-            system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! Identify("subject")
+            system.actorSelection(
+                RootActorPath(secondAddress) / "user" / "subject") ! Identify(
+                "subject")
             expectMsgType[ActorIdentity].ref.get
           }
         }
 
-        system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
+        system.actorSelection(
+            RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
       }
 
       runOn(second) {
-        val addr = system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
+        val addr =
+          system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         val firstAddress = node(first).address
 
         enterBarrier("gated")
 
         Await.ready(system.whenTerminated, 10.seconds)
 
-        val freshSystem = ActorSystem(system.name, ConfigFactory.parseString(s"""
+        val freshSystem =
+          ActorSystem(system.name, ConfigFactory.parseString(s"""
                     akka.remote.retry-gate-closed-for = 0.5 s
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}
@@ -110,7 +119,9 @@ abstract class RemoteNodeRestartGateSpec
         // Pierce the gate
         within(30.seconds) {
           awaitAssert {
-            freshSystem.actorSelection(RootActorPath(firstAddress) / "user" / "subject").tell(Identify("subject"), probe.ref)
+            freshSystem
+              .actorSelection(RootActorPath(firstAddress) / "user" / "subject")
+              .tell(Identify("subject"), probe.ref)
             probe.expectMsgType[ActorIdentity].ref.get
           }
         }
@@ -120,8 +131,6 @@ abstract class RemoteNodeRestartGateSpec
 
         Await.ready(freshSystem.whenTerminated, 30.seconds)
       }
-
     }
-
   }
 }

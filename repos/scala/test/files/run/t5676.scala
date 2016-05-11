@@ -20,5 +20,4 @@ object Test {
     println(Modifier.isFinal(classOf[Baz[Any]].getModifiers()))
     println(Modifier.isFinal(Test.getClass.getModifiers()))
   }
-
 }

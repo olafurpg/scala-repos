@@ -3,23 +3,24 @@
  */
 package scalaguide.http.scalabodyparsers {
 
-import akka.stream.ActorMaterializer
-import play.api.http.Writeable
-import play.api.libs.json.{Json, JsValue}
-import play.api.mvc._
-import play.api.test._
-import play.api.test.Helpers._
-import org.specs2.mutable.Specification
-import org.junit.runner.RunWith
-import org.specs2.runner.JUnitRunner
-import scala.concurrent.Future
-import java.io.File
-import org.specs2.execute.AsResult
+  import akka.stream.ActorMaterializer
+  import play.api.http.Writeable
+  import play.api.libs.json.{Json, JsValue}
+  import play.api.mvc._
+  import play.api.test._
+  import play.api.test.Helpers._
+  import org.specs2.mutable.Specification
+  import org.junit.runner.RunWith
+  import org.specs2.runner.JUnitRunner
+  import scala.concurrent.Future
+  import java.io.File
+  import org.specs2.execute.AsResult
 
   @RunWith(classOf[JUnitRunner])
   class ScalaBodyParsersSpec extends Specification with Controller {
 
-    def helloRequest = FakeRequest("POST", "/").withJsonBody(Json.obj("name" -> "foo"))
+    def helloRequest =
+      FakeRequest("POST", "/").withJsonBody(Json.obj("name" -> "foo"))
 
     "A scala body parser" should {
 
@@ -60,8 +61,9 @@ import org.specs2.execute.AsResult
 
       "body parser file" in {
         //#body-parser-file
-        def save = Action(parse.file(to = new File("/tmp/upload"))) { request =>
-          Ok("Saved the request content to " + request.body)
+        def save = Action(parse.file(to = new File("/tmp/upload"))) {
+          request =>
+            Ok("Saved the request content to " + request.body)
         }
         //#body-parser-file
         testAction(save, helloRequest.withSession("username" -> "player"))
@@ -86,14 +88,17 @@ import org.specs2.execute.AsResult
       "body parser limit file" in {
         running() { app =>
           implicit val mat = ActorMaterializer()(app.actorSystem)
-          val storeInUserFile = scalaguide.http.scalabodyparsers.full.Application.storeInUserFile
+          val storeInUserFile =
+            scalaguide.http.scalabodyparsers.full.Application.storeInUserFile
           //#body-parser-limit-file
           // Accept only 10KB of data.
-          def save = Action(parse.maxLength(1024 * 10, storeInUserFile)) { request =>
-            Ok("Saved the request content to " + request.body)
+          def save = Action(parse.maxLength(1024 * 10, storeInUserFile)) {
+            request =>
+              Ok("Saved the request content to " + request.body)
           }
           //#body-parser-limit-file
-          val result = call(save, helloRequest.withSession("username" -> "player"))
+          val result =
+            call(save, helloRequest.withSession("username" -> "player"))
           status(result) must_== OK
         }
       }
@@ -108,20 +113,23 @@ import org.specs2.execute.AsResult
         import scala.concurrent.ExecutionContext
         import akka.util.ByteString
 
-        class MyController @Inject() (ws: WSClient)(implicit ec: ExecutionContext) {
+        class MyController @Inject()(ws: WSClient)(
+            implicit ec: ExecutionContext) {
 
-          def forward(request: WSRequest): BodyParser[WSResponse] = BodyParser { req =>
-            Accumulator.source[ByteString].mapFuture { source =>
-              request
+          def forward(request: WSRequest): BodyParser[WSResponse] =
+            BodyParser { req =>
+              Accumulator.source[ByteString].mapFuture { source =>
+                request
                 // TODO: stream body when support is implemented
                 // .withBody(source)
-                .execute()
-                .map(Right.apply)
+                  .execute()
+                  .map(Right.apply)
+              }
             }
-          }
 
-          def myAction = Action(forward(ws.url("https://example.com"))) { req =>
-            Ok("Uploaded")
+          def myAction = Action(forward(ws.url("https://example.com"))) {
+            req =>
+              Ok("Uploaded")
           }
         }
         //#forward-body
@@ -139,31 +147,39 @@ import org.specs2.execute.AsResult
         import akka.stream.scaladsl._
 
         val csv: BodyParser[Seq[Seq[String]]] = BodyParser { req =>
-
           // A flow that splits the stream into CSV lines
-          val sink: Sink[ByteString, Future[Seq[Seq[String]]]] = Flow[ByteString]
+          val sink: Sink[ByteString, Future[Seq[Seq[String]]]] =
+            Flow[ByteString]
             // We split by the new line character, allowing a maximum of 1000 characters per line
-            .via(Framing.delimiter(ByteString("\n"), 1000, allowTruncation = true))
-            // Turn each line to a String and split it by commas
-            .map(_.utf8String.trim.split(",").toSeq)
-            // Now we fold it into a list
-            .toMat(Sink.fold(Seq.empty[Seq[String]])(_ :+ _))(Keep.right)
+              .via(Framing.delimiter(
+                      ByteString("\n"), 1000, allowTruncation = true))
+              // Turn each line to a String and split it by commas
+              .map(_.utf8String.trim.split(",").toSeq)
+              // Now we fold it into a list
+              .toMat(Sink.fold(Seq.empty[Seq[String]])(_ :+ _))(Keep.right)
 
           // Convert the body to a Right either
           Accumulator(sink).map(Right.apply)
         }
         //#csv
 
-        testAction(Action(csv)(req => Ok(req.body(1)(2))), FakeRequest("POST", "/").withTextBody("1,2\n3,4,foo\n5,6"))
+        testAction(Action(csv)(req => Ok(req.body(1)(2))),
+                   FakeRequest("POST", "/").withTextBody("1,2\n3,4,foo\n5,6"))
       }
-
     }
 
-    def testAction[A: Writeable](action: EssentialAction, request: => FakeRequest[A], expectedResponse: Int = OK) = {
-      assertAction(action, request, expectedResponse) { result => success }
+    def testAction[A : Writeable](action: EssentialAction,
+                                  request: => FakeRequest[A],
+                                  expectedResponse: Int = OK) = {
+      assertAction(action, request, expectedResponse) { result =>
+        success
+      }
     }
 
-    def assertAction[A: Writeable, T: AsResult](action: EssentialAction, request: => FakeRequest[A], expectedResponse: Int = OK)(assertions: Future[Result] => T) = {
+    def assertAction[A : Writeable, T : AsResult](action: EssentialAction,
+                                                  request: => FakeRequest[A],
+                                                  expectedResponse: Int = OK)(
+        assertions: Future[Result] => T) = {
       running() { app =>
         implicit val mat = ActorMaterializer()(app.actorSystem)
         val result = call(action, request)
@@ -171,24 +187,26 @@ import org.specs2.execute.AsResult
         assertions(result)
       }
     }
-
   }
 
   package scalaguide.http.scalabodyparsers.full {
 
-  import akka.util.ByteString
-  import play.api.libs.streams.Accumulator
-  import play.api.mvc._
+    import akka.util.ByteString
+    import play.api.libs.streams.Accumulator
+    import play.api.mvc._
 
     object Application extends Controller {
       def file(to: File) = parse.file(to)
       //#body-parser-combining
       val storeInUserFile = parse.using { request =>
-        request.session.get("username").map { user =>
-          file(to = new File("/tmp/" + user + ".upload"))
-        }.getOrElse {
-          sys.error("You don't have the right to upload here")
-        }
+        request.session
+          .get("username")
+          .map { user =>
+            file(to = new File("/tmp/" + user + ".upload"))
+          }
+          .getOrElse {
+            sys.error("You don't have the right to upload here")
+          }
       }
 
       def save = Action(storeInUserFile) { request =>
@@ -212,9 +230,9 @@ import org.specs2.execute.AsResult
       //#request
 
       //#body-parser
-      trait BodyParser[+A] extends (RequestHeader => Accumulator[ByteString, Either[Result, A]])
+      trait BodyParser[+A]
+          extends (RequestHeader => Accumulator[ByteString, Either[Result, A]])
       //#body-parser
     }
   }
 }
- 

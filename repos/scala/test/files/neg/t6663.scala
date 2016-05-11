@@ -13,7 +13,6 @@ object Test extends App {
   // but, before fixing SI-6663, became
   // C(42).selectDynamic("foo").get, ignoring
   // the [String] type parameter
-  var v = new C(42).foo[String].get :Int
+  var v = new C(42).foo[String].get: Int
   println(v)
 }
-

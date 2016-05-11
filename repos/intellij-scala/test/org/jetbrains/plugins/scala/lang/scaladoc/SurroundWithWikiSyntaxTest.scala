@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.lang.surroundWith.surrounders.scaladoc._
 import org.jetbrains.plugins.scala.util.ScalaToolsFactory
 
 /**
- * User: Dmitry Naydanov
- * Date: 3/12/12
- */
-
-class SurroundWithWikiSyntaxTest extends ScalaLightCodeInsightFixtureTestAdapter {
+  * User: Dmitry Naydanov
+  * Date: 3/12/12
+  */
+class SurroundWithWikiSyntaxTest
+    extends ScalaLightCodeInsightFixtureTestAdapter {
   import org.jetbrains.plugins.scala.lang.scaladoc.SurroundWithWikiSyntaxTest._
   val s = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_START
   val e = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_END
@@ -22,8 +22,14 @@ class SurroundWithWikiSyntaxTest extends ScalaLightCodeInsightFixtureTestAdapter
     val actualText = text.stripMargin.replace("\r", "")
 
     for (surrounder <- surrounders) {
-      checkAfterSurroundWith(actualText, getAssumedText(actualText,
-        surrounder.asInstanceOf[ScalaDocWithSyntaxSurrounder].getSyntaxTag), surrounder, canSurround = true)
+      checkAfterSurroundWith(
+          actualText,
+          getAssumedText(actualText,
+                         surrounder
+                           .asInstanceOf[ScalaDocWithSyntaxSurrounder]
+                           .getSyntaxTag),
+          surrounder,
+          canSurround = true)
     }
   }
 
@@ -127,8 +133,7 @@ class SurroundWithWikiSyntaxTest extends ScalaLightCodeInsightFixtureTestAdapter
   }
 
   def testCannotSurroundCrossTags() {
-    val text =
-      s"""
+    val text = s"""
          |/**
          |  * aa${s}aa__sahdkljahskdhasd
          |  * dajs${e}kjhd__kas
@@ -138,8 +143,7 @@ class SurroundWithWikiSyntaxTest extends ScalaLightCodeInsightFixtureTestAdapter
   }
 
   def testCannotSurroundMultilineWhitespace() {
-    val text =
-      s"""
+    val text = s"""
          |/**
          |  * b${s}lah blah
          |  *
@@ -150,8 +154,7 @@ class SurroundWithWikiSyntaxTest extends ScalaLightCodeInsightFixtureTestAdapter
   }
 
   def testCannotSurroundTagName() {
-    val text =
-      s"""
+    val text = s"""
          |/**
          |  * bla${s}h blah blah
          |  * @see   some${e}thing
@@ -161,8 +164,7 @@ class SurroundWithWikiSyntaxTest extends ScalaLightCodeInsightFixtureTestAdapter
   }
 
   def testCannotSurroundCrossTag2() {
-    val text =
-      s"""
+    val text = s"""
          |/**
          |  * blah${s}__blah${e}blah__
          |  */""".stripMargin.replace("\r", "")
@@ -171,8 +173,7 @@ class SurroundWithWikiSyntaxTest extends ScalaLightCodeInsightFixtureTestAdapter
   }
 
   def testCannotSurroundCrossTagWithWSAndSyntax() {
-    val text =
-      s"""
+    val text = s"""
          |/**
          |  * blah blah ${s}__blah blah
          |  *     blah bl${e}ah blah __
@@ -183,5 +184,9 @@ class SurroundWithWikiSyntaxTest extends ScalaLightCodeInsightFixtureTestAdapter
 }
 
 object SurroundWithWikiSyntaxTest {
-  val surrounders = ScalaToolsFactory.getInstance().createSurroundDescriptors().getSurroundDescriptors()(1).getSurrounders
+  val surrounders = ScalaToolsFactory
+    .getInstance()
+    .createSurroundDescriptors()
+    .getSurroundDescriptors()(1)
+    .getSurrounders
 }

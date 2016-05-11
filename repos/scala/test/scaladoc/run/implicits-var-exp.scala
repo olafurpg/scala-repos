@@ -46,11 +46,20 @@ object Test extends ScaladocModelTest {
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
-    val base = rootPackage._package("scala")._package("test")._package("scaladoc")._package("variable")._package("expansion")
+    val base = rootPackage
+      ._package("scala")
+      ._package("test")
+      ._package("scaladoc")
+      ._package("variable")
+      ._package("expansion")
     val foo = base._class("A")._method("foo")
-    assert(foo.comment.get.body.toString.contains("foo returns a collection"), "\"" + foo.comment.get.body.toString + "\".contains(\"foo returns a collection\")")
+    assert(foo.comment.get.body.toString.contains("foo returns a collection"),
+           "\"" + foo.comment.get.body.toString +
+           "\".contains(\"foo returns a collection\")")
 
     val bar = base._class("A")._method("bar")
-    assert(bar.comment.get.body.toString.contains("bar returns a result"), "\"" + bar.comment.get.body.toString + "\".contains(\"bar returns a result\")")
+    assert(bar.comment.get.body.toString.contains("bar returns a result"),
+           "\"" + bar.comment.get.body.toString +
+           "\".contains(\"bar returns a result\")")
   }
 }

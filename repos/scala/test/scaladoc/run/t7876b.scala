@@ -18,7 +18,8 @@ object Test extends ScaladocModelTest {
   def testModel(rootPackage: Package) = {
     import access._
     List("foo", "bar").foreach { name =>
-      println("foo: " + rootPackage._class("Test")._method(name).resultType.name)
+      println(
+          "foo: " + rootPackage._class("Test")._method(name).resultType.name)
     }
   }
 }

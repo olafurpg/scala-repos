@@ -43,33 +43,44 @@ import scalafx.scene.paint.{LinearGradient, Stops}
 import scalafx.scene.shape.StrokeType.Outside
 import scalafx.scene.shape.{Circle, Rectangle}
 
-
 /**
- * SimpleColorfulCircles
- */
+  * SimpleColorfulCircles
+  */
 object SimpleColorfulCircles extends JFXApp {
   var circles: Seq[Circle] = null
   stage = new PrimaryStage {
     width = 800
     height = 600
-    scene = new Scene {
-      _scene =>
+    scene = new Scene { _scene =>
       fill = Black
-      circles = for (i <- 0 until 30) yield new Circle {
-        centerX = random * 800
-        centerY = random * 600
-        radius = 150
-        fill = White opacity 0.05
-        stroke = White opacity 0.16
-        strokeWidth = 4
-        strokeType = Outside
-        effect = new BoxBlur(10, 10, 3)
-      }
+      circles = for (i <- 0 until 30) yield
+        new Circle {
+          centerX = random * 800
+          centerY = random * 600
+          radius = 150
+          fill = White opacity 0.05
+          stroke = White opacity 0.16
+          strokeWidth = 4
+          strokeType = Outside
+          effect = new BoxBlur(10, 10, 3)
+        }
       content = circles :+ new Rectangle {
         width <== _scene.width
         height <== _scene.height
-        fill = new LinearGradient(0, 1, 1, 0, true, NoCycle,
-          Stops(0xf8bd55, 0xc0fe56, 0x5dfbc1, 0x64c2f8, 0xbe4af7, 0xed5fc2, 0xef504c, 0xf2660f))
+        fill = new LinearGradient(0,
+                                  1,
+                                  1,
+                                  0,
+                                  true,
+                                  NoCycle,
+                                  Stops(0xf8bd55,
+                                        0xc0fe56,
+                                        0x5dfbc1,
+                                        0x64c2f8,
+                                        0xbe4af7,
+                                        0xed5fc2,
+                                        0xef504c,
+                                        0xf2660f))
         blendMode = Overlay
       }
     }
@@ -77,11 +88,12 @@ object SimpleColorfulCircles extends JFXApp {
   new Timeline {
     cycleCount = Indefinite
     autoReverse = true
-    keyFrames = for (circle <- circles) yield at(40 s) {
-      Set(
-        circle.centerX -> random * 800,
-        circle.centerY -> random * 600
-      )
-    }
+    keyFrames = for (circle <- circles) yield
+      at(40 s) {
+        Set(
+            circle.centerX -> random * 800,
+            circle.centerY -> random * 600
+        )
+      }
   }.play()
 }

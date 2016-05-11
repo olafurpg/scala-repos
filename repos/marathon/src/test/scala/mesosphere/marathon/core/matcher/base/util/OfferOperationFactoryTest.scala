@@ -1,13 +1,14 @@
 package mesosphere.marathon.core.matcher.base.util
 
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.state.{ PathId, PersistentVolume, PersistentVolumeInfo }
+import mesosphere.marathon.state.{PathId, PersistentVolume, PersistentVolumeInfo}
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{ MarathonSpec, MarathonTestHelper, WrongConfigurationException }
-import org.apache.mesos.{ Protos => Mesos }
-import org.scalatest.{ GivenWhenThen, Matchers }
+import mesosphere.marathon.{MarathonSpec, MarathonTestHelper, WrongConfigurationException}
+import org.apache.mesos.{Protos => Mesos}
+import org.scalatest.{GivenWhenThen, Matchers}
 
-class OfferOperationFactoryTest extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+class OfferOperationFactoryTest
+    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
 
   test("Launch operation succeeds even if principal/role are not set") {
     val f = new Fixture
@@ -32,11 +33,13 @@ class OfferOperationFactoryTest extends MarathonSpec with GivenWhenThen with Moc
 
     When("We create a reserve operation")
     val error = intercept[WrongConfigurationException] {
-      factory.reserve(f.frameworkId, Task.Id.forApp(PathId("/test")), Seq(Mesos.Resource.getDefaultInstance))
+      factory.reserve(f.frameworkId,
+                      Task.Id.forApp(PathId("/test")),
+                      Seq(Mesos.Resource.getDefaultInstance))
     }
 
     Then("A meaningful exception is thrown")
-    error.getMessage should startWith ("No principal set")
+    error.getMessage should startWith("No principal set")
   }
 
   test("Reserve operation fails when role is not set") {
@@ -47,11 +50,13 @@ class OfferOperationFactoryTest extends MarathonSpec with GivenWhenThen with Moc
 
     When("We create a reserve operation")
     val error = intercept[WrongConfigurationException] {
-      factory.reserve(f.frameworkId, Task.Id.forApp(PathId("/test")), Seq(Mesos.Resource.getDefaultInstance))
+      factory.reserve(f.frameworkId,
+                      Task.Id.forApp(PathId("/test")),
+                      Seq(Mesos.Resource.getDefaultInstance))
     }
 
     Then("A meaningful exception is thrown")
-    error.getMessage should startWith ("No role set")
+    error.getMessage should startWith("No role set")
   }
 
   test("Reserve operation succeeds") {
@@ -64,7 +69,8 @@ class OfferOperationFactoryTest extends MarathonSpec with GivenWhenThen with Moc
     val task = MarathonTestHelper.makeOneCPUTask("123")
 
     When("We create a reserve operation")
-    val operation = factory.reserve(f.frameworkId, Task.Id(task.getTaskId), task.getResourcesList.asScala)
+    val operation = factory.reserve(
+        f.frameworkId, Task.Id(task.getTaskId), task.getResourcesList.asScala)
 
     Then("The operation is as expected")
     operation.getType shouldEqual Mesos.Offer.Operation.Type.RESERVE
@@ -90,7 +96,8 @@ class OfferOperationFactoryTest extends MarathonSpec with GivenWhenThen with Moc
     val volumes = Seq(f.localVolume("mount"))
 
     When("We create a reserve operation")
-    val operation = factory.createVolumes(f.frameworkId, Task.Id(task.getTaskId), volumes)
+    val operation =
+      factory.createVolumes(f.frameworkId, Task.Id(task.getTaskId), volumes)
 
     Then("The operation is as expected")
     operation.getType shouldEqual Mesos.Offer.Operation.Type.CREATE
@@ -121,10 +128,9 @@ class OfferOperationFactoryTest extends MarathonSpec with GivenWhenThen with Moc
 
     def localVolume(containerPath: String): Task.LocalVolume = {
       val appId = PathId("/my-app")
-      val pv = PersistentVolume(
-        containerPath = containerPath,
-        persistent = PersistentVolumeInfo(size = 10),
-        mode = Mesos.Volume.Mode.RW)
+      val pv = PersistentVolume(containerPath = containerPath,
+                                persistent = PersistentVolumeInfo(size = 10),
+                                mode = Mesos.Volume.Mode.RW)
       Task.LocalVolume(Task.LocalVolumeId(appId, pv), pv)
     }
   }

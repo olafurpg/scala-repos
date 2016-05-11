@@ -6,19 +6,21 @@ package play.api.libs.ws.ahc
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import org.asynchttpclient.AsyncHandler.State
-import org.asynchttpclient.{ AsyncHttpClient, HttpResponseBodyPart, HttpResponseHeaders, HttpResponseStatus, Request }
+import org.asynchttpclient.{AsyncHttpClient, HttpResponseBodyPart, HttpResponseHeaders, HttpResponseStatus, Request}
 import org.asynchttpclient.handler.StreamedAsyncHandler
-import org.reactivestreams.{ Publisher, Subscriber, Subscription }
+import org.reactivestreams.{Publisher, Subscriber, Subscription}
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.streams.Streams
-import play.api.libs.ws.{ DefaultWSResponseHeaders, StreamedResponse, WSResponseHeaders }
+import play.api.libs.ws.{DefaultWSResponseHeaders, StreamedResponse, WSResponseHeaders}
 
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
 
 private[play] object Streamed {
 
-  def execute(client: AsyncHttpClient, request: Request): Future[StreamedResponse] = {
-    val promise = Promise[(WSResponseHeaders, Publisher[HttpResponseBodyPart])]()
+  def execute(
+      client: AsyncHttpClient, request: Request): Future[StreamedResponse] = {
+    val promise =
+      Promise[(WSResponseHeaders, Publisher[HttpResponseBodyPart])]()
     client.executeRequest(request, new DefaultStreamedAsyncHandler(promise))
     import play.api.libs.iteratee.Execution.Implicits.trampoline
     promise.future.map {
@@ -27,7 +29,9 @@ private[play] object Streamed {
         // a reactive-streams `Publisher` needs to be returned to implement `execute2`. Though, 
         // once `execute2` is removed, we should move the code here inside 
         // `DefaultStreamedAsyncHandler.onCompleted`.
-        val source = Source.fromPublisher(publisher).map(bodyPart => ByteString(bodyPart.getBodyPartBytes))
+        val source = Source
+          .fromPublisher(publisher)
+          .map(bodyPart => ByteString(bodyPart.getBodyPartBytes))
         StreamedResponse(headers, source)
     }
   }
@@ -39,18 +43,24 @@ private[play] object Streamed {
   // `DefaultStreamedAsyncHandler`' constructor parameter's type to the latter.
   // This method is `deprecated` because we should remember to remove it together with `AhcWSRequest.streamWithEnumerator`.
   @deprecated("2.5", "Use `execute()` instead.")
-  def execute2(client: AsyncHttpClient, request: Request): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = {
-    val promise = Promise[(WSResponseHeaders, Publisher[HttpResponseBodyPart])]()
+  def execute2(client: AsyncHttpClient, request: Request)
+    : Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = {
+    val promise =
+      Promise[(WSResponseHeaders, Publisher[HttpResponseBodyPart])]()
     client.executeRequest(request, new DefaultStreamedAsyncHandler(promise))
     import play.api.libs.iteratee.Execution.Implicits.trampoline
     promise.future.map {
       case (headers, publisher) =>
-        val enumerator = Streams.publisherToEnumerator(publisher).map(_.getBodyPartBytes)
-        (headers, enumerator)
+        val enumerator = Streams
+          .publisherToEnumerator(publisher)
+          .map(_.getBodyPartBytes)
+          (headers, enumerator)
     }
   }
 
-  private class DefaultStreamedAsyncHandler(promise: Promise[(WSResponseHeaders, Publisher[HttpResponseBodyPart])]) extends StreamedAsyncHandler[Unit] {
+  private class DefaultStreamedAsyncHandler(
+      promise: Promise[(WSResponseHeaders, Publisher[HttpResponseBodyPart])])
+      extends StreamedAsyncHandler[Unit] {
     private var statusCode: Int = _
     private var responseHeaders: WSResponseHeaders = _
     private var publisher: Publisher[HttpResponseBodyPart] = _
@@ -76,7 +86,8 @@ private[play] object Streamed {
       if (this.publisher != null) State.ABORT
       else {
         val headers = h.getHeaders
-        responseHeaders = DefaultWSResponseHeaders(statusCode, AhcWSRequest.ahcHeadersToMap(headers))
+        responseHeaders = DefaultWSResponseHeaders(
+            statusCode, AhcWSRequest.ahcHeadersToMap(headers))
         State.CONTINUE
       }
     }
@@ -95,7 +106,8 @@ private[play] object Streamed {
 
   private case object EmptyPublisher extends Publisher[HttpResponseBodyPart] {
     def subscribe(s: Subscriber[_ >: HttpResponseBodyPart]): Unit = {
-      if (s eq null) throw new NullPointerException("Subscriber must not be null, rule 1.9")
+      if (s eq null)
+        throw new NullPointerException("Subscriber must not be null, rule 1.9")
       s.onSubscribe(CancelledSubscription)
       s.onComplete()
     }

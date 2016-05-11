@@ -35,51 +35,52 @@ object RecoverJson {
   case object Quote extends Balanced
   case object EscapeChar extends Balanced
 
-  @tailrec private def findEndString(buffers: Vector[CharBuffer], bufferIndex: Int, offset: Int): Option[(Int, Int)] = {
-    if (bufferIndex >= buffers.length)
-      None
+  @tailrec private def findEndString(buffers: Vector[CharBuffer],
+                                     bufferIndex: Int,
+                                     offset: Int): Option[(Int, Int)] = {
+    if (bufferIndex >= buffers.length) None
     else if (offset >= buffers(bufferIndex).limit)
-      findEndString(buffers, bufferIndex + 1, offset % buffers(bufferIndex).limit)
+      findEndString(
+          buffers, bufferIndex + 1, offset % buffers(bufferIndex).limit)
     else {
       val char = buffers(bufferIndex).get(offset)
 
-      if (char == '"')
-        Some((bufferIndex, offset))
-      else if (char == '\\')
-        findEndString(buffers, bufferIndex, offset + 2)
-      else
-        findEndString(buffers, bufferIndex, offset + 1)
+      if (char == '"') Some((bufferIndex, offset))
+      else if (char == '\\') findEndString(buffers, bufferIndex, offset + 2)
+      else findEndString(buffers, bufferIndex, offset + 1)
     }
   }
 
-  private case class BalancedStackState(bufferIndex: Int, offset: Int, stack: Stack[Balanced]) {
+  private case class BalancedStackState(
+      bufferIndex: Int, offset: Int, stack: Stack[Balanced]) {
     def increment(balanced: Balanced) = BalancedStackState(
-      bufferIndex,
-      offset + 1,
-      stack push balanced
+        bufferIndex,
+        offset + 1,
+        stack push balanced
     )
     def decrement = BalancedStackState(
-      bufferIndex,
-      offset + 1,
-      stack pop
+        bufferIndex,
+        offset + 1,
+        stack pop
     )
     def skip = BalancedStackState(
-      bufferIndex,
-      offset + 1,
-      stack
+        bufferIndex,
+        offset + 1,
+        stack
     )
   }
 
   private def balancedStack(buffers: Vector[CharBuffer]) = {
-    @tailrec @inline def buildState(accum: BalancedStackState): BalancedStackState =
-      if (accum.bufferIndex >= buffers.length)
-        accum
+    @tailrec
+    @inline def buildState(accum: BalancedStackState): BalancedStackState =
+      if (accum.bufferIndex >= buffers.length) accum
       else if (accum.offset >= buffers(accum.bufferIndex).limit)
-        buildState(BalancedStackState(
-          accum.bufferIndex + 1,
-          accum.offset % buffers(accum.bufferIndex).limit,
-          accum.stack
-        ))
+        buildState(
+            BalancedStackState(
+                accum.bufferIndex + 1,
+                accum.offset % buffers(accum.bufferIndex).limit,
+                accum.stack
+            ))
       else {
         val buffer = buffers(accum.bufferIndex)
         var char = buffer.get(accum.offset)
@@ -111,22 +112,25 @@ object RecoverJson {
               case _ => accum
             }
 
-            buildState(findEndString(buffers, next.bufferIndex, next.offset + 1) map { case (bufferIndex, offset) =>
-              // Jump over the string
-              BalancedStackState(
-                bufferIndex,
-                offset + 1,
-                next.stack
-              )
+            buildState(
+                findEndString(buffers, next.bufferIndex, next.offset + 1) map {
+              case (bufferIndex, offset) =>
+                // Jump over the string
+                BalancedStackState(
+                    bufferIndex,
+                    offset + 1,
+                    next.stack
+                )
             } getOrElse {
               // String didn't end
               val lastBuffer = buffers(buffers.length - 1)
               val lastCharacter = lastBuffer.get(lastBuffer.length - 1)
               val quoted = next.stack push Quote
               BalancedStackState(
-                buffers.length,
-                0,
-                if (lastCharacter == '\\') quoted push EscapeChar else quoted
+                  buffers.length,
+                  0,
+                  if (lastCharacter == '\\') quoted push EscapeChar
+                  else quoted
               )
             })
 
@@ -157,9 +161,11 @@ object RecoverJson {
     // ,null <- 5
     val lastChar = buffers.last.get(buffers.last.length - 1)
     val needsComma = lastChar != ',' || stringStack.size > 1
-    val closerBuffer = CharBuffer.allocate(stringStack.map(_.length).sum + 4 + (if (needsComma) 1 else 0))
+    val closerBuffer = CharBuffer.allocate(
+        stringStack.map(_.length).sum + 4 + (if (needsComma) 1 else 0))
 
-    @tailrec def addToCloserBuffer(s: Stack[String]) {
+    @tailrec
+    def addToCloserBuffer(s: Stack[String]) {
       if (s.length == 1) {
         // Last element should always be a Bracket (']')
         // Put the blank element before end of array

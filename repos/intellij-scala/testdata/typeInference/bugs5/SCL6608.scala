@@ -9,6 +9,7 @@ object SCL6608 {
   trait Update
   private object Peer extends Model[Update]
 
-  def addListener(pf: Model.Listener[Update]): pf.type = /*start*/Peer.addListener(pf)/*end*/
+  def addListener(pf: Model.Listener[Update]): pf.type =
+    /*start*/ Peer.addListener(pf) /*end*/
 }
 //pf.type

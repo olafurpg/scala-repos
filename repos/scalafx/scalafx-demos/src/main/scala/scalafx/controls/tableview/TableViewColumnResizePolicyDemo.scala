@@ -37,12 +37,12 @@ import scalafx.scene.control.{Label, TableColumn, TableView}
 import scalafx.scene.layout.VBox
 
 /**
- * Demonstrates difference between [[scalafx.scene.control.TableView#UnconstrainedResizePolicy UnconstrainedResizePolicy]]
- * and [[scalafx.scene.control.TableView#ConstrainedResizePolicy ConstrainedResizePolicy]] in
- * [[scalafx.scene.control.TableView TableView]].
- *
- * Based on JavaFX example from [[https://gist.github.com/SaiPradeepDandem/1581600]].
- */
+  * Demonstrates difference between [[scalafx.scene.control.TableView#UnconstrainedResizePolicy UnconstrainedResizePolicy]]
+  * and [[scalafx.scene.control.TableView#ConstrainedResizePolicy ConstrainedResizePolicy]] in
+  * [[scalafx.scene.control.TableView TableView]].
+  *
+  * Based on JavaFX example from [[https://gist.github.com/SaiPradeepDandem/1581600]].
+  */
 object TableViewColumnResizePolicyDemo extends JFXApp {
 
   private val box = new VBox {
@@ -59,12 +59,11 @@ object TableViewColumnResizePolicyDemo extends JFXApp {
 
   configureTable(box)
 
-
   private def configureTable(root: VBox): Unit = {
     val data = ObservableBuffer(
-      new MyDomain("Apple", "This is a fruit.", "Red"),
-      new MyDomain("Orange", "This is also a fruit.", "Orange"),
-      new MyDomain("Potato", "This is a vegetable.", "Brown")
+        new MyDomain("Apple", "This is a fruit.", "Red"),
+        new MyDomain("Orange", "This is also a fruit.", "Orange"),
+        new MyDomain("Potato", "This is a vegetable.", "Brown")
     )
 
     val table1 = createTableView(data)
@@ -74,37 +73,36 @@ object TableViewColumnResizePolicyDemo extends JFXApp {
     table2.columnResizePolicy = TableView.UnconstrainedResizePolicy
 
     root.children = Seq(
-      new Label("Constrained Resize Policy") {
-        style = "-fx-font-weight:bold;"
-      },
-      table1,
-      new Label("Unconstrained Resize Policy") {
-        style = "-fx-font-weight:bold;"
-      },
-      table2
+        new Label("Constrained Resize Policy") {
+          style = "-fx-font-weight:bold;"
+        },
+        table1,
+        new Label("Unconstrained Resize Policy") {
+          style = "-fx-font-weight:bold;"
+        },
+        table2
     )
-
-
   }
 
-  private def createTableView(data: ObservableBuffer[MyDomain]): TableView[MyDomain] = {
+  private def createTableView(
+      data: ObservableBuffer[MyDomain]): TableView[MyDomain] = {
     val table = new TableView[MyDomain] {
       columns ++= Seq(
-        new TableColumn[MyDomain, String] {
-          text = "Title"
-          prefWidth = 100
-          cellValueFactory = {_.value.name}
-        }.delegate,
-        new TableColumn[MyDomain, String] {
-          text = "Description"
-          prefWidth = 250
-          cellValueFactory = {_.value.description}
-        }.delegate,
-        new TableColumn[MyDomain, String] {
-          text = "Color"
-          prefWidth = 100
-          cellValueFactory = {_.value.color}
-        }.delegate
+          new TableColumn[MyDomain, String] {
+            text = "Title"
+            prefWidth = 100
+            cellValueFactory = { _.value.name }
+          }.delegate,
+          new TableColumn[MyDomain, String] {
+            text = "Description"
+            prefWidth = 250
+            cellValueFactory = { _.value.description }
+          }.delegate,
+          new TableColumn[MyDomain, String] {
+            text = "Color"
+            prefWidth = 100
+            cellValueFactory = { _.value.color }
+          }.delegate
       )
       items = data
     }

@@ -31,20 +31,23 @@ import org.apache.spark.sql.types.{DoubleType, StructType}
 import org.apache.spark.util.random.XORShiftRandom
 
 /**
- * Params for [[QuantileDiscretizer]].
- */
-private[feature] trait QuantileDiscretizerBase extends Params
-  with HasInputCol with HasOutputCol with HasSeed {
+  * Params for [[QuantileDiscretizer]].
+  */
+private[feature] trait QuantileDiscretizerBase
+    extends Params with HasInputCol with HasOutputCol with HasSeed {
 
   /**
-   * Maximum number of buckets (quantiles, or categories) into which data points are grouped. Must
-   * be >= 2.
-   * default: 2
-   * @group param
-   */
-  val numBuckets = new IntParam(this, "numBuckets", "Maximum number of buckets (quantiles, or " +
-    "categories) into which data points are grouped. Must be >= 2.",
-    ParamValidators.gtEq(2))
+    * Maximum number of buckets (quantiles, or categories) into which data points are grouped. Must
+    * be >= 2.
+    * default: 2
+    * @group param
+    */
+  val numBuckets = new IntParam(
+      this,
+      "numBuckets",
+      "Maximum number of buckets (quantiles, or " +
+      "categories) into which data points are grouped. Must be >= 2.",
+      ParamValidators.gtEq(2))
   setDefault(numBuckets -> 2)
 
   /** @group getParam */
@@ -52,16 +55,17 @@ private[feature] trait QuantileDiscretizerBase extends Params
 }
 
 /**
- * :: Experimental ::
- * `QuantileDiscretizer` takes a column with continuous features and outputs a column with binned
- * categorical features. The bin ranges are chosen by taking a sample of the data and dividing it
- * into roughly equal parts. The lower and upper bin bounds will be -Infinity and +Infinity,
- * covering all real values. This attempts to find numBuckets partitions based on a sample of data,
- * but it may find fewer depending on the data sample values.
- */
+  * :: Experimental ::
+  * `QuantileDiscretizer` takes a column with continuous features and outputs a column with binned
+  * categorical features. The bin ranges are chosen by taking a sample of the data and dividing it
+  * into roughly equal parts. The lower and upper bin bounds will be -Infinity and +Infinity,
+  * covering all real values. This attempts to find numBuckets partitions based on a sample of data,
+  * but it may find fewer depending on the data sample values.
+  */
 @Experimental
 final class QuantileDiscretizer(override val uid: String)
-  extends Estimator[Bucketizer] with QuantileDiscretizerBase with DefaultParamsWritable {
+    extends Estimator[Bucketizer] with QuantileDiscretizerBase
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("quantileDiscretizer"))
 
@@ -81,7 +85,7 @@ final class QuantileDiscretizer(override val uid: String)
     SchemaUtils.checkColumnType(schema, $(inputCol), DoubleType)
     val inputFields = schema.fields
     require(inputFields.forall(_.name != $(outputCol)),
-      s"Output column ${$(outputCol)} already exists.")
+            s"Output column ${$(outputCol)} already exists.")
     val attr = NominalAttribute.defaultAttr.withName($(outputCol))
     val outputFields = inputFields :+ attr.toStructField()
     StructType(outputFields)
@@ -91,7 +95,8 @@ final class QuantileDiscretizer(override val uid: String)
     val samples = QuantileDiscretizer
       .getSampledInput(dataset.select($(inputCol)), $(numBuckets), $(seed))
       .map { case Row(feature: Double) => feature }
-    val candidates = QuantileDiscretizer.findSplitCandidates(samples, $(numBuckets) - 1)
+    val candidates =
+      QuantileDiscretizer.findSplitCandidates(samples, $(numBuckets) - 1)
     val splits = QuantileDiscretizer.getSplits(candidates)
     val bucketizer = new Bucketizer(uid).setSplits(splits)
     copyValues(bucketizer.setParent(this))
@@ -101,35 +106,43 @@ final class QuantileDiscretizer(override val uid: String)
 }
 
 @Since("1.6.0")
-object QuantileDiscretizer extends DefaultParamsReadable[QuantileDiscretizer] with Logging {
+object QuantileDiscretizer
+    extends DefaultParamsReadable[QuantileDiscretizer] with Logging {
 
   /**
-   * Minimum number of samples required for finding splits, regardless of number of bins.  If
-   * the dataset has fewer rows than this value, the entire dataset will be used.
-   */
+    * Minimum number of samples required for finding splits, regardless of number of bins.  If
+    * the dataset has fewer rows than this value, the entire dataset will be used.
+    */
   private[spark] val minSamplesRequired: Int = 10000
 
   /**
-   * Sampling from the given dataset to collect quantile statistics.
-   */
-  private[feature] def getSampledInput(dataset: DataFrame, numBins: Int, seed: Long): Array[Row] = {
+    * Sampling from the given dataset to collect quantile statistics.
+    */
+  private[feature] def getSampledInput(
+      dataset: DataFrame, numBins: Int, seed: Long): Array[Row] = {
     val totalSamples = dataset.count()
-    require(totalSamples > 0,
-      "QuantileDiscretizer requires non-empty input dataset but was given an empty input.")
+    require(
+        totalSamples > 0,
+        "QuantileDiscretizer requires non-empty input dataset but was given an empty input.")
     val requiredSamples = math.max(numBins * numBins, minSamplesRequired)
     val fraction = math.min(requiredSamples.toDouble / totalSamples, 1.0)
-    dataset.sample(withReplacement = false, fraction, new XORShiftRandom(seed).nextInt()).collect()
+    dataset
+      .sample(withReplacement = false,
+              fraction,
+              new XORShiftRandom(seed).nextInt())
+      .collect()
   }
 
   /**
-   * Compute split points with respect to the sample distribution.
-   */
-  private[feature]
-  def findSplitCandidates(samples: Array[Double], numSplits: Int): Array[Double] = {
+    * Compute split points with respect to the sample distribution.
+    */
+  private[feature] def findSplitCandidates(
+      samples: Array[Double], numSplits: Int): Array[Double] = {
     val valueCountMap = samples.foldLeft(Map.empty[Double, Int]) { (m, x) =>
       m + ((x, m.getOrElse(x, 0) + 1))
     }
-    val valueCounts = valueCountMap.toSeq.sortBy(_._1).toArray ++ Array((Double.MaxValue, 1))
+    val valueCounts =
+      valueCountMap.toSeq.sortBy(_._1).toArray ++ Array((Double.MaxValue, 1))
     val possibleSplits = valueCounts.length - 1
     if (possibleSplits <= numSplits) {
       valueCounts.dropRight(1).map(_._1)
@@ -161,29 +174,31 @@ object QuantileDiscretizer extends DefaultParamsReadable[QuantileDiscretizer] wi
   }
 
   /**
-   * Adjust split candidates to proper splits by: adding positive/negative infinity to both sides as
-   * needed, and adding a default split value of 0 if no good candidates are found.
-   */
+    * Adjust split candidates to proper splits by: adding positive/negative infinity to both sides as
+    * needed, and adding a default split value of 0 if no good candidates are found.
+    */
   private[feature] def getSplits(candidates: Array[Double]): Array[Double] = {
-    val effectiveValues = if (candidates.nonEmpty) {
-      if (candidates.head == Double.NegativeInfinity
-        && candidates.last == Double.PositiveInfinity) {
-        candidates.drop(1).dropRight(1)
-      } else if (candidates.head == Double.NegativeInfinity) {
-        candidates.drop(1)
-      } else if (candidates.last == Double.PositiveInfinity) {
-        candidates.dropRight(1)
+    val effectiveValues =
+      if (candidates.nonEmpty) {
+        if (candidates.head == Double.NegativeInfinity &&
+            candidates.last == Double.PositiveInfinity) {
+          candidates.drop(1).dropRight(1)
+        } else if (candidates.head == Double.NegativeInfinity) {
+          candidates.drop(1)
+        } else if (candidates.last == Double.PositiveInfinity) {
+          candidates.dropRight(1)
+        } else {
+          candidates
+        }
       } else {
         candidates
       }
-    } else {
-      candidates
-    }
 
     if (effectiveValues.isEmpty) {
       Array(Double.NegativeInfinity, 0, Double.PositiveInfinity)
     } else {
-      Array(Double.NegativeInfinity) ++ effectiveValues ++ Array(Double.PositiveInfinity)
+      Array(Double.NegativeInfinity) ++ effectiveValues ++ Array(
+          Double.PositiveInfinity)
     }
   }
 

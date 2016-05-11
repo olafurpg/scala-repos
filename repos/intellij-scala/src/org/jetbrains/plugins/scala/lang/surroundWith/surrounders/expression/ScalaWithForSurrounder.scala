@@ -5,10 +5,9 @@ package surrounders
 package expression
 
 /**
-* @author Alexander.Podkhalyuzin
-* Date: 28.04.2008
-*/
-
+  * @author Alexander.Podkhalyuzin
+  * Date: 28.04.2008
+  */
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -23,10 +22,11 @@ class ScalaWithForSurrounder extends ScalaExpressionSurrounder {
 
   override def getSurroundSelectionRange(withForNode: ASTNode): TextRange = {
     val element: PsiElement = withForNode.getPsi match {
-      case x: ScParenthesisedExpr => x.expr match {
-        case Some(y) => y
-        case _ => return x.getTextRange
-      }
+      case x: ScParenthesisedExpr =>
+        x.expr match {
+          case Some(y) => y
+          case _ => return x.getTextRange
+        }
       case x => x
     }
     val forStmt = element.asInstanceOf[ScForStatement]

@@ -35,12 +35,13 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * CheckBoxListCell Spec tests.
- *
- *
- */
+  * CheckBoxListCell Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class CheckBoxListCellSpec[T]
-  extends SimpleSFXDelegateSpec[jfxscc.CheckBoxListCell[T], CheckBoxListCell[T]](
-    classOf[jfxscc.CheckBoxListCell[T]], classOf[CheckBoxListCell[T]])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[
+        jfxscc.CheckBoxListCell[T], CheckBoxListCell[T]](
+        classOf[jfxscc.CheckBoxListCell[T]], classOf[CheckBoxListCell[T]])
+    with RunOnApplicationThread

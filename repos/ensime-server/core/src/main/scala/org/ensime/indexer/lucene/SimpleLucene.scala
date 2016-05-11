@@ -22,24 +22,25 @@ object SimpleLucene {
 }
 
 /**
- * Lightweight convenience wrapper over Lucene that does some sanity
- * checking, sets up per-field `Analyzer`s and gives access to
- * CRUD-like operations. Callers are expected to perform their own
- * marshalling and unmarshalling for Lucene's `Query` and `Document`
- * types.
- *
- * This class is thread safe. Only one instance is allowed **on the
- * operating system** (not just the JVM) for the same path. Lucene
- * manages a file lock to mitigate the risk of this happening.
- *
- * Technical note: Lucene is an excellent INDEX store, but is not
- * a database. Prefer using the DatabaseProvider where possible
- * and only fall back to using the index when SQL doesn't cut it.
- * Excellent examples of using an index are for creating multiple
- * representations of the same column, or for allowing allow/deny
- * filtering rules based on tags.
- */
-class SimpleLucene(path: File, analyzers: Map[String, Analyzer]) extends SLF4JLogging {
+  * Lightweight convenience wrapper over Lucene that does some sanity
+  * checking, sets up per-field `Analyzer`s and gives access to
+  * CRUD-like operations. Callers are expected to perform their own
+  * marshalling and unmarshalling for Lucene's `Query` and `Document`
+  * types.
+  *
+  * This class is thread safe. Only one instance is allowed **on the
+  * operating system** (not just the JVM) for the same path. Lucene
+  * manages a file lock to mitigate the risk of this happening.
+  *
+  * Technical note: Lucene is an excellent INDEX store, but is not
+  * a database. Prefer using the DatabaseProvider where possible
+  * and only fall back to using the index when SQL doesn't cut it.
+  * Excellent examples of using an index are for creating multiple
+  * representations of the same column, or for allowing allow/deny
+  * filtering rules based on tags.
+  */
+class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
+    extends SLF4JLogging {
   import org.ensime.indexer.lucene.SimpleLucene._
 
   path.mkdirs()
@@ -49,15 +50,16 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer]) extends SLF4JLo
 
   // our fallback analyzer
   class LowercaseAnalyzer extends Analyzer {
-    override protected def createComponents(fieldName: String, reader: Reader) = {
+    override protected def createComponents(
+        fieldName: String, reader: Reader) = {
       val source = new KeywordTokenizer(reader)
       val filtered = new LowerCaseFilter(SimpleLucene.LuceneVersion, source)
       new Analyzer.TokenStreamComponents(source, filtered)
     }
   }
   private val analyzer = new PerFieldAnalyzerWrapper(
-    new LowercaseAnalyzer,
-    analyzers.asJava
+      new LowercaseAnalyzer,
+      analyzers.asJava
   )
   private val config = new IndexWriterConfig(LuceneVersion, analyzer)
   //  config.setRAMBufferSizeMB(512)
@@ -101,15 +103,17 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer]) extends SLF4JLo
   }
 
   /**
-   * Lucene does not offer an out-of-the-box UPDATE, so we have to
-   * manually DELETE then CREATE, which is problematic because Lucene
-   * DELETE can be extremely slow (plus this is not atomic).
-   *
-   * It is a **lot** more efficient to do this in batch: expect
-   * 10,000 deletes to take about 1 second and inserts about 100ms.
-   * Each call to this method constitutes a batch UPDATE operation.
-   */
-  def update(delete: Seq[Query], create: Seq[Document], commit: Boolean = true): Unit = this.synchronized {
+    * Lucene does not offer an out-of-the-box UPDATE, so we have to
+    * manually DELETE then CREATE, which is problematic because Lucene
+    * DELETE can be extremely slow (plus this is not atomic).
+    *
+    * It is a **lot** more efficient to do this in batch: expect
+    * 10,000 deletes to take about 1 second and inserts about 100ms.
+    * Each call to this method constitutes a batch UPDATE operation.
+    */
+  def update(delete: Seq[Query],
+             create: Seq[Document],
+             commit: Boolean = true): Unit = this.synchronized {
     // Lucene 4.7.2 concurrency bugs: best to synchronise writes
     // https://issues.apache.org/jira/browse/LUCENE-5923
 
@@ -126,10 +130,11 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer]) extends SLF4JLo
     }
   }
 
-  def create(docs: Seq[Document], commit: Boolean = true): Unit = update(Nil, docs, commit)
-  def delete(queries: Seq[Query], commit: Boolean = true): Unit = update(queries, Nil, commit)
+  def create(docs: Seq[Document], commit: Boolean = true): Unit =
+    update(Nil, docs, commit)
+  def delete(queries: Seq[Query], commit: Boolean = true): Unit =
+    update(queries, Nil, commit)
 
   // for manual committing after multiple insertions
   def commit(): Unit = writer.commit()
-
 }

@@ -17,23 +17,29 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScValueStub
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext}
 
 /**
- * @author Alexander Podkhalyuzin
- * Date: 22.02.2008
- * Time: 9:55:28
- */
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  * Time: 9:55:28
+  */
+class ScValueDeclarationImpl private (
+    stub: StubElement[ScValue], nodeType: IElementType, node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScValueDeclaration {
+  def this(node: ASTNode) = { this(null, null, node) }
 
-class ScValueDeclarationImpl private (stub: StubElement[ScValue], nodeType: IElementType, node: ASTNode)
-  extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScValueDeclaration {
-  def this(node: ASTNode) = {this(null, null, node)}
+  def this(stub: ScValueStub) = {
+    this(stub, ScalaElementTypes.VALUE_DECLARATION, null)
+  }
 
-  def this(stub: ScValueStub) = {this(stub, ScalaElementTypes.VALUE_DECLARATION, null)}
-
-  override def toString: String = "ScValueDeclaration: " + declaredElements.map(_.name).mkString(", ")
+  override def toString: String =
+    "ScValueDeclaration: " + declaredElements.map(_.name).mkString(", ")
 
   def declaredElements = getIdList.fieldIds
 
   override def getType(ctx: TypingContext) = typeElement match {
-    case None => Failure(ScalaBundle.message("no.type.element.found", getText), Some(this))
+    case None =>
+      Failure(
+          ScalaBundle.message("no.type.element.found", getText), Some(this))
     case Some(te) => te.getType(ctx)
   }
 
@@ -41,14 +47,16 @@ class ScValueDeclarationImpl private (stub: StubElement[ScValue], nodeType: IEle
     val stub = getStub
     if (stub != null) {
       stub.asInstanceOf[ScValueStub].getTypeElement
-    }
-    else findChild(classOf[ScTypeElement])
+    } else findChild(classOf[ScTypeElement])
   }
 
   def getIdList: ScIdList = {
     val stub = getStub
     if (stub != null) {
-      stub.getChildrenByType(ScalaElementTypes.IDENTIFIER_LIST, JavaArrayFactoryUtil.ScIdListFactory).apply(0)
+      stub
+        .getChildrenByType(ScalaElementTypes.IDENTIFIER_LIST,
+                           JavaArrayFactoryUtil.ScIdListFactory)
+        .apply(0)
     } else findChildByClass(classOf[ScIdList])
   }
 

@@ -26,7 +26,8 @@ import scalaz._
 import scalaz.syntax.monad._
 
 object TerminateJson {
-  final class ArrayStack[@specialized(Int) A: Manifest](initCapacity: Int = 128) {
+  final class ArrayStack[@specialized(Int) A : Manifest](
+      initCapacity: Int = 128) {
     private[bifrost] var stack = new Array[A](initCapacity)
     private[bifrost] var next: Int = 0
 
@@ -45,7 +46,8 @@ object TerminateJson {
 
     def head: A = {
       if (next == 0)
-        throw new IllegalStateException("Cannot pop element off of empty stack.")
+        throw new IllegalStateException(
+            "Cannot pop element off of empty stack.")
       stack(next - 1)
     }
 
@@ -57,7 +59,8 @@ object TerminateJson {
 
     def pop(): A = {
       if (next == 0)
-        throw new IllegalStateException("Cannot pop element off of empty stack.")
+        throw new IllegalStateException(
+            "Cannot pop element off of empty stack.")
       next -= 1
       stack(next)
     }
@@ -77,16 +80,18 @@ object TerminateJson {
   @inline private final val CloseObject = 6
 
   /**
-   * Ensures the successful termination of a stream of JSON. This assumes quite
-   * a bit. First, aside from the fact that it may end abruptly, it assumes the
-   * JSON is valid. Using this on invalid JSON will produce unexpected results.
-   * Next, it assumes that all numeric, null and boolean values are produced in
-   * their entirety or not at all. Lastly, it assumes that there should be at
-   * least 1 value in the stream. If the stream is empty, then `null` will be
-   * inserted.
-   */
-  def ensure[M[+_]: Monad](stream0: StreamT[M, CharBuffer]): StreamT[M, CharBuffer] = {
-    def build(stack0: ArrayStack[Int], buf: CharBuffer): (ArrayStack[Int], CharBuffer) = {
+    * Ensures the successful termination of a stream of JSON. This assumes quite
+    * a bit. First, aside from the fact that it may end abruptly, it assumes the
+    * JSON is valid. Using this on invalid JSON will produce unexpected results.
+    * Next, it assumes that all numeric, null and boolean values are produced in
+    * their entirety or not at all. Lastly, it assumes that there should be at
+    * least 1 value in the stream. If the stream is empty, then `null` will be
+    * inserted.
+    */
+  def ensure[M[+ _]: Monad](
+      stream0: StreamT[M, CharBuffer]): StreamT[M, CharBuffer] = {
+    def build(stack0: ArrayStack[Int],
+              buf: CharBuffer): (ArrayStack[Int], CharBuffer) = {
       val stack = stack0.copy()
 
       while (buf.remaining() > 0) {
@@ -144,25 +149,29 @@ object TerminateJson {
     }
 
     def terminal(stack: ArrayStack[Int]): Option[CharBuffer] = {
-      if (stack.isEmpty) None else Some({
-        val sb = new StringBuilder()
-        while (stack.nonEmpty) {
-          sb ++= (stack.pop() match {
-            case ExpectValue => "null"
-            case ExpectField => "\"\":null"
-            case SkipChar => "\""
-            case FieldDelim => ":"
-            case CloseString => "\""
-            case CloseArray => "]"
-            case CloseObject => "}"
-            case _ => sys.error("Unreachable.")
-          })
-        }
-        CharBuffer.wrap(sb.toString)
-      })
+      if (stack.isEmpty) None
+      else
+        Some({
+          val sb = new StringBuilder()
+          while (stack.nonEmpty) {
+            sb ++=
+            (stack.pop() match {
+                  case ExpectValue => "null"
+                  case ExpectField => "\"\":null"
+                  case SkipChar => "\""
+                  case FieldDelim => ":"
+                  case CloseString => "\""
+                  case CloseArray => "]"
+                  case CloseObject => "}"
+                  case _ => sys.error("Unreachable.")
+                })
+          }
+          CharBuffer.wrap(sb.toString)
+        })
     }
 
-    def rec(stack0: ArrayStack[Int], stream: StreamT[M, CharBuffer]): StreamT[M, CharBuffer] = {
+    def rec(stack0: ArrayStack[Int],
+            stream: StreamT[M, CharBuffer]): StreamT[M, CharBuffer] = {
       StreamT(stream.uncons map {
         case Some((buf0, tail)) =>
           val (stack, buf) = build(stack0, buf0)
@@ -179,5 +188,3 @@ object TerminateJson {
     rec(init, stream0)
   }
 }
-
-

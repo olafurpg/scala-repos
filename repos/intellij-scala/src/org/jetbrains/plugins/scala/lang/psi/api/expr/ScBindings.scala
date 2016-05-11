@@ -5,10 +5,7 @@ package api
 package expr
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 07.03.2008
-*/
-
-trait ScBindings {
-
-}
+  * @author Alexander Podkhalyuzin
+  * Date: 07.03.2008
+  */
+trait ScBindings {}

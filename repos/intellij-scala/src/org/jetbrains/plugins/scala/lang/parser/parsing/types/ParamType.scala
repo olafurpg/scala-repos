@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils._
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 08.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 08.02.2008
+  */
 /*
  * ParamType ::= Type |
  *               '=>' Type |
@@ -26,7 +25,8 @@ object ParamType {
         builder.advanceLexer() //Ate '=>'
         Type.parse(builder)
       case _ =>
-        if (!Type.parse(builder, star = true)) false else {
+        if (!Type.parse(builder, star = true)) false
+        else {
           builder.getTokenText match {
             case "*" => builder.advanceLexer() // Ate '*'
             case _ => /* nothing needs to be done */
@@ -36,5 +36,6 @@ object ParamType {
     }
   }
 
-  def parse(builder: ScalaPsiBuilder) = build(ScalaElementTypes.PARAM_TYPE, builder) { parseInner(builder) }
+  def parse(builder: ScalaPsiBuilder) =
+    build(ScalaElementTypes.PARAM_TYPE, builder) { parseInner(builder) }
 }

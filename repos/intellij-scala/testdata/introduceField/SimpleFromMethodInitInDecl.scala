@@ -1,7 +1,8 @@
 /*initInDeclaration*/
 class Test {
   def foo() {
-    /*start*/1/*end*/
+    /*start*/
+    1 /*end*/
   }
 }
 /*
@@ -13,4 +14,4 @@ class Test {
     i
   }
 }
-*/
+ */

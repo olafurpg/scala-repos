@@ -7,22 +7,22 @@ import scala.collection.mutable
 import scala.collection.JavaConverters._
 
 /**
- * An in-memory implementation of [[StatsReceiver]], which is mostly used for testing.
- *
- * Note that an [[InMemoryStatsReceiver]] does not conflate `Seq("a", "b")` and `Seq("a/b")`
- * names no matter how they look when printed.
- *
- * {{{
- * val isr = new InMemoryStatsReceiver
- * isr.counter("a", "b", "foo")
- * irs.counter("a/b", "bar")
- *
- * irs.print(Console.out) // will print two lines "a/b/foo 0" and "a/b/bar 0"
- *
- * assert(isr.counters(Seq("a", "b", "foo") == 0)) // ok
- * assert(isr.counters(Seq("a", "b", "bar") == 0)) // fail
- * }}}
- **/
+  * An in-memory implementation of [[StatsReceiver]], which is mostly used for testing.
+  *
+  * Note that an [[InMemoryStatsReceiver]] does not conflate `Seq("a", "b")` and `Seq("a/b")`
+  * names no matter how they look when printed.
+  *
+  * {{{
+  * val isr = new InMemoryStatsReceiver
+  * isr.counter("a", "b", "foo")
+  * irs.counter("a/b", "bar")
+  *
+  * irs.print(Console.out) // will print two lines "a/b/foo 0" and "a/b/bar 0"
+  *
+  * assert(isr.counters(Seq("a", "b", "foo") == 0)) // ok
+  * assert(isr.counters(Seq("a", "b", "bar") == 0)) // fail
+  * }}}
+  **/
 class InMemoryStatsReceiver extends StatsReceiver {
   val repr = this
 
@@ -32,12 +32,13 @@ class InMemoryStatsReceiver extends StatsReceiver {
   val stats: mutable.Map[Seq[String], Seq[Float]] =
     new ConcurrentHashMap[Seq[String], Seq[Float]]().asScala
 
-  val gauges: mutable.Map[Seq[String], () => Float] =
-    Collections.synchronizedMap(new java.util.WeakHashMap[Seq[String], () => Float]()).asScala
+  val gauges: mutable.Map[Seq[String], () => Float] = Collections
+    .synchronizedMap(new java.util.WeakHashMap[Seq[String], () => Float]())
+    .asScala
 
   /**
-   * Creates a [[ReadableCounter]] of the given `name`.
-   */
+    * Creates a [[ReadableCounter]] of the given `name`.
+    */
   def counter(name: String*): ReadableCounter =
     new ReadableCounter {
 
@@ -52,8 +53,8 @@ class InMemoryStatsReceiver extends StatsReceiver {
     }
 
   /**
-   * Creates a [[ReadableStat]] of the given `name`.
-   */
+    * Creates a [[ReadableStat]] of the given `name`.
+    */
   def stat(name: String*): ReadableStat =
     new ReadableStat {
       def add(value: Float): Unit = stats.synchronized {
@@ -64,19 +65,22 @@ class InMemoryStatsReceiver extends StatsReceiver {
 
       override def toString: String = {
         val vals = apply()
-        val valStr = if (vals.length <= 3) {
-          vals.mkString("[", ",", "]")
-        } else {
-          val numOmitted = vals.length - 3
-          vals.take(3).mkString("[", ",", s"... (omitted $numOmitted value(s))]")
-        }
+        val valStr =
+          if (vals.length <= 3) {
+            vals.mkString("[", ",", "]")
+          } else {
+            val numOmitted = vals.length - 3
+            vals
+              .take(3)
+              .mkString("[", ",", s"... (omitted $numOmitted value(s))]")
+          }
         s"Stat(${name.mkString("/")}=$valStr)"
       }
     }
 
   /**
-   * Creates a [[Gauge]] of the given `name`.
-   */
+    * Creates a [[Gauge]] of the given `name`.
+    */
   def addGauge(name: String*)(f: => Float): Gauge = {
     val gauge = new Gauge {
       def remove(): Unit = {
@@ -99,21 +103,21 @@ class InMemoryStatsReceiver extends StatsReceiver {
   override def toString: String = "InMemoryStatsReceiver"
 
   /**
-   * Dumps this in-memory stats receiver to the given [[PrintStream]].
-   */
+    * Dumps this in-memory stats receiver to the given [[PrintStream]].
+    */
   def print(p: PrintStream): Unit = {
-    for ((k, v) <- counters)
-      p.printf("%s %d\n", k.mkString("/"), v: java.lang.Integer)
-    for ((k, g) <- gauges)
-      p.printf("%s %f\n", k.mkString("/"), g(): java.lang.Float)
-    for ((k, s) <- stats if s.size > 0)
-      p.printf("%s %f\n", k.mkString("/"), (s.sum / s.size): java.lang.Float)
+    for ((k, v) <- counters) p.printf(
+        "%s %d\n", k.mkString("/"), v: java.lang.Integer)
+    for ((k, g) <- gauges) p.printf(
+        "%s %f\n", k.mkString("/"), g(): java.lang.Float)
+    for ((k, s) <- stats if s.size > 0) p.printf(
+        "%s %f\n", k.mkString("/"), (s.sum / s.size): java.lang.Float)
   }
 
   /**
-   * Clears all registered counters, gauges and stats.
-   * @note this is not atomic. If new metrics are added while this method is executing, those metrics may remain.
-   */
+    * Clears all registered counters, gauges and stats.
+    * @note this is not atomic. If new metrics are added while this method is executing, those metrics may remain.
+    */
   def clear(): Unit = {
     counters.clear()
     stats.clear()
@@ -121,17 +125,16 @@ class InMemoryStatsReceiver extends StatsReceiver {
   }
 }
 
-
 /**
- * A variation of [[Counter]] that also supports reading of the current value via the `apply` method.
- */
+  * A variation of [[Counter]] that also supports reading of the current value via the `apply` method.
+  */
 trait ReadableCounter extends Counter {
   def apply(): Int
 }
 
 /**
- * A variation of [[Stat]] that also supports reading of the current time series via the `apply` method.
- */
+  * A variation of [[Stat]] that also supports reading of the current time series via the `apply` method.
+  */
 trait ReadableStat extends Stat {
   def apply(): Seq[Float]
 }

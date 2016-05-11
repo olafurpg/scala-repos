@@ -17,6 +17,6 @@ object Test {
     import Provider._
 
     val foo = new Foo
-    foo.<ref>doSomething
+    foo.< ref > doSomething
   }
 }

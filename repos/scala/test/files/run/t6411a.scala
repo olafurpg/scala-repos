@@ -10,23 +10,23 @@ class Z[T](val i: T) extends AnyRef {
 }
 
 object a {
-  def yg_1[T](y: Y[T])           = y.i
-  def yi_2(y: Y[Int])            = y.i
-  def ys_3(y: Y[String])         = y.i
+  def yg_1[T](y: Y[T]) = y.i
+  def yi_2(y: Y[Int]) = y.i
+  def ys_3(y: Y[String]) = y.i
   def ya_4(ys: Array[Y[String]]) = ys.toList.map(_.i)
-  def yl_5(ys: List[Y[String]])  = ys.map(_.i)
-  def yv_6(ys: Y[String]*)       = ys.toList.map(_.i)
-  def yni_7(y: => Y[Int])        = y.i
-  def yns_8(y: => Y[String])     = y.i
+  def yl_5(ys: List[Y[String]]) = ys.map(_.i)
+  def yv_6(ys: Y[String]*) = ys.toList.map(_.i)
+  def yni_7(y: => Y[Int]) = y.i
+  def yns_8(y: => Y[String]) = y.i
 
-  def zg_1[T](z: Z[T])           = z.i
-  def zi_2(z: Z[Int])            = z.i
-  def zs_3(z: Z[String])         = z.i
+  def zg_1[T](z: Z[T]) = z.i
+  def zi_2(z: Z[Int]) = z.i
+  def zs_3(z: Z[String]) = z.i
   def za_4(zs: Array[Z[String]]) = zs.toList.map(_.i)
-  def zl_5(zs: List[Z[String]])  = zs.map(_.i)
-  def zv_6(zs: Z[String]*)       = zs.toList.map(_.i)
-  def zni_7(z: => Z[Int])        = z.i
-  def zns_8(z: => Z[String])     = z.i
+  def zl_5(zs: List[Z[String]]) = zs.map(_.i)
+  def zv_6(zs: Z[String]*) = zs.toList.map(_.i)
+  def zni_7(z: => Z[Int]) = z.i
+  def zns_8(z: => Z[String]) = z.i
 }
 
 object Test extends App {
@@ -35,15 +35,15 @@ object Test extends App {
     val msym = moduleA.symbol.info.decl(TermName(methName)).asMethod
     println(s"meth = $msym")
     val mmirror = moduleA.reflectMethod(msym)
-    val mresult =
-      try { mmirror(arg) }
-      catch {
-        case ex: Exception =>
-          val ex1 = scala.reflect.runtime.ReflectionUtils.unwrapThrowable(ex)
-          s"${ex1.getClass}: ${ex1.getMessage}"
-      }
-    println(s"as seen by Scala reflection: ${msym.asInstanceOf[scala.reflect.internal.Symbols#Symbol].defString}")
-    println(s"as seen by Java reflection: ${mmirror.asInstanceOf[{val jmeth: java.lang.reflect.Method}].jmeth}")
+    val mresult = try { mmirror(arg) } catch {
+      case ex: Exception =>
+        val ex1 = scala.reflect.runtime.ReflectionUtils.unwrapThrowable(ex)
+        s"${ex1.getClass}: ${ex1.getMessage}"
+    }
+    println(
+        s"as seen by Scala reflection: ${msym.asInstanceOf[scala.reflect.internal.Symbols#Symbol].defString}")
+    println(
+        s"as seen by Java reflection: ${mmirror.asInstanceOf[ { val jmeth: java.lang.reflect.Method }].jmeth}")
     println(s"result = $mresult")
   }
 

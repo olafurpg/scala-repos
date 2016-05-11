@@ -1,30 +1,33 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 object Flag {
+
   /**
-   * `Flag` that is initialized to `false`.
-   */
+    * `Flag` that is initialized to `false`.
+    */
   val empty = new Flag(false)
   def apply(): Flag = empty
+
   /**
-   * Java API: `Flag` that is initialized to `false`.
-   */
+    * Java API: `Flag` that is initialized to `false`.
+    */
   def create(): Flag = empty
 
   // unapply from case class
 }
 
 /**
- * Implements a boolean flag CRDT that is initialized to `false` and
- * can be switched to `true`. `true` wins over `false` in merge.
- *
- * This class is immutable, i.e. "modifying" methods return a new instance.
- */
+  * Implements a boolean flag CRDT that is initialized to `false` and
+  * can be switched to `true`. `true` wins over `false` in merge.
+  *
+  * This class is immutable, i.e. "modifying" methods return a new instance.
+  */
 @SerialVersionUID(1L)
-final case class Flag(enabled: Boolean) extends ReplicatedData with ReplicatedDataSerialization {
+final case class Flag(enabled: Boolean)
+    extends ReplicatedData with ReplicatedDataSerialization {
 
   type T = Flag
 
@@ -42,4 +45,5 @@ object FlagKey {
 }
 
 @SerialVersionUID(1L)
-final case class FlagKey(_id: String) extends Key[Flag](_id) with ReplicatedDataSerialization
+final case class FlagKey(_id: String)
+    extends Key[Flag](_id) with ReplicatedDataSerialization

@@ -16,7 +16,8 @@ object Test {
   def narrow2(x: AnyRef): AnyRef with Singleton = x.asInstanceOf[x.type]
 
   // fails, wait, what? This fails and narrow1 compiles?
-  def narrow3(x: AnyRef): AnyRef with Singleton = x.asInstanceOf[AnyRef with Singleton]
+  def narrow3(x: AnyRef): AnyRef with Singleton =
+    x.asInstanceOf[AnyRef with Singleton]
 
   // ok
   def narrow4[T <: AnyRef](x: T): AnyRef with Singleton = x
@@ -52,4 +53,3 @@ object Test {
     f2(narrow4(x4))
   }
 }
-

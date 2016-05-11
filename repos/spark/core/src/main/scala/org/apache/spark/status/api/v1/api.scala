@@ -22,74 +22,69 @@ import scala.collection.Map
 
 import org.apache.spark.JobExecutionStatus
 
-class ApplicationInfo private[spark](
-    val id: String,
-    val name: String,
-    val coresGranted: Option[Int],
-    val maxCores: Option[Int],
-    val coresPerExecutor: Option[Int],
-    val memoryPerExecutorMB: Option[Int],
-    val attempts: Seq[ApplicationAttemptInfo])
+class ApplicationInfo private[spark](val id: String,
+                                     val name: String,
+                                     val coresGranted: Option[Int],
+                                     val maxCores: Option[Int],
+                                     val coresPerExecutor: Option[Int],
+                                     val memoryPerExecutorMB: Option[Int],
+                                     val attempts: Seq[ApplicationAttemptInfo])
 
-class ApplicationAttemptInfo private[spark](
-    val attemptId: Option[String],
-    val startTime: Date,
-    val endTime: Date,
-    val lastUpdated: Date,
-    val duration: Long,
-    val sparkUser: String,
-    val completed: Boolean = false)
+class ApplicationAttemptInfo private[spark](val attemptId: Option[String],
+                                            val startTime: Date,
+                                            val endTime: Date,
+                                            val lastUpdated: Date,
+                                            val duration: Long,
+                                            val sparkUser: String,
+                                            val completed: Boolean = false)
 
-class ExecutorStageSummary private[spark](
-    val taskTime : Long,
-    val failedTasks : Int,
-    val succeededTasks : Int,
-    val inputBytes : Long,
-    val outputBytes : Long,
-    val shuffleRead : Long,
-    val shuffleWrite : Long,
-    val memoryBytesSpilled : Long,
-    val diskBytesSpilled : Long)
+class ExecutorStageSummary private[spark](val taskTime: Long,
+                                          val failedTasks: Int,
+                                          val succeededTasks: Int,
+                                          val inputBytes: Long,
+                                          val outputBytes: Long,
+                                          val shuffleRead: Long,
+                                          val shuffleWrite: Long,
+                                          val memoryBytesSpilled: Long,
+                                          val diskBytesSpilled: Long)
 
-class ExecutorSummary private[spark](
-    val id: String,
-    val hostPort: String,
-    val isActive: Boolean,
-    val rddBlocks: Int,
-    val memoryUsed: Long,
-    val diskUsed: Long,
-    val totalCores: Int,
-    val maxTasks: Int,
-    val activeTasks: Int,
-    val failedTasks: Int,
-    val completedTasks: Int,
-    val totalTasks: Int,
-    val totalDuration: Long,
-    val totalGCTime: Long,
-    val totalInputBytes: Long,
-    val totalShuffleRead: Long,
-    val totalShuffleWrite: Long,
-    val maxMemory: Long,
-    val executorLogs: Map[String, String])
+class ExecutorSummary private[spark](val id: String,
+                                     val hostPort: String,
+                                     val isActive: Boolean,
+                                     val rddBlocks: Int,
+                                     val memoryUsed: Long,
+                                     val diskUsed: Long,
+                                     val totalCores: Int,
+                                     val maxTasks: Int,
+                                     val activeTasks: Int,
+                                     val failedTasks: Int,
+                                     val completedTasks: Int,
+                                     val totalTasks: Int,
+                                     val totalDuration: Long,
+                                     val totalGCTime: Long,
+                                     val totalInputBytes: Long,
+                                     val totalShuffleRead: Long,
+                                     val totalShuffleWrite: Long,
+                                     val maxMemory: Long,
+                                     val executorLogs: Map[String, String])
 
-class JobData private[spark](
-    val jobId: Int,
-    val name: String,
-    val description: Option[String],
-    val submissionTime: Option[Date],
-    val completionTime: Option[Date],
-    val stageIds: Seq[Int],
-    val jobGroup: Option[String],
-    val status: JobExecutionStatus,
-    val numTasks: Int,
-    val numActiveTasks: Int,
-    val numCompletedTasks: Int,
-    val numSkippedTasks: Int,
-    val numFailedTasks: Int,
-    val numActiveStages: Int,
-    val numCompletedStages: Int,
-    val numSkippedStages: Int,
-    val numFailedStages: Int)
+class JobData private[spark](val jobId: Int,
+                             val name: String,
+                             val description: Option[String],
+                             val submissionTime: Option[Date],
+                             val completionTime: Option[Date],
+                             val stageIds: Seq[Int],
+                             val jobGroup: Option[String],
+                             val status: JobExecutionStatus,
+                             val numTasks: Int,
+                             val numActiveTasks: Int,
+                             val numCompletedTasks: Int,
+                             val numSkippedTasks: Int,
+                             val numFailedTasks: Int,
+                             val numActiveStages: Int,
+                             val numCompletedStages: Int,
+                             val numSkippedStages: Int,
+                             val numFailedStages: Int)
 
 class RDDStorageInfo private[spark](
     val id: Int,
@@ -102,18 +97,16 @@ class RDDStorageInfo private[spark](
     val dataDistribution: Option[Seq[RDDDataDistribution]],
     val partitions: Option[Seq[RDDPartitionInfo]])
 
-class RDDDataDistribution private[spark](
-    val address: String,
-    val memoryUsed: Long,
-    val memoryRemaining: Long,
-    val diskUsed: Long)
+class RDDDataDistribution private[spark](val address: String,
+                                         val memoryUsed: Long,
+                                         val memoryRemaining: Long,
+                                         val diskUsed: Long)
 
-class RDDPartitionInfo private[spark](
-    val blockName: String,
-    val storageLevel: String,
-    val memoryUsed: Long,
-    val diskUsed: Long,
-    val executors: Seq[String])
+class RDDPartitionInfo private[spark](val blockName: String,
+                                      val storageLevel: String,
+                                      val memoryUsed: Long,
+                                      val diskUsed: Long,
+                                      val executors: Seq[String])
 
 class StageData private[spark](
     val status: StageStatus,
@@ -122,12 +115,10 @@ class StageData private[spark](
     val numActiveTasks: Int,
     val numCompleteTasks: Int,
     val numFailedTasks: Int,
-
     val executorRunTime: Long,
     val submissionTime: Option[Date],
     val firstTaskLaunchedTime: Option[Date],
     val completionTime: Option[Date],
-
     val inputBytes: Long,
     val inputRecords: Long,
     val outputBytes: Long,
@@ -138,27 +129,24 @@ class StageData private[spark](
     val shuffleWriteRecords: Long,
     val memoryBytesSpilled: Long,
     val diskBytesSpilled: Long,
-
     val name: String,
     val details: String,
     val schedulingPool: String,
-
     val accumulatorUpdates: Seq[AccumulableInfo],
     val tasks: Option[Map[Long, TaskData]],
     val executorSummary: Option[Map[String, ExecutorStageSummary]])
 
-class TaskData private[spark](
-    val taskId: Long,
-    val index: Int,
-    val attempt: Int,
-    val launchTime: Date,
-    val executorId: String,
-    val host: String,
-    val taskLocality: String,
-    val speculative: Boolean,
-    val accumulatorUpdates: Seq[AccumulableInfo],
-    val errorMessage: Option[String] = None,
-    val taskMetrics: Option[TaskMetrics] = None)
+class TaskData private[spark](val taskId: Long,
+                              val index: Int,
+                              val attempt: Int,
+                              val launchTime: Date,
+                              val executorId: String,
+                              val host: String,
+                              val taskLocality: String,
+                              val speculative: Boolean,
+                              val accumulatorUpdates: Seq[AccumulableInfo],
+                              val errorMessage: Option[String] = None,
+                              val taskMetrics: Option[TaskMetrics] = None)
 
 class TaskMetrics private[spark](
     val executorDeserializeTime: Long,
@@ -173,30 +161,23 @@ class TaskMetrics private[spark](
     val shuffleReadMetrics: Option[ShuffleReadMetrics],
     val shuffleWriteMetrics: Option[ShuffleWriteMetrics])
 
-class InputMetrics private[spark](
-    val bytesRead: Long,
-    val recordsRead: Long)
+class InputMetrics private[spark](val bytesRead: Long, val recordsRead: Long)
 
 class OutputMetrics private[spark](
-    val bytesWritten: Long,
-    val recordsWritten: Long)
+    val bytesWritten: Long, val recordsWritten: Long)
 
-class ShuffleReadMetrics private[spark](
-    val remoteBlocksFetched: Int,
-    val localBlocksFetched: Int,
-    val fetchWaitTime: Long,
-    val remoteBytesRead: Long,
-    val totalBlocksFetched: Int,
-    val recordsRead: Long)
+class ShuffleReadMetrics private[spark](val remoteBlocksFetched: Int,
+                                        val localBlocksFetched: Int,
+                                        val fetchWaitTime: Long,
+                                        val remoteBytesRead: Long,
+                                        val totalBlocksFetched: Int,
+                                        val recordsRead: Long)
 
 class ShuffleWriteMetrics private[spark](
-    val bytesWritten: Long,
-    val writeTime: Long,
-    val recordsWritten: Long)
+    val bytesWritten: Long, val writeTime: Long, val recordsWritten: Long)
 
 class TaskMetricDistributions private[spark](
     val quantiles: IndexedSeq[Double],
-
     val executorDeserializeTime: IndexedSeq[Double],
     val executorRunTime: IndexedSeq[Double],
     val resultSize: IndexedSeq[Double],
@@ -204,15 +185,13 @@ class TaskMetricDistributions private[spark](
     val resultSerializationTime: IndexedSeq[Double],
     val memoryBytesSpilled: IndexedSeq[Double],
     val diskBytesSpilled: IndexedSeq[Double],
-
     val inputMetrics: Option[InputMetricDistributions],
     val outputMetrics: Option[OutputMetricDistributions],
     val shuffleReadMetrics: Option[ShuffleReadMetricDistributions],
     val shuffleWriteMetrics: Option[ShuffleWriteMetricDistributions])
 
 class InputMetricDistributions private[spark](
-    val bytesRead: IndexedSeq[Double],
-    val recordsRead: IndexedSeq[Double])
+    val bytesRead: IndexedSeq[Double], val recordsRead: IndexedSeq[Double])
 
 class OutputMetricDistributions private[spark](
     val bytesWritten: IndexedSeq[Double],
@@ -232,8 +211,7 @@ class ShuffleWriteMetricDistributions private[spark](
     val writeRecords: IndexedSeq[Double],
     val writeTime: IndexedSeq[Double])
 
-class AccumulableInfo private[spark](
-    val id: Long,
-    val name: String,
-    val update: Option[String],
-    val value: String)
+class AccumulableInfo private[spark](val id: Long,
+                                     val name: String,
+                                     val update: Option[String],
+                                     val value: String)

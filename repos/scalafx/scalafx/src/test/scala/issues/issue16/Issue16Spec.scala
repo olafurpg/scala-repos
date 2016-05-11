@@ -39,8 +39,8 @@ import scalafx.beans.property.{ObjectProperty, ReadOnlyBooleanProperty}
 import scalafx.scene.paint.Color
 
 /**
- * Verify that code causing Issue 16 behaves correctly after fix.
- */
+  * Verify that code causing Issue 16 behaves correctly after fix.
+  */
 @RunWith(classOf[JUnitRunner])
 class Issue16Spec extends FlatSpec {
 

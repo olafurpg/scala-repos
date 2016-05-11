@@ -7,9 +7,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiManager, PsiTreeChangeAdapter, PsiTreeChangeEvent}
 
 /**
- * @author Pavel Fatin
- */
-class SbtProjectComponent(project: Project) extends AbstractProjectComponent(project) {
+  * @author Pavel Fatin
+  */
+class SbtProjectComponent(project: Project)
+    extends AbstractProjectComponent(project) {
   override def initComponent() {
     manager.addPsiTreeChangeListener(TreeListener)
   }

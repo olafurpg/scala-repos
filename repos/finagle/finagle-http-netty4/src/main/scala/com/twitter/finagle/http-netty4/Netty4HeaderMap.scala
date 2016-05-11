@@ -6,10 +6,12 @@ import java.util.Map.Entry
 import scala.collection.JavaConverters._
 
 /**
- * [[HeaderMap]] implementation which proxies all calls to a
- * mutable netty `HttpHeaders` instance.
- */
-private[http4] class Netty4HeaderMap(private[http4] val underlying: HttpHeaders) extends HeaderMap {
+  * [[HeaderMap]] implementation which proxies all calls to a
+  * mutable netty `HttpHeaders` instance.
+  */
+private[http4] class Netty4HeaderMap(
+    private[http4] val underlying: HttpHeaders)
+    extends HeaderMap {
   import Netty4HeaderMap._
 
   def getAll(key: String): Iterable[String] = underlying.getAll(key).asScala
@@ -38,10 +40,11 @@ private[http4] class Netty4HeaderMap(private[http4] val underlying: HttpHeaders)
 
   def iterator: Iterator[(String, String)] =
     underlying.iteratorAsString().asScala.map(entryToTuple)
-
 }
 
 private[http4] object Netty4HeaderMap {
-  val entryToTuple: (Entry[String, String]) => (String, String) =
-    { entry: Entry[String, String] => entry.getKey -> entry.getValue }
+  val entryToTuple: (Entry[String, String]) => (String, String) = {
+    entry: Entry[String, String] =>
+      entry.getKey -> entry.getValue
+  }
 }

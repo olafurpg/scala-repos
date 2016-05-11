@@ -8,11 +8,10 @@ import org.openjdk.jmh.infra.Blackhole
 @State(Scope.Benchmark)
 class StatusBenchmark extends StdBenchAnnotations {
 
-  private[this] val all =
-    Array(Open, Busy, Closed)
+  private[this] val all = Array(Open, Busy, Closed)
 
-  val combinations: Array[(Status, Status)] =
-    for (l <- all; r <- all) yield (l, r)
+  val combinations: Array[(Status, Status)] = for (l <- all; r <- all) yield
+    (l, r)
 
   @Benchmark
   def best(hole: Blackhole): Unit = {
@@ -33,5 +32,4 @@ class StatusBenchmark extends StdBenchAnnotations {
       i += 1
     }
   }
-
 }

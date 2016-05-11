@@ -22,7 +22,7 @@ object OneOrTest extends SpecLite {
 //    }
 //  }
 
-  "findLeft" ! forAll{ a: OneOr[List, Int] =>
+  "findLeft" ! forAll { a: OneOr[List, Int] =>
     val f = (_: Int) % 2 == 0
     val F = Foldable[OneOr.OneOrList]
     F.findLeft(a)(f) must_=== Foldable[List].findLeft(F.toList(a))(f)
@@ -45,5 +45,4 @@ object OneOrTest extends SpecLite {
     def traverse[F[_]: Traverse] = Traverse[OneOr[F, ?]]
     def traverse1[F[_]: Traverse1] = Traverse1[OneOr[F, ?]]
   }
-
 }

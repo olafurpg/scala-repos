@@ -35,15 +35,15 @@ import scalafx.Includes._
 import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 
 /**
- * MediaView Spec tests.
- *
- *
- */
+  * MediaView Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class MediaViewSpec
-  extends SimpleSFXDelegateSpec[jfxsm.MediaView, MediaView](classOf[jfxsm.MediaView], classOf[MediaView])
-  with PositionDelegateSpec[MediaView] {
+    extends SimpleSFXDelegateSpec[jfxsm.MediaView, MediaView](
+        classOf[jfxsm.MediaView], classOf[MediaView])
+    with PositionDelegateSpec[MediaView] {
 
   val positionDelegate = new MediaView
-
 }

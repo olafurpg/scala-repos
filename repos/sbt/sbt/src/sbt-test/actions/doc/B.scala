@@ -1,6 +1,7 @@
 object B {
-	/**
+
+  /**
 	* @notparam i An argument
 	*/
-	def x(i: Int) = 3
+  def x(i: Int) = 3
 }

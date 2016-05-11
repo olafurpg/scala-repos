@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.patterns.CaseClauses
 import org.jetbrains.plugins.scala.lang.parser.util.{ParserPatcher, ParserUtils}
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 03.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 03.03.2008
+  */
 /*
  * Expr1 ::= 'if' '(' Expr ')' {nl} Expr [[semi] else Expr]
  *         | 'while' '(' Expr ')' {nl} Expr
@@ -40,7 +39,7 @@ object Expr1 {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val exprMarker = builder.mark
     builder.getTokenType match {
-    //----------------------if statement------------------------//
+      //----------------------if statement------------------------//
       case ScalaTokenTypes.kIF =>
         builder.advanceLexer() //Ate if
         builder.getTokenType match {
@@ -164,7 +163,8 @@ object Expr1 {
               case ScalaTokenTypes.tLPARENTHESIS =>
                 builder.advanceLexer() //Ate (
                 builder.disableNewlines
-                if (!Expr.parse(builder)) builder error ErrMsg("wrong.expression")
+                if (!Expr.parse(builder))
+                  builder error ErrMsg("wrong.expression")
                 builder.getTokenType match {
                   case ScalaTokenTypes.tRPARENTHESIS =>
                     builder.advanceLexer() //Ate )
@@ -244,7 +244,8 @@ object Expr1 {
                 ipmarker.precede.done(ScalaElementTypes.PARAM_CLAUSES)
 
                 builder.advanceLexer() //Ate =>
-                if (!Expr.parse(builder)) builder error ErrMsg("wrong.expression")
+                if (!Expr.parse(builder))
+                  builder error ErrMsg("wrong.expression")
                 exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
                 return true
               case _ =>
@@ -258,8 +259,7 @@ object Expr1 {
       //---------------return statement-----------//
       case ScalaTokenTypes.kRETURN =>
         builder.advanceLexer() //Ate return
-        if (!builder.newlineBeforeCurrentToken)
-          Expr parse builder
+        if (!builder.newlineBeforeCurrentToken) Expr parse builder
         exprMarker.done(ScalaElementTypes.RETURN_STMT)
         return true
 

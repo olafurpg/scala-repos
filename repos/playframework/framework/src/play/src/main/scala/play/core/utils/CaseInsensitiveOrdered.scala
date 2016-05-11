@@ -4,11 +4,11 @@
 package play.core.utils
 
 /**
- * Case Insensitive Ordering. We first compare by length, then
- * use a case insensitive lexicographic order. This allows us to
- * use a much faster length comparison before we even start looking
- * at the content of the strings.
- */
+  * Case Insensitive Ordering. We first compare by length, then
+  * use a case insensitive lexicographic order. This allows us to
+  * use a much faster length comparison before we even start looking
+  * at the content of the strings.
+  */
 private[play] object CaseInsensitiveOrdered extends Ordering[String] {
   def compare(x: String, y: String): Int = {
     val xl = x.length
@@ -16,4 +16,3 @@ private[play] object CaseInsensitiveOrdered extends Ordering[String] {
     if (xl < yl) -1 else if (xl > yl) 1 else x.compareToIgnoreCase(y)
   }
 }
-

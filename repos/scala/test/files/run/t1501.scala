@@ -1,12 +1,12 @@
-import scala.tools.nsc._  
+import scala.tools.nsc._
 
 object Test {
-  
+
   /**
-   *  ...
-   */
-  
-  val testCode = """
+    *  ...
+    */
+  val testCode =
+    """
   
     class xyz[A] extends annotation.TypeConstraint
     
@@ -26,7 +26,7 @@ object Test {
     }}
     
   """
-  
+
   def main(args: Array[String]) {
     val settings = new Settings()
     settings.classpath.value = System.getProperty("java.class.path")
@@ -41,16 +41,13 @@ object Test {
       /** Check annotations to decide whether tpe1 <:< tpe2 */
       def annotationsConform(tpe1: Type, tpe2: Type): Boolean = {
 
-        tpe1.annotations.forall(a1 => tpe2.annotations.forall(a2 => a1.atp <:< a2.atp))
-
+        tpe1.annotations.forall(
+            a1 => tpe2.annotations.forall(a2 => a1.atp <:< a2.atp))
       }
     }
-    
+
     global.addAnnotationChecker(checker)
-    
+
     tool.interpret(testCode)
-    
   }
-
 }
-

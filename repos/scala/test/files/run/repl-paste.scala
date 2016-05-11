@@ -1,8 +1,7 @@
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  def code = ":paste\n" + (
-    """
+  def code = ":paste\n" + ("""
 class Dingus
 {
   private val x = 5
@@ -14,6 +13,5 @@ object Dingus
 }
 
 val x = (new Dingus).y
-    """
-  )
+    """)
 }

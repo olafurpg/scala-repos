@@ -3,30 +3,30 @@ package com.twitter.util.lint
 import java.util.regex.Pattern
 
 /**
- * A single lint rule, that when [[Rule.apply() run]] evaluates
- * whether or not there are any issues.
- */
+  * A single lint rule, that when [[Rule.apply() run]] evaluates
+  * whether or not there are any issues.
+  */
 trait Rule {
 
   /**
-   * Runs this lint check.
-   *
-   * @return An empty `Seq` if no issues are found.
-   */
+    * Runs this lint check.
+    *
+    * @return An empty `Seq` if no issues are found.
+    */
   def apply(): Seq[Issue]
 
   /** The broad category that this rule belongs in. */
   def category: Category
 
   /**
-   * A '''short''' name for this rule intended to be used for
-   * generating a machine readable [[id]].
-   */
+    * A '''short''' name for this rule intended to be used for
+    * generating a machine readable [[id]].
+    */
   def name: String
 
   /**
-   * Produce a "machine readable" id from [[name]].
-   */
+    * Produce a "machine readable" id from [[name]].
+    */
   def id: String =
     Rule.WhitespacePattern.matcher(name.toLowerCase.trim).replaceAll("-")
 
@@ -37,16 +37,16 @@ trait Rule {
 object Rule {
 
   /**
-   * Factory method for creating a [[Rule]].
-   *
-   * @param fn is evaluated to determine if there are any issues.
-   */
+    * Factory method for creating a [[Rule]].
+    *
+    * @param fn is evaluated to determine if there are any issues.
+    */
   def apply(
-    category: Category,
-    shortName: String,
-    desc: String
+      category: Category,
+      shortName: String,
+      desc: String
   )(
-    fn: => Seq[Issue]
+      fn: => Seq[Issue]
   ): Rule = {
     val _cat = category
     new Rule {
@@ -57,7 +57,5 @@ object Rule {
     }
   }
 
-  private[Rule] val WhitespacePattern =
-    Pattern.compile("\\s")
-
+  private[Rule] val WhitespacePattern = Pattern.compile("\\s")
 }

@@ -32,12 +32,13 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 
 /**
- * :: Experimental ::
- * A feature transformer that merges multiple columns into a vector column.
- */
+  * :: Experimental ::
+  * A feature transformer that merges multiple columns into a vector column.
+  */
 @Experimental
 class VectorAssembler(override val uid: String)
-  extends Transformer with HasInputCols with HasOutputCol with DefaultParamsWritable {
+    extends Transformer with HasInputCols with HasOutputCol
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("vecAssembler"))
 
@@ -70,22 +71,26 @@ class VectorAssembler(override val uid: String)
           val group = AttributeGroup.fromStructField(field)
           if (group.attributes.isDefined) {
             // If attributes are defined, copy them with updated names.
-            group.attributes.get.zipWithIndex.map { case (attr, i) =>
-              if (attr.name.isDefined) {
-                // TODO: Define a rigorous naming scheme.
-                attr.withName(c + "_" + attr.name.get)
-              } else {
-                attr.withName(c + "_" + i)
-              }
+            group.attributes.get.zipWithIndex.map {
+              case (attr, i) =>
+                if (attr.name.isDefined) {
+                  // TODO: Define a rigorous naming scheme.
+                  attr.withName(c + "_" + attr.name.get)
+                } else {
+                  attr.withName(c + "_" + i)
+                }
             }
           } else {
             // Otherwise, treat all attributes as numeric. If we cannot get the number of attributes
             // from metadata, check the first row.
-            val numAttrs = group.numAttributes.getOrElse(first.getAs[Vector](index).size)
-            Array.tabulate(numAttrs)(i => NumericAttribute.defaultAttr.withName(c + "_" + i))
+            val numAttrs =
+              group.numAttributes.getOrElse(first.getAs[Vector](index).size)
+            Array.tabulate(numAttrs)(
+                i => NumericAttribute.defaultAttr.withName(c + "_" + i))
           }
         case otherType =>
-          throw new SparkException(s"VectorAssembler does not support the $otherType type")
+          throw new SparkException(
+              s"VectorAssembler does not support the $otherType type")
       }
     }
     val metadata = new AttributeGroup($(outputCol), attrs).toMetadata()
@@ -98,11 +103,13 @@ class VectorAssembler(override val uid: String)
       schema(c).dataType match {
         case DoubleType => dataset(c)
         case _: VectorUDT => dataset(c)
-        case _: NumericType | BooleanType => dataset(c).cast(DoubleType).as(s"${c}_double_$uid")
+        case _: NumericType | BooleanType =>
+          dataset(c).cast(DoubleType).as(s"${c}_double_$uid")
       }
     }
 
-    dataset.select(col("*"), assembleFunc(struct(args: _*)).as($(outputCol), metadata))
+    dataset.select(
+        col("*"), assembleFunc(struct(args: _*)).as($(outputCol), metadata))
   }
 
   override def transformSchema(schema: StructType): StructType = {
@@ -113,12 +120,15 @@ class VectorAssembler(override val uid: String)
       case _: NumericType | BooleanType =>
       case t if t.isInstanceOf[VectorUDT] =>
       case other =>
-        throw new IllegalArgumentException(s"Data type $other is not supported.")
+        throw new IllegalArgumentException(
+            s"Data type $other is not supported.")
     }
     if (schema.fieldNames.contains(outputColName)) {
-      throw new IllegalArgumentException(s"Output column $outputColName already exists.")
+      throw new IllegalArgumentException(
+          s"Output column $outputColName already exists.")
     }
-    StructType(schema.fields :+ new StructField(outputColName, new VectorUDT, true))
+    StructType(
+        schema.fields :+ new StructField(outputColName, new VectorUDT, true))
   }
 
   override def copy(extra: ParamMap): VectorAssembler = defaultCopy(extra)
@@ -142,18 +152,20 @@ object VectorAssembler extends DefaultParamsReadable[VectorAssembler] {
         }
         cur += 1
       case vec: Vector =>
-        vec.foreachActive { case (i, v) =>
-          if (v != 0.0) {
-            indices += cur + i
-            values += v
-          }
+        vec.foreachActive {
+          case (i, v) =>
+            if (v != 0.0) {
+              indices += cur + i
+              values += v
+            }
         }
         cur += vec.size
       case null =>
         // TODO: output Double.NaN?
         throw new SparkException("Values to assemble cannot be null.")
       case o =>
-        throw new SparkException(s"$o of type ${o.getClass.getName} is not supported.")
+        throw new SparkException(
+            s"$o of type ${o.getClass.getName} is not supported.")
     }
     Vectors.sparse(cur, indices.result(), values.result()).compressed
   }

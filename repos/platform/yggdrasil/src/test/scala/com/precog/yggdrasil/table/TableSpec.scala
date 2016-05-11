@@ -102,7 +102,7 @@ object TableSpec extends Specification with ArbitrarySlice {
             (slice.column(VColumnRef(DynColumnId(1), CLong)).get.apply(i) must_== v) 
         }
       }
-      */
+       */
 
       /*
       "perform" in {
@@ -142,7 +142,7 @@ object TableSpec extends Specification with ArbitrarySlice {
         Vector(results2.iterator.toSeq: _*) mustEqual expected2
       }
 
-      */
+     */
     }
   }
 }

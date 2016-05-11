@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.geometry.Side]]. */
 @RunWith(classOf[JUnitRunner])
-class SideSpec extends SFXEnumDelegateSpec[jfxg.Side, Side](
-  javaClass = classOf[jfxg.Side],
-  scalaClass = classOf[Side],
-  companion = Side)
+class SideSpec
+    extends SFXEnumDelegateSpec[jfxg.Side, Side](
+        javaClass = classOf[jfxg.Side],
+        scalaClass = classOf[Side],
+        companion = Side)

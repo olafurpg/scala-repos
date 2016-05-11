@@ -5,10 +5,7 @@ package api
 package expr
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
-trait ScErrorStat extends ScalaPsiElement {
-
-}
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
+trait ScErrorStat extends ScalaPsiElement {}

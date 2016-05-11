@@ -17,8 +17,7 @@ object NetUtil {
           true
         else if (addr(0) == 192.toByte && addr(1) == 168.toByte) // 192.168/16
           true
-        else
-            false
+        else false
       case _ =>
         false
     }
@@ -64,9 +63,9 @@ object NetUtil {
   }
 
   /**
-   * Fast IPv4 decimal to int.  String.toInt is fast, but can throw an
-   * exception on invalid strings, which is expensive.
-   */
+    * Fast IPv4 decimal to int.  String.toInt is fast, but can throw an
+    * exception on invalid strings, which is expensive.
+    */
   private[this] def ipv4DecimalToInt(s: String): Int = {
     if (s.isEmpty || s.length > 3) {
       return -1
@@ -92,12 +91,11 @@ object NetUtil {
     inetAddress match {
       case inetAddress: Inet4Address =>
         val addr = inetAddress.getAddress
-        ((addr(0) & 0xff) << 24) |
-        ((addr(1) & 0xff) << 16) |
-        ((addr(2) & 0xff) <<  8) |
-         (addr(3) & 0xff)
+        ((addr(0) & 0xff) << 24) | ((addr(1) & 0xff) << 16) |
+        ((addr(2) & 0xff) << 8) | (addr(3) & 0xff)
       case _ =>
-        throw new IllegalArgumentException("non-Inet4Address cannot be converted to an Int")
+        throw new IllegalArgumentException(
+            "non-Inet4Address cannot be converted to an Int")
     }
   }
 
@@ -127,18 +125,22 @@ object NetUtil {
     case (netIp, mask) => (mask & ip) == netIp
   }
 
-  def isInetAddressInBlock(inetAddress: InetAddress, ipBlock: (Int, Int)): Boolean =
+  def isInetAddressInBlock(
+      inetAddress: InetAddress, ipBlock: (Int, Int)): Boolean =
     isIpInBlock(inetAddressToInt(inetAddress), ipBlock)
 
   def isIpInBlocks(ip: Int, ipBlocks: Iterable[(Int, Int)]): Boolean = {
-    ipBlocks exists { ipBlock => isIpInBlock(ip, ipBlock) }
+    ipBlocks exists { ipBlock =>
+      isIpInBlock(ip, ipBlock)
+    }
   }
 
   def isIpInBlocks(ip: String, ipBlocks: Iterable[(Int, Int)]): Boolean = {
     isIpInBlocks(ipToInt(ip), ipBlocks)
   }
 
-  def isInetAddressInBlocks(inetAddress: InetAddress, ipBlocks: Iterable[(Int, Int)]): Boolean =
+  def isInetAddressInBlocks(
+      inetAddress: InetAddress, ipBlocks: Iterable[(Int, Int)]): Boolean =
     isIpInBlocks(inetAddressToInt(inetAddress), ipBlocks)
 
   def getLocalHostName(): String = {

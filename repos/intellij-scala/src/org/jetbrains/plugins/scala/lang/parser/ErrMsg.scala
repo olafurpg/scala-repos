@@ -3,10 +3,9 @@ package lang
 package parser
 
 /**
-* @author ilyas
-*/
-
-object ErrMsg{
+  * @author ilyas
+  */
+object ErrMsg {
   def apply(msg: String) = {
     ScalaBundle.message(msg)
   }

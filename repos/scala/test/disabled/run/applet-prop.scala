@@ -37,4 +37,3 @@ object Test extends SecurityTest {
   // val xs = new Traversable[Int] { def foreach[U](f: Int => U) = 1 to 3 foreach f }
   // xs foreach println
 }
-

@@ -6,6 +6,7 @@ object SCL2618 {
   def foo(x: Int): Int = 2
   def foo(x: Z[F]): String = "text"
 
-  /*start*/foo(new Z[A])/*end*/
+  /*start*/
+  foo(new Z[A]) /*end*/
 }
 //String

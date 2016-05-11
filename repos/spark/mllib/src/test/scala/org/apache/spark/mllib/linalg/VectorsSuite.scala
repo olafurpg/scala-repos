@@ -40,7 +40,7 @@ class VectorsSuite extends SparkFunSuite with Logging {
   }
 
   test("dense vector construction from a double array") {
-   val vec = Vectors.dense(arr).asInstanceOf[DenseVector]
+    val vec = Vectors.dense(arr).asInstanceOf[DenseVector]
     assert(vec.size === arr.length)
     assert(vec.values.eq(arr))
   }
@@ -53,7 +53,8 @@ class VectorsSuite extends SparkFunSuite with Logging {
   }
 
   test("sparse vector construction with unordered elements") {
-    val vec = Vectors.sparse(n, indices.zip(values).reverse).asInstanceOf[SparseVector]
+    val vec =
+      Vectors.sparse(n, indices.zip(values).reverse).asInstanceOf[SparseVector]
     assert(vec.size === n)
     assert(vec.indices === indices)
     assert(vec.values === values)
@@ -86,7 +87,8 @@ class VectorsSuite extends SparkFunSuite with Logging {
     val vec2 = Vectors.dense(arr).asInstanceOf[DenseVector]
     assert(vec2.argmax === 3)
 
-    val vec3 = Vectors.dense(Array(-1.0, 0.0, -2.0, 1.0)).asInstanceOf[DenseVector]
+    val vec3 =
+      Vectors.dense(Array(-1.0, 0.0, -2.0, 1.0)).asInstanceOf[DenseVector]
     assert(vec3.argmax === 3)
   }
 
@@ -96,7 +98,9 @@ class VectorsSuite extends SparkFunSuite with Logging {
   }
 
   test("sparse argmax") {
-    val vec = Vectors.sparse(0, Array.empty[Int], Array.empty[Double]).asInstanceOf[SparseVector]
+    val vec = Vectors
+      .sparse(0, Array.empty[Int], Array.empty[Double])
+      .asInstanceOf[SparseVector]
     assert(vec.argmax === -1)
 
     val vec2 = Vectors.sparse(n, indices, values).asInstanceOf[SparseVector]
@@ -181,20 +185,20 @@ class VectorsSuite extends SparkFunSuite with Logging {
   }
 
   test("parse vectors") {
-    val vectors = Seq(
-      Vectors.dense(Array.empty[Double]),
-      Vectors.dense(1.0),
-      Vectors.dense(1.0E6, 0.0, -2.0e-7),
-      Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
-      Vectors.sparse(1, Array(0), Array(1.0)),
-      Vectors.sparse(3, Array(0, 2), Array(1.0, -2.0)))
+    val vectors = Seq(Vectors.dense(Array.empty[Double]),
+                      Vectors.dense(1.0),
+                      Vectors.dense(1.0E6, 0.0, -2.0e-7),
+                      Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
+                      Vectors.sparse(1, Array(0), Array(1.0)),
+                      Vectors.sparse(3, Array(0, 2), Array(1.0, -2.0)))
     vectors.foreach { v =>
       val v1 = Vectors.parse(v.toString)
       assert(v.getClass === v1.getClass)
       assert(v === v1)
     }
 
-    val malformatted = Seq("1", "[1,,]", "[1,2b]", "(1,[1,2])", "([1],[2.0,1.0])")
+    val malformatted =
+      Seq("1", "[1,,]", "[1,2b]", "(1,[1,2])", "([1],[2.0,1.0])")
     malformatted.foreach { s =>
       intercept[SparkException] {
         Vectors.parse(s)
@@ -218,7 +222,8 @@ class VectorsSuite extends SparkFunSuite with Logging {
         assert(!sv.indices.eq(svCopy.indices))
         assert(!sv.values.eq(svCopy.values))
       case _ =>
-        throw new RuntimeException(s"copy returned ${svCopy.getClass} on ${sv.getClass}.")
+        throw new RuntimeException(
+            s"copy returned ${svCopy.getClass} on ${sv.getClass}.")
     }
 
     val dv = Vectors.dense(1.0, 0.0, 2.0)
@@ -229,7 +234,8 @@ class VectorsSuite extends SparkFunSuite with Logging {
         assert(dv.values === dvCopy.values)
         assert(!dv.values.eq(dvCopy.values))
       case _ =>
-        throw new RuntimeException(s"copy returned ${dvCopy.getClass} on ${dv.getClass}.")
+        throw new RuntimeException(
+            s"copy returned ${dvCopy.getClass} on ${dv.getClass}.")
     }
   }
 
@@ -268,14 +274,18 @@ class VectorsSuite extends SparkFunSuite with Logging {
       val denseVector1 = Vectors.dense(sparseVector1.toArray)
       val denseVector2 = Vectors.dense(sparseVector2.toArray)
 
-      val squaredDist = breezeSquaredDistance(sparseVector1.toBreeze, sparseVector2.toBreeze)
+      val squaredDist =
+        breezeSquaredDistance(sparseVector1.toBreeze, sparseVector2.toBreeze)
 
       // SparseVector vs. SparseVector
-      assert(Vectors.sqdist(sparseVector1, sparseVector2) ~== squaredDist relTol 1E-8)
+      assert(Vectors.sqdist(sparseVector1, sparseVector2) ~==
+            squaredDist relTol 1E-8)
       // DenseVector  vs. SparseVector
-      assert(Vectors.sqdist(denseVector1, sparseVector2) ~== squaredDist relTol 1E-8)
+      assert(Vectors.sqdist(denseVector1, sparseVector2) ~==
+            squaredDist relTol 1E-8)
       // DenseVector  vs. DenseVector
-      assert(Vectors.sqdist(denseVector1, denseVector2) ~== squaredDist relTol 1E-8)
+      assert(Vectors.sqdist(denseVector1, denseVector2) ~==
+            squaredDist relTol 1E-8)
     }
   }
 
@@ -305,25 +315,32 @@ class VectorsSuite extends SparkFunSuite with Logging {
 
   test("vector p-norm") {
     val dv = Vectors.dense(0.0, -1.2, 3.1, 0.0, -4.5, 1.9)
-    val sv = Vectors.sparse(6, Seq((1, -1.2), (2, 3.1), (3, 0.0), (4, -4.5), (5, 1.9)))
+    val sv = Vectors.sparse(
+        6, Seq((1, -1.2), (2, 3.1), (3, 0.0), (4, -4.5), (5, 1.9)))
 
-    assert(Vectors.norm(dv, 1.0) ~== dv.toArray.foldLeft(0.0)((a, v) =>
-      a + math.abs(v)) relTol 1E-8)
-    assert(Vectors.norm(sv, 1.0) ~== sv.toArray.foldLeft(0.0)((a, v) =>
-      a + math.abs(v)) relTol 1E-8)
+    assert(Vectors.norm(dv, 1.0) ~==
+          dv.toArray.foldLeft(0.0)((a, v) => a + math.abs(v)) relTol 1E-8)
+    assert(Vectors.norm(sv, 1.0) ~==
+          sv.toArray.foldLeft(0.0)((a, v) => a + math.abs(v)) relTol 1E-8)
 
-    assert(Vectors.norm(dv, 2.0) ~== math.sqrt(dv.toArray.foldLeft(0.0)((a, v) =>
-      a + v * v)) relTol 1E-8)
-    assert(Vectors.norm(sv, 2.0) ~== math.sqrt(sv.toArray.foldLeft(0.0)((a, v) =>
-      a + v * v)) relTol 1E-8)
+    assert(Vectors.norm(dv, 2.0) ~==
+          math.sqrt(dv.toArray.foldLeft(0.0)((a, v) => a + v * v)) relTol 1E-8)
+    assert(Vectors.norm(sv, 2.0) ~==
+          math.sqrt(sv.toArray.foldLeft(0.0)((a, v) => a + v * v)) relTol 1E-8)
 
-    assert(Vectors.norm(dv, Double.PositiveInfinity) ~== dv.toArray.map(math.abs).max relTol 1E-8)
-    assert(Vectors.norm(sv, Double.PositiveInfinity) ~== sv.toArray.map(math.abs).max relTol 1E-8)
+    assert(Vectors.norm(dv, Double.PositiveInfinity) ~==
+          dv.toArray.map(math.abs).max relTol 1E-8)
+    assert(Vectors.norm(sv, Double.PositiveInfinity) ~==
+          sv.toArray.map(math.abs).max relTol 1E-8)
 
-    assert(Vectors.norm(dv, 3.7) ~== math.pow(dv.toArray.foldLeft(0.0)((a, v) =>
-      a + math.pow(math.abs(v), 3.7)), 1.0 / 3.7) relTol 1E-8)
-    assert(Vectors.norm(sv, 3.7) ~== math.pow(sv.toArray.foldLeft(0.0)((a, v) =>
-      a + math.pow(math.abs(v), 3.7)), 1.0 / 3.7) relTol 1E-8)
+    assert(
+        Vectors.norm(dv, 3.7) ~== math.pow(
+            dv.toArray.foldLeft(0.0)((a, v) => a + math.pow(math.abs(v), 3.7)),
+            1.0 / 3.7) relTol 1E-8)
+    assert(
+        Vectors.norm(sv, 3.7) ~== math.pow(
+            sv.toArray.foldLeft(0.0)((a, v) => a + math.pow(math.abs(v), 3.7)),
+            1.0 / 3.7) relTol 1E-8)
   }
 
   test("Vector numActive and numNonzeros") {
@@ -374,7 +391,8 @@ class VectorsSuite extends SparkFunSuite with Logging {
     val v = new SparseVector(5, Array(1, 2, 4), Array(1.1, 2.2, 4.4))
     assert(v.slice(Array(0, 2)) === new SparseVector(2, Array(1), Array(2.2)))
     assert(v.slice(Array(2, 0)) === new SparseVector(2, Array(0), Array(2.2)))
-    assert(v.slice(Array(2, 0, 3, 4)) === new SparseVector(4, Array(0, 3), Array(2.2, 4.4)))
+    assert(v.slice(Array(2, 0, 3, 4)) === new SparseVector(
+            4, Array(0, 3), Array(2.2, 4.4)))
   }
 
   test("toJson/fromJson") {
@@ -388,7 +406,8 @@ class VectorsSuite extends SparkFunSuite with Logging {
       val json = v.toJson
       parseJson(json) // `json` should be a valid JSON string
       val u = Vectors.fromJson(json)
-      assert(u.getClass === v.getClass, "toJson/fromJson should preserve vector types.")
+      assert(u.getClass === v.getClass,
+             "toJson/fromJson should preserve vector types.")
       assert(u === v, "toJson/fromJson should preserve vector values.")
     }
   }

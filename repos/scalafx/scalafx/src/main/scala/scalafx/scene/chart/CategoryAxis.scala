@@ -35,24 +35,28 @@ import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
 object CategoryAxis {
-  implicit def sfxCategoryAxis2jfx(v: CategoryAxis): jfxsc.CategoryAxis = if (v != null) v.delegate else null
+  implicit def sfxCategoryAxis2jfx(v: CategoryAxis): jfxsc.CategoryAxis =
+    if (v != null) v.delegate else null
 
   def apply() = new CategoryAxis()
 
-  def apply(categories: ObservableBuffer[String]) = new CategoryAxis(new jfxsc.CategoryAxis(categories))
+  def apply(categories: ObservableBuffer[String]) =
+    new CategoryAxis(new jfxsc.CategoryAxis(categories))
 
-  def apply(categories: Seq[String]) = new CategoryAxis(new jfxsc.CategoryAxis(ObservableBuffer(categories)))
+  def apply(categories: Seq[String]) =
+    new CategoryAxis(new jfxsc.CategoryAxis(ObservableBuffer(categories)))
 
   def apply(axisLabel: String) = new CategoryAxis {
     label = axisLabel
   }
 }
 
-class CategoryAxis(override val delegate: jfxsc.CategoryAxis = new jfxsc.CategoryAxis)
-  extends Axis[String](delegate)
-  with SFXDelegate[jfxsc.CategoryAxis] {
+class CategoryAxis(
+    override val delegate: jfxsc.CategoryAxis = new jfxsc.CategoryAxis)
+    extends Axis[String](delegate) with SFXDelegate[jfxsc.CategoryAxis] {
 
-  def categorySpacing: ReadOnlyDoubleProperty = delegate.categorySpacingProperty
+  def categorySpacing: ReadOnlyDoubleProperty =
+    delegate.categorySpacingProperty
 
   def endMargin: DoubleProperty = delegate.endMarginProperty
   def endMargin_=(v: Double) {
@@ -73,5 +77,4 @@ class CategoryAxis(override val delegate: jfxsc.CategoryAxis = new jfxsc.Categor
   def categories_=(value: ObservableBuffer[String]) {
     delegate.setCategories(value)
   }
-
 }

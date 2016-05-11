@@ -10,19 +10,27 @@ import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.testFramework.PlatformTestCase
 
 /**
- * TestCase class to use when testing ProjectDataService implementations
- * @author Nikolay Obedin
- * @since 6/5/15.
- */
+  * TestCase class to use when testing ProjectDataService implementations
+  * @author Nikolay Obedin
+  * @since 6/5/15.
+  */
 abstract class ProjectDataServiceTestCase extends PlatformTestCase {
   def importProjectData(projectData: DataNode[ProjectData]): Unit =
-    ExternalSystemApiUtil.executeProjectChangeAction(true, new DisposeAwareProjectChange(getProject) {
+    ExternalSystemApiUtil.executeProjectChangeAction(
+        true, new DisposeAwareProjectChange(getProject) {
       override def execute(): Unit =
-        ProjectRootManagerEx.getInstanceEx(getProject).mergeRootsChangesDuring(new Runnable() {
-          override def run(): Unit = {
-            val projectDataManager = ServiceManager.getService(classOf[ProjectDataManager])
-            projectDataManager.importData(projectData, getProject, new IdeModifiableModelsProviderImpl(getProject), true)
-          }
-        })
+        ProjectRootManagerEx
+          .getInstanceEx(getProject)
+          .mergeRootsChangesDuring(new Runnable() {
+            override def run(): Unit = {
+              val projectDataManager =
+                ServiceManager.getService(classOf[ProjectDataManager])
+              projectDataManager.importData(
+                  projectData,
+                  getProject,
+                  new IdeModifiableModelsProviderImpl(getProject),
+                  true)
+            }
+          })
     })
 }

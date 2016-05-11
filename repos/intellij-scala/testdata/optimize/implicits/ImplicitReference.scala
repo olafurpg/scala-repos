@@ -1,7 +1,8 @@
 package goo
 
 object ImplicitReferenceObject {
-  implicit def string2ImplicitReferenceClass(s: String): ImplicitReferenceClass = new ImplicitReferenceClass()
+  implicit def string2ImplicitReferenceClass(
+      s: String): ImplicitReferenceClass = new ImplicitReferenceClass()
 }
 
 class ImplicitReferenceClass {
@@ -21,4 +22,4 @@ class ImplicitReferenceClass {
   import ImplicitReferenceObject._
   "".foa
 }
-*/
+ */

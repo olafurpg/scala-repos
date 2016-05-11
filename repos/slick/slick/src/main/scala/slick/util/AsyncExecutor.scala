@@ -9,14 +9,17 @@ import scala.util.control.NonFatal
 /** A connection pool for asynchronous execution of blocking I/O actions.
   * This is used for the asynchronous query execution API on top of blocking back-ends like JDBC. */
 trait AsyncExecutor extends Closeable {
+
   /** An ExecutionContext for running Futures. */
   def executionContext: ExecutionContext
+
   /** Shut the thread pool down and try to stop running computations. The thread pool is
     * transitioned into a state where it will not accept any new jobs. */
   def close(): Unit
 }
 
 object AsyncExecutor extends Logging {
+
   /** Create an [[AsyncExecutor]] with a thread pool suitable for blocking
     * I/O. New threads are created as daemon threads.
     *
@@ -31,8 +34,9 @@ object AsyncExecutor extends Logging {
       @volatile private[this] var executor: ThreadPoolExecutor = _
 
       lazy val executionContext = {
-        if(!state.compareAndSet(0, 1))
-          throw new IllegalStateException("Cannot initialize ExecutionContext; AsyncExecutor already shut down")
+        if (!state.compareAndSet(0, 1))
+          throw new IllegalStateException(
+              "Cannot initialize ExecutionContext; AsyncExecutor already shut down")
         val queue = queueSize match {
           case 0 => new SynchronousQueue[Runnable]
           case -1 => new LinkedBlockingQueue[Runnable]
@@ -45,17 +49,20 @@ object AsyncExecutor extends Logging {
             }
         }
         val tf = new DaemonThreadFactory(name + "-")
-        executor = new ThreadPoolExecutor(numThreads, numThreads, 1, TimeUnit.MINUTES, queue, tf)
-        if(!state.compareAndSet(1, 2)) {
+        executor = new ThreadPoolExecutor(
+            numThreads, numThreads, 1, TimeUnit.MINUTES, queue, tf)
+        if (!state.compareAndSet(1, 2)) {
           executor.shutdownNow()
-          throw new IllegalStateException("Cannot initialize ExecutionContext; AsyncExecutor shut down during initialization")
+          throw new IllegalStateException(
+              "Cannot initialize ExecutionContext; AsyncExecutor shut down during initialization")
         }
         ExecutionContext.fromExecutorService(executor, loggingReporter)
       }
-      def close(): Unit = if(state.getAndSet(3) == 2) {
+      def close(): Unit = if (state.getAndSet(3) == 2) {
         executor.shutdownNow()
-        if(!executor.awaitTermination(30, TimeUnit.SECONDS))
-          logger.warn("Abandoning ThreadPoolExecutor (not yet destroyed after 30 seconds)")
+        if (!executor.awaitTermination(30, TimeUnit.SECONDS))
+          logger.warn(
+              "Abandoning ThreadPoolExecutor (not yet destroyed after 30 seconds)")
       }
     }
   }
@@ -63,19 +70,21 @@ object AsyncExecutor extends Logging {
   def default(name: String = "AsyncExecutor.default"): AsyncExecutor =
     apply(name, 20, 1000)
 
-
   trait PrioritizedRunnable extends Runnable {
     def highPriority: Boolean
   }
 
   private class DaemonThreadFactory(namePrefix: String) extends ThreadFactory {
-    private[this] val group = Option(System.getSecurityManager).fold(Thread.currentThread.getThreadGroup)(_.getThreadGroup)
+    private[this] val group = Option(System.getSecurityManager)
+      .fold(Thread.currentThread.getThreadGroup)(_.getThreadGroup)
     private[this] val threadNumber = new AtomicInteger(1)
 
     def newThread(r: Runnable): Thread = {
-      val t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement, 0)
-      if(!t.isDaemon) t.setDaemon(true)
-      if(t.getPriority != Thread.NORM_PRIORITY) t.setPriority(Thread.NORM_PRIORITY)
+      val t = new Thread(
+          group, r, namePrefix + threadNumber.getAndIncrement, 0)
+      if (!t.isDaemon) t.setDaemon(true)
+      if (t.getPriority != Thread.NORM_PRIORITY)
+        t.setPriority(Thread.NORM_PRIORITY)
       t
     }
   }
@@ -91,7 +100,8 @@ object AsyncExecutor extends Logging {
     }
   }
 
-  val loggingReporter: Throwable => Unit = (t: Throwable) => {
-    logger.warn("Execution of asynchronous I/O action failed", t)
+  val loggingReporter: Throwable => Unit = (t: Throwable) =>
+    {
+      logger.warn("Execution of asynchronous I/O action failed", t)
   }
 }

@@ -12,21 +12,23 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding.typed
 
-import cascading.pipe.joiner.{ Joiner => CJoiner, JoinerClosure }
-import cascading.tuple.{ Tuple => CTuple, Fields, TupleEntry }
+import cascading.pipe.joiner.{Joiner => CJoiner, JoinerClosure}
+import cascading.tuple.{Tuple => CTuple, Fields, TupleEntry}
 
 import com.twitter.scalding._
 
 import scala.collection.JavaConverters._
 
 /**
- * Only intended to be use to implement the hashCogroup on TypedPipe/Grouped
- */
-class HashJoiner[K, V, W, R](rightGetter: (K, Iterator[CTuple], Seq[Iterable[CTuple]]) => Iterator[W],
-  joiner: (K, V, Iterable[W]) => Iterator[R]) extends CJoiner {
+  * Only intended to be use to implement the hashCogroup on TypedPipe/Grouped
+  */
+class HashJoiner[K, V, W, R](rightGetter: (K, Iterator[CTuple],
+                             Seq[Iterable[CTuple]]) => Iterator[W],
+                             joiner: (K, V, Iterable[W]) => Iterator[R])
+    extends CJoiner {
 
   override def getIterator(jc: JoinerClosure) = {
     // The left one cannot be iterated multiple times on Hadoop:
@@ -46,15 +48,14 @@ class HashJoiner[K, V, W, R](rightGetter: (K, Iterator[CTuple], Seq[Iterable[CTu
       left.flatMap { kv =>
         val leftV = kv.getObject(1).asInstanceOf[V] // get just the Vs
 
-        joiner(key, leftV, rightIterable)
-          .map { rval =>
-            // There always has to be four resulting fields
-            // or otherwise the flow planner will throw
-            val res = CTuple.size(4)
-            res.set(0, key)
-            res.set(1, rval)
-            res
-          }
+        joiner(key, leftV, rightIterable).map { rval =>
+          // There always has to be four resulting fields
+          // or otherwise the flow planner will throw
+          val res = CTuple.size(4)
+          res.set(0, key)
+          res.set(1, rval)
+          res
+        }
       }.asJava
     }
   }

@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import org.apache.spark.SparkContext
@@ -37,7 +36,8 @@ import org.apache.spark.SparkContext
   * @see [[LocalFileSystemPersistentModelLoader]]
   * @group Algorithm
   */
-trait LocalFileSystemPersistentModel[AP <: Params] extends PersistentModel[AP] {
+trait LocalFileSystemPersistentModel[AP <: Params]
+    extends PersistentModel[AP] {
   def save(id: String, params: AP, sc: SparkContext): Boolean = {
     Utils.save(id, this)
     true
@@ -55,7 +55,7 @@ trait LocalFileSystemPersistentModel[AP <: Params] extends PersistentModel[AP] {
   * @group Algorithm
   */
 trait LocalFileSystemPersistentModelLoader[AP <: Params, M]
-  extends PersistentModelLoader[AP, M] {
+    extends PersistentModelLoader[AP, M] {
   def apply(id: String, params: AP, sc: Option[SparkContext]): M = {
     Utils.load(id).asInstanceOf[M]
   }
@@ -65,10 +65,12 @@ trait LocalFileSystemPersistentModelLoader[AP <: Params, M]
   *
   * @group Algorithm */
 @deprecated("Use LocalFileSystemPersistentModel instead.", "0.9.2")
-trait IFSPersistentModel[AP <: Params] extends LocalFileSystemPersistentModel[AP]
+trait IFSPersistentModel[AP <: Params]
+    extends LocalFileSystemPersistentModel[AP]
 
 /** DEPRECATED. Use [[LocalFileSystemPersistentModelLoader]] instead.
   *
   * @group Algorithm */
 @deprecated("Use LocalFileSystemPersistentModelLoader instead.", "0.9.2")
-trait IFSPersistentModelLoader[AP <: Params, M] extends LocalFileSystemPersistentModelLoader[AP, M]
+trait IFSPersistentModelLoader[AP <: Params, M]
+    extends LocalFileSystemPersistentModelLoader[AP, M]

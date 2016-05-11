@@ -38,12 +38,12 @@ import scalafx.scene.control.Alert.AlertType
 import scalafx.testutil.SFXEnumDelegateSpec
 
 /**
- *
- * Test for [[scalafx.scene.control.Alert.AlertType]].
- */
+  *
+  * Test for [[scalafx.scene.control.Alert.AlertType]].
+  */
 @RunWith(classOf[JUnitRunner])
 class AlertTypeSpec
-  extends SFXEnumDelegateSpec[jfxsc.Alert.AlertType, AlertType](
-    javaClass = classOf[jfxsc.Alert.AlertType],
-    scalaClass = classOf[AlertType],
-    companion = Alert.AlertType)
+    extends SFXEnumDelegateSpec[jfxsc.Alert.AlertType, AlertType](
+        javaClass = classOf[jfxsc.Alert.AlertType],
+        scalaClass = classOf[AlertType],
+        companion = Alert.AlertType)

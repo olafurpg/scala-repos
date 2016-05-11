@@ -33,20 +33,25 @@ object RankingMetricsExample {
     import sqlContext.implicits._
     // $example on$
     // Read in the ratings data
-    val ratings = sc.textFile("data/mllib/sample_movielens_data.txt").map { line =>
-      val fields = line.split("::")
-      Rating(fields(0).toInt, fields(1).toInt, fields(2).toDouble - 2.5)
-    }.cache()
+    val ratings = sc
+      .textFile("data/mllib/sample_movielens_data.txt")
+      .map { line =>
+        val fields = line.split("::")
+        Rating(fields(0).toInt, fields(1).toInt, fields(2).toDouble - 2.5)
+      }
+      .cache()
 
     // Map ratings to 1 or 0, 1 indicating a movie that should be recommended
-    val binarizedRatings = ratings.map(r => Rating(r.user, r.product,
-      if (r.rating > 0) 1.0 else 0.0)).cache()
+    val binarizedRatings = ratings
+      .map(r => Rating(r.user, r.product, if (r.rating > 0) 1.0 else 0.0))
+      .cache()
 
     // Summarize ratings
     val numRatings = ratings.count()
     val numUsers = ratings.map(_.user).distinct().count()
     val numMovies = ratings.map(_.product).distinct().count()
-    println(s"Got $numRatings ratings from $numUsers users on $numMovies movies.")
+    println(
+        s"Got $numRatings ratings from $numUsers users on $numMovies movies.")
 
     // Build the model
     val numIterations = 10
@@ -61,16 +66,18 @@ object RankingMetricsExample {
     }
 
     // Get sorted top ten predictions for each user and then scale from [0, 1]
-    val userRecommended = model.recommendProductsForUsers(10).map { case (user, recs) =>
-      (user, recs.map(scaledRating))
+    val userRecommended = model.recommendProductsForUsers(10).map {
+      case (user, recs) =>
+        (user, recs.map(scaledRating))
     }
 
     // Assume that any movie a user rated 3 or higher (which maps to a 1) is a relevant document
     // Compare with top ten most relevant documents
     val userMovies = binarizedRatings.groupBy(_.user)
-    val relevantDocuments = userMovies.join(userRecommended).map { case (user, (actual,
-    predictions)) =>
-      (predictions.map(_.product), actual.filter(_.rating > 0.0).map(_.product).toArray)
+    val relevantDocuments = userMovies.join(userRecommended).map {
+      case (user, (actual, predictions)) =>
+        (predictions.map(_.product),
+         actual.filter(_.rating > 0.0).map(_.product).toArray)
     }
 
     // Instantiate metrics object
@@ -90,12 +97,13 @@ object RankingMetricsExample {
     }
 
     // Get predictions for each data point
-    val allPredictions = model.predict(ratings.map(r => (r.user, r.product))).map(r => ((r.user,
-      r.product), r.rating))
+    val allPredictions = model
+      .predict(ratings.map(r => (r.user, r.product)))
+      .map(r => ((r.user, r.product), r.rating))
     val allRatings = ratings.map(r => ((r.user, r.product), r.rating))
-    val predictionsAndLabels = allPredictions.join(allRatings).map { case ((user, product),
-    (predicted, actual)) =>
-      (predicted, actual)
+    val predictionsAndLabels = allPredictions.join(allRatings).map {
+      case ((user, product), (predicted, actual)) =>
+        (predicted, actual)
     }
 
     // Get the RMSE using regression metrics

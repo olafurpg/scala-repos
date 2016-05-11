@@ -5,12 +5,12 @@ import event._
 import Swing._
 
 /**
- * @author John Sullivan
- * @author Ingo Maier
- */
+  * @author John Sullivan
+  * @author Ingo Maier
+  */
 object PopupDemo extends SimpleSwingApplication {
-	def top = new MainFrame {
-		val popupMenu = new PopupMenu {
+  def top = new MainFrame {
+    val popupMenu = new PopupMenu {
       contents += new Menu("menu 1") {
         contents += new RadioMenuItem("radio 1.1")
         contents += new RadioMenuItem("radio 1.2")
@@ -29,5 +29,5 @@ object PopupDemo extends SimpleSwingApplication {
     listenTo(button)
 
     contents = new FlowPanel(button)
-	}
+  }
 }

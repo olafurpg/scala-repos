@@ -1,15 +1,14 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.camel
 
 import language.implicitConversions
 
 import internal.CamelExchangeAdapter
 import org.apache.camel.impl.DefaultExchange
-import org.apache.camel.{ Exchange, ExchangePattern }
-import akka.camel.TestSupport.{ SharedCamelSystem }
+import org.apache.camel.{Exchange, ExchangePattern}
+import akka.camel.TestSupport.{SharedCamelSystem}
 import org.scalatest.FunSuite
 
 class CamelExchangeAdapterTest extends FunSuite with SharedCamelSystem {
@@ -83,17 +82,20 @@ class CamelExchangeAdapterTest extends FunSuite with SharedCamelSystem {
 
   test("mustCreateRequestMessageFromInMessageWithAdditionalHeader") {
     val m = sampleInOnly.toRequestMessage(Map("x" -> "y"))
-    assert(m === CamelMessage("test-in", Map("key-in" -> "val-in", "x" -> "y")))
+    assert(
+        m === CamelMessage("test-in", Map("key-in" -> "val-in", "x" -> "y")))
   }
 
   test("mustCreateResponseMessageFromInMessageWithAdditionalHeader") {
     val m = sampleInOnly.toResponseMessage(Map("x" -> "y"))
-    assert(m === CamelMessage("test-in", Map("key-in" -> "val-in", "x" -> "y")))
+    assert(
+        m === CamelMessage("test-in", Map("key-in" -> "val-in", "x" -> "y")))
   }
 
   test("mustCreateResponseMessageFromOutMessageWithAdditionalHeader") {
     val m = sampleInOut.toResponseMessage(Map("x" -> "y"))
-    assert(m === CamelMessage("test-out", Map("key-out" -> "val-out", "x" -> "y")))
+    assert(m === CamelMessage("test-out",
+                              Map("key-out" -> "val-out", "x" -> "y")))
   }
 
   test("mustCreateFailureMessageFromExceptionAndInMessageWithAdditionalHeader") {
@@ -108,10 +110,10 @@ class CamelExchangeAdapterTest extends FunSuite with SharedCamelSystem {
     val failureHeaders = e1.toFailureResult(Map("x" -> "y")).headers
     assert(failureHeaders("key-in") === "val-in")
     assert(failureHeaders("x") === "y")
-
   }
 
-  test("mustCreateFailureMessageFromExceptionAndOutMessageWithAdditionalHeader") {
+  test(
+      "mustCreateFailureMessageFromExceptionAndOutMessageWithAdditionalHeader") {
     val e1 = sampleInOut
     e1.setException(new Exception("test2"))
     assert(e1.toAkkaCamelException.getMessage === "test2")

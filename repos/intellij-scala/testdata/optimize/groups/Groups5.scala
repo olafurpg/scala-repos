@@ -1,5 +1,5 @@
 package pack {
-class G
+  class G
 }
 
 class Groups1 {

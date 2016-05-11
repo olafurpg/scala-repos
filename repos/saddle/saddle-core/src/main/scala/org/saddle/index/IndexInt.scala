@@ -1,19 +1,18 @@
 /**
- * Copyright (c) 2013 Saddle Development Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
-
+  * Copyright (c) 2013 Saddle Development Team
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  *     http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  **/
 package org.saddle.index
 
 import scala.{specialized => spec}
@@ -26,12 +25,13 @@ import locator.Locator
 import org.saddle.scalar._
 
 /**
- * Index with integer keys
- */
+  * Index with integer keys
+  */
 class IndexInt(keys: Vec[Int]) extends Index[Int] {
   val scalarTag = ScalarTagInt
 
-  private lazy val (lmap, IndexProperties(contiguous, monotonic)) = IndexImpl.keys2map(this)
+  private lazy val (lmap, IndexProperties(contiguous, monotonic)) =
+    IndexImpl.keys2map(this)
 
   protected def locator: Locator[Int] = lmap
 
@@ -42,11 +42,13 @@ class IndexInt(keys: Vec[Int]) extends Index[Int] {
   // get the key at the position specified
   def raw(idx: Int): Int = keys(idx)
 
-  def take(locs: Array[Int]): Index[Int] = Index(array.take(keys, locs, IndexImpl.sentinelErr))
+  def take(locs: Array[Int]): Index[Int] =
+    Index(array.take(keys, locs, IndexImpl.sentinelErr))
 
   def without(locs: Array[Int]): Index[Int] = Index(array.remove(keys, locs))
 
-  def concat[B, C](x: Index[B])(implicit wd: Promoter[Int, B, C], mc: ST[C], oc: ORD[C]): Index[C] =
+  def concat[B, C](x: Index[B])(
+      implicit wd: Promoter[Int, B, C], mc: ST[C], oc: ORD[C]): Index[C] =
     Index(util.Concat.append[Int, B, C](toArray, x.toArray))
 
   def isMonotonic: Boolean = monotonic
@@ -84,10 +86,8 @@ class IndexInt(keys: Vec[Int]) extends Index[Int] {
 
     val fnd = locator.count(t)
 
-    if (fnd > 0)
-      locator.get(t)
-    else
-      -(binarySearch(keys, t) + 1)
+    if (fnd > 0) locator.get(t)
+    else -(binarySearch(keys, t) + 1)
   }
 
   // find the last location whereby an insertion would maintain a sorted index
@@ -96,13 +96,12 @@ class IndexInt(keys: Vec[Int]) extends Index[Int] {
 
     val fnd = locator.count(t)
 
-    if (fnd > 0)
-      fnd + locator.get(t)
-    else
-      -(binarySearch(keys, t) + 1)
+    if (fnd > 0) fnd + locator.get(t)
+    else -(binarySearch(keys, t) + 1)
   }
 
-  def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](f: Int => B): Index[B] =
+  def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
+      f: Int => B): Index[B] =
     Index(VecImpl.map(keys)(f).toArray)
 
   def toArray: Array[Int] = keys.toArray
@@ -110,15 +109,16 @@ class IndexInt(keys: Vec[Int]) extends Index[Int] {
   /**Default equality does an iterative, element-wise equality check of all values. */
   override def equals(o: Any): Boolean = {
     o match {
-      case rv: IndexInt => (this eq rv) || (this.length == rv.length) && {
-        var i = 0
-        var eq = true
-        while(eq && i < this.length) {
-          eq &&= raw(i) == rv.raw(i)
-          i += 1
+      case rv: IndexInt =>
+        (this eq rv) || (this.length == rv.length) && {
+          var i = 0
+          var eq = true
+          while (eq && i < this.length) {
+            eq &&= raw(i) == rv.raw(i)
+            i += 1
+          }
+          eq
         }
-        eq
-      }
       case _ => super.equals(o)
     }
   }

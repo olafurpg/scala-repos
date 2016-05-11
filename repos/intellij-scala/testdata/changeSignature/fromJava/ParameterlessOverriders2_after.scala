@@ -25,5 +25,4 @@ object Test {
 
     val x = bar(true)
   }
-
 }

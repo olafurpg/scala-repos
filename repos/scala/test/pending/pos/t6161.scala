@@ -10,8 +10,7 @@ object t6161 {
     }
   }
 
-  trait S {
-    self: N => // change to N1 and it compiles
+  trait S { self: N => // change to N1 and it compiles
     type NameType <: Name
   }
 

@@ -4,7 +4,7 @@
 
 package akka.http.scaladsl.coding
 
-import akka.stream.{ Attributes, FlowShape }
+import akka.stream.{Attributes, FlowShape}
 import akka.stream.impl.fusing.GraphStages.SimpleLinearGraphStage
 
 import scala.concurrent.duration._
@@ -24,30 +24,40 @@ class DecoderSpec extends WordSpec with CodecSpecSupport {
       DummyDecoder.decode(request) shouldEqual request
     }
     "correctly transform the message if it contains a Content-Encoding header" in {
-      val request = HttpRequest(POST, entity = HttpEntity(smallText), headers = List(`Content-Encoding`(DummyDecoder.encoding)))
+      val request =
+        HttpRequest(POST,
+                    entity = HttpEntity(smallText),
+                    headers = List(`Content-Encoding`(DummyDecoder.encoding)))
       val decoded = DummyDecoder.decode(request)
       decoded.headers shouldEqual Nil
-      decoded.entity.toStrict(1.second).awaitResult(1.second) shouldEqual HttpEntity(dummyDecompress(smallText))
+      decoded.entity.toStrict(1.second).awaitResult(1.second) shouldEqual HttpEntity(
+          dummyDecompress(smallText))
     }
   }
 
-  def dummyDecompress(s: String): String = dummyDecompress(ByteString(s, "UTF8")).decodeString("UTF8")
-  def dummyDecompress(bytes: ByteString): ByteString = DummyDecoder.decode(bytes).awaitResult(1.second)
+  def dummyDecompress(s: String): String =
+    dummyDecompress(ByteString(s, "UTF8")).decodeString("UTF8")
+  def dummyDecompress(bytes: ByteString): ByteString =
+    DummyDecoder.decode(bytes).awaitResult(1.second)
 
   case object DummyDecoder extends StreamDecoder {
     val encoding = HttpEncodings.compress
 
-    override def newDecompressorStage(maxBytesPerChunk: Int): () ⇒ GraphStage[FlowShape[ByteString, ByteString]] =
-      () ⇒ new SimpleLinearGraphStage[ByteString] {
-        override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = new GraphStageLogic(shape) {
-          setHandler(in, new InHandler {
-            override def onPush(): Unit = push(out, grab(in) ++ ByteString("compressed"))
-          })
-          setHandler(out, new OutHandler {
-            override def onPull(): Unit = pull(in)
-          })
-        }
+    override def newDecompressorStage(maxBytesPerChunk: Int)
+      : () ⇒ GraphStage[FlowShape[ByteString, ByteString]] =
+      () ⇒
+        new SimpleLinearGraphStage[ByteString] {
+          override def createLogic(
+              inheritedAttributes: Attributes): GraphStageLogic =
+            new GraphStageLogic(shape) {
+              setHandler(in, new InHandler {
+                override def onPush(): Unit =
+                  push(out, grab(in) ++ ByteString("compressed"))
+              })
+              setHandler(out, new OutHandler {
+                override def onPull(): Unit = pull(in)
+              })
+            }
       }
   }
-
 }

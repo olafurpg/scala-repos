@@ -9,18 +9,33 @@ import scala.tools.nsc.settings.ClassPathRepresentationType
 import scala.tools.util.PathResolverFactory
 
 /**
- * Simple application to compare efficiency of the recursive and the flat classpath representations
- */
+  * Simple application to compare efficiency of the recursive and the flat classpath representations
+  */
 object ClassPathImplComparator {
 
   private class TestSettings extends Settings {
-    val checkClasses = PathSetting("-checkClasses", "Specify names of classes which should be found separated with ;", "")
-    val requiredIterations = IntSetting("-requiredIterations",
-      "Repeat tests specified number of times (to check e.g. impact of caches)", 1, Some((1, Int.MaxValue)), (_: String) => None)
-    val cpCreationRepetitions = IntSetting("-cpCreationRepetitions",
-      "Repeat tests specified number of times (to check e.g. impact of caches)", 1, Some((1, Int.MaxValue)), (_: String) => None)
-    val cpLookupRepetitions = IntSetting("-cpLookupRepetitions",
-      "Repeat tests specified number of times (to check e.g. impact of caches)", 1, Some((1, Int.MaxValue)), (_: String) => None)
+    val checkClasses = PathSetting(
+        "-checkClasses",
+        "Specify names of classes which should be found separated with ;",
+        "")
+    val requiredIterations = IntSetting(
+        "-requiredIterations",
+        "Repeat tests specified number of times (to check e.g. impact of caches)",
+        1,
+        Some((1, Int.MaxValue)),
+        (_: String) => None)
+    val cpCreationRepetitions = IntSetting(
+        "-cpCreationRepetitions",
+        "Repeat tests specified number of times (to check e.g. impact of caches)",
+        1,
+        Some((1, Int.MaxValue)),
+        (_: String) => None)
+    val cpLookupRepetitions = IntSetting(
+        "-cpLookupRepetitions",
+        "Repeat tests specified number of times (to check e.g. impact of caches)",
+        1,
+        Some((1, Int.MaxValue)),
+        (_: String) => None)
   }
 
   private class DurationStats(name: String) {
@@ -34,48 +49,61 @@ object ClassPathImplComparator {
 
     def printResults(): Unit = {
       val avg = if (iterations == 0) 0 else sum.toDouble / iterations
-      println(s"$name - total duration: $sum ms; iterations: $iterations; avg: $avg ms")
+      println(
+          s"$name - total duration: $sum ms; iterations: $iterations; avg: $avg ms")
     }
   }
 
   private lazy val defaultClassesToFind = List(
-    "scala.collection.immutable.List",
-    "scala.Option",
-    "scala.Int",
-    "scala.collection.immutable.Vector",
-    "scala.util.hashing.MurmurHash3"
+      "scala.collection.immutable.List",
+      "scala.Option",
+      "scala.Int",
+      "scala.collection.immutable.Vector",
+      "scala.util.hashing.MurmurHash3"
   )
 
   private val oldCpCreationStats = new DurationStats("Old classpath - create")
   private val oldCpSearchingStats = new DurationStats("Old classpath - search")
 
-  private val flatCpCreationStats = new DurationStats("Flat classpath - create")
-  private val flatCpSearchingStats = new DurationStats("Flat classpath - search")
+  private val flatCpCreationStats = new DurationStats(
+      "Flat classpath - create")
+  private val flatCpSearchingStats = new DurationStats(
+      "Flat classpath - search")
 
   def main(args: Array[String]): Unit = {
 
-    if (args contains "-help")
-      usage()
+    if (args contains "-help") usage()
     else {
-      val oldCpSettings = loadSettings(args.toList, ClassPathRepresentationType.Recursive)
-      val flatCpSettings = loadSettings(args.toList, ClassPathRepresentationType.Flat)
+      val oldCpSettings = loadSettings(
+          args.toList, ClassPathRepresentationType.Recursive)
+      val flatCpSettings = loadSettings(
+          args.toList, ClassPathRepresentationType.Flat)
 
       val classesToCheck = oldCpSettings.checkClasses.value
       val classesToFind =
         if (classesToCheck.isEmpty) defaultClassesToFind
         else classesToCheck.split(";").toList
 
-      def doTest(classPath: => ClassFileLookup[AbstractFile], cpCreationStats: DurationStats, cpSearchingStats: DurationStats,
-                 cpCreationRepetitions: Int, cpLookupRepetitions: Int)= {
+      def doTest(classPath: => ClassFileLookup[AbstractFile],
+                 cpCreationStats: DurationStats,
+                 cpSearchingStats: DurationStats,
+                 cpCreationRepetitions: Int,
+                 cpLookupRepetitions: Int) = {
 
-        def createClassPaths() = (1 to cpCreationRepetitions).map(_ => classPath).last
-        def testClassLookup(cp: ClassFileLookup[AbstractFile]): Boolean = (1 to cpCreationRepetitions).foldLeft(true) {
-          case (a, _) => a && checkExistenceOfClasses(classesToFind)(cp)
-        }
+        def createClassPaths() =
+          (1 to cpCreationRepetitions).map(_ => classPath).last
+        def testClassLookup(cp: ClassFileLookup[AbstractFile]): Boolean =
+          (1 to cpCreationRepetitions).foldLeft(true) {
+            case (a, _) => a && checkExistenceOfClasses(classesToFind)(cp)
+          }
 
-        val cp = withMeasuredTime("Creating classpath", createClassPaths(), cpCreationStats)
-        val result = withMeasuredTime("Searching for specified classes", testClassLookup(cp), cpSearchingStats)
-        println(s"The end of the test case. All expected classes found = $result \n")
+        val cp = withMeasuredTime(
+            "Creating classpath", createClassPaths(), cpCreationStats)
+        val result = withMeasuredTime("Searching for specified classes",
+                                      testClassLookup(cp),
+                                      cpSearchingStats)
+        println(
+            s"The end of the test case. All expected classes found = $result \n")
       }
 
       (1 to oldCpSettings.requiredIterations.value) foreach { iteration =>
@@ -83,12 +111,18 @@ object ClassPathImplComparator {
           println(s"Iteration no $iteration")
 
         println("Recursive (old) classpath representation:")
-        doTest(PathResolverFactory.create(oldCpSettings).result, oldCpCreationStats, oldCpSearchingStats,
-          oldCpSettings.cpCreationRepetitions.value, oldCpSettings.cpLookupRepetitions.value)
+        doTest(PathResolverFactory.create(oldCpSettings).result,
+               oldCpCreationStats,
+               oldCpSearchingStats,
+               oldCpSettings.cpCreationRepetitions.value,
+               oldCpSettings.cpLookupRepetitions.value)
 
         println("Flat classpath representation:")
-        doTest(PathResolverFactory.create(flatCpSettings).result, flatCpCreationStats, flatCpSearchingStats,
-          flatCpSettings.cpCreationRepetitions.value, flatCpSettings.cpLookupRepetitions.value)
+        doTest(PathResolverFactory.create(flatCpSettings).result,
+               flatCpCreationStats,
+               flatCpSearchingStats,
+               flatCpSettings.cpCreationRepetitions.value,
+               flatCpSettings.cpLookupRepetitions.value)
       }
 
       if (oldCpSettings.requiredIterations.value > 1) {
@@ -104,8 +138,8 @@ object ClassPathImplComparator {
   }
 
   /**
-   * Prints usage information
-   */
+    * Prints usage information
+    */
   private def usage(): Unit =
     println("""Use classpath and sourcepath options like in the case of e.g. 'scala' command.
               | There are also two additional options:
@@ -123,7 +157,8 @@ object ClassPathImplComparator {
     settings
   }
 
-  private def withMeasuredTime[T](operationName: String, f: => T, durationStats: DurationStats): T = {
+  private def withMeasuredTime[T](
+      operationName: String, f: => T, durationStats: DurationStats): T = {
     val startTime = System.currentTimeMillis()
     val res = f
     val elapsed = System.currentTimeMillis() - startTime
@@ -132,7 +167,8 @@ object ClassPathImplComparator {
     res
   }
 
-  private def checkExistenceOfClasses(classesToCheck: Seq[String])(classPath: ClassFileLookup[AbstractFile]): Boolean =
+  private def checkExistenceOfClasses(classesToCheck: Seq[String])(
+      classPath: ClassFileLookup[AbstractFile]): Boolean =
     classesToCheck.foldLeft(true) {
       case (res, classToCheck) =>
         val found = classPath.findClass(classToCheck).isDefined

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.testkit._
@@ -18,7 +18,8 @@ object RemoteRouterSpec {
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class RemoteRouterSpec extends AkkaSpec("""
+class RemoteRouterSpec
+    extends AkkaSpec("""
     akka.actor.provider = "akka.remote.RemoteActorRefProvider"
     akka.remote.netty.tcp {
       hostname = localhost
@@ -33,10 +34,14 @@ class RemoteRouterSpec extends AkkaSpec("""
 
   import RemoteRouterSpec._
 
-  val port = system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress.port.get
+  val port = system
+    .asInstanceOf[ExtendedActorSystem]
+    .provider
+    .getDefaultAddress
+    .port
+    .get
   val sysName = system.name
-  val conf = ConfigFactory.parseString(
-    s"""
+  val conf = ConfigFactory.parseString(s"""
     akka {
       actor.deployment {
         /blub {
@@ -80,7 +85,8 @@ class RemoteRouterSpec extends AkkaSpec("""
 
     "deploy its children on remote host driven by configuration" in {
       val probe = TestProbe()(masterSystem)
-      val router = masterSystem.actorOf(RoundRobinPool(2).props(Props[Echo]), "blub")
+      val router =
+        masterSystem.actorOf(RoundRobinPool(2).props(Props[Echo]), "blub")
       val replies = for (i ← 1 to 5) yield {
         router.tell("", probe.ref)
         probe.expectMsgType[ActorRef].path
@@ -88,14 +94,20 @@ class RemoteRouterSpec extends AkkaSpec("""
       val children = replies.toSet
       children should have size 2
       children.map(_.parent) should have size 1
-      children foreach (_.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}"))
+      children foreach
+      (_.address.toString should ===(
+              s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
     "deploy its children on remote host driven by programatic definition" in {
       val probe = TestProbe()(masterSystem)
-      val router = masterSystem.actorOf(new RemoteRouterConfig(RoundRobinPool(2),
-        Seq(Address("akka.tcp", sysName, "localhost", port))).props(Props[Echo]), "blub2")
+      val router = masterSystem.actorOf(
+          new RemoteRouterConfig(
+              RoundRobinPool(2),
+              Seq(Address("akka.tcp", sysName, "localhost", port)))
+            .props(Props[Echo]),
+          "blub2")
       val replies = for (i ← 1 to 5) yield {
         router.tell("", probe.ref)
         probe.expectMsgType[ActorRef].path
@@ -103,13 +115,16 @@ class RemoteRouterSpec extends AkkaSpec("""
       val children = replies.toSet
       children should have size 2
       children.map(_.parent) should have size 1
-      children foreach (_.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}"))
+      children foreach
+      (_.address.toString should ===(
+              s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
     "deploy dynamic resizable number of children on remote host driven by configuration" in {
       val probe = TestProbe()(masterSystem)
-      val router = masterSystem.actorOf(FromConfig.props(Props[Echo]), "elastic-blub")
+      val router =
+        masterSystem.actorOf(FromConfig.props(Props[Echo]), "elastic-blub")
       val replies = for (i ← 1 to 5000) yield {
         router.tell("", probe.ref)
         probe.expectMsgType[ActorRef].path
@@ -117,14 +132,18 @@ class RemoteRouterSpec extends AkkaSpec("""
       val children = replies.toSet
       children.size should be >= 2
       children.map(_.parent) should have size 1
-      children foreach (_.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}"))
+      children foreach
+      (_.address.toString should ===(
+              s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
     "deploy remote routers based on configuration" in {
       val probe = TestProbe()(masterSystem)
-      val router = masterSystem.actorOf(FromConfig.props(Props[Echo]), "remote-blub")
-      router.path.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}")
+      val router =
+        masterSystem.actorOf(FromConfig.props(Props[Echo]), "remote-blub")
+      router.path.address.toString should ===(
+          s"akka.tcp://${sysName}@localhost:${port}")
       val replies = for (i ← 1 to 5) yield {
         router.tell("", probe.ref)
         probe.expectMsgType[ActorRef].path
@@ -134,15 +153,22 @@ class RemoteRouterSpec extends AkkaSpec("""
       val parents = children.map(_.parent)
       parents should have size 1
       parents.head should ===(router.path)
-      children foreach (_.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}"))
+      children foreach
+      (_.address.toString should ===(
+              s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
     "deploy remote routers based on explicit deployment" in {
       val probe = TestProbe()(masterSystem)
-      val router = masterSystem.actorOf(RoundRobinPool(2).props(Props[Echo])
-        .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(s"akka.tcp://${sysName}@localhost:${port}")))), "remote-blub2")
-      router.path.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}")
+      val router = masterSystem.actorOf(
+          RoundRobinPool(2)
+            .props(Props[Echo])
+            .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(
+                              s"akka.tcp://${sysName}@localhost:${port}")))),
+          "remote-blub2")
+      router.path.address.toString should ===(
+          s"akka.tcp://${sysName}@localhost:${port}")
       val replies = for (i ← 1 to 5) yield {
         router.tell("", probe.ref)
         probe.expectMsgType[ActorRef].path
@@ -152,14 +178,20 @@ class RemoteRouterSpec extends AkkaSpec("""
       val parents = children.map(_.parent)
       parents should have size 1
       parents.head should ===(router.path)
-      children foreach (_.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}"))
+      children foreach
+      (_.address.toString should ===(
+              s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
     "let remote deployment be overridden by local configuration" in {
       val probe = TestProbe()(masterSystem)
-      val router = masterSystem.actorOf(RoundRobinPool(2).props(Props[Echo])
-        .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(s"akka.tcp://${sysName}@localhost:${port}")))), "local-blub")
+      val router = masterSystem.actorOf(
+          RoundRobinPool(2)
+            .props(Props[Echo])
+            .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(
+                              s"akka.tcp://${sysName}@localhost:${port}")))),
+          "local-blub")
       router.path.address.toString should ===("akka://MasterRemoteRouterSpec")
       val replies = for (i ← 1 to 5) yield {
         router.tell("", probe.ref)
@@ -169,16 +201,24 @@ class RemoteRouterSpec extends AkkaSpec("""
       children should have size 2
       val parents = children.map(_.parent)
       parents should have size 1
-      parents.head.address should ===(Address("akka.tcp", sysName, "localhost", port))
-      children foreach (_.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}"))
+      parents.head.address should ===(
+          Address("akka.tcp", sysName, "localhost", port))
+      children foreach
+      (_.address.toString should ===(
+              s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
     "let remote deployment router be overridden by local configuration" in {
       val probe = TestProbe()(masterSystem)
-      val router = masterSystem.actorOf(RoundRobinPool(2).props(Props[Echo])
-        .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(s"akka.tcp://${sysName}@localhost:${port}")))), "local-blub2")
-      router.path.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}")
+      val router = masterSystem.actorOf(
+          RoundRobinPool(2)
+            .props(Props[Echo])
+            .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(
+                              s"akka.tcp://${sysName}@localhost:${port}")))),
+          "local-blub2")
+      router.path.address.toString should ===(
+          s"akka.tcp://${sysName}@localhost:${port}")
       val replies = for (i ← 1 to 5) yield {
         router.tell("", probe.ref)
         probe.expectMsgType[ActorRef].path
@@ -188,15 +228,22 @@ class RemoteRouterSpec extends AkkaSpec("""
       val parents = children.map(_.parent)
       parents should have size 1
       parents.head should ===(router.path)
-      children foreach (_.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}"))
+      children foreach
+      (_.address.toString should ===(
+              s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
     "let remote deployment be overridden by remote configuration" in {
       val probe = TestProbe()(masterSystem)
-      val router = masterSystem.actorOf(RoundRobinPool(2).props(Props[Echo])
-        .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(s"akka.tcp://${sysName}@localhost:${port}")))), "remote-override")
-      router.path.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}")
+      val router = masterSystem.actorOf(
+          RoundRobinPool(2)
+            .props(Props[Echo])
+            .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(
+                              s"akka.tcp://${sysName}@localhost:${port}")))),
+          "remote-override")
+      router.path.address.toString should ===(
+          s"akka.tcp://${sysName}@localhost:${port}")
       val replies = for (i ← 1 to 5) yield {
         router.tell("", probe.ref)
         probe.expectMsgType[ActorRef].path
@@ -206,7 +253,9 @@ class RemoteRouterSpec extends AkkaSpec("""
       val parents = children.map(_.parent)
       parents should have size 1
       parents.head should ===(router.path)
-      children foreach (_.address.toString should ===(s"akka.tcp://${sysName}@localhost:${port}"))
+      children foreach
+      (_.address.toString should ===(
+              s"akka.tcp://${sysName}@localhost:${port}"))
       masterSystem.stop(router)
     }
 
@@ -215,9 +264,12 @@ class RemoteRouterSpec extends AkkaSpec("""
       val escalator = OneForOneStrategy() {
         case e ⇒ probe.ref ! e; SupervisorStrategy.Escalate
       }
-      val router = masterSystem.actorOf(new RemoteRouterConfig(
-        RoundRobinPool(1, supervisorStrategy = escalator),
-        Seq(Address("akka.tcp", sysName, "localhost", port))).props(Props.empty), "blub3")
+      val router = masterSystem.actorOf(
+          new RemoteRouterConfig(
+              RoundRobinPool(1, supervisorStrategy = escalator),
+              Seq(Address("akka.tcp", sysName, "localhost", port)))
+            .props(Props.empty),
+          "blub3")
 
       router.tell(GetRoutees, probe.ref)
       EventFilter[ActorKilledException](occurrences = 1).intercept {
@@ -225,7 +277,5 @@ class RemoteRouterSpec extends AkkaSpec("""
       }(masterSystem)
       probe.expectMsgType[ActorKilledException]
     }
-
   }
-
 }

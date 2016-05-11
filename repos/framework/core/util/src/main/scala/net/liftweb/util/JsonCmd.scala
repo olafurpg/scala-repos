@@ -24,42 +24,43 @@ trait HasParams {
   def param(name: String): Box[String]
 }
 
-
 /**
- * Impersonates a JSON command
- */
-case class JsonCmd(command: String, target: String, params: Any,
+  * Impersonates a JSON command
+  */
+case class JsonCmd(command: String,
+                   target: String,
+                   params: Any,
                    all: scala.collection.Map[String, Any])
 
 import net.liftweb.json.JsonAST._
 
 /**
-* A helpful extractor to take the JValue sent from the client-side JSON stuff and
-* make some sense of it.
-*/
+  * A helpful extractor to take the JValue sent from the client-side JSON stuff and
+  * make some sense of it.
+  */
 object JsonCommand {
   import scala.language.implicitConversions
 
-  implicit def iterableToOption[X](in: Iterable[X]): Option[X] = in.toSeq.headOption
+  implicit def iterableToOption[X](in: Iterable[X]): Option[X] =
+    in.toSeq.headOption
 
   def unapply(in: JValue): Option[(String, Option[String], JValue)] =
-  for {
-    JString(command) <- in \ "command"
-    params <- in \ "params"
-    if params != JNothing
-  } yield {
-    val target = (in \ "target") match {
-      case JString(t) => Some(t)
-      case _ => None
+    for {
+      JString(command) <- in \ "command"
+      params <- in \ "params" if params != JNothing
+    } yield {
+      val target = (in \ "target") match {
+        case JString(t) => Some(t)
+        case _ => None
+      }
+      (command, target, params)
     }
-    (command, target, params)
-  }
   // Some((in.command, in.target, in.params, in.all))
 }
 
 /**
- * Holds information about a response
- */
+  * Holds information about a response
+  */
 class ResponseInfoHolder {
   var headers: Map[String, String] = Map.empty
   private var _docType: Box[String] = Empty
@@ -74,4 +75,3 @@ class ResponseInfoHolder {
 
   def overrodeDocType = _setDocType
 }
-

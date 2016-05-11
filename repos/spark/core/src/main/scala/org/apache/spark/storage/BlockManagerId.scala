@@ -25,34 +25,33 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.util.Utils
 
 /**
- * :: DeveloperApi ::
- * This class represent an unique identifier for a BlockManager.
- *
- * The first 2 constructors of this class is made private to ensure that BlockManagerId objects
- * can be created only using the apply method in the companion object. This allows de-duplication
- * of ID objects. Also, constructor parameters are private to ensure that parameters cannot be
- * modified from outside this class.
- */
+  * :: DeveloperApi ::
+  * This class represent an unique identifier for a BlockManager.
+  *
+  * The first 2 constructors of this class is made private to ensure that BlockManagerId objects
+  * can be created only using the apply method in the companion object. This allows de-duplication
+  * of ID objects. Also, constructor parameters are private to ensure that parameters cannot be
+  * modified from outside this class.
+  */
 @DeveloperApi
-class BlockManagerId private (
-    private var executorId_ : String,
-    private var host_ : String,
-    private var port_ : Int)
-  extends Externalizable {
+class BlockManagerId private (private var executorId_ : String,
+                              private var host_ : String,
+                              private var port_ : Int)
+    extends Externalizable {
 
-  private def this() = this(null, null, 0)  // For deserialization only
+  private def this() = this(null, null, 0) // For deserialization only
 
   def executorId: String = executorId_
 
   if (null != host_) {
     Utils.checkHost(host_, "Expected hostname")
-    assert (port_ > 0)
+    assert(port_ > 0)
   }
 
   def hostPort: String = {
     // DEBUG code
     Utils.checkHost(host)
-    assert (port > 0)
+    assert(port > 0)
     host + ":" + port
   }
 
@@ -62,14 +61,15 @@ class BlockManagerId private (
 
   def isDriver: Boolean = {
     executorId == SparkContext.DRIVER_IDENTIFIER ||
-      executorId == SparkContext.LEGACY_DRIVER_IDENTIFIER
+    executorId == SparkContext.LEGACY_DRIVER_IDENTIFIER
   }
 
-  override def writeExternal(out: ObjectOutput): Unit = Utils.tryOrIOException {
-    out.writeUTF(executorId_)
-    out.writeUTF(host_)
-    out.writeInt(port_)
-  }
+  override def writeExternal(out: ObjectOutput): Unit =
+    Utils.tryOrIOException {
+      out.writeUTF(executorId_)
+      out.writeUTF(host_)
+      out.writeInt(port_)
+    }
 
   override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException {
     executorId_ = in.readUTF()
@@ -78,11 +78,13 @@ class BlockManagerId private (
   }
 
   @throws(classOf[IOException])
-  private def readResolve(): Object = BlockManagerId.getCachedBlockManagerId(this)
+  private def readResolve(): Object =
+    BlockManagerId.getCachedBlockManagerId(this)
 
   override def toString: String = s"BlockManagerId($executorId, $host, $port)"
 
-  override def hashCode: Int = (executorId.hashCode * 41 + host.hashCode) * 41 + port
+  override def hashCode: Int =
+    (executorId.hashCode * 41 + host.hashCode) * 41 + port
 
   override def equals(that: Any): Boolean = that match {
     case id: BlockManagerId =>
@@ -92,17 +94,16 @@ class BlockManagerId private (
   }
 }
 
-
 private[spark] object BlockManagerId {
 
   /**
-   * Returns a [[org.apache.spark.storage.BlockManagerId]] for the given configuration.
-   *
-   * @param execId ID of the executor.
-   * @param host Host name of the block manager.
-   * @param port Port of the block manager.
-   * @return A new [[org.apache.spark.storage.BlockManagerId]].
-   */
+    * Returns a [[org.apache.spark.storage.BlockManagerId]] for the given configuration.
+    *
+    * @param execId ID of the executor.
+    * @param host Host name of the block manager.
+    * @param port Port of the block manager.
+    * @return A new [[org.apache.spark.storage.BlockManagerId]].
+    */
   def apply(execId: String, host: String, port: Int): BlockManagerId =
     getCachedBlockManagerId(new BlockManagerId(execId, host, port))
 
@@ -112,7 +113,8 @@ private[spark] object BlockManagerId {
     getCachedBlockManagerId(obj)
   }
 
-  val blockManagerIdCache = new ConcurrentHashMap[BlockManagerId, BlockManagerId]()
+  val blockManagerIdCache =
+    new ConcurrentHashMap[BlockManagerId, BlockManagerId]()
 
   def getCachedBlockManagerId(id: BlockManagerId): BlockManagerId = {
     blockManagerIdCache.putIfAbsent(id, id)

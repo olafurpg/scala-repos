@@ -15,9 +15,9 @@ import org.ensime.util.map._
 class SourceResolver(
     config: EnsimeConfig
 )(
-    implicit
-    vfs: EnsimeVFS
-) extends FileChangeListener with SLF4JLogging {
+    implicit vfs: EnsimeVFS
+)
+    extends FileChangeListener with SLF4JLogging {
 
   // it's not worth doing incremental updates - this is cheap
   // (but it would be nice to have a "debounce" throttler)
@@ -29,13 +29,14 @@ class SourceResolver(
   def resolve(clazz: PackageName, source: RawSource): Option[FileObject] =
     source.filename match {
       case None => None
-      case Some(filename) => all.get(clazz) flatMap {
-        _.find(_.getName.getBaseName == filename)
-      } match {
-        case s @ Some(_) => s
-        case None if clazz.path == Nil => None
-        case _ => resolve(clazz.parent, source)
-      }
+      case Some(filename) =>
+        all.get(clazz) flatMap {
+          _.find(_.getName.getBaseName == filename)
+        } match {
+          case s @ Some(_) => s
+          case None if clazz.path == Nil => None
+          case _ => resolve(clazz.parent, source)
+        }
     }
 
   def update(): Unit = {
@@ -49,12 +50,13 @@ class SourceResolver(
   }
 
   private val depSources = {
-    val srcJars = config.referenceSourceJars.toSet ++ {
-      for {
-        (_, module) <- config.modules
-        srcArchive <- module.referenceSourceJars
-      } yield srcArchive
-    }
+    val srcJars =
+      config.referenceSourceJars.toSet ++ {
+        for {
+          (_, module) <- config.modules
+          srcArchive <- module.referenceSourceJars
+        } yield srcArchive
+      }
     for {
       srcJarFile <- srcJars.toList
       // interestingly, this is able to handle zip files
@@ -87,5 +89,4 @@ class SourceResolver(
     // vfs separator char is always /
     PackageName((relative split "/").toList.init)
   }
-
 }

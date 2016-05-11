@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -11,20 +11,20 @@ package collection
 package mutable
 
 /** This class can be used as an adaptor to create mutable sets from
- *  immutable set implementations. Only method `empty` has
- *  to be redefined if the immutable set on which this mutable set is
- *  originally based is not empty. `empty` is supposed to
- *  return the representation of an empty set.
- *
- *  @author  Matthias Zenger
- *  @version 1.0, 21/07/2003
- *  @since   1
- */
-@deprecated("Adaptors are inherently unreliable and prone to performance problems.", "2.11.0")
+  *  immutable set implementations. Only method `empty` has
+  *  to be redefined if the immutable set on which this mutable set is
+  *  originally based is not empty. `empty` is supposed to
+  *  return the representation of an empty set.
+  *
+  *  @author  Matthias Zenger
+  *  @version 1.0, 21/07/2003
+  *  @since   1
+  */
+@deprecated(
+    "Adaptors are inherently unreliable and prone to performance problems.",
+    "2.11.0")
 class ImmutableSetAdaptor[A](protected var set: immutable.Set[A])
-extends AbstractSet[A]
-   with Set[A]
-   with Serializable {
+    extends AbstractSet[A] with Set[A] with Serializable {
 
   override def size: Int = set.size
 

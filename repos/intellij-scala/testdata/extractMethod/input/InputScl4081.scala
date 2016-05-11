@@ -2,7 +2,7 @@ class InputScl4081 {
   def foo {
     val validations = List(0)
     val bar = 1
-    val as = /*start*/validations.size + bar/*end*/
+    val as = /*start*/ validations.size + bar /*end*/
     as
   }
 }
@@ -19,4 +19,4 @@ class InputScl4081 {
     validations.size + bar
   }
 }
-*/
+ */

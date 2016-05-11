@@ -7,15 +7,20 @@ trait AppSelector {
 }
 
 object AppSelector {
-  def apply(matchesFunc: AppDefinition => Boolean): AppSelector = new AppSelector {
-    override def matches(app: AppDefinition): Boolean = matchesFunc(app)
-  }
+  def apply(matchesFunc: AppDefinition => Boolean): AppSelector =
+    new AppSelector {
+      override def matches(app: AppDefinition): Boolean = matchesFunc(app)
+    }
 
   def all: AppSelector = AppSelector(_ => true)
 
-  def forall(selectors: Iterable[AppSelector]): AppSelector = new AllAppSelectorsMustMatch(selectors)
+  def forall(selectors: Iterable[AppSelector]): AppSelector =
+    new AllAppSelectorsMustMatch(selectors)
 
-  private[appinfo] class AllAppSelectorsMustMatch(selectors: Iterable[AppSelector]) extends AppSelector {
-    override def matches(app: AppDefinition): Boolean = selectors.forall(_.matches(app))
+  private[appinfo] class AllAppSelectorsMustMatch(
+      selectors: Iterable[AppSelector])
+      extends AppSelector {
+    override def matches(app: AppDefinition): Boolean =
+      selectors.forall(_.matches(app))
   }
 }

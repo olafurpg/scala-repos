@@ -12,14 +12,14 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.scalding
 
 import java.io.File
-import scala.io.{ Source => ScalaSource }
+import scala.io.{Source => ScalaSource}
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 import cascading.tap.SinkMode
 import cascading.tuple.Fields
@@ -27,7 +27,7 @@ import cascading.tuple.TupleEntry
 import cascading.util.Util
 import cascading.tap.partition.Partition
 
-import com.twitter.scalding.{ PartitionedTsv => StandardPartitionedTsv, _ }
+import com.twitter.scalding.{PartitionedTsv => StandardPartitionedTsv, _}
 
 object PartitionSourceTestHelpers {
   import Dsl._
@@ -38,7 +38,8 @@ object PartitionSourceTestHelpers {
     def getPathDepth(): Int = 1
 
     def toPartition(tupleEntry: TupleEntry): String =
-      "{" + Util.join(tupleEntry.asIterableOf(classOf[String]), "}->{", true) + "}"
+      "{" + Util.join(tupleEntry.asIterableOf(classOf[String]), "}->{", true) +
+      "}"
 
     def toTuple(partition: String, tupleEntry: TupleEntry): Unit =
       throw new RuntimeException("toTuple for reading not implemented")
@@ -46,8 +47,14 @@ object PartitionSourceTestHelpers {
 
   // Define once, here, otherwise testMode.getWritePathFor() won't work
   val DelimitedPartitionedTsv = StandardPartitionedTsv("base", "/", 'col1)
-  val CustomPartitionedTsv = StandardPartitionedTsv("base", new CustomPartition('col1, 'col2), false, Fields.ALL, SinkMode.REPLACE)
-  val PartialPartitionedTsv = StandardPartitionedTsv("base", "/", ('col1, 'col2), false, ('col1, 'col3))
+  val CustomPartitionedTsv = StandardPartitionedTsv(
+      "base",
+      new CustomPartition('col1, 'col2),
+      false,
+      Fields.ALL,
+      SinkMode.REPLACE)
+  val PartialPartitionedTsv = StandardPartitionedTsv(
+      "base", "/", ('col1, 'col2), false, ('col1, 'col3))
 }
 
 class DelimitedPartitionTestJob(args: Args) extends Job(args) {
@@ -99,12 +106,15 @@ class DelimitedPartitionSourceTest extends WordSpec with Matchers {
 
       val testMode = job.mode.asInstanceOf[HadoopTest]
 
-      val directory = new File(testMode.getWritePathFor(DelimitedPartitionedTsv))
+      val directory =
+        new File(testMode.getWritePathFor(DelimitedPartitionedTsv))
 
       directory.listFiles().map({ _.getName() }).toSet shouldBe Set("A", "B")
 
-      val aSource = ScalaSource.fromFile(new File(directory, "A/part-00000-00000"))
-      val bSource = ScalaSource.fromFile(new File(directory, "B/part-00000-00001"))
+      val aSource =
+        ScalaSource.fromFile(new File(directory, "A/part-00000-00000"))
+      val bSource =
+        ScalaSource.fromFile(new File(directory, "B/part-00000-00001"))
 
       aSource.getLines.toSeq shouldBe Seq("A\t1", "A\t2")
       bSource.getLines.toSeq shouldBe Seq("B\t3")
@@ -135,10 +145,13 @@ class CustomPartitionSourceTest extends WordSpec with Matchers {
 
       val directory = new File(testMode.getWritePathFor(CustomPartitionedTsv))
 
-      directory.listFiles().map({ _.getName() }).toSet shouldBe Set("{A}->{x}", "{B}->{y}")
+      directory.listFiles().map({ _.getName() }).toSet shouldBe Set("{A}->{x}",
+                                                                    "{B}->{y}")
 
-      val aSource = ScalaSource.fromFile(new File(directory, "{A}->{x}/part-00000-00000"))
-      val bSource = ScalaSource.fromFile(new File(directory, "{B}->{y}/part-00000-00001"))
+      val aSource =
+        ScalaSource.fromFile(new File(directory, "{A}->{x}/part-00000-00000"))
+      val bSource =
+        ScalaSource.fromFile(new File(directory, "{B}->{y}/part-00000-00001"))
 
       aSource.getLines.toSeq shouldBe Seq("A\tx\t1", "A\tx\t2")
       bSource.getLines.toSeq shouldBe Seq("B\ty\t3")
@@ -172,8 +185,10 @@ class PartialPartitionSourceTest extends WordSpec with Matchers {
 
       directory.listFiles().map({ _.getName() }).toSet shouldBe Set("A", "B")
 
-      val aSource = ScalaSource.fromFile(new File(directory, "A/x/part-00000-00000"))
-      val bSource = ScalaSource.fromFile(new File(directory, "B/y/part-00000-00001"))
+      val aSource =
+        ScalaSource.fromFile(new File(directory, "A/x/part-00000-00000"))
+      val bSource =
+        ScalaSource.fromFile(new File(directory, "B/y/part-00000-00001"))
 
       aSource.getLines.toSeq shouldBe Seq("A\t1", "A\t2")
       bSource.getLines.toSeq shouldBe Seq("B\t3")

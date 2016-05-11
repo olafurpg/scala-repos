@@ -18,8 +18,8 @@
 package org.apache.spark.util.collection
 
 /**
- * A dummy class that always returns the same hash code, to easily test hash collisions
- */
+  * A dummy class that always returns the same hash code, to easily test hash collisions
+  */
 case class FixedHashObject(v: Int, h: Int) extends Serializable {
   override def hashCode(): Int = h
 }

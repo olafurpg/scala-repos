@@ -24,13 +24,13 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.spark.util.Utils
 
 /**
- * A writer for writing byte-buffers to a write ahead log file.
- */
-private[streaming] class FileBasedWriteAheadLogWriter(path: String, hadoopConf: Configuration)
-  extends Closeable {
+  * A writer for writing byte-buffers to a write ahead log file.
+  */
+private[streaming] class FileBasedWriteAheadLogWriter(
+    path: String, hadoopConf: Configuration)
+    extends Closeable {
 
   private lazy val stream = HdfsUtils.getOutputStream(path, hadoopConf)
-
 
   private var nextOffset = stream.getPos()
   private var closed = false
@@ -40,7 +40,8 @@ private[streaming] class FileBasedWriteAheadLogWriter(path: String, hadoopConf: 
     assertOpen()
     data.rewind() // Rewind to ensure all data in the buffer is retrieved
     val lengthToWrite = data.remaining()
-    val segment = new FileBasedWriteAheadLogSegment(path, nextOffset, lengthToWrite)
+    val segment =
+      new FileBasedWriteAheadLogSegment(path, nextOffset, lengthToWrite)
     stream.writeInt(lengthToWrite)
     Utils.writeByteBuffer(data, stream: OutputStream)
     flush()
@@ -60,6 +61,7 @@ private[streaming] class FileBasedWriteAheadLogWriter(path: String, hadoopConf: 
   }
 
   private def assertOpen() {
-    HdfsUtils.checkState(!closed, "Stream is closed. Create a new Writer to write to file.")
+    HdfsUtils.checkState(
+        !closed, "Stream is closed. Create a new Writer to write to file.")
   }
 }

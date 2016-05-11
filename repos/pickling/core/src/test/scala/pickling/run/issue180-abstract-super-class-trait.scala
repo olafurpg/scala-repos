@@ -4,14 +4,14 @@ import org.scalatest.FunSuite
 import scala.pickling._, scala.pickling.Defaults._, json._
 
 trait TheTrait {
-  val name : String
+  val name: String
 }
 
 sealed abstract class BaseClass extends TheTrait {
   val name = "TestName"
 }
 
-case class TheClass(value : Int) extends BaseClass
+case class TheClass(value: Int) extends BaseClass
 
 class TraitWithAbstractValueTest extends FunSuite {
 

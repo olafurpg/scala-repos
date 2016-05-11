@@ -7,7 +7,7 @@ object SCL4282 {
   def test() {
     val tet: Throwable = null
     def apply[T](x: T*): Foo[T] = null
-    val j: Foo[RichException] = /*start*/apply(tet, tet)/*end*/
+    val j: Foo[RichException] = /*start*/ apply(tet, tet) /*end*/
   }
 }
 //SCL4282.Foo[SCL4282.RichException]

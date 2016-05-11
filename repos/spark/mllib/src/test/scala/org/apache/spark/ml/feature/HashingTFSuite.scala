@@ -26,16 +26,20 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
-class HashingTFSuite extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest {
+class HashingTFSuite
+    extends SparkFunSuite with MLlibTestSparkContext
+    with DefaultReadWriteTest {
 
   test("params") {
     ParamsSuite.checkParams(new HashingTF)
   }
 
   test("hashingTF") {
-    val df = sqlContext.createDataFrame(Seq(
-      (0, "a a b b c d".split(" ").toSeq)
-    )).toDF("id", "words")
+    val df = sqlContext
+      .createDataFrame(Seq(
+              (0, "a a b b c d".split(" ").toSeq)
+          ))
+      .toDF("id", "words")
     val n = 100
     val hashingTF = new HashingTF()
       .setInputCol("words")
@@ -48,7 +52,10 @@ class HashingTFSuite extends SparkFunSuite with MLlibTestSparkContext with Defau
     // Assume perfect hash on "a", "b", "c", and "d".
     def idx(any: Any): Int = Utils.nonNegativeMod(any.##, n)
     val expected = Vectors.sparse(n,
-      Seq((idx("a"), 2.0), (idx("b"), 2.0), (idx("c"), 1.0), (idx("d"), 1.0)))
+                                  Seq((idx("a"), 2.0),
+                                      (idx("b"), 2.0),
+                                      (idx("c"), 1.0),
+                                      (idx("d"), 1.0)))
     assert(features ~== expected absTol 1e-14)
   }
 

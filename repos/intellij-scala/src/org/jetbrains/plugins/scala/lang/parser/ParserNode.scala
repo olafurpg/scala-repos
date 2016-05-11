@@ -3,9 +3,8 @@ package lang
 package parser
 
 /**
-* @author ilyas 
-*/
-
+  * @author ilyas 
+  */
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
@@ -17,7 +16,8 @@ trait ParserNode extends ScalaTokenTypes {
     val rb: PsiBuilder.Marker = builder.mark
     builder.advanceLexer()
     var i: Int = 1
-    while (!builder.eof && i < elems.length && (elems(i) == builder.getTokenType)) {
+    while (!builder.eof && i < elems.length &&
+    (elems(i) == builder.getTokenType)) {
       builder.advanceLexer()
       i += 1
     }

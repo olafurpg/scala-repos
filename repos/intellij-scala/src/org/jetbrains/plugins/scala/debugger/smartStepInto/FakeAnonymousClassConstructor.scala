@@ -8,10 +8,12 @@ import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
 import org.jetbrains.plugins.scala.lang.psi.types.StdType
 
 /**
- * @author Nikolay.Tropin
- */
-class FakeAnonymousClassConstructor(templ: ScNewTemplateDefinition, interfaceName: String)
-        extends FakePsiMethod(templ, interfaceName, Array.empty, StdType.UNIT, _ => false) {
+  * @author Nikolay.Tropin
+  */
+class FakeAnonymousClassConstructor(
+    templ: ScNewTemplateDefinition, interfaceName: String)
+    extends FakePsiMethod(
+        templ, interfaceName, Array.empty, StdType.UNIT, _ => false) {
   override def isConstructor: Boolean = true
 
   override def getIcon(flags: Int): Icon = Icons.CLASS
@@ -24,4 +26,3 @@ class FakeAnonymousClassConstructor(templ: ScNewTemplateDefinition, interfaceNam
 
   override def hashCode() = navElement.hashCode() + 31 * getName.hashCode
 }
-

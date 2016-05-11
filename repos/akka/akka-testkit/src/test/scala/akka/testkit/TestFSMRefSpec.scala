@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.testkit
 
 import language.postfixOps
@@ -18,7 +17,7 @@ class TestFSMRefSpec extends AkkaSpec {
       val fsm = TestFSMRef(new Actor with FSM[Int, String] {
         startWith(1, "")
         when(1) {
-          case Event("go", _)         ⇒ goto(2) using "go"
+          case Event("go", _) ⇒ goto(2) using "go"
           case Event(StateTimeout, _) ⇒ goto(2) using "timeout"
         }
         when(2) {
@@ -61,7 +60,8 @@ class TestFSMRefSpec extends AkkaSpec {
 
     val guardian = system.asInstanceOf[ActorSystemImpl].guardian
 
-    val parent = system.actorOf(Props(new Actor { def receive = { case _ ⇒ } }))
+    val parent =
+      system.actorOf(Props(new Actor { def receive = { case _ ⇒ } }))
 
     class TestFSMActor extends Actor with FSM[Int, Null] {
       startWith(1, null)

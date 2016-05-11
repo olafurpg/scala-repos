@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.hbase.upgrade
 
 import io.prediction.annotation.Experimental
@@ -32,7 +31,7 @@ import org.joda.time.DateTimeZone
 
 import org.json4s.DefaultFormats
 import org.json4s.JObject
-import org.json4s.native.Serialization.{ read, write }
+import org.json4s.native.Serialization.{read, write}
 
 import org.apache.commons.codec.binary.Base64
 
@@ -44,10 +43,9 @@ object HB_0_8_0 {
 
   implicit val formats = DefaultFormats
 
-  def getByAppId(
-    connection: HConnection,
-    namespace: String,
-    appId: Int): Iterator[Event] = {
+  def getByAppId(connection: HConnection,
+                 namespace: String,
+                 appId: Int): Iterator[Event] = {
     val tableName = TableName.valueOf(namespace, "events")
     val table = connection.getTable(tableName)
     val start = PartialRowKey(appId)
@@ -59,22 +57,21 @@ object HB_0_8_0 {
   }
 
   val colNames: Map[String, Array[Byte]] = Map(
-    "event" -> "e",
-    "entityType" -> "ety",
-    "entityId" -> "eid",
-    "targetEntityType" -> "tety",
-    "targetEntityId" -> "teid",
-    "properties" -> "p",
-    "prId" -> "pk", // columna name is 'pk' in 0.8.0/0.8.1
-    "eventTimeZone" -> "etz",
-    "creationTimeZone" -> "ctz"
+      "event" -> "e",
+      "entityType" -> "ety",
+      "entityId" -> "eid",
+      "targetEntityType" -> "tety",
+      "targetEntityId" -> "teid",
+      "properties" -> "p",
+      "prId" -> "pk", // columna name is 'pk' in 0.8.0/0.8.1
+      "eventTimeZone" -> "etz",
+      "creationTimeZone" -> "ctz"
   ).mapValues(Bytes.toBytes(_))
 
-
   class RowKey(
-    val appId: Int,
-    val millis: Long,
-    val uuidLow: Long
+      val appId: Int,
+      val millis: Long,
+      val uuidLow: Long
   ) {
     lazy val toBytes: Array[Byte] = {
       // add UUID least significant bits for multiple actions at the same time
@@ -93,8 +90,9 @@ object HB_0_8_0 {
       try {
         apply(Base64.decodeBase64(s))
       } catch {
-        case e: Exception => throw new RowKeyException(
-          s"Failed to convert String ${s} to RowKey because ${e}", e)
+        case e: Exception =>
+          throw new RowKeyException(
+              s"Failed to convert String ${s} to RowKey because ${e}", e)
       }
     }
 
@@ -102,26 +100,26 @@ object HB_0_8_0 {
       if (b.size != 20) {
         val bString = b.mkString(",")
         throw new RowKeyException(
-          s"Incorrect byte array size. Bytes: ${bString}.")
+            s"Incorrect byte array size. Bytes: ${bString}.")
       }
 
       new RowKey(
-        appId = Bytes.toInt(b.slice(0, 4)),
-        millis = Bytes.toLong(b.slice(4, 12)),
-        uuidLow = Bytes.toLong(b.slice(12, 20))
+          appId = Bytes.toInt(b.slice(0, 4)),
+          millis = Bytes.toLong(b.slice(4, 12)),
+          uuidLow = Bytes.toLong(b.slice(12, 20))
       )
     }
   }
 
   class RowKeyException(msg: String, cause: Exception)
-    extends Exception(msg, cause) {
-      def this(msg: String) = this(msg, null)
-    }
+      extends Exception(msg, cause) {
+    def this(msg: String) = this(msg, null)
+  }
 
   case class PartialRowKey(val appId: Int, val millis: Option[Long] = None) {
     val toBytes: Array[Byte] = {
       Bytes.toBytes(appId) ++
-        (millis.map(Bytes.toBytes(_)).getOrElse(Array[Byte]()))
+      (millis.map(Bytes.toBytes(_)).getOrElse(Array[Byte]()))
     }
   }
 
@@ -134,9 +132,9 @@ object HB_0_8_0 {
     def getStringCol(col: String): String = {
       val r = result.getValue(eBytes, colNames(col))
       require(r != null,
-        s"Failed to get value for column ${col}. " +
-        s"Rowkey: ${rowKey.toString} " +
-        s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
+              s"Failed to get value for column ${col}. " +
+              s"Rowkey: ${rowKey.toString} " +
+              s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
 
       Bytes.toString(r)
     }
@@ -160,7 +158,8 @@ object HB_0_8_0 {
     val targetEntityType = getOptStringCol("targetEntityType")
     val targetEntityId = getOptStringCol("targetEntityId")
     val properties: DataMap = getOptStringCol("properties")
-      .map(s => DataMap(read[JObject](s))).getOrElse(DataMap())
+      .map(s => DataMap(read[JObject](s)))
+      .getOrElse(DataMap())
     val prId = getOptStringCol("prId")
     val eventTimeZone = getOptStringCol("eventTimeZone")
       .map(DateTimeZone.forID(_))
@@ -170,21 +169,22 @@ object HB_0_8_0 {
       .getOrElse(EventValidation.defaultTimeZone)
 
     val creationTime: DateTime = new DateTime(
-      getTimestamp("event"), creationTimeZone
+        getTimestamp("event"),
+        creationTimeZone
     )
 
     Event(
-      eventId = Some(RowKey(result.getRow()).toString),
-      event = event,
-      entityType = entityType,
-      entityId = entityId,
-      targetEntityType = targetEntityType,
-      targetEntityId = targetEntityId,
-      properties = properties,
-      eventTime = new DateTime(rowKey.millis, eventTimeZone),
-      tags = Seq(),
-      prId = prId,
-      creationTime = creationTime
+        eventId = Some(RowKey(result.getRow()).toString),
+        event = event,
+        entityType = entityType,
+        entityId = entityId,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId,
+        properties = properties,
+        eventTime = new DateTime(rowKey.millis, eventTimeZone),
+        tags = Seq(),
+        prId = prId,
+        creationTime = creationTime
     )
   }
 }

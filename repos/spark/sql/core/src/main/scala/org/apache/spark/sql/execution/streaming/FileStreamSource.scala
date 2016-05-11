@@ -27,25 +27,27 @@ import org.apache.spark.sql.types.{StringType, StructType}
 import org.apache.spark.util.collection.OpenHashSet
 
 /**
- * A very simple source that reads text files from the given directory as they appear.
- *
- * TODO Clean up the metadata files periodically
- */
-class FileStreamSource(
-    sqlContext: SQLContext,
-    metadataPath: String,
-    path: String,
-    dataSchema: Option[StructType],
-    providerName: String,
-    dataFrameBuilder: Array[String] => DataFrame) extends Source with Logging {
+  * A very simple source that reads text files from the given directory as they appear.
+  *
+  * TODO Clean up the metadata files periodically
+  */
+class FileStreamSource(sqlContext: SQLContext,
+                       metadataPath: String,
+                       path: String,
+                       dataSchema: Option[StructType],
+                       providerName: String,
+                       dataFrameBuilder: Array[String] => DataFrame)
+    extends Source with Logging {
 
   private val fs = FileSystem.get(sqlContext.sparkContext.hadoopConfiguration)
-  private val metadataLog = new HDFSMetadataLog[Seq[String]](sqlContext, metadataPath)
+  private val metadataLog =
+    new HDFSMetadataLog[Seq[String]](sqlContext, metadataPath)
   private var maxBatchId = metadataLog.getLatest().map(_._1).getOrElse(-1L)
 
   private val seenFiles = new OpenHashSet[String]
-  metadataLog.get(None, maxBatchId).foreach { case (batchId, files) =>
-    files.foreach(seenFiles.add)
+  metadataLog.get(None, maxBatchId).foreach {
+    case (batchId, files) =>
+      files.foreach(seenFiles.add)
   }
 
   /** Returns the schema of the data from this source */
@@ -67,11 +69,11 @@ class FileStreamSource(
   }
 
   /**
-   * Returns the maximum offset that can be retrieved from the source.
-   *
-   * `synchronized` on this method is for solving race conditions in tests. In the normal usage,
-   * there is no race here, so the cost of `synchronized` should be rare.
-   */
+    * Returns the maximum offset that can be retrieved from the source.
+    *
+    * `synchronized` on this method is for solving race conditions in tests. In the normal usage,
+    * there is no race here, so the cost of `synchronized` should be rare.
+    */
   private def fetchMaxOffset(): LongOffset = synchronized {
     val filesPresent = fetchAllFiles()
     val newFiles = new ArrayBuffer[String]()
@@ -94,9 +96,9 @@ class FileStreamSource(
   }
 
   /**
-   * For test only. Run `func` with the internal lock to make sure when `func` is running,
-   * the current offset won't be changed and no new batch will be emitted.
-   */
+    * For test only. Run `func` with the internal lock to make sure when `func` is running,
+    * the current offset won't be changed and no new batch will be emitted.
+    */
   def withBatchingLocked[T](func: => T): T = synchronized {
     func
   }
@@ -107,8 +109,8 @@ class FileStreamSource(
   }
 
   /**
-   * Returns the next batch of data that is available after `start`, if any is available.
-   */
+    * Returns the next batch of data that is available after `start`, if any is available.
+    */
   override def getNextBatch(start: Option[Offset]): Option[Batch] = {
     val startId = start.map(_.asInstanceOf[LongOffset].offset).getOrElse(-1L)
     val end = fetchMaxOffset()
@@ -119,8 +121,7 @@ class FileStreamSource(
       logDebug(s"Return files from batches ${startId + 1}:$endId")
       logDebug(s"Streaming ${files.mkString(", ")}")
       Some(new Batch(end, dataFrameBuilder(files)))
-    }
-    else {
+    } else {
       None
     }
   }

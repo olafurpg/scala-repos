@@ -21,8 +21,8 @@ import org.apache.spark.sql.QueryTest
 import org.apache.spark.sql.test.SharedSQLContext
 
 /**
- * Test cases for various [[JSONOptions]].
- */
+  * Test cases for various [[JSONOptions]].
+  */
 class JsonParsingOptionsSuite extends QueryTest with SharedSQLContext {
 
   test("allowComments off") {
@@ -70,7 +70,8 @@ class JsonParsingOptionsSuite extends QueryTest with SharedSQLContext {
   test("allowUnquotedFieldNames on") {
     val str = """{name: 'Reynold Xin'}"""
     val rdd = sqlContext.sparkContext.parallelize(Seq(str))
-    val df = sqlContext.read.option("allowUnquotedFieldNames", "true").json(rdd)
+    val df =
+      sqlContext.read.option("allowUnquotedFieldNames", "true").json(rdd)
 
     assert(df.schema.head.name == "name")
     assert(df.first().getString(0) == "Reynold Xin")
@@ -87,7 +88,8 @@ class JsonParsingOptionsSuite extends QueryTest with SharedSQLContext {
   test("allowNumericLeadingZeros on") {
     val str = """{"age": 0018}"""
     val rdd = sqlContext.sparkContext.parallelize(Seq(str))
-    val df = sqlContext.read.option("allowNumericLeadingZeros", "true").json(rdd)
+    val df =
+      sqlContext.read.option("allowNumericLeadingZeros", "true").json(rdd)
 
     assert(df.schema.head.name == "age")
     assert(df.first().getLong(0) == 18)
@@ -115,7 +117,9 @@ class JsonParsingOptionsSuite extends QueryTest with SharedSQLContext {
   test("allowBackslashEscapingAnyCharacter off") {
     val str = """{"name": "Cazen Lee", "price": "\$10"}"""
     val rdd = sqlContext.sparkContext.parallelize(Seq(str))
-    val df = sqlContext.read.option("allowBackslashEscapingAnyCharacter", "false").json(rdd)
+    val df = sqlContext.read
+      .option("allowBackslashEscapingAnyCharacter", "false")
+      .json(rdd)
 
     assert(df.schema.head.name == "_corrupt_record")
   }
@@ -123,7 +127,9 @@ class JsonParsingOptionsSuite extends QueryTest with SharedSQLContext {
   test("allowBackslashEscapingAnyCharacter on") {
     val str = """{"name": "Cazen Lee", "price": "\$10"}"""
     val rdd = sqlContext.sparkContext.parallelize(Seq(str))
-    val df = sqlContext.read.option("allowBackslashEscapingAnyCharacter", "true").json(rdd)
+    val df = sqlContext.read
+      .option("allowBackslashEscapingAnyCharacter", "true")
+      .json(rdd)
 
     assert(df.schema.head.name == "name")
     assert(df.schema.last.name == "price")

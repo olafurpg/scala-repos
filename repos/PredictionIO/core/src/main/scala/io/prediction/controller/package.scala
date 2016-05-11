@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction
 
 /** Provides building blocks for writing a complete prediction engine
@@ -119,7 +118,7 @@ package object controller {
     * @group Helper
     */
   type EmptyDataParams = EmptyParams
-  
+
   /** Empty evaluation info.
     * @group Helper
     */
@@ -164,5 +163,4 @@ package object controller {
     * @group Helper
     */
   type EmptyActualResult = SerializableClass
-
 }

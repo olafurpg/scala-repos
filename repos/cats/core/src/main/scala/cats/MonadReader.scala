@@ -2,6 +2,7 @@ package cats
 
 /** A monad that has the ability to read from an environment. */
 trait MonadReader[F[_], R] extends Monad[F] {
+
   /** Get the environment */
   def ask: F[R]
 

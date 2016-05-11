@@ -9,24 +9,25 @@ import cats.laws.discipline.SerializableTests
 class UnapplyTests extends CatsSuite {
 
   test("Unapply works for stuff already the right kind") {
-    val x = Traverse[List].traverseU(List(1,2,3))(Option(_))
-    x should === (Some(List(1,2,3)))
+    val x = Traverse[List].traverseU(List(1, 2, 3))(Option(_))
+    x should ===(Some(List(1, 2, 3)))
   }
 
   test("Unapply works for F[_,_] with the left fixed") {
-    val x = Traverse[List].traverseU(List(1,2,3))(Xor.right(_))
-    (x: String Xor List[Int]) should === (Xor.right(List(1,2,3)))
+    val x = Traverse[List].traverseU(List(1, 2, 3))(Xor.right(_))
+    (x: String Xor List[Int]) should ===(Xor.right(List(1, 2, 3)))
   }
 
   test("Unapply works for F[_[_],_] with the left fixed") {
     val x: OptionT[List, Int] = OptionT(List(Option(1), Option(2)))
     val y: OptionT[List, Int] = OptionT(List(Option(3), Option(4)))
 
-    val z: List[Option[(Int,Int)]] = (x |@| y).tupled.value
+    val z: List[Option[(Int, Int)]] = (x |@| y).tupled.value
 
-    z should be (List(Option((1,3)), Option((1,4)),
-                      Option((2,3)), Option((2,4))))
+    z should be(
+        List(Option((1, 3)), Option((1, 4)), Option((2, 3)), Option((2, 4))))
   }
 
-  checkAll("Unapply[Functor, Option[String]]", SerializableTests.serializable(Unapply[Functor, Option[String]]))
+  checkAll("Unapply[Functor, Option[String]]",
+           SerializableTests.serializable(Unapply[Functor, Option[String]]))
 }

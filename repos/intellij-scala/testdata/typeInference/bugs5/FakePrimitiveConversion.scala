@@ -6,6 +6,7 @@ object FakePrimitiveConversion {
     var z: Option[Int] = None
   }
 
-  /*start*/foo(z => z.z_=, 123)/*end*/
+  /*start*/
+  foo(z => z.z_=, 123) /*end*/
 }
 //Int

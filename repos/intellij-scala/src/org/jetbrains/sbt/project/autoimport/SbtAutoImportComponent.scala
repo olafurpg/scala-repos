@@ -5,10 +5,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
 
 /**
- * @author Nikolay Obedin
- * @since 3/23/15.
- */
-class SbtAutoImportComponent(project: Project) extends AbstractProjectComponent(project) {
+  * @author Nikolay Obedin
+  * @since 3/23/15.
+  */
+class SbtAutoImportComponent(project: Project)
+    extends AbstractProjectComponent(project) {
   private val listener = new SbtAutoImportListener(project)
 
   override def projectOpened(): Unit = {

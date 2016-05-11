@@ -16,15 +16,18 @@ object Error {
   }
 
   def cacheSaveError(cause: Throwable) = {
-    throw new Exception("Failed to save injector cache", cause) with InjectorCacheException
+    throw new Exception("Failed to save injector cache", cause)
+    with InjectorCacheException
   }
 
   def noJarFound(path: File) = {
-    throw new Exception(s"Failed to locate source jar file - $path") with InjectorIOException
+    throw new Exception(s"Failed to locate source jar file - $path")
+    with InjectorIOException
   }
 
   def extractFailed(injectorName: String, outDir: File) = {
-    throw new Exception(s"Failed to extract injector sources for $injectorName - failed to create directory $outDir")
-      with InjectorIOException
+    throw new Exception(
+        s"Failed to extract injector sources for $injectorName - failed to create directory $outDir")
+    with InjectorIOException
   }
 }

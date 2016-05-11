@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 import java.util.concurrent.TimeUnit
@@ -10,7 +10,7 @@ import org.openjdk.jmh.annotations.Fork
 import org.openjdk.jmh.annotations.Measurement
 import org.openjdk.jmh.annotations.Mode
 import org.openjdk.jmh.annotations.OutputTimeUnit
-import org.openjdk.jmh.annotations.{ Scope => JmhScope }
+import org.openjdk.jmh.annotations.{Scope => JmhScope}
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import akka.cluster.UniqueAddress
@@ -45,7 +45,7 @@ class VersionVectorBenchmark {
   var dot1: VersionVector = _
 
   @Setup(Level.Trial)
-  def setup():Unit = {
+  def setup(): Unit = {
     vv1 = (1 to size).foldLeft(VersionVector.empty)((vv, n) => vv + nextNode())
     vv2 = vv1 + nextNode()
     vv3 = vv1 + nextNode()
@@ -72,5 +72,4 @@ class VersionVectorBenchmark {
 
   @Benchmark
   def mergeConflicting: VersionVector = vv2.merge(vv3)
-
 }

@@ -45,7 +45,8 @@ private[spark] class SparkUICssErrorHandler extends DefaultCssErrorHandler {
 
   private val cssWhiteList = List("bootstrap.min.css", "vis.min.css")
 
-  private def isInWhileList(uri: String): Boolean = cssWhiteList.exists(uri.endsWith)
+  private def isInWhileList(uri: String): Boolean =
+    cssWhiteList.exists(uri.endsWith)
 
   override def warning(e: CSSParseException): Unit = {
     if (!isInWhileList(e.getURI)) {
@@ -67,13 +68,14 @@ private[spark] class SparkUICssErrorHandler extends DefaultCssErrorHandler {
 }
 
 /**
- * Selenium tests for the Spark Web UI.
- */
-class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with BeforeAndAfterAll {
+  * Selenium tests for the Spark Web UI.
+  */
+class UISeleniumSuite
+    extends SparkFunSuite with WebBrowser with Matchers
+    with BeforeAndAfterAll {
 
   implicit var webDriver: WebDriver = _
   implicit val formats = DefaultFormats
-
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -93,9 +95,9 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
   }
 
   /**
-   * Create a test SparkContext with the SparkUI enabled.
-   * It is safe to `get` the SparkUI directly from the SparkContext returned here.
-   */
+    * Create a test SparkContext with the SparkUI enabled.
+    * It is safe to `get` the SparkUI directly from the SparkContext returned here.
+    */
   private def newSparkContext(killEnabled: Boolean = true): SparkContext = {
     val conf = new SparkConf()
       .setMaster("local")
@@ -116,41 +118,47 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
       rdd.persist(StorageLevels.DISK_ONLY).count()
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(ui, "/storage")
-        val tableRowText = findAll(cssSelector("#storage-by-rdd-table td")).map(_.text).toSeq
-        tableRowText should contain (StorageLevels.DISK_ONLY.description)
+        val tableRowText =
+          findAll(cssSelector("#storage-by-rdd-table td")).map(_.text).toSeq
+        tableRowText should contain(StorageLevels.DISK_ONLY.description)
       }
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(ui, "/storage/rdd/?id=0")
-        val tableRowText = findAll(cssSelector("#rdd-storage-by-block-table td")).map(_.text).toSeq
-        tableRowText should contain (StorageLevels.DISK_ONLY.description)
+        val tableRowText = findAll(
+            cssSelector("#rdd-storage-by-block-table td")).map(_.text).toSeq
+        tableRowText should contain(StorageLevels.DISK_ONLY.description)
       }
 
       val storageJson = getJson(ui, "storage/rdd")
-      storageJson.children.length should be (1)
-      (storageJson \ "storageLevel").extract[String] should be (StorageLevels.DISK_ONLY.description)
+      storageJson.children.length should be(1)
+      (storageJson \ "storageLevel").extract[String] should be(
+          StorageLevels.DISK_ONLY.description)
       val rddJson = getJson(ui, "storage/rdd/0")
-      (rddJson  \ "storageLevel").extract[String] should be (StorageLevels.DISK_ONLY.description)
+      (rddJson \ "storageLevel").extract[String] should be(
+          StorageLevels.DISK_ONLY.description)
 
       rdd.unpersist()
       rdd.persist(StorageLevels.MEMORY_ONLY).count()
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(ui, "/storage")
-        val tableRowText = findAll(cssSelector("#storage-by-rdd-table td")).map(_.text).toSeq
-        tableRowText should contain (StorageLevels.MEMORY_ONLY.description)
+        val tableRowText =
+          findAll(cssSelector("#storage-by-rdd-table td")).map(_.text).toSeq
+        tableRowText should contain(StorageLevels.MEMORY_ONLY.description)
       }
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(ui, "/storage/rdd/?id=0")
-        val tableRowText = findAll(cssSelector("#rdd-storage-by-block-table td")).map(_.text).toSeq
-        tableRowText should contain (StorageLevels.MEMORY_ONLY.description)
+        val tableRowText = findAll(
+            cssSelector("#rdd-storage-by-block-table td")).map(_.text).toSeq
+        tableRowText should contain(StorageLevels.MEMORY_ONLY.description)
       }
 
       val updatedStorageJson = getJson(ui, "storage/rdd")
-      updatedStorageJson.children.length should be (1)
-      (updatedStorageJson \ "storageLevel").extract[String] should be (
-        StorageLevels.MEMORY_ONLY.description)
+      updatedStorageJson.children.length should be(1)
+      (updatedStorageJson \ "storageLevel").extract[String] should be(
+          StorageLevels.MEMORY_ONLY.description)
       val updatedRddJson = getJson(ui, "storage/rdd/0")
-      (updatedRddJson  \ "storageLevel").extract[String] should be (
-        StorageLevels.MEMORY_ONLY.description)
+      (updatedRddJson \ "storageLevel").extract[String] should be(
+          StorageLevels.MEMORY_ONLY.description)
     }
   }
 
@@ -158,40 +166,53 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
     withSpark(newSparkContext()) { sc =>
       // Regression test for SPARK-3021
       intercept[SparkException] {
-        sc.parallelize(1 to 10).map { x => throw new Exception()}.collect()
+        sc.parallelize(1 to 10)
+          .map { x =>
+            throw new Exception()
+          }
+          .collect()
       }
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(sc, "/stages")
-        find(id("active")) should be(None)  // Since we hide empty tables
+        find(id("active")) should be(None) // Since we hide empty tables
         find(id("failed")).get.text should be("Failed Stages (1)")
       }
       val stageJson = getJson(sc.ui.get, "stages")
-      stageJson.children.length should be (1)
-      (stageJson \ "status").extract[String] should be (StageStatus.FAILED.name())
+      stageJson.children.length should be(1)
+      (stageJson \ "status").extract[String] should be(
+          StageStatus.FAILED.name())
 
       // Regression test for SPARK-2105
       class NotSerializable
       val unserializableObject = new NotSerializable
       intercept[SparkException] {
-        sc.parallelize(1 to 10).map { x => unserializableObject}.collect()
+        sc.parallelize(1 to 10)
+          .map { x =>
+            unserializableObject
+          }
+          .collect()
       }
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(sc, "/stages")
-        find(id("active")) should be(None)  // Since we hide empty tables
+        find(id("active")) should be(None) // Since we hide empty tables
         // The failure occurs before the stage becomes active, hence we should still show only one
         // failed stage, not two:
         find(id("failed")).get.text should be("Failed Stages (1)")
       }
 
       val updatedStageJson = getJson(sc.ui.get, "stages")
-      updatedStageJson should be (stageJson)
+      updatedStageJson should be(stageJson)
     }
   }
 
   test("spark.ui.killEnabled should properly control kill button display") {
     def hasKillLink: Boolean = find(className("kill-link")).isDefined
     def runSlowJob(sc: SparkContext) {
-      sc.parallelize(1 to 10).map{x => Thread.sleep(10000); x}.countAsync()
+      sc.parallelize(1 to 10)
+        .map { x =>
+          Thread.sleep(10000); x
+        }
+        .countAsync()
     }
 
     withSpark(newSparkContext(killEnabled = true)) { sc =>
@@ -211,7 +232,8 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
     }
   }
 
-  test("jobs page should not display job group name unless some job was submitted in a job group") {
+  test(
+      "jobs page should not display job group name unless some job was submitted in a job group") {
     withSpark(newSparkContext()) { sc =>
       // If no job has been run in a job group, then "(Job Group)" should not appear in the header
       sc.parallelize(Seq(1, 2, 3)).count()
@@ -226,7 +248,7 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(sc, "/jobs")
         val tableHeaders = findAll(cssSelector("th")).map(_.text).toSeq
-        tableHeaders should contain ("Job Id (Job Group)")
+        tableHeaders should contain("Job Id (Job Group)")
       }
 
       val jobJson = getJson(sc.ui.get, "jobs")
@@ -236,8 +258,8 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
         jobGroup = job \ "jobGroup"
       } {
         jobId.toInt match {
-          case 0 => jobGroup should be (JNothing)
-          case 1 => jobGroup should be (JString("my-job-group"))
+          case 0 => jobGroup should be(JNothing)
+          case 1 => jobGroup should be(JString("my-job-group"))
         }
       }
     }
@@ -245,9 +267,11 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
 
   test("job progress bars should handle stage / task failures") {
     withSpark(newSparkContext()) { sc =>
-      val data = sc.parallelize(Seq(1, 2, 3), 1).map(identity).groupBy(identity)
-      val shuffleHandle =
-        data.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]].shuffleHandle
+      val data =
+        sc.parallelize(Seq(1, 2, 3), 1).map(identity).groupBy(identity)
+      val shuffleHandle = data.dependencies.head
+        .asInstanceOf[ShuffleDependency[_, _, _]]
+        .shuffleHandle
       // Simulate fetch failures:
       val mappedData = data.map { x =>
         val taskContext = TaskContext.get
@@ -259,7 +283,8 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
           val mapId = 0
           val reduceId = taskContext.partitionId()
           val message = "Simulated fetch failure"
-          throw new FetchFailedException(bmAddress, shuffleId, mapId, reduceId, message)
+          throw new FetchFailedException(
+              bmAddress, shuffleId, mapId, reduceId, message)
         } else {
           x
         }
@@ -267,20 +292,22 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
       mappedData.count()
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(sc, "/jobs")
-        find(cssSelector(".stage-progress-cell")).get.text should be ("2/2 (1 failed)")
+        find(cssSelector(".stage-progress-cell")).get.text should be(
+            "2/2 (1 failed)")
         // Ideally, the following test would pass, but currently we overcount completed tasks
         // if task recomputations occur:
         // find(cssSelector(".progress-cell .progress")).get.text should be ("2/2 (1 failed)")
         // Instead, we guarantee that the total number of tasks is always correct, while the number
         // of completed tasks may be higher:
-        find(cssSelector(".progress-cell .progress")).get.text should be ("3/2 (1 failed)")
+        find(cssSelector(".progress-cell .progress")).get.text should be(
+            "3/2 (1 failed)")
       }
       val jobJson = getJson(sc.ui.get, "jobs")
-      (jobJson \ "numTasks").extract[Int]should be (2)
-      (jobJson \ "numCompletedTasks").extract[Int] should be (3)
-      (jobJson \ "numFailedTasks").extract[Int] should be (1)
-      (jobJson \ "numCompletedStages").extract[Int] should be (2)
-      (jobJson \ "numFailedStages").extract[Int] should be (1)
+      (jobJson \ "numTasks").extract[Int] should be(2)
+      (jobJson \ "numCompletedTasks").extract[Int] should be(3)
+      (jobJson \ "numFailedTasks").extract[Int] should be(1)
+      (jobJson \ "numCompletedStages").extract[Int] should be(2)
+      (jobJson \ "numFailedStages").extract[Int] should be(1)
       val stageJson = getJson(sc.ui.get, "stages")
 
       for {
@@ -289,46 +316,56 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
         JInt(stageId) <- stage \ "stageId"
         JInt(attemptId) <- stage \ "attemptId"
       } {
-        val exp = if (attemptId.toInt == 0 && stageId.toInt == 1) {
-          StageStatus.FAILED
-        } else {
-          StageStatus.COMPLETE
-        }
-        status should be (exp.name())
+        val exp =
+          if (attemptId.toInt == 0 && stageId.toInt == 1) {
+            StageStatus.FAILED
+          } else {
+            StageStatus.COMPLETE
+          }
+        status should be(exp.name())
       }
 
       for {
         stageId <- 0 to 1
         attemptId <- 0 to 1
       } {
-        val exp = if (attemptId == 0 && stageId == 1) StageStatus.FAILED else StageStatus.COMPLETE
+        val exp =
+          if (attemptId == 0 && stageId == 1) StageStatus.FAILED
+          else StageStatus.COMPLETE
         val stageJson = getJson(sc.ui.get, s"stages/$stageId/$attemptId")
-        (stageJson \ "status").extract[String] should be (exp.name())
+        (stageJson \ "status").extract[String] should be(exp.name())
       }
     }
   }
 
-  test("job details page should display useful information for stages that haven't started") {
+  test(
+      "job details page should display useful information for stages that haven't started") {
     withSpark(newSparkContext()) { sc =>
       // Create a multi-stage job with a long delay in the first stage:
-      val rdd = sc.parallelize(Seq(1, 2, 3)).map { x =>
-        // This long sleep call won't slow down the tests because we don't actually need to wait
-        // for the job to finish.
-        Thread.sleep(20000)
-      }.groupBy(identity).map(identity).groupBy(identity).map(identity)
+      val rdd = sc
+        .parallelize(Seq(1, 2, 3))
+        .map { x =>
+          // This long sleep call won't slow down the tests because we don't actually need to wait
+          // for the job to finish.
+          Thread.sleep(20000)
+        }
+        .groupBy(identity)
+        .map(identity)
+        .groupBy(identity)
+        .map(identity)
       // Start the job:
       rdd.countAsync()
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
         goToUi(sc, "/jobs/job/?id=0")
-        find(id("active")).get.text should be ("Active Stages (1)")
-        find(id("pending")).get.text should be ("Pending Stages (2)")
+        find(id("active")).get.text should be("Active Stages (1)")
+        find(id("pending")).get.text should be("Pending Stages (2)")
         // Essentially, we want to check that none of the stage rows show
         // "No data available for this stage". Checking for the absence of that string is brittle
         // because someone could change the error message and cause this test to pass by accident.
         // Instead, it's safer to check that each row contains a link to a stage details page.
         findAll(cssSelector("tbody tr")).foreach { row =>
           val link = row.underlying.findElement(By.xpath("./td/div/a"))
-          link.getAttribute("href") should include ("stage")
+          link.getAttribute("href") should include("stage")
         }
       }
     }
@@ -337,9 +374,12 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
   test("job progress bars / cells reflect skipped stages / tasks") {
     withSpark(newSparkContext()) { sc =>
       // Create an RDD that involves multiple stages:
-      val rdd = sc.parallelize(1 to 8, 8)
-        .map(x => x).groupBy((x: Int) => x, numPartitions = 8)
-        .flatMap(x => x._2).groupBy((x: Int) => x, numPartitions = 8)
+      val rdd = sc
+        .parallelize(1 to 8, 8)
+        .map(x => x)
+        .groupBy((x: Int) => x, numPartitions = 8)
+        .flatMap(x => x._2)
+        .groupBy((x: Int) => x, numPartitions = 8)
       // Run it twice; this will cause the second job to have two "phantom" stages that were
       // mentioned in its job start event but which were never actually executed:
       rdd.count()
@@ -349,52 +389,62 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
         // The completed jobs table should have two rows. The first row will be the most recent job:
         val firstRow = find(cssSelector("tbody tr")).get.underlying
         val firstRowColumns = firstRow.findElements(By.tagName("td"))
-        firstRowColumns.get(0).getText should be ("1")
-        firstRowColumns.get(4).getText should be ("1/1 (2 skipped)")
-        firstRowColumns.get(5).getText should be ("8/8 (16 skipped)")
+        firstRowColumns.get(0).getText should be("1")
+        firstRowColumns.get(4).getText should be("1/1 (2 skipped)")
+        firstRowColumns.get(5).getText should be("8/8 (16 skipped)")
         // The second row is the first run of the job, where nothing was skipped:
         val secondRow = findAll(cssSelector("tbody tr")).toSeq(1).underlying
         val secondRowColumns = secondRow.findElements(By.tagName("td"))
-        secondRowColumns.get(0).getText should be ("0")
-        secondRowColumns.get(4).getText should be ("3/3")
-        secondRowColumns.get(5).getText should be ("24/24")
+        secondRowColumns.get(0).getText should be("0")
+        secondRowColumns.get(4).getText should be("3/3")
+        secondRowColumns.get(5).getText should be("24/24")
       }
     }
   }
 
-  test("stages that aren't run appear as 'skipped stages' after a job finishes") {
+  test(
+      "stages that aren't run appear as 'skipped stages' after a job finishes") {
     withSpark(newSparkContext()) { sc =>
       // Create an RDD that involves multiple stages:
-      val rdd =
-        sc.parallelize(Seq(1, 2, 3)).map(identity).groupBy(identity).map(identity).groupBy(identity)
+      val rdd = sc
+        .parallelize(Seq(1, 2, 3))
+        .map(identity)
+        .groupBy(identity)
+        .map(identity)
+        .groupBy(identity)
       // Run it twice; this will cause the second job to have two "phantom" stages that were
       // mentioned in its job start event but which were never actually executed:
       rdd.count()
       rdd.count()
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
         goToUi(sc, "/jobs/job/?id=1")
-        find(id("pending")) should be (None)
-        find(id("active")) should be (None)
-        find(id("failed")) should be (None)
-        find(id("completed")).get.text should be ("Completed Stages (1)")
-        find(id("skipped")).get.text should be ("Skipped Stages (2)")
+        find(id("pending")) should be(None)
+        find(id("active")) should be(None)
+        find(id("failed")) should be(None)
+        find(id("completed")).get.text should be("Completed Stages (1)")
+        find(id("skipped")).get.text should be("Skipped Stages (2)")
         // Essentially, we want to check that none of the stage rows show
         // "No data available for this stage". Checking for the absence of that string is brittle
         // because someone could change the error message and cause this test to pass by accident.
         // Instead, it's safer to check that each row contains a link to a stage details page.
         findAll(cssSelector("tbody tr")).foreach { row =>
           val link = row.underlying.findElement(By.xpath(".//a"))
-          link.getAttribute("href") should include ("stage")
+          link.getAttribute("href") should include("stage")
         }
       }
     }
   }
 
-  test("jobs with stages that are skipped should show correct link descriptions on all jobs page") {
+  test(
+      "jobs with stages that are skipped should show correct link descriptions on all jobs page") {
     withSpark(newSparkContext()) { sc =>
       // Create an RDD that involves multiple stages:
-      val rdd =
-        sc.parallelize(Seq(1, 2, 3)).map(identity).groupBy(identity).map(identity).groupBy(identity)
+      val rdd = sc
+        .parallelize(Seq(1, 2, 3))
+        .map(identity)
+        .groupBy(identity)
+        .map(identity)
+        .groupBy(identity)
       // Run it twice; this will cause the second job to have two "phantom" stages that were
       // mentioned in its job start event but which were never actually executed:
       rdd.count()
@@ -402,7 +452,7 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
         goToUi(sc, "/jobs")
         findAll(cssSelector("tbody tr a")).foreach { link =>
-          link.text.toLowerCase should include ("count")
+          link.text.toLowerCase should include("count")
           link.text.toLowerCase should not include "unknown"
         }
       }
@@ -414,7 +464,8 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
       val sparkUI = sc.ui.get
 
       val newTab = new WebUITab(sparkUI, "foo") {
-        attachPage(new WebUIPage("") {
+        attachPage(
+            new WebUIPage("") {
           def render(request: HttpServletRequest): Seq[Node] = {
             <b>"html magic"</b>
           }
@@ -423,24 +474,26 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
       sparkUI.attachTab(newTab)
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
         goToUi(sc, "")
-        find(cssSelector("""ul li a[href*="jobs"]""")) should not be(None)
-        find(cssSelector("""ul li a[href*="stages"]""")) should not be(None)
-        find(cssSelector("""ul li a[href*="storage"]""")) should not be(None)
-        find(cssSelector("""ul li a[href*="environment"]""")) should not be(None)
-        find(cssSelector("""ul li a[href*="foo"]""")) should not be(None)
+        find(cssSelector("""ul li a[href*="jobs"]""")) should not be (None)
+        find(cssSelector("""ul li a[href*="stages"]""")) should not be (None)
+        find(cssSelector("""ul li a[href*="storage"]""")) should not be (None)
+        find(cssSelector("""ul li a[href*="environment"]""")) should not be
+        (None)
+        find(cssSelector("""ul li a[href*="foo"]""")) should not be (None)
       }
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
         // check whether new page exists
         goToUi(sc, "/foo")
-        find(cssSelector("b")).get.text should include ("html magic")
+        find(cssSelector("b")).get.text should include("html magic")
       }
       sparkUI.detachTab(newTab)
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
         goToUi(sc, "")
-        find(cssSelector("""ul li a[href*="jobs"]""")) should not be(None)
-        find(cssSelector("""ul li a[href*="stages"]""")) should not be(None)
-        find(cssSelector("""ul li a[href*="storage"]""")) should not be(None)
-        find(cssSelector("""ul li a[href*="environment"]""")) should not be(None)
+        find(cssSelector("""ul li a[href*="jobs"]""")) should not be (None)
+        find(cssSelector("""ul li a[href*="stages"]""")) should not be (None)
+        find(cssSelector("""ul li a[href*="storage"]""")) should not be (None)
+        find(cssSelector("""ul li a[href*="environment"]""")) should not be
+        (None)
         find(cssSelector("""ul li a[href*="foo"]""")) should be(None)
       }
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
@@ -462,13 +515,17 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
     }
 
     withSpark(newSparkContext(killEnabled = true)) { sc =>
-      sc.parallelize(1 to 10).map{x => Thread.sleep(10000); x}.countAsync()
+      sc.parallelize(1 to 10)
+        .map { x =>
+          Thread.sleep(10000); x
+        }
+        .countAsync()
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
-        val url = new URL(
-          sc.ui.get.appUIAddress.stripSuffix("/") + "/stages/stage/kill/?id=0&terminate=true")
+        val url = new URL(sc.ui.get.appUIAddress.stripSuffix("/") +
+            "/stages/stage/kill/?id=0&terminate=true")
         // SPARK-6846: should be POST only but YARN AM doesn't proxy POST
-        getResponseCode(url, "GET") should be (200)
-        getResponseCode(url, "POST") should be (200)
+        getResponseCode(url, "GET") should be(200)
+        getResponseCode(url, "POST") should be(200)
       }
     }
   }
@@ -490,163 +547,191 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
         // NOTE: if we reverse the order, things don't really behave nicely
         // we lose the stage for a job we keep, and then the job doesn't know
         // about its last stage
-        sc.parallelize(idx to (idx + 3)).map(identity).groupBy(identity).map(identity)
-          .groupBy(identity).count()
+        sc.parallelize(idx to (idx + 3))
+          .map(identity)
+          .groupBy(identity)
+          .map(identity)
+          .groupBy(identity)
+          .count()
         sc.parallelize(idx to (idx + 3)).collect()
       }
 
       val expJobInfo = Seq(
-        ("9", "collect"),
-        ("8", "count")
+          ("9", "collect"),
+          ("8", "count")
       )
 
       eventually(timeout(1 second), interval(50 milliseconds)) {
         goToUi(sc, "/jobs")
         // The completed jobs table should have two rows. The first row will be the most recent job:
-        find("completed-summary").get.text should be ("Completed Jobs: 10, only showing 2")
-        find("completed").get.text should be ("Completed Jobs (10, only showing 2)")
-        val rows = findAll(cssSelector("tbody tr")).toIndexedSeq.map{_.underlying}
-        rows.size should be (expJobInfo.size)
+        find("completed-summary").get.text should be(
+            "Completed Jobs: 10, only showing 2")
+        find("completed").get.text should be(
+            "Completed Jobs (10, only showing 2)")
+        val rows = findAll(cssSelector("tbody tr")).toIndexedSeq.map {
+          _.underlying
+        }
+        rows.size should be(expJobInfo.size)
         for {
           (row, idx) <- rows.zipWithIndex
           columns = row.findElements(By.tagName("td"))
           id = columns.get(0).getText()
           description = columns.get(1).getText()
         } {
-          id should be (expJobInfo(idx)._1)
-          description should include (expJobInfo(idx)._2)
+          id should be(expJobInfo(idx)._1)
+          description should include(expJobInfo(idx)._2)
         }
       }
 
       val jobsJson = getJson(sc.ui.get, "jobs")
-      jobsJson.children.size should be (expJobInfo.size)
+      jobsJson.children.size should be(expJobInfo.size)
       for {
         (job @ JObject(_), idx) <- jobsJson.children.zipWithIndex
         id = (job \ "jobId").extract[String]
         name = (job \ "name").extract[String]
       } {
         withClue(s"idx = $idx; id = $id; name = ${name.substring(0, 20)}") {
-          id should be (expJobInfo(idx)._1)
-          name should include (expJobInfo(idx)._2)
+          id should be(expJobInfo(idx)._1)
+          name should include(expJobInfo(idx)._2)
         }
       }
 
       // what about when we query for a job that did exist, but has been cleared?
       goToUi(sc, "/jobs/job/?id=7")
-      find("no-info").get.text should be ("No information to display for job 7")
+      find("no-info").get.text should be("No information to display for job 7")
 
-      val badJob = HistoryServerSuite.getContentAndCode(apiUrl(sc.ui.get, "jobs/7"))
-      badJob._1 should be (HttpServletResponse.SC_NOT_FOUND)
-      badJob._2 should be (None)
-      badJob._3 should be (Some("unknown job: 7"))
+      val badJob =
+        HistoryServerSuite.getContentAndCode(apiUrl(sc.ui.get, "jobs/7"))
+      badJob._1 should be(HttpServletResponse.SC_NOT_FOUND)
+      badJob._2 should be(None)
+      badJob._3 should be(Some("unknown job: 7"))
 
       val expStageInfo = Seq(
-        ("19", "collect"),
-        ("18", "count"),
-        ("17", "groupBy")
+          ("19", "collect"),
+          ("18", "count"),
+          ("17", "groupBy")
       )
 
       eventually(timeout(1 second), interval(50 milliseconds)) {
         goToUi(sc, "/stages")
-        find("completed-summary").get.text should be ("Completed Stages: 20, only showing 3")
-        find("completed").get.text should be ("Completed Stages (20, only showing 3)")
-        val rows = findAll(cssSelector("tbody tr")).toIndexedSeq.map{_.underlying}
-        rows.size should be (3)
+        find("completed-summary").get.text should be(
+            "Completed Stages: 20, only showing 3")
+        find("completed").get.text should be(
+            "Completed Stages (20, only showing 3)")
+        val rows = findAll(cssSelector("tbody tr")).toIndexedSeq.map {
+          _.underlying
+        }
+        rows.size should be(3)
         for {
           (row, idx) <- rows.zipWithIndex
           columns = row.findElements(By.tagName("td"))
           id = columns.get(0).getText()
           description = columns.get(1).getText()
         } {
-          id should be (expStageInfo(idx)._1)
-          description should include (expStageInfo(idx)._2)
+          id should be(expStageInfo(idx)._1)
+          description should include(expStageInfo(idx)._2)
         }
       }
 
       val stagesJson = getJson(sc.ui.get, "stages")
-      stagesJson.children.size should be (3)
+      stagesJson.children.size should be(3)
       for {
         (stage @ JObject(_), idx) <- stagesJson.children.zipWithIndex
         id = (stage \ "stageId").extract[String]
         name = (stage \ "name").extract[String]
       } {
-        id should be (expStageInfo(idx)._1)
-        name should include (expStageInfo(idx)._2)
+        id should be(expStageInfo(idx)._1)
+        name should include(expStageInfo(idx)._2)
       }
 
       // nonexistent stage
 
       goToUi(sc, "/stages/stage/?id=12&attempt=0")
-      find("no-info").get.text should be ("No information to display for Stage 12 (Attempt 0)")
-      val badStage = HistoryServerSuite.getContentAndCode(apiUrl(sc.ui.get, "stages/12/0"))
-      badStage._1 should be (HttpServletResponse.SC_NOT_FOUND)
-      badStage._2 should be (None)
-      badStage._3 should be (Some("unknown stage: 12"))
+      find("no-info").get.text should be(
+          "No information to display for Stage 12 (Attempt 0)")
+      val badStage =
+        HistoryServerSuite.getContentAndCode(apiUrl(sc.ui.get, "stages/12/0"))
+      badStage._1 should be(HttpServletResponse.SC_NOT_FOUND)
+      badStage._2 should be(None)
+      badStage._3 should be(Some("unknown stage: 12"))
 
-      val badAttempt = HistoryServerSuite.getContentAndCode(apiUrl(sc.ui.get, "stages/19/15"))
-      badAttempt._1 should be (HttpServletResponse.SC_NOT_FOUND)
-      badAttempt._2 should be (None)
-      badAttempt._3 should be (Some("unknown attempt for stage 19.  Found attempts: [0]"))
+      val badAttempt =
+        HistoryServerSuite.getContentAndCode(apiUrl(sc.ui.get, "stages/19/15"))
+      badAttempt._1 should be(HttpServletResponse.SC_NOT_FOUND)
+      badAttempt._2 should be(None)
+      badAttempt._3 should be(
+          Some("unknown attempt for stage 19.  Found attempts: [0]"))
 
-      val badStageAttemptList = HistoryServerSuite.getContentAndCode(
-        apiUrl(sc.ui.get, "stages/12"))
-      badStageAttemptList._1 should be (HttpServletResponse.SC_NOT_FOUND)
-      badStageAttemptList._2 should be (None)
-      badStageAttemptList._3 should be (Some("unknown stage: 12"))
+      val badStageAttemptList =
+        HistoryServerSuite.getContentAndCode(apiUrl(sc.ui.get, "stages/12"))
+      badStageAttemptList._1 should be(HttpServletResponse.SC_NOT_FOUND)
+      badStageAttemptList._2 should be(None)
+      badStageAttemptList._3 should be(Some("unknown stage: 12"))
     }
   }
 
   test("live UI json application list") {
     withSpark(newSparkContext()) { sc =>
-      val appListRawJson = HistoryServerSuite.getUrl(new URL(
-        sc.ui.get.appUIAddress + "/api/v1/applications"))
+      val appListRawJson = HistoryServerSuite.getUrl(
+          new URL(sc.ui.get.appUIAddress + "/api/v1/applications"))
       val appListJsonAst = JsonMethods.parse(appListRawJson)
-      appListJsonAst.children.length should be (1)
+      appListJsonAst.children.length should be(1)
       val attempts = (appListJsonAst \ "attempts").children
-      attempts.size should be (1)
-      (attempts(0) \ "completed").extract[Boolean] should be (false)
-      parseDate(attempts(0) \ "startTime") should be (sc.startTime)
-      parseDate(attempts(0) \ "endTime") should be (-1)
+      attempts.size should be(1)
+      (attempts(0) \ "completed").extract[Boolean] should be(false)
+      parseDate(attempts(0) \ "startTime") should be(sc.startTime)
+      parseDate(attempts(0) \ "endTime") should be(-1)
       val oneAppJsonAst = getJson(sc.ui.get, "")
-      oneAppJsonAst should be (appListJsonAst.children(0))
+      oneAppJsonAst should be(appListJsonAst.children(0))
     }
   }
 
   test("job stages should have expected dotfile under DAG visualization") {
     withSpark(newSparkContext()) { sc =>
       // Create a multi-stage job
-      val rdd =
-        sc.parallelize(Seq(1, 2, 3)).map(identity).groupBy(identity).map(identity).groupBy(identity)
+      val rdd = sc
+        .parallelize(Seq(1, 2, 3))
+        .map(identity)
+        .groupBy(identity)
+        .map(identity)
+        .groupBy(identity)
       rdd.count()
 
-      val stage0 = Source.fromURL(sc.ui.get.appUIAddress +
-        "/stages/stage/?id=0&attempt=0&expandDagViz=true").mkString
+      val stage0 = Source
+        .fromURL(sc.ui.get.appUIAddress +
+            "/stages/stage/?id=0&attempt=0&expandDagViz=true")
+        .mkString
       assert(stage0.contains("digraph G {\n  subgraph clusterstage_0 {\n    " +
-        "label=&quot;Stage 0&quot;;\n    subgraph "))
-      assert(stage0.contains("{\n      label=&quot;parallelize&quot;;\n      " +
-        "0 [label=&quot;ParallelCollectionRDD [0]"))
+              "label=&quot;Stage 0&quot;;\n    subgraph "))
+      assert(
+          stage0.contains("{\n      label=&quot;parallelize&quot;;\n      " +
+              "0 [label=&quot;ParallelCollectionRDD [0]"))
       assert(stage0.contains("{\n      label=&quot;map&quot;;\n      " +
-        "1 [label=&quot;MapPartitionsRDD [1]"))
+              "1 [label=&quot;MapPartitionsRDD [1]"))
       assert(stage0.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-        "2 [label=&quot;MapPartitionsRDD [2]"))
+              "2 [label=&quot;MapPartitionsRDD [2]"))
 
-      val stage1 = Source.fromURL(sc.ui.get.appUIAddress +
-        "/stages/stage/?id=1&attempt=0&expandDagViz=true").mkString
+      val stage1 = Source
+        .fromURL(sc.ui.get.appUIAddress +
+            "/stages/stage/?id=1&attempt=0&expandDagViz=true")
+        .mkString
       assert(stage1.contains("digraph G {\n  subgraph clusterstage_1 {\n    " +
-        "label=&quot;Stage 1&quot;;\n    subgraph "))
+              "label=&quot;Stage 1&quot;;\n    subgraph "))
       assert(stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-        "3 [label=&quot;ShuffledRDD [3]"))
+              "3 [label=&quot;ShuffledRDD [3]"))
       assert(stage1.contains("{\n      label=&quot;map&quot;;\n      " +
-        "4 [label=&quot;MapPartitionsRDD [4]"))
+              "4 [label=&quot;MapPartitionsRDD [4]"))
       assert(stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-        "5 [label=&quot;MapPartitionsRDD [5]"))
+              "5 [label=&quot;MapPartitionsRDD [5]"))
 
-      val stage2 = Source.fromURL(sc.ui.get.appUIAddress +
-        "/stages/stage/?id=2&attempt=0&expandDagViz=true").mkString
+      val stage2 = Source
+        .fromURL(sc.ui.get.appUIAddress +
+            "/stages/stage/?id=2&attempt=0&expandDagViz=true")
+        .mkString
       assert(stage2.contains("digraph G {\n  subgraph clusterstage_2 {\n    " +
-        "label=&quot;Stage 2&quot;;\n    subgraph "))
+              "label=&quot;Stage 2&quot;;\n    subgraph "))
       assert(stage2.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-        "6 [label=&quot;ShuffledRDD [6]"))
+              "6 [label=&quot;ShuffledRDD [6]"))
     }
   }
 
@@ -667,6 +752,8 @@ class UISeleniumSuite extends SparkFunSuite with WebBrowser with Matchers with B
   }
 
   def apiUrl(ui: SparkUI, path: String): URL = {
-    new URL(ui.appUIAddress + "/api/v1/applications/" + ui.sc.get.applicationId + "/" + path)
+    new URL(
+        ui.appUIAddress + "/api/v1/applications/" + ui.sc.get.applicationId +
+        "/" + path)
   }
 }

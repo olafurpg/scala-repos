@@ -7,8 +7,8 @@ import com.github.fommil.netlib.BLAS
 import spire.syntax.cfor._
 
 /**
- * Created by dlwh on 8/14/15.
- */
+  * Created by dlwh on 8/14/15.
+  */
 class DenseAxpyBenchmark extends BreezeBenchmark {
   assert(usingNatives)
 
@@ -23,7 +23,8 @@ class DenseAxpyBenchmark extends BreezeBenchmark {
 
   def timeBlasSaxpy(reps: Int) = {
     cforRange(0 until reps) { _ =>
-      BLAS.getInstance.saxpy(fv.length, 0.042f, fv.data, fv.stride, fv2.data, fv2.stride)
+      BLAS.getInstance.saxpy(
+          fv.length, 0.042f, fv.data, fv.stride, fv2.data, fv2.stride)
     }
   }
 
@@ -82,14 +83,12 @@ class DenseAxpyBenchmark extends BreezeBenchmark {
       largeDV += largeDV2
     }
   }
-  */
-
+ */
 }
-
 
 object DenseAxpyBenchmark extends MyRunner(classOf[DenseAxpyBenchmark])
 object DenseAxpyX {
-  def main(args: Array[String]):Unit = {
+  def main(args: Array[String]): Unit = {
 //    (new DenseAxpyBenchmark).timeSmallDVScaleAddInline(44400000)
   }
 }

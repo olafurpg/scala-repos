@@ -5,22 +5,24 @@ object Test extends App {
 
   try {
     throw new A("meh")
-  } catch { // this should emit a "catch-switch"
+  } catch {
+    // this should emit a "catch-switch"
     case y: A => println(y.x)
-    case (_ : A | _ : B)  => println("B")
+    case (_: A | _: B) => println("B")
     case _: Throwable => println("other")
   }
 
   try {
     throw new B()
-  } catch { // case classes and alternative flattening aren't supported yet, but could be in principle
+  } catch {
+    // case classes and alternative flattening aren't supported yet, but could be in principle
     // case A(x) => println(x)
     case y: A => println(y.x)
-    case x@((_ : A) | (_ : B))  => println(x)
+    case x @ ((_: A) | (_: B)) => println(x)
     case _: Throwable => println("other")
   }
 
- def simpleTry {
+  def simpleTry {
     try {
       bla
     } catch {

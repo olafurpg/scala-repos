@@ -2,8 +2,8 @@ package test;
 trait B {
   type Node <: NodeImpl;
   trait NodeImpl {
-    def self : Node;
-    def chilren : List[Node];
+    def self: Node;
+    def chilren: List[Node];
   }
 }
 trait C extends B {

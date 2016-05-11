@@ -43,11 +43,11 @@ import org.apache.spark.streaming.Time
 import org.apache.spark.util.Utils
 
 /**
- * This is a helper class for Kafka test suites. This has the functionality to set up
- * and tear down local Kafka servers, and to push data using Kafka producers.
- *
- * The reason to put Kafka test utility class in src is to test Python related Kafka APIs.
- */
+  * This is a helper class for Kafka test suites. This has the functionality to set up
+  * and tear down local Kafka servers, and to push data using Kafka producers.
+  *
+  * The reason to put Kafka test utility class in src is to test Python related Kafka APIs.
+  */
 private[kafka] class KafkaTestUtils extends Logging {
 
   // Zookeeper related configurations
@@ -76,19 +76,25 @@ private[kafka] class KafkaTestUtils extends Logging {
   private var brokerReady = false
 
   def zkAddress: String = {
-    assert(zkReady, "Zookeeper not setup yet or already torn down, cannot get zookeeper address")
+    assert(
+        zkReady,
+        "Zookeeper not setup yet or already torn down, cannot get zookeeper address")
     s"$zkHost:$zkPort"
   }
 
   def brokerAddress: String = {
-    assert(brokerReady, "Kafka not setup yet or already torn down, cannot get broker address")
+    assert(
+        brokerReady,
+        "Kafka not setup yet or already torn down, cannot get broker address")
     s"$brokerHost:$brokerPort"
   }
 
   def zookeeperClient: ZkClient = {
-    assert(zkReady, "Zookeeper not setup yet or already torn down, cannot get zookeeper client")
-    Option(zkClient).getOrElse(
-      throw new IllegalStateException("Zookeeper client is not yet initialized"))
+    assert(
+        zkReady,
+        "Zookeeper not setup yet or already torn down, cannot get zookeeper client")
+    Option(zkClient).getOrElse(throw new IllegalStateException(
+            "Zookeeper client is not yet initialized"))
   }
 
   // Set up the Embedded Zookeeper server and get the proper Zookeeper port
@@ -97,8 +103,10 @@ private[kafka] class KafkaTestUtils extends Logging {
     zookeeper = new EmbeddedZookeeper(s"$zkHost:$zkPort")
     // Get the actual zookeeper binding port
     zkPort = zookeeper.actualPort
-    zkClient = new ZkClient(s"$zkHost:$zkPort", zkSessionTimeout, zkConnectionTimeout,
-      ZKStringSerializer)
+    zkClient = new ZkClient(s"$zkHost:$zkPort",
+                            zkSessionTimeout,
+                            zkConnectionTimeout,
+                            ZKStringSerializer)
     zkReady = true
   }
 
@@ -107,13 +115,18 @@ private[kafka] class KafkaTestUtils extends Logging {
     assert(zkReady, "Zookeeper should be set up beforehand")
 
     // Kafka broker startup
-    Utils.startServiceOnPort(brokerPort, port => {
-      brokerPort = port
-      brokerConf = new KafkaConfig(brokerConfiguration)
-      server = new KafkaServer(brokerConf)
-      server.startup()
-      (server, port)
-    }, new SparkConf(), "KafkaBroker")
+    Utils.startServiceOnPort(
+        brokerPort,
+        port =>
+          {
+            brokerPort = port
+            brokerConf = new KafkaConfig(brokerConfiguration)
+            server = new KafkaServer(brokerConf)
+            server.startup()
+            (server, port)
+        },
+        new SparkConf(),
+        "KafkaBroker")
 
     brokerReady = true
   }
@@ -139,7 +152,9 @@ private[kafka] class KafkaTestUtils extends Logging {
       server = null
     }
 
-    brokerConf.logDirs.foreach { f => Utils.deleteRecursively(new File(f)) }
+    brokerConf.logDirs.foreach { f =>
+      Utils.deleteRecursively(new File(f))
+    }
 
     if (zkClient != null) {
       zkClient.close()
@@ -156,7 +171,9 @@ private[kafka] class KafkaTestUtils extends Logging {
   def createTopic(topic: String, partitions: Int): Unit = {
     AdminUtils.createTopic(zkClient, topic, partitions, 1)
     // wait until metadata is propagated
-    (0 until partitions).foreach { p => waitUntilMetadataIsPropagated(topic, p) }
+    (0 until partitions).foreach { p =>
+      waitUntilMetadataIsPropagated(topic, p)
+    }
   }
 
   /** Single-argument version for backwards compatibility */
@@ -164,19 +181,24 @@ private[kafka] class KafkaTestUtils extends Logging {
 
   /** Java-friendly function for sending messages to the Kafka broker */
   def sendMessages(topic: String, messageToFreq: JMap[String, JInt]): Unit = {
-    sendMessages(topic, Map(messageToFreq.asScala.mapValues(_.intValue()).toSeq: _*))
+    sendMessages(
+        topic, Map(messageToFreq.asScala.mapValues(_.intValue()).toSeq: _*))
   }
 
   /** Send the messages to the Kafka broker */
   def sendMessages(topic: String, messageToFreq: Map[String, Int]): Unit = {
-    val messages = messageToFreq.flatMap { case (s, freq) => Seq.fill(freq)(s) }.toArray
+    val messages = messageToFreq.flatMap {
+      case (s, freq) => Seq.fill(freq)(s)
+    }.toArray
     sendMessages(topic, messages)
   }
 
   /** Send the array of messages to the Kafka broker */
   def sendMessages(topic: String, messages: Array[String]): Unit = {
-    producer = new Producer[String, String](new ProducerConfig(producerConfiguration))
-    producer.send(messages.map { new KeyedMessage[String, String](topic, _ ) }: _*)
+    producer = new Producer[String, String](
+        new ProducerConfig(producerConfiguration))
+    producer.send(
+        messages.map { new KeyedMessage[String, String](topic, _) }: _*)
     producer.close()
     producer = null
   }
@@ -233,20 +255,25 @@ private[kafka] class KafkaTestUtils extends Logging {
     tryAgain(1)
   }
 
-  private def waitUntilMetadataIsPropagated(topic: String, partition: Int): Unit = {
-    def isPropagated = server.apis.metadataCache.getPartitionInfo(topic, partition) match {
-      case Some(partitionState) =>
-        val leaderAndInSyncReplicas = partitionState.leaderIsrAndControllerEpoch.leaderAndIsr
+  private def waitUntilMetadataIsPropagated(
+      topic: String, partition: Int): Unit = {
+    def isPropagated =
+      server.apis.metadataCache.getPartitionInfo(topic, partition) match {
+        case Some(partitionState) =>
+          val leaderAndInSyncReplicas =
+            partitionState.leaderIsrAndControllerEpoch.leaderAndIsr
 
-        ZkUtils.getLeaderForPartition(zkClient, topic, partition).isDefined &&
+          ZkUtils.getLeaderForPartition(zkClient, topic, partition).isDefined &&
           Request.isValidBrokerId(leaderAndInSyncReplicas.leader) &&
           leaderAndInSyncReplicas.isr.size >= 1
 
-      case _ =>
-        false
-    }
+        case _ =>
+          false
+      }
     eventually(Time(10000), Time(100)) {
-      assert(isPropagated, s"Partition [$topic, $partition] metadata not propagated after timeout")
+      assert(
+          isPropagated,
+          s"Partition [$topic, $partition] metadata not propagated after timeout")
     }
   }
 
@@ -272,4 +299,3 @@ private[kafka] class KafkaTestUtils extends Logging {
     }
   }
 }
-

@@ -6,5 +6,5 @@ object Test {
 
   val a = new A
 
-  a./* resolved: false */foo("")
+  a. /* resolved: false */ foo("")
 }

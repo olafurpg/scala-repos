@@ -7,7 +7,7 @@ class SomeActor extends akka.actor.Actor {
 }
 
 //#Activator
-import akka.actor.{ Props, ActorSystem }
+import akka.actor.{Props, ActorSystem}
 import org.osgi.framework.BundleContext
 import akka.osgi.ActorSystemActivator
 
@@ -20,6 +20,5 @@ class Activator extends ActorSystemActivator {
     val someActor = system.actorOf(Props[SomeActor], name = "someName")
     someActor ! SomeMessage
   }
-
 }
 //#Activator

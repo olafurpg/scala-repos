@@ -32,7 +32,7 @@ import org.specs2.mutable.Specification
 
 import com.mongodb.{BasicDBList, DBObject}
 
-object BsonDSLSpec extends Specification  {
+object BsonDSLSpec extends Specification {
   "BsonDSL Specification".title
 
   "BsonDSL" should {
@@ -48,13 +48,18 @@ object BsonDSLSpec extends Specification  {
       val oidList = ObjectId.get :: ObjectId.get :: ObjectId.get :: Nil
       val qry: JObject = ("ids" -> oidList)
       val dbo: DBObject = JObjectParser.parse(qry)(DefaultFormats)
-      val oidList2: List[ObjectId] = dbo.get("ids").asInstanceOf[BasicDBList].toList.map(_.asInstanceOf[ObjectId])
+      val oidList2: List[ObjectId] = dbo
+        .get("ids")
+        .asInstanceOf[BasicDBList]
+        .toList
+        .map(_.asInstanceOf[ObjectId])
 
       oidList2 must_== oidList
     }
 
     "Convert Pattern properly" in {
-      val ptrn: Pattern = Pattern.compile("^Mongo", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE)
+      val ptrn: Pattern =
+        Pattern.compile("^Mongo", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE)
       val qry: JObject = ("ptrn" -> ptrn)
       val dbo: DBObject = JObjectParser.parse(qry)(DefaultFormats)
       val ptrn2: Pattern = dbo.get("ptrn").asInstanceOf[Pattern]
@@ -65,12 +70,18 @@ object BsonDSLSpec extends Specification  {
 
     "Convert List[Pattern] properly" in {
       val ptrnList =
-        Pattern.compile("^Mongo1", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE) ::
-        Pattern.compile("^Mongo2", Pattern.CASE_INSENSITIVE) ::
-        Pattern.compile("^Mongo3") :: Nil
+        Pattern.compile(
+            "^Mongo1",
+            Pattern.MULTILINE | Pattern.CASE_INSENSITIVE) :: Pattern.compile(
+            "^Mongo2",
+            Pattern.CASE_INSENSITIVE) :: Pattern.compile("^Mongo3") :: Nil
       val qry: JObject = ("ptrns" -> ptrnList)
       val dbo: DBObject = JObjectParser.parse(qry)(DefaultFormats)
-      val ptrnList2: List[Pattern] = dbo.get("ptrns").asInstanceOf[BasicDBList].toList.map(_.asInstanceOf[Pattern])
+      val ptrnList2: List[Pattern] = dbo
+        .get("ptrns")
+        .asInstanceOf[BasicDBList]
+        .toList
+        .map(_.asInstanceOf[Pattern])
 
       for (i <- 0 to 2) yield {
         ptrnList(i).pattern must_== ptrnList2(i).pattern
@@ -99,10 +110,15 @@ object BsonDSLSpec extends Specification  {
     }
 
     "Convert List[UUID] properly" in {
-      val uuidList = UUID.randomUUID :: UUID.randomUUID :: UUID.randomUUID :: Nil
+      val uuidList =
+        UUID.randomUUID :: UUID.randomUUID :: UUID.randomUUID :: Nil
       val qry: JObject = ("ids" -> uuidList)
       val dbo: DBObject = JObjectParser.parse(qry)(DefaultFormats)
-      val uuidList2: List[UUID] = dbo.get("ids").asInstanceOf[BasicDBList].toList.map(_.asInstanceOf[UUID])
+      val uuidList2: List[UUID] = dbo
+        .get("ids")
+        .asInstanceOf[BasicDBList]
+        .toList
+        .map(_.asInstanceOf[UUID])
 
       uuidList2 must_== uuidList
     }
@@ -121,7 +137,11 @@ object BsonDSLSpec extends Specification  {
       val dateList = new Date :: new Date :: new Date :: Nil
       val qry: JObject = ("dts" -> dateList)
       val dbo: DBObject = JObjectParser.parse(qry)
-      val dateList2: List[Date] = dbo.get("dts").asInstanceOf[BasicDBList].toList.map(_.asInstanceOf[Date])
+      val dateList2: List[Date] = dbo
+        .get("dts")
+        .asInstanceOf[BasicDBList]
+        .toList
+        .map(_.asInstanceOf[Date])
 
       dateList2 must_== dateList
     }
@@ -140,7 +160,12 @@ object BsonDSLSpec extends Specification  {
       val dateList = new DateTime :: new DateTime :: new DateTime :: Nil
       val qry: JObject = ("dts" -> dateList)
       val dbo: DBObject = JObjectParser.parse(qry)
-      val dateList2: List[DateTime] = dbo.get("dts").asInstanceOf[BasicDBList].toList.map(_.asInstanceOf[Date]).map(d => new DateTime(d))
+      val dateList2: List[DateTime] = dbo
+        .get("dts")
+        .asInstanceOf[BasicDBList]
+        .toList
+        .map(_.asInstanceOf[Date])
+        .map(d => new DateTime(d))
 
       dateList2 must_== dateList
     }

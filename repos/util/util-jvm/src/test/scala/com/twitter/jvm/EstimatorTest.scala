@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 class EstimatorTest extends FunSuite {
   test("LoadAverage") {
     // This makes LoadAverage.a = 1/2 for easy testing.
-    val interval = -1D/math.log(0.5)
+    val interval = -1D / math.log(0.5)
     val e = new LoadAverage(interval)
     assert(e.estimate.isNaN)
 
@@ -23,18 +23,17 @@ class EstimatorTest extends FunSuite {
   }
 }
 
-
 /**
- * Take a GC log produced by:
- *
- * {{{
- * $ jstat -gc \$PID 250 ...
- * }}}
- *
- * And report on GC prediction accuracy. Time is
- * indexed by the jstat output, and the columns are,
- * in order: current time, next gc, estimated next GC.
- */
+  * Take a GC log produced by:
+  *
+  * {{{
+  * $ jstat -gc \$PID 250 ...
+  * }}}
+  *
+  * And report on GC prediction accuracy. Time is
+  * indexed by the jstat output, and the columns are,
+  * in order: current time, next gc, estimated next GC.
+  */
 object EstimatorApp extends App {
   import com.twitter.conversions.storage._
 
@@ -42,35 +41,48 @@ object EstimatorApp extends App {
     case Array("kalman", n, error) =>
       new KalmanGaussianError(n.toInt, error.toDouble)
     case Array("windowed", n, windows) =>
-      new WindowedMeans(n.toInt,
-        windows.split(",") map { w =>
-          w.split(":") match {
-            case Array(w, i) => (w.toInt, i.toInt)
-            case _ => throw new IllegalArgumentException("bad weight, count pair "+w)
-          }
+      new WindowedMeans(n.toInt, windows.split(",") map { w =>
+        w.split(":") match {
+          case Array(w, i) => (w.toInt, i.toInt)
+          case _ =>
+            throw new IllegalArgumentException("bad weight, count pair " + w)
         }
-      )
+      })
     case Array("load", interval) =>
       new LoadAverage(interval.toDouble)
     case _ => throw new IllegalArgumentException("bad args ")
   }
 
   val lines = scala.io.Source.stdin.getLines().drop(1)
-  val states = lines.toArray map(_.split(" ") filter(_ != "") map(_.toDouble)) collect {
-    case Array(s0c, s1c, s0u, s1u, ec, eu, oc, ou, pc, pu, ygc, ygct, fgc, fgct, gct) =>
-      PoolState(ygc.toLong, ec.toLong.bytes, eu.toLong.bytes)
-  }
+  val states =
+    lines.toArray map (_.split(" ") filter (_ != "") map (_.toDouble)) collect {
+      case Array(s0c,
+                 s1c,
+                 s0u,
+                 s1u,
+                 ec,
+                 eu,
+                 oc,
+                 ou,
+                 pc,
+                 pu,
+                 ygc,
+                 ygct,
+                 fgc,
+                 fgct,
+                 gct) =>
+        PoolState(ygc.toLong, ec.toLong.bytes, eu.toLong.bytes)
+    }
 
   var elapsed = 1
   for (List(begin, end) <- states.toList.sliding(2)) {
     val allocated = (end - begin).used
     estimator.measure(allocated.inBytes)
     val r = end.capacity - end.used
-    val i = (r.inBytes/estimator.estimate.toLong) + elapsed
+    val i = (r.inBytes / estimator.estimate.toLong) + elapsed
     val j = states.indexWhere(_.numCollections > end.numCollections)
 
-    if (j  > 0)
-      println("%d %d %d".format(elapsed, j, i))
+    if (j > 0) println("%d %d %d".format(elapsed, j, i))
 
     elapsed += 1
   }
@@ -112,4 +124,4 @@ plot "< awk '{print $1 \" \" $2}' /tmp/out" title "Actual", \
 	"< awk '{print $1 \" \" $3}' /tmp/out" title "Predicted", \
 	"< awk '{print $1 \" \" $1}' /tmp/out" title "time" with lines
 
-*/
+ */

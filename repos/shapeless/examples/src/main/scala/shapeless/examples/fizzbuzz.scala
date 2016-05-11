@@ -17,7 +17,7 @@
 package shapeless.examples
 
 /** A type-level implementation of [[http://en.wikipedia.org/wiki/Fizz_buzz fizz buzz]]
- * based on `Nat` and `HList` */
+  * based on `Nat` and `HList` */
 object FizzBuzzExample {
   import shapeless._
   import nat._
@@ -49,13 +49,15 @@ object FizzBuzzExample {
   }
 
   sealed trait NatToFizzBuzInstances0 extends NatToFizzBuzzInstances1 {
-    implicit def fizz[N <: Nat](implicit ev: Mod.Aux[N, _3, _0]): Aux[N, Fizz.type] =
+    implicit def fizz[N <: Nat](
+        implicit ev: Mod.Aux[N, _3, _0]): Aux[N, Fizz.type] =
       new NatToFizzBuzz[N] {
         type Out = Fizz.type
         def apply = Fizz
       }
 
-    implicit def buzz[N <: Nat](implicit ev: Mod.Aux[N, _5, _0]): Aux[N, Buzz.type] =
+    implicit def buzz[N <: Nat](
+        implicit ev: Mod.Aux[N, _5, _0]): Aux[N, Buzz.type] =
       new NatToFizzBuzz[N] {
         type Out = Buzz.type
         def apply = Buzz
@@ -63,12 +65,14 @@ object FizzBuzzExample {
   }
 
   /** A type class that can translate a natural number into a particular type of FizzBuzz.
-   *
-   * Note: instances are separated into a type class hierarchy to prioritize
-   * implicit resolution.
-   */
+    *
+    * Note: instances are separated into a type class hierarchy to prioritize
+    * implicit resolution.
+    */
   object NatToFizzBuzz extends NatToFizzBuzInstances0 {
-    implicit def fizzAndBuzz[N <: Nat](implicit fizz: Aux[N, Fizz.type], buzz: Aux[N, Buzz.type]): Aux[N, FizzAndBuzz.type] =
+    implicit def fizzAndBuzz[N <: Nat](
+        implicit fizz: Aux[N, Fizz.type],
+        buzz: Aux[N, Buzz.type]): Aux[N, FizzAndBuzz.type] =
       new NatToFizzBuzz[N] {
         type Out = FizzAndBuzz.type
         def apply = FizzAndBuzz
@@ -76,9 +80,9 @@ object FizzBuzzExample {
   }
 
   /**
-   * Creates an HList that is the reverse solution to the fizzbuzz challenge for
-   * the number N. Each element of the HList is a subtype of FizzBuzz.
-   */
+    * Creates an HList that is the reverse solution to the fizzbuzz challenge for
+    * the number N. Each element of the HList is a subtype of FizzBuzz.
+    */
   sealed trait RevFizzBuzz[N <: Nat] extends DepFn0 { type Out <: HList }
 
   object RevFizzBuzz {
@@ -89,7 +93,9 @@ object FizzBuzzExample {
         def apply = new Other[_1] :: HNil
       }
 
-    implicit def succRevFizzBuzz[N <: Nat](implicit f: RevFizzBuzz[N], n: NatToFizzBuzz[Succ[N]]): Aux[Succ[N], n.Out :: f.Out] =
+    implicit def succRevFizzBuzz[N <: Nat](
+        implicit f: RevFizzBuzz[N],
+        n: NatToFizzBuzz[Succ[N]]): Aux[Succ[N], n.Out :: f.Out] =
       new RevFizzBuzz[Succ[N]] {
         type Out = n.Out :: f.Out
         def apply = n.apply :: f.apply
@@ -97,15 +103,16 @@ object FizzBuzzExample {
   }
 
   /**
-   * Creates an HList that is the solution to the fizzbuzz challenge for the
-   * number N. Each element of the HList is a subtype of FizzBuzz.
-   */
+    * Creates an HList that is the solution to the fizzbuzz challenge for the
+    * number N. Each element of the HList is a subtype of FizzBuzz.
+    */
   sealed trait FizzBuzzResult[N <: Nat] extends DepFn0 { type Out <: HList }
 
   object FizzBuzzResult {
     type Aux[N <: Nat, L <: HList] = FizzBuzzResult[N] { type Out = L }
 
-    implicit def fizzBuzzResult[N <: Nat, L <: HList](implicit rfb: RevFizzBuzz.Aux[N, L], r: Reverse[L]): Aux[N, r.Out] =
+    implicit def fizzBuzzResult[N <: Nat, L <: HList](
+        implicit rfb: RevFizzBuzz.Aux[N, L], r: Reverse[L]): Aux[N, r.Out] =
       new FizzBuzzResult[N] {
         type Out = r.Out
         def apply() = r(rfb())
@@ -117,42 +124,42 @@ object FizzBuzzExample {
     implicit val fizz = at[Fizz.type](_ => "fizz")
     implicit val buzz = at[Buzz.type](_ => "buzz")
     implicit val fizzAndBuzz = at[FizzAndBuzz.type](_ => "fizzbuzz")
-    implicit def other[N <: Nat](implicit t: ToInt[N]) = at[Other[N]](n => t().toString)
+    implicit def other[N <: Nat](implicit t: ToInt[N]) =
+      at[Other[N]](n => t().toString)
   }
 
   /**
-   * Creates an HList that is the solution to the fizzbuzz challenge for the
-   * number N. Each element of the HList is a subtype of FizzBuzz.
-   *
-   * Example call:
-   * {{{
-   * import shapeless.nat._
-   * import shapeless.examples.FizzBuzzExample._
-   *
-   * val r = fizzBuzz[_15]
-   * val s = r.map(FizzBuzzToString).mkString("", "\n", "")
-   * print(s)
-   * }}}
-   *
-   * Which produces the output:
-   * <pre>
-   * 1
-   * 2
-   * fizz
-   * 4
-   * buzz
-   * fizz
-   * 7
-   * 8
-   * fizz
-   * buzz
-   * 11
-   * fizz
-   * 13
-   * 14
-   * fizzbuzz
-   * </pre>
-   */
+    * Creates an HList that is the solution to the fizzbuzz challenge for the
+    * number N. Each element of the HList is a subtype of FizzBuzz.
+    *
+    * Example call:
+    * {{{
+    * import shapeless.nat._
+    * import shapeless.examples.FizzBuzzExample._
+    *
+    * val r = fizzBuzz[_15]
+    * val s = r.map(FizzBuzzToString).mkString("", "\n", "")
+    * print(s)
+    * }}}
+    *
+    * Which produces the output:
+    * <pre>
+    * 1
+    * 2
+    * fizz
+    * 4
+    * buzz
+    * fizz
+    * 7
+    * 8
+    * fizz
+    * buzz
+    * 11
+    * fizz
+    * 13
+    * 14
+    * fizzbuzz
+    * </pre>
+    */
   def fizzBuzz[N <: Nat](implicit f: FizzBuzzResult[N]): f.Out = f()
-
 }

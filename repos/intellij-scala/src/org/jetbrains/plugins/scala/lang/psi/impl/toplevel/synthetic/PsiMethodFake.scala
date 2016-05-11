@@ -5,7 +5,6 @@ package impl
 package toplevel
 package synthetic
 
-
 import java.util.{ArrayList, List}
 import javax.swing.Icon
 
@@ -13,10 +12,10 @@ import com.intellij.psi._
 import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.util.MethodSignatureBackedByPsiMethod
 import org.jetbrains.plugins.scala.icons.Icons
-/**
- * @author ilyas
- */
 
+/**
+  * @author ilyas
+  */
 trait PsiMethodFake extends PsiMethod {
   def setName(name: String): PsiElement = null
 
@@ -44,9 +43,11 @@ trait PsiMethodFake extends PsiMethod {
 
   def isConstructor: Boolean = false
 
-  def findSuperMethods(checkAccess: Boolean): Array[PsiMethod] = PsiMethod.EMPTY_ARRAY
+  def findSuperMethods(checkAccess: Boolean): Array[PsiMethod] =
+    PsiMethod.EMPTY_ARRAY
 
-  def findSuperMethods(parentClass: PsiClass): Array[PsiMethod] = PsiMethod.EMPTY_ARRAY
+  def findSuperMethods(parentClass: PsiClass): Array[PsiMethod] =
+    PsiMethod.EMPTY_ARRAY
 
   def findDeepestSuperMethod: PsiMethod = null
 
@@ -54,7 +55,8 @@ trait PsiMethodFake extends PsiMethod {
 
   def getReturnTypeElement: PsiTypeElement = null
 
-  def findSuperMethodSignaturesIncludingStatic(checkAccess: Boolean): List[MethodSignatureBackedByPsiMethod] =
+  def findSuperMethodSignaturesIncludingStatic(
+      checkAccess: Boolean): List[MethodSignatureBackedByPsiMethod] =
     new ArrayList[MethodSignatureBackedByPsiMethod]()
 
   def findSuperMethods: Array[PsiMethod] = PsiMethod.EMPTY_ARRAY

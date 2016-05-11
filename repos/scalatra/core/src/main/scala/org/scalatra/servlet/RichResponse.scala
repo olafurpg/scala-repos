@@ -1,8 +1,8 @@
 package org.scalatra
 package servlet
 
-import java.io.{ OutputStream, PrintWriter }
-import javax.servlet.http.{ HttpServletResponse, Cookie => ServletCookie }
+import java.io.{OutputStream, PrintWriter}
+import javax.servlet.http.{HttpServletResponse, Cookie => ServletCookie}
 
 import org.scalatra.util.RicherString._
 
@@ -12,9 +12,9 @@ import scala.collection.mutable.Map
 case class RichResponse(res: HttpServletResponse) {
 
   /**
-   * Note: the servlet API doesn't remember the reason.  If a custom
-   * reason was set, it will be returned incorrectly here,
-   */
+    * Note: the servlet API doesn't remember the reason.  If a custom
+    * reason was set, it will be returned incorrectly here,
+    */
   def status: ResponseStatus = ResponseStatus(res.getStatus)
 
   def status_=(statusLine: ResponseStatus): Unit = {
@@ -30,8 +30,8 @@ case class RichResponse(res: HttpServletResponse) {
       }
 
     def iterator: Iterator[(String, String)] =
-      for (name <- res.getHeaderNames.asScala.iterator)
-        yield (name, res.getHeaders(name).asScala mkString ", ")
+      for (name <- res.getHeaderNames.asScala.iterator) yield
+        (name, res.getHeaders(name).asScala mkString ", ")
 
     def +=(kv: (String, String)): this.type = {
       res.setHeader(kv._1, kv._2)
@@ -42,7 +42,6 @@ case class RichResponse(res: HttpServletResponse) {
       res.setHeader(key, "")
       this
     }
-
   }
 
   def addCookie(cookie: Cookie): Unit = {
@@ -83,5 +82,4 @@ case class RichResponse(res: HttpServletResponse) {
     res.flushBuffer()
     res.getOutputStream.close()
   }
-
 }

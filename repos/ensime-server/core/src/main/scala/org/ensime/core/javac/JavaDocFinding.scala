@@ -3,7 +3,7 @@
 package org.ensime.core.javac
 
 import com.sun.source.util.TreePath
-import org.ensime.core.{ DocSigPair }
+import org.ensime.core.{DocSigPair}
 
 trait JavaDocFinding extends Helpers {
 
@@ -13,5 +13,4 @@ trait JavaDocFinding extends Helpers {
       DocSigPair(sig, sig)
     }
   }
-
 }

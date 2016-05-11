@@ -5,11 +5,12 @@ import org.jetbrains.plugins.scala.codeInspection.methodSignature.quickfix.Remov
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDeclaration
 
 /**
- * Pavel Fatin
- */
-
-class UnitMethodDeclaredWithTypeAnnotationInspection extends AbstractMethodSignatureInspection(
-  "ScalaUnitMethodDeclaredWithTypeAnnotation", "Redundant Unit result type annotation") {
+  * Pavel Fatin
+  */
+class UnitMethodDeclaredWithTypeAnnotationInspection
+    extends AbstractMethodSignatureInspection(
+        "ScalaUnitMethodDeclaredWithTypeAnnotation",
+        "Redundant Unit result type annotation") {
 
   def actionFor(holder: ProblemsHolder) = {
     case f: ScFunctionDeclaration if f.hasUnitResultType =>

@@ -12,10 +12,10 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 class IntegralCompTest extends WordSpec with Matchers {
   def box[T](t: T) = t.asInstanceOf[AnyRef]
@@ -48,16 +48,16 @@ class IntegralCompTest extends WordSpec with Matchers {
       intComp.compare(null, null) shouldBe 0
     }
     "have consistent hashcode" in {
-      List((box(1), box(1L)), (box(2), box(2L)), (box(3), box(3L)))
-        .foreach { pair =>
+      List((box(1), box(1L)), (box(2), box(2L)), (box(3), box(3L))).foreach {
+        pair =>
           intComp.compare(pair._1, pair._2) shouldBe 0
           intComp.hashCode(pair._1) shouldBe (intComp.hashCode(pair._2))
-        }
-      List((box(1), box(2L)), (box(2), box(3L)), (box(3), box(4L)))
-        .foreach { pair =>
+      }
+      List((box(1), box(2L)), (box(2), box(3L)), (box(3), box(4L))).foreach {
+        pair =>
           intComp.compare(pair._1, pair._2) should be < (0)
           intComp.compare(pair._2, pair._1) should be > (0)
-        }
+      }
     }
     "Compare strings properly" in {
       intComp.compare("hey", "you") shouldBe ("hey".compareTo("you"))

@@ -2,15 +2,17 @@ package mesosphere.marathon.state
 
 import mesosphere.marathon.Protos.MarathonApp
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{ MarathonSpec, Protos }
+import mesosphere.marathon.{MarathonSpec, Protos}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ BeforeAndAfter, GivenWhenThen, Matchers }
+import org.scalatest.{BeforeAndAfter, GivenWhenThen, Matchers}
 
 import scala.collection.concurrent.TrieMap
 import scala.collection.mutable
 import scala.concurrent.Future
 
-class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers with BeforeAndAfter with ScalaFutures with Mockito {
+class EntityStoreCacheTest
+    extends MarathonSpec with GivenWhenThen with Matchers with BeforeAndAfter
+    with ScalaFutures with Mockito {
 
   test("The onElected trigger fills the cache") {
     Given("A store with some entries")
@@ -55,7 +57,8 @@ class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers
     verify(store, never).fetch(any)
 
     And("Fetch an existing entry with version from the cache")
-    val aWithVersion = entityCache.fetch("a:1970-01-01T00:00:00.000Z").futureValue
+    val aWithVersion =
+      entityCache.fetch("a:1970-01-01T00:00:00.000Z").futureValue
 
     Then("The value is returned without interaction to the underlying store")
     aWithVersion should be(Some(TestApp("a")))
@@ -69,7 +72,8 @@ class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers
     verify(store, never).fetch(any)
   }
 
-  test("Fetching an unversioned entry will succeed with querying store in direct mode") {
+  test(
+      "Fetching an unversioned entry will succeed with querying store in direct mode") {
     Given("A UNfilled entityCache")
     val store = mock[EntityStore[TestApp]]
     store.fetch("a") returns Future.successful(Some(TestApp("a")))
@@ -84,7 +88,8 @@ class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers
     noMoreInteractions(store)
   }
 
-  test("Fetching an unknown unversioned entry will succeed with querying store in direct mode") {
+  test(
+      "Fetching an unknown unversioned entry will succeed with querying store in direct mode") {
     Given("A UNfilled entityCache")
     val store = mock[EntityStore[TestApp]]
     store.fetch("notExisting") returns Future.successful(None)
@@ -99,14 +104,17 @@ class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers
     noMoreInteractions(store)
   }
 
-  test("Fetching a versioned entry will succeed with querying store in direct mode") {
+  test(
+      "Fetching a versioned entry will succeed with querying store in direct mode") {
     Given("A UNfilled entityCache")
     val store = mock[EntityStore[TestApp]]
-    store.fetch("b:1970-01-01T00:00:00.000Z") returns Future.successful(Some(TestApp("b")))
+    store.fetch("b:1970-01-01T00:00:00.000Z") returns Future.successful(
+        Some(TestApp("b")))
     entityCache = new EntityStoreCache[TestApp](store)
 
     When("Fetching an existing entry with version")
-    val aWithVersion = entityCache.fetch("b:1970-01-01T00:00:00.000Z").futureValue
+    val aWithVersion =
+      entityCache.fetch("b:1970-01-01T00:00:00.000Z").futureValue
 
     Then("The value is returned by querying the store")
     aWithVersion should be(Some(TestApp("b")))
@@ -125,13 +133,13 @@ class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers
     val a = entityCache.fetch(s"a:$fixed").futureValue
 
     Then("The versioned entry is read from cache")
-    a should be (Some(TestApp("a", fixed)))
+    a should be(Some(TestApp("a", fixed)))
 
     And("An unknown versioned entry is fetched")
     val unknown = entityCache.fetch(s"a:${Timestamp.zero}").futureValue
 
     Then("The store is used to fetch that version")
-    unknown should be (None)
+    unknown should be(None)
   }
 
   test("Modify will delegate to store in direct mode") {
@@ -142,7 +150,7 @@ class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers
     val a = entityCache.modify("a")(_ => update).futureValue
 
     Then("Modify on the store will be called")
-    content.keys should be (Set("a"))
+    content.keys should be(Set("a"))
     content.get("a") should be(Some(update))
   }
 
@@ -193,11 +201,14 @@ class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers
     content.get("a") should be(empty)
   }
 
-  test("Names will list all entries (versioned and unversioned) in cached mode") {
+  test(
+      "Names will list all entries (versioned and unversioned) in cached mode") {
     Given("A pre-filled entityCache")
     val names = Set("a", "b", "c")
     val now = Timestamp.now()
-    content ++= (names.map(t => t -> TestApp(t)) ++ names.map(t => s"$t:$now" -> TestApp(t, now)))
+    content ++=
+    (names.map(t => t -> TestApp(t)) ++ names.map(
+            t => s"$t:$now" -> TestApp(t, now)))
     content should have size 6
     entityCache.onElected.futureValue
 
@@ -210,11 +221,14 @@ class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers
     entityCache.cacheOpt.get.values.flatten should have size 3
   }
 
-  test("Names will list all entries (versioned and unversioned) in direct mode") {
+  test(
+      "Names will list all entries (versioned and unversioned) in direct mode") {
     Given("A store with three entries")
     val names = Set("a", "b", "c")
     val now = Timestamp.now()
-    content ++= (names.map(t => t -> TestApp(t)) ++ names.map(t => s"$t:$now" -> TestApp(t, now)))
+    content ++=
+    (names.map(t => t -> TestApp(t)) ++ names.map(
+            t => s"$t:$now" -> TestApp(t, now)))
     content should have size 6
 
     When("Get all names in the cache")
@@ -234,20 +248,24 @@ class EntityStoreCacheTest extends MarathonSpec with GivenWhenThen with Matchers
     entityCache = new EntityStoreCache(store)
   }
 
-  case class TestApp(id: String, version: Timestamp = Timestamp.zero) extends MarathonState[Protos.MarathonApp, TestApp] {
+  case class TestApp(id: String, version: Timestamp = Timestamp.zero)
+      extends MarathonState[Protos.MarathonApp, TestApp] {
     override def mergeFromProto(message: MarathonApp): TestApp = ???
     override def mergeFromProto(bytes: Array[Byte]): TestApp = ???
     override def toProto: MarathonApp = ???
   }
   class TestStore[T](map: mutable.Map[String, T]) extends EntityStore[T] {
-    override def fetch(key: String): Future[Option[T]] = Future.successful(map.get(key))
-    override def modify(key: String, onSuccess: (T) => Unit)(update: Update): Future[T] = {
+    override def fetch(key: String): Future[Option[T]] =
+      Future.successful(map.get(key))
+    override def modify(key: String, onSuccess: (T) => Unit)(
+        update: Update): Future[T] = {
       val updated = update(() => map(key))
       map += key -> updated
       onSuccess(updated)
       Future.successful(updated)
     }
-    override def names(): Future[Seq[String]] = Future.successful(map.keys.toSeq)
+    override def names(): Future[Seq[String]] =
+      Future.successful(map.keys.toSeq)
     override def expunge(key: String, onSuccess: () => Unit): Future[Boolean] = {
       map -= key
       onSuccess()

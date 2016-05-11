@@ -1,4 +1,3 @@
-
 object Test extends App {
   val ms = """This is a long multiline string
   with \u000d\u000a CRLF embedded."""

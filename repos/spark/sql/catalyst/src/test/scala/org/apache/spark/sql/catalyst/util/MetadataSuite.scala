@@ -29,9 +29,7 @@ class MetadataSuite extends SparkFunSuite {
     .putBoolean("isBase", true)
     .build()
 
-  val summary = new MetadataBuilder()
-    .putLong("numFeatures", 10L)
-    .build()
+  val summary = new MetadataBuilder().putLong("numFeatures", 10L).build()
 
   val age = new MetadataBuilder()
     .putString("name", "age")

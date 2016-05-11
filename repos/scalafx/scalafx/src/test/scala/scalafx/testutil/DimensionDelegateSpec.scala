@@ -33,13 +33,14 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.DimensionDelegate
 
 /**
- * Trait to test DimensionDelegate subclasses
- */
+  * Trait to test DimensionDelegate subclasses
+  */
 trait DimensionDelegateSpec[D <: DimensionDelegate[_]] extends FlatSpec {
 
   val dimensionDelegate: D
 
-  private def testDoublePropertyUpdate(testedProperty: DoubleProperty, propertyName: String) {
+  private def testDoublePropertyUpdate(
+      testedProperty: DoubleProperty, propertyName: String) {
     var moved = false
     val observerDouble = new DoubleProperty(dimensionDelegate, propertyName)
 
@@ -61,5 +62,4 @@ trait DimensionDelegateSpec[D <: DimensionDelegate[_]] extends FlatSpec {
   it should "have its Width observed when it is changed" in {
     testDoublePropertyUpdate(dimensionDelegate.width, "Width Property")
   }
-
 }

@@ -9,24 +9,23 @@ import java.nio._
 class CoderResult private (kind: Int, _length: Int) {
   import CoderResult._
 
-  @inline def isUnderflow(): Boolean  = kind == Underflow
-  @inline def isOverflow(): Boolean   = kind == Overflow
-  @inline def isMalformed(): Boolean  = kind == Malformed
+  @inline def isUnderflow(): Boolean = kind == Underflow
+  @inline def isOverflow(): Boolean = kind == Overflow
+  @inline def isMalformed(): Boolean = kind == Malformed
   @inline def isUnmappable(): Boolean = kind == Unmappable
 
   @inline def isError(): Boolean = isMalformed || isUnmappable
 
   @inline def length(): Int = {
     val l = _length
-    if (l < 0)
-      throw new UnsupportedOperationException
+    if (l < 0) throw new UnsupportedOperationException
     l
   }
 
   def throwException(): Unit = (kind: @switch) match {
-    case Overflow   => throw new BufferOverflowException
-    case Underflow  => throw new BufferUnderflowException
-    case Malformed  => throw new MalformedInputException(_length)
+    case Overflow => throw new BufferOverflowException
+    case Underflow => throw new BufferUnderflowException
+    case Malformed => throw new MalformedInputException(_length)
     case Unmappable => throw new UnmappableCharacterException(_length)
   }
 }
@@ -54,25 +53,28 @@ object CoderResult {
 
   private val uniqueUnmappable = mutable.Map.empty[Int, CoderResult]
 
-  @inline def malformedForLength(length: Int): CoderResult = (length: @switch) match {
-    case 1 => Malformed1
-    case 2 => Malformed2
-    case 3 => Malformed3
-    case 4 => Malformed4
-    case _ => malformedForLengthImpl(length)
-  }
+  @inline def malformedForLength(length: Int): CoderResult =
+    (length: @switch) match {
+      case 1 => Malformed1
+      case 2 => Malformed2
+      case 3 => Malformed3
+      case 4 => Malformed4
+      case _ => malformedForLengthImpl(length)
+    }
 
   private def malformedForLengthImpl(length: Int): CoderResult =
     uniqueMalformed.getOrElseUpdate(length, new CoderResult(Malformed, length))
 
-  @inline def unmappableForLength(length: Int): CoderResult = (length: @switch) match {
-    case 1 => Unmappable1
-    case 2 => Unmappable2
-    case 3 => Unmappable3
-    case 4 => Unmappable4
-    case _ => unmappableForLengthImpl(length)
-  }
+  @inline def unmappableForLength(length: Int): CoderResult =
+    (length: @switch) match {
+      case 1 => Unmappable1
+      case 2 => Unmappable2
+      case 3 => Unmappable3
+      case 4 => Unmappable4
+      case _ => unmappableForLengthImpl(length)
+    }
 
   private def unmappableForLengthImpl(length: Int): CoderResult =
-    uniqueUnmappable.getOrElseUpdate(length, new CoderResult(Unmappable, length))
+    uniqueUnmappable.getOrElseUpdate(
+        length, new CoderResult(Unmappable, length))
 }

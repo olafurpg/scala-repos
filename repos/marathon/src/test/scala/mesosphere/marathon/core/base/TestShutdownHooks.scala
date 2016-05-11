@@ -8,4 +8,3 @@ object TestShutdownHooks {
 }
 
 private class TestShutdownHooks extends BaseShutdownHooks
-

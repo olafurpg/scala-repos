@@ -1,8 +1,10 @@
 import collection.generic.{FilterMonadic, CanBuildFrom}
 
 object Test extends App {
-  def mapSucc[Repr, That](s: FilterMonadic[Int, Repr])(implicit cbf: CanBuildFrom[Repr, Int, That]) = s map (_ + 1)
-  def flatMapId[T, Repr, That](s: FilterMonadic[T, Repr])(implicit cbf: CanBuildFrom[Repr, T, That]) = s flatMap (Seq(_))
+  def mapSucc[Repr, That](s: FilterMonadic[Int, Repr])(
+      implicit cbf: CanBuildFrom[Repr, Int, That]) = s map (_ + 1)
+  def flatMapId[T, Repr, That](s: FilterMonadic[T, Repr])(
+      implicit cbf: CanBuildFrom[Repr, T, That]) = s flatMap (Seq(_))
 
   def testStreamPred(s: Stream[Int])(p: Int => Boolean) {
     val res1 = s withFilter p

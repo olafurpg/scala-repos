@@ -20,12 +20,16 @@ import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
   * Date: 22.12.15.
   */
 class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
-  override def invoke(project: Project, editor: Editor, element: PsiElement): Unit = {
-    ToggleTypeAnnotation.complete(new MakeTypeMoreSpecificStrategy(Option(editor)), element)
+  override def invoke(
+      project: Project, editor: Editor, element: PsiElement): Unit = {
+    ToggleTypeAnnotation.complete(
+        new MakeTypeMoreSpecificStrategy(Option(editor)), element)
   }
 
-  override def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = {
-    if (element == null || !IntentionAvailabilityChecker.checkIntention(this, element)) false
+  override def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
+    if (element == null ||
+        !IntentionAvailabilityChecker.checkIntention(this, element)) false
     else {
       var isAvailable = false
       def text(s: String): Unit = {
@@ -37,8 +41,9 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
           for {
             declared <- variable.declaredType
             expr <- variable.expr
-            tp <- expr.getType()
-            if MakeTypeMoreSpecificStrategy.computeBaseTypes(declared, tp).nonEmpty
+            tp <- expr.getType() if MakeTypeMoreSpecificStrategy
+                   .computeBaseTypes(declared, tp)
+                   .nonEmpty
           } text(ScalaBundle.message("make.type.more.specific"))
         }
 
@@ -46,8 +51,9 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
           for {
             declared <- value.declaredType
             expr <- value.expr
-            tp <- expr.getType()
-            if MakeTypeMoreSpecificStrategy.computeBaseTypes(declared, tp).nonEmpty
+            tp <- expr.getType() if MakeTypeMoreSpecificStrategy
+                   .computeBaseTypes(declared, tp)
+                   .nonEmpty
           } text(ScalaBundle.message("make.type.more.specific"))
         }
 
@@ -55,8 +61,9 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
           for {
             declared <- function.returnType
             expr <- function.body
-            tp <- expr.getType()
-            if MakeTypeMoreSpecificStrategy.computeBaseTypes(declared, tp).nonEmpty
+            tp <- expr.getType() if MakeTypeMoreSpecificStrategy
+                   .computeBaseTypes(declared, tp)
+                   .nonEmpty
           } text(ScalaBundle.message("make.type.more.specific.fun"))
         }
       }
@@ -66,16 +73,24 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
     }
   }
 
-  override def getFamilyName: String = ScalaBundle.message("make.type.more.specific")
+  override def getFamilyName: String =
+    ScalaBundle.message("make.type.more.specific")
 }
 
 class MakeTypeMoreSpecificStrategy(editor: Option[Editor]) extends Strategy {
   import MakeTypeMoreSpecificStrategy._
 
-  def doTemplate(te: ScTypeElement, declaredType: ScType, dynamicType: ScType, context: PsiElement, editor: Editor): Unit = {
-    val types = computeBaseTypes(declaredType, dynamicType).sortWith((t1, t2) => t1.conforms(t2))
+  def doTemplate(te: ScTypeElement,
+                 declaredType: ScType,
+                 dynamicType: ScType,
+                 context: PsiElement,
+                 editor: Editor): Unit = {
+    val types = computeBaseTypes(declaredType, dynamicType).sortWith(
+        (t1, t2) => t1.conforms(t2))
     if (types.size == 1) {
-      val replaced = te.replace(ScalaPsiElementFactory.createTypeElementFromText(types.head.canonicalText, te.getContext, te))
+      val replaced = te.replace(
+          ScalaPsiElementFactory.createTypeElementFromText(
+              types.head.canonicalText, te.getContext, te))
       TypeAdjuster.markToAdjust(replaced)
     } else {
       val texts = types.map(ScTypeText)
@@ -83,7 +98,6 @@ class MakeTypeMoreSpecificStrategy(editor: Option[Editor]) extends Strategy {
       IntentionUtil.startTemplate(te, context, expr, editor)
     }
   }
-
 
   override def removeFromFunction(function: ScFunctionDefinition): Unit = {
     for {
@@ -133,7 +147,8 @@ class MakeTypeMoreSpecificStrategy(editor: Option[Editor]) extends Strategy {
 }
 
 object MakeTypeMoreSpecificStrategy {
-  def computeBaseTypes(declaredType: ScType, dynamicType: ScType): Seq[ScType] = {
+  def computeBaseTypes(
+      declaredType: ScType, dynamicType: ScType): Seq[ScType] = {
     val baseTypes = dynamicType +: BaseTypes.get(dynamicType)
     baseTypes.filter(t => t.conforms(declaredType) && !t.equiv(declaredType))
   }

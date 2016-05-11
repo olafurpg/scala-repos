@@ -22,21 +22,19 @@ import scala.language.postfixOps
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.test.SharedSQLContext
 
-
 class DatasetCacheSuite extends QueryTest with SharedSQLContext {
   import testImplicits._
 
   test("persist and unpersist") {
-    val ds = Seq(("a", 1), ("b", 2), ("c", 3)).toDS().select(expr("_2 + 1").as[Int])
+    val ds =
+      Seq(("a", 1), ("b", 2), ("c", 3)).toDS().select(expr("_2 + 1").as[Int])
     val cached = ds.cache()
     // count triggers the caching action. It should not throw.
     cached.count()
     // Make sure, the Dataset is indeed cached.
     assertCached(cached)
     // Check result.
-    checkDataset(
-      cached,
-      2, 3, 4)
+    checkDataset(cached, 2, 3, 4)
     // Drop the cache.
     cached.unpersist()
     assert(!sqlContext.isCached(cached), "The Dataset should not be cached.")
@@ -67,14 +65,13 @@ class DatasetCacheSuite extends QueryTest with SharedSQLContext {
     val agged = grouped.mapGroups { case (g, iter) => (g, iter.map(_._2).sum) }
     agged.persist()
 
-    checkDataset(
-      agged.filter(_._1 == "b"),
-      ("b", 3))
+    checkDataset(agged.filter(_._1 == "b"), ("b", 3))
     assertCached(agged.filter(_._1 == "b"))
 
     ds.unpersist()
     assert(!sqlContext.isCached(ds), "The Dataset ds should not be cached.")
     agged.unpersist()
-    assert(!sqlContext.isCached(agged), "The Dataset agged should not be cached.")
+    assert(
+        !sqlContext.isCached(agged), "The Dataset agged should not be cached.")
   }
 }

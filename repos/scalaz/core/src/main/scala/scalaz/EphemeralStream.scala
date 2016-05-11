@@ -18,12 +18,12 @@ sealed abstract class EphemeralStream[A] {
   private[scalaz] def tail: () => EphemeralStream[A]
 
   def headOption: Option[A] = {
-    if(isEmpty) None
+    if (isEmpty) None
     else Some(head())
   }
 
   def tailOption: Option[EphemeralStream[A]] = {
-    if(isEmpty) None
+    if (isEmpty) None
     else Some(tail())
   }
 
@@ -80,67 +80,60 @@ sealed abstract class EphemeralStream[A] {
     else cons(emptyEphemeralStream, tail().inits.map(cons(head(), _)))
 
   def findM[M[_]: Monad](p: A => M[Boolean]): M[Option[A]] =
-    if(isEmpty)
-      Monad[M].point(None)
+    if (isEmpty) Monad[M].point(None)
     else {
       val hh = head()
       Monad[M].bind(p(hh))(if (_) Monad[M].point(Some(hh)) else tail() findM p)
     }
 
   def findMapM[M[_]: Monad, B](f: A => M[Option[B]]): M[Option[B]] = {
-    if(isEmpty)
-      Monad[M].point(None)
-    else{
+    if (isEmpty) Monad[M].point(None)
+    else {
       val hh = head()
-      Monad[M].bind(f(hh)) { case Some(b) => Monad[M].point(Some(b)); case None => tail() findMapM f }
+      Monad[M].bind(f(hh)) {
+        case Some(b) => Monad[M].point(Some(b)); case None => tail() findMapM f
+      }
     }
   }
 
   def reverse: EphemeralStream[A] = {
     def lcons(xs: => List[A])(x: => A) = x :: xs
-    apply(foldLeft(Nil: List[A])(lcons _) : _*)
+    apply(foldLeft(Nil: List[A])(lcons _): _*)
   }
 
   def zip[B](b: => EphemeralStream[B]): EphemeralStream[(A, B)] =
-    if(isEmpty || b.isEmpty)
-      emptyEphemeralStream
-    else
-      cons((head(), b.head()), tail() zip b.tail())
+    if (isEmpty || b.isEmpty) emptyEphemeralStream
+    else cons((head(), b.head()), tail() zip b.tail())
 
-  def unzip[X, Y](implicit ev: A <:< (X, Y)): (EphemeralStream[X], EphemeralStream[Y]) =
-    foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(q => r =>
-      (cons(q._1, r._1), cons(q._2, r._2)))
+  def unzip[X, Y](
+      implicit ev: A <:< (X, Y)): (EphemeralStream[X], EphemeralStream[Y]) =
+    foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(
+        q => r => (cons(q._1, r._1), cons(q._2, r._2)))
 
-  def alignWith[B, C](f: A \&/ B => C)(b: EphemeralStream[B]): EphemeralStream[C] =
-    if(b.isEmpty)
-      map(x => f(\&/.This(x)))
-    else if(isEmpty)
-      b.map(x => f(\&/.That(x)))
-    else
-      cons(f(\&/.Both(head(), b.head())), tail().alignWith(f)(b.tail()))
+  def alignWith[B, C](f: A \&/ B => C)(
+      b: EphemeralStream[B]): EphemeralStream[C] =
+    if (b.isEmpty) map(x => f(\&/.This(x)))
+    else if (isEmpty) b.map(x => f(\&/.That(x)))
+    else cons(f(\&/.Both(head(), b.head())), tail().alignWith(f)(b.tail()))
 
   def interleave(q: EphemeralStream[A]): EphemeralStream[A] =
-    if(isEmpty)
-      q
-    else if (q.isEmpty)
-      this
-    else
-      cons(head(), cons(q.head(), tail() interleave q.tail()))
+    if (isEmpty) q
+    else if (q.isEmpty) this
+    else cons(head(), cons(q.head(), tail() interleave q.tail()))
 
   def take(n: Int): EphemeralStream[A] =
-    unfold((n, this)){ case (len, xs) =>
-      if(len > 0 && !xs.isEmpty)
-        Some((xs.head(), (len - 1, xs.tail())))
-      else
-        None
+    unfold((n, this)) {
+      case (len, xs) =>
+        if (len > 0 && !xs.isEmpty) Some((xs.head(), (len - 1, xs.tail())))
+        else None
     }
 
   def takeWhile(p: A => Boolean): EphemeralStream[A] =
-    if(!isEmpty){
+    if (!isEmpty) {
       val h = head()
-      if(p(h)) cons(h, tail().takeWhile(p))
+      if (p(h)) cons(h, tail().takeWhile(p))
       else emptyEphemeralStream
-    }else this
+    } else this
 
   def zipWithIndex: EphemeralStream[(A, Int)] =
     zip(iterate(0)(_ + 1))
@@ -148,79 +141,101 @@ sealed abstract class EphemeralStream[A] {
 
 sealed abstract class EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
-    import EphemeralStream._
-    override def isEmpty[A](fa: EphemeralStream[A]) = fa.isEmpty
-    override def cojoin[A](a: EphemeralStream[A]): EphemeralStream[EphemeralStream[A]] = a match {
-      case _ ##:: tl  => if (tl.isEmpty) EphemeralStream(a)
-                         else cons(a, cojoin(tl))
-      case _ => emptyEphemeralStream
-    }
-    def cobind[A, B](fa: EphemeralStream[A])(f: EphemeralStream[A] => B): EphemeralStream[B] = map(cojoin(fa))(f)
-    def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
-    def bind[A, B](fa: EphemeralStream[A])(f: A => EphemeralStream[B]) = fa flatMap f
-    def point[A](a: => A) = EphemeralStream(a)
-    def empty[A] = EphemeralStream()
-    def zip[A, B](a: => EphemeralStream[A], b: => EphemeralStream[B]) = a zip b
-    def unzip[A, B](a: EphemeralStream[(A, B)]) = a.unzip
-    def alignWith[A, B, C](f: A \&/ B => C) =
-      (a, b) =>
-        a.alignWith(f)(b)
-    override def toEphemeralStream[A](fa: EphemeralStream[A]) = fa
-    override def foldRight[A, B](fa: EphemeralStream[A], z: => B)(f: (A, => B) => B): B =
-      if(fa.isEmpty) z else f(fa.head(), foldRight(fa.tail(), z)(f))
-    override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit M: Monoid[B]) =
-      this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
-    override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =
-      fa.foldLeft(z)(b => a => f(b, a))
-    override def zipWithL[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (A, Option[B]) => C) = {
-      if(fa.isEmpty) emptyEphemeralStream
-      else {
-        val (bo, bTail) = if(fb.isEmpty) (None, emptyEphemeralStream[B])
-                          else (Some(fb.head()), fb.tail())
-        cons(f(fa.head(), bo), zipWithL(fa.tail(), bTail)(f))
-      }
-    }
-    override def zipWithR[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (Option[A], B) => C) =
-      zipWithL(fb, fa)((b, a) => f(a, b))
-    def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
-      val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
-
-      fa.foldRight(seed) {
-        x => ys => G.apply2(f(x), ys)((b, bs) => EphemeralStream.cons(b, bs))
-      }
-    }
-    override def index[A](fa: EphemeralStream[A], i: Int): Option[A] = {
-      if(i < 0)
-        None
-      else{
-        var n = i
-        var these = fa
-        while (!these.isEmpty && n > 0){
-          n -= 1
-          these = these.tail()
+  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with BindRec[
+      EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[
+      EphemeralStream] with Traverse[EphemeralStream] with Cobind[
+      EphemeralStream] with IsEmpty[EphemeralStream] =
+    new MonadPlus[EphemeralStream] with BindRec[EphemeralStream]
+    with Zip[EphemeralStream] with Unzip[EphemeralStream]
+    with Align[EphemeralStream] with Traverse[EphemeralStream]
+    with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
+      import EphemeralStream._
+      override def isEmpty[A](fa: EphemeralStream[A]) = fa.isEmpty
+      override def cojoin[A](
+          a: EphemeralStream[A]): EphemeralStream[EphemeralStream[A]] =
+        a match {
+          case _ ##:: tl =>
+            if (tl.isEmpty) EphemeralStream(a)
+            else cons(a, cojoin(tl))
+          case _ => emptyEphemeralStream
         }
-        if (these.isEmpty) None else Some(these.head())
+      def cobind[A, B](fa: EphemeralStream[A])(
+          f: EphemeralStream[A] => B): EphemeralStream[B] = map(cojoin(fa))(f)
+      def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
+      def bind[A, B](fa: EphemeralStream[A])(f: A => EphemeralStream[B]) =
+        fa flatMap f
+      def point[A](a: => A) = EphemeralStream(a)
+      def empty[A] = EphemeralStream()
+      def zip[A, B](a: => EphemeralStream[A], b: => EphemeralStream[B]) =
+        a zip b
+      def unzip[A, B](a: EphemeralStream[(A, B)]) = a.unzip
+      def alignWith[A, B, C](f: A \&/ B => C) =
+        (a, b) => a.alignWith(f)(b)
+      override def toEphemeralStream[A](fa: EphemeralStream[A]) = fa
+      override def foldRight[A, B](fa: EphemeralStream[A], z: => B)(
+          f: (A, => B) => B): B =
+        if (fa.isEmpty) z else f(fa.head(), foldRight(fa.tail(), z)(f))
+      override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(
+          implicit M: Monoid[B]) =
+        this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
+      override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(
+          f: (B, A) => B) =
+        fa.foldLeft(z)(b => a => f(b, a))
+      override def zipWithL[A, B, C](
+          fa: EphemeralStream[A], fb: EphemeralStream[B])(
+          f: (A, Option[B]) => C) = {
+        if (fa.isEmpty) emptyEphemeralStream
+        else {
+          val (bo, bTail) =
+            if (fb.isEmpty) (None, emptyEphemeralStream[B])
+            else (Some(fb.head()), fb.tail())
+          cons(f(fa.head(), bo), zipWithL(fa.tail(), bTail)(f))
+        }
       }
-    }
-    def tailrecM[A, B](f: A => EphemeralStream[A \/ B])(a: A): EphemeralStream[B] = {
-      def go(s: EphemeralStream[A \/ B]): EphemeralStream[B] = {
-        @annotation.tailrec
-        def rec(abs: EphemeralStream[A \/ B]): EphemeralStream[B] =
-          abs match {
-            case \/-(b) ##:: tail => cons(b, go(tail))
-            case -\/(a0) ##:: tail => rec(f(a0) ++ tail)
-            case _ => emptyEphemeralStream
+      override def zipWithR[A, B, C](
+          fa: EphemeralStream[A], fb: EphemeralStream[B])(
+          f: (Option[A], B) => C) =
+        zipWithL(fb, fa)((b, a) => f(a, b))
+      def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(
+          implicit G: Applicative[G]): G[EphemeralStream[B]] = {
+        val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
+
+        fa.foldRight(seed) { x => ys =>
+          G.apply2(f(x), ys)((b, bs) => EphemeralStream.cons(b, bs))
+        }
+      }
+      override def index[A](fa: EphemeralStream[A], i: Int): Option[A] = {
+        if (i < 0) None
+        else {
+          var n = i
+          var these = fa
+          while (!these.isEmpty && n > 0) {
+            n -= 1
+            these = these.tail()
           }
-        rec(s)
+          if (these.isEmpty) None else Some(these.head())
+        }
       }
-      go(f(a))
+      def tailrecM[A, B](f: A => EphemeralStream[A \/ B])(
+          a: A): EphemeralStream[B] = {
+        def go(s: EphemeralStream[A \/ B]): EphemeralStream[B] = {
+          @annotation.tailrec
+          def rec(abs: EphemeralStream[A \/ B]): EphemeralStream[B] =
+            abs match {
+              case \/-(b) ##:: tail => cons(b, go(tail))
+              case -\/(a0) ##:: tail => rec(f(a0) ++ tail)
+              case _ => emptyEphemeralStream
+            }
+          rec(s)
+        }
+        go(f(a))
+      }
     }
-  }
 
   import std.list._
 
-  implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
+  implicit def ephemeralStreamEqual[A : Equal]: Equal[EphemeralStream[A]] =
+    Equal[List[A]] contramap { (_: EphemeralStream[A]).toList }
 }
 
 object EphemeralStream extends EphemeralStreamInstances {
@@ -244,22 +259,23 @@ object EphemeralStream extends EphemeralStreamInstances {
 
   def unfold[A, B](b: => B)(f: B => Option[(A, B)]): EphemeralStream[A] =
     f(b) match {
-      case None         => emptyEphemeralStream
+      case None => emptyEphemeralStream
       case Some((a, r)) => cons(a, unfold(r)(f))
     }
 
   def iterate[A](start: A)(f: A => A): EphemeralStream[A] =
-    unfold(start){ a =>
+    unfold(start) { a =>
       val fa = f(a)
       Some((a, fa))
     }
 
   def range(lower: Int, upper: Int): EphemeralStream[Int] =
-    if (lower >= upper) emptyEphemeralStream else cons(lower, range(lower + 1, upper))
+    if (lower >= upper) emptyEphemeralStream
+    else cons(lower, range(lower + 1, upper))
 
   def fromStream[A](s: => Stream[A]): EphemeralStream[A] = s match {
     case Stream() => emptyEphemeralStream
-    case h #:: t  => cons(h, fromStream(t))
+    case h #:: t => cons(h, fromStream(t))
   }
 
   def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
@@ -280,29 +296,31 @@ object EphemeralStream extends EphemeralStreamInstances {
     val latch = new Object
     // TODO I don't think this annotation does anything, as `v` isn't a class member.
     @volatile var v: Option[WeakReference[V]] = None
-    () => {
-      val a = v.map(x => x.get)
-      if (a.isDefined && a.get != null) a.get
-      else latch.synchronized {
-        val x = f
-        v = Some(new WeakReference(x))
-        x
+    () =>
+      {
+        val a = v.map(x => x.get)
+        if (a.isDefined && a.get != null) a.get
+        else
+          latch.synchronized {
+            val x = f
+            v = Some(new WeakReference(x))
+            x
+          }
       }
-    }
   }
 
   def apply[A]: EphemeralStream[A] =
     emptyEphemeralStream
 
   def apply[A](as: A*): EphemeralStream[A] = {
-    val as0 = as match{
+    val as0 = as match {
       case indexedSeq: collection.IndexedSeq[A] => indexedSeq
       case other => other.toIndexedSeq
     }
     val size = as.size
     unfold(0)(b =>
-      if (b < size) Some((as0(b), b + 1))
-      else None)
+          if (b < size) Some((as0(b), b + 1))
+          else None)
   }
 
   class ConsWrap[A](e: => EphemeralStream[A]) {

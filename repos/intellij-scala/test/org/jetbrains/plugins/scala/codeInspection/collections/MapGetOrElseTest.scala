@@ -4,9 +4,9 @@ package codeInspection.collections
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 
 /**
- * Nikolay.Tropin
- * 5/30/13
- */
+  * Nikolay.Tropin
+  * 5/30/13
+  */
 class MapGetOrElseTest extends OperationsOnCollectionInspectionTest {
   val hint: String = InspectionBundle.message("map.getOrElse.hint")
 

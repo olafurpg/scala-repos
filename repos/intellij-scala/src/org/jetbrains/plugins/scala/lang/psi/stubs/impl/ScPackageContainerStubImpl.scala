@@ -10,32 +10,44 @@ import com.intellij.util.io.StringRef
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackageContainer
 
 /**
- * @author ilyas
- */
+  * @author ilyas
+  */
+class ScPackageContainerStubImpl[ParentPsi <: PsiElement](
+    parent: StubElement[ParentPsi],
+    elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    extends StubBaseWrapper[ScPackageContainer](parent, elemType)
+    with ScPackageContainerStub {
 
-class ScPackageContainerStubImpl[ParentPsi <: PsiElement](parent: StubElement[ParentPsi],
-                                                          elemType: IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-extends StubBaseWrapper[ScPackageContainer](parent, elemType) with ScPackageContainerStub {
-
-  var myPrefix : StringRef = _
-  var myOwnNamePart : StringRef = _
+  var myPrefix: StringRef = _
+  var myOwnNamePart: StringRef = _
   var myExplicit: Boolean = false
 
-  def this(parent : StubElement[ParentPsi],
-          elemType : IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-          prefix : String,
-          ownNamePart : String, explicit: Boolean) {
-    this (parent, elemType.asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+  def this(parent: StubElement[ParentPsi],
+           elemType: IStubElementType[
+               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           prefix: String,
+           ownNamePart: String,
+           explicit: Boolean) {
+    this(
+        parent,
+        elemType
+          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     myPrefix = StringRef.fromString(prefix)
     myOwnNamePart = StringRef.fromString(ownNamePart)
     myExplicit = explicit
   }
 
-  def this(parent : StubElement[ParentPsi],
-          elemType : IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-          prefix : StringRef,
-          ownNamePart : StringRef, explicit: Boolean) {
-    this (parent, elemType.asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+  def this(parent: StubElement[ParentPsi],
+           elemType: IStubElementType[
+               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           prefix: StringRef,
+           ownNamePart: StringRef,
+           explicit: Boolean) {
+    this(
+        parent,
+        elemType
+          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     myPrefix = prefix
     myOwnNamePart = ownNamePart
     myExplicit = explicit

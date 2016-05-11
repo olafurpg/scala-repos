@@ -14,7 +14,7 @@ package breeze.optimize
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-*/
+ */
 
 import org.scalatest._
 import org.scalatest.junit._
@@ -24,11 +24,10 @@ import org.junit.runner.RunWith
 
 import breeze.linalg._
 
-
 @RunWith(classOf[JUnitRunner])
 class OWLQNTest extends OptimizeTestBase {
   test("super simple") {
-    val lbfgs = new OWLQN[Int, DenseVector[Double]](100,4)
+    val lbfgs = new OWLQN[Int, DenseVector[Double]](100, 4)
 
     def optimizeThis(init: DenseVector[Double]) = {
       val f = new DiffFunction[DenseVector[Double]] {
@@ -37,28 +36,27 @@ class OWLQNTest extends OptimizeTestBase {
         }
       }
 
-      val result = lbfgs.minimize(f,init)
+      val result = lbfgs.minimize(f, init)
       result
     }
 
-    val result = optimizeThis(DenseVector(-1.1053,0.0,0.0))
+    val result = optimizeThis(DenseVector(-1.1053, 0.0, 0.0))
     assert((result(0) - 2.5) < 1E-4, result)
   }
 
-
   test("optimize a simple multivariate gaussian") {
-    val lbfgs = new OWLQN[Int, DenseVector[Double]](100,4,1.0)
+    val lbfgs = new OWLQN[Int, DenseVector[Double]](100, 4, 1.0)
 
     def optimizeThis(init: DenseVector[Double]) = {
       val f = new DiffFunction[DenseVector[Double]] {
         def calculate(x: DenseVector[Double]) = {
-          ((math.pow(norm(x - 3.0,2),2)),(x * 2.0) - 6.0)
+          ((math.pow(norm(x - 3.0, 2), 2)), (x * 2.0) - 6.0)
         }
       }
 
-      val result = lbfgs.minimize(f,init)
-      val closeish = norm(result - 2.5,2) < 1E-4
-      if(closeish) {
+      val result = lbfgs.minimize(f, init)
+      val closeish = norm(result - 2.5, 2) < 1E-4
+      if (closeish) {
         true
       } else {
         throw new Exception(result.toString + " is not close enough to 2.5")
@@ -66,22 +64,21 @@ class OWLQNTest extends OptimizeTestBase {
     }
 
     check(Prop.forAll(optimizeThis _))
-
   }
 
   test("optimize a simple multivariate gaussian, sparse") {
-    val lbfgs = new OWLQN[Int, SparseVector[Double]](100,4,1.0)
+    val lbfgs = new OWLQN[Int, SparseVector[Double]](100, 4, 1.0)
 
     def optimizeThis(init: SparseVector[Double]) = {
       val f = new DiffFunction[SparseVector[Double]] {
         def calculate(x: SparseVector[Double]) = {
-          ((math.pow(norm(x - 3.0,2),2)),(x * 2.0) - 6.0)
+          ((math.pow(norm(x - 3.0, 2), 2)), (x * 2.0) - 6.0)
         }
       }
 
-      val result = lbfgs.minimize(f,init)
-      val closeish = norm(result - 2.5,2) < 1E-4
-      if(closeish) {
+      val result = lbfgs.minimize(f, init)
+      val closeish = norm(result - 2.5, 2) < 1E-4
+      if (closeish) {
         true
       } else {
         throw new Exception(result.toString + " is not close enough to 2.5")
@@ -89,7 +86,5 @@ class OWLQNTest extends OptimizeTestBase {
     }
 
     check(Prop.forAll(optimizeThis _))
-
   }
-
 }

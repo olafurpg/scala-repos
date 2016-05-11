@@ -12,7 +12,8 @@ object Test extends BytecodeTest {
       val classNode = loadClassNode("Lean")
       val methodNode = getMethod(classNode, methodName)
       val got = countNullChecks(methodNode.instructions)
-      assert(got == expected, s"$methodName: expected $expected but got $got comparisons")
+      assert(got == expected,
+             s"$methodName: expected $expected but got $got comparisons")
     }
     test("string", expected = 0)
     test("module", expected = 0)

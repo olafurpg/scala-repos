@@ -21,11 +21,10 @@ import org.specs2.mutable.Specification
 
 import common._
 
-
 /**
- * Systems under specification for MappedDate.
- */
-object MappedDecimalSpec extends Specification  {
+  * Systems under specification for MappedDate.
+  */
+object MappedDecimalSpec extends Specification {
   "MappedDecimal Specification".title
   sequential
 
@@ -34,7 +33,7 @@ object MappedDecimalSpec extends Specification  {
   private def ignoreLogger(f: => AnyRef): Unit = ()
   def setupDB {
     provider.setupDB
-    Schemifier.destroyTables_!!(ignoreLogger _,  Dog, User)
+    Schemifier.destroyTables_!!(ignoreLogger _, Dog, User)
     Schemifier.schemify(true, ignoreLogger _, Dog, User)
   }
 
@@ -61,4 +60,3 @@ object MappedDecimalSpec extends Specification  {
     }
   }
 }
-

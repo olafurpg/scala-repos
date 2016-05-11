@@ -4,6 +4,8 @@ class SCL4039 {
   def goo(x: Int*)(y: String) = 2
   def goo(x: Int, y: String) = 1
 
-  /* line: 2 */foo(1, "")
-  /* line: 5 */goo(1, "")
+  /* line: 2 */
+  foo(1, "")
+  /* line: 5 */
+  goo(1, "")
 }

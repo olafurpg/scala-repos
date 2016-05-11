@@ -12,23 +12,30 @@ import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScReferenceExpressionImpl
 
 /**
- * @author Nikolay Obedin
- * @since 7/30/14.
- */
+  * @author Nikolay Obedin
+  * @since 7/30/14.
+  */
 class SbtDocumentationProvider extends AbstractDocumentationProvider {
 
   private val scalaDocProvider = new ScalaDocumentationProvider
 
-  override def getQuickNavigateInfo(element: PsiElement, originalElement: PsiElement): String = {
-    val scalaDoc = Option(scalaDocProvider.getQuickNavigateInfo(element, originalElement))
-    scalaDoc.map { doc => appendToScalaDoc(doc, extractDoc(element))}.orNull
+  override def getQuickNavigateInfo(
+      element: PsiElement, originalElement: PsiElement): String = {
+    val scalaDoc = Option(
+        scalaDocProvider.getQuickNavigateInfo(element, originalElement))
+    scalaDoc.map { doc =>
+      appendToScalaDoc(doc, extractDoc(element))
+    }.orNull
   }
 
-  override def generateDoc(element: PsiElement, originalElement: PsiElement): String = {
-    val scalaDoc = Option(scalaDocProvider.generateDoc(element, originalElement))
-    scalaDoc.map { doc => appendToScalaDoc(doc, extractDoc(element))}.orNull
+  override def generateDoc(
+      element: PsiElement, originalElement: PsiElement): String = {
+    val scalaDoc = Option(
+        scalaDocProvider.generateDoc(element, originalElement))
+    scalaDoc.map { doc =>
+      appendToScalaDoc(doc, extractDoc(element))
+    }.orNull
   }
-
 
   private def appendToScalaDoc(scalaDoc: String, sbtDoc: String): String =
     (scalaDoc.replace("</body></html>", "") + sbtDoc) + "</body></html>"
@@ -41,29 +48,35 @@ class SbtDocumentationProvider extends AbstractDocumentationProvider {
   }
 
   private def isElementInSbtFile(element: PsiElement): Boolean =
-    Option(element).safeMap(_.getContainingFile).fold(false)(_.getFileType.getName != Sbt.Name)
+    Option(element)
+      .safeMap(_.getContainingFile)
+      .fold(false)(_.getFileType.getName != Sbt.Name)
 
   private def extractDocFromSettingKey(settingKey: ScNamedElement): String = {
     val keyDefinition = findSettingKeyDefinition(settingKey)
-    val keyDefinitionArgs = keyDefinition.fold(Seq.empty[ScExpression])(getKeyDefinitionArgs)
+    val keyDefinitionArgs =
+      keyDefinition.fold(Seq.empty[ScExpression])(getKeyDefinitionArgs)
     val argStrings = keyDefinitionArgs.flatMap(argToString)
 
     val doc = keyDefinitionArgs.headOption match {
       case Some(_: ScLiteral) => getDocForNewKeyDefinition(argStrings)
-      case Some(_: ScReferenceExpressionImpl) => getDocForKeyReference(argStrings)
+      case Some(_: ScReferenceExpressionImpl) =>
+        getDocForKeyReference(argStrings)
       case _ => None
     }
 
     doc.getOrElse("")
   }
 
-  private def findSettingKeyDefinition(settingKey: ScNamedElement): Option[ScPatternDefinition] =
+  private def findSettingKeyDefinition(
+      settingKey: ScNamedElement): Option[ScPatternDefinition] =
     Option(settingKey.getNavigationElement)
       .safeMap(_.getParent)
       .safeMap(_.getParent)
       .collect { case s: ScPatternDefinition => s }
 
-  private def getKeyDefinitionArgs(keyDefinition: ScPatternDefinition): Seq[ScExpression] =
+  private def getKeyDefinitionArgs(
+      keyDefinition: ScPatternDefinition): Seq[ScExpression] =
     keyDefinition.lastChild match {
       case Some(call: ScMethodCall) => call.argumentExpressions
       case _ => Seq.empty
@@ -73,8 +86,8 @@ class SbtDocumentationProvider extends AbstractDocumentationProvider {
     case ScLiteralImpl.string(str) =>
       Some(str)
     case ScInfixExpr(lOp, _, rOp) =>
-      val str = argToString(lOp).getOrElse("") ++
-        argToString(rOp).getOrElse("")
+      val str =
+        argToString(lOp).getOrElse("") ++ argToString(rOp).getOrElse("")
       if (str.nonEmpty) Some(str) else None
     case refExpr: ScReferenceExpression =>
       Some(refExpr.getText)

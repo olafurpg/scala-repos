@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import java.util.concurrent.TimeUnit
@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations.Fork
 import org.openjdk.jmh.annotations.Measurement
 import org.openjdk.jmh.annotations.Mode
 import org.openjdk.jmh.annotations.OutputTimeUnit
-import org.openjdk.jmh.annotations.{ Scope => JmhScope }
+import org.openjdk.jmh.annotations.{Scope => JmhScope}
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 
@@ -32,9 +32,11 @@ import org.openjdk.jmh.annotations.Warmup
 class ActorPathValidationBenchmark {
 
   final val a = "actor-1"
-  final val s = "687474703a2f2f74686566727569742e636f6d2f26683d37617165716378357926656e" * 100
+  final val s =
+    "687474703a2f2f74686566727569742e636f6d2f26683d37617165716378357926656e" * 100
 
-  final val ElementRegex = """(?:[-\w:@&=+,.!~*'_;]|%\p{XDigit}{2})(?:[-\w:@&=+,.!~*'$_;]|%\p{XDigit}{2})*""".r
+  final val ElementRegex =
+    """(?:[-\w:@&=+,.!~*'_;]|%\p{XDigit}{2})(?:[-\w:@&=+,.!~*'$_;]|%\p{XDigit}{2})*""".r
 
   //  @Benchmark // blows up with stack overflow, we know
   def old7000: Option[List[String]] = ElementRegex.unapplySeq(s)
@@ -47,5 +49,4 @@ class ActorPathValidationBenchmark {
 
   @Benchmark
   def handLoopActor_1: Boolean = ActorPath.isValidPathElement(a)
-
 }

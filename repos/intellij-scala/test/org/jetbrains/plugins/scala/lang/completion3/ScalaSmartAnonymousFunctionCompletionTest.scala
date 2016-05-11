@@ -4,21 +4,19 @@ import com.intellij.codeInsight.completion.CompletionType
 import org.jetbrains.plugins.scala.codeInsight.ScalaCodeInsightTestBase
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
-class ScalaSmartAnonymousFunctionCompletionTest extends ScalaCodeInsightTestBase {
+  * @author Alexander Podkhalyuzin
+  */
+class ScalaSmartAnonymousFunctionCompletionTest
+    extends ScalaCodeInsightTestBase {
   def testAbstractTypeInfoFromFirstClause() {
-    val fileText =
-"""
+    val fileText = """
 def foo[T](x: T)(y: T => Int) = 1
 foo(2)(<caret>)
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 def foo[T](x: T)(y: T => Int) = 1
 foo(2)((i: Int) =><caret>)
 """.replaceAll("\r", "").trim()
@@ -28,16 +26,14 @@ foo(2)((i: Int) =><caret>)
   }
 
   def testSimpleCaseTest() {
-    val fileText =
-"""
+    val fileText = """
 def foo(x: String => String) = 1
 foo {<caret>}
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 def foo(x: String => String) = 1
 foo {case s: String =><caret>}
 """.replaceAll("\r", "").trim()
@@ -47,16 +43,14 @@ foo {case s: String =><caret>}
   }
 
   def testSimple() {
-    val fileText =
-"""
+    val fileText = """
 def foo(x: String => String) = 1
 foo(<caret>)
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 def foo(x: String => String) = 1
 foo((s: String) =><caret>)
 """.replaceAll("\r", "").trim()
@@ -66,16 +60,14 @@ foo((s: String) =><caret>)
   }
 
   def testJustTuple() {
-    val fileText =
-"""
+    val fileText = """
 def foo(x: Tuple2[Int, Int] => Int) = 1
 foo(<caret>)
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 def foo(x: Tuple2[Int, Int] => Int) = 1
 foo((tuple: (Int, Int)) =><caret>)
 """.replaceAll("\r", "").trim()
@@ -85,16 +77,14 @@ foo((tuple: (Int, Int)) =><caret>)
   }
 
   def testCaseTuple() {
-    val fileText =
-"""
+    val fileText = """
 def foo(x: Tuple2[Int, Int] => Int) = 1
 foo{<caret>}
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 def foo(x: Tuple2[Int, Int] => Int) = 1
 foo{case (i: Int, i0: Int) =><caret>}
 """.replaceAll("\r", "").trim()
@@ -104,16 +94,14 @@ foo{case (i: Int, i0: Int) =><caret>}
   }
 
   def testAbstractTypeInfoWithUpper() {
-    val fileText =
-"""
+    val fileText = """
 def foo[T <: Runnable](x: (T, String) => String) = 1
 foo(<caret>)
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 def foo[T <: Runnable](x: (T, String) => String) = 1
 foo((value: Runnable, s: String) =><caret>)
 """.replaceAll("\r", "").trim()
@@ -123,16 +111,14 @@ foo((value: Runnable, s: String) =><caret>)
   }
 
   def testAbstractTypeInfoWithLower() {
-    val fileText =
-"""
+    val fileText = """
 def foo[T >: Int](x: (T, String) => String) = 1
 foo(<caret>)
 """.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 def foo[T >: Int](x: (T, String) => String) = 1
 foo((value: Int, s: String) =><caret>)
 """.replaceAll("\r", "").trim()
@@ -142,8 +128,7 @@ foo((value: Int, s: String) =><caret>)
   }
 
   def testAbstractTypeInfoTypeParameters() {
-    val fileText =
-"""
+    val fileText = """
 def foo[T <: Runnable](x: T => String) = 1
 class X extends Runnable
 foo[X](<caret>)
@@ -151,8 +136,7 @@ foo[X](<caret>)
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-"""
+    val resultText = """
 def foo[T <: Runnable](x: T => String) = 1
 class X extends Runnable
 foo[X]((x: X) =><caret>)
@@ -162,18 +146,15 @@ foo[X]((x: X) =><caret>)
     checkResultByText(resultText)
   }
 
-
   def testFewParams() {
-    val fileText =
-      """
+    val fileText = """
       |def foo(c: (Int, Int, Int, Int) => Int) = 1
       |foo(<caret>)
       """.stripMargin.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-      """
+    val resultText = """
       |def foo(c: (Int, Int, Int, Int) => Int) = 1
       |foo((i: Int, i0: Int, i1: Int, i2: Int) =><caret>)
       """.stripMargin.replaceAll("\r", "").trim()
@@ -183,16 +164,14 @@ foo[X]((x: X) =><caret>)
   }
 
   def testFewParamsDifferent() {
-    val fileText =
-      """
+    val fileText = """
       |def foo(x: (Int, String, Int, String) => Int) = 1
       |foo(<caret>)
       """.stripMargin.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-      """
+    val resultText = """
       |def foo(x: (Int, String, Int, String) => Int) = 1
       |foo((i: Int, s: String, i0: Int, s0: String) =><caret>)
       """.stripMargin.replaceAll("\r", "").trim()
@@ -202,16 +181,14 @@ foo[X]((x: X) =><caret>)
   }
 
   def testAbstractTypeInfo() {
-    val fileText =
-      """
+    val fileText = """
       |def foo[T](x: (T, String) => String) = 1
       |foo(<caret>)
       """.stripMargin.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-      """
+    val resultText = """
       |def foo[T](x: (T, String) => String) = 1
       |foo((value: T, s: String) =><caret>)
       """.stripMargin.replaceAll("\r", "").trim()
@@ -221,8 +198,7 @@ foo[X]((x: X) =><caret>)
   }
 
   def testAliasType() {
-    val fileText =
-      """
+    val fileText = """
       |type T = Int => String
       |def zoo(p: T) {}
       |zoo(<caret>)
@@ -230,8 +206,7 @@ foo[X]((x: X) =><caret>)
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, prefix) = complete(2, CompletionType.SMART)
 
-    val resultText =
-      """
+    val resultText = """
       |type T = Int => String
       |def zoo(p: T) {}
       |zoo((i: Int) =><caret>)

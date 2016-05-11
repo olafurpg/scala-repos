@@ -1,14 +1,13 @@
 abstract class A {
 
-    lazy val lazyBar = bar
+  lazy val lazyBar = bar
 
-    object bar {
-        val foo = 12
-    }
-
+  object bar {
+    val foo = 12
+  }
 }
 
 object Test extends App {
-    val a = new A{}
-    println(a.lazyBar.foo)
+  val a = new A {}
+  println(a.lazyBar.foo)
 }

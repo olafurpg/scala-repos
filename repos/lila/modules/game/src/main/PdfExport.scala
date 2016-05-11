@@ -1,6 +1,6 @@
 package lila.game
 
-import java.io.{ File, OutputStream }
+import java.io.{File, OutputStream}
 import scala.sys.process._
 
 object PdfExport {

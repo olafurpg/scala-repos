@@ -5,11 +5,12 @@ package a {
   }
 
   case class Meter(underlying: Double) extends AnyVal with _root_.b.Printable {
-    def + (other: Meter): Meter =
+    def +(other: Meter): Meter =
       new Meter(this.underlying + other.underlying)
-    def / (other: Meter)(implicit dummy: Meter.MeterArg = null): Double = this.underlying / other.underlying
-    def / (factor: Double): Meter = new Meter(this.underlying / factor)
-    def < (other: Meter): Boolean = this.underlying < other.underlying
+    def /(other: Meter)(implicit dummy: Meter.MeterArg = null): Double =
+      this.underlying / other.underlying
+    def /(factor: Double): Meter = new Meter(this.underlying / factor)
+    def <(other: Meter): Boolean = this.underlying < other.underlying
     def toFoot: Foot = new Foot(this.underlying * 0.3048)
     override def print = { Console.print(">>>"); super.print; proprint }
   }
@@ -25,9 +26,9 @@ package a {
   }
 
   class Foot(val unbox: Double) extends AnyVal {
-    def + (other: Foot): Foot =
+    def +(other: Foot): Foot =
       new Foot(this.unbox + other.unbox)
-    override def toString = unbox.toString+"ft"
+    override def toString = unbox.toString + "ft"
   }
   object Foot {
     implicit val boxings = new BoxingConversions[Foot, Double] {
@@ -35,7 +36,6 @@ package a {
       def unbox(m: Foot) = m.unbox
     }
   }
-
 }
 package b {
   trait Printable extends Any {
@@ -48,13 +48,13 @@ import _root_.b._
 object Test extends App {
 
   {
-  val x: Meter = new Meter(1)
-  val a: Object = x.asInstanceOf[Object]
-  val y: Meter = a.asInstanceOf[Meter]
+    val x: Meter = new Meter(1)
+    val a: Object = x.asInstanceOf[Object]
+    val y: Meter = a.asInstanceOf[Meter]
 
-  val u: Double = 1
-  val b: Object = u.asInstanceOf[Object]
-  val v: Double = b.asInstanceOf[Double]
+    val u: Double = 1
+    val b: Object = u.asInstanceOf[Object]
+    val v: Double = b.asInstanceOf[Double]
   }
 
   val x = new Meter(1)
@@ -62,23 +62,23 @@ object Test extends App {
   println((x + x) / x)
   println((x + x) / 0.5)
   println((x < x).toString)
-  println("x.isInstanceOf[Meter]: "+x.isInstanceOf[Meter])
+  println("x.isInstanceOf[Meter]: " + x.isInstanceOf[Meter])
 
-
-  println("x.hashCode: "+x.hashCode)
-  println("x == 1: "+(x == 1))
-  println("x == y: "+(x == y))
+  println("x.hashCode: " + x.hashCode)
+  println("x == 1: " + (x == 1))
+  println("x == y: " + (x == y))
   assert(x.hashCode == (1.0).hashCode)
 
   val a: Any = x
   val b: Any = y
-  println("a == b: "+(a == b))
+  println("a == b: " + (a == b))
 
-  { println("testing native arrays")
+  {
+    println("testing native arrays")
     val arr = Array(x, y + x)
     println(arr.deep)
     def foo[T <: Printable](x: Array[T]) {
-      for (i <- 0 until x.length) { x(i).print; println(" "+x(i)) }
+      for (i <- 0 until x.length) { x(i).print; println(" " + x(i)) }
     }
     val m = arr(0)
     println(m)
@@ -102,5 +102,4 @@ object Test extends App {
   //   val fs = arr map (_.toFoot)
   //   println(fs)
   // }
-
 }

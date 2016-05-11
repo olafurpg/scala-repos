@@ -3,9 +3,10 @@
 package org.ensime.core.debug
 
 sealed abstract class VmMode {
+
   /**
-   * @return True if the vm should be existed for this mode
-   */
+    * @return True if the vm should be existed for this mode
+    */
   def shouldExit: Boolean
 }
 

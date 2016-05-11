@@ -18,7 +18,8 @@ class ServerStatsFilterTest extends FunSuite {
         ctl.advance(5.microseconds)
         Future.never
       }
-      val filter = new ServerStatsFilter[Unit, Unit](inMemory, Stopwatch.timeNanos)
+      val filter =
+        new ServerStatsFilter[Unit, Unit](inMemory, Stopwatch.timeNanos)
       filter.andThen(svc)(())
       val expected = 5
       val actual = inMemory.stats(Seq("handletime_us"))(0)

@@ -30,11 +30,12 @@ class DarkTrafficFilterTest extends FunSuite with MockitoSugar {
 
     val enableSampling = (s: String) => gate()
 
-    val filter = new DarkTrafficFilter(darkService, enableSampling, statsReceiver)
+    val filter = new DarkTrafficFilter(
+        darkService, enableSampling, statsReceiver)
 
     val forwarded = Seq("darkTrafficFilter", "forwarded")
-    val skipped   = Seq("darkTrafficFilter", "skipped")
-    val failed    = Seq("darkTrafficFilter", "failed")
+    val skipped = Seq("darkTrafficFilter", "skipped")
+    val failed = Seq("darkTrafficFilter", "failed")
 
     val service = mock[Service[String, String]]
     when(service.apply(anyObject())) thenReturn Future.value(response)
@@ -53,7 +54,8 @@ class DarkTrafficFilterTest extends FunSuite with MockitoSugar {
     }
   }
 
-  test("when decider is on, send dark traffic to darkService and light to service") {
+  test(
+      "when decider is on, send dark traffic to darkService and light to service") {
     new Fixture {
       when(gate()) thenReturn true
       assert(Await.result(filter(request, service)) == response)
@@ -69,9 +71,11 @@ class DarkTrafficFilterTest extends FunSuite with MockitoSugar {
     new Fixture {
       when(gate()) thenReturn true
       val failingService = new Service[String, String] {
-        override def apply(request: String) = Future.exception(new Exception("fail"))
+        override def apply(request: String) =
+          Future.exception(new Exception("fail"))
       }
-      val failingFilter = new DarkTrafficFilter(failingService, enableSampling, statsReceiver)
+      val failingFilter =
+        new DarkTrafficFilter(failingService, enableSampling, statsReceiver)
       assert(Await.result(failingFilter(request, service)) == response)
 
       assert(statsReceiver.counters.get(failed) == Some(1))

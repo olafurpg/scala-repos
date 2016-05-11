@@ -1,4 +1,3 @@
-
 /*
  * The block under qual$1 must be owned by it.
  * In the sample bug, the first default arg generates x$4,
@@ -52,5 +51,4 @@ at scala.reflect.internal.SymbolTable.abort(SymbolTable.scala:45)
 at scala.tools.nsc.Global.abort(Global.scala:202)
 at scala.tools.nsc.backend.icode.GenICode$ICodePhase.liftedTree2$1(GenICode.scala:998)
 at scala.tools.nsc.backend.icode.GenICode$ICodePhase.scala$tools$nsc$backend$icode$GenICode$ICodePhase$$genLoad(GenICode.scala:992)
-*/
-
+ */

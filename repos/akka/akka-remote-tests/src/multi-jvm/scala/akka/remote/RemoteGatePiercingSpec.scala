@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.remote.transport.AssociationHandle
@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ ForceDisassociateExplicitly, ForceDisassociate, Direction }
+import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociateExplicitly, ForceDisassociate, Direction}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -24,18 +24,17 @@ object RemoteGatePiercingSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(
-    ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       akka.remote.transport-failure-detector.acceptable-heartbeat-pause = 5 s
                               """)))
 
-  nodeConfig(first)(
-    ConfigFactory.parseString("akka.remote.retry-gate-closed-for  = 1 d # Keep it long"))
+  nodeConfig(first)(ConfigFactory.parseString(
+          "akka.remote.retry-gate-closed-for  = 1 d # Keep it long"))
 
-  nodeConfig(second)(
-    ConfigFactory.parseString("akka.remote.retry-gate-closed-for  = 1 s # Keep it short"))
+  nodeConfig(second)(ConfigFactory.parseString(
+          "akka.remote.retry-gate-closed-for  = 1 s # Keep it short"))
 
   testTransport(on = true)
 
@@ -44,22 +43,22 @@ object RemoteGatePiercingSpec extends MultiNodeConfig {
       case "shutdown" ⇒ context.system.terminate()
     }
   }
-
 }
 
 class RemoteGatePiercingSpecMultiJvmNode1 extends RemoteGatePiercingSpec
 class RemoteGatePiercingSpecMultiJvmNode2 extends RemoteGatePiercingSpec
 
 abstract class RemoteGatePiercingSpec
-  extends MultiNodeSpec(RemoteGatePiercingSpec)
-  with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(RemoteGatePiercingSpec) with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteGatePiercingSpec._
 
   override def initialParticipants = 2
 
   def identify(role: RoleName, actorName: String): ActorRef = {
-    system.actorSelection(node(role) / "user" / actorName) ! Identify(actorName)
+    system.actorSelection(node(role) / "user" / actorName) ! Identify(
+        actorName)
     expectMsgType[ActorIdentity].ref.get
   }
 
@@ -74,15 +73,19 @@ abstract class RemoteGatePiercingSpec
 
         enterBarrier("actors-communicate")
 
-        EventFilter.warning(pattern = "address is now gated", occurrences = 1).intercept {
-          Await.result(RARP(system).provider.transport.managementCommand(
-            ForceDisassociateExplicitly(node(second).address, AssociationHandle.Unknown)), 3.seconds)
-        }
+        EventFilter
+          .warning(pattern = "address is now gated", occurrences = 1)
+          .intercept {
+            Await.result(
+                RARP(system).provider.transport.managementCommand(
+                    ForceDisassociateExplicitly(node(second).address,
+                                                AssociationHandle.Unknown)),
+                3.seconds)
+          }
 
         enterBarrier("gated")
 
         enterBarrier("gate-pierced")
-
       }
 
       runOn(second) {
@@ -98,10 +101,7 @@ abstract class RemoteGatePiercingSpec
         }
 
         enterBarrier("gate-pierced")
-
       }
-
     }
-
   }
 }

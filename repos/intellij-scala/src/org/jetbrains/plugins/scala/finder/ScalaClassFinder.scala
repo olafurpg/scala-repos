@@ -14,18 +14,25 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import scala.collection.mutable.ArrayBuffer
 
 class ScalaClassFinder(project: Project) extends PsiElementFinder {
-  def findClasses(qualifiedName: String, scope: GlobalSearchScope): Array[PsiClass] = {
+  def findClasses(
+      qualifiedName: String, scope: GlobalSearchScope): Array[PsiClass] = {
     val res = new ArrayBuffer[PsiClass]
 
     def iterateClasses(suffix: String)(fun: PsiClass => Unit) {
       if (!qualifiedName.endsWith(suffix)) return
-      val nameWithoutDollar = qualifiedName.substring(0, qualifiedName.length() - suffix.length)
-      val classes = ScalaShortNamesCacheManager.getInstance(project).getClassesByFQName(nameWithoutDollar, scope)
-      (if (classes.isEmpty) {
-        val converted = ScalaPsiUtil.convertMemberName(nameWithoutDollar)
-        if (nameWithoutDollar != converted) ScalaShortNamesCacheManager.getInstance(project).getClassesByFQName(converted, scope)
-        else classes
-      } else classes).foreach(fun)
+      val nameWithoutDollar =
+        qualifiedName.substring(0, qualifiedName.length() - suffix.length)
+      val classes = ScalaShortNamesCacheManager
+        .getInstance(project)
+        .getClassesByFQName(nameWithoutDollar, scope)
+        (if (classes.isEmpty) {
+           val converted = ScalaPsiUtil.convertMemberName(nameWithoutDollar)
+           if (nameWithoutDollar != converted)
+             ScalaShortNamesCacheManager
+               .getInstance(project)
+               .getClassesByFQName(converted, scope)
+           else classes
+         } else classes).foreach(fun)
     }
 
     iterateClasses("") {
@@ -62,17 +69,22 @@ class ScalaClassFinder(project: Project) extends PsiElementFinder {
 
   override def findPackage(qName: String): PsiPackage = null
 
-  override def getClassNames(psiPackage: PsiPackage, scope: GlobalSearchScope): util.Set[String] = {
-    ScalaPsiManager.instance(project).getJavaPackageClassNames(psiPackage, scope)
+  override def getClassNames(
+      psiPackage: PsiPackage, scope: GlobalSearchScope): util.Set[String] = {
+    ScalaPsiManager
+      .instance(project)
+      .getJavaPackageClassNames(psiPackage, scope)
   }
 
-  override def getClasses(psiPackage: PsiPackage, scope: GlobalSearchScope): Array[PsiClass] = {
+  override def getClasses(
+      psiPackage: PsiPackage, scope: GlobalSearchScope): Array[PsiClass] = {
     val otherClassNames = getClassNames(psiPackage, scope)
     val result: ArrayBuffer[PsiClass] = new ArrayBuffer[PsiClass]()
     import scala.collection.JavaConversions._
     for (clazzName <- otherClassNames) {
       val qualName = psiPackage.getQualifiedName + "." + clazzName
-      result ++= ScalaPsiManager.instance(project).getCachedClasses(scope, qualName)
+      result ++=
+        ScalaPsiManager.instance(project).getCachedClasses(scope, qualName)
       result ++= findClasses(qualName, scope)
     }
     result.toArray

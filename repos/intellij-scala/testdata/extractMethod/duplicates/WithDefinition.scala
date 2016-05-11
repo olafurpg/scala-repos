@@ -1,6 +1,6 @@
 object WithDefinition {
   def foo(i: Int) {
-/*start*/
+    /*start*/
 
     def bar = {
       val y = 0
@@ -39,4 +39,4 @@ object WithDefinition {
     testMethodName(1)
   }
 }
-*/
+ */

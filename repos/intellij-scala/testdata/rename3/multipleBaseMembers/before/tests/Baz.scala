@@ -13,11 +13,11 @@ object Baz2 extends Baz {
 }
 
 object Baz3 extends {
-  override var /*caret*/baz = 1
+  override var /*caret*/ baz = 1
 } with Baz with Bazzz {}
 
 object Test {
   Baz2.baz
-  Baz3.baz/*caret*/
-  Baz3.baz_=/*caret*/(3)
+  Baz3.baz /*caret*/
+  Baz3.baz_= /*caret*/ (3)
 }

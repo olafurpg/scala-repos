@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Test for [[scalafx.scene.shape.StrokeType]] */
 @RunWith(classOf[JUnitRunner])
-class StrokeTypeSpec extends SFXEnumDelegateSpec[jfxss.StrokeType, StrokeType](
-  javaClass = classOf[jfxss.StrokeType],
-  scalaClass = classOf[StrokeType],
-  companion = StrokeType)
+class StrokeTypeSpec
+    extends SFXEnumDelegateSpec[jfxss.StrokeType, StrokeType](
+        javaClass = classOf[jfxss.StrokeType],
+        scalaClass = classOf[StrokeType],
+        companion = StrokeType)

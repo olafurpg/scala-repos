@@ -13,7 +13,7 @@ import grizzled.slf4j.Logger
 
 //class Algorithm(val ap: AlgorithmParams)
 class Algorithm
-  extends P2LAlgorithm[TrainingData, Model, Query, PredictedResult] {
+    extends P2LAlgorithm[TrainingData, Model, Query, PredictedResult] {
 
   @transient lazy val logger = Logger[this.type]
 

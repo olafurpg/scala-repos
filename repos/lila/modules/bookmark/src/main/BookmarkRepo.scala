@@ -15,8 +15,8 @@ private[bookmark] object BookmarkRepo {
   def toggle(gameId: String, userId: String): Fu[Boolean] =
     $count exists selectId(gameId, userId) flatMap { e =>
       e.fold(
-        remove(gameId, userId),
-        add(gameId, userId, DateTime.now)
+          remove(gameId, userId),
+          add(gameId, userId, DateTime.now)
       ) inject !e
     }
 
@@ -30,16 +30,18 @@ private[bookmark] object BookmarkRepo {
     $remove(Json.obj("g" -> $in(gameIds)))
 
   private def add(gameId: String, userId: String, date: DateTime): Funit =
-    $insert(Json.obj(
-      "_id" -> makeId(gameId, userId),
-      "g" -> gameId,
-      "u" -> userId,
-      "d" -> $date(date)))
+    $insert(
+        Json.obj("_id" -> makeId(gameId, userId),
+                 "g" -> gameId,
+                 "u" -> userId,
+                 "d" -> $date(date)))
 
   def userIdQuery(userId: String) = Json.obj("u" -> userId)
   def makeId(gameId: String, userId: String) = gameId + userId
-  def selectId(gameId: String, userId: String) = $select(makeId(gameId, userId))
+  def selectId(gameId: String, userId: String) =
+    $select(makeId(gameId, userId))
 
-  def remove(gameId: String, userId: String): Funit = $remove(selectId(gameId, userId))
+  def remove(gameId: String, userId: String): Funit =
+    $remove(selectId(gameId, userId))
   def remove(selector: JsObject): Funit = $remove(selector)
 }

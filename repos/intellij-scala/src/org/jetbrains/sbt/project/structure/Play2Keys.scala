@@ -7,9 +7,9 @@ import scala.collection.mutable
 import scala.xml.Text
 
 /**
- * User: Dmitry.Naydanov
- * Date: 26.09.14.
- */
+  * User: Dmitry.Naydanov
+  * Date: 26.09.14.
+  */
 object Play2Keys {
   val GLOBAL_TAG = "$global$"
   val ROOT_TAG = "root"
@@ -20,22 +20,34 @@ object Play2Keys {
     val values: Map[String, T]
   }
 
-  class StringXmlKey(val name: String, val values: Map[String, String]) extends SettingKey[String] {}
-  class SeqStringXmlKey(val name: String, val values: Map[String, Seq[String]]) extends SettingKey[Seq[String]] {}
+  class StringXmlKey(val name: String, val values: Map[String, String])
+      extends SettingKey[String] {}
+  class SeqStringXmlKey(val name: String, val values: Map[String, Seq[String]])
+      extends SettingKey[Seq[String]] {}
 
   object KeyExtractor {
     def extract(elem: scala.xml.Node): Option[SettingKey[_]] = {
       if (elem.isInstanceOf[Text] || elem.label == "#PCDATA") return None
 
       val keyName = elem.label
-      val children = elem.child.filterNot(_.text.forall(c => c == '\n' || c == ' '))
+      val children =
+        elem.child.filterNot(_.text.forall(c => c == '\n' || c == ' '))
 
-      if (children.forall(_.child.forall{case _: Text => true; case _ => false})) {
-        Some(new StringXmlKey(keyName, children.map(projectKey => (projectKey.label, projectKey.text)).toMap))
-      } else if (children.forall(_.child.forall(node => node.label == ENTRY_SEQ_NAME || node.isInstanceOf[Text]))) {
-        val values = children.flatMap{
+      if (children.forall(
+              _.child.forall { case _: Text => true; case _ => false })) {
+        Some(
+            new StringXmlKey(
+                keyName,
+                children
+                  .map(projectKey => (projectKey.label, projectKey.text))
+                  .toMap))
+      } else if (children.forall(_.child.forall(node =>
+                           node.label == ENTRY_SEQ_NAME ||
+                           node.isInstanceOf[Text]))) {
+        val values = children.flatMap {
           case _: Text => None
-          case projectKey => Some((projectKey.label, projectKey \ ENTRY_SEQ_NAME map (_.text)))
+          case projectKey =>
+            Some((projectKey.label, projectKey \ ENTRY_SEQ_NAME map (_.text)))
         }.toMap
         Some(new SeqStringXmlKey(keyName, values))
       } else None
@@ -43,7 +55,8 @@ object Play2Keys {
   }
 
   object KeyTransformer {
-    def transform(keys: Seq[SettingKey[_]]): Map[String, Map[String, ParsedValue[_]]] = {
+    def transform(
+        keys: Seq[SettingKey[_]]): Map[String, Map[String, ParsedValue[_]]] = {
       val map = mutable.HashMap[String, Map[String, ParsedValue[_]]]()
 
       keys foreach {
@@ -62,44 +75,54 @@ object Play2Keys {
     }
   }
 
-
   object AllKeys {
     abstract class ParsedValue[T](val parsed: T) extends Serializable {
       override def toString: String = parsed.toString
     }
     class StringParsedValue(parsed: String) extends ParsedValue[String](parsed)
-    class SeqStringParsedValue(parsed: Seq[String]) extends ParsedValue[Seq[String]](parsed)
+    class SeqStringParsedValue(parsed: Seq[String])
+        extends ParsedValue[Seq[String]](parsed)
 
     abstract class ParsedKey[T](val name: String) {
-      def in(allKeys: Map[String, Map[String, ParsedValue[_]]]) = allKeys get name
+      def in(allKeys: Map[String, Map[String, ParsedValue[_]]]) =
+        allKeys get name
 
-      def in(projectName: String, allKeys: Map[String, Map[String, ParsedValue[_]]]): Option[T] = {
+      def in(projectName: String,
+             allKeys: Map[String, Map[String, ParsedValue[_]]]): Option[T] = {
         allIn(allKeys).find(_._1 == projectName).map(_._2)
       }
 
-      def allIn(allKeys: Map[String, Map[String, ParsedValue[_]]]): Seq[(String, T)]
+      def allIn(
+          allKeys: Map[String, Map[String, ParsedValue[_]]]): Seq[(String, T)]
 
       override def toString: String = name + "_KEY"
     }
 
     class StringParsedKey(name: String) extends ParsedKey[String](name) {
-      override def allIn(allKeys: Map[String, Map[String, ParsedValue[_]]]): Seq[(String, String)] = {
+      override def allIn(allKeys: Map[String, Map[String, ParsedValue[_]]])
+        : Seq[(String, String)] = {
         in(allKeys) map {
-          case vs => vs.toSeq flatMap {
-            case (projectName, projectValue: StringParsedValue) => Some((projectName, projectValue.parsed))
-            case _ => None
-          }
+          case vs =>
+            vs.toSeq flatMap {
+              case (projectName, projectValue: StringParsedValue) =>
+                Some((projectName, projectValue.parsed))
+              case _ => None
+            }
         } getOrElse Seq.empty
       }
     }
 
-    class SeqStringParsedKey(name: String) extends ParsedKey[Seq[String]](name) {
-      override def allIn(allKeys: Map[String, Map[String, ParsedValue[_]]]): Seq[(String, Seq[String])] = {
+    class SeqStringParsedKey(name: String)
+        extends ParsedKey[Seq[String]](name) {
+      override def allIn(allKeys: Map[String, Map[String, ParsedValue[_]]])
+        : Seq[(String, Seq[String])] = {
         in(allKeys) map {
-          case vs => vs.toSeq flatMap {
-            case (projectName, projectValue: SeqStringParsedValue) => Some((projectName, projectValue.parsed))
-            case _ => None
-          }
+          case vs =>
+            vs.toSeq flatMap {
+              case (projectName, projectValue: SeqStringParsedValue) =>
+                Some((projectName, projectValue.parsed))
+              case _ => None
+            }
         } getOrElse Seq.empty
       }
     }

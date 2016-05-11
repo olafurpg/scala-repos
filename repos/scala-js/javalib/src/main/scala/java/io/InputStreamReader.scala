@@ -6,38 +6,40 @@ import java.nio._
 import java.nio.charset._
 
 class InputStreamReader(private[this] var in: InputStream,
-    private[this] var decoder: CharsetDecoder) extends Reader {
+                        private[this] var decoder: CharsetDecoder)
+    extends Reader {
 
   private[this] var closed: Boolean = false
 
   /** Buffer in which to read bytes from the underlying input stream.
-   *
-   *  Class invariant: contains bytes already read from `in` but not yet
-   *  decoded.
-   */
+    *
+    *  Class invariant: contains bytes already read from `in` but not yet
+    *  decoded.
+    */
   private[this] var inBuf: ByteBuffer = ByteBuffer.allocate(4096)
   inBuf.limit(0)
 
   /** Tells whether the end of the underlying input stream has been reached.
-   *  Class invariant: if true, then `in.read()` has returned -1.
-   */
+    *  Class invariant: if true, then `in.read()` has returned -1.
+    */
   private[this] var endOfInput: Boolean = false
 
   /** Buffer in which to decode bytes into chars.
-   *  Usually, it is not used, because we try to decode directly to the
-   *  destination array. So as long as we do not really need one, we share
-   *  an empty buffer.
-   *
-   *  Class invariant: contains chars already decoded but not yet *read* by
-   *  the user of this instance.
-   */
-  private[this] var outBuf: CharBuffer = InputStreamReader.CommonEmptyCharBuffer
+    *  Usually, it is not used, because we try to decode directly to the
+    *  destination array. So as long as we do not really need one, we share
+    *  an empty buffer.
+    *
+    *  Class invariant: contains chars already decoded but not yet *read* by
+    *  the user of this instance.
+    */
+  private[this] var outBuf: CharBuffer =
+    InputStreamReader.CommonEmptyCharBuffer
 
   def this(in: InputStream, charset: Charset) =
     this(in,
-        charset.newDecoder
-               .onMalformedInput(CodingErrorAction.REPLACE)
-               .onUnmappableCharacter(CodingErrorAction.REPLACE))
+         charset.newDecoder
+           .onMalformedInput(CodingErrorAction.REPLACE)
+           .onUnmappableCharacter(CodingErrorAction.REPLACE))
 
   def this(in: InputStream) =
     this(in, Charset.defaultCharset)
@@ -97,7 +99,8 @@ class InputStreamReader(private[this] var in: InputStream,
   }
 
   // In a separate method because this is (hopefully) not a common case
-  private def readMoreThroughOutBuf(cbuf: Array[Char], off: Int, len: Int): Int = {
+  private def readMoreThroughOutBuf(
+      cbuf: Array[Char], off: Int, len: Int): Int = {
     // Return outBuf to its full capacity
     outBuf.limit(outBuf.capacity)
     outBuf.position(0)
@@ -108,12 +111,11 @@ class InputStreamReader(private[this] var in: InputStream,
         outBuf = CharBuffer.allocate(desiredOutBufSize)
       val charsRead = readImpl(outBuf)
       if (charsRead == InputStreamReader.Overflow)
-        loopWithOutBuf(desiredOutBufSize*2)
-      else
-        charsRead
+        loopWithOutBuf(desiredOutBufSize * 2)
+      else charsRead
     }
 
-    val charsRead = loopWithOutBuf(2*len)
+    val charsRead = loopWithOutBuf(2 * len)
     assert(charsRead != 0) // can be -1, though
     outBuf.flip()
 
@@ -142,9 +144,10 @@ class InputStreamReader(private[this] var in: InputStream,
       out.position - initPos
     } else if (result.isUnderflow) {
       if (endOfInput) {
-        assert(!inBuf.hasRemaining,
-            "CharsetDecoder.decode() should not have returned UNDERFLOW when "+
-            "both endOfInput and inBuf.hasRemaining are true. It should have "+
+        assert(
+            !inBuf.hasRemaining,
+            "CharsetDecoder.decode() should not have returned UNDERFLOW when " +
+            "both endOfInput and inBuf.hasRemaining are true. It should have " +
             "returned a MalformedInput error instead.")
         // Flush
         if (decoder.flush(out).isOverflow) {
@@ -176,10 +179,8 @@ class InputStreamReader(private[this] var in: InputStream,
         val bytesRead =
           in.read(inBuf.array, inBuf.limit, inBuf.capacity - inBuf.limit)
 
-        if (bytesRead == -1)
-          endOfInput = true
-        else
-          inBuf.limit(inBuf.limit + bytesRead)
+        if (bytesRead == -1) endOfInput = true
+        else inBuf.limit(inBuf.limit + bytesRead)
 
         readImpl(out)
       }
@@ -200,20 +201,18 @@ class InputStreamReader(private[this] var in: InputStream,
     outBuf.hasRemaining || in.available() > 0
 
   private def ensureOpen(): Unit = {
-    if (closed)
-      throw new IOException("Stream closed")
+    if (closed) throw new IOException("Stream closed")
   }
-
 }
 
 object InputStreamReader {
   private final val Overflow = -2
 
   /** Empty CharBuffer shared by all InputStreamReaders as long as they do
-   *  not really need one.
-   *  Since we do not use `mark()`, it is fine to share them, because `mark()`
-   *  is the only piece of mutable state for an empty buffer. Everything else
-   *  is effectively immutable (e.g., position and limit must always be 0).
-   */
+    *  not really need one.
+    *  Since we do not use `mark()`, it is fine to share them, because `mark()`
+    *  is the only piece of mutable state for an empty buffer. Everything else
+    *  is effectively immutable (e.g., position and limit must always be 0).
+    */
   private val CommonEmptyCharBuffer = CharBuffer.allocate(0)
 }

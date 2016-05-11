@@ -16,6 +16,7 @@ object SCL8119A {
 
   val dv: DV[Int] = ???
 
-  /*start*/dv.foo.x/*end*/
+  /*start*/
+  dv.foo.x /*end*/
 }
 //Int

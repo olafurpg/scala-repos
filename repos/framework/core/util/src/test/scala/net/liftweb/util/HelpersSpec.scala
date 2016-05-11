@@ -20,7 +20,4 @@ package util
 import org.specs2.mutable.Specification
 import common._
 
-
-object HelpersSpec extends Specification {
-}
-
+object HelpersSpec extends Specification {}

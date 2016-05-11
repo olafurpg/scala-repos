@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2002-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2002-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -47,33 +47,34 @@ object Platform {
     *                after `srcPos` or `destPos` in `src` and `dest` respectively.
     */
   @inline
-  def arraycopy(src: AnyRef, srcPos: Int, dest: AnyRef, destPos: Int, length: Int) {
+  def arraycopy(
+      src: AnyRef, srcPos: Int, dest: AnyRef, destPos: Int, length: Int) {
     System.arraycopy(src, srcPos, dest, destPos, length)
   }
 
   /** Creates a new array of the specified type and given length.
-   *
-   *  Note that if `elemClass` is a subclass of [[scala.AnyVal]] then the returned value is an Array of the corresponding java primitive type.
-   *  For example, the following code `scala.compat.Platform.createArray(classOf[Int], 4)` returns an array of the java primitive type `int`.
-   *
-   *  For a [[scala.AnyVal]] array, the values of the array are set to 0 for ''numeric value types'' ([[scala.Double]], [[scala.Float]], [[scala.Long]], [[scala.Int]], [[scala.Char]],
-   *  [[scala.Short]], and [[scala.Byte]]), and `false` for [[scala.Boolean]]. Creation of an array of type [[scala.Unit]] is not possible.
-   *
-   *  For subclasses of [[scala.AnyRef]], the values of the array are set to `null`.
-   *
-   *  The caller must cast the returned value to the correct type.
-   *
-   *  @example {{{
-   *  val a = scala.compat.Platform.createArray(classOf[Int], 4).asInstanceOf[Array[Int]] // returns Array[Int](0, 0, 0, 0)
-   *  }}}
-   *
-   *  @param elemClass the `Class` object of the component type of the array
-   *  @param length    the length of the new array.
-   *  @return          an array of the given component type as an `AnyRef`.
-   *  @throws java.lang.NullPointerException If `elemClass` is `null`.
-   *  @throws java.lang.IllegalArgumentException if componentType is [[scala.Unit]] or `java.lang.Void.TYPE`
-   *  @throws java.lang.NegativeArraySizeException if the specified length is negative
-   */
+    *
+    *  Note that if `elemClass` is a subclass of [[scala.AnyVal]] then the returned value is an Array of the corresponding java primitive type.
+    *  For example, the following code `scala.compat.Platform.createArray(classOf[Int], 4)` returns an array of the java primitive type `int`.
+    *
+    *  For a [[scala.AnyVal]] array, the values of the array are set to 0 for ''numeric value types'' ([[scala.Double]], [[scala.Float]], [[scala.Long]], [[scala.Int]], [[scala.Char]],
+    *  [[scala.Short]], and [[scala.Byte]]), and `false` for [[scala.Boolean]]. Creation of an array of type [[scala.Unit]] is not possible.
+    *
+    *  For subclasses of [[scala.AnyRef]], the values of the array are set to `null`.
+    *
+    *  The caller must cast the returned value to the correct type.
+    *
+    *  @example {{{
+    *  val a = scala.compat.Platform.createArray(classOf[Int], 4).asInstanceOf[Array[Int]] // returns Array[Int](0, 0, 0, 0)
+    *  }}}
+    *
+    *  @param elemClass the `Class` object of the component type of the array
+    *  @param length    the length of the new array.
+    *  @return          an array of the given component type as an `AnyRef`.
+    *  @throws java.lang.NullPointerException If `elemClass` is `null`.
+    *  @throws java.lang.IllegalArgumentException if componentType is [[scala.Unit]] or `java.lang.Void.TYPE`
+    *  @throws java.lang.NegativeArraySizeException if the specified length is negative
+    */
   @inline
   def createArray(elemClass: Class[_], length: Int): AnyRef =
     java.lang.reflect.Array.newInstance(elemClass, length)
@@ -86,26 +87,26 @@ object Platform {
   def arrayclear(arr: Array[Int]) { java.util.Arrays.fill(arr, 0) }
 
   /** Returns the `Class` object associated with the class or interface with the given string name using the current `ClassLoader`.
-   *  On the JVM, invoking this method is equivalent to: `java.lang.Class.forName(name)`
-   *
-   *  For more information, please see the Java documentation for [[java.lang.Class]].
-   *
-   * @param    name the fully qualified name of the desired class.
-   * @return   the `Class` object for the class with the specified name.
-   * @throws java.lang.LinkageError if the linkage fails
-   * @throws java.lang.ExceptionInInitializerError if the initialization provoked by this method fails
-   * @throws java.lang.ClassNotFoundException if the class cannot be located
-   *  @example {{{
-   *  val a = scala.compat.Platform.getClassForName("java.lang.Integer")  // returns the Class[_] for java.lang.Integer
-   *  }}}
-   */
+    *  On the JVM, invoking this method is equivalent to: `java.lang.Class.forName(name)`
+    *
+    *  For more information, please see the Java documentation for [[java.lang.Class]].
+    *
+    * @param    name the fully qualified name of the desired class.
+    * @return   the `Class` object for the class with the specified name.
+    * @throws java.lang.LinkageError if the linkage fails
+    * @throws java.lang.ExceptionInInitializerError if the initialization provoked by this method fails
+    * @throws java.lang.ClassNotFoundException if the class cannot be located
+    *  @example {{{
+    *  val a = scala.compat.Platform.getClassForName("java.lang.Integer")  // returns the Class[_] for java.lang.Integer
+    *  }}}
+    */
   @inline
   def getClassForName(name: String): Class[_] = java.lang.Class.forName(name)
 
   /** The default line separator.
-   *
-   *  On the JavaScript backend, this is always "\n".
-   */
+    *
+    *  On the JavaScript backend, this is always "\n".
+    */
   val EOL = "\n"
 
   /** The current time in milliseconds. The time is counted since 1 January 1970
@@ -118,11 +119,11 @@ object Platform {
   def currentTime: Long = System.currentTimeMillis()
 
   /** Runs the garbage collector.
-   *
-   * This is a request that the underlying JVM runs the garbage collector.
-   * The results of this call depends heavily on the JVM used.
-   * The underlying JVM is free to ignore this request.
-   */
+    *
+    * This is a request that the underlying JVM runs the garbage collector.
+    * The results of this call depends heavily on the JVM used.
+    * The underlying JVM is free to ignore this request.
+    */
   @inline
   def collectGarbage(): Unit = System.gc()
 

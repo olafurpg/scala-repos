@@ -1,19 +1,18 @@
 /**
- * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
- *
- * Based on Configgy by Robey Pointer.
- *   Copyright 2009 Robey Pointer <robeypointer@gmail.com>
- *   http://www.apache.org/licenses/LICENSE-2.0
- */
-
+  * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
+  *
+  * Based on Configgy by Robey Pointer.
+  *   Copyright 2009 Robey Pointer <robeypointer@gmail.com>
+  *   http://www.apache.org/licenses/LICENSE-2.0
+  */
 package akka.config
 
-import java.io.{ BufferedReader, File, FileInputStream, InputStream, InputStreamReader }
+import java.io.{BufferedReader, File, FileInputStream, InputStream, InputStreamReader}
 
 /**
- * An interface for finding config files and reading them into strings for
- * parsing. This is used to handle `include` directives in config files.
- */
+  * An interface for finding config files and reading them into strings for
+  * parsing. This is used to handle `include` directives in config files.
+  */
 trait Importer {
 
   def importFile(filename: String): String
@@ -41,9 +40,9 @@ trait Importer {
 }
 
 /**
- * An Importer that looks for imported config files in the filesystem.
- * This is the default importer.
- */
+  * An Importer that looks for imported config files in the filesystem.
+  * This is the default importer.
+  */
 class FilesystemImporter(val baseDir: String) extends Importer {
   def importFile(filename: String): String = {
     val f = new File(filename)
@@ -53,9 +52,9 @@ class FilesystemImporter(val baseDir: String) extends Importer {
 }
 
 /**
- * An Importer that looks for imported config files in the java resources
- * of the system class loader (usually the jar used to launch this app).
- */
+  * An Importer that looks for imported config files in the java resources
+  * of the system class loader (usually the jar used to launch this app).
+  */
 class ResourceImporter(classLoader: ClassLoader) extends Importer {
   def importFile(filename: String): String = {
     val stream = classLoader.getResourceAsStream(filename)

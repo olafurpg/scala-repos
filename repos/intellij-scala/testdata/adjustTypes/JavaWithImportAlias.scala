@@ -1,7 +1,8 @@
 import java.util.{Comparator => C}
 
 object A {
-  val comparator: /*start*/java.util.Comparator[java.lang.Boolean]/*end*/ = null
+  val comparator: /*start*/ java.util.Comparator[java.lang.Boolean] /*end*/ =
+    null
 }
 
 /*
@@ -11,4 +12,4 @@ import java.util.{Comparator => C}
 object A {
   val comparator: C[Boolean] = null
 }
-*/
+ */

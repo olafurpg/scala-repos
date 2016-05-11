@@ -22,9 +22,10 @@ import scala.util.Try
 import org.apache.spark.util.Utils
 
 /**
- * An abstract request sent from the client in the REST application submission protocol.
- */
-private[rest] abstract class SubmitRestProtocolRequest extends SubmitRestProtocolMessage {
+  * An abstract request sent from the client in the REST application submission protocol.
+  */
+private[rest] abstract class SubmitRestProtocolRequest
+    extends SubmitRestProtocolMessage {
   var clientSparkVersion: String = null
   protected override def doValidate(): Unit = {
     super.doValidate()
@@ -33,8 +34,8 @@ private[rest] abstract class SubmitRestProtocolRequest extends SubmitRestProtoco
 }
 
 /**
- * A request to launch a new application in the REST application submission protocol.
- */
+  * A request to launch a new application in the REST application submission protocol.
+  */
 private[rest] class CreateSubmissionRequest extends SubmitRestProtocolRequest {
   var appResource: String = null
   var mainClass: String = null
@@ -67,11 +68,12 @@ private[rest] class CreateSubmissionRequest extends SubmitRestProtocolRequest {
     assertProperty[Int](key, "memory", Utils.memoryStringToMb)
 
   /** Assert that a Spark property can be converted to a certain type. */
-  private def assertProperty[T](key: String, valueType: String, convert: (String => T)): Unit = {
+  private def assertProperty[T](
+      key: String, valueType: String, convert: (String => T)): Unit = {
     sparkProperties.get(key).foreach { value =>
       Try(convert(value)).getOrElse {
         throw new SubmitRestProtocolException(
-          s"Property '$key' expected $valueType value: actual was '$value'.")
+            s"Property '$key' expected $valueType value: actual was '$value'.")
       }
     }
   }

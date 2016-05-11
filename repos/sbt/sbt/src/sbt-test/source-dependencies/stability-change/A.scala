@@ -1,4 +1,3 @@
-object A
-{
-	val x = new C
+object A {
+  val x = new C
 }

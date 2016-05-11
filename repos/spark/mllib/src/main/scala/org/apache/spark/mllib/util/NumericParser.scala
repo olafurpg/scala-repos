@@ -24,12 +24,12 @@ import scala.collection.mutable.{ArrayBuilder, ListBuffer}
 import org.apache.spark.SparkException
 
 /**
- * Simple parser for a numeric structure consisting of three types:
- *
- *  - number: a double in Java's floating number format
- *  - array: an array of numbers stored as `[v0,v1,...,vn]`
- *  - tuple: a list of numbers, arrays, or tuples stored as `(...)`
- */
+  * Simple parser for a numeric structure consisting of three types:
+  *
+  *  - number: a double in Java's floating number format
+  *  - array: an array of numbers stored as `[v0,v1,...,vn]`
+  *  - tuple: a list of numbers, arrays, or tuples stored as `(...)`
+  */
 private[mllib] object NumericParser {
 
   /** Parses a string into a Double, an Array[Double], or a Seq[Any]. */
@@ -99,7 +99,7 @@ private[mllib] object NumericParser {
       } else if (token == ")") {
         parsing = false
       } else if (token.trim.isEmpty) {
-          // ignore whitespaces between delim chars, e.g. ", ["
+        // ignore whitespaces between delim chars, e.g. ", ["
       } else {
         // expecting a number
         items.append(parseDouble(token))

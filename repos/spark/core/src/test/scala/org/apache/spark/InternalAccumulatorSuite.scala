@@ -23,7 +23,6 @@ import org.apache.spark.scheduler.AccumulableInfo
 import org.apache.spark.shuffle.FetchFailedException
 import org.apache.spark.storage.{BlockId, BlockStatus}
 
-
 class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
   import InternalAccumulator._
   import AccumulatorParam._
@@ -45,7 +44,8 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     assert(getParam(MEMORY_BYTES_SPILLED) === LongAccumulatorParam)
     assert(getParam(DISK_BYTES_SPILLED) === LongAccumulatorParam)
     assert(getParam(PEAK_EXECUTION_MEMORY) === LongAccumulatorParam)
-    assert(getParam(UPDATED_BLOCK_STATUSES) === UpdatedBlockStatusesAccumulatorParam)
+    assert(
+        getParam(UPDATED_BLOCK_STATUSES) === UpdatedBlockStatusesAccumulatorParam)
     assert(getParam(TEST_ACCUM) === LongAccumulatorParam)
     // shuffle read
     assert(getParam(shuffleRead.REMOTE_BLOCKS_FETCHED) === IntAccumulatorParam)
@@ -80,7 +80,8 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     val inputReadMethod = create(input.READ_METHOD)
     assert(executorRunTime.name === Some(EXECUTOR_RUN_TIME))
     assert(updatedBlockStatuses.name === Some(UPDATED_BLOCK_STATUSES))
-    assert(shuffleRemoteBlocksRead.name === Some(shuffleRead.REMOTE_BLOCKS_FETCHED))
+    assert(shuffleRemoteBlocksRead.name === Some(
+            shuffleRead.REMOTE_BLOCKS_FETCHED))
     assert(inputReadMethod.name === Some(input.READ_METHOD))
     assert(executorRunTime.value.isInstanceOf[Long])
     assert(updatedBlockStatuses.value.isInstanceOf[Seq[_]])
@@ -143,8 +144,10 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     assert(OUTPUT_METRICS_PREFIX.startsWith(METRICS_PREFIX))
     assert(accums.forall(_.name.get.startsWith(METRICS_PREFIX)))
     // assert they all start with the expected prefixes
-    assert(shuffleReadAccums.forall(_.name.get.startsWith(SHUFFLE_READ_METRICS_PREFIX)))
-    assert(shuffleWriteAccums.forall(_.name.get.startsWith(SHUFFLE_WRITE_METRICS_PREFIX)))
+    assert(shuffleReadAccums.forall(
+            _.name.get.startsWith(SHUFFLE_READ_METRICS_PREFIX)))
+    assert(shuffleWriteAccums.forall(
+            _.name.get.startsWith(SHUFFLE_WRITE_METRICS_PREFIX)))
     assert(inputAccums.forall(_.name.get.startsWith(INPUT_METRICS_PREFIX)))
     assert(outputAccums.forall(_.name.get.startsWith(OUTPUT_METRICS_PREFIX)))
   }
@@ -198,8 +201,11 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     sc.addSparkListener(listener)
     // Each stage creates its own set of internal accumulators so the
     // values for the same metric should not be mixed up across stages
-    val rdd = sc.parallelize(1 to 100, numPartitions)
-      .map { i => (i, i) }
+    val rdd = sc
+      .parallelize(1 to 100, numPartitions)
+      .map { i =>
+        (i, i)
+      }
       .mapPartitions { iter =>
         TaskContext.get().taskMetrics().getAccum(TEST_ACCUM) += 1
         iter
@@ -216,16 +222,18 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
       }
     // Register asserts in job completion callback to avoid flakiness
     listener.registerJobCompletionCallback { () =>
-    // We ran 3 stages, and the accumulator values should be distinct
+      // We ran 3 stages, and the accumulator values should be distinct
       val stageInfos = listener.getCompletedStageInfos
       assert(stageInfos.size === 3)
       val (firstStageAccum, secondStageAccum, thirdStageAccum) =
         (findTestAccum(stageInfos(0).accumulables.values),
-        findTestAccum(stageInfos(1).accumulables.values),
-        findTestAccum(stageInfos(2).accumulables.values))
+         findTestAccum(stageInfos(1).accumulables.values),
+         findTestAccum(stageInfos(2).accumulables.values))
       assert(firstStageAccum.value.get.asInstanceOf[Long] === numPartitions)
-      assert(secondStageAccum.value.get.asInstanceOf[Long] === numPartitions * 10)
-      assert(thirdStageAccum.value.get.asInstanceOf[Long] === numPartitions * 2 * 100)
+      assert(
+          secondStageAccum.value.get.asInstanceOf[Long] === numPartitions * 10)
+      assert(
+          thirdStageAccum.value.get.asInstanceOf[Long] === numPartitions * 2 * 100)
     }
     rdd.count()
   }
@@ -240,26 +248,34 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
     // 2 stages. On the second stage, we trigger a fetch failure on the first stage attempt.
     // This should retry both stages in the scheduler. Note that we only want to fail the
     // first stage attempt because we want the stage to eventually succeed.
-    val x = sc.parallelize(1 to 100, numPartitions)
-      .mapPartitions { iter => TaskContext.get().taskMetrics().getAccum(TEST_ACCUM) += 1; iter }
-      .groupBy(identity)
-    val sid = x.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]].shuffleHandle.shuffleId
-    val rdd = x.mapPartitionsWithIndex { case (i, iter) =>
-      // Fail the first stage attempt. Here we use the task attempt ID to determine this.
-      // This job runs 2 stages, and we're in the second stage. Therefore, any task attempt
-      // ID that's < 2 * numPartitions belongs to the first attempt of this stage.
-      val taskContext = TaskContext.get()
-      val isFirstStageAttempt = taskContext.taskAttemptId() < numPartitions * 2
-      if (isFirstStageAttempt) {
-        throw new FetchFailedException(
-          SparkEnv.get.blockManager.blockManagerId,
-          sid,
-          taskContext.partitionId(),
-          taskContext.partitionId(),
-          "simulated fetch failure")
-      } else {
-        iter
+    val x = sc
+      .parallelize(1 to 100, numPartitions)
+      .mapPartitions { iter =>
+        TaskContext.get().taskMetrics().getAccum(TEST_ACCUM) += 1; iter
       }
+      .groupBy(identity)
+    val sid = x.dependencies.head
+      .asInstanceOf[ShuffleDependency[_, _, _]]
+      .shuffleHandle
+      .shuffleId
+    val rdd = x.mapPartitionsWithIndex {
+      case (i, iter) =>
+        // Fail the first stage attempt. Here we use the task attempt ID to determine this.
+        // This job runs 2 stages, and we're in the second stage. Therefore, any task attempt
+        // ID that's < 2 * numPartitions belongs to the first attempt of this stage.
+        val taskContext = TaskContext.get()
+        val isFirstStageAttempt =
+          taskContext.taskAttemptId() < numPartitions * 2
+        if (isFirstStageAttempt) {
+          throw new FetchFailedException(
+              SparkEnv.get.blockManager.blockManagerId,
+              sid,
+              taskContext.partitionId(),
+              taskContext.partitionId(),
+              "simulated fetch failure")
+        } else {
+          iter
+        }
     }
 
     // Register asserts in job completion callback to avoid flakiness
@@ -273,13 +289,17 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
           fail("expected two attempts of the same shuffle map stage.")
         }
       }
-      val stageAccum1stAttempt = findTestAccum(mapStageInfo1stAttempt.accumulables.values)
-      val stageAccum2ndAttempt = findTestAccum(mapStageInfo2ndAttempt.accumulables.values)
+      val stageAccum1stAttempt =
+        findTestAccum(mapStageInfo1stAttempt.accumulables.values)
+      val stageAccum2ndAttempt =
+        findTestAccum(mapStageInfo2ndAttempt.accumulables.values)
       // Both map stages should have succeeded, since the fetch failure happened in the
       // result stage, not the map stage. This means we should get the accumulator updates
       // from all partitions.
-      assert(stageAccum1stAttempt.value.get.asInstanceOf[Long] === numPartitions)
-      assert(stageAccum2ndAttempt.value.get.asInstanceOf[Long] === numPartitions)
+      assert(
+          stageAccum1stAttempt.value.get.asInstanceOf[Long] === numPartitions)
+      assert(
+          stageAccum2ndAttempt.value.get.asInstanceOf[Long] === numPartitions)
       // Because this test resubmitted the map stage with all missing partitions, we should have
       // created a fresh set of internal accumulators in the 2nd stage attempt. Assert this is
       // the case by comparing the accumulator IDs between the two attempts.
@@ -298,12 +318,18 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
       override def cleaner: Option[ContextCleaner] = Some(myCleaner)
     }
     assert(Accumulators.originals.isEmpty)
-    sc.parallelize(1 to 100).map { i => (i, i) }.reduceByKey { _ + _ }.count()
+    sc.parallelize(1 to 100)
+      .map { i =>
+        (i, i)
+      }
+      .reduceByKey { _ + _ }
+      .count()
     val internalAccums = InternalAccumulator.createAll()
     // We ran 2 stages, so we should have 2 sets of internal accumulators, 1 for each stage
     assert(Accumulators.originals.size === internalAccums.size * 2)
     val accumsRegistered = sc.cleaner match {
-      case Some(cleaner: SaveAccumContextCleaner) => cleaner.accumsRegisteredForCleanup
+      case Some(cleaner: SaveAccumContextCleaner) =>
+        cleaner.accumsRegisteredForCleanup
       case _ => Seq.empty[Long]
     }
     // Make sure the same set of accumulators is registered for cleanup
@@ -312,18 +338,22 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
   }
 
   /**
-   * Return the accumulable info that matches the specified name.
-   */
-  private def findTestAccum(accums: Iterable[AccumulableInfo]): AccumulableInfo = {
-    accums.find { a => a.name == Some(TEST_ACCUM) }.getOrElse {
+    * Return the accumulable info that matches the specified name.
+    */
+  private def findTestAccum(
+      accums: Iterable[AccumulableInfo]): AccumulableInfo = {
+    accums.find { a =>
+      a.name == Some(TEST_ACCUM)
+    }.getOrElse {
       fail(s"unable to find internal accumulator called $TEST_ACCUM")
     }
   }
 
   /**
-   * A special [[ContextCleaner]] that saves the IDs of the accumulators registered for cleanup.
-   */
-  private class SaveAccumContextCleaner(sc: SparkContext) extends ContextCleaner(sc) {
+    * A special [[ContextCleaner]] that saves the IDs of the accumulators registered for cleanup.
+    */
+  private class SaveAccumContextCleaner(sc: SparkContext)
+      extends ContextCleaner(sc) {
     private val accumsRegistered = new ArrayBuffer[Long]
 
     override def registerAccumulatorForCleanup(a: Accumulable[_, _]): Unit = {
@@ -333,5 +363,4 @@ class InternalAccumulatorSuite extends SparkFunSuite with LocalSparkContext {
 
     def accumsRegisteredForCleanup: Seq[Long] = accumsRegistered.toArray
   }
-
 }

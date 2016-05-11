@@ -51,75 +51,87 @@ import org.scalacheck.Arbitrary._
 import SampleData._
 import CValueGenerators._
 
-
-trait BlockLoadSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification with ScalaCheck { self =>
-  class BlockStoreLoadTestModule(sampleData: SampleData) extends BlockStoreTestModule[M] {
+trait BlockLoadSpec[M[+ _]]
+    extends BlockStoreTestSupport[M] with Specification with ScalaCheck {
+  self =>
+  class BlockStoreLoadTestModule(sampleData: SampleData)
+      extends BlockStoreTestModule[M] {
 
     val M = self.M
     val Some((idCount, schema)) = sampleData.schema
     val actualSchema = inferSchema(sampleData.data map { _ \ "value" })
 
     val projections = List(actualSchema).map { subschema =>
-    
-      val stream = sampleData.data flatMap { jv =>
-        val back = subschema.foldLeft[JValue](JObject(JField("key", jv \ "key") :: Nil)) {
-          case (obj, (jpath, ctype)) => { 
-            val vpath = JPath(JPathField("value") :: jpath.nodes)
-            val valueAtPath = jv.get(vpath)
-              
-            if (compliesWithSchema(valueAtPath, ctype)) {
-              obj.set(vpath, valueAtPath)
-            } else { 
-              obj
-            }
+      val stream =
+        sampleData.data flatMap { jv =>
+          val back = subschema.foldLeft[JValue](
+              JObject(JField("key", jv \ "key") :: Nil)) {
+            case (obj, (jpath, ctype)) => {
+                val vpath = JPath(JPathField("value") :: jpath.nodes)
+                val valueAtPath = jv.get(vpath)
+
+                if (compliesWithSchema(valueAtPath, ctype)) {
+                  obj.set(vpath, valueAtPath)
+                } else {
+                  obj
+                }
+              }
           }
+
+          if (back \ "value" == JUndefined) None
+          else Some(back)
         }
-          
-        if (back \ "value" == JUndefined)
-          None
-        else
-          Some(back)
-      }
-    
+
       Path("/test") -> Projection(stream)
     } toMap
-
   }
 
   def testLoadDense(sample: SampleData) = {
     val module = new BlockStoreLoadTestModule(sample)
-    
-    val expected = sample.data flatMap { jv =>
-      val back = module.schema.foldLeft[JValue](JObject(JField("key", jv \ "key") :: Nil)) {
-        case (obj, (jpath, ctype)) => { 
-          val vpath = JPath(JPathField("value") :: jpath.nodes)
-          val valueAtPath = jv.get(vpath)
-          
-          if (module.compliesWithSchema(valueAtPath, ctype)) {
-            obj.set(vpath, valueAtPath)
-          } else {
-            obj
-          }
+
+    val expected =
+      sample.data flatMap { jv =>
+        val back = module.schema
+          .foldLeft[JValue](JObject(JField("key", jv \ "key") :: Nil)) {
+          case (obj, (jpath, ctype)) => {
+              val vpath = JPath(JPathField("value") :: jpath.nodes)
+              val valueAtPath = jv.get(vpath)
+
+              if (module.compliesWithSchema(valueAtPath, ctype)) {
+                obj.set(vpath, valueAtPath)
+              } else {
+                obj
+              }
+            }
         }
+
+        (back \ "value" != JUndefined).option(back)
       }
-      
-      (back \ "value" != JUndefined).option(back)
-    }
 
-    val cschema = module.schema map { case (jpath, ctype) => ColumnRef(CPath(jpath), ctype) }
+    val cschema =
+      module.schema map {
+        case (jpath, ctype) => ColumnRef(CPath(jpath), ctype)
+      }
 
-    val result = module.Table.constString(Set("/test")).load("dummyAPIKey", Schema.mkType(cschema).get).flatMap(t => EitherT.right(t.toJson)).run.copoint
+    val result = module.Table
+      .constString(Set("/test"))
+      .load("dummyAPIKey", Schema.mkType(cschema).get)
+      .flatMap(t => EitherT.right(t.toJson))
+      .run
+      .copoint
     result.map(_.toList) must_== \/.right(expected.toList)
   }
 
   def checkLoadDense = {
     implicit val gen = sample(objectSchema(_, 3))
-    check { (sample: SampleData) => testLoadDense(sample) }
+    check { (sample: SampleData) =>
+      testLoadDense(sample)
+    }
   }
 
   def testLoadSample1 = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":{
             "u":false,
@@ -129,9 +141,12 @@ trait BlockLoadSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[1]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (1 , List(JPath(".u") -> CBoolean, JPath(".md") -> CString, JPath(".l") -> CEmptyArray))
-      )
+        Some(
+            (1,
+             List(JPath(".u") -> CBoolean,
+                  JPath(".md") -> CString,
+                  JPath(".l") -> CEmptyArray))
+        )
     )
 
     testLoadDense(sampleData)
@@ -139,7 +154,7 @@ trait BlockLoadSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
 
   def testLoadSample2 = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":{
             "rzp":{ },
@@ -149,9 +164,12 @@ trait BlockLoadSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[2,1]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (2, List(JPath(".fa") -> CNull, JPath(".hW") -> CLong, JPath(".rzp") -> CEmptyObject))
-      )
+        Some(
+            (2,
+             List(JPath(".fa") -> CNull,
+                  JPath(".hW") -> CLong,
+                  JPath(".rzp") -> CEmptyObject))
+        )
     )
 
     testLoadDense(sampleData)
@@ -159,7 +177,7 @@ trait BlockLoadSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
 
   def testLoadSample3 = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
          {
            "value":{
              "f":{
@@ -183,15 +201,16 @@ trait BlockLoadSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
            "key":[2,1,1]
          }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (3, List(JPath(".f.bn[0]") -> CNull, 
-                 JPath(".f.wei") -> CLong, 
-                 JPath(".f.wei") -> CDouble, 
-                 JPath(".ljz[0]") -> CNull,
-                 JPath(".ljz[1][0]") -> CString,
-                 JPath(".ljz[2]") -> CBoolean,
-                 JPath(".jmy") -> CDouble))
-      )
+        Some(
+            (3,
+             List(JPath(".f.bn[0]") -> CNull,
+                  JPath(".f.wei") -> CLong,
+                  JPath(".f.wei") -> CDouble,
+                  JPath(".ljz[0]") -> CNull,
+                  JPath(".ljz[1][0]") -> CString,
+                  JPath(".ljz[2]") -> CBoolean,
+                  JPath(".jmy") -> CDouble))
+        )
     )
 
     testLoadDense(sampleData)
@@ -199,7 +218,7 @@ trait BlockLoadSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
 
   def testLoadSample4 = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":{
             "dV":{
@@ -217,21 +236,22 @@ trait BlockLoadSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[1,1]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some(
-        (2, List(JPath(".dV.d") -> CBoolean, 
-                 JPath(".dV.l") -> CBoolean, 
-                 JPath(".dV.vq") -> CEmptyObject, 
-                 JPath(".oy.nm") -> CBoolean, 
-                 JPath(".uR") -> CDouble))
-      )
-    )   
+        Some(
+            (2,
+             List(JPath(".dV.d") -> CBoolean,
+                  JPath(".dV.l") -> CBoolean,
+                  JPath(".dV.vq") -> CEmptyObject,
+                  JPath(".oy.nm") -> CBoolean,
+                  JPath(".uR") -> CDouble))
+        )
+    )
 
     testLoadDense(sampleData)
-  } 
+  }
 
   def testLoadSample5 = {
     val sampleData = SampleData(
-      (JParser.parseUnsafe("""[
+        (JParser.parseUnsafe("""[
         {
           "value":{
             "cfnYTg92dg":"gu",
@@ -321,18 +341,19 @@ trait BlockLoadSpec[M[+_]] extends BlockStoreTestSupport[M] with Specification w
           "key":[9]
         }
       ]""") --> classOf[JArray]).elements.toStream,
-      Some((1, List((JPath(".o8agyghfjxe") -> CEmptyArray), 
-                    (JPath(".fg[0]") -> CBoolean), 
-                    (JPath(".fg[1]") -> CNum), 
-                    (JPath(".fg[1]") -> CLong), 
-                    (JPath(".fg[2]") -> CNum), 
-                    (JPath(".fg[2]") -> CLong), 
-                    (JPath(".cfnYTg92dg") -> CString))))
+        Some(
+            (1,
+             List((JPath(".o8agyghfjxe") -> CEmptyArray),
+                  (JPath(".fg[0]") -> CBoolean),
+                  (JPath(".fg[1]") -> CNum),
+                  (JPath(".fg[1]") -> CLong),
+                  (JPath(".fg[2]") -> CNum),
+                  (JPath(".fg[2]") -> CLong),
+                  (JPath(".cfnYTg92dg") -> CString))))
     )
 
     testLoadDense(sampleData)
   }
-
 }
 
 // vim: set ts=4 sw=4 et:

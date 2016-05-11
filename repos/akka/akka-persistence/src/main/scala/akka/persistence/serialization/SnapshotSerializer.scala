@@ -1,8 +1,7 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- * Copyright (C) 2012-2016 Eligotech BV.
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  * Copyright (C) 2012-2016 Eligotech BV.
+  */
 package akka.persistence.serialization
 
 import java.io._
@@ -11,24 +10,26 @@ import akka.serialization._
 import akka.util.ByteString.UTF_8
 
 /**
- * Wrapper for snapshot `data`. Snapshot `data` are the actual snapshot objects captured by
- * the persistent actor.
- *
- * @see [[SnapshotSerializer]]
- */
+  * Wrapper for snapshot `data`. Snapshot `data` are the actual snapshot objects captured by
+  * the persistent actor.
+  *
+  * @see [[SnapshotSerializer]]
+  */
 @SerialVersionUID(1L)
 final case class Snapshot(data: Any)
 
 /**
- * INTERNAL API.
- */
+  * INTERNAL API.
+  */
 @SerialVersionUID(1L)
-private[serialization] final case class SnapshotHeader(serializerId: Int, manifest: Option[String])
+private[serialization] final case class SnapshotHeader(
+    serializerId: Int, manifest: Option[String])
 
 /**
- * [[Snapshot]] serializer.
- */
-class SnapshotSerializer(val system: ExtendedActorSystem) extends BaseSerializer {
+  * [[Snapshot]] serializer.
+  */
+class SnapshotSerializer(val system: ExtendedActorSystem)
+    extends BaseSerializer {
 
   override val includeManifest: Boolean = false
 
@@ -41,18 +42,20 @@ class SnapshotSerializer(val system: ExtendedActorSystem) extends BaseSerializer
   }
 
   /**
-   * Serializes a [[Snapshot]]. Delegates serialization of snapshot `data` to a matching
-   * `akka.serialization.Serializer`.
-   */
+    * Serializes a [[Snapshot]]. Delegates serialization of snapshot `data` to a matching
+    * `akka.serialization.Serializer`.
+    */
   def toBinary(o: AnyRef): Array[Byte] = o match {
     case Snapshot(data) ⇒ snapshotToBinary(data.asInstanceOf[AnyRef])
-    case _              ⇒ throw new IllegalArgumentException(s"Can't serialize object of type ${o.getClass}")
+    case _ ⇒
+      throw new IllegalArgumentException(
+          s"Can't serialize object of type ${o.getClass}")
   }
 
   /**
-   * Deserializes a [[Snapshot]]. Delegates deserialization of snapshot `data` to a matching
-   * `akka.serialization.Serializer`.
-   */
+    * Deserializes a [[Snapshot]]. Delegates deserialization of snapshot `data` to a matching
+    * `akka.serialization.Serializer`.
+    */
   def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef =
     Snapshot(snapshotFromBinary(bytes))
 
@@ -66,8 +69,7 @@ class SnapshotSerializer(val system: ExtendedActorSystem) extends BaseSerializer
       snapshotSerializer match {
         case ser2: SerializerWithStringManifest ⇒
           val manifest = ser2.manifest(snapshot)
-          if (manifest != "")
-            headerOut.write(manifest.getBytes(UTF_8))
+          if (manifest != "") headerOut.write(manifest.getBytes(UTF_8))
         case _ ⇒
           if (snapshotSerializer.includeManifest)
             headerOut.write(snapshot.getClass.getName.getBytes(UTF_8))
@@ -86,8 +88,9 @@ class SnapshotSerializer(val system: ExtendedActorSystem) extends BaseSerializer
 
     // serialize actor references with full address information (defaultAddress)
     transportInformation match {
-      case Some(ti) ⇒ Serialization.currentTransportInformation.withValue(ti) { serialize() }
-      case None     ⇒ serialize()
+      case Some(ti) ⇒
+        Serialization.currentTransportInformation.withValue(ti) { serialize() }
+      case None ⇒ serialize()
     }
   }
 
@@ -126,8 +129,10 @@ class SnapshotSerializer(val system: ExtendedActorSystem) extends BaseSerializer
     // we can remove this attempt to deserialize SnapshotHeader with JavaSerializer.
     // Then the class SnapshotHeader can be removed. See issue #16009
     val oldHeader =
-      if (readShort(in) == 0xedac) { // Java Serialization magic value with swapped bytes
-        val b = if (SnapshotSerializer.doPatch) patch(headerBytes) else headerBytes
+      if (readShort(in) == 0xedac) {
+        // Java Serialization magic value with swapped bytes
+        val b =
+          if (SnapshotSerializer.doPatch) patch(headerBytes) else headerBytes
         serialization.deserialize(b, classOf[SnapshotHeader]).toOption
       } else None
 
@@ -145,11 +150,16 @@ class SnapshotSerializer(val system: ExtendedActorSystem) extends BaseSerializer
       SnapshotHeader(serializerId, manifest)
     }
 
-    serialization.deserialize(snapshotBytes, header.serializerId, header.manifest.getOrElse("")).get
+    serialization
+      .deserialize(
+          snapshotBytes, header.serializerId, header.manifest.getOrElse(""))
+      .get
   }
 
   private def writeInt(outputStream: OutputStream, i: Int) =
-    0 to 24 by 8 foreach { shift ⇒ outputStream.write(i >> shift) }
+    0 to 24 by 8 foreach { shift ⇒
+      outputStream.write(i >> shift)
+    }
 
   private def readShort(inputStream: InputStream) = {
     val ch1 = inputStream.read()
@@ -169,16 +179,40 @@ object SnapshotSerializer {
    * This is the serialized form of Class[Option[_]] (as a superclass, hence
    * the leading 0x78) with Scala 2.10.
    */
-  val key: Array[Byte] = Array(
-    0x78, 0x72, 0x00, 0x0c, 0x73, 0x63, 0x61, 0x6c,
-    0x61, 0x2e, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e,
-    0xe3, 0x60, 0x24, 0xa8, 0x32, 0x8a, 0x45, 0xe9, // here is the UID
-    0x02, 0x00, 0x00, 0x78, 0x70).map(_.toByte)
+  val key: Array[Byte] = Array(0x78,
+                               0x72,
+                               0x00,
+                               0x0c,
+                               0x73,
+                               0x63,
+                               0x61,
+                               0x6c,
+                               0x61,
+                               0x2e,
+                               0x4f,
+                               0x70,
+                               0x74,
+                               0x69,
+                               0x6f,
+                               0x6e,
+                               0xe3,
+                               0x60,
+                               0x24,
+                               0xa8,
+                               0x32,
+                               0x8a,
+                               0x45,
+                               0xe9, // here is the UID
+                               0x02,
+                               0x00,
+                               0x00,
+                               0x78,
+                               0x70).map(_.toByte)
   // The offset of the serialVersionUID in the above.
   val offset = 16
   // This is the new serialVersionUID from Scala 2.11 onwards.
-  val replacement: Array[Byte] = Array(
-    0xfe, 0x69, 0x37, 0xfd, 0xdb, 0x0e, 0x66, 0x74).map(_.toByte)
+  val replacement: Array[Byte] =
+    Array(0xfe, 0x69, 0x37, 0xfd, 0xdb, 0x0e, 0x66, 0x74).map(_.toByte)
   val doPatch: Boolean = {
     /*
      * The only way to obtain the serialVersionUID for the Option[_] class is
@@ -193,13 +227,15 @@ object SnapshotSerializer {
     val uidOffset = superOffset + offset
     val clazz: Seq[Byte] = baus.toByteArray.slice(superOffset, uidOffset)
     val knownClazz: Seq[Byte] = key.take(offset)
-    val uid: Seq[Byte] = baus.toByteArray.slice(uidOffset, uidOffset + replacement.length)
+    val uid: Seq[Byte] =
+      baus.toByteArray.slice(uidOffset, uidOffset + replacement.length)
     // only attempt to patch if we know the target class
     if (clazz == knownClazz) {
       if (uid == replacement.toSeq) {
         // running on 2.11
         true
-      } else if (uid == (key.slice(offset, offset + replacement.length): Seq[Byte])) {
+      } else if (uid ==
+                 (key.slice(offset, offset + replacement.length): Seq[Byte])) {
         // running on 2.10, need to switch out UID between key and replacement
         val len = replacement.length
         val tmp = new Array[Byte](len)

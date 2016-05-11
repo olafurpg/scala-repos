@@ -14,19 +14,26 @@ import scala.reflect.macros.whitebox
   * Author: Svyatoslav Ilinskiy
   * Date: 9/28/15.
   */
-class CachedWithRecursionGuard[T](element: Any, defaultValue: => Any, dependecyItem: Object) extends StaticAnnotation {
+class CachedWithRecursionGuard[T](
+    element: Any, defaultValue: => Any, dependecyItem: Object)
+    extends StaticAnnotation {
   def macroTransform(annottees: Any*) = macro CachedWithRecursionGuard.cachedWithRecursionGuardImpl
 }
 
 object CachedWithRecursionGuard {
   import CachedMacroUtil._
-  def cachedWithRecursionGuardImpl(c: whitebox.Context)(annottees: c.Tree*): c.Expr[Any] = {
+  def cachedWithRecursionGuardImpl(c: whitebox.Context)(
+      annottees: c.Tree*): c.Expr[Any] = {
     import c.universe._
     implicit val x: c.type = c
 
     def parameters: (Tree, Tree, Tree, Tree) = c.prefix.tree match {
-      case q"new CachedWithRecursionGuard[$t](..$params)" if params.length == 3 =>
-        (params.head, params(1), modCountParamToModTracker(c)(params(2), params.head), t)
+      case q"new CachedWithRecursionGuard[$t](..$params)"
+          if params.length == 3 =>
+        (params.head,
+         params(1),
+         modCountParamToModTracker(c)(params(2), params.head),
+         t)
       case _ => abort("Wrong annotation parameters!")
     }
 
@@ -48,22 +55,28 @@ object CachedWithRecursionGuard {
 
         val provider = TypeName("MyProvider")
 
-        val cachedFunRHS = transformRhsToAnalyzeCaches(c)(cacheStatsName, retTp, rhs)
+        val cachedFunRHS =
+          transformRhsToAnalyzeCaches(c)(cacheStatsName, retTp, rhs)
 
         val fun = q"def $cachedFunName(): $retTp = $cachedFunRHS"
-        val builder = q"new $cachesUtilFQN.$provider[$providerType, $retTp]($element, _ => $cachedFunName())($dependencyItem)"
+        val builder =
+          q"new $cachesUtilFQN.$provider[$providerType, $retTp]($element, _ => $cachedFunName())($dependencyItem)"
 
         val updatedRhs = q"""
-          ${if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()" else EmptyTree}
+          ${if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
+        else EmptyTree}
           $fun
           $cachesUtilFQN.incrementModCountForFunsWithModifiedReturn()
           $cachesUtilFQN.getWithRecursionPreventingWithRollback[$providerType, $retTp]($element, $keyVarName, $builder, $defaultValue)
           """
-        val updatedDef = DefDef(mods, name, tpParams, params, retTp, updatedRhs)
+        val updatedDef = DefDef(
+            mods, name, tpParams, params, retTp, updatedRhs)
         val res = q"""
           private val $keyVarName = $cachesUtilFQN.getOrCreateKey[$keyTypeFQN[$cachedValueTypeFQN[$retTp]]]($keyId)
 
-          ${if (analyzeCaches) q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)" else EmptyTree}
+          ${if (analyzeCaches)
+          q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
+        else EmptyTree}
 
           ..$updatedDef
           """

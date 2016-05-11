@@ -1,7 +1,6 @@
 package spire
 package benchmark
 
-
 import scala.util.Random
 import Random._
 
@@ -18,7 +17,9 @@ import com.google.caliper.Param
 
 object SortingBenchmarks extends MyRunner(classOf[SortingBenchmarks])
 
-final class FakeComplex[@sp(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T]) extends Ordered[FakeComplex[T]] {
+final class FakeComplex[@sp(Float, Double) T](val real: T, val imag: T)(
+    implicit f: Fractional[T], t: Trig[T])
+    extends Ordered[FakeComplex[T]] {
   def compare(b: FakeComplex[T]): Int = {
     if (f.lt(real, b.real)) -1
     else if (f.gt(real, b.real)) 1
@@ -28,18 +29,18 @@ final class FakeComplex[@sp(Float, Double) T](val real:T, val imag:T)(implicit f
   }
 }
 
-
 class SortingBenchmarks extends MyBenchmark with BenchmarkData {
-  implicit val lexicographic:Order[Complex[Double]] = new Order[Complex[Double]] {
-    override def eqv(a: Complex[Double], b: Complex[Double]) = a == b
-    def compare(a: Complex[Double], b: Complex[Double]): Int = {
-      if (a.real < b.real) -1
-      else if (a.real > b.real) 1
-      else if (a.imag < b.imag) -1
-      else if (a.imag > b.imag) 1
-      else 0
+  implicit val lexicographic: Order[Complex[Double]] =
+    new Order[Complex[Double]] {
+      override def eqv(a: Complex[Double], b: Complex[Double]) = a == b
+      def compare(a: Complex[Double], b: Complex[Double]): Int = {
+        if (a.real < b.real) -1
+        else if (a.real > b.real) 1
+        else if (a.imag < b.imag) -1
+        else if (a.imag > b.imag) 1
+        else 0
+      }
     }
-  }
 
   //@Param(Array("4", "6", "8", "10", "12", "14", "16", "18", "20"))
   @Param(Array("3", "4", "6", "9", "13", "18"))
@@ -73,7 +74,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
     cs2 = if (typ == "complex") cs.map(complexToFake) else null
   }
 
-  def timeJavaSort(reps:Int) = run(reps) {
+  def timeJavaSort(reps: Int) = run(reps) {
     if (typ == "int") {
       val arr = is.clone; java.util.Arrays.sort(arr); arr.length
     } else if (typ == "long") {
@@ -83,11 +84,12 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
     } else if (typ == "double") {
       val arr = ds.clone; java.util.Arrays.sort(arr); arr.length
     } else if (typ == "complex") {
-      val arr = cs2.clone.asInstanceOf[Array[Object]]; java.util.Arrays.sort(arr); arr.length
+      val arr = cs2.clone.asInstanceOf[Array[Object]];
+      java.util.Arrays.sort(arr); arr.length
     }
   }
 
-  def timeScalaQuicksort(reps:Int) = run(reps) {
+  def timeScalaQuicksort(reps: Int) = run(reps) {
     if (typ == "int") {
       val arr = is.clone; scala.util.Sorting.quickSort(arr); arr.length
     } else if (typ == "long") {
@@ -102,7 +104,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
     }
   }
 
-  def timeSpireInsertionSort(reps:Int): Unit = run(reps) {
+  def timeSpireInsertionSort(reps: Int): Unit = run(reps) {
     val n = if (pow > 13) 2 else spire.math.pow(2, pow).toInt
 
     if (typ == "int") {
@@ -118,7 +120,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
     }
   }
 
-  def timeSpireMergeSort(reps:Int) = run(reps) {
+  def timeSpireMergeSort(reps: Int) = run(reps) {
     if (typ == "int") {
       val arr = is.clone; spire.math.Sorting.mergeSort(arr); arr.length
     } else if (typ == "long") {
@@ -132,7 +134,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
     }
   }
 
-  def timeSpireQuickSort(reps:Int) = run(reps) {
+  def timeSpireQuickSort(reps: Int) = run(reps) {
     if (typ == "int") {
       val arr = is.clone; spire.math.Sorting.quickSort(arr); arr.length
     } else if (typ == "long") {

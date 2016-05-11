@@ -7,8 +7,8 @@ import scala.language.reflectiveCalls
 
 import org.specs2.mutable._
 import java.util.concurrent.atomic.AtomicInteger
-import scala.concurrent.{ ExecutionContext, Promise, Future, Await }
-import scala.concurrent.duration.{ Duration, SECONDS }
+import scala.concurrent.{ExecutionContext, Promise, Future, Await}
+import scala.concurrent.duration.{Duration, SECONDS}
 
 object NonBlockingMutexSpec extends Specification {
 
@@ -27,7 +27,8 @@ object NonBlockingMutexSpec extends Specification {
     def run(body: => Unit) = body
   }
 
-  def countOrderingErrors(runs: Int, tester: Tester)(implicit ec: ExecutionContext): Future[Int] = {
+  def countOrderingErrors(runs: Int, tester: Tester)(
+      implicit ec: ExecutionContext): Future[Int] = {
     val result = Promise[Int]()
     val runCount = new AtomicInteger(0)
     val orderingErrors = new AtomicInteger(0)
@@ -71,7 +72,8 @@ object NonBlockingMutexSpec extends Specification {
     "run code in order" in {
       import ExecutionContext.Implicits.global
 
-      def percentageOfRunsWithOrderingErrors(runSize: Int, tester: Tester): Int = {
+      def percentageOfRunsWithOrderingErrors(runSize: Int,
+                                             tester: Tester): Int = {
         val results: Seq[Future[Int]] = for (i <- 0 until 9) yield {
           countOrderingErrors(runSize, tester)
         }
@@ -84,18 +86,18 @@ object NonBlockingMutexSpec extends Specification {
       // is too small then the MutexTester probably isn't doing anything. We use
       // dynamic run sizing because the actual size that produces errors will vary
       // depending on the environment in which this test is run.
-      var runSize = 8 // This usually reaches 8192 on my dev machine with 10 simultaneous queues
+      var runSize =
+        8 // This usually reaches 8192 on my dev machine with 10 simultaneous queues
       var errorPercentage = 0
       while (errorPercentage < 90 && runSize < 1000000) {
         runSize = runSize << 1
-        errorPercentage = percentageOfRunsWithOrderingErrors(runSize, new NaiveTester())
+        errorPercentage = percentageOfRunsWithOrderingErrors(runSize,
+                                                             new NaiveTester())
       }
       //println(s"Got $errorPercentage% ordering errors on run size of $runSize")
 
       // Now show that this run length works fine with the MutexTester
       percentageOfRunsWithOrderingErrors(runSize, new MutexTester()) must_== 0
     }
-
   }
-
 }

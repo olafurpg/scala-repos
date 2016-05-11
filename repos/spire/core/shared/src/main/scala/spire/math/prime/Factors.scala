@@ -65,25 +65,31 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
       case Positive =>
         var t = SafeLong.one
         val it = iterator
-        while (it.hasNext && t <= rhs) { val (p, e) = it.next(); t *= (p ** e) }
+        while (it.hasNext && t <= rhs) {
+          val (p, e) = it.next(); t *= (p ** e)
+        }
         t compare rhs
       case Zero =>
         rhs.signum
       case Negative =>
         var t = -SafeLong.one
         val it = iterator
-        while (it.hasNext && t >= rhs) { val (p, e) = it.next(); t *= (p ** e) }
+        while (it.hasNext && t >= rhs) {
+          val (p, e) = it.next(); t *= (p ** e)
+        }
         t compare rhs
     }
 
   def gcd(rhs: Factors): Factors =
-    Factors(lhs.factors.flatMap { case (p, le) =>
-      rhs.factors.get(p).map(re => (p, le min re))
+    Factors(lhs.factors.flatMap {
+      case (p, le) =>
+        rhs.factors.get(p).map(re => (p, le min re))
     }, Positive)
 
   def lcm(rhs: Factors): Factors =
-    Factors(lhs.factors.foldLeft(rhs.factors) { case (fs, (p, e)) =>
-      fs.updated(p, fs.getOrElse(p, 0) max e)
+    Factors(lhs.factors.foldLeft(rhs.factors) {
+      case (fs, (p, e)) =>
+        fs.updated(p, fs.getOrElse(p, 0) max e)
     }, Positive)
 
   def unary_-(): Factors = Factors(factors, -sign)
@@ -99,18 +105,22 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
   def *(rhs: SafeLong): Factors =
     lhs * Factors(rhs)
 
-  private[prime] def qm(rhs: Factors): (Int, Map[SafeLong, Int], Map[SafeLong, Int], Map[SafeLong, Int]) = {
+  private[prime] def qm(rhs: Factors)
+    : (Int, Map[SafeLong, Int], Map[SafeLong, Int], Map[SafeLong, Int]) = {
     val sign = (lhs.sign * rhs.sign).toInt
-    val (nn, dd) = (lhs.factors - rhs.factors).filter(_._2 != 0).partition(_._2 > 0)
-    val cc = lhs.factors.flatMap { case (p, le) =>
-      rhs.factors.get(p).map(re => (p, le min re))
+    val (nn, dd) =
+      (lhs.factors - rhs.factors).filter(_._2 != 0).partition(_._2 > 0)
+    val cc = lhs.factors.flatMap {
+      case (p, le) =>
+        rhs.factors.get(p).map(re => (p, le min re))
     }
     (sign, nn, dd.map { case (p, e) => (p, -e) }, cc)
   }
 
   def /(rhs: Factors): Factors = {
     val (sign, nn, dd, cc) = qm(rhs)
-    if (dd.isEmpty) Factors(nn, sign) else Factors((prod(nn) * sign) / prod(dd))
+    if (dd.isEmpty) Factors(nn, sign)
+    else Factors((prod(nn) * sign) / prod(dd))
   }
 
   def /(rhs: SafeLong): Factors =

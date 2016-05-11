@@ -26,7 +26,9 @@ class FinagleStatsTest extends FunSuite with MockitoSugar {
         def pipelineFactory = new ChannelPipelineFactory {
           def getPipeline = {
             val pipeline = Channels.pipeline()
-            pipeline.addLast("line", new DelimiterBasedFrameDecoder(100, Delimiters.lineDelimiter: _*))
+            pipeline.addLast("line",
+                             new DelimiterBasedFrameDecoder(
+                                 100, Delimiters.lineDelimiter: _*))
             pipeline.addLast("stringDecoder", new StringDecoder(Charsets.Utf8))
             pipeline.addLast("stringEncoder", new StringEncoder(Charsets.Utf8))
             pipeline
@@ -80,7 +82,8 @@ class FinagleStatsTest extends FunSuite with MockitoSugar {
 
   test("system should show symmetric stats on client and server") {
     def equalsGauge(name: String) =
-      assert(Stats.getCounter("server/" + name)() == Stats.getCounter("client/" + name)())
+      assert(Stats.getCounter("server/" + name)() == Stats.getCounter(
+              "client/" + name)())
 
     equalsGauge("requests")
     equalsGauge("connects")

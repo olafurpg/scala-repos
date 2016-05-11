@@ -20,12 +20,15 @@ import org.jetbrains.plugins.scala.project._
 import scala.collection.JavaConversions._
 
 @State(
-  name = "HighlightingAdvisor", storages = Array(
-  new Storage("highlighting.xml"))
+    name = "HighlightingAdvisor",
+    storages = Array(new Storage("highlighting.xml"))
 )
-class HighlightingAdvisor(project: Project) extends ProjectComponent with PersistentStateComponent[HighlightingSettings] {
+class HighlightingAdvisor(project: Project)
+    extends ProjectComponent
+    with PersistentStateComponent[HighlightingSettings] {
   @Language("HTML")
-  private val AdviceMessage = """
+  private val AdviceMessage =
+    """
   <html>
    <body>
    <p><a href="http://confluence.jetbrains.net/display/SCA/Type-aware+highlighting">Type-aware highlighting</a>
@@ -38,7 +41,8 @@ class HighlightingAdvisor(project: Project) extends ProjectComponent with Persis
   </html>"""
 
   @Language("HTML")
-  private val EnabledMessage = """
+  private val EnabledMessage =
+    """
   <html>
    <body>
    <p><a href="http://confluence.jetbrains.net/display/SCA/Type-aware+highlighting">Type-aware highlighting</a> has been enabled.</p>
@@ -48,7 +52,8 @@ class HighlightingAdvisor(project: Project) extends ProjectComponent with Persis
   </html>"""
 
   @Language("HTML")
-  private val DisabledMessage = """
+  private val DisabledMessage =
+    """
   <html>
    <body>
    <p><a href="http://confluence.jetbrains.net/display/SCA/Type-aware+highlighting">Type-aware highlighting</a> has been disabled.</p>
@@ -102,12 +107,15 @@ class HighlightingAdvisor(project: Project) extends ProjectComponent with Persis
   }
 
   private def notifyIfNeeded() {
-    if(settings.SUGGEST_TYPE_AWARE_HIGHLIGHTING && !enabled && applicable) {
-      notify("Configure type-aware highlighting for the project", AdviceMessage, NotificationType.WARNING)
+    if (settings.SUGGEST_TYPE_AWARE_HIGHLIGHTING && !enabled && applicable) {
+      notify("Configure type-aware highlighting for the project",
+             AdviceMessage,
+             NotificationType.WARNING)
     }
   }
 
-  private def notify(title: String, message: String, notificationType: NotificationType) {
+  private def notify(
+      title: String, message: String, notificationType: NotificationType) {
     NotificationUtil.builder(project, message) setNotificationType notificationType setTitle title setHandler {
       case "enable" => enabled = true
       case "disable" => enabled = false
@@ -116,7 +124,7 @@ class HighlightingAdvisor(project: Project) extends ProjectComponent with Persis
   }
 
   def toggle() {
-    if(applicable) {
+    if (applicable) {
       enabled = !enabled
       TypeAwareHighlightingApplicationState.getInstance setSuggest enabled
     }
@@ -129,7 +137,7 @@ class HighlightingAdvisor(project: Project) extends ProjectComponent with Persis
   private def enabled_=(enabled: Boolean) {
     settings.SUGGEST_TYPE_AWARE_HIGHLIGHTING = false
 
-    if(this.enabled == enabled) return
+    if (this.enabled == enabled) return
 
     settings.TYPE_AWARE_HIGHLIGHTING_ENABLED = enabled
 
@@ -137,15 +145,14 @@ class HighlightingAdvisor(project: Project) extends ProjectComponent with Persis
       updateWidget(bar)
       reparseActiveFile()
 
-      if (enabled)
-        notify(status, EnabledMessage, NotificationType.INFORMATION)
-      else
-        notify(status, DisabledMessage, NotificationType.INFORMATION)
+      if (enabled) notify(status, EnabledMessage, NotificationType.INFORMATION)
+      else notify(status, DisabledMessage, NotificationType.INFORMATION)
     }
   }
 
-  private def status = "Scala type-aware highlighting: %s"
-          .format(if(enabled) "enabled" else "disabled")
+  private def status =
+    "Scala type-aware highlighting: %s".format(
+        if (enabled) "enabled" else "disabled")
 
   private def updateWidget(bar: StatusBar) {
     bar.updateWidget(Widget.ID)
@@ -157,7 +164,8 @@ class HighlightingAdvisor(project: Project) extends ProjectComponent with Persis
       override def consume(dataContext: DataContext): Unit = {
         CommonDataKeys.EDITOR_EVEN_IF_INACTIVE.getData(dataContext) match {
           case editor: EditorEx =>
-            FileContentUtil.reparseFiles(project, Seq(editor.getVirtualFile), true)
+            FileContentUtil.reparseFiles(
+                project, Seq(editor.getVirtualFile), true)
           case _ => // do nothing
         }
       }
@@ -177,12 +185,13 @@ class HighlightingAdvisor(project: Project) extends ProjectComponent with Persis
     def dispose() {}
 
     object Presentation extends StatusBarWidget.IconPresentation {
-      def getIcon = if(enabled) Icons.TYPED else Icons.UNTYPED
+      def getIcon = if (enabled) Icons.TYPED else Icons.UNTYPED
 
       def getClickConsumer = ClickConsumer
 
-      def getTooltipText = "%s (click to %s, or press Ctrl+Shift+Alt+E)"
-              .format(status, if(enabled) "disable" else "enable")
+      def getTooltipText =
+        "%s (click to %s, or press Ctrl+Shift+Alt+E)".format(
+            status, if (enabled) "disable" else "enable")
 
       object ClickConsumer extends Consumer[MouseEvent] {
         def consume(t: MouseEvent) {
@@ -205,5 +214,6 @@ class HighlightingAdvisor(project: Project) extends ProjectComponent with Persis
 }
 
 object HighlightingAdvisor {
-  def getInstance(project: Project) = project.getComponent(classOf[HighlightingAdvisor])
+  def getInstance(project: Project) =
+    project.getComponent(classOf[HighlightingAdvisor])
 }

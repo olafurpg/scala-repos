@@ -2,7 +2,8 @@ package java.lang
 
 import scala.scalajs.js
 
-class Throwable(s: String, private var e: Throwable) extends Object with java.io.Serializable {
+class Throwable(s: String, private var e: Throwable)
+    extends Object with java.io.Serializable {
   def this() = this(null, null)
   def this(s: String) = this(s, null)
   def this(e: Throwable) = this(null, e)
@@ -34,8 +35,7 @@ class Throwable(s: String, private var e: Throwable) extends Object with java.io
   def setStackTrace(stackTrace: Array[StackTraceElement]): Unit = {
     var i = 0
     while (i < stackTrace.length) {
-      if (stackTrace(i) eq null)
-        throw new NullPointerException()
+      if (stackTrace(i) eq null) throw new NullPointerException()
       i += 1
     }
 
@@ -60,7 +60,7 @@ class Throwable(s: String, private var e: Throwable) extends Object with java.io
     if (stackTrace.length != 0) {
       var i = 0
       while (i < stackTrace.length) {
-        sprintln("  at "+stackTrace(i))
+        sprintln("  at " + stackTrace(i))
         i += 1
       }
     } else {
@@ -69,7 +69,7 @@ class Throwable(s: String, private var e: Throwable) extends Object with java.io
 
     // Causes
     var wCause: Throwable = this
-    while ((wCause ne wCause.getCause) && (wCause.getCause ne null)) {
+    while ( (wCause ne wCause.getCause) && (wCause.getCause ne null)) {
       val parentTrace = wCause.getStackTrace
       wCause = wCause.getCause
       val thisTrace = wCause.getStackTrace
@@ -85,26 +85,25 @@ class Throwable(s: String, private var e: Throwable) extends Object with java.io
          */
         var sameFrameCount: Int = 0
         while (sameFrameCount < thisLength && sameFrameCount < parentLength &&
-            thisTrace(thisLength-sameFrameCount-1) == parentTrace(parentLength-sameFrameCount-1)) {
+        thisTrace(thisLength - sameFrameCount - 1) == parentTrace(
+            parentLength - sameFrameCount - 1)) {
           sameFrameCount += 1
         }
 
         /* If at least one, decrement so that the first common frame is still
          * printed. According to Harmony this is spec'ed and common practice.
          */
-        if (sameFrameCount > 0)
-          sameFrameCount -= 1
+        if (sameFrameCount > 0) sameFrameCount -= 1
 
         // Print the non-common frames
         val lengthToPrint = thisLength - sameFrameCount
         var i = 0
         while (i < lengthToPrint) {
-          sprintln("  at "+thisTrace(i))
+          sprintln("  at " + thisTrace(i))
           i += 1
         }
 
-        if (sameFrameCount > 0)
-          sprintln("  ... " + sameFrameCount + " more")
+        if (sameFrameCount > 0) sprintln("  ... " + sameFrameCount + " more")
       } else {
         sprintln("  <no stack trace available>")
       }
@@ -120,7 +119,6 @@ class Throwable(s: String, private var e: Throwable) extends Object with java.io
 }
 
 class ThreadDeath() extends Error()
-
 
 /* java.lang.*Error.java */
 
@@ -159,7 +157,8 @@ class Error(s: String, e: Throwable) extends Throwable(s, e) {
   def this(e: Throwable) = this(null, e)
 }
 
-class ExceptionInInitializerError private (s: String, private val e: Throwable) extends LinkageError(s) {
+class ExceptionInInitializerError private (s: String, private val e: Throwable)
+    extends LinkageError(s) {
   def this(thrown: Throwable) = this(null, thrown)
   def this(s: String) = this(s, null)
   def this() = this(null, null)
@@ -227,14 +226,14 @@ abstract class VirtualMachineError(s: String) extends Error(s) {
   def this() = this(null)
 }
 
-
 /* java.lang.*Exception.java */
 
 class ArithmeticException(s: String) extends RuntimeException(s) {
   def this() = this(null)
 }
 
-class ArrayIndexOutOfBoundsException(s: String) extends IndexOutOfBoundsException(s) {
+class ArrayIndexOutOfBoundsException(s: String)
+    extends IndexOutOfBoundsException(s) {
   def this(index: Int) = this("Array index out of range: " + index)
   def this() = this(null)
 }
@@ -247,7 +246,8 @@ class ClassCastException(s: String) extends RuntimeException(s) {
   def this() = this(null)
 }
 
-class ClassNotFoundException(s: String,  e: Throwable) extends ReflectiveOperationException(s) {
+class ClassNotFoundException(s: String, e: Throwable)
+    extends ReflectiveOperationException(s) {
   def this(s: String) = this(s, null)
   def this() = this(null, null)
   def getException(): Throwable = e
@@ -270,11 +270,13 @@ class Exception(s: String, e: Throwable) extends Throwable(s, e) {
   def this() = this(null, null)
 }
 
-class IllegalAccessException(s: String) extends ReflectiveOperationException(s) {
+class IllegalAccessException(s: String)
+    extends ReflectiveOperationException(s) {
   def this() = this(null)
 }
 
-class IllegalArgumentException(s: String, e: Throwable) extends RuntimeException(s, e) {
+class IllegalArgumentException(s: String, e: Throwable)
+    extends RuntimeException(s, e) {
   def this(e: Throwable) = this(null, e)
   def this(s: String) = this(s, null)
   def this() = this(null, null)
@@ -284,13 +286,15 @@ class IllegalMonitorStateException(s: String) extends RuntimeException(s) {
   def this() = this(null)
 }
 
-class IllegalStateException(s: String, e: Throwable) extends RuntimeException(s, e) {
+class IllegalStateException(s: String, e: Throwable)
+    extends RuntimeException(s, e) {
   def this(e: Throwable) = this(null, e)
   def this(s: String) = this(s, null)
   def this() = this(null, null)
 }
 
-class IllegalThreadStateException(s: String) extends IllegalArgumentException(s) {
+class IllegalThreadStateException(s: String)
+    extends IllegalArgumentException(s) {
   def this() = this(null)
 }
 
@@ -298,7 +302,8 @@ class IndexOutOfBoundsException(s: String) extends RuntimeException(s) {
   def this() = this(null)
 }
 
-class InstantiationException(s: String) extends ReflectiveOperationException(s) {
+class InstantiationException(s: String)
+    extends ReflectiveOperationException(s) {
   def this() = this(null)
 }
 
@@ -314,7 +319,8 @@ class NoSuchFieldException(s: String) extends ReflectiveOperationException(s) {
   def this() = this(null)
 }
 
-class NoSuchMethodException(s: String) extends ReflectiveOperationException(s) {
+class NoSuchMethodException(s: String)
+    extends ReflectiveOperationException(s) {
   def this() = this(null)
 }
 
@@ -326,13 +332,15 @@ class NumberFormatException(s: String) extends IllegalArgumentException(s) {
   def this() = this(null)
 }
 
-class ReflectiveOperationException(s: String, e: Throwable) extends Exception(s, e) {
+class ReflectiveOperationException(s: String, e: Throwable)
+    extends Exception(s, e) {
   def this(e: Throwable) = this(null, e)
   def this(s: String) = this(s, null)
   def this() = this(null, null)
 }
 
-class RejectedExecutionException(s: String, e: Throwable) extends RuntimeException(s, e) {
+class RejectedExecutionException(s: String, e: Throwable)
+    extends RuntimeException(s, e) {
   def this(e: Throwable) = this(null, e)
   def this(s: String) = this(s, null)
   def this() = this(null, null)
@@ -344,23 +352,26 @@ class RuntimeException(s: String, e: Throwable) extends Exception(s, e) {
   def this() = this(null, null)
 }
 
-class SecurityException(s: String, e: Throwable) extends RuntimeException(s, e) {
+class SecurityException(s: String, e: Throwable)
+    extends RuntimeException(s, e) {
   def this(e: Throwable) = this(null, e)
   def this(s: String) = this(s, null)
   def this() = this(null, null)
 }
 
-class StringIndexOutOfBoundsException(s: String) extends IndexOutOfBoundsException(s) {
+class StringIndexOutOfBoundsException(s: String)
+    extends IndexOutOfBoundsException(s) {
   def this(index: Int) = this("String index out of range: " + index)
   def this() = this(null)
 }
 
 class TypeNotPresentException(t: String, e: Throwable)
-  extends RuntimeException("Type " + t + " not present", e) {
+    extends RuntimeException("Type " + t + " not present", e) {
   def typeName(): String = t
 }
 
-class UnsupportedOperationException(s: String, e: Throwable) extends RuntimeException(s, e) {
+class UnsupportedOperationException(s: String, e: Throwable)
+    extends RuntimeException(s, e) {
   def this() = this(null, null)
   def this(s: String) = this(s, null)
   def this(e: Throwable) = this(null, e)

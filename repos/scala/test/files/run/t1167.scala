@@ -1,10 +1,9 @@
 /** Tests for compatible InnerClasses attribute between trait and
- *  impl classes, as well as anonymous classes.
- */
-
+  *  impl classes, as well as anonymous classes.
+  */
 trait Test1 {
-  def testFunc(i:Int): Unit = {
-    (i:Int) => i + 5
+  def testFunc(i: Int): Unit = { (i: Int) =>
+    i + 5
   }
 }
 

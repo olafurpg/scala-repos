@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Test for [[scalafx.scene.paint.CycleMethod]] */
 @RunWith(classOf[JUnitRunner])
-class CycleMethodSpec extends SFXEnumDelegateSpec[jfxsp.CycleMethod, CycleMethod](
-  javaClass = classOf[jfxsp.CycleMethod],
-  scalaClass = classOf[CycleMethod],
-  companion = CycleMethod)
+class CycleMethodSpec
+    extends SFXEnumDelegateSpec[jfxsp.CycleMethod, CycleMethod](
+        javaClass = classOf[jfxsp.CycleMethod],
+        scalaClass = classOf[CycleMethod],
+        companion = CycleMethod)

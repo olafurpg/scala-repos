@@ -22,44 +22,51 @@ import java.io.File
 import org.apache.spark.sql.catalyst.util._
 
 /**
- * A framework for running the query tests that are listed as a set of text files.
- *
- * TestSuites that derive from this class must provide a map of testCaseName -> testCaseFiles
- * that should be included. Additionally, there is support for whitelisting and blacklisting
- * tests as development progresses.
- */
+  * A framework for running the query tests that are listed as a set of text files.
+  *
+  * TestSuites that derive from this class must provide a map of testCaseName -> testCaseFiles
+  * that should be included. Additionally, there is support for whitelisting and blacklisting
+  * tests as development progresses.
+  */
 abstract class HiveQueryFileTest extends HiveComparisonTest {
+
   /** A list of tests deemed out of scope and thus completely disregarded */
   def blackList: Seq[String] = Nil
 
   /**
-   * The set of tests that are believed to be working in catalyst. Tests not in whiteList
-   * blacklist are implicitly marked as ignored.
-   */
+    * The set of tests that are believed to be working in catalyst. Tests not in whiteList
+    * blacklist are implicitly marked as ignored.
+    */
   def whiteList: Seq[String] = ".*" :: Nil
 
   def testCases: Seq[(String, File)]
 
   val runAll =
     !(System.getProperty("spark.hive.alltests") == null) ||
-    runOnlyDirectories.nonEmpty ||
-    skipDirectories.nonEmpty
+    runOnlyDirectories.nonEmpty || skipDirectories.nonEmpty
 
   val whiteListProperty = "spark.hive.whitelist"
   // Allow the whiteList to be overridden by a system property
-  val realWhiteList =
-    Option(System.getProperty(whiteListProperty)).map(_.split(",").toSeq).getOrElse(whiteList)
+  val realWhiteList = Option(System.getProperty(whiteListProperty))
+    .map(_.split(",").toSeq)
+    .getOrElse(whiteList)
 
   // Go through all the test cases and add them to scala test.
   testCases.sorted.foreach {
     case (testCaseName, testCaseFile) =>
-      if (blackList.map(_.r.pattern.matcher(testCaseName).matches()).reduceLeft(_||_)) {
+      if (blackList
+            .map(_.r.pattern.matcher(testCaseName).matches())
+            .reduceLeft(_ || _)) {
         logDebug(s"Blacklisted test skipped $testCaseName")
-      } else if (realWhiteList.map(_.r.pattern.matcher(testCaseName).matches()).reduceLeft(_||_) ||
-        runAll) {
+      } else if (realWhiteList
+                   .map(_.r.pattern.matcher(testCaseName).matches())
+                   .reduceLeft(_ || _) || runAll) {
         // Build a test case and submit it to scala test framework...
         val queriesString = fileToString(testCaseFile)
-        createQueryTest(testCaseName, queriesString, reset = true, tryWithoutResettingFirst = true)
+        createQueryTest(testCaseName,
+                        queriesString,
+                        reset = true,
+                        tryWithoutResettingFirst = true)
       } else {
         // Only output warnings for the built in whitelist as this clutters the output when the user
         // trying to execute a single test from the commandline.

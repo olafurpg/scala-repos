@@ -22,9 +22,9 @@ import java.{util => ju}
 import com.github.fommil.netlib.BLAS.{getInstance => blas}
 
 /**
- * Object used to solve nonnegative least squares problems using a modified
- * projected gradient method.
- */
+  * Object used to solve nonnegative least squares problems using a modified
+  * projected gradient method.
+  */
 private[spark] object NNLS {
   class Workspace(val n: Int) {
     val scratch = new Array[Double](n)
@@ -49,20 +49,21 @@ private[spark] object NNLS {
   }
 
   /**
-   * Solve a least squares problem, possibly with nonnegativity constraints, by a modified
-   * projected gradient method.  That is, find x minimising ||Ax - b||_2 given A^T A and A^T b.
-   *
-   * We solve the problem
-   *   min_x      1/2 x^T ata x^T - x^T atb
-   *   subject to x >= 0
-   *
-   * The method used is similar to one described by Polyak (B. T. Polyak, The conjugate gradient
-   * method in extremal problems, Zh. Vychisl. Mat. Mat. Fiz. 9(4)(1969), pp. 94-112) for bound-
-   * constrained nonlinear programming.  Polyak unconditionally uses a conjugate gradient
-   * direction, however, while this method only uses a conjugate gradient direction if the last
-   * iteration did not cause a previously-inactive constraint to become active.
-   */
-  def solve(ata: Array[Double], atb: Array[Double], ws: Workspace): Array[Double] = {
+    * Solve a least squares problem, possibly with nonnegativity constraints, by a modified
+    * projected gradient method.  That is, find x minimising ||Ax - b||_2 given A^T A and A^T b.
+    *
+    * We solve the problem
+    *   min_x      1/2 x^T ata x^T - x^T atb
+    *   subject to x >= 0
+    *
+    * The method used is similar to one described by Polyak (B. T. Polyak, The conjugate gradient
+    * method in extremal problems, Zh. Vychisl. Mat. Mat. Fiz. 9(4)(1969), pp. 94-112) for bound-
+    * constrained nonlinear programming.  Polyak unconditionally uses a conjugate gradient
+    * direction, however, while this method only uses a conjugate gradient direction if the last
+    * iteration did not cause a previously-inactive constraint to become active.
+    */
+  def solve(
+      ata: Array[Double], atb: Array[Double], ws: Workspace): Array[Double] = {
     ws.wipe()
 
     val n = atb.length
@@ -78,12 +79,12 @@ private[spark] object NNLS {
 
     // stopping condition
     def stop(step: Double, ndir: Double, nx: Double): Boolean = {
-        ((step.isNaN) // NaN
-      || (step < 1e-7) // too small or negative
-      || (step > 1e40) // too small; almost certainly numerical problems
-      || (ndir < 1e-12 * nx) // gradient relatively too small
-      || (ndir < 1e-32) // gradient absolutely too small; numerical issues may lurk
-      )
+      ((step.isNaN) // NaN
+          || (step < 1e-7) // too small or negative
+          || (step > 1e40) // too small; almost certainly numerical problems
+          || (ndir < 1e-12 * nx) // gradient relatively too small
+          || (ndir < 1e-32) // gradient absolutely too small; numerical issues may lurk
+          )
     }
 
     val grad = ws.grad

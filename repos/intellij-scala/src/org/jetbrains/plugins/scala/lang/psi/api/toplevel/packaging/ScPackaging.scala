@@ -8,8 +8,9 @@ package packaging
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaredElementsHolder
 
-
-trait ScPackaging extends ScToplevelElement with ScImportsHolder with ScPackageContainer with ScDeclaredElementsHolder with ScPackageLike {
+trait ScPackaging
+    extends ScToplevelElement with ScImportsHolder with ScPackageContainer
+    with ScDeclaredElementsHolder with ScPackageLike {
   def fullPackageName: String
 
   def getPackageName: String

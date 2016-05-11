@@ -6,10 +6,7 @@ package base
 package types
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-*/
-
-trait ScRefinements extends ScalaPsiElement {
-
-}
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
+trait ScRefinements extends ScalaPsiElement {}

@@ -24,56 +24,56 @@ import org.apache.spark.ml.param.{ParamMap, ParamPair}
 import org.apache.spark.sql.DataFrame
 
 /**
- * :: DeveloperApi ::
- * Abstract class for estimators that fit models to data.
- */
+  * :: DeveloperApi ::
+  * Abstract class for estimators that fit models to data.
+  */
 @DeveloperApi
 abstract class Estimator[M <: Model[M]] extends PipelineStage {
 
   /**
-   * Fits a single model to the input data with optional parameters.
-   *
-   * @param dataset input dataset
-   * @param firstParamPair the first param pair, overrides embedded params
-   * @param otherParamPairs other param pairs.  These values override any specified in this
-   *                        Estimator's embedded ParamMap.
-   * @return fitted model
-   */
+    * Fits a single model to the input data with optional parameters.
+    *
+    * @param dataset input dataset
+    * @param firstParamPair the first param pair, overrides embedded params
+    * @param otherParamPairs other param pairs.  These values override any specified in this
+    *                        Estimator's embedded ParamMap.
+    * @return fitted model
+    */
   @varargs
-  def fit(dataset: DataFrame, firstParamPair: ParamPair[_], otherParamPairs: ParamPair[_]*): M = {
-    val map = new ParamMap()
-      .put(firstParamPair)
-      .put(otherParamPairs: _*)
+  def fit(dataset: DataFrame,
+          firstParamPair: ParamPair[_],
+          otherParamPairs: ParamPair[_]*): M = {
+    val map = new ParamMap().put(firstParamPair).put(otherParamPairs: _*)
     fit(dataset, map)
   }
 
   /**
-   * Fits a single model to the input data with provided parameter map.
-   *
-   * @param dataset input dataset
-   * @param paramMap Parameter map.
-   *                 These values override any specified in this Estimator's embedded ParamMap.
-   * @return fitted model
-   */
+    * Fits a single model to the input data with provided parameter map.
+    *
+    * @param dataset input dataset
+    * @param paramMap Parameter map.
+    *                 These values override any specified in this Estimator's embedded ParamMap.
+    * @return fitted model
+    */
   def fit(dataset: DataFrame, paramMap: ParamMap): M = {
     copy(paramMap).fit(dataset)
   }
 
   /**
-   * Fits a model to the input data.
-   */
+    * Fits a model to the input data.
+    */
   def fit(dataset: DataFrame): M
 
   /**
-   * Fits multiple models to the input data with multiple sets of parameters.
-   * The default implementation uses a for loop on each parameter map.
-   * Subclasses could override this to optimize multi-model training.
-   *
-   * @param dataset input dataset
-   * @param paramMaps An array of parameter maps.
-   *                  These values override any specified in this Estimator's embedded ParamMap.
-   * @return fitted models, matching the input parameter maps
-   */
+    * Fits multiple models to the input data with multiple sets of parameters.
+    * The default implementation uses a for loop on each parameter map.
+    * Subclasses could override this to optimize multi-model training.
+    *
+    * @param dataset input dataset
+    * @param paramMaps An array of parameter maps.
+    *                  These values override any specified in this Estimator's embedded ParamMap.
+    * @return fitted models, matching the input parameter maps
+    */
   def fit(dataset: DataFrame, paramMaps: Array[ParamMap]): Seq[M] = {
     paramMaps.map(fit(dataset, _))
   }

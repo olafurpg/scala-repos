@@ -7,29 +7,31 @@ package scala
 package reflect
 package io
 
-import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream, File => JFile }
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream, File => JFile}
 
 /** This class implements an in-memory file.
- *
- *  @author  Philippe Altherr
- *  @version 1.0, 23/03/2004
- *
- *  ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
- */
-class VirtualFile(val name: String, override val path: String) extends AbstractFile {
+  *
+  *  @author  Philippe Altherr
+  *  @version 1.0, 23/03/2004
+  *
+  *  ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
+  */
+class VirtualFile(val name: String, override val path: String)
+    extends AbstractFile {
+
   /**
-   * Initializes this instance with the specified name and an
-   * identical path.
-   *
-   * @param name the name of the virtual file to be created
-   * @return     the created virtual file
-   */
+    * Initializes this instance with the specified name and an
+    * identical path.
+    *
+    * @param name the name of the virtual file to be created
+    * @return     the created virtual file
+    */
   def this(name: String) = this(name, name)
 
   override def hashCode = path.hashCode
   override def equals(that: Any) = that match {
     case x: VirtualFile => x.path == path
-    case _              => false
+    case _ => false
   }
 
   private var content = Array.emptyByteArray
@@ -41,7 +43,7 @@ class VirtualFile(val name: String, override val path: String) extends AbstractF
 
   override def sizeOption: Option[Int] = Some(content.length)
 
-  def input : InputStream = new ByteArrayInputStream(content)
+  def input: InputStream = new ByteArrayInputStream(content)
 
   override def output: OutputStream = {
     new ByteArrayOutputStream() {
@@ -81,18 +83,18 @@ class VirtualFile(val name: String, override val path: String) extends AbstractF
   def delete(): Unit = unsupported()
 
   /**
-   * Returns the abstract file in this abstract directory with the
-   * specified name. If there is no such file, returns null. The
-   * argument "directory" tells whether to look for a directory or
-   * or a regular file.
-   */
+    * Returns the abstract file in this abstract directory with the
+    * specified name. If there is no such file, returns null. The
+    * argument "directory" tells whether to look for a directory or
+    * or a regular file.
+    */
   def lookupName(name: String, directory: Boolean): AbstractFile = {
     assert(isDirectory, "not a directory '" + this + "'")
     null
   }
 
   /** Returns an abstract file with the given name. It does not
-   *  check that it exists.
-   */
+    *  check that it exists.
+    */
   def lookupNameUnchecked(name: String, directory: Boolean) = unsupported()
 }

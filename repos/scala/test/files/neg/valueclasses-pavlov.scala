@@ -10,7 +10,6 @@ class Box1(val value: String) extends AnyVal with Foo[Box2] {
 
 class Box2(val value: String) extends AnyVal
 
-
 object test2a {
 
   def main(args: Array[String]) {

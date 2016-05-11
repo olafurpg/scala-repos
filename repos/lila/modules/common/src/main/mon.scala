@@ -236,8 +236,10 @@ object mon {
       def move(platform: String) = inc(s"push.send.$platform.move")()
       def finish(platform: String) = inc(s"push.send.$platform.finish")()
       object challenge {
-        def create(platform: String) = inc(s"push.send.$platform.challenge_create")()
-        def accept(platform: String) = inc(s"push.send.$platform.challenge_accept")()
+        def create(platform: String) =
+          inc(s"push.send.$platform.challenge_create")()
+        def accept(platform: String) =
+          inc(s"push.send.$platform.challenge_accept")()
       }
     }
   }
@@ -250,7 +252,8 @@ object mon {
         def notFound = apply("not_found")
         def notAcquired = apply("not_acquired")
         def abort = apply("abort")
-        private def apply(r: String) = inc(s"fishnet.client.result.$skill.$client.$r")
+        private def apply(r: String) =
+          inc(s"fishnet.client.result.$skill.$client.$r")
       }
       object status {
         val enabled = rec("fishnet.client.status.enabled")
@@ -300,7 +303,8 @@ object mon {
     res
   }
 
-  def since[A](path: RecPath)(start: Long) = path(this)(System.nanoTime() - start)
+  def since[A](path: RecPath)(start: Long) =
+    path(this)(System.nanoTime() - start)
 
   type Rec = Long => Unit
   type Inc = () => Unit
@@ -315,17 +319,19 @@ object mon {
   private def inc(name: String): Inc = metrics.counter(name).increment _
   private def incX(name: String): IncX = {
     val count = metrics.counter(name)
-    value => {
-      if (value < 0) logger.warn(s"Negative increment value: $name=$value")
-      else count.increment(value)
-    }
+    value =>
+      {
+        if (value < 0) logger.warn(s"Negative increment value: $name=$value")
+        else count.increment(value)
+      }
   }
   private def rec(name: String): Rec = {
     val hist = metrics.histogram(name)
-    value => {
-      if (value < 0) logger.warn(s"Negative histogram value: $name=$value")
-      else hist.record(value)
-    }
+    value =>
+      {
+        if (value < 0) logger.warn(s"Negative histogram value: $name=$value")
+        else hist.record(value)
+      }
   }
 
   private def nodots(s: String) = s.replace(".", "_")

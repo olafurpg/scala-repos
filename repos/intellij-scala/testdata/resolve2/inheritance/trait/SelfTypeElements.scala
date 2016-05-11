@@ -8,15 +8,14 @@ trait T1 {
   def f = {}
 }
 
-trait T2 {
-  self: T1 =>
+trait T2 { self: T1 =>
 
-  println(classOf[/* line: 2 */C])
-  println(/* line: 3 */O.getClass)
-  println(classOf[/* line: 4 */A])
-  println(/* */CC.getClass)
-  println(classOf[/* line: 5 */CC])
-  println(/* line: 6 */v1.getClass)
-  println(/* line: 7 */v2.getClass)
-  println(/* line: 8 */f)
+  println(classOf[ /* line: 2 */ C])
+  println( /* line: 3 */ O.getClass)
+  println(classOf[ /* line: 4 */ A])
+  println( /* */ CC.getClass)
+  println(classOf[ /* line: 5 */ CC])
+  println( /* line: 6 */ v1.getClass)
+  println( /* line: 7 */ v2.getClass)
+  println( /* line: 8 */ f)
 }

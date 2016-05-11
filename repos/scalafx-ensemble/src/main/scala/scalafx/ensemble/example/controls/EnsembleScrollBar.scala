@@ -35,7 +35,6 @@ import scalafx.scene.layout.Pane
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Circle, Rectangle}
 
-
 class EnsembleScrollBar extends EnsembleExample {
 
   // @stage-property resizable = false
@@ -48,7 +47,8 @@ class EnsembleScrollBar extends EnsembleExample {
   private val yBarHeight = 393
   private val circleRadius = 90
 
-  val bg = Rectangle(xBarWidth + yBarWidth, xBarHeight + yBarHeight, Color.rgb(90, 90, 90))
+  val bg = Rectangle(
+      xBarWidth + yBarWidth, xBarHeight + yBarHeight, Color.rgb(90, 90, 90))
   val box = new Rectangle {
     width = 100
     height = 100
@@ -78,9 +78,11 @@ class EnsembleScrollBar extends EnsembleExample {
     visibleAmount = 50
     max = xBarWidth - (2 * circleRadius)
     unitIncrement = 20.0
-    value.onChange((_, _, _) => {
-      xScrollValue = value()
-      circle.relocate(xScrollValue, yScrollValue)
+    value.onChange(
+        (_, _, _) =>
+          {
+        xScrollValue = value()
+        circle.relocate(xScrollValue, yScrollValue)
     })
   }
 
@@ -95,15 +97,16 @@ class EnsembleScrollBar extends EnsembleExample {
     unitIncrement = 20.0
     visibleAmount = 50
     max = yBarHeight - (2 * circleRadius)
-    value.onChange((_, _, _) => {
-      yScrollValue = value() + xBarHeight
-      circle.relocate(xScrollValue, yScrollValue)
+    value.onChange(
+        (_, _, _) =>
+          {
+        yScrollValue = value() + xBarHeight
+        circle.relocate(xScrollValue, yScrollValue)
     })
     translateX = yBarHeight
     translateY = yBarWidth
     orientation = Orientation.VERTICAL
   }
-
 
   def getContent = new Pane {
     prefWidth = xBarWidth + yBarWidth

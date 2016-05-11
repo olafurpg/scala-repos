@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
 trait PropSpecGenerator extends ScalaTestTestCase {
   def addPropSpec() {
     addFileToProject("PropSpecTest.scala",
-      """
+                     """
         |import org.scalatest._
         |
         |class PropSpecTest extends PropSpec {
@@ -22,7 +22,6 @@ trait PropSpecGenerator extends ScalaTestTestCase {
         |    print(">>TEST: FAILED<<")
         |  }
         |}
-      """.stripMargin.trim()
-    )
+      """.stripMargin.trim())
   }
 }

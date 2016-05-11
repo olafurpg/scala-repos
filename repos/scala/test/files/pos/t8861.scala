@@ -1,4 +1,3 @@
-
 trait Test {
   type R = PartialFunction[Any, Unit]
 
@@ -6,6 +5,5 @@ trait Test {
   val y: R = { case "" => }
 
   val z: R = x orElse y
-  val zz   = x orElse y
+  val zz = x orElse y
 }
-

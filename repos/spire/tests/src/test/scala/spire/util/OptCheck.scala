@@ -30,13 +30,13 @@ class OptCheck extends FunSuite {
     intercept[NoSuchElementException] { Opt.empty[String].get }
   }
 
-  test("Opt Equality"){
+  test("Opt Equality") {
     import spire.std.boolean._
     val eq = Eq[Opt[Boolean]]
-    assert(eq.eqv(Opt(true) ,Opt(true)))
-    assert(eq.eqv(Opt.empty ,Opt.empty))
-    assert(eq.neqv(Opt.empty ,Opt(true)))
-    assert(eq.neqv(Opt(true) ,Opt.empty))
+    assert(eq.eqv(Opt(true), Opt(true)))
+    assert(eq.eqv(Opt.empty, Opt.empty))
+    assert(eq.neqv(Opt.empty, Opt(true)))
+    assert(eq.neqv(Opt(true), Opt.empty))
   }
 
   test("Opt(value)") {
@@ -95,11 +95,12 @@ class OptCheck extends FunSuite {
     assert(Opt.empty[Int].filter(_ % 2 == 0).isEmpty)
   }
 
-  def parseInt(str: String): Opt[Int] = try {
-    Opt(java.lang.Integer.parseInt(str))
-  } catch {
-    case e: NumberFormatException => Opt.empty[Int]
-  }
+  def parseInt(str: String): Opt[Int] =
+    try {
+      Opt(java.lang.Integer.parseInt(str))
+    } catch {
+      case e: NumberFormatException => Opt.empty[Int]
+    }
 
   test("Opt.map") {
     assertResult(Opt(2))(Opt(1).map(_ * 2))

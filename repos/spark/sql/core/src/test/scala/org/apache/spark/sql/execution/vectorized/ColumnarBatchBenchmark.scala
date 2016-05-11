@@ -30,8 +30,8 @@ import org.apache.spark.util.Benchmark
 import org.apache.spark.util.collection.BitSet
 
 /**
- * Benchmark to low level memory access using different ways to manage buffers.
- */
+  * Benchmark to low level memory access using different ways to manage buffers.
+  */
 object ColumnarBatchBenchmark {
 
   // This benchmark reads and writes an array of ints.
@@ -70,7 +70,8 @@ object ColumnarBatchBenchmark {
         }
         i = 0
         while (i < count) {
-          sum += Platform.getInt(data.array(), Platform.BYTE_ARRAY_OFFSET + i * 4)
+          sum +=
+            Platform.getInt(data.array(), Platform.BYTE_ARRAY_OFFSET + i * 4)
           i += 1
         }
       }
@@ -158,23 +159,26 @@ object ColumnarBatchBenchmark {
     }
 
     // Access through the column API with off heap memory
-    def columnOffHeap = { i: Int => {
-      val col = ColumnVector.allocate(count, IntegerType, MemoryMode.OFF_HEAP)
-      var sum = 0L
-      for (n <- 0L until iters) {
-        var i = 0
-        while (i < count) {
-          col.putInt(i, i)
-          i += 1
+    def columnOffHeap = { i: Int =>
+      {
+        val col =
+          ColumnVector.allocate(count, IntegerType, MemoryMode.OFF_HEAP)
+        var sum = 0L
+        for (n <- 0L until iters) {
+          var i = 0
+          while (i < count) {
+            col.putInt(i, i)
+            i += 1
+          }
+          i = 0
+          while (i < count) {
+            sum += col.getInt(i)
+            i += 1
+          }
         }
-        i = 0
-        while (i < count) {
-          sum += col.getInt(i)
-          i += 1
-        }
+        col.close
       }
-      col.close
-    }}
+    }
 
     // Access by directly getting the buffer backing the column.
     val columnOffheapDirect = { i: Int =>
@@ -277,7 +281,7 @@ object ColumnarBatchBenchmark {
     UnsafeRow (on heap)                 414.6           790.35         0.60 X
     UnsafeRow (off heap)                487.2           672.58         0.51 X
     Column On Heap Append               530.1           618.14         0.59 X
-    */
+     */
     val benchmark = new Benchmark("Int Read/Write", count * iters)
     benchmark.addCase("Java Array")(javaArray)
     benchmark.addCase("ByteBuffer Unsafe")(byteBufferUnsafe)
@@ -296,46 +300,50 @@ object ColumnarBatchBenchmark {
   def booleanAccess(iters: Int): Unit = {
     val count = 8 * 1024
     val benchmark = new Benchmark("Boolean Read/Write", iters * count)
-    benchmark.addCase("Bitset") { i: Int => {
-      val b = new BitSet(count)
-      var sum = 0L
-      for (n <- 0L until iters) {
-        var i = 0
-        while (i < count) {
-          if (i % 2 == 0) b.set(i)
-          i += 1
-        }
-        i = 0
-        while (i < count) {
-          if (b.get(i)) sum += 1
-          i += 1
+    benchmark.addCase("Bitset") { i: Int =>
+      {
+        val b = new BitSet(count)
+        var sum = 0L
+        for (n <- 0L until iters) {
+          var i = 0
+          while (i < count) {
+            if (i % 2 == 0) b.set(i)
+            i += 1
+          }
+          i = 0
+          while (i < count) {
+            if (b.get(i)) sum += 1
+            i += 1
+          }
         }
       }
-    }}
+    }
 
-    benchmark.addCase("Byte Array") { i: Int => {
-      val b = new Array[Byte](count)
-      var sum = 0L
-      for (n <- 0L until iters) {
-        var i = 0
-        while (i < count) {
-          if (i % 2 == 0) b(i) = 1;
-          i += 1
-        }
-        i = 0
-        while (i < count) {
-          if (b(i) == 1) sum += 1
-          i += 1
+    benchmark.addCase("Byte Array") { i: Int =>
+      {
+        val b = new Array[Byte](count)
+        var sum = 0L
+        for (n <- 0L until iters) {
+          var i = 0
+          while (i < count) {
+            if (i % 2 == 0) b(i) = 1;
+            i += 1
+          }
+          i = 0
+          while (i < count) {
+            if (b(i) == 1) sum += 1
+            i += 1
+          }
         }
       }
-    }}
+    }
     /*
     Intel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz
     Boolean Read/Write:          Avg Time(ms)    Avg Rate(M/s)  Relative Rate
     -------------------------------------------------------------------------
     Bitset                             895.88           374.54         1.00 X
     Byte Array                         578.96           579.56         1.55 X
-    */
+     */
     benchmark.run()
   }
 
@@ -358,8 +366,10 @@ object ColumnarBatchBenchmark {
     val maxString = 32
     val count = 4 * 1000
 
-    val data = Seq.fill(count)(randomString(minString, maxString))
-      .map(_.getBytes(StandardCharsets.UTF_8)).toArray
+    val data = Seq
+      .fill(count)(randomString(minString, maxString))
+      .map(_.getBytes(StandardCharsets.UTF_8))
+      .toArray
 
     def column(memoryMode: MemoryMode) = { i: Int =>
       val column = ColumnVector.allocate(count, BinaryType, memoryMode)
@@ -384,7 +394,7 @@ object ColumnarBatchBenchmark {
     -------------------------------------------------------------------------------------
     On Heap                                         457.0            35.85         1.00 X
     Off Heap                                       1206.0            13.59         0.38 X
-    */
+     */
     val benchmark = new Benchmark("String Read/Write", count * iters)
     benchmark.addCase("On Heap")(column(MemoryMode.ON_HEAP))
     benchmark.addCase("Off Heap")(column(MemoryMode.OFF_HEAP))

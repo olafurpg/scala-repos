@@ -4,6 +4,6 @@ class A {
   def x = 1
 
   def moo() {
-    new B(/* line: 2 */x = 1)
+    new B( /* line: 2 */ x = 1)
   }
 }

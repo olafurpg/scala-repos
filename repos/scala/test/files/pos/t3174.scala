@@ -11,4 +11,4 @@ object test {
     }
     new Foo
   }
- }
+}

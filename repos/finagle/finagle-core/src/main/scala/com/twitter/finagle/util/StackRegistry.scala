@@ -7,15 +7,18 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.language.existentials
 
 object StackRegistry {
+
   /**
-   * Represents an entry in the registry.
-   */
+    * Represents an entry in the registry.
+    */
   case class Entry(addr: String, stack: Stack[_], params: Stack.Params) {
     // Introspect the entries stack and params. We limit the
     // reflection of params to case classes.
     // TODO: we might be able to make this avoid reflection with Showable
     val modules: Seq[Module] = stack.tails.map { node =>
-      val raw = node.head.parameters.map { p => params(p) }
+      val raw = node.head.parameters.map { p =>
+        params(p)
+      }
       val reflected = raw.foldLeft(Seq.empty[(String, String)]) {
         case (seq, p: Product) =>
           // TODO: many case classes have a $outer field because they close over an outside scope.
@@ -34,17 +37,18 @@ object StackRegistry {
   }
 
   /**
-   * The module describing a given Param for a Stack element.
-   */
-  case class Module(name: String, description: String, fields: Seq[(String, String)])
+    * The module describing a given Param for a Stack element.
+    */
+  case class Module(
+      name: String, description: String, fields: Seq[(String, String)])
 }
 
 /**
- * A registry that allows the registration of a string identifier with a
- * a [[com.twitter.finagle.Stack]] and its params. This is especially useful
- * in keeping a process global registry of Finagle clients and servers for
- * dynamic introspection.
- */
+  * A registry that allows the registration of a string identifier with a
+  * a [[com.twitter.finagle.Stack]] and its params. This is especially useful
+  * in keeping a process global registry of Finagle clients and servers for
+  * dynamic introspection.
+  */
 trait StackRegistry {
   import StackRegistry._
 
@@ -61,8 +65,8 @@ trait StackRegistry {
     Map.empty[String, Seq[Entry]]
 
   /**
-   * Returns any registered [[Entry Entries]] that had the same [[Label]].
-   */
+    * Returns any registered [[Entry Entries]] that had the same [[Label]].
+    */
   def registeredDuplicates: Seq[Entry] = synchronized {
     duplicates.values.flatten.toSeq
   }
@@ -89,8 +93,7 @@ trait StackRegistry {
     synchronized {
       duplicates.get(entry.name) match {
         case Some(dups) =>
-          if (dups.size == 1)
-            duplicates -= entry.name
+          if (dups.size == 1) duplicates -= entry.name
           else
             // We may not remove the exact same entry, but since they are duplicates,
             // it does not matter.
@@ -105,24 +108,36 @@ trait StackRegistry {
 
   private[this] def addEntries(entry: Entry): Unit = {
     val gRegistry = GlobalRegistry.get
-    entry.modules.foreach { case Module(paramName, _, reflected) =>
-      reflected.foreach { case (field, value) =>
-        val key = Seq(registryName, entry.protocolLibrary, entry.name, entry.addr, paramName, field)
-        if (gRegistry.put(key, value).isEmpty)
-          numEntries.incrementAndGet()
-      }
+    entry.modules.foreach {
+      case Module(paramName, _, reflected) =>
+        reflected.foreach {
+          case (field, value) =>
+            val key = Seq(registryName,
+                          entry.protocolLibrary,
+                          entry.name,
+                          entry.addr,
+                          paramName,
+                          field)
+            if (gRegistry.put(key, value).isEmpty) numEntries.incrementAndGet()
+        }
     }
   }
 
   private[this] def removeEntries(entry: Entry): Unit = {
     val gRegistry = GlobalRegistry.get
     val name = entry.name
-    entry.modules.foreach { case Module(paramName, _, reflected) =>
-      reflected.foreach { case (field, value) =>
-        val key = Seq(registryName, entry.protocolLibrary, name, entry.addr, paramName, field)
-        if (gRegistry.remove(key).isDefined)
-          numEntries.decrementAndGet()
-      }
+    entry.modules.foreach {
+      case Module(paramName, _, reflected) =>
+        reflected.foreach {
+          case (field, value) =>
+            val key = Seq(registryName,
+                          entry.protocolLibrary,
+                          name,
+                          entry.addr,
+                          paramName,
+                          field)
+            if (gRegistry.remove(key).isDefined) numEntries.decrementAndGet()
+        }
     }
   }
 

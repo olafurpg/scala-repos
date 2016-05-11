@@ -22,18 +22,18 @@ import org.apache.spark.storage.ShuffleBlockId
 
 private[spark]
 /**
- * Implementers of this trait understand how to retrieve block data for a logical shuffle block
- * identifier (i.e. map, reduce, and shuffle). Implementations may use files or file segments to
- * encapsulate shuffle data. This is used by the BlockStore to abstract over different shuffle
- * implementations when shuffle data is retrieved.
- */
+  * Implementers of this trait understand how to retrieve block data for a logical shuffle block
+  * identifier (i.e. map, reduce, and shuffle). Implementations may use files or file segments to
+  * encapsulate shuffle data. This is used by the BlockStore to abstract over different shuffle
+  * implementations when shuffle data is retrieved.
+  */
 trait ShuffleBlockResolver {
   type ShuffleId = Int
 
   /**
-   * Retrieve the data for the specified block. If the data for that block is not available,
-   * throws an unspecified exception.
-   */
+    * Retrieve the data for the specified block. If the data for that block is not available,
+    * throws an unspecified exception.
+    */
   def getBlockData(blockId: ShuffleBlockId): ManagedBuffer
 
   def stop(): Unit

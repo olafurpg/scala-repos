@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import akka.NotUsed
@@ -20,7 +20,8 @@ class FlowCompileSpec extends AkkaSpec {
 
   import scala.concurrent.ExecutionContext.Implicits.global
   val intFut = Source.fromFuture(Future { 3 })
-  implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system))
+  implicit val materializer = ActorMaterializer(
+      ActorMaterializerSettings(system))
 
   "Flow" should {
     "not run" in {
@@ -50,7 +51,8 @@ class FlowCompileSpec extends AkkaSpec {
     }
     "append Sink" in {
       val open: Flow[Int, String, _] = Flow[Int].map(_.toString)
-      val closedSink: Sink[String, _] = Flow[String].map(_.hashCode).to(Sink.asPublisher[Int](false))
+      val closedSink: Sink[String, _] =
+        Flow[String].map(_.hashCode).to(Sink.asPublisher[Int](false))
       val appended: Sink[Int, _] = open.to(closedSink)
       "appended.run()" shouldNot compile
       "appended.to(Sink.head[Int])" shouldNot compile
@@ -58,7 +60,8 @@ class FlowCompileSpec extends AkkaSpec {
     }
     "be appended to Source" in {
       val open: Flow[Int, String, _] = Flow[Int].map(_.toString)
-      val closedSource: Source[Int, _] = strSeq.via(Flow[String].map(_.hashCode))
+      val closedSource: Source[Int, _] =
+        strSeq.via(Flow[String].map(_.hashCode))
       val closedSource2: Source[String, _] = closedSource.via(open)
       "closedSource2.run()" shouldNot compile
       "strSeq.to(closedSource2)" shouldNot compile
@@ -81,8 +84,7 @@ class FlowCompileSpec extends AkkaSpec {
   }
 
   "Source" should {
-    val openSource: Source[String, _] =
-      Source(Seq(1, 2, 3)).map(_.toString)
+    val openSource: Source[String, _] = Source(Seq(1, 2, 3)).map(_.toString)
     "accept Sink" in {
       openSource.to(Sink.asPublisher[String](false))
     }
@@ -96,8 +98,9 @@ class FlowCompileSpec extends AkkaSpec {
 
   "RunnableGraph" should {
     Sink.head[String]
-    val closed: RunnableGraph[Publisher[String]] =
-      Source(Seq(1, 2, 3)).map(_.toString).toMat(Sink.asPublisher[String](false))(Keep.right)
+    val closed: RunnableGraph[Publisher[String]] = Source(Seq(1, 2, 3))
+      .map(_.toString)
+      .toMat(Sink.asPublisher[String](false))(Keep.right)
     "run" in {
       closed.run()
     }
@@ -112,14 +115,16 @@ class FlowCompileSpec extends AkkaSpec {
 
   "FlowOps" should {
     "be extensible" in {
-      val f: FlowOps[Int, NotUsed] { type Closed = Sink[Int, NotUsed] } = Flow[Int]
+      val f: FlowOps[Int, NotUsed] { type Closed = Sink[Int, NotUsed] } =
+        Flow[Int]
       val fm = f.map(identity)
       val f2: FlowOps[Int, NotUsed] = fm
       val s: Sink[Int, NotUsed] = fm.to(Sink.ignore)
     }
 
     "be extensible (with MaterializedValue)" in {
-      val f: FlowOpsMat[Int, NotUsed] { type ClosedMat[+M] = Sink[Int, M] } = Flow[Int]
+      val f: FlowOpsMat[Int, NotUsed] { type ClosedMat[+M] = Sink[Int, M] } =
+        Flow[Int]
       val fm = f.map(identity).concatMat(Source.empty)(Keep.both)
       // this asserts only the FlowOpsMat part of the signature, but fm also carries the
       // CloseMat type without which `.to(sink)` does not work

@@ -1,7 +1,7 @@
 package a.b
 
 /** Declaring "override" all the time.
- */
+  */
 class S1 extends J {
   override private[b] def packageAbstract() = ()
   override protected[b] def protectedAbstract() = ()
@@ -13,7 +13,7 @@ class S1 extends J {
 }
 
 /** Implementing abstracts.
- */
+  */
 class S2 extends J {
   private[b] def packageAbstract() = ()
   protected[b] def protectedAbstract() = ()
@@ -21,7 +21,7 @@ class S2 extends J {
 }
 
 /** Widening access.
- */
+  */
 class S3 extends J {
   protected[b] def packageAbstract() = ()
   protected[b] def protectedAbstract() = ()
@@ -31,8 +31,9 @@ class S3 extends J {
   override protected[b] def protectedConcrete() = ()
   override def publicConcrete() = ()
 }
+
 /** More widening.
- */
+  */
 class S4 extends J {
   private[a] def packageAbstract() = ()
   protected[a] def protectedAbstract() = ()
@@ -42,8 +43,9 @@ class S4 extends J {
   override protected[a] def protectedConcrete() = ()
   override def publicConcrete() = ()
 }
+
 /** Yet more widening.
- */
+  */
 class S5 extends J {
   def packageAbstract() = ()
   def protectedAbstract() = ()
@@ -53,8 +55,9 @@ class S5 extends J {
   override def protectedConcrete() = ()
   override def publicConcrete() = ()
 }
+
 /** Constructors.
- */
+  */
 class S6 extends J(1) {
   def packageAbstract() = ()
   def protectedAbstract() = ()

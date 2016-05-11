@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import org.specs2.mutable._
@@ -43,8 +42,8 @@ class DataMapSpec extends Specification {
     }
 
     "get List of Int data" in {
-      properties.get[List[Int]]("prop3") must beEqualTo(List(1,2,3))
-      properties.getOpt[List[Int]]("prop3") must beEqualTo(Some(List(1,2,3)))
+      properties.get[List[Int]]("prop3") must beEqualTo(List(1, 2, 3))
+      properties.getOpt[List[Int]]("prop3") must beEqualTo(Some(List(1, 2, 3)))
     }
 
     "get Boolean data" in {
@@ -53,13 +52,16 @@ class DataMapSpec extends Specification {
     }
 
     "get List of String data" in {
-      properties.get[List[String]]("prop5") must beEqualTo(List("a", "b", "c", "c"))
-      properties.getOpt[List[String]]("prop5") must beEqualTo(Some(List("a", "b", "c", "c")))
+      properties.get[List[String]]("prop5") must beEqualTo(
+          List("a", "b", "c", "c"))
+      properties.getOpt[List[String]]("prop5") must beEqualTo(
+          Some(List("a", "b", "c", "c")))
     }
 
     "get Set of String data" in {
       properties.get[Set[String]]("prop5") must beEqualTo(Set("a", "b", "c"))
-      properties.getOpt[Set[String]]("prop5") must beEqualTo(Some(Set("a", "b", "c")))
+      properties.getOpt[Set[String]]("prop5") must beEqualTo(
+          Some(Set("a", "b", "c")))
     }
 
     "get Double data" in {
@@ -70,7 +72,6 @@ class DataMapSpec extends Specification {
     "get empty optional Int data" in {
       properties.getOpt[Int]("prop9999") must beEqualTo(None)
     }
-
   }
 
   "DataMap with multi-level data" should {
@@ -89,11 +90,11 @@ class DataMapSpec extends Specification {
 
     "get case class data" in {
       val expected = DataMapSpec.Context(
-        ip = "1.23.4.56",
-        prop1 = Some(2.345),
-        prop2 = Some("value1"),
-        prop3 = None,
-        prop4 = List(1,2,3)
+          ip = "1.23.4.56",
+          prop1 = Some(2.345),
+          prop2 = Some("value1"),
+          prop3 = None,
+          prop4 = List(1, 2, 3)
       )
 
       properties.get[DataMapSpec.Context]("context") must beEqualTo(expected)
@@ -128,12 +129,12 @@ class DataMapSpec extends Specification {
 
       val result = properties.extract[DataMapSpec.BasicProperty]
       val expected = DataMapSpec.BasicProperty(
-        prop1 = 1,
-        prop2 = "value2",
-        prop3 = List(1,2,3),
-        prop4 = true,
-        prop5 = List("a", "b", "c", "c"),
-        prop6 = 4.56
+          prop1 = 1,
+          prop2 = "value2",
+          prop3 = List(1, 2, 3),
+          prop4 = true,
+          prop5 = List("a", "b", "c", "c"),
+          prop6 = 4.56
       )
 
       result must beEqualTo(expected)
@@ -151,22 +152,22 @@ class DataMapSpec extends Specification {
 
       val resultEmpty = propertiesEmpty.extract[DataMapSpec.OptionProperty]
       val expectedEmpty = DataMapSpec.OptionProperty(
-        prop1 = None,
-        prop2 = None,
-        prop3 = None,
-        prop4 = None,
-        prop5 = None,
-        prop6 = None
+          prop1 = None,
+          prop2 = None,
+          prop3 = None,
+          prop4 = None,
+          prop5 = None,
+          prop6 = None
       )
 
       val resultSome = propertiesSome.extract[DataMapSpec.OptionProperty]
       val expectedSome = DataMapSpec.OptionProperty(
-        prop1 = Some(1),
-        prop2 = None,
-        prop3 = None,
-        prop4 = None,
-        prop5 = Some(List("a", "b", "c", "c")),
-        prop6 = Some(4.56)
+          prop1 = Some(1),
+          prop2 = None,
+          prop3 = None,
+          prop4 = None,
+          prop5 = Some(List("a", "b", "c", "c")),
+          prop6 = Some(4.56)
       )
 
       resultEmpty must beEqualTo(expectedEmpty)
@@ -189,20 +190,19 @@ class DataMapSpec extends Specification {
 
       val result = properties.extract[DataMapSpec.MultiLevelProperty]
       val expected = DataMapSpec.MultiLevelProperty(
-        context = DataMapSpec.Context(
-          ip = "1.23.4.56",
-          prop1 = Some(2.345),
-          prop2 = Some("value1"),
-          prop3 = None,
-          prop4 = List(1,2,3)
-        ),
-        anotherPropertyA = 4.567,
-        anotherPropertyB = false
+          context = DataMapSpec.Context(
+                ip = "1.23.4.56",
+                prop1 = Some(2.345),
+                prop2 = Some("value1"),
+                prop3 = None,
+                prop4 = List(1, 2, 3)
+            ),
+          anotherPropertyA = 4.567,
+          anotherPropertyB = false
       )
 
       result must beEqualTo(expected)
     }
-
   }
 }
 
@@ -210,34 +210,34 @@ object DataMapSpec {
 
   // define this case class inside object to avoid case class name conflict with other tests
   case class Context(
-    ip: String,
-    prop1: Option[Double],
-    prop2: Option[String],
-    prop3: Option[Int],
-    prop4: List[Int]
+      ip: String,
+      prop1: Option[Double],
+      prop2: Option[String],
+      prop3: Option[Int],
+      prop4: List[Int]
   )
 
   case class BasicProperty(
-    prop1: Int,
-    prop2: String,
-    prop3: List[Int],
-    prop4: Boolean,
-    prop5: List[String],
-    prop6: Double
+      prop1: Int,
+      prop2: String,
+      prop3: List[Int],
+      prop4: Boolean,
+      prop5: List[String],
+      prop6: Double
   )
 
   case class OptionProperty(
-    prop1: Option[Int],
-    prop2: Option[String],
-    prop3: Option[List[Int]],
-    prop4: Option[Boolean],
-    prop5: Option[List[String]],
-    prop6: Option[Double]
+      prop1: Option[Int],
+      prop2: Option[String],
+      prop3: Option[List[Int]],
+      prop4: Option[Boolean],
+      prop5: Option[List[String]],
+      prop6: Option[Double]
   )
 
   case class MultiLevelProperty(
-    context: Context,
-    anotherPropertyA: Double,
-    anotherPropertyB: Boolean
+      context: Context,
+      anotherPropertyA: Double,
+      anotherPropertyB: Boolean
   )
 }

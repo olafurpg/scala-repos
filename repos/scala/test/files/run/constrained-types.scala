@@ -7,7 +7,8 @@ import scala.tools.nsc.Settings
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  def code = """
+  def code =
+    """
 
 class Annot(obj: Any) extends annotation.Annotation with annotation.TypeConstraint
 

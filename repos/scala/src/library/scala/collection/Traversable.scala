@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -14,20 +14,19 @@ import mutable.Builder
 import scala.util.control.Breaks
 
 /** A trait for traversable collections.
- *  All operations are guaranteed to be performed in a single-threaded manner.
- *
- *  $traversableInfo
- */
-trait Traversable[+A] extends TraversableLike[A, Traversable[A]]
-                         with GenTraversable[A]
-                         with TraversableOnce[A]
-                         with GenericTraversableTemplate[A, Traversable] {
+  *  All operations are guaranteed to be performed in a single-threaded manner.
+  *
+  *  $traversableInfo
+  */
+trait Traversable[+A]
+    extends TraversableLike[A, Traversable[A]] with GenTraversable[A]
+    with TraversableOnce[A] with GenericTraversableTemplate[A, Traversable] {
   override def companion: GenericCompanion[Traversable] = Traversable
 
   override def seq: Traversable[A] = this
 
   /* The following methods are inherited from TraversableLike
-   *
+ *
   override def isEmpty: Boolean
   override def size: Int
   override def hasDefiniteSize
@@ -83,21 +82,23 @@ trait Traversable[+A] extends TraversableLike[A, Traversable[A]]
   override def stringPrefix : String
   override def view
   override def view(from: Int, until: Int): TraversableView[A, Traversable[A]]
-  */
+ */
 }
 
 /** $factoryInfo
- *  The current default implementation of a $Coll is a `List`.
- */
+  *  The current default implementation of a $Coll is a `List`.
+  */
 object Traversable extends TraversableFactory[Traversable] { self =>
 
   /** Provides break functionality separate from client code */
   private[collection] val breaks: Breaks = new Breaks
 
   /** $genericCanBuildFromInfo */
-  implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Traversable[A]] = ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
+  implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Traversable[A]] =
+    ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 
-  def newBuilder[A]: Builder[A, Traversable[A]] = immutable.Traversable.newBuilder[A]
+  def newBuilder[A]: Builder[A, Traversable[A]] =
+    immutable.Traversable.newBuilder[A]
 }
 
 /** Explicit instantiation of the `Traversable` trait to reduce class file size in subclasses. */

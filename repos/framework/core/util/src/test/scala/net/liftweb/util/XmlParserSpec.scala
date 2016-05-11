@@ -24,22 +24,19 @@ import xml.{Text, Unparsed}
 import org.specs2.matcher.XmlMatchers
 import org.specs2.mutable.Specification
 
-
 /**
- * Systems under specification for XmlParser, specifically PCDataMarkupParser.
- */
+  * Systems under specification for XmlParser, specifically PCDataMarkupParser.
+  */
 object XmlParserSpec extends Specification with XmlMatchers {
   "Xml Parser Specification".title
 
   "Multiple attributes with same name, but different namespace" should {
     "parse correctly" >> {
-      val actual =
-      <lift:surround with="base" at="body">
+      val actual = <lift:surround with="base" at="body">
         <lift:Menu.builder  li_path:class="p" li_item:class="i"/>
       </lift:surround>
 
-      val expected =
-      <lift:surround with="base" at="body">
+      val expected = <lift:surround with="base" at="body">
         <lift:Menu.builder  li_path:class="p" li_item:class="i"/>
       </lift:surround>
 
@@ -47,7 +44,6 @@ object XmlParserSpec extends Specification with XmlMatchers {
       val parsed = PCDataXmlParser(bis).openOrThrowException("Test")
       parsed must ==/(expected)
     }
-
   }
 
   "XML can contain PCData" in {
@@ -71,8 +67,7 @@ object XmlParserSpec extends Specification with XmlMatchers {
   }
 
   "XML cannot contain Control characters" in {
-     val data = 
-     <foo>
+    val data = <foo>
       {
         '\u0085'
       }{
@@ -98,6 +93,4 @@ object XmlParserSpec extends Specification with XmlMatchers {
 
     str.toList.foldLeft(0)((a, b) => a + cntIllegal(b)) must_== 0
   }
-
 }
-

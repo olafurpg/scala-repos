@@ -32,15 +32,16 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
- * Nikolay.Tropin
- * 5/6/13
- */
+  * Nikolay.Tropin
+  * 5/6/13
+  */
 object TypeCheckCanBeMatchInspection {
   val inspectionId = "TypeCheckCanBeMatch"
   val inspectionName = "Type check can be replaced by pattern matching"
 }
 
-class TypeCheckCanBeMatchInspection extends AbstractInspection(inspectionId, inspectionName){
+class TypeCheckCanBeMatchInspection
+    extends AbstractInspection(inspectionId, inspectionName) {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case IsInstanceOfCall(call) =>
@@ -48,31 +49,43 @@ class TypeCheckCanBeMatchInspection extends AbstractInspection(inspectionId, ins
         ifStmt <- Option(PsiTreeUtil.getParentOfType(call, classOf[ScIfStmt]))
         condition <- ifStmt.condition
         iioCall <- findIsInstanceOfCalls(condition, onlyFirst = true)
-        if iioCall == call
-        if typeCheckIsUsedEnough(ifStmt, call)
+                      if iioCall == call
+                  if typeCheckIsUsedEnough(ifStmt, call)
       } {
         val fix = new TypeCheckCanBeMatchQuickFix(call, ifStmt)
-        holder.registerProblem(call, inspectionName, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, fix)
+        holder.registerProblem(call,
+                               inspectionName,
+                               ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                               fix)
       }
   }
 
-  private def typeCheckIsUsedEnough (ifStmt: ScIfStmt, isInstOf: ScGenericCall): Boolean = {
-    val chainSize = listOfIfAndIsInstOf(ifStmt, isInstOf, onlyFirst = true).size
-    val typeCastsNumber = findAsInstOfCalls(ifStmt.condition, isInstOf).size + findAsInstOfCalls(ifStmt.thenBranch, isInstOf).size
+  private def typeCheckIsUsedEnough(
+      ifStmt: ScIfStmt, isInstOf: ScGenericCall): Boolean = {
+    val chainSize =
+      listOfIfAndIsInstOf(ifStmt, isInstOf, onlyFirst = true).size
+    val typeCastsNumber =
+      findAsInstOfCalls(ifStmt.condition, isInstOf).size + findAsInstOfCalls(
+          ifStmt.thenBranch, isInstOf).size
     chainSize > 1 || typeCastsNumber > 0
   }
 }
 
-class TypeCheckCanBeMatchQuickFix(isInstOfUnderFix: ScGenericCall, ifStmt: ScIfStmt)
-        extends AbstractFixOnTwoPsiElements(inspectionName, isInstOfUnderFix, ifStmt) {
+class TypeCheckCanBeMatchQuickFix(
+    isInstOfUnderFix: ScGenericCall, ifStmt: ScIfStmt)
+    extends AbstractFixOnTwoPsiElements(
+        inspectionName, isInstOfUnderFix, ifStmt) {
   def doApplyFix(project: Project) {
     val isInstOf = getFirstElement
     val ifSt = getSecondElement
     if (!ifSt.isValid || !isInstOf.isValid) return
-    val (matchStmtOption, renameData) = buildMatchStmt(ifSt, isInstOf, onlyFirst = true)
+    val (matchStmtOption, renameData) = buildMatchStmt(
+        ifSt, isInstOf, onlyFirst = true)
     for (matchStmt <- matchStmtOption) {
       val newMatch = inWriteAction {
-        ifSt.replaceExpression(matchStmt, removeParenthesis = true).asInstanceOf[ScMatchStmt]
+        ifSt
+          .replaceExpression(matchStmt, removeParenthesis = true)
+          .asInstanceOf[ScMatchStmt]
       }
       if (!ApplicationManager.getApplication.isUnitTestMode) {
         val renameHelper = new InplaceRenameHelper(newMatch)
@@ -86,32 +99,44 @@ class TypeCheckCanBeMatchQuickFix(isInstOfUnderFix: ScGenericCall, ifStmt: ScIfS
 object TypeCheckToMatchUtil {
   type RenameData = collection.mutable.ArrayBuffer[(Int, Seq[String])]
 
-  def buildMatchStmt(ifStmt: ScIfStmt, isInstOfUnderFix: ScGenericCall, onlyFirst: Boolean): (Option[ScMatchStmt], RenameData) = {
+  def buildMatchStmt(ifStmt: ScIfStmt,
+                     isInstOfUnderFix: ScGenericCall,
+                     onlyFirst: Boolean): (Option[ScMatchStmt], RenameData) = {
     baseExpr(isInstOfUnderFix) match {
       case Some(expr: ScExpression) =>
         val matchedExprText = expr.getText
-        val (caseClausesText, renameData) = buildCaseClausesText(ifStmt, isInstOfUnderFix, onlyFirst)
-        val matchStmtText = s"$matchedExprText match { \n " + caseClausesText + "}"
-        val matchStmt = ScalaPsiElementFactory.createExpressionFromText(matchStmtText, ifStmt.getManager).asInstanceOf[ScMatchStmt]
-        (Some(matchStmt), renameData)
+        val (caseClausesText, renameData) = buildCaseClausesText(
+            ifStmt, isInstOfUnderFix, onlyFirst)
+        val matchStmtText =
+          s"$matchedExprText match { \n " + caseClausesText + "}"
+        val matchStmt = ScalaPsiElementFactory
+          .createExpressionFromText(matchStmtText, ifStmt.getManager)
+          .asInstanceOf[ScMatchStmt]
+          (Some(matchStmt), renameData)
       case _ => (None, null)
     }
   }
 
-  private def buildCaseClauseText(ifStmt: ScIfStmt, isInstOf: ScGenericCall, caseClauseIndex: Int, renameData: RenameData): Option[String] = {
+  private def buildCaseClauseText(ifStmt: ScIfStmt,
+                                  isInstOf: ScGenericCall,
+                                  caseClauseIndex: Int,
+                                  renameData: RenameData): Option[String] = {
     var definedName: Option[String] = None
     var definition: Option[ScPatternDefinition] = None
 
     //method for finding and saving named type cast
     def checkAndStoreNameAndDef(asInstOfCall: ScGenericCall): Boolean = {
-      ScalaPsiUtil.getContextOfType(asInstOfCall, strict = true, classOf[ScPatternDefinition]) match {
+      ScalaPsiUtil.getContextOfType(
+          asInstOfCall, strict = true, classOf[ScPatternDefinition]) match {
         case patternDef: ScPatternDefinition =>
           val bindings = patternDef.bindings
           //pattern consist of one assignment of asInstanceOf call
           if (bindings.size == 1 && patternDef.expr.get == asInstOfCall) {
             definition match {
               //store first occurence of pattern definition and name
-              case Some(oldDef) if oldDef.getTextOffset < patternDef.getTextOffset => true
+              case Some(oldDef)
+                  if oldDef.getTextOffset < patternDef.getTextOffset =>
+                true
               case _ =>
                 definedName = Some(bindings.head.getName)
                 definition = Some(patternDef)
@@ -128,8 +153,7 @@ object TypeCheckToMatchUtil {
 
     for {
       args <- isInstOf.typeArgs
-      condition <- ifStmt.condition
-      if args.typeArgs.size == 1
+      condition <- ifStmt.condition if args.typeArgs.size == 1
     } yield {
       val typeElem = args.typeArgs.head
       val typeName0 = typeElem.getText
@@ -144,22 +168,35 @@ object TypeCheckToMatchUtil {
       if (asInstOfInBody.count(checkAndStoreNameAndDef) == 0) {
         //no usage of asInstanceOf
         if (asInstOfEverywhere.isEmpty) {
-          buildCaseClauseText("_ : " + typeName, guardCond, ifStmt.thenBranch, ifStmt.getProject)
+          buildCaseClauseText("_ : " + typeName,
+                              guardCond,
+                              ifStmt.thenBranch,
+                              ifStmt.getProject)
         }
         //no named usage
         else {
-          val suggestedNames: Array[String] = NameSuggester.suggestNames(asInstOfEverywhere.head,
-            new ScalaVariableValidator(null, ifStmt.getProject, ifStmt, false, ifStmt.getParent, ifStmt.getParent))
+          val suggestedNames: Array[String] = NameSuggester.suggestNames(
+              asInstOfEverywhere.head,
+              new ScalaVariableValidator(null,
+                                         ifStmt.getProject,
+                                         ifStmt,
+                                         false,
+                                         ifStmt.getParent,
+                                         ifStmt.getParent))
           val name = suggestedNames(0)
           asInstOfEverywhere.foreach { c =>
-            val newExpr = ScalaPsiElementFactory.createExpressionFromText(name, ifStmt.getManager)
+            val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+                name, ifStmt.getManager)
             inWriteAction {
               c.replaceExpression(newExpr, removeParenthesis = true)
             }
           }
 
           renameData += ((caseClauseIndex, suggestedNames.toSeq))
-          buildCaseClauseText(s"$name : $typeName", guardCond, ifStmt.thenBranch, ifStmt.getProject)
+          buildCaseClauseText(s"$name : $typeName",
+                              guardCond,
+                              ifStmt.thenBranch,
+                              ifStmt.getProject)
         }
       }
       //have named usage, use this name in case clause pattern definition
@@ -170,21 +207,29 @@ object TypeCheckToMatchUtil {
           patternDef.delete()
         }
         val name = definedName.get
-        val newExpr = ScalaPsiElementFactory.createExpressionFromText(name, ifStmt.getManager)
+        val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+            name, ifStmt.getManager)
         inWriteAction {
-          asInstOfEverywhere.foreach(_.replaceExpression(newExpr, removeParenthesis = true))
+          asInstOfEverywhere.foreach(
+              _.replaceExpression(newExpr, removeParenthesis = true))
         }
-        buildCaseClauseText(s"$name : $typeName", guardCond, ifStmt.thenBranch, ifStmt.getProject)
+        buildCaseClauseText(s"$name : $typeName",
+                            guardCond,
+                            ifStmt.thenBranch,
+                            ifStmt.getProject)
       }
     }
   }
 
-  private def buildDefaultCaseClauseText(body: Option[ScExpression], project: Project): Option[String] =  {
+  private def buildDefaultCaseClauseText(
+      body: Option[ScExpression], project: Project): Option[String] = {
     Some(buildCaseClauseText("_ ", None, body, project))
   }
 
-  private def buildCaseClauseText(patternText: String, guardCondition: Option[ScExpression],
-                                  body: Option[ScExpression], project: Project): String = {
+  private def buildCaseClauseText(patternText: String,
+                                  guardCondition: Option[ScExpression],
+                                  body: Option[ScExpression],
+                                  project: Project): String = {
     val builder = new StringBuilder
     builder.append("case ").append(patternText)
     guardCondition.map(cond => builder.append(" if " + cond.getText))
@@ -194,7 +239,8 @@ object TypeCheckToMatchUtil {
       case Some(block: ScBlock) =>
         for (elem <- block.children) {
           val elementType: IElementType = elem.getNode.getElementType
-          if (elementType != ScalaTokenTypes.tLBRACE && elementType != ScalaTokenTypes.tRBRACE)
+          if (elementType != ScalaTokenTypes.tLBRACE &&
+              elementType != ScalaTokenTypes.tRBRACE)
             builder.append(elem.getText)
         }
       case Some(expr: ScExpression) => builder.append(expr.getText)
@@ -204,17 +250,20 @@ object TypeCheckToMatchUtil {
     builder.toString()
   }
 
-  def listOfIfAndIsInstOf(currentIfStmt: ScIfStmt, currentCall: ScGenericCall, onlyFirst: Boolean): List[(ScIfStmt, ScGenericCall)] = {
+  def listOfIfAndIsInstOf(
+      currentIfStmt: ScIfStmt,
+      currentCall: ScGenericCall,
+      onlyFirst: Boolean): List[(ScIfStmt, ScGenericCall)] = {
     for (currentBase <- baseExpr(currentCall)) {
       currentIfStmt.elseBranch match {
         case Some(nextIfStmt: ScIfStmt) =>
           for {
             nextCond <- nextIfStmt.condition
             nextCall <- findIsInstanceOfCalls(nextCond, onlyFirst)
-            nextBase <- baseExpr(nextCall)
-            if equiv(currentBase, nextBase)
+            nextBase <- baseExpr(nextCall) if equiv(currentBase, nextBase)
           } {
-            return (currentIfStmt, currentCall) :: listOfIfAndIsInstOf(nextIfStmt, nextCall, onlyFirst)
+            return (currentIfStmt, currentCall) :: listOfIfAndIsInstOf(
+                nextIfStmt, nextCall, onlyFirst)
           }
           return (currentIfStmt, currentCall) :: Nil
         case _ => return (currentIfStmt, currentCall) :: Nil
@@ -223,22 +272,28 @@ object TypeCheckToMatchUtil {
     Nil
   }
 
-  private def buildCaseClausesText(ifStmt: ScIfStmt, isInstOfUnderFix: ScGenericCall, onlyFirst: Boolean): (String, RenameData) = {
+  private def buildCaseClausesText(
+      ifStmt: ScIfStmt,
+      isInstOfUnderFix: ScGenericCall,
+      onlyFirst: Boolean): (String, RenameData) = {
 
     val builder = new StringBuilder
-    val (ifStmts, isInstOf) = listOfIfAndIsInstOf(ifStmt, isInstOfUnderFix, onlyFirst).unzip
+    val (ifStmts, isInstOf) = listOfIfAndIsInstOf(
+        ifStmt, isInstOfUnderFix, onlyFirst).unzip
 
     val renameData = new RenameData()
     for {
       index <- ifStmts.indices
-      text <- buildCaseClauseText(ifStmts(index), isInstOf(index), index, renameData)
+      text <- buildCaseClauseText(
+          ifStmts(index), isInstOf(index), index, renameData)
     } {
       builder.append(text)
     }
 
     if (ifStmts != Nil) {
       val lastElse = ifStmts.last.elseBranch
-      val defaultText: Option[String] = buildDefaultCaseClauseText(lastElse, ifStmt.getProject)
+      val defaultText: Option[String] = buildDefaultCaseClauseText(
+          lastElse, ifStmt.getProject)
       defaultText.foreach(builder.append)
     }
 
@@ -246,21 +301,26 @@ object TypeCheckToMatchUtil {
   }
 
   @tailrec
-  def findIsInstanceOfCalls(condition: ScExpression, onlyFirst: Boolean): List[ScGenericCall] = {
+  def findIsInstanceOfCalls(
+      condition: ScExpression, onlyFirst: Boolean): List[ScGenericCall] = {
     if (onlyFirst) {
       condition match {
         case IsInstanceOfCall(call) => List(call)
-        case infixExpr: ScInfixExpr if infixExpr.operation.refName == "&&" => findIsInstanceOfCalls(infixExpr.lOp, onlyFirst)
-        case parenth: ScParenthesisedExpr => findIsInstanceOfCalls(parenth.expr.orNull, onlyFirst)
+        case infixExpr: ScInfixExpr if infixExpr.operation.refName == "&&" =>
+          findIsInstanceOfCalls(infixExpr.lOp, onlyFirst)
+        case parenth: ScParenthesisedExpr =>
+          findIsInstanceOfCalls(parenth.expr.orNull, onlyFirst)
         case _ => Nil
       }
-    }
-    else {
-      separateConditions(condition).collect {case IsInstanceOfCall(call) => call}
+    } else {
+      separateConditions(condition).collect {
+        case IsInstanceOfCall(call) => call
+      }
     }
   }
 
-  def findAsInstOfCalls(body: Option[ScExpression], isInstOfCall: ScGenericCall): Seq[ScGenericCall] = {
+  def findAsInstOfCalls(body: Option[ScExpression],
+                        isInstOfCall: ScGenericCall): Seq[ScGenericCall] = {
     def isAsInstOfCall(genCall: ScGenericCall) = {
       genCall.referencedExpr match {
         case ref: ScReferenceExpression if ref.refName == "asInstanceOf" =>
@@ -272,13 +332,14 @@ object TypeCheckToMatchUtil {
       }
     }
 
-    def equalTypes(firstCall: ScGenericCall, secondCall: ScGenericCall): Boolean = {
+    def equalTypes(
+        firstCall: ScGenericCall, secondCall: ScGenericCall): Boolean = {
       val option = for {
         firstArgs <- firstCall.typeArgs
         secondArgs <- secondCall.typeArgs
         firstTypes = firstArgs.typeArgs
-        secondTypes = secondArgs.typeArgs
-        if firstTypes.size == 1 && secondTypes.size == 1
+        secondTypes = secondArgs.typeArgs if firstTypes.size == 1 &&
+        secondTypes.size == 1
       } yield {
         val firstType = firstTypes.head.calcType
         val secondType = secondTypes.head.calcType
@@ -292,10 +353,9 @@ object TypeCheckToMatchUtil {
       override def visitGenericCallExpression(call: ScGenericCall) {
         for {
           base1 <- baseExpr(isInstOfCall)
-          base2 <- baseExpr(call)
-          if isAsInstOfCall(call)
-          if equalTypes(call, isInstOfCall)
-          if equiv(base1, base2)
+          base2 <- baseExpr(call) if isAsInstOfCall(call)
+                  if equalTypes(call, isInstOfCall)
+                  if equiv(base1, base2)
         } {
           result += call
         }
@@ -307,7 +367,9 @@ object TypeCheckToMatchUtil {
     result
   }
 
-  def setElementsForRename(matchStmt: ScMatchStmt, renameHelper: InplaceRenameHelper, renameData: RenameData) {
+  def setElementsForRename(matchStmt: ScMatchStmt,
+                           renameHelper: InplaceRenameHelper,
+                           renameData: RenameData) {
     val caseClauses = matchStmt.caseClauses.toList
 
     for {
@@ -316,7 +378,8 @@ object TypeCheckToMatchUtil {
       name = suggestedNames.head
     } {
       val primary = mutable.ArrayBuffer[ScNamedElement]()
-      val dependents = mutable.SortedSet()(Ordering.by[ScalaPsiElement, Int](_.getTextOffset))
+      val dependents =
+        mutable.SortedSet()(Ordering.by[ScalaPsiElement, Int](_.getTextOffset))
 
       val patternVisitor = new ScalaRecursiveElementVisitor() {
         override def visitPattern(pat: ScPattern) {
@@ -332,8 +395,7 @@ object TypeCheckToMatchUtil {
       val referenceVisitor = new ScalaRecursiveElementVisitor() {
         override def visitReferenceExpression(ref: ScReferenceExpression) {
           for (prim <- primary) {
-            if (ref.refName == name && ref.resolve() == prim)
-              dependents += ref
+            if (ref.refName == name && ref.resolve() == prim) dependents += ref
           }
           super.visitReferenceExpression(ref)
         }
@@ -341,23 +403,31 @@ object TypeCheckToMatchUtil {
 
       caseClause.accept(patternVisitor)
       caseClause.accept(referenceVisitor)
-      for (prim <- primary) renameHelper.addGroup(prim, dependents.toSeq, suggestedNames)
+      for (prim <- primary) renameHelper.addGroup(
+          prim, dependents.toSeq, suggestedNames)
     }
   }
 
-  def baseExpr(gCall: ScGenericCall): Option[ScExpression] = gCall.referencedExpr match {
-    case ref: ScReferenceExpression => ref.qualifier
-    case _ => None
-  }
+  def baseExpr(gCall: ScGenericCall): Option[ScExpression] =
+    gCall.referencedExpr match {
+      case ref: ScReferenceExpression => ref.qualifier
+      case _ => None
+    }
 
-  private def guardCondition(condition: ScExpression, isInstOfCall: ScGenericCall): Option[ScExpression] =  {
+  private def guardCondition(
+      condition: ScExpression,
+      isInstOfCall: ScGenericCall): Option[ScExpression] = {
     val conditions = separateConditions(condition)
     conditions match {
       case Nil => None
       case _ =>
-        val guardConditions: List[ScExpression] = conditions.filterNot(equiv(_, isInstOfCall))
-        val guardConditionsText: String = guardConditions.map(_.getText).mkString(" && ")
-        val guard = ScalaPsiElementFactory.createExpressionFromText(guardConditionsText, condition).asInstanceOf[ScExpression]
+        val guardConditions: List[ScExpression] =
+          conditions.filterNot(equiv(_, isInstOfCall))
+        val guardConditionsText: String =
+          guardConditions.map(_.getText).mkString(" && ")
+        val guard = ScalaPsiElementFactory
+          .createExpressionFromText(guardConditionsText, condition)
+          .asInstanceOf[ScExpression]
 
         Option(guard)
     }
@@ -382,12 +452,15 @@ object TypeCheckToMatchUtil {
 
   def separateConditions(expr: ScExpression): List[ScExpression] = {
     expr match {
-      case parenth: ScParenthesisedExpr => parenth.expr match {
-        case Some(infixExpr: ScInfixExpr) if infixExpr.operation.refName == "&&" =>
-          separateConditions(infixExpr.lOp) ::: separateConditions(infixExpr.rOp) ::: Nil
-        case genCall: ScGenericCall => genCall :: Nil
-        case _ => parenth :: Nil
-      }
+      case parenth: ScParenthesisedExpr =>
+        parenth.expr match {
+          case Some(infixExpr: ScInfixExpr)
+              if infixExpr.operation.refName == "&&" =>
+            separateConditions(infixExpr.lOp) ::: separateConditions(
+                infixExpr.rOp) ::: Nil
+          case genCall: ScGenericCall => genCall :: Nil
+          case _ => parenth :: Nil
+        }
       case infixExpr: ScInfixExpr if infixExpr.operation.refName == "&&" =>
         separateConditions(infixExpr.lOp) ::: separateConditions(infixExpr.rOp) ::: Nil
       case _ => expr :: Nil

@@ -5,9 +5,13 @@ import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{S
 import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.SelectorType._
 
 /**
- * @author Roman.Shein
- * @since 11.09.2015.
- */
-class ScalaNotPostfixTemplate(val alias: String = "not") extends NotPostfixTemplate(alias, "." + alias, "!expr",
-  new ScalaPostfixTemplatePsiInfo, new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, All)) {
-}
+  * @author Roman.Shein
+  * @since 11.09.2015.
+  */
+class ScalaNotPostfixTemplate(val alias: String = "not")
+    extends NotPostfixTemplate(
+        alias,
+        "." + alias,
+        "!expr",
+        new ScalaPostfixTemplatePsiInfo,
+        new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, All)) {}

@@ -1,33 +1,40 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.persistence
 
 import akka.actor._
 import akka.event.Logging
-import akka.persistence.EventAdapterSpec.{ Tagged, UserDataChanged }
-import akka.persistence.journal.{ SingleEventSeq, EventSeq, EventAdapter }
+import akka.persistence.EventAdapterSpec.{Tagged, UserDataChanged}
+import akka.persistence.journal.{SingleEventSeq, EventSeq, EventAdapter}
 import akka.testkit.ImplicitSender
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.immutable
 
 object EventAdapterSpec {
 
-  final val JournalModelClassName = classOf[EventAdapterSpec].getCanonicalName + "$" + classOf[JournalModel].getSimpleName
+  final val JournalModelClassName =
+    classOf[EventAdapterSpec].getCanonicalName + "$" +
+    classOf[JournalModel].getSimpleName
   trait JournalModel {
     def payload: Any
     def tags: immutable.Set[String]
   }
-  final case class Tagged(payload: Any, tags: immutable.Set[String]) extends JournalModel
+  final case class Tagged(payload: Any, tags: immutable.Set[String])
+      extends JournalModel
   final case class NotTagged(payload: Any) extends JournalModel {
     override def tags = Set.empty
   }
 
-  final val DomainEventClassName = classOf[EventAdapterSpec].getCanonicalName + "$" + classOf[DomainEvent].getSimpleName
+  final val DomainEventClassName =
+    classOf[EventAdapterSpec].getCanonicalName + "$" +
+    classOf[DomainEvent].getSimpleName
   trait DomainEvent
-  final case class TaggedDataChanged(tags: immutable.Set[String], value: Int) extends DomainEvent
-  final case class UserDataChanged(countryCode: String, age: Int) extends DomainEvent
+  final case class TaggedDataChanged(tags: immutable.Set[String], value: Int)
+      extends DomainEvent
+  final case class UserDataChanged(countryCode: String, age: Int)
+      extends DomainEvent
 
   class UserAgeTaggingAdapter extends EventAdapter {
     val Adult = Set("adult")
@@ -35,24 +42,27 @@ object EventAdapterSpec {
 
     override def toJournal(event: Any): Any = event match {
       case e @ UserDataChanged(_, age) if age > 18 ⇒ Tagged(e, Adult)
-      case e @ UserDataChanged(_, age)             ⇒ Tagged(e, Minor)
-      case e                                       ⇒ NotTagged(e)
+      case e @ UserDataChanged(_, age) ⇒ Tagged(e, Minor)
+      case e ⇒ NotTagged(e)
     }
-    override def fromJournal(event: Any, manifest: String): EventSeq = EventSeq.single {
-      event match {
-        case m: JournalModel ⇒ m.payload
+    override def fromJournal(event: Any, manifest: String): EventSeq =
+      EventSeq.single {
+        event match {
+          case m: JournalModel ⇒ m.payload
+        }
       }
-    }
 
     override def manifest(event: Any): String = ""
   }
 
   class ReplayPassThroughAdapter extends UserAgeTaggingAdapter {
-    override def fromJournal(event: Any, manifest: String): EventSeq = EventSeq.single {
-      event match {
-        case m: JournalModel ⇒ event // don't unpack, just pass through the JournalModel
+    override def fromJournal(event: Any, manifest: String): EventSeq =
+      EventSeq.single {
+        event match {
+          case m: JournalModel ⇒
+            event // don't unpack, just pass through the JournalModel
+        }
       }
-    }
   }
 
   class LoggingAdapter(system: ExtendedActorSystem) extends EventAdapter {
@@ -61,16 +71,18 @@ object EventAdapterSpec {
       log.info("On its way to the journal: []: " + event)
       event
     }
-    override def fromJournal(event: Any, manifest: String): EventSeq = EventSeq.single {
-      log.info("On its way out from the journal: []: " + event)
-      event
-    }
+    override def fromJournal(event: Any, manifest: String): EventSeq =
+      EventSeq.single {
+        log.info("On its way out from the journal: []: " + event)
+        event
+      }
 
     override def manifest(event: Any): String = ""
   }
 
-  class PersistAllIncomingActor(name: String, override val journalPluginId: String)
-    extends NamedPersistentActor(name) with PersistentActor {
+  class PersistAllIncomingActor(
+      name: String, override val journalPluginId: String)
+      extends NamedPersistentActor(name) with PersistentActor {
 
     var state: List[Any] = Nil
 
@@ -86,21 +98,23 @@ object EventAdapterSpec {
 
     override def receiveRecover = {
       case RecoveryCompleted ⇒ // ignore
-      case e                 ⇒ state ::= e
+      case e ⇒ state ::= e
     }
     override def receiveCommand = persistIncoming
   }
-
 }
 
-class EventAdapterSpec(journalName: String, journalConfig: Config, adapterConfig: Config)
-  extends PersistenceSpec(journalConfig.withFallback(adapterConfig)) with ImplicitSender {
+class EventAdapterSpec(
+    journalName: String, journalConfig: Config, adapterConfig: Config)
+    extends PersistenceSpec(journalConfig.withFallback(adapterConfig))
+    with ImplicitSender {
 
   import EventAdapterSpec._
 
   def this(journalName: String) {
-    this("inmem", PersistenceSpec.config("inmem", "InmemPersistentTaggingSpec"), ConfigFactory.parseString(
-      s"""
+    this("inmem",
+         PersistenceSpec.config("inmem", "InmemPersistentTaggingSpec"),
+         ConfigFactory.parseString(s"""
          |akka.persistence.journal {
          |
          |  common-event-adapters {
@@ -148,13 +162,22 @@ class EventAdapterSpec(journalName: String, journalConfig: Config, adapterConfig
   }
 
   def persister(name: String, journalId: String = journalName) =
-    system.actorOf(Props(classOf[PersistAllIncomingActor], name, "akka.persistence.journal." + journalId), name)
+    system.actorOf(Props(classOf[PersistAllIncomingActor],
+                         name,
+                         "akka.persistence.journal." + journalId),
+                   name)
 
   def toJournal(in: Any, journalId: String = journalName) =
-    Persistence(system).adaptersFor("akka.persistence.journal." + journalId).get(in.getClass).toJournal(in)
+    Persistence(system)
+      .adaptersFor("akka.persistence.journal." + journalId)
+      .get(in.getClass)
+      .toJournal(in)
 
   def fromJournal(in: Any, journalId: String = journalName) =
-    Persistence(system).adaptersFor("akka.persistence.journal." + journalId).get(in.getClass).fromJournal(in, "")
+    Persistence(system)
+      .adaptersFor("akka.persistence.journal." + journalId)
+      .get(in.getClass)
+      .fromJournal(in, "")
 
   "EventAdapter" must {
 
@@ -174,13 +197,14 @@ class EventAdapterSpec(journalName: String, journalConfig: Config, adapterConfig
     "create adapter requiring ActorSystem" in {
       val event = UserDataChanged("name", 42)
       toJournal(event, "with-actor-system") should equal(event)
-      fromJournal(event, "with-actor-system") should equal(SingleEventSeq(event))
+      fromJournal(event, "with-actor-system") should equal(
+          SingleEventSeq(event))
     }
   }
-
 }
 
-trait ReplayPassThrough { this: EventAdapterSpec ⇒
+trait ReplayPassThrough {
+  this: EventAdapterSpec ⇒
   "EventAdapter" must {
 
     "store events after applying adapter" in {
@@ -204,10 +228,10 @@ trait ReplayPassThrough { this: EventAdapterSpec ⇒
       expectMsg(m2)
     }
   }
-
 }
 
-trait NoAdapters { this: EventAdapterSpec ⇒
+trait NoAdapters {
+  this: EventAdapterSpec ⇒
   "EventAdapter" must {
     "work when plugin defines no adapter" in {
       val p2 = persister("p2", journalId = "no-adapter")
@@ -227,15 +251,17 @@ trait NoAdapters { this: EventAdapterSpec ⇒
       expectMsg(m1)
       expectMsg(m2)
     }
-
   }
 }
 
 // this style of testing allows us to try different leveldb journal plugin configurations
 // because it always would use the same leveldb directory anyway (based on class name),
 // yet we need different instances of the plugin. For inmem it does not matter, it can survive many instances.
-class InmemEventAdapterSpec extends EventAdapterSpec("inmem") with ReplayPassThrough with NoAdapters
+class InmemEventAdapterSpec
+    extends EventAdapterSpec("inmem") with ReplayPassThrough with NoAdapters
 
 class LeveldbBaseEventAdapterSpec extends EventAdapterSpec("leveldb")
-class LeveldbReplayPassThroughEventAdapterSpec extends EventAdapterSpec("leveldb") with ReplayPassThrough
-class LeveldbNoAdaptersEventAdapterSpec extends EventAdapterSpec("leveldb") with NoAdapters
+class LeveldbReplayPassThroughEventAdapterSpec
+    extends EventAdapterSpec("leveldb") with ReplayPassThrough
+class LeveldbNoAdaptersEventAdapterSpec
+    extends EventAdapterSpec("leveldb") with NoAdapters

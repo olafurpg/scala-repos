@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.util.ParserPatcher
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 18.04.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 18.04.2008
+  */
 /*
  * Element::= EmptyElementTag
  *            | STag Content ETag
@@ -19,7 +18,8 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserPatcher
 
 object Element {
   def parse(builder: ScalaPsiBuilder): Boolean = {
-    if (EmptyElemTag.parse(builder) || ParserPatcher.getSuitablePatcher(builder).parse(builder)) return true
+    if (EmptyElemTag.parse(builder) ||
+        ParserPatcher.getSuitablePatcher(builder).parse(builder)) return true
 
     val elemMarker = builder.mark()
     if (!STag.parse(builder)) {

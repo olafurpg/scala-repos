@@ -8,8 +8,8 @@ trait State[S, A] {
   def state(s: S): (S, A)
 }
 
-class FFF[S,B] {
-  def r (ft: PartialType[State, S]#Apply[B], s : S) = {
-    ft.<ref>state(s)
+class FFF[S, B] {
+  def r(ft: PartialType[State, S]#Apply[B], s: S) = {
+    ft.< ref > state (s)
   }
 }

@@ -27,7 +27,10 @@ class ScalaInlineInfoTest extends ClearAfterClass {
 
   val compiler = newCompiler()
 
-  def inlineInfo(c: ClassNode): InlineInfo = c.attrs.asScala.collect({ case a: InlineInfoAttribute => a.inlineInfo }).head
+  def inlineInfo(c: ClassNode): InlineInfo =
+    c.attrs.asScala
+      .collect({ case a: InlineInfoAttribute => a.inlineInfo })
+      .head
 
   @Test
   def traitMembersInlineInfo(): Unit = {
@@ -65,42 +68,61 @@ class ScalaInlineInfoTest extends ClearAfterClass {
 
     val cs @ List(t, tl, to) = compileClasses(compiler)(code)
     val info = inlineInfo(t)
-    val expect = InlineInfo (
-      None,  // self type
-      false, // final class
-      None, // not a sam
-      Map(
-        // TODO SD-86: the module accessor used to be `effectivelyFinal` before nuke-impl-classes
-        ("O()LT$O$;",                                                MethodInlineInfo(false,false,false,false)),
-        ("T$$super$toString()Ljava/lang/String;",                    MethodInlineInfo(false,false,false,false)),
-        ("T$_setter_$x1_$eq(I)V",                                    MethodInlineInfo(false,false,false,false)),
-        ("f1()I",                                                    MethodInlineInfo(false,false,false,false)),
-        ("f3()I",                                                    MethodInlineInfo(false,false,false,false)),
-        ("f4()Ljava/lang/String;",                                   MethodInlineInfo(false,false,true, false)),
-        ("f5()I",                                                    MethodInlineInfo(false,false,false,false)),
-        ("f6()I",                                                    MethodInlineInfo(false,false,false,true )),
-        ("x1()I",                                                    MethodInlineInfo(false,false,false,false)),
-        ("x3()I",                                                    MethodInlineInfo(false,false,false,false)),
-        ("x3_$eq(I)V",                                               MethodInlineInfo(false,false,false,false)),
-        ("x4()I",                                                    MethodInlineInfo(false,false,false,false)),
-        ("x5()I",                                                    MethodInlineInfo(true, false,false,false)),
-        ("y2()I",                                                    MethodInlineInfo(false,false,false,false)),
-        ("y2_$eq(I)V",                                               MethodInlineInfo(false,false,false,false)),
-        ("f2()I",                                                    MethodInlineInfo(true, false,false,false)),
-        ("L$lzycompute$1(Lscala/runtime/VolatileObjectRef;)LT$L$2$;",MethodInlineInfo(true, false,false,false)),
-        // TODO SD-86: should probably be effectivelyFinal
-        ("L$1(Lscala/runtime/VolatileObjectRef;)LT$L$2$;",           MethodInlineInfo(false,false,false,false)),
-        ("nest$1()I",                                                MethodInlineInfo(true, false,false,false)),
-        ("$init$()V",                                                MethodInlineInfo(false,false,false,false))),
-      None // warning
+    val expect = InlineInfo(
+        None, // self type
+        false, // final class
+        None, // not a sam
+        Map(
+            // TODO SD-86: the module accessor used to be `effectivelyFinal` before nuke-impl-classes
+            ("O()LT$O$;",
+             MethodInlineInfo(false, false, false, false)),
+            ("T$$super$toString()Ljava/lang/String;",
+             MethodInlineInfo(false, false, false, false)),
+            ("T$_setter_$x1_$eq(I)V",
+             MethodInlineInfo(false, false, false, false)),
+            ("f1()I",
+             MethodInlineInfo(false, false, false, false)),
+            ("f3()I",
+             MethodInlineInfo(false, false, false, false)),
+            ("f4()Ljava/lang/String;",
+             MethodInlineInfo(false, false, true, false)),
+            ("f5()I",
+             MethodInlineInfo(false, false, false, false)),
+            ("f6()I",
+             MethodInlineInfo(false, false, false, true)),
+            ("x1()I",
+             MethodInlineInfo(false, false, false, false)),
+            ("x3()I",
+             MethodInlineInfo(false, false, false, false)),
+            ("x3_$eq(I)V",
+             MethodInlineInfo(false, false, false, false)),
+            ("x4()I",
+             MethodInlineInfo(false, false, false, false)),
+            ("x5()I",
+             MethodInlineInfo(true, false, false, false)),
+            ("y2()I",
+             MethodInlineInfo(false, false, false, false)),
+            ("y2_$eq(I)V",
+             MethodInlineInfo(false, false, false, false)),
+            ("f2()I",
+             MethodInlineInfo(true, false, false, false)),
+            ("L$lzycompute$1(Lscala/runtime/VolatileObjectRef;)LT$L$2$;",
+             MethodInlineInfo(true, false, false, false)),
+            // TODO SD-86: should probably be effectivelyFinal
+            ("L$1(Lscala/runtime/VolatileObjectRef;)LT$L$2$;",
+             MethodInlineInfo(false, false, false, false)),
+            ("nest$1()I",
+             MethodInlineInfo(true, false, false, false)),
+            ("$init$()V",
+             MethodInlineInfo(false, false, false, false))),
+        None // warning
     )
     assert(info == expect, info)
   }
 
   @Test
   def inlineInfoSam(): Unit = {
-    val code =
-      """abstract class C {
+    val code = """abstract class C {
         |  def f = 0
         |  def g(x: Int): Int
         |  val foo = "hi"
@@ -125,13 +147,11 @@ class ScalaInlineInfoTest extends ClearAfterClass {
     val cs = compileClasses(compiler)(code)
     val sams = cs.map(c => (c.name, inlineInfo(c).sam))
     assertEquals(sams,
-      List(
-        ("C",Some("g(I)I")),
-        ("D",None),
-        ("E",Some("h(Ljava/lang/String;)I")),
-        ("F",None),
-        ("T",Some("h(Ljava/lang/String;)I")),
-        ("U",None)))
-
+                 List(("C", Some("g(I)I")),
+                      ("D", None),
+                      ("E", Some("h(Ljava/lang/String;)I")),
+                      ("F", None),
+                      ("T", Some("h(Ljava/lang/String;)I")),
+                      ("U", None)))
   }
 }

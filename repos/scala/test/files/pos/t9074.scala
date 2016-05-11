@@ -20,5 +20,5 @@ package blam {
 object Test {
   import blam._
   foo.f("3", 4.0)
-  foo.g[Any](1d) : Double
+  foo.g[Any](1d): Double
 }

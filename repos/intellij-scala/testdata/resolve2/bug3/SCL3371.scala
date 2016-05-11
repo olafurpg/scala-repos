@@ -1,3 +1,3 @@
 object A {
-  def bar(x : String)(y : String = /* resolved: true */x) { }
+  def bar(x: String)(y: String = /* resolved: true */ x) {}
 }

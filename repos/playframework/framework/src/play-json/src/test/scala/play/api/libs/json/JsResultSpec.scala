@@ -15,8 +15,9 @@ object JsResultSpec extends org.specs2.mutable.Specification {
     "be functor" in {
       val jsres = JsSuccess("jsStr")
 
-      implicitly[Functor[JsResult]].fmap[String, List[Char]](jsres, _.toList).
-        aka("JSON result") must_== JsSuccess(List('j', 's', 'S', 't', 'r'))
+      implicitly[Functor[JsResult]]
+        .fmap[String, List[Char]](jsres, _.toList)
+        .aka("JSON result") must_== JsSuccess(List('j', 's', 'S', 't', 'r'))
     }
   }
 }

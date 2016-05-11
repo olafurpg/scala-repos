@@ -36,7 +36,7 @@ import scala.collection.mutable.LinkedHashSet
 import scala.util.Random
 
 import scalaz._
-import scalaz.effect.IO 
+import scalaz.effect.IO
 import scalaz.syntax.comonad._
 import scalaz.std.anyVal._
 import scalaz.std.stream._
@@ -55,9 +55,10 @@ import SampleData._
 
 // TODO: mix in a trait rather than defining Table directly
 
-trait IndicesSpec[M[+_]] extends ColumnarTableModuleTestSupport[M]
-    with TableModuleSpec[M]
-    with IndicesModule[M] { spec =>
+trait IndicesSpec[M[+ _]]
+    extends ColumnarTableModuleTestSupport[M] with TableModuleSpec[M]
+    with IndicesModule[M] {
+  spec =>
 
   type GroupId = Int
   import trans._
@@ -74,20 +75,31 @@ trait IndicesSpec[M[+_]] extends ColumnarTableModuleTestSupport[M]
   private val groupId = new java.util.concurrent.atomic.AtomicInteger
   def newGroupId = groupId.getAndIncrement
 
-  class Table(slices: StreamT[M, Slice], size: TableSize) extends ColumnarTable(slices, size) {
+  class Table(slices: StreamT[M, Slice], size: TableSize)
+      extends ColumnarTable(slices, size) {
     import trans._
     def load(apiKey: APIKey, jtpe: JType) = sys.error("todo")
-    def sort(sortKey: TransSpec1, sortOrder: DesiredSortOrder, unique: Boolean = false) = sys.error("todo")
-    def groupByN(groupKeys: Seq[TransSpec1], valueSpec: TransSpec1, sortOrder: DesiredSortOrder = SortAscending, unique: Boolean = false): M[Seq[Table]] = sys.error("todo")
+    def sort(sortKey: TransSpec1,
+             sortOrder: DesiredSortOrder,
+             unique: Boolean = false) = sys.error("todo")
+    def groupByN(groupKeys: Seq[TransSpec1],
+                 valueSpec: TransSpec1,
+                 sortOrder: DesiredSortOrder = SortAscending,
+                 unique: Boolean = false): M[Seq[Table]] = sys.error("todo")
   }
-  
+
   trait TableCompanion extends ColumnarTableCompanion {
-    def apply(slices: StreamT[M, Slice], size: TableSize) = new Table(slices, size)
+    def apply(slices: StreamT[M, Slice], size: TableSize) =
+      new Table(slices, size)
 
-    def singleton(slice: Slice) = new Table(slice :: StreamT.empty[M, Slice], ExactSize(1))
+    def singleton(slice: Slice) =
+      new Table(slice :: StreamT.empty[M, Slice], ExactSize(1))
 
-    def align(sourceLeft: Table, alignOnL: TransSpec1, sourceRight: Table, alignOnR: TransSpec1):
-        M[(Table, Table)] = sys.error("not implemented here")
+    def align(sourceLeft: Table,
+              alignOnL: TransSpec1,
+              sourceRight: Table,
+              alignOnR: TransSpec1): M[(Table, Table)] =
+      sys.error("not implemented here")
   }
 
   object Table extends TableCompanion
@@ -102,7 +114,8 @@ trait IndicesSpec[M[+_]] extends ColumnarTableModuleTestSupport[M]
       val keySpecs = Array(groupkey("a"), groupkey("b"))
       val valSpec = valuekey("c")
 
-      val index: TableIndex = TableIndex.createFromTable(table, keySpecs, valSpec).copoint
+      val index: TableIndex =
+        TableIndex.createFromTable(table, keySpecs, valSpec).copoint
 
       index.getUniqueKeys(0).size must_== 0
       index.getSubTable(Array(0), Array(CString("a"))).size == ExactSize(0)
@@ -124,30 +137,35 @@ trait IndicesSpec[M[+_]] extends ColumnarTableModuleTestSupport[M]
 {"a": 1, "c": [666]}
 """
 
-    val table = fromJson(JParser.parseManyFromString(json).valueOr(throw _).toStream)
+    val table =
+      fromJson(JParser.parseManyFromString(json).valueOr(throw _).toStream)
 
     val keySpecs = Array(groupkey("a"), groupkey("b"))
     val valSpec = valuekey("c")
 
-    val index: TableIndex = TableIndex.createFromTable(table, keySpecs, valSpec).copoint
+    val index: TableIndex =
+      TableIndex.createFromTable(table, keySpecs, valSpec).copoint
 
     "determine unique groupkey values" in {
-      index.getUniqueKeys(0) must_== Set(CLong(1), CLong(2), CLong(3), CString("foo"))
-      index.getUniqueKeys(1) must_== Set(CLong(2), CLong(999), CString("bar"), CString(""))
+      index.getUniqueKeys(0) must_==
+        Set(CLong(1), CLong(2), CLong(3), CString("foo"))
+      index.getUniqueKeys(1) must_==
+        Set(CLong(2), CLong(999), CString("bar"), CString(""))
     }
 
     "determine unique groupkey sets" in {
       index.getUniqueKeys() must_== Set[Seq[RValue]](
-        Array(CLong(1), CLong(2)),
-        Array(CLong(2), CLong(2)),
-        Array(CString("foo"), CString("bar")),
-        Array(CLong(3), CString("")),
-        Array(CLong(3), CLong(2)),
-        Array(CString("foo"), CLong(999))
+          Array(CLong(1), CLong(2)),
+          Array(CLong(2), CLong(2)),
+          Array(CString("foo"), CString("bar")),
+          Array(CLong(3), CString("")),
+          Array(CLong(3), CLong(2)),
+          Array(CString("foo"), CLong(999))
       )
     }
 
-    def subtableSet(index: TableIndex, ids: Seq[Int], vs: Seq[RValue]): Set[RValue] =
+    def subtableSet(
+        index: TableIndex, ids: Seq[Int], vs: Seq[RValue]): Set[RValue] =
       index.getSubTable(ids, vs).toJson.copoint.toSet.map(RValue.fromJValue)
 
     def test(vs: Seq[RValue], result: Set[RValue]): Unit =
@@ -160,10 +178,10 @@ trait IndicesSpec[M[+_]] extends ColumnarTableModuleTestSupport[M]
 
       test(Array(CLong(1), CLong(2)), s1)
       def s1 = Set[RValue](
-        CLong(3),
-        CLong(999),
-        CString("cat"),
-        RObject(Map("cat" -> CLong(13), "dog" -> CLong(12)))
+          CLong(3),
+          CLong(999),
+          CString("cat"),
+          RObject(Map("cat" -> CLong(13), "dog" -> CLong(12)))
       )
 
       test(Array(CLong(2), CLong(2)), s2)
@@ -181,66 +199,75 @@ trait IndicesSpec[M[+_]] extends ColumnarTableModuleTestSupport[M]
       test(Array(CString("foo"), CLong(999)), empty)
     }
 
-    val index1 = TableIndex.createFromTable(
-      table, Array(groupkey("a")), valuekey("c")
-    ).copoint
+    val index1 = TableIndex
+      .createFromTable(
+          table,
+          Array(groupkey("a")),
+          valuekey("c")
+      )
+      .copoint
 
-    val index2 = TableIndex.createFromTable(
-      table, Array(groupkey("b")), valuekey("c")
-    ).copoint
+    val index2 = TableIndex
+      .createFromTable(
+          table,
+          Array(groupkey("b")),
+          valuekey("c")
+      )
+      .copoint
 
     "efficiently combine to produce unions" in {
 
-      def tryit(tpls: (TableIndex, Seq[Int], Seq[RValue])*)(expected: JValue*) {
+      def tryit(tpls: (TableIndex, Seq[Int], Seq[RValue])*)(
+          expected: JValue*) {
         val table = TableIndex.joinSubTables(tpls.toList)
         table.toJson.copoint.toSet must_== expected.toSet
       }
 
       // both disjunctions have data
       tryit(
-        (index1, Seq(0), Seq(CLong(1))),
-        (index2, Seq(0), Seq(CLong(2)))
+          (index1, Seq(0), Seq(CLong(1))),
+          (index2, Seq(0), Seq(CLong(2)))
       )(
-        JNum(3),
-        JNum(999),
-        JNum(9876),
-        JString("cat"),
-        JNum(13),
-        JArray(JNum(1), JNum(2), JNum(3), JNum(4)),
-        JArray(JNum(666)),
-        JObject(Map("cat" -> JNum(13), "dog" -> JNum(12)))
+          JNum(3),
+          JNum(999),
+          JNum(9876),
+          JString("cat"),
+          JNum(13),
+          JArray(JNum(1), JNum(2), JNum(3), JNum(4)),
+          JArray(JNum(666)),
+          JObject(Map("cat" -> JNum(13), "dog" -> JNum(12)))
       )
 
       // only first disjunction has data
       tryit(
-        (index1, Seq(0), Seq(CLong(1))),
-        (index2, Seq(0), Seq(CLong(1234567)))
+          (index1, Seq(0), Seq(CLong(1))),
+          (index2, Seq(0), Seq(CLong(1234567)))
       )(
-        JNum(3),
-        JNum(999),
-        JString("cat"),
-        JArray(JNum(666)),
-        JObject(Map("cat" -> JNum(13), "dog" -> JNum(12)))
+          JNum(3),
+          JNum(999),
+          JString("cat"),
+          JArray(JNum(666)),
+          JObject(Map("cat" -> JNum(13), "dog" -> JNum(12)))
       )
 
       // only second disjunction has data
       tryit(
-        (index1, Seq(0), Seq(CLong(-8000))),
-        (index2, Seq(0), Seq(CLong(2)))
+          (index1, Seq(0), Seq(CLong(-8000))),
+          (index2, Seq(0), Seq(CLong(2)))
       )(
-        JNum(3),
-        JNum(999),
-        JNum(9876),
-        JString("cat"),
-        JNum(13),
-        JArray(JNum(1), JNum(2), JNum(3), JNum(4)),
-        JObject(Map("cat" -> JNum(13), "dog" -> JNum(12)))
+          JNum(3),
+          JNum(999),
+          JNum(9876),
+          JString("cat"),
+          JNum(13),
+          JArray(JNum(1), JNum(2), JNum(3), JNum(4)),
+          JObject(Map("cat" -> JNum(13), "dog" -> JNum(12)))
       )
 
       // neither disjunction has data
       tryit(
-        (index1, Seq(0), Seq(CLong(-8000))),
-        (index2, Seq(0), Seq(CLong(1234567)))
+          (index1, Seq(0), Seq(CLong(-8000))),
+          (index2, Seq(0), Seq(CLong(1234567)))
       )()
     }
   }
@@ -254,7 +281,7 @@ object IndicesSpec extends IndicesSpec[Need] {
   val yggConfig = new IdSourceConfig with ColumnarTableModuleConfig {
     val maxSliceSize = 10
     val smallSliceSize = 3
-    
+
     val idSource = new FreshAtomicIdSource
   }
 }

@@ -7,7 +7,7 @@ object Test {
   sealed class File {
     val i = 1
   }
-  sealed class Dir extends File { }
+  sealed class Dir extends File {}
 
   type File
 }

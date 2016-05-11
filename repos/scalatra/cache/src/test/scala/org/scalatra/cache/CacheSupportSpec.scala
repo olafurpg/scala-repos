@@ -1,9 +1,9 @@
 package org.scalatra.cache
 
-import org.scalatra.{ AsyncResult, FutureSupport, ScalatraServlet }
+import org.scalatra.{AsyncResult, FutureSupport, ScalatraServlet}
 import org.scalatra.test.scalatest.ScalatraFlatSpec
-import scala.concurrent.{ ExecutionContext, Future, Promise }
-import scala.util.{ Failure, Success, Try }
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success, Try}
 
 class CacheSupportSpec extends ScalatraFlatSpec {
   class TestServlet extends ScalatraServlet with CacheSupport {

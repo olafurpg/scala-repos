@@ -27,7 +27,8 @@ final class Lcg64(_seed: Long) extends LongBasedGenerator {
 object Lcg64 extends GeneratorCompanion[Lcg64, Long] {
   def randomSeed(): Long = System.nanoTime()
 
-  def fromBytes(bytes: Array[Byte]): Lcg64 = new Lcg64(Pack.longFromBytes(bytes))
+  def fromBytes(bytes: Array[Byte]): Lcg64 =
+    new Lcg64(Pack.longFromBytes(bytes))
   def fromSeed(seed: Long): Lcg64 = new Lcg64(seed)
   def fromTime(time: Long = System.nanoTime()): Lcg64 = new Lcg64(time)
 

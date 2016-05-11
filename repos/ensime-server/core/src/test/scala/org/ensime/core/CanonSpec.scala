@@ -43,5 +43,4 @@ class CanonSpec extends EnsimeSpec {
     val expected = Breakpoint(canon, 13)
     Canonised(response) shouldBe expected
   }
-
 }

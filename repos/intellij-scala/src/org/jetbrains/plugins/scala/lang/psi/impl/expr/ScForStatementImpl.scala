@@ -21,11 +21,11 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
-class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScForStatement {
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
+class ScForStatementImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScForStatement {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -35,7 +35,8 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
 
   override def toString: String = "ForStatement"
 
-  def isYield: Boolean = findChildByType[PsiElement](ScalaTokenTypes.kYIELD) != null
+  def isYield: Boolean =
+    findChildByType[PsiElement](ScalaTokenTypes.kYIELD) != null
 
   def enumerators: Option[ScEnumerators] = findChild(classOf[ScEnumerators])
 
@@ -46,9 +47,9 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
   }
 
   override def processDeclarations(processor: PsiScopeProcessor,
-                                  state: ResolveState,
-                                  lastParent: PsiElement,
-                                  place: PsiElement): Boolean = {
+                                   state: ResolveState,
+                                   lastParent: PsiElement,
+                                   place: PsiElement): Boolean = {
     val enumerators: ScEnumerators = this.enumerators match {
       case None => return true
       case Some(x) => x
@@ -56,7 +57,7 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
     if (lastParent == enumerators) return true
     enumerators.processDeclarations(processor, state, null, place)
   }
-  
+
   protected def bodyToText(expr: ScExpression) = expr.getText
 
   @tailrec
@@ -80,8 +81,13 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
     if (guards.isEmpty && enums.isEmpty && gens.length == 1) {
       val gen = gens.head
       if (gen.rvalue == null) return None
-      exprText.append("(").append(gen.rvalue.getText).append(")").append(".").append(if (isYield) "map" else "foreach")
-              .append(" { case ")
+      exprText
+        .append("(")
+        .append(gen.rvalue.getText)
+        .append(")")
+        .append(".")
+        .append(if (isYield) "map" else "foreach")
+        .append(" { case ")
       gen.pattern.desugarizedPatternIndex = exprText.length
       exprText.append(gen.pattern.getText).append(s" $arrow ")
       body match {
@@ -101,26 +107,37 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
           var filterText = "withFilter"
           var filterFound = false
           val tp = gen.rvalue.getType(TypingContext.empty).getOrAny
-          val processor =
-            new CompletionProcessor(StdKinds.methodRef, this, collectImplicits = true, forName = Some("withFilter")) {
-              override def execute(_element: PsiElement, state: ResolveState): Boolean = {
-                super.execute(_element, state)
-                if (!levelSet.isEmpty) {
-                  filterFound = true
-                  false
-                } else true
-              }
+          val processor = new CompletionProcessor(
+              StdKinds.methodRef,
+              this,
+              collectImplicits = true,
+              forName = Some("withFilter")) {
+            override def execute(
+                _element: PsiElement, state: ResolveState): Boolean = {
+              super.execute(_element, state)
+              if (!levelSet.isEmpty) {
+                filterFound = true
+                false
+              } else true
             }
+          }
           processor.processType(tp, this)
           if (!filterFound) filterText = "filter"
-          exprText.append(gen.pattern.getText).
-                  append(" <- ((").append(gen.rvalue.getText).append(s").$filterText { case ").
-                  append(gen.pattern.bindings.map(b => b.name).mkString("(", ", ", ")")).append(s" $arrow ")
-                  if (forDisplay) {
-                    exprText.append(guard.expr.map(_.getText).getOrElse("true"))
-                  } else {
-                    exprText.append(guard.expr.map(_.getText).getOrElse("true")).append(";true")
-                  }
+          exprText
+            .append(gen.pattern.getText)
+            .append(" <- ((")
+            .append(gen.rvalue.getText)
+            .append(s").$filterText { case ")
+            .append(
+                gen.pattern.bindings.map(b => b.name).mkString("(", ", ", ")"))
+            .append(s" $arrow ")
+          if (forDisplay) {
+            exprText.append(guard.expr.map(_.getText).getOrElse("true"))
+          } else {
+            exprText
+              .append(guard.expr.map(_.getText).getOrElse("true"))
+              .append(";true")
+          }
           exprText.append("})")
 
           next = nextEnumerator(next)
@@ -141,10 +158,18 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
             case _ => exprText append "{}"
           }
         case gen2: ScGenerator =>
-          exprText.append("(").append(gen.rvalue.getText).append(")").append(".").
-                  append(if (isYield) "flatMap " else "foreach ").append("{ case ")
+          exprText
+            .append("(")
+            .append(gen.rvalue.getText)
+            .append(")")
+            .append(".")
+            .append(if (isYield) "flatMap " else "foreach ")
+            .append("{ case ")
           gen.pattern.desugarizedPatternIndex = exprText.length
-          exprText.append(gen.pattern.getText).append(s" $arrow ").append("for {")
+          exprText
+            .append(gen.pattern.getText)
+            .append(s" $arrow ")
+            .append("for {")
           while (next != null) {
             next match {
               case gen: ScGenerator =>
@@ -167,16 +192,31 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
           gen.pattern.desugarizedPatternIndex = exprText.length
           exprText.append(gen.pattern.getText)
 
-          val (freshName1, freshName2) = if (forDisplay) {
-            ("x$1", "x$2")
-          } else {
-            ("freshNameForIntelliJIDEA1", "freshNameForIntelliJIDEA2")
-          }
+          val (freshName1, freshName2) =
+            if (forDisplay) {
+              ("x$1", "x$2")
+            } else {
+              ("freshNameForIntelliJIDEA1", "freshNameForIntelliJIDEA2")
+            }
 
-          exprText.append(") <- (for (").append(freshName1).append("@(").append(gen.pattern.getText).append(") <- ").
-                  append(gen.rvalue.getText).append(") yield {val ").append(freshName2).append("@(").
-                  append(enum.pattern.getText).append(") = ").append(enum.rvalue.getText).
-                  append("; (").append(freshName2).append(", ").append(freshName1).append(")})")
+          exprText
+            .append(") <- (for (")
+            .append(freshName1)
+            .append("@(")
+            .append(gen.pattern.getText)
+            .append(") <- ")
+            .append(gen.rvalue.getText)
+            .append(") yield {val ")
+            .append(freshName2)
+            .append("@(")
+            .append(enum.pattern.getText)
+            .append(") = ")
+            .append(enum.rvalue.getText)
+            .append("; (")
+            .append(freshName2)
+            .append(", ")
+            .append(freshName1)
+            .append(")})")
           next = nextEnumerator(next)
           if (next != null) exprText.append(" ; ")
           while (next != null) {
@@ -207,7 +247,9 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
         if (text == "") None
         else {
           try {
-            Option(ScalaPsiElementFactory.createExpressionWithContextFromText(text, this.getContext, this))
+            Option(
+                ScalaPsiElementFactory.createExpressionWithContextFromText(
+                    text, this.getContext, this))
           } catch {
             case e: Throwable => None
           }
@@ -215,28 +257,33 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
       case _ => None
     }
 
-    val analogMap: mutable.HashMap[ScPattern, ScPattern] = mutable.HashMap.empty
+    val analogMap: mutable.HashMap[ScPattern, ScPattern] =
+      mutable.HashMap.empty
 
     res match {
       case Some(expr: ScExpression) =>
-        enumerators.map(e => e.generators.map(g => g.pattern)).foreach(patts =>
-          patts.foreach(patt => {
-            if (patt != null && patt.desugarizedPatternIndex != -1) {
-              var element = expr.findElementAt(patt.desugarizedPatternIndex)
-              while (element != null && (element.getTextLength < patt.getTextLength ||
-                (!element.isInstanceOf[ScPattern] && element.getTextLength == patt.getTextLength)))
-                element = element.getParent
-              if (element != null && element.getText == patt.getText) {
-                element match {
-                  case p: ScPattern =>
-                    analogMap.put(p, patt)
-                    patt.analog = p
-                  case _ =>
+        enumerators
+          .map(e => e.generators.map(g => g.pattern))
+          .foreach(patts =>
+                patts.foreach(patt =>
+                      {
+                if (patt != null && patt.desugarizedPatternIndex != -1) {
+                  var element =
+                    expr.findElementAt(patt.desugarizedPatternIndex)
+                  while (element != null &&
+                  (element.getTextLength < patt.getTextLength ||
+                      (!element.isInstanceOf[ScPattern] &&
+                          element.getTextLength == patt.getTextLength))) element = element.getParent
+                  if (element != null && element.getText == patt.getText) {
+                    element match {
+                      case p: ScPattern =>
+                        analogMap.put(p, patt)
+                        patt.analog = p
+                      case _ =>
+                    }
+                  }
                 }
-              }
-            }
-          })
-        )
+            }))
       case _ =>
     }
 
@@ -257,7 +304,8 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
         }
       }
     }
-    if ((enums.isEmpty && guards.isEmpty && gens.length == 1) || gens.isEmpty || res.isEmpty) res
+    if ((enums.isEmpty && guards.isEmpty && gens.length == 1) ||
+        gens.isEmpty || res.isEmpty) res
     else {
       val expr = res.get
       nextEnumerator(gens.head) match {
@@ -302,12 +350,11 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
             case call: ScMethodCall =>
               for {
                 expr <- call.args.exprs.headOption
-                if expr.isInstanceOf[ScBlockExpr]
+                           if expr.isInstanceOf[ScBlockExpr]
                 bl = expr.asInstanceOf[ScBlockExpr]
                 clauses <- bl.caseClauses
                 clause <- clauses.caseClauses.headOption
-                expr <- clause.expr
-                if expr.isInstanceOf[ScForStatementImpl]
+                expr <- clause.expr if expr.isInstanceOf[ScForStatementImpl]
                 f = expr.asInstanceOf[ScForStatementImpl]
                 additionalReplacement = f.getDesugarizedExpr
                 repl <- additionalReplacement
@@ -329,8 +376,9 @@ class ScForStatementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with S
     }
   }
 
-  def getLeftParenthesis = Option(findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS))
+  def getLeftParenthesis =
+    Option(findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS))
 
-  def getRightParenthesis = Option(findChildByType[PsiElement](ScalaTokenTypes.tRPARENTHESIS))
-
+  def getRightParenthesis =
+    Option(findChildByType[PsiElement](ScalaTokenTypes.tRPARENTHESIS))
 }

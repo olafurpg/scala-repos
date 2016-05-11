@@ -26,13 +26,13 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 /**
- * User: Dmitry Naidanov
- * Date: 12.10.11
- */
-
+  * User: Dmitry Naidanov
+  * Date: 12.10.11
+  */
 class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
-        extends JavaCommandLineState(env) {
-  setConsoleBuilder(TextConsoleBuilderFactory.getInstance.createBuilder(project))
+    extends JavaCommandLineState(env) {
+  setConsoleBuilder(
+      TextConsoleBuilderFactory.getInstance.createBuilder(project))
   private val MAIN_CLASS = "scala.tools.nsc.ScalaDoc"
   private val classpathDelimeter = File.pathSeparator
   private var outputDir: String = ""
@@ -71,9 +71,9 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     outputDir = dir
   }
 
-
   override protected def startProcess: OSProcessHandler = {
-    val handler: OSProcessHandler = JavaCommandLineStateUtil.startProcess(createCommandLine)
+    val handler: OSProcessHandler =
+      JavaCommandLineStateUtil.startProcess(createCommandLine)
     if (showInBrowser) {
       handler.addProcessListener(new ProcessAdapter {
         override def processTerminated(event: ProcessEvent) {
@@ -87,18 +87,24 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     handler
   }
 
-  private def visitAll(file: VirtualFile, scope: AnalysisScope,
-                       acc: mutable.MutableList[VirtualFile] = mutable.MutableList[VirtualFile]()): List[VirtualFile] = {
+  private def visitAll(file: VirtualFile,
+                       scope: AnalysisScope,
+                       acc: mutable.MutableList[VirtualFile] = mutable
+                           .MutableList[VirtualFile]()): List[VirtualFile] = {
 
-    def visitInner(file: VirtualFile, scope: AnalysisScope,
-                   acc: mutable.MutableList[VirtualFile] = mutable.MutableList[VirtualFile]()): mutable.MutableList[VirtualFile] = {
+    def visitInner(
+        file: VirtualFile,
+        scope: AnalysisScope,
+        acc: mutable.MutableList[VirtualFile] = mutable
+            .MutableList[VirtualFile]()): mutable.MutableList[VirtualFile] = {
       if (file == null) return acc
       if (file.isDirectory) {
         for (c <- file.getChildren) {
           visitInner(c, scope, acc)
         }
       } else {
-        if (file.getExtension == "scala" && file.isValid && scope.contains(file)) {
+        if (file.getExtension == "scala" && file.isValid &&
+            scope.contains(file)) {
           PsiManager.getInstance(project).findFile(file) match {
             case f: ScalaFile if !f.isScriptFile() => acc += file
             case _ => // do nothing
@@ -119,9 +125,13 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
 
     paramTokens.foldLeft(false) {
       case (true, _) => false
-      case (_, param: String) if ScaladocCommandLineState.generatedParamsWithArgs.contains(param) => true
+      case (_, param: String)
+          if ScaladocCommandLineState.generatedParamsWithArgs.contains(
+              param) =>
+        true
       case (_, param: String) =>
-        if (!ScaladocCommandLineState.generatedParamsWithoutArgs.contains(param)) result += param
+        if (!ScaladocCommandLineState.generatedParamsWithoutArgs.contains(
+                param)) result += param
         false
     }
 
@@ -157,7 +167,8 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     val jp = new JavaParameters
     val jdk: Sdk = PathUtilEx.getAnyJdk(project)
     assert(jdk != null, "JDK IS NULL")
-    jp.configureByProject(project, JavaParameters.JDK_AND_CLASSES_AND_TESTS, jdk)
+    jp.configureByProject(
+        project, JavaParameters.JDK_AND_CLASSES_AND_TESTS, jdk)
     jp.setWorkingDirectory(project.getBaseDir.getPath)
 
     val scalaModule = project.anyScalaModule.getOrElse {
@@ -176,25 +187,36 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
 
     val paramList = jp.getProgramParametersList
 
-    val paramListSimple =  ListBuffer.apply[String]()
+    val paramListSimple = ListBuffer.apply[String]()
 
     val modules = ModuleManager.getInstance(project).getModules
 
-    val sourcePath = OrderEnumerator.orderEntries(project).withoutLibraries().withoutSdk().getAllSourceRoots
+    val sourcePath = OrderEnumerator
+      .orderEntries(project)
+      .withoutLibraries()
+      .withoutSdk()
+      .getAllSourceRoots
     val documentableFilesList = ListBuffer.apply[String]()
     val allModules = MutableHashSet.apply(modules: _*)
     val modulesNeeded = MutableHashSet.apply[Module]()
 
     def filterModulesList(files: VirtualFile*) {
-      modulesNeeded ++= allModules.filter(m => files.exists(f => m.getModuleScope.contains(f)))
+      modulesNeeded ++=
+        allModules.filter(m => files.exists(f => m.getModuleScope.contains(f)))
       allModules --= modulesNeeded
     }
-    
-    def collectCPSources(target: OrderEnumerator, classesCollector: collection.mutable.HashSet[String],
-                         sourcesCollector: collection.mutable.HashSet[String]) {
-      Set(classesCollector -> target.classes(), sourcesCollector -> target.sources()).foreach {
-        entry => entry._1 ++= entry._2.withoutSelfModuleOutput().getRoots.map {
-          virtualFile => virtualFile.getPath.replaceAll(Pattern.quote(".") + "(\\S{2,6})" + Pattern.quote("!/"), ".$1/")
+
+    def collectCPSources(
+        target: OrderEnumerator,
+        classesCollector: collection.mutable.HashSet[String],
+        sourcesCollector: collection.mutable.HashSet[String]) {
+      Set(classesCollector -> target.classes(),
+          sourcesCollector -> target.sources()).foreach { entry =>
+        entry._1 ++= entry._2.withoutSelfModuleOutput().getRoots.map {
+          virtualFile =>
+            virtualFile.getPath.replaceAll(Pattern.quote(".") +
+                                           "(\\S{2,6})" + Pattern.quote("!/"),
+                                           ".$1/")
         }
       }
     }
@@ -205,10 +227,14 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
 
       if (modulesNeeded.nonEmpty) {
         for (module <- modulesNeeded) {
-          collectCPSources(OrderEnumerator.orderEntries(module), allEntries, allSourceEntries)
+          collectCPSources(OrderEnumerator.orderEntries(module),
+                           allEntries,
+                           allSourceEntries)
         }
       } else {
-        collectCPSources(OrderEnumerator.orderEntries(project), allEntries, allSourceEntries)
+        collectCPSources(OrderEnumerator.orderEntries(project),
+                         allEntries,
+                         allSourceEntries)
       }
       allEntries.foreach(a => classpathWithFacet.append(a))
       allSourceEntries.foreach(a => sourcepathWithFacet.append(a))
@@ -224,9 +250,9 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
           case Some(a) => modulesNeeded += a
           case None =>
         }
-      case AnalysisScope.MODULES => 
+      case AnalysisScope.MODULES =>
         for (module <- modules) {
-          if (scope.containsModule(module)){
+          if (scope.containsModule(module)) {
             modulesNeeded += module
           }
         }
@@ -274,12 +300,15 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
 
     if (JdkUtil.useDynamicClasspath(project)) {
       try {
-        val tempParamsFile: File = File.createTempFile("scaladocfileargs", ".tmp")
-        val pw: PrintStream = new PrintStream(new FileOutputStream(tempParamsFile))
+        val tempParamsFile: File =
+          File.createTempFile("scaladocfileargs", ".tmp")
+        val pw: PrintStream = new PrintStream(
+            new FileOutputStream(tempParamsFile))
 
         for (param <- paramListSimple) {
           var paramEsc = param
-          if (param.contains(" ") && !(param.startsWith("\"") && param.endsWith("\""))) {
+          if (param.contains(" ") &&
+              !(param.startsWith("\"") && param.endsWith("\""))) {
             paramEsc = "\"" + param + "\""
           }
 
@@ -288,8 +317,7 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
 
         pw.close()
         paramList.add("@" + tempParamsFile.getAbsolutePath)
-      }
-      catch {
+      } catch {
         case e: IOException => throw new ExecutionException("I/O Error", e)
       }
     } else {

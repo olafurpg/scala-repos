@@ -22,38 +22,37 @@ import scala.collection.mutable.ListBuffer
 import org.apache.spark.annotation.DeveloperApi
 
 /**
- * :: DeveloperApi ::
- * Information about a running task attempt inside a TaskSet.
- */
+  * :: DeveloperApi ::
+  * Information about a running task attempt inside a TaskSet.
+  */
 @DeveloperApi
-class TaskInfo(
-    val taskId: Long,
-    val index: Int,
-    val attemptNumber: Int,
-    val launchTime: Long,
-    val executorId: String,
-    val host: String,
-    val taskLocality: TaskLocality.TaskLocality,
-    val speculative: Boolean) {
+class TaskInfo(val taskId: Long,
+               val index: Int,
+               val attemptNumber: Int,
+               val launchTime: Long,
+               val executorId: String,
+               val host: String,
+               val taskLocality: TaskLocality.TaskLocality,
+               val speculative: Boolean) {
 
   /**
-   * The time when the task started remotely getting the result. Will not be set if the
-   * task result was sent immediately when the task finished (as opposed to sending an
-   * IndirectTaskResult and later fetching the result from the block manager).
-   */
+    * The time when the task started remotely getting the result. Will not be set if the
+    * task result was sent immediately when the task finished (as opposed to sending an
+    * IndirectTaskResult and later fetching the result from the block manager).
+    */
   var gettingResultTime: Long = 0
 
   /**
-   * Intermediate updates to accumulables during this task. Note that it is valid for the same
-   * accumulable to be updated multiple times in a single task or for two accumulables with the
-   * same name but different IDs to exist in a task.
-   */
+    * Intermediate updates to accumulables during this task. Note that it is valid for the same
+    * accumulable to be updated multiple times in a single task or for two accumulables with the
+    * same name but different IDs to exist in a task.
+    */
   val accumulables = ListBuffer[AccumulableInfo]()
 
   /**
-   * The time when the task has completed successfully (including the time to remotely fetch
-   * results, if necessary).
-   */
+    * The time when the task has completed successfully (including the time to remotely fetch
+    * results, if necessary).
+    */
   var finishTime: Long = 0
 
   var failed = false
@@ -99,11 +98,13 @@ class TaskInfo(
 
   def duration: Long = {
     if (!finished) {
-      throw new UnsupportedOperationException("duration() called on unfinished task")
+      throw new UnsupportedOperationException(
+          "duration() called on unfinished task")
     } else {
       finishTime - launchTime
     }
   }
 
-  private[spark] def timeRunning(currentTime: Long): Long = currentTime - launchTime
+  private[spark] def timeRunning(currentTime: Long): Long =
+    currentTime - launchTime
 }

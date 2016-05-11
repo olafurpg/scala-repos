@@ -5,4 +5,3 @@
 package scala.tools.nsc.ast.parser
 
 class Patch(off: Int, change: Change)
-

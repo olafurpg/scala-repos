@@ -5,9 +5,8 @@ class Crashy {
     for (_ <- g()) {
       (null: Any) match {
         case Some(_) => 5
-        case None    => sys.error("")
+        case None => sys.error("")
       }
     }
   }
 }
-

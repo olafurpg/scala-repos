@@ -29,13 +29,15 @@ class LoopState[T](init: T) extends WaitingState[T] { self =>
       failed = true
       self
     }
-    def willAccept(intr: T) = Right(new RunningState[T] {
-      def succeed = self
-      def fail(err: Throwable) = {
-        println(err)
-        failed = true
-        self
-      }
-    })
+    def willAccept(intr: T) =
+      Right(
+          new RunningState[T] {
+        def succeed = self
+        def fail(err: Throwable) = {
+          println(err)
+          failed = true
+          self
+        }
+      })
   }
 }

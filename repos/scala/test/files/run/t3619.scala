@@ -16,12 +16,10 @@ object Test extends App {
         this(Test.this.meth(Meh.this.nameClash))(Test.this.nameClash)
       }
     }
-  */
+   */
 
   new Meh
 }
-
-
 /*
   {
     def this(a: String, b: Int) {
@@ -31,4 +29,4 @@ object Test extends App {
       this(Meh.this.nameClash, 1)
     }
   }
-*/
+ */

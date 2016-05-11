@@ -15,9 +15,8 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.project._
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class ServerMediator(project: Project) extends ProjectComponent {
 
   private def isScalaProject = project.hasScala
@@ -25,9 +24,11 @@ class ServerMediator(project: Project) extends ProjectComponent {
 
   private val connection = project.getMessageBus.connect
   private val serverLauncher = new BuildManagerListener {
-    override def beforeBuildProcessStarted(project: Project, uuid: UUID): Unit = {}
+    override def beforeBuildProcessStarted(
+        project: Project, uuid: UUID): Unit = {}
 
-    override def buildStarted(project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {
+    override def buildStarted(
+        project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {
       if (settings.COMPILE_SERVER_ENABLED && isScalaProject) {
         invokeAndWait {
           CompileServerManager.instance(project).configureWidget()
@@ -45,7 +46,8 @@ class ServerMediator(project: Project) extends ProjectComponent {
       }
     }
 
-    override def buildFinished(project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {}
+    override def buildFinished(
+        project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {}
   }
 
   connection.subscribe(BuildManagerListener.TOPIC, serverLauncher)
@@ -55,8 +57,7 @@ class ServerMediator(project: Project) extends ProjectComponent {
       if (isScalaProject) {
         if (!checkCompilationSettings()) false
         else true
-      }
-      else true
+      } else true
     }
   }
 
@@ -69,7 +70,8 @@ class ServerMediator(project: Project) extends ProjectComponent {
       val test = extension.getCompilerOutputUrlForTests
       production == test
     }
-    val modulesWithClashes = ModuleManager.getInstance(project).getModules.toSeq.filter(hasClashes)
+    val modulesWithClashes =
+      ModuleManager.getInstance(project).getModules.toSeq.filter(hasClashes)
 
     var result = true
 
@@ -77,29 +79,37 @@ class ServerMediator(project: Project) extends ProjectComponent {
       invokeAndWait {
         val choice =
           if (!ApplicationManager.getApplication.isUnitTestMode) {
-            Messages.showYesNoDialog(project,
-              "Production and test output paths are shared in: " + modulesWithClashes.map(_.getName).mkString(" "),
-              "Shared compile output paths in Scala module(s)",
-              "Split output path(s) automatically", "Cancel compilation", Messages.getErrorIcon)
-          }
-          else Messages.YES
+            Messages.showYesNoDialog(
+                project,
+                "Production and test output paths are shared in: " +
+                modulesWithClashes.map(_.getName).mkString(" "),
+                "Shared compile output paths in Scala module(s)",
+                "Split output path(s) automatically",
+                "Cancel compilation",
+                Messages.getErrorIcon)
+          } else Messages.YES
 
         val splitAutomatically = choice == Messages.YES
 
         if (splitAutomatically) {
           inWriteAction {
             modulesWithClashes.foreach { module =>
-              val model = ModuleRootManager.getInstance(module).getModifiableModel
-              val extension = model.getModuleExtension(classOf[CompilerModuleExtension])
+              val model =
+                ModuleRootManager.getInstance(module).getModifiableModel
+              val extension =
+                model.getModuleExtension(classOf[CompilerModuleExtension])
 
               val outputUrlParts = extension.getCompilerOutputUrl match {
                 case null => Seq.empty
                 case url => url.split("/").toSeq
               }
-              val nameForTests = if (outputUrlParts.lastOption.contains("classes")) "test-classes" else "test"
+              val nameForTests =
+                if (outputUrlParts.lastOption.contains("classes"))
+                  "test-classes" else "test"
 
               extension.inheritCompilerOutputPath(false)
-              extension.setCompilerOutputPathForTests((outputUrlParts.dropRight(1) :+ nameForTests).mkString("/"))
+              extension.setCompilerOutputPathForTests(
+                  (outputUrlParts.dropRight(1) :+ nameForTests).mkString("/"))
 
               model.commit()
             }

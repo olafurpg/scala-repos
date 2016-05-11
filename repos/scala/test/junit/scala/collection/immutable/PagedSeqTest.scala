@@ -10,7 +10,8 @@ class PagedSeqTest {
   // should not NPE, and should equal the given Seq
   @Test
   def test_SI6615(): Unit = {
-    assertEquals(Seq('a'), PagedSeq.fromStrings(List.fill(5000)("a")).slice(4096, 4097))
+    assertEquals(
+        Seq('a'), PagedSeq.fromStrings(List.fill(5000)("a")).slice(4096, 4097))
   }
 
   // should not NPE, and should be empty
@@ -27,7 +28,7 @@ class PagedSeqTest {
       def hasNext = readAttempt < 65536
       def next = { readAttempt += 1; readAttempt }
     }
-    val s = PagedSeq.fromIterator(sideEffectingIterator).slice(0,2).mkString
+    val s = PagedSeq.fromIterator(sideEffectingIterator).slice(0, 2).mkString
     assertEquals(s, "12")
     assert(readAttempt <= 4096)
   }

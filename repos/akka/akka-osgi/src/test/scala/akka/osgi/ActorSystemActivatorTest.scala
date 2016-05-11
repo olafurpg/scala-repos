@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.osgi
 
 import language.postfixOps
@@ -13,28 +13,29 @@ import scala.concurrent.duration._
 import scala.collection.immutable
 import akka.util.Timeout
 import de.kalpatec.pojosr.framework.launch.BundleDescriptor
-import test.{ RuntimeNameActorSystemActivator, TestActivators, PingPongActorSystemActivator }
+import test.{RuntimeNameActorSystemActivator, TestActivators, PingPongActorSystemActivator}
 import test.PingPong._
 import PojoSRTestSupport.bundle
 import org.scalatest.Matchers
 
 /**
- * Test cases for [[akka.osgi.ActorSystemActivator]] in 2 different scenarios:
- * - no name configured for [[akka.actor.ActorSystem]]
- * - runtime name configuration
- */
+  * Test cases for [[akka.osgi.ActorSystemActivator]] in 2 different scenarios:
+  * - no name configured for [[akka.actor.ActorSystem]]
+  * - runtime name configuration
+  */
 object ActorSystemActivatorTest {
 
   val TEST_BUNDLE_NAME = "akka.osgi.test.activator"
-
 }
 
-class PingPongActorSystemActivatorTest extends WordSpec with Matchers with PojoSRTestSupport {
+class PingPongActorSystemActivatorTest
+    extends WordSpec with Matchers with PojoSRTestSupport {
 
   import ActorSystemActivatorTest._
 
-  val testBundles: immutable.Seq[BundleDescriptor] = buildTestBundles(List(
-    bundle(TEST_BUNDLE_NAME).withActivator(classOf[PingPongActorSystemActivator])))
+  val testBundles: immutable.Seq[BundleDescriptor] = buildTestBundles(
+      List(bundle(TEST_BUNDLE_NAME).withActivator(
+              classOf[PingPongActorSystemActivator])))
 
   "PingPongActorSystemActivator" must {
 
@@ -59,23 +60,25 @@ class PingPongActorSystemActivatorTest extends WordSpec with Matchers with PojoS
       }
     }
   }
-
 }
 
-class RuntimeNameActorSystemActivatorTest extends WordSpec with Matchers with PojoSRTestSupport {
+class RuntimeNameActorSystemActivatorTest
+    extends WordSpec with Matchers with PojoSRTestSupport {
 
   import ActorSystemActivatorTest._
 
-  val testBundles: immutable.Seq[BundleDescriptor] =
-    buildTestBundles(List(bundle(TEST_BUNDLE_NAME).withActivator(classOf[RuntimeNameActorSystemActivator])))
+  val testBundles: immutable.Seq[BundleDescriptor] = buildTestBundles(
+      List(bundle(TEST_BUNDLE_NAME).withActivator(
+              classOf[RuntimeNameActorSystemActivator])))
 
   "RuntimeNameActorSystemActivator" must {
 
     "register an ActorSystem and add the bundle id to the system name" in {
       filterErrors() {
-        serviceForType[ActorSystem].name should be(TestActivators.ACTOR_SYSTEM_NAME_PATTERN.format(bundleForName(TEST_BUNDLE_NAME).getBundleId))
+        serviceForType[ActorSystem].name should be(
+            TestActivators.ACTOR_SYSTEM_NAME_PATTERN.format(
+                bundleForName(TEST_BUNDLE_NAME).getBundleId))
       }
     }
   }
-
 }

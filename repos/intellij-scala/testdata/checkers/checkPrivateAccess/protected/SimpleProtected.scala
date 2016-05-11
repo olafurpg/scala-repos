@@ -4,7 +4,8 @@ class SimpleProtected {
   }
 
   class B extends A {
-    /*ref*/foo
+    /*ref*/
+    foo
   }
 }
 //true

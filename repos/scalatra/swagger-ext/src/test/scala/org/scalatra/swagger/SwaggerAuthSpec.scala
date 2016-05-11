@@ -1,11 +1,11 @@
 package org.scalatra
 package swagger
 
-import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.json4s._
 import org.json4s.native.JsonMethods._
-import org.scalatra.auth.{ ScentryConfig, ScentryStrategy, ScentrySupport }
+import org.scalatra.auth.{ScentryConfig, ScentryStrategy, ScentrySupport}
 import org.scalatra.json.NativeJsonSupport
 import org.scalatra.servlet.ServletApiImplicits._
 import org.scalatra.test.specs2.MutableScalatraSpec
@@ -17,20 +17,25 @@ object SwaggerAuthSpec {
   val Users = List(User("tom", "token1"), User("kate", "token2"), User("john"))
 
   val apiInfo = ApiInfo(
-    title = "Swagger Sample App",
-    description = "This is a sample server Petstore server.  You can find out more about Swagger \n    at <a href=\"http://swagger.wordnik.com\">http://swagger.wordnik.com</a> or on irc.freenode.net, #swagger.",
-    termsOfServiceUrl = "http://helloreverb.com/terms/",
-    contact = "apiteam@wordnik.com",
-    license = "Apache 2.0",
-    licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html"
+      title = "Swagger Sample App",
+      description = "This is a sample server Petstore server.  You can find out more about Swagger \n    at <a href=\"http://swagger.wordnik.com\">http://swagger.wordnik.com</a> or on irc.freenode.net, #swagger.",
+      termsOfServiceUrl = "http://helloreverb.com/terms/",
+      contact = "apiteam@wordnik.com",
+      license = "Apache 2.0",
+      licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html"
   )
   class SpecSwagger extends SwaggerWithAuth("1.2", "1.0.0", apiInfo)
 
-  class HeaderOrQueryToken(protected val app: ScalatraBase) extends ScentryStrategy[User] {
+  class HeaderOrQueryToken(protected val app: ScalatraBase)
+      extends ScentryStrategy[User] {
     override def name = "header_or_query_token"
-    private def token(implicit request: HttpServletRequest) = (app.request.header("API-TOKEN") orElse app.params.get("api_token")).flatMap(_.blankOption)
-    override def isValid(implicit request: HttpServletRequest) = token.isDefined
-    def authenticate()(implicit request: HttpServletRequest, response: HttpServletResponse) = {
+    private def token(implicit request: HttpServletRequest) =
+      (app.request.header("API-TOKEN") orElse app.params.get("api_token"))
+        .flatMap(_.blankOption)
+    override def isValid(implicit request: HttpServletRequest) =
+      token.isDefined
+    def authenticate()(implicit request: HttpServletRequest,
+                       response: HttpServletResponse) = {
       token match {
         case Some("token1") => Option(Users(0))
         case Some("token2") => Option(Users(1))
@@ -40,7 +45,9 @@ object SwaggerAuthSpec {
     }
   }
 
-  trait AuthenticatedBase extends ScalatraServlet with NativeJsonSupport with ScentrySupport[User] {
+  trait AuthenticatedBase
+      extends ScalatraServlet with NativeJsonSupport
+      with ScentrySupport[User] {
     type ScentryConfiguration = ScentryConfig
     protected val scentryConfig: ScentryConfiguration = new ScentryConfig {}
 
@@ -64,9 +71,7 @@ object SwaggerAuthSpec {
   }
 
   class ResourcesApp(implicit protected val swagger: SwaggerWithAuth)
-      extends AuthenticatedBase
-      with NativeJsonSupport
-      with CorsSupport
+      extends AuthenticatedBase with NativeJsonSupport with CorsSupport
       with SwaggerAuthBase[User] {
 
     error {
@@ -74,34 +79,40 @@ object SwaggerAuthSpec {
     }
 
     protected val userManifest = manifest[User]
-
   }
 
-  class PetsApi(implicit protected val swagger: SwaggerWithAuth) extends AuthenticatedBase with NativeJsonSupport with SwaggerAuthSupport[User] {
+  class PetsApi(implicit protected val swagger: SwaggerWithAuth)
+      extends AuthenticatedBase with NativeJsonSupport
+      with SwaggerAuthSupport[User] {
 
     implicit protected def jsonFormats: Formats = DefaultFormats
 
     protected val applicationDescription = "The pets api"
     override protected val applicationName = Some("pets")
 
-    private val allowsTom = (u: Option[User]) => {
-      u.map(_.login) == Some("tom")
+    private val allowsTom = (u: Option[User]) =>
+      {
+        u.map(_.login) == Some("tom")
     }
 
-    private val allowsAuthenticated = (u: Option[User]) => {
-      u.isDefined
+    private val allowsAuthenticated = (u: Option[User]) =>
+      {
+        u.isDefined
     }
 
-    private val noJohn = (u: Option[User]) => {
-      val uu = u.map(_.login)
-      uu.isDefined && uu != Some("john")
+    private val noJohn = (u: Option[User]) =>
+      {
+        val uu = u.map(_.login)
+        uu.isDefined && uu != Some("john")
     }
 
     get("/", operation(apiOperation[Unit]("getPets"))) {
       "OK"
     }
 
-    get("/authenticated", operation(apiOperation[Unit]("authenticated").allows(allowsAuthenticated))) {
+    get("/authenticated",
+        operation(
+            apiOperation[Unit]("authenticated").allows(allowsAuthenticated))) {
       "OK"
     }
 
@@ -109,12 +120,15 @@ object SwaggerAuthSpec {
       "OK"
     }
 
-    get("/kate-and-tom", operation(apiOperation[Unit]("getKateAndTom").allows(noJohn))) {
+    get("/kate-and-tom",
+        operation(apiOperation[Unit]("getKateAndTom").allows(noJohn))) {
       "OK"
     }
   }
 
-  class AdminApi(implicit protected val swagger: SwaggerWithAuth) extends AuthenticatedBase with NativeJsonSupport with SwaggerAuthSupport[User] {
+  class AdminApi(implicit protected val swagger: SwaggerWithAuth)
+      extends AuthenticatedBase with NativeJsonSupport
+      with SwaggerAuthSupport[User] {
     protected val applicationDescription = "The admin api"
     override protected val applicationName = Some("admin")
 
@@ -133,7 +147,8 @@ object SwaggerAuthSpec {
       "OK"
     }
 
-    post("/blah", operation(apiOperation[Unit]("createBlah").allows(isAllowed))) {
+    post("/blah",
+         operation(apiOperation[Unit]("createBlah").allows(isAllowed))) {
       "OK"
     }
   }
@@ -149,8 +164,10 @@ class SwaggerAuthSpec extends MutableScalatraSpec {
 
   addServlet(new ResourcesApp, "/api-docs/*")
 
-  private def apis(jv: JValue): List[String] = jv \ "apis" \ "path" \\ classOf[JString]
-  private def endpoints(jv: JValue): List[String] = jv \ "apis" \ "operations" \ "method" \\ classOf[JString]
+  private def apis(jv: JValue): List[String] =
+    jv \ "apis" \ "path" \\ classOf[JString]
+  private def endpoints(jv: JValue): List[String] =
+    jv \ "apis" \ "operations" \ "method" \\ classOf[JString]
   private def jsonBody = {
     val b = body
     //    println("json body")
@@ -222,7 +239,5 @@ class SwaggerAuthSpec extends MutableScalatraSpec {
         status must_== 404
       }
     }
-
   }
-
 }

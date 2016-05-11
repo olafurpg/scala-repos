@@ -19,13 +19,17 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
     }
 
     def boundWithWeight(weight: Double, addrs: Address*): Name.Bound =
-      Name.Bound(Var.value(Addr.Bound(addrs.toSet, Addr.Metadata(AddrWeightKey -> weight))), addrs.toSet)
+      Name.Bound(
+          Var.value(
+              Addr.Bound(addrs.toSet, Addr.Metadata(AddrWeightKey -> weight))),
+          addrs.toSet)
 
     class TestException extends Exception {}
     val exc = new TestException {}
 
     val namer = new Namer {
-      var acts: Map[Path, (Activity[NameTree[Path]], Witness[Try[NameTree[Path]]])] =
+      var acts: Map[
+          Path, (Activity[NameTree[Path]], Witness[Try[NameTree[Path]]])] =
         Map.empty
 
       def contains(path: String) = acts contains Path.read(path)
@@ -45,13 +49,18 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
       val pathNamer = new Namer {
         def lookup(path: Path): Activity[NameTree[Name]] = path match {
           // Don't capture system paths.
-          case Path.Utf8("$", _*) => Activity.value(NameTree.Neg)
-          case p@Path.Utf8(elems@_*) =>
+          case Path.Utf8("$", _ *) => Activity.value(NameTree.Neg)
+          case p @ Path.Utf8(elems @ _ *) =>
             acts.get(p) match {
-              case Some((a, _)) => a map { tree => tree.map(Name(_)) }
+              case Some((a, _)) =>
+                a map { tree =>
+                  tree.map(Name(_))
+                }
               case None =>
                 val (act, _) = addPath(p)
-                act map { tree => tree.map(Name(_)) }
+                act map { tree =>
+                  tree.map(Name(_))
+                }
             }
           case _ => Activity.value(NameTree.Neg)
         }
@@ -90,7 +99,9 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
     // Ok(Bound) & Ok(Bound)
     namer("/test/1").notify(Return(NameTree.read("/$/inet/0/1")))
     namer("/test/2").notify(Return(NameTree.read("/$/inet/0/2")))
-    assertEval(res, boundWithWeight(1.0, Address(1)), boundWithWeight(1.0, Address(2)))
+    assertEval(res,
+               boundWithWeight(1.0, Address(1)),
+               boundWithWeight(1.0, Address(2)))
 
     // Ok(Bound) & Ok(Neg)
     namer("/test/2").notify(Return(NameTree.Neg))
@@ -138,14 +149,18 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
   })
 
   test("NameTree.bind: Alt with Fail/Empty")(new Ctx {
-    assert(namer.bind(NameTree.read("(! | /test/1 | /test/2)")).sample() == NameTree.Fail)
-    assert(namer.bind(NameTree.read("(~ | /$/fail | /test/1)")).sample() == NameTree.Fail)
-    assert(namer.bind(NameTree.read("(/$/nil | /$/fail | /test/1)")).sample() == NameTree.Empty)
+    assert(
+        namer.bind(NameTree.read("(! | /test/1 | /test/2)")).sample() == NameTree.Fail)
+    assert(
+        namer.bind(NameTree.read("(~ | /$/fail | /test/1)")).sample() == NameTree.Fail)
+    assert(
+        namer.bind(NameTree.read("(/$/nil | /$/fail | /test/1)")).sample() == NameTree.Empty)
   })
 
   def assertLookup(path: String, addrs: Address*) {
     Namer.global.lookup(Path.read(path)).sample() match {
-      case NameTree.Leaf(Name.Bound(addr)) => assert(addr.sample() == Addr.Bound(addrs.toSet))
+      case NameTree.Leaf(Name.Bound(addr)) =>
+        assert(addr.sample() == Addr.Bound(addrs.toSet))
       case _ => fail()
     }
   }
@@ -178,22 +193,21 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
   }
 
   test("Namer.global: /$/fail") {
-    assert(Namer.global.lookup(Path.read("/$/fail")).sample()
-      == NameTree.Fail)
-    assert(Namer.global.lookup(Path.read("/$/fail/foo/bar")).sample()
-      == NameTree.Fail)
+    assert(Namer.global.lookup(Path.read("/$/fail")).sample() == NameTree.Fail)
+    assert(
+        Namer.global.lookup(Path.read("/$/fail/foo/bar")).sample() == NameTree.Fail)
   }
 
   test("Namer.global: /$/nil") {
-    assert(Namer.global.lookup(Path.read("/$/nil")).sample()
-        == NameTree.Empty)
-    assert(Namer.global.lookup(Path.read("/$/nil/foo/bar")).sample()
-        == NameTree.Empty)
+    assert(Namer.global.lookup(Path.read("/$/nil")).sample() == NameTree.Empty)
+    assert(
+        Namer.global.lookup(Path.read("/$/nil/foo/bar")).sample() == NameTree.Empty)
   }
 
   test("Namer.global: /$/{className}") {
-    assert(Namer.global.lookup(Path.read("/$/com.twitter.finagle.TestNamer/foo")).sample()
-      == NameTree.Leaf(Name.Path(Path.Utf8("bar"))))
+    assert(Namer.global
+          .lookup(Path.read("/$/com.twitter.finagle.TestNamer/foo"))
+          .sample() == NameTree.Leaf(Name.Path(Path.Utf8("bar"))))
   }
 
   test("Namer.global: /$/{className} ServiceNamer") {
@@ -205,7 +219,8 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
           case bound: Addr.Bound =>
             assert(bound.addrs.size == 1)
             bound.addrs.head match {
-              case exp.Address.ServiceFactory(sf: ServiceFactory[Path, Path], _) =>
+              case exp.Address
+                    .ServiceFactory(sf: ServiceFactory[Path, Path], _) =>
                 val svc = Await.result(sf())
                 val rsp = Await.result(svc(Path.Utf8("yodles")))
                 assert(rsp == Path.Utf8("foo", "yodles"))
@@ -220,7 +235,8 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
     }
   }
 
-  test("Namer.global: /$/{className} ServiceNamer of incompatible type raises ClassCastException") {
+  test(
+      "Namer.global: /$/{className} ServiceNamer of incompatible type raises ClassCastException") {
     val dst = Path.read("/$/com.twitter.finagle.PathServiceNamer/foo")
     Namer.global.lookup(dst).sample() match {
       case NameTree.Leaf(bound: Name.Bound) =>
@@ -229,9 +245,10 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
           case bound: Addr.Bound =>
             assert(bound.addrs.size == 1)
             bound.addrs.head match {
-              case exp.Address.ServiceFactory(sf: ServiceFactory[Int, Int], _) =>
+              case exp.Address
+                    .ServiceFactory(sf: ServiceFactory[Int, Int], _) =>
                 val svc = Await.result(sf())
-                intercept [ClassCastException] {
+                intercept[ClassCastException] {
                   val rsp = Await.result(svc(3))
                 }
 
@@ -246,14 +263,14 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
   }
 
   test("Namer.global: negative resolution") {
-    assert(Namer.global.lookup(Path.read("/foo/bar/bah/blah")).sample()
-        == NameTree.Neg)
-    assert(Namer.global.lookup(Path.read("/foo/bar")).sample()
-        == NameTree.Neg)
+    assert(
+        Namer.global.lookup(Path.read("/foo/bar/bah/blah")).sample() == NameTree.Neg)
+    assert(Namer.global.lookup(Path.read("/foo/bar")).sample() == NameTree.Neg)
   }
 
   test("Namer.resolve") {
-    assert(Namer.resolve("invalid").sample() match {
+    assert(
+        Namer.resolve("invalid").sample() match {
       case Addr.Failed(_: IllegalArgumentException) => true
       case _ => false
     })
@@ -263,15 +280,17 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
 class TestNamer extends Namer {
   def lookup(path: Path): Activity[NameTree[Name]] =
     Activity.value(
-      path match {
-        case Path.Utf8("foo") => NameTree.Leaf(Name.Path(Path.Utf8("bar")))
-        case _ => NameTree.Neg
-      })
+        path match {
+      case Path.Utf8("foo") => NameTree.Leaf(Name.Path(Path.Utf8("bar")))
+      case _ => NameTree.Neg
+    })
 }
 
 class PathServiceNamer extends ServiceNamer[Path, Path] {
   def lookupService(pfx: Path) = {
-    val svc = Service.mk[Path, Path] { req => Future.value(pfx ++ req) }
+    val svc = Service.mk[Path, Path] { req =>
+      Future.value(pfx ++ req)
+    }
     Some(svc)
   }
 }

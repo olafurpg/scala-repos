@@ -12,6 +12,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 
 @RunWith(classOf[JUnitRunner])
 class KetamaClientTest extends FunSuite with BeforeAndAfter {
+
   /**
     * We already proved above that we can hit a real memcache server,
     * so we can use our own for the partitioned client test.
@@ -22,9 +23,11 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
   var address2: InetSocketAddress = null
 
   before {
-    server1 = new InProcessMemcached(new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
+    server1 = new InProcessMemcached(
+        new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
     address1 = server1.start().boundAddress.asInstanceOf[InetSocketAddress]
-    server2 = new InProcessMemcached(new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
+    server2 = new InProcessMemcached(
+        new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
     address2 = server2.start().boundAddress.asInstanceOf[InetSocketAddress]
   }
 
@@ -33,10 +36,10 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
     server2.stop()
   }
 
-
   test("doesn't blow up") {
     val client = KetamaClientBuilder()
-      .nodes("localhost:%d,localhost:%d".format(address1.getPort, address2.getPort))
+      .nodes("localhost:%d,localhost:%d".format(address1.getPort,
+                                                address2.getPort))
       .build()
 
     Await.result(client.delete("foo"))
@@ -57,15 +60,20 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
     val Buf.Utf8(res) = Await.result(client.get("foo")).get
     assert(res == "bar")
   }
-  
+
   test("using .dest() preserves custom keys") {
     val key1 = 0
     val key2 = 3
-    val name = s"twcache!localhost:${address1.getPort}:1:$key1,localhost:${address2.getPort}:1:$key2"
-    val client = KetamaClientBuilder().dest(name).build().asInstanceOf[KetamaPartitionedClient]
-    
+    val name =
+      s"twcache!localhost:${address1.getPort}:1:$key1,localhost:${address2.getPort}:1:$key2"
+    val client = KetamaClientBuilder()
+      .dest(name)
+      .build()
+      .asInstanceOf[KetamaPartitionedClient]
+
     assert(client.ketamaNodeGrp().size == 2)
-    assert(client.ketamaNodeGrp().map(_._1) == Set(KetamaClientKey(key1.toString), KetamaClientKey(key2.toString)))
+    assert(client.ketamaNodeGrp().map(_._1) == Set(
+            KetamaClientKey(key1.toString), KetamaClientKey(key2.toString)))
 
     Await.result(client.delete("foo"))
     assert(Await.result(client.get("foo")) == None)
@@ -75,10 +83,11 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
   }
 
   test("using Group[InetSocketAddress] doesn't blow up") {
-    val mutableGroup = Group(address1, address2).map{_.asInstanceOf[SocketAddress]}
-    val client = KetamaClientBuilder()
-      .group(CacheNodeGroup(mutableGroup, true))
-      .build()
+    val mutableGroup = Group(address1, address2).map {
+      _.asInstanceOf[SocketAddress]
+    }
+    val client =
+      KetamaClientBuilder().group(CacheNodeGroup(mutableGroup, true)).build()
 
     Await.result(client.delete("foo"))
     assert(Await.result(client.get("foo")) == None)
@@ -89,7 +98,8 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
 
   test("using custom keys doesn't blow up") {
     val client = KetamaClientBuilder()
-      .nodes("localhost:%d:1:key1,localhost:%d:1:key2".format(address1.getPort, address2.getPort))
+      .nodes("localhost:%d:1:key1,localhost:%d:1:key2".format(
+              address1.getPort, address2.getPort))
       .build()
 
     Await.result(client.delete("foo"))
@@ -102,12 +112,14 @@ class KetamaClientTest extends FunSuite with BeforeAndAfter {
 
   test("even in future pool") {
     lazy val client = KetamaClientBuilder()
-      .nodes("localhost:%d,localhost:%d".format(address1.getPort, address2.getPort))
+      .nodes("localhost:%d,localhost:%d".format(address1.getPort,
+                                                address2.getPort))
       .build()
 
-    val futureResult = Future.value(true) flatMap {
-      _ => client.get("foo")
-    }
+    val futureResult =
+      Future.value(true) flatMap { _ =>
+        client.get("foo")
+      }
 
     assert(Await.result(futureResult) == None)
   }

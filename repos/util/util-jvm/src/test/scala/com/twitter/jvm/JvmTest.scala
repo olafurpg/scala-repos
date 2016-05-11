@@ -29,8 +29,8 @@ class JvmTest extends WordSpec with TestLogging {
         def snap = currentSnap
 
         def pushGc(gc: Gc) {
-          val gcs = snap.lastGcs filter(_.name != gc.name)
-          setSnap(snap.copy(lastGcs=gc +: gcs))
+          val gcs = snap.lastGcs filter (_.name != gc.name)
+          setSnap(snap.copy(lastGcs = gc +: gcs))
         }
 
         def forceGc() = ()
@@ -71,7 +71,7 @@ class JvmTest extends WordSpec with TestLogging {
         assert(b(0) == gc)
         r.run()
         assert(b.size == 1)
-        val gc1 = gc.copy(name="CMS")
+        val gc1 = gc.copy(name = "CMS")
         jvm.pushGc(gc1)
         r.run()
         assert(b.size == 2)
@@ -80,73 +80,79 @@ class JvmTest extends WordSpec with TestLogging {
         r.run()
         r.run()
         assert(b.size == 2)
-        jvm.pushGc(gc1.copy(count=1))
-        jvm.pushGc(gc.copy(count=1))
+        jvm.pushGc(gc1.copy(count = 1))
+        jvm.pushGc(gc.copy(count = 1))
         r.run()
         assert(b.size == 4)
-        assert(b(2) == gc.copy(count=1))
-        assert(b(3) == gc1.copy(count=1))
+        assert(b(2) == gc.copy(count = 1))
+        assert(b(3) == gc1.copy(count = 1))
       }
 
-      "Complain when sampling rate is too low, every 30 minutes" in Time.withCurrentTimeFrozen { tc =>
-        val h = new JvmHelper
-        import h._
+      "Complain when sampling rate is too low, every 30 minutes" in Time.withCurrentTimeFrozen {
+        tc =>
+          val h = new JvmHelper
+          import h._
 
-        traceLogger(Level.DEBUG)
+          traceLogger(Level.DEBUG)
 
-        jvm foreachGc { _ => /*ignore*/}
-        assert(jvm.executor.schedules.size == 1)
-        val Seq((r, _, _, _)) = jvm.executor.schedules
-        val gc = Gc(0, "pcopy", Time.now, 1.millisecond)
-        r.run()
-        jvm.pushGc(gc)
-        r.run()
-        jvm.pushGc(gc.copy(count=2))
-        r.run()
-        assert(logLines() == Seq("Missed 1 collections for pcopy due to sampling"))
-        jvm.pushGc(gc.copy(count=10))
-        assert(logLines() == Seq("Missed 1 collections for pcopy due to sampling"))
-        r.run()
-        tc.advance(29.minutes)
-        r.run()
-        assert(logLines() == Seq("Missed 1 collections for pcopy due to sampling"))
-        tc.advance(2.minutes)
-        jvm.pushGc(gc.copy(count=12))
-        r.run()
-        assert(logLines() == Seq(
-          "Missed 1 collections for pcopy due to sampling",
-          "Missed 8 collections for pcopy due to sampling"
-        ))
+          jvm foreachGc { _ => /*ignore*/
+          }
+          assert(jvm.executor.schedules.size == 1)
+          val Seq((r, _, _, _)) = jvm.executor.schedules
+          val gc = Gc(0, "pcopy", Time.now, 1.millisecond)
+          r.run()
+          jvm.pushGc(gc)
+          r.run()
+          jvm.pushGc(gc.copy(count = 2))
+          r.run()
+          assert(logLines() == Seq(
+                  "Missed 1 collections for pcopy due to sampling"))
+          jvm.pushGc(gc.copy(count = 10))
+          assert(logLines() == Seq(
+                  "Missed 1 collections for pcopy due to sampling"))
+          r.run()
+          tc.advance(29.minutes)
+          r.run()
+          assert(logLines() == Seq(
+                  "Missed 1 collections for pcopy due to sampling"))
+          tc.advance(2.minutes)
+          jvm.pushGc(gc.copy(count = 12))
+          r.run()
+          assert(logLines() == Seq(
+                  "Missed 1 collections for pcopy due to sampling",
+                  "Missed 8 collections for pcopy due to sampling"
+              ))
       }
     }
 
     "monitorsGcs" should {
-      "queries gcs in range, in reverse chronological order" in Time.withCurrentTimeFrozen { tc =>
-        val h = new JvmHelper
-        import h._
+      "queries gcs in range, in reverse chronological order" in Time.withCurrentTimeFrozen {
+        tc =>
+          val h = new JvmHelper
+          import h._
 
-        val query = jvm.monitorGcs(10.seconds)
-        assert(jvm.executor.schedules.size == 1)
-        val Seq((r, _, _, _)) = jvm.executor.schedules
-        val gc0 = Gc(0, "pcopy", Time.now, 1.millisecond)
-        val gc1 = Gc(1, "CMS", Time.now, 1.millisecond)
-        jvm.pushGc(gc1)
-        jvm.pushGc(gc0)
-        r.run()
-        tc.advance(9.seconds)
-        val gc2 = Gc(1, "pcopy", Time.now, 2.milliseconds)
-        jvm.pushGc(gc2)
-        r.run()
-        assert(query(10.seconds.ago) == Seq(gc2, gc1, gc0))
-        tc.advance(2.seconds)
-        val gc3 = Gc(2, "CMS", Time.now, 1.second)
-        jvm.pushGc(gc3)
-        r.run()
-        assert(query(10.seconds.ago) == Seq(gc3, gc2))
+          val query = jvm.monitorGcs(10.seconds)
+          assert(jvm.executor.schedules.size == 1)
+          val Seq((r, _, _, _)) = jvm.executor.schedules
+          val gc0 = Gc(0, "pcopy", Time.now, 1.millisecond)
+          val gc1 = Gc(1, "CMS", Time.now, 1.millisecond)
+          jvm.pushGc(gc1)
+          jvm.pushGc(gc0)
+          r.run()
+          tc.advance(9.seconds)
+          val gc2 = Gc(1, "pcopy", Time.now, 2.milliseconds)
+          jvm.pushGc(gc2)
+          r.run()
+          assert(query(10.seconds.ago) == Seq(gc2, gc1, gc0))
+          tc.advance(2.seconds)
+          val gc3 = Gc(2, "CMS", Time.now, 1.second)
+          jvm.pushGc(gc3)
+          r.run()
+          assert(query(10.seconds.ago) == Seq(gc3, gc2))
       }
     }
 
-    "safepoint" should { 
+    "safepoint" should {
       "show an increase in total time spent after a gc" in {
         val j = Jvm()
         val preGc = j.safepoint

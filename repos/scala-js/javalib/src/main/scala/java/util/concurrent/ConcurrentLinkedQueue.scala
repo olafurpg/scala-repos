@@ -28,10 +28,8 @@ class ConcurrentLinkedQueue[E]()
 
       _size += 1
 
-      if (oldLast ne null)
-        oldLast.next = last
-      else
-        head = last
+      if (oldLast ne null) oldLast.next = last
+      else head = last
 
       true
     }
@@ -46,8 +44,7 @@ class ConcurrentLinkedQueue[E]()
       val oldHead = head
       head = oldHead.next
 
-      if (head eq null)
-        last = null
+      if (head eq null) last = null
 
       _size -= 1
       oldHead.value
@@ -66,8 +63,7 @@ class ConcurrentLinkedQueue[E]()
 
   private def getNodeAt(index: Int): Node[E] = {
     var current: Node[E] = head
-    for (_ <- 0 until index)
-      current = current.next
+    for (_ <- 0 until index) current = current.next
     current
   }
 
@@ -78,7 +74,7 @@ class ConcurrentLinkedQueue[E]()
       var prev = head
       var current: Node[E] = head.next
 
-      while ((current ne null) && (current ne node)) {
+      while ( (current ne null) && (current ne node)) {
         prev = current
         current = current.next
       }
@@ -89,8 +85,7 @@ class ConcurrentLinkedQueue[E]()
         _size -= 1
 
         prev.next = current.next
-        if (current eq last)
-          last = prev
+        if (current eq last) last = prev
       }
     }
   }
@@ -122,8 +117,7 @@ class ConcurrentLinkedQueue[E]()
         nextNode ne null
 
       def next(): E = {
-        if (nextNode eq null)
-          throw new NoSuchElementException()
+        if (nextNode eq null) throw new NoSuchElementException()
 
         lastNode = nextNode
         nextNode = nextNode.next
@@ -132,8 +126,7 @@ class ConcurrentLinkedQueue[E]()
       }
 
       def remove(): Unit = {
-        if (lastNode eq null)
-          throw new IllegalStateException()
+        if (lastNode eq null) throw new IllegalStateException()
 
         removeNode(lastNode.value)
 
@@ -141,13 +134,9 @@ class ConcurrentLinkedQueue[E]()
       }
     }
   }
-
 }
 
 object ConcurrentLinkedQueue {
 
-  private final class Node[T](
-      var value: T,
-      var next: Node[T] = null)
-
+  private final class Node[T](var value: T, var next: Node[T] = null)
 }

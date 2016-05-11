@@ -19,13 +19,13 @@ package com.twitter.jvm
 import com.twitter.util.Duration
 
 /**
- * Support for heapster profiling (google perftools compatible):
- *
- * https://github.com/mariusaeriksen/heapster
- */
+  * Support for heapster profiling (google perftools compatible):
+  *
+  * https://github.com/mariusaeriksen/heapster
+  */
 class Heapster(klass: Class[_]) {
   private val startM = klass.getDeclaredMethod("start")
-  private val stopM  = klass.getDeclaredMethod("stop")
+  private val stopM = klass.getDeclaredMethod("stop")
   private val dumpProfileM =
     klass.getDeclaredMethod("dumpProfile", classOf[java.lang.Boolean])
   private val clearProfileM = klass.getDeclaredMethod("clearProfile")
@@ -34,12 +34,16 @@ class Heapster(klass: Class[_]) {
 
   def start() { startM.invoke(null) }
   def shutdown() { stopM.invoke(null) }
-  def setSamplingPeriod(period: java.lang.Integer) { setSamplingPeriodM.invoke(null, period) }
+  def setSamplingPeriod(period: java.lang.Integer) {
+    setSamplingPeriodM.invoke(null, period)
+  }
   def clearProfile() { clearProfileM.invoke(null) }
   def dumpProfile(forceGC: java.lang.Boolean): Array[Byte] =
     dumpProfileM.invoke(null, forceGC).asInstanceOf[Array[Byte]]
 
-  def profile(howlong: Duration, samplingPeriod: Int = 10<<19, forceGC: Boolean = true) = {
+  def profile(howlong: Duration,
+              samplingPeriod: Int = 10 << 19,
+              forceGC: Boolean = true) = {
     clearProfile()
     setSamplingPeriod(samplingPeriod)
 
@@ -61,4 +65,3 @@ object Heapster {
     }
   }
 }
-

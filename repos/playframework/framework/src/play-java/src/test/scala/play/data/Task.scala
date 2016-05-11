@@ -31,6 +31,4 @@ class Task {
 
   @BeanProperty
   var endDate: Date = _
-
 }
-

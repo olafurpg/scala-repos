@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package net.liftweb 
-package http 
-package js 
-package yui 
+package net.liftweb
+package http
+package js
+package yui
 
 import scala.xml.{Elem, NodeSeq}
 
@@ -30,53 +30,58 @@ import JsCmds._
 import JE._
 
 /**
- * Prerequisite YUI scripts:
- * yahoo.js
- * dom.js
- * connection.js
- * event.js
- */
+  * Prerequisite YUI scripts:
+  * yahoo.js
+  * dom.js
+  * connection.js
+  * event.js
+  */
 object YUIArtifacts extends JSArtifacts {
+
   /**
-   * Toggles between current JS object and the object denominated by id
-   */
+    * Toggles between current JS object and the object denominated by id
+    */
   def toggle(id: String) = new JsExp {
     def toJsCmd = "YAHOO.lift.toggle(this, " + id.encJs + ");";
   }
 
   /**
-   * Hides the element denominated by id
-   */
+    * Hides the element denominated by id
+    */
   def hide(id: String) = new JsExp {
-    def toJsCmd = "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'none');"
+    def toJsCmd =
+      "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'none');"
   }
 
   /**
-   * Shows the element denominated by this id
-   */
+    * Shows the element denominated by this id
+    */
   def show(id: String) = new JsExp {
-    def toJsCmd = "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'block');"
+    def toJsCmd =
+      "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'block');"
   }
 
   /**
-   * Shows the element denoinated by id and puts the focus on it
-   */
+    * Shows the element denoinated by id and puts the focus on it
+    */
   def showAndFocus(id: String) = new JsExp {
-    def toJsCmd = "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'block');" +
-            "setTimeout(function() { document.getElementById(" + id.encJs + ").focus(); }, 200);"
+    def toJsCmd =
+      "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'block');" +
+      "setTimeout(function() { document.getElementById(" + id.encJs +
+      ").focus(); }, 200);"
   }
 
   /**
-   * Serializes a form denominated by the id. It returns a query string
-   * containing the fields that are to be submitted
-   */
+    * Serializes a form denominated by the id. It returns a query string
+    * containing the fields that are to be submitted
+    */
   def serialize(id: String) = new JsExp {
     def toJsCmd = "YAHOO.util.Connect.setForm(" + id.encJs + ", false)"
   }
 
   /**
-   * Replaces the content of the node with the provided id with the markup given by content
-   */
+    * Replaces the content of the node with the provided id with the markup given by content
+    */
   def replace(id: String, content: NodeSeq): JsCmd = new JsCmd with HtmlFixer {
     override val toJsCmd = {
       val (html, js) = fixHtmlAndJs("inline", content)
@@ -84,8 +89,10 @@ object YUIArtifacts extends JSArtifacts {
       val ret =
         """
 	  try {
-	  var parent1 = document.getElementById(""" + id.encJs + """);
-	  parent1.innerHTML = """ + html + """;
+	  var parent1 = document.getElementById(""" + id.encJs +
+        """);
+	  parent1.innerHTML = """ + html +
+        """;
 	  for (var i = 0; i < parent1.childNodes.length; i++) {
 	    var node = parent1.childNodes[i];
 	    parent1.parentNode.insertBefore(node.cloneNode(true), parent1);
@@ -95,53 +102,54 @@ object YUIArtifacts extends JSArtifacts {
 	    // if the node doesn't exist or something else bad happens
 	  }
 	"""
-      if (js.isEmpty) ret else ret + " "+js.toJsCmd
-
+      if (js.isEmpty) ret else ret + " " + js.toJsCmd
     }
   }
 
   /**
-   * Sets the inner HTML of the element denominated by the id
-   */
+    * Sets the inner HTML of the element denominated by the id
+    */
   def setHtml(uid: String, content: NodeSeq): JsCmd = new JsCmd {
-    val toJsCmd = fixHtmlCmdFunc(uid, content){s => "try{document.getElementById(" + uid.encJs + ").innerHTML = " + s + ";} catch (e) {}"}
+    val toJsCmd = fixHtmlCmdFunc(uid, content) { s =>
+      "try{document.getElementById(" + uid.encJs + ").innerHTML = " + s +
+      ";} catch (e) {}"
+    }
   }
 
   /**
-   * Sets the JavScript that will be executed when document is ready
-   * for processing
-   */
+    * Sets the JavScript that will be executed when document is ready
+    * for processing
+    */
   def onLoad(cmd: JsCmd): JsCmd = new JsCmd {
-    def toJsCmd = "YAHOO.util.Event.onDOMReady(function(){" + cmd.toJsCmd + "})"
+    def toJsCmd =
+      "YAHOO.util.Event.onDOMReady(function(){" + cmd.toJsCmd + "})"
   }
 
   /**
-   * Fades out the element having the provided id, by waiting
-   * for the given duration and fades out during fadeTime
-   */
+    * Fades out the element having the provided id, by waiting
+    * for the given duration and fades out during fadeTime
+    */
   def fadeOut(id: String, duration: TimeSpan, fadeTime: TimeSpan) = Noop
 
   /**
-   * Trabsforms a JSON object intoits string representation
-   */
+    * Trabsforms a JSON object intoits string representation
+    */
   def jsonStringify(in: JsExp): JsExp = new JsExp {
     def toJsCmd = "YAHOO.lang.JSON.stringify(" + in.toJsCmd + ")"
   }
 
   /**
-   * Converts a form denominated by formId into a JSON object
-   */
+    * Converts a form denominated by formId into a JSON object
+    */
   def formToJSON(formId: String): JsExp = new JsExp() {
     def toJsCmd = "YAHOO.lift.formToJSON('" + formId + "')";
   }
 
   private def toJson(info: AjaxInfo): String =
-    ("timeout : " + info.timeout ::
-            "cache : " + info.cache ::
-            "success : function(resp) { res = YAHOO.lift.eval(resp);" + info.successFunc.map(_ + "(res);").openOr("") + "}" ::
-            "failure : " + info.failFunc.openOr("function (arg) {YAHOO.log('Ajax request failed');}") ::
-            Nil) mkString ("{ ", ", ", " }")
-
-
+    ("timeout : " + info.timeout :: "cache : " +
+        info.cache :: "success : function(resp) { res = YAHOO.lift.eval(resp);" +
+        info.successFunc.map(_ + "(res);").openOr("") + "}" :: "failure : " +
+        info.failFunc.openOr(
+            "function (arg) {YAHOO.log('Ajax request failed');}") :: Nil) mkString
+    ("{ ", ", ", " }")
 }
-

@@ -9,9 +9,8 @@ import com.intellij.psi.PsiFile
 import org.jetbrains.plugins.scala.debugger.evaluation.ScalaCodeFragment
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 object ReportHighlightingErrorQuickFix extends IntentionAction {
   def getText: String = ScalaBundle.message("report.highlighting.error.fix")
 
@@ -23,8 +22,10 @@ object ReportHighlightingErrorQuickFix extends IntentionAction {
   }
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
-    DesktopUtils.browse("http://youtrack.jetbrains.net/issues/SCL#newissue=yes")
+    DesktopUtils.browse(
+        "http://youtrack.jetbrains.net/issues/SCL#newissue=yes")
   }
 
-  def getFamilyName: String = ScalaBundle.message("report.highlighting.error.fix")
+  def getFamilyName: String =
+    ScalaBundle.message("report.highlighting.error.fix")
 }

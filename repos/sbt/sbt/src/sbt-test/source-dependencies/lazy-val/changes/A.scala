@@ -1,4 +1,3 @@
-class A
-{
-	lazy val x = 3
+class A {
+  lazy val x = 3
 }

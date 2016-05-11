@@ -2,7 +2,7 @@ package cats
 package tests
 
 import cats.data.{Xor, Coproduct}
-import cats.free.{Free, Inject,:<:}
+import cats.free.{Free, Inject, :<:}
 import org.scalacheck._
 
 class InjectTests extends CatsSuite {
@@ -11,11 +11,11 @@ class InjectTests extends CatsSuite {
 
   sealed trait Test1Algebra[A]
 
-  case class Test1[A](value : Int, f: Int => A) extends Test1Algebra[A]
+  case class Test1[A](value: Int, f: Int => A) extends Test1Algebra[A]
 
   sealed trait Test2Algebra[A]
 
-  case class Test2[A](value : Int, f: Int => A) extends Test2Algebra[A]
+  case class Test2[A](value: Int, f: Int => A) extends Test2Algebra[A]
 
   type T[A] = Coproduct[Test1Algebra, Test2Algebra, A]
 
@@ -33,11 +33,17 @@ class InjectTests extends CatsSuite {
       }
     }
 
-  implicit def test1Arbitrary[A](implicit seqArb: Arbitrary[Int], intAArb : Arbitrary[Int => A]): Arbitrary[Test1[A]] =
-    Arbitrary(for {s <- seqArb.arbitrary; f <- intAArb.arbitrary} yield Test1(s, f))
+  implicit def test1Arbitrary[A](
+      implicit seqArb: Arbitrary[Int],
+      intAArb: Arbitrary[Int => A]): Arbitrary[Test1[A]] =
+    Arbitrary(for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield
+          Test1(s, f))
 
-  implicit def test2Arbitrary[A](implicit seqArb: Arbitrary[Int], intAArb : Arbitrary[Int => A]): Arbitrary[Test2[A]] =
-    Arbitrary(for {s <- seqArb.arbitrary; f <- intAArb.arbitrary} yield Test2(s, f))
+  implicit def test2Arbitrary[A](
+      implicit seqArb: Arbitrary[Int],
+      intAArb: Arbitrary[Int => A]): Arbitrary[Test2[A]] =
+    Arbitrary(for { s <- seqArb.arbitrary; f <- intAArb.arbitrary } yield
+          Test2(s, f))
 
   object Test1Interpreter extends (Test1Algebra ~> Id) {
     override def apply[A](fa: Test1Algebra[A]): Id[A] = fa match {
@@ -57,32 +63,32 @@ class InjectTests extends CatsSuite {
 
   test("inj") {
     forAll { (x: Int, y: Int) =>
-        def res[F[_]]
-            (implicit I0: Test1Algebra :<: F,
-            I1: Test2Algebra :<: F): Free[F, Int] = {
-          for {
-            a <- Free.inject[Test1Algebra, F](Test1(x, identity))
-            b <- Free.inject[Test2Algebra, F](Test2(y, identity))
-          } yield a + b
-        }
+      def res[F[_]](implicit I0: Test1Algebra :<: F,
+                    I1: Test2Algebra :<: F): Free[F, Int] = {
+        for {
+          a <- Free.inject[Test1Algebra, F](Test1(x, identity))
+          b <- Free.inject[Test2Algebra, F](Test2(y, identity))
+        } yield a + b
+      }
       (res[T] foldMap coProductInterpreter) == Id.pure(x + y) should ===(true)
     }
   }
 
   test("prj") {
-    def distr[F[_], A](f: Free[F, A])
-                      (implicit
-                       F: Functor[F],
-                       I0: Test1Algebra :<: F,
-                       I1: Test2Algebra :<: F): Option[Free[F, A]] =
+    def distr[F[_], A](f: Free[F, A])(
+        implicit F: Functor[F],
+        I0: Test1Algebra :<: F,
+        I1: Test2Algebra :<: F): Option[Free[F, A]] =
       for {
         Test1(x, h) <- match_[F, Test1Algebra, A](f)
         Test2(y, k) <- match_[F, Test2Algebra, A](h(x))
       } yield k(x + y)
 
     forAll { (x: Int, y: Int) =>
-      val expr1: Free[T, Int] = Inject.inject[T, Test1Algebra, Int](Test1(x, Free.pure))
-      val expr2: Free[T, Int] = Inject.inject[T, Test2Algebra, Int](Test2(y, Free.pure))
+      val expr1: Free[T, Int] =
+        Inject.inject[T, Test1Algebra, Int](Test1(x, Free.pure))
+      val expr2: Free[T, Int] =
+        Inject.inject[T, Test2Algebra, Int](Test2(y, Free.pure))
       val res = distr[T, Int](expr1 >> expr2)
       res == Some(Free.pure(x + y)) should ===(true)
     }
@@ -96,8 +102,8 @@ class InjectTests extends CatsSuite {
 
   test("apply in right") {
     forAll { (y: Test2[Int]) =>
-      Inject[Test2Algebra, T].inj(y) == Coproduct(Xor.Right(y)) should ===(true)
+      Inject[Test2Algebra, T].inj(y) == Coproduct(Xor.Right(y)) should ===(
+          true)
     }
   }
-
 }

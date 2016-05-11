@@ -5,9 +5,8 @@ package surrounders
 package expression
 
 /**
- * author: Dmitry Krasilschikov
- */
-
+  * author: Dmitry Krasilschikov
+  */
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -24,19 +23,20 @@ class ScalaWithWhileSurrounder extends ScalaExpressionSurrounder {
 
   override def getTemplateDescription = "while"
 
-  override def getSurroundSelectionRange (withWhileNode : ASTNode ) : TextRange = {
+  override def getSurroundSelectionRange(withWhileNode: ASTNode): TextRange = {
     val element: PsiElement = withWhileNode.getPsi match {
-      case x: ScParenthesisedExpr => x.expr match {
-        case Some(y) => y
-        case _ => return x.getTextRange
-      }
+      case x: ScParenthesisedExpr =>
+        x.expr match {
+          case Some(y) => y
+          case _ => return x.getTextRange
+        }
       case x => x
     }
 
     val whileStmt = element.asInstanceOf[ScWhileStmtImpl]
 
-    val conditionNode : ASTNode = (whileStmt.condition: @unchecked) match {
-        case Some(c) => c.getNode
+    val conditionNode: ASTNode = (whileStmt.condition: @unchecked) match {
+      case Some(c) => c.getNode
     }
 
     val startOffset = conditionNode.getTextRange.getStartOffset

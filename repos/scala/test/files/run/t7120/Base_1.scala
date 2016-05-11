@@ -2,9 +2,9 @@
 // in the interests of minimizing the log output during
 // debugging this problem, I've split the compilation.
 
-case class Container( v: String )
+case class Container(v: String)
 
-trait Base[ T <: AnyRef ] {
+trait Base[T <: AnyRef] {
   type UserType = T
-  protected def defect: PartialFunction[ UserType, String ]
+  protected def defect: PartialFunction[UserType, String]
 }

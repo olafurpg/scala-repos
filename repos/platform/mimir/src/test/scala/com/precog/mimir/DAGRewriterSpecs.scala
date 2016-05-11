@@ -25,13 +25,13 @@ import com.precog.common._
 import com.precog.yggdrasil._
 import org.joda.time.DateTime
 
-import scalaz.{ FirstOption, NaturalTransformation, Tag }
+import scalaz.{FirstOption, NaturalTransformation, Tag}
 import scalaz.std.anyVal.booleanInstance.disjunction
 import scalaz.std.option.optionFirst
 import scalaz.syntax.comonad._
 
-trait DAGRewriterSpecs[M[+_]] extends Specification
-    with EvaluatorTestSupport[M] {
+trait DAGRewriterSpecs[M[+ _]]
+    extends Specification with EvaluatorTestSupport[M] {
 
   import dag._
   import instructions._
@@ -64,16 +64,19 @@ trait DAGRewriterSpecs[M[+_]] extends Specification
 
       val t1 = dag.AbsoluteLoad(Const(CString("/hom/pairs"))(line))(line)
 
-      val input =
-        Join(Add, IdentitySort,
-          Join(Add, Cross(None),
-            Join(DerefObject, Cross(None),
-              t1,
-              Const(CString("first"))(line))(line),
-            dag.Reduce(Count, t1)(line))(line),
-          Join(DerefObject, Cross(None),
-            t1,
-            Const(CString("second"))(line))(line))(line)
+      val input = Join(Add,
+                       IdentitySort,
+                       Join(Add,
+                            Cross(None),
+                            Join(DerefObject,
+                                 Cross(None),
+                                 t1,
+                                 Const(CString("first"))(line))(line),
+                            dag.Reduce(Count, t1)(line))(line),
+                       Join(DerefObject,
+                            Cross(None),
+                            t1,
+                            Const(CString("second"))(line))(line))(line)
 
       val ctx = defaultEvaluationContext
       val optimize = true
@@ -81,21 +84,18 @@ trait DAGRewriterSpecs[M[+_]] extends Specification
       // The should be a MegaReduce for the Count reduction
       val optimizedDAG = fullRewriteDAG(optimize, ctx)(input)
       val megaReduce = optimizedDAG.foldDown(true) {
-        case m@MegaReduce(_, _) => Tag(Some(m)): FirstOption[DepGraph]
+        case m @ MegaReduce(_, _) => Tag(Some(m)): FirstOption[DepGraph]
       }
 
       megaReduce must beSome
 
-      val rewritten = inlineNodeValue(
-        optimizedDAG,
-        megaReduce.get,
-        CNum(42))
+      val rewritten = inlineNodeValue(optimizedDAG, megaReduce.get, CNum(42))
 
       val hasMegaReduce = rewritten.foldDown(false) {
-        case m@MegaReduce(_, _) => true
+        case m @ MegaReduce(_, _) => true
       }(disjunction)
       val hasConst = rewritten.foldDown(false) {
-        case m@Const(CNum(n)) if n == 42 => true
+        case m @ Const(CNum(n)) if n == 42 => true
       }(disjunction)
 
       // Must be turned into a Const node
@@ -105,4 +105,5 @@ trait DAGRewriterSpecs[M[+_]] extends Specification
   }
 }
 
-object DAGRewriterSpecs extends DAGRewriterSpecs[test.YId] with test.YIdInstances
+object DAGRewriterSpecs
+    extends DAGRewriterSpecs[test.YId] with test.YIdInstances

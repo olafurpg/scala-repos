@@ -5,10 +5,11 @@ import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class LastIndexToLastInspection extends OperationOnCollectionInspection {
-  override def possibleSimplificationTypes: Array[SimplificationType] = Array(LastIndexToLast)
+  override def possibleSimplificationTypes: Array[SimplificationType] =
+    Array(LastIndexToLast)
 }
 
 object LastIndexToLast extends SimplificationType {
@@ -16,9 +17,10 @@ object LastIndexToLast extends SimplificationType {
 
   override def getSimplification(expr: ScExpression): Option[Simplification] = {
     expr match {
-      case qual`.apply`(qual2`.sizeOrLength`() `-` literal("1"))
-        if qual != null && qual2 != null &&
-          PsiEquivalenceUtil.areElementsEquivalent(qual, qual2) && isSeq(qual) && !isIndexedSeq(qual) =>
+      case qual `.apply` (qual2 `.sizeOrLength` () `-` literal("1"))
+          if qual != null && qual2 != null &&
+          PsiEquivalenceUtil.areElementsEquivalent(qual, qual2) &&
+          isSeq(qual) && !isIndexedSeq(qual) =>
         Some(replace(expr).withText(invocationText(qual, "last")))
       case _ => None
     }

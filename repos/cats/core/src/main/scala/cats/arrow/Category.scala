@@ -2,8 +2,8 @@ package cats
 package arrow
 
 /**
- * Must obey the laws defined in cats.laws.CategoryLaws.
- */
+  * Must obey the laws defined in cats.laws.CategoryLaws.
+  */
 trait Category[F[_, _]] extends Compose[F] { self =>
 
   def id[A]: F[A, A]

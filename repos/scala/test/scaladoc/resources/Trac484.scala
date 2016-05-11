@@ -14,5 +14,6 @@ class RefinementAndExistentials {
   }
   def hh(x: Float) = new { def quux(x: Int, y: Int) = 55 }
   def j(x: Int): Bar = sys.error("")
-  def k(): AnyRef { type Dingus <: T forSome { type T <: String } } = sys.error("")
+  def k(): AnyRef { type Dingus <: T forSome { type T <: String } } =
+    sys.error("")
 }

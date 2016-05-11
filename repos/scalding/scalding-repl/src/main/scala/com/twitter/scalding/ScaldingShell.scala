@@ -23,7 +23,7 @@ import java.util.jar.JarOutputStream
 import org.apache.hadoop.util.GenericOptionsParser
 import org.apache.hadoop.conf.Configuration
 
-import scala.tools.nsc.{ GenericRunnerCommand, MainGenericRunner }
+import scala.tools.nsc.{GenericRunnerCommand, MainGenericRunner}
 import scala.tools.nsc.interpreter.ILoop
 import scala.tools.nsc.io.VirtualDirectory
 
@@ -32,35 +32,37 @@ import com.google.common.io.Files
 case class ShellArgs(cfg: Config, mode: Mode, cmdArgs: List[String])
 
 /**
- * A runner for a Scala REPL providing functionality extensions specific to working with
- * Scalding.
- */
+  * A runner for a Scala REPL providing functionality extensions specific to working with
+  * Scalding.
+  */
 trait BaseScaldingShell extends MainGenericRunner {
 
   /**
-   * An instance of the Scala REPL the user will interact with.
-   */
+    * An instance of the Scala REPL the user will interact with.
+    */
   private var scaldingREPL: Option[ILoop] = None
 
   /**
-   * An instance of the default configuration for the REPL
-   */
+    * An instance of the default configuration for the REPL
+    */
   private val conf: Configuration = new Configuration()
 
   protected def replState: BaseReplState = ReplState
 
-  protected def scaldingREPLProvider: () => ILoop = { () => new ScaldingILoop }
+  protected def scaldingREPLProvider: () => ILoop = { () =>
+    new ScaldingILoop
+  }
 
   /**
-   * The main entry point for executing the REPL.
-   *
-   * This method is lifted from [[scala.tools.nsc.MainGenericRunner]] and modified to allow
-   * for custom functionality, including determining at runtime if the REPL is running,
-   * and making custom REPL colon-commands available to the user.
-   *
-   * @param args passed from the command line.
-   * @return `true` if execution was successful, `false` otherwise.
-   */
+    * The main entry point for executing the REPL.
+    *
+    * This method is lifted from [[scala.tools.nsc.MainGenericRunner]] and modified to allow
+    * for custom functionality, including determining at runtime if the REPL is running,
+    * and making custom REPL colon-commands available to the user.
+    *
+    * @param args passed from the command line.
+    * @return `true` if execution was successful, `false` otherwise.
+    */
   override def process(args: Array[String]): Boolean = {
     // Get the mode (hdfs or local), and initialize the configuration
     val ShellArgs(cfg, mode, cmdArgs) = parseModeArgs(args)
@@ -84,10 +86,11 @@ trait BaseScaldingShell extends MainGenericRunner {
     val repl = scaldingREPLProvider.apply()
     scaldingREPL = Some(repl)
     replState.mode = mode
-    replState.customConfig = replState.customConfig ++ (mode match {
-      case _: HadoopMode => cfg
-      case _ => Config.empty
-    })
+    replState.customConfig = replState.customConfig ++
+    (mode match {
+          case _: HadoopMode => cfg
+          case _ => Config.empty
+        })
 
     // if in Hdfs mode, store the mode to enable switching between Local and Hdfs
     mode match {
@@ -106,12 +109,12 @@ trait BaseScaldingShell extends MainGenericRunner {
     (new GenericOptionsParser(conf, args)).getRemainingArgs
 
   /**
-   * Sets the mode for this job, updates jobConf with hadoop arguments
-   * and returns all the non-hadoop arguments.
-   *
-   * @param args from the command line.
-   * @return a Mode for the job (e.g. local, hdfs), config and the non-hadoop params
-   */
+    * Sets the mode for this job, updates jobConf with hadoop arguments
+    * and returns all the non-hadoop arguments.
+    *
+    * @param args from the command line.
+    * @return a Mode for the job (e.g. local, hdfs), config and the non-hadoop params
+    */
   def parseModeArgs(args: Array[String]): ShellArgs = {
     val a = nonHadoopArgsFrom(args)
     val mode = Mode(Args(a), conf)
@@ -119,10 +122,10 @@ trait BaseScaldingShell extends MainGenericRunner {
   }
 
   /**
-   * Runs an instance of the shell.
-   *
-   * @param args from the command line.
-   */
+    * Runs an instance of the shell.
+    *
+    * @param args from the command line.
+    */
   def main(args: Array[String]) {
     val retVal = process(args)
     if (!retVal) {
@@ -131,27 +134,29 @@ trait BaseScaldingShell extends MainGenericRunner {
   }
 
   /**
-   * Creates a jar file in a temporary directory containing the code thus far compiled by the REPL.
-   *
-   * @return some file for the jar created, or `None` if the REPL is not running.
-   */
+    * Creates a jar file in a temporary directory containing the code thus far compiled by the REPL.
+    *
+    * @return some file for the jar created, or `None` if the REPL is not running.
+    */
   private[scalding] def createReplCodeJar(): Option[File] = {
     scaldingREPL.map { repl =>
       val virtualDirectory = repl.virtualDirectory
-      val tempJar = new File(Files.createTempDir(),
-        "scalding-repl-session-" + System.currentTimeMillis() + ".jar")
+      val tempJar = new File(
+          Files.createTempDir(),
+          "scalding-repl-session-" + System.currentTimeMillis() + ".jar")
       createJar(virtualDirectory.asInstanceOf[VirtualDirectory], tempJar)
     }
   }
 
   /**
-   * Creates a jar file from the classes contained in a virtual directory.
-   *
-   * @param virtualDirectory containing classes that should be added to the jar.
-   * @param jarFile that will be written.
-   * @return the jarFile specified and written.
-   */
-  private def createJar(virtualDirectory: VirtualDirectory, jarFile: File): File = {
+    * Creates a jar file from the classes contained in a virtual directory.
+    *
+    * @param virtualDirectory containing classes that should be added to the jar.
+    * @param jarFile that will be written.
+    * @return the jarFile specified and written.
+    */
+  private def createJar(
+      virtualDirectory: VirtualDirectory, jarFile: File): File = {
     val jarStream = new JarOutputStream(new FileOutputStream(jarFile))
     try {
       addVirtualDirectoryToJar(virtualDirectory, "", jarStream)
@@ -163,17 +168,15 @@ trait BaseScaldingShell extends MainGenericRunner {
   }
 
   /**
-   * Add the contents of the specified virtual directory to a jar. This method will recursively
-   * descend into subdirectories to add their contents.
-   *
-   * @param dir is a virtual directory whose contents should be added.
-   * @param entryPath for classes found in the virtual directory.
-   * @param jarStream for writing the jar file.
-   */
+    * Add the contents of the specified virtual directory to a jar. This method will recursively
+    * descend into subdirectories to add their contents.
+    *
+    * @param dir is a virtual directory whose contents should be added.
+    * @param entryPath for classes found in the virtual directory.
+    * @param jarStream for writing the jar file.
+    */
   private def addVirtualDirectoryToJar(
-    dir: VirtualDirectory,
-    entryPath: String,
-    jarStream: JarOutputStream) {
+      dir: VirtualDirectory, entryPath: String, jarStream: JarOutputStream) {
     dir.foreach { file =>
       if (file.isDirectory) {
         // Recursively descend into subdirectories, adjusting the package name as we do.
@@ -181,7 +184,8 @@ trait BaseScaldingShell extends MainGenericRunner {
         val entry: JarEntry = new JarEntry(dirPath)
         jarStream.putNextEntry(entry)
         jarStream.closeEntry()
-        addVirtualDirectoryToJar(file.asInstanceOf[VirtualDirectory], dirPath, jarStream)
+        addVirtualDirectoryToJar(
+            file.asInstanceOf[VirtualDirectory], dirPath, jarStream)
       } else if (file.hasExtension("class")) {
         // Add class files as an entry in the jar file and write the class to the jar.
         val entry: JarEntry = new JarEntry(entryPath + file.name)

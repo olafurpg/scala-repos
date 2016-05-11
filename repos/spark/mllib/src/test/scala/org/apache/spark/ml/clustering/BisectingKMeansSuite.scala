@@ -68,7 +68,10 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("fit & transform") {
     val predictionColName = "bisecting_kmeans_prediction"
-    val bkm = new BisectingKMeans().setK(k).setPredictionCol(predictionColName).setSeed(1)
+    val bkm = new BisectingKMeans()
+      .setK(k)
+      .setPredictionCol(predictionColName)
+      .setSeed(1)
     val model = bkm.fit(dataset)
     assert(model.clusterCenters.length === k)
 
@@ -77,8 +80,13 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     expectedColumns.foreach { column =>
       assert(transformed.columns.contains(column))
     }
-    val clusters =
-      transformed.select(predictionColName).rdd.map(_.getInt(0)).distinct().collect().toSet
+    val clusters = transformed
+      .select(predictionColName)
+      .rdd
+      .map(_.getInt(0))
+      .distinct()
+      .collect()
+      .toSet
     assert(clusters.size === k)
     assert(clusters === Set(0, 1, 2, 3, 4))
     assert(model.computeCost(dataset) < 0.1)

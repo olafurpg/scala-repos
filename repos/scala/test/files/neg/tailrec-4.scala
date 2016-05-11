@@ -1,8 +1,8 @@
 import annotation._
 
 object Tail {
-  def tcInFunc: Unit = {
-    () => {
+  def tcInFunc: Unit = { () =>
+    {
       @tailrec def foo: Int = foo + 1
     }
   }
@@ -26,10 +26,10 @@ object Tail {
   }
   def tcInPatternGuard(x: Int, v: Int): Boolean =
     v match {
-      case _ if
-        {
-          @tailrec def foo: Int = foo + 1
-          foo == 42
-        } => true
+      case _ if {
+            @tailrec def foo: Int = foo + 1
+            foo == 42
+          } =>
+        true
     }
 }

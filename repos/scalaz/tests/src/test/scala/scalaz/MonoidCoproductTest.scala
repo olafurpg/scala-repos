@@ -8,5 +8,4 @@ object MonoidCoproductTest extends SpecLite {
 
   checkAll(monoid.laws[Int :+: String])
   checkAll(equal.laws[Int :+: String])
-
 }

@@ -1,31 +1,35 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.tck
 
 import java.util.concurrent.Executors
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 import akka.stream.testkit.TestPublisher
-import org.reactivestreams.{ Subscriber, Subscription, Processor, Publisher }
+import org.reactivestreams.{Subscriber, Subscription, Processor, Publisher}
 import org.reactivestreams.tck.IdentityProcessorVerification
 import org.reactivestreams.tck.TestEnvironment
 import org.scalatest.testng.TestNGSuiteLike
 import org.testng.annotations.AfterClass
 
-abstract class AkkaIdentityProcessorVerification[T](env: TestEnvironment, publisherShutdownTimeout: Long)
-  extends IdentityProcessorVerification[T](env, publisherShutdownTimeout)
-  with TestNGSuiteLike with ActorSystemLifecycle {
+abstract class AkkaIdentityProcessorVerification[T](
+    env: TestEnvironment, publisherShutdownTimeout: Long)
+    extends IdentityProcessorVerification[T](env, publisherShutdownTimeout)
+    with TestNGSuiteLike with ActorSystemLifecycle {
 
   def this(printlnDebug: Boolean) =
-    this(new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug), Timeouts.publisherShutdownTimeoutMillis)
+    this(new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),
+         Timeouts.publisherShutdownTimeoutMillis)
 
   def this() = this(false)
 
   override def createFailedPublisher(): Publisher[T] =
-    TestPublisher.error(new Exception("Unable to serve subscribers right now!"))
+    TestPublisher.error(
+        new Exception("Unable to serve subscribers right now!"))
 
-  def processorFromSubscriberAndPublisher(sub: Subscriber[T], pub: Publisher[T]): Processor[T, T] = {
+  def processorFromSubscriberAndPublisher(
+      sub: Subscriber[T], pub: Publisher[T]): Processor[T, T] = {
     new Processor[T, T] {
       override def onSubscribe(s: Subscription): Unit = sub.onSubscribe(s)
       override def onError(t: Throwable): Unit = sub.onError(t)

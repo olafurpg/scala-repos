@@ -30,15 +30,19 @@ import scalaz._
 
 class TerminateJsonSpecs extends Specification {
   def parse(partialJson: String) = {
-    val stream = CharBuffer.wrap(partialJson) :: StreamT.empty[Need, CharBuffer]
+    val stream =
+      CharBuffer.wrap(partialJson) :: StreamT.empty[Need, CharBuffer]
     val terminated = TerminateJson.ensure(stream)
     val json = terminated.foldLeft("")(_ + _.toString).value
     JParser.parseFromString(json)
   }
 
   def chunkAndParse(partialJson: String) = {
-    val stream = StreamT.fromStream(Need {
-      partialJson.toStream.map { c => CharBuffer.wrap(c.toString) }
+    val stream = StreamT.fromStream(
+        Need {
+      partialJson.toStream.map { c =>
+        CharBuffer.wrap(c.toString)
+      }
     })
     val terminated = TerminateJson.ensure(stream)
     val json = terminated.foldLeft("")(_ + _.toString).value
@@ -107,13 +111,15 @@ class TerminateJsonSpecs extends Specification {
       }
     }
     "not terminate perfectly fine string ~" in {
-      val data = """[{"_id":"ObjectId(\"50c0340042a1295fc55f4783\")"},{"_id":"ObjectId(\"50c0340042a1295fc55f4784\")"}]"""
+      val data =
+        """[{"_id":"ObjectId(\"50c0340042a1295fc55f4783\")"},{"_id":"ObjectId(\"50c0340042a1295fc55f4784\")"}]"""
       parse(data) must beLike {
         case Success(x) => ok
       }
     }
     "not terminate perfectly fine string" in {
-      val data = """[{"Name":"HASTINGS Amy","_id":"ObjectId(\"50c0340042a1295fc55f4783\")","Countryname":"US","testthis":true,"Population":311591917,"Sportname":"Track                 and Field","Sex":"F"},{"Name":"SARNOBAT Rahi","_id":"ObjectId(\"50c0340042a1295fc55f4784\")","Countryname":"India","Population":1241491960,"Sportname":"Shooting","Sex":"F"}]"""
+      val data =
+        """[{"Name":"HASTINGS Amy","_id":"ObjectId(\"50c0340042a1295fc55f4783\")","Countryname":"US","testthis":true,"Population":311591917,"Sportname":"Track                 and Field","Sex":"F"},{"Name":"SARNOBAT Rahi","_id":"ObjectId(\"50c0340042a1295fc55f4784\")","Countryname":"India","Population":1241491960,"Sportname":"Shooting","Sex":"F"}]"""
       parse(data) must beLike {
         case Success(x) => ok
       }
@@ -178,4 +184,3 @@ class TerminateJsonSpecs extends Specification {
     }
   }
 }
-

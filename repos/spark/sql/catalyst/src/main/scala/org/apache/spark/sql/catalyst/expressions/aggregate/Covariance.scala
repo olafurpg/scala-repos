@@ -22,10 +22,11 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types._
 
 /**
- * Compute the covariance between two expressions.
- * When applied on empty data (i.e., count is zero), it returns NULL.
- */
-abstract class Covariance(x: Expression, y: Expression) extends DeclarativeAggregate {
+  * Compute the covariance between two expressions.
+  * When applied on empty data (i.e., count is zero), it returns NULL.
+  */
+abstract class Covariance(x: Expression, y: Expression)
+    extends DeclarativeAggregate {
 
   override def children: Seq[Expression] = Seq(x, y)
   override def nullable: Boolean = true
@@ -33,11 +34,14 @@ abstract class Covariance(x: Expression, y: Expression) extends DeclarativeAggre
   override def inputTypes: Seq[AbstractDataType] = Seq(DoubleType, DoubleType)
 
   protected val n = AttributeReference("n", DoubleType, nullable = false)()
-  protected val xAvg = AttributeReference("xAvg", DoubleType, nullable = false)()
-  protected val yAvg = AttributeReference("yAvg", DoubleType, nullable = false)()
+  protected val xAvg =
+    AttributeReference("xAvg", DoubleType, nullable = false)()
+  protected val yAvg =
+    AttributeReference("yAvg", DoubleType, nullable = false)()
   protected val ck = AttributeReference("ck", DoubleType, nullable = false)()
 
-  override val aggBufferAttributes: Seq[AttributeReference] = Seq(n, xAvg, yAvg, ck)
+  override val aggBufferAttributes: Seq[AttributeReference] = Seq(
+      n, xAvg, yAvg, ck)
 
   override val initialValues: Seq[Expression] = Array.fill(4)(Literal(0.0))
 
@@ -52,10 +56,10 @@ abstract class Covariance(x: Expression, y: Expression) extends DeclarativeAggre
 
     val isNull = IsNull(x) || IsNull(y)
     Seq(
-      If(isNull, n, newN),
-      If(isNull, xAvg, newXAvg),
-      If(isNull, yAvg, newYAvg),
-      If(isNull, ck, newCk)
+        If(isNull, n, newN),
+        If(isNull, xAvg, newXAvg),
+        If(isNull, yAvg, newYAvg),
+        If(isNull, ck, newCk)
     )
   }
 
@@ -76,20 +80,20 @@ abstract class Covariance(x: Expression, y: Expression) extends DeclarativeAggre
   }
 }
 
-case class CovPopulation(left: Expression, right: Expression) extends Covariance(left, right) {
+case class CovPopulation(left: Expression, right: Expression)
+    extends Covariance(left, right) {
   override val evaluateExpression: Expression = {
-    If(n === Literal(0.0), Literal.create(null, DoubleType),
-      ck / n)
+    If(n === Literal(0.0), Literal.create(null, DoubleType), ck / n)
   }
   override def prettyName: String = "covar_pop"
 }
 
-
-case class CovSample(left: Expression, right: Expression) extends Covariance(left, right) {
+case class CovSample(left: Expression, right: Expression)
+    extends Covariance(left, right) {
   override val evaluateExpression: Expression = {
-    If(n === Literal(0.0), Literal.create(null, DoubleType),
-      If(n === Literal(1.0), Literal(Double.NaN),
-        ck / (n - Literal(1.0))))
+    If(n === Literal(0.0),
+       Literal.create(null, DoubleType),
+       If(n === Literal(1.0), Literal(Double.NaN), ck / (n - Literal(1.0))))
   }
   override def prettyName: String = "covar_samp"
 }

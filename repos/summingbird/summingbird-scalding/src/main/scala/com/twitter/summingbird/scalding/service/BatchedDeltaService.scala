@@ -16,21 +16,23 @@
 
 package com.twitter.summingbird.scalding.service
 
-import com.twitter.algebird.monad.{ StateWithError, Reader }
+import com.twitter.algebird.monad.{StateWithError, Reader}
 import com.twitter.algebird.Semigroup
-import com.twitter.scalding.{ Mode, TypedPipe }
+import com.twitter.scalding.{Mode, TypedPipe}
 import com.twitter.scalding.typed.LookupJoin
-import com.twitter.summingbird.batch.{ BatchID, Batcher, Timestamp }
+import com.twitter.summingbird.batch.{BatchID, Batcher, Timestamp}
 import cascading.flow.FlowDef
 import com.twitter.summingbird.scalding._
 
 /**
- * Use this when you have written JUST BEFORE the store.
- * This is what you get from an IntermediateWrite in Builder API.
- */
-class BatchedDeltaService[K, V: Semigroup](val store: batch.BatchedStore[K, V],
+  * Use this when you have written JUST BEFORE the store.
+  * This is what you get from an IntermediateWrite in Builder API.
+  */
+class BatchedDeltaService[K, V : Semigroup](
+    val store: batch.BatchedStore[K, V],
     val deltas: batch.BatchedSink[(K, V)],
-    override val reducers: Option[Int] = None) extends batch.BatchedService[K, V] {
+    override val reducers: Option[Int] = None)
+    extends batch.BatchedService[K, V] {
 
   assert(store.batcher == deltas.batcher, "Batchers do not match")
 
@@ -39,24 +41,28 @@ class BatchedDeltaService[K, V: Semigroup](val store: batch.BatchedStore[K, V],
   override def readStream(batchID: BatchID, mode: Mode) =
     deltas.readStream(batchID, mode).map { fp =>
       fp.map { pipe =>
-        pipe.mapValues { kv: (K, V) => (kv._1, Some(kv._2)) } // case confused compiler here
+        pipe.mapValues { kv: (K, V) =>
+          (kv._1, Some(kv._2))
+        } // case confused compiler here
       }
     }
   override def readLast(exclusiveUB: BatchID, mode: Mode) =
     store.readLast(exclusiveUB, mode)
 
   /**
-   * This executes the join algorithm on the streams.
-   * You are guaranteed that all the service data needed
-   * to do the join is present.
-   */
+    * This executes the join algorithm on the streams.
+    * You are guaranteed that all the service data needed
+    * to do the join is present.
+    */
   override def lookup[W](incoming: TypedPipe[(Timestamp, (K, W))],
-    servStream: TypedPipe[(Timestamp, (K, Option[V]))]): TypedPipe[(Timestamp, (K, (W, Option[V])))] = {
+                         servStream: TypedPipe[(Timestamp, (K, Option[V]))])
+    : TypedPipe[(Timestamp, (K, (W, Option[V])))] = {
 
     def flatOpt[T](o: Option[Option[T]]): Option[T] = o.flatMap(identity)
 
     implicit val ord = ordering
-    LookupJoin.rightSumming(incoming, servStream, reducers)
-      .map { case (t, (k, (w, optoptv))) => (t, (k, (w, flatOpt(optoptv)))) }
+    LookupJoin.rightSumming(incoming, servStream, reducers).map {
+      case (t, (k, (w, optoptv))) => (t, (k, (w, flatOpt(optoptv))))
+    }
   }
 }

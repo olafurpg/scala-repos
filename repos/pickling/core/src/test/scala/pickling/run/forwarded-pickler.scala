@@ -24,7 +24,8 @@ class PicklerCanBeForwarded extends FunSuite {
   private def doPickle[T](t: T)(implicit pickler1: Pickler[T]): JSONPickle =
     t.pickle
 
-  private def doUnpickle[T](p: JSONPickle)(implicit unpickler1: Unpickler[T]): T =
+  private def doUnpickle[T](p: JSONPickle)(
+      implicit unpickler1: Unpickler[T]): T =
     p.unpickle[T]
 
   test("main") {

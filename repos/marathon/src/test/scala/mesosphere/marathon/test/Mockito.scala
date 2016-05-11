@@ -1,9 +1,9 @@
 package mesosphere.marathon.test
 
 import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.{ Answer, OngoingStubbing }
+import org.mockito.stubbing.{Answer, OngoingStubbing}
 import org.mockito.verification.VerificationMode
-import org.mockito.{ Mockito => M }
+import org.mockito.{Mockito => M}
 import org.scalatest.mock.MockitoSugar
 
 /**
@@ -42,12 +42,20 @@ trait Mockito extends MockitoSugar {
   implicit class Stubbed[T](c: => T) {
     def returns(t: T, t2: T*): OngoingStubbing[T] = {
       if (t2.isEmpty) M.when(c).thenReturn(t)
-      else t2.foldLeft (M.when(c).thenReturn(t)) { (res, cur) => res.thenReturn(cur) }
+      else
+        t2.foldLeft(M.when(c).thenReturn(t)) { (res, cur) =>
+          res.thenReturn(cur)
+        }
     }
-    def answers(function: Array[AnyRef] => T) = M.when(c).thenAnswer(new MockAnswer(function))
+    def answers(function: Array[AnyRef] => T) =
+      M.when(c).thenAnswer(new MockAnswer(function))
     def throws[E <: Throwable](e: E*): OngoingStubbing[T] = {
-      if (e.isEmpty) throw new java.lang.IllegalArgumentException("The parameter passed to throws must not be empty")
-      e.drop(1).foldLeft(M.when(c).thenThrow(e.head)) { (res, cur) => res.thenThrow(cur) }
+      if (e.isEmpty)
+        throw new java.lang.IllegalArgumentException(
+            "The parameter passed to throws must not be empty")
+      e.drop(1).foldLeft(M.when(c).thenThrow(e.head)) { (res, cur) =>
+        res.thenThrow(cur)
+      }
     }
   }
 }

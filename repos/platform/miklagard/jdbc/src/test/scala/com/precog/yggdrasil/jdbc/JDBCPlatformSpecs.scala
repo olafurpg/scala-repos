@@ -50,14 +50,14 @@ import scalaz._
 object JDBCPlatformSpecEngine extends Logging {
   Class.forName("org.h2.Driver")
 
-  def jvToSQL(jv: JValue): (String,String) = jv match {
-    case JBool(v)      => ("BOOL", v.toString)
-    case JNumLong(v)   => ("BIGINT", v.toString)
+  def jvToSQL(jv: JValue): (String, String) = jv match {
+    case JBool(v) => ("BOOL", v.toString)
+    case JNumLong(v) => ("BIGINT", v.toString)
     case JNumDouble(v) => ("DOUBLE", v.toString)
     case JNumBigDec(v) => ("DECIMAL", v.toString)
-    case JNumStr(v)    => ("DECIMAL", v)
-    case JString(v)    => ("VARCHAR", "'" + v.replaceAll("'", "\\'") + "'")
-    case _              => sys.error("SQL conversion doesn't support: " + jv)
+    case JNumStr(v) => ("DECIMAL", v)
+    case JString(v) => ("VARCHAR", "'" + v.replaceAll("'", "\\'") + "'")
+    case _ => sys.error("SQL conversion doesn't support: " + jv)
   }
 
   private[this] val lock = new Object
@@ -99,7 +99,8 @@ object JDBCPlatformSpecEngine extends Logging {
 
   val checkUnused = new Runnable {
     def run = lock.synchronized {
-      logger.debug("Checking for unused JDBCPlatformSpecEngine. Count = " + refcount)
+      logger.debug(
+          "Checking for unused JDBCPlatformSpecEngine. Count = " + refcount)
       if (refcount == 0) {
         logger.debug("Shutting down DB after final release")
         shutdown()
@@ -111,19 +112,18 @@ object JDBCPlatformSpecEngine extends Logging {
   def runLoads(): Unit = {
     logger.debug("Starting load")
 
-
     // Load the datasets into our test mongo by enumerating the test_data directory and loading each dataset found
     val dataDirURL = this.getClass.getClassLoader.getResource("test_data")
 
     if (dataDirURL == null || dataDirURL.getProtocol != "file") {
       logger.error("No data dir: " + dataDirURL)
-      throw new Exception("Failed to locate test_data directory. Found: " + dataDirURL)
+      throw new Exception(
+          "Failed to locate test_data directory. Found: " + dataDirURL)
     }
 
     logger.debug("Loading from " + dataDirURL)
 
-
-    def loadFile(path : String, file: File) {
+    def loadFile(path: String, file: File) {
       if (file.isDirectory) {
         file.listFiles.foreach { f =>
           logger.debug("Found child: " + f)
@@ -132,21 +132,31 @@ object JDBCPlatformSpecEngine extends Logging {
       } else {
         if (file.getName.endsWith(".json")) {
           try {
-            val tableName = path + file.getName.replace(".json","")
+            val tableName = path + file.getName.replace(".json", "")
             logger.debug("Loading %s into /test/%s".format(file, tableName))
 
             JParser.parseManyFromFile(file) match {
               case Success(data) =>
-                val rows: Seq[Seq[(String, (String, String))]] = data.map { jv =>
-                  jv.flattenWithPath.map { case (p, v) => (JDBCColumnarTableModule.escapePath(p.toString.drop(1)), jvToSQL(v)) }
+                val rows: Seq[Seq[(String, (String, String))]] = data.map {
+                  jv =>
+                    jv.flattenWithPath.map {
+                      case (p, v) =>
+                        (JDBCColumnarTableModule.escapePath(
+                             p.toString.drop(1)),
+                         jvToSQL(v))
+                    }
                 }
 
                 // Two passes: first one constructs a schema for the table, second inserts data
                 val schema = rows.foldLeft(Set[(String, String)]()) {
-                  case (acc, properties) => acc ++ (properties.map { case (p, (t, _)) => (p, t) }).toSet
+                  case (acc, properties) =>
+                    acc ++(properties.map { case (p, (t, _)) => (p, t) }).toSet
                 }
 
-                val ddlCreate = "CREATE TABLE %s (%s);".format(tableName, schema.map { case (p, t) => p + " " + t }.mkString(", "))
+                val ddlCreate =
+                  "CREATE TABLE %s (%s);".format(tableName, schema.map {
+                    case (p, t) => p + " " + t
+                  }.mkString(", "))
 
                 logger.debug("Create = " + ddlCreate)
 
@@ -157,13 +167,12 @@ object JDBCPlatformSpecEngine extends Logging {
 
                   stmt.executeUpdate(ddlCreate)
 
-
-                  rows.foreach {
-                    properties =>
+                  rows.foreach { properties =>
                     val columns = properties.map(_._1).mkString(", ")
                     val values = properties.map(_._2._2).mkString(", ")
 
-                    val insert = "INSERT INTO %s (%s) VALUES (%s);".format(tableName, columns, values)
+                    val insert = "INSERT INTO %s (%s) VALUES (%s);".format(
+                        tableName, columns, values)
 
                     logger.debug("Inserting with " + insert)
 
@@ -179,7 +188,8 @@ object JDBCPlatformSpecEngine extends Logging {
                 val conn2 = DriverManager.getConnection(dbURL)
                 val stmt2 = conn2.createStatement
 
-                val rs = stmt2.executeQuery("SELECT COUNT(*) AS total FROM " + tableName)
+                val rs = stmt2.executeQuery(
+                    "SELECT COUNT(*) AS total FROM " + tableName)
 
                 rs.next
 
@@ -205,29 +215,30 @@ object JDBCPlatformSpecEngine extends Logging {
   }
 }
 
-trait JDBCPlatformSpecs extends ParseEvalStackSpecs[Future]
-    with JDBCColumnarTableModule
-    with Logging
-    with StringIdMemoryDatasetConsumer[Future] { self =>
+trait JDBCPlatformSpecs
+    extends ParseEvalStackSpecs[Future] with JDBCColumnarTableModule
+    with Logging with StringIdMemoryDatasetConsumer[Future] {
+  self =>
 
-  class YggConfig extends ParseEvalStackSpecConfig
-      with IdSourceConfig
-      with EvaluatorConfig
-      with ColumnarTableModuleConfig
-      with BlockStoreColumnarTableModuleConfig
+  class YggConfig
+      extends ParseEvalStackSpecConfig with IdSourceConfig with EvaluatorConfig
+      with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig
       with JDBCColumnarTableModuleConfig
 
   object yggConfig extends YggConfig
 
-  override def controlTimeout = Duration(10, "minutes")      // it's just unreasonable to run tests longer than this
+  override def controlTimeout =
+    Duration(10, "minutes") // it's just unreasonable to run tests longer than this
 
-  implicit val M: Monad[Future] with Comonad[Future] = new blueeyes.bkka.UnsafeFutureComonad(asyncContext, yggConfig.maxEvalDuration)
+  implicit val M: Monad[Future] with Comonad[Future] =
+    new blueeyes.bkka.UnsafeFutureComonad(
+        asyncContext, yggConfig.maxEvalDuration)
 
   val unescapeColumnNames = true
 
   val report = new LoggingQueryLogger[Future, instructions.Line]
-      with ExceptionQueryLogger[Future, instructions.Line]
-      with TimingQueryLogger[Future, instructions.Line] {
+  with ExceptionQueryLogger[Future, instructions.Line]
+  with TimingQueryLogger[Future, instructions.Line] {
 
     implicit def M = self.M
   }
@@ -239,17 +250,20 @@ trait JDBCPlatformSpecs extends ParseEvalStackSpecs[Future]
 
     val databaseMap = Map("test" -> JDBCPlatformSpecEngine.dbURL)
 
-    override def load(table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
+    override def load(
+        table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
       // Rewrite paths of the form /foo/bar/baz to /test/foo_bar_baz
       val pathFixTS = Map1(Leaf(Source), CF1P("fix_paths") {
-        case orig: StrColumn => new StrColumn {
-          def apply(row: Int): String = {
-            val newPath = "/test/" + orig(row).replaceAll("^/|/$", "").replace('/', '_')
-            logger.debug("Fixed %s to %s".format(orig(row), newPath))
-            newPath
+        case orig: StrColumn =>
+          new StrColumn {
+            def apply(row: Int): String = {
+              val newPath =
+                "/test/" + orig(row).replaceAll("^/|/$", "").replace('/', '_')
+              logger.debug("Fixed %s to %s".format(orig(row), newPath))
+              newPath
+            }
+            def isDefinedAt(row: Int) = orig.isDefinedAt(row)
           }
-          def isDefinedAt(row: Int) = orig.isDefinedAt(row)
-        }
       })
       val transformed = table.transform(pathFixTS)
       super.load(transformed, apiKey, tpe)
@@ -266,13 +280,15 @@ trait JDBCPlatformSpecs extends ParseEvalStackSpecs[Future]
     JDBCPlatformSpecEngine.release
   }
 
-  override def map (fs: => Fragments): Fragments = Step { startup() } ^ fs ^ Step { shutdown() }
+  override def map(fs: => Fragments): Fragments =
+    Step { startup() } ^ fs ^ Step { shutdown() }
 
-  def Evaluator[N[+_]](N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
-    new Evaluator[N](N0)(mn,nm) {
+  def Evaluator[N[+ _]](
+      N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
+    new Evaluator[N](N0)(mn, nm) {
       val report = new LoggingQueryLogger[N, instructions.Line]
-          with ExceptionQueryLogger[N, instructions.Line]
-          with TimingQueryLogger[N, instructions.Line] {
+      with ExceptionQueryLogger[N, instructions.Line]
+      with TimingQueryLogger[N, instructions.Line] {
 
         val M = N0
       }
@@ -303,7 +319,7 @@ class JDBCRankSpecs extends RankSpecs with JDBCPlatformSpecs
 class JDBCRenderStackSpecs extends RenderStackSpecs with JDBCPlatformSpecs
 
 class JDBCUndefinedLiteralSpecs extends UndefinedLiteralSpecs with JDBCPlatformSpecs
-*/
+ */
 
 class JDBCLoadSpecs extends EvalStackSpecs with JDBCPlatformSpecs {
   "JDBC stack support" should {

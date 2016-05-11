@@ -35,11 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * Label Spec tests.
- *
- *
- */
+  * Label Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class LabelSpec
-  extends SimpleSFXDelegateSpec[jfxsc.Label, Label](classOf[jfxsc.Label], classOf[Label])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsc.Label, Label](
+        classOf[jfxsc.Label], classOf[Label]) with RunOnApplicationThread

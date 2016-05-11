@@ -2,8 +2,8 @@ package org.jetbrains.sbt
 package project.structure
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 sealed abstract class OutputType
 
 object OutputType {

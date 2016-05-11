@@ -92,14 +92,14 @@ object StatsReceiverBenchmark {
   private[this] val ostrich = new OstrichStatsReceiver
 
   private[this] val metrics = new MetricsStatsReceiver(
-    Metrics.createDetached(),
-    Sink.default,
-    (n: String) => new Histogram(n))
+      Metrics.createDetached(),
+      Sink.default,
+      (n: String) => new Histogram(n))
 
   private[this] val metricsBucketed = new MetricsStatsReceiver(
-    Metrics.createDetached(),
-    Sink.default,
-    (n: String) => new MetricsBucketedHistogram(n))
+      Metrics.createDetached(),
+      Sink.default,
+      (n: String) => new MetricsBucketedHistogram(n))
 
   private[this] val stats = new CommonsStatsReceiver
 
@@ -137,7 +137,8 @@ object StatsReceiverBenchmark {
 
     def ostrichGet(): StatsSummary = ostrich.repr.get()
     def metricsGet(): util.Map[String, Number] = metrics.registry.sample()
-    def metricsBucketedGet(): util.Map[String, Number] = metricsBucketed.registry.sample()
+    def metricsBucketedGet(): util.Map[String, Number] =
+      metricsBucketed.registry.sample()
     def statsGet(): java.lang.Iterable[CStat[_]] = Stats.getVariables()
 
     @Setup(Level.Trial)

@@ -18,6 +18,6 @@
 package org.apache.spark
 
 /**
- * IO codecs used for compression. See [[org.apache.spark.io.CompressionCodec]].
- */
+  * IO codecs used for compression. See [[org.apache.spark.io.CompressionCodec]].
+  */
 package object io

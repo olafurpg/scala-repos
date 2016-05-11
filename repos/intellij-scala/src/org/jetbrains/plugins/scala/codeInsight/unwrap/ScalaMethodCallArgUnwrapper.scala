@@ -10,14 +10,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScArgumentExprList, ScExpr
 import scala.annotation.tailrec
 
 /**
- * Nikolay.Tropin
- * 2014-06-26
- */
-class ScalaMethodCallArgUnwrapper extends ScalaUnwrapper with ShortTextDescription {
+  * Nikolay.Tropin
+  * 2014-06-26
+  */
+class ScalaMethodCallArgUnwrapper
+    extends ScalaUnwrapper with ShortTextDescription {
 
   override def getDescription(e: PsiElement) = super.getDescription(e)
 
-  override def isApplicableTo(e: PsiElement) = forMethodCallArg(e)((_, _) => true)(false)
+  override def isApplicableTo(e: PsiElement) =
+    forMethodCallArg(e)((_, _) => true)(false)
 
   override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) = {
     forMethodCallArg(element) { (expr, call) =>
@@ -26,14 +28,16 @@ class ScalaMethodCallArgUnwrapper extends ScalaUnwrapper with ShortTextDescripti
     } {}
   }
 
-  override def collectAffectedElements(e: PsiElement, toExtract: util.List[PsiElement]) = {
+  override def collectAffectedElements(
+      e: PsiElement, toExtract: util.List[PsiElement]) = {
     forMethodCallArg[PsiElement](e) { (expr, call) =>
       super.collectAffectedElements(e, toExtract)
       call
     }(e)
   }
 
-  private def forMethodCallArg[T](e: PsiElement)(ifArg: (ScExpression, ScMethodCall) => T)(ifNot: => T) = {
+  private def forMethodCallArg[T](e: PsiElement)(
+      ifArg: (ScExpression, ScMethodCall) => T)(ifNot: => T) = {
     e match {
       case (expr: ScExpression) childOf ((_: ScArgumentExprList) childOf (call: ScMethodCall)) =>
         @tailrec

@@ -1,5 +1,4 @@
-
-import scala.language.{ implicitConversions, reflectiveCalls }
+import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.Eval
 
@@ -12,6 +11,6 @@ object Test extends App {
         }
       }
     val x = Array(2, 3, 1, 4)
-    println("x = "+ x.sort((x: Int, y: Int) => x < y).toList)
+    println("x = " + x.sort((x: Int, y: Int) => x < y).toList)
   }.eval
 }

@@ -1,10 +1,9 @@
 import scala.collection._
 
-trait Foo[+A,
-                     +Coll,
-                     +This <: SeqView[A, Coll] with SeqViewLike[A, Coll, This]]
-extends Seq[A] with SeqLike[A, This] with IterableView[A, Coll] with IterableViewLike[A, Coll, This] {
-self =>
+trait Foo[+A, +Coll, +This <: SeqView[A, Coll] with SeqViewLike[A, Coll, This]]
+    extends Seq[A] with SeqLike[A, This]
+    with IterableView[A, Coll] with IterableViewLike[A, Coll, This] {
+  self =>
 
   trait Transformed[+B] extends SeqView[B, Coll] with super.Transformed[B] {
     def length: Int

@@ -30,7 +30,8 @@ trait Connector {
         try {
           listener(stateEvent)
         } catch {
-          case e: Throwable => log.error(e, "Exception in connection event listener")
+          case e: Throwable =>
+            log.error(e, "Exception in connection event listener")
         }
       } else log.debug("listener does not handle %s", event)
     }
@@ -53,11 +54,11 @@ object Connector {
   type EventHandler = PartialFunction[StateEvent, Unit]
 
   /**
-   * Dispatches requests across several connectors.
-   *
-   * Session events from all Connnectors are published on the session broker; however consumers
-   * of these events cannot know which specific connection the event was fired on.
-   */
+    * Dispatches requests across several connectors.
+    *
+    * Session events from all Connnectors are published on the session broker; however consumers
+    * of these events cannot know which specific connection the event was fired on.
+    */
   case class RoundRobin(connectors: Connector*) extends Connector {
     require(connectors.length > 0)
     override val name = "round-robin-zk-connector:%d".format(connectors.length)
@@ -65,13 +66,13 @@ object Connector {
     private[this] var index = 0
     protected[this] def nextConnector() = {
       val i = synchronized {
-        if (index == Int.MaxValue ) {
+        if (index == Int.MaxValue) {
           index = 0
         }
         index = index + 1
         index % connectors.length
       }
-      log.trace("connector %d of %d", i+1, connectors.length)
+      log.trace("connector %d of %d", i + 1, connectors.length)
       connectors(i)
     }
 

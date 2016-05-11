@@ -35,10 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Rotate Spec tests.
- *
- *
- */
+  * Rotate Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class RotateSpec
-  extends SimpleSFXDelegateSpec[jfxst.Rotate, Rotate](classOf[jfxst.Rotate], classOf[Rotate])
+    extends SimpleSFXDelegateSpec[jfxst.Rotate, Rotate](
+        classOf[jfxst.Rotate], classOf[Rotate])

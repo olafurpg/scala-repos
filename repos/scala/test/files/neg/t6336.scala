@@ -9,4 +9,3 @@ object D {
 }
 
 class X[T](val i: Int) extends AnyVal
-

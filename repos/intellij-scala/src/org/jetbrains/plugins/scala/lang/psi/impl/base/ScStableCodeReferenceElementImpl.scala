@@ -26,11 +26,12 @@ import org.jetbrains.plugins.scala.lang.resolve._
 import org.jetbrains.plugins.scala.lang.resolve.processor.CompletionProcessor
 
 /**
- * @author AlexanderPodkhalyuzin
- *         Date: 22.02.2008
- */
-
-class ScStableCodeReferenceElementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ResolvableStableCodeReferenceElement {
+  * @author AlexanderPodkhalyuzin
+  *         Date: 22.02.2008
+  */
+class ScStableCodeReferenceElementImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node)
+    with ResolvableStableCodeReferenceElement {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -39,12 +40,16 @@ class ScStableCodeReferenceElementImpl(node: ASTNode) extends ScalaPsiElementImp
   }
 
   def getVariants: Array[Object] = {
-    val isInImport: Boolean = ScalaPsiUtil.getParentOfType(this, classOf[ScImportStmt]) != null
+    val isInImport: Boolean =
+      ScalaPsiUtil.getParentOfType(this, classOf[ScImportStmt]) != null
     doResolve(this, new CompletionProcessor(getKinds(incomplete = true), this)).flatMap {
       case res: ScalaResolveResult =>
         import org.jetbrains.plugins.scala.lang.psi.types.Nothing
         val qualifier = res.fromType.getOrElse(Nothing)
-        LookupElementManager.getLookupElement(res, isInImport = isInImport, qualifierType = qualifier, isInStableCodeReference = true)
+        LookupElementManager.getLookupElement(res,
+                                              isInImport = isInImport,
+                                              qualifierType = qualifier,
+                                              isInStableCodeReference = true)
       case r => Seq(r.getElement)
     }
   }
@@ -76,7 +81,8 @@ class ScStableCodeReferenceElementImpl(node: ASTNode) extends ScalaPsiElementImp
 
   override def toString: String = "CodeReferenceElement: " + getText
 
-  def getKinds(incomplete: Boolean, completion: Boolean): Set[ResolveTargets.Value] = {
+  def getKinds(
+      incomplete: Boolean, completion: Boolean): Set[ResolveTargets.Value] = {
     import org.jetbrains.plugins.scala.lang.resolve.StdKinds._
 
     // The qualified identifier immediately following the `macro` keyword
@@ -84,7 +90,9 @@ class ScStableCodeReferenceElementImpl(node: ASTNode) extends ScalaPsiElementImp
     def isInMacroDef = getContext match {
       case _: ScMacroDefinition =>
         prevSiblings.exists {
-          case l: LeafPsiElement if l.getNode.getElementType == ScalaTokenTypes.kMACRO => true
+          case l: LeafPsiElement
+              if l.getNode.getElementType == ScalaTokenTypes.kMACRO =>
+            true
           case _ => false
         }
       case _ => false
@@ -92,14 +100,15 @@ class ScStableCodeReferenceElementImpl(node: ASTNode) extends ScalaPsiElementImp
 
     val result = getContext match {
       case _: ScStableCodeReferenceElement => stableQualRef
-      case e: ScImportExpr => if (e.selectorSet != None
-              //import Class._ is not allowed
-              || qualifier == None || e.singleWildcard) stableQualRef
-      else stableImportSelector
+      case e: ScImportExpr =>
+        if (e.selectorSet != None
+            //import Class._ is not allowed
+            || qualifier == None || e.singleWildcard) stableQualRef
+        else stableImportSelector
       case ste: ScSimpleTypeElement =>
-        if (incomplete) noPackagesClassCompletion // todo use the settings to include packages
+        if (incomplete)
+          noPackagesClassCompletion // todo use the settings to include packages
         else if (ste.getLastChild.isInstanceOf[PsiErrorElement]) stableQualRef
-
         else if (ste.singleton) stableQualRef
         else stableClass
       case _: ScTypeAlias => stableClass
@@ -112,24 +121,28 @@ class ScStableCodeReferenceElementImpl(node: ASTNode) extends ScalaPsiElementImp
       case _ if isInMacroDef => methodsOnly
       case _ => stableQualRef
     }
-    if (completion) result + ResolveTargets.PACKAGE + ResolveTargets.OBJECT + ResolveTargets.VAL else result
+    if (completion)
+      result + ResolveTargets.PACKAGE + ResolveTargets.OBJECT +
+      ResolveTargets.VAL else result
   }
 
-  def nameId: PsiElement = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
+  def nameId: PsiElement =
+    findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
 
   //  @throws(IncorrectOperationException)
   def bindToElement(element: PsiElement): PsiElement = {
     if (isReferenceTo(element)) this
     else {
-      val aliasedRef: Option[ScReferenceElement] = ScalaPsiUtil.importAliasFor(element, this)
+      val aliasedRef: Option[ScReferenceElement] =
+        ScalaPsiUtil.importAliasFor(element, this)
       if (aliasedRef.isDefined) {
         this.replace(aliasedRef.get)
-      }
-      else {
+      } else {
         def bindToType(c: ScalaImportTypeFix.TypeToImport): PsiElement = {
           val suitableKinds = getKinds(incomplete = false)
           if (!ResolveUtils.kindMatches(element, suitableKinds))
-            throw new IncorrectOperationException("class does not match expected kind, problem place: " + {
+            throw new IncorrectOperationException(
+                "class does not match expected kind, problem place: " + {
               if (getContext != null)
                 if (getContext.getContext != null)
                   if (getContext.getContext.getContext != null)
@@ -139,55 +152,78 @@ class ScStableCodeReferenceElementImpl(node: ASTNode) extends ScalaPsiElementImp
               else getText
             })
           if (nameId.getText != c.name) {
-            val ref = ScalaPsiElementFactory.createReferenceFromText(c.name, getManager)
-            return this.replace(ref).asInstanceOf[ScStableCodeReferenceElement].bindToElement(element)
+            val ref = ScalaPsiElementFactory.createReferenceFromText(
+                c.name, getManager)
+            return this
+              .replace(ref)
+              .asInstanceOf[ScStableCodeReferenceElement]
+              .bindToElement(element)
           }
           val qname = c.qualifiedName
-          val isPredefined = ScalaCodeStyleSettings.getInstance(getProject).hasImportWithPrefix(qname)
+          val isPredefined = ScalaCodeStyleSettings
+            .getInstance(getProject)
+            .hasImportWithPrefix(qname)
           if (qualifier.isDefined && !isPredefined) {
-            val ref = ScalaPsiElementFactory.createReferenceFromText(c.name, getContext, this)
+            val ref = ScalaPsiElementFactory.createReferenceFromText(
+                c.name, getContext, this)
             if (ref.isReferenceTo(element)) {
-              val ref = ScalaPsiElementFactory.createReferenceFromText(c.name, getManager)
+              val ref = ScalaPsiElementFactory.createReferenceFromText(
+                  c.name, getManager)
               return this.replace(ref)
             }
           }
           if (qname != null) {
-            val selector: ScImportSelector = PsiTreeUtil.getParentOfType(this, classOf[ScImportSelector])
+            val selector: ScImportSelector =
+              PsiTreeUtil.getParentOfType(this, classOf[ScImportSelector])
             if (selector != null) {
-              val importExpr = PsiTreeUtil.getParentOfType(this, classOf[ScImportExpr])
+              val importExpr =
+                PsiTreeUtil.getParentOfType(this, classOf[ScImportExpr])
               selector.deleteSelector() //we can't do anything here, so just simply delete it
               return importExpr.reference.get //todo: what we should return exactly?
               //              }
-            } else getParent match {
-              case importExpr: ScImportExpr if !importExpr.singleWildcard && !importExpr.selectorSet.isDefined =>
-                val holder = PsiTreeUtil.getParentOfType(this, classOf[ScImportsHolder])
-                importExpr.deleteExpr()
-                c match {
-                  case ClassTypeToImport(clazz) => holder.addImportForClass(clazz)
-                  case ta => holder.addImportForPath(ta.qualifiedName)
-                }
-              //todo: so what to return? probable PIEAE after such code invocation
-              case _ =>
-                return safeBindToElement(qname, {
-                  case (qual, true) => ScalaPsiElementFactory.createReferenceFromText(qual, getContext, this)
-                  case (qual, false) => ScalaPsiElementFactory.createReferenceFromText(qual, getManager)
-                }) {
+            } else
+              getParent match {
+                case importExpr: ScImportExpr
+                    if !importExpr.singleWildcard &&
+                    !importExpr.selectorSet.isDefined =>
+                  val holder =
+                    PsiTreeUtil.getParentOfType(this, classOf[ScImportsHolder])
+                  importExpr.deleteExpr()
                   c match {
                     case ClassTypeToImport(clazz) =>
-                      ScalaImportTypeFix.getImportHolder(ref = this, project = getProject).
-                        addImportForClass(clazz, ref = this)
-                    case ta =>
-                      ScalaImportTypeFix.getImportHolder(ref = this, project = getProject).
-                        addImportForPath(ta.qualifiedName, ref = this)
+                      holder.addImportForClass(clazz)
+                    case ta => holder.addImportForPath(ta.qualifiedName)
                   }
-                  if (qualifier != None) {
-                    //let's make our reference unqualified
-                    val ref: ScStableCodeReferenceElement = ScalaPsiElementFactory.createReferenceFromText(c.name, getManager)
-                    this.replace(ref).asInstanceOf[ScReferenceElement]
+                //todo: so what to return? probable PIEAE after such code invocation
+                case _ =>
+                  return safeBindToElement(qname, {
+                    case (qual, true) =>
+                      ScalaPsiElementFactory.createReferenceFromText(
+                          qual, getContext, this)
+                    case (qual, false) =>
+                      ScalaPsiElementFactory.createReferenceFromText(
+                          qual, getManager)
+                  }) {
+                    c match {
+                      case ClassTypeToImport(clazz) =>
+                        ScalaImportTypeFix
+                          .getImportHolder(ref = this, project = getProject)
+                          .addImportForClass(clazz, ref = this)
+                      case ta =>
+                        ScalaImportTypeFix
+                          .getImportHolder(ref = this, project = getProject)
+                          .addImportForPath(ta.qualifiedName, ref = this)
+                    }
+                    if (qualifier != None) {
+                      //let's make our reference unqualified
+                      val ref: ScStableCodeReferenceElement =
+                        ScalaPsiElementFactory.createReferenceFromText(
+                            c.name, getManager)
+                      this.replace(ref).asInstanceOf[ScReferenceElement]
+                    }
+                    this
                   }
-                  this
-                }
-            }
+              }
           }
           this
         }
@@ -205,23 +241,31 @@ class ScStableCodeReferenceElementImpl(node: ASTNode) extends ScalaPsiElementImp
               case member: ScMember =>
                 val containingClass = member.containingClass
                 val refToClass = bindToElement(containingClass)
-                val refToMember = ScalaPsiElementFactory.createReferenceFromText(refToClass.getText + "." + binding.name, getManager)
+                val refToMember =
+                  ScalaPsiElementFactory.createReferenceFromText(
+                      refToClass.getText + "." + binding.name, getManager)
                 this.replace(refToMember).asInstanceOf[ScReferenceElement]
             }
-          case fun: ScFunction if Seq("unapply", "unapplySeq").contains(fun.name) && ScalaPsiUtil.hasStablePath(fun) =>
+          case fun: ScFunction
+              if Seq("unapply", "unapplySeq").contains(fun.name) &&
+              ScalaPsiUtil.hasStablePath(fun) =>
             bindToElement(fun.containingClass)
           case fun: ScFunction if fun.isConstructor =>
             bindToElement(fun.containingClass)
           case m: PsiMethod if m.isConstructor =>
             bindToElement(m.getContainingClass)
           case pckg: PsiPackage => bindToPackage(pckg)
-          case _ => throw new IncorrectOperationException(s"Cannot bind to $element")
+          case _ =>
+            throw new IncorrectOperationException(s"Cannot bind to $element")
         }
       }
     }
   }
 
-  def getSameNameVariants: Array[ResolveResult] = doResolve(this, new CompletionProcessor(getKinds(incomplete = true), this, false, Some(refName)))
+  def getSameNameVariants: Array[ResolveResult] =
+    doResolve(this,
+              new CompletionProcessor(
+                  getKinds(incomplete = true), this, false, Some(refName)))
 
   override def delete() {
     getContext match {

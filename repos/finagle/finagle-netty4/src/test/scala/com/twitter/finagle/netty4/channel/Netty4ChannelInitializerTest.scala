@@ -17,16 +17,17 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class Netty4ChannelInitializerTest
-  extends FunSuite
-  with Eventually
-  with IntegrationPatience {
+    extends FunSuite with Eventually with IntegrationPatience {
 
   val writeDiscardHandler = new ChannelOutboundHandlerAdapter {
-    override def write(ctx: ChannelHandlerContext, msg: scala.Any, promise: ChannelPromise): Unit = ()
+    override def write(ctx: ChannelHandlerContext,
+                       msg: scala.Any,
+                       promise: ChannelPromise): Unit = ()
   }
 
   val nop = new ChannelHandler {
-    def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable): Unit = ()
+    def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable): Unit =
+      ()
     def handlerRemoved(ctx: ChannelHandlerContext): Unit = ()
     def handlerAdded(ctx: ChannelHandlerContext): Unit = ()
   }
@@ -39,18 +40,19 @@ class Netty4ChannelInitializerTest
     val baseParams = Params.empty + Stats(sr)
   }
 
-
   test("Netty4ChannelInitializer channel writes can time out") {
     new Ctx {
-      val params = baseParams + Transport.Liveness(
-        readTimeout = Duration.Top,
-        writeTimeout = Duration.fromMilliseconds(1),
-        keepAlive = None)
+      val params =
+        baseParams + Transport.Liveness(
+            readTimeout = Duration.Top,
+            writeTimeout = Duration.fromMilliseconds(1),
+            keepAlive = None)
 
       val init = new Netty4ChannelInitializer(_ => (), params, () => nop)
       init.initChannel(srv)
 
-      srv.pipeline.addBefore("writeCompletionTimeout", "writeDiscardHandler", writeDiscardHandler)
+      srv.pipeline.addBefore(
+          "writeCompletionTimeout", "writeDiscardHandler", writeDiscardHandler)
 
       // WriteCompletionTimeoutHandler throws a WriteTimeOutException after the message is lost.
       srv.writeAndFlush("hi")
@@ -64,10 +66,11 @@ class Netty4ChannelInitializerTest
 
   test("Netty4ChannelInitializer channel reads can time out") {
     new Ctx {
-      val params = baseParams + Transport.Liveness(
-        readTimeout = Duration.fromMilliseconds(1),
-        writeTimeout = Duration.Top,
-        keepAlive = None)
+      val params =
+        baseParams + Transport.Liveness(
+            readTimeout = Duration.fromMilliseconds(1),
+            writeTimeout = Duration.Top,
+            keepAlive = None)
 
       val init = new Netty4ChannelInitializer(_ => (), params, () => nop)
       init.initChannel(srv)

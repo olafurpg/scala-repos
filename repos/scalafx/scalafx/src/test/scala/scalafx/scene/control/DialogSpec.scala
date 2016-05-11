@@ -36,10 +36,11 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- *
- * Test for [[scalafx.scene.control.Dialog]].
- */
+  *
+  * Test for [[scalafx.scene.control.Dialog]].
+  */
 @RunWith(classOf[JUnitRunner])
 class DialogSpec[R]
-  extends SimpleSFXDelegateSpec[jfxsc.Dialog[R], Dialog[R]](classOf[jfxsc.Dialog[R]], classOf[Dialog[R]])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsc.Dialog[R], Dialog[R]](
+        classOf[jfxsc.Dialog[R]], classOf[Dialog[R]])
+    with RunOnApplicationThread

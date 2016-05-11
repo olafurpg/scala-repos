@@ -1,7 +1,5 @@
 package p
 
 object O {
-  println(p./* resolved: false */getClass)
+  println(p. /* resolved: false */ getClass)
 }
-
-

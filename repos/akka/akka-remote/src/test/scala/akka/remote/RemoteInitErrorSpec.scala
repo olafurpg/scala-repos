@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.actor.ActorSystem
@@ -15,14 +15,14 @@ import scala.language.postfixOps
 import scala.util.control.NonFatal
 
 /**
- * The 192.0.2.1 is a Documentation IP-address and should not be used at all
- * by any network node. Therefore we assume here that the initialization of
- * the ActorSystem with the use of remoting will intentionally fail.
- */
+  * The 192.0.2.1 is a Documentation IP-address and should not be used at all
+  * by any network node. Therefore we assume here that the initialization of
+  * the ActorSystem with the use of remoting will intentionally fail.
+  */
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RemoteInitErrorSpec extends FlatSpec with Matchers {
-  val conf = ConfigFactory.parseString(
-    """
+  val conf =
+    ConfigFactory.parseString("""
       akka {
         actor {
           provider = "akka.remote.RemoteActorRefProvider"
@@ -45,16 +45,18 @@ class RemoteInitErrorSpec extends FlatSpec with Matchers {
   "Remoting" must "shut down properly on RemoteActorRefProvider initialization failure" in {
     val start = currentThreadIds()
     try {
-      ActorSystem("duplicate", ConfigFactory.parseString("akka.loglevel=OFF").withFallback(conf))
+      ActorSystem(
+          "duplicate",
+          ConfigFactory.parseString("akka.loglevel=OFF").withFallback(conf))
       fail("initialization should fail due to invalid IP address")
     } catch {
       case NonFatal(e) ⇒ {
-        eventually(timeout(30 seconds), interval(800 milliseconds)) {
-          val current = currentThreadIds()
-          // no new threads should remain compared to the start state
-          (current diff start) should be(empty)
+          eventually(timeout(30 seconds), interval(800 milliseconds)) {
+            val current = currentThreadIds()
+            // no new threads should remain compared to the start state
+            (current diff start) should be(empty)
+          }
         }
-      }
     }
   }
 }

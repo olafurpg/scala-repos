@@ -5,9 +5,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
 
 /**
- * Pavel.Fatin, 28.04.2010
- */
-
+  * Pavel.Fatin, 28.04.2010
+  */
 class Description(message: String => Unit) extends Strategy {
   def addToFunction(function: ScFunctionDefinition) {
     message("intention.type.annotation.function.add.text")

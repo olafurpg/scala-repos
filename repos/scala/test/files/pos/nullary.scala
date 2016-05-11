@@ -10,11 +10,11 @@ abstract class NullaryTest[T, m[s]] {
 }
 
 class Concrete extends NullaryTest[Int, List] {
-        def nullary2 = 1
-        def nullary3 = List(1,2,3)
+  def nullary2 = 1
+  def nullary3 = List(1, 2, 3)
 }
 
 object test {
-        (new Concrete).nullary2
-        (new Concrete).nullary3
+  (new Concrete).nullary2
+  (new Concrete).nullary3
 }

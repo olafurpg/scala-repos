@@ -15,13 +15,14 @@ class NameTest extends FunSuite {
     var addr: Addr = Addr.Pending
     n.addr.changes.register(Witness({ addr = _ }))
     assert(addr == Addr.Pending)
-    val set = Set[SocketAddress](new InetSocketAddress(0), new InetSocketAddress(1))
+    val set =
+      Set[SocketAddress](new InetSocketAddress(0), new InetSocketAddress(1))
     g() = set
 
     val Addr.Bound(s2, r) = addr
     assert(s2.collect { case Address.Inet(ia, _) => ia } == set)
     assert(r.isEmpty)
-    
+
     g() = Set(new SocketAddress {})
     val Addr.Failed(e) = addr
     assert(e.isInstanceOf[IllegalArgumentException])

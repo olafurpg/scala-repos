@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -14,24 +14,29 @@ import scala.collection.mutable.HashEntry
 import scala.collection.parallel.IterableSplitter
 
 /** Provides functionality for hash tables with linked list buckets,
- *  enriching the data structure by fulfilling certain requirements
- *  for their parallel construction and iteration.
- */
-trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]] extends scala.collection.mutable.HashTable[K, Entry] {
+  *  enriching the data structure by fulfilling certain requirements
+  *  for their parallel construction and iteration.
+  */
+trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
+    extends scala.collection.mutable.HashTable[K, Entry] {
 
   override def alwaysInitSizeMap = true
 
   /** A parallel iterator returning all the entries.
-   */
-  abstract class EntryIterator[T, +IterRepr <: IterableSplitter[T]]
-  (private var idx: Int, private val until: Int, private val totalsize: Int, private var es: Entry)
-  extends IterableSplitter[T] with SizeMapUtils {
+    */
+  abstract class EntryIterator[T, +IterRepr <: IterableSplitter[T]](
+      private var idx: Int,
+      private val until: Int,
+      private val totalsize: Int,
+      private var es: Entry)
+      extends IterableSplitter[T] with SizeMapUtils {
     private val itertable = table
     private var traversed = 0
     scan()
 
     def entry2item(e: Entry): T
-    def newIterator(idxFrom: Int, idxUntil: Int, totalSize: Int, es: Entry): IterRepr
+    def newIterator(
+        idxFrom: Int, idxUntil: Int, totalSize: Int, es: Entry): IterRepr
 
     def hasNext = {
       es ne null
@@ -55,8 +60,7 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]] extends scala.collec
     def remaining = totalsize - traversed
 
     private[parallel] override def debugInformation = {
-      buildString {
-        append =>
+      buildString { append =>
         append("/--------------------\\")
         append("Parallel hash table entry iterator")
         append("total hash table elements: " + tableSize)
@@ -66,45 +70,54 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]] extends scala.collec
         append("totalsize: " + totalsize)
         append("current entry: " + es)
         append("underlying from " + idx + " until " + until)
-        append(itertable.slice(idx, until).map(x => if (x != null) x.toString else "n/a").mkString(" | "))
+        append(
+            itertable
+              .slice(idx, until)
+              .map(x => if (x != null) x.toString else "n/a")
+              .mkString(" | "))
         append("\\--------------------/")
       }
     }
 
     def dup = newIterator(idx, until, totalsize, es)
 
-    def split: Seq[IterableSplitter[T]] = if (remaining > 1) {
-      if (until > idx) {
-        // there is at least one more slot for the next iterator
-        // divide the rest of the table
-        val divsz = (until - idx) / 2
+    def split: Seq[IterableSplitter[T]] =
+      if (remaining > 1) {
+        if (until > idx) {
+          // there is at least one more slot for the next iterator
+          // divide the rest of the table
+          val divsz = (until - idx) / 2
 
-        // second iterator params
-        val sidx = idx + divsz + 1 // + 1 preserves iteration invariant
-        val suntil = until
-        val ses = itertable(sidx - 1).asInstanceOf[Entry] // sidx - 1 ensures counting from the right spot
-        val stotal = calcNumElems(sidx - 1, suntil, table.length, sizeMapBucketSize)
+          // second iterator params
+          val sidx = idx + divsz + 1 // + 1 preserves iteration invariant
+          val suntil = until
+          val ses =
+            itertable(sidx - 1).asInstanceOf[Entry] // sidx - 1 ensures counting from the right spot
+          val stotal = calcNumElems(
+              sidx - 1, suntil, table.length, sizeMapBucketSize)
 
-        // first iterator params
-        val fidx = idx
-        val funtil = idx + divsz
-        val fes = es
-        val ftotal = totalsize - stotal
+          // first iterator params
+          val fidx = idx
+          val funtil = idx + divsz
+          val fes = es
+          val ftotal = totalsize - stotal
 
-        Seq(
-          newIterator(fidx, funtil, ftotal, fes),
-          newIterator(sidx, suntil, stotal, ses)
-        )
-      } else {
-        // otherwise, this is the last entry in the table - all what remains is the chain
-        // so split the rest of the chain
-        val arr = convertToArrayBuffer(es)
-        val arrpit = new scala.collection.parallel.BufferSplitter[T](arr, 0, arr.length, signalDelegate)
-        arrpit.split
-      }
-    } else Seq(this.asInstanceOf[IterRepr])
+          Seq(
+              newIterator(fidx, funtil, ftotal, fes),
+              newIterator(sidx, suntil, stotal, ses)
+          )
+        } else {
+          // otherwise, this is the last entry in the table - all what remains is the chain
+          // so split the rest of the chain
+          val arr = convertToArrayBuffer(es)
+          val arrpit = new scala.collection.parallel.BufferSplitter[T](
+              arr, 0, arr.length, signalDelegate)
+          arrpit.split
+        }
+      } else Seq(this.asInstanceOf[IterRepr])
 
-    private def convertToArrayBuffer(chainhead: Entry): mutable.ArrayBuffer[T] = {
+    private def convertToArrayBuffer(
+        chainhead: Entry): mutable.ArrayBuffer[T] = {
       val buff = mutable.ArrayBuffer[Entry]()
       var curr = chainhead
       while (curr ne null) {
@@ -112,7 +125,9 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]] extends scala.collec
         curr = curr.next
       }
       // println("converted " + remaining + " element iterator into buffer: " + buff)
-      buff map { e => entry2item(e) }
+      buff map { e =>
+        entry2item(e)
+      }
     }
 
     protected def countElems(from: Int, until: Int) = {

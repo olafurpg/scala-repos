@@ -7,8 +7,7 @@ class ThreadLocal[T] {
   protected def initialValue(): T = null.asInstanceOf[T]
 
   def get(): T = {
-    if (!hasValue)
-      set(initialValue)
+    if (!hasValue) set(initialValue)
     v
   }
 

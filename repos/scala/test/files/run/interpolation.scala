@@ -3,10 +3,10 @@ object Test extends App {
   def test1(n: Int) = {
     println(s"Bob is $n years old")
     println(f"Bob is $n%2d years old")
-    println(s"Bob will be ${n+1} years old")
-    println(f"Bob will be ${n+1}%2d years old")
-    println(s"$n+1 = ${n+1}")
-    println(f"$n%d+1 = ${n+1}%d")
+    println(s"Bob will be ${n + 1} years old")
+    println(f"Bob will be ${n + 1}%2d years old")
+    println(s"$n+1 = ${n + 1}")
+    println(f"$n%d+1 = ${n + 1}%d")
   }
 
   def test2(f: Float) = {

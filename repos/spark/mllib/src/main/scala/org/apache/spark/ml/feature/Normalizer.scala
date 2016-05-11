@@ -26,21 +26,23 @@ import org.apache.spark.mllib.linalg.{Vector, VectorUDT}
 import org.apache.spark.sql.types.DataType
 
 /**
- * :: Experimental ::
- * Normalize a vector to have unit norm using the given p-norm.
- */
+  * :: Experimental ::
+  * Normalize a vector to have unit norm using the given p-norm.
+  */
 @Experimental
 class Normalizer(override val uid: String)
-  extends UnaryTransformer[Vector, Vector, Normalizer] with DefaultParamsWritable {
+    extends UnaryTransformer[Vector, Vector, Normalizer]
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("normalizer"))
 
   /**
-   * Normalization in L^p^ space.  Must be >= 1.
-   * (default: p = 2)
-   * @group param
-   */
-  val p = new DoubleParam(this, "p", "the p norm value", ParamValidators.gtEq(1))
+    * Normalization in L^p^ space.  Must be >= 1.
+    * (default: p = 2)
+    * @group param
+    */
+  val p = new DoubleParam(
+      this, "p", "the p norm value", ParamValidators.gtEq(1))
 
   setDefault(p -> 2.0)
 

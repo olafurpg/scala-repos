@@ -27,7 +27,8 @@ import org.apache.spark.deploy.master.ExecutorDesc
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 import org.apache.spark.util.Utils
 
-private[ui] class ApplicationPage(parent: MasterWebUI) extends WebUIPage("app") {
+private[ui] class ApplicationPage(parent: MasterWebUI)
+    extends WebUIPage("app") {
 
   private val master = parent.masterEndpointRef
 
@@ -35,26 +36,33 @@ private[ui] class ApplicationPage(parent: MasterWebUI) extends WebUIPage("app") 
   def render(request: HttpServletRequest): Seq[Node] = {
     val appId = request.getParameter("appId")
     val state = master.askWithRetry[MasterStateResponse](RequestMasterState)
-    val app = state.activeApps.find(_.id == appId).getOrElse({
-      state.completedApps.find(_.id == appId).getOrElse(null)
-    })
+    val app = state.activeApps
+      .find(_.id == appId)
+      .getOrElse({
+        state.completedApps.find(_.id == appId).getOrElse(null)
+      })
     if (app == null) {
-      val msg = <div class="row-fluid">No running application with ID {appId}</div>
+      val msg =
+        <div class="row-fluid">No running application with ID {appId}</div>
       return UIUtils.basicSparkPage(msg, "Not Found")
     }
 
-    val executorHeaders = Seq("ExecutorID", "Worker", "Cores", "Memory", "State", "Logs")
-    val allExecutors = (app.executors.values ++ app.removedExecutors).toSet.toSeq
+    val executorHeaders = Seq(
+        "ExecutorID", "Worker", "Cores", "Memory", "State", "Logs")
+    val allExecutors =
+      (app.executors.values ++ app.removedExecutors).toSet.toSeq
     // This includes executors that are either still running or have exited cleanly
     val executors = allExecutors.filter { exec =>
-      !ExecutorState.isFinished(exec.state) || exec.state == ExecutorState.EXITED
+      !ExecutorState.isFinished(exec.state) ||
+      exec.state == ExecutorState.EXITED
     }
     val removedExecutors = allExecutors.diff(executors)
-    val executorsTable = UIUtils.listingTable(executorHeaders, executorRow, executors)
-    val removedExecutorsTable = UIUtils.listingTable(executorHeaders, executorRow, removedExecutors)
+    val executorsTable =
+      UIUtils.listingTable(executorHeaders, executorRow, executors)
+    val removedExecutorsTable =
+      UIUtils.listingTable(executorHeaders, executorRow, removedExecutors)
 
-    val content =
-      <div class="row-fluid">
+    val content = <div class="row-fluid">
         <div class="span12">
           <ul class="unstyled">
             <li><strong>ID:</strong> {app.id}</li>

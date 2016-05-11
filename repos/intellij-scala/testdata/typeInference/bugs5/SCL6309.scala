@@ -7,6 +7,7 @@ object A {
   def l(x: B): B = x
   def l(x: C): C = x
 
-  /*start*/l(1)/*end*/
+  /*start*/
+  l(1) /*end*/
 }
 //A.C

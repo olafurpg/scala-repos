@@ -33,10 +33,9 @@ import scala.tools.nsc.reporters.{Reporter, AbstractReporter}
 import scala.tools.nsc.{Global, Settings}
 import scala.util.matching.Regex
 
-
 /**
- * Evaluate a file or string and return the result.
- */
+  * Evaluate a file or string and return the result.
+  */
 @deprecated("use a throw-away instance of Eval instead", "1.8.1")
 object Eval extends Eval {
   private val jvmId = java.lang.Math.abs(new Random().nextInt())
@@ -44,27 +43,28 @@ object Eval extends Eval {
 }
 
 /**
- * Evaluates files, strings, or input streams as Scala code, and returns the result.
- *
- * If `target` is `None`, the results are compiled to memory (and are therefore ephemeral). If
- * `target` is `Some(path)`, the path must point to a directory, and classes will be saved into
- * that directory.
- *
- * Eval also supports a limited set of preprocessors. Currently, "limited" means "exactly one":
- * directives of the form `#include <file>`.
- *
- * The flow of evaluation is:
- * - extract a string of code from the file, string, or input stream
- * - run preprocessors on that string
- * - wrap processed code in an `apply` method in a generated class
- * - compile the class
- * - contruct an instance of that class
- * - return the result of `apply()`
- */
+  * Evaluates files, strings, or input streams as Scala code, and returns the result.
+  *
+  * If `target` is `None`, the results are compiled to memory (and are therefore ephemeral). If
+  * `target` is `Some(path)`, the path must point to a directory, and classes will be saved into
+  * that directory.
+  *
+  * Eval also supports a limited set of preprocessors. Currently, "limited" means "exactly one":
+  * directives of the form `#include <file>`.
+  *
+  * The flow of evaluation is:
+  * - extract a string of code from the file, string, or input stream
+  * - run preprocessors on that string
+  * - wrap processed code in an `apply` method in a generated class
+  * - compile the class
+  * - contruct an instance of that class
+  * - return the result of `apply()`
+  */
 class Eval(target: Option[File]) {
+
   /**
-   * empty constructor for backwards compatibility
-   */
+    * empty constructor for backwards compatibility
+    */
   def this() {
     this(None)
   }
@@ -75,37 +75,40 @@ class Eval(target: Option[File]) {
     classPathOfClass("scala.tools.nsc.Interpreter")
   } catch {
     case e: Throwable =>
-      throw new RuntimeException("Unable to load Scala interpreter from classpath (scala-compiler jar is missing?)", e)
+      throw new RuntimeException(
+          "Unable to load Scala interpreter from classpath (scala-compiler jar is missing?)",
+          e)
   }
 
   private lazy val libPath = try {
     classPathOfClass("scala.AnyVal")
   } catch {
     case e: Throwable =>
-      throw new RuntimeException("Unable to load scala base object from classpath (scala-library jar is missing?)", e)
+      throw new RuntimeException(
+          "Unable to load scala base object from classpath (scala-library jar is missing?)",
+          e)
   }
 
   /**
-   * Preprocessors to run the code through before it is passed to the Scala compiler.
-   * if you want to add new resolvers, you can do so with
-   * new Eval(...) {
-   *   lazy val preprocessors = {...}
-   * }
-   */
-  protected lazy val preprocessors: Seq[Preprocessor] =
-    Seq(
+    * Preprocessors to run the code through before it is passed to the Scala compiler.
+    * if you want to add new resolvers, you can do so with
+    * new Eval(...) {
+    *   lazy val preprocessors = {...}
+    * }
+    */
+  protected lazy val preprocessors: Seq[Preprocessor] = Seq(
       new IncludePreprocessor(
-        Seq(
-          new ClassScopedResolver(getClass),
-          new FilesystemResolver(new File(".")),
-          new FilesystemResolver(new File("." + File.separator + "config"))
-        ) ++ (
-          Option(System.getProperty("com.twitter.util.Eval.includePath")) map { path =>
-            new FilesystemResolver(new File(path))
-          }
-        )
+          Seq(
+              new ClassScopedResolver(getClass),
+              new FilesystemResolver(new File(".")),
+              new FilesystemResolver(new File("." + File.separator + "config"))
+          ) ++
+          (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
+                path =>
+                  new FilesystemResolver(new File(path))
+              })
       )
-    )
+  )
 
   // For derived classes to provide an alternate compiler message handler.
   protected lazy val compilerMessageHandler: Option[Reporter] = None
@@ -114,11 +117,12 @@ class Eval(target: Option[File]) {
   protected lazy val compilerSettings: Settings = new EvalSettings(target)
 
   // Primary encapsulation around native Scala compiler
-  private[this] lazy val compiler = new StringCompiler(codeWrapperLineOffset, target, compilerSettings, compilerMessageHandler)
+  private[this] lazy val compiler = new StringCompiler(
+      codeWrapperLineOffset, target, compilerSettings, compilerMessageHandler)
 
   /**
-   * run preprocessors on our string, returning a String that is the processed source
-   */
+    * run preprocessors on our string, returning a String that is the processed source
+    */
   def sourceForString(code: String): String = {
     preprocessors.foldLeft(code) { (acc, p) =>
       p(acc)
@@ -126,8 +130,8 @@ class Eval(target: Option[File]) {
   }
 
   /**
-   * write the current checksum to a file
-   */
+    * write the current checksum to a file
+    */
   def writeChecksum(checksum: String, file: File) {
     val writer = new FileWriter(file)
     writer.write("%s".format(checksum))
@@ -135,28 +139,31 @@ class Eval(target: Option[File]) {
   }
 
   /**
-   * val i: Int = new Eval()("1 + 1") // => 2
-   */
+    * val i: Int = new Eval()("1 + 1") // => 2
+    */
   def apply[T](code: String, resetState: Boolean = true): T = {
     val processed = sourceForString(code)
     applyProcessed(processed, resetState)
   }
 
   /**
-   * val i: Int = new Eval()(new File("..."))
-   */
+    * val i: Int = new Eval()(new File("..."))
+    */
   def apply[T](files: File*): T = {
     if (target.isDefined) {
       val targetDir = target.get
-      val unprocessedSource = files.map { scala.io.Source.fromFile(_).mkString }.mkString("\n")
+      val unprocessedSource = files.map {
+        scala.io.Source.fromFile(_).mkString
+      }.mkString("\n")
       val processed = sourceForString(unprocessedSource)
       val sourceChecksum = uniqueId(processed, None)
       val checksumFile = new File(targetDir, "checksum")
-      val lastChecksum = if (checksumFile.exists) {
-        Source.fromFile(checksumFile).getLines().take(1).toList.head
-      } else {
-        -1
-      }
+      val lastChecksum =
+        if (checksumFile.exists) {
+          Source.fromFile(checksumFile).getLines().take(1).toList.head
+        } else {
+          -1
+        }
 
       if (lastChecksum != sourceChecksum) {
         compiler.reset()
@@ -169,27 +176,27 @@ class Eval(target: Option[File]) {
       // 3) And sometimes files with the same name live in different subdirectories
       // so, clean it hash it and slap it on the end of Evaluator
       val cleanBaseName = fileToClassName(files(0))
-      val className = "Evaluator__%s_%s".format(
-        cleanBaseName, sourceChecksum)
+      val className = "Evaluator__%s_%s".format(cleanBaseName, sourceChecksum)
       applyProcessed(className, processed, false)
     } else {
-      apply(files.map { scala.io.Source.fromFile(_).mkString }.mkString("\n"), true)
+      apply(files.map { scala.io.Source.fromFile(_).mkString }.mkString("\n"),
+            true)
     }
   }
 
   /**
-   * val i: Int = new Eval()(getClass.getResourceAsStream("..."))
-   */
+    * val i: Int = new Eval()(getClass.getResourceAsStream("..."))
+    */
   def apply[T](stream: InputStream): T = {
     apply(sourceForString(Source.fromInputStream(stream).mkString))
   }
 
   /**
-   * same as apply[T], but does not run preprocessors.
-   * Will generate a classname of the form Evaluater__<unique>,
-   * where unique is computed from the jvmID (a random number)
-   * and a digest of code
-   */
+    * same as apply[T], but does not run preprocessors.
+    * Will generate a classname of the form Evaluater__<unique>,
+    * where unique is computed from the jvmID (a random number)
+    * and a digest of code
+    */
   def applyProcessed[T](code: String, resetState: Boolean): T = {
     val id = uniqueId(code)
     val className = "Evaluator__" + id
@@ -197,47 +204,53 @@ class Eval(target: Option[File]) {
   }
 
   /**
-   * same as apply[T], but does not run preprocessors.
-   */
-  def applyProcessed[T](className: String, code: String, resetState: Boolean): T = {
+    * same as apply[T], but does not run preprocessors.
+    */
+  def applyProcessed[T](
+      className: String, code: String, resetState: Boolean): T = {
     val cls = compiler(wrapCodeInClass(className, code), className, resetState)
-    cls.getConstructor().newInstance().asInstanceOf[() => Any].apply().asInstanceOf[T]
+    cls
+      .getConstructor()
+      .newInstance()
+      .asInstanceOf[() => Any]
+      .apply()
+      .asInstanceOf[T]
   }
 
   /**
-   * converts the given file to evaluable source.
-   * delegates to toSource(code: String)
-   */
+    * converts the given file to evaluable source.
+    * delegates to toSource(code: String)
+    */
   def toSource(file: File): String = {
     toSource(scala.io.Source.fromFile(file).mkString)
   }
 
   /**
-   * converts the given file to evaluable source.
-   */
+    * converts the given file to evaluable source.
+    */
   def toSource(code: String): String = {
     sourceForString(code)
   }
 
   /**
-   * Compile an entire source file into the virtual classloader.
-   */
+    * Compile an entire source file into the virtual classloader.
+    */
   def compile(code: String) {
     compiler(sourceForString(code))
   }
 
   /**
-   * Like `Eval()`, but doesn't reset the virtual classloader before evaluating. So if you've
-   * loaded classes with `compile`, they can be referenced/imported in code run by `inPlace`.
-   */
+    * Like `Eval()`, but doesn't reset the virtual classloader before evaluating. So if you've
+    * loaded classes with `compile`, they can be referenced/imported in code run by `inPlace`.
+    */
   def inPlace[T](code: String) = {
     apply[T](code, false)
   }
 
   /**
-   * Check if code is Eval-able.
-   * @throws CompilerException if not Eval-able.
-   */
+    * Check if code is Eval-able.
+    * @throws CompilerException if not Eval-able.
+    */
   def check(code: String) {
     val id = uniqueId(sourceForString(code))
     val className = "Evaluator__" + id
@@ -246,27 +259,31 @@ class Eval(target: Option[File]) {
   }
 
   /**
-   * Check if files are Eval-able.
-   * @throws CompilerException if not Eval-able.
-   */
+    * Check if files are Eval-able.
+    * @throws CompilerException if not Eval-able.
+    */
   def check(files: File*) {
-    val code = files.map { scala.io.Source.fromFile(_).mkString }.mkString("\n")
+    val code = files.map { scala.io.Source.fromFile(_).mkString }
+      .mkString("\n")
     check(code)
   }
 
   /**
-   * Check if stream is Eval-able.
-   * @throws CompilerException if not Eval-able.
-   */
+    * Check if stream is Eval-able.
+    * @throws CompilerException if not Eval-able.
+    */
   def check(stream: InputStream) {
     check(scala.io.Source.fromInputStream(stream).mkString)
   }
 
   def findClass(className: String): Class[_] = {
-    compiler.findClass(className).getOrElse { throw new ClassNotFoundException("no such class: " + className) }
+    compiler.findClass(className).getOrElse {
+      throw new ClassNotFoundException("no such class: " + className)
+    }
   }
 
-  private[util] def uniqueId(code: String, idOpt: Option[Int] = Some(jvmId)): String = {
+  private[util] def uniqueId(
+      code: String, idOpt: Option[Int] = Some(jvmId)): String = {
     val digest = MessageDigest.getInstance("SHA-1").digest(code.getBytes())
     val sha = new BigInteger(1, digest).toString(16)
     idOpt match {
@@ -299,11 +316,8 @@ class Eval(target: Option[File]) {
    * NB: If this method is changed, make sure `codeWrapperLineOffset` is correct.
    */
   private[this] def wrapCodeInClass(className: String, code: String) = {
-    "class " + className + " extends (() => Any) {\n" +
-    "  def apply() = {\n" +
-    code + "\n" +
-    "  }\n" +
-    "}\n"
+    "class " + className + " extends (() => Any) {\n" + "  def apply() = {\n" +
+    code + "\n" + "  }\n" + "}\n"
   }
 
   /*
@@ -334,10 +348,15 @@ class Eval(target: Option[File]) {
    * This is probably fragile.
    */
   lazy val impliedClassPath: List[String] = {
-    def getClassPath(cl: ClassLoader, acc: List[List[String]] = List.empty): List[List[String]] = {
+    def getClassPath(
+        cl: ClassLoader,
+        acc: List[List[String]] = List.empty): List[List[String]] = {
       val cp = cl match {
-        case urlClassLoader: URLClassLoader => urlClassLoader.getURLs.filter(_.getProtocol == "file").
-          map(u => new File(u.toURI).getPath).toList
+        case urlClassLoader: URLClassLoader =>
+          urlClassLoader.getURLs
+            .filter(_.getProtocol == "file")
+            .map(u => new File(u.toURI).getPath)
+            .toList
         case _ => Nil
       }
       cl.getParent match {
@@ -350,18 +369,27 @@ class Eval(target: Option[File]) {
     val currentClassPath = classPath.head
 
     // if there's just one thing in the classpath, and it's a jar, assume an executable jar.
-    currentClassPath ::: (if (currentClassPath.size == 1 && currentClassPath(0).endsWith(".jar")) {
-      val jarFile = currentClassPath(0)
-      val relativeRoot = new File(jarFile).getParentFile()
-      val nestedClassPath = new JarFile(jarFile).getManifest.getMainAttributes.getValue("Class-Path")
-      if (nestedClassPath eq null) {
-        Nil
-      } else {
-        nestedClassPath.split(" ").map { f => new File(relativeRoot, f).getAbsolutePath }.toList
-      }
-    } else {
-      Nil
-    }) ::: classPath.tail.flatten
+    currentClassPath ::: (if (currentClassPath.size == 1 &&
+                              currentClassPath(0).endsWith(".jar")) {
+                            val jarFile = currentClassPath(0)
+                            val relativeRoot =
+                              new File(jarFile).getParentFile()
+                            val nestedClassPath =
+                              new JarFile(jarFile).getManifest.getMainAttributes
+                                .getValue("Class-Path")
+                            if (nestedClassPath eq null) {
+                              Nil
+                            } else {
+                              nestedClassPath
+                                .split(" ")
+                                .map { f =>
+                                  new File(relativeRoot, f).getAbsolutePath
+                                }
+                                .toList
+                            }
+                          } else {
+                            Nil
+                          }) ::: classPath.tail.flatten
   }
 
   trait Preprocessor {
@@ -416,28 +444,31 @@ class Eval(target: Option[File]) {
       apply(code, maximumRecursionDepth)
 
     def apply(code: String, maxDepth: Int): String = {
-      val lines = code.lines map { line: String =>
-        val tokens = line.trim.split(' ')
-        if (tokens.length == 2 && tokens(0).equals("#include")) {
-          val path = tokens(1)
-          resolvers find { resolver: Resolver =>
-            resolver.resolvable(path)
-          } match {
-            case Some(r: Resolver) => {
-              // recursively process includes
-              if (maxDepth == 0) {
-                throw new IllegalStateException("Exceeded maximum recusion depth")
-              } else {
-                apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
-              }
+      val lines =
+        code.lines map { line: String =>
+          val tokens = line.trim.split(' ')
+          if (tokens.length == 2 && tokens(0).equals("#include")) {
+            val path = tokens(1)
+            resolvers find { resolver: Resolver =>
+              resolver.resolvable(path)
+            } match {
+              case Some(r: Resolver) => {
+                  // recursively process includes
+                  if (maxDepth == 0) {
+                    throw new IllegalStateException(
+                        "Exceeded maximum recusion depth")
+                  } else {
+                    apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
+                  }
+                }
+              case _ =>
+                throw new IllegalStateException(
+                    "No resolver could find '%s'".format(path))
             }
-            case _ =>
-              throw new IllegalStateException("No resolver could find '%s'".format(path))
+          } else {
+            line
           }
-        } else {
-          line
         }
-      }
       lines.mkString("\n")
     }
   }
@@ -452,15 +483,18 @@ class Eval(target: Option[File]) {
     outputDirs.setSingleOutput(compilerOutputDir)
     private[this] val pathList = compilerPath ::: libPath
     bootclasspath.value = pathList.mkString(File.pathSeparator)
-    classpath.value = (pathList ::: impliedClassPath).mkString(File.pathSeparator)
+    classpath.value = (pathList ::: impliedClassPath).mkString(
+        File.pathSeparator)
   }
 
   /**
-   * Dynamic scala compiler. Lots of (slow) state is created, so it may be advantageous to keep
-   * around one of these and reuse it.
-   */
-  private class StringCompiler(
-    lineOffset: Int, targetDir: Option[File], settings: Settings, messageHandler: Option[Reporter]) {
+    * Dynamic scala compiler. Lots of (slow) state is created, so it may be advantageous to keep
+    * around one of these and reuse it.
+    */
+  private class StringCompiler(lineOffset: Int,
+                               targetDir: Option[File],
+                               settings: Settings,
+                               messageHandler: Option[Reporter]) {
 
     val cache = new mutable.HashMap[String, Class[_]]()
     val target = compilerOutputDir
@@ -469,43 +503,42 @@ class Eval(target: Option[File]) {
       val messages: Seq[List[String]]
     }
 
-    val reporter = messageHandler getOrElse new AbstractReporter with MessageCollector {
-      val settings = StringCompiler.this.settings
-      val messages = new mutable.ListBuffer[List[String]]
+    val reporter =
+      messageHandler getOrElse new AbstractReporter with MessageCollector {
+        val settings = StringCompiler.this.settings
+        val messages = new mutable.ListBuffer[List[String]]
 
-      def display(pos: Position, message: String, severity: Severity) {
-        severity.count += 1
-        val severityName = severity match {
-          case ERROR   => "error: "
-          case WARNING => "warning: "
-          case _ => ""
-        }
-        // the line number is not always available
-        val lineMessage =
-          try {
+        def display(pos: Position, message: String, severity: Severity) {
+          severity.count += 1
+          val severityName = severity match {
+            case ERROR => "error: "
+            case WARNING => "warning: "
+            case _ => ""
+          }
+          // the line number is not always available
+          val lineMessage = try {
             "line " + (pos.line - lineOffset)
           } catch {
             case _: Throwable => ""
           }
-        messages += (severityName + lineMessage + ": " + message) ::
+          messages += (severityName + lineMessage + ": " + message) ::
           (if (pos.isDefined) {
-            pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
-              (" " * (pos.column - 1) + "^") ::
-              Nil
-          } else {
-            Nil
-          })
-      }
+             pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
+             (" " * (pos.column - 1) + "^") :: Nil
+           } else {
+             Nil
+           })
+        }
 
-      def displayPrompt {
-        // no.
-      }
+        def displayPrompt {
+          // no.
+        }
 
-      override def reset {
-        super.reset
-        messages.clear()
+        override def reset {
+          super.reset
+          messages.clear()
+        }
       }
-    }
 
     val global = new Global(settings, reporter)
 
@@ -513,29 +546,31 @@ class Eval(target: Option[File]) {
      * Class loader for finding classes compiled by this StringCompiler.
      * After each reset, this class loader will not be able to find old compiled classes.
      */
-    var classLoader = new AbstractFileClassLoader(target, this.getClass.getClassLoader)
+    var classLoader = new AbstractFileClassLoader(
+        target, this.getClass.getClassLoader)
 
     def reset() {
       targetDir match {
         case None => {
-          target.asInstanceOf[VirtualDirectory].clear()
-        }
+            target.asInstanceOf[VirtualDirectory].clear()
+          }
         case Some(t) => {
-          target.foreach { abstractFile =>
-            if (abstractFile.file == null || abstractFile.file.getName.endsWith(".class")) {
-              abstractFile.delete()
+            target.foreach { abstractFile =>
+              if (abstractFile.file == null ||
+                  abstractFile.file.getName.endsWith(".class")) {
+                abstractFile.delete()
+              }
             }
           }
-        }
       }
       cache.clear()
       reporter.reset()
-      classLoader = new AbstractFileClassLoader(target, this.getClass.getClassLoader)
+      classLoader = new AbstractFileClassLoader(
+          target, this.getClass.getClassLoader)
     }
 
     object Debug {
-      val enabled =
-        System.getProperty("eval.debug") != null
+      val enabled = System.getProperty("eval.debug") != null
 
       def printWithLineNumbers(code: String) {
         printf("Code follows (%d bytes)\n", code.length)
@@ -563,11 +598,10 @@ class Eval(target: Option[File]) {
     }
 
     /**
-     * Compile scala code. It can be found using the above class loader.
-     */
+      * Compile scala code. It can be found using the above class loader.
+      */
     def apply(code: String) {
-      if (Debug.enabled)
-        Debug.printWithLineNumbers(code)
+      if (Debug.enabled) Debug.printWithLineNumbers(code)
 
       // if you're looking for the performance hit, it's 1/2 this line...
       val compiler = new global.Run
@@ -587,9 +621,11 @@ class Eval(target: Option[File]) {
     }
 
     /**
-     * Compile a new class, load it, and return it. Thread-safe.
-     */
-    def apply(code: String, className: String, resetState: Boolean = true): Class[_] = {
+      * Compile a new class, load it, and return it. Thread-safe.
+      */
+    def apply(code: String,
+              className: String,
+              resetState: Boolean = true): Class[_] = {
       synchronized {
         if (resetState) reset()
         findClass(className).getOrElse {
@@ -600,6 +636,8 @@ class Eval(target: Option[File]) {
     }
   }
 
-  class CompilerException(val messages: List[List[String]]) extends Exception(
-    "Compiler exception " + messages.map(_.mkString("\n")).mkString("\n"))
+  class CompilerException(val messages: List[List[String]])
+      extends Exception(
+          "Compiler exception " +
+          messages.map(_.mkString("\n")).mkString("\n"))
 }

@@ -1,35 +1,35 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
 package util
 
 /** An implementation of Austin Appleby's MurmurHash 3.0 algorithm
- *  (32 bit version); reference: https://github.com/aappleby/smhasher
- *
- *  This is the hash used by collections and case classes (including
- *  tuples).
- *
- *  @author  Rex Kerr
- *  @version 2.9
- *  @since   2.9
- */
-
-import java.lang.Integer.{ rotateLeft => rotl }
+  *  (32 bit version); reference: https://github.com/aappleby/smhasher
+  *
+  *  This is the hash used by collections and case classes (including
+  *  tuples).
+  *
+  *  @author  Rex Kerr
+  *  @version 2.9
+  *  @since   2.9
+  */
+import java.lang.Integer.{rotateLeft => rotl}
 import scala.collection.Iterator
 
 /** A class designed to generate well-distributed non-cryptographic
- *  hashes.  It is designed to be passed to a collection's foreach method,
- *  or can take individual hash values with append.  Its own hash code is
- *  set equal to the hash code of whatever it is hashing.
- */
+  *  hashes.  It is designed to be passed to a collection's foreach method,
+  *  or can take individual hash values with append.  Its own hash code is
+  *  set equal to the hash code of whatever it is hashing.
+  */
 @deprecated("Use the object MurmurHash3 instead.", "2.10.0")
-class MurmurHash[@specialized(Int,Long,Float,Double) T](seed: Int) extends (T => Unit) {
+class MurmurHash[@specialized(Int, Long, Float, Double) T](seed: Int)
+    extends (T => Unit) {
   import MurmurHash._
 
   private var h = startHash(seed)
@@ -48,7 +48,7 @@ class MurmurHash[@specialized(Int,Long,Float,Double) T](seed: Int) extends (T =>
 
   /** Incorporate the hash value of one item. */
   def apply(t: T) {
-    h = extendHash(h,t.##,c,k)
+    h = extendHash(h, t.##, c, k)
     c = nextMagicA(c)
     k = nextMagicB(k)
     hashed = false
@@ -56,7 +56,7 @@ class MurmurHash[@specialized(Int,Long,Float,Double) T](seed: Int) extends (T =>
 
   /** Incorporate a known hash value. */
   def append(i: Int) {
-    h = extendHash(h,i,c,k)
+    h = extendHash(h, i, c, k)
     c = nextMagicA(c)
     k = nextMagicB(k)
     hashed = false
@@ -74,13 +74,13 @@ class MurmurHash[@specialized(Int,Long,Float,Double) T](seed: Int) extends (T =>
 }
 
 /** An object designed to generate well-distributed non-cryptographic
- *  hashes.  It is designed to hash a collection of integers; along with
- *  the integers to hash, it generates two magic streams of integers to
- *  increase the distribution of repetitive input sequences.  Thus,
- *  three methods need to be called at each step (to start and to
- *  incorporate a new integer) to update the values.  Only one method
- *  needs to be called to finalize the hash.
- */
+  *  hashes.  It is designed to hash a collection of integers; along with
+  *  the integers to hash, it generates two magic streams of integers to
+  *  increase the distribution of repetitive input sequences.  Thus,
+  *  three methods need to be called at each step (to start and to
+  *  incorporate a new integer) to update the values.  Only one method
+  *  needs to be called to finalize the hash.
+  */
 @deprecated("Use the object MurmurHash3 instead.", "2.10.0")
 // NOTE: Used by SBT 0.13.0-M2 and below
 object MurmurHash {
@@ -117,26 +117,26 @@ object MurmurHash {
   def startMagicB = hiddenMagicB
 
   /** Incorporates a new value into an existing hash.
-   *
-   *  @param   hash    the prior hash value
-   *  @param  value    the new value to incorporate
-   *  @param magicA    a magic integer from the stream
-   *  @param magicB    a magic integer from a different stream
-   *  @return          the updated hash value
-   */
+    *
+    *  @param   hash    the prior hash value
+    *  @param  value    the new value to incorporate
+    *  @param magicA    a magic integer from the stream
+    *  @param magicB    a magic integer from a different stream
+    *  @return          the updated hash value
+    */
   def extendHash(hash: Int, value: Int, magicA: Int, magicB: Int) = {
-    (hash ^ rotl(value*magicA,11)*magicB)*3 + visibleMixer
+    (hash ^ rotl(value * magicA, 11) * magicB) * 3 + visibleMixer
   }
 
   /** Given a magic integer from the first stream, compute the next */
-  def nextMagicA(magicA: Int) = magicA*5 + hiddenMixerA
+  def nextMagicA(magicA: Int) = magicA * 5 + hiddenMixerA
 
   /** Given a magic integer from the second stream, compute the next */
-  def nextMagicB(magicB: Int) = magicB*5 + hiddenMixerB
+  def nextMagicB(magicB: Int) = magicB * 5 + hiddenMixerB
 
   /** Once all hashes have been incorporated, this performs a final mixing */
   def finalizeHash(hash: Int) = {
-    var i = (hash ^ (hash>>>16))
+    var i = (hash ^ (hash >>> 16))
     i *= finalMixer1
     i ^= (i >>> 13)
     i *= finalMixer2
@@ -165,30 +165,32 @@ object MurmurHash {
     var c = hiddenMagicA
     var k = hiddenMagicB
     var j = 0
-    while (j+1 < s.length) {
-      val i = (s.charAt(j)<<16) + s.charAt(j+1)
-      h = extendHash(h,i,c,k)
+    while (j + 1 < s.length) {
+      val i = (s.charAt(j) << 16) + s.charAt(j + 1)
+      h = extendHash(h, i, c, k)
       c = nextMagicA(c)
       k = nextMagicB(k)
       j += 2
     }
-    if (j < s.length) h = extendHash(h,s.charAt(j).toInt,c,k)
+    if (j < s.length) h = extendHash(h, s.charAt(j).toInt, c, k)
     finalizeHash(h)
   }
 
   /** Compute a hash that is symmetric in its arguments--that is,
-   *  where the order of appearance of elements does not matter.
-   *  This is useful for hashing sets, for example.
-   */
+    *  where the order of appearance of elements does not matter.
+    *  This is useful for hashing sets, for example.
+    */
   def symmetricHash[T](xs: scala.collection.TraversableOnce[T], seed: Int) = {
-    var a,b,n = 0
+    var a, b, n = 0
     var c = 1
-    xs.seq.foreach(i => {
-      val h = i.##
-      a += h
-      b ^= h
-      if (h != 0) c *= h
-      n += 1
+    xs.seq.foreach(
+        i =>
+          {
+        val h = i.##
+        a += h
+        b ^= h
+        if (h != 0) c *= h
+        n += 1
     })
     var h = startHash(seed * n)
     h = extendHash(h, a, storedMagicA(0), storedMagicB(0))

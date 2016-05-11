@@ -7,16 +7,23 @@ import com.intellij.openapi.externalSystem.model.project.AbstractExternalEntityD
 import com.intellij.openapi.externalSystem.model.{Key, ProjectKeys, ProjectSystemId}
 
 /**
- * @author Nikolay Obedin
- * @since 8/12/14.
- */
+  * @author Nikolay Obedin
+  * @since 8/12/14.
+  */
 class AndroidFacetData(val owner: ProjectSystemId,
-                       val version: String, val manifest: File, val apk: File,
-                       val res: File, val assets: File, val gen: File, val libs: File,
-                       val isLibrary: Boolean, val proguardConfig: Seq[String])
-        extends AbstractExternalEntityData(owner)
+                       val version: String,
+                       val manifest: File,
+                       val apk: File,
+                       val res: File,
+                       val assets: File,
+                       val gen: File,
+                       val libs: File,
+                       val isLibrary: Boolean,
+                       val proguardConfig: Seq[String])
+    extends AbstractExternalEntityData(owner)
 
 object AndroidFacetData {
-  val Key: Key[AndroidFacetData] = new Key(classOf[AndroidFacetData].getName,
-    ProjectKeys.LIBRARY_DEPENDENCY.getProcessingWeight + 1)
+  val Key: Key[AndroidFacetData] = new Key(
+      classOf[AndroidFacetData].getName,
+      ProjectKeys.LIBRARY_DEPENDENCY.getProcessingWeight + 1)
 }

@@ -1,5 +1,5 @@
 object Foo {
-  List(1,2,3).toSet()
+  List(1, 2, 3).toSet()
 
   class A[T](val x: T)
   new A

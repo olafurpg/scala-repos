@@ -43,7 +43,6 @@ object PathMetadata {
   case object PathOnly extends PathType
 }
 
-
 case class PathStructure(types: Map[CType, Long], children: Set[CPath])
 
 object PathStructure {

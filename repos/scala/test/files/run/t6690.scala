@@ -1,13 +1,13 @@
 import scala.collection.mutable
 
-import scala.language.{ reflectiveCalls }
+import scala.language.{reflectiveCalls}
 
 object Test extends App {
   def last0(ml: mutable.MutableList[Int]) =
-    ml.asInstanceOf[{def last0: mutable.LinkedList[Int]}].last0
+    ml.asInstanceOf[ { def last0: mutable.LinkedList[Int] }].last0
 
   def first0(ml: mutable.MutableList[Int]) =
-    ml.asInstanceOf[{def first0: mutable.LinkedList[Int]}].first0
+    ml.asInstanceOf[ { def first0: mutable.LinkedList[Int] }].first0
 
   val f = mutable.Queue[Int]()
   def check(desc: String) {

@@ -33,15 +33,18 @@ import javafx.util.{converter => jfxuc}
 import scala.language.implicitConversions
 
 object FormatStringConverter {
-  implicit def sfxFormatStringConverter2jfx[T <: AnyRef](c: FormatStringConverter[T]): jfxuc.FormatStringConverter[T] =
+  implicit def sfxFormatStringConverter2jfx[T <: AnyRef](
+      c: FormatStringConverter[T]): jfxuc.FormatStringConverter[T] =
     if (c != null) c.delegate else null
 }
 
 /**
- * `StringConverter` implementation that can use a `Format` instance.
- */
-class FormatStringConverter[T <: AnyRef](delegate: jfxuc.FormatStringConverter[T])
-  extends StringConverterDelegate[T, T, jfxuc.FormatStringConverter[T]](delegate) {
+  * `StringConverter` implementation that can use a `Format` instance.
+  */
+class FormatStringConverter[T <: AnyRef](
+    delegate: jfxuc.FormatStringConverter[T])
+    extends StringConverterDelegate[T, T, jfxuc.FormatStringConverter[T]](
+        delegate) {
 
   def this(format: Format) = this(new jfxuc.FormatStringConverter[T](format))
 }

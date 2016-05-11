@@ -10,17 +10,14 @@ class B extends A {
   override lazy val z: Int = { print("/*B.z/"); 3 }
 }
 
-
-
-
 object Test extends App {
- val a = new A
- print("a.x=")
- println(a.x)
+  val a = new A
+  print("a.x=")
+  println(a.x)
 
- val b = new B
- print("b.x=")
- println(b.x)
- print("b.z=")
- println(b.z)
+  val b = new B
+  print("b.x=")
+  println(b.x)
+  print("b.z=")
+  println(b.z)
 }

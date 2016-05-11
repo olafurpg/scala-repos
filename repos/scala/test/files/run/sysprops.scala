@@ -33,8 +33,9 @@ object Test {
     assert(prop.value == 523)
     prop.set("DingusInt")
 
-    try { println(prop.value) ; assert(false, "should not get here") }
-    catch { case _: Exception => () }
+    try { println(prop.value); assert(false, "should not get here") } catch {
+      case _: Exception => ()
+    }
   }
   def double() = {
     val prop = Prop[Double](key)

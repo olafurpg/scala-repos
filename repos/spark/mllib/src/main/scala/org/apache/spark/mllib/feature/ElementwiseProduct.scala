@@ -21,25 +21,27 @@ import org.apache.spark.annotation.Since
 import org.apache.spark.mllib.linalg._
 
 /**
- * Outputs the Hadamard product (i.e., the element-wise product) of each input vector with a
- * provided "weight" vector. In other words, it scales each column of the dataset by a scalar
- * multiplier.
- * @param scalingVec The values used to scale the reference vector's individual components.
- */
+  * Outputs the Hadamard product (i.e., the element-wise product) of each input vector with a
+  * provided "weight" vector. In other words, it scales each column of the dataset by a scalar
+  * multiplier.
+  * @param scalingVec The values used to scale the reference vector's individual components.
+  */
 @Since("1.4.0")
-class ElementwiseProduct @Since("1.4.0") (
-    @Since("1.4.0") val scalingVec: Vector) extends VectorTransformer {
+class ElementwiseProduct @Since("1.4.0")(
+    @Since("1.4.0") val scalingVec: Vector)
+    extends VectorTransformer {
 
   /**
-   * Does the hadamard product transformation.
-   *
-   * @param vector vector to be transformed.
-   * @return transformed vector.
-   */
+    * Does the hadamard product transformation.
+    *
+    * @param vector vector to be transformed.
+    * @return transformed vector.
+    */
   @Since("1.4.0")
   override def transform(vector: Vector): Vector = {
-    require(vector.size == scalingVec.size,
-      s"vector sizes do not match: Expected ${scalingVec.size} but found ${vector.size}")
+    require(
+        vector.size == scalingVec.size,
+        s"vector sizes do not match: Expected ${scalingVec.size} but found ${vector.size}")
     vector match {
       case dv: DenseVector =>
         val values: Array[Double] = dv.values.clone()
@@ -59,7 +61,9 @@ class ElementwiseProduct @Since("1.4.0") (
           i += 1
         }
         Vectors.sparse(size, indices, values)
-      case v => throw new IllegalArgumentException("Does not support vector type " + v.getClass)
+      case v =>
+        throw new IllegalArgumentException(
+            "Does not support vector type " + v.getClass)
     }
   }
 }

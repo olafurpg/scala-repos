@@ -20,15 +20,15 @@ package org.apache.spark.mllib.tree.model
 import org.apache.spark.annotation.{DeveloperApi, Since}
 
 /**
- * Predicted value for a node
- * @param predict predicted value
- * @param prob probability of the label (classification only)
- */
+  * Predicted value for a node
+  * @param predict predicted value
+  * @param prob probability of the label (classification only)
+  */
 @Since("1.2.0")
 @DeveloperApi
-class Predict @Since("1.2.0") (
-    @Since("1.2.0") val predict: Double,
-    @Since("1.2.0") val prob: Double = 0.0) extends Serializable {
+class Predict @Since("1.2.0")(@Since("1.2.0") val predict: Double,
+                              @Since("1.2.0") val prob: Double = 0.0)
+    extends Serializable {
 
   override def toString: String = s"$predict (prob = $prob)"
 
@@ -40,6 +40,7 @@ class Predict @Since("1.2.0") (
   }
 
   override def hashCode: Int = {
-    com.google.common.base.Objects.hashCode(predict: java.lang.Double, prob: java.lang.Double)
+    com.google.common.base.Objects
+      .hashCode(predict: java.lang.Double, prob: java.lang.Double)
   }
 }

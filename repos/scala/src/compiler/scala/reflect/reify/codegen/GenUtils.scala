@@ -1,8 +1,7 @@
 package scala.reflect.reify
 package codegen
 
-trait GenUtils {
-  self: Reifier =>
+trait GenUtils { self: Reifier =>
 
   import global._
 
@@ -14,7 +13,8 @@ trait GenUtils {
 
   def reifyProduct(prefix: String, elements: List[Any]): Tree = {
     // reflection would be more robust, but, hey, this is a hot path
-    if (prefix.startsWith("Tuple")) scalaFactoryCall(prefix, (elements map reify).toList: _*)
+    if (prefix.startsWith("Tuple"))
+      scalaFactoryCall(prefix, (elements map reify).toList: _*)
     else mirrorCall(TermName(prefix), (elements map reify): _*)
   }
 
@@ -30,7 +30,7 @@ trait GenUtils {
   def call(fname: String, args: Tree*): Tree =
     Apply(termPath(fname), args.toList)
 
-  def mirrorSelect(name: String): Tree   = termPath(nme.UNIVERSE_PREFIX + name)
+  def mirrorSelect(name: String): Tree = termPath(nme.UNIVERSE_PREFIX + name)
   def mirrorSelect(name: TermName): Tree = mirrorSelect(name.toString)
 
   def mirrorMirrorSelect(name: TermName): Tree =
@@ -43,7 +43,7 @@ trait GenUtils {
     call("" + nme.UNIVERSE_BUILD_PREFIX + name, args: _*)
 
   def reifyBuildCall(name: TermName, args: Any*) =
-      mirrorBuildCall(name, args map reify: _*)
+    mirrorBuildCall(name, args map reify: _*)
 
   def mirrorMirrorCall(name: TermName, args: Tree*): Tree =
     call("" + nme.MIRROR_PREFIX + name, args: _*)
@@ -67,16 +67,17 @@ trait GenUtils {
     scalaFactoryCall("collection.immutable.ListMap", args: _*)
 
   /**
-   * An (unreified) path that refers to definition with given fully qualified name
-   *  @param mkName   Creator for last portion of name (either TermName or TypeName)
-   */
+    * An (unreified) path that refers to definition with given fully qualified name
+    *  @param mkName   Creator for last portion of name (either TermName or TypeName)
+    */
   def path(fullname: String, mkName: String => Name): Tree = {
     val parts = fullname split "\\."
     val prefixParts = parts.init
     val lastName = mkName(parts.last)
     if (prefixParts.isEmpty) Ident(lastName)
     else {
-      val prefixTree = ((Ident(prefixParts.head): Tree) /: prefixParts.tail)(Select(_, _))
+      val prefixTree =
+        ((Ident(prefixParts.head): Tree) /: prefixParts.tail)(Select(_, _))
       Select(prefixTree, lastName)
     }
   }
@@ -96,20 +97,27 @@ trait GenUtils {
   }
 
   def isSemiConcreteTypeMember(tpe: Type) = tpe match {
-    case TypeRef(SingleType(_, _), sym, _) if sym.isAbstractType && !sym.isExistential => true
+    case TypeRef(SingleType(_, _), sym, _)
+        if sym.isAbstractType && !sym.isExistential =>
+      true
     case _ => false
   }
 
   def isCrossStageTypeBearer(tree: Tree): Boolean = tree match {
     case TypeApply(hk, _) => isCrossStageTypeBearer(hk)
-    case Select(sym @ Select(_, ctor), nme.apply) if ctor == nme.WeakTypeTag || ctor == nme.TypeTag || ctor == nme.Expr => true
+    case Select(sym @ Select(_, ctor), nme.apply)
+        if ctor == nme.WeakTypeTag || ctor == nme.TypeTag ||
+        ctor == nme.Expr =>
+      true
     case _ => false
   }
 
   def origin(sym: Symbol) = {
     var origin = ""
     if (sym.owner != NoSymbol) origin += "defined by %s".format(sym.owner.name)
-    if (sym.pos != NoPosition) origin += " in %s:%s:%s".format(sym.pos.source.file.name, sym.pos.line, sym.pos.column)
+    if (sym.pos != NoPosition)
+      origin += " in %s:%s:%s".format(
+          sym.pos.source.file.name, sym.pos.line, sym.pos.column)
     if (origin == "") origin = "of unknown origin"
     origin
   }

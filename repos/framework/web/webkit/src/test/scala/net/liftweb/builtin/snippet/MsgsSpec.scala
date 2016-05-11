@@ -25,12 +25,12 @@ import http._
 import util.Helpers.secureXML
 
 /**
- * System under specification for Msgs.
- */
+  * System under specification for Msgs.
+  */
 object MsgsSpec extends Specification with XmlMatchers {
   "Msgs Specification".title
 
-  def withSession[T](f: => T) : T =
+  def withSession[T](f: => T): T =
     S.initIfUninitted(new LiftSession("test", "", Empty))(f)
 
   "The built-in Msgs snippet" should {
@@ -42,13 +42,14 @@ object MsgsSpec extends Specification with XmlMatchers {
         S.notice("Notice")
 
         // We reparse due to inconsistencies with UnparsedAttributes
-        secureXML.loadString(Msgs.render(
-          <lift:warning_msg>Warning:</lift:warning_msg><lift:notice_class>funky</lift:notice_class>
-        ).toString)
+        secureXML.loadString(Msgs
+              .render(
+                  <lift:warning_msg>Warning:</lift:warning_msg><lift:notice_class>funky</lift:notice_class>
+              )
+              .toString)
       }
 
-      result must ==/(
-        <div id="lift__noticesContainer__">
+      result must ==/(<div id="lift__noticesContainer__">
           <div id="lift__noticesContainer___error">
             <ul>
               <li>Error</li>
@@ -73,4 +74,3 @@ object MsgsSpec extends Specification with XmlMatchers {
     }
   }
 }
-

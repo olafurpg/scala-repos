@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package sample.redelivery
 
 import akka.actor._
@@ -10,10 +9,12 @@ import java.util.concurrent.ThreadLocalRandom
 import java.util.UUID
 
 object SimpleOrderedRedeliverer {
+
   /**
-   * Props for creating a [[SimpleOrderedRedeliverer]].
-   */
-  def props(retryTimeout: FiniteDuration) = Props(classOf[SimpleOrderedRedeliverer], retryTimeout)
+    * Props for creating a [[SimpleOrderedRedeliverer]].
+    */
+  def props(retryTimeout: FiniteDuration) =
+    Props(classOf[SimpleOrderedRedeliverer], retryTimeout)
 
   /*
    * Messages exchanged with the requester of the delivery.
@@ -40,37 +41,39 @@ object SimpleOrderedRedeliverer {
   case object NoData extends Data
 
   /**
-   * Keeps track of our last delivery request.
-   */
+    * Keeps track of our last delivery request.
+    */
   case class LastRequest(last: Deliver, requester: ActorRef) extends Data
 
   /**
-   * Private message used only inside of the [[SimpleOrderedRedeliverer]] to signalize a tick of its retry timer.
-   */
+    * Private message used only inside of the [[SimpleOrderedRedeliverer]] to signalize a tick of its retry timer.
+    */
   private case object Retry
 }
 
 /**
- * An actor-in-the-middle kind. Takes care of message redelivery between two or more sides.
- *
- * Works “sequentially”, thus is able to process only one message at a time:
- *
- * <pre>
- *   Delivery-request#1 -> ACK#1 -> Delivery-request#2 -> ACK#2 -> ...
- * </pre>
- *
- * A situation like this:
- *
- * <pre>
- *   Delivery-request#1 -> Delivery-request#2 -> ...
- * </pre>
- *
- * ... will result in the second requester getting a [[SimpleOrderedRedeliverer.Busy]] message with [[UUID]]s
- * of both his request and currently-processed one.
- *
- * @param retryTimeout how long to wait for the [[SimpleOrderedRedeliverer.Ack]] message
- */
-class SimpleOrderedRedeliverer(retryTimeout: FiniteDuration) extends Actor with FSM[SimpleOrderedRedeliverer.State, SimpleOrderedRedeliverer.Data] {
+  * An actor-in-the-middle kind. Takes care of message redelivery between two or more sides.
+  *
+  * Works “sequentially”, thus is able to process only one message at a time:
+  *
+  * <pre>
+  *   Delivery-request#1 -> ACK#1 -> Delivery-request#2 -> ACK#2 -> ...
+  * </pre>
+  *
+  * A situation like this:
+  *
+  * <pre>
+  *   Delivery-request#1 -> Delivery-request#2 -> ...
+  * </pre>
+  *
+  * ... will result in the second requester getting a [[SimpleOrderedRedeliverer.Busy]] message with [[UUID]]s
+  * of both his request and currently-processed one.
+  *
+  * @param retryTimeout how long to wait for the [[SimpleOrderedRedeliverer.Ack]] message
+  */
+class SimpleOrderedRedeliverer(retryTimeout: FiniteDuration)
+    extends Actor
+    with FSM[SimpleOrderedRedeliverer.State, SimpleOrderedRedeliverer.Data] {
   import SimpleOrderedRedeliverer._
 
   // So that we don't make a typo when referencing this timer.
@@ -80,9 +83,9 @@ class SimpleOrderedRedeliverer(retryTimeout: FiniteDuration) extends Actor with 
   startWith(Idle, NoData)
 
   /**
-   * Will process the provided request, sending an [[Ackable]] to its recipient and resetting the inner timer.
-   * @return a new post-processing state.
-   */
+    * Will process the provided request, sending an [[Ackable]] to its recipient and resetting the inner timer.
+    * @return a new post-processing state.
+    */
   def process(request: Deliver, requester: ActorRef): State = {
     request.to ! Ackable(requester, request.msg, request.uuid)
     setTimer(RetryTimer, Retry, retryTimeout, repeat = false)
@@ -112,7 +115,8 @@ class SimpleOrderedRedeliverer(retryTimeout: FiniteDuration) extends Actor with 
      * cancel the retry timer, notify original requester with [[Delivered]] message,
      * and turn [[Idle]] again.
      */
-    case Event(Ack(uuid), LastRequest(request, requester)) if uuid == request.uuid =>
+    case Event(Ack(uuid), LastRequest(request, requester))
+        if uuid == request.uuid =>
       cancelTimer(RetryTimer)
       requester ! Delivered(uuid)
       goto(Idle) using NoData
@@ -124,40 +128,43 @@ class SimpleOrderedRedeliverer(retryTimeout: FiniteDuration) extends Actor with 
     case Event(request: Deliver, LastRequest(current, _)) =>
       stay() replying Busy(request.uuid, current.uuid)
   }
-
 }
 
 object Receiver {
+
   /**
-   * Props for creating a [[Receiver]].
-   */
+    * Props for creating a [[Receiver]].
+    */
   def props = Props(classOf[Receiver])
 }
 
 class Receiver extends Actor {
+
   /**
-   * Simulate losing 75% of all messages on the receiving end. We want to see the redelivery in action!
-   */
+    * Simulate losing 75% of all messages on the receiving end. We want to see the redelivery in action!
+    */
   def shouldSendAck = ThreadLocalRandom.current.nextDouble() < 0.25
 
   def receive = {
     case SimpleOrderedRedeliverer.Ackable(from, msg, uuid) =>
       val goingToSendAck = shouldSendAck
-      println(s"""  [Receiver] got "$msg"; ${if (goingToSendAck) "" else " ***NOT***"} going to send Ack this time""")
+      println(s"""  [Receiver] got "$msg"; ${if (goingToSendAck) ""
+      else " ***NOT***"} going to send Ack this time""")
       // Send a [[SimpleOrderedRedeliverer.Ack]] -- if they're lucky!
       if (goingToSendAck) sender() ! SimpleOrderedRedeliverer.Ack(uuid)
   }
 }
 
 object Requester {
+
   /**
-   * Props for creating a [[Requester]].
-   */
+    * Props for creating a [[Requester]].
+    */
   def props = Props(classOf[Requester])
 
   /**
-   * Requester-private message used to drive the simulation.
-   */
+    * Requester-private message used to drive the simulation.
+    */
   private case object Tick
 }
 
@@ -168,7 +175,8 @@ class Requester extends Actor {
   /*
    * Create a [[SimpleOrderedRedeliverer]] and a [[Receiver]].
    */
-  val redeliverer = context.actorOf(SimpleOrderedRedeliverer.props(retryTimeout = 3.seconds))
+  val redeliverer =
+    context.actorOf(SimpleOrderedRedeliverer.props(retryTimeout = 3.seconds))
   val receiver = context.actorOf(Receiver.props)
 
   /*
@@ -182,15 +190,17 @@ class Requester extends Actor {
   self ! Tick
 
   /**
-   * Make a new request every anywhere-between-1-and-10 seconds.
-   */
-  def nextTickIn: FiniteDuration = (1.0 + ThreadLocalRandom.current.nextDouble() * 9.0).seconds
+    * Make a new request every anywhere-between-1-and-10 seconds.
+    */
+  def nextTickIn: FiniteDuration =
+    (1.0 + ThreadLocalRandom.current.nextDouble() * 9.0).seconds
 
   def receive = {
     case Tick =>
       val msg = util.Random.shuffle(messages).head
       val uuid = UUID.randomUUID()
-      println(s"""[Requester] requesting ("$msg", $uuid) to be sent to [Receiver]...""")
+      println(
+          s"""[Requester] requesting ("$msg", $uuid) to be sent to [Receiver]...""")
 
       /*
        * Make the actual request...
@@ -208,7 +218,6 @@ class Requester extends Actor {
      */
     case msg => println(s"[Requester] got $msg")
   }
-
 }
 
 object FsmSimpleRedelivery extends App {
@@ -219,5 +228,4 @@ object FsmSimpleRedelivery extends App {
    * Start a new [[Requester]] actor.
    */
   system.actorOf(Requester.props)
-
 }

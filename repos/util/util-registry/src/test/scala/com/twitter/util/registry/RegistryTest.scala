@@ -53,7 +53,8 @@ abstract class RegistryTest extends FunSuite {
     val registry = mkRegistry()
     registry.put(Seq("foo"), "bar")
     registry.put(Seq("baz"), "qux")
-    assert(registry.toSet == Set(Entry(Seq("foo"), "bar"), Entry(Seq("baz"), "qux")))
+    assert(registry.toSet == Set(Entry(Seq("foo"), "bar"),
+                                 Entry(Seq("baz"), "qux")))
   }
 
   test(s"$name can support nontrivial keys") {
@@ -92,13 +93,15 @@ abstract class RegistryTest extends FunSuite {
     val registry = mkRegistry()
     registry.put(Seq("foo"), "bar")
     registry.put(Seq("foo", "baz"), "qux")
-    assert(registry.toSet == Set(Entry(Seq("foo"), "bar"), Entry(Seq("foo", "baz"), "qux")))
+    assert(registry.toSet == Set(Entry(Seq("foo"), "bar"),
+                                 Entry(Seq("foo", "baz"), "qux")))
   }
 
   test(s"$name can support varargs API") {
     val registry = mkRegistry()
     registry.put("foo", "bar", "baz")
     registry.put("qux")
-    assert(registry.toSet == Set(Entry(Seq("foo", "bar"), "baz"), Entry(Seq(), "qux")))
+    assert(registry.toSet == Set(Entry(Seq("foo", "bar"), "baz"),
+                                 Entry(Seq(), "qux")))
   }
 }

@@ -11,4 +11,3 @@ object Test {
 
   b = b match { case x => x }
 }
-

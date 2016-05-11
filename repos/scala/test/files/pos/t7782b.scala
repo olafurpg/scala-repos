@@ -3,7 +3,7 @@ package pack
 object Test {
   import O.empty
   empty // this will trigger completion of `test`
-        // with skolemizationLevel = 1
+  // with skolemizationLevel = 1
 }
 
 object O {

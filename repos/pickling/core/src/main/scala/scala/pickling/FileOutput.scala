@@ -16,5 +16,4 @@ class TextFileOutput(file: File) extends Output[String] {
   }
 
   def close(): Unit = writer.close()
-
 }

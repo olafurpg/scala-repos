@@ -1,16 +1,15 @@
 /**
- * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
- */
-
+  * Copyright (C) 2009-2011 Scalable Solutions AB <http://scalablesolutions.se>
+  */
 package akka.util
 
-import java.util.concurrent.locks.{ ReentrantReadWriteLock, ReentrantLock }
-import java.util.concurrent.atomic.{ AtomicBoolean }
+import java.util.concurrent.locks.{ReentrantReadWriteLock, ReentrantLock}
+import java.util.concurrent.atomic.{AtomicBoolean}
 import akka.event.EventHandler
 
 /**
- * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
- */
+  * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
+  */
 final class ReentrantGuard {
   val lock = new ReentrantLock
 
@@ -34,8 +33,8 @@ final class ReentrantGuard {
 }
 
 /**
- * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
- */
+  * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
+  */
 class ReadWriteGuard {
   private val rwl = new ReentrantReadWriteLock
   val readLock = rwl.readLock
@@ -61,9 +60,9 @@ class ReadWriteGuard {
 }
 
 /**
- * A very simple lock that uses CCAS (Compare Compare-And-Swap)
- * Does not keep track of the owner and isn't Reentrant, so don't nest and try to stick to the if*-methods
- */
+  * A very simple lock that uses CCAS (Compare Compare-And-Swap)
+  * Does not keep track of the owner and isn't Reentrant, so don't nest and try to stick to the if*-methods
+  */
 class SimpleLock {
   val acquired = new AtomicBoolean(false)
 
@@ -115,24 +114,25 @@ class SimpleLock {
 }
 
 /**
- * An atomic switch that can be either on or off
- */
+  * An atomic switch that can be either on or off
+  */
 class Switch(startAsOn: Boolean = false) {
   private val switch = new AtomicBoolean(startAsOn)
 
-  protected def transcend(from: Boolean, action: => Unit): Boolean = synchronized {
-    if (switch.compareAndSet(from, !from)) {
-      try {
-        action
-      } catch {
-        case e: Throwable =>
-          EventHandler.error(e, this, e.getMessage)
-          switch.compareAndSet(!from, from) // revert status
-          throw e
-      }
-      true
-    } else false
-  }
+  protected def transcend(from: Boolean, action: => Unit): Boolean =
+    synchronized {
+      if (switch.compareAndSet(from, !from)) {
+        try {
+          action
+        } catch {
+          case e: Throwable =>
+            EventHandler.error(e, this, e.getMessage)
+            switch.compareAndSet(!from, from) // revert status
+            throw e
+        }
+        true
+      } else false
+    }
 
   def switchOff(action: => Unit): Boolean = transcend(from = true, action)
   def switchOn(action: => Unit): Boolean = transcend(from = false, action)

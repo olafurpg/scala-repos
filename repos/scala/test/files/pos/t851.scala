@@ -10,7 +10,7 @@ object test {
   def ok3: String = {
     val x = "0".length
     """ok3
-    """//
+    """ //
   }
   def ok4: String = {
     val x = "0".length

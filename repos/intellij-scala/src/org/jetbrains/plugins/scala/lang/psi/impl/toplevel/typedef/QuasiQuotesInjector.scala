@@ -9,12 +9,14 @@ class QuasiQuotesInjector extends SyntheticMembersInjector {
     source match {
       // legacy macro emulation - in 2.10 quasiquotes were implemented by a compiler plugin
       // so we need to manually add QQ interpolator stub
-      case c: ScClass if c.qualifiedName == "scala.StringContext" && needQQEmulation(c) =>
+      case c: ScClass
+          if c.qualifiedName == "scala.StringContext" && needQQEmulation(c) =>
         Seq("def q(args: Any*): _root_.scala.reflect.runtime.universe.Tree = ???")
       case _ => Seq.empty
     }
   }
 
   private def needQQEmulation(e: PsiElement) =
-    e.module.exists(_.scalaCompilerSettings.plugins.exists(_.contains("paradise_2.10")))
+    e.module.exists(
+        _.scalaCompilerSettings.plugins.exists(_.contains("paradise_2.10")))
 }

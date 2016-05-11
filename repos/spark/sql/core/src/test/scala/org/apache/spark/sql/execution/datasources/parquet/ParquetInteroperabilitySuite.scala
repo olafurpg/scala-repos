@@ -22,8 +22,10 @@ import java.io.File
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.test.SharedSQLContext
 
-class ParquetInteroperabilitySuite extends ParquetCompatibilityTest with SharedSQLContext {
-  test("parquet files with different physical schemas but share the same logical schema") {
+class ParquetInteroperabilitySuite
+    extends ParquetCompatibilityTest with SharedSQLContext {
+  test(
+      "parquet files with different physical schemas but share the same logical schema") {
     import ParquetCompatibilityTest._
 
     // This test case writes two Parquet files, both representing the following Catalyst schema
@@ -40,8 +42,7 @@ class ParquetInteroperabilitySuite extends ParquetCompatibilityTest with SharedS
       val avroStylePath = new File(dir, "avro-style").getCanonicalPath
       val protobufStylePath = new File(dir, "protobuf-style").getCanonicalPath
 
-      val avroStyleSchema =
-        """message avro_style {
+      val avroStyleSchema = """message avro_style {
           |  required group f (LIST) {
           |    repeated int32 array;
           |  }
@@ -63,8 +64,7 @@ class ParquetInteroperabilitySuite extends ParquetCompatibilityTest with SharedS
 
       logParquetSchema(avroStylePath)
 
-      val protobufStyleSchema =
-        """message protobuf_style {
+      val protobufStyleSchema = """message protobuf_style {
           |  repeated int32 f;
           |}
         """.stripMargin
@@ -80,11 +80,8 @@ class ParquetInteroperabilitySuite extends ParquetCompatibilityTest with SharedS
 
       logParquetSchema(protobufStylePath)
 
-      checkAnswer(
-        sqlContext.read.parquet(dir.getCanonicalPath),
-        Seq(
-          Row(Seq(0, 1)),
-          Row(Seq(2, 3))))
+      checkAnswer(sqlContext.read.parquet(dir.getCanonicalPath),
+                  Seq(Row(Seq(0, 1)), Row(Seq(2, 3))))
     }
   }
 }

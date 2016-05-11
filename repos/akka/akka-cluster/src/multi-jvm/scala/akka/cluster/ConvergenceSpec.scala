@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import language.postfixOps
@@ -12,32 +12,44 @@ import akka.testkit._
 import scala.concurrent.duration._
 import akka.actor.Address
 
-final case class ConvergenceMultiNodeConfig(failureDetectorPuppet: Boolean) extends MultiNodeConfig {
+final case class ConvergenceMultiNodeConfig(failureDetectorPuppet: Boolean)
+    extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(debugConfig(on = false).
-    withFallback(ConfigFactory.parseString("akka.cluster.failure-detector.threshold = 4")).
-    withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
+  commonConfig(
+      debugConfig(on = false)
+        .withFallback(ConfigFactory.parseString(
+                "akka.cluster.failure-detector.threshold = 4"))
+        .withFallback(
+            MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
-class ConvergenceWithFailureDetectorPuppetMultiJvmNode1 extends ConvergenceSpec(failureDetectorPuppet = true)
-class ConvergenceWithFailureDetectorPuppetMultiJvmNode2 extends ConvergenceSpec(failureDetectorPuppet = true)
-class ConvergenceWithFailureDetectorPuppetMultiJvmNode3 extends ConvergenceSpec(failureDetectorPuppet = true)
-class ConvergenceWithFailureDetectorPuppetMultiJvmNode4 extends ConvergenceSpec(failureDetectorPuppet = true)
+class ConvergenceWithFailureDetectorPuppetMultiJvmNode1
+    extends ConvergenceSpec(failureDetectorPuppet = true)
+class ConvergenceWithFailureDetectorPuppetMultiJvmNode2
+    extends ConvergenceSpec(failureDetectorPuppet = true)
+class ConvergenceWithFailureDetectorPuppetMultiJvmNode3
+    extends ConvergenceSpec(failureDetectorPuppet = true)
+class ConvergenceWithFailureDetectorPuppetMultiJvmNode4
+    extends ConvergenceSpec(failureDetectorPuppet = true)
 
-class ConvergenceWithAccrualFailureDetectorMultiJvmNode1 extends ConvergenceSpec(failureDetectorPuppet = false)
-class ConvergenceWithAccrualFailureDetectorMultiJvmNode2 extends ConvergenceSpec(failureDetectorPuppet = false)
-class ConvergenceWithAccrualFailureDetectorMultiJvmNode3 extends ConvergenceSpec(failureDetectorPuppet = false)
-class ConvergenceWithAccrualFailureDetectorMultiJvmNode4 extends ConvergenceSpec(failureDetectorPuppet = false)
+class ConvergenceWithAccrualFailureDetectorMultiJvmNode1
+    extends ConvergenceSpec(failureDetectorPuppet = false)
+class ConvergenceWithAccrualFailureDetectorMultiJvmNode2
+    extends ConvergenceSpec(failureDetectorPuppet = false)
+class ConvergenceWithAccrualFailureDetectorMultiJvmNode3
+    extends ConvergenceSpec(failureDetectorPuppet = false)
+class ConvergenceWithAccrualFailureDetectorMultiJvmNode4
+    extends ConvergenceSpec(failureDetectorPuppet = false)
 
 abstract class ConvergenceSpec(multiNodeConfig: ConvergenceMultiNodeConfig)
-  extends MultiNodeSpec(multiNodeConfig)
-  with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
 
-  def this(failureDetectorPuppet: Boolean) = this(ConvergenceMultiNodeConfig(failureDetectorPuppet))
+  def this(failureDetectorPuppet: Boolean) =
+    this(ConvergenceMultiNodeConfig(failureDetectorPuppet))
 
   import multiNodeConfig._
 
@@ -75,7 +87,6 @@ abstract class ConvergenceSpec(multiNodeConfig: ConvergenceMultiNodeConfig)
           clusterView.unreachableMembers.size should ===(1)
           clusterView.unreachableMembers.head.address should ===(thirdAddress)
           clusterView.members.size should ===(3)
-
         }
       }
 
@@ -89,7 +100,9 @@ abstract class ConvergenceSpec(multiNodeConfig: ConvergenceMultiNodeConfig)
       }
 
       def memberStatus(address: Address): Option[MemberStatus] =
-        clusterView.members.collectFirst { case m if m.address == address ⇒ m.status }
+        clusterView.members.collectFirst {
+          case m if m.address == address ⇒ m.status
+        }
 
       enterBarrier("after-join")
 

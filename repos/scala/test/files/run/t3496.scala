@@ -1,7 +1,3 @@
-
-
-
-
 // ticket #3496
 object Test {
 
@@ -11,5 +7,4 @@ object Test {
     s.drop(5)
     s.splitAt(5)
   }
-
 }

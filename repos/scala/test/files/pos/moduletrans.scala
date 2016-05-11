@@ -4,5 +4,4 @@ object m1 {
     def f() = 5
   }
   final val m: m = new m()
-
 }

@@ -10,7 +10,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package net.liftweb
 package mongodb
 
@@ -18,8 +17,9 @@ import util.{ConnectionIdentifier, SimpleInjector}
 import util.Helpers._
 
 object MongoRules extends SimpleInjector {
-  private def defaultCollectionNameFunc(conn: ConnectionIdentifier, name: String): String = {
-    charSplit(name, '.').last.toLowerCase+"s"
+  private def defaultCollectionNameFunc(
+      conn: ConnectionIdentifier, name: String): String = {
+    charSplit(name, '.').last.toLowerCase + "s"
   }
 
   /**
@@ -32,5 +32,6 @@ object MongoRules extends SimpleInjector {
     *
     *  RecordRules.collectionName.default.set((_,name) => StringHelpers.snakify(name))
     */
-  val collectionName = new Inject[(ConnectionIdentifier, String) => String](defaultCollectionNameFunc _) {}
+  val collectionName = new Inject[(ConnectionIdentifier, String) => String](
+      defaultCollectionNameFunc _) {}
 }

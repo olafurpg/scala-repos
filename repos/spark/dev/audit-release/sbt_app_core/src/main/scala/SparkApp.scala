@@ -27,7 +27,8 @@ import org.apache.spark.SparkContext._
 object SimpleApp {
   def main(args: Array[String]) {
     val conf = sys.env.get("SPARK_AUDIT_MASTER") match {
-      case Some(master) => new SparkConf().setAppName("Simple Spark App").setMaster(master)
+      case Some(master) =>
+        new SparkConf().setAppName("Simple Spark App").setMaster(master)
       case None => new SparkConf().setAppName("Simple Spark App")
     }
     val logFile = "input.txt"
@@ -41,8 +42,10 @@ object SimpleApp {
     }
 
     // Regression test for SPARK-1167: Remove metrics-ganglia from default build due to LGPL issue
-    val foundConsole = Try(Class.forName("org.apache.spark.metrics.sink.ConsoleSink")).isSuccess
-    val foundGanglia = Try(Class.forName("org.apache.spark.metrics.sink.GangliaSink")).isSuccess
+    val foundConsole = Try(
+        Class.forName("org.apache.spark.metrics.sink.ConsoleSink")).isSuccess
+    val foundGanglia = Try(
+        Class.forName("org.apache.spark.metrics.sink.GangliaSink")).isSuccess
     if (!foundConsole) {
       println("Console sink not loaded via spark-core")
       System.exit(-1)
@@ -53,7 +56,8 @@ object SimpleApp {
     }
 
     // Remove kinesis from default build due to ASL license issue
-    val foundKinesis = Try(Class.forName("org.apache.spark.streaming.kinesis.KinesisUtils")).isSuccess
+    val foundKinesis = Try(Class.forName(
+            "org.apache.spark.streaming.kinesis.KinesisUtils")).isSuccess
     if (foundKinesis) {
       println("Kinesis was loaded via spark-core")
       System.exit(-1)

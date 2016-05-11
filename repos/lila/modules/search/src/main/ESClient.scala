@@ -4,9 +4,9 @@ import play.api.libs.json._
 
 sealed trait ESClient {
 
-  def search[Q: Writes](query: Q, from: From, size: Size): Fu[SearchResponse]
+  def search[Q : Writes](query: Q, from: From, size: Size): Fu[SearchResponse]
 
-  def count[Q: Writes](query: Q): Fu[CountResponse]
+  def count[Q : Writes](query: Q): Fu[CountResponse]
 
   def store(id: Id, doc: JsObject): Funit
 
@@ -16,9 +16,8 @@ sealed trait ESClient {
 }
 
 final class ESClientHttp(
-    endpoint: String,
-    val index: Index,
-    writeable: Boolean) extends ESClient {
+    endpoint: String, val index: Index, writeable: Boolean)
+    extends ESClient {
   import play.api.libs.ws.WS
   import play.api.Play.current
 
@@ -26,19 +25,23 @@ final class ESClientHttp(
     HTTP(s"store/${index.name}/${id.value}", doc)
   }
 
-  def search[Q: Writes](query: Q, from: From, size: Size) = monitor("search") {
-    HTTP(s"search/${index.name}/${from.value}/${size.value}", query, SearchResponse.apply)
-  }
+  def search[Q : Writes](query: Q, from: From, size: Size) =
+    monitor("search") {
+      HTTP(s"search/${index.name}/${from.value}/${size.value}",
+           query,
+           SearchResponse.apply)
+    }
 
-  def count[Q: Writes](query: Q) = monitor("count") {
+  def count[Q : Writes](query: Q) = monitor("count") {
     HTTP(s"count/${index.name}", query, CountResponse.apply)
   }
 
-  def deleteById(id: lila.search.Id) = writeable ??
-    HTTP(s"delete/id/${index.name}/${id.value}", Json.obj())
+  def deleteById(id: lila.search.Id) =
+    writeable ?? HTTP(s"delete/id/${index.name}/${id.value}", Json.obj())
 
-  def deleteByIds(ids: List[lila.search.Id]) = writeable ??
-    HTTP(s"delete/ids/${index.name}", Json.obj("ids" -> ids.map(_.value)))
+  def deleteByIds(ids: List[lila.search.Id]) =
+    writeable ?? HTTP(
+        s"delete/ids/${index.name}", Json.obj("ids" -> ids.map(_.value)))
 
   def putMapping =
     HTTP(s"mapping/${index.name}/${index.name}", Json.obj())
@@ -48,22 +51,25 @@ final class ESClientHttp(
       case (Id(id), doc) => id -> JsString(Json.stringify(doc))
     }))
 
-  private[search] def HTTP[D: Writes, R](url: String, data: D, read: String => R): Fu[R] =
+  private[search] def HTTP[D : Writes, R](
+      url: String, data: D, read: String => R): Fu[R] =
     WS.url(s"$endpoint/$url").post(Json toJson data) flatMap {
       case res if res.status == 200 => fuccess(read(res.body))
-      case res                      => fufail(s"$url ${res.status}")
+      case res => fufail(s"$url ${res.status}")
     }
-  private[search] def HTTP(url: String, data: JsObject): Funit = HTTP(url, data, _ => ())
+  private[search] def HTTP(url: String, data: JsObject): Funit =
+    HTTP(url, data, _ => ())
 
   private def monitor[A](op: String)(f: Fu[A]) =
-    f.mon(_.search.client(op)).addEffects(
-      _ => lila.mon.search.failure(op)(),
-      _ => lila.mon.search.success(op)())
+    f.mon(_.search.client(op))
+      .addEffects(_ => lila.mon.search.failure(op)(),
+                  _ => lila.mon.search.success(op)())
 }
 
 final class ESClientStub extends ESClient {
-  def search[Q: Writes](query: Q, from: From, size: Size) = fuccess(SearchResponse(Nil))
-  def count[Q: Writes](query: Q) = fuccess(CountResponse(0))
+  def search[Q : Writes](query: Q, from: From, size: Size) =
+    fuccess(SearchResponse(Nil))
+  def count[Q : Writes](query: Q) = fuccess(CountResponse(0))
   def store(id: Id, doc: JsObject) = funit
   def storeBulk(docs: Seq[(Id, JsObject)]) = funit
   def deleteById(id: Id) = funit

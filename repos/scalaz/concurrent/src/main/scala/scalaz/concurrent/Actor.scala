@@ -4,26 +4,27 @@ package concurrent
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Processes messages of type `A`, one at a time. Messages are submitted to
- * the actor with the method `!`. Processing is typically performed asynchronously,
- * this is controlled by the provided `strategy`.
- *
- * Memory consistency guarantee: when each message is processed by the `handler`, any memory that it
- * mutates is guaranteed to be visible by the `handler` when it processes the next message, even if
- * the `strategy` runs the invocations of `handler` on separate threads. This is achieved because
- * the `Actor` reads a volatile memory location before entering its event loop, and writes to the same
- * location before suspending.
- *
- * Implementation based on non-intrusive MPSC node-based queue, described by Dmitriy Vyukov:
- * [[http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue]]
- *
- * @param handler  The message handler
- * @param onError  Exception handler, called if the message handler throws any `Throwable`.
- * @param strategy Execution strategy, for example, a strategy that is backed by an `ExecutorService`
- * @tparam A       The type of messages accepted by this actor.
- */
-final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrowError)
-                         (implicit val strategy: Strategy) {
+  * Processes messages of type `A`, one at a time. Messages are submitted to
+  * the actor with the method `!`. Processing is typically performed asynchronously,
+  * this is controlled by the provided `strategy`.
+  *
+  * Memory consistency guarantee: when each message is processed by the `handler`, any memory that it
+  * mutates is guaranteed to be visible by the `handler` when it processes the next message, even if
+  * the `strategy` runs the invocations of `handler` on separate threads. This is achieved because
+  * the `Actor` reads a volatile memory location before entering its event loop, and writes to the same
+  * location before suspending.
+  *
+  * Implementation based on non-intrusive MPSC node-based queue, described by Dmitriy Vyukov:
+  * [[http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue]]
+  *
+  * @param handler  The message handler
+  * @param onError  Exception handler, called if the message handler throws any `Throwable`.
+  * @param strategy Execution strategy, for example, a strategy that is backed by an `ExecutorService`
+  * @tparam A       The type of messages accepted by this actor.
+  */
+final case class Actor[A](
+    handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrowError)(
+    implicit val strategy: Strategy) {
   private val head = new AtomicReference[Node[A]]
 
   val toEffect: Run[A] = Run[A](a => this ! a)
@@ -39,7 +40,8 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
   /** Pass the message `a` to the mailbox of this actor */
   def apply(a: A): Unit = this ! a
 
-  def contramap[B](f: B => A): Actor[B] = new Actor[B](b => this ! f(b), onError)(strategy)
+  def contramap[B](f: B => A): Actor[B] =
+    new Actor[B](b => this ! f(b), onError)(strategy)
 
   private def schedule(n: Node[A]): Unit = strategy(act(n))
 
@@ -56,7 +58,8 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
 
   private def scheduleLastTry(n: Node[A]): Unit = strategy(lastTry(n))
 
-  private def lastTry(n: Node[A]): Unit = if (!head.compareAndSet(n, null)) act(next(n))
+  private def lastTry(n: Node[A]): Unit =
+    if (!head.compareAndSet(n, null)) act(next(n))
 
   @annotation.tailrec
   private def next(n: Node[A]): Node[A] = {
@@ -75,14 +78,16 @@ private object ActorUtils {
 object Actor extends ActorInstances with ActorFunctions
 
 sealed abstract class ActorInstances {
-  implicit val actorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
-    def contramap[A, B](r: Actor[A])(f: B => A): Actor[B] = r contramap f
-  }
+  implicit val actorContravariant: Contravariant[Actor] =
+    new Contravariant[Actor] {
+      def contramap[A, B](r: Actor[A])(f: B => A): Actor[B] = r contramap f
+    }
 }
 
 trait ActorFunctions {
-  def actor[A](handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrowError)
-              (implicit s: Strategy): Actor[A] = new Actor[A](handler, onError)(s)
+  def actor[A](handler: A => Unit,
+               onError: Throwable => Unit = ActorUtils.rethrowError)(
+      implicit s: Strategy): Actor[A] = new Actor[A](handler, onError)(s)
 
   implicit def ToFunctionFromActor[A](a: Actor[A]): A => Unit = a ! _
 }

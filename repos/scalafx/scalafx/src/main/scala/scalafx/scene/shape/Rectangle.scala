@@ -35,9 +35,11 @@ import scalafx.delegate.{DimensionDelegate, PositionDelegate, SFXDelegate}
 import scalafx.scene.paint._
 
 object Rectangle {
-  implicit def sfxRectangle2jfx(v: Rectangle): jfxss.Rectangle = if (v != null) v.delegate else null
+  implicit def sfxRectangle2jfx(v: Rectangle): jfxss.Rectangle =
+    if (v != null) v.delegate else null
 
-  def apply(width: Double, height: Double) = new Rectangle(new jfxss.Rectangle(width, height))
+  def apply(width: Double, height: Double) =
+    new Rectangle(new jfxss.Rectangle(width, height))
 
   def apply(x: Double, y: Double, width: Double, height: Double) =
     new Rectangle(new jfxss.Rectangle(x, y, width, height))
@@ -47,29 +49,26 @@ object Rectangle {
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/Rectangle.html]]
- *
- */
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/Rectangle.html]]
+  *
+  */
 class Rectangle(override val delegate: jfxss.Rectangle = new jfxss.Rectangle())
-  extends Shape(delegate)
-  with PositionDelegate[jfxss.Rectangle]
-  with DimensionDelegate[jfxss.Rectangle]
-  with SFXDelegate[jfxss.Rectangle] {
+    extends Shape(delegate) with PositionDelegate[jfxss.Rectangle]
+    with DimensionDelegate[jfxss.Rectangle] with SFXDelegate[jfxss.Rectangle] {
 
   /**
-   * Defines the vertical diameter of the arc at the four corners of the rectangle.
-   */
+    * Defines the vertical diameter of the arc at the four corners of the rectangle.
+    */
   def arcWidth: DoubleProperty = delegate.arcWidthProperty
   def arcWidth_=(v: Double) {
     arcWidth() = v
   }
 
   /**
-   * Defines the horizontal diameter of the arc at the four corners of the rectangle.
-   */
+    * Defines the horizontal diameter of the arc at the four corners of the rectangle.
+    */
   def arcHeight: DoubleProperty = delegate.arcHeightProperty
   def arcHeight_=(v: Double) {
     arcHeight() = v
   }
-
 }

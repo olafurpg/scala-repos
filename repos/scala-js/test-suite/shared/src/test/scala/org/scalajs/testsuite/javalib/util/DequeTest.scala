@@ -14,5 +14,5 @@ object DequeFactory {
 }
 
 trait DequeFactory extends CollectionFactory {
-  def empty[E: ClassTag]: ju.Deque[E]
+  def empty[E : ClassTag]: ju.Deque[E]
 }

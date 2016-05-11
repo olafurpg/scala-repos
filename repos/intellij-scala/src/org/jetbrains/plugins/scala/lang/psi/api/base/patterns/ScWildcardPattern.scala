@@ -6,10 +6,7 @@ package base
 package patterns
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 28.02.2008
-*/
-
-trait ScWildcardPattern extends ScPattern {
-
-}
+  * @author Alexander Podkhalyuzin
+  * Date: 28.02.2008
+  */
+trait ScWildcardPattern extends ScPattern {}

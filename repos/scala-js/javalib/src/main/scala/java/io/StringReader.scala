@@ -65,8 +65,6 @@ class StringReader(s: String) extends Reader {
   }
 
   private def ensureOpen(): Unit = {
-    if (closed)
-      throw new IOException("Operation on closed stream")
+    if (closed) throw new IOException("Operation on closed stream")
   }
-
 }

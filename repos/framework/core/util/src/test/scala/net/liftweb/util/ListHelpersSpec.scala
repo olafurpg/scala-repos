@@ -21,11 +21,10 @@ import org.specs2.mutable.Specification
 
 import common._
 
-
 /**
- * Systems under specification for ListHelpers.
- */
-object ListHelpersSpec extends Specification  with ListHelpers {
+  * Systems under specification for ListHelpers.
+  */
+object ListHelpersSpec extends Specification with ListHelpers {
   "ListHelpers Specification".title
 
   "ListHelpers.delta" should {
@@ -40,9 +39,9 @@ object ListHelpersSpec extends Specification  with ListHelpers {
     "prepend and append 2,4, 99" in {
       val ret = delta(List(2, 4, 99), List(1, 2, 3, 4, 5)) {
         case InsertAfterDelta(3, 2) => "ok"
-        case AppendDelta(5)         => "ok5"
-        case RemoveDelta(99)        => "99"
-        case InsertAtStartDelta(1)  => "1"
+        case AppendDelta(5) => "ok5"
+        case RemoveDelta(99) => "99"
+        case InsertAtStartDelta(1) => "1"
         case InsertAfterDelta(5, 4) => "ok5"
         case _ => "fail"
       }
@@ -53,10 +52,10 @@ object ListHelpersSpec extends Specification  with ListHelpers {
       val ret = delta(List(4, 2, 99), List(1, 2, 3, 4, 5)) {
         case InsertAfterDelta(3, 2) => "ok"
         case InsertAfterDelta(4, 3) => "ok3"
-        case RemoveDelta(4)         => "r4"
-        case AppendDelta(5)         => "ok5"
-        case RemoveDelta(99)        => "99"
-        case InsertAtStartDelta(1)  => "1"
+        case RemoveDelta(4) => "r4"
+        case AppendDelta(5) => "ok5"
+        case RemoveDelta(99) => "99"
+        case InsertAtStartDelta(1) => "1"
         case InsertAfterDelta(5, 4) => "ok5"
         case _ => "fail"
       }
@@ -84,7 +83,11 @@ object ListHelpersSpec extends Specification  with ListHelpers {
       first(List(1, 2, 3))((i: Int) => Empty) must_== Empty
     }
     "return the first Full can returned by a function f over the list elements" in {
-      val f = (i: Int) => i >= 2 match {case true => Full(3) case false => Empty}
+      val f = (i: Int) =>
+        i >= 2 match {
+          case true => Full(3)
+          case false => Empty
+      }
       first(List(1, 2, 3))(f) must_== Full(3)
     }
   }
@@ -100,7 +103,8 @@ object ListHelpersSpec extends Specification  with ListHelpers {
       List(("one", "1"), ("two", "2")).ciGet("one") must_== Full("1")
     }
     "return a Full can with the first second value of a pair matching the key case-insensitively" in {
-      List(("one", "1"), ("two", "2"), ("two", "3")).ciGet("two") must_== Full("2")
+      List(("one", "1"), ("two", "2"), ("two", "3")).ciGet("two") must_==
+        Full("2")
     }
   }
 
@@ -127,7 +131,7 @@ object ListHelpersSpec extends Specification  with ListHelpers {
       head(Nil, 2) must_== 2
     }
     "not evaluate the default valueif list is not empty" in {
-      head(List(1), {sys.error("stop"); 2}) must_== 1
+      head(List(1), { sys.error("stop"); 2 }) must_== 1
     }
   }
 
@@ -139,32 +143,45 @@ object ListHelpersSpec extends Specification  with ListHelpers {
       listIf(false)(1) must_== Nil
     }
     "not evaluate its argument if the predicate is false" in {
-      listIf(false)({sys.error("stop"); 1}) must_== Nil
+      listIf(false)({ sys.error("stop"); 1 }) must_== Nil
     }
   }
 
   "The ListHelpers rotateList function (rotate method on a List object)" should {
     "create a List of all the circular permutations of a given list" in {
-      List(1, 2, 3).rotate must_== List(List(1, 2, 3), List(2, 3, 1), List(3, 1, 2))
+      List(1, 2, 3).rotate must_==
+        List(List(1, 2, 3), List(2, 3, 1), List(3, 1, 2))
     }
   }
 
   "The ListHelpers permuteList function (permute method on a List object)" should {
     "create a List of all the permutations of a given list" in {
-      List(1, 2, 3).permute must_==
-      List(List(1, 2, 3), List(1, 3, 2), List(2, 3, 1), List(2, 1, 3), List(3, 1, 2), List(3, 2, 1))
+      List(1, 2, 3).permute must_== List(List(1, 2, 3),
+                                         List(1, 3, 2),
+                                         List(2, 3, 1),
+                                         List(2, 1, 3),
+                                         List(3, 1, 2),
+                                         List(3, 2, 1))
     }
   }
 
   "The ListHelpers permuteWithSublists function (permuteAll method on a List object)" should {
     "create a List of all the permutations of a given list" in {
-      List(1, 2, 3).permuteAll must_==
-      List(
-        List(1, 2, 3), List(1, 3, 2), List(2, 3, 1),
-        List(2, 1, 3), List(3, 1, 2), List(3, 2, 1),
-        List(2, 3), List(3, 2), List(3, 1),
-        List(1, 3), List(1, 2), List(2, 1),
-        List(3), List(2), List(1))
+      List(1, 2, 3).permuteAll must_== List(List(1, 2, 3),
+                                            List(1, 3, 2),
+                                            List(2, 3, 1),
+                                            List(2, 1, 3),
+                                            List(3, 1, 2),
+                                            List(3, 2, 1),
+                                            List(2, 3),
+                                            List(3, 2),
+                                            List(3, 1),
+                                            List(1, 3),
+                                            List(1, 2),
+                                            List(2, 1),
+                                            List(3),
+                                            List(2),
+                                            List(1))
     }
   }
 
@@ -193,5 +210,4 @@ object ListHelpersSpec extends Specification  with ListHelpers {
       List(1, 2, 3).replace(-1, 4) must_== List(4, 2, 3)
     }
   }
-
 }

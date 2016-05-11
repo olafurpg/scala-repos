@@ -6,7 +6,7 @@ object SCL5790 {
   }
 
   class AnotherTest[U <: Universe](val u: U) {
-    val test = new Test[u.type](/*start*/u/*end*/)
+    val test = new Test[u.type]( /*start*/ u /*end*/ )
     def anotherMethod: u.Type = test.someMethod
   }
 }

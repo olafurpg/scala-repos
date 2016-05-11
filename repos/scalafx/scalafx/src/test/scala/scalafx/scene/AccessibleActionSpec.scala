@@ -35,11 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.AccessibleAction]]. */
 @RunWith(classOf[JUnitRunner])
-class AccessibleActionSpec extends SFXEnumDelegateSpec[jfxs.AccessibleAction, AccessibleAction](
-  javaClass = classOf[jfxs.AccessibleAction],
-  scalaClass = classOf[AccessibleAction],
-  companion = AccessibleAction)
-
+class AccessibleActionSpec
+    extends SFXEnumDelegateSpec[jfxs.AccessibleAction, AccessibleAction](
+        javaClass = classOf[jfxs.AccessibleAction],
+        scalaClass = classOf[AccessibleAction],
+        companion = AccessibleAction)

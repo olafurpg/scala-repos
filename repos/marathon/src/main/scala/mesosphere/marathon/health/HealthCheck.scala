@@ -5,32 +5,22 @@ import com.wix.accord.dsl._
 import mesosphere.marathon.Protos
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.state.{ Command, MarathonState, Timestamp }
-import org.apache.mesos.{ Protos => MesosProtos }
+import mesosphere.marathon.state.{Command, MarathonState, Timestamp}
+import org.apache.mesos.{Protos => MesosProtos}
 
 import scala.concurrent.duration._
 
 case class HealthCheck(
-
-  path: Option[String] = HealthCheck.DefaultPath,
-
-  protocol: Protocol = HealthCheck.DefaultProtocol,
-
-  portIndex: Option[Int] = HealthCheck.DefaultPortIndex,
-
-  command: Option[Command] = HealthCheck.DefaultCommand,
-
-  gracePeriod: FiniteDuration = HealthCheck.DefaultGracePeriod,
-
-  interval: FiniteDuration = HealthCheck.DefaultInterval,
-
-  timeout: FiniteDuration = HealthCheck.DefaultTimeout,
-
-  maxConsecutiveFailures: Int = HealthCheck.DefaultMaxConsecutiveFailures,
-
-  ignoreHttp1xx: Boolean = HealthCheck.DefaultIgnoreHttp1xx,
-
-  port: Option[Int] = HealthCheck.DefaultPort)
+    path: Option[String] = HealthCheck.DefaultPath,
+    protocol: Protocol = HealthCheck.DefaultProtocol,
+    portIndex: Option[Int] = HealthCheck.DefaultPortIndex,
+    command: Option[Command] = HealthCheck.DefaultCommand,
+    gracePeriod: FiniteDuration = HealthCheck.DefaultGracePeriod,
+    interval: FiniteDuration = HealthCheck.DefaultInterval,
+    timeout: FiniteDuration = HealthCheck.DefaultTimeout,
+    maxConsecutiveFailures: Int = HealthCheck.DefaultMaxConsecutiveFailures,
+    ignoreHttp1xx: Boolean = HealthCheck.DefaultIgnoreHttp1xx,
+    port: Option[Int] = HealthCheck.DefaultPort)
     extends MarathonState[Protos.HealthCheckDefinition, HealthCheck] {
 
   def toProto: Protos.HealthCheckDefinition = {
@@ -42,37 +32,39 @@ case class HealthCheck(
       .setMaxConsecutiveFailures(this.maxConsecutiveFailures)
       .setIgnoreHttp1Xx(this.ignoreHttp1xx)
 
-    command foreach { c => builder.setCommand(c.toProto) }
+    command foreach { c =>
+      builder.setCommand(c.toProto)
+    }
 
     path foreach builder.setPath
 
-    portIndex foreach { p => builder.setPortIndex(p.toInt) }
-    port foreach { p => builder.setPort(p.toInt) }
+    portIndex foreach { p =>
+      builder.setPortIndex(p.toInt)
+    }
+    port foreach { p =>
+      builder.setPort(p.toInt)
+    }
 
     builder.build
   }
 
   def mergeFromProto(proto: Protos.HealthCheckDefinition): HealthCheck =
     HealthCheck(
-      path =
-        if (proto.hasPath) Some(proto.getPath) else None,
-      protocol = proto.getProtocol,
-      portIndex =
-        if (proto.hasPortIndex)
-          Some(proto.getPortIndex)
-        else if (!proto.hasPort && proto.getProtocol != Protocol.COMMAND)
-          Some(0) // backward compatibility, this used to be the default value in marathon.proto
-        else
-          None,
-      command =
-        if (proto.hasCommand) Some(Command("").mergeFromProto(proto.getCommand))
-        else None,
-      gracePeriod = proto.getGracePeriodSeconds.seconds,
-      timeout = proto.getTimeoutSeconds.seconds,
-      interval = proto.getIntervalSeconds.seconds,
-      maxConsecutiveFailures = proto.getMaxConsecutiveFailures,
-      ignoreHttp1xx = proto.getIgnoreHttp1Xx,
-      port = if (proto.hasPort) Some(proto.getPort) else None
+        path = if (proto.hasPath) Some(proto.getPath) else None,
+        protocol = proto.getProtocol,
+        portIndex = if (proto.hasPortIndex) Some(proto.getPortIndex)
+          else if (!proto.hasPort && proto.getProtocol != Protocol.COMMAND)
+            Some(0) // backward compatibility, this used to be the default value in marathon.proto
+          else None,
+        command = if (proto.hasCommand)
+            Some(Command("").mergeFromProto(proto.getCommand))
+          else None,
+        gracePeriod = proto.getGracePeriodSeconds.seconds,
+        timeout = proto.getTimeoutSeconds.seconds,
+        interval = proto.getIntervalSeconds.seconds,
+        maxConsecutiveFailures = proto.getMaxConsecutiveFailures,
+        ignoreHttp1xx = proto.getIgnoreHttp1Xx,
+        port = if (proto.hasPort) Some(proto.getPort) else None
     )
 
   def mergeFromProto(bytes: Array[Byte]): HealthCheck =
@@ -83,22 +75,22 @@ case class HealthCheck(
     val builder = this.protocol match {
       case Protocol.COMMAND =>
         assert(
-          command.isDefined,
-          "A command is required when using the COMMAND health check protocol."
+            command.isDefined,
+            "A command is required when using the COMMAND health check protocol."
         )
-        MesosProtos.HealthCheck.newBuilder
-          .setCommand(this.command.get.toProto)
+        MesosProtos.HealthCheck.newBuilder.setCommand(this.command.get.toProto)
 
       case Protocol.HTTP =>
         throw new UnsupportedOperationException(
-          s"Mesos does not support health checks of type [$protocol]")
+            s"Mesos does not support health checks of type [$protocol]")
 
       case _ =>
         throw new UnsupportedOperationException(
-          s"Mesos does not support health checks of type [$protocol]")
+            s"Mesos does not support health checks of type [$protocol]")
     }
 
-    builder.setDelaySeconds(0)
+    builder
+      .setDelaySeconds(0)
       .setIntervalSeconds(this.interval.toSeconds.toDouble)
       .setTimeoutSeconds(this.timeout.toSeconds.toDouble)
       .setConsecutiveFailures(this.maxConsecutiveFailures)
@@ -107,7 +99,8 @@ case class HealthCheck(
   }
 
   def hostPort(launched: Task.Launched): Option[Int] = {
-    def portViaIndex: Option[Int] = portIndex.flatMap(launched.ports.toVector.lift(_))
+    def portViaIndex: Option[Int] =
+      portIndex.flatMap(launched.ports.toVector.lift(_))
     port.orElse(portViaIndex)
   }
 
@@ -136,15 +129,24 @@ object HealthCheck {
   private def validProtocol: Validator[HealthCheck] = {
     new Validator[HealthCheck] {
       override def apply(hc: HealthCheck): Result = {
-        def eitherPortIndexOrPort: Boolean = hc.portIndex.isDefined ^ hc.port.isDefined
+        def eitherPortIndexOrPort: Boolean =
+          hc.portIndex.isDefined ^ hc.port.isDefined
         val hasCommand = hc.command.isDefined
         val hasPath = hc.path.isDefined
         if (hc.protocol match {
-          case Protocol.COMMAND => hasCommand && !hasPath && hc.port.isEmpty
-          case Protocol.HTTP    => !hasCommand && eitherPortIndexOrPort
-          case Protocol.TCP     => !hasCommand && !hasPath && eitherPortIndexOrPort
-          case _                => true
-        }) Success else Failure(Set(RuleViolation(hc, s"HealthCheck is having parameters violation ${hc.protocol} protocol.", None)))
+              case Protocol.COMMAND =>
+                hasCommand && !hasPath && hc.port.isEmpty
+              case Protocol.HTTP => !hasCommand && eitherPortIndexOrPort
+              case Protocol.TCP =>
+                !hasCommand && !hasPath && eitherPortIndexOrPort
+              case _ => true
+            }) Success
+        else
+          Failure(
+              Set(RuleViolation(
+                      hc,
+                      s"HealthCheck is having parameters violation ${hc.protocol} protocol.",
+                      None)))
       }
     }
   }

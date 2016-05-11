@@ -1,8 +1,8 @@
 import scala.reflect.runtime.universe._
 
 object Test extends App {
-  class D[T: TypeTag] {
-    class C[U: TypeTag] {
+  class D[T : TypeTag] {
+    class C[U : TypeTag] {
       def foo[V] = macro Impls.foo[List[T], U, V]
       foo[Boolean]
     }

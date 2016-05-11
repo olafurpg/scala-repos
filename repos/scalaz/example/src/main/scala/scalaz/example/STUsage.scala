@@ -12,22 +12,23 @@ object STUsage extends App {
   import ST._
 
   // Creates a new mutable reference and mutates it
-  def e1[A] = for {
-    r <- newVar[A](0)
-    x <- r.mod(_ + 1)
-  } yield x
+  def e1[A] =
+    for {
+      r <- newVar[A](0)
+      x <- r.mod(_ + 1)
+    } yield x
 
   // Creates a new mutable reference, mutates it, and reads its value.
   def e2[A] = e1[A].flatMap(_.read)
 
   // Run e2, returning the final value of the mutable reference.
-  def test = new Forall[ST[?,Int]] {
+  def test = new Forall[ST[?, Int]] {
     def apply[A] = e2
   }
 
   // Run e1, returning a mutable reference to the outside world.
   // The type system ensures that this can never be run.
-  def test2 = new Forall[λ[S=>ST[S,STRef[S,Int]]]] {
+  def test2 = new Forall[λ[S => ST[S, STRef[S, Int]]]] {
     def apply[A] = e1
   }
 
@@ -38,9 +39,15 @@ object STUsage extends App {
 
   // Bin-sort a list into an immutable array.
   // Uses a non-observable mutable array in the background.
-  def binSort[A: ClassTag](size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =
-    accumArray(size, (vs: List[A], v: A) => v :: vs, List(), for { a <- as } yield (key(a), a))
+  def binSort[A : ClassTag](
+      size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =
+    accumArray(size,
+               (vs: List[A], v: A) => v :: vs,
+               List(),
+               for { a <- as } yield (key(a), a))
 
-  assert(binSort(12, (_: String).length, List("twenty four", "one", "")).toList.flatten === List("", "one", "twenty four"))
+  assert(
+      binSort(12, (_: String).length, List("twenty four", "one", "")).toList.flatten === List(
+          "", "one", "twenty four"))
   assert(compiles === 1)
 }

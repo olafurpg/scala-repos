@@ -33,13 +33,14 @@ import scalaz.syntax.monad._
 import scalaz.syntax.comonad._
 
 class InMemoryFileStorageSpec extends Specification {
-  include(new FileStorageSpec[Need] {
+  include(
+      new FileStorageSpec[Need] {
     val M: Monad[Need] with Comonad[Need] = Need.need
     val fs = new InMemoryFileStorage[Need]
   })
 }
 
-trait FileStorageSpec[M[+_]] extends Specification {
+trait FileStorageSpec[M[+ _]] extends Specification {
   lazy val TEXT = MimeTypes.text / plain
   lazy val HTML = MimeTypes.text / html
 
@@ -48,18 +49,26 @@ trait FileStorageSpec[M[+_]] extends Specification {
 
   lazy val data1: FileData[M] = {
     val strings = "Hello" :: "," :: " " :: "world!" :: StreamT.empty[M, String]
-    val data = strings map { s => s.getBytes("UTF-8") }
+    val data =
+      strings map { s =>
+        s.getBytes("UTF-8")
+      }
     FileData(Some(TEXT), data)
   }
 
   lazy val data2: FileData[M] = {
-    val strings = "Goodbye" :: "," :: " " :: "cruel world." :: StreamT.empty[M, String]
-    val data = strings map { s => s.getBytes("UTF-8") }
+    val strings =
+      "Goodbye" :: "," :: " " :: "cruel world." :: StreamT.empty[M, String]
+    val data =
+      strings map { s =>
+        s.getBytes("UTF-8")
+      }
     FileData(Some(HTML), data)
   }
 
-  def encode(s: StreamT[M, Array[Byte]]): M[String] = s.foldLeft("") { (acc, bytes) =>
-    acc + new String(bytes, "UTF-8")
+  def encode(s: StreamT[M, Array[Byte]]): M[String] = s.foldLeft("") {
+    (acc, bytes) =>
+      acc + new String(bytes, "UTF-8")
   }
 
   "File storage" should {

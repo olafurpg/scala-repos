@@ -35,18 +35,18 @@ import scalafx.Includes._
 import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 
 /**
- * Light.Point Spec tests.
- *
- *
- */
+  * Light.Point Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class LightPointSpec
-  extends SimpleSFXDelegateSpec[jfxse.Light.Point, Light.Point](classOf[jfxse.Light.Point], classOf[Light.Point])
-  with PositionDelegateSpec[Light.Point]
-  with ColorDelegateSpec[Light.Point] {
+    extends SimpleSFXDelegateSpec[jfxse.Light.Point, Light.Point](
+        classOf[jfxse.Light.Point], classOf[Light.Point])
+    with PositionDelegateSpec[Light.Point]
+    with ColorDelegateSpec[Light.Point] {
 
   val colorDelegate = getScalaClassInstance
 
   val positionDelegate = new Light.Point
-
 }

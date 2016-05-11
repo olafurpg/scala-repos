@@ -3,7 +3,8 @@ package crasher {
     override def toString = "" + ((a, b))
   }
   object O {
-    def apply[@specialized A, @specialized(AnyRef) B](a0: A, b0: B) = new Z(a0, b0)
+    def apply[@specialized A, @specialized(AnyRef) B](a0: A, b0: B) =
+      new Z(a0, b0)
   }
 }
 

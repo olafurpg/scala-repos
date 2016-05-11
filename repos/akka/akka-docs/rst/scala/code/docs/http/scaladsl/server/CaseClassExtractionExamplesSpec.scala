@@ -3,9 +3,6 @@
  */
 
 package docs.http.scaladsl.server
-
-
-
 /*
 import org.scalatest.Inside
 import akka.http.scaladsl.server._

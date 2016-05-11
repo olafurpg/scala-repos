@@ -12,9 +12,9 @@ import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
 import org.jetbrains.plugins.scala.lang.psi.light.{PsiTypedDefinitionWrapper, ScFunctionWrapper, StaticPsiMethodWrapper, StaticPsiTypedDefinitionWrapper}
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 08.09.2009
- */
+  * User: Alexander Podkhalyuzin
+  * Date: 08.09.2009
+  */
 class RenameLightProcessor extends RenamePsiElementProcessor {
   def canProcessElement(element: PsiElement): Boolean = {
     element match {
@@ -27,8 +27,9 @@ class RenameLightProcessor extends RenamePsiElementProcessor {
     }
   }
 
-
-  override def prepareRenaming(element: PsiElement, newName: String, allRenames: util.Map[PsiElement, String]) {
+  override def prepareRenaming(element: PsiElement,
+                               newName: String,
+                               allRenames: util.Map[PsiElement, String]) {
     val orig = originalElement(element)
     allRenames.put(orig, newName)
     import scala.collection.JavaConverters.asScalaBufferConverter
@@ -37,7 +38,8 @@ class RenameLightProcessor extends RenamePsiElementProcessor {
     }
   }
 
-  override def substituteElementToRename(element: PsiElement, editor: Editor): PsiElement = {
+  override def substituteElementToRename(
+      element: PsiElement, editor: Editor): PsiElement = {
     val orig = originalElement(element)
     if (orig != null) {
       val processor = RenamePsiElementProcessor.forElement(orig)
@@ -45,7 +47,10 @@ class RenameLightProcessor extends RenamePsiElementProcessor {
     } else null
   }
 
-  override def substituteElementToRename(element: PsiElement, editor: Editor, renameCallback: Pass[PsiElement]): Unit = {
+  override def substituteElementToRename(
+      element: PsiElement,
+      editor: Editor,
+      renameCallback: Pass[PsiElement]): Unit = {
     val orig = originalElement(element)
     if (orig != null) {
       val processor = RenamePsiElementProcessor.forElement(orig)
@@ -62,7 +67,11 @@ class RenameLightProcessor extends RenamePsiElementProcessor {
     case _ => element
   }
 
-  override def renameElement(element: PsiElement, newName: String, usages: Array[UsageInfo], listener: RefactoringElementListener) {
-    ScalaRenameUtil.doRenameGenericNamedElement(element, newName, usages, listener)
+  override def renameElement(element: PsiElement,
+                             newName: String,
+                             usages: Array[UsageInfo],
+                             listener: RefactoringElementListener) {
+    ScalaRenameUtil.doRenameGenericNamedElement(
+        element, newName, usages, listener)
   }
 }

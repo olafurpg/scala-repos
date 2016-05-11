@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote.testkit
 
 import java.awt.Toolkit
@@ -21,57 +20,54 @@ import java.io.StringWriter
 import scala.annotation.tailrec
 
 /**
- * Utility to make log files from multi-node tests easier to analyze.
- * Replaces jvm names and host:port with corresponding logical role name.
- */
+  * Utility to make log files from multi-node tests easier to analyze.
+  * Replaces jvm names and host:port with corresponding logical role name.
+  */
 object LogRoleReplace extends ClipboardOwner {
 
   /**
-   * Main program. Use with 0, 1 or 2 arguments.
-   *
-   * When using 0 arguments it reads from standard input
-   * (System.in) and writes to standard output (System.out).
-   *
-   * With 1 argument it reads from the file specified in the first argument
-   * and writes to standard output.
-   *
-   * With 2 arguments it reads the file specified in the first argument
-   * and writes to the file specified in the second argument.
-   *
-   * You can also replace the contents of the clipboard instead of using files
-   * by supplying `clipboard` as argument
-   */
+    * Main program. Use with 0, 1 or 2 arguments.
+    *
+    * When using 0 arguments it reads from standard input
+    * (System.in) and writes to standard output (System.out).
+    *
+    * With 1 argument it reads from the file specified in the first argument
+    * and writes to standard output.
+    *
+    * With 2 arguments it reads the file specified in the first argument
+    * and writes to the file specified in the second argument.
+    *
+    * You can also replace the contents of the clipboard instead of using files
+    * by supplying `clipboard` as argument
+    */
   def main(args: Array[String]): Unit = {
     val replacer = new LogRoleReplace
 
     if (args.length == 0) {
-      replacer.process(
-        new BufferedReader(new InputStreamReader(System.in)),
-        new PrintWriter(new OutputStreamWriter(System.out)))
-
+      replacer.process(new BufferedReader(new InputStreamReader(System.in)),
+                       new PrintWriter(new OutputStreamWriter(System.out)))
     } else if (args(0) == "clipboard") {
       val clipboard = Toolkit.getDefaultToolkit.getSystemClipboard
       val contents = clipboard.getContents(null)
-      if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-        val text = contents.getTransferData(DataFlavor.stringFlavor).asInstanceOf[String]
+      if (contents != null &&
+          contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        val text = contents
+          .getTransferData(DataFlavor.stringFlavor)
+          .asInstanceOf[String]
         val result = new StringWriter
-        replacer.process(
-          new BufferedReader(new StringReader(text)),
-          new PrintWriter(result))
+        replacer.process(new BufferedReader(new StringReader(text)),
+                         new PrintWriter(result))
         clipboard.setContents(new StringSelection(result.toString), this)
         println("Replaced clipboard contents")
       }
-
     } else if (args.length == 1) {
       val inputFile = new BufferedReader(new FileReader(args(0)))
       try {
-        replacer.process(
-          inputFile,
-          new PrintWriter(new OutputStreamWriter(System.out)))
+        replacer.process(inputFile,
+                         new PrintWriter(new OutputStreamWriter(System.out)))
       } finally {
         inputFile.close()
       }
-
     } else if (args.length == 2) {
       val outputFile = new PrintWriter(new FileWriter(args(1)))
       val inputFile = new BufferedReader(new FileReader(args(0)))
@@ -85,14 +81,15 @@ object LogRoleReplace extends ClipboardOwner {
   }
 
   /**
-   * Empty implementation of the ClipboardOwner interface
-   */
+    * Empty implementation of the ClipboardOwner interface
+    */
   def lostOwnership(clipboard: Clipboard, contents: Transferable): Unit = ()
 }
 
 class LogRoleReplace {
 
-  private val RoleStarted = """\[([\w\-]+)\].*Role \[([\w]+)\] started with address \[[\w\-\+\.]+://.*@([\w\-\.]+):([0-9]+)\]""".r
+  private val RoleStarted =
+    """\[([\w\-]+)\].*Role \[([\w]+)\] started with address \[[\w\-\+\.]+://.*@([\w\-\.]+):([0-9]+)\]""".r
   private val ColorCode = """\u001B?\[[0-9]+m"""
 
   private var replacements: Map[String, String] = Map.empty
@@ -111,10 +108,8 @@ class LogRoleReplace {
 
   def processLine(line: String): String = {
     val cleanLine = removeColorCodes(line)
-    if (updateReplacements(cleanLine))
-      replaceLine(cleanLine)
-    else
-      cleanLine
+    if (updateReplacements(cleanLine)) replaceLine(cleanLine)
+    else cleanLine
   }
 
   private def removeColorCodes(line: String): String =
@@ -142,5 +137,4 @@ class LogRoleReplace {
     }
     result
   }
-
 }

@@ -26,8 +26,10 @@ object Test extends ScaladocModelTest {
     import access._
 
     // just need to check the member exists, access methods will throw an error if there's a problem
-    assert(!rootPackage.templates.exists(_.name == "a"), "package a should not exist in the root package")
-    assert(rootPackage.templates.exists(_.name == "b"),  "package b should exist in the root package")
+    assert(!rootPackage.templates.exists(_.name == "a"),
+           "package a should not exist in the root package")
+    assert(rootPackage.templates.exists(_.name == "b"),
+           "package b should exist in the root package")
     val b = rootPackage._package("b")
     val B = b._class("B")
     val D = b._class("D")

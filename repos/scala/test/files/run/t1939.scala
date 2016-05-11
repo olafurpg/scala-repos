@@ -26,7 +26,9 @@ object Test extends App {
   def f(ts: List[tType]): Unit = {
 
     for (t <- ts; m = t.module) {}
-    ts.map(t => t.module).foreach { _ => () }
+    ts.map(t => t.module).foreach { _ =>
+      ()
+    }
     // ts.map(t => (t : T).module).foreach { _ => () } // runs successfully
   }
 

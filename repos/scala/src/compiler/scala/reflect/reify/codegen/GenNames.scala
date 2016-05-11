@@ -1,8 +1,7 @@
 package scala.reflect.reify
 package codegen
 
-trait GenNames {
-  self: Reifier =>
+trait GenNames { self: Reifier =>
 
   import global._
 

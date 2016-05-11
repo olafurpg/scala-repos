@@ -3,34 +3,39 @@
  */
 package scala.tools.nsc.classpath
 
-import java.io.{ File => JFile }
+import java.io.{File => JFile}
 import java.net.URL
 import scala.reflect.internal.FatalError
 import scala.reflect.io.AbstractFile
 
 /**
- * Common methods related to Java files and abstract files used in the context of classpath
- */
+  * Common methods related to Java files and abstract files used in the context of classpath
+  */
 object FileUtils {
   implicit class AbstractFileOps(val file: AbstractFile) extends AnyVal {
     def isPackage: Boolean = file.isDirectory && mayBeValidPackage(file.name)
 
     def isClass: Boolean = !file.isDirectory && file.hasExtension("class")
 
-    def isScalaOrJavaSource: Boolean = !file.isDirectory && (file.hasExtension("scala") || file.hasExtension("java"))
+    def isScalaOrJavaSource: Boolean =
+      !file.isDirectory &&
+      (file.hasExtension("scala") || file.hasExtension("java"))
 
     // TODO do we need to check also other files using ZipMagicNumber like in scala.tools.nsc.io.Jar.isJarOrZip?
-    def isJarOrZip: Boolean = file.hasExtension("jar") || file.hasExtension("zip")
+    def isJarOrZip: Boolean =
+      file.hasExtension("jar") || file.hasExtension("zip")
 
     /**
-     * Safe method returning a sequence containing one URL representing this file, when underlying file exists,
-     * and returning given default value in other case
-     */
-    def toURLs(default: => Seq[URL] = Seq.empty): Seq[URL] = if (file.file == null) default else Seq(file.toURL)
+      * Safe method returning a sequence containing one URL representing this file, when underlying file exists,
+      * and returning given default value in other case
+      */
+    def toURLs(default: => Seq[URL] = Seq.empty): Seq[URL] =
+      if (file.file == null) default else Seq(file.toURL)
   }
 
   implicit class FileOps(val file: JFile) extends AnyVal {
-    def isPackage: Boolean = file.isDirectory && mayBeValidPackage(file.getName)
+    def isPackage: Boolean =
+      file.isDirectory && mayBeValidPackage(file.getName)
 
     def isClass: Boolean = file.isFile && file.getName.endsWith(".class")
   }

@@ -25,39 +25,45 @@ trait ThriftSerializer extends StringEncoder {
   def fromBytes(obj: TBase[_, _], bytes: Array[Byte]): Unit =
     fromInputStream(obj, new ByteArrayInputStream(bytes))
 
-  def toString(obj: TBase[_, _], bufSize: Int): String = encode(toBytes(obj, bufSize))
+  def toString(obj: TBase[_, _], bufSize: Int): String =
+    encode(toBytes(obj, bufSize))
 
   def toString(obj: TBase[_, _]): String = encode(toBytes(obj))
 
-  def fromString(obj: TBase[_, _], str: String): Unit = fromBytes(obj, decode(str))
+  def fromString(obj: TBase[_, _], str: String): Unit =
+    fromBytes(obj, decode(str))
 }
 
 /**
- * A thread-safe [[ThriftSerializer]] that uses [[TSimpleJSONProtocol]].
- */
+  * A thread-safe [[ThriftSerializer]] that uses [[TSimpleJSONProtocol]].
+  */
 class JsonThriftSerializer extends ThriftSerializer {
   override def protocolFactory = new TSimpleJSONProtocol.Factory
 
   override def fromBytes(obj: TBase[_, _], bytes: Array[Byte]): Unit = {
     val binarySerializer = new BinaryThriftSerializer
-    val newObj = new MappingJsonFactory().createParser(bytes).readValueAs(obj.getClass)
-    binarySerializer.fromBytes(obj, binarySerializer.toBytes(newObj.asInstanceOf[TBase[_, _]]))
+    val newObj =
+      new MappingJsonFactory().createParser(bytes).readValueAs(obj.getClass)
+    binarySerializer.fromBytes(
+        obj, binarySerializer.toBytes(newObj.asInstanceOf[TBase[_, _]]))
   }
 }
 
 /**
- * A thread-safe [[ThriftSerializer]] that uses [[TBinaryProtocol]].
- *
- * @note an implementation using `com.twitter.finagle.thrift.Protocols.binaryFactory`
- *       instead of this is recommended.
- */
-class BinaryThriftSerializer extends ThriftSerializer with Base64StringEncoder {
+  * A thread-safe [[ThriftSerializer]] that uses [[TBinaryProtocol]].
+  *
+  * @note an implementation using `com.twitter.finagle.thrift.Protocols.binaryFactory`
+  *       instead of this is recommended.
+  */
+class BinaryThriftSerializer
+    extends ThriftSerializer with Base64StringEncoder {
   override def protocolFactory = new TBinaryProtocol.Factory
 }
 
 /**
- * A thread-safe [[ThriftSerializer]] that uses [[TCompactProtocol]].
- */
-class CompactThriftSerializer extends ThriftSerializer with Base64StringEncoder {
+  * A thread-safe [[ThriftSerializer]] that uses [[TCompactProtocol]].
+  */
+class CompactThriftSerializer
+    extends ThriftSerializer with Base64StringEncoder {
   override def protocolFactory = new TCompactProtocol.Factory
 }

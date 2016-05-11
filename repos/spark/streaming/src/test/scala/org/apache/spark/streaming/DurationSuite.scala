@@ -106,5 +106,4 @@ class DurationSuite extends TestSuiteBase {
   test("Minutes") {
     assert(new Duration(2 * 60 * 1000) == Minutes(2))
   }
-
 }

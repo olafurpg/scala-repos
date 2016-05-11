@@ -1,10 +1,9 @@
 trait Frog[T] {
-      def hello: T
-      def size: Int
-    }
+  def hello: T
+  def size: Int
+}
 
-    trait OnlyWithFrogs {
-      self: Frog[_] =>
+trait OnlyWithFrogs { self: Frog[_] =>
 
-        def sizeStr = size.toString
-    }
+  def sizeStr = size.toString
+}

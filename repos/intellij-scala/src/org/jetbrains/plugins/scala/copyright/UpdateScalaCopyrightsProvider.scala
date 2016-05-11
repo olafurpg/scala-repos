@@ -10,11 +10,13 @@ import com.maddyhome.idea.copyright.psi.{UpdateCopyright, UpdateCopyrightsProvid
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 class UpdateScalaCopyrightsProvider extends UpdateCopyrightsProvider {
-  def createInstance(project: Project, module: Module, file: VirtualFile, base: FileType,
+  def createInstance(project: Project,
+                     module: Module,
+                     file: VirtualFile,
+                     base: FileType,
                      options: CopyrightProfile): UpdateCopyright = {
     new UpdateJavaFileCopyright(project, module, file, options) {
       override def accept: Boolean = getFile.isInstanceOf[ScalaFile]

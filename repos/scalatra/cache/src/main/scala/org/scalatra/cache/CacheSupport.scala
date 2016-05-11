@@ -1,6 +1,6 @@
 package org.scalatra.cache
 
-import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.scalatra.ScalatraBase
 
@@ -18,10 +18,11 @@ trait CacheSupport { self: ScalatraBase =>
     }
   }
 
-  def cached[A](ttl: Option[Duration])(result: => A)(implicit keyStrategy: KeyStrategy,
-    headerStrategy: HeaderStrategy,
-    request: HttpServletRequest,
-    response: HttpServletResponse): A = {
+  def cached[A](ttl: Option[Duration])(result: => A)(
+      implicit keyStrategy: KeyStrategy,
+      headerStrategy: HeaderStrategy,
+      request: HttpServletRequest,
+      response: HttpServletResponse): A = {
 
     val key = keyStrategy.key
 

@@ -1,4 +1,5 @@
-trait Matrix[@specialized A, Repr[C] <: Matrix[C, Repr]] { // crash goes away if @specialize is removed
+trait Matrix[@specialized A, Repr[C] <: Matrix[C, Repr]] {
+  // crash goes away if @specialize is removed
   def duplicate(mb: MatrixBuilder[A, Repr]): Repr[A] = {
     mb.zeros
   }
@@ -18,7 +19,7 @@ object DenseFloatBuilder extends MatrixBuilder[Float, DenseMatrix] {
 }
 
 object Test extends App {
-  val m1 = DenseFloatBuilder.zeros // in 2.9 crash goes away if explicit type "DenseMatrixFlt" is assigned to m1
+  val m1 =
+    DenseFloatBuilder.zeros // in 2.9 crash goes away if explicit type "DenseMatrixFlt" is assigned to m1
   val m2 = m1.duplicate(DenseFloatBuilder)
 }
-

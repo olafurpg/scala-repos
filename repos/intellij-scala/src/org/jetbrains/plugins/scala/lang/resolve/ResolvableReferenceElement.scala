@@ -6,7 +6,6 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.{PsiPolyVariantReference, _}
 import org.jetbrains.annotations.TestOnly
 
-
 trait ResolvableReferenceElement extends PsiPolyVariantReference {
   def resolve(): PsiElement = {
     this.bind() match {
@@ -18,19 +17,22 @@ trait ResolvableReferenceElement extends PsiPolyVariantReference {
   @TestOnly
   def advancedResolve: Option[ScalaResolveResult] = {
     this.bind() match {
-      case Some(result) if !result.isCyclicReference =>  Some(result)
+      case Some(result) if !result.isCyclicReference => Some(result)
       case _ => None
     }
   }
 }
 
 object ResolvableReferenceElement {
-  implicit class ResolvableReferenceElementExt(val elem: ResolvableReferenceElement) extends AnyVal {
+  implicit class ResolvableReferenceElementExt(
+      val elem: ResolvableReferenceElement)
+      extends AnyVal {
     @inline
     def bind(): Option[ScalaResolveResult] = {
       ProgressManager.checkCanceled()
       val results = elem.multiResolve(false)
-      if (results.length == 1) Some(results(0).asInstanceOf[ScalaResolveResult]) else None
+      if (results.length == 1)
+        Some(results(0).asInstanceOf[ScalaResolveResult]) else None
     }
   }
 }

@@ -24,10 +24,8 @@ import util._
 import http._
 import Helpers._
 
-
-trait ProtoExtendedSession[T <: ProtoExtendedSession[T]] extends
-KeyedMapper[Long, T] {
-  self: T =>
+trait ProtoExtendedSession[T <: ProtoExtendedSession[T]]
+    extends KeyedMapper[Long, T] { self: T =>
 
   override def primaryKeyField: MappedLongIndex[T] = id
 
@@ -47,9 +45,9 @@ KeyedMapper[Long, T] {
   }
 
   /**
-   * Change this string to "experation" for compatibility with
-   * old mis-spelling
-   */
+    * Change this string to "experation" for compatibility with
+    * old mis-spelling
+    */
   protected def expirationColumnName = "expiration"
 
   def expirationTime: Long = millis + 180.days
@@ -59,9 +57,8 @@ trait UserIdAsString {
   def userIdAsString: String
 }
 
-trait MetaProtoExtendedSession[T <: ProtoExtendedSession[T]] extends
-KeyedMetaMapper[Long, T] {
-  self: T =>
+trait MetaProtoExtendedSession[T <: ProtoExtendedSession[T]]
+    extends KeyedMetaMapper[Long, T] { self: T =>
 
   def CookieName = "ext_id"
   type UserType <: UserIdAsString
@@ -90,9 +87,9 @@ KeyedMetaMapper[Long, T] {
   def userDidLogin(uid: UserType) {
     userDidLogout(Full(uid))
     val inst = create.userId(uid.userIdAsString).saveMe
-    val cookie = HTTPCookie(CookieName, inst.cookieId.get).
-    setMaxAge(((inst.expiration.get - millis) / 1000L).toInt).
-    setPath("/")
+    val cookie = HTTPCookie(CookieName, inst.cookieId.get)
+      .setMaxAge(((inst.expiration.get - millis) / 1000L).toInt)
+      .setPath("/")
     S.addCookie(cookie)
   }
 
@@ -106,13 +103,13 @@ KeyedMetaMapper[Long, T] {
   // def requestLoans: List[LoanWrapper] = myWrapper :: Nil
 
   /**
-   * This does the cookie to User lookup.  In Boot.scala:
-   * <code>
+    * This does the cookie to User lookup.  In Boot.scala:
+    * <code>
     LiftRules.earlyInStateful.append(ExtendedSession.testCookieEarlyInStateful)
-   * </code>
-   */
-  def testCookieEarlyInStateful: Box[Req] => Unit = {
-    ignoredReq => {
+    * </code>
+    */
+  def testCookieEarlyInStateful: Box[Req] => Unit = { ignoredReq =>
+    {
       (recoverUserId, S.findCookie(CookieName)) match {
         case (Empty, Full(c)) =>
           find(By(cookieId, c.value openOr "")) match {
@@ -120,10 +117,9 @@ KeyedMetaMapper[Long, T] {
             case Full(es) => logUserIdIn(es.userId.get)
             case _ =>
           }
-        
+
         case _ =>
       }
     }
   }
 }
-

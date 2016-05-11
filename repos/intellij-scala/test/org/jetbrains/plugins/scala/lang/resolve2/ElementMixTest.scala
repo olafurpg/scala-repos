@@ -1,11 +1,8 @@
 package org.jetbrains.plugins.scala.lang.resolve2
 
-
-
 /**
- * Pavel.Fatin, 02.02.2010
- */
-
+  * Pavel.Fatin, 02.02.2010
+  */
 class ElementMixTest extends ResolveTestBase {
   override def folderPath: String = {
     super.folderPath + "element/mix/"
@@ -39,5 +36,4 @@ class ElementMixTest extends ResolveTestBase {
   def testObjectAndTrait() = doTest()
   def testObjectAndTypeAlias() = doTest()
   def testTraitAndTypeAlias() = doTest()
-
 }

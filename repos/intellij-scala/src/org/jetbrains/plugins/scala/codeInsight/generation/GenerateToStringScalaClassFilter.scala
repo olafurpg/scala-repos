@@ -6,11 +6,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 
 /**
- * @author Nikolay.Tropin
- */
-class GenerateToStringScalaClassFilter extends GenerateToStringClassFilter{
-  override def canGenerateToString(psiClass: PsiClass): Boolean = psiClass match {
-    case _: ScTemplateDefinition | _: PsiClassWrapper => false
-    case _ => true
-  }
+  * @author Nikolay.Tropin
+  */
+class GenerateToStringScalaClassFilter extends GenerateToStringClassFilter {
+  override def canGenerateToString(psiClass: PsiClass): Boolean =
+    psiClass match {
+      case _: ScTemplateDefinition | _: PsiClassWrapper => false
+      case _ => true
+    }
 }

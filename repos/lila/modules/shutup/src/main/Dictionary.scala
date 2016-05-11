@@ -1,13 +1,14 @@
 package lila.shutup
 
 /**
- * - words are automatically pluralized. "tit" will also match "tits"
- * - words are automatically leetified. "tit" will also match "t1t", "t-i-t", and more.
- * - words do not partial match. "anal" will NOT match "analysis".
- */
+  * - words are automatically pluralized. "tit" will also match "tits"
+  * - words are automatically leetified. "tit" will also match "t1t", "t-i-t", and more.
+  * - words do not partial match. "anal" will NOT match "analysis".
+  */
 private object Dictionary {
 
-  def en: List[String] = dict("""
+  def en: List[String] =
+    dict("""
 (c|k)oc?k(y|suc?ker|)
 (c|k)um(shot|)
 (c|k)unt(ing|)

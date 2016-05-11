@@ -16,18 +16,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScEarlyDefinitionsStub
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-*/
-
-class ScEarlyDefinitionsImpl private (stub: StubElement[ScEarlyDefinitions], nodeType: IElementType, node: ASTNode)
-extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScEarlyDefinitions {
-  def this(node: ASTNode) = {this(null, null, node)}
-  def this(stub: ScEarlyDefinitionsStub) = {this(stub, ScalaElementTypes.EARLY_DEFINITIONS, null)}
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
+class ScEarlyDefinitionsImpl private (stub: StubElement[ScEarlyDefinitions],
+                                      nodeType: IElementType,
+                                      node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScEarlyDefinitions {
+  def this(node: ASTNode) = { this(null, null, node) }
+  def this(stub: ScEarlyDefinitionsStub) = {
+    this(stub, ScalaElementTypes.EARLY_DEFINITIONS, null)
+  }
   override def toString: String = "EarlyDefinitions"
 
-  override def processDeclarations(processor: PsiScopeProcessor, state: ResolveState,
-                                   lastParent: PsiElement, place: PsiElement): Boolean = {
+  override def processDeclarations(processor: PsiScopeProcessor,
+                                   state: ResolveState,
+                                   lastParent: PsiElement,
+                                   place: PsiElement): Boolean = {
     var element: PsiElement = lastParent
     while (element != null) {
       element match {
@@ -56,8 +62,7 @@ extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScEarlyDefinitions 
         import scala.collection.JavaConverters._
         for {
           child <- stub.getChildrenStubs.asScala
-          psi = child.getPsi
-          if psi.isInstanceOf[ScMember]
+          psi = child.getPsi if psi.isInstanceOf[ScMember]
         } yield psi.asInstanceOf[ScMember]
       case _ => findChildrenByClassScala(classOf[ScMember])
     }

@@ -25,7 +25,8 @@ import org.apache.spark.sql.execution.command._
 import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.types.StructType
 
-private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends CatalystQl(conf) {
+private[sql] class SparkQl(conf: ParserConf = SimpleParserConf())
+    extends CatalystQl(conf) {
   import ParserUtils._
 
   /** Check if a command should not be explained. */
@@ -34,28 +35,29 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
   }
 
   /**
-   * For each node, extract properties in the form of a list
-   * ['key_part1', 'key_part2', 'key_part3', 'value']
-   * into a pair (key_part1.key_part2.key_part3, value).
-   *
-   * Example format:
-   *
-   *   TOK_TABLEPROPERTY
-   *   :- 'k1'
-   *   +- 'v1'
-   *   TOK_TABLEPROPERTY
-   *   :- 'k2'
-   *   +- 'v2'
-   *   TOK_TABLEPROPERTY
-   *   :- 'k3'
-   *   +- 'v3'
-   */
+    * For each node, extract properties in the form of a list
+    * ['key_part1', 'key_part2', 'key_part3', 'value']
+    * into a pair (key_part1.key_part2.key_part3, value).
+    *
+    * Example format:
+    *
+    *   TOK_TABLEPROPERTY
+    *   :- 'k1'
+    *   +- 'v1'
+    *   TOK_TABLEPROPERTY
+    *   :- 'k2'
+    *   +- 'v2'
+    *   TOK_TABLEPROPERTY
+    *   :- 'k3'
+    *   +- 'v3'
+    */
   private def extractProps(
-      props: Seq[ASTNode],
-      expectedNodeText: String): Seq[(String, String)] = {
+      props: Seq[ASTNode], expectedNodeText: String): Seq[(String, String)] = {
     props.map {
       case Token(x, keysAndValue) if x == expectedNodeText =>
-        val key = keysAndValue.init.map { x => unquoteString(x.text) }.mkString(".")
+        val key = keysAndValue.init.map { x =>
+          unquoteString(x.text)
+        }.mkString(".")
         val value = unquoteString(keysAndValue.last.text)
         (key, value)
       case p =>
@@ -78,18 +80,20 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
         }
 
       // Just fake explain for any of the native commands.
-      case Token("TOK_EXPLAIN", explainArgs) if isNoExplainCommand(explainArgs.head.text) =>
+      case Token("TOK_EXPLAIN", explainArgs)
+          if isNoExplainCommand(explainArgs.head.text) =>
         ExplainCommand(OneRowRelation)
 
-      case Token("TOK_EXPLAIN", explainArgs) if "TOK_CREATETABLE" == explainArgs.head.text =>
-        val Some(crtTbl) :: _ :: extended :: Nil =
-          getClauses(Seq("TOK_CREATETABLE", "FORMATTED", "EXTENDED"), explainArgs)
+      case Token("TOK_EXPLAIN", explainArgs)
+          if "TOK_CREATETABLE" == explainArgs.head.text =>
+        val Some(crtTbl) :: _ :: extended :: Nil = getClauses(
+            Seq("TOK_CREATETABLE", "FORMATTED", "EXTENDED"), explainArgs)
         ExplainCommand(nodeToPlan(crtTbl), extended = extended.isDefined)
 
       case Token("TOK_EXPLAIN", explainArgs) =>
         // Ignore FORMATTED if present.
-        val Some(query) :: _ :: extended :: Nil =
-          getClauses(Seq("TOK_QUERY", "FORMATTED", "EXTENDED"), explainArgs)
+        val Some(query) :: _ :: extended :: Nil = getClauses(
+            Seq("TOK_QUERY", "FORMATTED", "EXTENDED"), explainArgs)
         ExplainCommand(nodeToPlan(query), extended = extended.isDefined)
 
       case Token("TOK_REFRESHTABLE", nameParts :: Nil) =>
@@ -99,21 +103,25 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
       // CREATE DATABASE [IF NOT EXISTS] database_name [COMMENT database_comment]
       // [LOCATION path] [WITH DBPROPERTIES (key1=val1, key2=val2, ...)];
       case Token("TOK_CREATEDATABASE", Token(databaseName, Nil) :: args) =>
-        val Seq(ifNotExists, dbLocation, databaseComment, dbprops) = getClauses(Seq(
-          "TOK_IFNOTEXISTS",
-          "TOK_DATABASELOCATION",
-          "TOK_DATABASECOMMENT",
-          "TOK_DATABASEPROPERTIES"), args)
+        val Seq(ifNotExists, dbLocation, databaseComment, dbprops) =
+          getClauses(Seq("TOK_IFNOTEXISTS",
+                         "TOK_DATABASELOCATION",
+                         "TOK_DATABASECOMMENT",
+                         "TOK_DATABASEPROPERTIES"),
+                     args)
         val location = dbLocation.map {
-          case Token("TOK_DATABASELOCATION", Token(loc, Nil) :: Nil) => unquoteString(loc)
+          case Token("TOK_DATABASELOCATION", Token(loc, Nil) :: Nil) =>
+            unquoteString(loc)
           case _ => parseFailed("Invalid CREATE DATABASE command", node)
         }
         val comment = databaseComment.map {
-          case Token("TOK_DATABASECOMMENT", Token(com, Nil) :: Nil) => unquoteString(com)
+          case Token("TOK_DATABASECOMMENT", Token(com, Nil) :: Nil) =>
+            unquoteString(com)
           case _ => parseFailed("Invalid CREATE DATABASE command", node)
         }
         val props = dbprops.toSeq.flatMap {
-          case Token("TOK_DATABASEPROPERTIES", Token("TOK_DBPROPLIST", propList) :: Nil) =>
+          case Token("TOK_DATABASEPROPERTIES",
+                     Token("TOK_DBPROPLIST", propList) :: Nil) =>
             // Example format:
             //
             //   TOK_DATABASEPROPERTIES
@@ -127,7 +135,9 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
             extractProps(propList, "TOK_TABLEPROPERTY")
           case _ => parseFailed("Invalid CREATE DATABASE command", node)
         }.toMap
-        CreateDatabase(databaseName, ifNotExists.isDefined, location, comment, props)(node.source)
+        CreateDatabase(
+            databaseName, ifNotExists.isDefined, location, comment, props)(
+            node.source)
 
       // CREATE [TEMPORARY] FUNCTION [db_name.]function_name AS class_name
       // [USING JAR|FILE|ARCHIVE 'file_uri' [, JAR|FILE|ARCHIVE 'file_uri'] ];
@@ -154,23 +164,27 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
         // If database name is specified, there are 3 tokens, otherwise 2.
         val (funcName, alias) = funcNameArgs match {
           case Token(dbName, Nil) :: Token(fname, Nil) :: Token(aname, Nil) :: Nil =>
-            (unquoteString(dbName) + "." + unquoteString(fname), unquoteString(aname))
+            (unquoteString(dbName) + "." + unquoteString(fname),
+             unquoteString(aname))
           case Token(fname, Nil) :: Token(aname, Nil) :: Nil =>
             (unquoteString(fname), unquoteString(aname))
           case _ =>
             parseFailed("Invalid CREATE FUNCTION command", node)
         }
         // Extract other keywords, if they exist
-        val Seq(rList, temp) = getClauses(Seq("TOK_RESOURCE_LIST", "TOK_TEMPORARY"), otherArgs)
+        val Seq(rList, temp) = getClauses(
+            Seq("TOK_RESOURCE_LIST", "TOK_TEMPORARY"), otherArgs)
         val resources: Seq[(String, String)] = rList.toSeq.flatMap {
           case Token("TOK_RESOURCE_LIST", resList) =>
             resList.map {
-              case Token("TOK_RESOURCE_URI", rType :: Token(rPath, Nil) :: Nil) =>
+              case Token("TOK_RESOURCE_URI",
+                         rType :: Token(rPath, Nil) :: Nil) =>
                 val resourceType = rType match {
                   case Token("TOK_JAR", Nil) => "jar"
                   case Token("TOK_FILE", Nil) => "file"
                   case Token("TOK_ARCHIVE", Nil) => "archive"
-                  case Token(f, _) => parseFailed(s"Unexpected resource format '$f'", node)
+                  case Token(f, _) =>
+                    parseFailed(s"Unexpected resource format '$f'", node)
                 }
                 (resourceType, unquoteString(rPath))
               case _ => parseFailed("Invalid CREATE FUNCTION command", node)
@@ -183,23 +197,24 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
         AlterTableCommandParser.parse(node)
 
       case Token("TOK_CREATETABLEUSING", createTableArgs) =>
-        val Seq(
-          temp,
-          ifNotExists,
-          Some(tabName),
-          tableCols,
-          Some(Token("TOK_TABLEPROVIDER", providerNameParts)),
-          tableOpts,
-          tableAs) = getClauses(Seq(
-          "TEMPORARY",
-          "TOK_IFNOTEXISTS",
-          "TOK_TABNAME", "TOK_TABCOLLIST",
-          "TOK_TABLEPROVIDER",
-          "TOK_TABLEOPTIONS",
-          "TOK_QUERY"), createTableArgs)
+        val Seq(temp,
+                ifNotExists,
+                Some(tabName),
+                tableCols,
+                Some(Token("TOK_TABLEPROVIDER", providerNameParts)),
+                tableOpts,
+                tableAs) = getClauses(Seq("TEMPORARY",
+                                          "TOK_IFNOTEXISTS",
+                                          "TOK_TABNAME",
+                                          "TOK_TABCOLLIST",
+                                          "TOK_TABLEPROVIDER",
+                                          "TOK_TABLEOPTIONS",
+                                          "TOK_QUERY"),
+                                      createTableArgs)
         val tableIdent: TableIdentifier = extractTableIdent(tabName)
         val columns = tableCols.map {
-          case Token("TOK_TABCOLLIST", fields) => StructType(fields.map(nodeToStructField))
+          case Token("TOK_TABCOLLIST", fields) =>
+            StructType(fields.map(nodeToStructField))
           case _ => parseFailed("Invalid CREATE TABLE command", node)
         }
         val provider = providerNameParts.map {
@@ -207,47 +222,48 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
           case _ => parseFailed("Invalid CREATE TABLE command", node)
         }.mkString(".")
         val options = tableOpts.toSeq.flatMap {
-          case Token("TOK_TABLEOPTIONS", opts) => extractProps(opts, "TOK_TABLEOPTION")
+          case Token("TOK_TABLEOPTIONS", opts) =>
+            extractProps(opts, "TOK_TABLEOPTION")
           case _ => parseFailed("Invalid CREATE TABLE command", node)
         }.toMap
         val asClause = tableAs.map(nodeToPlan)
 
         if (temp.isDefined && ifNotExists.isDefined) {
           throw new AnalysisException(
-            "a CREATE TEMPORARY TABLE statement does not allow IF NOT EXISTS clause.")
+              "a CREATE TEMPORARY TABLE statement does not allow IF NOT EXISTS clause.")
         }
 
         if (asClause.isDefined) {
           if (columns.isDefined) {
             throw new AnalysisException(
-              "a CREATE TABLE AS SELECT statement does not allow column definitions.")
+                "a CREATE TABLE AS SELECT statement does not allow column definitions.")
           }
 
-          val mode = if (ifNotExists.isDefined) {
-            SaveMode.Ignore
-          } else if (temp.isDefined) {
-            SaveMode.Overwrite
-          } else {
-            SaveMode.ErrorIfExists
-          }
+          val mode =
+            if (ifNotExists.isDefined) {
+              SaveMode.Ignore
+            } else if (temp.isDefined) {
+              SaveMode.Overwrite
+            } else {
+              SaveMode.ErrorIfExists
+            }
 
           CreateTableUsingAsSelect(tableIdent,
-            provider,
-            temp.isDefined,
-            Array.empty[String],
-            bucketSpec = None,
-            mode,
-            options,
-            asClause.get)
+                                   provider,
+                                   temp.isDefined,
+                                   Array.empty[String],
+                                   bucketSpec = None,
+                                   mode,
+                                   options,
+                                   asClause.get)
         } else {
-          CreateTableUsing(
-            tableIdent,
-            columns,
-            provider,
-            temp.isDefined,
-            options,
-            ifNotExists.isDefined,
-            managedIfNoPath = false)
+          CreateTableUsing(tableIdent,
+                           columns,
+                           provider,
+                           temp.isDefined,
+                           options,
+                           ifNotExists.isDefined,
+                           managedIfNoPath = false)
         }
 
       case Token("TOK_SWITCHDATABASE", Token(database, Nil) :: Nil) =>
@@ -256,30 +272,35 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
       case Token("TOK_DESCTABLE", describeArgs) =>
         // Reference: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL
         val Some(tableType) :: formatted :: extended :: pretty :: Nil =
-          getClauses(Seq("TOK_TABTYPE", "FORMATTED", "EXTENDED", "PRETTY"), describeArgs)
+          getClauses(Seq("TOK_TABTYPE", "FORMATTED", "EXTENDED", "PRETTY"),
+                     describeArgs)
         if (formatted.isDefined || pretty.isDefined) {
           // FORMATTED and PRETTY are not supported and this statement will be treated as
           // a Hive native command.
           nodeToDescribeFallback(node)
         } else {
           tableType match {
-            case Token("TOK_TABTYPE", Token("TOK_TABNAME", nameParts) :: Nil) =>
+            case Token(
+                "TOK_TABTYPE", Token("TOK_TABNAME", nameParts) :: Nil) =>
               nameParts match {
                 case Token(dbName, Nil) :: Token(tableName, Nil) :: Nil =>
                   // It is describing a table with the format like "describe db.table".
                   // TODO: Actually, a user may mean tableName.columnName. Need to resolve this
                   // issue.
                   val tableIdent = TableIdentifier(
-                    cleanIdentifier(tableName), Some(cleanIdentifier(dbName)))
-                  datasources.DescribeCommand(tableIdent, isExtended = extended.isDefined)
-                case Token(dbName, Nil) :: Token(tableName, Nil) :: Token(colName, Nil) :: Nil =>
+                      cleanIdentifier(tableName),
+                      Some(cleanIdentifier(dbName)))
+                  datasources.DescribeCommand(
+                      tableIdent, isExtended = extended.isDefined)
+                case Token(dbName, Nil) :: Token(tableName, Nil) :: Token(
+                    colName, Nil) :: Nil =>
                   // It is describing a column with the format like "describe db.table column".
                   nodeToDescribeFallback(node)
                 case tableName :: Nil =>
                   // It is describing a table with the format like "describe table".
                   datasources.DescribeCommand(
-                    TableIdentifier(cleanIdentifier(tableName.text)),
-                    isExtended = extended.isDefined)
+                      TableIdentifier(cleanIdentifier(tableName.text)),
+                      isExtended = extended.isDefined)
                 case _ =>
                   nodeToDescribeFallback(node)
               }
@@ -290,7 +311,7 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
         }
 
       case Token("TOK_CACHETABLE", Token(tableName, Nil) :: args) =>
-       val Seq(lzy, selectAst) = getClauses(Seq("LAZY", "TOK_QUERY"), args)
+        val Seq(lzy, selectAst) = getClauses(Seq("LAZY", "TOK_QUERY"), args)
         CacheTableCommand(tableName, selectAst.map(nodeToPlan), lzy.isDefined)
 
       case Token("TOK_UNCACHETABLE", Token(tableName, Nil) :: Nil) =>
@@ -302,7 +323,8 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
       case Token("TOK_SHOWTABLES", args) =>
         val databaseName = args match {
           case Nil => None
-          case Token("TOK_FROM", Token(dbName, Nil) :: Nil) :: Nil => Option(dbName)
+          case Token("TOK_FROM", Token(dbName, Nil) :: Nil) :: Nil =>
+            Option(dbName)
           case _ => noParseRule("SHOW TABLES", node)
         }
         ShowTablesCommand(databaseName)
@@ -312,5 +334,6 @@ private[sql] class SparkQl(conf: ParserConf = SimpleParserConf()) extends Cataly
     }
   }
 
-  protected def nodeToDescribeFallback(node: ASTNode): LogicalPlan = noParseRule("Describe", node)
+  protected def nodeToDescribeFallback(node: ASTNode): LogicalPlan =
+    noParseRule("Describe", node)
 }

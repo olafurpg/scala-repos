@@ -30,7 +30,8 @@ import S._
 object EmailField {
   def emailPattern = ProtoRules.emailRegexPattern.vend
 
-  def validEmailAddr_?(email: String): Boolean = emailPattern.matcher(email).matches
+  def validEmailAddr_?(email: String): Boolean =
+    emailPattern.matcher(email).matches
 }
 
 trait EmailTypedField extends TypedField[String] {
@@ -45,9 +46,10 @@ trait EmailTypedField extends TypedField[String] {
   override def validations = validateEmail _ :: Nil
 }
 
-class EmailField[OwnerType <: Record[OwnerType]](rec: OwnerType, maxLength: Int)
-  extends StringField[OwnerType](rec, maxLength) with EmailTypedField
+class EmailField[OwnerType <: Record[OwnerType]](
+    rec: OwnerType, maxLength: Int)
+    extends StringField[OwnerType](rec, maxLength) with EmailTypedField
 
-class OptionalEmailField[OwnerType <: Record[OwnerType]](rec: OwnerType, maxLength: Int)
-  extends OptionalStringField[OwnerType](rec, maxLength) with EmailTypedField
-
+class OptionalEmailField[OwnerType <: Record[OwnerType]](
+    rec: OwnerType, maxLength: Int)
+    extends OptionalStringField[OwnerType](rec, maxLength) with EmailTypedField

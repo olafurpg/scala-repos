@@ -7,31 +7,31 @@ package scala.tools.cmd
 package gen
 
 /** Code generation of the AnyVal types and their companions. */
-trait AnyValReps {
-  self: AnyVals =>
+trait AnyValReps { self: AnyVals =>
 
-  sealed abstract class AnyValNum(name: String, repr: Option[String], javaEquiv: String)
-      extends AnyValRep(name,repr,javaEquiv) {
+  sealed abstract class AnyValNum(
+      name: String, repr: Option[String], javaEquiv: String)
+      extends AnyValRep(name, repr, javaEquiv) {
 
-    case class Op(op : String, doc : String)
+    case class Op(op: String, doc: String)
 
     private def companionCoercions(tos: AnyValRep*) = {
-      tos.toList map (to =>
-        s"implicit def @javaequiv@2${to.javaEquiv}(x: @name@): ${to.name} = x.to${to.name}"
-      )
+      tos.toList map
+      (to =>
+            s"implicit def @javaequiv@2${to.javaEquiv}(x: @name@): ${to.name} = x.to${to.name}")
     }
     def coercionComment =
-"""/** Language mandated coercions from @name@ to "wider" types. */
+      """/** Language mandated coercions from @name@ to "wider" types. */
 import scala.language.implicitConversions"""
 
     def implicitCoercions: List[String] = {
       val coercions = this match {
-        case B     => companionCoercions(S, I, L, F, D)
+        case B => companionCoercions(S, I, L, F, D)
         case S | C => companionCoercions(I, L, F, D)
-        case I     => companionCoercions(L, F, D)
-        case L     => companionCoercions(F, D)
-        case F     => companionCoercions(D)
-        case _     => Nil
+        case I => companionCoercions(L, F, D)
+        case L => companionCoercions(F, D)
+        case F => companionCoercions(D)
+        case _ => Nil
       }
       if (coercions.isEmpty) Nil
       else coercionComment.lines.toList ++ coercions
@@ -39,103 +39,98 @@ import scala.language.implicitConversions"""
 
     def isCardinal: Boolean = isIntegerType(this)
     def unaryOps = {
-      val ops = List(
-        Op("+", "/** Returns this value, unmodified. */"),
-        Op("-", "/** Returns the negation of this value. */"))
+      val ops = List(Op("+", "/** Returns this value, unmodified. */"),
+                     Op("-", "/** Returns the negation of this value. */"))
 
-      if(isCardinal)
-        Op("~", "/**\n" +
-                " * Returns the bitwise negation of this value.\n" +
-                " * @example {{{\n" +
-                " * ~5 == -6\n" +
-                " * // in binary: ~00000101 ==\n" +
-                " * //             11111010\n" +
-                " * }}}\n" +
-                " */") :: ops
+      if (isCardinal)
+        Op("~",
+           "/**\n" + " * Returns the bitwise negation of this value.\n" +
+           " * @example {{{\n" +
+           " * ~5 == -6\n" + " * // in binary: ~00000101 ==\n" +
+           " * //             11111010\n" + " * }}}\n" + " */") :: ops
       else ops
     }
 
     def bitwiseOps =
       if (isCardinal)
-        List(
-          Op("|", "/**\n" +
-                     "  * Returns the bitwise OR of this value and `x`.\n" +
-                     "  * @example {{{\n" +
-                     "  * (0xf0 | 0xaa) == 0xfa\n" +
-                     "  * // in binary:   11110000\n" +
-                     "  * //            | 10101010\n" +
-                     "  * //              --------\n" +
-                     "  * //              11111010\n" +
-                     "  * }}}\n" +
-                     "  */"),
-          Op("&", "/**\n" +
-                     "  * Returns the bitwise AND of this value and `x`.\n" +
-                     "  * @example {{{\n" +
-                     "  * (0xf0 & 0xaa) == 0xa0\n" +
-                     "  * // in binary:   11110000\n" +
-                     "  * //            & 10101010\n" +
-                     "  * //              --------\n" +
-                     "  * //              10100000\n" +
-                     "  * }}}\n" +
-                     "  */"),
-          Op("^", "/**\n" +
-                     "  * Returns the bitwise XOR of this value and `x`.\n" +
-                     "  * @example {{{\n" +
-                     "  * (0xf0 ^ 0xaa) == 0x5a\n" +
-                     "  * // in binary:   11110000\n" +
-                     "  * //            ^ 10101010\n" +
-                     "  * //              --------\n" +
-                     "  * //              01011010\n" +
-                     "  * }}}\n" +
-                     "  */"))
+        List(Op("|",
+                "/**\n" +
+                "  * Returns the bitwise OR of this value and `x`.\n" +
+                "  * @example {{{\n" + "  * (0xf0 | 0xaa) == 0xfa\n" +
+                "  * // in binary:   11110000\n" +
+                "  * //            | 10101010\n" +
+                "  * //              --------\n" +
+                "  * //              11111010\n" + "  * }}}\n" + "  */"),
+             Op("&",
+                "/**\n" +
+                "  * Returns the bitwise AND of this value and `x`.\n" +
+                "  * @example {{{\n" + "  * (0xf0 & 0xaa) == 0xa0\n" +
+                "  * // in binary:   11110000\n" +
+                "  * //            & 10101010\n" +
+                "  * //              --------\n" +
+                "  * //              10100000\n" + "  * }}}\n" + "  */"),
+             Op("^",
+                "/**\n" +
+                "  * Returns the bitwise XOR of this value and `x`.\n" +
+                "  * @example {{{\n" + "  * (0xf0 ^ 0xaa) == 0x5a\n" +
+                "  * // in binary:   11110000\n" +
+                "  * //            ^ 10101010\n" +
+                "  * //              --------\n" +
+                "  * //              01011010\n" + "  * }}}\n" + "  */"))
       else Nil
 
     def shiftOps =
       if (isCardinal)
         List(
-          Op("<<",  "/**\n" +
-                       "  * Returns this value bit-shifted left by the specified number of bits,\n" +
-                       "  *         filling in the new right bits with zeroes.\n" +
-                       "  * @example {{{ 6 << 3 == 48 // in binary: 0110 << 3 == 0110000 }}}\n" +
-                       "  */"),
-
-          Op(">>>", "/**\n" +
-                       "  * Returns this value bit-shifted right by the specified number of bits,\n" +
-                       "  *         filling the new left bits with zeroes.\n" +
-                       "  * @example {{{ 21 >>> 3 == 2 // in binary: 010101 >>> 3 == 010 }}}\n" +
-                       "  * @example {{{\n" +
-                       "  * -21 >>> 3 == 536870909\n" +
-                       "  * // in binary: 11111111 11111111 11111111 11101011 >>> 3 ==\n" +
-                       "  * //            00011111 11111111 11111111 11111101\n" +
-                       "  * }}}\n" +
-                       "  */"),
-
-          Op(">>",  "/**\n" +
-                       "  * Returns this value bit-shifted right by the specified number of bits,\n" +
-                       "  *         filling in the left bits with the same value as the left-most bit of this.\n" +
-                       "  *         The effect of this is to retain the sign of the value.\n" +
-                       "  * @example {{{\n" +
-                       "  * -21 >> 3 == -3\n" +
-                       "  * // in binary: 11111111 11111111 11111111 11101011 >> 3 ==\n" +
-                       "  * //            11111111 11111111 11111111 11111101\n" +
-                       "  * }}}\n" +
-                       "  */"))
+            Op("<<",
+               "/**\n" +
+               "  * Returns this value bit-shifted left by the specified number of bits,\n" +
+               "  *         filling in the new right bits with zeroes.\n" +
+               "  * @example {{{ 6 << 3 == 48 // in binary: 0110 << 3 == 0110000 }}}\n" +
+               "  */"),
+            Op(">>>",
+               "/**\n" +
+               "  * Returns this value bit-shifted right by the specified number of bits,\n" +
+               "  *         filling the new left bits with zeroes.\n" +
+               "  * @example {{{ 21 >>> 3 == 2 // in binary: 010101 >>> 3 == 010 }}}\n" +
+               "  * @example {{{\n" + "  * -21 >>> 3 == 536870909\n" +
+               "  * // in binary: 11111111 11111111 11111111 11101011 >>> 3 ==\n" +
+               "  * //            00011111 11111111 11111111 11111101\n" +
+               "  * }}}\n" + "  */"),
+            Op(">>",
+               "/**\n" +
+               "  * Returns this value bit-shifted right by the specified number of bits,\n" +
+               "  *         filling in the left bits with the same value as the left-most bit of this.\n" +
+               "  *         The effect of this is to retain the sign of the value.\n" +
+               "  * @example {{{\n" + "  * -21 >> 3 == -3\n" +
+               "  * // in binary: 11111111 11111111 11111111 11101011 >> 3 ==\n" +
+               "  * //            11111111 11111111 11111111 11111101\n" +
+               "  * }}}\n" + "  */"))
       else Nil
 
-    def comparisonOps = List(
-      Op("==", "/** Returns `true` if this value is equal to x, `false` otherwise. */"),
-      Op("!=", "/** Returns `true` if this value is not equal to x, `false` otherwise. */"),
-      Op("<",  "/** Returns `true` if this value is less than x, `false` otherwise. */"),
-      Op("<=", "/** Returns `true` if this value is less than or equal to x, `false` otherwise. */"),
-      Op(">",  "/** Returns `true` if this value is greater than x, `false` otherwise. */"),
-      Op(">=", "/** Returns `true` if this value is greater than or equal to x, `false` otherwise. */"))
+    def comparisonOps =
+      List(
+          Op("==",
+             "/** Returns `true` if this value is equal to x, `false` otherwise. */"),
+          Op("!=",
+             "/** Returns `true` if this value is not equal to x, `false` otherwise. */"),
+          Op("<",
+             "/** Returns `true` if this value is less than x, `false` otherwise. */"),
+          Op("<=",
+             "/** Returns `true` if this value is less than or equal to x, `false` otherwise. */"),
+          Op(">",
+             "/** Returns `true` if this value is greater than x, `false` otherwise. */"),
+          Op(">=",
+             "/** Returns `true` if this value is greater than or equal to x, `false` otherwise. */"))
 
-    def otherOps = List(
-      Op("+", "/** Returns the sum of this value and `x`. */"),
-      Op("-", "/** Returns the difference of this value and `x`. */"),
-      Op("*", "/** Returns the product of this value and `x`. */"),
-      Op("/", "/** Returns the quotient of this value and `x`. */"),
-      Op("%", "/** Returns the remainder of the division of this value by `x`. */"))
+    def otherOps =
+      List(
+          Op("+", "/** Returns the sum of this value and `x`. */"),
+          Op("-", "/** Returns the difference of this value and `x`. */"),
+          Op("*", "/** Returns the product of this value and `x`. */"),
+          Op("/", "/** Returns the quotient of this value and `x`. */"),
+          Op("%",
+             "/** Returns the remainder of the division of this value by `x`. */"))
 
     // Given two numeric value types S and T , the operation type of S and T is defined as follows:
     // If both S and T are subrange types then the operation type of S and T is Int.
@@ -145,62 +140,69 @@ import scala.language.implicitConversions"""
     def opType(that: AnyValNum): AnyValNum = {
       val rank = IndexedSeq(I, L, F, D)
       (rank indexOf this, rank indexOf that) match {
-        case (-1, -1)   => I
-        case (r1, r2)   => rank apply (r1 max r2)
+        case (-1, -1) => I
+        case (r1, r2) => rank apply (r1 max r2)
       }
     }
 
     def mkCoercions = numeric map (x => "def to%s: %s".format(x, x))
-    def mkUnaryOps  = unaryOps map (x => "%s\n  def unary_%s : %s".format(x.doc, x.op, this opType I))
+    def mkUnaryOps =
+      unaryOps map
+      (x => "%s\n  def unary_%s : %s".format(x.doc, x.op, this opType I))
     def mkStringOps = List("def +(x: String): String")
-    def mkShiftOps  = (
-      for (op <- shiftOps ; arg <- List(I, L)) yield
-        "%s\n  def %s(x: %s): %s".format(op.doc, op.op, arg, this opType I)
-    )
+    def mkShiftOps = (for (op <- shiftOps; arg <- List(I, L)) yield
+      "%s\n  def %s(x: %s): %s".format(op.doc, op.op, arg, this opType I))
 
     def clumps: List[List[String]] = {
-      val xs1 = List(mkCoercions, mkUnaryOps, mkStringOps, mkShiftOps) map (xs => if (xs.isEmpty) xs else xs :+ "")
+      val xs1 =
+        List(mkCoercions, mkUnaryOps, mkStringOps, mkShiftOps) map
+        (xs => if (xs.isEmpty) xs else xs :+ "")
       val xs2 = List(
-        mkBinOpsGroup(comparisonOps, numeric, _ => Z),
-        mkBinOpsGroup(bitwiseOps, cardinal, this opType _),
-        mkBinOpsGroup(otherOps, numeric, this opType _)
+          mkBinOpsGroup(comparisonOps, numeric, _ => Z),
+          mkBinOpsGroup(bitwiseOps, cardinal, this opType _),
+          mkBinOpsGroup(otherOps, numeric, this opType _)
       )
       xs1 ++ xs2
     }
     def classLines = (clumps :+ commonClassLines).foldLeft(List[String]()) {
-      case (res, Nil)   => res
+      case (res, Nil) => res
       case (res, lines) =>
-        val xs = lines map {
-          case ""   => ""
-          case s    => interpolate(s)
-        }
+        val xs =
+          lines map {
+            case "" => ""
+            case s => interpolate(s)
+          }
         res ++ xs
     }
     def objectLines = {
       val comp = if (isCardinal) cardinalCompanion else floatingCompanion
-      interpolate(comp + allCompanions + "\n" + nonUnitCompanions).trim.lines.toList ++ (implicitCoercions map interpolate)
+      interpolate(comp + allCompanions + "\n" + nonUnitCompanions).trim.lines.toList ++
+      (implicitCoercions map interpolate)
     }
 
     /** Makes a set of binary operations based on the given set of ops, args, and resultFn.
-     *
-     *  @param    ops       list of function names e.g. List(">>", "%")
-     *  @param    args      list of types which should appear as arguments
-     *  @param    resultFn  function which calculates return type based on arg type
-     *  @return             list of function definitions
-     */
-    def mkBinOpsGroup(ops: List[Op], args: List[AnyValNum], resultFn: AnyValNum => AnyValRep): List[String] = (
-      ops flatMap (op =>
-        args.map(arg =>
-          "%s\n  def %s(x: %s): %s".format(op.doc, op.op, arg, resultFn(arg))) :+ ""
-      )
-    ).toList
+      *
+      *  @param    ops       list of function names e.g. List(">>", "%")
+      *  @param    args      list of types which should appear as arguments
+      *  @param    resultFn  function which calculates return type based on arg type
+      *  @return             list of function definitions
+      */
+    def mkBinOpsGroup(ops: List[Op],
+                      args: List[AnyValNum],
+                      resultFn: AnyValNum => AnyValRep): List[String] =
+      (ops flatMap
+          (op =>
+                args.map(arg =>
+                      "%s\n  def %s(x: %s): %s".format(
+                          op.doc, op.op, arg, resultFn(arg))) :+ "")).toList
   }
 
-  sealed abstract class AnyValRep(val name: String, val repr: Option[String], val javaEquiv: String) {
+  sealed abstract class AnyValRep(
+      val name: String, val repr: Option[String], val javaEquiv: String) {
     def classLines: List[String]
     def objectLines: List[String]
     def commonClassLines = List(
-      "override def getClass(): Class[@name@] = null"
+        "override def getClass(): Class[@name@] = null"
     )
 
     def lcname = name.toLowerCase
@@ -222,49 +224,58 @@ import scala.language.implicitConversions"""
 
     def representation = repr.map(", a " + _).getOrElse("")
 
-    def indent(s: String)  = if (s == "") "" else "  " + s
+    def indent(s: String) = if (s == "") "" else "  " + s
     def indentN(s: String) = s.lines map indent mkString "\n"
 
     def boxUnboxImpls = Map(
-      "@boxRunTimeDoc@" -> """
+        "@boxRunTimeDoc@" -> """
  *  Runtime implementation determined by `scala.runtime.BoxesRunTime.boxTo%s`. See [[https://github.com/scala/scala src/library/scala/runtime/BoxesRunTime.java]].
  *""".format(boxedSimpleName),
-      "@boxImpl@"   -> "%s.valueOf(x)".format(boxedName),
-      "@unboxRunTimeDoc@" -> """
+        "@boxImpl@" -> "%s.valueOf(x)".format(boxedName),
+        "@unboxRunTimeDoc@" -> """
  *  Runtime implementation determined by `scala.runtime.BoxesRunTime.unboxTo%s`. See [[https://github.com/scala/scala src/library/scala/runtime/BoxesRunTime.java]].
  *""".format(name),
-      "@unboxImpl@" -> "x.asInstanceOf[%s].%sValue()".format(boxedName, lcname),
-      "@unboxDoc@"  -> "the %s resulting from calling %sValue() on `x`".format(name, lcname)
+        "@unboxImpl@" -> "x.asInstanceOf[%s].%sValue()".format(
+            boxedName, lcname),
+        "@unboxDoc@" -> "the %s resulting from calling %sValue() on `x`"
+          .format(name, lcname)
     )
-    def interpolations = Map(
-      "@name@"      -> name,
-      "@representation@" -> representation,
-      "@javaequiv@" -> javaEquiv,
-      "@boxed@"     -> boxedName,
-      "@lcname@"    -> lcname,
-      "@zero@"      -> zeroRep
-    ) ++ boxUnboxImpls
+    def interpolations =
+      Map(
+          "@name@" -> name,
+          "@representation@" -> representation,
+          "@javaequiv@" -> javaEquiv,
+          "@boxed@" -> boxedName,
+          "@lcname@" -> lcname,
+          "@zero@" -> zeroRep
+      ) ++ boxUnboxImpls
 
     def interpolate(s: String): String = interpolations.foldLeft(s) {
       case (str, (key, value)) => str.replaceAll(key, value)
     }
-    def classDoc  = interpolate(classDocTemplate)
+    def classDoc = interpolate(classDocTemplate)
     def objectDoc = ""
     def mkImports = ""
 
-    def mkClass       = assemble("final abstract class " + name + " private extends AnyVal", classLines)
-    def mkObject      = assemble("object " + name + " extends AnyValCompanion", objectLines)
-    def make()    = List[String](
-      headerTemplate,
-      mkImports,
-      classDoc,
-      mkClass,
-      objectDoc,
-      mkObject
-    ) mkString ""
+    def mkClass =
+      assemble("final abstract class " + name + " private extends AnyVal",
+               classLines)
+    def mkObject =
+      assemble("object " + name + " extends AnyValCompanion", objectLines)
+    def make() =
+      List[String](
+          headerTemplate,
+          mkImports,
+          classDoc,
+          mkClass,
+          objectDoc,
+          mkObject
+      ) mkString ""
 
     def assemble(decl: String, lines: List[String]): String = {
-      val body = if (lines.isEmpty) " { }\n\n" else lines map indent mkString (" {\n", "\n", "\n}\n")
+      val body =
+        if (lines.isEmpty) " { }\n\n"
+        else lines map indent mkString (" {\n", "\n", "\n}\n")
 
       decl + body + "\n"
     }
@@ -273,7 +284,8 @@ import scala.language.implicitConversions"""
 }
 
 trait AnyValTemplates {
-  def headerTemplate = """/*                     __                                               *\
+  def headerTemplate =
+    """/*                     __                                               *\
 **     ________ ___   / /  ___     Scala API                            **
 **    / __/ __// _ | / /  / _ |    (c) 2002-2013, LAMP/EPFL             **
 **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
@@ -289,7 +301,8 @@ package scala
 
 """
 
-  def classDocTemplate = ("""
+  def classDocTemplate =
+    ("""
 /** `@name@`@representation@ (equivalent to Java's `@javaequiv@` primitive type) is a
  *  subtype of [[scala.AnyVal]]. Instances of `@name@` are not
  *  represented by an object in the underlying runtime system.
@@ -299,7 +312,8 @@ package scala
  */
 """.trim + "\n")
 
-  def allCompanions = """
+  def allCompanions =
+    """
 /** Transform a value type into a boxed reference type.
  *@boxRunTimeDoc@
  *  @param  x   the @name@ to be boxed
@@ -321,7 +335,7 @@ def unbox(x: java.lang.Object): @name@ = @unboxImpl@
 override def toString = "object scala.@name@"
 """
 
-  def nonUnitCompanions = ""  // todo
+  def nonUnitCompanions = "" // todo
 
   def cardinalCompanion = """
 /** The smallest value representable as a @name@. */
@@ -331,7 +345,8 @@ final val MinValue = @boxed@.MIN_VALUE
 final val MaxValue = @boxed@.MAX_VALUE
 """
 
-  def floatingCompanion = """
+  def floatingCompanion =
+    """
 /** The smallest positive value greater than @zero@ which is
  *  representable as a @name@.
  */
@@ -353,15 +368,20 @@ final val MaxValue = @boxed@.MAX_VALUE
 }
 
 class AnyVals extends AnyValReps with AnyValTemplates {
-  object B extends AnyValNum("Byte",    Some("8-bit signed integer"),                  "byte")
-  object S extends AnyValNum("Short",   Some("16-bit signed integer"),                 "short")
-  object C extends AnyValNum("Char",    Some("16-bit unsigned integer"),               "char")
-  object I extends AnyValNum("Int",     Some("32-bit signed integer"),                 "int")
-  object L extends AnyValNum("Long",    Some("64-bit signed integer"),                 "long")
-  object F extends AnyValNum("Float",   Some("32-bit IEEE-754 floating point number"), "float")
-  object D extends AnyValNum("Double",  Some("64-bit IEEE-754 floating point number"), "double")
-  object Z extends AnyValRep("Boolean", None,                                          "boolean") {
-    def classLines = """
+  object B extends AnyValNum("Byte", Some("8-bit signed integer"), "byte")
+  object S extends AnyValNum("Short", Some("16-bit signed integer"), "short")
+  object C extends AnyValNum("Char", Some("16-bit unsigned integer"), "char")
+  object I extends AnyValNum("Int", Some("32-bit signed integer"), "int")
+  object L extends AnyValNum("Long", Some("64-bit signed integer"), "long")
+  object F
+      extends AnyValNum(
+          "Float", Some("32-bit IEEE-754 floating point number"), "float")
+  object D
+      extends AnyValNum(
+          "Double", Some("64-bit IEEE-754 floating point number"), "double")
+  object Z extends AnyValRep("Boolean", None, "boolean") {
+    def classLines =
+      """
 /** Negates a Boolean expression.
   *
   * - `!a` results in `false` if and only if `a` evaluates to `true` and
@@ -447,38 +467,40 @@ def ^(x: Boolean): Boolean
 override def getClass(): Class[Boolean] = null
     """.trim.lines.toList
 
-    def objectLines = interpolate(allCompanions + "\n" + nonUnitCompanions).lines.toList
+    def objectLines =
+      interpolate(allCompanions + "\n" + nonUnitCompanions).lines.toList
   }
   object U extends AnyValRep("Unit", None, "void") {
-    override def classDoc = """
+    override def classDoc =
+      """
 /** `Unit` is a subtype of [[scala.AnyVal]]. There is only one value of type
  *  `Unit`, `()`, and it is not represented by any object in the underlying
  *  runtime system. A method with return type `Unit` is analogous to a Java
  *  method which is declared `void`.
  */
 """
-    def classLines  = List(
-      """override def getClass(): Class[Unit] = null"""
+    def classLines = List(
+        """override def getClass(): Class[Unit] = null"""
     )
     def objectLines = interpolate(allCompanions).lines.toList
 
     override def boxUnboxImpls = Map(
-      "@boxRunTimeDoc@" -> "",
-      "@boxImpl@"   -> "scala.runtime.BoxedUnit.UNIT",
-      "@unboxRunTimeDoc@" -> "",
-      "@unboxImpl@" -> "()",
-      "@unboxDoc@"  -> "the Unit value ()"
+        "@boxRunTimeDoc@" -> "",
+        "@boxImpl@" -> "scala.runtime.BoxedUnit.UNIT",
+        "@unboxRunTimeDoc@" -> "",
+        "@unboxImpl@" -> "()",
+        "@unboxDoc@" -> "the Unit value ()"
     )
   }
 
   def isSubrangeType = Set(B, S, C)
-  def isIntegerType  = Set(B, S, C, I, L)
+  def isIntegerType = Set(B, S, C, I, L)
   def isFloatingType = Set(F, D)
-  def isWideType     = Set(L, D)
+  def isWideType = Set(L, D)
 
   def cardinal = numeric filter isIntegerType
-  def numeric  = List(B, S, C, I, L, F, D)
-  def values   = List(U, Z) ++ numeric
+  def numeric = List(B, S, C, I, L, F, D)
+  def values = List(U, Z) ++ numeric
 
   def make() = values map (x => (x.name, x.make()))
 }

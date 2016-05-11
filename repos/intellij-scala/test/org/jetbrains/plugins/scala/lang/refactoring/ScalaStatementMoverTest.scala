@@ -2,9 +2,8 @@ package org.jetbrains.plugins.scala
 package lang.refactoring
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class ScalaStatementMoverTest extends StatementMoverTestBase {
   def testSingleLineMember() {
     "|def a".moveUpIsDisabled()

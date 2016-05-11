@@ -15,7 +15,4 @@ object ZipTest extends SpecLite {
     F.tuple3(nil[Int], undefined[Int], undefined[Int]) must_=== Nil
     F.tuple3(List(1), nil[Int], undefined[Int]) must_=== Nil
   }
-
 }
-
-

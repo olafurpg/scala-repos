@@ -25,11 +25,11 @@ trait Base64StringEncoder extends StringEncoder {
 }
 
 /**
- * A utility for encoding strings and byte arrays to a URL-safe base64 string,
- * and decoding from strings encoded in base64 to byte arrays.
- *
- * The encoding for strings is UTF-8.
- */
+  * A utility for encoding strings and byte arrays to a URL-safe base64 string,
+  * and decoding from strings encoded in base64 to byte arrays.
+  *
+  * The encoding for strings is UTF-8.
+  */
 trait Base64UrlSafeStringEncoder extends StringEncoder {
   // This uses a null line separator since maximum line length (0) is disabled.
   private[this] def codec = new Base64(0, null, true)
@@ -43,17 +43,17 @@ object Base64StringEncoder extends Base64StringEncoder
 object Base64UrlSafeStringEncoder extends Base64UrlSafeStringEncoder
 
 /**
- * A collection of utilities for encoding strings and byte arrays to and
- * decoding from strings compressed from with gzip.
- *
- * This trait is thread-safe because there are no streams shared outside of
- * method scope, and therefore no contention for shared byte arrays.
- *
- * The encoding for strings is UTF-8.
- *
- * gzipping inherently includes base64 encoding (the GZIP utilities from java
- * will complain otherwise!)
- */
+  * A collection of utilities for encoding strings and byte arrays to and
+  * decoding from strings compressed from with gzip.
+  *
+  * This trait is thread-safe because there are no streams shared outside of
+  * method scope, and therefore no contention for shared byte arrays.
+  *
+  * The encoding for strings is UTF-8.
+  *
+  * gzipping inherently includes base64 encoding (the GZIP utilities from java
+  * will complain otherwise!)
+  */
 trait GZIPStringEncoder extends StringEncoder {
   override def encode(bytes: Array[Byte]): String = {
     val baos = new ByteArrayOutputStream
@@ -70,7 +70,8 @@ trait GZIPStringEncoder extends StringEncoder {
 
   override def decode(str: String): Array[Byte] = {
     val baos = new ByteArrayOutputStream
-    val gis = new GZIPInputStream(new ByteArrayInputStream(Base64StringEncoder.decode(str)))
+    val gis = new GZIPInputStream(
+        new ByteArrayInputStream(Base64StringEncoder.decode(str)))
     try {
       StreamIO.copy(gis, baos)
     } finally {

@@ -5,6 +5,5 @@ class SubFoo extends Foo
 object SubT extends T
 
 object O {
-  new S {
-  }
+  new S {}
 }

@@ -1,6 +1,6 @@
 package org.scalatra.swagger.reflect
 
-import java.lang.reflect.{ GenericArrayType, ParameterizedType, Type, TypeVariable, WildcardType }
+import java.lang.reflect.{GenericArrayType, ParameterizedType, Type, TypeVariable, WildcardType}
 
 import scala.reflect.Manifest
 
@@ -19,7 +19,8 @@ private[swagger] object ManifestFactory {
 
     case at: GenericArrayType =>
       val componentManifest = manifestOf(at.getGenericComponentType)
-      val arrayManifest = componentManifest.arrayManifest // strips component type args off
+      val arrayManifest =
+        componentManifest.arrayManifest // strips component type args off
       Manifest.classType(arrayManifest.runtimeClass, componentManifest)
 
     case wt: WildcardType =>
@@ -33,7 +34,6 @@ private[swagger] object ManifestFactory {
       else manifestOf(classOf[AnyRef])
 
     case c: Class[_] => fromClass(c)
-
   }
 
   def manifestOf(erasure: Class[_], typeArgs: Seq[Manifest[_]]): Manifest[_] = {
@@ -43,8 +43,7 @@ private[swagger] object ManifestFactory {
       val normalizedErasure =
         if (erasure.getName == "scala.Array")
           typeArgs(0).arrayManifest.runtimeClass
-        else
-          erasure
+        else erasure
 
       Manifest.classType(normalizedErasure, typeArgs.head, typeArgs.tail: _*)
     }

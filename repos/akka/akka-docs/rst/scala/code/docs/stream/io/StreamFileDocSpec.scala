@@ -6,7 +6,7 @@ package docs.stream.io
 import java.io.File
 
 import akka.stream._
-import akka.stream.scaladsl.{ FileIO, Sink, Source }
+import akka.stream.scaladsl.{FileIO, Sink, Source}
 import akka.stream.testkit.Utils._
 import akka.stream.testkit._
 import akka.util.ByteString
@@ -46,16 +46,16 @@ class StreamFileDocSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
     //#file-source
 
-    val foreach: Future[IOResult] = FileIO.fromFile(file)
-      .to(Sink.ignore)
-      .run()
+    val foreach: Future[IOResult] = FileIO.fromFile(file).to(Sink.ignore).run()
     //#file-source
   }
 
   "configure dispatcher in code" in {
     //#custom-dispatcher-code
-    FileIO.fromFile(file)
-      .withAttributes(ActorAttributes.dispatcher("custom-blocking-io-dispatcher"))
+    FileIO
+      .fromFile(file)
+      .withAttributes(
+          ActorAttributes.dispatcher("custom-blocking-io-dispatcher"))
     //#custom-dispatcher-code
   }
 }

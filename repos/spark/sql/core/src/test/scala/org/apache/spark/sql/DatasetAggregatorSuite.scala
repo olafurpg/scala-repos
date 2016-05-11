@@ -39,7 +39,8 @@ class SumOf[I, N : Numeric](f: I => N) extends Aggregator[I, N, N] {
 object TypedAverage extends Aggregator[(String, Int), (Long, Long), Double] {
   override def zero: (Long, Long) = (0, 0)
 
-  override def reduce(countAndSum: (Long, Long), input: (String, Int)): (Long, Long) = {
+  override def reduce(
+      countAndSum: (Long, Long), input: (String, Int)): (Long, Long) = {
     (countAndSum._1 + 1, countAndSum._2 + input._2)
   }
 
@@ -47,14 +48,17 @@ object TypedAverage extends Aggregator[(String, Int), (Long, Long), Double] {
     (b1._1 + b2._1, b1._2 + b2._2)
   }
 
-  override def finish(countAndSum: (Long, Long)): Double = countAndSum._2 / countAndSum._1
+  override def finish(countAndSum: (Long, Long)): Double =
+    countAndSum._2 / countAndSum._1
 }
 
-object ComplexResultAgg extends Aggregator[(String, Int), (Long, Long), (Long, Long)] {
+object ComplexResultAgg
+    extends Aggregator[(String, Int), (Long, Long), (Long, Long)] {
 
   override def zero: (Long, Long) = (0, 0)
 
-  override def reduce(countAndSum: (Long, Long), input: (String, Int)): (Long, Long) = {
+  override def reduce(
+      countAndSum: (Long, Long), input: (String, Int)): (Long, Long) = {
     (countAndSum._1 + 1, countAndSum._2 + input._2)
   }
 
@@ -67,44 +71,47 @@ object ComplexResultAgg extends Aggregator[(String, Int), (Long, Long), (Long, L
 
 case class AggData(a: Int, b: String)
 object ClassInputAgg extends Aggregator[AggData, Int, Int] {
+
   /** A zero value for this aggregation. Should satisfy the property that any b + zero = b */
   override def zero: Int = 0
 
   /**
-   * Combine two values to produce a new value.  For performance, the function may modify `b` and
-   * return it instead of constructing new object for b.
-   */
+    * Combine two values to produce a new value.  For performance, the function may modify `b` and
+    * return it instead of constructing new object for b.
+    */
   override def reduce(b: Int, a: AggData): Int = b + a.a
 
   /**
-   * Transform the output of the reduction.
-   */
+    * Transform the output of the reduction.
+    */
   override def finish(reduction: Int): Int = reduction
 
   /**
-   * Merge two intermediate values
-   */
+    * Merge two intermediate values
+    */
   override def merge(b1: Int, b2: Int): Int = b1 + b2
 }
 
 object ComplexBufferAgg extends Aggregator[AggData, (Int, AggData), Int] {
+
   /** A zero value for this aggregation. Should satisfy the property that any b + zero = b */
   override def zero: (Int, AggData) = 0 -> AggData(0, "0")
 
   /**
-   * Combine two values to produce a new value.  For performance, the function may modify `b` and
-   * return it instead of constructing new object for b.
-   */
-  override def reduce(b: (Int, AggData), a: AggData): (Int, AggData) = (b._1 + 1, a)
+    * Combine two values to produce a new value.  For performance, the function may modify `b` and
+    * return it instead of constructing new object for b.
+    */
+  override def reduce(b: (Int, AggData), a: AggData): (Int, AggData) =
+    (b._1 + 1, a)
 
   /**
-   * Transform the output of the reduction.
-   */
+    * Transform the output of the reduction.
+    */
   override def finish(reduction: (Int, AggData)): Int = reduction._1
 
   /**
-   * Merge two intermediate values
-   */
+    * Merge two intermediate values
+    */
   override def merge(b1: (Int, AggData), b2: (Int, AggData)): (Int, AggData) =
     (b1._1 + b2._1, b1._2)
 }
@@ -120,90 +127,76 @@ class DatasetAggregatorSuite extends QueryTest with SharedSQLContext {
     val ds = Seq(("a", 10), ("a", 20), ("b", 1), ("b", 2), ("c", 1)).toDS()
 
     checkDataset(
-      ds.groupByKey(_._1).agg(sum(_._2)),
-      ("a", 30), ("b", 3), ("c", 1))
+        ds.groupByKey(_._1).agg(sum(_._2)), ("a", 30), ("b", 3), ("c", 1))
   }
 
   test("typed aggregation: TypedAggregator, expr, expr") {
     val ds = Seq(("a", 10), ("a", 20), ("b", 1), ("b", 2), ("c", 1)).toDS()
 
-    checkDataset(
-      ds.groupByKey(_._1).agg(
-        sum(_._2),
-        expr("sum(_2)").as[Long],
-        count("*")),
-      ("a", 30, 30L, 2L), ("b", 3, 3L, 2L), ("c", 1, 1L, 1L))
+    checkDataset(ds.groupByKey(_._1)
+                   .agg(sum(_._2), expr("sum(_2)").as[Long], count("*")),
+                 ("a", 30, 30L, 2L),
+                 ("b", 3, 3L, 2L),
+                 ("c", 1, 1L, 1L))
   }
 
   test("typed aggregation: complex case") {
     val ds = Seq("a" -> 1, "a" -> 3, "b" -> 3).toDS()
 
-    checkDataset(
-      ds.groupByKey(_._1).agg(
-        expr("avg(_2)").as[Double],
-        TypedAverage.toColumn),
-      ("a", 2.0, 2.0), ("b", 3.0, 3.0))
+    checkDataset(ds.groupByKey(_._1)
+                   .agg(expr("avg(_2)").as[Double], TypedAverage.toColumn),
+                 ("a", 2.0, 2.0),
+                 ("b", 3.0, 3.0))
   }
 
   test("typed aggregation: complex result type") {
     val ds = Seq("a" -> 1, "a" -> 3, "b" -> 3).toDS()
 
-    checkDataset(
-      ds.groupByKey(_._1).agg(
-        expr("avg(_2)").as[Double],
-        ComplexResultAgg.toColumn),
-      ("a", 2.0, (2L, 4L)), ("b", 3.0, (1L, 3L)))
+    checkDataset(ds.groupByKey(_._1)
+                   .agg(expr("avg(_2)").as[Double], ComplexResultAgg.toColumn),
+                 ("a", 2.0, (2L, 4L)),
+                 ("b", 3.0, (1L, 3L)))
   }
 
   test("typed aggregation: in project list") {
     val ds = Seq(1, 3, 2, 5).toDS()
 
+    checkDataset(ds.select(sum((i: Int) => i)), 11)
     checkDataset(
-      ds.select(sum((i: Int) => i)),
-      11)
-    checkDataset(
-      ds.select(sum((i: Int) => i), sum((i: Int) => i * 2)),
-      11 -> 22)
+        ds.select(sum((i: Int) => i), sum((i: Int) => i * 2)), 11 -> 22)
   }
 
   test("typed aggregation: class input") {
     val ds = Seq(AggData(1, "one"), AggData(2, "two")).toDS()
 
-    checkDataset(
-      ds.select(ClassInputAgg.toColumn),
-      3)
+    checkDataset(ds.select(ClassInputAgg.toColumn), 3)
   }
 
   test("typed aggregation: class input with reordering") {
     val ds = sql("SELECT 'one' AS b, 1 as a").as[AggData]
 
-    checkDataset(
-      ds.select(ClassInputAgg.toColumn),
-      1)
+    checkDataset(ds.select(ClassInputAgg.toColumn), 1)
 
-    checkDataset(
-      ds.select(expr("avg(a)").as[Double], ClassInputAgg.toColumn),
-      (1.0, 1))
+    checkDataset(ds.select(expr("avg(a)").as[Double], ClassInputAgg.toColumn),
+                 (1.0, 1))
 
-    checkDataset(
-      ds.groupByKey(_.b).agg(ClassInputAgg.toColumn),
-      ("one", 1))
+    checkDataset(ds.groupByKey(_.b).agg(ClassInputAgg.toColumn), ("one", 1))
   }
 
   test("typed aggregation: complex input") {
     val ds = Seq(AggData(1, "one"), AggData(2, "two")).toDS()
 
     checkDataset(
-      ds.select(ComplexBufferAgg.toColumn),
-      2
+        ds.select(ComplexBufferAgg.toColumn),
+        2
     )
 
     checkDataset(
-      ds.select(expr("avg(a)").as[Double], ComplexBufferAgg.toColumn),
-      (1.5, 2))
+        ds.select(expr("avg(a)").as[Double], ComplexBufferAgg.toColumn),
+        (1.5, 2))
 
-    checkDataset(
-      ds.groupByKey(_.b).agg(ComplexBufferAgg.toColumn),
-      ("one", 1), ("two", 1))
+    checkDataset(ds.groupByKey(_.b).agg(ComplexBufferAgg.toColumn),
+                 ("one", 1),
+                 ("two", 1))
   }
 }

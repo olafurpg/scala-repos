@@ -32,11 +32,13 @@ object Word2VecExample {
 
     // $example on$
     // Input data: Each row is a bag of words from a sentence or document.
-    val documentDF = sqlContext.createDataFrame(Seq(
-      "Hi I heard about Spark".split(" "),
-      "I wish Java could use case classes".split(" "),
-      "Logistic regression models are neat".split(" ")
-    ).map(Tuple1.apply)).toDF("text")
+    val documentDF = sqlContext
+      .createDataFrame(Seq(
+              "Hi I heard about Spark".split(" "),
+              "I wish Java could use case classes".split(" "),
+              "Logistic regression models are neat".split(" ")
+          ).map(Tuple1.apply))
+      .toDF("text")
 
     // Learn a mapping from words to Vectors.
     val word2Vec = new Word2Vec()

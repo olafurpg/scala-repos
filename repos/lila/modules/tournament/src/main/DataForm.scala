@@ -12,8 +12,10 @@ final class DataForm {
 
   import DataForm._
 
-  val clockTimes: Seq[Double] = Seq(0d, 1 / 2d, 3 / 4d, 1d, 3 / 2d) ++ (2d to 7d by 1d)
-  val clockTimesPrivate: Seq[Double] = clockTimes ++ (10d to 30d by 5d) ++ (40d to 60d by 10d)
+  val clockTimes: Seq[Double] =
+    Seq(0d, 1 / 2d, 3 / 4d, 1d, 3 / 2d) ++ (2d to 7d by 1d)
+  val clockTimesPrivate: Seq[Double] =
+    clockTimes ++ (10d to 30d by 5d) ++ (40d to 60d by 10d)
   val clockTimeDefault = 2d
   private def formatLimit(l: Double) =
     chess.Clock.showLimit(l * 60 toInt) + {
@@ -23,10 +25,12 @@ final class DataForm {
   val clockTimePrivateChoices = optionsDouble(clockTimesPrivate, formatLimit)
 
   val clockIncrements = 0 to 2 by 1
-  val clockIncrementsPrivate = clockIncrements ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
+  val clockIncrementsPrivate =
+    clockIncrements ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   val clockIncrementDefault = 0
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
-  val clockIncrementPrivateChoices = options(clockIncrementsPrivate, "%d second{s}")
+  val clockIncrementPrivateChoices = options(
+      clockIncrementsPrivate, "%d second{s}")
 
   val minutes = (20 to 60 by 5) ++ (70 to 120 by 10)
   val minutesPrivate = minutes ++ (150 to 360 by 30)
@@ -44,47 +48,57 @@ final class DataForm {
   }
   val positionDefault = StartingPosition.initial.eco
 
-  lazy val create = Form(mapping(
-    "clockTime" -> numberInDouble(clockTimePrivateChoices),
-    "clockIncrement" -> numberIn(clockIncrementPrivateChoices),
-    "minutes" -> numberIn(minutePrivateChoices),
-    "waitMinutes" -> numberIn(waitMinuteChoices),
-    "variant" -> number.verifying(validVariantIds contains _),
-    "position" -> nonEmptyText.verifying(positions contains _),
-    "mode" -> optional(number.verifying(Mode.all map (_.id) contains _)),
-    "private" -> optional(text.verifying("on" == _))
-  )(TournamentSetup.apply)(TournamentSetup.unapply)
-    .verifying("Invalid clock", _.validClock)
-    .verifying("Increase tournament duration, or decrease game clock", _.validTiming)
-  ) fill TournamentSetup(
-    clockTime = clockTimeDefault,
-    clockIncrement = clockIncrementDefault,
-    minutes = minuteDefault,
-    waitMinutes = waitMinuteDefault,
-    variant = chess.variant.Standard.id,
-    position = StartingPosition.initial.eco,
-    `private` = None,
-    mode = Mode.Rated.id.some)
+  lazy val create =
+    Form(
+        mapping(
+            "clockTime" -> numberInDouble(clockTimePrivateChoices),
+            "clockIncrement" -> numberIn(clockIncrementPrivateChoices),
+            "minutes" -> numberIn(minutePrivateChoices),
+            "waitMinutes" -> numberIn(waitMinuteChoices),
+            "variant" -> number.verifying(validVariantIds contains _),
+            "position" -> nonEmptyText.verifying(positions contains _),
+            "mode" -> optional(
+                number.verifying(Mode.all map (_.id) contains _)),
+            "private" -> optional(text.verifying("on" == _))
+        )(TournamentSetup.apply)(TournamentSetup.unapply)
+          .verifying("Invalid clock", _.validClock)
+          .verifying("Increase tournament duration, or decrease game clock",
+                     _.validTiming)) fill TournamentSetup(
+        clockTime = clockTimeDefault,
+        clockIncrement = clockIncrementDefault,
+        minutes = minuteDefault,
+        waitMinutes = waitMinuteDefault,
+        variant = chess.variant.Standard.id,
+        position = StartingPosition.initial.eco,
+        `private` = None,
+        mode = Mode.Rated.id.some)
 }
 
 object DataForm {
-  
+
   import chess.variant._
 
-  val validVariants = List(Standard, Chess960, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings, Crazyhouse)
+  val validVariants = List(Standard,
+                           Chess960,
+                           KingOfTheHill,
+                           ThreeCheck,
+                           Antichess,
+                           Atomic,
+                           Horde,
+                           RacingKings,
+                           Crazyhouse)
 
   val validVariantIds = validVariants.map(_.id).toSet
 }
 
-private[tournament] case class TournamentSetup(
-    clockTime: Double,
-    clockIncrement: Int,
-    minutes: Int,
-    waitMinutes: Int,
-    variant: Int,
-    position: String,
-    mode: Option[Int],
-    `private`: Option[String]) {
+private[tournament] case class TournamentSetup(clockTime: Double,
+                                               clockIncrement: Int,
+                                               minutes: Int,
+                                               waitMinutes: Int,
+                                               variant: Int,
+                                               position: String,
+                                               mode: Option[Int],
+                                               `private`: Option[String]) {
 
   def validClock = (clockTime + clockIncrement) > 0
 

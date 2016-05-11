@@ -5,9 +5,10 @@ object CompositePattern {
   def main(args: Array[String]) {
     val x: C = new C
     x match {
-      case t@(_: A | _: B) => {
-        /*start*/t/*end*/
-      }
+      case t @ (_: A | _: B) => {
+          /*start*/
+          t /*end*/
+        }
       case _ =>
     }
   }

@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util.regex
 
@@ -16,7 +16,7 @@ import org.junit.Assert._
 
 import org.scalajs.testsuite.utils.Platform._
 
-class RegexMatcherTest  {
+class RegexMatcherTest {
 
   @Test def find(): Unit = {
     val matcher = Pattern.compile("a").matcher("Scala.js")
@@ -29,7 +29,9 @@ class RegexMatcherTest  {
   }
 
   @Test def start_end_group_and_toMatchResult(): Unit = {
-    val matcher = Pattern.compile("\\s(([A-Za-z]{5}(hum)?).js)\\s").matcher("Write Scala.js everyday!")
+    val matcher = Pattern
+      .compile("\\s(([A-Za-z]{5}(hum)?).js)\\s")
+      .matcher("Write Scala.js everyday!")
 
     def checkGroup0(start: Int, end: Int, group: String): Unit =
       checkGroup(start, 5, end, 15, group, " Scala.js ")
@@ -43,8 +45,12 @@ class RegexMatcherTest  {
     def checkGroup3(start: Int, end: Int, group: String): Unit =
       checkGroup(start, -1, end, -1, group, null)
 
-    def checkGroup(start: Int, startExpected: Int, end: Int, endExpected: Int,
-                   group: String, groupExpected: String): Unit = {
+    def checkGroup(start: Int,
+                   startExpected: Int,
+                   end: Int,
+                   endExpected: Int,
+                   group: String,
+                   groupExpected: String): Unit = {
       assertEquals(startExpected, start)
       assertEquals(endExpected, end)
       assertEquals(groupExpected, group)
@@ -75,7 +81,8 @@ class RegexMatcherTest  {
     assertFalse(matcher1.matches())
   }
 
-  @Test def several_matches_from_the_same_pattern_should_be_independent(): Unit = {
+  @Test
+  def several_matches_from_the_same_pattern_should_be_independent(): Unit = {
     val pattern = Pattern.compile("S[a-z]+")
     val matcher0 = pattern.matcher("Scalable")
     val matcher1 = pattern.matcher("Scalable")
@@ -180,7 +187,9 @@ class RegexMatcherTest  {
       assertEquals("Solution", region5toEnd.group)
     }
 
-    val matcher1 = Pattern.compile("0[xX][A-Fa-f0-9]{3}$").matcher("In CSS, 0xc4fe is not a color")
+    val matcher1 = Pattern
+      .compile("0[xX][A-Fa-f0-9]{3}$")
+      .matcher("In CSS, 0xc4fe is not a color")
 
     val region5to13 = matcher1.region(5, 13)
     assertEquals(5, region5to13.regionStart)
@@ -196,7 +205,8 @@ class RegexMatcherTest  {
 
   @Test def appendReplacement_and_appendTail(): Unit = {
     // From the JavaDoc
-    val matcher = Pattern.compile("cat").matcher("one cat two cats in the yard")
+    val matcher =
+      Pattern.compile("cat").matcher("one cat two cats in the yard")
     val sb = new StringBuffer
 
     while (matcher.find()) {
@@ -219,7 +229,9 @@ class RegexMatcherTest  {
     assertEquals("zzzcatzzzdogzzz", matcher.replaceFirst("cat"))
   }
 
-  @Test def should_throw_exception_if_match_accessors_are_called_before_find(): Unit = {
+  @Test
+  def should_throw_exception_if_match_accessors_are_called_before_find(
+      ): Unit = {
     def checkInvalidAccess(block: => Unit): Unit = {
       val exception: Throwable = try {
         block
@@ -228,7 +240,8 @@ class RegexMatcherTest  {
         case e: Throwable => e
       }
 
-      assertEquals("java.lang.IllegalStateException", exception.getClass.getName)
+      assertEquals(
+          "java.lang.IllegalStateException", exception.getClass.getName)
       if (!executingInJVM) // On JVM the message is "No match found"
         assertEquals("No match available", exception.getMessage)
     }

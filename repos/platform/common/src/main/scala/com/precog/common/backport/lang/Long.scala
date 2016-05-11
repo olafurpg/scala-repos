@@ -20,6 +20,7 @@
 package com.precog.common.backport.lang
 
 object Long {
+
   /** Backport of Java 7's java.lang.Long's static compare method */
   @inline
   def compare(x: Long, y: Long): Int = {

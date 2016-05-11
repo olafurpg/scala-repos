@@ -1,10 +1,10 @@
 object Test extends App {
   trait Schtroumpf[T]
 
-  implicit def schtroumpf[T, U <: Coll[T], Coll[X] <: Traversable[X]]
-    (implicit minorSchtroumpf: Schtroumpf[T]): Schtroumpf[U] = ???
+  implicit def schtroumpf[T, U <: Coll[T], Coll[X] <: Traversable[X]](
+      implicit minorSchtroumpf: Schtroumpf[T]): Schtroumpf[U] = ???
 
-  implicit val qoo: Schtroumpf[Int] = new Schtroumpf[Int]{}
+  implicit val qoo: Schtroumpf[Int] = new Schtroumpf[Int] {}
   implicitly[Schtroumpf[Nil.type]]
 }
 
@@ -36,4 +36,4 @@ isStrictlyMoreSpecific(info1, info2)
 [   setInst] Nothing                  ( In Test#schtroumpf[T,U <: Coll[T],Coll[_] <: Traversable[_]], T=Nothing )
 [   setInst] Int                      ( In Test#schtroumpf[T,U <: Coll[T],Coll[_] <: Traversable[_]], U=Int )
 [   setInst] =?Int                    ( In Test#schtroumpf[T,U <: Coll[T],Coll[_] <: Traversable[_]], Coll==?Int )
-*/
+ */

@@ -5,11 +5,13 @@ import com.intellij.codeInspection.LocalInspectionTool
 import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTestAdapter
 
 /**
- * Nikolay.Tropin
- * 2014-09-23
- */
-class UselessExpressionInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
-  override protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[ScalaUselessExpressionInspection]
+  * Nikolay.Tropin
+  * 2014-09-23
+  */
+class UselessExpressionInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
+  override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[ScalaUselessExpressionInspection]
   override protected def annotation: String = "Useless expression"
 
   def testLiteral(): Unit = {
@@ -143,8 +145,7 @@ class UselessExpressionInspectionTest extends ScalaLightInspectionFixtureTestAda
   }
 
   def testFunctionalParam(): Unit = {
-    val text =
-      s"""def foo(f: Int => Unit): Unit = {
+    val text = s"""def foo(f: Int => Unit): Unit = {
          |  ${START}List(1) foreach f$END
          |}
        """
@@ -197,8 +198,7 @@ class UselessExpressionInspectionTest extends ScalaLightInspectionFixtureTestAda
   }
 
   def testImplicitClass(): Unit = {
-    val text =
-      s"""implicit class StringOps(val s: String) {
+    val text = s"""implicit class StringOps(val s: String) {
          |  def print(): Unit = println(s)
          |}
          |

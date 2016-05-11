@@ -6,11 +6,11 @@ class SmartOverloadedSelfType {
       this(2)
     }
     def this(z: String) {
-      this(nonon/*caret*/)
+      this(nonon /*caret*/ )
     }
   }
 }
 /*
 nononBoolean
 nononInt
-*/
+ */

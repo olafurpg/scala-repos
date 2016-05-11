@@ -1,6 +1,5 @@
-
-import scala.tools.partest.{ ReplTest, Welcoming }
-import scala.tools.nsc.{ GenericRunnerSettings, Settings }
+import scala.tools.partest.{ReplTest, Welcoming}
+import scala.tools.nsc.{GenericRunnerSettings, Settings}
 import scala.tools.nsc.settings.MutableSettings
 
 object Test extends ReplTest with HangingRepl with Welcoming {
@@ -25,8 +24,8 @@ object Resulting {
 }
 
 /** Test that hangs the REPL.
- *  Usually that is the "before" case.
- */
+  *  Usually that is the "before" case.
+  */
 trait HangingRepl extends ReplTest {
   import scala.language.postfixOps
   import scala.util._
@@ -35,7 +34,7 @@ trait HangingRepl extends ReplTest {
   import ExecutionContext.Implicits._
   import Resulting._
   def timeout = 120 seconds
-  def hanging[A](a: =>A): A = Future(a) resultWithin timeout
+  def hanging[A](a: => A): A = Future(a) resultWithin timeout
   override def show() = Try(hanging(super.show())) recover {
     case e => e.printStackTrace()
   }

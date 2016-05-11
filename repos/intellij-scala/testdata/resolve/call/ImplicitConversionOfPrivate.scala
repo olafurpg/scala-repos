@@ -1,4 +1,4 @@
 object Main {
   val text = ""
-  text.<ref>count(_ == '5')
+  text.< ref > count (_ == '5')
 }

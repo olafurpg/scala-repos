@@ -1,4 +1,3 @@
-
 import scala.language.postfixOps
 
 object Test extends App {

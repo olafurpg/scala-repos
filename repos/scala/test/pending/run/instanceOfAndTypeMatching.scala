@@ -3,10 +3,10 @@
 
 object Summary {
   class Outer {
-    class Inner { }
-    def f() = { class MethodInner ; new MethodInner }
+    class Inner {}
+    def f() = { class MethodInner; new MethodInner }
   }
-  
+
   // 1 static issue:
   // 
   //   Given method in MethodInner: def g(other: MethodInner) = ()
@@ -39,50 +39,57 @@ object Summary {
 
 class Outer {
   class Inner {
-    def passOuter(other: Outer) = ()                  // pass any Outer
-    def passThisType(other: Outer.this.type) = ()     // pass only this Outer instance
-    def passInner(other: Inner) = ()                  // pass only Inners from this Outer instance
-    def passInner2(other: Outer.this.Inner) = ()      // same as above
-    def passInnerSharp(other: Outer#Inner) = ()       // pass any Inner
-    
+    def passOuter(other: Outer) = () // pass any Outer
+    def passThisType(other: Outer.this.type) =
+      () // pass only this Outer instance
+    def passInner(other: Inner) =
+      () // pass only Inners from this Outer instance
+    def passInner2(other: Outer.this.Inner) = () // same as above
+    def passInnerSharp(other: Outer#Inner) = () // pass any Inner
+
     def compareSimpleWithTypeMatch(other: Any) = other match {
       case _: Inner => true
-      case _        => false
+      case _ => false
     }
     def compareSimpleWithInstanceOf(other: Any) = other.isInstanceOf[Inner]
-    
+
     def compareSharpWithTypeMatch(other: Any) = {
       other match {
         case _: Outer#Inner => true
-        case _              => false
+        case _ => false
       }
     }
-    def compareSharpWithInstanceOf(other: Any) = other.isInstanceOf[Outer#Inner]
-    
+    def compareSharpWithInstanceOf(other: Any) =
+      other.isInstanceOf[Outer#Inner]
+
     def comparePathWithTypeMatch(other: Any) = other match {
-      case _: Outer.this.Inner  => true
-      case _                    => false
+      case _: Outer.this.Inner => true
+      case _ => false
     }
-    def comparePathWithInstanceOf(other: Any) = other.isInstanceOf[Outer.this.Inner]    
+    def comparePathWithInstanceOf(other: Any) =
+      other.isInstanceOf[Outer.this.Inner]
   }
-  
+
   def f() = {
-    class MethodInner { 
-      def passOuter(other: Outer) = ()                  // pass any Outer
-      def passThisType(other: Outer.this.type) = ()     // pass only this Outer instance
-      def passInner(other: Inner) = ()                  // pass only Inners from this Outer instance
-      def passInner2(other: Outer.this.Inner) = ()      // same as above
-      def passInnerSharp(other: Outer#Inner) = ()       // pass any Inner
-      def passMethodInner(other: MethodInner) = ()      // pass only MethodInners from this Outer instance
+    class MethodInner {
+      def passOuter(other: Outer) = () // pass any Outer
+      def passThisType(other: Outer.this.type) =
+        () // pass only this Outer instance
+      def passInner(other: Inner) =
+        () // pass only Inners from this Outer instance
+      def passInner2(other: Outer.this.Inner) = () // same as above
+      def passInnerSharp(other: Outer#Inner) = () // pass any Inner
+      def passMethodInner(other: MethodInner) =
+        () // pass only MethodInners from this Outer instance
       // is there any way to refer to Outer#MethodInner? Not that there should be.
-      
+
       def compareWithInstanceOf(other: Any) = other.isInstanceOf[MethodInner]
       def compareWithTypeMatch(other: Any) = other match {
         case _: MethodInner => true
-        case _              => false
+        case _ => false
       }
     }
-    
+
     new MethodInner
   }
 }
@@ -94,7 +101,7 @@ object Test {
   val inner2 = new outer2.Inner
   val method1 = outer1.f()
   val method2 = outer2.f()
-  
+
   def testInnerStatic = {
     // these should all work
     inner1.passOuter(outer1)
@@ -104,7 +111,7 @@ object Test {
     inner1.passInner2(inner1)
     inner1.passInnerSharp(inner1)
     inner1.passInnerSharp(inner2)
-    
+
     // these should all fail to compile, and do
     //
     // inner1.passThisType(outer2)
@@ -113,32 +120,29 @@ object Test {
   }
   def testInnerRuntime = {
     println("testInnerRuntime\n")
-    
+
     List("These should be true under any scenario: ",
-      inner1.isInstanceOf[outer1.Inner] , 
-      inner1.isInstanceOf[Outer#Inner] ,
-      (inner1: Any) match { case _: Outer#Inner => true ; case _ => false } ,
-      (inner1: Any) match { case _: outer1.Inner => true ; case _ => false } ,
-      inner1.compareSharpWithTypeMatch(inner2) ,
-      inner1.compareSharpWithInstanceOf(inner2)
-    ) foreach println
-    
+         inner1.isInstanceOf[outer1.Inner],
+         inner1.isInstanceOf[Outer#Inner],
+         (inner1: Any) match { case _: Outer#Inner => true; case _ => false },
+         (inner1: Any) match { case _: outer1.Inner => true; case _ => false },
+         inner1.compareSharpWithTypeMatch(inner2),
+         inner1.compareSharpWithInstanceOf(inner2)) foreach println
+
     List("These should be true under current proposal: ",
-      inner1.compareSimpleWithInstanceOf(inner2) 
-    ) foreach println
-    
+         inner1.compareSimpleWithInstanceOf(inner2)) foreach println
+
     List("These should be false under current proposal: ",
-      inner1.compareSimpleWithTypeMatch(inner2) ,
-      inner1.comparePathWithTypeMatch(inner2) 
+         inner1.compareSimpleWithTypeMatch(inner2),
+         inner1.comparePathWithTypeMatch(inner2)) foreach println
+
+    List("These return true but I think should return false: ",
+         inner1.isInstanceOf[outer2.Inner], // true
+         inner1.comparePathWithInstanceOf(inner2) // true
     ) foreach println
-    
-    List("These return true but I think should return false: ", 
-      inner1.isInstanceOf[outer2.Inner] ,               // true
-      inner1.comparePathWithInstanceOf(inner2)          // true
-    ) foreach println
-    
+
     List("These are doing the wrong thing under current proposal",
-      (inner1: Any) match { case _: outer2.Inner => true ; case _ => false }    // should be false
+         (inner1: Any) match { case _: outer2.Inner => true; case _ => false } // should be false
     ) foreach println
   }
 
@@ -159,7 +163,7 @@ object Test {
     //     method1.passMethodInner(method1)
     //                             ^
     method1.passMethodInner(method1)
-    
+
     // these should all fail to compile, and do
     //
     // method1.passThisType(outer2)
@@ -167,24 +171,22 @@ object Test {
     // method1.passInner2(inner2)
     // method1.passMethodInner(method2)
   }
-  
+
   def testMethodInnerRuntime = {
     println("\ntestMethodInnerRuntime\n")
-    
+
     List("These should be true under any scenario: ",
-      method1.compareWithInstanceOf(method1) ,
-      method1.compareWithTypeMatch(method1) 
-    ) foreach println
-    
+         method1.compareWithInstanceOf(method1),
+         method1.compareWithTypeMatch(method1)) foreach println
+
     List("These should be true under current proposal: ",
-      method1.compareWithInstanceOf(method2)
-    ) foreach println
-    
+         method1.compareWithInstanceOf(method2)) foreach println
+
     List("These are doing the wrong thing under current proposal",
-      method1.compareWithTypeMatch(method2)    // should be false
+         method1.compareWithTypeMatch(method2) // should be false
     ) foreach println
   }
-  
+
   def main(args: Array[String]): Unit = {
     testInnerRuntime
     testMethodInnerRuntime

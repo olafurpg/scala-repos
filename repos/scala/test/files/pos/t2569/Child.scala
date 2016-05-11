@@ -1,9 +1,7 @@
 package varargs
 
-  class Child extends Parent {
+class Child extends Parent {
 
-    override def concatenate(strings: String*): String =
-      strings map("\"" + _ + "\"") mkString("(", ", ", ")")
-
-  }
-
+  override def concatenate(strings: String*): String =
+    strings map ("\"" + _ + "\"") mkString ("(", ", ", ")")
+}

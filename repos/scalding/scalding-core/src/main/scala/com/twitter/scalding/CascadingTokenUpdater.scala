@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
 object CascadingTokenUpdater {
@@ -21,8 +21,7 @@ object CascadingTokenUpdater {
   // Take a cascading string of tokens and turns it into a map
   // from token index to class
   def parseTokens(tokClass: String): Map[Int, String] =
-    if (tokClass == null || tokClass.isEmpty)
-      Map[Int, String]()
+    if (tokClass == null || tokClass.isEmpty) Map[Int, String]()
     else
       tokClass
         .split(",")
@@ -31,7 +30,9 @@ object CascadingTokenUpdater {
         .toIterator
         .map(_.split("="))
         .filter(_.size == 2)
-        .map { ary => (ary(0).toInt, ary(1)) }
+        .map { ary =>
+          (ary(0).toInt, ary(1))
+        }
         .toMap
 
   // does the inverse of the previous function, given a Map of index to class
@@ -47,18 +48,22 @@ object CascadingTokenUpdater {
   // Given the first free token spot
   // assign each of the class names given to al the subsequent
   // positions
-  private def assignTokens(first: Int, names: Iterable[String]): Map[Int, String] =
-    names.foldLeft((first, Map[Int, String]())) { (idMap, clz) =>
-      val (id, m) = idMap
-      (id + 1, m + (id -> clz))
-    }._2
+  private def assignTokens(
+      first: Int, names: Iterable[String]): Map[Int, String] =
+    names
+      .foldLeft((first, Map[Int, String]())) { (idMap, clz) =>
+        val (id, m) = idMap
+        (id + 1, m + (id -> clz))
+      }
+      ._2
 
   def update(config: Config, clazzes: Set[Class[_]]): Config = {
     val toks = config.getCascadingSerializationTokens
     // We don't want to assign tokens to classes already in the map
     val newClasses: Iterable[String] = clazzes.map { _.getName } -- toks.values
 
-    config + (Config.CascadingSerializationTokens -> toksToString(toks ++ assignTokens(firstAvailableToken(toks), newClasses)))
+    config +
+    (Config.CascadingSerializationTokens -> toksToString(
+            toks ++ assignTokens(firstAvailableToken(toks), newClasses)))
   }
-
 }

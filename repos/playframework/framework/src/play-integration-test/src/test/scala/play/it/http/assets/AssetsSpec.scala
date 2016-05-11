@@ -10,14 +10,16 @@ import play.api.test._
 import org.apache.commons.io.IOUtils
 import java.io.ByteArrayInputStream
 import play.api.Mode
-import play.core.server.{ ServerConfig, Server }
+import play.core.server.{ServerConfig, Server}
 import play.it._
 
 object NettyAssetsSpec extends AssetsSpec with NettyIntegrationSpecification
-object AkkaHttpAssetsSpec extends AssetsSpec with AkkaHttpIntegrationSpecification
+object AkkaHttpAssetsSpec
+    extends AssetsSpec with AkkaHttpIntegrationSpecification
 
-trait AssetsSpec extends PlaySpecification
-    with WsTestClient with ServerIntegrationSpecification {
+trait AssetsSpec
+    extends PlaySpecification with WsTestClient
+    with ServerIntegrationSpecification {
 
   sequential
 
@@ -76,22 +78,23 @@ trait AssetsSpec extends PlaySpecification
       result.header(CACHE_CONTROL) must_== defaultCacheControl
     }
 
-    "serve a non gzipped asset when gzip is available but not requested" in withServer { client =>
-      val result = await(client.url("/foo.txt").get())
+    "serve a non gzipped asset when gzip is available but not requested" in withServer {
+      client =>
+        val result = await(client.url("/foo.txt").get())
 
-      result.body must_== "This is a test asset."
-      result.header(VARY) must beSome(ACCEPT_ENCODING)
-      result.header(CONTENT_ENCODING) must beNone
+        result.body must_== "This is a test asset."
+        result.header(VARY) must beSome(ACCEPT_ENCODING)
+        result.header(CONTENT_ENCODING) must beNone
     }
 
     "serve a gzipped asset" in withServer { client =>
-      val result = await(client.url("/foo.txt")
-        .withHeaders(ACCEPT_ENCODING -> "gzip")
-        .get())
+      val result = await(
+          client.url("/foo.txt").withHeaders(ACCEPT_ENCODING -> "gzip").get())
 
       result.header(VARY) must beSome(ACCEPT_ENCODING)
       //result.header(CONTENT_ENCODING) must beSome("gzip")
-      val ahcResult: org.asynchttpclient.Response = result.underlying.asInstanceOf[org.asynchttpclient.Response]
+      val ahcResult: org.asynchttpclient.Response =
+        result.underlying.asInstanceOf[org.asynchttpclient.Response]
       val is = new ByteArrayInputStream(ahcResult.getResponseBodyAsBytes)
       IOUtils.toString(is) must_== "This is a test gzipped asset.\n"
       // release deflate resources
@@ -101,9 +104,8 @@ trait AssetsSpec extends PlaySpecification
 
     "return not modified when etag matches" in withServer { client =>
       val Some(etag) = await(client.url("/foo.txt").get()).header(ETAG)
-      val result = await(client.url("/foo.txt")
-        .withHeaders(IF_NONE_MATCH -> etag)
-        get ())
+      val result =
+        await(client.url("/foo.txt").withHeaders(IF_NONE_MATCH -> etag) get ())
 
       result.status must_== NOT_MODIFIED
       result.body must beEmpty
@@ -112,30 +114,35 @@ trait AssetsSpec extends PlaySpecification
       result.header(LAST_MODIFIED) must beSome
     }
 
-    "return not modified when multiple etags supply and one matches" in withServer { client =>
-      val Some(etag) = await(client.url("/foo.txt").get()).header(ETAG)
-      val result = await(client.url("/foo.txt")
-        .withHeaders(IF_NONE_MATCH -> ("\"foo\", " + etag + ", \"bar\""))
-        .get())
+    "return not modified when multiple etags supply and one matches" in withServer {
+      client =>
+        val Some(etag) = await(client.url("/foo.txt").get()).header(ETAG)
+        val result = await(client
+              .url("/foo.txt")
+              .withHeaders(IF_NONE_MATCH -> ("\"foo\", " + etag + ", \"bar\""))
+              .get())
 
-      result.status must_== NOT_MODIFIED
-      result.body must beEmpty
+        result.status must_== NOT_MODIFIED
+        result.body must beEmpty
     }
 
     "return asset when etag doesn't match" in withServer { client =>
-      val result = await(client.url("/foo.txt")
-        .withHeaders(IF_NONE_MATCH -> "\"foobar\"")
-        .get())
+      val result = await(client
+            .url("/foo.txt")
+            .withHeaders(IF_NONE_MATCH -> "\"foobar\"")
+            .get())
 
       result.status must_== OK
       result.body must_== "This is a test asset."
     }
 
     "return not modified when not modified since" in withServer { client =>
-      val Some(timestamp) = await(client.url("/foo.txt").get()).header(LAST_MODIFIED)
-      val result = await(client.url("/foo.txt")
-        .withHeaders(IF_MODIFIED_SINCE -> timestamp)
-        .get())
+      val Some(timestamp) =
+        await(client.url("/foo.txt").get()).header(LAST_MODIFIED)
+      val result = await(client
+            .url("/foo.txt")
+            .withHeaders(IF_MODIFIED_SINCE -> timestamp)
+            .get())
 
       result.status must_== NOT_MODIFIED
       result.body must beEmpty
@@ -147,32 +154,39 @@ trait AssetsSpec extends PlaySpecification
     }
 
     "return asset when modified since" in withServer { client =>
-      val result = await(client.url("/foo.txt")
-        .withHeaders(IF_MODIFIED_SINCE -> "Tue, 13 Mar 2012 13:08:36 GMT")
-        .get())
+      val result = await(client
+            .url("/foo.txt")
+            .withHeaders(IF_MODIFIED_SINCE -> "Tue, 13 Mar 2012 13:08:36 GMT")
+            .get())
 
       result.status must_== OK
       result.body must_== "This is a test asset."
     }
 
-    "ignore if modified since header if if none match header is set" in withServer { client =>
-      val result = await(client.url("/foo.txt")
-        .withHeaders(
-          IF_NONE_MATCH -> "\"foobar\"",
-          IF_MODIFIED_SINCE -> "Wed, 01 Jan 2113 00:00:00 GMT" // might break in 100 years, but I won't be alive, so :P
-        ).get())
+    "ignore if modified since header if if none match header is set" in withServer {
+      client =>
+        val result = await(
+            client
+              .url("/foo.txt")
+              .withHeaders(
+                  IF_NONE_MATCH -> "\"foobar\"",
+                  IF_MODIFIED_SINCE -> "Wed, 01 Jan 2113 00:00:00 GMT" // might break in 100 years, but I won't be alive, so :P
+              )
+              .get())
 
-      result.status must_== OK
-      result.body must_== "This is a test asset."
+        result.status must_== OK
+        result.body must_== "This is a test asset."
     }
 
-    "return the asset if the if modified since header can't be parsed" in withServer { client =>
-      val result = await(client.url("/foo.txt")
-        .withHeaders(IF_MODIFIED_SINCE -> "Not a date")
-        .get())
+    "return the asset if the if modified since header can't be parsed" in withServer {
+      client =>
+        val result = await(client
+              .url("/foo.txt")
+              .withHeaders(IF_MODIFIED_SINCE -> "Not a date")
+              .get())
 
-      result.status must_== OK
-      result.body must_== "This is a test asset."
+        result.status must_== OK
+        result.body must_== "This is a test asset."
     }
 
     "return 200 if the asset is empty" in withServer { client =>
@@ -190,7 +204,9 @@ trait AssetsSpec extends PlaySpecification
     }
 
     "serve a versioned asset" in withServer { client =>
-      val result = await(client.url("/versioned/sub/12345678901234567890123456789012-foo.txt").get())
+      val result = await(client
+            .url("/versioned/sub/12345678901234567890123456789012-foo.txt")
+            .get())
 
       result.status must_== OK
       result.body must_== "This is a test asset."

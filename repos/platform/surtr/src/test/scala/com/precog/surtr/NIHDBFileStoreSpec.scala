@@ -47,21 +47,24 @@ import org.specs2.specification.Fragments
 import scalaz._
 import scalaz.syntax.comonad._
 
-class NIHDBFileStoreSpec extends NIHDBTestActors with Specification with Logging {
+class NIHDBFileStoreSpec
+    extends NIHDBTestActors with Specification with Logging {
   class YggConfig extends NIHDBTestActorsConfig {
     val tmpDir = IOUtils.createTmpDir("filestorespec").unsafePerformIO
-    val config = Configuration parse { "precog.storage.root = %s".format(tmpDir) }
+    val config =
+      Configuration parse { "precog.storage.root = %s".format(tmpDir) }
     val clock = blueeyes.util.Clock.System
     val maxSliceSize = 10
 
     logger.info("Running NIHDBFileStoreSpec under " + tmpDir)
-  } 
+  }
 
   object yggConfig extends YggConfig
 
   implicit val timeout = new Timeout(5000)
 
-  val loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac dolor ac velit consequat vestibulum at id dolor. Vivamus luctus mauris ac massa iaculis a cursus leo porta. Aliquam tellus ligula, mattis quis luctus sed, tempus id ante. Donec sagittis, ante pharetra tempor ultrices, purus massa tincidunt neque, ut tempus massa nisl non libero. Aliquam tincidunt commodo facilisis. Phasellus accumsan dapibus lorem ac aliquam. Nullam vitae ullamcorper risus. Praesent quis tellus lectus."
+  val loremIpsum =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac dolor ac velit consequat vestibulum at id dolor. Vivamus luctus mauris ac massa iaculis a cursus leo porta. Aliquam tellus ligula, mattis quis luctus sed, tempus id ante. Donec sagittis, ante pharetra tempor ultrices, purus massa tincidunt neque, ut tempus massa nisl non libero. Aliquam tincidunt commodo facilisis. Phasellus accumsan dapibus lorem ac aliquam. Nullam vitae ullamcorper risus. Praesent quis tellus lectus."
 
   import TestStack._
 
@@ -69,12 +72,29 @@ class NIHDBFileStoreSpec extends NIHDBTestActors with Specification with Logging
     "Properly store and retrieve files" in {
       val testPath = Path("/store/this/somewhere")
 
-      (projectionsActor ? IngestData(Seq((0L, StoreFileMessage(testAPIKey, testPath, Authorities(testAccount), None, EventId.fromLong(42L), FileContent(loremIpsum.getBytes("UTF-8"), MimeType("text", "plain"), RawUTF8Encoding), Clock.System.instant, StreamRef.Create(UUID.randomUUID, true)))))).copoint must beLike {
+      (projectionsActor ? IngestData(
+              Seq(
+                  (0L,
+                   StoreFileMessage(testAPIKey,
+                                    testPath,
+                                    Authorities(testAccount),
+                                    None,
+                                    EventId.fromLong(42L),
+                                    FileContent(loremIpsum.getBytes("UTF-8"),
+                                                MimeType("text", "plain"),
+                                                RawUTF8Encoding),
+                                    Clock.System.instant,
+                                    StreamRef.Create(
+                                        UUID.randomUUID,
+                                        true)))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }
 
-      (projectionsActor ? Read(testPath, Version.Current)).mapTo[ReadResult].copoint must beLike {
-        case ReadSuccess(_, blob : BlobResource) => blob.asString.run.copoint must beSome(loremIpsum)
+      (projectionsActor ? Read(testPath, Version.Current))
+        .mapTo[ReadResult]
+        .copoint must beLike {
+        case ReadSuccess(_, blob: BlobResource) =>
+          blob.asString.run.copoint must beSome(loremIpsum)
       }
     }
 
@@ -84,21 +104,46 @@ class NIHDBFileStoreSpec extends NIHDBTestActors with Specification with Logging
 
       val streamId = UUID.randomUUID
 
-      (projectionsActor ? IngestData(Seq((0L, IngestMessage(testAPIKey, testPath, Authorities(testAccount), Seq(IngestRecord(EventId.fromLong(42L), JString("Foo!"))), None, Clock.System.instant, StreamRef.Create(streamId, false)))))).copoint must beLike {
+      (projectionsActor ? IngestData(
+              Seq((0L,
+                   IngestMessage(
+                       testAPIKey,
+                       testPath,
+                       Authorities(testAccount),
+                       Seq(IngestRecord(EventId.fromLong(42L),
+                                        JString("Foo!"))),
+                       None,
+                       Clock.System.instant,
+                       StreamRef.Create(streamId, false)))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }
 
       // We haven't terminated the stream yet, so it shouldn't find anything
-      (projectionsActor ? Read(testPath, Version.Current)).mapTo[ReadResult].copoint must beLike {
+      (projectionsActor ? Read(testPath, Version.Current))
+        .mapTo[ReadResult]
+        .copoint must beLike {
         case PathOpFailure(_, NotFound(_)) => ok
       }
 
-      (projectionsActor ? IngestData(Seq((1L, IngestMessage(testAPIKey, testPath, Authorities(testAccount), Seq(IngestRecord(EventId.fromLong(42L), JString("Foo!"))), None, Clock.System.instant, StreamRef.Create(streamId, true)))))).copoint must beLike {
+      (projectionsActor ? IngestData(
+              Seq((1L,
+                   IngestMessage(
+                       testAPIKey,
+                       testPath,
+                       Authorities(testAccount),
+                       Seq(IngestRecord(EventId.fromLong(42L),
+                                        JString("Foo!"))),
+                       None,
+                       Clock.System.instant,
+                       StreamRef.Create(streamId, true)))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }
 
-      (projectionsActor ? Read(testPath, Version.Current)).mapTo[ReadResult].copoint must beLike {
-        case ReadSuccess(_, proj: NIHDBResource) => proj.db.length.copoint mustEqual 2
+      (projectionsActor ? Read(testPath, Version.Current))
+        .mapTo[ReadResult]
+        .copoint must beLike {
+        case ReadSuccess(_, proj: NIHDBResource) =>
+          proj.db.length.copoint mustEqual 2
       }
     }
   }

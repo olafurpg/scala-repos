@@ -10,29 +10,35 @@ import java.io.File
 import akka.http.scaladsl.settings.RoutingSettings
 
 import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Properties
 import org.scalatest.matchers.Matcher
-import org.scalatest.{ Inside, Inspectors }
+import org.scalatest.{Inside, Inspectors}
 import akka.http.scaladsl.model.MediaTypes._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers._
 import akka.http.impl.util._
 import akka.http.scaladsl.TestUtils.writeAllText
 
-class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Inside {
+class FileAndResourceDirectivesSpec
+    extends RoutingSpec with Inspectors with Inside {
 
-  override def testConfigSource = "akka.http.routing.range-coalescing-threshold = 1"
+  override def testConfigSource =
+    "akka.http.routing.range-coalescing-threshold = 1"
 
   "getFromFile" should {
     "reject non-GET requests" in {
       Put() ~> getFromFile("some") ~> check { handled shouldEqual false }
     }
     "reject requests to non-existing files" in {
-      Get() ~> getFromFile("nonExistentFile") ~> check { handled shouldEqual false }
+      Get() ~> getFromFile("nonExistentFile") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to directories" in {
-      Get() ~> getFromFile(Properties.javaHome) ~> check { handled shouldEqual false }
+      Get() ~> getFromFile(Properties.javaHome) ~> check {
+        handled shouldEqual false
+      }
     }
     "return the file content with the MediaType matching the file extension" in {
       val file = File.createTempFile("akka Http Test", ".PDF")
@@ -74,13 +80,18 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
       try {
         writeAllText("ABCDEFGHIJKLMNOPQRSTUVWXYZ", file)
         val rangeHeader = Range(ByteRange(1, 10), ByteRange.suffix(10))
-        Get() ~> addHeader(rangeHeader) ~> getFromFile(file, ContentTypes.`text/plain(UTF-8)`) ~> check {
+        Get() ~> addHeader(rangeHeader) ~> getFromFile(
+            file, ContentTypes.`text/plain(UTF-8)`) ~> check {
           status shouldEqual StatusCodes.PartialContent
           header[`Content-Range`] shouldEqual None
           mediaType.withParams(Map.empty) shouldEqual `multipart/byteranges`
 
-          val parts = responseAs[Multipart.ByteRanges].toStrict(1.second).awaitResult(3.seconds).strictParts
-          parts.map(_.entity.data.utf8String) should contain theSameElementsAs List("BCDEFGHIJK", "QRSTUVWXYZ")
+          val parts = responseAs[Multipart.ByteRanges]
+            .toStrict(1.second)
+            .awaitResult(3.seconds)
+            .strictParts
+          parts.map(_.entity.data.utf8String) should contain theSameElementsAs List(
+              "BCDEFGHIJK", "QRSTUVWXYZ")
         }
       } finally file.delete
     }
@@ -101,7 +112,8 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
         writeAllText("123", file)
         Get() ~> getFromFile(file) ~> check {
           mediaType shouldEqual `image/svg+xml`
-          header[`Content-Encoding`] shouldEqual Some(`Content-Encoding`(HttpEncodings.gzip))
+          header[`Content-Encoding`] shouldEqual Some(
+              `Content-Encoding`(HttpEncodings.gzip))
           responseAs[String] shouldEqual "123"
         }
       } finally file.delete
@@ -113,7 +125,8 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
         writeAllText("456", file)
         Get() ~> getFromFile(file) ~> check {
           mediaType shouldEqual `application/javascript`
-          header[`Content-Encoding`] shouldEqual Some(`Content-Encoding`(HttpEncodings.gzip))
+          header[`Content-Encoding`] shouldEqual Some(
+              `Content-Encoding`(HttpEncodings.gzip))
           responseAs[String] shouldEqual "456"
         }
       } finally file.delete
@@ -125,19 +138,29 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
       Put() ~> getFromResource("some") ~> check { handled shouldEqual false }
     }
     "reject requests to non-existing resources" in {
-      Get() ~> getFromResource("nonExistingResource") ~> check { handled shouldEqual false }
+      Get() ~> getFromResource("nonExistingResource") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to directory resources" in {
-      Get() ~> getFromResource("someDir") ~> check { handled shouldEqual false }
+      Get() ~> getFromResource("someDir") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to directory resources with trailing slash" in {
-      Get() ~> getFromResource("someDir/") ~> check { handled shouldEqual false }
+      Get() ~> getFromResource("someDir/") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to directory resources from an archive " in {
-      Get() ~> getFromResource("com/typesafe/config") ~> check { handled shouldEqual false }
+      Get() ~> getFromResource("com/typesafe/config") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to directory resources from an archive with trailing slash" in {
-      Get() ~> getFromResource("com/typesafe/config/") ~> check { handled shouldEqual false }
+      Get() ~> getFromResource("com/typesafe/config/") ~> check {
+        handled shouldEqual false
+      }
     }
     "return the resource from an archive with spaces and umlauts" in {
       // contained within lib/jar with späces.jar
@@ -168,7 +191,12 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
     "return the resource content from an archive" in {
       Get() ~> getFromResource("com/typesafe/config/Config.class") ~> check {
         mediaType shouldEqual `application/octet-stream`
-        responseEntity.toStrict(1.second).awaitResult(1.second).data.asByteBuffer.getInt shouldEqual 0xCAFEBABE
+        responseEntity
+          .toStrict(1.second)
+          .awaitResult(1.second)
+          .data
+          .asByteBuffer
+          .getInt shouldEqual 0xCAFEBABE
       }
     }
     "return the file content with MediaType 'application/octet-stream' on unknown file extensions" in {
@@ -187,7 +215,9 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
 
   "getFromResourceDirectory" should {
     "reject requests to non-existing resources" in {
-      Get("not/found") ~> getFromResourceDirectory("subDirectory") ~> check { handled shouldEqual false }
+      Get("not/found") ~> getFromResourceDirectory("subDirectory") ~> check {
+        handled shouldEqual false
+      }
     }
     val verify = check {
       mediaType shouldEqual `application/pdf`
@@ -205,34 +235,54 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
     "return the resource content from an archive" in {
       Get("Config.class") ~> getFromResourceDirectory("com/typesafe/config") ~> check {
         mediaType shouldEqual `application/octet-stream`
-        responseEntity.toStrict(1.second).awaitResult(1.second).data.asByteBuffer.getInt shouldEqual 0xCAFEBABE
+        responseEntity
+          .toStrict(1.second)
+          .awaitResult(1.second)
+          .data
+          .asByteBuffer
+          .getInt shouldEqual 0xCAFEBABE
       }
     }
     "reject requests to directory resources" in {
-      Get() ~> getFromResourceDirectory("subDirectory") ~> check { handled shouldEqual false }
+      Get() ~> getFromResourceDirectory("subDirectory") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to directory resources with trailing slash" in {
-      Get() ~> getFromResourceDirectory("subDirectory/") ~> check { handled shouldEqual false }
+      Get() ~> getFromResourceDirectory("subDirectory/") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to sub directory resources" in {
-      Get("sub") ~> getFromResourceDirectory("someDir") ~> check { handled shouldEqual false }
+      Get("sub") ~> getFromResourceDirectory("someDir") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to sub directory resources with trailing slash" in {
-      Get("sub/") ~> getFromResourceDirectory("someDir") ~> check { handled shouldEqual false }
+      Get("sub/") ~> getFromResourceDirectory("someDir") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to directory resources from an archive" in {
-      Get() ~> getFromResourceDirectory("com/typesafe/config") ~> check { handled shouldEqual false }
+      Get() ~> getFromResourceDirectory("com/typesafe/config") ~> check {
+        handled shouldEqual false
+      }
     }
     "reject requests to directory resources from an archive with trailing slash" in {
-      Get() ~> getFromResourceDirectory("com/typesafe/config/") ~> check { handled shouldEqual false }
+      Get() ~> getFromResourceDirectory("com/typesafe/config/") ~> check {
+        handled shouldEqual false
+      }
     }
   }
 
   "listDirectoryContents" should {
     val base = new File(getClass.getClassLoader.getResource("").toURI).getPath
     new File(base, "subDirectory/emptySub").mkdir()
-    def eraseDateTime(s: String) = s.replaceAll("""\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d""", "xxxx-xx-xx xx:xx:xx")
-    implicit val settings = RoutingSettings.default.withRenderVanityFooter(false)
+    def eraseDateTime(s: String) =
+      s.replaceAll(
+          """\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d""", "xxxx-xx-xx xx:xx:xx")
+    implicit val settings =
+      RoutingSettings.default.withRenderVanityFooter(false)
 
     "properly render a simple directory" in {
       Get() ~> listDirectoryContents(base + "/someDir") ~> check {
@@ -336,7 +386,8 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
       }
     }
     "properly render a simple directory with a path prefix" in {
-      Get("/files/") ~> pathPrefix("files")(listDirectoryContents(base + "/someDir")) ~> check {
+      Get("/files/") ~> pathPrefix("files")(
+          listDirectoryContents(base + "/someDir")) ~> check {
         eraseDateTime(responseAs[String]) shouldEqual prep {
           """<html>
             |<head><title>Index of /files/</title></head>
@@ -356,7 +407,8 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
       }
     }
     "properly render a sub directory with a path prefix" in {
-      Get("/files/sub/") ~> pathPrefix("files")(listDirectoryContents(base + "/someDir")) ~> check {
+      Get("/files/sub/") ~> pathPrefix("files")(
+          listDirectoryContents(base + "/someDir")) ~> check {
         eraseDateTime(responseAs[String]) shouldEqual prep {
           """<html>
             |<head><title>Index of /files/sub/</title></head>
@@ -375,7 +427,8 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
       }
     }
     "properly render an empty top-level directory with a path prefix" in {
-      Get("/files/") ~> pathPrefix("files")(listDirectoryContents(base + "/subDirectory/emptySub")) ~> check {
+      Get("/files/") ~> pathPrefix("files")(
+          listDirectoryContents(base + "/subDirectory/emptySub")) ~> check {
         eraseDateTime(responseAs[String]) shouldEqual prep {
           """<html>
             |<head><title>Index of /files/</title></head>
@@ -393,13 +446,16 @@ class FileAndResourceDirectivesSpec extends RoutingSpec with Inspectors with Ins
       }
     }
     "reject requests to file resources" in {
-      Get() ~> listDirectoryContents(base + "subDirectory/empty.pdf") ~> check { handled shouldEqual false }
+      Get() ~> listDirectoryContents(base + "subDirectory/empty.pdf") ~> check {
+        handled shouldEqual false
+      }
     }
   }
 
   def prep(s: String) = s.stripMarginWithNewline("\n")
 
-  def evaluateTo[T](t: T, atMost: Duration = 100.millis)(implicit ec: ExecutionContext): Matcher[Future[T]] =
+  def evaluateTo[T](t: T, atMost: Duration = 100.millis)(
+      implicit ec: ExecutionContext): Matcher[Future[T]] =
     be(t).compose[Future[T]] { fut ⇒
       fut.awaitResult(atMost)
     }

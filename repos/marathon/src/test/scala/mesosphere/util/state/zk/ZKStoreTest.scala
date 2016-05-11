@@ -17,7 +17,8 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import ZKStore._
 
-class ZKStoreTest extends PersistentStoreTest with StartedZookeeper with Matchers {
+class ZKStoreTest
+    extends PersistentStoreTest with StartedZookeeper with Matchers {
 
   //
   // See PersistentStoreTests for general store tests
@@ -29,7 +30,9 @@ class ZKStoreTest extends PersistentStoreTest with StartedZookeeper with Matcher
     mesosLoaded should be('defined)
     mesosLoaded.get.bytes should be(created.bytes)
 
-    persistentStore.update(created.withNewContent("Hello again".getBytes)).futureValue
+    persistentStore
+      .update(created.withNewContent("Hello again".getBytes))
+      .futureValue
     val mesosLoadUpdated = mesosStore.load("foo").futureValue
     mesosLoadUpdated should be('defined)
     mesosLoadUpdated.get.bytes should be("Hello again".getBytes)
@@ -41,7 +44,9 @@ class ZKStoreTest extends PersistentStoreTest with StartedZookeeper with Matcher
     zkLoaded should be('defined)
     zkLoaded.get.bytes should be(created.bytes)
 
-    mesosStore.update(created.withNewContent("Hello again".getBytes)).futureValue
+    mesosStore
+      .update(created.withNewContent("Hello again".getBytes))
+      .futureValue
     val zkLoadUpdated = persistentStore.load("foo").futureValue
     zkLoadUpdated should be('defined)
     zkLoadUpdated.get.bytes should be("Hello again".getBytes)
@@ -70,9 +75,15 @@ class ZKStoreTest extends PersistentStoreTest with StartedZookeeper with Matcher
     import ZKStore._
 
     val compress = CompressionConf(true, 0)
-    val store = new ZKStore(persistentStore.client, persistentStore.client("/compressed"), compress)
+    val store = new ZKStore(persistentStore.client,
+                            persistentStore.client("/compressed"),
+                            compress)
     store.initialize().futureValue
-    val content = 1.to(100).map(num => s"Hello number $num!").mkString(", ").getBytes("UTF-8")
+    val content = 1
+      .to(100)
+      .map(num => s"Hello number $num!")
+      .mkString(", ")
+      .getBytes("UTF-8")
 
     //entity content is not changed , regardless of comression
     val entity = store.create("big", content).futureValue
@@ -80,7 +91,7 @@ class ZKStoreTest extends PersistentStoreTest with StartedZookeeper with Matcher
 
     //the proto that is created is compressed
     val proto = entity.data.toProto(compress)
-    proto.getCompressed should be (true)
+    proto.getCompressed should be(true)
     proto.getValue.size() should be < content.length
 
     //the node that is stored is compressed
@@ -95,18 +106,20 @@ class ZKStoreTest extends PersistentStoreTest with StartedZookeeper with Matcher
 
   lazy val persistentStore: ZKStore = {
     implicit val timer = com.twitter.util.Timer.Nil
-    val timeout = com.twitter.util.TimeConversions.intToTimeableNumber(10).minutes
-    val client = ZkClient(config.zkHostAndPort, timeout).withAcl(Ids.OPEN_ACL_UNSAFE.asScala)
+    val timeout =
+      com.twitter.util.TimeConversions.intToTimeableNumber(10).minutes
+    val client = ZkClient(config.zkHostAndPort, timeout)
+      .withAcl(Ids.OPEN_ACL_UNSAFE.asScala)
     new ZKStore(client, client(config.zkPath), conf)
   }
 
   lazy val mesosStore: MesosStateStore = {
     val duration = 30.seconds
     val state = new ZooKeeperState(
-      config.zkHostAndPort,
-      duration.toMillis,
-      TimeUnit.MILLISECONDS,
-      config.zkPath
+        config.zkHostAndPort,
+        duration.toMillis,
+        TimeUnit.MILLISECONDS,
+        config.zkPath
     )
     new MesosStateStore(state, duration)
   }

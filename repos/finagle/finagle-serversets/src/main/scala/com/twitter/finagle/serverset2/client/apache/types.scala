@@ -8,10 +8,10 @@ import org.apache.zookeeper.Watcher.Event.KeeperState
 
 private[serverset2] object ApacheCreateMode {
   def zkMap: Map[CreateMode, org.apache.zookeeper.CreateMode] = Map(
-    CreateMode.Ephemeral -> org.apache.zookeeper.CreateMode.EPHEMERAL,
-    CreateMode.EphemeralSequential -> org.apache.zookeeper.CreateMode.EPHEMERAL_SEQUENTIAL,
-    CreateMode.Persistent -> org.apache.zookeeper.CreateMode.PERSISTENT,
-    CreateMode.PersistentSequential -> org.apache.zookeeper.CreateMode.PERSISTENT_SEQUENTIAL
+      CreateMode.Ephemeral -> org.apache.zookeeper.CreateMode.EPHEMERAL,
+      CreateMode.EphemeralSequential -> org.apache.zookeeper.CreateMode.EPHEMERAL_SEQUENTIAL,
+      CreateMode.Persistent -> org.apache.zookeeper.CreateMode.PERSISTENT,
+      CreateMode.PersistentSequential -> org.apache.zookeeper.CreateMode.PERSISTENT_SEQUENTIAL
   )
 
   val zk: CreateMode => org.apache.zookeeper.CreateMode = zkMap
@@ -19,10 +19,10 @@ private[serverset2] object ApacheCreateMode {
 
 private[serverset2] object ApacheNodeEvent {
   def map = Map(
-    EventType.NodeChildrenChanged -> NodeEvent.ChildrenChanged,
-    EventType.NodeCreated -> NodeEvent.Created,
-    EventType.NodeDataChanged -> NodeEvent.DataChanged,
-    EventType.NodeDeleted -> NodeEvent.Deleted
+      EventType.NodeChildrenChanged -> NodeEvent.ChildrenChanged,
+      EventType.NodeCreated -> NodeEvent.Created,
+      EventType.NodeDataChanged -> NodeEvent.DataChanged,
+      EventType.NodeDeleted -> NodeEvent.Deleted
   )
 
   def apply(event: EventType): NodeEvent = map(event)
@@ -30,14 +30,14 @@ private[serverset2] object ApacheNodeEvent {
 
 private[serverset2] object ApacheSessionState {
   val map = Map(
-    KeeperState.Unknown -> SessionState.Unknown,
-    KeeperState.AuthFailed -> SessionState.AuthFailed,
-    KeeperState.Disconnected -> SessionState.Disconnected,
-    KeeperState.Expired -> SessionState.Expired,
-    KeeperState.NoSyncConnected -> SessionState.NoSyncConnected,
-    KeeperState.SyncConnected -> SessionState.SyncConnected,
-    KeeperState.SaslAuthenticated -> SessionState.SaslAuthenticated,
-    KeeperState.ConnectedReadOnly -> SessionState.ConnectedReadOnly
+      KeeperState.Unknown -> SessionState.Unknown,
+      KeeperState.AuthFailed -> SessionState.AuthFailed,
+      KeeperState.Disconnected -> SessionState.Disconnected,
+      KeeperState.Expired -> SessionState.Expired,
+      KeeperState.NoSyncConnected -> SessionState.NoSyncConnected,
+      KeeperState.SyncConnected -> SessionState.SyncConnected,
+      KeeperState.SaslAuthenticated -> SessionState.SaslAuthenticated,
+      KeeperState.ConnectedReadOnly -> SessionState.ConnectedReadOnly
   )
 
   def apply(state: KeeperState): SessionState = map(state)

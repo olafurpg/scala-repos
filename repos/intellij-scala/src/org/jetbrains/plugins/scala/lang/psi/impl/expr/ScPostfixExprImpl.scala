@@ -12,11 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import scala.collection.Seq
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
-class ScPostfixExprImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScPostfixExpr {
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
+class ScPostfixExprImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScPostfixExpr {
   override def toString: String = "PostfixExpression"
 
   def argumentExpressions: Seq[ScExpression] = Seq.empty

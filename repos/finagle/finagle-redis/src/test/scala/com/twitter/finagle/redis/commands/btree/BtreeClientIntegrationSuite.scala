@@ -13,7 +13,8 @@ import scala.collection.mutable
 
 @Ignore
 @RunWith(classOf[JUnitRunner])
-final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll {
+final class BtreeClientIntegrationSuite
+    extends FunSuite with BeforeAndAfterAll {
   var client: Client = _
   var dict: mutable.HashMap[String, mutable.HashMap[String, String]] = _
 
@@ -52,35 +53,43 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
     testBrange(client, dict)
   }
 
-  test("Correctly return BRANGE from a start key that exists to the end for outerkey") {
+  test(
+      "Correctly return BRANGE from a start key that exists to the end for outerkey") {
     testBrangeInclusiveStart(client, dict)
   }
 
-  test("Correctly return BRANGE from start to end key that exists for outerkey") {
+  test(
+      "Correctly return BRANGE from start to end key that exists for outerkey") {
     testBrangeInclusiveEnd(client, dict)
   }
 
-  test("Correctly return BRANGE from start key to end key where both exist for outerkey") {
+  test(
+      "Correctly return BRANGE from start key to end key where both exist for outerkey") {
     testBrangeInclusiveStartEnd(client, dict)
   }
 
-  test("Correctly return BRANGE from start key that doesn't exist to end for outerkey") {
+  test(
+      "Correctly return BRANGE from start key that doesn't exist to end for outerkey") {
     testBrangeExclusiveStart(client, dict)
   }
 
-  test("Correctly return BRANGE from start to end key that doesn't exist for outerkey") {
+  test(
+      "Correctly return BRANGE from start to end key that doesn't exist for outerkey") {
     testBrangeExclusiveEnd(client, dict)
   }
 
-  test("Correctly return BRANGE from start key to end key where both don't exist for outerkey") {
+  test(
+      "Correctly return BRANGE from start key to end key where both don't exist for outerkey") {
     testBrangeExclusiveStartEnd(client, dict)
   }
 
-  test("Correctly return removal of innerkey value pairs for outerkey using BREM command") {
+  test(
+      "Correctly return removal of innerkey value pairs for outerkey using BREM command") {
     testBrem(client, dict)
   }
 
-  test("Correctly return cardinality function for outerkey using BCARD command") {
+  test(
+      "Correctly return cardinality function for outerkey using BCARD command") {
     testBcard(client, dict)
   }
 
@@ -98,7 +107,8 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
     }
   }
 
-  def generateTestCases(): mutable.HashMap[String, mutable.HashMap[String, String]] = {
+  def generateTestCases(
+      ): mutable.HashMap[String, mutable.HashMap[String, String]] = {
     val numSets = 100
     val setSize = 100
 
@@ -107,7 +117,8 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
 
     for (i <- 0 until numSets) {
       val outerKey = UUID.randomUUID().toString
-      val temp: mutable.HashMap[String, String] = new mutable.HashMap[String, String]
+      val temp: mutable.HashMap[String, String] =
+        new mutable.HashMap[String, String]
       for (j <- 0 until setSize) {
         val innerKey = UUID.randomUUID().toString
         val value = UUID.randomUUID().toString
@@ -119,47 +130,61 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
     dict
   }
 
-  def testBadd(client: Client, dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
+  def testBadd(
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
     for ((outerKey, inner) <- dict) {
       for ((innerKey, value) <- inner) {
-        val target = client.bAdd(StringToChannelBuffer(outerKey), StringToChannelBuffer(innerKey),
-          StringToChannelBuffer(value))
-        assert(Await.result(target) == 1, "BADD failed for " + outerKey + " " + innerKey)
+        val target = client.bAdd(StringToChannelBuffer(outerKey),
+                                 StringToChannelBuffer(innerKey),
+                                 StringToChannelBuffer(value))
+        assert(Await.result(target) == 1,
+               "BADD failed for " + outerKey + " " + innerKey)
       }
     }
 
     println("Test BADD succeeded")
   }
 
-  def testBcard(client: Client, dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
+  def testBcard(
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
     for ((outerKey, inner) <- dict) {
       val target = client.bCard(StringToChannelBuffer(outerKey))
       assert(inner.size == Await.result(target),
-        "BCARD failed for " + outerKey + " expected " + inner.size + " got " + Await.result(target))
-      }
-
-      println("Test BCARD succeeded")
+             "BCARD failed for " + outerKey + " expected " + inner.size +
+             " got " + Await.result(target))
     }
 
-  def testBget(client: Client, dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
+    println("Test BCARD succeeded")
+  }
+
+  def testBget(
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
     for ((outerKey, inner) <- dict) {
       for ((innerKey, value) <- inner) {
-        val target = client.bGet(StringToChannelBuffer(outerKey), StringToChannelBuffer(innerKey))
+        val target = client.bGet(
+            StringToChannelBuffer(outerKey), StringToChannelBuffer(innerKey))
         val targetVal = CBToString(Await.result(target).get)
         assert(value == targetVal,
-          "BGET failed for " + outerKey + " expected " + value + " got " + targetVal)
+               "BGET failed for " + outerKey + " expected " + value + " got " +
+               targetVal)
       }
     }
 
     println("Test BGET succeeded")
   }
 
-  def testBrem(client: Client, dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
+  def testBrem(
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
     for ((outerKey, inner) <- dict) {
       for ((innerKey, value) <- inner) {
         val target = client.bRem(StringToChannelBuffer(outerKey),
-          Seq(StringToChannelBuffer(innerKey)))
-        assert(Await.result(target) == 1, "BREM failed for " + outerKey + " " + innerKey)
+                                 Seq(StringToChannelBuffer(innerKey)))
+        assert(Await.result(target) == 1,
+               "BREM failed for " + outerKey + " " + innerKey)
         inner.remove(innerKey)
       }
     }
@@ -167,10 +192,13 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
     println("Test BREM succeeded")
   }
 
-  def testBrange(client: Client, dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
+  def testBrange(
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]) {
     for ((outerKey, inner) <- dict) {
       val innerKeys = inner.toList.sortBy(_._1)
-      val target = Await.result(client.bRange(StringToChannelBuffer(outerKey), None, None))
+      val target = Await.result(
+          client.bRange(StringToChannelBuffer(outerKey), None, None))
       validate(outerKey, innerKeys, target)
     }
 
@@ -178,16 +206,18 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
   }
 
   def testBrangeInclusiveStart(
-    client: Client,
-    dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
   ) {
     val rand = new scala.util.Random()
     for ((outerKey, inner) <- dict) {
       var innerKeys = inner.toList.sortBy(_._1)
       val start = rand.nextInt(innerKeys.size)
       innerKeys = innerKeys.drop(start)
-      val target = Await.result(client.bRange(StringToChannelBuffer(outerKey),
-        Option(StringToChannelBuffer(innerKeys.head._1)), None))
+      val target = Await.result(
+          client.bRange(StringToChannelBuffer(outerKey),
+                        Option(StringToChannelBuffer(innerKeys.head._1)),
+                        None))
       validate(outerKey, innerKeys, target)
     }
 
@@ -195,16 +225,18 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
   }
 
   def testBrangeInclusiveEnd(
-    client: Client,
-    dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
   ) {
     val rand = new scala.util.Random()
     for ((outerKey, inner) <- dict) {
       var innerKeys = inner.toList.sortBy(_._1)
       val end = rand.nextInt(innerKeys.size)
       innerKeys = innerKeys.dropRight(end)
-      val target = Await.result(client.bRange(StringToChannelBuffer(outerKey), None,
-        Option(StringToChannelBuffer(innerKeys.last._1))))
+      val target = Await.result(
+          client.bRange(StringToChannelBuffer(outerKey),
+                        None,
+                        Option(StringToChannelBuffer(innerKeys.last._1))))
       validate(outerKey, innerKeys, target)
     }
 
@@ -212,8 +244,8 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
   }
 
   def testBrangeInclusiveStartEnd(
-    client: Client,
-    dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
   ) {
     val rand = new scala.util.Random()
     for ((outerKey, inner) <- dict) {
@@ -221,15 +253,14 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
       val start = rand.nextInt(innerKeys.size)
       val end = rand.nextInt(innerKeys.size)
       val target = client.bRange(
-        StringToChannelBuffer(outerKey),
-        Option(StringToChannelBuffer(innerKeys(start)._1)),
-        Option(StringToChannelBuffer(innerKeys(end)._1)))
+          StringToChannelBuffer(outerKey),
+          Option(StringToChannelBuffer(innerKeys(start)._1)),
+          Option(StringToChannelBuffer(innerKeys(end)._1)))
 
       if (start > end) {
         assert(Await.ready(target).poll.get.isThrow,
-          "BRANGE failed for " + outerKey + " return should be a throw")
-      }
-      else {
+               "BRANGE failed for " + outerKey + " return should be a throw")
+      } else {
         innerKeys = innerKeys.slice(start, end + 1)
         validate(outerKey, innerKeys, Await.result(target))
       }
@@ -239,15 +270,17 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
   }
 
   def testBrangeExclusiveStart(
-    client: Client,
-    dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
   ) {
     for ((outerKey, inner) <- dict) {
       var innerKeys = inner.toList.sortBy(_._1)
       val start = UUID.randomUUID().toString
       innerKeys = innerKeys.filter(p => (start <= p._1))
-      val target = Await.result(client.bRange(StringToChannelBuffer(outerKey),
-        Option(StringToChannelBuffer(start)), None))
+      val target = Await.result(
+          client.bRange(StringToChannelBuffer(outerKey),
+                        Option(StringToChannelBuffer(start)),
+                        None))
       validate(outerKey, innerKeys, target)
     }
 
@@ -255,15 +288,17 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
   }
 
   def testBrangeExclusiveEnd(
-    client: Client,
-    dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
   ) {
     for ((outerKey, inner) <- dict) {
       var innerKeys = inner.toList.sortBy(_._1)
       val end = UUID.randomUUID().toString
       innerKeys = innerKeys.filter(p => (p._1 <= end))
-      val target = Await.result(client.bRange(StringToChannelBuffer(outerKey), None,
-        Option(StringToChannelBuffer(end))))
+      val target = Await.result(
+          client.bRange(StringToChannelBuffer(outerKey),
+                        None,
+                        Option(StringToChannelBuffer(end))))
       validate(outerKey, innerKeys, target)
     }
 
@@ -271,24 +306,22 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
   }
 
   def testBrangeExclusiveStartEnd(
-    client: Client,
-    dict: mutable.HashMap[String, mutable.HashMap[String, String]]
+      client: Client,
+      dict: mutable.HashMap[String, mutable.HashMap[String, String]]
   ) {
     for ((outerKey, inner) <- dict) {
       var innerKeys = inner.toList.sortBy(_._1)
       val start = UUID.randomUUID().toString
       val end = UUID.randomUUID().toString
       innerKeys = innerKeys.filter(p => (start <= p._1 && p._1 <= end))
-      val target = client.bRange(
-        StringToChannelBuffer(outerKey),
-        Option(StringToChannelBuffer(start)),
-        Option(StringToChannelBuffer(end)))
+      val target = client.bRange(StringToChannelBuffer(outerKey),
+                                 Option(StringToChannelBuffer(start)),
+                                 Option(StringToChannelBuffer(end)))
 
       if (start > end) {
         assert(Await.ready(target).poll.get.isThrow,
-          "BRANGE failed for " + outerKey + " return should be a throw")
-      }
-      else {
+               "BRANGE failed for " + outerKey + " return should be a throw")
+      } else {
         validate(outerKey, innerKeys, Await.result(target))
       }
     }
@@ -297,12 +330,13 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
   }
 
   def validate(
-    outerKey: String,
-    exp: List[(String, String)],
-    got: Seq[(ChannelBuffer, ChannelBuffer)]
+      outerKey: String,
+      exp: List[(String, String)],
+      got: Seq[(ChannelBuffer, ChannelBuffer)]
   ) {
     assert(got.size == exp.size,
-      "BRANGE failed for " + outerKey + " expected size " + exp.size + " got size " + got.size)
+           "BRANGE failed for " + outerKey + " expected size " + exp.size +
+           " got size " + got.size)
 
     for (i <- 0 until exp.size) {
       val expKey = exp(i)._1
@@ -310,9 +344,11 @@ final class BtreeClientIntegrationSuite extends FunSuite with BeforeAndAfterAll 
       val expVal = exp(i)._2
       val gotVal = CBToString(got(i)._2)
       assert(exp(i)._1 == CBToString(got(i)._1),
-        "Key mismatch for outerKey " + outerKey + " expected " + expKey + "got " + gotKey)
+             "Key mismatch for outerKey " + outerKey + " expected " + expKey +
+             "got " + gotKey)
       assert(exp(i)._2 == CBToString(got(i)._2),
-        "Value mismatch for outerKey " + outerKey + " expected " + expVal + "got " + gotVal)
+             "Value mismatch for outerKey " + outerKey + " expected " +
+             expVal + "got " + gotVal)
     }
   }
 }

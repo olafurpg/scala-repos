@@ -20,7 +20,9 @@ package org.apache.spark.rdd
 import org.apache.spark.{SharedSparkContext, SparkFunSuite}
 
 object ZippedPartitionsSuite {
-  def procZippedData(i: Iterator[Int], s: Iterator[String], d: Iterator[Double]) : Iterator[Int] = {
+  def procZippedData(i: Iterator[Int],
+                     s: Iterator[String],
+                     d: Iterator[Double]): Iterator[Int] = {
     Iterator(i.toArray.size, s.toArray.size, d.toArray.size)
   }
 }
@@ -31,7 +33,8 @@ class ZippedPartitionsSuite extends SparkFunSuite with SharedSparkContext {
     val data2 = sc.makeRDD(Array("1", "2", "3", "4", "5", "6"), 2)
     val data3 = sc.makeRDD(Array(1.0, 2.0), 2)
 
-    val zippedRDD = data1.zipPartitions(data2, data3)(ZippedPartitionsSuite.procZippedData)
+    val zippedRDD =
+      data1.zipPartitions(data2, data3)(ZippedPartitionsSuite.procZippedData)
 
     val obtainedSizes = zippedRDD.collect()
     val expectedSizes = Array(2, 3, 1, 2, 3, 1)

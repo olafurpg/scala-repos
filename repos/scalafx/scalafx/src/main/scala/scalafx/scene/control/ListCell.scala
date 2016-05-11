@@ -34,23 +34,24 @@ import scalafx.beans.property.ReadOnlyObjectProperty
 import scalafx.delegate.SFXDelegate
 
 object ListCell {
-  implicit def sfxListCell2jfx[T](l: ListCell[T]): jfxsc.ListCell[T] = if (l != null) l.delegate else null
+  implicit def sfxListCell2jfx[T](l: ListCell[T]): jfxsc.ListCell[T] =
+    if (l != null) l.delegate else null
 }
 
-class ListCell[T](override val delegate: jfxsc.ListCell[T] = new jfxsc.ListCell[T])
-  extends IndexedCell(delegate)
-  with SFXDelegate[jfxsc.ListCell[T]] {
+class ListCell[T](
+    override val delegate: jfxsc.ListCell[T] = new jfxsc.ListCell[T])
+    extends IndexedCell(delegate) with SFXDelegate[jfxsc.ListCell[T]] {
 
   /**
-   * The ListView associated with this Cell.
-   */
-  def listView: ReadOnlyObjectProperty[jfxsc.ListView[T]] = delegate.listViewProperty
+    * The ListView associated with this Cell.
+    */
+  def listView: ReadOnlyObjectProperty[jfxsc.ListView[T]] =
+    delegate.listViewProperty
 
   /**
-   * Updates the ListView associated with this Cell.
-   */
+    * Updates the ListView associated with this Cell.
+    */
   def updateListView(listView: ListView[T]) {
     delegate.updateListView(listView)
   }
-
 }

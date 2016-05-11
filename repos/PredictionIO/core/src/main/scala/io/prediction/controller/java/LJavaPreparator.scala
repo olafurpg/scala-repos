@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller.java
 
 import io.prediction.controller.LPreparator
@@ -26,4 +25,4 @@ import scala.reflect.ClassTag
   * @group Preparator
   */
 abstract class LJavaPreparator[TD, PD]
-  extends LPreparator[TD, PD]()(ClassTag.AnyRef.asInstanceOf[ClassTag[PD]])
+    extends LPreparator[TD, PD]()(ClassTag.AnyRef.asInstanceOf[ClassTag[PD]])

@@ -6,6 +6,7 @@ object Second {
   def foo(x: Int, y: Int) = 45
   def foo(x: Int, y: String, z: Int = 34) = 45
 
-  /*start*/foo("")/*end*/
+  /*start*/
+  foo("") /*end*/
 }
 //Int

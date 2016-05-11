@@ -1,6 +1,7 @@
 object A {
   class B {
-    /*start*/this/*end*/
+    /*start*/
+    this /*end*/
   }
 }
 //A.B

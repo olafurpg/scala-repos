@@ -39,7 +39,8 @@ class EnsembleHtmlEditor extends EnsembleExample {
 
   def getContent = {
     // Initial Text in the html editor
-    val initialText = """<html><body>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    val initialText =
+      """<html><body>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             Nam tortor felis, pulvinar in scelerisque cursus, pulvinar at ante. Nulla consequat
             congue lectus in sodales. Nullam eu est a felis ornare bibendum et nec tellus.
             Vivamus non metus tempus augue auctor ornare. Duis pulvinar justo ac purus adipiscing
@@ -61,17 +62,18 @@ class EnsembleHtmlEditor extends EnsembleExample {
       spacing = 5
       padding = Insets(5)
       children = List(
-        htmlEditor,
-        new Button {
-          text = "Display Html below"
-          onAction = (ae: ActionEvent) => htmlLabel.text = htmlEditor.htmlText
-        },
-        new ScrollPane {
-          prefHeight = 200
-          hgrow = Priority.Always
-          vgrow = Priority.Always
-          children = htmlLabel
-        }
+          htmlEditor,
+          new Button {
+            text = "Display Html below"
+            onAction = (ae: ActionEvent) =>
+              htmlLabel.text = htmlEditor.htmlText
+          },
+          new ScrollPane {
+            prefHeight = 200
+            hgrow = Priority.Always
+            vgrow = Priority.Always
+            children = htmlLabel
+          }
       )
     }
   }

@@ -10,11 +10,10 @@ import scala.tools.nsc._
 import scala.collection.mutable
 
 /** Additions to Global meaningful for the JavaScript backend
- *
- *  @author Sébastien Doeraene
- */
-trait JSGlobalAddons extends JSDefinitions
-                        with Compat210Component {
+  *
+  *  @author Sébastien Doeraene
+  */
+trait JSGlobalAddons extends JSDefinitions with Compat210Component {
   val global: Global
 
   import global._
@@ -22,20 +21,21 @@ trait JSGlobalAddons extends JSDefinitions
   import definitions._
 
   /** JavaScript primitives, used in jscode */
-  object jsPrimitives extends JSPrimitives { // scalastyle:ignore
+  object jsPrimitives extends JSPrimitives {
+    // scalastyle:ignore
     val global: JSGlobalAddons.this.global.type = JSGlobalAddons.this.global
     val jsAddons: ThisJSGlobalAddons =
       JSGlobalAddons.this.asInstanceOf[ThisJSGlobalAddons]
   }
 
   /** global javascript interop related helpers */
-  object jsInterop { // scalastyle:ignore
+  object jsInterop {
+    // scalastyle:ignore
     import scala.reflect.NameTransformer
     import scala.reflect.internal.Flags
 
     /** Symbols of constructors and modules that are to be exported */
-    private val exportedSymbols =
-      mutable.Map.empty[Symbol, List[ExportInfo]]
+    private val exportedSymbols = mutable.Map.empty[Symbol, List[ExportInfo]]
 
     private val exportPrefix = "$js$exported$"
     private val methodExportPrefix = exportPrefix + "meth$"
@@ -49,7 +49,7 @@ trait JSGlobalAddons extends JSDefinitions
 
     private def assertValidForRegistration(sym: Symbol): Unit = {
       assert(sym.isConstructor || sym.isClass,
-          "Can only register constructors or classes for export")
+             "Can only register constructors or classes for export")
     }
 
     def clearRegisteredExports(): Unit =
@@ -79,10 +79,10 @@ trait JSGlobalAddons extends JSDefinitions
       !sym.hasFlag(Flags.DEFAULTPARAM)
 
     /** retrieves the originally assigned jsName of this export and whether it
-     *  is a property
-     */
+      *  is a property
+      */
     def jsExportInfo(name: Name): (String, Boolean) = {
-      def dropPrefix(prefix: String) ={
+      def dropPrefix(prefix: String) = {
         if (name.startsWith(prefix)) {
           // We can't decode right away due to $ separators
           val enc = name.encoded.substring(prefix.length)
@@ -90,9 +90,9 @@ trait JSGlobalAddons extends JSDefinitions
         } else None
       }
 
-      dropPrefix(methodExportPrefix).map((_,false)) orElse
-      dropPrefix(propExportPrefix).map((_,true)) getOrElse
-      sys.error("non-exported name passed to jsInfoSpec")
+      dropPrefix(methodExportPrefix).map((_, false)) orElse dropPrefix(
+          propExportPrefix).map((_, true)) getOrElse sys.error(
+          "non-exported name passed to jsInfoSpec")
     }
 
     def isJSProperty(sym: Symbol): Boolean = isJSGetter(sym) || isJSSetter(sym)
@@ -126,10 +126,10 @@ trait JSGlobalAddons extends JSDefinitions
       sym.hasAnnotation(JSBracketCallAnnotation)
 
     /** Gets the unqualified JS name of a symbol.
-     *
-     *  If it is not explicitly specified with an `@JSName` annotation, the
-     *  JS name is inferred from the Scala name.
-     */
+      *
+      *  If it is not explicitly specified with an `@JSName` annotation, the
+      *  JS name is inferred from the Scala name.
+      */
     def jsNameOf(sym: Symbol): String = {
       sym.getAnnotation(JSNameAnnotation).flatMap(_.stringArg(0)) getOrElse {
         val base = sym.unexpandedName.decoded.stripSuffix("_=")
@@ -139,17 +139,15 @@ trait JSGlobalAddons extends JSDefinitions
     }
 
     /** Gets the fully qualified JS name of a static class of module Symbol.
-     *
-     *  This is the JS name of the symbol qualified by the fully qualified JS
-     *  name of its original owner if the latter is a native JS object.
-     */
+      *
+      *  This is the JS name of the symbol qualified by the fully qualified JS
+      *  name of its original owner if the latter is a native JS object.
+      */
     def fullJSNameOf(sym: Symbol): String = {
       assert(sym.isClass, s"fullJSNameOf called for non-class symbol $sym")
       sym.getAnnotation(JSFullNameAnnotation).flatMap(_.stringArg(0)) getOrElse {
         jsNameOf(sym)
       }
     }
-
   }
-
 }

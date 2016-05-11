@@ -28,17 +28,16 @@ import org.apache.spark.ui.{ToolTips, UIUtils}
 import org.apache.spark.util.Utils
 
 /** Page showing list of all ongoing and recently finished stages */
-private[ui] class StageTableBase(
-    stages: Seq[StageInfo],
-    basePath: String,
-    listener: JobProgressListener,
-    isFairScheduler: Boolean,
-    killEnabled: Boolean) {
+private[ui] class StageTableBase(stages: Seq[StageInfo],
+                                 basePath: String,
+                                 listener: JobProgressListener,
+                                 isFairScheduler: Boolean,
+                                 killEnabled: Boolean) {
 
   protected def columns: Seq[Node] = {
-    <th>Stage Id</th> ++
-    {if (isFairScheduler) {<th>Pool Name</th>} else Seq.empty} ++
-    <th>Description</th>
+    <th>Stage Id</th> ++ {
+      if (isFairScheduler) { <th>Pool Name</th> } else Seq.empty
+    } ++ <th>Description</th>
     <th>Submitted</th>
     <th>Duration</th>
     <th>Tasks: Succeeded/Total</th>
@@ -62,7 +61,8 @@ private[ui] class StageTableBase(
   }
 
   /** Special table that merges two header cells. */
-  protected def stageTable[T](makeRow: T => Seq[Node], rows: Seq[T]): Seq[Node] = {
+  protected def stageTable[T](
+      makeRow: T => Seq[Node], rows: Seq[T]): Seq[Node] = {
     <table class="table table-bordered table-striped table-condensed sortable">
       <thead>{columns}</thead>
       <tbody>
@@ -74,33 +74,36 @@ private[ui] class StageTableBase(
   private def makeDescription(s: StageInfo): Seq[Node] = {
     val basePathUri = UIUtils.prependBaseUri(basePath)
 
-    val killLink = if (killEnabled) {
-      val confirm =
-        s"if (window.confirm('Are you sure you want to kill stage ${s.stageId} ?')) " +
-        "{ this.parentNode.submit(); return true; } else { return false; }"
-      // SPARK-6846 this should be POST-only but YARN AM won't proxy POST
-      /*
+    val killLink =
+      if (killEnabled) {
+        val confirm =
+          s"if (window.confirm('Are you sure you want to kill stage ${s.stageId} ?')) " +
+          "{ this.parentNode.submit(); return true; } else { return false; }"
+        // SPARK-6846 this should be POST-only but YARN AM won't proxy POST
+        /*
       val killLinkUri = s"$basePathUri/stages/stage/kill/"
       <form action={killLinkUri} method="POST" style="display:inline">
         <input type="hidden" name="id" value={s.stageId.toString}/>
         <input type="hidden" name="terminate" value="true"/>
         <a href="#" onclick={confirm} class="kill-link">(kill)</a>
       </form>
-       */
-      val killLinkUri = s"$basePathUri/stages/stage/kill/?id=${s.stageId}&terminate=true"
-      <a href={killLinkUri} onclick={confirm} class="kill-link">(kill)</a>
-    }
+         */
+        val killLinkUri =
+          s"$basePathUri/stages/stage/kill/?id=${s.stageId}&terminate=true"
+        <a href={killLinkUri} onclick={confirm} class="kill-link">(kill)</a>
+      }
 
-    val nameLinkUri = s"$basePathUri/stages/stage?id=${s.stageId}&attempt=${s.attemptId}"
+    val nameLinkUri =
+      s"$basePathUri/stages/stage?id=${s.stageId}&attempt=${s.attemptId}"
     val nameLink = <a href={nameLinkUri} class="name-link">{s.name}</a>
 
     val cachedRddInfos = s.rddInfos.filter(_.numCachedPartitions > 0)
-    val details = if (s.details.nonEmpty) {
-      <span onclick="this.parentNode.querySelector('.stage-details').classList.toggle('collapsed')"
+    val details =
+      if (s.details.nonEmpty) {
+        <span onclick="this.parentNode.querySelector('.stage-details').classList.toggle('collapsed')"
             class="expand-details">
         +details
-      </span> ++
-      <div class="stage-details collapsed">
+      </span> ++ <div class="stage-details collapsed">
         {if (cachedRddInfos.nonEmpty) {
           Text("RDD: ") ++
           cachedRddInfos.map { i =>
@@ -109,7 +112,7 @@ private[ui] class StageTableBase(
         }}
         <pre>{s.details}</pre>
       </div>
-    }
+      }
 
     val stageDesc = for {
       stageData <- listener.stageIdToData.get((s.stageId, s.attemptId))
@@ -121,9 +124,9 @@ private[ui] class StageTableBase(
   }
 
   protected def missingStageRow(stageId: Int): Seq[Node] = {
-    <td>{stageId}</td> ++
-    {if (isFairScheduler) {<td>-</td>} else Seq.empty} ++
-    <td>No data available for this stage</td> ++ // Description
+    <td>{stageId}</td> ++ {
+      if (isFairScheduler) { <td>-</td> } else Seq.empty
+    } ++ <td>No data available for this stage</td> ++ // Description
     <td></td> ++ // Submitted
     <td></td> ++ // Duration
     <td></td> ++ // Tasks: Succeeded/Total
@@ -161,33 +164,40 @@ private[ui] class StageTableBase(
       } else {
         None
       }
-    val formattedDuration = duration.map(d => UIUtils.formatDuration(d)).getOrElse("Unknown")
+    val formattedDuration =
+      duration.map(d => UIUtils.formatDuration(d)).getOrElse("Unknown")
 
     val inputRead = stageData.inputBytes
-    val inputReadWithUnit = if (inputRead > 0) Utils.bytesToString(inputRead) else ""
+    val inputReadWithUnit =
+      if (inputRead > 0) Utils.bytesToString(inputRead) else ""
     val outputWrite = stageData.outputBytes
-    val outputWriteWithUnit = if (outputWrite > 0) Utils.bytesToString(outputWrite) else ""
+    val outputWriteWithUnit =
+      if (outputWrite > 0) Utils.bytesToString(outputWrite) else ""
     val shuffleRead = stageData.shuffleReadTotalBytes
-    val shuffleReadWithUnit = if (shuffleRead > 0) Utils.bytesToString(shuffleRead) else ""
+    val shuffleReadWithUnit =
+      if (shuffleRead > 0) Utils.bytesToString(shuffleRead) else ""
     val shuffleWrite = stageData.shuffleWriteBytes
-    val shuffleWriteWithUnit = if (shuffleWrite > 0) Utils.bytesToString(shuffleWrite) else ""
+    val shuffleWriteWithUnit =
+      if (shuffleWrite > 0) Utils.bytesToString(shuffleWrite) else ""
 
-    {if (s.attemptId > 0) {
-      <td>{s.stageId} (retry {s.attemptId})</td>
-    } else {
-      <td>{s.stageId}</td>
-    }} ++
-    {if (isFairScheduler) {
-      <td>
+    {
+      if (s.attemptId > 0) {
+        <td>{s.stageId} (retry {s.attemptId})</td>
+      } else {
+        <td>{s.stageId}</td>
+      }
+    } ++ {
+      if (isFairScheduler) {
+        <td>
         <a href={"%s/stages/pool?poolname=%s"
           .format(UIUtils.prependBaseUri(basePath), stageData.schedulingPool)}>
           {stageData.schedulingPool}
         </a>
       </td>
-    } else {
-      Seq.empty
-    }} ++
-    <td>{makeDescription(s)}</td>
+      } else {
+        Seq.empty
+      }
+    } ++ <td>{makeDescription(s)}</td>
     <td sorttable_customkey={s.submissionTime.getOrElse(0).toString} valign="middle">
       {submissionTime}
     </td>
@@ -208,14 +218,15 @@ private[ui] class StageTableBase(
     <tr id={"stage-" + s.stageId + "-" + s.attemptId}>{stageRow(s)}</tr>
 }
 
-private[ui] class FailedStageTable(
-    stages: Seq[StageInfo],
-    basePath: String,
-    listener: JobProgressListener,
-    isFairScheduler: Boolean)
-  extends StageTableBase(stages, basePath, listener, isFairScheduler, killEnabled = false) {
+private[ui] class FailedStageTable(stages: Seq[StageInfo],
+                                   basePath: String,
+                                   listener: JobProgressListener,
+                                   isFairScheduler: Boolean)
+    extends StageTableBase(
+        stages, basePath, listener, isFairScheduler, killEnabled = false) {
 
-  override protected def columns: Seq[Node] = super.columns ++ <th>Failure Reason</th>
+  override protected def columns: Seq[Node] =
+    super.columns ++ <th>Failure Reason</th>
 
   override protected def stageRow(s: StageInfo): Seq[Node] = {
     val basicColumns = super.stageRow(s)
@@ -223,25 +234,26 @@ private[ui] class FailedStageTable(
     val isMultiline = failureReason.indexOf('\n') >= 0
     // Display the first line by default
     val failureReasonSummary = StringEscapeUtils.escapeHtml4(
+        if (isMultiline) {
+      failureReason.substring(0, failureReason.indexOf('\n'))
+    } else {
+      failureReason
+    })
+    val details =
       if (isMultiline) {
-        failureReason.substring(0, failureReason.indexOf('\n'))
-      } else {
-        failureReason
-      })
-    val details = if (isMultiline) {
-      // scalastyle:off
-      <span onclick="this.parentNode.querySelector('.stacktrace-details').classList.toggle('collapsed')"
+        // scalastyle:off
+        <span onclick="this.parentNode.querySelector('.stacktrace-details').classList.toggle('collapsed')"
             class="expand-details">
         +details
-      </span> ++
-        <div class="stacktrace-details collapsed">
+      </span> ++ <div class="stacktrace-details collapsed">
           <pre>{failureReason}</pre>
         </div>
-      // scalastyle:on
-    } else {
-      ""
-    }
-    val failureReasonHtml = <td valign="middle">{failureReasonSummary}{details}</td>
+        // scalastyle:on
+      } else {
+        ""
+      }
+    val failureReasonHtml =
+      <td valign="middle">{failureReasonSummary}{details}</td>
     basicColumns ++ failureReasonHtml
   }
 }

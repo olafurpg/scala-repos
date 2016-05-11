@@ -15,5 +15,4 @@ class LocalBenchmark extends StdBenchAnnotations {
         case None => "bye"
       }
     }
-
 }

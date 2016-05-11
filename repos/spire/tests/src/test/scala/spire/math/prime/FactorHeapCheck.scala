@@ -14,7 +14,8 @@ import Arbitrary.arbitrary
 
 import spire.implicits._
 
-class FactorHeapCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class FactorHeapCheck
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import SieveUtil._
 

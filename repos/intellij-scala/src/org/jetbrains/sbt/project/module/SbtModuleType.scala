@@ -5,8 +5,8 @@ import com.intellij.ide.util.projectWizard.EmptyModuleBuilder
 import com.intellij.openapi.module.ModuleType
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class SbtModuleType extends ModuleType[EmptyModuleBuilder]("SBT_MODULE") {
   def createModuleBuilder() = new EmptyModuleBuilder()
 
@@ -20,5 +20,8 @@ class SbtModuleType extends ModuleType[EmptyModuleBuilder]("SBT_MODULE") {
 }
 
 object SbtModuleType {
-  val instance = Class.forName("org.jetbrains.sbt.project.module.SbtModuleType").newInstance.asInstanceOf[SbtModuleType]
+  val instance = Class
+    .forName("org.jetbrains.sbt.project.module.SbtModuleType")
+    .newInstance
+    .asInstanceOf[SbtModuleType]
 }

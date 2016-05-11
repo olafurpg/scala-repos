@@ -5,6 +5,6 @@ object SCL5987 {
   class GenericType2[T] protected ()
 
   object GenericTypeUser {
-    val genericType = new /* line: 3, name: this */GenericType[List[Int]](){}
+    val genericType = new /* line: 3, name: this */ GenericType[List[Int]]() {}
   }
 }

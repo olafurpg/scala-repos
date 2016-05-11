@@ -40,7 +40,6 @@ class BsonRecordSpec extends Specification with MongoTestKit {
       subRec2.name("subrecord2")
 
       (subRec == subRec2) must_== false
-
     }
 
     "compare properly with default values" in {

@@ -15,22 +15,21 @@
  */
 
 package com.twitter.summingbird.scalding.service
-import com.twitter.algebird.monad.{ Reader, StateWithError }
+import com.twitter.algebird.monad.{Reader, StateWithError}
 import com.twitter.algebird.Interval
 
 import com.twitter.bijection.Conversion.asMethod
 import com.twitter.summingbird.scalding._
 import com.twitter.summingbird.batch.Timestamp
-import com.twitter.scalding.{ Source => SSource, _ }
+import com.twitter.scalding.{Source => SSource, _}
 import cascading.flow.FlowDef
 
 /**
- * A UniqueKeyedService covers the case where Keys are globally
- * unique and either are not present or have one value.
- * Examples could be Keys which are Unique IDs, such as UserIDs,
- * content IDs, cryptographic hashes, etc...
- */
-
+  * A UniqueKeyedService covers the case where Keys are globally
+  * unique and either are not present or have one value.
+  * Examples could be Keys which are Unique IDs, such as UserIDs,
+  * content IDs, cryptographic hashes, etc...
+  */
 trait SimpleService[K, V] extends ExternalService[K, V] {
 
   import Scalding.dateRangeInjection
@@ -38,18 +37,23 @@ trait SimpleService[K, V] extends ExternalService[K, V] {
   /** Return the maximum subset of the requested range that can be handled */
   def satisfiable(requested: DateRange, mode: Mode): Try[DateRange]
 
-  def serve[W](covering: DateRange,
-    input: TypedPipe[(Timestamp, (K, W))])(implicit flowDef: FlowDef, mode: Mode): TypedPipe[(Timestamp, (K, (W, Option[V])))]
+  def serve[W](covering: DateRange, input: TypedPipe[(Timestamp, (K, W))])(
+      implicit flowDef: FlowDef,
+      mode: Mode): TypedPipe[(Timestamp, (K, (W, Option[V])))]
 
-  final def lookup[W](getKeys: PipeFactory[(K, W)]): PipeFactory[(K, (W, Option[V]))] =
+  final def lookup[W](
+      getKeys: PipeFactory[(K, W)]): PipeFactory[(K, (W, Option[V]))] =
     StateWithError({ intMode: FactoryInput =>
       val (timeSpan, mode) = intMode
-      Scalding.toDateRange(timeSpan).right
-        .flatMap(satisfiable(_, mode)).right
-        .flatMap { dr =>
-          val ts = dr.as[Interval[Timestamp]]
-          getKeys((ts, mode)).right
-            .map {
+      Scalding
+        .toDateRange(timeSpan)
+        .right
+        .flatMap(satisfiable(_, mode))
+        .right
+        .flatMap {
+          dr =>
+            val ts = dr.as[Interval[Timestamp]]
+            getKeys((ts, mode)).right.map {
               case ((avail, m), getFlow) =>
                 val rdr = Reader({ implicit fdM: (FlowDef, Mode) =>
                   // This get can't fail because it came from a DateRange initially

@@ -1,19 +1,22 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.tck
 
 import akka.Done
 import akka.stream.impl.SinkholeSubscriber
-import org.reactivestreams.tck.{ TestEnvironment, SubscriberWhiteboxVerification }
-import org.reactivestreams.tck.SubscriberWhiteboxVerification.{ SubscriberPuppet, WhiteboxSubscriberProbe }
-import org.scalatest.testng.{ TestNGSuiteLike }
-import java.lang.{ Integer ⇒ JInt }
+import org.reactivestreams.tck.{TestEnvironment, SubscriberWhiteboxVerification}
+import org.reactivestreams.tck.SubscriberWhiteboxVerification.{SubscriberPuppet, WhiteboxSubscriberProbe}
+import org.scalatest.testng.{TestNGSuiteLike}
+import java.lang.{Integer ⇒ JInt}
 import scala.concurrent.Promise
-import org.reactivestreams.{ Subscription, Subscriber }
+import org.reactivestreams.{Subscription, Subscriber}
 
-class SinkholeSubscriberTest extends SubscriberWhiteboxVerification[JInt](new TestEnvironment()) with TestNGSuiteLike {
-  override def createSubscriber(probe: WhiteboxSubscriberProbe[JInt]): Subscriber[JInt] = {
+class SinkholeSubscriberTest
+    extends SubscriberWhiteboxVerification[JInt](new TestEnvironment())
+    with TestNGSuiteLike {
+  override def createSubscriber(
+      probe: WhiteboxSubscriberProbe[JInt]): Subscriber[JInt] = {
     new Subscriber[JInt] {
       val hole = new SinkholeSubscriber[JInt](Promise[Done]())
 
@@ -23,8 +26,10 @@ class SinkholeSubscriberTest extends SubscriberWhiteboxVerification[JInt](new Te
       }
 
       override def onSubscribe(s: Subscription): Unit = {
-        probe.registerOnSubscribe(new SubscriberPuppet() {
-          override def triggerRequest(elements: Long): Unit = s.request(elements)
+        probe.registerOnSubscribe(
+            new SubscriberPuppet() {
+          override def triggerRequest(elements: Long): Unit =
+            s.request(elements)
           override def signalCancel(): Unit = s.cancel()
         })
         hole.onSubscribe(s)
@@ -44,4 +49,3 @@ class SinkholeSubscriberTest extends SubscriberWhiteboxVerification[JInt](new Te
 
   override def createElement(element: Int): JInt = element
 }
-

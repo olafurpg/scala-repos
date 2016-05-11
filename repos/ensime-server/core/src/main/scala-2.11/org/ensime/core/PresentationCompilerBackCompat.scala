@@ -7,9 +7,9 @@ import Predef.{any2stringadd => _}
 import scala.reflect.internal.util.Position
 
 /**
- * Simulate methods that were added in later versions of the scalac
- * API, or to generate fake methods that we can use in both versions.
- */
+  * Simulate methods that were added in later versions of the scalac
+  * API, or to generate fake methods that we can use in both versions.
+  */
 trait PresentationCompilerBackCompat
 
 trait PositionBackCompat {

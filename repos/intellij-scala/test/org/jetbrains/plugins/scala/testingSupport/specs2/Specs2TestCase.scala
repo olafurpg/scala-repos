@@ -9,5 +9,5 @@ import com.intellij.execution.RunnerAndConfigurationSettings
   * @author Roman.Shein
   * @since 16.10.2014.
   */
-abstract class Specs2TestCase extends ScalaTestingTestCase(new Specs2ConfigurationProducer) {
-}
+abstract class Specs2TestCase
+    extends ScalaTestingTestCase(new Specs2ConfigurationProducer) {}

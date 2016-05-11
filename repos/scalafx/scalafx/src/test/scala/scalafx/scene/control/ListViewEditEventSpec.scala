@@ -35,14 +35,16 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * ListView.EditEvent Spec tests.
- *
- *
- */
+  * ListView.EditEvent Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ListViewEditEventSpec[T <: Any]
-  extends SimpleSFXDelegateSpec[jfxsc.ListView.EditEvent[T], ListView.EditEvent[T]](classOf[jfxsc.ListView.EditEvent[T]], classOf[ListView.EditEvent[T]])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[
+        jfxsc.ListView.EditEvent[T], ListView.EditEvent[T]](
+        classOf[jfxsc.ListView.EditEvent[T]], classOf[ListView.EditEvent[T]])
+    with RunOnApplicationThread {
 
   /*
    * In third argument, I it was used simply null compiler throws a error with message:
@@ -50,6 +52,6 @@ class ListViewEditEventSpec[T <: Any]
    * null to type T. 
    */
   override def getJavaClassInstance =
-    new jfxsc.ListView.EditEvent[T](new jfxsc.ListView[T], null, null.asInstanceOf[T], 0)
-
+    new jfxsc.ListView.EditEvent[T](
+        new jfxsc.ListView[T], null, null.asInstanceOf[T], 0)
 }

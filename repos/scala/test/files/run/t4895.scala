@@ -12,5 +12,4 @@ object Test {
     for (i <- 1000 until 10000 by 500) checkPar(i)
     for (i <- 10000 until 100000 by 5000) checkPar(i)
   }
-
 }

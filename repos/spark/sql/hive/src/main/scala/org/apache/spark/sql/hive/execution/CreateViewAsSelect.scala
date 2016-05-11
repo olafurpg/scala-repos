@@ -25,23 +25,24 @@ import org.apache.spark.sql.catalyst.catalog.{CatalogColumn, CatalogTable}
 import org.apache.spark.sql.catalyst.expressions.Alias
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Project}
 import org.apache.spark.sql.execution.command.RunnableCommand
-import org.apache.spark.sql.hive.{ HiveContext, HiveMetastoreTypes, SQLBuilder}
+import org.apache.spark.sql.hive.{HiveContext, HiveMetastoreTypes, SQLBuilder}
 
 /**
- * Create Hive view on non-hive-compatible tables by specifying schema ourselves instead of
- * depending on Hive meta-store.
- */
+  * Create Hive view on non-hive-compatible tables by specifying schema ourselves instead of
+  * depending on Hive meta-store.
+  */
 // TODO: Note that this class can NOT canonicalize the view SQL string entirely, which is different
 // from Hive and may not work for some cases like create view on self join.
-private[hive] case class CreateViewAsSelect(
-    tableDesc: CatalogTable,
-    child: LogicalPlan,
-    allowExisting: Boolean,
-    orReplace: Boolean) extends RunnableCommand {
+private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
+                                            child: LogicalPlan,
+                                            allowExisting: Boolean,
+                                            orReplace: Boolean)
+    extends RunnableCommand {
 
   private val childSchema = child.output
 
-  assert(tableDesc.schema == Nil || tableDesc.schema.length == childSchema.length)
+  assert(
+      tableDesc.schema == Nil || tableDesc.schema.length == childSchema.length)
   assert(tableDesc.viewText.isDefined)
 
   private val tableIdentifier = tableDesc.name
@@ -51,35 +52,39 @@ private[hive] case class CreateViewAsSelect(
 
     hiveContext.sessionState.catalog.tableExists(tableIdentifier) match {
       case true if allowExisting =>
-        // Handles `CREATE VIEW IF NOT EXISTS v0 AS SELECT ...`. Does nothing when the target view
-        // already exists.
+      // Handles `CREATE VIEW IF NOT EXISTS v0 AS SELECT ...`. Does nothing when the target view
+      // already exists.
 
       case true if orReplace =>
         // Handles `CREATE OR REPLACE VIEW v0 AS SELECT ...`
-        hiveContext.sessionState.catalog.client.alertView(prepareTable(sqlContext))
+        hiveContext.sessionState.catalog.client
+          .alertView(prepareTable(sqlContext))
 
       case true =>
         // Handles `CREATE VIEW v0 AS SELECT ...`. Throws exception when the target view already
         // exists.
-        throw new AnalysisException(s"View $tableIdentifier already exists. " +
-          "If you want to update the view definition, please use ALTER VIEW AS or " +
-          "CREATE OR REPLACE VIEW AS")
+        throw new AnalysisException(
+            s"View $tableIdentifier already exists. " +
+            "If you want to update the view definition, please use ALTER VIEW AS or " +
+            "CREATE OR REPLACE VIEW AS")
 
       case false =>
-        hiveContext.sessionState.catalog.client.createView(prepareTable(sqlContext))
+        hiveContext.sessionState.catalog.client
+          .createView(prepareTable(sqlContext))
     }
 
     Seq.empty[Row]
   }
 
   private def prepareTable(sqlContext: SQLContext): CatalogTable = {
-    val expandedText = if (sqlContext.conf.canonicalView) {
-      try rebuildViewQueryString(sqlContext) catch {
-        case NonFatal(e) => wrapViewTextWithSelect
+    val expandedText =
+      if (sqlContext.conf.canonicalView) {
+        try rebuildViewQueryString(sqlContext) catch {
+          case NonFatal(e) => wrapViewTextWithSelect
+        }
+      } else {
+        wrapViewTextWithSelect
       }
-    } else {
-      wrapViewTextWithSelect
-    }
 
     val viewSchema = {
       if (tableDesc.schema.isEmpty) {
@@ -87,12 +92,12 @@ private[hive] case class CreateViewAsSelect(
           CatalogColumn(a.name, HiveMetastoreTypes.toMetastoreType(a.dataType))
         }
       } else {
-        childSchema.zip(tableDesc.schema).map { case (a, col) =>
-          CatalogColumn(
-            col.name,
-            HiveMetastoreTypes.toMetastoreType(a.dataType),
-            nullable = true,
-            col.comment)
+        childSchema.zip(tableDesc.schema).map {
+          case (a, col) =>
+            CatalogColumn(col.name,
+                          HiveMetastoreTypes.toMetastoreType(a.dataType),
+                          nullable = true,
+                          col.comment)
         }
       }
     }
@@ -109,9 +114,12 @@ private[hive] case class CreateViewAsSelect(
       if (tableDesc.schema.isEmpty) {
         columnNames.mkString(", ")
       } else {
-        columnNames.zip(tableDesc.schema.map(f => quote(f.name))).map {
-          case (name, alias) => s"$name AS $alias"
-        }.mkString(", ")
+        columnNames
+          .zip(tableDesc.schema.map(f => quote(f.name)))
+          .map {
+            case (name, alias) => s"$name AS $alias"
+          }
+          .mkString(", ")
       }
     }
 
@@ -121,14 +129,15 @@ private[hive] case class CreateViewAsSelect(
   }
 
   private def rebuildViewQueryString(sqlContext: SQLContext): String = {
-    val logicalPlan = if (tableDesc.schema.isEmpty) {
-      child
-    } else {
-      val projectList = childSchema.zip(tableDesc.schema).map {
-        case (attr, col) => Alias(attr, col.name)()
+    val logicalPlan =
+      if (tableDesc.schema.isEmpty) {
+        child
+      } else {
+        val projectList = childSchema.zip(tableDesc.schema).map {
+          case (attr, col) => Alias(attr, col.name)()
+        }
+        sqlContext.executePlan(Project(projectList, child)).analyzed
       }
-      sqlContext.executePlan(Project(projectList, child)).analyzed
-    }
     new SQLBuilder(logicalPlan, sqlContext).toSQL
   }
 

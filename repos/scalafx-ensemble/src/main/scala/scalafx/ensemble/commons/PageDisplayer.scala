@@ -32,9 +32,9 @@ import scalafx.scene.Node
 import scalafx.scene.layout.{Priority, VBox}
 
 /**
- * the class that updates tabbed view or dashboard view
- * based on the TreeItem selected from left pane
- */
+  * the class that updates tabbed view or dashboard view
+  * based on the TreeItem selected from left pane
+  */
 object PageDisplayer {
 
   def choosePage(value: String = "dashBoard"): Node = {
@@ -44,7 +44,9 @@ object PageDisplayer {
         if (value.startsWith("dashBoard - ")) {
           displayPage(new DashboardPage(value.split("-")(1).trim()))
         } else {
-          displayPage(EnsembleTabbedPage.buildTab(value.split(">")(1).trim(), value.split(">")(0).trim()))
+          displayPage(
+              EnsembleTabbedPage.buildTab(
+                  value.split(">")(1).trim(), value.split(">")(0).trim()))
         }
     }
   }

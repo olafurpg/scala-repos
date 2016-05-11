@@ -8,13 +8,14 @@ import java.io.File
 import Path._
 
 /**
- * A ClassLoader for serving assets.
- *
- * Serves assets from the given directories, at the given prefix.
- *
- * @param assets A list of assets directories, paired with the prefix they should be served from.
- */
-class AssetsClassLoader(parent: ClassLoader, assets: Seq[(String, File)]) extends ClassLoader(parent) {
+  * A ClassLoader for serving assets.
+  *
+  * Serves assets from the given directories, at the given prefix.
+  *
+  * @param assets A list of assets directories, paired with the prefix they should be served from.
+  */
+class AssetsClassLoader(parent: ClassLoader, assets: Seq[(String, File)])
+    extends ClassLoader(parent) {
   override def findResource(name: String) = {
     assets.collectFirst {
       case (prefix, dir) if exists(name, prefix, dir) =>

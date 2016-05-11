@@ -44,12 +44,14 @@ trait BsonRecord[MyType <: BsonRecord[MyType]] extends Record[MyType] {
   /**
     * Set the fields of this record from the given DBObject
     */
-  def setFieldsFromDBObject(dbo: DBObject): Unit = meta.setFieldsFromDBObject(this, dbo)
+  def setFieldsFromDBObject(dbo: DBObject): Unit =
+    meta.setFieldsFromDBObject(this, dbo)
 
- /**
-   * Save the instance and return the instance
-   */
-  override def saveTheRecord(): Box[MyType] = throw new BackingStoreException("BSON Records don't save themselves")
+  /**
+    * Save the instance and return the instance
+    */
+  override def saveTheRecord(): Box[MyType] =
+    throw new BackingStoreException("BSON Records don't save themselves")
 
   /**
     * Pattern.equals doesn't work properly so it needs a special check. If you use PatternField, be sure to override equals with this.
@@ -57,11 +59,13 @@ trait BsonRecord[MyType <: BsonRecord[MyType]] extends Record[MyType] {
   protected def equalsWithPatternCheck(other: Any): Boolean = {
     other match {
       case that: BsonRecord[MyType] =>
-        that.fields.corresponds(this.fields) { (a,b) =>
-          (a.name == b.name) && ((a.valueBox, b.valueBox) match {
-            case (Full(ap: Pattern), Full(bp: Pattern)) => ap.pattern == bp.pattern && ap.flags == bp.flags
-            case _ => a.valueBox == b.valueBox
-          })
+        that.fields.corresponds(this.fields) { (a, b) =>
+          (a.name == b.name) &&
+          ((a.valueBox, b.valueBox) match {
+                case (Full(ap: Pattern), Full(bp: Pattern)) =>
+                  ap.pattern == bp.pattern && ap.flags == bp.flags
+                case _ => a.valueBox == b.valueBox
+              })
         }
       case _ => false
     }
@@ -69,8 +73,8 @@ trait BsonRecord[MyType <: BsonRecord[MyType]] extends Record[MyType] {
 }
 
 /** Specialized MetaRecord that deals with BsonRecords */
-trait BsonMetaRecord[BaseRecord <: BsonRecord[BaseRecord]] extends MetaRecord[BaseRecord] with JsonFormats {
-  self: BaseRecord =>
+trait BsonMetaRecord[BaseRecord <: BsonRecord[BaseRecord]]
+    extends MetaRecord[BaseRecord] with JsonFormats { self: BaseRecord =>
 
   /**
     * Create a BasicDBObject from the field names and values.
@@ -78,7 +82,8 @@ trait BsonMetaRecord[BaseRecord <: BsonRecord[BaseRecord]] extends MetaRecord[Ba
     *   using asDBObject
     */
   def asDBObject(inst: BaseRecord): DBObject = {
-    val dbo = BasicDBObjectBuilder.start // use this so regex patterns can be stored.
+    val dbo =
+      BasicDBObjectBuilder.start // use this so regex patterns can be stored.
 
     for {
       field <- fields(inst)
@@ -96,26 +101,29 @@ trait BsonMetaRecord[BaseRecord <: BsonRecord[BaseRecord]] extends MetaRecord[Ba
     import field.MongoFieldFlavor
 
     f match {
-      case field if (field.optional_? && field.valueBox.isEmpty) => Empty // don't add to DBObject
+      case field if (field.optional_? && field.valueBox.isEmpty) =>
+        Empty // don't add to DBObject
       case field: EnumTypedField[_] =>
-        field.asInstanceOf[EnumTypedField[Enumeration]].valueBox map {
-          v => v.id
+        field.asInstanceOf[EnumTypedField[Enumeration]].valueBox map { v =>
+          v.id
         }
       case field: EnumNameTypedField[_] =>
-        field.asInstanceOf[EnumNameTypedField[Enumeration]].valueBox map {
-          v => v.toString
+        field.asInstanceOf[EnumNameTypedField[Enumeration]].valueBox map { v =>
+          v.toString
         }
       case field: MongoFieldFlavor[_] =>
         Full(field.asInstanceOf[MongoFieldFlavor[Any]].asDBObject)
-      case field => field.valueBox map (_.asInstanceOf[AnyRef] match {
-        case null => null
-        case x if primitive_?(x.getClass) => x
-        case x if mongotype_?(x.getClass) => x
-        case x if datetype_?(x.getClass) => datetype2dbovalue(x)
-        case x: BsonRecord[_] => x.asDBObject
-        case x: Array[Byte] => x
-        case o => o.toString
-      })
+      case field =>
+        field.valueBox map
+        (_.asInstanceOf[AnyRef] match {
+              case null => null
+              case x if primitive_?(x.getClass) => x
+              case x if mongotype_?(x.getClass) => x
+              case x if datetype_?(x.getClass) => datetype2dbovalue(x)
+              case x: BsonRecord[_] => x.asDBObject
+              case x: Array[Byte] => x
+              case o => o.toString
+            })
     }
   }
 

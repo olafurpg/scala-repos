@@ -25,37 +25,38 @@ import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCo
 import org.apache.spark.sql.catalyst.plans.physical._
 import org.apache.spark.sql.execution.exchange.ShuffleExchange
 
-
 /**
- * Take the first `limit` elements and collect them to a single partition.
- *
- * This operator will be used when a logical `Limit` operation is the final operator in an
- * logical plan, which happens when the user is collecting results back to the driver.
- */
+  * Take the first `limit` elements and collect them to a single partition.
+  *
+  * This operator will be used when a logical `Limit` operation is the final operator in an
+  * logical plan, which happens when the user is collecting results back to the driver.
+  */
 case class CollectLimit(limit: Int, child: SparkPlan) extends UnaryNode {
   override def output: Seq[Attribute] = child.output
   override def outputPartitioning: Partitioning = SinglePartition
   override def executeCollect(): Array[InternalRow] = child.executeTake(limit)
-  private val serializer: Serializer = new UnsafeRowSerializer(child.output.size)
+  private val serializer: Serializer = new UnsafeRowSerializer(
+      child.output.size)
   protected override def doExecute(): RDD[InternalRow] = {
     val shuffled = new ShuffledRowRDD(
-      ShuffleExchange.prepareShuffleDependency(
-        child.execute(), child.output, SinglePartition, serializer))
+        ShuffleExchange.prepareShuffleDependency(
+            child.execute(), child.output, SinglePartition, serializer))
     shuffled.mapPartitionsInternal(_.take(limit))
   }
 }
 
 /**
- * Helper trait which defines methods that are shared by both [[LocalLimit]] and [[GlobalLimit]].
- */
+  * Helper trait which defines methods that are shared by both [[LocalLimit]] and [[GlobalLimit]].
+  */
 trait BaseLimit extends UnaryNode with CodegenSupport {
   val limit: Int
   override def output: Seq[Attribute] = child.output
   override def outputOrdering: Seq[SortOrder] = child.outputOrdering
   override def outputPartitioning: Partitioning = child.outputPartitioning
-  protected override def doExecute(): RDD[InternalRow] = child.execute().mapPartitions { iter =>
-    iter.take(limit)
-  }
+  protected override def doExecute(): RDD[InternalRow] =
+    child.execute().mapPartitions { iter =>
+      iter.take(limit)
+    }
 
   override def upstreams(): Seq[RDD[InternalRow]] = {
     child.asInstanceOf[CodegenSupport].upstreams()
@@ -65,11 +66,13 @@ trait BaseLimit extends UnaryNode with CodegenSupport {
     child.asInstanceOf[CodegenSupport].produce(ctx, this)
   }
 
-  override def doConsume(ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+  override def doConsume(
+      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
     val stopEarly = ctx.freshName("stopEarly")
     ctx.addMutableState("boolean", stopEarly, s"$stopEarly = false;")
 
-    ctx.addNewFunction("shouldStop", s"""
+    ctx.addNewFunction("shouldStop",
+                       s"""
       @Override
       protected boolean shouldStop() {
         return !currentRows.isEmpty() || $stopEarly;
@@ -89,31 +92,31 @@ trait BaseLimit extends UnaryNode with CodegenSupport {
 }
 
 /**
- * Take the first `limit` elements of each child partition, but do not collect or shuffle them.
- */
+  * Take the first `limit` elements of each child partition, but do not collect or shuffle them.
+  */
 case class LocalLimit(limit: Int, child: SparkPlan) extends BaseLimit {
   override def outputOrdering: Seq[SortOrder] = child.outputOrdering
 }
 
 /**
- * Take the first `limit` elements of the child's single output partition.
- */
+  * Take the first `limit` elements of the child's single output partition.
+  */
 case class GlobalLimit(limit: Int, child: SparkPlan) extends BaseLimit {
   override def requiredChildDistribution: List[Distribution] = AllTuples :: Nil
 }
 
 /**
- * Take the first limit elements as defined by the sortOrder, and do projection if needed.
- * This is logically equivalent to having a Limit operator after a [[Sort]] operator,
- * or having a [[Project]] operator between them.
- * This could have been named TopK, but Spark's top operator does the opposite in ordering
- * so we name it TakeOrdered to avoid confusion.
- */
-case class TakeOrderedAndProject(
-    limit: Int,
-    sortOrder: Seq[SortOrder],
-    projectList: Option[Seq[NamedExpression]],
-    child: SparkPlan) extends UnaryNode {
+  * Take the first limit elements as defined by the sortOrder, and do projection if needed.
+  * This is logically equivalent to having a Limit operator after a [[Sort]] operator,
+  * or having a [[Project]] operator between them.
+  * This could have been named TopK, but Spark's top operator does the opposite in ordering
+  * so we name it TakeOrdered to avoid confusion.
+  */
+case class TakeOrderedAndProject(limit: Int,
+                                 sortOrder: Seq[SortOrder],
+                                 projectList: Option[Seq[NamedExpression]],
+                                 child: SparkPlan)
+    extends UnaryNode {
 
   override def output: Seq[Attribute] = {
     projectList.map(_.map(_.toAttribute)).getOrElse(child.output)
@@ -132,7 +135,8 @@ case class TakeOrderedAndProject(
     }
   }
 
-  private val serializer: Serializer = new UnsafeRowSerializer(child.output.size)
+  private val serializer: Serializer = new UnsafeRowSerializer(
+      child.output.size)
 
   protected override def doExecute(): RDD[InternalRow] = {
     val ord = new LazilyGeneratedOrdering(sortOrder, child.output)
@@ -142,10 +146,11 @@ case class TakeOrderedAndProject(
       }
     }
     val shuffled = new ShuffledRowRDD(
-      ShuffleExchange.prepareShuffleDependency(
-        localTopK, child.output, SinglePartition, serializer))
+        ShuffleExchange.prepareShuffleDependency(
+            localTopK, child.output, SinglePartition, serializer))
     shuffled.mapPartitions { iter =>
-      val topK = org.apache.spark.util.collection.Utils.takeOrdered(iter.map(_.copy()), limit)(ord)
+      val topK = org.apache.spark.util.collection.Utils
+        .takeOrdered(iter.map(_.copy()), limit)(ord)
       if (projectList.isDefined) {
         val proj = UnsafeProjection.create(projectList.get, child.output)
         topK.map(r => proj(r))

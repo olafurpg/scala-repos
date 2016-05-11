@@ -4,9 +4,8 @@ trait Matcher {
     type Match <: Link { type Match = Link.this.Self; }
   }
   trait HasLinks {
-    def link(b : Boolean) : Link = null;
+    def link(b: Boolean): Link = null;
   }
-
 }
 trait BraceMatcher extends Matcher {
   trait BracePair {
@@ -30,16 +29,15 @@ trait IfElseMatcher extends BraceMatcher {
   trait ElseImpl extends IfElseLink with HasLinks {
     type Self = ElseImpl;
     type Match = IfLink;
-    override def link(b : Boolean) = this;
+    override def link(b: Boolean) = this;
   }
-  val parenPair : BracePair;
+  val parenPair: BracePair;
   trait IfWithParenImpl extends HasLinks {
     object ifLink extends IfLink;
     object openParen extends parenPair.OpenLink;
-    override def link(b : Boolean): Link = b match {
-    case true => ifLink;
-    case false => openParen;
+    override def link(b: Boolean): Link = b match {
+      case true => ifLink;
+      case false => openParen;
     }
   }
 }
-

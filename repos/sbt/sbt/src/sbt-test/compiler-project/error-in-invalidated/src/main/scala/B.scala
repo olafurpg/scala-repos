@@ -1,3 +1,3 @@
 class B {
-	def foo(a: A): Boolean = a.initialized
+  def foo(a: A): Boolean = a.initialized
 }

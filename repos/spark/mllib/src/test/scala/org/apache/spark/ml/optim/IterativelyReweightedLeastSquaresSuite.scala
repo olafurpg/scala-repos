@@ -24,7 +24,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.rdd.RDD
 
-class IterativelyReweightedLeastSquaresSuite extends SparkFunSuite with MLlibTestSparkContext {
+class IterativelyReweightedLeastSquaresSuite
+    extends SparkFunSuite with MLlibTestSparkContext {
 
   private var instances1: RDD[Instance] = _
   private var instances2: RDD[Instance] = _
@@ -38,12 +39,14 @@ class IterativelyReweightedLeastSquaresSuite extends SparkFunSuite with MLlibTes
        b <- c(1, 0, 1, 0)
        w <- c(1, 2, 3, 4)
      */
-    instances1 = sc.parallelize(Seq(
-      Instance(1.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
-      Instance(0.0, 2.0, Vectors.dense(1.0, 2.0)),
-      Instance(1.0, 3.0, Vectors.dense(2.0, 1.0)),
-      Instance(0.0, 4.0, Vectors.dense(3.0, 3.0))
-    ), 2)
+    instances1 = sc.parallelize(
+        Seq(
+            Instance(1.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
+            Instance(0.0, 2.0, Vectors.dense(1.0, 2.0)),
+            Instance(1.0, 3.0, Vectors.dense(2.0, 1.0)),
+            Instance(0.0, 4.0, Vectors.dense(3.0, 3.0))
+        ),
+        2)
     /*
        R code:
 
@@ -51,12 +54,14 @@ class IterativelyReweightedLeastSquaresSuite extends SparkFunSuite with MLlibTes
        b <- c(2, 8, 3, 9)
        w <- c(1, 2, 3, 4)
      */
-    instances2 = sc.parallelize(Seq(
-      Instance(2.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
-      Instance(8.0, 2.0, Vectors.dense(1.0, 7.0)),
-      Instance(3.0, 3.0, Vectors.dense(2.0, 11.0)),
-      Instance(9.0, 4.0, Vectors.dense(3.0, 13.0))
-    ), 2)
+    instances2 = sc.parallelize(
+        Seq(
+            Instance(2.0, 1.0, Vectors.dense(0.0, 5.0).toSparse),
+            Instance(8.0, 2.0, Vectors.dense(1.0, 7.0)),
+            Instance(3.0, 3.0, Vectors.dense(2.0, 11.0)),
+            Instance(9.0, 4.0, Vectors.dense(3.0, 13.0))
+        ),
+        2)
   }
 
   test("IRLS against GLM with Binomial errors") {
@@ -72,9 +77,8 @@ class IterativelyReweightedLeastSquaresSuite extends SparkFunSuite with MLlibTes
        [1] -0.30216651 -0.04452045
        [1]  3.5651651 -1.2334085 -0.7348971
      */
-    val expected = Seq(
-      Vectors.dense(0.0, -0.30216651, -0.04452045),
-      Vectors.dense(3.5651651, -1.2334085, -0.7348971))
+    val expected = Seq(Vectors.dense(0.0, -0.30216651, -0.04452045),
+                       Vectors.dense(3.5651651, -1.2334085, -0.7348971))
 
     import IterativelyReweightedLeastSquaresSuite._
 
@@ -85,11 +89,20 @@ class IterativelyReweightedLeastSquaresSuite extends SparkFunSuite with MLlibTes
         val eta = math.log(mu / (1.0 - mu))
         Instance(eta, instance.weight, instance.features)
       }
-      val initial = new WeightedLeastSquares(fitIntercept, regParam = 0.0,
-        standardizeFeatures = false, standardizeLabel = false).fit(newInstances)
-      val irls = new IterativelyReweightedLeastSquares(initial, BinomialReweightFunc,
-        fitIntercept, regParam = 0.0, maxIter = 25, tol = 1e-8).fit(instances1)
-      val actual = Vectors.dense(irls.intercept, irls.coefficients(0), irls.coefficients(1))
+      val initial =
+        new WeightedLeastSquares(fitIntercept,
+                                 regParam = 0.0,
+                                 standardizeFeatures = false,
+                                 standardizeLabel = false).fit(newInstances)
+      val irls =
+        new IterativelyReweightedLeastSquares(initial,
+                                              BinomialReweightFunc,
+                                              fitIntercept,
+                                              regParam = 0.0,
+                                              maxIter = 25,
+                                              tol = 1e-8).fit(instances1)
+      val actual = Vectors.dense(
+          irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
     }
@@ -108,9 +121,8 @@ class IterativelyReweightedLeastSquaresSuite extends SparkFunSuite with MLlibTes
        [1] -0.09607792  0.18375613
        [1]  6.299947  3.324107 -1.081766
      */
-    val expected = Seq(
-      Vectors.dense(0.0, -0.09607792, 0.18375613),
-      Vectors.dense(6.299947, 3.324107, -1.081766))
+    val expected = Seq(Vectors.dense(0.0, -0.09607792, 0.18375613),
+                       Vectors.dense(6.299947, 3.324107, -1.081766))
 
     import IterativelyReweightedLeastSquaresSuite._
 
@@ -122,11 +134,20 @@ class IterativelyReweightedLeastSquaresSuite extends SparkFunSuite with MLlibTes
         val eta = math.log(mu)
         Instance(eta, instance.weight, instance.features)
       }
-      val initial = new WeightedLeastSquares(fitIntercept, regParam = 0.0,
-        standardizeFeatures = false, standardizeLabel = false).fit(newInstances)
-      val irls = new IterativelyReweightedLeastSquares(initial, PoissonReweightFunc,
-        fitIntercept, regParam = 0.0, maxIter = 25, tol = 1e-8).fit(instances2)
-      val actual = Vectors.dense(irls.intercept, irls.coefficients(0), irls.coefficients(1))
+      val initial =
+        new WeightedLeastSquares(fitIntercept,
+                                 regParam = 0.0,
+                                 standardizeFeatures = false,
+                                 standardizeLabel = false).fit(newInstances)
+      val irls =
+        new IterativelyReweightedLeastSquares(initial,
+                                              PoissonReweightFunc,
+                                              fitIntercept,
+                                              regParam = 0.0,
+                                              maxIter = 25,
+                                              tol = 1e-8).fit(instances2)
+      val actual = Vectors.dense(
+          irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
     }
@@ -147,19 +168,27 @@ class IterativelyReweightedLeastSquaresSuite extends SparkFunSuite with MLlibTes
        [1] 1.266667 0.400000
        [1] 29.5 17.0 -5.5
      */
-    val expected = Seq(
-      Vectors.dense(0.0, 1.266667, 0.400000),
-      Vectors.dense(29.5, 17.0, -5.5))
+    val expected = Seq(Vectors.dense(0.0, 1.266667, 0.400000),
+                       Vectors.dense(29.5, 17.0, -5.5))
 
     import IterativelyReweightedLeastSquaresSuite._
 
     var idx = 0
     for (fitIntercept <- Seq(false, true)) {
-      val initial = new WeightedLeastSquares(fitIntercept, regParam = 0.0,
-        standardizeFeatures = false, standardizeLabel = false).fit(instances2)
-      val irls = new IterativelyReweightedLeastSquares(initial, L1RegressionReweightFunc,
-        fitIntercept, regParam = 0.0, maxIter = 200, tol = 1e-7).fit(instances2)
-      val actual = Vectors.dense(irls.intercept, irls.coefficients(0), irls.coefficients(1))
+      val initial =
+        new WeightedLeastSquares(fitIntercept,
+                                 regParam = 0.0,
+                                 standardizeFeatures = false,
+                                 standardizeLabel = false).fit(instances2)
+      val irls =
+        new IterativelyReweightedLeastSquares(initial,
+                                              L1RegressionReweightFunc,
+                                              fitIntercept,
+                                              regParam = 0.0,
+                                              maxIter = 200,
+                                              tol = 1e-7).fit(instances2)
+      val actual = Vectors.dense(
+          irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
     }

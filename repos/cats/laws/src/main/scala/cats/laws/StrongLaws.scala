@@ -7,15 +7,17 @@ import cats.syntax.strong._
 import cats.std.function._
 
 /**
- * Laws that must be obeyed by any `cats.functor.Strong`.
- */
+  * Laws that must be obeyed by any `cats.functor.Strong`.
+  */
 trait StrongLaws[F[_, _]] extends ProfunctorLaws[F] {
   implicit override def F: Strong[F]
 
-  def strongFirstDistributivity[A0, A1, B1, B2, C](fab: F[A1, B1], f: A0 => A1, g: B1 => B2): IsEq[F[(A0, C), (B2, C)]] =
+  def strongFirstDistributivity[A0, A1, B1, B2, C](
+      fab: F[A1, B1], f: A0 => A1, g: B1 => B2): IsEq[F[(A0, C), (B2, C)]] =
     fab.dimap(f)(g).first[C] <-> fab.first[C].dimap(f.first[C])(g.first[C])
 
-  def strongSecondDistributivity[A0, A1, B1, B2, C](fab: F[A1, B1], f: A0 => A1, g: B1 => B2): IsEq[F[(C, A0), (C, B2)]] =
+  def strongSecondDistributivity[A0, A1, B1, B2, C](
+      fab: F[A1, B1], f: A0 => A1, g: B1 => B2): IsEq[F[(C, A0), (C, B2)]] =
     fab.dimap(f)(g).second[C] <-> fab.second[C].dimap(f.second[C])(g.second[C])
 }
 

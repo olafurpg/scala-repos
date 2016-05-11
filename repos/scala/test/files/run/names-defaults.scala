@@ -1,8 +1,7 @@
-
-import scala.language.{ higherKinds, existentials }
+import scala.language.{higherKinds, existentials}
 
 object Test extends App {
-  def get[T](x: T) = { println("get: "+ x); x }
+  def get[T](x: T) = { println("get: " + x); x }
 
   // TESTS
 
@@ -13,14 +12,12 @@ object Test extends App {
   test3(b = get(110), a = get(11))(c = get("\\"), d = get(2.399))
   test3(get(14), get(3920))(d = get("}"), c = get("["))
 
-
   // mixing named and positional
   test1(get(4), b = get("@"))
   test1(a = get(10), get("flu"))
   test2(get(8), v = get(9))(get("%"), l = get(5))
   test3(12, 13)("'", d = 16)
   test3(a = 1, "swine")(c = "bird", d = 10L)
-
 
   // anonymous functions
   {
@@ -38,9 +35,7 @@ object Test extends App {
   }
   val f1: (Int, String) => Unit = test1(_, _); f1(6, "~")
 
-
   test4(14)
-
 
   // defaults: subclass overrides, adds and inherits default
   val b = new Base
@@ -51,8 +46,6 @@ object Test extends App {
   // defaults are chosen dynamically
   val b2: Base = new Sub1
   b2.test1(b = "")(c = 93.3)(f = -1)
-
-
 
   // overloading resolution
   object t1 {
@@ -72,7 +65,7 @@ object Test extends App {
     def f(a1: Int) = "first"
     def f(a2: Int)(b: Int) = "second"
   }
-  println(t3.f(a1 = 10))    // first
+  println(t3.f(a1 = 10)) // first
   println(t3.f(a2 = 20)(1)) // second
 
   object t4 {
@@ -87,7 +80,7 @@ object Test extends App {
     val f: String => String = a => "second"
   }
   println(t5.f(new Sub1())) // first
-  println(t5.f("dfklj"))    // second
+  println(t5.f("dfklj")) // second
 
   object t6 {
     def f(a: String = "sdf", b: Int) = "f"
@@ -117,17 +110,14 @@ object Test extends App {
   }
   println(t9.f("bla")) // first
 
-
   // vararg
-  def test5(a: Int, b: Int)(c: Int, d: String*) = a +", "+ d.toList
+  def test5(a: Int, b: Int)(c: Int, d: String*) = a + ", " + d.toList
   println(test5(b = 1, a = 2)(3, "4", "4", "4"))
   println(test5(b = 1, a = 2)(c = 29))
-
 
   // tuple conversion
   def foo(a: Int, b: Int)(c: (Int, String)) = a + c._1
   println(foo(b = 1, a = 2)(3, "4"))
-
 
   // by-name parameters
   def bn1(a: Int, b: => Int) = a
@@ -137,7 +127,7 @@ object Test extends App {
   println(bn2(b = get(2), a = get(1))()) // should get: 1, 2, 2
 
   def bn3(a: => Int = get(10)) = 0
-  def bn4(a: => Int = get(20)) = {a; a}
+  def bn4(a: => Int = get(20)) = { a; a }
   println(bn3())
   println(bn4())
   println(bn4(a = 0))
@@ -154,23 +144,26 @@ object Test extends App {
   println(a2.print)
   val b1 = new B("dklfj")(e = "nixda")
   println(b1.printB)
-  val c1 = new C(a = "dlkf", c = new { override def toString() = "struct" })(e = "???")
+  val c1 = new C(a = "dlkf", c = new { override def toString() = "struct" })(
+      e = "???")
   println(c1.print)
   val c2 = C("dflkj", c = Some(209): Option[Int])(None, "!!")
   println(c2.print)
 
-
   // "super" qualifier
   val b10 = new B1
   println(b10.bar())
-
 
   // defaults in traits / abstract classes
   val mn = new MN
   println(mn.foo()())
   println(mn.bar(10))
   // anonymous class
-  println((new M { def foo[T >: String](x: Int, y: T)(z: String = "2") = z ; def bar(x: Int, y: Double) = x }).foo()())
+  println(
+      (new M {
+    def foo[T >: String](x: Int, y: T)(z: String = "2") = z;
+    def bar(x: Int, y: Double) = x
+  }).foo()())
 
   // copy method for case classes
   val fact = Factory(y = "blabla")()
@@ -181,26 +174,23 @@ object Test extends App {
   println(Fact2(x = 1)())
   println(Fact2(10)().copy(y = "blabla")(3))
 
-
   // assignment to var <-> named argument
   var argName = 1
   test5(argName = (argName = 2))
   println(argName) // should be 2
-  test5({argName = 3})
+  test5({ argName = 3 })
   println(argName) // should be 3
   test5((argName = 4))
   println(argName) // should be 4
   test5 { argName = 5 }
   println(argName) // should be 5
-  val a: Unit = test1(a = 10, b = "2") // local values a and b exist, but it's not ambiguous since they're vals
-
+  val a: Unit =
+    test1(a = 10, b = "2") // local values a and b exist, but it's not ambiguous since they're vals
 
   // dependent types and copy method
   val a11 = new A2
   val b11 = a11.B2(new a11.C2)(1)
   println(b11.copy()(2))
-
-
 
   // bug #2057
   class O { class I(val x: Int = 1) }
@@ -208,11 +198,9 @@ object Test extends App {
   val u1 = new U
   println(u1.f.x)
 
-
   // names / defaults in self constructor call
   new A3("lskfdjlk")
   new A4(1.23, ",")
-
 
   // names / defaults in super constructor call
   new B4()
@@ -235,7 +223,6 @@ object Test extends App {
     println(test9)
   }
 
-
   // result type of default getters: parameter type, except if this one mentions any type
   // parameter, in which case the result type is inferred. examples:
 
@@ -244,24 +231,23 @@ object Test extends App {
   def transform(s: String, f: String => String = identity _) = f(s)
   println(transform("my text"))
 
-
   // a bug reported on a mailing list: see comment in Typer.typedModuleDef
   object TT
   class TT(x: Int = 1)
   val v = new TT()
 
-
   // result type of the default getter is inferred (parameter type mentions type parameter T)
-  def test10[T](x: List[T] = List(1,2)) = x
+  def test10[T](x: List[T] = List(1, 2)) = x
   println(test10())
 
   // some complicated type which mentions T
-  def test11[T[P]](x: T[T[List[T[X forSome { type X }]]]] = List(1,2)) = x
+  def test11[T[P]](x: T[T[List[T[X forSome { type X }]]]] = List(1, 2)) = x
   // (cannot call f using the default, List(1,2) doesn't match the param type)
 
-  def multinest = { def bar(x: Int = 1) = { def bar(x: Int = 2) = x; bar() + x }; bar() }
+  def multinest = {
+    def bar(x: Int = 1) = { def bar(x: Int = 2) = x; bar() + x }; bar()
+  }
   println(multinest)
-
 
   // #2290
   def spawn(a: Int, b: => Unit) = { () }
@@ -277,7 +263,11 @@ object Test extends App {
 
   // #2489
   class A2489 { def foo { def bar(a: Int = 1) = a; bar(); val u = 0 } }
-  class A2489x2 { def foo { val v = 10; def bar(a: Int = 1, b: Int = 2) = a; bar(); val u = 0 } }
+  class A2489x2 {
+    def foo {
+      val v = 10; def bar(a: Int = 1, b: Int = 2) = a; bar(); val u = 0
+    }
+  }
 
   // a bug reported on the mailing lists, related to #2489
   class Test2489 {
@@ -306,7 +296,6 @@ object Test extends App {
     def bar(foo: Int) = foo
     bar(foo = 1)
   }
-
 
   // #3207
   trait P3207[T] {
@@ -348,7 +337,6 @@ object Test extends App {
   }
   (new t3338.Test).a
 
-
   // subclassing and defaults in both class constructors
   class CBLAH(val x: Int = 1)
   class DBLAH(val y: String = "2") extends CBLAH()
@@ -370,7 +358,6 @@ object Test extends App {
   println(deprNam2.f(s = new Object))
   println(deprNam2.g(x = "sljkfd"))
 
-
   // #3697
   object t3697 {
     def a(x: Int*)(s: Int = 3) = s
@@ -379,7 +366,7 @@ object Test extends App {
   println(t3697.a(Seq(3): _*)())
   println(t3697.a(3)())
   println(t3697.a()())
-  println(t3697.a(2,3,1)())
+  println(t3697.a(2, 3, 1)())
   println(t3697.b(a = 1, b = 2))
   println(t3697.b(a = 1, b = 2, 3))
   println(t3697.b(b = 1, a = 2, c = 3))
@@ -387,13 +374,12 @@ object Test extends App {
   println(t3697.b(a = 1, b = 2, Seq(3, 4): _*))
   println(t3697.b(b = 1, a = 2, c = Seq(3, 4): _*))
 
-
   // #4041
   object t4041 {
     def _1 = (0, 0) copy (_1 = 1)
     def _2 = (1, 1) copy (_2 = 2)
   }
-  println(""+ t4041._1 +", "+ t4041._2)
+  println("" + t4041._1 + ", " + t4041._2)
 
   // #4441
   case class C4441a()
@@ -406,40 +392,48 @@ object Test extends App {
   println(f8177(a = 1, 1))
 
   // DEFINITIONS
-  def test1(a: Int, b: String) = println(a +": "+ b)
-  def test2(u: Int, v: Int)(k: String, l: Int) = println(l +": "+ k +", "+ (u + v))
+  def test1(a: Int, b: String) = println(a + ": " + b)
+  def test2(u: Int, v: Int)(k: String, l: Int) =
+    println(l + ": " + k + ", " + (u + v))
 
-  def test3[T1, T2](a: Int, b: T1)(c: String, d: T2) = println(a +": "+ c +", "+ b +", "+ d)
+  def test3[T1, T2](a: Int, b: T1)(c: String, d: T2) =
+    println(a + ": " + c + ", " + b + ", " + d)
 
   def test4(a: Int) = {
-    def inner(b: Int = a, c: String) = println(b +": "+ c)
+    def inner(b: Int = a, c: String) = println(b + ": " + c)
     inner(c = "/")
   }
   def test5(argName: Unit) = println("test5")
-  def test6(x: Int) = { () => x }
+  def test6(x: Int) = { () =>
+    x
+  }
   def test7(s: String) = List(1).foreach(_ => println(s))
 
   def test8(x: Int = 1)(implicit y: Int, z: String = "kldfj") = z + x + y
   def test9(implicit x: Int = 1, z: String = "klfj") = z + x
 }
 
-
 class Base {
-  def test1[T1, T2](a: Int = 100, b: T1)(c: T2, d: String = a +": "+ b)(e: T2 = c, f: Int) =
-    println(a +": "+ d +", "+ b +", "+ c +", "+ e +", "+ f)
+  def test1[T1, T2](a: Int = 100, b: T1)(c: T2, d: String = a + ": " + b)(
+      e: T2 = c, f: Int) =
+    println(a + ": " + d + ", " + b + ", " + c + ", " + e + ", " + f)
 }
 
 class Sub1 extends Base {
-  override def test1[U1, U2](b: Int, a: U1)(m: U2, r: String = "overridden")(o: U2, f: Int = 555) =
-    println(b +": "+ r +", "+ a +", "+ m +", "+ o +", "+ f)
+  override def test1[U1, U2](b: Int, a: U1)(m: U2, r: String = "overridden")(
+      o: U2, f: Int = 555) =
+    println(b + ": " + r + ", " + a + ", " + m + ", " + o + ", " + f)
 }
 
+class A[T <: String, U](a: Int = 0, b: T)(c: String = b, d: Int) {
+  def print = c + a + b + d
+}
+class B[T](a: T, b: Int = 1)(c: T = a, e: String = "dklsf")
+    extends A(5, e)("dlkd", 10) { def printB = super.print + e + a + b + c }
 
-class A[T <: String, U](a: Int = 0, b: T)(c: String = b, d: Int) { def print = c + a + b + d }
-class B[T](a: T, b: Int = 1)(c: T = a, e: String = "dklsf") extends A(5, e)("dlkd", 10) { def printB = super.print + e + a + b + c }
-
-case class C[U](a: String, b: Int = 234, c: U)(d: U = c, e: String = "dlkfj") { def print = toString + d + e }
-
+case class C[U](a: String, b: Int = 234, c: U)(d: U = c, e: String = "dlkfj") {
+  def print = toString + d + e
+}
 
 class A1 {
   def foo(a: Int = 10, b: String) = b + a
@@ -460,12 +454,11 @@ abstract class M extends N {
 
 class MN extends M {
   def foo[T >: String](x: Int, y: T)(z: String) = z + x + y
-  def bar(n: Int, m: Double) = n*m
+  def bar(n: Int, m: Double) = n * m
 }
 
 case class Factory(x: Int = 1, y: String)(z: String = y)
 case class Fact2[T, +U](x: T = "ju", y: U = 1)(z: T = 2)
-
 
 // dependent types and copy method
 class A2 {
@@ -474,8 +467,6 @@ class A2 {
   }
   class C2
 }
-
-
 
 // using names / defaults in self constructor call.
 // overloading resolution: calling A3("string") picks the second, method with default is always less specific.
@@ -491,7 +482,6 @@ class A4(x: String, y: Int = 11) {
     println(y)
   }
 }
-
 
 // using names / defaults in super constructor call
 class A5(x: Int, val y: Int = 2)(z: Int = x + y)

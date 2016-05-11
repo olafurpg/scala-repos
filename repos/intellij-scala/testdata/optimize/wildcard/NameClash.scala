@@ -22,4 +22,4 @@ class NameClash {
     val list = List(1, 2, 3) //java.awt.List would clash with scala.List
   }
 }
-*/
+ */

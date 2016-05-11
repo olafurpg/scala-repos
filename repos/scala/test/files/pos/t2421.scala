@@ -2,7 +2,6 @@ object Test {
   abstract class <~<[-From, +To] extends (From => To)
   implicit def trivial[A]: A <~< A = sys.error("")
 
-
   trait Forcible[T]
   implicit val forcibleInt: (Int <~< Forcible[Int]) = sys.error("")
 

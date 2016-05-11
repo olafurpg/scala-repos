@@ -2,7 +2,8 @@ import scala.tools.nsc._
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  def code = """
+  def code =
+    """
     import scala.language.experimental._, scala.reflect.macros.blackbox.Context
     object GrabContext {
       def lastContext = Option(System.getProperties.get("lastContext").asInstanceOf[reflect.macros.runtime.Context])

@@ -21,28 +21,27 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.streaming.Time
 
 /**
- * :: DeveloperApi ::
- * Class having information on output operations.
- * @param batchTime Time of the batch
- * @param id Id of this output operation. Different output operations have different ids in a batch.
- * @param name The name of this output operation.
- * @param description The description of this output operation.
- * @param startTime Clock time of when the output operation started processing
- * @param endTime Clock time of when the output operation started processing
- * @param failureReason Failure reason if this output operation fails
- */
+  * :: DeveloperApi ::
+  * Class having information on output operations.
+  * @param batchTime Time of the batch
+  * @param id Id of this output operation. Different output operations have different ids in a batch.
+  * @param name The name of this output operation.
+  * @param description The description of this output operation.
+  * @param startTime Clock time of when the output operation started processing
+  * @param endTime Clock time of when the output operation started processing
+  * @param failureReason Failure reason if this output operation fails
+  */
 @DeveloperApi
-case class OutputOperationInfo(
-    batchTime: Time,
-    id: Int,
-    name: String,
-    description: String,
-    startTime: Option[Long],
-    endTime: Option[Long],
-    failureReason: Option[String]) {
+case class OutputOperationInfo(batchTime: Time,
+                               id: Int,
+                               name: String,
+                               description: String,
+                               startTime: Option[Long],
+                               endTime: Option[Long],
+                               failureReason: Option[String]) {
 
   /**
-   * Return the duration of this output operation.
-   */
+    * Return the duration of this output operation.
+    */
   def duration: Option[Long] = for (s <- startTime; e <- endTime) yield e - s
 }

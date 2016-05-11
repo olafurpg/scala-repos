@@ -44,18 +44,27 @@ object RDDRelation {
     sqlContext.sql("SELECT * FROM records").collect().foreach(println)
 
     // Aggregation queries are also supported.
-    val count = sqlContext.sql("SELECT COUNT(*) FROM records").collect().head.getLong(0)
+    val count =
+      sqlContext.sql("SELECT COUNT(*) FROM records").collect().head.getLong(0)
     println(s"COUNT(*): $count")
 
     // The results of SQL queries are themselves RDDs and support all normal RDD functions.  The
     // items in the RDD are of type Row, which allows you to access each column by ordinal.
-    val rddFromSql = sqlContext.sql("SELECT key, value FROM records WHERE key < 10")
+    val rddFromSql =
+      sqlContext.sql("SELECT key, value FROM records WHERE key < 10")
 
     println("Result of RDD.map:")
-    rddFromSql.rdd.map(row => s"Key: ${row(0)}, Value: ${row(1)}").collect().foreach(println)
+    rddFromSql.rdd
+      .map(row => s"Key: ${row(0)}, Value: ${row(1)}")
+      .collect()
+      .foreach(println)
 
     // Queries can also be written using a LINQ-like Scala DSL.
-    df.where($"key" === 1).orderBy($"value".asc).select($"key").collect().foreach(println)
+    df.where($"key" === 1)
+      .orderBy($"value".asc)
+      .select($"key")
+      .collect()
+      .foreach(println)
 
     // Write out an RDD as a parquet file with overwrite mode.
     df.write.mode(SaveMode.Overwrite).parquet("pair.parquet")
@@ -64,7 +73,11 @@ object RDDRelation {
     val parquetFile = sqlContext.read.parquet("pair.parquet")
 
     // Queries can be run using the DSL on parquet files just like the original RDD.
-    parquetFile.where($"key" === 1).select($"value".as("a")).collect().foreach(println)
+    parquetFile
+      .where($"key" === 1)
+      .select($"value".as("a"))
+      .collect()
+      .foreach(println)
 
     // These files can also be registered as tables.
     parquetFile.registerTempTable("parquetFile")

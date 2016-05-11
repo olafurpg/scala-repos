@@ -21,10 +21,9 @@ package com.precog.ragnarok
 
 import scalaz._
 
-
 // TODO: The Timer should just be a member.
 
-trait PerfTestRunner[M[+_], T] {
+trait PerfTestRunner[M[+ _], T] {
   import scalaz.syntax.monad._
   import scalaz.syntax.monoid._
   import scalaz.syntax.comonad._
@@ -35,22 +34,17 @@ trait PerfTestRunner[M[+_], T] {
   /** Result type of running an eval. */
   type Result
 
-
   /** Evaluate a Quirrel query. */
   def eval(query: String): M[Result]
 
-
   def startup(): Unit
   def shutdown(): Unit
-
 
   val timer: Timer[T]
 
   import timer._
 
-
   type RunResult[A] = Tree[(PerfTest, A, Option[(T, T)])]
-
 
   private def fill[A](run: RunResult[A]): RunResult[A] = run match {
     case n @ Tree.Node((_: RunQuery, _, _), _) => n
@@ -63,19 +57,23 @@ trait PerfTestRunner[M[+_], T] {
       Tree.node((test, a, t), kids)
   }
 
-  private def merge[A: Monoid](run: RunResult[A], f: Option[(T, T)] => A): Tree[(PerfTest, A)] = {
-    fill(run) match { case Tree.Node((test, a, time), children) =>
-      Tree.node((test, a |+| f(time)), children map (merge(_, f)))
+  private def merge[A : Monoid](
+      run: RunResult[A], f: Option[(T, T)] => A): Tree[(PerfTest, A)] = {
+    fill(run) match {
+      case Tree.Node((test, a, time), children) =>
+        Tree.node((test, a |+| f(time)), children map (merge(_, f)))
     }
   }
 
-  def runAll[A: Monoid](test: Tree[PerfTest], n: Int)(f: Option[(T, T)] => A) = runAllM(test, n)(f).copoint
+  def runAll[A : Monoid](test: Tree[PerfTest], n: Int)(
+      f: Option[(T, T)] => A) = runAllM(test, n)(f).copoint
 
   /**
-   * Runs `test` `n` times, merging the times for queries together by converting
-   * the times to `A`s, then appending them.
-   */
-  def runAllM[A: Monoid](test: Tree[PerfTest], n: Int)(f: Option[(T, T)] => A) = {
+    * Runs `test` `n` times, merging the times for queries together by converting
+    * the times to `A`s, then appending them.
+    */
+  def runAllM[A : Monoid](test: Tree[PerfTest], n: Int)(
+      f: Option[(T, T)] => A) = {
     require(n > 0)
 
     (1 to n).foldLeft((test map (_ -> Monoid[A].zero)).pure[M]) { (acc, _) =>
@@ -86,24 +84,26 @@ trait PerfTestRunner[M[+_], T] {
   def runM[A](test: Tree[(PerfTest, A)]): M[RunResult[A]] = {
     test match {
       case Tree.Node((test @ RunQuery(q), a), _) =>
-        timeQuery(q) map { case (t, _) =>
-          Tree.leaf((test, a, Some(t)))
+        timeQuery(q) map {
+          case (t, _) =>
+            Tree.leaf((test, a, Some(t)))
         }
 
       case Tree.Node((RunSequential, a), tests) =>
         tests.foldLeft(List[RunResult[A]]().pure[M]) { (acc, test) =>
-            acc flatMap { rs =>
-              runM(test) map (_ :: rs)
-            }
+          acc flatMap { rs =>
+            runM(test) map (_ :: rs)
+          }
         } map { children =>
           Tree.node((RunSequential, a, None), children.reverse.toStream)
         }
 
       case Tree.Node((RunConcurrent, a), tests) =>
-        (tests map (runM(_))).foldLeft(List[RunResult[A]]().pure[M]) { (acc, run) =>
-          acc flatMap { rs =>
-            run map { _ :: rs }
-          }
+        (tests map (runM(_))).foldLeft(List[RunResult[A]]().pure[M]) {
+          (acc, run) =>
+            acc flatMap { rs =>
+              run map { _ :: rs }
+            }
         } map { children =>
           Tree.node((RunConcurrent, a, None), children.reverse.toStream)
         }
@@ -129,8 +129,9 @@ trait PerfTestRunner[M[+_], T] {
   }
 }
 
-
-class MockPerfTestRunner[M[+_]](evalTime: => Int)(implicit val M: Monad[M] with Comonad[M]) extends PerfTestRunner[M, Long] {
+class MockPerfTestRunner[M[+ _]](
+    evalTime: => Int)(implicit val M: Monad[M] with Comonad[M])
+    extends PerfTestRunner[M, Long] {
   import scalaz.syntax.monad._
 
   type Result = Unit

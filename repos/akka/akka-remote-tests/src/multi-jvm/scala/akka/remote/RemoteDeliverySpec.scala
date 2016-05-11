@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import scala.language.postfixOps
@@ -23,7 +23,9 @@ object RemoteDeliveryMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("akka.loglevel=INFO")))
+  commonConfig(
+      debugConfig(on = false)
+        .withFallback(ConfigFactory.parseString("akka.loglevel=INFO")))
 
   final case class Letter(n: Int, route: List[ActorRef])
 
@@ -32,7 +34,6 @@ object RemoteDeliveryMultiJvmSpec extends MultiNodeConfig {
       case Letter(n, route) ⇒ route.head ! Letter(n, route.tail)
     }
   }
-
 }
 
 class RemoteDeliveryMultiJvmNode1 extends RemoteDeliverySpec
@@ -40,17 +41,19 @@ class RemoteDeliveryMultiJvmNode2 extends RemoteDeliverySpec
 class RemoteDeliveryMultiJvmNode3 extends RemoteDeliverySpec
 
 abstract class RemoteDeliverySpec
-  extends MultiNodeSpec(RemoteDeliveryMultiJvmSpec)
-  with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(RemoteDeliveryMultiJvmSpec) with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteDeliveryMultiJvmSpec._
 
   override def initialParticipants = roles.size
 
-  def identify(role: RoleName, actorName: String): ActorRef = within(10 seconds) {
-    system.actorSelection(node(role) / "user" / actorName) ! Identify(actorName)
-    expectMsgType[ActorIdentity].ref.get
-  }
+  def identify(role: RoleName, actorName: String): ActorRef =
+    within(10 seconds) {
+      system.actorSelection(node(role) / "user" / actorName) ! Identify(
+          actorName)
+      expectMsgType[ActorIdentity].ref.get
+    }
 
   "Remoting with TCP" must {
 
@@ -74,6 +77,5 @@ abstract class RemoteDeliverySpec
 
       enterBarrier("after-1")
     }
-
   }
 }

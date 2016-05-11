@@ -37,7 +37,7 @@ import blueeyes.core.http.MimeTypes._
 import blueeyes.core.service._
 import blueeyes.json._
 
-import akka.dispatch.{ ExecutionContext, Future }
+import akka.dispatch.{ExecutionContext, Future}
 import com.weiglewilczek.slf4s.Logging
 
 import java.nio.ByteBuffer
@@ -47,67 +47,105 @@ import scalaz.syntax.show._
 import scalaz.effect.IO
 
 // having access to the whole platform is a bit of overkill, but whatever
-class DataServiceHandler[A](platform: Platform[Future, Slice, StreamT[Future, Slice]])(implicit M: Monad[Future])
-    extends CustomHttpService[A, (APIKey, Path) => Future[HttpResponse[ByteChunk]]] with Logging {
+class DataServiceHandler[A](
+    platform: Platform[Future, Slice, StreamT[Future, Slice]])(
+    implicit M: Monad[Future])
+    extends CustomHttpService[
+        A, (APIKey, Path) => Future[HttpResponse[ByteChunk]]] with Logging {
 
-  val service = (request: HttpRequest[A]) => Success {
-    import ResourceError._
+  val service = (request: HttpRequest[A]) =>
+    Success {
+      import ResourceError._
 
-    (apiKey: APIKey, path: Path) => {
-      val mimeTypes = request.headers.header[Accept].toSeq.flatMap(_.mimeTypes)
-      platform.vfs.readResource(apiKey, path, Version.Current, AccessMode.Read).run flatMap {
-        _.fold(
-          resourceError => M point { 
-            resourceError match {
-              case Corrupt(message) =>
-                logger.error("Corrupt resource found for current version of path %s: %s".format(path.path, message))
-                HttpResponse(InternalServerError)
+      (apiKey: APIKey, path: Path) =>
+        {
+          val mimeTypes =
+            request.headers.header[Accept].toSeq.flatMap(_.mimeTypes)
+          platform.vfs
+            .readResource(apiKey, path, Version.Current, AccessMode.Read)
+            .run flatMap {
+            _.fold(
+                resourceError =>
+                  M point {
+                    resourceError match {
+                      case Corrupt(message) =>
+                        logger.error(
+                            "Corrupt resource found for current version of path %s: %s"
+                              .format(path.path, message))
+                        HttpResponse(InternalServerError)
 
-              case IOError(throwable) =>
-                logger.error("An IO error was encountered reading data from path %s".format(path.path), throwable)
-                HttpResponse(InternalServerError)
+                      case IOError(throwable) =>
+                        logger.error(
+                            "An IO error was encountered reading data from path %s"
+                              .format(path.path),
+                            throwable)
+                        HttpResponse(InternalServerError)
 
-              case IllegalWriteRequestError(message) =>
-                logger.error("Unexpected write response to readResource of path %s: %s".format(path.path, message))
-                HttpResponse(InternalServerError)
-                
-              case PermissionsError(message) =>
-                logger.warn("Access denied after auth combinator check to path %s for %s: %s".format(path.path, apiKey, message))
-                HttpResponse(HttpStatus(Forbidden, message))
+                      case IllegalWriteRequestError(message) =>
+                        logger.error(
+                            "Unexpected write response to readResource of path %s: %s"
+                              .format(path.path, message))
+                        HttpResponse(InternalServerError)
 
-              case NotFound(message) =>
-                HttpResponse(HttpStatus(HttpStatusCodes.NotFound, message))
+                      case PermissionsError(message) =>
+                        logger.warn(
+                            "Access denied after auth combinator check to path %s for %s: %s"
+                              .format(path.path, apiKey, message))
+                        HttpResponse(HttpStatus(Forbidden, message))
 
-              case multiple: ResourceErrors =>
-                multiple.fold(
-                  fatal => { 
-                    logger.error("Multiple errors encountered serving readResource of path %s: %s".format(path.path, fatal.messages.list.mkString("[\n", ",\n", "]")))
-                    HttpResponse(InternalServerError)
-                  },
-                  userError => 
-                    HttpResponse(HttpStatus(BadRequest, "Multiple errors encountered reading resource at path %s".format(path.path)), 
-                      // although the returned content is actually application/json, the HTTP spec only allows for text/plain to be returned
-                      // in violation of accept headers, so I think the best thing to do here is lie.
-                      headers = HttpHeaders(`Content-Type`(text/plain)), 
-                      content = Some(Left(JObject("errors" -> JArray(userError.messages.list.map(JString(_)): _*)).renderPretty.getBytes("UTF-8"))))
+                      case NotFound(message) =>
+                        HttpResponse(
+                            HttpStatus(HttpStatusCodes.NotFound, message))
 
-                )
-            }
-          },
-          resource => resource.byteStream(mimeTypes).run map {
-            case Some((reportedType, byteStream)) =>
-              HttpResponse(OK, headers = HttpHeaders(`Content-Type`(reportedType)), content = Some(Right(byteStream)))
+                      case multiple: ResourceErrors =>
+                        multiple.fold(
+                            fatal =>
+                              {
+                                logger.error(
+                                    "Multiple errors encountered serving readResource of path %s: %s"
+                                      .format(path.path,
+                                              fatal.messages.list
+                                                .mkString("[\n", ",\n", "]")))
+                                HttpResponse(InternalServerError)
+                            },
+                            userError =>
+                              HttpResponse(
+                                  HttpStatus(BadRequest,
+                                             "Multiple errors encountered reading resource at path %s"
+                                               .format(path.path)),
+                                  // although the returned content is actually application/json, the HTTP spec only allows for text/plain to be returned
+                                  // in violation of accept headers, so I think the best thing to do here is lie.
+                                  headers = HttpHeaders(
+                                        `Content-Type`(text / plain)),
+                                  content = Some(
+                                        Left(JObject("errors" -> JArray(
+                                                    userError.messages.list
+                                                      .map(JString(_)): _*)).renderPretty
+                                              .getBytes("UTF-8"))))
+                        )
+                    }
+                },
+                resource =>
+                  resource.byteStream(mimeTypes).run map {
+                    case Some((reportedType, byteStream)) =>
+                      HttpResponse(
+                          OK,
+                          headers = HttpHeaders(`Content-Type`(reportedType)),
+                          content = Some(Right(byteStream)))
 
-            case None =>
-              HttpResponse(HttpStatus(HttpStatusCodes.NotFound, "Could not locate content for path " + path))
+                    case None =>
+                      HttpResponse(
+                          HttpStatus(HttpStatusCodes.NotFound,
+                                     "Could not locate content for path " +
+                                     path))
+                }
+            )
+          } recover {
+            case ex =>
+              logger.error("Exception thrown in readResource evaluation.", ex)
+              HttpResponse(InternalServerError)
           }
-        )
-      } recover {
-        case ex => 
-            logger.error("Exception thrown in readResource evaluation.", ex)
-            HttpResponse(InternalServerError)
-      }
-    }
+        }
   }
 
   val metadata = NoMetadata //FIXME

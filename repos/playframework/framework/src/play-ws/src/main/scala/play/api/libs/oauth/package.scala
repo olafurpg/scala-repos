@@ -4,6 +4,6 @@
 package play.api.libs
 
 /**
- * OAuth integration helpers.
- */
+  * OAuth integration helpers.
+  */
 package object oauth

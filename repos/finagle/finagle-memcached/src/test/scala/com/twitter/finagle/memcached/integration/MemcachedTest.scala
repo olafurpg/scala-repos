@@ -32,7 +32,8 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
     server1 = TestMemcachedServer.start()
     server2 = TestMemcachedServer.start()
     if (server1.isDefined && server2.isDefined) {
-      val n = Name.bound(Address(server1.get.address), Address(server2.get.address))
+      val n =
+        Name.bound(Address(server1.get.address), Address(server2.get.address))
       client = Memcached.client.newRichClient(n, clientName)
     }
   }
@@ -43,7 +44,8 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
   }
 
   override def withFixture(test: NoArgTest): Outcome = {
-    if (server1.isDefined && server2.isDefined) test() else {
+    if (server1.isDefined && server2.isDefined) test()
+    else {
       info("Cannot start memcached. Skipping test...")
       cancel()
     }
@@ -59,11 +61,13 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
   test("get") {
     Await.result(client.set("foo", Buf.Utf8("bar")))
     Await.result(client.set("baz", Buf.Utf8("boing")))
-    val result =
-      Await.result(
-        client.get(Seq("foo", "baz", "notthere"))
-      ).map { case (key, Buf.Utf8(value)) =>
-        (key, value)
+    val result = Await
+      .result(
+          client.get(Seq("foo", "baz", "notthere"))
+      )
+      .map {
+        case (key, Buf.Utf8(value)) =>
+          (key, value)
       }
     assert(result == Map("foo" -> "bar", "baz" -> "boing"))
   }
@@ -73,17 +77,18 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
       Await.result(client.set("foos", Buf.Utf8("xyz")))
       Await.result(client.set("bazs", Buf.Utf8("xyz")))
       Await.result(client.set("bazs", Buf.Utf8("zyx")))
-      val result =
-        Await.result(
-          client.gets(Seq("foos", "bazs", "somethingelse"))
-        ).map { case (key, (Buf.Utf8(value), Buf.Utf8(casUnique))) =>
-          (key, (value, casUnique))
+      val result = Await
+        .result(
+            client.gets(Seq("foos", "bazs", "somethingelse"))
+        )
+        .map {
+          case (key, (Buf.Utf8(value), Buf.Utf8(casUnique))) =>
+            (key, (value, casUnique))
         }
-      val expected =
-        Map(
+      val expected = Map(
           "foos" -> (("xyz", "1")), // the "cas unique" values are predictable from a fresh memcached
           "bazs" -> (("zyx", "3"))
-        )
+      )
       assert(result == expected)
     }
   }
@@ -114,15 +119,15 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
   test("incr & decr") {
     // As of memcached 1.4.8 (issue 221), empty values are no longer treated as integers
     Await.result(client.set("foo", Buf.Utf8("0")))
-    assert(Await.result(client.incr("foo"))    == Some(1L))
+    assert(Await.result(client.incr("foo")) == Some(1L))
     assert(Await.result(client.incr("foo", 2)) == Some(3L))
-    assert(Await.result(client.decr("foo"))    == Some(2L))
+    assert(Await.result(client.decr("foo")) == Some(2L))
 
     Await.result(client.set("foo", Buf.Utf8("0")))
-    assert(Await.result(client.incr("foo"))    == Some(1L))
+    assert(Await.result(client.incr("foo")) == Some(1L))
     val l = 1L << 50
     assert(Await.result(client.incr("foo", l)) == Some(l + 1L))
-    assert(Await.result(client.decr("foo"))    == Some(l))
+    assert(Await.result(client.decr("foo")) == Some(l))
     assert(Await.result(client.decr("foo", l)) == Some(0L))
   }
 
@@ -146,33 +151,54 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
     intercept[ClientError] { Await.result(client.get("    foo")) }
     val nullString: String = null
     intercept[NullPointerException] { Await.result(client.get(nullString)) }
-    intercept[NullPointerException] { Await.result(client.set(nullString, Buf.Utf8("bar"))) }
-    intercept[ClientError] { Await.result(client.set("    ", Buf.Utf8("bar"))) }
+    intercept[NullPointerException] {
+      Await.result(client.set(nullString, Buf.Utf8("bar")))
+    }
+    intercept[ClientError] {
+      Await.result(client.set("    ", Buf.Utf8("bar")))
+    }
 
-    assert(Await.result(client.set("\t", Buf.Utf8("bar")).liftToTry) == Return.Unit) // "\t" is a valid key
+    assert(
+        Await.result(client.set("\t", Buf.Utf8("bar")).liftToTry) == Return.Unit) // "\t" is a valid key
     intercept[ClientError] { Await.result(client.set("\r", Buf.Utf8("bar"))) }
     intercept[ClientError] { Await.result(client.set("\n", Buf.Utf8("bar"))) }
-    intercept[ClientError] { Await.result(client.set("\u0000", Buf.Utf8("bar"))) }
+    intercept[ClientError] {
+      Await.result(client.set("\u0000", Buf.Utf8("bar")))
+    }
 
-    val veryLongKey = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+    val veryLongKey =
+      "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
     intercept[ClientError] { Await.result(client.get(veryLongKey)) }
-    intercept[ClientError] { Await.result(client.set(veryLongKey, Buf.Utf8("bar"))) }
+    intercept[ClientError] {
+      Await.result(client.set(veryLongKey, Buf.Utf8("bar")))
+    }
 
     // test other keyed command validation
-    val nullSeq:Seq[String] = null
+    val nullSeq: Seq[String] = null
     intercept[NullPointerException] { Await.result(client.get(nullSeq)) }
-    intercept[ClientError] { Await.result(client.append("bad key", Buf.Utf8("rab"))) }
-    intercept[ClientError] { Await.result(client.prepend("bad key", Buf.Utf8("rab"))) }
-    intercept[ClientError] { Await.result(client.replace("bad key", Buf.Utf8("bar"))) }
-    intercept[ClientError] { Await.result(client.add("bad key", Buf.Utf8("2"))) }
-    intercept[ClientError] { Await.result(client.cas("bad key", Buf.Utf8("z"), Buf.Utf8("2"))) }
+    intercept[ClientError] {
+      Await.result(client.append("bad key", Buf.Utf8("rab")))
+    }
+    intercept[ClientError] {
+      Await.result(client.prepend("bad key", Buf.Utf8("rab")))
+    }
+    intercept[ClientError] {
+      Await.result(client.replace("bad key", Buf.Utf8("bar")))
+    }
+    intercept[ClientError] {
+      Await.result(client.add("bad key", Buf.Utf8("2")))
+    }
+    intercept[ClientError] {
+      Await.result(client.cas("bad key", Buf.Utf8("z"), Buf.Utf8("2")))
+    }
     intercept[ClientError] { Await.result(client.incr("bad key")) }
     intercept[ClientError] { Await.result(client.decr("bad key")) }
     intercept[ClientError] { Await.result(client.delete("bad key")) }
   }
 
   test("re-hash when a bad host is ejected") {
-    val n = Name.bound(Address(server1.get.address), Address(server2.get.address))
+    val n =
+      Name.bound(Address(server1.get.address), Address(server2.get.address))
     client = Memcached.client
       .configured(FailureAccrualFactory.Param(1, () => 10.minutes))
       .configured(Memcached.param.EjectFailedHost(true))
@@ -181,10 +207,11 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
 
     // set values
     Await.result(Future.collect(
-      (0 to 20).map { i =>
-        client.set(s"foo$i", Buf.Utf8(s"bar$i"))
-      }
-    ), TimeOut)
+                     (0 to 20).map { i =>
+                       client.set(s"foo$i", Buf.Utf8(s"bar$i"))
+                     }
+                 ),
+                 TimeOut)
 
     // shutdown one memcache host
     server2.foreach(_.stop())
@@ -195,17 +222,18 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
     }
 
     // one memcache host alive
-    val clientSet =
-      (0 to 20).foldLeft(Set[Client]()){ case (s, i) =>
+    val clientSet = (0 to 20).foldLeft(Set[Client]()) {
+      case (s, i) =>
         val c = partitionedClient.clientOf(s"foo$i")
         s + c
-      }
+    }
     assert(clientSet.size == 1)
 
     // previously set values have cache misses
     var cacheMisses = 0
     for (i <- 0 to 20) {
-      if (Await.result(client.get(s"foo$i"), TimeOut) == None) cacheMisses = cacheMisses + 1
+      if (Await.result(client.get(s"foo$i"), TimeOut) == None)
+        cacheMisses = cacheMisses + 1
     }
     assert(cacheMisses > 0)
   }
@@ -223,10 +251,10 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
     val expectedKey = Seq("client", "memcached", name, "is_pipelining")
     KetamaClientBuilder()
       .clientBuilder(ClientBuilder()
-        .hosts(Seq(server1.get.address))
-        .name(name)
-        .codec(new com.twitter.finagle.memcached.protocol.text.Memcached())
-        .hostConnectionLimit(1))
+            .hosts(Seq(server1.get.address))
+            .name(name)
+            .codec(new com.twitter.finagle.memcached.protocol.text.Memcached())
+            .hostConnectionLimit(1))
       .build()
 
     val isPipelining = GlobalRegistry.get.iterator.exists { e =>
@@ -240,15 +268,16 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
 
     class MockedMemcacheServer extends Service[Command, Response] {
       def apply(command: Command) = command match {
-        case Get(key) => Future.value(Values(List(Value(Buf.Utf8("foo"), Buf.Utf8("bar")))))
+        case Get(key) =>
+          Future.value(Values(List(Value(Buf.Utf8("foo"), Buf.Utf8("bar")))))
         case Set(_, _, _, _) => Future.value(Error(new Exception))
         case x => Future.exception(new MatchError(x))
       }
     }
 
-    val cacheServer = Memcached.serve(
-      new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
-      new MockedMemcacheServer)
+    val cacheServer =
+      Memcached.serve(new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
+                      new MockedMemcacheServer)
 
     val timer = new MockTimer
     val statsReceiver = new InMemoryStatsReceiver
@@ -258,15 +287,19 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
       .configured(Memcached.param.EjectFailedHost(true))
       .configured(param.Timer(timer))
       .configured(param.Stats(statsReceiver))
-      .newRichClient(Name.bound(Address(cacheServer.boundAddress.asInstanceOf[InetSocketAddress])), "cacheClient")
+      .newRichClient(
+          Name.bound(Address(
+                  cacheServer.boundAddress.asInstanceOf[InetSocketAddress])),
+          "cacheClient")
 
     Time.withCurrentTimeFrozen { timeControl =>
-
       // Send a bad request
       intercept[Exception] { Await.result(client.set("foo", Buf.Utf8("bar"))) }
 
       // Node should have been ejected
-      assert(statsReceiver.counters.get(List("cacheClient", "ejections")) == Some(1))
+      assert(
+          statsReceiver.counters.get(List("cacheClient", "ejections")) == Some(
+              1))
 
       // Node should have been marked dead, and still be dead after 5 minutes
       timeControl.advance(5.minutes)
@@ -280,7 +313,9 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
       timer.tick()
 
       // 10 minutes (markDeadFor duration) have passed, so the request should go through
-      assert(statsReceiver.counters.get(List("cacheClient", "revivals")) == Some(1))
+      assert(
+          statsReceiver.counters.get(List("cacheClient", "revivals")) == Some(
+              1))
       assert(Await.result(client.get(s"foo")).get == Buf.Utf8("bar"))
     }
   }

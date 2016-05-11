@@ -1,18 +1,19 @@
 /** Test contributed by Stefan Zeiger showing that HLists can be
- *  specialized.
- */
-
+  *  specialized.
+  */
 sealed trait HList {
   type Self <: HList
 
-  type |: [E] = HCons[E, Self]
+  type |:[E] = HCons[E, Self]
 
-  final def |: [@specialized E](elem: E): |: [E] = new HCons[E, Self](elem, this.asInstanceOf[Self])
+  final def |:[@specialized E](elem: E): |:[E] =
+    new HCons[E, Self](elem, this.asInstanceOf[Self])
 
   def m[@specialized E, T <: AnyRef](x: E): T = null.asInstanceOf[T]
 }
 
-final class HCons[@specialized H, T <: HList](val head: H, val tail: T) extends HList {
+final class HCons[@specialized H, T <: HList](val head: H, val tail: T)
+    extends HList {
   type Self = HCons[H, T]
 }
 

@@ -9,15 +9,16 @@ object ScaloidSettings {
 
   val Scaloid = config("scaloid") extend Compile
 
-  lazy val generate = taskKey[Seq[File]]("Generate Scaloid source code from templates")
-  lazy val extract = taskKey[Map[String, AndroidClass]]("Extract android classes")
+  lazy val generate =
+    taskKey[Seq[File]]("Generate Scaloid source code from templates")
+  lazy val extract =
+    taskKey[Map[String, AndroidClass]]("Extract android classes")
   lazy val apiVersion = settingKey[Int]("Target Android API Version")
 
   lazy val scaloidSettings = Seq(
-    generate in Scaloid <<= generateTask,
-    extract in Scaloid <<= extractTask,
-    apiVersion in Scaloid := 16,
-    libraryDependencies += android
+      generate in Scaloid <<= generateTask,
+      extract in Scaloid <<= extractTask,
+      apiVersion in Scaloid := 16,
+      libraryDependencies += android
   )
-
 }

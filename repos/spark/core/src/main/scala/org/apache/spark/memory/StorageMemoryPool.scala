@@ -24,12 +24,13 @@ import org.apache.spark.storage.BlockId
 import org.apache.spark.storage.memory.MemoryStore
 
 /**
- * Performs bookkeeping for managing an adjustable-size pool of memory that is used for storage
- * (caching).
- *
- * @param lock a [[MemoryManager]] instance to synchronize on
- */
-private[memory] class StorageMemoryPool(lock: Object) extends MemoryPool(lock) with Logging {
+  * Performs bookkeeping for managing an adjustable-size pool of memory that is used for storage
+  * (caching).
+  *
+  * @param lock a [[MemoryManager]] instance to synchronize on
+  */
+private[memory] class StorageMemoryPool(lock: Object)
+    extends MemoryPool(lock) with Logging {
 
   @GuardedBy("lock")
   private[this] var _memoryUsed: Long = 0L
@@ -47,35 +48,35 @@ private[memory] class StorageMemoryPool(lock: Object) extends MemoryPool(lock) w
   }
 
   /**
-   * Set the [[MemoryStore]] used by this manager to evict cached blocks.
-   * This must be set after construction due to initialization ordering constraints.
-   */
+    * Set the [[MemoryStore]] used by this manager to evict cached blocks.
+    * This must be set after construction due to initialization ordering constraints.
+    */
   final def setMemoryStore(store: MemoryStore): Unit = {
     _memoryStore = store
   }
 
   /**
-   * Acquire N bytes of memory to cache the given block, evicting existing ones if necessary.
- *
-   * @return whether all N bytes were successfully granted.
-   */
-  def acquireMemory(blockId: BlockId, numBytes: Long): Boolean = lock.synchronized {
-    val numBytesToFree = math.max(0, numBytes - memoryFree)
-    acquireMemory(blockId, numBytes, numBytesToFree)
-  }
+    * Acquire N bytes of memory to cache the given block, evicting existing ones if necessary.
+    *
+    * @return whether all N bytes were successfully granted.
+    */
+  def acquireMemory(blockId: BlockId, numBytes: Long): Boolean =
+    lock.synchronized {
+      val numBytesToFree = math.max(0, numBytes - memoryFree)
+      acquireMemory(blockId, numBytes, numBytesToFree)
+    }
 
   /**
-   * Acquire N bytes of storage memory for the given block, evicting existing ones if necessary.
-   *
-   * @param blockId the ID of the block we are acquiring storage memory for
-   * @param numBytesToAcquire the size of this block
-   * @param numBytesToFree the amount of space to be freed through evicting blocks
-   * @return whether all N bytes were successfully granted.
-   */
-  def acquireMemory(
-      blockId: BlockId,
-      numBytesToAcquire: Long,
-      numBytesToFree: Long): Boolean = lock.synchronized {
+    * Acquire N bytes of storage memory for the given block, evicting existing ones if necessary.
+    *
+    * @param blockId the ID of the block we are acquiring storage memory for
+    * @param numBytesToAcquire the size of this block
+    * @param numBytesToFree the amount of space to be freed through evicting blocks
+    * @return whether all N bytes were successfully granted.
+    */
+  def acquireMemory(blockId: BlockId,
+                    numBytesToAcquire: Long,
+                    numBytesToFree: Long): Boolean = lock.synchronized {
     assert(numBytesToAcquire >= 0)
     assert(numBytesToFree >= 0)
     assert(memoryUsed <= poolSize)
@@ -95,7 +96,7 @@ private[memory] class StorageMemoryPool(lock: Object) extends MemoryPool(lock) w
   def releaseMemory(size: Long): Unit = lock.synchronized {
     if (size > _memoryUsed) {
       logWarning(s"Attempted to release $size bytes of storage " +
-        s"memory when we only have ${_memoryUsed} bytes")
+          s"memory when we only have ${_memoryUsed} bytes")
       _memoryUsed = 0
     } else {
       _memoryUsed -= size
@@ -107,9 +108,9 @@ private[memory] class StorageMemoryPool(lock: Object) extends MemoryPool(lock) w
   }
 
   /**
-   * Try to shrink the size of this storage memory pool by `spaceToFree` bytes. Return the number
-   * of bytes removed from the pool's capacity.
-   */
+    * Try to shrink the size of this storage memory pool by `spaceToFree` bytes. Return the number
+    * of bytes removed from the pool's capacity.
+    */
   def shrinkPoolToFreeSpace(spaceToFree: Long): Long = lock.synchronized {
     // First, shrink the pool by reclaiming free memory:
     val spaceFreedByReleasingUnusedMemory = math.min(spaceToFree, memoryFree)
@@ -117,7 +118,8 @@ private[memory] class StorageMemoryPool(lock: Object) extends MemoryPool(lock) w
     val remainingSpaceToFree = spaceToFree - spaceFreedByReleasingUnusedMemory
     if (remainingSpaceToFree > 0) {
       // If reclaiming free memory did not adequately shrink the pool, begin evicting blocks:
-      val spaceFreedByEviction = memoryStore.evictBlocksToFreeSpace(None, remainingSpaceToFree)
+      val spaceFreedByEviction =
+        memoryStore.evictBlocksToFreeSpace(None, remainingSpaceToFree)
       // When a block is released, BlockManager.dropFromMemory() calls releaseMemory(), so we do
       // not need to decrement _memoryUsed here. However, we do need to decrement the pool size.
       decrementPoolSize(spaceFreedByEviction)

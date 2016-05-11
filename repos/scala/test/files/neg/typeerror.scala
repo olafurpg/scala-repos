@@ -1,5 +1,5 @@
 object Test {
-  def add2(x:Long,y:Long): Long = x + y
+  def add2(x: Long, y: Long): Long = x + y
 
   def add[Long](x: List[Long], y: List[Long]): List[Long] =
     if (x.isEmpty || y.isEmpty) Nil

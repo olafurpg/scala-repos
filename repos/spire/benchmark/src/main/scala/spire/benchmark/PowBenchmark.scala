@@ -1,7 +1,6 @@
 package spire
 package benchmark
 
-
 import scala.util.Random
 import Random._
 
@@ -27,7 +26,7 @@ class PowBenchmarks extends MyBenchmark {
     longs = init(200000)(nextLong)
   }
 
-  def timeLongPowForInt(reps:Int) = run(reps) {
+  def timeLongPowForInt(reps: Int) = run(reps) {
     var t = 0
     ints.foreach { n =>
       t += spire.math.pow(n.toLong, 2.toLong).toInt
@@ -35,7 +34,7 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeDoublePowForInt(reps:Int) = run(reps) {
+  def timeDoublePowForInt(reps: Int) = run(reps) {
     var t = 0
     ints.foreach { n =>
       t += spire.math.pow(n.toDouble, 2.0).toInt
@@ -43,7 +42,7 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeBigIntPowForInt(reps:Int) = run(reps) {
+  def timeBigIntPowForInt(reps: Int) = run(reps) {
     var t = 0
     ints.foreach { n =>
       t += (BigInt(n) pow 2).toInt
@@ -51,7 +50,7 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeLongPowForLong(reps:Int) = run(reps) {
+  def timeLongPowForLong(reps: Int) = run(reps) {
     var t = 0L
     longs.foreach { n =>
       t += spire.math.pow(n, 2L)
@@ -59,7 +58,7 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeDoublePowForLong(reps:Int) = run(reps) {
+  def timeDoublePowForLong(reps: Int) = run(reps) {
     var t = 0L
     longs.foreach { n =>
       t += spire.math.pow(n.toDouble, 2.0).toLong
@@ -67,7 +66,7 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeBigIntPowForLong(reps:Int) = run(reps) {
+  def timeBigIntPowForLong(reps: Int) = run(reps) {
     var t = 0L
     longs.foreach { n =>
       t += (BigInt(n) pow 2).toLong
@@ -75,7 +74,7 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeDoublePowForDouble(reps:Int) = run(reps) {
+  def timeDoublePowForDouble(reps: Int) = run(reps) {
     var t = 0.0
     longs.foreach { n =>
       t += spire.math.pow(n, 2.0)

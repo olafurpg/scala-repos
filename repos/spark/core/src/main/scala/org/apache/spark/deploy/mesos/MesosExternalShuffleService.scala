@@ -33,33 +33,35 @@ import org.apache.spark.network.util.TransportConf
 import org.apache.spark.util.ThreadUtils
 
 /**
- * An RPC endpoint that receives registration requests from Spark drivers running on Mesos.
- * It detects driver termination and calls the cleanup callback to [[ExternalShuffleService]].
- */
+  * An RPC endpoint that receives registration requests from Spark drivers running on Mesos.
+  * It detects driver termination and calls the cleanup callback to [[ExternalShuffleService]].
+  */
 private[mesos] class MesosExternalShuffleBlockHandler(
-    transportConf: TransportConf,
-    cleanerIntervalS: Long)
-  extends ExternalShuffleBlockHandler(transportConf, null) with Logging {
+    transportConf: TransportConf, cleanerIntervalS: Long)
+    extends ExternalShuffleBlockHandler(transportConf, null) with Logging {
 
-  ThreadUtils.newDaemonSingleThreadScheduledExecutor("shuffle-cleaner-watcher")
-    .scheduleAtFixedRate(new CleanerThread(), 0, cleanerIntervalS, TimeUnit.SECONDS)
+  ThreadUtils
+    .newDaemonSingleThreadScheduledExecutor("shuffle-cleaner-watcher")
+    .scheduleAtFixedRate(
+        new CleanerThread(), 0, cleanerIntervalS, TimeUnit.SECONDS)
 
   // Stores a map of app id to app state (timeout value and last heartbeat)
   private val connectedApps = new ConcurrentHashMap[String, AppState]()
 
-  protected override def handleMessage(
-      message: BlockTransferMessage,
-      client: TransportClient,
-      callback: RpcResponseCallback): Unit = {
+  protected override def handleMessage(message: BlockTransferMessage,
+                                       client: TransportClient,
+                                       callback: RpcResponseCallback): Unit = {
     message match {
       case RegisterDriverParam(appId, appState) =>
         val address = client.getSocketAddress
         val timeout = appState.heartbeatTimeout
-        logInfo(s"Received registration request from app $appId (remote address $address, " +
-          s"heartbeat timeout $timeout ms).")
+        logInfo(
+            s"Received registration request from app $appId (remote address $address, " +
+            s"heartbeat timeout $timeout ms).")
         if (connectedApps.containsKey(appId)) {
-          logWarning(s"Received a registration request from app $appId, but it was already " +
-            s"registered")
+          logWarning(
+              s"Received a registration request from app $appId, but it was already " +
+              s"registered")
         }
         connectedApps.put(appId, appState)
         callback.onSuccess(ByteBuffer.allocate(0))
@@ -67,12 +69,14 @@ private[mesos] class MesosExternalShuffleBlockHandler(
         val address = client.getSocketAddress
         Option(connectedApps.get(appId)) match {
           case Some(existingAppState) =>
-            logTrace(s"Received ShuffleServiceHeartbeat from app '$appId' (remote " +
-              s"address $address).")
+            logTrace(
+                s"Received ShuffleServiceHeartbeat from app '$appId' (remote " +
+                s"address $address).")
             existingAppState.lastHeartbeat = System.nanoTime()
           case None =>
-            logWarning(s"Received ShuffleServiceHeartbeat from an unknown app (remote " +
-              s"address $address, appId '$appId').")
+            logWarning(
+                s"Received ShuffleServiceHeartbeat from an unknown app (remote " +
+                s"address $address, appId '$appId').")
         }
       case _ => super.handleMessage(message, client, callback)
     }
@@ -81,40 +85,47 @@ private[mesos] class MesosExternalShuffleBlockHandler(
   /** An extractor object for matching [[RegisterDriver]] message. */
   private object RegisterDriverParam {
     def unapply(r: RegisterDriver): Option[(String, AppState)] =
-      Some((r.getAppId, new AppState(r.getHeartbeatTimeoutMs, System.nanoTime())))
+      Some(
+          (r.getAppId,
+           new AppState(r.getHeartbeatTimeoutMs, System.nanoTime())))
   }
 
   private object Heartbeat {
     def unapply(h: ShuffleServiceHeartbeat): Option[String] = Some(h.getAppId)
   }
 
-  private class AppState(val heartbeatTimeout: Long, @volatile var lastHeartbeat: Long)
+  private class AppState(
+      val heartbeatTimeout: Long, @volatile var lastHeartbeat: Long)
 
   private class CleanerThread extends Runnable {
     override def run(): Unit = {
       val now = System.nanoTime()
-      connectedApps.asScala.foreach { case (appId, appState) =>
-        if (now - appState.lastHeartbeat > appState.heartbeatTimeout * 1000 * 1000) {
-          logInfo(s"Application $appId timed out. Removing shuffle files.")
-          connectedApps.remove(appId)
-          applicationRemoved(appId, true)
-        }
+      connectedApps.asScala.foreach {
+        case (appId, appState) =>
+          if (now -
+              appState.lastHeartbeat > appState.heartbeatTimeout * 1000 * 1000) {
+            logInfo(s"Application $appId timed out. Removing shuffle files.")
+            connectedApps.remove(appId)
+            applicationRemoved(appId, true)
+          }
       }
     }
   }
 }
 
 /**
- * A wrapper of [[ExternalShuffleService]] that provides an additional endpoint for drivers
- * to associate with. This allows the shuffle service to detect when a driver is terminated
- * and can clean up the associated shuffle files.
- */
-private[mesos] class MesosExternalShuffleService(conf: SparkConf, securityManager: SecurityManager)
-  extends ExternalShuffleService(conf, securityManager) {
+  * A wrapper of [[ExternalShuffleService]] that provides an additional endpoint for drivers
+  * to associate with. This allows the shuffle service to detect when a driver is terminated
+  * and can clean up the associated shuffle files.
+  */
+private[mesos] class MesosExternalShuffleService(
+    conf: SparkConf, securityManager: SecurityManager)
+    extends ExternalShuffleService(conf, securityManager) {
 
   protected override def newShuffleBlockHandler(
       conf: TransportConf): ExternalShuffleBlockHandler = {
-    val cleanerIntervalS = this.conf.getTimeAsSeconds("spark.shuffle.cleaner.interval", "30s")
+    val cleanerIntervalS =
+      this.conf.getTimeAsSeconds("spark.shuffle.cleaner.interval", "30s")
     new MesosExternalShuffleBlockHandler(conf, cleanerIntervalS)
   }
 }
@@ -123,8 +134,7 @@ private[spark] object MesosExternalShuffleService extends Logging {
 
   def main(args: Array[String]): Unit = {
     ExternalShuffleService.main(args,
-      (conf: SparkConf, sm: SecurityManager) => new MesosExternalShuffleService(conf, sm))
+                                (conf: SparkConf, sm: SecurityManager) =>
+                                  new MesosExternalShuffleService(conf, sm))
   }
 }
-
-

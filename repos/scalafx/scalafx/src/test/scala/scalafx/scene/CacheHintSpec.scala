@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.CacheHint]]. */
 @RunWith(classOf[JUnitRunner])
-class CacheHintSpec extends SFXEnumDelegateSpec[jfxs.CacheHint, CacheHint](
-  javaClass = classOf[jfxs.CacheHint],
-  scalaClass = classOf[CacheHint],
-  companion = CacheHint)
+class CacheHintSpec
+    extends SFXEnumDelegateSpec[jfxs.CacheHint, CacheHint](
+        javaClass = classOf[jfxs.CacheHint],
+        scalaClass = classOf[CacheHint],
+        companion = CacheHint)

@@ -17,42 +17,57 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.EmptyConflictsReporter
 import org.junit.Assert
 
 /**
- * Created by user 
- * on 10/15/15
- */
-
-abstract class AbstractScopeSuggesterTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * Created by user 
+  * on 10/15/15
+  */
+abstract class AbstractScopeSuggesterTest
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   val BEGIN_MARKER: String = "/*begin*/"
   val END_MARKER: String = "/*end*/"
 
-  protected def folderPath = baseRootPath() + "introduceVariable/scopeSuggester/"
+  protected def folderPath =
+    baseRootPath() + "introduceVariable/scopeSuggester/"
 
   protected def doTest(suggestedScopesNames: Seq[String]) {
     val filePath = folderPath + getTestName(false) + ".scala"
-    val file = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
 
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
 
     val startOffset = fileText.indexOf(BEGIN_MARKER) + BEGIN_MARKER.length
     val endOffset = fileText.indexOf(END_MARKER)
 
-    assert(startOffset != -1, "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
+    assert(
+        startOffset != -1,
+        "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
 
-    val editor = CommonDataKeys.EDITOR.getData(DataManager.getInstance().getDataContextFromFocus.getResult)
+    val editor = CommonDataKeys.EDITOR.getData(
+        DataManager.getInstance().getDataContextFromFocus.getResult)
 
     editor.getSelectionModel.setSelection(startOffset, endOffset)
 
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
-    var element = CommonDataKeys.PSI_ELEMENT.getData(DataManager.getInstance().getDataContextFromFocus.getResult)
+    var element = CommonDataKeys.PSI_ELEMENT.getData(
+        DataManager.getInstance().getDataContextFromFocus.getResult)
     if (element == null) {
-      element = PsiTreeUtil.findElementOfClassAtRange(scalaFile, startOffset, endOffset, classOf[PsiElement])
+      element = PsiTreeUtil.findElementOfClassAtRange(
+          scalaFile, startOffset, endOffset, classOf[PsiElement])
     }
 
-    assert(element.isInstanceOf[ScTypeElement], "Selected element should be ScTypeElement")
+    assert(element.isInstanceOf[ScTypeElement],
+           "Selected element should be ScTypeElement")
 
-    val scopes: Array[ScopeItem] = ScopeSuggester.suggestScopes(new EmptyConflictsReporter {}, element.getProject, editor, element.getContainingFile, element.asInstanceOf[ScTypeElement])
-    Assert.assertEquals(scopes.map(_.getName).sorted.mkString(", "), suggestedScopesNames.sorted.mkString(", "))
+    val scopes: Array[ScopeItem] = ScopeSuggester.suggestScopes(
+        new EmptyConflictsReporter {},
+        element.getProject,
+        editor,
+        element.getContainingFile,
+        element.asInstanceOf[ScTypeElement])
+    Assert.assertEquals(scopes.map(_.getName).sorted.mkString(", "),
+                        suggestedScopesNames.sorted.mkString(", "))
   }
 }

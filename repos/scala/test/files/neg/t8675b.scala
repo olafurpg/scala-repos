@@ -16,7 +16,7 @@ object Test {
   // specifically in SI-7944. The type parameters to the implicit view
   // `EngineTools1` are undetermined, and are now treated as type variables
   // in the expected type of the closure argument to `withFilter`.
-  for (path: List[Any] <- (null : Engine1).asRequirement.pathsIncludingSelf.toList) {
+  for (path: List[Any] <- (null: Engine1).asRequirement.pathsIncludingSelf.toList) {
     ???
   }
 }

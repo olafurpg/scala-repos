@@ -11,7 +11,9 @@ object Test extends BytecodeTest {
   import ASMConverters._
 
   def show: Unit = {
-    val instrBaseSeqs = Seq("ScalaClient_1", "JavaClient_1") map (name => instructionsFromMethod(getMethod(loadClassNode(name), "foo")))
+    val instrBaseSeqs =
+      Seq("ScalaClient_1", "JavaClient_1") map
+      (name => instructionsFromMethod(getMethod(loadClassNode(name), "foo")))
     val instrSeqs = instrBaseSeqs map (_ filter isInvoke)
     cmpInstructions(instrSeqs(0), instrSeqs(1))
   }

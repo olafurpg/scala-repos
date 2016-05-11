@@ -16,18 +16,21 @@ import scala.concurrent.Future
   *
   * Until this plan is implemented, please think carefully when to use the app repository!
   */
-class AppRepository(
-  val store: EntityStore[AppDefinition],
-  val maxVersions: Option[Int] = None,
-  val metrics: Metrics)
+class AppRepository(val store: EntityStore[AppDefinition],
+                    val maxVersions: Option[Int] = None,
+                    val metrics: Metrics)
     extends EntityRepository[AppDefinition] {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def allPathIds(): Future[Iterable[PathId]] = allIds().map(_.map(PathId.fromSafePath))
+  def allPathIds(): Future[Iterable[PathId]] =
+    allIds().map(_.map(PathId.fromSafePath))
 
-  def currentVersion(appId: PathId): Future[Option[AppDefinition]] = currentVersion(appId.safePath)
-  def listVersions(appId: PathId): Future[Iterable[Timestamp]] = listVersions(appId.safePath)
-  def expunge(appId: PathId): Future[Iterable[Boolean]] = expunge(appId.safePath)
+  def currentVersion(appId: PathId): Future[Option[AppDefinition]] =
+    currentVersion(appId.safePath)
+  def listVersions(appId: PathId): Future[Iterable[Timestamp]] =
+    listVersions(appId.safePath)
+  def expunge(appId: PathId): Future[Iterable[Boolean]] =
+    expunge(appId.safePath)
 
   /**
     * Returns the app with the supplied id and version.
@@ -50,6 +53,8 @@ class AppRepository(
     * Returns a map from PathIds to current app timestamps.
     */
   def currentAppVersions(): Future[Map[PathId, Timestamp]] =
-    for (as <- apps()) yield as.map { a => a.id -> a.version }.toMap
-
+    for (as <- apps()) yield
+      as.map { a =>
+        a.id -> a.version
+      }.toMap
 }

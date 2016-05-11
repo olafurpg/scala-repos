@@ -1,4 +1,3 @@
 abstract class Message[+A]
 
-trait InPort [+T <: Message[V], +V]
-
+trait InPort[+T <: Message[V], +V]

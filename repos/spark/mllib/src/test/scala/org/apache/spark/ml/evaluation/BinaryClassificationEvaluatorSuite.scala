@@ -24,7 +24,8 @@ import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class BinaryClassificationEvaluatorSuite
-  extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest {
+    extends SparkFunSuite with MLlibTestSparkContext
+    with DefaultReadWriteTest {
 
   test("params") {
     ParamsSuite.checkParams(new BinaryClassificationEvaluator)
@@ -39,33 +40,41 @@ class BinaryClassificationEvaluatorSuite
   }
 
   test("should accept both vector and double raw prediction col") {
-    val evaluator = new BinaryClassificationEvaluator()
-      .setMetricName("areaUnderPR")
+    val evaluator =
+      new BinaryClassificationEvaluator().setMetricName("areaUnderPR")
 
-    val vectorDF = sqlContext.createDataFrame(Seq(
-      (0d, Vectors.dense(12, 2.5)),
-      (1d, Vectors.dense(1, 3)),
-      (0d, Vectors.dense(10, 2))
-    )).toDF("label", "rawPrediction")
+    val vectorDF = sqlContext
+      .createDataFrame(Seq(
+              (0d, Vectors.dense(12, 2.5)),
+              (1d, Vectors.dense(1, 3)),
+              (0d, Vectors.dense(10, 2))
+          ))
+      .toDF("label", "rawPrediction")
     assert(evaluator.evaluate(vectorDF) === 1.0)
 
-    val doubleDF = sqlContext.createDataFrame(Seq(
-      (0d, 0d),
-      (1d, 1d),
-      (0d, 0d)
-    )).toDF("label", "rawPrediction")
+    val doubleDF = sqlContext
+      .createDataFrame(Seq(
+              (0d, 0d),
+              (1d, 1d),
+              (0d, 0d)
+          ))
+      .toDF("label", "rawPrediction")
     assert(evaluator.evaluate(doubleDF) === 1.0)
 
-    val stringDF = sqlContext.createDataFrame(Seq(
-      (0d, "0d"),
-      (1d, "1d"),
-      (0d, "0d")
-    )).toDF("label", "rawPrediction")
+    val stringDF = sqlContext
+      .createDataFrame(Seq(
+              (0d, "0d"),
+              (1d, "1d"),
+              (0d, "0d")
+          ))
+      .toDF("label", "rawPrediction")
     val thrown = intercept[IllegalArgumentException] {
       evaluator.evaluate(stringDF)
     }
-    assert(thrown.getMessage.replace("\n", "") contains "Column rawPrediction must be of type " +
-      "equal to one of the following types: [DoubleType, ")
-    assert(thrown.getMessage.replace("\n", "") contains "but was actually of type StringType.")
+    assert(
+        thrown.getMessage.replace("\n", "") contains "Column rawPrediction must be of type " +
+        "equal to one of the following types: [DoubleType, ")
+    assert(
+        thrown.getMessage.replace("\n", "") contains "but was actually of type StringType.")
   }
 }

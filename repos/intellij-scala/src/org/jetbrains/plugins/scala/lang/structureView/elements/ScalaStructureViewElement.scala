@@ -10,11 +10,12 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariable};
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 04.05.2008
-*/
-
-abstract class ScalaStructureViewElement(protected val myElement: PsiElement, val inherited: Boolean) extends StructureViewTreeElement {
+  * @author Alexander Podkhalyuzin
+  * Date: 04.05.2008
+  */
+abstract class ScalaStructureViewElement(
+    protected val myElement: PsiElement, val inherited: Boolean)
+    extends StructureViewTreeElement {
 
   def getValue: Object = {
     if (myElement.isValid) {
@@ -35,8 +36,7 @@ abstract class ScalaStructureViewElement(protected val myElement: PsiElement, va
       } else {
         myElement
       }
-    }
-    else {
+    } else {
       null;
     }
   }
@@ -69,8 +69,8 @@ abstract class ScalaStructureViewElement(protected val myElement: PsiElement, va
 
   override def hashCode(): Int = {
     val value = getValue
-    val is = if(inherited) 1 else 0
+    val is = if (inherited) 1 else 0
     if (value == null) 0
-    else value.hashCode*2 + is
+    else value.hashCode * 2 + is
   }
 }

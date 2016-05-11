@@ -9,18 +9,20 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeArgs
 
 /**
-* @author Alexander Podkhalyuzin
-*/
-
+  * @author Alexander Podkhalyuzin
+  */
 trait ScInfixExpr extends ScExpression with ScSugarCallExpr {
-  def lOp: ScExpression = findChildrenByClassScala(classOf[ScExpression]).apply(0)
+  def lOp: ScExpression =
+    findChildrenByClassScala(classOf[ScExpression]).apply(0)
 
-  def operation : ScReferenceExpression = {
+  def operation: ScReferenceExpression = {
     val children = findChildrenByClassScala(classOf[ScExpression])
-    if (children.length < 2) throw new RuntimeException("Wrong infix expression: " + getText)
+    if (children.length < 2)
+      throw new RuntimeException("Wrong infix expression: " + getText)
     children.apply(1) match {
-      case re : ScReferenceExpression => re
-      case _ => throw new RuntimeException("Wrong infix expression: " + getText)
+      case re: ScReferenceExpression => re
+      case _ =>
+        throw new RuntimeException("Wrong infix expression: " + getText)
     }
   }
 
@@ -32,9 +34,12 @@ trait ScInfixExpr extends ScExpression with ScSugarCallExpr {
   }
 
   def rOp: ScExpression = {
-    val exprs: Array[ScExpression] = findChildrenByClassScala(classOf[ScExpression])
-    assert(exprs.length > 2,
-      s"Infix expression contains less than 3 expressions: ${exprs.mkString("(", ", ", ")")}, exprssion: $getText, full code: ${getContainingFile.getText}")
+    val exprs: Array[ScExpression] = findChildrenByClassScala(
+        classOf[ScExpression])
+    assert(
+        exprs.length > 2,
+        s"Infix expression contains less than 3 expressions: ${exprs.mkString(
+            "(", ", ", ")")}, exprssion: $getText, full code: ${getContainingFile.getText}")
     exprs.apply(2)
   }
 
@@ -47,7 +52,8 @@ trait ScInfixExpr extends ScExpression with ScSugarCallExpr {
     opText.endsWith(":")
   }
 
-  def isAssignmentOperator = ParserUtils.isAssignmentOperator(operation.getText)
+  def isAssignmentOperator =
+    ParserUtils.isAssignmentOperator(operation.getText)
 
   def getInvokedExpr: ScExpression = operation
 
@@ -55,6 +61,7 @@ trait ScInfixExpr extends ScExpression with ScSugarCallExpr {
 }
 
 object ScInfixExpr {
-  def unapply(it: ScInfixExpr): Some[(ScExpression, ScReferenceExpression, ScExpression)] =
+  def unapply(it: ScInfixExpr)
+    : Some[(ScExpression, ScReferenceExpression, ScExpression)] =
     Some(it.lOp, it.operation, it.rOp)
 }

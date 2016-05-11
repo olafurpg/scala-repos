@@ -33,8 +33,8 @@ trait MailerForTesting {
 }
 
 /**
- * Systems under specification for Lift Mailer.
- */
+  * Systems under specification for Lift Mailer.
+  */
 object MailerSpec extends Specification {
   "Mailer Specification".title
   sequential
@@ -44,8 +44,10 @@ object MailerSpec extends Specification {
   val myMailer = new Mailer with MailerForTesting {
     @volatile var lastMessage: Box[MimeMessage] = Empty
 
-    testModeSend.default.set((msg: MimeMessage) => {
-      lastMessage = Full(msg)
+    testModeSend.default.set(
+        (msg: MimeMessage) =>
+          {
+        lastMessage = Full(msg)
     })
   }
 
@@ -59,7 +61,7 @@ object MailerSpec extends Specification {
     eventually {
       lastMessage.isEmpty must_== false
     }
-    lastMessage openOrThrowException("Checked")
+    lastMessage openOrThrowException ("Checked")
   }
 
   "A Mailer" should {
@@ -67,10 +69,10 @@ object MailerSpec extends Specification {
     "deliver simple messages as simple messages" in {
       val msg = doNewMessage {
         sendMail(
-          From("sender@nowhere.com"),
-          Subject("This is a simple email"),
-          To("recipient@nowhere.com"),
-          PlainMailBodyType("Here is some plain text.")
+            From("sender@nowhere.com"),
+            Subject("This is a simple email"),
+            To("recipient@nowhere.com"),
+            PlainMailBodyType("Here is some plain text.")
         )
       }
 
@@ -80,11 +82,11 @@ object MailerSpec extends Specification {
     "deliver multipart messages as multipart" in {
       val msg = doNewMessage {
         sendMail(
-          From("sender@nowhere.com"),
-          Subject("This is a multipart email"),
-          To("recipient@nowhere.com"),
-          PlainMailBodyType("Here is some plain text."),
-          PlainMailBodyType("Here is some more plain text.")
+            From("sender@nowhere.com"),
+            Subject("This is a multipart email"),
+            To("recipient@nowhere.com"),
+            PlainMailBodyType("Here is some plain text."),
+            PlainMailBodyType("Here is some more plain text.")
         )
       }
 
@@ -94,10 +96,11 @@ object MailerSpec extends Specification {
     "deliver rich messages as multipart" in {
       val msg = doNewMessage {
         sendMail(
-          From("sender@nowhere.com"),
-          Subject("This is a rich email"),
-          To("recipient@nowhere.com"),
-          XHTMLMailBodyType(<html> <body>Here is some rich text</body> </html>)
+            From("sender@nowhere.com"),
+            Subject("This is a rich email"),
+            To("recipient@nowhere.com"),
+            XHTMLMailBodyType(
+                <html> <body>Here is some rich text</body> </html>)
         )
       }
 
@@ -105,18 +108,25 @@ object MailerSpec extends Specification {
     }
 
     "deliver emails with attachments as mixed multipart" in {
-      val attachmentBytes = Source.fromInputStream(
-        getClass.getClassLoader.getResourceAsStream("net/liftweb/util/Html5ParserSpec.page1.html")
-      ).map(_.toByte).toArray
+      val attachmentBytes = Source
+        .fromInputStream(
+            getClass.getClassLoader.getResourceAsStream(
+                "net/liftweb/util/Html5ParserSpec.page1.html")
+        )
+        .map(_.toByte)
+        .toArray
       val msg = doNewMessage {
         sendMail(
-          From("sender@nowhere.com"),
-          Subject("This is a mixed email"),
-          To("recipient@nowhere.com"),
-          XHTMLPlusImages(
-            <html> <body>Here is some rich text</body> </html>,
-            PlusImageHolder("awesome.pdf", "text/html", attachmentBytes, true)
-          )
+            From("sender@nowhere.com"),
+            Subject("This is a mixed email"),
+            To("recipient@nowhere.com"),
+            XHTMLPlusImages(
+                <html> <body>Here is some rich text</body> </html>,
+                PlusImageHolder("awesome.pdf",
+                                "text/html",
+                                attachmentBytes,
+                                true)
+            )
         )
       }
 

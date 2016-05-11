@@ -1,15 +1,16 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.testkit.metrics
 
 trait MetricKeyDSL {
 
-  case class MetricKey private[MetricKeyDSL] (path: String) {
+  case class MetricKey private[MetricKeyDSL](path: String) {
 
     import MetricKey._
 
-    def /(key: String): MetricKey = MetricKey(path + "." + sanitizeMetricKeyPart(key))
+    def /(key: String): MetricKey =
+      MetricKey(path + "." + sanitizeMetricKeyPart(key))
 
     override def toString = path
   }
@@ -26,7 +27,6 @@ trait MetricKeyDSL {
         .replaceAll(" ", "-")
         .replaceAll("/", "-")
   }
-
 }
 
 object MetricKeyDSL extends MetricKeyDSL

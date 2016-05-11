@@ -10,15 +10,15 @@ import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 
 /** 
-* @author Alexander Podkhalyuzin
-* Date: 22.05.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 22.05.2008
+  */
 class ModifiersFilter extends ElementFilter {
   def isAcceptable(element: Object, context: PsiElement): Boolean = {
     if (context.isInstanceOf[PsiComment]) return false
     if (element.isInstanceOf[PsiIdentifier]) return false
-    val (leaf, _) = processPsiLeafForFilter(getLeafByOffset(context.getTextRange.getStartOffset, context))
+    val (leaf, _) = processPsiLeafForFilter(
+        getLeafByOffset(context.getTextRange.getStartOffset, context))
 
     if (leaf != null) {
       val parent = leaf.getParent
@@ -27,7 +27,7 @@ class ModifiersFilter extends ElementFilter {
           return true
         case _ =>
       }
-      val tuple = ScalaCompletionUtil.getForAll(parent,leaf)
+      val tuple = ScalaCompletionUtil.getForAll(parent, leaf)
       if (tuple._1) return tuple._2
     }
     false

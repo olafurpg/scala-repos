@@ -31,8 +31,10 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
   def compareArrays(a: Seq[Any], b: Seq[Any], expected: Int): Unit = {
     test(s"compare two arrays: a = $a, b = $b") {
       val dataType = ArrayType(IntegerType)
-      val rowType = StructType(StructField("array", dataType, nullable = true) :: Nil)
-      val toCatalyst = CatalystTypeConverters.createToCatalystConverter(rowType)
+      val rowType =
+        StructType(StructField("array", dataType, nullable = true) :: Nil)
+      val toCatalyst =
+        CatalystTypeConverters.createToCatalystConverter(rowType)
       val rowA = toCatalyst(Row(a)).asInstanceOf[InternalRow]
       val rowB = toCatalyst(Row(b)).asInstanceOf[InternalRow]
       Seq(Ascending, Descending).foreach { direction =>
@@ -49,8 +51,10 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
         Seq(intOrdering, genOrdering).foreach { ordering =>
           assert(ordering.compare(rowA, rowA) === 0)
           assert(ordering.compare(rowB, rowB) === 0)
-          assert(signum(ordering.compare(rowA, rowB)) === expectedCompareResult)
-          assert(signum(ordering.compare(rowB, rowA)) === -1 * expectedCompareResult)
+          assert(
+              signum(ordering.compare(rowA, rowB)) === expectedCompareResult)
+          assert(
+              signum(ordering.compare(rowB, rowA)) === -1 * expectedCompareResult)
         }
       }
     }
@@ -84,41 +88,47 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
   // contain two columns of that type, then for pairs of randomly-generated rows we check that
   // GenerateOrdering agrees with RowOrdering.
   {
-    val structType =
-      new StructType()
-        .add("f1", FloatType, nullable = true)
-        .add("f2", ArrayType(BooleanType, containsNull = true), nullable = true)
+    val structType = new StructType()
+      .add("f1", FloatType, nullable = true)
+      .add("f2", ArrayType(BooleanType, containsNull = true), nullable = true)
     val arrayOfStructType = ArrayType(structType)
-    val complexTypes = ArrayType(IntegerType) :: structType :: arrayOfStructType :: Nil
-    (DataTypeTestUtils.atomicTypes ++ complexTypes ++ Set(NullType)).foreach { dataType =>
-      test(s"GenerateOrdering with $dataType") {
-        val rowOrdering = InterpretedOrdering.forSchema(Seq(dataType, dataType))
-        val genOrdering = GenerateOrdering.generate(
-          BoundReference(0, dataType, nullable = true).asc ::
-            BoundReference(1, dataType, nullable = true).asc :: Nil)
-        val rowType = StructType(
-          StructField("a", dataType, nullable = true) ::
-            StructField("b", dataType, nullable = true) :: Nil)
-        val maybeDataGenerator = RandomDataGenerator.forType(rowType, nullable = false)
-        assume(maybeDataGenerator.isDefined)
-        val randGenerator = maybeDataGenerator.get
-        val toCatalyst = CatalystTypeConverters.createToCatalystConverter(rowType)
-        for (_ <- 1 to 50) {
-          val a = toCatalyst(randGenerator()).asInstanceOf[InternalRow]
-          val b = toCatalyst(randGenerator()).asInstanceOf[InternalRow]
-          withClue(s"a = $a, b = $b") {
-            assert(genOrdering.compare(a, a) === 0)
-            assert(genOrdering.compare(b, b) === 0)
-            assert(rowOrdering.compare(a, a) === 0)
-            assert(rowOrdering.compare(b, b) === 0)
-            assert(signum(genOrdering.compare(a, b)) === -1 * signum(genOrdering.compare(b, a)))
-            assert(signum(rowOrdering.compare(a, b)) === -1 * signum(rowOrdering.compare(b, a)))
-            assert(
-              signum(rowOrdering.compare(a, b)) === signum(genOrdering.compare(a, b)),
-              "Generated and non-generated orderings should agree")
+    val complexTypes =
+      ArrayType(IntegerType) :: structType :: arrayOfStructType :: Nil
+    (DataTypeTestUtils.atomicTypes ++ complexTypes ++ Set(NullType)).foreach {
+      dataType =>
+        test(s"GenerateOrdering with $dataType") {
+          val rowOrdering =
+            InterpretedOrdering.forSchema(Seq(dataType, dataType))
+          val genOrdering = GenerateOrdering.generate(BoundReference(
+                  0, dataType, nullable = true).asc :: BoundReference(
+                  1, dataType, nullable = true).asc :: Nil)
+          val rowType = StructType(
+              StructField("a", dataType, nullable = true) :: StructField(
+                  "b", dataType, nullable = true) :: Nil)
+          val maybeDataGenerator =
+            RandomDataGenerator.forType(rowType, nullable = false)
+          assume(maybeDataGenerator.isDefined)
+          val randGenerator = maybeDataGenerator.get
+          val toCatalyst =
+            CatalystTypeConverters.createToCatalystConverter(rowType)
+          for (_ <- 1 to 50) {
+            val a = toCatalyst(randGenerator()).asInstanceOf[InternalRow]
+            val b = toCatalyst(randGenerator()).asInstanceOf[InternalRow]
+            withClue(s"a = $a, b = $b") {
+              assert(genOrdering.compare(a, a) === 0)
+              assert(genOrdering.compare(b, b) === 0)
+              assert(rowOrdering.compare(a, a) === 0)
+              assert(rowOrdering.compare(b, b) === 0)
+              assert(signum(genOrdering.compare(a, b)) === -1 * signum(
+                      genOrdering.compare(b, a)))
+              assert(signum(rowOrdering.compare(a, b)) === -1 * signum(
+                      rowOrdering.compare(b, a)))
+              assert(signum(rowOrdering.compare(a, b)) === signum(
+                         genOrdering.compare(a, b)),
+                     "Generated and non-generated orderings should agree")
+            }
           }
         }
-      }
     }
   }
 }

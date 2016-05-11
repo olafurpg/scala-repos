@@ -14,18 +14,20 @@ private trait ApertureTesting {
 
   class Empty extends Exception
 
-  protected trait TestBal extends Balancer[Unit, Unit] with Aperture[Unit, Unit] {
+  protected trait TestBal
+      extends Balancer[Unit, Unit] with Aperture[Unit, Unit] {
     protected val rng = Rng(12345L)
     protected val emptyException = new Empty
     protected val maxEffort = 10
     protected def statsReceiver = NullStatsReceiver
     protected val minAperture = 1
 
-    protected[this] val maxEffortExhausted = statsReceiver.counter("max_effort_exhausted")
+    protected[this] val maxEffortExhausted =
+      statsReceiver.counter("max_effort_exhausted")
 
     def applyn(n: Int): Unit = {
       val factories = Await.result(Future.collect(Seq.fill(n)(apply())))
-      Await.result(Closable.all(factories:_*).close())
+      Await.result(Closable.all(factories: _*).close())
     }
 
     // Expose some protected methods for testing
@@ -43,7 +45,8 @@ private trait ApertureTesting {
     def apply(conn: ClientConnection) = {
       n += 1
       p += 1
-      Future.value(new Service[Unit, Unit] {
+      Future.value(
+          new Service[Unit, Unit] {
         def apply(unit: Unit) = ???
         override def close(deadline: Time) = {
           p -= 1
@@ -71,17 +74,21 @@ private trait ApertureTesting {
 
     def aperture = nonzero.size
 
-    def nonzero = factories.filter({
-      case (_, f) => f.n > 0
-    }).keys.toSet
-
+    def nonzero =
+      factories
+        .filter({
+          case (_, f) => f.n > 0
+        })
+        .keys
+        .toSet
 
     def apply(i: Int) = factories.getOrElseUpdate(i, new Factory(i))
 
     def range(n: Int): Traversable[ServiceFactory[Unit, Unit]] =
-      Traversable.tabulate(n) { i => apply(i) }
+      Traversable.tabulate(n) { i =>
+        apply(i)
+      }
   }
-
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -162,8 +169,7 @@ private class ApertureTest extends FunSuite with ApertureTesting {
     val bal = new Bal
 
     bal.update(counts.range(10))
-    for (f <- counts)
-      f.status = Status.Closed
+    for (f <- counts) f.status = Status.Closed
 
     bal.applyn(1000)
     // The correctness of this behavior could be argued either way.
@@ -177,7 +183,6 @@ private class ApertureTest extends FunSuite with ApertureTesting {
     assert(counts.nonzero == Set(goodkey))
   }
 }
-
 
 @RunWith(classOf[JUnitRunner])
 private class LoadBandTest extends FunSuite with ApertureTesting {
@@ -199,7 +204,7 @@ private class LoadBandTest extends FunSuite with ApertureTesting {
       sum += v
     }
 
-    def apply(): Double = sum.toDouble/n
+    def apply(): Double = sum.toDouble / n
   }
 
   test("Aperture tracks concurrency") {
@@ -211,8 +216,8 @@ private class LoadBandTest extends FunSuite with ApertureTesting {
     val numNodes = rng.nextInt(100)
     bal.update(counts.range(numNodes))
 
-    val start = (high+1).toInt
-    val concurrency = (start to numNodes) ++ ((numNodes-1) to start by -1)
+    val start = (high + 1).toInt
+    val concurrency = (start to numNodes) ++ ((numNodes - 1) to start by -1)
 
     for (c <- concurrency) {
       var ap = 0
@@ -229,7 +234,7 @@ private class LoadBandTest extends FunSuite with ApertureTesting {
         for (f <- counts if f.n > 0) { avgLoad.update(f.p) }
         // no need to avg ap, it's independent of the load distribution
         ap = bal.aperturex
-        Await.result(Closable.all(factories:_*).close())
+        Await.result(Closable.all(factories: _*).close())
       }
 
       // The controller tracks the avg concurrency over
@@ -237,7 +242,7 @@ private class LoadBandTest extends FunSuite with ApertureTesting {
       // the aperture.
       // TODO: We should test this with a smoothWin to get a more
       // accurate picture of the lag in our adjustments.
-      assert(math.abs(c/high - ap) <= 1)
+      assert(math.abs(c / high - ap) <= 1)
 
       // The changes to the aperture should correlate to
       // the avg load per node but note that the distributor

@@ -31,8 +31,8 @@ private[nio] final class GenBuffer[B <: Buffer](val self: B) extends AnyVal {
   }
 
   @inline
-  def generic_get(dst: Array[ElementType],
-      offset: Int, length: Int): BufferType = {
+  def generic_get(
+      dst: Array[ElementType], offset: Int, length: Int): BufferType = {
     validateArrayIndexRange(dst, offset, length)
     load(getPosAndAdvanceRead(length), dst, offset, length)
     self
@@ -40,8 +40,7 @@ private[nio] final class GenBuffer[B <: Buffer](val self: B) extends AnyVal {
 
   @inline
   def generic_put(src: BufferType): BufferType = {
-    if (src eq self)
-      throw new IllegalArgumentException
+    if (src eq self) throw new IllegalArgumentException
     ensureNotReadOnly()
     val srcLimit = src.limit
     var srcPos = src.position
@@ -64,8 +63,8 @@ private[nio] final class GenBuffer[B <: Buffer](val self: B) extends AnyVal {
   }
 
   @inline
-  def generic_put(src: Array[ElementType],
-      offset: Int, length: Int): BufferType = {
+  def generic_put(
+      src: Array[ElementType], offset: Int, length: Int): BufferType = {
     ensureNotReadOnly()
     validateArrayIndexRange(src, offset, length)
     store(getPosAndAdvanceWrite(length), src, offset, length)
@@ -79,20 +78,16 @@ private[nio] final class GenBuffer[B <: Buffer](val self: B) extends AnyVal {
   @inline
   def generic_array(): Array[ElementType] = {
     val a = _array
-    if (a == null)
-      throw new UnsupportedOperationException
-    if (isReadOnly)
-      throw new ReadOnlyBufferException
+    if (a == null) throw new UnsupportedOperationException
+    if (isReadOnly) throw new ReadOnlyBufferException
     a
   }
 
   @inline
   def generic_arrayOffset(): Int = {
     val o = _arrayOffset
-    if (o == -1)
-      throw new UnsupportedOperationException
-    if (isReadOnly)
-      throw new ReadOnlyBufferException
+    if (o == -1) throw new UnsupportedOperationException
+    if (isReadOnly) throw new ReadOnlyBufferException
     o
   }
 
@@ -107,7 +102,7 @@ private[nio] final class GenBuffer[B <: Buffer](val self: B) extends AnyVal {
       h = mix(h, load(i).##)
       i += 1
     }
-    finalizeHash(h, end-start)
+    finalizeHash(h, end - start)
   }
 
   @inline
@@ -126,8 +121,7 @@ private[nio] final class GenBuffer[B <: Buffer](val self: B) extends AnyVal {
       var i = 0
       while (i != shortestLength) {
         val cmp = compare(self.load(thisStart + i), that.load(thatStart + i))
-        if (cmp != 0)
-          return cmp
+        if (cmp != 0) return cmp
         i += 1
       }
 
@@ -138,7 +132,9 @@ private[nio] final class GenBuffer[B <: Buffer](val self: B) extends AnyVal {
 
   @inline
   def generic_load(startIndex: Int,
-      dst: Array[ElementType], offset: Int, length: Int): Unit = {
+                   dst: Array[ElementType],
+                   offset: Int,
+                   length: Int): Unit = {
     var selfPos = startIndex
     val endPos = selfPos + length
     var arrayIndex = offset
@@ -151,7 +147,9 @@ private[nio] final class GenBuffer[B <: Buffer](val self: B) extends AnyVal {
 
   @inline
   def generic_store(startIndex: Int,
-      src: Array[ElementType], offset: Int, length: Int): Unit = {
+                    src: Array[ElementType],
+                    offset: Int,
+                    length: Int): Unit = {
     var selfPos = startIndex
     val endPos = selfPos + length
     var arrayIndex = offset
@@ -161,5 +159,4 @@ private[nio] final class GenBuffer[B <: Buffer](val self: B) extends AnyVal {
       arrayIndex += 1
     }
   }
-
 }

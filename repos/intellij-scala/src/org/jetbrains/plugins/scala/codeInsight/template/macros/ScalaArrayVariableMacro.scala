@@ -12,13 +12,15 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author Roman.Shein
- * @since 24.09.2015.
- */
+  * @author Roman.Shein
+  * @since 24.09.2015.
+  */
 class ScalaArrayVariableMacro extends ScalaVariableOfTypeMacro {
   override def getName = MacroUtil.scalaIdPrefix + "arrayVariable"
 
-  override def getPresentableName = MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message("macro.array.variable")
+  override def getPresentableName =
+    MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
+        "macro.array.variable")
 
   override def addLookupItems(exprs: Array[String],
                               context: ExpressionContext,
@@ -26,14 +28,19 @@ class ScalaArrayVariableMacro extends ScalaVariableOfTypeMacro {
                               scType: ScType,
                               project: Project,
                               array: ArrayBuffer[LookupElement]) =
-    super.addLookupItems(Array("scala.Array"), context, variant, scType, project, array)
+    super.addLookupItems(
+        Array("scala.Array"), context, variant, scType, project, array)
 
   override def getResult(exprs: Array[Expression],
-          context: ExpressionContext,
-          variant: ScalaResolveResult,
-          scType: ScType,
-          project: Project): Option[Result] =
-    super.getResult(Array(new TextExpression("scala.Array")), context, variant, scType, project)
+                         context: ExpressionContext,
+                         variant: ScalaResolveResult,
+                         scType: ScType,
+                         project: Project): Option[Result] =
+    super.getResult(Array(new TextExpression("scala.Array")),
+                    context,
+                    variant,
+                    scType,
+                    project)
 
   override def validExprsCount(exprsCount: Int): Boolean = exprsCount == 0
 }

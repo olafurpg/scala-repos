@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.tck
 
 import scala.concurrent.Await
@@ -12,9 +12,11 @@ import org.reactivestreams.Publisher
 class PrefixAndTailTest extends AkkaPublisherVerification[Int] {
 
   def createPublisher(elements: Long): Publisher[Int] = {
-    val futureTailSource = Source(iterable(elements)).prefixAndTail(0).map { case (_, tail) ⇒ tail }.runWith(Sink.head)
+    val futureTailSource = Source(iterable(elements))
+      .prefixAndTail(0)
+      .map { case (_, tail) ⇒ tail }
+      .runWith(Sink.head)
     val tailSource = Await.result(futureTailSource, 3.seconds)
     tailSource.runWith(Sink.asPublisher(false))
   }
-
 }

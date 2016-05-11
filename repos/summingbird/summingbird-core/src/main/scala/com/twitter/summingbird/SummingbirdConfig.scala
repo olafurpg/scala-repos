@@ -27,7 +27,8 @@ trait SummingbirdConfig { self =>
   def removes: Set[String]
   def toMap: Map[String, AnyRef] = new Map[String, AnyRef] {
     def get(k: String) = self.get(k)
-    def +[B1 >: AnyRef](kv: (String, B1)) = self.put(kv._1, kv._2.asInstanceOf[AnyRef]).toMap
+    def +[B1 >: AnyRef](kv: (String, B1)) =
+      self.put(kv._1, kv._2.asInstanceOf[AnyRef]).toMap
     def -(k: String) = self.-(k).toMap
     def iterator = self.keys.iterator.map(k => (k, self.get(k).get))
   }
@@ -73,24 +74,21 @@ trait ReadableMap {
 }
 
 object WrappingConfig {
-  def apply(backingConfig: ReadableMap) = new WrappingConfig(
-    backingConfig,
-    Map[String, AnyRef](),
-    Set[String]())
+  def apply(backingConfig: ReadableMap) =
+    new WrappingConfig(backingConfig, Map[String, AnyRef](), Set[String]())
 }
 
 case class WrappingConfig(private val backingConfig: ReadableMap,
-    updates: Map[String, AnyRef],
-    removes: Set[String]) extends SummingbirdConfig {
+                          updates: Map[String, AnyRef],
+                          removes: Set[String])
+    extends SummingbirdConfig {
 
   def get(key: String) = {
     updates.get(key) match {
       case s @ Some(_) => s
       case None =>
-        if (removes.contains(key))
-          None
-        else
-          backingConfig.get(key)
+        if (removes.contains(key)) None
+        else backingConfig.get(key)
     }
   }
 

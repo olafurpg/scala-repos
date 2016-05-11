@@ -6,30 +6,31 @@ import com.twitter.finagle.util.Ema
 import com.twitter.util.Duration
 
 /**
- * A `FailureAccrualPolicy` is used by `FailureAccrualFactory` to determine
- * whether to mark an endpoint dead upon a request failure. On each successful
- * response, `FailureAccrualFactory` calls `recordSuccess()`. On each failure,
- * `FailureAccrualFactory` calls `markDeadOnFailure()` to obtain the duration
- * to mark the endpoint dead for; (Some(Duration)), or None.
- *
- * @see The [[https://twitter.github.io/finagle/guide/Clients.html#failure-accrual user guide]]
- *      for more details.
- */
+  * A `FailureAccrualPolicy` is used by `FailureAccrualFactory` to determine
+  * whether to mark an endpoint dead upon a request failure. On each successful
+  * response, `FailureAccrualFactory` calls `recordSuccess()`. On each failure,
+  * `FailureAccrualFactory` calls `markDeadOnFailure()` to obtain the duration
+  * to mark the endpoint dead for; (Some(Duration)), or None.
+  *
+  * @see The [[https://twitter.github.io/finagle/guide/Clients.html#failure-accrual user guide]]
+  *      for more details.
+  */
 abstract class FailureAccrualPolicy {
+
   /** Invoked by FailureAccrualFactory when a request is successful. */
   def recordSuccess(): Unit
 
   /**
-   * Invoked by FailureAccrualFactory when a non-probing request fails.
-   * If it returns Some(Duration), the FailureAccrualFactory will mark the
-   * endpoint dead for the specified Duration.
-   */
+    * Invoked by FailureAccrualFactory when a non-probing request fails.
+    * If it returns Some(Duration), the FailureAccrualFactory will mark the
+    * endpoint dead for the specified Duration.
+    */
   def markDeadOnFailure(): Option[Duration]
 
   /**
-   * Invoked by FailureAccrualFactory when an endpoint is revived after
-   * probing. Used to reset any history.
-   */
+    * Invoked by FailureAccrualFactory when an endpoint is revived after
+    * probing. Used to reset any history.
+    */
   def revived(): Unit
 }
 
@@ -41,30 +42,30 @@ object FailureAccrualPolicy {
   private[this] val constantBackoff = Backoff.const(300.seconds)
 
   /**
-   * A policy based on an exponentially-weighted moving average success rate
-   * over a window of requests. A moving average is used so the success rate
-   * calculation is biased towards more recent requests; for an endpoint with
-   * low traffic, the window will span a longer time period and early successes
-   * and failures may not accurately reflect the current health.
-   *
-   * If the computed weighted success rate is less
-   * than the required success rate, `markDeadOnFailure()` will return
-   * Some(Duration).
-   *
-   * @see com.twitter.finagle.util.Ema for how the success rate is computed
-   *
-   * @param requiredSuccessRate successRate that must be met
-   *
-   * @param window window over which the success rate is tracked. `window` requests
-   * must occur for `markDeadOnFailure()` to ever return Some(Duration)
-   *
-   * @param markDeadFor stream of durations to use for the next duration
-   * returned from `markDeadOnFailure()`
-   */
+    * A policy based on an exponentially-weighted moving average success rate
+    * over a window of requests. A moving average is used so the success rate
+    * calculation is biased towards more recent requests; for an endpoint with
+    * low traffic, the window will span a longer time period and early successes
+    * and failures may not accurately reflect the current health.
+    *
+    * If the computed weighted success rate is less
+    * than the required success rate, `markDeadOnFailure()` will return
+    * Some(Duration).
+    *
+    * @see com.twitter.finagle.util.Ema for how the success rate is computed
+    *
+    * @param requiredSuccessRate successRate that must be met
+    *
+    * @param window window over which the success rate is tracked. `window` requests
+    * must occur for `markDeadOnFailure()` to ever return Some(Duration)
+    *
+    * @param markDeadFor stream of durations to use for the next duration
+    * returned from `markDeadOnFailure()`
+    */
   def successRate(
-    requiredSuccessRate: Double,
-    window: Int,
-    markDeadFor: Stream[Duration]
+      requiredSuccessRate: Double,
+      window: Int,
+      markDeadFor: Stream[Duration]
   ): FailureAccrualPolicy = new FailureAccrualPolicy {
 
     // Pad the back of the stream to mark dead for a constant amount (300 seconds)
@@ -87,7 +88,7 @@ object FailureAccrualPolicy {
     def markDeadOnFailure(): Option[Duration] = synchronized {
       totalRequests += 1
       val sr = successRate.update(totalRequests, Failure)
-      if (totalRequests >= window  && sr < requiredSuccessRate) {
+      if (totalRequests >= window && sr < requiredSuccessRate) {
         val duration = nextMarkDeadFor.head
         nextMarkDeadFor = nextMarkDeadFor.tail
         Some(duration)
@@ -103,18 +104,18 @@ object FailureAccrualPolicy {
   }
 
   /**
-   * A policy based on a maximum number of consecutive failures. If `numFailures`
-   * occur consecutively, `checkFailures()` will return a Some(Duration) to
-   * mark an endpoint dead for.
-   *
-   * @param numFailures number of consecutive failures
-   *
-   * @param markDeadFor stream of durations to use for the next duration
-   * returned from `markDeadOnFailure()`
-   */
+    * A policy based on a maximum number of consecutive failures. If `numFailures`
+    * occur consecutively, `checkFailures()` will return a Some(Duration) to
+    * mark an endpoint dead for.
+    *
+    * @param numFailures number of consecutive failures
+    *
+    * @param markDeadFor stream of durations to use for the next duration
+    * returned from `markDeadOnFailure()`
+    */
   def consecutiveFailures(
-    numFailures: Int,
-    markDeadFor: Stream[Duration]
+      numFailures: Int,
+      markDeadFor: Stream[Duration]
   ): FailureAccrualPolicy = new FailureAccrualPolicy {
 
     // Pad the back of the stream to mark dead for a constant amount (300 seconds)

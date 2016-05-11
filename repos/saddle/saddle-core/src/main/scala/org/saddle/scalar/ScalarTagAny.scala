@@ -1,19 +1,18 @@
 /**
- * Copyright (c) 2013 Saddle Development Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
-
+  * Copyright (c) 2013 Saddle Development Team
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  *     http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  **/
 package org.saddle.scalar
 
 import org.saddle._
@@ -24,7 +23,7 @@ import org.saddle.index.IndexAny
 import org.saddle.locator.{Locator, LocatorAny}
 import org.saddle.array.Sorter
 
-class ScalarTagAny[T: CLM] extends ScalarTag[T] {
+class ScalarTagAny[T : CLM] extends ScalarTag[T] {
   def missing: T = null.asInstanceOf[T]
   def isMissing(v: T): Boolean = v == null
   def notMissing(v: T): Boolean = v != null
@@ -46,12 +45,17 @@ class ScalarTagAny[T: CLM] extends ScalarTag[T] {
 
   override def runtimeClass = implicitly[CLM[T]].erasure
 
-  def makeBuf(sz: Int = Buffer.INIT_CAPACITY): Buffer[T] = new BufferAny[T](sz)(this)
-  def makeLoc(sz: Int = Buffer.INIT_CAPACITY): Locator[T] = new LocatorAny[T](sz)(this)
+  def makeBuf(sz: Int = Buffer.INIT_CAPACITY): Buffer[T] =
+    new BufferAny[T](sz)(this)
+  def makeLoc(sz: Int = Buffer.INIT_CAPACITY): Locator[T] =
+    new LocatorAny[T](sz)(this)
   def makeVec(arr: Array[T]): Vec[T] = new VecAny[T](arr)(this)
-  def makeMat(r: Int, c: Int, arr: Array[T]): Mat[T] = new MatAny[T](r, c, arr)(this)
-  def makeIndex(vec: Vec[T])(implicit ord: ORD[T]): Index[T] = new IndexAny[T](vec)(this, ord)
+  def makeMat(r: Int, c: Int, arr: Array[T]): Mat[T] =
+    new MatAny[T](r, c, arr)(this)
+  def makeIndex(vec: Vec[T])(implicit ord: ORD[T]): Index[T] =
+    new IndexAny[T](vec)(this, ord)
   def makeSorter(implicit ord: ORD[T]): Sorter[T] = Sorter.anySorter[T]
 
-  def concat(arrs: IndexedSeq[Vec[T]]): Vec[T] = Vec(array.flatten(arrs.map(_.toArray)))
+  def concat(arrs: IndexedSeq[Vec[T]]): Vec[T] =
+    Vec(array.flatten(arrs.map(_.toArray)))
 }

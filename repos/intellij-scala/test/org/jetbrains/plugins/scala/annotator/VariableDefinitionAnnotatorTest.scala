@@ -8,11 +8,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScVariableDefinition
 
 /**
- * Pavel.Fatin, 18.05.2010
- */
-
+  * Pavel.Fatin, 18.05.2010
+  */
 class VariableDefinitionAnnotatorTest extends SimpleTestCase {
-  final val Header = "class A; class B; object A extends A; object B extends B\n"
+  final val Header =
+    "class A; class B; object A extends A; object B extends B\n"
 
   def testFine() {
     assertMatches(messages("var v = A")) {
@@ -60,16 +60,19 @@ class VariableDefinitionAnnotatorTest extends SimpleTestCase {
     }
   }
 
-  def messages(@Language(value = "Scala", prefix = Header) code: String): List[Message] = {
+  def messages(@Language(value = "Scala", prefix = Header) code: String)
+    : List[Message] = {
     val parse: ScalaFile = (Header + code).parse
-    val definition = parse.depthFirst.findByType(classOf[ScVariableDefinition]).get
-    
+    val definition =
+      parse.depthFirst.findByType(classOf[ScVariableDefinition]).get
+
     val annotator = new VariableDefinitionAnnotator() {}
     val mock = new AnnotatorHolderMock
-    
-    annotator.annotateVariableDefinition(definition, mock, highlightErrors = true)
+
+    annotator.annotateVariableDefinition(
+        definition, mock, highlightErrors = true)
     mock.annotations
   }
-  
+
   val TypeMismatch = ContainsPattern("Type mismatch")
 }

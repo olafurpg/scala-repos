@@ -13,9 +13,9 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.extensions.ExtensionPointName
 
 /**
- * @author Alefas
- * @since 31.10.12
- */
+  * @author Alefas
+  * @since 31.10.12
+  */
 abstract class ScalaPluginVersionVerifier {
   def getSinceVersion: String
 
@@ -24,11 +24,15 @@ abstract class ScalaPluginVersionVerifier {
 
 object ScalaPluginVersionVerifier {
 
-  class Version(private val major: Int, private val minor: Int, private val build: Int) extends Ordered[Version] with Serializable {
-    def compare(that: Version) = implicitly[Ordering[(Int, Int, Int)]]
-      .compare((major, minor, build), (that.major, that.minor, that.build))
+  class Version(
+      private val major: Int, private val minor: Int, private val build: Int)
+      extends Ordered[Version] with Serializable {
+    def compare(that: Version) =
+      implicitly[Ordering[(Int, Int, Int)]]
+        .compare((major, minor, build), (that.major, that.minor, that.build))
 
-    val presentation: String = if (major == Int.MaxValue) "SNAPSHOT" else s"$major.$minor.$build"
+    val presentation: String =
+      if (major == Int.MaxValue) "SNAPSHOT" else s"$major.$minor.$build"
 
     def isSnapshot = presentation == "SNAPSHOT"
 
@@ -43,18 +47,21 @@ object ScalaPluginVersionVerifier {
       val VersionRegex = "(\\d+)[.](\\d+)[.](\\d+)".r
       version match {
         case "VERSION" => Some(Snapshot)
-        case VersionRegex(major: String, minor: String, build: String) => Some(new Version(major.toInt, minor.toInt, build.toInt))
+        case VersionRegex(major: String, minor: String, build: String) =>
+          Some(new Version(major.toInt, minor.toInt, build.toInt))
         case _ => None
       }
     }
   }
 
-  val EP_NAME: ExtensionPointName[ScalaPluginVersionVerifier] = ExtensionPointName.create("org.intellij.scala.scalaPluginVersionVerifier")
+  val EP_NAME: ExtensionPointName[ScalaPluginVersionVerifier] =
+    ExtensionPointName.create("org.intellij.scala.scalaPluginVersionVerifier")
 
   lazy val getPluginVersion: Option[Version] = {
     getClass.getClassLoader match {
       case pluginLoader: PluginClassLoader =>
-        Version.parse(PluginManager.getPlugin(pluginLoader.getPluginId).getVersion)
+        Version.parse(
+            PluginManager.getPlugin(pluginLoader.getPluginId).getVersion)
       case _ => Some(Version.Snapshot)
     }
   }
@@ -62,21 +69,26 @@ object ScalaPluginVersionVerifier {
   def getPluginDescriptor = {
     getClass.getClassLoader match {
       case pluginLoader: PluginClassLoader =>
-        PluginManager.getPlugin(pluginLoader.getPluginId).asInstanceOf[IdeaPluginDescriptorImpl]
-      case other => throw new RuntimeException(s"Wrong plugin classLoader: $other")
+        PluginManager
+          .getPlugin(pluginLoader.getPluginId)
+          .asInstanceOf[IdeaPluginDescriptorImpl]
+      case other =>
+        throw new RuntimeException(s"Wrong plugin classLoader: $other")
     }
-
   }
 }
 
 object ScalaPluginVersionVerifierApplicationComponent {
-  private val LOG = Logger.getInstance("#org.jetbrains.plugins.scala.components.ScalaPluginVersionVerifierApplicationComponent")
+  private val LOG = Logger.getInstance(
+      "#org.jetbrains.plugins.scala.components.ScalaPluginVersionVerifierApplicationComponent")
 }
 
-class ScalaPluginVersionVerifierApplicationComponent extends ApplicationComponent {
+class ScalaPluginVersionVerifierApplicationComponent
+    extends ApplicationComponent {
   import ScalaPluginVersionVerifier._
 
-  def getComponentName: String = "ScalaPluginVersionVerifierApplicationComponent"
+  def getComponentName: String =
+    "ScalaPluginVersionVerifierApplicationComponent"
 
   def initComponent() {
 
@@ -91,34 +103,48 @@ class ScalaPluginVersionVerifierApplicationComponent extends ApplicationComponen
               failed = true
               extension.getClass.getClassLoader match {
                 case pluginLoader: PluginClassLoader =>
-                  val plugin = PluginManager.getPlugin(pluginLoader.getPluginId)
+                  val plugin =
+                    PluginManager.getPlugin(pluginLoader.getPluginId)
                   val message =
                     s"Plugin ${plugin.getName} of version ${plugin.getVersion} is " +
-                      s"icompatible with Scala plugin of version $version. Do you want to disable ${plugin.getName} plugin?\n" +
-                      s"""<p/><a href="Yes">Yes, disable it</a>\n""" +
-                      s"""<p/><a href="No">No, leave it enabled</a>"""
+                    s"icompatible with Scala plugin of version $version. Do you want to disable ${plugin.getName} plugin?\n" +
+                    s"""<p/><a href="Yes">Yes, disable it</a>\n""" +
+                    s"""<p/><a href="No">No, leave it enabled</a>"""
                   if (ApplicationManager.getApplication.isUnitTestMode) {
-                    ScalaPluginVersionVerifierApplicationComponent.LOG.error(message)
+                    ScalaPluginVersionVerifierApplicationComponent.LOG.error(
+                        message)
                   } else {
                     val Scala_Group = "Scala Plugin Incompatibility"
                     val app: Application = ApplicationManager.getApplication
                     if (!app.isDisposed) {
-                      app.getMessageBus.syncPublisher(Notifications.TOPIC).register(Scala_Group, NotificationDisplayType.STICKY_BALLOON)
+                      app.getMessageBus
+                        .syncPublisher(Notifications.TOPIC)
+                        .register(Scala_Group,
+                                  NotificationDisplayType.STICKY_BALLOON)
                     }
                     NotificationGroup.balloonGroup(Scala_Group)
-                    val notification = new Notification(Scala_Group, "Incompatible plugin detected", message, NotificationType.ERROR, new NotificationListener {
-                      def hyperlinkUpdate(notification: Notification, event: HyperlinkEvent) {
-                        notification.expire()
-                        val description = event.getDescription
-                        description match {
-                          case "Yes" =>
-                            PluginManagerCore.disablePlugin(plugin.getPluginId.getIdString)
-                            PluginManagerConfigurable.showRestartDialog()
-                          case "No"  => //do nothing it seems all is ok for the user
-                          case _     => //do nothing it seems all is ok for the user
-                        }
-                      }
-                    })
+                    val notification = new Notification(
+                        Scala_Group,
+                        "Incompatible plugin detected",
+                        message,
+                        NotificationType.ERROR,
+                        new NotificationListener {
+                          def hyperlinkUpdate(notification: Notification,
+                                              event: HyperlinkEvent) {
+                            notification.expire()
+                            val description = event.getDescription
+                            description match {
+                              case "Yes" =>
+                                PluginManagerCore.disablePlugin(
+                                    plugin.getPluginId.getIdString)
+                                PluginManagerConfigurable.showRestartDialog()
+                              case "No" =>
+                              //do nothing it seems all is ok for the user
+                              case _ =>
+                              //do nothing it seems all is ok for the user
+                            }
+                          }
+                        })
 
                     Notifications.Bus.notify(notification)
                   }
@@ -129,7 +155,7 @@ class ScalaPluginVersionVerifierApplicationComponent extends ApplicationComponen
                 if (sinceVersion != version && version < sinceVersion) {
                   wrongVersion()
                 }
-              case _                  =>
+              case _ =>
             }
 
             Version.parse(extension.getUntilVersion) match {
@@ -137,14 +163,15 @@ class ScalaPluginVersionVerifierApplicationComponent extends ApplicationComponen
                 if (untilVersion != version && untilVersion < version) {
                   wrongVersion()
                 }
-              case _                  =>
+              case _ =>
             }
           }
-        case None          =>
+        case None =>
       }
       ScalaPluginUpdater.askUpdatePluginBranch()
     }
-    SwingUtilities.invokeLater(new Runnable {
+    SwingUtilities.invokeLater(
+        new Runnable {
       def run() {
         ScalaPluginUpdater.upgradeRepo()
         checkVersion()

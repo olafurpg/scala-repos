@@ -6,16 +6,15 @@ import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.junit.Assert
 
 /**
- * Pavel.Fatin, 18.05.2010
- */
-
+  * Pavel.Fatin, 18.05.2010
+  */
 class ScopeAnnotatorTest extends SimpleTestCase {
   // TODO List of explicit clash groups, report scope 
   // ("Foo is already defined as class Foo, object Foo in object Holder")
   // TODO Suggest "rename" quick fix 
-  
+
   final val Header = "class Foo; class Bar; "
-  
+
   def testEmpty() {
     assertFine("")
   }
@@ -49,7 +48,7 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertFine("{ v: Any => }")
     assertFine("class X { def this(x: Any) { this() } }")
   }
-  
+
   def testDistinctNames() {
     assertFine("class A; class B")
     assertFine("case class A; case class B")
@@ -117,13 +116,15 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertClashes("for(x <- Nil; v = null; v = null) {}", "v")
     assertClashes("for(v <- Nil; v = null) {}", "v")
     assertClashes("{ (v: Any, v: Any) => }", "v")
-    assertClashes("class X { def this(x: Any) { this() }; def this(x: Any) { this() } }", "this")
+    assertClashes(
+        "class X { def this(x: Any) { this() }; def this(x: Any) { this() } }",
+        "this")
   }
-  
+
   def testUnderscore() {
     assertFine("val f: (Any => Unit) = { case _: Foo | _: Bar => }")
   }
-  
+
   // TODO implement processing of distributed package declarations
 //  def testNameClashInPackage {
 //    assertMatches(messages("package p { class C }; package p { class C }")) { 
@@ -139,9 +140,10 @@ class ScopeAnnotatorTest extends SimpleTestCase {
       case Error("O", _) :: Error("O", _) :: Error("O", _) :: Nil =>
     }
   }
-  
+
   def testGroups() {
-    assertClashes("def f(a: Any, a: Any); def f(b: Any, b: Any)", "f", "a", "b")
+    assertClashes(
+        "def f(a: Any, a: Any); def f(b: Any, b: Any)", "f", "a", "b")
   }
 
   def testScopeInspection() {
@@ -161,7 +163,8 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertClashes("while(true) { class C; class C }", "C")
     assertClashes("do { class C; class C } while(true)", "C")
     assertClashes("try { class C; class C } catch { case _ => }", "C")
-    assertClashes("try {} catch { case _ => } finally { class C; class C }", "C")
+    assertClashes(
+        "try {} catch { case _ => } finally { class C; class C }", "C")
     assertClashes("new { class C; class C }", "C")
     assertClashes("null match { case _ => class C; class C }", "C")
     assertClashes("val x: (Any => Unit) = { case _ => class C; class C }", "C")
@@ -176,16 +179,17 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertFine("class C; trait X { class C }")
     assertFine("class C; object X { class C }")
     assertFine("class C; case object X { class C }")
-    assertFine("class C; package X { class C }")    
+    assertFine("class C; package X { class C }")
     assertFine("class C; def X { class C }")
     assertFine("class C; val X = { class C }")
     assertFine("class C; var X = { class C }")
     assertFine("val v = null; type X = { val v = null }")
-    assertFine("class C; for(x <- Nil) { class C }")    
-    assertFine("class C; if(true) { class C } else { class C }")    
-    assertFine("class C; while(true) { class C }")    
-    assertFine("class C; do { class C } while(true)")    
-    assertFine("class C; try { class C } catch { case _ => } finally { class C }")
+    assertFine("class C; for(x <- Nil) { class C }")
+    assertFine("class C; if(true) { class C } else { class C }")
+    assertFine("class C; while(true) { class C }")
+    assertFine("class C; do { class C } while(true)")
+    assertFine(
+        "class C; try { class C } catch { case _ => } finally { class C }")
     assertFine("class C; new { class C }")
     assertFine("class C; for(x <- Nil) { class C }")
     assertFine("class C; val x: C forSome { type C <: Any } = null")
@@ -203,7 +207,7 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertFine("val v = null; for(v <- Nil) {}")
     assertFine("val v = null; for(x <- Nil; v = null) {}")
   }
-  
+
   def testSelfBoundary() {
     assertFine("class C { class C }")
     assertFine("class C[T] { class T }")
@@ -217,22 +221,24 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertFine("null match ( case v => val v = null }")
     assertFine("{ v: Any => val v = null }")
   }
-  
+
   def testNestedScopes() {
     assertFine("class C; { class C; { class C } }")
     assertClashes("class X; { class X; { class C; class C } }", "C")
   }
-  
+
   def testSameLeveScopeBoundary() {
     assertFine("{ class C }; { class C }")
   }
-  
+
   def testMembers() {
     assertClashes("class C(p: Any) { val p = null }", "p")
-    assertMatches(messages("class C(a: Any, b: Any) { val a = null; val b = null }")) {
+    assertMatches(
+        messages("class C(a: Any, b: Any) { val a = null; val b = null }")) {
       case Error("b", _) :: Error("a", _) :: Error("a", _) :: Error("b", _) :: Nil =>
     }
-    assertMatches(messages("class C(a: Any)(b: Any) { val b = null; val a = null }")) {
+    assertMatches(
+        messages("class C(a: Any)(b: Any) { val b = null; val a = null }")) {
       case Error("a", _) :: Error("b", _) :: Error("a", _) :: Error("b", _) :: Nil =>
     }
     assertClashes("class C(val p: Any) { val p = null }", "p")
@@ -241,37 +247,37 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertClashes("case class C(val p: Any) { val p = null }", "p")
     assertClashes("case class C(var p: Any) { val p = null }", "p")
   }
-  
+
   def testMembersCrossClash() {
     assertMatches(messages("class C(p: Any, p: Any) { val p = null }")) {
       case Error("p", _) :: Error("p", _) :: Error("p", _) :: Nil =>
     }
-  }  
-  
+  }
+
   def testMemberAndIds() {
     assertFine("class X(p: Any){ class p }")
     assertClashes("class X(p: Any){ val p = null }", "p")
     assertClashes("class X(p: Any){ object p }", "p")
     assertClashes("class X(p: Any){ case class p }", "p")
- }
-  
+  }
+
   def testTypesClash() {
     assertClashes("class T; trait T", "T")
     assertClashes("class T; type T = Any", "T")
     assertClashes("class T; type T", "T")
     assertClashes("class T; case class T", "T")
   }
-  
+
   def testTermsClash() {
     assertClashes("def v {}; def v", "v")
     assertClashes("def v {}; val v = null", "v")
     assertClashes("def v {}; val v", "v")
-    assertClashes("def v {}; var v = null", "v") 
-    assertClashes("def v {}; var v", "v") 
-    assertClashes("def v {}; object v", "v") 
+    assertClashes("def v {}; var v = null", "v")
+    assertClashes("def v {}; var v", "v")
+    assertClashes("def v {}; object v", "v")
     assertClashes("def v {}; case class v", "v")
   }
-   
+
   def testTypeAndTerms() {
     assertFine("class x; val x = null")
     assertFine("class x; val x")
@@ -282,17 +288,17 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertFine("class x; object x")
     assertFine("class x; case object x")
   }
-  
+
   def testTypesOrTermsClash() {
     assertClashes("class X; class X; object X", "X")
     assertClashes("object X; object X; class X", "X")
   }
-  
+
   def testCaseClassCompanion() {
-    assertFine("case class X; object X") 
+    assertFine("case class X; object X")
     assertFine("case class X; case object X")
     assertClashes("case class v; def v {}", "v")
-    assertMatches(messages("case class X; object X; def X {}")) { 
+    assertMatches(messages("case class X; object X; def X {}")) {
       case Error("X", _) :: Error("X", _) :: Error("X", _) :: Nil =>
     }
     assertClashes("case class X; object X; object X", "X")
@@ -302,7 +308,7 @@ class ScopeAnnotatorTest extends SimpleTestCase {
   def testFunctionParameterNames() {
     assertClashes("def f(foo: Any) {}; def f(bar: Any) {}", "f")
   }
-  
+
   def testFunctionSignature() {
     assertFine("def f() {}; def f(p: Any) {}")
     assertFine("def a(p: Any) {}; def b(p: Any) {}")
@@ -310,7 +316,7 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertFine("def f(a: Any) {}; def f(a: Any, b: Any) {}")
     assertFine("def f(a: Bar)(b: Any) {}; def f(a: Foo)(b: Any) {}")
     assertFine("def f(a: Any, b: Any) {}; def f(a: Any)(b: Any) {}")
-    
+
     assertClashes("def f {}; def f {}", "f")
     assertClashes("def f() {}; def f() {}", "f")
     assertClashes("def f {}; def f() {}", "f")
@@ -342,36 +348,36 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertFine("for {a <- Some(1); b <- Some(a); a = b} {}")
     assertClashes("for {a <- Some(1); a <- Some(a); b = a; a = b} {}", "a")
   }
-  
+
   def testRepeatedParameter() {
     assertFine("def f(p: Any*) {}; def f(p: Any) {}")
     assertFine("def f(p: Any) {}; def f(p: Any*) {}")
     assertClashes("def f(p: Any*) {}; def f(p: Any*) {}", "f")
   }
-  
+
   def testConstructorSignature() {
     assertFine("class X { def this(x: Foo) {}; def this(x: AnyVal) {} }")
     assertFine("class X { def this(a: Any) {}; def this(a: Any, b: Any) {} }")
   }
-  
+
   def testPrimaryConstructor() {
     assertFine("class X(x: Foo) { def this(x: Bar) {} }")
     assertFine("class X(a: Any) { def this(a: Any, b: Any) {} }")
     assertFine("class X(a: Any) { def this(a: Any)(b: Any) {} }")
-    
+
     // TODO find clashes with primary constructor
 //    assertClashes("class X { def this() {} }", "this")
 //    assertClashes("class X(x: Any) { def this(x: Any) {} }", "this")
 //    assertClashes("class X(a: Any, b: Any) { def this(a: Any, b: Any) {} }", "this")
 //    assertClashes("class X(a: Any)(b: Any) { def this(a: Any)(b: Any) {} }", "this")
   }
-  
+
   def testFunctionHolders() {
     assertFine("class X { def f() {}; def f(p: Any) {} }")
     assertFine("object X { def f() {}; def f(p: Any) {} }")
     assertFine("trait X { def f() {}; def f(p: Any) {} }")
     assertFine("new { def f() {}; def f(p: Any) {} }")
-    
+
     assertClashes("def x { def f() {}; def f(p: Any) {} }", "f")
     assertClashes("if(true) { def f() {}; def f(p: Any) {} }", "f")
     assertClashes("if(true) {} else { def f() {}; def f(p: Any) {} }", "f")
@@ -379,13 +385,14 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertClashes("do { def f() {}; def f(p: Any) {} } while(true)", "f")
     assertClashes("for(x <- Nil) { def f() {}; def f(p: Any) {} }", "f")
   }
-  
+
   def testLocalFunctionSignature() {
     assertClashes("def x { def f() {}; def f(p: Any) {} }", "f")
     assertClashes("def x { def f(p: Foo) {}; def f(p: Bar) {} }", "f")
     assertClashes("def x { def f(a: Any) {}; def f(a: Any, b: Any) {} }", "f")
     assertClashes("def x { def f(a: Any) {}; def f(a: Any)(b: Any) {} }", "f")
-    assertClashes("def x { def f(a: Any)(b: Foo) {}; def f(a: Any)(b: Bar) {} }", "f")
+    assertClashes(
+        "def x { def f(a: Any)(b: Foo) {}; def f(a: Any)(b: Bar) {} }", "f")
   }
 
   def testFunctionFollowingApplications() {
@@ -393,46 +400,75 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertFine("def f(a: Any)(b: Foo) {}; def f(a: Any)(b: Bar) {}")
     assertFine("def f(a: Any)(b: Any) {}; def f(a: Any)(b: Any, c: Any) {}")
     assertFine("def f(a: Any)(b: Any) {}; def f(a: Any)(b: Any)(c: Any) {}")
-    
+
     assertFine("def f(a: Any)(b: Any) {}; def f(a: Any, b: Any) {}")
-    
+
     assertClashes("def f(a: Any)(b: Any) {}; def f(a: Any)(b: Any) {}", "f")
-    assertClashes("def f(a: Any)(b: Any)(c: Any) {}; def f(a: Any)(b: Any)(c: Any) {}", "f")
+    assertClashes(
+        "def f(a: Any)(b: Any)(c: Any) {}; def f(a: Any)(b: Any)(c: Any) {}",
+        "f")
   }
 
   def testConstructorFollowingApplications() {
     assertFine("class X { def this(a: Any) {}; def this(a: Any)(b: Any) {} }")
-    assertFine("class X { def this(a: Any)(b: AnyVal) {}; def this(a: Any)(b: AnyRef) {} }")
-    assertFine("class X { def this(a: Any)(b: Any) {}; def this(a: Any)(b: Any, c: Any) {} }")
-    assertFine("class X { def this(a: Any)(b: Any) {}; def this(a: Any)(b: Any)(c: Any) {} }")
-    
-    assertFine("class X { def this(a: Any)(b: Any) {}; def this(a: Any, b: Any) {} }")
-    
-    assertClashes("class X { def this(a: Any)(b: Any) {}; def this(a: Any)(b: Any) {} }", "this")
-    assertClashes("class X { def this(a: Any)(b: Any)(c: Any) {}; def this(a: Any)(b: Any)(c: Any) {} }", "this")
+    assertFine(
+        "class X { def this(a: Any)(b: AnyVal) {}; def this(a: Any)(b: AnyRef) {} }")
+    assertFine(
+        "class X { def this(a: Any)(b: Any) {}; def this(a: Any)(b: Any, c: Any) {} }")
+    assertFine(
+        "class X { def this(a: Any)(b: Any) {}; def this(a: Any)(b: Any)(c: Any) {} }")
+
+    assertFine(
+        "class X { def this(a: Any)(b: Any) {}; def this(a: Any, b: Any) {} }")
+
+    assertClashes(
+        "class X { def this(a: Any)(b: Any) {}; def this(a: Any)(b: Any) {} }",
+        "this")
+    assertClashes(
+        "class X { def this(a: Any)(b: Any)(c: Any) {}; def this(a: Any)(b: Any)(c: Any) {} }",
+        "this")
   }
-  
+
   def testTypeErasure() {
     // precheck
     assertFine("def f(a: Foo) {}; def f(a: Bar) {}")
-    assertClashes("class Holder[T]; def f(a: Holder) {}; def f(a: Holder) {}", "f")
-    assertClashes("class Holder[T]; def f(a: Holder[Any]) {}; def f(a: Holder[Any]) {}", "f")
-    
-    assertClashes("class Holder[T]; def f(a: Holder[Foo]) {}; def f(a: Holder[Bar]) {}", "f")
-    assertClashes("class Holder[T]; def f(a: Holder[Holder[Foo]]) {}; def f(a: Holder[Holder[Bar]]) {}", "f")
-    assertClashes("class Holder[T]; def f(a: Holder[Foo], b: Holder[Bar]) {}; def f(a: Holder[Bar], b: Holder[Foo]) {}", "f")
-    assertClashes("class Holder[A, B]; def f(a: Holder[Foo, Bar]) {}; def f(a: Holder[Bar, Foo]) {}", "f")
-  } 
+    assertClashes(
+        "class Holder[T]; def f(a: Holder) {}; def f(a: Holder) {}", "f")
+    assertClashes(
+        "class Holder[T]; def f(a: Holder[Any]) {}; def f(a: Holder[Any]) {}",
+        "f")
+
+    assertClashes(
+        "class Holder[T]; def f(a: Holder[Foo]) {}; def f(a: Holder[Bar]) {}",
+        "f")
+    assertClashes(
+        "class Holder[T]; def f(a: Holder[Holder[Foo]]) {}; def f(a: Holder[Holder[Bar]]) {}",
+        "f")
+    assertClashes(
+        "class Holder[T]; def f(a: Holder[Foo], b: Holder[Bar]) {}; def f(a: Holder[Bar], b: Holder[Foo]) {}",
+        "f")
+    assertClashes(
+        "class Holder[A, B]; def f(a: Holder[Foo, Bar]) {}; def f(a: Holder[Bar, Foo]) {}",
+        "f")
+  }
 
   def testNoTypeErasureForArray() {
-    assertFine("class Array[T]; def f(a: Array[Foo]) {}; def f(a: Array[Bar]) {}")
-    assertFine("class Array[T]; def f(a: Array[Array[Foo]]) {}; def f(a: Array[Array[Bar]]) {}")
-    assertFine("class Array[T]; def f(a: Array[Foo], b: Array[Bar]) {}; def f(a: Array[Bar], b: Array[Foo]) {}")
-    assertFine("class Array[A, B]; def f(a: Array[Foo, Bar]) {}; def f(a: Array[Bar, Foo]) {}")
-    
-    assertClashes("class ArrayFoo[T]; def f(a: ArrayFoo[Foo]) {}; def f(a: ArrayFoo[Bar]) {}", "f")
-    assertClashes("class FooArray[T]; def f(a: FooArray[Foo]) {}; def f(a: FooArray[Bar]) {}", "f")
-    
+    assertFine(
+        "class Array[T]; def f(a: Array[Foo]) {}; def f(a: Array[Bar]) {}")
+    assertFine(
+        "class Array[T]; def f(a: Array[Array[Foo]]) {}; def f(a: Array[Array[Bar]]) {}")
+    assertFine(
+        "class Array[T]; def f(a: Array[Foo], b: Array[Bar]) {}; def f(a: Array[Bar], b: Array[Foo]) {}")
+    assertFine(
+        "class Array[A, B]; def f(a: Array[Foo, Bar]) {}; def f(a: Array[Bar, Foo]) {}")
+
+    assertClashes(
+        "class ArrayFoo[T]; def f(a: ArrayFoo[Foo]) {}; def f(a: ArrayFoo[Bar]) {}",
+        "f")
+    assertClashes(
+        "class FooArray[T]; def f(a: FooArray[Foo]) {}; def f(a: FooArray[Bar]) {}",
+        "f")
+
     //TODO handle Array[X[T, ...], ...] cases
 //    assertClashes("class Array[T]; def f(a: Array[Holder[Foo]]) {}; def f(a: Array[Holder[Bar]]) {}", "f")
   }
@@ -449,12 +485,12 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertFine("{case a => val a = 1}")
     assertFine("{case a => {(); val a = 1}}")
   }
-  
+
   def testListOfPatterns() {
     assertClashes("val (a, a) = ()", "a")
-    assertClashes("val (a, (b, a)) = ()", "a")    
+    assertClashes("val (a, (b, a)) = ()", "a")
   }
-  
+
   // TODO implement function signatures comparison based on types (not on plain text representations)
 //  def testFunctionSignatureTypeConformanceAndErasure {
 //    assertMatches(messages("type Foo = Any; def f(p: Any) {}; def f(p: Foo) {}")) {
@@ -464,22 +500,27 @@ class ScopeAnnotatorTest extends SimpleTestCase {
 //      case Error("f", _) :: Error("f", _) :: Nil =>  
 //    }
 //  }
-  
+
   def testMessages() {
     assertMatches(messages("class Foo; class Foo")) {
-      case Error(_, m) :: _ if m.startsWith("Foo is already defined") =>  
+      case Error(_, m) :: _ if m.startsWith("Foo is already defined") =>
     }
-    assertMatches(messages("def f(a: Any, b: Any) {}; def f(a: Any, b: Any) {}")) {
-      case Error(_, m) :: _ if m.startsWith("f(Any, Any) is already defined") =>  
+    assertMatches(
+        messages("def f(a: Any, b: Any) {}; def f(a: Any, b: Any) {}")) {
+      case Error(_, m) :: _
+          if m.startsWith("f(Any, Any) is already defined") =>
     }
-    assertMatches(messages("def f(a: Any)(b: Any) {}; def f(a: Any)(b: Any) {}")) {
-      case Error(_, m) :: _ if m.startsWith("f(Any)(Any) is already defined") =>  
+    assertMatches(
+        messages("def f(a: Any)(b: Any) {}; def f(a: Any)(b: Any) {}")) {
+      case Error(_, m) :: _
+          if m.startsWith("f(Any)(Any) is already defined") =>
     }
     assertMatches(messages("def x { def f(p: Any) {}; def f(p: Any) {} }")) {
-      case Error(_, m) :: _ if m.startsWith("f is already defined") =>  
-    }                           
-    assertMatches(messages("def x { def f(a: Any) {}; def f(a: Any, b: Any) {} }")) {
-      case Error(_, m) :: _ if m.startsWith("f is already defined") =>  
+      case Error(_, m) :: _ if m.startsWith("f is already defined") =>
+    }
+    assertMatches(
+        messages("def x { def f(a: Any) {}; def f(a: Any, b: Any) {} }")) {
+      case Error(_, m) :: _ if m.startsWith("f is already defined") =>
     }
   }
 
@@ -490,25 +531,30 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     }
   }
 
-  def assertClashes(@Language(value = "Scala", prefix = Header) code: String, pairs: String*) {
+  def assertClashes(@Language(value = "Scala", prefix = Header) code: String,
+                    pairs: String*) {
     val expectation = pairs.flatMap(p => List(p, p))
-    Assert.assertEquals("Incorrect clashed elements", expectation.mkString(", "), clashesOf(code).mkString(", "))
+    Assert.assertEquals("Incorrect clashed elements",
+                        expectation.mkString(", "),
+                        clashesOf(code).mkString(", "))
   }
-  
+
   def assertFine(@Language(value = "Scala", prefix = Header) code: String) {
     val clashes = clashesOf(code)
-    if(clashes.nonEmpty) Assert.fail("Unexpected clashes: " + clashes.mkString(", "))
+    if (clashes.nonEmpty)
+      Assert.fail("Unexpected clashes: " + clashes.mkString(", "))
   }
-  
-  def messages(@Language(value = "Scala", prefix = Header) code: String): List[Message] = {
+
+  def messages(@Language(value = "Scala", prefix = Header) code: String)
+    : List[Message] = {
     val psi = (Header + code).parse
     val annotator = new ScopeAnnotator() {}
     val mock = new AnnotatorHolderMock
 
     psi.depthFirst.foreach {
-      annotator.annotateScope(_, mock)  
+      annotator.annotateScope(_, mock)
     }
-    
+
     mock.annotations
   }
 }

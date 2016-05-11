@@ -6,38 +6,37 @@ import spire.math.{SafeLong, log, max}
 import SieveUtil._
 
 /**
- * Segmented Stream of Eratosthenes implementation
- *
- * This section really needs some good comments.
- *
- * Some future optimizations:
- *
- * 0. Consider an option to use multiple threads
- * 1. Faster heap/priority queue
- * 2. Tune chunkSize
- * 3. Use Long internally until we have to switch to SafeLong.
- * 4. Compress the amount of space our heaps take up.
- * 5. Read more efficient segmented sieves to get other ideas.
- * 6. Try using a delta-encoded prime log
- *
- * Obviously we are trying to be a bit more flexible than a
- * traditional prime finder that knows ahead of time what range it
- * will be operating over, which will hurt performance a bit. Also,
- * it's not written in C/assembly. So it will probably never be truly
- * competitive, but I'd like us to do as well as possible.
- */
-
+  * Segmented Stream of Eratosthenes implementation
+  *
+  * This section really needs some good comments.
+  *
+  * Some future optimizations:
+  *
+  * 0. Consider an option to use multiple threads
+  * 1. Faster heap/priority queue
+  * 2. Tune chunkSize
+  * 3. Use Long internally until we have to switch to SafeLong.
+  * 4. Compress the amount of space our heaps take up.
+  * 5. Read more efficient segmented sieves to get other ideas.
+  * 6. Try using a delta-encoded prime log
+  *
+  * Obviously we are trying to be a bit more flexible than a
+  * traditional prime finder that knows ahead of time what range it
+  * will be operating over, which will hurt performance a bit. Also,
+  * it's not written in C/assembly. So it will probably never be truly
+  * competitive, but I'd like us to do as well as possible.
+  */
 /**
- * The Siever manages the segmented sieve process.
- *
- * At any given time, it holds onto a single sieve segment. Thus, the
- * siever should be used for a single lookup or traversal.
- *
- * Sievers are built using 'chunkSize' and 'cutoff' parameters. These
- * are passed along to any sieve segments they create. When possible,
- * it's probably better to use methods on the companion object, which
- * will instantiate a Siever for you with reasonable parameters.
- */
+  * The Siever manages the segmented sieve process.
+  *
+  * At any given time, it holds onto a single sieve segment. Thus, the
+  * siever should be used for a single lookup or traversal.
+  *
+  * Sievers are built using 'chunkSize' and 'cutoff' parameters. These
+  * are passed along to any sieve segments they create. When possible,
+  * it's probably better to use methods on the companion object, which
+  * will instantiate a Siever for you with reasonable parameters.
+  */
 case class Siever(chunkSize: Int, cutoff: SafeLong) {
   require(chunkSize % 480 == 0, "chunkSize must be a multiple of 480")
 
@@ -50,7 +49,8 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
   sieve.init(fastq, slowq)
 
   def largestBelow(n: SafeLong): SafeLong = {
-    if (n < 3) throw new IllegalArgumentException("invalid argument: %s" format n)
+    if (n < 3)
+      throw new IllegalArgumentException("invalid argument: %s" format n)
     if (n == 3) return SafeLong(2)
 
     var i = 3
@@ -102,7 +102,8 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     start += chunkSize
     limit += chunkSize
     val csq = cutoff ** 2
-    if (limit >= csq) sys.error("too big: %s > %s (%s)" format (limit, csq, cutoff))
+    if (limit >= csq)
+      sys.error("too big: %s > %s (%s)" format (limit, csq, cutoff))
     arr.clear()
     sieve = SieveSegment(start, arr, cutoff)
     sieve.init(fastq, slowq)

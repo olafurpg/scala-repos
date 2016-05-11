@@ -1,4 +1,3 @@
-
 import scala.language.reflectiveCalls
 
 object Test extends App {
@@ -12,8 +11,8 @@ object Test extends App {
     def lastIndexOf(str: String, fromIndex: Int): Int
   }
 
-  import scala.collection.mutable.{ StringBuilder => ScalaStringBuilder }
-  import java.lang.{ StringBuilder => JavaStringBuilder }
+  import scala.collection.mutable.{StringBuilder => ScalaStringBuilder}
+  import java.lang.{StringBuilder => JavaStringBuilder}
 
   val sbScala = new ScalaStringBuilder() append str
   val sbJava = new JavaStringBuilder() append str

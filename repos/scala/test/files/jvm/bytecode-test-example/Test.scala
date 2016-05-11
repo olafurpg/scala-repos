@@ -15,14 +15,15 @@ object Test extends BytecodeTest {
   }
 
   def countNullChecks(insnList: InsnList): Int = {
+
     /** Is given instruction a null check?
-     *  NOTE
-     *   This will detect direct null comparison as in
-     *    if (x == null) ...
-     *   and not indirect as in
-     *     val foo = null
-     *     if (x == foo) ...
-     */
+      *  NOTE
+      *   This will detect direct null comparison as in
+      *    if (x == null) ...
+      *   and not indirect as in
+      *     val foo = null
+      *     if (x == foo) ...
+      */
     def isNullCheck(node: asm.tree.AbstractInsnNode): Boolean = {
       val opcode = node.getOpcode
       (opcode == asm.Opcodes.IFNULL) || (opcode == asm.Opcodes.IFNONNULL)

@@ -24,16 +24,15 @@ import org.apache.spark.annotation.DeveloperApi
 // information about a specific split instance : handles both split instances.
 // So that we do not need to worry about the differences.
 @DeveloperApi
-class SplitInfo(
-    val inputFormatClazz: Class[_],
-    val hostLocation: String,
-    val path: String,
-    val length: Long,
-    val underlyingSplit: Any) {
+class SplitInfo(val inputFormatClazz: Class[_],
+                val hostLocation: String,
+                val path: String,
+                val length: Long,
+                val underlyingSplit: Any) {
   override def toString(): String = {
-    "SplitInfo " + super.toString + " .. inputFormatClazz " + inputFormatClazz +
-      ", hostLocation : " + hostLocation + ", path : " + path +
-      ", length : " + length + ", underlyingSplit " + underlyingSplit
+    "SplitInfo " + super.toString + " .. inputFormatClazz " +
+    inputFormatClazz + ", hostLocation : " + hostLocation + ", path : " +
+    path + ", length : " + length + ", underlyingSplit " + underlyingSplit
   }
 
   override def hashCode(): Int = {
@@ -50,35 +49,40 @@ class SplitInfo(
   // is pointing to same block.
   override def equals(other: Any): Boolean = other match {
     case that: SplitInfo => {
-      this.hostLocation == that.hostLocation &&
+        this.hostLocation == that.hostLocation &&
         this.inputFormatClazz == that.inputFormatClazz &&
-        this.path == that.path &&
-        this.length == that.length &&
+        this.path == that.path && this.length == that.length &&
         // other split specific checks (like start for FileSplit)
         this.underlyingSplit == that.underlyingSplit
-    }
+      }
     case _ => false
   }
 }
 
 object SplitInfo {
 
-  def toSplitInfo(inputFormatClazz: Class[_], path: String,
-                  mapredSplit: org.apache.hadoop.mapred.InputSplit): Seq[SplitInfo] = {
+  def toSplitInfo(
+      inputFormatClazz: Class[_],
+      path: String,
+      mapredSplit: org.apache.hadoop.mapred.InputSplit): Seq[SplitInfo] = {
     val retval = new ArrayBuffer[SplitInfo]()
     val length = mapredSplit.getLength
     for (host <- mapredSplit.getLocations) {
-      retval += new SplitInfo(inputFormatClazz, host, path, length, mapredSplit)
+      retval +=
+        new SplitInfo(inputFormatClazz, host, path, length, mapredSplit)
     }
     retval
   }
 
-  def toSplitInfo(inputFormatClazz: Class[_], path: String,
-                  mapreduceSplit: org.apache.hadoop.mapreduce.InputSplit): Seq[SplitInfo] = {
+  def toSplitInfo(inputFormatClazz: Class[_],
+                  path: String,
+                  mapreduceSplit: org.apache.hadoop.mapreduce.InputSplit)
+    : Seq[SplitInfo] = {
     val retval = new ArrayBuffer[SplitInfo]()
     val length = mapreduceSplit.getLength
     for (host <- mapreduceSplit.getLocations) {
-      retval += new SplitInfo(inputFormatClazz, host, path, length, mapreduceSplit)
+      retval +=
+        new SplitInfo(inputFormatClazz, host, path, length, mapreduceSplit)
     }
     retval
   }

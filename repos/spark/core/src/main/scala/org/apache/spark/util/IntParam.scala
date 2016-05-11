@@ -18,8 +18,8 @@
 package org.apache.spark.util
 
 /**
- * An extractor object for parsing strings into integers.
- */
+  * An extractor object for parsing strings into integers.
+  */
 private[spark] object IntParam {
   def unapply(str: String): Option[Int] = {
     try {

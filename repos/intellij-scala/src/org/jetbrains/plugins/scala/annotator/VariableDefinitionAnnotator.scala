@@ -8,13 +8,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSimpleTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScVariableDefinition
 
 /**
- * Pavel.Fatin, 18.05.2010
- */
+  * Pavel.Fatin, 18.05.2010
+  */
 trait VariableDefinitionAnnotator {
-  def annotateVariableDefinition(definition: ScVariableDefinition, holder: AnnotationHolder, highlightErrors: Boolean) {
+  def annotateVariableDefinition(definition: ScVariableDefinition,
+                                 holder: AnnotationHolder,
+                                 highlightErrors: Boolean) {
     if (highlightErrors && definition.pList.allPatternsSimple) {
-      for (expr <- definition.expr; element <- definition.children.findByType(classOf[ScSimpleTypeElement]))
-        checkConformance(expr, element, holder)
+      for (expr <- definition.expr;
+      element <- definition.children.findByType(classOf[ScSimpleTypeElement])) checkConformance(
+          expr, element, holder)
     }
   }
 }

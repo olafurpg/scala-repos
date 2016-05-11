@@ -10,10 +10,10 @@ object Test {
 }
 
 class VC(val a: Any) extends AnyVal {
-   def foo(a: A) = {
-     val pf: PartialFunction[a.C, Any] = { case x => x }
-     (pf: PartialFunction[Null, Any]).isDefinedAt(null)
-   }
+  def foo(a: A) = {
+    val pf: PartialFunction[a.C, Any] = { case x => x }
+    (pf: PartialFunction[Null, Any]).isDefinedAt(null)
+  }
 }
 
 // 2.11.0-M6

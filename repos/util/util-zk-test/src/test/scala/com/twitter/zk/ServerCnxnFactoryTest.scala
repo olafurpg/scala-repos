@@ -9,7 +9,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ServerCnxnFactoryTest extends FunSuite with BeforeAndAfter  {
+class ServerCnxnFactoryTest extends FunSuite with BeforeAndAfter {
   val addr = InetAddress.getLocalHost
 
   var testServer: ZooKeeperServer = null
@@ -17,7 +17,8 @@ class ServerCnxnFactoryTest extends FunSuite with BeforeAndAfter  {
 
   before {
     tmpDir = FileUtils.createTempDir()
-    testServer = new ZooKeeperServer(tmpDir, tmpDir, ZooKeeperServer.DEFAULT_TICK_TIME)
+    testServer = new ZooKeeperServer(
+        tmpDir, tmpDir, ZooKeeperServer.DEFAULT_TICK_TIME)
   }
 
   after {

@@ -1,6 +1,6 @@
 object SCL1734 {
   class A {
-    val p = /*start*/_: B/*end*/
+    val p = /*start*/ _: B /*end*/
   }
   class B
 }

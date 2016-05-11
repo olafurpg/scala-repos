@@ -20,50 +20,53 @@ package actor
 import java.util.concurrent._
 
 /**
- * Rules for dealing with thread pools, both in lift-actor and
- * in lift-util
- */
+  * Rules for dealing with thread pools, both in lift-actor and
+  * in lift-util
+  */
 object ThreadPoolRules {
+
   /**
-   * When threads are created in the thread factories, should
-   * they null the context class loader.  By default false,
-   * but it you set it to true, Tomcat complains less about stuff.
-   * Must be set in the first line of Boot.scala
-   */
+    * When threads are created in the thread factories, should
+    * they null the context class loader.  By default false,
+    * but it you set it to true, Tomcat complains less about stuff.
+    * Must be set in the first line of Boot.scala
+    */
   @volatile var nullContextClassLoader: Boolean = false
 }
 
 /**
- * The ActorPing object schedules an actor to be ping-ed with a given message at specific intervals.
- * The schedule methods return a ScheduledFuture object which can be cancelled if necessary
- */
+  * The ActorPing object schedules an actor to be ping-ed with a given message at specific intervals.
+  * The schedule methods return a ScheduledFuture object which can be cancelled if necessary
+  */
 object LAPinger {
 
   /**The underlying <code>java.util.concurrent.ScheduledExecutor</code> */
   private var service = Executors.newSingleThreadScheduledExecutor(TF)
 
   /**
-   * Re-create the underlying <code>SingleThreadScheduledExecutor</code>
-   */
+    * Re-create the underlying <code>SingleThreadScheduledExecutor</code>
+    */
   def restart: Unit = synchronized {
     if ((service eq null) || service.isShutdown)
       service = Executors.newSingleThreadScheduledExecutor(TF)
   }
 
   /**
-   * Shut down the underlying <code>SingleThreadScheduledExecutor</code>
-   */
+    * Shut down the underlying <code>SingleThreadScheduledExecutor</code>
+    */
   def shutdown: Unit = synchronized {
     service.shutdown
   }
 
   /**
-   * Schedules the sending of a message to occur after the specified delay.
-   *
-   * @return a <code>ScheduledFuture</code> which sends the <code>msg</code> to
-   * the <code>to<code> Actor after the specified TimeSpan <code>delay</code>.
-   */
-  def schedule[T](to: SpecializedLiftActor[T], msg: T, delay: Long): ScheduledFuture[Unit] = {
+    * Schedules the sending of a message to occur after the specified delay.
+    *
+    * @return a <code>ScheduledFuture</code> which sends the <code>msg</code> to
+    * the <code>to<code> Actor after the specified TimeSpan <code>delay</code>.
+    */
+  def schedule[T](to: SpecializedLiftActor[T],
+                  msg: T,
+                  delay: Long): ScheduledFuture[Unit] = {
     val r = new Callable[Unit] {
       def call: Unit = {
         to ! msg
@@ -72,16 +75,17 @@ object LAPinger {
     try {
       service.schedule(r, delay, TimeUnit.MILLISECONDS)
     } catch {
-      case e: RejectedExecutionException => throw PingerException(msg + " could not be scheduled on " + to, e)
+      case e: RejectedExecutionException =>
+        throw PingerException(msg + " could not be scheduled on " + to, e)
     }
   }
-
 }
 
 /**
- * Exception thrown if a ping can't be scheduled.
- */
-case class PingerException(msg: String, e: Throwable) extends RuntimeException(msg, e)
+  * Exception thrown if a ping can't be scheduled.
+  */
+case class PingerException(msg: String, e: Throwable)
+    extends RuntimeException(msg, e)
 
 private object TF extends ThreadFactory {
   val threadFactory = Executors.defaultThreadFactory()
@@ -96,4 +100,3 @@ private object TF extends ThreadFactory {
     d
   }
 }
-

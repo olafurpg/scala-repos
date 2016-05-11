@@ -14,8 +14,8 @@ class PrepareCacheTest extends FunSuite with MockitoSugar {
   test("cache prepare requests") {
     val dispatcher = mock[Service[Request, Result]]
     val stmtId = 2
-    when(dispatcher(any[Request])).thenReturn(Future.value(
-      PrepareOK(stmtId, 1, 1, 0)))
+    when(dispatcher(any[Request]))
+      .thenReturn(Future.value(PrepareOK(stmtId, 1, 1, 0)))
 
     val svc = new PrepareCache(dispatcher, 11)
     val r0 = PrepareRequest("SELECT 0")

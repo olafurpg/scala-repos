@@ -1,7 +1,6 @@
 class Foo { def f = 5 }
 class Bar extends Foo { private def f = 10 }
 
-
 class Foo1 { private def f = 5 }
 class Bar1 extends Foo1 { def f = 10 } // okay
 

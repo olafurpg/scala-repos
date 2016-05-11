@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.testkit.metrics.reporter
 
 import java.io.PrintStream
@@ -11,17 +11,24 @@ import akka.testkit.metrics._
 import scala.reflect.ClassTag
 
 /**
- * Used to report `akka.testkit.metric.Metric` types that the original `com.codahale.metrics.ConsoleReporter` is unaware of (cannot re-use directly because of private constructor).
- */
-class AkkaConsoleReporter(
-  registry: AkkaMetricRegistry,
-  verbose: Boolean,
-  output: PrintStream = System.out)
-  extends ScheduledReporter(registry.asInstanceOf[MetricRegistry], "akka-console-reporter", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.NANOSECONDS) {
+  * Used to report `akka.testkit.metric.Metric` types that the original `com.codahale.metrics.ConsoleReporter` is unaware of (cannot re-use directly because of private constructor).
+  */
+class AkkaConsoleReporter(registry: AkkaMetricRegistry,
+                          verbose: Boolean,
+                          output: PrintStream = System.out)
+    extends ScheduledReporter(registry.asInstanceOf[MetricRegistry],
+                              "akka-console-reporter",
+                              MetricFilter.ALL,
+                              TimeUnit.SECONDS,
+                              TimeUnit.NANOSECONDS) {
 
   private final val ConsoleWidth = 80
 
-  override def report(gauges: util.SortedMap[String, Gauge[_]], counters: util.SortedMap[String, Counter], histograms: util.SortedMap[String, Histogram], meters: util.SortedMap[String, Meter], timers: util.SortedMap[String, Timer]) {
+  override def report(gauges: util.SortedMap[String, Gauge[_]],
+                      counters: util.SortedMap[String, Counter],
+                      histograms: util.SortedMap[String, Histogram],
+                      meters: util.SortedMap[String, Meter],
+                      timers: util.SortedMap[String, Timer]) {
     import collection.JavaConverters._
 
     // default Metrics types
@@ -32,7 +39,8 @@ class AkkaConsoleReporter(
     printMetrics(timers.asScala, printTimer)
 
     // custom Akka types
-    printMetrics(registry.getKnownOpsInTimespanCounters, printKnownOpsInTimespanCounter)
+    printMetrics(
+        registry.getKnownOpsInTimespanCounters, printKnownOpsInTimespanCounter)
     printMetrics(registry.getHdrHistograms, printHdrHistogram)
     printMetrics(registry.getAveragingGauges, printAveragingGauge)
 
@@ -40,7 +48,9 @@ class AkkaConsoleReporter(
     output.flush()
   }
 
-  def printMetrics[T <: Metric](metrics: Iterable[(String, T)], printer: T ⇒ Unit)(implicit clazz: ClassTag[T]) {
+  def printMetrics[T <: Metric](
+      metrics: Iterable[(String, T)], printer: T ⇒ Unit)(
+      implicit clazz: ClassTag[T]) {
     if (!metrics.isEmpty) {
       printWithBanner(s"-- ${simpleName(metrics.head._2.getClass)}", '-')
       for ((key, metric) ← metrics) {
@@ -53,10 +63,14 @@ class AkkaConsoleReporter(
 
   private def printMeter(meter: Meter) {
     output.print("             count = %d%n".format(meter.getCount))
-    output.print("         mean rate = %2.2f events/%s%n".format(convertRate(meter.getMeanRate), getRateUnit))
-    output.print("     1-minute rate = %2.2f events/%s%n".format(convertRate(meter.getOneMinuteRate), getRateUnit))
-    output.print("     5-minute rate = %2.2f events/%s%n".format(convertRate(meter.getFiveMinuteRate), getRateUnit))
-    output.print("    15-minute rate = %2.2f events/%s%n".format(convertRate(meter.getFifteenMinuteRate), getRateUnit))
+    output.print("         mean rate = %2.2f events/%s%n".format(
+            convertRate(meter.getMeanRate), getRateUnit))
+    output.print("     1-minute rate = %2.2f events/%s%n".format(
+            convertRate(meter.getOneMinuteRate), getRateUnit))
+    output.print("     5-minute rate = %2.2f events/%s%n".format(
+            convertRate(meter.getFiveMinuteRate), getRateUnit))
+    output.print("    15-minute rate = %2.2f events/%s%n".format(
+            convertRate(meter.getFifteenMinuteRate), getRateUnit))
   }
 
   private def printCounter(entry: Counter) {
@@ -75,39 +89,61 @@ class AkkaConsoleReporter(
     output.print("              mean = %2.2f%n".format(snapshot.getMean))
     output.print("            stddev = %2.2f%n".format(snapshot.getStdDev))
     output.print("            median = %2.2f%n".format(snapshot.getMedian))
-    output.print("              75%% <= %2.2f%n".format(snapshot.get75thPercentile))
-    output.print("              95%% <= %2.2f%n".format(snapshot.get95thPercentile))
-    output.print("              98%% <= %2.2f%n".format(snapshot.get98thPercentile))
-    output.print("              99%% <= %2.2f%n".format(snapshot.get99thPercentile))
-    output.print("            99.9%% <= %2.2f%n".format(snapshot.get999thPercentile))
+    output.print(
+        "              75%% <= %2.2f%n".format(snapshot.get75thPercentile))
+    output.print(
+        "              95%% <= %2.2f%n".format(snapshot.get95thPercentile))
+    output.print(
+        "              98%% <= %2.2f%n".format(snapshot.get98thPercentile))
+    output.print(
+        "              99%% <= %2.2f%n".format(snapshot.get99thPercentile))
+    output.print(
+        "            99.9%% <= %2.2f%n".format(snapshot.get999thPercentile))
   }
 
   private def printTimer(timer: Timer) {
     val snapshot = timer.getSnapshot
     output.print("             count = %d%n".format(timer.getCount))
-    output.print("         mean rate = %2.2f calls/%s%n".format(convertRate(timer.getMeanRate), getRateUnit))
-    output.print("     1-minute rate = %2.2f calls/%s%n".format(convertRate(timer.getOneMinuteRate), getRateUnit))
-    output.print("     5-minute rate = %2.2f calls/%s%n".format(convertRate(timer.getFiveMinuteRate), getRateUnit))
-    output.print("    15-minute rate = %2.2f calls/%s%n".format(convertRate(timer.getFifteenMinuteRate), getRateUnit))
-    output.print("               min = %2.2f %s%n".format(convertDuration(snapshot.getMin), getDurationUnit))
-    output.print("               max = %2.2f %s%n".format(convertDuration(snapshot.getMax), getDurationUnit))
-    output.print("              mean = %2.2f %s%n".format(convertDuration(snapshot.getMean), getDurationUnit))
-    output.print("            stddev = %2.2f %s%n".format(convertDuration(snapshot.getStdDev), getDurationUnit))
-    output.print("            median = %2.2f %s%n".format(convertDuration(snapshot.getMedian), getDurationUnit))
-    output.print("              75%% <= %2.2f %s%n".format(convertDuration(snapshot.get75thPercentile), getDurationUnit))
-    output.print("              95%% <= %2.2f %s%n".format(convertDuration(snapshot.get95thPercentile), getDurationUnit))
-    output.print("              98%% <= %2.2f %s%n".format(convertDuration(snapshot.get98thPercentile), getDurationUnit))
-    output.print("              99%% <= %2.2f %s%n".format(convertDuration(snapshot.get99thPercentile), getDurationUnit))
-    output.print("            99.9%% <= %2.2f %s%n".format(convertDuration(snapshot.get999thPercentile), getDurationUnit))
+    output.print("         mean rate = %2.2f calls/%s%n".format(
+            convertRate(timer.getMeanRate), getRateUnit))
+    output.print("     1-minute rate = %2.2f calls/%s%n".format(
+            convertRate(timer.getOneMinuteRate), getRateUnit))
+    output.print("     5-minute rate = %2.2f calls/%s%n".format(
+            convertRate(timer.getFiveMinuteRate), getRateUnit))
+    output.print("    15-minute rate = %2.2f calls/%s%n".format(
+            convertRate(timer.getFifteenMinuteRate), getRateUnit))
+    output.print("               min = %2.2f %s%n".format(
+            convertDuration(snapshot.getMin), getDurationUnit))
+    output.print("               max = %2.2f %s%n".format(
+            convertDuration(snapshot.getMax), getDurationUnit))
+    output.print("              mean = %2.2f %s%n".format(
+            convertDuration(snapshot.getMean), getDurationUnit))
+    output.print("            stddev = %2.2f %s%n".format(
+            convertDuration(snapshot.getStdDev), getDurationUnit))
+    output.print("            median = %2.2f %s%n".format(
+            convertDuration(snapshot.getMedian), getDurationUnit))
+    output.print("              75%% <= %2.2f %s%n".format(
+            convertDuration(snapshot.get75thPercentile), getDurationUnit))
+    output.print("              95%% <= %2.2f %s%n".format(
+            convertDuration(snapshot.get95thPercentile), getDurationUnit))
+    output.print("              98%% <= %2.2f %s%n".format(
+            convertDuration(snapshot.get98thPercentile), getDurationUnit))
+    output.print("              99%% <= %2.2f %s%n".format(
+            convertDuration(snapshot.get99thPercentile), getDurationUnit))
+    output.print("            99.9%% <= %2.2f %s%n".format(
+            convertDuration(snapshot.get999thPercentile), getDurationUnit))
   }
 
-  private def printKnownOpsInTimespanCounter(counter: KnownOpsInTimespanTimer) {
+  private def printKnownOpsInTimespanCounter(
+      counter: KnownOpsInTimespanTimer) {
     import concurrent.duration._
     import akka.util.PrettyDuration._
     output.print("               ops = %d%n".format(counter.getCount))
-    output.print("              time = %s%n".format(counter.elapsedTime.nanos.pretty))
+    output.print(
+        "              time = %s%n".format(counter.elapsedTime.nanos.pretty))
     output.print("             ops/s = %2.2f%n".format(counter.opsPerSecond))
-    output.print("               avg = %s%n".format(counter.avgDuration.nanos.pretty))
+    output.print(
+        "               avg = %s%n".format(counter.avgDuration.nanos.pretty))
   }
 
   private def printHdrHistogram(hist: HdrHistogram) {
@@ -117,14 +153,18 @@ class AkkaConsoleReporter(
     output.print("               max = %d %s%n".format(data.getMaxValue, unit))
     output.print("              mean = %2.2f %s%n".format(data.getMean, unit))
     output.print("            stddev = %2.2f%n".format(data.getStdDeviation))
-    output.print("              75%% <= %d %s%n".format(data.getValueAtPercentile(75.0), unit))
-    output.print("              95%% <= %d %s%n".format(data.getValueAtPercentile(95.0), unit))
-    output.print("              98%% <= %d %s%n".format(data.getValueAtPercentile(98.0), unit))
-    output.print("              99%% <= %d %s%n".format(data.getValueAtPercentile(99.0), unit))
-    output.print("            99.9%% <= %d %s%n".format(data.getValueAtPercentile(99.9), unit))
+    output.print("              75%% <= %d %s%n".format(
+            data.getValueAtPercentile(75.0), unit))
+    output.print("              95%% <= %d %s%n".format(
+            data.getValueAtPercentile(95.0), unit))
+    output.print("              98%% <= %d %s%n".format(
+            data.getValueAtPercentile(98.0), unit))
+    output.print("              99%% <= %d %s%n".format(
+            data.getValueAtPercentile(99.0), unit))
+    output.print("            99.9%% <= %d %s%n".format(
+            data.getValueAtPercentile(99.9), unit))
 
-    if (verbose)
-      data.outputPercentileDistribution(output, 1)
+    if (verbose) data.outputPercentileDistribution(output, 1)
   }
 
   private def printAveragingGauge(gauge: AveragingGauge) {
@@ -148,6 +188,4 @@ class AkkaConsoleReporter(
     val i = n.lastIndexOf('.')
     n.substring(i + 1)
   }
-
 }
-

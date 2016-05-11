@@ -1,4 +1,3 @@
-class A
-{
-	implicit def x(i: Int): String = i.toString
+class A {
+  implicit def x(i: Int): String = i.toString
 }

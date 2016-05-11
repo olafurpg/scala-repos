@@ -21,14 +21,15 @@ object ReplicatedCacheSpec extends MultiNodeConfig {
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
     """))
-
 }
 
 class ReplicatedCacheSpecMultiJvmNode1 extends ReplicatedCacheSpec
 class ReplicatedCacheSpecMultiJvmNode2 extends ReplicatedCacheSpec
 class ReplicatedCacheSpecMultiJvmNode3 extends ReplicatedCacheSpec
 
-class ReplicatedCacheSpec extends MultiNodeSpec(ReplicatedCacheSpec) with STMultiNodeSpec with ImplicitSender {
+class ReplicatedCacheSpec
+    extends MultiNodeSpec(ReplicatedCacheSpec) with STMultiNodeSpec
+    with ImplicitSender {
   import ReplicatedCacheSpec._
   import ReplicatedCache._
 
@@ -73,8 +74,7 @@ class ReplicatedCacheSpec extends MultiNodeSpec(ReplicatedCacheSpec) with STMult
 
     "replicate many cached entries" in within(10.seconds) {
       runOn(node1) {
-        for (i ← 100 to 200)
-          replicatedCache ! PutInCache("key" + i, i)
+        for (i ← 100 to 200) replicatedCache ! PutInCache("key" + i, i)
       }
 
       awaitAssert {
@@ -127,8 +127,5 @@ class ReplicatedCacheSpec extends MultiNodeSpec(ReplicatedCacheSpec) with STMult
 
       enterBarrier("after-5")
     }
-
   }
-
 }
-

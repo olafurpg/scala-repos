@@ -7,9 +7,12 @@ import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTes
   * Daniyar Itegulov
   * 2016-02-08
   */
-class HashCodeUsesVarInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
-  override protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[HashCodeUsesVarInspection]
-  override protected def annotation: String = "Non-value field is accessed in 'hashCode()'"
+class HashCodeUsesVarInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
+  override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[HashCodeUsesVarInspection]
+  override protected def annotation: String =
+    "Non-value field is accessed in 'hashCode()'"
 
   def testReturnsVar(): Unit = {
     val text = s"""class A {

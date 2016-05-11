@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.contrib.pattern
 
 import akka.testkit.AkkaSpec
@@ -36,15 +35,16 @@ object ReliableProxyDocSpec {
         client = sender()
       case FSM.CurrentState(`proxy`, initial) ⇒
       case FSM.Transition(`proxy`, from, to) ⇒
-        if (to == ReliableProxy.Idle)
-          client ! "done"
+        if (to == ReliableProxy.Idle) client ! "done"
     }
   }
   //#demo-transition
 
   class WatchingProxyParent(targetPath: ActorPath) extends Actor {
-    val proxy = context.watch(context.actorOf(
-      ReliableProxy.props(targetPath, 100.millis, reconnectAfter = 500.millis, maxReconnects = 3)))
+    val proxy = context.watch(
+        context
+          .actorOf(
+            ReliableProxy.props(targetPath, 100.millis, reconnectAfter = 500.millis, maxReconnects = 3)))
 
     var client: Option[ActorRef] = None
 
@@ -74,7 +74,8 @@ class ReliableProxyDocSpec extends AkkaSpec {
     "show state transitions" in {
       val target = TestProbe().ref
       val probe = TestProbe()
-      val a = system.actorOf(Props(classOf[ProxyTransitionParent], target.path))
+      val a =
+        system.actorOf(Props(classOf[ProxyTransitionParent], target.path))
       a.tell("go", probe.ref)
       probe.expectMsg("done")
     }
@@ -86,7 +87,5 @@ class ReliableProxyDocSpec extends AkkaSpec {
       a.tell("hello", probe.ref)
       probe.expectMsg("terminated")
     }
-
   }
-
 }

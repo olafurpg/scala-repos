@@ -13,14 +13,13 @@ import org.jdom.Element
 import org.jetbrains.plugins.scala.runner.BaseRunConfiguration
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 10.02.2009
- */
-
-class ScalaConsoleRunConfiguration(project: Project, configurationFactory: ConfigurationFactory, name: String)
-        extends BaseRunConfiguration(project, configurationFactory, name) {
+  * User: Alexander Podkhalyuzin
+  * Date: 10.02.2009
+  */
+class ScalaConsoleRunConfiguration(
+    project: Project, configurationFactory: ConfigurationFactory, name: String)
+    extends BaseRunConfiguration(project, configurationFactory, name) {
   val mainClass = "org.jetbrains.plugins.scala.compiler.rt.ConsoleRunner"
-
 
   def apply(params: ScalaConsoleRunConfigurationForm) {
     javaOptions = params.getJavaOptions
@@ -29,7 +28,8 @@ class ScalaConsoleRunConfiguration(project: Project, configurationFactory: Confi
     setModule(params.getModule)
   }
 
-  def getState(executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+  def getState(
+      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
     val state = new JavaCommandLineState(env) {
       protected override def createJavaParameters: JavaParameters = {
         val params = createParams
@@ -40,7 +40,8 @@ class ScalaConsoleRunConfiguration(project: Project, configurationFactory: Confi
 
     val consoleBuilder = new TextConsoleBuilderImpl(project) {
       override def getConsole: ConsoleView = {
-        val consoleView = new ScalaLanguageConsole(project, ScalaLanguageConsoleView.SCALA_CONSOLE)
+        val consoleView = new ScalaLanguageConsole(
+            project, ScalaLanguageConsoleView.SCALA_CONSOLE)
         consoleView.setPrompt(null)
         consoleView
       }
@@ -49,7 +50,8 @@ class ScalaConsoleRunConfiguration(project: Project, configurationFactory: Confi
     state
   }
 
-  def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] = new ScalaConsoleRunConfigurationEditor(project, this)
+  def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
+    new ScalaConsoleRunConfigurationEditor(project, this)
 
   override def writeExternal(element: Element) {
     super.writeExternal(element)

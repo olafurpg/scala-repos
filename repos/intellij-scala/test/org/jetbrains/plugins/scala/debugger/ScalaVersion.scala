@@ -3,8 +3,8 @@ package org.jetbrains.plugins.scala.debugger
 import org.jetbrains.plugins.scala.util.TestUtils.ScalaSdkVersion
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 trait ScalaVersion {
   protected def scalaSdkVersion: ScalaSdkVersion
   protected def scalaVersion: String = scalaSdkVersion.getMajor

@@ -4,7 +4,7 @@ object Test {
   class A {
     private val count: Int = 0
   }
-  class B extends A { }
+  class B extends A {}
   object B {
     implicit def b2seq(x: B): Seq[Int] = Nil
 

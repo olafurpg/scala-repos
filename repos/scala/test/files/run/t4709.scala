@@ -1,7 +1,4 @@
-
-
 import collection.GenSeq
-
 
 object Test {
   def main(args: Array[String]) {

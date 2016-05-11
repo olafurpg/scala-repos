@@ -2,7 +2,7 @@ package mesosphere.marathon.test
 
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.core.{ Context, AppenderBase }
+import ch.qos.logback.core.{Context, AppenderBase}
 import org.slf4j.LoggerFactory
 
 object CaptureLogEvents {
@@ -18,7 +18,10 @@ object CaptureLogEvents {
     setName("capture")
 
     private[this] var events = Vector.empty[ILoggingEvent]
-    private[this] def rootLogger: Logger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).asInstanceOf[Logger]
+    private[this] def rootLogger: Logger =
+      LoggerFactory
+        .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
+        .asInstanceOf[Logger]
 
     def appendToRootLogger(): Unit = {
       setContext(LoggerFactory.getILoggerFactory.asInstanceOf[Context])
@@ -31,6 +34,8 @@ object CaptureLogEvents {
     def clearEvents(): Unit = synchronized { events = Vector.empty }
     def getEvents: Vector[ILoggingEvent] = synchronized { events }
 
-    override def append(eventObject: ILoggingEvent): Unit = synchronized { events :+= eventObject }
+    override def append(eventObject: ILoggingEvent): Unit = synchronized {
+      events :+= eventObject
+    }
   }
 }

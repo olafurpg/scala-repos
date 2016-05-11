@@ -1,19 +1,19 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+  * Licensed to the Apache Software Foundation (ASF) under one or more
+  * contributor license agreements.  See the NOTICE file distributed with
+  * this work for additional information regarding copyright ownership.
+  * The ASF licenses this file to You under the Apache License, Version 2.0
+  * (the "License"); you may not use this file except in compliance with
+  * the License.  You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package kafka.utils.timer
 
 import kafka.utils.nonthreadsafe
@@ -97,12 +97,19 @@ import java.util.concurrent.atomic.AtomicInteger
  * It is caller's responsibility to enforce it. Simultaneous add calls are thread-safe.
  */
 @nonthreadsafe
-private[timer] class TimingWheel(tickMs: Long, wheelSize: Int, startMs: Long, taskCounter: AtomicInteger, queue: DelayQueue[TimerTaskList]) {
+private[timer] class TimingWheel(tickMs: Long,
+                                 wheelSize: Int,
+                                 startMs: Long,
+                                 taskCounter: AtomicInteger,
+                                 queue: DelayQueue[TimerTaskList]) {
 
   private[this] val interval = tickMs * wheelSize
-  private[this] val buckets = Array.tabulate[TimerTaskList](wheelSize) { _ => new TimerTaskList(taskCounter) }
+  private[this] val buckets = Array.tabulate[TimerTaskList](wheelSize) { _ =>
+    new TimerTaskList(taskCounter)
+  }
 
-  private[this] var currentTime = startMs - (startMs % tickMs) // rounding down to multiple of tickMs
+  private[this] var currentTime =
+    startMs - (startMs % tickMs) // rounding down to multiple of tickMs
 
   // overflowWheel can potentially be updated and read by two concurrent threads through add().
   // Therefore, it needs to be volatile due to the issue of Double-Checked Locking pattern with JVM
@@ -112,11 +119,11 @@ private[timer] class TimingWheel(tickMs: Long, wheelSize: Int, startMs: Long, ta
     synchronized {
       if (overflowWheel == null) {
         overflowWheel = new TimingWheel(
-          tickMs = interval,
-          wheelSize = wheelSize,
-          startMs = currentTime,
-          taskCounter = taskCounter,
-          queue
+            tickMs = interval,
+            wheelSize = wheelSize,
+            startMs = currentTime,
+            taskCounter = taskCounter,
+            queue
         )
       }
     }

@@ -16,11 +16,17 @@ object Test extends App {
   val ru = reificationSupport.newFreeTerm("ru", scala.reflect.runtime.universe)
   reificationSupport.setInfo(ru, rutpe)
 
-  val tree1 = Apply(Select(Ident(ru), TermName("reify")), List(Apply(Select(Ident(TermName("scala")), TermName("Array")), List(Literal(Constant(2))))))
+  val tree1 = Apply(
+      Select(Ident(ru), TermName("reify")),
+      List(Apply(Select(Ident(TermName("scala")), TermName("Array")),
+                 List(Literal(Constant(2))))))
   val ttree1 = toolbox.typecheck(tree1, withMacrosDisabled = false)
   println(ttree1)
 
-  val tree2 = Apply(Select(Ident(ru), TermName("reify")), List(Apply(Select(Ident(TermName("scala")), TermName("Array")), List(Literal(Constant(2))))))
+  val tree2 = Apply(
+      Select(Ident(ru), TermName("reify")),
+      List(Apply(Select(Ident(TermName("scala")), TermName("Array")),
+                 List(Literal(Constant(2))))))
   val ttree2 = toolbox.typecheck(tree2, withMacrosDisabled = true)
   println(ttree2)
 }

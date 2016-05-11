@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.impl.engine.parsing
 
 import akka.NotUsed
@@ -18,22 +17,26 @@ import scala.collection.mutable.ListBuffer
 import akka.stream.impl.fusing.SubSource
 
 /**
- * INTERNAL API
- *
- * see: http://tools.ietf.org/html/rfc2046#section-5.1.1
- */
+  * INTERNAL API
+  *
+  * see: http://tools.ietf.org/html/rfc2046#section-5.1.1
+  */
 private[http] final class BodyPartParser(defaultContentType: ContentType,
                                          boundary: String,
                                          log: LoggingAdapter,
                                          settings: BodyPartParser.Settings)
-  extends PushPullStage[ByteString, BodyPartParser.Output] {
+    extends PushPullStage[ByteString, BodyPartParser.Output] {
   import BodyPartParser._
   import settings._
 
-  require(boundary.nonEmpty, "'boundary' parameter of multipart Content-Type must be non-empty")
-  require(boundary.charAt(boundary.length - 1) != ' ', "'boundary' parameter of multipart Content-Type must not end with a space char")
-  require(boundaryChar matchesAll boundary,
-    s"'boundary' parameter of multipart Content-Type contains illegal character '${boundaryChar.firstMismatch(boundary).get}'")
+  require(boundary.nonEmpty,
+          "'boundary' parameter of multipart Content-Type must be non-empty")
+  require(
+      boundary.charAt(boundary.length - 1) != ' ',
+      "'boundary' parameter of multipart Content-Type must not end with a space char")
+  require(
+      boundaryChar matchesAll boundary,
+      s"'boundary' parameter of multipart Content-Type contains illegal character '${boundaryChar.firstMismatch(boundary).get}'")
 
   sealed trait StateResult // phantom type for ensuring soundness of our parsing method setup
 
@@ -54,24 +57,31 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
 
   // TODO: prevent re-priming header parser from scratch
   private[this] val headerParser = HttpHeaderParser(settings) { errorInfo ⇒
-    if (illegalHeaderWarnings) log.warning(errorInfo.withSummaryPrepended("Illegal multipart header").formatPretty)
+    if (illegalHeaderWarnings)
+      log.warning(errorInfo
+            .withSummaryPrepended("Illegal multipart header")
+            .formatPretty)
   }
 
-  private[this] var output = collection.immutable.Queue.empty[Output] // FIXME this probably is too wasteful
+  private[this] var output =
+    collection.immutable.Queue.empty[Output] // FIXME this probably is too wasteful
   private[this] var state: ByteString ⇒ StateResult = tryParseInitialBoundary
   private[this] var terminated = false
 
   def warnOnIllegalHeader(errorInfo: ErrorInfo): Unit =
-    if (illegalHeaderWarnings) log.warning(errorInfo.withSummaryPrepended("Illegal multipart header").formatPretty)
+    if (illegalHeaderWarnings)
+      log.warning(errorInfo
+            .withSummaryPrepended("Illegal multipart header")
+            .formatPretty)
 
   override def onPush(input: ByteString, ctx: Context[Output]): SyncDirective =
     if (!terminated) {
-      try state(input)
-      catch {
+      try state(input) catch {
         case e: ParsingException ⇒ fail(e.info)
         case NotEnoughDataException ⇒
           // we are missing a try/catch{continue} wrapper somewhere
-          throw new IllegalStateException("unexpected NotEnoughDataException", NotEnoughDataException)
+          throw new IllegalStateException(
+              "unexpected NotEnoughDataException", NotEnoughDataException)
       }
       if (output.nonEmpty) ctx.push(dequeue())
       else if (!terminated) ctx.pull()
@@ -79,16 +89,17 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
     } else ctx.finish()
 
   override def onPull(ctx: Context[Output]): SyncDirective = {
-    if (output.nonEmpty)
-      ctx.push(dequeue())
+    if (output.nonEmpty) ctx.push(dequeue())
     else if (ctx.isFinishing) {
       if (terminated) ctx.finish()
-      else ctx.pushAndFinish(ParseError(ErrorInfo("Unexpected end of multipart entity")))
-    } else
-      ctx.pull()
+      else
+        ctx.pushAndFinish(
+            ParseError(ErrorInfo("Unexpected end of multipart entity")))
+    } else ctx.pull()
   }
 
-  override def onUpstreamFinish(ctx: Context[Output]): TerminationDirective = ctx.absorbTermination()
+  override def onUpstreamFinish(ctx: Context[Output]): TerminationDirective =
+    ctx.absorbTermination()
 
   def tryParseInitialBoundary(input: ByteString): StateResult =
     // we don't use boyerMoore here because we are testing for the boundary *without* a
@@ -101,7 +112,8 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
         else parsePreamble(input, 0)
       } else parsePreamble(input, 0)
     } catch {
-      case NotEnoughDataException ⇒ continue(input, 0)((newInput, _) ⇒ tryParseInitialBoundary(newInput))
+      case NotEnoughDataException ⇒
+        continue(input, 0)((newInput, _) ⇒ tryParseInitialBoundary(newInput))
     }
 
   def parsePreamble(input: ByteString, offset: Int): StateResult =
@@ -114,29 +126,36 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
       }
       rec(offset)
     } catch {
-      case NotEnoughDataException ⇒ continue(input.takeRight(needle.length + 2), 0)(parsePreamble)
+      case NotEnoughDataException ⇒
+        continue(input.takeRight(needle.length + 2), 0)(parsePreamble)
     }
 
-  @tailrec def parseHeaderLines(input: ByteString, lineStart: Int, headers: ListBuffer[HttpHeader] = ListBuffer[HttpHeader](),
-                                headerCount: Int = 0, cth: Option[`Content-Type`] = None): StateResult = {
+  @tailrec
+  def parseHeaderLines(
+      input: ByteString,
+      lineStart: Int,
+      headers: ListBuffer[HttpHeader] = ListBuffer[HttpHeader](),
+      headerCount: Int = 0,
+      cth: Option[`Content-Type`] = None): StateResult = {
     def contentType =
       cth match {
         case Some(x) ⇒ x.contentType
-        case None    ⇒ defaultContentType
+        case None ⇒ defaultContentType
       }
 
     var lineEnd = 0
-    val resultHeader =
-      try {
-        if (!boundary(input, lineStart)) {
-          lineEnd = headerParser.parseHeaderLine(input, lineStart)()
-          headerParser.resultHeader
-        } else BoundaryHeader
-      } catch {
-        case NotEnoughDataException ⇒ null
-      }
+    val resultHeader = try {
+      if (!boundary(input, lineStart)) {
+        lineEnd = headerParser.parseHeaderLine(input, lineStart)()
+        headerParser.resultHeader
+      } else BoundaryHeader
+    } catch {
+      case NotEnoughDataException ⇒ null
+    }
     resultHeader match {
-      case null ⇒ continue(input, lineStart)(parseHeaderLinesAux(headers, headerCount, cth))
+      case null ⇒
+        continue(input, lineStart)(
+            parseHeaderLinesAux(headers, headerCount, cth))
 
       case BoundaryHeader ⇒
         emit(BodyPartStart(headers.toList, _ ⇒ HttpEntity.empty(contentType)))
@@ -145,43 +164,61 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
         else if (doubleDash(input, ix)) terminate()
         else fail("Illegal multipart boundary in message content")
 
-      case EmptyHeader ⇒ parseEntity(headers.toList, contentType)(input, lineEnd)
+      case EmptyHeader ⇒
+        parseEntity(headers.toList, contentType)(input, lineEnd)
 
       case h: `Content-Type` ⇒
-        if (cth.isEmpty) parseHeaderLines(input, lineEnd, headers, headerCount + 1, Some(h))
-        else if (cth.get == h) parseHeaderLines(input, lineEnd, headers, headerCount, cth)
-        else fail("multipart part must not contain more than one Content-Type header")
+        if (cth.isEmpty)
+          parseHeaderLines(input, lineEnd, headers, headerCount + 1, Some(h))
+        else if (cth.get == h)
+          parseHeaderLines(input, lineEnd, headers, headerCount, cth)
+        else
+          fail(
+              "multipart part must not contain more than one Content-Type header")
 
       case h if headerCount < maxHeaderCount ⇒
         parseHeaderLines(input, lineEnd, headers += h, headerCount + 1, cth)
 
-      case _ ⇒ fail(s"multipart part contains more than the configured limit of $maxHeaderCount headers")
+      case _ ⇒
+        fail(
+            s"multipart part contains more than the configured limit of $maxHeaderCount headers")
     }
   }
 
   // work-around for compiler complaining about non-tail-recursion if we inline this method
-  def parseHeaderLinesAux(headers: ListBuffer[HttpHeader], headerCount: Int,
-                          cth: Option[`Content-Type`])(input: ByteString, lineStart: Int): StateResult =
+  def parseHeaderLinesAux(headers: ListBuffer[HttpHeader],
+                          headerCount: Int,
+                          cth: Option[`Content-Type`])(
+      input: ByteString, lineStart: Int): StateResult =
     parseHeaderLines(input, lineStart, headers, headerCount, cth)
 
-  def parseEntity(headers: List[HttpHeader], contentType: ContentType,
-                  emitPartChunk: (List[HttpHeader], ContentType, ByteString) ⇒ Unit = {
-                    (headers, ct, bytes) ⇒
-                      emit(BodyPartStart(headers, entityParts ⇒ HttpEntity.IndefiniteLength(ct,
-                        entityParts.collect { case EntityPart(data) ⇒ data })))
-                      emit(bytes)
+  def parseEntity(headers: List[HttpHeader],
+                  contentType: ContentType,
+                  emitPartChunk: (List[HttpHeader], ContentType,
+                  ByteString) ⇒ Unit = { (headers, ct, bytes) ⇒
+                    emit(
+                        BodyPartStart(headers,
+                                      entityParts ⇒
+                                        HttpEntity.IndefiniteLength(
+                                            ct, entityParts.collect {
+                                      case EntityPart(data) ⇒ data
+                                    })))
+                    emit(bytes)
                   },
-                  emitFinalPartChunk: (List[HttpHeader], ContentType, ByteString) ⇒ Unit = {
-                    (headers, ct, bytes) ⇒
-                      emit(BodyPartStart(headers, { rest ⇒
-                        SubSource.kill(rest)
-                        HttpEntity.Strict(ct, bytes)
-                      }))
+                  emitFinalPartChunk: (List[HttpHeader], ContentType,
+                  ByteString) ⇒ Unit = { (headers, ct, bytes) ⇒
+                    emit(
+                        BodyPartStart(headers, { rest ⇒
+                      SubSource.kill(rest)
+                      HttpEntity.Strict(ct, bytes)
+                    }))
                   })(input: ByteString, offset: Int): StateResult =
     try {
       @tailrec def rec(index: Int): StateResult = {
         val currentPartEnd = boyerMoore.nextIndex(input, index)
-        def emitFinalChunk() = emitFinalPartChunk(headers, contentType, input.slice(offset, currentPartEnd))
+        def emitFinalChunk() =
+          emitFinalPartChunk(
+              headers, contentType, input.slice(offset, currentPartEnd))
         val needleEnd = currentPartEnd + needle.length
         if (crlf(input, needleEnd)) {
           emitFinalChunk()
@@ -198,12 +235,17 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
         val emitEnd = input.length - needle.length - 2
         if (emitEnd > offset) {
           emitPartChunk(headers, contentType, input.slice(offset, emitEnd))
-          val simpleEmit: (List[HttpHeader], ContentType, ByteString) ⇒ Unit = (_, _, bytes) ⇒ emit(bytes)
-          continue(input drop emitEnd, 0)(parseEntity(null, null, simpleEmit, simpleEmit))
-        } else continue(input, offset)(parseEntity(headers, contentType, emitPartChunk, emitFinalPartChunk))
+          val simpleEmit: (List[HttpHeader], ContentType, ByteString) ⇒ Unit =
+            (_, _, bytes) ⇒ emit(bytes)
+          continue(input drop emitEnd, 0)(
+              parseEntity(null, null, simpleEmit, simpleEmit))
+        } else
+          continue(input, offset)(parseEntity(
+                  headers, contentType, emitPartChunk, emitFinalPartChunk))
     }
 
-  def emit(bytes: ByteString): Unit = if (bytes.nonEmpty) emit(EntityPart(bytes))
+  def emit(bytes: ByteString): Unit =
+    if (bytes.nonEmpty) emit(EntityPart(bytes))
 
   def emit(element: Output): Unit = output = output.enqueue(element)
 
@@ -213,13 +255,15 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
     head
   }
 
-  def continue(input: ByteString, offset: Int)(next: (ByteString, Int) ⇒ StateResult): StateResult = {
-    state =
-      math.signum(offset - input.length) match {
-        case -1 ⇒ more ⇒ next(input ++ more, offset)
+  def continue(input: ByteString, offset: Int)(
+      next: (ByteString, Int) ⇒ StateResult): StateResult = {
+    state = math.signum(offset - input.length) match {
+      case -1 ⇒
+        more ⇒
+          next(input ++ more, offset)
         case 0 ⇒ next(_, 0)
-        case 1 ⇒ throw new IllegalStateException
-      }
+      case 1 ⇒ throw new IllegalStateException
+    }
     done()
   }
 
@@ -245,19 +289,20 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
   def boundaryLength = needle.length - 2
 
   @tailrec def boundary(input: ByteString, offset: Int, ix: Int = 2): Boolean =
-    (ix == needle.length) || (byteAt(input, offset + ix - 2) == needle(ix)) && boundary(input, offset, ix + 1)
+    (ix == needle.length) || (byteAt(input, offset + ix - 2) == needle(ix)) &&
+    boundary(input, offset, ix + 1)
 
   def crlf(input: ByteString, offset: Int): Boolean =
     byteChar(input, offset) == '\r' && byteChar(input, offset + 1) == '\n'
 
   def doubleDash(input: ByteString, offset: Int): Boolean =
     byteChar(input, offset) == '-' && byteChar(input, offset + 1) == '-'
-
 }
 
 private[http] object BodyPartParser {
   // http://tools.ietf.org/html/rfc2046#section-5.1.1
-  val boundaryChar = CharPredicate.Digit ++ CharPredicate.Alpha ++ "'()+_,-./:=? "
+  val boundaryChar =
+    CharPredicate.Digit ++ CharPredicate.Alpha ++ "'()+_,-./:=? "
 
   private object BoundaryHeader extends HttpHeader {
     def renderInRequests = false
@@ -271,7 +316,10 @@ private[http] object BodyPartParser {
 
   sealed trait Output
   sealed trait PartStart extends Output
-  final case class BodyPartStart(headers: List[HttpHeader], createEntity: Source[Output, NotUsed] ⇒ BodyPartEntity) extends PartStart
+  final case class BodyPartStart(
+      headers: List[HttpHeader],
+      createEntity: Source[Output, NotUsed] ⇒ BodyPartEntity)
+      extends PartStart
   final case class EntityPart(data: ByteString) extends Output
   final case class ParseError(info: ErrorInfo) extends PartStart
 

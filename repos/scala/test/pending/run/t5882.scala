@@ -6,7 +6,6 @@ class NodeOps(val n: Any) extends AnyVal { self =>
   def show(x: Any) = x.toString
 }
 
-
 object Test extends App {
 
   val n = new NodeOps("abc")

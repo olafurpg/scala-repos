@@ -1,17 +1,14 @@
-
-
-
 import collection.immutable._
-
 
 object Test {
   def main(args: Array[String]) {
-    val ps = PagedSeq.fromLines(List(
-      "line1",
-      "line2",
-      "line3",
-      "line4"
-    ).iterator)
+    val ps = PagedSeq.fromLines(
+        List(
+            "line1",
+            "line2",
+            "line3",
+            "line4"
+        ).iterator)
     assert(ps.filter(_ == '\n').size == 3)
 
     val ps1 = PagedSeq.fromLines(List("Ok").iterator)

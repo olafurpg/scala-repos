@@ -4,12 +4,12 @@
 package play.sbt
 
 import java.security.SecureRandom
-import com.typesafe.config.{ ConfigValue, ConfigOrigin, Config, ConfigFactory }
+import com.typesafe.config.{ConfigValue, ConfigOrigin, Config, ConfigFactory}
 import sbt._
 
 /**
- * Provides tasks for generating and updating application secrets
- */
+  * Provides tasks for generating and updating application secrets
+  */
 object ApplicationSecretGenerator {
 
   def generateSecret = {
@@ -26,7 +26,8 @@ object ApplicationSecretGenerator {
     secret
   }
 
-  private val ApplicationSecret = """\s*(?:(?:application\.secret)|(?:play\.crypto\.secret))\s*[=:].*""".r
+  private val ApplicationSecret =
+    """\s*(?:(?:application\.secret)|(?:play\.crypto\.secret))\s*[=:].*""".r
 
   def updateSecretTask = Def.task[File] {
     val secret: String = play.sbt.PlayImport.PlayKeys.generateSecret.value
@@ -35,35 +36,42 @@ object ApplicationSecretGenerator {
 
     val appConfFile = Option(System.getProperty("config.file")) match {
       case Some(applicationConf) => new File(baseDir, applicationConf)
-      case None => (Keys.resourceDirectory in Compile).value / "application.conf"
+      case None =>
+        (Keys.resourceDirectory in Compile).value / "application.conf"
     }
 
     if (appConfFile.exists()) {
-      log.info("Updating application secret in " + appConfFile.getCanonicalPath)
+      log.info(
+          "Updating application secret in " + appConfFile.getCanonicalPath)
 
       val lines = IO.readLines(appConfFile)
       val config: Config = ConfigFactory.parseString(lines.mkString("\n"))
 
-      val newLines = if (config.hasPath("play.crypto.secret")) {
-        log.info("Replacing old application secret: " + config.getString("play.crypto.secret"))
-        getUpdatedSecretLines(secret, lines, config)
-      } else {
-        log.warn("Did not find application secret in " + appConfFile.getCanonicalPath)
-        log.warn("Adding application secret to start of file")
-        val secretConfig = s"""play.crypto.secret="$secret""""
-        secretConfig :: lines
-      }
+      val newLines =
+        if (config.hasPath("play.crypto.secret")) {
+          log.info("Replacing old application secret: " +
+              config.getString("play.crypto.secret"))
+          getUpdatedSecretLines(secret, lines, config)
+        } else {
+          log.warn("Did not find application secret in " +
+              appConfFile.getCanonicalPath)
+          log.warn("Adding application secret to start of file")
+          val secretConfig = s"""play.crypto.secret="$secret""""
+          secretConfig :: lines
+        }
 
       IO.writeLines(appConfFile, newLines)
 
       appConfFile
     } else {
-      log.error("Could not find configuration file at " + appConfFile.getCanonicalPath)
+      log.error("Could not find configuration file at " +
+          appConfFile.getCanonicalPath)
       throw new FeedbackProvidedException {}
     }
   }
 
-  def getUpdatedSecretLines(newSecret: String, lines: List[String], config: Config): List[String] = {
+  def getUpdatedSecretLines(
+      newSecret: String, lines: List[String], config: Config): List[String] = {
 
     val secretConfigValue: ConfigValue = config.getValue("play.crypto.secret")
     val secretConfigOrigin: ConfigOrigin = secretConfigValue.origin()
@@ -73,8 +81,10 @@ object ApplicationSecretGenerator {
     } else {
       val lineNumber: Int = secretConfigOrigin.lineNumber - 1
 
-      val newLines: List[String] = lines.updated(lineNumber,
-        lines(lineNumber).replace(secretConfigValue.unwrapped().asInstanceOf[String], newSecret))
+      val newLines: List[String] = lines.updated(
+          lineNumber,
+          lines(lineNumber).replace(
+              secretConfigValue.unwrapped().asInstanceOf[String], newSecret))
 
       // removes existing application.secret key
       if (config.hasPath("application.secret")) {

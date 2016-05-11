@@ -35,14 +35,15 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * ListCell Spec tests.
- *
- *
- */
+  * ListCell Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ListCellSpec[T]
-  extends SimpleSFXDelegateSpec[jfxsc.ListCell[T], ListCell[T]](classOf[jfxsc.ListCell[T]], classOf[ListCell[T]])
-  with RunOnApplicationThread {
+    extends SimpleSFXDelegateSpec[jfxsc.ListCell[T], ListCell[T]](
+        classOf[jfxsc.ListCell[T]], classOf[ListCell[T]])
+    with RunOnApplicationThread {
 
   "ListCell" should "have index property (Issue #167)" in {
     val cell = new ListCell()

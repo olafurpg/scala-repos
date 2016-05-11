@@ -1,6 +1,6 @@
 /** All of these should work, some don't yet.
- *  !!!
- */
+  *  !!!
+  */
 class A {
   def f() = { case class Bob(); Bob }
 

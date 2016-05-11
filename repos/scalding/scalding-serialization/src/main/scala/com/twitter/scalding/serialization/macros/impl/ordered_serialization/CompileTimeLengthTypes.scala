@@ -57,7 +57,8 @@ object CompileTimeLengthTypes {
       }
   }
 
-  trait ConstantLengthCalculation[C <: Context] extends CompileTimeLengthTypes[C] {
+  trait ConstantLengthCalculation[C <: Context]
+      extends CompileTimeLengthTypes[C] {
     def toInt: Int
   }
 
@@ -73,5 +74,6 @@ object CompileTimeLengthTypes {
     }
   }
 
-  trait NoLengthCalculationAvailable[C <: Context] extends CompileTimeLengthTypes[C]
+  trait NoLengthCalculationAvailable[C <: Context]
+      extends CompileTimeLengthTypes[C]
 }

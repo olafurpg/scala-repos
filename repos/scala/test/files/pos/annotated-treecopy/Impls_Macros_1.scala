@@ -10,20 +10,21 @@ object Macros {
     val typeOut: String
   }
 
-  def tree[T,U](f:Function1[T,U]): Function1[T,U] = macro tree_impl[T,U]
+  def tree[T, U](f: Function1[T, U]): Function1[T, U] = macro tree_impl[T, U]
 
-  def tree_impl[T:c.WeakTypeTag,U:c.WeakTypeTag](c: Context)
-      (f:c.Expr[Function1[T,U]]): c.Expr[Function1[T,U]] = {
+  def tree_impl[T : c.WeakTypeTag, U : c.WeakTypeTag](c: Context)(
+      f: c.Expr[Function1[T, U]]): c.Expr[Function1[T, U]] = {
     import c.universe._
     import internal._
     val ttag = c.weakTypeTag[U]
     f match {
-      case Expr(Function(List(ValDef(_,n,tp,_)),b)) =>
+      case Expr(Function(List(ValDef(_, n, tp, _)), b)) =>
         // normalize argument name
         var b1 = new Transformer {
           override def transform(tree: Tree): Tree = tree match {
-            case Ident(x) if (x==n) => Ident(TermName("_arg"))
-            case tt: TypeTree if tt.original != null => setOriginal(TypeTree(tt.tpe), transform(tt.original))
+            case Ident(x) if (x == n) => Ident(TermName("_arg"))
+            case tt: TypeTree if tt.original != null =>
+              setOriginal(TypeTree(tt.tpe), transform(tt.original))
             // without the fix to LazyTreeCopier.Annotated, we would need to uncomment the line below to make the macro work
             // that's because the pattern match in the input expression gets expanded into Typed(<x>, TypeTree(<Int @unchecked>))
             // with the original of the TypeTree being Annotated(<@unchecked>, Ident(<x>))
@@ -36,15 +37,19 @@ object Macros {
         }.transform(b)
 
         val reifiedTree = c.reifyTree(gen.mkRuntimeUniverseRef, EmptyTree, b1)
-        val reifiedExpr = c.Expr[scala.reflect.runtime.universe.Expr[T => U]](reifiedTree)
-        val template =
-          c.universe.reify(new (T => U) with TypedFunction {
-            override def toString = c.Expr[String](q"""${tp+" => "+ttag.tpe+" { "+b1.toString+" } "}""").splice // DEBUG
-            def tree = reifiedExpr.splice.tree
-            val typeIn = c.Expr[String](q"${tp.toString}").splice
-            val typeOut = c.Expr[String](q"${ttag.tpe.toString}").splice
-            def apply(_arg: T): U = c.Expr[U](b1)(ttag.asInstanceOf[c.WeakTypeTag[U]]).splice
-          })
+        val reifiedExpr =
+          c.Expr[scala.reflect.runtime.universe.Expr[T => U]](reifiedTree)
+        val template = c.universe.reify(new (T => U) with TypedFunction {
+          override def toString =
+            c.Expr[String](q"""${tp + " => " + ttag.tpe +
+              " { " + b1.toString + " } "}""")
+              .splice // DEBUG
+          def tree = reifiedExpr.splice.tree
+          val typeIn = c.Expr[String](q"${tp.toString}").splice
+          val typeOut = c.Expr[String](q"${ttag.tpe.toString}").splice
+          def apply(_arg: T): U =
+            c.Expr[U](b1)(ttag.asInstanceOf[c.WeakTypeTag[U]]).splice
+        })
         val untyped = c.untypecheck(template.tree)
 
         c.Expr[T => U](untyped)

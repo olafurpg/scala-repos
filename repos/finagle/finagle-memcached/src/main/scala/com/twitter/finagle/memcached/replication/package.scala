@@ -22,5 +22,5 @@ with generic cache client interface is also provided. The SimpleReplicationClien
 a subset of all memcached commands for now, and will succeed only if the command succeed on all
 cache replicas. In a more complicate caching scenario, this simple/naive replication client may
 not be applicable.
- */
+  */
 package object replication

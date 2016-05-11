@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -20,16 +20,16 @@ import scala.reflect.ClassTag
 
 class CollectionsTest extends CollectionsTestBase {
 
-  private def checkImmutablilityOfCollectionApi[E](coll: ju.Collection[E],
-      elem: E): Unit = {
+  private def checkImmutablilityOfCollectionApi[E](
+      coll: ju.Collection[E], elem: E): Unit = {
     expectThrows(classOf[UnsupportedOperationException], coll.add(elem))
-    expectThrows(classOf[UnsupportedOperationException], coll.addAll(List(elem)))
+    expectThrows(
+        classOf[UnsupportedOperationException], coll.addAll(List(elem)))
     assertFalse(coll.addAll(List.empty[E]))
 
     if (coll.count(_ == elem) != coll.size)
       expectThrows(classOf[Exception], coll.retainAll(List(elem)))
-    else
-      assertFalse(coll.retainAll(List(elem)))
+    else assertFalse(coll.retainAll(List(elem)))
 
     if (coll.contains(elem)) {
       expectThrows(classOf[Exception], coll.remove(elem))
@@ -54,29 +54,27 @@ class CollectionsTest extends CollectionsTestBase {
     checkImmutablilityOfCollectionApi(list, elem)
     expectThrows(classOf[UnsupportedOperationException], list.add(0, elem))
     assertFalse(list.addAll(0, List.empty[E]))
-    expectThrows(classOf[UnsupportedOperationException], list.addAll(0, List(elem)))
+    expectThrows(
+        classOf[UnsupportedOperationException], list.addAll(0, List(elem)))
     expectThrows(classOf[UnsupportedOperationException], list.remove(0))
   }
 
-  private def checkImmutablilityOfMapApi[K, V](map: ju.Map[K, V], k: K,
-      v: V): Unit = {
+  private def checkImmutablilityOfMapApi[K, V](
+      map: ju.Map[K, V], k: K, v: V): Unit = {
     expectThrows(classOf[UnsupportedOperationException], map.put(k, v))
-    expectThrows(classOf[UnsupportedOperationException], map.putAll(Map(k ->v)))
+    expectThrows(
+        classOf[UnsupportedOperationException], map.putAll(Map(k -> v)))
     map.putAll(Map.empty[K, V]) // Should not throw
 
-    if (map.containsKey(k))
-      expectThrows(classOf[Throwable], map.remove(k))
-    else
-      assertNull(map.remove(k).asInstanceOf[AnyRef])
+    if (map.containsKey(k)) expectThrows(classOf[Throwable], map.remove(k))
+    else assertNull(map.remove(k).asInstanceOf[AnyRef])
 
-    if (map.nonEmpty)
-      expectThrows(classOf[Throwable], map.clear())
-    else
-      map.clear() // Should not throw
+    if (map.nonEmpty) expectThrows(classOf[Throwable], map.clear())
+    else map.clear() // Should not throw
   }
 
   @Test def emptySet(): Unit = {
-    def test[E: ClassTag](toElem: Int => E): Unit = {
+    def test[E : ClassTag](toElem: Int => E): Unit = {
       val emptySet = ju.Collections.emptySet[E]
       assertTrue(emptySet.isEmpty)
       assertEquals(0, emptySet.size)
@@ -90,7 +88,7 @@ class CollectionsTest extends CollectionsTestBase {
   }
 
   @Test def emptyList(): Unit = {
-    def test[E: ClassTag](toElem: Int => E): Unit = {
+    def test[E : ClassTag](toElem: Int => E): Unit = {
       val emptyList = ju.Collections.emptyList[E]
       assertTrue(emptyList.isEmpty)
       assertEquals(0, emptyList.size)
@@ -120,7 +118,7 @@ class CollectionsTest extends CollectionsTestBase {
   }
 
   @Test def singleton(): Unit = {
-    def test[E: ClassTag](toElem: Int => E): Unit = {
+    def test[E : ClassTag](toElem: Int => E): Unit = {
       val singletonSet = ju.Collections.singleton[E](toElem(0))
       assertTrue(singletonSet.contains(toElem(0)))
       assertEquals(1, singletonSet.size)
@@ -135,7 +133,7 @@ class CollectionsTest extends CollectionsTestBase {
   }
 
   @Test def singletonList(): Unit = {
-    def test[E: ClassTag](toElem: Int => E): Unit = {
+    def test[E : ClassTag](toElem: Int => E): Unit = {
       val singletonList = ju.Collections.singletonList[E](toElem(0))
       assertTrue(singletonList.contains(toElem(0)))
       assertEquals(1, singletonList.size)
@@ -151,7 +149,8 @@ class CollectionsTest extends CollectionsTestBase {
 
   @Test def singletonMap(): Unit = {
     def test[K, V](toKey: Int => K, toValue: Int => V): Unit = {
-      val singletonMap = ju.Collections.singletonMap[K, V](toKey(0), toValue(1))
+      val singletonMap =
+        ju.Collections.singletonMap[K, V](toKey(0), toValue(1))
       assertEquals(toValue(1), singletonMap.get(toKey(0)))
       assertEquals(1, singletonMap.size)
       assertEquals(1, singletonMap.iterator.size)
@@ -165,7 +164,7 @@ class CollectionsTest extends CollectionsTestBase {
   }
 
   @Test def nCopies(): Unit = {
-    def test[E: ClassTag](toElem: Int => E): Unit = {
+    def test[E : ClassTag](toElem: Int => E): Unit = {
       for (n <- Seq(1, 4, 543)) {
         val nCopies = ju.Collections.nCopies(n, toElem(0))
         assertTrue(nCopies.contains(toElem(0)))
@@ -184,7 +183,7 @@ class CollectionsTest extends CollectionsTestBase {
 
       for (n <- Seq(-1, -4, -543)) {
         expectThrows(classOf[IllegalArgumentException],
-          ju.Collections.nCopies(n, toElem(0)))
+                     ju.Collections.nCopies(n, toElem(0)))
       }
     }
 
@@ -271,8 +270,7 @@ class CollectionsTest extends CollectionsTestBase {
     val enum = asJavaEnumeration(range.iterator)
     val list = ju.Collections.list(enum)
     assertEquals(range.size, list.size)
-    for (i <- range)
-      assertEquals(i, list.get(i))
+    for (i <- range) assertEquals(i, list.get(i))
   }
 
   @Test def disjoint(): Unit = {

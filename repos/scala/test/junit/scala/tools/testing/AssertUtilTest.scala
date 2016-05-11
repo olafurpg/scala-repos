@@ -16,6 +16,6 @@ class AssertUtilTest {
     class Holder[A](val ref: SoftReference[A])
     val o = new Object
     val r = new SoftReference(o)
-    assertNotReachable(o, new Holder(r)) { }
+    assertNotReachable(o, new Holder(r)) {}
   }
 }

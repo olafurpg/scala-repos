@@ -169,7 +169,7 @@ class TailCall[S](s: S) {
     aux[T](x, y);
   }
   final def g3[T](x: Int, y: Int, zs: List[T]): Int = {
-    def aux[U](n: Int, v: Int, ls: List[Tuple2[T,U]]): Int =
+    def aux[U](n: Int, v: Int, ls: List[Tuple2[T, U]]): Int =
       if (n == 0) v else aux(n - 1, v - 1, ls);
     aux(x, y, Nil);
   }
@@ -185,7 +185,6 @@ class TailCall[S](s: S) {
   // !!! test return in non-tail-call position
   // !!! test non-same-instance calls
   // !!! test non-same-type calls
-
 }
 
 object FancyTailCalls {
@@ -195,12 +194,9 @@ object FancyTailCalls {
 
 object PolyObject extends App {
   def tramp[A](x: Int): Int =
-    if (x > 0)
-      tramp[A](x - 1)
-    else
-      0
+    if (x > 0) tramp[A](x - 1)
+    else 0
 }
-
 
 class FancyTailCalls {
 
@@ -233,11 +229,11 @@ class FancyTailCalls {
   }
   def tcInPatternGuard(x: Int, v: Int): Boolean =
     v match {
-      case _ if
-        {
-          def loop(n: Int): Int = if (n == 0) v else loop(n - 1)
-          loop(x) == v
-        } => true
+      case _ if {
+            def loop(n: Int): Int = if (n == 0) v else loop(n - 1)
+            loop(x) == v
+          } =>
+        true
     }
 
   import FancyTailCalls._
@@ -249,18 +245,18 @@ class FancyTailCalls {
 }
 
 class NonTailCall {
-  final def f1(n: Int): Int = try {
-    if (n == 0) 0
-    else f1(n - 1)
-  } finally {
-    Console.print(" " + n)
-  }
+  final def f1(n: Int): Int =
+    try {
+      if (n == 0) 0
+      else f1(n - 1)
+    } finally {
+      Console.print(" " + n)
+    }
 
   final def f2(n: Int): Int = synchronized {
     if (n == 0) 0
     else f2(n - 1)
   }
-
 }
 
 //############################################################################
@@ -274,12 +270,12 @@ object Test {
       if (actual == expected) {
         print(" was successful")
       } else {
-        print(" failed: expected "+ expected +", found "+ actual)
+        print(" failed: expected " + expected + ", found " + actual)
       }
     } catch {
       case exception: Throwable => {
-        print(" raised exception " + exception)
-      }
+          print(" raised exception " + exception)
+        }
     }
     println
   }
@@ -291,12 +287,12 @@ object Test {
       if (actual == expected) {
         print(" was successful")
       } else {
-        print(" failed: expected "+ expected +", found "+ actual)
+        print(" failed: expected " + expected + ", found " + actual)
       }
     } catch {
       case exception: Throwable => {
-        Console.print(" raised exception " + exception);
-      }
+          Console.print(" raised exception " + exception);
+        }
     }
     println
   }
@@ -309,8 +305,8 @@ object Test {
       case exception: compat.Platform.StackOverflowError =>
         println(" was successful")
       case exception: Throwable => {
-        print(" raised exception " + exception)
-      }
+          print(" raised exception " + exception)
+        }
     }
     println
   }
@@ -334,38 +330,39 @@ object Test {
   def main(args: Array[String]) {
     // compute min and max iteration number
     val min = 16;
-    val max = if (scala.tools.partest.utils.Properties.isAvian) 10000 else calibrate
+    val max =
+      if (scala.tools.partest.utils.Properties.isAvian) 10000 else calibrate
 
     // test tail calls in different contexts
-    val Final     = new Final()
-    val Class     = new Class()
-    val SubClass  = new SubClass()
-    val Sealed    = new Sealed()
+    val Final = new Final()
+    val Class = new Class()
+    val SubClass = new SubClass()
+    val Sealed = new Sealed()
     val SubSealed = new SubSealed()
-    check_success("Object   .f", Object   .f(max, max), 0)
-    check_success("Final    .f", Final    .f(max, max), 0)
-    check_success("Class    .f", Class    .f(max, max), 0)
-    check_success("SubClass .f", SubClass .f(max, max), max)
-    check_success("Sealed   .f", Sealed   .f(max, max), 0)
+    check_success("Object   .f", Object.f(max, max), 0)
+    check_success("Final    .f", Final.f(max, max), 0)
+    check_success("Class    .f", Class.f(max, max), 0)
+    check_success("SubClass .f", SubClass.f(max, max), max)
+    check_success("Sealed   .f", Sealed.f(max, max), 0)
     check_success("SubSealed.f", SubSealed.f(max, max), max)
     println
 
     // test tail calls in nested classes/objects
     val c: C = new C
-    check_success("O      .f", O      .f(max, max), 0)
-    check_success("c      .f", c      .f(max, max), 0)
-    check_success("O.O    .f", O.O    .f(max, max), 0)
-    check_success("O.c    .f", O.c    .f(max, max), 0)
-    check_success("c.O    .f", c.O    .f(max, max), 0)
-    check_success("c.c    .f", c.c    .f(max, max), 0)
-    check_success("O.O.O  .f", O.O.O  .f(max, max), 0)
-    check_success("O.O.c  .f", O.O.c  .f(max, max), 0)
-    check_success("O.c.O  .f", O.c.O  .f(max, max), 0)
-    check_success("O.c.c  .f", O.c.c  .f(max, max), 0)
-    check_success("c.O.O  .f", c.O.O  .f(max, max), 0)
-    check_success("c.O.c  .f", c.O.c  .f(max, max), 0)
-    check_success("c.c.O  .f", c.c.O  .f(max, max), 0)
-    check_success("c.c.c  .f", c.c.c  .f(max, max), 0)
+    check_success("O      .f", O.f(max, max), 0)
+    check_success("c      .f", c.f(max, max), 0)
+    check_success("O.O    .f", O.O.f(max, max), 0)
+    check_success("O.c    .f", O.c.f(max, max), 0)
+    check_success("c.O    .f", c.O.f(max, max), 0)
+    check_success("c.c    .f", c.c.f(max, max), 0)
+    check_success("O.O.O  .f", O.O.O.f(max, max), 0)
+    check_success("O.O.c  .f", O.O.c.f(max, max), 0)
+    check_success("O.c.O  .f", O.c.O.f(max, max), 0)
+    check_success("O.c.c  .f", O.c.c.f(max, max), 0)
+    check_success("c.O.O  .f", c.O.O.f(max, max), 0)
+    check_success("c.O.c  .f", c.O.c.f(max, max), 0)
+    check_success("c.c.O  .f", c.c.O.f(max, max), 0)
+    check_success("c.c.c  .f", c.c.c.f(max, max), 0)
     check_success("O.O.O.O.f", O.O.O.O.f(max, max), 0)
     check_success("O.O.O.c.f", O.O.O.c.f(max, max), 0)
     check_success("O.O.c.O.f", O.O.c.O.f(max, max), 0)
@@ -386,13 +383,13 @@ object Test {
 
     // test tail calls with different signatures
     val TailCall = new TailCall("S")
-    check_success("TailCall.f1", TailCall.f1(max, max     ), 0)
-    check_success("TailCall.f2", TailCall.f2(max, max     ), 0)
+    check_success("TailCall.f1", TailCall.f1(max, max), 0)
+    check_success("TailCall.f2", TailCall.f2(max, max), 0)
     check_success("TailCall.f3", TailCall.f3(max, max, Nil), 0)
-    check_success("TailCall.g1", TailCall.g1(max, max     ), 0)
-    check_success("TailCall.g2", TailCall.g2(max, max     ), 0)
+    check_success("TailCall.g1", TailCall.g1(max, max), 0)
+    check_success("TailCall.g2", TailCall.g2(max, max), 0)
     check_success("TailCall.g3", TailCall.g3(max, max, Nil), 0)
-    check_success("TailCall.h1", TailCall.h1(max, max     ), 0)
+    check_success("TailCall.h1", TailCall.h1(max, max), 0)
     println
 
     val NonTailCall = new NonTailCall
@@ -403,12 +400,22 @@ object Test {
     check_success_b("TailCall.b2", TailCall.b2(max), true)
 
     val FancyTailCalls = new FancyTailCalls;
-    check_success("FancyTailCalls.tcTryLocal", FancyTailCalls.tcTryLocal(max, max), max)
-    check_success_b("FancyTailCalls.tcInBooleanExprFirstOp", FancyTailCalls.tcInBooleanExprFirstOp(max, max), true)
-    check_success_b("FancyTailCalls.tcInBooleanExprSecondOp", FancyTailCalls.tcInBooleanExprSecondOp(max, max), true)
-    check_success_b("FancyTailCalls.tcInIfCond", FancyTailCalls.tcInIfCond(max, max), true)
-    check_success_b("FancyTailCalls.tcInPatternGuard", FancyTailCalls.tcInPatternGuard(max, max), true)
-    check_success("FancyTailCalls.differentInstance", FancyTailCalls.differentInstance(max, 42), 42)
+    check_success(
+        "FancyTailCalls.tcTryLocal", FancyTailCalls.tcTryLocal(max, max), max)
+    check_success_b("FancyTailCalls.tcInBooleanExprFirstOp",
+                    FancyTailCalls.tcInBooleanExprFirstOp(max, max),
+                    true)
+    check_success_b("FancyTailCalls.tcInBooleanExprSecondOp",
+                    FancyTailCalls.tcInBooleanExprSecondOp(max, max),
+                    true)
+    check_success_b(
+        "FancyTailCalls.tcInIfCond", FancyTailCalls.tcInIfCond(max, max), true)
+    check_success_b("FancyTailCalls.tcInPatternGuard",
+                    FancyTailCalls.tcInPatternGuard(max, max),
+                    true)
+    check_success("FancyTailCalls.differentInstance",
+                  FancyTailCalls.differentInstance(max, 42),
+                  42)
     check_success("PolyObject.tramp", PolyObject.tramp[Int](max), 0)
   }
 
@@ -423,20 +430,23 @@ object Test {
     if (xs.isEmpty) done(false) else tailcall(isEven(xs.tail))
 
   def fib(n: Int): TailRec[Int] =
-    if (n < 2) done(n) else for {
-      x <- tailcall(fib(n - 1))
-      y <- tailcall(fib(n - 2))
-    } yield (x + y)
+    if (n < 2) done(n)
+    else
+      for {
+        x <- tailcall(fib(n - 1))
+        y <- tailcall(fib(n - 2))
+      } yield (x + y)
 
   def rec(n: Int): TailRec[Int] =
-    if (n == 1) done(n) else for {
-      x <- tailcall(rec(n - 1))
-    } yield x
+    if (n == 1) done(n)
+    else
+      for {
+        x <- tailcall(rec(n - 1))
+      } yield x
 
   assert(isEven((1 to 100000).toList).result)
   //assert(fib(40).result == 102334155) // Commented out, as it takes a long time
   assert(rec(100000).result == 1)
-
 }
 
 //############################################################################

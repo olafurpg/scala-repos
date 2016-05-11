@@ -18,14 +18,18 @@ class RecipeManualTrigger extends RecipeSpec {
       val sink = Sink.fromSubscriber(sub)
 
       //#manually-triggered-stream
-      val graph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
-        import GraphDSL.Implicits._
-        val zip = builder.add(Zip[Message, Trigger]())
-        elements ~> zip.in0
-        triggerSource ~> zip.in1
-        zip.out ~> Flow[(Message, Trigger)].map { case (msg, trigger) => msg } ~> sink
-        ClosedShape
-      })
+      val graph =
+        RunnableGraph.fromGraph(
+            GraphDSL.create() { implicit builder =>
+          import GraphDSL.Implicits._
+          val zip = builder.add(Zip[Message, Trigger]())
+          elements ~> zip.in0
+          triggerSource ~> zip.in1
+          zip.out ~> Flow[(Message, Trigger)].map {
+            case (msg, trigger) => msg
+          } ~> sink
+          ClosedShape
+        })
       //#manually-triggered-stream
 
       graph.run()
@@ -57,7 +61,8 @@ class RecipeManualTrigger extends RecipeSpec {
       val sink = Sink.fromSubscriber(sub)
 
       //#manually-triggered-stream-zipwith
-      val graph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
+      val graph = RunnableGraph.fromGraph(
+          GraphDSL.create() { implicit builder =>
         import GraphDSL.Implicits._
         val zip = builder.add(ZipWith((msg: Message, trigger: Trigger) => msg))
 
@@ -87,7 +92,5 @@ class RecipeManualTrigger extends RecipeSpec {
       sub.expectNext("4")
       sub.expectComplete()
     }
-
   }
-
 }

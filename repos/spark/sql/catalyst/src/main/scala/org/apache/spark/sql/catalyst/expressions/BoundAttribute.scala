@@ -24,12 +24,12 @@ import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCo
 import org.apache.spark.sql.types._
 
 /**
- * A bound reference points to a specific slot in the input tuple, allowing the actual value
- * to be retrieved more efficiently.  However, since operations like column pruning can change
- * the layout of intermediate tuples, BindReferences should be run after all such transformations.
- */
+  * A bound reference points to a specific slot in the input tuple, allowing the actual value
+  * to be retrieved more efficiently.  However, since operations like column pruning can change
+  * the layout of intermediate tuples, BindReferences should be run after all such transformations.
+  */
 case class BoundReference(ordinal: Int, dataType: DataType, nullable: Boolean)
-  extends LeafExpression {
+    extends LeafExpression {
 
   override def toString: String = s"input[$ordinal, ${dataType.simpleString}]"
 
@@ -84,23 +84,24 @@ case class BoundReference(ordinal: Int, dataType: DataType, nullable: Boolean)
 
 object BindReferences extends Logging {
 
-  def bindReference[A <: Expression](
-      expression: A,
-      input: Seq[Attribute],
-      allowFailures: Boolean = false): A = {
-    expression.transform { case a: AttributeReference =>
-      attachTree(a, "Binding attribute") {
-        val ordinal = input.indexWhere(_.exprId == a.exprId)
-        if (ordinal == -1) {
-          if (allowFailures) {
-            a
+  def bindReference[A <: Expression](expression: A,
+                                     input: Seq[Attribute],
+                                     allowFailures: Boolean = false): A = {
+    expression.transform {
+      case a: AttributeReference =>
+        attachTree(a, "Binding attribute") {
+          val ordinal = input.indexWhere(_.exprId == a.exprId)
+          if (ordinal == -1) {
+            if (allowFailures) {
+              a
+            } else {
+              sys.error(
+                  s"Couldn't find $a in ${input.mkString("[", ",", "]")}")
+            }
           } else {
-            sys.error(s"Couldn't find $a in ${input.mkString("[", ",", "]")}")
+            BoundReference(ordinal, a.dataType, input(ordinal).nullable)
           }
-        } else {
-          BoundReference(ordinal, a.dataType, input(ordinal).nullable)
         }
-      }
     }.asInstanceOf[A] // Kind of a hack, but safe.  TODO: Tighten return type when possible.
   }
 }

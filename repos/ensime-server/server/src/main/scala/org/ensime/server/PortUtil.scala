@@ -10,10 +10,8 @@ object PortUtil extends SLF4JLogging {
 
   def port(cacheDir: File, name: String): Option[Int] = {
     val portFile = cacheDir / name
-    if (portFile.exists())
-      Some(portFile.readString().trim.toInt)
-    else
-      None
+    if (portFile.exists()) Some(portFile.readString().trim.toInt)
+    else None
   }
 
   def writePort(cacheDir: File, port: Int, name: String): Unit = {

@@ -1,8 +1,3 @@
-
-
-
-
-
 object Test {
 
   def main(args: Array[String]) {
@@ -23,5 +18,4 @@ object Test {
     phm --= 1 to 10
     assert(phm.isEmpty)
   }
-
 }

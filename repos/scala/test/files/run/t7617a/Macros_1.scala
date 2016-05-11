@@ -8,7 +8,8 @@ object Macros {
   }
   def setValueImpl[T](c: Context)(value: c.Expr[T]): c.Expr[Unit] = {
     import c.universe._
-    c.Expr[Unit](Apply(Select(c.prefix.tree, newTermName("setVal")), List(value.tree)))
+    c.Expr[Unit](
+        Apply(Select(c.prefix.tree, newTermName("setVal")), List(value.tree)))
   }
 }
 

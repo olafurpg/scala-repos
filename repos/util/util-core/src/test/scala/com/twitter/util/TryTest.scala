@@ -80,17 +80,17 @@ class TryTest extends FunSuite {
   }
 
   test("Try.map: when there is an exception") {
-    val result1 = Return(1) map(_ => throw e)
+    val result1 = Return(1) map (_ => throw e)
     assert(result1 == Throw(e))
 
     val e2 = new Exception
-    val result2 = Throw[Int](e) map(_ => throw e2)
+    val result2 = Throw[Int](e) map (_ => throw e2)
     assert(result2 == Throw(e))
   }
 
   test("Try.flatMap: when there is no exception") {
-    val result1 = Return(1) flatMap(x => Return(1 + x))
-    val result2 = Throw[Int](e) flatMap(x => Return(1 + x))
+    val result1 = Return(1) flatMap (x => Return(1 + x))
+    val result2 = Throw[Int](e) flatMap (x => Return(1 + x))
 
     assert(result1 == Return(2))
     assert(result2 == Throw(e))
@@ -105,12 +105,14 @@ class TryTest extends FunSuite {
     assert(result2 == Throw(e))
   }
 
-  test("Try.exists: should return true when predicate passes for a Return value") {
+  test(
+      "Try.exists: should return true when predicate passes for a Return value") {
     val t = Return(4)
     assert(t.exists(_ > 0) == true)
   }
 
-  test("Try.exists: should return false when predicate doesn't pass for a Return value") {
+  test(
+      "Try.exists: should return false when predicate doesn't pass for a Return value") {
     val t = Return(4)
     assert(t.exists(_ < 0) == false)
   }
@@ -181,17 +183,23 @@ class TryTest extends FunSuite {
 
   test("Try.orThrow: returns on Some") {
     val exc = new Exception("boom!")
-    assert(Try.orThrow(Some("OK")) { () => exc } == Return("OK"))
+    assert(Try.orThrow(Some("OK")) { () =>
+      exc
+    } == Return("OK"))
   }
 
   test("Try.orThrow: fails on empty on Some") {
     val exc = new Exception("boom!")
-    assert(Try.orThrow(None) { () => exc } == Throw(exc))
+    assert(Try.orThrow(None) { () =>
+      exc
+    } == Throw(exc))
   }
 
   test("Try.orThrow: OK if you throw") {
     val exc = new Exception("boom!")
-    assert(Try.orThrow(None) { () => throw exc } == Throw(exc))
+    assert(Try.orThrow(None) { () =>
+      throw exc
+    } == Throw(exc))
   }
 
   test("OrThrow implicits in nicely") {

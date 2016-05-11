@@ -14,5 +14,5 @@ class SCL6478 {
 
   implicit def a2b(a: A): B = new B {}
 
-  c./* resolved: false */foo
+  c. /* resolved: false */ foo
 }

@@ -8,7 +8,8 @@ import org.junit.runner.RunWith
 @RunWith(classOf[JUnitRunner])
 class AnnotationTest extends FunSuite {
   test("ZipkinAnnotation should serialize properly") {
-    val ann = ZipkinAnnotation(Time.fromSeconds(123), "value", Endpoint(123, 123))
+    val ann =
+      ZipkinAnnotation(Time.fromSeconds(123), "value", Endpoint(123, 123))
     val tann = ann.toThrift
 
     assert(tann.isSetHost)

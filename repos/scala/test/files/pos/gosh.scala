@@ -30,14 +30,14 @@ object ShapeTest extends App {
     override def print() { Console.println("in LineFoo") }
   }
 
-  val p1 = new Point(1,4)
+  val p1 = new Point(1, 4)
   val p2 = new Point(12, 28)
 
   val l1 = new Line(p1, p2)
 
-
-  val l = new ShapeFoo {  // ** //
-    type T = Line  // ** //
+  val l = new ShapeFoo {
+    // ** //
+    type T = Line // ** //
     override def print() { Console.println("in LineFoo") } // ** //
   }
   l.show(l1) // ** //

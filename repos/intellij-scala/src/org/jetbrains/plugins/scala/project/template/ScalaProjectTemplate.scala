@@ -6,10 +6,11 @@ import com.intellij.platform.ProjectTemplate
 import org.jetbrains.plugins.scala.icons.Icons
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class ScalaProjectTemplate extends ProjectTemplate {
-  protected val libraryDescription: CustomLibraryDescription = ScalaLibraryDescription
+  protected val libraryDescription: CustomLibraryDescription =
+    ScalaLibraryDescription
 
   def getName = "Scala"
 
@@ -17,7 +18,8 @@ class ScalaProjectTemplate extends ProjectTemplate {
 
   def getIcon = Icons.SCALA_SMALL_LOGO
 
-  def createModuleBuilder() = new ScalaModuleBuilder(getName, libraryDescription)
+  def createModuleBuilder() =
+    new ScalaModuleBuilder(getName, libraryDescription)
 
   def validateSettings() = null
 }

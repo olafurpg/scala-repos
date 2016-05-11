@@ -22,12 +22,10 @@ import org.jetbrains.sbt.settings.SbtSystemSettings
 
 import scala.collection.JavaConverters._
 
-
 /**
- * @author Nikolay Obedin
- * @since 7/23/15.
- */
-
+  * @author Nikolay Obedin
+  * @since 7/23/15.
+  */
 class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
 
   def test_0_12_4(): Unit = runTest("0.12.4", Expectations.sbt012)
@@ -43,13 +41,18 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
     addSbtAsModuleDependency(createBuildModule())
     addTestFileToModuleSources()
     setUpProjectSettings()
-    inWriteAction(StartupManager.getInstance(getProject).asInstanceOf[StartupManagerImpl].startCacheUpdate())
+    inWriteAction(
+        StartupManager
+          .getInstance(getProject)
+          .asInstanceOf[StartupManagerImpl]
+          .startCacheUpdate())
   }
 
   override def loadTestFile(): SbtFileImpl = {
     val fileName = "SbtAnnotator.sbt"
     val filePath = testdataPath + fileName
-    val vfile = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val vfile = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     val psifile = PsiManager.getInstance(getProject).findFile(vfile)
     psifile.putUserData(ModuleUtilCore.KEY_MODULE, getModule)
     psifile.asInstanceOf[SbtFileImpl]
@@ -58,14 +61,17 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
   override def getTestProjectJdk: Sdk =
     JavaSdk.getInstance().createJdk("java sdk", TestUtils.getDefaultJdk, false)
 
-  private def runTest(sbtVersion: String, expectedMessages: Seq[Message]): Unit = {
+  private def runTest(
+      sbtVersion: String, expectedMessages: Seq[Message]): Unit = {
     setSbtVersion(sbtVersion)
     val actualMessages = annotate().asJava
-    UsefulTestCase.assertSameElements(actualMessages, expectedMessages:_*)
+    UsefulTestCase.assertSameElements(actualMessages, expectedMessages: _*)
   }
 
   private def setSbtVersion(sbtVersion: String): Unit = {
-    val projectSettings = SbtSystemSettings.getInstance(getProject).getLinkedProjectSettings(getProject.getBasePath)
+    val projectSettings = SbtSystemSettings
+      .getInstance(getProject)
+      .getLinkedProjectSettings(getProject.getBasePath)
     assert(projectSettings != null)
     projectSettings.setSbtVersion(sbtVersion)
   }
@@ -79,7 +85,9 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
 
   private def createBuildModule(): Module = inWriteAction {
     val moduleName = getModule.getName + Sbt.BuildModuleSuffix + ".iml"
-    val module = ModuleManager.getInstance(getProject).newModule(moduleName, SbtModuleType.instance.getId)
+    val module = ModuleManager
+      .getInstance(getProject)
+      .newModule(moduleName, SbtModuleType.instance.getId)
     ModuleRootModificationUtil.setModuleSdk(module, getTestProjectJdk)
     module
   }
@@ -87,13 +95,16 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
   private def setUpProjectSettings(): Unit = {
     val projectSettings = SbtProjectSettings.default
     projectSettings.setExternalProjectPath(getProject.getBasePath)
-    projectSettings.setModules(java.util.Collections.singleton(getModule.getModuleFilePath))
+    projectSettings.setModules(
+        java.util.Collections.singleton(getModule.getModuleFilePath))
     SbtSystemSettings.getInstance(getProject).linkProject(projectSettings)
-    getModule.setOption(ExternalSystemConstants.ROOT_PROJECT_PATH_KEY, getProject.getBasePath)
+    getModule.setOption(
+        ExternalSystemConstants.ROOT_PROJECT_PATH_KEY, getProject.getBasePath)
   }
 
   private def addTestFileToModuleSources(): Unit = {
-    ModuleRootModificationUtil.updateModel(getModule, new Consumer[ModifiableRootModel] {
+    ModuleRootModificationUtil.updateModel(
+        getModule, new Consumer[ModifiableRootModel] {
       override def consume(model: ModifiableRootModel): Unit = {
         val testdataUrl = VfsUtilCore.pathToUrl(testdataPath)
         model.addContentEntry(testdataUrl).addSourceFolder(testdataUrl, false)
@@ -105,19 +116,27 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
 
 object Expectations {
   val sbt0137 = Seq(
-    Error("object Bar", SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions")),
-    Error("null", SbtBundle("sbt.annotation.expectedExpressionType")),
-    Error("???", SbtBundle("sbt.annotation.expectedExpressionType")),
-    Error("organization", SbtBundle("sbt.annotation.expressionMustConform", "SettingKey[String]")),
-    Error("\"some string\"", SbtBundle("sbt.annotation.expressionMustConform", "String"))
+      Error("object Bar",
+            SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions")),
+      Error("null", SbtBundle("sbt.annotation.expectedExpressionType")),
+      Error("???", SbtBundle("sbt.annotation.expectedExpressionType")),
+      Error("organization",
+            SbtBundle(
+                "sbt.annotation.expressionMustConform", "SettingKey[String]")),
+      Error("\"some string\"",
+            SbtBundle("sbt.annotation.expressionMustConform", "String"))
   )
 
-  val sbt013 = sbt0137 :+
-    Error("version := \"SNAPSHOT\"", SbtBundle("sbt.annotation.blankLineRequired", "0.13.1"))
+  val sbt013 =
+    sbt0137 :+ Error("version := \"SNAPSHOT\"",
+                     SbtBundle("sbt.annotation.blankLineRequired", "0.13.1"))
 
-  val sbt012 = sbt0137 ++ Seq(
-    Error("version := \"SNAPSHOT\"", SbtBundle("sbt.annotation.blankLineRequired", "0.12.4")),
-    Error("lazy val foo = project.in(file(\"foo\")).enablePlugins(sbt.plugins.JvmPlugin)",
-      SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions"))
-  )
+  val sbt012 =
+    sbt0137 ++ Seq(
+        Error("version := \"SNAPSHOT\"",
+              SbtBundle("sbt.annotation.blankLineRequired", "0.12.4")),
+        Error(
+            "lazy val foo = project.in(file(\"foo\")).enablePlugins(sbt.plugins.JvmPlugin)",
+            SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions"))
+    )
 }

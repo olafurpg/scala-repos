@@ -4,7 +4,8 @@ import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.hocon.lang.HoconLanguage
 
-sealed class HoconTokenType(debugString: String) extends IElementType(debugString, HoconLanguage)
+sealed class HoconTokenType(debugString: String)
+    extends IElementType(debugString, HoconLanguage)
 
 object HoconTokenType extends TokenType {
 
@@ -29,5 +30,4 @@ object HoconTokenType extends TokenType {
   val UnquotedChars = new HoconTokenType("UNQUOTED_CHARS")
   val QuotedString = new HoconTokenType("QUOTED_STRING")
   val MultilineString = new HoconTokenType("MULTILINE_STRING")
-
 }

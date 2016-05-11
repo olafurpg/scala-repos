@@ -21,8 +21,8 @@ object ScriptSpec extends Specification {
 
     "not delimit statements on double-semicolons, rather escaping them to a single semicolon" in {
       val statements = IndexedSeq(
-        "SELECT * FROM punctuation WHERE characters = ';' OR characters = ';;'",
-        "DROP the_beat"
+          "SELECT * FROM punctuation WHERE characters = ';' OR characters = ';;'",
+          "DROP the_beat"
       )
 
       // double the semicolons
@@ -44,7 +44,6 @@ object ScriptSpec extends Specification {
 
       scriptStatements.toList must beEqualTo(List(statement))
     }
-
   }
 
   private case class ScriptSansEvolution(sql: String) extends Script {
@@ -55,10 +54,12 @@ object ScriptSpec extends Specification {
 
     "not be noticed if there aren't any" in {
 
-      val downRest = (9 to 1).reverse.map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
+      val downRest = (9 to 1).reverse
+        .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
       val upRest = downRest
 
-      val (conflictingDowns, conflictingUps) = Evolutions.conflictings(downRest, upRest)
+      val (conflictingDowns, conflictingUps) =
+        Evolutions.conflictings(downRest, upRest)
 
       conflictingDowns.size must beEqualTo(0)
       conflictingUps.size must beEqualTo(0)
@@ -66,10 +67,15 @@ object ScriptSpec extends Specification {
 
     "be noticed on the most recent one" in {
 
-      val downRest = (1 to 9).reverse.map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
-      val upRest = Evolution(9, "DifferentDummySQLUP", "DifferentDummySQLDOWN") +: (1 to 8).reverse.map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
+      val downRest = (1 to 9).reverse
+        .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
+      val upRest =
+        Evolution(9, "DifferentDummySQLUP", "DifferentDummySQLDOWN") +:
+        (1 to 8).reverse
+          .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
 
-      val (conflictingDowns, conflictingUps) = Evolutions.conflictings(downRest, upRest)
+      val (conflictingDowns, conflictingUps) =
+        Evolutions.conflictings(downRest, upRest)
 
       conflictingDowns.size must beEqualTo(1)
       conflictingUps.size must beEqualTo(1)
@@ -79,10 +85,16 @@ object ScriptSpec extends Specification {
 
     "be noticed in the middle" in {
 
-      val downRest = (1 to 9).reverse.map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
-      val upRest = (6 to 9).reverse.map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i")) ++: Evolution(5, "DifferentDummySQLUP", "DifferentDummySQLDOWN") +: (1 to 4).reverse.map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
+      val downRest = (1 to 9).reverse
+        .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
+      val upRest =
+        (6 to 9).reverse.map(i =>
+              Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i")) ++: Evolution(
+            5, "DifferentDummySQLUP", "DifferentDummySQLDOWN") +: (1 to 4).reverse
+          .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
 
-      val (conflictingDowns, conflictingUps) = Evolutions.conflictings(downRest, upRest)
+      val (conflictingDowns, conflictingUps) =
+        Evolutions.conflictings(downRest, upRest)
 
       conflictingDowns.size must beEqualTo(5)
       conflictingUps.size must beEqualTo(5)
@@ -94,10 +106,15 @@ object ScriptSpec extends Specification {
 
     "be noticed on the first" in {
 
-      val downRest = (1 to 9).reverse.map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
-      val upRest = (2 to 9).reverse.map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i")) ++: List(Evolution(1, "DifferentDummySQLUP", "DifferentDummySQLDOWN"))
+      val downRest = (1 to 9).reverse
+        .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
+      val upRest =
+        (2 to 9).reverse
+          .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i")) ++: List(
+            Evolution(1, "DifferentDummySQLUP", "DifferentDummySQLDOWN"))
 
-      val (conflictingDowns, conflictingUps) = Evolutions.conflictings(downRest, upRest)
+      val (conflictingDowns, conflictingUps) =
+        Evolutions.conflictings(downRest, upRest)
 
       conflictingDowns.size must beEqualTo(9)
       conflictingUps.size must beEqualTo(9)
@@ -106,6 +123,5 @@ object ScriptSpec extends Specification {
       conflictingDowns(8).revision must beEqualTo(1)
       conflictingUps(8).revision must beEqualTo(1)
     }
-
   }
 }

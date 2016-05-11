@@ -6,9 +6,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.CommonUtils
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
- * @author kfeodorov
- * @since 01.03.14.
- */
+  * @author kfeodorov
+  * @since 01.03.14.
+  */
 object InterpolationPattern {
   def parse(builder: ScalaPsiBuilder): Boolean =
     builder.getTokenType match {

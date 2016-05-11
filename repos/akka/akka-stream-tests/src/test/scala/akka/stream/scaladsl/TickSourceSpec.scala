@@ -1,10 +1,10 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import scala.concurrent.duration._
-import akka.stream.{ ClosedShape, ActorMaterializer }
+import akka.stream.{ClosedShape, ActorMaterializer}
 import akka.stream.testkit._
 import akka.stream.testkit.Utils._
 import akka.testkit.AkkaSpec
@@ -47,7 +47,9 @@ class TickSourceSpec extends AkkaSpec {
     }
 
     "reject multiple subscribers, but keep the first" in {
-      val p = Source.tick(1.second, 1.second, "tick").runWith(Sink.asPublisher(false))
+      val p = Source
+        .tick(1.second, 1.second, "tick")
+        .runWith(Sink.asPublisher(false))
       val c1 = TestSubscriber.manualProbe[String]()
       val c2 = TestSubscriber.manualProbe[String]()
       p.subscribe(c1)
@@ -65,14 +67,18 @@ class TickSourceSpec extends AkkaSpec {
     "be usable with zip for a simple form of rate limiting" in {
       val c = TestSubscriber.manualProbe[Int]()
 
-      RunnableGraph.fromGraph(GraphDSL.create() { implicit b ⇒
-        import GraphDSL.Implicits._
-        val zip = b.add(Zip[Int, String]())
-        Source(1 to 100) ~> zip.in0
-        Source.tick(1.second, 1.second, "tick") ~> zip.in1
-        zip.out ~> Flow[(Int, String)].map { case (n, _) ⇒ n } ~> Sink.fromSubscriber(c)
-        ClosedShape
-      }).run()
+      RunnableGraph
+        .fromGraph(
+            GraphDSL.create() { implicit b ⇒
+          import GraphDSL.Implicits._
+          val zip = b.add(Zip[Int, String]())
+          Source(1 to 100) ~> zip.in0
+          Source.tick(1.second, 1.second, "tick") ~> zip.in1
+          zip.out ~> Flow[(Int, String)].map { case (n, _) ⇒ n } ~> Sink
+            .fromSubscriber(c)
+          ClosedShape
+        })
+        .run()
 
       val sub = c.expectSubscription()
       sub.request(1000)
@@ -100,6 +106,5 @@ class TickSourceSpec extends AkkaSpec {
       sub.request(3)
       c.expectComplete()
     }
-
   }
 }

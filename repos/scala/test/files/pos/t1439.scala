@@ -1,5 +1,5 @@
 // no unchecked warnings
-class View[C[A]] { }
+class View[C[A]] {}
 
 object Test {
   (null: Any) match {

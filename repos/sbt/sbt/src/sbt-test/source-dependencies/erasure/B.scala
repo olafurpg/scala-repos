@@ -1,3 +1,3 @@
 object B {
-	val y: List[Int] = A.x
+  val y: List[Int] = A.x
 }

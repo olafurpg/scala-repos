@@ -12,7 +12,7 @@ class MonadCombineTest extends CatsSuite {
       val strings = list.collect { case Xor.Right(s) => s }
       val expected = (ints, strings)
 
-      MonadCombine[List].separate(list) should === (expected)
+      MonadCombine[List].separate(list) should ===(expected)
     }
   }
 }

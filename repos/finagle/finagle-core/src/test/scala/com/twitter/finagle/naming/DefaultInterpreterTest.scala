@@ -10,7 +10,8 @@ import org.scalatest.FunSuite
 
 class testnamer extends Namer {
   override def lookup(path: Path) =
-    Activity.value(NameTree.Leaf(Name.Path(Path.read("/rewritten/by/test/namer"))))
+    Activity.value(
+        NameTree.Leaf(Name.Path(Path.read("/rewritten/by/test/namer"))))
 }
 
 @RunWith(classOf[JUnitRunner])
@@ -18,13 +19,17 @@ class DefaultInterpreterTest extends FunSuite {
 
   def assertEval(dtab: Dtab, path: String, expected: Name.Bound*) {
     DefaultInterpreter.bind(dtab, Path.read(path)).sample().eval match {
-      case Some(actual) => assert(actual.map(_.addr.sample) == expected.map(_.addr.sample).toSet)
+      case Some(actual) =>
+        assert(actual.map(_.addr.sample) == expected.map(_.addr.sample).toSet)
       case _ => assert(false)
     }
   }
 
   def boundWithWeight(weight: Double, addrs: Address*): Name.Bound =
-    Name.Bound(Var.value(Addr.Bound(addrs.toSet, Addr.Metadata(AddrWeightKey -> weight))), addrs.toSet)
+    Name.Bound(
+        Var.value(
+            Addr.Bound(addrs.toSet, Addr.Metadata(AddrWeightKey -> weight))),
+        addrs.toSet)
 
   test("basic dtab evaluation") {
     val dtab = Dtab.read("/foo=>/$/inet/0/8080")
@@ -46,14 +51,15 @@ class DefaultInterpreterTest extends FunSuite {
 
   test("recurse back to the dtab") {
     val dtab = Dtab.read(
-      "/foo=>/$/com.twitter.finagle.naming.testnamer;/rewritten/by/test/namer=>/$/inet/0/7070"
+        "/foo=>/$/com.twitter.finagle.naming.testnamer;/rewritten/by/test/namer=>/$/inet/0/7070"
     )
 
     assertEval(dtab, "/foo", Name.bound(Address(7070)))
   }
 
   test("full example") {
-    val dtab = Dtab.read("""
+    val dtab =
+      Dtab.read("""
       /foo => /bar;
       /foo => 3 * /baz & 2 * /booz & /$/com.twitter.finagle.naming.testnamer;
       /rewritten/by/test/namer => /$/inet/0/7070;
@@ -61,10 +67,10 @@ class DefaultInterpreterTest extends FunSuite {
       /booz => ~
     """)
 
-    assertEval(dtab, "/foo",
-      boundWithWeight(3.0, Address(8080)),
-      boundWithWeight(2.0, Address(9090)),
-      boundWithWeight(1.0, Address(7070))
-    )
+    assertEval(dtab,
+               "/foo",
+               boundWithWeight(3.0, Address(8080)),
+               boundWithWeight(2.0, Address(9090)),
+               boundWithWeight(1.0, Address(7070)))
   }
 }

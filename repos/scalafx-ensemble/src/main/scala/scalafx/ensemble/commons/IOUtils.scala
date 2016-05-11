@@ -41,5 +41,4 @@ object IOUtils {
     val in = reference.getClass.getResourceAsStream(path)
     Source.fromInputStream(in).mkString
   }
-
 }

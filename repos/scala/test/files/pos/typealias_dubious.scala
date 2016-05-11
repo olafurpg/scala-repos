@@ -6,7 +6,7 @@ class MailBox {
 abstract class Actor {
   private val in = new MailBox
 
-  def send(msg: in.Message) =  sys.error("foo")
+  def send(msg: in.Message) = sys.error("foo")
 
   def unstable: Actor = sys.error("foo")
 

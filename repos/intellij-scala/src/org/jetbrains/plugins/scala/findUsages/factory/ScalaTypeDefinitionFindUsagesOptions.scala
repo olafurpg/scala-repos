@@ -11,7 +11,8 @@ import com.intellij.openapi.project.Project
   * @author Alefas
   * @since 15.12.12
   */
-class ScalaTypeDefinitionFindUsagesOptions(project: Project) extends JavaFindUsagesOptions(project) {
+class ScalaTypeDefinitionFindUsagesOptions(project: Project)
+    extends JavaFindUsagesOptions(project) {
   isSearchForTextOccurrences = false
 
   var isImplementingTypeDefinitions = false
@@ -22,9 +23,11 @@ class ScalaTypeDefinitionFindUsagesOptions(project: Project) extends JavaFindUsa
     o match {
       case other: ScalaTypeDefinitionFindUsagesOptions =>
         if (!super.equals(o)) return false
-        if (other.isImplementingTypeDefinitions != isImplementingTypeDefinitions) return false
+        if (other.isImplementingTypeDefinitions != isImplementingTypeDefinitions)
+          return false
         if (other.isMembersUsages != isMembersUsages) return false
-        if (other.isSearchCompanionModule != isSearchCompanionModule) return false
+        if (other.isSearchCompanionModule != isSearchCompanionModule)
+          return false
         true
       case _ => false
     }
@@ -44,7 +47,8 @@ class ScalaTypeDefinitionFindUsagesOptions(project: Project) extends JavaFindUsa
     }
 
     if (isImplementingTypeDefinitions) {
-      strings.add(ScalaBundle.message("find.usages.implementing.type.definition"))
+      strings.add(
+          ScalaBundle.message("find.usages.implementing.type.definition"))
     }
 
     if (isSearchCompanionModule) {

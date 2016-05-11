@@ -9,6 +9,7 @@ object Macros {
 }
 
 trait SourceLocation {
+
   /** Source location of the outermost call */
   val outer: SourceLocation
 
@@ -22,4 +23,8 @@ trait SourceLocation {
   val charOffset: Int
 }
 
-case class SourceLocation1(val outer: SourceLocation, val fileName: String, val line: Int, val charOffset: Int) extends SourceLocation
+case class SourceLocation1(val outer: SourceLocation,
+                           val fileName: String,
+                           val line: Int,
+                           val charOffset: Int)
+    extends SourceLocation

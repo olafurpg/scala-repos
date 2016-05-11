@@ -48,7 +48,6 @@ object o_ioc {
 
 import o_ioc.v_ioc;
 
-
 class C_ioc() {
   o_ioc.v_ioc = this;
   override def toString(): String = "C_ioc";

@@ -20,7 +20,6 @@ package org.apache.spark.sql.catalyst.expressions
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types._
 
-
 class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   import IntegralLiteralTestUtils._
@@ -69,9 +68,11 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseAnd(Literal(1), nullLit), null)
     checkEvaluation(BitwiseAnd(nullLit, nullLit), null)
     checkEvaluation(BitwiseAnd(positiveShortLit, negativeShortLit),
-      (positiveShort & negativeShort).toShort)
-    checkEvaluation(BitwiseAnd(positiveIntLit, negativeIntLit), positiveInt & negativeInt)
-    checkEvaluation(BitwiseAnd(positiveLongLit, negativeLongLit), positiveLong & negativeLong)
+                    (positiveShort & negativeShort).toShort)
+    checkEvaluation(
+        BitwiseAnd(positiveIntLit, negativeIntLit), positiveInt & negativeInt)
+    checkEvaluation(BitwiseAnd(positiveLongLit, negativeLongLit),
+                    positiveLong & negativeLong)
 
     DataTypeTestUtils.integralType.foreach { dt =>
       checkConsistencyBetweenInterpretedAndCodegen(BitwiseAnd, dt, dt)
@@ -96,9 +97,11 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseOr(Literal(1), nullLit), null)
     checkEvaluation(BitwiseOr(nullLit, nullLit), null)
     checkEvaluation(BitwiseOr(positiveShortLit, negativeShortLit),
-      (positiveShort | negativeShort).toShort)
-    checkEvaluation(BitwiseOr(positiveIntLit, negativeIntLit), positiveInt | negativeInt)
-    checkEvaluation(BitwiseOr(positiveLongLit, negativeLongLit), positiveLong | negativeLong)
+                    (positiveShort | negativeShort).toShort)
+    checkEvaluation(
+        BitwiseOr(positiveIntLit, negativeIntLit), positiveInt | negativeInt)
+    checkEvaluation(BitwiseOr(positiveLongLit, negativeLongLit),
+                    positiveLong | negativeLong)
 
     DataTypeTestUtils.integralType.foreach { dt =>
       checkConsistencyBetweenInterpretedAndCodegen(BitwiseOr, dt, dt)
@@ -123,9 +126,11 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseXor(Literal(1), nullLit), null)
     checkEvaluation(BitwiseXor(nullLit, nullLit), null)
     checkEvaluation(BitwiseXor(positiveShortLit, negativeShortLit),
-      (positiveShort ^ negativeShort).toShort)
-    checkEvaluation(BitwiseXor(positiveIntLit, negativeIntLit), positiveInt ^ negativeInt)
-    checkEvaluation(BitwiseXor(positiveLongLit, negativeLongLit), positiveLong ^ negativeLong)
+                    (positiveShort ^ negativeShort).toShort)
+    checkEvaluation(
+        BitwiseXor(positiveIntLit, negativeIntLit), positiveInt ^ negativeInt)
+    checkEvaluation(BitwiseXor(positiveLongLit, negativeLongLit),
+                    positiveLong ^ negativeLong)
 
     DataTypeTestUtils.integralType.foreach { dt =>
       checkConsistencyBetweenInterpretedAndCodegen(BitwiseXor, dt, dt)

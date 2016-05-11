@@ -1,7 +1,7 @@
 object Test extends App {
   def foo(bar: Any) = bar
 
-  val code = foo{
+  val code = foo {
     object lazyLib {
 
       def delay[A](value: => A): Susp[A] = new SuspImpl[A](value)

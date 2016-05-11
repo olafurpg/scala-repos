@@ -29,5 +29,4 @@ class SinkTest extends FunSuite {
       }
     }
   }
-
 }

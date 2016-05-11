@@ -30,55 +30,55 @@ class HListConstraintsTests {
   @Test
   def testUnaryTCConstraint {
     import UnaryTCConstraint._
-    
-    def acceptOption[L <: HList : *->*[Option]#λ](l : L) = true
-    
-    val l1 = Option(23) :: Option(true) :: Option("foo") :: HNil 
+
+    def acceptOption[L <: HList : *->*[Option]#λ](l: L) = true
+
+    val l1 = Option(23) :: Option(true) :: Option("foo") :: HNil
     val l2 = Option(23) :: true :: Option("foo") :: HNil
-    
-    acceptOption(l1)  // Compiles
+
+    acceptOption(l1) // Compiles
     acceptOption(HNil: HNil)
 
     illTyped("""
     acceptOption(l2)
     """)
 
-    val l3 = 23 :: true :: "foo" :: HNil 
-    
-    def acceptId[L <: HList : *->*[Id]#λ](l : L) = true
+    val l3 = 23 :: true :: "foo" :: HNil
 
-    acceptId(l3)  // Compiles
+    def acceptId[L <: HList : *->*[Id]#λ](l: L) = true
+
+    acceptId(l3) // Compiles
     acceptId(HNil: HNil)
-    
+
     val l4 = "foo" :: "bar" :: "baz" :: HNil
     val l5 = "foo" :: true :: "baz" :: HNil
-    
-    def acceptConst[L <: HList : *->*[Const[String]#λ]#λ](l : L) = true
-    
-    acceptConst(l4)  // Compiles
+
+    def acceptConst[L <: HList : *->*[Const[String]#λ]#λ](l: L) = true
+
+    acceptConst(l4) // Compiles
     acceptConst(HNil: HNil)
     illTyped("""
     acceptConst(l5)
     """)
 
-    def acceptTypeConstructor[F[_], L <: HList : *->*[F]#λ](l : L) = true
+    def acceptTypeConstructor[F[_], L <: HList : *->*[F]#λ](l: L) = true
 
-    acceptTypeConstructor(l1)  // Compiles - F = Option
-    acceptTypeConstructor(l2)  // Compiles - F = Id
-    acceptTypeConstructor(l3)  // Compiles - F = Id
-    acceptTypeConstructor(l4)  // Compiles - F = Const[String]
-    acceptTypeConstructor(l5)  // Compiles - F = Id
+    acceptTypeConstructor(l1) // Compiles - F = Option
+    acceptTypeConstructor(l2) // Compiles - F = Id
+    acceptTypeConstructor(l3) // Compiles - F = Id
+    acceptTypeConstructor(l4) // Compiles - F = Const[String]
+    acceptTypeConstructor(l5) // Compiles - F = Id
     acceptTypeConstructor(HNil: HNil)
   }
-  
+
   @Test
   def testBasisConstraint {
     import BasisConstraint._
-    
+
     type M = Int :: Boolean :: String :: HNil
-    
-    def acceptBasis[L <: HList : Basis[M]#λ](l : L) = true
-    
+
+    def acceptBasis[L <: HList : Basis[M]#λ](l: L) = true
+
     val l1 = 23 :: true :: 13 :: 7 :: 5 :: false :: "foo" :: "bar" :: HNil
     val l2 = 23 :: true :: 13 :: 7 :: 5 :: 2.0 :: "foo" :: "bar" :: HNil
 
@@ -88,13 +88,13 @@ class HListConstraintsTests {
     acceptBasis(l2)
     """)
   }
-  
+
   @Test
   def testLUBConstraint {
     import LUBConstraint._
-    
-    def acceptLUB[L <: HList : <<:[Fruit]#λ](l : L) = true
-    
+
+    def acceptLUB[L <: HList : <<:[Fruit]#λ](l: L) = true
+
     val l1 = Apple :: Pear :: Apple :: Pear :: HNil
     val l2 = Apple :: 23 :: "foo" :: Pear :: HNil
 
@@ -109,36 +109,33 @@ class HListConstraintsTests {
   def testKeyValueConstraints {
     import KeyConstraint._
     import ValueConstraint._
-    
-    object author  extends FieldOf[String]
-    object title   extends FieldOf[String]
-    object id      extends FieldOf[Int]
-    object price   extends FieldOf[Double]
+
+    object author extends FieldOf[String]
+    object title extends FieldOf[String]
+    object id extends FieldOf[Int]
+    object price extends FieldOf[Double]
     object inPrint extends FieldOf[Boolean]
 
     val book =
       (author ->> "Benjamin Pierce") ::
-      (title  ->> "Types and Programming Languages") ::
-      (id     ->>  262162091) ::
-      (price  ->>  44.11) ::
-      HNil
-    
-    val summary = 
-      (author ->> "Benjamin Pierce") ::
-      (title  ->> "Types and Programming Languages") ::
-      (id     ->>  262162091) ::
-      HNil
+      (title ->> "Types and Programming Languages") :: (id ->> 262162091) ::
+      (price ->> 44.11) :: HNil
 
-    def acceptKeys[R <: HList : Keys[author.type :: title.type :: id.type :: HNil]#λ](r : R) = true
-    
-    acceptKeys(summary)   // Compiles
+    val summary =
+      (author ->> "Benjamin Pierce") ::
+      (title ->> "Types and Programming Languages") :: (id ->> 262162091) :: HNil
+
+    def acceptKeys[R <: HList : Keys[
+            author.type :: title.type :: id.type :: HNil]#λ](r: R) = true
+
+    acceptKeys(summary) // Compiles
     acceptKeys(HNil: HNil)
     illTyped("""
     acceptKeys(book)
     """)
 
-    def acceptValues[R <: HList : Values[Int :: String :: HNil]#λ](r : R) = true
-    
+    def acceptValues[R <: HList : Values[Int :: String :: HNil]#λ](r: R) = true
+
     acceptValues(summary) // Compiles
     acceptValues(HNil: HNil)
     illTyped("""
@@ -151,12 +148,13 @@ class HListConstraintsTests {
 
     import NotContainsConstraint._
 
-    def notContains[L <: HList:NotContains[String]#λ, U](l: L, u: U)(implicit ev: NotContainsConstraint[L, U]) = true
+    def notContains[L <: HList : NotContains[String]#λ, U](l: L, u: U)(
+        implicit ev: NotContainsConstraint[L, U]) = true
 
     notContains(HNil: HNil, 2)
     notContains(2 :: HNil, "str")
     notContains(Pear :: 2 :: HNil, Apple)
-    notContains(Pear :: 2 :: HNil, new Fruit{})
+    notContains(Pear :: 2 :: HNil, new Fruit {})
 
     illTyped("""
     notContains(2 :: HNil, 3)
@@ -170,11 +168,12 @@ class HListConstraintsTests {
   @Test
   def testIsDistinctConstraint {
 
-    def isDistinct[L <: HList](l: L)(implicit ev: IsDistinctConstraint[L]) = true
+    def isDistinct[L <: HList](l: L)(implicit ev: IsDistinctConstraint[L]) =
+      true
 
     isDistinct(HNil: HNil)
     isDistinct(2 :: HNil)
-    isDistinct("str" :: Pear :: Apple :: new Fruit{} :: 2 :: HNil)
+    isDistinct("str" :: Pear :: Apple :: new Fruit {} :: 2 :: HNil)
 
     illTyped("""
     isDistinct(10 :: 2 :: HNil)
@@ -188,5 +187,4 @@ class HListConstraintsTests {
     isDistinct(Pear :: true :: "str" :: 2 :: false :: HNil)
     """)
   }
-
 }

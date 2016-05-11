@@ -39,37 +39,37 @@ import org.apache.spark.ui.SparkUI
 import org.apache.spark.util.{Clock, SystemClock, ThreadUtils, Utils}
 
 /**
- * A class that provides application history from event logs stored in the file system.
- * This provider checks for new finished applications in the background periodically and
- * renders the history application UI by parsing the associated event logs.
- *
- * == How new and updated attempts are detected ==
- *
- * - New attempts are detected in [[checkForLogs]]: the log dir is scanned, and any
- * entries in the log dir whose modification time is greater than the last scan time
- * are considered new or updated. These are replayed to create a new [[FsApplicationAttemptInfo]]
- * entry and update or create a matching [[FsApplicationHistoryInfo]] element in the list
- * of applications.
- * - Updated attempts are also found in [[checkForLogs]] -- if the attempt's log file has grown, the
- * [[FsApplicationAttemptInfo]] is replaced by another one with a larger log size.
- * - When [[updateProbe()]] is invoked to check if a loaded [[SparkUI]]
- * instance is out of date, the log size of the cached instance is checked against the app last
- * loaded by [[checkForLogs]].
- *
- * The use of log size, rather than simply relying on modification times, is needed to
- * address the following issues
- * - some filesystems do not appear to update the `modtime` value whenever data is flushed to
- * an open file output stream. Changes to the history may not be picked up.
- * - the granularity of the `modtime` field may be 2+ seconds. Rapid changes to the FS can be
- * missed.
- *
- * Tracking filesize works given the following invariant: the logs get bigger
- * as new events are added. If a format was used in which this did not hold, the mechanism would
- * break. Simple streaming of JSON-formatted events, as is implemented today, implicitly
- * maintains this invariant.
- */
+  * A class that provides application history from event logs stored in the file system.
+  * This provider checks for new finished applications in the background periodically and
+  * renders the history application UI by parsing the associated event logs.
+  *
+  * == How new and updated attempts are detected ==
+  *
+  * - New attempts are detected in [[checkForLogs]]: the log dir is scanned, and any
+  * entries in the log dir whose modification time is greater than the last scan time
+  * are considered new or updated. These are replayed to create a new [[FsApplicationAttemptInfo]]
+  * entry and update or create a matching [[FsApplicationHistoryInfo]] element in the list
+  * of applications.
+  * - Updated attempts are also found in [[checkForLogs]] -- if the attempt's log file has grown, the
+  * [[FsApplicationAttemptInfo]] is replaced by another one with a larger log size.
+  * - When [[updateProbe()]] is invoked to check if a loaded [[SparkUI]]
+  * instance is out of date, the log size of the cached instance is checked against the app last
+  * loaded by [[checkForLogs]].
+  *
+  * The use of log size, rather than simply relying on modification times, is needed to
+  * address the following issues
+  * - some filesystems do not appear to update the `modtime` value whenever data is flushed to
+  * an open file output stream. Changes to the history may not be picked up.
+  * - the granularity of the `modtime` field may be 2+ seconds. Rapid changes to the FS can be
+  * missed.
+  *
+  * Tracking filesize works given the following invariant: the logs get bigger
+  * as new events are added. If a format was used in which this did not hold, the mechanism would
+  * break. Simple streaming of JSON-formatted events, as is implemented today, implicitly
+  * maintains this invariant.
+  */
 private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
-  extends ApplicationHistoryProvider with Logging {
+    extends ApplicationHistoryProvider with Logging {
 
   def this(conf: SparkConf) = {
     this(conf, new SystemClock())
@@ -80,17 +80,22 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   private val NOT_STARTED = "<Not Started>"
 
   // Interval between safemode checks.
-  private val SAFEMODE_CHECK_INTERVAL_S = conf.getTimeAsSeconds(
-    "spark.history.fs.safemodeCheck.interval", "5s")
+  private val SAFEMODE_CHECK_INTERVAL_S =
+    conf.getTimeAsSeconds("spark.history.fs.safemodeCheck.interval", "5s")
 
   // Interval between each check for event log updates
-  private val UPDATE_INTERVAL_S = conf.getTimeAsSeconds("spark.history.fs.update.interval", "10s")
+  private val UPDATE_INTERVAL_S =
+    conf.getTimeAsSeconds("spark.history.fs.update.interval", "10s")
 
   // Interval between each cleaner checks for event logs to delete
-  private val CLEAN_INTERVAL_S = conf.getTimeAsSeconds("spark.history.fs.cleaner.interval", "1d")
+  private val CLEAN_INTERVAL_S =
+    conf.getTimeAsSeconds("spark.history.fs.cleaner.interval", "1d")
 
-  private val logDir = conf.getOption("spark.history.fs.logDirectory")
-    .map { d => Utils.resolveURI(d).toString }
+  private val logDir = conf
+    .getOption("spark.history.fs.logDirectory")
+    .map { d =>
+      Utils.resolveURI(d).toString
+    }
     .getOrElse(DEFAULT_LOG_DIR)
 
   private val hadoopConf = SparkHadoopUtil.get.newConfiguration(conf)
@@ -99,8 +104,12 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   // Used by check event thread and clean log thread.
   // Scheduled thread pool size must be one, otherwise it will have concurrent issues about fs
   // and applications between check task and clean task.
-  private val pool = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
-    .setNameFormat("spark-history-task-%d").setDaemon(true).build())
+  private val pool = Executors.newScheduledThreadPool(
+      1,
+      new ThreadFactoryBuilder()
+        .setNameFormat("spark-history-task-%d")
+        .setDaemon(true)
+        .build())
 
   // The modification time of the newest log detected during the last scan.   Currently only
   // used for logging msgs (logs are re-scanned based on file size, rather than modtime)
@@ -108,18 +117,19 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
 
   // Mapping of application IDs to their metadata, in descending end time order. Apps are inserted
   // into the map in order, so the LinkedHashMap maintains the correct ordering.
-  @volatile private var applications: mutable.LinkedHashMap[String, FsApplicationHistoryInfo]
-    = new mutable.LinkedHashMap()
+  @volatile private var applications: mutable.LinkedHashMap[
+      String, FsApplicationHistoryInfo] = new mutable.LinkedHashMap()
 
   val fileToAppInfo = new mutable.HashMap[Path, FsApplicationAttemptInfo]()
 
   // List of application logs to be deleted by event log cleaner.
-  private var attemptsToClean = new mutable.ListBuffer[FsApplicationAttemptInfo]
+  private var attemptsToClean =
+    new mutable.ListBuffer[FsApplicationAttemptInfo]
 
   /**
-   * Return a runnable that performs the given operation on the event logs.
-   * This operation is expected to be executed periodically.
-   */
+    * Return a runnable that performs the given operation on the event logs.
+    * This operation is expected to be executed periodically.
+    */
   private def getRunner(operateFun: () => Unit): Runnable = {
     new Runnable() {
       override def run(): Unit = Utils.tryOrExit {
@@ -129,8 +139,8 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   }
 
   /**
-   * An Executor to fetch and parse log files.
-   */
+    * An Executor to fetch and parse log files.
+    */
   private val replayExecutor: ExecutorService = {
     if (!conf.contains("spark.testing")) {
       ThreadUtils.newDaemonSingleThreadExecutor("log-replay-executor")
@@ -161,7 +171,8 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
         try {
           while (isFsInSafeMode()) {
             logInfo("HDFS is still in safe mode. Waiting...")
-            val deadline = clock.getTimeMillis() +
+            val deadline =
+              clock.getTimeMillis() +
               TimeUnit.SECONDS.toMillis(SAFEMODE_CHECK_INTERVAL_S)
             clock.waitTillTime(deadline)
           }
@@ -173,13 +184,13 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
     })
     initThread.setDaemon(true)
     initThread.setName(s"${getClass().getSimpleName()}-init")
-    initThread.setUncaughtExceptionHandler(errorHandler.getOrElse(
-      new Thread.UncaughtExceptionHandler() {
-        override def uncaughtException(t: Thread, e: Throwable): Unit = {
-          logError("Error initializing FsHistoryProvider.", e)
-          System.exit(1)
-        }
-      }))
+    initThread.setUncaughtExceptionHandler(
+        errorHandler.getOrElse(new Thread.UncaughtExceptionHandler() {
+      override def uncaughtException(t: Thread, e: Throwable): Unit = {
+        logError("Error initializing FsHistoryProvider.", e)
+        System.exit(1)
+      }
+    }))
     initThread.start()
     initThread
   }
@@ -196,27 +207,31 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
     }
     if (!fs.getFileStatus(path).isDirectory) {
       throw new IllegalArgumentException(
-        "Logging directory specified is not a directory: %s".format(logDir))
+          "Logging directory specified is not a directory: %s".format(logDir))
     }
 
     // Disable the background thread during tests.
     if (!conf.contains("spark.testing")) {
       // A task that periodically checks for event log updates on disk.
       logDebug(s"Scheduling update thread every $UPDATE_INTERVAL_S seconds")
-      pool.scheduleWithFixedDelay(getRunner(checkForLogs), 0, UPDATE_INTERVAL_S, TimeUnit.SECONDS)
+      pool.scheduleWithFixedDelay(
+          getRunner(checkForLogs), 0, UPDATE_INTERVAL_S, TimeUnit.SECONDS)
 
       if (conf.getBoolean("spark.history.fs.cleaner.enabled", false)) {
         // A task that periodically cleans event logs on disk.
-        pool.scheduleWithFixedDelay(getRunner(cleanLogs), 0, CLEAN_INTERVAL_S, TimeUnit.SECONDS)
+        pool.scheduleWithFixedDelay(
+            getRunner(cleanLogs), 0, CLEAN_INTERVAL_S, TimeUnit.SECONDS)
       }
     } else {
       logDebug("Background update thread disabled for testing")
     }
   }
 
-  override def getListing(): Iterable[FsApplicationHistoryInfo] = applications.values
+  override def getListing(): Iterable[FsApplicationHistoryInfo] =
+    applications.values
 
-  override def getAppUI(appId: String, attemptId: Option[String]): Option[LoadedAppUI] = {
+  override def getAppUI(
+      appId: String, attemptId: Option[String]): Option[LoadedAppUI] = {
     try {
       applications.get(appId).flatMap { appInfo =>
         appInfo.attempts.find(_.attemptId == attemptId).flatMap { attempt =>
@@ -224,21 +239,28 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
           val ui = {
             val conf = this.conf.clone()
             val appSecManager = new SecurityManager(conf)
-            SparkUI.createHistoryUI(conf, replayBus, appSecManager, appInfo.name,
-              HistoryServer.getAttemptURI(appId, attempt.attemptId), attempt.startTime)
+            SparkUI.createHistoryUI(
+                conf,
+                replayBus,
+                appSecManager,
+                appInfo.name,
+                HistoryServer.getAttemptURI(appId, attempt.attemptId),
+                attempt.startTime)
             // Do not call ui.bind() to avoid creating a new server for each application
           }
           val appListener = new ApplicationEventListener()
           replayBus.addListener(appListener)
-          val appAttemptInfo = replay(fs.getFileStatus(new Path(logDir, attempt.logPath)),
-            replayBus)
+          val appAttemptInfo = replay(
+              fs.getFileStatus(new Path(logDir, attempt.logPath)), replayBus)
           appAttemptInfo.map { info =>
-            val uiAclsEnabled = conf.getBoolean("spark.history.ui.acls.enable", false)
+            val uiAclsEnabled =
+              conf.getBoolean("spark.history.ui.acls.enable", false)
             ui.getSecurityManager.setAcls(uiAclsEnabled)
             // make sure to set admin acls before view acls so they are properly picked up
-            ui.getSecurityManager.setAdminAcls(appListener.adminAcls.getOrElse(""))
-            ui.getSecurityManager.setViewAcls(attempt.sparkUser,
-              appListener.viewAcls.getOrElse(""))
+            ui.getSecurityManager.setAdminAcls(
+                appListener.adminAcls.getOrElse(""))
+            ui.getSecurityManager.setViewAcls(
+                attempt.sparkUser, appListener.viewAcls.getOrElse(""))
             LoadedAppUI(ui, updateProbe(appId, attemptId, attempt.fileSize))
           }
         }
@@ -249,11 +271,12 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   }
 
   override def getConfig(): Map[String, String] = {
-    val safeMode = if (isFsInSafeMode()) {
-      Map("HDFS State" -> "In safe mode, application logs not available.")
-    } else {
-      Map()
-    }
+    val safeMode =
+      if (isFsInSafeMode()) {
+        Map("HDFS State" -> "In safe mode, application logs not available.")
+      } else {
+        Map()
+      }
     Map("Event log directory" -> logDir.toString) ++ safeMode
   }
 
@@ -265,39 +288,43 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   }
 
   /**
-   * Builds the application list based on the current contents of the log directory.
-   * Tries to reuse as much of the data already in memory as possible, by not reading
-   * applications that haven't been updated since last time the logs were checked.
-   */
+    * Builds the application list based on the current contents of the log directory.
+    * Tries to reuse as much of the data already in memory as possible, by not reading
+    * applications that haven't been updated since last time the logs were checked.
+    */
   private[history] def checkForLogs(): Unit = {
     try {
       val newLastScanTime = getNewLastScanTime()
       logDebug(s"Scanning $logDir with lastScanTime==$lastScanTime")
-      val statusList = Option(fs.listStatus(new Path(logDir))).map(_.toSeq)
+      val statusList = Option(fs.listStatus(new Path(logDir)))
+        .map(_.toSeq)
         .getOrElse(Seq[FileStatus]())
       // scan for modified applications, replay and merge them
-      val logInfos: Seq[FileStatus] = statusList
-        .filter { entry =>
-          try {
-            val prevFileSize = fileToAppInfo.get(entry.getPath()).map{_.fileSize}.getOrElse(0L)
-            !entry.isDirectory() && prevFileSize < entry.getLen()
-          } catch {
-            case e: AccessControlException =>
-              // Do not use "logInfo" since these messages can get pretty noisy if printed on
-              // every poll.
-              logDebug(s"No permission to read $entry, ignoring.")
-              false
-          }
+      val logInfos: Seq[FileStatus] = statusList.filter { entry =>
+        try {
+          val prevFileSize =
+            fileToAppInfo.get(entry.getPath()).map { _.fileSize }.getOrElse(0L)
+          !entry.isDirectory() && prevFileSize < entry.getLen()
+        } catch {
+          case e: AccessControlException =>
+            // Do not use "logInfo" since these messages can get pretty noisy if printed on
+            // every poll.
+            logDebug(s"No permission to read $entry, ignoring.")
+            false
         }
-        .flatMap { entry => Some(entry) }
-        .sortWith { case (entry1, entry2) =>
+      }.flatMap { entry =>
+        Some(entry)
+      }.sortWith {
+        case (entry1, entry2) =>
           entry1.getModificationTime() >= entry2.getModificationTime()
       }
 
       if (logInfos.nonEmpty) {
-        logDebug(s"New/updated attempts found: ${logInfos.size} ${logInfos.map(_.getPath)}")
+        logDebug(
+            s"New/updated attempts found: ${logInfos.size} ${logInfos.map(_.getPath)}")
       }
-      logInfos.grouped(20)
+      logInfos
+        .grouped(20)
         .map { batch =>
           replayExecutor.submit(new Runnable {
             override def run(): Unit = mergeApplicationListing(batch)
@@ -319,7 +346,8 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
 
       lastScanTime = newLastScanTime
     } catch {
-      case e: Exception => logError("Exception in checking for event log updates", e)
+      case e: Exception =>
+        logError("Exception in checking for event log updates", e)
     }
   }
 
@@ -333,7 +361,9 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
       fs.getFileStatus(path).getModificationTime
     } catch {
       case e: Exception =>
-        logError("Exception encountered when attempting to update last scan time", e)
+        logError(
+            "Exception encountered when attempting to update last scan time",
+            e)
         lastScanTime
     } finally {
       if (!fs.delete(path, true)) {
@@ -342,17 +372,17 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
     }
   }
 
-  override def writeEventLogs(
-      appId: String,
-      attemptId: Option[String],
-      zipStream: ZipOutputStream): Unit = {
+  override def writeEventLogs(appId: String,
+                              attemptId: Option[String],
+                              zipStream: ZipOutputStream): Unit = {
 
     /**
-     * This method compresses the files passed in, and writes the compressed data out into the
-     * [[OutputStream]] passed in. Each file is written as a new [[ZipEntry]] with its name being
-     * the name of the file being compressed.
-     */
-    def zipFileToStream(file: Path, entryName: String, outputStream: ZipOutputStream): Unit = {
+      * This method compresses the files passed in, and writes the compressed data out into the
+      * [[OutputStream]] passed in. Each file is written as a new [[ZipEntry]] with its name being
+      * the name of the file being compressed.
+      */
+    def zipFileToStream(
+        file: Path, entryName: String, outputStream: ZipOutputStream): Unit = {
       val fs = FileSystem.get(hadoopConf)
       val inputStream = fs.open(file, 1 * 1024 * 1024) // 1MB Buffer
       try {
@@ -369,10 +399,12 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
         try {
           // If no attempt is specified, or there is no attemptId for attempts, return all attempts
           appInfo.attempts.filter { attempt =>
-            attempt.attemptId.isEmpty || attemptId.isEmpty || attempt.attemptId.get == attemptId.get
+            attempt.attemptId.isEmpty || attemptId.isEmpty ||
+            attempt.attemptId.get == attemptId.get
           }.foreach { attempt =>
             val logPath = new Path(logDir, attempt.logPath)
-            zipFileToStream(new Path(logDir, attempt.logPath), attempt.logPath, zipStream)
+            zipFileToStream(
+                new Path(logDir, attempt.logPath), attempt.logPath, zipStream)
           }
         } finally {
           zipStream.close()
@@ -381,26 +413,28 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
     }
   }
 
-
   /**
-   * Replay the log files in the list and merge the list of old applications with new ones
-   */
+    * Replay the log files in the list and merge the list of old applications with new ones
+    */
   private def mergeApplicationListing(logs: Seq[FileStatus]): Unit = {
     val newAttempts = logs.flatMap { fileStatus =>
       try {
         val bus = new ReplayListenerBus()
         val res = replay(fileStatus, bus)
         res match {
-          case Some(r) => logDebug(s"Application log ${r.logPath} loaded successfully: $r")
-          case None => logWarning(s"Failed to load application log ${fileStatus.getPath}. " +
-            "The application may have not started.")
+          case Some(r) =>
+            logDebug(s"Application log ${r.logPath} loaded successfully: $r")
+          case None =>
+            logWarning(
+                s"Failed to load application log ${fileStatus.getPath}. " +
+                "The application may have not started.")
         }
         res
       } catch {
         case e: Exception =>
           logError(
-            s"Exception encountered when attempting to load application log ${fileStatus.getPath}",
-            e)
+              s"Exception encountered when attempting to load application log ${fileStatus.getPath}",
+              e)
           None
       }
     }
@@ -414,15 +448,19 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
     // map. If an attempt has been updated, it replaces the old attempt in the list.
     val newAppMap = new mutable.HashMap[String, FsApplicationHistoryInfo]()
     newAttempts.foreach { attempt =>
-      val appInfo = newAppMap.get(attempt.appId)
+      val appInfo = newAppMap
+        .get(attempt.appId)
         .orElse(applications.get(attempt.appId))
         .map { app =>
           val attempts =
-            app.attempts.filter(_.attemptId != attempt.attemptId).toList ++ List(attempt)
-          new FsApplicationHistoryInfo(attempt.appId, attempt.name,
-            attempts.sortWith(compareAttemptInfo))
+            app.attempts.filter(_.attemptId != attempt.attemptId).toList ++ List(
+                attempt)
+          new FsApplicationHistoryInfo(attempt.appId,
+                                       attempt.name,
+                                       attempts.sortWith(compareAttemptInfo))
         }
-        .getOrElse(new FsApplicationHistoryInfo(attempt.appId, attempt.name, List(attempt)))
+        .getOrElse(new FsApplicationHistoryInfo(
+                attempt.appId, attempt.name, List(attempt)))
       newAppMap(attempt.appId) = appInfo
     }
 
@@ -430,7 +468,8 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
     // end time). Maintaining the order is important to avoid having to sort the list every time
     // there is a request for the log list.
     val newApps = newAppMap.values.toSeq.sortWith(compareAppInfo)
-    val mergedApps = new mutable.LinkedHashMap[String, FsApplicationHistoryInfo]()
+    val mergedApps =
+      new mutable.LinkedHashMap[String, FsApplicationHistoryInfo]()
     def addIfAbsent(info: FsApplicationHistoryInfo): Unit = {
       if (!mergedApps.contains(info.id)) {
         mergedApps += (info.id -> info)
@@ -455,14 +494,16 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   }
 
   /**
-   * Delete event logs from the log directory according to the clean policy defined by the user.
-   */
+    * Delete event logs from the log directory according to the clean policy defined by the user.
+    */
   private[history] def cleanLogs(): Unit = {
     try {
-      val maxAge = conf.getTimeAsSeconds("spark.history.fs.cleaner.maxAge", "7d") * 1000
+      val maxAge =
+        conf.getTimeAsSeconds("spark.history.fs.cleaner.maxAge", "7d") * 1000
 
       val now = clock.getTimeMillis()
-      val appsToRetain = new mutable.LinkedHashMap[String, FsApplicationHistoryInfo]()
+      val appsToRetain =
+        new mutable.LinkedHashMap[String, FsApplicationHistoryInfo]()
 
       def shouldClean(attempt: FsApplicationAttemptInfo): Boolean = {
         now - attempt.lastUpdated > maxAge && attempt.completed
@@ -477,8 +518,10 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
         if (toClean.isEmpty) {
           appsToRetain += (app.id -> app)
         } else if (toRetain.nonEmpty) {
-          appsToRetain += (app.id ->
-            new FsApplicationHistoryInfo(app.id, app.name, toRetain.toList))
+          appsToRetain +=
+          (app.id -> new FsApplicationHistoryInfo(app.id,
+                                                  app.name,
+                                                  toRetain.toList))
         }
       }
 
@@ -509,38 +552,37 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   }
 
   /**
-   * Comparison function that defines the sort order for the application listing.
-   *
-   * @return Whether `i1` should precede `i2`.
-   */
+    * Comparison function that defines the sort order for the application listing.
+    *
+    * @return Whether `i1` should precede `i2`.
+    */
   private def compareAppInfo(
-      i1: FsApplicationHistoryInfo,
-      i2: FsApplicationHistoryInfo): Boolean = {
+      i1: FsApplicationHistoryInfo, i2: FsApplicationHistoryInfo): Boolean = {
     val a1 = i1.attempts.head
     val a2 = i2.attempts.head
-    if (a1.endTime != a2.endTime) a1.endTime >= a2.endTime else a1.startTime >= a2.startTime
+    if (a1.endTime != a2.endTime) a1.endTime >= a2.endTime
+    else a1.startTime >= a2.startTime
   }
 
   /**
-   * Comparison function that defines the sort order for application attempts within the same
-   * application. Order is: attempts are sorted by descending start time.
-   * Most recent attempt state matches with current state of the app.
-   *
-   * Normally applications should have a single running attempt; but failure to call sc.stop()
-   * may cause multiple running attempts to show up.
-   *
-   * @return Whether `a1` should precede `a2`.
-   */
+    * Comparison function that defines the sort order for application attempts within the same
+    * application. Order is: attempts are sorted by descending start time.
+    * Most recent attempt state matches with current state of the app.
+    *
+    * Normally applications should have a single running attempt; but failure to call sc.stop()
+    * may cause multiple running attempts to show up.
+    *
+    * @return Whether `a1` should precede `a2`.
+    */
   private def compareAttemptInfo(
-      a1: FsApplicationAttemptInfo,
-      a2: FsApplicationAttemptInfo): Boolean = {
+      a1: FsApplicationAttemptInfo, a2: FsApplicationAttemptInfo): Boolean = {
     a1.startTime >= a2.startTime
   }
 
   /**
-   * Replays the events in the specified log file and returns information about the associated
-   * application. Return `None` if the application ID cannot be located.
-   */
+    * Replays the events in the specified log file and returns information about the associated
+    * application. Return `None` if the application ID cannot be located.
+    */
   private def replay(
       eventLog: FileStatus,
       bus: ReplayListenerBus): Option[FsApplicationAttemptInfo] = {
@@ -563,16 +605,16 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
       // try to show their UI.
       if (appListener.appId.isDefined) {
         val attemptInfo = new FsApplicationAttemptInfo(
-          logPath.getName(),
-          appListener.appName.getOrElse(NOT_STARTED),
-          appListener.appId.getOrElse(logPath.getName()),
-          appListener.appAttemptId,
-          appListener.startTime.getOrElse(-1L),
-          appListener.endTime.getOrElse(-1L),
-          eventLog.getModificationTime(),
-          appListener.sparkUser.getOrElse(NOT_STARTED),
-          appCompleted,
-          eventLog.getLen()
+            logPath.getName(),
+            appListener.appName.getOrElse(NOT_STARTED),
+            appListener.appId.getOrElse(logPath.getName()),
+            appListener.appAttemptId,
+            appListener.startTime.getOrElse(-1L),
+            appListener.endTime.getOrElse(-1L),
+            eventLog.getModificationTime(),
+            appListener.sparkUser.getOrElse(NOT_STARTED),
+            appCompleted,
+            eventLog.getLen()
         )
         fileToAppInfo(logPath) = attemptInfo
         Some(attemptInfo)
@@ -585,18 +627,18 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   }
 
   /**
-   * Return true when the application has completed.
-   */
+    * Return true when the application has completed.
+    */
   private def isApplicationCompleted(entry: FileStatus): Boolean = {
     !entry.getPath().getName().endsWith(EventLoggingListener.IN_PROGRESS)
   }
 
   /**
-   * Checks whether HDFS is in safe mode.
-   *
-   * Note that DistributedFileSystem is a `@LimitedPrivate` class, which for all practical reasons
-   * makes it more public than not.
-   */
+    * Checks whether HDFS is in safe mode.
+    *
+    * Note that DistributedFileSystem is a `@LimitedPrivate` class, which for all practical reasons
+    * makes it more public than not.
+    */
   private[history] def isFsInSafeMode(): Boolean = fs match {
     case dfs: DistributedFileSystem =>
       isFsInSafeMode(dfs)
@@ -610,9 +652,9 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   }
 
   /**
-   * String description for diagnostics
-   * @return a summary of the component state
-   */
+    * String description for diagnostics
+    * @return a summary of the component state
+    */
   override def toString: String = {
     val header = s"""
       | FsHistoryProvider: logdir=$logDir,
@@ -625,32 +667,32 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
   }
 
   /**
-   * Look up an application attempt
-   * @param appId application ID
-   * @param attemptId Attempt ID, if set
-   * @return the matching attempt, if found
-   */
-  def lookup(appId: String, attemptId: Option[String]): Option[FsApplicationAttemptInfo] = {
+    * Look up an application attempt
+    * @param appId application ID
+    * @param attemptId Attempt ID, if set
+    * @return the matching attempt, if found
+    */
+  def lookup(appId: String,
+             attemptId: Option[String]): Option[FsApplicationAttemptInfo] = {
     applications.get(appId).flatMap { appInfo =>
       appInfo.attempts.find(_.attemptId == attemptId)
     }
   }
 
   /**
-   * Return true iff a newer version of the UI is available.  The check is based on whether the
-   * fileSize for the currently loaded UI is smaller than the file size the last time
-   * the logs were loaded.
-   *
-   * This is a very cheap operation -- the work of loading the new attempt was already done
-   * by [[checkForLogs]].
-   * @param appId application to probe
-   * @param attemptId attempt to probe
-   * @param prevFileSize the file size of the logs for the currently displayed UI
-   */
+    * Return true iff a newer version of the UI is available.  The check is based on whether the
+    * fileSize for the currently loaded UI is smaller than the file size the last time
+    * the logs were loaded.
+    *
+    * This is a very cheap operation -- the work of loading the new attempt was already done
+    * by [[checkForLogs]].
+    * @param appId application to probe
+    * @param attemptId attempt to probe
+    * @param prevFileSize the file size of the logs for the currently displayed UI
+    */
   private def updateProbe(
-      appId: String,
-      attemptId: Option[String],
-      prevFileSize: Long)(): Boolean = {
+      appId: String, attemptId: Option[String], prevFileSize: Long)(
+      ): Boolean = {
     lookup(appId, attemptId) match {
       case None =>
         logDebug(s"Application Attempt $appId/$attemptId not found")
@@ -666,49 +708,48 @@ private[history] object FsHistoryProvider {
 }
 
 /**
- * Application attempt information.
- *
- * @param logPath path to the log file, or, for a legacy log, its directory
- * @param name application name
- * @param appId application ID
- * @param attemptId optional attempt ID
- * @param startTime start time (from playback)
- * @param endTime end time (from playback). -1 if the application is incomplete.
- * @param lastUpdated the modification time of the log file when this entry was built by replaying
- *                    the history.
- * @param sparkUser user running the application
- * @param completed flag to indicate whether or not the application has completed.
- * @param fileSize the size of the log file the last time the file was scanned for changes
- */
-private class FsApplicationAttemptInfo(
-    val logPath: String,
-    val name: String,
-    val appId: String,
-    attemptId: Option[String],
-    startTime: Long,
-    endTime: Long,
-    lastUpdated: Long,
-    sparkUser: String,
-    completed: Boolean,
-    val fileSize: Long)
-  extends ApplicationAttemptInfo(
-      attemptId, startTime, endTime, lastUpdated, sparkUser, completed) {
+  * Application attempt information.
+  *
+  * @param logPath path to the log file, or, for a legacy log, its directory
+  * @param name application name
+  * @param appId application ID
+  * @param attemptId optional attempt ID
+  * @param startTime start time (from playback)
+  * @param endTime end time (from playback). -1 if the application is incomplete.
+  * @param lastUpdated the modification time of the log file when this entry was built by replaying
+  *                    the history.
+  * @param sparkUser user running the application
+  * @param completed flag to indicate whether or not the application has completed.
+  * @param fileSize the size of the log file the last time the file was scanned for changes
+  */
+private class FsApplicationAttemptInfo(val logPath: String,
+                                       val name: String,
+                                       val appId: String,
+                                       attemptId: Option[String],
+                                       startTime: Long,
+                                       endTime: Long,
+                                       lastUpdated: Long,
+                                       sparkUser: String,
+                                       completed: Boolean,
+                                       val fileSize: Long)
+    extends ApplicationAttemptInfo(
+        attemptId, startTime, endTime, lastUpdated, sparkUser, completed) {
 
   /** extend the superclass string value with the extra attributes of this class */
   override def toString: String = {
     s"FsApplicationAttemptInfo($name, $appId," +
-      s" ${super.toString}, source=$logPath, size=$fileSize"
+    s" ${super.toString}, source=$logPath, size=$fileSize"
   }
 }
 
 /**
- * Application history information
- * @param id application ID
- * @param name application name
- * @param attempts list of attempts, most recent first.
- */
+  * Application history information
+  * @param id application ID
+  * @param name application name
+  * @param attempts list of attempts, most recent first.
+  */
 private class FsApplicationHistoryInfo(
     id: String,
     override val name: String,
     override val attempts: List[FsApplicationAttemptInfo])
-  extends ApplicationHistoryInfo(id, name, attempts)
+    extends ApplicationHistoryInfo(id, name, attempts)

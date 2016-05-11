@@ -33,33 +33,32 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{Priority, VBox}
 
 /**
- * A sample that demonstrates the use of two different constructors in the Image
- * class.
- *
- * @related images/ImageProperties
- * @see scalafx.scene.image.Image
- * @see scalafx.scene.image.ImageView
- * @resource /scalafx/ensemble/images/icon-48x48.png
- * @resource /scalafx/ensemble/images/scala-logo.png
- */
+  * A sample that demonstrates the use of two different constructors in the Image
+  * class.
+  *
+  * @related images/ImageProperties
+  * @see scalafx.scene.image.Image
+  * @see scalafx.scene.image.ImageView
+  * @resource /scalafx/ensemble/images/icon-48x48.png
+  * @resource /scalafx/ensemble/images/scala-logo.png
+  */
 class EnsembleImageCreation extends EnsembleExample {
   def getContent = new VBox {
     vgrow = Priority.Always
     hgrow = Priority.Always
     spacing = 10
     padding = Insets(20)
-    children = List(
-      new ImageView {
-        image = new Image(this.getClass.getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
-        fitHeight = 50
-        fitWidth = 150
-        preserveRatio = true
-        smooth = true
-      },
-      new ImageView {
-        // image = new Image("/scalafx/ensemble/images/scala-logo.png")
-        image = new Image("http://www.scala-lang.org/resources/img/scala-logo.png")
-
-      })
+    children = List(new ImageView {
+      image = new Image(this.getClass
+            .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+      fitHeight = 50
+      fitWidth = 150
+      preserveRatio = true
+      smooth = true
+    }, new ImageView {
+      // image = new Image("/scalafx/ensemble/images/scala-logo.png")
+      image = new Image(
+          "http://www.scala-lang.org/resources/img/scala-logo.png")
+    })
   }
 }

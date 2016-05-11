@@ -37,7 +37,8 @@ class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll {
 
     kafkaTestUtils.createTopic(topic)
     kafkaTestUtils.sendMessages(topic, Map("a" -> 1))
-    kc = new KafkaCluster(Map("metadata.broker.list" -> kafkaTestUtils.brokerAddress))
+    kc = new KafkaCluster(
+        Map("metadata.broker.list" -> kafkaTestUtils.brokerAddress))
   }
 
   override def afterAll() {
@@ -48,7 +49,8 @@ class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll {
   }
 
   test("metadata apis") {
-    val leader = kc.findLeaders(Set(topicAndPartition)).right.get(topicAndPartition)
+    val leader =
+      kc.findLeaders(Set(topicAndPartition)).right.get(topicAndPartition)
     val leaderAddress = s"${leader._1}:${leader._2}"
     assert(leaderAddress === kafkaTestUtils.brokerAddress, "didn't get leader")
 
@@ -56,11 +58,13 @@ class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll {
     assert(parts(topicAndPartition), "didn't get partitions")
 
     val err = kc.getPartitions(Set(topic + "BAD"))
-    assert(err.isLeft, "getPartitions for a nonexistant topic should be an error")
+    assert(
+        err.isLeft, "getPartitions for a nonexistant topic should be an error")
   }
 
   test("leader offset apis") {
-    val earliest = kc.getEarliestLeaderOffsets(Set(topicAndPartition)).right.get
+    val earliest =
+      kc.getEarliestLeaderOffsets(Set(topicAndPartition)).right.get
     assert(earliest(topicAndPartition).offset === 0, "didn't get earliest")
 
     val latest = kc.getLatestLeaderOffsets(Set(topicAndPartition)).right.get

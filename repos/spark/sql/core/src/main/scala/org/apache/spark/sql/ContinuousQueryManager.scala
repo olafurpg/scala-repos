@@ -24,16 +24,17 @@ import org.apache.spark.sql.execution.streaming.{ContinuousQueryListenerBus, Sin
 import org.apache.spark.sql.util.ContinuousQueryListener
 
 /**
- * :: Experimental ::
- * A class to manage all the [[org.apache.spark.sql.ContinuousQuery ContinuousQueries]] active
- * on a [[SQLContext]].
- *
- * @since 2.0.0
- */
+  * :: Experimental ::
+  * A class to manage all the [[org.apache.spark.sql.ContinuousQuery ContinuousQueries]] active
+  * on a [[SQLContext]].
+  *
+  * @since 2.0.0
+  */
 @Experimental
 class ContinuousQueryManager(sqlContext: SQLContext) {
 
-  private val listenerBus = new ContinuousQueryListenerBus(sqlContext.sparkContext.listenerBus)
+  private val listenerBus = new ContinuousQueryListenerBus(
+      sqlContext.sparkContext.listenerBus)
   private val activeQueries = new mutable.HashMap[String, ContinuousQuery]
   private val activeQueriesLock = new Object
   private val awaitTerminationLock = new Object
@@ -41,76 +42,78 @@ class ContinuousQueryManager(sqlContext: SQLContext) {
   private var lastTerminatedQuery: ContinuousQuery = null
 
   /**
-   * Returns a list of active queries associated with this SQLContext
-   *
-   * @since 2.0.0
-   */
+    * Returns a list of active queries associated with this SQLContext
+    *
+    * @since 2.0.0
+    */
   def active: Array[ContinuousQuery] = activeQueriesLock.synchronized {
     activeQueries.values.toArray
   }
 
   /**
-   * Returns an active query from this SQLContext or throws exception if bad name
-   *
-   * @since 2.0.0
-   */
+    * Returns an active query from this SQLContext or throws exception if bad name
+    *
+    * @since 2.0.0
+    */
   def get(name: String): ContinuousQuery = activeQueriesLock.synchronized {
     activeQueries.getOrElse(name,
-      throw new IllegalArgumentException(s"There is no active query with name $name"))
+                            throw new IllegalArgumentException(
+                                s"There is no active query with name $name"))
   }
 
   /**
-   * Wait until any of the queries on the associated SQLContext has terminated since the
-   * creation of the context, or since `resetTerminated()` was called. If any query was terminated
-   * with an exception, then the exception will be thrown.
-   *
-   * If a query has terminated, then subsequent calls to `awaitAnyTermination()` will either
-   * return immediately (if the query was terminated by `query.stop()`),
-   * or throw the exception immediately (if the query was terminated with exception). Use
-   * `resetTerminated()` to clear past terminations and wait for new terminations.
-   *
-   * In the case where multiple queries have terminated since `resetTermination()` was called,
-   * if any query has terminated with exception, then `awaitAnyTermination()` will
-   * throw any of the exception. For correctly documenting exceptions across multiple queries,
-   * users need to stop all of them after any of them terminates with exception, and then check the
-   * `query.exception()` for each query.
-   *
-   * @throws ContinuousQueryException, if any query has terminated with an exception
-   *
-   * @since 2.0.0
-   */
+    * Wait until any of the queries on the associated SQLContext has terminated since the
+    * creation of the context, or since `resetTerminated()` was called. If any query was terminated
+    * with an exception, then the exception will be thrown.
+    *
+    * If a query has terminated, then subsequent calls to `awaitAnyTermination()` will either
+    * return immediately (if the query was terminated by `query.stop()`),
+    * or throw the exception immediately (if the query was terminated with exception). Use
+    * `resetTerminated()` to clear past terminations and wait for new terminations.
+    *
+    * In the case where multiple queries have terminated since `resetTermination()` was called,
+    * if any query has terminated with exception, then `awaitAnyTermination()` will
+    * throw any of the exception. For correctly documenting exceptions across multiple queries,
+    * users need to stop all of them after any of them terminates with exception, and then check the
+    * `query.exception()` for each query.
+    *
+    * @throws ContinuousQueryException, if any query has terminated with an exception
+    *
+    * @since 2.0.0
+    */
   def awaitAnyTermination(): Unit = {
     awaitTerminationLock.synchronized {
       while (lastTerminatedQuery == null) {
         awaitTerminationLock.wait(10)
       }
-      if (lastTerminatedQuery != null && lastTerminatedQuery.exception.nonEmpty) {
+      if (lastTerminatedQuery != null &&
+          lastTerminatedQuery.exception.nonEmpty) {
         throw lastTerminatedQuery.exception.get
       }
     }
   }
 
   /**
-   * Wait until any of the queries on the associated SQLContext has terminated since the
-   * creation of the context, or since `resetTerminated()` was called. Returns whether any query
-   * has terminated or not (multiple may have terminated). If any query has terminated with an
-   * exception, then the exception will be thrown.
-   *
-   * If a query has terminated, then subsequent calls to `awaitAnyTermination()` will either
-   * return `true` immediately (if the query was terminated by `query.stop()`),
-   * or throw the exception immediately (if the query was terminated with exception). Use
-   * `resetTerminated()` to clear past terminations and wait for new terminations.
-   *
-   * In the case where multiple queries have terminated since `resetTermination()` was called,
-   * if any query has terminated with exception, then `awaitAnyTermination()` will
-   * throw any of the exception. For correctly documenting exceptions across multiple queries,
-   * users need to stop all of them after any of them terminates with exception, and then check the
-   * `query.exception()` for each query.
-   *
-   * @throws ContinuousQueryException, if any query has terminated with an exception
-   *
-   * @since 2.0.0
-   */
+    * Wait until any of the queries on the associated SQLContext has terminated since the
+    * creation of the context, or since `resetTerminated()` was called. Returns whether any query
+    * has terminated or not (multiple may have terminated). If any query has terminated with an
+    * exception, then the exception will be thrown.
+    *
+    * If a query has terminated, then subsequent calls to `awaitAnyTermination()` will either
+    * return `true` immediately (if the query was terminated by `query.stop()`),
+    * or throw the exception immediately (if the query was terminated with exception). Use
+    * `resetTerminated()` to clear past terminations and wait for new terminations.
+    *
+    * In the case where multiple queries have terminated since `resetTermination()` was called,
+    * if any query has terminated with exception, then `awaitAnyTermination()` will
+    * throw any of the exception. For correctly documenting exceptions across multiple queries,
+    * users need to stop all of them after any of them terminates with exception, and then check the
+    * `query.exception()` for each query.
+    *
+    * @throws ContinuousQueryException, if any query has terminated with an exception
+    *
+    * @since 2.0.0
+    */
   def awaitAnyTermination(timeoutMs: Long): Boolean = {
 
     val startTime = System.currentTimeMillis
@@ -120,7 +123,8 @@ class ContinuousQueryManager(sqlContext: SQLContext) {
       while (!isTimedout && lastTerminatedQuery == null) {
         awaitTerminationLock.wait(10)
       }
-      if (lastTerminatedQuery != null && lastTerminatedQuery.exception.nonEmpty) {
+      if (lastTerminatedQuery != null &&
+          lastTerminatedQuery.exception.nonEmpty) {
         throw lastTerminatedQuery.exception.get
       }
       lastTerminatedQuery != null
@@ -128,11 +132,11 @@ class ContinuousQueryManager(sqlContext: SQLContext) {
   }
 
   /**
-   * Forget about past terminated queries so that `awaitAnyTermination()` can be used again to
-   * wait for new terminations.
-   *
-   * @since 2.0.0
-   */
+    * Forget about past terminated queries so that `awaitAnyTermination()` can be used again to
+    * wait for new terminations.
+    *
+    * @since 2.0.0
+    */
   def resetTerminated(): Unit = {
     awaitTerminationLock.synchronized {
       lastTerminatedQuery = null
@@ -140,35 +144,37 @@ class ContinuousQueryManager(sqlContext: SQLContext) {
   }
 
   /**
-   * Register a [[ContinuousQueryListener]] to receive up-calls for life cycle events of
-   * [[org.apache.spark.sql.ContinuousQuery ContinuousQueries]].
-   *
-   * @since 2.0.0
-   */
+    * Register a [[ContinuousQueryListener]] to receive up-calls for life cycle events of
+    * [[org.apache.spark.sql.ContinuousQuery ContinuousQueries]].
+    *
+    * @since 2.0.0
+    */
   def addListener(listener: ContinuousQueryListener): Unit = {
     listenerBus.addListener(listener)
   }
 
   /**
-   * Deregister a [[ContinuousQueryListener]].
-   *
-   * @since 2.0.0
-   */
+    * Deregister a [[ContinuousQueryListener]].
+    *
+    * @since 2.0.0
+    */
   def removeListener(listener: ContinuousQueryListener): Unit = {
     listenerBus.removeListener(listener)
   }
 
   /** Post a listener event */
-  private[sql] def postListenerEvent(event: ContinuousQueryListener.Event): Unit = {
+  private[sql] def postListenerEvent(
+      event: ContinuousQueryListener.Event): Unit = {
     listenerBus.post(event)
   }
 
   /** Start a query */
-  private[sql] def startQuery(name: String, df: DataFrame, sink: Sink): ContinuousQuery = {
+  private[sql] def startQuery(
+      name: String, df: DataFrame, sink: Sink): ContinuousQuery = {
     activeQueriesLock.synchronized {
       if (activeQueries.contains(name)) {
         throw new IllegalArgumentException(
-          s"Cannot start query with name $name as a query with that name is already active")
+            s"Cannot start query with name $name as a query with that name is already active")
       }
       val query = new StreamExecution(sqlContext, name, df.logicalPlan, sink)
       query.start()
@@ -178,7 +184,8 @@ class ContinuousQueryManager(sqlContext: SQLContext) {
   }
 
   /** Notify (by the ContinuousQuery) that the query has been terminated */
-  private[sql] def notifyQueryTermination(terminatedQuery: ContinuousQuery): Unit = {
+  private[sql] def notifyQueryTermination(
+      terminatedQuery: ContinuousQuery): Unit = {
     activeQueriesLock.synchronized {
       activeQueries -= terminatedQuery.name
     }

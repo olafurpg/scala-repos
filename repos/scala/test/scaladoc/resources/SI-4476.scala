@@ -1,9 +1,9 @@
 package foo
 
-@deprecated("","")
+@deprecated("", "")
 class A
 
 class B {
-  @deprecated("","")
+  @deprecated("", "")
   def bar = 1
 }

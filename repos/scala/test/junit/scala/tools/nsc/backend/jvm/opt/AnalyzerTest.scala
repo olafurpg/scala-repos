@@ -33,8 +33,7 @@ class AnalyzerTest extends ClearAfterClass {
 
   @Test
   def aliasingOfPrimitives(): Unit = {
-    val code =
-      """class C {
+    val code = """class C {
         |  def f(a: Int, b: Long) = {
         |    val c = a - b // a is converted with i2l
         |    val d = c

@@ -11,9 +11,8 @@ import org.jetbrains.plugins.scala.util.TestUtils
 import org.jetbrains.plugins.scala.util.TestUtils.ScalaSdkVersion
 
 /**
- * Pavel.Fatin, 02.02.2010
- */
-
+  * Pavel.Fatin, 02.02.2010
+  */
 abstract class ResolveTestBase extends ScalaResolveTestCase {
   val pattern = """/\*\s*(.*?)\s*\*/\s*""".r
   type Parameters = Map[String, String]
@@ -29,16 +28,23 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
   val Applicable = "applicable" // default: true
   val Accessible = "accessible" // default: true
 
-  val Parameters = List(Resolved, Name, File, Line, Offset, Length, Type, Path, Applicable, Accessible)
+  val Parameters = List(Resolved,
+                        Name,
+                        File,
+                        Line,
+                        Offset,
+                        Length,
+                        Type,
+                        Path,
+                        Applicable,
+                        Accessible)
 
   var options: List[Parameters] = List()
   var references: List[PsiReference] = List()
 
-
   override def setUp() {
     setUp(TestUtils.DEFAULT_SCALA_SDK_VERSION)
   }
-
 
   override def setUp(version: ScalaSdkVersion) {
     super.setUp(version)
@@ -68,8 +74,9 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
 
     options = options.reverse
     references = references.reverse
-    
-    Assert.assertFalse("At least one expectation must be specified", references.isEmpty)
+
+    Assert.assertFalse(
+        "At least one expectation must be specified", references.isEmpty)
     Assert.assertEquals("Options number", references.size, options.size)
 
     null
@@ -77,17 +84,20 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
 
   def assertKnown(parameters: Parameters) {
     for ((key, value) <- parameters) {
-      Assert.assertTrue("Unknown parameter: " + key + "\nAllowed: " + Parameters.mkString(", "),
-        Parameters.contains(key))
+      Assert.assertTrue("Unknown parameter: " + key +
+                        "\nAllowed: " + Parameters.mkString(", "),
+                        Parameters.contains(key))
     }
   }
 
   def parseParameters(s: String): Parameters = {
-    if (s.isEmpty) Map() else Map(s.split("""\s*,\s*""").map(_.trim).map {
-      it: String =>
+    if (s.isEmpty) Map()
+    else
+      Map(
+          s.split("""\s*,\s*""").map(_.trim).map { it: String =>
         val parts = it.split("""\s*:\s*""")
         (parts(0), parts(1))
-    }: _*)
+      }: _*)
   }
 
   def doTest() {
@@ -95,70 +105,90 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
   }
 
   def doTest(file: String) {
-    references.zip(options).foreach(it => {
-      it._1 match {
-        case ref: ScReferenceElement =>
-          doEachTest(it._1.asInstanceOf[ScReferenceElement], it._2)
-        case ref: PsiMultiReference =>
-          val hostReferences = ref.getReferences
-          if (hostReferences.length == 2) {
-            hostReferences.find(_.isInstanceOf[ScReferenceElement]) match {
-              case Some(r: ScReferenceElement) =>
-                doEachTest(r, it._2)
-              case _ => assert(assertion = false, message = "Multihost references are not supported")
-            }
-          } else {
-            assert(assertion = false, message = "Multihost references are not supported")
+    references
+      .zip(options)
+      .foreach(it =>
+            {
+          it._1 match {
+            case ref: ScReferenceElement =>
+              doEachTest(it._1.asInstanceOf[ScReferenceElement], it._2)
+            case ref: PsiMultiReference =>
+              val hostReferences = ref.getReferences
+              if (hostReferences.length == 2) {
+                hostReferences.find(_.isInstanceOf[ScReferenceElement]) match {
+                  case Some(r: ScReferenceElement) =>
+                    doEachTest(r, it._2)
+                  case _ =>
+                    assert(assertion = false,
+                           message = "Multihost references are not supported")
+                }
+              } else {
+                assert(assertion = false,
+                       message = "Multihost references are not supported")
+              }
           }
-      }
-    })
+      })
   }
 
   def doEachTest(reference: ScReferenceElement, options: Parameters) {
     val referenceName = reference.refName
     val result = reference.advancedResolve
-    val (target, accessible, applicable) = if(result.isDefined) (
-            result.get.element,
-            result.get.isAccessible,
-            result.get.isApplicable()) else (null, true, true)
+    val (target, accessible, applicable) =
+      if (result.isDefined)
+        (result.get.element,
+         result.get.isAccessible,
+         result.get.isApplicable()) else (null, true, true)
 
     def message = format(getFileAdapter.getText, _: String, lineOf(reference))
 
     def assertEquals(name: String, v1: Any, v2: Any) {
-      if(v1 != v2) Assert.fail(message(name + " - expected: " + v1 + ", actual: " + v2))
+      if (v1 != v2)
+        Assert.fail(message(name + " - expected: " + v1 + ", actual: " + v2))
     }
 
     if (options.contains(Resolved) && options(Resolved) == "false") {
-      Assert.assertNull(message(referenceName + " must NOT be resolved!"), target)
+      Assert.assertNull(
+          message(referenceName + " must NOT be resolved!"), target)
     } else {
-      Assert.assertNotNull(message(referenceName + " must BE resolved!"), target)
+      Assert.assertNotNull(
+          message(referenceName + " must BE resolved!"), target)
 
       if (options.contains(Accessible) && options(Accessible) == "false") {
-        Assert.assertFalse(message(referenceName + " must NOT be accessible!"), accessible)
+        Assert.assertFalse(
+            message(referenceName + " must NOT be accessible!"), accessible)
       } else {
-        Assert.assertTrue(message(referenceName + " must BE accessible!"), accessible)
+        Assert.assertTrue(
+            message(referenceName + " must BE accessible!"), accessible)
       }
 
       if (options.contains(Applicable) && options(Applicable) == "false") {
-        Assert.assertFalse(message(referenceName + " must NOT be applicable!"), applicable)
+        Assert.assertFalse(
+            message(referenceName + " must NOT be applicable!"), applicable)
       } else {
         Assert.assertTrue(message(referenceName + " must BE applicable! " +
-          result.get.problems.mkString("(", ",", ")")), applicable)
+                              result.get.problems.mkString("(", ",", ")")),
+                          applicable)
       }
 
       if (options.contains(Path)) {
-        assertEquals(Path, options(Path), target.asInstanceOf[ScTypeDefinition].qualifiedName)
+        assertEquals(Path,
+                     options(Path),
+                     target.asInstanceOf[ScTypeDefinition].qualifiedName)
       }
 
-      if (options.contains(File) || options.contains(Offset) || options.contains(Line)) {
-        val actual = target.getContainingFile.getVirtualFile.getNameWithoutExtension
-        val expected = if (!options.contains(File) || options(File) == "this") {
-          reference.getElement.getContainingFile.getVirtualFile.getNameWithoutExtension
-        } else options(File)
+      if (options.contains(File) || options.contains(Offset) ||
+          options.contains(Line)) {
+        val actual =
+          target.getContainingFile.getVirtualFile.getNameWithoutExtension
+        val expected =
+          if (!options.contains(File) || options(File) == "this") {
+            reference.getElement.getContainingFile.getVirtualFile.getNameWithoutExtension
+          } else options(File)
         assertEquals(File, expected, actual)
       }
 
-      val expectedName = if (options.contains(Name)) options(Name) else referenceName
+      val expectedName =
+        if (options.contains(Name)) options(Name) else referenceName
       assertEquals(Name, expectedName, target.name)
 
       if (options.contains(Line)) {
@@ -176,19 +206,24 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
       if (options.contains(Type)) {
         val expectedClass = Class.forName(options(Type))
         val targetClass = target.getClass
-        val text = Type + " - expected: " + expectedClass.getSimpleName + ", actual: " + targetClass.getSimpleName
-        Assert.assertTrue(message(text), expectedClass.isAssignableFrom(targetClass))
+        val text =
+          Type + " - expected: " + expectedClass.getSimpleName + ", actual: " +
+          targetClass.getSimpleName
+        Assert.assertTrue(
+            message(text), expectedClass.isAssignableFrom(targetClass))
       }
     }
   }
 
   def lineOf(element: PsiElement) = {
-    element.getContainingFile.getText.substring(0, element.getTextOffset).count(_ == '\n') + 1
+    element.getContainingFile.getText
+      .substring(0, element.getTextOffset)
+      .count(_ == '\n') + 1
   }
 
   def format(text: String, message: String, line: Int) = {
-    val lines = text.lines.zipWithIndex.map(p => if (p._2 + 1 == line) p._1 + " // " + message else p._1)
+    val lines = text.lines.zipWithIndex
+      .map(p => if (p._2 + 1 == line) p._1 + " // " + message else p._1)
     "\n\n" + lines.mkString("\n") + "\n"
   }
 }
-

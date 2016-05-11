@@ -15,9 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Pavel.Fatin, 25.05.2010
- */
-
+  * Pavel.Fatin, 25.05.2010
+  */
 trait ScopeAnnotator {
   private type Definitions = List[ScNamedElement]
   private val TypeParameters = """\[.*\]""".r
@@ -25,19 +24,20 @@ trait ScopeAnnotator {
   def annotateScope(element: PsiElement, holder: AnnotationHolder) {
     if (!element.isScope) return
     def checkScope(elements: PsiElement*) {
-      val (types, terms, parameters, caseClasses, objects) = definitionsIn(elements : _*)
+      val (types, terms, parameters, caseClasses, objects) = definitionsIn(
+          elements: _*)
 
       val jointTerms = terms ::: parameters
 
-      val complexClashes = clashesOf(jointTerms ::: objects) :::
-        clashesOf(types ::: caseClasses) :::
-        clashesOf(jointTerms ::: caseClasses)
+      val complexClashes =
+        clashesOf(jointTerms ::: objects) ::: clashesOf(types ::: caseClasses) ::: clashesOf(
+            jointTerms ::: caseClasses)
 
       val clashes = (complexClashes.distinct diff clashesOf(parameters))
 
-      clashes.foreach {
-        e =>
-          holder.createErrorAnnotation(e.getNameIdentifier,
+      clashes.foreach { e =>
+        holder.createErrorAnnotation(
+            e.getNameIdentifier,
             ScalaBundle.message("id.is.already.defined", nameOf(e)))
       }
     }
@@ -67,15 +67,17 @@ trait ScopeAnnotator {
     var objects: Definitions = List()
     elements.foreach {
       case element =>
-        if(element.isInstanceOf[ScTemplateBody]) element match {
-          case Parent(Parent(aClass: ScClass)) => parameters :::= aClass.parameters.toList
-          case _ =>
-        }
+        if (element.isInstanceOf[ScTemplateBody])
+          element match {
+            case Parent(Parent(aClass: ScClass)) =>
+              parameters :::= aClass.parameters.toList
+            case _ =>
+          }
 
         element.children.foreach {
           _.depthFirst(!_.isScope).foreach {
             case e: ScObject => objects ::= e
-            case e: ScFunction => if(e.typeParameters.isEmpty) terms ::= e
+            case e: ScFunction => if (e.typeParameters.isEmpty) terms ::= e
             case e: ScTypedDefinition => terms ::= e
             case e: ScTypeAlias => types ::= e
             case e: ScTypeParam => types ::= e
@@ -96,15 +98,17 @@ trait ScopeAnnotator {
   }
 
   private def nameOf(element: ScNamedElement): String = element match {
-    case f: ScFunction if !f.getParent.isInstanceOf[ScBlockExpr] => f.name + signatureOf(f)
+    case f: ScFunction if !f.getParent.isInstanceOf[ScBlockExpr] =>
+      f.name + signatureOf(f)
     case _ => element.name
   }
 
   private def signatureOf(f: ScFunction): String = {
-    if(f.parameters.isEmpty)
-      ""
+    if (f.parameters.isEmpty) ""
     else
-      f.paramClauses.clauses.map(clause => format(clause.parameters, clause.paramTypes)).mkString
+      f.paramClauses.clauses
+        .map(clause => format(clause.parameters, clause.paramTypes))
+        .mkString
   }
 
   private def eraseType(s: String) =
@@ -113,7 +117,8 @@ trait ScopeAnnotator {
 
   private def format(parameters: Seq[ScParameter], types: Seq[ScType]) = {
     val parts = parameters.zip(types).map {
-      case (p, t) => eraseType(t.canonicalText) + (if(p.isRepeatedParameter) "*" else "")
+      case (p, t) =>
+        eraseType(t.canonicalText) + (if (p.isRepeatedParameter) "*" else "")
     }
     "(%s)".format(parts.mkString(", "))
   }

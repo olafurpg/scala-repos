@@ -3,9 +3,11 @@ import java.io.{Console => _, _}
 
 object Test extends DirectTest {
 
-  override def extraSettings: String = "-usejavacp -Ydelambdafy:method -Xprint:lambdalift -d " + testOutput.path
+  override def extraSettings: String =
+    "-usejavacp -Ydelambdafy:method -Xprint:lambdalift -d " + testOutput.path
 
-  override def code = """class T(classParam: String) {
+  override def code =
+    """class T(classParam: String) {
                         |  val field: String = ""
                         |  def foo(methodParam: String) = {val methodLocal = "" ; () => classParam + field + methodParam + methodLocal }
                         |  def bar(barParam: String) = { trait MethodLocalTrait { print(barParam) }; object MethodLocalObject extends MethodLocalTrait; MethodLocalObject }

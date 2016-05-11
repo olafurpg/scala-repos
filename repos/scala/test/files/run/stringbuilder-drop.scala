@@ -4,4 +4,3 @@ object Test {
     assert("" + s == "hello worl")
   }
 }
-

@@ -11,41 +11,42 @@ import algebra.laws.{GroupLaws, OrderLaws}
 class EvalTests extends CatsSuite {
 
   /**
-   * Class for spooky side-effects and action-at-a-distance.
-   *
-   * It is basically a mutable counter that can be used to measure how
-   * many times an otherwise pure function is being evaluted.
-   */
+    * Class for spooky side-effects and action-at-a-distance.
+    *
+    * It is basically a mutable counter that can be used to measure how
+    * many times an otherwise pure function is being evaluted.
+    */
   class Spooky(var counter: Int = 0) {
     def increment(): Unit = counter += 1
   }
 
   /**
-   * This method creates a Eval[A] instance (along with a
-   * corresponding Spooky instance) from an initial `value` using the
-   * given `init` function.
-   *
-   * It will then proceed to call `value` 0-or-more times, verifying
-   * that the result is equal to `value`, and also that the
-   * appropriate number of evaluations are occuring using the
-   * `numCalls` function.
-   *
-   * In other words, each invocation of run says:
-   *
-   *  1. What underlying `value` to use.
-   *  2. How to create Eval instances (memoized, eager, or by-name).
-   *  3. How many times we expect the value to be computed.
-   */
-  def runValue[A: Eq](value: A)(init: A => (Spooky, Eval[A]))(numCalls: Int => Int): Unit = {
+    * This method creates a Eval[A] instance (along with a
+    * corresponding Spooky instance) from an initial `value` using the
+    * given `init` function.
+    *
+    * It will then proceed to call `value` 0-or-more times, verifying
+    * that the result is equal to `value`, and also that the
+    * appropriate number of evaluations are occuring using the
+    * `numCalls` function.
+    *
+    * In other words, each invocation of run says:
+    *
+    *  1. What underlying `value` to use.
+    *  2. How to create Eval instances (memoized, eager, or by-name).
+    *  3. How many times we expect the value to be computed.
+    */
+  def runValue[A : Eq](value: A)(init: A => (Spooky, Eval[A]))(
+      numCalls: Int => Int): Unit = {
     var spin = 0
     def nTimes(n: Int, numEvals: Int): Unit = {
       val (spooky, lz) = init(value)
       (0 until n).foreach { _ =>
         val result = lz.value
-        result should === (value)
+        result should ===(value)
         spin ^= result.##
       }
-      spooky.counter should === (numEvals)
+      spooky.counter should ===(numEvals)
     }
     (0 to 2).foreach(n => nTimes(n, numCalls(n)))
   }
@@ -80,14 +81,14 @@ class EvalTests extends CatsSuite {
     runValue(999)(always)(n => n)
   }
 
-  test(".value should evaluate only once on the result of .memoize"){
+  test(".value should evaluate only once on the result of .memoize") {
     forAll { i: Eval[Int] =>
       val spooky = new Spooky
       val i2 = i.map(_ => spooky.increment).memoize
       i2.value
-      spooky.counter should === (1)
+      spooky.counter should ===(1)
       i2.value
-      spooky.counter should === (1)
+      spooky.counter should ===(1)
     }
   }
 
@@ -101,12 +102,14 @@ class EvalTests extends CatsSuite {
 
   {
     implicit val A = ListWrapper.monoid[Int]
-    checkAll("Eval[ListWrapper[Int]]", GroupLaws[Eval[ListWrapper[Int]]].monoid)
+    checkAll(
+        "Eval[ListWrapper[Int]]", GroupLaws[Eval[ListWrapper[Int]]].monoid)
   }
 
   {
     implicit val A = ListWrapper.semigroup[Int]
-    checkAll("Eval[ListWrapper[Int]]", GroupLaws[Eval[ListWrapper[Int]]].semigroup)
+    checkAll(
+        "Eval[ListWrapper[Int]]", GroupLaws[Eval[ListWrapper[Int]]].semigroup)
   }
 
   {
@@ -116,7 +119,8 @@ class EvalTests extends CatsSuite {
 
   {
     implicit val A = ListWrapper.partialOrder[Int]
-    checkAll("Eval[ListWrapper[Int]]", OrderLaws[Eval[ListWrapper[Int]]].partialOrder)
+    checkAll("Eval[ListWrapper[Int]]",
+             OrderLaws[Eval[ListWrapper[Int]]].partialOrder)
   }
 
   {
@@ -132,14 +136,14 @@ class EvalTests extends CatsSuite {
   test("cokleisli left identity") {
     forAll { (fa: Eval[Int], f: Eval[Int] => Long) =>
       val isEq = ComonadLaws[Eval].cokleisliLeftIdentity(fa, f)
-      isEq.lhs should === (isEq.rhs)
+      isEq.lhs should ===(isEq.rhs)
     }
   }
 
   test("cokleisli right identity") {
     forAll { (fa: Eval[Int], f: Eval[Int] => Long) =>
       val isEq = ComonadLaws[Eval].cokleisliRightIdentity(fa, f)
-      isEq.lhs should === (isEq.rhs)
+      isEq.lhs should ===(isEq.rhs)
     }
   }
 }

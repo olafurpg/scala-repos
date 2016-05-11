@@ -5,8 +5,13 @@ import io.prediction.controller.Engine
 import io.prediction.controller._
 
 class VanillaEvaluator
-  extends Evaluator[EmptyEvaluationInfo, Query, PredictedResult,
-  ActualResult, Int, Int, String] {
+    extends Evaluator[EmptyEvaluationInfo,
+                      Query,
+                      PredictedResult,
+                      ActualResult,
+                      Int,
+                      Int,
+                      String] {
 
   def evaluateUnit(q: Query, p: PredictedResult, a: ActualResult): Int = {
     q.q - p.p

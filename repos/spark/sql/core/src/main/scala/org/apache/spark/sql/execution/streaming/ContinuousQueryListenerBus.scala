@@ -23,21 +23,22 @@ import org.apache.spark.sql.util.ContinuousQueryListener._
 import org.apache.spark.util.ListenerBus
 
 /**
- * A bus to forward events to [[ContinuousQueryListener]]s. This one will wrap received
- * [[ContinuousQueryListener.Event]]s as WrappedContinuousQueryListenerEvents and send them to the
- * Spark listener bus. It also registers itself with Spark listener bus, so that it can receive
- * WrappedContinuousQueryListenerEvents, unwrap them as ContinuousQueryListener.Events and
- * dispatch them to ContinuousQueryListener.
- */
+  * A bus to forward events to [[ContinuousQueryListener]]s. This one will wrap received
+  * [[ContinuousQueryListener.Event]]s as WrappedContinuousQueryListenerEvents and send them to the
+  * Spark listener bus. It also registers itself with Spark listener bus, so that it can receive
+  * WrappedContinuousQueryListenerEvents, unwrap them as ContinuousQueryListener.Events and
+  * dispatch them to ContinuousQueryListener.
+  */
 class ContinuousQueryListenerBus(sparkListenerBus: LiveListenerBus)
-  extends SparkListener with ListenerBus[ContinuousQueryListener, ContinuousQueryListener.Event] {
+    extends SparkListener
+    with ListenerBus[ContinuousQueryListener, ContinuousQueryListener.Event] {
 
   sparkListenerBus.addListener(this)
 
   /**
-   * Post a ContinuousQueryListener event to the Spark listener bus asynchronously. This event will
-   * be dispatched to all ContinuousQueryListener in the thread of the Spark listener bus.
-   */
+    * Post a ContinuousQueryListener event to the Spark listener bus asynchronously. This event will
+    * be dispatched to all ContinuousQueryListener in the thread of the Spark listener bus.
+    */
   def post(event: ContinuousQueryListener.Event) {
     event match {
       case s: QueryStarted =>
@@ -70,11 +71,12 @@ class ContinuousQueryListenerBus(sparkListenerBus: LiveListenerBus)
   }
 
   /**
-   * Wrapper for StreamingListenerEvent as SparkListenerEvent so that it can be posted to Spark
-   * listener bus.
-   */
+    * Wrapper for StreamingListenerEvent as SparkListenerEvent so that it can be posted to Spark
+    * listener bus.
+    */
   private case class WrappedContinuousQueryListenerEvent(
-      streamingListenerEvent: ContinuousQueryListener.Event) extends SparkListenerEvent {
+      streamingListenerEvent: ContinuousQueryListener.Event)
+      extends SparkListenerEvent {
 
     // Do not log streaming events in event log as history server does not support these events.
     protected[spark] override def logEvent: Boolean = false

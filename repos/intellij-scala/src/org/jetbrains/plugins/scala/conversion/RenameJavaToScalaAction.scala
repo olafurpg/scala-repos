@@ -11,8 +11,8 @@ import org.jetbrains.plugins.scala.util.{NotificationUtil, ScalaUtils}
 import org.jetbrains.plugins.scala.project._
 
 /**
- * @author Alexander Podkhalyuzin
- */
+  * @author Alexander Podkhalyuzin
+  */
 class RenameJavaToScalaAction extends AnAction {
   override def update(e: AnActionEvent) {
     val presentation = e.getPresentation
@@ -45,11 +45,9 @@ class RenameJavaToScalaAction extends AnAction {
         }
       }
       enable()
-    }
-    catch {
+    } catch {
       case e: Exception => disable()
     }
-
   }
 
   def actionPerformed(e: AnActionEvent) {
@@ -69,26 +67,39 @@ class RenameJavaToScalaAction extends AnAction {
                 val directory = jFile.getContainingDirectory
                 val name = jFile.getName.substring(0, jFile.getName.length - 5)
                 val nameWithExtension: String = name + ".scala"
-                val existingFile: VirtualFile = directory.getVirtualFile.findChild(nameWithExtension)
+                val existingFile: VirtualFile =
+                  directory.getVirtualFile.findChild(nameWithExtension)
                 if (existingFile != null) {
-                  NotificationUtil.builder(directory.getProject, s"File $nameWithExtension already exists").
-                    setDisplayType(NotificationDisplayType.BALLOON).
-                    setNotificationType(NotificationType.ERROR).
-                    setGroup("rename.java.to.scala").
-                    setTitle("Cannot create file").
-                    show()
+                  NotificationUtil
+                    .builder(directory.getProject,
+                             s"File $nameWithExtension already exists")
+                    .setDisplayType(NotificationDisplayType.BALLOON)
+                    .setNotificationType(NotificationType.ERROR)
+                    .setGroup("rename.java.to.scala")
+                    .setTitle("Cannot create file")
+                    .show()
                   return
                 }
                 val file = directory.createFile(name + ".scala")
                 val newText = JavaToScala.convertPsiToText(jFile).trim
-                val document = PsiDocumentManager.getInstance(file.getProject).getDocument(file)
+                val document = PsiDocumentManager
+                  .getInstance(file.getProject)
+                  .getDocument(file)
                 document.insertString(0, newText)
-                PsiDocumentManager.getInstance(file.getProject).commitDocument(document)
-                val manager: CodeStyleManager = CodeStyleManager.getInstance(file.getProject)
-                val settings = CodeStyleSettingsManager.getSettings(file.getProject).getCommonSettings(ScalaFileType.SCALA_LANGUAGE)
-                val keep_blank_lines_in_code = settings.KEEP_BLANK_LINES_IN_CODE
-                val keep_blank_lines_in_declarations = settings.KEEP_BLANK_LINES_IN_DECLARATIONS
-                val keep_blank_lines_before_rbrace = settings.KEEP_BLANK_LINES_BEFORE_RBRACE
+                PsiDocumentManager
+                  .getInstance(file.getProject)
+                  .commitDocument(document)
+                val manager: CodeStyleManager =
+                  CodeStyleManager.getInstance(file.getProject)
+                val settings = CodeStyleSettingsManager
+                  .getSettings(file.getProject)
+                  .getCommonSettings(ScalaFileType.SCALA_LANGUAGE)
+                val keep_blank_lines_in_code =
+                  settings.KEEP_BLANK_LINES_IN_CODE
+                val keep_blank_lines_in_declarations =
+                  settings.KEEP_BLANK_LINES_IN_DECLARATIONS
+                val keep_blank_lines_before_rbrace =
+                  settings.KEEP_BLANK_LINES_BEFORE_RBRACE
                 settings.KEEP_BLANK_LINES_IN_CODE = 0
                 settings.KEEP_BLANK_LINES_IN_DECLARATIONS = 0
                 settings.KEEP_BLANK_LINES_BEFORE_RBRACE = 0

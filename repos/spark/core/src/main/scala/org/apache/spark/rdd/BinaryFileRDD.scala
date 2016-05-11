@@ -17,7 +17,7 @@
 
 package org.apache.spark.rdd
 
-import org.apache.hadoop.conf.{ Configurable, Configuration }
+import org.apache.hadoop.conf.{Configurable, Configuration}
 import org.apache.hadoop.io.Writable
 import org.apache.hadoop.mapreduce._
 import org.apache.hadoop.mapreduce.task.JobContextImpl
@@ -32,7 +32,8 @@ private[spark] class BinaryFileRDD[T](
     valueClass: Class[T],
     conf: Configuration,
     minPartitions: Int)
-  extends NewHadoopRDD[String, T](sc, inputFormatClass, keyClass, valueClass, conf) {
+    extends NewHadoopRDD[String, T](
+        sc, inputFormatClass, keyClass, valueClass, conf) {
 
   override def getPartitions: Array[Partition] = {
     val inputFormat = inputFormatClass.newInstance
@@ -47,7 +48,8 @@ private[spark] class BinaryFileRDD[T](
     val rawSplits = inputFormat.getSplits(jobContext).toArray
     val result = new Array[Partition](rawSplits.size)
     for (i <- 0 until rawSplits.size) {
-      result(i) = new NewHadoopPartition(id, i, rawSplits(i).asInstanceOf[InputSplit with Writable])
+      result(i) = new NewHadoopPartition(
+          id, i, rawSplits(i).asInstanceOf[InputSplit with Writable])
     }
     result
   }

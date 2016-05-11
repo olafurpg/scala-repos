@@ -4,12 +4,13 @@ import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.annotator.{AnnotatorTestBase, Error, Message}
 
 /**
- * Pavel Fatin
- */
-
-class FinalClassInheritanceTest extends AnnotatorTestBase(FinalClassInheritance) {
+  * Pavel Fatin
+  */
+class FinalClassInheritanceTest
+    extends AnnotatorTestBase(FinalClassInheritance) {
   private val Message = "Illegal inheritance from final class (\\w+)".r
-  private val ValueClassMessage = ScalaBundle.message("illegal.inheritance.from.value.class", "C")
+  private val ValueClassMessage =
+    ScalaBundle.message("illegal.inheritance.from.value.class", "C")
 
   def testOrdinaryClass(): Unit = {
     assertNothing(messages("class C; new C"))
@@ -39,10 +40,14 @@ class FinalClassInheritanceTest extends AnnotatorTestBase(FinalClassInheritance)
     assertMatches(messages("final class C; new Object with C {}"))(expectation)
     assertMatches(messages("final class C; class X extends C"))(expectation)
     assertMatches(messages("final class C; class X extends C {}"))(expectation)
-    assertMatches(messages("final class C; class X extends C with Object"))(expectation)
-    assertMatches(messages("final class C; class X extends C with Object {}"))(expectation)
-    assertMatches(messages("final class C; class X extends Object with C"))(expectation)
-    assertMatches(messages("final class C; class X extends Object with C {}"))(expectation)
+    assertMatches(messages("final class C; class X extends C with Object"))(
+        expectation)
+    assertMatches(messages("final class C; class X extends C with Object {}"))(
+        expectation)
+    assertMatches(messages("final class C; class X extends Object with C"))(
+        expectation)
+    assertMatches(messages("final class C; class X extends Object with C {}"))(
+        expectation)
   }
 
   def testValueClass(): Unit = {
@@ -51,7 +56,10 @@ class FinalClassInheritanceTest extends AnnotatorTestBase(FinalClassInheritance)
     }
 
     assertNothing(messages("class C(val x: Int) extends AnyVal; new C"))
-    assertMatches(messages("class C(val x: Int) extends AnyVal; new C {}"))(expectation)
-    assertMatches(messages("class C(val x: Int) extends AnyVal; class X extends C(2)"))(expectation)
+    assertMatches(messages("class C(val x: Int) extends AnyVal; new C {}"))(
+        expectation)
+    assertMatches(
+        messages("class C(val x: Int) extends AnyVal; class X extends C(2)"))(
+        expectation)
   }
 }

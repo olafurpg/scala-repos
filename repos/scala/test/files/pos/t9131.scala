@@ -7,6 +7,6 @@ class Test {
     byNameFunc(z => z())
     // okay
     byNameFunc(z => z.apply())
-    byNameFunc(z => {val f = z; f()})
+    byNameFunc(z => { val f = z; f() })
   }
 }

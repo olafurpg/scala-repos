@@ -14,12 +14,16 @@ import org.jetbrains.plugins.hocon.psi.HoconPsiFile
 import org.jetbrains.plugins.scala.extensions._
 
 /**
- * HOCON line comments can start with either '//' or '#'. Unfortunately, only one of them can be declared in
- * [[HoconCommenter]] and so I need this custom enter handler for the other one.
- */
+  * HOCON line comments can start with either '//' or '#'. Unfortunately, only one of them can be declared in
+  * [[HoconCommenter]] and so I need this custom enter handler for the other one.
+  */
 class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
-  override def preprocessEnter(file: PsiFile, editor: Editor, caretOffsetRef: Ref[Integer], caretAdvance: Ref[Integer],
-                               dataContext: DataContext, originalHandler: EditorActionHandler): Result =
+  override def preprocessEnter(file: PsiFile,
+                               editor: Editor,
+                               caretOffsetRef: Ref[Integer],
+                               caretAdvance: Ref[Integer],
+                               dataContext: DataContext,
+                               originalHandler: EditorActionHandler): Result =
     file match {
       case _: HoconPsiFile =>
         // This code is copied from com.intellij.codeInsight.editorActions.enter.EnterInLineCommentHandler
@@ -33,7 +37,8 @@ class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
           val text = document.getText
           if (token.getElementType == HoconTokenType.HashComment) {
             val offset = CharArrayUtil.shiftForward(text, caretOffset, " \t")
-            if (offset < document.getTextLength && text.charAt(offset) != '\n') {
+            if (offset < document.getTextLength &&
+                text.charAt(offset) != '\n') {
               var prefix = "#"
               if (!StringUtil.startsWith(text, offset, prefix)) {
                 if (text.charAt(caretOffset) != ' ' && !prefix.endsWith(" ")) {
@@ -42,7 +47,8 @@ class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
                 document.insertString(caretOffset, prefix)
               } else {
                 val afterPrefix = offset + prefix.length
-                if (afterPrefix < document.getTextLength && text.charAt(afterPrefix) != ' ') {
+                if (afterPrefix < document.getTextLength &&
+                    text.charAt(afterPrefix) != ' ') {
                   document.insertString(afterPrefix, " ")
                 }
                 caretOffsetRef.set(offset)
@@ -54,7 +60,8 @@ class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
       case _ => Result.Continue
     }
 
-  override def postProcessEnter(file: PsiFile, editor: Editor, dataContext: DataContext): Result =
+  override def postProcessEnter(
+      file: PsiFile, editor: Editor, dataContext: DataContext): Result =
     file match {
       case _: HoconPsiFile =>
         val caretModel = editor.getCaretModel
@@ -65,11 +72,12 @@ class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
         def lineNumber(psi: PsiElement) =
           editor.getDocument.getLineNumber(psi.getTextRange.getStartOffset)
         def isHashComment(psi: PsiElement) =
-          psi != null && psi.getNode.getElementType == HoconTokenType.HashComment
+          psi != null &&
+          psi.getNode.getElementType == HoconTokenType.HashComment
 
         if (isHashComment(psiAtOffset) && isHashComment(prevPsi) &&
-          lineNumber(psiAtOffset) == lineNumber(prevPsi) + 1 &&
-          caretOffset == psiAtOffset.getTextRange.getStartOffset) {
+            lineNumber(psiAtOffset) == lineNumber(prevPsi) + 1 &&
+            caretOffset == psiAtOffset.getTextRange.getStartOffset) {
 
           caretModel.moveToOffset(caretOffset + 2)
           Result.Default

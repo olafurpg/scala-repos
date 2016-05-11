@@ -23,37 +23,39 @@ import scala.reflect.ClassTag
 import org.apache.spark.{Partition, TaskContext}
 import org.apache.spark.rdd.RDD
 
-private[mllib]
-class SlidingRDDPartition[T](val idx: Int, val prev: Partition, val tail: Seq[T], val offset: Int)
-  extends Partition with Serializable {
+private[mllib] class SlidingRDDPartition[T](
+    val idx: Int, val prev: Partition, val tail: Seq[T], val offset: Int)
+    extends Partition with Serializable {
   override val index: Int = idx
 }
 
 /**
- * Represents an RDD from grouping items of its parent RDD in fixed size blocks by passing a sliding
- * window over them. The ordering is first based on the partition index and then the ordering of
- * items within each partition. This is similar to sliding in Scala collections, except that it
- * becomes an empty RDD if the window size is greater than the total number of items. It needs to
- * trigger a Spark job if the parent RDD has more than one partitions. To make this operation
- * efficient, the number of items per partition should be larger than the window size and the
- * window size should be small, e.g., 2.
- *
- * @param parent the parent RDD
- * @param windowSize the window size, must be greater than 1
- * @param step step size for windows
- *
- * @see [[org.apache.spark.mllib.rdd.RDDFunctions.sliding(Int, Int)*]]
- * @see [[scala.collection.IterableLike.sliding(Int, Int)*]]
- */
-private[mllib]
-class SlidingRDD[T: ClassTag](@transient val parent: RDD[T], val windowSize: Int, val step: Int)
-  extends RDD[Array[T]](parent) {
+  * Represents an RDD from grouping items of its parent RDD in fixed size blocks by passing a sliding
+  * window over them. The ordering is first based on the partition index and then the ordering of
+  * items within each partition. This is similar to sliding in Scala collections, except that it
+  * becomes an empty RDD if the window size is greater than the total number of items. It needs to
+  * trigger a Spark job if the parent RDD has more than one partitions. To make this operation
+  * efficient, the number of items per partition should be larger than the window size and the
+  * window size should be small, e.g., 2.
+  *
+  * @param parent the parent RDD
+  * @param windowSize the window size, must be greater than 1
+  * @param step step size for windows
+  *
+  * @see [[org.apache.spark.mllib.rdd.RDDFunctions.sliding(Int, Int)*]]
+  * @see [[scala.collection.IterableLike.sliding(Int, Int)*]]
+  */
+private[mllib] class SlidingRDD[T : ClassTag](
+    @transient val parent: RDD[T], val windowSize: Int, val step: Int)
+    extends RDD[Array[T]](parent) {
 
-  require(windowSize > 0 && step > 0 && !(windowSize == 1 && step == 1),
-    "Window size and step must be greater than 0, " +
+  require(
+      windowSize > 0 && step > 0 && !(windowSize == 1 && step == 1),
+      "Window size and step must be greater than 0, " +
       s"and they cannot be both 1, but got windowSize = $windowSize and step = $step.")
 
-  override def compute(split: Partition, context: TaskContext): Iterator[Array[T]] = {
+  override def compute(
+      split: Partition, context: TaskContext): Iterator[Array[T]] = {
     val part = split.asInstanceOf[SlidingRDDPartition[T]]
     (firstParent[T].iterator(part.prev, context) ++ part.tail)
       .drop(part.offset)
@@ -63,7 +65,8 @@ class SlidingRDD[T: ClassTag](@transient val parent: RDD[T], val windowSize: Int
   }
 
   override def getPreferredLocations(split: Partition): Seq[String] =
-    firstParent[T].preferredLocations(split.asInstanceOf[SlidingRDDPartition[T]].prev)
+    firstParent[T].preferredLocations(
+        split.asInstanceOf[SlidingRDDPartition[T]].prev)
 
   override def getPartitions: Array[Partition] = {
     val parentPartitions = parent.partitions
@@ -96,8 +99,8 @@ class SlidingRDD[T: ClassTag](@transient val parent: RDD[T], val windowSize: Int
             j += 1
           }
           if (sizes(i) + tail.length >= offset + windowSize) {
-            partitions +=
-              new SlidingRDDPartition[T](partitionIndex, parentPartitions(i), tail, offset)
+            partitions += new SlidingRDDPartition[T](
+                partitionIndex, parentPartitions(i), tail, offset)
             partitionIndex += 1
           }
         }

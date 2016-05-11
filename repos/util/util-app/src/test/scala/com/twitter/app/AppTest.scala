@@ -21,14 +21,14 @@ object VeryBadApp extends App {
     throw new RuntimeException("this is a bad app")
   }
 
-  def main() = {
-  }
+  def main() = {}
 }
 
 @RunWith(classOf[JUnitRunner])
 class AppTest extends FunSuite {
   test("App: make sure system.exit called on exception from main") {
-    val test1 = new TestApp(() => throw new RuntimeException("simulate main failing"))
+    val test1 =
+      new TestApp(() => throw new RuntimeException("simulate main failing"))
 
     test1.main(Array())
 

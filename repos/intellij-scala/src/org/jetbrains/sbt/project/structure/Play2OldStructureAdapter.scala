@@ -20,24 +20,37 @@ object Play2OldStructureAdapter {
     val projectKeyValueTriples = newData.toSeq.flatMap {
       case (id, baseDir, data) => extractProjectKeyValue(id, baseDir, data)
     }
-    val oldData = projectKeyValueTriples.groupBy(_._2).mapValues(_.map({ case (id, _, v) => (id, v)}))
+    val oldData = projectKeyValueTriples
+      .groupBy(_._2)
+      .mapValues(_.map({ case (id, _, v) => (id, v) }))
 
-    new Play2ProjectData(SbtProjectSystem.Id, avoidSL7005Bug(oldData.mapValues(_.toMap)))
+    new Play2ProjectData(
+        SbtProjectSystem.Id, avoidSL7005Bug(oldData.mapValues(_.toMap)))
   }
 
-  private def extractProjectKeyValue(id: ProjectId, baseDir: File, data: Play2Data): Seq[(ProjectId, String, ParsedValue[_])] =  {
-    val playVersion = data.playVersion.map(v => (PLAY_VERSION, new StringParsedValue(v))).toSeq
-    val confDirectory = data.confDirectory.map(d => (PLAY_CONF_DIR, new StringParsedValue(d.getCanonicalPath))).toSeq
+  private def extractProjectKeyValue(
+      id: ProjectId,
+      baseDir: File,
+      data: Play2Data): Seq[(ProjectId, String, ParsedValue[_])] = {
+    val playVersion =
+      data.playVersion.map(v => (PLAY_VERSION, new StringParsedValue(v))).toSeq
+    val confDirectory = data.confDirectory
+      .map(d => (PLAY_CONF_DIR, new StringParsedValue(d.getCanonicalPath)))
+      .toSeq
 
-    val keyValues = playVersion ++ confDirectory ++ Seq(
-      (TEMPLATES_IMPORT, new SeqStringParsedValue(data.templatesImports)),
-      (ROUTES_IMPORT, new SeqStringParsedValue(data.routesImports)),
-      (SOURCE_DIR, new StringParsedValue(data.sourceDirectory.getCanonicalPath)),
-      (PROJECT_URI, new StringParsedValue(baseDir.getCanonicalFile.toURI.toString))
-    )
+    val keyValues =
+      playVersion ++ confDirectory ++ Seq(
+          (TEMPLATES_IMPORT, new SeqStringParsedValue(data.templatesImports)),
+          (ROUTES_IMPORT, new SeqStringParsedValue(data.routesImports)),
+          (SOURCE_DIR,
+           new StringParsedValue(data.sourceDirectory.getCanonicalPath)),
+          (PROJECT_URI,
+           new StringParsedValue(baseDir.getCanonicalFile.toURI.toString))
+      )
 
-    keyValues.map({ case (k, v) => (id, k.name, v)})
+    keyValues.map({ case (k, v) => (id, k.name, v) })
   }
 
-  @inline private def avoidSL7005Bug[K, V](m: Map[K,V]): Map[K, V] = HashMap(m.toSeq:_*)
+  @inline private def avoidSL7005Bug[K, V](m: Map[K, V]): Map[K, V] =
+    HashMap(m.toSeq: _*)
 }

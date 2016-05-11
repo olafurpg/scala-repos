@@ -8,7 +8,7 @@ object SCL2936 {
       println(v.toString)
     }
     def main(args: Array[String]) {
-      stuff(/*start*/MyEnum(1)/*end*/)
+      stuff( /*start*/ MyEnum(1) /*end*/ )
     }
   }
 }

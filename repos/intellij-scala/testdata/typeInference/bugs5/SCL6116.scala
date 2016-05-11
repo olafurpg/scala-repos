@@ -5,6 +5,6 @@ class SCL6116 {
     def apply(x: String): T
   }
 
-  def useFoo(f: Foo): f.T = /*start*/f.apply("hello")/*end*/
+  def useFoo(f: Foo): f.T = /*start*/ f.apply("hello") /*end*/
 }
 //f.T

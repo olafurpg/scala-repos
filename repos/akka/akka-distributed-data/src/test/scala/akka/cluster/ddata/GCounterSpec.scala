@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 import akka.actor.Address
@@ -166,6 +165,5 @@ class GCounterSpec extends WordSpec with Matchers {
           value4 should be(2L)
       }
     }
-
   }
 }

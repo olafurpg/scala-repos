@@ -20,13 +20,13 @@ package org.apache.spark.util
 import org.apache.spark.SparkConf
 
 /**
- * Customized SparkConf that allows env variables to be overridden.
- */
+  * Customized SparkConf that allows env variables to be overridden.
+  */
 class SparkConfWithEnv(env: Map[String, String]) extends SparkConf(false) {
-  override def getenv(name: String): String = env.getOrElse(name, super.getenv(name))
+  override def getenv(name: String): String =
+    env.getOrElse(name, super.getenv(name))
 
   override def clone: SparkConf = {
     new SparkConfWithEnv(env).setAll(getAll)
   }
-
 }

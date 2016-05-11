@@ -3,9 +3,9 @@ object A {
   def f1[T](x: => T): T = x
   def f2[T](x: () => T): T = x()
 
-  f0(this.getClass)  // ok
+  f0(this.getClass) // ok
   f1(this.getClass)
-  f2(this.getClass)  // ok
+  f2(this.getClass) // ok
 
   // a.scala:7: error: type mismatch;
   //  found   : Class[_ <: A.type]

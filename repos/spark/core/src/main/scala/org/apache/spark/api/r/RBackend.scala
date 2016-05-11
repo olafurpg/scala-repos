@@ -33,8 +33,8 @@ import org.apache.spark.SparkConf
 import org.apache.spark.internal.Logging
 
 /**
- * Netty-based backend server that is used to communicate between R and Java.
- */
+  * Netty-based backend server that is used to communicate between R and Java.
+  */
 private[spark] class RBackend {
 
   private[this] var channelFuture: ChannelFuture = null
@@ -43,7 +43,8 @@ private[spark] class RBackend {
 
   def init(): Int = {
     val conf = new SparkConf()
-    bossGroup = new NioEventLoopGroup(conf.getInt("spark.r.numRBackendThreads", 2))
+    bossGroup = new NioEventLoopGroup(
+        conf.getInt("spark.r.numRBackendThreads", 2))
     val workerGroup = bossGroup
     val handler = new RBackendHandler(this)
 
@@ -55,13 +56,14 @@ private[spark] class RBackend {
       def initChannel(ch: SocketChannel): Unit = {
         ch.pipeline()
           .addLast("encoder", new ByteArrayEncoder())
-          .addLast("frameDecoder",
-            // maxFrameLength = 2G
-            // lengthFieldOffset = 0
-            // lengthFieldLength = 4
-            // lengthAdjustment = 0
-            // initialBytesToStrip = 4, i.e. strip out the length field itself
-            new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
+          .addLast(
+              "frameDecoder",
+              // maxFrameLength = 2G
+              // lengthFieldOffset = 0
+              // lengthFieldLength = 4
+              // lengthAdjustment = 0
+              // initialBytesToStrip = 4, i.e. strip out the length field itself
+              new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
           .addLast("decoder", new ByteArrayDecoder())
           .addLast("handler", handler)
       }
@@ -69,7 +71,11 @@ private[spark] class RBackend {
 
     channelFuture = bootstrap.bind(new InetSocketAddress("localhost", 0))
     channelFuture.syncUninterruptibly()
-    channelFuture.channel().localAddress().asInstanceOf[InetSocketAddress].getPort()
+    channelFuture
+      .channel()
+      .localAddress()
+      .asInstanceOf[InetSocketAddress]
+      .getPort()
   }
 
   def run(): Unit = {
@@ -79,7 +85,10 @@ private[spark] class RBackend {
   def close(): Unit = {
     if (channelFuture != null) {
       // close is a local operation and should finish within milliseconds; timeout just to be safe
-      channelFuture.channel().close().awaitUninterruptibly(10, TimeUnit.SECONDS)
+      channelFuture
+        .channel()
+        .close()
+        .awaitUninterruptibly(10, TimeUnit.SECONDS)
       channelFuture = null
     }
     if (bootstrap != null && bootstrap.group() != null) {
@@ -90,7 +99,6 @@ private[spark] class RBackend {
     }
     bootstrap = null
   }
-
 }
 
 private[spark] object RBackend extends Logging {
@@ -105,7 +113,8 @@ private[spark] object RBackend extends Logging {
     try {
       // bind to random port
       val boundPort = sparkRBackend.init()
-      val serverSocket = new ServerSocket(0, 1, InetAddress.getByName("localhost"))
+      val serverSocket = new ServerSocket(
+          0, 1, InetAddress.getByName("localhost"))
       val listenPort = serverSocket.getLocalPort()
 
       // tell the R process via temporary file

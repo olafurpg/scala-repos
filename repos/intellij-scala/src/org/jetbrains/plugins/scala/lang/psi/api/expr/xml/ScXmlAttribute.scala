@@ -6,10 +6,7 @@ package expr
 package xml
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 21.04.2008
-*/
-
-trait ScXmlAttribute extends ScalaPsiElement {
-
-}
+  * @author Alexander Podkhalyuzin
+  * Date: 21.04.2008
+  */
+trait ScXmlAttribute extends ScalaPsiElement {}

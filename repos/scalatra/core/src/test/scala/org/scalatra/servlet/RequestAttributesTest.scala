@@ -8,4 +8,3 @@ class RequestAttributesTest extends ScalatraFunSuite with AttributesTest {
     def attributesMap = request
   }, "/*")
 }
-

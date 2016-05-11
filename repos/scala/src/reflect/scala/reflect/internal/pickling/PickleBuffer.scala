@@ -9,11 +9,11 @@ package internal
 package pickling
 
 /** Variable length byte arrays, with methods for basic pickling and unpickling.
- *
- *  @param data The initial buffer
- *  @param from The first index where defined data are found
- *  @param to   The first index where new data can be written
- */
+  *
+  *  @param data The initial buffer
+  *  @param from The first index where defined data are found
+  *  @param to   The first index where new data can be written
+  */
 class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
 
   var bytes = data
@@ -40,18 +40,18 @@ class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
   }
 
   /** Write a natural number in big endian format, base 128.
-   *  All but the last digits have bit 0x80 set.
-   */
+    *  All but the last digits have bit 0x80 set.
+    */
   def writeNat(x: Int) =
     writeLongNat(x.toLong & 0x00000000FFFFFFFFL)
 
   /**
-   * Like writeNat, but for longs. This is not the same as
-   * writeLong, which writes in base 256. Note that the
-   * binary representation of LongNat is identical to Nat
-   * if the long value is in the range Int.MIN_VALUE to
-   * Int.MAX_VALUE.
-   */
+    * Like writeNat, but for longs. This is not the same as
+    * writeLong, which writes in base 256. Note that the
+    * binary representation of LongNat is identical to Nat
+    * if the long value is in the range Int.MIN_VALUE to
+    * Int.MAX_VALUE.
+    */
   def writeLongNat(x: Long) {
     def writeNatPrefix(x: Long) {
       val y = x >>> 7
@@ -64,12 +64,12 @@ class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
   }
 
   /** Write a natural number `x` at position `pos`.
-   *  If number is more than one byte, shift rest of array to make space.
-   */
+    *  If number is more than one byte, shift rest of array to make space.
+    */
   def patchNat(pos: Int, x: Int) {
     def patchNatPrefix(x: Int) {
       writeByte(0)
-      Array.copy(bytes, pos, bytes, pos+1, writeIndex - (pos+1))
+      Array.copy(bytes, pos, bytes, pos + 1, writeIndex - (pos + 1))
       bytes(pos) = ((x & 0x7f) | 0x80).toByte
       val y = x >>> 7
       if (y != 0) patchNatPrefix(y)
@@ -80,9 +80,9 @@ class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
   }
 
   /** Write a long number `x` in signed big endian format, base 256.
-   *
-   *  @param x The long number to be written.
-   */
+    *
+    *  @param x The long number to be written.
+    */
   def writeLong(x: Long) {
     val y = x >> 8
     val z = x & 0xff
@@ -98,7 +98,7 @@ class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
   }
 
   /** Read a natural number in big endian format, base 128.
-   *  All but the last digits have bit 0x80 set.*/
+    *  All but the last digits have bit 0x80 set.*/
   def readNat(): Int = readLongNat().toInt
 
   def readLongNat(): Long = {
@@ -107,7 +107,7 @@ class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
     do {
       b = readByte().toLong
       x = (x << 7) + (b & 0x7f)
-    } while ((b & 0x80) != 0L)
+    } while ( (b & 0x80) != 0L)
     x
   }
 
@@ -124,13 +124,12 @@ class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
   }
 
   /** Returns the buffer as a sequence of (Int, Array[Byte]) representing
-   *  (tag, data) of the individual entries.  Saves and restores buffer state.
-   */
-
+    *  (tag, data) of the individual entries.  Saves and restores buffer state.
+    */
   def toIndexedSeq: IndexedSeq[(Int, Array[Byte])] = {
     val saved = readIndex
     readIndex = 0
-    readNat() ; readNat()     // discarding version
+    readNat(); readNat() // discarding version
     val result = new Array[(Int, Array[Byte])](readNat())
 
     result.indices foreach { index =>
@@ -147,26 +146,26 @@ class PickleBuffer(data: Array[Byte], from: Int, to: Int) {
   }
 
   /** Perform operation `op` until the condition
-   *  `readIndex == end` is satisfied.
-   *  Concatenate results into a list.
-   */
+    *  `readIndex == end` is satisfied.
+    *  Concatenate results into a list.
+    */
   def until[T](end: Int, op: () => T): List[T] =
     if (readIndex == end) List() else op() :: until(end, op)
 
   /** Perform operation `op` the number of
-   *  times specified.  Concatenate the results into a list.
-   */
-  def times[T](n: Int, op: ()=>T): List[T] =
-    if (n == 0) List() else op() :: times(n-1, op)
+    *  times specified.  Concatenate the results into a list.
+    */
+  def times[T](n: Int, op: () => T): List[T] =
+    if (n == 0) List() else op() :: times(n - 1, op)
 
   /** Pickle = majorVersion_Nat minorVersion_Nat nbEntries_Nat {Entry}
-   *  Entry  = type_Nat length_Nat [actual entries]
-   *
-   *  Assumes that the ..Version_Nat are already consumed.
-   *
-   *  @return an array mapping entry numbers to locations in
-   *  the byte array where the entries start.
-   */
+    *  Entry  = type_Nat length_Nat [actual entries]
+    *
+    *  Assumes that the ..Version_Nat are already consumed.
+    *
+    *  @return an array mapping entry numbers to locations in
+    *  the byte array where the entries start.
+    */
   def createIndex: Array[Int] = {
     val index = new Array[Int](readNat()) // nbEntries_Nat
     for (i <- 0 until index.length) {

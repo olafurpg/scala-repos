@@ -1,7 +1,7 @@
 package lila.perfStat
 
 import lila.common.LightUser
-import lila.rating.{ PerfType, Perf, Glicko }
+import lila.rating.{PerfType, Perf, Glicko}
 import lila.user.User
 
 import org.joda.time.DateTime
@@ -10,20 +10,21 @@ import play.api.libs.json._
 
 final class JsonView(getLightUser: String => Option[LightUser]) {
 
-  def apply(
-    user: User,
-    stat: PerfStat,
-    rank: Option[Int],
-    ratingDistribution: Option[List[Int]]) = Json.obj(
-    "user" -> user,
-    "perf" -> user.perfs(stat.perfType),
-    "rank" -> rank,
-    "percentile" -> ratingDistribution.map { distrib =>
-      lila.user.Stat.percentile(distrib, user.perfs(stat.perfType).intRating) match {
-        case (under, sum) => Math.round(under * 1000.0 / sum) / 10.0
-      }
-    },
-    "stat" -> stat.copy(playStreak = stat.playStreak.checkCurrent))
+  def apply(user: User,
+            stat: PerfStat,
+            rank: Option[Int],
+            ratingDistribution: Option[List[Int]]) =
+    Json.obj(
+        "user" -> user,
+        "perf" -> user.perfs(stat.perfType),
+        "rank" -> rank,
+        "percentile" -> ratingDistribution.map { distrib =>
+          lila.user.Stat
+            .percentile(distrib, user.perfs(stat.perfType).intRating) match {
+            case (under, sum) => Math.round(under * 1000.0 / sum) / 10.0
+          }
+        },
+        "stat" -> stat.copy(playStreak = stat.playStreak.checkCurrent))
 
   private def truncate(v: Double) = lila.common.Maths.truncateAt(v, 2)
 
@@ -35,11 +36,10 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
     Json.obj("name" -> u.username)
   }
   private implicit val glickoWriter: OWrites[Glicko] = OWrites { p =>
-    Json.obj(
-      "rating" -> truncate(p.rating),
-      "deviation" -> truncate(p.deviation),
-      "volatility" -> truncate(p.volatility),
-      "provisional" -> p.provisional)
+    Json.obj("rating" -> truncate(p.rating),
+             "deviation" -> truncate(p.deviation),
+             "volatility" -> truncate(p.volatility),
+             "provisional" -> p.provisional)
   }
   private implicit val perfWriter: OWrites[Perf] = OWrites { p =>
     Json.obj("glicko" -> p.glicko, "nb" -> p.nb, "progress" -> p.progress)
@@ -48,16 +48,13 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
     JsNumber(truncate(a.avg))
   }
   private implicit val perfTypeWriter: OWrites[PerfType] = OWrites { pt =>
-    Json.obj(
-      "key" -> pt.key,
-      "name" -> pt.name)
+    Json.obj("key" -> pt.key, "name" -> pt.name)
   }
   private implicit val userIdWriter: OWrites[UserId] = OWrites { u =>
     val light = getLightUser(u.value)
-    Json.obj(
-      "id" -> u.value,
-      "name" -> light.fold(u.value)(_.name),
-      "title" -> light.flatMap(_.title))
+    Json.obj("id" -> u.value,
+             "name" -> light.fold(u.value)(_.name),
+             "title" -> light.flatMap(_.title))
   }
   private implicit val ratingAtWrites = Json.writes[RatingAt]
   private implicit val resultWrites = Json.writes[Result]

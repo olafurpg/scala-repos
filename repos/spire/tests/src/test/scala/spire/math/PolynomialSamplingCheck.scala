@@ -6,7 +6,6 @@ import spire.math.poly._
 import spire.std.bigDecimal._
 import spire.syntax.euclideanRing._
 
-
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
@@ -16,7 +15,8 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class PolynomialSamplingCheck
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import PolynomialSetup._
 
@@ -27,8 +27,9 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
   runDense[Rational]("rational")
   runSparse[Rational]("rational")
 
-  def runDense[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
-    implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
+  def runDense[A : Arbitrary : Eq : Field : ClassTag](typ: String): Unit = {
+    implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(
+        for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
       Polynomial(ts.take(6)).toDense
@@ -36,8 +37,9 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
     runTest[A](s"$typ/dense")
   }
 
-  def runSparse[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
-    implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
+  def runSparse[A : Arbitrary : Eq : Field : ClassTag](typ: String): Unit = {
+    implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(
+        for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
       Polynomial(ts.take(6)).toSparse
@@ -45,7 +47,8 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
     runTest[A](s"$typ/sparse")
   }
 
-  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]): Unit = {
+  def runTest[A : Eq : Field : ClassTag](name: String)(
+      implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]): Unit = {
     type P = Polynomial[A]
 
     val zero = Polynomial.zero[A]

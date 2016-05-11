@@ -19,9 +19,7 @@ object ForComprehensionListString {
     for (n <- l) {
       n.size
     }
-
   }
-
 }
 
 class ForComprehensionListString(l: List[String]) {
@@ -35,7 +33,5 @@ class ForComprehensionListString(l: List[String]) {
     for (n <- l) {
       n.size
     }
-
   }
-
 }

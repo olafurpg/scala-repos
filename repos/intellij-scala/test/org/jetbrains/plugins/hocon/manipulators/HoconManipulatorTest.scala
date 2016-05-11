@@ -10,8 +10,9 @@ import scala.reflect.ClassTag
 /**
   * @author ghik
   */
-abstract class HoconManipulatorTest[T <: HoconPsiElement : ClassTag](name: String)
-  extends HoconFileSetTestCase("manipulators/" + name) {
+abstract class HoconManipulatorTest[T <: HoconPsiElement : ClassTag](
+    name: String)
+    extends HoconFileSetTestCase("manipulators/" + name) {
 
   protected def transform(data: Seq[String]): String = {
     val Seq(inputCaret, newContentInBrackets) = data
@@ -21,8 +22,10 @@ abstract class HoconManipulatorTest[T <: HoconPsiElement : ClassTag](name: Strin
     val psiFile = createPseudoPhysicalHoconFile(getProject, input)
 
     inWriteCommandAction {
-      val element = Iterator.iterate(psiFile.findElementAt(offset))(_.getParent)
-        .collectFirst({ case t: T => t }).get
+      val element = Iterator
+        .iterate(psiFile.findElementAt(offset))(_.getParent)
+        .collectFirst({ case t: T => t })
+        .get
       val manipulator = ElementManipulators.getManipulator(element)
       val range = manipulator.getRangeInElement(element)
       manipulator.handleContentChange(element, range, newContent)

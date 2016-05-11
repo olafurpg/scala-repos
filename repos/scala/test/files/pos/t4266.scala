@@ -1,9 +1,9 @@
 object Test {
 
   trait Tensor2Like[
-    @specialized(Int) A1,
-    +D1 <: DomainLike[A1],
-    +D <: Product2DomainLike[D1]
+      @specialized(Int) A1,
+      +D1 <: DomainLike[A1],
+      +D <: Product2DomainLike[D1]
   ] {
     def domain: D;
 
@@ -24,4 +24,3 @@ object Test {
     def _1: D1;
   }
 }
-

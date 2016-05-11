@@ -34,7 +34,8 @@ object Codensity extends CodensityInstances {
     * [[scalaz.Applicative]] and [[scalaz.PlusEmpty]] for `F`, the
     * [[scalaz.MonadPlus]] laws should hold.
     */
-  implicit def codensityMonadPlus[F[_]](implicit F: ApplicativePlus[F]): MonadPlus[Codensity[F, ?]] =
+  implicit def codensityMonadPlus[F[_]](
+      implicit F: ApplicativePlus[F]): MonadPlus[Codensity[F, ?]] =
     new CodensityMonad[F] with MonadPlus[Codensity[F, ?]] {
       def empty[A] =
         new Codensity[F, A] {
@@ -59,7 +60,8 @@ sealed abstract class CodensityInstances {
     new CodensityMonad[F]
 }
 
-private[scalaz] sealed class CodensityMonad[F[_]] extends Monad[Codensity[F, ?]] {
+private[scalaz] sealed class CodensityMonad[F[_]]
+    extends Monad[Codensity[F, ?]] {
   final def point[A](a: => A) = Codensity.pureCodensity(a)
 
   override final def map[A, B](fa: Codensity[F, A])(f: A => B) =

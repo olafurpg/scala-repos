@@ -17,64 +17,84 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import scala.collection.JavaConversions._
 
 /**
- * Nikolay.Tropin
- * 8/20/13
- */
-class ScalaGenerateEqualsWizard(project: Project, aClass: PsiClass, needEquals: Boolean, needHashCode: Boolean)
-        extends {private val builder = new ScalaGenerateEqualsWizardBuilder(aClass, needEquals, needHashCode)}
-        with AbstractGenerateEqualsWizard[PsiClass, ScNamedElement, ScalaMemberInfo](project, builder) {
+  * Nikolay.Tropin
+  * 8/20/13
+  */
+class ScalaGenerateEqualsWizard(project: Project,
+                                aClass: PsiClass,
+                                needEquals: Boolean,
+                                needHashCode: Boolean)
+    extends {
+  private val builder =
+    new ScalaGenerateEqualsWizardBuilder(aClass, needEquals, needHashCode)
+} with AbstractGenerateEqualsWizard[PsiClass, ScNamedElement, ScalaMemberInfo](
+    project, builder) {
 
-
-  private def getSelectedFields(panel: AbstractMemberSelectionPanel[ScNamedElement, ScalaMemberInfo]): Seq[ScNamedElement] =
-    if(panel == null) Seq.empty
+  private def getSelectedFields(
+      panel: AbstractMemberSelectionPanel[ScNamedElement, ScalaMemberInfo])
+    : Seq[ScNamedElement] =
+    if (panel == null) Seq.empty
     else panel.getTable.getSelectedMemberInfos.map(_.getMember).toSeq
 
   def getEqualsFields = getSelectedFields(myEqualsPanel)
   def getHashCodeFields = getSelectedFields(myHashCodePanel)
 }
 
-private class ScalaGenerateEqualsWizardBuilder(aClass: PsiClass, needEquals: Boolean, needHashCode: Boolean)
-        extends AbstractGenerateEqualsWizard.Builder[PsiClass, ScNamedElement, ScalaMemberInfo] {
+private class ScalaGenerateEqualsWizardBuilder(
+    aClass: PsiClass, needEquals: Boolean, needHashCode: Boolean)
+    extends AbstractGenerateEqualsWizard.Builder[
+        PsiClass, ScNamedElement, ScalaMemberInfo] {
 
   protected def getPsiClass: PsiClass = aClass
 
   private val classFields: util.List[ScalaMemberInfo] = extractFields
-  classFields.foreach {info =>
+  classFields.foreach { info =>
     if (GenerationUtil.isVar(info.getMember)) info.setChecked(false)
     else info.setChecked(true)
   }
 
   private val equalsPanel: ScalaMemberSelectionPanel =
     if (needEquals) {
-    val panel = new ScalaMemberSelectionPanel(CodeInsightBundle.message("generate.equals.hashcode.equals.fields.chooser.title"), classFields, null)
-    panel.getTable.setMemberInfoModel(new ScalaEqualsMemberInfoModel)
-    panel
-  }
-  else null
+      val panel = new ScalaMemberSelectionPanel(
+          CodeInsightBundle.message(
+              "generate.equals.hashcode.equals.fields.chooser.title"),
+          classFields,
+          null)
+      panel.getTable.setMemberInfoModel(new ScalaEqualsMemberInfoModel)
+      panel
+    } else null
 
-  private val fieldsToHashCode = if (needHashCode && needEquals) createFieldToMemberInfoMap(checkedByDefault = true) else null
+  private val fieldsToHashCode =
+    if (needHashCode && needEquals)
+      createFieldToMemberInfoMap(checkedByDefault = true) else null
   private val hashCodeMemberInfos =
     if (needHashCode && needEquals) Collections.emptyList[ScalaMemberInfo]
     else if (needHashCode) classFields
     else null
   private val hashCodePanel =
-  if (needHashCode) {
-    val title = CodeInsightBundle.message("generate.equals.hashcode.hashcode.fields.chooser.title")
-    val panel = new ScalaMemberSelectionPanel(title, hashCodeMemberInfos, null)
-    panel.getTable.setMemberInfoModel(new ScalaHashCodeMemberInfoModel)
-    if (needEquals) updateHashCodeMemberInfos(classFields)
-    panel
-  }
-  else null
+    if (needHashCode) {
+      val title = CodeInsightBundle.message(
+          "generate.equals.hashcode.hashcode.fields.chooser.title")
+      val panel = new ScalaMemberSelectionPanel(
+          title, hashCodeMemberInfos, null)
+      panel.getTable.setMemberInfoModel(new ScalaHashCodeMemberInfoModel)
+      if (needEquals) updateHashCodeMemberInfos(classFields)
+      panel
+    } else null
 
   protected def getClassFields = classFields
-  protected def getFieldsToHashCode: HashMap[ScNamedElement, ScalaMemberInfo] = fieldsToHashCode
-  protected def getEqualsPanel: AbstractMemberSelectionPanel[ScNamedElement, ScalaMemberInfo] = equalsPanel
-  protected def getHashCodePanel: AbstractMemberSelectionPanel[ScNamedElement, ScalaMemberInfo] = hashCodePanel
+  protected def getFieldsToHashCode: HashMap[ScNamedElement, ScalaMemberInfo] =
+    fieldsToHashCode
+  protected def getEqualsPanel: AbstractMemberSelectionPanel[
+      ScNamedElement, ScalaMemberInfo] = equalsPanel
+  protected def getHashCodePanel: AbstractMemberSelectionPanel[
+      ScNamedElement, ScalaMemberInfo] = hashCodePanel
 
-  protected def updateHashCodeMemberInfos(equalsMemberInfos: util.Collection[ScalaMemberInfo]) {
+  protected def updateHashCodeMemberInfos(
+      equalsMemberInfos: util.Collection[ScalaMemberInfo]) {
     if (hashCodePanel == null) return
-    val hashCodeFields = equalsMemberInfos.map(_.getMember).map(fieldsToHashCode.get(_))
+    val hashCodeFields =
+      equalsMemberInfos.map(_.getMember).map(fieldsToHashCode.get(_))
     hashCodePanel.getTable.setMemberInfos(hashCodeFields)
   }
 
@@ -82,9 +102,11 @@ private class ScalaGenerateEqualsWizardBuilder(aClass: PsiClass, needEquals: Boo
     GenerationUtil.getAllFields(aClass).map(new ScalaMemberInfo(_))
   }
 
-  private def createFieldToMemberInfoMap(checkedByDefault: Boolean): HashMap[ScNamedElement, ScalaMemberInfo] = {
+  private def createFieldToMemberInfoMap(
+      checkedByDefault: Boolean): HashMap[ScNamedElement, ScalaMemberInfo] = {
     val memberInfos: util.Collection[ScalaMemberInfo] = extractFields
-    val result: HashMap[ScNamedElement, ScalaMemberInfo] = new HashMap[ScNamedElement, ScalaMemberInfo]
+    val result: HashMap[ScNamedElement, ScalaMemberInfo] =
+      new HashMap[ScNamedElement, ScalaMemberInfo]
     import scala.collection.JavaConversions._
     for (memberInfo <- memberInfos) {
       memberInfo.setChecked(checkedByDefault)
@@ -93,15 +115,16 @@ private class ScalaGenerateEqualsWizardBuilder(aClass: PsiClass, needEquals: Boo
     result
   }
 
-  protected def getFieldsToNonNull: HashMap[ScNamedElement, ScalaMemberInfo] = null
-  protected def getNonNullPanel: AbstractMemberSelectionPanel[ScNamedElement, ScalaMemberInfo] = null
-  protected def updateNonNullMemberInfos(equalsMemberInfos: util.Collection[ScalaMemberInfo]) {}
+  protected def getFieldsToNonNull: HashMap[ScNamedElement, ScalaMemberInfo] =
+    null
+  protected def getNonNullPanel: AbstractMemberSelectionPanel[
+      ScNamedElement, ScalaMemberInfo] = null
+  protected def updateNonNullMemberInfos(
+      equalsMemberInfos: util.Collection[ScalaMemberInfo]) {}
 }
 
-private class ScalaHashCodeMemberInfoModel extends AbstractMemberInfoModel[ScNamedElement, ScalaMemberInfo] {
+private class ScalaHashCodeMemberInfoModel
+    extends AbstractMemberInfoModel[ScNamedElement, ScalaMemberInfo] {}
 
-}
-
-private class ScalaEqualsMemberInfoModel extends AbstractMemberInfoModel[ScNamedElement, ScalaMemberInfo] {
-
-}
+private class ScalaEqualsMemberInfoModel
+    extends AbstractMemberInfoModel[ScNamedElement, ScalaMemberInfo] {}

@@ -22,37 +22,45 @@ import org.apache.spark.sql.catalyst.expressions.{Attribute, AttributeMap, Attri
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
-private[columnar] class ColumnStatisticsSchema(a: Attribute) extends Serializable {
-  val upperBound = AttributeReference(a.name + ".upperBound", a.dataType, nullable = true)()
-  val lowerBound = AttributeReference(a.name + ".lowerBound", a.dataType, nullable = true)()
-  val nullCount = AttributeReference(a.name + ".nullCount", IntegerType, nullable = false)()
-  val count = AttributeReference(a.name + ".count", IntegerType, nullable = false)()
-  val sizeInBytes = AttributeReference(a.name + ".sizeInBytes", LongType, nullable = false)()
+private[columnar] class ColumnStatisticsSchema(a: Attribute)
+    extends Serializable {
+  val upperBound =
+    AttributeReference(a.name + ".upperBound", a.dataType, nullable = true)()
+  val lowerBound =
+    AttributeReference(a.name + ".lowerBound", a.dataType, nullable = true)()
+  val nullCount =
+    AttributeReference(a.name + ".nullCount", IntegerType, nullable = false)()
+  val count =
+    AttributeReference(a.name + ".count", IntegerType, nullable = false)()
+  val sizeInBytes =
+    AttributeReference(a.name + ".sizeInBytes", LongType, nullable = false)()
 
   val schema = Seq(lowerBound, upperBound, nullCount, count, sizeInBytes)
 }
 
-private[columnar] class PartitionStatistics(tableSchema: Seq[Attribute]) extends Serializable {
+private[columnar] class PartitionStatistics(tableSchema: Seq[Attribute])
+    extends Serializable {
   val (forAttribute, schema) = {
     val allStats = tableSchema.map(a => a -> new ColumnStatisticsSchema(a))
-    (AttributeMap(allStats), allStats.map(_._2.schema).foldLeft(Seq.empty[Attribute])(_ ++ _))
+    (AttributeMap(allStats),
+     allStats.map(_._2.schema).foldLeft(Seq.empty[Attribute])(_ ++ _))
   }
 }
 
 /**
- * Used to collect statistical information when building in-memory columns.
- *
- * NOTE: we intentionally avoid using `Ordering[T]` to compare values here because `Ordering[T]`
- * brings significant performance penalty.
- */
+  * Used to collect statistical information when building in-memory columns.
+  *
+  * NOTE: we intentionally avoid using `Ordering[T]` to compare values here because `Ordering[T]`
+  * brings significant performance penalty.
+  */
 private[columnar] sealed trait ColumnStats extends Serializable {
   protected var count = 0
   protected var nullCount = 0
   private[columnar] var sizeInBytes = 0L
 
   /**
-   * Gathers statistics information from `row(ordinal)`.
-   */
+    * Gathers statistics information from `row(ordinal)`.
+    */
   def gatherStats(row: InternalRow, ordinal: Int): Unit = {
     if (row.isNullAt(ordinal)) {
       nullCount += 1
@@ -63,17 +71,18 @@ private[columnar] sealed trait ColumnStats extends Serializable {
   }
 
   /**
-   * Column statistics represented as a single row, currently including closed lower bound, closed
-   * upper bound and null count.
-   */
+    * Column statistics represented as a single row, currently including closed lower bound, closed
+    * upper bound and null count.
+    */
   def collectedStatistics: GenericInternalRow
 }
 
 /**
- * A no-op ColumnStats only used for testing purposes.
- */
+  * A no-op ColumnStats only used for testing purposes.
+  */
 private[columnar] class NoopColumnStats extends ColumnStats {
-  override def gatherStats(row: InternalRow, ordinal: Int): Unit = super.gatherStats(row, ordinal)
+  override def gatherStats(row: InternalRow, ordinal: Int): Unit =
+    super.gatherStats(row, ordinal)
 
   override def collectedStatistics: GenericInternalRow =
     new GenericInternalRow(Array[Any](null, null, nullCount, count, 0L))
@@ -94,7 +103,8 @@ private[columnar] class BooleanColumnStats extends ColumnStats {
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](lower, upper, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](lower, upper, nullCount, count, sizeInBytes))
 }
 
 private[columnar] class ByteColumnStats extends ColumnStats {
@@ -112,7 +122,8 @@ private[columnar] class ByteColumnStats extends ColumnStats {
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](lower, upper, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](lower, upper, nullCount, count, sizeInBytes))
 }
 
 private[columnar] class ShortColumnStats extends ColumnStats {
@@ -130,7 +141,8 @@ private[columnar] class ShortColumnStats extends ColumnStats {
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](lower, upper, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](lower, upper, nullCount, count, sizeInBytes))
 }
 
 private[columnar] class IntColumnStats extends ColumnStats {
@@ -148,7 +160,8 @@ private[columnar] class IntColumnStats extends ColumnStats {
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](lower, upper, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](lower, upper, nullCount, count, sizeInBytes))
 }
 
 private[columnar] class LongColumnStats extends ColumnStats {
@@ -166,7 +179,8 @@ private[columnar] class LongColumnStats extends ColumnStats {
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](lower, upper, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](lower, upper, nullCount, count, sizeInBytes))
 }
 
 private[columnar] class FloatColumnStats extends ColumnStats {
@@ -184,7 +198,8 @@ private[columnar] class FloatColumnStats extends ColumnStats {
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](lower, upper, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](lower, upper, nullCount, count, sizeInBytes))
 }
 
 private[columnar] class DoubleColumnStats extends ColumnStats {
@@ -202,7 +217,8 @@ private[columnar] class DoubleColumnStats extends ColumnStats {
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](lower, upper, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](lower, upper, nullCount, count, sizeInBytes))
 }
 
 private[columnar] class StringColumnStats extends ColumnStats {
@@ -220,7 +236,8 @@ private[columnar] class StringColumnStats extends ColumnStats {
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](lower, upper, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](lower, upper, nullCount, count, sizeInBytes))
 }
 
 private[columnar] class BinaryColumnStats extends ColumnStats {
@@ -232,10 +249,12 @@ private[columnar] class BinaryColumnStats extends ColumnStats {
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](null, null, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](null, null, nullCount, count, sizeInBytes))
 }
 
-private[columnar] class DecimalColumnStats(precision: Int, scale: Int) extends ColumnStats {
+private[columnar] class DecimalColumnStats(precision: Int, scale: Int)
+    extends ColumnStats {
   def this(dt: DecimalType) = this(dt.precision, dt.scale)
 
   protected var upper: Decimal = null
@@ -253,10 +272,12 @@ private[columnar] class DecimalColumnStats(precision: Int, scale: Int) extends C
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](lower, upper, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](lower, upper, nullCount, count, sizeInBytes))
 }
 
-private[columnar] class ObjectColumnStats(dataType: DataType) extends ColumnStats {
+private[columnar] class ObjectColumnStats(dataType: DataType)
+    extends ColumnStats {
   val columnType = ColumnType(dataType)
 
   override def gatherStats(row: InternalRow, ordinal: Int): Unit = {
@@ -267,5 +288,6 @@ private[columnar] class ObjectColumnStats(dataType: DataType) extends ColumnStat
   }
 
   override def collectedStatistics: GenericInternalRow =
-    new GenericInternalRow(Array[Any](null, null, nullCount, count, sizeInBytes))
+    new GenericInternalRow(
+        Array[Any](null, null, nullCount, count, sizeInBytes))
 }

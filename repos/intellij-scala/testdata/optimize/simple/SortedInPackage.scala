@@ -28,4 +28,4 @@ abstract class SortedInPackage {
   val c: Clob
   val b: Blob
 }
-*/
+ */

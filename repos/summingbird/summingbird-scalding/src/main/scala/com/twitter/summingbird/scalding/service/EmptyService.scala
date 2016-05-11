@@ -19,7 +19,9 @@ package com.twitter.summingbird.scalding.service
 import com.twitter.summingbird.scalding._
 
 class EmptyService[K, V] extends ExternalService[K, V] {
-  def lookup[W](getKeys: PipeFactory[(K, W)]): PipeFactory[(K, (W, Option[V]))] =
-    getKeys.map { _.map { _.map { case (t, (k, v)) => (t, (k, (v, None: Option[V]))) } } }
+  def lookup[W](
+      getKeys: PipeFactory[(K, W)]): PipeFactory[(K, (W, Option[V]))] =
+    getKeys.map {
+      _.map { _.map { case (t, (k, v)) => (t, (k, (v, None: Option[V]))) } }
+    }
 }
-

@@ -23,9 +23,9 @@ import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression,
 import org.apache.spark.sql.execution.metric.LongSQLMetric
 
 /**
- * An iterator used to evaluate [[AggregateFunction]]. It assumes the input rows have been
- * sorted by values of [[groupingExpressions]].
- */
+  * An iterator used to evaluate [[AggregateFunction]]. It assumes the input rows have been
+  * sorted by values of [[groupingExpressions]].
+  */
 class SortBasedAggregationIterator(
     groupingExpressions: Seq[NamedExpression],
     valueAttributes: Seq[Attribute],
@@ -34,16 +34,16 @@ class SortBasedAggregationIterator(
     aggregateAttributes: Seq[Attribute],
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
-    newMutableProjection: (Seq[Expression], Seq[Attribute]) => (() => MutableProjection),
+    newMutableProjection: (Seq[Expression],
+    Seq[Attribute]) => (() => MutableProjection),
     numOutputRows: LongSQLMetric)
-  extends AggregationIterator(
-    groupingExpressions,
-    valueAttributes,
-    aggregateExpressions,
-    aggregateAttributes,
-    initialInputBufferOffset,
-    resultExpressions,
-    newMutableProjection) {
+    extends AggregationIterator(groupingExpressions,
+                                valueAttributes,
+                                aggregateExpressions,
+                                aggregateAttributes,
+                                initialInputBufferOffset,
+                                resultExpressions,
+                                newMutableProjection) {
 
   /**
     * Creates a new aggregation buffer and initializes buffer values
@@ -54,15 +54,17 @@ class SortBasedAggregationIterator(
     val bufferRowSize: Int = bufferSchema.length
 
     val genericMutableBuffer = new GenericMutableRow(bufferRowSize)
-    val useUnsafeBuffer = bufferSchema.map(_.dataType).forall(UnsafeRow.isMutable)
+    val useUnsafeBuffer =
+      bufferSchema.map(_.dataType).forall(UnsafeRow.isMutable)
 
-    val buffer = if (useUnsafeBuffer) {
-      val unsafeProjection =
-        UnsafeProjection.create(bufferSchema.map(_.dataType))
-      unsafeProjection.apply(genericMutableBuffer)
-    } else {
-      genericMutableBuffer
-    }
+    val buffer =
+      if (useUnsafeBuffer) {
+        val unsafeProjection =
+          UnsafeProjection.create(bufferSchema.map(_.dataType))
+        unsafeProjection.apply(genericMutableBuffer)
+      } else {
+        genericMutableBuffer
+      }
     initializeBuffer(buffer)
     buffer
   }
@@ -88,7 +90,8 @@ class SortBasedAggregationIterator(
 
   // An SafeProjection to turn UnsafeRow into GenericInternalRow, because UnsafeRow can't be
   // compared to MutableRow (aggregation buffer) directly.
-  private[this] val safeProj: Projection = FromUnsafeProjection(valueAttributes.map(_.dataType))
+  private[this] val safeProj: Projection = FromUnsafeProjection(
+      valueAttributes.map(_.dataType))
 
   protected def initialize(): Unit = {
     if (inputIterator.hasNext) {
@@ -149,7 +152,8 @@ class SortBasedAggregationIterator(
       // Process the current group.
       processCurrentSortedGroup()
       // Generate output row for the current group.
-      val outputRow = generateOutput(currentGroupingKey, sortBasedAggregationBuffer)
+      val outputRow = generateOutput(
+          currentGroupingKey, sortBasedAggregationBuffer)
       // Initialize buffer values for the next group.
       initializeBuffer(sortBasedAggregationBuffer)
       numOutputRows += 1
@@ -162,6 +166,7 @@ class SortBasedAggregationIterator(
 
   def outputForEmptyGroupingKeyWithoutInput(): UnsafeRow = {
     initializeBuffer(sortBasedAggregationBuffer)
-    generateOutput(UnsafeRow.createFromByteArray(0, 0), sortBasedAggregationBuffer)
+    generateOutput(
+        UnsafeRow.createFromByteArray(0, 0), sortBasedAggregationBuffer)
   }
 }

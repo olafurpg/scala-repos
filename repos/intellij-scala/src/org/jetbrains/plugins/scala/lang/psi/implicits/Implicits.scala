@@ -3,15 +3,12 @@ package lang
 package psi
 package implicits
 
-
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 object Implicits {
 
-  def get(t: ScType) : Seq[ScType] = Nil
-
+  def get(t: ScType): Seq[ScType] = Nil
 }

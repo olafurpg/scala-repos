@@ -5,10 +5,10 @@ import org.scalatest.Matchers
 import org.scalatest.WordSpec;
 
 /**
- * A spec that verified that the AkkaException has at least a single argument constructor of type String.
- *
- * This is required to make Akka Exceptions be friends with serialization/deserialization.
- */
+  * A spec that verified that the AkkaException has at least a single argument constructor of type String.
+  *
+  * This is required to make Akka Exceptions be friends with serialization/deserialization.
+  */
 class AkkaExceptionSpec extends WordSpec with Matchers {
 
   "AkkaException" must {

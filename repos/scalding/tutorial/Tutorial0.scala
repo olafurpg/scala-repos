@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 import com.twitter.scalding._
 
 /**
@@ -36,9 +36,7 @@ And the output:
 
 The output should look just like the input, but with line numbers.
 More on this in part 1 of the tutorial.
-**/
-
-
+  **/
 /**
 All jobs in scalding are represented by a subclass of com.twitter.scalding.Job.
 The constructor must take a single com.twitter.scalding.Args, even if, as here,
@@ -46,8 +44,8 @@ we don't use it.
 
 For the scald.rb script to work, name the class to match the file,
 and don't use a package.
-**/
-class Tutorial0(args : Args) extends Job(args) {
+  **/
+class Tutorial0(args: Args) extends Job(args) {
 
   /**
   Both input and output data sources are represented by instances of
@@ -55,7 +53,7 @@ class Tutorial0(args : Args) extends Job(args) {
 
   Scalding comes with some basic source types like TextLine and Tsv.
   There are also many twitter-specific types like MergedAdRequestSource.
-  **/
+    **/
   val input = TextLine("tutorial/data/hello.txt")
   val output = TextLine("tutorial/data/output0.txt")
 
@@ -63,7 +61,7 @@ class Tutorial0(args : Args) extends Job(args) {
   This is the minimal pipeline. Source.read returns a cascading.pipe.Pipe, which represents
   a stream of data. We can transform this stream in many ways, but here we're simply
   asking it to write itself to the output source.
-  **/
+    **/
   input.read.write(output)
 
   /**

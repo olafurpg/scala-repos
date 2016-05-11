@@ -1,7 +1,7 @@
 object Test {
-  case class Foo[+T[_]](activity:T[Long])
+  case class Foo[+T[_]](activity: T[Long])
   type Cell[T] = T
-  def insertCell(u:Foo[Cell]) = ???
+  def insertCell(u: Foo[Cell]) = ???
   insertCell(Foo(5))
 }
 
@@ -35,4 +35,4 @@ object Test {
 -three errors found
 +            ^
 +one error found
-*/
+ */

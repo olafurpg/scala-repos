@@ -4,11 +4,11 @@
 
 package akka.http.scaladsl.server
 
-import akka.http.scaladsl.model.{ HttpHeader, StatusCodes }
+import akka.http.scaladsl.model.{HttpHeader, StatusCodes}
 import akka.http.scaladsl.model.headers._
 
 import scala.concurrent.Future
-import scala.util.{ Success, Failure, Try }
+import scala.util.{Success, Failure, Try}
 
 object ModeledCustomHeaderSpec {
 
@@ -19,7 +19,8 @@ object ModeledCustomHeaderSpec {
     override val name = "apiKey"
     override def parse(value: String) = Try(new ApiTokenHeader(value))
   }
-  final class ApiTokenHeader(token: String) extends ModeledCustomHeader[ApiTokenHeader] {
+  final class ApiTokenHeader(token: String)
+      extends ModeledCustomHeader[ApiTokenHeader] {
     def renderInRequests = false
     def renderInResponses = false
     override val companion = ApiTokenHeader
@@ -27,21 +28,23 @@ object ModeledCustomHeaderSpec {
   }
   //#modeled-api-key-custom-header
 
-  object DifferentHeader extends ModeledCustomHeaderCompanion[DifferentHeader] {
+  object DifferentHeader
+      extends ModeledCustomHeaderCompanion[DifferentHeader] {
     def renderInRequests = false
     def renderInResponses = false
     override val name = "different"
     override def parse(value: String) =
-      if (value contains " ") Failure(new Exception("Contains illegal whitespace!"))
+      if (value contains " ")
+        Failure(new Exception("Contains illegal whitespace!"))
       else Success(new DifferentHeader(value))
   }
-  final class DifferentHeader(token: String) extends ModeledCustomHeader[DifferentHeader] {
+  final class DifferentHeader(token: String)
+      extends ModeledCustomHeader[DifferentHeader] {
     def renderInRequests = false
     def renderInResponses = false
     override val companion = DifferentHeader
     override def value = token
   }
-
 }
 
 class ModeledCustomHeaderSpec extends RoutingSpec {
@@ -84,7 +87,7 @@ class ModeledCustomHeaderSpec extends RoutingSpec {
       //#matching-in-routes
       def extractFromCustomHeader = headerValuePF {
         case t @ ApiTokenHeader(token) ⇒ s"extracted> $t"
-        case raw: RawHeader            ⇒ s"raw> $raw"
+        case raw: RawHeader ⇒ s"raw> $raw"
       }
 
       val routes = extractFromCustomHeader { s ⇒
@@ -113,9 +116,9 @@ class ModeledCustomHeaderSpec extends RoutingSpec {
         DifferentHeader("Hello world") // illegal " "
       }
 
-      ex.getMessage should ===("Unable to construct custom header by parsing: 'Hello world'")
+      ex.getMessage should ===(
+          "Unable to construct custom header by parsing: 'Hello world'")
       ex.getCause.getMessage should include("whitespace")
     }
   }
-
 }

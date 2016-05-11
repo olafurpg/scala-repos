@@ -1,7 +1,4 @@
-
-
 import collection.immutable._
-
 
 // ticket #3508
 object Test {

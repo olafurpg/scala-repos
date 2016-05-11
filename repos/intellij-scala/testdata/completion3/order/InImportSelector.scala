@@ -10,5 +10,5 @@ class InImportSelector {
   }
   implicit def a2c(a: A): C = new C
   val a: A
-  a.foo<caret>
+  a.foo < caret >
 }

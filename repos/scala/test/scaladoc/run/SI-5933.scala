@@ -4,7 +4,8 @@ import scala.tools.partest.ScaladocModelTest
 object Test extends ScaladocModelTest {
 
   // Test code
-  override def code = """
+  override def code =
+    """
       // This example should compile without errors, and the pattern match should be correctly displayed
 
       import language.higherKinds
@@ -35,9 +36,11 @@ object Test extends ScaladocModelTest {
     val test1 = Test._method("test1")
     val test2 = Test._method("test2")
 
-    def assertEqual(s1: String, s2: String) = assert(s1 == s2, s1 + " == " + s2)
+    def assertEqual(s1: String, s2: String) =
+      assert(s1 == s2, s1 + " == " + s2)
 
     assertEqual(test1.valueParams(0)(0).defaultValue.get.expression, "lx")
-    assertEqual(test2.valueParams(0)(0).defaultValue.get.expression, "lx match { case 0 => 1; case 3 => 4 }")
+    assertEqual(test2.valueParams(0)(0).defaultValue.get.expression,
+                "lx match { case 0 => 1; case 3 => 4 }")
   }
 }

@@ -15,10 +15,9 @@ import org.scalatest.mock.MockitoSugar
 import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
-class FailFastFactoryTest extends FunSuite
-  with MockitoSugar
-  with Conductors
-  with IntegrationPatience {
+class FailFastFactoryTest
+    extends FunSuite with MockitoSugar with Conductors
+    with IntegrationPatience {
 
   def newCtx() = new {
     val timer = new MockTimer
@@ -30,7 +29,8 @@ class FailFastFactoryTest extends FunSuite
     when(underlying.close(any[Time])).thenReturn(Future.Done)
     val stats = new InMemoryStatsReceiver
     val label = "test"
-    val failfast = new FailFastFactory(underlying, stats, timer, label, backoffs = backoffs)
+    val failfast = new FailFastFactory(
+        underlying, stats, timer, label, backoffs = backoffs)
 
     val p, q, r = new Promise[Service[Int, Int]]
     when(underlying()).thenReturn(p)
@@ -190,7 +190,9 @@ class FailFastFactoryTest extends FunSuite
       val ffe = intercept[FailedFastException] {
         failfast().poll.get.get
       }
-      assert(ffe.getMessage().contains("twitter.github.io/finagle/guide/FAQ.html"))
+      assert(ffe
+            .getMessage()
+            .contains("twitter.github.io/finagle/guide/FAQ.html"))
     }
   }
 
@@ -206,9 +208,9 @@ class FailFastFactoryTest extends FunSuite
         ctx.p() = Throw(new Exception)
         ctx.failfast().poll match {
           case Some(Throw(ex: FailedFastException)) => {
-            ex.serviceName = "threadOne"
-            assert(beat == 0)
-          }
+              ex.serviceName = "threadOne"
+              assert(beat == 0)
+            }
           case _ => throw new Exception
         }
         threadCompletionCount.incrementAndGet()
@@ -220,8 +222,8 @@ class FailFastFactoryTest extends FunSuite
         ctx.p() = Throw(new Exception)
         ctx.failfast().poll match {
           case Some(Throw(ex: FailedFastException)) => {
-            assert(ex.serviceName == SourcedException.UnspecifiedServiceName)
-          }
+              assert(ex.serviceName == SourcedException.UnspecifiedServiceName)
+            }
           case _ => throw new Exception
         }
         threadCompletionCount.incrementAndGet()
@@ -238,7 +240,8 @@ class FailFastFactoryTest extends FunSuite
       val ctx = newCtx()
       import ctx._
 
-      val failfast = new FailFastFactory(underlying, stats, timer, label, backoffs = Stream.empty)
+      val failfast = new FailFastFactory(
+          underlying, stats, timer, label, backoffs = Stream.empty)
       failfast()
     }
   }

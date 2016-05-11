@@ -1,18 +1,12 @@
-
-
-
 import runtime.ScalaRunTime._
-
 
 class Generic[T](a: Array[T]) {
   def apply() = a(0)
 }
 
-
 class Spec[@specialized(AnyRef) T](a: Array[T]) {
   def apply() = a(0)
 }
-
 
 object Test {
 
@@ -51,5 +45,4 @@ object Test {
     }
     sum
   }
-
 }

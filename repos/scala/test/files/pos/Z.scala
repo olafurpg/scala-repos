@@ -6,5 +6,4 @@ object test {
 
   def g(x: X) = x.elem;
   def f(x: AnyRef) = x.toString();
-
 }

@@ -1,8 +1,3 @@
-
-
-
-
-
 // should not result in a stack overflow
 object Test {
   def main(args: Array[String]) {

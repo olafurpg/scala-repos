@@ -6,7 +6,7 @@ import scala.tools.reflect.ToolBox
 object Test extends App {
   def fun() = {
     def z() = 2
-    reify{z}
+    reify { z }
   }
 
   val toolbox = cm.mkToolBox()

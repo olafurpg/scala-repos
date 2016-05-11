@@ -24,26 +24,26 @@ import com.google.common.hash.Hashing
 import org.apache.spark.annotation.DeveloperApi
 
 /**
- * :: DeveloperApi ::
- * A simple open hash table optimized for the append-only use case, where keys
- * are never removed, but the value for each key may be changed.
- *
- * This implementation uses quadratic probing with a power-of-2 hash table
- * size, which is guaranteed to explore all spaces for each key (see
- * http://en.wikipedia.org/wiki/Quadratic_probing).
- *
- * The map can support up to `375809638 (0.7 * 2 ^ 29)` elements.
- *
- * TODO: Cache the hash values of each key? java.util.HashMap does that.
- */
+  * :: DeveloperApi ::
+  * A simple open hash table optimized for the append-only use case, where keys
+  * are never removed, but the value for each key may be changed.
+  *
+  * This implementation uses quadratic probing with a power-of-2 hash table
+  * size, which is guaranteed to explore all spaces for each key (see
+  * http://en.wikipedia.org/wiki/Quadratic_probing).
+  *
+  * The map can support up to `375809638 (0.7 * 2 ^ 29)` elements.
+  *
+  * TODO: Cache the hash values of each key? java.util.HashMap does that.
+  */
 @DeveloperApi
 class AppendOnlyMap[K, V](initialCapacity: Int = 64)
-  extends Iterable[(K, V)] with Serializable {
+    extends Iterable[(K, V)] with Serializable {
 
   import AppendOnlyMap._
 
   require(initialCapacity <= MAXIMUM_CAPACITY,
-    s"Can't make capacity bigger than ${MAXIMUM_CAPACITY} elements")
+          s"Can't make capacity bigger than ${MAXIMUM_CAPACITY} elements")
   require(initialCapacity >= 1, "Invalid initial capacity")
 
   private val LOAD_FACTOR = 0.7
@@ -63,7 +63,8 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
 
   // Triggered by destructiveSortedIterator; the underlying data array may no longer be used
   private var destroyed = false
-  private val destructionMessage = "Map state is invalid from destructive sorting!"
+  private val destructionMessage =
+    "Map state is invalid from destructive sorting!"
 
   /** Get the value for a given key */
   def apply(key: K): V = {
@@ -108,7 +109,7 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
       if (curKey.eq(null)) {
         data(2 * pos) = k
         data(2 * pos + 1) = value.asInstanceOf[AnyRef]
-        incrementSize()  // Since we added a new key
+        incrementSize() // Since we added a new key
         return
       } else if (k.eq(curKey) || k.equals(curKey)) {
         data(2 * pos + 1) = value.asInstanceOf[AnyRef]
@@ -122,9 +123,9 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
   }
 
   /**
-   * Set the value for key to updateFunc(hadValue, oldValue), where oldValue will be the old value
-   * for key, if any, or null otherwise. Returns the newly updated value.
-   */
+    * Set the value for key to updateFunc(hadValue, oldValue), where oldValue will be the old value
+    * for key, if any, or null otherwise. Returns the newly updated value.
+    */
   def changeValue(key: K, updateFunc: (Boolean, V) => V): V = {
     assert(!destroyed, destructionMessage)
     val k = key.asInstanceOf[AnyRef]
@@ -167,7 +168,8 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
 
       /** Get the next value we should return from next(), or null if we're finished iterating */
       def nextValue(): (K, V) = {
-        if (pos == -1) {    // Treat position -1 as looking at the null value
+        if (pos == -1) {
+          // Treat position -1 as looking at the null value
           if (haveNullValue) {
             return (null.asInstanceOf[K], nullValue)
           }
@@ -175,7 +177,8 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
         }
         while (pos < capacity) {
           if (!data(2 * pos).eq(null)) {
-            return (data(2 * pos).asInstanceOf[K], data(2 * pos + 1).asInstanceOf[V])
+            return (data(2 * pos).asInstanceOf[K],
+                    data(2 * pos + 1).asInstanceOf[V])
           }
           pos += 1
         }
@@ -206,15 +209,16 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
   }
 
   /**
-   * Re-hash a value to deal better with hash functions that don't differ in the lower bits.
-   */
+    * Re-hash a value to deal better with hash functions that don't differ in the lower bits.
+    */
   private def rehash(h: Int): Int = Hashing.murmur3_32().hashInt(h).asInt()
 
   /** Double the table's size and re-hash everything */
   protected def growTable() {
     // capacity < MAXIMUM_CAPACITY (2 ^ 29) so capacity * 2 won't overflow
     val newCapacity = capacity * 2
-    require(newCapacity <= MAXIMUM_CAPACITY, s"Can't contain more than ${growThreshold} elements")
+    require(newCapacity <= MAXIMUM_CAPACITY,
+            s"Can't contain more than ${growThreshold} elements")
     val newData = new Array[AnyRef](2 * newCapacity)
     val newMask = newCapacity - 1
     // Insert all our old values into the new array. Note that because our old keys are
@@ -254,10 +258,11 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
   }
 
   /**
-   * Return an iterator of the map in sorted order. This provides a way to sort the map without
-   * using additional memory, at the expense of destroying the validity of the map.
-   */
-  def destructiveSortedIterator(keyComparator: Comparator[K]): Iterator[(K, V)] = {
+    * Return an iterator of the map in sorted order. This provides a way to sort the map without
+    * using additional memory, at the expense of destroying the validity of the map.
+    */
+  def destructiveSortedIterator(
+      keyComparator: Comparator[K]): Iterator[(K, V)] = {
     destroyed = true
     // Pack KV pairs into the front of the underlying array
     var keyIndex, newIndex = 0
@@ -271,7 +276,8 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
     }
     assert(curSize == newIndex + (if (haveNullValue) 1 else 0))
 
-    new Sorter(new KVArraySortDataFormat[K, AnyRef]).sort(data, 0, newIndex, keyComparator)
+    new Sorter(new KVArraySortDataFormat[K, AnyRef])
+      .sort(data, 0, newIndex, keyComparator)
 
     new Iterator[(K, V)] {
       var i = 0
@@ -282,7 +288,8 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
           nullValueReady = false
           (null.asInstanceOf[K], nullValue)
         } else {
-          val item = (data(2 * i).asInstanceOf[K], data(2 * i + 1).asInstanceOf[V])
+          val item =
+            (data(2 * i).asInstanceOf[K], data(2 * i + 1).asInstanceOf[V])
           i += 1
           item
         }
@@ -291,8 +298,8 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
   }
 
   /**
-   * Return whether the next insert will cause the map to grow
-   */
+    * Return whether the next insert will cause the map to grow
+    */
   def atGrowThreshold: Boolean = curSize == growThreshold
 }
 

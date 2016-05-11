@@ -16,7 +16,8 @@ final class Function1Ops[T, R](val self: T => R) extends AnyVal {
 
   def unary_!(implicit m: Memo[T, R]): T => R = m(self)
 
-  def toValidation[E](e: => E)(implicit ev: R =:= Boolean): T => Validation[NonEmptyList[E], T] =
+  def toValidation[E](e: => E)(
+      implicit ev: R =:= Boolean): T => Validation[NonEmptyList[E], T] =
     (t: T) => (if (self(t): Boolean) Success(t) else Failure(NonEmptyList(e)))
 
   def byName: (=> T) => R = t => self(t)
@@ -33,7 +34,8 @@ final class Function1Ops[T, R](val self: T => R) extends AnyVal {
   def succState(implicit e: Enum[T]): State[T, R] =
     e.succState(self)
 
-  def succStateZeroM[Y](k: R => State[T, Y])(implicit e: Enum[T], m: Monoid[T]): Y =
+  def succStateZeroM[Y](k: R => State[T, Y])(
+      implicit e: Enum[T], m: Monoid[T]): Y =
     e.succStateZeroM(self, k)
 
   def succStateZero[Y](k: R => Y)(implicit e: Enum[T], m: Monoid[T]): Y =
@@ -48,7 +50,8 @@ final class Function1Ops[T, R](val self: T => R) extends AnyVal {
   def predState(implicit e: Enum[T]): State[T, R] =
     e.predState(self)
 
-  def predStateZeroM[Y](k: R => State[T, Y])(implicit e: Enum[T], m: Monoid[T]): Y =
+  def predStateZeroM[Y](k: R => State[T, Y])(
+      implicit e: Enum[T], m: Monoid[T]): Y =
     e.predStateZeroM(self, k)
 
   def predStateZero[Y](k: R => Y)(implicit e: Enum[T], m: Monoid[T]): Y =
@@ -59,9 +62,9 @@ final class Function1Ops[T, R](val self: T => R) extends AnyVal {
 
   def predStateMax[Y](k: R => Y)(implicit e: Enum[T]): Option[Y] =
     e.predStateMax(self, k)
-
 }
 
 trait ToFunction1Ops {
-  implicit def ToFunction1OpsFromBoolean[A, B](f: A => B): Function1Ops[A, B] = new Function1Ops(f)
+  implicit def ToFunction1OpsFromBoolean[A, B](f: A => B): Function1Ops[A, B] =
+    new Function1Ops(f)
 }

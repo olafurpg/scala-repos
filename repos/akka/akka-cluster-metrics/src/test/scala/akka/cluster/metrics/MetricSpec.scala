@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.metrics
 
 import org.scalatest.WordSpec
@@ -11,10 +10,11 @@ import scala.util.Failure
 import akka.actor.Address
 import akka.testkit.AkkaSpec
 import akka.testkit.ImplicitSender
-import java.lang.System.{ currentTimeMillis ⇒ newTimestamp }
+import java.lang.System.{currentTimeMillis ⇒ newTimestamp}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class MetricNumericConverterSpec extends WordSpec with Matchers with MetricNumericConverter {
+class MetricNumericConverterSpec
+    extends WordSpec with Matchers with MetricNumericConverter {
 
   "MetricNumericConverter" must {
 
@@ -26,7 +26,8 @@ class MetricNumericConverterSpec extends WordSpec with Matchers with MetricNumer
     }
 
     "define a new metric" in {
-      val Some(metric) = Metric.create(HeapMemoryUsed, 256L, decayFactor = Some(0.18))
+      val Some(metric) =
+        Metric.create(HeapMemoryUsed, 256L, decayFactor = Some(0.18))
       metric.name should ===(HeapMemoryUsed)
       metric.value should ===(256L)
       metric.isSmooth should ===(true)
@@ -35,8 +36,10 @@ class MetricNumericConverterSpec extends WordSpec with Matchers with MetricNumer
 
     "define an undefined value with a None " in {
       Metric.create("x", -1, None).isDefined should ===(false)
-      Metric.create("x", java.lang.Double.NaN, None).isDefined should ===(false)
-      Metric.create("x", Failure(new RuntimeException), None).isDefined should ===(false)
+      Metric.create("x", java.lang.Double.NaN, None).isDefined should ===(
+          false)
+      Metric.create("x", Failure(new RuntimeException), None).isDefined should ===(
+          false)
     }
 
     "recognize whether a metric value is defined" in {
@@ -69,8 +72,14 @@ class NodeMetricsSpec extends WordSpec with Matchers {
     }
 
     "merge 2 NodeMetrics by most recent" in {
-      val sample1 = NodeMetrics(node1, 1, Set(Metric.create("a", 10, None), Metric.create("b", 20, None)).flatten)
-      val sample2 = NodeMetrics(node1, 2, Set(Metric.create("a", 11, None), Metric.create("c", 30, None)).flatten)
+      val sample1 = NodeMetrics(node1,
+                                1,
+                                Set(Metric.create("a", 10, None),
+                                    Metric.create("b", 20, None)).flatten)
+      val sample2 = NodeMetrics(node1,
+                                2,
+                                Set(Metric.create("a", 11, None),
+                                    Metric.create("c", 30, None)).flatten)
 
       val merged = sample1 merge sample2
       merged.timestamp should ===(sample2.timestamp)
@@ -80,8 +89,14 @@ class NodeMetricsSpec extends WordSpec with Matchers {
     }
 
     "not merge 2 NodeMetrics if master is more recent" in {
-      val sample1 = NodeMetrics(node1, 1, Set(Metric.create("a", 10, None), Metric.create("b", 20, None)).flatten)
-      val sample2 = NodeMetrics(node1, 0, Set(Metric.create("a", 11, None), Metric.create("c", 30, None)).flatten)
+      val sample1 = NodeMetrics(node1,
+                                1,
+                                Set(Metric.create("a", 10, None),
+                                    Metric.create("b", 20, None)).flatten)
+      val sample2 = NodeMetrics(node1,
+                                0,
+                                Set(Metric.create("a", 11, None),
+                                    Metric.create("c", 30, None)).flatten)
 
       val merged = sample1 merge sample2 // older and not same
       merged.timestamp should ===(sample1.timestamp)
@@ -89,8 +104,14 @@ class NodeMetricsSpec extends WordSpec with Matchers {
     }
 
     "update 2 NodeMetrics by most recent" in {
-      val sample1 = NodeMetrics(node1, 1, Set(Metric.create("a", 10, None), Metric.create("b", 20, None)).flatten)
-      val sample2 = NodeMetrics(node1, 2, Set(Metric.create("a", 11, None), Metric.create("c", 30, None)).flatten)
+      val sample1 = NodeMetrics(node1,
+                                1,
+                                Set(Metric.create("a", 10, None),
+                                    Metric.create("b", 20, None)).flatten)
+      val sample2 = NodeMetrics(node1,
+                                2,
+                                Set(Metric.create("a", 11, None),
+                                    Metric.create("c", 30, None)).flatten)
 
       val updated = sample1 update sample2
 
@@ -107,9 +128,18 @@ class NodeMetricsSpec extends WordSpec with Matchers {
       val decay = Some(defaultDecayFactor)
       val epsilon = 0.001
 
-      val sample1 = NodeMetrics(node1, 1, Set(Metric.create("a", 1, decay), Metric.create("b", 4, decay)).flatten)
-      val sample2 = NodeMetrics(node1, 2, Set(Metric.create("a", 2, decay), Metric.create("c", 5, decay)).flatten)
-      val sample3 = NodeMetrics(node1, 3, Set(Metric.create("a", 3, decay), Metric.create("d", 6, decay)).flatten)
+      val sample1 = NodeMetrics(node1,
+                                1,
+                                Set(Metric.create("a", 1, decay),
+                                    Metric.create("b", 4, decay)).flatten)
+      val sample2 = NodeMetrics(node1,
+                                2,
+                                Set(Metric.create("a", 2, decay),
+                                    Metric.create("c", 5, decay)).flatten)
+      val sample3 = NodeMetrics(node1,
+                                3,
+                                Set(Metric.create("a", 3, decay),
+                                    Metric.create("d", 6, decay)).flatten)
 
       val updated = sample1 update sample2 update sample3
 
@@ -126,19 +156,20 @@ class NodeMetricsSpec extends WordSpec with Matchers {
       updated.metric("c").map(_.smoothValue).get should ===(5.000 +- epsilon)
       updated.metric("d").map(_.smoothValue).get should ===(6.000 +- epsilon)
     }
-
   }
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class MetricsGossipSpec extends AkkaSpec(MetricsConfig.defaultEnabled) with ImplicitSender with MetricsCollectorFactory {
+class MetricsGossipSpec
+    extends AkkaSpec(MetricsConfig.defaultEnabled) with ImplicitSender
+    with MetricsCollectorFactory {
 
   val collector = createMetricsCollector
 
   /**
-   * sometimes Sigar will not be able to return a valid value (NaN and such) so must ensure they
-   * have the same Metric types
-   */
+    * sometimes Sigar will not be able to return a valid value (NaN and such) so must ensure they
+    * have the same Metric types
+    */
   def newSample(previousSample: Set[Metric]): Set[Metric] = {
     // Metric.equals is based on name equality
     collector.sample.metrics.filter(previousSample.contains) ++ previousSample
@@ -146,8 +177,12 @@ class MetricsGossipSpec extends AkkaSpec(MetricsConfig.defaultEnabled) with Impl
 
   "A MetricsGossip" must {
     "add new NodeMetrics" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554), newTimestamp, collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555), newTimestamp, collector.sample.metrics)
+      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
+                           newTimestamp,
+                           collector.sample.metrics)
+      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
+                           newTimestamp,
+                           collector.sample.metrics)
 
       m1.metrics.size should be > (3)
       m2.metrics.size should be > (3)
@@ -163,26 +198,44 @@ class MetricsGossipSpec extends AkkaSpec(MetricsConfig.defaultEnabled) with Impl
     }
 
     "merge peer metrics" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554), newTimestamp, collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555), newTimestamp, collector.sample.metrics)
+      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
+                           newTimestamp,
+                           collector.sample.metrics)
+      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
+                           newTimestamp,
+                           collector.sample.metrics)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
       val beforeMergeNodes = g1.nodes
 
-      val m2Updated = m2 copy (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
+      val m2Updated =
+        m2 copy
+        (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
       val g2 = g1 :+ m2Updated // merge peers
       g2.nodes.size should ===(2)
       g2.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
-      g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(Some(m2Updated.metrics))
-      g2.nodes collect { case peer if peer.address == m2.address ⇒ peer.timestamp should ===(m2Updated.timestamp) }
+      g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(
+          Some(m2Updated.metrics))
+      g2.nodes collect {
+        case peer if peer.address == m2.address ⇒
+          peer.timestamp should ===(m2Updated.timestamp)
+      }
     }
 
     "merge an existing metric set for a node and update node ring" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554), newTimestamp, collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555), newTimestamp, collector.sample.metrics)
-      val m3 = NodeMetrics(Address("akka.tcp", "sys", "a", 2556), newTimestamp, collector.sample.metrics)
-      val m2Updated = m2 copy (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
+      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
+                           newTimestamp,
+                           collector.sample.metrics)
+      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
+                           newTimestamp,
+                           collector.sample.metrics)
+      val m3 = NodeMetrics(Address("akka.tcp", "sys", "a", 2556),
+                           newTimestamp,
+                           collector.sample.metrics)
+      val m2Updated =
+        m2 copy
+        (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       val g2 = MetricsGossip.empty :+ m3 :+ m2Updated
@@ -191,23 +244,34 @@ class MetricsGossipSpec extends AkkaSpec(MetricsConfig.defaultEnabled) with Impl
 
       // should contain nodes 1,3, and the most recent version of 2
       val mergedGossip = g1 merge g2
-      mergedGossip.nodes.map(_.address) should ===(Set(m1.address, m2.address, m3.address))
-      mergedGossip.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
-      mergedGossip.nodeMetricsFor(m2.address).map(_.metrics) should ===(Some(m2Updated.metrics))
-      mergedGossip.nodeMetricsFor(m3.address).map(_.metrics) should ===(Some(m3.metrics))
+      mergedGossip.nodes.map(_.address) should ===(
+          Set(m1.address, m2.address, m3.address))
+      mergedGossip.nodeMetricsFor(m1.address).map(_.metrics) should ===(
+          Some(m1.metrics))
+      mergedGossip.nodeMetricsFor(m2.address).map(_.metrics) should ===(
+          Some(m2Updated.metrics))
+      mergedGossip.nodeMetricsFor(m3.address).map(_.metrics) should ===(
+          Some(m3.metrics))
       mergedGossip.nodes.foreach(_.metrics.size should be > (3))
-      mergedGossip.nodeMetricsFor(m2.address).map(_.timestamp) should ===(Some(m2Updated.timestamp))
+      mergedGossip.nodeMetricsFor(m2.address).map(_.timestamp) should ===(
+          Some(m2Updated.timestamp))
     }
 
     "get the current NodeMetrics if it exists in the local nodes" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554), newTimestamp, collector.sample.metrics)
+      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
+                           newTimestamp,
+                           collector.sample.metrics)
       val g1 = MetricsGossip.empty :+ m1
       g1.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
     }
 
     "remove a node if it is no longer Up" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554), newTimestamp, collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555), newTimestamp, collector.sample.metrics)
+      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
+                           newTimestamp,
+                           collector.sample.metrics)
+      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
+                           newTimestamp,
+                           collector.sample.metrics)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
@@ -219,8 +283,12 @@ class MetricsGossipSpec extends AkkaSpec(MetricsConfig.defaultEnabled) with Impl
     }
 
     "filter nodes" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554), newTimestamp, collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555), newTimestamp, collector.sample.metrics)
+      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
+                           newTimestamp,
+                           collector.sample.metrics)
+      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
+                           newTimestamp,
+                           collector.sample.metrics)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
@@ -234,19 +302,24 @@ class MetricsGossipSpec extends AkkaSpec(MetricsConfig.defaultEnabled) with Impl
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class MetricValuesSpec extends AkkaSpec(MetricsConfig.defaultEnabled) with MetricsCollectorFactory {
+class MetricValuesSpec
+    extends AkkaSpec(MetricsConfig.defaultEnabled)
+    with MetricsCollectorFactory {
   import akka.cluster.metrics.StandardMetrics._
 
   val collector = createMetricsCollector
 
-  val node1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554), 1, collector.sample.metrics)
-  val node2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555), 1, collector.sample.metrics)
+  val node1 = NodeMetrics(
+      Address("akka.tcp", "sys", "a", 2554), 1, collector.sample.metrics)
+  val node2 = NodeMetrics(
+      Address("akka.tcp", "sys", "a", 2555), 1, collector.sample.metrics)
 
   val nodes: Seq[NodeMetrics] = {
     (1 to 100).foldLeft(List(node1, node2)) { (nodes, _) ⇒
       nodes map { n ⇒
-        n.copy(metrics = collector.sample.metrics.flatMap(latest ⇒ n.metrics.collect {
-          case streaming if latest sameAs streaming ⇒ streaming :+ latest
+        n.copy(metrics = collector.sample.metrics.flatMap(latest ⇒
+                    n.metrics.collect {
+            case streaming if latest sameAs streaming ⇒ streaming :+ latest
         }))
       }
     }
@@ -273,7 +346,12 @@ class MetricValuesSpec extends AkkaSpec(MetricsConfig.defaultEnabled) with Metri
         }
 
         node match {
-          case Cpu(address, _, systemLoadAverageOption, cpuCombinedOption, cpuStolenOption, processors) ⇒
+          case Cpu(address,
+                   _,
+                   systemLoadAverageOption,
+                   cpuCombinedOption,
+                   cpuStolenOption,
+                   processors) ⇒
             processors should be > (0)
             if (systemLoadAverageOption.isDefined)
               systemLoadAverageOption.get should be >= (0.0)
@@ -291,5 +369,4 @@ class MetricValuesSpec extends AkkaSpec(MetricsConfig.defaultEnabled) with Metri
       }
     }
   }
-
 }

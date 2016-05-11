@@ -9,8 +9,10 @@ import akka.http.javadsl.server.Unmarshaller
 import akka.http.scaladsl.unmarshalling.FromMessageUnmarshaller
 
 /**
- * INTERNAL API
- *
- */
-private[http] case class UnmarshallerImpl[T](scalaUnmarshaller: FromMessageUnmarshaller[T])(implicit val classTag: ClassTag[T])
-  extends Unmarshaller[T]
+  * INTERNAL API
+  *
+  */
+private[http] case class UnmarshallerImpl[T](
+    scalaUnmarshaller: FromMessageUnmarshaller[T])(
+    implicit val classTag: ClassTag[T])
+    extends Unmarshaller[T]

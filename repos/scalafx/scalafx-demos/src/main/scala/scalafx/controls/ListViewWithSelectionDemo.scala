@@ -42,11 +42,11 @@ object ListViewWithSelectionDemo extends JFXApp {
   }
 
   val characters = ObservableBuffer[Person](
-    Person("Bungalow ", "Bill"),
-    Person("Dennis", "O’Dell"),
-    Person("Eleanor", "Rigby"),
-    Person("Rocky", "Raccoon"),
-    Person("Peggy", "Sue")
+      Person("Bungalow ", "Bill"),
+      Person("Dennis", "O’Dell"),
+      Person("Eleanor", "Rigby"),
+      Person("Rocky", "Raccoon"),
+      Person("Peggy", "Sue")
   )
 
   stage = new PrimaryStage {
@@ -54,8 +54,8 @@ object ListViewWithSelectionDemo extends JFXApp {
     scene = new Scene {
       content = new ListView[Person] {
         items = characters
-        selectionModel().selectedItem.onChange {
-          (_, _, newValue) => println("Selection Changed: " + newValue)
+        selectionModel().selectedItem.onChange { (_, _, newValue) =>
+          println("Selection Changed: " + newValue)
         }
       }
     }

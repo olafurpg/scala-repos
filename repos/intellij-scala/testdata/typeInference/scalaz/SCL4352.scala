@@ -9,10 +9,10 @@ class BindStopTest {
 
   val ri1 = (x: Int) => some(x)
   val ri2 = (x: Int) => some(x + 1)
-  /*start*/for {
+  /*start*/
+  for {
     j1 <- ri1
     j2 <- ri2
-  } yield j1 *> j2/*end*/
-
+  } yield j1 *> j2 /*end*/
 }
 //(Int) => Option[Int]

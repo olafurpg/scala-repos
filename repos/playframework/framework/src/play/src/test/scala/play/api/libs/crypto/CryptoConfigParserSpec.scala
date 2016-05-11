@@ -4,11 +4,11 @@
 package play.api.libs.crypto
 
 import org.specs2.mutable.Specification
-import play.api.{ PlayException, Configuration, Environment, Mode }
+import play.api.{PlayException, Configuration, Environment, Mode}
 
 /**
- *
- */
+  *
+  */
 class CryptoConfigParserSpec extends Specification {
 
   "Crypto config parser" should {
@@ -16,11 +16,12 @@ class CryptoConfigParserSpec extends Specification {
       val Secret = "abcdefghijklmnopqrs"
 
       def parseSecret(mode: Mode.Mode, secret: Option[String] = None) = {
-        new CryptoConfigParser(Environment.simple(mode = mode),
-          Configuration.reference ++ Configuration.from(
-            secret.map("play.crypto.secret" -> _).toMap +
-              ("play.crypto.aes.transformation" -> "AES")
-          )).get.secret
+        new CryptoConfigParser(
+            Environment.simple(mode = mode),
+            Configuration.reference ++ Configuration.from(
+                secret.map("play.crypto.secret" -> _).toMap +
+                ("play.crypto.aes.transformation" -> "AES")
+            )).get.secret
       }
 
       "load a configured secret in prod" in {

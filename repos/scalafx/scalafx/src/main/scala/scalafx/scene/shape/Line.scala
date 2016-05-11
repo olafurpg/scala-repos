@@ -34,13 +34,15 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
 object Line {
-  implicit def sfxLine2jfx(v: Line): jfxss.Line = if (v != null) v.delegate else null
+  implicit def sfxLine2jfx(v: Line): jfxss.Line =
+    if (v != null) v.delegate else null
 
   def apply(startX: Double, startY: Double, endX: Double, endY: Double) =
     new Line(new jfxss.Line(startX, startY, endX, endY))
 }
 
-class Line(override val delegate: jfxss.Line = new jfxss.Line()) extends Shape(delegate) with SFXDelegate[jfxss.Line] {
+class Line(override val delegate: jfxss.Line = new jfxss.Line())
+    extends Shape(delegate) with SFXDelegate[jfxss.Line] {
   def endX: DoubleProperty = delegate.endXProperty
   def endX_=(v: Double) {
     endX() = v

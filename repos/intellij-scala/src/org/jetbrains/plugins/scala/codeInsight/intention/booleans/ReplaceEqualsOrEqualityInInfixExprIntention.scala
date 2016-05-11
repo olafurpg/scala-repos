@@ -12,19 +12,21 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScInfixExpr
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * @author Ksenia.Sautina
- * @since 4/23/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 4/23/12
+  */
 object ReplaceEqualsOrEqualityInInfixExprIntention {
   def familyName = "Replace equals or equality in infix expression"
 }
 
-class ReplaceEqualsOrEqualityInInfixExprIntention extends PsiElementBaseIntentionAction {
+class ReplaceEqualsOrEqualityInInfixExprIntention
+    extends PsiElementBaseIntentionAction {
   def getFamilyName = ReplaceEqualsOrEqualityInInfixExprIntention.familyName
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = {
-    val infixExpr: ScInfixExpr = PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
+  def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
+    val infixExpr: ScInfixExpr =
+      PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
 
     val oper = infixExpr.operation.nameId.getText
@@ -33,7 +35,8 @@ class ReplaceEqualsOrEqualityInInfixExprIntention extends PsiElementBaseIntentio
 
     val range: TextRange = infixExpr.operation.nameId.getTextRange
     val offset = editor.getCaretModel.getOffset
-    if (!(range.getStartOffset <= offset && offset <= range.getEndOffset)) return false
+    if (!(range.getStartOffset <= offset && offset <= range.getEndOffset))
+      return false
 
     val replaceOper = Map("equals" -> "==", "==" -> "equals")
     setText("Replace '" + oper + "' with '" + replaceOper(oper) + "'")
@@ -42,26 +45,38 @@ class ReplaceEqualsOrEqualityInInfixExprIntention extends PsiElementBaseIntentio
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
-    val infixExpr: ScInfixExpr = PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
+    val infixExpr: ScInfixExpr =
+      PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null || !infixExpr.isValid) return
 
     val start = infixExpr.getTextRange.getStartOffset
 
     val expr = new StringBuilder
     val replaceOper = Map("equals" -> "==", "==" -> "equals")
-    expr.append(infixExpr.getBaseExpr.getText).append(" ").append(replaceOper(infixExpr.operation.nameId.getText)).
-            append(" ").append(infixExpr.getArgExpr.getText)
+    expr
+      .append(infixExpr.getBaseExpr.getText)
+      .append(" ")
+      .append(replaceOper(infixExpr.operation.nameId.getText))
+      .append(" ")
+      .append(infixExpr.getArgExpr.getText)
 
-    val newInfixExpr = ScalaPsiElementFactory.createExpressionFromText(expr.toString(), element.getManager)
+    val newInfixExpr = ScalaPsiElementFactory.createExpressionFromText(
+        expr.toString(), element.getManager)
 
-    val size = newInfixExpr.asInstanceOf[ScInfixExpr].operation.nameId.getTextRange.getStartOffset -
-            newInfixExpr.getTextRange.getStartOffset
+    val size =
+      newInfixExpr
+        .asInstanceOf[ScInfixExpr]
+        .operation
+        .nameId
+        .getTextRange
+        .getStartOffset - newInfixExpr.getTextRange.getStartOffset
 
     inWriteAction {
       infixExpr.replace(newInfixExpr)
       editor.getCaretModel.moveToOffset(start + size)
-      PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
+      PsiDocumentManager
+        .getInstance(project)
+        .commitDocument(editor.getDocument)
     }
-
   }
 }

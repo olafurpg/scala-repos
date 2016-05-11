@@ -10,7 +10,7 @@ class Test {
 
   def test {
     val a = Array[A]()
-    a.update(0, x[A]({new isString(true)})) // !!! allowed
+    a.update(0, x[A]({ new isString(true) })) // !!! allowed
 
     // boils down to
     class X {
@@ -19,6 +19,6 @@ class Test {
     implicit class XOps(x: X) {
       def m(p: Any) {}
     }
-    new X().m(x[A]({new isString(true)})) // !!! allowed
+    new X().m(x[A]({ new isString(true) })) // !!! allowed
   }
 }

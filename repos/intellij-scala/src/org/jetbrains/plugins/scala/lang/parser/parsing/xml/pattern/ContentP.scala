@@ -14,7 +14,6 @@ import scala.annotation.tailrec
   * @author Alexander Podkhalyuzin
   *         Date: 18.04.2008
   */
-
 /*
  *  ContentP ::= [CharData] {ContentP1 [CharData]}
  *
@@ -37,12 +36,10 @@ object ContentP {
     @tailrec
     def subparse() {
       var isReturn = false
-      if (!CDSect.parse(builder) &&
-        !Comment.parse(builder) &&
-        !PI.parse(builder) &&
-        !Reference.parse(builder) &&
-        !ScalaPatterns.parse(builder) &&
-        !XmlPattern.parse(builder)) isReturn = true
+      if (!CDSect.parse(builder) && !Comment.parse(builder) &&
+          !PI.parse(builder) && !Reference.parse(builder) &&
+          !ScalaPatterns.parse(builder) && !XmlPattern.parse(builder))
+        isReturn = true
       builder.getTokenType match {
         case ScalaXmlTokenTypes.XML_DATA_CHARACTERS =>
           builder.advanceLexer()

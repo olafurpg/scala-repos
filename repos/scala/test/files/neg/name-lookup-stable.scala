@@ -17,4 +17,3 @@ class A {
     PrimaryKey // was already ambiguous in 2.10.3
   }
 }
-

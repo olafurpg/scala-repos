@@ -35,15 +35,15 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * GaussianBlur Spec tests.
- *
- *
- */
+  * GaussianBlur Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class GaussianBlurSpec
-  extends SimpleSFXDelegateSpec[jfxse.GaussianBlur, GaussianBlur](classOf[jfxse.GaussianBlur], classOf[GaussianBlur])
-  with InputDelegateSpec[GaussianBlur] {
+    extends SimpleSFXDelegateSpec[jfxse.GaussianBlur, GaussianBlur](
+        classOf[jfxse.GaussianBlur], classOf[GaussianBlur])
+    with InputDelegateSpec[GaussianBlur] {
 
   val inputDelegate = getScalaClassInstance
-
 }

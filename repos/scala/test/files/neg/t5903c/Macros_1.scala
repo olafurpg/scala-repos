@@ -10,9 +10,10 @@ object Interpolation {
 }
 
 object Macros {
-  def unapplyImpl[T: c.WeakTypeTag](c: Context)(x: c.Tree) = {
+  def unapplyImpl[T : c.WeakTypeTag](c: Context)(x: c.Tree) = {
     import c.universe._
-    if (!(c.weakTypeOf[Int] =:= c.weakTypeOf[T])) c.abort(c.enclosingPosition, s"${c.weakTypeOf[T]} is not supported")
+    if (!(c.weakTypeOf[Int] =:= c.weakTypeOf[T]))
+      c.abort(c.enclosingPosition, s"${c.weakTypeOf[T]} is not supported")
     else {
       q"""
         new {

@@ -8,14 +8,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScR
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScCatchBlock}
 
 /**
- * @author Ksenia.Sautina
- * @since 6/25/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 6/25/12
+  */
 class DangerousCatchAllInspection extends LocalInspectionTool {
   override def isEnabledByDefault: Boolean = true
 
-  override def buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+  override def buildVisitor(
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
     new ScalaElementVisitor {
       override def visitCatchBlock(catchBlock: ScCatchBlock) {
         val expr = catchBlock.expression.orNull
@@ -23,7 +23,8 @@ class DangerousCatchAllInspection extends LocalInspectionTool {
         def isInspection: (Boolean, ScCaseClause) = expr match {
           case block: ScBlockExpr =>
             val caseClauses = block.caseClauses.orNull
-            if (caseClauses == null || caseClauses.caseClauses.size != 1) return (false, null)
+            if (caseClauses == null || caseClauses.caseClauses.size != 1)
+              return (false, null)
             val caseClause = caseClauses.caseClause
             if (caseClause == null) return (false, null)
             val pattern = caseClause.pattern.orNull
@@ -40,12 +41,16 @@ class DangerousCatchAllInspection extends LocalInspectionTool {
           val startElement = isInspection._2.firstChild.orNull
           val endElement = isInspection._2.pattern.orNull
           if (startElement == null || endElement == null) return
-          holder.registerProblem(holder.getManager.createProblemDescriptor(startElement, endElement,
-            InspectionBundle.message("catch.all"), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly,
-            new ReplaceDangerousCatchAllQuickFix(isInspection._2)))
+          holder.registerProblem(
+              holder.getManager.createProblemDescriptor(
+                  startElement,
+                  endElement,
+                  InspectionBundle.message("catch.all"),
+                  ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                  isOnTheFly,
+                  new ReplaceDangerousCatchAllQuickFix(isInspection._2)))
         }
       }
     }
   }
 }
-

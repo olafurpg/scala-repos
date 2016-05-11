@@ -3,8 +3,8 @@ object Test {
   trait A extends S { type T <: A; val x: A = null }
   trait B extends S { type T <: B; val x: B = null }
 
-  val a = new A{}
-  val b = new B{}
+  val a = new A {}
+  val b = new B {}
   val y = if (true) a else b
 
   // lub of y should allow for this

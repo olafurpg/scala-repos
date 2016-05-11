@@ -2,7 +2,7 @@
 // Licence: http://www.gnu.org/licenses/gpl-3.0.en.html
 package org.ensime.core
 
-import java.io.{ File => JFile }
+import java.io.{File => JFile}
 import java.nio.charset.Charset
 
 import akka.actor._
@@ -11,11 +11,11 @@ import org.ensime.api._
 import org.ensime.vfs._
 import org.ensime.indexer.SearchService
 import org.ensime.model._
-import org.ensime.util.{ PresentationReporter, ReportHandler, FileUtils }
+import org.ensime.util.{PresentationReporter, ReportHandler, FileUtils}
 import org.slf4j.LoggerFactory
 import org.ensime.util.file._
 
-import scala.reflect.internal.util.{ OffsetPosition, RangePosition, SourceFile }
+import scala.reflect.internal.util.{OffsetPosition, RangePosition, SourceFile}
 import scala.tools.nsc.Settings
 import scala.tools.nsc.interactive.Global
 import scala.util.Try
@@ -23,12 +23,13 @@ import scala.util.Try
 case class CompilerFatalError(e: Throwable)
 
 /**
- * Information necessary to create a javadoc or scaladoc URI for a
- * particular type or type member.
- */
+  * Information necessary to create a javadoc or scaladoc URI for a
+  * particular type or type member.
+  */
 case class DocFqn(pack: String, typeName: String) {
   def mkString: String = if (pack.isEmpty) typeName else pack + "." + typeName
-  def inPackage(prefix: String): Boolean = pack == prefix || pack.startsWith(prefix + ".")
+  def inPackage(prefix: String): Boolean =
+    pack == prefix || pack.startsWith(prefix + ".")
   def javaStdLib: Boolean = inPackage("java") || inPackage("javax")
   def androidStdLib: Boolean = inPackage("android")
   def scalaStdLib: Boolean = inPackage("scala")
@@ -36,10 +37,10 @@ case class DocFqn(pack: String, typeName: String) {
 case class DocSig(fqn: DocFqn, member: Option[String])
 
 /**
- * We generate DocSigs for java and scala at the same time, since we
- * don't know a priori whether the docs will be in scaladoc or javadoc
- * format.
- */
+  * We generate DocSigs for java and scala at the same time, since we
+  * don't know a priori whether the docs will be in scaladoc or javadoc
+  * format.
+  */
 case class DocSigPair(scala: DocSig, java: DocSig)
 
 class Analyzer(
@@ -48,7 +49,8 @@ class Analyzer(
     search: SearchService,
     implicit val config: EnsimeConfig,
     implicit val vfs: EnsimeVFS
-) extends Actor with Stash with ActorLogging with RefactoringHandler {
+)
+    extends Actor with Stash with ActorLogging with RefactoringHandler {
 
   import FileUtils._
 
@@ -68,10 +70,13 @@ class Analyzer(
     settings.verbose.value = presCompLog.isDebugEnabled
     settings.usejavacp.value = false
     config.scalaLibrary match {
-      case Some(scalaLib) => settings.bootclasspath.value = scalaLib.getAbsolutePath
-      case None => log.warning("scala-library.jar not present, enabling Odersky mode")
+      case Some(scalaLib) =>
+        settings.bootclasspath.value = scalaLib.getAbsolutePath
+      case None =>
+        log.warning("scala-library.jar not present, enabling Odersky mode")
     }
-    settings.classpath.value = config.compileClasspath.mkString(JFile.pathSeparator)
+    settings.classpath.value = config.compileClasspath.mkString(
+        JFile.pathSeparator)
     settings.processArguments(config.compilerArgs, processAll = false)
     presCompLog.debug("Presentation Compiler settings:\n" + settings)
 
@@ -90,14 +95,20 @@ class Analyzer(
 
     scalaCompiler = makeScalaCompiler()
 
-    broadcaster ! SendBackgroundMessageEvent("Initializing Analyzer. Please wait...")
+    broadcaster ! SendBackgroundMessageEvent(
+        "Initializing Analyzer. Please wait...")
 
     scalaCompiler.askNotifyWhenReady()
     if (config.sourceMode) scalaCompiler.askReloadAllFiles()
   }
 
   protected def makeScalaCompiler() = new RichPresentationCompiler(
-    config, settings, reporter, self, indexer, search
+      config,
+      settings,
+      reporter,
+      self,
+      indexer,
+      search
   )
 
   protected def restartCompiler(keepLoaded: Boolean): Unit = {
@@ -189,7 +200,8 @@ class Analyzer(
     case CompletionsReq(fileInfo, point, maxResults, caseSens, _reload) =>
       sender ! withExisting(fileInfo) {
         reporter.disable()
-        scalaCompiler.askCompletionsAt(pos(fileInfo, point), maxResults, caseSens)
+        scalaCompiler.askCompletionsAt(
+            pos(fileInfo, point), maxResults, caseSens)
       }
     case UsesOfSymbolAtPointReq(file, point) =>
       sender ! withExisting(file) {
@@ -208,21 +220,30 @@ class Analyzer(
         scalaCompiler.askInspectTypeAt(p).getOrElse(FalseResponse)
       }
     case InspectTypeByNameReq(name: String) =>
-      sender ! scalaCompiler.askInspectTypeByName(name).getOrElse(FalseResponse)
+      sender ! scalaCompiler
+        .askInspectTypeByName(name)
+        .getOrElse(FalseResponse)
     case SymbolAtPointReq(file, point: Int) =>
       sender ! withExisting(file) {
         val p = pos(file, point)
         scalaCompiler.askLoadedTyped(p.source)
         scalaCompiler.askSymbolInfoAt(p).getOrElse(FalseResponse)
       }
-    case SymbolByNameReq(typeFullName: String, memberName: Option[String], signatureString: Option[String]) =>
-      sender ! scalaCompiler.askSymbolByName(typeFullName, memberName, signatureString).getOrElse(FalseResponse)
+    case SymbolByNameReq(typeFullName: String,
+                         memberName: Option[String],
+                         signatureString: Option[String]) =>
+      sender ! scalaCompiler
+        .askSymbolByName(typeFullName, memberName, signatureString)
+        .getOrElse(FalseResponse)
     case DocUriAtPointReq(file, range: OffsetRange) =>
       val p = pos(file, range)
       scalaCompiler.askLoadedTyped(p.source)
       sender() ! scalaCompiler.askDocSignatureAtPoint(p)
-    case DocUriForSymbolReq(typeFullName: String, memberName: Option[String], signatureString: Option[String]) =>
-      sender() ! scalaCompiler.askDocSignatureForSymbol(typeFullName, memberName, signatureString)
+    case DocUriForSymbolReq(typeFullName: String,
+                            memberName: Option[String],
+                            signatureString: Option[String]) =>
+      sender() ! scalaCompiler.askDocSignatureForSymbol(
+          typeFullName, memberName, signatureString)
     case InspectPackageByPathReq(path: String) =>
       sender ! scalaCompiler.askPackageByPath(path).getOrElse(FalseResponse)
     case TypeAtPointReq(file, range: OffsetRange) =>
@@ -272,10 +293,13 @@ class Analyzer(
   def handleReloadFiles(files: List[SourceFileInfo]): RpcResponse = {
     val (existing, missingFiles) = files.partition(FileUtils.exists)
     if (missingFiles.nonEmpty) {
-      val missingFilePaths = missingFiles.map { f => "\"" + f.file + "\"" }.mkString(",")
+      val missingFilePaths = missingFiles.map { f =>
+        "\"" + f.file + "\""
+      }.mkString(",")
       EnsimeServerError(s"file(s): $missingFilePaths do not exist")
     } else {
-      val (javas, scalas) = existing.partition(_.file.getName.endsWith(".java"))
+      val (javas, scalas) =
+        existing.partition(_.file.getName.endsWith(".java"))
       if (scalas.nonEmpty) {
         val sourceFiles = scalas.map(createSourceFile)
         scalaCompiler.askReloadFiles(sourceFiles)
@@ -286,7 +310,8 @@ class Analyzer(
   }
 
   def withExisting(x: SourceFileInfo)(f: => RpcResponse): RpcResponse =
-    if (FileUtils.exists(x)) f else EnsimeServerError(s"File does not exist: ${x.file}")
+    if (FileUtils.exists(x)) f
+    else EnsimeServerError(s"File does not exist: ${x.file}")
 
   def pos(file: File, range: OffsetRange): OffsetPosition =
     pos(createSourceFile(file), range)
@@ -300,7 +325,8 @@ class Analyzer(
     if (range.from == range.to) new OffsetPosition(f, range.from)
     else new RangePosition(f, range.from, range.from, range.to)
   }
-  def pos(f: SourceFile, offset: Int): OffsetPosition = new OffsetPosition(f, offset)
+  def pos(f: SourceFile, offset: Int): OffsetPosition =
+    new OffsetPosition(f, offset)
 
   def createSourceFile(file: File): SourceFile =
     scalaCompiler.createSourceFile(file.getPath)
@@ -311,12 +337,11 @@ class Analyzer(
 
 object Analyzer {
   def apply(
-    broadcaster: ActorRef,
-    indexer: ActorRef,
-    search: SearchService
+      broadcaster: ActorRef,
+      indexer: ActorRef,
+      search: SearchService
   )(
-    implicit
-    config: EnsimeConfig,
-    vfs: EnsimeVFS
+      implicit config: EnsimeConfig,
+      vfs: EnsimeVFS
   ) = Props(new Analyzer(broadcaster, indexer, search, config, vfs))
 }

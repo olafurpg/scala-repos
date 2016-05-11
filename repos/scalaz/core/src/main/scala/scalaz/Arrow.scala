@@ -2,14 +2,15 @@ package scalaz
 
 ////
 /**
- * A [[scalaz.Category]] supporting all ordinary functions, as well as
- * combining arrows product-wise.  Every Arrow forms a
- * [[scalaz.Contravariant]] in one type parameter, and a
- * [[scalaz.Applicative]] in the other, just as with ordinary
- * functions.
- */
+  * A [[scalaz.Category]] supporting all ordinary functions, as well as
+  * combining arrows product-wise.  Every Arrow forms a
+  * [[scalaz.Contravariant]] in one type parameter, and a
+  * [[scalaz.Applicative]] in the other, just as with ordinary
+  * functions.
+  */
 ////
-trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { self =>
+trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] {
+  self =>
   ////
 
   /** Lift an ordinary function. */
@@ -18,7 +19,8 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
   override def covariantInstance[C]: Applicative[C =>: ?] =
     new Applicative[C =>: ?] with SndCovariant[C] {
       def point[A](a: => A): C =>: A = arr(_ => a)
-      def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
+      def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) =
+        <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
     }
 
   /** Alias for `compose`. */
@@ -39,11 +41,12 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
   }
 
   /** Alias for `split`. */
-  final def splitA[A, B, C, D](fab: (A =>: B), fcd: (C =>: D)): ((A, C) =>: (B, D)) =
+  final def splitA[A, B, C, D](
+      fab: (A =>: B), fcd: (C =>: D)): ((A, C) =>: (B, D)) =
     split(fab, fcd)
 
   /** Run `fab` and `fcd` alongside each other.  Sometimes `***`. */
-  def split[A, B, C, D](f: A =>: B, g: C =>: D): ((A,  C) =>: (B, D)) =
+  def split[A, B, C, D](f: A =>: B, g: C =>: D): ((A, C) =>: (B, D)) =
     >>>(first[A, B, C](f), second[C, D, B](g))
 
   /** Run two `fab`s alongside each other. */

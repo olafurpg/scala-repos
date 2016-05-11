@@ -14,8 +14,8 @@ import scala.collection.mutable
 
 import java.net.URI
 
-private[closure] class ClosureAstBuilder(
-    relativizeBaseURI: Option[URI] = None) extends JSTreeBuilder {
+private[closure] class ClosureAstBuilder(relativizeBaseURI: Option[URI] = None)
+    extends JSTreeBuilder {
 
   private val transformer = new ClosureAstTransformer(relativizeBaseURI)
   private val treeBuf = mutable.ListBuffer.empty[Node]
@@ -30,7 +30,6 @@ private[closure] class ClosureAstBuilder(
 
     new ClosureAstBuilder.ScalaJSSourceAst(root)
   }
-
 }
 
 private object ClosureAstBuilder {

@@ -7,7 +7,8 @@ trait VersionedEntry {
   /**
     * Create a compound version key from id and timestamp.
     */
-  def versionKey(id: String, version: Timestamp): String = id + VERSION_SEPARATOR + version.toString
+  def versionKey(id: String, version: Timestamp): String =
+    id + VERSION_SEPARATOR + version.toString
 
   /**
     * True if the given key is a compound versioned key, otherwise false.
@@ -27,8 +28,8 @@ trait VersionedEntry {
   /**
     * Gives the id part of the compound version key.
     */
-  def idFromVersionKey(key: String): String = key.substring(0, key.indexOf(VERSION_SEPARATOR))
-
+  def idFromVersionKey(key: String): String =
+    key.substring(0, key.indexOf(VERSION_SEPARATOR))
 }
 
 object VersionedEntry {

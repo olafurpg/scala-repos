@@ -6,7 +6,7 @@
 package scala.tools.nsc
 package typechecker
 
-import java.lang.{ reflect => r }
+import java.lang.{reflect => r}
 import r.TypeVariable
 import scala.reflect.NameTransformer
 import NameTransformer._
@@ -14,64 +14,70 @@ import scala.reflect.runtime.{universe => ru}
 import scala.reflect.{ClassTag, classTag}
 
 /** A more principled system for turning types into strings.
- */
+  */
 trait StructuredTypeStrings extends DestructureTypes {
   val global: Global
   import global._
 
-  case class LabelAndType(label: String, typeName: String) { }
+  case class LabelAndType(label: String, typeName: String) {}
   object LabelAndType {
     val empty = LabelAndType("", "")
   }
-  case class Grouping(ldelim: String, mdelim: String, rdelim: String, labels: Boolean) {
-    def join(elems: String*): String = (
-      if (elems.isEmpty) ""
-      else elems.mkString(ldelim, mdelim, rdelim)
-    )
+  case class Grouping(
+      ldelim: String, mdelim: String, rdelim: String, labels: Boolean) {
+    def join(elems: String*): String = (if (elems.isEmpty) ""
+                                        else
+                                          elems.mkString(
+                                              ldelim, mdelim, rdelim))
   }
-  val NoGrouping      = Grouping("", "", "", labels = false)
-  val ListGrouping    = Grouping("(", ", ", ")", labels = false)
+  val NoGrouping = Grouping("", "", "", labels = false)
+  val ListGrouping = Grouping("(", ", ", ")", labels = false)
   val ProductGrouping = Grouping("(", ", ", ")", labels = true)
-  val BlockGrouping   = Grouping(" { ", "; ", "}", labels = false)
+  val BlockGrouping = Grouping(" { ", "; ", "}", labels = false)
 
   private def str(level: Int)(body: => String): String = "  " * level + body
-  private def block(level: Int, grouping: Grouping)(name: String, nodes: List[TypeNode]): String = {
+  private def block(level: Int, grouping: Grouping)(
+      name: String, nodes: List[TypeNode]): String = {
     val l1 = str(level)(name + grouping.ldelim)
     val l2 = nodes.map(_ show level + 1)
     val l3 = str(level)(grouping.rdelim)
 
     l1 +: l2 :+ l3 mkString "\n"
   }
-  private def maybeBlock(level: Int, grouping: Grouping)(name: String, nodes: List[TypeNode]): String = {
+  private def maybeBlock(level: Int, grouping: Grouping)(
+      name: String, nodes: List[TypeNode]): String = {
     val threshold = 70
 
-    val try1 = str(level)(name + grouping.join(nodes map (_.show(0, grouping.labels)): _*))
+    val try1 = str(level)(
+        name + grouping.join(nodes map (_.show(0, grouping.labels)): _*))
     if (try1.length < threshold) try1
     else block(level, grouping)(name, nodes)
   }
   private def shortClass(x: Any) = {
     if (settings.debug) {
-      val name   = (x.getClass.getName split '.').last
-      val str    = if (TypeStrings.isAnonClass(x.getClass)) name else (name split '$').last
+      val name = (x.getClass.getName split '.').last
+      val str =
+        if (TypeStrings.isAnonClass(x.getClass)) name
+        else (name split '$').last
 
       " // " + str
-    }
-    else ""
+    } else ""
   }
 
   sealed abstract class TypeNode {
     def grouping: Grouping
     def nodes: List[TypeNode]
 
-    def show(indent: Int, showLabel: Boolean): String = maybeBlock(indent, grouping)(mkPrefix(showLabel), nodes)
+    def show(indent: Int, showLabel: Boolean): String =
+      maybeBlock(indent, grouping)(mkPrefix(showLabel), nodes)
     def show(indent: Int): String = show(indent, showLabel = true)
     def show(): String = show(0)
 
     def withLabel(l: String): this.type = modifyNameInfo(_.copy(label = l))
-    def withType(t: String): this.type  = modifyNameInfo(_.copy(typeName = t))
+    def withType(t: String): this.type = modifyNameInfo(_.copy(typeName = t))
 
-    def label       = nameInfo.label
-    def typeName    = nameInfo.typeName
+    def label = nameInfo.label
+    def typeName = nameInfo.typeName
 
     protected def mkPrefix(showLabel: Boolean) = {
       val pre = if (showLabel && label != "") label + " = " else ""
@@ -93,17 +99,20 @@ trait StructuredTypeStrings extends DestructureTypes {
   case class TypeProduct(nodes: List[TypeNode]) extends TypeNode {
     def grouping: Grouping = ProductGrouping
     def emptyTypeName = ""
-    override def typeName = if (nodes.isEmpty) emptyTypeName else super.typeName
+    override def typeName =
+      if (nodes.isEmpty) emptyTypeName else super.typeName
   }
 
   /** For a NullaryMethod, in = TypeEmpty; for MethodType(Nil, _) in = TypeNil */
   class NullaryFunction(out: TypeNode) extends TypeProduct(List(out)) {
     override def typeName = "NullaryMethodType"
   }
-  class MonoFunction(in: TypeNode, out: TypeNode) extends TypeProduct(List(in, out)) {
+  class MonoFunction(in: TypeNode, out: TypeNode)
+      extends TypeProduct(List(in, out)) {
     override def typeName = "MethodType"
   }
-  class PolyFunction(in: TypeNode, out: TypeNode) extends TypeProduct(List(in, out)) {
+  class PolyFunction(in: TypeNode, out: TypeNode)
+      extends TypeProduct(List(in, out)) {
     override def typeName = "PolyType"
   }
 
@@ -122,45 +131,56 @@ trait StructuredTypeStrings extends DestructureTypes {
   }
 
   object intoNodes extends DestructureType[TypeNode] {
-    def withLabel(node: TypeNode, label: String): TypeNode   = node withLabel label
-    def withType(node: TypeNode, typeName: String): TypeNode = node withType typeName
+    def withLabel(node: TypeNode, label: String): TypeNode =
+      node withLabel label
+    def withType(node: TypeNode, typeName: String): TypeNode =
+      node withType typeName
 
-    def wrapEmpty                             = TypeEmpty
-    def wrapSequence(nodes: List[TypeNode])   = new TypeList(nodes)
-    def wrapProduct(nodes: List[TypeNode])    = new TypeProduct(nodes)
+    def wrapEmpty = TypeEmpty
+    def wrapSequence(nodes: List[TypeNode]) = new TypeList(nodes)
+    def wrapProduct(nodes: List[TypeNode]) = new TypeProduct(nodes)
     def wrapPoly(in: TypeNode, out: TypeNode) = new PolyFunction(in, out)
-    def wrapMono(in: TypeNode, out: TypeNode) = if (in == wrapEmpty) new NullaryFunction(out) else new MonoFunction(in, out)
-    def wrapAtom[U](value: U)                 = new TypeAtom(value)
+    def wrapMono(in: TypeNode, out: TypeNode) =
+      if (in == wrapEmpty) new NullaryFunction(out)
+      else new MonoFunction(in, out)
+    def wrapAtom[U](value: U) = new TypeAtom(value)
   }
 
   def show(tp: Type): String = intoNodes(tp).show()
 }
 
-
 /** Logic for turning a type into a String.  The goal is to be
- *  able to take some arbitrary object 'x' and obtain the most precise
- *  String for which an injection of x.asInstanceOf[String] will
- *  be valid from both the JVM's and scala's perspectives.
- *
- *  "definition" is when you want strings like
- */
+  *  able to take some arbitrary object 'x' and obtain the most precise
+  *  String for which an injection of x.asInstanceOf[String] will
+  *  be valid from both the JVM's and scala's perspectives.
+  *
+  *  "definition" is when you want strings like
+  */
 trait TypeStrings {
   private type JClass = java.lang.Class[_]
   private val ObjectClass = classOf[java.lang.Object]
-  private val primitives = Set[String]("byte", "char", "short", "int", "long", "float", "double", "boolean", "void")
+  private val primitives = Set[String]("byte",
+                                       "char",
+                                       "short",
+                                       "int",
+                                       "long",
+                                       "float",
+                                       "double",
+                                       "boolean",
+                                       "void")
   private val primitiveMap = (primitives.toList map { x =>
-    val key = x match {
-      case "int"  => "Integer"
-      case "char" => "Character"
-      case s      => s.capitalize
-    }
-    val value = x match {
-      case "void" => "Unit"
-      case s      => s.capitalize
-    }
+        val key = x match {
+          case "int" => "Integer"
+          case "char" => "Character"
+          case s => s.capitalize
+        }
+        val value = x match {
+          case "void" => "Unit"
+          case s => s.capitalize
+        }
 
-    ("java.lang." + key) -> ("scala." + value)
-  }).toMap
+        ("java.lang." + key) -> ("scala." + value)
+      }).toMap
 
   def isAnonClass(cl: Class[_]) = {
     val xs = cl.getName.reverse takeWhile (_ != '$')
@@ -175,14 +195,14 @@ trait TypeStrings {
   }
   // Trying to put humpty dumpty back together again.
   def scalaName(clazz: JClass): String = {
-    val name      = clazz.getName
+    val name = clazz.getName
     val enclClass = clazz.getEnclosingClass
-    def enclPre   = enclClass.getName + MODULE_SUFFIX_STRING
+    def enclPre = enclClass.getName + MODULE_SUFFIX_STRING
     def enclMatch = name startsWith enclPre
 
     scalaName(
-      if (enclClass == null || isAnonClass(clazz) || !enclMatch) name
-      else enclClass.getName + "." + (name stripPrefix enclPre)
+        if (enclClass == null || isAnonClass(clazz) || !enclMatch) name
+        else enclClass.getName + "." + (name stripPrefix enclPre)
     )
   }
   def anyClass(x: Any): JClass = if (x == null) null else x.getClass
@@ -191,9 +211,11 @@ trait TypeStrings {
     if (tps.isEmpty) ""
     else tps.mkString("[", ", ", "]")
 
-  private def tvarString(tvar: TypeVariable[_]): String = tvarString(tvar.getBounds.toList)
+  private def tvarString(tvar: TypeVariable[_]): String =
+    tvarString(tvar.getBounds.toList)
   private def tvarString(bounds: List[AnyRef]): String = {
-    val xs = bounds filterNot (_ == ObjectClass) collect { case x: JClass => x }
+    val xs =
+      bounds filterNot (_ == ObjectClass) collect { case x: JClass => x }
     if (xs.isEmpty) "_"
     else scalaName(xs.head)
   }
@@ -201,34 +223,39 @@ trait TypeStrings {
     brackets(clazz.getTypeParameters map tvarString: _*)
   }
 
-  private def tparamString[T: ru.TypeTag] : String = {
+  private def tparamString[T : ru.TypeTag]: String = {
     import ru._ // get TypeRefTag in scope so that pattern match works (TypeRef is an abstract type)
-    def typeArguments: List[ru.Type] = ru.typeOf[T] match { case ru.TypeRef(_, _, args) => args; case _ => Nil }
+    def typeArguments: List[ru.Type] = ru.typeOf[T] match {
+      case ru.TypeRef(_, _, args) => args; case _ => Nil
+    }
     brackets(typeArguments map (jc => tvarString(List(jc))): _*)
   }
 
   /** Going for an overabundance of caution right now.  Later these types
-   *  can be a lot more precise, but right now the tags have a habit of
-   *  introducing material which is not syntactically valid as scala source.
-   *  When this happens it breaks the repl.  It would be nice if we mandated
-   *  that tag toString methods (or some other method, since it's bad
-   *  practice to rely on toString for correctness) generated the VALID string
-   *  representation of the type.
-   */
-  def fromValue(value: Any): String                          = if (value == null) "Null" else fromClazz(anyClass(value))
-  def fromClazz(clazz: JClass): String                       = scalaName(clazz) + tparamString(clazz)
-  def fromTag[T: ru.TypeTag : ClassTag] : String             = scalaName(classTag[T].runtimeClass) + tparamString[T]
+    *  can be a lot more precise, but right now the tags have a habit of
+    *  introducing material which is not syntactically valid as scala source.
+    *  When this happens it breaks the repl.  It would be nice if we mandated
+    *  that tag toString methods (or some other method, since it's bad
+    *  practice to rely on toString for correctness) generated the VALID string
+    *  representation of the type.
+    */
+  def fromValue(value: Any): String =
+    if (value == null) "Null" else fromClazz(anyClass(value))
+  def fromClazz(clazz: JClass): String = scalaName(clazz) + tparamString(clazz)
+  def fromTag[T : ru.TypeTag : ClassTag]: String =
+    scalaName(classTag[T].runtimeClass) + tparamString[T]
 
   /** Reducing fully qualified noise for some common packages.
-   */
+    */
   def quieter(tpe: String, alsoStrip: String*): String = {
-    val transforms = List(
-      "scala.collection.immutable." -> "immutable.",
-      "scala.collection.mutable." -> "mutable.",
-      "scala.collection.generic." -> "generic.",
-      "java.lang." -> "jl.",
-      "scala.runtime." -> "runtime."
-    ) ++ (alsoStrip map (_ -> ""))
+    val transforms =
+      List(
+          "scala.collection.immutable." -> "immutable.",
+          "scala.collection.mutable." -> "mutable.",
+          "scala.collection.generic." -> "generic.",
+          "java.lang." -> "jl.",
+          "scala.runtime." -> "runtime."
+      ) ++ (alsoStrip map (_ -> ""))
 
     transforms.foldLeft(tpe) {
       case (res, (k, v)) => res.replaceAll(k, v)
@@ -236,4 +263,4 @@ trait TypeStrings {
   }
 }
 
-object TypeStrings extends TypeStrings { }
+object TypeStrings extends TypeStrings {}

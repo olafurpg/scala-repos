@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.lang
 
@@ -38,7 +38,8 @@ class IntegerTestOnJDK8 {
 
   @Test def should_reject_invalid_uInt_strings_when_parsing(): Unit = {
     def test(s: String, radix: Int = 10): Unit =
-      expectThrows(classOf[NumberFormatException], Integer.parseUnsignedInt(s, radix))
+      expectThrows(
+          classOf[NumberFormatException], Integer.parseUnsignedInt(s, radix))
 
     test("abc")
     test("5a")
@@ -128,7 +129,7 @@ class IntegerTestOnJDK8 {
     assertEquals("17777777777", Integer.toUnsignedString(2147483647, 8))
     assertEquals("7fffffff", Integer.toUnsignedString(2147483647, 16))
     assertEquals("1111111111111111111111111111111",
-        Integer.toUnsignedString(2147483647, 2))
+                 Integer.toUnsignedString(2147483647, 2))
     assertEquals("2147483647", Integer.toUnsignedString(2147483647, 10))
     assertEquals("ffffffff", Integer.toUnsignedString(0xFFFFFFFF, 16))
     assertEquals("4294967295", Integer.toUnsignedString(0xFFFFFFFF, 10))
@@ -137,8 +138,7 @@ class IntegerTestOnJDK8 {
   }
 
   @Test def should_provide_hashCode_as_a_static_function(): Unit = {
-    for (i <- -256 to 256)
-      assertEquals(i.hashCode(), Integer.hashCode(i))
+    for (i <- -256 to 256) assertEquals(i.hashCode(), Integer.hashCode(i))
     assertEquals(Int.MaxValue.hashCode, Integer.hashCode(Int.MaxValue))
     assertEquals(Int.MinValue.hashCode, Integer.hashCode(Int.MinValue))
   }

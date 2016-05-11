@@ -5,8 +5,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.refactoring.ui.ScalaMemberInfoBase
 
 /**
- * Nikolay.Tropin
- * 8/20/13
- */
+  * Nikolay.Tropin
+  * 8/20/13
+  */
 class ScalaMemberInfo(member: ScNamedElement)
-        extends ScalaMemberInfoBase[ScNamedElement](member: ScNamedElement)
+    extends ScalaMemberInfoBase[ScNamedElement](member: ScNamedElement)

@@ -18,7 +18,7 @@ class LocalAnnouncer extends Announcer {
 class LocalResolver extends Resolver {
   val scheme = "local"
 
-  def bind(arg: String): Var[Addr]= {
+  def bind(arg: String): Var[Addr] = {
     val Name.Bound(va) = Resolver.eval(Local.mkAddr(arg))
     va
   }

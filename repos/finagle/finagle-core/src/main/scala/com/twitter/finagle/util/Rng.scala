@@ -3,40 +3,41 @@ package com.twitter.finagle.util
 import java.util.concurrent.ThreadLocalRandom
 
 /**
- * A random number generator. Java's divergent interfaces
- * forces our hand here: ThreadLocalRandom does not conform
- * to java.util.Random. We bridge this gap.
- */
+  * A random number generator. Java's divergent interfaces
+  * forces our hand here: ThreadLocalRandom does not conform
+  * to java.util.Random. We bridge this gap.
+  */
 trait Rng {
+
   /**
-   * Generate a random Double between `0.0` and `1.0`, inclusive.
-   */
+    * Generate a random Double between `0.0` and `1.0`, inclusive.
+    */
   def nextDouble(): Double
 
   /**
-   * Generate a random Int betwen 0 (inclusive) and `n` (exclusive).
-   *
-   * @param n the upper bound (exclusive). Must be a positive value.
-   */
+    * Generate a random Int betwen 0 (inclusive) and `n` (exclusive).
+    *
+    * @param n the upper bound (exclusive). Must be a positive value.
+    */
   def nextInt(n: Int): Int
 
   /**
-   * Generate a random Int across the entire allowed integer values
-   * from `Int.MinValue` to `Int.MaxValue`, inclusive.
-   */
+    * Generate a random Int across the entire allowed integer values
+    * from `Int.MinValue` to `Int.MaxValue`, inclusive.
+    */
   def nextInt(): Int
 
   /**
-   * Generate a random Long between 0 (inclusive) and `n` (exclusive).
-   *
-   * @param n the upper bound (exclusive). Must be a positive value.
-   */
+    * Generate a random Long between 0 (inclusive) and `n` (exclusive).
+    *
+    * @param n the upper bound (exclusive). Must be a positive value.
+    */
   def nextLong(n: Long): Long
 }
 
 /**
- * See [[Rngs]] for Java compatible APIs.
- */
+  * See [[Rngs]] for Java compatible APIs.
+  */
 object Rng {
   def apply(): Rng = Rng(new java.util.Random)
   def apply(seed: Long): Rng = Rng(new java.util.Random(seed))
@@ -51,15 +52,14 @@ object Rng {
       // This is the algorithm used by Java's random number generator
       // internally.
       //   http://docs.oracle.com/javase/6/docs/api/java/util/Random.html#nextInt(int)
-      if ((n & -n) == n)
-        return r.nextLong() % n
+      if ((n & -n) == n) return r.nextLong() % n
 
       var bits = 0L
       var v = 0L
       do {
         bits = (r.nextLong() << 1) >>> 1
-        v = bits%n
-      } while (bits-v+(n-1) < 0L)
+        v = bits % n
+      } while (bits - v + (n - 1) < 0L)
       v
     }
   }
@@ -75,4 +75,3 @@ object Rng {
 object Rngs {
   val threadLocal: Rng = Rng.threadLocal
 }
-

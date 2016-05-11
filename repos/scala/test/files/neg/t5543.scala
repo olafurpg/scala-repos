@@ -8,8 +8,8 @@ class C1a[T] {
 }
 
 class C2(x: Int) {
-   def this(a: Int, b: Int = x) {
-     this(b)
+  def this(a: Int, b: Int = x) {
+    this(b)
   }
 }
 

@@ -31,14 +31,13 @@ import org.apache.spark.rpc._
 import org.apache.spark.util.ThreadUtils
 
 /**
- * A message dispatcher, responsible for routing RPC messages to the appropriate endpoint(s).
- */
+  * A message dispatcher, responsible for routing RPC messages to the appropriate endpoint(s).
+  */
 private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
 
-  private class EndpointData(
-      val name: String,
-      val endpoint: RpcEndpoint,
-      val ref: NettyRpcEndpointRef) {
+  private class EndpointData(val name: String,
+                             val endpoint: RpcEndpoint,
+                             val ref: NettyRpcEndpointRef) {
     val inbox = new Inbox(ref, endpoint)
   }
 
@@ -49,39 +48,44 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
   private val receivers = new LinkedBlockingQueue[EndpointData]
 
   /**
-   * True if the dispatcher has been stopped. Once stopped, all messages posted will be bounced
-   * immediately.
-   */
+    * True if the dispatcher has been stopped. Once stopped, all messages posted will be bounced
+    * immediately.
+    */
   @GuardedBy("this")
   private var stopped = false
 
-  def registerRpcEndpoint(name: String, endpoint: RpcEndpoint): NettyRpcEndpointRef = {
+  def registerRpcEndpoint(
+      name: String, endpoint: RpcEndpoint): NettyRpcEndpointRef = {
     val addr = RpcEndpointAddress(nettyEnv.address, name)
     val endpointRef = new NettyRpcEndpointRef(nettyEnv.conf, addr, nettyEnv)
     synchronized {
       if (stopped) {
         throw new IllegalStateException("RpcEnv has been stopped")
       }
-      if (endpoints.putIfAbsent(name, new EndpointData(name, endpoint, endpointRef)) != null) {
-        throw new IllegalArgumentException(s"There is already an RpcEndpoint called $name")
+      if (endpoints.putIfAbsent(
+              name, new EndpointData(name, endpoint, endpointRef)) != null) {
+        throw new IllegalArgumentException(
+            s"There is already an RpcEndpoint called $name")
       }
       val data = endpoints.get(name)
       endpointRefs.put(data.endpoint, data.ref)
-      receivers.offer(data)  // for the OnStart message
+      receivers.offer(data) // for the OnStart message
     }
     endpointRef
   }
 
-  def getRpcEndpointRef(endpoint: RpcEndpoint): RpcEndpointRef = endpointRefs.get(endpoint)
+  def getRpcEndpointRef(endpoint: RpcEndpoint): RpcEndpointRef =
+    endpointRefs.get(endpoint)
 
-  def removeRpcEndpointRef(endpoint: RpcEndpoint): Unit = endpointRefs.remove(endpoint)
+  def removeRpcEndpointRef(endpoint: RpcEndpoint): Unit =
+    endpointRefs.remove(endpoint)
 
   // Should be idempotent
   private def unregisterRpcEndpoint(name: String): Unit = {
     val data = endpoints.remove(name)
     if (data != null) {
       data.inbox.stop()
-      receivers.offer(data)  // for the OnStop message
+      receivers.offer(data) // for the OnStop message
     }
     // Don't clean `endpointRefs` here because it's possible that some messages are being processed
     // now and they can use `getRpcEndpointRef`. So `endpointRefs` will be cleaned in Inbox via
@@ -99,51 +103,57 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
   }
 
   /**
-   * Send a message to all registered [[RpcEndpoint]]s in this process.
-   *
-   * This can be used to make network events known to all end points (e.g. "a new node connected").
-   */
+    * Send a message to all registered [[RpcEndpoint]]s in this process.
+    *
+    * This can be used to make network events known to all end points (e.g. "a new node connected").
+    */
   def postToAll(message: InboxMessage): Unit = {
     val iter = endpoints.keySet().iterator()
     while (iter.hasNext) {
       val name = iter.next
-      postMessage(name, message, (e) => logWarning(s"Message $message dropped. ${e.getMessage}"))
+      postMessage(
+          name,
+          message,
+          (e) => logWarning(s"Message $message dropped. ${e.getMessage}"))
     }
   }
 
   /** Posts a message sent by a remote endpoint. */
-  def postRemoteMessage(message: RequestMessage, callback: RpcResponseCallback): Unit = {
-    val rpcCallContext =
-      new RemoteNettyRpcCallContext(nettyEnv, callback, message.senderAddress)
-    val rpcMessage = RpcMessage(message.senderAddress, message.content, rpcCallContext)
-    postMessage(message.receiver.name, rpcMessage, (e) => callback.onFailure(e))
+  def postRemoteMessage(
+      message: RequestMessage, callback: RpcResponseCallback): Unit = {
+    val rpcCallContext = new RemoteNettyRpcCallContext(
+        nettyEnv, callback, message.senderAddress)
+    val rpcMessage = RpcMessage(
+        message.senderAddress, message.content, rpcCallContext)
+    postMessage(
+        message.receiver.name, rpcMessage, (e) => callback.onFailure(e))
   }
 
   /** Posts a message sent by a local endpoint. */
   def postLocalMessage(message: RequestMessage, p: Promise[Any]): Unit = {
-    val rpcCallContext =
-      new LocalNettyRpcCallContext(message.senderAddress, p)
-    val rpcMessage = RpcMessage(message.senderAddress, message.content, rpcCallContext)
+    val rpcCallContext = new LocalNettyRpcCallContext(message.senderAddress, p)
+    val rpcMessage = RpcMessage(
+        message.senderAddress, message.content, rpcCallContext)
     postMessage(message.receiver.name, rpcMessage, (e) => p.tryFailure(e))
   }
 
   /** Posts a one-way message. */
   def postOneWayMessage(message: RequestMessage): Unit = {
-    postMessage(message.receiver.name, OneWayMessage(message.senderAddress, message.content),
-      (e) => throw e)
+    postMessage(message.receiver.name,
+                OneWayMessage(message.senderAddress, message.content),
+                (e) => throw e)
   }
 
   /**
-   * Posts a message to a specific endpoint.
-   *
-   * @param endpointName name of the endpoint.
-   * @param message the message to post
-   * @param callbackIfStopped callback function if the endpoint is stopped.
-   */
-  private def postMessage(
-      endpointName: String,
-      message: InboxMessage,
-      callbackIfStopped: (Exception) => Unit): Unit = {
+    * Posts a message to a specific endpoint.
+    *
+    * @param endpointName name of the endpoint.
+    * @param message the message to post
+    * @param callbackIfStopped callback function if the endpoint is stopped.
+    */
+  private def postMessage(endpointName: String,
+                          message: InboxMessage,
+                          callbackIfStopped: (Exception) => Unit): Unit = {
     val shouldCallOnStop = synchronized {
       val data = endpoints.get(endpointName)
       if (stopped || data == null) {
@@ -156,10 +166,12 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
     }
     if (shouldCallOnStop) {
       // We don't need to call `onStop` in the `synchronized` block
-      val error = if (stopped) {
+      val error =
+        if (stopped) {
           new RpcEnvStoppedException()
         } else {
-          new SparkException(s"Could not find $endpointName or it has been stopped.")
+          new SparkException(
+              s"Could not find $endpointName or it has been stopped.")
         }
       callbackIfStopped(error)
     }
@@ -184,17 +196,19 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
   }
 
   /**
-   * Return if the endpoint exists
-   */
+    * Return if the endpoint exists
+    */
   def verify(name: String): Boolean = {
     endpoints.containsKey(name)
   }
 
   /** Thread pool used for dispatching messages. */
   private val threadpool: ThreadPoolExecutor = {
-    val numThreads = nettyEnv.conf.getInt("spark.rpc.netty.dispatcher.numThreads",
-      math.max(2, Runtime.getRuntime.availableProcessors()))
-    val pool = ThreadUtils.newDaemonFixedThreadPool(numThreads, "dispatcher-event-loop")
+    val numThreads = nettyEnv.conf.getInt(
+        "spark.rpc.netty.dispatcher.numThreads",
+        math.max(2, Runtime.getRuntime.availableProcessors()))
+    val pool =
+      ThreadUtils.newDaemonFixedThreadPool(numThreads, "dispatcher-event-loop")
     for (i <- 0 until numThreads) {
       pool.execute(new MessageLoop)
     }

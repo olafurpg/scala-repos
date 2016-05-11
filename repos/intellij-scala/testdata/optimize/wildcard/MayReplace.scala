@@ -20,4 +20,4 @@ class MayReplace {
     val p = new Point(30, 50)
   }
 }
-*/
+ */

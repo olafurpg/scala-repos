@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import io.prediction.annotation.DeveloperApi
@@ -27,12 +26,12 @@ import io.prediction.annotation.DeveloperApi
   */
 @DeveloperApi
 case class Channel(
-  id: Int,
-  name: String, // must be unique within the same app
-  appid: Int
+    id: Int,
+    name: String, // must be unique within the same app
+    appid: Int
 ) {
   require(Channel.isValidName(name),
-    "Invalid channel name: ${name}. ${Channel.nameConstraint}")
+          "Invalid channel name: ${name}. ${Channel.nameConstraint}")
 }
 
 /** :: DeveloperApi ::
@@ -42,6 +41,7 @@ case class Channel(
   */
 @DeveloperApi
 object Channel {
+
   /** Examine whether the supplied channel name is valid. A valid channel name
     * must consists of 1 to 16 alphanumeric and '-' characters.
     *
@@ -65,6 +65,7 @@ object Channel {
   */
 @DeveloperApi
 trait Channels {
+
   /** Insert a new [[Channel]]. Returns a generated channel ID if original ID is 0. */
   def insert(channel: Channel): Option[Int]
 

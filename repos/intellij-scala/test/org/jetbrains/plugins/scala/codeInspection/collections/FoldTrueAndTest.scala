@@ -4,9 +4,9 @@ package codeInspection.collections
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 
 /**
- * Nikolay.Tropin
- * 5/30/13
- */
+  * Nikolay.Tropin
+  * 5/30/13
+  */
 class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
   val hint = InspectionBundle.message("fold.true.and.hint")
   def test_1() {
@@ -47,8 +47,7 @@ class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testWithoutSideEffect(): Unit = {
-    doTest(
-      s"""
+    doTest(s"""
          |List(0).${START}foldLeft(true) {(x, y) =>
          |  x && {
          |    var z = 1
@@ -56,8 +55,7 @@ class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
          |    z + y % 2 == 1
          |  }
          |}$END
-       """.stripMargin,
-      """
+       """.stripMargin, """
          |List(0).foldLeft(true) {(x, y) =>
          |  x && {
          |    var z = 1
@@ -65,8 +63,7 @@ class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
          |    z + y % 2 == 1
          |  }
          |}
-       """.stripMargin,
-      """
+       """.stripMargin, """
         |List(0).forall(y => {
         |  var z = 1
         |  z += 1
@@ -76,8 +73,7 @@ class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testWithSideEffect(): Unit = {
-    checkTextHasNoErrors(
-      """
+    checkTextHasNoErrors("""
         |var q = 1
         |List(0).foldLeft(true) {(x, y) =>
         |  x && {

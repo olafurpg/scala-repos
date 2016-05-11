@@ -32,23 +32,27 @@ import javafx.scene.{shape => jfxss}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/StrokeLineJoin.html javafx.scene.shape.StrokeLineJoin]] */
-object StrokeLineJoin extends SFXEnumDelegateCompanion[jfxss.StrokeLineJoin, StrokeLineJoin] {
+object StrokeLineJoin
+    extends SFXEnumDelegateCompanion[jfxss.StrokeLineJoin, StrokeLineJoin] {
 
   val Miter = new StrokeLineJoin(jfxss.StrokeLineJoin.MITER)
-  @deprecated ("Use Miter; MITER will be removed in a future release", "8.0.60-R10")
+  @deprecated(
+      "Use Miter; MITER will be removed in a future release", "8.0.60-R10")
   val MITER = Miter
 
   val Bevel = new StrokeLineJoin(jfxss.StrokeLineJoin.BEVEL)
-  @deprecated ("Use Bevel; BEVEL will be removed in a future release", "8.0.60-R10")
+  @deprecated(
+      "Use Bevel; BEVEL will be removed in a future release", "8.0.60-R10")
   val BEVEL = Bevel
 
   val Round = new StrokeLineJoin(jfxss.StrokeLineJoin.ROUND)
-  @deprecated ("Use Round; ROUND will be removed in a future release", "8.0.60-R10")
+  @deprecated(
+      "Use Round; ROUND will be removed in a future release", "8.0.60-R10")
   val ROUND = Round
 
-  protected override def unsortedValues: Array[StrokeLineJoin] = Array(Miter, Bevel, Round)
+  protected override def unsortedValues: Array[StrokeLineJoin] =
+    Array(Miter, Bevel, Round)
 }
 
-
 sealed case class StrokeLineJoin(override val delegate: jfxss.StrokeLineJoin)
-  extends SFXEnumDelegate[jfxss.StrokeLineJoin]
+    extends SFXEnumDelegate[jfxss.StrokeLineJoin]

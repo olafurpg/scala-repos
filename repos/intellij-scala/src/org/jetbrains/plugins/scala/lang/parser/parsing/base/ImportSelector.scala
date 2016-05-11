@@ -8,10 +8,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 11.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 11.02.2008
+  */
 object ImportSelector {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val importSelectorMarker = builder.mark
@@ -29,15 +28,15 @@ object ImportSelector {
         builder.advanceLexer //Ate =>
         builder.getTokenType match {
           case ScalaTokenTypes.tUNDER | ScalaTokenTypes.tIDENTIFIER => {
-            builder.advanceLexer //Ate _ | identifier
-            importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTOR)
-            return true
-          }
+              builder.advanceLexer //Ate _ | identifier
+              importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTOR)
+              return true
+            }
           case _ => {
-            builder error ErrMsg("identifier.or.wild.sign.expected")
-            importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTOR)
-            return true
-          }
+              builder error ErrMsg("identifier.or.wild.sign.expected")
+              importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTOR)
+              return true
+            }
         }
       case _ =>
         importSelectorMarker.done(ScalaElementTypes.IMPORT_SELECTOR)

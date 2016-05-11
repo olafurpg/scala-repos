@@ -23,18 +23,25 @@ import slick.util._
   * Concrete backends like `JdbcBackend` extend this type and provide concrete
   * types for `Database`, `DatabaseFactory` and `Session`. */
 trait BasicBackend { self =>
-  protected lazy val actionLogger = new SlickLogger(LoggerFactory.getLogger(classOf[BasicBackend].getName+".action"))
-  protected lazy val streamLogger = new SlickLogger(LoggerFactory.getLogger(classOf[BasicBackend].getName+".stream"))
+  protected lazy val actionLogger = new SlickLogger(
+      LoggerFactory.getLogger(classOf[BasicBackend].getName + ".action"))
+  protected lazy val streamLogger = new SlickLogger(
+      LoggerFactory.getLogger(classOf[BasicBackend].getName + ".stream"))
 
   type This >: this.type <: BasicBackend
+
   /** The type of database objects used by this backend. */
   type Database <: DatabaseDef
+
   /** The type of the database factory used by this backend. */
   type DatabaseFactory
+
   /** The type of session objects used by this backend. */
   type Session >: Null <: SessionDef
+
   /** The type of the context used for running SynchronousDatabaseActions */
   type Context >: Null <: BasicActionContext
+
   /** The type of the context used for streaming SynchronousDatabaseActions */
   type StreamingContext >: Null <: Context with BasicStreamingActionContext
 
@@ -50,14 +57,18 @@ trait BasicBackend { self =>
   def createDatabase(config: Config, path: String): Database
 
   /** A database instance to which connections can be created. */
-  trait DatabaseDef extends Closeable { this: Database =>
+  trait DatabaseDef extends Closeable {
+    this: Database =>
+
     /** Create a new session. The session needs to be closed explicitly by calling its close() method. */
     def createSession(): Session
 
     /** Free all resources allocated by Slick for this Database. This is done asynchronously, so
       * you need to wait for the returned `Future` to complete in order to ensure that everything
       * has been shut down. */
-    def shutdown: Future[Unit] = Future(close)(ExecutionContext.fromExecutor(AsyncExecutor.shutdownExecutor))
+    def shutdown: Future[Unit] =
+      Future(close)(
+          ExecutionContext.fromExecutor(AsyncExecutor.shutdownExecutor))
 
     /** Free all resources allocated by Slick for this Database, blocking the current thread until
       * everything has been shut down.
@@ -69,11 +80,16 @@ trait BasicBackend { self =>
     def close: Unit
 
     /** Run an Action asynchronously and return the result as a Future. */
-    final def run[R](a: DBIOAction[R, NoStream, Nothing]): Future[R] = runInternal(a, false)
+    final def run[R](a: DBIOAction[R, NoStream, Nothing]): Future[R] =
+      runInternal(a, false)
 
-    private[slick] final def runInternal[R](a: DBIOAction[R, NoStream, Nothing], useSameThread: Boolean): Future[R] =
-      try runInContext(a, createDatabaseActionContext(useSameThread), false, true)
-      catch { case NonFatal(ex) => Future.failed(ex) }
+    private[slick] final def runInternal[R](
+        a: DBIOAction[R, NoStream, Nothing],
+        useSameThread: Boolean): Future[R] =
+      try runInContext(
+          a, createDatabaseActionContext(useSameThread), false, true) catch {
+        case NonFatal(ex) => Future.failed(ex)
+      }
 
     /** Create a `Publisher` for Reactive Streams which, when subscribed to, will run the specified
       * `DBIOAction` and return the result directly as a stream without buffering everything first.
@@ -95,23 +111,32 @@ trait BasicBackend { self =>
       * from within `onNext`. If streaming is interrupted due to back-pressure signaling, the next
       * row will be prefetched (in order to buffer the next result page from the server when a page
       * boundary has been reached). */
-    final def stream[T](a: DBIOAction[_, Streaming[T], Nothing]): DatabasePublisher[T] = streamInternal(a, false)
+    final def stream[T](
+        a: DBIOAction[_, Streaming[T], Nothing]): DatabasePublisher[T] =
+      streamInternal(a, false)
 
-    private[slick] final def streamInternal[T](a: DBIOAction[_, Streaming[T], Nothing], useSameThread: Boolean): DatabasePublisher[T] =
-      createPublisher(a, s => createStreamingDatabaseActionContext(s, useSameThread))
+    private[slick] final def streamInternal[T](
+        a: DBIOAction[_, Streaming[T], Nothing],
+        useSameThread: Boolean): DatabasePublisher[T] =
+      createPublisher(
+          a, s => createStreamingDatabaseActionContext(s, useSameThread))
 
     /** Create a Reactive Streams `Publisher` using the given context factory. */
-    protected[this] def createPublisher[T](a: DBIOAction[_, Streaming[T], Nothing], createCtx: Subscriber[_ >: T] => StreamingContext): DatabasePublisher[T] = new DatabasePublisher[T] {
+    protected[this] def createPublisher[T](
+        a: DBIOAction[_, Streaming[T], Nothing],
+        createCtx: Subscriber[_ >: T] => StreamingContext)
+      : DatabasePublisher[T] = new DatabasePublisher[T] {
       def subscribe(s: Subscriber[_ >: T]) = {
-        if(s eq null) throw new NullPointerException("Subscriber is null")
+        if (s eq null) throw new NullPointerException("Subscriber is null")
         val ctx = createCtx(s)
-        if(streamLogger.isDebugEnabled) streamLogger.debug(s"Signaling onSubscribe($ctx)")
+        if (streamLogger.isDebugEnabled)
+          streamLogger.debug(s"Signaling onSubscribe($ctx)")
         val subscribed = try { s.onSubscribe(ctx.subscription); true } catch {
           case NonFatal(ex) =>
             streamLogger.warn("Subscriber.onSubscribe failed unexpectedly", ex)
             false
         }
-        if(subscribed) {
+        if (subscribed) {
           try {
             runInContext(a, ctx, true, true).onComplete {
               case Success(_) => ctx.tryOnComplete
@@ -123,10 +148,12 @@ trait BasicBackend { self =>
     }
 
     /** Create the default DatabaseActionContext for this backend. */
-    protected[this] def createDatabaseActionContext[T](_useSameThread: Boolean): Context
+    protected[this] def createDatabaseActionContext[T](
+        _useSameThread: Boolean): Context
 
     /** Create the default StreamingDatabaseActionContext for this backend. */
-    protected[this] def createStreamingDatabaseActionContext[T](s: Subscriber[_ >: T], useSameThread: Boolean): StreamingContext
+    protected[this] def createStreamingDatabaseActionContext[T](
+        s: Subscriber[_ >: T], useSameThread: Boolean): StreamingContext
 
     /** Run an Action in an existing DatabaseActionContext. This method can be overridden in
       * subclasses to support new DatabaseActions which cannot be expressed through
@@ -136,19 +163,24 @@ trait BasicBackend { self =>
       *                  be a `StreamingDatabaseActionContext` and the Future result should be
       *                  completed with `null` or failed after streaming has finished. This
       *                  method should not call any `Subscriber` method other than `onNext`. */
-    protected[this] def runInContext[R](a: DBIOAction[R, NoStream, Nothing], ctx: Context, streaming: Boolean, topLevel: Boolean): Future[R] = {
+    protected[this] def runInContext[R](a: DBIOAction[R, NoStream, Nothing],
+                                        ctx: Context,
+                                        streaming: Boolean,
+                                        topLevel: Boolean): Future[R] = {
       logAction(a, ctx)
       a match {
         case SuccessAction(v) => Future.successful(v)
         case FailureAction(t) => Future.failed(t)
         case FutureAction(f) => f
         case FlatMapAction(base, f, ec) =>
-          runInContext(base, ctx, false, topLevel).flatMap(v => runInContext(f(v), ctx, streaming, false))(ctx.getEC(ec))
+          runInContext(base, ctx, false, topLevel).flatMap(
+              v => runInContext(f(v), ctx, streaming, false))(ctx.getEC(ec))
         case AndThenAction(actions) =>
           val last = actions.length - 1
           def run(pos: Int, v: Any): Future[Any] = {
-            val f1 = runInContext(actions(pos), ctx, streaming && pos == last, pos == 0)
-            if(pos == last) f1
+            val f1 = runInContext(
+                actions(pos), ctx, streaming && pos == last, pos == 0)
+            if (pos == last) f1
             else f1.flatMap(run(pos + 1, _))(DBIO.sameThreadExecutionContext)
           }
           run(0, null).asInstanceOf[Future[R]]
@@ -156,33 +188,37 @@ trait BasicBackend { self =>
           val len = actions.length
           val results = new AtomicReferenceArray[Any](len)
           def run(pos: Int): Future[Any] = {
-            if(pos == len) Future.successful {
-              val b = sa.cbf()
-              var i = 0
-              while(i < len) {
-                b += results.get(i)
-                i += 1
-              }
-              b.result()
-            }
-            else runInContext(actions(pos), ctx, false, pos == 0).flatMap { (v: Any) =>
-              results.set(pos, v)
-              run(pos + 1)
-            } (DBIO.sameThreadExecutionContext)
+            if (pos == len)
+              Future.successful {
+                val b = sa.cbf()
+                var i = 0
+                while (i < len) {
+                  b += results.get(i)
+                  i += 1
+                }
+                b.result()
+              } else
+              runInContext(actions(pos), ctx, false, pos == 0).flatMap {
+                (v: Any) =>
+                  results.set(pos, v)
+                  run(pos + 1)
+              }(DBIO.sameThreadExecutionContext)
           }
           run(0).asInstanceOf[Future[R]]
         case CleanUpAction(base, f, keepFailure, ec) =>
           val p = Promise[R]()
           runInContext(base, ctx, streaming, topLevel).onComplete { t1 =>
             try {
-              val a2 = f(t1 match {
+              val a2 = f(
+                  t1 match {
                 case Success(_) => None
                 case Failure(t) => Some(t)
               })
               runInContext(a2, ctx, false, false).onComplete { t2 =>
-                if(t2.isFailure && (t1.isSuccess || !keepFailure)) p.complete(t2.asInstanceOf[Failure[R]])
+                if (t2.isFailure && (t1.isSuccess || !keepFailure))
+                  p.complete(t2.asInstanceOf[Failure[R]])
                 else p.complete(t1)
-              } (DBIO.sameThreadExecutionContext)
+              }(DBIO.sameThreadExecutionContext)
             } catch {
               case NonFatal(ex) =>
                 throw (t1 match {
@@ -190,21 +226,42 @@ trait BasicBackend { self =>
                   case _ => ex
                 })
             }
-          } (ctx.getEC(ec))
+          }(ctx.getEC(ec))
           p.future
         case FailedAction(a) =>
           runInContext(a, ctx, false, topLevel).failed.asInstanceOf[Future[R]]
         case AsTryAction(a) =>
           val p = Promise[R]()
-          runInContext(a, ctx, false, topLevel).onComplete(v => p.success(v.asInstanceOf[R]))(DBIO.sameThreadExecutionContext)
+          runInContext(a, ctx, false, topLevel).onComplete(v =>
+                p.success(v.asInstanceOf[R]))(DBIO.sameThreadExecutionContext)
           p.future
         case NamedAction(a, _) =>
           runInContext(a, ctx, streaming, topLevel)
         case a: SynchronousDatabaseAction[_, _, _, _] =>
-          if(streaming) {
-            if(a.supportsStreaming) streamSynchronousDatabaseAction(a.asInstanceOf[SynchronousDatabaseAction[_, _ <: NoStream, This, _ <: Effect]], ctx.asInstanceOf[StreamingContext], !topLevel).asInstanceOf[Future[R]]
-            else runInContext(CleanUpAction(AndThenAction(Vector(DBIO.Pin, a.nonFusedEquivalentAction)), _ => DBIO.Unpin, true, DBIO.sameThreadExecutionContext), ctx, streaming, topLevel)
-          } else runSynchronousDatabaseAction(a.asInstanceOf[SynchronousDatabaseAction[R, NoStream, This, _]], ctx, !topLevel)
+          if (streaming) {
+            if (a.supportsStreaming)
+              streamSynchronousDatabaseAction(
+                  a.asInstanceOf[SynchronousDatabaseAction[
+                          _, _ <: NoStream, This, _ <: Effect]],
+                  ctx.asInstanceOf[StreamingContext],
+                  !topLevel).asInstanceOf[Future[R]]
+            else
+              runInContext(
+                  CleanUpAction(
+                      AndThenAction(
+                          Vector(DBIO.Pin, a.nonFusedEquivalentAction)),
+                      _ => DBIO.Unpin,
+                      true,
+                      DBIO.sameThreadExecutionContext),
+                  ctx,
+                  streaming,
+                  topLevel)
+          } else
+            runSynchronousDatabaseAction(
+                a.asInstanceOf[
+                    SynchronousDatabaseAction[R, NoStream, This, _]],
+                ctx,
+                !topLevel)
         case a: DatabaseAction[_, _, _] =>
           throw new SlickException(s"Unsupported database action $a for $this")
       }
@@ -212,124 +269,168 @@ trait BasicBackend { self =>
 
     /** Within a synchronous execution, ensure that a Session is available. */
     protected[this] final def acquireSession(ctx: Context): Unit =
-      if(!ctx.isPinned) ctx.currentSession = createSession()
+      if (!ctx.isPinned) ctx.currentSession = createSession()
 
     /** Within a synchronous execution, close the current Session unless it is pinned.
       *
       * @param discardErrors If set to true, swallow all non-fatal errors that arise while
       *        closing the Session. */
-    protected[this] final def releaseSession(ctx: Context, discardErrors: Boolean): Unit =
-      if(!ctx.isPinned) {
-        try ctx.currentSession.close() catch { case NonFatal(ex) if(discardErrors) => }
+    protected[this] final def releaseSession(
+        ctx: Context, discardErrors: Boolean): Unit =
+      if (!ctx.isPinned) {
+        try ctx.currentSession.close() catch {
+          case NonFatal(ex) if (discardErrors) =>
+        }
         ctx.currentSession = null
       }
 
     /** Run a `SynchronousDatabaseAction` on this database. */
-    protected[this] def runSynchronousDatabaseAction[R](a: SynchronousDatabaseAction[R, NoStream, This, _], ctx: Context, highPrio: Boolean): Future[R] = {
+    protected[this] def runSynchronousDatabaseAction[R](
+        a: SynchronousDatabaseAction[R, NoStream, This, _],
+        ctx: Context,
+        highPrio: Boolean): Future[R] = {
       val promise = Promise[R]()
-      ctx.getEC(synchronousExecutionContext).prepare.execute(new AsyncExecutor.PrioritizedRunnable {
-        def highPriority = highPrio
-        def run: Unit =
-          try {
-            ctx.readSync
-            val res = try {
-              acquireSession(ctx)
-              val res = try a.run(ctx) catch { case NonFatal(ex) =>
-                releaseSession(ctx, true)
-                throw ex
-              }
-              releaseSession(ctx, false)
-              res
-            } finally { ctx.sync = 0 }
-            promise.success(res)
-          } catch { case NonFatal(ex) => promise.tryFailure(ex) }
-      })
+      ctx
+        .getEC(synchronousExecutionContext)
+        .prepare
+        .execute(new AsyncExecutor.PrioritizedRunnable {
+          def highPriority = highPrio
+          def run: Unit =
+            try {
+              ctx.readSync
+              val res = try {
+                acquireSession(ctx)
+                val res = try a.run(ctx) catch {
+                  case NonFatal(ex) =>
+                    releaseSession(ctx, true)
+                    throw ex
+                }
+                releaseSession(ctx, false)
+                res
+              } finally { ctx.sync = 0 }
+              promise.success(res)
+            } catch { case NonFatal(ex) => promise.tryFailure(ex) }
+        })
       promise.future
     }
 
     /** Stream a `SynchronousDatabaseAction` on this database. */
-    protected[this] def streamSynchronousDatabaseAction(a: SynchronousDatabaseAction[_, _ <: NoStream, This, _ <: Effect], ctx: StreamingContext, highPrio: Boolean): Future[Null] = {
+    protected[this] def streamSynchronousDatabaseAction(
+        a: SynchronousDatabaseAction[_, _ <: NoStream, This, _ <: Effect],
+        ctx: StreamingContext,
+        highPrio: Boolean): Future[Null] = {
       ctx.streamingAction = a
       scheduleSynchronousStreaming(a, ctx, highPrio)(null)
       ctx.streamingResultPromise.future
     }
 
     /** Stream a part of the results of a `SynchronousDatabaseAction` on this database. */
-    protected[BasicBackend] def scheduleSynchronousStreaming(a: SynchronousDatabaseAction[_, _ <: NoStream, This, _ <: Effect], ctx: StreamingContext, highPrio: Boolean)(initialState: a.StreamState): Unit = try {
-      ctx.getEC(synchronousExecutionContext).prepare.execute(new AsyncExecutor.PrioritizedRunnable {
-        private[this] def str(l: Long) = if(l != Long.MaxValue) l else if(GlobalConfig.unicodeDump) "\u221E" else "oo"
+    protected[BasicBackend] def scheduleSynchronousStreaming(
+        a: SynchronousDatabaseAction[_, _ <: NoStream, This, _ <: Effect],
+        ctx: StreamingContext,
+        highPrio: Boolean)(initialState: a.StreamState): Unit =
+      try {
+        ctx
+          .getEC(synchronousExecutionContext)
+          .prepare
+          .execute(new AsyncExecutor.PrioritizedRunnable {
+            private[this] def str(l: Long) =
+              if (l != Long.MaxValue) l
+              else if (GlobalConfig.unicodeDump) "\u221E" else "oo"
 
-        def highPriority = highPrio
+            def highPriority = highPrio
 
-        def run: Unit = try {
-          val debug = streamLogger.isDebugEnabled
-          var state = initialState
-          ctx.readSync
-          if(state eq null) acquireSession(ctx)
-          var demand = ctx.demandBatch
-          var realDemand = if(demand < 0) demand - Long.MinValue else demand
-          do {
-            try {
-              if(debug)
-                streamLogger.debug((if(state eq null) "Starting initial" else "Restarting ") + " streaming action, realDemand = " + str(realDemand))
-              if(ctx.cancelled) {
-                if(ctx.deferredError ne null) throw ctx.deferredError
-                if(state ne null) { // streaming cancelled before finishing
-                  val oldState = state
-                  state = null
-                  a.cancelStream(ctx, oldState)
+            def run: Unit =
+              try {
+                val debug = streamLogger.isDebugEnabled
+                var state = initialState
+                ctx.readSync
+                if (state eq null) acquireSession(ctx)
+                var demand = ctx.demandBatch
+                var realDemand =
+                  if (demand < 0) demand - Long.MinValue else demand
+                do {
+                  try {
+                    if (debug)
+                      streamLogger.debug((if (state eq null) "Starting initial"
+                                          else "Restarting ") +
+                          " streaming action, realDemand = " + str(realDemand))
+                    if (ctx.cancelled) {
+                      if (ctx.deferredError ne null) throw ctx.deferredError
+                      if (state ne null) {
+                        // streaming cancelled before finishing
+                        val oldState = state
+                        state = null
+                        a.cancelStream(ctx, oldState)
+                      }
+                    } else if ((realDemand > 0 || (state eq null))) {
+                      val oldState = state
+                      state = null
+                      state = a.emitStream(ctx, realDemand, oldState)
+                    }
+                    if (state eq null) {
+                      // streaming finished and cleaned up
+                      releaseSession(ctx, true)
+                      ctx.streamingResultPromise.trySuccess(null)
+                    }
+                  } catch {
+                    case NonFatal(ex) =>
+                      if (state ne null)
+                        try a.cancelStream(ctx, state) catch ignoreFollowOnError
+                      releaseSession(ctx, true)
+                      throw ex
+                  } finally {
+                    ctx.streamState = state
+                    ctx.sync = 0
+                  }
+                  if (debug) {
+                    if (state eq null)
+                      streamLogger.debug(
+                          s"Sent up to ${str(realDemand)} elements - Stream " +
+                          (if (ctx.cancelled) "cancelled"
+                           else "completely delivered"))
+                    else
+                      streamLogger.debug(
+                          s"Sent ${str(realDemand)} elements, more available - Performing atomic state transition")
+                  }
+                  demand = ctx.delivered(demand)
+                  realDemand = if (demand < 0) demand - Long.MinValue
+                  else demand
+                } while ( (state ne null) && realDemand > 0)
+                if (debug) {
+                  if (state ne null)
+                    streamLogger.debug(
+                        "Suspending streaming action with continuation (more data available)")
+                  else streamLogger.debug("Finished streaming action")
                 }
-              } else if((realDemand > 0 || (state eq null))) {
-                val oldState = state
-                state = null
-                state = a.emitStream(ctx, realDemand, oldState)
+              } catch {
+                case NonFatal(ex) => ctx.streamingResultPromise.tryFailure(ex)
               }
-              if(state eq null) { // streaming finished and cleaned up
-                releaseSession(ctx, true)
-                ctx.streamingResultPromise.trySuccess(null)
-              }
-            } catch { case NonFatal(ex) =>
-              if(state ne null) try a.cancelStream(ctx, state) catch ignoreFollowOnError
-              releaseSession(ctx, true)
-              throw ex
-            } finally {
-              ctx.streamState = state
-              ctx.sync = 0
-            }
-            if(debug) {
-              if(state eq null) streamLogger.debug(s"Sent up to ${str(realDemand)} elements - Stream " + (if(ctx.cancelled) "cancelled" else "completely delivered"))
-              else streamLogger.debug(s"Sent ${str(realDemand)} elements, more available - Performing atomic state transition")
-            }
-            demand = ctx.delivered(demand)
-            realDemand = if(demand < 0) demand - Long.MinValue else demand
-          } while ((state ne null) && realDemand > 0)
-          if(debug) {
-            if(state ne null) streamLogger.debug("Suspending streaming action with continuation (more data available)")
-            else streamLogger.debug("Finished streaming action")
-          }
-        } catch { case NonFatal(ex) => ctx.streamingResultPromise.tryFailure(ex) }
-      })
-    } catch { case NonFatal(ex) =>
-      streamLogger.warn("Error scheduling synchronous streaming", ex)
-      throw ex
-    }
-
-
+          })
+      } catch {
+        case NonFatal(ex) =>
+          streamLogger.warn("Error scheduling synchronous streaming", ex)
+          throw ex
+      }
 
     /** Return the default ExecutionContet for this Database which should be used for running
       * SynchronousDatabaseActions for asynchronous execution. */
     protected[this] def synchronousExecutionContext: ExecutionContext
 
-    protected[this] def logAction(a: DBIOAction[_, NoStream, Nothing], ctx: Context): Unit = {
-      if(actionLogger.isDebugEnabled && a.isLogged) {
+    protected[this] def logAction(
+        a: DBIOAction[_, NoStream, Nothing], ctx: Context): Unit = {
+      if (actionLogger.isDebugEnabled && a.isLogged) {
         ctx.sequenceCounter += 1
         val logA = a.nonFusedEquivalentAction
-        val aPrefix = if(a eq logA) "" else "[fused] "
-        val dump = new TreePrinter(prefix = "    ", firstPrefix = aPrefix, narrow = {
-          case a: DBIOAction[_, _, _] => a.nonFusedEquivalentAction
-          case o => o
-        }).get(logA)
-        val msg = DumpInfo.highlight("#" + ctx.sequenceCounter) + ": " + dump.substring(0, dump.length-1)
+        val aPrefix = if (a eq logA) "" else "[fused] "
+        val dump =
+          new TreePrinter(prefix = "    ", firstPrefix = aPrefix, narrow = {
+            case a: DBIOAction[_, _, _] => a.nonFusedEquivalentAction
+            case o => o
+          }).get(logA)
+        val msg =
+          DumpInfo.highlight("#" + ctx.sequenceCounter) + ": " +
+          dump.substring(0, dump.length - 1)
         actionLogger.debug(msg)
       }
     }
@@ -337,6 +438,7 @@ trait BasicBackend { self =>
 
   /** A logical session of a `Database`. The underlying database connection is created lazily on demand. */
   trait SessionDef extends Closeable {
+
     /** Close this Session. */
     def close(): Unit
 
@@ -347,6 +449,7 @@ trait BasicBackend { self =>
 
   /** The context object passed to database actions by the execution engine. */
   trait BasicActionContext extends ActionContext {
+
     /** Whether to run all operations on the current thread or schedule them normally on the
       * appropriate ExecutionContext. This is used by the blocking API. */
     protected[BasicBackend] val useSameThread: Boolean
@@ -354,7 +457,7 @@ trait BasicBackend { self =>
     /** Return the specified ExecutionContext unless running in same-thread mode, in which case
       * `Action.sameThreadExecutionContext` is returned instead. */
     private[BasicBackend] def getEC(ec: ExecutionContext): ExecutionContext =
-      if(useSameThread) DBIO.sameThreadExecutionContext else ec
+      if (useSameThread) DBIO.sameThreadExecutionContext else ec
 
     /** A volatile variable to enforce the happens-before relationship (see
       * [[https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html]] and
@@ -364,7 +467,8 @@ trait BasicBackend { self =>
       * synchronous execution. */
     @volatile private[BasicBackend] var sync = 0
 
-    private[BasicBackend] def readSync = sync // workaround for SI-9053 to avoid warnings
+    private[BasicBackend] def readSync =
+      sync // workaround for SI-9053 to avoid warnings
 
     private[BasicBackend] var currentSession: Session = null
 
@@ -376,7 +480,13 @@ trait BasicBackend { self =>
   }
 
   /** A special DatabaseActionContext for streaming execution. */
-  protected[this] class BasicStreamingActionContext(subscriber: Subscriber[_], protected[BasicBackend] val useSameThread: Boolean, database: Database) extends BasicActionContext with StreamingActionContext with Subscription {
+  protected[this] class BasicStreamingActionContext(
+      subscriber: Subscriber[_],
+      protected[BasicBackend] val useSameThread: Boolean,
+      database: Database)
+      extends BasicActionContext with StreamingActionContext
+      with Subscription {
+
     /** Whether the Subscriber has been signaled with `onComplete` or `onError`. */
     private[this] var finished = false
 
@@ -397,7 +507,8 @@ trait BasicBackend { self =>
     private[BasicBackend] var streamState: AnyRef = null
 
     /** The streaming action which may need to be continued with the suspended state */
-    private[BasicBackend] var streamingAction: SynchronousDatabaseAction[_, _ <: NoStream, This, _ <: Effect] = null
+    private[BasicBackend] var streamingAction: SynchronousDatabaseAction[
+        _, _ <: NoStream, This, _ <: Effect] = null
 
     @volatile private[this] var cancelRequested = false
 
@@ -422,21 +533,25 @@ trait BasicBackend { self =>
 
     /** Finish the stream with `onComplete` if it is not finished yet. May only be called from a
       * synchronous action context. */
-    def tryOnComplete: Unit = if(!finished && !cancelRequested) {
-      if(streamLogger.isDebugEnabled) streamLogger.debug("Signaling onComplete()")
+    def tryOnComplete: Unit = if (!finished && !cancelRequested) {
+      if (streamLogger.isDebugEnabled)
+        streamLogger.debug("Signaling onComplete()")
       finished = true
       try subscriber.onComplete() catch {
-        case NonFatal(ex) => streamLogger.warn("Subscriber.onComplete failed unexpectedly", ex)
+        case NonFatal(ex) =>
+          streamLogger.warn("Subscriber.onComplete failed unexpectedly", ex)
       }
     }
 
     /** Finish the stream with `onError` if it is not finished yet. May only be called from a
       * synchronous action context. */
-    def tryOnError(t: Throwable): Unit = if(!finished) {
-      if(streamLogger.isDebugEnabled) streamLogger.debug(s"Signaling onError($t)")
+    def tryOnError(t: Throwable): Unit = if (!finished) {
+      if (streamLogger.isDebugEnabled)
+        streamLogger.debug(s"Signaling onError($t)")
       finished = true
       try subscriber.onError(t) catch {
-        case NonFatal(ex) => streamLogger.warn("Subscriber.onError failed unexpectedly", ex)
+        case NonFatal(ex) =>
+          streamLogger.warn("Subscriber.onError failed unexpectedly", ex)
       }
     }
 
@@ -444,13 +559,20 @@ trait BasicBackend { self =>
     def restartStreaming: Unit = {
       readSync
       val s = streamState
-      if(s ne null) {
+      if (s ne null) {
         streamState = null
-        if(streamLogger.isDebugEnabled) streamLogger.debug("Scheduling stream continuation after transition from demand = 0")
+        if (streamLogger.isDebugEnabled)
+          streamLogger.debug(
+              "Scheduling stream continuation after transition from demand = 0")
         val a = streamingAction
-        database.scheduleSynchronousStreaming(a, this.asInstanceOf[StreamingContext], highPrio = true)(s.asInstanceOf[a.StreamState])
+        database.scheduleSynchronousStreaming(
+            a,
+            this.asInstanceOf[StreamingContext],
+            highPrio = true)(s.asInstanceOf[a.StreamState])
       } else {
-        if(streamLogger.isDebugEnabled) streamLogger.debug("Saw transition from demand = 0, but no stream continuation available")
+        if (streamLogger.isDebugEnabled)
+          streamLogger.debug(
+              "Saw transition from demand = 0, but no stream continuation available")
       }
     }
 
@@ -458,21 +580,22 @@ trait BasicBackend { self =>
 
     ////////////////////////////////////////////////////////////////////////// Subscription methods
 
-    def request(l: Long): Unit = if(!cancelRequested) {
-      if(l <= 0) {
-        deferredError = new IllegalArgumentException("Requested count must not be <= 0 (see Reactive Streams spec, 3.9)")
+    def request(l: Long): Unit = if (!cancelRequested) {
+      if (l <= 0) {
+        deferredError = new IllegalArgumentException(
+            "Requested count must not be <= 0 (see Reactive Streams spec, 3.9)")
         cancel
       } else {
-        if(!cancelRequested && remaining.getAndAdd(l) == 0L) restartStreaming
+        if (!cancelRequested && remaining.getAndAdd(l) == 0L) restartStreaming
       }
     }
 
-    def cancel: Unit = if(!cancelRequested) {
+    def cancel: Unit = if (!cancelRequested) {
       cancelRequested = true
       // Restart streaming because cancelling requires closing the result set and the session from
       // within a synchronous action context. This will also complete the result Promise and thus
       // allow the rest of the scheduled Action to run.
-      if(remaining.getAndSet(Long.MaxValue) == 0L) restartStreaming
+      if (remaining.getAndSet(Long.MaxValue) == 0L) restartStreaming
     }
   }
 }

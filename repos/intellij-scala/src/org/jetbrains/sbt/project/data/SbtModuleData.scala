@@ -6,12 +6,15 @@ import com.intellij.openapi.externalSystem.model.{Key, ProjectKeys, ProjectSyste
 import org.jetbrains.sbt.resolvers.SbtResolver
 
 /**
- * @author Pavel Fatin
- */
-class SbtModuleData(val owner: ProjectSystemId, val imports: Seq[String], val resolvers: Set[SbtResolver])
-        extends AbstractExternalEntityData(owner)
+  * @author Pavel Fatin
+  */
+class SbtModuleData(val owner: ProjectSystemId,
+                    val imports: Seq[String],
+                    val resolvers: Set[SbtResolver])
+    extends AbstractExternalEntityData(owner)
 
 object SbtModuleData {
-  val Key: Key[SbtModuleData] = new Key(classOf[SbtModuleData].getName,
-    ProjectKeys.MODULE.getProcessingWeight + 1)
+  val Key: Key[SbtModuleData] = new Key(
+      classOf[SbtModuleData].getName,
+      ProjectKeys.MODULE.getProcessingWeight + 1)
 }

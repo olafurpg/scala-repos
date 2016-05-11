@@ -28,15 +28,18 @@ private class JmDNSAnnouncer extends MDNSAnnouncerIface {
   val scheme = "jmdns"
 
   def announce(
-    addr: InetSocketAddress,
-    name: String,
-    regType: String,
-    domain: String
+      addr: InetSocketAddress,
+      name: String,
+      regType: String,
+      domain: String
   ): Future[Announcement] = {
-    val info = ServiceInfo.create(regType + "." + domain, name, addr.getPort, "")
+    val info =
+      ServiceInfo.create(regType + "." + domain, name, addr.getPort, "")
     DNS.registerService(info) map { _ =>
       new Announcement {
-        def unannounce() = DNS.unregisterService(info) map { _ => () }
+        def unannounce() = DNS.unregisterService(info) map { _ =>
+          ()
+        }
       }
     }
   }
@@ -51,20 +54,21 @@ private object JmDNSResolver {
       def serviceResolved(event: ServiceEvent) {}
 
       def serviceAdded(event: ServiceEvent) {
-        DNS.getServiceInfo(event.getType, event.getName) foreach { info =>
-          val addresses = info.getInetAddresses
-          val metadata = MdnsAddrMetadata(
-            info.getName,
-            info.getApplication + "." + info.getProtocol,
-            info.getDomain)
-          val addr = Address.Inet(
-            new InetSocketAddress(addresses(0), info.getPort),
-            MdnsAddrMetadata.toAddrMetadata(metadata))
+        DNS.getServiceInfo(event.getType, event.getName) foreach {
+          info =>
+            val addresses = info.getInetAddresses
+            val metadata =
+              MdnsAddrMetadata(info.getName,
+                               info.getApplication + "." + info.getProtocol,
+                               info.getDomain)
+            val addr =
+              Address.Inet(new InetSocketAddress(addresses(0), info.getPort),
+                           MdnsAddrMetadata.toAddrMetadata(metadata))
 
-          synchronized {
-            services.put(info.getName, addr)
-            v() = Addr.Bound(services.values.toSet: Set[Address])
-          }
+            synchronized {
+              services.put(info.getName, addr)
+              v() = Addr.Bound(services.values.toSet: Set[Address])
+            }
         }
       }
 
@@ -94,20 +98,21 @@ private class JmDNSGroup(regType: String) extends Group[Address] {
     def serviceResolved(event: ServiceEvent) {}
 
     def serviceAdded(event: ServiceEvent) {
-      DNS.getServiceInfo(event.getType, event.getName) foreach { info =>
-        val addresses = info.getInetAddresses
-        val metadata = MdnsAddrMetadata(
-          info.getName,
-          info.getApplication + "." + info.getProtocol,
-          info.getDomain)
-        val addr = Address.Inet(
-          new InetSocketAddress(addresses(0), info.getPort),
-          MdnsAddrMetadata.toAddrMetadata(metadata))
+      DNS.getServiceInfo(event.getType, event.getName) foreach {
+        info =>
+          val addresses = info.getInetAddresses
+          val metadata =
+            MdnsAddrMetadata(info.getName,
+                             info.getApplication + "." + info.getProtocol,
+                             info.getDomain)
+          val addr =
+            Address.Inet(new InetSocketAddress(addresses(0), info.getPort),
+                         MdnsAddrMetadata.toAddrMetadata(metadata))
 
-        synchronized {
-          services.put(info.getName, addr)
-          set() = services.values.toSet
-        }
+          synchronized {
+            services.put(info.getName, addr)
+            set() = services.values.toSet
+          }
       }
     }
 

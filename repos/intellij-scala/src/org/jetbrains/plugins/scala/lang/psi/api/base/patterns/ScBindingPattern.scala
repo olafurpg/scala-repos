@@ -18,7 +18,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 import scala.annotation.tailrec
 
-trait ScBindingPattern extends ScPattern with ScNamedElement with ScTypedDefinition with NavigationItem with PsiDocCommentOwner {
+trait ScBindingPattern
+    extends ScPattern with ScNamedElement with ScTypedDefinition
+    with NavigationItem with PsiDocCommentOwner {
   override def getTextOffset: Int = nameId.getTextRange.getStartOffset
 
   def isWildcard: Boolean
@@ -54,11 +56,11 @@ trait ScBindingPattern extends ScPattern with ScNamedElement with ScTypedDefinit
     }
   }
 
-
   def getOriginalElement: PsiElement = {
     val ccontainingClass = containingClass
     if (ccontainingClass == null) return this
-    val originalClass: PsiClass = ccontainingClass.getOriginalElement.asInstanceOf[PsiClass]
+    val originalClass: PsiClass =
+      ccontainingClass.getOriginalElement.asInstanceOf[PsiClass]
     if (ccontainingClass eq originalClass) return this
     if (!originalClass.isInstanceOf[ScTypeDefinition]) return this
     val c = originalClass.asInstanceOf[ScTypeDefinition]
@@ -94,8 +96,8 @@ trait ScBindingPattern extends ScPattern with ScNamedElement with ScTypedDefinit
   }
 
   /**
-   * It's for Java only
-   */
+    * It's for Java only
+    */
   def getContainingClass: PsiClass = {
     nameContext match {
       case m: PsiMember => m.getContainingClass
@@ -123,7 +125,8 @@ object ScBindingPattern {
   def getCompoundCopy(rt: ScType, b: ScBindingPattern): ScBindingPattern = {
     b match {
       case light: ScLightBindingPattern => getCompoundCopy(rt, light.b)
-      case definition: ScBindingPattern  => new ScLightBindingPattern(rt, definition)
+      case definition: ScBindingPattern =>
+        new ScLightBindingPattern(rt, definition)
     }
   }
 }

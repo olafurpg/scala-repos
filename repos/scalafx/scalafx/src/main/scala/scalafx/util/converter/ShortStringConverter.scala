@@ -31,9 +31,12 @@ import javafx.util.{converter => jfxuc}
 import scala.language.implicitConversions
 
 object ShortStringConverter {
-  implicit def sfxShortStringConverter2jfx(c: ShortStringConverter): jfxuc.ShortStringConverter =
+  implicit def sfxShortStringConverter2jfx(
+      c: ShortStringConverter): jfxuc.ShortStringConverter =
     if (c != null) c.delegate else null
 }
 
-class ShortStringConverter(delegate: jfxuc.ShortStringConverter = new jfxuc.ShortStringConverter)
-  extends StringConverterDelegate[java.lang.Short, Short, jfxuc.ShortStringConverter](delegate)
+class ShortStringConverter(
+    delegate: jfxuc.ShortStringConverter = new jfxuc.ShortStringConverter)
+    extends StringConverterDelegate[
+        java.lang.Short, Short, jfxuc.ShortStringConverter](delegate)

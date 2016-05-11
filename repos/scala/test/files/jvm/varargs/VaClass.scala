@@ -1,8 +1,4 @@
-
-
 import annotation.varargs
-
-
 
 class VaClass {
 

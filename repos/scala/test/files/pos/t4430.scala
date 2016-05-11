@@ -5,7 +5,7 @@ class Crash {
   val t = 0
 
   val q = A(
-    b = S { val xxx = t ; 42 },
-    a = 0
+      b = S { val xxx = t; 42 },
+      a = 0
   )
 }

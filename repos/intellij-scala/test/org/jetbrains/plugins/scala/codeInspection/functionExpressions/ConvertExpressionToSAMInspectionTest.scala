@@ -7,36 +7,37 @@ import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
 import org.jetbrains.plugins.scala.util.TestUtils.ScalaSdkVersion
 
 /**
- * Author: Svyatoslav Ilinskiy
- * Date: 6/30/15
- */
-class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
+  * Author: Svyatoslav Ilinskiy
+  * Date: 6/30/15
+  */
+class ConvertExpressionToSAMInspectionTest
+    extends ScalaLightInspectionFixtureTestAdapter {
   override protected def setUp(): Unit = {
     super.setUp()
 
-    val defaultProfile = ScalaCompilerConfiguration.instanceIn(getProject).defaultProfile
+    val defaultProfile =
+      ScalaCompilerConfiguration.instanceIn(getProject).defaultProfile
     val newSettings = defaultProfile.getSettings
     newSettings.experimental = true
     defaultProfile.setSettings(newSettings)
   }
 
-
   override protected def libVersion: ScalaSdkVersion = ScalaSdkVersion._2_11
 
-  override protected def classOfInspection: Class[_ <: LocalInspectionTool] = classOf[ConvertExpressionToSAMInspection]
+  override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
+    classOf[ConvertExpressionToSAMInspection]
 
-  override protected def annotation: String = InspectionBundle.message("convert.expression.to.sam")
+  override protected def annotation: String =
+    InspectionBundle.message("convert.expression.to.sam")
 
   def testThreadRunnable(): Unit = {
-    val code =
-      s"""
+    val code = s"""
          |new Thread(${START}new Runnable $END{
          |override def run() = println()
          |}
       """.stripMargin
     check(code)
-    val text =
-      s"""
+    val text = s"""
          |new Thread(new Runnable {
          |override def run() = println()
          |})
@@ -46,15 +47,13 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def testValueDefinition(): Unit = {
-    val code =
-      s"""
+    val code = s"""
         |val y: Runnable = ${START}new Runnable $END{
         |  override def run(): Unit = ???
         |}
       """.stripMargin
     check(code)
-    val text =
-      """
+    val text = """
         |val y: Runnable = new Runnable {
         |  override def run(): Unit = ???
         |}
@@ -64,8 +63,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def testValueDefinitionNoDeclaredType(): Unit = {
-    val text =
-      """
+    val text = """
         |val y = new Runnable {
         |  override def run(): Unit = println()
         |}
@@ -74,8 +72,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def testNoParenFunction(): Unit = {
-    val code =
-      s"""
+    val code = s"""
         |trait A {
         |  def foo(): String
         |}
@@ -85,8 +82,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
         |})
       """.stripMargin
     check(code)
-    val text =
-      """
+    val text = """
         |trait A {
         |  def foo(): String
         |}
@@ -107,8 +103,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def testParameterless(): Unit = {
-    val code =
-      """
+    val code = """
         |trait A {
         |  def foo: String
         |}
@@ -121,8 +116,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def testTwoFunctions(): Unit = {
-    val code =
-      """
+    val code = """
         |trait A {
         |  def foo(): String
         |  def bar(): Int = 2
@@ -137,8 +131,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def testInner(): Unit = {
-    val code =
-      s"""
+    val code = s"""
         |new Thread(${START}new Runnable $END{
         |  def run() {
         |    def foo(i: Int) = i
@@ -148,8 +141,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
         |})
       """.stripMargin
     check(code)
-    val text =
-      s"""
+    val text = s"""
          |new Thread(new Runnable {
          |  def run() {
          |    def foo(i: Int) = i
@@ -158,8 +150,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
          |  }
          |})
       """.stripMargin
-    val res =
-      s"""
+    val res = s"""
          |new Thread(() => {
          |  def foo(i: Int) = i
          |
@@ -170,8 +161,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def testMultiLine(): Unit = {
-    val code =
-      s"""
+    val code = s"""
         |new Thread(${START}new Runnable $END{
         |  override def run(): Unit = {
         |    val i = 2 + 3
@@ -181,8 +171,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
         |})
       """.stripMargin
     check(code)
-    val text =
-      s"""
+    val text = s"""
          |new Thread(new Runnable {
          |  override def run(): Unit = {
          |    val i = 2 + 3
@@ -191,8 +180,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
          |  }
          |})
        """.stripMargin
-    val res =
-      """
+    val res = """
         |new Thread(() => {
         |  val i = 2 + 3
         |  val z = 2
@@ -203,8 +191,7 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
   }
 
   def testByNameAndDefaultParams(): Unit = {
-    val code =
-      s"""trait SAM { def test(s: ⇒ String, x: Int = 0): Unit }
+    val code = s"""trait SAM { def test(s: ⇒ String, x: Int = 0): Unit }
          |
          |val sm: SAM = ${START}new SAM $END{
          |  override def test(s: => String, x: Int = 1): Unit = println(s)
@@ -225,5 +212,4 @@ class ConvertExpressionToSAMInspectionTest extends ScalaLightInspectionFixtureTe
       """.stripMargin
     testFix(text, res, annotation)
   }
-
 }

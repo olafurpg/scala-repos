@@ -52,5 +52,4 @@ class Issue091Spec extends FlatSpec with RunOnApplicationThread {
 
     drop.effect() should be(null)
   }
-
 }

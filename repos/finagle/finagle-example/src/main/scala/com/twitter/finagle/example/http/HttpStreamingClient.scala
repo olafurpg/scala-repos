@@ -7,10 +7,10 @@ import com.twitter.finagle.Http
 import com.twitter.io.{Buf, Reader}
 
 /**
- * This client connects to a Streaming HTTP service, prints 1000 messages, then
- * disconnects.  If you start two or more of these clients simultaneously, you
- * will notice that this is also a PubSub example.
- */
+  * This client connects to a Streaming HTTP service, prints 1000 messages, then
+  * disconnects.  If you start two or more of these clients simultaneously, you
+  * will notice that this is also a PubSub example.
+  */
 object HttpStreamingClient {
   def main(args: Array[String]): Unit = {
     val username = args(0)
@@ -22,7 +22,8 @@ object HttpStreamingClient {
 
     val request = Request(Method.Get, path)
     val userpass = username + ":" + password
-    request.headerMap.add("Authorization", "Basic " + Base64.encode(userpass.getBytes("UTF-8")))
+    request.headerMap.add(
+        "Authorization", "Basic " + Base64.encode(userpass.getBytes("UTF-8")))
     request.headerMap.add("User-Agent", "Finagle 0.0")
     request.headerMap.add("Host", host)
     println(request)

@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -139,6 +139,7 @@ import ProcessBuilder._
   * }}}
   */
 trait ProcessBuilder extends Source with Sink {
+
   /** Starts the process represented by this builder, blocks until it exits, and
     * returns the output as a String.  Standard error is sent to the console.  If
     * the exit code is non-zero, an exception is thrown.
@@ -172,7 +173,7 @@ trait ProcessBuilder extends Source with Sink {
     * and then throw an exception.
     */
   def lineStream: Stream[String]
-  
+
   /** Deprecated (renamed). Use `lineStream` instead. */
   @deprecated("Use lineStream instead.", "2.11.0")
   def lines: Stream[String] = lineStream
@@ -184,7 +185,7 @@ trait ProcessBuilder extends Source with Sink {
     * to termination and then throw an exception.
     */
   def lineStream(log: ProcessLogger): Stream[String]
-  
+
   /** Deprecated (renamed).  Use `lineStream(log: ProcessLogger)` instead. */
   @deprecated("Use stream instead.", "2.11.0")
   def lines(log: ProcessLogger): Stream[String] = lineStream(log)
@@ -196,9 +197,9 @@ trait ProcessBuilder extends Source with Sink {
     * but will not throw an exception.
     */
   def lineStream_! : Stream[String]
-  
+
   /** Deprecated (renamed).  Use `lineStream_!` instead. */
-  @deprecated("Use lineStream_! instead.", "2.11.0")  
+  @deprecated("Use lineStream_! instead.", "2.11.0")
   def lines_! : Stream[String] = lineStream_!
 
   /** Starts the process represented by this builder.  The output is returned as
@@ -208,7 +209,7 @@ trait ProcessBuilder extends Source with Sink {
     * to termination but will not throw an exception.
     */
   def lineStream_!(log: ProcessLogger): Stream[String]
-  
+
   /** Deprecated (renamed).  Use `lineStream_!(log: ProcessLogger)` instead. */
   @deprecated("Use stream_! instead.", "2.11.0")
   def lines_!(log: ProcessLogger): Stream[String] = lineStream_!(log)
@@ -238,7 +239,7 @@ trait ProcessBuilder extends Source with Sink {
   def !<(log: ProcessLogger): Int
 
   /** Starts the process represented by this builder.  Standard output and error
-   * are sent to the console.*/
+    * are sent to the console.*/
   def run(): Process
 
   /** Starts the process represented by this builder.  Standard output and error
@@ -267,23 +268,22 @@ trait ProcessBuilder extends Source with Sink {
   /** Constructs a command that runs this command first and then `other` if this
     * command succeeds.
     */
-  def #&& (other: ProcessBuilder): ProcessBuilder
+  def #&&(other: ProcessBuilder): ProcessBuilder
 
   /** Constructs a command that runs this command first and then `other` if this
     * command does not succeed.
     */
-  def #|| (other: ProcessBuilder): ProcessBuilder
+  def #||(other: ProcessBuilder): ProcessBuilder
 
   /** Constructs a command that will run this command and pipes the output to
     * `other`.  `other` must be a simple command.
     */
-  def #| (other: ProcessBuilder): ProcessBuilder
+  def #|(other: ProcessBuilder): ProcessBuilder
 
   /** Constructs a command that will run this command and then `other`.  The
     * exit code will be the exit code of `other`.
     */
-  def ### (other: ProcessBuilder): ProcessBuilder
-
+  def ###(other: ProcessBuilder): ProcessBuilder
 
   /** True if this command can be the target of a pipe.  */
   def canPipeTo: Boolean
@@ -299,15 +299,15 @@ trait ProcessBuilder extends Source with Sink {
 
 /** This object contains traits used to describe input and output sources. */
 object ProcessBuilder extends ProcessBuilderImpl {
-  /** Used when creating [[scala.sys.process.ProcessBuilder.Source]] from an URL. */
-  trait URLBuilder extends Source {
 
-  }
+  /** Used when creating [[scala.sys.process.ProcessBuilder.Source]] from an URL. */
+  trait URLBuilder extends Source {}
 
   /** Used when creating [[scala.sys.process.ProcessBuilder.Source]] and/or
     * [[scala.sys.process.ProcessBuilder.Sink]] from a file.
     */
   trait FileBuilder extends Sink with Source {
+
     /** Append the contents of a `java.io.File` to this file */
     def #<<(f: File): ProcessBuilder
 
@@ -328,23 +328,26 @@ object ProcessBuilder extends ProcessBuilderImpl {
     protected def toSource: ProcessBuilder
 
     /** Writes the output stream of this process to the given file. */
-    def #> (f: File): ProcessBuilder = toFile(f, append = false)
+    def #>(f: File): ProcessBuilder = toFile(f, append = false)
 
     /** Appends the output stream of this process to the given file. */
-    def #>> (f: File): ProcessBuilder = toFile(f, append = true)
+    def #>>(f: File): ProcessBuilder = toFile(f, append = true)
 
     /** Writes the output stream of this process to the given OutputStream. The
       * argument is call-by-name, so the stream is recreated, written, and closed each
       * time this process is executed.
       */
-    def #>(out: => OutputStream): ProcessBuilder = #> (new OStreamBuilder(out, "<output stream>"))
+    def #>(out: => OutputStream): ProcessBuilder =
+      #>(new OStreamBuilder(out, "<output stream>"))
 
     /** Writes the output stream of this process to a [[scala.sys.process.ProcessBuilder]]. */
-    def #>(b: ProcessBuilder): ProcessBuilder = new PipedBuilder(toSource, b, false)
+    def #>(b: ProcessBuilder): ProcessBuilder =
+      new PipedBuilder(toSource, b, false)
 
     /** Returnes a [[scala.sys.process.ProcessBuilder]] representing this `Source`. */
     def cat = toSource
-    private def toFile(f: File, append: Boolean) = #> (new FileOutput(f, append))
+    private def toFile(f: File, append: Boolean) =
+      #>(new FileOutput(f, append))
   }
 
   /** Represents everything that can receive an output from a
@@ -354,18 +357,20 @@ object ProcessBuilder extends ProcessBuilderImpl {
     protected def toSink: ProcessBuilder
 
     /** Reads the given file into the input stream of this process. */
-    def #< (f: File): ProcessBuilder = #< (new FileInput(f))
+    def #<(f: File): ProcessBuilder = #<(new FileInput(f))
 
     /** Reads the given URL into the input stream of this process. */
-    def #< (f: URL): ProcessBuilder = #< (new URLInput(f))
+    def #<(f: URL): ProcessBuilder = #<(new URLInput(f))
 
     /** Reads the given InputStream into the input stream of this process. The
       * argument is call-by-name, so the stream is recreated, read, and closed each
       * time this process is executed.
       */
-    def #<(in: => InputStream): ProcessBuilder = #< (new IStreamBuilder(in, "<input stream>"))
+    def #<(in: => InputStream): ProcessBuilder =
+      #<(new IStreamBuilder(in, "<input stream>"))
 
     /** Reads the output of a [[scala.sys.process.ProcessBuilder]] into the input stream of this process. */
-    def #<(b: ProcessBuilder): ProcessBuilder = new PipedBuilder(b, toSink, false)
+    def #<(b: ProcessBuilder): ProcessBuilder =
+      new PipedBuilder(b, toSink, false)
   }
 }

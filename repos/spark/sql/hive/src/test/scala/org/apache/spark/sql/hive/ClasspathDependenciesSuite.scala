@@ -22,12 +22,12 @@ import java.net.URL
 import org.apache.spark.SparkFunSuite
 
 /**
- * Verify that some classes load and that others are not found on the classpath.
- *
- *
- * This is used to detect classpath and shading conflict, especially between
- * Spark's required Kryo version and that which can be found in some Hive versions.
- */
+  * Verify that some classes load and that others are not found on the classpath.
+  *
+  *
+  * This is used to detect classpath and shading conflict, especially between
+  * Spark's required Kryo version and that which can be found in some Hive versions.
+  */
 class ClasspathDependenciesSuite extends SparkFunSuite {
   private val classloader = this.getClass.getClassLoader
 
@@ -84,7 +84,8 @@ class ClasspathDependenciesSuite extends SparkFunSuite {
     assertLoads("org.apache.hadoop.hive.ql.CommandNeedRetryException")
   }
 
-  private val STD_INSTANTIATOR = "org.objenesis.strategy.StdInstantiatorStrategy"
+  private val STD_INSTANTIATOR =
+    "org.objenesis.strategy.StdInstantiatorStrategy"
 
   test("unshaded kryo") {
     assertLoads(KRYO, STD_INSTANTIATOR)
@@ -92,19 +93,19 @@ class ClasspathDependenciesSuite extends SparkFunSuite {
 
   test("Forbidden Dependencies") {
     assertClassNotFound(
-      SPARK_HIVE + KRYO,
-      SPARK_SHADED + KRYO,
-      "org.apache.hive." + KRYO,
-      "com.esotericsoftware.shaded." + STD_INSTANTIATOR,
-      SPARK_HIVE + "com.esotericsoftware.shaded." + STD_INSTANTIATOR,
-      "org.apache.hive.com.esotericsoftware.shaded." + STD_INSTANTIATOR
+        SPARK_HIVE + KRYO,
+        SPARK_SHADED + KRYO,
+        "org.apache.hive." + KRYO,
+        "com.esotericsoftware.shaded." + STD_INSTANTIATOR,
+        SPARK_HIVE + "com.esotericsoftware.shaded." + STD_INSTANTIATOR,
+        "org.apache.hive.com.esotericsoftware.shaded." + STD_INSTANTIATOR
     )
   }
 
   test("parquet-hadoop-bundle") {
     assertLoads(
-      "parquet.hadoop.ParquetOutputFormat",
-      "parquet.hadoop.ParquetInputFormat"
+        "parquet.hadoop.ParquetOutputFormat",
+        "parquet.hadoop.ParquetInputFormat"
     )
   }
 }

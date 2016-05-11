@@ -3,13 +3,11 @@ class ProtectedCompanion {
     protected def foo = 55
   }
 
-  class B extends A {
-
-  }
+  class B extends A {}
 
   object B {
     val b = new B
-    b./*ref*/foo
+    b. /*ref*/ foo
   }
 }
 //true

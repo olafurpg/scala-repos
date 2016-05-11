@@ -35,16 +35,16 @@ import com.mongodb._
 import org.bson.types.ObjectId
 import http.{S, LiftSession}
 
-
 package mongotestrecords {
 
   import field._
 
-  class TstRecord private () extends MongoRecord[TstRecord] with UUIDPk[TstRecord] {
+  class TstRecord private ()
+      extends MongoRecord[TstRecord] with UUIDPk[TstRecord] {
 
     def meta = TstRecord
 
-    object booleanfield	extends BooleanField(this)
+    object booleanfield extends BooleanField(this)
     object datetimefield extends DateTimeField(this)
     object doublefield extends DoubleField(this)
     object emailfield extends EmailField(this, 220)
@@ -68,14 +68,16 @@ package mongotestrecords {
   case class Address(street: String, city: String)
   case class Child(name: String, age: Int, birthdate: Option[Date])
 
-  case class Person(name: String, age: Int, address: Address, children: List[Child])
-    extends JsonObject[Person] {
+  case class Person(
+      name: String, age: Int, address: Address, children: List[Child])
+      extends JsonObject[Person] {
     def meta = Person
   }
 
   object Person extends JsonObjectMeta[Person]
 
-  class MainDoc private () extends MongoRecord[MainDoc] with ObjectIdPk[MainDoc] {
+  class MainDoc private ()
+      extends MongoRecord[MainDoc] with ObjectIdPk[MainDoc] {
     def meta = MainDoc
 
     object name extends StringField(this, 12)
@@ -91,12 +93,14 @@ package mongotestrecords {
   object RefDoc extends RefDoc with MongoMetaRecord[RefDoc]
 
   // uuid as id
-  class RefUuidDoc private () extends MongoRecord[RefUuidDoc] with UUIDPk[RefUuidDoc] {
+  class RefUuidDoc private ()
+      extends MongoRecord[RefUuidDoc] with UUIDPk[RefUuidDoc] {
     def meta = RefUuidDoc
   }
   object RefUuidDoc extends RefUuidDoc with MongoMetaRecord[RefUuidDoc]
 
-  class ListDoc private () extends MongoRecord[ListDoc] with ObjectIdPk[ListDoc] {
+  class ListDoc private ()
+      extends MongoRecord[ListDoc] with ObjectIdPk[ListDoc] {
     def meta = ListDoc
 
     import scala.collection.JavaConversions._
@@ -120,12 +124,13 @@ package mongotestrecords {
       override def asDBObject: DBObject = {
         val dbl = new BasicDBList
 
-        value.foreach {
-          m => {
+        value.foreach { m =>
+          {
             val dbo = new BasicDBObject
 
-            m.keys.foreach(k => {
-              dbo.put(k.toString, m.getOrElse(k, ""))
+            m.keys.foreach(k =>
+                  {
+                dbo.put(k.toString, m.getOrElse(k, ""))
             })
 
             dbl.add(dbo)
@@ -135,19 +140,25 @@ package mongotestrecords {
         dbl
       }
 
-      override def setFromDBObject(dbo: DBObject): Box[List[Map[String, String]]] = {
-        val lst: List[Map[String, String]] =
-          dbo.keySet.toList.map(k => {
-            dbo.get(k.toString) match {
-              case bdbo: BasicDBObject if (bdbo.containsField("name") && bdbo.containsField("type")) =>
-                Map("name"-> bdbo.getString("name"), "type" -> bdbo.getString("type"))
-              case _ => null
-            }
-          }).filter(_ != null)
+      override def setFromDBObject(
+          dbo: DBObject): Box[List[Map[String, String]]] = {
+        val lst: List[Map[String, String]] = dbo.keySet.toList
+          .map(k =>
+                {
+              dbo.get(k.toString) match {
+                case bdbo: BasicDBObject
+                    if
+                    (bdbo.containsField("name") &&
+                        bdbo.containsField("type")) =>
+                  Map("name" -> bdbo.getString("name"),
+                      "type" -> bdbo.getString("type"))
+                case _ => null
+              }
+          })
+          .filter(_ != null)
         Full(set(lst))
       }
     }
-
   }
   object ListDoc extends ListDoc with MongoMetaRecord[ListDoc]
 
@@ -165,7 +176,8 @@ package mongotestrecords {
     override def formats = DefaultFormats.lossless // adds .000
   }
 
-  class OptionalDoc private () extends MongoRecord[OptionalDoc] with ObjectIdPk[OptionalDoc] {
+  class OptionalDoc private ()
+      extends MongoRecord[OptionalDoc] with ObjectIdPk[OptionalDoc] {
     def meta = OptionalDoc
     // optional fields
     object stringbox extends StringField(this, 32) {
@@ -175,7 +187,8 @@ package mongotestrecords {
   }
   object OptionalDoc extends OptionalDoc with MongoMetaRecord[OptionalDoc]
 
-  class StrictDoc private () extends MongoRecord[StrictDoc] with ObjectIdPk[StrictDoc] {
+  class StrictDoc private ()
+      extends MongoRecord[StrictDoc] with ObjectIdPk[StrictDoc] {
     def meta = StrictDoc
     object name extends StringField(this, 32)
   }
@@ -187,10 +200,9 @@ package mongotestrecords {
   }
 }
 
-
 /**
- * Systems under specification for MongoRecordExamples.
- */
+  * Systems under specification for MongoRecordExamples.
+  */
 class MongoRecordExamplesSpec extends Specification with MongoTestKit {
   "MongoRecordExamples Specification".title
 
@@ -202,7 +214,7 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
 
     checkMongoIsRunning
 
-    S.initIfUninitted(session){
+    S.initIfUninitted(session) {
 
       val pwd = "test"
       val cal = Calendar.getInstance
@@ -220,7 +232,11 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
 
       // JsonObjectField
       val dob1 = Calendar.getInstance.setYear(2005).setMonth(7).setDay(4)
-      val per = Person("joe", 27, Address("Bulevard", "Helsinki"), List(Child("Mary", 5, Some(dob1.getTime)), Child("Mazy", 3, None)))
+      val per = Person("joe",
+                       27,
+                       Address("Bulevard", "Helsinki"),
+                       List(Child("Mary", 5, Some(dob1.getTime)),
+                            Child("Mazy", 3, None)))
       tr.person(per)
 
       // save the record in the db
@@ -235,7 +251,7 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
         t.id.value must_== tr.id.value
         t.booleanfield.value must_== tr.booleanfield.value
         TstRecord.formats.dateFormat.format(t.datetimefield.value.getTime) must_==
-        TstRecord.formats.dateFormat.format(tr.datetimefield.value.getTime)
+          TstRecord.formats.dateFormat.format(tr.datetimefield.value.getTime)
         t.doublefield.value must_== tr.doublefield.value
         t.intfield.value must_== tr.intfield.value
         t.localefield.value must_== tr.localefield.value
@@ -252,10 +268,13 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
         t.person.value.address.street must_== tr.person.value.address.street
         t.person.value.address.city must_== tr.person.value.address.city
         t.person.value.children.size must_== tr.person.value.children.size
-        for (i <- List.range(0, t.person.value.children.size-1)) {
-          t.person.value.children(i).name must_== tr.person.value.children(i).name
-          t.person.value.children(i).age must_== tr.person.value.children(i).age
-          t.person.value.children(i).birthdate must_== tr.person.value.children(i).birthdate
+        for (i <- List.range(0, t.person.value.children.size - 1)) {
+          t.person.value.children(i).name must_==
+            tr.person.value.children(i).name
+          t.person.value.children(i).age must_==
+            tr.person.value.children(i).age
+          t.person.value.children(i).birthdate must_==
+            tr.person.value.children(i).birthdate
         }
       }
 
@@ -310,17 +329,21 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
     RefDoc.count must_== 2
 
     // get the docs back from the db
-    MainDoc.find(md1.id.get).foreach(m => {
-      m.name.value must_== md1.name.value
-      m.cnt.value must_== md1.cnt.value
-      m.refdocId.value must_== md1.refdocId.value
-      m.refuuid.value must_== md1.refuuid.value
-    })
+    MainDoc
+      .find(md1.id.get)
+      .foreach(m =>
+            {
+          m.name.value must_== md1.name.value
+          m.cnt.value must_== md1.cnt.value
+          m.refdocId.value must_== md1.refdocId.value
+          m.refuuid.value must_== md1.refuuid.value
+      })
 
     // fetch a refdoc
     val refFromFetch = md1.refdocId.obj
     refFromFetch.isDefined must_== true
-    refFromFetch.openOrThrowException("we know this is Full").id.get must_== ref1.id.get
+    refFromFetch.openOrThrowException("we know this is Full").id.get must_==
+      ref1.id.get
 
     // query for a single doc with a JObject query
     val md1a = MainDoc.find(("name") -> "md1")
@@ -372,9 +395,11 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
     // get the doc back from the db and compare
     val mdq5 = MainDoc.find("_id", md1.id.get)
     mdq5.isDefined must_== true
-    mdq5.map ( m => {
-      m.name.value must_== "md1a"
-      m.cnt.value must_== 1
+    mdq5.map(
+        m =>
+          {
+        m.name.value must_== "md1a"
+        m.cnt.value must_== 1
     })
 
     if (!debug) {
@@ -412,14 +437,16 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
     val ld1 = ListDoc.createRecord
     ld1.name.set(name)
     ld1.stringlist.set(strlist)
-    ld1.intlist.set(List(99988,88, 88))
-    ld1.doublelist.set(List(997655.998,88.8))
-    ld1.boollist.set(List(true,true,false))
+    ld1.intlist.set(List(99988, 88, 88))
+    ld1.doublelist.set(List(997655.998, 88.8))
+    ld1.boollist.set(List(true, true, false))
     ld1.objidlist.set(List(ObjectId.get, ObjectId.get))
     ld1.dtlist.set(List(now, now))
     ld1.jsonobjlist.set(List(jd1, JsonDoc("2", "jsondoc2"), jd1))
-    ld1.patternlist.set(List(Pattern.compile("^Mongo"), Pattern.compile("^Mongo2")))
-    ld1.maplist.set(List(Map("name" -> "map1", "type" -> "map"), Map("name" -> "map2", "type" -> "map")))
+    ld1.patternlist.set(
+        List(Pattern.compile("^Mongo"), Pattern.compile("^Mongo2")))
+    ld1.maplist.set(List(Map("name" -> "map1", "type" -> "map"),
+                         Map("name" -> "map2", "type" -> "map")))
     ld1.binarylist.set(List[Array[Byte]]("foo".getBytes(), "bar".getBytes()))
 
     ld1.save() must_== ld1
@@ -437,11 +464,11 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
       l.objidlist.value must_== ld1.objidlist.value
       l.dtlist.value must_== ld1.dtlist.value
       l.jsonobjlist.value must_== ld1.jsonobjlist.value
-      for (i <- List.range(0, l.patternlist.value.size-1)) {
+      for (i <- List.range(0, l.patternlist.value.size - 1)) {
         l.patternlist.value(i).pattern must_== ld1.patternlist.value(i).pattern
       }
       l.maplist.value must_== ld1.maplist.value
-      for (i <- List.range(0, l.jsonobjlist.value.size-1)) {
+      for (i <- List.range(0, l.jsonobjlist.value.size - 1)) {
         l.jsonobjlist.value(i).id must_== ld1.jsonobjlist.value(i).id
         l.jsonobjlist.value(i).name must_== ld1.jsonobjlist.value(i).name
       }
@@ -483,20 +510,17 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
     od1.stringbox.valueBox must_== Empty
     od1.save() must_== od1
 
-    OptionalDoc.find(od1.id.get).foreach {
-      od1FromDB =>
-        od1FromDB.stringbox.valueBox must_== od1.stringbox.valueBox
+    OptionalDoc.find(od1.id.get).foreach { od1FromDB =>
+      od1FromDB.stringbox.valueBox must_== od1.stringbox.valueBox
     }
-
 
     val od2 = OptionalDoc.createRecord
     od1.stringbox.valueBox must_== Empty
     od2.stringbox.set("aloha")
     od2.save() must_== od2
 
-    OptionalDoc.find(od2.id.get).foreach {
-      od2FromDB =>
-        od2FromDB.stringbox.valueBox must_== od2.stringbox.valueBox
+    OptionalDoc.find(od2.id.get).foreach { od2FromDB =>
+      od2FromDB.stringbox.valueBox must_== od2.stringbox.valueBox
     }
 
     if (!debug) OptionalDoc.drop

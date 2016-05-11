@@ -1,6 +1,5 @@
 package source
 
-
 object UtilS {
   def foo() {}
   def bar() {

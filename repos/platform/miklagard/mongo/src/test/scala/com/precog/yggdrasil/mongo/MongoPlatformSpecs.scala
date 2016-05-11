@@ -91,7 +91,8 @@ object MongoPlatformSpecEngine extends Logging {
 
   private val checkUnused = new Runnable {
     def run = lock.synchronized {
-      logger.debug("Checking for unused MongoPlatformSpecEngine. Count = " + refcount)
+      logger.debug(
+          "Checking for unused MongoPlatformSpecEngine. Count = " + refcount)
       if (refcount == 0) {
         logger.debug("Running shutdown after final Mongo release")
         val current = engine
@@ -110,14 +111,15 @@ object MongoPlatformSpecEngine extends Logging {
 
     if (dataDirURL == null || dataDirURL.getProtocol != "file") {
       logger.error("No data dir: " + dataDirURL)
-      throw new Exception("Failed to locate test_data directory. Found: " + dataDirURL)
+      throw new Exception(
+          "Failed to locate test_data directory. Found: " + dataDirURL)
     }
 
     logger.debug("Loading from " + dataDirURL)
 
     val db = engine.realMongo.getDB("test")
 
-    def loadFile(path : String, file: File) {
+    def loadFile(path: String, file: File) {
       if (file.isDirectory) {
         file.listFiles.foreach { f =>
           logger.debug("Found child: " + f)
@@ -126,13 +128,16 @@ object MongoPlatformSpecEngine extends Logging {
       } else {
         if (file.getName.endsWith(".json")) {
           try {
-            val collectionName = path + file.getName.replace(".json","")
-            logger.debug("Loading %s into /test/%s".format(file, collectionName))
+            val collectionName = path + file.getName.replace(".json", "")
+            logger.debug(
+                "Loading %s into /test/%s".format(file, collectionName))
             val collection = db.getCollection(collectionName)
             JParser.parseManyFromFile(file) match {
               case Success(data) =>
                 val objs = data.map { jv =>
-                  JsonToMongo.apply(jv.asInstanceOf[JObject]).fold(e => throw new Exception(e.toString), s => s)
+                  JsonToMongo
+                    .apply(jv.asInstanceOf[JObject])
+                    .fold(e => throw new Exception(e.toString), s => s)
                 }.toArray
                 collection.insert(objs, WriteConcern.FSYNC_SAFE)
 
@@ -153,31 +158,33 @@ object MongoPlatformSpecEngine extends Logging {
   }
 }
 
-trait MongoPlatformSpecs extends ParseEvalStackSpecs[Future]
-    with MongoColumnarTableModule
-    with Logging
-    with StringIdMemoryDatasetConsumer[Future] { self =>
+trait MongoPlatformSpecs
+    extends ParseEvalStackSpecs[Future] with MongoColumnarTableModule
+    with Logging with StringIdMemoryDatasetConsumer[Future] {
+  self =>
 
-  class YggConfig extends ParseEvalStackSpecConfig
-      with IdSourceConfig
-      with EvaluatorConfig
-      with ColumnarTableModuleConfig
-      with BlockStoreColumnarTableModuleConfig
+  class YggConfig
+      extends ParseEvalStackSpecConfig with IdSourceConfig with EvaluatorConfig
+      with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig
       with MongoColumnarTableModuleConfig
 
   object yggConfig extends YggConfig {
-    override val maxSliceSize = 1000 // 10 was waaaaay too small, and we have other specs that cover that case
+    override val maxSliceSize =
+      1000 // 10 was waaaaay too small, and we have other specs that cover that case
   }
 
-  override def controlTimeout = Duration(10, "minutes")      // it's just unreasonable to run tests longer than this
+  override def controlTimeout =
+    Duration(10, "minutes") // it's just unreasonable to run tests longer than this
 
   def includeIdField = false
 
-  implicit val M: Monad[Future] with Comonad[Future] = new blueeyes.bkka.UnsafeFutureComonad(asyncContext, yggConfig.maxEvalDuration)
+  implicit val M: Monad[Future] with Comonad[Future] =
+    new blueeyes.bkka.UnsafeFutureComonad(
+        asyncContext, yggConfig.maxEvalDuration)
 
   val report = new LoggingQueryLogger[Future, instructions.Line]
-      with ExceptionQueryLogger[Future, instructions.Line]
-      with TimingQueryLogger[Future, instructions.Line] {
+  with ExceptionQueryLogger[Future, instructions.Line]
+  with TimingQueryLogger[Future, instructions.Line] {
 
     implicit def M = self.M
   }
@@ -191,17 +198,20 @@ trait MongoPlatformSpecs extends ParseEvalStackSpecs[Future]
 
     def dbAuthParams = Map.empty
     def mongo = self.mongo
-    override def load(table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
+    override def load(
+        table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
       // Rewrite paths of the form /foo/bar/baz to /test/foo_bar_baz
       val pathFixTS = Map1(Leaf(Source), CF1P("fix_paths") {
-        case orig: StrColumn => new StrColumn {
-          def apply(row: Int): String = {
-            val newPath = "/test/" + orig(row).replaceAll("^/|/$", "").replace('/', '_')
-            logger.debug("Fixed %s to %s".format(orig(row), newPath))
-            newPath
+        case orig: StrColumn =>
+          new StrColumn {
+            def apply(row: Int): String = {
+              val newPath =
+                "/test/" + orig(row).replaceAll("^/|/$", "").replace('/', '_')
+              logger.debug("Fixed %s to %s".format(orig(row), newPath))
+              newPath
+            }
+            def isDefinedAt(row: Int) = orig.isDefinedAt(row)
           }
-          def isDefinedAt(row: Int) = orig.isDefinedAt(row)
-        }
       })
       val transformed = table.transform(pathFixTS)
       super.load(transformed, apiKey, tpe)
@@ -218,30 +228,35 @@ trait MongoPlatformSpecs extends ParseEvalStackSpecs[Future]
     MongoPlatformSpecEngine.release
   }
 
-  override def map (fs: => Fragments): Fragments = (Step { startup() }) ^ fs ^ (Step { shutdown() })
+  override def map(fs: => Fragments): Fragments =
+    (Step { startup() }) ^ fs ^ (Step { shutdown() })
 
-  def Evaluator[N[+_]](N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
-    new Evaluator[N](N0)(mn,nm) {
+  def Evaluator[N[+ _]](
+      N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
+    new Evaluator[N](N0)(mn, nm) {
       val report = new LoggingQueryLogger[N, instructions.Line]
-          with ExceptionQueryLogger[N, instructions.Line]
-          with TimingQueryLogger[N, instructions.Line] {
+      with ExceptionQueryLogger[N, instructions.Line]
+      with TimingQueryLogger[N, instructions.Line] {
 
         val M = N0
       }
       class YggConfig extends EvaluatorConfig {
         val idSource = new FreshAtomicIdSource
-        val maxSliceSize = 1000 // 10 was waaaaay too small, and we have other specs that cover that case
+        val maxSliceSize =
+          1000 // 10 was waaaaay too small, and we have other specs that cover that case
       }
       val yggConfig = new YggConfig
       def freshIdScanner = self.freshIdScanner
     }
 }
 
-class MongoBasicValidationSpecs extends BasicValidationSpecs with MongoPlatformSpecs
+class MongoBasicValidationSpecs
+    extends BasicValidationSpecs with MongoPlatformSpecs
 
 class MongoHelloQuirrelSpecs extends HelloQuirrelSpecs with MongoPlatformSpecs
 
-class MongoLogisticRegressionSpecs extends LogisticRegressionSpecs with MongoPlatformSpecs
+class MongoLogisticRegressionSpecs
+    extends LogisticRegressionSpecs with MongoPlatformSpecs
 
 class MongoMiscStackSpecs extends MiscStackSpecs with MongoPlatformSpecs
 
@@ -249,7 +264,8 @@ class MongoRankSpecs extends RankSpecs with MongoPlatformSpecs
 
 class MongoRenderStackSpecs extends RenderStackSpecs with MongoPlatformSpecs
 
-class MongoUndefinedLiteralSpecs extends UndefinedLiteralSpecs with MongoPlatformSpecs
+class MongoUndefinedLiteralSpecs
+    extends UndefinedLiteralSpecs with MongoPlatformSpecs
 
 class MongoIdFieldSpecs extends MongoPlatformSpecs {
   override def includeIdField = true

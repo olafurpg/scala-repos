@@ -1,5 +1,5 @@
 object Final {
-  class X(final var x: Int)  { }
+  class X(final var x: Int) {}
   def f = new X(0).x += 1
 }
 
@@ -33,5 +33,5 @@ object Test {
   }
 }
 
-class C { var w = 1 ; def ten = this.w = 10 }
+class C { var w = 1; def ten = this.w = 10 }
 class D extends C { override var w = 2 }

@@ -19,14 +19,14 @@ package akka.parboiled2.support
 import akka.shapeless._
 
 /**
- * "Unpacks" an HList if it has only zero or one element(s).
- *   Out =
- *     Unit  if L == HNil
- *     T     if L == T :: HNil
- *     L     otherwise
- *
- *  You can `import Unpack.dontUnpack` if you'd like to circumvent this unpacking logic.
- */
+  * "Unpacks" an HList if it has only zero or one element(s).
+  *   Out =
+  *     Unit  if L == HNil
+  *     T     if L == T :: HNil
+  *     L     otherwise
+  *
+  *  You can `import Unpack.dontUnpack` if you'd like to circumvent this unpacking logic.
+  */
 sealed trait Unpack[L <: HList] {
   type Out
   def apply(hlist: L): Out
@@ -34,34 +34,38 @@ sealed trait Unpack[L <: HList] {
 
 object Unpack extends AlternativeUnpacks {
 
-  implicit def fromAux[L <: HList, Out0](implicit aux: Aux[L, Out0]) = new Unpack[L] {
-    type Out = Out0
-    def apply(hlist: L) = aux(hlist)
-  }
+  implicit def fromAux[L <: HList, Out0](implicit aux: Aux[L, Out0]) =
+    new Unpack[L] {
+      type Out = Out0
+      def apply(hlist: L) = aux(hlist)
+    }
 
   sealed trait Aux[L <: HList, Out0] {
     def apply(hlist: L): Out0
   }
 
-  implicit def hnil[L <: HNil]: Aux[L, Unit] = HNilUnpack.asInstanceOf[Aux[L, Unit]]
+  implicit def hnil[L <: HNil]: Aux[L, Unit] =
+    HNilUnpack.asInstanceOf[Aux[L, Unit]]
   implicit object HNilUnpack extends Aux[HNil, Unit] {
     def apply(hlist: HNil): Unit = ()
   }
 
-  implicit def single[T]: Aux[T :: HNil, T] = SingleUnpack.asInstanceOf[Aux[T :: HNil, T]]
+  implicit def single[T]: Aux[T :: HNil, T] =
+    SingleUnpack.asInstanceOf[Aux[T :: HNil, T]]
   private object SingleUnpack extends Aux[Any :: HList, Any] {
     def apply(hlist: Any :: HList): Any = hlist.head
   }
 }
 
 sealed abstract class AlternativeUnpacks {
+
   /**
-   * Import if you'd like to *always* deliver the valueStack as an `HList`
-   * at the end of the parsing run, even if it has only zero or one element(s).
-   */
-  implicit def dontUnpack[L <: HList]: Unpack.Aux[L, L] = DontUnpack.asInstanceOf[Unpack.Aux[L, L]]
+    * Import if you'd like to *always* deliver the valueStack as an `HList`
+    * at the end of the parsing run, even if it has only zero or one element(s).
+    */
+  implicit def dontUnpack[L <: HList]: Unpack.Aux[L, L] =
+    DontUnpack.asInstanceOf[Unpack.Aux[L, L]]
   private object DontUnpack extends Unpack.Aux[HList, HList] {
     def apply(hlist: HList): HList = hlist
   }
 }
-

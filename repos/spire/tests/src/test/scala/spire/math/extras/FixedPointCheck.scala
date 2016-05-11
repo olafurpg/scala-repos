@@ -12,13 +12,14 @@ import spire.math.Rational
 
 import scala.util.Try
 
-class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class FixedPointCheck
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  implicit val arbFixedScale: Arbitrary[FixedScale] =
-    Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))
+  implicit val arbFixedScale: Arbitrary[FixedScale] = Arbitrary(
+      arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))
 
-  implicit val arbFixedPoint: Arbitrary[FixedPoint] =
-    Arbitrary(arbitrary[Long].map(new FixedPoint(_)))
+  implicit val arbFixedPoint: Arbitrary[FixedPoint] = Arbitrary(
+      arbitrary[Long].map(new FixedPoint(_)))
 
   property("FixedScale(r).toRational ~= r") {
     forAll { (s: FixedScale, r: Rational) =>
@@ -40,7 +41,8 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  def build(x: Long, y0: Long, z: Byte, noZero: Boolean): (Int, Int, FixedPoint, FixedPoint, Rational, Rational) = {
+  def build(x: Long, y0: Long, z: Byte, noZero: Boolean)
+    : (Int, Int, FixedPoint, FixedPoint, Rational, Rational) = {
     val y = if (y0 == 0L && noZero) 1L else y0
     val d = z.toInt.abs % 11
     val denom = 10 ** (d)
@@ -53,7 +55,8 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   type F2[A] = (A, A) => A
 
   import scala.util.{Success, Try}
-  def testBinop2(name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
+  def testBinop2(
+      name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
     property(name) {
       forAll { (x: Long, y: Long, s: FixedScale) =>
         implicit val scale = s
@@ -65,13 +68,15 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
             case Success(fz) =>
               BigInt(fz.long) shouldBe (az * s.denom).toBigInt
             case _ =>
-              (az * s.denom < Long.MinValue || Long.MaxValue < az * s.denom) shouldBe true
+              (az * s.denom < Long.MinValue ||
+                  Long.MaxValue < az * s.denom) shouldBe true
           }
         }
       }
     }
 
-  def testBinop(name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
+  def testBinop(
+      name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
     property(name) {
       forAll { (x: Long, y: Long, z: Byte) =>
         val (_, denom, fx, fy, ax, ay) = build(x, y, z, noZero)
@@ -88,7 +93,8 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
           case Some(fz) =>
             BigInt(fz.long) shouldBe (az * denom).toBigInt
           case None =>
-            (az * denom < Long.MinValue || Long.MaxValue < az * denom) shouldBe true
+            (az * denom < Long.MinValue ||
+                Long.MaxValue < az * denom) shouldBe true
         }
       }
     }
@@ -114,7 +120,8 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   type SH2[A] = (A, Long, FixedScale) => A
   type FH2[A] = (A, Long) => A
 
-  def testHalfop(name: String, noZero: Boolean, f: SH2[FixedPoint], g: FH2[Rational]) =
+  def testHalfop(
+      name: String, noZero: Boolean, f: SH2[FixedPoint], g: FH2[Rational]) =
     property(name) {
       forAll { (x: Long, y0: Long, z: Byte) =>
         val y = if (noZero && y0 == 0) 1L else y0
@@ -132,7 +139,8 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
           case Some(fz) =>
             BigInt(fz.long) shouldBe (az * denom).toBigInt
           case None =>
-            (az * denom < Long.MinValue || Long.MaxValue < az * denom) shouldBe true
+            (az * denom < Long.MinValue ||
+                Long.MaxValue < az * denom) shouldBe true
         }
       }
     }
@@ -165,7 +173,8 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
         case Some(fz) =>
           BigInt(fz.long) shouldBe (az * denom).toBigInt
         case None =>
-          (az * denom < Long.MinValue || Long.MaxValue < az * denom) shouldBe true
+          (az * denom < Long.MinValue ||
+              Long.MaxValue < az * denom) shouldBe true
       }
     }
   }

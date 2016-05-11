@@ -15,8 +15,8 @@ object Test extends ReplTest {
     |{ new BippyBungus ; x1 }
   """.stripMargin
 
-    // would be nice if we could count on javap being present
-    // but no
-    //
-    // |:javap BippyBungus
+  // would be nice if we could count on javap being present
+  // but no
+  //
+  // |:javap BippyBungus
 }

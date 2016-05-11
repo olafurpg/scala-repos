@@ -1,6 +1,5 @@
 package foo {
-  case class Opt[A](val get: A) extends AnyVal {
-  }
+  case class Opt[A](val get: A) extends AnyVal {}
   object Opt {
     def mkOpt = Opt("")
   }

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.ddata.protobuf
 
 //#serializer
@@ -13,7 +13,7 @@ import docs.ddata.TwoPhaseSet
 import docs.ddata.protobuf.msg.TwoPhaseSetMessages
 
 class TwoPhaseSetSerializer2(val system: ExtendedActorSystem)
-  extends Serializer with SerializationSupport {
+    extends Serializer with SerializationSupport {
 
   override def includeManifest: Boolean = false
 
@@ -23,15 +23,18 @@ class TwoPhaseSetSerializer2(val system: ExtendedActorSystem)
 
   override def toBinary(obj: AnyRef): Array[Byte] = obj match {
     case m: TwoPhaseSet ⇒ twoPhaseSetToProto(m).toByteArray
-    case _ ⇒ throw new IllegalArgumentException(
-      s"Can't serialize object of type ${obj.getClass}")
+    case _ ⇒
+      throw new IllegalArgumentException(
+          s"Can't serialize object of type ${obj.getClass}")
   }
 
-  override def fromBinary(bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
+  override def fromBinary(
+      bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
     twoPhaseSetFromBinary(bytes)
   }
 
-  def twoPhaseSetToProto(twoPhaseSet: TwoPhaseSet): TwoPhaseSetMessages.TwoPhaseSet2 = {
+  def twoPhaseSetToProto(
+      twoPhaseSet: TwoPhaseSet): TwoPhaseSetMessages.TwoPhaseSet2 = {
     val b = TwoPhaseSetMessages.TwoPhaseSet2.newBuilder()
     if (!twoPhaseSet.adds.isEmpty)
       b.setAdds(otherMessageToProto(twoPhaseSet.adds).toByteString())
@@ -44,14 +47,14 @@ class TwoPhaseSetSerializer2(val system: ExtendedActorSystem)
     val msg = TwoPhaseSetMessages.TwoPhaseSet2.parseFrom(bytes)
     val adds =
       if (msg.hasAdds)
-        otherMessageFromBinary(msg.getAdds.toByteArray).asInstanceOf[GSet[String]]
-      else
-        GSet.empty[String]
+        otherMessageFromBinary(msg.getAdds.toByteArray)
+          .asInstanceOf[GSet[String]]
+      else GSet.empty[String]
     val removals =
       if (msg.hasRemovals)
-        otherMessageFromBinary(msg.getRemovals.toByteArray).asInstanceOf[GSet[String]]
-      else
-        GSet.empty[String]
+        otherMessageFromBinary(msg.getRemovals.toByteArray)
+          .asInstanceOf[GSet[String]]
+      else GSet.empty[String]
     TwoPhaseSet(adds, removals)
   }
 }

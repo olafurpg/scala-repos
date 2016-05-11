@@ -1,11 +1,11 @@
 package mesosphere.marathon.io.storage
 
-import java.io.{ InputStream, OutputStream }
+import java.io.{InputStream, OutputStream}
 import java.net.URI
 
 import mesosphere.marathon.io.IO
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
+import org.apache.hadoop.fs.{FileSystem, Path}
 
 /**
   * The Hadoop File System implementation.
@@ -13,7 +13,9 @@ import org.apache.hadoop.fs.{ FileSystem, Path }
   * @param fs the related hadoop file system.
   * @param fsPath the path inside the file system.
   */
-case class HDFSStorageItem(fs: FileSystem, fsPath: Path, base: String, path: String) extends StorageItem {
+case class HDFSStorageItem(
+    fs: FileSystem, fsPath: Path, base: String, path: String)
+    extends StorageItem {
 
   def store(fn: (OutputStream) => Unit): StorageItem = {
     IO.using(fs.create(fsPath, true)) { fn }
@@ -42,11 +44,11 @@ case class HDFSStorageItem(fs: FileSystem, fsPath: Path, base: String, path: Str
   * @param uri the uri of the hadoop dfs.
   * @param configuration the configuration used to connect.
   */
-class HDFSStorageProvider(uri: URI, base: String, configuration: Configuration) extends StorageProvider {
+class HDFSStorageProvider(uri: URI, base: String, configuration: Configuration)
+    extends StorageProvider {
   val fs = FileSystem.get(uri, configuration)
 
   override def item(path: String): StorageItem = {
     HDFSStorageItem(fs, new Path(base, path), base, path)
   }
 }
-

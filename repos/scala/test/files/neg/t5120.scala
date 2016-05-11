@@ -5,7 +5,7 @@ class Cell[T](x0: T) {
 
 object Test {
   val str: Cell[String] = new Cell("a")
-  val other: Cell[Int]  = new Cell(0)
+  val other: Cell[Int] = new Cell(0)
 
   def main(args: Array[String]): Unit = {
     List(str, other) foreach (_.x1 = new AnyRef)
@@ -14,10 +14,10 @@ object Test {
 }
 // another way demonstrating the same underlying problem, as reported by Roman Kalukiewicz
 
-class Holder[_T](_f1 : _T, _f2 : _T) {
+class Holder[_T](_f1: _T, _f2: _T) {
   type T = _T
-  var f1 : T = _f1
-  var f2 : T = _f2
+  var f1: T = _f1
+  var f2: T = _f2
 }
 object Test2 {
   val str = new Holder("t1", "t2")

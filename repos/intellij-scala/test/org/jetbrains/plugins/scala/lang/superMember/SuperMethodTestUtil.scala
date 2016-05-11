@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 15.11.2008
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 15.11.2008
+  */
 object SuperMethodTestUtil {
   def transform(myFile: PsiFile, offset: Int): String = {
     var resa = ""
@@ -27,14 +26,14 @@ object SuperMethodTestUtil {
           val s = ScalaPsiUtil.nameContext(sign.namedElement) match {
             case member: PsiMember =>
               val clazz = member.containingClass
-              if (clazz != null)
-                clazz.qualifiedName + "."
+              if (clazz != null) clazz.qualifiedName + "."
               else ""
             case _ => ""
           }
           res.append(s + sign.namedElement.name + "\n")
         }
-        resa = if (res.toString == "") "" else res.substring(0, res.length - 1).toString
+        resa = if (res.toString == "") ""
+        else res.substring(0, res.length - 1).toString
       case _ => resa = "Not implemented test"
     }
     resa

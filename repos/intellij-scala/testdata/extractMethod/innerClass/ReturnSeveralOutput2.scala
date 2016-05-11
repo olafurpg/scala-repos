@@ -44,4 +44,4 @@ class ReturnSeveralOutput2 {
     Right(new TestMethodNameResult(x, y, z, zz))
   }
 }
-*/
+ */

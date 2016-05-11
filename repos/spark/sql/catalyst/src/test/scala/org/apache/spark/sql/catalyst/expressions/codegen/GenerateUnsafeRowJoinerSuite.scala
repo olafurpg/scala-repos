@@ -26,11 +26,11 @@ import org.apache.spark.sql.catalyst.expressions.UnsafeProjection
 import org.apache.spark.sql.types._
 
 /**
- * Test suite for [[GenerateUnsafeRowJoiner]].
- *
- * There is also a separate [[GenerateUnsafeRowJoinerBitsetSuite]] that tests specifically
- * concatenation for the bitset portion, since that is the hardest one to get right.
- */
+  * Test suite for [[GenerateUnsafeRowJoiner]].
+  *
+  * There is also a separate [[GenerateUnsafeRowJoinerBitsetSuite]] that tests specifically
+  * concatenation for the bitset portion, since that is the hardest one to get right.
+  */
 class GenerateUnsafeRowJoinerSuite extends SparkFunSuite {
 
   private val fixed = Seq(IntegerType)
@@ -66,29 +66,40 @@ class GenerateUnsafeRowJoinerSuite extends SparkFunSuite {
     }
   }
 
-  private def testConcat(numFields1: Int, numFields2: Int, candidateTypes: Seq[DataType]): Unit = {
+  private def testConcat(numFields1: Int,
+                         numFields2: Int,
+                         candidateTypes: Seq[DataType]): Unit = {
     for (i <- 0 until 10) {
       testConcatOnce(numFields1, numFields2, candidateTypes)
     }
   }
 
-  private def testConcatOnce(numFields1: Int, numFields2: Int, candidateTypes: Seq[DataType]) {
+  private def testConcatOnce(
+      numFields1: Int, numFields2: Int, candidateTypes: Seq[DataType]) {
     info(s"schema size $numFields1, $numFields2")
     val random = new Random()
-    val schema1 = RandomDataGenerator.randomSchema(random, numFields1, candidateTypes)
-    val schema2 = RandomDataGenerator.randomSchema(random, numFields2, candidateTypes)
+    val schema1 =
+      RandomDataGenerator.randomSchema(random, numFields1, candidateTypes)
+    val schema2 =
+      RandomDataGenerator.randomSchema(random, numFields2, candidateTypes)
 
     // Create the converters needed to convert from external row to internal row and to UnsafeRows.
-    val internalConverter1 = CatalystTypeConverters.createToCatalystConverter(schema1)
-    val internalConverter2 = CatalystTypeConverters.createToCatalystConverter(schema2)
+    val internalConverter1 =
+      CatalystTypeConverters.createToCatalystConverter(schema1)
+    val internalConverter2 =
+      CatalystTypeConverters.createToCatalystConverter(schema2)
     val converter1 = UnsafeProjection.create(schema1)
     val converter2 = UnsafeProjection.create(schema2)
 
     // Create the input rows, convert them into UnsafeRows.
-    val extRow1 = RandomDataGenerator.forType(schema1, nullable = false).get.apply()
-    val extRow2 = RandomDataGenerator.forType(schema2, nullable = false).get.apply()
-    val row1 = converter1.apply(internalConverter1.apply(extRow1).asInstanceOf[InternalRow])
-    val row2 = converter2.apply(internalConverter2.apply(extRow2).asInstanceOf[InternalRow])
+    val extRow1 =
+      RandomDataGenerator.forType(schema1, nullable = false).get.apply()
+    val extRow2 =
+      RandomDataGenerator.forType(schema2, nullable = false).get.apply()
+    val row1 = converter1.apply(
+        internalConverter1.apply(extRow1).asInstanceOf[InternalRow])
+    val row2 = converter2.apply(
+        internalConverter2.apply(extRow2).asInstanceOf[InternalRow])
 
     // Run the joiner.
     val mergedSchema = StructType(schema1 ++ schema2)
@@ -100,16 +111,17 @@ class GenerateUnsafeRowJoinerSuite extends SparkFunSuite {
       if (i < schema1.size) {
         assert(output.isNullAt(i) === row1.isNullAt(i))
         if (!output.isNullAt(i)) {
-          assert(output.get(i, mergedSchema(i).dataType) === row1.get(i, mergedSchema(i).dataType))
+          assert(
+              output.get(i, mergedSchema(i).dataType) === row1.get(
+                  i, mergedSchema(i).dataType))
         }
       } else {
         assert(output.isNullAt(i) === row2.isNullAt(i - schema1.size))
         if (!output.isNullAt(i)) {
-          assert(output.get(i, mergedSchema(i).dataType) ===
-            row2.get(i - schema1.size, mergedSchema(i).dataType))
+          assert(output.get(i, mergedSchema(i).dataType) === row2.get(
+                  i - schema1.size, mergedSchema(i).dataType))
         }
       }
     }
   }
-
 }

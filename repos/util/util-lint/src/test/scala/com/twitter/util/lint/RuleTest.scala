@@ -18,5 +18,4 @@ class RuleTest extends FunSuite {
     assert("abc" == idOfNamed("ABC"))
     assert("abc-def" == idOfNamed("Abc Def"))
   }
-
 }

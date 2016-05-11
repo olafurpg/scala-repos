@@ -14,16 +14,18 @@ abstract class Generator {
 
   /** A series of tests that must be true before generation can be done. This is used by data provider traits to
     * confirm that they have been correctly initialised before allowing generation to proceed. */
-  protected val checks: mutable.Set[()=>Boolean] =
-    mutable.Set.empty[()=>Boolean]
+  protected val checks: mutable.Set[() => Boolean] =
+    mutable.Set.empty[() => Boolean]
 
   /** Outputs documentation (as a side effect). */
   def generate(): Unit = {
-    assert(checks forall { check => check() })
+    assert(
+        checks forall { check =>
+      check()
+    })
     generateImpl()
   }
 
   /** Outputs documentation (as a side effect). This method is called only if all `checks` are true. */
   protected def generateImpl(): Unit
-
 }

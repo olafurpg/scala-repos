@@ -3,11 +3,9 @@ package org.jetbrains.plugins.scala.lang.psi.controlFlow
 import org.jetbrains.annotations.Nullable
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 
-
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 trait Instruction {
   def succ( /*put call env here*/ ): Iterable[Instruction]
   def pred( /*put call env here*/ ): Iterable[Instruction]

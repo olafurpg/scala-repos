@@ -36,10 +36,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Ellipse Spec tests.
- *
- *
- */
+  * Ellipse Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class EllipseSpec
-  extends SimpleSFXDelegateSpec[jfxss.Ellipse, Ellipse](classOf[jfxss.Ellipse], classOf[Ellipse])
+    extends SimpleSFXDelegateSpec[jfxss.Ellipse, Ellipse](
+        classOf[jfxss.Ellipse], classOf[Ellipse])

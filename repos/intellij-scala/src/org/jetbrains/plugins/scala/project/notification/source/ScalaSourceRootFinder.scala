@@ -5,8 +5,8 @@ import com.intellij.ide.util.projectWizard.importSources.JavaSourceRootDetector
 import com.intellij.util.NullableFunction
 
 /**
- * @author Alexander Podkhalyuzin
- */
+  * @author Alexander Podkhalyuzin
+  */
 class ScalaSourceRootFinder extends JavaSourceRootDetector {
   def getLanguageName: String = "Scala"
 

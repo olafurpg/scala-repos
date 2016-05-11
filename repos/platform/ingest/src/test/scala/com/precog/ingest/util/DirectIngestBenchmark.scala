@@ -65,12 +65,15 @@ object DirectKafkaConsumer extends App {
       // advance the offset after consuming each message
       offset = msg.offset
       msgs += 1
-      if(msgs % 1000 == 0) {
-        System.out.println("consumed: " + EventMessageEncoding.read(msg.message.buffer));
+      if (msgs % 1000 == 0) {
+        System.out.println(
+            "consumed: " + EventMessageEncoding.read(msg.message.buffer));
         val now = System.nanoTime
-        val secs = (now-start)/1000000000.0
+        val secs = (now - start) / 1000000000.0
         val throughput = msgs / secs
-        println("Message %d batch %d time %.02fs throughput %.01f msgs/s".format(msgs, batch, secs, throughput))
+        println(
+            "Message %d batch %d time %.02fs throughput %.01f msgs/s".format(
+                msgs, batch, secs, throughput))
       }
     }
 
@@ -82,23 +85,33 @@ object DirectKafkaProducer extends App {
   val config = new Properties()
   config.put("broker.list", "0:localhost:9092")
   config.put("enable.zookeeper", "false")
-  config.put("serializer.class", "com.precog.ingest.kafka.KafkaIngestMessageCodec")
+  config.put(
+      "serializer.class", "com.precog.ingest.kafka.KafkaIngestMessageCodec")
 
-  val producer = new Producer[String, IngestMessage](new ProducerConfig(config))
+  val producer =
+    new Producer[String, IngestMessage](new ProducerConfig(config))
 
   val topic = "direct_test_topic"
 
   val sample = DistributedSampleSet(0, sampler = AdSamples.adCampaignSample)
-  val msg = IngestMessage("test", Path("/test/"), Authorities("test"), Vector(IngestRecord(EventId(0, 0), sample.next._1)), None, new Instant(), StreamRef.Append)
+  val msg = IngestMessage("test",
+                          Path("/test/"),
+                          Authorities("test"),
+                          Vector(IngestRecord(EventId(0, 0), sample.next._1)),
+                          None,
+                          new Instant(),
+                          StreamRef.Append)
 
   val total = 1000000
   val start = System.nanoTime
-  for(i <- 0 to total) {
-    if(i % 1000 == 0) {
+  for (i <- 0 to total) {
+    if (i % 1000 == 0) {
       val now = System.nanoTime
-      val secs = (now-start)/1000000000.0
+      val secs = (now - start) / 1000000000.0
       val throughput = i / secs
-      println("Message %d time %.02fs throughput %.01f msgs/s".format(i, secs, throughput))
+      println(
+          "Message %d time %.02fs throughput %.01f msgs/s".format(
+              i, secs, throughput))
     }
 
     val data = new ProducerData[String, IngestMessage](topic, msg)

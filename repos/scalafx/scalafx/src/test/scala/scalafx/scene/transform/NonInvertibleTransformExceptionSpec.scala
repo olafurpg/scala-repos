@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,8 +37,14 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 /** NonInvertibleTransformException Spec tests. */
 @RunWith(classOf[JUnitRunner])
 class NonInvertibleTransformExceptionSpec
-  extends SimpleSFXDelegateSpec[jfxst.NonInvertibleTransformException, NonInvertibleTransformException](classOf[jfxst.NonInvertibleTransformException], classOf[NonInvertibleTransformException]) {
+    extends SimpleSFXDelegateSpec[jfxst.NonInvertibleTransformException,
+                                  NonInvertibleTransformException](
+        classOf[jfxst.NonInvertibleTransformException],
+        classOf[NonInvertibleTransformException]) {
 
-  override protected def getJavaClassInstance = new jfxst.NonInvertibleTransformException("test message")
-  override protected def getScalaClassInstance = new NonInvertibleTransformException(new jfxst.NonInvertibleTransformException("test message"))
+  override protected def getJavaClassInstance =
+    new jfxst.NonInvertibleTransformException("test message")
+  override protected def getScalaClassInstance =
+    new NonInvertibleTransformException(
+        new jfxst.NonInvertibleTransformException("test message"))
 }

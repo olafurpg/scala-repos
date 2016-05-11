@@ -1,13 +1,13 @@
 package mesosphere.marathon.health
 
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.state.{ AppDefinition, PathId, Timestamp }
+import mesosphere.marathon.state.{AppDefinition, PathId, Timestamp}
 
 import org.apache.mesos.Protos.TaskStatus
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.Future
-import scala.collection.immutable.{ Seq, Map }
+import scala.collection.immutable.{Seq, Map}
 
 trait HealthCheckManager {
 

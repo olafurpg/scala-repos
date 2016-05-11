@@ -11,5 +11,4 @@ class PromiseBenchmark extends StdBenchAnnotations {
   def attached(): Promise[String] = {
     Promise.attached(StringFuture)
   }
-
 }

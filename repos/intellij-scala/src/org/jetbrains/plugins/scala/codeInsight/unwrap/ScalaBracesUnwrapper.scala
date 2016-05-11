@@ -9,9 +9,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScBlock
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 
 /**
- * Nikolay.Tropin
- * 2014-06-30
- */
+  * Nikolay.Tropin
+  * 2014-06-30
+  */
 class ScalaBracesUnwrapper extends ScalaUnwrapper {
 
   override def isApplicableTo(e: PsiElement) = e match {
@@ -19,16 +19,19 @@ class ScalaBracesUnwrapper extends ScalaUnwrapper {
     case _ => false
   }
 
-  override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) = element match {
-    case b: ScBlock if b.hasRBrace && canBeUnwrapped(b) =>
-      context.extractBlockOrSingleStatement(b, b)
-      context.delete(b)
-    case _ =>
-  }
+  override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) =
+    element match {
+      case b: ScBlock if b.hasRBrace && canBeUnwrapped(b) =>
+        context.extractBlockOrSingleStatement(b, b)
+        context.delete(b)
+      case _ =>
+    }
 
-  override def getDescription(e: PsiElement) = CodeInsightBundle.message("unwrap.braces")
+  override def getDescription(e: PsiElement) =
+    CodeInsightBundle.message("unwrap.braces")
 
-  override def collectAffectedElements(e: PsiElement, toExtract: util.List[PsiElement]) = e match {
+  override def collectAffectedElements(
+      e: PsiElement, toExtract: util.List[PsiElement]) = e match {
     case b: ScBlock if b.hasRBrace && canBeUnwrapped(b) =>
       super.collectAffectedElements(e, toExtract)
       b.getParent

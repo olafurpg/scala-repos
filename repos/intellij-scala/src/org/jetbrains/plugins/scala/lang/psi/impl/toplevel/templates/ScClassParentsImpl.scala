@@ -15,23 +15,27 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateParentsStub
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
-
 /**
- * @author Alexander Podkhalyuzin
- */
+  * @author Alexander Podkhalyuzin
+  */
+class ScClassParentsImpl private (stub: StubElement[ScTemplateParents],
+                                  nodeType: IElementType,
+                                  node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScClassParents {
+  def this(node: ASTNode) = { this(null, null, node) }
 
-class ScClassParentsImpl private (stub: StubElement[ScTemplateParents], nodeType: IElementType, node: ASTNode)
-  extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScClassParents {
-  def this(node: ASTNode) = {this(null, null, node)}
-
-  def this(stub: ScTemplateParentsStub) = {this(stub, ScalaElementTypes.CLASS_PARENTS, null)}
+  def this(stub: ScTemplateParentsStub) = {
+    this(stub, ScalaElementTypes.CLASS_PARENTS, null)
+  }
 
   override def toString: String = "ClassParents"
 
   def superTypes: Seq[ScType] = {
     val stub = getStub
     if (stub != null) {
-      return stub.asInstanceOf[ScTemplateParentsStub].getTemplateParentsTypes ++ syntheticTypeElements.map(_.getType(TypingContext.empty).getOrAny)
+      return stub.asInstanceOf[ScTemplateParentsStub].getTemplateParentsTypes ++ syntheticTypeElements
+        .map(_.getType(TypingContext.empty).getOrAny)
     }
     allTypeElements.map(_.getType(TypingContext.empty).getOrAny)
   }
@@ -39,7 +43,9 @@ class ScClassParentsImpl private (stub: StubElement[ScTemplateParents], nodeType
   def typeElements: Seq[ScTypeElement] = {
     val stub = getStub
     if (stub != null) {
-      return stub.asInstanceOf[ScTemplateParentsStub].getTemplateParentsTypeElements
+      return stub
+        .asInstanceOf[ScTemplateParentsStub]
+        .getTemplateParentsTypeElements
     }
     (constructor match {
       case Some(x) => Array[ScTypeElement](x.typeElement)

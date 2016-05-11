@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http
 
 import akka.actor.ActorSystem
@@ -24,8 +23,7 @@ import com.typesafe.config.ConfigFactory
 @BenchmarkMode(Array(Mode.Throughput))
 class HttpBenchmark {
 
-  val config = ConfigFactory.parseString(
-    """
+  val config = ConfigFactory.parseString("""
       akka {
         loglevel = "ERROR"
       }""".stripMargin).withFallback(ConfigFactory.load())
@@ -38,7 +36,7 @@ class HttpBenchmark {
   var pool: Flow[(HttpRequest, Int), (Try[HttpResponse], Int), _] = _
 
   @Setup
-  def setup():Unit = {
+  def setup(): Unit = {
     val route = {
       path("test") {
         get {
@@ -47,29 +45,37 @@ class HttpBenchmark {
       }
     }
 
-    binding = Await.result(Http().bindAndHandle(route, "127.0.0.1", 0), 1.second)
-    request = HttpRequest(uri = s"http://${binding.localAddress.getHostString}:${binding.localAddress.getPort}/test")
-    pool = Http().cachedHostConnectionPool[Int](binding.localAddress.getHostString, binding.localAddress.getPort)
+    binding = Await.result(
+        Http().bindAndHandle(route, "127.0.0.1", 0), 1.second)
+    request = HttpRequest(
+        uri = s"http://${binding.localAddress.getHostString}:${binding.localAddress.getPort}/test")
+    pool = Http().cachedHostConnectionPool[Int](
+        binding.localAddress.getHostString, binding.localAddress.getPort)
   }
 
   @TearDown
-  def shutdown():Unit = {
+  def shutdown(): Unit = {
     Await.ready(Http().shutdownAllConnectionPools(), 1.second)
     binding.unbind()
     Await.result(system.terminate(), 5.seconds)
   }
 
   @Benchmark
-  def single_request():Unit = {
+  def single_request(): Unit = {
     import system.dispatcher
     val response = Await.result(Http().singleRequest(request), 1.second)
     Await.result(Unmarshal(response.entity).to[String], 1.second)
   }
 
   @Benchmark
-  def single_request_pool():Unit = {
+  def single_request_pool(): Unit = {
     import system.dispatcher
-    val (response, id) = Await.result(Source.single(HttpRequest(uri = "/test") -> 42).via(pool).runWith(Sink.head), 1.second)
+    val (response, id) = Await.result(
+        Source
+          .single(HttpRequest(uri = "/test") -> 42)
+          .via(pool)
+          .runWith(Sink.head),
+        1.second)
     Await.result(Unmarshal(response.get.entity).to[String], 1.second)
   }
 }

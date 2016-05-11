@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.jdbc
 
 import grizzled.slf4j.Logging
@@ -22,8 +21,10 @@ import io.prediction.data.storage.StorageClientConfig
 import scalikejdbc._
 
 /** JDBC implementation of [[EngineInstances]] */
-class JDBCEngineInstances(client: String, config: StorageClientConfig, prefix: String)
-  extends EngineInstances with Logging {
+class JDBCEngineInstances(
+    client: String, config: StorageClientConfig, prefix: String)
+    extends EngineInstances with Logging {
+
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "engineinstances")
   DB autoCommit { implicit session =>
@@ -68,8 +69,9 @@ class JDBCEngineInstances(client: String, config: StorageClientConfig, prefix: S
     id
   }
 
-  def get(id: String): Option[EngineInstance] = DB localTx { implicit session =>
-    sql"""
+  def get(id: String): Option[EngineInstance] = DB localTx {
+    implicit session =>
+      sql"""
     SELECT
       id,
       status,
@@ -86,8 +88,10 @@ class JDBCEngineInstances(client: String, config: StorageClientConfig, prefix: S
       preparatorParams,
       algorithmsParams,
       servingParams
-    FROM $tableName WHERE id = $id""".map(resultToEngineInstance).
-      single().apply()
+    FROM $tableName WHERE id = $id"""
+        .map(resultToEngineInstance)
+        .single()
+        .apply()
   }
 
   def getAll(): Seq[EngineInstance] = DB localTx { implicit session =>
@@ -111,17 +115,16 @@ class JDBCEngineInstances(client: String, config: StorageClientConfig, prefix: S
     FROM $tableName""".map(resultToEngineInstance).list().apply()
   }
 
-  def getLatestCompleted(
-    engineId: String,
-    engineVersion: String,
-    engineVariant: String): Option[EngineInstance] =
+  def getLatestCompleted(engineId: String,
+                         engineVersion: String,
+                         engineVariant: String): Option[EngineInstance] =
     getCompleted(engineId, engineVersion, engineVariant).headOption
 
-  def getCompleted(
-    engineId: String,
-    engineVersion: String,
-    engineVariant: String): Seq[EngineInstance] = DB localTx { implicit s =>
-    sql"""
+  def getCompleted(engineId: String,
+                   engineVersion: String,
+                   engineVariant: String): Seq[EngineInstance] = DB localTx {
+    implicit s =>
+      sql"""
     SELECT
       id,
       status,
@@ -144,8 +147,7 @@ class JDBCEngineInstances(client: String, config: StorageClientConfig, prefix: S
       engineId = $engineId AND
       engineVersion = $engineVersion AND
       engineVariant = $engineVariant
-    ORDER BY startTime DESC""".
-      map(resultToEngineInstance).list().apply()
+    ORDER BY startTime DESC""".map(resultToEngineInstance).list().apply()
   }
 
   def update(i: EngineInstance): Unit = DB localTx { implicit session =>
@@ -174,21 +176,20 @@ class JDBCEngineInstances(client: String, config: StorageClientConfig, prefix: S
 
   /** Convert JDBC results to [[EngineInstance]] */
   def resultToEngineInstance(rs: WrappedResultSet): EngineInstance = {
-    EngineInstance(
-      id = rs.string("id"),
-      status = rs.string("status"),
-      startTime = rs.jodaDateTime("startTime"),
-      endTime = rs.jodaDateTime("endTime"),
-      engineId = rs.string("engineId"),
-      engineVersion = rs.string("engineVersion"),
-      engineVariant = rs.string("engineVariant"),
-      engineFactory = rs.string("engineFactory"),
-      batch = rs.string("batch"),
-      env = JDBCUtils.stringToMap(rs.string("env")),
-      sparkConf = JDBCUtils.stringToMap(rs.string("sparkConf")),
-      dataSourceParams = rs.string("datasourceParams"),
-      preparatorParams = rs.string("preparatorParams"),
-      algorithmsParams = rs.string("algorithmsParams"),
-      servingParams = rs.string("servingParams"))
+    EngineInstance(id = rs.string("id"),
+                   status = rs.string("status"),
+                   startTime = rs.jodaDateTime("startTime"),
+                   endTime = rs.jodaDateTime("endTime"),
+                   engineId = rs.string("engineId"),
+                   engineVersion = rs.string("engineVersion"),
+                   engineVariant = rs.string("engineVariant"),
+                   engineFactory = rs.string("engineFactory"),
+                   batch = rs.string("batch"),
+                   env = JDBCUtils.stringToMap(rs.string("env")),
+                   sparkConf = JDBCUtils.stringToMap(rs.string("sparkConf")),
+                   dataSourceParams = rs.string("datasourceParams"),
+                   preparatorParams = rs.string("preparatorParams"),
+                   algorithmsParams = rs.string("algorithmsParams"),
+                   servingParams = rs.string("servingParams"))
   }
 }

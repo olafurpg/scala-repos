@@ -13,7 +13,8 @@ object SCL7192 {
 
     val x: User = new User
     val y: M = new M
-    /*start*/x/*end*/
+    /*start*/
+    x /*end*/
   }
 }
 //SCL7192.B.User

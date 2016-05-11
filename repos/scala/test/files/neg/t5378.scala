@@ -34,8 +34,8 @@ class Coll[+T] {
       type B2 <: B1
     }
     new Bippy { def apply[T1 <: AnyRef](value: T1) = ??? }
-    new Bippy { type B1 = String ; def apply[T1 <: B1](value: T1) = ??? }
-    new Bippy { type B2 = String ; def apply[T1 <: B2](value: T1) = ??? }
+    new Bippy { type B1 = String; def apply[T1 <: B1](value: T1) = ??? }
+    new Bippy { type B2 = String; def apply[T1 <: B2](value: T1) = ??? }
   }
 }
 

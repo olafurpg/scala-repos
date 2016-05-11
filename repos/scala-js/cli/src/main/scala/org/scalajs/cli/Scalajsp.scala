@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js CLI               **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js CLI               **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.cli
 
@@ -22,47 +21,47 @@ import java.util.zip.{ZipFile, ZipEntry}
 
 object Scalajsp {
 
-  private case class Options(
-    infos: Boolean = false,
-    jar: Option[File] = None,
-    fileNames: Seq[String] = Seq.empty)
+  private case class Options(infos: Boolean = false,
+                             jar: Option[File] = None,
+                             fileNames: Seq[String] = Seq.empty)
 
   def main(args: Array[String]): Unit = {
     val parser = new scopt.OptionParser[Options]("scalajsp") {
       head("scalajsp", ScalaJSVersions.current)
       arg[String]("<file> ...")
         .unbounded()
-        .action { (x, c) => c.copy(fileNames = c.fileNames :+ x) }
+        .action { (x, c) =>
+          c.copy(fileNames = c.fileNames :+ x)
+        }
         .text("*.sjsir file to display content of")
       opt[File]('j', "jar")
         .valueName("<jar>")
-        .action { (x, c) => c.copy(jar = Some(x)) }
+        .action { (x, c) =>
+          c.copy(jar = Some(x))
+        }
         .text("Read *.sjsir file(s) from the given JAR.")
-      opt[Unit]('i', "infos")
-        .action { (_, c) => c.copy(infos = true) }
-        .text("Show DCE infos instead of trees")
-      opt[Unit]('s', "supported")
-        .action { (_,_) => printSupported(); sys.exit() }
-        .text("Show supported Scala.js IR versions")
-      version("version")
-        .abbr("v")
-        .text("Show scalajsp version")
-      help("help")
-        .abbr("h")
-        .text("prints this usage text")
+      opt[Unit]('i', "infos").action { (_, c) =>
+        c.copy(infos = true)
+      }.text("Show DCE infos instead of trees")
+      opt[Unit]('s', "supported").action { (_, _) =>
+        printSupported(); sys.exit()
+      }.text("Show supported Scala.js IR versions")
+      version("version").abbr("v").text("Show scalajsp version")
+      help("help").abbr("h").text("prints this usage text")
 
       override def showUsageOnError = true
     }
 
     for {
-      options  <- parser.parse(args, Options())
+      options <- parser.parse(args, Options())
       fileName <- options.fileNames
     } {
-      val vfile = options.jar map { jar =>
-        readFromJar(jar, fileName)
-      } getOrElse {
-        readFromFile(fileName)
-      }
+      val vfile =
+        options.jar map { jar =>
+          readFromJar(jar, fileName)
+        } getOrElse {
+          readFromFile(fileName)
+        }
 
       displayFileContent(vfile, options)
     }
@@ -75,12 +74,10 @@ object Scalajsp {
     binarySupported.foreach(v => println(s"* $v"))
   }
 
-  private def displayFileContent(vfile: VirtualScalaJSIRFile,
-      opts: Options): Unit = {
-    if (opts.infos)
-      new InfoPrinter(stdout).print(vfile.info)
-    else
-      new IRTreePrinter(stdout).printTopLevelTree(vfile.tree)
+  private def displayFileContent(
+      vfile: VirtualScalaJSIRFile, opts: Options): Unit = {
+    if (opts.infos) new InfoPrinter(stdout).print(vfile.info)
+    else new IRTreePrinter(stdout).printTopLevelTree(vfile.tree)
 
     stdout.flush()
   }
@@ -93,22 +90,18 @@ object Scalajsp {
   private def readFromFile(fileName: String) = {
     val file = new File(fileName)
 
-    if (!file.exists)
-      fail(s"No such file: $fileName")
-    else if (!file.canRead)
-      fail(s"Unable to read file: $fileName")
-    else
-      FileVirtualScalaJSIRFile(file)
+    if (!file.exists) fail(s"No such file: $fileName")
+    else if (!file.canRead) fail(s"Unable to read file: $fileName")
+    else FileVirtualScalaJSIRFile(file)
   }
 
   private def readFromJar(jar: File, name: String) = {
-    val jarFile =
-      try { new ZipFile(jar) }
-      catch { case _: FileNotFoundException => fail(s"No such JAR: $jar") }
+    val jarFile = try { new ZipFile(jar) } catch {
+      case _: FileNotFoundException => fail(s"No such JAR: $jar")
+    }
     try {
       val entry = jarFile.getEntry(name)
-      if (entry == null)
-        fail(s"No such file in jar: $name")
+      if (entry == null) fail(s"No such file in jar: $name")
       else {
         val name = jarFile.getName + "#" + entry.getName
         val content =
@@ -120,7 +113,6 @@ object Scalajsp {
     }
   }
 
-  private val stdout =
-    new BufferedWriter(new OutputStreamWriter(Console.out, "UTF-8"))
-
+  private val stdout = new BufferedWriter(
+      new OutputStreamWriter(Console.out, "UTF-8"))
 }

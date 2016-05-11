@@ -1,27 +1,27 @@
 /**
- *  Test scaladoc implicits distinguishing -- suppress all members by implicit conversion that are shadowed by the
- *  class' own members
- *
- *  {{{
- *     scala> class A { def foo(t: String) = 4 }
- *     defined class A
- *
- *     scala> class B { def foo(t: Any) = 5 }
- *     defined class B
- *
- *     scala> implicit def AtoB(a:A) = new B
- *     AtoB: (a: A)B
- *
- *     scala> val a = new A
- *     a: A = A@28f553e3
- *
- *     scala> a.foo("T")
- *     res1: Int = 4
- *
- *     scala> a.foo(4)
- *     res2: Int = 5
- *  }}}
- */
+  *  Test scaladoc implicits distinguishing -- suppress all members by implicit conversion that are shadowed by the
+  *  class' own members
+  *
+  *  {{{
+  *     scala> class A { def foo(t: String) = 4 }
+  *     defined class A
+  *
+  *     scala> class B { def foo(t: Any) = 5 }
+  *     defined class B
+  *
+  *     scala> implicit def AtoB(a:A) = new B
+  *     AtoB: (a: A)B
+  *
+  *     scala> val a = new A
+  *     a: A = A@28f553e3
+  *
+  *     scala> a.foo("T")
+  *     res1: Int = 4
+  *
+  *     scala> a.foo(4)
+  *     res2: Int = 5
+  *  }}}
+  */
 package scala.test.scaladoc.implicits.shadowing
 import language.implicitConversions // according to SIP18
 
@@ -39,10 +39,13 @@ class A[T] {
   def conv10(l: T): T = ???
   def conv11(l: T): T = ???
 }
+
 /** conv5, conv8, conv9, conv11 should be visible */
 class B extends A[Int]
+
 /** conv5, conv8, conv9, conv10, conv11 should be visible */
 class C extends A[Double]
+
 /** conv5, conv8, conv9, conv10 should be visible */
 class D extends A[AnyRef]
 

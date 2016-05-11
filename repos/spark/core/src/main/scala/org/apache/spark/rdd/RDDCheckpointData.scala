@@ -22,22 +22,23 @@ import scala.reflect.ClassTag
 import org.apache.spark.Partition
 
 /**
- * Enumeration to manage state transitions of an RDD through checkpointing
- * [ Initialized --> checkpointing in progress --> checkpointed ].
- */
+  * Enumeration to manage state transitions of an RDD through checkpointing
+  * [ Initialized --> checkpointing in progress --> checkpointed ].
+  */
 private[spark] object CheckpointState extends Enumeration {
   type CheckpointState = Value
   val Initialized, CheckpointingInProgress, Checkpointed = Value
 }
 
 /**
- * This class contains all the information related to RDD checkpointing. Each instance of this
- * class is associated with a RDD. It manages process of checkpointing of the associated RDD,
- * as well as, manages the post-checkpoint state by providing the updated partitions,
- * iterator and preferred locations of the checkpointed RDD.
- */
-private[spark] abstract class RDDCheckpointData[T: ClassTag](@transient private val rdd: RDD[T])
-  extends Serializable {
+  * This class contains all the information related to RDD checkpointing. Each instance of this
+  * class is associated with a RDD. It manages process of checkpointing of the associated RDD,
+  * as well as, manages the post-checkpoint state by providing the updated partitions,
+  * iterator and preferred locations of the checkpointed RDD.
+  */
+private[spark] abstract class RDDCheckpointData[T : ClassTag](
+    @transient private val rdd: RDD[T])
+    extends Serializable {
 
   import CheckpointState._
 
@@ -50,16 +51,16 @@ private[spark] abstract class RDDCheckpointData[T: ClassTag](@transient private 
   // TODO: are we sure we need to use a global lock in the following methods?
 
   /**
-   * Return whether the checkpoint data for this RDD is already persisted.
-   */
+    * Return whether the checkpoint data for this RDD is already persisted.
+    */
   def isCheckpointed: Boolean = RDDCheckpointData.synchronized {
     cpState == Checkpointed
   }
 
   /**
-   * Materialize this RDD and persist its content.
-   * This is called immediately after the first action invoked on this RDD has completed.
-   */
+    * Materialize this RDD and persist its content.
+    * This is called immediately after the first action invoked on this RDD has completed.
+    */
   final def checkpoint(): Unit = {
     // Guard against multiple threads checkpointing the same RDD by
     // atomically flipping the state of this RDDCheckpointData
@@ -82,30 +83,30 @@ private[spark] abstract class RDDCheckpointData[T: ClassTag](@transient private 
   }
 
   /**
-   * Materialize this RDD and persist its content.
-   *
-   * Subclasses should override this method to define custom checkpointing behavior.
-   * @return the checkpoint RDD created in the process.
-   */
+    * Materialize this RDD and persist its content.
+    *
+    * Subclasses should override this method to define custom checkpointing behavior.
+    * @return the checkpoint RDD created in the process.
+    */
   protected def doCheckpoint(): CheckpointRDD[T]
 
   /**
-   * Return the RDD that contains our checkpointed data.
-   * This is only defined if the checkpoint state is `Checkpointed`.
-   */
-  def checkpointRDD: Option[CheckpointRDD[T]] = RDDCheckpointData.synchronized { cpRDD }
+    * Return the RDD that contains our checkpointed data.
+    * This is only defined if the checkpoint state is `Checkpointed`.
+    */
+  def checkpointRDD: Option[CheckpointRDD[T]] =
+    RDDCheckpointData.synchronized { cpRDD }
 
   /**
-   * Return the partitions of the resulting checkpoint RDD.
-   * For tests only.
-   */
+    * Return the partitions of the resulting checkpoint RDD.
+    * For tests only.
+    */
   def getPartitions: Array[Partition] = RDDCheckpointData.synchronized {
     cpRDD.map(_.partitions).getOrElse { Array.empty }
   }
-
 }
 
 /**
- * Global lock for synchronizing checkpoint operations.
- */
+  * Global lock for synchronizing checkpoint operations.
+  */
 private[spark] object RDDCheckpointData

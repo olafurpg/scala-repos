@@ -18,7 +18,7 @@
  *
  */
 package com.precog
-package muspelheim 
+package muspelheim
 
 import yggdrasil._
 import yggdrasil.table.cf
@@ -31,8 +31,5 @@ import quirrel.typer._
 
 import scalaz._
 
-trait ParseEvalStack[M[+_]] extends Compiler
-    with LineErrors
-    with Emitter 
-    with StdLibEvaluatorStack[M]
-
+trait ParseEvalStack[M[+ _]]
+    extends Compiler with LineErrors with Emitter with StdLibEvaluatorStack[M]

@@ -35,9 +35,8 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
-
 /** CheckMenuItem Spec tests. */
 @RunWith(classOf[JUnitRunner])
 class CheckMenuItemSpec
-  extends SimpleSFXDelegateSpec[jfxsc.CheckMenuItem, CheckMenuItem](
-    classOf[jfxsc.CheckMenuItem], classOf[CheckMenuItem])
+    extends SimpleSFXDelegateSpec[jfxsc.CheckMenuItem, CheckMenuItem](
+        classOf[jfxsc.CheckMenuItem], classOf[CheckMenuItem])

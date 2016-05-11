@@ -58,15 +58,17 @@ trait EncodingFlags {
     val magic = buffer.get()
     if (magic == magicByte) {
       val msgType = buffer.get()
-      val stop    = buffer.get()
+      val stop = buffer.get()
 
       if (stop == stopByte) {
         success(msgType)
       } else {
-        failure(Error.invalid("Invalid message: bad stop byte. Found [" + stop + "]"))
+        failure(Error.invalid(
+                "Invalid message: bad stop byte. Found [" + stop + "]"))
       }
     } else {
-      failure(Error.invalid("Invalid message: bad magic byte. Found [" + magic + "]"))
+      failure(Error.invalid(
+              "Invalid message: bad magic byte. Found [" + magic + "]"))
     }
   }
 }
@@ -90,7 +92,10 @@ object EventEncoding extends EncodingFlags with Logging {
     logger.trace("Serialized event " + event + " to " + serialized)
     val msgBuffer = charset.encode(serialized)
     val bytes = ByteBuffer.allocate(msgBuffer.limit + 3)
-    writeHeader(bytes, event.fold(_ => jsonIngestFlag, _ => jsonArchiveFlag, _ => storeFileFlag))
+    writeHeader(
+        bytes,
+        event.fold(
+            _ => jsonIngestFlag, _ => jsonArchiveFlag, _ => storeFileFlag))
     bytes.put(msgBuffer)
     bytes.flip()
     bytes
@@ -104,13 +109,13 @@ object EventEncoding extends EncodingFlags with Logging {
     for {
       msgType <- readHeader(buffer)
       jv <- ((Error.thrown _) <-: JParser.parseFromByteBuffer(buffer))
-      event <-  msgType match {
-                  case `jsonIngestFlag`  => jv.validated[Ingest]
-                  case `jsonArchiveFlag` => jv.validated[Archive]
-                  case `jsonIngestMessageFlag`  => jv.validated[Ingest]("ingest")
-                  case `jsonArchiveMessageFlag` => jv.validated[Archive]("archive")
-                  case `storeFileFlag` => jv.validated[StoreFile]
-                }
+      event <- msgType match {
+        case `jsonIngestFlag` => jv.validated[Ingest]
+        case `jsonArchiveFlag` => jv.validated[Archive]
+        case `jsonIngestMessageFlag` => jv.validated[Ingest]("ingest")
+        case `jsonArchiveMessageFlag` => jv.validated[Archive]("archive")
+        case `storeFileFlag` => jv.validated[StoreFile]
+      }
     } yield event
   }
 }
@@ -134,7 +139,10 @@ object EventMessageEncoding extends EncodingFlags with Logging {
     logger.trace("Serialized event " + msg + " to " + serialized)
     val msgBuffer = charset.encode(serialized)
     val bytes = ByteBuffer.allocate(msgBuffer.limit + 3)
-    writeHeader(bytes, msg.fold(_ => jsonIngestMessageFlag, _ => jsonArchiveMessageFlag, _ => storeFileFlag))
+    writeHeader(bytes,
+                msg.fold(_ => jsonIngestMessageFlag,
+                         _ => jsonArchiveMessageFlag,
+                         _ => storeFileFlag))
     bytes.put(msgBuffer)
     bytes.flip()
     bytes
@@ -151,10 +159,12 @@ object EventMessageEncoding extends EncodingFlags with Logging {
       msgType <- readHeader(buffer)
       //_ = println(java.nio.charset.Charset.forName("UTF-8").decode(buffer).toString)
       jv <- ((Error.thrown _) <-: JParser.parseFromByteBuffer(buffer))
-      message <-  msgType match {
-        case `jsonIngestMessageFlag`  => jv.validated[EventMessageExtraction](IngestMessage.Extractor)
-        case `jsonArchiveMessageFlag` => jv.validated[ArchiveMessage].map(\/.right(_))
-        case `storeFileFlag`          => jv.validated[StoreFileMessage].map(\/.right(_))
+      message <- msgType match {
+        case `jsonIngestMessageFlag` =>
+          jv.validated[EventMessageExtraction](IngestMessage.Extractor)
+        case `jsonArchiveMessageFlag` =>
+          jv.validated[ArchiveMessage].map(\/.right(_))
+        case `storeFileFlag` => jv.validated[StoreFileMessage].map(\/.right(_))
       }
     } yield message
   }

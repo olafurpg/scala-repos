@@ -33,38 +33,40 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
 object WritableImage {
-  implicit def sfxWritableImage2jfx(wi: WritableImage): jfxsi.WritableImage = if (null == wi) null else wi.delegate
+  implicit def sfxWritableImage2jfx(wi: WritableImage): jfxsi.WritableImage =
+    if (null == wi) null else wi.delegate
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/WritableImage.html]]
- */
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/WritableImage.html]]
+  */
 class WritableImage(override val delegate: jfxsi.WritableImage)
-  extends Image(delegate)
-  with SFXDelegate[jfxsi.WritableImage] {
+    extends Image(delegate) with SFXDelegate[jfxsi.WritableImage] {
 
   /**
-   * Construct an empty image of the specified dimensions.
-   */
-  def this(width: Int, height: Int) = this(new jfxsi.WritableImage(width, height))
+    * Construct an empty image of the specified dimensions.
+    */
+  def this(width: Int, height: Int) =
+    this(new jfxsi.WritableImage(width, height))
 
   /**
-   * Construct an image of the specified dimensions, initialized from the indicated
-   * [[scalafx.scene.image.PixelReader]].
-   */
-  def this(reader: PixelReader, width: Int, height: Int) = this(new jfxsi.WritableImage(reader, width, height))
+    * Construct an image of the specified dimensions, initialized from the indicated
+    * [[scalafx.scene.image.PixelReader]].
+    */
+  def this(reader: PixelReader, width: Int, height: Int) =
+    this(new jfxsi.WritableImage(reader, width, height))
 
   /**
-   * Construct an image of the specified dimensions, initialized from the indicated region of the
-   * [[scalafx.scene.image.PixelReader]].
-   */
-  def this(reader: PixelReader, x: Int, y: Int, width: Int, height: Int) = this(new jfxsi.WritableImage(reader, x, y, width, height))
+    * Construct an image of the specified dimensions, initialized from the indicated region of the
+    * [[scalafx.scene.image.PixelReader]].
+    */
+  def this(reader: PixelReader, x: Int, y: Int, width: Int, height: Int) =
+    this(new jfxsi.WritableImage(reader, x, y, width, height))
 
   /**
-   * This method returns a PixelWriter that provides access to write the pixels of the image.
-   */
+    * This method returns a PixelWriter that provides access to write the pixels of the image.
+    */
   def pixelWriter: PixelWriter = delegate.getPixelWriter
   @deprecated("Method name is incorrect use `pixelWriter`.", "8.0.60-R10")
   def pixelWrit: PixelWriter = delegate.getPixelWriter
-
 }

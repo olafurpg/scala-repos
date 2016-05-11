@@ -29,51 +29,54 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types._
 
 /**
- * A set of tests for the filter conversion logic used when pushing partition pruning into the
- * metastore
- */
+  * A set of tests for the filter conversion logic used when pushing partition pruning into the
+  * metastore
+  */
 class FiltersSuite extends SparkFunSuite with Logging {
   private val shim = new Shim_v0_13
 
-  private val testTable = new org.apache.hadoop.hive.ql.metadata.Table("default", "test")
+  private val testTable =
+    new org.apache.hadoop.hive.ql.metadata.Table("default", "test")
   private val varCharCol = new FieldSchema()
   varCharCol.setName("varchar")
   varCharCol.setType(serdeConstants.VARCHAR_TYPE_NAME)
   testTable.setPartCols(Collections.singletonList(varCharCol))
 
   filterTest("string filter",
-    (a("stringcol", StringType) > Literal("test")) :: Nil,
-    "stringcol > \"test\"")
+             (a("stringcol", StringType) > Literal("test")) :: Nil,
+             "stringcol > \"test\"")
 
   filterTest("string filter backwards",
-    (Literal("test") > a("stringcol", StringType)) :: Nil,
-    "\"test\" > stringcol")
+             (Literal("test") > a("stringcol", StringType)) :: Nil,
+             "\"test\" > stringcol")
 
   filterTest("int filter",
-    (a("intcol", IntegerType) === Literal(1)) :: Nil,
-    "intcol = 1")
+             (a("intcol", IntegerType) === Literal(1)) :: Nil,
+             "intcol = 1")
 
   filterTest("int filter backwards",
-    (Literal(1) === a("intcol", IntegerType)) :: Nil,
-    "1 = intcol")
+             (Literal(1) === a("intcol", IntegerType)) :: Nil,
+             "1 = intcol")
 
   filterTest("int and string filter",
-    (Literal(1) === a("intcol", IntegerType)) :: (Literal("a") === a("strcol", IntegerType)) :: Nil,
-    "1 = intcol and \"a\" = strcol")
+             (Literal(1) === a("intcol", IntegerType)) ::
+             (Literal("a") === a("strcol", IntegerType)) :: Nil,
+             "1 = intcol and \"a\" = strcol")
 
-  filterTest("skip varchar",
-    (Literal("") === a("varchar", StringType)) :: Nil,
-    "")
+  filterTest(
+      "skip varchar", (Literal("") === a("varchar", StringType)) :: Nil, "")
 
-  private def filterTest(name: String, filters: Seq[Expression], result: String) = {
+  private def filterTest(
+      name: String, filters: Seq[Expression], result: String) = {
     test(name) {
       val converted = shim.convertFilters(testTable, filters)
       if (converted != result) {
         fail(
-          s"Expected filters ${filters.mkString(",")} to convert to '$result' but got '$converted'")
+            s"Expected filters ${filters.mkString(",")} to convert to '$result' but got '$converted'")
       }
     }
   }
 
-  private def a(name: String, dataType: DataType) = AttributeReference(name, dataType)()
+  private def a(name: String, dataType: DataType) =
+    AttributeReference(name, dataType)()
 }

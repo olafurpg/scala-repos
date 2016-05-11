@@ -31,10 +31,9 @@ import java.{util => ju}
 
 import scala.collection.{Iterator, mutable}
 
-private[input] trait JMapWrapperLike[A, B, +Repr <: mutable.MapLike[A, B, Repr]
-  with mutable.Map[A, B]]
-  extends mutable.Map[A, B]
-  with mutable.MapLike[A, B, Repr] {
+private[input] trait JMapWrapperLike[
+    A, B, +Repr <: mutable.MapLike[A, B, Repr] with mutable.Map[A, B]]
+    extends mutable.Map[A, B] with mutable.MapLike[A, B, Repr] {
 
   def underlying: ju.Map[A, B]
 
@@ -42,12 +41,9 @@ private[input] trait JMapWrapperLike[A, B, +Repr <: mutable.MapLike[A, B, Repr]
 
   def get(k: A) = {
     val v = underlying get k
-    if (v != null)
-      Some(v)
-    else if (underlying containsKey k)
-      Some(null.asInstanceOf[B])
-    else
-      None
+    if (v != null) Some(v)
+    else if (underlying containsKey k) Some(null.asInstanceOf[B])
+    else None
   }
 
   def +=(kv: (A, B)): this.type = { underlying.put(kv._1, kv._2); this }

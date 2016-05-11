@@ -13,6 +13,9 @@ object DottyVersions extends Versions {
 
   def loadDottyVersions = loadVersionsOf(Dotty)
 
-  private object Dotty extends Entity(s"$RepositoryUrl/${GroupId.replace('.', '/')}/$ArtifactId",
-    Version(DefaultRevision), Seq(DefaultRevision))
+  private object Dotty
+      extends Entity(
+          s"$RepositoryUrl/${GroupId.replace('.', '/')}/$ArtifactId",
+          Version(DefaultRevision),
+          Seq(DefaultRevision))
 }

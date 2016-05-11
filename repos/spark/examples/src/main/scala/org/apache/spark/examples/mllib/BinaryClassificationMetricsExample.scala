@@ -34,24 +34,25 @@ object BinaryClassificationMetricsExample {
     val sc = new SparkContext(conf)
     // $example on$
     // Load training data in LIBSVM format
-    val data = MLUtils.loadLibSVMFile(sc, "data/mllib/sample_binary_classification_data.txt")
+    val data = MLUtils.loadLibSVMFile(
+        sc, "data/mllib/sample_binary_classification_data.txt")
 
     // Split data into training (60%) and test (40%)
     val Array(training, test) = data.randomSplit(Array(0.6, 0.4), seed = 11L)
     training.cache()
 
     // Run training algorithm to build the model
-    val model = new LogisticRegressionWithLBFGS()
-      .setNumClasses(2)
-      .run(training)
+    val model =
+      new LogisticRegressionWithLBFGS().setNumClasses(2).run(training)
 
     // Clear the prediction threshold so the model will return probabilities
     model.clearThreshold
 
     // Compute raw scores on the test set
-    val predictionAndLabels = test.map { case LabeledPoint(label, features) =>
-      val prediction = model.predict(features)
-      (prediction, label)
+    val predictionAndLabels = test.map {
+      case LabeledPoint(label, features) =>
+        val prediction = model.predict(features)
+        (prediction, label)
     }
 
     // Instantiate metrics object
@@ -59,14 +60,16 @@ object BinaryClassificationMetricsExample {
 
     // Precision by threshold
     val precision = metrics.precisionByThreshold
-    precision.foreach { case (t, p) =>
-      println(s"Threshold: $t, Precision: $p")
+    precision.foreach {
+      case (t, p) =>
+        println(s"Threshold: $t, Precision: $p")
     }
 
     // Recall by threshold
     val recall = metrics.recallByThreshold
-    recall.foreach { case (t, r) =>
-      println(s"Threshold: $t, Recall: $r")
+    recall.foreach {
+      case (t, r) =>
+        println(s"Threshold: $t, Recall: $r")
     }
 
     // Precision-Recall Curve
@@ -74,14 +77,16 @@ object BinaryClassificationMetricsExample {
 
     // F-measure
     val f1Score = metrics.fMeasureByThreshold
-    f1Score.foreach { case (t, f) =>
-      println(s"Threshold: $t, F-score: $f, Beta = 1")
+    f1Score.foreach {
+      case (t, f) =>
+        println(s"Threshold: $t, F-score: $f, Beta = 1")
     }
 
     val beta = 0.5
     val fScore = metrics.fMeasureByThreshold(beta)
-    f1Score.foreach { case (t, f) =>
-      println(s"Threshold: $t, F-score: $f, Beta = 0.5")
+    f1Score.foreach {
+      case (t, f) =>
+        println(s"Threshold: $t, F-score: $f, Beta = 0.5")
     }
 
     // AUPRC

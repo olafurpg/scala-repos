@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.workflow.KryoInstantiator
@@ -30,6 +29,7 @@ import _root_.java.io.FileOutputStream
   * @group Helper
   */
 object Utils {
+
   /** Default JSON4S serializers for PredictionIO controllers. */
   val json4sDefaultFormats = DefaultFormats.lossless ++ JodaTimeSerializers.all
 
@@ -41,7 +41,8 @@ object Utils {
     * @param model Model object.
     */
   def save(id: String, model: Any): Unit = {
-    val tmpdir = sys.env.getOrElse("PIO_FS_TMPDIR", System.getProperty("java.io.tmpdir"))
+    val tmpdir =
+      sys.env.getOrElse("PIO_FS_TMPDIR", System.getProperty("java.io.tmpdir"))
     val modelFile = tmpdir + File.separator + id
     (new File(tmpdir)).mkdirs
     val fos = new FileOutputStream(modelFile)
@@ -58,7 +59,8 @@ object Utils {
     * @param id Used as the filename of the file.
     */
   def load(id: String): Any = {
-    val tmpdir = sys.env.getOrElse("PIO_FS_TMPDIR", System.getProperty("java.io.tmpdir"))
+    val tmpdir =
+      sys.env.getOrElse("PIO_FS_TMPDIR", System.getProperty("java.io.tmpdir"))
     val modelFile = tmpdir + File.separator + id
     val src = Source.fromFile(modelFile)(scala.io.Codec.ISO8859)
     val kryo = KryoInstantiator.newKryoInjection

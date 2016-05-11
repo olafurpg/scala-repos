@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.api
 
 import io.prediction.data.webhooks.JsonConnector
@@ -38,18 +37,17 @@ import akka.actor.ActorSelection
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
 private[prediction] object Webhooks {
 
   def postJson(
-    appId: Int,
-    channelId: Option[Int],
-    web: String,
-    data: JObject,
-    eventClient: LEvents,
-    log: LoggingAdapter,
-    stats: Boolean,
-    statsActorRef: ActorSelection
+      appId: Int,
+      channelId: Option[Int],
+      web: String,
+      data: JObject,
+      eventClient: LEvents,
+      log: LoggingAdapter,
+      stats: Boolean,
+      statsActorRef: ActorSelection
   )(implicit ec: ExecutionContext): Future[(StatusCode, Map[String, String])] = {
 
     val eventFuture = Future {
@@ -66,13 +64,14 @@ private[prediction] object Webhooks {
         }
       } else {
         val event = eventOpt.get
-        val data = eventClient.futureInsert(event, appId, channelId).map { id =>
-          val result = (StatusCodes.Created, Map("eventId" -> s"${id}"))
+        val data = eventClient.futureInsert(event, appId, channelId).map {
+          id =>
+            val result = (StatusCodes.Created, Map("eventId" -> s"${id}"))
 
-          if (stats) {
-            statsActorRef ! Bookkeeping(appId, result._1, event)
-          }
-          result
+            if (stats) {
+              statsActorRef ! Bookkeeping(appId, result._1, event)
+            }
+            result
         }
         data
       }
@@ -80,30 +79,33 @@ private[prediction] object Webhooks {
   }
 
   def getJson(
-    appId: Int,
-    channelId: Option[Int],
-    web: String,
-    log: LoggingAdapter
+      appId: Int,
+      channelId: Option[Int],
+      web: String,
+      log: LoggingAdapter
   )(implicit ec: ExecutionContext): Future[(StatusCode, Map[String, String])] = {
     Future {
-      WebhooksConnectors.json.get(web).map { connector =>
-        (StatusCodes.OK, Map("message" -> "Ok"))
-      }.getOrElse {
-        val message = s"webhooks connection for ${web} is not supported."
-        (StatusCodes.NotFound, Map("message" -> message))
-      }
+      WebhooksConnectors.json
+        .get(web)
+        .map { connector =>
+          (StatusCodes.OK, Map("message" -> "Ok"))
+        }
+        .getOrElse {
+          val message = s"webhooks connection for ${web} is not supported."
+          (StatusCodes.NotFound, Map("message" -> message))
+        }
     }
   }
 
   def postForm(
-    appId: Int,
-    channelId: Option[Int],
-    web: String,
-    data: FormData,
-    eventClient: LEvents,
-    log: LoggingAdapter,
-    stats: Boolean,
-    statsActorRef: ActorSelection
+      appId: Int,
+      channelId: Option[Int],
+      web: String,
+      data: FormData,
+      eventClient: LEvents,
+      log: LoggingAdapter,
+      stats: Boolean,
+      statsActorRef: ActorSelection
   )(implicit ec: ExecutionContext): Future[(StatusCode, Map[String, String])] = {
     val eventFuture = Future {
       WebhooksConnectors.form.get(web).map { connector =>
@@ -119,13 +121,14 @@ private[prediction] object Webhooks {
         }
       } else {
         val event = eventOpt.get
-        val data = eventClient.futureInsert(event, appId, channelId).map { id =>
-          val result = (StatusCodes.Created, Map("eventId" -> s"${id}"))
+        val data = eventClient.futureInsert(event, appId, channelId).map {
+          id =>
+            val result = (StatusCodes.Created, Map("eventId" -> s"${id}"))
 
-          if (stats) {
-            statsActorRef ! Bookkeeping(appId, result._1, event)
-          }
-          result
+            if (stats) {
+              statsActorRef ! Bookkeeping(appId, result._1, event)
+            }
+            result
         }
         data
       }
@@ -133,19 +136,21 @@ private[prediction] object Webhooks {
   }
 
   def getForm(
-    appId: Int,
-    channelId: Option[Int],
-    web: String,
-    log: LoggingAdapter
+      appId: Int,
+      channelId: Option[Int],
+      web: String,
+      log: LoggingAdapter
   )(implicit ec: ExecutionContext): Future[(StatusCode, Map[String, String])] = {
     Future {
-      WebhooksConnectors.form.get(web).map { connector =>
-        (StatusCodes.OK, Map("message" -> "Ok"))
-      }.getOrElse {
-        val message = s"webhooks connection for ${web} is not supported."
-        (StatusCodes.NotFound, Map("message" -> message))
-      }
+      WebhooksConnectors.form
+        .get(web)
+        .map { connector =>
+          (StatusCodes.OK, Map("message" -> "Ok"))
+        }
+        .getOrElse {
+          val message = s"webhooks connection for ${web} is not supported."
+          (StatusCodes.NotFound, Map("message" -> message))
+        }
     }
   }
-
 }

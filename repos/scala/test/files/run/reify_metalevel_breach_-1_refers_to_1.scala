@@ -5,9 +5,9 @@ import scala.tools.reflect.ToolBox
 import scala.tools.reflect.Eval
 
 object Test extends App {
-  val code = reify{
+  val code = reify {
     val x = 2
-    val inner = reify{reify{x}}
+    val inner = reify { reify { x } }
 // was:    inner.splice.splice
     inner.eval.eval
   };

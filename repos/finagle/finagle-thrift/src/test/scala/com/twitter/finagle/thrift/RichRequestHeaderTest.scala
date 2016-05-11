@@ -16,16 +16,15 @@ class RichRequestHeaderTest extends FunSuite {
   }
 
   test("None if clientId.name is not set") {
-    val header = (new thrift.RequestHeader)
-      .setClient_id(new thrift.ClientId)
+    val header = (new thrift.RequestHeader).setClient_id(new thrift.ClientId)
 
     val richHeader = new RichRequestHeader(header)
     assert(None == richHeader.clientId)
   }
 
   test("Some(clientId)") {
-    val header = (new thrift.RequestHeader)
-      .setClient_id(new thrift.ClientId("foo"))
+    val header =
+      (new thrift.RequestHeader).setClient_id(new thrift.ClientId("foo"))
 
     val richHeader = new RichRequestHeader(header)
     assert(Some(ClientId("foo")) == richHeader.clientId)
@@ -38,8 +37,7 @@ class RichRequestHeaderTest extends FunSuite {
   }
 
   test("path if dest is non-null") {
-    val header = (new thrift.RequestHeader)
-      .setDest("/foo")
+    val header = (new thrift.RequestHeader).setDest("/foo")
 
     val richHeader = new RichRequestHeader(header)
     assert(Path.read("/foo") == richHeader.dest)
@@ -55,8 +53,7 @@ class RichRequestHeaderTest extends FunSuite {
     val delegations = new ArrayList[thrift.Delegation]
     delegations.add(new thrift.Delegation("/foo", "/bar"))
 
-    val header = (new thrift.RequestHeader)
-      .setDelegations(delegations)
+    val header = (new thrift.RequestHeader).setDelegations(delegations)
 
     val richHeader = new RichRequestHeader(header)
     assert(Dtab.read("/foo=>/bar") == richHeader.dtab)
@@ -65,7 +62,8 @@ class RichRequestHeaderTest extends FunSuite {
   test("default traceId") {
     val header = new thrift.RequestHeader
     val richHeader = new RichRequestHeader(header)
-    assert(TraceId(Some(SpanId(0)), None, SpanId(0), None, Flags()) == richHeader.traceId)
+    assert(
+        TraceId(Some(SpanId(0)), None, SpanId(0), None, Flags()) == richHeader.traceId)
   }
 
   test("non-default traceId") {
@@ -77,7 +75,8 @@ class RichRequestHeaderTest extends FunSuite {
       .setFlags(4)
 
     val richHeader = new RichRequestHeader(header)
-    val expected = TraceId(Some(SpanId(0)), Some(SpanId(1)), SpanId(2), Some(true), Flags(4))
+    val expected = TraceId(
+        Some(SpanId(0)), Some(SpanId(1)), SpanId(2), Some(true), Flags(4))
     assert(expected == richHeader.traceId)
   }
 }

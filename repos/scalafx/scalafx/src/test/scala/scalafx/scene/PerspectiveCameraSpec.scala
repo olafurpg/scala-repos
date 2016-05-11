@@ -36,11 +36,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * PerspectiveCamera Spec tests.
- *
- *
- */
+  * PerspectiveCamera Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class PerspectiveCameraSpec
-  extends SimpleSFXDelegateSpec[jfxs.PerspectiveCamera, PerspectiveCamera](
-    classOf[jfxs.PerspectiveCamera], classOf[PerspectiveCamera])
+    extends SimpleSFXDelegateSpec[jfxs.PerspectiveCamera, PerspectiveCamera](
+        classOf[jfxs.PerspectiveCamera], classOf[PerspectiveCamera])

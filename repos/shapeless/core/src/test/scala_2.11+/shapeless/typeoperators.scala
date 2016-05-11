@@ -28,13 +28,18 @@ class TypeOperator211Tests {
   }
 
   object Bar {
-    implicit def mkBar1: Bar[Boolean] { type U = Int } = new Bar[Boolean] { type U = Int ; val tu = Right(23) }
-    implicit def mkBar2: Bar[String] { type U = Double } = new Bar[String] { type U = Double ; val tu = Right(13.0) }
+    implicit def mkBar1: Bar[Boolean] { type U = Int } = new Bar[Boolean] {
+      type U = Int; val tu = Right(23)
+    }
+    implicit def mkBar2: Bar[String] { type U = Double } = new Bar[String] {
+      type U = Double; val tu = Right(13.0)
+    }
   }
 
   @Test
   def testTheQuantifiers {
-    def bar0[T, U0](implicit b: Bar[T] { type U = U0 }): Bar[T] { type U = U0 } = {
+    def bar0[T, U0](
+        implicit b: Bar[T] { type U = U0 }): Bar[T] { type U = U0 } = {
       val res = the[Bar[T]]
       res
     }
@@ -50,5 +55,4 @@ class TypeOperator211Tests {
     val b1 = bar1[Boolean, Int]
     typed[Option[Int]](b1)
   }
-
 }

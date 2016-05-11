@@ -26,24 +26,24 @@ import org.apache.parquet.hadoop.{ParquetFileReader, ParquetFileWriter, ParquetO
 import org.apache.parquet.hadoop.util.ContextUtil
 
 /**
- * An output committer for writing Parquet files.  In stead of writing to the `_temporary` folder
- * like what [[ParquetOutputCommitter]] does, this output committer writes data directly to the
- * destination folder.  This can be useful for data stored in S3, where directory operations are
- * relatively expensive.
- *
- * To enable this output committer, users may set the "spark.sql.parquet.output.committer.class"
- * property via Hadoop [[Configuration]].  Not that this property overrides
- * "spark.sql.sources.outputCommitterClass".
- *
- * *NOTE*
- *
- *   NEVER use [[DirectParquetOutputCommitter]] when appending data, because currently there's
- *   no safe way undo a failed appending job (that's why both `abortTask()` and `abortJob()` are
- *   left empty).
- */
+  * An output committer for writing Parquet files.  In stead of writing to the `_temporary` folder
+  * like what [[ParquetOutputCommitter]] does, this output committer writes data directly to the
+  * destination folder.  This can be useful for data stored in S3, where directory operations are
+  * relatively expensive.
+  *
+  * To enable this output committer, users may set the "spark.sql.parquet.output.committer.class"
+  * property via Hadoop [[Configuration]].  Not that this property overrides
+  * "spark.sql.sources.outputCommitterClass".
+  *
+  * *NOTE*
+  *
+  *   NEVER use [[DirectParquetOutputCommitter]] when appending data, because currently there's
+  *   no safe way undo a failed appending job (that's why both `abortTask()` and `abortJob()` are
+  *   left empty).
+  */
 private[datasources] class DirectParquetOutputCommitter(
     outputPath: Path, context: TaskAttemptContext)
-  extends ParquetOutputCommitter(outputPath, context) {
+    extends ParquetOutputCommitter(outputPath, context) {
   val LOG = Log.getLog(classOf[ParquetOutputCommitter])
 
   override def getWorkPath: Path = outputPath
@@ -60,29 +60,36 @@ private[datasources] class DirectParquetOutputCommitter(
     if (configuration.getBoolean(ParquetOutputFormat.ENABLE_JOB_SUMMARY, true)) {
       try {
         val outputStatus = fileSystem.getFileStatus(outputPath)
-        val footers = ParquetFileReader.readAllFootersInParallel(configuration, outputStatus)
+        val footers = ParquetFileReader.readAllFootersInParallel(
+            configuration, outputStatus)
         try {
-          ParquetFileWriter.writeMetadataFile(configuration, outputPath, footers)
-        } catch { case e: Exception =>
-          LOG.warn("could not write summary file for " + outputPath, e)
-          val metadataPath = new Path(outputPath, ParquetFileWriter.PARQUET_METADATA_FILE)
-          if (fileSystem.exists(metadataPath)) {
-            fileSystem.delete(metadataPath, true)
-          }
+          ParquetFileWriter.writeMetadataFile(
+              configuration, outputPath, footers)
+        } catch {
+          case e: Exception =>
+            LOG.warn("could not write summary file for " + outputPath, e)
+            val metadataPath = new Path(
+                outputPath, ParquetFileWriter.PARQUET_METADATA_FILE)
+            if (fileSystem.exists(metadataPath)) {
+              fileSystem.delete(metadataPath, true)
+            }
         }
       } catch {
-        case e: Exception => LOG.warn("could not write summary file for " + outputPath, e)
+        case e: Exception =>
+          LOG.warn("could not write summary file for " + outputPath, e)
       }
     }
 
-    if (configuration.getBoolean("mapreduce.fileoutputcommitter.marksuccessfuljobs", true)) {
+    if (configuration.getBoolean(
+            "mapreduce.fileoutputcommitter.marksuccessfuljobs", true)) {
       try {
-        val successPath = new Path(outputPath, FileOutputCommitter.SUCCEEDED_FILE_NAME)
+        val successPath = new Path(
+            outputPath, FileOutputCommitter.SUCCEEDED_FILE_NAME)
         fileSystem.create(successPath).close()
       } catch {
-        case e: Exception => LOG.warn("could not write success file for " + outputPath, e)
+        case e: Exception =>
+          LOG.warn("could not write success file for " + outputPath, e)
       }
     }
   }
 }
-

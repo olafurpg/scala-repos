@@ -8,8 +8,8 @@ package interpreter
 package session
 
 /** An implementation-agnostic history interface which makes no
- *  reference to the jline classes.  Very sparse right now.
- */
+  *  reference to the jline classes.  Very sparse right now.
+  */
 trait History {
   def historicize(text: String): Boolean = false
 
@@ -19,7 +19,7 @@ trait History {
   def size: Int
 }
 object NoHistory extends History {
-  def asStrings       = Nil
-  def index           = 0
-  def size            = 0
+  def asStrings = Nil
+  def index = 0
+  def size = 0
 }

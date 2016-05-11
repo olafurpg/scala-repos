@@ -40,11 +40,9 @@ class Printer(p: VarModel[String]) extends Serializable {
 }
 
 @SerialVersionUID(1L)
-class Component extends Serializable {
-}
+class Component extends Serializable {}
 
-class Form extends Component {
-}
+class Form extends Component {}
 
 @SerialVersionUID(1L)
 class Main extends Serializable {

@@ -14,11 +14,9 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class LoadBalancerFactoryTest extends FunSuite
-  with StringClient
-  with StringServer
-  with Eventually
-  with IntegrationPatience {
+class LoadBalancerFactoryTest
+    extends FunSuite with StringClient with StringServer with Eventually
+    with IntegrationPatience {
   val echoService = Service.mk[String, String](Future.value(_))
 
   trait PerHostFlagCtx extends App {
@@ -34,14 +32,12 @@ class LoadBalancerFactoryTest extends FunSuite
       val sr1 = new InMemoryStatsReceiver
 
       perHostStats.let(true) {
-        client.configured(LoadBalancerFactory.HostStats(sr))
-          .newService(port)
+        client.configured(LoadBalancerFactory.HostStats(sr)).newService(port)
         eventually {
           assert(sr.self.gauges(perHostStatKey).apply == 1.0)
         }
 
-        client.configured(LoadBalancerFactory.HostStats(sr1))
-          .newService(port)
+        client.configured(LoadBalancerFactory.HostStats(sr1)).newService(port)
         eventually {
           assert(sr1.gauges(perHostStatKey).apply == 1.0)
         }
@@ -55,12 +51,10 @@ class LoadBalancerFactoryTest extends FunSuite
       val sr1 = new InMemoryStatsReceiver
 
       perHostStats.let(false) {
-        client.configured(LoadBalancerFactory.HostStats(sr))
-          .newService(port)
+        client.configured(LoadBalancerFactory.HostStats(sr)).newService(port)
         assert(sr.self.gauges.contains(perHostStatKey) == false)
 
-        client.configured(LoadBalancerFactory.HostStats(sr1))
-          .newService(port)
+        client.configured(LoadBalancerFactory.HostStats(sr1)).newService(port)
         assert(sr1.gauges.contains(perHostStatKey) == false)
       }
     }
@@ -75,8 +69,12 @@ class LoadBalancerFactoryTest extends FunSuite
 
     val sr = new InMemoryStatsReceiver
     val client = stringClient
-        .configured(Stats(sr))
-        .newService(Name.bound(Address(server1.boundAddress.asInstanceOf[InetSocketAddress]), Address(server2.boundAddress.asInstanceOf[InetSocketAddress])), "client")
+      .configured(Stats(sr))
+      .newService(
+          Name.bound(
+              Address(server1.boundAddress.asInstanceOf[InetSocketAddress]),
+              Address(server2.boundAddress.asInstanceOf[InetSocketAddress])),
+          "client")
 
     assert(sr.counters(Seq("client", "loadbalancer", "adds")) == 2)
     assert(Await.result(client("hello\n")) == "hello")
@@ -84,8 +82,9 @@ class LoadBalancerFactoryTest extends FunSuite
 
   test("throws NoBrokersAvailableException with negative addresses") {
     val next: Stack[ServiceFactory[String, String]] =
-      Stack.Leaf(Stack.Role("mock"), ServiceFactory.const[String, String](
-        Service.mk[String, String](req => Future.value(s"$req"))))
+      Stack.Leaf(Stack.Role("mock"),
+                 ServiceFactory.const[String, String](
+                     Service.mk[String, String](req => Future.value(s"$req"))))
 
     val stack = new LoadBalancerFactory.StackModule[String, String] {
       val description = "mock"
@@ -101,7 +100,8 @@ class LoadBalancerFactoryTest extends FunSuite
 }
 
 @RunWith(classOf[JUnitRunner])
-class ConcurrentLoadBalancerFactoryTest extends FunSuite with StringClient with StringServer {
+class ConcurrentLoadBalancerFactoryTest
+    extends FunSuite with StringClient with StringServer {
   val echoService = Service.mk[String, String](Future.value(_))
 
   test("makes service factory stack") {
@@ -109,12 +109,16 @@ class ConcurrentLoadBalancerFactoryTest extends FunSuite with StringClient with 
     val server = stringServer.serve(address, echoService)
 
     val sr = new InMemoryStatsReceiver
-    val clientStack =
-      StackClient.newStack.replace(
-        LoadBalancerFactory.role, ConcurrentLoadBalancerFactory.module[String, String])
-    val client = stringClient.withStack(clientStack)
+    val clientStack = StackClient.newStack.replace(
+        LoadBalancerFactory.role,
+        ConcurrentLoadBalancerFactory.module[String, String])
+    val client = stringClient
+      .withStack(clientStack)
       .configured(Stats(sr))
-      .newService(Name.bound(Address(server.boundAddress.asInstanceOf[InetSocketAddress])), "client")
+      .newService(
+          Name.bound(
+              Address(server.boundAddress.asInstanceOf[InetSocketAddress])),
+          "client")
 
     assert(sr.counters(Seq("client", "loadbalancer", "adds")) == 4)
     assert(Await.result(client("hello\n")) == "hello")
@@ -128,13 +132,18 @@ class ConcurrentLoadBalancerFactoryTest extends FunSuite with StringClient with 
     val server2 = stringServer.serve(addr2, echoService)
 
     val sr = new InMemoryStatsReceiver
-    val clientStack =
-      StackClient.newStack.replace(
-        LoadBalancerFactory.role, ConcurrentLoadBalancerFactory.module[String, String])
-    val client = stringClient.withStack(clientStack)
+    val clientStack = StackClient.newStack.replace(
+        LoadBalancerFactory.role,
+        ConcurrentLoadBalancerFactory.module[String, String])
+    val client = stringClient
+      .withStack(clientStack)
       .configured(Stats(sr))
       .configured(ConcurrentLoadBalancerFactory.Param(3))
-      .newService(Name.bound(Address(server1.boundAddress.asInstanceOf[InetSocketAddress]), Address(server2.boundAddress.asInstanceOf[InetSocketAddress])), "client")
+      .newService(
+          Name.bound(
+              Address(server1.boundAddress.asInstanceOf[InetSocketAddress]),
+              Address(server2.boundAddress.asInstanceOf[InetSocketAddress])),
+          "client")
 
     assert(sr.counters(Seq("client", "loadbalancer", "adds")) == 6)
   }

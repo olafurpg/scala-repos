@@ -18,28 +18,35 @@ sealed abstract class STRef[S, A] {
   def read: ST[S, A] = returnST(value)
 
   /**Modifies the value at this reference with the given function. */
-  def mod[B](f: A => A): ST[S, STRef[S, A]] = st((s: Tower[S]) => {
-    value = f(value);
-    (s, this)
-  })
+  def mod[B](f: A => A): ST[S, STRef[S, A]] =
+    st(
+        (s: Tower[S]) =>
+          {
+        value = f(value);
+        (s, this)
+    })
 
   /**Associates this reference with the given value. */
-  def write(a: => A): ST[S, STRef[S, A]] = st((s: Tower[S]) => {
-    value = a;
-    (s, this)
-  })
+  def write(a: => A): ST[S, STRef[S, A]] =
+    st(
+        (s: Tower[S]) =>
+          {
+        value = a;
+        (s, this)
+    })
 
   /**Synonym for write*/
   def |=(a: => A): ST[S, STRef[S, A]] =
     write(a)
 
   /**Swap the value at this reference with the value at another. */
-  def swap(that: STRef[S, A]): ST[S, Unit] = for {
-    v1 <- this.read
-    v2 <- that.read
-    _ <- this write v2
-    _ <- that write v1
-  } yield ()
+  def swap(that: STRef[S, A]): ST[S, Unit] =
+    for {
+      v1 <- this.read
+      v2 <- that.read
+      _ <- this write v2
+      _ <- that write v1
+    } yield ()
 }
 
 object STRef extends STRefInstances {
@@ -55,7 +62,7 @@ object STRef extends STRefInstances {
 }
 
 sealed abstract class STRefInstances {
-  
+
   /**Equality for STRefs is reference equality */
   implicit def STRefEqual[S, A]: Equal[STRef[S, A]] =
     Equal.equalA // todo reference equality?
@@ -75,57 +82,69 @@ sealed abstract class STArray[S, A] {
   def read(i: Int): ST[S, A] = returnST(value(i))
 
   /**Writes the given value to the array, at the given offset. */
-  def write(i: Int, a: A): ST[S, STArray[S, A]] = st(s => {
-    value(i) = a;
-    (s, this)
-  })
+  def write(i: Int, a: A): ST[S, STArray[S, A]] =
+    st(
+        s =>
+          {
+        value(i) = a;
+        (s, this)
+    })
 
   /**Turns a mutable array into an immutable one which is safe to return. */
-  def freeze: ST[S, ImmutableArray[A]] = st(s => (s, ImmutableArray.fromArray(value)))
+  def freeze: ST[S, ImmutableArray[A]] =
+    st(s => (s, ImmutableArray.fromArray(value)))
 
   /**Fill this array from the given association list. */
-  def fill[B](f: (A, B) => A, xs: Traversable[(Int, B)]): ST[S, Unit] = xs match {
-    case Nil             => returnST(())
-    case ((i, v) :: ivs) => for {
-      _ <- update(f, i, v)
-      _ <- fill(f, ivs)
-    } yield ()
-  }
+  def fill[B](f: (A, B) => A, xs: Traversable[(Int, B)]): ST[S, Unit] =
+    xs match {
+      case Nil => returnST(())
+      case ((i, v) :: ivs) =>
+        for {
+          _ <- update(f, i, v)
+          _ <- fill(f, ivs)
+        } yield ()
+    }
 
   /**Combine the given value with the value at the given index, using the given function. */
-  def update[B](f: (A, B) => A, i: Int, v: B) = for {
-    x <- read(i)
-    _ <- write(i, f(x, v))
-  } yield ()
+  def update[B](f: (A, B) => A, i: Int, v: B) =
+    for {
+      x <- read(i)
+      _ <- write(i, f(x, v))
+    } yield ()
 }
 
 object STArray {
   def apply[S, A : ClassTag](s: Int, a: A): STArray[S, A] = stArray(s, a)
 
-  def stArray[S, A](s: Int, a: A)(implicit t: ClassTag[A]): STArray[S, A] = new STArray[S, A] {
-    val size = s
-    val z = a
-    implicit val tag = t
-  }
+  def stArray[S, A](s: Int, a: A)(implicit t: ClassTag[A]): STArray[S, A] =
+    new STArray[S, A] {
+      val size = s
+      val z = a
+      implicit val tag = t
+    }
 }
 
 /**
- * Purely functional mutable state threads.
- * Based on JL and SPJ's paper "Lazy Functional State Threads"
- */
+  * Purely functional mutable state threads.
+  * Based on JL and SPJ's paper "Lazy Functional State Threads"
+  */
 sealed abstract class ST[S, A] {
   private[effect] def apply(s: Tower[S]): (Tower[S], A)
 
   import ST._
 
   def flatMap[B](g: A => ST[S, B]): ST[S, B] =
-    st(s => apply(s) match {
-      case (ns, a) => g(a)(ns)
+    st(
+        s =>
+          apply(s) match {
+        case (ns, a) => g(a)(ns)
     })
 
   def map[B](g: A => B): ST[S, B] =
-    st(s => apply(s) match {
-      case (ns, a) => (ns, g(a))
+    st(
+        s =>
+          apply(s) match {
+        case (ns, a) => (ns, g(a))
     })
 }
 
@@ -156,42 +175,51 @@ object ST extends STInstances {
     }
 
   /**Allocates a fresh mutable array. */
-  def newArr[S, A: ClassTag](size: Int, z: A): ST[S, STArray[S, A]] =
+  def newArr[S, A : ClassTag](size: Int, z: A): ST[S, STArray[S, A]] =
     returnST(stArray[S, A](size, z))
 
   /**Allows the result of a state transformer computation to be used lazily inside the computation. */
-  def fixST[S, A](k: (=> A) => ST[S, A]): ST[S, A] = st(s => {
-    lazy val ans: (Tower[S], A) = k(r)(s)
-    lazy val (_, r) = ans
-    ans
-  })
+  def fixST[S, A](k: (=> A) => ST[S, A]): ST[S, A] =
+    st(
+        s =>
+          {
+        lazy val ans: (Tower[S], A) = k(r)(s)
+        lazy val (_, r) = ans
+        ans
+    })
 
   /**Accumulates an integer-associated list into an immutable array. */
-  def accumArray[F[_], A : ClassTag, B](size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)])(implicit F: Foldable[F]): ImmutableArray[A] = {
+  def accumArray[F[_], A : ClassTag, B](
+      size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)])(
+      implicit F: Foldable[F]): ImmutableArray[A] = {
     import std.anyVal.unitInstance
     type STA[S] = ST[S, ImmutableArray[A]]
-    runST(new Forall[STA] {
-      def apply[S] = for {
-        a <- newArr(size, z)
-        _ <- {
-          F.foldMap(ivs)((x: (Int, B)) => a.update(f, x._1, x._2))(stMonoid[S, Unit])
-        }
-        frozen <- a.freeze
-      } yield frozen
+    runST(
+        new Forall[STA] {
+      def apply[S] =
+        for {
+          a <- newArr(size, z)
+          _ <- {
+            F.foldMap(ivs)((x: (Int, B)) => a.update(f, x._1, x._2))(
+                stMonoid[S, Unit])
+          }
+          frozen <- a.freeze
+        } yield frozen
     })
   }
 }
 
 sealed abstract class STInstance0 {
-  implicit def stSemigroup[S, A](implicit A: Semigroup[A]): Semigroup[ST[S, A]] =
-      Semigroup.liftSemigroup[ST[S, ?], A](ST.stMonad[S], A)
+  implicit def stSemigroup[S, A](
+      implicit A: Semigroup[A]): Semigroup[ST[S, A]] =
+    Semigroup.liftSemigroup[ST[S, ?], A](ST.stMonad[S], A)
 }
 
 sealed abstract class STInstances extends STInstance0 {
   implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
     Monoid.liftMonoid[ST[S, ?], A](stMonad[S], A)
 
-  implicit def stMonad[S]: Monad[ST[S, ?]] = 
+  implicit def stMonad[S]: Monad[ST[S, ?]] =
     new Monad[ST[S, ?]] {
       def point[A](a: => A): ST[S, A] = returnST(a)
       def bind[A, B](fa: ST[S, A])(f: A => ST[S, B]): ST[S, B] = fa flatMap f

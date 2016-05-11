@@ -10,7 +10,9 @@ import mesosphere.marathon.io.IO
   * @param file the underlying file
   * @param path the relative path, this item is identified with.
   */
-case class FileStorageItem(file: File, basePath: File, path: String, baseUrl: String) extends StorageItem {
+case class FileStorageItem(
+    file: File, basePath: File, path: String, baseUrl: String)
+    extends StorageItem {
 
   def store(fn: OutputStream => Unit): FileStorageItem = {
     IO.createDirectory(file.getParentFile)
@@ -49,13 +51,17 @@ case class FileStorageItem(file: File, basePath: File, path: String, baseUrl: St
   *
   * @param basePath the base path to the managed asset directory
   */
-class FileStorageProvider(val url: String, val basePath: File) extends StorageProvider {
-  require(basePath.exists(), "Base path does not exist: %s. Configuration error?".format(basePath.getAbsolutePath))
+class FileStorageProvider(val url: String, val basePath: File)
+    extends StorageProvider {
+  require(basePath.exists(),
+          "Base path does not exist: %s. Configuration error?".format(
+              basePath.getAbsolutePath))
 
   def item(path: String): FileStorageItem = {
     val file: File = new File(basePath, path)
     //make sure, no file from outside base path is created
-    if (!file.getCanonicalPath.startsWith(basePath.getCanonicalPath)) throw new IOException("Access Denied")
+    if (!file.getCanonicalPath.startsWith(basePath.getCanonicalPath))
+      throw new IOException("Access Denied")
     new FileStorageItem(file, basePath, path, url)
   }
 }

@@ -56,7 +56,8 @@ class RequestMeterFilterTest extends FunSuite with MockitoSugar {
 
   test("meter exceptions are not wrapped as rejected") {
     val meter = mock[AsyncMeter]
-    when(meter.await(1)).thenReturn(Future.exception(new RuntimeException("Error!")))
+    when(meter.await(1))
+      .thenReturn(Future.exception(new RuntimeException("Error!")))
 
     Time.withCurrentTimeFrozen { ctl =>
       val svc = new RequestMeterFilter(meter).andThen(echoSvc)
@@ -80,6 +81,5 @@ class RequestMeterFilterTest extends FunSuite with MockitoSugar {
       val e = intercept[Exception] { Await.result(svc(1)) }
       assert(e == exc)
     }
-
   }
 }

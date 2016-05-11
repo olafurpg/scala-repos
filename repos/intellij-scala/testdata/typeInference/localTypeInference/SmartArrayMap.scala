@@ -10,6 +10,6 @@ abstract class test {
 
   class H extends O
 
-  def x: Array[O] = /*start*/map(new H)/*end*/
+  def x: Array[O] = /*start*/ map(new H) /*end*/
 }
 //Array[test.this.O]

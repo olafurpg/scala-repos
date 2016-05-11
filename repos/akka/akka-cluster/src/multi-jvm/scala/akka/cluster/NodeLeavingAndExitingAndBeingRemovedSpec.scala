@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import scala.collection.immutable.SortedSet
@@ -10,23 +10,30 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.testkit._
 import scala.concurrent.duration._
 
-object NodeLeavingAndExitingAndBeingRemovedMultiJvmSpec extends MultiNodeConfig {
+object NodeLeavingAndExitingAndBeingRemovedMultiJvmSpec
+    extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString(
-    "akka.cluster.auto-down-unreachable-after = 0s")).
-    withFallback(MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+  commonConfig(
+      debugConfig(on = false)
+        .withFallback(ConfigFactory.parseString(
+                "akka.cluster.auto-down-unreachable-after = 0s"))
+        .withFallback(
+            MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
-class NodeLeavingAndExitingAndBeingRemovedMultiJvmNode1 extends NodeLeavingAndExitingAndBeingRemovedSpec
-class NodeLeavingAndExitingAndBeingRemovedMultiJvmNode2 extends NodeLeavingAndExitingAndBeingRemovedSpec
-class NodeLeavingAndExitingAndBeingRemovedMultiJvmNode3 extends NodeLeavingAndExitingAndBeingRemovedSpec
+class NodeLeavingAndExitingAndBeingRemovedMultiJvmNode1
+    extends NodeLeavingAndExitingAndBeingRemovedSpec
+class NodeLeavingAndExitingAndBeingRemovedMultiJvmNode2
+    extends NodeLeavingAndExitingAndBeingRemovedSpec
+class NodeLeavingAndExitingAndBeingRemovedMultiJvmNode3
+    extends NodeLeavingAndExitingAndBeingRemovedSpec
 
 abstract class NodeLeavingAndExitingAndBeingRemovedSpec
-  extends MultiNodeSpec(NodeLeavingAndExitingAndBeingRemovedMultiJvmSpec)
-  with MultiNodeClusterSpec {
+    extends MultiNodeSpec(NodeLeavingAndExitingAndBeingRemovedMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import NodeLeavingAndExitingAndBeingRemovedMultiJvmSpec._
 
@@ -47,10 +54,12 @@ abstract class NodeLeavingAndExitingAndBeingRemovedSpec
           markNodeAsUnavailable(second)
           // verify that the 'second' node is no longer part of the 'members'/'unreachable' set
           awaitAssert {
-            clusterView.members.map(_.address) should not contain (address(second))
+            clusterView.members.map(_.address) should not contain
+            (address(second))
           }
           awaitAssert {
-            clusterView.unreachableMembers.map(_.address) should not contain (address(second))
+            clusterView.unreachableMembers.map(_.address) should not contain
+            (address(second))
           }
         }
 

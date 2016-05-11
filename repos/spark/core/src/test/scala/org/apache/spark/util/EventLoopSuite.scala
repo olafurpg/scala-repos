@@ -83,7 +83,8 @@ class EventLoopSuite extends SparkFunSuite with Timeouts {
     eventLoop.stop()
   }
 
-  test("EventLoop: error thrown from onError should not crash the event thread") {
+  test(
+      "EventLoop: error thrown from onError should not crash the event thread") {
     val e = new RuntimeException("Oops")
     @volatile var receivedError: Throwable = null
     val eventLoop = new EventLoop[Int]("test") {
@@ -110,11 +111,9 @@ class EventLoopSuite extends SparkFunSuite with Timeouts {
     var onStopTimes = 0
     val eventLoop = new EventLoop[Int]("test") {
 
-      override def onReceive(event: Int): Unit = {
-      }
+      override def onReceive(event: Int): Unit = {}
 
-      override def onError(e: Throwable): Unit = {
-      }
+      override def onError(e: Throwable): Unit = {}
 
       override def onStop(): Unit = {
         onStopTimes += 1
@@ -138,9 +137,7 @@ class EventLoopSuite extends SparkFunSuite with Timeouts {
         receivedEventsCount += 1
       }
 
-      override def onError(e: Throwable): Unit = {
-      }
-
+      override def onError(e: Throwable): Unit = {}
     }
     eventLoop.start()
 
@@ -173,9 +170,7 @@ class EventLoopSuite extends SparkFunSuite with Timeouts {
         }
       }
 
-      override def onError(e: Throwable): Unit = {
-      }
-
+      override def onError(e: Throwable): Unit = {}
     }
     eventLoop.start()
     eventLoop.post(1)
@@ -194,9 +189,7 @@ class EventLoopSuite extends SparkFunSuite with Timeouts {
         stop()
       }
 
-      override def onError(e: Throwable): Unit = {
-      }
-
+      override def onError(e: Throwable): Unit = {}
     }
     eventLoop.start()
     eventLoop.post(1)
@@ -213,11 +206,9 @@ class EventLoopSuite extends SparkFunSuite with Timeouts {
         stop()
       }
 
-      override def onReceive(event: Int): Unit = {
-      }
+      override def onReceive(event: Int): Unit = {}
 
-      override def onError(e: Throwable): Unit = {
-      }
+      override def onError(e: Throwable): Unit = {}
 
       override def onStop(): Unit = {
         onStopCalled = true
@@ -238,8 +229,7 @@ class EventLoopSuite extends SparkFunSuite with Timeouts {
         stop()
       }
 
-      override def onError(e: Throwable): Unit = {
-      }
+      override def onError(e: Throwable): Unit = {}
 
       override def onStop(): Unit = {
         onStopCalled = true

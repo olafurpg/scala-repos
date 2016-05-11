@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2002-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2002-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 // DO NOT EDIT, CHANGES WILL BE LOST
@@ -13,13 +13,14 @@
 package scala
 
 /** `Boolean` (equivalent to Java's `boolean` primitive type) is a
- *  subtype of [[scala.AnyVal]]. Instances of `Boolean` are not
- *  represented by an object in the underlying runtime system.
- *
- *  There is an implicit conversion from [[scala.Boolean]] => [[scala.runtime.RichBoolean]]
- *  which provides useful non-primitive operations.
- */
+  *  subtype of [[scala.AnyVal]]. Instances of `Boolean` are not
+  *  represented by an object in the underlying runtime system.
+  *
+  *  There is an implicit conversion from [[scala.Boolean]] => [[scala.runtime.RichBoolean]]
+  *  which provides useful non-primitive operations.
+  */
 final abstract class Boolean private extends AnyVal {
+
   /** Negates a Boolean expression.
     *
     * - `!a` results in `false` if and only if `a` evaluates to `true` and
@@ -108,28 +109,27 @@ final abstract class Boolean private extends AnyVal {
 object Boolean extends AnyValCompanion {
 
   /** Transform a value type into a boxed reference type.
-   *
-   *  Runtime implementation determined by `scala.runtime.BoxesRunTime.boxToBoolean`. See [[https://github.com/scala/scala src/library/scala/runtime/BoxesRunTime.java]].
-   *
-   *  @param  x   the Boolean to be boxed
-   *  @return     a java.lang.Boolean offering `x` as its underlying value.
-   */
+    *
+    *  Runtime implementation determined by `scala.runtime.BoxesRunTime.boxToBoolean`. See [[https://github.com/scala/scala src/library/scala/runtime/BoxesRunTime.java]].
+    *
+    *  @param  x   the Boolean to be boxed
+    *  @return     a java.lang.Boolean offering `x` as its underlying value.
+    */
   def box(x: Boolean): java.lang.Boolean = java.lang.Boolean.valueOf(x)
 
   /** Transform a boxed type into a value type.  Note that this
-   *  method is not typesafe: it accepts any Object, but will throw
-   *  an exception if the argument is not a java.lang.Boolean.
-   *
-   *  Runtime implementation determined by `scala.runtime.BoxesRunTime.unboxToBoolean`. See [[https://github.com/scala/scala src/library/scala/runtime/BoxesRunTime.java]].
-   *
-   *  @param  x   the java.lang.Boolean to be unboxed.
-   *  @throws     ClassCastException  if the argument is not a java.lang.Boolean
-   *  @return     the Boolean resulting from calling booleanValue() on `x`
-   */
-  def unbox(x: java.lang.Object): Boolean = x.asInstanceOf[java.lang.Boolean].booleanValue()
+    *  method is not typesafe: it accepts any Object, but will throw
+    *  an exception if the argument is not a java.lang.Boolean.
+    *
+    *  Runtime implementation determined by `scala.runtime.BoxesRunTime.unboxToBoolean`. See [[https://github.com/scala/scala src/library/scala/runtime/BoxesRunTime.java]].
+    *
+    *  @param  x   the java.lang.Boolean to be unboxed.
+    *  @throws     ClassCastException  if the argument is not a java.lang.Boolean
+    *  @return     the Boolean resulting from calling booleanValue() on `x`
+    */
+  def unbox(x: java.lang.Object): Boolean =
+    x.asInstanceOf[java.lang.Boolean].booleanValue()
 
   /** The String representation of the scala.Boolean companion object. */
   override def toString = "object scala.Boolean"
-
 }
-

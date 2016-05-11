@@ -10,14 +10,14 @@ import scala.tools.nsc.classpath.PackageNameUtils
 import scala.tools.nsc.io.Jar
 
 /**
- * Generates directories, jars and zip files containing sources and classes
- * (the result of a compilation which is executed here)
- * and use them as a class- and sourcepath during compilation and running
- * created application. At the end everything is cleaned up.
- *
- * It can test also current, recursive classpath. Just right now we force
- * flat classpath to test it also when the recursive one would be set as a default.
- */
+  * Generates directories, jars and zip files containing sources and classes
+  * (the result of a compilation which is executed here)
+  * and use them as a class- and sourcepath during compilation and running
+  * created application. At the end everything is cleaned up.
+  *
+  * It can test also current, recursive classpath. Just right now we force
+  * flat classpath to test it also when the recursive one would be set as a default.
+  */
 object Test {
 
   private implicit class JFileOps(file: JFile) {
@@ -49,7 +49,8 @@ object Test {
           fileToAdd.listFiles() foreach addFileToZip(dirEntryName)
         } else {
           val inputStream = new FileInputStream(fileToAdd)
-          outputStream.putNextEntry(new ZipEntry(dirPrefix + fileToAdd.getName))
+          outputStream.putNextEntry(
+              new ZipEntry(dirPrefix + fileToAdd.getName))
 
           val buffer = new Array[Byte](1024)
           var count = inputStream.read(buffer)
@@ -69,14 +70,18 @@ object Test {
 
     def moveContentToJar(jarName: String): Unit = {
       val newJar = jarsDir createFile s"$jarName.jar"
-      Jar.create(file = File(newJar), sourceDir = Directory(file), mainClass = "won't be used")
+      Jar.create(file = File(newJar),
+                 sourceDir = Directory(file),
+                 mainClass = "won't be used")
       cleanDir(file)
     }
 
     def path: String = file.getAbsolutePath
   }
 
-  private case class DirRep(name: String, nestedDirs: Seq[DirRep] = Nil, sourceFiles: Seq[String] = Nil)
+  private case class DirRep(name: String,
+                            nestedDirs: Seq[DirRep] = Nil,
+                            sourceFiles: Seq[String] = Nil)
 
   private val compiler = new scala.tools.nsc.MainClass
   private val appRunner = new scala.tools.nsc.MainGenericRunner
@@ -86,7 +91,8 @@ object Test {
   // creates a test dir in a temporary dir containing compiled files of this test
   // root dir will be automatically deleted after the end of test
   private val rootDir = new JFile(sys.props("partest.output"))
-  private val testDir = rootDir createDir s"cp-tests-${System.currentTimeMillis()}"
+  private val testDir =
+    rootDir createDir s"cp-tests-${System.currentTimeMillis()}"
 
   private val jarsDir = testDir createDir "jars"
   private val zipsDir = testDir createDir "zips"
@@ -163,27 +169,45 @@ object Test {
   }
 
   private def compileFinalApp(): Unit = {
-    val classPath = mkPath(javaClassPath, binDir.path, zipsDir.path + "/Bin.zip", jarsDir.path + "/Bin.jar")
-    val sourcePath = mkPath(srcDir.path, zipsDir.path + "/Src.zip", jarsDir.path + "/Src.jar")
+    val classPath = mkPath(javaClassPath,
+                           binDir.path,
+                           zipsDir.path + "/Bin.zip",
+                           jarsDir.path + "/Bin.jar")
+    val sourcePath = mkPath(
+        srcDir.path, zipsDir.path + "/Src.zip", jarsDir.path + "/Src.jar")
 
-    compiler.process(Array(classPathImplFlag, "-cp", classPath, "-sourcepath", sourcePath,
-      "-d", outDir.path, s"${srcDir.path}/Main.scala"))
+    compiler.process(
+        Array(classPathImplFlag,
+              "-cp",
+              classPath,
+              "-sourcepath",
+              sourcePath,
+              "-d",
+              outDir.path,
+              s"${srcDir.path}/Main.scala"))
   }
 
   private def runApp(): Unit = {
-    val classPath = mkPath(javaClassPath, outDir.path, binDir.path, zipsDir.path + "/Bin.zip", jarsDir.path + "/Bin.jar")
+    val classPath = mkPath(javaClassPath,
+                           outDir.path,
+                           binDir.path,
+                           zipsDir.path + "/Bin.zip",
+                           jarsDir.path + "/Bin.jar")
     appRunner.process(Array(classPathImplFlag, "-cp", classPath, "Main"))
   }
 
   private def createStandardSrcHierarchy(baseFileName: String): Unit =
-    createSources(RootPackage, srcDir,
-      DirRep("",
-        nestedDirs = Seq(DirRep("nested", sourceFiles = Seq("Nested" + baseFileName))),
-        sourceFiles = Seq(baseFileName)
-      )
-    )
+    createSources(
+        RootPackage,
+        srcDir,
+        DirRep("",
+               nestedDirs = Seq(
+                     DirRep("nested",
+                            sourceFiles = Seq("Nested" + baseFileName))),
+               sourceFiles = Seq(baseFileName)))
 
-  private def createSources(pkg: String, dirFile: JFile, dirRep: DirRep): Unit = {
+  private def createSources(
+      pkg: String, dirFile: JFile, dirRep: DirRep): Unit = {
     dirRep.nestedDirs foreach { rep =>
       val nestedDir = dirFile createDir rep.name
       val nestedPkg = PackageNameUtils.packagePrefix(pkg) + rep.name
@@ -198,10 +222,17 @@ object Test {
     }
   }
 
-  private def compileSrc(baseFileName: String, destination: JFile = outDir): Unit = {
+  private def compileSrc(
+      baseFileName: String, destination: JFile = outDir): Unit = {
     val srcDirPath = srcDir.path
-    compiler.process(Array(classPathImplFlag, "-cp", javaClassPath, "-d", destination.path,
-      s"$srcDirPath/$baseFileName.scala", s"$srcDirPath/nested/Nested$baseFileName.scala"))
+    compiler.process(
+        Array(classPathImplFlag,
+              "-cp",
+              javaClassPath,
+              "-d",
+              destination.path,
+              s"$srcDirPath/$baseFileName.scala",
+              s"$srcDirPath/nested/Nested$baseFileName.scala"))
   }
 
   private def cleanDir(dir: JFile): Unit =
@@ -210,5 +241,6 @@ object Test {
       file.delete()
     }
 
-  private def mkPath(pathEntries: String*) = pathEntries.mkString(File.pathSeparator)
+  private def mkPath(pathEntries: String*) =
+    pathEntries.mkString(File.pathSeparator)
 }

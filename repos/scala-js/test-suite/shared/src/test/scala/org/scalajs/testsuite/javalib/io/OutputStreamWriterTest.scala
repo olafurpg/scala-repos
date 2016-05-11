@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.io
 
@@ -38,8 +38,7 @@ class OutputStreamWriterTest {
     assertFalse(bos.flushed)
 
     osw.close()
-    if (!executingInJVM)
-      assertTrue(bos.flushed)
+    if (!executingInJVM) assertTrue(bos.flushed)
     assertTrue(bos.closed)
 
     // can double-close without error
@@ -57,15 +56,15 @@ class OutputStreamWriterTest {
   }
 
   def testW(body: OutputStreamWriter => Unit,
-      expected: Array[Int], alreadyFlushed: Boolean = false): Unit = {
+            expected: Array[Int],
+            alreadyFlushed: Boolean = false): Unit = {
     val (osw, bos) = newOSWriter()
     body(osw)
     if (!alreadyFlushed) {
       assertEquals(0, bos.size) // write() methods should buffer
       osw.flush()
     }
-    if (!executingInJVM)
-      assertTrue(bos.flushed)
+    if (!executingInJVM) assertTrue(bos.flushed)
     assertArrayEquals(expected.map(_.toByte), bos.toByteArray)
   }
 
@@ -80,32 +79,52 @@ class OutputStreamWriterTest {
 
   @Test def write_Unicode_repertoire_without_surrogates(): Unit = {
     testW(_.write('é'), Array(0xc3, 0xa9))
-    testW(_.write("こんにちは"), Array(
-        0xe3, 0x81, 0x93, 0xe3, 0x82, 0x93, 0xe3, 0x81, 0xab, 0xe3, 0x81, 0xa1, 0xe3, 0x81, 0xaf))
-    testW(_.write("Καλημέρα", 3, 4), Array(
-        0xce, 0xb7, 0xce, 0xbc, 0xce, 0xad, 0xcf, 0x81))
+    testW(_.write("こんにちは"),
+          Array(0xe3,
+                0x81,
+                0x93,
+                0xe3,
+                0x82,
+                0x93,
+                0xe3,
+                0x81,
+                0xab,
+                0xe3,
+                0x81,
+                0xa1,
+                0xe3,
+                0x81,
+                0xaf))
+    testW(_.write("Καλημέρα", 3, 4),
+          Array(0xce, 0xb7, 0xce, 0xbc, 0xce, 0xad, 0xcf, 0x81))
   }
 
   @Test def write_surrogate_pairs(): Unit = {
     testW(_.write("\ud83d\udca9"), Array(0xf0, 0x9f, 0x92, 0xa9))
-    testW(_.write("ab\ud83d\udca9cd", 1, 3), Array('b', 0xf0, 0x9f, 0x92, 0xa9))
+    testW(
+        _.write("ab\ud83d\udca9cd", 1, 3), Array('b', 0xf0, 0x9f, 0x92, 0xa9))
   }
 
   @Test def write_surrogate_pairs_spread_across_multiple_writes(): Unit = {
-    testW({ osw => osw.write('\ud83d'); osw.write('\udca9') },
-        Array(0xf0, 0x9f, 0x92, 0xa9))
+    testW({ osw =>
+      osw.write('\ud83d'); osw.write('\udca9')
+    }, Array(0xf0, 0x9f, 0x92, 0xa9))
 
-    testW({ osw => osw.write('\ud83d'); osw.flush(); osw.write('\udca9') },
-        Array(0xf0, 0x9f, 0x92, 0xa9))
+    testW({ osw =>
+      osw.write('\ud83d'); osw.flush(); osw.write('\udca9')
+    }, Array(0xf0, 0x9f, 0x92, 0xa9))
 
-    testW({ osw => osw.write("ab\ud83d"); osw.write('\udca9') },
-        Array('a', 'b', 0xf0, 0x9f, 0x92, 0xa9))
+    testW({ osw =>
+      osw.write("ab\ud83d"); osw.write('\udca9')
+    }, Array('a', 'b', 0xf0, 0x9f, 0x92, 0xa9))
 
-    testW({ osw => osw.write("ab\ud83d"); osw.write("\udca9cd") },
-        Array('a', 'b', 0xf0, 0x9f, 0x92, 0xa9, 'c', 'd'))
+    testW({ osw =>
+      osw.write("ab\ud83d"); osw.write("\udca9cd")
+    }, Array('a', 'b', 0xf0, 0x9f, 0x92, 0xa9, 'c', 'd'))
 
-    testW({ osw => osw.write("ab\ud83dzz", 1, 2); osw.write("ww\udca9cd", 2, 2) },
-        Array('b', 0xf0, 0x9f, 0x92, 0xa9, 'c'))
+    testW({ osw =>
+      osw.write("ab\ud83dzz", 1, 2); osw.write("ww\udca9cd", 2, 2)
+    }, Array('b', 0xf0, 0x9f, 0x92, 0xa9, 'c'))
   }
 
   @Test def write_malformed_surrogates(): Unit = {
@@ -114,21 +133,26 @@ class OutputStreamWriterTest {
   }
 
   @Test def write_malformed_surrogates_spread_across_multiple_writes(): Unit = {
-    testW({ osw => osw.write('\ud83d'); osw.write('a') },
-        Array('?', 'a'))
+    testW({ osw =>
+      osw.write('\ud83d'); osw.write('a')
+    }, Array('?', 'a'))
 
-    testW({ osw => osw.write("ab\ud83d"); osw.write("\ud83d") },
-        Array('a', 'b', '?'))
+    testW({ osw =>
+      osw.write("ab\ud83d"); osw.write("\ud83d")
+    }, Array('a', 'b', '?'))
 
-    testW({ osw => osw.write("ab\ud83d"); osw.write("\ud83dc") },
-        Array('a', 'b', '?', '?', 'c'))
+    testW({ osw =>
+      osw.write("ab\ud83d"); osw.write("\ud83dc")
+    }, Array('a', 'b', '?', '?', 'c'))
   }
 
   @Test def write_malformed_surrogates_at_end_of_input(): Unit = {
-    testW({ osw => osw.write('\ud83d'); osw.close() },
-        Array('?'), alreadyFlushed = true)
+    testW({ osw =>
+      osw.write('\ud83d'); osw.close()
+    }, Array('?'), alreadyFlushed = true)
 
-    testW({ osw => osw.write("ab\ud83d"); osw.close() },
-        Array('a', 'b', '?'), alreadyFlushed = true)
+    testW({ osw =>
+      osw.write("ab\ud83d"); osw.close()
+    }, Array('a', 'b', '?'), alreadyFlushed = true)
   }
 }

@@ -23,28 +23,28 @@ import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 
 /**
- * :: DeveloperApi ::
- * Trait for transformation of a vector
- */
+  * :: DeveloperApi ::
+  * Trait for transformation of a vector
+  */
 @Since("1.1.0")
 @DeveloperApi
 trait VectorTransformer extends Serializable {
 
   /**
-   * Applies transformation on a vector.
-   *
-   * @param vector vector to be transformed.
-   * @return transformed vector.
-   */
+    * Applies transformation on a vector.
+    *
+    * @param vector vector to be transformed.
+    * @return transformed vector.
+    */
   @Since("1.1.0")
   def transform(vector: Vector): Vector
 
   /**
-   * Applies transformation on an RDD[Vector].
-   *
-   * @param data RDD[Vector] to be transformed.
-   * @return transformed RDD[Vector].
-   */
+    * Applies transformation on an RDD[Vector].
+    *
+    * @param data RDD[Vector] to be transformed.
+    * @return transformed RDD[Vector].
+    */
   @Since("1.1.0")
   def transform(data: RDD[Vector]): RDD[Vector] = {
     // Later in #1498 , all RDD objects are sent via broadcasting instead of RPC.
@@ -53,14 +53,13 @@ trait VectorTransformer extends Serializable {
   }
 
   /**
-   * Applies transformation on an JavaRDD[Vector].
-   *
-   * @param data JavaRDD[Vector] to be transformed.
-   * @return transformed JavaRDD[Vector].
-   */
+    * Applies transformation on an JavaRDD[Vector].
+    *
+    * @param data JavaRDD[Vector] to be transformed.
+    * @return transformed JavaRDD[Vector].
+    */
   @Since("1.1.0")
   def transform(data: JavaRDD[Vector]): JavaRDD[Vector] = {
     transform(data.rdd)
   }
-
 }

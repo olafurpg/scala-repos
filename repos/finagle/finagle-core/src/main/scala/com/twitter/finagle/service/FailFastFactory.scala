@@ -14,32 +14,33 @@ import scala.util.Random
 object FailFastFactory {
   private sealed trait State
   private case object Ok extends State
-  private case class Retrying(
-      since: Time,
-      task: TimerTask,
-      ntries: Int,
-      backoffs: Stream[Duration])
-    extends State
+  private case class Retrying(since: Time,
+                              task: TimerTask,
+                              ntries: Int,
+                              backoffs: Stream[Duration])
+      extends State
 
-  private val url = "https://twitter.github.io/finagle/guide/FAQ.html#why-do-clients-see-com-twitter-finagle-failedfastexception-s"
+  private val url =
+    "https://twitter.github.io/finagle/guide/FAQ.html#why-do-clients-see-com-twitter-finagle-failedfastexception-s"
 
   private object Observation extends Enumeration {
     type t = Value
     val Success, Fail, Timeout, TimeoutFail, Close = Value
   }
 
-  private val defaultBackoffs = (Backoff.exponential(1.second, 2) take 5) ++ Backoff.const(32.seconds)
+  private val defaultBackoffs =
+    (Backoff.exponential(1.second, 2) take 5) ++ Backoff.const(32.seconds)
   private val rng = new Random
 
   val role = Stack.Role("FailFast")
 
   /**
-   * For details on why clients see [[FailedFastException]]s see the
-   * [[https://twitter.github.io/finagle/guide/FAQ.html#why-do-clients-see-com-twitter-finagle-failedfastexception-s FAQ]]
-   *
-   * @see The [[https://twitter.github.io/finagle/guide/Clients.html#fail-fast user guide]]
-   *      for more details.
-   */
+    * For details on why clients see [[FailedFastException]]s see the
+    * [[https://twitter.github.io/finagle/guide/FAQ.html#why-do-clients-see-com-twitter-finagle-failedfastexception-s FAQ]]
+    *
+    * @see The [[https://twitter.github.io/finagle/guide/Clients.html#fail-fast user guide]]
+    *      for more details.
+    */
   case class FailFast(enabled: Boolean) {
     def mk(): (FailFast, Stack.Param[FailFast]) =
       (this, FailFast.param)
@@ -49,27 +50,27 @@ object FailFastFactory {
   }
 
   /**
-   * Creates a [[com.twitter.finagle.Stackable]] [[FailFastFactory]] when enabled.
-   */
+    * Creates a [[com.twitter.finagle.Stackable]] [[FailFastFactory]] when enabled.
+    */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module6[
-      FailFast,
-      param.Stats,
-      param.Timer,
-      param.Label,
-      param.Logger,
-      Transporter.EndpointAddr,
-      ServiceFactory[Req, Rep]] {
+    new Stack.Module6[FailFast,
+                      param.Stats,
+                      param.Timer,
+                      param.Label,
+                      param.Logger,
+                      Transporter.EndpointAddr,
+                      ServiceFactory[Req, Rep]] {
       val role = FailFastFactory.role
-      val description = "Backoff exponentially from hosts to which we cannot establish a connection"
+      val description =
+        "Backoff exponentially from hosts to which we cannot establish a connection"
       def make(
-        failFast: FailFast,
-        _stats: param.Stats,
-        _timer: param.Timer,
-        _label: param.Label,
-        _logger: param.Logger,
-        _endpoint: Transporter.EndpointAddr,
-        next: ServiceFactory[Req, Rep]
+          failFast: FailFast,
+          _stats: param.Stats,
+          _timer: param.Timer,
+          _label: param.Label,
+          _logger: param.Logger,
+          _endpoint: Transporter.EndpointAddr,
+          next: ServiceFactory[Req, Rep]
       ) = {
         failFast match {
           case FailFast(false) =>
@@ -81,28 +82,33 @@ object FailFastFactory {
             val param.Logger(logger) = _logger
             val Transporter.EndpointAddr(endpoint) = _endpoint
 
-            new FailFastFactory(next, statsReceiver.scope("failfast"), timer, label, logger, endpoint)
+            new FailFastFactory(next,
+                                statsReceiver.scope("failfast"),
+                                timer,
+                                label,
+                                logger,
+                                endpoint)
         }
       }
     }
 }
 
 /**
- * A fail-fast factory that attempts to reduce the number of requests dispatched
- * to endpoints that will anyway fail. It works by marking a host dead on
- * failure, launching a background process that attempts to reestablish the
- * connection with the given backoff schedule. At this time, the factory is
- * marked unavailable (and thus the load balancer above it will avoid its
- * use). The factory becomes available again on success or when the backoff
- * schedule runs out.
- *
- * Inflight attempts to connect will continue uninterrupted. However, trying to
- * connect *after* being marked dead will fail fast until the background process
- * is able to establish a connection.
- *
- * @see The [[https://twitter.github.io/finagle/guide/Clients.html#fail-fast user guide]]
- *      for more details.
- */
+  * A fail-fast factory that attempts to reduce the number of requests dispatched
+  * to endpoints that will anyway fail. It works by marking a host dead on
+  * failure, launching a background process that attempts to reestablish the
+  * connection with the given backoff schedule. At this time, the factory is
+  * marked unavailable (and thus the load balancer above it will avoid its
+  * use). The factory becomes available again on success or when the backoff
+  * schedule runs out.
+  *
+  * Inflight attempts to connect will continue uninterrupted. However, trying to
+  * connect *after* being marked dead will fail fast until the background process
+  * is able to establish a connection.
+  *
+  * @see The [[https://twitter.github.io/finagle/guide/Clients.html#fail-fast user guide]]
+  *      for more details.
+  */
 private[finagle] class FailFastFactory[Req, Rep](
     underlying: ServiceFactory[Req, Rep],
     statsReceiver: StatsReceiver,
@@ -111,14 +117,16 @@ private[finagle] class FailFastFactory[Req, Rep](
     logger: Logger = DefaultLogger,
     endpoint: Address = Address.failing,
     backoffs: Stream[Duration] = FailFastFactory.defaultBackoffs)
-  extends ServiceFactoryProxy(underlying) {
+    extends ServiceFactoryProxy(underlying) {
   import FailFastFactory._
 
-  private[this] val exc = new FailedFastException(s"Endpoint $label is marked down. For more details see: $url")
+  private[this] val exc = new FailedFastException(
+      s"Endpoint $label is marked down. For more details see: $url")
 
   private[this] val futureExc = Future.exception(exc)
 
-  private[this] val markedAvailableCounter = statsReceiver.counter("marked_available")
+  private[this] val markedAvailableCounter =
+    statsReceiver.counter("marked_available")
   private[this] val markedDeadCounter = statsReceiver.counter("marked_dead")
 
   private[this] val unhealthyForMsGauge =
@@ -137,10 +145,11 @@ private[finagle] class FailFastFactory[Req, Rep](
       }
     }
 
-  private[this] def getBackoffs(): Stream[Duration] = backoffs map { duration =>
-    // Add a 10% jitter to reduce correlation.
-    val ms = duration.inMilliseconds
-    (ms + ms*(rng.nextFloat()*0.10)).toInt.milliseconds
+  private[this] def getBackoffs(): Stream[Duration] = backoffs map {
+    duration =>
+      // Add a 10% jitter to reduce correlation.
+      val ms = duration.inMilliseconds
+      (ms + ms * (rng.nextFloat() * 0.10)).toInt.milliseconds
   }
 
   @volatile private[this] var state: State = Ok
@@ -161,11 +170,15 @@ private[finagle] class FailFastFactory[Req, Rep](
           case wait #:: rest => (wait, rest)
         }
         val now = Time.now
-        val task = timer.schedule(now + wait) { this.apply(Observation.Timeout) }
+        val task = timer.schedule(now + wait) {
+          this.apply(Observation.Timeout)
+        }
         markedDeadCounter.incr()
 
         if (logger.isLoggable(Level.DEBUG))
-          logger.log(Level.DEBUG, s"""FailFastFactory marking connection to "$label" as dead. Remote Address: ${endpoint.toString}""")
+          logger.log(
+              Level.DEBUG,
+              s"""FailFastFactory marking connection to "$label" as dead. Remote Address: ${endpoint.toString}""")
 
         state = Retrying(now, task, 0, rest)
 
@@ -187,8 +200,10 @@ private[finagle] class FailFastFactory[Req, Rep](
 
           case Retrying(since, task, ntries, wait #:: rest) =>
             task.cancel()
-            val newTask = timer.schedule(Time.now + wait) { this.apply(Observation.Timeout) }
-            state = Retrying(since, newTask, ntries+1, rest)
+            val newTask = timer.schedule(Time.now + wait) {
+              this.apply(Observation.Timeout)
+            }
+            state = Retrying(since, newTask, ntries + 1, rest)
 
           case Ok => assert(false)
         }
@@ -203,12 +218,12 @@ private[finagle] class FailFastFactory[Req, Rep](
         }
 
       case _ => ()
-
     }
   }
 
   override def apply(conn: ClientConnection): Future[Service[Req, Rep]] = {
-    if (state != Ok) futureExc else {
+    if (state != Ok) futureExc
+    else {
       underlying(conn).respond {
         case Throw(_) => update(Observation.Fail)
         case Return(_) if state != Ok => update(Observation.Success)

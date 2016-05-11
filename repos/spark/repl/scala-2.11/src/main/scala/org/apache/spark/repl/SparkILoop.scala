@@ -27,8 +27,8 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.util.stringFromStream
 
 /**
- *  A Spark-specific interactive shell.
- */
+  *  A Spark-specific interactive shell.
+  */
 class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
     extends ILoop(in0, out) {
   def this(in0: BufferedReader, out: JPrintWriter) = this(Some(in0), out)
@@ -69,15 +69,16 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
       /_/
          """.format(SPARK_VERSION))
     val welcomeMsg = "Using Scala %s (%s, Java %s)".format(
-      versionString, javaVmName, javaVersion)
+        versionString, javaVmName, javaVersion)
     echo(welcomeMsg)
     echo("Type in expressions to have them evaluated.")
     echo("Type :help for more information.")
   }
 
-  import LoopCommand.{ cmd, nullary }
+  import LoopCommand.{cmd, nullary}
 
-  private val blockedCommands = Set("implicits", "javap", "power", "type", "kind")
+  private val blockedCommands = Set(
+      "implicits", "javap", "power", "type", "kind")
 
   /** Standard commands **/
   lazy val sparkStandardCommands: List[SparkILoop.this.LoopCommand] =
@@ -87,10 +88,10 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
   override def commands: List[LoopCommand] = sparkStandardCommands
 
   /**
-   * We override `loadFiles` because we need to initialize Spark *before* the REPL
-   * sees any files, so that the Spark context is visible in those files. This is a bit of a
-   * hack, but there isn't another hook available to us at this point.
-   */
+    * We override `loadFiles` because we need to initialize Spark *before* the REPL
+    * sees any files, so that the Spark context is visible in those files. This is a bit of a
+    * hack, but there isn't another hook available to us at this point.
+    */
   override def loadFiles(settings: Settings): Unit = {
     initializeSpark()
     super.loadFiles(settings)
@@ -100,11 +101,11 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
 object SparkILoop {
 
   /**
-   * Creates an interpreter loop with default settings and feeds
-   * the given code to it as input.
-   */
+    * Creates an interpreter loop with default settings and feeds
+    * the given code to it as input.
+    */
   def run(code: String, sets: Settings = new Settings): String = {
-    import java.io.{ BufferedReader, StringReader, OutputStreamWriter }
+    import java.io.{BufferedReader, StringReader, OutputStreamWriter}
 
     stringFromStream { ostream =>
       Console.withOut(ostream) {

@@ -1,13 +1,13 @@
 //inner class
 class UnitReturnSeveralOutput2 {
   def foo(i: Int) {
-/*start*/
+    /*start*/
     if (true) return
     val x = 0
     val y = "a"
     val z = 1
     val zz = "1"
-/*end*/
+    /*end*/
     println(x + y + z + zz)
   }
 }
@@ -40,4 +40,4 @@ class UnitReturnSeveralOutput2 {
     Some(new TestMethodNameResult(x, y, z, zz))
   }
 }
-*/
+ */

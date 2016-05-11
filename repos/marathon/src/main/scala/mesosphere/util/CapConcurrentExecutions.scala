@@ -4,14 +4,14 @@ import javax.annotation.PreDestroy
 
 import akka.actor._
 import mesosphere.marathon.metrics.Metrics.AtomicIntGauge
-import mesosphere.marathon.metrics.{ MetricPrefixes, Metrics }
+import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
 import mesosphere.util.RestrictParallelExecutionsActor.Finished
 import org.slf4j.LoggerFactory
 
 import scala.collection.immutable.Queue
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
 import scala.util.control.NonFatal
-import scala.util.{ Failure, Try }
+import scala.util.{Failure, Try}
 
 /**
   * Allows capping parallel executions of methods which return `scala.concurrent.Future`s.
@@ -27,20 +27,25 @@ import scala.util.{ Failure, Try }
 object CapConcurrentExecutions {
   private val log = LoggerFactory.getLogger(getClass.getName)
 
-  def apply[T](
-    metrics: CapConcurrentExecutionsMetrics,
-    actorRefFactory: ActorRefFactory,
-    actorName: String,
-    maxParallel: Int,
-    maxQueued: Int): CapConcurrentExecutions = {
-    new CapConcurrentExecutions(metrics, actorRefFactory, actorName, maxParallel, maxQueued)
+  def apply[T](metrics: CapConcurrentExecutionsMetrics,
+               actorRefFactory: ActorRefFactory,
+               actorName: String,
+               maxParallel: Int,
+               maxQueued: Int): CapConcurrentExecutions = {
+    new CapConcurrentExecutions(
+        metrics, actorRefFactory, actorName, maxParallel, maxQueued)
   }
 }
 
 class CapConcurrentExecutionsMetrics(metrics: Metrics, metricsClass: Class[_]) {
-  val queued = metrics.gauge(metrics.name(MetricPrefixes.SERVICE, metricsClass, "queued"), new AtomicIntGauge)
-  val processing = metrics.gauge(metrics.name(MetricPrefixes.SERVICE, metricsClass, "processing"), new AtomicIntGauge)
-  val processingTimer = metrics.timer(metrics.name(MetricPrefixes.SERVICE, metricsClass, "processing-time"))
+  val queued = metrics.gauge(
+      metrics.name(MetricPrefixes.SERVICE, metricsClass, "queued"),
+      new AtomicIntGauge)
+  val processing = metrics.gauge(
+      metrics.name(MetricPrefixes.SERVICE, metricsClass, "processing"),
+      new AtomicIntGauge)
+  val processingTimer = metrics.timer(
+      metrics.name(MetricPrefixes.SERVICE, metricsClass, "processing-time"))
 
   def reset(): Unit = {
     queued.setValue(0)
@@ -48,17 +53,16 @@ class CapConcurrentExecutionsMetrics(metrics: Metrics, metricsClass: Class[_]) {
   }
 }
 
-class CapConcurrentExecutions private (
-    metrics: CapConcurrentExecutionsMetrics,
-    actorRefFactory: ActorRefFactory,
-    actorName: String,
-    maxParallel: Int,
-    maxQueued: Int) {
+class CapConcurrentExecutions private (metrics: CapConcurrentExecutionsMetrics,
+                                       actorRefFactory: ActorRefFactory,
+                                       actorName: String,
+                                       maxParallel: Int,
+                                       maxQueued: Int) {
   import CapConcurrentExecutions.log
 
   private[util] val serializeExecutionActorRef = {
-    val serializeExecutionActorProps =
-      RestrictParallelExecutionsActor.props(metrics, maxParallel = maxParallel, maxQueued = maxQueued)
+    val serializeExecutionActorProps = RestrictParallelExecutionsActor.props(
+        metrics, maxParallel = maxParallel, maxQueued = maxQueued)
     actorRefFactory.actorOf(serializeExecutionActorProps, actorName)
   }
 
@@ -67,7 +71,8 @@ class CapConcurrentExecutions private (
     */
   def apply[T](block: => Future[T]): Future[T] = {
     val promise = Promise[T]()
-    serializeExecutionActorRef ! RestrictParallelExecutionsActor.Execute(promise, () => block)
+    serializeExecutionActorRef ! RestrictParallelExecutionsActor.Execute(
+        promise, () => block)
     promise.future
   }
 
@@ -84,7 +89,8 @@ class CapConcurrentExecutions private (
   * It will not queue more than `maxQueued` execute instructions.
   */
 private[util] class RestrictParallelExecutionsActor(
-    metrics: CapConcurrentExecutionsMetrics, maxParallel: Int, maxQueued: Int) extends Actor {
+    metrics: CapConcurrentExecutionsMetrics, maxParallel: Int, maxQueued: Int)
+    extends Actor {
 
   import RestrictParallelExecutionsActor.Execute
 
@@ -95,14 +101,14 @@ private[util] class RestrictParallelExecutionsActor(
     super.preStart()
 
     metrics.reset()
-
   }
 
   override def postStop(): Unit = {
     metrics.reset()
 
     for (execute <- queue) {
-      execute.complete(Failure(new IllegalStateException(s"$self actor stopped")))
+      execute.complete(
+          Failure(new IllegalStateException(s"$self actor stopped")))
     }
 
     queue = Queue.empty
@@ -113,9 +119,9 @@ private[util] class RestrictParallelExecutionsActor(
   override def receive: Receive = {
     case exec: Execute[_] =>
       if (active >= maxParallel && queue.size >= maxQueued) {
-        sender ! Status.Failure(new IllegalStateException(s"$self queue may not exceed $maxQueued entries"))
-      }
-      else {
+        sender ! Status.Failure(new IllegalStateException(
+                s"$self queue may not exceed $maxQueued entries"))
+      } else {
         queue :+= exec
         startNextIfPossible()
       }
@@ -141,8 +147,9 @@ private[util] class RestrictParallelExecutionsActor(
         active += 1
 
         val future: Future[_] =
-          try metrics.processingTimer.timeFuture(next.func())
-          catch { case NonFatal(e) => Future.failed(e) }
+          try metrics.processingTimer.timeFuture(next.func()) catch {
+            case NonFatal(e) => Future.failed(e)
+          }
 
         val myself = self
         future.onComplete { (result: Try[_]) =>
@@ -154,12 +161,16 @@ private[util] class RestrictParallelExecutionsActor(
 }
 
 private[util] object RestrictParallelExecutionsActor {
-  def props(metrics: CapConcurrentExecutionsMetrics, maxParallel: Int, maxQueued: Int): Props =
-    Props(new RestrictParallelExecutionsActor(metrics, maxParallel = maxParallel, maxQueued = maxQueued))
+  def props(metrics: CapConcurrentExecutionsMetrics,
+            maxParallel: Int,
+            maxQueued: Int): Props =
+    Props(new RestrictParallelExecutionsActor(
+            metrics, maxParallel = maxParallel, maxQueued = maxQueued))
 
   private val log = LoggerFactory.getLogger(getClass.getName)
   case class Execute[T](promise: Promise[T], func: () => Future[T]) {
-    def complete(result: Try[_]): Unit = promise.complete(result.asInstanceOf[Try[T]])
+    def complete(result: Try[_]): Unit =
+      promise.complete(result.asInstanceOf[Try[T]])
   }
   private case object Finished
 }

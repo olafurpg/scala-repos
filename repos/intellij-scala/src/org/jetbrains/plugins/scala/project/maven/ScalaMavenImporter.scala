@@ -23,63 +23,89 @@ import org.jetbrains.plugins.scala.project.maven.ScalaMavenImporter._
 import scala.collection.JavaConversions._
 
 /**
- * @author Pavel Fatin
- */
-class ScalaMavenImporter extends MavenImporter("org.scala-tools", "maven-scala-plugin") {
-  override def collectSourceFolders(mavenProject: MavenProject, result: java.util.List[String]) {
-    collectSourceOrTestFolders(mavenProject, "add-source", "sourceDir", "src/main/scala", result)
+  * @author Pavel Fatin
+  */
+class ScalaMavenImporter
+    extends MavenImporter("org.scala-tools", "maven-scala-plugin") {
+  override def collectSourceFolders(
+      mavenProject: MavenProject, result: java.util.List[String]) {
+    collectSourceOrTestFolders(
+        mavenProject, "add-source", "sourceDir", "src/main/scala", result)
   }
 
-  override def collectTestFolders(mavenProject: MavenProject, result: java.util.List[String]) {
-    collectSourceOrTestFolders(mavenProject, "add-source", "testSourceDir", "src/test/scala", result)
+  override def collectTestFolders(
+      mavenProject: MavenProject, result: java.util.List[String]) {
+    collectSourceOrTestFolders(
+        mavenProject, "add-source", "testSourceDir", "src/test/scala", result)
   }
 
-  private def collectSourceOrTestFolders(mavenProject: MavenProject, goal: String, goalPath: String,
-                                         defaultDir: String, result: java.util.List[String]) {
+  private def collectSourceOrTestFolders(mavenProject: MavenProject,
+                                         goal: String,
+                                         goalPath: String,
+                                         defaultDir: String,
+                                         result: java.util.List[String]) {
     val goalConfigValue = findGoalConfigValue(mavenProject, goal, goalPath)
     result.add(if (goalConfigValue == null) defaultDir else goalConfigValue)
   }
 
   // exclude "default" plugins, should be done inside IDEA's MavenImporter itself
-  override def isApplicable(mavenProject: MavenProject) = validConfigurationIn(mavenProject).isDefined
+  override def isApplicable(mavenProject: MavenProject) =
+    validConfigurationIn(mavenProject).isDefined
 
-  override def preProcess(module: Module, mavenProject: MavenProject, changes: MavenProjectChanges, modelsProvider: IdeModifiableModelsProvider) {}
+  override def preProcess(module: Module,
+                          mavenProject: MavenProject,
+                          changes: MavenProjectChanges,
+                          modelsProvider: IdeModifiableModelsProvider) {}
 
-  override def process(modelsProvider: IdeModifiableModelsProvider, module: Module,
-              rootModel: MavenRootModelAdapter, mavenModel: MavenProjectsTree, mavenProject: MavenProject,
-              changes: MavenProjectChanges, mavenProjectToModuleName: util.Map[MavenProject, String],
-              postTasks: util.List[MavenProjectsProcessorTask]) {
+  override def process(
+      modelsProvider: IdeModifiableModelsProvider,
+      module: Module,
+      rootModel: MavenRootModelAdapter,
+      mavenModel: MavenProjectsTree,
+      mavenProject: MavenProject,
+      changes: MavenProjectChanges,
+      mavenProjectToModuleName: util.Map[MavenProject, String],
+      postTasks: util.List[MavenProjectsProcessorTask]) {
 
     validConfigurationIn(mavenProject).foreach { configuration =>
       // TODO configuration.vmOptions
 
       val compilerOptions = {
-        val plugins = configuration.plugins.map(id => mavenProject.localPathTo(id).getPath)
-        configuration.compilerOptions ++ plugins.map(path => "-Xplugin:" + path)
+        val plugins =
+          configuration.plugins.map(id => mavenProject.localPathTo(id).getPath)
+        configuration.compilerOptions ++ plugins.map(
+            path => "-Xplugin:" + path)
       }
-      
+
       module.configureScalaCompilerSettingsFrom("Maven", compilerOptions)
 
       val compilerVersion = configuration.compilerVersion.get
 
-      val scalaLibrary =modelsProvider.getAllLibraries.toSeq
-              .filter(_.getName.contains("scala-library"))
-              .find(_.scalaVersion == Some(compilerVersion))
-              .getOrElse(throw new ExternalSystemException("Cannot find project Scala library " +
-              compilerVersion.number + " for module " + module.getName))
+      val scalaLibrary = modelsProvider.getAllLibraries.toSeq
+        .filter(_.getName.contains("scala-library"))
+        .find(_.scalaVersion == Some(compilerVersion))
+        .getOrElse(throw new ExternalSystemException(
+                "Cannot find project Scala library " + compilerVersion.number +
+                " for module " + module.getName))
 
       if (!scalaLibrary.isScalaSdk) {
-        val languageLevel = compilerVersion.toLanguageLevel.getOrElse(ScalaLanguageLevel.Default)
-        val compilerClasspath = configuration.compilerClasspath.map(mavenProject.localPathTo)
+        val languageLevel =
+          compilerVersion.toLanguageLevel.getOrElse(ScalaLanguageLevel.Default)
+        val compilerClasspath =
+          configuration.compilerClasspath.map(mavenProject.localPathTo)
 
-        val libraryModel = modelsProvider.getModifiableLibraryModel(scalaLibrary).asInstanceOf[LibraryEx.ModifiableModelEx]
+        val libraryModel = modelsProvider
+          .getModifiableLibraryModel(scalaLibrary)
+          .asInstanceOf[LibraryEx.ModifiableModelEx]
         convertToScalaSdk(libraryModel, languageLevel, compilerClasspath)
       }
     }
   }
 
   // Can we reuse library.convertToScalaSdk? (dependency on modifiable model, cannot commit model)
-  private def convertToScalaSdk(model: ModifiableModelEx, languageLevel: ScalaLanguageLevel, compilerClasspath: Seq[File]) {
+  private def convertToScalaSdk(model: ModifiableModelEx,
+                                languageLevel: ScalaLanguageLevel,
+                                compilerClasspath: Seq[File]) {
     model.setKind(ScalaLibraryKind)
 
     val properties = new ScalaLibraryProperties()
@@ -89,7 +115,9 @@ class ScalaMavenImporter extends MavenImporter("org.scala-tools", "maven-scala-p
     model.setProperties(properties)
   }
 
-  override def resolve(project: Project, mavenProject: MavenProject, nativeMavenProject: NativeMavenProjectHolder,
+  override def resolve(project: Project,
+                       mavenProject: MavenProject,
+                       nativeMavenProject: NativeMavenProjectHolder,
                        embedder: MavenEmbedderWrapper) {
     validConfigurationIn(mavenProject).foreach { configuration =>
       val repositories = mavenProject.getRemoteRepositories
@@ -104,13 +132,15 @@ class ScalaMavenImporter extends MavenImporter("org.scala-tools", "maven-scala-p
     }
   }
 
-  private def validConfigurationIn(project: MavenProject) = Some(new ScalaConfiguration(project)).filter(_.valid)
+  private def validConfigurationIn(project: MavenProject) =
+    Some(new ScalaConfiguration(project)).filter(_.valid)
 }
 
 private object ScalaMavenImporter {
   implicit class RichMavenProject(val project: MavenProject) extends AnyVal {
-    def localPathTo(id: MavenId) = project.getLocalRepository / id.getGroupId.replaceAll("\\.", "/") /
-            id.getArtifactId / id.getVersion / "%s-%s.jar".format(id.getArtifactId, id.getVersion)
+    def localPathTo(id: MavenId) =
+      project.getLocalRepository / id.getGroupId.replaceAll("\\.", "/") / id.getArtifactId / id.getVersion / "%s-%s.jar"
+        .format(id.getArtifactId, id.getVersion)
   }
 
   implicit class RichFile(val file: File) extends AnyVal {
@@ -119,22 +149,35 @@ private object ScalaMavenImporter {
 }
 
 private class ScalaConfiguration(project: MavenProject) {
-  private def versionNumber = compilerVersion.map(_.number).getOrElse("unknown")
+  private def versionNumber =
+    compilerVersion.map(_.number).getOrElse("unknown")
 
-  private def scalaCompilerId = new MavenId("org.scala-lang", "scala-compiler", versionNumber)
+  private def scalaCompilerId =
+    new MavenId("org.scala-lang", "scala-compiler", versionNumber)
 
-  private def scalaLibraryId = new MavenId("org.scala-lang", "scala-library", versionNumber)
+  private def scalaLibraryId =
+    new MavenId("org.scala-lang", "scala-library", versionNumber)
 
-  private def scalaReflectId = new MavenId("org.scala-lang", "scala-reflect", versionNumber)
+  private def scalaReflectId =
+    new MavenId("org.scala-lang", "scala-reflect", versionNumber)
 
   private def compilerPlugin: Option[MavenPlugin] =
-    project.findPlugin("org.scala-tools", "maven-scala-plugin").toOption.filter(!_.isDefault).orElse(
-      project.findPlugin("net.alchim31.maven", "scala-maven-plugin").toOption.filter(!_.isDefault))
+    project
+      .findPlugin("org.scala-tools", "maven-scala-plugin")
+      .toOption
+      .filter(!_.isDefault)
+      .orElse(project
+            .findPlugin("net.alchim31.maven", "scala-maven-plugin")
+            .toOption
+            .filter(!_.isDefault))
 
-  private def compilerConfigurations: Seq[Element] = compilerPlugin.toSeq.flatMap { plugin =>
-    plugin.getConfigurationElement.toOption.toSeq ++
-            plugin.getGoalConfiguration("compile").toOption.toSeq
-  }
+  private def compilerConfigurations: Seq[Element] =
+    compilerPlugin.toSeq.flatMap { plugin =>
+      plugin.getConfigurationElement.toOption.toSeq ++ plugin
+        .getGoalConfiguration("compile")
+        .toOption
+        .toSeq
+    }
 
   private def standardLibrary: Option[MavenArtifact] =
     project.findDependencies("org.scala-lang", "scala-library").headOption
@@ -144,10 +187,14 @@ private class ScalaConfiguration(project: MavenProject) {
     if (usesReflect) basicIds :+ scalaReflectId else basicIds
   }
 
-  def compilerVersion: Option[Version] = element("scalaVersion").map(_.getTextTrim)
-          .orElse(standardLibrary.map(_.getVersion)).map(Version(_))
+  def compilerVersion: Option[Version] =
+    element("scalaVersion")
+      .map(_.getTextTrim)
+      .orElse(standardLibrary.map(_.getVersion))
+      .map(Version(_))
 
-  private def usesReflect: Boolean = compilerVersion.exists(it => it.toLanguageLevel.exists(_ >= Scala_2_10))
+  private def usesReflect: Boolean =
+    compilerVersion.exists(it => it.toLanguageLevel.exists(_ >= Scala_2_10))
 
   def vmOptions: Seq[String] = elements("jvmArgs", "jvmArg").map(_.getTextTrim)
 
@@ -155,11 +202,15 @@ private class ScalaConfiguration(project: MavenProject) {
 
   def plugins: Seq[MavenId] = {
     elements("compilerPlugins", "compilerPlugin").flatMap { plugin =>
-      plugin.getChildTextTrim("groupId").toOption
-              .zip(plugin.getChildTextTrim("artifactId").toOption)
-              .zip(plugin.getChildTextTrim("version").toOption).map {
-        case ((groupId, artifactId), version) => new MavenId(groupId, artifactId, version)
-      }
+      plugin
+        .getChildTextTrim("groupId")
+        .toOption
+        .zip(plugin.getChildTextTrim("artifactId").toOption)
+        .zip(plugin.getChildTextTrim("version").toOption)
+        .map {
+          case ((groupId, artifactId), version) =>
+            new MavenId(groupId, artifactId, version)
+        }
     }
   }
 

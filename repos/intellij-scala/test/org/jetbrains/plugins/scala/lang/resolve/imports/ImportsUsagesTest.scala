@@ -3,19 +3,17 @@ package lang
 package resolve
 package imports
 
-
 import com.intellij.psi.{PsiField, PsiMethod, PsiPolyVariantReference, PsiReference}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 class ImportsUsagesTest extends ScalaResolveTestCase {
-  override def folderPath: String = super.folderPath() + "resolve/imports/simple/"
+  override def folderPath: String =
+    super.folderPath() + "resolve/imports/simple/"
 
-  def printResults(imports: Object) {
-  }
+  def printResults(imports: Object) {}
 
   def testStaticJava() {
     findReferenceAtCaret() match {
@@ -71,7 +69,6 @@ class ImportsUsagesTest extends ScalaResolveTestCase {
     }
   }
 
-
   def testSimpleImport() {
     findReferenceAtCaret() match {
       case r: PsiPolyVariantReference =>
@@ -90,7 +87,6 @@ class ImportsUsagesTest extends ScalaResolveTestCase {
       case _ => throw new Exception("Wrong reference!")
     }
   }
-
 
   def testImportSelector() {
     findReferenceAtCaret() match {
@@ -167,7 +163,4 @@ class ImportsUsagesTest extends ScalaResolveTestCase {
       case _ => throw new Exception("Wrong reference!")
     }
   }
-
-
-
 }

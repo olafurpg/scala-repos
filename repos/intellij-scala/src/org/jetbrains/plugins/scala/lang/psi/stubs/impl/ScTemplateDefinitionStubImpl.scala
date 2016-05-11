@@ -11,12 +11,14 @@ import com.intellij.util.io.StringRef
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 
 /**
- * @author ilyas
- */
-
-class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](parent: StubElement[ParentPsi],
-                                                        elemType: IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-extends StubBaseWrapper[ScTemplateDefinition](parent, elemType) with ScTemplateDefinitionStub {
+  * @author ilyas
+  */
+class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
+    parent: StubElement[ParentPsi],
+    elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+    extends StubBaseWrapper[ScTemplateDefinition](parent, elemType)
+    with ScTemplateDefinitionStub {
 
   var myName: String = _
   var myQualName: String = _
@@ -34,7 +36,8 @@ extends StubBaseWrapper[ScTemplateDefinition](parent, elemType) with ScTemplateD
   private var visibleInJava: Boolean = false
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[
+               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
            name: String,
            qualName: String,
            javaQualName: String,
@@ -49,7 +52,10 @@ extends StubBaseWrapper[ScTemplateDefinition](parent, elemType) with ScTemplateD
            additionalJavaNames: Array[String],
            isLocal: Boolean,
            visibleInJava: Boolean) {
-    this(parent, elemType.asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+    this(
+        parent,
+        elemType
+          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     mySourceFileName = sourceFileName
     myName = name
     myQualName = qualName
@@ -67,7 +73,8 @@ extends StubBaseWrapper[ScTemplateDefinition](parent, elemType) with ScTemplateD
   }
 
   def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[_ <: StubElement[_ <: PsiElement], _ <: PsiElement],
+           elemType: IStubElementType[
+               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
            name: StringRef,
            qualName: StringRef,
            javaQualName: StringRef,
@@ -82,7 +89,10 @@ extends StubBaseWrapper[ScTemplateDefinition](parent, elemType) with ScTemplateD
            additionalJavaNames: Array[StringRef],
            isLocal: Boolean,
            visibleInJava: Boolean) {
-    this(parent, elemType.asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+    this(
+        parent,
+        elemType
+          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     mySourceFileName = StringRef.toString(sourceFileName)
     myName = StringRef.toString(name)
     myQualName = StringRef.toString(qualName)

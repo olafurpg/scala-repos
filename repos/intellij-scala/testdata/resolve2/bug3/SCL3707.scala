@@ -1,7 +1,7 @@
 package SCL3707
 
 object Test {
-  import a./*resolved: true*/b./*resolved: true*/a./*resolved: true*/Foo
+  import a. /*resolved: true*/ b. /*resolved: true*/ a. /*resolved: true*/ Foo
 
   def main(args: Array[String]) {
     println("foo")

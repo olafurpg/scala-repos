@@ -18,6 +18,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Outcome}
 
 @RunWith(classOf[JUnitRunner])
 class Finagle6APITest extends FunSuite with BeforeAndAfter {
+
   /**
     * Note: This integration test requires a real Memcached server to run.
     */
@@ -38,10 +39,12 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
     zookeeperServerPort = zookeeperServer.getPort()
 
     // connect to zookeeper server
-    zookeeperClient = zookeeperServer.createClient(ZooKeeperClient.digestCredentials("user","pass"))
+    zookeeperClient = zookeeperServer.createClient(
+        ZooKeeperClient.digestCredentials("user", "pass"))
 
     // create serverset
-    val serverSet = ServerSets.create(zookeeperClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
+    val serverSet = ServerSets.create(
+        zookeeperClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
     zkServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
     // start five memcached server and join the cluster
@@ -57,7 +60,8 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
 
     if (!testServers.isEmpty) {
       // set cache pool config node data
-      val cachePoolConfig: CachePoolConfig = new CachePoolConfig(cachePoolSize = 5)
+      val cachePoolConfig: CachePoolConfig =
+        new CachePoolConfig(cachePoolSize = 5)
       val output: ByteArrayOutputStream = new ByteArrayOutputStream
       CachePoolConfig.jsonCodec.serialize(cachePoolConfig, output)
       zookeeperClient.get().setData(zkPath, output.toByteArray, -1)
@@ -85,24 +89,26 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
 
   if (!Option(System.getProperty("SKIP_FLAKY")).isDefined) {
     test("with unmanaged regular zk serverset") {
-      val client = Memcached.client.newTwemcacheClient(
-        "zk!localhost:"+zookeeperServerPort+"!"+zkPath).asInstanceOf[PartitionedClient]
+      val client = Memcached.client
+        .newTwemcacheClient(
+            "zk!localhost:" + zookeeperServerPort + "!" + zkPath)
+        .asInstanceOf[PartitionedClient]
 
       // Wait for group to contain members
       Thread.sleep(5000)
 
       val count = 100
-        (0 until count).foreach{
-          n => {
-            client.set("foo"+n, Buf.Utf8("bar"+n))()
-          }
+      (0 until count).foreach { n =>
+        {
+          client.set("foo" + n, Buf.Utf8("bar" + n))()
         }
+      }
 
-      (0 until count).foreach {
-        n => {
-          val c = client.clientOf("foo"+n)
-          val Buf.Utf8(res) = c.get("foo"+n)().get
-          assert(res == "bar"+n)
+      (0 until count).foreach { n =>
+        {
+          val c = client.clientOf("foo" + n)
+          val Buf.Utf8(res) = c.get("foo" + n)().get
+          assert(res == "bar" + n)
         }
       }
     }
@@ -110,8 +116,10 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
 
   if (!Option(System.getProperty("SKIP_FLAKY")).isDefined)
     test("with managed cache pool") {
-      val client = Memcached.client.newTwemcacheClient(
-        "twcache!localhost:"+zookeeperServerPort+"!"+zkPath).asInstanceOf[PartitionedClient]
+      val client = Memcached.client
+        .newTwemcacheClient(
+            "twcache!localhost:" + zookeeperServerPort + "!" + zkPath)
+        .asInstanceOf[PartitionedClient]
 
       // Wait for group to contain members
       Thread.sleep(5000)
@@ -124,24 +132,25 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
       assert(res == "bar")
 
       val count = 100
-        (0 until count).foreach{
-          n => {
-            client.set("foo"+n, Buf.Utf8("bar"+n))()
-          }
+      (0 until count).foreach { n =>
+        {
+          client.set("foo" + n, Buf.Utf8("bar" + n))()
         }
+      }
 
-      (0 until count).foreach {
-        n => {
-          val c = client.clientOf("foo"+n)
-          val Buf.Utf8(res) = c.get("foo"+n)().get
-          assert(res == "bar"+n)
+      (0 until count).foreach { n =>
+        {
+          val c = client.clientOf("foo" + n)
+          val Buf.Utf8(res) = c.get("foo" + n)().get
+          assert(res == "bar" + n)
         }
       }
     }
 
   test("with static servers list") {
     val client = Memcached.client.newRichClient(
-      "twcache!localhost:%d,localhost:%d".format(testServers(0).address.getPort, testServers(1).address.getPort))
+        "twcache!localhost:%d,localhost:%d".format(
+            testServers(0).address.getPort, testServers(1).address.getPort))
 
     Await.result(client.delete("foo"))
     assert(Await.result(client.get("foo")) == None)

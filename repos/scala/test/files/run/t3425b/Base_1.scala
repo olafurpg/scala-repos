@@ -1,16 +1,13 @@
 trait P { def reflected: Boolean }
 trait Q { def reflected: Boolean }
-class PQ(val reflected: Boolean) extends P with Q { }
+class PQ(val reflected: Boolean) extends P with Q {}
 
 trait A
 trait B
 trait C { val y: P }
 class ABC extends A with B with C {
-  private def reflected = (
-    Thread.currentThread.getStackTrace
-      takeWhile (_.getMethodName != "main")
-      exists (_.toString contains "sun.reflect.")
-  )
+  private def reflected = (Thread.currentThread.getStackTrace takeWhile
+      (_.getMethodName != "main") exists (_.toString contains "sun.reflect."))
   lazy val y: PQ = new PQ(reflected)
 }
 
@@ -18,19 +15,18 @@ class ABC extends A with B with C {
      Not otherwise used in the test except that compiling
      it helps make sure it still compiles.
 
-****/
-
+  ****/
 object Gen {
   case class Tp(outer: String, elem: String) {
     override def toString = s"$outer { val y: $elem }"
   }
   case class Pair(tp1: Tp, tp2: Tp) {
     def expr = s"((new ABC): $tp)"
-    def tp   = s"($tp1) with ($tp2)"
+    def tp = s"($tp1) with ($tp2)"
   }
   val traits = Vector("Any", "A", "B", "C") map ("%6s" format _)
-  val types  = Vector("P", "Q", "R forSome { type R <: P with Q }")
-  val allTypes = for (c <- traits ; tp <- types) yield Tp(c, tp)
+  val types = Vector("P", "Q", "R forSome { type R <: P with Q }")
+  val allTypes = for (c <- traits; tp <- types) yield Tp(c, tp)
   val pairs = allTypes flatMap (t1 => allTypes map (t2 => Pair(t1, t2)))
   val indices = pairs.indices
 
@@ -38,20 +34,22 @@ object Gen {
     val p = pairs(idx)
     import p._
     List(
-      s"type R1_$idx = $tp",
-      s"type R2_$idx = R1_$idx { val y: (${tp1.elem}) with (${tp2.elem}) }"
+        s"type R1_$idx = $tp",
+        s"type R2_$idx = R1_$idx { val y: (${tp1.elem}) with (${tp2.elem}) }"
     )
   }
 
   def mkMethodContent(pre: String)(f: Int => String) =
     indices map (i => s"def $pre$i${f(i)}") mkString "\n  "
 
-  def content = List(
-    indices flatMap aliases mkString "\n  ",
-    mkMethodContent("f")(i => s" = { val x = ${pairs(i).expr} ; x.y.reflected -> whatis(x).toString }"),
-    mkMethodContent("g")(i => s"""(x: R1_$i) = x.y"""),
-    mkMethodContent("h")(i => s"""(x: R2_$i) = x.y""")
-  ) mkString "\n  "
+  def content =
+    List(
+        indices flatMap aliases mkString "\n  ",
+        mkMethodContent("f")(i =>
+              s" = { val x = ${pairs(i).expr} ; x.y.reflected -> whatis(x).toString }"),
+        mkMethodContent("g")(i => s"""(x: R1_$i) = x.y"""),
+        mkMethodContent("h")(i => s"""(x: R2_$i) = x.y""")
+    ) mkString "\n  "
 
   def fCalls = indices map ("f" + _) mkString ("\n    ", ",\n    ", "\n  ")
 
@@ -83,7 +81,6 @@ object Gen {
       |    // println(typeOf[Test.type].typeSymbol.asClass.info)
       |  }
       |}
-      """.stripMargin.trim
-    )
+      """.stripMargin.trim)
   }
 }

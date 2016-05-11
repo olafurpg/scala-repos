@@ -35,12 +35,13 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * ComboBoxListCell Spec tests.
- *
- *
- */
+  * ComboBoxListCell Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ComboBoxListCellSpec[T]
-  extends SimpleSFXDelegateSpec[jfxscc.ComboBoxListCell[T], ComboBoxListCell[T]](
-    classOf[jfxscc.ComboBoxListCell[T]], classOf[ComboBoxListCell[T]])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[
+        jfxscc.ComboBoxListCell[T], ComboBoxListCell[T]](
+        classOf[jfxscc.ComboBoxListCell[T]], classOf[ComboBoxListCell[T]])
+    with RunOnApplicationThread

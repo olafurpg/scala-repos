@@ -6,12 +6,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 class ScalaAnnotationSupport extends PsiAnnotationSupport {
   def createLiteralValue(value: String, context: PsiElement): PsiLiteral = {
-    return ScalaPsiElementFactory.createExpressionFromText("\"" + StringUtil.escapeStringCharacters(value) + "\"",
-      context.getManager).asInstanceOf[ScLiteral]
+    return ScalaPsiElementFactory
+      .createExpressionFromText(
+          "\"" + StringUtil.escapeStringCharacters(value) + "\"",
+          context.getManager)
+      .asInstanceOf[ScLiteral]
   }
 }

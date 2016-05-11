@@ -12,14 +12,16 @@ import org.jetbrains.plugins.scala.util.DebugPrint
 
 import scala.annotation.tailrec
 
-
 object ParserUtils extends ParserUtilsBase {
 
-  def lookAheadSeq(n: Int)(builder: PsiBuilder) = (1 to n).map(i => {
-    val token = if (!builder.eof) builder.getTokenType else null
-    builder.advanceLexer()
-    token
-  })
+  def lookAheadSeq(n: Int)(builder: PsiBuilder) =
+    (1 to n).map(
+        i =>
+          {
+        val token = if (!builder.eof) builder.getTokenType else null
+        builder.advanceLexer()
+        token
+    })
 
   //Write element node
   def eatElement(builder: PsiBuilder, elem: IElementType) {
@@ -27,7 +29,6 @@ object ParserUtils extends ParserUtilsBase {
       builder.advanceLexer() // Ate something
     }
     ()
-
   }
 
   def parseTillLast(builder: PsiBuilder, lastSet: TokenSet) {
@@ -47,7 +48,7 @@ object ParserUtils extends ParserUtilsBase {
     if (builder.getTokenType == ScalaTokenTypes.tUNDER) {
       builder.advanceLexer()
       if (builder.getTokenType == ScalaTokenTypes.tIDENTIFIER &&
-        builder.getTokenText == "*") {
+          builder.getTokenText == "*") {
         builder.advanceLexer()
         marker.done(ScalaElementTypes.SEQ_WILDCARD)
         true
@@ -61,7 +62,6 @@ object ParserUtils extends ParserUtilsBase {
     }
   }
 
-
   def build(t: IElementType, builder: PsiBuilder)(inner: => Boolean): Boolean = {
     val marker = builder.mark
     val parsed = inner
@@ -70,7 +70,10 @@ object ParserUtils extends ParserUtilsBase {
   }
 
   def isAssignmentOperator(id: String) = id.charAt(id.length - 1) match {
-    case '=' if id != "<=" && id != ">=" && id != "!=" && (id.charAt(0) != '=' || id == "=") => true
+    case '='
+        if id != "<=" && id != ">=" &&
+        id != "!=" && (id.charAt(0) != '=' || id == "=") =>
+      true
     case _ => false
   }
 
@@ -102,7 +105,9 @@ object ParserUtils extends ParserUtilsBase {
   }
 
   @tailrec
-  def parseLoopUntilRBrace(builder: ScalaPsiBuilder, fun: () => Unit, braceReported: Boolean = false) {
+  def parseLoopUntilRBrace(builder: ScalaPsiBuilder,
+                           fun: () => Unit,
+                           braceReported: Boolean = false) {
     var br = braceReported
     fun()
     builder.getTokenType match {
@@ -124,8 +129,7 @@ object ParserUtils extends ParserUtilsBase {
           }
           builder.advanceLexer()
         }
-        if (builder.eof)
-          return
+        if (builder.eof) return
       case _ =>
         if (!braceReported) {
           builder error ErrMsg("rbrace.expected")
@@ -139,7 +143,8 @@ object ParserUtils extends ParserUtilsBase {
     parseLoopUntilRBrace(builder, fun, br)
   }
 
-  def elementCanStartStatement(element: IElementType, builder: ScalaPsiBuilder): Boolean = {
+  def elementCanStartStatement(
+      element: IElementType, builder: ScalaPsiBuilder): Boolean = {
     element match {
       case ScalaTokenTypes.kCATCH => false
       case ScalaTokenTypes.kELSE => false

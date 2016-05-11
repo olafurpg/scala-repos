@@ -7,9 +7,11 @@ class MyCollection[A] {
 class OtherFunc[-A, +B] {}
 
 object Test {
-  implicit def functionToMyFunc[A, B](f: A => B): MyFunc[A, B] = new MyFunc // = new MyFunc[A,Nothing]();
+  implicit def functionToMyFunc[A, B](f: A => B): MyFunc[A, B] =
+    new MyFunc // = new MyFunc[A,Nothing]();
 
-  implicit def otherFuncToMyFunc[A, B](f: OtherFunc[A, B]): MyFunc[A, B] = new MyFunc // = new MyFunc[A,Nothing]();
+  implicit def otherFuncToMyFunc[A, B](f: OtherFunc[A, B]): MyFunc[A, B] =
+    new MyFunc // = new MyFunc[A,Nothing]();
 
   def main(args: Array[String]) {
     val col = new MyCollection[Int]

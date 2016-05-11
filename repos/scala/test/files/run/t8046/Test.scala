@@ -15,4 +15,3 @@ object Test extends DirectTest {
     println(f4ParamInfo.baseTypeSeq)
   }
 }
-

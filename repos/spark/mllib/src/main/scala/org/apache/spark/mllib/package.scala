@@ -18,6 +18,6 @@
 package org.apache.spark
 
 /**
- * Spark's machine learning library.
- */
+  * Spark's machine learning library.
+  */
 package object mllib

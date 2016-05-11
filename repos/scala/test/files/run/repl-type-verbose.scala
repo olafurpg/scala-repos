@@ -1,7 +1,8 @@
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  def code = """
+  def code =
+    """
     |// verbose!
     |:type -v def f = 5
     |:type -v def f() = 5

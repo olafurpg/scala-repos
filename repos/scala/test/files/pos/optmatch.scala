@@ -11,7 +11,6 @@ object NonZeroLong {
   def unapply(value: Long): NonZeroLong = new NonZeroLong(value)
 }
 
-
 object Foo {
   def unapply(x: Int): NonZeroLong = new NonZeroLong(1L << x)
   // public long unapply(int);
@@ -24,7 +23,7 @@ object Foo {
 object Test {
   def f(x: Int): Int = x match {
     case Foo(1024l) => 1
-    case _          => 2
+    case _ => 2
   }
   def main(args: Array[String]): Unit = {
     println(f(10))

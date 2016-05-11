@@ -8,5 +8,6 @@ object OfferReviverDelegate {
 }
 
 class OfferReviverDelegate(offerReviverRef: ActorRef) extends OfferReviver {
-  override def reviveOffers(): Unit = offerReviverRef ! OfferReviverDelegate.ReviveOffers
+  override def reviveOffers(): Unit =
+    offerReviverRef ! OfferReviverDelegate.ReviveOffers
 }

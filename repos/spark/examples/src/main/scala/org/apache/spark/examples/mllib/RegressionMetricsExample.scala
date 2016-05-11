@@ -33,14 +33,16 @@ object RegressionMetricsExample {
     val sqlContext = new SQLContext(sc)
     // $example on$
     // Load the data
-    val data = MLUtils.loadLibSVMFile(sc, "data/mllib/sample_linear_regression_data.txt").cache()
+    val data = MLUtils
+      .loadLibSVMFile(sc, "data/mllib/sample_linear_regression_data.txt")
+      .cache()
 
     // Build the model
     val numIterations = 100
     val model = LinearRegressionWithSGD.train(data, numIterations)
 
     // Get predictions
-    val valuesAndPreds = data.map{ point =>
+    val valuesAndPreds = data.map { point =>
       val prediction = model.predict(point.features)
       (prediction, point.label)
     }
@@ -64,4 +66,3 @@ object RegressionMetricsExample {
   }
 }
 // scalastyle:on println
-

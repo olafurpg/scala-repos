@@ -23,36 +23,39 @@ import shapeless.test.illTyped
 class NatTests {
   import nat._
   import ops.nat._
-  
+
   trait Check[N <: Nat]
-  def check(expected: Nat)(actually : => Check[expected.N]) {}
-  
+  def check(expected: Nat)(actually: => Check[expected.N]) {}
+
   @Test
   def testNat {
     implicitly[Succ[_1] =:= _2]
-    
+
     implicitly[Pred.Aux[_19, _18]]
-    
-    def pred(n: Nat)(implicit pred : Pred[n.N]) = new Check[pred.Out] {}
+
+    def pred(n: Nat)(implicit pred: Pred[n.N]) = new Check[pred.Out] {}
     val pd1 = pred(19)
     check(18)(pd1)
-    
+
     implicitly[Sum.Aux[_2, _3, _5]]
-    
-    def sum(a: Nat, b: Nat)(implicit sum : Sum[a.N, b.N]) = new Check[sum.Out] {}
+
+    def sum(a: Nat, b: Nat)(implicit sum: Sum[a.N, b.N]) =
+      new Check[sum.Out] {}
     val s1 = sum(2, 3)
     check(5)(s1)
 
     implicitly[Diff.Aux[_5, _1, _4]]
 
-    def diff(a: Nat, b: Nat)(implicit diff : Diff[a.N, b.N]) = new Check[diff.Out] {}
+    def diff(a: Nat, b: Nat)(implicit diff: Diff[a.N, b.N]) =
+      new Check[diff.Out] {}
     val diff1 = diff(5, 1)
     check(4)(diff1)
 
     implicitly[Prod.Aux[_2, _3, _6]]
     implicitly[Prod.Aux[_4, _5, _20]]
 
-    def prod(a: Nat, b: Nat)(implicit prod : Prod[a.N, b.N]) = new Check[prod.Out] {}
+    def prod(a: Nat, b: Nat)(implicit prod: Prod[a.N, b.N]) =
+      new Check[prod.Out] {}
     val p1 = prod(2, 3)
     check(6)(p1)
     val p2 = prod(4, 5)
@@ -62,7 +65,8 @@ class NatTests {
     implicitly[Div.Aux[_22, _11, _2]]
     implicitly[Div.Aux[_15, _3, _5]]
 
-    def div(a: Nat, b: Nat)(implicit div : Div[a.N, b.N]) = new Check[div.Out] {}
+    def div(a: Nat, b: Nat)(implicit div: Div[a.N, b.N]) =
+      new Check[div.Out] {}
     val d1 = div(7, 2)
     check(3)(d1)
     val d2 = div(22, 11)
@@ -74,7 +78,8 @@ class NatTests {
     implicitly[Mod.Aux[_22, _5, _2]]
     implicitly[Mod.Aux[_9, _3, _0]]
 
-    def mod(a: Nat, b: Nat)(implicit mod : Mod[a.N, b.N]) = new Check[mod.Out] {}
+    def mod(a: Nat, b: Nat)(implicit mod: Mod[a.N, b.N]) =
+      new Check[mod.Out] {}
     val m1 = mod(7, 2)
     check(1)(m1)
     val m2 = mod(22, 5)
@@ -102,7 +107,7 @@ class NatTests {
       illTyped(""" implicitly[LTEq[_1, N]] """)
       illTyped(""" implicitly[LTEq[Succ[N], N]] """)
     }
-    
+
     implicitly[GT[_5, _3]]
     implicitly[GT[_15, _10]]
     implicitly[GTEq[_2, _2]]
@@ -128,7 +133,8 @@ class NatTests {
     implicitly[Min.Aux[_5, _2, _2]]
     implicitly[Min.Aux[_3, _8, _3]]
 
-    def min[A <: Nat, B <: Nat](implicit min : Min[A, B]) = new Check[min.Out] {}
+    def min[A <: Nat, B <: Nat](implicit min: Min[A, B]) =
+      new Check[min.Out] {}
     val min1 = min[_3, _4]
     check(3)(min1)
     val min2 = min[_5, _4]
@@ -138,7 +144,8 @@ class NatTests {
     implicitly[Max.Aux[_5, _2, _5]]
     implicitly[Max.Aux[_3, _8, _8]]
 
-    def max[A <: Nat, B <: Nat](implicit max : Max[A, B]) = new Check[max.Out] {}
+    def max[A <: Nat, B <: Nat](implicit max: Max[A, B]) =
+      new Check[max.Out] {}
     val max1 = max[_3, _4]
     check(4)(max1)
     val max2 = max[_5, _4]
@@ -148,7 +155,8 @@ class NatTests {
     implicitly[Pow.Aux[_9, _0, _0]]
     implicitly[Pow.Aux[_3, _2, _8]]
 
-    def pow[A <: Nat, B <: Nat](implicit pow : Pow[A, B]) = new Check[pow.Out] {}
+    def pow[A <: Nat, B <: Nat](implicit pow: Pow[A, B]) =
+      new Check[pow.Out] {}
     val e1 = pow[_3, _1]
     check(1)(e1)
     val e2 = pow[_2, _3]
@@ -156,23 +164,24 @@ class NatTests {
     val e3 = pow[_2, _4]
     check(16)(e3)
 
-    implicitly[Range.Aux[_0,_0, HNil]]
-    implicitly[Range.Aux[_0,_2, _0::_1::HNil]]
-    implicitly[Range.Aux[_1,_1, HNil]]
-    implicitly[Range.Aux[_1,_2,_1::HNil]]
-    implicitly[Range.Aux[_1,_4, _1::_2::_3::HNil]]
+    implicitly[Range.Aux[_0, _0, HNil]]
+    implicitly[Range.Aux[_0, _2, _0 :: _1 :: HNil]]
+    implicitly[Range.Aux[_1, _1, HNil]]
+    implicitly[Range.Aux[_1, _2, _1 :: HNil]]
+    implicitly[Range.Aux[_1, _4, _1 :: _2 :: _3 :: HNil]]
 
-    val r1 = the[Range[_0,_0]]
-    val r2 = the[Range[_0,_1]]
-    val r3 = the[Range[_1,_1]]
-    val r4 = the[Range[_1,_5]]
+    val r1 = the[Range[_0, _0]]
+    val r2 = the[Range[_0, _1]]
+    val r3 = the[Range[_1, _1]]
+    val r4 = the[Range[_1, _5]]
 
     import shapeless.testutil._
 
     assertTypedEquals[HNil](HNil, r1())
-    assertTypedEquals[_0::HNil](_0::HNil, r2())
+    assertTypedEquals[_0 :: HNil](_0 :: HNil, r2())
     assertTypedEquals[HNil](HNil, r3())
-    assertTypedEquals[_1::_2::_3::_4::HNil](_1::_2::_3::_4::HNil, r4())
+    assertTypedEquals[_1 :: _2 :: _3 :: _4 :: HNil](
+        _1 :: _2 :: _3 :: _4 :: HNil, r4())
 
     // GCD tests
 
@@ -187,7 +196,7 @@ class NatTests {
     implicitly[LCM.Aux[_1, _0, _0]]
     implicitly[LCM.Aux[_2, _3, _6]]
     implicitly[LCM.Aux[_4, _6, _12]]
-    
+
     // Type level
     assertEquals(0, toInt[_0])
     assertEquals(1, toInt[_1])

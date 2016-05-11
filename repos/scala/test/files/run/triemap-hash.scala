@@ -1,9 +1,4 @@
-
-
-
 import util.hashing.Hashing
-
-
 
 object Test {
 
@@ -15,7 +10,8 @@ object Test {
   def hashing() {
     import collection._
 
-    val tm = new concurrent.TrieMap[String, String](Hashing.fromFunction(x => x.length + x(0).toInt), Equiv.universal)
+    val tm = new concurrent.TrieMap[String, String](
+        Hashing.fromFunction(x => x.length + x(0).toInt), Equiv.universal)
     tm.put("a", "b")
     tm.put("c", "d")
 
@@ -29,7 +25,9 @@ object Test {
   def equality() {
     import collection._
 
-    val tm = new concurrent.TrieMap[String, String](Hashing.fromFunction(x => x(0).toInt), Equiv.fromFunction(_(0) == _(0)))
+    val tm = new concurrent.TrieMap[String, String](
+        Hashing.fromFunction(x => x(0).toInt),
+        Equiv.fromFunction(_ (0) == _ (0)))
     tm.put("a", "b")
     tm.put("a1", "d")
     tm.put("b", "c")
@@ -42,5 +40,4 @@ object Test {
     assert(tm("0") == "0", tm)
     for (i <- 1 to 9) assert(tm(i.toString) == i.toString + "99", tm)
   }
-
 }

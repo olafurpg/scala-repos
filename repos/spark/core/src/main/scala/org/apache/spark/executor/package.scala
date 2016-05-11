@@ -18,7 +18,7 @@
 package org.apache.spark
 
 /**
- * Executor components used with various cluster managers.
- * See [[org.apache.spark.executor.Executor]].
- */
+  * Executor components used with various cluster managers.
+  * See [[org.apache.spark.executor.Executor]].
+  */
 package object executor

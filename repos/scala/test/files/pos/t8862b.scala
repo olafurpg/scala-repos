@@ -1,5 +1,5 @@
 package p {
-  trait T[X] { def O : { def apply(): X } }
+  trait T[X] { def O: { def apply(): X } }
   object `package` extends T[Int] {
     def O: { def apply(): Int } = new { def apply(): Int = 42 }
   }

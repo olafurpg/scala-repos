@@ -8,15 +8,23 @@ import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
   *         Date: 21.12.2015
   */
 class ScalaPrimaryConstructorParamTypesMacro extends Macro {
-  override def calculateResult(params: Array[Expression], context: ExpressionContext): Result =
-    params.headOption.map(_.calculateResult(context).toString).map(MacroUtil.paramPairs(_).map(_._2)) match {
-      case Some(head::tail) => new TextResult(addParens(tail.foldLeft(head)(_ + ", " + _), tail.nonEmpty))
+  override def calculateResult(
+      params: Array[Expression], context: ExpressionContext): Result =
+    params.headOption
+      .map(_.calculateResult(context).toString)
+      .map(MacroUtil.paramPairs(_).map(_._2)) match {
+      case Some(head :: tail) =>
+        new TextResult(
+            addParens(tail.foldLeft(head)(_ + ", " + _), tail.nonEmpty))
       case _ => null
     }
 
-  def getName: String = MacroUtil.scalaIdPrefix + "primaryConstructorParamTypes"
+  def getName: String =
+    MacroUtil.scalaIdPrefix + "primaryConstructorParamTypes"
 
-  def getPresentableName: String = MacroUtil.scalaPresentablePrefix + "primaryConstructorParamTypes"
+  def getPresentableName: String =
+    MacroUtil.scalaPresentablePrefix + "primaryConstructorParamTypes"
 
-  private def addParens(text: String, doAdd: Boolean) = if (doAdd) "(" + text + ")" else text
+  private def addParens(text: String, doAdd: Boolean) =
+    if (doAdd) "(" + text + ")" else text
 }

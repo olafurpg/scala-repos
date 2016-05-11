@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.linker.frontend.optimizer
 
@@ -15,8 +14,8 @@ import scala.collection.mutable
 import org.scalajs.core.tools.sem.Semantics
 import org.scalajs.core.tools.javascript.ESLevel
 
-final class IncOptimizer(semantics: Semantics, esLevel: ESLevel,
-    considerPositions: Boolean)
+final class IncOptimizer(
+    semantics: Semantics, esLevel: ESLevel, considerPositions: Boolean)
     extends GenIncOptimizer(semantics, esLevel, considerPositions) {
 
   private[optimizer] object CollOps extends GenIncOptimizer.AbsCollOps {
@@ -63,21 +62,25 @@ final class IncOptimizer(semantics: Semantics, esLevel: ESLevel,
   private[optimizer] def scheduleMethod(method: MethodImpl): Unit =
     methodsToProcess += method
 
-  private[optimizer] def newMethodImpl(owner: MethodContainer,
-      encodedName: String): MethodImpl = new SeqMethodImpl(owner, encodedName)
+  private[optimizer] def newMethodImpl(
+      owner: MethodContainer, encodedName: String): MethodImpl =
+    new SeqMethodImpl(owner, encodedName)
 
   private[optimizer] def processAllTaggedMethods(): Unit = {
     logProcessingMethods(methodsToProcess.count(!_.deleted))
-    for (method <- methodsToProcess)
-      method.process()
+    for (method <- methodsToProcess) method.process()
     methodsToProcess.clear()
   }
 
-  private class SeqInterfaceType(encName: String) extends InterfaceType(encName) {
+  private class SeqInterfaceType(encName: String)
+      extends InterfaceType(encName) {
     private val ancestorsAskers = mutable.Set.empty[MethodImpl]
-    private val dynamicCallers = mutable.Map.empty[String, mutable.Set[MethodImpl]]
-    private val staticCallers = mutable.Map.empty[String, mutable.Set[MethodImpl]]
-    private val callersOfStatic = mutable.Map.empty[String, mutable.Set[MethodImpl]]
+    private val dynamicCallers =
+      mutable.Map.empty[String, mutable.Set[MethodImpl]]
+    private val staticCallers =
+      mutable.Map.empty[String, mutable.Set[MethodImpl]]
+    private val callersOfStatic =
+      mutable.Map.empty[String, mutable.Set[MethodImpl]]
 
     private var _ancestors: List[String] = encodedName :: Nil
 
@@ -130,8 +133,8 @@ final class IncOptimizer(semantics: Semantics, esLevel: ESLevel,
       callersOfStatic.remove(methodName).foreach(_.foreach(_.tag()))
   }
 
-  private class SeqMethodImpl(owner: MethodContainer,
-      encodedName: String) extends MethodImpl(owner, encodedName) {
+  private class SeqMethodImpl(owner: MethodContainer, encodedName: String)
+      extends MethodImpl(owner, encodedName) {
 
     private val bodyAskers = mutable.Set.empty[MethodImpl]
 
@@ -163,9 +166,7 @@ final class IncOptimizer(semantics: Semantics, esLevel: ESLevel,
       res
     }
     protected def resetTag(): Unit = tagged = false
-
   }
-
 }
 
 object IncOptimizer {

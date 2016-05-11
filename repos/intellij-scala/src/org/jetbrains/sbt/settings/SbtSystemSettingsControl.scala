@@ -3,26 +3,28 @@ package org.jetbrains.sbt.settings
 import com.intellij.openapi.externalSystem.util.{ExternalSystemSettingsControl, ExternalSystemUiUtil, PaintAwarePanel}
 
 /**
- * @author Pavel Fatin
- */
-class SbtSystemSettingsControl(settings: SbtSystemSettings) extends ExternalSystemSettingsControl[SbtSystemSettings] {
+  * @author Pavel Fatin
+  */
+class SbtSystemSettingsControl(settings: SbtSystemSettings)
+    extends ExternalSystemSettingsControl[SbtSystemSettings] {
 
   private val pane = new SbtSettingsPane
 
   def isModified = ! {
     pane.isCustomLauncher == settings.customLauncherEnabled &&
-      pane.getLauncherPath == settings.customLauncherPath &&
-      pane.getMaximumHeapSize == settings.maximumHeapSize &&
-      pane.getVmParameters == settings.vmParameters &&
-      pane.isCustomVM == settings.customVMEnabled &&
-      pane.getCustomVMPath == settings.customVMPath
+    pane.getLauncherPath == settings.customLauncherPath &&
+    pane.getMaximumHeapSize == settings.maximumHeapSize &&
+    pane.getVmParameters == settings.vmParameters &&
+    pane.isCustomVM == settings.customVMEnabled &&
+    pane.getCustomVMPath == settings.customVMPath
   }
 
   def showUi(show: Boolean): Unit =
     pane.getContentPanel.setVisible(show)
 
   def fillUi(canvas: PaintAwarePanel, indentLevel: Int): Unit =
-    canvas.add(pane.getContentPanel, ExternalSystemUiUtil.getFillLineConstraints(indentLevel))
+    canvas.add(pane.getContentPanel,
+               ExternalSystemUiUtil.getFillLineConstraints(indentLevel))
 
   def disposeUIResources() {}
 

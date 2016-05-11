@@ -36,10 +36,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Polyline Spec tests.
- *
- *
- */
+  * Polyline Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class PolylineSpec
-  extends SimpleSFXDelegateSpec[jfxss.Polyline, Polyline](classOf[jfxss.Polyline], classOf[Polyline])
+    extends SimpleSFXDelegateSpec[jfxss.Polyline, Polyline](
+        classOf[jfxss.Polyline], classOf[Polyline])

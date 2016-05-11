@@ -1,28 +1,29 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
 
 /** This class provides a simple way to get unique objects for equal strings.
- *  Since symbols are interned, they can be compared using reference equality.
- *  Instances of `Symbol` can be created easily with Scala's built-in quote
- *  mechanism.
- *
- *  For instance, the [[http://scala-lang.org/#_top Scala]] term `'mysym` will
- *  invoke the constructor of the `Symbol` class in the following way:
- *  `Symbol("mysym")`.
- *
- *  @author  Martin Odersky, Iulian Dragos
- *  @version 1.8
- */
+  *  Since symbols are interned, they can be compared using reference equality.
+  *  Instances of `Symbol` can be created easily with Scala's built-in quote
+  *  mechanism.
+  *
+  *  For instance, the [[http://scala-lang.org/#_top Scala]] term `'mysym` will
+  *  invoke the constructor of the `Symbol` class in the following way:
+  *  `Symbol("mysym")`.
+  *
+  *  @author  Martin Odersky, Iulian Dragos
+  *  @version 1.8
+  */
 final class Symbol private (val name: String) extends Serializable {
+
   /** Converts this symbol to a string.
-   */
+    */
   override def toString(): String = "'" + name
 
   @throws(classOf[java.io.ObjectStreamException])
@@ -39,8 +40,7 @@ object Symbol extends UniquenessCache[String, Symbol] {
 
 /** This is private so it won't appear in the library API, but
   * abstracted to offer some hope of reusability.  */
-private[scala] abstract class UniquenessCache[K, V >: Null]
-{
+private[scala] abstract class UniquenessCache[K, V >: Null] {
   import java.lang.ref.WeakReference
   import java.util.WeakHashMap
   import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -59,9 +59,8 @@ private[scala] abstract class UniquenessCache[K, V >: Null]
       try {
         val reference = map get name
         if (reference == null) null
-        else reference.get  // will be null if we were gc-ed
-      }
-      finally rlock.unlock
+        else reference.get // will be null if we were gc-ed
+      } finally rlock.unlock
     }
     def updateCache(): V = {
       wlock.lock
@@ -78,8 +77,7 @@ private[scala] abstract class UniquenessCache[K, V >: Null]
           map.put(name, new WeakReference(sym))
           sym
         }
-      }
-      finally wlock.unlock
+      } finally wlock.unlock
     }
 
     val res = cached()

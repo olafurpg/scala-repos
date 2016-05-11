@@ -8,10 +8,8 @@ object TestExpressions {
       case None => "failed"
     }
     print("lazy val in scrutinee: ")
-    if (res == "lazy z1")
-      println("ok")
-    else
-      println("failed")
+    if (res == "lazy z1") println("ok")
+    else println("failed")
   }
 
   def patmatchCase {
@@ -24,12 +22,9 @@ object TestExpressions {
       case None => "failed"
     }
     print("lazy val in case: ")
-    if (res == "lazy z1")
-      println("ok")
-    else
-      println("failed")
+    if (res == "lazy z1") println("ok")
+    else println("failed")
   }
-
 
   def patmatchPat {
     lazy val Z1 = { println("forced <z1>"); "lazy Z1" }
@@ -47,12 +42,9 @@ object TestExpressions {
   def ifcond {
     lazy val z1 = { println("forced <z1>"); "lazy z1" }
     print("lazy val in if condition: ")
-    if (z1 == "lazy z1")
-      println("ok")
-    else
-      println("failed")
+    if (z1 == "lazy z1") println("ok")
+    else println("failed")
   }
-
 
   lazy val LazyField = { println("forced LazyField"); "LazyField" }
 
@@ -68,12 +60,12 @@ object TestExpressions {
     }
   }
 
-  lazy val (x, y) = ({print("x"); "x"}, {print("y"); "y"})
+  lazy val (x, y) = ({ print("x"); "x" }, { print("y"); "y" })
   def testPatLazyVal {
     println("lazy val with patterns:")
     print("x and y: ")
     println("(" + x + ", " + y + ")")
-    lazy val (x1, y1) = ({print("x1"); "x1"}, {print("y1"); "y1"})
+    lazy val (x1, y1) = ({ print("x1"); "x1" }, { print("y1"); "y1" })
     print("x1 and y1: ")
     println("(" + x1 + ", " + y1 + ")")
   }
@@ -87,7 +79,6 @@ object TestExpressions {
     testPatLazyVal
   }
 }
-
 
 object Test extends App {
 

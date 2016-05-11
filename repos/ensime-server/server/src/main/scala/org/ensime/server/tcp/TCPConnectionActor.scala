@@ -4,11 +4,11 @@ package org.ensime.server.tcp
 
 import akka.actor._
 
-import akka.actor.{ ActorRef, Props, ActorLogging, Actor }
+import akka.actor.{ActorRef, Props, ActorLogging, Actor}
 import akka.io.Tcp
 import akka.util.ByteString
-import org.ensime.api.{ RpcRequestEnvelope, EnsimeServerError, RpcResponseEnvelope, EnsimeEvent }
-import org.ensime.core.{ Broadcaster, Canonised, Protocol }
+import org.ensime.api.{RpcRequestEnvelope, EnsimeServerError, RpcResponseEnvelope, EnsimeEvent}
+import org.ensime.core.{Broadcaster, Canonised, Protocol}
 import org.ensime.server.RequestHandler
 
 import scala.annotation.tailrec
@@ -19,7 +19,8 @@ class TCPConnectionActor(
     protocol: Protocol,
     project: ActorRef,
     broadcaster: ActorRef
-) extends Actor with Stash with ActorLogging {
+)
+    extends Actor with Stash with ActorLogging {
 
   case object Ack extends Tcp.Event
 
@@ -78,10 +79,10 @@ class TCPConnectionActor(
       case NonFatal(t) =>
         log.error(t, s"Problem serialising $envelope")
         protocol.encode(
-          RpcResponseEnvelope(
-            envelope.callId,
-            EnsimeServerError(s"Server error: ${t.getMessage}")
-          )
+            RpcResponseEnvelope(
+                envelope.callId,
+                EnsimeServerError(s"Server error: ${t.getMessage}")
+            )
         )
     }
     connection ! Tcp.Write(msg, Ack)
@@ -97,10 +98,11 @@ class TCPConnectionActor(
       repeatedDecode()
     } catch {
       case e: Throwable =>
-        log.error(e, "Error seen during message processing, closing client connection")
+        log.error(
+            e,
+            "Error seen during message processing, closing client connection")
         context.stop(self)
     }
-
   }
 
   @tailrec
@@ -110,7 +112,8 @@ class TCPConnectionActor(
     envelopeOpt match {
       case Some(rawEnvelope: RpcRequestEnvelope) =>
         val envelope = Canonised(rawEnvelope)
-        context.actorOf(RequestHandler(envelope, project, self), s"${envelope.callId}")
+        context.actorOf(
+            RequestHandler(envelope, project, self), s"${envelope.callId}")
         repeatedDecode()
       case None =>
     }
@@ -118,6 +121,9 @@ class TCPConnectionActor(
 }
 
 object TCPConnectionActor {
-  def apply(connection: ActorRef, protocol: Protocol, project: ActorRef, broadcaster: ActorRef): Props =
+  def apply(connection: ActorRef,
+            protocol: Protocol,
+            project: ActorRef,
+            broadcaster: ActorRef): Props =
     Props(new TCPConnectionActor(connection, protocol, project, broadcaster))
 }

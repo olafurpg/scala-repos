@@ -18,19 +18,22 @@
 package org.apache.spark.util
 
 /**
- * A class for tracking the statistics of a set of numbers (count, mean and variance) in a
- * numerically robust way. Includes support for merging two StatCounters. Based on Welford
- * and Chan's [[http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance algorithms]]
- * for running variance.
- *
- * @constructor Initialize the StatCounter with the given values.
- */
+  * A class for tracking the statistics of a set of numbers (count, mean and variance) in a
+  * numerically robust way. Includes support for merging two StatCounters. Based on Welford
+  * and Chan's [[http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance algorithms]]
+  * for running variance.
+  *
+  * @constructor Initialize the StatCounter with the given values.
+  */
 class StatCounter(values: TraversableOnce[Double]) extends Serializable {
-  private var n: Long = 0     // Running count of our values
-  private var mu: Double = 0  // Running mean of our values
-  private var m2: Double = 0  // Running variance numerator (sum of (x - mean)^2)
-  private var maxValue: Double = Double.NegativeInfinity // Running max of our values
-  private var minValue: Double = Double.PositiveInfinity // Running min of our values
+  private var n: Long = 0 // Running count of our values
+  private var mu: Double = 0 // Running mean of our values
+  private var m2: Double =
+    0 // Running variance numerator (sum of (x - mean)^2)
+  private var maxValue: Double =
+    Double.NegativeInfinity // Running max of our values
+  private var minValue: Double =
+    Double.PositiveInfinity // Running min of our values
 
   merge(values)
 
@@ -57,7 +60,7 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
   /** Merge another StatCounter into this one, adding up the internal statistics. */
   def merge(other: StatCounter): StatCounter = {
     if (other == this) {
-      merge(other.copy())  // Avoid overwriting fields in a weird order
+      merge(other.copy()) // Avoid overwriting fields in a weird order
     } else {
       if (n == 0) {
         mu = other.mu
@@ -114,9 +117,9 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
   }
 
   /**
-   * Return the sample variance, which corrects for bias in estimating the variance by dividing
-   * by N-1 instead of N.
-   */
+    * Return the sample variance, which corrects for bias in estimating the variance by dividing
+    * by N-1 instead of N.
+    */
   def sampleVariance: Double = {
     if (n <= 1) {
       Double.NaN
@@ -129,19 +132,22 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
   def stdev: Double = math.sqrt(variance)
 
   /**
-   * Return the sample standard deviation of the values, which corrects for bias in estimating the
-   * variance by dividing by N-1 instead of N.
-   */
+    * Return the sample standard deviation of the values, which corrects for bias in estimating the
+    * variance by dividing by N-1 instead of N.
+    */
   def sampleStdev: Double = math.sqrt(sampleVariance)
 
   override def toString: String = {
-    "(count: %d, mean: %f, stdev: %f, max: %f, min: %f)".format(count, mean, stdev, max, min)
+    "(count: %d, mean: %f, stdev: %f, max: %f, min: %f)".format(
+        count, mean, stdev, max, min)
   }
 }
 
 object StatCounter {
+
   /** Build a StatCounter from a list of values. */
-  def apply(values: TraversableOnce[Double]): StatCounter = new StatCounter(values)
+  def apply(values: TraversableOnce[Double]): StatCounter =
+    new StatCounter(values)
 
   /** Build a StatCounter from a list of values passed as variable-length arguments. */
   def apply(values: Double*): StatCounter = new StatCounter(values)

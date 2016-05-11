@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 
 /** Tests for [[scalafx.print.Printer.MarginType]]. */
 @RunWith(classOf[JUnitRunner])
-class PrinterMarginTypeSpec extends SFXEnumDelegateSpec[jfxp.Printer.MarginType, Printer.MarginType](
-  javaClass = classOf[jfxp.Printer.MarginType],
-  scalaClass = classOf[Printer.MarginType],
-  companion = Printer.MarginType)
+class PrinterMarginTypeSpec
+    extends SFXEnumDelegateSpec[jfxp.Printer.MarginType, Printer.MarginType](
+        javaClass = classOf[jfxp.Printer.MarginType],
+        scalaClass = classOf[Printer.MarginType],
+        companion = Printer.MarginType)

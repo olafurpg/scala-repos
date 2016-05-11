@@ -1,11 +1,11 @@
 /**
- * Copyright (C) 2016 Typesafe Inc. <http://www.typesafe.com>
- */
+  * Copyright (C) 2016 Typesafe Inc. <http://www.typesafe.com>
+  */
 package akka.http.javadsl
 
 import akka.http.javadsl.model._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 
 class ConnectHttpSpec extends WordSpec with Matchers with BeforeAndAfterAll {
 
@@ -59,7 +59,9 @@ class ConnectHttpSpec extends WordSpec with Matchers with BeforeAndAfterAll {
       connect.port should ===(443)
     }
     "connect toHostHttps HTTPS:443 using custom https context" in {
-      val connect = ConnectHttp.toHostHttps("https://127.0.0.1").withCustomHttpsContext(httpsContext)
+      val connect = ConnectHttp
+        .toHostHttps("https://127.0.0.1")
+        .withCustomHttpsContext(httpsContext)
       connect.isHttps should ===(true)
       connect.connectionContext.isPresent should equal(true)
       connect.host should ===("127.0.0.1")

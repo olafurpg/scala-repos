@@ -17,12 +17,15 @@ import StatusCodes._
 import HttpMethods._
 import Directives._
 
-class ScalatestRouteTestSpec extends FreeSpec with Matchers with ScalatestRouteTest {
+class ScalatestRouteTestSpec
+    extends FreeSpec with Matchers with ScalatestRouteTest {
 
   "The ScalatestRouteTest should support" - {
 
     "the most simple and direct route test" in {
-      Get() ~> complete(HttpResponse()) ~> { rr ⇒ rr.awaitResult; rr.response } shouldEqual HttpResponse()
+      Get() ~> complete(HttpResponse()) ~> { rr ⇒
+        rr.awaitResult; rr.response
+      } shouldEqual HttpResponse()
     }
 
     "a test using a directive and some checks" in {
@@ -33,7 +36,8 @@ class ScalatestRouteTestSpec extends FreeSpec with Matchers with ScalatestRouteT
         }
       } ~> check {
         status shouldEqual OK
-        responseEntity shouldEqual HttpEntity(ContentTypes.`text/plain(UTF-8)`, "abc")
+        responseEntity shouldEqual HttpEntity(ContentTypes.`text/plain(UTF-8)`,
+                                              "abc")
         header("Fancy") shouldEqual Some(pinkHeader)
       }
     }
@@ -69,7 +73,8 @@ class ScalatestRouteTestSpec extends FreeSpec with Matchers with ScalatestRouteT
 
       check {
         status shouldEqual OK
-        responseEntity shouldEqual HttpEntity(ContentTypes.`text/plain(UTF-8)`, "abc")
+        responseEntity shouldEqual HttpEntity(ContentTypes.`text/plain(UTF-8)`,
+                                              "abc")
         header("Fancy") shouldEqual Some(pinkHeader)
       }(result)
     }

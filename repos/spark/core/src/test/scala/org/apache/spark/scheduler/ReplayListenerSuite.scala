@@ -29,11 +29,11 @@ import org.apache.spark.io.CompressionCodec
 import org.apache.spark.util.{JsonProtocol, JsonProtocolSuite, Utils}
 
 /**
- * Test whether ReplayListenerBus replays events from logs correctly.
- */
+  * Test whether ReplayListenerBus replays events from logs correctly.
+  */
 class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
-  private val fileSystem = Utils.getHadoopFileSystem("/",
-    SparkHadoopUtil.get.newConfiguration(new SparkConf()))
+  private val fileSystem = Utils.getHadoopFileSystem(
+      "/", SparkHadoopUtil.get.newConfiguration(new SparkConf()))
   private var testDir: File = _
 
   before {
@@ -48,12 +48,14 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     val logFilePath = Utils.getFilePath(testDir, "events.txt")
     val fstream = fileSystem.create(logFilePath)
     val writer = new PrintWriter(fstream)
-    val applicationStart = SparkListenerApplicationStart("Greatest App (N)ever", None,
-      125L, "Mickey", None)
+    val applicationStart = SparkListenerApplicationStart(
+        "Greatest App (N)ever", None, 125L, "Mickey", None)
     val applicationEnd = SparkListenerApplicationEnd(1000L)
     // scalastyle:off println
-    writer.println(compact(render(JsonProtocol.sparkEventToJson(applicationStart))))
-    writer.println(compact(render(JsonProtocol.sparkEventToJson(applicationEnd))))
+    writer.println(
+        compact(render(JsonProtocol.sparkEventToJson(applicationStart))))
+    writer.println(
+        compact(render(JsonProtocol.sparkEventToJson(applicationEnd))))
     // scalastyle:on println
     writer.close()
 
@@ -68,8 +70,10 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
       logData.close()
     }
     assert(eventMonster.loggedEvents.size === 2)
-    assert(eventMonster.loggedEvents(0) === JsonProtocol.sparkEventToJson(applicationStart))
-    assert(eventMonster.loggedEvents(1) === JsonProtocol.sparkEventToJson(applicationEnd))
+    assert(eventMonster.loggedEvents(0) === JsonProtocol.sparkEventToJson(
+            applicationStart))
+    assert(eventMonster.loggedEvents(1) === JsonProtocol.sparkEventToJson(
+            applicationEnd))
   }
 
   // This assumes the correctness of EventLoggingListener
@@ -84,18 +88,17 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     }
   }
 
-
   /* ----------------- *
    * Actual test logic *
    * ----------------- */
 
   /**
-   * Test end-to-end replaying of events.
-   *
-   * This test runs a few simple jobs with event logging enabled, and compares each emitted
-   * event to the corresponding event replayed from the event logs. This test makes the
-   * assumption that the event logging behavior is correct (tested in a separate suite).
-   */
+    * Test end-to-end replaying of events.
+    *
+    * This test runs a few simple jobs with event logging enabled, and compares each emitted
+    * event to the corresponding event replayed from the event logs. This test makes the
+    * assumption that the event logging behavior is correct (tested in a separate suite).
+    */
   private def testApplicationReplay(codecName: Option[String] = None) {
     val logDirPath = Utils.getFilePath(testDir, "test-replay")
     fileSystem.mkdirs(logDirPath)
@@ -117,7 +120,8 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     assert(!eventLog.isDirectory)
 
     // Replay events
-    val logData = EventLoggingListener.openEventLog(eventLog.getPath(), fileSystem)
+    val logData =
+      EventLoggingListener.openEventLog(eventLog.getPath(), fileSystem)
     val eventMonster = new EventMonster(conf)
     try {
       val replayer = new ReplayListenerBus()
@@ -131,29 +135,29 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     assert(sc.eventLogger.isDefined)
     val originalEvents = sc.eventLogger.get.loggedEvents
     val replayedEvents = eventMonster.loggedEvents
-    originalEvents.zip(replayedEvents).foreach { case (e1, e2) =>
-      // Don't compare the JSON here because accumulators in StageInfo may be out of order
-      JsonProtocolSuite.assertEquals(
-        JsonProtocol.sparkEventFromJson(e1), JsonProtocol.sparkEventFromJson(e2))
+    originalEvents.zip(replayedEvents).foreach {
+      case (e1, e2) =>
+        // Don't compare the JSON here because accumulators in StageInfo may be out of order
+        JsonProtocolSuite.assertEquals(JsonProtocol.sparkEventFromJson(e1),
+                                       JsonProtocol.sparkEventFromJson(e2))
     }
   }
 
   /**
-   * A simple listener that buffers all the events it receives.
-   *
-   * The event buffering functionality must be implemented within EventLoggingListener itself.
-   * This is because of the following race condition: the event may be mutated between being
-   * processed by one listener and being processed by another. Thus, in order to establish
-   * a fair comparison between the original events and the replayed events, both functionalities
-   * must be implemented within one listener (i.e. the EventLoggingListener).
-   *
-   * This child listener inherits only the event buffering functionality, but does not actually
-   * log the events.
-   */
+    * A simple listener that buffers all the events it receives.
+    *
+    * The event buffering functionality must be implemented within EventLoggingListener itself.
+    * This is because of the following race condition: the event may be mutated between being
+    * processed by one listener and being processed by another. Thus, in order to establish
+    * a fair comparison between the original events and the replayed events, both functionalities
+    * must be implemented within one listener (i.e. the EventLoggingListener).
+    *
+    * This child listener inherits only the event buffering functionality, but does not actually
+    * log the events.
+    */
   private class EventMonster(conf: SparkConf)
-    extends EventLoggingListener("test", None, new URI("testdir"), conf) {
+      extends EventLoggingListener("test", None, new URI("testdir"), conf) {
 
-    override def start() { }
-
+    override def start() {}
   }
 }

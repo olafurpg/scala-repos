@@ -35,10 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * ComboBox Spec tests.
- *
- */
+  * ComboBox Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ComboBoxSpec[J]
-  extends SimpleSFXDelegateSpec[jfxsc.ComboBox[J], ComboBox[J]](classOf[jfxsc.ComboBox[J]], classOf[ComboBox[J]])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsc.ComboBox[J], ComboBox[J]](
+        classOf[jfxsc.ComboBox[J]], classOf[ComboBox[J]])
+    with RunOnApplicationThread

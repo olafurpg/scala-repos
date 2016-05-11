@@ -44,51 +44,63 @@ object ColumnarTestUtils {
       case NULL => null
       case BOOLEAN => Random.nextBoolean()
       case BYTE => (Random.nextInt(Byte.MaxValue * 2) - Byte.MaxValue).toByte
-      case SHORT => (Random.nextInt(Short.MaxValue * 2) - Short.MaxValue).toShort
+      case SHORT =>
+        (Random.nextInt(Short.MaxValue * 2) - Short.MaxValue).toShort
       case INT => Random.nextInt()
       case LONG => Random.nextLong()
       case FLOAT => Random.nextFloat()
       case DOUBLE => Random.nextDouble()
-      case STRING => UTF8String.fromString(Random.nextString(Random.nextInt(32)))
+      case STRING =>
+        UTF8String.fromString(Random.nextString(Random.nextInt(32)))
       case BINARY => randomBytes(Random.nextInt(32))
-      case COMPACT_DECIMAL(precision, scale) => Decimal(Random.nextLong() % 100, precision, scale)
-      case LARGE_DECIMAL(precision, scale) => Decimal(Random.nextLong(), precision, scale)
+      case COMPACT_DECIMAL(precision, scale) =>
+        Decimal(Random.nextLong() % 100, precision, scale)
+      case LARGE_DECIMAL(precision, scale) =>
+        Decimal(Random.nextLong(), precision, scale)
       case STRUCT(_) =>
-        new GenericInternalRow(Array[Any](UTF8String.fromString(Random.nextString(10))))
+        new GenericInternalRow(
+            Array[Any](UTF8String.fromString(Random.nextString(10))))
       case ARRAY(_) =>
         new GenericArrayData(Array[Any](Random.nextInt(), Random.nextInt()))
       case MAP(_) =>
         ArrayBasedMapData(
-          Map(Random.nextInt() -> UTF8String.fromString(Random.nextString(Random.nextInt(32)))))
-      case _ => throw new IllegalArgumentException(s"Unknown column type $columnType")
+            Map(Random.nextInt() -> UTF8String.fromString(
+                    Random.nextString(Random.nextInt(32)))))
+      case _ =>
+        throw new IllegalArgumentException(s"Unknown column type $columnType")
     }).asInstanceOf[JvmType]
   }
 
-  def makeRandomValues(
-      head: ColumnType[_],
-      tail: ColumnType[_]*): Seq[Any] = makeRandomValues(Seq(head) ++ tail)
+  def makeRandomValues(head: ColumnType[_], tail: ColumnType[_]*): Seq[Any] =
+    makeRandomValues(Seq(head) ++ tail)
 
   def makeRandomValues(columnTypes: Seq[ColumnType[_]]): Seq[Any] = {
     columnTypes.map(makeRandomValue(_))
   }
 
   def makeUniqueRandomValues[JvmType](
-      columnType: ColumnType[JvmType],
-      count: Int): Seq[JvmType] = {
+      columnType: ColumnType[JvmType], count: Int): Seq[JvmType] = {
 
-    Iterator.iterate(HashSet.empty[JvmType]) { set =>
-      set + Iterator.continually(makeRandomValue(columnType)).filterNot(set.contains).next()
-    }.drop(count).next().toSeq
+    Iterator
+      .iterate(HashSet.empty[JvmType]) { set =>
+        set + Iterator
+          .continually(makeRandomValue(columnType))
+          .filterNot(set.contains)
+          .next()
+      }
+      .drop(count)
+      .next()
+      .toSeq
   }
 
-  def makeRandomRow(
-      head: ColumnType[_],
-      tail: ColumnType[_]*): InternalRow = makeRandomRow(Seq(head) ++ tail)
+  def makeRandomRow(head: ColumnType[_], tail: ColumnType[_]*): InternalRow =
+    makeRandomRow(Seq(head) ++ tail)
 
   def makeRandomRow(columnTypes: Seq[ColumnType[_]]): InternalRow = {
     val row = new GenericMutableRow(columnTypes.length)
-    makeRandomValues(columnTypes).zipWithIndex.foreach { case (value, index) =>
-      row(index) = value
+    makeRandomValues(columnTypes).zipWithIndex.foreach {
+      case (value, index) =>
+        row(index) = value
     }
     row
   }

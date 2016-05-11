@@ -12,20 +12,20 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.macroAnnotations.{CachedInsidePsiElement, ModCount}
 
 /**
- * A member that can be converted to a ScMethodType, ie a method or a constructor.
- */
+  * A member that can be converted to a ScMethodType, ie a method or a constructor.
+  */
 trait ScMethodLike extends ScMember with PsiMethod {
   def methodType: ScType = methodType(None)
   def methodType(result: Option[ScType]): ScType
 
   /**
-   * This method is very important for generic type inference.
-   * In case if we use just containg class type parameters
-   * we can get problems about intersection of just class
-   * type parameters and constructor type parameters. And
-   * in that context it will have different meaning. See SCL-3095.
-   * @return generated type parameters only for constructors
-   */
+    * This method is very important for generic type inference.
+    * In case if we use just containg class type parameters
+    * we can get problems about intersection of just class
+    * type parameters and constructor type parameters. And
+    * in that context it will have different meaning. See SCL-3095.
+    * @return generated type parameters only for constructors
+    */
   @CachedInsidePsiElement(this, ModCount.getBlockModificationCount)
   def getConstructorTypeParameters: Option[ScTypeParamClause] = {
     this match {
@@ -33,10 +33,15 @@ trait ScMethodLike extends ScMember with PsiMethod {
         val clazz = method.containingClass
         clazz match {
           case c: ScTypeDefinition =>
-            c.typeParametersClause.map((typeParamClause: ScTypeParamClause) => {
-              val paramClauseText = typeParamClause.getTextByStub
-              ScalaPsiElementFactory.createTypeParameterClauseFromTextWithContext(paramClauseText,
-                typeParamClause.getContext, typeParamClause)
+            c.typeParametersClause.map(
+                (typeParamClause: ScTypeParamClause) =>
+                  {
+                val paramClauseText = typeParamClause.getTextByStub
+                ScalaPsiElementFactory
+                  .createTypeParameterClauseFromTextWithContext(
+                    paramClauseText,
+                    typeParamClause.getContext,
+                    typeParamClause)
             })
           case _ => None
         }
@@ -62,7 +67,8 @@ trait ScMethodLike extends ScMember with PsiMethod {
     if (parameterList.clauses.length > 0)
       parameterList.clauses.apply(0).addParameter(param)
     else {
-      val clause: ScParameterClause = ScalaPsiElementFactory.createClauseFromText("()", getManager)
+      val clause: ScParameterClause =
+        ScalaPsiElementFactory.createClauseFromText("()", getManager)
       val newClause = clause.addParameter(param)
       parameterList.addClause(newClause)
     }

@@ -29,7 +29,8 @@ class HoconErrorHighlightingAnnotator extends Annotator {
         }.takeWhile {
           case (tokenType, _) => tokenType != null
         } foreach {
-          case (StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN, range) =>
+          case (
+              StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN, range) =>
             holder.createErrorAnnotation(range, "invalid escape character")
           case (StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN, range) =>
             holder.createErrorAnnotation(range, "invalid unicode escape")
@@ -38,31 +39,30 @@ class HoconErrorHighlightingAnnotator extends Annotator {
 
       case Concatenation =>
         @tailrec
-        def validateConcatenation(constrainingToken: IElementType, child: ASTNode): Unit = if (child != null) {
-          (constrainingToken, child.getElementType) match {
-            case (_, Substitution | BadCharacter | TokenType.ERROR_ELEMENT | TokenType.WHITE_SPACE) =>
+        def validateConcatenation(
+            constrainingToken: IElementType, child: ASTNode): Unit =
+          if (child != null) {
+            (constrainingToken, child.getElementType) match {
+              case (_,
+                    Substitution | BadCharacter | TokenType.ERROR_ELEMENT |
+                    TokenType.WHITE_SPACE) =>
+                validateConcatenation(constrainingToken, child.getTreeNext)
 
-              validateConcatenation(constrainingToken, child.getTreeNext)
+              case (StringValue, StringValue) | (Object, Object) |
+                  (Array, Array) | (null, _) =>
+                validateConcatenation(child.getElementType, child.getTreeNext)
 
-            case (StringValue, StringValue) |
-                 (Object, Object) |
-                 (Array, Array) |
-                 (null, _) =>
-
-              validateConcatenation(child.getElementType, child.getTreeNext)
-
-            case (required, actual) =>
-
-              holder.createErrorAnnotation(child, s"cannot concatenate ${uncaps(required.toString)} with ${uncaps(actual.toString)}")
-              validateConcatenation(actual, child.getTreeNext)
-
+              case (required, actual) =>
+                holder
+                  .createErrorAnnotation(child, s"cannot concatenate ${uncaps(
+                    required.toString)} with ${uncaps(actual.toString)}")
+                validateConcatenation(actual, child.getTreeNext)
+            }
           }
-        }
 
         validateConcatenation(null, element.getNode.getFirstChildNode)
 
       case _ =>
-
     }
   }
 }

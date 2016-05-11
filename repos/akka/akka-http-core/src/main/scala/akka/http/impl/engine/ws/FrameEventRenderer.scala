@@ -5,62 +5,72 @@
 package akka.http.impl.engine.ws
 
 import akka.util.ByteString
-import akka.stream.stage.{ StatefulStage, SyncDirective, Context }
+import akka.stream.stage.{StatefulStage, SyncDirective, Context}
 
 import scala.annotation.tailrec
 
 /**
- * Renders FrameEvents to ByteString.
- *
- * INTERNAL API
- */
-private[http] class FrameEventRenderer extends StatefulStage[FrameEvent, ByteString] {
+  * Renders FrameEvents to ByteString.
+  *
+  * INTERNAL API
+  */
+private[http] class FrameEventRenderer
+    extends StatefulStage[FrameEvent, ByteString] {
   def initial: State = Idle
 
   object Idle extends State {
-    def onPush(elem: FrameEvent, ctx: Context[ByteString]): SyncDirective = elem match {
-      case start @ FrameStart(header, data) ⇒
-        require(header.length >= data.size)
-        if (!start.lastPart && header.length > 0) become(renderData(header.length - data.length, this))
+    def onPush(elem: FrameEvent, ctx: Context[ByteString]): SyncDirective =
+      elem match {
+        case start @ FrameStart(header, data) ⇒
+          require(header.length >= data.size)
+          if (!start.lastPart && header.length > 0)
+            become(renderData(header.length - data.length, this))
 
-        ctx.push(renderStart(start))
+          ctx.push(renderStart(start))
 
-      case f: FrameData ⇒
-        ctx.fail(new IllegalStateException("unexpected FrameData (need FrameStart first)"))
-    }
+        case f: FrameData ⇒
+          ctx.fail(new IllegalStateException(
+                  "unexpected FrameData (need FrameStart first)"))
+      }
   }
 
   def renderData(initialRemaining: Long, nextState: State): State =
     new State {
       var remaining: Long = initialRemaining
 
-      def onPush(elem: FrameEvent, ctx: Context[ByteString]): SyncDirective = elem match {
-        case FrameData(data, lastPart) ⇒
-          if (data.size > remaining)
-            throw new IllegalStateException(s"Expected $remaining frame bytes but got ${data.size}")
-          else if (data.size == remaining) {
-            if (!lastPart) throw new IllegalStateException(s"Frame data complete but `lastPart` flag not set")
-            become(nextState)
-            ctx.push(data)
-          } else {
-            remaining -= data.size
-            ctx.push(data)
-          }
+      def onPush(elem: FrameEvent, ctx: Context[ByteString]): SyncDirective =
+        elem match {
+          case FrameData(data, lastPart) ⇒
+            if (data.size > remaining)
+              throw new IllegalStateException(
+                  s"Expected $remaining frame bytes but got ${data.size}")
+            else if (data.size == remaining) {
+              if (!lastPart)
+                throw new IllegalStateException(
+                    s"Frame data complete but `lastPart` flag not set")
+              become(nextState)
+              ctx.push(data)
+            } else {
+              remaining -= data.size
+              ctx.push(data)
+            }
 
-        case f: FrameStart ⇒
-          ctx.fail(new IllegalStateException("unexpected FrameStart (need more FrameData first)"))
-      }
+          case f: FrameStart ⇒
+            ctx.fail(new IllegalStateException(
+                    "unexpected FrameStart (need more FrameData first)"))
+        }
     }
 
-  def renderStart(start: FrameStart): ByteString = renderHeader(start.header) ++ start.data
+  def renderStart(start: FrameStart): ByteString =
+    renderHeader(start.header) ++ start.data
   def renderHeader(header: FrameHeader): ByteString = {
     import Protocol._
 
     val length = header.length
     val (lengthBits, extraLengthBytes) = length match {
-      case x if x < 126     ⇒ (x.toInt, 0)
+      case x if x < 126 ⇒ (x.toInt, 0)
       case x if x <= 0xFFFF ⇒ (126, 2)
-      case _                ⇒ (127, 8)
+      case _ ⇒ (127, 8)
     }
 
     val maskBytes = if (header.mask.isDefined) 4 else 0
@@ -70,10 +80,8 @@ private[http] class FrameEventRenderer extends StatefulStage[FrameEvent, ByteStr
 
     def bool(b: Boolean, mask: Int): Int = if (b) mask else 0
     val flags =
-      bool(header.fin, FIN_MASK) |
-        bool(header.rsv1, RSV1_MASK) |
-        bool(header.rsv2, RSV2_MASK) |
-        bool(header.rsv3, RSV3_MASK)
+      bool(header.fin, FIN_MASK) | bool(header.rsv1, RSV1_MASK) | bool(
+          header.rsv2, RSV2_MASK) | bool(header.rsv3, RSV3_MASK)
 
     data(0) = (flags | header.opcode.code).toByte
     data(1) = (bool(header.mask.isDefined, MASK_MASK) | lengthBits).toByte

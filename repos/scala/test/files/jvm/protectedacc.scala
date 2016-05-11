@@ -5,9 +5,9 @@
 import java.io.{BufferedReader, File, FileWriter, InputStreamReader}
 
 /** The entry point of this test. It has to come first,
- *  before the package declarations. The parser wouldn't want it
- *  any other way.
- */
+  *  before the package declarations. The parser wouldn't want it
+  *  any other way.
+  */
 object Test {
   def main(args: Array[String]): Unit = {
     val b = new p.b.B;
@@ -40,7 +40,7 @@ package p {
     /** Test type members */
     trait HighlighterXXX {
       type Node;
-      protected def highlight(node : Node) : Unit;
+      protected def highlight(node: Node): Unit;
     }
 
     /** Test type parameters */
@@ -63,10 +63,10 @@ package p {
 
     trait HasNSC {
       trait GlobalExt extends Global;
-      val global : GlobalExt;
+      val global: GlobalExt;
       import global._;
-      protected def doTyped(tree : Tree): Tree = tree;
-      def mkTree : Tree;
+      protected def doTyped(tree: Tree): Tree = tree;
+      def mkTree: Tree;
       doTyped(mkTree);
     }
   }
@@ -82,12 +82,12 @@ package p {
           Console.println("meth1(1) = " + meth1(1));
           Console.println("meth1(1.0) = " + meth1(1.0));
           // test accesses from closures
-          for (x <- 1 until 3)
-            Console.println("meth2(1)(1) = " + meth2(1)("prefix: "));
+          for (x <- 1 until 3) Console.println(
+              "meth2(1)(1) = " + meth2(1)("prefix: "));
 
           Console.println("meth3 = " + meth3.getClass);
 
-          val inc = meth2(1)_;
+          val inc = meth2(1) _;
           Console.println("100 = " + inc("10"));
 
           Console.println("id(1) = " + f(1))
@@ -99,7 +99,8 @@ package p {
     }
 
     /** Test interaction with Java inherited protected fields. */
-    class JavaInteraction(arr: Array[Char]) extends java.io.CharArrayReader(arr) {
+    class JavaInteraction(arr: Array[Char])
+        extends java.io.CharArrayReader(arr) {
       class Inner {
         def m = {
           Console.println("count before: " + count);
@@ -117,7 +118,7 @@ package p {
           Console.println("meth1(1) = " + meth1(1));
           Console.println("meth2(1)(1) = " + meth2(1)("1"));
 
-          val inc = meth2(1)_;
+          val inc = meth2(1) _;
           Console.println("100 = " + inc("10"));
 
           getA.x;
@@ -127,7 +128,7 @@ package p {
 
     trait ScalaAutoEditXXX extends HighlighterXXX {
       trait NodeImpl {
-        def self : Node;
+        def self: Node;
         highlight(self);
       }
     }
@@ -149,10 +150,10 @@ package p {
     }
 
     trait ScalaTyperXXX extends HasNSC {
-      val global : GlobalExt;
+      val global: GlobalExt;
       import global._;
       trait XXX {
-        def foo(tree : Tree) = doTyped(tree);
+        def foo(tree: Tree) = doTyped(tree);
       }
     }
   }

@@ -31,12 +31,18 @@ import org.joda.time.DateTime
 
 import shapeless._
 
-case class ResetToken(tokenId: ResetTokenId, accountId: AccountId, email: String, expiresAt: DateTime, usedAt: Option[DateTime] = None)
+case class ResetToken(tokenId: ResetTokenId,
+                      accountId: AccountId,
+                      email: String,
+                      expiresAt: DateTime,
+                      usedAt: Option[DateTime] = None)
 
 object ResetToken {
   implicit val iso = Iso.hlist(ResetToken.apply _, ResetToken.unapply _)
 
-  val schemaV1 = "tokenId" :: "accountId" :: "email" :: "expiresAt" :: "usedAt" :: HNil
+  val schemaV1 =
+    "tokenId" :: "accountId" :: "email" :: "expiresAt" :: "usedAt" :: HNil
 
-  implicit val (decomposerV1, extractorV1)  = serializationV(schemaV1, Some("1.0".v))
+  implicit val (decomposerV1, extractorV1) = serializationV(
+      schemaV1, Some("1.0".v))
 }

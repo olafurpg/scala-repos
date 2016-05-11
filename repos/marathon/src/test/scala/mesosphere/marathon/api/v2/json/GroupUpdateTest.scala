@@ -1,8 +1,8 @@
 package mesosphere.marathon.api.v2.json
 
-import mesosphere.marathon.state.{ AppDefinition, Timestamp, PathId, Group }
+import mesosphere.marathon.state.{AppDefinition, Timestamp, PathId, Group}
 import com.wix.accord.validate
-import org.scalatest.{ GivenWhenThen, Matchers, FunSuite }
+import org.scalatest.{GivenWhenThen, Matchers, FunSuite}
 import PathId._
 
 class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
@@ -10,17 +10,24 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
   test("A group update can be applied to an empty group") {
     Given("An empty group with updates")
     val group = Group.empty
-    val update = GroupUpdate(PathId.empty, Set.empty[AppDefinition], Set(
-      GroupUpdate("test".toPath, Set.empty[AppDefinition], Set(
-        GroupUpdate.empty("foo".toPath)
-      )),
-      GroupUpdate(
-        "apps".toPath,
-        Set(AppDefinition("app1".toPath, Some("foo"),
-          dependencies = Set("d1".toPath, "../test/foo".toPath, "/test".toPath)))
-      )
-    )
-    )
+    val update = GroupUpdate(
+        PathId.empty,
+        Set.empty[AppDefinition],
+        Set(
+            GroupUpdate("test".toPath,
+                        Set.empty[AppDefinition],
+                        Set(
+                            GroupUpdate.empty("foo".toPath)
+                        )),
+            GroupUpdate(
+                "apps".toPath,
+                Set(AppDefinition("app1".toPath,
+                                  Some("foo"),
+                                  dependencies = Set("d1".toPath,
+                                                     "../test/foo".toPath,
+                                                     "/test".toPath)))
+            )
+        ))
     val timestamp = Timestamp.now()
 
     When("The update is performed")
@@ -38,31 +45,39 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     apps should be('defined)
     apps.get.apps should have size 1
     val app = apps.get.apps.head
-    app.id.toString should be ("/apps/app1")
-    app.dependencies should be (Set("/apps/d1".toPath, "/test/foo".toPath, "/test".toPath))
+    app.id.toString should be("/apps/app1")
+    app.dependencies should be(
+        Set("/apps/d1".toPath, "/test/foo".toPath, "/test".toPath))
   }
 
   test("A group update can be applied to existing entries") {
     Given("A group with updates of existing nodes")
-    val actual = Group(PathId.empty, groups = Set(
-      Group("/test".toPath, apps = Set(AppDefinition("/test/bla".toPath, Some("foo")))),
-      Group("/apps".toPath, groups = Set(Group("/apps/foo".toPath)))
-    ))
+    val actual = Group(
+        PathId.empty,
+        groups = Set(
+              Group(
+                  "/test".toPath,
+                  apps = Set(AppDefinition("/test/bla".toPath, Some("foo")))),
+              Group("/apps".toPath, groups = Set(Group("/apps/foo".toPath)))
+          ))
     val update = GroupUpdate(
-      PathId.empty,
-      Set.empty[AppDefinition],
-      Set(
-        GroupUpdate(
-          "test".toPath,
-          Set.empty[AppDefinition],
-          Set(GroupUpdate.empty("foo".toPath))
-        ),
-        GroupUpdate(
-          "apps".toPath,
-          Set(AppDefinition("app1".toPath, Some("foo"),
-            dependencies = Set("d1".toPath, "../test/foo".toPath, "/test".toPath)))
+        PathId.empty,
+        Set.empty[AppDefinition],
+        Set(
+            GroupUpdate(
+                "test".toPath,
+                Set.empty[AppDefinition],
+                Set(GroupUpdate.empty("foo".toPath))
+            ),
+            GroupUpdate(
+                "apps".toPath,
+                Set(AppDefinition("app1".toPath,
+                                  Some("foo"),
+                                  dependencies = Set("d1".toPath,
+                                                     "../test/foo".toPath,
+                                                     "/test".toPath)))
+            )
         )
-      )
     )
     val timestamp = Timestamp.now()
 
@@ -83,33 +98,42 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     apps.get.groups should have size 1
     apps.get.apps should have size 1
     val app = apps.get.apps.head
-    app.id.toString should be ("/apps/app1")
-    app.dependencies should be (Set("/apps/d1".toPath, "/test/foo".toPath, "/test".toPath))
+    app.id.toString should be("/apps/app1")
+    app.dependencies should be(
+        Set("/apps/d1".toPath, "/test/foo".toPath, "/test".toPath))
   }
 
   test("GroupUpdate will update a Group correctly") {
     Given("An existing group with two subgroups")
     val current = Group(
-      "/test".toPath,
-      groups = Set(
-        Group("/test/group1".toPath, Set(AppDefinition("/test/group1/app1".toPath, Some("foo")))),
-        Group("/test/group2".toPath, Set(AppDefinition("/test/group2/app2".toPath, Some("foo"))))
-      )
+        "/test".toPath,
+        groups = Set(
+              Group(
+                  "/test/group1".toPath,
+                  Set(AppDefinition("/test/group1/app1".toPath, Some("foo")))),
+              Group(
+                  "/test/group2".toPath,
+                  Set(AppDefinition("/test/group2/app2".toPath, Some("foo"))))
+          )
     )
 
     When("A group update is applied")
     val update = GroupUpdate(
-      "/test".toPath,
-      Set.empty[AppDefinition],
-      Set(
-        GroupUpdate("/test/group1".toPath, Set(AppDefinition("/test/group1/app3".toPath, Some("foo")))),
-        GroupUpdate(
-          "/test/group3".toPath,
-          Set.empty[AppDefinition],
-          Set(GroupUpdate("/test/group3/sub1".toPath, Set(AppDefinition("/test/group3/sub1/app4".toPath,
-            Some("foo")))))
+        "/test".toPath,
+        Set.empty[AppDefinition],
+        Set(
+            GroupUpdate(
+                "/test/group1".toPath,
+                Set(AppDefinition("/test/group1/app3".toPath, Some("foo")))),
+            GroupUpdate(
+                "/test/group3".toPath,
+                Set.empty[AppDefinition],
+                Set(GroupUpdate(
+                        "/test/group3/sub1".toPath,
+                        Set(AppDefinition("/test/group3/sub1/app4".toPath,
+                                          Some("foo")))))
+            )
         )
-      )
     )
 
     val timestamp = Timestamp.now()
@@ -143,15 +167,21 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     }
   }
 
-  test("Relative path of a dependency, should be relative to group and not to the app") {
+  test(
+      "Relative path of a dependency, should be relative to group and not to the app") {
     Given("A group with two apps. Second app is dependend of first.")
-    val update = GroupUpdate(PathId.empty, Set.empty[AppDefinition], Set(
-      GroupUpdate(
-        "test-group".toPath,
-        Set(AppDefinition("test-app1".toPath, Some("foo")),
-          AppDefinition("test-app2".toPath, Some("foo"), dependencies = Set("test-app1".toPath)))
-      )
-    ))
+    val update = GroupUpdate(
+        PathId.empty,
+        Set.empty[AppDefinition],
+        Set(
+            GroupUpdate(
+                "test-group".toPath,
+                Set(AppDefinition("test-app1".toPath, Some("foo")),
+                    AppDefinition("test-app2".toPath,
+                                  Some("foo"),
+                                  dependencies = Set("test-app1".toPath)))
+            )
+        ))
 
     When("The update is performed")
     val result = update(Group.empty, Timestamp.now())
@@ -163,6 +193,6 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     group should be('defined)
     group.get.apps should have size 2
     val dependentApp = group.get.app("/test-group/test-app2".toPath).get
-    dependentApp.dependencies should be (Set("/test-group/test-app1".toPath))
+    dependentApp.dependencies should be(Set("/test-group/test-app1".toPath))
   }
 }

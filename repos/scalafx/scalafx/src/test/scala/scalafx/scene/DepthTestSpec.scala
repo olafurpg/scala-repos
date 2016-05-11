@@ -35,11 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.DepthTest]]. */
 @RunWith(classOf[JUnitRunner])
-class DepthTestSpec extends SFXEnumDelegateSpec[jfxs.DepthTest, DepthTest](
-  javaClass = classOf[jfxs.DepthTest],
-  scalaClass = classOf[DepthTest],
-  companion = DepthTest)
-
+class DepthTestSpec
+    extends SFXEnumDelegateSpec[jfxs.DepthTest, DepthTest](
+        javaClass = classOf[jfxs.DepthTest],
+        scalaClass = classOf[DepthTest],
+        companion = DepthTest)

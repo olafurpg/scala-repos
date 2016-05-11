@@ -35,10 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * ScrollBar Spec tests.
- *
- */
+  * ScrollBar Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ScrollBarSpec
-  extends SimpleSFXDelegateSpec[jfxsc.ScrollBar, ScrollBar](classOf[jfxsc.ScrollBar], classOf[ScrollBar])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsc.ScrollBar, ScrollBar](
+        classOf[jfxsc.ScrollBar], classOf[ScrollBar])
+    with RunOnApplicationThread

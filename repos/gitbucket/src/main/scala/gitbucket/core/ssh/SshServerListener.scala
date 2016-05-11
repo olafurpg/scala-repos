@@ -17,7 +17,8 @@ object SshServer {
 
   private def configure(sshAddress: SshAddress, baseUrl: String) = {
     server.setPort(sshAddress.port)
-    val provider = new SimpleGeneratorHostKeyProvider(new File(s"${Directory.GitBucketHome}/gitbucket.ser"))
+    val provider = new SimpleGeneratorHostKeyProvider(
+        new File(s"${Directory.GitBucketHome}/gitbucket.ser"))
     provider.setAlgorithm("RSA")
     provider.setOverwriteAllowed(false)
     server.setKeyPairProvider(provider)
@@ -27,7 +28,7 @@ object SshServer {
   }
 
   def start(sshAddress: SshAddress, baseUrl: String) = {
-    if(active.compareAndSet(false, true)){
+    if (active.compareAndSet(false, true)) {
       configure(sshAddress, baseUrl)
       server.start()
       logger.info(s"Start SSH Server Listen on ${server.getPort}")
@@ -35,7 +36,7 @@ object SshServer {
   }
 
   def stop() = {
-    if(active.compareAndSet(true, false)){
+    if (active.compareAndSet(true, false)) {
       server.stop(true)
       logger.info("SSH Server is stopped.")
     }
@@ -50,24 +51,24 @@ object SshServer {
  * How to use:
  * git clone ssh://username@host_or_ip:29418/owner/repository_name.git
  */
-class SshServerListener extends ServletContextListener with SystemSettingsService {
+class SshServerListener
+    extends ServletContextListener with SystemSettingsService {
 
   private val logger = LoggerFactory.getLogger(classOf[SshServerListener])
 
   override def contextInitialized(sce: ServletContextEvent): Unit = {
     val settings = loadSystemSettings()
     if (settings.sshAddress.isDefined && settings.baseUrl.isEmpty) {
-    	logger.error("Could not start SshServer because the baseUrl is not configured.")
+      logger.error(
+          "Could not start SshServer because the baseUrl is not configured.")
     }
     for {
       sshAddress <- settings.sshAddress
-      baseUrl    <- settings.baseUrl
-    }
-    SshServer.start(sshAddress, baseUrl)
+      baseUrl <- settings.baseUrl
+    } SshServer.start(sshAddress, baseUrl)
   }
 
   override def contextDestroyed(sce: ServletContextEvent): Unit = {
     SshServer.stop()
   }
-
 }

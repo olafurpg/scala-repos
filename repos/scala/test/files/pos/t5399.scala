@@ -42,4 +42,3 @@ class Test2 {
       case (caller: Task[_], target: Task[_]) => "bazinga!"
     }
 }
-

@@ -3,7 +3,7 @@ package lila.app
 import lila.common.HTTPRequest
 import play.api.mvc._
 import play.api.mvc.Results._
-import play.api.{ Application, GlobalSettings, Mode }
+import play.api.{Application, GlobalSettings, Mode}
 
 object Global extends GlobalSettings {
 
@@ -22,9 +22,8 @@ object Global extends GlobalSettings {
   }
 
   private def niceError(req: RequestHeader): Boolean =
-    req.method == "GET" &&
-      HTTPRequest.isSynchronousHttp(req) &&
-      !HTTPRequest.hasFileExtension(req)
+    req.method == "GET" && HTTPRequest.isSynchronousHttp(req) &&
+    !HTTPRequest.hasFileExtension(req)
 
   override def onHandlerNotFound(req: RequestHeader) =
     if (niceError(req)) controllers.Main.notFound(req)
@@ -36,16 +35,15 @@ object Global extends GlobalSettings {
     else if (niceError(req)) {
       lila.mon.http.response.code400()
       controllers.Lobby.handleStatus(req, Results.BadRequest)
-    }
-    else fuccess(BadRequest(error))
+    } else fuccess(BadRequest(error))
 
   override def onError(req: RequestHeader, ex: Throwable) =
     if (niceError(req)) {
       if (lila.common.PlayApp.isProd) {
         lila.mon.http.response.code500()
-        fuccess(InternalServerError(views.html.base.errorPage(ex)(lila.api.Context(req))))
-      }
-      else super.onError(req, ex)
-    }
-    else fuccess(InternalServerError(ex.getMessage))
+        fuccess(
+            InternalServerError(
+                views.html.base.errorPage(ex)(lila.api.Context(req))))
+      } else super.onError(req, ex)
+    } else fuccess(InternalServerError(ex.getMessage))
 }

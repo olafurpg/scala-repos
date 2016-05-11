@@ -27,13 +27,10 @@ import org.specs2.mutable.Specification
 
 import parser._
 
-object InfinityCheckerSpecs extends Specification
-    with StubPhases
-    with CompilerUtils
-    with Compiler
-    with ProvenanceChecker
-    with StaticLibrarySpec {
-  
+object InfinityCheckerSpecs
+    extends Specification with StubPhases with CompilerUtils with Compiler
+    with ProvenanceChecker with StaticLibrarySpec {
+
   import ast._
   import library._
 
@@ -42,13 +39,12 @@ object InfinityCheckerSpecs extends Specification
     set must haveSize(1)
     set.head
   }
-  
+
   private def parseSingle(str: String): Expr = parseSingle(LineStream(str))
 
   "do something right" should {
     "reject a distribution" in {
-      val expr @ Dispatch(_, _, _) =
-        parseSingle("std::random::foobar(5)")
+      val expr @ Dispatch(_, _, _) = parseSingle("std::random::foobar(5)")
       expr.errors mustEqual Set(CannotUseDistributionWithoutSampling)
     }
 
@@ -113,8 +109,7 @@ object InfinityCheckerSpecs extends Specification
     }
 
     "reject unobserved distribution actual" in {
-      val expr @ Let(_, _, _, _, _) =
-        parseSingle("""
+      val expr @ Let(_, _, _, _, _) = parseSingle("""
           f(x) := x
           f(std::random::foobar(12))
         """)
@@ -231,16 +226,14 @@ object InfinityCheckerSpecs extends Specification
     }
 
     "reject another unobserved in object" in {
-      val expr @ ObjectDef(_, _) =
-        parseSingle("""
+      val expr @ ObjectDef(_, _) = parseSingle("""
           {a: std::random::foobar(23)}
         """)
       expr.errors mustEqual Set(CannotUseDistributionWithoutSampling)
     }
 
     "reject unobserved in array" in {
-      val expr @ ArrayDef(_, _) =
-        parseSingle("""
+      val expr @ ArrayDef(_, _) = parseSingle("""
           [std::random::foobar(12), 7]
         """)
       expr.errors mustEqual Set(CannotUseDistributionWithoutSampling)
@@ -283,8 +276,7 @@ object InfinityCheckerSpecs extends Specification
     }
 
     "accept observe through import" in {
-      val expr @ Observe(_, _, _) =
-        parseSingle("""
+      val expr @ Observe(_, _, _) = parseSingle("""
           observe(5,
             import std::lib::* 
             std::random::foobar(12))
@@ -293,8 +285,7 @@ object InfinityCheckerSpecs extends Specification
     }
 
     "reject through import" in {
-      val expr @ Import(_, _, _) =
-        parseSingle("""
+      val expr @ Import(_, _, _) = parseSingle("""
           import std::lib::* 
           std::random::foobar(12)
         """)
@@ -311,16 +302,14 @@ object InfinityCheckerSpecs extends Specification
     }
 
     "reject new" in {
-      val expr @ New(_, _) =
-        parseSingle("""
+      val expr @ New(_, _) = parseSingle("""
           new std::random::foobar(12)
         """)
       expr.errors mustEqual Set(CannotUseDistributionWithoutSampling)
     }
 
     "accept observed new" in {
-      val expr @ Observe(_, _, _) =
-        parseSingle("""
+      val expr @ Observe(_, _, _) = parseSingle("""
           observe(5,
             new std::random::foobar(12))
         """)

@@ -35,7 +35,7 @@ class LabelledGeneric211Tests {
     import ShapelessTaggedAux._
 
     val lgen = LabelledGeneric[Dummy]
-    val s = s"${lgen from Record(i=tag[CustomTag](0))}"
+    val s = s"${lgen from Record(i = tag[CustomTag](0))}"
     assertEquals(s, "Dummy(0)")
   }
 
@@ -53,5 +53,4 @@ class LabelledGeneric211Tests {
     implicitly[lgent.Repr =:= RT]
     implicitly[TC[RT]]
   }
-
 }

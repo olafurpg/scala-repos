@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.api
 
 trait EventServerPlugin {
@@ -24,7 +23,8 @@ trait EventServerPlugin {
 
   def process(eventInfo: EventInfo, context: EventServerPluginContext)
 
-  def handleREST(appId: Int, channelId: Option[Int], arguments: Seq[String]): String
+  def handleREST(
+      appId: Int, channelId: Option[Int], arguments: Seq[String]): String
 }
 
 object EventServerPlugin {

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import scala.collection.immutable
@@ -19,8 +19,8 @@ object JoinSeedNodeMultiJvmSpec extends MultiNodeConfig {
   val ordinary1 = role("ordinary1")
   val ordinary2 = role("ordinary2")
 
-  commonConfig(debugConfig(on = false).
-    withFallback(MultiNodeClusterSpec.clusterConfig))
+  commonConfig(
+      debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig))
 }
 
 class JoinSeedNodeMultiJvmNode1 extends JoinSeedNodeSpec
@@ -30,8 +30,7 @@ class JoinSeedNodeMultiJvmNode4 extends JoinSeedNodeSpec
 class JoinSeedNodeMultiJvmNode5 extends JoinSeedNodeSpec
 
 abstract class JoinSeedNodeSpec
-  extends MultiNodeSpec(JoinSeedNodeMultiJvmSpec)
-  with MultiNodeClusterSpec {
+    extends MultiNodeSpec(JoinSeedNodeMultiJvmSpec) with MultiNodeClusterSpec {
 
   import JoinSeedNodeMultiJvmSpec._
 

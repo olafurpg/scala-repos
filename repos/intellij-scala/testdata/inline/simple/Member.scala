@@ -1,5 +1,5 @@
 object X {
-  val /*caret*/a = 1
+  val /*caret*/ a = 1
 
   def foo() = {
     a + a

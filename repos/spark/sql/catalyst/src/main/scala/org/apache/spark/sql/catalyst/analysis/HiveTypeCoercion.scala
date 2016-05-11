@@ -29,61 +29,44 @@ import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules.Rule
 import org.apache.spark.sql.types._
 
-
 /**
- * A collection of [[Rule]] that can be used to coerce differing types that participate in
- * operations into compatible ones.
- *
- * Most of these rules are based on Hive semantics, but they do not introduce any dependencies on
- * the hive codebase.
- *
- * Notes about type widening / tightest common types: Broadly, there are two cases when we need
- * to widen data types (e.g. union, binary comparison). In case 1, we are looking for a common
- * data type for two or more data types, and in this case no loss of precision is allowed. Examples
- * include type inference in JSON (e.g. what's the column's data type if one row is an integer
- * while the other row is a long?). In case 2, we are looking for a widened data type with
- * some acceptable loss of precision (e.g. there is no common type for double and decimal because
- * double's range is larger than decimal, and yet decimal is more precise than double, but in
- * union we would cast the decimal into double).
- */
+  * A collection of [[Rule]] that can be used to coerce differing types that participate in
+  * operations into compatible ones.
+  *
+  * Most of these rules are based on Hive semantics, but they do not introduce any dependencies on
+  * the hive codebase.
+  *
+  * Notes about type widening / tightest common types: Broadly, there are two cases when we need
+  * to widen data types (e.g. union, binary comparison). In case 1, we are looking for a common
+  * data type for two or more data types, and in this case no loss of precision is allowed. Examples
+  * include type inference in JSON (e.g. what's the column's data type if one row is an integer
+  * while the other row is a long?). In case 2, we are looking for a widened data type with
+  * some acceptable loss of precision (e.g. there is no common type for double and decimal because
+  * double's range is larger than decimal, and yet decimal is more precise than double, but in
+  * union we would cast the decimal into double).
+  */
 object HiveTypeCoercion {
 
   val typeCoercionRules =
-    PropagateTypes ::
-      InConversion ::
-      WidenSetOperationTypes ::
-      PromoteStrings ::
-      DecimalPrecision ::
-      BooleanEquality ::
-      StringToIntegralCasts ::
-      FunctionArgumentConversion ::
-      CaseWhenCoercion ::
-      IfCoercion ::
-      Division ::
-      PropagateTypes ::
-      ImplicitTypeCasts ::
-      DateTimeOperations ::
-      Nil
+    PropagateTypes :: InConversion :: WidenSetOperationTypes :: PromoteStrings :: DecimalPrecision :: BooleanEquality :: StringToIntegralCasts :: FunctionArgumentConversion :: CaseWhenCoercion :: IfCoercion :: Division :: PropagateTypes :: ImplicitTypeCasts :: DateTimeOperations :: Nil
 
   // See https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types.
   // The conversion for integral and floating point types have a linear widening hierarchy:
-  private[sql] val numericPrecedence =
-    IndexedSeq(
-      ByteType,
-      ShortType,
-      IntegerType,
-      LongType,
-      FloatType,
-      DoubleType)
+  private[sql] val numericPrecedence = IndexedSeq(ByteType,
+                                                  ShortType,
+                                                  IntegerType,
+                                                  LongType,
+                                                  FloatType,
+                                                  DoubleType)
 
   /**
-   * Case 1 type widening (see the classdoc comment above for HiveTypeCoercion).
-   *
-   * Find the tightest common type of two types that might be used in a binary expression.
-   * This handles all numeric types except fixed-precision decimals interacting with each other or
-   * with primitive types, because in that case the precision and scale of the result depends on
-   * the operation. Those rules are implemented in [[DecimalPrecision]].
-   */
+    * Case 1 type widening (see the classdoc comment above for HiveTypeCoercion).
+    *
+    * Find the tightest common type of two types that might be used in a binary expression.
+    * This handles all numeric types except fixed-precision decimals interacting with each other or
+    * with primitive types, because in that case the precision and scale of the result depends on
+    * the operation. Those rules are implemented in [[DecimalPrecision]].
+    */
   val findTightestCommonTypeOfTwo: (DataType, DataType) => Option[DataType] = {
     case (t1, t2) if t1 == t2 => Some(t1)
     case (NullType, t1) => Some(t1)
@@ -103,67 +86,80 @@ object HiveTypeCoercion {
   }
 
   /** Similar to [[findTightestCommonType]], but can promote all the way to StringType. */
-  private def findTightestCommonTypeToString(left: DataType, right: DataType): Option[DataType] = {
-    findTightestCommonTypeOfTwo(left, right).orElse((left, right) match {
-      case (StringType, t2: AtomicType) if t2 != BinaryType && t2 != BooleanType => Some(StringType)
-      case (t1: AtomicType, StringType) if t1 != BinaryType && t1 != BooleanType => Some(StringType)
+  private def findTightestCommonTypeToString(
+      left: DataType, right: DataType): Option[DataType] = {
+    findTightestCommonTypeOfTwo(left, right).orElse(
+        (left, right) match {
+      case (StringType, t2: AtomicType)
+          if t2 != BinaryType && t2 != BooleanType =>
+        Some(StringType)
+      case (t1: AtomicType, StringType)
+          if t1 != BinaryType && t1 != BooleanType =>
+        Some(StringType)
       case _ => None
     })
   }
 
   /**
-   * Similar to [[findTightestCommonType]], if can not find the TightestCommonType, try to use
-   * [[findTightestCommonTypeToString]] to find the TightestCommonType.
-   */
-  private def findTightestCommonTypeAndPromoteToString(types: Seq[DataType]): Option[DataType] = {
-    types.foldLeft[Option[DataType]](Some(NullType))((r, c) => r match {
-      case None => None
-      case Some(d) =>
-        findTightestCommonTypeToString(d, c)
+    * Similar to [[findTightestCommonType]], if can not find the TightestCommonType, try to use
+    * [[findTightestCommonTypeToString]] to find the TightestCommonType.
+    */
+  private def findTightestCommonTypeAndPromoteToString(
+      types: Seq[DataType]): Option[DataType] = {
+    types.foldLeft[Option[DataType]](Some(NullType))(
+        (r, c) =>
+          r match {
+        case None => None
+        case Some(d) =>
+          findTightestCommonTypeToString(d, c)
     })
   }
 
   /**
-   * Find the tightest common type of a set of types by continuously applying
-   * `findTightestCommonTypeOfTwo` on these types.
-   */
+    * Find the tightest common type of a set of types by continuously applying
+    * `findTightestCommonTypeOfTwo` on these types.
+    */
   private def findTightestCommonType(types: Seq[DataType]): Option[DataType] = {
-    types.foldLeft[Option[DataType]](Some(NullType))((r, c) => r match {
-      case None => None
-      case Some(d) => findTightestCommonTypeOfTwo(d, c)
+    types.foldLeft[Option[DataType]](Some(NullType))((r, c) =>
+          r match {
+        case None => None
+        case Some(d) => findTightestCommonTypeOfTwo(d, c)
     })
   }
 
   /**
-   * Case 2 type widening (see the classdoc comment above for HiveTypeCoercion).
-   *
-   * i.e. the main difference with [[findTightestCommonTypeOfTwo]] is that here we allow some
-   * loss of precision when widening decimal and double.
-   */
-  private def findWiderTypeForTwo(t1: DataType, t2: DataType): Option[DataType] = (t1, t2) match {
+    * Case 2 type widening (see the classdoc comment above for HiveTypeCoercion).
+    *
+    * i.e. the main difference with [[findTightestCommonTypeOfTwo]] is that here we allow some
+    * loss of precision when widening decimal and double.
+    */
+  private def findWiderTypeForTwo(
+      t1: DataType, t2: DataType): Option[DataType] = (t1, t2) match {
     case (t1: DecimalType, t2: DecimalType) =>
       Some(DecimalPrecision.widerDecimalType(t1, t2))
     case (t: IntegralType, d: DecimalType) =>
       Some(DecimalPrecision.widerDecimalType(DecimalType.forType(t), d))
     case (d: DecimalType, t: IntegralType) =>
       Some(DecimalPrecision.widerDecimalType(DecimalType.forType(t), d))
-    case (_: FractionalType, _: DecimalType) | (_: DecimalType, _: FractionalType) =>
+    case (_: FractionalType, _: DecimalType) |
+        (_: DecimalType, _: FractionalType) =>
       Some(DoubleType)
     case _ =>
       findTightestCommonTypeToString(t1, t2)
   }
 
   private def findWiderCommonType(types: Seq[DataType]) = {
-    types.foldLeft[Option[DataType]](Some(NullType))((r, c) => r match {
-      case Some(d) => findWiderTypeForTwo(d, c)
-      case None => None
+    types.foldLeft[Option[DataType]](Some(NullType))((r, c) =>
+          r match {
+        case Some(d) => findWiderTypeForTwo(d, c)
+        case None => None
     })
   }
 
   /**
-   * Applies any changes to [[AttributeReference]] data types that are made by other rules to
-   * instances higher in the query tree.
-   */
+    * Applies any changes to [[AttributeReference]] data types that are made by other rules to
+    * instances higher in the query tree.
+    */
   object PropagateTypes extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveOperators {
 
@@ -193,56 +189,62 @@ object HiveTypeCoercion {
   }
 
   /**
-   * Widens numeric types and converts strings to numbers when appropriate.
-   *
-   * Loosely based on rules from "Hadoop: The Definitive Guide" 2nd edition, by Tom White
-   *
-   * The implicit conversion rules can be summarized as follows:
-   *   - Any integral numeric type can be implicitly converted to a wider type.
-   *   - All the integral numeric types, FLOAT, and (perhaps surprisingly) STRING can be implicitly
-   *     converted to DOUBLE.
-   *   - TINYINT, SMALLINT, and INT can all be converted to FLOAT.
-   *   - BOOLEAN types cannot be converted to any other type.
-   *   - Any integral numeric type can be implicitly converted to decimal type.
-   *   - two different decimal types will be converted into a wider decimal type for both of them.
-   *   - decimal type will be converted into double if there float or double together with it.
-   *
-   * Additionally, all types when UNION-ed with strings will be promoted to strings.
-   * Other string conversions are handled by PromoteStrings.
-   *
-   * Widening types might result in loss of precision in the following cases:
-   * - IntegerType to FloatType
-   * - LongType to FloatType
-   * - LongType to DoubleType
-   * - DecimalType to Double
-   *
-   * This rule is only applied to Union/Except/Intersect
-   */
+    * Widens numeric types and converts strings to numbers when appropriate.
+    *
+    * Loosely based on rules from "Hadoop: The Definitive Guide" 2nd edition, by Tom White
+    *
+    * The implicit conversion rules can be summarized as follows:
+    *   - Any integral numeric type can be implicitly converted to a wider type.
+    *   - All the integral numeric types, FLOAT, and (perhaps surprisingly) STRING can be implicitly
+    *     converted to DOUBLE.
+    *   - TINYINT, SMALLINT, and INT can all be converted to FLOAT.
+    *   - BOOLEAN types cannot be converted to any other type.
+    *   - Any integral numeric type can be implicitly converted to decimal type.
+    *   - two different decimal types will be converted into a wider decimal type for both of them.
+    *   - decimal type will be converted into double if there float or double together with it.
+    *
+    * Additionally, all types when UNION-ed with strings will be promoted to strings.
+    * Other string conversions are handled by PromoteStrings.
+    *
+    * Widening types might result in loss of precision in the following cases:
+    * - IntegerType to FloatType
+    * - LongType to FloatType
+    * - LongType to DoubleType
+    * - DecimalType to Double
+    *
+    * This rule is only applied to Union/Except/Intersect
+    */
   object WidenSetOperationTypes extends Rule[LogicalPlan] {
 
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveOperators {
       case p if p.analyzed => p
 
-      case s @ SetOperation(left, right) if s.childrenResolved &&
-          left.output.length == right.output.length && !s.resolved =>
-        val newChildren: Seq[LogicalPlan] = buildNewChildrenWithWiderTypes(left :: right :: Nil)
+      case s @ SetOperation(left, right)
+          if s.childrenResolved && left.output.length == right.output.length &&
+          !s.resolved =>
+        val newChildren: Seq[LogicalPlan] =
+          buildNewChildrenWithWiderTypes(left :: right :: Nil)
         assert(newChildren.length == 2)
         s.makeCopy(Array(newChildren.head, newChildren.last))
 
-      case s: Union if s.childrenResolved &&
-          s.children.forall(_.output.length == s.children.head.output.length) && !s.resolved =>
-        val newChildren: Seq[LogicalPlan] = buildNewChildrenWithWiderTypes(s.children)
+      case s: Union
+          if s.childrenResolved && s.children
+            .forall(_.output.length == s.children.head.output.length) &&
+          !s.resolved =>
+        val newChildren: Seq[LogicalPlan] =
+          buildNewChildrenWithWiderTypes(s.children)
         s.makeCopy(Array(newChildren))
     }
 
     /** Build new children with the widest types for each attribute among all the children */
-    private def buildNewChildrenWithWiderTypes(children: Seq[LogicalPlan]): Seq[LogicalPlan] = {
+    private def buildNewChildrenWithWiderTypes(
+        children: Seq[LogicalPlan]): Seq[LogicalPlan] = {
       require(children.forall(_.output.length == children.head.output.length))
 
       // Get a sequence of data types, each of which is the widest type of this specific attribute
       // in all the children
-      val targetTypes: Seq[DataType] =
-        getWidestTypes(children, attrIndex = 0, mutable.Queue[DataType]())
+      val targetTypes: Seq[DataType] = getWidestTypes(
+          children, attrIndex = 0, mutable.Queue[DataType]())
 
       if (targetTypes.nonEmpty) {
         // Add an extra Project if the targetTypes are different from the original types.
@@ -273,7 +275,8 @@ object HiveTypeCoercion {
     }
 
     /** Given a plan, add an extra project on top to widen some columns' data types. */
-    private def widenTypes(plan: LogicalPlan, targetTypes: Seq[DataType]): LogicalPlan = {
+    private def widenTypes(
+        plan: LogicalPlan, targetTypes: Seq[DataType]): LogicalPlan = {
       val casted = plan.output.zip(targetTypes).map {
         case (e, dt) if e.dataType != dt => Alias(Cast(e, dt), e.name)()
         case (e, _) => e
@@ -283,16 +286,18 @@ object HiveTypeCoercion {
   }
 
   /**
-   * Promotes strings that appear in arithmetic expressions.
-   */
+    * Promotes strings that appear in arithmetic expressions.
+    */
   object PromoteStrings extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
-      case a @ BinaryArithmetic(left @ StringType(), right @ DecimalType.Expression(_, _)) =>
+      case a @ BinaryArithmetic(
+          left @ StringType(), right @ DecimalType.Expression(_, _)) =>
         a.makeCopy(Array(Cast(left, DecimalType.SYSTEM_DEFAULT), right))
-      case a @ BinaryArithmetic(left @ DecimalType.Expression(_, _), right @ StringType()) =>
+      case a @ BinaryArithmetic(
+          left @ DecimalType.Expression(_, _), right @ StringType()) =>
         a.makeCopy(Array(left, Cast(right, DecimalType.SYSTEM_DEFAULT)))
 
       case a @ BinaryArithmetic(left @ StringType(), right) =>
@@ -314,9 +319,11 @@ object HiveTypeCoercion {
         p.makeCopy(Array(left, Cast(right, StringType)))
       case p @ BinaryComparison(left @ DateType(), right @ StringType()) =>
         p.makeCopy(Array(Cast(left, StringType), right))
-      case p @ BinaryComparison(left @ StringType(), right @ TimestampType()) =>
+      case p @ BinaryComparison(
+          left @ StringType(), right @ TimestampType()) =>
         p.makeCopy(Array(left, Cast(right, StringType)))
-      case p @ BinaryComparison(left @ TimestampType(), right @ StringType()) =>
+      case p @ BinaryComparison(
+          left @ TimestampType(), right @ StringType()) =>
         p.makeCopy(Array(Cast(left, StringType), right))
 
       // Comparisons between dates and timestamps.
@@ -331,18 +338,23 @@ object HiveTypeCoercion {
       case p @ BinaryComparison(left @ NullType(), right @ StringType()) =>
         p.makeCopy(Array(Literal.create(null, StringType), right))
 
-      case p @ BinaryComparison(left @ StringType(), right) if right.dataType != StringType =>
+      case p @ BinaryComparison(left @ StringType(), right)
+          if right.dataType != StringType =>
         p.makeCopy(Array(Cast(left, DoubleType), right))
-      case p @ BinaryComparison(left, right @ StringType()) if left.dataType != StringType =>
+      case p @ BinaryComparison(left, right @ StringType())
+          if left.dataType != StringType =>
         p.makeCopy(Array(left, Cast(right, DoubleType)))
 
       case i @ In(a @ DateType(), b) if b.forall(_.dataType == StringType) =>
         i.makeCopy(Array(Cast(a, StringType), b))
-      case i @ In(a @ TimestampType(), b) if b.forall(_.dataType == StringType) =>
+      case i @ In(a @ TimestampType(), b)
+          if b.forall(_.dataType == StringType) =>
         i.makeCopy(Array(a, b.map(Cast(_, TimestampType))))
-      case i @ In(a @ DateType(), b) if b.forall(_.dataType == TimestampType) =>
+      case i @ In(a @ DateType(), b)
+          if b.forall(_.dataType == TimestampType) =>
         i.makeCopy(Array(Cast(a, StringType), b.map(Cast(_, StringType))))
-      case i @ In(a @ TimestampType(), b) if b.forall(_.dataType == DateType) =>
+      case i @ In(a @ TimestampType(), b)
+          if b.forall(_.dataType == DateType) =>
         i.makeCopy(Array(Cast(a, StringType), b.map(Cast(_, StringType))))
 
       case Sum(e @ StringType()) => Sum(Cast(e, DoubleType))
@@ -357,12 +369,12 @@ object HiveTypeCoercion {
   }
 
   /**
-   * Convert the value and in list expressions to the common operator type
-   * by looking at all the argument types and finding the closest one that
-   * all the arguments can be cast to. When no common operator type is found
-   * the original expression will be returned and an Analysis Exception will
-   * be raised at type checking phase.
-   */
+    * Convert the value and in list expressions to the common operator type
+    * by looking at all the argument types and finding the closest one that
+    * all the arguments can be cast to. When no common operator type is found
+    * the original expression will be returned and an Analysis Exception will
+    * be raised at type checking phase.
+    */
   object InConversion extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
@@ -370,15 +382,16 @@ object HiveTypeCoercion {
 
       case i @ In(a, b) if b.exists(_.dataType != a.dataType) =>
         findWiderCommonType(i.children.map(_.dataType)) match {
-          case Some(finalDataType) => i.withNewChildren(i.children.map(Cast(_, finalDataType)))
+          case Some(finalDataType) =>
+            i.withNewChildren(i.children.map(Cast(_, finalDataType)))
           case None => i
         }
     }
   }
 
   /**
-   * Changes numeric values to booleans so that expressions like true = 1 can be evaluated.
-   */
+    * Changes numeric values to booleans so that expressions like true = 1 can be evaluated.
+    */
   object BooleanEquality extends Rule[LogicalPlan] {
     private val trueValues = Seq(1.toByte, 1.toShort, 1, 1L, Decimal.ONE)
     private val falseValues = Seq(0.toByte, 0.toShort, 0, 0L, Decimal.ZERO)
@@ -393,21 +406,29 @@ object HiveTypeCoercion {
       // We may simplify the expression if one side is literal numeric values
       // TODO: Maybe these rules should go into the optimizer.
       case EqualTo(bool @ BooleanType(), Literal(value, _: NumericType))
-        if trueValues.contains(value) => bool
+          if trueValues.contains(value) =>
+        bool
       case EqualTo(bool @ BooleanType(), Literal(value, _: NumericType))
-        if falseValues.contains(value) => Not(bool)
+          if falseValues.contains(value) =>
+        Not(bool)
       case EqualTo(Literal(value, _: NumericType), bool @ BooleanType())
-        if trueValues.contains(value) => bool
+          if trueValues.contains(value) =>
+        bool
       case EqualTo(Literal(value, _: NumericType), bool @ BooleanType())
-        if falseValues.contains(value) => Not(bool)
+          if falseValues.contains(value) =>
+        Not(bool)
       case EqualNullSafe(bool @ BooleanType(), Literal(value, _: NumericType))
-        if trueValues.contains(value) => And(IsNotNull(bool), bool)
+          if trueValues.contains(value) =>
+        And(IsNotNull(bool), bool)
       case EqualNullSafe(bool @ BooleanType(), Literal(value, _: NumericType))
-        if falseValues.contains(value) => And(IsNotNull(bool), Not(bool))
+          if falseValues.contains(value) =>
+        And(IsNotNull(bool), Not(bool))
       case EqualNullSafe(Literal(value, _: NumericType), bool @ BooleanType())
-        if trueValues.contains(value) => And(IsNotNull(bool), bool)
+          if trueValues.contains(value) =>
+        And(IsNotNull(bool), bool)
       case EqualNullSafe(Literal(value, _: NumericType), bool @ BooleanType())
-        if falseValues.contains(value) => And(IsNotNull(bool), Not(bool))
+          if falseValues.contains(value) =>
+        And(IsNotNull(bool), Not(bool))
 
       case EqualTo(left @ BooleanType(), right @ NumericType()) =>
         EqualTo(Cast(left, right.dataType), right)
@@ -421,10 +442,10 @@ object HiveTypeCoercion {
   }
 
   /**
-   * When encountering a cast from a string representing a valid fractional number to an integral
-   * type the jvm will throw a `java.lang.NumberFormatException`.  Hive, in contrast, returns the
-   * truncated version of this number.
-   */
+    * When encountering a cast from a string representing a valid fractional number to an integral
+    * type the jvm will throw a `java.lang.NumberFormatException`.  Hive, in contrast, returns the
+    * truncated version of this number.
+    */
   object StringToIntegralCasts extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
@@ -436,26 +457,31 @@ object HiveTypeCoercion {
   }
 
   /**
-   * This ensure that the types for various functions are as expected.
-   */
+    * This ensure that the types for various functions are as expected.
+    */
   object FunctionArgumentConversion extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
-      case a @ CreateArray(children) if children.map(_.dataType).distinct.size > 1 =>
+      case a @ CreateArray(children)
+          if children.map(_.dataType).distinct.size > 1 =>
         val types = children.map(_.dataType)
         findTightestCommonTypeAndPromoteToString(types) match {
-          case Some(finalDataType) => CreateArray(children.map(Cast(_, finalDataType)))
+          case Some(finalDataType) =>
+            CreateArray(children.map(Cast(_, finalDataType)))
           case None => a
         }
 
       // Promote SUM, SUM DISTINCT and AVERAGE to largest types to prevent overflows.
       case s @ Sum(e @ DecimalType()) => s // Decimal is already the biggest.
-      case Sum(e @ IntegralType()) if e.dataType != LongType => Sum(Cast(e, LongType))
-      case Sum(e @ FractionalType()) if e.dataType != DoubleType => Sum(Cast(e, DoubleType))
+      case Sum(e @ IntegralType()) if e.dataType != LongType =>
+        Sum(Cast(e, LongType))
+      case Sum(e @ FractionalType()) if e.dataType != DoubleType =>
+        Sum(Cast(e, DoubleType))
 
-      case s @ Average(e @ DecimalType()) => s // Decimal is already the biggest.
+      case s @ Average(e @ DecimalType()) =>
+        s // Decimal is already the biggest.
       case Average(e @ IntegralType()) if e.dataType != LongType =>
         Average(Cast(e, LongType))
       case Average(e @ FractionalType()) if e.dataType != DoubleType =>
@@ -475,31 +501,36 @@ object HiveTypeCoercion {
           case None => c
         }
 
-      case g @ Greatest(children) if children.map(_.dataType).distinct.size > 1 =>
+      case g @ Greatest(children)
+          if children.map(_.dataType).distinct.size > 1 =>
         val types = children.map(_.dataType)
         findTightestCommonType(types) match {
-          case Some(finalDataType) => Greatest(children.map(Cast(_, finalDataType)))
+          case Some(finalDataType) =>
+            Greatest(children.map(Cast(_, finalDataType)))
           case None => g
         }
 
       case l @ Least(children) if children.map(_.dataType).distinct.size > 1 =>
         val types = children.map(_.dataType)
         findTightestCommonType(types) match {
-          case Some(finalDataType) => Least(children.map(Cast(_, finalDataType)))
+          case Some(finalDataType) =>
+            Least(children.map(Cast(_, finalDataType)))
           case None => l
         }
 
-      case NaNvl(l, r) if l.dataType == DoubleType && r.dataType == FloatType =>
+      case NaNvl(l, r)
+          if l.dataType == DoubleType && r.dataType == FloatType =>
         NaNvl(l, Cast(r, DoubleType))
-      case NaNvl(l, r) if l.dataType == FloatType && r.dataType == DoubleType =>
+      case NaNvl(l, r)
+          if l.dataType == FloatType && r.dataType == DoubleType =>
         NaNvl(Cast(l, DoubleType), r)
     }
   }
 
   /**
-   * Hive only performs integral division with the DIV operator. The arguments to / are always
-   * converted to fractional types.
-   */
+    * Hive only performs integral division with the DIV operator. The arguments to / are always
+    * converted to fractional types.
+    */
   object Division extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
       // Skip nodes who has not been resolved yet,
@@ -510,26 +541,28 @@ object HiveTypeCoercion {
       case d: Divide if d.dataType == DoubleType => d
       case d: Divide if d.dataType.isInstanceOf[DecimalType] => d
 
-      case Divide(left, right) => Divide(Cast(left, DoubleType), Cast(right, DoubleType))
+      case Divide(left, right) =>
+        Divide(Cast(left, DoubleType), Cast(right, DoubleType))
     }
   }
 
   /**
-   * Coerces the type of different branches of a CASE WHEN statement to a common type.
-   */
+    * Coerces the type of different branches of a CASE WHEN statement to a common type.
+    */
   object CaseWhenCoercion extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
       case c: CaseWhen if c.childrenResolved && !c.valueTypesEqual =>
         val maybeCommonType = findWiderCommonType(c.valueTypes)
         maybeCommonType.map { commonType =>
           var changed = false
-          val newBranches = c.branches.map { case (condition, value) =>
-            if (value.dataType.sameType(commonType)) {
-              (condition, value)
-            } else {
-              changed = true
-              (condition, Cast(value, commonType))
-            }
+          val newBranches = c.branches.map {
+            case (condition, value) =>
+              if (value.dataType.sameType(commonType)) {
+                (condition, value)
+              } else {
+                changed = true
+                (condition, Cast(value, commonType))
+              }
           }
           val newElseValue = c.elseValue.map { value =>
             if (value.dataType.sameType(commonType)) {
@@ -545,18 +578,21 @@ object HiveTypeCoercion {
   }
 
   /**
-   * Coerces the type of different branches of If statement to a common type.
-   */
+    * Coerces the type of different branches of If statement to a common type.
+    */
   object IfCoercion extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
       case e if !e.childrenResolved => e
       // Find tightest common type for If, if the true value and false value have different types.
       case i @ If(pred, left, right) if left.dataType != right.dataType =>
         findWiderTypeForTwo(left.dataType, right.dataType).map { widestType =>
-          val newLeft = if (left.dataType == widestType) left else Cast(left, widestType)
-          val newRight = if (right.dataType == widestType) right else Cast(right, widestType)
+          val newLeft =
+            if (left.dataType == widestType) left else Cast(left, widestType)
+          val newRight =
+            if (right.dataType == widestType) right
+            else Cast(right, widestType)
           If(pred, newLeft, newRight)
-        }.getOrElse(i)  // If there is no applicable conversion, leave expression unchanged.
+        }.getOrElse(i) // If there is no applicable conversion, leave expression unchanged.
       // Convert If(null literal, _, _) into boolean type.
       // In the optimizer, we should short-circuit this directly into false value.
       case If(pred, left, right) if pred.dataType == NullType =>
@@ -565,9 +601,9 @@ object HiveTypeCoercion {
   }
 
   /**
-   * Turns Add/Subtract of DateType/TimestampType/StringType and CalendarIntervalType
-   * to TimeAdd/TimeSub
-   */
+    * Turns Add/Subtract of DateType/TimestampType/StringType and CalendarIntervalType
+    * to TimeAdd/TimeSub
+    */
   object DateTimeOperations extends Rule[LogicalPlan] {
 
     private val acceptedTypes = Seq(DateType, TimestampType, StringType)
@@ -576,63 +612,75 @@ object HiveTypeCoercion {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
-      case Add(l @ CalendarIntervalType(), r) if acceptedTypes.contains(r.dataType) =>
+      case Add(l @ CalendarIntervalType(), r)
+          if acceptedTypes.contains(r.dataType) =>
         Cast(TimeAdd(r, l), r.dataType)
-      case Add(l, r @ CalendarIntervalType()) if acceptedTypes.contains(l.dataType) =>
+      case Add(l, r @ CalendarIntervalType())
+          if acceptedTypes.contains(l.dataType) =>
         Cast(TimeAdd(l, r), l.dataType)
-      case Subtract(l, r @ CalendarIntervalType()) if acceptedTypes.contains(l.dataType) =>
+      case Subtract(l, r @ CalendarIntervalType())
+          if acceptedTypes.contains(l.dataType) =>
         Cast(TimeSub(l, r), l.dataType)
     }
   }
 
   /**
-   * Casts types according to the expected input types for [[Expression]]s.
-   */
+    * Casts types according to the expected input types for [[Expression]]s.
+    */
   object ImplicitTypeCasts extends Rule[LogicalPlan] {
     def apply(plan: LogicalPlan): LogicalPlan = plan resolveExpressions {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
-      case b @ BinaryOperator(left, right) if left.dataType != right.dataType =>
-        findTightestCommonTypeOfTwo(left.dataType, right.dataType).map { commonType =>
-          if (b.inputType.acceptsType(commonType)) {
-            // If the expression accepts the tightest common type, cast to that.
-            val newLeft = if (left.dataType == commonType) left else Cast(left, commonType)
-            val newRight = if (right.dataType == commonType) right else Cast(right, commonType)
-            b.withNewChildren(Seq(newLeft, newRight))
-          } else {
-            // Otherwise, don't do anything with the expression.
-            b
-          }
-        }.getOrElse(b)  // If there is no applicable conversion, leave expression unchanged.
+      case b @ BinaryOperator(left, right)
+          if left.dataType != right.dataType =>
+        findTightestCommonTypeOfTwo(left.dataType, right.dataType).map {
+          commonType =>
+            if (b.inputType.acceptsType(commonType)) {
+              // If the expression accepts the tightest common type, cast to that.
+              val newLeft =
+                if (left.dataType == commonType) left
+                else Cast(left, commonType)
+              val newRight =
+                if (right.dataType == commonType) right
+                else Cast(right, commonType)
+              b.withNewChildren(Seq(newLeft, newRight))
+            } else {
+              // Otherwise, don't do anything with the expression.
+              b
+            }
+        }.getOrElse(b) // If there is no applicable conversion, leave expression unchanged.
 
       case e: ImplicitCastInputTypes if e.inputTypes.nonEmpty =>
-        val children: Seq[Expression] = e.children.zip(e.inputTypes).map { case (in, expected) =>
-          // If we cannot do the implicit cast, just use the original input.
-          implicitCast(in, expected).getOrElse(in)
+        val children: Seq[Expression] = e.children.zip(e.inputTypes).map {
+          case (in, expected) =>
+            // If we cannot do the implicit cast, just use the original input.
+            implicitCast(in, expected).getOrElse(in)
         }
         e.withNewChildren(children)
 
       case e: ExpectsInputTypes if e.inputTypes.nonEmpty =>
         // Convert NullType into some specific target type for ExpectsInputTypes that don't do
         // general implicit casting.
-        val children: Seq[Expression] = e.children.zip(e.inputTypes).map { case (in, expected) =>
-          if (in.dataType == NullType && !expected.acceptsType(NullType)) {
-            Literal.create(null, expected.defaultConcreteType)
-          } else {
-            in
-          }
+        val children: Seq[Expression] = e.children.zip(e.inputTypes).map {
+          case (in, expected) =>
+            if (in.dataType == NullType && !expected.acceptsType(NullType)) {
+              Literal.create(null, expected.defaultConcreteType)
+            } else {
+              in
+            }
         }
         e.withNewChildren(children)
     }
 
     /**
-     * Given an expected data type, try to cast the expression and return the cast expression.
-     *
-     * If the expression already fits the input type, we simply return the expression itself.
-     * If the expression has an incompatible type that cannot be implicitly cast, return None.
-     */
-    def implicitCast(e: Expression, expectedType: AbstractDataType): Option[Expression] = {
+      * Given an expected data type, try to cast the expression and return the cast expression.
+      *
+      * If the expression already fits the input type, we simply return the expression itself.
+      * If the expression has an incompatible type that cannot be implicitly cast, return None.
+      */
+    def implicitCast(
+        e: Expression, expectedType: AbstractDataType): Option[Expression] = {
       val inType = e.dataType
 
       // Note that ret is nullable to avoid typing a lot of Some(...) in this local scope.
@@ -647,7 +695,8 @@ object HiveTypeCoercion {
 
         // If the function accepts any numeric type and the input is a string, we follow the hive
         // convention and cast that input into a double
-        case (StringType, NumericType) => Cast(e, NumericType.defaultConcreteType)
+        case (StringType, NumericType) =>
+          Cast(e, NumericType.defaultConcreteType)
 
         // Implicit cast among numeric types. When we reach here, input type is not acceptable.
 
@@ -668,11 +717,13 @@ object HiveTypeCoercion {
         case (StringType, TimestampType) => Cast(e, TimestampType)
         case (StringType, BinaryType) => Cast(e, BinaryType)
         // Cast any atomic type to string.
-        case (any: AtomicType, StringType) if any != StringType => Cast(e, StringType)
+        case (any: AtomicType, StringType) if any != StringType =>
+          Cast(e, StringType)
 
         // When we reach here, input type is not acceptable for any types in this type collection,
         // try to find the first one we can implicitly cast.
-        case (_, TypeCollection(types)) => types.flatMap(implicitCast(e, _)).headOption.orNull
+        case (_, TypeCollection(types)) =>
+          types.flatMap(implicitCast(e, _)).headOption.orNull
 
         // Else, just return the same input expression
         case _ => null

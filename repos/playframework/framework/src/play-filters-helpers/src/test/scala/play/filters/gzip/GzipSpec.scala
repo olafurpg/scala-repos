@@ -9,7 +9,7 @@ import java.util.zip.GZIPOutputStream
 import org.apache.commons.io.IOUtils
 
 import concurrent.Await
-import play.api.libs.iteratee.{ Iteratee, Enumeratee, Enumerator }
+import play.api.libs.iteratee.{Iteratee, Enumeratee, Enumerator}
 import concurrent.duration._
 import org.specs2.mutable.Specification
 
@@ -20,15 +20,18 @@ object GzipSpec extends Specification {
   "gzip" should {
 
     /**
-     * Uses both Java's GZIPOutputStream and GZIPInputStream to verify correctness.
-     */
+      * Uses both Java's GZIPOutputStream and GZIPInputStream to verify correctness.
+      */
     def test(values: String*) = {
       import java.io._
       import java.util.zip._
 
       val valuesBytes = values.map(_.getBytes("utf-8"))
 
-      val result: Array[Byte] = Await.result(Enumerator.enumerate(valuesBytes) &> Gzip.gzip() |>>> Iteratee.consume[Array[Byte]](), Duration.Inf)
+      val result: Array[Byte] = Await.result(
+          Enumerator.enumerate(valuesBytes) &> Gzip.gzip() |>>> Iteratee
+            .consume[Array[Byte]](),
+          Duration.Inf)
 
       // Check that it exactly matches the gzip output stream
       val baos = new ByteArrayOutputStream()
@@ -48,7 +51,9 @@ object GzipSpec extends Specification {
       // Check that it can be unzipped
       val bais = new ByteArrayInputStream(result)
       val is = new GZIPInputStream(bais)
-      val check: Array[Byte] = Await.result(Enumerator.fromStream(is) |>>> Iteratee.consume[Array[Byte]](), 10.seconds)
+      val check: Array[Byte] = Await.result(
+          Enumerator.fromStream(is) |>>> Iteratee.consume[Array[Byte]](),
+          10.seconds)
       values.mkString("") must_== new String(check, "utf-8")
     }
 
@@ -76,8 +81,8 @@ object GzipSpec extends Specification {
 
     "gzip multiple large random inputs" in {
       test(scala.util.Random.nextString(10000),
-        scala.util.Random.nextString(10000),
-        scala.util.Random.nextString(10000))
+           scala.util.Random.nextString(10000),
+           scala.util.Random.nextString(10000))
     }
   }
 
@@ -100,16 +105,22 @@ object GzipSpec extends Specification {
       }
     }
 
-    def test(value: String, gunzip: Enumeratee[Array[Byte], Array[Byte]] = Gzip.gunzip(), chunkSize: Option[Int] = None) = {
+    def test(value: String,
+             gunzip: Enumeratee[Array[Byte], Array[Byte]] = Gzip.gunzip(),
+             chunkSize: Option[Int] = None) = {
       testInput(gzip(value), value, gunzip, chunkSize)
     }
 
-    def testInput(input: Array[Byte], expected: String, gunzip: Enumeratee[Array[Byte], Array[Byte]] = Gzip.gunzip(), chunkSize: Option[Int] = None) = {
+    def testInput(input: Array[Byte],
+                  expected: String,
+                  gunzip: Enumeratee[Array[Byte], Array[Byte]] = Gzip.gunzip(),
+                  chunkSize: Option[Int] = None) = {
       val gzipEnumerator = chunkSize match {
         case Some(size) => Enumerator.enumerate(input.grouped(size))
         case None => Enumerator(input)
       }
-      val future = gzipEnumerator &> gunzip |>>> Iteratee.consume[Array[Byte]]()
+      val future =
+        gzipEnumerator &> gunzip |>>> Iteratee.consume[Array[Byte]]()
       val result = new String(Await.result(future, 10.seconds), "utf-8")
       result must_== expected
     }
@@ -149,6 +160,5 @@ object GzipSpec extends Specification {
     "gunzip a stream with a filename in individual bytes" in {
       testInput(read("helloWorld.txt.gz"), "Hello world", chunkSize = Some(1))
     }
-
   }
 }

@@ -8,13 +8,13 @@ package reflect
 package internal
 
 /** Provides delegates to the reporter doing the actual work.
- *  All forwarding methods should be marked final,
- *  but some subclasses out of our reach still override them.
- *
- *  Eventually, this interface should be reduced to one method: `reporter`,
- *  and clients should indirect themselves (reduce duplication of forwarders).
- */
-trait Reporting { self : Positions =>
+  *  All forwarding methods should be marked final,
+  *  but some subclasses out of our reach still override them.
+  *
+  *  Eventually, this interface should be reduced to one method: `reporter`,
+  *  and clients should indirect themselves (reduce duplication of forwarders).
+  */
+trait Reporting { self: Positions =>
   def reporter: Reporter
   def currentRun: RunReporting
 
@@ -35,21 +35,27 @@ trait Reporting { self : Positions =>
         supplementedError = true
         supplementTyperState(errorMessage)
       }
-
   }
 
   // overridden in Global
   def supplementTyperState(errorMessage: String): String = errorMessage
 
-  def supplementErrorMessage(errorMessage: String) = currentRun.reporting.supplementErrorMessage(errorMessage)
+  def supplementErrorMessage(errorMessage: String) =
+    currentRun.reporting.supplementErrorMessage(errorMessage)
 
-  @deprecatedOverriding("This forwards to the corresponding method in reporter -- override reporter instead", "2.11.2")
-  def inform(msg: String): Unit      = inform(NoPosition, msg)
-  @deprecatedOverriding("This forwards to the corresponding method in reporter -- override reporter instead", "2.11.2")
-  def warning(msg: String): Unit     = warning(NoPosition, msg)
+  @deprecatedOverriding(
+      "This forwards to the corresponding method in reporter -- override reporter instead",
+      "2.11.2")
+  def inform(msg: String): Unit = inform(NoPosition, msg)
+  @deprecatedOverriding(
+      "This forwards to the corresponding method in reporter -- override reporter instead",
+      "2.11.2")
+  def warning(msg: String): Unit = warning(NoPosition, msg)
   // globalError(msg: String) used to abort -- not sure that was a good idea, so I made it more regular
   // (couldn't find any uses that relied on old behavior)
-  @deprecatedOverriding("This forwards to the corresponding method in reporter -- override reporter instead", "2.11.2")
+  @deprecatedOverriding(
+      "This forwards to the corresponding method in reporter -- override reporter instead",
+      "2.11.2")
   def globalError(msg: String): Unit = globalError(NoPosition, msg)
 
   def abort(msg: String): Nothing = {
@@ -59,27 +65,37 @@ trait Reporting { self : Positions =>
     throw new FatalError(augmented)
   }
 
-  @deprecatedOverriding("This forwards to the corresponding method in reporter -- override reporter instead", "2.11.2")
-  def inform(pos: Position, msg: String)      = reporter.echo(pos, msg)
-  @deprecatedOverriding("This forwards to the corresponding method in reporter -- override reporter instead", "2.11.2")
-  def warning(pos: Position, msg: String)     = reporter.warning(pos, msg)
-  @deprecatedOverriding("This forwards to the corresponding method in reporter -- override reporter instead", "2.11.2")
+  @deprecatedOverriding(
+      "This forwards to the corresponding method in reporter -- override reporter instead",
+      "2.11.2")
+  def inform(pos: Position, msg: String) = reporter.echo(pos, msg)
+  @deprecatedOverriding(
+      "This forwards to the corresponding method in reporter -- override reporter instead",
+      "2.11.2")
+  def warning(pos: Position, msg: String) = reporter.warning(pos, msg)
+  @deprecatedOverriding(
+      "This forwards to the corresponding method in reporter -- override reporter instead",
+      "2.11.2")
   def globalError(pos: Position, msg: String) = reporter.error(pos, msg)
 }
 
 import util.Position
 
 /** Report information, warnings and errors.
- *
- *  This describes the (future) external interface for issuing information, warnings and errors.
- *  Currently, scala.tools.nsc.Reporter is used by sbt/ide/partest.
- */
+  *
+  *  This describes the (future) external interface for issuing information, warnings and errors.
+  *  Currently, scala.tools.nsc.Reporter is used by sbt/ide/partest.
+  */
 abstract class Reporter {
-  protected def info0(pos: Position, msg: String, severity: Severity, force: Boolean): Unit
+  protected def info0(
+      pos: Position, msg: String, severity: Severity, force: Boolean): Unit
 
-  def echo(pos: Position, msg: String): Unit    = info0(pos, msg, INFO, force = true)
-  def warning(pos: Position, msg: String): Unit = info0(pos, msg, WARNING, force = false)
-  def error(pos: Position, msg: String): Unit   = info0(pos, msg, ERROR, force = false)
+  def echo(pos: Position, msg: String): Unit =
+    info0(pos, msg, INFO, force = true)
+  def warning(pos: Position, msg: String): Unit =
+    info0(pos, msg, WARNING, force = false)
+  def error(pos: Position, msg: String): Unit =
+    info0(pos, msg, ERROR, force = false)
 
   type Severity
   val INFO: Severity
@@ -89,10 +105,10 @@ abstract class Reporter {
   def count(severity: Severity): Int
   def resetCount(severity: Severity): Unit
 
-  def errorCount: Int   = count(ERROR)
+  def errorCount: Int = count(ERROR)
   def warningCount: Int = count(WARNING)
 
-  def hasErrors: Boolean   = count(ERROR) > 0
+  def hasErrors: Boolean = count(ERROR) > 0
   def hasWarnings: Boolean = count(WARNING) > 0
 
   def reset(): Unit = {
@@ -109,11 +125,13 @@ abstract class Reporter {
 
 // TODO: move into superclass once partest cuts tie on Severity
 abstract class ReporterImpl extends Reporter {
-  class Severity(val id: Int)(name: String) { var count: Int = 0 ; override def toString = name}
-  object INFO    extends Severity(0)("INFO")
+  class Severity(val id: Int)(name: String) {
+    var count: Int = 0; override def toString = name
+  }
+  object INFO extends Severity(0)("INFO")
   object WARNING extends Severity(1)("WARNING")
-  object ERROR   extends Severity(2)("ERROR")
+  object ERROR extends Severity(2)("ERROR")
 
-  def count(severity: Severity): Int       = severity.count
+  def count(severity: Severity): Int = severity.count
   def resetCount(severity: Severity): Unit = severity.count = 0
 }

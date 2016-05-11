@@ -22,7 +22,6 @@ import org.junit.Assert._
 import test._
 import testutil._
 
-
 class FinTests {
   import nat._
   import fin._

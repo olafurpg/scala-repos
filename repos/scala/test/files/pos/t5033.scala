@@ -1,5 +1,5 @@
 trait Eater {
-  type Food[T]
+  type Food [T]
 }
 
 trait Fruit {

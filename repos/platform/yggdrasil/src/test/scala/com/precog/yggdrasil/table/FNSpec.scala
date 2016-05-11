@@ -56,7 +56,7 @@ class FNSpec extends Specification {
       (f2(col4, col0) |> f1).isDefinedAt(0) must beFalse
       (f2(col5, col1) |> f1).isDefinedAt(0) must beFalse
       (f2(col4, col1) |> f1 |> f1).isDefinedAt(0) must beFalse
-      */
+     */
     }
 
     /* performance test
@@ -103,22 +103,24 @@ class FNSpec extends Specification {
       //pt.start
       ok
     }
-    */
+   */
   }
 
-
-  val AddOneLongP = CF1P ("testing::ct::addOneLong") {
-    case (c: LongColumn) => new LongColumn {
-      def isDefinedAt(row: Int) = c.isDefinedAt(row)
-      def apply(row: Int) = c(row) + 1
-    }
+  val AddOneLongP = CF1P("testing::ct::addOneLong") {
+    case (c: LongColumn) =>
+      new LongColumn {
+        def isDefinedAt(row: Int) = c.isDefinedAt(row)
+        def apply(row: Int) = c(row) + 1
+      }
   }
 
   val DivZeroLongP = CF2P("testing::ct::divzerolong") {
-    case (c1: LongColumn, c2: LongColumn) => new LongColumn {
-      def isDefinedAt(row: Int) = c1.isDefinedAt(row) && c2.isDefinedAt(row) && c2(row) != 0
-      def apply(row: Int) = c1(row) / c2(row)
-    }
+    case (c1: LongColumn, c2: LongColumn) =>
+      new LongColumn {
+        def isDefinedAt(row: Int) =
+          c1.isDefinedAt(row) && c2.isDefinedAt(row) && c2(row) != 0
+        def apply(row: Int) = c1(row) / c2(row)
+      }
   }
 }
 

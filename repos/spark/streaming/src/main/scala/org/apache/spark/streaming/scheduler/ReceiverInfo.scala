@@ -20,9 +20,9 @@ package org.apache.spark.streaming.scheduler
 import org.apache.spark.annotation.DeveloperApi
 
 /**
- * :: DeveloperApi ::
- * Class having information about a receiver
- */
+  * :: DeveloperApi ::
+  * Class having information about a receiver
+  */
 @DeveloperApi
 case class ReceiverInfo(
     streamId: Int,
@@ -33,5 +33,4 @@ case class ReceiverInfo(
     lastErrorMessage: String = "",
     lastError: String = "",
     lastErrorTime: Long = -1L
-   ) {
-}
+) {}

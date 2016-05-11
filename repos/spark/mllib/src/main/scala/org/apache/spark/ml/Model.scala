@@ -21,22 +21,23 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.ml.param.ParamMap
 
 /**
- * :: DeveloperApi ::
- * A fitted model, i.e., a [[Transformer]] produced by an [[Estimator]].
- *
- * @tparam M model type
- */
+  * :: DeveloperApi ::
+  * A fitted model, i.e., a [[Transformer]] produced by an [[Estimator]].
+  *
+  * @tparam M model type
+  */
 @DeveloperApi
 abstract class Model[M <: Model[M]] extends Transformer {
+
   /**
-   * The parent estimator that produced this model.
-   * Note: For ensembles' component Models, this value can be null.
-   */
+    * The parent estimator that produced this model.
+    * Note: For ensembles' component Models, this value can be null.
+    */
   @transient var parent: Estimator[M] = _
 
   /**
-   * Sets the parent of this model (Java API).
-   */
+    * Sets the parent of this model (Java API).
+    */
   def setParent(parent: Estimator[M]): M = {
     this.parent = parent
     this.asInstanceOf[M]

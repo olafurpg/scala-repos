@@ -7,16 +7,13 @@ package scala
 package tools.nsc
 package interpreter
 
-import java.io.{ BufferedReader }
+import java.io.{BufferedReader}
 import session.NoHistory
 
 /** Reads using standard JDK API */
 class SimpleReader(
-  in: BufferedReader,
-  out: JPrintWriter,
-  val interactive: Boolean)
-extends InteractiveReader
-{
+    in: BufferedReader, out: JPrintWriter, val interactive: Boolean)
+    extends InteractiveReader {
   val history = NoHistory
   val completion = NoCompletion
 
@@ -28,7 +25,8 @@ extends InteractiveReader
     echo(prompt)
     readOneLine()
   }
-  protected def readOneKey(prompt: String) = sys.error("No char-based input in SimpleReader")
+  protected def readOneKey(prompt: String) =
+    sys.error("No char-based input in SimpleReader")
 
   protected def readOneLine(): String = in.readLine()
   protected def echo(s: String): Unit = if (interactive) {
@@ -38,10 +36,12 @@ extends InteractiveReader
 }
 
 object SimpleReader {
-  def defaultIn  = Console.in
+  def defaultIn = Console.in
   def defaultOut = new JPrintWriter(Console.out)
 
-  def apply(in: BufferedReader = defaultIn, out: JPrintWriter = defaultOut, interactive: Boolean = true): SimpleReader =
+  def apply(in: BufferedReader = defaultIn,
+            out: JPrintWriter = defaultOut,
+            interactive: Boolean = true): SimpleReader =
     new SimpleReader(in, out, interactive)
 }
 

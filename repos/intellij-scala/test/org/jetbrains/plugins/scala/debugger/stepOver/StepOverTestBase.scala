@@ -7,19 +7,24 @@ import org.junit.Assert
 import scala.io.Source
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 abstract class StepOverTestBase extends ScalaDebuggerTestCase {
   def doStepOver(): Unit = {
-    val stepOverCommand = getDebugProcess.createStepOverCommand(suspendContext, false)
+    val stepOverCommand =
+      getDebugProcess.createStepOverCommand(suspendContext, false)
     getDebugProcess.getManagerThread.invokeAndWait(stepOverCommand)
   }
 
   def testStepThrough(expectedLineNumbers: Seq[Int]): Unit = {
     val file = getFileInSrc(mainFileName)
     val lines = Source.fromFile(file).getLines().toSeq
-    Assert.assertTrue(s"File should start with definition of object $mainClassName" , lines.head.startsWith(s"object $mainClassName"))
-    Assert.assertTrue("Method main should be defined on a second line", lines(1).trim.startsWith("def main") && lines(2).trim.nonEmpty)
+    Assert.assertTrue(
+        s"File should start with definition of object $mainClassName",
+        lines.head.startsWith(s"object $mainClassName"))
+    Assert.assertTrue("Method main should be defined on a second line",
+                      lines(1).trim.startsWith("def main") &&
+                      lines(2).trim.nonEmpty)
 
     def checkLine(expectedLineNumber: Int): Unit = {
       val actualLineNumber = currentLineNumber
@@ -41,7 +46,8 @@ abstract class StepOverTestBase extends ScalaDebuggerTestCase {
         if (expectedNumbers.hasNext) checkLine(expectedNumbers.next())
         else {
           val lineNumber = currentLineNumber
-          Assert.fail(s"No expected lines left, stopped at line $lineNumber: ${lines(lineNumber)}")
+          Assert.fail(
+              s"No expected lines left, stopped at line $lineNumber: ${lines(lineNumber)}")
         }
         doStepOver()
       }
@@ -52,7 +58,9 @@ abstract class StepOverTestBase extends ScalaDebuggerTestCase {
     managed[Integer] {
       val location = suspendContext.getFrameProxy.location
       inReadAction {
-        new ScalaPositionManager(getDebugProcess).getSourcePosition(location).getLine
+        new ScalaPositionManager(getDebugProcess)
+          .getSourcePosition(location)
+          .getLine
       }
     }
   }

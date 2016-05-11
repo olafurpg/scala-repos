@@ -1,8 +1,7 @@
-
-import scala.language.{ implicitConversions }
+import scala.language.{implicitConversions}
 abstract class BaseList {
   type Node <: NodeImpl;
-  implicit def convertNode(ni : NodeImpl) = ni.asInstanceOf[Node];
+  implicit def convertNode(ni: NodeImpl) = ni.asInstanceOf[Node];
   abstract class NodeImpl;
 }
 abstract class LinkedList extends BaseList {
@@ -17,13 +16,14 @@ trait OffsetList extends LinkedList {
 trait PriorityTree extends BaseList {
   type Node <: NodeImpl;
   trait NodeImpl extends super.NodeImpl {
-    def chop : Node = this;
+    def chop: Node = this;
   }
 }
 
-trait PrecedenceParser  extends LinkedList with PriorityTree {
+trait PrecedenceParser extends LinkedList with PriorityTree {
   type Node <: NodeImpl;
-  trait NodeImpl extends super[LinkedList].NodeImpl with super[PriorityTree].NodeImpl;
+  trait NodeImpl
+      extends super [LinkedList].NodeImpl with super [PriorityTree].NodeImpl;
 }
 
 trait Matcher extends PrecedenceParser {
@@ -31,9 +31,9 @@ trait Matcher extends PrecedenceParser {
   trait NodeImpl extends super.NodeImpl;
 
   type Matchable <: Node with MatchableImpl;
-  implicit def convertMatchable(m : MatchableImpl) = m.asInstanceOf[Matchable];
+  implicit def convertMatchable(m: MatchableImpl) = m.asInstanceOf[Matchable];
   trait MatchableImpl extends NodeImpl {
-    override def chop : Node = {
+    override def chop: Node = {
       Console.println("passed"); super.chop;
     }
   }
@@ -41,7 +41,8 @@ trait Matcher extends PrecedenceParser {
 
 class Test1 extends OffsetList with Matcher {
   type Node = NodeImpl;
-  trait NodeImpl extends super[OffsetList].NodeImpl with super[Matcher].NodeImpl;
+  trait NodeImpl
+      extends super [OffsetList].NodeImpl with super [Matcher].NodeImpl;
   class MatchableImpl extends super.MatchableImpl with NodeImpl;
   type Matchable = MatchableImpl;
 }

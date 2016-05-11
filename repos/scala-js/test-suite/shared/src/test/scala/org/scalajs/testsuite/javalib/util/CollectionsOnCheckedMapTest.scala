@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -29,10 +29,11 @@ trait CollectionsOnCheckedMapTest extends CollectionsOnMapsTest {
       override def implementationName: String =
         s"checkedMap(${originalFactory.implementationName})"
 
-      def empty[K, V](implicit kct: ClassTag[K], vct: ClassTag[V]): ju.Map[K, V] = {
+      def empty[K, V](
+          implicit kct: ClassTag[K], vct: ClassTag[V]): ju.Map[K, V] = {
         ju.Collections.checkedMap(originalFactory.empty[K, V],
-            kct.runtimeClass.asInstanceOf[Class[K]],
-            vct.runtimeClass.asInstanceOf[Class[V]])
+                                  kct.runtimeClass.asInstanceOf[Class[K]],
+                                  vct.runtimeClass.asInstanceOf[Class[V]])
       }
 
       override def allowsNullKeys: Boolean =
@@ -60,7 +61,7 @@ trait CollectionsOnCheckedMapTest extends CollectionsOnMapsTest {
       m.asInstanceOf[ju.Map[A, A]]
     }
     expectThrows(classOf[ClassCastException],
-      singletonMap().entrySet().head.setValue(new A))
+                 singletonMap().entrySet().head.setValue(new A))
   }
 
   private def superMap(): ju.Map[A, A] =
@@ -76,8 +77,10 @@ trait CollectionsOnCheckedSortedMapTest extends CollectionsOnSortedMapsTest {
       override def implementationName: String =
         s"checkedSortedMap(${originalFactory.implementationName})"
 
-      def empty[K, V](implicit kct: ClassTag[K], vct: ClassTag[V]): ju.SortedMap[K, V] = {
-        ju.Collections.checkedSortedMap(originalFactory.empty[K, V],
+      def empty[K, V](
+          implicit kct: ClassTag[K], vct: ClassTag[V]): ju.SortedMap[K, V] = {
+        ju.Collections.checkedSortedMap(
+            originalFactory.empty[K, V],
             kct.runtimeClass.asInstanceOf[Class[K]],
             vct.runtimeClass.asInstanceOf[Class[V]])
       }
@@ -107,7 +110,7 @@ trait CollectionsOnCheckedSortedMapTest extends CollectionsOnSortedMapsTest {
       m.asInstanceOf[ju.Map[A, A]]
     }
     expectThrows(classOf[ClassCastException],
-        singletonMap().entrySet().head.setValue(new A))
+                 singletonMap().entrySet().head.setValue(new A))
   }
 
   private def superMap(): ju.Map[A, A] =

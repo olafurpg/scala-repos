@@ -3,10 +3,9 @@ package utils
 
 import scala.tools.nsc.Global
 
-trait Utils extends NodePrinters
-               with Extractors
-               with SymbolTables
-               with StdAttachments {
+trait Utils
+    extends NodePrinters with Extractors with SymbolTables
+    with StdAttachments {
 
   val global: Global
   val typer: global.analyzer.Typer

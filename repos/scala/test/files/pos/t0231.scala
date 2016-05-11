@@ -7,7 +7,7 @@ class Foo {
 class Bar extends Foo {
   object b {
     //println("b: " + a) //OK
-    println("b: " + Bar.super.aaa)
+    println("b: " + Bar. super.aaa)
   }
 }
 

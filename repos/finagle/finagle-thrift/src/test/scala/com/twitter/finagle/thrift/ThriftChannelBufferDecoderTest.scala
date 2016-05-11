@@ -10,7 +10,7 @@ import org.scalatest.mock.MockitoSugar
 @RunWith(classOf[JUnitRunner])
 class ThriftChannelBufferDecoderTest extends FunSuite with MockitoSugar {
 
-  class ThriftChannelBufferDecoderContext{
+  class ThriftChannelBufferDecoderContext {
     val decoder: ThriftChannelBufferDecoder = new ThriftChannelBufferDecoder
     val ctx: ChannelHandlerContext = mock[ChannelHandlerContext]
     val ch: Channel = mock[Channel]
@@ -28,7 +28,8 @@ class ThriftChannelBufferDecoderTest extends FunSuite with MockitoSugar {
     }
   }
 
-  test("ThriftChannelBufferDecoder convert channel buffers to arrays with offset") {
+  test(
+      "ThriftChannelBufferDecoder convert channel buffers to arrays with offset") {
     val c = new ThriftChannelBufferDecoderContext
     import c._
 

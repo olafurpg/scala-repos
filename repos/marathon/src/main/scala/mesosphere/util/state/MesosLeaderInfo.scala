@@ -16,7 +16,8 @@ trait MesosLeaderInfo {
   def onNewMasterInfo(master: MasterInfo): Unit
 }
 
-case class ConstMesosLeaderInfo(currentLeaderUrl: Option[String]) extends MesosLeaderInfo {
+case class ConstMesosLeaderInfo(currentLeaderUrl: Option[String])
+    extends MesosLeaderInfo {
 
   override def onNewMasterInfo(ignored: MasterInfo): Unit = {}
 }
@@ -33,4 +34,3 @@ class MutableMesosLeaderInfo extends MesosLeaderInfo {
     leaderUrl = Some(s"http://${master.getHostname}:${master.getPort}/")
   }
 }
-

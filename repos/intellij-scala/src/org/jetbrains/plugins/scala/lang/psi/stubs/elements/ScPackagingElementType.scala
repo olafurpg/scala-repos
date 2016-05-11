@@ -10,12 +10,13 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 
 /**
- * @author ilyas
- */
-
-class ScPackagingElementType extends ScPackageContainerElementType[ScPackaging]("packaging") {
+  * @author ilyas
+  */
+class ScPackagingElementType
+    extends ScPackageContainerElementType[ScPackaging]("packaging") {
 
   def createElement(node: ASTNode): PsiElement = new ScPackagingImpl(node)
 
-  def createPsi(stub: ScPackageContainerStub): ScPackaging = new ScPackagingImpl(stub)
+  def createPsi(stub: ScPackageContainerStub): ScPackaging =
+    new ScPackagingImpl(stub)
 }

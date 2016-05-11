@@ -91,6 +91,10 @@ trait CanvasRenderingContext2D extends js.Object {
   def fill(): Unit = js.native
   def stroke(): Unit = js.native
 
-  def arc(x: Double, y: Double, radius: Double, startAngle: Double,
-      endAngle: Double, anticlockwise: Boolean): Unit = js.native
+  def arc(x: Double,
+          y: Double,
+          radius: Double,
+          startAngle: Double,
+          endAngle: Double,
+          anticlockwise: Boolean): Unit = js.native
 }

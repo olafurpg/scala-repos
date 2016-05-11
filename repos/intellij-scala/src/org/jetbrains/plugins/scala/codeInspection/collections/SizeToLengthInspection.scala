@@ -6,10 +6,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class SizeToLengthInspection extends OperationOnCollectionInspection {
-  override def possibleSimplificationTypes: Array[SimplificationType] = Array(SizeToLength)
+  override def possibleSimplificationTypes: Array[SimplificationType] =
+    Array(SizeToLength)
 }
 
 object SizeToLength extends SimplificationType {
@@ -18,15 +19,20 @@ object SizeToLength extends SimplificationType {
 
   override def getSimplification(expr: ScExpression): Option[Simplification] = {
     expr match {
-      case (qual @ ExpressionType(tpe))`.size`() if isArray(qual) || isString(tpe) =>
-        Some(replace(expr).withText(invocationText(qual, "length")).highlightFrom(qual))
+      case (qual @ ExpressionType(tpe)) `.size` ()
+          if isArray(qual) || isString(tpe) =>
+        Some(
+            replace(expr)
+              .withText(invocationText(qual, "length"))
+              .highlightFrom(qual))
       case _ => None
     }
   }
-  
+
   def isString(tp: ScType) = {
     val extracted = ScType.extractDesignatorSingletonType(tp).getOrElse(tp)
     val canonicalText = extracted.canonicalText
-    canonicalText == "_root_.java.lang.String" || canonicalText == "_root_.scala.Predef.String"
+    canonicalText == "_root_.java.lang.String" ||
+    canonicalText == "_root_.scala.Predef.String"
   }
 }

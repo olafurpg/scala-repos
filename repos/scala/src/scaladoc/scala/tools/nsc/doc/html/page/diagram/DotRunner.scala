@@ -19,7 +19,7 @@ import model._
 class DotRunner(settings: doc.Settings) {
 
   private[this] var dotAttempts = 0
-  private[this] var dotProcess: DotProcess  = null
+  private[this] var dotProcess: DotProcess = null
 
   def feedToDot(dotInput: String, template: DocTemplateEntity): String = {
 
@@ -29,8 +29,7 @@ class DotRunner(settings: doc.Settings) {
           settings.printMsg("Graphviz will be restarted...\n")
         dotAttempts += 1
         dotProcess = new DotProcess(settings)
-      } else
-        return null
+      } else return null
     }
 
     val tStart = System.currentTimeMillis
@@ -43,20 +42,26 @@ class DotRunner(settings: doc.Settings) {
       dotProcess = null
       if (dotAttempts == 1 + settings.docDiagramsDotRestart.value) {
         settings.printMsg("\n")
-        settings.printMsg("**********************************************************************")
-        settings.printMsg("Diagrams will be disabled for this run because the graphviz dot tool")
-        settings.printMsg("has malfunctioned too many times. These scaladoc flags may help:")
+        settings.printMsg(
+            "**********************************************************************")
+        settings.printMsg(
+            "Diagrams will be disabled for this run because the graphviz dot tool")
+        settings.printMsg(
+            "has malfunctioned too many times. These scaladoc flags may help:")
         settings.printMsg("")
         val baseList = List(settings.docDiagramsDebug,
                             settings.docDiagramsDotPath,
                             settings.docDiagramsDotRestart,
                             settings.docDiagramsDotTimeout)
-        val width    = (baseList map (_.helpSyntax.length)).max
-        def helpStr(s: doc.Settings#Setting) = ("%-" + width + "s") format (s.helpSyntax) + "  " + s.helpDescription
-        baseList.foreach((sett: doc.Settings#Setting) => settings.printMsg(helpStr(sett)))
-        settings.printMsg("\nPlease note that graphviz package version 2.26 or above is required.")
-        settings.printMsg("**********************************************************************\n\n")
-
+        val width = (baseList map (_.helpSyntax.length)).max
+        def helpStr(s: doc.Settings#Setting) =
+          ("%-" + width + "s") format (s.helpSyntax) + "  " + s.helpDescription
+        baseList.foreach(
+            (sett: doc.Settings#Setting) => settings.printMsg(helpStr(sett)))
+        settings.printMsg(
+            "\nPlease note that graphviz package version 2.26 or above is required.")
+        settings.printMsg(
+            "**********************************************************************\n\n")
       }
     }
 
@@ -64,16 +69,16 @@ class DotRunner(settings: doc.Settings) {
   }
 
   def cleanup() =
-    if (dotProcess != null)
-      dotProcess.cleanup()
+    if (dotProcess != null) dotProcess.cleanup()
 }
 
 class DotProcess(settings: doc.Settings) {
 
-  @volatile var error: Boolean = false           // signal an error
-  val inputString = new SyncVar[String]                 // used for the dot process input
-  val outputString = new SyncVar[String]                // used for the dot process output
-  val errorBuffer: StringBuffer = new StringBuffer() // buffer used for both dot process error console AND logging
+  @volatile var error: Boolean = false // signal an error
+  val inputString = new SyncVar[String] // used for the dot process input
+  val outputString = new SyncVar[String] // used for the dot process output
+  val errorBuffer: StringBuffer =
+    new StringBuffer() // buffer used for both dot process error console AND logging
 
   // set in only one place, in the main thread
   var process: Process = null
@@ -90,7 +95,8 @@ class DotProcess(settings: doc.Settings) {
       // process creation
       if (process == null) {
         val procIO = new ProcessIO(inputFn(_), outputFn(_), errorFn(_))
-        val processBuilder: ProcessBuilder = Seq(settings.docDiagramsDotPath.value, "-Tsvg")
+        val processBuilder: ProcessBuilder = Seq(
+            settings.docDiagramsDotPath.value, "-Tsvg")
         process = processBuilder.run(procIO)
       }
 
@@ -98,15 +104,16 @@ class DotProcess(settings: doc.Settings) {
       assert(!inputString.isSet)
       assert(!outputString.isSet)
       inputString.put(input)
-      var result = outputString.take(settings.docDiagramsDotTimeout.value * 1000L)
+      var result =
+        outputString.take(settings.docDiagramsDotTimeout.value * 1000L)
       if (error) result = null
 
       result
-
     } catch {
       case exc: Throwable =>
         errorBuffer.append("  Main thread in " + templateName + ": " +
-          (if (exc.isInstanceOf[NoSuchElementException]) "Timeout" else "Exception: " + exc))
+            (if (exc.isInstanceOf[NoSuchElementException]) "Timeout"
+             else "Exception: " + exc))
         error = true
         return null
     }
@@ -131,22 +138,31 @@ class DotProcess(settings: doc.Settings) {
 
     if (_error) {
       if (settings.docDiagramsDebug.value) {
-        settings.printMsg("\n**********************************************************************")
-        settings.printMsg("The graphviz dot diagram tool has malfunctioned and will be restarted.")
+        settings.printMsg(
+            "\n**********************************************************************")
+        settings.printMsg(
+            "The graphviz dot diagram tool has malfunctioned and will be restarted.")
         settings.printMsg("\nThe following is the log of the failure:")
         settings.printMsg(errorBuffer.toString)
         settings.printMsg("  Cleanup: Last template: " + templateName)
-        settings.printMsg("  Cleanup: Last dot input: \n    " + templateInput.replaceAll("\n","\n    ") + "\n")
-        settings.printMsg("  Cleanup: Dot path: " + settings.docDiagramsDotPath.value)
+        settings.printMsg("  Cleanup: Last dot input: \n    " +
+            templateInput.replaceAll("\n", "\n    ") + "\n")
+        settings.printMsg(
+            "  Cleanup: Dot path: " + settings.docDiagramsDotPath.value)
         if (process != null)
           settings.printMsg("  Cleanup: Dot exit code: " + process.exitValue)
-        settings.printMsg("**********************************************************************")
+        settings.printMsg(
+            "**********************************************************************")
       } else {
         // we shouldn't just sit there for 50s not reporting anything, no?
-        settings.printMsg("Graphviz dot encountered an error when generating the diagram for:")
+        settings.printMsg(
+            "Graphviz dot encountered an error when generating the diagram for:")
         settings.printMsg(templateName)
-        settings.printMsg("These are usually spurious errors, but if you notice a persistent error on")
-        settings.printMsg("a diagram, please use the " + settings.docDiagramsDebug.name + " flag and report a bug with the output.")
+        settings.printMsg(
+            "These are usually spurious errors, but if you notice a persistent error on")
+        settings.printMsg(
+            "a diagram, please use the " + settings.docDiagramsDebug.name +
+            " flag and report a bug with the output.")
       }
     }
   }
@@ -175,7 +191,8 @@ class DotProcess(settings: doc.Settings) {
       case exc: Throwable =>
         error = true
         stdin.close()
-        errorBuffer.append("  Input thread in " + templateName + ": Exception: " + exc + "\n")
+        errorBuffer.append(
+            "  Input thread in " + templateName + ": Exception: " + exc + "\n")
     }
   }
 
@@ -201,7 +218,8 @@ class DotProcess(settings: doc.Settings) {
       case exc: Throwable =>
         error = true
         stdOut.close()
-        errorBuffer.append("  Output thread in " + templateName + ": Exception: " + exc + "\n")
+        errorBuffer.append("  Output thread in " + templateName +
+            ": Exception: " + exc + "\n")
     }
   }
 
@@ -219,7 +237,8 @@ class DotProcess(settings: doc.Settings) {
       case exc: Throwable =>
         error = true
         stdErr.close()
-        errorBuffer.append("  Error thread in " + templateName + ": Exception: " + exc + "\n")
+        errorBuffer.append(
+            "  Error thread in " + templateName + ": Exception: " + exc + "\n")
     }
   }
 }

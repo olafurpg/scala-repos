@@ -26,10 +26,13 @@ import scala.language.existentials
 private[streaming] sealed trait ReceivedBlock
 
 /** class representing a block received as an ArrayBuffer */
-private[streaming] case class ArrayBufferBlock(arrayBuffer: ArrayBuffer[_]) extends ReceivedBlock
+private[streaming] case class ArrayBufferBlock(arrayBuffer: ArrayBuffer[_])
+    extends ReceivedBlock
 
 /** class representing a block received as an Iterator */
-private[streaming] case class IteratorBlock(iterator: Iterator[_]) extends ReceivedBlock
+private[streaming] case class IteratorBlock(iterator: Iterator[_])
+    extends ReceivedBlock
 
 /** class representing a block received as an ByteBuffer */
-private[streaming] case class ByteBufferBlock(byteBuffer: ByteBuffer) extends ReceivedBlock
+private[streaming] case class ByteBufferBlock(byteBuffer: ByteBuffer)
+    extends ReceivedBlock

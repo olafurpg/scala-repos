@@ -19,7 +19,6 @@
  */
 package com.precog.muspelheim
 
-
 import com.precog.yggdrasil._
 import com.precog.yggdrasil.execution.EvaluationContext
 import com.precog.common._
@@ -108,13 +107,13 @@ trait EnrichmentSpecs extends EvalStackSpecs {
 
       val (_, actual) = results.head
 
-      val expected = SObject(Map(
-        "email" -> SString("nobody@precog.com"),
-        "accountId" -> SString("dummyAccount"),
-        "name" -> SString("Tom"),
-        "age" -> SDecimal(27),
-        "mission" -> SString("Write tons of code."),
-        "status" -> SFalse))
+      val expected = SObject(
+          Map("email" -> SString("nobody@precog.com"),
+              "accountId" -> SString("dummyAccount"),
+              "name" -> SString("Tom"),
+              "age" -> SDecimal(27),
+              "mission" -> SString("Write tons of code."),
+              "status" -> SFalse))
 
       actual must_== expected
     }
@@ -136,9 +135,8 @@ trait EnrichmentSpecs extends EvalStackSpecs {
 
       val (_, actual) = results.head
 
-      val expected = SObject(Map(
-        "email" -> SString("nobody@precog.com"),
-        "accountId" -> SString("dummyAccount")))
+      val expected = SObject(Map("email" -> SString("nobody@precog.com"),
+                                 "accountId" -> SString("dummyAccount")))
 
       actual must_== expected
     }

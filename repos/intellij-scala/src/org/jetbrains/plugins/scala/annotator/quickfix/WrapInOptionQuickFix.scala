@@ -12,10 +12,13 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
 import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 
 /**
- * Nikolay.Tropin
- * 6/27/13
- */
-class WrapInOptionQuickFix(expr: ScExpression, expectedType: TypeResult[ScType], exprType: TypeResult[ScType]) extends IntentionAction {
+  * Nikolay.Tropin
+  * 6/27/13
+  */
+class WrapInOptionQuickFix(expr: ScExpression,
+                           expectedType: TypeResult[ScType],
+                           exprType: TypeResult[ScType])
+    extends IntentionAction {
   def getText: String = ScalaBundle.message("wrap.in.option.hint")
 
   def getFamilyName: String = ScalaBundle.message("wrap.in.option.name")
@@ -27,17 +30,19 @@ class WrapInOptionQuickFix(expr: ScExpression, expectedType: TypeResult[ScType],
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     if (expr.isValid) {
       val newText = "Option(" + expr.getText + ")"
-      val newExpr = ScalaPsiElementFactory.createExpressionFromText(newText, expr.getManager)
+      val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+          newText, expr.getManager)
       expr.replaceExpression(newExpr, removeParenthesis = true)
     }
   }
 
   def startInWriteAction(): Boolean = true
-
 }
 
 object WrapInOptionQuickFix {
-  def isAvailable(expr: ScExpression, expectedType: TypeResult[ScType], exprType: TypeResult[ScType]): Boolean = {
+  def isAvailable(expr: ScExpression,
+                  expectedType: TypeResult[ScType],
+                  exprType: TypeResult[ScType]): Boolean = {
     var result = false
     for {
       scType <- exprType
@@ -47,7 +52,9 @@ object WrapInOptionQuickFix {
         case ScParameterizedType(des, Seq(typeArg)) =>
           ScType.extractClass(des) match {
             case Some(scClass: ScClass)
-              if scClass.qualifiedName == "scala.Option" && scType.conforms(typeArg) => result = true
+                if scClass.qualifiedName == "scala.Option" &&
+                scType.conforms(typeArg) =>
+              result = true
             case _ =>
           }
         case _ =>

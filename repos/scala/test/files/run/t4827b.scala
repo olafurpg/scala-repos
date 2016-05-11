@@ -1,5 +1,5 @@
 package foo {
-  class Foo { }
+  class Foo {}
   object Foo {
     def bippy(x: Int) = x
   }

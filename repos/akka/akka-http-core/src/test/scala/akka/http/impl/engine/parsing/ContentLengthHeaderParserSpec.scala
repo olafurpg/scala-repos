@@ -1,10 +1,9 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.impl.engine.parsing
 
-import org.scalatest.{ WordSpec, Matchers }
+import org.scalatest.{WordSpec, Matchers}
 import akka.util.ByteString
 import akka.http.scaladsl.model.headers.`Content-Length`
 import akka.http.impl.engine.parsing.SpecializedHeaderValueParsers.ContentLengthParser
@@ -30,8 +29,8 @@ class ContentLengthHeaderParserSpec extends WordSpec with Matchers {
   }
 
   def parse(bigint: String): Long = {
-    val (`Content-Length`(length), _) = ContentLengthParser(null, ByteString(bigint + "\r\n").compact, 0, _ ⇒ ())
+    val (`Content-Length`(length), _) = ContentLengthParser(
+        null, ByteString(bigint + "\r\n").compact, 0, _ ⇒ ())
     length
   }
-
 }

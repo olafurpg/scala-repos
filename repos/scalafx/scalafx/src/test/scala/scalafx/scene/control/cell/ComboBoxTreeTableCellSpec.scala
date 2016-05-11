@@ -35,9 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * ComboBoxTreeTableCell Spec tests.
- */
+  * ComboBoxTreeTableCell Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class ComboBoxTreeTableCellSpec[S, T]
-  extends SimpleSFXDelegateSpec[jfxscc.ComboBoxTreeTableCell[S, T], ComboBoxTreeTableCell[S, T]](
-    classOf[jfxscc.ComboBoxTreeTableCell[S, T]], classOf[ComboBoxTreeTableCell[S, T]])
+    extends SimpleSFXDelegateSpec[
+        jfxscc.ComboBoxTreeTableCell[S, T], ComboBoxTreeTableCell[S, T]](
+        classOf[jfxscc.ComboBoxTreeTableCell[S, T]],
+        classOf[ComboBoxTreeTableCell[S, T]])

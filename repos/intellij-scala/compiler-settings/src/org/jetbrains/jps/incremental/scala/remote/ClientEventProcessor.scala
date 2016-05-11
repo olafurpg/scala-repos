@@ -4,8 +4,8 @@ package remote
 import java.io.{PrintStream, PrintWriter}
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class ClientEventProcessor(client: Client) {
   def process(event: Event) {
     event match {
@@ -33,13 +33,14 @@ class ClientEventProcessor(client: Client) {
       case CompilationEndEvent() =>
         client.compilationEnd()
 
-      case WorksheetOutputEvent(text) => 
+      case WorksheetOutputEvent(text) =>
         client.worksheetOutput(text)
     }
   }
 }
 
-class ServerException(message: String, lines: Array[String]) extends Exception {
+class ServerException(message: String, lines: Array[String])
+    extends Exception {
   override def getMessage = message
 
   override def printStackTrace(s: PrintWriter) {

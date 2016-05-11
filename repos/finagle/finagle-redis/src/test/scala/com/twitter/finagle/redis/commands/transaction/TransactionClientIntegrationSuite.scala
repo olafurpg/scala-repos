@@ -16,27 +16,34 @@ final class TransactionClientIntegrationSuite extends RedisClientTest {
 
   test("Correctly set and get transaction", RedisTest, ClientTest) {
     withRedisClient { client =>
-      val txResult = Await.result(client.transaction(Seq(Set(foo, bar), Set(baz, boo))))
+      val txResult =
+        Await.result(client.transaction(Seq(Set(foo, bar), Set(baz, boo))))
       assert(ReplyFormat.toString(txResult.toList) == Seq("OK", "OK"))
     }
   }
 
   test("Correctly hash set and multi get transaction", RedisTest, ClientTest) {
     withRedisClient { client =>
-      val txResult = Await.result(client.transaction(Seq(HSet(foo, bar, baz), HSet(foo, boo, moo),
-        HMGet(foo, Seq(bar, boo)))))
-      assert(ReplyFormat.toString(txResult.toList) == Seq("1", "1", "baz", "moo"))
+      val txResult =
+        Await.result(client.transaction(Seq(HSet(foo, bar, baz),
+                                            HSet(foo, boo, moo),
+                                            HMGet(foo, Seq(bar, boo)))))
+      assert(
+          ReplyFormat.toString(txResult.toList) == Seq("1", "1", "baz", "moo"))
     }
   }
 
-  test("Correctly perform key command on incorrect data type", RedisTest, ClientTest) {
+  test("Correctly perform key command on incorrect data type",
+       RedisTest,
+       ClientTest) {
     withRedisClient { client =>
-      val txResult = Await.result(client.transaction(Seq(HSet(foo, boo, moo), Get(foo),
-        HDel(foo, Seq(boo)))))
+      val txResult = Await.result(client.transaction(
+              Seq(HSet(foo, boo, moo), Get(foo), HDel(foo, Seq(boo)))))
       txResult.toList match {
         case Seq(IntegerReply(1), ErrorReply(message), IntegerReply(1)) =>
           // TODO: the exact error message varies in different versions of redis. fix this later
-          assert(message endsWith "Operation against a key holding the wrong kind of value")
+          assert(
+              message endsWith "Operation against a key holding the wrong kind of value")
       }
     }
   }
@@ -63,9 +70,12 @@ final class TransactionClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly perform a set followed by get on the same key", RedisTest, ClientTest) {
+  test("Correctly perform a set followed by get on the same key",
+       RedisTest,
+       ClientTest) {
     withRedisClient { client =>
-      val txResult = Await.result(client.transaction(Seq(Set(foo, bar), Get(foo))))
+      val txResult =
+        Await.result(client.transaction(Seq(Set(foo, bar), Get(foo))))
       assert(ReplyFormat.toString(txResult.toList) == Seq("OK", "bar"))
     }
   }

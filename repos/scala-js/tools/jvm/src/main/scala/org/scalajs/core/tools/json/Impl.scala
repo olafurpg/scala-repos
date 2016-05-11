@@ -34,5 +34,4 @@ private[json] object Impl extends AbstractJSONImpl {
   def deserialize(str: String): Repr = JSONValue.parse(str)
 
   def deserialize(reader: Reader): Repr = JSONValue.parse(reader)
-
 }

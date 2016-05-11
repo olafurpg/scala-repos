@@ -1,25 +1,28 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2002-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2002-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
 package runtime
 
 @deprecated("Use Predef.SeqCharSequence", "2.11.0")
-final class SeqCharSequence(val xs: scala.collection.IndexedSeq[Char]) extends CharSequence {
-  def length: Int                                     = xs.length
-  def charAt(index: Int): Char                        = xs(index)
-  def subSequence(start: Int, end: Int): CharSequence = new SeqCharSequence(xs.slice(start, end))
+final class SeqCharSequence(val xs: scala.collection.IndexedSeq[Char])
+    extends CharSequence {
+  def length: Int = xs.length
+  def charAt(index: Int): Char = xs(index)
+  def subSequence(start: Int, end: Int): CharSequence =
+    new SeqCharSequence(xs.slice(start, end))
   override def toString = xs.mkString("")
 }
 
 // Still need this one since the implicit class ArrayCharSequence only converts
 // a single argument.
-final class ArrayCharSequence(val xs: Array[Char], start: Int, end: Int) extends CharSequence {
+final class ArrayCharSequence(val xs: Array[Char], start: Int, end: Int)
+    extends CharSequence {
   // yikes
   // java.lang.VerifyError: (class: scala/runtime/ArrayCharSequence, method: <init> signature: ([C)V)
   //   Constructor must call super() or this()
@@ -28,8 +31,7 @@ final class ArrayCharSequence(val xs: Array[Char], start: Int, end: Int) extends
 
   def length: Int = math.max(0, end - start)
   def charAt(index: Int): Char = {
-    if (0 <= index && index < length)
-      xs(start + index)
+    if (0 <= index && index < length) xs(start + index)
     else throw new ArrayIndexOutOfBoundsException(index)
   }
   def subSequence(start0: Int, end0: Int): CharSequence = {

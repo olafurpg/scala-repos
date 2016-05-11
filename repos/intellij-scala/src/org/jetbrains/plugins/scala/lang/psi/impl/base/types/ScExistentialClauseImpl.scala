@@ -13,18 +13,17 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaredElementsHol
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 
 /**
- * @author Alexander Podkhalyuzin
- * Date: 07.03.2008
- */
-
-class ScExistentialClauseImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScExistentialClause {
+  * @author Alexander Podkhalyuzin
+  * Date: 07.03.2008
+  */
+class ScExistentialClauseImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScExistentialClause {
   override def toString: String = "ExistentialClause"
 
-
   override def processDeclarations(processor: PsiScopeProcessor,
-                                  state: ResolveState,
-                                  lastParent: PsiElement,
-                                  place: PsiElement): Boolean = {
+                                   state: ResolveState,
+                                   lastParent: PsiElement,
+                                   place: PsiElement): Boolean = {
     if (lastParent != null) {
       var run = lastParent
       while (run != null) {
@@ -35,15 +34,16 @@ class ScExistentialClauseImpl(node: ASTNode) extends ScalaPsiElementImpl(node) w
     true
   }
 
-  private def processElement(e: PsiElement, processor: PsiScopeProcessor, state: ResolveState): Boolean = e match {
+  private def processElement(e: PsiElement,
+                             processor: PsiScopeProcessor,
+                             state: ResolveState): Boolean = e match {
     case named: ScNamedElement => processor.execute(named, state)
     case holder: ScDeclaredElementsHolder => {
-      for (declared <- holder.declaredElements) {
-        if (!processor.execute(declared, state)) return false
+        for (declared <- holder.declaredElements) {
+          if (!processor.execute(declared, state)) return false
+        }
+        true
       }
-      true
-    }
     case _ => true
   }
-
 }

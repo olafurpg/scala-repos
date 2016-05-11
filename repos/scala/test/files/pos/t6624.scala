@@ -1,8 +1,9 @@
 sealed trait KList[+M[_]]
 
 case class KCons[M[_], +T <: KList[M]](
-  tail: T
-) extends KList[M]
+    tail: T
+)
+    extends KList[M]
 
 case class KNil[M[_]]() extends KList[M]
 
@@ -13,7 +14,7 @@ object Test {
   // "Exception in thread "main" scala.reflect.internal.Types$TypeError: value _1 is not a member
   // of KCons[Option,KCons[Option,KNil[Nothing]]]"
   klist match {
-   case KCons(KCons(KCons(_))) =>
+    case KCons(KCons(KCons(_))) =>
   }
 
   // fails with a similar message as an error, rather than a crash.

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import com.typesafe.config.ConfigFactory
@@ -11,30 +11,42 @@ import akka.testkit._
 import akka.actor.Address
 import scala.collection.immutable
 
-final case class ClientDowningNodeThatIsUpMultiNodeConfig(failureDetectorPuppet: Boolean) extends MultiNodeConfig {
+final case class ClientDowningNodeThatIsUpMultiNodeConfig(
+    failureDetectorPuppet: Boolean)
+    extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
+  commonConfig(debugConfig(on = false).withFallback(
+          MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
-class ClientDowningNodeThatIsUpWithFailureDetectorPuppetMultiJvmNode1 extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = true)
-class ClientDowningNodeThatIsUpWithFailureDetectorPuppetMultiJvmNode2 extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = true)
-class ClientDowningNodeThatIsUpWithFailureDetectorPuppetMultiJvmNode3 extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = true)
-class ClientDowningNodeThatIsUpWithFailureDetectorPuppetMultiJvmNode4 extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = true)
+class ClientDowningNodeThatIsUpWithFailureDetectorPuppetMultiJvmNode1
+    extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = true)
+class ClientDowningNodeThatIsUpWithFailureDetectorPuppetMultiJvmNode2
+    extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = true)
+class ClientDowningNodeThatIsUpWithFailureDetectorPuppetMultiJvmNode3
+    extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = true)
+class ClientDowningNodeThatIsUpWithFailureDetectorPuppetMultiJvmNode4
+    extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = true)
 
-class ClientDowningNodeThatIsUpWithAccrualFailureDetectorMultiJvmNode1 extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = false)
-class ClientDowningNodeThatIsUpWithAccrualFailureDetectorMultiJvmNode2 extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = false)
-class ClientDowningNodeThatIsUpWithAccrualFailureDetectorMultiJvmNode3 extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = false)
-class ClientDowningNodeThatIsUpWithAccrualFailureDetectorMultiJvmNode4 extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = false)
+class ClientDowningNodeThatIsUpWithAccrualFailureDetectorMultiJvmNode1
+    extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = false)
+class ClientDowningNodeThatIsUpWithAccrualFailureDetectorMultiJvmNode2
+    extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = false)
+class ClientDowningNodeThatIsUpWithAccrualFailureDetectorMultiJvmNode3
+    extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = false)
+class ClientDowningNodeThatIsUpWithAccrualFailureDetectorMultiJvmNode4
+    extends ClientDowningNodeThatIsUpSpec(failureDetectorPuppet = false)
 
-abstract class ClientDowningNodeThatIsUpSpec(multiNodeConfig: ClientDowningNodeThatIsUpMultiNodeConfig)
-  extends MultiNodeSpec(multiNodeConfig)
-  with MultiNodeClusterSpec {
+abstract class ClientDowningNodeThatIsUpSpec(
+    multiNodeConfig: ClientDowningNodeThatIsUpMultiNodeConfig)
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
 
-  def this(failureDetectorPuppet: Boolean) = this(ClientDowningNodeThatIsUpMultiNodeConfig(failureDetectorPuppet))
+  def this(failureDetectorPuppet: Boolean) =
+    this(ClientDowningNodeThatIsUpMultiNodeConfig(failureDetectorPuppet))
 
   import multiNodeConfig._
 
@@ -51,7 +63,8 @@ abstract class ClientDowningNodeThatIsUpSpec(multiNodeConfig: ClientDowningNodeT
 
         markNodeAsUnavailable(thirdAddress)
 
-        awaitMembersUp(numberOfMembers = 3, canNotBePartOfMemberRing = Set(thirdAddress))
+        awaitMembersUp(numberOfMembers = 3,
+                       canNotBePartOfMemberRing = Set(thirdAddress))
         clusterView.members.exists(_.address == thirdAddress) should ===(false)
       }
 
@@ -62,7 +75,8 @@ abstract class ClientDowningNodeThatIsUpSpec(multiNodeConfig: ClientDowningNodeT
       runOn(second, fourth) {
         enterBarrier("down-third-node")
 
-        awaitMembersUp(numberOfMembers = 3, canNotBePartOfMemberRing = Set(thirdAddress))
+        awaitMembersUp(numberOfMembers = 3,
+                       canNotBePartOfMemberRing = Set(thirdAddress))
       }
 
       enterBarrier("await-completion")

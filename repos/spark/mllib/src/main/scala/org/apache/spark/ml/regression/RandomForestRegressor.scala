@@ -31,17 +31,18 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
-
 /**
- * :: Experimental ::
- * [[http://en.wikipedia.org/wiki/Random_forest  Random Forest]] learning algorithm for regression.
- * It supports both continuous and categorical features.
- */
+  * :: Experimental ::
+  * [[http://en.wikipedia.org/wiki/Random_forest  Random Forest]] learning algorithm for regression.
+  * It supports both continuous and categorical features.
+  */
 @Since("1.4.0")
 @Experimental
-final class RandomForestRegressor @Since("1.4.0") (@Since("1.4.0") override val uid: String)
-  extends Predictor[Vector, RandomForestRegressor, RandomForestRegressionModel]
-  with RandomForestParams with TreeRegressorParams {
+final class RandomForestRegressor @Since("1.4.0")(
+    @Since("1.4.0") override val uid: String)
+    extends Predictor[
+        Vector, RandomForestRegressor, RandomForestRegressionModel]
+    with RandomForestParams with TreeRegressorParams {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("rfr"))
@@ -60,23 +61,28 @@ final class RandomForestRegressor @Since("1.4.0") (@Since("1.4.0") override val 
     super.setMinInstancesPerNode(value)
 
   @Since("1.4.0")
-  override def setMinInfoGain(value: Double): this.type = super.setMinInfoGain(value)
+  override def setMinInfoGain(value: Double): this.type =
+    super.setMinInfoGain(value)
 
   @Since("1.4.0")
-  override def setMaxMemoryInMB(value: Int): this.type = super.setMaxMemoryInMB(value)
+  override def setMaxMemoryInMB(value: Int): this.type =
+    super.setMaxMemoryInMB(value)
 
   @Since("1.4.0")
-  override def setCacheNodeIds(value: Boolean): this.type = super.setCacheNodeIds(value)
+  override def setCacheNodeIds(value: Boolean): this.type =
+    super.setCacheNodeIds(value)
 
   @Since("1.4.0")
-  override def setCheckpointInterval(value: Int): this.type = super.setCheckpointInterval(value)
+  override def setCheckpointInterval(value: Int): this.type =
+    super.setCheckpointInterval(value)
 
   @Since("1.4.0")
   override def setImpurity(value: String): this.type = super.setImpurity(value)
 
   // Parameters from TreeEnsembleParams:
   @Since("1.4.0")
-  override def setSubsamplingRate(value: Double): this.type = super.setSubsamplingRate(value)
+  override def setSubsamplingRate(value: Double): this.type =
+    super.setSubsamplingRate(value)
 
   @Since("1.4.0")
   override def setSeed(value: Long): this.type = super.setSeed(value)
@@ -89,29 +95,36 @@ final class RandomForestRegressor @Since("1.4.0") (@Since("1.4.0") override val 
   override def setFeatureSubsetStrategy(value: String): this.type =
     super.setFeatureSubsetStrategy(value)
 
-  override protected def train(dataset: DataFrame): RandomForestRegressionModel = {
+  override protected def train(
+      dataset: DataFrame): RandomForestRegressionModel = {
     val categoricalFeatures: Map[Int, Int] =
       MetadataUtils.getCategoricalFeatures(dataset.schema($(featuresCol)))
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
-    val strategy =
-      super.getOldStrategy(categoricalFeatures, numClasses = 0, OldAlgo.Regression, getOldImpurity)
-    val trees =
-      RandomForest.run(oldDataset, strategy, getNumTrees, getFeatureSubsetStrategy, getSeed)
-        .map(_.asInstanceOf[DecisionTreeRegressionModel])
+    val strategy = super.getOldStrategy(categoricalFeatures,
+                                        numClasses = 0,
+                                        OldAlgo.Regression,
+                                        getOldImpurity)
+    val trees = RandomForest
+      .run(
+          oldDataset, strategy, getNumTrees, getFeatureSubsetStrategy, getSeed)
+      .map(_.asInstanceOf[DecisionTreeRegressionModel])
     val numFeatures = oldDataset.first().features.size
     new RandomForestRegressionModel(trees, numFeatures)
   }
 
   @Since("1.4.0")
-  override def copy(extra: ParamMap): RandomForestRegressor = defaultCopy(extra)
+  override def copy(extra: ParamMap): RandomForestRegressor =
+    defaultCopy(extra)
 }
 
 @Since("1.4.0")
 @Experimental
 object RandomForestRegressor {
+
   /** Accessor for supported impurity settings: variance */
   @Since("1.4.0")
-  final val supportedImpurities: Array[String] = TreeRegressorParams.supportedImpurities
+  final val supportedImpurities: Array[String] =
+    TreeRegressorParams.supportedImpurities
 
   /** Accessor for supported featureSubsetStrategy settings: auto, all, onethird, sqrt, log2 */
   @Since("1.4.0")
@@ -120,35 +133,39 @@ object RandomForestRegressor {
 }
 
 /**
- * :: Experimental ::
- * [[http://en.wikipedia.org/wiki/Random_forest  Random Forest]] model for regression.
- * It supports both continuous and categorical features.
- * @param _trees  Decision trees in the ensemble.
- * @param numFeatures  Number of features used by this model
- */
+  * :: Experimental ::
+  * [[http://en.wikipedia.org/wiki/Random_forest  Random Forest]] model for regression.
+  * It supports both continuous and categorical features.
+  * @param _trees  Decision trees in the ensemble.
+  * @param numFeatures  Number of features used by this model
+  */
 @Since("1.4.0")
 @Experimental
-final class RandomForestRegressionModel private[ml] (
+final class RandomForestRegressionModel private[ml](
     override val uid: String,
     private val _trees: Array[DecisionTreeRegressionModel],
     override val numFeatures: Int)
-  extends PredictionModel[Vector, RandomForestRegressionModel]
-  with TreeEnsembleModel with Serializable {
+    extends PredictionModel[Vector, RandomForestRegressionModel]
+    with TreeEnsembleModel with Serializable {
 
-  require(numTrees > 0, "RandomForestRegressionModel requires at least 1 tree.")
+  require(
+      numTrees > 0, "RandomForestRegressionModel requires at least 1 tree.")
 
   /**
-   * Construct a random forest regression model, with all trees weighted equally.
-   * @param trees  Component trees
-   */
-  private[ml] def this(trees: Array[DecisionTreeRegressionModel], numFeatures: Int) =
+    * Construct a random forest regression model, with all trees weighted equally.
+    * @param trees  Component trees
+    */
+  private[ml] def this(
+      trees: Array[DecisionTreeRegressionModel], numFeatures: Int) =
     this(Identifiable.randomUID("rfr"), trees, numFeatures)
 
   @Since("1.4.0")
-  override def trees: Array[DecisionTreeModel] = _trees.asInstanceOf[Array[DecisionTreeModel]]
+  override def trees: Array[DecisionTreeModel] =
+    _trees.asInstanceOf[Array[DecisionTreeModel]]
 
   // Note: We may add support for weights (based on tree performance) later on.
-  private lazy val _treeWeights: Array[Double] = Array.fill[Double](numTrees)(1.0)
+  private lazy val _treeWeights: Array[Double] =
+    Array.fill[Double](numTrees)(1.0)
 
   @Since("1.4.0")
   override def treeWeights: Array[Double] = _treeWeights
@@ -170,7 +187,8 @@ final class RandomForestRegressionModel private[ml] (
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): RandomForestRegressionModel = {
-    copyValues(new RandomForestRegressionModel(uid, _trees, numFeatures), extra).setParent(parent)
+    copyValues(new RandomForestRegressionModel(uid, _trees, numFeatures),
+               extra).setParent(parent)
   }
 
   @Since("1.4.0")
@@ -179,21 +197,22 @@ final class RandomForestRegressionModel private[ml] (
   }
 
   /**
-   * Estimate of the importance of each feature.
-   *
-   * This generalizes the idea of "Gini" importance to other losses,
-   * following the explanation of Gini importance from "Random Forests" documentation
-   * by Leo Breiman and Adele Cutler, and following the implementation from scikit-learn.
-   *
-   * This feature importance is calculated as follows:
-   *  - Average over trees:
-   *     - importance(feature j) = sum (over nodes which split on feature j) of the gain,
-   *       where gain is scaled by the number of instances passing through node
-   *     - Normalize importances for tree to sum to 1.
-   *  - Normalize feature importance vector to sum to 1.
-   */
+    * Estimate of the importance of each feature.
+    *
+    * This generalizes the idea of "Gini" importance to other losses,
+    * following the explanation of Gini importance from "Random Forests" documentation
+    * by Leo Breiman and Adele Cutler, and following the implementation from scikit-learn.
+    *
+    * This feature importance is calculated as follows:
+    *  - Average over trees:
+    *     - importance(feature j) = sum (over nodes which split on feature j) of the gain,
+    *       where gain is scaled by the number of instances passing through node
+    *     - Normalize importances for tree to sum to 1.
+    *  - Normalize feature importance vector to sum to 1.
+    */
   @Since("1.5.0")
-  lazy val featureImportances: Vector = RandomForest.featureImportances(trees, numFeatures)
+  lazy val featureImportances: Vector =
+    RandomForest.featureImportances(trees, numFeatures)
 
   /** (private[ml]) Convert to a model in the old API */
   private[ml] def toOld: OldRandomForestModel = {
@@ -204,13 +223,14 @@ final class RandomForestRegressionModel private[ml] (
 private[ml] object RandomForestRegressionModel {
 
   /** (private[ml]) Convert a model from the old API */
-  def fromOld(
-      oldModel: OldRandomForestModel,
-      parent: RandomForestRegressor,
-      categoricalFeatures: Map[Int, Int],
-      numFeatures: Int = -1): RandomForestRegressionModel = {
-    require(oldModel.algo == OldAlgo.Regression, "Cannot convert RandomForestModel" +
-      s" with algo=${oldModel.algo} (old API) to RandomForestRegressionModel (new API).")
+  def fromOld(oldModel: OldRandomForestModel,
+              parent: RandomForestRegressor,
+              categoricalFeatures: Map[Int, Int],
+              numFeatures: Int = -1): RandomForestRegressionModel = {
+    require(
+        oldModel.algo == OldAlgo.Regression,
+        "Cannot convert RandomForestModel" +
+        s" with algo=${oldModel.algo} (old API) to RandomForestRegressionModel (new API).")
     val newTrees = oldModel.trees.map { tree =>
       // parent for each tree is null since there is no good way to set this.
       DecisionTreeRegressionModel.fromOld(tree, null, categoricalFeatures)

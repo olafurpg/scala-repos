@@ -14,11 +14,12 @@ object GenSerialServerDispatcher {
 }
 
 /**
- * A generic version of
- * [[com.twitter.finagle.dispatch.SerialServerDispatcher SerialServerDispatcher]],
- * allowing the implementor to furnish custom dispatchers & handlers.
- */
-abstract class GenSerialServerDispatcher[Req, Rep, In, Out](trans: Transport[In, Out])
+  * A generic version of
+  * [[com.twitter.finagle.dispatch.SerialServerDispatcher SerialServerDispatcher]],
+  * allowing the implementor to furnish custom dispatchers & handlers.
+  */
+abstract class GenSerialServerDispatcher[Req, Rep, In, Out](
+    trans: Transport[In, Out])
     extends Closable {
 
   import GenSerialServerDispatcher._
@@ -27,16 +28,16 @@ abstract class GenSerialServerDispatcher[Req, Rep, In, Out](trans: Transport[In,
   private[this] val cancelled = new CancelledRequestException
 
   /**
-   * Dispatches a request. The first argument is the request. The second
-   * argument `eos` (end-of-stream promise) must be fulfilled when the request
-   * is complete.
-   *
-   * For non-streaming requests, `eos.setDone()` should be called immediately,
-   * since the entire request is present. For streaming requests,
-   * `eos.setDone()` must be called at the end of stream (in HTTP, this is on
-   * receipt of last chunk). Refer to the implementation in
-   * [[com.twitter.finagle.http.codec.HttpServerDispatcher]].
-   */
+    * Dispatches a request. The first argument is the request. The second
+    * argument `eos` (end-of-stream promise) must be fulfilled when the request
+    * is complete.
+    *
+    * For non-streaming requests, `eos.setDone()` should be called immediately,
+    * since the entire request is present. For streaming requests,
+    * `eos.setDone()` must be called at the end of stream (in HTTP, this is on
+    * receipt of last chunk). Refer to the implementation in
+    * [[com.twitter.finagle.http.codec.HttpServerDispatcher]].
+    */
   protected def dispatch(req: Out, eos: Promise[Unit]): Future[Rep]
   protected def handle(rep: Rep): Future[Unit]
 
@@ -48,19 +49,24 @@ abstract class GenSerialServerDispatcher[Req, Rep, In, Out](trans: Transport[In,
         val eos = new Promise[Unit]
         val save = Local.save()
         try {
-          Contexts.local.let(RemoteInfo.Upstream.AddressCtx, trans.remoteAddress) {
+          Contexts.local.let(RemoteInfo.Upstream.AddressCtx,
+                             trans.remoteAddress) {
             trans.peerCertificate match {
               case None => p.become(dispatch(req, eos))
-              case Some(cert) => Contexts.local.let(Transport.peerCertCtx, cert) {
-                p.become(dispatch(req, eos))
-              }
+              case Some(cert) =>
+                Contexts.local.let(Transport.peerCertCtx, cert) {
+                  p.become(dispatch(req, eos))
+                }
             }
           }
         } finally Local.restore(save)
-        p map { res => (res, eos) }
+        p map { res =>
+          (res, eos)
+        }
       } else Eof
-    } flatMap { case (rep, eos) =>
-      Future.join(handle(rep), eos).unit
+    } flatMap {
+      case (rep, eos) =>
+        Future.join(handle(rep), eos).unit
     } respond {
       case Return(()) if state.get ne Closed =>
         loop()
@@ -85,22 +91,20 @@ abstract class GenSerialServerDispatcher[Req, Rep, In, Out](trans: Transport[In,
   // protocol support). Presumably, half-closing TCP connection is
   // also possible.
   def close(deadline: Time) = {
-    if (state.getAndSet(Closed) eq Idle)
-      trans.close(deadline)
+    if (state.getAndSet(Closed) eq Idle) trans.close(deadline)
     trans.onClose.unit
   }
 }
 
 /**
- * Dispatch requests from transport one at a time, queueing
- * concurrent requests.
- *
- * Transport errors are considered fatal; the service will be
- * released after any error.
- */
+  * Dispatch requests from transport one at a time, queueing
+  * concurrent requests.
+  *
+  * Transport errors are considered fatal; the service will be
+  * released after any error.
+  */
 class SerialServerDispatcher[Req, Rep](
-    trans: Transport[Rep, Req],
-    service: Service[Req, Rep])
+    trans: Transport[Rep, Req], service: Service[Req, Rep])
     extends GenSerialServerDispatcher[Req, Rep, Rep, Req](trans) {
 
   trans.onClose ensure {

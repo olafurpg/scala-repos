@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl
 
 import akka.testkit.AkkaSpec
@@ -95,7 +95,9 @@ class FixedBufferSpec extends AkkaSpec {
         import language.reflectiveCalls
         val buf = FixedSizeBuffer[Int](size)
 
-        val cheat = buf.asInstanceOf[{ def readIdx_=(l: Long): Unit; def writeIdx_=(l: Long): Unit }]
+        val cheat = buf.asInstanceOf[ {
+          def readIdx_=(l: Long): Unit; def writeIdx_=(l: Long): Unit
+        }]
         cheat.readIdx_=(Int.MaxValue)
         cheat.writeIdx_=(Int.MaxValue)
 
@@ -108,7 +110,6 @@ class FixedBufferSpec extends AkkaSpec {
           for (elem ← 1 to size) buf.dequeue() should be(elem)
         }
       }
-
     }
   }
 
@@ -124,17 +125,18 @@ class FixedBufferSpec extends AkkaSpec {
     }
 
     "produce FixedSizeBuffers when capacity < max-fixed-buffer-size" in {
-      Buffer(1000, default) shouldBe a[FixedSizeBuffer.ModuloFixedSizeBuffer[_]]
-      Buffer(1024, default) shouldBe a[FixedSizeBuffer.PowerOfTwoFixedSizeBuffer[_]]
+      Buffer(1000, default) shouldBe a[
+          FixedSizeBuffer.ModuloFixedSizeBuffer[_]]
+      Buffer(1024, default) shouldBe a[
+          FixedSizeBuffer.PowerOfTwoFixedSizeBuffer[_]]
     }
 
     "produce FixedSizeBuffers when max-fixed-buffer-size < BoundedBufferSize" in {
       val settings = default.withMaxFixedBufferSize(9)
       Buffer(5, default) shouldBe a[FixedSizeBuffer.ModuloFixedSizeBuffer[_]]
       Buffer(10, default) shouldBe a[FixedSizeBuffer.ModuloFixedSizeBuffer[_]]
-      Buffer(16, default) shouldBe a[FixedSizeBuffer.PowerOfTwoFixedSizeBuffer[_]]
+      Buffer(16, default) shouldBe a[
+          FixedSizeBuffer.PowerOfTwoFixedSizeBuffer[_]]
     }
-
   }
-
 }

@@ -7,9 +7,9 @@ package scala.tools
 package cmd
 
 /** This trait works together with others in scala.tools.cmd to allow
- *  declaratively specifying a command line program, with many attendant
- *  benefits.  See scala.tools.cmd.DemoSpec for an example.
- */
+  *  declaratively specifying a command line program, with many attendant
+  *  benefits.  See scala.tools.cmd.DemoSpec for an example.
+  */
 trait Spec {
   def referenceSpec: Reference
   def programInfo: Spec.Info
@@ -23,26 +23,27 @@ trait Spec {
 
 object Spec {
   class Info(
-    val runner: String,
-    val usage: String,
-    val mainClass: String
+      val runner: String,
+      val usage: String,
+      val mainClass: String
   )
   object Info {
-    def apply(runner: String, help: String, mainClass: String): Info = new Info(runner, help, mainClass)
+    def apply(runner: String, help: String, mainClass: String): Info =
+      new Info(runner, help, mainClass)
   }
 
-  class Accumulator[T: FromString]() {
+  class Accumulator[T : FromString]() {
     private var _buf: List[T] = Nil
 
-    def convert(s: String)    = implicitly[FromString[T]] apply s
-    def apply(s: String): T   = returning(convert(s))(_buf +:= _)
+    def convert(s: String) = implicitly[FromString[T]] apply s
+    def apply(s: String): T = returning(convert(s))(_buf +:= _)
 
     lazy val get = _buf
   }
 
-  class Choices[T: FromString](val xs: List[T]) {
+  class Choices[T : FromString](val xs: List[T]) {
     def fs: FromString[T] = implicitly[FromString[T]]
-    def contains(x: T)    = xs contains x
+    def contains(x: T) = xs contains x
     override def toString = xs.mkString("{ ", ", ", " }")
   }
 

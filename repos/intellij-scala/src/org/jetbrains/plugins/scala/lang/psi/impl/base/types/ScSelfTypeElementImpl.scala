@@ -20,28 +20,34 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingCont
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * @author Alexander Podkhalyuzin
- */
+  * @author Alexander Podkhalyuzin
+  */
+class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
+                                     nodeType: IElementType,
+                                     node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScSelfTypeElement {
+  def this(node: ASTNode) = { this(null, null, node) }
 
-class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement], nodeType: IElementType, node: ASTNode)
-  extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScSelfTypeElement {
-  def this(node: ASTNode) = {this(null, null, node)}
-
-  def this(stub: ScSelfTypeElementStub) = {this(stub, ScalaElementTypes.SELF_TYPE, null)}
+  def this(stub: ScSelfTypeElementStub) = {
+    this(stub, ScalaElementTypes.SELF_TYPE, null)
+  }
 
   override def toString: String = "SelfType: " + name
 
   def nameId: PsiElement = findChildByType[PsiElement](TokenSets.SELF_TYPE_ID)
 
   def getType(ctx: TypingContext): TypeResult[ScType] = {
-    val parent = PsiTreeUtil.getParentOfType(this, classOf[ScTemplateDefinition])
+    val parent =
+      PsiTreeUtil.getParentOfType(this, classOf[ScTemplateDefinition])
     assert(parent != null)
     typeElement match {
       case Some(ste) =>
         for {
           templateType <- parent.getType(ctx)
           selfType <- ste.getType(ctx)
-          ct = ScCompoundType(Seq(templateType, selfType), Map.empty, Map.empty)
+          ct = ScCompoundType(
+              Seq(templateType, selfType), Map.empty, Map.empty)
         } yield ct
       case None => parent.getType(ctx)
     }
@@ -52,7 +58,10 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement], nodeT
     if (stub != null) {
       return stub.asInstanceOf[ScSelfTypeElementStub].getTypeElementText match {
         case "" => None
-        case text => Some(ScalaPsiElementFactory.createTypeElementFromText(text, this, this))
+        case text =>
+          Some(
+              ScalaPsiElementFactory.createTypeElementFromText(
+                  text, this, this))
       }
     }
     findChild(classOf[ScTypeElement])
@@ -66,10 +75,11 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement], nodeT
     val names = new ArrayBuffer[String]()
     def fillNames(typeElement: ScTypeElement) {
       typeElement match {
-        case s: ScSimpleTypeElement => s.reference match {
-          case Some(ref) => names += ref.refName
-          case _ =>
-        }
+        case s: ScSimpleTypeElement =>
+          s.reference match {
+            case Some(ref) => names += ref.refName
+            case _ =>
+          }
         case p: ScParameterizedTypeElement => fillNames(p.typeElement)
         case c: ScCompoundTypeElement =>
           c.components.foreach(fillNames)

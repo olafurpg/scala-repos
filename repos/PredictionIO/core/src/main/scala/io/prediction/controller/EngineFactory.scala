@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.core.BaseEngine
@@ -26,6 +25,7 @@ import scala.language.implicitConversions
   * @group Engine
   */
 abstract class EngineFactory {
+
   /** Creates an instance of an [[Engine]]. */
   def apply(): BaseEngine[_, _, _, _]
 

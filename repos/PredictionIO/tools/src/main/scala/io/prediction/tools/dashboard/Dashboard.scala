@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.tools.dashboard
 
 import com.typesafe.config.ConfigFactory
@@ -36,19 +35,17 @@ import spray.routing.authentication.{Authentication, UserPass, BasicAuth}
 
 import scala.concurrent.duration._
 
-case class DashboardConfig(
-  ip: String = "localhost",
-  port: Int = 9000)
+case class DashboardConfig(ip: String = "localhost", port: Int = 9000)
 
-object Dashboard extends Logging with SSLConfiguration{
+object Dashboard extends Logging with SSLConfiguration {
   def main(args: Array[String]): Unit = {
     val parser = new scopt.OptionParser[DashboardConfig]("Dashboard") {
       opt[String]("ip") action { (x, c) =>
         c.copy(ip = x)
-      } text("IP to bind to (default: localhost).")
+      } text ("IP to bind to (default: localhost).")
       opt[Int]("port") action { (x, c) =>
         c.copy(port = x)
-      } text("Port to bind to (default: 9000).")
+      } text ("Port to bind to (default: 9000).")
     }
 
     parser.parse(args, DashboardConfig()) map { dc =>
@@ -62,23 +59,22 @@ object Dashboard extends Logging with SSLConfiguration{
       system.actorOf(Props(classOf[DashboardActor], dc), "dashboard")
     implicit val timeout = Timeout(5.seconds)
     val settings = ServerSettings(system)
-    IO(Http) ? Http.Bind(
-      service,
-      interface = dc.ip,
-      port = dc.port,
-      settings = Some(settings.copy(sslEncryption = true)))
+    IO(Http) ? Http.Bind(service,
+                         interface = dc.ip,
+                         port = dc.port,
+                         settings = Some(settings.copy(sslEncryption = true)))
     system.awaitTermination
   }
 }
 
-class DashboardActor(
-    val dc: DashboardConfig)
-  extends Actor with DashboardService {
+class DashboardActor(val dc: DashboardConfig)
+    extends Actor with DashboardService {
   def actorRefFactory: ActorContext = context
   def receive: Actor.Receive = runRoute(dashboardRoute)
 }
 
-trait DashboardService extends HttpService with KeyAuthentication with CORSSupport {
+trait DashboardService
+    extends HttpService with KeyAuthentication with CORSSupport {
 
   implicit def executionContext: ExecutionContext = actorRefFactory.dispatcher
   val dc: DashboardConfig
@@ -92,17 +88,17 @@ trait DashboardService extends HttpService with KeyAuthentication with CORSSuppo
           respondWithMediaType(`text/html`) {
             complete {
               val completedInstances = evaluationInstances.getCompleted
-              html.index(
-                dc,
-                serverStartTime,
-                pioEnvVars,
-                completedInstances).toString
+              html
+                .index(dc,
+                       serverStartTime,
+                       pioEnvVars,
+                       completedInstances)
+                .toString
             }
           }
         }
       }
-    } ~
-    pathPrefix("engine_instances" / Segment) { instanceId =>
+    } ~ pathPrefix("engine_instances" / Segment) { instanceId =>
       path("evaluator_results.txt") {
         get {
           respondWithMediaType(`text/plain`) {
@@ -113,8 +109,7 @@ trait DashboardService extends HttpService with KeyAuthentication with CORSSuppo
             }
           }
         }
-      } ~
-      path("evaluator_results.html") {
+      } ~ path("evaluator_results.html") {
         get {
           respondWithMediaType(`text/html`) {
             evaluationInstances.get(instanceId).map { i =>
@@ -124,8 +119,7 @@ trait DashboardService extends HttpService with KeyAuthentication with CORSSuppo
             }
           }
         }
-      } ~
-      path("evaluator_results.json") {
+      } ~ path("evaluator_results.json") {
         get {
           respondWithMediaType(`application/json`) {
             evaluationInstances.get(instanceId).map { i =>
@@ -135,8 +129,7 @@ trait DashboardService extends HttpService with KeyAuthentication with CORSSuppo
             }
           }
         }
-      } ~
-      cors {
+      } ~ cors {
         path("local_evaluator_results.json") {
           get {
             respondWithMediaType(`application/json`) {
@@ -149,8 +142,7 @@ trait DashboardService extends HttpService with KeyAuthentication with CORSSuppo
           }
         }
       }
-    } ~
-    pathPrefix("assets") {
+    } ~ pathPrefix("assets") {
       getFromResourceDirectory("assets")
     }
 }

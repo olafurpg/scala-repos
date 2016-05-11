@@ -6,7 +6,7 @@ import com.google.inject.name.Names
 import com.google.inject.servlet.ServletModule
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
 import mesosphere.chaos.ServiceStatus
-import mesosphere.chaos.http.{ HelpServlet, LogConfigServlet, PingServlet, ServiceStatusServlet }
+import mesosphere.chaos.http.{HelpServlet, LogConfigServlet, PingServlet, ServiceStatusServlet}
 
 /**
   * This mostly corresponds to the RestModule from Chaos but with the following functionality removed:
@@ -33,7 +33,9 @@ class BaseRestModule extends ServletModule {
     bind(classOf[ServiceStatus]).asEagerSingleton()
     bind(classOf[ServiceStatusServlet]).in(Scopes.SINGLETON)
 
-    bind(classOf[String]).annotatedWith(Names.named("helpPathPrefix")).toInstance(helpUrl)
+    bind(classOf[String])
+      .annotatedWith(Names.named("helpPathPrefix"))
+      .toInstance(helpUrl)
 
     serve(statusUrl).`with`(classOf[ServiceStatusServlet])
     serve(statusCatchAllUrl).`with`(classOf[ServiceStatusServlet])

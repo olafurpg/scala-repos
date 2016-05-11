@@ -5,16 +5,23 @@ import java.time._
 
 trait TimeInstances0 {
 
-  private[this] def orderFromInt[A](f: (A, A) => Int): Order[A] = new Order[A] {
-    def order(x: A, y: A) = Ordering.fromInt(f(x, y))
-  }
+  private[this] def orderFromInt[A](f: (A, A) => Int): Order[A] =
+    new Order[A] {
+      def order(x: A, y: A) = Ordering.fromInt(f(x, y))
+    }
 
-  implicit val instantInstance: Order[Instant] = orderFromInt[Instant](_ compareTo _)
-  implicit val localDateTimeInstance: Order[LocalDateTime] = orderFromInt[LocalDateTime](_ compareTo _)
-  implicit val offsetDateTimeInstance: Order[OffsetDateTime] = orderFromInt[OffsetDateTime](_ compareTo _)
-  implicit val offsetTimeInstance: Order[OffsetTime] = orderFromInt[OffsetTime](_ compareTo _)
-  implicit val zonedDateTime: Order[ZonedDateTime] = orderFromInt[ZonedDateTime](_ compareTo _)
-  implicit val zoneOffsetInstance: Order[ZoneOffset] = orderFromInt[ZoneOffset](_ compareTo _)
+  implicit val instantInstance: Order[Instant] =
+    orderFromInt[Instant](_ compareTo _)
+  implicit val localDateTimeInstance: Order[LocalDateTime] =
+    orderFromInt[LocalDateTime](_ compareTo _)
+  implicit val offsetDateTimeInstance: Order[OffsetDateTime] =
+    orderFromInt[OffsetDateTime](_ compareTo _)
+  implicit val offsetTimeInstance: Order[OffsetTime] =
+    orderFromInt[OffsetTime](_ compareTo _)
+  implicit val zonedDateTime: Order[ZonedDateTime] =
+    orderFromInt[ZonedDateTime](_ compareTo _)
+  implicit val zoneOffsetInstance: Order[ZoneOffset] =
+    orderFromInt[ZoneOffset](_ compareTo _)
 
   implicit val dayOfWeekInstance: Enum[DayOfWeek] = new Enum[DayOfWeek] {
     override val max = Some(DayOfWeek.SUNDAY)

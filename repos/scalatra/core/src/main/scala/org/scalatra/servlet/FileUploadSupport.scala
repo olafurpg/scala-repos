@@ -1,64 +1,64 @@
 package org.scalatra.servlet
 
-import java.io.{ InputStream, File, FileOutputStream }
-import java.util.{ Map => JMap, HashMap => JHashMap }
+import java.io.{InputStream, File, FileOutputStream}
+import java.util.{Map => JMap, HashMap => JHashMap}
 import javax.servlet.http._
 
 import org.scalatra.ScalatraBase
 import org.scalatra.util.RicherString._
-import org.scalatra.util.{ io, _ }
+import org.scalatra.util.{io, _}
 
 import scala.collection.JavaConverters._
 
 /**
- * FileUploadSupport can be mixed into a [[org.scalatra.ScalatraFilter]]
- * or [[org.scalatra.ScalatraServlet]] to provide easy access to data
- * submitted as part of a multipart HTTP request.  Commonly this is used for
- * retrieving uploaded files.
- *
- * Once the trait has been mixed into your handler, you need to enable multipart
- * configuration in your ''web.xml'' or by using `@MultipartConfig` annotation. To
- * configure in ''web.xml'' add `<multipart-config />` to your `<servlet>` element. If you
- * prefer annotations instead, place `@MultipartConfig` to your handler. Both ways
- * provide some further configuration options, such as specifying the max total request size
- * and max size for invidual files in the request. You might want to set these to prevent
- * users from uploading too large files.
- *
- * When the configuration has been done, you can access any files using
- * `fileParams("myFile")` where ''myFile'' is the name
- * of the parameter used to upload the file being retrieved. If you are
- * expecting multiple files with the same name, you can use
- * `fileMultiParams("files[]")` to access them all.
- *
- * To handle any errors that are caused by multipart handling, you need
- * to configure an error handler to your handler class:
- *
- * {{{
- * import org.scalatra.servlet.SizeLimitExceededException
- * import org.scalatra.servlet.FileUploadSupport
- *
- * @MultipartConfig(maxFileSize=1024*1024)
- * class FileEaterServlet extends ScalatraServlet with FileUploadSupport {
- *   error {
- *     case e: SizeConstrainttExceededException => "Oh, too much! Can't take it all."
- *     case e: IOException                      => "Server denied me my meal, thanks anyway."
- *   }
- *
- *   post("/eatfile") {
- *     "Thanks! You just provided me " + fileParams("lunch").size + " bytes for a lunch."
- *   }
- * }
- * }}}
- *
- * }}* @note Once any handler with FileUploadSupport has accessed the request, the
- *       fileParams returned by FileUploadSupport will remain fixed for the
- *       lifetime of the request.
- *
- * @note Will not work on Jetty versions prior to 8.1.3.  See
- * https://bugs.eclipse.org/bugs/show_bug.cgi?id=376324.  The old
- * scalatra-fileupload module still works for earlier versions
- * of Jetty.
- */
+  * FileUploadSupport can be mixed into a [[org.scalatra.ScalatraFilter]]
+  * or [[org.scalatra.ScalatraServlet]] to provide easy access to data
+  * submitted as part of a multipart HTTP request.  Commonly this is used for
+  * retrieving uploaded files.
+  *
+  * Once the trait has been mixed into your handler, you need to enable multipart
+  * configuration in your ''web.xml'' or by using `@MultipartConfig` annotation. To
+  * configure in ''web.xml'' add `<multipart-config />` to your `<servlet>` element. If you
+  * prefer annotations instead, place `@MultipartConfig` to your handler. Both ways
+  * provide some further configuration options, such as specifying the max total request size
+  * and max size for invidual files in the request. You might want to set these to prevent
+  * users from uploading too large files.
+  *
+  * When the configuration has been done, you can access any files using
+  * `fileParams("myFile")` where ''myFile'' is the name
+  * of the parameter used to upload the file being retrieved. If you are
+  * expecting multiple files with the same name, you can use
+  * `fileMultiParams("files[]")` to access them all.
+  *
+  * To handle any errors that are caused by multipart handling, you need
+  * to configure an error handler to your handler class:
+  *
+  * {{{
+  * import org.scalatra.servlet.SizeLimitExceededException
+  * import org.scalatra.servlet.FileUploadSupport
+  *
+  * @MultipartConfig(maxFileSize=1024*1024)
+  * class FileEaterServlet extends ScalatraServlet with FileUploadSupport {
+  *   error {
+  *     case e: SizeConstrainttExceededException => "Oh, too much! Can't take it all."
+  *     case e: IOException                      => "Server denied me my meal, thanks anyway."
+  *   }
+  *
+  *   post("/eatfile") {
+  *     "Thanks! You just provided me " + fileParams("lunch").size + " bytes for a lunch."
+  *   }
+  * }
+  * }}}
+  *
+  * }}* @note Once any handler with FileUploadSupport has accessed the request, the
+  *       fileParams returned by FileUploadSupport will remain fixed for the
+  *       lifetime of the request.
+  *
+  * @note Will not work on Jetty versions prior to 8.1.3.  See
+  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=376324.  The old
+  * scalatra-fileupload module still works for earlier versions
+  * of Jetty.
+  */
 trait FileUploadSupport extends ServletBase with HasMultipartConfig {
 
   import org.scalatra.servlet.FileUploadSupport._
@@ -76,7 +76,8 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
     case _ => false
   }
 
-  override def handle(req: HttpServletRequest, res: HttpServletResponse): Unit = {
+  override def handle(
+      req: HttpServletRequest, res: HttpServletResponse): Unit = {
     val req2 = try {
       if (isMultipartRequest(req)) {
         val bodyParams = extractMultipartParams(req)
@@ -86,9 +87,9 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
       } else req
     } catch {
       case e: Exception => {
-        req.setAttribute(ScalatraBase.PrehandleExceptionKey, e)
-        req
-      }
+          req.setAttribute(ScalatraBase.PrehandleExceptionKey, e)
+          req
+        }
     }
 
     super.handle(req2, res)
@@ -96,10 +97,11 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
 
   private def isMultipartRequest(req: HttpServletRequest): Boolean = {
     val isPostOrPut = Set("POST", "PUT", "PATCH").contains(req.getMethod)
-    isPostOrPut && (req.contentType match {
-      case Some(contentType) => contentType.startsWith("multipart/")
-      case _ => false
-    })
+    isPostOrPut &&
+    (req.contentType match {
+          case Some(contentType) => contentType.startsWith("multipart/")
+          case _ => false
+        })
   }
 
   private def extractMultipartParams(req: HttpServletRequest): BodyParams = {
@@ -108,22 +110,27 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
         bodyParams
 
       case None => {
-        val bodyParams = getParts(req).foldRight(BodyParams(FileMultiParams(), Map.empty)) {
-          (part, params) =>
-            val item = FileItem(part)
+          val bodyParams =
+            getParts(req).foldRight(BodyParams(FileMultiParams(), Map.empty)) {
+              (part, params) =>
+                val item = FileItem(part)
 
-            if (!(item.isFormField)) {
-              BodyParams(params.fileParams + ((
-                item.getFieldName, item +: params.fileParams.getOrElse(item.getFieldName, List[FileItem]())
-              )), params.formParams)
-            } else {
-              BodyParams(params.fileParams, params.formParams)
+                if (!(item.isFormField)) {
+                  BodyParams(params.fileParams +
+                             ((
+                                     item.getFieldName,
+                                     item +: params.fileParams.getOrElse(
+                                         item.getFieldName, List[FileItem]())
+                                 )),
+                             params.formParams)
+                } else {
+                  BodyParams(params.fileParams, params.formParams)
+                }
             }
-        }
 
-        req.setAttribute(BodyParamsKey, bodyParams)
-        bodyParams
-      }
+          req.setAttribute(BodyParamsKey, bodyParams)
+          bodyParams
+        }
     }
   }
 
@@ -131,7 +138,9 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
     try {
       if (isMultipartRequest(req)) req.getParts.asScala else Seq.empty[Part]
     } catch {
-      case e: Exception if isSizeConstraintException(e) => throw new SizeConstraintExceededException("Too large request or file", e)
+      case e: Exception if isSizeConstraintException(e) =>
+        throw new SizeConstraintExceededException(
+            "Too large request or file", e)
     }
   }
 
@@ -140,7 +149,9 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
     new String(item.get().map(_.toChar))
   }
 
-  private def mergeFormParamsWithQueryString(req: HttpServletRequest, bodyParams: BodyParams): Map[String, List[String]] = {
+  private def mergeFormParamsWithQueryString(
+      req: HttpServletRequest,
+      bodyParams: BodyParams): Map[String, List[String]] = {
     var mergedParams = bodyParams.formParams
     req.getParameterMap.asScala foreach {
       case (name, values) =>
@@ -151,22 +162,28 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
     mergedParams
   }
 
-  private def wrapRequest(req: HttpServletRequest, formMap: Map[String, Seq[String]]): HttpServletRequestWrapper = {
+  private def wrapRequest(
+      req: HttpServletRequest,
+      formMap: Map[String, Seq[String]]): HttpServletRequestWrapper = {
     val wrapped = new HttpServletRequestWrapper(req) {
-      override def getParameter(name: String): String = formMap.get(name) map {
-        _.head
-      } getOrElse null
+      override def getParameter(name: String): String =
+        formMap.get(name) map {
+          _.head
+        } getOrElse null
 
-      override def getParameterNames: java.util.Enumeration[String] = formMap.keysIterator.asJavaEnumeration
+      override def getParameterNames: java.util.Enumeration[String] =
+        formMap.keysIterator.asJavaEnumeration
 
-      override def getParameterValues(name: String): Array[String] = formMap.get(name) map {
-        _.toArray
-      } getOrElse null
+      override def getParameterValues(name: String): Array[String] =
+        formMap.get(name) map {
+          _.toArray
+        } getOrElse null
 
       override def getParameterMap: JMap[String, Array[String]] = {
-        (new JHashMap[String, Array[String]].asScala ++ (formMap transform {
-          (k, v) => v.toArray
-        })).asJava
+        (new JHashMap[String, Array[String]].asScala ++
+            (formMap transform { (k, v) =>
+                  v.toArray
+                })).asJava
       }
     }
     wrapped
@@ -176,15 +193,17 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
     extractMultipartParams(request).fileParams
   }
 
-  def fileMultiParams(key: String)(implicit request: HttpServletRequest): Seq[FileItem] = {
+  def fileMultiParams(key: String)(
+      implicit request: HttpServletRequest): Seq[FileItem] = {
     fileMultiParams(request)(key)
   }
 
   /**
-   * @return a Map, keyed on the names of multipart file upload parameters,
-   *         of all multipart files submitted with the request
-   */
-  def fileParams(implicit request: HttpServletRequest): MultiMapHeadView[String, FileItem] = {
+    * @return a Map, keyed on the names of multipart file upload parameters,
+    *         of all multipart files submitted with the request
+    */
+  def fileParams(implicit request: HttpServletRequest)
+    : MultiMapHeadView[String, FileItem] = {
     new MultiMapHeadView[String, FileItem] {
       protected def multiMap = fileMultiParams
     }
@@ -200,9 +219,7 @@ object FileUploadSupport {
   private val BodyParamsKey = "org.scalatra.fileupload.bodyParams"
 
   case class BodyParams(
-    fileParams: FileMultiParams,
-    formParams: Map[String, List[String]])
-
+      fileParams: FileMultiParams, formParams: Map[String, List[String]])
 }
 
 class FileMultiParams(wrapped: Map[String, Seq[FileItem]] = Map.empty)
@@ -228,19 +245,21 @@ object FileMultiParams {
 
   def apply(): FileMultiParams = new FileMultiParams
 
-  def apply[SeqType <: Seq[FileItem]](wrapped: Map[String, Seq[FileItem]]): FileMultiParams = {
+  def apply[SeqType <: Seq[FileItem]](
+      wrapped: Map[String, Seq[FileItem]]): FileMultiParams = {
     new FileMultiParams(wrapped)
   }
-
 }
 
 case class FileItem(part: Part) {
 
   val size: Long = part.getSize
   val fieldName: String = part.getName
-  val name: String = Util.partAttribute(part, "content-disposition", "filename")
+  val name: String =
+    Util.partAttribute(part, "content-disposition", "filename")
   val contentType: Option[String] = part.getContentType.blankOption
-  val charset: Option[String] = Util.partAttribute(part, "content-type", "charset").blankOption
+  val charset: Option[String] =
+    Util.partAttribute(part, "content-type", "charset").blankOption
 
   def getName: String = name
 
@@ -271,20 +290,22 @@ case class FileItem(part: Part) {
 
 object Util {
 
-  def partAttribute(
-    part: Part,
-    headerName: String, attributeName: String,
-    defaultValue: String = null): String = {
+  def partAttribute(part: Part,
+                    headerName: String,
+                    attributeName: String,
+                    defaultValue: String = null): String = {
     Option(part.getHeader(headerName)) match {
       case Some(value) => {
-        value.split(";").find(_.trim().startsWith(attributeName)) match {
-          case Some(attributeValue) => attributeValue.substring(attributeValue.indexOf('=') + 1).trim().replace("\"", "")
-          case _ => defaultValue
+          value.split(";").find(_.trim().startsWith(attributeName)) match {
+            case Some(attributeValue) =>
+              attributeValue
+                .substring(attributeValue.indexOf('=') + 1)
+                .trim()
+                .replace("\"", "")
+            case _ => defaultValue
+          }
         }
-      }
       case _ => defaultValue
     }
   }
-
 }
-

@@ -39,14 +39,14 @@ import scalafx.scene.layout.{BorderPane, VBox}
 import scalafx.util.StringConverter
 
 /**
- * Demonstrates a TextField control with a TextFormatter that filters changes.
- *
- * The text field at a top is an input area. It should have a prompt-like text "> " that cannot be edited.
- * When pressing "Enter" the text after the prompt is copied to bottom output area.
- *
- * The changes in the input text field are monitored and filtered using TextFormatter parameter `filter`.
- * The examines the change and modifies it as needed to preserve the prompt text "> " at the beginning.
- */
+  * Demonstrates a TextField control with a TextFormatter that filters changes.
+  *
+  * The text field at a top is an input area. It should have a prompt-like text "> " that cannot be edited.
+  * When pressing "Enter" the text after the prompt is copied to bottom output area.
+  *
+  * The changes in the input text field are monitored and filtered using TextFormatter parameter `filter`.
+  * The examines the change and modifies it as needed to preserve the prompt text "> " at the beginning.
+  */
 object TextFormatterWithChangeFilterDemo extends JFXApp {
 
   case class Message(text: String) {
@@ -75,10 +75,12 @@ object TextFormatterWithChangeFilterDemo extends JFXApp {
     }
     // Restore caret position if it moved over the prompt
     if (change.anchor < prompt.length) change.anchor = prompt.length
-    if (change.caretPosition < prompt.length) change.caretPosition = prompt.length
+    if (change.caretPosition < prompt.length)
+      change.caretPosition = prompt.length
     change
   }
-  val formatter = new TextFormatter[Message](converter, Message("hello"), filter)
+  val formatter =
+    new TextFormatter[Message](converter, Message("hello"), filter)
 
   val outputTextArea = new TextArea {
     editable = false
@@ -88,11 +90,12 @@ object TextFormatterWithChangeFilterDemo extends JFXApp {
   val textField = new TextField {
     text = prompt
     textFormatter = formatter
-    onAction = (a: ActionEvent) => {
-      val str = text()
-      val message = converter.fromString(str) + "\n"
-      outputTextArea.text = message + outputTextArea.text()
-      text() = ""
+    onAction = (a: ActionEvent) =>
+      {
+        val str = text()
+        val message = converter.fromString(str) + "\n"
+        outputTextArea.text = message + outputTextArea.text()
+        text() = ""
     }
   }
 
@@ -103,14 +106,15 @@ object TextFormatterWithChangeFilterDemo extends JFXApp {
         spacing = 6
         padding = Insets(10)
         children = Seq(
-          new Label("Example of using `TextFormatter` to ensure that the input field includes prompt text \"> \".") {
-            wrapText = true
-          },
-          new Label("Type message at the prompt. Press \"Enter\" to send."),
-          new BorderPane {
-            top = textField
-            center = outputTextArea
-          }
+            new Label(
+                "Example of using `TextFormatter` to ensure that the input field includes prompt text \"> \".") {
+              wrapText = true
+            },
+            new Label("Type message at the prompt. Press \"Enter\" to send."),
+            new BorderPane {
+              top = textField
+              center = outputTextArea
+            }
         )
       }
     }

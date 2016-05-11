@@ -26,6 +26,4 @@ object JavaInterop extends DecorateAsJava with DecorateAsScala {
     def apply[A](values: A*): JList[A] =
       JavaConversions.seqAsJavaList(values)
   }
-
 }
-

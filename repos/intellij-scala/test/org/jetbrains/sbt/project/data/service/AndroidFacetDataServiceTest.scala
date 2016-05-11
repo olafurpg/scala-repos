@@ -14,14 +14,15 @@ import org.jetbrains.sbt.project.data.AndroidFacetNode
 import scala.io.Source
 
 /**
- * @author Nikolay Obedin
- * @since 6/15/15.
- */
+  * @author Nikolay Obedin
+  * @since 6/15/15.
+  */
 class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
 
   import ExternalSystemDataDsl._
 
-  private def generateProject(proguardConfig: Seq[String]): DataNode[ProjectData] =
+  private def generateProject(
+      proguardConfig: Seq[String]): DataNode[ProjectData] =
     new project {
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
@@ -32,15 +33,15 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
         moduleFileDirectoryPath := getProject.getBasePath + "/module1"
         externalConfigPath := getProject.getBasePath + "/module1"
         arbitraryNodes += new AndroidFacetNode(
-          version = "21",
-          manifest = new File(getProject.getBasePath + "/manifest.xml"),
-          apk = new File(getProject.getBasePath + "/test.apk"),
-          res = new File(getProject.getBasePath + "/res"),
-          assets = new File(getProject.getBasePath + "/assets"),
-          gen = new File(getProject.getBasePath + "/gen"),
-          libs = new File(getProject.getBasePath + "/libs"),
-          isLibrary = true,
-          proguardConfig = proguardConfig
+            version = "21",
+            manifest = new File(getProject.getBasePath + "/manifest.xml"),
+            apk = new File(getProject.getBasePath + "/test.apk"),
+            res = new File(getProject.getBasePath + "/res"),
+            assets = new File(getProject.getBasePath + "/assets"),
+            gen = new File(getProject.getBasePath + "/gen"),
+            libs = new File(getProject.getBasePath + "/libs"),
+            isLibrary = true,
+            proguardConfig = proguardConfig
         )
       }
     }.build.toDataNode
@@ -48,10 +49,12 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
   private def doTestFacetSetup(proguardConfig: Seq[String]): Unit = {
     importProjectData(generateProject(proguardConfig))
 
-    val module = ModuleManager.getInstance(getProject).findModuleByName("Module 1")
+    val module =
+      ModuleManager.getInstance(getProject).findModuleByName("Module 1")
     assert(module != null)
 
-    val facet = FacetManager.getInstance(module).getFacetByType(AndroidFacet.ID)
+    val facet =
+      FacetManager.getInstance(module).getFacetByType(AndroidFacet.ID)
     assert(facet != null)
 
     val properties = facet.getConfiguration.getState
@@ -68,9 +71,13 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
 
     if (proguardConfig.nonEmpty) {
       import scala.collection.JavaConverters._
-      val proguardConfigPath = FileUtil.toSystemDependentName(getProject.getBasePath + "/proguard-sbt.txt")
-      assert(properties.myProGuardCfgFiles.asScala.toSeq == Seq(proguardConfigPath))
-      val actualProguardConfig = using(Source.fromFile(proguardConfigPath))(_.getLines().toVector)
+      val proguardConfigPath = FileUtil.toSystemDependentName(
+          getProject.getBasePath + "/proguard-sbt.txt")
+      assert(
+          properties.myProGuardCfgFiles.asScala.toSeq == Seq(
+              proguardConfigPath))
+      val actualProguardConfig =
+        using(Source.fromFile(proguardConfigPath))(_.getLines().toVector)
       assert(actualProguardConfig == proguardConfig)
     }
   }
@@ -86,7 +93,8 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
-      arbitraryNodes += new AndroidFacetNode("", null, null, null, null, null, null, false, Seq.empty)
+      arbitraryNodes += new AndroidFacetNode(
+          "", null, null, null, null, null, null, false, Seq.empty)
     }.build.toDataNode
     importProjectData(testProject)
   }

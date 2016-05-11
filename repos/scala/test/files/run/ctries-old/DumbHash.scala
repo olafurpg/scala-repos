@@ -1,9 +1,3 @@
-
-
-
-
-
-
 class DumbHash(val i: Int) {
   override def equals(other: Any) = other match {
     case that: DumbHash => that.i == this.i

@@ -1,4 +1,3 @@
-
 import scala.tools.partest.ScriptTest
 
 object Test extends ScriptTest {

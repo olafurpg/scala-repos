@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.config
 
 import org.scalatest.WordSpec
@@ -33,7 +33,8 @@ class ConfigDocSpec extends WordSpec with Matchers {
   }
 
   "deployment section" in {
-    val conf = ConfigFactory.parseString("""
+    val conf =
+      ConfigFactory.parseString("""
   #//#deployment-section
   akka.actor.deployment {
   

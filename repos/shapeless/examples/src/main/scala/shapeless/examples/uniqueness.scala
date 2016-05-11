@@ -17,26 +17,26 @@
 package shapeless.examples
 
 /**
- * Determining whether an `HList` contains a given type (optionally including
- * subtypes) exactly once.
- *
- * See this Shapeless Dev mailing list question for the original framing and
- * some additional discussion: 
- *
- * https://groups.google.com/d/msg/shapeless-dev/HvV63toSBNM/K84lmwSsYzwJ
- *
- * @author Travis Brown
- */
+  * Determining whether an `HList` contains a given type (optionally including
+  * subtypes) exactly once.
+  *
+  * See this Shapeless Dev mailing list question for the original framing and
+  * some additional discussion: 
+  *
+  * https://groups.google.com/d/msg/shapeless-dev/HvV63toSBNM/K84lmwSsYzwJ
+  *
+  * @author Travis Brown
+  */
 object UniquenessExample extends App {
   import shapeless._
   import ops.hlist.Filter
 
   /**
-   * We'll enrich `HList` with a `unique` method that takes a type parameter,
-   * gathers evidence that the list contains that type exactly once, and
-   * returns the element of that type. It will not compile if the type does
-   * not occur exactly once in the list.
-   */
+    * We'll enrich `HList` with a `unique` method that takes a type parameter,
+    * gathers evidence that the list contains that type exactly once, and
+    * returns the element of that type. It will not compile if the type does
+    * not occur exactly once in the list.
+    */
   implicit class Uniqueable[L <: HList](l: L) {
     def unique[A](implicit ev: Filter.Aux[L, A, A :: HNil]) = ev(l).head
   }
@@ -53,9 +53,9 @@ object UniquenessExample extends App {
   val stuff = (1 :: bar :: foo :: "a" :: HNil)
 
   /**
-   * Because `filter` does not select subtypes of the query type, both `Foo`
-   * and `Bar` occur uniquely in the list, and we can write the following:
-   */
+    * Because `filter` does not select subtypes of the query type, both `Foo`
+    * and `Bar` occur uniquely in the list, and we can write the following:
+    */
   val uniqueFoo = stuff.unique[Foo]
   val uniqueBar = stuff.unique[Bar]
 
@@ -63,11 +63,11 @@ object UniquenessExample extends App {
   assert(bar == uniqueBar)
 
   /**
-   * If we wanted to confirm that the list uniquely contains `Foo` or any
-   * subtype of `Foo`, we could first use `unifySubtypes` to upcast any
-   * subtypes of `Foo` in the list to `Foo`.
-   *
-   * The following would not compile, for example:
-   */
+    * If we wanted to confirm that the list uniquely contains `Foo` or any
+    * subtype of `Foo`, we could first use `unifySubtypes` to upcast any
+    * subtypes of `Foo` in the list to `Foo`.
+    *
+    * The following would not compile, for example:
+    */
   //stuff.unifySubtypes[Foo].unique[Foo]
 }

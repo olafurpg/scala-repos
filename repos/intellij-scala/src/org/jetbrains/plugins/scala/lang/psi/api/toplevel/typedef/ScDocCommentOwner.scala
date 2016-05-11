@@ -5,9 +5,8 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 import com.intellij.psi.PsiDocCommentOwner
 import com.intellij.psi.javadoc.PsiDocComment
 import org.jetbrains.annotations.Nullable

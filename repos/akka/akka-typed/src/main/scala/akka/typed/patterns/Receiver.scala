@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.typed.patterns
 
 import scala.concurrent.duration._
@@ -20,23 +20,34 @@ object Receiver {
   sealed trait Command[T]
 
   /**
-   * Retrieve one message from the Receiver, waiting at most for the given duration.
-   */
-  final case class GetOne[T](timeout: FiniteDuration)(val replyTo: ActorRef[GetOneResult[T]]) extends Command[T]
+    * Retrieve one message from the Receiver, waiting at most for the given duration.
+    */
+  final case class GetOne[T](timeout: FiniteDuration)(
+      val replyTo: ActorRef[GetOneResult[T]])
+      extends Command[T]
+
   /**
-   * Retrieve all messages from the Receiver that it has queued after the given
-   * duration has elapsed.
-   */
-  final case class GetAll[T](timeout: FiniteDuration)(val replyTo: ActorRef[GetAllResult[T]]) extends Command[T]
+    * Retrieve all messages from the Receiver that it has queued after the given
+    * duration has elapsed.
+    */
+  final case class GetAll[T](timeout: FiniteDuration)(
+      val replyTo: ActorRef[GetAllResult[T]])
+      extends Command[T]
+
   /**
-   * Retrieve the external address of this Receiver (i.e. the side at which it
-   * takes in the messages of type T.
-   */
-  final case class ExternalAddress[T](replyTo: ActorRef[ActorRef[T]]) extends Command[T]
+    * Retrieve the external address of this Receiver (i.e. the side at which it
+    * takes in the messages of type T.
+    */
+  final case class ExternalAddress[T](replyTo: ActorRef[ActorRef[T]])
+      extends Command[T]
 
   sealed trait Replies[T]
-  final case class GetOneResult[T](receiver: ActorRef[Command[T]], msg: Option[T]) extends Replies[T]
-  final case class GetAllResult[T](receiver: ActorRef[Command[T]], msgs: immutable.Seq[T]) extends Replies[T]
+  final case class GetOneResult[T](
+      receiver: ActorRef[Command[T]], msg: Option[T])
+      extends Replies[T]
+  final case class GetAllResult[T](
+      receiver: ActorRef[Command[T]], msgs: immutable.Seq[T])
+      extends Replies[T]
 
   private final case class Enqueue[T](msg: T) extends Command[T]
 
@@ -44,21 +55,29 @@ object Receiver {
     ContextAware[Any] { ctx ⇒
       SynchronousSelf { syncself ⇒
         Or(
-          empty(ctx).widen { case c: Command[t] ⇒ c.asInstanceOf[Command[T]] },
-          Static[Any] {
-            case msg ⇒ syncself ! Enqueue(msg)
-          })
+            empty(ctx).widen {
+          case c: Command[t] ⇒ c.asInstanceOf[Command[T]]
+        }, Static[Any] {
+          case msg ⇒ syncself ! Enqueue(msg)
+        })
       }
     }.narrow
 
   private def empty[T](ctx: ActorContext[Any]): Behavior[Command[T]] =
     Total {
-      case ExternalAddress(replyTo)            ⇒ { replyTo ! ctx.self; Same }
-      case g @ GetOne(d) if d <= Duration.Zero ⇒ { g.replyTo ! GetOneResult(ctx.self, None); Same }
-      case g @ GetOne(d)                       ⇒ asked(ctx, Queue(Asked(g.replyTo, Deadline.now + d)))
-      case g @ GetAll(d) if d <= Duration.Zero ⇒ { g.replyTo ! GetAllResult(ctx.self, Nil); Same }
-      case g @ GetAll(d)                       ⇒ { ctx.schedule(d, ctx.self, GetAll(Duration.Zero)(g.replyTo)); Same }
-      case Enqueue(msg)                        ⇒ queued(ctx, msg)
+      case ExternalAddress(replyTo) ⇒ { replyTo ! ctx.self; Same }
+      case g @ GetOne(d) if d <= Duration.Zero ⇒ {
+          g.replyTo ! GetOneResult(ctx.self, None); Same
+        }
+      case g @ GetOne(d) ⇒
+        asked(ctx, Queue(Asked(g.replyTo, Deadline.now + d)))
+      case g @ GetAll(d) if d <= Duration.Zero ⇒ {
+          g.replyTo ! GetAllResult(ctx.self, Nil); Same
+        }
+      case g @ GetAll(d) ⇒ {
+          ctx.schedule(d, ctx.self, GetAll(Duration.Zero)(g.replyTo)); Same
+        }
+      case Enqueue(msg) ⇒ queued(ctx, msg)
     }
 
   private def queued[T](ctx: ActorContext[Any], t: T): Behavior[Command[T]] = {
@@ -83,8 +102,10 @@ object Receiver {
     }
   }
 
-  private case class Asked[T](replyTo: ActorRef[GetOneResult[T]], deadline: Deadline)
-  private def asked[T](ctx: ActorContext[Any], queue: Queue[Asked[T]]): Behavior[Command[T]] = {
+  private case class Asked[T](
+      replyTo: ActorRef[GetOneResult[T]], deadline: Deadline)
+  private def asked[T](
+      ctx: ActorContext[Any], queue: Queue[Asked[T]]): Behavior[Command[T]] = {
     ctx.setReceiveTimeout(queue.map(_.deadline).min.timeLeft)
 
     Full {

@@ -1,3 +1,1 @@
-package object org {
-
-}
+package object org {}

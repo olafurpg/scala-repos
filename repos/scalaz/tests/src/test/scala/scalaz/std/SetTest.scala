@@ -19,12 +19,11 @@ object SetTest extends SpecLite {
     // fixed in b0b80be
     "not stack overflow" in {
 
-      def sum = Set(1,2,3).foldLeftM[Option,Int](0) { case (x,y) => Some(x+y) }
+      def sum = Set(1, 2, 3).foldLeftM[Option, Int](0) {
+        case (x, y) => Some(x + y)
+      }
 
       sum must_== Some(6)
-
     }
-
   }
-
 }

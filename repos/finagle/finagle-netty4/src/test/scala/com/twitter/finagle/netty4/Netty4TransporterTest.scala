@@ -9,7 +9,8 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class Netty4TransporterTest extends FunSuite with Eventually with IntegrationPatience {
+class Netty4TransporterTest
+    extends FunSuite with Eventually with IntegrationPatience {
 
   test("connection failures are propagated to the transporter promise") {
     val transporter = Netty4Transporter(None, None, Params.empty)

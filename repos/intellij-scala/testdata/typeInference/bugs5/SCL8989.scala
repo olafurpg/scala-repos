@@ -12,9 +12,10 @@ object SCL8989 {
   }
 
   object Main {
-    val i : B[String]#I = ???
+    val i: B[String]#I = ???
 
-    /*start*/i.t.substring(1)/*end*/
+    /*start*/
+    i.t.substring(1) /*end*/
   }
 }
 //String

@@ -81,7 +81,8 @@ class ApplicationMasterArguments(val args: Array[String]) {
 
     if (primaryPyFile != null && primaryRFile != null) {
       // scalastyle:off println
-      System.err.println("Cannot have primary-py-file and primary-r-file at the same time")
+      System.err.println(
+          "Cannot have primary-py-file and primary-r-file at the same time")
       // scalastyle:on println
       System.exit(-1)
     }

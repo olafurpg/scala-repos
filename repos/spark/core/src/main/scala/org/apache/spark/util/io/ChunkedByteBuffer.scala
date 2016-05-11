@@ -28,22 +28,22 @@ import org.apache.spark.network.util.ByteArrayWritableChannel
 import org.apache.spark.storage.StorageUtils
 
 /**
- * Read-only byte buffer which is physically stored as multiple chunks rather than a single
- * contiguous array.
- *
- * @param chunks an array of [[ByteBuffer]]s. Each buffer in this array must be non-empty and have
- *               position == 0. Ownership of these buffers is transferred to the ChunkedByteBuffer,
- *               so if these buffers may also be used elsewhere then the caller is responsible for
- *               copying them as needed.
- */
+  * Read-only byte buffer which is physically stored as multiple chunks rather than a single
+  * contiguous array.
+  *
+  * @param chunks an array of [[ByteBuffer]]s. Each buffer in this array must be non-empty and have
+  *               position == 0. Ownership of these buffers is transferred to the ChunkedByteBuffer,
+  *               so if these buffers may also be used elsewhere then the caller is responsible for
+  *               copying them as needed.
+  */
 private[spark] class ChunkedByteBuffer(var chunks: Array[ByteBuffer]) {
   require(chunks != null, "chunks must not be null")
   require(chunks.forall(_.limit() > 0), "chunks must be non-empty")
   require(chunks.forall(_.position() == 0), "chunks' positions must be 0")
 
   /**
-   * This size of this buffer, in bytes.
-   */
+    * This size of this buffer, in bytes.
+    */
   val size: Long = chunks.map(_.limit().asInstanceOf[Long]).sum
 
   def this(byteBuffer: ByteBuffer) = {
@@ -51,8 +51,8 @@ private[spark] class ChunkedByteBuffer(var chunks: Array[ByteBuffer]) {
   }
 
   /**
-   * Write this buffer to a channel.
-   */
+    * Write this buffer to a channel.
+    */
   def writeFully(channel: WritableByteChannel): Unit = {
     for (bytes <- getChunks()) {
       while (bytes.remaining > 0) {
@@ -62,21 +62,21 @@ private[spark] class ChunkedByteBuffer(var chunks: Array[ByteBuffer]) {
   }
 
   /**
-   * Wrap this buffer to view it as a Netty ByteBuf.
-   */
+    * Wrap this buffer to view it as a Netty ByteBuf.
+    */
   def toNetty: ByteBuf = {
     Unpooled.wrappedBuffer(getChunks(): _*)
   }
 
   /**
-   * Copy this buffer into a new byte array.
-   *
-   * @throws UnsupportedOperationException if this buffer's size exceeds the maximum array size.
-   */
+    * Copy this buffer into a new byte array.
+    *
+    * @throws UnsupportedOperationException if this buffer's size exceeds the maximum array size.
+    */
   def toArray: Array[Byte] = {
     if (size >= Integer.MAX_VALUE) {
       throw new UnsupportedOperationException(
-        s"cannot call toArray because buffer size ($size bytes) exceeds maximum array size")
+          s"cannot call toArray because buffer size ($size bytes) exceeds maximum array size")
     }
     val byteChannel = new ByteArrayWritableChannel(size.toInt)
     writeFully(byteChannel)
@@ -85,10 +85,10 @@ private[spark] class ChunkedByteBuffer(var chunks: Array[ByteBuffer]) {
   }
 
   /**
-   * Copy this buffer into a new ByteBuffer.
-   *
-   * @throws UnsupportedOperationException if this buffer's size exceeds the max ByteBuffer size.
-   */
+    * Copy this buffer into a new ByteBuffer.
+    *
+    * @throws UnsupportedOperationException if this buffer's size exceeds the max ByteBuffer size.
+    */
   def toByteBuffer: ByteBuffer = {
     if (chunks.length == 1) {
       chunks.head.duplicate()
@@ -98,26 +98,26 @@ private[spark] class ChunkedByteBuffer(var chunks: Array[ByteBuffer]) {
   }
 
   /**
-   * Creates an input stream to read data from this ChunkedByteBuffer.
-   *
-   * @param dispose if true, [[dispose()]] will be called at the end of the stream
-   *                in order to close any memory-mapped files which back this buffer.
-   */
+    * Creates an input stream to read data from this ChunkedByteBuffer.
+    *
+    * @param dispose if true, [[dispose()]] will be called at the end of the stream
+    *                in order to close any memory-mapped files which back this buffer.
+    */
   def toInputStream(dispose: Boolean = false): InputStream = {
     new ChunkedByteBufferInputStream(this, dispose)
   }
 
   /**
-   * Get duplicates of the ByteBuffers backing this ChunkedByteBuffer.
-   */
+    * Get duplicates of the ByteBuffers backing this ChunkedByteBuffer.
+    */
   def getChunks(): Array[ByteBuffer] = {
     chunks.map(_.duplicate())
   }
 
   /**
-   * Make a copy of this ChunkedByteBuffer, copying all of the backing data into new buffers.
-   * The new buffer will share no resources with the original buffer.
-   */
+    * Make a copy of this ChunkedByteBuffer, copying all of the backing data into new buffers.
+    * The new buffer will share no resources with the original buffer.
+    */
   def copy(): ChunkedByteBuffer = {
     val copiedChunks = getChunks().map { chunk =>
       // TODO: accept an allocator in this copy method to integrate with mem. accounting systems
@@ -130,26 +130,25 @@ private[spark] class ChunkedByteBuffer(var chunks: Array[ByteBuffer]) {
   }
 
   /**
-   * Attempt to clean up a ByteBuffer if it is memory-mapped. This uses an *unsafe* Sun API that
-   * might cause errors if one attempts to read from the unmapped buffer, but it's better than
-   * waiting for the GC to find it because that could lead to huge numbers of open files. There's
-   * unfortunately no standard API to do this.
-   */
+    * Attempt to clean up a ByteBuffer if it is memory-mapped. This uses an *unsafe* Sun API that
+    * might cause errors if one attempts to read from the unmapped buffer, but it's better than
+    * waiting for the GC to find it because that could lead to huge numbers of open files. There's
+    * unfortunately no standard API to do this.
+    */
   def dispose(): Unit = {
     chunks.foreach(StorageUtils.dispose)
   }
 }
 
 /**
- * Reads data from a ChunkedByteBuffer.
- *
- * @param dispose if true, [[ChunkedByteBuffer.dispose()]] will be called at the end of the stream
- *                in order to close any memory-mapped files which back the buffer.
- */
+  * Reads data from a ChunkedByteBuffer.
+  *
+  * @param dispose if true, [[ChunkedByteBuffer.dispose()]] will be called at the end of the stream
+  *                in order to close any memory-mapped files which back the buffer.
+  */
 private class ChunkedByteBufferInputStream(
-    var chunkedByteBuffer: ChunkedByteBuffer,
-    dispose: Boolean)
-  extends InputStream {
+    var chunkedByteBuffer: ChunkedByteBuffer, dispose: Boolean)
+    extends InputStream {
 
   private[this] var chunks = chunkedByteBuffer.getChunks().iterator
   private[this] var currentChunk: ByteBuffer = {

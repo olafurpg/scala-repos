@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -202,10 +202,8 @@ trait SetTest extends CollectionTest {
     val hs = factory.empty[String]
 
     val l = {
-      if (factory.allowsNullElement)
-        List[String]("ONE", "TWO", (null: String))
-      else
-        List[String]("ONE", "TWO", "THREE")
+      if (factory.allowsNullElement) List[String]("ONE", "TWO", (null: String))
+      else List[String]("ONE", "TWO", "THREE")
     }
     assertTrue(hs.addAll(asJavaCollection(l)))
     assertEquals(3, hs.size)
@@ -229,7 +227,7 @@ object SetFactory {
 }
 
 trait SetFactory extends CollectionFactory {
-  def empty[E: ClassTag]: ju.Set[E]
+  def empty[E : ClassTag]: ju.Set[E]
 
   def allowsNullElement: Boolean
 }

@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.linker
 
@@ -26,11 +25,11 @@ final class Linker(frontend: LinkerFrontend, backend: LinkerBackend)
     extends GenLinker {
 
   require(!backend.withSourceMap || frontend.withSourceMap,
-      "Frontend must have source maps enabled if backend has them enabled")
+          "Frontend must have source maps enabled if backend has them enabled")
   require(frontend.semantics == backend.semantics,
-      "Frontend and backend must agree on semantics")
+          "Frontend and backend must agree on semantics")
   require(frontend.esLevel == backend.esLevel,
-      "Frontend and backend must agree on ESLevel")
+          "Frontend and backend must agree on ESLevel")
 
   val semantics: Semantics = frontend.semantics
   val esLevel: ESLevel = backend.esLevel
@@ -39,11 +38,13 @@ final class Linker(frontend: LinkerFrontend, backend: LinkerBackend)
   private[this] val _linking = new AtomicBoolean(false)
 
   def linkUnit(irFiles: Seq[VirtualScalaJSIRFile],
-      symbolRequirements: SymbolRequirement, logger: Logger): LinkingUnit =
+               symbolRequirements: SymbolRequirement,
+               logger: Logger): LinkingUnit =
     guard(frontend.link(irFiles, symbolRequirements, logger))
 
   def link(irFiles: Seq[VirtualScalaJSIRFile],
-      output: WritableVirtualJSFile, logger: Logger): Unit = {
+           output: WritableVirtualJSFile,
+           logger: Logger): Unit = {
     guard {
       val unit = frontend.link(irFiles, backend.symbolRequirements, logger)
       backend.emit(unit, output, logger)

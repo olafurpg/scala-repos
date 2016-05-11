@@ -16,14 +16,14 @@ object AnyValAddBenchmarks extends MyRunner(classOf[AnyValAddBenchmarks])
 class AnyValAddBenchmarks extends MyBenchmark {
   //@Param(Array("1000000", "2000000", "4000000", "8000000", "16000000"))
   @Param(Array("1000000", "2000000", "4000000"))
-  var size:Int = 0
+  var size: Int = 0
 
-  var bytes:Array[Byte] = null
-  var shorts:Array[Short] = null
-  var ints:Array[Int] = null
-  var longs:Array[Long] = null
-  var floats:Array[Float] = null
-  var doubles:Array[Double] = null
+  var bytes: Array[Byte] = null
+  var shorts: Array[Short] = null
+  var ints: Array[Int] = null
+  var longs: Array[Long] = null
+  var floats: Array[Float] = null
+  var doubles: Array[Double] = null
 
   override protected def setUp(): Unit = {
     bytes = init(size)(nextInt.toByte)
@@ -34,7 +34,8 @@ class AnyValAddBenchmarks extends MyBenchmark {
     doubles = init(size)(nextDouble)
   }
 
-  def addGeneric[@sp(Byte, Short, Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
+  def addGeneric[@sp(Byte, Short, Int, Long, Float, Double) A : Ring](
+      data: Array[A]): A = {
     var total = Ring[A].zero
     var i = 0
     val len = data.length
@@ -42,7 +43,7 @@ class AnyValAddBenchmarks extends MyBenchmark {
     total
   }
 
-  def addBytesDirect(data:Array[Byte]):Int = {
+  def addBytesDirect(data: Array[Byte]): Int = {
     var total = 0.toByte
     var i = 0
     val len = data.length
@@ -50,7 +51,7 @@ class AnyValAddBenchmarks extends MyBenchmark {
     total
   }
 
-  def addShortsDirect(data:Array[Short]):Int = {
+  def addShortsDirect(data: Array[Short]): Int = {
     var total = 0.toShort
     var i = 0
     val len = data.length
@@ -58,7 +59,7 @@ class AnyValAddBenchmarks extends MyBenchmark {
     total
   }
 
-  def addIntsDirect(data:Array[Int]):Int = {
+  def addIntsDirect(data: Array[Int]): Int = {
     var total = 0
     var i = 0
     val len = data.length
@@ -66,7 +67,7 @@ class AnyValAddBenchmarks extends MyBenchmark {
     total
   }
 
-  def addLongsDirect(data:Array[Long]):Long = {
+  def addLongsDirect(data: Array[Long]): Long = {
     var total = 0L
     var i = 0
     val len = data.length
@@ -74,7 +75,7 @@ class AnyValAddBenchmarks extends MyBenchmark {
     total
   }
 
-  def addFloatsDirect(data:Array[Float]):Float = {
+  def addFloatsDirect(data: Array[Float]): Float = {
     var total = 0.0F
     var i = 0
     val len = data.length
@@ -82,7 +83,7 @@ class AnyValAddBenchmarks extends MyBenchmark {
     total
   }
 
-  def addDoublesDirect(data:Array[Double]):Double = {
+  def addDoublesDirect(data: Array[Double]): Double = {
     var total = 0.0
     var i = 0
     val len = data.length
@@ -90,16 +91,16 @@ class AnyValAddBenchmarks extends MyBenchmark {
     total
   }
 
-  def timeAddBytesDirect(reps:Int) = run(reps)(addBytesDirect(bytes))
-  def timeAddBytesGeneric(reps:Int) = run(reps)(addGeneric(bytes))
-  def timeAddShortsDirect(reps:Int) = run(reps)(addShortsDirect(shorts))
-  def timeAddShortsGeneric(reps:Int) = run(reps)(addGeneric(shorts))
-  def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
-  def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
-  def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
-  def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
-  def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
-  def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
-  def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
-  def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
+  def timeAddBytesDirect(reps: Int) = run(reps)(addBytesDirect(bytes))
+  def timeAddBytesGeneric(reps: Int) = run(reps)(addGeneric(bytes))
+  def timeAddShortsDirect(reps: Int) = run(reps)(addShortsDirect(shorts))
+  def timeAddShortsGeneric(reps: Int) = run(reps)(addGeneric(shorts))
+  def timeAddIntsDirect(reps: Int) = run(reps)(addIntsDirect(ints))
+  def timeAddIntsGeneric(reps: Int) = run(reps)(addGeneric(ints))
+  def timeAddLongsDirect(reps: Int) = run(reps)(addLongsDirect(longs))
+  def timeAddLongsGeneric(reps: Int) = run(reps)(addGeneric(longs))
+  def timeAddFloatsDirect(reps: Int) = run(reps)(addFloatsDirect(floats))
+  def timeAddFloatsGeneric(reps: Int) = run(reps)(addGeneric(floats))
+  def timeAddDoublesDirect(reps: Int) = run(reps)(addDoublesDirect(doubles))
+  def timeAddDoublesGeneric(reps: Int) = run(reps)(addGeneric(doubles))
 }

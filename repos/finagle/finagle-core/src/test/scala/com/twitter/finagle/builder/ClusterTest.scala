@@ -38,7 +38,8 @@ class ClusterTest extends FunSuite {
     assert(set.size == 0)
   }
 
-  test("Cluster map should remove mapped objects in the same order they were received (for each key)") {
+  test(
+      "Cluster map should remove mapped objects in the same order they were received (for each key)") {
     val h = new ClusterHelper
     import h._
 
@@ -49,12 +50,13 @@ class ClusterTest extends FunSuite {
     cluster1.add(2)
     cluster1.add(1)
     cluster1.add(2)
-    assert(changes.toSeq == Seq(
-      Cluster.Add(WrappedInt(1)),
-      Cluster.Add(WrappedInt(2)),
-      Cluster.Add(WrappedInt(1)),
-      Cluster.Add(WrappedInt(2))
-    ))
+    assert(
+        changes.toSeq == Seq(
+            Cluster.Add(WrappedInt(1)),
+            Cluster.Add(WrappedInt(2)),
+            Cluster.Add(WrappedInt(1)),
+            Cluster.Add(WrappedInt(2))
+        ))
 
     cluster1.del(1)
     assert(changes.size == 5)
@@ -72,8 +74,7 @@ class ClusterTest extends FunSuite {
 
     cluster1.del(100)
     assert(changes.size == 9)
-    for (ch <- changes take 8)
-      assert(ch.value != changes(8).value)
+    for (ch <- changes take 8) assert(ch.value != changes(8).value)
   }
 
   test("Cluster ready should wait on cluster initialization") {
@@ -93,14 +94,16 @@ class ClusterTest extends FunSuite {
 
   // Cluster initialization should honor global timeout as well as timeout specified
   // together with the requests
-  test("Cluster ready should honor timeout while waiting for cluster to initialize") {
-    val cluster = new DynamicCluster[SocketAddress](Seq[SocketAddress]()) //empty cluster
+  test(
+      "Cluster ready should honor timeout while waiting for cluster to initialize") {
+    val cluster =
+      new DynamicCluster[SocketAddress](Seq[SocketAddress]()) //empty cluster
     val client = ClientBuilder()
-        .cluster(cluster)
-        .codec(StringCodec)
-        .hostConnectionLimit(1)
-        .timeout(1.seconds) //global time out
-        .build()
+      .cluster(cluster)
+      .codec(StringCodec)
+      .hostConnectionLimit(1)
+      .timeout(1.seconds) //global time out
+      .build()
 
     intercept[GlobalRequestTimeoutException] {
       Await.result(client("hello1"))

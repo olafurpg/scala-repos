@@ -42,7 +42,7 @@ trait RandomStackSpecs extends EvalStackSpecs {
       result must haveSize(resultClicks.size)
 
       result must haveAllElementsLike {
-        case (ids, SDecimal(d)) => 
+        case (ids, SDecimal(d)) =>
           ids must haveSize(1)
 
           d must be_>=(BigDecimal(0))
@@ -73,17 +73,19 @@ trait RandomStackSpecs extends EvalStackSpecs {
 
       result must haveSize(resultClicks.size)
 
-      val pageIds: Set[SValue] = (0 to 4).map { i => SString("page-" + i.toString) }.toSet
+      val pageIds: Set[SValue] = (0 to 4).map { i =>
+        SString("page-" + i.toString)
+      }.toSet
 
       result must haveAllElementsLike {
-        case (ids, SObject(fields)) => 
+        case (ids, SObject(fields)) =>
           ids must haveSize(1)
           fields.keys mustEqual Set("pageId", "rand")
 
           pageIds must contain(fields("pageId"))
 
           fields("rand") must beLike {
-            case SDecimal(d) => 
+            case SDecimal(d) =>
               d must be_>=(BigDecimal(0))
               d must be_<(BigDecimal(1))
           }
@@ -116,13 +118,13 @@ trait RandomStackSpecs extends EvalStackSpecs {
       result must haveSize(resultClicks.size)
 
       result must haveAllElementsLike {
-        case (ids, SObject(fields)) => 
+        case (ids, SObject(fields)) =>
           ids must haveSize(2)
 
           fields.keys must contain("predict")
 
           fields("predict") must beLike {
-            case SString(str) => 
+            case SString(str) =>
               Set("foo", "bar") must contain(str)
           }
       }
@@ -144,7 +146,7 @@ trait RandomStackSpecs extends EvalStackSpecs {
       result must haveSize(resultClicks.size)
 
       result must haveAllElementsLike {
-        case (ids, SDecimal(d)) => 
+        case (ids, SDecimal(d)) =>
           ids must haveSize(1)
 
           d must be_>=(BigDecimal(0))
@@ -168,9 +170,9 @@ trait RandomStackSpecs extends EvalStackSpecs {
       result must haveSize(resultClicks.size)
 
       result must haveAllElementsLike {
-        case (ids, SDecimal(d)) => 
+        case (ids, SDecimal(d)) =>
           ids must haveSize(1)
-          d mustEqual(0)
+          d mustEqual (0)
       }
     }.pendingUntilFixed
 
@@ -190,7 +192,7 @@ trait RandomStackSpecs extends EvalStackSpecs {
       result must haveSize(resultClicks.size)
 
       result must haveAllElementsLike {
-        case (ids, SDecimal(d)) => 
+        case (ids, SDecimal(d)) =>
           ids must haveSize(1)
 
           d must be_>=(BigDecimal(10))

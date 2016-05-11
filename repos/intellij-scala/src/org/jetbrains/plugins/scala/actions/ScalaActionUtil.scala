@@ -16,19 +16,19 @@ object ScalaActionUtil {
     presentation setEnabled true
     presentation setVisible true
   }
-  
+
   def disablePresentation(presentation: Presentation): Unit = {
     presentation setEnabled false
     presentation setVisible false
   }
-  
+
   def enableAndShowIfInScalaFile(e: AnActionEvent) {
     val presentation = e.getPresentation
-    
+
     @inline def enable(): Unit = enablePresentation(presentation)
-    
+
     @inline def disable(): Unit = disablePresentation(presentation)
-    
+
     try {
       val dataContext = e.getDataContext
       val file = CommonDataKeys.PSI_FILE.getData(dataContext)
@@ -36,8 +36,7 @@ object ScalaActionUtil {
         case _: ScalaFile => enable()
         case _ => disable()
       }
-    }
-    catch {
+    } catch {
       case e: Exception => disable()
     }
   }
@@ -50,16 +49,23 @@ object ScalaActionUtil {
 
     val hintManager: HintManagerImpl = HintManagerImpl.getInstanceImpl
 
-    label.addMouseMotionListener(new MouseMotionAdapter {
+    label.addMouseMotionListener(
+        new MouseMotionAdapter {
       override def mouseMoved(e: MouseEvent) {
         hintManager.hideAllHints()
       }
     })
 
     val position = editor.getCaretModel.getLogicalPosition
-    val p: Point = HintManagerImpl.getHintPosition(hint, editor, position, HintManager.ABOVE)
+    val p: Point = HintManagerImpl.getHintPosition(
+        hint, editor, position, HintManager.ABOVE)
 
-    hintManager.showEditorHint(hint, editor, p,
-      HintManager.HIDE_BY_ANY_KEY | HintManager.HIDE_BY_TEXT_CHANGE | HintManager.HIDE_BY_SCROLLING, 0, false)
+    hintManager.showEditorHint(
+        hint,
+        editor,
+        p,
+        HintManager.HIDE_BY_ANY_KEY | HintManager.HIDE_BY_TEXT_CHANGE | HintManager.HIDE_BY_SCROLLING,
+        0,
+        false)
   }
 }

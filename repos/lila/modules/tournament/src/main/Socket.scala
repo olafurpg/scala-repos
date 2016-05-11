@@ -11,16 +11,17 @@ import lila.common.LightUser
 import lila.hub.actorApi.WithUserIds
 import lila.hub.TimeBomb
 import lila.memo.ExpireSetMemo
-import lila.socket.actorApi.{ Connected => _, _ }
-import lila.socket.{ SocketActor, History, Historical }
+import lila.socket.actorApi.{Connected => _, _}
+import lila.socket.{SocketActor, History, Historical}
 
-private[tournament] final class Socket(
-    tournamentId: String,
-    val history: History[Messadata],
-    jsonView: JsonView,
-    lightUser: String => Option[LightUser],
-    uidTimeout: Duration,
-    socketTimeout: Duration) extends SocketActor[Member](uidTimeout) with Historical[Member, Messadata] {
+private[tournament] final class Socket(tournamentId: String,
+                                       val history: History[Messadata],
+                                       jsonView: JsonView,
+                                       lightUser: String => Option[LightUser],
+                                       uidTimeout: Duration,
+                                       socketTimeout: Duration)
+    extends SocketActor[Member](uidTimeout)
+    with Historical[Member, Messadata] {
 
   private val timeBomb = new TimeBomb(socketTimeout)
 
@@ -58,23 +59,25 @@ private[tournament] final class Socket(
       sender ! waitingUsers
 
     case PingVersion(uid, v) => {
-      ping(uid)
-      timeBomb.delay
-      withMember(uid) { m =>
-        history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+        ping(uid)
+        timeBomb.delay
+        withMember(uid) { m =>
+          history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+        }
       }
-    }
 
     case Broom => {
-      broom
-      if (timeBomb.boom) self ! PoisonPill
-    }
+        broom
+        if (timeBomb.boom) self ! PoisonPill
+      }
 
-    case lila.chat.actorApi.ChatLine(_, line) => line match {
-      case line: lila.chat.UserLine =>
-        notifyVersion("message", lila.chat.Line toJson line, Messadata(line.troll))
-      case _ =>
-    }
+    case lila.chat.actorApi.ChatLine(_, line) =>
+      line match {
+        case line: lila.chat.UserLine =>
+          notifyVersion(
+              "message", lila.chat.Line toJson line, Messadata(line.troll))
+        case _ =>
+      }
 
     case GetVersion => sender ! history.version
 

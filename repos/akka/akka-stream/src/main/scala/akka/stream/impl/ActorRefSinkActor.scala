@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl
 
 import akka.stream.actor.ActorSubscriber
@@ -12,17 +12,19 @@ import akka.actor.Props
 import akka.actor.Terminated
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object ActorRefSinkActor {
   def props(ref: ActorRef, highWatermark: Int, onCompleteMessage: Any): Props =
     Props(new ActorRefSinkActor(ref, highWatermark, onCompleteMessage))
 }
 
 /**
- * INTERNAL API
- */
-private[akka] class ActorRefSinkActor(ref: ActorRef, highWatermark: Int, onCompleteMessage: Any) extends ActorSubscriber {
+  * INTERNAL API
+  */
+private[akka] class ActorRefSinkActor(
+    ref: ActorRef, highWatermark: Int, onCompleteMessage: Any)
+    extends ActorSubscriber {
   import ActorSubscriberMessage._
 
   override val requestStrategy = WatermarkRequestStrategy(highWatermark)
@@ -41,5 +43,4 @@ private[akka] class ActorRefSinkActor(ref: ActorRef, highWatermark: Int, onCompl
     case Terminated(`ref`) ⇒
       context.stop(self) // will cancel upstream
   }
-
 }

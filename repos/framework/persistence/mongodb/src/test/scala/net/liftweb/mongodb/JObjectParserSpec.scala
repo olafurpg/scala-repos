@@ -26,7 +26,7 @@ import org.specs2.mutable.Specification
 
 import com.mongodb.DBObject
 
-object JObjectParserSpec extends Specification  {
+object JObjectParserSpec extends Specification {
   "JObjectParser Specification".title
 
   def buildTestData: (ObjectId, DBObject) = {

@@ -18,7 +18,8 @@ import scala.pickling.binary._
 import java.nio.charset.CodingErrorAction
 import scala.io.Codec
 
-final class Vertex(val label: String, var neighbors: List[Vertex]) extends Serializable {
+final class Vertex(val label: String, var neighbors: List[Vertex])
+    extends Serializable {
 
   //var graph: Graph = null
 
@@ -27,13 +28,12 @@ final class Vertex(val label: String, var neighbors: List[Vertex]) extends Seria
   }
 
   def sameAs(other: Vertex): Boolean = {
-    (this ne other) &&
-    this.label == other.label && (
-      this.neighbors.length == other.neighbors.length &&
-      this.neighbors.zip(other.neighbors).forall {
-        case (thisv, otherv) => thisv.label == otherv.label
-      }
-    )
+    (this ne other) && this.label == other.label &&
+    (this.neighbors.length == other.neighbors.length && this.neighbors
+          .zip(other.neighbors)
+          .forall {
+            case (thisv, otherv) => thisv.label == otherv.label
+          })
   }
 
   override def toString = "Vertex(" + label + ")"
@@ -49,8 +49,7 @@ final class Graph extends Serializable {
   }
 
   def sameAs(other: Graph): Boolean = {
-    (this ne other) &&
-    this.vertices.length == other.vertices.length &&
+    (this ne other) && this.vertices.length == other.vertices.length &&
     this.vertices.zip(other.vertices).forall {
       case (thisv, otherv) => thisv.sameAs(otherv)
     }
@@ -60,10 +59,8 @@ final class Graph extends Serializable {
 object GraphReader extends RegexParsers {
   override def skipWhitespace = false
 
-  lazy val token: Parser[String] =
-    """\S+""".r
-  lazy val edgeline: Parser[List[String]] =
-    repsep(token, whiteSpace)
+  lazy val token: Parser[String] = """\S+""".r
+  lazy val edgeline: Parser[List[String]] = repsep(token, whiteSpace)
 
   val vertices: Map[String, Vertex] = new HashMap[String, Vertex]
 
@@ -72,11 +69,13 @@ object GraphReader extends RegexParsers {
 
   def tokenize(line: String, onError: String => Unit): List[String] =
     parse(edgeline, line.trim) match {
-      case Success(args, _)     => args
+      case Success(args, _) => args
       case NoSuccess(msg, rest) => onError(msg); List()
     }
 
-  def readChunk(lines: Iterator[String], names: Map[String, String], size: Int): Graph = {
+  def readChunk(lines: Iterator[String],
+                names: Map[String, String],
+                size: Int): Graph = {
     val graph = new Graph
 
     for (line <- lines) {
@@ -86,7 +85,8 @@ object GraphReader extends RegexParsers {
       val firstLabel = labels.head.substring(0, labels.head.length - 1)
       val firstVertexOpt = vertices.get(firstLabel)
       val firstVertex =
-        if (firstVertexOpt.isEmpty) graph.addVertex(new Vertex(names(firstLabel), List()))
+        if (firstVertexOpt.isEmpty)
+          graph.addVertex(new Vertex(names(firstLabel), List()))
         else firstVertexOpt.get
       vertices.put(firstLabel, firstVertex)
 
@@ -94,7 +94,8 @@ object GraphReader extends RegexParsers {
         val vertexOpt = vertices.get(targetLabel)
 
         if (vertexOpt.isEmpty) {
-          val newVertex = graph.addVertex(new Vertex(names(targetLabel), List()))
+          val newVertex =
+            graph.addVertex(new Vertex(names(targetLabel), List()))
           vertices.put(targetLabel, newVertex)
           newVertex
         } else {
@@ -122,12 +123,12 @@ object GraphReader extends RegexParsers {
 
 object WikiGraph {
   val titlesPath = "benchmark/data/titles-sorted.txt"
-  val linksPath  = "benchmark/data/links-sorted.txt"
+  val linksPath = "benchmark/data/links-sorted.txt"
 
   implicit val codec = Codec("UTF-8")
   codec.onMalformedInput(CodingErrorAction.REPLACE)
   codec.onUnmappableCharacter(CodingErrorAction.REPLACE)
-  
+
   val names: Map[String, String] = new HashMap[String, String] {
     override def default(label: String) = {
       "no_title[" + label + "]"
@@ -136,8 +137,7 @@ object WikiGraph {
   // println("Building page title map...")
 
   val titles = Source.fromFile(titlesPath).getLines()
-  for ((title, i) <- titles.zipWithIndex)
-    names.put("" + i, title)
+  for ((title, i) <- titles.zipWithIndex) names.put("" + i, title)
 
   // println("Reading wikipedia graph from file... " + linksPath)
   val lines: Iterator[String] = Source.fromFile(linksPath).getLines()
@@ -160,10 +160,13 @@ object WikiGraphPicklingBench extends WikiGraphBenchmark {
   implicit val VertexTag = FastTypeTag.materializeFastTypeTag[Vertex]
   implicit val GraphTag = FastTypeTag.materializeFastTypeTag[Graph]
   implicit val StringTag = FastTypeTag.materializeFastTypeTag[String]
-  implicit val ColonColonVertexTag = FastTypeTag.materializeFastTypeTag[::[Vertex]]
+  implicit val ColonColonVertexTag =
+    FastTypeTag.materializeFastTypeTag[::[Vertex]]
   import scala.reflect.runtime.{universe => ru}
-  implicit val myLittlePony: ru.Mirror = ru.runtimeMirror(getClass.getClassLoader)
-  implicit val VectorVertexTag = FastTypeTag.materializeFastTypeTag[Vector[Vertex]]
+  implicit val myLittlePony: ru.Mirror =
+    ru.runtimeMirror(getClass.getClassLoader)
+  implicit val VectorVertexTag =
+    FastTypeTag.materializeFastTypeTag[Vector[Vertex]]
   implicit val ListVertexTag = FastTypeTag.materializeFastTypeTag[List[Vertex]]
   implicit val NilTag = FastTypeTag.materializeFastTypeTag[Nil.type]
   // TODO - why does this no longer compile?
@@ -222,8 +225,10 @@ object WikiGraphPicklingBench extends WikiGraphBenchmark {
   //     }
   //   }
   // }
-  implicit lazy val picklerUnpicklerColonColonVertex: Pickler[::[Vertex]] with Unpickler[::[Vertex]] = implicitly
-  implicit lazy val picklerUnpicklerVectorVertex: Pickler[Vector[Vertex]] with Unpickler[Vector[Vertex]] = Defaults.vectorPickler[Vertex]
+  implicit lazy val picklerUnpicklerColonColonVertex: Pickler[::[Vertex]] with Unpickler[
+      ::[Vertex]] = implicitly
+  implicit lazy val picklerUnpicklerVectorVertex: Pickler[Vector[Vertex]] with Unpickler[
+      Vector[Vertex]] = Defaults.vectorPickler[Vertex]
   implicit val picklerGraph = implicitly[Pickler[Graph]]
   implicit val unpicklerGraph = implicitly[Unpickler[Graph]]
 

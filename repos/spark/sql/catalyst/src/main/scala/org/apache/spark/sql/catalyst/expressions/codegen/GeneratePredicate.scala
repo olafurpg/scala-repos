@@ -21,18 +21,20 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 
 /**
- * Interface for generated predicate
- */
+  * Interface for generated predicate
+  */
 abstract class Predicate {
   def eval(r: InternalRow): Boolean
 }
 
 /**
- * Generates bytecode that evaluates a boolean [[Expression]] on a given input [[InternalRow]].
- */
-object GeneratePredicate extends CodeGenerator[Expression, (InternalRow) => Boolean] {
+  * Generates bytecode that evaluates a boolean [[Expression]] on a given input [[InternalRow]].
+  */
+object GeneratePredicate
+    extends CodeGenerator[Expression, (InternalRow) => Boolean] {
 
-  protected def canonicalize(in: Expression): Expression = ExpressionCanonicalizer.execute(in)
+  protected def canonicalize(in: Expression): Expression =
+    ExpressionCanonicalizer.execute(in)
 
   protected def bind(in: Expression, inputSchema: Seq[Attribute]): Expression =
     BindReferences.bindReference(in, inputSchema)
@@ -61,9 +63,14 @@ object GeneratePredicate extends CodeGenerator[Expression, (InternalRow) => Bool
         }
       }"""
 
-    logDebug(s"Generated predicate '$predicate':\n${CodeFormatter.format(code)}")
+    logDebug(
+        s"Generated predicate '$predicate':\n${CodeFormatter.format(code)}")
 
-    val p = CodeGenerator.compile(code).generate(ctx.references.toArray).asInstanceOf[Predicate]
-    (r: InternalRow) => p.eval(r)
+    val p = CodeGenerator
+      .compile(code)
+      .generate(ctx.references.toArray)
+      .asInstanceOf[Predicate]
+      (r: InternalRow) =>
+      p.eval(r)
   }
 }

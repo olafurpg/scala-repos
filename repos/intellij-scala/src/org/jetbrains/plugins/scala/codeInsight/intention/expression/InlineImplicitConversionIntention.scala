@@ -12,10 +12,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.util.IntentionUtils
 
 /**
- * @author Ksenia.Sautina
- * @since 5/4/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 5/4/12
+  */
 object InlineImplicitConversionIntention {
   def familyName = "Provide implicit conversion"
 }
@@ -25,8 +24,10 @@ class InlineImplicitConversionIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = getFamilyName
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean =  {
-    val expr : ScExpression = PsiTreeUtil.getParentOfType(element, classOf[ScExpression], false)
+  def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
+    val expr: ScExpression =
+      PsiTreeUtil.getParentOfType(element, classOf[ScExpression], false)
     if (expr == null) return false
 
     val implicitConversions = expr.getImplicitConversions(fromUnder = true)
@@ -37,14 +38,20 @@ class InlineImplicitConversionIntention extends PsiElementBaseIntentionAction {
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
-    val expr : ScExpression = PsiTreeUtil.getParentOfType(element, classOf[ScExpression], false)
+    val expr: ScExpression =
+      PsiTreeUtil.getParentOfType(element, classOf[ScExpression], false)
     if (expr == null || !expr.isValid) return
 
     val implicitConversions = expr.getImplicitConversions(fromUnder = true)
     val conversionFun = implicitConversions._2.orNull
-    if (conversionFun == null || !conversionFun.isInstanceOf[ScFunction]) return
+    if (conversionFun == null || !conversionFun.isInstanceOf[ScFunction])
+      return
     val secondPart = implicitConversions._4.getOrElse(Seq.empty)
 
-    IntentionUtils.replaceWithExplicit(expr, conversionFun.asInstanceOf[ScFunction], project, editor, secondPart)
+    IntentionUtils.replaceWithExplicit(expr,
+                                       conversionFun.asInstanceOf[ScFunction],
+                                       project,
+                                       editor,
+                                       secondPart)
   }
 }

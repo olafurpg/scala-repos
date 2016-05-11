@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.singleton.protobuf
 
 import akka.actor.ExtendedActorSystem
@@ -12,7 +12,8 @@ import akka.cluster.singleton.ClusterSingletonManager.Internal.TakeOverFromMe
 
 class ClusterSingletonMessageSerializerSpec extends AkkaSpec {
 
-  val serializer = new ClusterSingletonMessageSerializer(system.asInstanceOf[ExtendedActorSystem])
+  val serializer = new ClusterSingletonMessageSerializer(
+      system.asInstanceOf[ExtendedActorSystem])
 
   def checkSerialization(obj: AnyRef): Unit = {
     val blob = serializer.toBinary(obj)

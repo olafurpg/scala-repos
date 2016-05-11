@@ -1,4 +1,3 @@
-object UseIvy
-{
-	def yi = PublishedIvy.x
+object UseIvy {
+  def yi = PublishedIvy.x
 }

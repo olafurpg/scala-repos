@@ -23,5 +23,4 @@ object Main2 {
         context.system.terminate()
     }
   }
-
 }

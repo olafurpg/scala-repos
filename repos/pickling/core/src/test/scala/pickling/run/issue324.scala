@@ -12,5 +12,4 @@ class Issue324 extends FunSuite {
     val up = p.unpickle[Foo]
     assert(up.toString == "Foo(Set())")
   }
-
 }

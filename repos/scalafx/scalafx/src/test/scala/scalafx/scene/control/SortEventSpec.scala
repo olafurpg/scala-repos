@@ -35,12 +35,13 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * SortEvent Spec tests.
- */
+  * SortEvent Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class SortEventSpec[C]
-  extends SimpleSFXDelegateSpec[jfxsc.SortEvent[C], SortEvent[C]](classOf[jfxsc.SortEvent[C]], classOf[SortEvent[C]]) {
+    extends SimpleSFXDelegateSpec[jfxsc.SortEvent[C], SortEvent[C]](
+        classOf[jfxsc.SortEvent[C]], classOf[SortEvent[C]]) {
 
-  override def getJavaClassInstance = new jfxsc.SortEvent[C](null.asInstanceOf[C], null)
-
+  override def getJavaClassInstance =
+    new jfxsc.SortEvent[C](null.asInstanceOf[C], null)
 }

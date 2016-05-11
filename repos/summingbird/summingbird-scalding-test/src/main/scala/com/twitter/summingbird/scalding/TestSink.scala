@@ -19,13 +19,13 @@ package com.twitter.summingbird.scalding
 import com.twitter.algebird.monad._
 import com.twitter.summingbird.batch._
 
-import com.twitter.scalding.{ Source => ScaldingSource, Test => TestMode, _ }
+import com.twitter.scalding.{Source => ScaldingSource, Test => TestMode, _}
 import com.twitter.scalding.typed.TypedSink
 
 /**
- * This is a test sink that assumes single threaded testing with
- * cascading local mode
- */
+  * This is a test sink that assumes single threaded testing with
+  * cascading local mode
+  */
 class TestSink[T] extends Sink[T] {
   private var data: Vector[(Timestamp, T)] = Vector.empty
 

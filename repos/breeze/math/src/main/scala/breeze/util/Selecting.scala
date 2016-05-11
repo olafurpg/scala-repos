@@ -8,13 +8,15 @@ import scala.collection.mutable.ArrayBuffer
 
 /**Quickselect for linear-time medians, etc.
   * See [[scala.util.Sorting]] and [[breeze.util.Sorting]]
- * @author ktakagaki, dlwh
- */
-object quickSelect extends UFunc  {
+  * @author ktakagaki, dlwh
+  */
+object quickSelect extends UFunc {
 
 //  /** Quickselect from an array of T. */
 
-  implicit def implFromQSInPlace[T](implicit op: quickSelect.InPlaceImpl2[Array[T], Int]):Impl2[Array[T], Int, T] = {
+  implicit def implFromQSInPlace[T](
+      implicit op: quickSelect.InPlaceImpl2[Array[T], Int])
+    : Impl2[Array[T], Int, T] = {
     new Impl2[Array[T], Int, T] {
       def apply(a: Array[T], position: Int): T = {
         val quickselected: Array[T] = a.clone()
@@ -25,7 +27,8 @@ object quickSelect extends UFunc  {
   }
 
   @expand
-  implicit def inPlaceImpl2[@expand.args(Int, Long, Double, Float) T]: InPlaceImpl2[Array[T], Int] = {
+  implicit def inPlaceImpl2[
+      @expand.args(Int, Long, Double, Float) T]: InPlaceImpl2[Array[T], Int] = {
 
     new InPlaceImpl2[Array[T], Int] {
 
@@ -36,7 +39,9 @@ object quickSelect extends UFunc  {
         def implQuickSelectSort(x: Array[T], position: Int): Unit = {
           var left = 0
           var right = x.length - 1
-          require(position >= left && position <= right, "Invalid position specification: " + position + " with array length: " + x.length)
+          require(position >= left && position <= right,
+                  "Invalid position specification: " + position +
+                  " with array length: " + x.length)
 
           while (pivotIndex != position && right >= left) {
             val rand = Rand.randInt(right - left + 1)
@@ -73,12 +78,11 @@ object quickSelect extends UFunc  {
         implQuickSelectSort(x, position)
       }
     }
-
   }
 
-
-
-  implicit def implFromQSInPlaceColl[Coll, T](implicit view: Coll <:< Seq[T], ordering: Ordering[T]):Impl2[Coll, Int, T] = {
+  implicit def implFromQSInPlaceColl[Coll, T](
+      implicit view: Coll <:< Seq[T],
+      ordering: Ordering[T]): Impl2[Coll, Int, T] = {
     new Impl2[Coll, Int, T] {
       def apply(a: Coll, position: Int): T = {
         val copy = view(a).to[ArrayBuffer]
@@ -88,8 +92,9 @@ object quickSelect extends UFunc  {
     }
   }
 
-
-  implicit def implFromOrdering[T, Coll](implicit view: Coll <:< mutable.IndexedSeq[T], ordering: Ordering[T]): InPlaceImpl2[Coll, Int]  = {
+  implicit def implFromOrdering[T, Coll](
+      implicit view: Coll <:< mutable.IndexedSeq[T],
+      ordering: Ordering[T]): InPlaceImpl2[Coll, Int] = {
     new InPlaceImpl2[Coll, Int] {
 
       def apply(rawx: Coll, position: Int): Unit = {
@@ -97,10 +102,13 @@ object quickSelect extends UFunc  {
         val coll = view(rawx)
         var pivotIndex = -1
 
-        def implQuickSelectSort(x: mutable.IndexedSeq[T], position: Int): Unit = {
+        def implQuickSelectSort(
+            x: mutable.IndexedSeq[T], position: Int): Unit = {
           var left = 0
           var right = x.length - 1
-          require(position >= left && position <= right, "Invalid position specification: " + position + " with coll length: " + x.length)
+          require(position >= left && position <= right,
+                  "Invalid position specification: " + position +
+                  " with coll length: " + x.length)
 
           while (pivotIndex != position && right >= left) {
             val rand = Rand.randInt(right - left + 1)
@@ -110,7 +118,10 @@ object quickSelect extends UFunc  {
           }
         }
 
-        def partition(x: mutable.IndexedSeq[T], left: Int, right: Int, pivot: Int): Int = {
+        def partition(x: mutable.IndexedSeq[T],
+                      left: Int,
+                      right: Int,
+                      pivot: Int): Int = {
           val pivotVal = x(pivot)
           swap(pivot, right)
           var storeIndex = left
@@ -137,9 +148,7 @@ object quickSelect extends UFunc  {
         implQuickSelectSort(coll, position)
       }
     }
-
   }
-
 }
 
 /**quickSelectImpl does not clone the input array before doing a quickSelect-sort but instead
@@ -154,14 +163,14 @@ object quickSelect extends UFunc  {
   * For example, appending an element or updating an element to an array which has already
   * been through `quickSelectImpl` and then re-calculating `quickSelectImpl`
   * will be faster than applying quickSelectImpl de-novo to the original unsorted array.
- *
- */
+  *
+  */
 @deprecated("use quickSelect.inPlace instead", "0.12")
 object quickSelectImpl extends UFunc {
 
   @expand
-  implicit def impl[@expand.args(Int, Long, Double, Float) T]: Impl2[Array[T], Int, T] =
-
+  implicit def impl[@expand.args(Int, Long, Double, Float) T]: Impl2[
+      Array[T], Int, T] =
     new Impl2[Array[T], Int, T] {
 
       def apply(x: Array[T], position: Int): T = {
@@ -171,7 +180,9 @@ object quickSelectImpl extends UFunc {
         def implQuickSelectSort(x: Array[T], position: Int): Unit = {
           var left = 0
           var right = x.length - 1
-          require(position >= left && position <= right, "Invalid position specification: " + position + " with array length: " + x.length)
+          require(position >= left && position <= right,
+                  "Invalid position specification: " + position +
+                  " with array length: " + x.length)
 
           while (pivotIndex != position && right >= left) {
             val rand = Rand.randInt(right - left + 1)
@@ -187,8 +198,8 @@ object quickSelectImpl extends UFunc {
           var storeIndex = left
 
           var index = left
-          while( index < right ){
-            if( x(index) < pivotVal ){
+          while (index < right) {
+            if (x(index) < pivotVal) {
               swap(index, storeIndex)
               storeIndex += 1
             }
@@ -207,8 +218,6 @@ object quickSelectImpl extends UFunc {
 
         implQuickSelectSort(x, position)
         x(pivotIndex) // return
-
       }
     }
-
 }

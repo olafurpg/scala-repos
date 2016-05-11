@@ -45,10 +45,11 @@ object TestMutable {
   val bs = BitSet((1 until N): _*)
   (1 until N).foldLeft(gen) {
     case (acc, i) =>
-      assert(bs.size == N-i, s"Bad size for $bs, expected ${N-i} actual ${bs.size}")
+      assert(bs.size == N - i,
+             s"Bad size for $bs, expected ${N - i} actual ${bs.size}")
       assert(!bs.isEmpty, s"Unexpected isEmpty for $bs")
       bs -= acc
-      acc*gen % N
+      acc * gen % N
   }
   assert(bs.size == 0, s"Expected size == 0 for $bs")
   assert(bs.isEmpty, s"Expected isEmpty for $bs")
@@ -89,10 +90,10 @@ object TestMutable2 {
   println("m2_t1 = " + (t1.to(195) == b1.to(195)))
   println("m2_t2 = " + (t2.to(195) == b2.to(195)))
   println("m2_t3 = " + (t3.to(195) == b3.to(195)))
-  println("m2_r0 = " + (t0.range(43,194) == b0.range(43,194)))
-  println("m2_r1 = " + (t1.range(43,194) == b1.range(43,194)))
-  println("m2_r2 = " + (t2.range(43,194) == b2.range(43,194)))
-  println("m2_r3 = " + (t3.range(43,194) == b3.range(43,194)))
+  println("m2_r0 = " + (t0.range(43, 194) == b0.range(43, 194)))
+  println("m2_r1 = " + (t1.range(43, 194) == b1.range(43, 194)))
+  println("m2_r2 = " + (t2.range(43, 194) == b2.range(43, 194)))
+  println("m2_r3 = " + (t3.range(43, 194) == b3.range(43, 194)))
   println
 }
 
@@ -133,8 +134,7 @@ object TestMutable4 {
 
   println(bMax == bLarge)
 }
-***/
-
+  ***/
 object TestImmutable {
   import scala.collection.immutable.BitSet
 
@@ -199,10 +199,10 @@ object TestImmutable2 {
   println("i2_t1 = " + (t1.to(195) == b1.to(195)))
   println("i2_t2 = " + (t2.to(195) == b2.to(195)))
   println("i2_t3 = " + (t3.to(195) == b3.to(195)))
-  println("i2_r0 = " + (t0.range(77,194) == b0.range(77,194)))
-  println("i2_r1 = " + (t1.range(77,194) == b1.range(77,194)))
-  println("i2_r2 = " + (t2.range(77,194) == b2.range(77,194)))
-  println("i2_r3 = " + (t3.range(77,194) == b3.range(77,194)))
+  println("i2_r0 = " + (t0.range(77, 194) == b0.range(77, 194)))
+  println("i2_r1 = " + (t1.range(77, 194) == b1.range(77, 194)))
+  println("i2_r2 = " + (t2.range(77, 194) == b2.range(77, 194)))
+  println("i2_r3 = " + (t3.range(77, 194) == b3.range(77, 194)))
   println
 }
 

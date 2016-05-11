@@ -1,11 +1,10 @@
 // ticket #421
 
-@deprecated("Suppress warnings", since="2.11")
+@deprecated("Suppress warnings", since = "2.11")
 object Test extends App {
 
-  def transpose[A: ClassManifest](xss: Array[Array[A]]) = {
-    for (i <- Array.range(0, xss(0).length)) yield
-      for (xs <- xss) yield xs(i)
+  def transpose[A : ClassManifest](xss: Array[Array[A]]) = {
+    for (i <- Array.range(0, xss(0).length)) yield for (xs <- xss) yield xs(i)
   }
 
   def scalprod(xs: Array[Double], ys: Array[Double]) = {
@@ -18,15 +17,16 @@ object Test extends App {
     val ysst = transpose(yss)
     val ysst1: Array[Array[Double]] = yss.transpose
     assert(ysst.deep == ysst1.deep)
-    for (xs <- xss) yield
-      for (yst <- ysst) yield
-        scalprod(xs, yst)
+    for (xs <- xss) yield for (yst <- ysst) yield scalprod(xs, yst)
   }
 
   val a1 = Array(Array(0, 2, 4), Array(1, 3, 5))
   println(transpose(a1).deep.mkString("[", ",", "]"))
 
-  println(matmul(Array(Array(2, 3)), Array(Array(5), Array(7))).deep.mkString("[", ",", "]"))
+  println(
+      matmul(Array(Array(2, 3)), Array(Array(5), Array(7))).deep
+        .mkString("[", ",", "]"))
 
-  println(matmul(Array(Array(4)), Array(Array(6, 8))).deep.mkString("[", ",", "]"))
+  println(
+      matmul(Array(Array(4)), Array(Array(6, 8))).deep.mkString("[", ",", "]"))
 }

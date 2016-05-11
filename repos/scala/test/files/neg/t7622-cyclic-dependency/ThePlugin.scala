@@ -11,12 +11,12 @@ class ThePlugin(val global: Global) extends Plugin {
 
   val name = "cyclicdependency"
   val description = "Declares two phases that have a cyclic dependency"
-  val components = List[PluginComponent](thePhase1,thePhase2)
+  val components = List[PluginComponent](thePhase1, thePhase2)
 
   private object thePhase1 extends PluginComponent {
     val global = ThePlugin.this.global
 
-    val runsAfter = List[String]("tailcalls","cyclicdependency2")
+    val runsAfter = List[String]("tailcalls", "cyclicdependency2")
 
     val phaseName = ThePlugin.this.name + "1"
 
@@ -26,7 +26,7 @@ class ThePlugin(val global: Global) extends Plugin {
   private object thePhase2 extends PluginComponent {
     val global = ThePlugin.this.global
 
-    val runsAfter = List[String]("jvm","cyclicdependency1")
+    val runsAfter = List[String]("jvm", "cyclicdependency1")
 
     val phaseName = ThePlugin.this.name + "2"
 
@@ -37,4 +37,3 @@ class ThePlugin(val global: Global) extends Plugin {
     def run {}
   }
 }
-

@@ -1,6 +1,6 @@
-class DAOBase[E]{
+class DAOBase[E] {
   type TableType <: Config.driver.Table[E]
 }
-class SitesDAO extends DAOBase[String]{
+class SitesDAO extends DAOBase[String] {
   type TableType = Sites
 }

@@ -11,7 +11,8 @@ class Test[@specialized(Int, Double) X](val x: X) {
     // extract from an exception's stack trace. We can match just the
     // prefix, since the compiler will add a suffix to the method name
     // during lambdalift, when it lifts the local methods outside.
-    def specMe[@specialized(Int, Double) T, N](t: T, n: N): Unit = checkNameStartsWith(n.toString)
+    def specMe[@specialized(Int, Double) T, N](t: T, n: N): Unit =
+      checkNameStartsWith(n.toString)
 
     // expected to specialize:
     specMe("x", "specMe")
@@ -24,7 +25,8 @@ class Test[@specialized(Int, Double) X](val x: X) {
   // name matching:
   private[this] def checkNameStartsWith(prefix: String): Unit = {
     val method = (new Exception).getStackTrace()(1).getMethodName()
-    assert(method.startsWith(prefix), method + ".startsWith(" + prefix + ") should be true")
+    assert(method.startsWith(prefix),
+           method + ".startsWith(" + prefix + ") should be true")
   }
 }
 

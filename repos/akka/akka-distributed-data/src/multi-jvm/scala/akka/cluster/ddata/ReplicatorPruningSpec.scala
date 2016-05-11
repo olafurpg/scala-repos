@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.ddata
 
 import scala.concurrent.duration._
@@ -24,14 +24,15 @@ object ReplicatorPruningSpec extends MultiNodeConfig {
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
     """))
-
 }
 
 class ReplicatorPruningSpecMultiJvmNode1 extends ReplicatorPruningSpec
 class ReplicatorPruningSpecMultiJvmNode2 extends ReplicatorPruningSpec
 class ReplicatorPruningSpecMultiJvmNode3 extends ReplicatorPruningSpec
 
-class ReplicatorPruningSpec extends MultiNodeSpec(ReplicatorPruningSpec) with STMultiNodeSpec with ImplicitSender {
+class ReplicatorPruningSpec
+    extends MultiNodeSpec(ReplicatorPruningSpec) with STMultiNodeSpec
+    with ImplicitSender {
   import ReplicatorPruningSpec._
   import Replicator._
 
@@ -39,9 +40,11 @@ class ReplicatorPruningSpec extends MultiNodeSpec(ReplicatorPruningSpec) with ST
 
   implicit val cluster = Cluster(system)
   val maxPruningDissemination = 3.seconds
-  val replicator = system.actorOf(Replicator.props(
-    ReplicatorSettings(system).withGossipInterval(1.second)
-      .withPruning(pruningInterval = 1.second, maxPruningDissemination)), "replicator")
+  val replicator = system.actorOf(
+      Replicator.props(ReplicatorSettings(system)
+            .withGossipInterval(1.second)
+            .withPruning(pruningInterval = 1.second, maxPruningDissemination)),
+      "replicator")
   val timeout = 2.seconds.dilated
 
   val KeyA = GCounterKey("A")
@@ -71,22 +74,29 @@ class ReplicatorPruningSpec extends MultiNodeSpec(ReplicatorPruningSpec) with ST
 
       // we need the UniqueAddress
       val memberProbe = TestProbe()
-      cluster.subscribe(memberProbe.ref, initialStateMode = InitialStateAsEvents, classOf[MemberUp])
+      cluster.subscribe(memberProbe.ref,
+                        initialStateMode = InitialStateAsEvents,
+                        classOf[MemberUp])
       val thirdUniqueAddress = {
-        val member = memberProbe.fishForMessage(3.seconds) {
-          case MemberUp(m) if m.address == node(third).address ⇒ true
-          case _ ⇒ false
-        }.asInstanceOf[MemberUp].member
+        val member = memberProbe
+          .fishForMessage(3.seconds) {
+            case MemberUp(m) if m.address == node(third).address ⇒ true
+            case _ ⇒ false
+          }
+          .asInstanceOf[MemberUp]
+          .member
         member.uniqueAddress
       }
 
       replicator ! Update(KeyA, GCounter(), WriteAll(timeout))(_ + 3)
       expectMsg(UpdateSuccess(KeyA, None))
 
-      replicator ! Update(KeyB, ORSet(), WriteAll(timeout))(_ + "a" + "b" + "c")
+      replicator ! Update(KeyB, ORSet(), WriteAll(timeout))(
+          _ + "a" + "b" + "c")
       expectMsg(UpdateSuccess(KeyB, None))
 
-      replicator ! Update(KeyC, PNCounterMap(), WriteAll(timeout))(_ increment "x" increment "y")
+      replicator ! Update(KeyC, PNCounterMap(), WriteAll(timeout))(
+          _ increment "x" increment "y")
       expectMsg(UpdateSuccess(KeyC, None))
 
       enterBarrier("updates-done")
@@ -127,7 +137,8 @@ class ReplicatorPruningSpec extends MultiNodeSpec(ReplicatorPruningSpec) with ST
             expectMsgPF() {
               case g @ GetSuccess(KeyA, _) ⇒
                 g.get(KeyA).value should be(9)
-                g.get(KeyA).needPruningFrom(thirdUniqueAddress) should be(false)
+                g.get(KeyA).needPruningFrom(thirdUniqueAddress) should be(
+                    false)
             }
           }
         }
@@ -137,7 +148,8 @@ class ReplicatorPruningSpec extends MultiNodeSpec(ReplicatorPruningSpec) with ST
             expectMsgPF() {
               case g @ GetSuccess(KeyB, _) ⇒
                 g.get(KeyB).elements should be(Set("a", "b", "c"))
-                g.get(KeyB).needPruningFrom(thirdUniqueAddress) should be(false)
+                g.get(KeyB).needPruningFrom(thirdUniqueAddress) should be(
+                    false)
             }
           }
         }
@@ -147,7 +159,8 @@ class ReplicatorPruningSpec extends MultiNodeSpec(ReplicatorPruningSpec) with ST
             expectMsgPF() {
               case g @ GetSuccess(KeyC, _) ⇒
                 g.get(KeyC).entries should be(Map("x" -> 3L, "y" -> 3L))
-                g.get(KeyC).needPruningFrom(thirdUniqueAddress) should be(false)
+                g.get(KeyC).needPruningFrom(thirdUniqueAddress) should be(
+                    false)
             }
           }
         }
@@ -192,6 +205,4 @@ class ReplicatorPruningSpec extends MultiNodeSpec(ReplicatorPruningSpec) with ST
       enterBarrier("after-1")
     }
   }
-
 }
-

@@ -37,8 +37,8 @@ package lensTestDataTypes {
   case class Foo(i: Int, s: String)
   case class Bar(i: Int, b: Boolean)
 
-  case class Address(street : String, city : String, postcode : String)
-  case class Person(name : String, age : Int, address : Address)
+  case class Address(street: String, city: String, postcode: String)
+  case class Person(name: String, age: Int, address: Address)
 
   sealed trait BGraph[T]
   case class BTerm[T](value: T) extends BGraph[T]
@@ -86,7 +86,8 @@ trait LensTests {
 
     val personStreetLens1 = streetLens compose addressLens
     val personStreetLens2 = compose(streetLens, addressLens)
-    val personStreetLens3 = (streetLens :: addressLens :: HNil).reduceLeft(compose)
+    val personStreetLens3 =
+      (streetLens :: addressLens :: HNil).reduceLeft(compose)
 
     val street1 = personStreetLens1.get(person)
     typed[String](street1)
@@ -122,7 +123,7 @@ trait LensTests {
     typed[ISDB](tpi)
     assertEquals((13, ("foo", (2.0, false))), tpi)
 
-    val sdb  = lens1.get(tp)
+    val sdb = lens1.get(tp)
     typed[(String, (Double, Boolean))](sdb)
     assertEquals(("foo", (2.0, false)), sdb)
 
@@ -138,7 +139,7 @@ trait LensTests {
     typed[ISDB](tps)
     assertEquals((23, ("bar", (2.0, false))), tps)
 
-    val db  = lens11.get(tp)
+    val db = lens11.get(tp)
     typed[(Double, Boolean)](db)
     assertEquals((2.0, false), db)
 
@@ -148,7 +149,7 @@ trait LensTests {
 
     val d = lens110.get(tp)
     typed[Double](d)
-    (2.0, d,  Double.MinPositiveValue)
+    (2.0, d, Double.MinPositiveValue)
 
     val tpd = lens110.set(tp)(3.0)
     typed[ISDB](tpd)
@@ -278,43 +279,46 @@ trait LensTests {
     assertEquals(("Joe Grey", 37, "Brighton"), nac1)
 
     val person2 = nameAgeCityLens.set(person)("Joe Soap", 27, "London")
-    assertEquals(Person("Joe Soap", 27, Address("Southover Street", "London", "BN2 9UA")), person2)
+    assertEquals(
+        Person(
+            "Joe Soap", 27, Address("Southover Street", "London", "BN2 9UA")),
+        person2)
   }
 }
 
 class LensTestsNat extends LensTests {
-  val nameLens     = lens[Person] >> 0
-  val ageLens      = lens[Person] >> 1
-  val addressLens  = lens[Person] >> 2
-  val streetLens   = lens[Person] >> 2 >> 0
-  val cityLens     = lens[Person] >> 2 >> 1
+  val nameLens = lens[Person] >> 0
+  val ageLens = lens[Person] >> 1
+  val addressLens = lens[Person] >> 2
+  val streetLens = lens[Person] >> 2 >> 0
+  val cityLens = lens[Person] >> 2 >> 1
   val postcodeLens = lens[Person] >> 2 >> 2
 }
 
 class LensTestsKey extends LensTests {
-  val nameLens     = lens[Person] >> 'name
-  val ageLens      = lens[Person] >> 'age
-  val addressLens  = lens[Person] >> 'address
-  val streetLens   = lens[Person] >> 'address >> 'street
-  val cityLens     = lens[Person] >> 'address >> 'city
+  val nameLens = lens[Person] >> 'name
+  val ageLens = lens[Person] >> 'age
+  val addressLens = lens[Person] >> 'address
+  val streetLens = lens[Person] >> 'address >> 'street
+  val cityLens = lens[Person] >> 'address >> 'city
   val postcodeLens = lens[Person] >> 'address >> 'postcode
 }
 
 class OpticTestsDynamic extends LensTests {
-  val nameLens     = lens[Person].name
-  val ageLens      = lens[Person].age
-  val addressLens  = lens[Person].address
-  val streetLens   = lens[Person].address.street
-  val cityLens     = lens[Person].address.city
+  val nameLens = lens[Person].name
+  val ageLens = lens[Person].age
+  val addressLens = lens[Person].address
+  val streetLens = lens[Person].address.street
+  val cityLens = lens[Person].address.city
   val postcodeLens = lens[Person].address.postcode
 }
 
 class AscribedOpticTestsDynamic extends LensTests {
-  val nameLens: Lens[Person, String]     = lens[Person].name
-  val ageLens: Lens[Person, Int]         = lens[Person].age
+  val nameLens: Lens[Person, String] = lens[Person].name
+  val ageLens: Lens[Person, Int] = lens[Person].age
   val addressLens: Lens[Person, Address] = lens[Person].address
-  val streetLens: Lens[Person, String]   = lens[Person].address.street
-  val cityLens: Lens[Person, String]     = lens[Person].address.city
+  val streetLens: Lens[Person, String] = lens[Person].address.street
+  val cityLens: Lens[Person, String] = lens[Person].address.city
   val postcodeLens: Lens[Person, String] = lens[Person].address.postcode
 }
 
@@ -689,7 +693,8 @@ class OpticTests {
 
   @Test
   def testInferredLenses {
-    def update[T, E](t: T)(e: E)(implicit mkLens: p.Lens[T, E]): T = mkLens().set(t)(e)
+    def update[T, E](t: T)(e: E)(implicit mkLens: p.Lens[T, E]): T =
+      mkLens().set(t)(e)
 
     val p = ^.i
 
@@ -705,7 +710,6 @@ class OpticTests {
     assertEquals(Bar(7, true), bar2)
   }
 
-  
   @Test
   def testUnapply {
     val t1: Tree[Int] = Node(Node(Leaf(1), Leaf(2)), Leaf(3))
@@ -768,12 +772,14 @@ class OpticTests {
     assertEquals(BTerm(2), a)
     assertEquals(BTerm(1), b)
 
-    lazy val g0 @ rll(x: BTerm[Int], y: BTerm[Int]) = new BNode(BTerm(1), new BNode(BTerm(2), new BNode(x, y)))
+    lazy val g0 @ rll(x: BTerm[Int], y: BTerm[Int]) = new BNode(
+        BTerm(1), new BNode(BTerm(2), new BNode(x, y)))
     val rrlvrrrv(x1, y1) = g0
     assertEquals(2, x1)
     assertEquals(1, y1)
 
-    lazy val rlg(z: BTerm[Int], g1: BGraph[Int]) = new BNode(BTerm(1), new BNode(BTerm(2), new BNode(z, g1)))
+    lazy val rlg(z: BTerm[Int], g1: BGraph[Int]) = new BNode(
+        BTerm(1), new BNode(BTerm(2), new BNode(z, g1)))
 
     val looped(x2, y2) = g1
     assertEquals(1, x2)

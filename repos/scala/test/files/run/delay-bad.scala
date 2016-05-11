@@ -1,5 +1,4 @@
-trait A extends DelayedInit
-{
+trait A extends DelayedInit {
   print("-A")
 
   def delayedInit(body: => Unit) = {
@@ -26,7 +25,7 @@ trait C extends B {
   }
 }
 
-class D() extends C  {
+class D() extends C {
   print(" -D")
   override def postConstructionCode: Unit = {
     super.postConstructionCode
@@ -48,14 +47,14 @@ object Test {
     val f: A => Unit = _ => ()
 
     p("new C { }")
-    f(new C { })
+    f(new C {})
     p("new C { 5 }")
     f(new C { 5 })
 
     p("new D()")
     f(new D())
     p("new D() { }")
-    f(new D() { })
+    f(new D() {})
 
     p("new D() { val x = 5 }")
     f(new D() { val x = 5 })
@@ -68,7 +67,7 @@ object Test {
     f(new { val x = 5 } with E())
 
     p("new { val x = 5 } with E() { }")
-    f(new { val x = 5 } with E() { })
+    f(new { val x = 5 } with E() {})
     p("new { val x = 5 } with E() { 5 }")
     f(new { val x = 5 } with E() { 5 })
 

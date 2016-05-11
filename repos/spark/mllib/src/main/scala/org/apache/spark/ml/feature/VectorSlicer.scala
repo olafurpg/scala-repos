@@ -29,32 +29,36 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StructType
 
 /**
- * :: Experimental ::
- * This class takes a feature vector and outputs a new feature vector with a subarray of the
- * original features.
- *
- * The subset of features can be specified with either indices ([[setIndices()]])
- * or names ([[setNames()]]).  At least one feature must be selected. Duplicate features
- * are not allowed, so there can be no overlap between selected indices and names.
- *
- * The output vector will order features with the selected indices first (in the order given),
- * followed by the selected names (in the order given).
- */
+  * :: Experimental ::
+  * This class takes a feature vector and outputs a new feature vector with a subarray of the
+  * original features.
+  *
+  * The subset of features can be specified with either indices ([[setIndices()]])
+  * or names ([[setNames()]]).  At least one feature must be selected. Duplicate features
+  * are not allowed, so there can be no overlap between selected indices and names.
+  *
+  * The output vector will order features with the selected indices first (in the order given),
+  * followed by the selected names (in the order given).
+  */
 @Experimental
 final class VectorSlicer(override val uid: String)
-  extends Transformer with HasInputCol with HasOutputCol with DefaultParamsWritable {
+    extends Transformer with HasInputCol with HasOutputCol
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("vectorSlicer"))
 
   /**
-   * An array of indices to select features from a vector column.
-   * There can be no overlap with [[names]].
-   * Default: Empty array
-   * @group param
-   */
-  val indices = new IntArrayParam(this, "indices",
-    "An array of indices to select features from a vector column." +
-      " There can be no overlap with names.", VectorSlicer.validIndices)
+    * An array of indices to select features from a vector column.
+    * There can be no overlap with [[names]].
+    * Default: Empty array
+    * @group param
+    */
+  val indices = new IntArrayParam(
+      this,
+      "indices",
+      "An array of indices to select features from a vector column." +
+      " There can be no overlap with names.",
+      VectorSlicer.validIndices)
 
   setDefault(indices -> Array.empty[Int])
 
@@ -65,15 +69,18 @@ final class VectorSlicer(override val uid: String)
   def setIndices(value: Array[Int]): this.type = set(indices, value)
 
   /**
-   * An array of feature names to select features from a vector column.
-   * These names must be specified by ML [[org.apache.spark.ml.attribute.Attribute]]s.
-   * There can be no overlap with [[indices]].
-   * Default: Empty Array
-   * @group param
-   */
-  val names = new StringArrayParam(this, "names",
-    "An array of feature names to select features from a vector column." +
-      " There can be no overlap with indices.", VectorSlicer.validNames)
+    * An array of feature names to select features from a vector column.
+    * These names must be specified by ML [[org.apache.spark.ml.attribute.Attribute]]s.
+    * There can be no overlap with [[indices]].
+    * Default: Empty Array
+    * @group param
+    */
+  val names = new StringArrayParam(
+      this,
+      "names",
+      "An array of feature names to select features from a vector column." +
+      " There can be no overlap with indices.",
+      VectorSlicer.validNames)
 
   setDefault(names -> Array.empty[String])
 
@@ -95,14 +102,16 @@ final class VectorSlicer(override val uid: String)
     val inputAttr = AttributeGroup.fromStructField(dataset.schema($(inputCol)))
     inputAttr.numAttributes.foreach { numFeatures =>
       val maxIndex = $(indices).max
-      require(maxIndex < numFeatures,
-        s"Selected feature index $maxIndex invalid for only $numFeatures input features.")
+      require(
+          maxIndex < numFeatures,
+          s"Selected feature index $maxIndex invalid for only $numFeatures input features.")
     }
 
     // Prepare output attributes
     val inds = getSelectedFeatureIndices(dataset.schema)
-    val selectedAttrs: Option[Array[Attribute]] = inputAttr.attributes.map { attrs =>
-      inds.map(index => attrs(index))
+    val selectedAttrs: Option[Array[Attribute]] = inputAttr.attributes.map {
+      attrs =>
+        inds.map(index => attrs(index))
     }
     val outputAttr = selectedAttrs match {
       case Some(attrs) => new AttributeGroup($(outputCol), attrs)
@@ -116,30 +125,37 @@ final class VectorSlicer(override val uid: String)
         case features: SparseVector => features.slice(inds)
       }
     }
-    dataset.withColumn($(outputCol), slicer(dataset($(inputCol))), outputAttr.toMetadata())
+    dataset.withColumn(
+        $(outputCol), slicer(dataset($(inputCol))), outputAttr.toMetadata())
   }
 
   /** Get the feature indices in order: indices, names */
   private def getSelectedFeatureIndices(schema: StructType): Array[Int] = {
-    val nameFeatures = MetadataUtils.getFeatureIndicesFromNames(schema($(inputCol)), $(names))
+    val nameFeatures =
+      MetadataUtils.getFeatureIndicesFromNames(schema($(inputCol)), $(names))
     val indFeatures = $(indices)
     val numDistinctFeatures = (nameFeatures ++ indFeatures).distinct.length
-    lazy val errMsg = "VectorSlicer requires indices and names to be disjoint" +
+    lazy val errMsg =
+      "VectorSlicer requires indices and names to be disjoint" +
       s" sets of features, but they overlap." +
-      s" indices: ${indFeatures.mkString("[", ",", "]")}." +
-      s" names: " +
-      nameFeatures.zip($(names)).map { case (i, n) => s"$i:$n" }.mkString("[", ",", "]")
-    require(nameFeatures.length + indFeatures.length == numDistinctFeatures, errMsg)
+      s" indices: ${indFeatures.mkString("[", ",", "]")}." + s" names: " +
+      nameFeatures
+        .zip($(names))
+        .map { case (i, n) => s"$i:$n" }
+        .mkString("[", ",", "]")
+    require(nameFeatures.length + indFeatures.length == numDistinctFeatures,
+            errMsg)
     indFeatures ++ nameFeatures
   }
 
   override def transformSchema(schema: StructType): StructType = {
     require($(indices).length > 0 || $(names).length > 0,
-      s"VectorSlicer requires that at least one feature be selected.")
+            s"VectorSlicer requires that at least one feature be selected.")
     SchemaUtils.checkColumnType(schema, $(inputCol), new VectorUDT)
 
     if (schema.fieldNames.contains($(outputCol))) {
-      throw new IllegalArgumentException(s"Output column ${$(outputCol)} already exists.")
+      throw new IllegalArgumentException(
+          s"Output column ${$(outputCol)} already exists.")
     }
     val numFeaturesSelected = $(indices).length + $(names).length
     val outputAttr = new AttributeGroup($(outputCol), numFeaturesSelected)

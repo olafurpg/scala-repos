@@ -3,7 +3,9 @@
 // lambda had a constant type. That would result in a compiler crash as
 // when the delambdafy phase got a tree shape it didn't understand
 class X[@specialized(Int) A] {
-  val f = { x: A => false }
+  val f = { x: A =>
+    false
+  }
 }
 
 object Test {

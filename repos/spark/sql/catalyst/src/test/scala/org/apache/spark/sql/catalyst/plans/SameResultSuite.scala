@@ -24,18 +24,20 @@ import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, LogicalPlan}
 import org.apache.spark.sql.catalyst.util._
 
 /**
- * Tests for the sameResult function of [[LogicalPlan]].
- */
+  * Tests for the sameResult function of [[LogicalPlan]].
+  */
 class SameResultSuite extends SparkFunSuite {
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
   val testRelation2 = LocalRelation('a.int, 'b.int, 'c.int)
 
-  def assertSameResult(a: LogicalPlan, b: LogicalPlan, result: Boolean = true): Unit = {
+  def assertSameResult(
+      a: LogicalPlan, b: LogicalPlan, result: Boolean = true): Unit = {
     val aAnalyzed = a.analyze
     val bAnalyzed = b.analyze
 
     if (aAnalyzed.sameResult(bAnalyzed) != result) {
-      val comparison = sideBySide(aAnalyzed.toString, bAnalyzed.toString).mkString("\n")
+      val comparison =
+        sideBySide(aAnalyzed.toString, bAnalyzed.toString).mkString("\n")
       fail(s"Plans should return sameResult = $result\n$comparison")
     }
   }
@@ -51,14 +53,18 @@ class SameResultSuite extends SparkFunSuite {
     assertSameResult(testRelation.select('b, 'a), testRelation2.select('b, 'a))
 
     assertSameResult(testRelation, testRelation2.select('a), result = false)
-    assertSameResult(testRelation.select('b, 'a), testRelation2.select('a, 'b), result = false)
+    assertSameResult(testRelation.select('b, 'a),
+                     testRelation2.select('a, 'b),
+                     result = false)
   }
 
   test("filters") {
-    assertSameResult(testRelation.where('a === 'b), testRelation2.where('a === 'b))
+    assertSameResult(
+        testRelation.where('a === 'b), testRelation2.where('a === 'b))
   }
 
   test("sorts") {
-    assertSameResult(testRelation.orderBy('a.asc), testRelation2.orderBy('a.asc))
+    assertSameResult(
+        testRelation.orderBy('a.asc), testRelation2.orderBy('a.asc))
   }
 }

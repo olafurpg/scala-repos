@@ -6,7 +6,8 @@ class SCL6417 {
   def testValidation(): Unit = {
     (validateOptionalX(Some(0)) |@| validateOptionalY(Some(1))).tupled match {
       case Success((x, y)) =>
-        /*start*/y/*end*/
+        /*start*/
+        y /*end*/
         println(s"Success $x, $y")
       case Failure(errors) => println(errors.toString)
     }
@@ -23,6 +24,5 @@ class SCL6417 {
     case Some(yy) => Success(yy)
     case None => Failure("Required!").toValidationNel
   }
-
 }
 //Int

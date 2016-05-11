@@ -6,7 +6,7 @@ object Test {
   implicitly[Int]
 }
 
-object Implicits  {
+object Implicits {
   implicit val Baz: Int = 0
   // This implicit was being ignored by `isQualifyingImplicit`
   // if the classpath contained a class file for `class Baz`.

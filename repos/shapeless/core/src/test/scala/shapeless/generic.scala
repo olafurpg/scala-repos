@@ -19,7 +19,7 @@ package shapeless
 import org.junit.Test
 import org.junit.Assert._
 
-import ops.{ hlist => hl, coproduct => cp }
+import ops.{hlist => hl, coproduct => cp}
 import testutil.assertTypedEquals
 import test.illTyped
 
@@ -31,8 +31,8 @@ package GenericTestsAux {
   case class Orange() extends Fruit
 
   object showFruit extends Poly1 {
-    implicit def caseApple  = at[Apple](_ => "Pomme")
-    implicit def casePear   = at[Pear](_ => "Poire")
+    implicit def caseApple = at[Apple](_ => "Pomme")
+    implicit def casePear = at[Pear](_ => "Poire")
     implicit def caseBanana = at[Banana](_ => "Banane")
     implicit def caseOrange = at[Orange](_ => "Orange")
   }
@@ -59,13 +59,14 @@ package GenericTestsAux {
   case object N extends L
   case class C(hd: Int, tl: L) extends L
 
-  case class Company(depts : List[Dept])
+  case class Company(depts: List[Dept])
   sealed trait Subunit
-  case class Dept(name : String, manager : Employee, subunits : List[Subunit]) extends Subunit
-  case class Employee(person : Person, salary : Salary) extends Subunit
-  case class Person(name : String, address : String, age: Int)
+  case class Dept(name: String, manager: Employee, subunits: List[Subunit])
+      extends Subunit
+  case class Employee(person: Person, salary: Salary) extends Subunit
+  case class Person(name: String, address: String, age: Int)
 
-  case class Salary(salary : Double)
+  case class Salary(salary: Double)
 
   case class PersonWithPseudonims(name: String, nicks: String*)
 
@@ -74,9 +75,11 @@ package GenericTestsAux {
   }
 
   object star extends starLP {
-    implicit def caseString = at[String](_+"*")
+    implicit def caseString = at[String](_ + "*")
 
-    implicit def caseIso[T, L <: HList](implicit gen: Generic.Aux[T, L], mapper: Lazy[hl.Mapper.Aux[this.type, L, L]]) =
+    implicit def caseIso[T, L <: HList](
+        implicit gen: Generic.Aux[T, L],
+        mapper: Lazy[hl.Mapper.Aux[this.type, L, L]]) =
       at[T](t => gen.from(mapper.value(gen.to(t))))
   }
 
@@ -85,12 +88,16 @@ package GenericTestsAux {
   }
 
   object inc extends incLP {
-    implicit val caseInt = at[Int](_+1)
+    implicit val caseInt = at[Int](_ + 1)
 
-    implicit def caseProduct[T, L <: HList](implicit gen: Generic.Aux[T, L], mapper: hl.Mapper.Aux[this.type, L, L]) =
+    implicit def caseProduct[T, L <: HList](
+        implicit gen: Generic.Aux[T, L],
+        mapper: hl.Mapper.Aux[this.type, L, L]) =
       at[T](t => gen.from(gen.to(t).map(inc)))
 
-    implicit def caseCoproduct[T, L <: Coproduct](implicit gen: Generic.Aux[T, L], mapper: cp.Mapper.Aux[this.type, L, L]) =
+    implicit def caseCoproduct[T, L <: Coproduct](
+        implicit gen: Generic.Aux[T, L],
+        mapper: cp.Mapper.Aux[this.type, L, L]) =
       at[T](t => gen.from(gen.to(t).map(inc)))
   }
 
@@ -101,7 +108,8 @@ package GenericTestsAux {
   class NonCCWithCompanion private (val i: Int, val s: String)
   object NonCCWithCompanion {
     def apply(i: Int, s: String) = new NonCCWithCompanion(i, s)
-    def unapply(s: NonCCWithCompanion): Option[(Int, String)] = Some((s.i, s.s))
+    def unapply(s: NonCCWithCompanion): Option[(Int, String)] =
+      Some((s.i, s.s))
   }
 
   class NonCCLazy(prev0: => NonCCLazy, next0: => NonCCLazy) {
@@ -126,7 +134,7 @@ package GenericTestsAux {
 
 class GenericTests {
   import GenericTestsAux._
-  import scala.collection.immutable.{ :: => Cons }
+  import scala.collection.immutable.{:: => Cons}
   import test._
 
   type ABP = Apple :+: Banana :+: Pear :+: CNil
@@ -172,7 +180,9 @@ class GenericTests {
     typed[Generic[(Int, String)] { type Repr = Int :: String :: HNil }](gen2)
 
     val gen3 = Generic[(Int, String, Boolean)]
-    typed[Generic[(Int, String, Boolean)] { type Repr = Int :: String :: Boolean :: HNil }](gen3)
+    typed[
+        Generic[(Int, String, Boolean)] { type Repr = Int :: String :: Boolean :: HNil }](
+        gen3)
   }
 
   @Test
@@ -191,7 +201,8 @@ class GenericTests {
 
     val e0 = star(e)
     typed[Employee](e0)
-    assertEquals(Employee(Person("Joe Soap*", "Brighton*", 23), Salary(2000)), e0)
+    assertEquals(
+        Employee(Person("Joe Soap*", "Brighton*", 23), Salary(2000)), e0)
   }
 
   @Test
@@ -385,7 +396,7 @@ class GenericTests {
 
   @Test
   def testParametrizedWithVarianceList {
-    import scala.collection.immutable.{ :: => Cons }
+    import scala.collection.immutable.{:: => Cons}
 
     val l: List[Int] = List(1, 2, 3)
     type CN = Cons[Int] :+: Nil.type :+: CNil
@@ -623,12 +634,17 @@ class GenericTests {
     def apply[T](implicit tc: TC[T]): TC[T] = tc
 
     implicit def hnilTC: TC[HNil] = new TC[HNil] {}
-    implicit def hconsTC[H, T <: HList](implicit hd: Lazy[TC[H]], tl: Lazy[TC[T]]): TC[H :: T] = new TC[H :: T] {}
+    implicit def hconsTC[H, T <: HList](
+        implicit hd: Lazy[TC[H]], tl: Lazy[TC[T]]): TC[H :: T] =
+      new TC[H :: T] {}
 
     implicit def cnilTC: TC[CNil] = new TC[CNil] {}
-    implicit def cconsTC[H, T <: Coproduct](implicit hd: Lazy[TC[H]], tl: Lazy[TC[T]]): TC[H :+: T] = new TC[H :+: T] {}
+    implicit def cconsTC[H, T <: Coproduct](
+        implicit hd: Lazy[TC[H]], tl: Lazy[TC[T]]): TC[H :+: T] =
+      new TC[H :+: T] {}
 
-    implicit def projectTC[F, G](implicit gen: Generic.Aux[F, G], tc: Lazy[TC[G]]): TC[F] = new TC[F] {}
+    implicit def projectTC[F, G](
+        implicit gen: Generic.Aux[F, G], tc: Lazy[TC[G]]): TC[F] = new TC[F] {}
   }
 
   @Test
@@ -643,8 +659,8 @@ package GenericTestsAux2 {
   object Foo {
     implicit val deriveHNil: Foo[HNil] = ???
 
-    implicit def deriveLabelledGeneric[A, Rec <: HList]
-      (implicit gen: Generic.Aux[A, Rec], auto: Foo[Rec]): Foo[A] = ???
+    implicit def deriveLabelledGeneric[A, Rec <: HList](
+        implicit gen: Generic.Aux[A, Rec], auto: Foo[Rec]): Foo[A] = ???
   }
 
   class Bar[A]
@@ -652,11 +668,11 @@ package GenericTestsAux2 {
   object Bar {
     implicit def cnil: Bar[CNil] = ???
 
-    implicit def deriveCoproduct[H, T <: Coproduct]
-      (implicit headFoo: Foo[H], tailAux: Bar[T]): Bar[H :+: T] = ???
+    implicit def deriveCoproduct[H, T <: Coproduct](
+        implicit headFoo: Foo[H], tailAux: Bar[T]): Bar[H :+: T] = ???
 
-    implicit def labelledGeneric[A, U <: Coproduct]
-      (implicit gen: Generic.Aux[A, U], auto: Bar[U]): Bar[A] = ???
+    implicit def labelledGeneric[A, U <: Coproduct](
+        implicit gen: Generic.Aux[A, U], auto: Bar[U]): Bar[A] = ???
   }
 
   class Outer1 {
@@ -719,13 +735,13 @@ package GenericTestsAux2 {
 
     Generic[Command.Execution]
   }
-  */
+ */
 }
 
 object MixedCCNonCCNested {
   // Block local
   {
-    object T1{
+    object T1 {
       sealed abstract class Tree
       final case class Node(left: Tree, right: Tree, v: Int) extends Tree
       case object Leaf extends Tree
@@ -759,7 +775,7 @@ object MixedCCNonCCNested {
   }
 
   def methodLocal: Unit = {
-    object T1{
+    object T1 {
       sealed abstract class Tree
       final case class Node(left: Tree, right: Tree, v: Int) extends Tree
       case object Leaf extends Tree
@@ -793,7 +809,7 @@ object MixedCCNonCCNested {
   }
 
   // Top level
-  object T1{
+  object T1 {
     sealed abstract class Tree
     final case class Node(left: Tree, right: Tree, v: Int) extends Tree
     case object Leaf extends Tree
@@ -1094,17 +1110,18 @@ object Thrift {
     //class Immutable(val a: Double, val b: String) extends TProduct
 
     class Immutable(
-      val a: Double,
-      val b: String,
-      val _passthroughFields: scala.collection.immutable.Map[Short, Byte]
-    ) extends TProduct {
+        val a: Double,
+        val b: String,
+        val _passthroughFields: scala.collection.immutable.Map[Short, Byte]
+    )
+        extends TProduct {
       def this(
-        a: Double,
-        b: String
+          a: Double,
+          b: String
       ) = this(
-        a,
-        b,
-        Map.empty
+          a,
+          b,
+          Map.empty
       )
     }
   }

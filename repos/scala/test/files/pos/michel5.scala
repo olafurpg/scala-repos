@@ -1,5 +1,5 @@
-trait A[Ta] { }
+trait A[Ta] {}
 
 class B() extends AnyRef with A[Int] {
-  val x : Int = 2
+  val x: Int = 2
 }

@@ -29,5 +29,5 @@ object Test {
 
   "": AnyVal
 
-  new Object() : AnyVal
+  new Object(): AnyVal
 }

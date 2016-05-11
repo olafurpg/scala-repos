@@ -6,7 +6,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class BufferTest extends FunSuite {
-  val bytes = Array[Byte](0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x78)
+  val bytes = Array[Byte](0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x78)
 
   test("read Byte") {
     val br = BufferReader(bytes)
@@ -43,7 +43,8 @@ class BufferTest extends FunSuite {
 
   test("read Signed Int") {
     val n = 0xfffff6ff
-    val br = BufferReader(Array[Byte](0xff.toByte, 0xf6.toByte, 0xff.toByte, 0xff.toByte))
+    val br = BufferReader(
+        Array[Byte](0xff.toByte, 0xf6.toByte, 0xff.toByte, 0xff.toByte))
     assert(n == br.readInt())
   }
 
@@ -55,7 +56,7 @@ class BufferTest extends FunSuite {
   test("read null terminated string") {
     val str = "Null Terminated String\u0000"
     val br = BufferReader(str.getBytes)
-    assert(str.take(str.size-1) == br.readNullTerminatedString())
+    assert(str.take(str.size - 1) == br.readNullTerminatedString())
   }
 
   test("read tiny length coded string") {
@@ -139,7 +140,7 @@ class BufferTest extends FunSuite {
     import ctx._
     val str = "test\u0000"
     bw.writeNullTerminatedString(str)
-    assert(str.take(str.length-1) == br.readNullTerminatedString())
+    assert(str.take(str.length - 1) == br.readNullTerminatedString())
   }
 
   test("tiny length coded string") {

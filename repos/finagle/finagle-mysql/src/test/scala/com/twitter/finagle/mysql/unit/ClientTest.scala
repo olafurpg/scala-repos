@@ -9,8 +9,8 @@ import org.mockito.Matchers._
 import com.twitter.util.Time
 
 /**
- * Tests the functionality of the MySQL client.
- */
+  * Tests the functionality of the MySQL client.
+  */
 @RunWith(classOf[JUnitRunner])
 class ClientTest extends FunSuite with MockitoSugar with MustMatchers {
   private val sqlQuery = "SELECT * FROM FOO"
@@ -23,9 +23,10 @@ class ClientTest extends FunSuite with MockitoSugar with MustMatchers {
     client.query(sqlQuery)
     client.query(sqlQuery)
 
-    service.requests must equal (List(
-     sqlQuery, sqlQuery
-    ).map(QueryRequest(_)))
+    service.requests must equal(List(
+            sqlQuery,
+            sqlQuery
+        ).map(QueryRequest(_)))
 
     verify(client, times(2)).query(sqlQuery)
     verify(factory, times(2)).apply()

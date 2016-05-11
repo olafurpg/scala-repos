@@ -1,7 +1,8 @@
 object Scaladoc1 {
+
   /**
-   * Foo
-   */
+    * Foo
+    */
   val (a, b) = (1, 2)
   a
   b

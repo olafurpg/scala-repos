@@ -27,16 +27,20 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 
 /**
- * Params for [[TrainValidationSplit]] and [[TrainValidationSplitModel]].
- */
+  * Params for [[TrainValidationSplit]] and [[TrainValidationSplitModel]].
+  */
 private[ml] trait TrainValidationSplitParams extends ValidatorParams {
+
   /**
-   * Param for ratio between train and validation data. Must be between 0 and 1.
-   * Default: 0.75
-   * @group param
-   */
-  val trainRatio: DoubleParam = new DoubleParam(this, "trainRatio",
-    "ratio between training set and validation set (>= 0 && <= 1)", ParamValidators.inRange(0, 1))
+    * Param for ratio between train and validation data. Must be between 0 and 1.
+    * Default: 0.75
+    * @group param
+    */
+  val trainRatio: DoubleParam = new DoubleParam(
+      this,
+      "trainRatio",
+      "ratio between training set and validation set (>= 0 && <= 1)",
+      ParamValidators.inRange(0, 1))
 
   /** @group getParam */
   def getTrainRatio: Double = $(trainRatio)
@@ -45,17 +49,18 @@ private[ml] trait TrainValidationSplitParams extends ValidatorParams {
 }
 
 /**
- * :: Experimental ::
- * Validation for hyper-parameter tuning.
- * Randomly splits the input dataset into train and validation sets,
- * and uses evaluation metric on the validation set to select the best model.
- * Similar to [[CrossValidator]], but only splits the set once.
- */
+  * :: Experimental ::
+  * Validation for hyper-parameter tuning.
+  * Randomly splits the input dataset into train and validation sets,
+  * and uses evaluation metric on the validation set to select the best model.
+  * Similar to [[CrossValidator]], but only splits the set once.
+  */
 @Since("1.5.0")
 @Experimental
-class TrainValidationSplit @Since("1.5.0") (@Since("1.5.0") override val uid: String)
-  extends Estimator[TrainValidationSplitModel]
-  with TrainValidationSplitParams with Logging {
+class TrainValidationSplit @Since("1.5.0")(
+    @Since("1.5.0") override val uid: String)
+    extends Estimator[TrainValidationSplitModel]
+    with TrainValidationSplitParams with Logging {
 
   @Since("1.5.0")
   def this() = this(Identifiable.randomUID("tvs"))
@@ -66,7 +71,8 @@ class TrainValidationSplit @Since("1.5.0") (@Since("1.5.0") override val uid: St
 
   /** @group setParam */
   @Since("1.5.0")
-  def setEstimatorParamMaps(value: Array[ParamMap]): this.type = set(estimatorParamMaps, value)
+  def setEstimatorParamMaps(value: Array[ParamMap]): this.type =
+    set(estimatorParamMaps, value)
 
   /** @group setParam */
   @Since("1.5.0")
@@ -99,7 +105,8 @@ class TrainValidationSplit @Since("1.5.0") (@Since("1.5.0") override val uid: St
     var i = 0
     while (i < numModels) {
       // TODO: duplicate evaluator to take extra params from input
-      val metric = eval.evaluate(models(i).transform(validationDataset, epm(i)))
+      val metric =
+        eval.evaluate(models(i).transform(validationDataset, epm(i)))
       logDebug(s"Got metric $metric for model trained with ${epm(i)}.")
       metrics(i) += metric
       i += 1
@@ -113,11 +120,13 @@ class TrainValidationSplit @Since("1.5.0") (@Since("1.5.0") override val uid: St
     logInfo(s"Best set of parameters:\n${epm(bestIndex)}")
     logInfo(s"Best train validation split metric: $bestMetric.")
     val bestModel = est.fit(dataset, epm(bestIndex)).asInstanceOf[Model[_]]
-    copyValues(new TrainValidationSplitModel(uid, bestModel, metrics).setParent(this))
+    copyValues(
+        new TrainValidationSplitModel(uid, bestModel, metrics).setParent(this))
   }
 
   @Since("1.5.0")
-  override def transformSchema(schema: StructType): StructType = transformSchemaImpl(schema)
+  override def transformSchema(schema: StructType): StructType =
+    transformSchemaImpl(schema)
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): TrainValidationSplit = {
@@ -133,20 +142,20 @@ class TrainValidationSplit @Since("1.5.0") (@Since("1.5.0") override val uid: St
 }
 
 /**
- * :: Experimental ::
- * Model from train validation split.
- *
- * @param uid Id.
- * @param bestModel Estimator determined best model.
- * @param validationMetrics Evaluated validation metrics.
- */
+  * :: Experimental ::
+  * Model from train validation split.
+  *
+  * @param uid Id.
+  * @param bestModel Estimator determined best model.
+  * @param validationMetrics Evaluated validation metrics.
+  */
 @Since("1.5.0")
 @Experimental
-class TrainValidationSplitModel private[ml] (
+class TrainValidationSplitModel private[ml](
     @Since("1.5.0") override val uid: String,
     @Since("1.5.0") val bestModel: Model[_],
     @Since("1.5.0") val validationMetrics: Array[Double])
-  extends Model[TrainValidationSplitModel] with TrainValidationSplitParams {
+    extends Model[TrainValidationSplitModel] with TrainValidationSplitParams {
 
   @Since("1.5.0")
   override def transform(dataset: DataFrame): DataFrame = {
@@ -161,10 +170,10 @@ class TrainValidationSplitModel private[ml] (
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): TrainValidationSplitModel = {
-    val copied = new TrainValidationSplitModel (
-      uid,
-      bestModel.copy(extra).asInstanceOf[Model[_]],
-      validationMetrics.clone())
+    val copied = new TrainValidationSplitModel(
+        uid,
+        bestModel.copy(extra).asInstanceOf[Model[_]],
+        validationMetrics.clone())
     copyValues(copied, extra)
   }
 }

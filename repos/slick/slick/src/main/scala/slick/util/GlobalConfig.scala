@@ -38,11 +38,12 @@ object GlobalConfig {
 
   /** Get a `Config` object for a Slick profile */
   @deprecated("Use `profileConfig` instead of `driverConfig`", "3.2")
-  def driverConfig(name: String): Config = profileConfig("slick.driver." + name)
+  def driverConfig(name: String): Config =
+    profileConfig("slick.driver." + name)
 
   /** Get a `Config` object for a Slick profile */
   def profileConfig(path: String): Config = {
-    if(config.hasPath(path)) config.getConfig(path)
+    if (config.hasPath(path)) config.getConfig(path)
     else ConfigFactory.empty()
   }
 }
@@ -51,39 +52,55 @@ object GlobalConfig {
 class ConfigExtensionMethods(val c: Config) extends AnyVal {
   import scala.collection.JavaConverters._
 
-  def getBooleanOr(path: String, default: => Boolean = false) = if(c.hasPath(path)) c.getBoolean(path) else default
-  def getIntOr(path: String, default: => Int = 0) = if(c.hasPath(path)) c.getInt(path) else default
-  def getStringOr(path: String, default: => String = null) = if(c.hasPath(path)) c.getString(path) else default
-  def getConfigOr(path: String, default: => Config = ConfigFactory.empty()) = if(c.hasPath(path)) c.getConfig(path) else default
+  def getBooleanOr(path: String, default: => Boolean = false) =
+    if (c.hasPath(path)) c.getBoolean(path) else default
+  def getIntOr(path: String, default: => Int = 0) =
+    if (c.hasPath(path)) c.getInt(path) else default
+  def getStringOr(path: String, default: => String = null) =
+    if (c.hasPath(path)) c.getString(path) else default
+  def getConfigOr(path: String, default: => Config = ConfigFactory.empty()) =
+    if (c.hasPath(path)) c.getConfig(path) else default
 
-  def getMillisecondsOr(path: String, default: => Long = 0L) = if(c.hasPath(path)) c.getDuration(path, TimeUnit.MILLISECONDS) else default
+  def getMillisecondsOr(path: String, default: => Long = 0L) =
+    if (c.hasPath(path)) c.getDuration(path, TimeUnit.MILLISECONDS)
+    else default
   def getDurationOr(path: String, default: => Duration = Duration.Zero) =
-    if(c.hasPath(path)) Duration(c.getDuration(path, TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS) else default
+    if (c.hasPath(path))
+      Duration(
+          c.getDuration(path, TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS)
+    else default
 
-  def getPropertiesOr(path: String, default: => Properties = null): Properties =
-    if(c.hasPath(path)) new ConfigExtensionMethods(c.getConfig(path)).toProperties else default
+  def getPropertiesOr(
+      path: String, default: => Properties = null): Properties =
+    if (c.hasPath(path))
+      new ConfigExtensionMethods(c.getConfig(path)).toProperties else default
 
   def toProperties: Properties = {
     def toProps(m: mutable.Map[String, ConfigValue]): Properties = {
       val props = new Properties(null)
-      m.foreach { case (k, cv) =>
-        val v =
-          if(cv.valueType() == ConfigValueType.OBJECT) toProps(cv.asInstanceOf[ConfigObject].asScala)
-          else if(cv.unwrapped eq null) null
-          else cv.unwrapped.toString
-        if(v ne null) props.put(k, v)
+      m.foreach {
+        case (k, cv) =>
+          val v =
+            if (cv.valueType() == ConfigValueType.OBJECT)
+              toProps(cv.asInstanceOf[ConfigObject].asScala)
+            else if (cv.unwrapped eq null) null
+            else cv.unwrapped.toString
+          if (v ne null) props.put(k, v)
       }
       props
     }
     toProps(c.root.asScala)
   }
 
-  def getBooleanOpt(path: String): Option[Boolean] = if(c.hasPath(path)) Some(c.getBoolean(path)) else None
-  def getIntOpt(path: String): Option[Int] = if(c.hasPath(path)) Some(c.getInt(path)) else None
+  def getBooleanOpt(path: String): Option[Boolean] =
+    if (c.hasPath(path)) Some(c.getBoolean(path)) else None
+  def getIntOpt(path: String): Option[Int] =
+    if (c.hasPath(path)) Some(c.getInt(path)) else None
   def getStringOpt(path: String) = Option(getStringOr(path))
   def getPropertiesOpt(path: String) = Option(getPropertiesOr(path))
 }
 
 object ConfigExtensionMethods {
-  @inline implicit def configExtensionMethods(c: Config): ConfigExtensionMethods = new ConfigExtensionMethods(c)
+  @inline implicit def configExtensionMethods(
+      c: Config): ConfigExtensionMethods = new ConfigExtensionMethods(c)
 }

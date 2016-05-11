@@ -28,44 +28,42 @@ import org.apache.spark.sql.execution.exchange.{EnsureRequirements, ReuseExchang
 import org.apache.spark.sql.util.ExecutionListenerManager
 
 /**
- * A class that holds all session-specific state in a given [[SQLContext]].
- */
+  * A class that holds all session-specific state in a given [[SQLContext]].
+  */
 private[sql] class SessionState(ctx: SQLContext) {
 
   // Note: These are all lazy vals because they depend on each other (e.g. conf) and we
   // want subclasses to override some of the fields. Otherwise, we would get a lot of NPEs.
 
   /**
-   * SQL-specific key-value configurations.
-   */
+    * SQL-specific key-value configurations.
+    */
   lazy val conf = new SQLConf
 
   lazy val experimentalMethods = new ExperimentalMethods
 
   /**
-   * Internal catalog for managing table and database states.
-   */
+    * Internal catalog for managing table and database states.
+    */
   lazy val catalog: Catalog = new SimpleCatalog(conf)
 
   /**
-   * Internal catalog for managing functions registered by the user.
-   */
+    * Internal catalog for managing functions registered by the user.
+    */
   lazy val functionRegistry: FunctionRegistry = FunctionRegistry.builtin.copy()
 
   /**
-   * Interface exposed to the user for registering user-defined functions.
-   */
+    * Interface exposed to the user for registering user-defined functions.
+    */
   lazy val udf: UDFRegistration = new UDFRegistration(functionRegistry)
 
   /**
-   * Logical query plan analyzer for resolving unresolved attributes and relations.
-   */
+    * Logical query plan analyzer for resolving unresolved attributes and relations.
+    */
   lazy val analyzer: Analyzer = {
     new Analyzer(catalog, functionRegistry, conf) {
       override val extendedResolutionRules =
-        python.ExtractPythonUDFs ::
-        PreInsertCastAndRename ::
-        DataSourceAnalysis ::
+        python.ExtractPythonUDFs :: PreInsertCastAndRename :: DataSourceAnalysis ::
         (if (conf.runSQLOnFile) new ResolveDataSource(ctx) :: Nil else Nil)
 
       override val extendedCheckRules = Seq(datasources.PreWriteCheck(catalog))
@@ -73,42 +71,44 @@ private[sql] class SessionState(ctx: SQLContext) {
   }
 
   /**
-   * Logical query plan optimizer.
-   */
+    * Logical query plan optimizer.
+    */
   lazy val optimizer: Optimizer = new SparkOptimizer(experimentalMethods)
 
   /**
-   * Parser that extracts expressions, plans, table identifiers etc. from SQL texts.
-   */
+    * Parser that extracts expressions, plans, table identifiers etc. from SQL texts.
+    */
   lazy val sqlParser: ParserInterface = new SparkQl(conf)
 
   /**
-   * Planner that converts optimized logical plans to physical plans.
-   */
-  lazy val planner: SparkPlanner = new SparkPlanner(ctx.sparkContext, conf, experimentalMethods)
+    * Planner that converts optimized logical plans to physical plans.
+    */
+  lazy val planner: SparkPlanner = new SparkPlanner(
+      ctx.sparkContext, conf, experimentalMethods)
 
   /**
-   * Prepares a planned [[SparkPlan]] for execution by inserting shuffle operations and internal
-   * row format conversions as needed.
-   */
+    * Prepares a planned [[SparkPlan]] for execution by inserting shuffle operations and internal
+    * row format conversions as needed.
+    */
   lazy val prepareForExecution = new RuleExecutor[SparkPlan] {
     override val batches: Seq[Batch] = Seq(
-      Batch("Subquery", Once, PlanSubqueries(SessionState.this)),
-      Batch("Add exchange", Once, EnsureRequirements(conf)),
-      Batch("Whole stage codegen", Once, CollapseCodegenStages(conf)),
-      Batch("Reuse duplicated exchanges", Once, ReuseExchange(conf))
+        Batch("Subquery", Once, PlanSubqueries(SessionState.this)),
+        Batch("Add exchange", Once, EnsureRequirements(conf)),
+        Batch("Whole stage codegen", Once, CollapseCodegenStages(conf)),
+        Batch("Reuse duplicated exchanges", Once, ReuseExchange(conf))
     )
   }
 
   /**
-   * An interface to register custom [[org.apache.spark.sql.util.QueryExecutionListener]]s
-   * that listen for execution metrics.
-   */
-  lazy val listenerManager: ExecutionListenerManager = new ExecutionListenerManager
+    * An interface to register custom [[org.apache.spark.sql.util.QueryExecutionListener]]s
+    * that listen for execution metrics.
+    */
+  lazy val listenerManager: ExecutionListenerManager =
+    new ExecutionListenerManager
 
   /**
-   * Interface to start and stop [[org.apache.spark.sql.ContinuousQuery]]s.
-   */
-  lazy val continuousQueryManager: ContinuousQueryManager = new ContinuousQueryManager(ctx)
-
+    * Interface to start and stop [[org.apache.spark.sql.ContinuousQuery]]s.
+    */
+  lazy val continuousQueryManager: ContinuousQueryManager =
+    new ContinuousQueryManager(ctx)
 }

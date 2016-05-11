@@ -21,7 +21,6 @@ object Test extends DirectTest {
     }
   """.trim
 
-
   // point of this test: type-check the "Annotated" tree twice. first time the analyzer plugin types it,
   // second time the typer.
 
@@ -35,18 +34,24 @@ object Test extends DirectTest {
     import collection.{mutable => m}
 
     object analyzerPlugin extends AnalyzerPlugin {
-    val templates: m.Map[Symbol, (Template, Typer)] = m.Map()
-      override def pluginsTypeSig(tpe: Type, typer: Typer, defTree: Tree, pt: Type): Type = {
+      val templates: m.Map[Symbol, (Template, Typer)] = m.Map()
+      override def pluginsTypeSig(
+          tpe: Type, typer: Typer, defTree: Tree, pt: Type): Type = {
         defTree match {
           case impl: Template =>
             templates += typer.context.owner -> (impl, typer)
 
-          case dd: DefDef if dd.symbol.isPrimaryConstructor && templates.contains(dd.symbol.owner) =>
+          case dd: DefDef
+              if dd.symbol.isPrimaryConstructor &&
+              templates.contains(dd.symbol.owner) =>
             val (impl, templTyper) = templates(dd.symbol.owner)
             for (stat <- impl.body.filterNot(_.isDef)) {
-              println("typing "+ stat)
-              val statsOwner = impl.symbol orElse templTyper.context.owner.newLocalDummy(impl.pos)
-              val tpr = analyzer.newTyper(templTyper.context.make(stat, statsOwner))
+              println("typing " + stat)
+              val statsOwner =
+                impl.symbol orElse templTyper.context.owner
+                  .newLocalDummy(impl.pos)
+              val tpr =
+                analyzer.newTyper(templTyper.context.make(stat, statsOwner))
               tpr.typed(stat)
             }
 

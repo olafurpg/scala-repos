@@ -8,7 +8,10 @@ import org.jetbrains.plugins.scala.lang.completion.postfix.templates.selector.{S
   * @author Roman.Shein
   *         Date: 24.12.2015
   */
-class ScalaListPostfixTemplate extends ScalaStringBasedPostfixTemplate("List", "List(expr)",
-  new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
+class ScalaListPostfixTemplate
+    extends ScalaStringBasedPostfixTemplate(
+        "List",
+        "List(expr)",
+        new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
   override def getTemplateString(element: PsiElement): String = "List($expr$)"
 }

@@ -26,27 +26,33 @@ class IndexScript(universe: doc.Universe) extends Page {
   }
 
   val packages = {
-    val pairs = allPackagesWithTemplates.toIterable.map(_ match {
-      case (pack, templates) => {
-        val merged = mergeByQualifiedName(templates)
+    val pairs = allPackagesWithTemplates.toIterable
+      .map(_ match {
+        case (pack, templates) => {
+            val merged = mergeByQualifiedName(templates)
 
-        val ary = merged.keys.toList.sortBy(_.toLowerCase).map(key => {
-          val pairs = merged(key).flatMap { t: DocTemplateEntity =>
-            Seq(
-              kindToString(t) -> relativeLinkTo(t),
-              "kind" -> kindToString(t),
-              "members" -> membersToJSON(t.members.filter(!_.isShadowedOrAmbiguousImplicit)),
-              "shortDescription" -> shortDesc(t))
+            val ary = merged.keys.toList
+              .sortBy(_.toLowerCase)
+              .map(key =>
+                    {
+                  val pairs = merged(key).flatMap {
+                    t: DocTemplateEntity =>
+                      Seq(kindToString(t) -> relativeLinkTo(t),
+                          "kind" -> kindToString(t),
+                          "members" -> membersToJSON(t.members.filter(
+                                  !_.isShadowedOrAmbiguousImplicit)),
+                          "shortDescription" -> shortDesc(t))
+                  }
+
+                  JSONObject(Map(pairs: _*) + ("name" -> key))
+              })
+
+            pack.qualifiedName -> JSONArray(ary)
           }
+      })
+      .toSeq
 
-          JSONObject(Map(pairs : _*) + ("name" -> key))
-        })
-
-        pack.qualifiedName -> JSONArray(ary)
-      }
-    }).toSeq
-
-    JSONObject(Map(pairs : _*))
+    JSONObject(Map(pairs: _*))
   }
 
   def mergeByQualifiedName(source: List[DocTemplateEntity]) = {
@@ -63,18 +69,24 @@ class IndexScript(universe: doc.Universe) extends Page {
   def allPackages = {
     def f(parent: Package): List[Package] = {
       parent.packages.flatMap(
-        p => f(p) :+ p
+          p => f(p) :+ p
       )
     }
     f(universe.rootPackage).sortBy(_.toString)
   }
 
   def allPackagesWithTemplates = {
-    Map(allPackages.map((key) => {
-      key -> key.templates.collect {
-        case t: DocTemplateEntity if !t.isPackage && !universe.settings.hardcoded.isExcluded(t.qualifiedName) => t
-      }
-    }) : _*)
+    Map(
+        allPackages.map(
+            (key) =>
+              {
+        key -> key.templates.collect {
+          case t: DocTemplateEntity
+              if !t.isPackage &&
+              !universe.settings.hardcoded.isExcluded(t.qualifiedName) =>
+            t
+        }
+    }): _*)
   }
 
   /** Gets the short description i.e. the first sentence of the docstring */
@@ -87,26 +99,26 @@ class IndexScript(universe: doc.Universe) extends Page {
     JSONArray(entities map memberToJSON)
 
   private def memberToJSON(mbr: MemberEntity): JSONObject = {
+
     /** This function takes a member and gets eventual parameters and the
-     *  return type. For example, the definition:
-     *  {{{ def get(key: A): Option[B] }}}
-     *  Gets turned into: "(key: A): Option[B]"
-     */
+      *  return type. For example, the definition:
+      *  {{{ def get(key: A): Option[B] }}}
+      *  Gets turned into: "(key: A): Option[B]"
+      */
     def memberTail: MemberEntity => String = {
-      case d: Def => d
-          .valueParams //List[List[ValueParam]]
-          .map { params =>
-            params.map(p => p.name + ": " + p.resultType.name).mkString(", ")
-          }
-          .mkString("(", ")(", "): " + d.resultType.name)
+      case d: Def =>
+        d.valueParams //List[List[ValueParam]]
+        .map { params =>
+          params.map(p => p.name + ": " + p.resultType.name).mkString(", ")
+        }.mkString("(", ")(", "): " + d.resultType.name)
       case v: Val => ": " + v.resultType.name
     }
 
     /** This function takes a member entity and return all modifiers in a
-     *  string, example:
-     *  {{{ lazy val scalaProps: java.util.Properties }}}
-     *  Gets turned into: "lazy val"
-     */
+      *  string, example:
+      *  {{{ lazy val scalaProps: java.util.Properties }}}
+      *  Gets turned into: "lazy val"
+      */
     def memberKindToString(mbr: MemberEntity): String = {
       val kind = mbr.flags.map(_.text.asInstanceOf[Text].text).mkString(" ")
       val space = if (kind == "") "" else " "
@@ -115,21 +127,22 @@ class IndexScript(universe: doc.Universe) extends Page {
     }
 
     /** This function turns a member entity into a JSON object that the index.js
-     *  script can use to render search results
-     */
+      *  script can use to render search results
+      */
     def jsonObject(m: MemberEntity): JSONObject =
-      JSONObject(Map(
-        "label"  -> m.definitionName.replaceAll(".*#", ""),  // member name
-        "member" -> m.definitionName.replaceFirst("#", "."), // full member name
-        "tail"   -> memberTail(m),
-        "kind"   -> memberKindToString(m),                   // modifiers i.e. "abstract def"
-        "link"   -> memberToUrl(m)))                         // permalink to the member
+      JSONObject(
+          Map("label" -> m.definitionName.replaceAll(".*#", ""), // member name
+              "member" -> m.definitionName.replaceFirst("#", "."), // full member name
+              "tail" -> memberTail(m),
+              "kind" -> memberKindToString(m), // modifiers i.e. "abstract def"
+              "link" -> memberToUrl(m))) // permalink to the member
 
     mbr match {
       case d: Def => jsonObject(d)
       case v: Val => jsonObject(v)
       case m: MemberEntity =>
-        JSONObject(Map("member" -> m.definitionName, "error" -> "unsupported entity"))
+        JSONObject(
+            Map("member" -> m.definitionName, "error" -> "unsupported entity"))
     }
   }
 

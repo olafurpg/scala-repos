@@ -4,9 +4,8 @@ class AAA {
 }
 
 object bbb {
-  val a : AAA
+  val a: AAA
   import a.{T => _, _}
 
-  def foo: Case<ref>Class
-
+  def foo: Case < ref > Class
 }

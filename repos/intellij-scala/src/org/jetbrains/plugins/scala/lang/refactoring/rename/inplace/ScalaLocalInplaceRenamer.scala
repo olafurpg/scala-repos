@@ -17,38 +17,58 @@ import org.jetbrains.plugins.scala.lang.refactoring.rename.ScalaRenameUtil
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
 /**
- * Nikolay.Tropin
- * 1/20/14
- */
-class ScalaLocalInplaceRenamer(elementToRename: PsiNamedElement, editor: Editor, project: Project, initialName: String, oldName: String)
-        extends VariableInplaceRenamer(elementToRename, editor, project, initialName, oldName) {
+  * Nikolay.Tropin
+  * 1/20/14
+  */
+class ScalaLocalInplaceRenamer(elementToRename: PsiNamedElement,
+                               editor: Editor,
+                               project: Project,
+                               initialName: String,
+                               oldName: String)
+    extends VariableInplaceRenamer(
+        elementToRename, editor, project, initialName, oldName) {
 
-  private val elementRange = editor.getDocument.createRangeMarker(elementToRename.getTextRange)
+  private val elementRange =
+    editor.getDocument.createRangeMarker(elementToRename.getTextRange)
 
   def this(@NotNull elementToRename: PsiNamedElement, editor: Editor) =
-    this(elementToRename, editor, elementToRename.getProject,
-      ScalaNamesUtil.scalaName(elementToRename), ScalaNamesUtil.scalaName(elementToRename))
+    this(elementToRename,
+         editor,
+         elementToRename.getProject,
+         ScalaNamesUtil.scalaName(elementToRename),
+         ScalaNamesUtil.scalaName(elementToRename))
 
-  override def collectAdditionalElementsToRename(stringUsages: util.List[Pair[PsiElement, TextRange]]): Unit = {
+  override def collectAdditionalElementsToRename(
+      stringUsages: util.List[Pair[PsiElement, TextRange]]): Unit = {
     val stringToSearch: String = ScalaNamesUtil.scalaName(elementToRename)
-    val currentFile: PsiFile = PsiDocumentManager.getInstance(myProject).getPsiFile(myEditor.getDocument)
+    val currentFile: PsiFile = PsiDocumentManager
+      .getInstance(myProject)
+      .getPsiFile(myEditor.getDocument)
     if (stringToSearch != null) {
-      TextOccurrencesUtil.processUsagesInStringsAndComments(elementToRename, stringToSearch, true, new PairProcessor[PsiElement, TextRange] {
-        def process(psiElement: PsiElement, textRange: TextRange): Boolean = {
-          if (psiElement.getContainingFile == currentFile) {
-            stringUsages.add(Pair.create(psiElement, textRange))
-          }
-          true
-        }
-      })
+      TextOccurrencesUtil.processUsagesInStringsAndComments(
+          elementToRename,
+          stringToSearch,
+          true,
+          new PairProcessor[PsiElement, TextRange] {
+            def process(
+                psiElement: PsiElement, textRange: TextRange): Boolean = {
+              if (psiElement.getContainingFile == currentFile) {
+                stringUsages.add(Pair.create(psiElement, textRange))
+              }
+              true
+            }
+          })
     }
   }
 
-  override def isIdentifier(newName: String, language: Language): Boolean = ScalaNamesUtil.isIdentifier(newName)
+  override def isIdentifier(newName: String, language: Language): Boolean =
+    ScalaNamesUtil.isIdentifier(newName)
 
-  override def startsOnTheSameElement(handler: RefactoringActionHandler, element: PsiElement): Boolean = {
+  override def startsOnTheSameElement(
+      handler: RefactoringActionHandler, element: PsiElement): Boolean = {
     handler match {
-      case _: ScalaLocalInplaceRenameHandler => ScalaRenameUtil.sameElement(elementRange, element)
+      case _: ScalaLocalInplaceRenameHandler =>
+        ScalaRenameUtil.sameElement(elementRange, element)
       case _ => false
     }
   }

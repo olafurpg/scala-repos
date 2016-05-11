@@ -43,14 +43,14 @@ object TextBinding extends JFXApp {
     height = 600
     scene = new Scene {
       content = Seq(
-        new VBox {
-          children = Seq(
-            comboBox,
-            new Label {
-              text <== comboBox.editor().text
-            }
-          )
-        }
+          new VBox {
+            children = Seq(
+                comboBox,
+                new Label {
+                  text <== comboBox.editor().text
+                }
+            )
+          }
       )
     }
   }

@@ -5,7 +5,7 @@ class ThisType {
 
   object InnerObj
 
-  class Inner /*start*/{
+  class Inner /*start*/ {
     type Ambig = scala.ArrayIndexOutOfBoundsException
 
     val ambig1: this.type#Ambig = ???
@@ -28,7 +28,7 @@ class ThisType {
     val innerObj: ThisType.this.InnerObj.type = InnerObj
 
     val outerthis: ThisType.this.type = ThisType.this
-  }/*end*/
+  } /*end*/
 }
 
 /*
@@ -64,4 +64,4 @@ class ThisType {
     val outerthis: ThisType.this.type = ThisType.this
   }
 }
-*/
+ */

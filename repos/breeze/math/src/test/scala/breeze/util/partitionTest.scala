@@ -21,10 +21,10 @@ package breeze.util
 import org.scalatest.FunSuite
 
 /**
- * TODO
- *
- * @author dlwh
- **/
+  * TODO
+  *
+  * @author dlwh
+  **/
 class partitionTest extends FunSuite {
 
   test("partition array in place") {
@@ -38,7 +38,5 @@ class partitionTest extends FunSuite {
     val b = partition(a, 3)
     assert(b(3) === 4)
     assert(a.toIndexedSeq == IndexedSeq(3, 4, 2, 1))
-
   }
-
 }

@@ -5,5 +5,5 @@ object Bar {
 
   def bar2(foo: Baz_1) = foo match {
     case Baz_1.A => 1
-    }
+  }
 }

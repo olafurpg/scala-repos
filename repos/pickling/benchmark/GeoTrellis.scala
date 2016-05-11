@@ -9,7 +9,7 @@ import scala.util.Random
 trait MutableRasterData
 trait IntBasedArray
 final case class IntArrayRasterData(array: Array[Int], cols: Int, rows: Int)
-  extends MutableRasterData with IntBasedArray
+    extends MutableRasterData with IntBasedArray
 
 trait GeoTrellisBenchmark extends scala.pickling.testing.PicklingBenchmark {
   // println("alloc new arr of size " + size)

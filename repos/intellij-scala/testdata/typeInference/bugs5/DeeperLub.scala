@@ -6,7 +6,7 @@ object DeeperLub {
     case _ =>
       A(2, A(2, A(2, A(2, A(2, None)))))
   }
-  
+
   class Az[+T] {}
   class B extends Az[B]
   class C extends Az[C]
@@ -16,6 +16,7 @@ object DeeperLub {
     case 2 => new C
   }
 
-  /*start*/(f, g)/*end*/
+  /*start*/
+  (f, g) /*end*/
 }
 //(DeeperLub.A[Int, DeeperLub.A[Int, DeeperLub.A[Int, DeeperLub.A[Int, DeeperLub.A[Int, Option[Int]]]]]], DeeperLub.Az[DeeperLub.Az[Any]])

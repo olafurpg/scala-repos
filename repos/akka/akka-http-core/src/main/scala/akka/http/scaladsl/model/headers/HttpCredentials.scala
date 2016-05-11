@@ -1,16 +1,16 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl.model.headers
 
 import akka.parboiled2.util.Base64
 import akka.http.scaladsl.model.HttpCharsets._
-import akka.http.impl.util.{ Rendering, ValueRenderable }
-import akka.http.javadsl.{ model ⇒ jm }
+import akka.http.impl.util.{Rendering, ValueRenderable}
+import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util.JavaMapping.Implicits._
 
-sealed abstract class HttpCredentials extends jm.headers.HttpCredentials with ValueRenderable {
+sealed abstract class HttpCredentials
+    extends jm.headers.HttpCredentials with ValueRenderable {
   def scheme: String
   def token: String
   def params: Map[String, String]
@@ -19,7 +19,8 @@ sealed abstract class HttpCredentials extends jm.headers.HttpCredentials with Va
   def getParams: java.util.Map[String, String] = params.asJava
 }
 
-final case class BasicHttpCredentials(username: String, password: String) extends jm.headers.BasicHttpCredentials {
+final case class BasicHttpCredentials(username: String, password: String)
+    extends jm.headers.BasicHttpCredentials {
   val cookie = {
     val userPass = username + ':' + password
     val bytes = userPass.getBytes(`UTF-8`.nioCharset)
@@ -43,15 +44,19 @@ object BasicHttpCredentials {
   }
 }
 
-final case class OAuth2BearerToken(token: String) extends jm.headers.OAuth2BearerToken {
+final case class OAuth2BearerToken(token: String)
+    extends jm.headers.OAuth2BearerToken {
   def render[R <: Rendering](r: R): r.type = r ~~ "Bearer " ~~ token
 
   override def scheme: String = "Bearer"
   override def params: Map[String, String] = Map.empty
 }
 
-final case class GenericHttpCredentials(scheme: String, token: String,
-                                        params: Map[String, String] = Map.empty) extends HttpCredentials {
+final case class GenericHttpCredentials(
+    scheme: String,
+    token: String,
+    params: Map[String, String] = Map.empty)
+    extends HttpCredentials {
   def render[R <: Rendering](r: R): r.type = {
     r ~~ scheme
     if (!token.isEmpty) r ~~ ' ' ~~ token
@@ -70,5 +75,7 @@ final case class GenericHttpCredentials(scheme: String, token: String,
 }
 
 object GenericHttpCredentials {
-  def apply(scheme: String, params: Map[String, String]): GenericHttpCredentials = apply(scheme, "", params)
+  def apply(
+      scheme: String, params: Map[String, String]): GenericHttpCredentials =
+    apply(scheme, "", params)
 }

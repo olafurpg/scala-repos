@@ -24,72 +24,75 @@ import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 
 /**
- * Clustering model produced by [[BisectingKMeans]].
- * The prediction is done level-by-level from the root node to a leaf node, and at each node among
- * its children the closest to the input point is selected.
- *
- * @param root the root node of the clustering tree
- */
+  * Clustering model produced by [[BisectingKMeans]].
+  * The prediction is done level-by-level from the root node to a leaf node, and at each node among
+  * its children the closest to the input point is selected.
+  *
+  * @param root the root node of the clustering tree
+  */
 @Since("1.6.0")
 @Experimental
-class BisectingKMeansModel private[clustering] (
+class BisectingKMeansModel private[clustering](
     private[clustering] val root: ClusteringTreeNode
-  ) extends Serializable with Logging {
+)
+    extends Serializable with Logging {
 
   /**
-   * Leaf cluster centers.
-   */
+    * Leaf cluster centers.
+    */
   @Since("1.6.0")
   def clusterCenters: Array[Vector] = root.leafNodes.map(_.center)
 
   /**
-   * Number of leaf clusters.
-   */
+    * Number of leaf clusters.
+    */
   lazy val k: Int = clusterCenters.length
 
   /**
-   * Predicts the index of the cluster that the input point belongs to.
-   */
+    * Predicts the index of the cluster that the input point belongs to.
+    */
   @Since("1.6.0")
   def predict(point: Vector): Int = {
     root.predict(point)
   }
 
   /**
-   * Predicts the indices of the clusters that the input points belong to.
-   */
+    * Predicts the indices of the clusters that the input points belong to.
+    */
   @Since("1.6.0")
   def predict(points: RDD[Vector]): RDD[Int] = {
-    points.map { p => root.predict(p) }
+    points.map { p =>
+      root.predict(p)
+    }
   }
 
   /**
-   * Java-friendly version of [[predict()]].
-   */
+    * Java-friendly version of [[predict()]].
+    */
   @Since("1.6.0")
   def predict(points: JavaRDD[Vector]): JavaRDD[java.lang.Integer] =
     predict(points.rdd).toJavaRDD().asInstanceOf[JavaRDD[java.lang.Integer]]
 
   /**
-   * Computes the squared distance between the input point and the cluster center it belongs to.
-   */
+    * Computes the squared distance between the input point and the cluster center it belongs to.
+    */
   @Since("1.6.0")
   def computeCost(point: Vector): Double = {
     root.computeCost(point)
   }
 
   /**
-   * Computes the sum of squared distances between the input points and their corresponding cluster
-   * centers.
-   */
+    * Computes the sum of squared distances between the input points and their corresponding cluster
+    * centers.
+    */
   @Since("1.6.0")
   def computeCost(data: RDD[Vector]): Double = {
     data.map(root.computeCost).sum()
   }
 
   /**
-   * Java-friendly version of [[computeCost()]].
-   */
+    * Java-friendly version of [[computeCost()]].
+    */
   @Since("1.6.0")
   def computeCost(data: JavaRDD[Vector]): Double = this.computeCost(data.rdd)
 }

@@ -17,4 +17,4 @@ class FromStringLiteral {
 
   aaa(1, "aa")
 }
-*/
+ */

@@ -4,7 +4,6 @@ package scaladoc
 package psi
 package impl
 
-
 import java.util
 
 import com.intellij.psi.impl.source.tree.LazyParseablePsiElement
@@ -23,14 +22,18 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocComment, ScDocTag
 import scala.collection.mutable
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 22.07.2008
- */
- 
-class ScDocCommentImpl(text: CharSequence) extends LazyParseablePsiElement(ScalaDocElementTypes.SCALA_DOC_COMMENT, text) with ScDocComment {
+  * User: Alexander Podkhalyuzin
+  * Date: 22.07.2008
+  */
+class ScDocCommentImpl(text: CharSequence)
+    extends LazyParseablePsiElement(
+        ScalaDocElementTypes.SCALA_DOC_COMMENT, text) with ScDocComment {
   def version: Int = {
-    val firstLineIsEmpty = getNode.getChildren(null).lift(2).exists(
-      _.getElementType == ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS)
+    val firstLineIsEmpty = getNode
+      .getChildren(null)
+      .lift(2)
+      .exists(
+          _.getElementType == ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS)
 
     if (firstLineIsEmpty) 1 else 2
   }
@@ -40,9 +43,12 @@ class ScDocCommentImpl(text: CharSequence) extends LazyParseablePsiElement(Scala
     case _ => null
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor, state: ResolveState, lastParent: PsiElement,
+  override def processDeclarations(processor: PsiScopeProcessor,
+                                   state: ResolveState,
+                                   lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
-    super.processDeclarations(processor, state, lastParent, place) && !Option(getOwner).exists {
+    super.processDeclarations(processor, state, lastParent, place) &&
+    !Option(getOwner).exists {
       case owner: ScClass =>
         owner.members.exists {
           case named: PsiNamedElement => !processor.execute(named, state)
@@ -61,20 +67,24 @@ class ScDocCommentImpl(text: CharSequence) extends LazyParseablePsiElement(Scala
 
   def getDescriptionElements: Array[PsiElement] = PsiElement.EMPTY_ARRAY
 
-  def findTagByName(name: String): PsiDocTag = if (findTagsByName(name).length > 0) findTagsByName(name)(0) else null
+  def findTagByName(name: String): PsiDocTag =
+    if (findTagsByName(name).length > 0) findTagsByName(name)(0) else null
 
-  def findTagsByName(name: String): Array[PsiDocTag] = findTagsByName(a => a == name)
-  
+  def findTagsByName(name: String): Array[PsiDocTag] =
+    findTagsByName(a => a == name)
+
   def findTagsByName(filter: String => Boolean): Array[PsiDocTag] = {
     var currentChild = getFirstChild
     val answer = mutable.ArrayBuilder.make[PsiDocTag]()
 
-    while (currentChild != null && currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
+    while (currentChild != null &&
+    currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
       currentChild match {
-        case docTag: ScDocTag if docTag.getNode.getElementType == ScalaDocElementTypes.DOC_TAG  &&
-          filter(docTag.name) => answer += currentChild.asInstanceOf[PsiDocTag]
+        case docTag: ScDocTag
+            if docTag.getNode.getElementType == ScalaDocElementTypes.DOC_TAG &&
+            filter(docTag.name) =>
+          answer += currentChild.asInstanceOf[PsiDocTag]
         case _ =>
-
       }
       currentChild = currentChild.getNextSibling
     }
@@ -82,18 +92,21 @@ class ScDocCommentImpl(text: CharSequence) extends LazyParseablePsiElement(Scala
     answer.result()
   }
 
-
-  protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](aClass: Class[T]): Array[T] = {
+  protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
+      aClass: Class[T]): Array[T] = {
     val result: util.List[T] = new util.ArrayList[T]
     var cur: PsiElement = getFirstChild
     while (cur != null) {
       if (aClass.isInstance(cur)) result.add(cur.asInstanceOf[T])
       cur = cur.getNextSibling
     }
-    result.toArray[T](java.lang.reflect.Array.newInstance(aClass, result.size).asInstanceOf[Array[T]])
+    result.toArray[T](java.lang.reflect.Array
+          .newInstance(aClass, result.size)
+          .asInstanceOf[Array[T]])
   }
 
-  protected def findChildByClassScala[T >: Null <: ScalaPsiElement](aClass: Class[T]): T = {
+  protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
+      aClass: Class[T]): T = {
     var cur: PsiElement = getFirstChild
     while (cur != null) {
       if (aClass.isInstance(cur)) return cur.asInstanceOf[T]

@@ -11,5 +11,7 @@ trait Z extends X {
 
 trait Comb extends Y with Z {
   // ... which led to a type error here.
-  abstract override def foo: PartialFunction[Int, Int] = { case i => super.foo(i) - 2 }
+  abstract override def foo: PartialFunction[Int, Int] = {
+    case i => super.foo(i) - 2
+  }
 }

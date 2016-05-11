@@ -1,15 +1,13 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
 package collection.parallel.immutable
-
-
 
 import scala.collection.parallel.ParSetLike
 import scala.collection.parallel.Combiner
@@ -21,43 +19,40 @@ import scala.collection.generic.CanCombineFrom
 import scala.collection.generic.GenericParTemplate
 import scala.collection.generic.GenericParCompanion
 import scala.collection.generic.GenericCompanion
-import scala.collection.immutable.{ HashSet, TrieIterator }
+import scala.collection.immutable.{HashSet, TrieIterator}
 import scala.collection.parallel.Task
 
-
-
 /** Immutable parallel hash set, based on hash tries.
- *
- *  $paralleliterableinfo
- *
- *  $sideeffects
- *
- *  @tparam T    the element type of the set
- *
- *  @author Aleksandar Prokopec
- *  @since 2.9
- *  @see  [[http://docs.scala-lang.org/overviews/parallel-collections/concrete-parallel-collections.html#parallel_hash_tries Scala's Parallel Collections Library overview]]
- *  section on Parallel Hash Tries for more information.
- *
- *  @define Coll `immutable.ParHashSet`
- *  @define coll immutable parallel hash set
- */
+  *
+  *  $paralleliterableinfo
+  *
+  *  $sideeffects
+  *
+  *  @tparam T    the element type of the set
+  *
+  *  @author Aleksandar Prokopec
+  *  @since 2.9
+  *  @see  [[http://docs.scala-lang.org/overviews/parallel-collections/concrete-parallel-collections.html#parallel_hash_tries Scala's Parallel Collections Library overview]]
+  *  section on Parallel Hash Tries for more information.
+  *
+  *  @define Coll `immutable.ParHashSet`
+  *  @define coll immutable parallel hash set
+  */
 @SerialVersionUID(1L)
-class ParHashSet[T] private[immutable] (private[this] val trie: HashSet[T])
-extends ParSet[T]
-   with GenericParTemplate[T, ParHashSet]
-   with ParSetLike[T, ParHashSet[T], HashSet[T]]
-   with Serializable
-{
-self =>
+class ParHashSet[T] private[immutable](private[this] val trie: HashSet[T])
+    extends ParSet[T] with GenericParTemplate[T, ParHashSet]
+    with ParSetLike[T, ParHashSet[T], HashSet[T]] with Serializable {
+  self =>
 
   def this() = this(HashSet.empty[T])
 
-  override def companion: GenericCompanion[ParHashSet] with GenericParCompanion[ParHashSet] = ParHashSet
+  override def companion: GenericCompanion[ParHashSet] with GenericParCompanion[
+      ParHashSet] = ParHashSet
 
   override def empty: ParHashSet[T] = new ParHashSet[T]
 
-  def splitter: IterableSplitter[T] = new ParHashSetIterator(trie.iterator, trie.size)
+  def splitter: IterableSplitter[T] =
+    new ParHashSetIterator(trie.iterator, trie.size)
 
   override def seq = trie
 
@@ -69,13 +64,14 @@ self =>
 
   override def size = trie.size
 
-  protected override def reuse[S, That](oldc: Option[Combiner[S, That]], newc: Combiner[S, That]) = oldc match {
+  protected override def reuse[S, That](
+      oldc: Option[Combiner[S, That]], newc: Combiner[S, That]) = oldc match {
     case Some(old) => old
     case None => newc
   }
 
   class ParHashSetIterator(var triter: Iterator[T], val sz: Int)
-  extends IterableSplitter[T] {
+      extends IterableSplitter[T] {
     var i = 0
     def dup = triter match {
       case t: TrieIterator[_] =>
@@ -90,21 +86,26 @@ self =>
       phit.i = i
       phit
     }
-    def split: Seq[IterableSplitter[T]] = if (remaining < 2) Seq(this) else triter match {
-      case t: TrieIterator[_] =>
-        val previousRemaining = remaining
-        val ((fst, fstlength), snd) = t.split
-        val sndlength = previousRemaining - fstlength
-        Seq(
-          new ParHashSetIterator(fst, fstlength),
-          new ParHashSetIterator(snd, sndlength)
-        )
-      case _ =>
-        // iterator of the collision map case
-        val buff = triter.toBuffer
-        val (fp, sp) = buff.splitAt(buff.length / 2)
-        Seq(fp, sp) map { b => new ParHashSetIterator(b.iterator, b.length) }
-    }
+    def split: Seq[IterableSplitter[T]] =
+      if (remaining < 2) Seq(this)
+      else
+        triter match {
+          case t: TrieIterator[_] =>
+            val previousRemaining = remaining
+            val ((fst, fstlength), snd) = t.split
+            val sndlength = previousRemaining - fstlength
+            Seq(
+                new ParHashSetIterator(fst, fstlength),
+                new ParHashSetIterator(snd, sndlength)
+            )
+          case _ =>
+            // iterator of the collision map case
+            val buff = triter.toBuffer
+            val (fp, sp) = buff.splitAt(buff.length / 2)
+            Seq(fp, sp) map { b =>
+              new ParHashSetIterator(b.iterator, b.length)
+            }
+        }
     def next(): T = {
       i += 1
       triter.next()
@@ -114,14 +115,12 @@ self =>
     }
     def remaining = sz - i
   }
-
 }
 
-
 /** $factoryInfo
- *  @define Coll `immutable.ParHashSet`
- *  @define coll immutable parallel hash set
- */
+  *  @define Coll `immutable.ParHashSet`
+  *  @define coll immutable parallel hash set
+  */
 object ParHashSet extends ParSetFactory[ParHashSet] {
   def newCombiner[T]: Combiner[T, ParHashSet[T]] = HashSetCombiner[T]
 
@@ -131,9 +130,9 @@ object ParHashSet extends ParSetFactory[ParHashSet] {
   def fromTrie[T](t: HashSet[T]) = new ParHashSet(t)
 }
 
-
 private[immutable] abstract class HashSetCombiner[T]
-extends scala.collection.parallel.BucketCombiner[T, ParHashSet[T], Any, HashSetCombiner[T]](HashSetCombiner.rootsize) {
+    extends scala.collection.parallel.BucketCombiner[
+        T, ParHashSet[T], Any, HashSetCombiner[T]](HashSetCombiner.rootsize) {
 //self: EnvironmentPassingCombiner[T, ParHashSet[T]] =>
   import HashSetCombiner._
   val emptyTrie = HashSet.empty[T]
@@ -155,7 +154,8 @@ extends scala.collection.parallel.BucketCombiner[T, ParHashSet[T], Any, HashSetC
     val bucks = buckets.filter(_ != null).map(_.headPtr)
     val root = new Array[HashSet[T]](bucks.length)
 
-    combinerTaskSupport.executeAndWaitResult(new CreateTrie(bucks, root, 0, bucks.length))
+    combinerTaskSupport.executeAndWaitResult(
+        new CreateTrie(bucks, root, 0, bucks.length))
 
     var bitmap = 0
     var i = 0
@@ -175,8 +175,11 @@ extends scala.collection.parallel.BucketCombiner[T, ParHashSet[T], Any, HashSetC
 
   /* tasks */
 
-  class CreateTrie(bucks: Array[Unrolled[Any]], root: Array[HashSet[T]], offset: Int, howmany: Int)
-  extends Task[Unit, CreateTrie] {
+  class CreateTrie(bucks: Array[Unrolled[Any]],
+                   root: Array[HashSet[T]],
+                   offset: Int,
+                   howmany: Int)
+      extends Task[Unit, CreateTrie] {
     var result = ()
     def leaf(prev: Option[Unit]) = {
       var i = offset
@@ -197,7 +200,7 @@ extends scala.collection.parallel.BucketCombiner[T, ParHashSet[T], Any, HashSetC
         while (i < chunksz) {
           val v = chunkarr(i).asInstanceOf[T]
           val hc = trie.computeHash(v)
-          trie = trie.updated0(v, hc, rootbits)  // internal API, private[collection]
+          trie = trie.updated0(v, hc, rootbits) // internal API, private[collection]
           i += 1
         }
         i = 0
@@ -208,15 +211,18 @@ extends scala.collection.parallel.BucketCombiner[T, ParHashSet[T], Any, HashSetC
     }
     def split = {
       val fp = howmany / 2
-      List(new CreateTrie(bucks, root, offset, fp), new CreateTrie(bucks, root, offset + fp, howmany - fp))
+      List(new CreateTrie(bucks, root, offset, fp),
+           new CreateTrie(bucks, root, offset + fp, howmany - fp))
     }
-    def shouldSplitFurther = howmany > scala.collection.parallel.thresholdFromSize(root.length, combinerTaskSupport.parallelismLevel)
+    def shouldSplitFurther =
+      howmany > scala.collection.parallel
+        .thresholdFromSize(root.length, combinerTaskSupport.parallelismLevel)
   }
 }
 
-
 object HashSetCombiner {
-  def apply[T] = new HashSetCombiner[T] {} // was: with EnvironmentPassingCombiner[T, ParHashSet[T]] {}
+  def apply[T] =
+    new HashSetCombiner[T] {} // was: with EnvironmentPassingCombiner[T, ParHashSet[T]] {}
 
   private[immutable] val rootbits = 5
   private[immutable] val rootsize = 1 << 5

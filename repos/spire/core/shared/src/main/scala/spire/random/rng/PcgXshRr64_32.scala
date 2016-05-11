@@ -7,17 +7,18 @@ import java.util.concurrent.atomic.AtomicLong
 import spire.util.Pack
 
 /**
- * This is a Scala implementation of the PCG-XSH-RR-64/32 PRNG based on <a href="https://github.com/imneme/pcg-c-basic/blob/master/pcg_basic.c">basic C implementation</a>.
- *
- * <p><b>Reference: </b>
- * Melissa E. O'Neill:
- * <a href="http://www.pcg-random.org/paper.html">"PCG: A Family of Simple Fast Space-Efficient Statistically Good Algorithms for Random Number Generation"</a>,
- * Submitted to <i>ACM Transactions on Mathematical Software</i>.
- *
- * @see <a href="http://www.pcg-random.org">PCG Home Page</a>
- * @author <a href="mailto:alexey.v.romanov@gmail.com">Alexey Romanov</a>
- */
-class PcgXshRr64_32 private (private var state: Long, private var inc: Long) extends IntBasedGenerator {
+  * This is a Scala implementation of the PCG-XSH-RR-64/32 PRNG based on <a href="https://github.com/imneme/pcg-c-basic/blob/master/pcg_basic.c">basic C implementation</a>.
+  *
+  * <p><b>Reference: </b>
+  * Melissa E. O'Neill:
+  * <a href="http://www.pcg-random.org/paper.html">"PCG: A Family of Simple Fast Space-Efficient Statistically Good Algorithms for Random Number Generation"</a>,
+  * Submitted to <i>ACM Transactions on Mathematical Software</i>.
+  *
+  * @see <a href="http://www.pcg-random.org">PCG Home Page</a>
+  * @author <a href="mailto:alexey.v.romanov@gmail.com">Alexey Romanov</a>
+  */
+class PcgXshRr64_32 private (private var state: Long, private var inc: Long)
+    extends IntBasedGenerator {
   protected[this] def copyInit = new PcgXshRr64_32(state, inc)
 
   def nextInt(): Int = {
@@ -67,7 +68,8 @@ object PcgXshRr64_32 extends GeneratorCompanion[PcgXshRr64_32, PcgSeed64] {
     fromSeed(PcgSeed64(longs(0), longs(1)))
   }
 
-  private[this] val streamUniquifier = new AtomicLong(System.identityHashCode(PcgXshRr64_32))
+  private[this] val streamUniquifier = new AtomicLong(
+      System.identityHashCode(PcgXshRr64_32))
 
   @tailrec
   private[this] def nextStreamId(): Long = {

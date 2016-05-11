@@ -12,9 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
 import org.junit.Assert
 
 /**
- * Pavel.Fatin, 18.05.2010
- */
-
+  * Pavel.Fatin, 18.05.2010
+  */
 abstract class ApplicabilityTestBase extends SimpleTestCase {
   private val Header = """
   class Seq[+A] 
@@ -25,26 +24,25 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   object B extends L with B
   object C extends L with C
   """
- 
-  
+
   // following applications f()
   // function value applications
-  
+
   // calls with no braces
   // parametrized (shortage, excess, miss, etc)
   // synthetic
   // unresolved args
   // constructors, java methods
   // partially applied
-  
+
   // implicit conversions of partially applied to function value
-  
+
   // auto-tupling
-  
+
   // named with repeated
   // named with implicits
   // named with defaults
-  
+
   // duplicates, most specific
   // highlight malformed definition itself
   // setters like foo_=
@@ -71,85 +69,93 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   // java interop
   // syntetic methods (apply, unapply)
   // braces
-  
+
   // complex (missed + mismatches, etc)
 
-  def assertProblems(definition: String, application: String)
-                    (pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
+  def assertProblems(definition: String, application: String)(
+      pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
     assertProblems("", definition, application)(pattern)
   }
 
-  def assertProblems(auxiliary: String, definition: String, application: String)
-                    (pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
+  def assertProblems(
+      auxiliary: String, definition: String, application: String)(
+      pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
     assertProblemsFunction(auxiliary, definition, application)(pattern)
     assertProblemsConstructor(auxiliary, definition, application)(pattern)
   }
 
-  def assertProblemsFunction(auxiliary: String, definition: String, application: String)
-                            (pattern: PartialFunction[scala.List[ApplicabilityProblem], Unit]) {
+  def assertProblemsFunction(
+      auxiliary: String, definition: String, application: String)(
+      pattern: PartialFunction[scala.List[ApplicabilityProblem], Unit]) {
     val typified = typify(definition, application)
 
-    assertProblemsAre(auxiliary, formatFunction(definition, application))(pattern)
-    assertProblemsAre(auxiliary, formatFunction(typified._1, typified._2))(pattern)
+    assertProblemsAre(auxiliary, formatFunction(definition, application))(
+        pattern)
+    assertProblemsAre(auxiliary, formatFunction(typified._1, typified._2))(
+        pattern)
   }
 
-  def assertProblemsConstructor(auxiliary: String, definition: String, application: String)
-                               (pattern: PartialFunction[scala.List[ApplicabilityProblem], Unit]) {
+  def assertProblemsConstructor(
+      auxiliary: String, definition: String, application: String)(
+      pattern: PartialFunction[scala.List[ApplicabilityProblem], Unit]) {
     val typified = typify(definition, application)
-    assertProblemsAre(auxiliary, formatConstructor(definition, application))(pattern)
+    assertProblemsAre(auxiliary, formatConstructor(definition, application))(
+        pattern)
     // TODO Uncomment and solve problems with primary constructors substitutors
     //    assertProblemsAre(auxiliary, formatConstructor(typified._1, typified._2))((pattern))
   }
 
-  private def assertProblemsAre(preface: String, code: String)
-                    (pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
-    val line = if(preface.isEmpty) code else preface + "; " + code
+  private def assertProblemsAre(preface: String, code: String)(
+      pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
+    val line = if (preface.isEmpty) code else preface + "; " + code
     val file = (Header + "\n" + line).parse
     Compatibility.seqClass = file.depthFirst.findByType(classOf[ScClass])
     try {
-      val message = "\n\n             code: " + line +
-        "\n  actual problems: " + problemsIn(file).toString + "\n"
+      val message =
+        "\n\n             code: " + line + "\n  actual problems: " +
+        problemsIn(file).toString + "\n"
       Assert.assertTrue(message, pattern.isDefinedAt(problemsIn(file)))
-    }
-    finally {
+    } finally {
       Compatibility.seqClass = None
     }
   }
-  
+
   private def problemsIn(file: ScalaFile): List[ApplicabilityProblem] = {
-    for (ref <- file.depthFirst.filterByType(classOf[ScReferenceElement]).toList;
-         result <- ref.advancedResolve.toList;
-         problem <- result.problems.filter(_ != ExpectedTypeMismatch))
-    yield problem
+    for (ref <- file.depthFirst
+      .filterByType(classOf[ScReferenceElement])
+      .toList;
+    result <- ref.advancedResolve.toList;
+    problem <- result.problems.filter(_ != ExpectedTypeMismatch)) yield problem
   }
-  
-  private def formatFunction(definition: String, application: String) = 
+
+  private def formatFunction(definition: String, application: String) =
     "def f" + definition + " {}; " + "f" + application
-  
-  private def formatConstructor(definition: String, application: String) = 
+
+  private def formatConstructor(definition: String, application: String) =
     "class F" + definition + " {}; " + "new F" + application
 
   private def typify(definition: String, application: String) = {
     val Parameter = """(\w+):\s*([A-Za-z\[\]]+)""".r
-    
-    val types = for(Parameter(_, t) <- Parameter.findAllIn(definition).toList) yield t
+
+    val types =
+      for (Parameter(_, t) <- Parameter.findAllIn(definition).toList) yield t
     val ids = (1 to types.size).map("T" + _)
 
     val id = ids.toIterator
     val typedDefinition = Parameter.replaceAllIn(definition, _ match {
       case Parameter(n, t) => n + ": " + id.next
     })
-    
+
     val typeParameters = "[" + ids.mkString(", ") + "]"
     val typeArguments = "[" + types.mkString(", ") + "]"
 
-    (typeParameters + typedDefinition,  typeArguments + application)
+    (typeParameters + typedDefinition, typeArguments + application)
   }
-  
+
   object Expression {
     def unapply(e: ScExpression) = e.toOption.map(_.getText)
   }
-  
+
   object Parameter {
     def unapply(e: Parameter) = e.toOption.map(_.name)
   }
@@ -157,7 +163,7 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   object Assignment {
     def unapply(e: ScAssignStmt) = e.toOption.map(_.getText)
   }
-    
+
   object Type {
     def unapply(t: ScType) = t.toOption.map(_.presentableText)
   }

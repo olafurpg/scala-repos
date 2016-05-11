@@ -34,7 +34,7 @@ object M0 {
 
   def sumOfSquares(x: Double, y: Double) = square(x) + square(y);
 
-  Console.println(sumOfSquares(3, 2+2));
+  Console.println(sumOfSquares(3, 2 + 2));
 
   //##########################################################################
 
@@ -141,16 +141,17 @@ object M1 {
 object M2 {
   def abs(x: Double) = if (x >= 0) x else -x;
 
-  def sqrt(x:Double):Double = {
-    def sqrtIter(guess:Double):Double = {
+  def sqrt(x: Double): Double = {
+    def sqrtIter(guess: Double): Double = {
       val next = improve(guess);
-      if (isGoodEnough(guess,next)) next
+      if (isGoodEnough(guess, next)) next
       else sqrtIter(next)
     }
 
-    def improve(guess:Double) = (guess+x/guess)/2;
+    def improve(guess: Double) = (guess + x / guess) / 2;
 
-    def isGoodEnough(prev:Double,guess:Double) = abs(prev-guess)/guess<0.001;
+    def isGoodEnough(prev: Double, guess: Double) =
+      abs(prev - guess) / guess < 0.001;
 
     sqrtIter(1.0)
   }
@@ -163,16 +164,17 @@ object M2 {
 object M3 {
   def abs(x: Double) = if (x >= 0) x else -x;
 
-  def cbrt(x:Double):Double = {
-    def cbrtIter(guess:Double):Double = {
+  def cbrt(x: Double): Double = {
+    def cbrtIter(guess: Double): Double = {
       val next = improve(guess);
-      if (isGoodEnough(guess,next)) next
+      if (isGoodEnough(guess, next)) next
       else cbrtIter(next)
     }
 
-    def improve(y:Double) = (x/(y*y)+2*y)/3;
+    def improve(y: Double) = (x / (y * y) + 2 * y) / 3;
 
-    def isGoodEnough(prev:Double,guess:Double) = abs(prev-guess)/guess<0.001;
+    def isGoodEnough(prev: Double, guess: Double) =
+      abs(prev - guess) / guess < 0.001;
 
     cbrtIter(1.0)
   }
@@ -187,39 +189,39 @@ object M4 {
     if (c <= 0 || c >= l) 1
     else pascal(c - 1, l - 1) + pascal(c, l - 1);
 
-  Console.print(pascal(0,0));
+  Console.print(pascal(0, 0));
   Console.println;
 
-  Console.print(pascal(0,1));
+  Console.print(pascal(0, 1));
   Console.print(' ');
-  Console.print(pascal(1,1));
+  Console.print(pascal(1, 1));
   Console.println;
 
-  Console.print(pascal(0,2));
+  Console.print(pascal(0, 2));
   Console.print(' ');
-  Console.print(pascal(1,2));
+  Console.print(pascal(1, 2));
   Console.print(' ');
-  Console.print(pascal(2,2));
+  Console.print(pascal(2, 2));
   Console.println;
 
-  Console.print(pascal(0,3));
+  Console.print(pascal(0, 3));
   Console.print(' ');
-  Console.print(pascal(1,3));
+  Console.print(pascal(1, 3));
   Console.print(' ');
-  Console.print(pascal(2,3));
+  Console.print(pascal(2, 3));
   Console.print(' ');
-  Console.print(pascal(3,3));
+  Console.print(pascal(3, 3));
   Console.println;
 
-  Console.print(pascal(0,4));
+  Console.print(pascal(0, 4));
   Console.print(' ');
-  Console.print(pascal(1,4));
+  Console.print(pascal(1, 4));
   Console.print(' ');
-  Console.print(pascal(2,4));
+  Console.print(pascal(2, 4));
   Console.print(' ');
-  Console.print(pascal(3,4));
+  Console.print(pascal(3, 4));
   Console.print(' ');
-  Console.print(pascal(4,4));
+  Console.print(pascal(4, 4));
   Console.println;
 }
 

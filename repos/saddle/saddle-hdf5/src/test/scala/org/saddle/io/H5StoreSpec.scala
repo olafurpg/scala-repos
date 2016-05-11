@@ -1,19 +1,18 @@
 /**
- * Copyright (c) 2013 Saddle Development Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
-
+  * Copyright (c) 2013 Saddle Development Team
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  *     http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  **/
 package org.saddle.io
 
 import org.saddle._
@@ -23,7 +22,7 @@ import org.joda.time.DateTime
 
 import java.io.File
 import java.util.concurrent._
-import java.nio.file.{ Files, Paths }
+import java.nio.file.{Files, Paths}
 
 import org.specs2.mutable.Specification
 import org.specs2.execute.{AsResult, Skipped}
@@ -32,19 +31,18 @@ import org.specs2.specification.Fragment
 import scala.util.control.Exception.allCatch
 
 /**
- * Tests the H5Store implementation
- */
+  * Tests the H5Store implementation
+  */
 class H5StoreSpec extends Specification {
 
   // We run only one HDF5 test at a time. It would be fine to run multiple
   // tests in parallel, but then the invariant won't hold that at the end
   // of a test we have zero outstanding HDF5 handles (ie open resources).
 
-  args(sequential=true)
+  args(sequential = true)
 
   val tmpDir = new File(System.getProperty("java.io.tmpdir"))
   val random = new java.util.Random
-
 
   val d1 = new DateTime(2005, 1, 1, 0, 0, 0, 0)
   val d2 = new DateTime(2005, 1, 2, 0, 0, 0, 0)
@@ -52,23 +50,23 @@ class H5StoreSpec extends Specification {
   val d4 = new DateTime(2005, 1, 4, 0, 0, 0, 0)
 
   private def tmpFilePath(ext: String): String = {
-    val randomName = "tmp" + java.lang.Integer.toHexString(random.nextInt) + ext
+    val randomName =
+      "tmp" + java.lang.Integer.toHexString(random.nextInt) + ext
     val fn = System.getProperty("java.io.tmpdir") + "/" + randomName
     fn
   }
 
-  def hdfTest[T: AsResult](test: String)(logic: => T): Fragment = {
+  def hdfTest[T : AsResult](test: String)(logic: => T): Fragment = {
     allCatch either {
       java.lang.Runtime.getRuntime.loadLibrary("jhdf5")
-    }
-    match {
+    } match {
       case Left(exception) => Skipped("Could not import HDF5")
-      case Right(result)   => {
-        test in {
-          logic
-          H5Store.openResourceCount must_== 0  // check for any resource leaks
+      case Right(result) => {
+          test in {
+            logic
+            H5Store.openResourceCount must_== 0 // check for any resource leaks
+          }
         }
-      }
     }
   }
 
@@ -152,7 +150,8 @@ class H5StoreSpec extends Specification {
       H5Store.readSeries[Double, Double](fid, "s5") must_== s5
 
       // try slicing
-      H5Store.readSeriesSlice[DateTime, Double](fid, "s1", d2, d3, true) must_== s1.sliceBy(d2, d3)
+      H5Store.readSeriesSlice[DateTime, Double](fid, "s1", d2, d3, true) must_==
+        s1.sliceBy(d2, d3)
 
       H5Store.closeFile(fid)
 
@@ -210,7 +209,9 @@ class H5StoreSpec extends Specification {
       val df3 = Frame(mat.rand(3, 3), Index(1, 2, 3), Index(1, 2, 3))
       val df4 = Frame(mat.rand(3, 3), Index(1L, 2, 3), Index(1, 2, 3))
       val df5 = Frame(mat.rand(3, 3), Index(1d, 2, 3), Index(1, 2, 3))
-      val df6 = Panel(Vec("string", "anotherString", "unrelated"), vec.randi(3), vec.rand(3))
+      val df6 = Panel(Vec("string", "anotherString", "unrelated"),
+                      vec.randi(3),
+                      vec.rand(3))
 
       H5Store.writeFrame(tmp, "df1", df1)
       H5Store.writeFrame(tmp, "df2", df2)
@@ -220,11 +221,11 @@ class H5StoreSpec extends Specification {
       H5Store.writeFrame(tmp, "df6", df6)
 
       H5Store.readFrame[DateTime, Int, Double](tmp, "df1") must_== df1
-      H5Store.readFrame[String, Int, Double](tmp, "df2")   must_== df2
-      H5Store.readFrame[Int, Int, Double](tmp, "df3")      must_== df3
-      H5Store.readFrame[Long, Int, Double](tmp, "df4")     must_== df4
-      H5Store.readFrame[Double, Int, Double](tmp, "df5")   must_== df5
-      H5Store.readFrame[Int, Int, Any](tmp, "df6")         must_== df6
+      H5Store.readFrame[String, Int, Double](tmp, "df2") must_== df2
+      H5Store.readFrame[Int, Int, Double](tmp, "df3") must_== df3
+      H5Store.readFrame[Long, Int, Double](tmp, "df4") must_== df4
+      H5Store.readFrame[Double, Int, Double](tmp, "df5") must_== df5
+      H5Store.readFrame[Int, Int, Any](tmp, "df6") must_== df6
 
       Files.deleteIfExists(Paths.get(tmp))
 
@@ -244,14 +245,16 @@ class H5StoreSpec extends Specification {
       fid = H5Store.openFile(tmp)
 
       H5Store.readFrame[DateTime, Int, Double](fid, "df1") must_== df1
-      H5Store.readFrame[String, Int, Double](fid, "df2")   must_== df2
-      H5Store.readFrame[Int, Int, Double](fid, "df3")      must_== df3
-      H5Store.readFrame[Long, Int, Double](fid, "df4")     must_== df4
-      H5Store.readFrame[Double, Int, Double](fid, "df5")   must_== df5
-      H5Store.readFrame[Int, Int, Any](tmp, "df6")         must_== df6
+      H5Store.readFrame[String, Int, Double](fid, "df2") must_== df2
+      H5Store.readFrame[Int, Int, Double](fid, "df3") must_== df3
+      H5Store.readFrame[Long, Int, Double](fid, "df4") must_== df4
+      H5Store.readFrame[Double, Int, Double](fid, "df5") must_== df5
+      H5Store.readFrame[Int, Int, Any](tmp, "df6") must_== df6
 
       // try slicing
-      H5Store.readFrameSlice[DateTime, Int, Double](fid, "df1", d2, d3, 2, 3, true, true) must_== df1.colSliceBy(2, 3).rowSliceBy(d2, d3)
+      H5Store.readFrameSlice[DateTime, Int, Double](
+          fid, "df1", d2, d3, 2, 3, true, true) must_==
+        df1.colSliceBy(2, 3).rowSliceBy(d2, d3)
 
       H5Store.closeFile(fid)
 
@@ -272,7 +275,8 @@ class H5StoreSpec extends Specification {
       H5Store.writeFrame(tmp, "df1", df1)
       H5Store.readFrame[DateTime, Int, Double](tmp, "df1") must_== df1
 
-      H5Store.writeFrame(tmp, "df1", df2) must throwAn[H5Store.H5StoreException]
+      H5Store.writeFrame(tmp, "df1", df2) must throwAn[
+          H5Store.H5StoreException]
       H5Store.readFrame[DateTime, Int, Double](tmp, "df1") must_== df1
 
       Files.deleteIfExists(Paths.get(tmp))
@@ -374,14 +378,18 @@ class H5StoreSpec extends Specification {
     hdfTest("H5Store exceptions are handled properly") {
       val tmp = tmpFilePath(".h5")
 
-      H5Store.readSeries[DateTime, Double](tmp, "s1") must throwAn[H5Store.H5StoreException]
-      H5Store.readFrame[DateTime, Int, Double](tmp, "f1") must throwAn[H5Store.H5StoreException]
+      H5Store.readSeries[DateTime, Double](tmp, "s1") must throwAn[
+          H5Store.H5StoreException]
+      H5Store.readFrame[DateTime, Int, Double](tmp, "f1") must throwAn[
+          H5Store.H5StoreException]
 
       // try reading wrong data type
       val s1 = Series(vec.rand(3), Index(d1, d2, d3))
       H5Store.writeSeries(tmp, "s1", s1)
-      H5Store.readSeries[Int, Double](tmp, "s1") must throwAn[H5Store.H5StoreException]
-      H5Store.readSeries[DateTime, Int](tmp, "s1") must throwAn[H5Store.H5StoreException]
+      H5Store.readSeries[Int, Double](tmp, "s1") must throwAn[
+          H5Store.H5StoreException]
+      H5Store.readSeries[DateTime, Int](tmp, "s1") must throwAn[
+          H5Store.H5StoreException]
 
       Files.deleteIfExists(Paths.get(tmp))
     }
@@ -403,42 +411,45 @@ class H5StoreSpec extends Specification {
 
       // simultaneous writes
 
-      val taskListW = for (i <- 1 to 100) yield new Callable[Unit] {
-        def call() {
-          H5Store.writeFrame(tmp, "f%s".format(i), df1)
-          H5Store.writeFrame(tmp, "f%s".format(100 + i), df2)
+      val taskListW = for (i <- 1 to 100) yield
+        new Callable[Unit] {
+          def call() {
+            H5Store.writeFrame(tmp, "f%s".format(i), df1)
+            H5Store.writeFrame(tmp, "f%s".format(100 + i), df2)
+          }
         }
-      }
 
       pool.invokeAll(taskListW)
 
       // simultaneous reads
 
-      val taskListR = for (i <- 1 to 100) yield new Callable[Unit] {
-        def call() {
-          H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(100 + i)) must_== df2
-          H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+      val taskListR = for (i <- 1 to 100) yield
+        new Callable[Unit] {
+          def call() {
+            H5Store.readFrame[DateTime, Int, Double](
+                tmp, "f%s".format(100 + i)) must_== df2
+            H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+          }
         }
-      }
 
       pool.invokeAll(taskListR.toSeq)
 
       // interleaved reads & writes
 
-      val taskListRW = for (i <- 1 to 100) yield new Callable[Unit] {
-        def call() {
-          if (i % 2 == 0)
-            H5Store.writeFrame(tmp, "f%s".format(100 + i), df1)
-          else
-            H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+      val taskListRW = for (i <- 1 to 100) yield
+        new Callable[Unit] {
+          def call() {
+            if (i % 2 == 0) H5Store.writeFrame(tmp, "f%s".format(100 + i), df1)
+            else
+              H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
+          }
         }
-      }
 
       pool.invokeAll(taskListRW.toSeq)
 
       pool.shutdown()
 
       Files.deleteIfExists(Paths.get(tmp))
-   }
+    }
   }
 }

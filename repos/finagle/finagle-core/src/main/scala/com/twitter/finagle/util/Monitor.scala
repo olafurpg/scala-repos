@@ -5,10 +5,10 @@ import com.twitter.util.{RootMonitor, Monitor, NullMonitor}
 import java.net.SocketAddress
 
 /**
- * Exposed for testing.
- *
- * Use the companion object [[DefaultMonitor]].
- */
+  * Exposed for testing.
+  *
+  * Use the companion object [[DefaultMonitor]].
+  */
 private[util] class DefaultMonitor(log: Logger) extends Monitor {
   private[this] val MinLogLevel = Level.INFO.value
 
@@ -37,17 +37,16 @@ private[util] class DefaultMonitor(log: Logger) extends Monitor {
 }
 
 /**
- * The default [[Monitor]] to be used throughout Finagle.
- *
- * Mostly delegates to [[RootMonitor]], with the exception
- * of [[HasLogLevel HasLogLevels]] with a `logLevel` below `INFO`.
- * [[com.twitter.util.TimeoutException TimeoutExceptions]] are also
- * suppressed because they often originate from `Future.within` and
- * `Future.raiseWithin`.
- */
+  * The default [[Monitor]] to be used throughout Finagle.
+  *
+  * Mostly delegates to [[RootMonitor]], with the exception
+  * of [[HasLogLevel HasLogLevels]] with a `logLevel` below `INFO`.
+  * [[com.twitter.util.TimeoutException TimeoutExceptions]] are also
+  * suppressed because they often originate from `Future.within` and
+  * `Future.raiseWithin`.
+  */
 object DefaultMonitor
-  extends DefaultMonitor(Logger.get(classOf[DefaultMonitor]))
-{
+    extends DefaultMonitor(Logger.get(classOf[DefaultMonitor])) {
   val get = this
 }
 
@@ -63,7 +62,9 @@ object LoadedReporterFactory extends ReporterFactory {
   private[this] val factories = LoadService[ReporterFactory]()
 
   def apply(name: String, addr: Option[SocketAddress]): Monitor =
-    factories.map(_(name, addr)).foldLeft(NullMonitor: Monitor) { (a, m) => a andThen m }
+    factories.map(_ (name, addr)).foldLeft(NullMonitor: Monitor) { (a, m) =>
+      a andThen m
+    }
 
   val get = this
 

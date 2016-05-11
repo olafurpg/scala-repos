@@ -20,34 +20,42 @@ import org.jetbrains.plugins.scala.lang.psi.light.isWrapper
 import scala.annotation.tailrec
 
 /**
- * Nikolay.Tropin
- * 2014-08-29
- */
+  * Nikolay.Tropin
+  * 2014-08-29
+  */
 class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
 
   def invokeWithDialog(project: Project, fun: ScMethodLike) {
     UsageTrigger.trigger(ScalaChangeSignatureHandler.id)
-    val dialog = new ScalaChangeSignatureDialog(project, new ScalaMethodDescriptor(fun))
+    val dialog = new ScalaChangeSignatureDialog(
+        project, new ScalaMethodDescriptor(fun))
     dialog.show()
   }
 
-  private def invokeOnElement(project: Project, editor: Editor, element: PsiElement): Unit = {
+  private def invokeOnElement(
+      project: Project, editor: Editor, element: PsiElement): Unit = {
     def showErrorHint(message: String) = {
       val name = ChangeSignatureHandler.REFACTORING_NAME
-      CommonRefactoringUtil.showErrorHint(project, editor, message, name, HelpID.CHANGE_SIGNATURE)
+      CommonRefactoringUtil.showErrorHint(
+          project, editor, message, name, HelpID.CHANGE_SIGNATURE)
     }
     def isSupportedFor(fun: ScMethodLike): Boolean = {
       fun match {
-        case fun: ScFunction if fun.paramClauses.clauses.exists(_.isImplicit) =>
-          val message = ScalaBundle.message("change.signature.not.supported.implicit.parameters")
+        case fun: ScFunction
+            if fun.paramClauses.clauses.exists(_.isImplicit) =>
+          val message = ScalaBundle.message(
+              "change.signature.not.supported.implicit.parameters")
           showErrorHint(message)
           false
         case fun: ScFunction if fun.hasModifierProperty("implicit") =>
-          val message = ScalaBundle.message("change.signature.not.supported.implicit.functions")
+          val message = ScalaBundle.message(
+              "change.signature.not.supported.implicit.functions")
           showErrorHint(message)
           false
-        case fun: ScFunction if fun.name == "unapply" || fun.name == "unapplySeq" =>
-          val message = ScalaBundle.message("change.signature.not.supported.extractors")
+        case fun: ScFunction
+            if fun.name == "unapply" || fun.name == "unapplySeq" =>
+          val message =
+            ScalaBundle.message("change.signature.not.supported.extractors")
           showErrorHint(message)
           false
         case _ => true
@@ -72,58 +80,76 @@ class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
           case _ =>
         }
 
-        val newMethod = SuperMethodWarningUtil.checkSuperMethod(method, RefactoringBundle.message("to.refactor"))
+        val newMethod = SuperMethodWarningUtil.checkSuperMethod(
+            method, RefactoringBundle.message("to.refactor"))
         unwrapMethod(newMethod) match {
           case Some(fun: ScMethodLike) =>
             if (isSupportedFor(fun)) invokeWithDialog(project, fun)
-          case Some(m) if m != method => ChangeSignatureUtil.invokeChangeSignatureOn(m, project)
+          case Some(m) if m != method =>
+            ChangeSignatureUtil.invokeChangeSignatureOn(m, project)
           case _ =>
         }
       case None =>
-        val message = RefactoringBundle.getCannotRefactorMessage(getTargetNotFoundMessage)
+        val message =
+          RefactoringBundle.getCannotRefactorMessage(getTargetNotFoundMessage)
         showErrorHint(message)
     }
   }
 
-  override def invoke(project: Project, editor: Editor, file: PsiFile, dataContext: DataContext): Unit = {
+  override def invoke(project: Project,
+                      editor: Editor,
+                      file: PsiFile,
+                      dataContext: DataContext): Unit = {
     editor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     val element = Option(findTargetMember(file, editor))
-            .getOrElse(CommonDataKeys.PSI_ELEMENT.getData(dataContext))
+      .getOrElse(CommonDataKeys.PSI_ELEMENT.getData(dataContext))
 
     invokeOnElement(project, editor, element)
   }
 
-  override def invoke(project: Project, elements: Array[PsiElement], dataContext: DataContext): Unit = {
+  override def invoke(project: Project,
+                      elements: Array[PsiElement],
+                      dataContext: DataContext): Unit = {
     if (elements.length != 1) return
-    val editor: Editor = if (dataContext == null) null else CommonDataKeys.EDITOR.getData(dataContext)
+    val editor: Editor =
+      if (dataContext == null) null
+      else CommonDataKeys.EDITOR.getData(dataContext)
     invokeOnElement(project, editor, elements(0))
   }
 
-  override def getTargetNotFoundMessage: String = ScalaBundle.message("error.wrong.caret.position.method.name")
+  override def getTargetNotFoundMessage: String =
+    ScalaBundle.message("error.wrong.caret.position.method.name")
 
   override def findTargetMember(element: PsiElement): PsiElement = {
     if (element.isInstanceOf[PsiMethod]) return element
 
-    def resolvedMethod = PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement]) match {
-      case null => null
-      case ResolvesTo(m: PsiMethod) => m
-      case _ => null
-    }
-    def currentFunction = PsiTreeUtil.getParentOfType(element, classOf[ScFunction]) match {
-      case null => null
-      case funDef: ScFunctionDefinition if !funDef.body.exists(_.isAncestorOf(element)) => funDef
-      case decl: ScFunctionDeclaration => decl
-      case _ => null
-    }
-    def primaryConstr = PsiTreeUtil.getParentOfType(element, classOf[ScClass]) match {
-      case null => null
-      case c: ScClass =>
-        c.constructor match {
-          case Some(constr)
-            if PsiTreeUtil.isAncestor(c.nameId, element, false) || PsiTreeUtil.isAncestor(constr, element, false) => constr
-          case _ => null
-        }
-    }
+    def resolvedMethod =
+      PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement]) match {
+        case null => null
+        case ResolvesTo(m: PsiMethod) => m
+        case _ => null
+      }
+    def currentFunction =
+      PsiTreeUtil.getParentOfType(element, classOf[ScFunction]) match {
+        case null => null
+        case funDef: ScFunctionDefinition
+            if !funDef.body.exists(_.isAncestorOf(element)) =>
+          funDef
+        case decl: ScFunctionDeclaration => decl
+        case _ => null
+      }
+    def primaryConstr =
+      PsiTreeUtil.getParentOfType(element, classOf[ScClass]) match {
+        case null => null
+        case c: ScClass =>
+          c.constructor match {
+            case Some(constr)
+                if PsiTreeUtil.isAncestor(c.nameId, element, false) ||
+                PsiTreeUtil.isAncestor(constr, element, false) =>
+              constr
+            case _ => null
+          }
+      }
     Option(resolvedMethod) orElse Option(currentFunction) getOrElse primaryConstr
   }
 

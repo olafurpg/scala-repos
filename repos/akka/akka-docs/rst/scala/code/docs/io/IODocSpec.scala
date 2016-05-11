@@ -1,12 +1,11 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.io
 
 //#imports
-import akka.actor.{ Actor, ActorRef, Props }
-import akka.io.{ IO, Tcp }
+import akka.actor.{Actor, ActorRef, Props}
+import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import java.net.InetSocketAddress
 //#imports
@@ -16,7 +15,7 @@ import scala.concurrent.duration._
 
 class DemoActor extends Actor {
   //#manager
-  import akka.io.{ IO, Tcp }
+  import akka.io.{IO, Tcp}
   import context.system // implicitly used by IO(Tcp)
 
   val manager = IO(Tcp)
@@ -49,7 +48,6 @@ class Server extends Actor {
       val connection = sender()
       connection ! Register(handler)
   }
-
 }
 //#server
 
@@ -58,7 +56,7 @@ class SimplisticHandler extends Actor {
   import Tcp._
   def receive = {
     case Received(data) => sender() ! Write(data)
-    case PeerClosed     => context stop self
+    case PeerClosed => context stop self
   }
 }
 //#simplistic-handler
@@ -130,5 +128,4 @@ class IODocSpec extends AkkaSpec {
     expectMsg("connection closed")
     expectTerminated(client, 1.second)
   }
-
 }

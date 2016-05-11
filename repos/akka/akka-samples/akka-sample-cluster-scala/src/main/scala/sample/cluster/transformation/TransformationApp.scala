@@ -10,5 +10,4 @@ object TransformationApp {
     TransformationBackend.main(Array.empty)
     TransformationFrontend.main(Array.empty)
   }
-
 }

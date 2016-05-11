@@ -7,7 +7,8 @@ import org.scalatra.util.ValueReader
 
 import scala.util.control.Exception.allCatch
 
-class JsonValueReader(val data: JValue)(implicit formats: Formats) extends ValueReader[JValue, JValue] {
+class JsonValueReader(val data: JValue)(implicit formats: Formats)
+    extends ValueReader[JValue, JValue] {
   //  type I = T
 
   private val separator = new {
@@ -20,12 +21,15 @@ class JsonValueReader(val data: JValue)(implicit formats: Formats) extends Value
 
   protected def readPath(path: String, subj: JValue = data): Option[JValue] = {
     val partIndex = path.indexOf(separator.beginning)
-    val (part, rest) = if (path.indexOf(separator.beginning) > -1) path.splitAt(partIndex) else (path, "")
-    val realRest = if (rest.nonEmpty) {
-      if (separator.end.nonBlank) {
-        if (rest.size > 1) rest.substring(2) else rest.substring(1)
-      } else rest.substring(1)
-    } else rest
+    val (part, rest) =
+      if (path.indexOf(separator.beginning) > -1) path.splitAt(partIndex)
+      else (path, "")
+    val realRest =
+      if (rest.nonEmpty) {
+        if (separator.end.nonBlank) {
+          if (rest.size > 1) rest.substring(2) else rest.substring(1)
+        } else rest.substring(1)
+      } else rest
     if (realRest.isEmpty) {
       get(part, subj)
     } else {
@@ -44,6 +48,6 @@ class JsonValueReader(val data: JValue)(implicit formats: Formats) extends Value
 trait JsonValueReaderProperty[T] { self: JsonMethods[T] =>
 
   implicit protected def jsonFormats: Formats
-  protected implicit def jsonValueReader(d: JValue): JsonValueReader = new JsonValueReader(d)
+  protected implicit def jsonValueReader(d: JValue): JsonValueReader =
+    new JsonValueReader(d)
 }
-

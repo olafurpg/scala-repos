@@ -14,7 +14,7 @@ package breeze.stats.distributions
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. 
-*/
+ */
 
 import org.junit.runner.RunWith
 import org.scalacheck._
@@ -23,7 +23,7 @@ import org.scalatest.junit._
 import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
-class LogarthmicTest extends FunSuite with Checkers with MomentsTestBase[Int]  {
+class LogarthmicTest extends FunSuite with Checkers with MomentsTestBase[Int] {
   import org.scalacheck.Arbitrary.arbitrary
 
   val expFam = Logarthmic
@@ -33,15 +33,19 @@ class LogarthmicTest extends FunSuite with Checkers with MomentsTestBase[Int]  {
   override val VARIANCE_TOLERANCE: Double = 1E-1
 
   def paramsClose(p: Double, q: Double) = {
-     (p - q).abs / (p.abs / 2 + q.abs / 2+ 1)  < 1E-1
+    (p - q).abs / (p.abs / 2 + q.abs / 2 + 1) < 1E-1
   }
 
   implicit def arbParameter = Arbitrary {
-    for(p <- arbitrary[Double].map{m => (math.abs(m) % 1.0) + 1E-3}) yield p
+    for (p <- arbitrary[Double].map { m =>
+      (math.abs(m) % 1.0) + 1E-3
+    }) yield p
   }
 
   implicit def arbDistr: Arbitrary[Logarthmic] = Arbitrary {
-    for(p <- arbitrary[Double].map{m => (math.abs(m) % 1.0) + 1E-3}) yield new Logarthmic(p)(RandBasis.mt0)
+    for (p <- arbitrary[Double].map { m =>
+      (math.abs(m) % 1.0) + 1E-3
+    }) yield new Logarthmic(p)(RandBasis.mt0)
   }
 
   def asDouble(x: Int) = x.toDouble

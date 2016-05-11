@@ -1,12 +1,12 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 import akka.persistence.PersistentActor
 
 object PersistenceMultiDocSpec {
 
-  val DefaultConfig = """
+  val DefaultConfig =
+    """
   //#default-config
   # Absolute path to the default journal plugin configuration entry.
   akka.persistence.journal.plugin = "akka.persistence.journal.inmem"
@@ -49,5 +49,4 @@ object PersistenceMultiDocSpec {
     override def snapshotPluginId = "akka.persistence.chronicle.snapshot-store"
   }
   //#override-plugins
-
 }

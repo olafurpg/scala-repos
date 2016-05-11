@@ -2,7 +2,7 @@ package spire
 package example
 
 import org.apfloat._
-import org.jscience.mathematics.number.{ Rational => JRational }
+import org.jscience.mathematics.number.{Rational => JRational}
 
 import scala.collection.JavaConverters._
 
@@ -12,13 +12,13 @@ import spire.math._
 import spire.implicits._
 
 /**
- * An example showing how to use the Auto macros.
- *
- * The Auto macros let you auto-generate Spire type classes for Scala and Java
- * types that follow common conventions in those languages. For instance, in
- * Scala, people will usually use the `+` method to denote addition, whereas in
- * Java, they use `add`.
- */
+  * An example showing how to use the Auto macros.
+  *
+  * The Auto macros let you auto-generate Spire type classes for Scala and Java
+  * types that follow common conventions in those languages. For instance, in
+  * Scala, people will usually use the `+` method to denote addition, whereas in
+  * Java, they use `add`.
+  */
 object AutoAlgebraExample extends App {
 
   // Let's say you wanted to use the Apfloat arbitrary precision number type,
@@ -34,7 +34,8 @@ object AutoAlgebraExample extends App {
   // instances for a few Spire type classes.
 
   implicit val apfloatOrder = Auto.java.order[Apfloat]
-  implicit val apfloatField = Auto.java.field[Apfloat](Apcomplex.ZERO, Apcomplex.ONE)
+  implicit val apfloatField =
+    Auto.java.field[Apfloat](Apcomplex.ZERO, Apcomplex.ONE)
 
   // That's it! Auto.java.order provides Eq & Order instances for Apfloat and
   // Auto.java.field provides a Field instance. We use the `Auto.java` macros
@@ -49,18 +50,22 @@ object AutoAlgebraExample extends App {
   // Apfloat has some other number types too.
 
   implicit val apintOrder = Auto.java.order[Apint]
-  implicit val apintEuclideanRing = Auto.java.euclideanRing[Apint](Apcomplex.ZERO, Apcomplex.ONE)
+  implicit val apintEuclideanRing =
+    Auto.java.euclideanRing[Apint](Apcomplex.ZERO, Apcomplex.ONE)
   implicit val aprationalOrder = Auto.java.order[Aprational]
-  implicit val aprationalField = Auto.java.field[Aprational](Apcomplex.ZERO, Apcomplex.ONE)
+  implicit val aprationalField =
+    Auto.java.field[Aprational](Apcomplex.ZERO, Apcomplex.ONE)
   implicit val apcomplexOrder = Auto.java.eq[Apcomplex]
-  implicit val apcomplexField = Auto.java.field[Apcomplex](Apcomplex.ZERO, Apcomplex.ONE)
+  implicit val apcomplexField =
+    Auto.java.field[Apcomplex](Apcomplex.ZERO, Apcomplex.ONE)
 
   // That's a total of 8 lines to create an Apfloat -> Spire bridge!
 
   // Creating a JScience bridge isn't any harder:
 
   implicit val jrationalOrder = Auto.java.order[JRational]
-  implicit val jrationalField = Auto.java.field[JRational](JRational.ZERO, JRational.ONE)
+  implicit val jrationalField =
+    Auto.java.field[JRational](JRational.ZERO, JRational.ONE)
 
   assert(-JRational.valueOf(2L, 1L) === JRational.valueOf(-2L, 1L))
 
@@ -70,7 +75,8 @@ object AutoAlgebraExample extends App {
 
   implicit def javaListEq[A] = Auto.java.eq[java.util.List[A]]
   implicit def javaListMonoid[A] =
-    Auto.java.collection.monoid[java.util.List[A]](new java.util.ArrayList[A]())
+    Auto.java.collection
+      .monoid[java.util.List[A]](new java.util.ArrayList[A]())
 
   // The Auto.java.collection's use addAll and the identity collection to
   // implement concatention. This means Java's collecitons behave well.
@@ -92,10 +98,12 @@ object AutoAlgebraExample extends App {
   implicit val intEuclideanRing = Auto.scala.euclideanRing[Int](0, 1)
 
   implicit val bigIntOrder = Auto.scala.order[BigInt]
-  implicit val bigIntField = Auto.scala.euclideanRing[BigInt](BigInt(0), BigInt(1))
+  implicit val bigIntField =
+    Auto.scala.euclideanRing[BigInt](BigInt(0), BigInt(1))
 
   implicit val rationalOrder = Auto.scala.order[Rational]
-  implicit val rationalField = Auto.scala.field[Rational](Rational.zero, Rational.one)
+  implicit val rationalField =
+    Auto.scala.field[Rational](Rational.zero, Rational.one)
 
   implicit val doubleOrder = Auto.scala.order[Double]
   implicit val doubleField = Auto.scala.field[Double](0d, 1d)

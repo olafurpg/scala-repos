@@ -1,17 +1,15 @@
 /************************************************************************\
-** Project                                                              **
-**       ______  ______   __    ______    ____                          **
-**      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
-**     / /__   / /_/ /  / /   / /_/ /   / /_                            **
-**    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
-**   ____/ / / /      / /   / / | |   / /__                             **
-**  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
-**                                                                      **
-**      Redistribution and use permitted under the MIT license.         **
-**                                                                      **
+  ** Project                                                              **
+  **       ______  ______   __    ______    ____                          **
+  **      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+  **     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+  **    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+  **   ____/ / / /      / /   / / | |   / /__                             **
+  **  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+  **                                                                      **
+  **      Redistribution and use permitted under the MIT license.         **
+  **                                                                      **
 \************************************************************************/
-
-
 package spire
 package random
 package rng
@@ -20,24 +18,24 @@ import spire.syntax.cfor._
 import spire.math.max
 
 /**
- * This object provides helper functions used for seeding arrays of integers or longs.
- *
- * The seeding functions are an adaptation/port of code from the the 32-bit and 64-bit implementations of MersenneTwister (MT19937.c, MT19937-64.c).
- *
- * <p>MersenneTwister is a fast, 623-dimensionally equidistributed pseudo random number generator
- * with a <tt>2<sup>19937</sup>&nbsp;-&nbsp;1</tt> long period.
- *
- * <p><b>Reference: </b>
- * Makato Matsumoto and Takuji Nishimura:
- * "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform Pseudo-Random Number Generator",
- * <i>ACM Transactions on Modeling and Computer Simulation,</i> Vol. 8, No. 1, January 1998, pp 3--30.
- *
- * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c">MT19937.c</a>
- * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/VERSIONS/C-LANG/mt19937-64.c">MT19937-64.c</a>
- * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html">Mersenne Twister Home Page</a>
- * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
- * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
- */
+  * This object provides helper functions used for seeding arrays of integers or longs.
+  *
+  * The seeding functions are an adaptation/port of code from the the 32-bit and 64-bit implementations of MersenneTwister (MT19937.c, MT19937-64.c).
+  *
+  * <p>MersenneTwister is a fast, 623-dimensionally equidistributed pseudo random number generator
+  * with a <tt>2<sup>19937</sup>&nbsp;-&nbsp;1</tt> long period.
+  *
+  * <p><b>Reference: </b>
+  * Makato Matsumoto and Takuji Nishimura:
+  * "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform Pseudo-Random Number Generator",
+  * <i>ACM Transactions on Modeling and Computer Simulation,</i> Vol. 8, No. 1, January 1998, pp 3--30.
+  *
+  * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c">MT19937.c</a>
+  * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/VERSIONS/C-LANG/mt19937-64.c">MT19937-64.c</a>
+  * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html">Mersenne Twister Home Page</a>
+  * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
+  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
+  */
 object Utils {
   /*
     final class IntArrayWrapper(transform: Int => Int, array: Array[Int]) {
@@ -49,15 +47,15 @@ object Utils {
       def apply(i: Int) = array(transform(i))
       def update(i: Int, v: Int) = array(transform(i)) = v
    }
-  */
+   */
 
   @volatile private var seedUniquifier = 8682522807148012L
 
-  def intFromTime(time: Long = System.nanoTime) : Int = {
+  def intFromTime(time: Long = System.nanoTime): Int = {
     longFromTime(time).toInt
   }
 
-  def longFromTime(time: Long = System.nanoTime) : Long = {
+  def longFromTime(time: Long = System.nanoTime): Long = {
     seedUniquifier += 1
     (seedUniquifier + time)
   }
@@ -79,8 +77,8 @@ object Utils {
     a(0) = seed
 
     cfor(1)(_ < length, _ + 1) { i =>
-        val x = a(i - 1)
-        a(i) = 6364136223846793005L * (x ^ (x >>> 62)) + i
+      val x = a(i - 1)
+      a(i) = 6364136223846793005L * (x ^ (x >>> 62)) + i
     }
 
     a

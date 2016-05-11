@@ -4,5 +4,4 @@ object Test {
     case Nil => Nil
     case head :: tail => head ::: flatten(tail)
   }
-
 }

@@ -1,5 +1,5 @@
 trait Expr[T] {
-  def + (other : Expr[T]): Expr[T] = Add(this, other)
+  def +(other: Expr[T]): Expr[T] = Add(this, other)
 }
 
 object Expr {
@@ -10,8 +10,8 @@ object Expr {
 case class Const[T](value: T) extends Expr[T]
 case class Add[T](first: Expr[T], second: Expr[T]) extends Expr[T]
 
-case class ExtDouble(value : Double) {
-  def + (other: ExtDouble) = ExtDouble(value + other.value)
+case class ExtDouble(value: Double) {
+  def +(other: ExtDouble) = ExtDouble(value + other.value)
 }
 
 object ExtDouble {
@@ -19,7 +19,8 @@ object ExtDouble {
 }
 
 object HighlightingTest {
-  import Expr._              // when you import these implicits
-  /*start*/1.0 + ExtDouble(1.0)/*end*/   // Expr[ExtDouble] doesn't conform to ExtDouble.
+  import Expr._ // when you import these implicits
+  /*start*/
+  1.0 + ExtDouble(1.0) /*end*/ // Expr[ExtDouble] doesn't conform to ExtDouble.
 }
 //ExtDouble

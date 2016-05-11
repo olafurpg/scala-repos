@@ -1,7 +1,8 @@
 class A {
   class F {
-    def foo(r : A.this.R) = {
-      /*start*/r/*end*/
+    def foo(r: A.this.R) = {
+      /*start*/
+      r /*end*/
     }
   }
 

@@ -1,9 +1,4 @@
-
-
-
 import scala.collection.JavaConverters._
-
-
 
 object Test extends App {
 
@@ -45,7 +40,10 @@ object Test extends App {
 
   def benchScalaPar(values: Iterable[(Int, Int)]) = {
     bench("Scala ParMap") {
-      val m = new scala.collection.parallel.mutable.ParHashMap[Int, Int] map { x => x }
+      val m =
+        new scala.collection.parallel.mutable.ParHashMap[Int, Int] map { x =>
+          x
+        }
 
       m ++= values
     }
@@ -75,14 +73,8 @@ object Test extends App {
   // println(scalamap)
   // println(scalaparmap)
 
-  assert(scalamap < (javamap * 10), "scalamap: " + scalamap + " vs. javamap: " + javamap)
-  assert(scalaparmap < (javamap * 10), "scalaparmap: " + scalaparmap + " vs. javamap: " + javamap)
+  assert(scalamap < (javamap * 10),
+         "scalamap: " + scalamap + " vs. javamap: " + javamap)
+  assert(scalaparmap < (javamap * 10),
+         "scalaparmap: " + scalaparmap + " vs. javamap: " + javamap)
 }
-
-
-
-
-
-
-
-

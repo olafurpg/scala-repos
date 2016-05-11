@@ -1,4 +1,3 @@
-
 class NameDefaults {
   val someString = "abc"
   val someInt = 42
@@ -11,6 +10,6 @@ class NameDefaults {
     println()
     val someOtherInt = 10
 
-    foo(y = someOtherInt/*#*/, x = someString/*#*/)
+    foo(y = someOtherInt /*#*/, x = someString /*#*/ )
   }
 }

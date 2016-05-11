@@ -6,5 +6,3 @@ object Test {
   class Foo(val a: Int)
   def test(f: NewType[Foo]) = f.a
 }
-
-

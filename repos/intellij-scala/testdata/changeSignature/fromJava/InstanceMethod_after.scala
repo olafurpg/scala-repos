@@ -3,6 +3,7 @@ object InstanceMethodScala {
     val value = new InstanceMethod
     value.bar(true, 1)
 
-    (i: Int) => value.foo(true, i)
+    (i: Int) =>
+      value.foo(true, i)
   }
 }

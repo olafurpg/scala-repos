@@ -35,11 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Test for [[scalafx.stage.StageStyle]] */
 @RunWith(classOf[JUnitRunner])
-class StageStyleSpec extends SFXEnumDelegateSpec[jfxs.StageStyle, StageStyle](
-  javaClass = classOf[jfxs.StageStyle],
-  scalaClass = classOf[StageStyle],
-  companion = StageStyle)
-
+class StageStyleSpec
+    extends SFXEnumDelegateSpec[jfxs.StageStyle, StageStyle](
+        javaClass = classOf[jfxs.StageStyle],
+        scalaClass = classOf[StageStyle],
+        companion = StageStyle)

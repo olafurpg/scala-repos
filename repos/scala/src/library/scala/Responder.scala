@@ -1,39 +1,38 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2005-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2005-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
-
 
 package scala
 
 /** This object contains utility methods to build responders.
- *
- *  @author Martin Odersky
- *  @author Burak Emir
- *  @version 1.0
- *
- *  @see class Responder
- *  @since 2.1
- */
+  *
+  *  @author Martin Odersky
+  *  @author Burak Emir
+  *  @version 1.0
+  *
+  *  @see class Responder
+  *  @since 2.1
+  */
 @deprecated("This object will be removed", "2.11.0")
 object Responder {
 
   /** Creates a responder that answer continuations with the constant `a`.
-   */
+    */
   def constant[A](x: A) = new Responder[A] {
     def respond(k: A => Unit) = k(x)
   }
 
   /** Executes `x` and returns `'''true'''`, useful as syntactic
-   *  convenience in for comprehensions.
-   */
+    *  convenience in for comprehensions.
+    */
   def exec[A](x: => Unit): Boolean = { x; true }
 
   /** Runs a responder, returning an optional result.
-  */
+    */
   def run[A](r: Responder[A]): Option[A] = {
     var result: Option[A] = None
     r.foreach(x => result = Some(x))
@@ -49,16 +48,16 @@ object Responder {
 }
 
 /** Instances of responder are the building blocks of small programs
- *  written in continuation passing style. By using responder classes
- *  in for comprehensions, one can embed domain-specific languages in
- *  Scala while giving the impression that programs in these DSLs are
- *  written in direct style.
- *
- *  @author Martin Odersky
- *  @author Burak Emir
- *  @version 1.0
- *  @since 2.1
- */
+  *  written in continuation passing style. By using responder classes
+  *  in for comprehensions, one can embed domain-specific languages in
+  *  Scala while giving the impression that programs in these DSLs are
+  *  written in direct style.
+  *
+  *  @author Martin Odersky
+  *  @author Burak Emir
+  *  @version 1.0
+  *  @since 2.1
+  */
 @deprecated("This class will be removed", "2.11.0")
 abstract class Responder[+A] extends Serializable {
 

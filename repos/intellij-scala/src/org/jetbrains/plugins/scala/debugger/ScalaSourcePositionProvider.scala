@@ -15,8 +15,8 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import scala.annotation.tailrec
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class ScalaSourcePositionProvider extends SourcePositionProvider {
   override def computeSourcePosition(descriptor: NodeDescriptor,
                                      project: Project,
@@ -42,11 +42,14 @@ class ScalaSourcePositionProvider extends SourcePositionProvider {
   }
 
   @tailrec
-  private def resolveReferenceWithName(name: String, context: PsiElement): PsiElement = {
+  private def resolveReferenceWithName(
+      name: String, context: PsiElement): PsiElement = {
     if (!ScalaNamesUtil.isIdentifier(name)) return null
     if (name == "$outer" || name.startsWith("x$")) return null
 
-    val ref = ScalaPsiElementFactory.createExpressionWithContextFromText(name, context, context).asInstanceOf[ScReferenceExpression]
+    val ref = ScalaPsiElementFactory
+      .createExpressionWithContextFromText(name, context, context)
+      .asInstanceOf[ScReferenceExpression]
 
     ref.resolve() match {
       case null if name.contains("$") =>

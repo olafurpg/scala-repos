@@ -1,2 +1,1 @@
-object Common {
-}
+object Common {}

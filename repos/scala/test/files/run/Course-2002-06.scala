@@ -3,7 +3,7 @@
 //############################################################################
 
 /** Two-dimensional vector. */
-class Vector (_x: Double, _y: Double) {
+class Vector(_x: Double, _y: Double) {
   def x: Double = _x;
   def y: Double = _y;
   def +(that: Vector): Vector = new Vector(x + that.x, y + that.y);
@@ -16,10 +16,11 @@ class Vector (_x: Double, _y: Double) {
 //############################################################################
 
 /** Frame. */
-class Frame (_origin: Vector, _edgeX: Vector, _edgeY: Vector) {
+class Frame(_origin: Vector, _edgeX: Vector, _edgeY: Vector) {
   def origin: Vector = _origin;
   def edgeX: Vector = _edgeX;
   def edgeY: Vector = _edgeY;
+
   /** The vector v in the absolute (drawing) coordinate system */
   def coordMap(v: Vector): Vector = origin + (edgeX * v.x) + (edgeY * v.y);
 }
@@ -28,6 +29,7 @@ class Frame (_origin: Vector, _edgeX: Vector, _edgeY: Vector) {
 
 /** Space on which we can draw lines. */
 abstract class Graphics(_width: Double, _height: Double) {
+
   /** Width of the picture.*/
   def width: Double = _width;
 
@@ -63,7 +65,7 @@ abstract class Graphics(_width: Double, _height: Double) {
     }
 
   /** Draw a list of continuous segments on the picture.*/
-  def drawPolySegment(frm: Frame)(points: List[Vector]) : Unit =
+  def drawPolySegment(frm: Frame)(points: List[Vector]): Unit =
     if (!points.tail.isEmpty) {
       drawSegment(frm)(points.head, points.tail.head);
       drawPolySegment(frm)(points.tail);
@@ -73,31 +75,31 @@ abstract class Graphics(_width: Double, _height: Double) {
   def repaint = ();
 
   /** Add the last touch to the picture.*/
-  def close : Unit;
+  def close: Unit;
 }
 
 //############################################################################
 
 /** Provides PostScript output. The name of the file is the first parameter
- *  of the constructor. The width and height determine the aspect ratio
- */
-class PostScript (filename: String, _width: Double, _height: Double)
- extends Graphics(_width, _height) {
+  *  of the constructor. The width and height determine the aspect ratio
+  */
+class PostScript(filename: String, _width: Double, _height: Double)
+    extends Graphics(_width, _height) {
+
   /** Convert mm into 72th of inch.*/
-  def mm2ps(x: Double) : Double = round(x * 72.0 / 25.4);
+  def mm2ps(x: Double): Double = round(x * 72.0 / 25.4);
 
-   def round(x: Double): Double =
-     Math.floor(x * 100.0 + 0.5) / 100.0;
+  def round(x: Double): Double =
+    Math.floor(x * 100.0 + 0.5) / 100.0;
 
-  def scaleAndCenter(frm: Frame, ratio:Double): Frame = {
+  def scaleAndCenter(frm: Frame, ratio: Double): Frame = {
     val currentRatio = frm.edgeX.norm / frm.edgeY.norm;
     if (currentRatio < ratio) {
       val newEdgeX = frm.edgeX;
-      val newEdgeY = frm.edgeY * (currentRatio /ratio);
+      val newEdgeY = frm.edgeY * (currentRatio / ratio);
       val newOrigin = frm.origin + ((frm.edgeY - newEdgeY) / 2);
       new Frame(newOrigin, newEdgeX, newEdgeY)
-    }
-    else {
+    } else {
       val newEdgeX = frm.edgeX * (ratio / currentRatio);
       val newEdgeY = frm.edgeY;
       val newOrigin = frm.origin + ((frm.edgeX - newEdgeX) / 2);
@@ -106,7 +108,7 @@ class PostScript (filename: String, _width: Double, _height: Double)
   }
 
   /** Line thickness in millimeters.*/
-  val line_thickness : Double = 0.05;
+  val line_thickness: Double = 0.05;
 
   /** Width, height, left and right margins in mm.*/
   val psWidth: Double = 210.0;
@@ -122,20 +124,21 @@ class PostScript (filename: String, _width: Double, _height: Double)
   }
 
   def plotLine(x1: Double, y1: Double, x2: Double, y2: Double): Unit = {
-    Console.println(round(x1) + " " + round(y1) + " m " +
-                    round(x2) + " " + round(y2) + " l");
+    Console.println(round(x1) + " " + round(y1) + " m " + round(x2) + " " +
+        round(y2) + " l");
   }
 
   /** Print the PS header.*/
   Console.println("%!PS-Adobe-3.0 EPSF-3.0\n%%Title: ProgrammationIV");
   Console.println("%%Creator: LAMP");
-  Console.println("%%BoundingBox: 0 0 " + mm2ps(psWidth) + " " + mm2ps(psHeight));
+  Console.println(
+      "%%BoundingBox: 0 0 " + mm2ps(psWidth) + " " + mm2ps(psHeight));
   Console.println("%%EndComments\n");
   Console.println("/m {moveto} bind def\n/l {lineto} bind def\n");
   Console.println(mm2ps(line_thickness) + " setlinewidth\nnewpath");
 
   /** Terminate the PS document and close the file stream. */
-  def close : Unit = {
+  def close: Unit = {
     Console.println("stroke\nshowpage\n%%EOF");
     Console.flush;
   }
@@ -146,16 +149,16 @@ class PostScript (filename: String, _width: Double, _height: Double)
 object M0 {
 
   /** Define the type of a painter as a function that takes a frame,
-   *  draws itself onto it and returns nothing
-   */
+    *  draws itself onto it and returns nothing
+    */
   type Painter = (Frame) => Unit;
 
-
   /** Transform the frame in which the painter is to be drawn, hence
-   *  changing the appearance of the painter
-   */
-  def transformPainter(origin: Vector, newX: Vector, newY: Vector)(painter: Painter): Painter = {
-    frame: Frame => {
+    *  changing the appearance of the painter
+    */
+  def transformPainter(origin: Vector, newX: Vector, newY: Vector)(
+      painter: Painter): Painter = { frame: Frame =>
+    {
       val newOrigin = frame.coordMap(origin);
       val newFrame = new Frame(newOrigin,
                                frame.coordMap(newX) - newOrigin,
@@ -164,25 +167,24 @@ object M0 {
     }
   }
 
-
   /** Flip the painter vertically
-   */
+    */
   def flipVert: Painter => Painter =
     transformPainter(new Vector(0.0, 1.0),
                      new Vector(1.0, 1.0),
                      new Vector(0.0, 0.0));
 
   /** Flip the painter horizontally
-   */
+    */
   def flipHoriz: Painter => Painter =
     transformPainter(new Vector(1.0, 0.0),
                      new Vector(0.0, 0.0),
                      new Vector(1.0, 1.0));
 
   /** Compose a painter that draws p1 on the left of p2
-   */
-  def beside(p1: Painter, p2: Painter) : Painter = {
-    frame: Frame => {
+    */
+  def beside(p1: Painter, p2: Painter): Painter = { frame: Frame =>
+    {
       transformPainter(new Vector(0.0, 0.0),
                        new Vector(0.5, 0.0),
                        new Vector(0.0, 1.0))(p1)(frame);
@@ -193,9 +195,9 @@ object M0 {
   }
 
   /** Compose a painter that draws p1 below p2
-   */
-  def below(p1: Painter, p2: Painter): Painter = {
-    frame: Frame => {
+    */
+  def below(p1: Painter, p2: Painter): Painter = { frame: Frame =>
+    {
       transformPainter(new Vector(0.0, 0.0),
                        new Vector(1.0, 0.0),
                        new Vector(0.0, 0.5))(p1)(frame);
@@ -208,22 +210,23 @@ object M0 {
   def rightSplit(painter: Painter, n: Int): Painter = {
     if (n == 0) painter
     else {
-      val smaller = rightSplit(painter, n-1);
+      val smaller = rightSplit(painter, n - 1);
       beside(painter, below(smaller, smaller))
     }
   }
 
   // A small test painter.
   def house(canvas: Graphics)(frame: Frame): Unit = {
-    canvas.drawPolySegment(frame)(List(new Vector(0.0, 0.0),
-                                       new Vector(1.0, 0.0),
-                                       new Vector(1.0, 2.0/3.0),
-                                       new Vector(0.0, 2.0/3.0),
-                                       new Vector(0.5, 1.0),
-                                       new Vector(1.0, 2.0/3.0),
-                                       new Vector(0.0, 0.0),
-                                       new Vector(0.0, 2.0/3.0),
-                                       new Vector(1.0, 0.0)));
+    canvas.drawPolySegment(frame)(
+        List(new Vector(0.0, 0.0),
+             new Vector(1.0, 0.0),
+             new Vector(1.0, 2.0 / 3.0),
+             new Vector(0.0, 2.0 / 3.0),
+             new Vector(0.5, 1.0),
+             new Vector(1.0, 2.0 / 3.0),
+             new Vector(0.0, 0.0),
+             new Vector(0.0, 2.0 / 3.0),
+             new Vector(1.0, 0.0)));
     canvas.repaint
   }
 
@@ -232,9 +235,9 @@ object M0 {
     val canvas: Graphics = new PostScript(psfile, 2, 2);
 
     // the identity frame
-    val identFrame = new Frame(new Vector(0.0,0.0),
-                               new Vector(1.0,0.0),
-                               new Vector(0.0,1.0));
+    val identFrame = new Frame(new Vector(0.0, 0.0),
+                               new Vector(1.0, 0.0),
+                               new Vector(0.0, 1.0));
 
     // Create a basic painter...
     val p: Painter = house(canvas);

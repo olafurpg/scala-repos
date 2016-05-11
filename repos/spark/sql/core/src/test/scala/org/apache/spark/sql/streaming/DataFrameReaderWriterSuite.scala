@@ -33,23 +33,22 @@ object LastOptions {
 
 /** Dummy provider: returns no-op source/sink and records options in [[LastOptions]]. */
 class DefaultSource extends StreamSourceProvider with StreamSinkProvider {
-  override def createSource(
-      sqlContext: SQLContext,
-      schema: Option[StructType],
-      providerName: String,
-      parameters: Map[String, String]): Source = {
+  override def createSource(sqlContext: SQLContext,
+                            schema: Option[StructType],
+                            providerName: String,
+                            parameters: Map[String, String]): Source = {
     LastOptions.parameters = parameters
     LastOptions.schema = schema
     new Source {
       override def getNextBatch(start: Option[Offset]): Option[Batch] = None
-      override def schema: StructType = StructType(StructField("a", IntegerType) :: Nil)
+      override def schema: StructType =
+        StructType(StructField("a", IntegerType) :: Nil)
     }
   }
 
-  override def createSink(
-      sqlContext: SQLContext,
-      parameters: Map[String, String],
-      partitionColumns: Seq[String]): Sink = {
+  override def createSink(sqlContext: SQLContext,
+                          parameters: Map[String, String],
+                          partitionColumns: Seq[String]): Sink = {
     LastOptions.parameters = parameters
     LastOptions.partitionColumns = partitionColumns
     new Sink {
@@ -59,7 +58,8 @@ class DefaultSource extends StreamSourceProvider with StreamSinkProvider {
   }
 }
 
-class DataFrameReaderWriterSuite extends StreamTest with SharedSQLContext with BeforeAndAfter {
+class DataFrameReaderWriterSuite
+    extends StreamTest with SharedSQLContext with BeforeAndAfter {
   import testImplicits._
 
   after {
@@ -91,11 +91,11 @@ class DataFrameReaderWriterSuite extends StreamTest with SharedSQLContext with B
     map.put("opt3", "3")
 
     val df = sqlContext.read
-        .format("org.apache.spark.sql.streaming.test")
-        .option("opt1", "1")
-        .options(Map("opt2" -> "2"))
-        .options(map)
-        .stream()
+      .format("org.apache.spark.sql.streaming.test")
+      .option("opt1", "1")
+      .options(Map("opt2" -> "2"))
+      .options(map)
+      .stream()
 
     assert(LastOptions.parameters("opt1") == "1")
     assert(LastOptions.parameters("opt2") == "2")
@@ -117,14 +117,10 @@ class DataFrameReaderWriterSuite extends StreamTest with SharedSQLContext with B
   }
 
   test("partitioning") {
-    val df = sqlContext.read
-      .format("org.apache.spark.sql.streaming.test")
-      .stream()
+    val df =
+      sqlContext.read.format("org.apache.spark.sql.streaming.test").stream()
 
-    df.write
-      .format("org.apache.spark.sql.streaming.test")
-      .startStream()
-      .stop()
+    df.write.format("org.apache.spark.sql.streaming.test").startStream().stop()
     assert(LastOptions.partitionColumns == Nil)
 
     df.write
@@ -222,7 +218,8 @@ class DataFrameReaderWriterSuite extends StreamTest with SharedSQLContext with B
     def activeStreamNames: Set[String] = {
       val streams = sqlContext.streams.active
       val names = streams.map(_.name).toSet
-      assert(streams.length === names.size, s"names of active queries are not unique: $names")
+      assert(streams.length === names.size,
+             s"names of active queries are not unique: $names")
       names
     }
 

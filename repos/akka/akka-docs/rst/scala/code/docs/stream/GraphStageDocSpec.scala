@@ -1,18 +1,18 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.stream
 
 import akka.NotUsed
-import akka.stream.scaladsl.{ Keep, Sink, Flow, Source }
+import akka.stream.scaladsl.{Keep, Sink, Flow, Source}
 import akka.stream.stage._
 import akka.stream._
 
-import akka.stream.testkit.{ TestPublisher, TestSubscriber }
-import akka.testkit.{ AkkaSpec, TestLatch }
+import akka.stream.testkit.{TestPublisher, TestSubscriber}
+import akka.testkit.{AkkaSpec, TestLatch}
 
 import scala.collection.mutable
-import scala.concurrent.{ Promise, Await, Future }
+import scala.concurrent.{Promise, Await, Future}
 import scala.concurrent.duration._
 import scala.collection.immutable.Iterable
 
@@ -32,10 +32,10 @@ class GraphStageDocSpec extends AkkaSpec {
       override val shape: SourceShape[Int] = SourceShape(out)
 
       // This is where the actual (possibly stateful) logic will live
-      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = ???
+      override def createLogic(
+          inheritedAttributes: Attributes): GraphStageLogic = ???
     }
     //#boilerplate-example
-
   }
 
   "Demonstrate creation of GraphStage Source" in {
@@ -49,7 +49,8 @@ class GraphStageDocSpec extends AkkaSpec {
       val out: Outlet[Int] = Outlet("NumbersSource")
       override val shape: SourceShape[Int] = SourceShape(out)
 
-      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+      override def createLogic(
+          inheritedAttributes: Attributes): GraphStageLogic =
         new GraphStageLogic(shape) {
           // All state MUST be inside the GraphStageLogic,
           // never inside the enclosing GraphStage.
@@ -114,10 +115,9 @@ class GraphStageDocSpec extends AkkaSpec {
     // tests:
     val stringLength = Flow.fromGraph(new Map[String, Int](_.length))
 
-    val result =
-      Source(Vector("one", "two", "three"))
-        .via(stringLength)
-        .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
+    val result = Source(Vector("one", "two", "three"))
+      .via(stringLength)
+      .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(3, 3, 5))
   }
@@ -130,7 +130,8 @@ class GraphStageDocSpec extends AkkaSpec {
 
     val shape = FlowShape.of(in, out)
 
-    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(
+        inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
         setHandler(in, new InHandler {
           override def onPush(): Unit = {
@@ -153,10 +154,9 @@ class GraphStageDocSpec extends AkkaSpec {
     // tests:
     val evenFilter = Flow.fromGraph(new Filter[Int](_ % 2 == 0))
 
-    val result =
-      Source(Vector(1, 2, 3, 4, 5, 6))
-        .via(evenFilter)
-        .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
+    val result = Source(Vector(1, 2, 3, 4, 5, 6))
+      .via(evenFilter)
+      .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(2, 4, 6))
   }
@@ -169,7 +169,8 @@ class GraphStageDocSpec extends AkkaSpec {
 
     val shape = FlowShape.of(in, out)
 
-    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(
+        inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
         // Again: note that all mutable state
         // MUST be inside the GraphStageLogic
@@ -186,7 +187,6 @@ class GraphStageDocSpec extends AkkaSpec {
             if (lastElem.isDefined) emit(out, lastElem.get)
             complete(out)
           }
-
         })
         setHandler(out, new OutHandler {
           override def onPull(): Unit = {
@@ -206,10 +206,9 @@ class GraphStageDocSpec extends AkkaSpec {
     // tests:
     val duplicator = Flow.fromGraph(new Duplicator[Int])
 
-    val result =
-      Source(Vector(1, 2, 3))
-        .via(duplicator)
-        .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
+    val result = Source(Vector(1, 2, 3))
+      .via(duplicator)
+      .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(1, 1, 2, 2, 3, 3))
   }
@@ -223,7 +222,8 @@ class GraphStageDocSpec extends AkkaSpec {
 
       val shape = FlowShape.of(in, out)
 
-      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+      override def createLogic(
+          inheritedAttributes: Attributes): GraphStageLogic =
         new GraphStageLogic(shape) {
 
           setHandler(in, new InHandler {
@@ -246,13 +246,11 @@ class GraphStageDocSpec extends AkkaSpec {
     // tests:
     val duplicator = Flow.fromGraph(new Duplicator[Int])
 
-    val result =
-      Source(Vector(1, 2, 3))
-        .via(duplicator)
-        .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
+    val result = Source(Vector(1, 2, 3))
+      .via(duplicator)
+      .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(1, 1, 2, 2, 3, 3))
-
   }
 
   "Demonstrate chaining of graph stages" in {
@@ -275,14 +273,16 @@ class GraphStageDocSpec extends AkkaSpec {
     //#async-side-channel
     // will close upstream in all materializations of the graph stage instance
     // when the future completes
-    class KillSwitch[A](switch: Future[Unit]) extends GraphStage[FlowShape[A, A]] {
+    class KillSwitch[A](switch: Future[Unit])
+        extends GraphStage[FlowShape[A, A]] {
 
       val in = Inlet[A]("KillSwitch.in")
       val out = Outlet[A]("KillSwitch.out")
 
       val shape = FlowShape.of(in, out)
 
-      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+      override def createLogic(
+          inheritedAttributes: Attributes): GraphStageLogic =
         new GraphStageLogic(shape) {
 
           override def preStart(): Unit = {
@@ -310,7 +310,8 @@ class GraphStageDocSpec extends AkkaSpec {
     val in = TestPublisher.probe[Int]()
     val out = TestSubscriber.probe[Int]()
 
-    Source.fromPublisher(in)
+    Source
+      .fromPublisher(in)
       .via(duplicator)
       .to(Sink.fromSubscriber(out))
       .withAttributes(Attributes.inputBuffer(1, 1))
@@ -334,14 +335,16 @@ class GraphStageDocSpec extends AkkaSpec {
 
     //#timed
     // each time an event is pushed through it will trigger a period of silence
-    class TimedGate[A](silencePeriod: FiniteDuration) extends GraphStage[FlowShape[A, A]] {
+    class TimedGate[A](silencePeriod: FiniteDuration)
+        extends GraphStage[FlowShape[A, A]] {
 
       val in = Inlet[A]("TimedGate.in")
       val out = Outlet[A]("TimedGate.out")
 
       val shape = FlowShape.of(in, out)
 
-      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+      override def createLogic(
+          inheritedAttributes: Attributes): GraphStageLogic =
         new TimerGraphStageLogic(shape) {
 
           var open = false
@@ -369,11 +372,10 @@ class GraphStageDocSpec extends AkkaSpec {
     //#timed
 
     // tests:
-    val result =
-      Source(Vector(1, 2, 3))
-        .via(new TimedGate[Int](2.second))
-        .takeWithin(250.millis)
-        .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
+    val result = Source(Vector(1, 2, 3))
+      .via(new TimedGate[Int](2.second))
+      .takeWithin(250.millis)
+      .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(1))
   }
@@ -381,14 +383,16 @@ class GraphStageDocSpec extends AkkaSpec {
   "Demonstrate a custom materialized value" in {
 
     //#materialized
-    class FirstValue[A] extends GraphStageWithMaterializedValue[FlowShape[A, A], Future[A]] {
+    class FirstValue[A]
+        extends GraphStageWithMaterializedValue[FlowShape[A, A], Future[A]] {
 
       val in = Inlet[A]("FirstValue.in")
       val out = Outlet[A]("FirstValue.out")
 
       val shape = FlowShape.of(in, out)
 
-      override def createLogicAndMaterializedValue(inheritedAttributes: Attributes): (GraphStageLogic, Future[A]) = {
+      override def createLogicAndMaterializedValue(
+          inheritedAttributes: Attributes): (GraphStageLogic, Future[A]) = {
         val promise = Promise[A]()
         val logic = new GraphStageLogic(shape) {
 
@@ -412,7 +416,6 @@ class GraphStageDocSpec extends AkkaSpec {
               pull(in)
             }
           })
-
         }
 
         (logic, promise.future)
@@ -428,7 +431,6 @@ class GraphStageDocSpec extends AkkaSpec {
     val result: Future[Int] = flow.run()
 
     Await.result(result, 3.seconds) should ===(1)
-
   }
 
   "Demonstrate a detached graph stage" in {
@@ -441,7 +443,8 @@ class GraphStageDocSpec extends AkkaSpec {
 
       val shape = FlowShape.of(in, out)
 
-      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
+      override def createLogic(
+          inheritedAttributes: Attributes): GraphStageLogic =
         new GraphStageLogic(shape) {
 
           val buffer = mutable.Queue[A]()
@@ -491,7 +494,6 @@ class GraphStageDocSpec extends AkkaSpec {
             }
           })
         }
-
     }
     //#detached
 
@@ -504,10 +506,10 @@ class GraphStageDocSpec extends AkkaSpec {
 
     val subscriber = TestSubscriber.manualProbe[Int]()
     val publisher = TestPublisher.probe[Int]()
-    val flow2 =
-      Source.fromPublisher(publisher)
-        .via(new TwoBuffer)
-        .to(Sink.fromSubscriber(subscriber))
+    val flow2 = Source
+      .fromPublisher(publisher)
+      .via(new TwoBuffer)
+      .to(Sink.fromSubscriber(subscriber))
 
     val result2 = flow2.run()
 
@@ -518,5 +520,4 @@ class GraphStageDocSpec extends AkkaSpec {
 
     sub.cancel()
   }
-
 }

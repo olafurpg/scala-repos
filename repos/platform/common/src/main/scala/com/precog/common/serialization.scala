@@ -37,17 +37,21 @@ package object serialization {
     def validated(jv: JValue) = jv.validated[String].map(UUID.fromString)
   }
 
-  implicit val mimeTypeDecomposer: Decomposer[MimeType] = new Decomposer[MimeType] {
-    def decompose(m: MimeType) = JString(m.toString)
-  }
-
-  implicit val mimeTypeExtractor: Extractor[MimeType] = new Extractor[MimeType] {
-    def validated(jv: JValue) = jv.validated[String] map(MimeTypes.parseMimeTypes(_).toList) flatMap {
-      case Nil =>
-        Failure(Extractor.Error.invalid("No mime types found in " + jv.renderCompact))
-
-      case primary :: rest =>
-        Success(primary)
+  implicit val mimeTypeDecomposer: Decomposer[MimeType] =
+    new Decomposer[MimeType] {
+      def decompose(m: MimeType) = JString(m.toString)
     }
-  }
+
+  implicit val mimeTypeExtractor: Extractor[MimeType] =
+    new Extractor[MimeType] {
+      def validated(jv: JValue) =
+        jv.validated[String] map (MimeTypes.parseMimeTypes(_).toList) flatMap {
+          case Nil =>
+            Failure(Extractor.Error.invalid(
+                    "No mime types found in " + jv.renderCompact))
+
+          case primary :: rest =>
+            Success(primary)
+        }
+    }
 }

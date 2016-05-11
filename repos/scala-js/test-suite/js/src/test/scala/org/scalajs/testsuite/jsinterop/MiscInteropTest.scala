@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.jsinterop
 
@@ -40,7 +40,8 @@ class MiscInteropTest {
   }
 
   @Test def js_constructorOf_T_for_Scala_js_defined_JS_classes(): Unit = {
-    val concreteCtor = (new ConcreteJSClass).asInstanceOf[js.Dynamic].constructor
+    val concreteCtor =
+      (new ConcreteJSClass).asInstanceOf[js.Dynamic].constructor
     val concreteProto = concreteCtor.prototype.asInstanceOf[js.Object]
     val abstractProto = js.Object.getPrototypeOf(concreteProto)
     val abstractCtor = abstractProto.asInstanceOf[js.Dynamic].constructor
@@ -48,16 +49,17 @@ class MiscInteropTest {
     assertSame(concreteCtor, js.constructorOf[ConcreteJSClass])
     assertSame(abstractCtor, js.constructorOf[AbstractJSClass])
 
-    val concreteInstance = js.Dynamic.newInstance(js.constructorOf[ConcreteJSClass])()
+    val concreteInstance =
+      js.Dynamic.newInstance(js.constructorOf[ConcreteJSClass])()
     assertTrue((concreteInstance: Any).isInstanceOf[ConcreteJSClass])
 
     val instance = js.Dynamic.newInstance(
-      js.constructorOf[OtherwiseUnreferencedJSClass])(35)
+        js.constructorOf[OtherwiseUnreferencedJSClass])(35)
     assertEquals(35, instance.x)
   }
 
   @Test def js_constructorTag_T_for_native_classes(): Unit = {
-    def test[T <: js.Any: js.ConstructorTag](expected: js.Dynamic): Unit =
+    def test[T <: js.Any : js.ConstructorTag](expected: js.Dynamic): Unit =
       assertSame(expected, js.constructorTag[T].constructor)
 
     test[js.RegExp](js.Dynamic.global.RegExp)
@@ -66,10 +68,11 @@ class MiscInteropTest {
   }
 
   @Test def js_constructorTag_T_for_Scala_js_defined_JS_classes(): Unit = {
-    def test[T <: js.Any: js.ConstructorTag](expected: js.Dynamic): Unit =
+    def test[T <: js.Any : js.ConstructorTag](expected: js.Dynamic): Unit =
       assertSame(expected, js.constructorTag[T].constructor)
 
-    val concreteCtor = (new ConcreteJSClass).asInstanceOf[js.Dynamic].constructor
+    val concreteCtor =
+      (new ConcreteJSClass).asInstanceOf[js.Dynamic].constructor
     val concreteProto = concreteCtor.prototype.asInstanceOf[js.Object]
     val abstractProto = js.Object.getPrototypeOf(concreteProto)
     val abstractCtor = abstractProto.asInstanceOf[js.Dynamic].constructor
@@ -89,16 +92,16 @@ class MiscInteropTest {
       val tag = js.constructorTag[ConcreteJSClass]
       if (assumingES6)
         js.Dynamic.newInstance(tag.constructor)().asInstanceOf[ConcreteJSClass]
-      else
-        tag.newInstance()
+      else tag.newInstance()
     }
     assertTrue((concreteInstance: Any).isInstanceOf[ConcreteJSClass])
 
     val instance = {
       val tag = js.constructorTag[OtherwiseUnreferencedJSClassForTag]
       if (assumingES6) {
-        js.Dynamic.newInstance(tag.constructor)(35)
-            .asInstanceOf[OtherwiseUnreferencedJSClassForTag]
+        js.Dynamic
+          .newInstance(tag.constructor)(35)
+          .asInstanceOf[OtherwiseUnreferencedJSClassForTag]
       } else {
         tag.newInstance(35)
       }
@@ -132,7 +135,8 @@ class MiscInteropTest {
   }
 
   @Test def should_provide_equivalent_of_JS_for_in_loop_of_issue_13(): Unit = {
-    val obj = js.eval("var dictionaryTest13 = { a: 'Scala.js', b: 7357 }; dictionaryTest13;")
+    val obj = js.eval(
+        "var dictionaryTest13 = { a: 'Scala.js', b: 7357 }; dictionaryTest13;")
     val dict = obj.asInstanceOf[js.Dictionary[js.Any]]
     var propCount = 0
     var propString = ""
@@ -162,21 +166,26 @@ class MiscInteropTest {
   }
 
   @Test def should_compile_js_undefined(): Unit = {
-    assertThrows(classOf[Exception], js.undefined.asInstanceOf[js.Dynamic].toFixed())
+    assertThrows(
+        classOf[Exception], js.undefined.asInstanceOf[js.Dynamic].toFixed())
   }
 
   @Test def should_allow_to_define_direct_subtraits_of_js_Any(): Unit = {
-    val f = js.Dynamic.literal(
-      foo = (x: Int) => x + 1
-    ).asInstanceOf[DirectSubtraitOfJSAny]
+    val f = js.Dynamic
+      .literal(
+          foo = (x: Int) => x + 1
+      )
+      .asInstanceOf[DirectSubtraitOfJSAny]
 
     assertEquals(6, f.foo(5))
   }
 
   @Test def should_allow_to_define_direct_subclasses_of_js_Any(): Unit = {
-    val f = js.Dynamic.literal(
-      bar = (x: Int) => x + 2
-    ).asInstanceOf[DirectSubclassOfJSAny]
+    val f = js.Dynamic
+      .literal(
+          bar = (x: Int) => x + 2
+      )
+      .asInstanceOf[DirectSubclassOfJSAny]
 
     assertEquals(7, f.bar(5))
   }
@@ -193,7 +202,6 @@ class MiscInteropTest {
     assertTrue(nameOf(new SomeScalaClass).toString.contains("SomeScalaClass"))
     assertTrue(nameOf(new SomeJSClass).toString.contains("SomeJSClass"))
   }
-
 }
 
 object MiscInteropTest {
@@ -225,5 +233,4 @@ object MiscInteropTest {
 
   @ScalaJSDefined
   class SomeJSClass extends js.Object
-
 }

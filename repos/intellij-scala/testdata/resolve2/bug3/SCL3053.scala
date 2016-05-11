@@ -9,10 +9,10 @@ object test {
   def profileMappings_=(mappings: ProfileMappings) {}
 
   profileMappings = {
-    case device if device./*line: 2*/name.endsWith("PFH") => "profile_A"
+    case device if device. /*line: 2*/ name.endsWith("PFH") => "profile_A"
   }: ProfileMappings
 
   profileMappings = {
-    case device if device./*line: 2*/name.endsWith("PFH") => "profile_A"
+    case device if device. /*line: 2*/ name.endsWith("PFH") => "profile_A"
   }
 }

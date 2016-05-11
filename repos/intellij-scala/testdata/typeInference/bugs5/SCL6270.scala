@@ -3,8 +3,7 @@ object Funcs {
   def foo(s: String): String = s
 }
 
-
 object GCR {
-  val s: String = /*start*/Funcs.foo("blah")/*end*/
+  val s: String = /*start*/ Funcs.foo("blah") /*end*/
 }
 //String

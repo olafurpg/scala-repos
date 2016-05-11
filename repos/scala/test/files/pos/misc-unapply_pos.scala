@@ -23,5 +23,5 @@ object Test_ {
     case Baz(x) => println("baz")
 //                          ^
 // error: unreachable code
-   }
- }
+  }
+}

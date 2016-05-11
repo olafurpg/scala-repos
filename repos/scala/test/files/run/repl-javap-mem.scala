@@ -13,7 +13,12 @@ object Test extends JavapTest {
   override def yah(res: Seq[String]) = {
     // cheaply, methods end in arg list
     val p = """.*m\(.*\);""".r
-    def filtered = res filter (_ match { case p() => true case _ => false })
+    def filtered =
+      res filter
+      (_ match {
+            case p() => true
+            case _ => false
+          })
     1 == filtered.size
   }
 }

@@ -7,13 +7,15 @@ import com.intellij.usageView.{UsageInfo, UsageViewDescriptor}
 import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.changeInfo.ScalaChangeInfo
 
 /**
- * Nikolay.Tropin
- * 2014-09-01
- */
-class ScalaChangeSignatureProcessor(project: Project, changeInfo: ScalaChangeInfo)
-        extends ChangeSignatureProcessorBase(project, changeInfo) {
+  * Nikolay.Tropin
+  * 2014-09-01
+  */
+class ScalaChangeSignatureProcessor(
+    project: Project, changeInfo: ScalaChangeInfo)
+    extends ChangeSignatureProcessorBase(project, changeInfo) {
 
-  override def createUsageViewDescriptor(usages: Array[UsageInfo]): UsageViewDescriptor =
+  override def createUsageViewDescriptor(
+      usages: Array[UsageInfo]): UsageViewDescriptor =
     new ChangeSignatureViewDescriptor(changeInfo.getMethod)
 
   override def performRefactoring(usages: Array[UsageInfo]): Unit = {

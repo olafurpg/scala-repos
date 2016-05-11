@@ -1,9 +1,4 @@
-
-
-
 import collection._
-
-
 
 object Test {
 
@@ -16,5 +11,4 @@ object Test {
     gen.lastOption
     gen.init
   }
-
 }

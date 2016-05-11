@@ -4,14 +4,15 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.iteratee._
 import play.api.libs.json._
-import scala.util.{ Try, Success, Failure }
+import scala.util.{Try, Success, Failure}
 
 import lila.common.PimpedJson._
 import lila.game.actorApi._
-import lila.game.{ Game, GameRepo }
+import lila.game.{Game, GameRepo}
 import lila.search._
 
-final class GameSearchApi(client: ESClient) extends SearchReadApi[Game, Query] {
+final class GameSearchApi(client: ESClient)
+    extends SearchReadApi[Game, Query] {
 
   private var writeable = true
 
@@ -36,29 +37,33 @@ final class GameSearchApi(client: ESClient) extends SearchReadApi[Game, Query] {
 
   private def storable(game: Game) = (game.finished || game.imported)
 
-  private def toDoc(game: Game, analysed: Boolean) = Json.obj(
-    Fields.status -> (game.status match {
-      case s if s.is(_.Timeout) => chess.Status.Resign
-      case s if s.is(_.NoStart) => chess.Status.Resign
-      case s                    => game.status
-    }).id,
-    Fields.turns -> math.ceil(game.turns.toFloat / 2),
-    Fields.rated -> game.rated,
-    Fields.perf -> game.perfType.map(_.id),
-    Fields.uids -> game.userIds.toArray.some.filterNot(_.isEmpty),
-    Fields.winner -> (game.winner flatMap (_.userId)),
-    Fields.winnerColor -> game.winner.fold(3)(_.color.fold(1, 2)),
-    Fields.averageRating -> game.averageUsersRating,
-    Fields.ai -> game.aiLevel,
-    Fields.date -> (lila.search.Date.formatter print game.updatedAtOrCreatedAt),
-    Fields.duration -> game.durationSeconds,
-    Fields.clockInit -> game.clock.map(_.limit),
-    Fields.clockInc -> game.clock.map(_.increment),
-    Fields.analysed -> analysed,
-    Fields.whiteUser -> game.whitePlayer.userId,
-    Fields.blackUser -> game.blackPlayer.userId,
-    Fields.source -> game.source.map(_.id)
-  ).noNull
+  private def toDoc(game: Game, analysed: Boolean) =
+    Json
+      .obj(
+          Fields.status -> (game.status match {
+            case s if s.is(_.Timeout) => chess.Status.Resign
+            case s if s.is(_.NoStart) => chess.Status.Resign
+            case s => game.status
+          }).id,
+          Fields.turns -> math.ceil(game.turns.toFloat / 2),
+          Fields.rated -> game.rated,
+          Fields.perf -> game.perfType.map(_.id),
+          Fields.uids -> game.userIds.toArray.some.filterNot(_.isEmpty),
+          Fields.winner -> (game.winner flatMap (_.userId)),
+          Fields.winnerColor -> game.winner.fold(3)(_.color.fold(1, 2)),
+          Fields.averageRating -> game.averageUsersRating,
+          Fields.ai -> game.aiLevel,
+          Fields.date ->
+          (lila.search.Date.formatter print game.updatedAtOrCreatedAt),
+          Fields.duration -> game.durationSeconds,
+          Fields.clockInit -> game.clock.map(_.limit),
+          Fields.clockInc -> game.clock.map(_.increment),
+          Fields.analysed -> analysed,
+          Fields.whiteUser -> game.whitePlayer.userId,
+          Fields.blackUser -> game.blackPlayer.userId,
+          Fields.source -> game.source.map(_.id)
+      )
+      .noNull
 
   def indexAll: Funit = {
     writeable = false
@@ -74,24 +79,26 @@ final class GameSearchApi(client: ESClient) extends SearchReadApi[Game, Query] {
   }
 
   def indexSince(sinceStr: String): Funit =
-    parseDate(sinceStr).fold(fufail[Unit](s"Invalid date $sinceStr")) { since =>
-      client match {
-        case c: ESClientHttp =>
-          logger.info(s"Index to ${c.index.name} since $since")
-          writeable = false
-          Thread sleep 3000
-          doIndex(c, since) >>- {
-            logger.info("[game search] Completed indexation.")
+    parseDate(sinceStr).fold(fufail[Unit](s"Invalid date $sinceStr")) {
+      since =>
+        client match {
+          case c: ESClientHttp =>
+            logger.info(s"Index to ${c.index.name} since $since")
+            writeable = false
             Thread sleep 3000
-            writeable = true
-          }
-        case _ => funit
-      }
+            doIndex(c, since) >>- {
+              logger.info("[game search] Completed indexation.")
+              Thread sleep 3000
+              writeable = true
+            }
+          case _ => funit
+        }
     }
 
   private val datePattern = "yyyy-MM-dd"
   private val dateFormatter = DateTimeFormat forPattern datePattern
-  private val dateTimeFormatter = DateTimeFormat forPattern s"$datePattern HH:mm"
+  private val dateTimeFormatter =
+    DateTimeFormat forPattern s"$datePattern HH:mm"
 
   private def parseDate(str: String): Option[DateTime] =
     Try(dateFormatter parseDateTime str).toOption
@@ -106,25 +113,28 @@ final class GameSearchApi(client: ESClient) extends SearchReadApi[Game, Query] {
     val maxGames = Int.MaxValue
     // val maxGames = 10 * 1000 * 1000
 
-    lila.game.tube.gameTube.coll.find(BSONDocument(
-      "ca" -> BSONDocument("$gt" -> since)
-    )).sort(BSONDocument("ca" -> 1))
+    lila.game.tube.gameTube.coll
+      .find(BSONDocument(
+              "ca" -> BSONDocument("$gt" -> since)
+          ))
+      .sort(BSONDocument("ca" -> 1))
       .cursor[Game](ReadPreference.secondaryPreferred)
-      .enumerate(maxGames, stopOnError = true) &>
-      Enumeratee.grouped(Iteratee takeUpTo batchSize) |>>>
-      Enumeratee.mapM[Seq[Game]].apply[(Seq[Game], Set[String])] { games =>
+      .enumerate(maxGames, stopOnError = true) &> Enumeratee.grouped(
+        Iteratee takeUpTo batchSize) |>>> Enumeratee
+      .mapM[Seq[Game]]
+      .apply[(Seq[Game], Set[String])] { games =>
         GameRepo filterAnalysed games.map(_.id) map games.->
-      } &>
-      Iteratee.foldM[(Seq[Game], Set[String]), Long](nowMillis) {
-        case (millis, (games, analysedIds)) =>
-          client.storeBulk(games map { g =>
-            Id(g.id) -> toDoc(g, analysedIds(g.id))
-          }) inject {
-            val date = games.headOption.map(_.createdAt) ?? dateTimeFormatter.print
-            val gameMs = (nowMillis - millis) / batchSize.toDouble
-            logger.info(s"$date ${(1000 / gameMs).toInt} games/s")
-            nowMillis
-          }
-      } void
+      } &> Iteratee.foldM[(Seq[Game], Set[String]), Long](nowMillis) {
+      case (millis, (games, analysedIds)) =>
+        client.storeBulk(games map { g =>
+          Id(g.id) -> toDoc(g, analysedIds(g.id))
+        }) inject {
+          val date =
+            games.headOption.map(_.createdAt) ?? dateTimeFormatter.print
+          val gameMs = (nowMillis - millis) / batchSize.toDouble
+          logger.info(s"$date ${(1000 / gameMs).toInt} games/s")
+          nowMillis
+        }
+    } void
   }
 }

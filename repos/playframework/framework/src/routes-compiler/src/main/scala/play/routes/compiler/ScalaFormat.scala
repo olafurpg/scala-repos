@@ -3,14 +3,15 @@
  */
 package play.routes.compiler
 
-import play.twirl.api.{ Format, BufferedContent }
+import play.twirl.api.{Format, BufferedContent}
 
 import scala.collection.immutable
 
 /**
- * Twirl scala content type
- */
-class ScalaContent(elements: immutable.Seq[ScalaContent], text: String) extends BufferedContent[ScalaContent](elements, text) {
+  * Twirl scala content type
+  */
+class ScalaContent(elements: immutable.Seq[ScalaContent], text: String)
+    extends BufferedContent[ScalaContent](elements, text) {
   def this(text: String) = this(Nil, text)
   def this(elements: immutable.Seq[ScalaContent]) = this(elements, "")
 
@@ -18,8 +19,8 @@ class ScalaContent(elements: immutable.Seq[ScalaContent], text: String) extends 
 }
 
 /**
- * Twirl Scala format
- */
+  * Twirl Scala format
+  */
 object ScalaFormat extends Format[ScalaContent] {
   def raw(text: String) = new ScalaContent(text)
 

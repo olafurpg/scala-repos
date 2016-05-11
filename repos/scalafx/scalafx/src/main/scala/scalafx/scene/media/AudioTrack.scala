@@ -33,15 +33,20 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object AudioTrack {
-  implicit def sfxAudioTrack2jfx(at: AudioTrack): jfxsm.AudioTrack = if (at != null) at.delegate else null
+  implicit def sfxAudioTrack2jfx(at: AudioTrack): jfxsm.AudioTrack =
+    if (at != null) at.delegate else null
 }
 
-class AudioTrack(override val delegate: jfxsm.AudioTrack) extends Track(delegate) with SFXDelegate[jfxsm.AudioTrack] {
+class AudioTrack(override val delegate: jfxsm.AudioTrack)
+    extends Track(delegate) with SFXDelegate[jfxsm.AudioTrack] {
 
   /**
-   * Retrieves the language of the audio track.
-   *
-   */
-  @deprecated("This method is deprecated, due to deprecation of the underlying JavaFX method 'getLanguage'. Use 'locale' instead. For now, this method call is redirected to utilise 'locale'.", "ScalaFX 8.0.0-R5")
-  def language = locale // <-- Calling 'getLocale' instead of the deprecated 'getLanguage' removes a compilation warning while building ScalaFX.
+    * Retrieves the language of the audio track.
+    *
+    */
+  @deprecated(
+      "This method is deprecated, due to deprecation of the underlying JavaFX method 'getLanguage'. Use 'locale' instead. For now, this method call is redirected to utilise 'locale'.",
+      "ScalaFX 8.0.0-R5")
+  def language =
+    locale // <-- Calling 'getLocale' instead of the deprecated 'getLanguage' removes a compilation warning while building ScalaFX.
 }

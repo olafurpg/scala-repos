@@ -4,7 +4,9 @@ import scala.scalajs.js.typedarray._
 
 private[nio] final class DataViewDoubleBuffer private (
     override private[nio] val _dataView: DataView,
-    _initialPosition: Int, _initialLimit: Int, _readOnly: Boolean,
+    _initialPosition: Int,
+    _initialLimit: Int,
+    _readOnly: Boolean,
     override private[nio] val isBigEndian: Boolean)
     extends DoubleBuffer(_dataView.byteLength / 8, null, -1) {
 
@@ -47,11 +49,13 @@ private[nio] final class DataViewDoubleBuffer private (
     GenBuffer(this).generic_put(index, d)
 
   @noinline
-  override def get(dst: Array[Double], offset: Int, length: Int): DoubleBuffer =
+  override def get(
+      dst: Array[Double], offset: Int, length: Int): DoubleBuffer =
     GenBuffer(this).generic_get(dst, offset, length)
 
   @noinline
-  override def put(src: Array[Double], offset: Int, length: Int): DoubleBuffer =
+  override def put(
+      src: Array[Double], offset: Int, length: Int): DoubleBuffer =
     GenBuffer(this).generic_put(src, offset, length)
 
   @noinline
@@ -80,13 +84,13 @@ private[nio] final class DataViewDoubleBuffer private (
     _dataView.setFloat64(8 * index, elem, !isBigEndian)
 
   @inline
-  override private[nio] def load(startIndex: Int,
-      dst: Array[Double], offset: Int, length: Int): Unit =
+  override private[nio] def load(
+      startIndex: Int, dst: Array[Double], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
-  override private[nio] def store(startIndex: Int,
-      src: Array[Double], offset: Int, length: Int): Unit =
+  override private[nio] def store(
+      startIndex: Int, src: Array[Double], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }
 
@@ -96,14 +100,17 @@ private[nio] object DataViewDoubleBuffer {
     def bytesPerElem: Int = 8
 
     def apply(dataView: DataView,
-        initialPosition: Int, initialLimit: Int,
-        readOnly: Boolean, isBigEndian: Boolean): DoubleBuffer = {
-      new DataViewDoubleBuffer(dataView,
-          initialPosition, initialLimit, readOnly, isBigEndian)
+              initialPosition: Int,
+              initialLimit: Int,
+              readOnly: Boolean,
+              isBigEndian: Boolean): DoubleBuffer = {
+      new DataViewDoubleBuffer(
+          dataView, initialPosition, initialLimit, readOnly, isBigEndian)
     }
   }
 
   @inline
-  def fromTypedArrayByteBuffer(byteBuffer: TypedArrayByteBuffer): DoubleBuffer =
+  def fromTypedArrayByteBuffer(
+      byteBuffer: TypedArrayByteBuffer): DoubleBuffer =
     GenDataViewBuffer.generic_fromTypedArrayByteBuffer(byteBuffer)
 }

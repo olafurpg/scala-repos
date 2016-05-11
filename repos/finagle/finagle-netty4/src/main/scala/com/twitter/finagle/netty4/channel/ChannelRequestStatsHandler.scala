@@ -12,16 +12,15 @@ private[finagle] object ChannelRequestStatsHandler {
 }
 
 /**
- * A channel stats handler that keeps per-connection request
- * statistics. This handler should be after the request codec in the
- * stack as it assumes messages are POJOs with request/responses.
- *
- * @param statsReceiver the [[StatsReceiver]] to which stats are reported
- */
+  * A channel stats handler that keeps per-connection request
+  * statistics. This handler should be after the request codec in the
+  * stack as it assumes messages are POJOs with request/responses.
+  *
+  * @param statsReceiver the [[StatsReceiver]] to which stats are reported
+  */
 @Sharable
 private[finagle] class ChannelRequestStatsHandler(statsReceiver: StatsReceiver)
-  extends ChannelInboundHandlerAdapter
-{
+    extends ChannelInboundHandlerAdapter {
   import ChannelRequestStatsHandler.ConnectionRequestsKey
 
   private[this] val requestCount = statsReceiver.stat("connection_requests")

@@ -11,23 +11,24 @@ object JavaScriptRouterGenerator extends App {
 
   val host = if (args.length > 1) args(1) else "localhost"
 
-  val jsFile = play.api.routing.JavaScriptReverseRouter("jsRoutes", None, host,
-    Application.index,
-    Application.post,
-    Application.withParam,
-    Application.takeBool,
-    Application.takeListTickedParam,
-    Application.takeTickedParams
-  ).body
+  val jsFile = play.api.routing
+    .JavaScriptReverseRouter("jsRoutes",
+                             None,
+                             host,
+                             Application.index,
+                             Application.post,
+                             Application.withParam,
+                             Application.takeBool,
+                             Application.takeListTickedParam,
+                             Application.takeTickedParams)
+    .body
 
   // Add module exports for node
-  val jsModule = jsFile +
-    """
+  val jsModule = jsFile + """
       |module.exports = jsRoutes
     """.stripMargin
-  
+
   val path = Paths.get(args(0))
   Files.createDirectories(path.getParent)
   Files.write(path, jsModule.getBytes("UTF-8"))
-
 }

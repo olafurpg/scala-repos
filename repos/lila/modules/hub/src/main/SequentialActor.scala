@@ -24,10 +24,11 @@ trait SequentialActor extends Actor {
 
   private def busy: Receive = {
 
-    case Done => dequeue match {
-      case None      => context become idle
-      case Some(msg) => processThenDone(msg)
-    }
+    case Done =>
+      dequeue match {
+        case None => context become idle
+        case Some(msg) => processThenDone(msg)
+      }
 
     case msg => queue enqueue msg
   }
@@ -51,9 +52,14 @@ trait SequentialActor extends Actor {
       case SequentialActor.Terminate => self ! PoisonPill
       case msg =>
         val future = (process orElse fallback)(msg)
-        futureTimeout.fold(future) { timeout =>
-          future.withTimeout(timeout, LilaException(s"Sequential actor timeout: $timeout"))(context.system)
-        }.addFailureEffect(onFailure).andThenAnyway { self ! Done }
+        futureTimeout
+          .fold(future) { timeout =>
+            future.withTimeout(
+                timeout, LilaException(s"Sequential actor timeout: $timeout"))(
+                context.system)
+          }
+          .addFailureEffect(onFailure)
+          .andThenAnyway { self ! Done }
     }
   }
 }

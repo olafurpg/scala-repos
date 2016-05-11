@@ -4,9 +4,8 @@ import com.intellij.psi.codeStyle.CommonCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.formatter.AbstractScalaFormatterTestBase
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
+  * @author Alexander Podkhalyuzin
+  */
 class ScalaWrappingAndBracesTest extends AbstractScalaFormatterTestBase {
   /* stub:
   def test {
@@ -24,13 +23,12 @@ class ScalaWrappingAndBracesTest extends AbstractScalaFormatterTestBase {
     getSettings.setRightMargin(null, 20)
     getIndentOptions.CONTINUATION_INDENT_SIZE = 2
     val before =
-"""
+      """
 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2
 2 :: 2 :: 2 :: 2 :: 2 :: 2 :: 2 :: 2 :: 2 :: 2 :: 2 :: 2 :: Nil
 2 + 2 + 2 + 2 + 22 * 66 + 2
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 2 + 2 + 2 + 2 + 2 +
   2 + 2 + 2 + 2 +
   2 + 2 + 2 + 2 +
@@ -49,14 +47,12 @@ class ScalaWrappingAndBracesTest extends AbstractScalaFormatterTestBase {
     getCommonSettings.BINARY_OPERATION_WRAP = CommonCodeStyleSettings.WRAP_AS_NEEDED
     getSettings.setRightMargin(null, 20)
     getIndentOptions.CONTINUATION_INDENT_SIZE = 2
-    val before =
-"""
+    val before = """
 List(1, 2) match {
   case x :: y :: z :: Nil =>
 }
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 List(1, 2) match {
   case x :: y ::
     z :: Nil =>
@@ -69,12 +65,10 @@ List(1, 2) match {
     getCommonSettings.BINARY_OPERATION_WRAP = CommonCodeStyleSettings.WRAP_AS_NEEDED
     getSettings.setRightMargin(null, 20)
     getIndentOptions.CONTINUATION_INDENT_SIZE = 2
-    val before =
-"""
+    val before = """
 val x: T + T + T + T + T
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 val x: T + T + T +
   T + T
 """.replace("\r", "")
@@ -85,12 +79,10 @@ val x: T + T + T +
     getCommonSettings.BINARY_OPERATION_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
     getSettings.setRightMargin(null, 20)
     getIndentOptions.CONTINUATION_INDENT_SIZE = 2
-    val before =
-"""
+    val before = """
 2 + 3 + 4 * 6 + (7 + 9 * 10) - 8 - 4
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 2 +
   3 +
   4 *
@@ -108,13 +100,11 @@ val x: T + T + T +
     getCommonSettings.BINARY_OPERATION_WRAP = CommonCodeStyleSettings.WRAP_ON_EVERY_ITEM
     getSettings.setRightMargin(null, 20)
     getIndentOptions.CONTINUATION_INDENT_SIZE = 2
-    val before =
-"""
+    val before = """
 2 + 2 + 2 + 2 + 2 + 2
 2 + 2 + 2 + 2 + 2
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 2 +
   2 +
   2 +
@@ -130,13 +120,11 @@ val x: T + T + T +
     getCommonSettings.BINARY_OPERATION_WRAP = CommonCodeStyleSettings.DO_NOT_WRAP
     getSettings.setRightMargin(null, 20)
     getIndentOptions.CONTINUATION_INDENT_SIZE = 2
-    val before =
-"""
+    val before = """
 2 + 2 + 2 + 2 + 2 + 2
 2 + 2 + 2 + 2 + 2
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 2 + 2 + 2 + 2 + 2 + 2
 2 + 2 + 2 + 2 + 2
 """.replace("\r", "")
@@ -145,15 +133,13 @@ val x: T + T + T +
 
   def testAlignBinary() {
     getCommonSettings.ALIGN_MULTILINE_BINARY_OPERATION = true
-    val before =
-"""
+    val before = """
 val i = 2 + 2 +
  3 + 5 +
  6 + 7 *
  8
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 val i = 2 + 2 +
         3 + 5 +
         6 + 7 *
@@ -167,14 +153,12 @@ val i = 2 + 2 +
     getCommonSettings.PARENTHESES_EXPRESSION_LPAREN_WRAP = true
     getCommonSettings.PARENTHESES_EXPRESSION_RPAREN_WRAP = true
     getSettings.setRightMargin(null, 20)
-    val before =
-"""
+    val before = """
 (2333333333333333 + 2)
 (2 +
 2)
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 (
   2333333333333333 +
     2
@@ -189,12 +173,10 @@ val i = 2 + 2 +
 
   def testCallParametersWrap() {
     getCommonSettings.CALL_PARAMETERS_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
-    val before =
-"""
+    val before = """
 foo(1, 2, 3)
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 foo(1,
   2,
   3)
@@ -204,14 +186,12 @@ foo(1,
 
   def testAlignMultilineParametersCalls() {
     getCommonSettings.ALIGN_MULTILINE_PARAMETERS_IN_CALLS = true
-    val before =
-"""
+    val before = """
 foo(1,
 2,
 3)
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 foo(1,
     2,
     3)
@@ -222,14 +202,12 @@ foo(1,
   def testCallParametersParen() {
     getCommonSettings.CALL_PARAMETERS_LPAREN_ON_NEXT_LINE = true
     getCommonSettings.CALL_PARAMETERS_RPAREN_ON_NEXT_LINE = true
-    val before =
-"""
+    val before = """
 foo(1,
 2,
 3)
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 foo(
   1,
   2,
@@ -241,12 +219,10 @@ foo(
 
   def testMethodCallChainWrap() {
     getCommonSettings.METHOD_CALL_CHAIN_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
-    val before =
-"""
+    val before = """
 foo(1, 2).foo(1, 2).foo(1, 2)
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 foo(1, 2)
   .foo(1, 2)
   .foo(1, 2)
@@ -256,8 +232,7 @@ foo(1, 2)
 
   def testMethodCallChainAlign() {
     getCommonSettings.ALIGN_MULTILINE_CHAINED_METHODS = true
-    val before =
-"""
+    val before = """
 val x = foo.
 foo.goo.
 foo(1, 2, 3).
@@ -265,8 +240,7 @@ foo.
 foo
 .foo
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 val x = foo.
         foo.goo.
         foo(1, 2, 3).
@@ -281,8 +255,7 @@ val x = foo.
     getCommonSettings.CLASS_BRACE_STYLE = CommonCodeStyleSettings.NEXT_LINE
     getCommonSettings.METHOD_BRACE_STYLE = CommonCodeStyleSettings.NEXT_LINE_SHIFTED
     getCommonSettings.BRACE_STYLE = CommonCodeStyleSettings.NEXT_LINE_IF_WRAPPED
-    val before =
-"""
+    val before = """
 class A {
   def foo = {
   val z =
@@ -294,8 +267,7 @@ class A {
 class B extends A {
 }
 """.replace("\r", "")
-    val after =
-"""
+    val after = """
 class A
 {
   def foo =
@@ -313,5 +285,4 @@ class B extends A
 """.replace("\r", "")
     doTextTest(before, after)
   }
-
 }

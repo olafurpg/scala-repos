@@ -14,7 +14,7 @@ package breeze.stats.distributions
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. 
-*/
+ */
 
 import org.junit.runner.RunWith
 import org.scalacheck._
@@ -23,19 +23,21 @@ import org.scalatest.junit._
 import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
-class PoissonTest extends FunSuite with Checkers with MomentsTestBase[Int] with ExpFamTest[Poisson,Int] {
+class PoissonTest
+    extends FunSuite with Checkers
+    with MomentsTestBase[Int] with ExpFamTest[Poisson, Int] {
   import org.scalacheck.Arbitrary.arbitrary
   val expFam = Poisson
 
   implicit def arbDistr: Arbitrary[Poisson] = Arbitrary {
-    for(p <- arbitrary[Double].map{_.abs % 200 + 1}) yield new Poisson(p)
+    for (p <- arbitrary[Double].map { _.abs % 200 + 1 }) yield new Poisson(p)
   }
   def arbParameter = Arbitrary(arbitrary[Double].map(x => math.abs(x) % 20))
-  def paramsClose(p: Double, b: Double) = if(b == 0.0) p < 1E-4 else (p -b).abs / b.abs.max(1E-4) < 1E-1
+  def paramsClose(p: Double, b: Double) =
+    if (b == 0.0) p < 1E-4 else (p - b).abs / b.abs.max(1E-4) < 1E-1
 
   def asDouble(x: Int) = x.toDouble
   def fromDouble(x: Double) = x.toInt
-
 
   override val VARIANCE_TOLERANCE: Double = 1E-1
   val TOL = 1E-1
@@ -44,7 +46,7 @@ class PoissonTest extends FunSuite with Checkers with MomentsTestBase[Int] with 
     val mean = 5.0
     import breeze.numerics._
     val poi = new Poisson(mean)
-    assert( closeTo(poi.cdf(0),exp(-mean)), poi.cdf(0) + " " + exp(-mean) )
+    assert(closeTo(poi.cdf(0), exp(-mean)), poi.cdf(0) + " " + exp(-mean))
   }
 
   override type Distr = Poisson

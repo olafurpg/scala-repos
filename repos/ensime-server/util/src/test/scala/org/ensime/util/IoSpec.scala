@@ -2,7 +2,7 @@
 // Licence: http://www.gnu.org/licenses/gpl-3.0.en.html
 package org.ensime.util
 
-import Predef.{ any2stringadd => _ }
+import Predef.{any2stringadd => _}
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
@@ -27,5 +27,4 @@ class IoSpec extends FlatSpec with Matchers {
 
     // no way to confirm that the streams are closed, thanks for that J2SE
   }
-
 }

@@ -13,7 +13,6 @@ trait BasicJSEnvTests extends JSEnvTest {
     var a = {};
     a.foo();
     """.fails()
-
   }
 
   @Test
@@ -22,7 +21,6 @@ trait BasicJSEnvTests extends JSEnvTest {
     """
     {
     """.fails()
-
   }
 
   @Test // Failed in Phantom - #2053
@@ -31,7 +29,5 @@ trait BasicJSEnvTests extends JSEnvTest {
     """
     console.log("\u1234");
     """ hasOutput "\u1234\n";
-
   }
-
 }

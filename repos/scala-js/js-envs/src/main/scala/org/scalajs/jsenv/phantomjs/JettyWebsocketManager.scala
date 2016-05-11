@@ -9,7 +9,8 @@ import org.eclipse.jetty.util.component.{LifeCycle, AbstractLifeCycle}
 import org.eclipse.jetty.util.log
 
 private[phantomjs] final class JettyWebsocketManager(
-    wsListener: WebsocketListener) extends WebsocketManager { thisMgr =>
+    wsListener: WebsocketListener)
+    extends WebsocketManager { thisMgr =>
 
   private[this] var webSocketConn: WebSocket.Connection = null
   private[this] var closed = false
@@ -26,7 +27,8 @@ private[phantomjs] final class JettyWebsocketManager(
   private[this] val server = new Server()
 
   server.addConnector(connector)
-  server.setHandler(new WebSocketHandler {
+  server.setHandler(
+      new WebSocketHandler {
     // Support Hixie 76 for Phantom.js
     getWebSocketFactory().setMinVersion(-1)
 
@@ -35,10 +37,10 @@ private[phantomjs] final class JettyWebsocketManager(
       new ComWebSocketListener
   })
 
-  server.addLifeCycleListener(new AbstractLifeCycle.AbstractLifeCycleListener {
+  server.addLifeCycleListener(
+      new AbstractLifeCycle.AbstractLifeCycleListener {
     override def lifeCycleStarted(event: LifeCycle): Unit = {
-      if (event.isRunning())
-        wsListener.onRunning()
+      if (event.isRunning()) wsListener.onRunning()
     }
   })
 
@@ -62,7 +64,8 @@ private[phantomjs] final class JettyWebsocketManager(
       server.stop()
 
       if (statusCode != 1000) {
-        throw new Exception("Abnormal closing of connection. " +
+        throw new Exception(
+            "Abnormal closing of connection. " +
             s"Code: $statusCode, Reason: $reason")
       }
     }
@@ -120,8 +123,6 @@ private[phantomjs] final class JettyWebsocketManager(
   def localPort: Int = connector.getLocalPort()
 
   def sendMessage(msg: String): Unit = synchronized {
-    if (webSocketConn != null)
-      webSocketConn.sendMessage(msg)
+    if (webSocketConn != null) webSocketConn.sendMessage(msg)
   }
-
 }

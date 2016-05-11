@@ -1,6 +1,6 @@
 /**
- *  Testing scaladoc implicits elimination
- */
+  *  Testing scaladoc implicits elimination
+  */
 package scala.test.scaladoc.implicits.elimination {
 
   import language.implicitConversions // according to SIP18
@@ -9,6 +9,6 @@ package scala.test.scaladoc.implicits.elimination {
   class A
   class B { class C; trait V; type T; }
   object A {
-  	implicit def toB(a: A): B = null
+    implicit def toB(a: A): B = null
   }
 }

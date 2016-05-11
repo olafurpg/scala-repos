@@ -1,7 +1,3 @@
-
-
-
-
 class Base[@specialized(Int) A](val a: A)
 
 class Derived(override val a: Int) extends Base[Int](a)

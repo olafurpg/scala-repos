@@ -11,63 +11,60 @@ object Test extends App {
   def time(op: => Unit) {
     val start = currentTime
     op
-    if (printTime) println("  time = "+(currentTime - start)+"ms")
+    if (printTime) println("  time = " + (currentTime - start) + "ms")
   }
 
   def test(msg: String, s0: collection.immutable.Set[Int], iters: Int) = {
-    println("***** "+msg+":")
+    println("***** " + msg + ":")
     var s = s0
     s = s + 2
     s = s + (3, 4000, 10000)
-    println("test1: "+sum(s))
+    println("test1: " + sum(s))
     time {
-      s = s ++ (List.range(0, iters) map (2*))
-      println("test2: "+sum(s)+", iters = "+iters)
+      s = s ++ (List.range(0, iters) map (2 *))
+      println("test2: " + sum(s) + ", iters = " + iters)
     }
     time {
       var x = 0
-      for (i <- 0 to 10000)
-        if (s contains i) x += i
-      println("test3: "+x)
+      for (i <- 0 to 10000) if (s contains i) x += i
+      println("test3: " + x)
     }
   }
 
   def test(msg: String, s0: collection.mutable.Set[Int], iters: Int) = {
-    println("***** "+msg+":")
+    println("***** " + msg + ":")
     var s = s0
     s = s + 2
     s = s + (3, 4000, 10000)
-    println("test1: "+sum(s))
+    println("test1: " + sum(s))
     time {
-      s = s ++ (List.range(0, iters) map (2*))
-      println("test2: "+sum(s)+", iters = "+iters)
+      s = s ++ (List.range(0, iters) map (2 *))
+      println("test2: " + sum(s) + ", iters = " + iters)
     }
     time {
       var x = 0
-      for (i <- 0 to 10000)
-        if (s contains i) x += i
-      println("test3: "+x)
+      for (i <- 0 to 10000) if (s contains i) x += i
+      println("test3: " + x)
     }
   }
 
   def test(msg: String, s0: collection.immutable.Map[Int, Int], iters: Int) = {
-    println("***** "+msg+":")
+    println("***** " + msg + ":")
     var s = s0
     s = s + (2 -> 2)
     s = s + (3 -> 3, 4000 -> 4000, 10000 -> 10000)
-    println("test1: "+sum(s map (_._2)))
+    println("test1: " + sum(s map (_._2)))
     time {
       s = s ++ (List.range(0, iters) map (x => x * 2 -> x * 2))
-      println("test2: "+sum(s map (_._2))+", iters = "+iters)
+      println("test2: " + sum(s map (_._2)) + ", iters = " + iters)
     }
     time {
       var x = 0
-      for (i <- 0 to 10000)
-        s get i match {
-          case Some(i) => x += i
-          case None =>
-        }
-      println("test3: "+x)
+      for (i <- 0 to 10000) s get i match {
+        case Some(i) => x += i
+        case None =>
+      }
+      println("test3: " + x)
     }
     if (iters == 5000) {
       time {
@@ -80,29 +77,28 @@ object Test extends App {
           }
           s1 = s1 + ((i + 10000) -> i)
         }
-        println("test4: "+x)
+        println("test4: " + x)
       }
     }
   }
 
   def test(msg: String, s0: collection.mutable.Map[Int, Int], iters: Int) = {
-    println("***** "+msg+":")
+    println("***** " + msg + ":")
     var s = s0
     s = s + (2 -> 2)
     s = s + (3 -> 3, 4000 -> 4000, 10000 -> 10000)
-    println("test1: "+sum(s map (_._2)))
+    println("test1: " + sum(s map (_._2)))
     time {
       s = s ++ (List.range(0, iters) map (x => x * 2 -> x * 2))
-      println("test2: "+sum(s map (_._2))+", iters = "+iters)
+      println("test2: " + sum(s map (_._2)) + ", iters = " + iters)
     }
     time {
       var x = 0
-      for (i <- 0 to 10000)
-        s get i match {
-          case Some(i) => x += i
-          case None =>
-        }
-      println("test3: "+x)
+      for (i <- 0 to 10000) s get i match {
+        case Some(i) => x += i
+        case None =>
+      }
+      println("test3: " + x)
     }
   }
 

@@ -1,4 +1,4 @@
-object Test  {
+object Test {
 
   def testCons: Unit = {
     def x[A](a: PartialFunction[Any, A]): A = a(0)

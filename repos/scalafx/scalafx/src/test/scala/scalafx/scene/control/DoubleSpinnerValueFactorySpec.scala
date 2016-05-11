@@ -36,16 +36,20 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * DoubleSpinnerValueFactory Spec tests.
- */
+  * DoubleSpinnerValueFactory Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class DoubleSpinnerValueFactorySpec
-  extends SimpleSFXDelegateSpec[jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory, SpinnerValueFactory.DoubleSpinnerValueFactory](
-    classOf[jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory], classOf[SpinnerValueFactory.DoubleSpinnerValueFactory])
-  with RunOnApplicationThread   {
+    extends SimpleSFXDelegateSpec[
+        jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory,
+        SpinnerValueFactory.DoubleSpinnerValueFactory](
+        classOf[jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory],
+        classOf[SpinnerValueFactory.DoubleSpinnerValueFactory])
+    with RunOnApplicationThread {
 
-    override protected def getScalaClassInstance = new SpinnerValueFactory.DoubleSpinnerValueFactory(1, 10)
+  override protected def getScalaClassInstance =
+    new SpinnerValueFactory.DoubleSpinnerValueFactory(1, 10)
 
-    override protected def getJavaClassInstance = new jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory(1, 10)
-
-  }
+  override protected def getJavaClassInstance =
+    new jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory(1, 10)
+}

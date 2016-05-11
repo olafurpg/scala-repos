@@ -35,10 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Blend Spec tests.
- *
- *
- */
+  * Blend Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class BlendSpec
-  extends SimpleSFXDelegateSpec[jfxse.Blend, Blend](classOf[jfxse.Blend], classOf[Blend])
+    extends SimpleSFXDelegateSpec[jfxse.Blend, Blend](
+        classOf[jfxse.Blend], classOf[Blend])

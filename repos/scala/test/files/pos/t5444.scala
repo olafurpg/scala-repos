@@ -26,7 +26,9 @@ class Test {
         def yy() = 11
       }
     }
-    class Bippy extends T with U { def z() = y() + y1() + (1 to (new T2 { }).yy()).map(_ + 1).sum }
+    class Bippy extends T with U {
+      def z() = y() + y1() + (1 to (new T2 {}).yy()).map(_ + 1).sum
+    }
     (new Bippy).z()
   }
   def c() {
@@ -39,4 +41,3 @@ class Test {
     (new Test with T with U).z1()
   }
 }
-

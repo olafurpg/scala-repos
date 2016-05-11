@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.patterns._
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 21.04.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 21.04.2008
+  */
 object ScalaPatterns {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     builder.getTokenType match {
@@ -21,7 +20,8 @@ object ScalaPatterns {
         builder.enableNewlines
       case _ => return false
     }
-    if (!XmlPatterns.parse(builder)) builder error ErrMsg("xml.scala.patterns.exected")
+    if (!XmlPatterns.parse(builder))
+      builder error ErrMsg("xml.scala.patterns.exected")
     builder.getTokenType match {
       case ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_END =>
         builder.advanceLexer

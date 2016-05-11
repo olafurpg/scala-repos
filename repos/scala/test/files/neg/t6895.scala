@@ -16,7 +16,8 @@ class Test {
 
   // val ok2: Foo[({type L[X] = Bar[M]})#L] = barFoo[N]
 
-  val nok: Foo[({type L[X3] = Bar[M]})#L] = barFoo /* Type inference can't unify F with L */
+  val nok: Foo[({ type L[X3] = Bar[M] })#L] =
+    barFoo /* Type inference can't unify F with L */
   // Foo[?F3] <:< Foo[[X3]Bar[[X1]String]]
   //   [X3]Bar[[X1]String] <:< ?F3
   //     [X3]Bar[[X1]String] <:< [F3_P]?F3[F3_P]

@@ -28,16 +28,16 @@ object MyEnum extends Enumeration {
   val d = Value
   val e = Value
 }
-  
+
 class EnumObj extends LongKeyedMapper[EnumObj] with IdPK {
   def getSingleton = EnumObj
 
   object enum extends MappedEnum(this, MyEnum)
 }
 
-object EnumObj extends EnumObj with LongKeyedMetaMapper[EnumObj] 
+object EnumObj extends EnumObj with LongKeyedMetaMapper[EnumObj]
 
-object MappedEnumSpec extends Specification  {
+object MappedEnumSpec extends Specification {
   "MappedEnum Specification".title
 
   "MappedEnum" should {
@@ -45,8 +45,11 @@ object MappedEnumSpec extends Specification  {
       val v = EnumObj.create
 
       import MyEnum._
-      v.enum.buildDisplayList must_== List(a.id -> a.toString, b.id -> b.toString, c.id -> c.toString, d.id -> d.toString, e.id -> e.toString)
+      v.enum.buildDisplayList must_== List(a.id -> a.toString,
+                                           b.id -> b.toString,
+                                           c.id -> c.toString,
+                                           d.id -> d.toString,
+                                           e.id -> e.toString)
     }
   }
 }
-

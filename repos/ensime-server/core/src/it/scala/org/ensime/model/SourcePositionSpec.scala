@@ -9,12 +9,12 @@ import org.ensime.vfs._
 import org.ensime.util.EnsimeSpec
 import org.ensime.util.file._
 
-class SourcePositionSpec extends EnsimeSpec
-    with SharedEnsimeConfigFixture
+class SourcePositionSpec
+    extends EnsimeSpec with SharedEnsimeConfigFixture
     with SharedEnsimeVFSFixture {
 
   val original = EnsimeConfigFixture.SimpleTestProject.copy(
-    javaLibs = Nil
+      javaLibs = Nil
   )
 
   "SourcePosition" should "resolve FqnSymbols for local files with no line number" in {
@@ -59,15 +59,20 @@ class SourcePositionSpec extends EnsimeSpec
   }
 
   def knownJarEntry(implicit config: EnsimeConfig): String = {
-    val scalatest = config.subprojects.head.referenceSourceJars.find(
-      _.getName.contains("scalatest_")
-    ).get.getAbsoluteFile
+    val scalatest = config.subprojects.head.referenceSourceJars
+      .find(
+          _.getName.contains("scalatest_")
+      )
+      .get
+      .getAbsoluteFile
     "jar:" + scalatest + "!/org/scalatest/FunSpec.scala"
   }
 
-  def lookup(uri: String, line: Option[Int] = None)(implicit config: EnsimeConfig) = {
+  def lookup(uri: String, line: Option[Int] = None)(
+      implicit config: EnsimeConfig) = {
     withVFS { implicit vfs: EnsimeVFS =>
-      val sym = FqnSymbol(None, "", "", "", None, None, Some(uri), line, Some(0))
+      val sym =
+        FqnSymbol(None, "", "", "", None, None, Some(uri), line, Some(0))
       LineSourcePositionHelper.fromFqnSymbol(sym)
     }
   }

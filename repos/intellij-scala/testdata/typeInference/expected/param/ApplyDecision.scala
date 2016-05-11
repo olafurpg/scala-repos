@@ -6,6 +6,6 @@ object Test {
     def apply(x: Int, y: Int) = 2
   }
   val a = A
-  a(p => /*start*/p/*end*/)
+  a(p => /*start*/ p /*end*/ )
 }
 //Int

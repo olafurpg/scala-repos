@@ -5,7 +5,8 @@ import scala.tools.reflect.Eval
 object Test extends App {
   class C {
     type T
-    implicit val tt: TypeTag[T] = implicitly[TypeTag[Int]].asInstanceOf[TypeTag[T]]
+    implicit val tt: TypeTag[T] =
+      implicitly[TypeTag[Int]].asInstanceOf[TypeTag[T]]
     val code = reify {
       List[T](2.asInstanceOf[T])
     }

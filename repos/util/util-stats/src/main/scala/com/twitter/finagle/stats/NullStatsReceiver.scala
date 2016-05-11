@@ -5,16 +5,16 @@ object NullStatsReceiver extends NullStatsReceiver {
 }
 
 /**
- * A no-op StatsReceiver. Metrics are not recorded, making this receiver useful
- * in unit tests and as defaults in situations where metrics are not strictly
- * required.
- */
+  * A no-op StatsReceiver. Metrics are not recorded, making this receiver useful
+  * in unit tests and as defaults in situations where metrics are not strictly
+  * required.
+  */
 class NullStatsReceiver extends StatsReceiver {
   val repr = this
   override def isNull = true
 
   private[this] val NullCounter = new Counter { def incr(delta: Int) {} }
-  private[this] val NullStat = new Stat { def add(value: Float) {}}
+  private[this] val NullStat = new Stat { def add(value: Float) {} }
   private[this] val NullGauge = new Gauge { def remove() {} }
 
   def counter(name: String*) = NullCounter

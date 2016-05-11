@@ -27,13 +27,15 @@ import org.apache.spark.sql.SQLContext
 object LogisticRegressionWithElasticNetExample {
 
   def main(args: Array[String]): Unit = {
-    val conf = new SparkConf().setAppName("LogisticRegressionWithElasticNetExample")
+    val conf =
+      new SparkConf().setAppName("LogisticRegressionWithElasticNetExample")
     val sc = new SparkContext(conf)
     val sqlCtx = new SQLContext(sc)
 
     // $example on$
     // Load training data
-    val training = sqlCtx.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+    val training =
+      sqlCtx.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
 
     val lr = new LogisticRegression()
       .setMaxIter(10)
@@ -44,7 +46,8 @@ object LogisticRegressionWithElasticNetExample {
     val lrModel = lr.fit(training)
 
     // Print the coefficients and intercept for logistic regression
-    println(s"Coefficients: ${lrModel.coefficients} Intercept: ${lrModel.intercept}")
+    println(
+        s"Coefficients: ${lrModel.coefficients} Intercept: ${lrModel.intercept}")
     // $example off$
 
     sc.stop()

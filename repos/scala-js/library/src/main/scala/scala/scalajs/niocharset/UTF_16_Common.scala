@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js API               **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-lang.org/     **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js API               **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-lang.org/     **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package scala.scalajs.niocharset
 
@@ -15,10 +14,13 @@ import java.nio._
 import java.nio.charset._
 
 /** This is a very specific common implementation for UTF_16BE and UTF_16LE.
- */
-private[niocharset] abstract class UTF_16_Common protected ( // scalastyle:ignore
-    name: String, aliases: Array[String],
-    private val endianness: Int) extends Charset(name, aliases) {
+  */
+private[niocharset] abstract class UTF_16_Common protected (
+    // scalastyle:ignore
+    name: String,
+    aliases: Array[String],
+    private val endianness: Int)
+    extends Charset(name, aliases) {
 
   import UTF_16_Common._
 
@@ -27,8 +29,8 @@ private[niocharset] abstract class UTF_16_Common protected ( // scalastyle:ignor
   def newDecoder(): CharsetDecoder = new Decoder
   def newEncoder(): CharsetEncoder = new Encoder
 
-  private class Decoder extends CharsetDecoder(
-      UTF_16_Common.this, 0.5f, 1.0f) {
+  private class Decoder
+      extends CharsetDecoder(UTF_16_Common.this, 0.5f, 1.0f) {
     private var endianness = UTF_16_Common.this.endianness
 
     override protected def implReset(): Unit = {
@@ -45,20 +47,21 @@ private[niocharset] abstract class UTF_16_Common protected ( // scalastyle:ignor
           val b1 = in.get() & 0xff
           val b2 = in.get() & 0xff
 
-          val wasBOM = if (endianness == AutoEndian) {
-            // Read BOM
-            if (b1 == 0xfe && b2 == 0xff) {
-              endianness = BigEndian
-              true
-            } else if (b1 == 0xff && b2 == 0xfe) {
-              endianness = LittleEndian
-              true
-            } else {
-              // Not a valid BOM: default to BigEndian and start reading
-              endianness = BigEndian
-              false
-            }
-          } else false
+          val wasBOM =
+            if (endianness == AutoEndian) {
+              // Read BOM
+              if (b1 == 0xfe && b2 == 0xff) {
+                endianness = BigEndian
+                true
+              } else if (b1 == 0xff && b2 == 0xfe) {
+                endianness = LittleEndian
+                true
+              } else {
+                // Not a valid BOM: default to BigEndian and start reading
+                endianness = BigEndian
+                false
+              }
+            } else false
 
           if (wasBOM) {
             loop()
@@ -113,10 +116,13 @@ private[niocharset] abstract class UTF_16_Common protected ( // scalastyle:ignor
     }
   }
 
-  private class Encoder extends CharsetEncoder(
-      UTF_16_Common.this, 2.0f, 2.0f,
-      // Character 0xfffd
-      if (endianness == LittleEndian) Array(-3, -1) else Array(-1, -3)) {
+  private class Encoder
+      extends CharsetEncoder(UTF_16_Common.this,
+                             2.0f,
+                             2.0f,
+                             // Character 0xfffd
+                             if (endianness == LittleEndian)
+                               Array(-3, -1) else Array(-1, -3)) {
 
     private var needToWriteBOM: Boolean = endianness == AutoEndian
 
@@ -198,7 +204,8 @@ private[niocharset] abstract class UTF_16_Common protected ( // scalastyle:ignor
   }
 }
 
-private[niocharset] object UTF_16_Common { // scalastyle:ignore
+private[niocharset] object UTF_16_Common {
+  // scalastyle:ignore
   final val AutoEndian = 0
   final val BigEndian = 1
   final val LittleEndian = 2

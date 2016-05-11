@@ -12,10 +12,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScInfixExpr
 import org.jetbrains.plugins.scala.util.IntentionUtils
 
 /**
- * @author Ksenia.Sautina
- * @since 5/13/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 5/13/12
+  */
 object NegateComparisonIntention {
   def familyName = "Negate comparison"
 }
@@ -23,46 +22,68 @@ object NegateComparisonIntention {
 class NegateComparisonIntention extends PsiElementBaseIntentionAction {
   def getFamilyName = NegateComparisonIntention.familyName
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = {
-    val infixExpr: ScInfixExpr = PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
+  def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
+    val infixExpr: ScInfixExpr =
+      PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
 
     val oper = infixExpr.operation.nameId.getText
 
-    if (oper != "==" && oper != "!=" && oper != ">" && oper != "<" && oper != ">=" && oper != "<=")
-      return false
+    if (oper != "==" && oper != "!=" && oper != ">" && oper != "<" &&
+        oper != ">=" && oper != "<=") return false
 
     val range: TextRange = infixExpr.operation.nameId.getTextRange
     val offset = editor.getCaretModel.getOffset
-    if (!(range.getStartOffset <= offset && offset <= range.getEndOffset)) return false
+    if (!(range.getStartOffset <= offset && offset <= range.getEndOffset))
+      return false
 
-    val replaceOper = Map("==" -> "!=", "!=" -> "==", ">" -> "<=", "<" -> ">=", ">=" -> "<", "<=" -> ">")
+    val replaceOper = Map("==" -> "!=",
+                          "!=" -> "==",
+                          ">" -> "<=",
+                          "<" -> ">=",
+                          ">=" -> "<",
+                          "<=" -> ">")
     setText("Negate '" + oper + "' to " + replaceOper(oper) + "'")
 
     true
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
-    val infixExpr: ScInfixExpr = PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
+    val infixExpr: ScInfixExpr =
+      PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null || !infixExpr.isValid) return
 
-    val replaceOper = Map("==" -> "!=", "!=" -> "==", ">" -> "<=", "<" -> ">=", ">=" -> "<", "<=" -> ">")
+    val replaceOper = Map("==" -> "!=",
+                          "!=" -> "==",
+                          ">" -> "<=",
+                          "<" -> ">=",
+                          ">=" -> "<",
+                          "<=" -> ">")
 
     val start = infixExpr.getTextRange.getStartOffset
-    val diff = editor.getCaretModel.getOffset - infixExpr.operation.nameId.getTextRange.getStartOffset
+    val diff =
+      editor.getCaretModel.getOffset -
+      infixExpr.operation.nameId.getTextRange.getStartOffset
 
     val buf = new StringBuilder
 
-    buf.append(infixExpr.getBaseExpr.getText).append(" ").
-            append(replaceOper(infixExpr.operation.nameId.getText)).append(" ").
-            append(infixExpr.getArgExpr.getText)
+    buf
+      .append(infixExpr.getBaseExpr.getText)
+      .append(" ")
+      .append(replaceOper(infixExpr.operation.nameId.getText))
+      .append(" ")
+      .append(infixExpr.getArgExpr.getText)
 
-    val res = IntentionUtils.negateAndValidateExpression(infixExpr, element.getManager, buf)
+    val res = IntentionUtils.negateAndValidateExpression(
+        infixExpr, element.getManager, buf)
 
     inWriteAction {
       res._1.replaceExpression(res._2, true)
       editor.getCaretModel.moveToOffset(start + diff + res._3)
-      PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
+      PsiDocumentManager
+        .getInstance(project)
+        .commitDocument(editor.getDocument)
     }
   }
 }

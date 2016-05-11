@@ -47,11 +47,13 @@ object TagUsage extends App {
 
   // tags have a convenience method name subst for tagging an F[A] as
   // a F[A @@ SomeTag]
-  assert(Conjunction.subst(List(false, true, false)).suml === Conjunction(false))
+  assert(
+      Conjunction.subst(List(false, true, false)).suml === Conjunction(false))
   assert(Conjunction.subst(List.empty[Boolean]).suml === Conjunction(true))
   assert(Conjunction.subst(List(true, true)).suml === Conjunction(true))
 
-  assert(Disjunction.subst(List(false, true, false)).suml === Disjunction(true))
+  assert(
+      Disjunction.subst(List(false, true, false)).suml === Disjunction(true))
   assert(Disjunction.subst(List.empty[Boolean]).suml === Disjunction(false))
   assert(Disjunction.subst(List(false, false)).suml === Disjunction(false))
 
@@ -68,7 +70,8 @@ object TagUsage extends App {
 
   // Tags have an unwrap method which converts the value back to a untagged type:
   assert(Disjunction.unwrap(Disjunction(true)) === true)
-  assert(Conjunction.unwrap(Conjunction.subst(List(false, true, false)).suml) === false)
+  assert(
+      Conjunction.unwrap(Conjunction.subst(List(false, true, false)).suml) === false)
 
   // Some other Tags in scalaz:
 
@@ -90,14 +93,15 @@ object TagUsage extends App {
   val Sorted = Tag.of[Sorted]
 
   // a sort function which will sort then add the Tag
-  def sortList[A: scala.math.Ordering](as: List[A]): List[A] @@ Sorted =
+  def sortList[A : scala.math.Ordering](as: List[A]): List[A] @@ Sorted =
     Sorted(as.sorted)
 
   // now we can define a function which takes lists which are tagged as being sorted
-  def minOption[A](a: List[A] @@ Sorted): Option[A] = Sorted.unwrap(a).headOption
+  def minOption[A](a: List[A] @@ Sorted): Option[A] =
+    Sorted.unwrap(a).headOption
 
   implicit val ord = implicitly[Order[Option[Int]]].toScalaOrdering
-  assert(minOption(sortList(List(3,2,1,5,3))) === Some(1))
+  assert(minOption(sortList(List(3, 2, 1, 5, 3))) === Some(1))
 
   // we can also use pattern matching:
   def minOption_v2[A]: List[A] @@ Sorted ⇒ Option[A] = {

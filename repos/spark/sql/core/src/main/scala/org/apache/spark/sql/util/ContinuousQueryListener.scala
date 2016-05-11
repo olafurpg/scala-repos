@@ -22,20 +22,20 @@ import org.apache.spark.sql.ContinuousQuery
 import org.apache.spark.sql.util.ContinuousQueryListener._
 
 /**
- * :: Experimental ::
- * Interface for listening to events related to [[ContinuousQuery ContinuousQueries]].
- * @note The methods are not thread-safe as they may be called from different threads.
- */
+  * :: Experimental ::
+  * Interface for listening to events related to [[ContinuousQuery ContinuousQueries]].
+  * @note The methods are not thread-safe as they may be called from different threads.
+  */
 @Experimental
 abstract class ContinuousQueryListener {
 
   /**
-   * Called when a query is started.
-   * @note This is called synchronously with
-   *       [[org.apache.spark.sql.DataFrameWriter `DataFrameWriter.startStream()`]],
-   *       that is, `onQueryStart` will be called on all listeners before
-   *       `DataFrameWriter.startStream()` returns the corresponding [[ContinuousQuery]].
-   */
+    * Called when a query is started.
+    * @note This is called synchronously with
+    *       [[org.apache.spark.sql.DataFrameWriter `DataFrameWriter.startStream()`]],
+    *       that is, `onQueryStart` will be called on all listeners before
+    *       `DataFrameWriter.startStream()` returns the corresponding [[ContinuousQuery]].
+    */
   def onQueryStarted(queryStarted: QueryStarted)
 
   /** Called when there is some status update (ingestion rate updated, etc. */
@@ -45,11 +45,10 @@ abstract class ContinuousQueryListener {
   def onQueryTerminated(queryTerminated: QueryTerminated)
 }
 
-
 /**
- * :: Experimental ::
- * Companion object of [[ContinuousQueryListener]] that defines the listener events.
- */
+  * :: Experimental ::
+  * Companion object of [[ContinuousQueryListener]] that defines the listener events.
+  */
 @Experimental
 object ContinuousQueryListener {
 

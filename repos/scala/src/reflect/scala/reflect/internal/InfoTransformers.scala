@@ -7,8 +7,7 @@ package scala
 package reflect
 package internal
 
-trait InfoTransformers {
-  self: SymbolTable =>
+trait InfoTransformers { self: SymbolTable =>
 
   /* Syncnote: This should not need to be protected, as reflection does not run in multiple phases.
    */
@@ -28,7 +27,9 @@ trait InfoTransformers {
       } else if (next.pid <= that.pid && next.pid != NoPhase.id) {
         next insert that
       } else {
-        log("Inserting info transformer %s following %s".format(phaseOf(that.pid), phaseOf(this.pid)))
+        log(
+            "Inserting info transformer %s following %s".format(
+                phaseOf(that.pid), phaseOf(this.pid)))
         that.next = next
         that.prev = this
         next.prev = that
@@ -37,9 +38,9 @@ trait InfoTransformers {
     }
 
     /** The InfoTransformer whose (pid == from).
-     *  If no such exists, the InfoTransformer with the next
-     *  higher pid.
-     */
+      *  If no such exists, the InfoTransformer with the next
+      *  higher pid.
+      */
     def nextFrom(from: Phase#Id): InfoTransformer =
       if (from == this.pid) this
       else if (from < this.pid)
@@ -49,4 +50,3 @@ trait InfoTransformers {
       else next.nextFrom(from)
   }
 }
-

@@ -4,9 +4,9 @@ import com.intellij.psi.util.PsiModificationTracker
 import org.junit.Assert
 
 /**
- * Author: Svyatoslav Ilinskiy
- * Date: 9/25/15.
- */
+  * Author: Svyatoslav Ilinskiy
+  * Date: 9/25/15.
+  */
 class CachedInsidePsiElementTest extends CachedWithRecursionGuardTestBase {
 
   def testSimple(): Unit = {

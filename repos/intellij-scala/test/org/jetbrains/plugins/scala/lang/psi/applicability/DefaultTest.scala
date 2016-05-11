@@ -2,10 +2,10 @@ package org.jetbrains.plugins.scala
 package lang.psi.applicability
 
 import org.jetbrains.plugins.scala.lang.psi.types._
-/**
- * Pavel.Fatin, 18.05.2010
- */
 
+/**
+  * Pavel.Fatin, 18.05.2010
+  */
 class DefaultTest extends ApplicabilityTestBase {
   def testFine() {
     assertProblems("(a: A = null)", "()") {
@@ -24,7 +24,7 @@ class DefaultTest extends ApplicabilityTestBase {
       case Nil =>
     }
   }
-  
+
   def testMix() {
     assertProblems("(a: A, b: B = null)", "(A)") {
       case Nil =>
@@ -36,13 +36,13 @@ class DefaultTest extends ApplicabilityTestBase {
       case Nil =>
     }
   }
-  
+
   def testTooManyArguments() {
     assertProblems("(a: A = null)", "(A, B)") {
       case ExcessArgument(Expression("B")) :: Nil =>
     }
     assertProblems("(a: A = null)", "(A, B, C)") {
-      case ExcessArgument(Expression("B")) :: ExcessArgument(Expression("C")) ::Nil =>
+      case ExcessArgument(Expression("B")) :: ExcessArgument(Expression("C")) :: Nil =>
     }
     assertProblems("(a: A = null, b: B = null)", "(A, B, C)") {
       case ExcessArgument(Expression("C")) :: Nil =>
@@ -58,7 +58,7 @@ class DefaultTest extends ApplicabilityTestBase {
       case Nil =>
     }
   }
-  
+
   def testMissedParameter() {
     assertProblems("(a: A, b: B = null)", "()") {
       case MissedValueParameter(Parameter("a")) :: Nil =>
@@ -67,7 +67,8 @@ class DefaultTest extends ApplicabilityTestBase {
       case MissedValueParameter(Parameter("a")) :: Nil =>
     }
     assertProblems("(a: A, b: B, c: C = null)", "()") {
-      case MissedValueParameter(Parameter("a")) :: MissedValueParameter(Parameter("b")) ::Nil =>
+      case MissedValueParameter(Parameter("a")) :: MissedValueParameter(
+          Parameter("b")) :: Nil =>
     }
     assertProblems("(a: A = null, b: B)", "()") {
       case MissedValueParameter(Parameter("b")) :: Nil =>
@@ -85,13 +86,14 @@ class DefaultTest extends ApplicabilityTestBase {
       case MissedValueParameter(Parameter("c")) :: Nil =>
     }
   }
-  
+
   def testTypeMismatch() {
     assertProblems("(a: A = null)", "(B)") {
       case TypeMismatch(Expression("B"), Type("A")) :: Nil =>
     }
     assertProblems("(a: A = null, b: B = null)", "(B, A)") {
-      case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(Expression("A"), Type("B")) :: Nil =>
+      case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(
+          Expression("A"), Type("B")) :: Nil =>
     }
   }
 }

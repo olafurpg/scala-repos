@@ -20,7 +20,8 @@ package org.apache.spark.scheduler
 import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkException, SparkFunSuite}
 import org.apache.spark.util.{RpcUtils, SerializableBuffer}
 
-class CoarseGrainedSchedulerBackendSuite extends SparkFunSuite with LocalSparkContext {
+class CoarseGrainedSchedulerBackendSuite
+    extends SparkFunSuite with LocalSparkContext {
 
   test("serialized task larger than max RPC message size") {
     val conf = new SparkConf
@@ -28,14 +29,15 @@ class CoarseGrainedSchedulerBackendSuite extends SparkFunSuite with LocalSparkCo
     conf.set("spark.default.parallelism", "1")
     sc = new SparkContext("local-cluster[2, 1, 1024]", "test", conf)
     val frameSize = RpcUtils.maxMessageSizeBytes(sc.conf)
-    val buffer = new SerializableBuffer(java.nio.ByteBuffer.allocate(2 * frameSize))
+    val buffer =
+      new SerializableBuffer(java.nio.ByteBuffer.allocate(2 * frameSize))
     val larger = sc.parallelize(Seq(buffer))
     val thrown = intercept[SparkException] {
       larger.collect()
     }
-    assert(thrown.getMessage.contains("using broadcast variables for large values"))
+    assert(thrown.getMessage.contains(
+            "using broadcast variables for large values"))
     val smaller = sc.parallelize(1 to 4).collect()
     assert(smaller.size === 4)
   }
-
 }

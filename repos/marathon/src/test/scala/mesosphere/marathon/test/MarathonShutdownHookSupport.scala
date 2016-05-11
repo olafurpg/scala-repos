@@ -1,12 +1,13 @@
 package mesosphere.marathon.test
 
 import mesosphere.marathon.core.base.ShutdownHooks
-import org.scalatest.{ Suite, BeforeAndAfterEach }
+import org.scalatest.{Suite, BeforeAndAfterEach}
 
 /**
   * Creates shutdown hooks before each test and shuts it down after each test.
   */
-trait MarathonShutdownHookSupport extends BeforeAndAfterEach { this: Suite =>
+trait MarathonShutdownHookSupport extends BeforeAndAfterEach {
+  this: Suite =>
 
   var shutdownHooks: ShutdownHooks = _
 
@@ -16,7 +17,6 @@ trait MarathonShutdownHookSupport extends BeforeAndAfterEach { this: Suite =>
   }
 
   override protected def afterEach(): Unit = {
-    try super.afterEach()
-    finally shutdownHooks.shutdown()
+    try super.afterEach() finally shutdownHooks.shutdown()
   }
 }

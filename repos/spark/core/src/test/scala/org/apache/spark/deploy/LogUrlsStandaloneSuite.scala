@@ -45,17 +45,19 @@ class LogUrlsStandaloneSuite extends SparkFunSuite with LocalSparkContext {
     listener.addedExecutorInfos.values.foreach { info =>
       assert(info.logUrlMap.nonEmpty)
       // Browse to each URL to check that it's valid
-      info.logUrlMap.foreach { case (logType, logUrl) =>
-        val html = Source.fromURL(logUrl).mkString
-        assert(html.contains(s"$logType log page"))
+      info.logUrlMap.foreach {
+        case (logType, logUrl) =>
+          val html = Source.fromURL(logUrl).mkString
+          assert(html.contains(s"$logType log page"))
       }
     }
   }
 
   test("verify that log urls reflect SPARK_PUBLIC_DNS (SPARK-6175)") {
     val SPARK_PUBLIC_DNS = "public_dns"
-    val conf = new SparkConfWithEnv(Map("SPARK_PUBLIC_DNS" -> SPARK_PUBLIC_DNS)).set(
-      "spark.extraListeners", classOf[SaveExecutorInfo].getName)
+    val conf =
+      new SparkConfWithEnv(Map("SPARK_PUBLIC_DNS" -> SPARK_PUBLIC_DNS))
+        .set("spark.extraListeners", classOf[SaveExecutorInfo].getName)
     sc = new SparkContext("local-cluster[2,1,1024]", "test", conf)
 
     // Trigger a job so that executors get added

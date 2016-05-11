@@ -7,25 +7,22 @@ import mesosphere.marathon.health.HealthCheck
 import mesosphere.marathon.state.Container.Docker
 import mesosphere.marathon.state._
 import mesosphere.marathon._
-import org.apache.mesos.{ Protos => mesos }
-import org.scalatest.{ GivenWhenThen, Matchers }
+import org.apache.mesos.{Protos => mesos}
+import org.scalatest.{GivenWhenThen, Matchers}
 
 import scala.collection.immutable.Seq
 
-class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWhenThen {
+class AppDefinitionValidatorTest
+    extends MarathonSpec with Matchers with GivenWhenThen {
 
   test("only cmd") {
-    val app = AppDefinition(
-      id = PathId("/test"),
-      cmd = Some("true"))
+    val app = AppDefinition(id = PathId("/test"), cmd = Some("true"))
     validate(app)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   private[this] def testValidId(id: String): Unit = {
-    val app = AppDefinition(
-      id = PathId(id),
-      cmd = Some("true"))
+    val app = AppDefinition(id = PathId(id), cmd = Some("true"))
 
     validate(app)
     MarathonTestHelper.validateJsonSchema(app)
@@ -77,9 +74,7 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
   }
 
   private[this] def testSchemaLessStrictForId(id: String): Unit = {
-    val app = AppDefinition(
-      id = PathId(id),
-      cmd = Some("true"))
+    val app = AppDefinition(id = PathId(id), cmd = Some("true"))
 
     an[ValidationFailedException] should be thrownBy validateOrThrow(app)
 
@@ -98,8 +93,8 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
 
   private[this] def testInvalid(id: String): Unit = {
     val app = AppDefinition(
-      id = PathId(id),
-      cmd = Some("true")
+        id = PathId(id),
+        cmd = Some("true")
     )
 
     val result = validate(app)
@@ -128,55 +123,55 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
     testInvalid("/asd asd")
   }
 
-  test("id '/app-' is invalid because hyphens and dots are only allowed inside of path fragments") {
+  test(
+      "id '/app-' is invalid because hyphens and dots are only allowed inside of path fragments") {
     testInvalid("/app-")
   }
 
-  test("id '/nest./ted' is invalid because hyphens and dots are only allowed inside of path fragments") {
+  test(
+      "id '/nest./ted' is invalid because hyphens and dots are only allowed inside of path fragments") {
     testInvalid("/nest./ted")
   }
 
-  test("id '/nest/-ted' is invalid because hyphens and dots are only allowed inside of path fragments") {
+  test(
+      "id '/nest/-ted' is invalid because hyphens and dots are only allowed inside of path fragments") {
     testInvalid("/nest/-ted")
   }
 
   test("only cmd + command health check") {
     val app = AppDefinition(
-      id = PathId("/test"),
-      cmd = Some("true"),
-      healthChecks = Set(
-        HealthCheck(
-          protocol = HealthCheckDefinition.Protocol.COMMAND,
-          command = Some(Command("curl http://localhost:$PORT"))
-        )
-      )
+        id = PathId("/test"),
+        cmd = Some("true"),
+        healthChecks = Set(
+              HealthCheck(
+                  protocol = HealthCheckDefinition.Protocol.COMMAND,
+                  command = Some(Command("curl http://localhost:$PORT"))
+              )
+          )
     )
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("only cmd + acceptedResourceRoles") {
-    val app = AppDefinition(
-      id = PathId("/test"),
-      cmd = Some("true"),
-      acceptedResourceRoles = Some(Set("*")))
+    val app = AppDefinition(id = PathId("/test"),
+                            cmd = Some("true"),
+                            acceptedResourceRoles = Some(Set("*")))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("only cmd + acceptedResourceRoles 2") {
-    val app = AppDefinition(
-      id = PathId("/test"),
-      cmd = Some("true"),
-      acceptedResourceRoles = Some(Set("*", "production")))
+    val app =
+      AppDefinition(id = PathId("/test"),
+                    cmd = Some("true"),
+                    acceptedResourceRoles = Some(Set("*", "production")))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("only args") {
-    val app = AppDefinition(
-      id = PathId("/test"),
-      args = Some("test" :: Nil))
+    val app = AppDefinition(id = PathId("/test"), args = Some("test" :: Nil))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
@@ -184,86 +179,80 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
   test("only container") {
     val f = new Fixture
     val app = AppDefinition(
-      id = PathId("/test"),
-      container = Some(f.validDockerContainer))
+        id = PathId("/test"), container = Some(f.validDockerContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("empty container is invalid") {
-    val app = AppDefinition(
-      id = PathId("/test"),
-      container = Some(Container()))
+    val app =
+      AppDefinition(id = PathId("/test"), container = Some(Container()))
     assert(validate(app).isFailure)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("container with type DOCKER and empty docker field is invalid") {
     val f = new Fixture
-    val app = AppDefinition(
-      id = PathId("/test"),
-      cmd = Some("true"),
-      container = Some(f.invalidDockerContainer))
+    val app = AppDefinition(id = PathId("/test"),
+                            cmd = Some("true"),
+                            container = Some(f.invalidDockerContainer))
     assert(validate(app).isFailure)
     MarathonTestHelper.validateJsonSchema(app, valid = true)
   }
 
   test("container and cmd") {
     val f = new Fixture
-    val app = AppDefinition(
-      id = PathId("/test"),
-      cmd = Some("true"),
-      container = Some(f.validDockerContainer))
+    val app = AppDefinition(id = PathId("/test"),
+                            cmd = Some("true"),
+                            container = Some(f.validDockerContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("container and args") {
     val f = new Fixture
-    val app = AppDefinition(
-      id = PathId("/test"),
-      args = Some("test" :: Nil),
-      container = Some(f.validDockerContainer))
+    val app = AppDefinition(id = PathId("/test"),
+                            args = Some("test" :: Nil),
+                            container = Some(f.validDockerContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("container, cmd and args is not valid") {
     val f = new Fixture
-    val app = AppDefinition(
-      id = PathId("/test"),
-      cmd = Some("true"),
-      args = Some("test" :: Nil),
-      container = Some(f.validDockerContainer))
+    val app = AppDefinition(id = PathId("/test"),
+                            cmd = Some("true"),
+                            args = Some("test" :: Nil),
+                            container = Some(f.validDockerContainer))
     assert(validate(app).isFailure)
     MarathonTestHelper.validateJsonSchema(app, valid = false)
   }
 
   test("container with type MESOS and nonEmpty docker field is invalid") {
     val f = new Fixture
-    val app = AppDefinition(
-      id = PathId("/test"),
-      cmd = Some("true"),
-      container = Some(f.invalidMesosContainer))
+    val app = AppDefinition(id = PathId("/test"),
+                            cmd = Some("true"),
+                            container = Some(f.invalidMesosContainer))
     assert(validate(app).isFailure)
     MarathonTestHelper.validateJsonSchema(app, valid = true)
   }
 
   test("container with type MESOS and empty docker field is valid") {
     val f = new Fixture
-    val app = AppDefinition(
-      id = PathId("/test"),
-      cmd = Some("true"),
-      container = Some(f.validMesosContainer))
+    val app = AppDefinition(id = PathId("/test"),
+                            cmd = Some("true"),
+                            container = Some(f.validMesosContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app, valid = true)
   }
 
   test("valid docker volume") {
-    AllConf.SuppliedOptionNames = Set("mesos_authentication_principal", "mesos_role", "mesos_authentication_secret_file")
+    AllConf.SuppliedOptionNames = Set("mesos_authentication_principal",
+                                      "mesos_role",
+                                      "mesos_authentication_secret_file")
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-      volumes = Seq(f.validPersistentVolume)
+        volumes = Seq(f.validPersistentVolume)
     )
     assert(validate(container).isSuccess)
   }
@@ -272,7 +261,7 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
     AllConf.SuppliedOptionNames = Set.empty
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-      volumes = Seq(f.validPersistentVolume)
+        volumes = Seq(f.validPersistentVolume)
     )
     assert(validate(container).isFailure)
   }
@@ -280,7 +269,7 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
   test("docker volume with missing containerPath is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-      volumes = Seq(f.validDockerVolume.copy(containerPath = ""))
+        volumes = Seq(f.validDockerVolume.copy(containerPath = ""))
     )
     assert(validate(container).isFailure)
   }
@@ -288,7 +277,7 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
   test("docker volume with missing hostPath is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-      volumes = Seq(f.validDockerVolume.copy(hostPath = ""))
+        volumes = Seq(f.validDockerVolume.copy(hostPath = ""))
     )
     assert(validate(container).isFailure)
   }
@@ -296,7 +285,7 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
   test("persistent volume with missing containerPath is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-      volumes = Seq(f.validPersistentVolume.copy(containerPath = ""))
+        volumes = Seq(f.validPersistentVolume.copy(containerPath = ""))
     )
     assert(validate(container).isFailure)
   }
@@ -304,7 +293,8 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
   test("persistent volume with mode RO is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-      volumes = Seq(f.validPersistentVolume.copy(mode = mesos.Volume.Mode.RO))
+        volumes = Seq(
+              f.validPersistentVolume.copy(mode = mesos.Volume.Mode.RO))
     )
     assert(validate(container).isFailure)
   }
@@ -312,7 +302,8 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
   test("persistent volume with size 0 is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-      volumes = Seq(f.validPersistentVolume.copy(persistent = PersistentVolumeInfo(0)))
+        volumes = Seq(f.validPersistentVolume.copy(
+                  persistent = PersistentVolumeInfo(0)))
     )
     assert(validate(container).isFailure)
   }
@@ -320,7 +311,8 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
   test("persistent volume with size < 0 is invalid") {
     val f = new Fixture
     val container = f.validDockerContainer.copy(
-      volumes = Seq(f.validPersistentVolume.copy(persistent = PersistentVolumeInfo(-1)))
+        volumes = Seq(f.validPersistentVolume.copy(
+                  persistent = PersistentVolumeInfo(-1)))
     )
     assert(validate(container).isFailure)
   }
@@ -380,9 +372,12 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
     Given("A resident app definition")
     val f = new Fixture
     val from = f.validResident
-    AllConf.SuppliedOptionNames = Set("mesos_authentication_principal", "mesos_role", "mesos_authentication_secret_file")
+    AllConf.SuppliedOptionNames = Set("mesos_authentication_principal",
+                                      "mesos_role",
+                                      "mesos_authentication_secret_file")
 
-    When("Check if only defining residency without persistent volumes is valid")
+    When(
+        "Check if only defining residency without persistent volumes is valid")
     val to1 = from.copy(container = None)
     Then("Should be invalid")
     AppDefinition.validAppDefinition(to1).isSuccess should be(false)
@@ -404,54 +399,60 @@ class AppDefinitionValidatorTest extends MarathonSpec with Matchers with GivenWh
 
   class Fixture {
     def validDockerContainer: Container = Container(
-      `type` = mesos.ContainerInfo.Type.DOCKER,
-      volumes = Nil,
-      docker = Some(Docker(image = "foo/bar:latest"))
+        `type` = mesos.ContainerInfo.Type.DOCKER,
+        volumes = Nil,
+        docker = Some(Docker(image = "foo/bar:latest"))
     )
 
     def invalidDockerContainer: Container = Container(
-      `type` = mesos.ContainerInfo.Type.DOCKER,
-      volumes = Nil,
-      docker = None
+        `type` = mesos.ContainerInfo.Type.DOCKER,
+        volumes = Nil,
+        docker = None
     )
 
     def validMesosContainer: Container = Container(
-      `type` = mesos.ContainerInfo.Type.MESOS,
-      volumes = Nil,
-      docker = None
+        `type` = mesos.ContainerInfo.Type.MESOS,
+        volumes = Nil,
+        docker = None
     )
 
     def invalidMesosContainer: Container = Container(
-      `type` = mesos.ContainerInfo.Type.MESOS,
-      volumes = Nil,
-      docker = Some(Docker(image = "foo/bar:latest"))
+        `type` = mesos.ContainerInfo.Type.MESOS,
+        volumes = Nil,
+        docker = Some(Docker(image = "foo/bar:latest"))
     )
 
     // scalastyle:off magic.number
-    def validPersistentVolume: PersistentVolume = PersistentVolume(
-      containerPath = "/test",
-      persistent = PersistentVolumeInfo(10),
-      mode = mesos.Volume.Mode.RW)
+    def validPersistentVolume: PersistentVolume =
+      PersistentVolume(containerPath = "/test",
+                       persistent = PersistentVolumeInfo(10),
+                       mode = mesos.Volume.Mode.RW)
 
-    def validDockerVolume: DockerVolume = DockerVolume(
-      containerPath = "/test",
-      hostPath = "/etc/foo",
-      mode = mesos.Volume.Mode.RW)
+    def validDockerVolume: DockerVolume =
+      DockerVolume(containerPath = "/test",
+                   hostPath = "/etc/foo",
+                   mode = mesos.Volume.Mode.RW)
 
-    def persistentVolume(path: String) = PersistentVolume(path, PersistentVolumeInfo(123), mesos.Volume.Mode.RW)
+    def persistentVolume(path: String) =
+      PersistentVolume(path, PersistentVolumeInfo(123), mesos.Volume.Mode.RW)
     val zero = UpgradeStrategy(0, 0)
 
-    def residentApp(id: String, volumes: Seq[PersistentVolume]): AppDefinition = {
+    def residentApp(
+        id: String, volumes: Seq[PersistentVolume]): AppDefinition = {
       AppDefinition(
-        id = PathId(id),
-        cmd = Some("test"),
-        container = Some(Container(mesos.ContainerInfo.Type.MESOS, volumes)),
-        residency = Some(Residency(123, Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
+          id = PathId(id),
+          cmd = Some("test"),
+          container = Some(Container(mesos.ContainerInfo.Type.MESOS, volumes)),
+          residency = Some(
+                Residency(
+                    123,
+                    Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
       )
     }
     val vol1 = persistentVolume("foo")
     val vol2 = persistentVolume("bla")
     val vol3 = persistentVolume("test")
-    val validResident = residentApp("/app1", Seq(vol1, vol2)).copy(upgradeStrategy = zero)
+    val validResident =
+      residentApp("/app1", Seq(vol1, vol2)).copy(upgradeStrategy = zero)
   }
 }

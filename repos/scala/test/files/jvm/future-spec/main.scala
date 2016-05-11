@@ -1,11 +1,7 @@
-
-
-
 import scala.collection._
 import scala.concurrent._
 import scala.concurrent.duration.Duration
-import java.util.concurrent.{ TimeoutException, CountDownLatch, TimeUnit }
-
+import java.util.concurrent.{TimeoutException, CountDownLatch, TimeUnit}
 
 object Test {
 
@@ -14,15 +10,13 @@ object Test {
     (new PromiseTests).check()
     (new TryTests).check()
   }
-
 }
 
 trait Features {
   implicit def implicitously = scala.language.implicitConversions
-  implicit def reflectively  = scala.language.reflectiveCalls
-  implicit def postulously   = scala.language.postfixOps
+  implicit def reflectively = scala.language.reflectiveCalls
+  implicit def postulously = scala.language.postfixOps
 }
-
 
 trait Output {
   val buffer = new StringBuilder
@@ -31,7 +25,6 @@ trait Output {
     buffer.append(a.toString + "\n")
   }
 }
-
 
 trait MinimalScalaTest extends Output with Features {
 
@@ -43,12 +36,12 @@ trait MinimalScalaTest extends Output with Features {
 
   implicit def stringops(s: String) = new {
 
-    def should[U](snippets: =>U) = {
+    def should[U](snippets: => U) = {
       bufferPrintln(s + " should:")
       snippets
     }
 
-    def in[U](snippet: =>U) = {
+    def in[U](snippet: => U) = {
       try {
         bufferPrintln("- " + s)
         snippet
@@ -60,20 +53,19 @@ trait MinimalScalaTest extends Output with Features {
           throwables += e
       }
     }
-
   }
 
   implicit def objectops(obj: Any) = new {
 
     def mustBe(other: Any) = assert(obj == other, obj + " is not " + other)
     def mustEqual(other: Any) = mustBe(other)
-
   }
 
-  def intercept[T <: Throwable: Manifest](body: =>Any): T = {
+  def intercept[T <: Throwable : Manifest](body: => Any): T = {
     try {
       body
-      throw new Exception("Exception of type %s was not thrown".format(manifest[T]))
+      throw new Exception(
+          "Exception of type %s was not thrown".format(manifest[T]))
     } catch {
       case t: Throwable =>
         if (manifest[T].runtimeClass != t.getClass) throw t
@@ -81,16 +73,16 @@ trait MinimalScalaTest extends Output with Features {
     }
   }
 
-  def checkType[T: Manifest, S](in: Future[T], refmanifest: Manifest[S]): Boolean = manifest[T] == refmanifest
+  def checkType[T : Manifest, S](
+      in: Future[T], refmanifest: Manifest[S]): Boolean =
+    manifest[T] == refmanifest
 }
-
 
 object TestLatch {
   val DefaultTimeout = Duration(5, TimeUnit.SECONDS)
 
   def apply(count: Int = 1) = new TestLatch(count)
 }
-
 
 class TestLatch(count: Int = 1) extends Awaitable[Unit] {
   private var latch = new CountDownLatch(count)
@@ -103,7 +95,8 @@ class TestLatch(count: Int = 1) extends Awaitable[Unit] {
   @throws(classOf[TimeoutException])
   def ready(atMost: Duration)(implicit permit: CanAwait) = {
     val opened = latch.await(atMost.toNanos, TimeUnit.NANOSECONDS)
-    if (!opened) throw new TimeoutException("Timeout of %s." format (atMost.toString))
+    if (!opened)
+      throw new TimeoutException("Timeout of %s." format (atMost.toString))
     this
   }
 
@@ -111,6 +104,4 @@ class TestLatch(count: Int = 1) extends Awaitable[Unit] {
   def result(atMost: Duration)(implicit permit: CanAwait): Unit = {
     ready(atMost)
   }
-
 }
-

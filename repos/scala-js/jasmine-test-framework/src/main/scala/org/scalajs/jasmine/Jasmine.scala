@@ -15,5 +15,7 @@ object Jasmine extends js.GlobalScope {
   def fail(message: String): Unit = js.native
   def runs(block: js.Function0[_]): Unit = js.native
   def waits(timeout: Int): Unit = js.native
-  def waitsFor(block: js.Function0[Boolean], errorMsg: String, timeout: Int): Unit = js.native
+  def waitsFor(
+      block: js.Function0[Boolean], errorMsg: String, timeout: Int): Unit =
+    js.native
 }

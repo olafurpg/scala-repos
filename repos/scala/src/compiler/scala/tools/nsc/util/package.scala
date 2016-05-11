@@ -7,7 +7,7 @@ package scala
 package tools
 package nsc
 
-import java.io.{ OutputStream, PrintStream, ByteArrayOutputStream, PrintWriter, StringWriter, Reader }
+import java.io.{OutputStream, PrintStream, ByteArrayOutputStream, PrintWriter, StringWriter, Reader}
 
 package object util {
   // forwarder for old code that builds against 2.9 and 2.10
@@ -18,30 +18,30 @@ package object util {
   val HashSet = scala.reflect.internal.util.HashSet
 
   /** Apply a function and return the passed value */
-  def returning[T](x: T)(f: T => Unit): T = { f(x) ; x }
+  def returning[T](x: T)(f: T => Unit): T = { f(x); x }
 
   /** Execute code and then wait for all non-daemon Threads
-   *  created and begun during its execution to complete.
-   */
+    *  created and begun during its execution to complete.
+    */
   def waitingForThreads[T](body: => T) = {
     val (result, created) = trackingThreads(body)
     val threads = created filterNot (_.isDaemon)
 
     // As long as there are non-daemon, live threads (the latter
     // condition should exclude shutdown hooks) we will wait.
-    while (threads exists (_.isAlive))
-      threads filter (_.isAlive) foreach (_.join())
+    while (threads exists (_.isAlive)) threads filter (_.isAlive) foreach
+    (_.join())
 
     result
   }
 
   /** Executes the code and returns the result and any threads
-   *  which were created during its execution.
-   */
+    *  which were created during its execution.
+    */
   def trackingThreads[T](body: => T): (T, Seq[Thread]) = {
-    val ts1    = sys.allThreads()
+    val ts1 = sys.allThreads()
     val result = body
-    val ts2    = sys.allThreads()
+    val ts2 = sys.allThreads()
 
     (result, ts2 filterNot (ts1 contains _))
   }
@@ -49,7 +49,7 @@ package object util {
   def stringFromReader(reader: Reader) = {
     val writer = new StringWriter()
     var c = reader.read()
-    while(c != -1) {
+    while (c != -1) {
       writer.write(c)
       c = reader.read()
     }
@@ -72,31 +72,38 @@ package object util {
     ps.close()
     bs.toString()
   }
-  def stackTraceString(ex: Throwable): String = stringFromWriter(ex printStackTrace _)
+  def stackTraceString(ex: Throwable): String =
+    stringFromWriter(ex printStackTrace _)
 
   /** A one line string which contains the class of the exception, the
-   *  message if any, and the first non-Predef location in the stack trace
-   *  (to exclude assert, require, etc.)
-   */
+    *  message if any, and the first non-Predef location in the stack trace
+    *  (to exclude assert, require, etc.)
+    */
   def stackTraceHeadString(ex: Throwable): String = {
-    val frame = ex.getStackTrace.dropWhile(_.getClassName contains "Predef") take 1 mkString ""
-    val msg   = ex.getMessage match { case null | "" => "" ; case s => s"""("$s")""" }
+    val frame =
+      ex.getStackTrace.dropWhile(_.getClassName contains "Predef") take 1 mkString ""
+    val msg = ex.getMessage match {
+      case null | "" => ""; case s => s"""("$s")"""
+    }
     val clazz = ex.getClass.getName.split('.').last
 
     s"$clazz$msg @ $frame"
   }
 
-  implicit class StackTraceOps(private val e: Throwable) extends AnyVal with StackTracing {
+  implicit class StackTraceOps(private val e: Throwable)
+      extends AnyVal with StackTracing {
+
     /** Format the stack trace, returning the prefix consisting of frames that satisfy
-     *  a given predicate.
-     *  The format is similar to the typical case described in the JavaDoc
-     *  for [[java.lang.Throwable#printStackTrace]].
-     *  If a stack trace is truncated, it will be followed by a line of the form
-     *  `... 3 elided`, by analogy to the lines `... 3 more` which indicate
-     *  shared stack trace segments.
-     *  @param p the predicate to select the prefix
-     */
-    def stackTracePrefixString(p: StackTraceElement => Boolean): String = stackTracePrefixString(e)(p)
+      *  a given predicate.
+      *  The format is similar to the typical case described in the JavaDoc
+      *  for [[java.lang.Throwable#printStackTrace]].
+      *  If a stack trace is truncated, it will be followed by a line of the form
+      *  `... 3 elided`, by analogy to the lines `... 3 more` which indicate
+      *  shared stack trace segments.
+      *  @param p the predicate to select the prefix
+      */
+    def stackTracePrefixString(p: StackTraceElement => Boolean): String =
+      stackTracePrefixString(e)(p)
   }
 
   lazy val trace = new SimpleTracer(System.out)
@@ -120,12 +127,15 @@ package object util {
   @deprecated("Moved to scala.reflect.internal.util.BatchSourceFile", "2.10.0")
   type BatchSourceFile = scala.reflect.internal.util.BatchSourceFile
 
-  @deprecated("Moved to scala.reflect.internal.util.AbstractFileClassLoader", "2.11.0")
+  @deprecated(
+      "Moved to scala.reflect.internal.util.AbstractFileClassLoader", "2.11.0")
   type AbstractFileClassLoader = scala.reflect.internal.util.AbstractFileClassLoader
 
-  @deprecated("Moved to scala.reflect.internal.util.ScalaClassLoader", "2.11.0")
+  @deprecated(
+      "Moved to scala.reflect.internal.util.ScalaClassLoader", "2.11.0")
   val ScalaClassLoader = scala.reflect.internal.util.ScalaClassLoader
 
-  @deprecated("Moved to scala.reflect.internal.util.ScalaClassLoader", "2.11.0")
+  @deprecated(
+      "Moved to scala.reflect.internal.util.ScalaClassLoader", "2.11.0")
   type ScalaClassLoader = scala.reflect.internal.util.ScalaClassLoader
 }

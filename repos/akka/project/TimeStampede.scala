@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka
 
 import sbt._
@@ -11,7 +11,7 @@ object TimeStampede extends AutoPlugin {
   override def trigger = noTrigger
 
   override lazy val projectSettings = Seq(
-    commands += stampVersion
+      commands += stampVersion
   )
 
   final val Snapshot = "-SNAPSHOT"
@@ -22,7 +22,9 @@ object TimeStampede extends AutoPlugin {
   }
 
   def stamp(version: String): String = {
-    if (version endsWith Snapshot) (version stripSuffix Snapshot) + "-" + timestamp(System.currentTimeMillis)
+    if (version endsWith Snapshot)
+      (version stripSuffix Snapshot) + "-" + timestamp(
+          System.currentTimeMillis)
     else version
   }
 

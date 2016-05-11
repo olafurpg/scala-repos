@@ -8,17 +8,20 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 
 /**
- * Nikolay.Tropin
- * 2014-08-01
- */
+  * Nikolay.Tropin
+  * 2014-08-01
+  */
 class CreateUnapplyQuickFix(clazz: ScTypeDefinition, pattern: ScPattern)
-        extends {val getFamilyName = "Create 'unapply' method"} with CreateApplyOrUnapplyQuickFix(clazz) {
+    extends { val getFamilyName = "Create 'unapply' method" }
+with CreateApplyOrUnapplyQuickFix(clazz) {
 
-  override protected def methodType: Some[String] = Some(unapplyMethodTypeText(pattern))
+  override protected def methodType: Some[String] =
+    Some(unapplyMethodTypeText(pattern))
 
   override protected def methodText = unapplyMethodText(pattern)
 
-  override protected def addElementsToTemplate(method: ScFunction, builder: TemplateBuilder) = {
+  override protected def addElementsToTemplate(
+      method: ScFunction, builder: TemplateBuilder) = {
     addParametersToTemplate(method, builder)
     addUnapplyResultTypesToTemplate(method, builder)
     addQmarksToTemplate(method, builder)

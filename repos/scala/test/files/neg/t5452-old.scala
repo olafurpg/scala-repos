@@ -11,19 +11,19 @@ object Bip {
 import Bip._
 
 case class Queryable[T]() {
-  def treeFilter( t:Tree ) : Queryable[T] = ???
+  def treeFilter(t: Tree): Queryable[T] = ???
 }
 
 object Queryable {
-  def apply[T:Manifest] = ???
-  def apply[T:Manifest]( t:Tree ) = ???
+  def apply[T : Manifest] = ???
+  def apply[T : Manifest](t: Tree) = ???
 }
 
-trait CoffeesTable{
-  def sales : Int
+trait CoffeesTable {
+  def sales: Int
 }
 
-object Test extends App{
+object Test extends App {
   val q = new Queryable[CoffeesTable]
-  Queryable[CoffeesTable](  q.treeFilter(null)  )
+  Queryable[CoffeesTable](q.treeFilter(null))
 }

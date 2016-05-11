@@ -23,14 +23,19 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScPrimaryConstructorStub
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 07.03.2008
-*/
-
-class ScPrimaryConstructorImpl private (stub: StubElement[ScPrimaryConstructor], nodeType: IElementType, node: ASTNode)
-  extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScPrimaryConstructor {
-  def this(node: ASTNode) = {this(null, null, node)}
-  def this(stub: ScPrimaryConstructorStub) = {this(stub, ScalaElementTypes.PRIMARY_CONSTRUCTOR, null)}
+  * @author Alexander Podkhalyuzin
+  * Date: 07.03.2008
+  */
+class ScPrimaryConstructorImpl private (
+    stub: StubElement[ScPrimaryConstructor],
+    nodeType: IElementType,
+    node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScPrimaryConstructor {
+  def this(node: ASTNode) = { this(null, null, node) }
+  def this(stub: ScPrimaryConstructorStub) = {
+    this(stub, ScalaElementTypes.PRIMARY_CONSTRUCTOR, null)
+  }
 
   override def getIcon(flags: Int): Icon = Icons.FUNCTION
 
@@ -43,7 +48,6 @@ class ScPrimaryConstructorImpl private (stub: StubElement[ScPrimaryConstructor],
 
   override def toString: String = "PrimaryConstructor"
 
-
   def parameterList: ScParameters = {
     getStubOrPsiChild(ScalaElementTypes.PARAM_CLAUSES)
   }
@@ -54,7 +58,8 @@ class ScPrimaryConstructorImpl private (stub: StubElement[ScPrimaryConstructor],
 
   def getReturnTypeElement = null
 
-  def getHierarchicalMethodSignature = new HierarchicalMethodSignatureImpl(getSignature(PsiSubstitutor.EMPTY))
+  def getHierarchicalMethodSignature =
+    new HierarchicalMethodSignatureImpl(getSignature(PsiSubstitutor.EMPTY))
 
   def findSuperMethods(parentClass: PsiClass) = PsiMethod.EMPTY_ARRAY
 
@@ -71,7 +76,8 @@ class ScPrimaryConstructorImpl private (stub: StubElement[ScPrimaryConstructor],
   def findSuperMethodSignaturesIncludingStatic(checkAccess: Boolean) =
     new ArrayList[MethodSignatureBackedByPsiMethod]()
 
-  def getSignature(substitutor: PsiSubstitutor) = MethodSignatureBackedByPsiMethod.create(this, substitutor)
+  def getSignature(substitutor: PsiSubstitutor) =
+    MethodSignatureBackedByPsiMethod.create(this, substitutor)
 
   def getTypeParameters = PsiTypeParameter.EMPTY_ARRAY
 

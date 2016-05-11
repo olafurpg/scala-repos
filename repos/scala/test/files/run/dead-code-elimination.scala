@@ -1,4 +1,3 @@
-
 // This testcase is a snippet that did not compile correctly under
 // pre-release 2.10.x. The relevant discussion around it can be
 // found at:

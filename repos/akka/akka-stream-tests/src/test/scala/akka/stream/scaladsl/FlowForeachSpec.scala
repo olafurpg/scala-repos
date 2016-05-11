@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import scala.util.control.NoStackTrace
@@ -52,7 +52,5 @@ class FlowForeachSpec extends AkkaSpec {
       val future = Source.single(1).runForeach(_ ⇒ throw error)
       the[Exception] thrownBy Await.result(future, 3.seconds) should be(error)
     }
-
   }
-
 }

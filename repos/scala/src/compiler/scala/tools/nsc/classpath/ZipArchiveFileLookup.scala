@@ -11,11 +11,12 @@ import scala.reflect.io.FileZipArchive
 import FileUtils.AbstractFileOps
 
 /**
- * A trait allowing to look for classpath entries of given type in zip and jar files.
- * It provides common logic for classes handling class and source files.
- * It's aware of things like e.g. META-INF directory which is correctly skipped.
- */
-trait ZipArchiveFileLookup[FileEntryType <: ClassRepClassPathEntry] extends FlatClassPath {
+  * A trait allowing to look for classpath entries of given type in zip and jar files.
+  * It provides common logic for classes handling class and source files.
+  * It's aware of things like e.g. META-INF directory which is correctly skipped.
+  */
+trait ZipArchiveFileLookup[FileEntryType <: ClassRepClassPathEntry]
+    extends FlatClassPath {
   val zipFile: File
 
   assert(zipFile != null, "Zip file in ZipArchiveFileLookup cannot be null")
@@ -48,10 +49,8 @@ trait ZipArchiveFileLookup[FileEntryType <: ClassRepClassPathEntry] extends Flat
       val prefix = PackageNameUtils.packagePrefix(inPackage)
 
       for (entry <- dirEntry.iterator) {
-        if (entry.isPackage)
-          pkgBuf += PackageEntryImpl(prefix + entry.name)
-        else if (isRequiredFileType(entry))
-          fileBuf += createFileEntry(entry)
+        if (entry.isPackage) pkgBuf += PackageEntryImpl(prefix + entry.name)
+        else if (isRequiredFileType(entry)) fileBuf += createFileEntry(entry)
       }
       FlatClassPathEntries(pkgBuf, fileBuf)
     } getOrElse FlatClassPathEntries(Seq.empty, Seq.empty)

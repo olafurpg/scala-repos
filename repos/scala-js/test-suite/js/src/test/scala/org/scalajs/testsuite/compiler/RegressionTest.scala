@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.compiler
 
@@ -41,7 +41,8 @@ class RegressionTest {
     // Nothing to check
   }
 
-  @Test def Bad_encoding_for_characters_spanning_2_UTF_16_chars_issue_23(): Unit = {
+  @Test
+  def Bad_encoding_for_characters_spanning_2_UTF_16_chars_issue_23(): Unit = {
     val str = "A∀\uD835\uDCAB"
     var s: String = ""
     for (c <- str) {
@@ -56,11 +57,15 @@ class RegressionTest {
     assertEquals("nullcheck", x + "check")
   }
 
-  @Test def should_emit_static_calls_when_forwarding_to_another_constructor_issue_66(): Unit = {
+  @Test
+  def should_emit_static_calls_when_forwarding_to_another_constructor_issue_66(
+      ): Unit = {
     new Bug66B("", "")
   }
 
-  @Test def should_not_swallow_Unit_expressions_when_converting_to_js_Any_issue_83(): Unit = {
+  @Test
+  def should_not_swallow_Unit_expressions_when_converting_to_js_Any_issue_83(
+      ): Unit = {
     var effectHappened = false
     def doEffect(): Unit = effectHappened = true
     def f(): js.Any = doEffect()
@@ -68,19 +73,24 @@ class RegressionTest {
     assertTrue(effectHappened)
   }
 
-  @Test def should_correctly_call_subSequence_on_non_string_CharSequences_issue_55(): Unit = {
-    val arr: CharSequence = Array('a','b','c','d')
-    val ss = arr.subSequence(2,3)
+  @Test
+  def should_correctly_call_subSequence_on_non_string_CharSequences_issue_55(
+      ): Unit = {
+    val arr: CharSequence = Array('a', 'b', 'c', 'd')
+    val ss = arr.subSequence(2, 3)
     assertEquals(1, ss.length())
     assertEquals('c', ss.charAt(0))
   }
 
-  @Test def should_correctly_concat_primitive_values_to_strings_issue_113(): Unit = {
+  @Test
+  def should_correctly_concat_primitive_values_to_strings_issue_113(): Unit = {
     assertEquals("4foo", 4 + "foo")
     assertEquals("afoo", 'a' + "foo")
   }
 
-  @Test def should_resolve_overloads_on_scala_Function_apply_when_converting_to_js_Function_issue_125(): Unit = {
+  @Test
+  def should_resolve_overloads_on_scala_Function_apply_when_converting_to_js_Function_issue_125(
+      ): Unit = {
     class Fct extends Function1[Int, Any] {
       def apply(n: Int): Int = n
     }
@@ -90,7 +100,8 @@ class RegressionTest {
     val thisFunction: js.ThisFunction = scalaFunction
   }
 
-  @Test def should_correctly_dispatch_calls_on_private_functions_issue_165(): Unit = {
+  @Test
+  def should_correctly_dispatch_calls_on_private_functions_issue_165(): Unit = {
     class A {
       private def x: Int = 1
       def value: Int = x
@@ -101,7 +112,9 @@ class RegressionTest {
     assertEquals(1, new B().value)
   }
 
-  @Test def should_correctly_mangle_JavaScript_reserved_identifiers_issue_153(): Unit = {
+  @Test
+  def should_correctly_mangle_JavaScript_reserved_identifiers_issue_153(
+      ): Unit = {
     // scalastyle:off class.name
 
     // Class name
@@ -128,7 +141,9 @@ class RegressionTest {
     // scalastyle:on class.name
   }
 
-  @Test def should_correctly_mangle_identifiers_starting_with_a_digit_issue_153(): Unit = {
+  @Test
+  def should_correctly_mangle_identifiers_starting_with_a_digit_issue_153(
+      ): Unit = {
     // scalastyle:off class.name
 
     // Class name
@@ -162,9 +177,11 @@ class RegressionTest {
     assertEquals("hello", arguments)
   }
 
-  @Test def should_support_class_literals_for_existential_value_types_issue_218(): Unit = {
+  @Test
+  def should_support_class_literals_for_existential_value_types_issue_218(
+      ): Unit = {
     assertEquals("org.scalajs.testsuite.compiler.RegressionTest$Bug218Foo",
-        scala.reflect.classTag[Bug218Foo[_]].toString)
+                 scala.reflect.classTag[Bug218Foo[_]].toString)
   }
 
   @Test def should_support_Buffer_issue_268(): Unit = {
@@ -177,7 +194,9 @@ class RegressionTest {
     assertEquals("1, 3, 5, 7, 9, 10, 8, 6, 4, 2, 0", a.mkString(", "))
   }
 
-  @Test def should_not_call_equals_when_comparing_with_a_literal_null_issue_362(): Unit = {
+  @Test
+  def should_not_call_equals_when_comparing_with_a_literal_null_issue_362(
+      ): Unit = {
     // scalastyle:off equals.hash.code
     class A {
       override def equals(x: Any): Boolean = !(this == null)
@@ -239,7 +258,9 @@ class RegressionTest {
     assertEquals(null, ref)
   }
 
-  @Test def Param_defs_in_tailrec_methods_should_be_considered_mutable_issue_825(): Unit = {
+  @Test
+  def Param_defs_in_tailrec_methods_should_be_considered_mutable_issue_825(
+      ): Unit = {
     @tailrec
     def foo(x: Int, y: Int): Unit = {
       if (x < y) foo(y, x)
@@ -262,17 +283,24 @@ class RegressionTest {
     assertEquals(1, c)
   }
 
-  @Test def IR_checker_should_allow_Apply_Select_on_NullType_and_NothingType_issue_1123(): Unit = {
+  @Test
+  def IR_checker_should_allow_Apply_Select_on_NullType_and_NothingType_issue_1123(
+      ): Unit = {
     def giveMeANull(): Null = null
     assertThrows(classOf[Exception], (giveMeANull(): StringBuilder).append(5))
-    assertThrows(classOf[Exception], (giveMeANull(): scala.runtime.IntRef).elem)
+    assertThrows(
+        classOf[Exception], (giveMeANull(): scala.runtime.IntRef).elem)
 
     def giveMeANothing(): Nothing = sys.error("boom")
-    assertThrows(classOf[Exception], (giveMeANothing(): StringBuilder).append(5))
-    assertThrows(classOf[Exception], (giveMeANothing(): scala.runtime.IntRef).elem)
+    assertThrows(
+        classOf[Exception], (giveMeANothing(): StringBuilder).append(5))
+    assertThrows(
+        classOf[Exception], (giveMeANothing(): scala.runtime.IntRef).elem)
   }
 
-  @Test def should_not_put_bad_flags_on_caseaccessor_export_forwarders_issue_1191(): Unit = {
+  @Test
+  def should_not_put_bad_flags_on_caseaccessor_export_forwarders_issue_1191(
+      ): Unit = {
     // This test used to choke patmat
 
     @scala.scalajs.js.annotation.JSExportAll
@@ -284,7 +312,8 @@ class RegressionTest {
     assertEquals(2, b)
   }
 
-  @Test def should_properly_order_ctor_statements_when_inlining_issue_1369(): Unit = {
+  @Test
+  def should_properly_order_ctor_statements_when_inlining_issue_1369(): Unit = {
     trait Bar {
       def x: Int
       var y = x + 1
@@ -320,7 +349,9 @@ class RegressionTest {
     assertEquals(2, a.get)
   }
 
-  @Test def should_populate_desugar_environments_with_Closure_params_issue_1399(): Unit = {
+  @Test
+  def should_populate_desugar_environments_with_Closure_params_issue_1399(
+      ): Unit = {
     /* To query whether a field is mutable, the JSDesugar needs to first
      * unnest a statement block from an argument list, and then unnest the
      * parameter under test.
@@ -334,7 +365,8 @@ class RegressionTest {
       def concat(x: Any, y: Any): String = x.toString + y.toString
 
       @noinline
-      def fct: Function1[Any, String] = { (v: Any) => // parameter under test
+      def fct: Function1[Any, String] = { (v: Any) =>
+        // parameter under test
         /* Pass `v` as a first parameter, a true block as a second parameter.
          * Note that this only works after optimizations, because `v` is first
          * asInstanceOfd to Object and hence not the original `v` is used in
@@ -353,7 +385,9 @@ class RegressionTest {
     assertEquals("15", new Test().fct(1))
   }
 
-  @Test def should_support_debugger_statements_through_the_whole_pipeline_issue_1402(): Unit = {
+  @Test
+  def should_support_debugger_statements_through_the_whole_pipeline_issue_1402(
+      ): Unit = {
     // A function that hopfully persuades the optimizer not to optimize
     // we need a debugger statement that is unreachable, but not eliminated
     @noinline
@@ -376,11 +410,12 @@ class RegressionTest {
       }
     }
 
-    if (new A().plus(5, 10) < 3)
-      js.debugger()
+    if (new A().plus(5, 10) < 3) js.debugger()
   }
 
-  @Test def should_not_cause_Closure_to_crash_with_Unexpected_variable_NaN_issue_1469(): Unit = {
+  @Test
+  def should_not_cause_Closure_to_crash_with_Unexpected_variable_NaN_issue_1469(
+      ): Unit = {
     /* Basically we want to make sure that a specialized bridge of Function1
      * taking and returning Double is emitted (and not dce'ed) for this
      * class F, which actually returns Unit.
@@ -428,7 +463,9 @@ class RegressionTest {
     assertEquals(5, x)
   }
 
-  @Test def switch_match_with_a_guard_and_a_result_type_of_BoxedUnit_issue_1955(): Unit = {
+  @Test
+  def switch_match_with_a_guard_and_a_result_type_of_BoxedUnit_issue_1955(
+      ): Unit = {
     val bug = new Bug1955
     bug.bug(2, true)
     assertEquals(0, bug.result)
@@ -447,7 +484,6 @@ class RegressionTest {
     val f = (`a-b`: Int) => `a-b` + 1
     assertEquals(6, f(5))
   }
-
 }
 
 object RegressionTest {

@@ -4,5 +4,4 @@ class LambdaLift {
     def innerMethod(x: Int): Int = x + capturedArg
     val f = (y: Int) => innerMethod(y)
   }
-
 }

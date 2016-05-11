@@ -1,10 +1,10 @@
 object Magic {
-  abstract class O[X,Y] {
+  abstract class O[X, Y] {
     type T >: X <: Y;
     class I { def magic(v: T): T = v; }
   }
-  def magic[X,Y](v: X): Y = {
-    val o: O[X,Y] = null;
+  def magic[X, Y](v: X): Y = {
+    val o: O[X, Y] = null;
     val i: o.I = new o.I();
     i.magic(v);
   }

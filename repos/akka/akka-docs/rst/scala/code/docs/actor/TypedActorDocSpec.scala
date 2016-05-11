@@ -1,19 +1,19 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.actor
 
-import java.lang.String.{ valueOf => println }
+import java.lang.String.{valueOf => println}
 
-import akka.actor.{ ActorContext, ActorRef, TypedActor, TypedProps }
+import akka.actor.{ActorContext, ActorRef, TypedActor, TypedProps}
 import akka.routing.RoundRobinGroup
 import akka.testkit._
 
-import scala.concurrent.{ Future, Await }
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 
 //Mr funny man avoids printing to stdout AND keeping docs alright
-import java.lang.String.{ valueOf => println }
+import java.lang.String.{valueOf => println}
 import akka.actor.ActorRef
 
 //#typed-actor-iface
@@ -120,9 +120,8 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
       TypedActor(system).typedActorOf(TypedProps[SquarerImpl]())
     //#typed-actor-create1
     //#typed-actor-create2
-    val otherSquarer: Squarer =
-      TypedActor(system).typedActorOf(TypedProps(classOf[Squarer],
-        new SquarerImpl("foo")), "name")
+    val otherSquarer: Squarer = TypedActor(system).typedActorOf(
+        TypedProps(classOf[Squarer], new SquarerImpl("foo")), "name")
     //#typed-actor-create2
 
     //#typed-actor-calls
@@ -161,11 +160,8 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
   "proxy any ActorRef" in {
     val actorRefToRemoteActor: ActorRef = system.deadLetters
     //#typed-actor-remote
-    val typedActor: Foo with Bar =
-      TypedActor(system).
-        typedActorOf(
-          TypedProps[FooBar],
-          actorRefToRemoteActor)
+    val typedActor: Foo with Bar = TypedActor(system).typedActorOf(
+        TypedProps[FooBar], actorRefToRemoteActor)
     //Use "typedActor" as a FooBar
     //#typed-actor-remote
   }
@@ -198,13 +194,15 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
 
   "typed router pattern" in {
     //#typed-router
-    def namedActor(): HasName = TypedActor(system).typedActorOf(TypedProps[Named]())
+    def namedActor(): HasName =
+      TypedActor(system).typedActorOf(TypedProps[Named]())
 
     // prepare routees
     val routees: List[HasName] = List.fill(5) { namedActor() }
-    val routeePaths = routees map { r =>
-      TypedActor(system).getActorRefFor(r).path.toStringWithoutAddress
-    }
+    val routeePaths =
+      routees map { r =>
+        TypedActor(system).getActorRefFor(r).path.toStringWithoutAddress
+      }
 
     // prepare untyped router
     val router: ActorRef = system.actorOf(RoundRobinGroup(routeePaths).props())

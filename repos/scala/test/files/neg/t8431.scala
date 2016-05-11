@@ -1,19 +1,18 @@
 trait Covariant[+A]
-trait Invariant[A] extends Covariant[A @annotation.unchecked.uncheckedVariance] 
- 
+trait Invariant[A] extends Covariant[A @annotation.unchecked.uncheckedVariance]
+
 trait Combinable[G] {
   def combined = 0
 }
 
 trait CanBuildFrom[+C]
- 
+
 object C {
-  implicit def convert1[G, TRAVONCE[+e] <: Covariant[e]]
-    (xs: TRAVONCE[G]): Combinable[G] = ???
- 
-  implicit def convert2[G, SET[e] <: Invariant[e]]
-    (xs: SET[_ <: G])
-    (implicit cbf: CanBuildFrom[SET[G]]): Combinable[G] = ???
+  implicit def convert1[G, TRAVONCE[+e] <: Covariant[e]](
+      xs: TRAVONCE[G]): Combinable[G] = ???
+
+  implicit def convert2[G, SET[e] <: Invariant[e]](xs: SET[_ <: G])(
+      implicit cbf: CanBuildFrom[SET[G]]): Combinable[G] = ???
 
   implicit def cbf[A]: CanBuildFrom[Invariant[A]] = ???
 }
@@ -35,7 +34,6 @@ class Test2 {
   s.combined // was okay!
 }
 
-
 class TestExplicit {
   import C.{cbf, convert2}
 
@@ -45,19 +43,19 @@ class TestExplicit {
   convert2(s).combined
 
   // Breaking this expression down doesn't make it work.
-  {val c1 = convert2(s); c1.combined}
+  { val c1 = convert2(s); c1.combined }
 }
 
 // These ones work before and after; inferring G=Null doesn't need to contribute an undetermined type param.
 class Test3 {
-   import C.{cbf, convert1, convert2}
-   val s: Invariant[Null] = ???
-   s.combined // okay
+  import C.{cbf, convert1, convert2}
+  val s: Invariant[Null] = ???
+  s.combined // okay
 }
 
 class Test4 {
-   import C.{cbf, convert2, convert1}
+  import C.{cbf, convert2, convert1}
 
-   val s: Invariant[Null] = ???
-   s.combined // okay
+  val s: Invariant[Null] = ???
+  s.combined // okay
 }

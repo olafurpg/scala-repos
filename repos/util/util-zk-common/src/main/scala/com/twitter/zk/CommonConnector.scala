@@ -7,14 +7,13 @@ import com.twitter.conversions.common.quantity._
 import com.twitter.util.{Duration, FuturePool}
 
 /**
- * Adapts a common ZooKeeperClient for use as a Connector.
- * This connector blocks, but it doesn't seem worth a FuturePool only for this connector.
- */
+  * Adapts a common ZooKeeperClient for use as a Connector.
+  * This connector blocks, but it doesn't seem worth a FuturePool only for this connector.
+  */
 class CommonConnector(
-    val underlying: ZooKeeperClient,
-    timeout: Duration = COMMON_FOREVER)
-    (implicit pool: FuturePool)
-extends Connector {
+    val underlying: ZooKeeperClient, timeout: Duration = COMMON_FOREVER)(
+    implicit pool: FuturePool)
+    extends Connector {
   underlying.register(sessionBroker)
 
   def apply() = pool { underlying.get(timeout.toLongAmount) }
@@ -22,22 +21,22 @@ extends Connector {
 }
 
 object CommonConnector {
-  def apply(underlying: ZooKeeperClient,
-            connectTimeout: Duration = COMMON_FOREVER)
-           (implicit pool: FuturePool): CommonConnector = {
+  def apply(
+      underlying: ZooKeeperClient, connectTimeout: Duration = COMMON_FOREVER)(
+      implicit pool: FuturePool): CommonConnector = {
     new CommonConnector(underlying, connectTimeout)(pool)
   }
 
-  def apply(addrs: Seq[java.net.InetSocketAddress],
-            sessionTimeout: Duration)
-           (implicit pool: FuturePool): CommonConnector = {
+  def apply(addrs: Seq[java.net.InetSocketAddress], sessionTimeout: Duration)(
+      implicit pool: FuturePool): CommonConnector = {
     apply(new ZooKeeperClient(sessionTimeout.toIntAmount, addrs.asJava))(pool)
   }
 
   def apply(addrs: Seq[java.net.InetSocketAddress],
             sessionTimeout: Duration,
-            connectTimeout: Duration)
-           (implicit pool: FuturePool): CommonConnector = {
-    apply(new ZooKeeperClient(sessionTimeout.toIntAmount, addrs.asJava), connectTimeout)(pool)
+            connectTimeout: Duration)(
+      implicit pool: FuturePool): CommonConnector = {
+    apply(new ZooKeeperClient(sessionTimeout.toIntAmount, addrs.asJava),
+          connectTimeout)(pool)
   }
 }

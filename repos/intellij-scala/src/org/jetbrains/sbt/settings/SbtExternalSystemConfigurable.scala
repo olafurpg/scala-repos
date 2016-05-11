@@ -7,15 +7,19 @@ import org.jetbrains.sbt.project.settings.Context.Configuration
 import org.jetbrains.sbt.project.settings._
 
 /**
- * User: Dmitry Naydanov
- * Date: 11/25/13
- */
-class SbtExternalSystemConfigurable(project: Project) 
-  extends AbstractExternalSystemConfigurable[SbtProjectSettings, SbtProjectSettingsListener, SbtSystemSettings](project, SbtProjectSystem.Id) {
+  * User: Dmitry Naydanov
+  * Date: 11/25/13
+  */
+class SbtExternalSystemConfigurable(project: Project)
+    extends AbstractExternalSystemConfigurable[
+        SbtProjectSettings, SbtProjectSettingsListener, SbtSystemSettings](
+        project, SbtProjectSystem.Id) {
 
-  def createProjectSettingsControl(settings: SbtProjectSettings) = new SbtProjectSettingsControl(Configuration, settings)
+  def createProjectSettingsControl(settings: SbtProjectSettings) =
+    new SbtProjectSettingsControl(Configuration, settings)
 
-  def createSystemSettingsControl(settings: SbtSystemSettings) = new SbtSystemSettingsControl(settings)
+  def createSystemSettingsControl(settings: SbtSystemSettings) =
+    new SbtSystemSettingsControl(settings)
 
   def newProjectSettings() = new SbtProjectSettings()
 

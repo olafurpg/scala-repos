@@ -11,17 +11,20 @@ object test {
 
   {
     import Imp.a
-    /* resolved: true */a = A
+    /* resolved: true */
+    a = A
   }
 
   {
     import Imp.a_=
-    /*resolved: false */a = A
+    /*resolved: false */
+    a = A
   }
 
   {
     import Imp.a_=
     val a: Any = 0
-    /*resolved: true */a = A
+    /*resolved: true */
+    a = A
   }
 }

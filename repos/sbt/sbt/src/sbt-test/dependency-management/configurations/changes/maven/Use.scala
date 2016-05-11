@@ -1,4 +1,3 @@
-object UseMaven
-{
-	def y = PublishedMaven.x
+object UseMaven {
+  def y = PublishedMaven.x
 }

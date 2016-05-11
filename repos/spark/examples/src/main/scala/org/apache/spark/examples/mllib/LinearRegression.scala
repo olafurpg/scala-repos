@@ -27,13 +27,13 @@ import org.apache.spark.mllib.regression.LinearRegressionWithSGD
 import org.apache.spark.mllib.util.MLUtils
 
 /**
- * An example app for linear regression. Run with
- * {{{
- * bin/run-example org.apache.spark.examples.mllib.LinearRegression
- * }}}
- * A synthetic dataset can be found at `data/mllib/sample_linear_regression_data.txt`.
- * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
- */
+  * An example app for linear regression. Run with
+  * {{{
+  * bin/run-example org.apache.spark.examples.mllib.LinearRegression
+  * }}}
+  * A synthetic dataset can be found at `data/mllib/sample_linear_regression_data.txt`.
+  * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
+  */
 object LinearRegression {
 
   object RegType extends Enumeration {
@@ -43,12 +43,12 @@ object LinearRegression {
 
   import RegType._
 
-  case class Params(
-      input: String = null,
-      numIterations: Int = 100,
-      stepSize: Double = 1.0,
-      regType: RegType = L2,
-      regParam: Double = 0.01) extends AbstractParams[Params]
+  case class Params(input: String = null,
+                    numIterations: Int = 100,
+                    stepSize: Double = 1.0,
+                    regType: RegType = L2,
+                    regParam: Double = 0.01)
+      extends AbstractParams[Params]
 
   def main(args: Array[String]) {
     val defaultParams = Params()
@@ -63,7 +63,7 @@ object LinearRegression {
         .action((x, c) => c.copy(stepSize = x))
       opt[String]("regType")
         .text(s"regularization type (${RegType.values.mkString(",")}), " +
-        s"default: ${defaultParams.regType}")
+            s"default: ${defaultParams.regType}")
         .action((x, c) => c.copy(regType = RegType.withName(x)))
       opt[Double]("regParam")
         .text(s"regularization parameter, default: ${defaultParams.regParam}")
@@ -71,8 +71,7 @@ object LinearRegression {
         .required()
         .text("input paths to labeled examples in LIBSVM format")
         .action((x, c) => c.copy(input = x))
-      note(
-        """
+      note("""
           |For example, the following command runs this app on a synthetic dataset:
           |
           | bin/spark-submit --class org.apache.spark.examples.mllib.LinearRegression \
@@ -124,9 +123,10 @@ object LinearRegression {
     val prediction = model.predict(test.map(_.features))
     val predictionAndLabel = prediction.zip(test.map(_.label))
 
-    val loss = predictionAndLabel.map { case (p, l) =>
-      val err = p - l
-      err * err
+    val loss = predictionAndLabel.map {
+      case (p, l) =>
+        val err = p - l
+        err * err
     }.reduce(_ + _)
     val rmse = math.sqrt(loss / numTest)
 

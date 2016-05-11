@@ -3,11 +3,12 @@ package org.jetbrains.plugins.scala.lang.completion3
 import com.intellij.codeInsight.completion.CompletionType
 
 /**
- * @author Alefas
- * @since 23.03.12
- */
-
-class ScalaCompletionOrderTest extends ScalaCompletionSortingTestCase(CompletionType.BASIC, "/completion3/order/") {
+  * @author Alefas
+  * @since 23.03.12
+  */
+class ScalaCompletionOrderTest
+    extends ScalaCompletionSortingTestCase(
+        CompletionType.BASIC, "/completion3/order/") {
   def testCaseClasuseParamAsLocal(): Unit = {
     checkPreferredItems(0, "retparam", "retField")
   }

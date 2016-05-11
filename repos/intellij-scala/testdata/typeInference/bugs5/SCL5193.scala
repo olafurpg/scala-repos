@@ -11,6 +11,6 @@ object M {
   }
   import A._
 
-  val s: (String, T) = /*start*/f/*end*/
+  val s: (String, T) = /*start*/ f /*end*/
 }
 //(String, M.T)

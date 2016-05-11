@@ -14,24 +14,25 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base._
 
 /**
-* @author ilyas
-*/
-
+  * @author ilyas
+  */
 trait ScModifierListOwner extends ScalaPsiElement with PsiModifierListOwner {
   override def getModifierList: ScModifierList = {
     this match {
       case st: ScalaStubBasedElementImpl[_] =>
         val stub: StubElement[_ <: PsiElement] = st.getStub
         if (stub != null) {
-          val array = stub.getChildrenByType(ScalaElementTypes.MODIFIERS, JavaArrayFactoryUtil.ScModifierListFactory)
+          val array = stub.getChildrenByType(
+              ScalaElementTypes.MODIFIERS,
+              JavaArrayFactoryUtil.ScModifierListFactory)
           if (array.isEmpty) {
             val faultyContainer: VirtualFile = PsiUtilCore.getVirtualFile(this)
             if (faultyContainer != null && faultyContainer.isValid) {
               FileBasedIndex.getInstance.requestReindex(faultyContainer)
             }
-            throw new Throwable("Stub hasn't ScModifierList child: " + faultyContainer)
-          }
-          else return array.apply(0)
+            throw new Throwable(
+                "Stub hasn't ScModifierList child: " + faultyContainer)
+          } else return array.apply(0)
         }
       case _ =>
     }
@@ -44,7 +45,8 @@ trait ScModifierListOwner extends ScalaPsiElement with PsiModifierListOwner {
 
   def hasModifierPropertyScala(name: String): Boolean = {
     if (name == PsiModifier.PUBLIC) {
-      return !hasModifierPropertyScala("private") && !hasModifierPropertyScala("protected")
+      return !hasModifierPropertyScala("private") &&
+      !hasModifierPropertyScala("protected")
     }
     hasModifierPropertyInner(name)
   }
@@ -66,7 +68,8 @@ trait ScModifierListOwner extends ScalaPsiElement with PsiModifierListOwner {
         }
       case _ =>
     }
-    if (getModifierList != null) getModifierList.hasModifierProperty(name: String)
+    if (getModifierList != null)
+      getModifierList.hasModifierProperty(name: String)
     else false
   }
 

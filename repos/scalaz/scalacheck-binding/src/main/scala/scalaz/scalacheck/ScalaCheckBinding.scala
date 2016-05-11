@@ -2,16 +2,18 @@ package scalaz
 package scalacheck
 
 /**
- * Type class instances for types from [[https://github.com/rickynils/scalacheck Scalacheck]]
- */
+  * Type class instances for types from [[https://github.com/rickynils/scalacheck Scalacheck]]
+  */
 object ScalaCheckBinding {
   import org.scalacheck.{Gen, Arbitrary, Shrink}
   import Gen.{sized, const}
 
   implicit val ArbitraryMonad: Monad[Arbitrary] = new Monad[Arbitrary] {
-    def bind[A, B](fa: Arbitrary[A])(f: A => Arbitrary[B]) = Arbitrary(fa.arbitrary.flatMap(f(_).arbitrary))
+    def bind[A, B](fa: Arbitrary[A])(f: A => Arbitrary[B]) =
+      Arbitrary(fa.arbitrary.flatMap(f(_).arbitrary))
     def point[A](a: => A) = Arbitrary(sized(_ => const(a)))
-    override def map[A, B](fa: Arbitrary[A])(f: A => B) = Arbitrary(fa.arbitrary.map(f))
+    override def map[A, B](fa: Arbitrary[A])(f: A => B) =
+      Arbitrary(fa.arbitrary.map(f))
   }
 
   implicit val GenMonad: Monad[Gen] = new Monad[Gen] {
@@ -23,7 +25,9 @@ object ScalaCheckBinding {
   implicit val ShrinkFunctor: InvariantFunctor[Shrink] =
     new InvariantFunctor[Shrink] {
       def xmap[A, B](ma: Shrink[A], f: A => B, g: B => A): Shrink[B] =
-        Shrink{b => ma shrink g(b) map f}
+        Shrink { b =>
+          ma shrink g(b) map f
+        }
     }
 }
 

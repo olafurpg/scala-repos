@@ -7,7 +7,7 @@ object A {
 
   import R._
   import C.D
-  val x : D = new D
+  val x: D = new D
 }
 /*
 object A {
@@ -21,4 +21,4 @@ object A {
   import C.D
   val x : D = new D
 }
-*/
+ */

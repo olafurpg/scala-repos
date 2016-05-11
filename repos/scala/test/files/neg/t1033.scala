@@ -1,5 +1,5 @@
 object A {
-  def f :Int = {
+  def f: Int = {
     class B {
       println("B")
       return 10

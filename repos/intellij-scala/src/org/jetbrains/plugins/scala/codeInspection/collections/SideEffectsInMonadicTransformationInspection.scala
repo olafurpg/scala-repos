@@ -5,17 +5,23 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 
 /**
- * @author Nikolay.Tropin
- */
-class SideEffectsInMonadicTransformationInspection extends OperationOnCollectionInspection {
+  * @author Nikolay.Tropin
+  */
+class SideEffectsInMonadicTransformationInspection
+    extends OperationOnCollectionInspection {
 
-  override def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
-    case qual`.monadicMethod`(arg) =>
+  override def actionFor(
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+    case qual `.monadicMethod` (arg) =>
       exprsWithSideEffects(arg).foreach {
-        case expr => holder.registerProblem(expr, InspectionBundle.message("side.effects.in.monadic"), highlightType)
+        case expr =>
+          holder.registerProblem(
+              expr,
+              InspectionBundle.message("side.effects.in.monadic"),
+              highlightType)
       }
   }
 
-
-  override def possibleSimplificationTypes: Array[SimplificationType] = Array.empty
+  override def possibleSimplificationTypes: Array[SimplificationType] =
+    Array.empty
 }

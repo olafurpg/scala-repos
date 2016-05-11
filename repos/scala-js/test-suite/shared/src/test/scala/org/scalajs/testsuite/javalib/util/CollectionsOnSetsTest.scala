@@ -10,8 +10,8 @@ import scala.reflect.ClassTag
 trait CollectionsOnSetsTest extends CollectionsOnCollectionsTest {
   def factory: SetFactory
 
-  @Test def unmodifiableSet():Unit = {
-    def test[E: ClassTag](toElem: Int => E): Unit = {
+  @Test def unmodifiableSet(): Unit = {
+    def test[E : ClassTag](toElem: Int => E): Unit = {
       val set = factory.empty[E]
       testSetUnmodifiability(ju.Collections.unmodifiableSet(set), toElem(0))
       set.addAll(range.map(toElem))
@@ -28,14 +28,14 @@ trait CollectionsOnSetsTest extends CollectionsOnCollectionsTest {
 trait CollectionsOnSortedSetsTest extends CollectionsOnSetsTest {
   def factory: SortedSetFactory
 
-  @Test def unmodifiableSortedSet():Unit = {
-    def test[E: ClassTag](toElem: Int => E): Unit = {
+  @Test def unmodifiableSortedSet(): Unit = {
+    def test[E : ClassTag](toElem: Int => E): Unit = {
       val sortedSet = factory.empty[E]
-      testSortedSetUnmodifiability(ju.Collections.unmodifiableSortedSet(sortedSet),
-        toElem(0))
+      testSortedSetUnmodifiability(
+          ju.Collections.unmodifiableSortedSet(sortedSet), toElem(0))
       sortedSet.addAll(range.map(toElem))
-      testSortedSetUnmodifiability(ju.Collections.unmodifiableSortedSet(sortedSet),
-        toElem(0))
+      testSortedSetUnmodifiability(
+          ju.Collections.unmodifiableSortedSet(sortedSet), toElem(0))
     }
 
     test[jl.Integer](_.toInt)

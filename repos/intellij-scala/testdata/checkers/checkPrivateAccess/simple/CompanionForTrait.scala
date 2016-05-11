@@ -1,6 +1,6 @@
 object CompanionForTrait {
   trait A {
-    A./*ref*/x
+    A. /*ref*/ x
   }
   object A {
     private val x = 34

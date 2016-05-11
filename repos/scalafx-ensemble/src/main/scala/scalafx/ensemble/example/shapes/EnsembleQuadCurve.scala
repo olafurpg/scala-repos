@@ -37,28 +37,26 @@ class EnsembleQuadCurve extends EnsembleExample {
   def getContent = new VBox {
     spacing = 20
     padding = Insets(20)
-    children = List(
-      new QuadCurve {
-        controlX = 50
-        controlY = 10
-        startX = 0
-        startY = 45
-        endX = 180
-        endY = 45
-        stroke = Color.Red
-        fill = Color.RosyBrown
-        strokeWidth = 2d
-      },
-      new QuadCurve {
-        controlX = 150
-        controlY = 100
-        startX = 35
-        startY = 145
-        endX = 210
-        endY = 145
-        stroke = Color.Blue
-        fill = Color.White
-        strokeWidth = 2d
-      })
+    children = List(new QuadCurve {
+      controlX = 50
+      controlY = 10
+      startX = 0
+      startY = 45
+      endX = 180
+      endY = 45
+      stroke = Color.Red
+      fill = Color.RosyBrown
+      strokeWidth = 2d
+    }, new QuadCurve {
+      controlX = 150
+      controlY = 100
+      startX = 35
+      startY = 145
+      endX = 210
+      endY = 145
+      stroke = Color.Blue
+      fill = Color.White
+      strokeWidth = 2d
+    })
   }
 }

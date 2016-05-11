@@ -69,12 +69,14 @@ class SizeTrackerSuite extends SparkFunSuite {
     testMap[String, Int](10000, i => (randString(0, 10000), i))
   }
 
-  def testVector[T: ClassTag](numElements: Int, makeElement: Int => T) {
+  def testVector[T : ClassTag](numElements: Int, makeElement: Int => T) {
     val vector = new SizeTrackingVector[T]
     for (i <- 0 until numElements) {
       val item = makeElement(i)
       vector += item
-      expectWithinError(vector, vector.estimateSize(), if (i < 32) HIGH_ERROR else NORMAL_ERROR)
+      expectWithinError(vector,
+                        vector.estimateSize(),
+                        if (i < 32) HIGH_ERROR else NORMAL_ERROR)
     }
   }
 
@@ -83,24 +85,27 @@ class SizeTrackerSuite extends SparkFunSuite {
     for (i <- 0 until numElements) {
       val (k, v) = makeElement(i)
       map(k) = v
-      expectWithinError(map, map.estimateSize(), if (i < 32) HIGH_ERROR else NORMAL_ERROR)
+      expectWithinError(
+          map, map.estimateSize(), if (i < 32) HIGH_ERROR else NORMAL_ERROR)
     }
   }
 
   def expectWithinError(obj: AnyRef, estimatedSize: Long, error: Double) {
     val betterEstimatedSize = SizeEstimator.estimate(obj)
-    assert(betterEstimatedSize * (1 - error) < estimatedSize,
-      s"Estimated size $estimatedSize was less than expected size $betterEstimatedSize")
-    assert(betterEstimatedSize * (1 + 2 * error) > estimatedSize,
-      s"Estimated size $estimatedSize was greater than expected size $betterEstimatedSize")
+    assert(
+        betterEstimatedSize * (1 - error) < estimatedSize,
+        s"Estimated size $estimatedSize was less than expected size $betterEstimatedSize")
+    assert(
+        betterEstimatedSize * (1 + 2 * error) > estimatedSize,
+        s"Estimated size $estimatedSize was greater than expected size $betterEstimatedSize")
   }
 }
 
 private object SizeTrackerSuite {
 
   /**
-   * Run speed tests for size tracking collections.
-   */
+    * Run speed tests for size tracking collections.
+    */
   def main(args: Array[String]): Unit = {
     if (args.size < 1) {
       // scalastyle:off println
@@ -114,74 +119,81 @@ private object SizeTrackerSuite {
   }
 
   /**
-   * Speed test for SizeTrackingVector.
-   *
-   * Results for 100000 elements (possibly non-deterministic):
-   *   PrimitiveVector  15 ms
-   *   SizeTracker      51 ms
-   *   SizeEstimator    2000 ms
-   */
+    * Speed test for SizeTrackingVector.
+    *
+    * Results for 100000 elements (possibly non-deterministic):
+    *   PrimitiveVector  15 ms
+    *   SizeTracker      51 ms
+    *   SizeEstimator    2000 ms
+    */
   def vectorSpeedTest(numElements: Int): Unit = {
-    val baseTimes = for (i <- 0 until 10) yield time {
-      val vector = new PrimitiveVector[LargeDummyClass]
-      for (i <- 0 until numElements) {
-        vector += new LargeDummyClass
+    val baseTimes = for (i <- 0 until 10) yield
+      time {
+        val vector = new PrimitiveVector[LargeDummyClass]
+        for (i <- 0 until numElements) {
+          vector += new LargeDummyClass
+        }
       }
-    }
-    val sampledTimes = for (i <- 0 until 10) yield time {
-      val vector = new SizeTrackingVector[LargeDummyClass]
-      for (i <- 0 until numElements) {
-        vector += new LargeDummyClass
-        vector.estimateSize()
+    val sampledTimes = for (i <- 0 until 10) yield
+      time {
+        val vector = new SizeTrackingVector[LargeDummyClass]
+        for (i <- 0 until numElements) {
+          vector += new LargeDummyClass
+          vector.estimateSize()
+        }
       }
-    }
-    val unsampledTimes = for (i <- 0 until 3) yield time {
-      val vector = new PrimitiveVector[LargeDummyClass]
-      for (i <- 0 until numElements) {
-        vector += new LargeDummyClass
-        SizeEstimator.estimate(vector)
+    val unsampledTimes = for (i <- 0 until 3) yield
+      time {
+        val vector = new PrimitiveVector[LargeDummyClass]
+        for (i <- 0 until numElements) {
+          vector += new LargeDummyClass
+          SizeEstimator.estimate(vector)
+        }
       }
-    }
-    printSpeedTestResult("SizeTrackingVector", baseTimes, sampledTimes, unsampledTimes)
+    printSpeedTestResult(
+        "SizeTrackingVector", baseTimes, sampledTimes, unsampledTimes)
   }
 
   /**
-   * Speed test for SizeTrackingAppendOnlyMap.
-   *
-   * Results for 100000 elements (possibly non-deterministic):
-   *   AppendOnlyMap  30 ms
-   *   SizeTracker    41 ms
-   *   SizeEstimator  1666 ms
-   */
+    * Speed test for SizeTrackingAppendOnlyMap.
+    *
+    * Results for 100000 elements (possibly non-deterministic):
+    *   AppendOnlyMap  30 ms
+    *   SizeTracker    41 ms
+    *   SizeEstimator  1666 ms
+    */
   def mapSpeedTest(numElements: Int): Unit = {
-    val baseTimes = for (i <- 0 until 10) yield time {
-      val map = new AppendOnlyMap[Int, LargeDummyClass]
-      for (i <- 0 until numElements) {
-        map(i) = new LargeDummyClass
+    val baseTimes = for (i <- 0 until 10) yield
+      time {
+        val map = new AppendOnlyMap[Int, LargeDummyClass]
+        for (i <- 0 until numElements) {
+          map(i) = new LargeDummyClass
+        }
       }
-    }
-    val sampledTimes = for (i <- 0 until 10) yield time {
-      val map = new SizeTrackingAppendOnlyMap[Int, LargeDummyClass]
-      for (i <- 0 until numElements) {
-        map(i) = new LargeDummyClass
-        map.estimateSize()
+    val sampledTimes = for (i <- 0 until 10) yield
+      time {
+        val map = new SizeTrackingAppendOnlyMap[Int, LargeDummyClass]
+        for (i <- 0 until numElements) {
+          map(i) = new LargeDummyClass
+          map.estimateSize()
+        }
       }
-    }
-    val unsampledTimes = for (i <- 0 until 3) yield time {
-      val map = new AppendOnlyMap[Int, LargeDummyClass]
-      for (i <- 0 until numElements) {
-        map(i) = new LargeDummyClass
-        SizeEstimator.estimate(map)
+    val unsampledTimes = for (i <- 0 until 3) yield
+      time {
+        val map = new AppendOnlyMap[Int, LargeDummyClass]
+        for (i <- 0 until numElements) {
+          map(i) = new LargeDummyClass
+          SizeEstimator.estimate(map)
+        }
       }
-    }
-    printSpeedTestResult("SizeTrackingAppendOnlyMap", baseTimes, sampledTimes, unsampledTimes)
+    printSpeedTestResult(
+        "SizeTrackingAppendOnlyMap", baseTimes, sampledTimes, unsampledTimes)
   }
 
-  def printSpeedTestResult(
-      testName: String,
-      baseTimes: Seq[Long],
-      sampledTimes: Seq[Long],
-      unsampledTimes: Seq[Long]): Unit = {
+  def printSpeedTestResult(testName: String,
+                           baseTimes: Seq[Long],
+                           sampledTimes: Seq[Long],
+                           unsampledTimes: Seq[Long]): Unit = {
     // scalastyle:off println
     println(s"Average times for $testName (ms):")
     println("  Base - " + averageTime(baseTimes))

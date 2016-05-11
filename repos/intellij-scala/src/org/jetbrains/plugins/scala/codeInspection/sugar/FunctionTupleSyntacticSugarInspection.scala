@@ -17,8 +17,10 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
 
   override def getID: String = "ScalaSyntacticSugar"
 
-  override def buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
-    if (!holder.getFile.isInstanceOf[ScalaFile]) return new PsiElementVisitor {}
+  override def buildVisitor(
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+    if (!holder.getFile.isInstanceOf[ScalaFile])
+      return new PsiElementVisitor {}
 
     object QualifiedName {
       def unapply(p: PsiElement): Option[String] = p match {
@@ -37,15 +39,29 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
               case s: ScSimpleTypeElement =>
                 s.reference match {
                   case Some(ref) =>
-                    if (ref.refName.startsWith("Tuple") || ref.refName.startsWith("Function") && ref.isValid) {
+                    if (ref.refName.startsWith("Tuple") ||
+                        ref.refName.startsWith("Function") && ref.isValid) {
                       val referredElement = ref.bind().map(_.getElement)
                       referredElement match {
-                        case Some(QualifiedName(FunctionN(n))) if te.typeArgList.typeArgs.length == (n.toInt + 1) =>
-                          holder.registerProblem(holder.getManager.createProblemDescriptor(te, "syntactic sugar could be used",
-                            new FunctionTypeSyntacticSugarQuickFix(te), ProblemHighlightType.WEAK_WARNING, false))
-                        case Some(QualifiedName(TupleN(n))) if (te.typeArgList.typeArgs.length == n.toInt) && n.toInt != 1 =>
-                          holder.registerProblem(holder.getManager.createProblemDescriptor(te, "syntactic sugar could be used",
-                            new TupleTypeSyntacticSugarQuickFix(te), ProblemHighlightType.WEAK_WARNING, false))
+                        case Some(QualifiedName(FunctionN(n)))
+                            if te.typeArgList.typeArgs.length == (n.toInt + 1) =>
+                          holder.registerProblem(
+                              holder.getManager.createProblemDescriptor(
+                                  te,
+                                  "syntactic sugar could be used",
+                                  new FunctionTypeSyntacticSugarQuickFix(te),
+                                  ProblemHighlightType.WEAK_WARNING,
+                                  false))
+                        case Some(QualifiedName(TupleN(n)))
+                            if (te.typeArgList.typeArgs.length == n.toInt) &&
+                            n.toInt != 1 =>
+                          holder.registerProblem(
+                              holder.getManager.createProblemDescriptor(
+                                  te,
+                                  "syntactic sugar could be used",
+                                  new TupleTypeSyntacticSugarQuickFix(te),
+                                  ProblemHighlightType.WEAK_WARNING,
+                                  false))
                         case _ =>
                       }
                     }
@@ -64,32 +80,39 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
 object FunctionTupleSyntacticSugarInspection {
   val FunctionN = """scala.Function(\d)""".r
   val TupleN = """scala.Tuple(\d)""".r
-  
+
   import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory._
 
   class TupleTypeSyntacticSugarQuickFix(te: ScParameterizedTypeElement)
-          extends AbstractFixOnPsiElement(ScalaBundle.message("replace.tuple.type"), te) {
+      extends AbstractFixOnPsiElement(
+          ScalaBundle.message("replace.tuple.type"), te) {
     def doApplyFix(project: Project): Unit = {
       val typeElement = getElement
 
       val typeTextWithParens = {
         val needParens = typeElement.getContext match {
-          case ft: ScFunctionalTypeElement => true // (Tuple2[A, B]) => B  ==>> ((A, B)) => C
+          case ft: ScFunctionalTypeElement =>
+            true // (Tuple2[A, B]) => B  ==>> ((A, B)) => C
           case _ => false
         }
-        ("(" + typeElement.typeArgList.getText.drop(1).dropRight(1) + ")").parenthesisedIf(needParens)
+        ("(" + typeElement.typeArgList.getText.drop(1).dropRight(1) + ")")
+          .parenthesisedIf(needParens)
       }
-      typeElement.replace(createTypeElementFromText(typeTextWithParens, typeElement.getManager))
+      typeElement.replace(createTypeElementFromText(
+              typeTextWithParens, typeElement.getManager))
     }
   }
 
   class FunctionTypeSyntacticSugarQuickFix(te: ScParameterizedTypeElement)
-          extends AbstractFixOnPsiElement(ScalaBundle.message("replace.fun.type"), te) {
+      extends AbstractFixOnPsiElement(
+          ScalaBundle.message("replace.fun.type"), te) {
     def doApplyFix(project: Project): Unit = {
       val typeElement = getElement
       val paramTypes = typeElement.typeArgList.typeArgs.dropRight(1)
       val returnType = typeElement.typeArgList.typeArgs.last
-      val elemsInParamTypes = if (paramTypes.isEmpty) Seq.empty else ScalaPsiUtil.getElementsRange(paramTypes.head, paramTypes.last)
+      val elemsInParamTypes =
+        if (paramTypes.isEmpty) Seq.empty
+        else ScalaPsiUtil.getElementsRange(paramTypes.head, paramTypes.last)
 
       val returnTypeTextWithParens = {
         val returnTypeNeedParens = returnType match {
@@ -107,9 +130,11 @@ object FunctionTupleSyntacticSugarInspection {
           case _ => false
         }
         val arrow = ScalaPsiUtil.functionArrow(project)
-        s"(${elemsInParamTypes.map(_.getText).mkString}) $arrow $returnTypeTextWithParens".parenthesisedIf(needParens)
+        s"(${elemsInParamTypes.map(_.getText).mkString}) $arrow $returnTypeTextWithParens"
+          .parenthesisedIf(needParens)
       }
-      typeElement.replace(createTypeElementFromText(typeTextWithParens, typeElement.getManager))
+      typeElement.replace(createTypeElementFromText(
+              typeTextWithParens, typeElement.getManager))
     }
   }
 }
@@ -135,4 +160,4 @@ object sugar {
   type a6 = ((Int) => (() => Int)) <:< ((Int) => Int)
   type a7 = (() => Int) <:< ((Int) => Int)
 }
-*/
+ */

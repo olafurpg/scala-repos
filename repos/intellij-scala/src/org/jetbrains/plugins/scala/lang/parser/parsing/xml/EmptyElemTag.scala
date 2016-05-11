@@ -9,10 +9,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 18.04.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 18.04.2008
+  */
 /*
  * EmptyElemTag ::= '<' Name {Attribute} [S]'/>'
  */
@@ -33,7 +32,8 @@ object EmptyElemTag {
       case _ => builder error ErrMsg("xml.name.expected")
     }
     while (Attribute.parse(builder)) {}
-    builder.getTokenType match { //looks like this code became obsolete long ago
+    builder.getTokenType match {
+      //looks like this code became obsolete long ago
       case XmlTokenType.XML_WHITE_SPACE => builder.advanceLexer()
       case _ =>
     }

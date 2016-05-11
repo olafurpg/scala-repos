@@ -1,6 +1,6 @@
 package mesosphere.marathon.plugin.auth
 
-import mesosphere.marathon.plugin.{ Group, AppDefinition }
+import mesosphere.marathon.plugin.{Group, AppDefinition}
 
 /**
   * Base trait for all actions in the system.

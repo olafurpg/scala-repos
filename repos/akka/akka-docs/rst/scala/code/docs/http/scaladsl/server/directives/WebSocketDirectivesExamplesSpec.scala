@@ -9,10 +9,10 @@ import scala.concurrent.duration._
 import akka.util.ByteString
 
 import akka.stream.OverflowStrategy
-import akka.stream.scaladsl.{ Sink, Source, Flow }
+import akka.stream.scaladsl.{Sink, Source, Flow}
 
 import docs.http.scaladsl.server.RoutingSpec
-import akka.http.scaladsl.model.ws.{ TextMessage, Message, BinaryMessage }
+import akka.http.scaladsl.model.ws.{TextMessage, Message, BinaryMessage}
 import akka.http.scaladsl.testkit.WSProbe
 
 class WebSocketDirectivesExamplesSpec extends RoutingSpec {
@@ -20,47 +20,47 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
     def greeter: Flow[Message, Message, Any] =
       Flow[Message].mapConcat {
         case tm: TextMessage ⇒
-          TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source.single("!")) :: Nil
+          TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source
+                .single("!")) :: Nil
         case bm: BinaryMessage ⇒
           // ignore binary messages but drain content to avoid the stream being clogged
           bm.dataStream.runWith(Sink.ignore)
           Nil
       }
-    val websocketRoute =
-      path("greeter") {
-        handleWebSocketMessages(greeter)
-      }
+    val websocketRoute = path("greeter") {
+      handleWebSocketMessages(greeter)
+    }
 
     // tests:
     // create a testing probe representing the client-side
     val wsClient = WSProbe()
 
     // WS creates a WebSocket request for testing
-    WS("/greeter", wsClient.flow) ~> websocketRoute ~>
-      check {
-        // check response for WS Upgrade headers
-        isWebSocketUpgrade shouldEqual true
+    WS("/greeter", wsClient.flow) ~> websocketRoute ~> check {
+      // check response for WS Upgrade headers
+      isWebSocketUpgrade shouldEqual true
 
-        // manually run a WS conversation
-        wsClient.sendMessage("Peter")
-        wsClient.expectMessage("Hello Peter!")
+      // manually run a WS conversation
+      wsClient.sendMessage("Peter")
+      wsClient.expectMessage("Hello Peter!")
 
-        wsClient.sendMessage(BinaryMessage(ByteString("abcdef")))
-        wsClient.expectNoMessage(100.millis)
+      wsClient.sendMessage(BinaryMessage(ByteString("abcdef")))
+      wsClient.expectNoMessage(100.millis)
 
-        wsClient.sendMessage("John")
-        wsClient.expectMessage("Hello John!")
+      wsClient.sendMessage("John")
+      wsClient.expectMessage("Hello John!")
 
-        wsClient.sendCompletion()
-        wsClient.expectCompletion()
-      }
+      wsClient.sendCompletion()
+      wsClient.expectCompletion()
+    }
   }
 
   "handle-multiple-protocols" in {
     def greeterService: Flow[Message, Message, Any] =
       Flow[Message].mapConcat {
         case tm: TextMessage ⇒
-          TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source.single("!")) :: Nil
+          TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source
+                .single("!")) :: Nil
         case bm: BinaryMessage ⇒
           // ignore binary messages but drain content to avoid the stream being clogged
           bm.dataStream.runWith(Sink.ignore)
@@ -69,37 +69,35 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
 
     def echoService: Flow[Message, Message, Any] =
       Flow[Message]
-        // needed because a noop flow hasn't any buffer that would start processing in tests
+      // needed because a noop flow hasn't any buffer that would start processing in tests
         .buffer(1, OverflowStrategy.backpressure)
 
     def websocketMultipleProtocolRoute =
       path("services") {
-        handleWebSocketMessagesForProtocol(greeterService, "greeter") ~
-          handleWebSocketMessagesForProtocol(echoService, "echo")
+        handleWebSocketMessagesForProtocol(greeterService, "greeter") ~ handleWebSocketMessagesForProtocol(
+            echoService, "echo")
       }
 
     // tests:
     val wsClient = WSProbe()
 
     // WS creates a WebSocket request for testing
-    WS("/services", wsClient.flow, List("other", "echo")) ~>
-      websocketMultipleProtocolRoute ~>
-      check {
-        expectWebSocketUpgradeWithProtocol { protocol ⇒
-          protocol shouldEqual "echo"
+    WS("/services", wsClient.flow, List("other", "echo")) ~> websocketMultipleProtocolRoute ~> check {
+      expectWebSocketUpgradeWithProtocol { protocol ⇒
+        protocol shouldEqual "echo"
 
-          wsClient.sendMessage("Peter")
-          wsClient.expectMessage("Peter")
+        wsClient.sendMessage("Peter")
+        wsClient.expectMessage("Peter")
 
-          wsClient.sendMessage(BinaryMessage(ByteString("abcdef")))
-          wsClient.expectMessage(ByteString("abcdef"))
+        wsClient.sendMessage(BinaryMessage(ByteString("abcdef")))
+        wsClient.expectMessage(ByteString("abcdef"))
 
-          wsClient.sendMessage("John")
-          wsClient.expectMessage("John")
+        wsClient.sendMessage("John")
+        wsClient.expectMessage("John")
 
-          wsClient.sendCompletion()
-          wsClient.expectCompletion()
-        }
+        wsClient.sendCompletion()
+        wsClient.expectCompletion()
       }
+    }
   }
 }

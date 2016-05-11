@@ -34,14 +34,16 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
   override val dataSourceName: String = classOf[DefaultSource].getCanonicalName
 
   // ORC does not play well with NullType and UDT.
-  override protected def supportsDataType(dataType: DataType): Boolean = dataType match {
-    case _: NullType => false
-    case _: CalendarIntervalType => false
-    case _: UserDefinedType[_] => false
-    case _ => true
-  }
+  override protected def supportsDataType(dataType: DataType): Boolean =
+    dataType match {
+      case _: NullType => false
+      case _: CalendarIntervalType => false
+      case _: UserDefinedType[_] => false
+      case _ => true
+    }
 
-  test("save()/load() - partitioned table - simple queries - partition columns in data") {
+  test(
+      "save()/load() - partitioned table - simple queries - partition columns in data") {
     withTempDir { file =>
       val basePath = new Path(file.getCanonicalPath)
       val fs = basePath.getFileSystem(SparkHadoopUtil.get.conf)
@@ -56,13 +58,15 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
           .orc(partitionDir.toString)
       }
 
-      val dataSchemaWithPartition =
-        StructType(dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
+      val dataSchemaWithPartition = StructType(
+          dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
 
       checkQueries(
-        hiveContext.read.options(Map(
-          "path" -> file.getCanonicalPath,
-          "dataSchema" -> dataSchemaWithPartition.json)).format(dataSourceName).load())
+          hiveContext.read
+            .options(Map("path" -> file.getCanonicalPath,
+                         "dataSchema" -> dataSchemaWithPartition.json))
+            .format(dataSourceName)
+            .load())
     }
   }
 
@@ -75,36 +79,35 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
         (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b").write.orc(path)
 
         checkAnswer(
-          sqlContext.read.orc(path).where("not (a = 2) or not(b in ('1'))"),
-          (1 to 5).map(i => Row(i, (i % 2).toString)))
+            sqlContext.read.orc(path).where("not (a = 2) or not(b in ('1'))"),
+            (1 to 5).map(i => Row(i, (i % 2).toString)))
 
         checkAnswer(
-          sqlContext.read.orc(path).where("not (a = 2 and b in ('1'))"),
-          (1 to 5).map(i => Row(i, (i % 2).toString)))
+            sqlContext.read.orc(path).where("not (a = 2 and b in ('1'))"),
+            (1 to 5).map(i => Row(i, (i % 2).toString)))
       }
     }
   }
 
-  test("SPARK-13543: Support for specifying compression codec for ORC via option()") {
+  test(
+      "SPARK-13543: Support for specifying compression codec for ORC via option()") {
     withTempPath { dir =>
       val path = s"${dir.getCanonicalPath}/table1"
       val df = (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b")
-      df.write
-        .option("compression", "ZlIb")
-        .orc(path)
+      df.write.option("compression", "ZlIb").orc(path)
 
       // Check if this is compressed as ZLIB.
       val conf = sparkContext.hadoopConfiguration
       val fs = FileSystem.getLocal(conf)
-      val maybeOrcFile = new File(path).listFiles().find(_.getName.endsWith(".zlib.orc"))
+      val maybeOrcFile =
+        new File(path).listFiles().find(_.getName.endsWith(".zlib.orc"))
       assert(maybeOrcFile.isDefined)
       val orcFilePath = new Path(maybeOrcFile.get.toPath.toString)
-      val orcReader = OrcFile.createReader(orcFilePath, OrcFile.readerOptions(conf))
+      val orcReader =
+        OrcFile.createReader(orcFilePath, OrcFile.readerOptions(conf))
       assert(orcReader.getCompression == CompressionKind.ZLIB)
 
-      val copyDf = sqlContext
-        .read
-        .orc(path)
+      val copyDf = sqlContext.read.orc(path)
       checkAnswer(df, copyDf)
     }
   }

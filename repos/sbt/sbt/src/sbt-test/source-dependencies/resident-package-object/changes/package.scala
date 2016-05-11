@@ -1,3 +1,3 @@
 package object example {
-        val green = 3
+  val green = 3
 }

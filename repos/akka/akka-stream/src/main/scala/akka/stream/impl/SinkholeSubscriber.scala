@@ -1,18 +1,18 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl
 
 import akka.Done
 
 import scala.concurrent.Promise
-import org.reactivestreams.{ Subscriber, Subscription }
+import org.reactivestreams.{Subscriber, Subscription}
 
 /**
- * INTERNAL API
- */
-
-private[akka] final class SinkholeSubscriber[T](whenComplete: Promise[Done]) extends Subscriber[T] {
+  * INTERNAL API
+  */
+private[akka] final class SinkholeSubscriber[T](whenComplete: Promise[Done])
+    extends Subscriber[T] {
   private[this] var running: Boolean = false
 
   override def onSubscribe(sub: Subscription): Unit = {
@@ -31,5 +31,6 @@ private[akka] final class SinkholeSubscriber[T](whenComplete: Promise[Done]) ext
 
   override def onComplete(): Unit = whenComplete.trySuccess(Done)
 
-  override def onNext(element: T): Unit = ReactiveStreamsCompliance.requireNonNullElement(element)
+  override def onNext(element: T): Unit =
+    ReactiveStreamsCompliance.requireNonNullElement(element)
 }

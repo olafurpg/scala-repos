@@ -1,3 +1,3 @@
 object A {
-	def x: Byte = 3
+  def x: Byte = 3
 }

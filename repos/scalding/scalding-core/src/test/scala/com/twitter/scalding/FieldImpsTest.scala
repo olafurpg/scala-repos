@@ -12,18 +12,19 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
 import cascading.tuple.Fields
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
   def setAndCheck[T <: Comparable[_]](v: T)(implicit conv: (T) => Fields) {
     conv(v) shouldBe (new Fields(v))
   }
-  def setAndCheckS[T <: Comparable[_]](v: Seq[T])(implicit conv: (Seq[T]) => Fields) {
+  def setAndCheckS[T <: Comparable[_]](v: Seq[T])(
+      implicit conv: (Seq[T]) => Fields) {
     conv(v) shouldBe (new Fields(v: _*))
   }
   def setAndCheckSym(v: Symbol) {
@@ -60,7 +61,7 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
   "Field" should {
     "contain manifest" in {
       val field = Field[Long]("foo")
-      field.mf should contain (implicitly[Manifest[Long]])
+      field.mf should contain(implicitly[Manifest[Long]])
     }
   }
   "RichFields" should {
@@ -80,12 +81,23 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       val comparator = implicitly[Ordering[String]]
       fields.setComparators(comparator, comparator)
       val fieldList: List[Field[_]] = fields.toFieldList
-      fieldList shouldBe List(new StringField[String]("foo")(comparator, None), new StringField[String]("bar")(comparator, None))
+      fieldList shouldBe List(new StringField[String]("foo")(comparator, None),
+                              new StringField[String]("bar")(comparator, None))
     }
     "throw an exception on when converting a virtual Fields instance" in {
 
       import Fields._
-      List(ALL, ARGS, FIRST, GROUP, LAST, NONE, REPLACE, RESULTS, SWAP, UNKNOWN, VALUES).foreach { fields =>
+      List(ALL,
+           ARGS,
+           FIRST,
+           GROUP,
+           LAST,
+           NONE,
+           REPLACE,
+           RESULTS,
+           SWAP,
+           UNKNOWN,
+           VALUES).foreach { fields =>
         an[Exception] should be thrownBy fields.toFieldList
       }
     }
@@ -117,8 +129,10 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       setAndCheckField(Field[java.math.BigInteger](0))
       // Try a custom ordering
       val ord = implicitly[Ordering[java.math.BigInteger]].reverse
-      setAndCheckField(Field[java.math.BigInteger]("bell")(ord, implicitly[Manifest[java.math.BigInteger]]))
-      setAndCheckFieldS(List(Field[java.math.BigInteger](0), Field[java.math.BigDecimal]("bar")))
+      setAndCheckField(Field[java.math.BigInteger]("bell")(
+              ord, implicitly[Manifest[java.math.BigInteger]]))
+      setAndCheckFieldS(List(Field[java.math.BigInteger](0),
+                             Field[java.math.BigDecimal]("bar")))
     }
     "convert from enumeration values" in {
       object Schema extends Enumeration {
@@ -143,7 +157,9 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       vf = (1, 2, 3)
       vf shouldBe (new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
       vf = (1, 2, 3, 4)
-      vf shouldBe (new Fields(int2Integer(1), int2Integer(2), int2Integer(3), int2Integer(4)))
+      vf shouldBe
+      (new Fields(
+              int2Integer(1), int2Integer(2), int2Integer(3), int2Integer(4)))
     }
     "convert from general string tuples" in {
       var vf: Fields = Tuple1("hey")
@@ -201,7 +217,8 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       f2 shouldBe (new Fields("hey"), new Fields("you"))
 
       f2 = (0 until 10) -> 'you
-      f2 shouldBe (new Fields((0 until 10).map(int2Integer): _*), new Fields("you"))
+      f2 shouldBe
+      (new Fields((0 until 10).map(int2Integer): _*), new Fields("you"))
 
       f2 = (('hey, 'world) -> 'other)
       f2 shouldBe (new Fields("hey", "world"), new Fields("other"))
@@ -210,7 +227,8 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       f2 shouldBe (new Fields(int2Integer(0)), new Fields(int2Integer(2)))
 
       f2 = (0, (1, "you"))
-      f2 shouldBe (new Fields(int2Integer(0)), new Fields(int2Integer(1), "you"))
+      f2 shouldBe
+      (new Fields(int2Integer(0)), new Fields(int2Integer(1), "you"))
 
       val foo = Field[java.math.BigInteger]("foo")
       val bar = Field[java.math.BigDecimal]("bar")
@@ -225,14 +243,18 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       f2 shouldBe (fields, new Fields("bar", "bell"))
 
       f2 = Seq("one", "two", "three") -> Seq("1", "2", "3")
-      f2 shouldBe (new Fields("one", "two", "three"), new Fields("1", "2", "3"))
+      f2 shouldBe
+      (new Fields("one", "two", "three"), new Fields("1", "2", "3"))
       f2 = List("one", "two", "three") -> List("1", "2", "3")
-      f2 shouldBe (new Fields("one", "two", "three"), new Fields("1", "2", "3"))
+      f2 shouldBe
+      (new Fields("one", "two", "three"), new Fields("1", "2", "3"))
       f2 = List('one, 'two, 'three) -> List('n1, 'n2, 'n3)
-      f2 shouldBe (new Fields("one", "two", "three"), new Fields("n1", "n2", "n3"))
+      f2 shouldBe
+      (new Fields("one", "two", "three"), new Fields("n1", "n2", "n3"))
       f2 = List(4, 5, 6) -> List(1, 2, 3)
-      f2 shouldBe (new Fields(int2Integer(4), int2Integer(5), int2Integer(6)),
-        new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
+      f2 shouldBe
+      (new Fields(int2Integer(4), int2Integer(5), int2Integer(6)),
+          new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
 
       object Schema extends Enumeration {
         val one, two, three = Value
@@ -275,6 +297,5 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       defaultMode(0, ('hey, 0)) shouldBe Fields.SWAP
       defaultMode(('hey, 0), 0) shouldBe Fields.SWAP
     }
-
   }
 }

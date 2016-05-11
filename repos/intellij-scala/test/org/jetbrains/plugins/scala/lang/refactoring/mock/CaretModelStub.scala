@@ -7,13 +7,15 @@ import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.editor.markup.TextAttributes
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class CaretModelStub extends CaretModel {
-  override def setCaretsAndSelections(caretStates: util.List[CaretState]): Unit = ???
+  override def setCaretsAndSelections(
+      caretStates: util.List[CaretState]): Unit = ???
 
-  override def setCaretsAndSelections(caretStates: util.List[CaretState], updateSystemSelection: Boolean): Unit = ???
+  override def setCaretsAndSelections(caretStates: util.List[CaretState],
+                                      updateSystemSelection: Boolean): Unit =
+    ???
 
   override def getCaretCount: Int = ???
 
@@ -41,7 +43,11 @@ class CaretModelStub extends CaretModel {
 
   override def moveToLogicalPosition(pos: LogicalPosition): Unit = {}
 
-  override def moveCaretRelatively(columnShift: Int, lineShift: Int, withSelection: Boolean, blockSelection: Boolean, scrollToCaret: Boolean): Unit = {}
+  override def moveCaretRelatively(columnShift: Int,
+                                   lineShift: Int,
+                                   withSelection: Boolean,
+                                   blockSelection: Boolean,
+                                   scrollToCaret: Boolean): Unit = {}
 
   override def isUpToDate = false
 
@@ -67,7 +73,6 @@ class CaretModelStub extends CaretModel {
 
   override def getCaretsAndSelections: util.List[CaretState] = ???
 
-  override def runForEachCaret(action: CaretAction, reverseOrder: Boolean): Unit = ???
-
-
+  override def runForEachCaret(
+      action: CaretAction, reverseOrder: Boolean): Unit = ???
 }

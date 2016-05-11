@@ -2,7 +2,7 @@ package mesosphere.marathon.api
 
 import java.net.URL
 import javax.servlet.FilterChain
-import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import mesosphere.chaos.http.HttpConf
 import mesosphere.marathon.MarathonSpec
@@ -58,7 +58,8 @@ class LeaderProxyFilterTest extends MarathonSpec {
     filter.doFilter(request, response, chain)
 
     // we pass that request down the chain
-    verify(response, times(1)).addHeader(LeaderProxyFilter.HEADER_MARATHON_LEADER, "http://host:10000")
+    verify(response, times(1))
+      .addHeader(LeaderProxyFilter.HEADER_MARATHON_LEADER, "http://host:10000")
     verify(leaderInfo, times(1)).elected
     verify(chain, times(1)).doFilter(request, response)
   }
@@ -75,8 +76,9 @@ class LeaderProxyFilterTest extends MarathonSpec {
     // we pass that request down the chain
     verify(leaderInfo, times(12)).elected
     verify(leaderInfo, times(12)).currentLeaderHostPort()
-    verify(response, times(1))
-      .sendError(HttpStatus.SC_SERVICE_UNAVAILABLE, LeaderProxyFilter.ERROR_STATUS_NO_CURRENT_LEADER)
+    verify(response, times(1)).sendError(
+        HttpStatus.SC_SERVICE_UNAVAILABLE,
+        LeaderProxyFilter.ERROR_STATUS_NO_CURRENT_LEADER)
   }
 
   test("forward to leader without query string") {
@@ -95,7 +97,8 @@ class LeaderProxyFilterTest extends MarathonSpec {
     verify(leaderInfo, times(1)).currentLeaderHostPort()
     verify(request, atLeastOnce()).getRequestURI
     verify(request, atLeastOnce()).getQueryString
-    verify(forwarder, times(1)).forward(new URL("http://otherhost:9999/test"), request, response)
+    verify(forwarder, times(1))
+      .forward(new URL("http://otherhost:9999/test"), request, response)
   }
 
   test("forward to leader with query string") {
@@ -114,7 +117,10 @@ class LeaderProxyFilterTest extends MarathonSpec {
     verify(leaderInfo, times(1)).currentLeaderHostPort()
     verify(request, atLeastOnce()).getRequestURI
     verify(request, atLeastOnce()).getQueryString
-    verify(forwarder, times(1)).forward(new URL("http://otherhost:9999/test?argument=blieh"), request, response)
+    verify(forwarder, times(1)).forward(
+        new URL("http://otherhost:9999/test?argument=blieh"),
+        request,
+        response)
   }
 
   test("use https if http is disabled") {
@@ -133,14 +139,17 @@ class LeaderProxyFilterTest extends MarathonSpec {
     verify(leaderInfo, times(1)).currentLeaderHostPort()
     verify(request, atLeastOnce()).getRequestURI
     verify(request, atLeastOnce()).getQueryString
-    verify(forwarder, times(1)).forward(new URL("https://otherhost:9999/test"), request, response)
+    verify(forwarder, times(1))
+      .forward(new URL("https://otherhost:9999/test"), request, response)
   }
 
-  test("successfully wait for consistent leadership info, then someone else is the leader") {
+  test(
+      "successfully wait for consistent leadership info, then someone else is the leader") {
     // When we have inconsistent leadership info
     init()
     when(leaderInfo.elected).thenReturn(false)
-    when(leaderInfo.currentLeaderHostPort()).thenReturn(Some("host:10000"), Some("host:10000"), Some("otherhost:9999"))
+    when(leaderInfo.currentLeaderHostPort()).thenReturn(
+        Some("host:10000"), Some("host:10000"), Some("otherhost:9999"))
     when(request.getRequestURI).thenReturn("/test")
     when(request.getQueryString).thenReturn(null)
 
@@ -150,7 +159,8 @@ class LeaderProxyFilterTest extends MarathonSpec {
     // we pass that request down the chain
     verify(leaderInfo, times(4)).elected
     verify(leaderInfo, times(4)).currentLeaderHostPort()
-    verify(forwarder, times(1)).forward(new URL("http://otherhost:9999/test"), request, response)
+    verify(forwarder, times(1))
+      .forward(new URL("http://otherhost:9999/test"), request, response)
     verify(request, atLeastOnce()).getRequestURI
     verify(request, atLeastOnce()).getQueryString
   }
@@ -169,7 +179,8 @@ class LeaderProxyFilterTest extends MarathonSpec {
     // we pass that request down the chain
     verify(leaderInfo, times(4)).elected
     verify(leaderInfo, times(3)).currentLeaderHostPort()
-    verify(response, times(1)).addHeader(LeaderProxyFilter.HEADER_MARATHON_LEADER, "http://host:10000")
+    verify(response, times(1))
+      .addHeader(LeaderProxyFilter.HEADER_MARATHON_LEADER, "http://host:10000")
     verify(chain, times(1)).doFilter(request, response)
   }
 
@@ -187,7 +198,8 @@ class LeaderProxyFilterTest extends MarathonSpec {
     // we pass that request down the chain
     verify(leaderInfo, times(12)).elected
     verify(leaderInfo, times(12)).currentLeaderHostPort()
-    verify(response, times(1))
-      .sendError(HttpStatus.SC_SERVICE_UNAVAILABLE, LeaderProxyFilter.ERROR_STATUS_NO_CURRENT_LEADER)
+    verify(response, times(1)).sendError(
+        HttpStatus.SC_SERVICE_UNAVAILABLE,
+        LeaderProxyFilter.ERROR_STATUS_NO_CURRENT_LEADER)
   }
 }

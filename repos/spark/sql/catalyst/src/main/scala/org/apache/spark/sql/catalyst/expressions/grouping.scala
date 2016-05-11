@@ -35,7 +35,8 @@ trait GroupingSet extends Expression with CodegenFallback {
   override def dataType: DataType = throw new UnsupportedOperationException
   override def foldable: Boolean = false
   override def nullable: Boolean = true
-  override def eval(input: InternalRow): Any = throw new UnsupportedOperationException
+  override def eval(input: InternalRow): Any =
+    throw new UnsupportedOperationException
 }
 
 case class Cube(groupByExprs: Seq[Expression]) extends GroupingSet {}
@@ -47,7 +48,8 @@ case class Rollup(groupByExprs: Seq[Expression]) extends GroupingSet {}
   * GROUPING returns 1 for aggregated or 0 for not aggregated in the result set.
   */
 case class Grouping(child: Expression) extends Expression with Unevaluable {
-  override def references: AttributeSet = AttributeSet(VirtualColumn.groupingIdAttribute :: Nil)
+  override def references: AttributeSet =
+    AttributeSet(VirtualColumn.groupingIdAttribute :: Nil)
   override def children: Seq[Expression] = child :: Nil
   override def dataType: DataType = ByteType
   override def nullable: Boolean = false
@@ -58,8 +60,10 @@ case class Grouping(child: Expression) extends Expression with Unevaluable {
   *
   * If groupByExprs is empty, it means all grouping expressions in GroupingSets.
   */
-case class GroupingID(groupByExprs: Seq[Expression]) extends Expression with Unevaluable {
-  override def references: AttributeSet = AttributeSet(VirtualColumn.groupingIdAttribute :: Nil)
+case class GroupingID(groupByExprs: Seq[Expression])
+    extends Expression with Unevaluable {
+  override def references: AttributeSet =
+    AttributeSet(VirtualColumn.groupingIdAttribute :: Nil)
   override def children: Seq[Expression] = groupByExprs
   override def dataType: DataType = IntegerType
   override def nullable: Boolean = false

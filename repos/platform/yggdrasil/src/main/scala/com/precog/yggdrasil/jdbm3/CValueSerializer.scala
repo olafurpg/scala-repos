@@ -25,7 +25,7 @@ import com.weiglewilczek.slf4s.Logger
 import org.apache.jdbm._
 import org.joda.time.DateTime
 
-import java.io.{DataInput,DataOutput}
+import java.io.{DataInput, DataOutput}
 
 import com.precog.common._
 import com.precog.util.{BitSet, BitSetUtil, Loop}
@@ -40,53 +40,53 @@ import com.precog.util.BitSetUtil.Implicits._
  * DCB - 2012-07-27
  */
 private[jdbm3] object CTypeMappings {
-  final val FSTRING      = 0.toByte
-  final val FBOOLEAN     = 1.toByte
-  final val FLONG        = 2.toByte
-  final val FDOUBLE      = 3.toByte
-  final val FNUM         = 4.toByte
-  final val FDATE        = 5.toByte
-  final val FNULL        = 6.toByte
+  final val FSTRING = 0.toByte
+  final val FBOOLEAN = 1.toByte
+  final val FLONG = 2.toByte
+  final val FDOUBLE = 3.toByte
+  final val FNUM = 4.toByte
+  final val FDATE = 5.toByte
+  final val FNULL = 6.toByte
   final val FEMPTYOBJECT = 7.toByte
-  final val FEMPTYARRAY  = 8.toByte
-  final val FARRAY       = 9.toByte
-  final val FPERIOD      = 10.toByte
-  final val FUNDEFINED   = -1.toByte
+  final val FEMPTYARRAY = 8.toByte
+  final val FARRAY = 9.toByte
+  final val FPERIOD = 10.toByte
+  final val FUNDEFINED = -1.toByte
 
   def flagFor(tpe: CType): Byte = tpe match {
-    case CString      => FSTRING
-    case CBoolean     => FBOOLEAN
-    case CLong        => FLONG
-    case CDouble      => FDOUBLE
-    case CNum         => FNUM
-    case CDate        => FDATE
-    case CPeriod      => FPERIOD
-    case CNull        => FNULL
+    case CString => FSTRING
+    case CBoolean => FBOOLEAN
+    case CLong => FLONG
+    case CDouble => FDOUBLE
+    case CNum => FNUM
+    case CDate => FDATE
+    case CPeriod => FPERIOD
+    case CNull => FNULL
     case CEmptyObject => FEMPTYOBJECT
-    case CEmptyArray  => FEMPTYARRAY
-    case CArrayType(_)=> FARRAY
-    case CUndefined   => sys.error("Undefined is not a valid format")
+    case CEmptyArray => FEMPTYARRAY
+    case CArrayType(_) => FARRAY
+    case CUndefined => sys.error("Undefined is not a valid format")
   }
 
   def fromFlag(b: Byte): CType = b match {
-    case FSTRING       => CString     
-    case FBOOLEAN      => CBoolean    
-    case FLONG         => CLong       
-    case FDOUBLE       => CDouble     
-    case FNUM          => CNum        
-    case FDATE         => CDate       
-    case FPERIOD       => CPeriod       
-    case FNULL         => CNull       
-    case FEMPTYOBJECT  => CEmptyObject
-    case FEMPTYARRAY   => CEmptyArray 
-    case FARRAY        => sys.error("todo")
-    case invalid       => sys.error(invalid + " is not a valid format")
+    case FSTRING => CString
+    case FBOOLEAN => CBoolean
+    case FLONG => CLong
+    case FDOUBLE => CDouble
+    case FNUM => CNum
+    case FDATE => CDate
+    case FPERIOD => CPeriod
+    case FNULL => CNull
+    case FEMPTYOBJECT => CEmptyObject
+    case FEMPTYARRAY => CEmptyArray
+    case FARRAY => sys.error("todo")
+    case invalid => sys.error(invalid + " is not a valid format")
   }
 }
 
 //object CValueSerializer {
-  //import CTypeMappings._
-  //def apply(format: Seq[CType]) = new CValueSerializer(format.map(flagFor).toArray)
+//import CTypeMappings._
+//def apply(format: Seq[CType]) = new CValueSerializer(format.map(flagFor).toArray)
 //}
 
 //object CValueSerializerUtil {

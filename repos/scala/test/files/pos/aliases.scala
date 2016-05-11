@@ -21,5 +21,4 @@ abstract class C() {
   fy(xt); fy(yt); fy(zt); fy(ut);
   fz(xt); fz(yt); fz(zt); fz(ut);
   fu(xt); fu(yt); fu(zt); fu(ut);
-
 }

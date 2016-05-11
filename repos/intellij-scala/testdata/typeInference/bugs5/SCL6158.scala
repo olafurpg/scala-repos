@@ -25,6 +25,7 @@ object O {
   def foo1(y: ExampleY) = 1
   def foo1(s: String) = s
 
-  /*start*/foo1(ExampleF())/*end*/
+  /*start*/
+  foo1(ExampleF()) /*end*/
 }
 //Int

@@ -7,7 +7,7 @@ trait T extends I {
 }
 
 class C extends I with T {
-  println(/* line: 6 */f)
-  println(this./* line: 6 */f)
-  println(super./* line: 6 */f)
+  println( /* line: 6 */ f)
+  println(this. /* line: 6 */ f)
+  println(super. /* line: 6 */ f)
 }

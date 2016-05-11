@@ -23,7 +23,6 @@ package actor
 import com.precog.common._
 import com.precog.common.ingest._
 
-
 import blueeyes.json._
 
 import org.specs2.mutable._

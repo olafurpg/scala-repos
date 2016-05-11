@@ -6,10 +6,11 @@ package imports
 import com.intellij.psi.PsiPolyVariantReference
 
 /**
- * @author jzaugg
- */
+  * @author jzaugg
+  */
 class ImplicitPriorityTest extends ScalaResolveTestCase {
-  override def folderPath(): String = super.folderPath() + "resolve/implicitPriority/"
+  override def folderPath(): String =
+    super.folderPath() + "resolve/implicitPriority/"
 
   def testlowPriorityImplicits() {
     findReferenceAtCaret() match {

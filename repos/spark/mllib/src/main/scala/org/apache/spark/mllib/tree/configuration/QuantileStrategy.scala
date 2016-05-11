@@ -20,8 +20,8 @@ package org.apache.spark.mllib.tree.configuration
 import org.apache.spark.annotation.Since
 
 /**
- * Enum for selecting the quantile calculation strategy
- */
+  * Enum for selecting the quantile calculation strategy
+  */
 @Since("1.0.0")
 object QuantileStrategy extends Enumeration {
   @Since("1.0.0")

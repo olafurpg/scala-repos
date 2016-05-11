@@ -27,15 +27,14 @@ import org.apache.spark.sql.catalyst.rules.RuleExecutor
 class AggregateOptimizeSuite extends PlanTest {
 
   object Optimize extends RuleExecutor[LogicalPlan] {
-    val batches = Batch("Aggregate", FixedPoint(100),
-      RemoveLiteralFromGroupExpressions) :: Nil
+    val batches =
+      Batch("Aggregate", FixedPoint(100), RemoveLiteralFromGroupExpressions) :: Nil
   }
 
   test("remove literals in grouping expression") {
     val input = LocalRelation('a.int, 'b.int)
 
-    val query =
-      input.groupBy('a, Literal(1), Literal(1) + Literal(2))(sum('b))
+    val query = input.groupBy('a, Literal(1), Literal(1) + Literal(2))(sum('b))
     val optimized = Optimize.execute(query)
 
     val correctAnswer = input.groupBy('a)(sum('b))

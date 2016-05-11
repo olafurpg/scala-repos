@@ -1,6 +1,7 @@
 object Test {
   def main(args: Array[String]) {
-    /*start*/CaseClass.curried/*end*/
+    /*start*/
+    CaseClass.curried /*end*/
   }
 }
 

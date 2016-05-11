@@ -1,8 +1,3 @@
-
-
-
-
-
 object Test {
 
   def main(args: Array[String]) {
@@ -10,10 +5,8 @@ object Test {
     testConverters()
   }
 
-  def needPackageConcurrentMap(map: collection.concurrent.Map[Int, Int]) {
-  }
-  def needJavaConcurrent(map: java.util.concurrent.ConcurrentMap[Int, Int]) {
-  }
+  def needPackageConcurrentMap(map: collection.concurrent.Map[Int, Int]) {}
+  def needJavaConcurrent(map: java.util.concurrent.ConcurrentMap[Int, Int]) {}
 
   def testConversions() {
     import collection.JavaConversions._
@@ -32,5 +25,4 @@ object Test {
     needPackageConcurrentMap(skiplist.asScala)
     needJavaConcurrent(ctrie.asJava)
   }
-
 }

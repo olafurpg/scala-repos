@@ -12,10 +12,10 @@ import org.openjdk.jmh.infra.Blackhole
 //  - to run a specific benchmark, use: .*SchedulerBenchmark.timeSubmit
 //  - to send specific params, use: -p lifo=false -p m=1,8,16
 /**
- * Measure Scheduler.submit/run time when there are multiple threads.  Previous
- * to changing SampleScale from 50 to 1000, there was sometimes contention for
- * the global threads lock in getCurrentThreadCpuTime().
- */
+  * Measure Scheduler.submit/run time when there are multiple threads.  Previous
+  * to changing SampleScale from 50 to 1000, there was sometimes contention for
+  * the global threads lock in getCurrentThreadCpuTime().
+  */
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Array(Mode.AverageTime))
 class SchedulerBenchmark {
@@ -32,7 +32,6 @@ class SchedulerBenchmark {
     state.scheduler.submit(state.runnable)
     state.scheduler.flush()
   }
-
 }
 
 object SchedulerBenchmark {
@@ -68,5 +67,4 @@ object SchedulerBenchmark {
       }
     }
   }
-
 }

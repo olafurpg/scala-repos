@@ -40,14 +40,14 @@ import scalafx.scene.layout.{Region, VBox}
 import scalafx.util.converter.FormatStringConverter
 
 /**
- * Demonstrates a TextField control with a TextFormatter that formats the content.
- */
+  * Demonstrates a TextField control with a TextFormatter that formats the content.
+  */
 object TextFormatterDemo extends JFXApp {
 
   val infoLabel = new Label {
     text = "" +
-      "Demonstrates a TextField control with a TextFormatter. Text is formatted as a currency. " +
-      "Move slider or edit the text field content."
+    "Demonstrates a TextField control with a TextFormatter. Text is formatted as a currency. " +
+    "Move slider or edit the text field content."
     wrapText = true
     prefHeight = Region.USE_COMPUTED_SIZE
   }

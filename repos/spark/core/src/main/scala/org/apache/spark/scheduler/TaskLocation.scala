@@ -18,34 +18,37 @@
 package org.apache.spark.scheduler
 
 /**
- * A location where a task should run. This can either be a host or a (host, executorID) pair.
- * In the latter case, we will prefer to launch the task on that executorID, but our next level
- * of preference will be executors on the same host if this is not possible.
- */
+  * A location where a task should run. This can either be a host or a (host, executorID) pair.
+  * In the latter case, we will prefer to launch the task on that executorID, but our next level
+  * of preference will be executors on the same host if this is not possible.
+  */
 private[spark] sealed trait TaskLocation {
   def host: String
 }
 
 /**
- * A location that includes both a host and an executor id on that host.
- */
-private [spark]
-case class ExecutorCacheTaskLocation(override val host: String, executorId: String)
-  extends TaskLocation {
-  override def toString: String = s"${TaskLocation.executorLocationTag}${host}_$executorId"
+  * A location that includes both a host and an executor id on that host.
+  */
+private[spark] case class ExecutorCacheTaskLocation(
+    override val host: String, executorId: String)
+    extends TaskLocation {
+  override def toString: String =
+    s"${TaskLocation.executorLocationTag}${host}_$executorId"
 }
 
 /**
- * A location on a host.
- */
-private [spark] case class HostTaskLocation(override val host: String) extends TaskLocation {
+  * A location on a host.
+  */
+private[spark] case class HostTaskLocation(override val host: String)
+    extends TaskLocation {
   override def toString: String = host
 }
 
 /**
- * A location on a host that is cached by HDFS.
- */
-private [spark] case class HDFSCacheTaskLocation(override val host: String) extends TaskLocation {
+  * A location on a host that is cached by HDFS.
+  */
+private[spark] case class HDFSCacheTaskLocation(override val host: String)
+    extends TaskLocation {
   override def toString: String = TaskLocation.inMemoryLocationTag + host
 }
 
@@ -63,17 +66,18 @@ private[spark] object TaskLocation {
   }
 
   /**
-   * Create a TaskLocation from a string returned by getPreferredLocations.
-   * These strings have the form [hostname] or hdfs_cache_[hostname], depending on whether the
-   * location is cached.
-   */
+    * Create a TaskLocation from a string returned by getPreferredLocations.
+    * These strings have the form [hostname] or hdfs_cache_[hostname], depending on whether the
+    * location is cached.
+    */
   def apply(str: String): TaskLocation = {
     val hstr = str.stripPrefix(inMemoryLocationTag)
     if (hstr.equals(str)) {
       if (str.startsWith(executorLocationTag)) {
         val splits = str.split("_")
         if (splits.length != 3) {
-          throw new IllegalArgumentException("Illegal executor location format: " + str)
+          throw new IllegalArgumentException(
+              "Illegal executor location format: " + str)
         }
         new ExecutorCacheTaskLocation(splits(1), splits(2))
       } else {

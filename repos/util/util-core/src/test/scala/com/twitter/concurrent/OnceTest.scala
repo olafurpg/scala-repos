@@ -20,7 +20,8 @@ class OnceTest extends FunSuite {
     @volatile var x = 0
     val once = Once { x += 1 }
     val p = Promise[Unit]()
-    val t = new Thread(new Runnable {
+    val t = new Thread(
+        new Runnable {
       def run(): Unit = {
         once()
         try {

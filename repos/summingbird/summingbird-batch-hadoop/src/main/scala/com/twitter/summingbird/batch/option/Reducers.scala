@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird.batch.option
 
@@ -21,6 +21,6 @@ object Reducers {
 }
 
 /**
- * This specifies the number of reducers to be used in the context of the map-reduce framework.
- */
+  * This specifies the number of reducers to be used in the context of the map-reduce framework.
+  */
 case class Reducers(count: Int)

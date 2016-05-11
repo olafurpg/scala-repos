@@ -38,10 +38,10 @@ class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
     service.expectNoMsg()
     client.expectMsg(13L)
 
-    // it would be good to check that errors / closing will stop the
-    // actor but that's perhaps testing the framework.
+  // it would be good to check that errors / closing will stop the
+  // actor but that's perhaps testing the framework.
 
-    // TODO: use Streams TestKit as much as possible here
+  // TODO: use Streams TestKit as much as possible here
   }
 
   case class Foo(a: String)
@@ -52,65 +52,69 @@ class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
   val foo = Foo("hello")
   val bar = Bar(13L)
 
-  it should "produce a marshalled Flow that accepts valid messages" in withTestKit { tk =>
-    import tk.system
-    import tk.system.dispatcher
-    implicit val mat = ActorMaterializer()
+  it should "produce a marshalled Flow that accepts valid messages" in withTestKit {
+    tk =>
+      import tk.system
+      import tk.system.dispatcher
+      implicit val mat = ActorMaterializer()
 
-    // This is quite horrible and really highlights why a BidiFlow
-    // model would be better. WebSockets are *not* request / response
-    // (like this).
-    val user = Flow[Foo].map { f =>
-      f shouldBe foo
-      bar
-    }
-    val endpoints = jsonMarshalledMessageFlow(user)
+      // This is quite horrible and really highlights why a BidiFlow
+      // model would be better. WebSockets are *not* request / response
+      // (like this).
+      val user = Flow[Foo].map { f =>
+        f shouldBe foo
+        bar
+      }
+      val endpoints = jsonMarshalledMessageFlow(user)
 
-    val input = TextMessage(foo.toJson.compactPrint)
-    val client = TestProbe()
+      val input = TextMessage(foo.toJson.compactPrint)
+      val client = TestProbe()
 
-    Source.single(input).via(endpoints).runWith(Sink.head).pipeTo(client.ref)
+      Source.single(input).via(endpoints).runWith(Sink.head).pipeTo(client.ref)
 
-    client.expectMsg(TextMessage(bar.toJson.prettyPrint))
+      client.expectMsg(TextMessage(bar.toJson.prettyPrint))
   }
 
-  it should "produce a marshalled Flow that errors on bad message" in withTestKit { tk =>
-    import tk.system
-    import tk.system.dispatcher
-    implicit val mat = ActorMaterializer()
+  it should "produce a marshalled Flow that errors on bad message" in withTestKit {
+    tk =>
+      import tk.system
+      import tk.system.dispatcher
+      implicit val mat = ActorMaterializer()
 
-    val user = Flow[Foo].map { f =>
-      f shouldBe foo
-      bar
-    }
-    val endpoints = jsonMarshalledMessageFlow(user)
+      val user = Flow[Foo].map { f =>
+        f shouldBe foo
+        bar
+      }
+      val endpoints = jsonMarshalledMessageFlow(user)
 
-    val input = BinaryMessage(ByteString(0, 1, 2))
-    val client = TestProbe()
+      val input = BinaryMessage(ByteString(0, 1, 2))
+      val client = TestProbe()
 
-    Source.single(input).via(endpoints).runWith(Sink.head).pipeTo(client.ref)
+      Source.single(input).via(endpoints).runWith(Sink.head).pipeTo(client.ref)
 
-    client.expectMsgPF() {
-      case Status.Failure(_) =>
-    }
+      client.expectMsgPF() {
+        case Status.Failure(_) =>
+      }
   }
 
-  it should "produce a marshalled Flow that errors on bad inbound JSON" in withTestKit { tk =>
-    import tk.system
-    import tk.system.dispatcher
-    implicit val mat = ActorMaterializer()
+  it should "produce a marshalled Flow that errors on bad inbound JSON" in withTestKit {
+    tk =>
+      import tk.system
+      import tk.system.dispatcher
+      implicit val mat = ActorMaterializer()
 
-    val user = Flow[Foo].map { _ => bar }
-    val endpoints = jsonMarshalledMessageFlow(user)
+      val user = Flow[Foo].map { _ =>
+        bar
+      }
+      val endpoints = jsonMarshalledMessageFlow(user)
 
-    val input = TextMessage.Strict("""{}""")
-    val client = TestProbe()
+      val input = TextMessage.Strict("""{}""")
+      val client = TestProbe()
 
-    Source.single(input).via(endpoints).runWith(Sink.head).pipeTo(client.ref)
+      Source.single(input).via(endpoints).runWith(Sink.head).pipeTo(client.ref)
 
-    client.expectMsgPF() {
-      case Status.Failure(e: DeserializationException) =>
-    }
+      client.expectMsgPF() {
+        case Status.Failure(e: DeserializationException) =>
+      }
   }
-
 }

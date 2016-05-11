@@ -1,3 +1,3 @@
 trait A {
-	def bar: Int = 0
+  def bar: Int = 0
 }

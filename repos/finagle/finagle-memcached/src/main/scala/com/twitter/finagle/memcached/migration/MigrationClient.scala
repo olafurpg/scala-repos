@@ -12,13 +12,12 @@ import com.twitter.io.Buf
 import com.twitter.util.{Future, Time}
 
 /**
- * migration config data
- */
+  * migration config data
+  */
 private[memcached] object MigrationConstants {
-  case class MigrationConfig(
-      state: String,
-      readRepairBack: Boolean,
-      readRepairFront: Boolean)
+  case class MigrationConfig(state: String,
+                             readRepairBack: Boolean,
+                             readRepairFront: Boolean)
 
   val jsonMapper = new ObjectMapper().registerModule(DefaultScalaModule)
 
@@ -34,19 +33,20 @@ private[memcached] object MigrationConstants {
 }
 
 /**
- * Migration client. This client manages a two cache clients representing source and
- * destination cache pool. Depending on the migration state, this client may send dark traffic
- * to destination pool to warm up the cache, or send light traffic to destination pool and fall
- * back to original pool for cache misses. The state transitioning is controlled by operator
- * by setting corresponding metadata in zookeeper.
- */
+  * Migration client. This client manages a two cache clients representing source and
+  * destination cache pool. Depending on the migration state, this client may send dark traffic
+  * to destination pool to warm up the cache, or send light traffic to destination pool and fall
+  * back to original pool for cache misses. The state transitioning is controlled by operator
+  * by setting corresponding metadata in zookeeper.
+  */
 class MigrationClient(
     oldClient: Client,
     newClient: Client,
     protected val zkPath: String,
     protected val zkClient: ZooKeeperClient,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver
-) extends ProxyClient with ZookeeperStateMonitor {
+)
+    extends ProxyClient with ZookeeperStateMonitor {
 
   import MigrationConstants._
 
@@ -65,15 +65,18 @@ class MigrationClient(
       case MigrationState.Pending =>
         proxyClient = new FrontendClient(oldClient)
       case MigrationState.Warming if (config.readRepairBack) =>
-        proxyClient = new FrontendClient(oldClient) with DarkRead with ReadWarmup with DarkWrite {
+        proxyClient = new FrontendClient(oldClient)
+        with DarkRead with ReadWarmup with DarkWrite {
           val backendClient = newClient
         }
       case MigrationState.Warming =>
-        proxyClient = new FrontendClient(oldClient) with DarkRead with DarkWrite {
+        proxyClient = new FrontendClient(oldClient) with DarkRead
+        with DarkWrite {
           val backendClient = newClient
         }
       case MigrationState.Verifying if (config.readRepairFront) =>
-        proxyClient = new FrontendClient(newClient) with FallbackRead with ReadRepair {
+        proxyClient = new FrontendClient(newClient)
+        with FallbackRead with ReadRepair {
           val backendClient = oldClient
         }
       case MigrationState.Verifying =>
@@ -87,11 +90,11 @@ class MigrationClient(
 }
 
 /**
- * DarkRead client.
- * requires backendClient;
- * override Get and Gets to send dark read to backend pool;
- * backend read results are not blocking or exposed.
- */
+  * DarkRead client.
+  * requires backendClient;
+  * override Get and Gets to send dark read to backend pool;
+  * backend read results are not blocking or exposed.
+  */
 trait DarkRead extends Client {
   protected val backendClient: Client
 
@@ -103,7 +106,9 @@ trait DarkRead extends Client {
   }
 
   // DarkRead always choose the front result and ignore the backend one
-  protected def chooseGetResult(frontResult: Future[GetResult], backResult: Future[GetResult]): Future[GetResult] = {
+  protected def chooseGetResult(
+      frontResult: Future[GetResult],
+      backResult: Future[GetResult]): Future[GetResult] = {
     frontResult
   }
 
@@ -115,7 +120,9 @@ trait DarkRead extends Client {
   }
 
   // DarkRead always choose the front result and ignore the backend one
-  protected def chooseGetsResult(frontResult: Future[GetsResult], backResult: Future[GetsResult]): Future[GetsResult] = {
+  protected def chooseGetsResult(
+      frontResult: Future[GetsResult],
+      backResult: Future[GetsResult]): Future[GetsResult] = {
     frontResult
   }
 
@@ -126,30 +133,38 @@ trait DarkRead extends Client {
 }
 
 /**
- * ReadWarmup client.
- * can only be mixed into DarkRead client;
- * before returning frontend result, use frontend result to warm up backend missed key;
- * backend warming up is not not blocking or exposed.
- */
+  * ReadWarmup client.
+  * can only be mixed into DarkRead client;
+  * before returning frontend result, use frontend result to warm up backend missed key;
+  * backend warming up is not not blocking or exposed.
+  */
 trait ReadWarmup { self: DarkRead =>
-  override protected def chooseGetResult(frontResult: Future[GetResult], backResult: Future[GetResult]): Future[GetResult] = {
+  override protected def chooseGetResult(
+      frontResult: Future[GetResult],
+      backResult: Future[GetResult]): Future[GetResult] = {
     // when readRepairDark, hit on front should repair miss on back in the background
     Future.join(frontResult, backResult) onSuccess {
-      case (frontR, backR) => backR.misses foreach {
-        case key if frontR.hits.contains(key) => backendClient.set(key, frontR.hits.get(key).get.value)
-        case _ =>
-      }
+      case (frontR, backR) =>
+        backR.misses foreach {
+          case key if frontR.hits.contains(key) =>
+            backendClient.set(key, frontR.hits.get(key).get.value)
+          case _ =>
+        }
     }
 
     frontResult
   }
 
-  override protected def chooseGetsResult(frontResult: Future[GetsResult], backResult: Future[GetsResult]): Future[GetsResult] = {
+  override protected def chooseGetsResult(
+      frontResult: Future[GetsResult],
+      backResult: Future[GetsResult]): Future[GetsResult] = {
     Future.join(frontResult, backResult) onSuccess {
-      case (frontR, backR) => backR.misses foreach {
-        case key if frontR.hits.contains(key) => backendClient.set(key, frontR.hits.get(key).get.value)
-        case _ =>
-      }
+      case (frontR, backR) =>
+        backR.misses foreach {
+          case key if frontR.hits.contains(key) =>
+            backendClient.set(key, frontR.hits.get(key).get.value)
+          case _ =>
+        }
     }
 
     frontResult
@@ -157,39 +172,44 @@ trait ReadWarmup { self: DarkRead =>
 }
 
 /**
- * DarkWrite client.
- * requires backendClient;
- * override all write operation (except cas) to send dark write to backend pool;
- * backend write results are not blocking or exposed.
- */
+  * DarkWrite client.
+  * requires backendClient;
+  * override all write operation (except cas) to send dark write to backend pool;
+  * backend write results are not blocking or exposed.
+  */
 trait DarkWrite extends Client {
   protected val backendClient: Client
 
-  abstract override def set(key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def set(
+      key: String, flags: Int, expiry: Time, value: Buf) = {
     val result = super.set(key, flags, expiry, value)
     backendClient.set(key, flags, expiry, value)
     result
   }
 
-  abstract override def add(key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def add(
+      key: String, flags: Int, expiry: Time, value: Buf) = {
     val result = super.add(key, flags, expiry, value)
     backendClient.add(key, flags, expiry, value)
     result
   }
 
-  abstract override def append(key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def append(
+      key: String, flags: Int, expiry: Time, value: Buf) = {
     val result = super.append(key, flags, expiry, value)
     backendClient.append(key, flags, expiry, value)
     result
   }
 
-  abstract override def prepend(key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def prepend(
+      key: String, flags: Int, expiry: Time, value: Buf) = {
     val result = super.prepend(key, flags, expiry, value)
     backendClient.prepend(key, flags, expiry, value)
     result
   }
 
-  abstract override def replace(key: String, flags: Int, expiry: Time, value: Buf) = {
+  abstract override def replace(
+      key: String, flags: Int, expiry: Time, value: Buf) = {
     val result = super.replace(key, flags, expiry, value)
     backendClient.replace(key, flags, expiry, value)
     result
@@ -208,7 +228,8 @@ trait DarkWrite extends Client {
   }
 
   // cas operation does not migrate
-  abstract override def checkAndSet(key: String, flags: Int, expiry: Time, value: Buf, casUnique: Buf) =
+  abstract override def checkAndSet(
+      key: String, flags: Int, expiry: Time, value: Buf, casUnique: Buf) =
     super.checkAndSet(key, flags, expiry, value, casUnique)
 
   abstract override def delete(key: String) = {
@@ -224,11 +245,11 @@ trait DarkWrite extends Client {
 }
 
 /**
- * FallbackRead client.
- * requires backendClient;
- * override Get to read the backend pool if for frontend pool misses;
- * Gets remains the same, as fallback reading backend pool for cas_unique is useless.
- */
+  * FallbackRead client.
+  * requires backendClient;
+  * override Get to read the backend pool if for frontend pool misses;
+  * Gets remains the same, as fallback reading backend pool for cas_unique is useless.
+  */
 trait FallbackRead extends Client {
   protected val backendClient: Client
 
@@ -237,14 +258,16 @@ trait FallbackRead extends Client {
 
     frontResult flatMap {
       case frontR if (frontR.misses.nonEmpty || frontR.failures.nonEmpty) =>
-        backendClient.getResult(frontR.misses ++ frontR.failures.keySet) map { backR =>
-          combineGetResult(frontR, backR)
+        backendClient.getResult(frontR.misses ++ frontR.failures.keySet) map {
+          backR =>
+            combineGetResult(frontR, backR)
         }
       case frontR => Future.value(frontR)
     }
   }
 
-  protected def combineGetResult(frontR: GetResult, backR: GetResult): GetResult = {
+  protected def combineGetResult(
+      frontR: GetResult, backR: GetResult): GetResult = {
     // when fallback, merge the front hits with back result
     GetResult.merged(Seq(GetResult(frontR.hits), backR))
   }
@@ -261,13 +284,14 @@ trait FallbackRead extends Client {
 }
 
 /**
- * ReadRepair client.
- * can only be mixed into FallbackRead client;
- * before combining frontend and backend result, use backend result to repair frontend missed key;
- * frontend repairing is not not blocking or exposed.
- */
+  * ReadRepair client.
+  * can only be mixed into FallbackRead client;
+  * before combining frontend and backend result, use backend result to repair frontend missed key;
+  * frontend repairing is not not blocking or exposed.
+  */
 trait ReadRepair { self: FallbackRead =>
-  override def combineGetResult(frontR: GetResult, backR: GetResult): GetResult = {
+  override def combineGetResult(
+      frontR: GetResult, backR: GetResult): GetResult = {
     // when readrepair, use back hit to repair front miss
     backR.hits foreach {
       case (k, v) => set(k, v.value)
@@ -278,10 +302,13 @@ trait ReadRepair { self: FallbackRead =>
 
 object MigrationClient {
   def newMigrationClient(zkHosts: String, zkPath: String) = {
-    val zkClient = DefaultZkClientFactory.get(DefaultZkClientFactory.hostSet(zkHosts))._1
+    val zkClient =
+      DefaultZkClientFactory.get(DefaultZkClientFactory.hostSet(zkHosts))._1
 
-    val oldPoolPath = zkPath+"/" + MigrationConstants.PoolNames.OldPool.toString
-    val newPoolPath = zkPath+"/" + MigrationConstants.PoolNames.NewPool.toString
+    val oldPoolPath =
+      zkPath + "/" + MigrationConstants.PoolNames.OldPool.toString
+    val newPoolPath =
+      zkPath + "/" + MigrationConstants.PoolNames.NewPool.toString
 
     // verify the format of the path (zkPath, zkClient)
     assert(zkClient.get().exists(zkPath, false) != null)
@@ -291,14 +318,15 @@ object MigrationClient {
     // create client for old and new pool
     val oldClient = Memcached.client
       .configured(Memcached.param.EjectFailedHost(false))
-      .newRichClient("twcache!"+zkHosts+"!"+oldPoolPath)
+      .newRichClient("twcache!" + zkHosts + "!" + oldPoolPath)
     val newClient = Memcached.client
       .configured(Memcached.param.EjectFailedHost(false))
-      .newRichClient("twcache!"+zkHosts+"!"+newPoolPath)
+      .newRichClient("twcache!" + zkHosts + "!" + newPoolPath)
 
     val migrationStatsReceiver = ClientStatsReceiver.scope("migrationclient")
 
     // create MigrationClient, by oldClient newClient, (zkPath, zkClient)
-    new MigrationClient(oldClient, newClient, zkPath, zkClient, migrationStatsReceiver)
+    new MigrationClient(
+        oldClient, newClient, zkPath, zkClient, migrationStatsReceiver)
   }
 }

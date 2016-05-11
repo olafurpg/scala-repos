@@ -6,12 +6,14 @@ import com.intellij.refactoring.rename.RenamePsiElementProcessor
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 
 /**
- * Nikolay.Tropin
- * 2014-03-27
- */
-trait ScalaRenameProcessor { this: RenamePsiElementProcessor =>
+  * Nikolay.Tropin
+  * 2014-03-27
+  */
+trait ScalaRenameProcessor {
+  this: RenamePsiElementProcessor =>
 
-  override def setToSearchForTextOccurrences(element: PsiElement, enabled: Boolean): Unit = {
+  override def setToSearchForTextOccurrences(
+      element: PsiElement, enabled: Boolean): Unit = {
     ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_NON_CODE_FILES = enabled
   }
 
@@ -19,11 +21,16 @@ trait ScalaRenameProcessor { this: RenamePsiElementProcessor =>
     ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_NON_CODE_FILES
   }
 
-  override def setToSearchInComments(element: PsiElement, enabled: Boolean): Unit = {
-    ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_COMMENTS_AND_STRINGS = enabled
+  override def setToSearchInComments(
+      element: PsiElement, enabled: Boolean): Unit = {
+    ScalaApplicationSettings
+      .getInstance()
+      .RENAME_SEARCH_IN_COMMENTS_AND_STRINGS = enabled
   }
 
   override def isToSearchInComments(element: PsiElement): Boolean = {
-    ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_COMMENTS_AND_STRINGS
+    ScalaApplicationSettings
+      .getInstance()
+      .RENAME_SEARCH_IN_COMMENTS_AND_STRINGS
   }
 }

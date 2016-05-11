@@ -12,50 +12,49 @@ import akka.http.scaladsl.server._
 import akka.http.scaladsl.model.ws._
 
 /**
- * This crazy amount of indecipherable boilerplate is how we turn a
- * simple Actor into a Flow, without any backpressure, specifically
- * for use in akka-http WebSocket (but could be used elsewhere with
- * caution).
- *
- * If you want backpressure, you need to implement `Publisher` /
- * `Subscriber` or wait for:
- *
- *  - Source backpressure: https://github.com/akka/akka/issues/17610
- *  - Sink backpressure: https://github.com/akka/akka/issues/17967
- *
- * and then add appropriate Akka Streams buffering.
- *
- * Some more things that you might want:
- *
- *  - marshalling https://github.com/akka/akka/issues/17969
- *  - ping rate: https://github.com/akka/akka/issues/17968
- *  - compression: https://github.com/akka/akka/issues/17725
- *  - testing https://github.com/akka/akka/issues/17914
- *
- * And also note that WebSockets would almost certainly be better
- * modelled as a BidiFlow:
- *
- *  - https://github.com/akka/akka/issues/18008
- *
- * Some basic docs:
- *  http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC4/scala/http/routing-dsl/websocket-support.html
- */
+  * This crazy amount of indecipherable boilerplate is how we turn a
+  * simple Actor into a Flow, without any backpressure, specifically
+  * for use in akka-http WebSocket (but could be used elsewhere with
+  * caution).
+  *
+  * If you want backpressure, you need to implement `Publisher` /
+  * `Subscriber` or wait for:
+  *
+  *  - Source backpressure: https://github.com/akka/akka/issues/17610
+  *  - Sink backpressure: https://github.com/akka/akka/issues/17967
+  *
+  * and then add appropriate Akka Streams buffering.
+  *
+  * Some more things that you might want:
+  *
+  *  - marshalling https://github.com/akka/akka/issues/17969
+  *  - ping rate: https://github.com/akka/akka/issues/17968
+  *  - compression: https://github.com/akka/akka/issues/17725
+  *  - testing https://github.com/akka/akka/issues/17914
+  *
+  * And also note that WebSockets would almost certainly be better
+  * modelled as a BidiFlow:
+  *
+  *  - https://github.com/akka/akka/issues/18008
+  *
+  * Some basic docs:
+  *  http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC4/scala/http/routing-dsl/websocket-support.html
+  */
 object WebSocketBoilerplate {
   import Directives._
 
   /**
-   * @param actor see `actorRefAsFlow`
-   * @return a `Flow` suitable for use in a `Route`.
-   */
+    * @param actor see `actorRefAsFlow`
+    * @return a `Flow` suitable for use in a `Route`.
+    */
   def jsonWebsocket[Incoming, Outgoing](
-    actor: ActorRef => ActorRef
+      actor: ActorRef => ActorRef
   )(
-    implicit
-    m1: RootJsonFormat[Incoming],
-    m2: RootJsonFormat[Outgoing],
-    mat: Materializer,
-    oc: ClassTag[Outgoing],
-    printer: JsonPrinter = PrettyPrinter
+      implicit m1: RootJsonFormat[Incoming],
+      m2: RootJsonFormat[Outgoing],
+      mat: Materializer,
+      oc: ClassTag[Outgoing],
+      printer: JsonPrinter = PrettyPrinter
   ): Route = {
     val underlying = actorRefAsFlow[Incoming, Outgoing](actor)
     val marshalled = jsonMarshalledMessageFlow(underlying)
@@ -63,21 +62,24 @@ object WebSocketBoilerplate {
   }
 
   /**
-   * @param actor constructor for an actor that accepts `Incoming` messages and
-   *              sends (potentially async) `Outgoing` messages to
-   *              `target` (the parameter).
-   * @return the actor represented as a `Flow`, suitable for use in akka-stream
-   *         with caution.
-   */
+    * @param actor constructor for an actor that accepts `Incoming` messages and
+    *              sends (potentially async) `Outgoing` messages to
+    *              `target` (the parameter).
+    * @return the actor represented as a `Flow`, suitable for use in akka-stream
+    *         with caution.
+    */
   def actorRefAsFlow[Incoming, Outgoing](
-    actor: ActorRef => ActorRef
+      actor: ActorRef => ActorRef
   )(
-    implicit
-    mat: Materializer
+      implicit mat: Materializer
   ): Flow[Incoming, Outgoing, Unit] = {
-    val (target, pub) = Source.actorRef[Outgoing](
-      0, OverflowStrategy.fail
-    ).toMat(Sink.publisher)(Keep.both).run()
+    val (target, pub) = Source
+      .actorRef[Outgoing](
+          0,
+          OverflowStrategy.fail
+      )
+      .toMat(Sink.publisher)(Keep.both)
+      .run()
     val source = Source(pub)
 
     val handler = actor(target)
@@ -87,18 +89,17 @@ object WebSocketBoilerplate {
   }
 
   /**
-   * @param flow using user domain objects
-   * @return a `Flow` using WebSocket `Message`s
-   */
+    * @param flow using user domain objects
+    * @return a `Flow` using WebSocket `Message`s
+    */
   def jsonMarshalledMessageFlow[Incoming, Outgoing](
-    flow: Flow[Incoming, Outgoing, Unit]
+      flow: Flow[Incoming, Outgoing, Unit]
   )(
-    implicit
-    m1: RootJsonFormat[Incoming],
-    m2: RootJsonFormat[Outgoing],
-    //mat: Materializer,
-    oc: ClassTag[Outgoing],
-    printer: JsonPrinter = PrettyPrinter
+      implicit m1: RootJsonFormat[Incoming],
+      m2: RootJsonFormat[Outgoing],
+      //mat: Materializer,
+      oc: ClassTag[Outgoing],
+      printer: JsonPrinter = PrettyPrinter
   ): Flow[Message, Message, Unit] = {
     Flow[Message].collect {
       case TextMessage.Strict(msg) =>
@@ -110,5 +111,4 @@ object WebSocketBoilerplate {
         TextMessage.Strict(e.toJson.toString(printer)): Message
     }
   }
-
 }

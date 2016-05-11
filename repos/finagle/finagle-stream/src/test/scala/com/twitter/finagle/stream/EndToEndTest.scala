@@ -33,10 +33,11 @@ class EndToEndTest extends FunSuite {
   val codec = new Stream[Request]
 
   case class MyStreamResponse(
-    info: StreamResponse.Info,
-    messages: Offer[Buf],
-    error: Offer[Throwable]
-  ) extends StreamResponse {
+      info: StreamResponse.Info,
+      messages: Offer[Buf],
+      error: Offer[Throwable]
+  )
+      extends StreamResponse {
 
     val released = new Promise[Unit]
     def release() = released.updateIfEmpty(Return.Unit)
@@ -46,29 +47,34 @@ class EndToEndTest extends FunSuite {
     def apply(request: Request) = Future.value(response)
   }
 
-  class WorkItContext(){
+  class WorkItContext() {
     val streamRequest = 1
-    val httpRequest = from(StreamRequest(StreamRequest.Method.Get, "/")): HttpRequest
-    val info = StreamResponse.Info(Version(1, 1), StreamResponse.Status(200), Nil)
+    val httpRequest =
+      from(StreamRequest(StreamRequest.Method.Get, "/")): HttpRequest
+    val info =
+      StreamResponse.Info(Version(1, 1), StreamResponse.Status(200), Nil)
     val messages = new Broker[Buf]
     val error = new Broker[Throwable]
     val serverRes = MyStreamResponse(info, messages.recv, error.recv)
   }
 
-  def workIt(what: String)(mkClient: (MyStreamResponse) => (StreamService, SocketAddress)) {
-    test("Streams %s: writes from the server arrive on the client's channel".format(what)) {
+  def workIt(what: String)(
+      mkClient: (MyStreamResponse) => (StreamService, SocketAddress)) {
+    test("Streams %s: writes from the server arrive on the client's channel"
+          .format(what)) {
       val c = new WorkItContext()
       import c._
       val (client, _) = mkClient(serverRes)
       val clientRes = Await.result(client(streamRequest), 1.second)
       var result = ""
       val latch = new CountDownLatch(1)
-      (clientRes.error?) ensure {
+      (clientRes.error ?) ensure {
         Future { latch.countDown() }
       }
 
-      clientRes.messages.foreach { case Buf.Utf8(str) =>
-        result += str
+      clientRes.messages.foreach {
+        case Buf.Utf8(str) =>
+          result += str
       }
 
       messages !! Buf.Utf8("1")
@@ -81,7 +87,8 @@ class EndToEndTest extends FunSuite {
       client.close()
     }
 
-    test("Streams %s: writes from the server are queued before the client responds".format(what)) {
+    test("Streams %s: writes from the server are queued before the client responds"
+          .format(what)) {
       val c = new WorkItContext()
       import c._
       val (client, _) = mkClient(serverRes)
@@ -92,9 +99,10 @@ class EndToEndTest extends FunSuite {
 
       val latch = new CountDownLatch(3)
       var result = ""
-      clientRes.messages.foreach { case Buf.Utf8(str) =>
-        result += str
-        latch.countDown()
+      clientRes.messages.foreach {
+        case Buf.Utf8(str) =>
+          result += str
+          latch.countDown()
       }
 
       latch.within(1.second)
@@ -103,12 +111,14 @@ class EndToEndTest extends FunSuite {
       client.close()
     }
 
-    test("Streams %s: the client does not admit concurrent requests".format(what)) {
+    test("Streams %s: the client does not admit concurrent requests".format(
+            what)) {
       val c = new WorkItContext()
       import c._
       val (client, _) = mkClient(serverRes)
       val clientRes = Await.result(client(streamRequest), 15.seconds)
-      assert(client(streamRequest).poll match {
+      assert(
+          client(streamRequest).poll match {
         case Some(Throw(_: TooManyConcurrentRequestsException)) => true
         case _ => false
       })
@@ -116,120 +126,121 @@ class EndToEndTest extends FunSuite {
     }
 
     if (!sys.props.contains("SKIP_FLAKY"))
-    test("Streams %s: the server does not admit concurrent requests".format(what)) {
-      val c = new WorkItContext()
-      import c._
-      val (client, address) = mkClient(serverRes)
-      // The finagle client, by nature, doesn't allow for this, so
-      // we need to go through the trouble of establishing our own
-      // pipeline.
+      test("Streams %s: the server does not admit concurrent requests".format(
+              what)) {
+        val c = new WorkItContext()
+        import c._
+        val (client, address) = mkClient(serverRes)
+        // The finagle client, by nature, doesn't allow for this, so
+        // we need to go through the trouble of establishing our own
+        // pipeline.
 
-      val recvd = new Broker[ChannelEvent]
-      val bootstrap = new ClientBootstrap(
-        new NioClientSocketChannelFactory(
-          Executors.newCachedThreadPool(),
-          Executors.newCachedThreadPool()))
-      bootstrap.setPipelineFactory(new ChannelPipelineFactory {
-        override def getPipeline() = {
-          val pipeline = Channels.pipeline()
-          pipeline.addLast("httpCodec", new HttpClientCodec)
-          pipeline.addLast("recvd", new ChannelUpstreamHandler {
-            override def handleUpstream(ctx: ChannelHandlerContext, e: ChannelEvent) {
-              val keep = e match {
-                case se: ChannelStateEvent =>
-                  se.getState == ChannelState.OPEN
-                case _: WriteCompletionEvent => false
-                case _ => true
+        val recvd = new Broker[ChannelEvent]
+        val bootstrap = new ClientBootstrap(
+            new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
+                                              Executors.newCachedThreadPool()))
+        bootstrap.setPipelineFactory(new ChannelPipelineFactory {
+          override def getPipeline() = {
+            val pipeline = Channels.pipeline()
+            pipeline.addLast("httpCodec", new HttpClientCodec)
+            pipeline.addLast("recvd", new ChannelUpstreamHandler {
+              override def handleUpstream(ctx: ChannelHandlerContext,
+                                          e: ChannelEvent) {
+                val keep = e match {
+                  case se: ChannelStateEvent =>
+                    se.getState == ChannelState.OPEN
+                  case _: WriteCompletionEvent => false
+                  case _ => true
+                }
+                if (keep) recvd ! e
               }
-              if (keep) recvd ! e
+            })
+            pipeline
+          }
+        })
+
+        val connectFuture = bootstrap.connect(address).awaitUninterruptibly()
+        assert(connectFuture.isSuccess)
+        val channel = connectFuture.getChannel
+
+        // first request is accepted
+        assert(channel.write(httpRequest).awaitUninterruptibly().isSuccess)
+
+        messages !! Buf.Utf8("chunk1")
+
+        assert(
+            Await.result(recvd ?, 1.second) match {
+          case e: ChannelStateEvent =>
+            e.getState == ChannelState.OPEN &&
+            (java.lang.Boolean.TRUE equals e.getValue)
+          case _ => false
+        })
+
+        assert(
+            Await.result(recvd ?, 1.second) match {
+          case m: MessageEvent =>
+            m.getMessage match {
+              case res: HttpResponse => res.isChunked
+              case _ => false
             }
-          })
-          pipeline
-        }
-      })
+          case _ => false
+        })
 
-      val connectFuture = bootstrap
-        .connect(address)
-        .awaitUninterruptibly()
-      assert(connectFuture.isSuccess)
-      val channel = connectFuture.getChannel
+        assert(
+            Await.result(recvd ?, 1.second) match {
+          case m: MessageEvent =>
+            m.getMessage match {
+              case res: HttpChunk => !res.isLast // get "chunk1"
+              case _ => false
+            }
+          case _ => false
+        })
 
-      // first request is accepted
-      assert(channel
-        .write(httpRequest)
-        .awaitUninterruptibly()
-        .isSuccess)
+        // The following requests should be ignored
+        assert(channel.write(httpRequest).awaitUninterruptibly().isSuccess)
 
-      messages !! Buf.Utf8("chunk1")
+        // the streaming should continue
+        messages !! Buf.Utf8("chunk2")
 
-      assert(Await.result(recvd?, 1.second) match {
-        case e: ChannelStateEvent =>
-          e.getState == ChannelState.OPEN && (java.lang.Boolean.TRUE equals e.getValue)
-        case _ => false
-      })
+        assert(
+            Await.result(recvd ?, 1.second) match {
+          case m: MessageEvent =>
+            m.getMessage match {
+              case res: HttpChunk => !res.isLast // get "chunk2"
+              case _ => false
+            }
+          case _ => false
+        })
 
-      assert(Await.result(recvd?, 1.second) match {
-        case m: MessageEvent =>
-          m.getMessage match {
-            case res: HttpResponse => res.isChunked
-            case _ => false
-          }
-        case _ => false
-      })
+        error !! EOF
+        assert(Await.result(recvd ?, 1.second) match {
+          // Flaky because ChannelEvent can be an ExceptionEvent of
+          // "java.io.IOException: Connection reset by peer". Uncomment the
+          // following line to observe.
+          // case e: ExceptionEvent => throw new Exception(e.getCause)
+          case m: MessageEvent =>
+            m.getMessage match {
+              case res: HttpChunkTrailer => res.isLast
+              case _ => false
+            }
+          case _ => false
+        })
 
-      assert(Await.result(recvd?, 1.second) match {
-        case m: MessageEvent =>
-          m.getMessage match {
-            case res: HttpChunk => !res.isLast  // get "chunk1"
-            case _ => false
-          }
-        case _ => false
-      })
+        // And finally it's closed.
+        assert(
+            Await.result(recvd ?, 1.second) match {
+          case e: ChannelStateEvent =>
+            e.getState == ChannelState.OPEN &&
+            (java.lang.Boolean.FALSE equals e.getValue)
+          case _ => false
+        })
 
-      // The following requests should be ignored
-      assert(channel
-        .write(httpRequest)
-        .awaitUninterruptibly()
-        .isSuccess)
+        bootstrap.releaseExternalResources()
+        channel.close()
+      }
 
-      // the streaming should continue
-      messages !! Buf.Utf8("chunk2")
-
-      assert(Await.result(recvd?, 1.second) match {
-        case m: MessageEvent =>
-          m.getMessage match {
-            case res: HttpChunk => !res.isLast  // get "chunk2"
-            case _ => false
-          }
-        case _ => false
-      })
-
-      error !! EOF
-      assert(Await.result(recvd?, 1.second) match {
-        // Flaky because ChannelEvent can be an ExceptionEvent of
-        // "java.io.IOException: Connection reset by peer". Uncomment the
-        // following line to observe.
-        // case e: ExceptionEvent => throw new Exception(e.getCause)
-        case m: MessageEvent =>
-          m.getMessage match {
-            case res: HttpChunkTrailer => res.isLast
-            case _ => false
-          }
-        case _ => false
-      })
-
-      // And finally it's closed.
-      assert(Await.result(recvd?, 1.second) match {
-        case e: ChannelStateEvent =>
-          e.getState == ChannelState.OPEN && (java.lang.Boolean.FALSE equals e.getValue)
-        case _ => false
-      })
-
-      bootstrap.releaseExternalResources()
-      channel.close()
-    }
-
-    test("Streams %s: server ignores channel buffer messages after channel close".format(what)) {
+    test("Streams %s: server ignores channel buffer messages after channel close"
+          .format(what)) {
       val c = new WorkItContext()
       import c._
       val (client, address) = mkClient(serverRes)
@@ -238,12 +249,13 @@ class EndToEndTest extends FunSuite {
       var result = ""
       val latch = new CountDownLatch(1)
 
-      (clientRes.error?) ensure {
+      (clientRes.error ?) ensure {
         Future { latch.countDown() }
       }
 
-      clientRes.messages.foreach { case Buf.Utf8(str) =>
-        result += str
+      clientRes.messages.foreach {
+        case Buf.Utf8(str) =>
+          result += str
       }
 
       FuturePool.unboundedPool {
@@ -318,8 +330,10 @@ class EndToEndTest extends FunSuite {
     val s = Service.mk { (req: StreamRequest) =>
       val errors = new Broker[Throwable]
       errors ! EOF
-      Future.value(new StreamResponse {
-        val info = StreamResponse.Info(req.version, StreamResponse.Status(200), req.headers)
+      Future.value(
+          new StreamResponse {
+        val info = StreamResponse.Info(
+            req.version, StreamResponse.Status(200), req.headers)
         def messages = new Broker[Buf].recv
         def error = errors.recv
         def release() = errors !! EOF
@@ -342,7 +356,8 @@ class EndToEndTest extends FunSuite {
     val headers = Seq(Header("a", "b"), Header("c", "d"))
     val req = StreamRequest(StreamRequest.Method.Get, "/", headers = headers)
     val res = Await.result(client(req), 1.second)
-    assert(headers.forall(res.info.headers.contains), s"$headers not found in ${res.info.headers}")
+    assert(headers.forall(res.info.headers.contains),
+           s"$headers not found in ${res.info.headers}")
 
     Closable.all(client, server).close()
   }
@@ -370,10 +385,10 @@ class EndToEndTest extends FunSuite {
     val res = Await.result(client(streamRequest), 1.second)
     assert(count == 1)
     val f2 = client(streamRequest)
-    assert(f2.poll.isEmpty)  // because of the host connection limit
+    assert(f2.poll.isEmpty) // because of the host connection limit
 
     messages !! Buf.Utf8("1")
-    assert((res.messages??) == Buf.Utf8("1"))
+    assert((res.messages ??) == Buf.Utf8("1"))
     assert(count == 1)
     res.release()
     error !! EOF

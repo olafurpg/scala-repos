@@ -1,6 +1,6 @@
 import scala.tools.nsc._
 import scala.tools.partest.CompilerTest
-import scala.collection.{ mutable, immutable, generic }
+import scala.collection.{mutable, immutable, generic}
 
 object Test extends CompilerTest {
   import global._

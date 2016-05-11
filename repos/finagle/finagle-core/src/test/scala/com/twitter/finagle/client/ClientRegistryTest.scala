@@ -30,12 +30,9 @@ class crtnamer extends Namer {
 }
 
 @RunWith(classOf[JUnitRunner])
-class ClientRegistryTest extends FunSuite
-  with StringClient
-  with Eventually
-  with IntegrationPatience
-  with BeforeAndAfter
-  with MockitoSugar {
+class ClientRegistryTest
+    extends FunSuite with StringClient with Eventually with IntegrationPatience
+    with BeforeAndAfter with MockitoSugar {
 
   trait Ctx {
     val sr = new InMemoryStatsReceiver
@@ -48,12 +45,14 @@ class ClientRegistryTest extends FunSuite
     ClientRegistry.clear()
   }
 
-  test("ClientRegistry.expAllRegisteredClientsResolved zero clients")(new Ctx {
+  test("ClientRegistry.expAllRegisteredClientsResolved zero clients")(
+      new Ctx {
     val allResolved0 = ClientRegistry.expAllRegisteredClientsResolved()
     assert(allResolved0.poll == Some(Return(Set())))
   })
 
-  test("ClientRegistry.expAllRegisteredClientsResolved handles Addr.Bound")(new Ctx {
+  test("ClientRegistry.expAllRegisteredClientsResolved handles Addr.Bound")(
+      new Ctx {
     val va = Var[Addr](Addr.Pending)
 
     val c = stackClient.newClient(Name.Bound(va, new Object()), "foo")
@@ -66,7 +65,8 @@ class ClientRegistryTest extends FunSuite
     }
   })
 
-  test("ClientRegistry.expAllRegisteredClientsResolved handles Addr.Failed")(new Ctx {
+  test("ClientRegistry.expAllRegisteredClientsResolved handles Addr.Failed")(
+      new Ctx {
     val va = Var[Addr](Addr.Pending)
 
     val c = stackClient.newClient(Name.Bound(va, new Object()), "foo")
@@ -79,7 +79,8 @@ class ClientRegistryTest extends FunSuite
     }
   })
 
-  test("ClientRegistry.expAllRegisteredClientsResolved handles Addr.Neg")(new Ctx {
+  test("ClientRegistry.expAllRegisteredClientsResolved handles Addr.Neg")(
+      new Ctx {
     val va = Var[Addr](Addr.Pending)
 
     val c = stackClient.newClient(Name.Bound(va, new Object()), "foo")
@@ -92,7 +93,8 @@ class ClientRegistryTest extends FunSuite
     }
   })
 
-  test("ClientRegistry.expAllRegisteredClientsResolved more than one client")(new Ctx {
+  test("ClientRegistry.expAllRegisteredClientsResolved more than one client")(
+      new Ctx {
     val va0 = Var[Addr](Addr.Pending)
     val va1 = Var[Addr](Addr.Pending)
 
@@ -114,7 +116,8 @@ class ClientRegistryTest extends FunSuite
     }
   })
 
-  test("ClientRegistry.expAllRegisteredClientsResolved handles Name.Path")(new Ctx {
+  test("ClientRegistry.expAllRegisteredClientsResolved handles Name.Path")(
+      new Ctx {
     val path = Path.read("/$/com.twitter.finagle.client.crtnamer/foo")
     val c = stackClient.newClient(Name.Path(path), "foo")
     val allResolved = ClientRegistry.expAllRegisteredClientsResolved()
@@ -130,15 +133,19 @@ class ClientRegistryTest extends FunSuite
     val simple = new SimpleRegistry
     GlobalRegistry.withRegistry(simple) {
       val c = stackClient.newClient(Name.Path(path), "foo")
-      val prefix = Seq("client", "fancy", "foo", "/$/com.twitter.finagle.client.crtnamer/foo", "Pool")
+      val prefix = Seq("client",
+                       "fancy",
+                       "foo",
+                       "/$/com.twitter.finagle.client.crtnamer/foo",
+                       "Pool")
       val filtered = GlobalRegistry.get.toSet.filter { e =>
         e.key.startsWith(prefix)
       }
       val expected = Seq(
-        "high" -> "2147483647",
-        "low" -> "0",
-        "idleTime" -> "Duration.Top",
-        "maxWaiters" -> "2147483647"
+          "high" -> "2147483647",
+          "low" -> "0",
+          "idleTime" -> "Duration.Top",
+          "maxWaiters" -> "2147483647"
       ).map { case (key, value) => Entry(prefix :+ key, value) }
 
       expected.foreach { entry =>
@@ -153,39 +160,47 @@ class ClientRegistryTest extends FunSuite
 
   val param1 = TestParam(999)
 
-
   def newStack(): Stack[ServiceFactory[Int, Int]] = {
     val mockSvc = mock[Service[Int, Int]]
     when(mockSvc.apply(anyObject[Int])).thenReturn(Future.value(10))
 
     val factory = ServiceFactory.const(mockSvc)
 
-    val stack = new StackBuilder(Stack.Leaf(new Stack.Head {
+    val stack = new StackBuilder(
+        Stack.Leaf(new Stack.Head {
       def role: Stack.Role = headRole
       def description: String = "the head!!"
       def parameters: Seq[Stack.Param[_]] = Seq(TestParam2.param)
     }, factory))
-    val stackable: Stackable[ServiceFactory[Int, Int]] = new Stack.Module1[TestParam, ServiceFactory[Int, Int]] {
-      def make(p: TestParam, l: ServiceFactory[Int, Int]): ServiceFactory[Int, Int] = l.map { _.map { _ + p.p1 }}
+    val stackable: Stackable[ServiceFactory[Int, Int]] =
+      new Stack.Module1[TestParam, ServiceFactory[Int, Int]] {
+        def make(p: TestParam,
+                 l: ServiceFactory[Int, Int]): ServiceFactory[Int, Int] =
+          l.map { _.map { _ + p.p1 } }
 
-      val description: String = "description"
-      val role: Stack.Role = nameRole
-    }
+        val description: String = "description"
+        val role: Stack.Role = nameRole
+      }
     stack.push(stackable)
 
     stack.result
   }
 
-  test("RegistryEntryLifecycle module registers a Stack and then deregisters it") {
+  test(
+      "RegistryEntryLifecycle module registers a Stack and then deregisters it") {
     val stk = newStack()
-    val params = Stack.Params.empty + param1 + param.Label("foo") + param.ProtocolLibrary("fancy")
+    val params =
+      Stack.Params.empty + param1 + param.Label("foo") +
+      param.ProtocolLibrary("fancy")
     val simple = new SimpleRegistry()
     GlobalRegistry.withRegistry(simple) {
-      val factory = (RegistryEntryLifecycle.module[Int, Int] +: stk).make(params)
+      val factory =
+        (RegistryEntryLifecycle.module[Int, Int] +: stk).make(params)
       val expected = {
         Set(
-          Entry(Seq("client", "fancy", "foo", "/$/fail", "name", "p1"), "999"),
-          Entry(Seq("client", "fancy", "foo", "/$/fail", "head", "p2"), "1")
+            Entry(Seq("client", "fancy", "foo", "/$/fail", "name", "p1"),
+                  "999"),
+            Entry(Seq("client", "fancy", "foo", "/$/fail", "head", "p2"), "1")
         )
       }
       assert(GlobalRegistry.get.toSet == expected)
@@ -195,7 +210,8 @@ class ClientRegistryTest extends FunSuite
     }
   }
 
-  test("RegistryEntryLifecycle module cleans up duplicates after service closes") {
+  test(
+      "RegistryEntryLifecycle module cleans up duplicates after service closes") {
     val stk = newStack()
     val params = Stack.Params.empty + param.Label("foo")
 
@@ -208,7 +224,6 @@ class ClientRegistryTest extends FunSuite
     assert(ClientRegistry.registeredDuplicates(0).addr == "second")
     assert(ClientRegistry.registeredDuplicates(1).name == "foo")
     assert(ClientRegistry.registeredDuplicates(1).addr == "/$/fail")
-
 
     factory.close()
 

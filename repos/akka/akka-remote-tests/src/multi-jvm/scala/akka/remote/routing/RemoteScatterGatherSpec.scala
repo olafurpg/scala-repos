@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote.routing
 
 import scala.concurrent.duration._
@@ -9,7 +9,7 @@ import akka.actor.ActorRef
 import akka.actor.Address
 import akka.actor.PoisonPill
 import akka.actor.Props
-import akka.remote.testkit.{ STMultiNodeSpec, MultiNodeConfig, MultiNodeSpec }
+import akka.remote.testkit.{STMultiNodeSpec, MultiNodeConfig, MultiNodeSpec}
 import akka.routing.Broadcast
 import akka.routing.ScatterGatherFirstCompletedPool
 import akka.routing.RoutedActorRef
@@ -45,8 +45,9 @@ class RemoteScatterGatherMultiJvmNode2 extends RemoteScatterGatherSpec
 class RemoteScatterGatherMultiJvmNode3 extends RemoteScatterGatherSpec
 class RemoteScatterGatherMultiJvmNode4 extends RemoteScatterGatherSpec
 
-class RemoteScatterGatherSpec extends MultiNodeSpec(RemoteScatterGatherMultiJvmSpec)
-  with STMultiNodeSpec with ImplicitSender with DefaultTimeout {
+class RemoteScatterGatherSpec
+    extends MultiNodeSpec(RemoteScatterGatherMultiJvmSpec) with STMultiNodeSpec
+    with ImplicitSender with DefaultTimeout {
   import RemoteScatterGatherMultiJvmSpec._
 
   def initialParticipants = roles.size
@@ -54,7 +55,8 @@ class RemoteScatterGatherSpec extends MultiNodeSpec(RemoteScatterGatherMultiJvmS
   "A remote ScatterGatherFirstCompleted pool" must {
     "be locally instantiated on a remote node and be able to communicate through its RemoteActorRef" taggedAs LongRunningTest in {
 
-      system.eventStream.publish(Mute(EventFilter.warning(pattern = ".*received dead letter from.*")))
+      system.eventStream.publish(
+          Mute(EventFilter.warning(pattern = ".*received dead letter from.*")))
 
       runOn(first, second, third) {
         enterBarrier("start", "broadcast-end", "end", "done")
@@ -62,7 +64,11 @@ class RemoteScatterGatherSpec extends MultiNodeSpec(RemoteScatterGatherMultiJvmS
 
       runOn(fourth) {
         enterBarrier("start")
-        val actor = system.actorOf(ScatterGatherFirstCompletedPool(nrOfInstances = 1, within = 10.seconds).props(Props[SomeActor]), "service-hello")
+        val actor =
+          system.actorOf(ScatterGatherFirstCompletedPool(
+                             nrOfInstances = 1,
+                             within = 10.seconds).props(Props[SomeActor]),
+                         "service-hello")
         actor.isInstanceOf[RoutedActorRef] should ===(true)
 
         val connectionCount = 3
@@ -72,10 +78,14 @@ class RemoteScatterGatherSpec extends MultiNodeSpec(RemoteScatterGatherMultiJvmS
           actor ! "hit"
         }
 
-        val replies: Map[Address, Int] = (receiveWhile(5.seconds, messages = connectionCount * iterationCount) {
+        val replies: Map[Address, Int] = (receiveWhile(
+            5.seconds, messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
-        }).foldLeft(Map(node(first).address -> 0, node(second).address -> 0, node(third).address -> 0)) {
-          case (replyMap, address) ⇒ replyMap + (address -> (replyMap(address) + 1))
+        }).foldLeft(Map(node(first).address -> 0,
+                        node(second).address -> 0,
+                        node(third).address -> 0)) {
+          case (replyMap, address) ⇒
+            replyMap + (address -> (replyMap(address) + 1))
         }
 
         enterBarrier("broadcast-end")

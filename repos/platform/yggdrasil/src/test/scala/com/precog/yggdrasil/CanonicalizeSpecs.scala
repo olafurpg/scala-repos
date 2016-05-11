@@ -29,7 +29,9 @@ import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import org.scalacheck.Gen
 
-trait CanonicalizeSpec[M[+_]] extends ColumnarTableModuleTestSupport[M] with Specification with ScalaCheck {
+trait CanonicalizeSpec[M[+ _]]
+    extends ColumnarTableModuleTestSupport[M] with Specification
+    with ScalaCheck {
   import SampleData._
 
   val table = {
@@ -49,7 +51,7 @@ trait CanonicalizeSpec[M[+_]] extends ColumnarTableModuleTestSupport[M] with Spe
       {"foo":13},
       {"foo":14}
     ]""")
-    
+
     val sample = SampleData(elements.toStream)
     fromSample(sample)
   }
@@ -65,8 +67,9 @@ trait CanonicalizeSpec[M[+_]] extends ColumnarTableModuleTestSupport[M] with Spe
       val canonicalizedTable = table.canonicalize(minLength, Some(maxLength))
       val slices = canonicalizedTable.slices.toStream.copoint map (_.size)
       if (size > 0) {
-        slices.init must haveAllElementsLike { case (sliceSize: Int) =>
-          sliceSize must beBetween(minLength, maxLength)
+        slices.init must haveAllElementsLike {
+          case (sliceSize: Int) =>
+            sliceSize must beBetween(minLength, maxLength)
         }
         slices.last must be_<=(maxLength)
       } else {
@@ -76,7 +79,7 @@ trait CanonicalizeSpec[M[+_]] extends ColumnarTableModuleTestSupport[M] with Spe
   }
 
   def checkCanonicalize = {
-    implicit val gen = sample(schema)  
+    implicit val gen = sample(schema)
     check { (sample: SampleData) =>
       val table = fromSample(sample)
       val size = sample.data.size
@@ -129,15 +132,16 @@ trait CanonicalizeSpec[M[+_]] extends ColumnarTableModuleTestSupport[M] with Spe
   }
 
   def testCanonicalizeEmptySlices = {
-    def tableTakeRange(table: Table, start: Int, numToTake: Long) = 
+    def tableTakeRange(table: Table, start: Int, numToTake: Long) =
       table.takeRange(start, numToTake).slices.toStream.copoint
 
     val emptySlice = Slice(Map(), 0)
-    val slices = 
-      Stream(emptySlice) ++ tableTakeRange(table, 0, 5) ++
-      Stream(emptySlice) ++ tableTakeRange(table, 5, 4) ++
-      Stream(emptySlice) ++ tableTakeRange(table, 9, 5) ++
-      Stream(emptySlice)
+    val slices =
+      Stream(emptySlice) ++ tableTakeRange(table, 0, 5) ++ Stream(emptySlice) ++ tableTakeRange(
+          table,
+          5,
+          4) ++ Stream(emptySlice) ++ tableTakeRange(table, 9, 5) ++ Stream(
+          emptySlice)
 
     val toPrint = slices.map(_.size)
 
@@ -152,7 +156,7 @@ trait CanonicalizeSpec[M[+_]] extends ColumnarTableModuleTestSupport[M] with Spe
 
   def testCanonicalizeEmpty = {
     val table = Table.empty
-    
+
     val result = table.canonicalize(3)
 
     val slices = result.slices.toStream.copoint

@@ -1,19 +1,20 @@
 /** benchmark for testing equality.
- *  Mix: == between non-numbers ith Object.equals as equality: 66%
- *          50% of these are tests where eq is true.
- *       == between boxed integers: 17%
- *       == between boxed characters: 5%
- *       == between boxed bytes: 5%
- *       == between boxed longs: 5%
- *       == between boxed shorts: < 1%
- *       == between boxed floats: < 1%
- *       == between boxed doubles: < 1%
- * In all cases 50% of the tests return true.
- */
+  *  Mix: == between non-numbers ith Object.equals as equality: 66%
+  *          50% of these are tests where eq is true.
+  *       == between boxed integers: 17%
+  *       == between boxed characters: 5%
+  *       == between boxed bytes: 5%
+  *       == between boxed longs: 5%
+  *       == between boxed shorts: < 1%
+  *       == between boxed floats: < 1%
+  *       == between boxed doubles: < 1%
+  * In all cases 50% of the tests return true.
+  */
 object eqeq extends testing.Benchmark {
 
   def eqeqtest[T](creator: Int => T, n: Int): Int = {
-    val elems = Array.tabulate[AnyRef](n)(i => creator(i % 2).asInstanceOf[AnyRef])
+    val elems =
+      Array.tabulate[AnyRef](n)(i => creator(i % 2).asInstanceOf[AnyRef])
 
     var sum = 0
     var i = 0

@@ -1,10 +1,11 @@
 package com.twitter.concurrent
 
 object Once {
+
   /**
-   * Returns a function that runs `fn` the first time it's called and then never
-   * again.
-   */
+    * Returns a function that runs `fn` the first time it's called and then never
+    * again.
+    */
   def apply(fn: => Unit): () => Unit = {
     var executed = false
     new Function0[Unit] {

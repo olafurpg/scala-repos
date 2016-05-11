@@ -18,7 +18,8 @@ object RedisClientPipelineFactory extends ChannelPipelineFactory {
     val commandCodec = new CommandCodec
     val replyCodec = new ReplyCodec
 
-    pipeline.addLast("codec", new NaggatiCodec(replyCodec.decode, commandCodec.encode))
+    pipeline.addLast(
+        "codec", new NaggatiCodec(replyCodec.decode, commandCodec.encode))
 
     pipeline
   }
@@ -35,7 +36,9 @@ class Redis extends CodecFactory[Command, Reply] {
             val commandCodec = new CommandCodec
             val replyCodec = new ReplyCodec
 
-            pipeline.addLast("codec", new NaggatiCodec(commandCodec.decode, replyCodec.encode))
+            pipeline.addLast(
+                "codec",
+                new NaggatiCodec(commandCodec.decode, replyCodec.encode))
 
             pipeline
           }
@@ -71,30 +74,25 @@ private class RedisTracingFilter extends SimpleFilter[Command, Reply] {
         Trace.record(Annotation.ClientRecv())
         response
       }
-    }
-    else
-      service(command)
+    } else service(command)
   }
 }
 
 private class RedisLoggingFilter(stats: StatsReceiver)
-  extends SimpleFilter[Command, Reply] {
+    extends SimpleFilter[Command, Reply] {
 
   private[this] val error = stats.scope("error")
-  private[this] val succ  = stats.scope("success")
+  private[this] val succ = stats.scope("success")
 
   override def apply(command: Command, service: Service[Command, Reply]) = {
     service(command).map { response =>
       response match {
-        case StatusReply(_)
-          | IntegerReply(_)
-          | BulkReply(_)
-          | EmptyBulkReply()
-          | MBulkReply(_)
-          | NilMBulkReply()
-          | EmptyMBulkReply()    => succ.counter(command.command).incr()
+        case StatusReply(_) | IntegerReply(_) | BulkReply(_) |
+            EmptyBulkReply() | MBulkReply(_) | NilMBulkReply() |
+            EmptyMBulkReply() =>
+          succ.counter(command.command).incr()
         case ErrorReply(message) => error.counter(command.command).incr()
-        case _                   => error.counter(command.command).incr()
+        case _ => error.counter(command.command).incr()
       }
       response
     }

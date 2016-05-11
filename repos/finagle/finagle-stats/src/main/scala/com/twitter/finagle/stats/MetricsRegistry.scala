@@ -5,8 +5,7 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 private object MetricsRegistry {
-  case class StatEntryImpl(delta: Double, value: Double)
-    extends StatEntry
+  case class StatEntryImpl(delta: Double, value: Double) extends StatEntry
 
   def instantaneous(value: Double): StatEntry =
     StatEntryImpl(value, value)
@@ -19,9 +18,9 @@ private[twitter] trait MetricsRegistry extends StatsRegistry {
   import MetricsRegistry._
 
   /**
-   * A reference to the underlying Metrics representation.
-   * Note, this may be null.
-   */
+    * A reference to the underlying Metrics representation.
+    * Note, this may be null.
+    */
   val registry: Metrics
 
   private[this] val metrics = mutable.Map.empty[String, StatEntry]

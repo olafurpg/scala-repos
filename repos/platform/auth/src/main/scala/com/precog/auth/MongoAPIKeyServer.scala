@@ -31,9 +31,12 @@ import org.streum.configrity.Configuration
 
 import scalaz._
 
-object MongoAPIKeyServer extends BlueEyesServer with SecurityService with AkkaDefaults {
+object MongoAPIKeyServer
+    extends BlueEyesServer with SecurityService with AkkaDefaults {
   implicit val executionContext = defaultFutureDispatch
   implicit val M: Monad[Future] = new FutureMonad(executionContext)
-  def APIKeyManager(config: Configuration): (APIKeyManager[Future], Stoppable) = MongoAPIKeyManager(config)
+  def APIKeyManager(
+      config: Configuration): (APIKeyManager[Future], Stoppable) =
+    MongoAPIKeyManager(config)
   val clock = blueeyes.util.Clock.System
 }

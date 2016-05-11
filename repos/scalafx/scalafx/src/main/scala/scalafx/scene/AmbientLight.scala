@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,13 +33,14 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Color
 
 object AmbientLight {
-  implicit def sfxAmbientLight2jfx(al: AmbientLight): jfxs.AmbientLight = if (al != null) al.delegate else null
+  implicit def sfxAmbientLight2jfx(al: AmbientLight): jfxs.AmbientLight =
+    if (al != null) al.delegate else null
 }
 
 /** Defines an ambient light source object. Ambient light is a light source that seems to come from all directions. */
-class AmbientLight(override val delegate: jfxs.AmbientLight = new jfxs.AmbientLight())
-  extends LightBase(delegate)
-  with SFXDelegate[jfxs.AmbientLight] {
+class AmbientLight(
+    override val delegate: jfxs.AmbientLight = new jfxs.AmbientLight())
+    extends LightBase(delegate) with SFXDelegate[jfxs.AmbientLight] {
 
   /** Creates a new instance of `AmbientLight` class using the specified color. */
   def this(color: Color) {

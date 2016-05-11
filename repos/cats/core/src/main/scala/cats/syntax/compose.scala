@@ -5,7 +5,8 @@ import cats.arrow.Compose
 
 trait ComposeSyntax {
   // TODO: use simulacrum instances eventually
-  implicit def composeSyntax[F[_, _]: Compose, A, B](fab: F[A, B]): ComposeOps[F, A, B] =
+  implicit def composeSyntax[F[_, _]: Compose, A, B](
+      fab: F[A, B]): ComposeOps[F, A, B] =
     new ComposeOps[F, A, B](fab)
 }
 

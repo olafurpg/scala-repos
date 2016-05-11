@@ -1,9 +1,6 @@
+import scala.language.{implicitConversions, postfixOps, reflectiveCalls}
 
-
-import scala.language.{ implicitConversions, postfixOps, reflectiveCalls }
-
-object Test
-{
+object Test {
   implicit def x[A](a: A) = new { def xx = a }
 
   def main(args: Array[String]): Unit = {

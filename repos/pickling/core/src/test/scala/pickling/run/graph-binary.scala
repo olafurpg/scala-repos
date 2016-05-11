@@ -4,7 +4,6 @@ import org.scalatest.FunSuite
 
 import scala.pickling._, scala.pickling.Defaults._, binary._
 
-
 class Vertex(val label: String) {
   var neighbors: List[Vertex] = List()
 
@@ -53,6 +52,7 @@ class GraphBinaryTest extends FunSuite {
 
     val pickle = g.pickle
     val res = pickle.unpickle[Graph]
-    assert(res.vertices.toString === "List(Vertex(PHILIPP), Vertex(EPFL), Vertex(MS), Vertex(BBC))")
+    assert(
+        res.vertices.toString === "List(Vertex(PHILIPP), Vertex(EPFL), Vertex(MS), Vertex(BBC))")
   }
 }

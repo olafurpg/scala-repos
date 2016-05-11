@@ -1,21 +1,21 @@
 object SCL4276 {
-import java.io.ByteArrayInputStream
+  import java.io.ByteArrayInputStream
 
-object App extends Application {
+  object App extends Application {
 
-  val streamUser = new StreamUser
-  val is = ""
-  /*start*/streamUser.use(is)/*end*/
+    val streamUser = new StreamUser
+    val is = ""
+    /*start*/
+    streamUser.use(is) /*end*/
+  }
 
+  class StreamUser {
 
-}
-
-class StreamUser {
-
-  def use(stream: AnyRef{
-    def indexOf(x: String): Int
-  }) = 1
-  def use(x: Boolean): Boolean = false
-}
+    def use(
+        stream: AnyRef {
+      def indexOf(x: String): Int
+    }) = 1
+    def use(x: Boolean): Boolean = false
+  }
 }
 //Int

@@ -2,7 +2,8 @@ package lila.security
 
 case object Fixtures {
 
-  def json = """
+  def json =
+    """
 [
 
   "0-mail.com",

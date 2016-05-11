@@ -9,8 +9,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class DeserializeCtxTest extends FunSuite
-  with MockitoSugar {
+class DeserializeCtxTest extends FunSuite with MockitoSugar {
 
   test("only deserializes once") {
     val times = new AtomicInteger()
@@ -39,5 +38,4 @@ class DeserializeCtxTest extends FunSuite
     assert(Return(0) == deserCtx.deserialize(Array.empty))
     assert(Return(0) == deserCtx.deserialize(Array(9.toByte)))
   }
-
 }

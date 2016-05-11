@@ -42,7 +42,6 @@ final class Double private () extends Number with Comparable[Double] {
 
   @inline def isInfinite(): scala.Boolean =
     Double.isInfinite(doubleValue)
-
 }
 
 object Double {
@@ -61,22 +60,21 @@ object Double {
 
   @inline def valueOf(s: String): Double = valueOf(parseDouble(s))
 
-  private[this] lazy val doubleStrPat = new js.RegExp("^" +
-      "[\\x00-\\x20]*"   + // optional whitespace
-      "[+-]?"            + // optional sign
-      "(NaN|Infinity|"   + // special cases
-       "(\\d+\\.?\\d*|"  + // literal w/  leading digit
-        "\\.\\d+)"       + // literal w/o leading digit
-       "([eE][+-]?\\d+)?"+ // optional exponent
-      ")[fFdD]?"         + // optional float / double specifier (ignored)
-      "[\\x00-\\x20]*"   + // optional whitespace
+  private[this] lazy val doubleStrPat = new js.RegExp(
+      "^" + "[\\x00-\\x20]*" + // optional whitespace
+      "[+-]?" + // optional sign
+      "(NaN|Infinity|" + // special cases
+      "(\\d+\\.?\\d*|" + // literal w/  leading digit
+      "\\.\\d+)" + // literal w/o leading digit
+      "([eE][+-]?\\d+)?" + // optional exponent
+      ")[fFdD]?" + // optional float / double specifier (ignored)
+      "[\\x00-\\x20]*" + // optional whitespace
       "$")
 
   def parseDouble(s: String): scala.Double = {
     if (doubleStrPat.test(s))
       js.Dynamic.global.parseFloat(s).asInstanceOf[scala.Double]
-    else
-      throw new NumberFormatException(s"""For input string: "$s"""")
+    else throw new NumberFormatException(s"""For input string: "$s"""")
   }
 
   @inline def toString(d: scala.Double): String =
@@ -93,8 +91,8 @@ object Double {
       if (a == b) {
         // -0.0 must be smaller than 0.0
         if (a == 0.0) {
-          val ainf = 1.0/a
-          if (ainf == 1.0/b) 0
+          val ainf = 1.0 / a
+          if (ainf == 1.0 / b) 0
           else if (ainf < 0) -1
           else 1
         } else {

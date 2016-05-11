@@ -25,7 +25,7 @@ object ImplicitTest {
       if (xs.isEmpty) m.unit
       else m.add(xs.head, sum(xs.tail))
 
-    println(sum(/*start*/List(1, 2, 3))/*end*/)
+    println(sum( /*start*/ List(1, 2, 3)) /*end*/ )
   }
 }
 //List[Int]

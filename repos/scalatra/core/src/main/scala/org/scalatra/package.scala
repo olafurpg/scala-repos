@@ -1,7 +1,7 @@
 package org
 
 import org.scalatra.servlet.FileUploadSupport
-import org.scalatra.util.{ MultiMap, MapWithIndifferentAccess, MultiMapHeadView }
+import org.scalatra.util.{MultiMap, MapWithIndifferentAccess, MultiMapHeadView}
 
 package object scalatra
     extends Control // make halt and pass visible to helpers outside the DSL
@@ -10,21 +10,25 @@ package object scalatra
 
   object RouteTransformer {
 
-    implicit def fn2transformer(fn: Route => Route): RouteTransformer = new RouteTransformer {
-      override def apply(route: Route): Route = fn(route)
-    }
+    implicit def fn2transformer(fn: Route => Route): RouteTransformer =
+      new RouteTransformer {
+        override def apply(route: Route): Route = fn(route)
+      }
   }
 
   trait RouteTransformer {
     def apply(route: Route): Route
   }
 
-  @deprecated("Use ContentEncodingSupport, GZipSupport will be removed eventually", "2.4")
+  @deprecated(
+      "Use ContentEncodingSupport, GZipSupport will be removed eventually",
+      "2.4")
   type GZipSupport = ContentEncodingSupport
 
   type MultiParams = MultiMap
 
-  type Params = MultiMapHeadView[String, String] with MapWithIndifferentAccess[String]
+  type Params = MultiMapHeadView[String, String] with MapWithIndifferentAccess[
+      String]
 
   type Action = () => Any
 
@@ -38,7 +42,9 @@ package object scalatra
 
   val MultiParamsKey = "org.scalatra.MultiParams"
 
-  @deprecated("Use org.scalatra.servlet.ServletBase if you depend on the Servlet API, or org.scalatra.ScalatraBase if you don't.", "2.1.0")
+  @deprecated(
+      "Use org.scalatra.servlet.ServletBase if you depend on the Servlet API, or org.scalatra.ScalatraBase if you don't.",
+      "2.1.0")
   type ScalatraKernel = servlet.ServletBase
 
   type CoreStackNoFlash = CorsSupport with FutureSupport
@@ -55,5 +61,4 @@ package object scalatra
 
   type FullCoreStack = CoreStack with FileUploadSupport
   type FileUploadStack = FutureSupport with FlashMapSupport with FileUploadSupport
-
 }

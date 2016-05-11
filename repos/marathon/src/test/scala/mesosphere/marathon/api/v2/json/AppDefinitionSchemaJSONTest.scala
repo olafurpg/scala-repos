@@ -1,6 +1,6 @@
 package mesosphere.marathon.api.v2.json
 
-import mesosphere.marathon.{ MarathonTestHelper, MarathonSpec }
+import mesosphere.marathon.{MarathonTestHelper, MarathonSpec}
 import org.scalatest.GivenWhenThen
 
 /**
@@ -11,9 +11,9 @@ import org.scalatest.GivenWhenThen
   */
 class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
   test("command health checks WITHOUT a nested value should be rejected") {
-    Given("an app definition WITHOUT a nested value in command section of a health check")
-    val json =
-      """
+    Given(
+        "an app definition WITHOUT a nested value in command section of a health check")
+    val json = """
         |{
         |  "id": "/test",
         |  "cmd": "echo hi",
@@ -31,7 +31,8 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
   }
 
   test("command health checks WITH a nested value should be accepted") {
-    Given("an app definition WITH a nested value in command section of a health check")
+    Given(
+        "an app definition WITH a nested value in command section of a health check")
     val json =
       """
         |{
@@ -52,8 +53,7 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
   test("discoveryInfo ports WITH a correct protocol should be accepted") {
     Given("an app definition WITH a discovery info with a TCP and a UDP port")
-    val json =
-      """
+    val json = """
         |{
         |  "id": "/test",
         |  "cmd": "echo hi",
@@ -74,8 +74,7 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
   test("discoveryInfo ports WITH an incorrect protocol should be rejected") {
     Given("an app definition WITH a discovery info with a FOO protocol port")
-    val json =
-      """
+    val json = """
         |{
         |  "id": "/test",
         |  "cmd": "echo hi",
@@ -95,8 +94,7 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
   test("command constrains WITH array of arrays of strings should succeed") {
     Given("constrains WITH nested arrays of strings")
-    val json =
-      """
+    val json = """
         |{
         |  "id": "/test",
         |  "cmd": "echo hi",
@@ -113,8 +111,7 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
   test("command constrains WITH unknown constraint should fail") {
     Given("constrains WITH nested arrays of strings")
-    val json =
-      """
+    val json = """
         |{
         |  "id": "/test",
         |  "cmd": "echo hi",
@@ -131,8 +128,7 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
   test("command constrains WITH array of strings and boolean should fail") {
     Given("constrains WITH nested array of something")
-    val json =
-      """
+    val json = """
         |{
         |  "id": "/test",
         |  "cmd": "echo hi",
@@ -146,8 +142,7 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
   test("command constrains WITH array of one string should fail") {
     Given("constrains WITH nested array of something")
-    val json =
-      """
+    val json = """
         |{
         |  "id": "/test",
         |  "cmd": "echo hi",

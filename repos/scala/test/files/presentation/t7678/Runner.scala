@@ -7,23 +7,33 @@ object Test extends InteractiveTest {
 
   override def runDefaultTests() {
     def resolveTypeTagHyperlink() {
-      val sym = compiler.askForResponse(() => compiler.currentRun.runDefinitions.TypeTagClass).get.left.get
+      val sym = compiler
+        .askForResponse(() => compiler.currentRun.runDefinitions.TypeTagClass)
+        .get
+        .left
+        .get
       val r = new Response[Position]
       compiler.askLinkPos(sym, new BatchSourceFile("", source), r)
       r.get
     }
 
     def checkTypeTagSymbolConsistent() {
-      compiler.askForResponse {
-        () => {
+      compiler.askForResponse { () =>
+        {
           val runDefinitions = currentRun.runDefinitions
           import runDefinitions._
-          assert(TypeTagsClass.map(sym => getMemberClass(sym, tpnme.TypeTag)) == TypeTagClass)
-          assert(TypeTagsClass.map(sym => getMemberClass(sym, tpnme.WeakTypeTag)) == WeakTypeTagClass)
-          assert(TypeTagsClass.map(sym => getMemberModule(sym, nme.WeakTypeTag)) == WeakTypeTagModule)
-          assert(getMemberMethod(ReflectPackage, nme.materializeClassTag) == materializeClassTag)
-          assert(ReflectApiPackage.map(sym => getMemberMethod(sym, nme.materializeWeakTypeTag)) == materializeWeakTypeTag)
-          assert(ReflectApiPackage.map(sym => getMemberMethod(sym, nme.materializeTypeTag)) == materializeTypeTag)
+          assert(
+              TypeTagsClass.map(sym => getMemberClass(sym, tpnme.TypeTag)) == TypeTagClass)
+          assert(TypeTagsClass.map(sym =>
+                    getMemberClass(sym, tpnme.WeakTypeTag)) == WeakTypeTagClass)
+          assert(TypeTagsClass.map(sym =>
+                    getMemberModule(sym, nme.WeakTypeTag)) == WeakTypeTagModule)
+          assert(
+              getMemberMethod(ReflectPackage, nme.materializeClassTag) == materializeClassTag)
+          assert(ReflectApiPackage.map(sym =>
+                    getMemberMethod(sym, nme.materializeWeakTypeTag)) == materializeWeakTypeTag)
+          assert(ReflectApiPackage.map(sym =>
+                    getMemberMethod(sym, nme.materializeTypeTag)) == materializeTypeTag)
           ()
         }
       }.get match {

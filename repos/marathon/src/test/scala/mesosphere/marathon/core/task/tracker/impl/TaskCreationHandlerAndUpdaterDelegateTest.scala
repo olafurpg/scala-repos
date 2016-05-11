@@ -5,14 +5,15 @@ import akka.testkit.TestProbe
 import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.state.PathId
-import mesosphere.marathon.test.{ MarathonActorSupport, Mockito }
-import mesosphere.marathon.{ MarathonSpec, MarathonTestHelper }
-import org.apache.mesos.Protos.{ TaskID, TaskStatus }
-import org.scalatest.{ Matchers, GivenWhenThen }
+import mesosphere.marathon.test.{MarathonActorSupport, Mockito}
+import mesosphere.marathon.{MarathonSpec, MarathonTestHelper}
+import org.apache.mesos.Protos.{TaskID, TaskStatus}
+import org.scalatest.{Matchers, GivenWhenThen}
 import org.scalatest.concurrent.ScalaFutures
 
 class TaskCreationHandlerAndUpdaterDelegateTest
-    extends MarathonActorSupport with MarathonSpec with Mockito with GivenWhenThen with ScalaFutures with Matchers {
+    extends MarathonActorSupport with MarathonSpec with Mockito
+    with GivenWhenThen with ScalaFutures with Matchers {
 
   test("Created succeeds") {
     val f = new Fixture
@@ -24,7 +25,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an update operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Update(task))
+        TaskTrackerActor.ForwardTaskOp(
+            f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Update(task))
     )
 
     When("the request is acknowledged")
@@ -43,7 +45,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an update operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Update(task))
+        TaskTrackerActor.ForwardTaskOp(
+            f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Update(task))
     )
 
     When("the response is an error")
@@ -66,7 +69,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an expunge operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Expunge)
+        TaskTrackerActor.ForwardTaskOp(
+            f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Expunge)
     )
 
     When("the request is acknowledged")
@@ -85,7 +89,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an expunge operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Expunge)
+        TaskTrackerActor.ForwardTaskOp(
+            f.timeoutFromNow, task.taskId, TaskOpProcessor.Action.Expunge)
     )
 
     When("the response is an error")
@@ -93,7 +98,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     f.taskTrackerProbe.reply(Status.Failure(cause))
     Then("The reply is the value of task")
     terminated.failed.futureValue.getMessage should include(appId.toString)
-    terminated.failed.futureValue.getMessage should include(task.taskId.idString)
+    terminated.failed.futureValue.getMessage should include(
+        task.taskId.idString)
     terminated.failed.futureValue.getMessage should include("Expunge")
     terminated.failed.futureValue.getCause should be(cause)
   }
@@ -103,14 +109,20 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     val appId: PathId = PathId("/test")
     val taskId = "task1"
 
-    val update = TaskStatus.newBuilder().setTaskId(TaskID.newBuilder().setValue(taskId)).buildPartial()
+    val update = TaskStatus
+      .newBuilder()
+      .setTaskId(TaskID.newBuilder().setValue(taskId))
+      .buildPartial()
 
     When("created is called")
     val statusUpdate = f.delegate.statusUpdate(appId, update)
 
     Then("an update operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow, Task.Id(taskId), TaskOpProcessor.Action.UpdateStatus(update))
+        TaskTrackerActor.ForwardTaskOp(
+            f.timeoutFromNow,
+            Task.Id(taskId),
+            TaskOpProcessor.Action.UpdateStatus(update))
     )
 
     When("the request is acknowledged")
@@ -124,14 +136,18 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     val appId: PathId = PathId("/test")
     val taskId = Task.Id.forApp(appId)
 
-    val update = TaskStatus.newBuilder().setTaskId(taskId.mesosTaskId).buildPartial()
+    val update =
+      TaskStatus.newBuilder().setTaskId(taskId.mesosTaskId).buildPartial()
 
     When("statusUpdate is called")
     val statusUpdate = f.delegate.statusUpdate(appId, update)
 
     Then("an update operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow, taskId, TaskOpProcessor.Action.UpdateStatus(update))
+        TaskTrackerActor.ForwardTaskOp(
+            f.timeoutFromNow,
+            taskId,
+            TaskOpProcessor.Action.UpdateStatus(update))
     )
 
     When("the response is an error")
@@ -148,7 +164,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     lazy val clock = ConstantClock()
     lazy val config = MarathonTestHelper.defaultConfig()
     lazy val taskTrackerProbe = TestProbe()
-    lazy val delegate = new TaskCreationHandlerAndUpdaterDelegate(clock, config, taskTrackerProbe.ref)
+    lazy val delegate = new TaskCreationHandlerAndUpdaterDelegate(
+        clock, config, taskTrackerProbe.ref)
     lazy val timeoutDuration = delegate.timeout.duration
     def timeoutFromNow = clock.now() + timeoutDuration
   }

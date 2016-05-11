@@ -18,23 +18,29 @@
 package org.apache.spark.graphx
 
 /**
- * Represents an edge along with its neighboring vertices and allows sending messages along the
- * edge. Used in [[Graph#aggregateMessages]].
- */
+  * Represents an edge along with its neighboring vertices and allows sending messages along the
+  * edge. Used in [[Graph#aggregateMessages]].
+  */
 abstract class EdgeContext[VD, ED, A] {
+
   /** The vertex id of the edge's source vertex. */
   def srcId: VertexId
+
   /** The vertex id of the edge's destination vertex. */
   def dstId: VertexId
+
   /** The vertex attribute of the edge's source vertex. */
   def srcAttr: VD
+
   /** The vertex attribute of the edge's destination vertex. */
   def dstAttr: VD
+
   /** The attribute associated with the edge. */
   def attr: ED
 
   /** Sends a message to the source vertex. */
   def sendToSrc(msg: A): Unit
+
   /** Sends a message to the destination vertex. */
   def sendToDst(msg: A): Unit
 
@@ -53,15 +59,16 @@ abstract class EdgeContext[VD, ED, A] {
 object EdgeContext {
 
   /**
-   * Extractor mainly used for Graph#aggregateMessages*.
-   * Example:
-   * {{{
-   *  val messages = graph.aggregateMessages(
-   *    case ctx @ EdgeContext(_, _, _, _, attr) =>
-   *      ctx.sendToDst(attr)
-   *    , _ + _)
-   * }}}
-   */
-  def unapply[VD, ED, A](edge: EdgeContext[VD, ED, A]): Some[(VertexId, VertexId, VD, VD, ED)] =
+    * Extractor mainly used for Graph#aggregateMessages*.
+    * Example:
+    * {{{
+    *  val messages = graph.aggregateMessages(
+    *    case ctx @ EdgeContext(_, _, _, _, attr) =>
+    *      ctx.sendToDst(attr)
+    *    , _ + _)
+    * }}}
+    */
+  def unapply[VD, ED, A](
+      edge: EdgeContext[VD, ED, A]): Some[(VertexId, VertexId, VD, VD, ED)] =
     Some(edge.srcId, edge.dstId, edge.srcAttr, edge.dstAttr, edge.attr)
 }

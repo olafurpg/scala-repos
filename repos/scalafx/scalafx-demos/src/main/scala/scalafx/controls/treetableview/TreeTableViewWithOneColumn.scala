@@ -44,9 +44,9 @@ object TreeTableViewWithOneColumn extends JFXApp {
   val rootNode = new TreeItem("Root node") {
     expanded = true
     children = Seq(
-      new TreeItem("Child Node 1"),
-      new TreeItem("Child Node 2"),
-      new TreeItem("Child Node 3")
+        new TreeItem("Child Node 1"),
+        new TreeItem("Child Node 2"),
+        new TreeItem("Child Node 3")
     )
   }
 
@@ -57,12 +57,13 @@ object TreeTableViewWithOneColumn extends JFXApp {
       root = new TreeTableView(rootNode) {
         columns += new TreeTableColumn[String, String]("Column") {
           prefWidth = 150
-          cellValueFactory = { p => p.value.value }
+          cellValueFactory = { p =>
+            p.value.value
+          }
         }
         prefWidth = 152
         showRoot = true
       }
     }
   }
-
 }

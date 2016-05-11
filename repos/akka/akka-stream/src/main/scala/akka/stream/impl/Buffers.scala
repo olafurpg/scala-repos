@@ -1,14 +1,14 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.impl
 
-import java.{ util ⇒ ju }
+import java.{util ⇒ ju}
 import akka.stream._
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] trait Buffer[T] {
   def capacity: Int
   def used: Int
@@ -35,7 +35,7 @@ private[akka] object Buffer {
   def apply[T](size: Int, materializer: Materializer): Buffer[T] =
     materializer match {
       case m: ActorMaterializer ⇒ apply(size, m.settings.maxFixedBufferSize)
-      case _                    ⇒ apply(size, 1000000000)
+      case _ ⇒ apply(size, 1000000000)
     }
 
   def apply[T](size: Int, max: Int): Buffer[T] =
@@ -44,26 +44,28 @@ private[akka] object Buffer {
 }
 
 /**
- * INTERNAL API
- */
+  * INTERNAL API
+  */
 private[akka] object FixedSizeBuffer {
 
   /**
-   * INTERNAL API
-   *
-   * Returns a fixed size buffer backed by an array. The buffer implementation DOES NOT check against overflow or
-   * underflow, it is the responsibility of the user to track or check the capacity of the buffer before enqueueing
-   * dequeueing or dropping.
-   *
-   * Returns a specialized instance for power-of-two sized buffers.
-   */
+    * INTERNAL API
+    *
+    * Returns a fixed size buffer backed by an array. The buffer implementation DOES NOT check against overflow or
+    * underflow, it is the responsibility of the user to track or check the capacity of the buffer before enqueueing
+    * dequeueing or dropping.
+    *
+    * Returns a specialized instance for power-of-two sized buffers.
+    */
   def apply[T](size: Int): FixedSizeBuffer[T] =
     if (size < 1) throw new IllegalArgumentException("size must be positive")
     else if (((size - 1) & size) == 0) new PowerOfTwoFixedSizeBuffer(size)
     else new ModuloFixedSizeBuffer(size)
 
-  sealed abstract class FixedSizeBuffer[T](val capacity: Int) extends Buffer[T] {
-    override def toString = s"Buffer($capacity, $readIdx, $writeIdx)(${(readIdx until writeIdx).map(get).mkString(", ")})"
+  sealed abstract class FixedSizeBuffer[T](val capacity: Int)
+      extends Buffer[T] {
+    override def toString =
+      s"Buffer($capacity, $readIdx, $writeIdx)(${(readIdx until writeIdx).map(get).mkString(", ")})"
     private val buffer = new Array[AnyRef](capacity)
 
     protected var readIdx = 0L
@@ -82,8 +84,10 @@ private[akka] object FixedSizeBuffer {
     // for the maintenance parameter see dropHead
     protected def toOffset(idx: Long, maintenance: Boolean): Int
 
-    private def put(idx: Long, elem: T, maintenance: Boolean): Unit = buffer(toOffset(idx, maintenance)) = elem.asInstanceOf[AnyRef]
-    private def get(idx: Long): T = buffer(toOffset(idx, false)).asInstanceOf[T]
+    private def put(idx: Long, elem: T, maintenance: Boolean): Unit =
+      buffer(toOffset(idx, maintenance)) = elem.asInstanceOf[AnyRef]
+    private def get(idx: Long): T =
+      buffer(toOffset(idx, false)).asInstanceOf[T]
 
     def peek(): T = get(readIdx)
 
@@ -114,7 +118,8 @@ private[akka] object FixedSizeBuffer {
     }
   }
 
-  private[akka] final class ModuloFixedSizeBuffer[T](_size: Int) extends FixedSizeBuffer[T](_size) {
+  private[akka] final class ModuloFixedSizeBuffer[T](_size: Int)
+      extends FixedSizeBuffer[T](_size) {
     override protected def toOffset(idx: Long, maintenance: Boolean): Int = {
       if (maintenance && readIdx > Int.MaxValue) {
         /*
@@ -130,17 +135,19 @@ private[akka] object FixedSizeBuffer {
     }
   }
 
-  private[akka] final class PowerOfTwoFixedSizeBuffer[T](_size: Int) extends FixedSizeBuffer[T](_size) {
+  private[akka] final class PowerOfTwoFixedSizeBuffer[T](_size: Int)
+      extends FixedSizeBuffer[T](_size) {
     private val Mask = capacity - 1
-    override protected def toOffset(idx: Long, maintenance: Boolean): Int = idx.toInt & Mask
+    override protected def toOffset(idx: Long, maintenance: Boolean): Int =
+      idx.toInt & Mask
   }
-
 }
 
 /**
- * INTERNAL API
- */
-private[akka] final class BoundedBuffer[T](val capacity: Int) extends Buffer[T] {
+  * INTERNAL API
+  */
+private[akka] final class BoundedBuffer[T](val capacity: Int)
+    extends Buffer[T] {
 
   def used: Int = q.used
   def isFull: Boolean = q.isFull
@@ -202,7 +209,8 @@ private[akka] final class BoundedBuffer[T](val capacity: Int) extends Buffer[T] 
     }
   }
 
-  private final class DynamicQueue(startIdx: Int) extends ju.LinkedList[T] with Buffer[T] {
+  private final class DynamicQueue(startIdx: Int)
+      extends ju.LinkedList[T] with Buffer[T] {
     override def capacity = BoundedBuffer.this.capacity
     override def used = size
     override def isFull = size == capacity

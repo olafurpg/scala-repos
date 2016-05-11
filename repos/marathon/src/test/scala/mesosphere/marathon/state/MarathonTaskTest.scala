@@ -5,13 +5,14 @@ import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.Protos.MarathonTask
 import mesosphere.mesos.protos.Implicits._
 import mesosphere.mesos.protos.TextAttribute
-import org.scalatest.{ GivenWhenThen, Matchers }
+import org.scalatest.{GivenWhenThen, Matchers}
 
 class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
 
   test("toProto returns the encapsulated MarathonTask") {
     Given("A state created from a task")
-    val encapsulatedTask = makeTask("app/dummy", "dummyhost", 42000, version = Some("123"))
+    val encapsulatedTask =
+      makeTask("app/dummy", "dummyhost", 42000, version = Some("123"))
     val state = MarathonTaskState(encapsulatedTask)
 
     When("We call the toProto function")
@@ -23,7 +24,8 @@ class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
 
   test("mergeFromProto returns a sane instance") {
     Given("A state created from a task with version")
-    val dummy = makeTask("app/dummy", "dummyhost", 42000, version = Some("123"))
+    val dummy =
+      makeTask("app/dummy", "dummyhost", 42000, version = Some("123"))
     val dummyState = MarathonTaskState(dummy)
 
     When("We call the mergeFromProto function on that state")
@@ -36,7 +38,8 @@ class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
 
   test("mergeFromProto bytes returns a sane instance") {
     Given("A state created from a task with version")
-    val dummy = makeTask("app/dummy", "dummyhost", 42000, version = Some("123"))
+    val dummy =
+      makeTask("app/dummy", "dummyhost", 42000, version = Some("123"))
     val dummyState = MarathonTaskState(dummy)
 
     When("We call the mergeFromProto function using a byte array")
@@ -47,8 +50,10 @@ class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
     merged.toProto shouldEqual proto
   }
 
-  private[this] def makeTask(id: String, host: String, port: Int, version: Option[String]) = {
-    val builder = MarathonTask.newBuilder()
+  private[this] def makeTask(
+      id: String, host: String, port: Int, version: Option[String]) = {
+    val builder = MarathonTask
+      .newBuilder()
       .setHost(host)
       .addAllPorts(Lists.newArrayList(port))
       .setId(id)
@@ -58,5 +63,4 @@ class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
 
     builder.build()
   }
-
 }

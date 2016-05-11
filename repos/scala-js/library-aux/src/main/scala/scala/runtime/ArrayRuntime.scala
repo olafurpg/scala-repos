@@ -1,8 +1,7 @@
 package scala.runtime
 
 /** Not for public consumption.  Usage by the runtime only.
- */
-
+  */
 object ArrayRuntime {
   def cloneArray(array: Array[Boolean]): Array[Boolean] = array.clone()
   def cloneArray(array: Array[Char]): Array[Char] = array.clone()

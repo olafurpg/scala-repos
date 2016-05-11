@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.dispatch
 
 import akka.actor._
@@ -25,7 +25,8 @@ object NodeQueueBenchmark {
 class NodeQueueBenchmark {
   import NodeQueueBenchmark._
 
-  val config = ConfigFactory.parseString("""
+  val config = ConfigFactory
+    .parseString("""
 dispatcher {
   executor = "thread-pool-executor"
   throughput = 1000
@@ -37,12 +38,13 @@ mailbox {
   mailbox-type = "akka.dispatch.SingleConsumerOnlyUnboundedMailbox"
   mailbox-capacity = 1000000
 }
-""").withFallback(ConfigFactory.load())
+""")
+    .withFallback(ConfigFactory.load())
   implicit val sys = ActorSystem("ANQ", config)
   val ref = sys.actorOf(Props(new Actor {
     def receive = {
       case Stop => sender() ! Stop
-      case _    =>
+      case _ =>
     }
   }).withDispatcher("dispatcher").withMailbox("mailbox"), "receiver")
 
@@ -68,5 +70,4 @@ mailbox {
       todo -= 1
     }
   }
-
 }

@@ -9,7 +9,7 @@ abstract class C[@specialized T](_f: T) {
   }
 
   new Inner
-*/
+ */
 }
 
 class D extends C[Int](0) {

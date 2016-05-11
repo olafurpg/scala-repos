@@ -7,4 +7,3 @@ class Base[Coll] {
 class Derived extends Base[String] {
   class C extends Transformed[Any]
 }
-

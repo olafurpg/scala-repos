@@ -1,3 +1,3 @@
 object D {
-	val x = 3
+  val x = 3
 }

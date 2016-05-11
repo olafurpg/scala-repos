@@ -12,7 +12,7 @@ trait FunSpecStaticStringTest extends ScalaTestTestCase {
 
   def addFunSpec() = {
     addFileToProject(funSpecFileName,
-      """
+                     """
         |import org.scalatest._
         |
         |class FunSpecStringTest extends FunSpec {
@@ -40,19 +40,22 @@ trait FunSpecStaticStringTest extends ScalaTestTestCase {
   def testFunSpecSum() = {
     addFunSpec()
 
-    assert(checkConfigAndSettings(createTestFromLocation(8, 10, funSpecFileName), funSpecClassName,
-      "FunSpecTest works with sums"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(8, 10, funSpecFileName),
+                               funSpecClassName,
+                               "FunSpecTest works with sums"))
   }
 
   def testFunSpecVal() = {
     addFunSpec()
 
-    assert(checkConfigAndSettings(createTestFromLocation(5, 10, funSpecFileName), funSpecClassName,
-      "FunSpecTest consts"))
+    assert(
+        checkConfigAndSettings(createTestFromLocation(5, 10, funSpecFileName),
+                               funSpecClassName,
+                               "FunSpecTest consts"))
   }
 
   def testFunSpecValSum() = {
     addFunSpec()
-
   }
 }

@@ -6,9 +6,9 @@ class SmartOverloadedConstructor {
       this(2)
     }
   }
-  new A(nonon/*caret*/)
+  new A(nonon /*caret*/ )
 }
 /*
 nononBoolean
 nononInt
-*/
+ */

@@ -35,16 +35,16 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * PerspectiveTransform Spec tests.
- *
- *
- */
+  * PerspectiveTransform Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class PerspectiveTransformSpec
-  extends SimpleSFXDelegateSpec[jfxse.PerspectiveTransform, PerspectiveTransform](
-    classOf[jfxse.PerspectiveTransform], classOf[PerspectiveTransform])
-  with InputDelegateSpec[PerspectiveTransform] {
+    extends SimpleSFXDelegateSpec[
+        jfxse.PerspectiveTransform, PerspectiveTransform](
+        classOf[jfxse.PerspectiveTransform], classOf[PerspectiveTransform])
+    with InputDelegateSpec[PerspectiveTransform] {
 
   val inputDelegate = getScalaClassInstance
-
 }

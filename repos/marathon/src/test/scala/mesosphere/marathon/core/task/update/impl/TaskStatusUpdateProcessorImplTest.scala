@@ -9,29 +9,34 @@ import mesosphere.marathon.core.CoreGuiceModule
 import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.core.task.bus.{ TaskStatusEmitter, TaskStatusUpdateTestHelper }
-import mesosphere.marathon.core.task.tracker.{ TaskUpdater, TaskTracker }
+import mesosphere.marathon.core.task.bus.{TaskStatusEmitter, TaskStatusUpdateTestHelper}
+import mesosphere.marathon.core.task.tracker.{TaskUpdater, TaskTracker}
 import mesosphere.marathon.core.task.update.impl.steps._
 import mesosphere.marathon.event.MesosStatusUpdateEvent
 import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.metrics.Metrics
-import mesosphere.marathon.state.{ AppDefinition, AppRepository, PathId, Timestamp }
+import mesosphere.marathon.state.{AppDefinition, AppRepository, PathId, Timestamp}
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{ MarathonSchedulerDriverHolder, MarathonSpec, MarathonTestHelper }
+import mesosphere.marathon.{MarathonSchedulerDriverHolder, MarathonSpec, MarathonTestHelper}
 import org.apache.mesos.SchedulerDriver
 import org.mockito.ArgumentCaptor
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ GivenWhenThen, Matchers }
+import org.scalatest.{GivenWhenThen, Matchers}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class TaskStatusUpdateProcessorImplTest
-    extends MarathonSpec with Mockito with ScalaFutures with GivenWhenThen with Matchers {
-  test("process update for unknown task that's not lost will result in a kill and ack") {
+    extends MarathonSpec with Mockito with ScalaFutures with GivenWhenThen
+    with Matchers {
+  test(
+      "process update for unknown task that's not lost will result in a kill and ack") {
     fOpt = Some(new Fixture)
-    val origUpdate = TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
-    val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder.setTaskId(Task.Id.forApp(appId).mesosTaskId).build()
+    val origUpdate =
+      TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
+    val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder
+      .setTaskId(Task.Id.forApp(appId).mesosTaskId)
+      .build()
     val update = origUpdate.withTaskId(status.getTaskId)
     val taskId = update.wrapped.taskId
 
@@ -54,18 +59,24 @@ class TaskStatusUpdateProcessorImplTest
     f.verifyNoMoreInteractions()
   }
 
-  test("process update for known task without launchedTask that's not lost will result in a kill and ack") {
+  test(
+      "process update for known task without launchedTask that's not lost will result in a kill and ack") {
     fOpt = Some(new Fixture)
-    val origUpdate = TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
-    val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder.setTaskId(Task.Id.forApp(appId).mesosTaskId).build()
+    val origUpdate =
+      TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
+    val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder
+      .setTaskId(Task.Id.forApp(appId).mesosTaskId)
+      .build()
     val update = origUpdate.withTaskId(status.getTaskId)
     val taskId = update.wrapped.taskId
 
     Given("an unknown task")
     import scala.concurrent.ExecutionContext.Implicits.global
     f.taskTracker.task(taskId)(global) returns Future.successful(
-      Some(MarathonTestHelper.minimalReservedTask(
-        taskId.appId, Task.Reservation(Iterable.empty, MarathonTestHelper.taskReservationStateNew)))
+        Some(MarathonTestHelper.minimalReservedTask(
+                taskId.appId,
+                Task.Reservation(Iterable.empty,
+                                 MarathonTestHelper.taskReservationStateNew)))
     )
 
     When("we process the updated")
@@ -87,7 +98,9 @@ class TaskStatusUpdateProcessorImplTest
     fOpt = Some(new Fixture)
 
     val origUpdate = TaskStatusUpdateTestHelper.lost
-    val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder.setTaskId(Task.Id.forApp(appId).mesosTaskId).build()
+    val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder
+      .setTaskId(Task.Id.forApp(appId).mesosTaskId)
+      .build()
     val update = origUpdate.withTaskId(status.getTaskId)
     val taskId = update.wrapped.taskId
 
@@ -112,14 +125,17 @@ class TaskStatusUpdateProcessorImplTest
     fOpt = Some(new Fixture)
 
     val origUpdate = TaskStatusUpdateTestHelper.finished
-    val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder.setTaskId(Task.Id.forApp(appId).mesosTaskId).build()
+    val status = origUpdate.wrapped.status.mesosStatus.get.toBuilder
+      .setTaskId(Task.Id.forApp(appId).mesosTaskId)
+      .build()
     val update = origUpdate.withTaskId(status.getTaskId)
     val taskId = update.wrapped.taskId
 
     Given("a known task")
     import scala.concurrent.ExecutionContext.Implicits.global
     f.taskTracker.task(taskId) returns Future.successful(Some(taskState))
-    f.taskUpdater.statusUpdate(appId, status).asInstanceOf[Future[Unit]] returns Future.successful(())
+    f.taskUpdater.statusUpdate(appId, status).asInstanceOf[Future[Unit]] returns Future
+      .successful(())
     f.appRepository.app(appId, version) returns Future.successful(Some(app))
     And("and a cooperative launchQueue")
     f.launchQueue.notifyOfTaskUpdate(any) returns Future.successful(None)
@@ -148,7 +164,7 @@ class TaskStatusUpdateProcessorImplTest
     val eventCaptor = ArgumentCaptor.forClass(classOf[MesosStatusUpdateEvent])
     verify(f.eventBus).publish(eventCaptor.capture())
     eventCaptor.getValue should not be (null)
-    eventCaptor.getValue.appId should equal (appId)
+    eventCaptor.getValue.appId should equal(appId)
 
     And("that's it")
     f.verifyNoMoreInteractions()
@@ -160,8 +176,11 @@ class TaskStatusUpdateProcessorImplTest
   lazy val appId = PathId("/app")
   lazy val app = AppDefinition(appId)
   lazy val version = Timestamp.now()
-  lazy val task = MarathonTestHelper.makeOneCPUTask(Task.Id.forApp(appId).mesosTaskId.getValue).build()
-  lazy val taskState = MarathonTestHelper.stagedTask(task.getTaskId.getValue, appVersion = version)
+  lazy val task = MarathonTestHelper
+    .makeOneCPUTask(Task.Id.forApp(appId).mesosTaskId.getValue)
+    .build()
+  lazy val taskState = MarathonTestHelper.stagedTask(
+      task.getTaskId.getValue, appVersion = version)
   lazy val marathonTask = taskState.marathonTask
 
   after {
@@ -187,30 +206,33 @@ class TaskStatusUpdateProcessorImplTest
       holder
     }
 
-    lazy val notifyHealthCheckManager = new NotifyHealthCheckManagerStepImpl(healthCheckManager)
-    lazy val notifyRateLimiter = new NotifyRateLimiterStepImpl(launchQueue, appRepository)
+    lazy val notifyHealthCheckManager = new NotifyHealthCheckManagerStepImpl(
+        healthCheckManager)
+    lazy val notifyRateLimiter = new NotifyRateLimiterStepImpl(
+        launchQueue, appRepository)
     lazy val updateTaskTrackerStep = new UpdateTaskTrackerStepImpl(taskUpdater)
     lazy val postToEventStream = new PostToEventStreamStepImpl(eventBus)
     lazy val notifyLaunchQueue = new NotifyLaunchQueueStepImpl(launchQueue)
-    lazy val emitUpdate = new TaskStatusEmitterPublishStepImpl(taskStatusEmitter)
+    lazy val emitUpdate = new TaskStatusEmitterPublishStepImpl(
+        taskStatusEmitter)
     lazy val scaleApp = new ScaleAppUpdateStepImpl(schedulerActor.ref)
     lazy val guiceModule = new CoreGuiceModule
 
     lazy val updateProcessor = new TaskStatusUpdateProcessorImpl(
-      new Metrics(new MetricRegistry),
-      clock,
-      taskTracker,
-      marathonSchedulerDriverHolder,
-      // Use module method to ensure that we keep the list of steps in sync with the test.
-      guiceModule.taskStatusUpdateSteps(
-        notifyHealthCheckManager,
-        notifyRateLimiter,
-        updateTaskTrackerStep,
-        notifyLaunchQueue,
-        emitUpdate,
-        postToEventStream,
-        scaleApp
-      )
+        new Metrics(new MetricRegistry),
+        clock,
+        taskTracker,
+        marathonSchedulerDriverHolder,
+        // Use module method to ensure that we keep the list of steps in sync with the test.
+        guiceModule.taskStatusUpdateSteps(
+            notifyHealthCheckManager,
+            notifyRateLimiter,
+            updateTaskTrackerStep,
+            notifyLaunchQueue,
+            emitUpdate,
+            postToEventStream,
+            scaleApp
+        )
     )
 
     def verifyNoMoreInteractions(): Unit = {

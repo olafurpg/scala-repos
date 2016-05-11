@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js sbt plugin        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js sbt plugin        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.testadapter
 
@@ -26,11 +25,12 @@ import sbt.testing._
 import TaskDefSerializers._
 import ComUtils.LoopHandler
 
-final class ScalaJSRunner private[testadapter] (
+final class ScalaJSRunner private[testadapter](
     framework: ScalaJSFramework,
     val args: Array[String],
     val remoteArgs: Array[String]
-) extends Runner {
+)
+    extends Runner {
 
   // State and simple vals
 
@@ -40,8 +40,8 @@ final class ScalaJSRunner private[testadapter] (
   private[this] val slaves = TrieMap.empty[Long, ComJSRunner]
 
   /** An object used as lock for the loggers. Ensures output does not get
-   *  interleaved.
-   */
+    *  interleaved.
+    */
   private[testadapter] val loggerLock = new Object
 
   // Constructor body
@@ -92,8 +92,8 @@ final class ScalaJSRunner private[testadapter] (
     }
 
     // Now we wait for everyone to be completely stopped
-    val slavesStopped =
-      slaves.values.toList.map(s => Try(s.awaitOrStop(slavesDeadline.timeLeft)))
+    val slavesStopped = slaves.values.toList
+      .map(s => Try(s.awaitOrStop(slavesDeadline.timeLeft)))
     val masterStopped = Try(master.awaitOrStop(masterDeadline.timeLeft))
 
     // Cleanup
@@ -126,8 +126,7 @@ final class ScalaJSRunner private[testadapter] (
         }
       }
 
-      for (reply <- optReply)
-        slave.send(s"msg:$reply")
+      for (reply <- optReply) slave.send(s"msg:$reply")
 
       None
   }
@@ -149,22 +148,24 @@ final class ScalaJSRunner private[testadapter] (
   }
 
   /** Starts the stopping sequence of all slaves.
-   *  The returned future will be completed when all slaves are closing.
-   */
+    *  The returned future will be completed when all slaves are closing.
+    */
   private def stopSlaves(deadline: Deadline): Try[Unit] = {
     val slaves = this.slaves.values.toList // .toList to make it strict
 
     // First launch the stopping sequence on all slaves
-    val stopMessagesSent = for (slave <- slaves) yield Try {
-      slave.send("stopSlave")
-    }
+    val stopMessagesSent = for (slave <- slaves) yield
+      Try {
+        slave.send("stopSlave")
+      }
 
     // Then process all their messages and close them
-    val slavesClosed = for (slave <- slaves) yield Try {
-      ComUtils.receiveLoop(slave, deadline)(
-          msgHandler(slave) orElse ComUtils.doneHandler)
-      slave.close()
-    }
+    val slavesClosed = for (slave <- slaves) yield
+      Try {
+        ComUtils.receiveLoop(slave, deadline)(
+            msgHandler(slave) orElse ComUtils.doneHandler)
+        slave.close()
+      }
 
     // Return the first failed of all these Try's
     (stopMessagesSent ++ slavesClosed) collectFirst {
@@ -231,5 +232,4 @@ final class ScalaJSRunner private[testadapter] (
       case ("ok", "") =>
     }
   }
-
 }

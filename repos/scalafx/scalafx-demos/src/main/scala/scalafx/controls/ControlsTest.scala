@@ -36,14 +36,15 @@ import scalafx.scene.layout._
 object ControlsTest extends JFXApp {
 
   val indicatorPane = new VBox {
-    children = List(new Label {
+    children = List(
+        new Label {
       text = "LEFT"
-
     })
   }
 
   val controlsPane = new VBox {
-    children = List(new Label {
+    children = List(
+        new Label {
       text = "RIGHT"
     })
   }
@@ -53,7 +54,8 @@ object ControlsTest extends JFXApp {
       text = "Label"
     }
     center = new StackPane {
-      children = List(new Button {
+      children = List(
+          new Button {
         text = "Button"
       })
     }
@@ -84,5 +86,4 @@ object ControlsTest extends JFXApp {
   controlsPane.prefWidth <== mainContent.width * 0.2
   //  centerPane.prefHeight <== stage.scene.height
   //  centerPane.prefWidth <== stage.scene.width * 0.6
-
 }

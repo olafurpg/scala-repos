@@ -1,7 +1,8 @@
 package scala.t6162
 
 class Bar {
-  @deprecatedOverriding("`bar` will be made private in a future version.", "2.10.0")
+  @deprecatedOverriding(
+      "`bar` will be made private in a future version.", "2.10.0")
   def bar = 42
 
   @deprecatedOverriding()

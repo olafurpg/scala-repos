@@ -1,7 +1,8 @@
 import org.scalacheck._, Prop._, Gen._, Arbitrary._
 import scala.reflect.runtime.universe._, Flag._
 
-object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction") {
+object TermDeconstructionProps
+    extends QuasiquoteProperties("term deconstruction") {
   property("f(..x) = f") = test {
     // see SI-8008
     assertThrows[MatchError] {
@@ -29,14 +30,16 @@ object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction
     y1 ≈ x1 && y2 ≈ x2 && ys ≈ List(x3)
   }
 
-  property("f(y1, ..ys, yn)") = forAll { (x1: Tree, x2: Tree, x3: Tree, x4: Tree) =>
-    val q"f($y1, ..$ys, $yn)" = q"f($x1, $x2, $x3, $x4)"
-    y1 ≈ x1 && ys ≈ List(x2, x3) && yn ≈ x4
+  property("f(y1, ..ys, yn)") = forAll {
+    (x1: Tree, x2: Tree, x3: Tree, x4: Tree) =>
+      val q"f($y1, ..$ys, $yn)" = q"f($x1, $x2, $x3, $x4)"
+      y1 ≈ x1 && ys ≈ List(x2, x3) && yn ≈ x4
   }
 
-  property("f(..ys, y_{n-1}, y_n)") = forAll { (x1: Tree, x2: Tree, x3: Tree, x4: Tree) =>
-    val q"f(..$ys, $yn1, $yn)" = q"f($x1, $x2, $x3, $x4)"
-    ys ≈ List(x1, x2) && yn1 ≈ x3 && yn ≈ x4
+  property("f(..ys, y_{n-1}, y_n)") = forAll {
+    (x1: Tree, x2: Tree, x3: Tree, x4: Tree) =>
+      val q"f(..$ys, $yn1, $yn)" = q"f($x1, $x2, $x3, $x4)"
+      ys ≈ List(x1, x2) && yn1 ≈ x3 && yn ≈ x4
   }
 
   property("f(...xss)") = forAll { (x1: Tree, x2: Tree) =>
@@ -49,9 +52,10 @@ object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction
     xss ≈ List(List(x1), List(x2)) && last ≈ List(x3)
   }
 
-  property("f(...$xss)(..$lastinit, $lastlast)") = forAll { (x1: Tree, x2: Tree, x3: Tree, x4: Tree) =>
-    val q"f(...$xss)(..$lastinit, $lastlast)" = q"f($x1)($x2, $x3, $x4)"
-    xss ≈ List(List(x1)) && lastinit ≈ List(x2, x3) && lastlast ≈ x4
+  property("f(...$xss)(..$lastinit, $lastlast)") = forAll {
+    (x1: Tree, x2: Tree, x3: Tree, x4: Tree) =>
+      val q"f(...$xss)(..$lastinit, $lastlast)" = q"f($x1)($x2, $x3, $x4)"
+      xss ≈ List(List(x1)) && lastinit ≈ List(x2, x3) && lastlast ≈ x4
   }
 
   property("f(...xss) = f") = forAll { (x1: Tree, x2: Tree) =>
@@ -94,7 +98,8 @@ object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction
   }
 
   property("deconstruct splitting last case") = test {
-    val q"$_ match { case ..$cases case $last }" = q"x match { case 1 => case 2 => case 3 => }"
+    val q"$_ match { case ..$cases case $last }" =
+      q"x match { case 1 => case 2 => case 3 => }"
     assert(cases ≈ List(cq"1 =>", cq"2 =>"))
     assert(last ≈ cq"3 =>")
   }
@@ -119,7 +124,8 @@ object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction
 
   property("exhaustive new pattern") = test {
     def matches(line: String) {
-      val q"new { ..$early } with $name[..$targs](...$vargss) with ..$mixin { $self => ..$body }" = parse(line)
+      val q"new { ..$early } with $name[..$targs](...$vargss) with ..$mixin { $self => ..$body }" =
+        parse(line)
     }
     matches("new foo")
     matches("new foo { body }")
@@ -228,7 +234,7 @@ object TermDeconstructionProps extends QuasiquoteProperties("term deconstruction
     val q"new C()" = q"new C"
   }
 
-  property("SI-8350 new applications extracted only for non-empty ctor calls") = test{
+  property("SI-8350 new applications extracted only for non-empty ctor calls") = test {
     val q"new $c1" = q"new C()"
     assert(c1 ≈ tq"C")
     val q"new $c2" = q"new C(x)"

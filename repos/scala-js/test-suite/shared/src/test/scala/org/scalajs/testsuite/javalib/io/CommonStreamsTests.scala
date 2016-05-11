@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.io
 
@@ -25,11 +25,9 @@ trait CommonStreamsTests {
     @Test def should_provide_read()(): Unit = {
       val stream = newStream
 
-      for (i <- 1 to length)
-        assertEquals(i, stream.read())
+      for (i <- 1 to length) assertEquals(i, stream.read())
 
-      for (_ <- 1 to 5)
-        assertEquals(-1, stream.read())
+      for (_ <- 1 to 5) assertEquals(-1, stream.read())
     }
 
     @Test def should_provide_read_from_buf(): Unit = {
@@ -75,7 +73,6 @@ trait CommonStreamsTests {
       assertEquals(-1, stream.read(buf, 0, 10))
       assertEquals(0, stream.read(buf, 0, 0))
       assertEquals((46 to 50) ++ (11 to 25), buf)
-
     }
 
     @Test def should_provide_available(): Unit = {
@@ -100,8 +97,7 @@ trait CommonStreamsTests {
 
       assertEquals(7, stream.skip(7))
 
-      for (i <- 8 to 32)
-        assertEquals(i, stream.read())
+      for (i <- 8 to 32) assertEquals(i, stream.read())
 
       assertEquals(0, stream.skip(0))
       assertEquals(33, stream.read())

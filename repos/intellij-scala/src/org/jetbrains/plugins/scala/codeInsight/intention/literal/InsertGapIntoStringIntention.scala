@@ -8,10 +8,9 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 
 /**
- * User: Dmitry Naydanov
- * Date: 3/31/12
- */
-
+  * User: Dmitry Naydanov
+  * Date: 3/31/12
+  */
 class InsertGapIntoStringIntention extends PsiElementBaseIntentionAction {
   import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes._
 
@@ -19,21 +18,24 @@ class InsertGapIntoStringIntention extends PsiElementBaseIntentionAction {
 
   override def getText: String = "Insert gap with concatenation: (\" +  + \")"
 
-
-  def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = element != null && 
-    element.getNode != null && Set(tSTRING, tMULTILINE_STRING).contains(element.getNode.getElementType)
+  def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean =
+    element != null && element.getNode != null &&
+    Set(tSTRING, tMULTILINE_STRING).contains(element.getNode.getElementType)
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     def insertString(str: String, caretMove: Int) {
       extensions.inWriteAction {
         editor.getDocument.insertString(editor.getCaretModel.getOffset, str)
-        editor.getCaretModel.moveCaretRelatively(caretMove, 0, false, false, false)
+        editor.getCaretModel.moveCaretRelatively(
+            caretMove, 0, false, false, false)
       }
     }
 
     element.getNode.getElementType match {
       case ScalaTokenTypes.tSTRING => insertString("\" +  + \"", 4)
-      case ScalaTokenTypes.tMULTILINE_STRING => insertString("\"\"\" +  + \"\"\"", 6)
+      case ScalaTokenTypes.tMULTILINE_STRING =>
+        insertString("\"\"\" +  + \"\"\"", 6)
       case _ =>
     }
   }

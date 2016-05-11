@@ -14,13 +14,13 @@ package breeze.optimize;
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License. 
-*/
+ */
 
 /**
-* Anything that can minimize a function
-*
-* @author dlwh
-*/
-trait Minimizer[T,-F] {
+  * Anything that can minimize a function
+  *
+  * @author dlwh
+  */
+trait Minimizer[T, -F] {
   def minimize(f: F, initial: T): T
 }

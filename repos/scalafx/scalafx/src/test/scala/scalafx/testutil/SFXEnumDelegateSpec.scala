@@ -32,7 +32,6 @@ import java.util.EnumSet
 import scala.collection.JavaConversions._
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
-
 /** Abstract class that facilitates testing of wrappers for Java enums.
   *
   * IMPORTANT: the second order parameters jfx2sfx and sfx2jfx have to be left unassigned in the derived class.
@@ -66,8 +65,13 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * @param sfx2jfx Implicit conversion from ScalaFX to JavaFX, it should not be assigned,
   *                it has to be resolved automatically by the compiler.
   */
-abstract class SFXEnumDelegateSpec[E <: java.lang.Enum[E], S <: SFXEnumDelegate[E]] protected(javaClass: Class[E], scalaClass: Class[S], companion: SFXEnumDelegateCompanion[E, S])(implicit jfx2sfx: E => S = null, sfx2jfx: S => E = null)
-  extends SFXDelegateSpec[E, S](javaClass, scalaClass) {
+abstract class SFXEnumDelegateSpec[
+    E <: java.lang.Enum[E], S <: SFXEnumDelegate[E]] protected (
+    javaClass: Class[E],
+    scalaClass: Class[S],
+    companion: SFXEnumDelegateCompanion[E, S])(
+    implicit jfx2sfx: E => S = null, sfx2jfx: S => E = null)
+    extends SFXDelegateSpec[E, S](javaClass, scalaClass) {
 
   private val javaEnumConstants = EnumSet.allOf(javaClass)
 
@@ -81,17 +85,21 @@ abstract class SFXEnumDelegateSpec[E <: java.lang.Enum[E], S <: SFXEnumDelegate[
   }
 
   private def assertScalaEnumWithOrdinal(s: S, index: Int) {
-    assert(s.delegate.ordinal() == index, "%s - Expected position: %d, actual: %d".format(s, s.delegate.ordinal(), index))
+    assert(s.delegate.ordinal() == index,
+           "%s - Expected position: %d, actual: %d".format(
+               s, s.delegate.ordinal(), index))
   }
 
-  protected override def getDesirableMethodName(javaMethod: Method): String = JavaBeanEvaluator.scalaizePropertyNames(javaMethod)
+  protected override def getDesirableMethodName(javaMethod: Method): String =
+    JavaBeanEvaluator.scalaizePropertyNames(javaMethod)
 
   /*
    * Functionality from static method "valueOf" (present in all java enums) are being replaced by apply method in
    * companions objects. Therefore, "valueOf" is being excluded from methods search.
    */
-  protected override def isSpecialMethodName(name: String) = super.isImplementation(name) ||
-    (name == "values") || (name == "valueOf") || name.startsWith("is") || name.startsWith("get")
+  protected override def isSpecialMethodName(name: String) =
+    super.isImplementation(name) || (name == "values") || (name == "valueOf") ||
+    name.startsWith("is") || name.startsWith("get")
 
   // Simply it gets the first constant available.
   override protected def getScalaClassInstance = companion.values.toList.head
@@ -114,9 +122,11 @@ abstract class SFXEnumDelegateSpec[E <: java.lang.Enum[E], S <: SFXEnumDelegate[
   }
 
   it should "generate all ScalaFX enums from JavaFX enums names" in {
-    val missingJavaEnumNames = javaEnumConstants.map(_.name).filterNot(nameIsPresent(_))
+    val missingJavaEnumNames =
+      javaEnumConstants.map(_.name).filterNot(nameIsPresent(_))
 
-    assert(missingJavaEnumNames.isEmpty, "Missing constants: " + missingJavaEnumNames.mkString(", "))
+    assert(missingJavaEnumNames.isEmpty,
+           "Missing constants: " + missingJavaEnumNames.mkString(", "))
   }
 
   it should "not find a non registered name among enum constants" in {
@@ -132,11 +142,12 @@ abstract class SFXEnumDelegateSpec[E <: java.lang.Enum[E], S <: SFXEnumDelegate[
   }
 
   it should "presents its values at same order as its JavaFX enum ordinal" in {
-    companion.values.zipWithIndex.foreach({ case (s, i) => assertScalaEnumWithOrdinal(s, i)})
+    companion.values.zipWithIndex.foreach({
+      case (s, i) => assertScalaEnumWithOrdinal(s, i)
+    })
   }
 
   ///////////////
   // TESTS - END 
   ///////////////
-
 }

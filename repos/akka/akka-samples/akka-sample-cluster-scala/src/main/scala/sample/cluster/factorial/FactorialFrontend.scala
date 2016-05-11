@@ -13,10 +13,11 @@ import scala.util.Try
 import scala.concurrent.Await
 
 //#frontend
-class FactorialFrontend(upToN: Int, repeat: Boolean) extends Actor with ActorLogging {
+class FactorialFrontend(upToN: Int, repeat: Boolean)
+    extends Actor with ActorLogging {
 
-  val backend = context.actorOf(FromConfig.props(),
-    name = "factorialBackendRouter")
+  val backend =
+    context.actorOf(FromConfig.props(), name = "factorialBackendRouter")
 
   override def preStart(): Unit = {
     sendJobs()
@@ -48,15 +49,17 @@ object FactorialFrontend {
   def main(args: Array[String]): Unit = {
     val upToN = 200
 
-    val config = ConfigFactory.parseString("akka.cluster.roles = [frontend]").
-      withFallback(ConfigFactory.load("factorial"))
+    val config = ConfigFactory
+      .parseString("akka.cluster.roles = [frontend]")
+      .withFallback(ConfigFactory.load("factorial"))
 
     val system = ActorSystem("ClusterSystem", config)
-    system.log.info("Factorials will start when 2 backend members in the cluster.")
+    system.log.info(
+        "Factorials will start when 2 backend members in the cluster.")
     //#registerOnUp
     Cluster(system) registerOnMemberUp {
       system.actorOf(Props(classOf[FactorialFrontend], upToN, true),
-        name = "factorialFrontend")
+                     name = "factorialFrontend")
     }
     //#registerOnUp
 
@@ -79,6 +82,5 @@ object FactorialFrontend {
       }.start()
     }
     //#registerOnRemoved
-
   }
 }

@@ -19,4 +19,4 @@ package org.apache.spark.rpc
 import org.apache.spark.SparkException
 
 private[rpc] class RpcEndpointNotFoundException(uri: String)
-  extends SparkException(s"Cannot find endpoint: $uri")
+    extends SparkException(s"Cannot find endpoint: $uri")

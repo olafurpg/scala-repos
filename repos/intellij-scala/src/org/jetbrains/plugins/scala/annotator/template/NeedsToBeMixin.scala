@@ -12,16 +12,21 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinition
 import org.jetbrains.plugins.scala.lang.psi.types.PhysicalSignature
 
 /**
- * @author Alefas
- * @since 17.10.12
- */
+  * @author Alefas
+  * @since 17.10.12
+  */
 object NeedsToBeMixin extends AnnotatorPart[ScTemplateDefinition] {
   def kind: Class[ScTemplateDefinition] = classOf[ScTemplateDefinition]
 
-  def annotate(element: ScTemplateDefinition, holder: AnnotationHolder, typeAware: Boolean) {
+  def annotate(element: ScTemplateDefinition,
+               holder: AnnotationHolder,
+               typeAware: Boolean) {
     if (element.isInstanceOf[ScTrait]) return
-    val signaturesIterator = TypeDefinitionMembers.getSignatures(element).allFirstSeq().
-      flatMap(_.map(_._2)).iterator
+    val signaturesIterator = TypeDefinitionMembers
+      .getSignatures(element)
+      .allFirstSeq()
+      .flatMap(_.map(_._2))
+      .iterator
 
     while (signaturesIterator.hasNext) {
       val signature = signaturesIterator.next()
@@ -30,34 +35,46 @@ object NeedsToBeMixin extends AnnotatorPart[ScTemplateDefinition] {
           val m = sign.method
           m match {
             case f: ScFunctionDefinition =>
-              if (f.hasModifierPropertyScala("abstract") && f.hasModifierPropertyScala("override")) {
+              if (f.hasModifierPropertyScala("abstract") &&
+                  f.hasModifierPropertyScala("override")) {
                 signature.supers.find {
-                  case node => node.info.namedElement match {
-                    case f: ScFunctionDefinition => !f.hasModifierPropertyScala("abstract") ||
-                            !f.hasModifierProperty("override")
-                    case v: ScBindingPattern =>
-                      v.nameContext match {
-                        case v: ScVariableDefinition if !f.hasModifierPropertyScala("abstract") ||
-                          !f.hasModifierPropertyScala("override") => true
-                        case v: ScPatternDefinition if !f.hasModifierPropertyScala("abstract") ||
-                          !f.hasModifierPropertyScala("override") => true
-                        case _ => false
-                      }
-                    case m: PsiMethod => !m.hasModifierProperty("abstract")
-                    case _ => false
-                  }
+                  case node =>
+                    node.info.namedElement match {
+                      case f: ScFunctionDefinition =>
+                        !f.hasModifierPropertyScala("abstract") ||
+                        !f.hasModifierProperty("override")
+                      case v: ScBindingPattern =>
+                        v.nameContext match {
+                          case v: ScVariableDefinition
+                              if !f.hasModifierPropertyScala("abstract") ||
+                              !f.hasModifierPropertyScala("override") =>
+                            true
+                          case v: ScPatternDefinition
+                              if !f.hasModifierPropertyScala("abstract") ||
+                              !f.hasModifierPropertyScala("override") =>
+                            true
+                          case _ => false
+                        }
+                      case m: PsiMethod => !m.hasModifierProperty("abstract")
+                      case _ => false
+                    }
                 } match {
                   case Some(_) => //do nothing
                   case None =>
                     val place: PsiElement = element match {
                       case td: ScTypeDefinition => td.nameId
                       case t: ScNewTemplateDefinition =>
-                        t.extendsBlock.templateParents.flatMap(_.typeElements.headOption).orNull
+                        t.extendsBlock.templateParents
+                          .flatMap(_.typeElements.headOption)
+                          .orNull
                       case _ => null
                     }
                     if (place != null) {
-                      holder.createErrorAnnotation(place,
-                        message(kindOf(element), element.name, (f.name, f.containingClass.name)))
+                      holder.createErrorAnnotation(
+                          place,
+                          message(kindOf(element),
+                                  element.name,
+                                  (f.name, f.containingClass.name)))
                     }
                 }
               }
@@ -70,6 +87,6 @@ object NeedsToBeMixin extends AnnotatorPart[ScTemplateDefinition] {
 
   def message(kind: String, name: String, member: (String, String)) = {
     s"$kind '$name' needs to be mixin, since member '${member._1}' in '${member._2}' is marked 'abstract' and 'override', " +
-      s"but no concrete implementation could be found in a base class"
+    s"but no concrete implementation could be found in a base class"
   }
 }

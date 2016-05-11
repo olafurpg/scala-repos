@@ -1,13 +1,12 @@
-
 object Test {
 
   def compare(first: Any, second: Any): Any = {
-      (first, second) match {
-        case (k: Int, o: Int) => k compare o
-        //why the next case matches (Float, Int) but does not match (Int, Float) ???
-        case (k: Number, o: Number) => k.doubleValue() compare o.doubleValue()
-        case _ => "BOGON"
-        // throw new Exception("Unsupported compare " + first + "; " + second)
+    (first, second) match {
+      case (k: Int, o: Int) => k compare o
+      //why the next case matches (Float, Int) but does not match (Int, Float) ???
+      case (k: Number, o: Number) => k.doubleValue() compare o.doubleValue()
+      case _ => "BOGON"
+      // throw new Exception("Unsupported compare " + first + "; " + second)
     }
   }
 
@@ -18,4 +17,3 @@ object Test {
     println("Int then Float", 0, compare(10, 10.0)) //this fails with an exception
   }
 }
-

@@ -21,13 +21,16 @@ class MockClientTest extends FunSuite {
   test("correctly perform the SET command") {
     val memcache = new MockClient(Map("key" -> "value")).withStrings
 
-    assert(Await.result(memcache.set("key", "new value").liftToTry) == Return.Unit)
+    assert(
+        Await.result(memcache.set("key", "new value").liftToTry) == Return.Unit)
     assert(Await.result(memcache.get("key")) == Some("new value"))
 
-    assert(Await.result(memcache.set("key2", "value2").liftToTry) == Return.Unit)
+    assert(
+        Await.result(memcache.set("key2", "value2").liftToTry) == Return.Unit)
     assert(Await.result(memcache.get("key2")) == Some("value2"))
 
-    assert(Await.result(memcache.set("key2", "value3").liftToTry) == Return.Unit)
+    assert(
+        Await.result(memcache.set("key2", "value3").liftToTry) == Return.Unit)
     assert(Await.result(memcache.get("key2")) == Some("value3"))
   }
 
@@ -85,7 +88,8 @@ class MockClientTest extends FunSuite {
   }
 
   test("correctly perform the INCR command") {
-    val memcache = new MockClient(Map("key" -> "value", "count" -> "1")).withStrings
+    val memcache =
+      new MockClient(Map("key" -> "value", "count" -> "1")).withStrings
 
     intercept[ClientError] { Await.result(memcache.incr("key")) }
 
@@ -99,7 +103,8 @@ class MockClientTest extends FunSuite {
   }
 
   test("correctly perform the DECR command") {
-    val memcache = new MockClient(Map("key" -> "value", "count" -> "1")).withStrings
+    val memcache =
+      new MockClient(Map("key" -> "value", "count" -> "1")).withStrings
 
     intercept[ClientError] { Await.result(memcache.decr("key")) }
 
@@ -115,7 +120,8 @@ class MockClientTest extends FunSuite {
   }
 
   test("`getResults` command populates the `casUnique` value") {
-    val memcache = new MockClient(Map("key" -> "value", "count" -> "1")).withStrings
+    val memcache =
+      new MockClient(Map("key" -> "value", "count" -> "1")).withStrings
 
     val result = Await.result(memcache.getResult(Seq("key")))
 

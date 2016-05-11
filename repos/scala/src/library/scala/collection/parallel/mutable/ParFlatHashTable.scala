@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -13,19 +13,20 @@ package parallel.mutable
 import scala.collection.parallel.IterableSplitter
 
 /** Parallel flat hash table.
- *
- *  @tparam T      type of the elements in the $coll.
- *  @define coll   table
- *  @define Coll   `ParFlatHashTable`
- *
- *  @author Aleksandar Prokopec
- */
+  *
+  *  @tparam T      type of the elements in the $coll.
+  *  @define coll   table
+  *  @define Coll   `ParFlatHashTable`
+  *
+  *  @author Aleksandar Prokopec
+  */
 trait ParFlatHashTable[T] extends scala.collection.mutable.FlatHashTable[T] {
 
   override def alwaysInitSizeMap = true
 
-  abstract class ParFlatHashTableIterator(var idx: Int, val until: Int, val totalsize: Int)
-  extends IterableSplitter[T] with SizeMapUtils {
+  abstract class ParFlatHashTableIterator(
+      var idx: Int, val until: Int, val totalsize: Int)
+      extends IterableSplitter[T] with SizeMapUtils {
     import scala.collection.DebugUtils._
 
     private[this] var traversed = 0
@@ -39,36 +40,39 @@ trait ParFlatHashTable[T] extends scala.collection.mutable.FlatHashTable[T] {
       }
     }
 
-    def newIterator(index: Int, until: Int, totalsize: Int): IterableSplitter[T]
+    def newIterator(
+        index: Int, until: Int, totalsize: Int): IterableSplitter[T]
 
     def remaining = totalsize - traversed
     def hasNext = traversed < totalsize
-    def next() = if (hasNext) {
-      val r = entryToElem(itertable(idx))
-      traversed += 1
-      idx += 1
-      if (hasNext) scan()
-      r
-    } else Iterator.empty.next()
+    def next() =
+      if (hasNext) {
+        val r = entryToElem(itertable(idx))
+        traversed += 1
+        idx += 1
+        if (hasNext) scan()
+        r
+      } else Iterator.empty.next()
     def dup = newIterator(idx, until, totalsize)
-    def split = if (remaining > 1) {
-      val divpt = (until + idx) / 2
+    def split =
+      if (remaining > 1) {
+        val divpt = (until + idx) / 2
 
-      val fstidx = idx
-      val fstuntil = divpt
-      val fsttotal = calcNumElems(idx, divpt, itertable.length, sizeMapBucketSize)
-      val fstit = newIterator(fstidx, fstuntil, fsttotal)
+        val fstidx = idx
+        val fstuntil = divpt
+        val fsttotal = calcNumElems(
+            idx, divpt, itertable.length, sizeMapBucketSize)
+        val fstit = newIterator(fstidx, fstuntil, fsttotal)
 
-      val sndidx = divpt
-      val snduntil = until
-      val sndtotal = remaining - fsttotal
-      val sndit = newIterator(sndidx, snduntil, sndtotal)
+        val sndidx = divpt
+        val snduntil = until
+        val sndtotal = remaining - fsttotal
+        val sndit = newIterator(sndidx, snduntil, sndtotal)
 
-      Seq(fstit, sndit)
-    } else Seq(this)
+        Seq(fstit, sndit)
+      } else Seq(this)
 
-    override def debugInformation = buildString {
-      append =>
+    override def debugInformation = buildString { append =>
       append("Parallel flat hash table iterator")
       append("---------------------------------")
       append("Traversed/total: " + traversed + " / " + totalsize)

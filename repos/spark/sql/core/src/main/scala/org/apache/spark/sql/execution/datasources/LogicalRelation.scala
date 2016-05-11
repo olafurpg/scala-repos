@@ -23,17 +23,17 @@ import org.apache.spark.sql.catalyst.plans.logical.{LeafNode, LogicalPlan, Stati
 import org.apache.spark.sql.sources.BaseRelation
 
 /**
- * Used to link a [[BaseRelation]] in to a logical query plan.
- *
- * Note that sometimes we need to use `LogicalRelation` to replace an existing leaf node without
- * changing the output attributes' IDs.  The `expectedOutputAttributes` parameter is used for
- * this purpose.  See https://issues.apache.org/jira/browse/SPARK-10741 for more details.
- */
+  * Used to link a [[BaseRelation]] in to a logical query plan.
+  *
+  * Note that sometimes we need to use `LogicalRelation` to replace an existing leaf node without
+  * changing the output attributes' IDs.  The `expectedOutputAttributes` parameter is used for
+  * this purpose.  See https://issues.apache.org/jira/browse/SPARK-10741 for more details.
+  */
 case class LogicalRelation(
     relation: BaseRelation,
     expectedOutputAttributes: Option[Seq[Attribute]] = None,
     metastoreTableIdentifier: Option[TableIdentifier] = None)
-  extends LeafNode with MultiInstanceRelation {
+    extends LeafNode with MultiInstanceRelation {
 
   override val output: Seq[AttributeReference] = {
     val attrs = relation.schema.toAttributes
@@ -51,7 +51,8 @@ case class LogicalRelation(
 
   // Logical Relations are distinct if they have different output for the sake of transformations.
   override def equals(other: Any): Boolean = other match {
-    case l @ LogicalRelation(otherRelation, _, _) => relation == otherRelation && output == l.output
+    case l @ LogicalRelation(otherRelation, _, _) =>
+      relation == otherRelation && output == l.output
     case _ => false
   }
 
@@ -70,17 +71,18 @@ case class LogicalRelation(
   override lazy val cleanArgs: Seq[Any] = Seq(relation)
 
   @transient override lazy val statistics: Statistics = Statistics(
-    sizeInBytes = BigInt(relation.sizeInBytes)
+      sizeInBytes = BigInt(relation.sizeInBytes)
   )
 
   /** Used to lookup original attribute capitalization */
-  val attributeMap: AttributeMap[AttributeReference] = AttributeMap(output.map(o => (o, o)))
+  val attributeMap: AttributeMap[AttributeReference] = AttributeMap(
+      output.map(o => (o, o)))
 
   def newInstance(): this.type =
     LogicalRelation(
-      relation,
-      expectedOutputAttributes,
-      metastoreTableIdentifier).asInstanceOf[this.type]
+        relation, expectedOutputAttributes, metastoreTableIdentifier)
+      .asInstanceOf[this.type]
 
-  override def simpleString: String = s"Relation[${output.mkString(",")}] $relation"
+  override def simpleString: String =
+    s"Relation[${output.mkString(",")}] $relation"
 }

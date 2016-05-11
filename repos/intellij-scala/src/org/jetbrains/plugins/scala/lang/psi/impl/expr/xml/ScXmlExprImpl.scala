@@ -12,16 +12,18 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
 
 /**
-* @author Alexander Podkhalyuzin
-*/
-
-class ScXmlExprImpl(node: ASTNode) extends ScalaPsiElementImpl (node) with ScXmlExpr{
+  * @author Alexander Podkhalyuzin
+  */
+class ScXmlExprImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScXmlExpr {
   override def toString: String = "XmlExpression"
-
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
     def getType(s: String): ScType = {
-      val typez = ScalaPsiManager.instance(getProject).getCachedClasses(getResolveScope, s).filter(!_.isInstanceOf[ScObject])
+      val typez = ScalaPsiManager
+        .instance(getProject)
+        .getCachedClasses(getResolveScope, s)
+        .filter(!_.isInstanceOf[ScObject])
       if (typez.length != 0) ScType.designator(typez(0))
       else types.Nothing
     }

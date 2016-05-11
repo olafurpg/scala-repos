@@ -3,9 +3,9 @@ package breeze.util
 import breeze.macros.expand
 
 /**
- *
- * @author dlwh
- */
+  *
+  * @author dlwh
+  */
 object Sorting {
   // Based on code by
   // /*                     __                                               *\
@@ -16,25 +16,29 @@ object Sorting {
   //**                          |/                                          **
   //\*                                                                      */
 
-
-  def indexSort(x: Array[Int], off: Int, len: Int, order: Array[Int]): Array[Int] = {
+  def indexSort(
+      x: Array[Int], off: Int, len: Int, order: Array[Int]): Array[Int] = {
     indexSort_Int(x, off, len, order)
   }
 
-  def indexSort(x: Array[Int], off: Int, len: Int, order: Array[Long]): Array[Int] = {
+  def indexSort(
+      x: Array[Int], off: Int, len: Int, order: Array[Long]): Array[Int] = {
     indexSort_Long(x, off, len, order)
   }
-  
-  def indexSort(x: Array[Int], off: Int, len: Int, order: Array[Float]): Array[Int] = {
+
+  def indexSort(
+      x: Array[Int], off: Int, len: Int, order: Array[Float]): Array[Int] = {
     indexSort_Float(x, off, len, order)
   }
 
-  def indexSort(x: Array[Int], off: Int, len: Int, order: Array[Double]): Array[Int] = {
+  def indexSort(
+      x: Array[Int], off: Int, len: Int, order: Array[Double]): Array[Int] = {
     indexSort_Double(x, off, len, order)
   }
 
   @expand
-  def indexSort[@expand.args(Int, Long, Float, Double) T](x: Array[Int], off: Int, len: Int, order: Array[T]): Array[Int] = {
+  def indexSort[@expand.args(Int, Long, Float, Double) T](
+      x: Array[Int], off: Int, len: Int, order: Array[T]): Array[Int] = {
     def swap(a: Int, b: Int) {
       val t = x(a)
       x(a) = x(b)
@@ -53,9 +57,11 @@ object Sorting {
     }
     def med3(a: Int, b: Int, c: Int) = {
       if (order(x(a)) < order(x(b))) {
-        if (order(x(b)) < order(x(c))) b else if (order(x(a)) < order(x(c))) c else a
+        if (order(x(b)) < order(x(c))) b
+        else if (order(x(a)) < order(x(c))) c else a
       } else {
-        if (order(x(b)) > order(x(c))) b else if (order(x(a)) > order(x(c))) c else a
+        if (order(x(b)) > order(x(c))) b
+        else if (order(x(a)) > order(x(c))) c else a
       }
     }
     def sort2(off: Int, len: Int) {
@@ -64,23 +70,24 @@ object Sorting {
         var i = off
         while (i < len + off) {
           var j = i
-          while (j>off && order(x(j-1)) > order(x(j))) {
-            swap(j, j-1)
+          while (j > off && order(x(j - 1)) > order(x(j))) {
+            swap(j, j - 1)
             j -= 1
           }
           i += 1
         }
       } else {
         // Choose a partition element, v
-        var m = off + (len >> 1)        // Small arrays, middle element
+        var m = off + (len >> 1) // Small arrays, middle element
         if (len > 7) {
           var l = off
           var n = off + len - 1
-          if (len > 40) {        // Big arrays, pseudomedian of 9
+          if (len > 40) {
+            // Big arrays, pseudomedian of 9
             val s = len / 8
-            l = med3(l, l+s, l+2*s)
-            m = med3(m-s, m, m+s)
-            n = med3(n-2*s, n-s, n)
+            l = med3(l, l + s, l + 2 * s)
+            m = med3(m - s, m, m + s)
+            n = med3(n - 2 * s, n - s, n)
           }
           m = med3(l, m, n) // Mid-size, med of 3
         }
@@ -118,24 +125,20 @@ object Sorting {
 
         // Swap partition elements back to middle
         val n = off + len
-        var s = math.min(a-off, b-a)
-        vecswap(off, b-s, s)
-        s = math.min(d-c, n-d-1)
-        vecswap(b,   n-s, s)
+        var s = math.min(a - off, b - a)
+        vecswap(off, b - s, s)
+        s = math.min(d - c, n - d - 1)
+        vecswap(b, n - s, s)
 
         // Recursively sort non-partition-elements
         s = b - a
-        if (s > 1)
-          sort2(off, s)
+        if (s > 1) sort2(off, s)
         s = d - c
-        if (s > 1)
-          sort2(n-s, s)
+        if (s > 1) sort2(n - s, s)
       }
     }
     sort2(off, len)
 
     x
   }
-
-
 }

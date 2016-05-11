@@ -4,7 +4,7 @@
 
 package akka.http.scaladsl.server
 
-import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse, StatusCodes }
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 
@@ -14,7 +14,8 @@ class StreamingResponseSpecs extends RoutingSpec {
     "should render empty string if stream was empty" in {
 
       val src = Source.empty[ByteString]
-      val entity = HttpEntity.Chunked.fromData(ContentTypes.`application/json`, src)
+      val entity =
+        HttpEntity.Chunked.fromData(ContentTypes.`application/json`, src)
       val response = HttpResponse(status = StatusCodes.OK, entity = entity)
       val route = complete(response)
 
@@ -23,6 +24,5 @@ class StreamingResponseSpecs extends RoutingSpec {
         responseAs[String] should ===("")
       }
     }
-
   }
 }

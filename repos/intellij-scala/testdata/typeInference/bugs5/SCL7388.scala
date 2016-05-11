@@ -5,6 +5,6 @@ object SCL7388 {
 
   def foo(x: Int): Int = 123
 
-  val x: A[String] = foo(/*start*/new A/*end*/)
+  val x: A[String] = foo( /*start*/ new A /*end*/ )
 }
 //SCL7388.A[String]

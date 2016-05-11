@@ -18,6 +18,6 @@
 package org.apache.spark.streaming.api
 
 /**
- * Spark streaming's Java API.
- */
+  * Spark streaming's Java API.
+  */
 package object java

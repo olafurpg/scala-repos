@@ -8,19 +8,19 @@ import java.lang.Math
 import java.lang.Integer
 
 trait IntIsEuclideanRing extends EuclideanRing[Int] {
-  override def minus(a:Int, b:Int): Int = a - b
-  def negate(a:Int): Int = -a
+  override def minus(a: Int, b: Int): Int = a - b
+  def negate(a: Int): Int = -a
   def one: Int = 1
-  def plus(a:Int, b:Int): Int = a + b
-  override def pow(a:Int, b:Int): Int = spire.math.pow(a, b).toInt
-  override def times(a:Int, b:Int): Int = a * b
+  def plus(a: Int, b: Int): Int = a + b
+  override def pow(a: Int, b: Int): Int = spire.math.pow(a, b).toInt
+  override def times(a: Int, b: Int): Int = a * b
   def zero: Int = 0
 
   override def fromInt(n: Int): Int = n
 
-  def quot(a:Int, b:Int): Int = a / b
-  def mod(a:Int, b:Int): Int = a % b
-  def gcd(a:Int, b:Int): Int = spire.math.gcd(a, b).toInt
+  def quot(a: Int, b: Int): Int = a / b
+  def mod(a: Int, b: Int): Int = a % b
+  def gcd(a: Int, b: Int): Int = spire.math.gcd(a, b).toInt
 }
 
 // Not included in Instances trait.
@@ -42,8 +42,8 @@ trait IntIsNRoot extends NRoot[Int] {
     findnroot(0, 1 << ((33 - n) / n))
   }
 
-  def log(a:Int): Int = Math.log(a.toDouble).toInt
-  def fpow(a:Int, b:Int): Int = Math.pow(a, b).toInt
+  def log(a: Int): Int = Math.log(a.toDouble).toInt
+  def fpow(a: Int, b: Int): Int = Math.pow(a, b).toInt
 }
 
 trait IntOrder extends Order[Int] {
@@ -93,11 +93,13 @@ class IntIsBitString extends BitString[Int] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with Serializable
+class IntAlgebra
+    extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with Serializable
 
 trait IntInstances {
   implicit final val IntBitString = new IntIsBitString
   implicit final val IntAlgebra = new IntAlgebra
   import spire.math.NumberTag._
-  implicit final val IntTag = new BuiltinIntTag[Int](0, Int.MinValue, Int.MaxValue)
+  implicit final val IntTag =
+    new BuiltinIntTag[Int](0, Int.MinValue, Int.MaxValue)
 }

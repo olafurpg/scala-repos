@@ -14,9 +14,7 @@ class MetricsBucketedHistogramTest extends FunSuite {
     // the next snap window while the test does `roll()`s.
     Time.withTimeAt(Time.fromSeconds(1439242122)) { tc =>
       val ps = Array[Double](0.5, 0.9)
-      val h = new MetricsBucketedHistogram(
-        name = "h",
-        percentiles = ps)
+      val h = new MetricsBucketedHistogram(name = "h", percentiles = ps)
 
       def roll(): Unit = {
         tc.advance(60.seconds)

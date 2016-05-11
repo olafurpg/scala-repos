@@ -10,7 +10,7 @@ object Bang {
     Some(x.chan, x.data)
 }
 
-*/
+ */
 object Test extends App {
   object IC extends Channel[Int]
   def f[b](x: ![b]): Int = x match {

@@ -15,22 +15,23 @@ class PartialFunctionSerializationTest {
     case n if n <= 0 => 2
   }
 
-
-  private def assertSerializable[A,B](fn: A => B) = {
+  private def assertSerializable[A, B](fn: A => B) = {
     import java.io._
 
     new ObjectOutputStream(new ByteArrayOutputStream()).writeObject(fn)
   }
 
-  @Test def canSerializeLiteral= assertSerializable(pf1)
+  @Test def canSerializeLiteral = assertSerializable(pf1)
 
-  @Test def canSerializeLifted= assertSerializable(pf1.lift)
+  @Test def canSerializeLifted = assertSerializable(pf1.lift)
 
   @Test def canSerializeOrElse = assertSerializable(pf1 orElse pf2)
 
-  @Test def canSerializeUnlifted = assertSerializable(Function.unlift((x: Int) => Some(x)))
+  @Test def canSerializeUnlifted =
+    assertSerializable(Function.unlift((x: Int) => Some(x)))
 
-  @Test def canSerializeAndThen = assertSerializable(pf1.andThen((x: Int) => x))
+  @Test def canSerializeAndThen =
+    assertSerializable(pf1.andThen((x: Int) => x))
 
   @Test def canSerializeEmpty = assertSerializable(PartialFunction.empty)
 }

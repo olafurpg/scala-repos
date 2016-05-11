@@ -21,7 +21,8 @@ object UnapplyInference extends App {
     val either: (List[Int] \/ List[Int]) = \/.right(List(1))
     val eitherT: EitherT[Option, List[Int], List[Int]] = EitherT(some(either))
 
-    val bisequence: List[EitherT[Option, Int, Int]] = eitherT.bisequence[List, Int, Int]
+    val bisequence: List[EitherT[Option, Int, Int]] =
+      eitherT.bisequence[List, Int, Int]
   }
 
   // Without Unapply
@@ -29,7 +30,8 @@ object UnapplyInference extends App {
     import scalaz._, Scalaz._
     val ls = List(1, 2, 3)
     val traverseOpt: Option[List[Int]] = ls.traverse(a => some(a))
-    val traverseState: State[Int, List[Int]] = ls.traverse[State[Int,?],Int](a => State((x: Int) => (x+1,a)))
+    val traverseState: State[Int, List[Int]] =
+      ls.traverse[State[Int, ?], Int](a => State((x: Int) => (x + 1, a)))
   }
 
   // With Unapply (in the signature of traverseU)
@@ -40,7 +42,8 @@ object UnapplyInference extends App {
     val traverseOpt: Option[List[Int]] = ls.traverseU(a => some(a))
     val traverseState = ls.traverseU(a => State((x: Int) => (x + 1, a)))
 
-    val pair: State[Int, (Int, Int)] = State((x: Int) => (x + 1, x)).tuple(State((x: Int) => (x + 2, x)))
+    val pair: State[Int, (Int, Int)] =
+      State((x: Int) => (x + 1, x)).tuple(State((x: Int) => (x + 2, x)))
   }
 
   def kleisliCompose() {
@@ -56,7 +59,9 @@ object UnapplyInference extends App {
   def kleisliU() {
     import scalaz._
     val k: Kleisli[NumberFormatException \/ ?, String, Int] =
-      Kleisli.kleisliU{s: String => try \/-(s.toInt) catch{ case e: NumberFormatException => -\/(e) }}
+      Kleisli.kleisliU { s: String =>
+        try \/-(s.toInt) catch { case e: NumberFormatException => -\/(e) }
+      }
   }
 
   def functorSyntaxChaining() {
@@ -72,11 +77,21 @@ object UnapplyInference extends App {
 
     import std.tuple._
 
-    (1, 2).map(1+).map(1+)
-    (1, 2, 3).map(1+).map(1+)
-    (1, 2, 3, 4).map(1+).map(1+)
-    (1, 2, 3, 4, 5).map(1+).map(1+)
-    (1, 2, 3, 4, 5, 6).map(1+).map(1+)
-    (1, 2, 3, 4, 5, 6, 7).map(1+).map(1+)
+    (1, 2)
+      .map(1 +)
+      .map(1 +)
+      (1, 2, 3)
+      .map(1 +)
+      .map(1 +)
+      (1, 2, 3, 4)
+      .map(1 +)
+      .map(1 +)
+      (1, 2, 3, 4, 5)
+      .map(1 +)
+      .map(1 +)
+      (1, 2, 3, 4, 5, 6)
+      .map(1 +)
+      .map(1 +)
+      (1, 2, 3, 4, 5, 6, 7).map(1 +).map(1 +)
   }
 }

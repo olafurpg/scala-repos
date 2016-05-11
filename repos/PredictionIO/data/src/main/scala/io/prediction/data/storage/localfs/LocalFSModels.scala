@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage.localfs
 
 import java.io.File
@@ -27,7 +26,7 @@ import io.prediction.data.storage.StorageClientConfig
 import scala.io.Source
 
 class LocalFSModels(f: File, config: StorageClientConfig, prefix: String)
-  extends Models with Logging {
+    extends Models with Logging {
 
   def insert(i: Model): Unit = {
     try {
@@ -41,10 +40,13 @@ class LocalFSModels(f: File, config: StorageClientConfig, prefix: String)
 
   def get(id: String): Option[Model] = {
     try {
-      Some(Model(
-        id = id,
-        models = Source.fromFile(new File(f, s"${prefix}${id}"))(
-          scala.io.Codec.ISO8859).map(_.toByte).toArray))
+      Some(
+          Model(id = id,
+                models = Source
+                    .fromFile(new File(f, s"${prefix}${id}"))(
+                        scala.io.Codec.ISO8859)
+                    .map(_.toByte)
+                    .toArray))
     } catch {
       case e: Throwable =>
         error(e.getMessage)

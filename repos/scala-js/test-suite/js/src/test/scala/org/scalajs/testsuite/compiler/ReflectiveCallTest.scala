@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.compiler
 
@@ -50,7 +50,7 @@ class ReflectiveCallTest {
       def e(x: Tata): Tata = new Tata("iei")
     }
 
-    def m[T](r: Object { def e(x: Tata): T}): T =
+    def m[T](r: Object { def e(x: Tata): T }): T =
       r.e(new Tata("foo"))
 
     assertEquals("Tata(iei)", m[Tata](Rec).toString)
@@ -67,7 +67,7 @@ class ReflectiveCallTest {
     def fLong(x: Any { def unary_- : Long }): Long = -x
     assertEquals(-1L, fLong(1L))
 
-    def fFloat(x: Any { def unary_- : Float}): Float = -x
+    def fFloat(x: Any { def unary_- : Float }): Float = -x
     assertEquals(-1.5f, fFloat(1.5f))
 
     def fDouble(x: Any { def unary_- : Double }): Double = -x
@@ -99,13 +99,14 @@ class ReflectiveCallTest {
     assertEquals(31, fShort(25.toChar))
     assertEquals(-34, fShort(-40))
 
-    def fFloat(x: Any { def %(x: Float): Float}): Float = x % 3.4f
+    def fFloat(x: Any { def %(x: Float): Float }): Float = x % 3.4f
     assertEquals(2.1f, fFloat(5.5f))
 
     def fDouble(x: Any { def /(x: Double): Double }): Double = x / 1.4
     assertEquals(-1.0714285714285714, fDouble(-1.5))
 
-    def fBoolean(x: Any { def &&(x: Boolean): Boolean }): Boolean = x && true // scalastyle:ignore
+    def fBoolean(x: Any { def &&(x: Boolean): Boolean }): Boolean =
+      x && true // scalastyle:ignore
     assertFalse(fBoolean(false))
     assertTrue(fBoolean(true))
   }
@@ -126,7 +127,8 @@ class ReflectiveCallTest {
     assertFalse(fNum(5.6f))
     assertTrue(fNum(5.0))
     assertFalse(fNum(7.9))
-    def fBool(obj: Any { def ==(x: Boolean): Boolean }): Boolean = obj == false // scalastyle:ignore
+    def fBool(obj: Any { def ==(x: Boolean): Boolean }): Boolean =
+      obj == false // scalastyle:ignore
     assertFalse(fBool(true))
     assertTrue(fBool(false))
 
@@ -145,10 +147,10 @@ class ReflectiveCallTest {
     assertTrue(fNumN(5.6f))
     assertFalse(fNumN(5.0))
     assertTrue(fNumN(7.9))
-    def fBoolN(obj: Any { def !=(x: Boolean): Boolean }): Boolean = obj != false // scalastyle:ignore
+    def fBoolN(obj: Any { def !=(x: Boolean): Boolean }): Boolean =
+      obj != false // scalastyle:ignore
     assertTrue(fBoolN(true))
     assertFalse(fBoolN(false))
-
   }
 
   @Test def should_work_with_Arrays(): Unit = {
@@ -157,38 +159,38 @@ class ReflectiveCallTest {
     type LEN = { def length: Int }
     type CLONE = Any { def clone(): Object }
 
-    def upd(obj: UPD, i: Int, x: String): Unit = obj.update(i,x)
+    def upd(obj: UPD, i: Int, x: String): Unit = obj.update(i, x)
     def apl(obj: APL, i: Int): String = obj.apply(i)
     def len(obj: LEN): Int = obj.length
     def clone(obj: CLONE): Object = obj.clone
 
-    val x = Array("asdf","foo","bar")
+    val x = Array("asdf", "foo", "bar")
     val y = clone(x).asInstanceOf[Array[String]]
 
     assertEquals(3, len(x))
-    assertEquals("asdf", apl(x,0))
-    upd(x,1,"2foo")
+    assertEquals("asdf", apl(x, 0))
+    upd(x, 1, "2foo")
     assertEquals("2foo", x(1))
     assertEquals("foo", y(1))
   }
 
   @Test def should_work_with_Arrays_of_primitive_values(): Unit = {
     type UPD = { def update(i: Int, x: Int): Unit }
-    type APL = { def apply(i: Int): Int}
+    type APL = { def apply(i: Int): Int }
     type LEN = { def length: Int }
     type CLONE = Any { def clone(): Object }
 
-    def upd(obj: UPD, i: Int, x: Int): Unit = obj.update(i,x)
+    def upd(obj: UPD, i: Int, x: Int): Unit = obj.update(i, x)
     def apl(obj: APL, i: Int): Int = obj.apply(i)
     def len(obj: LEN): Int = obj.length
     def clone(obj: CLONE): Object = obj.clone
 
-    val x = Array(5,2,8)
+    val x = Array(5, 2, 8)
     val y = clone(x).asInstanceOf[Array[Int]]
 
     assertEquals(3, len(x))
-    assertEquals(5, apl(x,0))
-    upd(x,1,1000)
+    assertEquals(5, apl(x, 0))
+    upd(x, 1, 1000)
     assertEquals(1000, x(1))
     assertEquals(2, y(1))
   }
@@ -222,7 +224,8 @@ class ReflectiveCallTest {
     assertEquals(1, call(new C))
   }
 
-  @Test def should_be_bug_compatible_with_Scala_JVM_for_inherited_overloads(): Unit = {
+  @Test
+  def should_be_bug_compatible_with_Scala_JVM_for_inherited_overloads(): Unit = {
     class Base {
       def foo(x: Option[Int]): String = "a"
     }
@@ -240,7 +243,8 @@ class ReflectiveCallTest {
     assertEquals(1, y.foo(Some("hello")).asInstanceOf[js.Any])
   }
 
-  @Test def should_work_on_java_lang_Object_notify_notifyAll_issue_303(): Unit = {
+  @Test
+  def should_work_on_java_lang_Object_notify_notifyAll_issue_303(): Unit = {
     type ObjNotifyLike = Any {
       def notify(): Unit
       def notifyAll(): Unit
@@ -284,11 +288,11 @@ class ReflectiveCallTest {
     val a1 = new A
     val a2 = new A
 
-    assertFalse(objEqTest(a1,a2))
-    assertTrue(objEqTest(a1,a1))
+    assertFalse(objEqTest(a1, a2))
+    assertTrue(objEqTest(a1, a1))
 
-    assertTrue(objNeTest(a1,a2))
-    assertFalse(objNeTest(a1,a1))
+    assertTrue(objNeTest(a1, a2))
+    assertFalse(objNeTest(a1, a1))
   }
 
   @Test def should_work_on_java_lang_Float_Double_isNaN_isInfinite(): Unit = {
@@ -296,8 +300,8 @@ class ReflectiveCallTest {
       def isNaN(): Boolean
       def isInfinite(): Boolean
     }
-    def test(x: FloatingNumberLike, isNaN: Boolean,
-        isInfinite: Boolean): Unit = {
+    def test(
+        x: FloatingNumberLike, isNaN: Boolean, isInfinite: Boolean): Unit = {
       assertEquals(isNaN, x.isNaN())
       assertEquals(isInfinite, x.isInfinite())
     }
@@ -314,12 +318,13 @@ class ReflectiveCallTest {
   }
 
   @Test def should_work_with_default_arguments_issue_390(): Unit = {
-    def pimpIt(a: Int) = new { // scalastyle:ignore
+    def pimpIt(a: Int) = new {
+      // scalastyle:ignore
       def foo(b: Int, c: Int = 1): Int = a + b + c
     }
 
     assertEquals(4, pimpIt(1).foo(2))
-    assertEquals(8, pimpIt(2).foo(2,4))
+    assertEquals(8, pimpIt(2).foo(2, 4))
   }
 
   @Test def should_unbox_all_types_of_arguments_issue_899(): Unit = {
@@ -336,7 +341,8 @@ class ReflectiveCallTest {
      * methods in structural types.
      */
 
-    def test(foo: {
+    def test(
+        foo: {
       def makeInt: Int
       def testInt(x: Int): Unit
       def makeRef: Option[String]

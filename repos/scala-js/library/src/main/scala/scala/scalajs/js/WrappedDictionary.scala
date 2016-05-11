@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js API               **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-lang.org/     **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js API               **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-lang.org/     **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 
 package scala.scalajs.js
@@ -16,24 +16,19 @@ import scala.collection.generic.CanBuildFrom
 /** Wrapper to use a js.Dictionary as a scala.mutable.Map */
 @inline
 class WrappedDictionary[A](val dict: Dictionary[A])
-    extends mutable.AbstractMap[String, A]
-       with mutable.Map[String, A]
-       with mutable.MapLike[String, A, WrappedDictionary[A]] {
+    extends mutable.AbstractMap[String, A] with mutable.Map[String, A]
+    with mutable.MapLike[String, A, WrappedDictionary[A]] {
 
   import WrappedDictionary._
 
   def get(key: String): Option[A] = {
-    if (contains(key))
-      Some(dict.rawApply(key))
-    else
-      None
+    if (contains(key)) Some(dict.rawApply(key))
+    else None
   }
 
   override def apply(key: String): A = {
-    if (contains(key))
-      dict.rawApply(key)
-    else
-      throw new NoSuchElementException("key not found: " + key)
+    if (contains(key)) dict.rawApply(key)
+    else throw new NoSuchElementException("key not found: " + key)
   }
 
   override def contains(key: String): Boolean = {
@@ -44,8 +39,7 @@ class WrappedDictionary[A](val dict: Dictionary[A])
   }
 
   def -=(key: String): this.type = {
-    if (contains(key))
-      dict.delete(key)
+    if (contains(key)) dict.delete(key)
     this
   }
 
@@ -66,7 +60,6 @@ class WrappedDictionary[A](val dict: Dictionary[A])
 
   override def empty: WrappedDictionary[A] =
     new WrappedDictionary(Dictionary.empty)
-
 }
 
 object WrappedDictionary {
@@ -74,17 +67,16 @@ object WrappedDictionary {
   // it requires support for any type of key
 
   private object Cache {
-    val safeHasOwnProperty =
-      Dynamic.global.Object.prototype.hasOwnProperty
-        .asInstanceOf[ThisFunction1[Dictionary[_], String, Boolean]]
+    val safeHasOwnProperty = Dynamic.global.Object.prototype.hasOwnProperty
+      .asInstanceOf[ThisFunction1[Dictionary[_], String, Boolean]]
   }
 
   @inline
   private def safeHasOwnProperty(dict: Dictionary[_], key: String): Boolean =
     Cache.safeHasOwnProperty(dict, key)
 
-  private final class DictionaryIterator[+A](
-      dict: Dictionary[A]) extends Iterator[(String, A)] {
+  private final class DictionaryIterator[+A](dict: Dictionary[A])
+      extends Iterator[(String, A)] {
     private[this] val keys = Object.keys(dict.asInstanceOf[Object])
     private[this] var index: Int = 0
     def hasNext(): Boolean = index < keys.length
@@ -97,9 +89,11 @@ object WrappedDictionary {
 
   def empty[A]: WrappedDictionary[A] = new WrappedDictionary(Dictionary.empty)
 
-  type CBF[A] = CanBuildFrom[WrappedDictionary[_], (String, A), WrappedDictionary[A]]
+  type CBF[A] = CanBuildFrom[
+      WrappedDictionary[_], (String, A), WrappedDictionary[A]]
   implicit def canBuildFrom[A]: CBF[A] = new CBF[A] {
-    def apply(from: WrappedDictionary[_]): Builder[(String, A), WrappedDictionary[A]] =
+    def apply(from: WrappedDictionary[_])
+      : Builder[(String, A), WrappedDictionary[A]] =
       new WrappedDictionaryBuilder[A]
     def apply(): Builder[(String, A), WrappedDictionary[A]] =
       new WrappedDictionaryBuilder[A]
@@ -117,5 +111,4 @@ object WrappedDictionary {
     def result(): WrappedDictionary[A] =
       new WrappedDictionary(dict)
   }
-
 }

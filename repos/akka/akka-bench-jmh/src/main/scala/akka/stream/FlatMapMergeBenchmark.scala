@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream
 
 import akka.{Done, NotUsed}
@@ -17,7 +16,8 @@ import scala.concurrent.duration._
 @BenchmarkMode(Array(Mode.Throughput))
 class FlatMapMergeBenchmark {
   implicit val system = ActorSystem("FlatMapMergeBenchmark")
-  val materializerSettings = ActorMaterializerSettings(system).withDispatcher("akka.test.stream-dispatcher")
+  val materializerSettings = ActorMaterializerSettings(system).withDispatcher(
+      "akka.test.stream-dispatcher")
   implicit val materializer = ActorMaterializer(materializerSettings)
 
   val NumberOfElements = 100000
@@ -27,10 +27,11 @@ class FlatMapMergeBenchmark {
 
   var graph: RunnableGraph[Future[Done]] = _
 
-  def createSource(count: Int): Graph[SourceShape[Int], NotUsed] = akka.stream.Fusing.aggressive(Source.repeat(1).take(count))
+  def createSource(count: Int): Graph[SourceShape[Int], NotUsed] =
+    akka.stream.Fusing.aggressive(Source.repeat(1).take(count))
 
   @Setup
-  def setup():Unit = {
+  def setup(): Unit = {
     val source = NumberOfStreams match {
       // Base line: process NumberOfElements-many elements from a single source without using flatMapMerge
       case 0 => createSource(NumberOfElements)
@@ -43,13 +44,13 @@ class FlatMapMergeBenchmark {
   }
 
   @TearDown
-  def shutdown():Unit = {
+  def shutdown(): Unit = {
     Await.result(system.terminate(), 5.seconds)
   }
 
   @Benchmark
   @OperationsPerInvocation(100000) // Note: needs to match NumberOfElements.
-  def flat_map_merge_100k_elements():Unit = {
+  def flat_map_merge_100k_elements(): Unit = {
     Await.result(graph.run(), Duration.Inf)
   }
 }

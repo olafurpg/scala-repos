@@ -34,7 +34,8 @@ import com.precog.common.security.APIKeyFinder
 import com.precog.standalone.StandaloneShardServer
 
 object JDBCShardServer extends StandaloneShardServer {
-  val caveatMessage = Some("""
+  val caveatMessage =
+    Some("""
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Precog for PostgreSQL is a free product that Precog provides to the
 PostgreSQL community for doing data analysis on PostgreSQL.
@@ -51,10 +52,16 @@ Please note that path globs are not yet supported in Precog for PostgreSQL
 """)
 
   val actorSystem = ActorSystem("ExecutorSystem")
-  implicit val executionContext = ExecutionContext.defaultExecutionContext(actorSystem)
+  implicit val executionContext =
+    ExecutionContext.defaultExecutionContext(actorSystem)
   implicit val M: Monad[Future] = new FutureMonad(executionContext)
 
-  def platformFor(config: Configuration, apiKeyfinder: APIKeyFinder[Future], jobManager: JobManager[Future]) =
-    (new JDBCQueryExecutor(new JDBCQueryExecutorConfig(config.detach("queryExecutor")), jobManager, actorSystem),
+  def platformFor(config: Configuration,
+                  apiKeyfinder: APIKeyFinder[Future],
+                  jobManager: JobManager[Future]) =
+    (new JDBCQueryExecutor(
+         new JDBCQueryExecutorConfig(config.detach("queryExecutor")),
+         jobManager,
+         actorSystem),
      Stoppable.fromFuture(Future(())))
 }

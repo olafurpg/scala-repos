@@ -14,14 +14,12 @@ class ExceptionFilterTest extends FunSuite {
     def apply(request: Request): Future[Response] = {
       request.response.write("hello")
       request.response.contentLength = 5
-      if (request.params.get("exception").isDefined)
-        throw new Exception
+      if (request.params.get("exception").isDefined) throw new Exception
       else if (request.params.get("throw").isDefined)
         Future.exception(new Exception)
       else if (request.params.get("cancel").isDefined)
         Future.exception(new CancelledRequestException)
-      else
-        Future.value(request.response)
+      else Future.value(request.response)
     }
   }
 
@@ -30,8 +28,8 @@ class ExceptionFilterTest extends FunSuite {
     val filter = (new ExceptionFilter) andThen service
 
     val response = Await.result(filter(request))
-    assert(response.status        == Status.Ok)
-    assert(response.contentString ==  "hello")
+    assert(response.status == Status.Ok)
+    assert(response.contentString == "hello")
     assert(response.contentLength == Some(5))
   }
 
@@ -40,7 +38,7 @@ class ExceptionFilterTest extends FunSuite {
     val filter = (new ExceptionFilter) andThen service
 
     val response = Await.result(filter(request))
-    assert(response.status        == Status.InternalServerError)
+    assert(response.status == Status.InternalServerError)
     assert(response.contentString == "")
     assert(response.contentLength == Some(0))
   }
@@ -50,7 +48,7 @@ class ExceptionFilterTest extends FunSuite {
     val filter = (new ExceptionFilter) andThen service
 
     val response = Await.result(filter(request))
-    assert(response.status        == Status.InternalServerError)
+    assert(response.status == Status.InternalServerError)
     assert(response.contentString == "")
     assert(response.contentLength == Some(0))
   }
@@ -60,7 +58,7 @@ class ExceptionFilterTest extends FunSuite {
     val filter = (new ExceptionFilter) andThen service
 
     val response = Await.result(filter(request))
-    assert(response.statusCode    == 499)
+    assert(response.statusCode == 499)
     assert(response.contentString == "")
     assert(response.contentLength == Some(0))
   }

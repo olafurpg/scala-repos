@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.pattern
 
 import language.postfixOps
@@ -10,8 +9,8 @@ import scala.concurrent.duration._
 import scala.concurrent.TimeoutException
 import akka.testkit._
 import org.scalatest.BeforeAndAfter
-import akka.actor.{ ActorSystem }
-import scala.concurrent.{ ExecutionContext, Future, Await }
+import akka.actor.{ActorSystem}
+import scala.concurrent.{ExecutionContext, Future, Await}
 
 object CircuitBreakerSpec {
 
@@ -22,24 +21,41 @@ object CircuitBreakerSpec {
     val openLatch = new TestLatch(1)
     val closedLatch = new TestLatch(1)
     def apply(): CircuitBreaker = instance
-    instance.onClose(closedLatch.countDown()).onHalfOpen(halfOpenLatch.countDown()).onOpen(openLatch.countDown())
+    instance
+      .onClose(closedLatch.countDown())
+      .onHalfOpen(halfOpenLatch.countDown())
+      .onOpen(openLatch.countDown())
   }
 
-  def shortCallTimeoutCb()(implicit system: ActorSystem, ec: ExecutionContext): Breaker =
-    new Breaker(new CircuitBreaker(system.scheduler, 1, 50.millis.dilated, 500.millis.dilated))
+  def shortCallTimeoutCb()(
+      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+    new Breaker(
+        new CircuitBreaker(
+            system.scheduler, 1, 50.millis.dilated, 500.millis.dilated))
 
-  def shortResetTimeoutCb()(implicit system: ActorSystem, ec: ExecutionContext): Breaker =
-    new Breaker(new CircuitBreaker(system.scheduler, 1, 1000.millis.dilated, 50.millis.dilated))
+  def shortResetTimeoutCb()(
+      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+    new Breaker(
+        new CircuitBreaker(
+            system.scheduler, 1, 1000.millis.dilated, 50.millis.dilated))
 
-  def longCallTimeoutCb()(implicit system: ActorSystem, ec: ExecutionContext): Breaker =
-    new Breaker(new CircuitBreaker(system.scheduler, 1, 5 seconds, 500.millis.dilated))
+  def longCallTimeoutCb()(
+      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+    new Breaker(
+        new CircuitBreaker(system.scheduler, 1, 5 seconds, 500.millis.dilated))
 
   val longResetTimeout = 5.seconds
-  def longResetTimeoutCb()(implicit system: ActorSystem, ec: ExecutionContext): Breaker =
-    new Breaker(new CircuitBreaker(system.scheduler, 1, 100.millis.dilated, longResetTimeout))
+  def longResetTimeoutCb()(
+      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+    new Breaker(
+        new CircuitBreaker(
+            system.scheduler, 1, 100.millis.dilated, longResetTimeout))
 
-  def multiFailureCb()(implicit system: ActorSystem, ec: ExecutionContext): Breaker =
-    new Breaker(new CircuitBreaker(system.scheduler, 5, 200.millis.dilated, 500.millis.dilated))
+  def multiFailureCb()(
+      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+    new Breaker(
+        new CircuitBreaker(
+            system.scheduler, 5, 200.millis.dilated, 500.millis.dilated))
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -60,18 +76,25 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
     "throw exceptions when called before reset timeout" in {
       val breaker = CircuitBreakerSpec.longResetTimeoutCb()
 
-      intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
+      intercept[TestException] {
+        breaker().withSyncCircuitBreaker(throwException)
+      }
 
       checkLatch(breaker.openLatch)
 
-      val e = intercept[CircuitBreakerOpenException] { breaker().withSyncCircuitBreaker(sayHi) }
+      val e = intercept[CircuitBreakerOpenException] {
+        breaker().withSyncCircuitBreaker(sayHi)
+      }
       (e.remainingDuration > Duration.Zero) should ===(true)
-      (e.remainingDuration <= CircuitBreakerSpec.longResetTimeout) should ===(true)
+      (e.remainingDuration <= CircuitBreakerSpec.longResetTimeout) should ===(
+          true)
     }
 
     "transition to half-open on reset timeout" in {
       val breaker = CircuitBreakerSpec.shortResetTimeoutCb()
-      intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
+      intercept[TestException] {
+        breaker().withSyncCircuitBreaker(throwException)
+      }
       checkLatch(breaker.halfOpenLatch)
     }
   }
@@ -79,7 +102,9 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
   "A synchronous circuit breaker that is half-open" must {
     "pass through next call and close on success" in {
       val breaker = CircuitBreakerSpec.shortResetTimeoutCb()
-      intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
+      intercept[TestException] {
+        breaker().withSyncCircuitBreaker(throwException)
+      }
       checkLatch(breaker.halfOpenLatch)
       assert("hi" == breaker().withSyncCircuitBreaker(sayHi))
       checkLatch(breaker.closedLatch)
@@ -87,9 +112,13 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
 
     "open on exception in call" in {
       val breaker = CircuitBreakerSpec.shortResetTimeoutCb()
-      intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
+      intercept[TestException] {
+        breaker().withSyncCircuitBreaker(throwException)
+      }
       checkLatch(breaker.halfOpenLatch)
-      intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
+      intercept[TestException] {
+        breaker().withSyncCircuitBreaker(throwException)
+      }
       checkLatch(breaker.openLatch)
     }
   }
@@ -103,7 +132,9 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
     "increment failure count on failure" in {
       val breaker = CircuitBreakerSpec.longCallTimeoutCb()
       breaker().currentFailureCount should ===(0)
-      intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
+      intercept[TestException] {
+        breaker().withSyncCircuitBreaker(throwException)
+      }
       checkLatch(breaker.openLatch)
       breaker().currentFailureCount should ===(1)
     }
@@ -112,8 +143,11 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
       val breaker = CircuitBreakerSpec.multiFailureCb()
       breaker().currentFailureCount should ===(0)
       intercept[TestException] {
-        val ct = Thread.currentThread() // Ensure that the thunk is executed in the tests thread
-        breaker().withSyncCircuitBreaker({ if (Thread.currentThread() eq ct) throwException else "fail" })
+        val ct =
+          Thread.currentThread() // Ensure that the thunk is executed in the tests thread
+        breaker().withSyncCircuitBreaker({
+          if (Thread.currentThread() eq ct) throwException else "fail"
+        })
       }
       breaker().currentFailureCount should ===(1)
       breaker().withSyncCircuitBreaker(sayHi)
@@ -150,7 +184,9 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
 
       checkLatch(breaker.openLatch)
 
-      intercept[CircuitBreakerOpenException] { Await.result(breaker().withCircuitBreaker(Future(sayHi)), awaitTimeout) }
+      intercept[CircuitBreakerOpenException] {
+        Await.result(breaker().withCircuitBreaker(Future(sayHi)), awaitTimeout)
+      }
     }
 
     "transition to half-open on reset timeout" in {
@@ -165,7 +201,8 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
       val breaker = CircuitBreakerSpec.shortResetTimeoutCb()
       breaker().withCircuitBreaker(Future(throwException))
       checkLatch(breaker.halfOpenLatch)
-      Await.result(breaker().withCircuitBreaker(Future(sayHi)), awaitTimeout) should ===("hi")
+      Await.result(breaker().withCircuitBreaker(Future(sayHi)), awaitTimeout) should ===(
+          "hi")
       checkLatch(breaker.closedLatch)
     }
 
@@ -173,7 +210,10 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
       val breaker = CircuitBreakerSpec.shortResetTimeoutCb()
       breaker().withCircuitBreaker(Future(throwException))
       checkLatch(breaker.halfOpenLatch)
-      intercept[TestException] { Await.result(breaker().withCircuitBreaker(Future(throwException)), awaitTimeout) }
+      intercept[TestException] {
+        Await.result(breaker().withCircuitBreaker(Future(throwException)),
+                     awaitTimeout)
+      }
       checkLatch(breaker.openLatch)
     }
 
@@ -190,12 +230,16 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
   "An asynchronous circuit breaker that is closed" must {
     "allow calls through" in {
       val breaker = CircuitBreakerSpec.longCallTimeoutCb()
-      Await.result(breaker().withCircuitBreaker(Future(sayHi)), awaitTimeout) should ===("hi")
+      Await.result(breaker().withCircuitBreaker(Future(sayHi)), awaitTimeout) should ===(
+          "hi")
     }
 
     "increment failure count on exception" in {
       val breaker = CircuitBreakerSpec.longCallTimeoutCb()
-      intercept[TestException] { Await.result(breaker().withCircuitBreaker(Future(throwException)), awaitTimeout) }
+      intercept[TestException] {
+        Await.result(breaker().withCircuitBreaker(Future(throwException)),
+                     awaitTimeout)
+      }
       checkLatch(breaker.openLatch)
       breaker().currentFailureCount should ===(1)
     }
@@ -230,8 +274,6 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
       intercept[TimeoutException] {
         Await.result(fut, awaitTimeout)
       }
-
     }
   }
-
 }

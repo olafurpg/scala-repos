@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import org.apache.spark.SparkContext
@@ -62,6 +61,7 @@ import org.apache.spark.SparkContext
   * @group Algorithm
   */
 trait PersistentModel[AP <: Params] {
+
   /** Save the model to some persistent storage.
     *
     * This method should return true if the model has been saved successfully so
@@ -87,6 +87,7 @@ trait PersistentModel[AP <: Params] {
   * @group Algorithm
   */
 trait PersistentModelLoader[AP <: Params, M] {
+
   /** Implement this method to restore a persisted model that extends the
     * [[PersistentModel]] trait. All arguments of this method are provided
     * automatically by PredictionIO.
@@ -109,4 +110,5 @@ trait IPersistentModel[AP <: Params] extends PersistentModel[AP]
   *
   * @group Algorithm */
 @deprecated("Use PersistentModelLoader instead.", "0.9.2")
-trait IPersistentModelLoader[AP <: Params, M] extends PersistentModelLoader[AP, M]
+trait IPersistentModelLoader[AP <: Params, M]
+    extends PersistentModelLoader[AP, M]

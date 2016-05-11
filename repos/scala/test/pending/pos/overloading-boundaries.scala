@@ -34,4 +34,4 @@ a.scala:2: error: bippy is already defined as method bippy in package object bar
          ^
 one error found
 
-****/
+  ****/

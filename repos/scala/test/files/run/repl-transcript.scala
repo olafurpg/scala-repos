@@ -1,7 +1,8 @@
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  def code = """
+  def code =
+    """
 scala> class Bippity
 defined class Bippity
 
@@ -17,4 +18,3 @@ res6: scala.collection.immutable.IndexedSeq[Int] = Vector(2, 3, 4, 5, 6, 7, 8, 9
 scala> res6.sum + res5
   """
 }
-

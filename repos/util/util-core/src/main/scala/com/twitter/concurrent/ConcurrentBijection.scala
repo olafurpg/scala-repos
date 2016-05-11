@@ -19,8 +19,7 @@ class ConcurrentBijection[A, B] extends MMap[A, B] {
   def -=(key: A) = {
     synchronized {
       val value = forward.remove(key)
-      if (value != null)
-        reverse.remove(value)
+      if (value != null) reverse.remove(value)
     }
     this
   }
@@ -54,13 +53,11 @@ class ConcurrentBijection[A, B] extends MMap[A, B] {
       if (oldValue != null) {
         // Remove the old reverse mapping.
         val keyForOldValue = reverse.remove(oldValue)
-        if (key != keyForOldValue)
-          forward.remove(keyForOldValue)
+        if (key != keyForOldValue) forward.remove(keyForOldValue)
       }
 
       val oldKeyForValue = reverse.put(value, key)
-      if (oldKeyForValue != null)
-        forward.remove(oldKeyForValue)
+      if (oldKeyForValue != null) forward.remove(oldKeyForValue)
     }
   }
 

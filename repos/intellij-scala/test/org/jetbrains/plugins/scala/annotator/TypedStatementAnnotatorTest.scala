@@ -7,7 +7,8 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScTypedStmt
 
 class TypedStatementAnnotatorTest extends SimpleTestCase {
-  final val Header = "class A; class B; object A extends A; object B extends B\n"
+  final val Header =
+    "class A; class B; object A extends A; object B extends B\n"
 
   def testFine() {
     assertMatches(messages("A: A")) {
@@ -34,16 +35,17 @@ class TypedStatementAnnotatorTest extends SimpleTestCase {
     }
   }*/
 
+  def messages(@Language(value = "Scala", prefix = Header) code: String)
+    : List[Message] = {
+    val definition =
+      (Header + code).parse.depthFirst.findByType(classOf[ScTypedStmt]).get
 
-  def messages(@Language(value = "Scala", prefix = Header) code: String): List[Message] = {
-    val definition = (Header + code).parse.depthFirst.findByType(classOf[ScTypedStmt]).get
-    
     val annotator = new TypedStatementAnnotator() {}
     val mock = new AnnotatorHolderMock
-    
+
     annotator.annotateTypedStatement(definition, mock, highlightErrors = true)
     mock.annotations
   }
-  
+
   val TypeMismatch = ContainsPattern("Type mismatch")
 }

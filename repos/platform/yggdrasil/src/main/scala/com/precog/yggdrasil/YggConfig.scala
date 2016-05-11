@@ -27,7 +27,7 @@ import common.Config
 import java.io.File
 
 trait YggConfigComponent {
-  type YggConfig 
+  type YggConfig
 
   val yggConfig: YggConfig
 }
@@ -46,19 +46,20 @@ trait BaseConfig extends Config {
         }
       }
     }
- """, io.BlockFormat)
+ """,
+                                                  io.BlockFormat)
 
-  lazy private val cfg = localDefaults ++ config 
+  lazy private val cfg = localDefaults ++ config
 
   lazy val rootDir = new File(cfg[String]("precog.storage.root"))
-  
+
   lazy val dataDir = new File(rootDir, "data")
   lazy val archiveDir = new File(rootDir, "archive")
   lazy val cacheDir = new File(rootDir, "cache")
   lazy val scratchDir = new File(rootDir, "scratch")
 
   def newWorkDir = {
-    if(!scratchDir.exists) scratchDir.mkdirs
+    if (!scratchDir.exists) scratchDir.mkdirs
     val tempFile = File.createTempFile("ygg", "workdir", scratchDir)
     tempFile.delete
     tempFile.mkdir

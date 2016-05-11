@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import scala.concurrent.duration._
@@ -21,20 +20,16 @@ object AutoDownSpec {
   val memberC = TestMember(Address("akka.tcp", "sys", "c", 2552), Up)
 
   class AutoDownTestActor(
-    autoDownUnreachableAfter: FiniteDuration,
-    probe: ActorRef)
-    extends AutoDownBase(autoDownUnreachableAfter) {
+      autoDownUnreachableAfter: FiniteDuration, probe: ActorRef)
+      extends AutoDownBase(autoDownUnreachableAfter) {
 
     override def selfAddress = memberA.address
     override def scheduler: Scheduler = context.system.scheduler
 
     override def down(node: Address): Unit = {
-      if (leader)
-        probe ! DownCalled(node)
-      else
-        probe ! "down must only be done by leader"
+      if (leader) probe ! DownCalled(node)
+      else probe ! "down must only be done by leader"
     }
-
   }
 }
 
@@ -43,7 +38,8 @@ class AutoDownSpec extends AkkaSpec {
   import AutoDownSpec._
 
   def autoDownActor(autoDownUnreachableAfter: FiniteDuration): ActorRef =
-    system.actorOf(Props(classOf[AutoDownTestActor], autoDownUnreachableAfter, testActor))
+    system.actorOf(
+        Props(classOf[AutoDownTestActor], autoDownUnreachableAfter, testActor))
 
   "AutoDown" must {
 
@@ -116,6 +112,5 @@ class AutoDownSpec extends AkkaSpec {
       a ! UnreachableMember(memberB.copy(Down))
       expectNoMsg(1.second)
     }
-
   }
 }

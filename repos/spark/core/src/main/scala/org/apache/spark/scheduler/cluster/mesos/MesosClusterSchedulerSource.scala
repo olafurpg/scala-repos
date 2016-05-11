@@ -21,16 +21,19 @@ import com.codahale.metrics.{Gauge, MetricRegistry}
 
 import org.apache.spark.metrics.source.Source
 
-private[mesos] class MesosClusterSchedulerSource(scheduler: MesosClusterScheduler)
-  extends Source {
+private[mesos] class MesosClusterSchedulerSource(
+    scheduler: MesosClusterScheduler)
+    extends Source {
   override def sourceName: String = "mesos_cluster"
   override def metricRegistry: MetricRegistry = new MetricRegistry()
 
-  metricRegistry.register(MetricRegistry.name("waitingDrivers"), new Gauge[Int] {
+  metricRegistry.register(
+      MetricRegistry.name("waitingDrivers"), new Gauge[Int] {
     override def getValue: Int = scheduler.getQueuedDriversSize
   })
 
-  metricRegistry.register(MetricRegistry.name("launchedDrivers"), new Gauge[Int] {
+  metricRegistry.register(
+      MetricRegistry.name("launchedDrivers"), new Gauge[Int] {
     override def getValue: Int = scheduler.getLaunchedDriversSize
   })
 

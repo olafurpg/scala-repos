@@ -25,7 +25,8 @@ import org.apache.spark.storage._
 import org.apache.spark.ui._
 
 /** Web UI showing storage status of all RDD's in the given SparkContext. */
-private[ui] class StorageTab(parent: SparkUI) extends SparkUITab(parent, "storage") {
+private[ui] class StorageTab(parent: SparkUI)
+    extends SparkUITab(parent, "storage") {
   val listener = parent.storageListener
 
   attachPage(new StoragePage(this))
@@ -33,17 +34,20 @@ private[ui] class StorageTab(parent: SparkUI) extends SparkUITab(parent, "storag
 }
 
 /**
- * :: DeveloperApi ::
- * A SparkListener that prepares information to be displayed on the BlockManagerUI.
- *
- * This class is thread-safe (unlike JobProgressListener)
- */
+  * :: DeveloperApi ::
+  * A SparkListener that prepares information to be displayed on the BlockManagerUI.
+  *
+  * This class is thread-safe (unlike JobProgressListener)
+  */
 @DeveloperApi
-class StorageListener(storageStatusListener: StorageStatusListener) extends BlockStatusListener {
+class StorageListener(storageStatusListener: StorageStatusListener)
+    extends BlockStatusListener {
 
-  private[ui] val _rddInfoMap = mutable.Map[Int, RDDInfo]() // exposed for testing
+  private[ui] val _rddInfoMap =
+    mutable.Map[Int, RDDInfo]() // exposed for testing
 
-  def activeStorageStatusList: Seq[StorageStatus] = storageStatusListener.storageStatusList
+  def activeStorageStatusList: Seq[StorageStatus] =
+    storageStatusListener.storageStatusList
 
   /** Filter RDD info to include only those with cached partitions */
   def rddInfoList: Seq[RDDInfo] = synchronized {
@@ -52,15 +56,19 @@ class StorageListener(storageStatusListener: StorageStatusListener) extends Bloc
 
   /** Update the storage info of the RDDs whose blocks are among the given updated blocks */
   private def updateRDDInfo(updatedBlocks: Seq[(BlockId, BlockStatus)]): Unit = {
-    val rddIdsToUpdate = updatedBlocks.flatMap { case (bid, _) => bid.asRDDId.map(_.rddId) }.toSet
-    val rddInfosToUpdate = _rddInfoMap.values.toSeq.filter { s => rddIdsToUpdate.contains(s.id) }
+    val rddIdsToUpdate = updatedBlocks.flatMap {
+      case (bid, _) => bid.asRDDId.map(_.rddId)
+    }.toSet
+    val rddInfosToUpdate = _rddInfoMap.values.toSeq.filter { s =>
+      rddIdsToUpdate.contains(s.id)
+    }
     StorageUtils.updateRddInfo(rddInfosToUpdate, activeStorageStatusList)
   }
 
   /**
-   * Assumes the storage status list is fully up-to-date. This implies the corresponding
-   * StorageStatusSparkListener must process the SparkListenerTaskEnd event before this listener.
-   */
+    * Assumes the storage status list is fully up-to-date. This implies the corresponding
+    * StorageStatusSparkListener must process the SparkListenerTaskEnd event before this listener.
+    */
   override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit = synchronized {
     val metrics = taskEnd.taskMetrics
     if (metrics != null && metrics.updatedBlockStatuses.nonEmpty) {
@@ -68,20 +76,27 @@ class StorageListener(storageStatusListener: StorageStatusListener) extends Bloc
     }
   }
 
-  override def onStageSubmitted(stageSubmitted: SparkListenerStageSubmitted): Unit = synchronized {
+  override def onStageSubmitted(
+      stageSubmitted: SparkListenerStageSubmitted): Unit = synchronized {
     val rddInfos = stageSubmitted.stageInfo.rddInfos
-    rddInfos.foreach { info => _rddInfoMap.getOrElseUpdate(info.id, info) }
-  }
-
-  override def onStageCompleted(stageCompleted: SparkListenerStageCompleted): Unit = synchronized {
-    // Remove all partitions that are no longer cached in current completed stage
-    val completedRddIds = stageCompleted.stageInfo.rddInfos.map(r => r.id).toSet
-    _rddInfoMap.retain { case (id, info) =>
-      !completedRddIds.contains(id) || info.numCachedPartitions > 0
+    rddInfos.foreach { info =>
+      _rddInfoMap.getOrElseUpdate(info.id, info)
     }
   }
 
-  override def onUnpersistRDD(unpersistRDD: SparkListenerUnpersistRDD): Unit = synchronized {
-    _rddInfoMap.remove(unpersistRDD.rddId)
+  override def onStageCompleted(
+      stageCompleted: SparkListenerStageCompleted): Unit = synchronized {
+    // Remove all partitions that are no longer cached in current completed stage
+    val completedRddIds =
+      stageCompleted.stageInfo.rddInfos.map(r => r.id).toSet
+    _rddInfoMap.retain {
+      case (id, info) =>
+        !completedRddIds.contains(id) || info.numCachedPartitions > 0
+    }
   }
+
+  override def onUnpersistRDD(unpersistRDD: SparkListenerUnpersistRDD): Unit =
+    synchronized {
+      _rddInfoMap.remove(unpersistRDD.rddId)
+    }
 }

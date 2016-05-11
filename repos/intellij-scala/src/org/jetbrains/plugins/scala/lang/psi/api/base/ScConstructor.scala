@@ -14,10 +14,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
 import scala.collection.Seq
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 22.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 22.02.2008
+  */
 trait ScConstructor extends ScalaPsiElement {
   def typeElement: ScTypeElement
 
@@ -40,7 +39,7 @@ trait ScConstructor extends ScalaPsiElement {
   def shapeType(i: Int): TypeResult[ScType]
 
   def shapeMultiType(i: Int): Seq[TypeResult[ScType]]
-  
+
   def multiType(i: Int): Seq[TypeResult[ScType]]
 
   def reference: Option[ScStableCodeReferenceElement]
@@ -49,7 +48,8 @@ trait ScConstructor extends ScalaPsiElement {
 }
 
 object ScConstructor {
-  def unapply(c: ScConstructor): Option[(ScTypeElement, Seq[ScArgumentExprList])] = {
+  def unapply(
+      c: ScConstructor): Option[(ScTypeElement, Seq[ScArgumentExprList])] = {
     Option(c).map(it => (it.typeElement, it.arguments))
   }
 
@@ -62,7 +62,7 @@ object ScConstructor {
       }
     }
   }
-  
+
   new A(i = 1)(s = "A")
 }
 

@@ -1,5 +1,4 @@
-abstract class Bar[+B] {
-}
+abstract class Bar[+B] {}
 abstract class C1[+B] extends Bar[B] {
   private[this] def g(x: C1[B]): Unit = ()
 

@@ -1,7 +1,5 @@
 class A {
-  if (true) {
-
-  }
+  if (true) {}
   /*caret*/
 }
 /*
@@ -36,4 +34,4 @@ type
 val
 var
 while
-*/
+ */

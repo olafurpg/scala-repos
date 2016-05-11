@@ -30,7 +30,8 @@ import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
-class KafkaStreamSuite extends SparkFunSuite with Eventually with BeforeAndAfterAll {
+class KafkaStreamSuite
+    extends SparkFunSuite with Eventually with BeforeAndAfterAll {
   private var ssc: StreamingContext = _
   private var kafkaTestUtils: KafkaTestUtils = _
 
@@ -52,19 +53,23 @@ class KafkaStreamSuite extends SparkFunSuite with Eventually with BeforeAndAfter
   }
 
   test("Kafka input stream") {
-    val sparkConf = new SparkConf().setMaster("local[4]").setAppName(this.getClass.getSimpleName)
+    val sparkConf = new SparkConf()
+      .setMaster("local[4]")
+      .setAppName(this.getClass.getSimpleName)
     ssc = new StreamingContext(sparkConf, Milliseconds(500))
     val topic = "topic1"
     val sent = Map("a" -> 5, "b" -> 3, "c" -> 10)
     kafkaTestUtils.createTopic(topic)
     kafkaTestUtils.sendMessages(topic, sent)
 
-    val kafkaParams = Map("zookeeper.connect" -> kafkaTestUtils.zkAddress,
-      "group.id" -> s"test-consumer-${Random.nextInt(10000)}",
-      "auto.offset.reset" -> "smallest")
+    val kafkaParams =
+      Map("zookeeper.connect" -> kafkaTestUtils.zkAddress,
+          "group.id" -> s"test-consumer-${Random.nextInt(10000)}",
+          "auto.offset.reset" -> "smallest")
 
-    val stream = KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
-      ssc, kafkaParams, Map(topic -> 1), StorageLevel.MEMORY_ONLY)
+    val stream =
+      KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
+          ssc, kafkaParams, Map(topic -> 1), StorageLevel.MEMORY_ONLY)
     val result = new mutable.HashMap[String, Long]()
     stream.map(_._2).countByValue().foreachRDD { r =>
       r.collect().foreach { kv =>

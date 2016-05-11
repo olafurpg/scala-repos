@@ -9,9 +9,9 @@ import org.jetbrains.jps.incremental.scala.remote.MessageEvent
 import org.jetbrains.jps.incremental.scala.remote.play.WatcherCommands._
 
 /**
- * User: Dmitry.Naydanov
- * Date: 12.02.15.
- */
+  * User: Dmitry.Naydanov
+  * Date: 12.02.15.
+  */
 object SbtWatcherMain {
   private var currentExec: Option[(SbtWatcherExec, Seq[String])] = None
 
@@ -26,7 +26,14 @@ object SbtWatcherMain {
   private def handle(arguments: Seq[String], out: PrintStream) {
     val messageConsumer = new MessageConsumer {
       override def consume(message: String) {
-        out.write(Base64Converter.encode(MessageEvent(BuildMessage.Kind.INFO, message, None, None, None).toBytes).getBytes)
+        out.write(
+            Base64Converter
+              .encode(MessageEvent(BuildMessage.Kind.INFO,
+                                   message,
+                                   None,
+                                   None,
+                                   None).toBytes)
+              .getBytes)
       }
     }
 
@@ -51,7 +58,11 @@ object SbtWatcherMain {
           case _ => run()
         }
       case STOP => currentExec.foreach(a => a._1.endSbtExec())
-      case IS_RUNNING => messageConsumer.consume(currentExec.map {a => toMessage(a._1.isRunning)} getOrElse FALSE)
+      case IS_RUNNING =>
+        messageConsumer.consume(
+            currentExec.map { a =>
+          toMessage(a._1.isRunning)
+        } getOrElse FALSE)
       case _ =>
     }
   }

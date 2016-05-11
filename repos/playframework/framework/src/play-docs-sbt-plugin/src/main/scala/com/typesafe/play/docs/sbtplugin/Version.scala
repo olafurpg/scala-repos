@@ -10,7 +10,10 @@ private[sbtplugin] object Version {
       // if qualifier is not null, drop the leading "-"
       val qual = Option(qualifier).map(_.tail)
       Version(era.toInt, major.toInt, minor.toInt, qual)
-    case _ => throw new IllegalArgumentException(s"$version is not a valid version string")
+    case _ =>
+      throw new IllegalArgumentException(
+          s"$version is not a valid version string")
   }
 }
-private[sbtplugin] case class Version(era: Int, major: Int, minor: Int, qualifier: Option[String])
+private[sbtplugin] case class Version(
+    era: Int, major: Int, minor: Int, qualifier: Option[String])

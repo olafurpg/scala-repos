@@ -3,7 +3,7 @@ package lila.round
 import akka.actor._
 import chess.Color
 
-import lila.game.{ Game, GameRepo, Pov }
+import lila.game.{Game, GameRepo, Pov}
 
 private[round] final class CheatDetector(reporter: ActorSelection) {
 
@@ -13,12 +13,18 @@ private[round] final class CheatDetector(reporter: ActorSelection) {
     GameRepo findMirror game map {
       _ ?? { mirror =>
         mirror.players map (p => p -> p.userId) collectFirst {
-          case (player, Some(userId)) => game.players find (_.userId == player.userId) map { cheater =>
-            lila.log("cheat").info(s"${cheater.color} ($userId) @ ${game.id} uses ${mirror.id}")
-            if (createReport) reporter ! lila.hub.actorApi.report.Cheater(userId,
-              s"Cheat detected on ${gameUrl(game.id)}, using lichess AI: ${gameUrl(mirror.id)}")
-            cheater.color
-          }
+          case (player, Some(userId)) =>
+            game.players find (_.userId == player.userId) map { cheater =>
+              lila
+                .log("cheat")
+                .info(
+                    s"${cheater.color} ($userId) @ ${game.id} uses ${mirror.id}")
+              if (createReport)
+                reporter ! lila.hub.actorApi.report.Cheater(
+                    userId,
+                    s"Cheat detected on ${gameUrl(game.id)}, using lichess AI: ${gameUrl(mirror.id)}")
+              cheater.color
+            }
         } flatten
       }
     }

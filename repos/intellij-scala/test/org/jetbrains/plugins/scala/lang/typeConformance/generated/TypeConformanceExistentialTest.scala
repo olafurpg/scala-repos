@@ -14,34 +14,34 @@ class TypeConformanceExistentialTest extends TypeConformanceTestBase {
   //todo:
   /*def testBadLowerBoundPrimitive() {doTest()}*/
 
-  def testBadLowerUpper() {doTest()}
+  def testBadLowerUpper() { doTest() }
 
-  def testBadToExistential() {doTest()}
+  def testBadToExistential() { doTest() }
 
-  def testInnerPlaceHolder() {doTest()}
+  def testInnerPlaceHolder() { doTest() }
 
-  def testInnerPlaceholderBack() {doTest()}
+  def testInnerPlaceholderBack() { doTest() }
 
-  def testLowerBound() {doTest()}
+  def testLowerBound() { doTest() }
 
-  def testLowerBound2() {doTest()}
+  def testLowerBound2() { doTest() }
 
-  def testLowerBoundAbstract() {doTest()}
+  def testLowerBoundAbstract() { doTest() }
 
   //todo:
   /*def testLowerBoundAbstract2() {doTest()}*/
 
-  def testLowerBoundPrimitive() {doTest()}
+  def testLowerBoundPrimitive() { doTest() }
 
-  def testLowerBoundsPrimitiveCovariant() {doTest()}
+  def testLowerBoundsPrimitiveCovariant() { doTest() }
 
-  def testLowerUpperBouns() {doTest()}
+  def testLowerUpperBouns() { doTest() }
 
-  def testSCL2977() {doTest()}
+  def testSCL2977() { doTest() }
 
-  def testSCL2977B() {doTest()}
+  def testSCL2977B() { doTest() }
 
-  def testToExistential() {doTest()}
+  def testToExistential() { doTest() }
 
-  def testToExistentialSimple() {doTest()}
+  def testToExistentialSimple() { doTest() }
 }

@@ -6,19 +6,19 @@ import com.twitter.conversions.time.intToTimeableNumber
 import scala.collection.immutable.SortedSet
 
 class LoadGenerator[Req, Rep](
-  history: TraversableOnce[Event[Req, Rep]],
-  recorder: (Duration, Future[Rep]) => Unit,
-  filter: SimpleFilter[Event[Req, Rep], Rep],
-  timer: MockTimer = new MockTimer()
+    history: TraversableOnce[Event[Req, Rep]],
+    recorder: (Duration, Future[Rep]) => Unit,
+    filter: SimpleFilter[Event[Req, Rep], Rep],
+    timer: MockTimer = new MockTimer()
 ) {
-  val svc = filter andThen Service.mk[Event[Req, Rep], Rep] { evt: Event[Req, Rep] =>
-    val p = Promise[Rep]()
-    timer.schedule(evt.finish) {
-      p.updateIfEmpty(evt())
+  val svc =
+    filter andThen Service.mk[Event[Req, Rep], Rep] { evt: Event[Req, Rep] =>
+      val p = Promise[Rep]()
+      timer.schedule(evt.finish) {
+        p.updateIfEmpty(evt())
+      }
+      p
     }
-    p
-  }
-
 
   def forward(dur: Duration, ctl: TimeControl) {
     ctl.advance(dur - 1.nanosecond)
@@ -28,11 +28,11 @@ class LoadGenerator[Req, Rep](
   }
 
   /**
-   * Makes a request to a filtered service that starts at Event.start and lasts for Event.length,
-   * and at the end, fulfils the response with the result of Event.fn(Event.length).
-   *
-   * Every time a request is made, it is recorded with the latency and passed to recorder.
-   */
+    * Makes a request to a filtered service that starts at Event.start and lasts for Event.length,
+    * and at the end, fulfils the response with the result of Event.fn(Event.length).
+    *
+    * Every time a request is made, it is recorded with the latency and passed to recorder.
+    */
   def execute(): Unit = {
     var cur = Time.fromMilliseconds(0)
     var endTimes = SortedSet[Time]()
@@ -73,25 +73,26 @@ class LoadGenerator[Req, Rep](
 }
 
 object LoadGenerator {
-  def mkHistory[Req, Rep](event: () => Event[Req, Rep], num: Int): Iterator[Event[Req, Rep]] =
+  def mkHistory[Req, Rep](
+      event: () => Event[Req, Rep], num: Int): Iterator[Event[Req, Rep]] =
     new Iterator[Event[Req, Rep]] {
       def hasNext: Boolean = true
       def next(): Event[Req, Rep] = event()
     }.take(num)
 
   def mk[Req, Rep](
-    start: Time,
-    interval: Duration,
-    mkEvent: Time => Event[Req, Rep],
-    num: Int
+      start: Time,
+      interval: Duration,
+      mkEvent: Time => Event[Req, Rep],
+      num: Int
   ): Iterator[Event[Req, Rep]] = mkInGroups(start, interval, mkEvent, 1, num)
 
   def mkInGroups[Req, Rep](
-    start: Time,
-    interval: Duration,
-    mkEvent: Time => Event[Req, Rep],
-    groupSize: Int,
-    num: Int
+      start: Time,
+      interval: Duration,
+      mkEvent: Time => Event[Req, Rep],
+      groupSize: Int,
+      num: Int
   ): Iterator[Event[Req, Rep]] = {
     var cur = start
     var curGroupSize = 0

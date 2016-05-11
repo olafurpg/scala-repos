@@ -7,12 +7,12 @@ package p1 {
 class C {
   import p1._
 
-  println(/* */p1./* */p2./* */ Foo.getClass)
-  println(classOf[/* */p1./* */p2./* offset: 43, path: p1.p2.Foo */ Foo])
+  println( /* */ p1. /* */ p2. /* */ Foo.getClass)
+  println(classOf[ /* */ p1. /* */ p2. /* offset: 43, path: p1.p2.Foo */ Foo])
 
-  println(/* */p2./* */ Foo.getClass)
-  println(classOf[/* */p2./* offset: 43, path: p1.p2.Foo */ Foo])
+  println( /* */ p2. /* */ Foo.getClass)
+  println(classOf[ /* */ p2. /* offset: 43, path: p1.p2.Foo */ Foo])
 
-  println(/* resolved: false */Foo.getClass)
-  println(classOf[/* resolved: false */Foo])
+  println( /* resolved: false */ Foo.getClass)
+  println(classOf[ /* resolved: false */ Foo])
 }

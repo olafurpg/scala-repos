@@ -1,19 +1,18 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.persistence
 
-import java.io.{ File, IOException }
+import java.io.{File, IOException}
 
-import akka.actor.{ ActorInitializationException, ActorRef, Props }
-import akka.testkit.{ AkkaSpec, EventFilter, ImplicitSender }
+import akka.actor.{ActorInitializationException, ActorRef, Props}
+import akka.testkit.{AkkaSpec, EventFilter, ImplicitSender}
 
 object SnapshotDirectoryFailureSpec {
   val inUseSnapshotPath = "target/inUseSnapshotPath"
 
-  class TestPersistentActor(name: String, probe: ActorRef) extends PersistentActor
-    with TurnOffRecoverOnStart {
+  class TestPersistentActor(name: String, probe: ActorRef)
+      extends PersistentActor with TurnOffRecoverOnStart {
 
     override def persistenceId: String = name
 
@@ -22,15 +21,16 @@ object SnapshotDirectoryFailureSpec {
     }
 
     override def receiveCommand = {
-      case s: String               ⇒ saveSnapshot(s)
+      case s: String ⇒ saveSnapshot(s)
       case SaveSnapshotSuccess(md) ⇒ probe ! md.sequenceNr
-      case other                   ⇒ probe ! other
+      case other ⇒ probe ! other
     }
   }
 }
 
-class SnapshotDirectoryFailureSpec extends AkkaSpec(PersistenceSpec.config("leveldb", "SnapshotDirectoryFailureSpec", extraConfig = Some(
-  s"""
+class SnapshotDirectoryFailureSpec
+    extends AkkaSpec(PersistenceSpec.config(
+            "leveldb", "SnapshotDirectoryFailureSpec", extraConfig = Some(s"""
   akka.persistence.snapshot-store.local.dir = "${SnapshotDirectoryFailureSpec.inUseSnapshotPath}"
   """))) with ImplicitSender {
 
@@ -39,17 +39,23 @@ class SnapshotDirectoryFailureSpec extends AkkaSpec(PersistenceSpec.config("leve
   val file = new File(inUseSnapshotPath)
 
   override protected def atStartup() {
-    if (!file.createNewFile()) throw new IOException(s"Failed to create test file [${file.getCanonicalFile}]")
+    if (!file.createNewFile())
+      throw new IOException(
+          s"Failed to create test file [${file.getCanonicalFile}]")
   }
 
   override protected def afterTermination() {
-    if (!file.delete()) throw new IOException(s"Failed to delete test file [${file.getCanonicalFile}]")
+    if (!file.delete())
+      throw new IOException(
+          s"Failed to delete test file [${file.getCanonicalFile}]")
   }
 
   "A local snapshot store configured with an failing directory name " must {
     "throw an exception at startup" in {
       EventFilter[ActorInitializationException](occurrences = 1).intercept {
-        val p = system.actorOf(Props(classOf[TestPersistentActor], "SnapshotDirectoryFailureSpec-1", testActor))
+        val p = system.actorOf(Props(classOf[TestPersistentActor],
+                                     "SnapshotDirectoryFailureSpec-1",
+                                     testActor))
         p ! "blahonga"
       }
     }

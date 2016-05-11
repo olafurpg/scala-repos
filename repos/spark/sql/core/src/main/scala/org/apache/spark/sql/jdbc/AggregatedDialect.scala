@@ -20,21 +20,24 @@ package org.apache.spark.sql.jdbc
 import org.apache.spark.sql.types.{DataType, MetadataBuilder}
 
 /**
- * AggregatedDialect can unify multiple dialects into one virtual Dialect.
- * Dialects are tried in order, and the first dialect that does not return a
- * neutral element will will.
- *
- * @param dialects List of dialects.
- */
-private class AggregatedDialect(dialects: List[JdbcDialect]) extends JdbcDialect {
+  * AggregatedDialect can unify multiple dialects into one virtual Dialect.
+  * Dialects are tried in order, and the first dialect that does not return a
+  * neutral element will will.
+  *
+  * @param dialects List of dialects.
+  */
+private class AggregatedDialect(dialects: List[JdbcDialect])
+    extends JdbcDialect {
 
   require(dialects.nonEmpty)
 
-  override def canHandle(url : String): Boolean =
+  override def canHandle(url: String): Boolean =
     dialects.map(_.canHandle(url)).reduce(_ && _)
 
-  override def getCatalystType(
-      sqlType: Int, typeName: String, size: Int, md: MetadataBuilder): Option[DataType] = {
+  override def getCatalystType(sqlType: Int,
+                               typeName: String,
+                               size: Int,
+                               md: MetadataBuilder): Option[DataType] = {
     dialects.flatMap(_.getCatalystType(sqlType, typeName, size, md)).headOption
   }
 

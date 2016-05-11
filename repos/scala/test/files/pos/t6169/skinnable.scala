@@ -6,9 +6,10 @@ class ObjectProperty[T](val delegate: OP[T])
 
 trait TestWildcardBoundInference {
   def delegate: Skinnable
-  def skin: ObjectProperty[Skin[_ /* inferred: <: Skinnable */]] = ObjectProperty.jfxObjectProperty2sfx(delegate.skinProperty)
-  skin: ObjectProperty[Skin[_  <: Skinnable]]
+  def skin: ObjectProperty[Skin[_ /* inferred: <: Skinnable */ ]] =
+    ObjectProperty.jfxObjectProperty2sfx(delegate.skinProperty)
+  skin: ObjectProperty[Skin[_ <: Skinnable]]
 
   def skinCheckInference = delegate.skinProperty
-  skinCheckInference: ObjectProperty[Skin[_  <: Skinnable]]
+  skinCheckInference: ObjectProperty[Skin[_ <: Skinnable]]
 }

@@ -11,12 +11,15 @@ import org.jetbrains.plugins.scala.finder.ScalaSourceFilterScope
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackageContainer
 
 /**
- * @author ilyas
- */
+  * @author ilyas
+  */
+class ScFullPackagingNameIndex
+    extends IntStubIndexExtension[ScPackageContainer] {
 
-class ScFullPackagingNameIndex extends IntStubIndexExtension[ScPackageContainer] {
-
-  override def get(int: java.lang.Integer, project: Project, scope: GlobalSearchScope): java.util.Collection[ScPackageContainer] =
+  override def get(
+      int: java.lang.Integer,
+      project: Project,
+      scope: GlobalSearchScope): java.util.Collection[ScPackageContainer] =
     super.get(int, project, new ScalaSourceFilterScope(scope, project))
 
   def getKey = ScFullPackagingNameIndex.KEY

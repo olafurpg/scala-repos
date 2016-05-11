@@ -30,22 +30,23 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.StructType
 
 /**
- * Base class for operators that exchange data among multiple threads or processes.
- *
- * Exchanges are the key class of operators that enable parallelism. Although the implementation
- * differs significantly, the concept is similar to the exchange operator described in
- * "Volcano -- An Extensible and Parallel Query Evaluation System" by Goetz Graefe.
- */
+  * Base class for operators that exchange data among multiple threads or processes.
+  *
+  * Exchanges are the key class of operators that enable parallelism. Although the implementation
+  * differs significantly, the concept is similar to the exchange operator described in
+  * "Volcano -- An Extensible and Parallel Query Evaluation System" by Goetz Graefe.
+  */
 abstract class Exchange extends UnaryNode {
   override def output: Seq[Attribute] = child.output
 }
 
 /**
- * A wrapper for reused exchange to have different output, because two exchanges which produce
- * logically identical output will have distinct sets of output attribute ids, so we need to
- * preserve the original ids because they're what downstream operators are expecting.
- */
-case class ReusedExchange(override val output: Seq[Attribute], child: Exchange) extends LeafNode {
+  * A wrapper for reused exchange to have different output, because two exchanges which produce
+  * logically identical output will have distinct sets of output attribute ids, so we need to
+  * preserve the original ids because they're what downstream operators are expecting.
+  */
+case class ReusedExchange(override val output: Seq[Attribute], child: Exchange)
+    extends LeafNode {
 
   override def sameResult(plan: SparkPlan): Boolean = {
     // Ignore this wrapper. `plan` could also be a ReusedExchange, so we reverse the order here.
@@ -65,9 +66,9 @@ case class ReusedExchange(override val output: Seq[Attribute], child: Exchange) 
 }
 
 /**
- * Find out duplicated exchanges in the spark plan, then use the same exchange for all the
- * references.
- */
+  * Find out duplicated exchanges in the spark plan, then use the same exchange for all the
+  * references.
+  */
 case class ReuseExchange(conf: SQLConf) extends Rule[SparkPlan] {
 
   def apply(plan: SparkPlan): SparkPlan = {
@@ -79,7 +80,8 @@ case class ReuseExchange(conf: SQLConf) extends Rule[SparkPlan] {
     plan.transformUp {
       case exchange: Exchange =>
         // the exchanges that have same results usually also have same schemas (same column names).
-        val sameSchema = exchanges.getOrElseUpdate(exchange.schema, ArrayBuffer[Exchange]())
+        val sameSchema =
+          exchanges.getOrElseUpdate(exchange.schema, ArrayBuffer[Exchange]())
         val samePlan = sameSchema.find { e =>
           exchange.sameResult(e)
         }

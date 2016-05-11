@@ -13,79 +13,66 @@ import org.scalacheck.Arbitrary
 
 object arb {
 
-  implicit val ubyte: Arbitrary[UByte] =
-    Arbitrary(gen.ubyte)
+  implicit val ubyte: Arbitrary[UByte] = Arbitrary(gen.ubyte)
 
-  implicit val ushort: Arbitrary[UShort] =
-    Arbitrary(gen.ushort)
+  implicit val ushort: Arbitrary[UShort] = Arbitrary(gen.ushort)
 
-  implicit val uint: Arbitrary[UInt] =
-    Arbitrary(gen.uint)
+  implicit val uint: Arbitrary[UInt] = Arbitrary(gen.uint)
 
-  implicit val ulong: Arbitrary[ULong] =
-    Arbitrary(gen.ulong)
+  implicit val ulong: Arbitrary[ULong] = Arbitrary(gen.ulong)
 
-  implicit val trilean: Arbitrary[Trilean] =
-    Arbitrary(gen.trilean)
+  implicit val trilean: Arbitrary[Trilean] = Arbitrary(gen.trilean)
 
-  implicit val fixedScale: Arbitrary[FixedScale] =
-    Arbitrary(gen.fixedScale)
+  implicit val fixedScale: Arbitrary[FixedScale] = Arbitrary(gen.fixedScale)
 
-  implicit val fixedPoint: Arbitrary[FixedPoint] =
-    Arbitrary(gen.fixedPoint)
+  implicit val fixedPoint: Arbitrary[FixedPoint] = Arbitrary(gen.fixedPoint)
 
-  implicit val bigInteger: Arbitrary[BigInteger] =
-    Arbitrary(gen.bigInteger)
+  implicit val bigInteger: Arbitrary[BigInteger] = Arbitrary(gen.bigInteger)
 
-  implicit val safeLong: Arbitrary[SafeLong] =
-    Arbitrary(gen.safeLong)
+  implicit val safeLong: Arbitrary[SafeLong] = Arbitrary(gen.safeLong)
 
-  implicit val natural: Arbitrary[Natural] =
-    Arbitrary(gen.natural)
+  implicit val natural: Arbitrary[Natural] = Arbitrary(gen.natural)
 
-  implicit val rational: Arbitrary[Rational] =
-    Arbitrary(gen.rational)
+  implicit val rational: Arbitrary[Rational] = Arbitrary(gen.rational)
 
-  implicit val number: Arbitrary[Number] =
-    Arbitrary(gen.number)
+  implicit val number: Arbitrary[Number] = Arbitrary(gen.number)
 
-  implicit val algebraic: Arbitrary[Algebraic] =
-    Arbitrary(gen.algebraic)
+  implicit val algebraic: Arbitrary[Algebraic] = Arbitrary(gen.algebraic)
 
-  implicit val real: Arbitrary[Real] =
-    Arbitrary(gen.real)
+  implicit val real: Arbitrary[Real] = Arbitrary(gen.real)
 
-  implicit val sign: Arbitrary[Sign] =
-    Arbitrary(gen.sign)
+  implicit val sign: Arbitrary[Sign] = Arbitrary(gen.sign)
 
-  implicit def term[A: Arbitrary]: Arbitrary[poly.Term[A]] =
+  implicit def term[A : Arbitrary]: Arbitrary[poly.Term[A]] =
     Arbitrary(gen.term[A])
 
-  implicit def polynomial[A: Arbitrary: Semiring: Eq: ClassTag]: Arbitrary[Polynomial[A]] =
+  implicit def polynomial[A : Arbitrary : Semiring : Eq : ClassTag]: Arbitrary[
+      Polynomial[A]] =
     Arbitrary(gen.polynomial[A])
 
-  implicit def complex[A: Arbitrary]: Arbitrary[Complex[A]] =
+  implicit def complex[A : Arbitrary]: Arbitrary[Complex[A]] =
     Arbitrary(gen.complex[A])
 
-  implicit def jet[A: Arbitrary: ClassTag]: Arbitrary[Jet[A]] =
+  implicit def jet[A : Arbitrary : ClassTag]: Arbitrary[Jet[A]] =
     Arbitrary(gen.jet2[A])
 
-  implicit def quaternion[A: Arbitrary]: Arbitrary[Quaternion[A]] =
+  implicit def quaternion[A : Arbitrary]: Arbitrary[Quaternion[A]] =
     Arbitrary(gen.quaternion[A])
 
-  implicit def bound[A: Arbitrary]: Arbitrary[Bound[A]] =
+  implicit def bound[A : Arbitrary]: Arbitrary[Bound[A]] =
     Arbitrary(gen.bound[A])
 
-  implicit def interval[A: Arbitrary: Order: AdditiveMonoid]: Arbitrary[Interval[A]] =
+  implicit def interval[A : Arbitrary : Order : AdditiveMonoid]: Arbitrary[
+      Interval[A]] =
     Arbitrary(gen.interval[A])
 
-  implicit def freeMonoid[A: Arbitrary]: Arbitrary[FreeMonoid[A]] =
+  implicit def freeMonoid[A : Arbitrary]: Arbitrary[FreeMonoid[A]] =
     Arbitrary(gen.freeMonoid[A])
 
-  implicit def freeGroup[A: Arbitrary]: Arbitrary[FreeGroup[A]] =
+  implicit def freeGroup[A : Arbitrary]: Arbitrary[FreeGroup[A]] =
     Arbitrary(gen.freeGroup[A])
 
-  implicit def freeAbGroup[A: Arbitrary]: Arbitrary[FreeAbGroup[A]] =
+  implicit def freeAbGroup[A : Arbitrary]: Arbitrary[FreeAbGroup[A]] =
     Arbitrary(gen.freeAbGroup[A])
 
   implicit def perm: Arbitrary[Perm] =

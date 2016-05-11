@@ -1,16 +1,16 @@
-trait MatcherYYY  {
+trait MatcherYYY {
   trait NodeImpl;
   trait Matchable extends NodeImpl {
-    protected def doMatch : Unit = {}
+    protected def doMatch: Unit = {}
   }
 }
 trait BraceMatcherXXX extends MatcherYYY {
   trait NodeImpl extends super.NodeImpl {
-    def doMatch  (braces : BracePair) : Unit
+    def doMatch(braces: BracePair): Unit
   }
   trait BracePair {
     trait BraceImpl extends NodeImpl with Matchable {
-      override def doMatch : Unit = {
+      override def doMatch: Unit = {
         super.doMatch;
         ();
       }

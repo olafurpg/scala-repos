@@ -12,8 +12,8 @@ import scala.runtime.NonLocalReturnControl
 @RunWith(classOf[JUnitRunner])
 class FuturePoolTest extends FunSuite with Eventually {
 
-  implicit override val patienceConfig =
-    PatienceConfig(timeout = scaled(Span(15, Seconds)), interval = scaled(Span(5, Millis)))
+  implicit override val patienceConfig = PatienceConfig(
+      timeout = scaled(Span(15, Seconds)), interval = scaled(Span(5, Millis)))
 
   test("FuturePool should dispatch to another thread") {
     val executor = Executors.newFixedThreadPool(1)
@@ -46,7 +46,8 @@ class FuturePoolTest extends FunSuite with Eventually {
   }
 
   test("does not execute interrupted tasks") {
-    val executor = Executors.newFixedThreadPool(1).asInstanceOf[ThreadPoolExecutor]
+    val executor =
+      Executors.newFixedThreadPool(1).asInstanceOf[ThreadPoolExecutor]
     val pool = FuturePool(executor)
 
     val runCount = new atomic.AtomicInteger
@@ -67,12 +68,13 @@ class FuturePoolTest extends FunSuite with Eventually {
     eventually { assert(executor.getCompletedTaskCount == 2) }
 
     assert(runCount.get() == 1)
-    assert(Await.result(result1)  == 1)
+    assert(Await.result(result1) == 1)
     intercept[CancellationException] { Await.result(result2) }
   }
 
   test("continue to run a task if it's interrupted while running") {
-    val executor = Executors.newFixedThreadPool(1).asInstanceOf[ThreadPoolExecutor]
+    val executor =
+      Executors.newFixedThreadPool(1).asInstanceOf[ThreadPoolExecutor]
     val pool = FuturePool(executor)
 
     val runCount = new atomic.AtomicInteger
@@ -103,7 +105,8 @@ class FuturePoolTest extends FunSuite with Eventually {
   }
 
   test("returns exceptions that result from submitting a task to the pool") {
-    val executor = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue(1))
+    val executor = new ThreadPoolExecutor(
+        1, 1, 60, TimeUnit.SECONDS, new LinkedBlockingQueue(1))
     val pool = FuturePool(executor)
 
     val source = new Promise[Int]
@@ -130,8 +133,9 @@ class FuturePoolTest extends FunSuite with Eventually {
         while (true) {
           Thread.sleep(Long.MaxValue)
         }
-      } catch { case _: InterruptedException =>
-        interrupted.setDone()
+      } catch {
+        case _: InterruptedException =>
+          interrupted.setDone()
       }
     }
 

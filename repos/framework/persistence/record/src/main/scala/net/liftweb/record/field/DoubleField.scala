@@ -27,15 +27,13 @@ import Helpers._
 import S._
 
 trait DoubleTypedField extends NumericTypedField[Double] {
-  
+
   def setFromAny(in: Any): Box[Double] = setNumericFromAny(in, _.doubleValue)
 
-  def setFromString(s: String): Box[Double] = 
-    if(s == null || s.isEmpty) {
-      if(optional_?)
-    	  setBox(Empty)
-       else
-          setBox(Failure(notOptionalErrorMessage))
+  def setFromString(s: String): Box[Double] =
+    if (s == null || s.isEmpty) {
+      if (optional_?) setBox(Empty)
+      else setBox(Failure(notOptionalErrorMessage))
     } else {
       setBox(tryo(java.lang.Double.parseDouble(s)))
     }
@@ -43,17 +41,18 @@ trait DoubleTypedField extends NumericTypedField[Double] {
   def defaultValue = 0.0
 
   def asJValue: JValue = valueBox.map(JDouble) openOr (JNothing: JValue)
-  
+
   def setFromJValue(jvalue: JValue) = jvalue match {
-    case JNothing|JNull if optional_? => setBox(Empty)
-    case JDouble(d)                   => setBox(Full(d))
-    case JInt(i)                      => setBox(Full(i.toDouble))
-    case other                        => setBox(FieldHelpers.expectedA("JDouble", other))
+    case JNothing | JNull if optional_? => setBox(Empty)
+    case JDouble(d) => setBox(Full(d))
+    case JInt(i) => setBox(Full(i.toDouble))
+    case other => setBox(FieldHelpers.expectedA("JDouble", other))
   }
 }
 
 class DoubleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-  extends Field[Double, OwnerType] with MandatoryTypedField[Double] with DoubleTypedField {
+    extends Field[Double, OwnerType] with MandatoryTypedField[Double]
+    with DoubleTypedField {
 
   def this(rec: OwnerType, value: Double) = {
     this(rec)
@@ -64,7 +63,8 @@ class DoubleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalDoubleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-  extends Field[Double, OwnerType] with OptionalTypedField[Double] with DoubleTypedField {
+    extends Field[Double, OwnerType] with OptionalTypedField[Double]
+    with DoubleTypedField {
 
   def this(rec: OwnerType, value: Box[Double]) = {
     this(rec)
@@ -73,4 +73,3 @@ class OptionalDoubleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 
   def owner = rec
 }
-

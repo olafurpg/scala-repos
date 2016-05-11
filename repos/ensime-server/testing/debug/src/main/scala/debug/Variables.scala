@@ -20,7 +20,6 @@ object Variables {
 
     noop(None)
   }
-
 }
 
 case class One(s: String) {

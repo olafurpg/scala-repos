@@ -32,7 +32,6 @@ import javafx.{application => jfxa}
 import scalafx.Includes._
 import scalafx.beans.property.ReadOnlyBooleanProperty
 
-
 /** Application platform support, wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/application/Platform.html javafx.application.Platform]]. */
 object Platform {
 
@@ -53,7 +52,8 @@ object Platform {
   }
 
   /** Queries whether a specific conditional feature is supported by the platform. */
-  def isSupported(feature: ConditionalFeature) = jfxa.Platform.isSupported(feature)
+  def isSupported(feature: ConditionalFeature) =
+    jfxa.Platform.isSupported(feature)
 
   /** Run the specified Runnable on the JavaFX Application Thread at some unspecified time in the future.
     * Returns immediately.
@@ -73,7 +73,8 @@ object Platform {
     * }}}
     */
   def runLater[R](op: => R) {
-    runLater(new Runnable {
+    runLater(
+        new Runnable {
       def run() {
         op
       }
@@ -83,17 +84,17 @@ object Platform {
   def isAccessibilityActive: Boolean = jfxa.Platform.isAccessibilityActive
 
   /**
-   * Indicates whether or not accessibility is active.
-   * This property is typically set to true the first time an
-   * assistive technology, such as a screen reader, requests
-   * information about any JavaFX window or its children.
-   *
-   * This method may be called from any thread.
-   *
-   * @return the read-only boolean property indicating if accessibility is active
-   *
-   * @since JavaFX 8u40
-   */
-  def accessibilityActive: ReadOnlyBooleanProperty = jfxa.Platform.accessibilityActiveProperty
-
+    * Indicates whether or not accessibility is active.
+    * This property is typically set to true the first time an
+    * assistive technology, such as a screen reader, requests
+    * information about any JavaFX window or its children.
+    *
+    * This method may be called from any thread.
+    *
+    * @return the read-only boolean property indicating if accessibility is active
+    *
+    * @since JavaFX 8u40
+    */
+  def accessibilityActive: ReadOnlyBooleanProperty =
+    jfxa.Platform.accessibilityActiveProperty
 }

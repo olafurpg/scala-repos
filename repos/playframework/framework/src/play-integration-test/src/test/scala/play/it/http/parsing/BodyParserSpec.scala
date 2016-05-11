@@ -4,20 +4,21 @@
 package play.it.http.parsing
 
 import akka.actor.ActorSystem
-import akka.stream.{ ActorMaterializer, Materializer }
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.Source
 import play.api.libs.streams.Accumulator
 
 import scala.concurrent.Future
 
 import play.api.libs.iteratee.ExecutionSpecification
-import play.api.mvc.{ BodyParser, Results, Result }
-import play.api.test.{ FakeRequest, PlaySpecification }
+import play.api.mvc.{BodyParser, Results, Result}
+import play.api.test.{FakeRequest, PlaySpecification}
 
 import org.specs2.ScalaCheck
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{Arbitrary, Gen}
 
-object BodyParserSpec extends PlaySpecification with ExecutionSpecification with ScalaCheck {
+object BodyParserSpec
+    extends PlaySpecification with ExecutionSpecification with ScalaCheck {
 
   def run[A](bodyParser: BodyParser[A]) = {
     import scala.concurrent.ExecutionContext.Implicits.global
@@ -46,14 +47,14 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
       Accumulator.done(Left(s))
     }
 
-  implicit val arbResult: Arbitrary[Result] =
-    Arbitrary {
-      Gen.oneOf(
+  implicit val arbResult: Arbitrary[Result] = Arbitrary {
+    Gen.oneOf(
         Results.Ok,
-        Results.BadRequest, Results.NotFound,
+        Results.BadRequest,
+        Results.NotFound,
         Results.InternalServerError
-      )
-    }
+    )
+  }
 
   /* map and mapM should satisfy the functor laws, namely,
    * preservation of identity and function composition.
@@ -71,7 +72,8 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
   "BodyParser.map" should {
 
     "satisfy functor law 1" in prop { (x: Int) =>
-      mustExecute(1) { implicit ec => // one execution from `map`
+      mustExecute(1) { implicit ec =>
+        // one execution from `map`
         run {
           constant(x).map(identity)
         } must beRight(x)
@@ -81,10 +83,10 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
     "satisfy functor law 2" in prop { (x: Int) =>
       val inc = (i: Int) => i + 1
       val dbl = (i: Int) => i * 2
-      mustExecute(3) { implicit ec => // three executions from `map`
+      mustExecute(3) { implicit ec =>
+        // three executions from `map`
         run {
-          constant(x).map(inc)
-            .map(dbl)
+          constant(x).map(inc).map(dbl)
         } must_== run {
           constant(x).map(inc andThen dbl)
         }
@@ -92,7 +94,8 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
     }
 
     "pass through simple result" in prop { (s: Result) =>
-      mustExecute(1) { implicit ec => // one execution from `map`
+      mustExecute(1) { implicit ec =>
+        // one execution from `map`
         run {
           simpleResult(s).map(identity)
         } must beLeft(s)
@@ -103,7 +106,8 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
   "BodyParser.mapM" should {
 
     "satisfy lifted functor law 1" in prop { (x: Int) =>
-      mustExecute(1) { implicit ec => // one execution from `mapM`
+      mustExecute(1) { implicit ec =>
+        // one execution from `mapM`
         run {
           constant(x).mapM(Future.successful)
         } must beRight(x)
@@ -119,8 +123,7 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
          * and one from `Future.flatMapM`
          */
         run {
-          constant(x).mapM(inc)(mapMEC)
-            .mapM(dbl)(mapMEC)
+          constant(x).mapM(inc)(mapMEC).mapM(dbl)(mapMEC)
         } must_== run {
           constant(x).mapM { y =>
             inc(y).flatMap(dbl)(flatMapPEC)
@@ -130,7 +133,8 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
     }
 
     "pass through simple result" in prop { (s: Result) =>
-      mustExecute(1) { implicit ec => // one execution from `mapM`
+      mustExecute(1) { implicit ec =>
+        // one execution from `mapM`
         run {
           simpleResult(s).mapM(Future.successful)
         } must beLeft(s)
@@ -142,7 +146,8 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
 
     "satisfy right-biased functor law 1" in prop { (x: Int) =>
       val id = (i: Int) => Right(i)
-      mustExecute(1) { implicit ec => // one execution from `validate`
+      mustExecute(1) { implicit ec =>
+        // one execution from `validate`
         run {
           constant(x).validate(id)
         } must beRight(x)
@@ -152,10 +157,10 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
     "satisfy right-biased functor law 2" in prop { (x: Int) =>
       val inc = (i: Int) => Right(i + 1)
       val dbl = (i: Int) => Right(i * 2)
-      mustExecute(3) { implicit ec => // three executions from `validate`
+      mustExecute(3) { implicit ec =>
+        // three executions from `validate`
         run {
-          constant(x).validate(inc)
-            .validate(dbl)
+          constant(x).validate(inc).validate(dbl)
         } must_== run {
           constant(x).validate { y =>
             inc(y).right.flatMap(dbl)
@@ -165,7 +170,8 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
     }
 
     "pass through simple result (case 1)" in prop { (s: Result) =>
-      mustExecute(1) { implicit ec => // one execution from `validate`
+      mustExecute(1) { implicit ec =>
+        // one execution from `validate`
         run {
           simpleResult(s).validate(Right.apply)
         } must beLeft(s)
@@ -173,17 +179,23 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
     }
 
     "pass through simple result (case 2)" in prop { (s1: Result, s2: Result) =>
-      mustExecute(1) { implicit ec => // one execution from `validate`
+      mustExecute(1) { implicit ec =>
+        // one execution from `validate`
         run {
-          simpleResult(s1).validate { _ => Left(s2) }
+          simpleResult(s1).validate { _ =>
+            Left(s2)
+          }
         } must beLeft(s1)
       }
     }
 
     "fail with simple result" in prop { (s: Result) =>
-      mustExecute(1) { implicit ec => // one execution from `validate`
+      mustExecute(1) { implicit ec =>
+        // one execution from `validate`
         run {
-          constant(0).validate { _ => Left(s) }
+          constant(0).validate { _ =>
+            Left(s)
+          }
         } must beLeft(s)
       }
     }
@@ -193,7 +205,8 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
 
     "satisfy right-biased, lifted functor law 1" in prop { (x: Int) =>
       val id = (i: Int) => Future.successful(Right(i))
-      mustExecute(1) { implicit ec => // one execution from `validateM`
+      mustExecute(1) { implicit ec =>
+        // one execution from `validateM`
         run {
           constant(x).validateM(id)
         } must beRight(x)
@@ -203,7 +216,8 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
     "satisfy right-biased, lifted functor law 2" in prop { (x: Int) =>
       val inc = (i: Int) => Future.successful(Right(i + 1))
       val dbl = (i: Int) => Future.successful(Right(i * 2))
-      mustExecute(3) { implicit ec => // three executions from `validateM`
+      mustExecute(3) { implicit ec =>
+        // three executions from `validateM`
         run {
           constant(x).validateM(inc).validateM(dbl)
         } must_== run {
@@ -215,28 +229,36 @@ object BodyParserSpec extends PlaySpecification with ExecutionSpecification with
     }
 
     "pass through simple result (case 1)" in prop { (s: Result) =>
-      mustExecute(1) { implicit ec => // one execution from `validateM`
+      mustExecute(1) { implicit ec =>
+        // one execution from `validateM`
         run {
-          simpleResult(s).validateM { x => Future.successful(Right(x)) }
+          simpleResult(s).validateM { x =>
+            Future.successful(Right(x))
+          }
         } must beLeft(s)
       }
     }
 
     "pass through simple result (case 2)" in prop { (s1: Result, s2: Result) =>
-      mustExecute(1) { implicit ec => // one execution from `validateM`
+      mustExecute(1) { implicit ec =>
+        // one execution from `validateM`
         run {
-          simpleResult(s1).validateM { _ => Future.successful(Left(s2)) }
+          simpleResult(s1).validateM { _ =>
+            Future.successful(Left(s2))
+          }
         } must beLeft(s1)
       }
     }
 
     "fail with simple result" in prop { (s: Result) =>
-      mustExecute(1) { implicit ec => // one execution from `validateM`
+      mustExecute(1) { implicit ec =>
+        // one execution from `validateM`
         run {
-          constant(0).validateM { _ => Future.successful(Left(s)) }
+          constant(0).validateM { _ =>
+            Future.successful(Left(s))
+          }
         } must beLeft(s)
       }
     }
   }
-
 }

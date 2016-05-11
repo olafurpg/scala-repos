@@ -27,13 +27,15 @@ import org.apache.spark.sql.SQLContext
 object LinearRegressionWithElasticNetExample {
 
   def main(args: Array[String]): Unit = {
-    val conf = new SparkConf().setAppName("LinearRegressionWithElasticNetExample")
+    val conf =
+      new SparkConf().setAppName("LinearRegressionWithElasticNetExample")
     val sc = new SparkContext(conf)
     val sqlCtx = new SQLContext(sc)
 
     // $example on$
     // Load training data
-    val training = sqlCtx.read.format("libsvm")
+    val training = sqlCtx.read
+      .format("libsvm")
       .load("data/mllib/sample_linear_regression_data.txt")
 
     val lr = new LinearRegression()
@@ -45,7 +47,8 @@ object LinearRegressionWithElasticNetExample {
     val lrModel = lr.fit(training)
 
     // Print the coefficients and intercept for linear regression
-    println(s"Coefficients: ${lrModel.coefficients} Intercept: ${lrModel.intercept}")
+    println(
+        s"Coefficients: ${lrModel.coefficients} Intercept: ${lrModel.intercept}")
 
     // Summarize the model over the training set and print out some metrics
     val trainingSummary = lrModel.summary

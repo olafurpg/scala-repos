@@ -1,3 +1,3 @@
 trait C extends A {
-	def x = 5
+  def x = 5
 }

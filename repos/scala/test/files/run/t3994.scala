@@ -3,7 +3,8 @@ trait T {
   object Default extends Default
 }
 
-class Crash { // if you change this to a `trait` it keeps failing, though if it is an `object` it compiles just fine!
+class Crash {
+  // if you change this to a `trait` it keeps failing, though if it is an `object` it compiles just fine!
   class Element
 
   /* declare this as a class, and the crash goes away */

@@ -11,7 +11,7 @@ import io.AbstractFile
 import scala.tools.nsc.classpath.FlatClassPath
 
 /** The platform dependent pieces of Global.
- */
+  */
 trait Platform {
   val symbolTable: symtab.SymbolTable
   import symbolTable._
@@ -23,7 +23,8 @@ trait Platform {
   private[nsc] def flatClassPath: FlatClassPath
 
   /** Update classpath with a substitution that maps entries to entries */
-  def updateClassPath(subst: Map[ClassPath[AbstractFile], ClassPath[AbstractFile]])
+  def updateClassPath(
+      subst: Map[ClassPath[AbstractFile], ClassPath[AbstractFile]])
 
   /** Any platform-specific phases. */
   def platformPhases: List[SubComponent]
@@ -35,11 +36,10 @@ trait Platform {
   def isMaybeBoxed(sym: Symbol): Boolean
 
   /**
-   * Tells whether a class with both a binary and a source representation
-   * (found in classpath and in sourcepath) should be re-compiled. Behaves
-   * on the JVM similar to javac, i.e. if the source file is newer than the classfile,
-   * a re-compile is triggered. On .NET by contrast classfiles always take precedence.
-   */
+    * Tells whether a class with both a binary and a source representation
+    * (found in classpath and in sourcepath) should be re-compiled. Behaves
+    * on the JVM similar to javac, i.e. if the source file is newer than the classfile,
+    * a re-compile is triggered. On .NET by contrast classfiles always take precedence.
+    */
   def needCompile(bin: AbstractFile, src: AbstractFile): Boolean
 }
-

@@ -1,6 +1,5 @@
 class C[A] {
-  class D[B] {
-  }
+  class D[B] {}
 }
 
 object Test {

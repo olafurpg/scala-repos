@@ -9,11 +9,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 
 /**
- * Pavel Fatin
- */
-
-class CreateApplyQuickFix(td: ScTypeDefinition, call: ScMethodCall)
-        extends {val getFamilyName = "Create 'apply' method"} with CreateApplyOrUnapplyQuickFix(td) {
+  * Pavel Fatin
+  */
+class CreateApplyQuickFix(td: ScTypeDefinition, call: ScMethodCall) extends {
+  val getFamilyName = "Create 'apply' method"
+} with CreateApplyOrUnapplyQuickFix(td) {
 
   val methodType = call.expectedType().map(_.canonicalText)
 
@@ -23,9 +23,10 @@ class CreateApplyQuickFix(td: ScTypeDefinition, call: ScMethodCall)
     s"def apply$argsText$dummyTypeText = ???"
   }
 
-  override protected def addElementsToTemplate(method: ScFunction, builder: TemplateBuilder) = {
+  override protected def addElementsToTemplate(
+      method: ScFunction, builder: TemplateBuilder) = {
     for (aType <- methodType;
-         typeElement <- method.children.findByType(classOf[ScSimpleTypeElement])) {
+    typeElement <- method.children.findByType(classOf[ScSimpleTypeElement])) {
       builder.replaceElement(typeElement, aType)
     }
 

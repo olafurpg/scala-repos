@@ -21,50 +21,51 @@ import org.apache.spark.annotation.Since
 import org.apache.spark.mllib.linalg.Vector
 
 /**
- * Train or predict a linear regression model on streaming data. Training uses
- * Stochastic Gradient Descent to update the model based on each new batch of
- * incoming data from a DStream (see `LinearRegressionWithSGD` for model equation)
- *
- * Each batch of data is assumed to be an RDD of LabeledPoints.
- * The number of data points per batch can vary, but the number
- * of features must be constant. An initial weight
- * vector must be provided.
- *
- * Use a builder pattern to construct a streaming linear regression
- * analysis in an application, like:
- *
- *  val model = new StreamingLinearRegressionWithSGD()
- *    .setStepSize(0.5)
- *    .setNumIterations(10)
- *    .setInitialWeights(Vectors.dense(...))
- *    .trainOn(DStream)
- */
+  * Train or predict a linear regression model on streaming data. Training uses
+  * Stochastic Gradient Descent to update the model based on each new batch of
+  * incoming data from a DStream (see `LinearRegressionWithSGD` for model equation)
+  *
+  * Each batch of data is assumed to be an RDD of LabeledPoints.
+  * The number of data points per batch can vary, but the number
+  * of features must be constant. An initial weight
+  * vector must be provided.
+  *
+  * Use a builder pattern to construct a streaming linear regression
+  * analysis in an application, like:
+  *
+  *  val model = new StreamingLinearRegressionWithSGD()
+  *    .setStepSize(0.5)
+  *    .setNumIterations(10)
+  *    .setInitialWeights(Vectors.dense(...))
+  *    .trainOn(DStream)
+  */
 @Since("1.1.0")
-class StreamingLinearRegressionWithSGD private[mllib] (
+class StreamingLinearRegressionWithSGD private[mllib](
     private var stepSize: Double,
     private var numIterations: Int,
     private var regParam: Double,
     private var miniBatchFraction: Double)
-  extends StreamingLinearAlgorithm[LinearRegressionModel, LinearRegressionWithSGD]
-  with Serializable {
+    extends StreamingLinearAlgorithm[
+        LinearRegressionModel, LinearRegressionWithSGD] with Serializable {
 
   /**
-   * Construct a StreamingLinearRegression object with default parameters:
-   * {stepSize: 0.1, numIterations: 50, miniBatchFraction: 1.0}.
-   * Initial weights must be set before using trainOn or predictOn
-   * (see `StreamingLinearAlgorithm`)
-   */
+    * Construct a StreamingLinearRegression object with default parameters:
+    * {stepSize: 0.1, numIterations: 50, miniBatchFraction: 1.0}.
+    * Initial weights must be set before using trainOn or predictOn
+    * (see `StreamingLinearAlgorithm`)
+    */
   @Since("1.1.0")
   def this() = this(0.1, 50, 0.0, 1.0)
 
   @Since("1.1.0")
-  val algorithm = new LinearRegressionWithSGD(stepSize, numIterations, regParam, miniBatchFraction)
+  val algorithm = new LinearRegressionWithSGD(
+      stepSize, numIterations, regParam, miniBatchFraction)
 
   protected var model: Option[LinearRegressionModel] = None
 
   /**
-   * Set the step size for gradient descent. Default: 0.1.
-   */
+    * Set the step size for gradient descent. Default: 0.1.
+    */
   @Since("1.1.0")
   def setStepSize(stepSize: Double): this.type = {
     this.algorithm.optimizer.setStepSize(stepSize)
@@ -72,8 +73,8 @@ class StreamingLinearRegressionWithSGD private[mllib] (
   }
 
   /**
-   * Set the regularization parameter. Default: 0.0.
-   */
+    * Set the regularization parameter. Default: 0.0.
+    */
   @Since("2.0.0")
   def setRegParam(regParam: Double): this.type = {
     this.algorithm.optimizer.setRegParam(regParam)
@@ -90,8 +91,8 @@ class StreamingLinearRegressionWithSGD private[mllib] (
   }
 
   /**
-   * Set the fraction of each batch to use for updates. Default: 1.0.
-   */
+    * Set the fraction of each batch to use for updates. Default: 1.0.
+    */
   @Since("1.1.0")
   def setMiniBatchFraction(miniBatchFraction: Double): this.type = {
     this.algorithm.optimizer.setMiniBatchFraction(miniBatchFraction)
@@ -99,8 +100,8 @@ class StreamingLinearRegressionWithSGD private[mllib] (
   }
 
   /**
-   * Set the initial weights.
-   */
+    * Set the initial weights.
+    */
   @Since("1.1.0")
   def setInitialWeights(initialWeights: Vector): this.type = {
     this.model = Some(algorithm.createModel(initialWeights, 0.0))
@@ -108,8 +109,8 @@ class StreamingLinearRegressionWithSGD private[mllib] (
   }
 
   /**
-   * Set the convergence tolerance. Default: 0.001.
-   */
+    * Set the convergence tolerance. Default: 0.001.
+    */
   @Since("1.5.0")
   def setConvergenceTol(tolerance: Double): this.type = {
     this.algorithm.optimizer.setConvergenceTol(tolerance)

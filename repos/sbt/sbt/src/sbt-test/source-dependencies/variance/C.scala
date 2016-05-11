@@ -1,3 +1,3 @@
 object C {
-	val a: A[Any] = new A[Int]
+  val a: A[Any] = new A[Int]
 }

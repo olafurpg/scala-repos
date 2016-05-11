@@ -4,13 +4,14 @@
 
 //Simplified example:
 
-    class Test private (val value : Int)
+class Test private (val value: Int)
 
-    abstract class Bar(val ctor : (Int) => Test)
+abstract class Bar(val ctor: (Int) => Test)
 
-    object Test extends Bar(new Test(_)) { //<--- ILLEGAL ACCESS
-      def main(args: Array[String]){}
-    }
+object Test extends Bar(new Test(_)) {
+  //<--- ILLEGAL ACCESS
+  def main(args: Array[String]) {}
+}
 
 //however the following is legal:
 /*
@@ -29,4 +30,4 @@
     }
 
 The constructor invocation of Bar is done within the scope of object Foo's constructor, and therefore the private constructor of Foo should be visible and accessible.
-*/
+ */

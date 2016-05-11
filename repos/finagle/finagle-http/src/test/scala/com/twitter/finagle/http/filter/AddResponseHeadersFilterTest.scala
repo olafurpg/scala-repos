@@ -12,10 +12,8 @@ class AddResponseHeadersFilterTest extends FunSuite {
   test("add headers") {
     val service = new Service[Request, Response] {
       def apply(request: Request): Future[Response] =
-        if (request.uri == "/object")
-          Future(request.response)
-        else
-          throw new Exception("Invalid test request")
+        if (request.uri == "/object") Future(request.response)
+        else throw new Exception("Invalid test request")
     }
 
     val request = Request("/object")

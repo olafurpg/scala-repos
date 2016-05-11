@@ -1,6 +1,6 @@
 package mesosphere.marathon.upgrade
 
-import akka.actor.{ Actor, ActorLogging, Cancellable }
+import akka.actor.{Actor, ActorLogging, Cancellable}
 import akka.event.EventStream
 import mesosphere.marathon.TaskUpgradeCanceledException
 import mesosphere.marathon.core.task.Task
@@ -8,7 +8,7 @@ import mesosphere.marathon.core.task.tracker.TaskTracker
 import mesosphere.marathon.event.MesosStatusUpdateEvent
 import mesosphere.marathon.state.PathId
 import mesosphere.marathon.upgrade.StoppingBehavior.SynchronizeTasks
-import org.apache.mesos.{ Protos, SchedulerDriver }
+import org.apache.mesos.{Protos, SchedulerDriver}
 
 import scala.collection.mutable
 import scala.concurrent.Promise
@@ -38,20 +38,23 @@ trait StoppingBehavior extends Actor with ActorLogging {
     eventBus.unsubscribe(self)
     if (!promise.isCompleted)
       promise.tryFailure(
-        new TaskUpgradeCanceledException(
-          "The operation has been cancelled"))
+          new TaskUpgradeCanceledException("The operation has been cancelled"))
   }
 
   val taskFinished = "^TASK_(ERROR|FAILED|FINISHED|LOST|KILLED)$".r
 
   def receive: Receive = {
-    case MesosStatusUpdateEvent(_, taskId, taskFinished(_), _, _, _, _, _, _, _, _) if idsToKill(taskId) =>
+    case MesosStatusUpdateEvent(
+        _, taskId, taskFinished(_), _, _, _, _, _, _, _, _)
+        if idsToKill(taskId) =>
       idsToKill.remove(taskId)
-      log.info(s"Task $taskId has been killed. Waiting for ${idsToKill.size} more tasks to be killed.")
+      log.info(
+          s"Task $taskId has been killed. Waiting for ${idsToKill.size} more tasks to be killed.")
       checkFinished()
 
     case SynchronizeTasks =>
-      val trackerIds = taskTracker.appTasksLaunchedSync(appId).map(_.taskId).toSet
+      val trackerIds =
+        taskTracker.appTasksLaunchedSync(appId).map(_.taskId).toSet
       idsToKill = idsToKill.filter(trackerIds)
 
       idsToKill.foreach { id =>
@@ -73,7 +76,8 @@ trait StoppingBehavior extends Actor with ActorLogging {
     }
 
   def scheduleSynchronization(): Unit =
-    periodicalCheck = context.system.scheduler.scheduleOnce(5.seconds, self, SynchronizeTasks)
+    periodicalCheck = context.system.scheduler
+      .scheduleOnce(5.seconds, self, SynchronizeTasks)
 }
 
 object StoppingBehavior {

@@ -31,4 +31,3 @@ object Test {
     x.f6
   }
 }
-

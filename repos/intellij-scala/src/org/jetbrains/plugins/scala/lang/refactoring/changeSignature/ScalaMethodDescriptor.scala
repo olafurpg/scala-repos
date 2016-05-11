@@ -12,10 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import scala.collection.JavaConverters._
 
 /**
- * Nikolay.Tropin
- * 2014-08-29
- */
-class ScalaMethodDescriptor(val fun: ScMethodLike) extends MethodDescriptor[ScalaParameterInfo, String] {
+  * Nikolay.Tropin
+  * 2014-08-29
+  */
+class ScalaMethodDescriptor(val fun: ScMethodLike)
+    extends MethodDescriptor[ScalaParameterInfo, String] {
   override def getName: String = fun match {
     case fun: ScFunction =>
       if (fun.isConstructor) fun.containingClass.name
@@ -29,7 +30,8 @@ class ScalaMethodDescriptor(val fun: ScMethodLike) extends MethodDescriptor[Scal
   override def canChangeVisibility: Boolean = !fun.isLocal
 
   val parameters = parametersInner
-  override def getParameters: util.List[ScalaParameterInfo] = parameters.flatten.asJava
+  override def getParameters: util.List[ScalaParameterInfo] =
+    parameters.flatten.asJava
 
   override def getParametersCount: Int = parameters.flatten.size
 
@@ -40,12 +42,14 @@ class ScalaMethodDescriptor(val fun: ScMethodLike) extends MethodDescriptor[Scal
 
   override def getMethod: PsiElement = fun
 
-  override def getVisibility: String = fun.getModifierList.accessModifier.fold("")(_.getText)
+  override def getVisibility: String =
+    fun.getModifierList.accessModifier.fold("")(_.getText)
 
   def returnTypeText = fun match {
     case f: ScFunction => f.returnType.getOrAny.presentableText
     case _ => ""
   }
 
-  protected def parametersInner: Seq[Seq[ScalaParameterInfo]] = ScalaParameterInfo.allForMethod(fun)
+  protected def parametersInner: Seq[Seq[ScalaParameterInfo]] =
+    ScalaParameterInfo.allForMethod(fun)
 }

@@ -4,11 +4,11 @@ import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 
 /** This test uses recursive calls to Future.flatMap to create arrays whose
- *  combined size is slightly greater than the JVM heap size. A previous
- *  implementation of Future.flatMap would retain references to each array,
- *  resulting in a speedy OutOfMemoryError. Now, each array should be freed soon
- *  after it is created and the test should complete without problems.
- */
+  *  combined size is slightly greater than the JVM heap size. A previous
+  *  implementation of Future.flatMap would retain references to each array,
+  *  resulting in a speedy OutOfMemoryError. Now, each array should be freed soon
+  *  after it is created and the test should complete without problems.
+  */
 object Test {
   def main(args: Array[String]) {
     def loop(i: Int, arraySize: Int): Future[Unit] = {
@@ -20,12 +20,12 @@ object Test {
           array.size // Force closure to refer to array
           loop(i - 1, arraySize)
         }
-
       }
     }
 
     val arraySize = 1000000
-    val tooManyArrays = (Runtime.getRuntime().totalMemory() / arraySize).toInt + 1
+    val tooManyArrays =
+      (Runtime.getRuntime().totalMemory() / arraySize).toInt + 1
     Await.ready(loop(tooManyArrays, arraySize), Duration.Inf)
   }
 }

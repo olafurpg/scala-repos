@@ -7,19 +7,22 @@ import play.api.data._, Forms._
 
 object Cli extends LilaController {
 
-  private lazy val form = Form(tuple(
-    "command" -> nonEmptyText,
-    "password" -> nonEmptyText
-  ))
+  private lazy val form = Form(
+      tuple(
+          "command" -> nonEmptyText,
+          "password" -> nonEmptyText
+      ))
 
   def command = OpenBody { implicit ctx =>
     implicit val req = ctx.body
-    form.bindFromRequest.fold(
-      err => fuccess(BadRequest("invalid cli call")), {
-        case (command, password) => CliAuth(password) {
-          Env.api.cli(command.split(" ").toList) map { res => Ok(res) }
+    form.bindFromRequest.fold(err => fuccess(BadRequest("invalid cli call")), {
+      case (command, password) =>
+        CliAuth(password) {
+          Env.api.cli(command.split(" ").toList) map { res =>
+            Ok(res)
+          }
         }
-      })
+    })
   }
 
   private def CliAuth(password: String)(op: => Fu[Result]): Fu[Result] =

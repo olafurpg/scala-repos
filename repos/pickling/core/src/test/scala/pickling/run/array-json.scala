@@ -4,7 +4,9 @@ import org.scalatest.FunSuite
 import scala.pickling.Defaults._
 import scala.pickling.json._
 
-case class C(arr: Array[Int]) { override def toString = s"""C(${arr.mkString("[", ",", "]")})""" }
+case class C(arr: Array[Int]) {
+  override def toString = s"""C(${arr.mkString("[", ",", "]")})"""
+}
 
 case class D(x: Int)
 

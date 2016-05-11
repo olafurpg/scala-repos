@@ -21,11 +21,12 @@ import scala.xml.Node
 import net.liftweb.http.SHtml
 
 /**
- * This trait can be added to existing Mapper fields to make them use AjaxUtils.editable
- * for field display.
- */
-trait AjaxEditableField[FieldType,OwnerType <: Mapper[OwnerType]] extends MappedField[FieldType,OwnerType] {
-  override def asHtml : Node =
+  * This trait can be added to existing Mapper fields to make them use AjaxUtils.editable
+  * for field display.
+  */
+trait AjaxEditableField[FieldType, OwnerType <: Mapper[OwnerType]]
+    extends MappedField[FieldType, OwnerType] {
+  override def asHtml: Node =
     if (editableField) {
       <xml:group>{
         toForm.map { form =>
@@ -40,7 +41,6 @@ trait AjaxEditableField[FieldType,OwnerType <: Mapper[OwnerType]] extends Mapped
   def onSave {}
 
   /** This method allows you to do programmatic control of whether the field will display
-   *  as editable. The default is true */
+    *  as editable. The default is true */
   def editableField = true
 }
-

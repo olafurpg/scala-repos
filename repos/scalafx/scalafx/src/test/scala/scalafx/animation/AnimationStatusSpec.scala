@@ -34,10 +34,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.animation.Animation.Status]]. */
 @RunWith(classOf[JUnitRunner])
-class AnimationStatusSpec extends SFXEnumDelegateSpec[jfxa.Animation.Status, Animation.Status](
-  classOf[jfxa.Animation.Status],
-  classOf[Animation.Status],
-  Animation.Status)
+class AnimationStatusSpec
+    extends SFXEnumDelegateSpec[jfxa.Animation.Status, Animation.Status](
+        classOf[jfxa.Animation.Status],
+        classOf[Animation.Status],
+        Animation.Status)

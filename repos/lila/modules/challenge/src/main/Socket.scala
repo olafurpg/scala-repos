@@ -6,15 +6,16 @@ import play.api.libs.json._
 import scala.concurrent.duration.Duration
 
 import lila.hub.TimeBomb
-import lila.socket.actorApi.{ Connected => _, _ }
-import lila.socket.{ SocketActor, History, Historical }
+import lila.socket.actorApi.{Connected => _, _}
+import lila.socket.{SocketActor, History, Historical}
 
-private final class Socket(
-    challengeId: String,
-    val history: History[Unit],
-    getChallenge: Challenge.ID => Fu[Option[Challenge]],
-    uidTimeout: Duration,
-    socketTimeout: Duration) extends SocketActor[Socket.Member](uidTimeout) with Historical[Socket.Member, Unit] {
+private final class Socket(challengeId: String,
+                           val history: History[Unit],
+                           getChallenge: Challenge.ID => Fu[Option[Challenge]],
+                           uidTimeout: Duration,
+                           socketTimeout: Duration)
+    extends SocketActor[Socket.Member](uidTimeout)
+    with Historical[Socket.Member, Unit] {
 
   private val timeBomb = new TimeBomb(socketTimeout)
 
@@ -28,17 +29,17 @@ private final class Socket(
       }
 
     case PingVersion(uid, v) => {
-      ping(uid)
-      timeBomb.delay
-      withMember(uid) { m =>
-        history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+        ping(uid)
+        timeBomb.delay
+        withMember(uid) { m =>
+          history.since(v).fold(resync(m))(_ foreach sendMessage(m))
+        }
       }
-    }
 
     case Broom => {
-      broom
-      if (timeBomb.boom) self ! PoisonPill
-    }
+        broom
+        if (timeBomb.boom) self ! PoisonPill
+      }
 
     case GetVersion => sender ! history.version
 
@@ -51,15 +52,14 @@ private final class Socket(
     case Quit(uid) => quit(uid)
   }
 
-  protected def shouldSkipMessageFor(message: Message, member: Socket.Member) = false
+  protected def shouldSkipMessageFor(message: Message, member: Socket.Member) =
+    false
 }
 
 private object Socket {
 
-  case class Member(
-      channel: JsChannel,
-      userId: Option[String],
-      owner: Boolean) extends lila.socket.SocketMember {
+  case class Member(channel: JsChannel, userId: Option[String], owner: Boolean)
+      extends lila.socket.SocketMember {
     val troll = false
   }
 

@@ -56,5 +56,4 @@ object ProgressBarTest extends JFXApp {
       content = mainPane
     }
   }
-
 }

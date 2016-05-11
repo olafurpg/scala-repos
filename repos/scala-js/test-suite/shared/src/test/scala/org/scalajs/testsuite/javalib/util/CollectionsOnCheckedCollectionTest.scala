@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -22,8 +22,7 @@ import org.scalajs.testsuite.utils.Platform._
 
 import scala.reflect.ClassTag
 
-trait CollectionsCheckedCollectionTest
-    extends CollectionsOnCollectionsTest {
+trait CollectionsCheckedCollectionTest extends CollectionsOnCollectionsTest {
 
   def originalFactory: CollectionFactory
 
@@ -33,8 +32,8 @@ trait CollectionsCheckedCollectionTest
         s"checkedCollection(${originalFactory.implementationName})"
 
       override def empty[E](implicit ct: ClassTag[E]): ju.Collection[E] = {
-        ju.Collections.checkedCollection(originalFactory.empty[E],
-          ct.runtimeClass.asInstanceOf[Class[E]])
+        ju.Collections.checkedCollection(
+            originalFactory.empty[E], ct.runtimeClass.asInstanceOf[Class[E]])
       }
     }
   }
@@ -48,8 +47,7 @@ trait CollectionsCheckedCollectionTest
     assumeTrue("Needs compliant asInstanceOf", hasCompliantAsInstanceOfs)
 
     expectThrows(classOf[ClassCastException], superColl().add(new A))
-    expectThrows(classOf[ClassCastException],
-        superColl().addAll(Seq(new A)))
+    expectThrows(classOf[ClassCastException], superColl().addAll(Seq(new A)))
   }
 
   protected def superColl(): ju.Collection[A] =
@@ -61,7 +59,8 @@ class CollectionsOnCheckedCollectionAbstractListTest
   def originalFactory: CollectionFactory = new AbstractListFactory
 }
 
-class CollectionsOnCheckedCollectionArrayListTest extends CollectionsCheckedCollectionTest {
+class CollectionsOnCheckedCollectionArrayListTest
+    extends CollectionsCheckedCollectionTest {
   def originalFactory: CollectionFactory = new ArrayListFactory
 }
 

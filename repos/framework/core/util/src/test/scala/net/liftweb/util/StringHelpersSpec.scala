@@ -24,10 +24,9 @@ import org.scalacheck.Prop.forAll
 
 import StringHelpers._
 
-
 /**
- * Systems under specification for StringHelpers.
- */
+  * Systems under specification for StringHelpers.
+  */
 object StringHelpersSpec extends Specification with ScalaCheck with StringGen {
   "StringHelpers Specification".title
 
@@ -61,20 +60,30 @@ object StringHelpersSpec extends Specification with ScalaCheck with StringGen {
 
   "The camelify function" should {
     "CamelCase a name which is underscored, removing each underscore and capitalizing the next letter" in {
-      def previousCharacterIsUnderscore(name: String, i: Int) = i > 1 && name.charAt(i - 1) == '_'
-      def underscoresNumber(name: String, i: Int) = if (i == 0) 0 else name.substring(0, i).toList.count(_ == '_')
-      def correspondingIndexInCamelCase(name: String, i: Int) = i - underscoresNumber(name, i)
-      def correspondingCharInCamelCase(name: String, i: Int): Char = camelify(name).charAt(correspondingIndexInCamelCase(name, i))
+      def previousCharacterIsUnderscore(name: String, i: Int) =
+        i > 1 && name.charAt(i - 1) == '_'
+      def underscoresNumber(name: String, i: Int) =
+        if (i == 0) 0 else name.substring(0, i).toList.count(_ == '_')
+      def correspondingIndexInCamelCase(name: String, i: Int) =
+        i - underscoresNumber(name, i)
+      def correspondingCharInCamelCase(name: String, i: Int): Char =
+        camelify(name).charAt(correspondingIndexInCamelCase(name, i))
 
-      val doesntContainUnderscores = forAll(underscoredStrings){ ((name: String) => !camelify(name).contains("_")) }
-      val isCamelCased = forAll(underscoredStrings) ((name: String) => {
-        name.forall(_ == '_') && camelify(name).isEmpty ||
-        name.toList.zipWithIndex.forall { case (c, i) =>
-          c == '_' ||
-          correspondingIndexInCamelCase(name, i) == 0 && correspondingCharInCamelCase(name, i) == c.toUpper ||
-          !previousCharacterIsUnderscore(name, i) && correspondingCharInCamelCase(name, i) == c ||
-          previousCharacterIsUnderscore(name, i) && correspondingCharInCamelCase(name, i) == c.toUpper
-       }
+      val doesntContainUnderscores = forAll(underscoredStrings) {
+        ((name: String) => !camelify(name).contains("_"))
+      }
+      val isCamelCased = forAll(underscoredStrings)((name: String) =>
+            {
+          name.forall(_ == '_') && camelify(name).isEmpty ||
+          name.toList.zipWithIndex.forall {
+            case (c, i) =>
+              c == '_' || correspondingIndexInCamelCase(name, i) == 0 &&
+              correspondingCharInCamelCase(name, i) == c.toUpper ||
+              !previousCharacterIsUnderscore(name, i) &&
+              correspondingCharInCamelCase(name, i) == c ||
+              previousCharacterIsUnderscore(name, i) &&
+              correspondingCharInCamelCase(name, i) == c.toUpper
+          }
       })
       (doesntContainUnderscores && isCamelCased)
     }
@@ -82,16 +91,18 @@ object StringHelpersSpec extends Specification with ScalaCheck with StringGen {
       camelify(null) must_== ""
     }
     "leave a CamelCased name untouched" in {
-      forAll(camelCasedStrings){ (name: String) => camelify(name) == name }
+      forAll(camelCasedStrings) { (name: String) =>
+        camelify(name) == name
+      }
     }
   }
 
   "The camelifyMethod function" should {
     "camelCase a name with the first letter being lower cased" in {
-      forAll(underscoredStrings){
-        (name: String) =>
+      forAll(underscoredStrings) { (name: String) =>
         camelify(name).isEmpty && camelifyMethod(name).isEmpty ||
-        camelifyMethod(name).toList.head.isLower && camelify(name) == camelifyMethod(name).capitalize
+        camelifyMethod(name).toList.head.isLower &&
+        camelify(name) == camelifyMethod(name).capitalize
       }
     }
   }
@@ -111,13 +122,16 @@ object StringHelpersSpec extends Specification with ScalaCheck with StringGen {
       processString("<%=hello%>", Map("hello" -> "bonjour")) must_== "bonjour"
     }
     "replace groups found in several strings surrounded by <%= ... %> by their corresponding value in a map" in {
-      processString("<%=hello%> <%=world%>", Map("hello" -> "bonjour", "world" -> "monde")) must_== "bonjour monde"
+      processString(
+          "<%=hello%> <%=world%>",
+          Map("hello" -> "bonjour", "world" -> "monde")) must_== "bonjour monde"
     }
     "not replace the group if it starts with %" in {
       processString("<%=%hello%>", Map("hello" -> "bonjour")) must_== "<%=%hello%>"
     }
     "throw an exception if no correspondance is found" in {
-      processString("<%=hello%>", Map("hallo" -> "bonjour")) must throwA[Exception]
+      processString("<%=hello%>", Map("hallo" -> "bonjour")) must throwA[
+          Exception]
     }
   }
 
@@ -160,7 +174,7 @@ object StringHelpersSpec extends Specification with ScalaCheck with StringGen {
     "return a string of size n" in {
       randomString(10).toSeq must haveSize(10)
     }
-    */
+     */
 
     "return only capital letters and digits" in {
       randomString(10) must beMatching("[A-Z0-9]*")
@@ -267,7 +281,6 @@ object StringHelpersSpec extends Specification with ScalaCheck with StringGen {
     }
   }
 
-
   "The SuperString class splitAt method" should {
     "split a string according to a separator and return a List containing a pair with the 2 parts" in {
       stringToSuper("hello").splitAt("ll") must_== List(("he", "o"))
@@ -332,20 +345,17 @@ object StringHelpersSpec extends Specification with ScalaCheck with StringGen {
   }
 }
 
-
 trait StringGen {
-  val underscoredStrings =
-    for {
-      length <- choose(0, 4)
-      s <- listOfN(length, frequency((3, alphaChar), (1, oneOf(List('_')))))
-    } yield s.mkString
+  val underscoredStrings = for {
+    length <- choose(0, 4)
+    s <- listOfN(length, frequency((3, alphaChar), (1, oneOf(List('_')))))
+  } yield s.mkString
 
-  val camelCasedStrings =
-    for {
-      length <- choose(0, 4)
-      firstLetter <- alphaNumChar.map(_.toUpper)
-      string <- listOfN(length, frequency((3, alphaNumChar.map(_.toLower)),
-                                          (1, alphaNumChar.map(_.toUpper))))
+  val camelCasedStrings = for {
+    length <- choose(0, 4)
+    firstLetter <- alphaNumChar.map(_.toUpper)
+    string <- listOfN(length,
+                      frequency((3, alphaNumChar.map(_.toLower)),
+                                (1, alphaNumChar.map(_.toUpper))))
   } yield (firstLetter :: string).mkString
 }
-

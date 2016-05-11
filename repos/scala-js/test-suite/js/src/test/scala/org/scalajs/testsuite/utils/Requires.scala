@@ -15,5 +15,4 @@ object Requires {
     @BeforeClass def needsTypedArrays(): Unit =
       assumeTrue("Requires strict-floats", hasStrictFloats)
   }
-
 }

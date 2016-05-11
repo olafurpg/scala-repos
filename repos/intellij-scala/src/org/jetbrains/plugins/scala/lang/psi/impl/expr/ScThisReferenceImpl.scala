@@ -15,27 +15,36 @@ import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
 
 /**
- * @author Alexander Podkhalyuzin
- * Date: 06.03.2008
- */
-
-class ScThisReferenceImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScThisReference {
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
+class ScThisReferenceImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScThisReference {
   override def toString: String = "ThisReference"
 
-  protected override def innerType(ctx: TypingContext): TypeResult[ScType] = refTemplate match {
-    case Some(td) => ScThisReferenceImpl.getThisTypeForTypeDefinition(td, this)
-    case _ => Failure("Cannot infer type", Some(this))
-  }
+  protected override def innerType(ctx: TypingContext): TypeResult[ScType] =
+    refTemplate match {
+      case Some(td) =>
+        ScThisReferenceImpl.getThisTypeForTypeDefinition(td, this)
+      case _ => Failure("Cannot infer type", Some(this))
+    }
 
   def refTemplate: Option[ScTemplateDefinition] = reference match {
-    case Some(ref) => ref.resolve match {
-      case td: ScTypeDefinition if PsiTreeUtil.isContextAncestor(td, ref, false) => Some(td)
-      case _ => None
-    }
+    case Some(ref) =>
+      ref.resolve match {
+        case td: ScTypeDefinition
+            if PsiTreeUtil.isContextAncestor(td, ref, false) =>
+          Some(td)
+        case _ => None
+      }
     case None => {
-      val encl = PsiTreeUtil.getContextOfType(this, false, classOf[ScTemplateBody])
-      if (encl != null) Some(PsiTreeUtil.getContextOfType(encl, false, classOf[ScTemplateDefinition])) else None
-    }
+        val encl =
+          PsiTreeUtil.getContextOfType(this, false, classOf[ScTemplateBody])
+        if (encl != null)
+          Some(
+              PsiTreeUtil.getContextOfType(
+                  encl, false, classOf[ScTemplateDefinition])) else None
+      }
   }
 
   override def accept(visitor: ScalaElementVisitor) {
@@ -51,13 +60,15 @@ class ScThisReferenceImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with 
 }
 
 object ScThisReferenceImpl {
-  def getThisTypeForTypeDefinition(td: ScTemplateDefinition, expr: ScExpression): TypeResult[ScType] = {
-    lazy val selfTypeOfClass = td.getTypeWithProjections(TypingContext.empty, thisProjections = true).map(tp =>
-      td.selfType match {
-        case Some(selfType) => Bounds.glb(tp, selfType)
-        case _ => tp
-      }
-    )
+  def getThisTypeForTypeDefinition(
+      td: ScTemplateDefinition, expr: ScExpression): TypeResult[ScType] = {
+    lazy val selfTypeOfClass = td
+      .getTypeWithProjections(TypingContext.empty, thisProjections = true)
+      .map(tp =>
+            td.selfType match {
+          case Some(selfType) => Bounds.glb(tp, selfType)
+          case _ => tp
+      })
 
     // SLS 6.5:  If the expression’s expected type is a stable type,
     // or C .this occurs as the prefix of a selection, its type is C.this.type,
@@ -65,12 +76,15 @@ object ScThisReferenceImpl {
     expr.getContext match {
       case r: ScReferenceExpression if r.qualifier.exists(_ == expr) =>
         Success(ScThisType(td), Some(expr))
-      case _ => expr.expectedType() match {
-        case Some(t) if t.isStable =>
-          Success(ScThisType(td), Some(expr))
-        case _ =>
-          Success(selfTypeOfClass.getOrElse (return Failure("No clazz type found", Some(expr))), Some(expr))
-      }
+      case _ =>
+        expr.expectedType() match {
+          case Some(t) if t.isStable =>
+            Success(ScThisType(td), Some(expr))
+          case _ =>
+            Success(selfTypeOfClass.getOrElse(
+                        return Failure("No clazz type found", Some(expr))),
+                    Some(expr))
+        }
     }
   }
 }

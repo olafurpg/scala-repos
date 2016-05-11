@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird
 
@@ -23,11 +23,10 @@ import com.twitter.summingbird.scalding.ScaldingEnv
 import com.twitter.summingbird.builder.CompletedBuilder
 
 /**
- * @author Oscar Boykin
- * @author Sam Ritchie
- * @author Ashu Singhal
- */
-
+  * @author Oscar Boykin
+  * @author Sam Ritchie
+  * @author Ashu Singhal
+  */
 // Main app class launching any summingbird job. storm.StormEnv
 // handles storm-specific job-launching, scalding.ScaldingEnv handles
 // Scalding.
@@ -39,14 +38,15 @@ object Env {
     val restArgs = inargs.tail.tail
     mode match {
       case "scalding" => {
-        // Hadoop args must be processed specially:
-        ScaldingEnv(job, restArgs)
-      }
+          // Hadoop args must be processed specially:
+          ScaldingEnv(job, restArgs)
+        }
       case "storm" => {
-        // Skip "storm" and the jobname:
-        StormEnv(job, Args(restArgs))
-      }
-      case _ => sys.error("Unrecognized mode: " + mode + ", try: storm or scalding")
+          // Skip "storm" and the jobname:
+          StormEnv(job, Args(restArgs))
+        }
+      case _ =>
+        sys.error("Unrecognized mode: " + mode + ", try: storm or scalding")
     }
   }
 
@@ -56,8 +56,8 @@ object Env {
 }
 
 /**
- * Any environment data an AbstractJob may need. This state is mutable.
- */
+  * Any environment data an AbstractJob may need. This state is mutable.
+  */
 abstract class Env(val jobName: String) extends java.io.Serializable {
   val args: Args
   @transient var builder: CompletedBuilder[_, _, _] = null

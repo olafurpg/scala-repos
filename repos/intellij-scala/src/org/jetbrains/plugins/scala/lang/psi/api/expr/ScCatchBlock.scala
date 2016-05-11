@@ -9,13 +9,13 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClauses
 
 /**
- * Author: Alexander Podkhalyuzin
- * Date: 06.03.2008
- */
+  * Author: Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
 trait ScCatchBlock extends ScalaPsiElement {
   def expression: Option[ScExpression] = findChild(classOf[ScExpression])
-  def getLeftParenthesis : Option[PsiElement]
-  def getRightParenthesis : Option[PsiElement]
+  def getLeftParenthesis: Option[PsiElement]
+  def getRightParenthesis: Option[PsiElement]
 }
 
 object ScCatchBlock {
@@ -23,7 +23,7 @@ object ScCatchBlock {
     for {
       expr <- catchBlock.expression
       child = PsiTreeUtil.findChildOfType(expr, classOf[ScCaseClauses])
-      if child != null
+          if child != null
     } yield child
   }
 }

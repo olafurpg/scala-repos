@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.storage
 
 import io.prediction.annotation.DeveloperApi
@@ -28,10 +27,7 @@ import scala.util.Random
   * @group Meta Data
   */
 @DeveloperApi
-case class AccessKey(
-  key: String,
-  appid: Int,
-  events: Seq[String])
+case class AccessKey(key: String, appid: Int, events: Seq[String])
 
 /** :: DeveloperApi ::
   * Base trait of the [[AccessKey]] data access object
@@ -40,6 +36,7 @@ case class AccessKey(
   */
 @DeveloperApi
 trait AccessKeys {
+
   /** Insert a new [[AccessKey]]. If the key field is empty, a key will be
     * generated.
     */

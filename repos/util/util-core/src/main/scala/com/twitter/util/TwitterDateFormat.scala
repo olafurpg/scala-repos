@@ -4,9 +4,9 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**
- * A `java.text.SimpleDateFormat` that avoids confusion between YYYY and yyyy.
- * One should never use YYYY (week year) unless the format also includes the week of year.
- */
+  * A `java.text.SimpleDateFormat` that avoids confusion between YYYY and yyyy.
+  * One should never use YYYY (week year) unless the format also includes the week of year.
+  */
 object TwitterDateFormat {
   def apply(pattern: String): SimpleDateFormat = {
     validatePattern(pattern)
@@ -22,7 +22,8 @@ object TwitterDateFormat {
     val stripped = stripSingleQuoted(pattern)
     if (stripped.contains('Y') && !(stripped.contains('w'))) {
       throw new IllegalArgumentException(
-        "Invalid date format uses 'Y' for week-of-year without 'w': %s".format(pattern))
+          "Invalid date format uses 'Y' for week-of-year without 'w': %s"
+            .format(pattern))
     }
   }
 
@@ -38,12 +39,13 @@ object TwitterDateFormat {
         startIndex = -1
       } else {
         buf.append(pattern.substring(startIndex, endIndex))
-        startIndex = endIndex+1
+        startIndex = endIndex + 1
         endIndex = pattern.indexOf('\'', startIndex)
         if (endIndex < 0) {
-          throw new IllegalArgumentException("Unmatched quote in date format: %s".format(pattern))
+          throw new IllegalArgumentException(
+              "Unmatched quote in date format: %s".format(pattern))
         }
-        startIndex = endIndex+1
+        startIndex = endIndex + 1
       }
     }
     buf.toString

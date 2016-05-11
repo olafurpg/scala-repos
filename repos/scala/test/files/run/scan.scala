@@ -1,7 +1,3 @@
-
-
-
-
 object Test {
 
   def main(args: Array[String]) {
@@ -19,5 +15,4 @@ object Test {
 
     assert(Stream.from(1).scanLeft(0)(_ + _).take(5) == Stream(0, 1, 3, 6, 10))
   }
-
 }

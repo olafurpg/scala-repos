@@ -29,23 +29,25 @@ import org.apache.spark.internal.Logging
 private[spark] case class TimeStampedValue[V](value: V, timestamp: Long)
 
 /**
- * This is a custom implementation of scala.collection.mutable.Map which stores the insertion
- * timestamp along with each key-value pair. If specified, the timestamp of each pair can be
- * updated every time it is accessed. Key-value pairs whose timestamp are older than a particular
- * threshold time can then be removed using the clearOldValues method. This is intended to
- * be a drop-in replacement of scala.collection.mutable.HashMap.
- *
- * @param updateTimeStampOnGet Whether timestamp of a pair will be updated when it is accessed
- */
-private[spark] class TimeStampedHashMap[A, B](updateTimeStampOnGet: Boolean = false)
-  extends mutable.Map[A, B]() with Logging {
+  * This is a custom implementation of scala.collection.mutable.Map which stores the insertion
+  * timestamp along with each key-value pair. If specified, the timestamp of each pair can be
+  * updated every time it is accessed. Key-value pairs whose timestamp are older than a particular
+  * threshold time can then be removed using the clearOldValues method. This is intended to
+  * be a drop-in replacement of scala.collection.mutable.HashMap.
+  *
+  * @param updateTimeStampOnGet Whether timestamp of a pair will be updated when it is accessed
+  */
+private[spark] class TimeStampedHashMap[A, B](
+    updateTimeStampOnGet: Boolean = false)
+    extends mutable.Map[A, B]() with Logging {
 
   private val internalMap = new ConcurrentHashMap[A, TimeStampedValue[B]]()
 
   def get(key: A): Option[B] = {
     val value = internalMap.get(key)
     if (value != null && updateTimeStampOnGet) {
-      internalMap.replace(key, value, TimeStampedValue(value.value, currentTime))
+      internalMap.replace(
+          key, value, TimeStampedValue(value.value, currentTime))
     }
     Option(value).map(_.value)
   }
@@ -56,27 +58,33 @@ private[spark] class TimeStampedHashMap[A, B](updateTimeStampOnGet: Boolean = fa
 
   def getEntrySet: Set[Entry[A, TimeStampedValue[B]]] = internalMap.entrySet
 
-  override def + [B1 >: B](kv: (A, B1)): mutable.Map[A, B1] = {
+  override def +[B1 >: B](kv: (A, B1)): mutable.Map[A, B1] = {
     val newMap = new TimeStampedHashMap[A, B1]
-    val oldInternalMap = this.internalMap.asInstanceOf[ConcurrentHashMap[A, TimeStampedValue[B1]]]
+    val oldInternalMap =
+      this.internalMap.asInstanceOf[ConcurrentHashMap[A, TimeStampedValue[B1]]]
     newMap.internalMap.putAll(oldInternalMap)
-    kv match { case (a, b) => newMap.internalMap.put(a, TimeStampedValue(b, currentTime)) }
+    kv match {
+      case (a, b) =>
+        newMap.internalMap.put(a, TimeStampedValue(b, currentTime))
+    }
     newMap
   }
 
-  override def - (key: A): mutable.Map[A, B] = {
+  override def -(key: A): mutable.Map[A, B] = {
     val newMap = new TimeStampedHashMap[A, B]
     newMap.internalMap.putAll(this.internalMap)
     newMap.internalMap.remove(key)
     newMap
   }
 
-  override def += (kv: (A, B)): this.type = {
-    kv match { case (a, b) => internalMap.put(a, TimeStampedValue(b, currentTime)) }
+  override def +=(kv: (A, B)): this.type = {
+    kv match {
+      case (a, b) => internalMap.put(a, TimeStampedValue(b, currentTime))
+    }
     this
   }
 
-  override def -= (key: A): this.type = {
+  override def -=(key: A): this.type = {
     internalMap.remove(key)
     this
   }
@@ -90,7 +98,8 @@ private[spark] class TimeStampedHashMap[A, B](updateTimeStampOnGet: Boolean = fa
   }
 
   override def filter(p: ((A, B)) => Boolean): mutable.Map[A, B] = {
-    internalMap.asScala.map { case (k, TimeStampedValue(v, t)) => (k, v) }.filter(p)
+    internalMap.asScala.map { case (k, TimeStampedValue(v, t)) => (k, v) }
+      .filter(p)
   }
 
   override def empty: mutable.Map[A, B] = new TimeStampedHashMap[A, B]()
@@ -99,7 +108,7 @@ private[spark] class TimeStampedHashMap[A, B](updateTimeStampOnGet: Boolean = fa
 
   override def foreach[U](f: ((A, B)) => U) {
     val it = getEntrySet.iterator
-    while(it.hasNext) {
+    while (it.hasNext) {
       val entry = it.next()
       val kv = (entry.getKey, entry.getValue.value)
       f(kv)
@@ -107,7 +116,8 @@ private[spark] class TimeStampedHashMap[A, B](updateTimeStampOnGet: Boolean = fa
   }
 
   def putIfAbsent(key: A, value: B): Option[B] = {
-    val prev = internalMap.putIfAbsent(key, TimeStampedValue(value, currentTime))
+    val prev =
+      internalMap.putIfAbsent(key, TimeStampedValue(value, currentTime))
     Option(prev).map(_.value)
   }
 

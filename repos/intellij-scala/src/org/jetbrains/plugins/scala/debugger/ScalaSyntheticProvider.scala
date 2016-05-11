@@ -9,21 +9,29 @@ import scala.collection.JavaConverters._
 import scala.util.Try
 
 /**
- * Nikolay.Tropin
- * 2014-12-03
- */
+  * Nikolay.Tropin
+  * 2014-12-03
+  */
 class ScalaSyntheticProvider extends SyntheticTypeComponentProvider {
-  override def isSynthetic(typeComponent: TypeComponent): Boolean = ScalaSyntheticProvider.isSynthetic(typeComponent)
+  override def isSynthetic(typeComponent: TypeComponent): Boolean =
+    ScalaSyntheticProvider.isSynthetic(typeComponent)
 }
 
 object ScalaSyntheticProvider {
   def isSynthetic(typeComponent: TypeComponent): Boolean = {
-    val isScala = DebuggerUtil.isScala(typeComponent.declaringType(), default = false)
+    val isScala =
+      DebuggerUtil.isScala(typeComponent.declaringType(), default = false)
     if (!isScala) return false
 
     typeComponent match {
-      case m: Method if m.isConstructor && ScalaPositionManager.isAnonfunType(m.declaringType()) => true
-      case m: Method if m.name() == "apply" && hasSpecializationMethod(m.declaringType()) && !isMacroDefined(m) => true
+      case m: Method
+          if m.isConstructor &&
+          ScalaPositionManager.isAnonfunType(m.declaringType()) =>
+        true
+      case m: Method
+          if m.name() == "apply" &&
+          hasSpecializationMethod(m.declaringType()) && !isMacroDefined(m) =>
+        true
       case m: Method if isDefaultArg(m) => true
       case m: Method if isTraitForwarder(m) => true
       case m: Method if m.name().endsWith("$adapted") => true
@@ -31,7 +39,8 @@ object ScalaSyntheticProvider {
       case f: Field if f.name().startsWith("bitmap$") => true
       case _ =>
         val machine: VirtualMachine = typeComponent.virtualMachine
-        machine != null && machine.canGetSyntheticAttribute && typeComponent.isSynthetic
+        machine != null && machine.canGetSyntheticAttribute &&
+        typeComponent.isSynthetic
     }
   }
 
@@ -49,7 +58,8 @@ object ScalaSyntheticProvider {
     val methodName = m.name()
     if (!methodName.contains("$default$")) false
     else {
-      val lastDefault = defaultArgPattern.findAllMatchIn(methodName).toSeq.lastOption
+      val lastDefault =
+        defaultArgPattern.findAllMatchIn(methodName).toSeq.lastOption
       lastDefault.map(_.matched) match {
         case Some(s) if methodName.endsWith(s) =>
           val origMethodName = methodName.stripSuffix(s)
@@ -69,9 +79,9 @@ object ScalaSyntheticProvider {
   }
 
   private def onlyInvokesStatic(m: Method): Boolean = {
-    val bytecodes =
-      try m.bytecodes()
-      catch {case t: Throwable => return false}
+    val bytecodes = try m.bytecodes() catch {
+      case t: Throwable => return false
+    }
 
     var i = 0
     while (i < bytecodes.length) {
@@ -81,9 +91,9 @@ object ScalaSyntheticProvider {
       else if (instr == DecompilerUtil.Opcodes.invokeStatic) {
         val nextIdx = i + 3
         val nextInstr = bytecodes(nextIdx)
-        return nextIdx == (bytecodes.length - 1) && BytecodeUtil.returnCodes.contains(nextInstr)
-      }
-      else return false
+        return nextIdx == (bytecodes.length - 1) &&
+        BytecodeUtil.returnCodes.contains(nextInstr)
+      } else return false
     }
     false
   }
@@ -93,11 +103,13 @@ object ScalaSyntheticProvider {
       case ct: ClassType =>
         val interfaces = ct.allInterfaces().asScala
         val vm = ct.virtualMachine()
-        val allTraitImpls = vm.allClasses().asScala.filter(_.name().endsWith("$class"))
+        val allTraitImpls =
+          vm.allClasses().asScala.filter(_.name().endsWith("$class"))
         for {
           interface <- interfaces
           traitImpl <- allTraitImpls
-          if traitImpl.name().stripSuffix("$class") == interface.name() && !traitImpl.methodsByName(m.name).isEmpty
+                          if traitImpl.name().stripSuffix("$class") == interface
+                        .name() && !traitImpl.methodsByName(m.name).isEmpty
         } {
           return true
         }

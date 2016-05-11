@@ -8,10 +8,8 @@ object LongOverflowArith {
   @deprecated("Use Java 8's Math.addExact instead", "2015-11-16")
   def add(a: Long, b: Long) = {
     val c = a + b
-    if (((a ^ c) & (b ^ c)) < 0)
-      throw new LongOverflowException(a + " + " + b)
-    else
-      c
+    if (((a ^ c) & (b ^ c)) < 0) throw new LongOverflowException(a + " + " + b)
+    else c
   }
 
   @deprecated("Use Java 8's Math.subtractExact instead", "2015-11-16")
@@ -19,8 +17,7 @@ object LongOverflowArith {
     val c = a - b
     if (((a ^ c) & (-b ^ c)) < 0)
       throw new LongOverflowException(a + " - " + b)
-    else
-      c
+    else c
   }
 
   @deprecated("Use Java 8's Math.multiplyExact instead", "2015-11-16")
@@ -30,9 +27,11 @@ object LongOverflowArith {
       mul(b, a)
     } else if (a < 0L) {
       if (b < 0L) {
-        if (a < Long.MaxValue / b) throw new LongOverflowException(a + " * " + b)
+        if (a < Long.MaxValue / b)
+          throw new LongOverflowException(a + " * " + b)
       } else if (b > 0L) {
-        if (Long.MinValue / b > a) throw new LongOverflowException(a + " * " + b)
+        if (Long.MinValue / b > a)
+          throw new LongOverflowException(a + " * " + b)
       }
     } else if (a > 0L) {
       // and b > 0L

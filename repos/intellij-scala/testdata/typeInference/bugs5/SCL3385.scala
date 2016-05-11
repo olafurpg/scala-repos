@@ -10,7 +10,7 @@ object SCL3385 {
   case class JString(s: String) extends JParent
 
   case class Trip(id: String, price: Double, duration: Double)
-  private def getCheapestTripId(trips: List[JObject]) : String = {
+  private def getCheapestTripId(trips: List[JObject]): String = {
 
     val cheapestTrips = for {
       JObject(trip) <- trips
@@ -18,7 +18,8 @@ object SCL3385 {
       JField("Id", JString(id)) <- trip
     } yield Trip(id, price, 0)
 
-    val list = (cheapestTrips sortWith (/*start*/_.price < _.price/*end*/)).asInstanceOf[List[Trip]]
+    val list = (cheapestTrips sortWith (/*start*/ _.price < _.price /*end*/ ))
+      .asInstanceOf[List[Trip]]
     return list.head.id
   }
 }

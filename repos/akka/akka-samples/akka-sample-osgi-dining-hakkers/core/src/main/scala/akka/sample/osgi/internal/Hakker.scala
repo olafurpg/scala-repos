@@ -4,10 +4,10 @@ import language.postfixOps
 import scala.concurrent.duration._
 import akka.actor.Terminated
 import akka.cluster.Cluster
-import akka.cluster.ClusterEvent.{ CurrentClusterState, LeaderChanged }
+import akka.cluster.ClusterEvent.{CurrentClusterState, LeaderChanged}
 import akka.event.Logging
 import akka.sample.osgi.api._
-import akka.actor.{ RootActorPath, Address, ActorRef, Actor }
+import akka.actor.{RootActorPath, Address, ActorRef, Actor}
 import akka.sample.osgi.api.SubscribeToHakkerStateChanges
 import akka.sample.osgi.api.HakkerStateChange
 
@@ -15,8 +15,8 @@ import akka.sample.osgi.api.HakkerStateChange
 //http://www.dalnefre.com/wp/2010/08/dining-philosophers-in-humus/
 
 /*
-* A Chopstick is an actor, it can be taken, and put back
-*/
+ * A Chopstick is an actor, it can be taken, and put back
+ */
 class Chopstick extends Actor {
 
   val log = Logging(context.system, this)
@@ -46,8 +46,8 @@ class Chopstick extends Actor {
 }
 
 /*
-* A hakker is an awesome dude or dudette who either thinks about hacking or has to eat ;-)
-*/
+ * A hakker is an awesome dude or dudette who either thinks about hacking or has to eat ;-)
+ */
 class Hakker(name: String, chair: Int) extends Actor {
 
   val log = Logging(context.system, this)
@@ -101,14 +101,17 @@ class Hakker(name: String, chair: Int) extends Actor {
   //When a hakker is waiting for the last chopstick it can either obtain it
   //and start eating, or the other chopstick was busy, and the hakker goes
   //back to think about how he should obtain his chopsticks :-)
-  def waiting_for(left: ActorRef, right: ActorRef, waitingForLeft: Boolean): Receive = {
+  def waiting_for(
+      left: ActorRef, right: ActorRef, waitingForLeft: Boolean): Receive = {
     case Taken(`left`) if waitingForLeft =>
-      log.info("%s has picked up %s and %s and starts to eat".format(name, left.path.name, right.path.name))
+      log.info("%s has picked up %s and %s and starts to eat".format(
+              name, left.path.name, right.path.name))
       pubStateChange("waiting", "eating")
       become(eating(left, right) orElse (managementEvents))
       system.scheduler.scheduleOnce(5 seconds, self, Think)
     case Taken(`right`) if !waitingForLeft =>
-      log.info("%s has picked up %s and %s and starts to eat".format(name, left.path.name, right.path.name))
+      log.info("%s has picked up %s and %s and starts to eat".format(
+              name, left.path.name, right.path.name))
       pubStateChange("waiting", "eating")
       become(eating(left, right) orElse (managementEvents))
       system.scheduler.scheduleOnce(5 seconds, self, Think)
@@ -162,7 +165,7 @@ class Hakker(name: String, chair: Int) extends Actor {
   }
 
   def managementEvents: Receive = {
-    case state: CurrentClusterState         => state.leader foreach updateTable
+    case state: CurrentClusterState => state.leader foreach updateTable
     case LeaderChanged(Some(leaderAddress)) => updateTable(leaderAddress)
     case SubscribeToHakkerStateChanges =>
       subscribers += sender()
@@ -192,5 +195,4 @@ class Hakker(name: String, chair: Int) extends Actor {
     val chg = HakkerStateChange(name, from, to)
     subscribers foreach { _ ! chg }
   }
-
 }

@@ -68,16 +68,18 @@ final private[streaming] class DStreamGraph extends Serializable with Logging {
 
   def setBatchDuration(duration: Duration) {
     this.synchronized {
-      require(batchDuration == null,
-        s"Batch duration already set as $batchDuration. Cannot set it again.")
+      require(
+          batchDuration == null,
+          s"Batch duration already set as $batchDuration. Cannot set it again.")
       batchDuration = duration
     }
   }
 
   def remember(duration: Duration) {
     this.synchronized {
-      require(rememberDuration == null,
-        s"Remember duration already set as $rememberDuration. Cannot set it again.")
+      require(
+          rememberDuration == null,
+          s"Remember duration already set as $rememberDuration. Cannot set it again.")
       rememberDuration = duration
     }
   }
@@ -96,15 +98,21 @@ final private[streaming] class DStreamGraph extends Serializable with Logging {
     }
   }
 
-  def getInputStreams(): Array[InputDStream[_]] = this.synchronized { inputStreams.toArray }
-
-  def getOutputStreams(): Array[DStream[_]] = this.synchronized { outputStreams.toArray }
-
-  def getReceiverInputStreams(): Array[ReceiverInputDStream[_]] = this.synchronized {
-    inputStreams.filter(_.isInstanceOf[ReceiverInputDStream[_]])
-      .map(_.asInstanceOf[ReceiverInputDStream[_]])
-      .toArray
+  def getInputStreams(): Array[InputDStream[_]] = this.synchronized {
+    inputStreams.toArray
   }
+
+  def getOutputStreams(): Array[DStream[_]] = this.synchronized {
+    outputStreams.toArray
+  }
+
+  def getReceiverInputStreams(): Array[ReceiverInputDStream[_]] =
+    this.synchronized {
+      inputStreams
+        .filter(_.isInstanceOf[ReceiverInputDStream[_]])
+        .map(_.asInstanceOf[ReceiverInputDStream[_]])
+        .toArray
+    }
 
   def getInputStreamName(streamId: Int): Option[String] = synchronized {
     inputStreams.find(_.id == streamId).map(_.name)
@@ -160,39 +168,44 @@ final private[streaming] class DStreamGraph extends Serializable with Logging {
       require(batchDuration != null, "Batch duration has not been set")
       // assert(batchDuration >= Milliseconds(100), "Batch duration of " + batchDuration +
       // " is very low")
-      require(getOutputStreams().nonEmpty, "No output operations registered, so nothing to execute")
+      require(getOutputStreams().nonEmpty,
+              "No output operations registered, so nothing to execute")
     }
   }
 
   /**
-   * Get the maximum remember duration across all the input streams. This is a conservative but
-   * safe remember duration which can be used to perform cleanup operations.
-   */
+    * Get the maximum remember duration across all the input streams. This is a conservative but
+    * safe remember duration which can be used to perform cleanup operations.
+    */
   def getMaxInputStreamRememberDuration(): Duration = {
     // If an InputDStream is not used, its `rememberDuration` will be null and we can ignore them
-    inputStreams.map(_.rememberDuration).filter(_ != null).maxBy(_.milliseconds)
+    inputStreams
+      .map(_.rememberDuration)
+      .filter(_ != null)
+      .maxBy(_.milliseconds)
   }
 
   @throws(classOf[IOException])
-  private def writeObject(oos: ObjectOutputStream): Unit = Utils.tryOrIOException {
-    logDebug("DStreamGraph.writeObject used")
-    this.synchronized {
-      checkpointInProgress = true
-      logDebug("Enabled checkpoint mode")
-      oos.defaultWriteObject()
-      checkpointInProgress = false
-      logDebug("Disabled checkpoint mode")
+  private def writeObject(oos: ObjectOutputStream): Unit =
+    Utils.tryOrIOException {
+      logDebug("DStreamGraph.writeObject used")
+      this.synchronized {
+        checkpointInProgress = true
+        logDebug("Enabled checkpoint mode")
+        oos.defaultWriteObject()
+        checkpointInProgress = false
+        logDebug("Disabled checkpoint mode")
+      }
     }
-  }
 
   @throws(classOf[IOException])
-  private def readObject(ois: ObjectInputStream): Unit = Utils.tryOrIOException {
-    logDebug("DStreamGraph.readObject used")
-    this.synchronized {
-      checkpointInProgress = true
-      ois.defaultReadObject()
-      checkpointInProgress = false
+  private def readObject(ois: ObjectInputStream): Unit =
+    Utils.tryOrIOException {
+      logDebug("DStreamGraph.readObject used")
+      this.synchronized {
+        checkpointInProgress = true
+        ois.defaultReadObject()
+        checkpointInProgress = false
+      }
     }
-  }
 }
-

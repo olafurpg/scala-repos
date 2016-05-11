@@ -29,33 +29,34 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
   // When the input data is all constant, the variance is zero. The standardization against
   // zero variance is not well-defined, but we decide to just set it into zero here.
   val constantData = Array(
-    Vectors.dense(2.0),
-    Vectors.dense(2.0),
-    Vectors.dense(2.0)
+      Vectors.dense(2.0),
+      Vectors.dense(2.0),
+      Vectors.dense(2.0)
   )
 
   val sparseData = Array(
-    Vectors.sparse(3, Seq((0, -2.0), (1, 2.3))),
-    Vectors.sparse(3, Seq((1, -1.0), (2, -3.0))),
-    Vectors.sparse(3, Seq((1, -5.1))),
-    Vectors.sparse(3, Seq((0, 3.8), (2, 1.9))),
-    Vectors.sparse(3, Seq((0, 1.7), (1, -0.6))),
-    Vectors.sparse(3, Seq((1, 1.9)))
+      Vectors.sparse(3, Seq((0, -2.0), (1, 2.3))),
+      Vectors.sparse(3, Seq((1, -1.0), (2, -3.0))),
+      Vectors.sparse(3, Seq((1, -5.1))),
+      Vectors.sparse(3, Seq((0, 3.8), (2, 1.9))),
+      Vectors.sparse(3, Seq((0, 1.7), (1, -0.6))),
+      Vectors.sparse(3, Seq((1, 1.9)))
   )
 
   val denseData = Array(
-    Vectors.dense(-2.0, 2.3, 0),
-    Vectors.dense(0.0, -1.0, -3.0),
-    Vectors.dense(0.0, -5.1, 0.0),
-    Vectors.dense(3.8, 0.0, 1.9),
-    Vectors.dense(1.7, -0.6, 0.0),
-    Vectors.dense(0.0, 1.9, 0.0)
+      Vectors.dense(-2.0, 2.3, 0),
+      Vectors.dense(0.0, -1.0, -3.0),
+      Vectors.dense(0.0, -5.1, 0.0),
+      Vectors.dense(3.8, 0.0, 1.9),
+      Vectors.dense(1.7, -0.6, 0.0),
+      Vectors.dense(0.0, 1.9, 0.0)
   )
 
-  private def computeSummary(data: RDD[Vector]): MultivariateStatisticalSummary = {
+  private def computeSummary(
+      data: RDD[Vector]): MultivariateStatisticalSummary = {
     data.treeAggregate(new MultivariateOnlineSummarizer)(
-      (aggregator, data) => aggregator.add(data),
-      (aggregator1, aggregator2) => aggregator1.merge(aggregator2))
+        (aggregator, data) => aggregator.add(data),
+        (aggregator1, aggregator2) => aggregator1.merge(aggregator2))
   }
 
   test("Standardization with dense input when means and stds are provided") {
@@ -71,8 +72,10 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val model3 = standardizer3.fit(dataRDD)
 
     val equivalentModel1 = new StandardScalerModel(model1.std, model1.mean)
-    val equivalentModel2 = new StandardScalerModel(model2.std, model2.mean, true, false)
-    val equivalentModel3 = new StandardScalerModel(model3.std, model3.mean, false, true)
+    val equivalentModel2 =
+      new StandardScalerModel(model2.std, model2.mean, true, false)
+    val equivalentModel3 =
+      new StandardScalerModel(model3.std, model3.mean, false, true)
 
     val data1 = denseData.map(equivalentModel1.transform)
     val data2 = denseData.map(equivalentModel2.transform)
@@ -105,9 +108,12 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after standardization.")
 
-    assert((data1, data1RDD.collect()).zipped.forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert((data3, data3RDD.collect()).zipped.forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data1, data1RDD.collect()).zipped
+          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data2, data2RDD.collect()).zipped
+          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data3, data3RDD.collect()).zipped
+          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
 
     assert(summary1.mean ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary1.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)
@@ -118,12 +124,17 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(summary3.mean ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary3.variance ~== summary.variance absTol 1E-5)
 
-    assert(data1(0) ~== Vectors.dense(-1.31527964, 1.023470449, 0.11637768424) absTol 1E-5)
-    assert(data1(3) ~== Vectors.dense(1.637735298, 0.156973995, 1.32247368462) absTol 1E-5)
-    assert(data2(4) ~== Vectors.dense(0.865538862, -0.22604255, 0.0) absTol 1E-5)
+    assert(data1(0) ~==
+          Vectors.dense(-1.31527964, 1.023470449, 0.11637768424) absTol 1E-5)
+    assert(data1(3) ~==
+          Vectors.dense(1.637735298, 0.156973995, 1.32247368462) absTol 1E-5)
+    assert(
+        data2(4) ~== Vectors.dense(0.865538862, -0.22604255, 0.0) absTol 1E-5)
     assert(data2(5) ~== Vectors.dense(0.0, 0.71580142, 0.0) absTol 1E-5)
-    assert(data3(1) ~== Vectors.dense(-0.58333333, -0.58333333, -2.8166666666) absTol 1E-5)
-    assert(data3(5) ~== Vectors.dense(-0.58333333, 2.316666666, 0.18333333333) absTol 1E-5)
+    assert(data3(1) ~==
+          Vectors.dense(-0.58333333, -0.58333333, -2.8166666666) absTol 1E-5)
+    assert(data3(5) ~==
+          Vectors.dense(-0.58333333, 2.316666666, 0.18333333333) absTol 1E-5)
   }
 
   test("Standardization with dense input") {
@@ -169,9 +180,12 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after standardization.")
 
-    assert((data1, data1RDD.collect()).zipped.forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert((data3, data3RDD.collect()).zipped.forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data1, data1RDD.collect()).zipped
+          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data2, data2RDD.collect()).zipped
+          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data3, data3RDD.collect()).zipped
+          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
 
     assert(summary1.mean ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary1.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)
@@ -182,14 +196,18 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(summary3.mean ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary3.variance ~== summary.variance absTol 1E-5)
 
-    assert(data1(0) ~== Vectors.dense(-1.31527964, 1.023470449, 0.11637768424) absTol 1E-5)
-    assert(data1(3) ~== Vectors.dense(1.637735298, 0.156973995, 1.32247368462) absTol 1E-5)
-    assert(data2(4) ~== Vectors.dense(0.865538862, -0.22604255, 0.0) absTol 1E-5)
+    assert(data1(0) ~==
+          Vectors.dense(-1.31527964, 1.023470449, 0.11637768424) absTol 1E-5)
+    assert(data1(3) ~==
+          Vectors.dense(1.637735298, 0.156973995, 1.32247368462) absTol 1E-5)
+    assert(
+        data2(4) ~== Vectors.dense(0.865538862, -0.22604255, 0.0) absTol 1E-5)
     assert(data2(5) ~== Vectors.dense(0.0, 0.71580142, 0.0) absTol 1E-5)
-    assert(data3(1) ~== Vectors.dense(-0.58333333, -0.58333333, -2.8166666666) absTol 1E-5)
-    assert(data3(5) ~== Vectors.dense(-0.58333333, 2.316666666, 0.18333333333) absTol 1E-5)
+    assert(data3(1) ~==
+          Vectors.dense(-0.58333333, -0.58333333, -2.8166666666) absTol 1E-5)
+    assert(data3(5) ~==
+          Vectors.dense(-0.58333333, 2.316666666, 0.18333333333) absTol 1E-5)
   }
-
 
   test("Standardization with sparse input when means and stds are provided") {
 
@@ -204,8 +222,10 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val model3 = standardizer3.fit(dataRDD)
 
     val equivalentModel1 = new StandardScalerModel(model1.std, model1.mean)
-    val equivalentModel2 = new StandardScalerModel(model2.std, model2.mean, true, false)
-    val equivalentModel3 = new StandardScalerModel(model3.std, model3.mean, false, true)
+    val equivalentModel2 =
+      new StandardScalerModel(model2.std, model2.mean, true, false)
+    val equivalentModel3 =
+      new StandardScalerModel(model3.std, model3.mean, false, true)
 
     val data2 = sparseData.map(equivalentModel2.transform)
 
@@ -231,12 +251,14 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after standardization.")
 
-    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data2, data2RDD.collect()).zipped
+          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
 
     assert(summary.mean !~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)
 
-    assert(data2(4) ~== Vectors.sparse(3, Seq((0, 0.865538862), (1, -0.22604255))) absTol 1E-5)
+    assert(data2(4) ~== Vectors.sparse(
+            3, Seq((0, 0.865538862), (1, -0.22604255))) absTol 1E-5)
     assert(data2(5) ~== Vectors.sparse(3, Seq((1, 0.71580142))) absTol 1E-5)
   }
 
@@ -268,7 +290,6 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val data2RDD = model2.transform(dataRDD)
 
-
     val summary = computeSummary(data2RDD)
 
     assert((sparseData, data2, data2RDD.collect()).zipped.forall {
@@ -277,12 +298,14 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after standardization.")
 
-    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data2, data2RDD.collect()).zipped
+          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
 
     assert(summary.mean !~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)
 
-    assert(data2(4) ~== Vectors.sparse(3, Seq((0, 0.865538862), (1, -0.22604255))) absTol 1E-5)
+    assert(data2(4) ~== Vectors.sparse(
+            3, Seq((0, 0.865538862), (1, -0.22604255))) absTol 1E-5)
     assert(data2(5) ~== Vectors.sparse(3, Seq((1, 0.71580142))) absTol 1E-5)
   }
 
@@ -299,19 +322,21 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val model3 = standardizer3.fit(dataRDD)
 
     val equivalentModel1 = new StandardScalerModel(model1.std, model1.mean)
-    val equivalentModel2 = new StandardScalerModel(model2.std, model2.mean, true, false)
-    val equivalentModel3 = new StandardScalerModel(model3.std, model3.mean, false, true)
+    val equivalentModel2 =
+      new StandardScalerModel(model2.std, model2.mean, true, false)
+    val equivalentModel3 =
+      new StandardScalerModel(model3.std, model3.mean, false, true)
 
     val data1 = constantData.map(equivalentModel1.transform)
     val data2 = constantData.map(equivalentModel2.transform)
     val data3 = constantData.map(equivalentModel3.transform)
 
     assert(data1.forall(_.toArray.forall(_ == 0.0)),
-      "The variance is zero, so the transformed result should be 0.0")
+           "The variance is zero, so the transformed result should be 0.0")
     assert(data2.forall(_.toArray.forall(_ == 0.0)),
-      "The variance is zero, so the transformed result should be 0.0")
+           "The variance is zero, so the transformed result should be 0.0")
     assert(data3.forall(_.toArray.forall(_ == 0.0)),
-      "The variance is zero, so the transformed result should be 0.0")
+           "The variance is zero, so the transformed result should be 0.0")
   }
 
   test("Standardization with constant input") {
@@ -331,11 +356,11 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val data3 = constantData.map(model3.transform)
 
     assert(data1.forall(_.toArray.forall(_ == 0.0)),
-      "The variance is zero, so the transformed result should be 0.0")
+           "The variance is zero, so the transformed result should be 0.0")
     assert(data2.forall(_.toArray.forall(_ == 0.0)),
-      "The variance is zero, so the transformed result should be 0.0")
+           "The variance is zero, so the transformed result should be 0.0")
     assert(data3.forall(_.toArray.forall(_ == 0.0)),
-      "The variance is zero, so the transformed result should be 0.0")
+           "The variance is zero, so the transformed result should be 0.0")
   }
 
   test("StandardScalerModel argument nulls are properly handled") {
@@ -357,9 +382,11 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
         model.setWithMean(true)
       }
     }
-    withClue("model needs std and mean vectors to be equal size when both are provided") {
+    withClue(
+        "model needs std and mean vectors to be equal size when both are provided") {
       intercept[IllegalArgumentException] {
-        val model = new StandardScalerModel(Vectors.dense(0.0), Vectors.dense(0.0, 1.0))
+        val model =
+          new StandardScalerModel(Vectors.dense(0.0), Vectors.dense(0.0, 1.0))
       }
     }
   }

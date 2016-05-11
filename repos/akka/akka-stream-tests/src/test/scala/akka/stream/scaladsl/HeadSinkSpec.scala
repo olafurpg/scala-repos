@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import scala.concurrent.Await
@@ -15,8 +15,8 @@ import akka.testkit.AkkaSpec
 
 class HeadSinkSpec extends AkkaSpec with ScriptedTest {
 
-  val settings = ActorMaterializerSettings(system)
-    .withInputBuffer(initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system).withInputBuffer(
+      initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -24,7 +24,8 @@ class HeadSinkSpec extends AkkaSpec with ScriptedTest {
 
     "yield the first value" in assertAllStagesStopped {
       val p = TestPublisher.manualProbe[Int]()
-      val f: Future[Int] = Source.fromPublisher(p).map(identity).runWith(Sink.head)
+      val f: Future[Int] =
+        Source.fromPublisher(p).map(identity).runWith(Sink.head)
       val proc = p.expectSubscription()
       proc.expectRequest()
       proc.sendNext(42)
@@ -58,13 +59,13 @@ class HeadSinkSpec extends AkkaSpec with ScriptedTest {
         Await.result(Source.empty[Int].runWith(Sink.head), 1.second)
       }.getMessage should be("head of empty stream")
     }
-
   }
   "A Flow with Sink.headOption" must {
 
     "yield the first value" in assertAllStagesStopped {
       val p = TestPublisher.manualProbe[Int]()
-      val f: Future[Option[Int]] = Source.fromPublisher(p).map(identity).runWith(Sink.headOption)
+      val f: Future[Option[Int]] =
+        Source.fromPublisher(p).map(identity).runWith(Sink.headOption)
       val proc = p.expectSubscription()
       proc.expectRequest()
       proc.sendNext(42)
@@ -80,9 +81,8 @@ class HeadSinkSpec extends AkkaSpec with ScriptedTest {
     }
 
     "yield None for empty stream" in assertAllStagesStopped {
-      Await.result(Source.empty[Int].runWith(Sink.headOption), 1.second) should be(None)
+      Await.result(Source.empty[Int].runWith(Sink.headOption), 1.second) should be(
+          None)
     }
-
   }
-
 }

@@ -7,17 +7,20 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import org.scalacheck.{Arbitrary, Gen}
 
-class CheckedTest extends FunSuite with GeneratorDrivenPropertyChecks with Matchers {
+class CheckedTest
+    extends FunSuite with GeneratorDrivenPropertyChecks with Matchers {
   import Checked.checked
   import Arbitrary.arbitrary
 
   case class NotZero[A](value: A)
-  implicit def arbNotZeroLong = Arbitrary(arbitrary[Long] filter (_ != 0L) map (NotZero(_)))
-  implicit def arbNotZeroInt = Arbitrary(arbitrary[Int] filter (_ != 0L) map (NotZero(_)))
+  implicit def arbNotZeroLong =
+    Arbitrary(arbitrary[Long] filter (_ != 0L) map (NotZero(_)))
+  implicit def arbNotZeroInt =
+    Arbitrary(arbitrary[Int] filter (_ != 0L) map (NotZero(_)))
 
   def checkForLongOverflow(value: BigInt, check: => Long) = {
     if (value.isValidLong) {
-      check should equal (value.toLong)
+      check should equal(value.toLong)
     } else {
       an[ArithmeticException] should be thrownBy { check }
     }
@@ -25,7 +28,7 @@ class CheckedTest extends FunSuite with GeneratorDrivenPropertyChecks with Match
 
   def checkForIntOverflow(value: BigInt, check: => Int) = {
     if (value.isValidInt) {
-      check should equal (value.toInt)
+      check should equal(value.toInt)
     } else {
       an[ArithmeticException] should be thrownBy { check }
     }
@@ -66,7 +69,8 @@ class CheckedTest extends FunSuite with GeneratorDrivenPropertyChecks with Match
     }
   }
 
-  def distSq(x: Long, y: Long): BigInt = BigInt(x) * BigInt(x) + BigInt(y) * BigInt(y)
+  def distSq(x: Long, y: Long): BigInt =
+    BigInt(x) * BigInt(x) + BigInt(y) * BigInt(y)
 
   test("Int euclidean square distance overflow throws arithmetic exception") {
     forAll("x", "y") { (x: Int, y: Int) =>
@@ -128,42 +132,48 @@ class CheckedTest extends FunSuite with GeneratorDrivenPropertyChecks with Match
       y + x
     } should equal(Some(Int.MaxValue.toLong + 2))
 
-    an[ArithmeticException] should be thrownBy (checked {
-      val x = Long.MaxValue
-      val y = 2
-      x * y
-    })
+    an[ArithmeticException] should be thrownBy
+    (checked {
+          val x = Long.MaxValue
+          val y = 2
+          x * y
+        })
 
-    an[ArithmeticException] should be thrownBy (checked {
-      val x = Long.MaxValue
-      val y = 2
-      y * x
-    })
+    an[ArithmeticException] should be thrownBy
+    (checked {
+          val x = Long.MaxValue
+          val y = 2
+          y * x
+        })
   }
 
   test("Byte and Short upgrade to Int when mixed") {
-    an[ArithmeticException] should be thrownBy (checked {
-      val x = Int.MaxValue
-      val y = (2: Byte)
-      x * y
-    })
+    an[ArithmeticException] should be thrownBy
+    (checked {
+          val x = Int.MaxValue
+          val y = (2: Byte)
+          x * y
+        })
 
-    an[ArithmeticException] should be thrownBy (checked {
-      val x = Int.MaxValue
-      val y = (2: Byte)
-      y * x
-    })
+    an[ArithmeticException] should be thrownBy
+    (checked {
+          val x = Int.MaxValue
+          val y = (2: Byte)
+          y * x
+        })
 
-    an[ArithmeticException] should be thrownBy (checked {
-      val x = Int.MaxValue
-      val y = (2: Short)
-      x * y
-    })
+    an[ArithmeticException] should be thrownBy
+    (checked {
+          val x = Int.MaxValue
+          val y = (2: Short)
+          x * y
+        })
 
-    an[ArithmeticException] should be thrownBy (checked {
-      val x = Int.MaxValue
-      val y = (2: Short)
-      y * x
-    })
+    an[ArithmeticException] should be thrownBy
+    (checked {
+          val x = Int.MaxValue
+          val y = (2: Short)
+          y * x
+        })
   }
 }

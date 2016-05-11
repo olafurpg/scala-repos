@@ -37,24 +37,24 @@ import scalafx.geometry.Insets
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- *
- * Test for [[scalafx.scene.layout.BorderImageSpec]].
- */
+  *
+  * Test for [[scalafx.scene.layout.BorderImageSpec]].
+  */
 @RunWith(classOf[JUnitRunner])
 class BorderImageSpec
-  extends SimpleSFXDelegateSpec[jfxsl.BorderImage, BorderImage](
-    classOf[jfxsl.BorderImage], classOf[BorderImage]) {
+    extends SimpleSFXDelegateSpec[jfxsl.BorderImage, BorderImage](
+        classOf[jfxsl.BorderImage], classOf[BorderImage]) {
 
-  override protected def getScalaClassInstance = new BorderImage(getJavaClassInstance) {}
+  override protected def getScalaClassInstance =
+    new BorderImage(getJavaClassInstance) {}
 
   override protected def getJavaClassInstance = new jfxsl.BorderImage(
-    new jfxsi.Image(this.getClass.getResourceAsStream("")),
-    BorderWidths.Default,
-    Insets.Empty,
-    BorderWidths.Default,
-    true,
-    BorderRepeat.Repeat,
-    BorderRepeat.Repeat
+      new jfxsi.Image(this.getClass.getResourceAsStream("")),
+      BorderWidths.Default,
+      Insets.Empty,
+      BorderWidths.Default,
+      true,
+      BorderRepeat.Repeat,
+      BorderRepeat.Repeat
   )
-
 }

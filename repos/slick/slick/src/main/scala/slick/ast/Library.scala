@@ -3,8 +3,8 @@ package slick.ast
 import slick.util.ConstArray
 
 /**
- * The standard library for query operators.
- */
+  * The standard library for query operators.
+  */
 object Library {
   trait AggregateFunctionSymbol extends TermSymbol
   class JdbcFunction(name: String) extends FunctionSymbol(name) {
@@ -16,8 +16,10 @@ object Library {
   }
   class SqlFunction(name: String) extends FunctionSymbol(name)
   class SqlOperator(name: String) extends FunctionSymbol(name)
-  class AggregateFunction(name: String) extends FunctionSymbol(name) with AggregateFunctionSymbol
-  class SqlAggregateFunction(name: String) extends SqlFunction(name) with AggregateFunctionSymbol
+  class AggregateFunction(name: String)
+      extends FunctionSymbol(name) with AggregateFunctionSymbol
+  class SqlAggregateFunction(name: String)
+      extends SqlFunction(name) with AggregateFunctionSymbol
 
   // Boolean operators
   val And = new SqlOperator("and")
@@ -102,13 +104,16 @@ object Library {
 class FunctionSymbol(val name: String) extends TermSymbol {
 
   /** Match an Apply of this Symbol */
-  def unapplySeq(a: Apply) = if(a.sym eq this) Some(a.children.toSeq) else None
+  def unapplySeq(a: Apply) =
+    if (a.sym eq this) Some(a.children.toSeq) else None
 
   /** Create a typed Apply of this Symbol */
-  def typed(tpe: Type, ch: Node*): Apply = Apply(this, ConstArray.from(ch))(tpe)
+  def typed(tpe: Type, ch: Node*): Apply =
+    Apply(this, ConstArray.from(ch))(tpe)
 
   /** Create a typed Apply of this Symbol */
-  def typed[T : ScalaBaseType](ch: Node*): Apply = Apply(this, ConstArray.from(ch))(implicitly[ScalaBaseType[T]])
+  def typed[T : ScalaBaseType](ch: Node*): Apply =
+    Apply(this, ConstArray.from(ch))(implicitly[ScalaBaseType[T]])
 
-  override def toString = "Function "+name
+  override def toString = "Function " + name
 }

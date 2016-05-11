@@ -4,10 +4,12 @@ import java.lang.{Long => JLong}
 
 import scala.scalajs.js
 
-final class UUID private (
-    private val i1: Int, private val i2: Int,
-    private val i3: Int, private val i4: Int,
-    private[this] var l1: JLong, private[this] var l2: JLong)
+final class UUID private (private val i1: Int,
+                          private val i2: Int,
+                          private val i3: Int,
+                          private val i4: Int,
+                          private[this] var l1: JLong,
+                          private[this] var l2: JLong)
     extends AnyRef with java.io.Serializable with Comparable[UUID] {
 
   import UUID._
@@ -27,20 +29,21 @@ final class UUID private (
    */
 
   def this(mostSigBits: Long, leastSigBits: Long) = {
-    this((mostSigBits >>> 32).toInt, mostSigBits.toInt,
-        (leastSigBits >>> 32).toInt, leastSigBits.toInt,
-        mostSigBits, leastSigBits)
+    this((mostSigBits >>> 32).toInt,
+         mostSigBits.toInt,
+         (leastSigBits >>> 32).toInt,
+         leastSigBits.toInt,
+         mostSigBits,
+         leastSigBits)
   }
 
   def getLeastSignificantBits(): Long = {
-    if (l2 eq null)
-      l2 = (i3.toLong << 32) | (i4.toLong & 0xffffffffL)
+    if (l2 eq null) l2 = (i3.toLong << 32) | (i4.toLong & 0xffffffffL)
     l2.longValue
   }
 
   def getMostSignificantBits(): Long = {
-    if (l1 eq null)
-      l1 = (i1.toLong << 32) | (i2.toLong & 0xffffffffL)
+    if (l1 eq null) l1 = (i1.toLong << 32) | (i2.toLong & 0xffffffffL)
     l1.longValue
   }
 
@@ -63,7 +66,8 @@ final class UUID private (
   def timestamp(): Long = {
     if (version() != TimeBased)
       throw new UnsupportedOperationException("Not a time-based UUID")
-    (((i2 >>> 16) | ((i2 & 0x0fff) << 16)).toLong << 32) | (i1.toLong & 0xffffffffL)
+    (((i2 >>> 16) | ((i2 & 0x0fff) << 16)).toLong << 32) |
+    (i1.toLong & 0xffffffffL)
   }
 
   def clockSequence(): Int = {
@@ -89,8 +93,9 @@ final class UUID private (
       "0000".substring(s.length) + s
     }
 
-    paddedHex8(i1) + "-" + paddedHex4(i2 >>> 16) + "-" + paddedHex4(i2 & 0xffff) + "-" +
-    paddedHex4(i3 >>> 16) + "-" + paddedHex4(i3 & 0xffff) + paddedHex8(i4)
+    paddedHex8(i1) + "-" + paddedHex4(i2 >>> 16) + "-" +
+    paddedHex4(i2 & 0xffff) + "-" + paddedHex4(i3 >>> 16) + "-" + paddedHex4(
+        i3 & 0xffff) + paddedHex8(i4)
   }
 
   override def hashCode(): Int =
@@ -141,14 +146,13 @@ object UUID {
     import Integer.parseInt
 
     def fail(): Nothing =
-      throw new IllegalArgumentException("Invalid UUID string: "+name)
+      throw new IllegalArgumentException("Invalid UUID string: " + name)
 
     @inline def parseHex8(his: String, los: String): Int =
       (parseInt(his, 16) << 16) | parseInt(los, 16)
 
-    if (name.length != 36 || name.charAt(8) != '-' ||
-        name.charAt(13) != '-' || name.charAt(18) != '-' || name.charAt(23) != '-')
-      fail()
+    if (name.length != 36 || name.charAt(8) != '-' || name.charAt(13) != '-' ||
+        name.charAt(18) != '-' || name.charAt(23) != '-') fail()
 
     try {
       val i1 = parseHex8(name.substring(0, 4), name.substring(4, 8))

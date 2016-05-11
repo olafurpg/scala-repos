@@ -5,11 +5,10 @@ import com.typesafe.config.Config
 
 import lila.common.PimpedConfig._
 
-final class Env(
-    config: Config,
-    db: lila.db.Env,
-    system: ActorSystem,
-    hub: lila.hub.Env) {
+final class Env(config: Config,
+                db: lila.db.Env,
+                system: ActorSystem,
+                hub: lila.hub.Env) {
 
   private val CollectionReport = config getString "collection.report"
   private val ActorName = config getString "actor.name"
@@ -43,9 +42,9 @@ final class Env(
 
 object Env {
 
-  lazy val current = "report" boot new Env(
-    config = lila.common.PlayApp loadConfig "report",
-    db = lila.db.Env.current,
-    system = lila.common.PlayApp.system,
-    hub = lila.hub.Env.current)
+  lazy val current =
+    "report" boot new Env(config = lila.common.PlayApp loadConfig "report",
+                          db = lila.db.Env.current,
+                          system = lila.common.PlayApp.system,
+                          hub = lila.hub.Env.current)
 }

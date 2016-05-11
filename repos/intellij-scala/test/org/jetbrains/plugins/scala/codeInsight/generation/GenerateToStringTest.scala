@@ -1,9 +1,9 @@
 package org.jetbrains.plugins.scala.codeInsight.generation
 
 /**
- * Tests for toString method generation.
- * @author Rado Buransky (buransky.com)
- */
+  * Tests for toString method generation.
+  * @author Rado Buransky (buransky.com)
+  */
 class GenerateToStringTest extends ScalaGenerateTestBase {
   override val handler = new ScalaGenerateToStringHandler
 
@@ -20,7 +20,8 @@ class GenerateToStringTest extends ScalaGenerateTestBase {
                  |
                  |  private val z = 0
                  |}"""
-    val result = """class A (i: Int, val j: Int) {
+    val result =
+      """class A (i: Int, val j: Int) {
                    |  val x = 0
                    |  var y = 0
                    |

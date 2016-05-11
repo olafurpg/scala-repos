@@ -4,7 +4,7 @@ import scala.tools.reflect.Eval
 object Test extends App {
   {
     val x = 42
-    def foo() = reify{ val y = x; reify(y) };
+    def foo() = reify { val y = x; reify(y) };
     {
       val x = 2
       val code1 = foo()

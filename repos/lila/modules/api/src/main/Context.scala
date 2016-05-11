@@ -1,19 +1,18 @@
 package lila.api
 
-import play.api.libs.json.{ JsObject, JsArray }
-import play.api.mvc.{ Request, RequestHeader }
+import play.api.libs.json.{JsObject, JsArray}
+import play.api.mvc.{Request, RequestHeader}
 
 import lila.pref.Pref
-import lila.user.{ UserContext, HeaderUserContext, BodyUserContext }
+import lila.user.{UserContext, HeaderUserContext, BodyUserContext}
 
-case class PageData(
-  friends: List[lila.common.LightUser],
-  teamNbRequests: Int,
-  nbMessages: Int,
-  nbChallenges: Int,
-  pref: Pref,
-  blindMode: Boolean,
-  hasFingerprint: Boolean)
+case class PageData(friends: List[lila.common.LightUser],
+                    teamNbRequests: Int,
+                    nbMessages: Int,
+                    nbChallenges: Int,
+                    pref: Pref,
+                    blindMode: Boolean,
+                    hasFingerprint: Boolean)
 
 object PageData {
 
@@ -43,13 +42,16 @@ sealed trait Context extends lila.user.UserContextWrapper {
     ctxPref("theme3d").fold(Pref.default.realTheme3d)(lila.pref.Theme3d.apply)
 
   def currentPieceSet =
-    ctxPref("pieceSet").fold(Pref.default.realPieceSet)(lila.pref.PieceSet.apply)
+    ctxPref("pieceSet").fold(Pref.default.realPieceSet)(
+        lila.pref.PieceSet.apply)
 
   def currentPieceSet3d =
-    ctxPref("pieceSet3d").fold(Pref.default.realPieceSet3d)(lila.pref.PieceSet3d.apply)
+    ctxPref("pieceSet3d").fold(Pref.default.realPieceSet3d)(
+        lila.pref.PieceSet3d.apply)
 
   def currentSoundSet =
-    ctxPref("soundSet").fold(Pref.default.realSoundSet)(lila.pref.SoundSet.apply)
+    ctxPref("soundSet").fold(Pref.default.realSoundSet)(
+        lila.pref.SoundSet.apply)
 
   lazy val currentBg = ctxPref("bg") | "light"
 
@@ -66,28 +68,28 @@ sealed trait Context extends lila.user.UserContextWrapper {
 }
 
 sealed abstract class BaseContext(
-  val userContext: lila.user.UserContext,
-  val pageData: PageData) extends Context
+    val userContext: lila.user.UserContext, val pageData: PageData)
+    extends Context
 
-final class BodyContext[A](
-    val bodyContext: BodyUserContext[A],
-    data: PageData) extends BaseContext(bodyContext, data) {
+final class BodyContext[A](val bodyContext: BodyUserContext[A], data: PageData)
+    extends BaseContext(bodyContext, data) {
 
   def body = bodyContext.body
 }
 
-final class HeaderContext(
-  headerContext: HeaderUserContext,
-  data: PageData) extends BaseContext(headerContext, data)
+final class HeaderContext(headerContext: HeaderUserContext, data: PageData)
+    extends BaseContext(headerContext, data)
 
 object Context {
 
   def apply(req: RequestHeader): HeaderContext =
     new HeaderContext(UserContext(req, none), PageData.default)
 
-  def apply(userContext: HeaderUserContext, pageData: PageData): HeaderContext =
+  def apply(
+      userContext: HeaderUserContext, pageData: PageData): HeaderContext =
     new HeaderContext(userContext, pageData)
 
-  def apply[A](userContext: BodyUserContext[A], pageData: PageData): BodyContext[A] =
+  def apply[A](
+      userContext: BodyUserContext[A], pageData: PageData): BodyContext[A] =
     new BodyContext(userContext, pageData)
 }

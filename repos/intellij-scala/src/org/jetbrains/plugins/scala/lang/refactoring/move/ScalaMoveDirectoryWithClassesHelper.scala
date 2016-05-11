@@ -18,9 +18,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 
 /**
- * @author Nikolay.Tropin
- */
-class ScalaMoveDirectoryWithClassesHelper extends MoveDirectoryWithClassesHelper {
+  * @author Nikolay.Tropin
+  */
+class ScalaMoveDirectoryWithClassesHelper
+    extends MoveDirectoryWithClassesHelper {
 
   override def findUsages(filesToMove: util.Collection[PsiFile],
                           directoriesToMove: Array[PsiDirectory],
@@ -41,7 +42,8 @@ class ScalaMoveDirectoryWithClassesHelper extends MoveDirectoryWithClassesHelper
 
           for {
             aClass <- classes
-            usage <- MoveClassesOrPackagesUtil.findUsages(aClass, searchInComments, searchInNonJavaFiles, aClass.name)
+            usage <- MoveClassesOrPackagesUtil.findUsages(
+                aClass, searchInComments, searchInNonJavaFiles, aClass.name)
           } {
             usages.add(usage)
           }
@@ -52,7 +54,13 @@ class ScalaMoveDirectoryWithClassesHelper extends MoveDirectoryWithClassesHelper
             ref <- ReferencesSearch.search(named).findAll()
           } {
             val range = ref.getRangeInElement
-            usages.add(new MoveRenameUsageInfo(ref.getElement, ref, range.getStartOffset, range.getEndOffset, named, false))
+            usages.add(
+                new MoveRenameUsageInfo(ref.getElement,
+                                        ref,
+                                        range.getStartOffset,
+                                        range.getEndOffset,
+                                        named,
+                                        false))
           }
 
           packageNames.add(packageName(sf))
@@ -65,13 +73,17 @@ class ScalaMoveDirectoryWithClassesHelper extends MoveDirectoryWithClassesHelper
     for (packageName <- packageNames) {
       val aPackage: PsiPackage = psiFacade.findPackage(packageName)
       if (aPackage != null) {
-        val remainsNothing: Boolean = aPackage.getDirectories.exists(!isUnderRefactoring(_, directoriesToMove))
+        val remainsNothing: Boolean = aPackage.getDirectories.exists(
+            !isUnderRefactoring(_, directoriesToMove))
 
         if (remainsNothing) {
           import scala.collection.JavaConversions._
-          for (reference <- ReferencesSearch.search(aPackage, GlobalSearchScope.projectScope(project)).findAll()) {
+          for (reference <- ReferencesSearch
+            .search(aPackage, GlobalSearchScope.projectScope(project))
+            .findAll()) {
             val element: PsiElement = reference.getElement
-            val importStmt = PsiTreeUtil.getParentOfType(element, classOf[ScImportStmt])
+            val importStmt =
+              PsiTreeUtil.getParentOfType(element, classOf[ScImportStmt])
             if (importStmt != null) {
               usages.add(new ImportStatementToRemoveUsage(importStmt))
             }
@@ -91,7 +103,8 @@ class ScalaMoveDirectoryWithClassesHelper extends MoveDirectoryWithClassesHelper
       clazz match {
         case o: ScObject if o.isPackageObject =>
           val oldElems = o.namedElements
-          val newClass: PsiClass = MoveClassesOrPackagesUtil.doMoveClass(clazz, moveDestination)
+          val newClass: PsiClass =
+            MoveClassesOrPackagesUtil.doMoveClass(clazz, moveDestination)
           oldToNewElementsMapping.put(clazz, newClass)
           listener.elementMoved(newClass)
 
@@ -106,12 +119,11 @@ class ScalaMoveDirectoryWithClassesHelper extends MoveDirectoryWithClassesHelper
           }
 
         case _ =>
-          val newClass: PsiClass = MoveClassesOrPackagesUtil.doMoveClass(clazz, moveDestination)
+          val newClass: PsiClass =
+            MoveClassesOrPackagesUtil.doMoveClass(clazz, moveDestination)
           oldToNewElementsMapping.put(clazz, newClass)
           listener.elementMoved(newClass)
       }
-
-
     }
 
     file match {
@@ -122,7 +134,9 @@ class ScalaMoveDirectoryWithClassesHelper extends MoveDirectoryWithClassesHelper
     }
   }
 
-  override def postProcessUsages(usages: Array[UsageInfo], newDirMapper: Function[PsiDirectory, PsiDirectory]): Unit = {
+  override def postProcessUsages(
+      usages: Array[UsageInfo],
+      newDirMapper: Function[PsiDirectory, PsiDirectory]): Unit = {
     usages.foreach {
       case ImportStatementToRemoveUsage(impStmt) => impStmt.delete()
       case _ =>
@@ -148,18 +162,22 @@ class ScalaMoveDirectoryWithClassesHelper extends MoveDirectoryWithClassesHelper
     }
   }
 
-  private def isUnderRefactoring(packageDirectory: PsiDirectory, directoriesToMove: Array[PsiDirectory]): Boolean = {
+  private def isUnderRefactoring(
+      packageDirectory: PsiDirectory,
+      directoriesToMove: Array[PsiDirectory]): Boolean = {
     directoriesToMove.exists(PsiTreeUtil.isAncestor(_, packageDirectory, true))
   }
 
   private def packageName(sf: ScalaFile) = {
     sf.typeDefinitions match {
       case Seq(obj: ScObject) if obj.isPackageObject =>
-        if (obj.name == "`package`") obj.qualifiedName.stripSuffix(".`package`")
+        if (obj.name == "`package`")
+          obj.qualifiedName.stripSuffix(".`package`")
         else obj.qualifiedName
       case _ => sf.getPackageName
     }
   }
 }
 
-private case class ImportStatementToRemoveUsage(stmt: ScImportStmt) extends UsageInfo(stmt)
+private case class ImportStatementToRemoveUsage(stmt: ScImportStmt)
+    extends UsageInfo(stmt)

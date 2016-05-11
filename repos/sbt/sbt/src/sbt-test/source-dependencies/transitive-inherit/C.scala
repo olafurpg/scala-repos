@@ -1,4 +1,3 @@
-trait C extends B
-{
-	def x = 3
+trait C extends B {
+  def x = 3
 }

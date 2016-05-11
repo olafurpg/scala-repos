@@ -31,4 +31,3 @@ class Test2_2(i: Int) {
     0
   }
 }
-

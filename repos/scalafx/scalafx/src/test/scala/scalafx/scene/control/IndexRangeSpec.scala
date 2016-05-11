@@ -35,16 +35,16 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * IndexRange Spec tests.
- *
- *
- */
+  * IndexRange Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class IndexRangeSpec
-  extends SimpleSFXDelegateSpec[jfxsc.IndexRange, IndexRange](classOf[jfxsc.IndexRange], classOf[IndexRange]) {
+    extends SimpleSFXDelegateSpec[jfxsc.IndexRange, IndexRange](
+        classOf[jfxsc.IndexRange], classOf[IndexRange]) {
 
   override protected def getScalaClassInstance = new IndexRange(1, 2)
 
   protected override def getJavaClassInstance = new jfxsc.IndexRange(1, 2)
-
 }

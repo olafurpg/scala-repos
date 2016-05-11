@@ -14,4 +14,4 @@ object O {
   implicit def C(s: String): C = new C(s)
 }
 
-**/
+  **/

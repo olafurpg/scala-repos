@@ -1,9 +1,8 @@
 package org.jetbrains.plugins.scala.annotator.gutter
 
 /**
- * Pavel.Fatin, 21.01.2010
- */
-
+  * Pavel.Fatin, 21.01.2010
+  */
 class GroupLineTest extends LineMarkerTestBase {
   protected override def getBasePath = super.getBasePath + "/group/line/"
 
@@ -21,4 +20,5 @@ class GroupLineTest extends LineMarkerTestBase {
   def testTypes() = doTest()
   def testValues() = doTest()
   def testVariableDeclarations() = doTest()
-  def testVariableDefinitions() = doTest()}
+  def testVariableDefinitions() = doTest()
+}

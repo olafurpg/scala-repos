@@ -12,6 +12,7 @@ object Test {
   val u: U = ???
 
   (null: Any) match {
-    case _: u.emptyValDef.T => // and, unlike in pos/t6185.scala, we shouldn't allow this.
+    case _: u.emptyValDef.T =>
+    // and, unlike in pos/t6185.scala, we shouldn't allow this.
   }
 }

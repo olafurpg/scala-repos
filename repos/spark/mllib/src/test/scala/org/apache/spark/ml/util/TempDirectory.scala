@@ -24,8 +24,8 @@ import org.scalatest.{BeforeAndAfterAll, Suite}
 import org.apache.spark.util.Utils
 
 /**
- * Trait that creates a temporary directory before all tests and deletes it after all.
- */
+  * Trait that creates a temporary directory before all tests and deletes it after all.
+  */
 trait TempDirectory extends BeforeAndAfterAll { self: Suite =>
 
   private var _tempDir: File = _

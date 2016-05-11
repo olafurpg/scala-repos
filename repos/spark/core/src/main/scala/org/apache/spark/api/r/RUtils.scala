@@ -28,35 +28,39 @@ private[spark] object RUtils {
   var rPackages: Option[String] = None
 
   /**
-   * Get the SparkR package path in the local spark distribution.
-   */
+    * Get the SparkR package path in the local spark distribution.
+    */
   def localSparkRPackagePath: Option[String] = {
-    val sparkHome = sys.env.get("SPARK_HOME").orElse(sys.props.get("spark.test.home"))
+    val sparkHome =
+      sys.env.get("SPARK_HOME").orElse(sys.props.get("spark.test.home"))
     sparkHome.map(
-      Seq(_, "R", "lib").mkString(File.separator)
+        Seq(_, "R", "lib").mkString(File.separator)
     )
   }
 
   /**
-   * Get the list of paths for R packages in various deployment modes, of which the first
-   * path is for the SparkR package itself. The second path is for R packages built as
-   * part of Spark Packages, if any exist. Spark Packages can be provided through the
-   *  "--packages" or "--jars" command line options.
-   *
-   * This assumes that Spark properties `spark.master` and `spark.submit.deployMode`
-   * and environment variable `SPARK_HOME` are set.
-   */
+    * Get the list of paths for R packages in various deployment modes, of which the first
+    * path is for the SparkR package itself. The second path is for R packages built as
+    * part of Spark Packages, if any exist. Spark Packages can be provided through the
+    *  "--packages" or "--jars" command line options.
+    *
+    * This assumes that Spark properties `spark.master` and `spark.submit.deployMode`
+    * and environment variable `SPARK_HOME` are set.
+    */
   def sparkRPackagePath(isDriver: Boolean): Seq[String] = {
     val (master, deployMode) =
       if (isDriver) {
         (sys.props("spark.master"), sys.props("spark.submit.deployMode"))
       } else {
         val sparkConf = SparkEnv.get.conf
-        (sparkConf.get("spark.master"), sparkConf.get("spark.submit.deployMode", "client"))
+        (sparkConf.get("spark.master"),
+         sparkConf.get("spark.submit.deployMode", "client"))
       }
 
-    val isYarnCluster = master != null && master.contains("yarn") && deployMode == "cluster"
-    val isYarnClient = master != null && master.contains("yarn") && deployMode == "client"
+    val isYarnCluster =
+      master != null && master.contains("yarn") && deployMode == "cluster"
+    val isYarnClient =
+      master != null && master.contains("yarn") && deployMode == "client"
 
     // In YARN mode, the SparkR package is distributed as an archive symbolically
     // linked to the "sparkr" file in the current directory and additional R packages
@@ -77,7 +81,8 @@ private[spark] object RUtils {
       // Otherwise, assume the package is local
       // TODO: support this for Mesos
       val sparkRPkgPath = localSparkRPackagePath.getOrElse {
-          throw new SparkException("SPARK_HOME not set. Can't locate SparkR package.")
+        throw new SparkException(
+            "SPARK_HOME not set. Can't locate SparkR package.")
       }
       if (!rPackages.isEmpty) {
         Seq(sparkRPkgPath, rPackages.get)

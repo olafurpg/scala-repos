@@ -1,6 +1,7 @@
 class A
 object A {
-  def unapply(a: A): Some[A] = Some(a) // Change return type to Option[A] and the warning is gone
+  def unapply(a: A): Some[A] =
+    Some(a) // Change return type to Option[A] and the warning is gone
 }
 
 object Test {

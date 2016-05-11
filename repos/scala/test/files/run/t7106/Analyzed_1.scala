@@ -1,4 +1,3 @@
-
 abstract class Base0 { def p2: Int }
 class Base(p1: Int, override val p2: Int) extends Base0
 

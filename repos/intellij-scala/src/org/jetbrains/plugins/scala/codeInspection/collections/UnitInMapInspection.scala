@@ -11,30 +11,47 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBod
 import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, Unit}
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class UnitInMapInspection extends OperationOnCollectionInspection {
   override def possibleSimplificationTypes: Array[SimplificationType] = Array()
 
-  override def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+  override def actionFor(
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case MethodRepr(call, _, Some(ref), Seq(arg @ lambdaWithBody(body)))
-      if ref.refName == "map" && checkResolve(ref, getLikeCollectionClasses) =>
-
+        if ref.refName == "map" &&
+        checkResolve(ref, getLikeCollectionClasses) =>
       val isInBlock = call.getParent match {
-        case _: ScBlock | _: ScTemplateBody | _: ScEarlyDefinitions | _: ScalaFile => true
+        case _: ScBlock | _: ScTemplateBody | _: ScEarlyDefinitions |
+            _: ScalaFile =>
+          true
         case _ => false
       }
       val fixes =
-        if (isInBlock) Seq(new ChangeReferenceNameQuickFix(InspectionBundle.message("use.foreach.instead.of.map"), ref, "foreach"))
+        if (isInBlock)
+          Seq(
+              new ChangeReferenceNameQuickFix(
+                  InspectionBundle.message("use.foreach.instead.of.map"),
+                  ref,
+                  "foreach"))
         else Seq.empty
-      val unitTypeReturns = body.calculateReturns().collect {
-        case expr @ ExpressionType(ft @ ScFunctionType(Unit, _)) if arg.getType().getOrAny.equiv(ft) => expr
-        case expr @ ExpressionType(Unit) => expr
-      }.filter(_.getTextLength > 0)
+      val unitTypeReturns = body
+        .calculateReturns()
+        .collect {
+          case expr @ ExpressionType(ft @ ScFunctionType(Unit, _))
+              if arg.getType().getOrAny.equiv(ft) =>
+            expr
+          case expr @ ExpressionType(Unit) => expr
+        }
+        .filter(_.getTextLength > 0)
 
       unitTypeReturns.foreach { e =>
         if (e.isPhysical)
-          holder.registerProblem(e, InspectionBundle.message("expression.unit.return.in.map"), highlightType, fixes: _*)
+          holder.registerProblem(
+              e,
+              InspectionBundle.message("expression.unit.return.in.map"),
+              highlightType,
+              fixes: _*)
       }
   }
 

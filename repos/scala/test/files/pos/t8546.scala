@@ -38,7 +38,6 @@ class F2[M]() {
     foo(B())
     foo(C)
   }
-
 }
 
 object Test {

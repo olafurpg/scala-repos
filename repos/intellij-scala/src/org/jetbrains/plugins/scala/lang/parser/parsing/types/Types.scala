@@ -8,30 +8,30 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 
 /**
-* @author Alexander Podkhalyuzin
-*/
-
+  * @author Alexander Podkhalyuzin
+  */
 /*
  *  Types ::= Type {',' Type}
  */
 
-object Types extends ParserNode{
-  def parse(builder: ScalaPsiBuilder): (Boolean, Boolean) ={
+object Types extends ParserNode {
+  def parse(builder: ScalaPsiBuilder): (Boolean, Boolean) = {
     var isTuple = false
 
-    def typesParse() = if (ParamType.parseInner(builder)){
-      true
-    } else if (builder.getTokenType == ScalaTokenTypes.tUNDER) {
-      builder.advanceLexer()
-      true
-    } else {
-      false
-    }
+    def typesParse() =
+      if (ParamType.parseInner(builder)) {
+        true
+      } else if (builder.getTokenType == ScalaTokenTypes.tUNDER) {
+        builder.advanceLexer()
+        true
+      } else {
+        false
+      }
 
     val typesMarker = builder.mark
     if (!typesParse) {
       typesMarker.drop()
-      return (false,isTuple)
+      return (false, isTuple)
     }
     var exit = true
     while (exit && builder.getTokenType == ScalaTokenTypes.tCOMMA) {
@@ -44,6 +44,6 @@ object Types extends ParserNode{
     }
     if (isTuple) typesMarker.done(ScalaElementTypes.TYPES)
     else typesMarker.drop()
-    return (true,isTuple)
+    return (true, isTuple)
   }
 }

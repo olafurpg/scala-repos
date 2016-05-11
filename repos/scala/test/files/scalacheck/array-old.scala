@@ -7,18 +7,20 @@ import Buildable._
 import scala.collection.mutable.ArraySeq
 
 object Test extends Properties("Array") {
+
   /** At this moment the authentic scalacheck Array Builder/Arb bits are commented out.
-   */
-  implicit def arbArray[T](implicit a: Arbitrary[T], m: Manifest[T]): Arbitrary[Array[T]] =
-    Arbitrary(containerOf[List,T](arbitrary[T]) map (_.toArray))
+    */
+  implicit def arbArray[T](
+      implicit a: Arbitrary[T], m: Manifest[T]): Arbitrary[Array[T]] =
+    Arbitrary(containerOf[List, T](arbitrary[T]) map (_.toArray))
 
   val arrGen: Gen[Array[_]] = oneOf(
-    arbitrary[Array[Int]],
-    arbitrary[Array[Array[Int]]],
-    arbitrary[Array[List[String]]],
-    arbitrary[Array[String]],
-    arbitrary[Array[Boolean]],
-    arbitrary[Array[AnyVal]]
+      arbitrary[Array[Int]],
+      arbitrary[Array[Array[Int]]],
+      arbitrary[Array[List[String]]],
+      arbitrary[Array[String]],
+      arbitrary[Array[Boolean]],
+      arbitrary[Array[AnyVal]]
   )
 
   // inspired by #1857 and #2352
@@ -34,4 +36,3 @@ object Test extends Properties("Array") {
     flattened.length == i1 * i2 * i3
   }
 }
-

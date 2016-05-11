@@ -3,7 +3,7 @@
 package org.ensime.sexp.formats
 
 import collection.BitSet
-import collection.{ immutable => im }
+import collection.{immutable => im}
 
 class BigDecimalConvertor[T](
     val to: T => BigDecimal,
@@ -22,28 +22,36 @@ class BigDecimalConvertor[T](
 
 object BigDecimalConvertor {
   // an implicit already exists from many of these types to BigDecimal
-  implicit val IntBigConv = new BigDecimalConvertor[Int](identity, _.intValue())
-  implicit val LongBigConv = new BigDecimalConvertor[Long](identity, _.longValue())
-  implicit val FloatBigConv = new BigDecimalConvertor[Float](identity, _.floatValue()) {
-    override def isPosInf(t: Float) = t.isPosInfinity
-    override def PosInf = Float.PositiveInfinity
-    override def isNegInf(t: Float) = t.isNegInfinity
-    override def NegInf = Float.NegativeInfinity
-    override def isNaN(t: Float) = t.isNaN
-    override def NaN = Float.NaN
-  }
-  implicit val DoubleBigConv = new BigDecimalConvertor[Double](identity, _.doubleValue()) {
-    override def isPosInf(t: Double) = t.isPosInfinity
-    override def PosInf = Double.PositiveInfinity
-    override def isNegInf(t: Double) = t.isNegInfinity
-    override def NegInf = Double.NegativeInfinity
-    override def isNaN(t: Double) = t.isNaN
-    override def NaN = Double.NaN
-  }
-  implicit val ByteBigConv = new BigDecimalConvertor[Byte](identity, _.byteValue())
-  implicit val ShortBigConv = new BigDecimalConvertor[Short](identity, _.shortValue())
-  implicit val BigIntBigConv = new BigDecimalConvertor[BigInt](BigDecimal.apply, _.toBigInt())
-  implicit val BigDecimalBigConv = new BigDecimalConvertor[BigDecimal](identity, identity)
+  implicit val IntBigConv =
+    new BigDecimalConvertor[Int](identity, _.intValue())
+  implicit val LongBigConv =
+    new BigDecimalConvertor[Long](identity, _.longValue())
+  implicit val FloatBigConv =
+    new BigDecimalConvertor[Float](identity, _.floatValue()) {
+      override def isPosInf(t: Float) = t.isPosInfinity
+      override def PosInf = Float.PositiveInfinity
+      override def isNegInf(t: Float) = t.isNegInfinity
+      override def NegInf = Float.NegativeInfinity
+      override def isNaN(t: Float) = t.isNaN
+      override def NaN = Float.NaN
+    }
+  implicit val DoubleBigConv =
+    new BigDecimalConvertor[Double](identity, _.doubleValue()) {
+      override def isPosInf(t: Double) = t.isPosInfinity
+      override def PosInf = Double.PositiveInfinity
+      override def isNegInf(t: Double) = t.isNegInfinity
+      override def NegInf = Double.NegativeInfinity
+      override def isNaN(t: Double) = t.isNaN
+      override def NaN = Double.NaN
+    }
+  implicit val ByteBigConv =
+    new BigDecimalConvertor[Byte](identity, _.byteValue())
+  implicit val ShortBigConv =
+    new BigDecimalConvertor[Short](identity, _.shortValue())
+  implicit val BigIntBigConv =
+    new BigDecimalConvertor[BigInt](BigDecimal.apply, _.toBigInt())
+  implicit val BigDecimalBigConv =
+    new BigDecimalConvertor[BigDecimal](identity, identity)
 }
 
 object BigIntConvertor {

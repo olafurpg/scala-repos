@@ -10,17 +10,15 @@ import com.twitter.util.{Throw, Try, Await, Future}
 @RunWith(classOf[JUnitRunner])
 class FilterTest extends FunSuite {
   class FilterHelper {
-    val stringToInt =
-      new Filter[Int, Int, String, String] {
-        def apply(request: Int, service: Service[String, String]) =
-          service(request.toString) map (_.toInt)
-      }
+    val stringToInt = new Filter[Int, Int, String, String] {
+      def apply(request: Int, service: Service[String, String]) =
+        service(request.toString) map (_.toInt)
+    }
 
-    val intToString =
-      new Filter[String, String, Int, Int] {
-        def apply(request: String, service: Service[Int, Int]) =
-          service(request.toInt) map (_.toString)
-      }
+    val intToString = new Filter[String, String, Int, Int] {
+      def apply(request: String, service: Service[Int, Int]) =
+        service(request.toInt) map (_.toString)
+    }
   }
 
   test("filters should compose when it's all chill") {
@@ -39,7 +37,8 @@ class FilterTest extends FunSuite {
     assert(Await.result(result) == (123 * 2))
   }
 
-  test("filters should compose when synchronous exceptions are thrown with simple composition") {
+  test(
+      "filters should compose when synchronous exceptions are thrown with simple composition") {
     val h = new FilterHelper
     import h._
 
@@ -51,10 +50,12 @@ class FilterTest extends FunSuite {
       }
     }
 
-    assert(Try(Await.result(intToString.andThen(exceptionThrowingService)("1"), 1.second)) == Throw(e))
+    assert(Try(Await.result(intToString.andThen(exceptionThrowingService)("1"),
+                            1.second)) == Throw(e))
   }
 
-  test("filters should compose when synchronous exceptions are thrown with transitive composition") {
+  test(
+      "filters should compose when synchronous exceptions are thrown with transitive composition") {
     val h = new FilterHelper
     import h._
 
@@ -66,10 +67,14 @@ class FilterTest extends FunSuite {
       }
     }
 
-    assert(Try(Await.result(stringToInt.andThen(
-      intToString.andThen(exceptionThrowingService))(1), 1.second)) == Throw(e))
-    assert(Try(Await.result(stringToInt.andThen(
-      intToString).andThen(exceptionThrowingService)(1), 1.second)) == Throw(e))
+    assert(
+        Try(Await.result(stringToInt.andThen(
+                             intToString.andThen(exceptionThrowingService))(1),
+                         1.second)) == Throw(e))
+    assert(
+        Try(Await.result(stringToInt
+                           .andThen(intToString)
+                           .andThen(exceptionThrowingService)(1),
+                         1.second)) == Throw(e))
   }
-
 }

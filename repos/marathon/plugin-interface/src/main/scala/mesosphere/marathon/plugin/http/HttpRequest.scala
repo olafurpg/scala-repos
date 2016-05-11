@@ -43,4 +43,3 @@ trait HttpRequest {
     */
   def remoteAddr: String
 }
-

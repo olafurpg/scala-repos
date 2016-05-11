@@ -10,15 +10,18 @@ import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.project._
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class NewScalaScriptAction
-        extends CreateFromTemplateAction(FileTemplateManager.getDefaultInstance().getInternalTemplate("Scala Script"))
-        with DumbAware {
+    extends CreateFromTemplateAction(
+        FileTemplateManager
+          .getDefaultInstance()
+          .getInternalTemplate("Scala Script")) with DumbAware {
   override def update(e: AnActionEvent) {
     super.update(e)
-    val module: Module = e.getDataContext.getData(LangDataKeys.MODULE.getName).asInstanceOf[Module]
+    val module: Module = e.getDataContext
+      .getData(LangDataKeys.MODULE.getName)
+      .asInstanceOf[Module]
     val isEnabled: Boolean = Option(module).exists(_.hasScala)
     e.getPresentation.setEnabled(isEnabled)
     e.getPresentation.setVisible(isEnabled)

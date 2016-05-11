@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.extensions.{ChildOf, ExpressionType}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScGenericCall}
 
 /**
- * @author Nikolay.Tropin
- */
-
+  * @author Nikolay.Tropin
+  */
 object RedundantCollectionConversion extends SimplificationType {
-  override def hint: String = InspectionBundle.message("redundant.collection.conversion")
+  override def hint: String =
+    InspectionBundle.message("redundant.collection.conversion")
 
   override def getSimplification(expr: ScExpression) = {
     val withGeneric = expr match {
@@ -19,16 +19,20 @@ object RedundantCollectionConversion extends SimplificationType {
     }
     val typeAfterConversion = withGeneric.getType().getOrAny
     withGeneric match {
-      case (base @ ExpressionType(baseType))`.toCollection`() if baseType.conforms(typeAfterConversion, checkWeak = false) =>
-        val simplification = replace(withGeneric).withText(base.getText).highlightFrom(base)
+      case (base @ ExpressionType(baseType)) `.toCollection` ()
+          if baseType.conforms(typeAfterConversion, checkWeak = false) =>
+        val simplification =
+          replace(withGeneric).withText(base.getText).highlightFrom(base)
         Some(simplification)
       case _ => None
     }
   }
 }
 
-class RedundantCollectionConversionInspection extends OperationOnCollectionInspection {
+class RedundantCollectionConversionInspection
+    extends OperationOnCollectionInspection {
   override def highlightType = ProblemHighlightType.LIKE_UNUSED_SYMBOL
 
-  override def possibleSimplificationTypes: Array[SimplificationType] = Array(RedundantCollectionConversion)
+  override def possibleSimplificationTypes: Array[SimplificationType] =
+    Array(RedundantCollectionConversion)
 }

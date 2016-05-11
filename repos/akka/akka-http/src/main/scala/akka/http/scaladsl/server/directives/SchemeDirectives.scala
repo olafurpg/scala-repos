@@ -9,19 +9,21 @@ trait SchemeDirectives {
   import BasicDirectives._
 
   /**
-   * Extracts the Uri scheme from the request.
-   */
+    * Extracts the Uri scheme from the request.
+    */
   def extractScheme: Directive1[String] = SchemeDirectives._extractScheme
 
   /**
-   * Rejects all requests whose Uri scheme does not match the given one.
-   */
+    * Rejects all requests whose Uri scheme does not match the given one.
+    */
   def scheme(name: String): Directive0 =
-    extractScheme.require(_ == name, SchemeRejection(name)) & cancelRejections(classOf[SchemeRejection])
+    extractScheme.require(_ == name, SchemeRejection(name)) & cancelRejections(
+        classOf[SchemeRejection])
 }
 
 object SchemeDirectives extends SchemeDirectives {
   import BasicDirectives._
 
-  private val _extractScheme: Directive1[String] = extract(_.request.uri.scheme)
+  private val _extractScheme: Directive1[String] = extract(
+      _.request.uri.scheme)
 }

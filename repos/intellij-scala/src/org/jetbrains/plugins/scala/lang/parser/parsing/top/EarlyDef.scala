@@ -11,10 +11,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.statements.PatVarDef
 import scala.annotation.tailrec
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.02.2008
+  */
 /*
  * EarlyDef ::= '{' [PatVarDef {semi PatVarDef}] '}' 'with'
  */
@@ -42,23 +41,22 @@ object EarlyDef {
           if (PatVarDef parse builder) {
             builder.getTokenType match {
               case ScalaTokenTypes.tRBRACE => {
-                builder.advanceLexer() //Ate }
-                true
-              }
-              case ScalaTokenTypes.tSEMICOLON => {
-                builder.advanceLexer() //Ate semicolon
-                subparse
-              }
-              case _ => {
-                if (builder.newlineBeforeCurrentToken) {
-                  subparse
-                } else {
-                  false
+                  builder.advanceLexer() //Ate }
+                  true
                 }
-              }
+              case ScalaTokenTypes.tSEMICOLON => {
+                  builder.advanceLexer() //Ate semicolon
+                  subparse
+                }
+              case _ => {
+                  if (builder.newlineBeforeCurrentToken) {
+                    subparse
+                  } else {
+                    false
+                  }
+                }
             }
-          }
-          else {
+          } else {
             false
           }
       }

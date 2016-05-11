@@ -7,12 +7,12 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 03.05.2009
- */
-
-class AbstractTestRunConfigurationEditor (project: Project, configuration: AbstractTestRunConfiguration)
-        extends SettingsEditor[AbstractTestRunConfiguration] {
+  * User: Alexander Podkhalyuzin
+  * Date: 03.05.2009
+  */
+class AbstractTestRunConfigurationEditor(
+    project: Project, configuration: AbstractTestRunConfiguration)
+    extends SettingsEditor[AbstractTestRunConfiguration] {
   val form = new TestRunConfigurationForm(project, configuration)
 
   def resetEditorFrom(s: AbstractTestRunConfiguration) {

@@ -19,28 +19,27 @@ package org.apache.spark.sql.test
 
 import org.apache.spark.sql.SQLContext
 
-
 /**
- * Helper trait for SQL test suites where all tests share a single [[TestSQLContext]].
- */
+  * Helper trait for SQL test suites where all tests share a single [[TestSQLContext]].
+  */
 trait SharedSQLContext extends SQLTestUtils {
 
   /**
-   * The [[TestSQLContext]] to use for all tests in this suite.
-   *
-   * By default, the underlying [[org.apache.spark.SparkContext]] will be run in local
-   * mode with the default test configurations.
-   */
+    * The [[TestSQLContext]] to use for all tests in this suite.
+    *
+    * By default, the underlying [[org.apache.spark.SparkContext]] will be run in local
+    * mode with the default test configurations.
+    */
   private var _ctx: TestSQLContext = null
 
   /**
-   * The [[TestSQLContext]] to use for all tests in this suite.
-   */
+    * The [[TestSQLContext]] to use for all tests in this suite.
+    */
   protected implicit def sqlContext: SQLContext = _ctx
 
   /**
-   * Initialize the [[TestSQLContext]].
-   */
+    * Initialize the [[TestSQLContext]].
+    */
   protected override def beforeAll(): Unit = {
     SQLContext.clearSqlListener()
     if (_ctx == null) {
@@ -51,8 +50,8 @@ trait SharedSQLContext extends SQLTestUtils {
   }
 
   /**
-   * Stop the underlying [[org.apache.spark.SparkContext]], if any.
-   */
+    * Stop the underlying [[org.apache.spark.SparkContext]], if any.
+    */
   protected override def afterAll(): Unit = {
     try {
       if (_ctx != null) {

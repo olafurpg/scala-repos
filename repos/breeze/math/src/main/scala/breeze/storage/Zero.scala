@@ -16,23 +16,20 @@ import breeze.math.Semiring
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-*/
-
-
+ */
 
 /**
- *
- * @author dlwh
- */
+  *
+  * @author dlwh
+  */
 @SerialVersionUID(1l)
 trait Zero[@specialized T] extends Serializable {
-  def zero : T
+  def zero: T
 }
 
-
 object Zero extends ZeroLowPriority {
-  def forClass(clazz: Class[_]):Zero[_] = {
-    if(clazz == Integer.TYPE) IntZero
+  def forClass(clazz: Class[_]): Zero[_] = {
+    if (clazz == Integer.TYPE) IntZero
     else if (clazz == java.lang.Float.TYPE) FloatZero
     else if (clazz == java.lang.Double.TYPE) DoubleZero
     else if (clazz == java.lang.Short.TYPE) ShortZero
@@ -42,7 +39,7 @@ object Zero extends ZeroLowPriority {
     else refDefault
   }
 
-  def apply[T](v: T):Zero[T] = new Zero[T] {
+  def apply[T](v: T): Zero[T] = new Zero[T] {
     def zero = v
   }
 
@@ -85,23 +82,22 @@ object Zero extends ZeroLowPriority {
   implicit object BigDecimalZero extends Zero[BigDecimal] {
     override def zero = BigDecimal(0L)
   }
-
-
 }
 
-trait ZeroVeryLowPriority { this: Zero.type =>
-  implicit def ObjectZero[T<:AnyRef] = {
+trait ZeroVeryLowPriority {
+  this: Zero.type =>
+  implicit def ObjectZero[T <: AnyRef] = {
     refDefault.asInstanceOf[Zero[T]]
   }
 
   protected val refDefault = new Zero[AnyRef] {
-    override def zero : AnyRef = null
+    override def zero: AnyRef = null
   }
 }
 
-trait ZeroLowPriority extends ZeroVeryLowPriority { this: Zero.type =>
+trait ZeroLowPriority extends ZeroVeryLowPriority {
+  this: Zero.type =>
 
-  implicit def zeroFromSemiring[T:Semiring] = Zero(implicitly[Semiring[T]].zero)
-
-
+  implicit def zeroFromSemiring[T : Semiring] =
+    Zero(implicitly[Semiring[T]].zero)
 }

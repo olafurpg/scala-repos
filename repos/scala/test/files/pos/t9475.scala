@@ -16,4 +16,3 @@ object Test {
   // if this doesn't happen for the 2nd method, the specialization
   // transformation fails
 }
-

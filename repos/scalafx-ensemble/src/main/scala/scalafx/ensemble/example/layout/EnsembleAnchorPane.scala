@@ -44,7 +44,9 @@ class EnsembleAnchorPane extends EnsembleExample {
     val label = Label("We are all in an AnchorPane.")
     val button = new Button("Submit")
     val imageView = new ImageView {
-      image = new Image(this.getClass.getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
+      image = new Image(
+          this.getClass
+            .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
     }
 
     AnchorPane.setTopAnchor(label, 2.0)

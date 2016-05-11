@@ -4,4 +4,3 @@ object Test {
     assert(f.size == 4)
   }
 }
-

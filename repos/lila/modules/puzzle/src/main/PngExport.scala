@@ -1,7 +1,7 @@
 package lila.puzzle
 
 import chess.format.Forsyth
-import java.io.{ File, OutputStream }
+import java.io.{File, OutputStream}
 import scala.sys.process._
 
 object PngExport {
@@ -12,7 +12,8 @@ object PngExport {
     val color = puzzle.color.letter.toString
     val lastMove = puzzle.initialMove
     val fen = (puzzle.fenAfterInitialMove | puzzle.fen).takeWhile(' ' !=)
-    val exec = Process(Seq("php", "board-creator.php", fen, color, lastMove), new File(execPath))
+    val exec = Process(Seq("php", "board-creator.php", fen, color, lastMove),
+                       new File(execPath))
     exec #> out ! logger
   }
 }

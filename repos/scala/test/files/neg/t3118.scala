@@ -3,6 +3,6 @@ class O1 {
 
   val x = new O1
 
-  println(x.C())   // should not be accessible
+  println(x.C()) // should not be accessible
   println(new x.C) // is correctly not accessible
 }

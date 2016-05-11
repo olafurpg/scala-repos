@@ -8,12 +8,13 @@ import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
 import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
 
 /**
- * Nikolay.Tropin
- * 2014-10-24
- */
+  * Nikolay.Tropin
+  * 2014-10-24
+  */
 case class ScalaBoxingEvaluator(evaluator: Evaluator) extends Evaluator {
-  
-  override def evaluate(context: EvaluationContextImpl): AnyRef = ScalaBoxingEvaluator.box(evaluator.evaluate(context), context)
+
+  override def evaluate(context: EvaluationContextImpl): AnyRef =
+    ScalaBoxingEvaluator.box(evaluator.evaluate(context), context)
 
   override def getModifier: Modifier = null
 }
@@ -27,7 +28,8 @@ object ScalaBoxingEvaluator {
       case v: Value =>
         new BoxingEvaluator(new IdentityEvaluator(v)).evaluate(context)
       case result =>
-        throw EvaluationException(s"Cannot perform boxing conversion for $result")
+        throw EvaluationException(
+            s"Cannot perform boxing conversion for $result")
     }
   }
 }

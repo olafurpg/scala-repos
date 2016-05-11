@@ -3,10 +3,9 @@ object Test {
   (null: Tuple1[Boolean]) match {
     case Tuple1(X) =>
     case Tuple1(Y) => // unreachable
-    case _      =>
+    case _ =>
   }
 }
-
 
 sealed abstract class B;
 case object True extends B;
@@ -20,7 +19,7 @@ object Test2 {
   (null: Tuple1[B]) match {
     case Tuple1(X) =>
     case Tuple1(Y) => // no warning
-    case _      =>
+    case _ =>
   }
 }
 

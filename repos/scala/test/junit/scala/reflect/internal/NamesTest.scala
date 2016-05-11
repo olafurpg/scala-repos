@@ -14,16 +14,17 @@ class NamesTest {
 
   val h1 = newTermName("hai")
   val h2 = newTermName("hai")
-  val f  = newTermName("fisch")
+  val f = newTermName("fisch")
 
   val h1y = h1.toTypeName
   val h2y = newTypeName("hai")
-  val fy  = newTypeName("fisch")
+  val fy = newTypeName("fisch")
 
   val uy = newTypeName("uhu")
-  val u  = uy.toTermName // calling toTermName after constructing a typeName. This tests the fact
-                         // that creating a typeName always also first creates a termName. There is
-                         // an assertion for that in toTermName.
+  val u =
+    uy.toTermName // calling toTermName after constructing a typeName. This tests the fact
+  // that creating a typeName always also first creates a termName. There is
+  // an assertion for that in toTermName.
 
   @Test
   def termNamesAreHashConsed() {
@@ -54,9 +55,11 @@ class NamesTest {
     assert(lookupTypeName("fisch".toCharArray) eq fy)
     assert(lookupTypeName("uhu".toCharArray) eq uy)
 
-    assertThrows[AssertionError](lookupTypeName("dog".toCharArray), _ contains "not yet created")
+    assertThrows[AssertionError](
+        lookupTypeName("dog".toCharArray), _ contains "not yet created")
     val d = newTermName("dog")
-    assertThrows[AssertionError](lookupTypeName("dog".toCharArray), _ contains "not yet created")
+    assertThrows[AssertionError](
+        lookupTypeName("dog".toCharArray), _ contains "not yet created")
     val dy = d.toTypeName
     assert(lookupTypeName("dog".toCharArray) eq dy)
   }
@@ -81,7 +84,7 @@ class NamesTest {
     assert(iy.start == (fy.start + 1) && iy.length == (fy.length - 1))
     assert(fy.subName(0, fy.length) eq fy)
 
-    assert(f.subName(1,1) eq newTermName(""))
+    assert(f.subName(1, 1) eq newTermName(""))
     assert(f.subName(1, 0) eq newTermName(""))
 
     assertThrows[IllegalArgumentException](f.subName(0 - f.start - 1, 1))

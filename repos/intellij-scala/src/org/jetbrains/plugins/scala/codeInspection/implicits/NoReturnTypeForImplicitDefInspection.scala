@@ -12,17 +12,22 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 
 /**
- * Nikolay.Tropin
- * 2014-09-23
- */
-class NoReturnTypeForImplicitDefInspection extends AbstractInspection(id, description){
-  override def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
-    case fun: ScFunctionDefinition if fun.hasModifierProperty("implicit") &&
-            fun.parameters.size == 1 &&
-            !fun.paramClauses.clauses.exists(_.isImplicit) &&
-            fun.returnTypeElement.isEmpty =>
+  * Nikolay.Tropin
+  * 2014-09-23
+  */
+class NoReturnTypeForImplicitDefInspection
+    extends AbstractInspection(id, description) {
+  override def actionFor(
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+    case fun: ScFunctionDefinition
+        if fun.hasModifierProperty("implicit") && fun.parameters.size == 1 &&
+        !fun.paramClauses.clauses.exists(_.isImplicit) &&
+        fun.returnTypeElement.isEmpty =>
       val descr = description
-      val range = new TextRange(0, fun.parameterList.getTextRange.getEndOffset - fun.getModifierList.getTextRange.getStartOffset)
+      val range = new TextRange(
+          0,
+          fun.parameterList.getTextRange.getEndOffset -
+          fun.getModifierList.getTextRange.getStartOffset)
       holder.registerProblem(fun, range, descr, new AddReturnTypeQuickFix(fun))
   }
 }
@@ -32,7 +37,8 @@ object NoReturnTypeForImplicitDefInspection {
   val description = "No return type for implicit function"
 }
 
-class AddReturnTypeQuickFix(td: ScTypedDefinition) extends AbstractFixOnPsiElement("Add explicit return type", td) {
+class AddReturnTypeQuickFix(td: ScTypedDefinition)
+    extends AbstractFixOnPsiElement("Add explicit return type", td) {
   override def doApplyFix(project: Project): Unit = {
     ToggleTypeAnnotation.complete(AddOnlyStrategy.withoutEditor, getElement)
   }

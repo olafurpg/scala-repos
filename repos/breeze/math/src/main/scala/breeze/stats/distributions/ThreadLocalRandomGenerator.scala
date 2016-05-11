@@ -3,11 +3,12 @@ package breeze.stats.distributions
 import org.apache.commons.math3.random.RandomGenerator
 
 /**
- * TODO
- *
- * @author dlwh
- **/
-class ThreadLocalRandomGenerator(genThunk: =>RandomGenerator) extends RandomGenerator{
+  * TODO
+  *
+  * @author dlwh
+  **/
+class ThreadLocalRandomGenerator(genThunk: => RandomGenerator)
+    extends RandomGenerator {
   private val genTL = new ThreadLocal[RandomGenerator] {
     override def initialValue(): RandomGenerator = genThunk
   }

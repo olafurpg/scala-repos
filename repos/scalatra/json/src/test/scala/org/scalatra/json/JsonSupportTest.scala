@@ -12,29 +12,25 @@ class JsonSupportTest extends json.JsonSupportTestBase {
     implicit protected def jsonFormats: Formats = DefaultFormats
 
     override protected lazy val jsonVulnerabilityGuard: Boolean = true
-    override val jsonpCallbackParameterNames: Iterable[String] = Some("callback")
+    override val jsonpCallbackParameterNames: Iterable[String] =
+      Some("callback")
     get("/json") {
       import org.json4s.JsonDSL._
-      ("k1" -> "v1") ~
-        ("k2" -> "v2")
+      ("k1" -> "v1") ~ ("k2" -> "v2")
     }
 
     get("/jsonp") {
       import org.json4s.JsonDSL._
-      ("k1" -> "v1") ~
-        ("k2" -> "v2")
+      ("k1" -> "v1") ~ ("k2" -> "v2")
     }
-
   }, "/g/*")
-
 }
 
 class JsonSupportTestServlet extends ScalatraServlet with NativeJsonSupport {
 
   get("/json") {
     import org.json4s.JsonDSL._
-    ("k1" -> "v1") ~
-      ("k2" -> "v2")
+    ("k1" -> "v1") ~ ("k2" -> "v2")
   }
 
   get("/json-in-action-result") {
@@ -67,8 +63,7 @@ class JsonPTestServlet extends ScalatraServlet with NativeJsonSupport {
 
   get("/jsonp") {
     import org.json4s.JsonDSL._
-    ("k1" -> "v1") ~
-      ("k2" -> "v2")
+    ("k1" -> "v1") ~ ("k2" -> "v2")
   }
 }
 
@@ -154,5 +149,4 @@ abstract class JsonSupportTestBase extends ScalatraFunSuite {
       response.body should equal("""/**/function({"k1":"v1","k2":"v2"});""")
     }
   }
-
 }

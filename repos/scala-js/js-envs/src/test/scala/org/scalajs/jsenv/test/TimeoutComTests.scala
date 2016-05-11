@@ -31,7 +31,6 @@ trait TimeoutComTests extends TimeoutTests with ComTests {
 
     com.close()
     com.await(DefaultTimeout)
-
   }
 
   @Test
@@ -54,7 +53,6 @@ trait TimeoutComTests extends TimeoutTests with ComTests {
 
     com.close()
     com.await(DefaultTimeout)
-
   }
 
   @Test
@@ -81,7 +79,6 @@ trait TimeoutComTests extends TimeoutTests with ComTests {
 
     com.close()
     com.await(DefaultTimeout)
-
   }
 
   @Test
@@ -97,14 +94,12 @@ trait TimeoutComTests extends TimeoutTests with ComTests {
 
     start(com)
 
-    for (i <- 1 to 5)
-      assertEquals("Hello", com.receive())
+    for (i <- 1 to 5) assertEquals("Hello", com.receive())
 
     com.close()
     com.await(DefaultTimeout)
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-
   }
 
   @Test
@@ -136,7 +131,6 @@ trait TimeoutComTests extends TimeoutTests with ComTests {
     }
 
     async.stop() // should do nothing, and not fail
-
   }
 
   @Test
@@ -158,5 +152,4 @@ trait TimeoutComTests extends TimeoutTests with ComTests {
 
     async.stop() // should do nothing, and not fail
   }
-
 }

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.scaladsl
 
 import akka.stream.ActorMaterializer
@@ -8,7 +8,7 @@ import akka.stream.ActorAttributes._
 import akka.stream.Supervision._
 import akka.stream.testkit.Utils._
 import akka.testkit.AkkaSpec
-import akka.testkit.{ TestLatch, TestProbe }
+import akka.testkit.{TestLatch, TestProbe}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -24,9 +24,10 @@ class SinkForeachParallelSpec extends AkkaSpec {
 
       val probe = TestProbe()
       val latch = (1 to 4).map(_ -> TestLatch(1)).toMap
-      val p = Source(1 to 4).runWith(Sink.foreachParallel(4)((n: Int) ⇒ {
-        Await.ready(latch(n), 5.seconds)
-        probe.ref ! n
+      val p = Source(1 to 4).runWith(Sink.foreachParallel(4)((n: Int) ⇒
+                {
+          Await.ready(latch(n), 5.seconds)
+          probe.ref ! n
       }))
       latch(2).countDown()
       probe.expectMsg(2)
@@ -50,9 +51,10 @@ class SinkForeachParallelSpec extends AkkaSpec {
       val probe = TestProbe()
       val latch = (1 to 5).map(_ -> TestLatch()).toMap
 
-      val p = Source(1 to 5).runWith(Sink.foreachParallel(4)((n: Int) ⇒ {
-        probe.ref ! n
-        Await.ready(latch(n), 5.seconds)
+      val p = Source(1 to 5).runWith(Sink.foreachParallel(4)((n: Int) ⇒
+                {
+          probe.ref ! n
+          Await.ready(latch(n), 5.seconds)
       }))
       probe.expectMsgAllOf(1, 2, 3, 4)
       probe.expectNoMsg(200.millis)
@@ -66,7 +68,6 @@ class SinkForeachParallelSpec extends AkkaSpec {
 
       Await.result(p, 5.seconds)
       assert(p.isCompleted)
-
     }
 
     "resume after function failure" in assertAllStagesStopped {
@@ -75,13 +76,17 @@ class SinkForeachParallelSpec extends AkkaSpec {
       val probe = TestProbe()
       val latch = TestLatch(1)
 
-      val p = Source(1 to 5).runWith(Sink.foreachParallel(4)((n: Int) ⇒ {
-        if (n == 3) throw new RuntimeException("err1") with NoStackTrace
-        else {
-          probe.ref ! n
-          Await.ready(latch, 10.seconds)
-        }
-      }).withAttributes(supervisionStrategy(resumingDecider)))
+      val p = Source(1 to 5).runWith(
+          Sink
+            .foreachParallel(4)((n: Int) ⇒
+                  {
+            if (n == 3) throw new RuntimeException("err1") with NoStackTrace
+            else {
+              probe.ref ! n
+              Await.ready(latch, 10.seconds)
+            }
+        })
+            .withAttributes(supervisionStrategy(resumingDecider)))
 
       latch.countDown()
       probe.expectMsgAllOf(1, 2, 4, 5)
@@ -94,13 +99,17 @@ class SinkForeachParallelSpec extends AkkaSpec {
       val latch = TestLatch(1)
 
       implicit val ec = system.dispatcher
-      val p = Source(1 to 5).runWith(Sink.foreachParallel(3)((n: Int) ⇒ {
-        if (n == 3) throw new RuntimeException("err2") with NoStackTrace
-        else {
-          probe.ref ! n
-          Await.ready(latch, 10.seconds)
-        }
-      }).withAttributes(supervisionStrategy(stoppingDecider)))
+      val p = Source(1 to 5).runWith(
+          Sink
+            .foreachParallel(3)((n: Int) ⇒
+                  {
+            if (n == 3) throw new RuntimeException("err2") with NoStackTrace
+            else {
+              probe.ref ! n
+              Await.ready(latch, 10.seconds)
+            }
+        })
+            .withAttributes(supervisionStrategy(stoppingDecider)))
       p.onFailure { case e ⇒ assert(e.getMessage.equals("err2")); Unit }
       p.onSuccess { case _ ⇒ fail() }
 
@@ -119,7 +128,5 @@ class SinkForeachParallelSpec extends AkkaSpec {
 
       Await.result(p, 200.seconds)
     }
-
   }
-
 }

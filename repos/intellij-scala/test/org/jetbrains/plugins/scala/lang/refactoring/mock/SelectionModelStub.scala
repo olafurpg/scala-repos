@@ -5,9 +5,8 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.editor.{LogicalPosition, RangeMarker, SelectionModel, VisualPosition}
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class SelectionModelStub extends SelectionModel {
   def getTextAttributes: TextAttributes = null
 
@@ -27,7 +26,8 @@ class SelectionModelStub extends SelectionModel {
 
   def removeBlockSelection(): Unit = {}
 
-  def setBlockSelection(blockStart: LogicalPosition, blockEnd: LogicalPosition): Unit = {}
+  def setBlockSelection(
+      blockStart: LogicalPosition, blockEnd: LogicalPosition): Unit = {}
 
   def copySelectionToClipboard(): Unit = {}
 
@@ -43,9 +43,13 @@ class SelectionModelStub extends SelectionModel {
 
   def setSelection(startOffset: Int, endOffset: Int): Unit = {}
 
-  def setSelection(startOffset: Int, endPosition: VisualPosition, endOffset: Int): Unit = {}
+  def setSelection(
+      startOffset: Int, endPosition: VisualPosition, endOffset: Int): Unit = {}
 
-  def setSelection(startPosition: VisualPosition, startOffset: Int, endPosition: VisualPosition, endOffset: Int): Unit = {}
+  def setSelection(startPosition: VisualPosition,
+                   startOffset: Int,
+                   endPosition: VisualPosition,
+                   endOffset: Int): Unit = {}
 
   def hasSelection: Boolean = false
 

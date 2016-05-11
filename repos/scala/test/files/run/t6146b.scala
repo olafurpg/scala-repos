@@ -19,7 +19,8 @@ object O extends C[Int] {
 class S4 extends O.F[String]
 
 object Test extends ReplTest {
-  override def code = """
+  override def code =
+    """
 :power
 val u = rootMirror.universe; import u._, language._
 val S1 = typeOf[c.X.S1.type forSome { val c: C[_] }].typeSymbol.tpeHK

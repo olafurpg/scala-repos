@@ -16,19 +16,24 @@ class EncoderSpec extends WordSpec with CodecSpecSupport {
 
   "An Encoder" should {
     "not transform the message if messageFilter returns false" in {
-      val request = HttpRequest(POST, entity = HttpEntity(smallText.getBytes("UTF8")))
+      val request =
+        HttpRequest(POST, entity = HttpEntity(smallText.getBytes("UTF8")))
       DummyEncoder.encode(request) shouldEqual request
     }
     "correctly transform the HttpMessage if messageFilter returns true" in {
       val request = HttpRequest(POST, entity = HttpEntity(smallText))
       val encoded = DummyEncoder.encode(request)
-      encoded.headers shouldEqual List(`Content-Encoding`(DummyEncoder.encoding))
-      encoded.entity.toStrict(1.second).awaitResult(1.second) shouldEqual HttpEntity(dummyCompress(smallText))
+      encoded.headers shouldEqual List(
+          `Content-Encoding`(DummyEncoder.encoding))
+      encoded.entity.toStrict(1.second).awaitResult(1.second) shouldEqual HttpEntity(
+          dummyCompress(smallText))
     }
   }
 
-  def dummyCompress(s: String): String = dummyCompress(ByteString(s, "UTF8")).utf8String
-  def dummyCompress(bytes: ByteString): ByteString = DummyCompressor.compressAndFinish(bytes)
+  def dummyCompress(s: String): String =
+    dummyCompress(ByteString(s, "UTF8")).utf8String
+  def dummyCompress(bytes: ByteString): ByteString =
+    DummyCompressor.compressAndFinish(bytes)
 
   case object DummyEncoder extends Encoder {
     val messageFilter = Encoder.DefaultFilter

@@ -16,10 +16,10 @@ package com.twitter.scalding
 package typed
 
 import cascading.scheme.Scheme
-import cascading.tap.{ Tap, SinkMode }
-import cascading.tap.hadoop.{ Hfs, PartitionTap }
+import cascading.tap.{Tap, SinkMode}
+import cascading.tap.hadoop.{Hfs, PartitionTap}
 import cascading.tap.partition.Partition
-import cascading.tuple.{ Fields, Tuple, TupleEntry }
+import cascading.tuple.{Fields, Tuple, TupleEntry}
 
 /** Utility functions to assist with creating partitioned sourced. */
 object PartitionUtil {
@@ -29,7 +29,8 @@ object PartitionUtil {
     Dsl.strFields((start until end).map(_.toString))
 
   /** A tuple converter that splits a cascading tuple into a pair of types.*/
-  def converter[P, T, U >: (P, T)](valueConverter: TupleConverter[T], partitionConverter: TupleConverter[P]) = {
+  def converter[P, T, U >: (P, T)](valueConverter: TupleConverter[T],
+                                   partitionConverter: TupleConverter[P]) = {
     TupleConverter.asSuperConverter[(P, T), U](new TupleConverter[(P, T)] {
       val arity = valueConverter.arity + partitionConverter.arity
 
@@ -37,12 +38,14 @@ object PartitionUtil {
         val value = Tuple.size(valueConverter.arity)
         val partition = Tuple.size(partitionConverter.arity)
 
-        (0 until valueConverter.arity).foreach(idx => value.set(idx, te.getObject(idx)))
-        (0 until partitionConverter.arity)
-          .foreach(idx => partition.set(idx, te.getObject(idx + valueConverter.arity)))
+        (0 until valueConverter.arity)
+          .foreach(idx => value.set(idx, te.getObject(idx)))
+        (0 until partitionConverter.arity).foreach(idx =>
+              partition.set(idx, te.getObject(idx + valueConverter.arity)))
 
         val valueTE = new TupleEntry(toFields(0, valueConverter.arity), value)
-        val partitionTE = new TupleEntry(toFields(0, partitionConverter.arity), partition)
+        val partitionTE =
+          new TupleEntry(toFields(0, partitionConverter.arity), partition)
 
         (partitionConverter(partitionTE), valueConverter(valueTE))
       }
@@ -50,7 +53,9 @@ object PartitionUtil {
   }
 
   /** A tuple setter for a pair of types which are flattened into a cascading tuple.*/
-  def setter[P, T, U <: (P, T)](valueSetter: TupleSetter[T], partitionSetter: TupleSetter[P]): TupleSetter[U] =
+  def setter[P, T, U <: (P, T)](
+      valueSetter: TupleSetter[T],
+      partitionSetter: TupleSetter[P]): TupleSetter[U] =
     TupleSetter.asSubSetter[(P, T), U](new TupleSetter[(P, T)] {
       val arity = valueSetter.arity + partitionSetter.arity
 
@@ -59,9 +64,10 @@ object PartitionUtil {
         val value = valueSetter(in._2)
         val output = Tuple.size(partition.size + value.size)
 
-        (0 until value.size).foreach(idx => output.set(idx, value.getObject(idx)))
-        (0 until partition.size).foreach(idx =>
-          output.set(idx + value.size, partition.getObject(idx)))
+        (0 until value.size)
+          .foreach(idx => output.set(idx, value.getObject(idx)))
+        (0 until partition.size).foreach(
+            idx => output.set(idx + value.size, partition.getObject(idx)))
 
         output
       }

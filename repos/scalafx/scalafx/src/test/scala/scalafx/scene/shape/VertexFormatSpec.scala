@@ -37,14 +37,16 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- *
- * Test for [[scalafx.scene.shape.VertexFormat]].
- */
+  *
+  * Test for [[scalafx.scene.shape.VertexFormat]].
+  */
 @RunWith(classOf[JUnitRunner])
 class VertexFormatSpec
-  extends SimpleSFXDelegateSpec[jfxss.VertexFormat, VertexFormat](
-    classOf[jfxss.VertexFormat], classOf[VertexFormat]) {
+    extends SimpleSFXDelegateSpec[jfxss.VertexFormat, VertexFormat](
+        classOf[jfxss.VertexFormat], classOf[VertexFormat]) {
 
-  override protected def getScalaClassInstance = VertexFormat.PointNormalTexcoord
-  override protected def getJavaClassInstance = jfxss.VertexFormat.POINT_NORMAL_TEXCOORD
+  override protected def getScalaClassInstance =
+    VertexFormat.PointNormalTexcoord
+  override protected def getJavaClassInstance =
+    jfxss.VertexFormat.POINT_NORMAL_TEXCOORD
 }

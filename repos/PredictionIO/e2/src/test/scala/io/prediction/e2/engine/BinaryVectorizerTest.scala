@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.e2.engine
 
 import io.prediction.e2.fixture.BinaryVectorizerFixture
@@ -23,34 +22,33 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 import scala.collection.immutable.HashMap
 
-
 import scala.language.reflectiveCalls
 
-class BinaryVectorizerTest extends FlatSpec with Matchers with SharedSparkContext
-with BinaryVectorizerFixture{
+class BinaryVectorizerTest
+    extends FlatSpec with Matchers with SharedSparkContext
+    with BinaryVectorizerFixture {
 
   "toBinary" should "produce the following summed values:" in {
     val testCase = BinaryVectorizer(sc.parallelize(base.maps), base.properties)
     val vectorTwoA = testCase.toBinary(testArrays.twoA)
     val vectorTwoB = testCase.toBinary(testArrays.twoB)
 
-
     // Make sure vectors produced are the same size.
-    vectorTwoA.size should be (vectorTwoB.size)
+    vectorTwoA.size should be(vectorTwoB.size)
 
     // // Test case for checking food value not listed in base.maps.
-    testCase.toBinary(testArrays.one).toArray.sum should be (1.0)
+    testCase.toBinary(testArrays.one).toArray.sum should be(1.0)
 
     // Test cases for making sure indices are preserved.
     val sumOne = vecSum(vectorTwoA, vectorTwoB)
 
-    exactly (1, sumOne) should be (2.0)
-    exactly (2,sumOne) should be (0.0)
-    exactly (2, sumOne) should be (1.0)
+    exactly(1, sumOne) should be(2.0)
+    exactly(2, sumOne) should be(0.0)
+    exactly(2, sumOne) should be(1.0)
 
-    val sumTwo = vecSum(Vectors.dense(sumOne), testCase.toBinary(testArrays.twoC))
+    val sumTwo =
+      vecSum(Vectors.dense(sumOne), testCase.toBinary(testArrays.twoC))
 
-    exactly (3, sumTwo) should be (1.0)
+    exactly(3, sumTwo) should be(1.0)
   }
-
 }

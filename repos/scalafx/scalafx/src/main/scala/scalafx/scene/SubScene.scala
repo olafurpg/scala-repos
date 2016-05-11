@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,14 +37,13 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Paint
 
 object SubScene {
-  implicit def sfxSubScene2jfx(v: SubScene): jfxs.SubScene = if (v != null) v.delegate else null
+  implicit def sfxSubScene2jfx(v: SubScene): jfxs.SubScene =
+    if (v != null) v.delegate else null
 }
-
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/SubScene.html]]. */
 class SubScene(override val delegate: jfxs.SubScene)
-  extends Node(delegate)
-  with SFXDelegate[jfxs.SubScene] {
+    extends Node(delegate) with SFXDelegate[jfxs.SubScene] {
 
   // TODO Combine common features with Scene in a trait used by both.
 
@@ -54,22 +53,33 @@ class SubScene(override val delegate: jfxs.SubScene)
     * @param width The width of the scene
     * @param height The height of the scene
     */
-  def this(width: Double, height: Double) = this(new jfxs.SubScene(new jfxs.Group(), width, height))
+  def this(width: Double, height: Double) =
+    this(new jfxs.SubScene(new jfxs.Group(), width, height))
 
   /** Constructs a SubScene with a [[http://docs.oracle.com/javafx/8/api/javafx/scene/Group.html Group]]
     * as root Node, with a dimension of width and height,
     * specifies whether a depth buffer is created for this scene and specifies the level of antialiasing required.
     */
-  def this(width: Double, height: Double, depthBuffer: Boolean, antiAliasing: SceneAntialiasing) =
-    this(new jfxs.SubScene(new jfxs.Group(), width, height, depthBuffer, antiAliasing))
+  def this(width: Double,
+           height: Double,
+           depthBuffer: Boolean,
+           antiAliasing: SceneAntialiasing) =
+    this(
+        new jfxs.SubScene(
+            new jfxs.Group(), width, height, depthBuffer, antiAliasing))
 
   /** Creates a SubScene for a specific root Node with a specific size. */
-  def this(root: Parent, width: Double, height: Double) = this(new jfxs.SubScene(root, width, height))
+  def this(root: Parent, width: Double, height: Double) =
+    this(new jfxs.SubScene(root, width, height))
 
   /** Constructs a SubScene consisting of a root, with a dimension of width and height,
     * specifies whether a depth buffer is created for this scene and specifies the level of antialiasing required.
     */
-  def this(root: Parent, width: Double, height: Double, depthBuffer: Boolean, antiAliasing: SceneAntialiasing) =
+  def this(root: Parent,
+           width: Double,
+           height: Double,
+           depthBuffer: Boolean,
+           antiAliasing: SceneAntialiasing) =
     this(new jfxs.SubScene(root, width, height, depthBuffer, antiAliasing))
 
   /** Defines the root Node of the SubScene scene graph. */
@@ -79,35 +89,37 @@ class SubScene(override val delegate: jfxs.SubScene)
   }
 
   /**
-   * Returns Nodes children from this Scene's `root`.
-   */
+    * Returns Nodes children from this Scene's `root`.
+    */
   def getChildren = root.value match {
     case group: jfxs.Group => group.getChildren
-    case pane: jfxsl.Pane  => pane.getChildren
-    case _                 => throw new IllegalStateException("Cannot access children of root: " + root +
-      "\nUse a class that extends Group or Pane, or override the getChildren method.")
+    case pane: jfxsl.Pane => pane.getChildren
+    case _ =>
+      throw new IllegalStateException(
+          "Cannot access children of root: " + root +
+          "\nUse a class that extends Group or Pane, or override the getChildren method.")
   }
 
   /**
-   * Returns Content's Node children from this Scene's `root`.
-   */
+    * Returns Content's Node children from this Scene's `root`.
+    */
   def content: jfxc.ObservableList[jfxs.Node] = getChildren
 
   /**
-   * Sets the list of Nodes children from this Scene's `root`, replacing the prior content. If you want append to
-   * current content, use `add` or similar.
-   *
-   * @param c list of Nodes children from this Scene's `root` to replace prior content.
-   */
+    * Sets the list of Nodes children from this Scene's `root`, replacing the prior content. If you want append to
+    * current content, use `add` or similar.
+    *
+    * @param c list of Nodes children from this Scene's `root` to replace prior content.
+    */
   def content_=(c: Iterable[Node]) {
     fillSFXCollection(this.content, c)
   }
 
   /**
-   * Sets a Node child, replacing the prior content. If you want append to current content, use `add` or similar.
-   *
-   * @param n Node child to replace prior content.
-   */
+    * Sets a Node child, replacing the prior content. If you want append to current content, use `add` or similar.
+    *
+    * @param n Node child to replace prior content.
+    */
   def content_=(n: Node) {
     fillSFXCollectionWithOne(this.content, n)
   }
@@ -131,29 +143,31 @@ class SubScene(override val delegate: jfxs.SubScene)
   }
 
   /**
-   * The URL of the user-agent stylesheet that will be used by this Scene in place of the the platform-default
-   * user-agent stylesheet. If the URL does not resolve to a valid location, the platform-default user-agent
-   * stylesheet will be used.
-   *
-   * For additional information about using CSS with the scene graph, see the
-   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html CSS Reference Guide]].
-   *
-   * @return The URL of the user-agent stylesheet that will be used by this SubScene, or null if has not been set.
-   */
-  def userAgentStylesheet: ObjectProperty[String] = delegate.userAgentStylesheetProperty
+    * The URL of the user-agent stylesheet that will be used by this Scene in place of the the platform-default
+    * user-agent stylesheet. If the URL does not resolve to a valid location, the platform-default user-agent
+    * stylesheet will be used.
+    *
+    * For additional information about using CSS with the scene graph, see the
+    * [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html CSS Reference Guide]].
+    *
+    * @return The URL of the user-agent stylesheet that will be used by this SubScene, or null if has not been set.
+    */
+  def userAgentStylesheet: ObjectProperty[String] =
+    delegate.userAgentStylesheetProperty
+
   /**
-   * Set the URL of the user-agent stylesheet that will be used by this Scene in place of the the platform-default
-   * user-agent stylesheet. If the URL does not resolve to a valid location, the platform-default user-agent
-   * stylesheet will be used.
-   *
-   * For additional information about using CSS with the scene graph, see the
-   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html CSS Reference Guide]].
-   *
-   * @param url  The URL is a hierarchical URI of the form `[scheme:][//authority][path]`.
-   *             If the URL does not have a `[scheme:]` component, the URL is considered to be the `[path]`
-   *             component only. Any leading '/' character of the `[path]` is ignored and the `[path]` is
-   *             treated as a path relative to the root of the application's classpath.
-   */
+    * Set the URL of the user-agent stylesheet that will be used by this Scene in place of the the platform-default
+    * user-agent stylesheet. If the URL does not resolve to a valid location, the platform-default user-agent
+    * stylesheet will be used.
+    *
+    * For additional information about using CSS with the scene graph, see the
+    * [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html CSS Reference Guide]].
+    *
+    * @param url  The URL is a hierarchical URI of the form `[scheme:][//authority][path]`.
+    *             If the URL does not have a `[scheme:]` component, the URL is considered to be the `[path]`
+    *             component only. Any leading '/' character of the `[path]` is ignored and the `[path]` is
+    *             treated as a path relative to the root of the application's classpath.
+    */
   def userAgentStylesheet_=(url: String) {
     ObjectProperty.fillProperty[String](userAgentStylesheet, url)
   }

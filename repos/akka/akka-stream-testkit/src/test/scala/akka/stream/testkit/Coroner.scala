@@ -1,50 +1,53 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.stream.testkit
 
 import java.io.PrintStream
-import java.lang.management.{ ManagementFactory, ThreadInfo }
+import java.lang.management.{ManagementFactory, ThreadInfo}
 import java.util.Date
-import java.util.concurrent.{ TimeoutException, CountDownLatch }
-import scala.concurrent.{ Promise, Awaitable, CanAwait, Await }
+import java.util.concurrent.{TimeoutException, CountDownLatch}
+import scala.concurrent.{Promise, Awaitable, CanAwait, Await}
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
-import akka.testkit.{ TestKit, TestDuration }
+import akka.testkit.{TestKit, TestDuration}
 
 /**
- * The Coroner can be used to print a diagnostic report of the JVM state,
- * including stack traces and deadlocks. A report can be printed directly, by
- * calling `printReport`. Alternatively, the Coroner can be asked to `watch`
- * the JVM and generate a report at a later time - unless the Coroner is canceled
- * by that time.
- *
- * The latter method is useful for printing diagnostics in the event that, for
- * example, a unit test stalls and fails to cancel the Coroner in time. The
- * Coroner will assume that the test has "died" and print a report to aid in
- * debugging.
- */
-object Coroner { // FIXME: remove once going back to project dependencies
+  * The Coroner can be used to print a diagnostic report of the JVM state,
+  * including stack traces and deadlocks. A report can be printed directly, by
+  * calling `printReport`. Alternatively, the Coroner can be asked to `watch`
+  * the JVM and generate a report at a later time - unless the Coroner is canceled
+  * by that time.
+  *
+  * The latter method is useful for printing diagnostics in the event that, for
+  * example, a unit test stalls and fails to cancel the Coroner in time. The
+  * Coroner will assume that the test has "died" and print a report to aid in
+  * debugging.
+  */
+object Coroner {
+  // FIXME: remove once going back to project dependencies
 
   /**
-   * Used to cancel the Coroner after calling `watch`.
-   * The result of this Awaitable will be `true` if it has been canceled.
-   */
+    * Used to cancel the Coroner after calling `watch`.
+    * The result of this Awaitable will be `true` if it has been canceled.
+    */
   trait WatchHandle extends Awaitable[Boolean] {
+
     /**
-     * Will try to ensure that the Coroner has finished reporting.
-     */
+      * Will try to ensure that the Coroner has finished reporting.
+      */
     def cancel(): Unit
   }
 
   private class WatchHandleImpl(startAndStopDuration: FiniteDuration)
-    extends WatchHandle {
+      extends WatchHandle {
     val cancelPromise = Promise[Boolean]
     val startedLatch = new CountDownLatch(1)
     val finishedLatch = new CountDownLatch(1)
 
     def waitForStart(): Unit = {
-      startedLatch.await(startAndStopDuration.length, startAndStopDuration.unit)
+      startedLatch.await(
+          startAndStopDuration.length, startAndStopDuration.unit)
     }
 
     def started(): Unit = startedLatch.countDown()
@@ -55,29 +58,34 @@ object Coroner { // FIXME: remove once going back to project dependencies
 
     override def cancel(): Unit = {
       cancelPromise.trySuccess(true)
-      finishedLatch.await(startAndStopDuration.length, startAndStopDuration.unit)
+      finishedLatch.await(
+          startAndStopDuration.length, startAndStopDuration.unit)
     }
 
-    override def ready(atMost: Duration)(implicit permit: CanAwait): this.type = {
+    override def ready(atMost: Duration)(
+        implicit permit: CanAwait): this.type = {
       result(atMost)
       this
     }
 
     override def result(atMost: Duration)(implicit permit: CanAwait): Boolean =
-      try { Await.result(cancelPromise.future, atMost) } catch { case _: TimeoutException ⇒ false }
-
+      try { Await.result(cancelPromise.future, atMost) } catch {
+        case _: TimeoutException ⇒ false
+      }
   }
 
   val defaultStartAndStopDuration = 1.second
 
   /**
-   * Ask the Coroner to print a report if it is not canceled by the given deadline.
-   * The returned handle can be used to perform the cancellation.
-   *
-   * If displayThreadCounts is set to true, then the Coroner will print thread counts during start
-   * and stop.
-   */
-  def watch(duration: FiniteDuration, reportTitle: String, out: PrintStream,
+    * Ask the Coroner to print a report if it is not canceled by the given deadline.
+    * The returned handle can be used to perform the cancellation.
+    *
+    * If displayThreadCounts is set to true, then the Coroner will print thread counts during start
+    * and stop.
+    */
+  def watch(duration: FiniteDuration,
+            reportTitle: String,
+            out: PrintStream,
             startAndStopDuration: FiniteDuration = defaultStartAndStopDuration,
             displayThreadCounts: Boolean = false): WatchHandle = {
 
@@ -88,37 +96,41 @@ object Coroner { // FIXME: remove once going back to project dependencies
       val startThreads = threadMx.getThreadCount
       if (displayThreadCounts) {
         threadMx.resetPeakThreadCount()
-        out.println(s"Coroner Thread Count starts at $startThreads in $reportTitle")
+        out.println(
+            s"Coroner Thread Count starts at $startThreads in $reportTitle")
       }
       watchedHandle.started()
       try {
         if (!Await.result(watchedHandle, duration)) {
           watchedHandle.expired()
-          out.println(s"Coroner not cancelled after ${duration.toMillis}ms. Looking for signs of foul play...")
+          out.println(
+              s"Coroner not cancelled after ${duration.toMillis}ms. Looking for signs of foul play...")
           try printReport(reportTitle, out) catch {
             case NonFatal(ex) ⇒ {
-              out.println("Error displaying Coroner's Report")
-              ex.printStackTrace(out)
-            }
+                out.println("Error displaying Coroner's Report")
+                ex.printStackTrace(out)
+              }
           }
         }
       } finally {
         if (displayThreadCounts) {
           val endThreads = threadMx.getThreadCount
-          out.println(s"Coroner Thread Count started at $startThreads, ended at $endThreads, peaked at ${threadMx.getPeakThreadCount} in $reportTitle")
+          out.println(
+              s"Coroner Thread Count started at $startThreads, ended at $endThreads, peaked at ${threadMx.getPeakThreadCount} in $reportTitle")
         }
         out.flush()
         watchedHandle.finished()
       }
     }
-    new Thread(new Runnable { def run = triggerReportIfOverdue(duration) }, "Coroner").start()
+    new Thread(new Runnable { def run = triggerReportIfOverdue(duration) },
+               "Coroner").start()
     watchedHandle.waitForStart()
     watchedHandle
   }
 
   /**
-   * Print a report containing diagnostic information.
-   */
+    * Print a report containing diagnostic information.
+    */
   def printReport(reportTitle: String, out: PrintStream) {
     import out.println
 
@@ -127,27 +139,31 @@ object Coroner { // FIXME: remove once going back to project dependencies
     val memMx = ManagementFactory.getMemoryMXBean()
     val threadMx = ManagementFactory.getThreadMXBean()
 
-    println(s"""#Coroner's Report: $reportTitle
+    println(
+        s"""#Coroner's Report: $reportTitle
                 #OS Architecture: ${osMx.getArch()}
                 #Available processors: ${osMx.getAvailableProcessors()}
                 #System load (last minute): ${osMx.getSystemLoadAverage()}
                 #VM start time: ${new Date(rtMx.getStartTime())}
                 #VM uptime: ${rtMx.getUptime()}ms
                 #Heap usage: ${memMx.getHeapMemoryUsage()}
-                #Non-heap usage: ${memMx.getNonHeapMemoryUsage()}""".stripMargin('#'))
+                #Non-heap usage: ${memMx.getNonHeapMemoryUsage()}"""
+          .stripMargin('#'))
 
     def dumpAllThreads: Seq[ThreadInfo] = {
-      threadMx.dumpAllThreads(
-        threadMx.isObjectMonitorUsageSupported,
-        threadMx.isSynchronizerUsageSupported)
+      threadMx.dumpAllThreads(threadMx.isObjectMonitorUsageSupported,
+                              threadMx.isSynchronizerUsageSupported)
     }
 
     def findDeadlockedThreads: (Seq[ThreadInfo], String) = {
-      val (ids, desc) = if (threadMx.isSynchronizerUsageSupported()) {
-        (threadMx.findDeadlockedThreads(), "monitors and ownable synchronizers")
-      } else {
-        (threadMx.findMonitorDeadlockedThreads(), "monitors, but NOT ownable synchronizers")
-      }
+      val (ids, desc) =
+        if (threadMx.isSynchronizerUsageSupported()) {
+          (threadMx.findDeadlockedThreads(),
+           "monitors and ownable synchronizers")
+        } else {
+          (threadMx.findMonitorDeadlockedThreads(),
+           "monitors, but NOT ownable synchronizers")
+        }
       if (ids == null) {
         (Seq.empty, desc)
       } else {
@@ -160,7 +176,9 @@ object Coroner { // FIXME: remove once going back to project dependencies
       if (threadInfos.isEmpty) {
         println("None")
       } else {
-        for (ti ← threadInfos.sortBy(_.getThreadName)) { println(threadInfoToString(ti)) }
+        for (ti ← threadInfos.sortBy(_.getThreadName)) {
+          println(threadInfoToString(ti))
+        }
       }
     }
 
@@ -207,15 +225,16 @@ object Coroner { // FIXME: remove once going back to project dependencies
         if (i == 0 && ti.getLockInfo != null) {
           import java.lang.Thread.State._
           ti.getThreadState match {
-            case BLOCKED       ⇒ appendMsg("\t-  blocked on ", ti.getLockInfo)
-            case WAITING       ⇒ appendMsg("\t-  waiting on ", ti.getLockInfo)
+            case BLOCKED ⇒ appendMsg("\t-  blocked on ", ti.getLockInfo)
+            case WAITING ⇒ appendMsg("\t-  waiting on ", ti.getLockInfo)
             case TIMED_WAITING ⇒ appendMsg("\t-  waiting on ", ti.getLockInfo)
-            case _             ⇒
+            case _ ⇒
           }
         }
 
-        for (mi ← ti.getLockedMonitors if mi.getLockedStackDepth == i)
-          appendMsg("\t-  locked ", mi)
+        for (mi ← ti.getLockedMonitors
+                     if mi.getLockedStackDepth == i) appendMsg(
+            "\t-  locked ", mi)
       }
 
       val locks = ti.getLockedSynchronizers
@@ -234,26 +253,27 @@ object Coroner { // FIXME: remove once going back to project dependencies
     println(s"Deadlocks found for $deadlockDesc:")
     printThreadInfos(deadlockedThreads)
   }
-
 }
 
 /**
- * Mixin for tests that should be watched by the Coroner. The `startCoroner`
- * and `stopCoroner` methods should be called before and after the test runs.
- * The Coroner will display its report if the test takes longer than the
- * (dilated) `expectedTestDuration` to run.
- *
- * If displayThreadCounts is set to true, then the Coroner will print thread
- * counts during start and stop.
- */
-trait WatchedByCoroner {
-  self: TestKit ⇒
+  * Mixin for tests that should be watched by the Coroner. The `startCoroner`
+  * and `stopCoroner` methods should be called before and after the test runs.
+  * The Coroner will display its report if the test takes longer than the
+  * (dilated) `expectedTestDuration` to run.
+  *
+  * If displayThreadCounts is set to true, then the Coroner will print thread
+  * counts during start and stop.
+  */
+trait WatchedByCoroner { self: TestKit ⇒
 
   @volatile private var coronerWatch: Coroner.WatchHandle = _
 
   final def startCoroner() {
-    coronerWatch = Coroner.watch(expectedTestDuration.dilated, getClass.getName, System.err,
-      startAndStopDuration.dilated, displayThreadCounts)
+    coronerWatch = Coroner.watch(expectedTestDuration.dilated,
+                                 getClass.getName,
+                                 System.err,
+                                 startAndStopDuration.dilated,
+                                 displayThreadCounts)
   }
 
   final def stopCoroner() {
@@ -265,5 +285,6 @@ trait WatchedByCoroner {
 
   def displayThreadCounts: Boolean = true
 
-  def startAndStopDuration: FiniteDuration = Coroner.defaultStartAndStopDuration
+  def startAndStopDuration: FiniteDuration =
+    Coroner.defaultStartAndStopDuration
 }

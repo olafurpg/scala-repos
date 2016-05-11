@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.e2.fixture
 
 import scala.collection.immutable.HashMap
@@ -23,23 +22,23 @@ trait BinaryVectorizerFixture {
 
   def base = {
     new {
-      val maps : Seq[HashMap[String, String]] = Seq(
-        HashMap("food" -> "orange", "music" -> "rock", "hobby" -> "scala"),
-        HashMap("food" -> "orange", "music" -> "pop", "hobby" ->"running"),
-        HashMap("food" -> "banana", "music" -> "rock", "hobby" -> "guitar"),
-        HashMap("food" -> "banana", "music" -> "rock", "hobby" -> "guitar")
+      val maps: Seq[HashMap[String, String]] = Seq(
+          HashMap("food" -> "orange", "music" -> "rock", "hobby" -> "scala"),
+          HashMap("food" -> "orange", "music" -> "pop", "hobby" -> "running"),
+          HashMap("food" -> "banana", "music" -> "rock", "hobby" -> "guitar"),
+          HashMap("food" -> "banana", "music" -> "rock", "hobby" -> "guitar")
       )
 
       val properties = HashSet("food", "hobby")
     }
   }
 
-
   def testArrays = {
     new {
       // Test case for checking food value not listed in base.maps, and
       // property not in properties.
-      val one = Array(("food", "burger"), ("music", "rock"), ("hobby", "scala"))
+      val one = Array(
+          ("food", "burger"), ("music", "rock"), ("hobby", "scala"))
 
       // Test case for making sure indices are preserved.
       val twoA = Array(("food", "orange"), ("hobby", "scala"))
@@ -48,12 +47,11 @@ trait BinaryVectorizerFixture {
     }
   }
 
-  def vecSum (vec1 : Vector, vec2 : Vector) : Array[Double] = {
-    (0 until vec1.size).map(
-      k => vec1(k) + vec2(k)
-    ).toArray
+  def vecSum(vec1: Vector, vec2: Vector): Array[Double] = {
+    (0 until vec1.size)
+      .map(
+          k => vec1(k) + vec2(k)
+      )
+      .toArray
   }
-
 }
-
-

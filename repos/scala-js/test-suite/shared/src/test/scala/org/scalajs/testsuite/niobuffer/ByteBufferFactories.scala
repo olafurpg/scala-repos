@@ -10,8 +10,8 @@ object ByteBufferFactories {
       ByteBuffer.allocate(capacity)
   }
 
-  class WrappedByteBufferFactory extends ByteBufferFactory
-      with WrappedBufferFactory {
+  class WrappedByteBufferFactory
+      extends ByteBufferFactory with WrappedBufferFactory {
     def baseWrap(array: Array[Byte]): ByteBuffer =
       ByteBuffer.wrap(array)
 

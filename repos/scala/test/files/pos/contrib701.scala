@@ -1,3 +1,3 @@
 trait B {
-  type A[T] >: A[A[T]]
+  type A [T] >: A[A[T]]
 }

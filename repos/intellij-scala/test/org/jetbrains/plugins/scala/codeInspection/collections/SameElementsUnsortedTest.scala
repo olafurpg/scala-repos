@@ -3,10 +3,11 @@ package org.jetbrains.plugins.scala.codeInspection.collections
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class SameElementsUnsortedTest extends OperationsOnCollectionInspectionTest {
-  override val inspectionClass: Class[_ <: OperationOnCollectionInspection] = classOf[CorrespondsUnsortedInspection]
+  override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
+    classOf[CorrespondsUnsortedInspection]
 
   override def hint: String = InspectionBundle.message("sameElements.unsorted")
 
@@ -35,7 +36,8 @@ class SameElementsUnsortedTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testSeqSortedMap(): Unit = {
-    checkTextHasNoErrors("Seq((1, 1)).sameElements(scala.collection.SortedMap(1 -> 1))")
+    checkTextHasNoErrors(
+        "Seq((1, 1)).sameElements(scala.collection.SortedMap(1 -> 1))")
   }
 
   def testSeqArray(): Unit = {
@@ -52,7 +54,8 @@ class SameElementsUnsortedTest extends OperationsOnCollectionInspectionTest {
 }
 
 class CorrespondsUnsortedTest extends OperationsOnCollectionInspectionTest {
-  override val inspectionClass: Class[_ <: OperationOnCollectionInspection] = classOf[CorrespondsUnsortedInspection]
+  override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
+    classOf[CorrespondsUnsortedInspection]
 
   override def hint: String = InspectionBundle.message("corresponds.unsorted")
 
@@ -61,7 +64,8 @@ class CorrespondsUnsortedTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testCorrespondsSortedSet(): Unit = {
-    checkTextHasNoErrors("Iterator(1).corresponds(scala.collection.SortedSet(1))((x, y) => true)")
+    checkTextHasNoErrors(
+        "Iterator(1).corresponds(scala.collection.SortedSet(1))((x, y) => true)")
   }
 
   def testCorrespondsArray(): Unit = {
@@ -76,4 +80,3 @@ class CorrespondsUnsortedTest extends OperationsOnCollectionInspectionTest {
     checkTextHasNoErrors("Seq(1).corresponds(Seq(1))((x, y) => true)")
   }
 }
-

@@ -16,26 +16,28 @@ import org.jetbrains.plugins.scala.util.NotificationUtil
 import scala.collection.mutable
 
 /**
- * @author Nikolay Obedin
- * @since 7/25/14.
- */
-
-class SbtResolverIndexesManager(val testIndexesDir: Option[File]) extends Disposable {
+  * @author Nikolay Obedin
+  * @since 7/25/14.
+  */
+class SbtResolverIndexesManager(val testIndexesDir: Option[File])
+    extends Disposable {
   import org.jetbrains.sbt.resolvers.SbtResolverIndexesManager._
 
   def this() = this(None)
 
-  private val indexesDir = testIndexesDir getOrElse SbtResolverIndexesManager.DEFAULT_INDEXES_DIR
+  private val indexesDir =
+    testIndexesDir getOrElse SbtResolverIndexesManager.DEFAULT_INDEXES_DIR
   private val indexes: mutable.Set[SbtResolverIndex] = mutable.Set.empty
-  private val updatingIndexes: mutable.Set[SbtResolverIndex] = mutable.Set.empty
+  private val updatingIndexes: mutable.Set[SbtResolverIndex] =
+    mutable.Set.empty
 
   loadIndexes()
-
 
   def add(resolver: SbtResolver) = find(resolver) match {
     case Some(index) => index
     case None =>
-      val newIndex = SbtResolverIndex.create(resolver.kind, resolver.root, getIndexDirectory(resolver.root))
+      val newIndex = SbtResolverIndex.create(
+          resolver.kind, resolver.root, getIndexDirectory(resolver.root))
       indexes.add(newIndex)
       newIndex
   }
@@ -50,37 +52,46 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File]) extends Dispos
 
     var indexesToUpdate = Seq.empty[SbtResolverIndex]
     updatingIndexes synchronized {
-      indexesToUpdate = resolvers.filterNot(r => updatingIndexes.exists(r.root == _.root)).map(add)
+      indexesToUpdate = resolvers
+        .filterNot(r => updatingIndexes.exists(r.root == _.root))
+        .map(add)
       updatingIndexes ++= indexesToUpdate
     }
 
     if (indexesToUpdate.isEmpty) return
 
-    ProgressManager.getInstance().run(new Task.Backgroundable(null, "Indexing resolvers") {
-      def run(progressIndicator: ProgressIndicator): Unit =
-        indexesToUpdate.foreach { index =>
-          progressIndicator.setFraction(0.0)
-          progressIndicator.setText(index.root)
-          try {
-            index.update(Some(progressIndicator))
-          } catch {
-            case exc : ResolverException =>
-              notifyWarning(exc.getMessage)
-            case exc : LockReleaseFailedException =>
-              notifyWarning(SbtBundle("sbt.resolverIndexer.luceneLockException", exc.getMessage))
-          } finally {
-            updatingIndexes synchronized {
-              updatingIndexes -= index
-            }
+    ProgressManager
+      .getInstance()
+      .run(new Task.Backgroundable(null, "Indexing resolvers") {
+        def run(progressIndicator: ProgressIndicator): Unit =
+          indexesToUpdate.foreach {
+            index =>
+              progressIndicator.setFraction(0.0)
+              progressIndicator.setText(index.root)
+              try {
+                index.update(Some(progressIndicator))
+              } catch {
+                case exc: ResolverException =>
+                  notifyWarning(exc.getMessage)
+                case exc: LockReleaseFailedException =>
+                  notifyWarning(
+                      SbtBundle("sbt.resolverIndexer.luceneLockException",
+                                exc.getMessage))
+              } finally {
+                updatingIndexes synchronized {
+                  updatingIndexes -= index
+                }
+              }
           }
-        }
-    })
+      })
   }
 
   private def loadIndexes() {
     indexesDir.mkdirs()
     if (!indexesDir.exists || !indexesDir.isDirectory) {
-      notifyWarning(SbtBundle("sbt.resolverIndexer.cantCreateIndexesDir", indexesDir.absolutePath))
+      notifyWarning(
+          SbtBundle("sbt.resolverIndexer.cantCreateIndexesDir",
+                    indexesDir.absolutePath))
       return
     }
 
@@ -92,9 +103,10 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File]) extends Dispos
           val index = SbtResolverIndex.load(indexDir)
           indexes.add(index)
         } catch {
-          case exc : ResolverException =>
+          case exc: ResolverException =>
             notifyWarning(exc.getMessage)
-          case _: PersistentEnumeratorBase.CorruptedException | _: IOException =>
+          case _: PersistentEnumeratorBase.CorruptedException |
+              _: IOException =>
             cleanUpCorruptedIndex(indexDir)
         }
       }
@@ -104,18 +116,24 @@ class SbtResolverIndexesManager(val testIndexesDir: Option[File]) extends Dispos
   private def cleanUpCorruptedIndex(indexDir: File): Unit = {
     try {
       FileUtil.delete(indexDir)
-      notifyWarning(SbtBundle("sbt.resolverIndexer.indexDirIsCorruptedAndRemoved", indexDir.getAbsolutePath))
+      notifyWarning(
+          SbtBundle("sbt.resolverIndexer.indexDirIsCorruptedAndRemoved",
+                    indexDir.getAbsolutePath))
     } catch {
-      case _ : Throwable =>
-        notifyWarning(SbtBundle("sbt.resolverIndexer.indexDirIsCorruptedCantBeRemoved", indexDir.getAbsolutePath))
+      case _: Throwable =>
+        notifyWarning(
+            SbtBundle("sbt.resolverIndexer.indexDirIsCorruptedCantBeRemoved",
+                      indexDir.getAbsolutePath))
     }
   }
 
-  private def getIndexDirectory(root: String) = new File(indexesDir, root.shaDigest)
+  private def getIndexDirectory(root: String) =
+    new File(indexesDir, root.shaDigest)
 }
 
 object SbtResolverIndexesManager {
-  val DEFAULT_INDEXES_DIR = new File(PathManager.getSystemPath) / "sbt" / "indexes"
+  val DEFAULT_INDEXES_DIR =
+    new File(PathManager.getSystemPath) / "sbt" / "indexes"
 
   def notifyWarning(message: String) =
     NotificationUtil.showMessage(null, message, title = "Resolver Indexer")

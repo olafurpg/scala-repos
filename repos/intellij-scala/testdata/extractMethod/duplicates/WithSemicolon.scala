@@ -1,6 +1,6 @@
 object WithSemicolon {
   def foo(i: Int) {
-/*start*/
+    /*start*/
 
     val y = 0
     println(i)
@@ -34,4 +34,4 @@ object WithSemicolon {
 
   }
 }
-*/
+ */

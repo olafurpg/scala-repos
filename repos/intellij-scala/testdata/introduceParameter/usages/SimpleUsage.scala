@@ -2,7 +2,8 @@ object test {
   foo
 
   def foo = {
-    /*start*/1/*end*/ + 2
+    /*start*/
+    1 /*end*/ + 2
   }
 }
 /*
@@ -13,4 +14,4 @@ object test {
     /*start*/param/*end*/ + 2
   }
 }
-*/
+ */

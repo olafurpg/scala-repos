@@ -26,7 +26,8 @@ import org.apache.spark.sql.hive.test.TestHiveSingleton
 // TODO ideally we should put the test suite into the package `sql`, as
 // `hive` package is optional in compiling, however, `SQLContext.sql` doesn't
 // support the `cube` or `rollup` yet.
-class HiveDataFrameAnalyticsSuite extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
+class HiveDataFrameAnalyticsSuite
+    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
   import hiveContext.implicits._
   import hiveContext.sql
 
@@ -43,36 +44,40 @@ class HiveDataFrameAnalyticsSuite extends QueryTest with TestHiveSingleton with 
 
   test("rollup") {
     checkAnswer(
-      testData.rollup($"a" + $"b", $"b").agg(sum($"a" - $"b")),
-      sql("select a + b, b, sum(a - b) from mytable group by a + b, b with rollup").collect()
+        testData.rollup($"a" + $"b", $"b").agg(sum($"a" - $"b")),
+        sql("select a + b, b, sum(a - b) from mytable group by a + b, b with rollup")
+          .collect()
     )
 
     checkAnswer(
-      testData.rollup("a", "b").agg(sum("b")),
-      sql("select a, b, sum(b) from mytable group by a, b with rollup").collect()
+        testData.rollup("a", "b").agg(sum("b")),
+        sql("select a, b, sum(b) from mytable group by a, b with rollup")
+          .collect()
     )
   }
 
   test("collect functions") {
     checkAnswer(
-      testData.select(collect_list($"a"), collect_list($"b")),
-      Seq(Row(Seq(1, 2, 3), Seq(2, 2, 4)))
+        testData.select(collect_list($"a"), collect_list($"b")),
+        Seq(Row(Seq(1, 2, 3), Seq(2, 2, 4)))
     )
     checkAnswer(
-      testData.select(collect_set($"a"), collect_set($"b")),
-      Seq(Row(Seq(1, 2, 3), Seq(2, 4)))
+        testData.select(collect_set($"a"), collect_set($"b")),
+        Seq(Row(Seq(1, 2, 3), Seq(2, 4)))
     )
   }
 
   test("cube") {
     checkAnswer(
-      testData.cube($"a" + $"b", $"b").agg(sum($"a" - $"b")),
-      sql("select a + b, b, sum(a - b) from mytable group by a + b, b with cube").collect()
+        testData.cube($"a" + $"b", $"b").agg(sum($"a" - $"b")),
+        sql("select a + b, b, sum(a - b) from mytable group by a + b, b with cube")
+          .collect()
     )
 
     checkAnswer(
-      testData.cube("a", "b").agg(sum("b")),
-      sql("select a, b, sum(b) from mytable group by a, b with cube").collect()
+        testData.cube("a", "b").agg(sum("b")),
+        sql("select a, b, sum(b) from mytable group by a, b with cube")
+          .collect()
     )
   }
 }

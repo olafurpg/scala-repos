@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import language.postfixOps
@@ -12,33 +11,46 @@ import akka.testkit._
 import scala.concurrent.duration._
 import scala.collection.immutable
 
-final case class LeaderElectionMultiNodeConfig(failureDetectorPuppet: Boolean) extends MultiNodeConfig {
+final case class LeaderElectionMultiNodeConfig(failureDetectorPuppet: Boolean)
+    extends MultiNodeConfig {
   val controller = role("controller")
   val first = role("first")
   val second = role("second")
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
+  commonConfig(debugConfig(on = false).withFallback(
+          MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 }
 
-class LeaderElectionWithFailureDetectorPuppetMultiJvmNode1 extends LeaderElectionSpec(failureDetectorPuppet = true)
-class LeaderElectionWithFailureDetectorPuppetMultiJvmNode2 extends LeaderElectionSpec(failureDetectorPuppet = true)
-class LeaderElectionWithFailureDetectorPuppetMultiJvmNode3 extends LeaderElectionSpec(failureDetectorPuppet = true)
-class LeaderElectionWithFailureDetectorPuppetMultiJvmNode4 extends LeaderElectionSpec(failureDetectorPuppet = true)
-class LeaderElectionWithFailureDetectorPuppetMultiJvmNode5 extends LeaderElectionSpec(failureDetectorPuppet = true)
+class LeaderElectionWithFailureDetectorPuppetMultiJvmNode1
+    extends LeaderElectionSpec(failureDetectorPuppet = true)
+class LeaderElectionWithFailureDetectorPuppetMultiJvmNode2
+    extends LeaderElectionSpec(failureDetectorPuppet = true)
+class LeaderElectionWithFailureDetectorPuppetMultiJvmNode3
+    extends LeaderElectionSpec(failureDetectorPuppet = true)
+class LeaderElectionWithFailureDetectorPuppetMultiJvmNode4
+    extends LeaderElectionSpec(failureDetectorPuppet = true)
+class LeaderElectionWithFailureDetectorPuppetMultiJvmNode5
+    extends LeaderElectionSpec(failureDetectorPuppet = true)
 
-class LeaderElectionWithAccrualFailureDetectorMultiJvmNode1 extends LeaderElectionSpec(failureDetectorPuppet = false)
-class LeaderElectionWithAccrualFailureDetectorMultiJvmNode2 extends LeaderElectionSpec(failureDetectorPuppet = false)
-class LeaderElectionWithAccrualFailureDetectorMultiJvmNode3 extends LeaderElectionSpec(failureDetectorPuppet = false)
-class LeaderElectionWithAccrualFailureDetectorMultiJvmNode4 extends LeaderElectionSpec(failureDetectorPuppet = false)
-class LeaderElectionWithAccrualFailureDetectorMultiJvmNode5 extends LeaderElectionSpec(failureDetectorPuppet = false)
+class LeaderElectionWithAccrualFailureDetectorMultiJvmNode1
+    extends LeaderElectionSpec(failureDetectorPuppet = false)
+class LeaderElectionWithAccrualFailureDetectorMultiJvmNode2
+    extends LeaderElectionSpec(failureDetectorPuppet = false)
+class LeaderElectionWithAccrualFailureDetectorMultiJvmNode3
+    extends LeaderElectionSpec(failureDetectorPuppet = false)
+class LeaderElectionWithAccrualFailureDetectorMultiJvmNode4
+    extends LeaderElectionSpec(failureDetectorPuppet = false)
+class LeaderElectionWithAccrualFailureDetectorMultiJvmNode5
+    extends LeaderElectionSpec(failureDetectorPuppet = false)
 
-abstract class LeaderElectionSpec(multiNodeConfig: LeaderElectionMultiNodeConfig)
-  extends MultiNodeSpec(multiNodeConfig)
-  with MultiNodeClusterSpec {
+abstract class LeaderElectionSpec(
+    multiNodeConfig: LeaderElectionMultiNodeConfig)
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
 
-  def this(failureDetectorPuppet: Boolean) = this(LeaderElectionMultiNodeConfig(failureDetectorPuppet))
+  def this(failureDetectorPuppet: Boolean) =
+    this(LeaderElectionMultiNodeConfig(failureDetectorPuppet))
 
   import multiNodeConfig._
 
@@ -72,7 +84,10 @@ abstract class LeaderElectionSpec(multiNodeConfig: LeaderElectionMultiNodeConfig
           val leaderAddress = address(leader)
           enterBarrier("before-shutdown" + n)
           testConductor.exit(leader, 0).await
-          enterBarrier("after-shutdown" + n, "after-unavailable" + n, "after-down" + n, "completed" + n)
+          enterBarrier("after-shutdown" + n,
+                       "after-unavailable" + n,
+                       "after-down" + n,
+                       "completed" + n)
 
         case `leader` ⇒
           enterBarrier("before-shutdown" + n, "after-shutdown" + n)
@@ -84,13 +99,17 @@ abstract class LeaderElectionSpec(multiNodeConfig: LeaderElectionMultiNodeConfig
 
           // detect failure
           markNodeAsUnavailable(leaderAddress)
-          awaitAssert(clusterView.unreachableMembers.map(_.address) should contain(leaderAddress))
+          awaitAssert(
+              clusterView.unreachableMembers.map(_.address) should contain(
+                  leaderAddress))
           enterBarrier("after-unavailable" + n)
 
           // user marks the shutdown leader as DOWN
           cluster.down(leaderAddress)
           // removed
-          awaitAssert(clusterView.unreachableMembers.map(_.address) should not contain (leaderAddress))
+          awaitAssert(
+              clusterView.unreachableMembers.map(_.address) should not contain
+              (leaderAddress))
           enterBarrier("after-down" + n, "completed" + n)
 
         case _ if remainingRoles.contains(myself) ⇒
@@ -98,7 +117,9 @@ abstract class LeaderElectionSpec(multiNodeConfig: LeaderElectionMultiNodeConfig
           val leaderAddress = address(leader)
           enterBarrier("before-shutdown" + n, "after-shutdown" + n)
 
-          awaitAssert(clusterView.unreachableMembers.map(_.address) should contain(leaderAddress))
+          awaitAssert(
+              clusterView.unreachableMembers.map(_.address) should contain(
+                  leaderAddress))
           enterBarrier("after-unavailable" + n)
 
           enterBarrier("after-down" + n)
@@ -108,16 +129,17 @@ abstract class LeaderElectionSpec(multiNodeConfig: LeaderElectionMultiNodeConfig
           assertLeaderIn(remainingRoles)
 
           enterBarrier("completed" + n)
-
       }
     }
 
-    "be able to 're-elect' a single leader after leader has left" taggedAs LongRunningTest in within(30 seconds) {
+    "be able to 're-elect' a single leader after leader has left" taggedAs LongRunningTest in within(
+        30 seconds) {
       shutdownLeaderAndVerifyNewLeader(alreadyShutdown = 0)
       enterBarrier("after-2")
     }
 
-    "be able to 're-elect' a single leader after leader has left (again)" taggedAs LongRunningTest in within(30 seconds) {
+    "be able to 're-elect' a single leader after leader has left (again)" taggedAs LongRunningTest in within(
+        30 seconds) {
       shutdownLeaderAndVerifyNewLeader(alreadyShutdown = 1)
       enterBarrier("after-3")
     }

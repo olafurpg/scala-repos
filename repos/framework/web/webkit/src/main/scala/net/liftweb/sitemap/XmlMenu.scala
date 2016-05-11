@@ -18,19 +18,17 @@ package net.liftweb
 package sitemap
 
 import scala.xml.NodeSeq
-
-
 /**
- * The beginning of an experiment to provide a capability to define
- * the sitemap menu in xml. Currently pretty limited.
- * menu elements have a name attribute, and contain text and link
- * elements, and optionally multiple menu elemnts.
- * The contents of the text element is the menu display x(ht)ml,
- * and the contents of the link element is an array of
- * path components in JSON array syntax.
- *
- * @author nafg
- */
+  * The beginning of an experiment to provide a capability to define
+  * the sitemap menu in xml. Currently pretty limited.
+  * menu elements have a name attribute, and contain text and link
+  * elements, and optionally multiple menu elemnts.
+  * The contents of the text element is the menu display x(ht)ml,
+  * and the contents of the link element is an array of
+  * path components in JSON array syntax.
+  *
+  * @author nafg
+  */
 
 /*
 object XmlMenu {
@@ -42,4 +40,3 @@ object XmlMenu {
       Menu(Loc(name, link, text), apply(m \ "menu") : _*)
   }
 }*/
-

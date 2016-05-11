@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2015, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -23,7 +23,7 @@ trait CollectionsSynchronizedCollectionTest
       override def implementationName: String =
         s"synchronizedCollection(${originalFactory.implementationName})"
 
-      override def empty[E: ClassTag]: ju.Collection[E] =
+      override def empty[E : ClassTag]: ju.Collection[E] =
         ju.Collections.synchronizedCollection(originalFactory.empty[E])
     }
   }
@@ -34,7 +34,8 @@ class CollectionsOnSynchronizedCollectionAbstractListTest
   def originalFactory: CollectionFactory = new AbstractListFactory
 }
 
-class CollectionsOnSynchronizedCollectionArrayListTest extends CollectionsSynchronizedCollectionTest {
+class CollectionsOnSynchronizedCollectionArrayListTest
+    extends CollectionsSynchronizedCollectionTest {
   def originalFactory: CollectionFactory = new ArrayListFactory
 }
 
@@ -69,4 +70,3 @@ class CollectionsOnSynchronizedCollectionArrayDequeTest
   def originalFactory: CollectionFactory =
     new ArrayDequeFactory
 }
-

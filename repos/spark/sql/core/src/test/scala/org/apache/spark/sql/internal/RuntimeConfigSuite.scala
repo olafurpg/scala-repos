@@ -26,10 +26,7 @@ class RuntimeConfigSuite extends SparkFunSuite {
 
   test("set and get") {
     val conf = newConf()
-    conf
-      .set("k1", "v1")
-      .set("k2", 2)
-      .set("k3", value = false)
+    conf.set("k1", "v1").set("k2", 2).set("k3", value = false)
 
     assert(conf.get("k1") == "v1")
     assert(conf.get("k2") == "2")
@@ -57,9 +54,7 @@ class RuntimeConfigSuite extends SparkFunSuite {
 
   test("set and get hadoop configuration") {
     val conf = newConf()
-    conf
-      .setHadoop("k1", "v1")
-      .setHadoop("k2", "v2")
+    conf.setHadoop("k1", "v1").setHadoop("k2", "v2")
 
     assert(conf.getHadoop("k1") == "v1")
     assert(conf.getHadoop("k2") == "v2")

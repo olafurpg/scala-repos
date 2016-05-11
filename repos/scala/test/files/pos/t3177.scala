@@ -6,7 +6,8 @@ object InvariantFunctor {
   import Endo._
 
   implicit val EndoInvariantFunctor = new InvariantFunctor[Endo] {
-    def xmap[A, B](ma: Endo[A], f: A => B, g: B => A): Endo[B] = (b: B) => f(ma(g(b)))
+    def xmap[A, B](ma: Endo[A], f: A => B, g: B => A): Endo[B] =
+      (b: B) => f(ma(g(b)))
   }
 
   // The definition about fails with:
@@ -16,8 +17,6 @@ object InvariantFunctor {
   //   anon-type.scala:8: error: not found: type $anon
   //     implicit val EndoInvariantFunctor = new InvariantFunctor[Endo] {
   //                                         ^
-
-
   // These both work:
   // implicit val EndoInvariantFunctorAscribed: InvariantFunctor[Endo] = new InvariantFunctor[Endo] {
   //   def xmap[A, B](ma: Endo[A], f: A => B, g: B => A): Endo[B] = (b: B) => f(ma(g(b)))

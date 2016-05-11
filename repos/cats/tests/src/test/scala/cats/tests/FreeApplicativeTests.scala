@@ -10,13 +10,15 @@ import cats.data.State
 import org.scalacheck.{Arbitrary, Gen}
 
 class FreeApplicativeTests extends CatsSuite {
-  implicit def freeApplicativeArbitrary[F[_], A](implicit F: Arbitrary[F[A]], A: Arbitrary[A]): Arbitrary[FreeApplicative[F, A]] =
+  implicit def freeApplicativeArbitrary[F[_], A](
+      implicit F: Arbitrary[F[A]],
+      A: Arbitrary[A]): Arbitrary[FreeApplicative[F, A]] =
     Arbitrary(
-      Gen.oneOf(
-        A.arbitrary.map(FreeApplicative.pure[F, A]),
-        F.arbitrary.map(FreeApplicative.lift[F, A])))
+        Gen.oneOf(A.arbitrary.map(FreeApplicative.pure[F, A]),
+                  F.arbitrary.map(FreeApplicative.lift[F, A])))
 
-  implicit def freeApplicativeEq[S[_]: Applicative, A](implicit SA: Eq[S[A]]): Eq[FreeApplicative[S, A]] =
+  implicit def freeApplicativeEq[S[_]: Applicative, A](
+      implicit SA: Eq[S[A]]): Eq[FreeApplicative[S, A]] =
     new Eq[FreeApplicative[S, A]] {
       def eqv(a: FreeApplicative[S, A], b: FreeApplicative[S, A]): Boolean = {
         val nt = NaturalTransformation.id[S]
@@ -24,10 +26,15 @@ class FreeApplicativeTests extends CatsSuite {
       }
     }
 
-  implicit val iso = CartesianTests.Isomorphisms.invariant[FreeApplicative[Option, ?]]
+  implicit val iso =
+    CartesianTests.Isomorphisms.invariant[FreeApplicative[Option, ?]]
 
-  checkAll("FreeApplicative[Option, ?]", ApplicativeTests[FreeApplicative[Option, ?]].applicative[Int, Int, Int])
-  checkAll("Monad[FreeApplicative[Option, ?]]", SerializableTests.serializable(Applicative[FreeApplicative[Option, ?]]))
+  checkAll(
+      "FreeApplicative[Option, ?]",
+      ApplicativeTests[FreeApplicative[Option, ?]].applicative[Int, Int, Int])
+  checkAll(
+      "Monad[FreeApplicative[Option, ?]]",
+      SerializableTests.serializable(Applicative[FreeApplicative[Option, ?]]))
 
   test("FreeApplicative#fold") {
     val n = 2
@@ -38,7 +45,7 @@ class FreeApplicativeTests extends CatsSuite {
     val y = FreeApplicative.pure[Option, Int](n)
     val f = x.map(i => (j: Int) => i + j)
     val r = y.ap(f)
-    r.fold should === (Apply[Option].map2(o1, o2)(_ + _))
+    r.fold should ===(Apply[Option].map2(o1, o2)(_ + _))
   }
 
   test("FreeApplicative#compile") {
@@ -48,7 +55,7 @@ class FreeApplicativeTests extends CatsSuite {
     val nt = NaturalTransformation.id[Id]
     val r1 = y.ap(f)
     val r2 = r1.compile(nt)
-    r1.foldMap(nt) should === (r2.foldMap(nt))
+    r1.foldMap(nt) should ===(r2.foldMap(nt))
   }
 
   test("FreeApplicative#monad") {
@@ -57,11 +64,10 @@ class FreeApplicativeTests extends CatsSuite {
     val f = x.map(i => (j: Int) => i + j)
     val r1 = y.ap(f)
     val r2 = r1.monad
-    val nt =
-      new NaturalTransformation[Id, Id] {
-        def apply[A](fa: Id[A]): Id[A] = fa
-      }
-    r1.foldMap(nt) should === (r2.foldMap(nt))
+    val nt = new NaturalTransformation[Id, Id] {
+      def apply[A](fa: Id[A]): Id[A] = fa
+    }
+    r1.foldMap(nt) should ===(r2.foldMap(nt))
   }
 
   // Ensure that syntax and implicit resolution work as expected.
@@ -81,7 +87,7 @@ class FreeApplicativeTests extends CatsSuite {
     }
 
     val fli1 = FreeApplicative.lift[List, Int](List(1, 3, 5, 7))
-    fli1.analyze[G[Int]](countingNT) should === (List(4))
+    fli1.analyze[G[Int]](countingNT) should ===(List(4))
 
     val fli2 = FreeApplicative.lift[List, Int](List.empty)
     fli2.analyze[G[Int]](countingNT) should ===(List(0))
@@ -99,7 +105,7 @@ class FreeApplicativeTests extends CatsSuite {
     type Tracked[A] = State[String, A]
 
     val f: Foo ~> Tracked = new (Foo ~> Tracked) {
-      def apply[A](fa: Foo[A]): Tracked[A] = State[String, A]{ s0 =>
+      def apply[A](fa: Foo[A]): Tracked[A] = State[String, A] { s0 =>
         (s0 + fa.toString + ";", fa.getA)
       }
     }
@@ -110,8 +116,8 @@ class FreeApplicativeTests extends CatsSuite {
     val z1: Dsl[Long] = Apply[Dsl].map2(x, y)((x, y) => x.toLong + y)
     val z2: Dsl[Long] = Apply[Dsl].map2(y, x)((y, x) => x.toLong + y)
 
-    z1.foldMap(f).run("").value should === (("Bar(3);Baz(5);", 8L))
-    z2.foldMap(f).run("").value should === (("Baz(5);Bar(3);", 8L))
+    z1.foldMap(f).run("").value should ===(("Bar(3);Baz(5);", 8L))
+    z2.foldMap(f).run("").value should ===(("Baz(5);Bar(3);", 8L))
   }
 
   test("analyze order of effects - regression check for #799") {
@@ -125,6 +131,6 @@ class FreeApplicativeTests extends CatsSuite {
       def apply[A](a: A): String = a.toString
     }
 
-    z.analyze(asString) should === ("xy")
+    z.analyze(asString) should ===("xy")
   }
 }

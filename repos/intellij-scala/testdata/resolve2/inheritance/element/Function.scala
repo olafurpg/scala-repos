@@ -3,5 +3,5 @@ class C1 {
 }
 
 class C2 extends C1 {
-  println(/* line: 2 */ f)
+  println( /* line: 2 */ f)
 }

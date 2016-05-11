@@ -93,7 +93,9 @@ object Test extends App {
   locally(sym.isLocal: Boolean)
   locally(sym.isOverride: Boolean)
   locally(tsym.isSkolem: Boolean)
-  locally(manifestToTypeTag(mirror, manifest): scala.reflect.api.Universe#TypeTag[Int])
+  locally(
+      manifestToTypeTag(mirror, manifest): scala.reflect.api.Universe#TypeTag[
+          Int])
   locally(treeBuild.mkAttributedIdent(sym): RefTree)
   locally(treeBuild.mkAttributedQualifier(tpe): Tree)
   locally(treeBuild.mkAttributedQualifier(tpe, sym): Tree)
@@ -101,7 +103,10 @@ object Test extends App {
   locally(treeBuild.mkAttributedRef(sym): RefTree)
   locally(treeBuild.mkAttributedSelect(tree, sym): RefTree)
   locally(treeBuild.mkAttributedThis(sym): This)
-  locally(mkImporter(scala.reflect.runtime.universe): Importer{val from: scala.reflect.runtime.universe.type})
+  locally(
+      mkImporter(scala.reflect.runtime.universe): Importer {
+    val from: scala.reflect.runtime.universe.type
+  })
   locally(treeBuild.mkMethodCall(sym, trees): Tree)
   locally(treeBuild.mkMethodCall(sym, tpes, trees): Tree)
   locally(treeBuild.mkMethodCall(sym, name, trees): Tree)
@@ -115,7 +120,9 @@ object Test extends App {
   locally(treeBuild.mkUnattributedRef(sym): RefTree)
   locally(sym.newClassSymbol(tyname, pos, flags): ClassSymbol)
   locally(sym.newMethodSymbol(tename, pos, flags): MethodSymbol)
-  locally(sym.newModuleAndClassSymbol(name, pos, flags): (ModuleSymbol, ClassSymbol))
+  locally(
+      sym.newModuleAndClassSymbol(name, pos, flags): (ModuleSymbol,
+      ClassSymbol))
   locally(newScopeWith(sym, sym, sym): Scope)
   locally(sym.newTermSymbol(tename, pos, flags): TermSymbol)
   locally(sym.newTypeSymbol(tyname, pos, flags): TypeSymbol)

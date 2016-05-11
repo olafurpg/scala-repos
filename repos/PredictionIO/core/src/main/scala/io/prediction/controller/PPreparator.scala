@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.core.BasePreparator
@@ -27,8 +26,7 @@ import org.apache.spark.SparkContext
   * @tparam PD Prepared data class.
   * @group Preparator
   */
-abstract class PPreparator[TD, PD]
-  extends BasePreparator[TD, PD] {
+abstract class PPreparator[TD, PD] extends BasePreparator[TD, PD] {
 
   def prepareBase(sc: SparkContext, td: TD): PD = {
     prepare(sc, td)

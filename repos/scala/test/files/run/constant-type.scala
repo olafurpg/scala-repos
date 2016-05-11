@@ -6,7 +6,8 @@ import scala.tools.partest.ReplTest
 // as explained in the commit message, Type.erasure won't do for this test
 // because it does some postprocessing to the result of transformedType
 object Test extends ReplTest {
-  def code = """
+  def code =
+    """
 :power
 val s = transformedType(StringClass.toType).asInstanceOf[Type]
 { println(exitingPhase(currentRun.erasurePhase)(ConstantType(Constant(s)))) }

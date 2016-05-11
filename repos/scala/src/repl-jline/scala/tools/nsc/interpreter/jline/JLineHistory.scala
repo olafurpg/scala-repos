@@ -14,10 +14,9 @@ import jconsole.history.{History => JHistory}
 import scala.tools.nsc.interpreter
 import scala.tools.nsc.interpreter.session.{History, SimpleHistory}
 
-
 /** A straight scalafication of the jline interface which mixes
- *  in the sparse jline-independent one too.
- */
+  *  in the sparse jline-independent one too.
+  */
 trait JLineHistory extends JHistory with History {
   def size: Int
   def isEmpty: Boolean
@@ -56,7 +55,8 @@ object JLineHistory {
         addLineToFile(item)
       }
     }
-    override def toString = "History(size = " + size + ", index = " + index + ")"
+    override def toString =
+      "History(size = " + size + ", index = " + index + ")"
 
     import scala.collection.JavaConverters._
 
@@ -67,11 +67,16 @@ object JLineHistory {
       override def toString = value.toString
     }
 
-    private def toEntries(): Seq[JEntry] = buf.zipWithIndex map { case (x, i) => Entry(i, x)}
-    def entries(idx: Int): JListIterator[JEntry] = toEntries().asJava.listIterator(idx)
+    private def toEntries(): Seq[JEntry] = buf.zipWithIndex map {
+      case (x, i) => Entry(i, x)
+    }
+    def entries(idx: Int): JListIterator[JEntry] =
+      toEntries().asJava.listIterator(idx)
     def entries(): JListIterator[JEntry] = toEntries().asJava.listIterator()
     def iterator: JIterator[JEntry] = toEntries().iterator.asJava
   }
 
-  def apply(): History = try new JLineFileHistory catch { case x: Exception => new SimpleHistory() }
+  def apply(): History = try new JLineFileHistory catch {
+    case x: Exception => new SimpleHistory()
+  }
 }

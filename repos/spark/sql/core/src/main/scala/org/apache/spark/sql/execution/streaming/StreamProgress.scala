@@ -20,14 +20,17 @@ package org.apache.spark.sql.execution.streaming
 import scala.collection.mutable
 
 /**
- * A helper class that looks like a Map[Source, Offset].
- */
+  * A helper class that looks like a Map[Source, Offset].
+  */
 class StreamProgress {
   private val currentOffsets = new mutable.HashMap[Source, Offset]
 
   private[streaming] def update(source: Source, newOffset: Offset): Unit = {
-    currentOffsets.get(source).foreach(old =>
-      assert(newOffset > old, s"Stream going backwards $newOffset -> $old"))
+    currentOffsets
+      .get(source)
+      .foreach(old =>
+            assert(
+                newOffset > old, s"Stream going backwards $newOffset -> $old"))
     currentOffsets.put(source, newOffset)
   }
 
@@ -35,8 +38,10 @@ class StreamProgress {
     update(newOffset._1, newOffset._2)
 
   private[streaming] def apply(source: Source): Offset = currentOffsets(source)
-  private[streaming] def get(source: Source): Option[Offset] = currentOffsets.get(source)
-  private[streaming] def contains(source: Source): Boolean = currentOffsets.contains(source)
+  private[streaming] def get(source: Source): Option[Offset] =
+    currentOffsets.get(source)
+  private[streaming] def contains(source: Source): Boolean =
+    currentOffsets.contains(source)
 
   private[streaming] def ++(updates: Map[Source, Offset]): StreamProgress = {
     val updated = new StreamProgress
@@ -46,9 +51,9 @@ class StreamProgress {
   }
 
   /**
-   * Used to create a new copy of this [[StreamProgress]]. While this class is currently mutable,
-   * it should be copied before being passed to user code.
-   */
+    * Used to create a new copy of this [[StreamProgress]]. While this class is currently mutable,
+    * it should be copied before being passed to user code.
+    */
   private[streaming] def copy(): StreamProgress = {
     val copied = new StreamProgress
     currentOffsets.foreach(copied.update)
@@ -60,7 +65,7 @@ class StreamProgress {
   }
 
   override def toString: String =
-    currentOffsets.map { case (k, v) => s"$k: $v"}.mkString("{", ",", "}")
+    currentOffsets.map { case (k, v) => s"$k: $v" }.mkString("{", ",", "}")
 
   override def equals(other: Any): Boolean = other match {
     case s: StreamProgress => currentOffsets == s.currentOffsets

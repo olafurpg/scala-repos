@@ -11,15 +11,16 @@ import opt.BytecodeUtils._
 import AliasSet.SmallBitSet
 
 /**
- * A subclass of Frame that tracks aliasing of values stored in local variables and on the stack.
- *
- * Note: an analysis tracking aliases is roughly 5x slower than a usual analysis (assuming a simple
- * value domain with a fast merge function). For example, nullness analysis is roughly 5x slower
- * than a BasicValue analysis.
- *
- * See the doc of package object `analysis` for some notes on the performance of alias analysis.
- */
-class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLocals, nStack) {
+  * A subclass of Frame that tracks aliasing of values stored in local variables and on the stack.
+  *
+  * Note: an analysis tracking aliases is roughly 5x slower than a usual analysis (assuming a simple
+  * value domain with a fast merge function). For example, nullness analysis is roughly 5x slower
+  * than a BasicValue analysis.
+  *
+  * See the doc of package object `analysis` for some notes on the performance of alias analysis.
+  */
+class AliasingFrame[V <: Value](nLocals: Int, nStack: Int)
+    extends Frame[V](nLocals, nStack) {
   import Opcodes._
 
   // Auxiliary constructor required for implementing `AliasingAnalyzer.newFrame`
@@ -28,23 +29,29 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
     init(src)
   }
 
-  override def toString: String = super.toString + " - " + aliases.toList.filter(s => s != null && s.size > 1).map(_.toString).distinct.mkString(",")
+  override def toString: String =
+    super.toString + " - " + aliases.toList
+      .filter(s => s != null && s.size > 1)
+      .map(_.toString)
+      .distinct
+      .mkString(",")
 
   /**
-   * For every value the set of values that are aliases of it.
-   *
-   * Invariants:
-   *  - If `aliases(i) == null` then i has no aliases. This is equivalent to having
-   *    `aliases(i) == SingletonSet(i)`.
-   *  - If `aliases(i) != null` then `aliases(i) contains i`.
-   *  - If `aliases(i) contains j` then `aliases(i) eq aliases(j)`, i.e., they are references to the
-   *    same (mutable) AliasSet.
-   */
-  val aliases: Array[AliasSet] = new Array[AliasSet](getLocals + getMaxStackSize)
+    * For every value the set of values that are aliases of it.
+    *
+    * Invariants:
+    *  - If `aliases(i) == null` then i has no aliases. This is equivalent to having
+    *    `aliases(i) == SingletonSet(i)`.
+    *  - If `aliases(i) != null` then `aliases(i) contains i`.
+    *  - If `aliases(i) contains j` then `aliases(i) eq aliases(j)`, i.e., they are references to the
+    *    same (mutable) AliasSet.
+    */
+  val aliases: Array[AliasSet] =
+    new Array[AliasSet](getLocals + getMaxStackSize)
 
   /**
-   * The set of aliased values for a given entry in the `values` array.
-   */
+    * The set of aliased values for a given entry in the `values` array.
+    */
   def aliasesOf(entry: Int): AliasSet = {
     if (aliases(entry) != null) aliases(entry)
     else {
@@ -55,10 +62,10 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
   }
 
   /**
-   * Define a new alias. For example, an assignment
-   *   b = a
-   * adds b to the set of aliases of a.
-   */
+    * Define a new alias. For example, an assignment
+    *   b = a
+    * adds b to the set of aliases of a.
+    */
   private def newAlias(assignee: Int, source: Int): Unit = {
     removeAlias(assignee)
     val sourceAliases = aliasesOf(source)
@@ -67,11 +74,11 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
   }
 
   /**
-   * Remove an alias. For example, an assignment
-   *   a = someUnknownValue()
-   * removes a from its former alias set.
-   * As another example, stack values are removed from their alias sets when being consumed.
-   */
+    * Remove an alias. For example, an assignment
+    *   a = someUnknownValue()
+    * removes a from its former alias set.
+    * As another example, stack values are removed from their alias sets when being consumed.
+    */
   private def removeAlias(assignee: Int): Unit = {
     if (aliases(assignee) != null) {
       aliases(assignee) -= assignee
@@ -80,8 +87,8 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
   }
 
   /**
-   * Define the alias set for a given value.
-   */
+    * Define the alias set for a given value.
+    */
   private def setAliasSet(assignee: Int, set: AliasSet): Unit = {
     if (aliases(assignee) != null) {
       aliases(assignee) -= assignee
@@ -89,12 +96,14 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
     aliases(assignee) = set
   }
 
-  override def execute(insn: AbstractInsnNode, interpreter: Interpreter[V]): Unit = {
+  override def execute(
+      insn: AbstractInsnNode, interpreter: Interpreter[V]): Unit = {
     // Make the extension methods easier to use (otherwise we have to repeat `this`.stackTop)
     def stackTop: Int = this.stackTop
     def peekStack(n: Int): V = this.peekStack(n)
 
-    val prodCons = InstructionStackEffect.forAsmAnalysis(insn, this) // needs to be called before super.execute, see its doc
+    val prodCons =
+      InstructionStackEffect.forAsmAnalysis(insn, this) // needs to be called before super.execute, see its doc
     val consumed = InstructionStackEffect.cons(prodCons)
     val produced = InstructionStackEffect.prod(prodCons)
 
@@ -102,7 +111,8 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
 
     (insn.getOpcode: @switch) match {
       case ILOAD | LLOAD | FLOAD | DLOAD | ALOAD =>
-        newAlias(assignee = stackTop, source = insn.asInstanceOf[VarInsnNode].`var`)
+        newAlias(
+            assignee = stackTop, source = insn.asInstanceOf[VarInsnNode].`var`)
 
       case DUP =>
         val top = stackTop
@@ -110,7 +120,7 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
 
       case DUP_X1 =>
         val top = stackTop
-        newAlias(assignee = top,     source = top - 1)
+        newAlias(assignee = top, source = top - 1)
         newAlias(assignee = top - 1, source = top - 2)
         newAlias(assignee = top - 2, source = top)
 
@@ -119,7 +129,7 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
         // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.5.dup_x2
         val isSize2 = peekStack(1).getSize == 2
         val top = stackTop
-        newAlias(assignee = top,     source = top - 1)
+        newAlias(assignee = top, source = top - 1)
         newAlias(assignee = top - 1, source = top - 2)
         if (isSize2) {
           // Size 2 values on the stack only take one slot in the `values` array
@@ -136,18 +146,18 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
           newAlias(assignee = top, source = top - 1)
         } else {
           newAlias(assignee = top - 1, source = top - 3)
-          newAlias(assignee = top,     source = top - 2)
+          newAlias(assignee = top, source = top - 2)
         }
 
       case DUP2_X1 =>
         val isSize2 = peekStack(0).getSize == 2
         val top = stackTop
         if (isSize2) {
-          newAlias(assignee = top,     source = top - 1)
+          newAlias(assignee = top, source = top - 1)
           newAlias(assignee = top - 1, source = top - 2)
           newAlias(assignee = top - 2, source = top)
         } else {
-          newAlias(assignee = top,     source = top - 2)
+          newAlias(assignee = top, source = top - 2)
           newAlias(assignee = top - 1, source = top - 3)
           newAlias(assignee = top - 2, source = top - 4)
           newAlias(assignee = top - 4, source = top)
@@ -159,7 +169,7 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
         // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.5.dup2_x2
         val v1isSize2 = peekStack(0).getSize == 2
         if (v1isSize2) {
-          newAlias(assignee = top,     source = top - 1)
+          newAlias(assignee = top, source = top - 1)
           newAlias(assignee = top - 1, source = top - 2)
           val v2isSize2 = peekStack(1).getSize == 2
           if (v2isSize2) {
@@ -171,7 +181,7 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
             newAlias(assignee = top - 3, source = top)
           }
         } else {
-          newAlias(assignee = top,     source = top - 2)
+          newAlias(assignee = top, source = top - 2)
           newAlias(assignee = top - 1, source = top - 3)
           newAlias(assignee = top - 2, source = top - 4)
           val v3isSize2 = peekStack(2).getSize == 2
@@ -222,8 +232,7 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
             newAlias(assignee = local, source = stackTopBefore)
             // if the value written is size 2, it overwrites the subsequent slot, which is then no
             // longer an alias of anything. see the corresponding case in `Frame.execute`.
-            if (getLocal(local).getSize == 2)
-              removeAlias(local + 1)
+            if (getLocal(local).getSize == 2) removeAlias(local + 1)
 
             // if the value at the preceding index is size 2, it is no longer valid, so we remove its
             // aliasing. see corresponding case in `Frame.execute`
@@ -240,17 +249,16 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
         // Example: iadd
         //  - before: local1, local2, stack1, consumed1, consumed2
         //  - after:  local1, local2, stack1, produced1             // stackTop = 3
-        val firstConsumed = stackTop - produced + 1                 // firstConsumed = 3
-        for (i <- 0 until consumed)
-          removeAlias(firstConsumed + i)                            // remove aliases for 3 and 4
+        val firstConsumed = stackTop - produced + 1 // firstConsumed = 3
+        for (i <- 0 until consumed) removeAlias(firstConsumed + i) // remove aliases for 3 and 4
     }
   }
 
   /**
-   * When entering an exception handler, all values are dropped from the stack (and the exception
-   * value is pushed). The ASM analyzer invokes `firstHandlerInstructionFrame.clearStack()`. To
-   * ensure consistent aliasing sets, we need to remove the dropped values from aliasing sets.
-   */
+    * When entering an exception handler, all values are dropped from the stack (and the exception
+    * value is pushed). The ASM analyzer invokes `firstHandlerInstructionFrame.clearStack()`. To
+    * ensure consistent aliasing sets, we need to remove the dropped values from aliasing sets.
+    */
   override def clearStack(): Unit = {
     var i = getLocals
     val end = i + getStackSize
@@ -262,21 +270,22 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
   }
 
   /**
-   * Merge the AliasingFrame `other` into this AliasingFrame.
-   *
-   * Aliases that are common in both frames are kept. Example:
-   *
-   * var x, y = null
-   * if (...) {
-   *   x = a
-   *   y = a     // (x, y, a) are aliases
-   * } else {
-   *   x = a
-   *   y = b     // (x, a) and (y, b)
-   * }
-   * [...]       // (x, a) -- merge of ((x, y, a)) and ((x, a), (y, b))
-   */
-  override def merge(other: Frame[_ <: V], interpreter: Interpreter[V]): Boolean = {
+    * Merge the AliasingFrame `other` into this AliasingFrame.
+    *
+    * Aliases that are common in both frames are kept. Example:
+    *
+    * var x, y = null
+    * if (...) {
+    *   x = a
+    *   y = a     // (x, y, a) are aliases
+    * } else {
+    *   x = a
+    *   y = b     // (x, a) and (y, b)
+    * }
+    * [...]       // (x, a) -- merge of ((x, y, a)) and ((x, a), (y, b))
+    */
+  override def merge(
+      other: Frame[_ <: V], interpreter: Interpreter[V]): Boolean = {
     // merge is the main performance hot spot of a data flow analysis.
 
     // in nullness analysis, super.merge (which actually merges the nullness values) takes 20% of
@@ -311,7 +320,8 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
             // The iterator yields elements that are in `thisAliases` but not in `otherAliases`.
             // As a side-effect, for every index `i` that is in both alias sets, the iterator sets
             // `knownOk(i) = true`: the alias sets for these values don't need to be merged again.
-            val thisNotOtherIt = AliasSet.andNotIterator(thisAliases, otherAliases, knownOk)
+            val thisNotOtherIt =
+              AliasSet.andNotIterator(thisAliases, otherAliases, knownOk)
             if (thisNotOtherIt.hasNext) {
               aliasesChanged = true
               val newSet = AliasSet.empty
@@ -332,7 +342,7 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
 
   private def min(s: SmallBitSet) = {
     var r = s.a
-    if (             s.b < r) r = s.b
+    if (s.b < r) r = s.b
     if (s.c != -1 && s.c < r) r = s.c
     if (s.d != -1 && s.d < r) r = s.d
     r
@@ -340,7 +350,11 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int) extends Frame[V](nLoc
 
   override def init(src: Frame[_ <: V]): Frame[V] = {
     super.init(src) // very quick (just an arraycopy)
-    System.arraycopy(src.asInstanceOf[AliasingFrame[_]].aliases, 0, aliases, 0, aliases.length) // also quick
+    System.arraycopy(src.asInstanceOf[AliasingFrame[_]].aliases,
+                     0,
+                     aliases,
+                     0,
+                     aliases.length) // also quick
 
     val newSets = mutable.HashMap.empty[AliasSet, AliasSet]
 
@@ -400,78 +414,88 @@ object AliasingFrame {
 }
 
 /**
- * An analyzer that uses AliasingFrames instead of bare Frames. This can be used when an analysis
- * needs to track aliases, but doesn't require a more specific Frame subclass.
- */
-class AliasingAnalyzer[V <: Value](interpreter: Interpreter[V]) extends Analyzer[V](interpreter) {
-  override def newFrame(nLocals: Int, nStack: Int): AliasingFrame[V] = new AliasingFrame(nLocals, nStack)
-  override def newFrame(src: Frame[_ <: V]): AliasingFrame[V] = new AliasingFrame(src)
+  * An analyzer that uses AliasingFrames instead of bare Frames. This can be used when an analysis
+  * needs to track aliases, but doesn't require a more specific Frame subclass.
+  */
+class AliasingAnalyzer[V <: Value](interpreter: Interpreter[V])
+    extends Analyzer[V](interpreter) {
+  override def newFrame(nLocals: Int, nStack: Int): AliasingFrame[V] =
+    new AliasingFrame(nLocals, nStack)
+  override def newFrame(src: Frame[_ <: V]): AliasingFrame[V] =
+    new AliasingFrame(src)
 }
 
 /**
- * An iterator over Int (required to prevent boxing the result of next).
- */
+  * An iterator over Int (required to prevent boxing the result of next).
+  */
 abstract class IntIterator extends Iterator[Int] {
   def hasNext: Boolean
   def next(): Int
 }
 
 /**
- * An efficient mutable bit set.
- *
- * @param set  Either a SmallBitSet or an Array[Long]
- * @param size The size of the set, useful for performance of certain operations
- */
+  * An efficient mutable bit set.
+  *
+  * @param set  Either a SmallBitSet or an Array[Long]
+  * @param size The size of the set, useful for performance of certain operations
+  */
 class AliasSet(var set: Object /*SmallBitSet | Array[Long]*/, var size: Int) {
   import AliasSet._
 
   override def toString: String = iterator.toSet.mkString("<", ",", ">")
 
   /**
-   * An iterator for the elements of this bit set. Note that only one iterator can be used at a
-   * time. Also make sure not to change the underlying AliasSet during iteration.
-   */
+    * An iterator for the elements of this bit set. Note that only one iterator can be used at a
+    * time. Also make sure not to change the underlying AliasSet during iteration.
+    */
   def iterator: IntIterator = andNotIterator(this, empty, null)
 
   def +=(value: Int): Unit = this.set match {
-    case s: SmallBitSet => (size: @switch) match {
-      case 0 =>                                                     s.a = value; size = 1
-      case 1 => if (value != s.a)                                 { s.b = value; size = 2 }
-      case 2 => if (value != s.a && value != s.b)                 { s.c = value; size = 3 }
-      case 3 => if (value != s.a && value != s.b && value != s.c) { s.d = value; size = 4 }
-      case 4 =>
-        if (value != s.a && value != s.b && value != s.c && value != s.d) {
-          this.set = bsEmpty
-          this.size = 0
-          bsAdd(this, s.a)
-          bsAdd(this, s.b)
-          bsAdd(this, s.c)
-          bsAdd(this, s.d)
-          bsAdd(this, value)
-        }
-    }
+    case s: SmallBitSet =>
+      (size: @switch) match {
+        case 0 => s.a = value; size = 1
+        case 1 => if (value != s.a) { s.b = value; size = 2 }
+        case 2 => if (value != s.a && value != s.b) { s.c = value; size = 3 }
+        case 3 =>
+          if (value != s.a && value != s.b && value != s.c) {
+            s.d = value; size = 4
+          }
+        case 4 =>
+          if (value != s.a && value != s.b && value != s.c && value != s.d) {
+            this.set = bsEmpty
+            this.size = 0
+            bsAdd(this, s.a)
+            bsAdd(this, s.b)
+            bsAdd(this, s.c)
+            bsAdd(this, s.d)
+            bsAdd(this, value)
+          }
+      }
     case bits: Array[Long] =>
       bsAdd(this, value)
   }
 
   def -=(value: Int): Unit = this.set match {
-    case s: SmallBitSet => (size: @switch) match {
-      case 0 =>
-      case 1 =>
-        if      (value == s.a) { s.a = -1; size = 0 }
-      case 2 =>
-        if      (value == s.a) { s.a = s.b; s.b = -1; size = 1 }
-        else if (value == s.b) {            s.b = -1; size = 1 }
-      case 3 =>
-        if      (value == s.a) { s.a = s.b; s.b = s.c; s.c = -1; size = 2 }
-        else if (value == s.b) {            s.b = s.c; s.c = -1; size = 2 }
-        else if (value == s.c) {                       s.c = -1; size = 2 }
-      case 4 =>
-        if      (value == s.a) { s.a = s.b; s.b = s.c; s.c = s.d; s.d = -1; size = 3 }
-        else if (value == s.b) {            s.b = s.c; s.c = s.d; s.d = -1; size = 3 }
-        else if (value == s.c) {                       s.c = s.d; s.d = -1; size = 3 }
-        else if (value == s.d) {                                  s.d = -1; size = 3 }
-    }
+    case s: SmallBitSet =>
+      (size: @switch) match {
+        case 0 =>
+        case 1 =>
+          if (value == s.a) { s.a = -1; size = 0 }
+        case 2 =>
+          if (value == s.a) { s.a = s.b; s.b = -1; size = 1 } else if (value == s.b) {
+            s.b = -1; size = 1
+          }
+        case 3 =>
+          if (value == s.a) { s.a = s.b; s.b = s.c; s.c = -1; size = 2 } else if (value == s.b) {
+            s.b = s.c; s.c = -1; size = 2
+          } else if (value == s.c) { s.c = -1; size = 2 }
+        case 4 =>
+          if (value == s.a) {
+            s.a = s.b; s.b = s.c; s.c = s.d; s.d = -1; size = 3
+          } else if (value == s.b) { s.b = s.c; s.c = s.d; s.d = -1; size = 3 } else if (value == s.c) {
+            s.c = s.d; s.d = -1; size = 3
+          } else if (value == s.d) { s.d = -1; size = 3 }
+      }
     case bits: Array[Long] =>
       bsRemove(this, value)
       if (this.size == 4)
@@ -541,8 +565,8 @@ object AliasSet {
 //  var sizesHist: Array[Int] = new Array[Int](1000)
 
   /**
-   * Convert a bit array to a SmallBitSet. Requires the bit array to contain exactly four bits.
-   */
+    * Convert a bit array to a SmallBitSet. Requires the bit array to contain exactly four bits.
+    */
   def bsToSmall(bits: Array[Long]): SmallBitSet = {
     var a = -1
     var b = -1
@@ -562,9 +586,11 @@ object AliasSet {
   }
 
   /**
-   * An iterator that yields the elements that are in one bit set and not in another (&~).
-   */
-  private class AndNotIt(setA: AliasSet, setB: AliasSet, thisAndOther: Array[Boolean]) extends IntIterator {
+    * An iterator that yields the elements that are in one bit set and not in another (&~).
+    */
+  private class AndNotIt(
+      setA: AliasSet, setB: AliasSet, thisAndOther: Array[Boolean])
+      extends IntIterator {
     // values in the first bit set
     private var a, b, c, d = -1
     private var xs: Array[Long] = null
@@ -593,12 +619,15 @@ object AliasSet {
 
     // for each value that exists both in this AND (&) the other bit, `thisAndOther` is set to true.
     // hacky side-effect, used for performance of AliasingFrame.merge.
-    private def setThisAndOther(x: Int) = if (thisAndOther != null) thisAndOther(x) = true
+    private def setThisAndOther(x: Int) =
+      if (thisAndOther != null) thisAndOther(x) = true
 
     private def checkABCD(x: Int, num: Int): Boolean = {
       // assert(x == a && num == 1 || x == b && num == 2 || ...)
       x != -1 && {
-        val otherHasA = x == notA || x == notB  || x == notC || x == notD || (notXs != null && bsContains(notXs, x))
+        val otherHasA =
+          x == notA || x == notB || x == notC || x == notD ||
+          (notXs != null && bsContains(notXs, x))
         if (otherHasA) setThisAndOther(x)
         else abcdNext = x
         (num: @switch) match {
@@ -618,15 +647,19 @@ object AliasSet {
 
         while (i < end && {
           val index = i >> 6
-          if (xs(index) == 0l) { // boom. for nullness, this saves 35% of the overall analysis time.
-            i = ((index + 1) << 6) - 1 // -1 required because i is incremented in the loop body
+          if (xs(index) == 0l) {
+            // boom. for nullness, this saves 35% of the overall analysis time.
+            i = ((index + 1) << 6) -
+            1 // -1 required because i is incremented in the loop body
             true
           } else {
             val mask = 1l << i
             // if (mask > xs(index)) we could also advance i to the next value, but that didn't pay off in benchmarks
             val thisHasI = (xs(index) & mask) != 0l
             !thisHasI || {
-              val otherHasI = i == notA || i == notB || i == notC || i == notD || (notXs != null && index < notXs.length && (notXs(index) & mask) != 0l)
+              val otherHasI =
+                i == notA || i == notB || i == notC || i == notD ||
+                (notXs != null && index < notXs.length && (notXs(index) & mask) != 0l)
               if (otherHasI) setThisAndOther(i)
               otherHasI
             }
@@ -641,7 +674,9 @@ object AliasSet {
     // this is the main hot spot of alias analysis. for nullness, 38% of the overall analysis time
     // is spent here. within hasNext, almost the entire time is spent in `checkXs`.
     //
-    def hasNext: Boolean = iValid || abcdNext != -1 || checkABCD(a, 1) || checkABCD(b, 2) || checkABCD(c, 3) || checkABCD(d, 4) || checkXs
+    def hasNext: Boolean =
+      iValid || abcdNext != -1 || checkABCD(a, 1) || checkABCD(b, 2) ||
+      checkABCD(c, 3) || checkABCD(d, 4) || checkXs
 
     def next(): Int = {
       if (hasNext) {
@@ -666,10 +701,12 @@ object AliasSet {
 //  }
 
   /**
-   * An iterator returning the elements in a that are not also in b (a &~ b).
-   *
-   * If `thisAndOther` is non-null, the iterator sets thisAndOther(i) to true for every value that
-   * is both in a and b (&).
-   */
-  def andNotIterator(a: AliasSet, b: AliasSet, thisAndOther: Array[Boolean]): IntIterator = new AndNotIt(a, b, thisAndOther)
+    * An iterator returning the elements in a that are not also in b (a &~ b).
+    *
+    * If `thisAndOther` is non-null, the iterator sets thisAndOther(i) to true for every value that
+    * is both in a and b (&).
+    */
+  def andNotIterator(
+      a: AliasSet, b: AliasSet, thisAndOther: Array[Boolean]): IntIterator =
+    new AndNotIt(a, b, thisAndOther)
 }

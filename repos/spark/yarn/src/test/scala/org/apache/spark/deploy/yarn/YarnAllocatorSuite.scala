@@ -47,11 +47,13 @@ class MockResolver extends DNSToSwitchMapping {
   def reloadCachedMappings(names: JList[String]) {}
 }
 
-class YarnAllocatorSuite extends SparkFunSuite with Matchers with BeforeAndAfterEach {
+class YarnAllocatorSuite
+    extends SparkFunSuite with Matchers with BeforeAndAfterEach {
   val conf = new Configuration()
   conf.setClass(
-    CommonConfigurationKeysPublic.NET_TOPOLOGY_NODE_SWITCH_MAPPING_IMPL_KEY,
-    classOf[MockResolver], classOf[DNSToSwitchMapping])
+      CommonConfigurationKeysPublic.NET_TOPOLOGY_NODE_SWITCH_MAPPING_IMPL_KEY,
+      classOf[MockResolver],
+      classOf[DNSToSwitchMapping])
 
   val sparkConf = new SparkConf()
   sparkConf.set("spark.driver.host", "localhost")
@@ -59,7 +61,8 @@ class YarnAllocatorSuite extends SparkFunSuite with Matchers with BeforeAndAfter
   sparkConf.set(SPARK_JARS, Seq("notarealjar.jar"))
   sparkConf.set("spark.yarn.launchContainers", "false")
 
-  val appAttemptId = ApplicationAttemptId.newInstance(ApplicationId.newInstance(0, 0), 0)
+  val appAttemptId =
+    ApplicationAttemptId.newInstance(ApplicationId.newInstance(0, 0), 0)
 
   // Resource returned by YARN.  YARN can give larger containers than requested, so give 6 cores
   // instead of the 5 requested and 3 GB instead of the 2 requested.
@@ -84,166 +87,192 @@ class YarnAllocatorSuite extends SparkFunSuite with Matchers with BeforeAndAfter
     }
   }
 
-  class MockSplitInfo(host: String) extends SplitInfo(null, host, null, 1, null) {
+  class MockSplitInfo(host: String)
+      extends SplitInfo(null, host, null, 1, null) {
     override def equals(other: Any): Boolean = false
   }
 
   def createAllocator(maxExecutors: Int = 5): YarnAllocator = {
-    val args = Array(
-      "--executor-cores", "5",
-      "--executor-memory", "2048",
-      "--jar", "somejar.jar",
-      "--class", "SomeClass")
+    val args = Array("--executor-cores",
+                     "5",
+                     "--executor-memory",
+                     "2048",
+                     "--jar",
+                     "somejar.jar",
+                     "--class",
+                     "SomeClass")
     val sparkConfClone = sparkConf.clone()
     sparkConfClone.set("spark.executor.instances", maxExecutors.toString)
-    new YarnAllocator(
-      "not used",
-      mock(classOf[RpcEndpointRef]),
-      conf,
-      sparkConfClone,
-      rmClient,
-      appAttemptId,
-      new ApplicationMasterArguments(args),
-      new SecurityManager(sparkConf))
+    new YarnAllocator("not used",
+                      mock(classOf[RpcEndpointRef]),
+                      conf,
+                      sparkConfClone,
+                      rmClient,
+                      appAttemptId,
+                      new ApplicationMasterArguments(args),
+                      new SecurityManager(sparkConf))
   }
 
   def createContainer(host: String): Container = {
     val containerId = ContainerId.newInstance(appAttemptId, containerNum)
     containerNum += 1
     val nodeId = NodeId.newInstance(host, 1000)
-    Container.newInstance(containerId, nodeId, "", containerResource, RM_REQUEST_PRIORITY, null)
+    Container.newInstance(
+        containerId, nodeId, "", containerResource, RM_REQUEST_PRIORITY, null)
   }
 
   test("single container allocated") {
     // request a single container and receive it
     val handler = createAllocator(1)
     handler.updateResourceRequests()
-    handler.getNumExecutorsRunning should be (0)
-    handler.getPendingAllocate.size should be (1)
+    handler.getNumExecutorsRunning should be(0)
+    handler.getPendingAllocate.size should be(1)
 
     val container = createContainer("host1")
     handler.handleAllocatedContainers(Array(container))
 
-    handler.getNumExecutorsRunning should be (1)
-    handler.allocatedContainerToHostMap.get(container.getId).get should be ("host1")
-    handler.allocatedHostToContainersMap.get("host1").get should contain (container.getId)
+    handler.getNumExecutorsRunning should be(1)
+    handler.allocatedContainerToHostMap.get(container.getId).get should be(
+        "host1")
+    handler.allocatedHostToContainersMap.get("host1").get should contain(
+        container.getId)
 
-    val size = rmClient.getMatchingRequests(container.getPriority, "host1", containerResource).size
-    size should be (0)
+    val size = rmClient
+      .getMatchingRequests(container.getPriority, "host1", containerResource)
+      .size
+    size should be(0)
   }
 
   test("some containers allocated") {
     // request a few containers and receive some of them
     val handler = createAllocator(4)
     handler.updateResourceRequests()
-    handler.getNumExecutorsRunning should be (0)
-    handler.getPendingAllocate.size should be (4)
+    handler.getNumExecutorsRunning should be(0)
+    handler.getPendingAllocate.size should be(4)
 
     val container1 = createContainer("host1")
     val container2 = createContainer("host1")
     val container3 = createContainer("host2")
-    handler.handleAllocatedContainers(Array(container1, container2, container3))
+    handler.handleAllocatedContainers(
+        Array(container1, container2, container3))
 
-    handler.getNumExecutorsRunning should be (3)
-    handler.allocatedContainerToHostMap.get(container1.getId).get should be ("host1")
-    handler.allocatedContainerToHostMap.get(container2.getId).get should be ("host1")
-    handler.allocatedContainerToHostMap.get(container3.getId).get should be ("host2")
-    handler.allocatedHostToContainersMap.get("host1").get should contain (container1.getId)
-    handler.allocatedHostToContainersMap.get("host1").get should contain (container2.getId)
-    handler.allocatedHostToContainersMap.get("host2").get should contain (container3.getId)
+    handler.getNumExecutorsRunning should be(3)
+    handler.allocatedContainerToHostMap.get(container1.getId).get should be(
+        "host1")
+    handler.allocatedContainerToHostMap.get(container2.getId).get should be(
+        "host1")
+    handler.allocatedContainerToHostMap.get(container3.getId).get should be(
+        "host2")
+    handler.allocatedHostToContainersMap.get("host1").get should contain(
+        container1.getId)
+    handler.allocatedHostToContainersMap.get("host1").get should contain(
+        container2.getId)
+    handler.allocatedHostToContainersMap.get("host2").get should contain(
+        container3.getId)
   }
 
   test("receive more containers than requested") {
     val handler = createAllocator(2)
     handler.updateResourceRequests()
-    handler.getNumExecutorsRunning should be (0)
-    handler.getPendingAllocate.size should be (2)
+    handler.getNumExecutorsRunning should be(0)
+    handler.getPendingAllocate.size should be(2)
 
     val container1 = createContainer("host1")
     val container2 = createContainer("host2")
     val container3 = createContainer("host4")
-    handler.handleAllocatedContainers(Array(container1, container2, container3))
+    handler.handleAllocatedContainers(
+        Array(container1, container2, container3))
 
-    handler.getNumExecutorsRunning should be (2)
-    handler.allocatedContainerToHostMap.get(container1.getId).get should be ("host1")
-    handler.allocatedContainerToHostMap.get(container2.getId).get should be ("host2")
-    handler.allocatedContainerToHostMap.contains(container3.getId) should be (false)
-    handler.allocatedHostToContainersMap.get("host1").get should contain (container1.getId)
-    handler.allocatedHostToContainersMap.get("host2").get should contain (container2.getId)
-    handler.allocatedHostToContainersMap.contains("host4") should be (false)
+    handler.getNumExecutorsRunning should be(2)
+    handler.allocatedContainerToHostMap.get(container1.getId).get should be(
+        "host1")
+    handler.allocatedContainerToHostMap.get(container2.getId).get should be(
+        "host2")
+    handler.allocatedContainerToHostMap.contains(container3.getId) should be(
+        false)
+    handler.allocatedHostToContainersMap.get("host1").get should contain(
+        container1.getId)
+    handler.allocatedHostToContainersMap.get("host2").get should contain(
+        container2.getId)
+    handler.allocatedHostToContainersMap.contains("host4") should be(false)
   }
 
   test("decrease total requested executors") {
     val handler = createAllocator(4)
     handler.updateResourceRequests()
-    handler.getNumExecutorsRunning should be (0)
-    handler.getPendingAllocate.size should be (4)
+    handler.getNumExecutorsRunning should be(0)
+    handler.getPendingAllocate.size should be(4)
 
     handler.requestTotalExecutorsWithPreferredLocalities(3, 0, Map.empty)
     handler.updateResourceRequests()
-    handler.getPendingAllocate.size should be (3)
+    handler.getPendingAllocate.size should be(3)
 
     val container = createContainer("host1")
     handler.handleAllocatedContainers(Array(container))
 
-    handler.getNumExecutorsRunning should be (1)
-    handler.allocatedContainerToHostMap.get(container.getId).get should be ("host1")
-    handler.allocatedHostToContainersMap.get("host1").get should contain (container.getId)
+    handler.getNumExecutorsRunning should be(1)
+    handler.allocatedContainerToHostMap.get(container.getId).get should be(
+        "host1")
+    handler.allocatedHostToContainersMap.get("host1").get should contain(
+        container.getId)
 
     handler.requestTotalExecutorsWithPreferredLocalities(2, 0, Map.empty)
     handler.updateResourceRequests()
-    handler.getPendingAllocate.size should be (1)
+    handler.getPendingAllocate.size should be(1)
   }
 
   test("decrease total requested executors to less than currently running") {
     val handler = createAllocator(4)
     handler.updateResourceRequests()
-    handler.getNumExecutorsRunning should be (0)
-    handler.getPendingAllocate.size should be (4)
+    handler.getNumExecutorsRunning should be(0)
+    handler.getPendingAllocate.size should be(4)
 
     handler.requestTotalExecutorsWithPreferredLocalities(3, 0, Map.empty)
     handler.updateResourceRequests()
-    handler.getPendingAllocate.size should be (3)
+    handler.getPendingAllocate.size should be(3)
 
     val container1 = createContainer("host1")
     val container2 = createContainer("host2")
     handler.handleAllocatedContainers(Array(container1, container2))
 
-    handler.getNumExecutorsRunning should be (2)
+    handler.getNumExecutorsRunning should be(2)
 
     handler.requestTotalExecutorsWithPreferredLocalities(1, 0, Map.empty)
     handler.updateResourceRequests()
-    handler.getPendingAllocate.size should be (0)
-    handler.getNumExecutorsRunning should be (2)
+    handler.getPendingAllocate.size should be(0)
+    handler.getNumExecutorsRunning should be(2)
   }
 
   test("kill executors") {
     val handler = createAllocator(4)
     handler.updateResourceRequests()
-    handler.getNumExecutorsRunning should be (0)
-    handler.getPendingAllocate.size should be (4)
+    handler.getNumExecutorsRunning should be(0)
+    handler.getPendingAllocate.size should be(4)
 
     val container1 = createContainer("host1")
     val container2 = createContainer("host2")
     handler.handleAllocatedContainers(Array(container1, container2))
 
     handler.requestTotalExecutorsWithPreferredLocalities(1, 0, Map.empty)
-    handler.executorIdToContainer.keys.foreach { id => handler.killExecutor(id ) }
+    handler.executorIdToContainer.keys.foreach { id =>
+      handler.killExecutor(id)
+    }
 
     val statuses = Seq(container1, container2).map { c =>
-      ContainerStatus.newInstance(c.getId(), ContainerState.COMPLETE, "Finished", 0)
+      ContainerStatus.newInstance(
+          c.getId(), ContainerState.COMPLETE, "Finished", 0)
     }
     handler.updateResourceRequests()
     handler.processCompletedContainers(statuses.toSeq)
-    handler.getNumExecutorsRunning should be (0)
-    handler.getPendingAllocate.size should be (1)
+    handler.getNumExecutorsRunning should be(0)
+    handler.getPendingAllocate.size should be(1)
   }
 
   test("lost executor removed from backend") {
     val handler = createAllocator(4)
     handler.updateResourceRequests()
-    handler.getNumExecutorsRunning should be (0)
-    handler.getPendingAllocate.size should be (4)
+    handler.getNumExecutorsRunning should be(0)
+    handler.getPendingAllocate.size should be(4)
 
     val container1 = createContainer("host1")
     val container2 = createContainer("host2")
@@ -252,24 +281,27 @@ class YarnAllocatorSuite extends SparkFunSuite with Matchers with BeforeAndAfter
     handler.requestTotalExecutorsWithPreferredLocalities(2, 0, Map())
 
     val statuses = Seq(container1, container2).map { c =>
-      ContainerStatus.newInstance(c.getId(), ContainerState.COMPLETE, "Failed", -1)
+      ContainerStatus.newInstance(
+          c.getId(), ContainerState.COMPLETE, "Failed", -1)
     }
     handler.updateResourceRequests()
     handler.processCompletedContainers(statuses.toSeq)
     handler.updateResourceRequests()
-    handler.getNumExecutorsRunning should be (0)
-    handler.getPendingAllocate.size should be (2)
-    handler.getNumExecutorsFailed should be (2)
-    handler.getNumUnexpectedContainerRelease should be (2)
+    handler.getNumExecutorsRunning should be(0)
+    handler.getPendingAllocate.size should be(2)
+    handler.getNumExecutorsFailed should be(2)
+    handler.getNumUnexpectedContainerRelease should be(2)
   }
 
   test("memory exceeded diagnostic regexes") {
     val diagnostics =
       "Container [pid=12465,containerID=container_1412887393566_0003_01_000002] is running " +
-        "beyond physical memory limits. Current usage: 2.1 MB of 2 GB physical memory used; " +
-        "5.8 GB of 4.2 GB virtual memory used. Killing container."
-    val vmemMsg = memLimitExceededLogMessage(diagnostics, VMEM_EXCEEDED_PATTERN)
-    val pmemMsg = memLimitExceededLogMessage(diagnostics, PMEM_EXCEEDED_PATTERN)
+      "beyond physical memory limits. Current usage: 2.1 MB of 2 GB physical memory used; " +
+      "5.8 GB of 4.2 GB virtual memory used. Killing container."
+    val vmemMsg =
+      memLimitExceededLogMessage(diagnostics, VMEM_EXCEEDED_PATTERN)
+    val pmemMsg =
+      memLimitExceededLogMessage(diagnostics, PMEM_EXCEEDED_PATTERN)
     assert(vmemMsg.contains("5.8 GB of 4.2 GB virtual memory used."))
     assert(pmemMsg.contains("2.1 MB of 2 GB physical memory used."))
   }

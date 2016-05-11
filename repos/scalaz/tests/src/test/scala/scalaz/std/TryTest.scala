@@ -12,7 +12,6 @@ object TryTest extends SpecLite {
   implicit val showThrowable: Show[Throwable] = Show.showA
   implicit val equalThrowable: Equal[Throwable] = Equal.equalA
 
-
   "toDisjunction Failure" ! forAll { t: Throwable =>
     `try`.toDisjunction(Failure[Int](t)).isLeft
   }
@@ -34,16 +33,16 @@ object TryTest extends SpecLite {
     `try`.toValidation(Success[Int](i)).isSuccess
   }
 
-  "toValidationNel Failure" ! forAll {t: Throwable =>
+  "toValidationNel Failure" ! forAll { t: Throwable =>
     `try`.toValidationNel(Failure[Int](t)).isFailure
   }
 
-  "toValidationNel Success" ! forAll {i: Int =>
+  "toValidationNel Success" ! forAll { i: Int =>
     `try`.toValidationNel(Success[Int](i)).isSuccess
   }
 
   "validation round trip" ! forAll { v: Validation[Throwable, Int] =>
     val iso = `try`.tryValidationIso
     iso.to(iso.from(v)) must_=== v
-   }
+  }
 }

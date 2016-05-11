@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster.metrics
 
 import org.scalatest.WordSpec
@@ -15,7 +15,8 @@ class MetricsSelectorSpec extends WordSpec with Matchers {
   val factor = 0.3 // TODO read from reference.conf
 
   val abstractSelector = new CapacityMetricsSelector {
-    override def capacity(nodeMetrics: Set[NodeMetrics]): Map[Address, Double] = Map.empty
+    override def capacity(
+        nodeMetrics: Set[NodeMetrics]): Map[Address, Double] = Map.empty
   }
 
   val a1 = Address("akka.tcp", "sys", "a1", 2551)
@@ -25,38 +26,46 @@ class MetricsSelectorSpec extends WordSpec with Matchers {
 
   val decayFactor = Some(0.18)
 
-  val nodeMetricsA = NodeMetrics(a1, System.currentTimeMillis, Set(
-    Metric.create(HeapMemoryUsed, 128, decayFactor),
-    Metric.create(HeapMemoryCommitted, 256, decayFactor),
-    Metric.create(HeapMemoryMax, 512, None),
-    Metric.create(CpuCombined, 0.2, decayFactor),
-    Metric.create(CpuStolen, 0.1, decayFactor),
-    Metric.create(SystemLoadAverage, 0.5, None),
-    Metric.create(Processors, 8, None)).flatten)
+  val nodeMetricsA = NodeMetrics(
+      a1,
+      System.currentTimeMillis,
+      Set(Metric.create(HeapMemoryUsed, 128, decayFactor),
+          Metric.create(HeapMemoryCommitted, 256, decayFactor),
+          Metric.create(HeapMemoryMax, 512, None),
+          Metric.create(CpuCombined, 0.2, decayFactor),
+          Metric.create(CpuStolen, 0.1, decayFactor),
+          Metric.create(SystemLoadAverage, 0.5, None),
+          Metric.create(Processors, 8, None)).flatten)
 
-  val nodeMetricsB = NodeMetrics(b1, System.currentTimeMillis, Set(
-    Metric.create(HeapMemoryUsed, 256, decayFactor),
-    Metric.create(HeapMemoryCommitted, 512, decayFactor),
-    Metric.create(HeapMemoryMax, 1024, None),
-    Metric.create(CpuCombined, 0.4, decayFactor),
-    Metric.create(CpuStolen, 0.2, decayFactor),
-    Metric.create(SystemLoadAverage, 1.0, None),
-    Metric.create(Processors, 16, None)).flatten)
+  val nodeMetricsB = NodeMetrics(
+      b1,
+      System.currentTimeMillis,
+      Set(Metric.create(HeapMemoryUsed, 256, decayFactor),
+          Metric.create(HeapMemoryCommitted, 512, decayFactor),
+          Metric.create(HeapMemoryMax, 1024, None),
+          Metric.create(CpuCombined, 0.4, decayFactor),
+          Metric.create(CpuStolen, 0.2, decayFactor),
+          Metric.create(SystemLoadAverage, 1.0, None),
+          Metric.create(Processors, 16, None)).flatten)
 
-  val nodeMetricsC = NodeMetrics(c1, System.currentTimeMillis, Set(
-    Metric.create(HeapMemoryUsed, 1024, decayFactor),
-    Metric.create(HeapMemoryCommitted, 1024, decayFactor),
-    Metric.create(HeapMemoryMax, 1024, None),
-    Metric.create(CpuCombined, 0.6, decayFactor),
-    Metric.create(CpuStolen, 0.3, decayFactor),
-    Metric.create(SystemLoadAverage, 16.0, None),
-    Metric.create(Processors, 16, None)).flatten)
+  val nodeMetricsC = NodeMetrics(
+      c1,
+      System.currentTimeMillis,
+      Set(Metric.create(HeapMemoryUsed, 1024, decayFactor),
+          Metric.create(HeapMemoryCommitted, 1024, decayFactor),
+          Metric.create(HeapMemoryMax, 1024, None),
+          Metric.create(CpuCombined, 0.6, decayFactor),
+          Metric.create(CpuStolen, 0.3, decayFactor),
+          Metric.create(SystemLoadAverage, 16.0, None),
+          Metric.create(Processors, 16, None)).flatten)
 
-  val nodeMetricsD = NodeMetrics(d1, System.currentTimeMillis, Set(
-    Metric.create(HeapMemoryUsed, 511, decayFactor),
-    Metric.create(HeapMemoryCommitted, 512, decayFactor),
-    Metric.create(HeapMemoryMax, 512, None),
-    Metric.create(Processors, 2, decayFactor)).flatten)
+  val nodeMetricsD = NodeMetrics(
+      d1,
+      System.currentTimeMillis,
+      Set(Metric.create(HeapMemoryUsed, 511, decayFactor),
+          Metric.create(HeapMemoryCommitted, 512, decayFactor),
+          Metric.create(HeapMemoryMax, 512, None),
+          Metric.create(Processors, 2, decayFactor)).flatten)
 
   val nodeMetrics = Set(nodeMetricsA, nodeMetricsB, nodeMetricsC, nodeMetricsD)
 
@@ -73,7 +82,6 @@ class MetricsSelectorSpec extends WordSpec with Matchers {
       val weights = abstractSelector.weights(capacity)
       weights should ===(Map(a1 -> 0, b1 -> 100, c1 -> 1, d1 -> 0))
     }
-
   }
 
   "HeapMetricsSelector" must {
@@ -115,5 +123,4 @@ class MetricsSelectorSpec extends WordSpec with Matchers {
       capacity(d1) should ===((0.001953125) / 1 +- 0.0001)
     }
   }
-
 }

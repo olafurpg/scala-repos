@@ -4,7 +4,7 @@ package example
 import Scalaz._
 
 object IListUsage extends App {
-  
+
   // Construct using elements
   val ns = IList(1, 2, 3)
 
@@ -13,7 +13,7 @@ object IListUsage extends App {
   val ns3 = 1 :: 2 :: 3 :: INil()
 
   // Construct from something else
-  val ns4 = IList.fromList(List(1,3,4))
+  val ns4 = IList.fromList(List(1, 3, 4))
   val ns5 = IList.fromOption(Some(2))
 
   // Empty IList 
@@ -25,7 +25,7 @@ object IListUsage extends App {
   // e1 ++ ns
 
   // You can widen explicitly if you want to accomplish the above
-  val any = "abc" :: ns.widen[Any] 
+  val any = "abc" :: ns.widen[Any]
 
   // List operations are generally the same as stdlib List
   val rev = ns.reverse
@@ -36,7 +36,8 @@ object IListUsage extends App {
   val prod = ns.reduceLeftOption(_ * _)
 
   // Destructure with uncons
-  val s1 = ns.uncons("empty", (h, t) => "head is %s and tail is %s".format(h, t))
+  val s1 =
+    ns.uncons("empty", (h, t) => "head is %s and tail is %s".format(h, t))
 
   // Destructure with matching
   val s2 = ns match {
@@ -46,9 +47,9 @@ object IListUsage extends App {
 
   // Same typeclass instances as List
   val xprod = (IList(1, 2) |@| IList(true, false)).tupled
-  val unit  = 33.point[IList]
-  val less  = IList(1,2,3) < IList(1,2,4)
-  val trav  = IList(1, 2, 3).traverse(_.some)
+  val unit = 33.point[IList]
+  val less = IList(1, 2, 3) < IList(1, 2, 4)
+  val trav = IList(1, 2, 3).traverse(_.some)
 
   // Turn into something more familiar
   val lst = ns.toList
@@ -58,5 +59,4 @@ object IListUsage extends App {
   // Or less familiar
   val estr = ns.toEphemeralStream
   val zmap = ns.map(n => (n, "x" * n)).toMap // Int ==>> String
-
 }

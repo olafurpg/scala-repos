@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
 trait FreeSpecGenerator extends ScalaTestTestCase {
   def addFreeSpec() {
     addFileToProject("FreeSpecTest.scala",
-      """
+                     """
         |import org.scalatest._
         |
         |class FreeSpecTest extends FreeSpec {
@@ -23,13 +23,12 @@ trait FreeSpecGenerator extends ScalaTestTestCase {
         |    }
         |  }
         |}
-      """.stripMargin.trim()
-    )
+      """.stripMargin.trim())
   }
 
   def addComplexFreeSpec() = {
     addFileToProject("ComplexFreeSpec.scala",
-      """
+                     """
         |import org.scalatest._
         |
         |class ComplexFreeSpec extends FreeSpec {

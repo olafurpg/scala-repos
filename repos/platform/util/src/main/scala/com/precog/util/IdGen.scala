@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class IdGen {
   private[this] val currentId = new AtomicInteger(0)
-  
+
   def nextInt(): Int = currentId.getAndIncrement()
 }
 

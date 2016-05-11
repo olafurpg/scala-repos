@@ -1,3 +1,3 @@
 object Test extends Derived with App {
-  println( defect( Container( "8" ) ) )
+  println(defect(Container("8")))
 }

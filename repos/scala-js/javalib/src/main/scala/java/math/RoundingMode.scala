@@ -40,14 +40,17 @@ object RoundingMode {
 
   final val HALF_UP = new RoundingMode("HALF_UP", BigDecimal.ROUND_HALF_UP)
 
-  final val HALF_DOWN = new RoundingMode("HALF_DOWN", BigDecimal.ROUND_HALF_DOWN)
+  final val HALF_DOWN = new RoundingMode(
+      "HALF_DOWN", BigDecimal.ROUND_HALF_DOWN)
 
-  final val HALF_EVEN = new RoundingMode("HALF_EVEN", BigDecimal.ROUND_HALF_EVEN)
+  final val HALF_EVEN = new RoundingMode(
+      "HALF_EVEN", BigDecimal.ROUND_HALF_EVEN)
 
-  final val UNNECESSARY = new RoundingMode("UNNECESSARY", BigDecimal.ROUND_UNNECESSARY)
+  final val UNNECESSARY = new RoundingMode(
+      "UNNECESSARY", BigDecimal.ROUND_UNNECESSARY)
 
-  private val _values: Array[RoundingMode] =
-    Array(UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN, HALF_EVEN, UNNECESSARY)
+  private val _values: Array[RoundingMode] = Array(
+      UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN, HALF_EVEN, UNNECESSARY)
 
   def values(): Array[RoundingMode] = _values.clone()
 
@@ -58,16 +61,15 @@ object RoundingMode {
   }
 
   def valueOf(mode: Int): RoundingMode = (mode: @switch) match {
-    case BigDecimal.ROUND_CEILING     => CEILING
-    case BigDecimal.ROUND_DOWN        => DOWN
-    case BigDecimal.ROUND_FLOOR       => FLOOR
-    case BigDecimal.ROUND_HALF_DOWN   => HALF_DOWN
-    case BigDecimal.ROUND_HALF_EVEN   => HALF_EVEN
-    case BigDecimal.ROUND_HALF_UP     => HALF_UP
+    case BigDecimal.ROUND_CEILING => CEILING
+    case BigDecimal.ROUND_DOWN => DOWN
+    case BigDecimal.ROUND_FLOOR => FLOOR
+    case BigDecimal.ROUND_HALF_DOWN => HALF_DOWN
+    case BigDecimal.ROUND_HALF_EVEN => HALF_EVEN
+    case BigDecimal.ROUND_HALF_UP => HALF_UP
     case BigDecimal.ROUND_UNNECESSARY => UNNECESSARY
-    case BigDecimal.ROUND_UP          => UP
-    case _                            =>
+    case BigDecimal.ROUND_UP => UP
+    case _ =>
       throw new IllegalArgumentException("Invalid rounding mode")
   }
 }
-

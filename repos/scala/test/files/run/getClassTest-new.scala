@@ -46,19 +46,17 @@ class MoreAnyRefs {
   trait B
 
   // don't leak anon/refinements
-  def f1 = (new A with B { }).getClass()
-  def f2 = (new B with A { }).getClass()
+  def f1 = (new A with B {}).getClass()
+  def f2 = (new B with A {}).getClass()
   def f3 = (new { def bippy() = 5 }).getClass()
   def f4 = (new A { def bippy() = 5 }).getClass()
 }
 
 object Test {
-  def returnTypes[T: ClassTag] = (
-    classTag[T].runtimeClass.getMethods.toList
-      filter (_.getName startsWith "f")
-      sortBy (_.getName)
-      map (m => m.getName + ": " + m.getGenericReturnType.toString)
-  )
+  def returnTypes[T : ClassTag] =
+    (classTag[T].runtimeClass.getMethods.toList filter
+        (_.getName startsWith "f") sortBy (_.getName) map
+        (m => m.getName + ": " + m.getGenericReturnType.toString))
 
   def main(args: Array[String]): Unit = {
     returnTypes[AnyVals] foreach println

@@ -5,7 +5,7 @@ class A {
       // or:
       // do () while (b == false)
     }
-  } 
+  }
 }
 // 
 // [Now checking: erasure]

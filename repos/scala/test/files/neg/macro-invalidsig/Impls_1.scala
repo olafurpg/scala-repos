@@ -2,7 +2,9 @@ import scala.reflect.runtime.universe._
 import scala.reflect.macros.blackbox.Context
 
 object Impls1 {
-  def foo[U: c.WeakTypeTag: Numeric](c: Context) = { import c.universe._; q"42" }
+  def foo[U : c.WeakTypeTag : Numeric](c: Context) = {
+    import c.universe._; q"42"
+  }
 }
 
 object Impls2 {
@@ -22,7 +24,7 @@ object Impls5 {
 }
 
 object Impls6 {
-  def foo[T, U: c.WeakTypeTag](c: Context)(implicit x: c.Expr[Int]) = {
+  def foo[T, U : c.WeakTypeTag](c: Context)(implicit x: c.Expr[Int]) = {
     import c.{prefix => prefix}
     import c.universe._
     c.Expr[Unit](q"""
@@ -62,11 +64,12 @@ object Impls13 {
 }
 
 object Impls14 {
-  def foo[U: c.WeakTypeTag](c: Context) = ???
+  def foo[U : c.WeakTypeTag](c: Context) = ???
 }
 
 object Impls15 {
-  def foo[T: c.WeakTypeTag, U: c.WeakTypeTag, V](c: Context)(implicit V: c.WeakTypeTag[V]): c.Expr[Unit] = {
+  def foo[T : c.WeakTypeTag, U : c.WeakTypeTag, V](c: Context)(
+      implicit V: c.WeakTypeTag[V]): c.Expr[Unit] = {
     import c.universe._
     println(implicitly[c.WeakTypeTag[T]])
     println(implicitly[c.WeakTypeTag[U]])
@@ -76,7 +79,8 @@ object Impls15 {
 }
 
 object Impls16 {
-  def foo[T: c.WeakTypeTag, U: c.WeakTypeTag, V](c: Context)(implicit V: c.WeakTypeTag[V]): c.Expr[Unit] = {
+  def foo[T : c.WeakTypeTag, U : c.WeakTypeTag, V](c: Context)(
+      implicit V: c.WeakTypeTag[V]): c.Expr[Unit] = {
     import c.universe._
     println(implicitly[c.WeakTypeTag[T]])
     println(implicitly[c.WeakTypeTag[U]])

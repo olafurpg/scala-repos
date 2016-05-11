@@ -1,8 +1,6 @@
-object Test
-{
-        type T = Foo.type
-        object Foo
+object Test {
+  type T = Foo.type
+  object Foo
 
-        def main(argv : Array[String]) : Unit = {
-        }
+  def main(argv: Array[String]): Unit = {}
 }

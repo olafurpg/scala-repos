@@ -3,5 +3,5 @@ import scala.reflect.runtime.{universe => ru}
 import scala.tools.reflect.Eval
 
 object Test extends App {
-  println(reify{ru}.eval.getClass)
+  println(reify { ru }.eval.getClass)
 }

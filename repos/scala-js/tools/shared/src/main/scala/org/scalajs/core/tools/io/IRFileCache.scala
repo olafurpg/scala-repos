@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.io
 
@@ -19,11 +18,11 @@ import java.util.concurrent.atomic.AtomicInteger
 import org.scalajs.core.ir
 
 /** Centralized Scala.js IR cache.
- *
- *  Caches all Scala.js IR used in a given JVM. It supports creating of multiple
- *  sub-caches ([[IRFileCache.Cache]]) that track individual file sets.
- *  The global cache is fully thread-safe. However, the sub-caches are not.
- */
+  *
+  *  Caches all Scala.js IR used in a given JVM. It supports creating of multiple
+  *  sub-caches ([[IRFileCache.Cache]]) that track individual file sets.
+  *  The global cache is fully thread-safe. However, the sub-caches are not.
+  */
 final class IRFileCache {
   /* General implementation comment: We always synchronize before doing I/O
    * (instead of using a calculate and CAS pattern). This is since we assume
@@ -41,16 +40,16 @@ final class IRFileCache {
   private[this] val statsTreesRead = new AtomicInteger(0)
 
   /** Create a new sub-cache.
-   *
-   *  Users should call [[Cache.free]] once they are done to allow for more
-   *  aggressive GC.
-   */
+    *
+    *  Users should call [[Cache.free]] once they are done to allow for more
+    *  aggressive GC.
+    */
   def newCache: Cache = new Cache
 
   /** Approximate statistics about the cache usage */
   def stats: IRFileCache.Stats = {
-    new IRFileCache.Stats(statsReused.get, statsInvalidated.get,
-        statsTreesRead.get)
+    new IRFileCache.Stats(
+        statsReused.get, statsInvalidated.get, statsTreesRead.get)
   }
 
   /** Reset statistics */
@@ -66,14 +65,14 @@ final class IRFileCache {
     private[this] var localCache: Seq[PersistedFiles] = _
 
     /** Extract and cache IR.
-     *
-     *  The returned value is valid until the next invocation of [[cached]] or
-     *  [[free]].
-     *
-     *  @note Updating any of the underlying files in the container during the
-     *      lifetime of a returned [[IRFileCache.VirtualRelativeIRFile]] yields
-     *      unspecified behavior.
-     */
+      *
+      *  The returned value is valid until the next invocation of [[cached]] or
+      *  [[free]].
+      *
+      *  @note Updating any of the underlying files in the container during the
+      *      lifetime of a returned [[IRFileCache.VirtualRelativeIRFile]] yields
+      *      unspecified behavior.
+      */
     def cached(files: Seq[IRContainer]): Seq[VirtualRelativeIRFile] = {
       update(files)
       localCache.flatMap(_.files)
@@ -104,11 +103,11 @@ final class IRFileCache {
     }
 
     /** Should be called if this cache is not used anymore.
-     *
-     *  Frees resources in the global cache, if they are not used anymore.
-     *  The cache may be reused after calling [[free]] (but this is not any
-     *  faster than calling [[newCache]], modulo the object allocation).
-     */
+      *
+      *  Frees resources in the global cache, if they are not used anymore.
+      *  The cache may be reused after calling [[free]] (but this is not any
+      *  faster than calling [[newCache]], modulo the object allocation).
+      */
     def free(): Unit = {
       if (localCache != null) {
         localCache.foreach(_.unreference())
@@ -123,35 +122,35 @@ final class IRFileCache {
   }
 
   /** Stores the extracted [[VirtualScalaJSIRFile]]s from the file at path.
-   *
-   *  This also tracks references to itself by reference counting.
-   *  Further, a [[PersistedFiles]] has a tombstone state. It is necessary to
-   *  avoid a race between referencing a file just retrieved from
-   *  [[globalCache]] and removing a file from [[globalCache]] that has just
-   *  been unreferenced.
-   */
+    *
+    *  This also tracks references to itself by reference counting.
+    *  Further, a [[PersistedFiles]] has a tombstone state. It is necessary to
+    *  avoid a race between referencing a file just retrieved from
+    *  [[globalCache]] and removing a file from [[globalCache]] that has just
+    *  been unreferenced.
+    */
   private final class PersistedFiles(path: String) {
 
     /** Number of references we have. -1 means we are a tombstone */
     private[this] val _references = new AtomicInteger(0)
 
     /** Last version we have been updated with.
-     *  May only be written under synchronization, except if this is a tombstone
-     */
+      *  May only be written under synchronization, except if this is a tombstone
+      */
     @volatile
     private[this] var _version: Option[String] = None
 
     /** Files in this [[PersistedFiles]]
-     *  May only be written under synchronization, except if this is a tombstone
-     */
+      *  May only be written under synchronization, except if this is a tombstone
+      */
     @volatile
     private[this] var _files: Seq[VirtualRelativeIRFile] = null
 
     def files: Seq[VirtualRelativeIRFile] = _files
 
     /** Try to reference this block of files.
-     *  @return true if referencing succeeded, false if this is a tombstone
-     */
+      *  @return true if referencing succeeded, false if this is a tombstone
+      */
     @tailrec
     final def reference(): Boolean = {
       val refs = _references.get
@@ -168,10 +167,10 @@ final class IRFileCache {
     }
 
     /** Unreference this file.
-     *
-     *  If there are no references any more, turn this [[PersistedFiles]] into
-     *  a tombstone and remove it from the cache.
-     */
+      *
+      *  If there are no references any more, turn this [[PersistedFiles]] into
+      *  a tombstone and remove it from the cache.
+      */
     final def unreference(): Unit = {
       val refs = _references.decrementAndGet()
       assert(refs >= 0, "Unreferencing an not referenced file")
@@ -196,9 +195,9 @@ final class IRFileCache {
     }
 
     /** Updates this file with the given [[IRContainer]].
-     *
-     *  May only be called by a thread, if it holds a reference to this file.
-     */
+      *
+      *  May only be called by a thread, if it holds a reference to this file.
+      */
     def update(file: IRContainer): Unit = {
       assert(_references.get > 0, "Updating an unreferenced file")
       assert(file.path == path, s"Path mismatch: $path, ${file.path}")
@@ -227,7 +226,7 @@ final class IRFileCache {
 
     private def extractIRFiles(file: IRContainer) = file match {
       case IRContainer.File(file) => file :: Nil
-      case IRContainer.Jar(jar)   => jar.sjsirFiles
+      case IRContainer.Jar(jar) => jar.sjsirFiles
     }
   }
 
@@ -253,7 +252,8 @@ final class IRFileCache {
     override def tree: ClassDef = {
       if (_tree == null) {
         synchronized {
-          if (_tree == null) { // check again, race!
+          if (_tree == null) {
+            // check again, race!
             loadTree()
           }
         }
@@ -273,28 +273,26 @@ final class IRFileCache {
   }
 
   /** If something fails, we clear the `globalCache` to avoid leaks. The already
-   *  existing [[PersistedFiles]]s may continue to exist. This is OK, since in
-   *  the worst case they will try to remove themselves form a map in which they
-   *  are not anymore.
-   */
+    *  existing [[PersistedFiles]]s may continue to exist. This is OK, since in
+    *  the worst case they will try to remove themselves form a map in which they
+    *  are not anymore.
+    */
   @inline
   private def clearOnThrow[T](body: => T): T = {
-    try body
-    catch {
+    try body catch {
       case t: Throwable =>
         globalCache.clear()
         throw t
     }
   }
-
 }
 
 object IRFileCache {
   final class Stats(val reused: Int, val invalidated: Int, val treesRead: Int) {
+
     /** Descriptive line to display in logs */
     def logLine: String = {
-      s"reused: $reused -- " +
-      s"invalidated: $invalidated -- " +
+      s"reused: $reused -- " + s"invalidated: $invalidated -- " +
       s"trees read: $treesRead"
     }
   }

@@ -11,10 +11,9 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.junit.{AssertionsForJUnit, JUnitRunner}
 
 @RunWith(classOf[JUnitRunner])
-class ThresholdFailureDetectorTest extends FunSuite
-  with AssertionsForJUnit
-  with Eventually
-  with IntegrationPatience {
+class ThresholdFailureDetectorTest
+    extends FunSuite with AssertionsForJUnit with Eventually
+    with IntegrationPatience {
   def testt(desc: String)(f: TimeControl => Unit): Unit =
     test(desc) {
       Time.withCurrentTimeFrozen(f)
@@ -34,14 +33,14 @@ class ThresholdFailureDetectorTest extends FunSuite
 
     val timer = new MockTimer
     val d = new ThresholdFailureDetector(
-      ping,
-      minPeriod = 10.milliseconds,
-      threshold = 2,
-      windowSize = 5,
-      closeTimeout = closeTimeout,
-      nanoTime = nanoTime,
-      statsReceiver = sr,
-      timer = timer
+        ping,
+        minPeriod = 10.milliseconds,
+        threshold = 2,
+        windowSize = 5,
+        closeTimeout = closeTimeout,
+        nanoTime = nanoTime,
+        statsReceiver = sr,
+        timer = timer
     )
   }
 
@@ -175,19 +174,20 @@ class ThresholdFailureDetectorTest extends FunSuite
     val failAfter = 5
 
     def ping() = {
-      if (n.incrementAndGet() >= failAfter) Future.exception(new Exception("test"))
+      if (n.incrementAndGet() >= failAfter)
+        Future.exception(new Exception("test"))
       else Future.Done
     }
 
     val d = new ThresholdFailureDetector(
-      ping,
-      minPeriod = 10.milliseconds,
-      threshold = 2,
-      windowSize = 5,
-      closeTimeout = Duration.Top,
-      nanoTime = nanoTime,
-      timer = timer,
-      statsReceiver = sr
+        ping,
+        minPeriod = 10.milliseconds,
+        threshold = 2,
+        windowSize = 5,
+        closeTimeout = Duration.Top,
+        nanoTime = nanoTime,
+        timer = timer,
+        statsReceiver = sr
     )
 
     for (i <- 1 until failAfter) {

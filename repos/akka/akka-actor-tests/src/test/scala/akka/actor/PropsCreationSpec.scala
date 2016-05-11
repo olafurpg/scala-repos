@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2014-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import akka.testkit.AkkaSpec
@@ -22,11 +22,11 @@ object PropsCreationSpec {
   object OneParamActorCreator extends akka.japi.Creator[Actor] {
     override def create(): Actor = new OneParamActor(null)
   }
-
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class PropsCreationSpec extends AkkaSpec("akka.actor.serialize-creators = on") {
+class PropsCreationSpec
+    extends AkkaSpec("akka.actor.serialize-creators = on") {
 
   import akka.actor.PropsCreationSpec._
 
@@ -59,5 +59,4 @@ class PropsCreationSpec extends AkkaSpec("akka.actor.serialize-creators = on") {
       system.actorOf(p)
     }
   }
-
 }

@@ -8,8 +8,8 @@ object Test extends CompilerTest {
     global.settings.Xexperimental.value = true
 
     // This test itself does not depend on JDK8.
-    javaCompilationUnits(global)(samSource) ++
-    compilationUnits(global)(useSamSource)
+    javaCompilationUnits(global)(samSource) ++ compilationUnits(global)(
+        useSamSource)
   }
 
   private def samSource = """

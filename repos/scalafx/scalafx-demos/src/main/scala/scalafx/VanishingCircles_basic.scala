@@ -35,10 +35,9 @@ import scalafx.scene.effect.BoxBlur
 import scalafx.scene.paint.Color._
 import scalafx.scene.shape.Circle
 
-
 /**
- * Vanishing Circles Basic
- */
+  * Vanishing Circles Basic
+  */
 object VanishingCircles_basic extends JFXApp {
   stage = new PrimaryStage {
     title = "Vanishing Circles"
@@ -46,13 +45,14 @@ object VanishingCircles_basic extends JFXApp {
     height = 600
     scene = new Scene {
       fill = Black
-      content = for (i <- 0 until 50) yield new Circle {
-        centerX = random * 800
-        centerY = random * 600
-        radius = 150
-        fill = color(random, random, random, .2)
-        effect = new BoxBlur(10, 10, 3)
-      }
+      content = for (i <- 0 until 50) yield
+        new Circle {
+          centerX = random * 800
+          centerY = random * 600
+          radius = 150
+          fill = color(random, random, random, .2)
+          effect = new BoxBlur(10, 10, 3)
+        }
     }
   }
 }

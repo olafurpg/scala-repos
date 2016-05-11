@@ -25,13 +25,15 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 import org.apache.spark.internal.Logging
 
 /**
- * Custom Input Format for reading and splitting flat binary files that contain records,
- * each of which are a fixed size in bytes. The fixed record size is specified through
- * a parameter recordLength in the Hadoop configuration.
- */
+  * Custom Input Format for reading and splitting flat binary files that contain records,
+  * each of which are a fixed size in bytes. The fixed record size is specified through
+  * a parameter recordLength in the Hadoop configuration.
+  */
 private[spark] object FixedLengthBinaryInputFormat {
+
   /** Property name to set in Hadoop JobConfs for record length */
-  val RECORD_LENGTH_PROPERTY = "org.apache.spark.input.FixedLengthBinaryInputFormat.recordLength"
+  val RECORD_LENGTH_PROPERTY =
+    "org.apache.spark.input.FixedLengthBinaryInputFormat.recordLength"
 
   /** Retrieves the record length property from a Hadoop configuration */
   def getRecordLength(context: JobContext): Int = {
@@ -40,14 +42,13 @@ private[spark] object FixedLengthBinaryInputFormat {
 }
 
 private[spark] class FixedLengthBinaryInputFormat
-  extends FileInputFormat[LongWritable, BytesWritable]
-  with Logging {
+    extends FileInputFormat[LongWritable, BytesWritable] with Logging {
 
   private var recordLength = -1
 
   /**
-   * Override of isSplitable to ensure initial computation of the record length
-   */
+    * Override of isSplitable to ensure initial computation of the record length
+    */
   override def isSplitable(context: JobContext, filename: Path): Boolean = {
     if (recordLength == -1) {
       recordLength = FixedLengthBinaryInputFormat.getRecordLength(context)
@@ -61,11 +62,12 @@ private[spark] class FixedLengthBinaryInputFormat
   }
 
   /**
-   * This input format overrides computeSplitSize() to make sure that each split
-   * only contains full records. Each InputSplit passed to FixedLengthBinaryRecordReader
-   * will start at the first byte of a record, and the last byte will the last byte of a record.
-   */
-  override def computeSplitSize(blockSize: Long, minSize: Long, maxSize: Long): Long = {
+    * This input format overrides computeSplitSize() to make sure that each split
+    * only contains full records. Each InputSplit passed to FixedLengthBinaryRecordReader
+    * will start at the first byte of a record, and the last byte will the last byte of a record.
+    */
+  override def computeSplitSize(
+      blockSize: Long, minSize: Long, maxSize: Long): Long = {
     val defaultSize = super.computeSplitSize(blockSize, minSize, maxSize)
     // If the default size is less than the length of a record, make it equal to it
     // Otherwise, make sure the split size is as close to possible as the default size,
@@ -79,10 +81,11 @@ private[spark] class FixedLengthBinaryInputFormat
   }
 
   /**
-   * Create a FixedLengthBinaryRecordReader
-   */
-  override def createRecordReader(split: InputSplit, context: TaskAttemptContext)
-      : RecordReader[LongWritable, BytesWritable] = {
+    * Create a FixedLengthBinaryRecordReader
+    */
+  override def createRecordReader(
+      split: InputSplit, context: TaskAttemptContext)
+    : RecordReader[LongWritable, BytesWritable] = {
     new FixedLengthBinaryRecordReader
   }
 }

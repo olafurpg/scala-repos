@@ -7,7 +7,8 @@ object HasMultipartConfig {
   val DefaultMultipartConfig = MultipartConfig()
   val MultipartConfigKey = "org.scalatra.MultipartConfigKey"
 }
-trait HasMultipartConfig extends Initializable { self: { def servletContext: ServletContext } =>
+trait HasMultipartConfig extends Initializable {
+  self: { def servletContext: ServletContext } =>
 
   import org.scalatra.servlet.HasMultipartConfig._
 
@@ -15,25 +16,25 @@ trait HasMultipartConfig extends Initializable { self: { def servletContext: Ser
     // hack to support the tests without changes
     providedConfig orElse {
       try {
-        (Option(servletContext)
-          flatMap (sc => Option(sc.getAttribute(MultipartConfigKey)))
-          filterNot (_ == null)
-          map (_.asInstanceOf[MultipartConfig]))
+        (Option(servletContext) flatMap
+            (sc => Option(sc.getAttribute(MultipartConfigKey))) filterNot
+            (_ == null) map (_.asInstanceOf[MultipartConfig]))
       } catch {
         case _: NullPointerException => Some(DefaultMultipartConfig)
       }
-
     }
   }
 
-  def multipartConfig: MultipartConfig = try {
-    multipartConfigFromContext getOrElse DefaultMultipartConfig
-  } catch {
-    case e: Throwable =>
-      System.err.println("Couldn't get the multipart config from the servlet context because: ")
-      e.printStackTrace()
-      DefaultMultipartConfig
-  }
+  def multipartConfig: MultipartConfig =
+    try {
+      multipartConfigFromContext getOrElse DefaultMultipartConfig
+    } catch {
+      case e: Throwable =>
+        System.err.println(
+            "Couldn't get the multipart config from the servlet context because: ")
+        e.printStackTrace()
+        DefaultMultipartConfig
+    }
 
   private[this] var providedConfig: Option[MultipartConfig] = None
 

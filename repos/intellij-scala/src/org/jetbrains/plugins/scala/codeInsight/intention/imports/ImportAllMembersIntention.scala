@@ -15,30 +15,37 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportExpr
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
-
 /**
-* Nikolay.Tropin
-* 2014-03-19
-*/
+  * Nikolay.Tropin
+  * 2014-03-19
+  */
 class ImportAllMembersIntention extends PsiElementBaseIntentionAction {
-  override def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = {
-    val qualAtCaret = PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
+  override def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
+    val qualAtCaret =
+      PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
     if (qualAtCaret == null) return false
     setText(s"Import all members of ${qualAtCaret.refName}")
     checkQualifier(qualAtCaret)
   }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement): Unit = {
-    val qualAtCaret = PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
+  override def invoke(
+      project: Project, editor: Editor, element: PsiElement): Unit = {
+    val qualAtCaret =
+      PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement])
     if (qualAtCaret == null || !checkQualifier(qualAtCaret)) return
     qualAtCaret.resolve() match {
       case named: PsiNamedElement =>
         val importHolder = ScalaImportTypeFix.getImportHolder(element, project)
-        val usages = ReferencesSearch.search(named, new LocalSearchScope(importHolder)).findAll()
-        val pathWithWildcard = ScalaNamesUtil.qualifiedName(named).getOrElse(return) + "._"
+        val usages = ReferencesSearch
+          .search(named, new LocalSearchScope(importHolder))
+          .findAll()
+        val pathWithWildcard =
+          ScalaNamesUtil.qualifiedName(named).getOrElse(return ) + "._"
         importHolder.addImportForPath(pathWithWildcard)
         sorted(usages, isQualifier = true).foreach {
-          case isQualifierFor(ref @ resolve(resolved: PsiNamedElement)) if !isInImport(ref) =>
+          case isQualifierFor(ref @ resolve(resolved: PsiNamedElement))
+              if !isInImport(ref) =>
             replaceAndBind(ref, ref.refName, resolved)
           case _ =>
         }

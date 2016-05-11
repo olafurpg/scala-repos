@@ -26,16 +26,15 @@ object KeystoreFormats {
     }
     keystore
   }
-
 }
 
 import KeystoreFormats._
 
 /**
- * Builds a keystore from a string containing PEM encoded certificates, using CertificateFactory internally.
- *
- * @see java.security.cert.CertificateFactory
- */
+  * Builds a keystore from a string containing PEM encoded certificates, using CertificateFactory internally.
+  *
+  * @see java.security.cert.CertificateFactory
+  */
 class StringBasedKeyStoreBuilder(data: String) extends KeyStoreBuilder {
 
   val logger = org.slf4j.LoggerFactory.getLogger(getClass)
@@ -44,7 +43,6 @@ class StringBasedKeyStoreBuilder(data: String) extends KeyStoreBuilder {
     val certs = readCertificates(data)
     val store = loadCertificates(certs)
     store
-
   }
 
   def readCertificates(certificateString: String): Seq[Certificate] = {
@@ -60,17 +58,16 @@ class StringBasedKeyStoreBuilder(data: String) extends KeyStoreBuilder {
     }
     buffer.toList
   }
-
 }
 
 /**
- * Builds a keystore from a file containing PEM encoded certificates, using CertificateFactory internally.
- *
- * @see java.security.cert.CertificateFactory
- */
-class FileBasedKeyStoreBuilder(keyStoreType: String,
-    filePath: String,
-    password: Option[Array[Char]]) extends KeyStoreBuilder {
+  * Builds a keystore from a file containing PEM encoded certificates, using CertificateFactory internally.
+  *
+  * @see java.security.cert.CertificateFactory
+  */
+class FileBasedKeyStoreBuilder(
+    keyStoreType: String, filePath: String, password: Option[Array[Char]])
+    extends KeyStoreBuilder {
 
   val logger = org.slf4j.LoggerFactory.getLogger(getClass)
 
@@ -109,5 +106,4 @@ class FileBasedKeyStoreBuilder(keyStoreType: String,
 
     cf.generateCertificates(bis).asScala
   }
-
 }

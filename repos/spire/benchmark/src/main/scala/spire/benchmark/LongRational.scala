@@ -33,13 +33,10 @@ final class LongRational private (val n: Long, val d: Long) {
       val rden: Long = r.d / dgcd
       val num: Long = rden * n + r.n * lden
       val ngcd: Long = gcd(num, dgcd)
-      if (ngcd == 1)
-        new LongRational(num, lden * r.d)
-      else
-        new LongRational(num / ngcd, (r.d / ngcd) * lden)
+      if (ngcd == 1) new LongRational(num, lden * r.d)
+      else new LongRational(num / ngcd, (r.d / ngcd) * lden)
     }
   }
-
 
   def -(r: LongRational): LongRational = {
     val dgcd: Long = gcd(d, r.d)
@@ -50,20 +47,16 @@ final class LongRational private (val n: Long, val d: Long) {
       val rden: Long = r.d / dgcd
       val num: Long = rden * n - r.n * lden
       val ngcd: Long = gcd(num, dgcd)
-      if (ngcd == 1)
-        new LongRational(num, lden * r.d)
-      else
-        new LongRational(num / ngcd, (r.d / ngcd) * lden)
+      if (ngcd == 1) new LongRational(num, lden * r.d)
+      else new LongRational(num / ngcd, (r.d / ngcd) * lden)
     }
   }
-
 
   def *(r: LongRational): LongRational = {
     val a = gcd(n, r.d)
     val b = gcd(d, r.n)
     new LongRational((n / a) * (r.n / b), (d / b) * (r.d / a))
   }
-
 
   def /(r: LongRational): LongRational = {
     val a = gcd(n, r.n)
@@ -77,23 +70,21 @@ final class LongRational private (val n: Long, val d: Long) {
     }
   }
 
-  def pow(exp: Int): LongRational = if (exp == 0) {
-    LongRational.One
-  } else if (exp < 0) {
-    new LongRational(d pow java.lang.Math.abs(exp), n pow java.lang.Math.abs(exp))
-  } else {
-    new LongRational(n pow exp, d pow exp)
-  }
+  def pow(exp: Int): LongRational =
+    if (exp == 0) {
+      LongRational.One
+    } else if (exp < 0) {
+      new LongRational(
+          d pow java.lang.Math.abs(exp), n pow java.lang.Math.abs(exp))
+    } else {
+      new LongRational(n pow exp, d pow exp)
+    }
 
   def compare(r: LongRational): Int = {
     val dgcd = gcd(d, r.d)
-    if (dgcd == 1)
-      java.lang.Math.signum(n * r.d - r.n * d).toInt
-    else
-      java.lang.Math.signum((r.d / dgcd) * n - (d / dgcd) * r.n).toInt
+    if (dgcd == 1) java.lang.Math.signum(n * r.d - r.n * d).toInt
+    else java.lang.Math.signum((r.d / dgcd) * n - (d / dgcd) * r.n).toInt
   }
 
   def signum: Int = if (n < 0) -1 else if (n > 0) 1 else 0
 }
-
-

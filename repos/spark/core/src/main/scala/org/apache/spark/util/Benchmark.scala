@@ -24,22 +24,21 @@ import scala.util.Try
 import org.apache.commons.lang3.SystemUtils
 
 /**
- * Utility class to benchmark components. An example of how to use this is:
- *  val benchmark = new Benchmark("My Benchmark", valuesPerIteration)
- *   benchmark.addCase("V1")(<function>)
- *   benchmark.addCase("V2")(<function>)
- *   benchmark.run
- * This will output the average time to run each function and the rate of each function.
- *
- * The benchmark function takes one argument that is the iteration that's being run.
- *
- * If outputPerIteration is true, the timing for each run will be printed to stdout.
- */
-private[spark] class Benchmark(
-    name: String,
-    valuesPerIteration: Long,
-    iters: Int = 5,
-    outputPerIteration: Boolean = false) {
+  * Utility class to benchmark components. An example of how to use this is:
+  *  val benchmark = new Benchmark("My Benchmark", valuesPerIteration)
+  *   benchmark.addCase("V1")(<function>)
+  *   benchmark.addCase("V2")(<function>)
+  *   benchmark.run
+  * This will output the average time to run each function and the rate of each function.
+  *
+  * The benchmark function takes one argument that is the iteration that's being run.
+  *
+  * If outputPerIteration is true, the timing for each run will be printed to stdout.
+  */
+private[spark] class Benchmark(name: String,
+                               valuesPerIteration: Long,
+                               iters: Int = 5,
+                               outputPerIteration: Boolean = false) {
   val benchmarks = mutable.ArrayBuffer.empty[Benchmark.Case]
 
   def addCase(name: String)(f: Int => Unit): Unit = {
@@ -47,10 +46,10 @@ private[spark] class Benchmark(
   }
 
   /**
-   * Runs the benchmark and outputs the results to stdout. This should be copied and added as
-   * a comment with the benchmark. Although the results vary from machine to machine, it should
-   * provide some baseline.
-   */
+    * Runs the benchmark and outputs the results to stdout. This should be copied and added as
+    * a comment with the benchmark. Although the results vary from machine to machine, it should
+    * provide some baseline.
+    */
   def run(): Unit = {
     require(benchmarks.nonEmpty)
     // scalastyle:off
@@ -65,17 +64,23 @@ private[spark] class Benchmark(
     val firstBest = results.head.bestMs
     // The results are going to be processor specific so it is useful to include that.
     println(Benchmark.getProcessorName())
-    printf("%-35s %16s %12s %13s %10s\n", name + ":", "Best/Avg Time(ms)", "Rate(M/s)",
-      "Per Row(ns)", "Relative")
-    println("-----------------------------------------------------------------------------------" +
-      "--------")
-    results.zip(benchmarks).foreach { case (result, benchmark) =>
-      printf("%-35s %16s %12s %13s %10s\n",
-        benchmark.name,
-        "%5.0f / %4.0f" format (result.bestMs, result.avgMs),
-        "%10.1f" format result.bestRate,
-        "%6.1f" format (1000 / result.bestRate),
-        "%3.1fX" format (firstBest / result.bestMs))
+    printf("%-35s %16s %12s %13s %10s\n",
+           name + ":",
+           "Best/Avg Time(ms)",
+           "Rate(M/s)",
+           "Per Row(ns)",
+           "Relative")
+    println(
+        "-----------------------------------------------------------------------------------" +
+        "--------")
+    results.zip(benchmarks).foreach {
+      case (result, benchmark) =>
+        printf("%-35s %16s %12s %13s %10s\n",
+               benchmark.name,
+               "%5.0f / %4.0f" format (result.bestMs, result.avgMs),
+               "%10.1f" format result.bestRate,
+               "%6.1f" format (1000 / result.bestRate),
+               "%3.1fX" format (firstBest / result.bestMs))
     }
     println
     // scalastyle:on
@@ -87,16 +92,18 @@ private[spark] object Benchmark {
   case class Result(avgMs: Double, bestRate: Double, bestMs: Double)
 
   /**
-   * This should return a user helpful processor information. Getting at this depends on the OS.
-   * This should return something like "Intel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz"
-   */
+    * This should return a user helpful processor information. Getting at this depends on the OS.
+    * This should return something like "Intel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz"
+    */
   def getProcessorName(): String = {
     if (SystemUtils.IS_OS_MAC_OSX) {
-      Utils.executeAndGetOutput(Seq("/usr/sbin/sysctl", "-n", "machdep.cpu.brand_string"))
+      Utils.executeAndGetOutput(
+          Seq("/usr/sbin/sysctl", "-n", "machdep.cpu.brand_string"))
     } else if (SystemUtils.IS_OS_LINUX) {
       Try {
         val grepPath = Utils.executeAndGetOutput(Seq("which", "grep"))
-        Utils.executeAndGetOutput(Seq(grepPath, "-m", "1", "model name", "/proc/cpuinfo"))
+        Utils.executeAndGetOutput(
+            Seq(grepPath, "-m", "1", "model name", "/proc/cpuinfo"))
       }.getOrElse("Unknown processor")
     } else {
       System.getenv("PROCESSOR_IDENTIFIER")
@@ -104,10 +111,11 @@ private[spark] object Benchmark {
   }
 
   /**
-   * Runs a single function `f` for iters, returning the average time the function took and
-   * the rate of the function.
-   */
-  def measure(num: Long, iters: Int, outputPerIteration: Boolean)(f: Int => Unit): Result = {
+    * Runs a single function `f` for iters, returning the average time the function took and
+    * the rate of the function.
+    */
+  def measure(num: Long, iters: Int, outputPerIteration: Boolean)(
+      f: Int => Unit): Result = {
     val runTimes = ArrayBuffer[Long]()
     for (i <- 0 until iters + 1) {
       val start = System.nanoTime()
@@ -131,4 +139,3 @@ private[spark] object Benchmark {
     Result(avg / 1000000.0, num / (best / 1000.0), best / 1000000.0)
   }
 }
-

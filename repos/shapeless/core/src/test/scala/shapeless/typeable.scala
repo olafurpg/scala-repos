@@ -17,7 +17,7 @@
 package shapeless
 
 class TypeableTests {
-  import java.{ lang => jl }
+  import java.{lang => jl}
 
   import org.junit.Test
   import org.junit.Assert._
@@ -416,7 +416,7 @@ class TypeableTests {
   def testTypeCase {
     import HList.ListCompat._
 
-    def typeCase[T: Typeable](t: Any): Option[T] = {
+    def typeCase[T : Typeable](t: Any): Option[T] = {
       val T = TypeCase[T]
       val `List[T]` = TypeCase[List[T]]
       val `(String, T)` = TypeCase[(String, T)]
@@ -425,9 +425,9 @@ class TypeableTests {
       t match {
         case T(t) => Some(t)
         case `List[T]`(lt) => lt.headOption
-        case `(String, T)`(s, t) => typed[String](s) ; Some(t)
+        case `(String, T)`(s, t) => typed[String](s); Some(t)
         case `List[(String, T)]`((s, t) :: _) => typed[String](s); Some(t)
-        case `List[(String, T)]`(lst) => assertTrue(lst.isEmpty) ; None
+        case `List[(String, T)]`(lst) => assertTrue(lst.isEmpty); None
         case _ => None
       }
     }
@@ -517,10 +517,10 @@ class TypeableTests {
     val a: Any = ()
     assertEquals("Typeable[Any]", typeableString(a))
 
-    val av: AnyVal =  7
+    val av: AnyVal = 7
     assertEquals("Typeable[AnyVal]", typeableString(av))
 
-    val ar: AnyRef =  ""
+    val ar: AnyRef = ""
     assertEquals("Typeable[AnyRef]", typeableString(ar))
 
     val f: Foo = Foo(0, "", true)
@@ -531,7 +531,7 @@ class TypeableTests {
 
     val i1: A with B = new C
     assertEquals("Typeable[A with B]", typeableString(i1))
-    assertEquals("Typeable[A]", typeableString(new A{}))
+    assertEquals("Typeable[A]", typeableString(new A {}))
 
     val o: Option[Long] = Some(4l)
     assertEquals("Typeable[Option[Long]]", typeableString(o))
@@ -540,7 +540,7 @@ class TypeableTests {
     assertEquals("Typeable[Either[Long, String]]", typeableString(e))
     assertEquals("Typeable[Right[Long]]", typeableString(Right(3l)))
 
-    val l: List[Int] = List(1,2)
+    val l: List[Int] = List(1, 2)
     assertEquals("Typeable[List[Int]]", typeableString(l))
 
     val m: Map[Int, String] = Map(1 -> "one", 2 -> "two")
@@ -567,7 +567,5 @@ class TypeableTests {
 
     val tc = TypeCase[List[Int]]
     assertEquals("TypeCase[List[Int]]", tc.toString)
-
   }
-
 }

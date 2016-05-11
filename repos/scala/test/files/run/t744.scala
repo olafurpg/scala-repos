@@ -11,7 +11,7 @@ object Test {
     }
     class File extends FileImpl;
   }
-  def main(args : Array[String]) : Unit = {
+  def main(args: Array[String]): Unit = {
     Console.println("BEGIN");
     val test = new Test;
     val file = new test.File;

@@ -1,24 +1,27 @@
 package mesosphere.marathon.api.v2
 
 import mesosphere.marathon.api.TestAuthFixture
-import mesosphere.marathon.state.{ PathId, AppDefinition, Group, GroupManager }
+import mesosphere.marathon.state.{PathId, AppDefinition, Group, GroupManager}
 import mesosphere.marathon.test.Mockito
 import mesosphere.marathon.upgrade.DeploymentManager.DeploymentStepInfo
-import mesosphere.marathon.upgrade.{ DeploymentStep, DeploymentPlan }
-import mesosphere.marathon.{ MarathonConf, MarathonSchedulerService, MarathonSpec }
-import org.scalatest.{ Matchers, GivenWhenThen }
+import mesosphere.marathon.upgrade.{DeploymentStep, DeploymentPlan}
+import mesosphere.marathon.{MarathonConf, MarathonSchedulerService, MarathonSpec}
+import org.scalatest.{Matchers, GivenWhenThen}
 
 import scala.concurrent.Future
 import scala.collection.immutable.Seq
 
-class DeploymentsResourceTest extends MarathonSpec with GivenWhenThen with Matchers with Mockito {
+class DeploymentsResourceTest
+    extends MarathonSpec with GivenWhenThen with Matchers with Mockito {
 
   test("access without authentication is denied") {
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
-    val targetGroup = Group.empty.copy(apps = Set(AppDefinition(PathId("/test"))))
-    val deployment = DeploymentStepInfo(DeploymentPlan(Group.empty, targetGroup), DeploymentStep(Seq.empty), 1)
+    val targetGroup =
+      Group.empty.copy(apps = Set(AppDefinition(PathId("/test"))))
+    val deployment = DeploymentStepInfo(
+        DeploymentPlan(Group.empty, targetGroup), DeploymentStep(Seq.empty), 1)
     service.listRunningDeployments() returns Future.successful(Seq(deployment))
 
     When(s"the index is fetched")
@@ -37,8 +40,10 @@ class DeploymentsResourceTest extends MarathonSpec with GivenWhenThen with Match
     auth.authenticated = true
     auth.authorized = false
     val req = auth.request
-    val targetGroup = Group.empty.copy(apps = Set(AppDefinition(PathId("/test"))))
-    val deployment = DeploymentStepInfo(DeploymentPlan(Group.empty, targetGroup), DeploymentStep(Seq.empty), 1)
+    val targetGroup =
+      Group.empty.copy(apps = Set(AppDefinition(PathId("/test"))))
+    val deployment = DeploymentStepInfo(
+        DeploymentPlan(Group.empty, targetGroup), DeploymentStep(Seq.empty), 1)
     service.listRunningDeployments() returns Future.successful(Seq(deployment))
 
     When(s"one app version is fetched")
@@ -58,6 +63,7 @@ class DeploymentsResourceTest extends MarathonSpec with GivenWhenThen with Match
     groupManager = mock[GroupManager]
     config = mock[MarathonConf]
     service = mock[MarathonSchedulerService]
-    deploymentsResource = new DeploymentsResource(service, groupManager, auth.auth, auth.auth, config)
+    deploymentsResource = new DeploymentsResource(
+        service, groupManager, auth.auth, auth.auth, config)
   }
 }

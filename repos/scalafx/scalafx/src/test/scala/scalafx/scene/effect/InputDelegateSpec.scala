@@ -30,8 +30,8 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 
 /**
- * Trait to test InputDelegate subclasses
- */
+  * Trait to test InputDelegate subclasses
+  */
 trait InputDelegateSpec[D <: InputDelegate[_]] extends FlatSpec {
 
   protected val inputDelegate: D
@@ -43,10 +43,12 @@ trait InputDelegateSpec[D <: InputDelegate[_]] extends FlatSpec {
 
     inputDelegate.input = initialInput
 
-    inputDelegate.input.onChange((ov, oldInput, newInput) => {
-      oldInput should be(initialInput.delegate)
-      newInput should be(finalInput.delegate)
-      changed = true
+    inputDelegate.input.onChange(
+        (ov, oldInput, newInput) =>
+          {
+        oldInput should be(initialInput.delegate)
+        newInput should be(finalInput.delegate)
+        changed = true
     })
 
     inputDelegate.input = finalInput
@@ -54,5 +56,4 @@ trait InputDelegateSpec[D <: InputDelegate[_]] extends FlatSpec {
     changed should be(true)
     inputDelegate.input.value should be(finalInput.delegate)
   }
-
 }

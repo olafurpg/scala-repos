@@ -31,17 +31,17 @@ class FilterPushdownSuite extends PlanTest {
 
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
-      Batch("Subqueries", Once,
-        EliminateSubqueryAliases) ::
-      Batch("Filter Pushdown", Once,
-        SamplePushDown,
-        CombineFilters,
-        PushPredicateThroughProject,
-        BooleanSimplification,
-        PushPredicateThroughJoin,
-        PushPredicateThroughGenerate,
-        PushPredicateThroughAggregate,
-        CollapseProject) :: Nil
+      Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
+          "Filter Pushdown",
+          Once,
+          SamplePushDown,
+          CombineFilters,
+          PushPredicateThroughProject,
+          BooleanSimplification,
+          PushPredicateThroughJoin,
+          PushPredicateThroughGenerate,
+          PushPredicateThroughAggregate,
+          CollapseProject) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
@@ -50,70 +50,48 @@ class FilterPushdownSuite extends PlanTest {
 
   // This test already passes.
   test("eliminate subqueries") {
-    val originalQuery =
-      testRelation
-        .subquery('y)
-        .select('a)
+    val originalQuery = testRelation.subquery('y).select('a)
 
     val optimized = Optimize.execute(originalQuery.analyze)
-    val correctAnswer =
-      testRelation
-        .select('a.attr)
-        .analyze
+    val correctAnswer = testRelation.select('a.attr).analyze
 
     comparePlans(optimized, correctAnswer)
   }
 
   // After this line is unimplemented.
   test("simple push down") {
-    val originalQuery =
-      testRelation
-        .select('a)
-        .where('a === 1)
+    val originalQuery = testRelation.select('a).where('a === 1)
 
     val optimized = Optimize.execute(originalQuery.analyze)
-    val correctAnswer =
-      testRelation
-        .where('a === 1)
-        .select('a)
-        .analyze
+    val correctAnswer = testRelation.where('a === 1).select('a).analyze
 
     comparePlans(optimized, correctAnswer)
   }
 
   test("combine redundant filters") {
     val originalQuery =
-      testRelation
-        .where('a === 1 && 'b === 1)
-        .where('a === 1 && 'c === 1)
+      testRelation.where('a === 1 && 'b === 1).where('a === 1 && 'c === 1)
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val correctAnswer =
-      testRelation
-        .where('a === 1 && 'b === 1 && 'c === 1)
-        .analyze
+      testRelation.where('a === 1 && 'b === 1 && 'c === 1).analyze
 
     comparePlans(optimized, correctAnswer)
   }
 
   test("can't push without rewrite") {
     val originalQuery =
-      testRelation
-        .select('a + 'b as 'e)
-        .where('e === 1)
-        .analyze
+      testRelation.select('a + 'b as 'e).where('e === 1).analyze
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val correctAnswer =
-      testRelation
-        .where('a + 'b === 1)
-        .select('a + 'b as 'e)
-        .analyze
+      testRelation.where('a + 'b === 1).select('a + 'b as 'e).analyze
 
     comparePlans(optimized, correctAnswer)
   }
 
-  test("nondeterministic: can't push down filter with nondeterministic condition through project") {
+  test(
+      "nondeterministic: can't push down filter with nondeterministic condition through project") {
     val originalQuery = testRelation
       .select(Rand(10).as('rand), 'a)
       .where('rand > 5 || 'a > 5)
@@ -124,11 +102,10 @@ class FilterPushdownSuite extends PlanTest {
     comparePlans(optimized, originalQuery)
   }
 
-  test("nondeterministic: can't push down filter through project with nondeterministic field") {
-    val originalQuery = testRelation
-      .select(Rand(10).as('rand), 'a)
-      .where('a > 5)
-      .analyze
+  test(
+      "nondeterministic: can't push down filter through project with nondeterministic field") {
+    val originalQuery =
+      testRelation.select(Rand(10).as('rand), 'a).where('a > 5).analyze
 
     val optimized = Optimize.execute(originalQuery)
 
@@ -136,16 +113,11 @@ class FilterPushdownSuite extends PlanTest {
   }
 
   test("filters: combines filters") {
-    val originalQuery = testRelation
-      .select('a)
-      .where('a === 1)
-      .where('a === 2)
+    val originalQuery = testRelation.select('a).where('a === 1).where('a === 2)
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val correctAnswer =
-      testRelation
-        .where('a === 1 && 'a === 2)
-        .select('a).analyze
+      testRelation.where('a === 1 && 'a === 2).select('a).analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -155,16 +127,13 @@ class FilterPushdownSuite extends PlanTest {
     val y = testRelation.subquery('y)
 
     val originalQuery = {
-      x.join(y)
-        .where("x.b".attr === 1)
-        .where("y.b".attr === 2)
+      x.join(y).where("x.b".attr === 1).where("y.b".attr === 2)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('b === 1)
     val right = testRelation.where('b === 2)
-    val correctAnswer =
-      left.join(right).analyze
+    val correctAnswer = left.join(right).analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -174,15 +143,13 @@ class FilterPushdownSuite extends PlanTest {
     val y = testRelation.subquery('y)
 
     val originalQuery = {
-      x.join(y)
-        .where("x.b".attr === 1)
+      x.join(y).where("x.b".attr === 1)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('b === 1)
     val right = testRelation
-    val correctAnswer =
-      left.join(right).analyze
+    val correctAnswer = left.join(right).analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -193,15 +160,17 @@ class FilterPushdownSuite extends PlanTest {
 
     val originalQuery = {
       x.join(y)
-       .where(("x.a".attr === 1 && "y.d".attr === "x.b".attr) ||
-              ("x.a".attr === 1 && "y.d".attr === "x.c".attr))
+        .where(("x.a".attr === 1 && "y.d".attr === "x.b".attr) ||
+            ("x.a".attr === 1 && "y.d".attr === "x.c".attr))
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('a === 1)
     val right = testRelation1
-    val correctAnswer =
-      left.join(right, condition = Some("d".attr === "b".attr || "d".attr === "c".attr)).analyze
+    val correctAnswer = left
+      .join(right,
+            condition = Some("d".attr === "b".attr || "d".attr === "c".attr))
+      .analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -211,15 +180,13 @@ class FilterPushdownSuite extends PlanTest {
     val y = testRelation.subquery('y)
 
     val originalQuery = {
-      x.join(y)
-        .where("x.b".attr === 1 && "y.b".attr === 2)
+      x.join(y).where("x.b".attr === 1 && "y.b".attr === 2)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('b === 1)
     val right = testRelation.where('b === 2)
-    val correctAnswer =
-      left.join(right).analyze
+    val correctAnswer = left.join(right).analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -229,7 +196,11 @@ class FilterPushdownSuite extends PlanTest {
     val y = testRelation1.subquery('y)
 
     val originalQuery = {
-      x.join(y, LeftSemi, Option("x.a".attr === "y.d".attr && "x.b".attr >= 1 && "y.d".attr >= 2))
+      x.join(
+          y,
+          LeftSemi,
+          Option(
+              "x.a".attr === "y.d".attr && "x.b".attr >= 1 && "y.d".attr >= 2))
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -246,14 +217,12 @@ class FilterPushdownSuite extends PlanTest {
     val y = testRelation.subquery('y)
 
     val originalQuery = {
-      x.join(y, LeftOuter)
-        .where("x.b".attr === 1 && "y.b".attr === 2)
+      x.join(y, LeftOuter).where("x.b".attr === 1 && "y.b".attr === 2)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('b === 1)
-    val correctAnswer =
-      left.join(y, LeftOuter).where("y.b".attr === 2).analyze
+    val correctAnswer = left.join(y, LeftOuter).where("y.b".attr === 2).analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -263,8 +232,7 @@ class FilterPushdownSuite extends PlanTest {
     val y = testRelation.subquery('y)
 
     val originalQuery = {
-      x.join(y, RightOuter)
-        .where("x.b".attr === 1 && "y.b".attr === 2)
+      x.join(y, RightOuter).where("x.b".attr === 1 && "y.b".attr === 2)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -286,8 +254,10 @@ class FilterPushdownSuite extends PlanTest {
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('b === 2).subquery('d)
-    val correctAnswer =
-      left.join(y, LeftOuter, Some("d.b".attr === 1)).where("y.b".attr === 2).analyze
+    val correctAnswer = left
+      .join(y, LeftOuter, Some("d.b".attr === 1))
+      .where("y.b".attr === 2)
+      .analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -303,8 +273,10 @@ class FilterPushdownSuite extends PlanTest {
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val right = testRelation.where('b === 2).subquery('d)
-    val correctAnswer =
-      x.join(right, RightOuter, Some("d.b".attr === 1)).where("x.b".attr === 2).analyze
+    val correctAnswer = x
+      .join(right, RightOuter, Some("d.b".attr === 1))
+      .where("x.b".attr === 2)
+      .analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -338,8 +310,10 @@ class FilterPushdownSuite extends PlanTest {
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val right = testRelation.where('b === 2).subquery('r)
-    val correctAnswer =
-      x.join(right, RightOuter, Some("r.b".attr === 1)).where("x.b".attr === 2).analyze
+    val correctAnswer = x
+      .join(right, RightOuter, Some("r.b".attr === 1))
+      .where("x.b".attr === 2)
+      .analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -350,14 +324,17 @@ class FilterPushdownSuite extends PlanTest {
 
     val originalQuery = {
       x.join(y, LeftOuter, Some("y.b".attr === 1))
-        .where("x.b".attr === 2 && "y.b".attr === 2 && "x.c".attr === "y.c".attr)
+        .where("x.b".attr === 2 && "y.b".attr === 2 &&
+            "x.c".attr === "y.c".attr)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('b === 2).subquery('l)
     val right = testRelation.where('b === 1).subquery('r)
-    val correctAnswer =
-      left.join(right, LeftOuter).where("r.b".attr === 2 && "l.c".attr === "r.c".attr).analyze
+    val correctAnswer = left
+      .join(right, LeftOuter)
+      .where("r.b".attr === 2 && "l.c".attr === "r.c".attr)
+      .analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -368,15 +345,17 @@ class FilterPushdownSuite extends PlanTest {
 
     val originalQuery = {
       x.join(y, RightOuter, Some("y.b".attr === 1))
-        .where("x.b".attr === 2 && "y.b".attr === 2 && "x.c".attr === "y.c".attr)
+        .where("x.b".attr === 2 && "y.b".attr === 2 &&
+            "x.c".attr === "y.c".attr)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.subquery('l)
     val right = testRelation.where('b === 2).subquery('r)
-    val correctAnswer =
-      left.join(right, RightOuter, Some("r.b".attr === 1)).
-        where("l.b".attr === 2 && "l.c".attr === "r.c".attr).analyze
+    val correctAnswer = left
+      .join(right, RightOuter, Some("r.b".attr === 1))
+      .where("l.b".attr === 2 && "l.c".attr === "r.c".attr)
+      .analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -387,15 +366,17 @@ class FilterPushdownSuite extends PlanTest {
 
     val originalQuery = {
       x.join(y, LeftOuter, Some("y.b".attr === 1 && "x.a".attr === 3))
-        .where("x.b".attr === 2 && "y.b".attr === 2 && "x.c".attr === "y.c".attr)
+        .where("x.b".attr === 2 && "y.b".attr === 2 &&
+            "x.c".attr === "y.c".attr)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('b === 2).subquery('l)
     val right = testRelation.where('b === 1).subquery('r)
-    val correctAnswer =
-      left.join(right, LeftOuter, Some("l.a".attr===3)).
-        where("r.b".attr === 2 && "l.c".attr === "r.c".attr).analyze
+    val correctAnswer = left
+      .join(right, LeftOuter, Some("l.a".attr === 3))
+      .where("r.b".attr === 2 && "l.c".attr === "r.c".attr)
+      .analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -406,15 +387,17 @@ class FilterPushdownSuite extends PlanTest {
 
     val originalQuery = {
       x.join(y, RightOuter, Some("y.b".attr === 1 && "x.a".attr === 3))
-        .where("x.b".attr === 2 && "y.b".attr === 2 && "x.c".attr === "y.c".attr)
+        .where("x.b".attr === 2 && "y.b".attr === 2 &&
+            "x.c".attr === "y.c".attr)
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('a === 3).subquery('l)
     val right = testRelation.where('b === 2).subquery('r)
-    val correctAnswer =
-      left.join(right, RightOuter, Some("r.b".attr === 1)).
-        where("l.b".attr === 2 && "l.c".attr === "r.c".attr).analyze
+    val correctAnswer = left
+      .join(right, RightOuter, Some("r.b".attr === 1))
+      .where("l.b".attr === 2 && "l.c".attr === "r.c".attr)
+      .analyze
 
     comparePlans(optimized, correctAnswer)
   }
@@ -428,7 +411,8 @@ class FilterPushdownSuite extends PlanTest {
     }
     val optimized = Optimize.execute(originalQuery.analyze)
 
-    comparePlans(analysis.EliminateSubqueryAliases(originalQuery.analyze), optimized)
+    comparePlans(
+        analysis.EliminateSubqueryAliases(originalQuery.analyze), optimized)
   }
 
   test("joins: conjunctive predicates") {
@@ -437,15 +421,15 @@ class FilterPushdownSuite extends PlanTest {
 
     val originalQuery = {
       x.join(y)
-        .where(("x.b".attr === "y.b".attr) && ("x.a".attr === 1) && ("y.a".attr === 1))
+        .where(("x.b".attr === "y.b".attr) && ("x.a".attr === 1) &&
+            ("y.a".attr === 1))
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('a === 1).subquery('x)
     val right = testRelation.where('a === 1).subquery('y)
     val correctAnswer =
-      left.join(right, condition = Some("x.b".attr === "y.b".attr))
-        .analyze
+      left.join(right, condition = Some("x.b".attr === "y.b".attr)).analyze
 
     comparePlans(optimized, analysis.EliminateSubqueryAliases(correctAnswer))
   }
@@ -455,16 +439,14 @@ class FilterPushdownSuite extends PlanTest {
     val y = testRelation.subquery('y)
 
     val originalQuery = {
-      x.join(y)
-        .where(("x.b".attr === "y.b".attr) && ("x.a".attr === 1))
+      x.join(y).where(("x.b".attr === "y.b".attr) && ("x.a".attr === 1))
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation.where('a === 1).subquery('x)
     val right = testRelation.subquery('y)
     val correctAnswer =
-      left.join(right, condition = Some("x.b".attr === "y.b".attr))
-        .analyze
+      left.join(right, condition = Some("x.b".attr === "y.b".attr)).analyze
 
     comparePlans(optimized, analysis.EliminateSubqueryAliases(correctAnswer))
   }
@@ -477,23 +459,23 @@ class FilterPushdownSuite extends PlanTest {
     val originalQuery = {
       z.join(x.join(y))
         .where(("x.b".attr === "y.b".attr) && ("x.a".attr === 1) &&
-          ("z.a".attr >= 3) && ("z.a".attr === "x.b".attr))
+            ("z.a".attr >= 3) && ("z.a".attr === "x.b".attr))
     }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val lleft = testRelation.where('a >= 3).subquery('z)
     val left = testRelation.where('a === 1).subquery('x)
     val right = testRelation.subquery('y)
-    val correctAnswer =
-      lleft.join(
-        left.join(right, condition = Some("x.b".attr === "y.b".attr)),
-          condition = Some("z.a".attr === "x.b".attr))
-        .analyze
+    val correctAnswer = lleft
+      .join(left.join(right, condition = Some("x.b".attr === "y.b".attr)),
+            condition = Some("z.a".attr === "x.b".attr))
+      .analyze
 
     comparePlans(optimized, analysis.EliminateSubqueryAliases(correctAnswer))
   }
 
-  val testRelationWithArrayType = LocalRelation('a.int, 'b.int, 'c_arr.array(IntegerType))
+  val testRelationWithArrayType = LocalRelation(
+      'a.int, 'b.int, 'c_arr.array(IntegerType))
 
   test("generate: predicate referenced no generated column") {
     val originalQuery = {
@@ -505,7 +487,8 @@ class FilterPushdownSuite extends PlanTest {
     val correctAnswer = {
       testRelationWithArrayType
         .where(('b >= 5) && ('a > 6))
-        .generate(Explode('c_arr), true, false, Some("arr")).analyze
+        .generate(Explode('c_arr), true, false, Some("arr"))
+        .analyze
     }
 
     comparePlans(optimized, correctAnswer)
@@ -541,7 +524,8 @@ class FilterPushdownSuite extends PlanTest {
       testRelationWithArrayType
         .where('b >= 5)
         .generate(generator, true, false, Some("arr"))
-        .where('c > 6).analyze
+        .where('c > 6)
+        .analyze
     }
 
     // Since newly generated columns get different ids every time being analyzed
@@ -562,7 +546,8 @@ class FilterPushdownSuite extends PlanTest {
     val originalQuery = {
       testRelationWithArrayType
         .generate(Explode('c_arr), true, false, Some("arr"))
-        .where(('c > 6) || ('b > 5)).analyze
+        .where(('c > 6) || ('b > 5))
+        .analyze
     }
     val optimized = Optimize.execute(originalQuery)
 
@@ -571,60 +556,58 @@ class FilterPushdownSuite extends PlanTest {
 
   test("push project and filter down into sample") {
     val x = testRelation.subquery('x)
-    val originalQuery =
-      Sample(0.0, 0.6, false, 11L, x)().select('a)
+    val originalQuery = Sample(0.0, 0.6, false, 11L, x)().select('a)
 
     val originalQueryAnalyzed =
       EliminateSubqueryAliases(analysis.SimpleAnalyzer.execute(originalQuery))
 
     val optimized = Optimize.execute(originalQueryAnalyzed)
 
-    val correctAnswer =
-      Sample(0.0, 0.6, false, 11L, x.select('a))()
+    val correctAnswer = Sample(0.0, 0.6, false, 11L, x.select('a))()
 
     comparePlans(optimized, correctAnswer.analyze)
   }
 
   test("aggregate: push down filter when filter on group by expression") {
     val originalQuery = testRelation
-                        .groupBy('a)('a, count('b) as 'c)
-                        .select('a, 'c)
-                        .where('a === 2)
+      .groupBy('a)('a, count('b) as 'c)
+      .select('a, 'c)
+      .where('a === 2)
 
     val optimized = Optimize.execute(originalQuery.analyze)
 
-    val correctAnswer = testRelation
-                        .where('a === 2)
-                        .groupBy('a)('a, count('b) as 'c)
-                        .analyze
+    val correctAnswer =
+      testRelation.where('a === 2).groupBy('a)('a, count('b) as 'c).analyze
     comparePlans(optimized, correctAnswer)
   }
 
-  test("aggregate: don't push down filter when filter not on group by expression") {
+  test(
+      "aggregate: don't push down filter when filter not on group by expression") {
     val originalQuery = testRelation
-                        .select('a, 'b)
-                        .groupBy('a)('a, count('b) as 'c)
-                        .where('c === 2L)
+      .select('a, 'b)
+      .groupBy('a)('a, count('b) as 'c)
+      .where('c === 2L)
 
     val optimized = Optimize.execute(originalQuery.analyze)
 
     comparePlans(optimized, originalQuery.analyze)
   }
 
-  test("aggregate: push down filters partially which are subset of group by expressions") {
+  test(
+      "aggregate: push down filters partially which are subset of group by expressions") {
     val originalQuery = testRelation
-                        .select('a, 'b)
-                        .groupBy('a)('a, count('b) as 'c)
-                        .where('c === 2L && 'a === 3)
+      .select('a, 'b)
+      .groupBy('a)('a, count('b) as 'c)
+      .where('c === 2L && 'a === 3)
 
     val optimized = Optimize.execute(originalQuery.analyze)
 
     val correctAnswer = testRelation
-                        .select('a, 'b)
-                        .where('a === 3)
-                        .groupBy('a)('a, count('b) as 'c)
-                        .where('c === 2L)
-                        .analyze
+      .select('a, 'b)
+      .where('a === 3)
+      .groupBy('a)('a, count('b) as 'c)
+      .where('c === 2L)
+      .analyze
 
     comparePlans(optimized, correctAnswer)
   }

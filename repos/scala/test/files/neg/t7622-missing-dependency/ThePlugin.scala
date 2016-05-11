@@ -30,4 +30,3 @@ class ThePlugin(val global: Global) extends Plugin {
     def run {}
   }
 }
-

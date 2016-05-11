@@ -8,21 +8,22 @@ import org.jboss.netty.buffer.ChannelBuffers._
 import scala.collection.mutable.{Buffer => SBuffer}
 
 /**
- * The Buffer interfaces provide convenience methods for reading/writing
- * a logical packet exchanged between a mysql client and server.
- * Additionally, a buffer is guaranteed to be read from and written to
- * in little endian byte order, which conforms to the mysql spec.
- */
+  * The Buffer interfaces provide convenience methods for reading/writing
+  * a logical packet exchanged between a mysql client and server.
+  * Additionally, a buffer is guaranteed to be read from and written to
+  * in little endian byte order, which conforms to the mysql spec.
+  */
 object Buffer {
-  val NullLength = -1 // denotes a SQL NULL value when reading a length coded binary.
+  val NullLength =
+    -1 // denotes a SQL NULL value when reading a length coded binary.
   val EmptyString = new String
   val EmptyByteArray = new Array[Byte](0)
 
   /**
-   * Calculates the size required to store a length
-   * according to the MySQL protocol for length coded
-   * binary.
-   */
+    * Calculates the size required to store a length
+    * according to the MySQL protocol for length coded
+    * binary.
+    */
   def sizeOfLen(l: Long) =
     if (l < 251) 1 else if (l < 65536) 3 else if (l < 16777216) 4 else 9
 
@@ -38,34 +39,36 @@ object Buffer {
 
   def fromChannelBuffer(cb: ChannelBuffer): Buffer = {
     require(cb != null)
-    require(cb.order == ByteOrder.LITTLE_ENDIAN, "Invalid ChannelBuffer ByteOrder")
+    require(
+        cb.order == ByteOrder.LITTLE_ENDIAN, "Invalid ChannelBuffer ByteOrder")
     new Buffer { val underlying = cb }
   }
 }
 
 sealed trait Buffer {
   val underlying: ChannelBuffer
-  def headOption: Option[Byte] = if (capacity >= 1) Some(underlying.getByte(0)) else None
+  def headOption: Option[Byte] =
+    if (capacity >= 1) Some(underlying.getByte(0)) else None
   def capacity: Int = underlying.capacity
 }
 
 /**
- * Provides convenient methods for reading
- * data in a packet body. All data is decoded
- * in little endian byte order in accordance with
- * the mysql protocol. Operations are side-effecting,
- * that is, all operations increase the offset
- * into the underlying buffer.
- */
+  * Provides convenient methods for reading
+  * data in a packet body. All data is decoded
+  * in little endian byte order in accordance with
+  * the mysql protocol. Operations are side-effecting,
+  * that is, all operations increase the offset
+  * into the underlying buffer.
+  */
 trait BufferReader extends Buffer {
 
   /** Current reader offset in the buffer. */
   def offset: Int
 
   /**
-   * Denotes if the buffer is readable upto the given width
-   * based on the current offset.
-   */
+    * Denotes if the buffer is readable upto the given width
+    * based on the current offset.
+    */
   def readable(width: Int): Boolean
 
   def readByte(): Byte
@@ -81,36 +84,35 @@ trait BufferReader extends Buffer {
   def readDouble(): Double
 
   /**
-   * Increases offset by n.
-   */
+    * Increases offset by n.
+    */
   def skip(n: Int): Unit
 
   /**
-   * Consumes the rest of the buffer and returns
-   * it in a new Array[Byte].
-   * @return Array[Byte] containing the rest of the buffer.
-   */
+    * Consumes the rest of the buffer and returns
+    * it in a new Array[Byte].
+    * @return Array[Byte] containing the rest of the buffer.
+    */
   def takeRest(): Array[Byte] = take(capacity - offset)
 
   /**
-   * Consumes n bytes in the buffer and
-   * returns them in a new Array.
-   * @return An Array[Byte] containing bytes from offset to offset+n
-   */
+    * Consumes n bytes in the buffer and
+    * returns them in a new Array.
+    * @return An Array[Byte] containing bytes from offset to offset+n
+    */
   def take(n: Int): Array[Byte]
 
   /**
-   * Reads a MySQL data field. A variable-length numeric value.
-   * Depending on the first byte, reads a different width from
-   * the buffer. For more info, refer to MySQL Client/Server protocol
-   * documentation.
-   * @return a numeric value representing the number of
-   * bytes expected to follow.
-   */
+    * Reads a MySQL data field. A variable-length numeric value.
+    * Depending on the first byte, reads a different width from
+    * the buffer. For more info, refer to MySQL Client/Server protocol
+    * documentation.
+    * @return a numeric value representing the number of
+    * bytes expected to follow.
+    */
   def readLengthCodedBinary(): Long = {
     val firstByte = readUnsignedByte()
-    if (firstByte < 251)
-      firstByte
+    if (firstByte < 251) firstByte
     else
       firstByte match {
         case 251 => Buffer.NullLength
@@ -123,26 +125,26 @@ trait BufferReader extends Buffer {
   }
 
   /**
-   * Reads a null-terminated string where
-   * null is denoted by '\0'. Uses Charset.defaultCharset by default
-   * to decode strings.
-   * @return a null-terminated String starting at offset.
-   */
-  def readNullTerminatedString(charset: JCharset = Charset.defaultCharset): String = {
+    * Reads a null-terminated string where
+    * null is denoted by '\0'. Uses Charset.defaultCharset by default
+    * to decode strings.
+    * @return a null-terminated String starting at offset.
+    */
+  def readNullTerminatedString(
+      charset: JCharset = Charset.defaultCharset): String = {
     val start = offset
     var length = 0
 
-    while (readByte() != 0x00)
-      length += 1
+    while (readByte() != 0x00) length += 1
 
     this.toString(start, length, charset)
   }
 
   /**
-   * Reads a null-terminated array where
-   * null is denoted by '\0'.
-   * @return a null-terminated String starting at offset.
-   */
+    * Reads a null-terminated array where
+    * null is denoted by '\0'.
+    * @return a null-terminated String starting at offset.
+    */
   def readNullTerminatedBytes(): Array[Byte] = {
     val cur: SBuffer[Byte] = SBuffer()
     do cur += readByte() while (cur.last != 0x00)
@@ -150,19 +152,18 @@ trait BufferReader extends Buffer {
   }
 
   /**
-   * Reads a length encoded string according to the MySQL
-   * Client/Server protocol. Uses Charset.defaultCharset by default
-   * to decode strings. For more details refer to MySQL
-   * documentation.
-   * @return a MySQL length coded String starting at
-   * offset.
-   */
-  def readLengthCodedString(charset: JCharset = Charset.defaultCharset): String = {
+    * Reads a length encoded string according to the MySQL
+    * Client/Server protocol. Uses Charset.defaultCharset by default
+    * to decode strings. For more details refer to MySQL
+    * documentation.
+    * @return a MySQL length coded String starting at
+    * offset.
+    */
+  def readLengthCodedString(
+      charset: JCharset = Charset.defaultCharset): String = {
     val length = readLengthCodedBinary().toInt
-    if (length == Buffer.NullLength)
-       null
-    else if (length == 0)
-      Buffer.EmptyString
+    if (length == Buffer.NullLength) null
+    else if (length == 0) Buffer.EmptyString
     else {
       val start = offset
       skip(length)
@@ -171,26 +172,23 @@ trait BufferReader extends Buffer {
   }
 
   /**
-   * Reads a length encoded set of bytes according to the MySQL
-   * Client/Server protocol. This is identical to a length coded
-   * string except the bytes are returned raw.
-   * @return an Array[Byte] containing the length coded set of
-   * bytes starting at offset.
-   */
+    * Reads a length encoded set of bytes according to the MySQL
+    * Client/Server protocol. This is identical to a length coded
+    * string except the bytes are returned raw.
+    * @return an Array[Byte] containing the length coded set of
+    * bytes starting at offset.
+    */
   def readLengthCodedBytes(): Array[Byte] = {
     val len = readLengthCodedBinary().toInt
-    if (len == Buffer.NullLength)
-      null
-    else if (len == 0)
-      Buffer.EmptyByteArray
-    else
-      take(len)
+    if (len == Buffer.NullLength) null
+    else if (len == 0) Buffer.EmptyByteArray
+    else take(len)
   }
 
   /**
-   * Returns the bytes from start to start+length
-   * into a string using the given java.nio.charset.Charset.
-   */
+    * Returns the bytes from start to start+length
+    * into a string using the given java.nio.charset.Charset.
+    */
   def toString(start: Int, length: Int, charset: JCharset): String
 }
 
@@ -206,10 +204,10 @@ object BufferReader {
     apply(Buffer(bytes), 0)
 
   /**
-   * BufferReader implementation backed by a Netty ChannelBuffer.
-   */
+    * BufferReader implementation backed by a Netty ChannelBuffer.
+    */
   private[this] class Netty3BufferReader(val underlying: ChannelBuffer)
-    extends BufferReader with Buffer {
+      extends BufferReader with Buffer {
     def offset = underlying.readerIndex
     def readable(width: Int) = underlying.readableBytes >= width
 
@@ -239,24 +237,24 @@ object BufferReader {
 }
 
 /**
- * Provides convenient methods for writing the
- * data in a mysql packet body. All data is encoded
- * in little endian byte order in accordance with
- * the mysql protocol. Operations are side-effecting,
- * that is, all operations increase the offset
- * into the underlying buffer.
- */
+  * Provides convenient methods for writing the
+  * data in a mysql packet body. All data is encoded
+  * in little endian byte order in accordance with
+  * the mysql protocol. Operations are side-effecting,
+  * that is, all operations increase the offset
+  * into the underlying buffer.
+  */
 trait BufferWriter extends Buffer {
 
   /**
-   * Current writer offset.
-   */
+    * Current writer offset.
+    */
   def offset: Int
 
   /**
-   * Denotes if the buffer is writable upto the given width
-   * based on the current offset.
-   */
+    * Denotes if the buffer is writable upto the given width
+    * based on the current offset.
+    */
   def writable(width: Int): Boolean
 
   def writeBoolean(b: Boolean): BufferWriter
@@ -271,82 +269,84 @@ trait BufferWriter extends Buffer {
   def skip(n: Int): BufferWriter
 
   /**
-   * Fills the rest of the buffer with the given byte.
-   * @param b Byte used to fill.
-   */
+    * Fills the rest of the buffer with the given byte.
+    * @param b Byte used to fill.
+    */
   def fillRest(b: Byte) = fill(capacity - offset, b)
 
   /**
-   * Fills the buffer from current offset to offset+n with b.
-   * @param n width to fill
-   * @param b Byte used to fill.
-   */
+    * Fills the buffer from current offset to offset+n with b.
+    * @param n width to fill
+    * @param b Byte used to fill.
+    */
   def fill(n: Int, b: Byte) = {
-    (offset until offset + n) foreach { j => writeByte(b) }
+    (offset until offset + n) foreach { j =>
+      writeByte(b)
+    }
     this
   }
 
   /**
-   * Writes bytes onto the buffer.
-   * @param bytes Array[Byte] to copy onto the buffer.
-   */
-   def writeBytes(bytes: Array[Byte]): BufferWriter
+    * Writes bytes onto the buffer.
+    * @param bytes Array[Byte] to copy onto the buffer.
+    */
+  def writeBytes(bytes: Array[Byte]): BufferWriter
 
-   /**
+  /**
     * Writes a length coded binary according the the MySQL
     * Client/Server protocol. Refer to MySQL documentation for
     * more information.
     */
-   def writeLengthCodedBinary(length: Long): BufferWriter = {
-     if (length < 251) {
-        writeByte(length.toInt)
-      } else if (length < 65536) {
-        writeByte(252)
-        writeShort(length.toInt)
-      } else if (length < 16777216) {
-        writeByte(253)
-        writeInt24(length.toInt)
-      } else {
-        writeByte(254)
-        writeLong(length)
-      }
+  def writeLengthCodedBinary(length: Long): BufferWriter = {
+    if (length < 251) {
+      writeByte(length.toInt)
+    } else if (length < 65536) {
+      writeByte(252)
+      writeShort(length.toInt)
+    } else if (length < 16777216) {
+      writeByte(253)
+      writeInt24(length.toInt)
+    } else {
+      writeByte(254)
+      writeLong(length)
     }
+  }
 
-   /**
+  /**
     * Writes a null terminated string onto the buffer where
     * '\0' denotes null. Uses Charset.defaultCharset by default
     * to decode the given String.
     * @param s String to write.
     */
-   def writeNullTerminatedString(
-     s: String,
-     charset: JCharset = Charset.defaultCharset
-   ): BufferWriter = {
+  def writeNullTerminatedString(
+      s: String,
+      charset: JCharset = Charset.defaultCharset
+  ): BufferWriter = {
     writeBytes(s.getBytes(charset))
     writeByte('\u0000')
     this
-   }
+  }
 
-   /**
+  /**
     * Writes a length coded string using the MySQL Client/Server
     * protocol. Uses Charset.defaultCharset by default to decode
     * the given String.
     * @param s String to write to buffer.
     */
-   def writeLengthCodedString(
-     s: String,
-     charset: JCharset = Charset.defaultCharset
-   ): BufferWriter = writeLengthCodedBytes(s.getBytes(charset))
+  def writeLengthCodedString(
+      s: String,
+      charset: JCharset = Charset.defaultCharset
+  ): BufferWriter = writeLengthCodedBytes(s.getBytes(charset))
 
-   /**
+  /**
     * Writes a length coded set of bytes according to the MySQL
     * client/server protocol.
     */
-   def writeLengthCodedBytes(bytes: Array[Byte]): BufferWriter = {
+  def writeLengthCodedBytes(bytes: Array[Byte]): BufferWriter = {
     writeLengthCodedBinary(bytes.length)
     writeBytes(bytes)
     this
-   }
+  }
 }
 
 object BufferWriter {
@@ -361,14 +361,15 @@ object BufferWriter {
     apply(Buffer(bytes), 0)
 
   /**
-   * BufferWriter implementation backed by a Netty ChannelBuffer.
-   */
+    * BufferWriter implementation backed by a Netty ChannelBuffer.
+    */
   private[this] class Netty3BufferWriter(val underlying: ChannelBuffer)
-    extends BufferWriter with Buffer {
+      extends BufferWriter with Buffer {
     def offset = underlying.writerIndex
     def writable(width: Int = 1): Boolean = underlying.writableBytes >= width
 
-    def writeBoolean(b: Boolean): BufferWriter = if(b) writeByte(1) else writeByte(0)
+    def writeBoolean(b: Boolean): BufferWriter =
+      if (b) writeByte(1) else writeByte(0)
 
     def writeByte(n: Int): BufferWriter = {
       underlying.writeByte(n)

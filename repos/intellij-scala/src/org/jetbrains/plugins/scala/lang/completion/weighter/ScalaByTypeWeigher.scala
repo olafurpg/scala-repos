@@ -16,10 +16,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
   */
 class ScalaByTypeWeigher extends CompletionWeigher {
 
-  override def weigh(element: LookupElement, location: CompletionLocation): Comparable[_] = {
+  override def weigh(
+      element: LookupElement, location: CompletionLocation): Comparable[_] = {
     import KindWeights._
 
-    val position = ScalaCompletionUtil.positionFromParameters(location.getCompletionParameters)
+    val position = ScalaCompletionUtil.positionFromParameters(
+        location.getCompletionParameters)
     val context = location.getProcessingContext
 
     val isAfterNew = ScalaAfterNewCompletionUtil.isAfterNew(position, context)
@@ -35,7 +37,9 @@ class ScalaByTypeWeigher extends CompletionWeigher {
           s.element match {
             case ta: ScTypeAlias if ta.isLocal => localType
             case ta: ScTypeAlias => typeDefinition
-            case te: ScTypeDefinition if !te.isObject && (te.isLocal || inFunction(te)) => localType
+            case te: ScTypeDefinition
+                if !te.isObject && (te.isLocal || inFunction(te)) =>
+              localType
             case te: ScTypeDefinition => typeDefinition
             case te: PsiClass => typeDefinition
             case _ => normal

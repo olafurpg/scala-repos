@@ -8,10 +8,14 @@ import sbt.compiler.AnalyzingCompiler
 import sbt.inc.AnalysisStore
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 trait CompilerFactory {
-  def createCompiler(compilerData: CompilerData, client: Client, fileToStore: File => AnalysisStore): Compiler
+  def createCompiler(compilerData: CompilerData,
+                     client: Client,
+                     fileToStore: File => AnalysisStore): Compiler
 
-  def getScalac(sbtData: SbtData, compilerJars: Option[CompilerJars], client: Client): Option[AnalyzingCompiler]
+  def getScalac(sbtData: SbtData,
+                compilerJars: Option[CompilerJars],
+                client: Client): Option[AnalyzingCompiler]
 }

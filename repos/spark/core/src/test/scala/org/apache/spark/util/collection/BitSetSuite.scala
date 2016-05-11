@@ -70,13 +70,13 @@ class BitSetSuite extends SparkFunSuite {
     assert(bitset.nextSetBit(97) === -1)
   }
 
-  test( "xor len(bitsetX) < len(bitsetY)" ) {
-    val setBitsX = Seq( 0, 2, 3, 37, 41 )
-    val setBitsY = Seq( 0, 1, 3, 37, 38, 41, 85)
+  test("xor len(bitsetX) < len(bitsetY)") {
+    val setBitsX = Seq(0, 2, 3, 37, 41)
+    val setBitsY = Seq(0, 1, 3, 37, 38, 41, 85)
     val bitsetX = new BitSet(60)
-    setBitsX.foreach( i => bitsetX.set(i))
+    setBitsX.foreach(i => bitsetX.set(i))
     val bitsetY = new BitSet(100)
-    setBitsY.foreach( i => bitsetY.set(i))
+    setBitsY.foreach(i => bitsetY.set(i))
 
     val bitsetXor = bitsetX ^ bitsetY
 
@@ -89,16 +89,15 @@ class BitSetSuite extends SparkFunSuite {
     assert(bitsetXor.nextSetBit(42) === 85)
     assert(bitsetXor.nextSetBit(85) === 85)
     assert(bitsetXor.nextSetBit(86) === -1)
-
   }
 
-  test( "xor len(bitsetX) > len(bitsetY)" ) {
-    val setBitsX = Seq( 0, 1, 3, 37, 38, 41, 85)
-    val setBitsY = Seq( 0, 2, 3, 37, 41)
+  test("xor len(bitsetX) > len(bitsetY)") {
+    val setBitsX = Seq(0, 1, 3, 37, 38, 41, 85)
+    val setBitsY = Seq(0, 2, 3, 37, 41)
     val bitsetX = new BitSet(100)
-    setBitsX.foreach( i => bitsetX.set(i))
+    setBitsX.foreach(i => bitsetX.set(i))
     val bitsetY = new BitSet(60)
-    setBitsY.foreach( i => bitsetY.set(i))
+    setBitsY.foreach(i => bitsetY.set(i))
 
     val bitsetXor = bitsetX ^ bitsetY
 
@@ -111,18 +110,17 @@ class BitSetSuite extends SparkFunSuite {
     assert(bitsetXor.nextSetBit(42) === 85)
     assert(bitsetXor.nextSetBit(85) === 85)
     assert(bitsetXor.nextSetBit(86) === -1)
-
   }
 
-  test( "andNot len(bitsetX) < len(bitsetY)" ) {
-    val setBitsX = Seq( 0, 2, 3, 37, 41, 48 )
-    val setBitsY = Seq( 0, 1, 3, 37, 38, 41, 85)
+  test("andNot len(bitsetX) < len(bitsetY)") {
+    val setBitsX = Seq(0, 2, 3, 37, 41, 48)
+    val setBitsY = Seq(0, 1, 3, 37, 38, 41, 85)
     val bitsetX = new BitSet(60)
-    setBitsX.foreach( i => bitsetX.set(i))
+    setBitsX.foreach(i => bitsetX.set(i))
     val bitsetY = new BitSet(100)
-    setBitsY.foreach( i => bitsetY.set(i))
+    setBitsY.foreach(i => bitsetY.set(i))
 
-    val bitsetDiff = bitsetX.andNot( bitsetY )
+    val bitsetDiff = bitsetX.andNot(bitsetY)
 
     assert(bitsetDiff.nextSetBit(0) === 2)
     assert(bitsetDiff.nextSetBit(1) === 2)
@@ -133,15 +131,15 @@ class BitSetSuite extends SparkFunSuite {
     assert(bitsetDiff.nextSetBit(65) === -1)
   }
 
-  test( "andNot len(bitsetX) > len(bitsetY)" ) {
-    val setBitsX = Seq( 0, 1, 3, 37, 38, 41, 85)
-    val setBitsY = Seq( 0, 2, 3, 37, 41, 48 )
+  test("andNot len(bitsetX) > len(bitsetY)") {
+    val setBitsX = Seq(0, 1, 3, 37, 38, 41, 85)
+    val setBitsY = Seq(0, 2, 3, 37, 41, 48)
     val bitsetX = new BitSet(100)
-    setBitsX.foreach( i => bitsetX.set(i))
+    setBitsX.foreach(i => bitsetX.set(i))
     val bitsetY = new BitSet(60)
-    setBitsY.foreach( i => bitsetY.set(i))
+    setBitsY.foreach(i => bitsetY.set(i))
 
-    val bitsetDiff = bitsetX.andNot( bitsetY )
+    val bitsetDiff = bitsetX.andNot(bitsetY)
 
     assert(bitsetDiff.nextSetBit(0) === 1)
     assert(bitsetDiff.nextSetBit(1) === 1)

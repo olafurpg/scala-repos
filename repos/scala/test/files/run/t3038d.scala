@@ -35,7 +35,8 @@ class Bar extends Foo with Serializable {
 
 object Test {
   private def toObject[A](bytes: Array[Byte]): A = {
-    val in = new java.io.ObjectInputStream(new java.io.ByteArrayInputStream(bytes))
+    val in =
+      new java.io.ObjectInputStream(new java.io.ByteArrayInputStream(bytes))
     in.readObject.asInstanceOf[A]
   }
 
@@ -47,10 +48,9 @@ object Test {
     bos.toByteArray
   }
 
-
   def main(args: Array[String]) {
     val a1 = new Bar()
-    val serialized:Array[Byte] = toBytes(a1)
+    val serialized: Array[Byte] = toBytes(a1)
     val deserialized: Bar = toObject(serialized)
     deserialized.size
     deserialized.checkMember

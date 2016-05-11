@@ -4,10 +4,10 @@ package object holder {
 }
 
 package holder {
-class C
-object O
-trait T {
-  println(/* line: 8 */ O.getClass)
-  println(classOf[ /* line: 7 */ C])
-}
+  class C
+  object O
+  trait T {
+    println( /* line: 8 */ O.getClass)
+    println(classOf[ /* line: 7 */ C])
+  }
 }

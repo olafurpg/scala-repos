@@ -18,14 +18,14 @@
 package org.apache.spark.mllib.evaluation.binary
 
 /**
- * A counter for positives and negatives.
- *
- * @param numPositives number of positive labels
- * @param numNegatives number of negative labels
- */
+  * A counter for positives and negatives.
+  *
+  * @param numPositives number of positive labels
+  * @param numNegatives number of negative labels
+  */
 private[evaluation] class BinaryLabelCounter(
-    var numPositives: Long = 0L,
-    var numNegatives: Long = 0L) extends Serializable {
+    var numPositives: Long = 0L, var numNegatives: Long = 0L)
+    extends Serializable {
 
   /** Processes a label. */
   def +=(label: Double): BinaryLabelCounter = {
@@ -46,5 +46,6 @@ private[evaluation] class BinaryLabelCounter(
     new BinaryLabelCounter(numPositives, numNegatives)
   }
 
-  override def toString: String = s"{numPos: $numPositives, numNeg: $numNegatives}"
+  override def toString: String =
+    s"{numPos: $numPositives, numNeg: $numNegatives}"
 }

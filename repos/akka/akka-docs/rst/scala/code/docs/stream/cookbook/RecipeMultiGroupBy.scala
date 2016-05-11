@@ -1,7 +1,7 @@
 package docs.stream.cookbook
 
 import akka.NotUsed
-import akka.stream.scaladsl.{ Sink, Source }
+import akka.stream.scaladsl.{Sink, Source}
 
 import scala.collection.immutable
 import scala.concurrent.Await
@@ -24,21 +24,21 @@ class RecipeMultiGroupBy extends RecipeSpec {
       //#multi-groupby
       val topicMapper: (Message) => immutable.Seq[Topic] = extractTopics
 
-      val messageAndTopic: Source[(Message, Topic), NotUsed] = elems.mapConcat { msg: Message =>
-        val topicsForMessage = topicMapper(msg)
-        // Create a (Msg, Topic) pair for each of the topics
-        // the message belongs to
-        topicsForMessage.map(msg -> _)
-      }
-
-      val multiGroups = messageAndTopic
-        .groupBy(2, _._2).map {
-          case (msg, topic) =>
-            // do what needs to be done
-            //#multi-groupby
-            (msg, topic)
-          //#multi-groupby
+      val messageAndTopic: Source[(Message, Topic), NotUsed] =
+        elems.mapConcat { msg: Message =>
+          val topicsForMessage = topicMapper(msg)
+          // Create a (Msg, Topic) pair for each of the topics
+          // the message belongs to
+          topicsForMessage.map(msg -> _)
         }
+
+      val multiGroups = messageAndTopic.groupBy(2, _._2).map {
+        case (msg, topic) =>
+          // do what needs to be done
+          //#multi-groupby
+          (msg, topic)
+        //#multi-groupby
+      }
       //#multi-groupby
 
       val result = multiGroups
@@ -48,12 +48,8 @@ class RecipeMultiGroupBy extends RecipeSpec {
         .limit(10)
         .runWith(Sink.seq)
 
-      Await.result(result, 3.seconds).toSet should be(Set(
-        "1[1: a, 1: b, all: c, all: d, 1: e]",
-        "2[all: c, all: d]"))
-
+      Await.result(result, 3.seconds).toSet should be(
+          Set("1[1: a, 1: b, all: c, all: d, 1: e]", "2[all: c, all: d]"))
     }
-
   }
-
 }

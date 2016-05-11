@@ -12,27 +12,26 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird.batch.store
 
-import com.twitter.scalding.commons.datastores.{ VersionedStore => BacktypeVersionedStore }
-import com.twitter.bijection.json.{ JsonInjection, JsonNodeInjection }
-import java.io.{ DataOutputStream, DataInputStream }
+import com.twitter.scalding.commons.datastores.{VersionedStore => BacktypeVersionedStore}
+import com.twitter.bijection.json.{JsonInjection, JsonNodeInjection}
+import java.io.{DataOutputStream, DataInputStream}
 import java.net.URI
 import org.apache.hadoop.io.WritableUtils
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{ FileSystem, Path }
+import org.apache.hadoop.fs.{FileSystem, Path}
 import scala.collection.JavaConverters._
 import scala.util.Try
 import scala.util.control.Exception.allCatch
 
 /**
- * @author Oscar Boykin
- * @author Sam Ritchie
- * @author Ashu Singhal
- */
-
+  * @author Oscar Boykin
+  * @author Sam Ritchie
+  * @author Ashu Singhal
+  */
 // HDFSMetadata allows metadata about a versioned dataset to be stored
 // alongside that version. "versions" are really just timestamp folder
 // names guaranteed to appear in increasing order. The BatchIDs stored
@@ -62,22 +61,20 @@ private[summingbird] object HDFSMetadata {
     new HDFSMetadata(conf, rootPath)
 
   /** Get from the most recent version */
-  def get[T: JsonNodeInjection](conf: Configuration, path: String): Option[T] =
-    apply(conf, path)
-      .mostRecentVersion
-      .flatMap { _.get[T].toOption }
+  def get[T : JsonNodeInjection](
+      conf: Configuration, path: String): Option[T] =
+    apply(conf, path).mostRecentVersion.flatMap { _.get[T].toOption }
 
   /** Put to the most recent version */
-  def put[T: JsonNodeInjection](conf: Configuration, path: String, obj: Option[T]) =
-    apply(conf, path)
-      .mostRecentVersion
-      .get.put(obj)
+  def put[T : JsonNodeInjection](
+      conf: Configuration, path: String, obj: Option[T]) =
+    apply(conf, path).mostRecentVersion.get.put(obj)
 }
 
 /**
- * Class to access metadata for a single versioned output directory
- * @param rootPath the base root path to where versions of a single output are stored
- */
+  * Class to access metadata for a single versioned output directory
+  * @param rootPath the base root path to where versions of a single output are stored
+  */
 class HDFSMetadata(conf: Configuration, rootPath: String) {
   protected val versionedStore: BacktypeVersionedStore = {
     val fs = FileSystem.get(new URI(rootPath), conf)
@@ -85,27 +82,30 @@ class HDFSMetadata(conf: Configuration, rootPath: String) {
   }
 
   /**
-   * path to a specific version WHETHER OR NOT IT EXISTS
-   */
+    * path to a specific version WHETHER OR NOT IT EXISTS
+    */
   private def pathOf(version: Long): Path =
     new Path(versionedStore.versionPath(version), HDFSMetadata.METADATA_FILE)
 
   /**
-   * The greatest version number that has been completed on disk
-   */
+    * The greatest version number that has been completed on disk
+    */
   def mostRecentVersion: Option[HDFSVersionMetadata] =
-    Option(versionedStore.mostRecentVersion)
-      .map { jlong => new HDFSVersionMetadata(jlong.longValue, conf, pathOf(jlong.longValue)) }
+    Option(versionedStore.mostRecentVersion).map { jlong =>
+      new HDFSVersionMetadata(jlong.longValue, conf, pathOf(jlong.longValue))
+    }
 
   /** Create a new version number that is greater than all previous */
   def newVersion: Long = versionedStore.newVersion
 
   /** Find the newest version that satisfies a predicate */
-  def find[T: JsonNodeInjection](fn: (T) => Boolean): Option[(T, HDFSVersionMetadata)] =
+  def find[T : JsonNodeInjection](
+      fn: (T) => Boolean): Option[(T, HDFSVersionMetadata)] =
     select(fn).headOption
 
   /** select all versions that satisfy a predicate */
-  def select[T: JsonNodeInjection](fn: (T) => Boolean): Iterable[(T, HDFSVersionMetadata)] =
+  def select[T : JsonNodeInjection](
+      fn: (T) => Boolean): Iterable[(T, HDFSVersionMetadata)] =
     for {
       v <- versions
       hmd = apply(v)
@@ -113,18 +113,14 @@ class HDFSMetadata(conf: Configuration, rootPath: String) {
     } yield (it, hmd)
 
   /**
-   * This touches the filesystem once on each call, newest (largest) to oldest (smallest)
-   * This relies on dfs-datastore doing the sorting, which it does
-   * last we checked
-   */
+    * This touches the filesystem once on each call, newest (largest) to oldest (smallest)
+    * This relies on dfs-datastore doing the sorting, which it does
+    * last we checked
+    */
   def versions: Iterable[Long] =
-    versionedStore
-      .getAllVersions
-      .asScala
-      .toList
-      .sorted
-      .reverse
-      .map { _.longValue }
+    versionedStore.getAllVersions.asScala.toList.sorted.reverse.map {
+      _.longValue
+    }
 
   /** Refer to a specific version, even if it does not exist on disk */
   def apply(version: Long): HDFSVersionMetadata =
@@ -136,9 +132,10 @@ class HDFSMetadata(conf: Configuration, rootPath: String) {
 }
 
 /**
- * Refers to a specific version on disk. Allows reading and writing metadata to specific locations
- */
-private[summingbird] class HDFSVersionMetadata private[store] (val version: Long, conf: Configuration, val path: Path) {
+  * Refers to a specific version on disk. Allows reading and writing metadata to specific locations
+  */
+private[summingbird] class HDFSVersionMetadata private[store](
+    val version: Long, conf: Configuration, val path: Path) {
   private def getFS = path.getFileSystem(conf)
   private def getString: Try[String] =
     Try {
@@ -147,10 +144,11 @@ private[summingbird] class HDFSVersionMetadata private[store] (val version: Long
       is.close
       str
     }
+
   /**
-   * get an item from the metadata file. If there is any failure, you get None.
-   */
-  def get[T: JsonNodeInjection]: Try[T] =
+    * get an item from the metadata file. If there is any failure, you get None.
+    */
+  def get[T : JsonNodeInjection]: Try[T] =
     getString.flatMap { JsonInjection.fromString[T](_) }
 
   private def putString(str: String) {
@@ -160,8 +158,7 @@ private[summingbird] class HDFSVersionMetadata private[store] (val version: Long
   }
 
   /** Put a new meta-data file, or overwrite on HDFS */
-  def put[T: JsonNodeInjection](obj: Option[T]) = putString {
-    obj.map { JsonInjection.toString[T].apply(_) }
-      .getOrElse("")
+  def put[T : JsonNodeInjection](obj: Option[T]) = putString {
+    obj.map { JsonInjection.toString[T].apply(_) }.getOrElse("")
   }
 }

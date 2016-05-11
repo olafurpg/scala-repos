@@ -1,33 +1,36 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import language.postfixOps
 import java.io.Closeable
 import java.util.concurrent._
-import atomic.{ AtomicReference, AtomicInteger }
-import scala.concurrent.{ future, Await, ExecutionContext }
+import atomic.{AtomicReference, AtomicInteger}
+import scala.concurrent.{future, Await, ExecutionContext}
 import scala.concurrent.duration._
 import java.util.concurrent.ThreadLocalRandom
 import scala.util.Try
 import scala.util.control.NonFatal
 import org.scalatest.BeforeAndAfterEach
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 import akka.pattern.ask
 import akka.testkit._
 import scala.util.control.NoStackTrace
 
 object SchedulerSpec {
-  val testConfRevolver = ConfigFactory.parseString("""
+  val testConfRevolver = ConfigFactory
+    .parseString("""
     akka.scheduler.implementation = akka.actor.LightArrayRevolverScheduler
     akka.scheduler.ticks-per-wheel = 32
     akka.actor.serialize-messages = off
-  """).withFallback(AkkaSpec.testConf)
+  """)
+    .withFallback(AkkaSpec.testConf)
 }
 
-trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with ImplicitSender { this: AkkaSpec ⇒
+trait SchedulerSpec
+    extends BeforeAndAfterEach with DefaultTimeout with ImplicitSender {
+  this: AkkaSpec ⇒
   import system.dispatcher
 
   def collectCancellable(c: Cancellable): Cancellable
@@ -38,7 +41,9 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
       case object Tick
       case object Tock
 
-      val tickActor, tickActor2 = system.actorOf(Props(new Actor {
+      val tickActor, tickActor2 = system.actorOf(
+          Props(
+              new Actor {
         var ticks = 0
         def receive = {
           case Tick ⇒
@@ -49,7 +54,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
         }
       }))
       // run every 50 milliseconds
-      collectCancellable(system.scheduler.schedule(0 milliseconds, 50 milliseconds, tickActor, Tick))
+      collectCancellable(system.scheduler.schedule(
+              0 milliseconds, 50 milliseconds, tickActor, Tick))
 
       // after max 1 second it should be executed at least the 3 times already
       expectMsg(Tock)
@@ -57,7 +63,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
       expectMsg(Tock)
       expectNoMsg(500 millis)
 
-      collectCancellable(system.scheduler.schedule(0 milliseconds, 50 milliseconds)(tickActor2 ! Tick))
+      collectCancellable(system.scheduler.schedule(
+              0 milliseconds, 50 milliseconds)(tickActor2 ! Tick))
 
       // after max 1 second it should be executed at least the 3 times already
       expectMsg(Tock)
@@ -67,10 +74,12 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
     }
 
     "stop continuous scheduling if the receiving actor has been terminated" taggedAs TimingTest in {
-      val actor = system.actorOf(Props(new Actor { def receive = { case x ⇒ sender() ! x } }))
+      val actor = system.actorOf(
+          Props(new Actor { def receive = { case x ⇒ sender() ! x } }))
 
       // run immediately and then every 100 milliseconds
-      collectCancellable(system.scheduler.schedule(0 milliseconds, 100 milliseconds, actor, "msg"))
+      collectCancellable(system.scheduler.schedule(
+              0 milliseconds, 100 milliseconds, actor, "msg"))
       expectMsg("msg")
 
       // stop the actor and, hence, the continuous messaging from happening
@@ -81,7 +90,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
 
     "stop continuous scheduling if the task throws exception" taggedAs TimingTest in {
       val count = new AtomicInteger(0)
-      collectCancellable(system.scheduler.schedule(0 milliseconds, 20.millis) {
+      collectCancellable(
+          system.scheduler.schedule(0 milliseconds, 20.millis) {
         val c = count.incrementAndGet()
         testActor ! c
         if (c == 3) throw new RuntimeException("TEST") with NoStackTrace
@@ -100,8 +110,10 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
       }))
 
       // run after 300 millisec
-      collectCancellable(system.scheduler.scheduleOnce(300 milliseconds, tickActor, Tick))
-      collectCancellable(system.scheduler.scheduleOnce(300 milliseconds)(countDownLatch.countDown()))
+      collectCancellable(
+          system.scheduler.scheduleOnce(300 milliseconds, tickActor, Tick))
+      collectCancellable(system.scheduler.scheduleOnce(300 milliseconds)(
+              countDownLatch.countDown()))
 
       // should not be run immediately
       assert(countDownLatch.await(100, TimeUnit.MILLISECONDS) == false)
@@ -114,10 +126,12 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
     }
 
     /**
-     * ticket #372
-     */
+      * ticket #372
+      */
     "be cancellable" taggedAs TimingTest in {
-      for (_ ← 1 to 10) system.scheduler.scheduleOnce(1 second, testActor, "fail").cancel()
+      for (_ ← 1 to 10) system.scheduler
+        .scheduleOnce(1 second, testActor, "fail")
+        .cancel()
 
       expectNoMsg(2 seconds)
     }
@@ -127,7 +141,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
 
       val initialDelay = 200.milliseconds.dilated
       val delay = 10.milliseconds.dilated
-      val timeout = collectCancellable(system.scheduler.schedule(initialDelay, delay) {
+      val timeout = collectCancellable(
+          system.scheduler.schedule(initialDelay, delay) {
         ticks.incrementAndGet()
       })
       Thread.sleep(10.milliseconds.dilated.toMillis)
@@ -142,7 +157,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
 
       val initialDelay = 90.milliseconds.dilated
       val delay = 500.milliseconds.dilated
-      val timeout = collectCancellable(system.scheduler.schedule(initialDelay, delay) {
+      val timeout = collectCancellable(
+          system.scheduler.schedule(initialDelay, delay) {
         ticks.incrementAndGet()
       })
       Thread.sleep((initialDelay + 200.milliseconds.dilated).toMillis)
@@ -153,7 +169,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
     }
 
     "be canceled if cancel is performed before execution" in {
-      val task = collectCancellable(system.scheduler.scheduleOnce(10 seconds)(()))
+      val task =
+        collectCancellable(system.scheduler.scheduleOnce(10 seconds)(()))
       task.cancel() should ===(true)
       task.isCancelled should ===(true)
       task.cancel() should ===(false)
@@ -162,7 +179,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
 
     "not be canceled if cancel is performed after execution" in {
       val latch = TestLatch(1)
-      val task = collectCancellable(system.scheduler.scheduleOnce(10 millis)(latch.countDown()))
+      val task = collectCancellable(
+          system.scheduler.scheduleOnce(10 millis)(latch.countDown()))
       Await.ready(latch, remainingOrDefault)
       task.cancel() should ===(false)
       task.isCancelled should ===(false)
@@ -171,8 +189,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
     }
 
     /**
-     * ticket #307
-     */
+      * ticket #307
+      */
     "pick up schedule after actor restart" taggedAs TimingTest in {
 
       object Ping
@@ -181,21 +199,26 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
       val restartLatch = new TestLatch
       val pingLatch = new TestLatch(6)
 
-      val supervisor = system.actorOf(Props(new Supervisor(AllForOneStrategy(3, 1 second)(List(classOf[Exception])))))
-      val props = Props(new Actor {
+      val supervisor = system.actorOf(Props(new Supervisor(
+                  AllForOneStrategy(3, 1 second)(List(classOf[Exception])))))
+      val props = Props(
+          new Actor {
         def receive = {
-          case Ping  ⇒ pingLatch.countDown()
+          case Ping ⇒ pingLatch.countDown()
           case Crash ⇒ throw new Exception("CRASH")
         }
 
         override def postRestart(reason: Throwable) = restartLatch.open
       })
-      val actor = Await.result((supervisor ? props).mapTo[ActorRef], timeout.duration)
+      val actor =
+        Await.result((supervisor ? props).mapTo[ActorRef], timeout.duration)
 
-      collectCancellable(system.scheduler.schedule(500 milliseconds, 500 milliseconds, actor, Ping))
+      collectCancellable(system.scheduler.schedule(
+              500 milliseconds, 500 milliseconds, actor, Ping))
       // appx 2 pings before crash
       EventFilter[Exception]("CRASH", occurrences = 1) intercept {
-        collectCancellable(system.scheduler.scheduleOnce(1000 milliseconds, actor, Crash))
+        collectCancellable(
+            system.scheduler.scheduleOnce(1000 milliseconds, actor, Crash))
       }
 
       Await.ready(restartLatch, 2 seconds)
@@ -213,13 +236,16 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
           case Msg(ts) ⇒
             val now = System.nanoTime
             // Make sure that no message has been dispatched before the scheduled time (10ms) has occurred
-            if (now < ts) throw new RuntimeException("Interval is too small: " + (now - ts))
+            if (now < ts)
+              throw new RuntimeException(
+                  "Interval is too small: " + (now - ts))
             ticks.countDown()
         }
       }))
 
       (1 to 300).foreach { i ⇒
-        collectCancellable(system.scheduler.scheduleOnce(20 milliseconds, actor, Msg(System.nanoTime)))
+        collectCancellable(system.scheduler.scheduleOnce(
+                20 milliseconds, actor, Msg(System.nanoTime)))
         Thread.sleep(5)
       }
 
@@ -236,7 +262,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
       }))
 
       val startTime = System.nanoTime()
-      collectCancellable(system.scheduler.schedule(1 second, 300 milliseconds, actor, Msg))
+      collectCancellable(
+          system.scheduler.schedule(1 second, 300 milliseconds, actor, Msg))
       Await.ready(ticks, 3 seconds)
 
       // LARS is a bit more aggressive in scheduling recurring tasks at the right
@@ -252,7 +279,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
       system.scheduler.schedule(25.millis, 25.millis) { latch.countDown() }
       Await.ready(latch, 6.seconds)
       // Rate
-      n * 1000.0 / (System.nanoTime - startTime).nanos.toMillis should ===(40.0 +- 4)
+      n * 1000.0 / (System.nanoTime - startTime).nanos.toMillis should ===(
+          40.0 +- 4)
     }
 
     "not be affected by long running task" taggedAs TimingTest in {
@@ -265,7 +293,8 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
       }
       Await.ready(latch, 6.seconds)
       // Rate
-      n * 1000.0 / (System.nanoTime - startTime).nanos.toMillis should ===(4.4 +- 0.5)
+      n * 1000.0 / (System.nanoTime - startTime).nanos.toMillis should ===(
+          4.4 +- 0.5)
     }
 
     "handle timeouts equal to multiple of wheel period" taggedAs TimingTest in {
@@ -292,9 +321,11 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
         }
       }
       val latencies = within(10.seconds) {
-        for (i ← 1 to N) yield try expectMsgType[Long] catch {
-          case NonFatal(e) ⇒ throw new Exception(s"failed expecting the $i-th latency", e)
-        }
+        for (i ← 1 to N) yield
+          try expectMsgType[Long] catch {
+            case NonFatal(e) ⇒
+              throw new Exception(s"failed expecting the $i-th latency", e)
+          }
       }
       val histogram = latencies groupBy (_ / 100000000L)
       for (k ← histogram.keys.toSeq.sorted) {
@@ -304,11 +335,13 @@ trait SchedulerSpec extends BeforeAndAfterEach with DefaultTimeout with Implicit
   }
 }
 
-class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRevolver) with SchedulerSpec {
+class LightArrayRevolverSchedulerSpec
+    extends AkkaSpec(SchedulerSpec.testConfRevolver) with SchedulerSpec {
 
   def collectCancellable(c: Cancellable): Cancellable = c
 
-  def tickDuration = system.scheduler.asInstanceOf[LightArrayRevolverScheduler].TickDuration
+  def tickDuration =
+    system.scheduler.asInstanceOf[LightArrayRevolverScheduler].TickDuration
 
   "A LightArrayRevolverScheduler" must {
 
@@ -324,7 +357,8 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
     "reject periodic tasks scheduled too far into the future" in {
       val maxDelay = tickDuration * Int.MaxValue
       import system.dispatcher
-      system.scheduler.schedule(maxDelay - tickDuration, 1.second, testActor, "OK")
+      system.scheduler.schedule(
+          maxDelay - tickDuration, 1.second, testActor, "OK")
       intercept[IllegalArgumentException] {
         system.scheduler.schedule(maxDelay, 1.second, testActor, "Too far")
       }
@@ -333,7 +367,8 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
     "reject periodic tasks scheduled with too long interval" in {
       val maxDelay = tickDuration * Int.MaxValue
       import system.dispatcher
-      system.scheduler.schedule(100.millis, maxDelay - tickDuration, testActor, "OK")
+      system.scheduler.schedule(
+          100.millis, maxDelay - tickDuration, testActor, "OK")
       expectMsg("OK")
       intercept[IllegalArgumentException] {
         system.scheduler.schedule(100.millis, maxDelay, testActor, "Too long")
@@ -362,9 +397,11 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
       val cancelled = cancellations.sum
       println(cancelled)
       val latencies = within(10.seconds) {
-        for (i ← 1 to (N - cancelled)) yield try expectMsgType[Long] catch {
-          case NonFatal(e) ⇒ throw new Exception(s"failed expecting the $i-th latency", e)
-        }
+        for (i ← 1 to (N - cancelled)) yield
+          try expectMsgType[Long] catch {
+            case NonFatal(e) ⇒
+              throw new Exception(s"failed expecting the $i-th latency", e)
+          }
       }
       val histogram = latencies groupBy (_ / 100000000L)
       for (k ← histogram.keys.toSeq.sorted) {
@@ -374,7 +411,8 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
     }
 
     "survive vicious enqueueing" in {
-      withScheduler(config = ConfigFactory.parseString("akka.scheduler.ticks-per-wheel=2")) { (sched, driver) ⇒
+      withScheduler(config = ConfigFactory.parseString(
+                "akka.scheduler.ticks-per-wheel=2")) { (sched, driver) ⇒
         import driver._
         import system.dispatcher
         val counter = new AtomicInteger
@@ -387,9 +425,11 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
           }
           rounds
         }
-        def delay = if (ThreadLocalRandom.current.nextBoolean) step * 2 else step
+        def delay =
+          if (ThreadLocalRandom.current.nextBoolean) step * 2 else step
         val N = 1000000
-        (1 to N) foreach (_ ⇒ sched.scheduleOnce(delay)(counter.incrementAndGet()))
+        (1 to N) foreach
+        (_ ⇒ sched.scheduleOnce(delay)(counter.incrementAndGet()))
         sched.close()
         Await.result(terminated, 3.seconds.dilated) should be > 10
         awaitCond(counter.get == N)
@@ -401,7 +441,8 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
         implicit def ec = localEC
         import driver._
         val start = step / 2
-        (0 to 3) foreach (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
+        (0 to 3) foreach
+        (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
         expectNoMsg(step)
         wakeUp(step)
         expectWait(step)
@@ -427,11 +468,13 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
     }
 
     "correctly wrap around wheel rounds" in {
-      withScheduler(config = ConfigFactory.parseString("akka.scheduler.ticks-per-wheel=2")) { (sched, driver) ⇒
+      withScheduler(config = ConfigFactory.parseString(
+                "akka.scheduler.ticks-per-wheel=2")) { (sched, driver) ⇒
         implicit def ec = localEC
         import driver._
         val start = step / 2
-        (0 to 3) foreach (i ⇒ sched.scheduleOnce(start + step * i, probe.ref, "hello"))
+        (0 to 3) foreach
+        (i ⇒ sched.scheduleOnce(start + step * i, probe.ref, "hello"))
         probe.expectNoMsg(step)
         wakeUp(step)
         expectWait(step)
@@ -458,7 +501,8 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
         implicit def ec = localEC
         import driver._
         val start = step / 2
-        (0 to 3) foreach (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
+        (0 to 3) foreach
+        (i ⇒ sched.scheduleOnce(start + step * i, testActor, "hello"))
         expectNoMsg(step)
         wakeUp(step)
         expectWait(step)
@@ -489,7 +533,8 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
         var overrun = headroom
         val cap = 1000000
         val (success, failure) = Iterator
-          .continually(Try(sched.scheduleOnce(100.millis)(counter.incrementAndGet())))
+          .continually(
+              Try(sched.scheduleOnce(100.millis)(counter.incrementAndGet())))
           .take(cap)
           .takeWhile(_.isSuccess || { overrun -= 1; overrun >= 0 })
           .partition(_.isSuccess)
@@ -515,48 +560,50 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
     def reportFailure(t: Throwable) { t.printStackTrace() }
   }
 
-  def withScheduler(start: Long = 0L, config: Config = ConfigFactory.empty)(thunk: (Scheduler with Closeable, Driver) ⇒ Unit): Unit = {
-    import akka.actor.{ LightArrayRevolverScheduler ⇒ LARS }
-    val lbq = new AtomicReference[LinkedBlockingQueue[Long]](new LinkedBlockingQueue[Long])
+  def withScheduler(start: Long = 0L, config: Config = ConfigFactory.empty)(
+      thunk: (Scheduler with Closeable, Driver) ⇒ Unit): Unit = {
+    import akka.actor.{LightArrayRevolverScheduler ⇒ LARS}
+    val lbq = new AtomicReference[LinkedBlockingQueue[Long]](
+        new LinkedBlockingQueue[Long])
     val prb = TestProbe()
     val tf = system.asInstanceOf[ActorSystemImpl].threadFactory
-    val sched =
-      new { @volatile var time = start } with LARS(config.withFallback(system.settings.config), log, tf) {
-        override protected def clock(): Long = {
-          // println(s"clock=$time")
-          time
-        }
+    val sched = new { @volatile var time = start } with LARS(
+        config.withFallback(system.settings.config), log, tf) {
+      override protected def clock(): Long = {
+        // println(s"clock=$time")
+        time
+      }
 
-        override protected def getShutdownTimeout: FiniteDuration = (10 seconds).dilated
+      override protected def getShutdownTimeout: FiniteDuration =
+        (10 seconds).dilated
 
-        override protected def waitNanos(ns: Long): Unit = {
-          // println(s"waiting $ns")
-          prb.ref ! ns
-          try time += (lbq.get match {
-            case q: LinkedBlockingQueue[Long] ⇒ q.take()
-            case _                            ⇒ 0L
-          })
-          catch {
-            case _: InterruptedException ⇒ Thread.currentThread.interrupt()
-          }
+      override protected def waitNanos(ns: Long): Unit = {
+        // println(s"waiting $ns")
+        prb.ref ! ns
+        try time +=
+        (lbq.get match {
+              case q: LinkedBlockingQueue[Long] ⇒ q.take()
+              case _ ⇒ 0L
+            }) catch {
+          case _: InterruptedException ⇒ Thread.currentThread.interrupt()
         }
       }
+    }
     val driver = new Driver {
       def wakeUp(d: FiniteDuration) = lbq.get match {
         case q: LinkedBlockingQueue[Long] ⇒ q.offer(d.toNanos)
-        case _                            ⇒
+        case _ ⇒
       }
       def expectWait(): FiniteDuration = probe.expectMsgType[Long].nanos
       def probe = prb
       def step = sched.TickDuration
       def close() = lbq.getAndSet(null) match {
         case q: LinkedBlockingQueue[Long] ⇒ q.offer(0L)
-        case _                            ⇒
+        case _ ⇒
       }
     }
     driver.expectWait()
-    try thunk(sched, driver)
-    catch {
+    try thunk(sched, driver) catch {
       case NonFatal(ex) ⇒
         try {
           driver.close()
@@ -567,5 +614,4 @@ class LightArrayRevolverSchedulerSpec extends AkkaSpec(SchedulerSpec.testConfRev
     driver.close()
     sched.close()
   }
-
 }

@@ -26,9 +26,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.Utils
 
 /**
- * This testsuite tests master failures at random times while the stream is running using
- * the real clock.
- */
+  * This testsuite tests master failures at random times while the stream is running using
+  * the real clock.
+  */
 class FailureSuite extends SparkFunSuite with BeforeAndAfter with Logging {
 
   private val batchDuration: Duration = Milliseconds(1000)
@@ -46,15 +46,18 @@ class FailureSuite extends SparkFunSuite with BeforeAndAfter with Logging {
     StreamingContext.getActive().foreach { _.stop() }
 
     // Stop SparkContext if active
-    SparkContext.getOrCreate(new SparkConf().setMaster("local").setAppName("bla")).stop()
+    SparkContext
+      .getOrCreate(new SparkConf().setMaster("local").setAppName("bla"))
+      .stop()
   }
 
   test("multiple failures with map") {
-    MasterFailureTest.testMap(directory.getAbsolutePath, numBatches, batchDuration)
+    MasterFailureTest.testMap(
+        directory.getAbsolutePath, numBatches, batchDuration)
   }
 
   test("multiple failures with updateStateByKey") {
-    MasterFailureTest.testUpdateStateByKey(directory.getAbsolutePath, numBatches, batchDuration)
+    MasterFailureTest.testUpdateStateByKey(
+        directory.getAbsolutePath, numBatches, batchDuration)
   }
 }
-

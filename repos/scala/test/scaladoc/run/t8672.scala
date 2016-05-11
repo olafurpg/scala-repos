@@ -26,7 +26,7 @@ object Test extends ScaladocModelTest {
     val ms = List("method1", "method2", "method3")
     for (m <- ms) {
       val method = root._class("C")._method(m)
-      println(method.comment.get.body.summary)  
+      println(method.comment.get.body.summary)
     }
   }
 }

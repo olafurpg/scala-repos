@@ -7,19 +7,19 @@ package scala.tools.nsc
 package interpreter
 package session
 
-import scala.collection.mutable.{ Buffer, ListBuffer }
+import scala.collection.mutable.{Buffer, ListBuffer}
 
 class SimpleHistory extends History {
   private var _index: Int = 0
   protected val buf: Buffer[String] = new ListBuffer[String]
-  private def setTo(num: Int)          = { _index = num ; true }
-  private def minusOne                 = { _index -= 1 ; true }
-  private def plusOne                  = { _index += 1 ; true }
-  private def lastIndex                = size - 1
+  private def setTo(num: Int) = { _index = num; true }
+  private def minusOne = { _index -= 1; true }
+  private def plusOne = { _index += 1; true }
+  private def lastIndex = size - 1
   private def fail(msg: String): String = {
-    repldbg("Internal error in history(size %d, index %d): %s".format(
-      size, index, msg)
-    )
+    repldbg(
+        "Internal error in history(size %d, index %d): %s".format(
+            size, index, msg))
     ""
   }
 
@@ -37,17 +37,18 @@ class SimpleHistory extends History {
     add(item)
   }
 
-  def remove(idx: Int): CharSequence        = buf remove idx
-  def removeFirst(): CharSequence           = buf remove 0
-  def removeLast(): CharSequence            = buf remove lastIndex
+  def remove(idx: Int): CharSequence = buf remove idx
+  def removeFirst(): CharSequence = buf remove 0
+  def removeLast(): CharSequence = buf remove lastIndex
   def set(idx: Int, to: CharSequence): Unit = buf(idx) = to
 
-  def current()         = if (index >= 0 && index < buf.size) buf(index) else fail("current()")
-  def previous()        = (index > 0) && minusOne
-  def next()            = (index <= lastIndex) && plusOne
-  def moveToFirst()     = (size > 0) && (index != 0) && setTo(0)
-  def moveToLast()      = (size > 0) && (index < lastIndex) && setTo(lastIndex)
-  def moveTo(idx: Int)  = (idx > 0) && (idx <= lastIndex) && setTo(idx)
+  def current() =
+    if (index >= 0 && index < buf.size) buf(index) else fail("current()")
+  def previous() = (index > 0) && minusOne
+  def next() = (index <= lastIndex) && plusOne
+  def moveToFirst() = (size > 0) && (index != 0) && setTo(0)
+  def moveToLast() = (size > 0) && (index < lastIndex) && setTo(lastIndex)
+  def moveTo(idx: Int) = (idx > 0) && (idx <= lastIndex) && setTo(idx)
   def moveToEnd(): Unit = setTo(size)
 
   def asStrings = buf.toList

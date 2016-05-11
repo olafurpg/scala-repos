@@ -1,11 +1,12 @@
 package sbt
 
 /**
- * A custom SecurityException that tries not to be caught.  Closely based on a similar class in Nailgun.
- * The main goal of this exception is that once thrown, it propagates all of the way up the call stack,
- * terminating the thread's execution.
- */
-private final class TrapExitSecurityException(val exitCode: Int) extends SecurityException {
+  * A custom SecurityException that tries not to be caught.  Closely based on a similar class in Nailgun.
+  * The main goal of this exception is that once thrown, it propagates all of the way up the call stack,
+  * terminating the thread's execution.
+  */
+private final class TrapExitSecurityException(val exitCode: Int)
+    extends SecurityException {
   private var accessAllowed = false
   def allowAccess(): Unit = {
     accessAllowed = true
@@ -16,11 +17,8 @@ private final class TrapExitSecurityException(val exitCode: Int) extends Securit
   override def getMessage = ifAccessAllowed(super.getMessage)
   override def fillInStackTrace = ifAccessAllowed(super.fillInStackTrace)
   override def getLocalizedMessage = ifAccessAllowed(super.getLocalizedMessage)
-  private def ifAccessAllowed[T](f: => T): T =
-    {
-      if (accessAllowed)
-        f
-      else
-        throw this
-    }
+  private def ifAccessAllowed[T](f: => T): T = {
+    if (accessAllowed) f
+    else throw this
+  }
 }

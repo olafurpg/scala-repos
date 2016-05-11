@@ -14,8 +14,7 @@ trait MonadStateLaws[F[_], S] extends MonadLaws[F] {
   def monadStateSetGet(s: S): IsEq[F[S]] =
     F.flatMap(F.set(s))(_ => F.get) <-> F.flatMap(F.set(s))(_ => F.pure(s))
 
-  val monadStateGetSet: IsEq[F[Unit]] =
-    F.flatMap(F.get)(F.set) <-> F.pure(())
+  val monadStateGetSet: IsEq[F[Unit]] = F.flatMap(F.get)(F.set) <-> F.pure(())
 }
 
 object MonadStateLaws {

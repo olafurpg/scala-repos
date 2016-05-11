@@ -13,30 +13,36 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class RedundantBlockInspection extends AbstractInspection {
 
   def actionFor(holder: ProblemsHolder) = {
     case (block: ScBlock) childOf ((blockOfExpr: ScBlock) childOf (_: ScCaseClause))
-      if block.hasRBrace && block.getFirstChild.getText == "{" &&
-              blockOfExpr.getChildren.length == 1 && !block.getChildren.exists(_.isInstanceOf[ScCaseClauses]) =>
-      holder.registerProblem(block, new TextRange(0, 1), "Remove redundant braces", new InCaseClauseQuickFix(block))
+        if block.hasRBrace && block.getFirstChild.getText == "{" &&
+        blockOfExpr.getChildren.length == 1 &&
+        !block.getChildren.exists(_.isInstanceOf[ScCaseClauses]) =>
+      holder.registerProblem(block,
+                             new TextRange(0, 1),
+                             "Remove redundant braces",
+                             new InCaseClauseQuickFix(block))
     case block: ScBlockExpr if block.getChildren.length == 3 =>
       if (RedundantBlockInspection.isRedundantBlock(block)) {
-        holder.registerProblem(block, "The enclosing block is redundant", new QuickFix(block))
+        holder.registerProblem(
+            block, "The enclosing block is redundant", new QuickFix(block))
       }
   }
 
-  private class QuickFix(e: PsiElement) extends AbstractFixOnPsiElement("Unwrap the expression", e) {
+  private class QuickFix(e: PsiElement)
+      extends AbstractFixOnPsiElement("Unwrap the expression", e) {
     def doApplyFix(project: Project) {
       val elem = getElement
       elem.replace(elem.getChildren.apply(1))
     }
   }
-  
-  private class InCaseClauseQuickFix(block: ScBlock) extends AbstractFixOnPsiElement("Remove redundant braces", block) {
+
+  private class InCaseClauseQuickFix(block: ScBlock)
+      extends AbstractFixOnPsiElement("Remove redundant braces", block) {
     def doApplyFix(project: Project): Unit = {
       val bl = getElement
       val children = bl.getChildren.drop(1).dropRight(1)
@@ -65,8 +71,12 @@ object RedundantBlockInspection {
         case _: ScInterpolatedStringLiteral =>
           val text = child.getText
           val nextLetter = next.getText.headOption.getOrElse(' ')
-          val checkId = ScalaNamesUtil.isIdentifier(text) && (nextLetter == '$' || !ScalaNamesUtil.isIdentifier(text + nextLetter))
-          checkId && !text.startsWith("_") && !text.exists(_ == '$') && !text.startsWith("`")
+          val checkId =
+            ScalaNamesUtil.isIdentifier(text) &&
+            (nextLetter == '$' ||
+                !ScalaNamesUtil.isIdentifier(text + nextLetter))
+          checkId && !text.startsWith("_") && !text.exists(_ == '$') &&
+          !text.startsWith("`")
         case _ => false
       }
     } else false

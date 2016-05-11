@@ -8,9 +8,8 @@ import com.intellij.psi.stubs.{StringStubIndexExtension, StubIndexKey}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotation
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 class ScAnnotatedMemberIndex extends StringStubIndexExtension[ScAnnotation] {
   def getKey: StubIndexKey[String, ScAnnotation] = ScAnnotatedMemberIndex.KEY
 }

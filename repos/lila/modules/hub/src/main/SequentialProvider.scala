@@ -34,12 +34,13 @@ trait SequentialProvider extends Actor {
 
   private def busy: Receive = {
 
-    case Done => dequeue match {
-      case None => context become idle
-      case Some(envelope) =>
-        debugQueue
-        processThenDone(envelope)
-    }
+    case Done =>
+      dequeue match {
+        case None => context become idle
+        case Some(envelope) =>
+          debugQueue
+          processThenDone(envelope)
+      }
 
     case msg =>
       queue enqueue Envelope(msg, sender)
@@ -52,11 +53,14 @@ trait SequentialProvider extends Actor {
   private def dequeue: Option[Any] = Try(queue.dequeue).toOption
 
   private def debugQueue {
-    if (debug) queue.size match {
-      case size if (size == 50 || (size >= 100 && size % 100 == 0)) =>
-        logger.branch("SequentialProvider").warn(s"Seq[$name] queue = $size, mps = ${windowCount.get}")
-      case _ =>
-    }
+    if (debug)
+      queue.size match {
+        case size if (size == 50 || (size >= 100 && size % 100 == 0)) =>
+          logger
+            .branch("SequentialProvider")
+            .warn(s"Seq[$name] queue = $size, mps = ${windowCount.get}")
+        case _ =>
+      }
   }
 
   private case object Done
@@ -72,9 +76,15 @@ trait SequentialProvider extends Actor {
       case SequentialProvider.Terminate => self ! PoisonPill
       case Envelope(msg, replyTo) =>
         (process orElse fallback)(msg)
-          .withTimeout(futureTimeout, LilaException(s"Sequential provider timeout: $futureTimeout"))(context.system)
+          .withTimeout(
+              futureTimeout,
+              LilaException(s"Sequential provider timeout: $futureTimeout"))(
+              context.system)
           .pipeTo(replyTo) andThenAnyway { self ! Done }
-      case x => logger.branch("SequentialProvider").warn(s"should never have received $x")
+      case x =>
+        logger
+          .branch("SequentialProvider")
+          .warn(s"should never have received $x")
     }
   }
 }

@@ -3,7 +3,8 @@ import scala.tools.partest.ScaladocModelTest
 
 object Test extends ScaladocModelTest {
 
-  override def code = """
+  override def code =
+    """
         case class Test4324(arg11: String, arg12: Int)(arg21: String, arg22: Int)(arg31: Int, arg32: String)
     """
 
@@ -16,9 +17,12 @@ object Test extends ScaladocModelTest {
 
     // just need to check the member exists, access methods will throw an error if there's a problem
     rootPackage._class("Test4324").asInstanceOf[Class].valueParams match {
-      case List(List(arg11, arg12), List(arg21, arg22), List(arg31, arg32)) => //yeeey, do nothing
+      case List(List(arg11, arg12), List(arg21, arg22), List(arg31, arg32)) =>
+      //yeeey, do nothing
       case other =>
-        assert(false, "Incorrect valueParams generated: " + other + " instead of (arg11, arg12)(arg21, arg22)(arg31, arg32)")
+        assert(false,
+               "Incorrect valueParams generated: " + other +
+               " instead of (arg11, arg12)(arg21, arg22)(arg31, arg32)")
     }
   }
 }

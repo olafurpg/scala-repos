@@ -1,9 +1,7 @@
 class a {
-  try {
-
-  } /*caret*/
+  try {} /*caret*/
 }
 /*
 catch
 finally
-*/
+ */

@@ -5,15 +5,15 @@ import scala.util.control.Exception._
 import scala.language.reflectiveCalls
 
 /**
- * Provides control facilities.
- */
+  * Provides control facilities.
+  */
 object ControlUtil {
 
   def defining[A, B](value: A)(f: A => B): B = f(value)
 
   def using[A <% { def close(): Unit }, B](resource: A)(f: A => B): B =
     try f(resource) finally {
-      if(resource != null){
+      if (resource != null) {
         ignoring(classOf[Throwable]) {
           resource.close()
         }
@@ -29,10 +29,10 @@ object ControlUtil {
       git2.getRepository.close()
     }
 
-  def ignore[T](f: => Unit): Unit = try {
-    f
-  } catch {
-    case e: Exception => ()
-  }
-
+  def ignore[T](f: => Unit): Unit =
+    try {
+      f
+    } catch {
+      case e: Exception => ()
+    }
 }

@@ -7,13 +7,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
- * Nikolay.Tropin
- * 2014-06-26
- */
+  * Nikolay.Tropin
+  * 2014-06-26
+  */
 class ScalaUnwrapContext extends AbstractUnwrapper.AbstractContext {
-  override def isWhiteSpace(element: PsiElement) = element.isInstanceOf[PsiWhiteSpace]
+  override def isWhiteSpace(element: PsiElement) =
+    element.isInstanceOf[PsiWhiteSpace]
 
-  def extractBlockOrSingleStatement(blockStmt: ScBlockStatement, from: PsiElement) = blockStmt match {
+  def extractBlockOrSingleStatement(
+      blockStmt: ScBlockStatement, from: PsiElement) = blockStmt match {
     case block: ScBlock if block.statements.nonEmpty =>
       extract(block.statements.head, block.statements.last, from)
     case stmt: ScBlockStatement => extract(stmt, stmt, from)
@@ -22,7 +24,8 @@ class ScalaUnwrapContext extends AbstractUnwrapper.AbstractContext {
 
   def insertNewLine() {
     val lastExtracted = myElementsToExtract.get(myElementsToExtract.size() - 1)
-    val newLine = ScalaPsiElementFactory.createNewLine(lastExtracted.getManager)
+    val newLine =
+      ScalaPsiElementFactory.createNewLine(lastExtracted.getManager)
     if (myIsEffective && lastExtracted.isValid) {
       lastExtracted.getParent.addAfter(newLine, lastExtracted)
     }

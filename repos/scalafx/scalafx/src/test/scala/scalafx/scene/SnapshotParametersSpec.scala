@@ -35,9 +35,9 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * SnapshotParameters Spec tests.
- */
+  * SnapshotParameters Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class SnapshotParametersSpec
-  extends SimpleSFXDelegateSpec[jfxs.SnapshotParameters, SnapshotParameters](
-    classOf[jfxs.SnapshotParameters], classOf[SnapshotParameters])
+    extends SimpleSFXDelegateSpec[jfxs.SnapshotParameters, SnapshotParameters](
+        classOf[jfxs.SnapshotParameters], classOf[SnapshotParameters])

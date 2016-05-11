@@ -30,7 +30,9 @@ import scalaz.syntax.comonad._
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
-trait DistinctSpec[M[+_]] extends ColumnarTableModuleTestSupport[M] with Specification with ScalaCheck {
+trait DistinctSpec[M[+ _]]
+    extends ColumnarTableModuleTestSupport[M] with Specification
+    with ScalaCheck {
   import SampleData._
   import trans._
 
@@ -208,10 +210,18 @@ trait DistinctSpec[M[+_]] extends ColumnarTableModuleTestSupport[M] with Specifi
   }
 
   def removeUndefined(jv: JValue): JValue = jv match {
-      case JObject(jfields) => JObject(jfields collect { case (s, v) if v != JUndefined => JField(s, removeUndefined(v)) })
-      case JArray(jvs) => JArray(jvs map { jv => removeUndefined(jv) })
-      case v => v
-    }
+    case JObject(jfields) =>
+      JObject(
+          jfields collect {
+        case (s, v) if v != JUndefined => JField(s, removeUndefined(v))
+      })
+    case JArray(jvs) =>
+      JArray(
+          jvs map { jv =>
+        removeUndefined(jv)
+      })
+    case v => v
+  }
 
   def testDistinct = {
     implicit val gen = sort(duplicateRows(sample(schema)))

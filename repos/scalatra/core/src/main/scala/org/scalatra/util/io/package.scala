@@ -6,17 +6,18 @@ import java.nio.channels.Channels
 import scala.annotation.tailrec
 
 /**
- * A collection of I/O ulility methods.
- */
+  * A collection of I/O ulility methods.
+  */
 package object io {
+
   /**
-   * Copies the input stream to the output stream.
-   *
-   * @param in the input stream to read.  The InputStream will be closed, unlike
-   * commons-io's version.
-   * @param out the output stream to write
-   * @param bufferSize the size of buffer to use for each read
-   */
+    * Copies the input stream to the output stream.
+    *
+    * @param in the input stream to read.  The InputStream will be closed, unlike
+    * commons-io's version.
+    * @param out the output stream to write
+    * @param bufferSize the size of buffer to use for each read
+    */
   def copy(in: InputStream, out: OutputStream, bufferSize: Int = 4096): Unit = {
     using(in) { in =>
       val buf = new Array[Byte](bufferSize)
@@ -33,7 +34,9 @@ package object io {
   }
 
   def zeroCopy(in: FileInputStream, out: OutputStream): Unit = {
-    using(in.getChannel) { ch => ch.transferTo(0, ch.size, Channels.newChannel(out)) }
+    using(in.getChannel) { ch =>
+      ch.transferTo(0, ch.size, Channels.newChannel(out))
+    }
   }
 
   def readBytes(in: InputStream): Array[Byte] = {
@@ -44,21 +47,20 @@ package object io {
   }
 
   /**
-   * Creates a temp file, passes it to a block, and removes the temp file on the block's completion.
-   *
-   * @tparam A the return type of the block
-   * @param content The content of the file
-   * @param prefix The prefix of the temp file; must be at least three characters long
-   * @param suffix The suffix of the temp file
-   * @param directory The directory of the temp file; a system dependent temp directory if None
-   * @param f the block
-   * @return the result of f
-   */
-  def withTempFile[A](
-    content: String,
-    prefix: String = "scalatra",
-    suffix: String = ".tmp",
-    directory: Option[File] = None)(f: File => A): A = {
+    * Creates a temp file, passes it to a block, and removes the temp file on the block's completion.
+    *
+    * @tparam A the return type of the block
+    * @param content The content of the file
+    * @param prefix The prefix of the temp file; must be at least three characters long
+    * @param suffix The suffix of the temp file
+    * @param directory The directory of the temp file; a system dependent temp directory if None
+    * @param f the block
+    * @return the result of f
+    */
+  def withTempFile[A](content: String,
+                      prefix: String = "scalatra",
+                      suffix: String = ".tmp",
+                      directory: Option[File] = None)(f: File => A): A = {
     val tmp = File.createTempFile(prefix, suffix, directory.getOrElse(null))
     try {
       using(new BufferedWriter(new FileWriter(tmp))) { out =>
@@ -70,5 +72,4 @@ package object io {
       tmp.delete()
     }
   }
-
 }

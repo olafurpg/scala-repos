@@ -9,11 +9,12 @@ import java.lang.Integer.rotateLeft
 // Contributed by Rex Kerr
 
 /**
- * Bit-mixing random number generator based on rotations from Bob
- * Burtle.  Maintains 16 bytes of state information.  Algorithm from
- * [[http://burtleburtle.net/bob/rand/]]
- */
-abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedGenerator {
+  * Bit-mixing random number generator based on rotations from Bob
+  * Burtle.  Maintains 16 bytes of state information.  Algorithm from
+  * [[http://burtleburtle.net/bob/rand/]]
+  */
+abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int)
+    extends IntBasedGenerator {
   protected var a = _a
   protected var b = _b
   protected var c = _c
@@ -43,7 +44,8 @@ abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedG
   }
 }
 
-abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, Array[Int]] {
+abstract class BurtleCompanion[G <: BurtleRot32]
+    extends GeneratorCompanion[G, Array[Int]] {
 
   protected def create(_a: Int, _b: Int, _c: Int, _d: Int): G
 
@@ -67,15 +69,16 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
 }
 
 /**
- * Bit-mixing random number generator based on rotations from Bob
- * Burtle.  Maintains 16 bytes of state information.  Good speed and
- * randomness (see `Burtle3rot` for better randomness).  Algorithm
- * from [[http://burtleburtle.net/bob/rand/]]
- */
-final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
+  * Bit-mixing random number generator based on rotations from Bob
+  * Burtle.  Maintains 16 bytes of state information.  Good speed and
+  * randomness (see `Burtle3rot` for better randomness).  Algorithm
+  * from [[http://burtleburtle.net/bob/rand/]]
+  */
+final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int)
+    extends BurtleRot32(_a, _b, _c, _d) {
   protected def advance(): Unit = {
-    val e = a - rotateLeft(b,27)
-    a = b ^ rotateLeft(c,17)
+    val e = a - rotateLeft(b, 27)
+    a = b ^ rotateLeft(c, 17)
     b = c + d
     c = d + e
     d = e + a
@@ -85,16 +88,18 @@ final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_
 }
 
 object BurtleRot2 extends BurtleCompanion[BurtleRot2] {
-  def create(a: Int, b: Int, c: Int, d: Int): BurtleRot2 = new BurtleRot2(a, b, c, d)
+  def create(a: Int, b: Int, c: Int, d: Int): BurtleRot2 =
+    new BurtleRot2(a, b, c, d)
 }
 
 /**
- * Bit-mixing random number generator based on rotations from Bob
- * Burtle.  Maintains 16 bytes of state information.  Decent speed and
- * very good randomness (see `Burtle2rot` for better speed).
- * Algorithm from [[http://burtleburtle.net/bob/rand/]]
- */
-final class BurtleRot3(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
+  * Bit-mixing random number generator based on rotations from Bob
+  * Burtle.  Maintains 16 bytes of state information.  Decent speed and
+  * very good randomness (see `Burtle2rot` for better speed).
+  * Algorithm from [[http://burtleburtle.net/bob/rand/]]
+  */
+final class BurtleRot3(_a: Int, _b: Int, _c: Int, _d: Int)
+    extends BurtleRot32(_a, _b, _c, _d) {
   protected def advance(): Unit = {
     val e = a - rotateLeft(b, 23)
     a = b ^ rotateLeft(c, 16)
@@ -107,5 +112,6 @@ final class BurtleRot3(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_
 }
 
 object BurtleRot3 extends BurtleCompanion[BurtleRot3] {
-  def create(a: Int, b: Int, c: Int, d: Int): BurtleRot3 = new BurtleRot3(a, b, c, d)
+  def create(a: Int, b: Int, c: Int, d: Int): BurtleRot3 =
+    new BurtleRot3(a, b, c, d)
 }

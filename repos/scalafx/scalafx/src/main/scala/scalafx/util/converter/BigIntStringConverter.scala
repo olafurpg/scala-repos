@@ -31,15 +31,18 @@ import javafx.util.{converter => jfxuc}
 import scala.language.implicitConversions
 
 object BigIntStringConverter {
-  implicit def sfxBigIntStringConverter2jfx(c: BigIntStringConverter): jfxuc.BigIntegerStringConverter =
+  implicit def sfxBigIntStringConverter2jfx(
+      c: BigIntStringConverter): jfxuc.BigIntegerStringConverter =
     if (c != null) c.delegate else null
 }
 
-class BigIntStringConverter(delegate: jfxuc.BigIntegerStringConverter = new jfxuc.BigIntegerStringConverter)
-  extends StringConverterDelegate[java.math.BigInteger, BigInt, jfxuc.BigIntegerStringConverter](delegate) {
+class BigIntStringConverter(
+    delegate: jfxuc.BigIntegerStringConverter = new jfxuc.BigIntegerStringConverter)
+    extends StringConverterDelegate[
+        java.math.BigInteger, BigInt, jfxuc.BigIntegerStringConverter](
+        delegate) {
 
   override def fromString(s: String) = new BigInt(delegate.fromString(s))
 
   override def toString(b: BigInt) = delegate.toString(b.bigInteger)
-
 }

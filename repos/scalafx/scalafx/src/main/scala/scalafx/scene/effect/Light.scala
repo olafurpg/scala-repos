@@ -35,37 +35,41 @@ import scalafx.delegate.{PositionDelegate, SFXDelegate}
 import scalafx.scene.paint.Color
 
 object Light {
-  implicit def sfxLight2jfx(l: Light): jfxse.Light = if (l != null) l.delegate else null
+  implicit def sfxLight2jfx(l: Light): jfxse.Light =
+    if (l != null) l.delegate else null
 
   // Distant Definition - Begin
 
   object Distant {
-    implicit def sfxDistant2jfx(d: Distant): jfxse.Light.Distant = if (d != null) d.delegate else null
+    implicit def sfxDistant2jfx(d: Distant): jfxse.Light.Distant =
+      if (d != null) d.delegate else null
   }
 
-  class Distant(override val delegate: jfxse.Light.Distant = new jfxse.Light.Distant) extends Light(delegate) with SFXDelegate[jfxse.Light.Distant] {
+  class Distant(
+      override val delegate: jfxse.Light.Distant = new jfxse.Light.Distant)
+      extends Light(delegate) with SFXDelegate[jfxse.Light.Distant] {
 
     /**
-     * Creates a new instance of Distant light with the specified azimuth, elevation, and color.
-     */
-    def this(azimuth: Double, elevation: Double, color: Color) = this(new jfxse.Light.Distant(azimuth, elevation, color))
+      * Creates a new instance of Distant light with the specified azimuth, elevation, and color.
+      */
+    def this(azimuth: Double, elevation: Double, color: Color) =
+      this(new jfxse.Light.Distant(azimuth, elevation, color))
 
     /**
-     * The azimuth of the light.
-     */
+      * The azimuth of the light.
+      */
     def azimuth: DoubleProperty = delegate.azimuthProperty
     def azimuth_=(v: Double) {
       azimuth() = v
     }
 
     /**
-     * The elevation of the light.
-     */
+      * The elevation of the light.
+      */
     def elevation: DoubleProperty = delegate.elevationProperty
     def elevation_=(v: Double) {
       elevation() = v
     }
-
   }
 
   // Distant Definition - End
@@ -73,25 +77,24 @@ object Light {
   // Point Definition - Begin
 
   object Point {
-    implicit def sfxPoint2jfx(p: Point): jfxse.Light.Point = if (p != null) p.delegate else null
-
+    implicit def sfxPoint2jfx(p: Point): jfxse.Light.Point =
+      if (p != null) p.delegate else null
   }
 
   class Point(override val delegate: jfxse.Light.Point = new jfxse.Light.Point)
-    extends Light(delegate)
-    with PositionDelegate[jfxse.Light.Point]
-    with SFXDelegate[jfxse.Light.Point] {
+      extends Light(delegate) with PositionDelegate[jfxse.Light.Point]
+      with SFXDelegate[jfxse.Light.Point] {
 
-    def this(x: Double, y: Double, z: Double, color: Color) = this(new jfxse.Light.Point(x, y, z, color))
+    def this(x: Double, y: Double, z: Double, color: Color) =
+      this(new jfxse.Light.Point(x, y, z, color))
 
     /**
-     * The z coordinate of the light position.
-     */
+      * The z coordinate of the light position.
+      */
     def z: DoubleProperty = delegate.zProperty
     def z_=(v: Double) {
       z() = v
     }
-
   }
 
   // Point Definition - End
@@ -99,55 +102,58 @@ object Light {
   // Spot Definition - Begin
 
   object Spot {
-    implicit def sfxSpot2jfx(s: Spot): jfxse.Light.Spot = if (s != null) s.delegate else null
-
+    implicit def sfxSpot2jfx(s: Spot): jfxse.Light.Spot =
+      if (s != null) s.delegate else null
   }
 
-  class Spot(override val delegate: jfxse.Light.Spot = new jfxse.Light.Spot) extends Point(delegate) with SFXDelegate[jfxse.Light.Spot] {
+  class Spot(override val delegate: jfxse.Light.Spot = new jfxse.Light.Spot)
+      extends Point(delegate) with SFXDelegate[jfxse.Light.Spot] {
 
     /**
-     * Creates a new instance of Spot light with the specified x, y, z, specularExponent, and color
-     */
-    def this(x: Double, y: Double, z: Double, specularExponent: Double, color: Color) = this(new jfxse.Light.Spot(x, y, z, specularExponent, color))
+      * Creates a new instance of Spot light with the specified x, y, z, specularExponent, and color
+      */
+    def this(x: Double,
+             y: Double,
+             z: Double,
+             specularExponent: Double,
+             color: Color) =
+      this(new jfxse.Light.Spot(x, y, z, specularExponent, color))
 
     /**
-     * The x coordinate of the direction vector for this light.
-     */
+      * The x coordinate of the direction vector for this light.
+      */
     def pointsAtX: DoubleProperty = delegate.pointsAtXProperty
     def pointsAtX_=(v: Double) {
       pointsAtX() = v
     }
 
     /**
-     * The y coordinate of the direction vector for this light.
-     */
+      * The y coordinate of the direction vector for this light.
+      */
     def pointsAtY: DoubleProperty = delegate.pointsAtYProperty
     def pointsAtY_=(v: Double) {
       pointsAtY() = v
     }
 
     /**
-     * The z coordinate of the direction vector for this light.
-     */
+      * The z coordinate of the direction vector for this light.
+      */
     def pointsAtZ: DoubleProperty = delegate.pointsAtZProperty
     def pointsAtZ_=(v: Double) {
       pointsAtZ() = v
     }
 
     /**
-     * The specular exponent, which controls the focus of this light source.
-     */
+      * The specular exponent, which controls the focus of this light source.
+      */
     def specularExponent: DoubleProperty = delegate.specularExponentProperty
     def specularExponent_=(v: Double) {
       specularExponent() = v
     }
-
   }
 
   // Spot Definition - End
-
 }
 
-abstract class Light protected(override val delegate: jfxse.Light)
-  extends ColorDelegate[jfxse.Light]
-  with SFXDelegate[jfxse.Light] 
+abstract class Light protected (override val delegate: jfxse.Light)
+    extends ColorDelegate[jfxse.Light] with SFXDelegate[jfxse.Light]

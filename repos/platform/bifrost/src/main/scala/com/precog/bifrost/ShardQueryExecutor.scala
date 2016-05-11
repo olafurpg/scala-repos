@@ -44,7 +44,7 @@ import com.precog.yggdrasil.vfs._
 import com.precog.util.FilesystemFileOps
 import com.precog.util.XLightWebHttpClientModule
 
-import org.slf4j.{ Logger, LoggerFactory }
+import org.slf4j.{Logger, LoggerFactory}
 
 import java.nio.CharBuffer
 
@@ -56,13 +56,10 @@ import scalaz.syntax.bifunctor._
 import scalaz.syntax.std.either._
 import scalaz.syntax.traverse._
 
-trait Blah {
-}
+trait Blah {}
 
 trait ShardQueryExecutorConfig
-    extends BaseConfig
-    with ColumnarTableModuleConfig
-    with EvaluatorConfig
+    extends BaseConfig with ColumnarTableModuleConfig with EvaluatorConfig
     with IdSourceConfig {
   def clock: Clock
   val queryId = new java.util.concurrent.atomic.AtomicLong()
@@ -73,11 +70,12 @@ case class FaultPosition(line: Int, col: Int, text: String)
 object FaultPosition {
   import shapeless._
   import blueeyes.json.serialization._
-  import DefaultSerialization.{ DateTimeExtractor => _, DateTimeDecomposer => _, _ }
+  import DefaultSerialization.{DateTimeExtractor => _, DateTimeDecomposer => _, _}
 
   implicit val iso = Iso.hlist(FaultPosition.apply _, FaultPosition.unapply _)
   val schema = "line" :: "column" :: "text" :: HNil
-  implicit val (decomposer, extractor) = IsoSerialization.serialization[FaultPosition](schema)
+  implicit val (decomposer, extractor) =
+    IsoSerialization.serialization[FaultPosition](schema)
 }
 
 sealed trait Fault {
@@ -90,59 +88,77 @@ object Fault {
   case class Error(pos: Option[FaultPosition], message: String) extends Fault
 }
 
-trait ShardQueryExecutorPlatform[M[+_]] extends ParseEvalStack[M] with XLightWebHttpClientModule[M] {
-  case class StackException(error: StackError) extends Exception(error.toString)
+trait ShardQueryExecutorPlatform[M[+ _]]
+    extends ParseEvalStack[M] with XLightWebHttpClientModule[M] {
+  case class StackException(error: StackError)
+      extends Exception(error.toString)
 
-  abstract class ShardQueryExecutor[N[+_]](N0: Monad[N])(implicit mn: M ~> N, nm: N ~> M)
-      extends Evaluator[N](N0) with QueryExecutor[N, (Set[Fault], StreamT[N, Slice])] {
+  abstract class ShardQueryExecutor[N[+ _]](
+      N0: Monad[N])(implicit mn: M ~> N, nm: N ~> M)
+      extends Evaluator[N](N0)
+      with QueryExecutor[N, (Set[Fault], StreamT[N, Slice])] {
 
     type YggConfig <: ShardQueryExecutorConfig
-    protected lazy val queryLogger = LoggerFactory.getLogger("com.precog.bifrost.ShardQueryExecutor")
+    protected lazy val queryLogger =
+      LoggerFactory.getLogger("com.precog.bifrost.ShardQueryExecutor")
 
     implicit val M: Monad[M]
     private implicit val N: Monad[N] = N0
 
-    implicit def LineDecompose: Decomposer[instructions.Line] = new Decomposer[instructions.Line] {
-      def decompose(line: instructions.Line): JValue = {
-        JObject(JField("lineNum", JNum(line.line)), JField("colNum", JNum(line.col)), JField("detail", JString(line.text)))
+    implicit def LineDecompose: Decomposer[instructions.Line] =
+      new Decomposer[instructions.Line] {
+        def decompose(line: instructions.Line): JValue = {
+          JObject(JField("lineNum", JNum(line.line)),
+                  JField("colNum", JNum(line.col)),
+                  JField("detail", JString(line.text)))
+        }
       }
-    }
 
-    lazy val report = queryReport contramap { (l: instructions.Line) =>
-      Option(FaultPosition(l.line, l.col, l.text))
-    }
+    lazy val report =
+      queryReport contramap { (l: instructions.Line) =>
+        Option(FaultPosition(l.line, l.col, l.text))
+      }
 
     def queryReport: QueryLogger[N, Option[FaultPosition]]
 
-    def execute(query: String, evaluationContext: EvaluationContext, opts: QueryOptions): EitherT[N, EvaluationError, (Set[Fault], StreamT[N, Slice])] = {
+    def execute(query: String,
+                evaluationContext: EvaluationContext,
+                opts: QueryOptions)
+      : EitherT[N, EvaluationError, (Set[Fault], StreamT[N, Slice])] = {
       import trans.constants._
 
       val qid = yggConfig.queryId.getAndIncrement()
-      queryLogger.info("[QID:%d] Executing query for %s: %s, context: %s" format 
-        (qid, evaluationContext.apiKey, query, evaluationContext))
+      queryLogger.info(
+          "[QID:%d] Executing query for %s: %s, context: %s" format
+          (qid, evaluationContext.apiKey, query, evaluationContext))
 
       import EvaluationError._
 
-      val solution = EitherT.fromTryCatch[N, EitherT[N, EvaluationError, (Set[Fault], Table)]] {
+      val solution = EitherT
+        .fromTryCatch[N, EitherT[N, EvaluationError, (Set[Fault], Table)]] {
         N point {
           val (faults, bytecode) = asBytecode(query)
 
           val resultVN: N[EvaluationError \/ Table] = {
             bytecode map { instrs =>
-              ((systemError _) <-: (StackException(_)) <-: decorate(instrs).disjunction) traverse { dag =>
-                applyQueryOptions(opts) {
-                  logger.debug("[QID:%d] Evaluating query".format(qid))
+              ((systemError _) <-:(StackException(_)) <-: decorate(instrs).disjunction) traverse {
+                dag =>
+                  applyQueryOptions(opts) {
+                    logger.debug("[QID:%d] Evaluating query".format(qid))
 
-                  if (queryLogger.isDebugEnabled) {
-                    eval(dag, evaluationContext, true) map {
-                      _.logged(queryLogger, "[QID:"+qid+"]", "begin result stream", "end result stream") {
-                        slice => "size: " + slice.size
+                    if (queryLogger.isDebugEnabled) {
+                      eval(dag, evaluationContext, true) map {
+                        _.logged(queryLogger,
+                                 "[QID:" + qid + "]",
+                                 "begin result stream",
+                                 "end result stream") { slice =>
+                          "size: " + slice.size
+                        }
                       }
+                    } else {
+                      eval(dag, evaluationContext, true)
                     }
-                  } else {
-                    eval(dag, evaluationContext, true)
                   }
-                }
               }
             } getOrElse {
               // compilation errors will be reported as warnings, but there are no results so
@@ -154,15 +170,22 @@ trait ShardQueryExecutorPlatform[M[+_]] extends ParseEvalStack[M] with XLightWeb
           EitherT(resultVN) flatMap { table =>
             EitherT.right {
               faults.toStream traverse {
-                case Fault.Error(pos, msg) => queryReport.error(pos, msg) map { _ => true }
-                case Fault.Warning(pos, msg) => queryReport.warn(pos, msg) map { _ => false }
+                case Fault.Error(pos, msg) =>
+                  queryReport.error(pos, msg) map { _ =>
+                    true
+                  }
+                case Fault.Warning(pos, msg) =>
+                  queryReport.warn(pos, msg) map { _ =>
+                    false
+                  }
               } map { errors =>
-                faults -> (if (errors.exists(_ == true)) Table.empty else table)
+                faults ->
+                (if (errors.exists(_ == true)) Table.empty else table)
               }
             }
           }
         }
-      } 
+      }
 
       for {
         solutionResult <- solution.leftMap(systemError).join
@@ -173,49 +196,58 @@ trait ShardQueryExecutorPlatform[M[+_]] extends ParseEvalStack[M] with XLightWeb
       }
     }
 
-    private def applyQueryOptions(opts: QueryOptions)(table: N[Table]): N[Table] = {
+    private def applyQueryOptions(opts: QueryOptions)(
+        table: N[Table]): N[Table] = {
       import trans._
 
-      def sort(table: N[Table]): N[Table] = if (!opts.sortOn.isEmpty) {
-        val sortKey = InnerArrayConcat(opts.sortOn map { cpath =>
-          WrapArray(cpath.nodes.foldLeft(constants.SourceValue.Single: TransSpec1) {
-            case (inner, f @ CPathField(_)) =>
-              DerefObjectStatic(inner, f)
-            case (inner, i @ CPathIndex(_)) =>
-              DerefArrayStatic(inner, i)
-          })
-        }: _*)
+      def sort(table: N[Table]): N[Table] =
+        if (!opts.sortOn.isEmpty) {
+          val sortKey = InnerArrayConcat(
+              opts.sortOn map { cpath =>
+            WrapArray(cpath.nodes
+                  .foldLeft(constants.SourceValue.Single: TransSpec1) {
+              case (inner, f @ CPathField(_)) =>
+                DerefObjectStatic(inner, f)
+              case (inner, i @ CPathIndex(_)) =>
+                DerefArrayStatic(inner, i)
+            })
+          }: _*)
 
-        table flatMap { tbl =>
-          mn(tbl.sort(sortKey, opts.sortOrder))
+          table flatMap { tbl =>
+            mn(tbl.sort(sortKey, opts.sortOrder))
+          }
+        } else {
+          table
         }
-      } else {
-        table
-      }
 
-      def page(table: N[Table]): N[Table] = opts.page map {
-        case (offset, limit) =>
-          table map { _.takeRange(offset, limit) }
-      } getOrElse table
+      def page(table: N[Table]): N[Table] =
+        opts.page map {
+          case (offset, limit) =>
+            table map { _.takeRange(offset, limit) }
+        } getOrElse table
 
       page(sort(table map (_.compact(constants.SourceValue.Single))))
     }
 
-    private def asBytecode(query: String): (Set[Fault], Option[Vector[Instruction]]) = {
+    private def asBytecode(
+        query: String): (Set[Fault], Option[Vector[Instruction]]) = {
       def renderError(err: Error): Fault = {
         val loc = err.loc
         val tp = err.tp
 
-        val constr = if (isWarning(err)) Fault.Warning.apply _ else Fault.Error.apply _
+        val constr =
+          if (isWarning(err)) Fault.Warning.apply _ else Fault.Error.apply _
 
-        constr(Some(FaultPosition(loc.lineNum, loc.colNum, loc.line)), tp.toString)
+        constr(Some(FaultPosition(loc.lineNum, loc.colNum, loc.line)),
+               tp.toString)
       }
 
       try {
         val forest = compile(query)
-        val validForest = forest filter { tree =>
-          tree.errors forall isWarning
-        }
+        val validForest =
+          forest filter { tree =>
+            tree.errors forall isWarning
+          }
 
         if (validForest.size == 1) {
           val tree = validForest.head
@@ -225,16 +257,19 @@ trait ShardQueryExecutorPlatform[M[+_]] extends ParseEvalStack[M] with XLightWeb
         } else if (validForest.size > 1) {
           (Set(Fault.Error(None, "Ambiguous parse results.")), None)
         } else {
-          val faults = forest flatMap { tree =>
-            (tree.errors: Set[Error]) map renderError
-          }
+          val faults =
+            forest flatMap { tree =>
+              (tree.errors: Set[Error]) map renderError
+            }
 
           (faults, None)
         }
       } catch {
         case ex: ParseException =>
           val loc = ex.failures.head.tail
-          val fault = Fault.Error(Some(FaultPosition(loc.lineNum, loc.colNum, loc.line)), ex.mkString)
+          val fault = Fault.Error(
+              Some(FaultPosition(loc.lineNum, loc.colNum, loc.line)),
+              ex.mkString)
 
           (Set(fault), None)
       }

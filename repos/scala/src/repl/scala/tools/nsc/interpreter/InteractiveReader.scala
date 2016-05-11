@@ -22,12 +22,13 @@ trait InteractiveReader {
   def completion: Completion
   def redrawLine(): Unit
 
-  def readYesOrNo(prompt: String, alt: => Boolean): Boolean = readOneKey(prompt) match {
-    case 'y'  => true
-    case 'n'  => false
-    case -1   => false // EOF
-    case _    => alt
-  }
+  def readYesOrNo(prompt: String, alt: => Boolean): Boolean =
+    readOneKey(prompt) match {
+      case 'y' => true
+      case 'n' => false
+      case -1 => false // EOF
+      case _ => alt
+    }
 
   protected def readOneLine(prompt: String): String
   protected def readOneKey(prompt: String): Int
@@ -42,11 +43,10 @@ object InteractiveReader {
   val msgEINTR = "Interrupted system call"
   def restartSysCalls[R](body: => R, reset: => Unit): R =
     try body catch {
-      case e: IOException if e.getMessage == msgEINTR => reset ; body
+      case e: IOException if e.getMessage == msgEINTR => reset; body
     }
 
   def apply(): InteractiveReader = SimpleReader()
   @deprecated("Use `apply` instead.", "2.9.0")
   def createDefault(): InteractiveReader = apply() // used by sbt
 }
-

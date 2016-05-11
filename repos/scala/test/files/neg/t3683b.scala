@@ -5,8 +5,9 @@ case class X() extends W[Foo]
 case class XX() extends W[Bar]
 case class Y() extends W[Bar]
 case class Z[T >: Bar <: Foo](
-  z1: W[T]
-) extends W[T]
+    z1: W[T]
+)
+    extends W[T]
 
 object Main {
   // should fail for including X()

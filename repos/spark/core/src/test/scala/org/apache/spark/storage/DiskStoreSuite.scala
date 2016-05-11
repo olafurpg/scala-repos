@@ -33,22 +33,27 @@ class DiskStoreSuite extends SparkFunSuite {
     val byteBuffer = new ChunkedByteBuffer(ByteBuffer.wrap(bytes))
 
     val blockId = BlockId("rdd_1_2")
-    val diskBlockManager = new DiskBlockManager(new SparkConf(), deleteFilesOnStop = true)
+    val diskBlockManager =
+      new DiskBlockManager(new SparkConf(), deleteFilesOnStop = true)
 
-    val diskStoreMapped = new DiskStore(new SparkConf().set(confKey, "0"), diskBlockManager)
+    val diskStoreMapped =
+      new DiskStore(new SparkConf().set(confKey, "0"), diskBlockManager)
     diskStoreMapped.putBytes(blockId, byteBuffer)
     val mapped = diskStoreMapped.getBytes(blockId)
     assert(diskStoreMapped.remove(blockId))
 
-    val diskStoreNotMapped = new DiskStore(new SparkConf().set(confKey, "1m"), diskBlockManager)
+    val diskStoreNotMapped =
+      new DiskStore(new SparkConf().set(confKey, "1m"), diskBlockManager)
     diskStoreNotMapped.putBytes(blockId, byteBuffer)
     val notMapped = diskStoreNotMapped.getBytes(blockId)
 
     // Not possible to do isInstanceOf due to visibility of HeapByteBuffer
-    assert(notMapped.getChunks().forall(_.getClass.getName.endsWith("HeapByteBuffer")),
-      "Expected HeapByteBuffer for un-mapped read")
+    assert(notMapped
+             .getChunks()
+             .forall(_.getClass.getName.endsWith("HeapByteBuffer")),
+           "Expected HeapByteBuffer for un-mapped read")
     assert(mapped.getChunks().forall(_.isInstanceOf[MappedByteBuffer]),
-      "Expected MappedByteBuffer for mapped read")
+           "Expected MappedByteBuffer for mapped read")
 
     def arrayFromByteBuffer(in: ByteBuffer): Array[Byte] = {
       val array = new Array[Byte](in.remaining())

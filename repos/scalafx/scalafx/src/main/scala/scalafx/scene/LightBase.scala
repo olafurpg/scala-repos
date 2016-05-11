@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,14 +37,13 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Color
 
 object LightBase {
-  implicit def sfxLightBase2jfx(lb: LightBase): jfxs.LightBase = if (lb != null) lb.delegate else null
+  implicit def sfxLightBase2jfx(lb: LightBase): jfxs.LightBase =
+    if (lb != null) lb.delegate else null
 }
-
 
 /** The LightBase class provides definitions of common properties for objects that represent a form of Light source. */
 abstract class LightBase(override val delegate: jfxs.LightBase)
-  extends Node(delegate)
-  with SFXDelegate[jfxs.LightBase] {
+    extends Node(delegate) with SFXDelegate[jfxs.LightBase] {
 
   /** Specifies the color of light source. */
   def color: ObjectProperty[jfxsp.Color] = delegate.colorProperty

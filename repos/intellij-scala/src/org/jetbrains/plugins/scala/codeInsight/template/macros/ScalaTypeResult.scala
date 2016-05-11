@@ -6,9 +6,9 @@ import com.intellij.psi.{PsiElement, PsiFile}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 /**
- * @author Roman.Shein
- * @since 22.09.2015.
- */
+  * @author Roman.Shein
+  * @since 22.09.2015.
+  */
 class ScalaTypeResult(val myType: ScType) extends Result {
   override def equalsToText(text: String, context: PsiElement): Boolean = {
     //TODO maybe add a more meaningful implementation
@@ -17,5 +17,8 @@ class ScalaTypeResult(val myType: ScType) extends Result {
 
   override def toString = myType.canonicalText
 
-  override def handleFocused(psiFile: PsiFile, document: Document, segmentStart: Int, segmentEnd: Int): Unit = {}
+  override def handleFocused(psiFile: PsiFile,
+                             document: Document,
+                             segmentStart: Int,
+                             segmentEnd: Int): Unit = {}
 }

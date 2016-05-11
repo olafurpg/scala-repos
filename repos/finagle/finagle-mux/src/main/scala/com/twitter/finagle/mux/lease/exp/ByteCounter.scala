@@ -13,35 +13,36 @@ private[lease] trait ByteCounter {
 }
 
 /**
- * WindowedByteCounter is a [[java.lang.Thread]] which sleeps for period P, and
- * after waking up, adds to an Array how many bytes were allocated while it
- * slept.  This means that the rate is windowed.  It also keeps track of the
- * last time that we did a garbage collection.
- *
- * iiii|iii|iiii|iii|iiii|iii|iiii/ii
- *
- * Every i is the thread waking up and counting the number of bytes that have
- * changed collection.  Every | is where a garbage collection is.  We also store
- * the most recent garbage collection, which is denoted by the /.  There's a
- * period P that passes between each i, so we know when a garbage collection
- * occurred precise to within period P.
- *
- * Knowing the rate is useful for guessing when our next gc will happen, and how
- * long we should wait for outstanding requests to finish draining.
- *
- * '''Note:''' You must call `start()` on this [[java.lang.Thread]] for it to begin
- * running.
- */
+  * WindowedByteCounter is a [[java.lang.Thread]] which sleeps for period P, and
+  * after waking up, adds to an Array how many bytes were allocated while it
+  * slept.  This means that the rate is windowed.  It also keeps track of the
+  * last time that we did a garbage collection.
+  *
+  * iiii|iii|iiii|iii|iiii|iii|iiii/ii
+  *
+  * Every i is the thread waking up and counting the number of bytes that have
+  * changed collection.  Every | is where a garbage collection is.  We also store
+  * the most recent garbage collection, which is denoted by the /.  There's a
+  * period P that passes between each i, so we know when a garbage collection
+  * occurred precise to within period P.
+  *
+  * Knowing the rate is useful for guessing when our next gc will happen, and how
+  * long we should wait for outstanding requests to finish draining.
+  *
+  * '''Note:''' You must call `start()` on this [[java.lang.Thread]] for it to begin
+  * running.
+  */
 // It might be simpler to just make it an exponential moving average.
 private[lease] class WindowedByteCounter private[lease](
-  val info: JvmInfo,
-  ctx: Context
-) extends Thread("WindowedByteClock") with ByteCounter with Closable {
+    val info: JvmInfo,
+    ctx: Context
+)
+    extends Thread("WindowedByteClock") with ByteCounter with Closable {
 
   import WindowedByteCounter._
 
   def this(
-    info: JvmInfo
+      info: JvmInfo
   ) = this(info, new Context(0))
 
   /*
@@ -80,16 +81,13 @@ private[lease] class WindowedByteCounter private[lease](
   private[this] def lastRate(): Double = allocs(idx).inBytes / P.inMilliseconds
 
   override def toString =
-    "WindowedByteCounter(windowed="+
-      rate()+"bpms; last="+
-      lastRate()+"bpms; count="+
-      count+"; sum="+
-      sum()+"bytes)"
+    "WindowedByteCounter(windowed=" + rate() + "bpms; last=" + lastRate() +
+    "bpms; count=" + count + "; sum=" + sum() + "bytes)"
 
   /**
-   * Measures the amount of bytes used since the last sample, and bumps
-   * the collection number if necessary.
-   */
+    * Measures the amount of bytes used since the last sample, and bumps
+    * the collection number if necessary.
+    */
   override def run() {
     Local.restore(ctx)
     var prevUsed = info.used()
@@ -132,7 +130,8 @@ private[lease] class WindowedByteCounter private[lease](
 
 private[lease] object WindowedByteCounter {
   // TODO: W, P could be configurable--for some servers, 100ms may be too slow
-  private[lease] val W = 2000.milliseconds  // window size
-  private[lease] val P = 100.milliseconds  // poll period
-  private[lease] val N = (W.inMilliseconds/P.inMilliseconds).toInt  // # of polls in a window
+  private[lease] val W = 2000.milliseconds // window size
+  private[lease] val P = 100.milliseconds // poll period
+  private[lease] val N =
+    (W.inMilliseconds / P.inMilliseconds).toInt // # of polls in a window
 }

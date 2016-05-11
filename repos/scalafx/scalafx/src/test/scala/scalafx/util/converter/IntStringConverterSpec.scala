@@ -34,15 +34,23 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 
 /**
- * IntStringConverter Spec tests.
- *
- *
- */
+  * IntStringConverter Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class IntStringConverterSpec
-  extends AbstractStringConverterDelegateSpec[java.lang.Integer, jfxuc.IntegerStringConverter, Int, IntStringConverter](classOf[jfxuc.IntegerStringConverter], classOf[IntStringConverter], classOf[Int]) {
+    extends AbstractStringConverterDelegateSpec[java.lang.Integer,
+                                                jfxuc.IntegerStringConverter,
+                                                Int,
+                                                IntStringConverter](
+        classOf[jfxuc.IntegerStringConverter],
+        classOf[IntStringConverter],
+        classOf[Int]) {
 
-  val examples = List((0, "0"), (123, "123"), (-123, "-123"),
-    (Int.MaxValue, Int.MaxValue.toString), (Int.MinValue, Int.MinValue.toString))
-
+  val examples = List((0, "0"),
+                      (123, "123"),
+                      (-123, "-123"),
+                      (Int.MaxValue, Int.MaxValue.toString),
+                      (Int.MinValue, Int.MinValue.toString))
 }

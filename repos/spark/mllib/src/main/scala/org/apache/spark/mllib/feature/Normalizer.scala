@@ -21,17 +21,17 @@ import org.apache.spark.annotation.Since
 import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors}
 
 /**
- * Normalizes samples individually to unit L^p^ norm
- *
- * For any 1 &lt;= p &lt; Double.PositiveInfinity, normalizes samples using
- * sum(abs(vector).^p^)^(1/p)^ as norm.
- *
- * For p = Double.PositiveInfinity, max(abs(vector)) will be used as norm for normalization.
- *
- * @param p Normalization in L^p^ space, p = 2 by default.
- */
+  * Normalizes samples individually to unit L^p^ norm
+  *
+  * For any 1 &lt;= p &lt; Double.PositiveInfinity, normalizes samples using
+  * sum(abs(vector).^p^)^(1/p)^ as norm.
+  *
+  * For p = Double.PositiveInfinity, max(abs(vector)) will be used as norm for normalization.
+  *
+  * @param p Normalization in L^p^ space, p = 2 by default.
+  */
 @Since("1.1.0")
-class Normalizer @Since("1.1.0") (p: Double) extends VectorTransformer {
+class Normalizer @Since("1.1.0")(p: Double) extends VectorTransformer {
 
   @Since("1.1.0")
   def this() = this(2)
@@ -39,11 +39,11 @@ class Normalizer @Since("1.1.0") (p: Double) extends VectorTransformer {
   require(p >= 1.0)
 
   /**
-   * Applies unit length normalization on a vector.
-   *
-   * @param vector vector to be normalized.
-   * @return normalized vector. If the norm of the input is zero, it will return the input vector.
-   */
+    * Applies unit length normalization on a vector.
+    *
+    * @param vector vector to be normalized.
+    * @return normalized vector. If the norm of the input is zero, it will return the input vector.
+    */
   @Since("1.1.0")
   override def transform(vector: Vector): Vector = {
     val norm = Vectors.norm(vector, p)
@@ -71,7 +71,9 @@ class Normalizer @Since("1.1.0") (p: Double) extends VectorTransformer {
             i += 1
           }
           Vectors.sparse(size, ids, values)
-        case v => throw new IllegalArgumentException("Do not support vector type " + v.getClass)
+        case v =>
+          throw new IllegalArgumentException(
+              "Do not support vector type " + v.getClass)
       }
     } else {
       // Since the norm is zero, return the input vector object itself.
@@ -80,5 +82,4 @@ class Normalizer @Since("1.1.0") (p: Double) extends VectorTransformer {
       vector
     }
   }
-
 }

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.extension
 
 //#imports
@@ -21,8 +21,8 @@ import akka.testkit.AkkaSpec
 //#extension
 class SettingsImpl(config: Config) extends Extension {
   val DbUri: String = config.getString("myapp.db.uri")
-  val CircuitBreakerTimeout: Duration =
-    Duration(config.getMilliseconds("myapp.circuit-breaker.timeout"),
+  val CircuitBreakerTimeout: Duration = Duration(
+      config.getMilliseconds("myapp.circuit-breaker.timeout"),
       TimeUnit.MILLISECONDS)
 }
 //#extension
@@ -36,8 +36,8 @@ object Settings extends ExtensionId[SettingsImpl] with ExtensionIdProvider {
     new SettingsImpl(system.settings.config)
 
   /**
-   * Java API: retrieve the Settings extension for the given system.
-   */
+    * Java API: retrieve the Settings extension for the given system.
+    */
   override def get(system: ActorSystem): SettingsImpl = super.get(system)
 }
 //#extensionid
@@ -72,10 +72,10 @@ object SettingsExtensionDocSpec {
       "dummy"
     }
   }
-
 }
 
-class SettingsExtensionDocSpec extends AkkaSpec(SettingsExtensionDocSpec.config) {
+class SettingsExtensionDocSpec
+    extends AkkaSpec(SettingsExtensionDocSpec.config) {
 
   "demonstrate how to create application specific settings extension in Scala" in {
     //#extension-usage
@@ -83,5 +83,4 @@ class SettingsExtensionDocSpec extends AkkaSpec(SettingsExtensionDocSpec.config)
     val circuitBreakerTimeout = Settings(system).CircuitBreakerTimeout
     //#extension-usage
   }
-
 }

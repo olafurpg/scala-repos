@@ -1,18 +1,18 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl.model.headers
 
 import scala.collection.immutable
 import akka.parboiled2.CharPredicate
 import akka.http.impl.util._
 import akka.http.scaladsl.model._
-import akka.http.javadsl.{ model ⇒ jm }
+import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util.JavaMapping.Implicits._
 import UriRendering.UriRenderer
 
-final case class LinkValue(uri: Uri, params: immutable.Seq[LinkParam]) extends jm.headers.LinkValue with ValueRenderable {
+final case class LinkValue(uri: Uri, params: immutable.Seq[LinkParam])
+    extends jm.headers.LinkValue with ValueRenderable {
   def render[R <: Rendering](r: R): r.type = {
     r ~~ '<' ~~ uri ~~ '>'
     if (params.nonEmpty) r ~~ "; " ~~ params
@@ -24,15 +24,18 @@ final case class LinkValue(uri: Uri, params: immutable.Seq[LinkParam]) extends j
 }
 
 object LinkValue {
-  def apply(uri: Uri, params: LinkParam*): LinkValue = apply(uri, immutable.Seq(params: _*))
+  def apply(uri: Uri, params: LinkParam*): LinkValue =
+    apply(uri, immutable.Seq(params: _*))
 }
 
-sealed abstract class LinkParam extends jm.headers.LinkParam with ToStringRenderable {
+sealed abstract class LinkParam
+    extends jm.headers.LinkParam with ToStringRenderable {
   val key: String = getClass.getSimpleName
   def value: AnyRef
 }
 object LinkParam {
-  implicit val paramsRenderer: Renderer[immutable.Seq[LinkParam]] = Renderer.seqRenderer(separator = "; ")
+  implicit val paramsRenderer: Renderer[immutable.Seq[LinkParam]] =
+    Renderer.seqRenderer(separator = "; ")
 }
 
 object LinkParams {
@@ -110,7 +113,8 @@ object LinkParams {
 
     def render[R <: Rendering](r: R): r.type = {
       r ~~ "type="
-      if (reserved matchesAny mediaType.value) r ~~ '"' ~~ mediaType.value ~~ '"' else r ~~ mediaType.value
+      if (reserved matchesAny mediaType.value)
+        r ~~ '"' ~~ mediaType.value ~~ '"' else r ~~ mediaType.value
     }
   }
 }

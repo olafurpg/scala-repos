@@ -9,10 +9,12 @@ import com.intellij.util.{Consumer, PlatformIcons}
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
 
 /**
- * @author Alexander Podkhalyuzin
- */
+  * @author Alexander Podkhalyuzin
+  */
 class ScalaImportStaticLookupActionProvider extends LookupActionProvider {
-  def fillActions(element: LookupElement, lookup: Lookup, consumer: Consumer[LookupElementAction]) {
+  def fillActions(element: LookupElement,
+                  lookup: Lookup,
+                  consumer: Consumer[LookupElementAction]) {
     element match {
       case elem: ScalaLookupItem if elem.element.isInstanceOf[PsiClass] =>
       case elem: ScalaLookupItem =>
@@ -23,7 +25,8 @@ class ScalaImportStaticLookupActionProvider extends LookupActionProvider {
         val icon: Icon =
           if (!elem.shouldImport) checkIcon
           else new EmptyIcon(checkIcon.getIconWidth, checkIcon.getIconHeight)
-        consumer.consume(new LookupElementAction(icon, "Import method") {
+        consumer.consume(
+            new LookupElementAction(icon, "Import method") {
           def performLookupAction: LookupElementAction.Result = {
             elem.usedImportStaticQuickfix = true
             new LookupElementAction.Result.ChooseItem(elem)

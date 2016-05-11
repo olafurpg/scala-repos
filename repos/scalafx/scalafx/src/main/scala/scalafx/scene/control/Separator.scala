@@ -36,10 +36,12 @@ import scalafx.delegate.SFXDelegate
 import scalafx.geometry.{HPos, Orientation, VPos}
 
 object Separator {
-  implicit def sfxSeparator2jfx(v: Separator): jfxsc.Separator = if (v != null) v.delegate else null
+  implicit def sfxSeparator2jfx(v: Separator): jfxsc.Separator =
+    if (v != null) v.delegate else null
 }
 
-class Separator(override val delegate: jfxsc.Separator = new jfxsc.Separator) extends Control(delegate) with SFXDelegate[jfxsc.Separator] {
+class Separator(override val delegate: jfxsc.Separator = new jfxsc.Separator)
+    extends Control(delegate) with SFXDelegate[jfxsc.Separator] {
 
   def halignment: ObjectProperty[jfxg.HPos] = delegate.halignmentProperty
   def halignment_=(v: HPos) {
@@ -51,9 +53,9 @@ class Separator(override val delegate: jfxsc.Separator = new jfxsc.Separator) ex
     valignment() = v
   }
 
-  def orientation: ObjectProperty[jfxg.Orientation] = delegate.orientationProperty
+  def orientation: ObjectProperty[jfxg.Orientation] =
+    delegate.orientationProperty
   def orientation_=(v: Orientation) {
     orientation() = v
   }
-
 }

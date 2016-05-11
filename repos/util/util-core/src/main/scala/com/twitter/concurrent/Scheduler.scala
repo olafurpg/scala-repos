@@ -7,18 +7,19 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
 
 /**
- * An interface for scheduling [[java.lang.Runnable]] tasks.
- */
+  * An interface for scheduling [[java.lang.Runnable]] tasks.
+  */
 trait Scheduler {
+
   /**
-   * Schedule `r` to be run at some time in the future.
-   */
+    * Schedule `r` to be run at some time in the future.
+    */
   def submit(r: Runnable): Unit
 
   /**
-   * Flush the schedule. Returns when there is no more
-   * work to do.
-   */
+    * Flush the schedule. Returns when there is no more
+    * work to do.
+    */
   def flush(): Unit
 
   // A note on Hotspot's ThreadMXBean's CPU time. On Linux, this
@@ -35,56 +36,56 @@ trait Scheduler {
   // code complexity to support them.
 
   /**
-   * The amount of User time that's been scheduled as per ThreadMXBean.
-   */
+    * The amount of User time that's been scheduled as per ThreadMXBean.
+    */
   @deprecated("schedulers no longer export this", "2015-01-10")
   def usrTime: Long = -1L
 
   /**
-   * The amount of CPU time that's been scheduled as per ThreadMXBean.
-   */
+    * The amount of CPU time that's been scheduled as per ThreadMXBean.
+    */
   @deprecated("schedulers no longer export this", "2015-01-10")
   def cpuTime: Long = -1L
 
   /**
-   * Total walltime spent in the scheduler.
-   */
+    * Total walltime spent in the scheduler.
+    */
   @deprecated("schedulers no longer export this", "2015-01-10")
   def wallTime: Long = -1L
 
   /**
-   * The number of dispatches performed by this scheduler.
-   */
+    * The number of dispatches performed by this scheduler.
+    */
   def numDispatches: Long
 
   /**
-   * Executes a function `f` in a blocking fashion.
-   *
-   * Note: The permit may be removed in the future.
-   */
+    * Executes a function `f` in a blocking fashion.
+    *
+    * Note: The permit may be removed in the future.
+    */
   def blocking[T](f: => T)(implicit perm: CanAwait): T
 }
 
 /**
- * A global scheduler.
- */
+  * A global scheduler.
+  */
 object Scheduler extends Scheduler {
   @volatile private var self: Scheduler = new LocalScheduler
 
   def apply(): Scheduler = self
 
   /**
-   * Swap out the current globally-set scheduler with another.
-   *
-   * Note: This can be unsafe since some schedulers may be active,
-   * and flush() can be invoked on the wrong scheduler.
-   *
-   * This can happen, for example, if a LocalScheduler is used while
-   * a future is resolved via Await.
-   *
-   * @param sched the other Scheduler to swap in for the one that is
-   * currently set
-   */
+    * Swap out the current globally-set scheduler with another.
+    *
+    * Note: This can be unsafe since some schedulers may be active,
+    * and flush() can be invoked on the wrong scheduler.
+    *
+    * This can happen, for example, if a LocalScheduler is used while
+    * a future is resolved via Await.
+    *
+    * @param sched the other Scheduler to swap in for the one that is
+    * currently set
+    */
   def setUnsafe(sched: Scheduler): Unit = {
     self = sched
   }
@@ -98,22 +99,23 @@ object Scheduler extends Scheduler {
 }
 
 /**
- * An efficient thread-local, direct-dispatch scheduler.
- */
+  * An efficient thread-local, direct-dispatch scheduler.
+  */
 class LocalScheduler(lifo: Boolean) extends Scheduler {
   def this() = this(false)
 
   // use weak refs to prevent Activations from causing a memory leak
   // thread-safety provided by synchronizing on `activations`
-  private[this] val activations = new mutable.WeakHashMap[Activation, Boolean]()
+  private[this] val activations =
+    new mutable.WeakHashMap[Activation, Boolean]()
 
   private[this] val local = new ThreadLocal[Activation] {
     override def initialValue = null
   }
 
   /**
-   * A task-queueing, direct-dispatch scheduler
-   */
+    * A task-queueing, direct-dispatch scheduler
+    */
   private class Activation extends Scheduler with Iterator[Runnable] {
     private[this] var r0, r1, r2: Runnable = null
     private[this] val rs = new ArrayDeque[Runnable]
@@ -174,8 +176,7 @@ class LocalScheduler(lifo: Boolean) extends Scheduler {
       val save = running
       running = true
       try {
-        while (hasNext)
-          next().run()
+        while (hasNext) next().run()
       } finally {
         running = save
       }
@@ -186,8 +187,7 @@ class LocalScheduler(lifo: Boolean) extends Scheduler {
 
   private[this] def get(): Activation = {
     val a = local.get()
-    if (a != null)
-      return a
+    if (a != null) return a
 
     val activation = new Activation()
     local.set(activation)
@@ -212,15 +212,14 @@ class LocalScheduler(lifo: Boolean) extends Scheduler {
 
   def numDispatches: Long = activationsSum(_.numDispatches)
 
-
   def blocking[T](f: => T)(implicit perm: CanAwait): T = f
 }
 
 /**
- * A named Scheduler mix-in that causes submitted tasks to be dispatched according to
- * an [[java.util.concurrent.ExecutorService]] created by an abstract factory
- * function.
- */
+  * A named Scheduler mix-in that causes submitted tasks to be dispatched according to
+  * an [[java.util.concurrent.ExecutorService]] created by an abstract factory
+  * function.
+  */
 trait ExecutorScheduler { self: Scheduler =>
   val name: String
   val executorFactory: ThreadFactory => ExecutorService
@@ -242,7 +241,7 @@ trait ExecutorScheduler { self: Scheduler =>
     // We add 2x slop here because it's inherently racy to enumerate
     // threads. Since this is used only for monitoring purposes, we
     // don't try too hard.
-    val threads = new Array[Thread](threadGroup.activeCount*2)
+    val threads = new Array[Thread](threadGroup.activeCount * 2)
     val n = threadGroup.enumerate(threads)
     threads take n
   }
@@ -262,49 +261,48 @@ trait ExecutorScheduler { self: Scheduler =>
 }
 
 /**
- * A scheduler that dispatches directly to an underlying Java
- * cached threadpool executor.
- */
+  * A scheduler that dispatches directly to an underlying Java
+  * cached threadpool executor.
+  */
 class ThreadPoolScheduler(
-  val name: String,
-  val executorFactory: ThreadFactory => ExecutorService
-) extends Scheduler with ExecutorScheduler {
+    val name: String,
+    val executorFactory: ThreadFactory => ExecutorService
+)
+    extends Scheduler with ExecutorScheduler {
   def this(name: String) = this(name, Executors.newCachedThreadPool(_))
 }
 
 /**
- * A scheduler that bridges tasks submitted by external threads into local
- * executor threads. All tasks submitted locally are executed on local threads.
- *
- * Note: This scheduler expects to create executors with unbounded capacity.
- * Thus it does not expect and has undefined behavior for any
- * `RejectedExecutionException`s other than those encountered after executor
- * shutdown.
- */
+  * A scheduler that bridges tasks submitted by external threads into local
+  * executor threads. All tasks submitted locally are executed on local threads.
+  *
+  * Note: This scheduler expects to create executors with unbounded capacity.
+  * Thus it does not expect and has undefined behavior for any
+  * `RejectedExecutionException`s other than those encountered after executor
+  * shutdown.
+  */
 class BridgedThreadPoolScheduler(
-  val name: String,
-  val executorFactory: ThreadFactory => ExecutorService
-) extends Scheduler with ExecutorScheduler {
+    val name: String,
+    val executorFactory: ThreadFactory => ExecutorService
+)
+    extends Scheduler with ExecutorScheduler {
   private[this] val local = new LocalScheduler
 
   def this(name: String) = this(name, Executors.newCachedThreadPool(_))
 
   override def submit(r: Runnable) {
-    if (Thread.currentThread.getThreadGroup == threadGroup)
-      local.submit(r)
+    if (Thread.currentThread.getThreadGroup == threadGroup) local.submit(r)
     else
-      try
-        executor.execute(new Runnable {
-          def run() {
-            BridgedThreadPoolScheduler.this.submit(r)
-          }
-        })
-      catch {
+      try executor.execute(
+          new Runnable {
+        def run() {
+          BridgedThreadPoolScheduler.this.submit(r)
+        }
+      }) catch {
         case _: RejectedExecutionException => local.submit(r)
       }
   }
 
   override def flush() =
-    if (Thread.currentThread.getThreadGroup == threadGroup)
-      local.flush()
+    if (Thread.currentThread.getThreadGroup == threadGroup) local.flush()
 }

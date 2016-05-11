@@ -28,27 +28,27 @@ class ZipperTests {
     val l = 1 :: "foo" :: 3.0 :: HNil
 
     val z = l.toZipper
-    
+
     val i = z.get
     typed[Int](i)
     assertEquals(1, i)
-    
+
     val s = z.right.get
     typed[String](s)
     assertEquals("foo", s)
-    
+
     val d = z.right.right.get
     typed[Double](d)
     assertEquals(3.0, d, Double.MinPositiveValue)
-    
+
     val zl = z.last
-    
+
     val d2 = zl.left.get
     typed[Double](d2)
     assertEquals(3.0, d2, Double.MinPositiveValue)
-    
+
     val zf = zl.first
-    
+
     val i2 = zf.get
     typed[Int](i2)
     assertEquals(1, i2)
@@ -61,7 +61,7 @@ class ZipperTests {
     val l2 = l.toZipper.right.put("wibble", 45).reify
     typed[Int :: (String, Int) :: Double :: HNil](l2)
     assertEquals(1 :: ("wibble", 45) :: 3.0 :: HNil, l2)
-  
+
     val l3 = l.toZipper.right.delete.reify
     typed[Int :: Double :: HNil](l3)
     assertEquals(1 :: 3.0 :: HNil, l3)
@@ -93,7 +93,7 @@ class ZipperTests {
     typed[Int](i7)
     assertEquals(1, i7)
   }
-  
+
   @Test
   def testNatIndexing {
     val l = 1 :: "foo" :: 3.0 :: HNil
@@ -102,114 +102,141 @@ class ZipperTests {
     val d8 = l8.get
     typed[Double](d8)
     assertEquals(3.0, d8, Double.MinPositiveValue)
-    
+
     val l9 = l8.leftBy(1)
     val s9 = l9.get
     typed[String](s9)
     assertEquals("foo", s9)
   }
-  
+
   @Test
   def testEmpty {
     val l = HNil
     val z = l.toZipper
-    
+
     val l2 = z.insert(23).insert("foo").insert(true).reify
     typed[Int :: String :: Boolean :: HNil](l2)
     assertEquals(23 :: "foo" :: true :: HNil, l2)
   }
 
-  case class Address(street : String, city : String, postcode : String)
-  case class Person(name : String, age : Int, address : Address)
-  
-  val p1 = Person("Joe Grey", 37, Address("Southover Street", "Brighton", "BN2 9UA"))
-  
-  case class Dept[E <: HList](manager : Employee, employees : E)
-  case class Employee(name : String, salary : Int)
-  
+  case class Address(street: String, city: String, postcode: String)
+  case class Person(name: String, age: Int, address: Address)
+
+  val p1 = Person(
+      "Joe Grey", 37, Address("Southover Street", "Brighton", "BN2 9UA"))
+
+  case class Dept[E <: HList](manager: Employee, employees: E)
+  case class Employee(name: String, salary: Int)
+
   type D = Dept[Employee :: Employee :: Employee :: HNil]
 
-  val dept =
-    Dept(
+  val dept = Dept(
       Employee("Agamemnon", 5000),
-      Employee("Menelaus", 3000) ::
-      Employee("Achilles", 2000) ::
-      Employee("Odysseus", 2000) ::
-      HNil
-    )
-  
+      Employee("Menelaus", 3000) :: Employee("Achilles", 2000) :: Employee(
+          "Odysseus", 2000) :: HNil
+  )
+
   @Test
   def testCaseClasses {
     val z = p1.toZipper
-    
+
     val name = z.get
     typed[String](name)
     assertEquals("Joe Grey", name)
-    
+
     val age = z.right.get
     typed[Int](age)
     assertEquals(37, age)
-    
+
     val address = z.right.right.get
     typed[Address](address)
     assertEquals(Address("Southover Street", "Brighton", "BN2 9UA"), address)
-    
+
     val street = z.right.right.down.get
     typed[String](street)
     assertEquals("Southover Street", street)
-    
+
     val city = z.right.right.down.right.get
     typed[String](city)
     assertEquals("Brighton", city)
-    
+
     val postcode = z.right.right.down.right.right.get
     typed[String](postcode)
     assertEquals("BN2 9UA", postcode)
-    
+
     val updatedName = z.put("Fred Bloggs").reify
     typed[Person](updatedName)
-    assertEquals(Person("Fred Bloggs", 37, Address("Southover Street", "Brighton", "BN2 9UA")), updatedName)
-    
+    assertEquals(Person("Fred Bloggs",
+                        37,
+                        Address("Southover Street", "Brighton", "BN2 9UA")),
+                 updatedName)
+
     val updatedCity = z.right.right.down.right.put("London")
     typed[Address](updatedCity.reify)
-    assertEquals(Address("Southover Street", "London", "BN2 9UA"), updatedCity.reify)
-    
+    assertEquals(
+        Address("Southover Street", "London", "BN2 9UA"), updatedCity.reify)
+
     typed[Person](updatedCity.up.reify)
-    assertEquals(Person("Joe Grey", 37, Address("Southover Street", "London", "BN2 9UA")), updatedCity.up.reify)
+    assertEquals(
+        Person(
+            "Joe Grey", 37, Address("Southover Street", "London", "BN2 9UA")),
+        updatedCity.up.reify)
 
     typed[Person](updatedCity.root.reify)
-    assertEquals(Person("Joe Grey", 37, Address("Southover Street", "London", "BN2 9UA")), updatedCity.up.reify)
-    
+    assertEquals(
+        Person(
+            "Joe Grey", 37, Address("Southover Street", "London", "BN2 9UA")),
+        updatedCity.up.reify)
+
     val agedPerson = z.right.modify(_ + 1).reify
     typed[Person](agedPerson)
-    assertEquals(Person("Joe Grey", 38, Address("Southover Street", "Brighton", "BN2 9UA")), agedPerson)
+    assertEquals(Person("Joe Grey",
+                        38,
+                        Address("Southover Street", "Brighton", "BN2 9UA")),
+                 agedPerson)
 
     val reifiedAddress = z.right.right.down.reify
     typed[Address](reifiedAddress)
-    
+
     val reifiedCity = z.right.right.down.right.reify
     typed[Address](reifiedCity)
-    
+
     val underAddress = z.right.right.down
     val addressAgain = underAddress.up.get
     typed[Address](addressAgain)
-    
+
     val root1 = z.root
     typed[Person](root1.reify)
-    
+
     val root2 = underAddress.root
     typed[Person](root2.reify)
-    
+
     val z2 = dept.toZipper
-    
-    val z3 = z2.down.put("King Agamemnon").right.put(8000).up.right.down.right.down.right.put(3000).up.right.down.right.modify(_ * 2).root.reify
+
+    val z3 = z2.down
+      .put("King Agamemnon")
+      .right
+      .put(8000)
+      .up
+      .right
+      .down
+      .right
+      .down
+      .right
+      .put(3000)
+      .up
+      .right
+      .down
+      .right
+      .modify(_ * 2)
+      .root
+      .reify
     typed[D](z3)
     assertEquals(
-     Dept(
-       Employee("King Agamemnon", 8000),
-       Employee("Menelaus", 3000) ::
-       Employee("Achilles", 3000) ::
-       Employee("Odysseus", 4000) ::
-       HNil), z3)
+        Dept(
+            Employee("King Agamemnon", 8000),
+            Employee("Menelaus", 3000) :: Employee("Achilles", 3000) :: Employee(
+                "Odysseus", 4000) :: HNil),
+        z3)
   }
 }

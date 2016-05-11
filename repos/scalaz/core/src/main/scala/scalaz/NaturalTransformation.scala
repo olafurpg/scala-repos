@@ -11,8 +11,7 @@ import Id._
   * from [[scalaz.Distributive]] give rise to `([a]T[A[a]]) ~>
   * ([a]A[T[a]])`, for varying `A` and `T` constraints.
   */
-trait NaturalTransformation[-F[_], +G[_]] {
-  self =>
+trait NaturalTransformation[-F[_], +G[_]] { self =>
   def apply[A](fa: F[A]): G[A]
 
   def compose[E[_]](f: E ~> F): E ~> G = new (E ~> G) {
@@ -24,13 +23,14 @@ trait NaturalTransformation[-F[_], +G[_]] {
 }
 
 trait NaturalTransformations {
+
   /** A function type encoded as a natural transformation by adding a
     * phantom parameter.
     */
   type ->[A, B] = λ[α => A] ~> λ[α => B]
 
   /** `refl` specialized to [[scalaz.Id.Id]]. */
-  def id = 
+  def id =
     new (Id ~> Id) {
       def apply[A](a: A) = a
     }
@@ -42,14 +42,14 @@ trait NaturalTransformations {
     }
 
   /** Reify a `NaturalTransformation`. */
-  implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
+  implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] =
+    x => f(x)
 }
 
 object NaturalTransformation extends NaturalTransformations
 
 /** A function universally quantified over two parameters. */
-trait BiNaturalTransformation[-F[_, _], +G[_, _]] {
-  self =>
+trait BiNaturalTransformation[-F[_, _], +G[_, _]] { self =>
   def apply[A, B](f: F[A, B]): G[A, B]
 
   def compose[E[_, _]](f: BiNaturalTransformation[E, F]) =
@@ -60,16 +60,16 @@ trait BiNaturalTransformation[-F[_, _], +G[_, _]] {
 
 /** A constrained natural transformation */
 trait ConstrainedNaturalTransformation[F[_], G[_], E[_]] {
-  def apply[A: E](f: F[A]): G[A]
+  def apply[A : E](f: F[A]): G[A]
 }
 
 /** A constrained transformation natural in both sides of a bifunctor */
-trait BiConstrainedNaturalTransformation[F[_,_], G[_,_], C[_], E[_]] {
-  def apply[A: C, B: E](f: F[A,B]): G[A,B]
+trait BiConstrainedNaturalTransformation[F[_, _], G[_, _], C[_], E[_]] {
+  def apply[A : C, B : E](f: F[A, B]): G[A, B]
 }
 
-trait DiNaturalTransformation[F[_,_], G[_,_]] {
-  def apply[A](f: F[A,A]): G[A,A]
+trait DiNaturalTransformation[F[_, _], G[_, _]] {
+  def apply[A](f: F[A, A]): G[A, A]
 }
 
 // TODO needed, or just use type lambdas?

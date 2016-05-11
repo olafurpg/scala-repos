@@ -30,7 +30,8 @@ object StreamingLinearRegressionExample {
 
   def main(args: Array[String]): Unit = {
     if (args.length != 2) {
-      System.err.println("Usage: StreamingLinearRegressionExample <trainingDir> <testDir>")
+      System.err.println(
+          "Usage: StreamingLinearRegressionExample <trainingDir> <testDir>")
       System.exit(1)
     }
 
@@ -38,7 +39,8 @@ object StreamingLinearRegressionExample {
     val ssc = new StreamingContext(conf, Seconds(1))
 
     // $example on$
-    val trainingData = ssc.textFileStream(args(0)).map(LabeledPoint.parse).cache()
+    val trainingData =
+      ssc.textFileStream(args(0)).map(LabeledPoint.parse).cache()
     val testData = ssc.textFileStream(args(1)).map(LabeledPoint.parse)
 
     val numFeatures = 3

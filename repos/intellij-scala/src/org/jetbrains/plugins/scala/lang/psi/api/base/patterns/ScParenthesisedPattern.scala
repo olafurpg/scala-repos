@@ -6,9 +6,8 @@ package base
 package patterns
 
 /** 
-* @author Alexander Podkhalyuzin
-*/
-
+  * @author Alexander Podkhalyuzin
+  */
 trait ScParenthesisedPattern extends ScPattern {
   def subpattern = findChild(classOf[ScPattern])
 }

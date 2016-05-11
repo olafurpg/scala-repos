@@ -1,17 +1,17 @@
 package org.scalatra
 
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
-import javax.servlet.{ AsyncEvent, AsyncListener, ServletContext }
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import javax.servlet.{AsyncEvent, AsyncListener, ServletContext}
 
 import org.scalatra.servlet.AsyncSupport
 
 import scala.concurrent.duration._
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 abstract class AsyncResult(
-  implicit override val scalatraContext: ScalatraContext)
+    implicit override val scalatraContext: ScalatraContext)
     extends ScalatraContext {
 
   implicit val request: HttpServletRequest = scalatraContext.request
@@ -24,7 +24,6 @@ abstract class AsyncResult(
   implicit def timeout: Duration = 30 seconds
 
   val is: Future[_]
-
 }
 
 trait FutureSupport extends AsyncSupport {
@@ -37,12 +36,14 @@ trait FutureSupport extends AsyncSupport {
   // In the meantime, this gives us enough control for our test.
   // IPC: it may not be perfect but I need to be able to configure this timeout in an application
   // This is a Duration instead of a timeout because a duration has the concept of infinity
-  @deprecated("Override the `timeout` method on a `org.scalatra.AsyncResult` instead.", "2.2")
+  @deprecated(
+      "Override the `timeout` method on a `org.scalatra.AsyncResult` instead.",
+      "2.2")
   protected def asyncTimeout: Duration = 30 seconds
 
   override protected def isAsyncExecutable(result: Any): Boolean =
     classOf[Future[_]].isAssignableFrom(result.getClass) ||
-      classOf[AsyncResult].isAssignableFrom(result.getClass)
+    classOf[AsyncResult].isAssignableFrom(result.getClass)
 
   override protected def renderResponse(actionResult: Any): Unit = {
     actionResult match {
@@ -55,7 +56,8 @@ trait FutureSupport extends AsyncSupport {
   private[this] def handleFuture(f: Future[_], timeout: Duration): Unit = {
     val gotResponseAlready = new AtomicBoolean(false)
     val context = request.startAsync(request, response)
-    if (timeout.isFinite()) context.setTimeout(timeout.toMillis) else context.setTimeout(-1)
+    if (timeout.isFinite()) context.setTimeout(timeout.toMillis)
+    else context.setTimeout(-1)
 
     def renderFutureResult(f: Future[_]): Unit = {
       f onComplete {
@@ -64,30 +66,30 @@ trait FutureSupport extends AsyncSupport {
         case Success(r: AsyncResult) => renderFutureResult(r.is)
         case t => {
 
-          if (gotResponseAlready.compareAndSet(false, true)) {
-            withinAsyncContext(context) {
-              try {
-                t map { result =>
-                  renderResponse(result)
-                } recover {
-                  case e: HaltException =>
-                    renderHaltException(e)
-                  case e =>
-                    try {
-                      renderResponse(errorHandler(e))
-                    } catch {
-                      case e: Throwable =>
-                        ScalatraBase.runCallbacks(Failure(e))
-                        renderUncaughtException(e)
-                        ScalatraBase.runRenderCallbacks(Failure(e))
-                    }
+            if (gotResponseAlready.compareAndSet(false, true)) {
+              withinAsyncContext(context) {
+                try {
+                  t map { result =>
+                    renderResponse(result)
+                  } recover {
+                    case e: HaltException =>
+                      renderHaltException(e)
+                    case e =>
+                      try {
+                        renderResponse(errorHandler(e))
+                      } catch {
+                        case e: Throwable =>
+                          ScalatraBase.runCallbacks(Failure(e))
+                          renderUncaughtException(e)
+                          ScalatraBase.runRenderCallbacks(Failure(e))
+                      }
+                  }
+                } finally {
+                  context.complete()
                 }
-              } finally {
-                context.complete()
               }
             }
           }
-        }
       }
     }
 
@@ -96,7 +98,8 @@ trait FutureSupport extends AsyncSupport {
       def onTimeout(event: AsyncEvent): Unit = {
         onAsyncEvent(event) {
           if (gotResponseAlready.compareAndSet(false, true)) {
-            renderHaltException(HaltException(Some(504), None, Map.empty, "Gateway timeout"))
+            renderHaltException(
+                HaltException(Some(504), None, Map.empty, "Gateway timeout"))
             event.getAsyncContext.complete()
           }
         }
@@ -128,6 +131,4 @@ trait FutureSupport extends AsyncSupport {
 
     renderFutureResult(f)
   }
-
 }
-

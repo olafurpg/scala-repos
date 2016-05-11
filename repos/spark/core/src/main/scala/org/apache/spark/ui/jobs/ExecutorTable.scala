@@ -25,7 +25,8 @@ import org.apache.spark.ui.jobs.UIData.StageUIData
 import org.apache.spark.util.Utils
 
 /** Stage summary grouped by executors. */
-private[ui] class ExecutorTable(stageId: Int, stageAttemptId: Int, parent: StagesTab) {
+private[ui] class ExecutorTable(
+    stageId: Int, stageAttemptId: Int, parent: StagesTab) {
   private val listener = parent.progressListener
 
   def toNodeSeq: Seq[Node] = {
@@ -42,7 +43,9 @@ private[ui] class ExecutorTable(stageId: Int, stageAttemptId: Int, parent: Stage
     var hasShuffleWrite = false
     var hasShuffleRead = false
     var hasBytesSpilled = false
-    stageData.foreach(data => {
+    stageData.foreach(
+        data =>
+          {
         hasInput = data.hasInput
         hasOutput = data.hasOutput
         hasShuffleRead = data.hasShuffleRead
@@ -100,7 +103,7 @@ private[ui] class ExecutorTable(stageId: Int, stageAttemptId: Int, parent: Stage
     </script>
   }
 
-  private def createExecutorTable() : Seq[Node] = {
+  private def createExecutorTable(): Seq[Node] = {
     // Make an executor-id -> address map
     val executorIdToAddress = mutable.HashMap[String, String]()
     listener.blockManagerIds.foreach { blockManagerId =>
@@ -111,8 +114,9 @@ private[ui] class ExecutorTable(stageId: Int, stageAttemptId: Int, parent: Stage
 
     listener.stageIdToData.get((stageId, stageAttemptId)) match {
       case Some(stageData: StageUIData) =>
-        stageData.executorSummary.toSeq.sortBy(_._1).map { case (k, v) =>
-          <tr>
+        stageData.executorSummary.toSeq.sortBy(_._1).map {
+          case (k, v) =>
+            <tr>
             <td>{k}</td>
             <td>{executorIdToAddress.getOrElse(k, "CANNOT FIND ADDRESS")}</td>
             <td sorttable_customkey={v.taskTime.toString}>{UIUtils.formatDuration(v.taskTime)}</td>

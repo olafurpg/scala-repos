@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import language.postfixOps
@@ -24,8 +24,7 @@ object Ticket15109Spec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(
-    ConfigFactory.parseString("""
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       ## Keep it tight, otherwise reestablishing a connection takes too much time
@@ -41,15 +40,14 @@ object Ticket15109Spec extends MultiNodeConfig {
       case "ping" ⇒ sender() ! "pong"
     }
   }
-
 }
 
 class Ticket15109SpecMultiJvmNode1 extends Ticket15109Spec
 class Ticket15109SpecMultiJvmNode2 extends Ticket15109Spec
 
-abstract class Ticket15109Spec extends MultiNodeSpec(Ticket15109Spec)
-  with STMultiNodeSpec
-  with ImplicitSender {
+abstract class Ticket15109Spec
+    extends MultiNodeSpec(Ticket15109Spec) with STMultiNodeSpec
+    with ImplicitSender {
 
   import Ticket15109Spec._
 
@@ -90,8 +88,10 @@ abstract class Ticket15109Spec extends MultiNodeSpec(Ticket15109Spec)
       runOn(second) {
         // Force a disassociation. Using the message Shutdown, which is suboptimal here, but this is the only
         // DisassociateInfo that triggers the code-path we want to test
-        Await.result(RARP(system).provider.transport.managementCommand(
-          ForceDisassociateExplicitly(node(first).address, AssociationHandle.Shutdown)), 3.seconds)
+        Await.result(RARP(system).provider.transport
+                       .managementCommand(ForceDisassociateExplicitly(
+                             node(first).address, AssociationHandle.Shutdown)),
+                     3.seconds)
       }
 
       enterBarrier("disassociated")
@@ -101,8 +101,6 @@ abstract class Ticket15109Spec extends MultiNodeSpec(Ticket15109Spec)
       }
 
       enterBarrier("done")
-
     }
-
   }
 }

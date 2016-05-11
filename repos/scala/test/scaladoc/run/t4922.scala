@@ -24,9 +24,11 @@ object Test extends ScaladocModelTest {
     val f = Test._method("f")
     val g = Test._method("g")
 
-    def assertEqual(s1: String, s2: String) = assert(s1 == s2, s1 + " == " + s2)
+    def assertEqual(s1: String, s2: String) =
+      assert(s1 == s2, s1 + " == " + s2)
 
-    assertEqual(f.valueParams(0)(0).defaultValue.get.expression, "\"\".isEmpty")
+    assertEqual(
+        f.valueParams(0)(0).defaultValue.get.expression, "\"\".isEmpty")
     assertEqual(g.valueParams(0)(0).defaultValue.get.expression, "null")
   }
 }

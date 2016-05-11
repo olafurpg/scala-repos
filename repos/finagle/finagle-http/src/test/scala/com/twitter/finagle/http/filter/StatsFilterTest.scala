@@ -14,14 +14,15 @@ class StatsFilterTest extends FunSuite {
   test("increment stats") {
     val receiver = new InMemoryStatsReceiver
 
-    val filter = new StatsFilter(receiver) andThen new Service[Request, Response] {
-      def apply(request: Request): Future[Response] = {
-        val response = request.response
-        response.statusCode = 404
-        response.write("hello")
-        Future.value(response)
+    val filter =
+      new StatsFilter(receiver) andThen new Service[Request, Response] {
+        def apply(request: Request): Future[Response] = {
+          val response = request.response
+          response.statusCode = 404
+          response.write("hello")
+          Future.value(response)
+        }
       }
-    }
 
     Time.withCurrentTimeFrozen { _ =>
       Await.result(filter(Request()))

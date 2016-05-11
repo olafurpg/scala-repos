@@ -4,11 +4,12 @@
 package play.api
 
 /**
- * Contains test helpers.
- */
+  * Contains test helpers.
+  */
 package object test {
+
   /**
-   * Provided as an implicit by WithServer and WithBrowser.
-   */
+    * Provided as an implicit by WithServer and WithBrowser.
+    */
   type Port = Int
 }

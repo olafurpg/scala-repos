@@ -1,13 +1,15 @@
-class Automaton[@specialized(Double) W,State] {
+class Automaton[@specialized(Double) W, State] {
 
   def finalWeight(s: State): W = sys.error("todo");
 
   def allStates: Set[State] = sys.error("toodo");
 
   /**
-   * Returns a map from states to its final weight. may expand all nodes.
-   */
-  def finalStateWeights = Map.empty ++ allStates.map { s => (s,finalWeight(s)) }
+    * Returns a map from states to its final weight. may expand all nodes.
+    */
+  def finalStateWeights = Map.empty ++ allStates.map { s =>
+    (s, finalWeight(s))
+  }
 
   // This works fine:
   /*
@@ -17,8 +19,7 @@ class Automaton[@specialized(Double) W,State] {
       finalWeight(it.next);
     }
   }
-  */
-
+ */
 }
 
 abstract class Automaton2[@specialized T1, T2] {

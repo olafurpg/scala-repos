@@ -94,7 +94,7 @@ package object bijections {
       _unapply(0).map(identity[T])
     }
   }
-  */
+ */
 }
 
 // vim: set ts=4 sw=4 et:

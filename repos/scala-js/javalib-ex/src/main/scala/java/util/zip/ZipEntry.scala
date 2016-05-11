@@ -66,5 +66,4 @@ class ZipEntry(private[this] val _name: String) extends Cloneable {
   def setSize(size: Long): Unit = { _size = size }
   def setTime(time: Long): Unit = { _time = time }
   override def toString(): String = _name
-
 }

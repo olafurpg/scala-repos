@@ -19,12 +19,13 @@ object SCL4559A {
     type A = AA
     type B = BB
 
-    /*start*/foo(new BB{}, new ZZ2)/*end*/
+    /*start*/
+    foo(new BB {}, new ZZ2) /*end*/
   }
 
   import Z._
 
-  val b : BB = new BB {}
+  val b: BB = new BB {}
 
   b.contains("text")
 }

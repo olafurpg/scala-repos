@@ -3,9 +3,7 @@ trait SCL7008 {
     trait Name
   }
   trait SN { self: F =>
-    object nme extends Z {
-
-    }
+    object nme extends Z {}
   }
   class F extends N with SN with NM
 
@@ -13,7 +11,7 @@ trait SCL7008 {
     trait NMC
     trait Z extends NMC { self: nme.type =>
       def one(name: Name): Name = null
-      def two(name: Name) = /*start*/one(name)/*end*/
+      def two(name: Name) = /*start*/ one(name) /*end*/
     }
   }
 }

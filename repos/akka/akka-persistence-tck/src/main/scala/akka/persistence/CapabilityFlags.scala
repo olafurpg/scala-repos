@@ -7,12 +7,14 @@ package akka.persistence
 import scala.language.implicitConversions
 
 sealed abstract class CapabilityFlag {
-  private val capturedStack = (new Throwable().getStackTrace)
-    .filter(_.getMethodName.startsWith("supports"))
-    .find { el ⇒
-      val clazz = Class.forName(el.getClassName)
-      clazz.getDeclaredMethod(el.getMethodName).getReturnType == classOf[CapabilityFlag]
-    } map { _.getMethodName } getOrElse "[unknown]"
+  private val capturedStack =
+    (new Throwable().getStackTrace)
+      .filter(_.getMethodName.startsWith("supports"))
+      .find { el ⇒
+        val clazz = Class.forName(el.getClassName)
+        clazz.getDeclaredMethod(el.getMethodName).getReturnType == classOf[
+            CapabilityFlag]
+      } map { _.getMethodName } getOrElse "[unknown]"
 
   def name: String = capturedStack
   def value: Boolean
@@ -39,11 +41,10 @@ sealed trait CapabilityFlags
 trait JournalCapabilityFlags extends CapabilityFlags {
 
   /**
-   * When `true` enables tests which check if the Journal properly rejects
-   * writes of objects which are not `java.lang.Serializable`.
-   */
+    * When `true` enables tests which check if the Journal properly rejects
+    * writes of objects which are not `java.lang.Serializable`.
+    */
   protected def supportsRejectingNonSerializableObjects: CapabilityFlag
-
 }
 //#journal-flags
 

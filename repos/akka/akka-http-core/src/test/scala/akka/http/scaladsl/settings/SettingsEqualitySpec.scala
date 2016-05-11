@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.scaladsl.settings
 
 import com.typesafe.config.ConfigFactory
@@ -11,7 +10,8 @@ import org.scalatest.WordSpec
 
 class SettingsEqualitySpec extends WordSpec with Matchers {
 
-  val config = ConfigFactory.parseString("""
+  val config = ConfigFactory
+    .parseString("""
     akka.http.routing {
       verbose-error-messages = off
       file-get-conditional = on
@@ -21,7 +21,9 @@ class SettingsEqualitySpec extends WordSpec with Matchers {
       decode-max-bytes-per-chunk = 1m
       file-io-dispatcher = ${akka.stream.blocking-io-dispatcher}
     }
-  """).withFallback(ConfigFactory.load).resolve
+  """)
+    .withFallback(ConfigFactory.load)
+    .resolve
 
   "equality" should {
     "hold for ConnectionPoolSettings" in {
@@ -64,5 +66,4 @@ class SettingsEqualitySpec extends WordSpec with Matchers {
       s1.toString should startWith("ServerSettings(")
     }
   }
-
 }

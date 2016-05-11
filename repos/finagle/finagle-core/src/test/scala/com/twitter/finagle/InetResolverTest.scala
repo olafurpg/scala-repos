@@ -67,5 +67,4 @@ class InetResolverTest extends FunSuite {
     assert(statsReceiver.counter("inet", "dns", "successes")() > 0)
     assert(statsReceiver.stat("inet", "dns", "lookup_ms")().size > 0)
   }
-
 }

@@ -9,5 +9,3 @@ object AA3 extends A {
 
   val x: NameAfterRename = this
 }
-
-

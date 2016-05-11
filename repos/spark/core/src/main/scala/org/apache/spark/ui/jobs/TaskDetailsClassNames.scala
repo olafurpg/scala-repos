@@ -18,12 +18,12 @@
 package org.apache.spark.ui.jobs
 
 /**
- * Names of the CSS classes corresponding to each type of task detail. Used to allow users
- * to optionally show/hide columns.
- *
- * If new optional metrics are added here, they should also be added to the end of webui.css
- * to have the style set to "display: none;" by default.
- */
+  * Names of the CSS classes corresponding to each type of task detail. Used to allow users
+  * to optionally show/hide columns.
+  *
+  * If new optional metrics are added here, they should also be added to the end of webui.css
+  * to have the style set to "display: none;" by default.
+  */
 private[spark] object TaskDetailsClassNames {
   val SCHEDULER_DELAY = "scheduler_delay"
   val TASK_DESERIALIZATION_TIME = "deserialization_time"

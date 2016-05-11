@@ -18,8 +18,8 @@
 package org.apache.spark
 
 /**
- * Test cases where JDK8-compiled Scala user code is used with Spark.
- */
+  * Test cases where JDK8-compiled Scala user code is used with Spark.
+  */
 class JDK8ScalaSuite extends SparkFunSuite with SharedSparkContext {
   test("basic RDD closure test (SPARK-6152)") {
     sc.parallelize(1 to 1000).map(x => x * x).count()

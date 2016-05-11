@@ -7,13 +7,14 @@ package impl
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging._
 
 /**
- * @author Alexander Podkhalyuzin
- * @deprecated
- * Date : 04.05.2008
- */
-
-class ScalaPackagingItemPresentation(private val element: ScPackaging) extends ScalaItemPresentation(element) {
+  * @author Alexander Podkhalyuzin
+  * @deprecated
+  * Date : 04.05.2008
+  */
+class ScalaPackagingItemPresentation(private val element: ScPackaging)
+    extends ScalaItemPresentation(element) {
   def getPresentableText: String = {
-    ScalaElementPresentation.getPackagingPresentableText(myElement.asInstanceOf[ScPackaging])
+    ScalaElementPresentation.getPackagingPresentableText(
+        myElement.asInstanceOf[ScPackaging])
   }
 }

@@ -5,12 +5,12 @@ package akka.http.impl.engine.client
 
 import akka.http.impl.engine.client.OutgoingConnectionBlueprint.PrepareResponse
 import akka.http.impl.engine.parsing.ParserOutput
-import akka.http.impl.engine.parsing.ParserOutput.{ StrictEntityCreator, EntityStreamError, EntityChunk, StreamedEntityCreator }
+import akka.http.impl.engine.parsing.ParserOutput.{StrictEntityCreator, EntityStreamError, EntityChunk, StreamedEntityCreator}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.settings.ParserSettings
-import akka.stream.{ ActorMaterializer, Attributes }
-import akka.stream.scaladsl.{ Sink, Source }
-import akka.stream.testkit.{ TestSubscriber, TestPublisher }
+import akka.stream.{ActorMaterializer, Attributes}
+import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.testkit.{TestSubscriber, TestPublisher}
 import akka.util.ByteString
 import akka.testkit.AkkaSpec
 
@@ -19,24 +19,25 @@ class PrepareResponseSpec extends AkkaSpec {
   val parserSettings = ParserSettings(system)
 
   val chunkedStart = ParserOutput.ResponseStart(
-    StatusCodes.OK,
-    HttpProtocols.`HTTP/1.1`,
-    List(),
-    StreamedEntityCreator[ParserOutput, ResponseEntity] { entityChunks ⇒
-      val chunks = entityChunks.collect {
-        case EntityChunk(chunk)      ⇒ chunk
-        case EntityStreamError(info) ⇒ throw EntityStreamException(info)
-      }
-      HttpEntity.Chunked(ContentTypes.`application/octet-stream`, HttpEntity.limitableChunkSource(chunks))
-    },
-    closeRequested = false)
+      StatusCodes.OK,
+      HttpProtocols.`HTTP/1.1`,
+      List(),
+      StreamedEntityCreator[ParserOutput, ResponseEntity] { entityChunks ⇒
+        val chunks = entityChunks.collect {
+          case EntityChunk(chunk) ⇒ chunk
+          case EntityStreamError(info) ⇒ throw EntityStreamException(info)
+        }
+        HttpEntity.Chunked(ContentTypes.`application/octet-stream`,
+                           HttpEntity.limitableChunkSource(chunks))
+      },
+      closeRequested = false)
 
   val strictStart = ParserOutput.ResponseStart(
-    StatusCodes.OK,
-    HttpProtocols.`HTTP/1.1`,
-    List(),
-    StrictEntityCreator(HttpEntity("body")),
-    closeRequested = false)
+      StatusCodes.OK,
+      HttpProtocols.`HTTP/1.1`,
+      List(),
+      StrictEntityCreator(HttpEntity("body")),
+      closeRequested = false)
 
   val chunk = ParserOutput.EntityChunk(HttpEntity.ChunkStreamPart("abc"))
 
@@ -50,7 +51,8 @@ class PrepareResponseSpec extends AkkaSpec {
       val inProbe = TestPublisher.manualProbe[ParserOutput.ResponseOutput]()
       val responseProbe = TestSubscriber.manualProbe[HttpResponse]
 
-      Source.fromPublisher(inProbe)
+      Source
+        .fromPublisher(inProbe)
         .via(new PrepareResponse(parserSettings))
         .to(Sink.fromSubscriber(responseProbe))
         .withAttributes(Attributes.inputBuffer(1, 1))
@@ -86,7 +88,6 @@ class PrepareResponseSpec extends AkkaSpec {
       // and that demand should go downstream
       // since the chunk end was consumed by the stage
       inSub.expectRequest(1)
-
     }
 
     "not lose demand that comes in while handling strict entity" in {
@@ -95,7 +96,8 @@ class PrepareResponseSpec extends AkkaSpec {
       val inProbe = TestPublisher.manualProbe[ParserOutput.ResponseOutput]()
       val responseProbe = TestSubscriber.manualProbe[HttpResponse]
 
-      Source.fromPublisher(inProbe)
+      Source
+        .fromPublisher(inProbe)
         .via(new PrepareResponse(parserSettings))
         .to(Sink.fromSubscriber(responseProbe))
         .withAttributes(Attributes.inputBuffer(1, 1))
@@ -120,7 +122,6 @@ class PrepareResponseSpec extends AkkaSpec {
       // and that demand should go downstream
       // since the chunk end was consumed by the stage
       inSub.expectRequest(1)
-
     }
 
     "complete entity stream then complete stage when downstream cancels" in {
@@ -131,7 +132,8 @@ class PrepareResponseSpec extends AkkaSpec {
       val inProbe = TestPublisher.manualProbe[ParserOutput.ResponseOutput]()
       val responseProbe = TestSubscriber.manualProbe[HttpResponse]
 
-      Source.fromPublisher(inProbe)
+      Source
+        .fromPublisher(inProbe)
         .via(new PrepareResponse(parserSettings))
         .to(Sink.fromSubscriber(responseProbe))
         .withAttributes(Attributes.inputBuffer(1, 1))
@@ -172,7 +174,8 @@ class PrepareResponseSpec extends AkkaSpec {
       val inProbe = TestPublisher.manualProbe[ParserOutput.ResponseOutput]()
       val responseProbe = TestSubscriber.manualProbe[HttpResponse]
 
-      Source.fromPublisher(inProbe)
+      Source
+        .fromPublisher(inProbe)
         .via(new PrepareResponse(parserSettings))
         .to(Sink.fromSubscriber(responseProbe))
         .withAttributes(Attributes.inputBuffer(1, 1))
@@ -200,7 +203,8 @@ class PrepareResponseSpec extends AkkaSpec {
       val inProbe = TestPublisher.manualProbe[ParserOutput.ResponseOutput]()
       val responseProbe = TestSubscriber.manualProbe[HttpResponse]
 
-      Source.fromPublisher(inProbe)
+      Source
+        .fromPublisher(inProbe)
         .via(new PrepareResponse(parserSettings))
         .to(Sink.fromSubscriber(responseProbe))
         .withAttributes(Attributes.inputBuffer(1, 1))
@@ -230,9 +234,6 @@ class PrepareResponseSpec extends AkkaSpec {
       // this means that the entire stage should
       // cancel
       inSub.expectCancellation()
-
     }
-
   }
-
 }

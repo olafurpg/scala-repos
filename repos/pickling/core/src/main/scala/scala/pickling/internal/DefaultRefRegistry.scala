@@ -10,10 +10,12 @@ import scala.pickling.spi.{RefUnpicklingRegistry, RefPicklingRegistry, RefRegist
   */
 final class DefaultRefRegistry extends RefRegistry {
   private object picklerTl extends ThreadLocal[RefPicklingRegistry] {
-    override def initialValue(): RefPicklingRegistry = new DefaultRefPicklingRegistry
+    override def initialValue(): RefPicklingRegistry =
+      new DefaultRefPicklingRegistry
   }
   private object unpicklerTl extends ThreadLocal[RefUnpicklingRegistry] {
-    override def initialValue(): RefUnpicklingRegistry = new DefaultRefUnpicklingRegistry()
+    override def initialValue(): RefUnpicklingRegistry =
+      new DefaultRefUnpicklingRegistry()
   }
   override def pickle: RefPicklingRegistry = picklerTl.get()
   override def unpickle: RefUnpicklingRegistry = unpicklerTl.get()
@@ -40,18 +42,20 @@ class DefaultRefPicklingRegistry extends RefPicklingRegistry {
 }
 
 // Single-threaded unpickling registry. */
-class DefaultRefUnpicklingRegistry(maxRefs: Int = 655536) extends RefUnpicklingRegistry {
+class DefaultRefUnpicklingRegistry(maxRefs: Int = 655536)
+    extends RefUnpicklingRegistry {
   private var refs: Array[Any] = new Array[Any](maxRefs)
   private var idx = 0
   override def preregisterUnpicklee(): Int = {
     val index = idx
     val len = refs.length
-    val target = if (index == len) {
-      val newArr = Array.ofDim[Any](len * 2)
-      System.arraycopy(refs, 0, newArr, 0, len)
-      refs = newArr
-      newArr
-    } else refs
+    val target =
+      if (index == len) {
+        val newArr = Array.ofDim[Any](len * 2)
+        System.arraycopy(refs, 0, newArr, 0, len)
+        refs = newArr
+        newArr
+      } else refs
     target(index) = null
     idx += 1
     index
@@ -64,16 +68,17 @@ class DefaultRefUnpicklingRegistry(maxRefs: Int = 655536) extends RefUnpicklingR
       refs(i) = null
       i += 1
     }
-
   }
   override def regsiterUnpicklee(oid: Int, value: Any): Unit = {
     refs(oid) = value
   }
   override def lookupUnpicklee(oid: Int): Any = {
-    if (oid >= idx) throw PicklingException(s"fatal error: invalid index $oid unpicklee cache of length $idx")
+    if (oid >= idx)
+      throw PicklingException(
+          s"fatal error: invalid index $oid unpicklee cache of length $idx")
     val result = refs(oid)
-    if (result == null) throw new Error(s"fatal error: unpicklee cache is corrupted at $oid")
+    if (result == null)
+      throw new Error(s"fatal error: unpicklee cache is corrupted at $oid")
     result
   }
 }
-

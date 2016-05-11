@@ -8,46 +8,54 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
 
 /**
- * User: Dmitry Naydanov
- * Date: 3/26/12
- */
-
-class TypeCollectionAnotatorTest extends ScalaLightPlatformCodeInsightTestCaseAdapter with TestScalaProjectSettings {
-  private val immutableCollectionMessage = ScalaBundle.message("scala.immutable.collection")
-  private val mutableCollectionMessage = ScalaBundle.message("scala.mutable.collection")
+  * User: Dmitry Naydanov
+  * Date: 3/26/12
+  */
+class TypeCollectionAnotatorTest
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
+    with TestScalaProjectSettings {
+  private val immutableCollectionMessage =
+    ScalaBundle.message("scala.immutable.collection")
+  private val mutableCollectionMessage =
+    ScalaBundle.message("scala.mutable.collection")
   private val javaCollectionMessage = ScalaBundle.message("java.collection")
 
   protected override def setUp() {
     super.setUp()
 
-    scalaProjectSettings.
-      setCollectionTypeHighlightingLevel(ScalaProjectSettings.COLLECTION_TYPE_HIGHLIGHTING_ALL)
+    scalaProjectSettings.setCollectionTypeHighlightingLevel(
+        ScalaProjectSettings.COLLECTION_TYPE_HIGHLIGHTING_ALL)
   }
 
   private def annotate(text: String, holder: AnnotatorHolderMock) {
     configureFromFileTextAdapter("dummy.scala", text.replace("\r", ""))
 
     getFileAdapter.asInstanceOf[ScalaFile].breadthFirst.foreach {
-      case refElement: ScReferenceElement => AnnotatorHighlighter.highlightReferenceElement(refElement, holder)
+      case refElement: ScReferenceElement =>
+        AnnotatorHighlighter.highlightReferenceElement(refElement, holder)
       case _ =>
     }
   }
 
-  private def testCanAnnotate(text: String, highlightedText: String,  highlightingMessage: String) {
+  private def testCanAnnotate(
+      text: String, highlightedText: String, highlightingMessage: String) {
     val holder = new AnnotatorHolderMock
     annotate(text, holder)
 
-    assert(holder.annotations.exists {
+    assert(
+        holder.annotations.exists {
       case Info(`highlightedText`, `highlightingMessage`) => true
       case _ => false
     })
   }
 
-  private def testCannotAnnotate(text: String,  textCantHighlight: (String, String)) {
+  private def testCannotAnnotate(
+      text: String, textCantHighlight: (String, String)) {
     val holder = new AnnotatorHolderMock
     annotate(text, holder)
 
-    assert(!holder.annotations.exists {
+    assert(
+        !holder.annotations.exists {
       case Info(`textCantHighlight`._1, `textCantHighlight`._2) => true
       case _ => false
     })
@@ -172,7 +180,8 @@ class TypeCollectionAnotatorTest extends ScalaLightPlatformCodeInsightTestCaseAd
   }
 
   def testAnnotateMutableQualifiedNameWithApply() {
-    val text = """
+    val text =
+      """
       class A {
         val sb = scala.collection.mutable.HashMap.apply("aaa" -> 2, "3" -> 4)
       }

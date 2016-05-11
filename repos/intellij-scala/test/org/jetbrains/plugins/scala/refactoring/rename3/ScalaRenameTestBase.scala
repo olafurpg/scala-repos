@@ -23,22 +23,30 @@ import org.jetbrains.plugins.scala.util.TestUtils
 import scala.collection.mutable.ListBuffer
 
 /**
- * Nikolay.Tropin
- * 9/6/13
- */
-abstract class ScalaRenameTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * Nikolay.Tropin
+  * 9/6/13
+  */
+abstract class ScalaRenameTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   val caretMarker = "/*caret*/"
   private var myEditors: Map[VirtualFile, Editor] = null
   private var myDirectory: VirtualFile = null
 
   protected val folderPath: String = TestUtils.getTestDataPath + "/rename3/"
 
-  private def rootBefore = (folderPath + getTestName(true) + "/before").replace(File.separatorChar, '/')
-  private def rootAfter = (folderPath + getTestName(true) + "/after").replace(File.separatorChar, '/')
+  private def rootBefore =
+    (folderPath + getTestName(true) + "/before")
+      .replace(File.separatorChar, '/')
+  private def rootAfter =
+    (folderPath + getTestName(true) + "/after")
+      .replace(File.separatorChar, '/')
 
   protected def doTest(newName: String = "NameAfterRename") {
-    myDirectory = PsiTestUtil.createTestProjectStructure(projectAdapter, moduleAdapter, rootBefore, new util.HashSet[File]())
-    VirtualFilePointerManager.getInstance.asInstanceOf[VirtualFilePointerManagerImpl].storePointers()
+    myDirectory = PsiTestUtil.createTestProjectStructure(
+        projectAdapter, moduleAdapter, rootBefore, new util.HashSet[File]())
+    VirtualFilePointerManager.getInstance
+      .asInstanceOf[VirtualFilePointerManagerImpl]
+      .storePointers()
     val filesBefore = myDirectory.findChild("tests").getChildren
 
     val caretPositions = findCaretsAndRemoveMarkers(filesBefore)
@@ -54,7 +62,8 @@ abstract class ScalaRenameTestBase extends ScalaLightPlatformCodeInsightTestCase
 
       val oldName = doRename(editor, file, newName)
 
-      val dirAfter = LocalFileSystem.getInstance.refreshAndFindFileByPath(rootAfter)
+      val dirAfter =
+        LocalFileSystem.getInstance.refreshAndFindFileByPath(rootAfter)
       PlatformTestUtil.assertDirectoriesEqual(dirAfter, myDirectory)
 
       //rename back for next caret position
@@ -69,7 +78,8 @@ abstract class ScalaRenameTestBase extends ScalaLightPlatformCodeInsightTestCase
 
   case class CaretPosition(file: VirtualFile, offset: Int)
 
-  private def findCaretsAndRemoveMarkers(files: Array[VirtualFile]): Seq[CaretPosition] = {
+  private def findCaretsAndRemoveMarkers(
+      files: Array[VirtualFile]): Seq[CaretPosition] = {
     val caretsInFile: VirtualFile => Seq[CaretPosition] = { file =>
       var text = fileText(file)
       val fileLength = text.length
@@ -77,7 +87,7 @@ abstract class ScalaRenameTestBase extends ScalaLightPlatformCodeInsightTestCase
         val result = ListBuffer[Int]()
         val length = caretMarker.length
         var occ = text.indexOf(caretMarker)
-        while(occ > 0) {
+        while (occ > 0) {
           result += occ
           text = text.substring(0, occ) + text.substring(occ + length)
           occ = text.indexOf(caretMarker)
@@ -87,21 +97,25 @@ abstract class ScalaRenameTestBase extends ScalaLightPlatformCodeInsightTestCase
       }
       val result = findOffsets(text).map(offset => CaretPosition(file, offset))
       if (result.nonEmpty) {
-        inWriteAction(FileDocumentManager.getInstance().getDocument(file).replaceString(0, fileLength, text))
+        inWriteAction(
+            FileDocumentManager
+              .getInstance()
+              .getDocument(file)
+              .replaceString(0, fileLength, text))
       }
       result
     }
     files.flatMap(caretsInFile)
   }
 
-  private def createEditors(files: Array[VirtualFile]): Map[VirtualFile, Editor] = {
+  private def createEditors(
+      files: Array[VirtualFile]): Map[VirtualFile, Editor] = {
     files.map(f => f -> createEditor(f)).toMap
   }
 
   private def createEditor(file: VirtualFile) = {
     LightPlatformCodeInsightTestCase.createEditor(file)
   }
-
 
   protected override def tearDown() {
     super.tearDown()
@@ -111,23 +125,32 @@ abstract class ScalaRenameTestBase extends ScalaLightPlatformCodeInsightTestCase
   private def projectAdapter = getProjectAdapter
   private def moduleAdapter = getModuleAdapter
 
-  private def doRename(editor: Editor, file: PsiFile, newName: String): String = {
+  private def doRename(
+      editor: Editor, file: PsiFile, newName: String): String = {
     val element = TargetElementUtil.findTargetElement(
-      InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(editor, file),
-      TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED)
+        InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(
+            editor, file),
+        TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED | TargetElementUtil.ELEMENT_NAME_ACCEPTED)
     assert(element != null, "Reference is not specified.")
-    val searchInComments = element.getText != null && element.getText.contains("Comments")
+    val searchInComments =
+      element.getText != null && element.getText.contains("Comments")
     var oldName: String = ""
     inWriteAction {
-      val subst = RenamePsiElementProcessor.forElement(element).substituteElementToRename(element, getEditorAdapter)
+      val subst = RenamePsiElementProcessor
+        .forElement(element)
+        .substituteElementToRename(element, getEditorAdapter)
       if (subst != null) {
         oldName = ScalaNamesUtil.scalaName(subst)
-        new RenameProcessor(projectAdapter, subst, newName, searchInComments, false).run()
+        new RenameProcessor(
+            projectAdapter, subst, newName, searchInComments, false).run()
       }
     }
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
-    val document = PsiDocumentManager.getInstance(getProjectAdapter).getDocument(file)
-    PsiDocumentManager.getInstance(getProjectAdapter).doPostponedOperationsAndUnblockDocument(document)
+    val document =
+      PsiDocumentManager.getInstance(getProjectAdapter).getDocument(file)
+    PsiDocumentManager
+      .getInstance(getProjectAdapter)
+      .doPostponedOperationsAndUnblockDocument(document)
     FileDocumentManager.getInstance.saveAllDocuments()
     oldName
   }

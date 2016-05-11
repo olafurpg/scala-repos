@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.actor
 
 import language.postfixOps
@@ -11,7 +11,7 @@ import akka.testkit.TestEvent._
 import akka.dispatch.BoundedDequeBasedMailbox
 import scala.concurrent.duration._
 import akka.actor.ActorSystem.Settings
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 import org.scalatest.BeforeAndAfterEach
 
 object ActorWithBoundedStashSpec {
@@ -25,7 +25,6 @@ object ActorWithBoundedStashSpec {
       case "world" ⇒
         context.become(afterWorldBehaviour)
         unstashAll()
-
     }
 
     def afterWorldBehaviour: Receive = {
@@ -52,9 +51,11 @@ object ActorWithBoundedStashSpec {
   }
 
   // bounded deque-based mailbox with capacity 10
-  class Bounded10(settings: Settings, config: Config) extends BoundedDequeBasedMailbox(10, 500 millis)
+  class Bounded10(settings: Settings, config: Config)
+      extends BoundedDequeBasedMailbox(10, 500 millis)
 
-  class Bounded100(settings: Settings, config: Config) extends BoundedDequeBasedMailbox(100, 500 millis)
+  class Bounded100(settings: Settings, config: Config)
+      extends BoundedDequeBasedMailbox(100, 500 millis)
 
   val dispatcherId1 = "my-dispatcher-1"
   val dispatcherId2 = "my-dispatcher-2"
@@ -82,11 +83,14 @@ object ActorWithBoundedStashSpec {
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ActorWithBoundedStashSpec extends AkkaSpec(ActorWithBoundedStashSpec.testConf) with BeforeAndAfterEach with DefaultTimeout with ImplicitSender {
+class ActorWithBoundedStashSpec
+    extends AkkaSpec(ActorWithBoundedStashSpec.testConf)
+    with BeforeAndAfterEach with DefaultTimeout with ImplicitSender {
   import ActorWithBoundedStashSpec._
 
   override def atStartup: Unit = {
-    system.eventStream.publish(Mute(EventFilter.warning(pattern = ".*received dead letter from.*hello.*")))
+    system.eventStream.publish(Mute(EventFilter.warning(
+                pattern = ".*received dead letter from.*hello.*")))
   }
 
   override def beforeEach(): Unit =
@@ -128,22 +132,26 @@ class ActorWithBoundedStashSpec extends AkkaSpec(ActorWithBoundedStashSpec.testC
   "An Actor with Stash" must {
 
     "end up in DeadLetters in case of a capacity violation when configured via dispatcher" in {
-      val stasher = system.actorOf(Props[StashingActor].withDispatcher(dispatcherId1))
+      val stasher =
+        system.actorOf(Props[StashingActor].withDispatcher(dispatcherId1))
       testDeadLetters(stasher)
     }
 
     "end up in DeadLetters in case of a capacity violation when configured via mailbox" in {
-      val stasher = system.actorOf(Props[StashingActor].withMailbox(mailboxId1))
+      val stasher =
+        system.actorOf(Props[StashingActor].withMailbox(mailboxId1))
       testDeadLetters(stasher)
     }
 
     "throw a StashOverflowException in case of a stash capacity violation when configured via dispatcher" in {
-      val stasher = system.actorOf(Props[StashingActorWithOverflow].withDispatcher(dispatcherId2))
+      val stasher = system.actorOf(
+          Props[StashingActorWithOverflow].withDispatcher(dispatcherId2))
       testStashOverflowException(stasher)
     }
 
     "throw a StashOverflowException in case of a stash capacity violation when configured via mailbox" in {
-      val stasher = system.actorOf(Props[StashingActorWithOverflow].withMailbox(mailboxId2))
+      val stasher = system.actorOf(
+          Props[StashingActorWithOverflow].withMailbox(mailboxId2))
       testStashOverflowException(stasher)
     }
   }

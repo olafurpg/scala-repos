@@ -6,9 +6,10 @@ import scala.annotation.switch
 
 import scala.scalajs.js
 
-final class Matcher private[regex] (
-    private var pattern0: Pattern, private var input0: CharSequence,
-    private var regionStart0: Int, private var regionEnd0: Int)
+final class Matcher private[regex](private var pattern0: Pattern,
+                                   private var input0: CharSequence,
+                                   private var regionStart0: Int,
+                                   private var regionEnd0: Int)
     extends AnyRef with MatchResult {
 
   import Matcher._
@@ -36,30 +37,28 @@ final class Matcher private[regex] (
     // Further, it might be wrong to just use ^$ delimiters for two reasons:
     // - They might already be there
     // - They might not behave as expected when newline characters are present
-    if ((lastMatch ne null) && (start != 0 || end != inputstr.length))
-      reset()
+    if ((lastMatch ne null) && (start != 0 || end != inputstr.length)) reset()
     lastMatch ne null
   }
 
   def lookingAt(): Boolean = {
     reset()
     find()
-    if ((lastMatch ne null) && (start != 0))
-      reset()
+    if ((lastMatch ne null) && (start != 0)) reset()
     lastMatch ne null
   }
 
-  def find(): Boolean = if (canStillFind) {
-    lastMatchIsValid = true
-    lastMatch = regexp.exec(inputstr)
-    if (lastMatch ne null) {
-      if (lastMatch(0).get.isEmpty)
-        regexp.lastIndex += 1
-    } else {
-      canStillFind = false
-    }
-    lastMatch ne null
-  } else false
+  def find(): Boolean =
+    if (canStillFind) {
+      lastMatchIsValid = true
+      lastMatch = regexp.exec(inputstr)
+      if (lastMatch ne null) {
+        if (lastMatch(0).get.isEmpty) regexp.lastIndex += 1
+      } else {
+        canStillFind = false
+      }
+      lastMatch ne null
+    } else false
 
   def find(start: Int): Boolean = {
     reset()
@@ -81,15 +80,13 @@ final class Matcher private[regex] (
         case '$' =>
           i += 1
           val j = i
-          while (i < len && isDigit(replacement.charAt(i)))
-            i += 1
+          while (i < len && isDigit(replacement.charAt(i))) i += 1
           val group = Integer.parseInt(replacement.substring(j, i))
           sb.append(this.group(group))
 
         case '\\' =>
           i += 1
-          if (i < len)
-            sb.append(replacement.charAt(i))
+          if (i < len) sb.append(replacement.charAt(i))
           i += 1
 
         case c =>
@@ -169,7 +166,7 @@ final class Matcher private[regex] (
     lastMatch
   }
 
-  def groupCount(): Int = ensureLastMatch.length-1
+  def groupCount(): Int = ensureLastMatch.length - 1
 
   def start(): Int = ensureLastMatch.index
   def end(): Int = start() + group().length
@@ -181,8 +178,8 @@ final class Matcher private[regex] (
       val last = ensureLastMatch
       // not provided by JS RegExp, so we make up something that at least
       // will have some sound behavior from scala.util.matching.Regex
-      last(group).fold(-1) {
-        groupStr => inputstr.indexOf(groupStr, last.index)
+      last(group).fold(-1) { groupStr =>
+        inputstr.indexOf(groupStr, last.index)
       }
     }
   }
@@ -226,19 +223,21 @@ object Matcher {
     var i = 0
     while (i < s.length) {
       val c = s.charAt(i)
-      result += ((c: @switch) match {
-        case '\\' | '$' => "\\"+c
-        case _ => c
-      })
+      result +=
+      ((c: @switch) match {
+            case '\\' | '$' => "\\" + c
+            case _ => c
+          })
       i += 1
     }
     result
   }
 
-  private final class SealedResult(inputstr: String,
-      lastMatch: js.RegExp.ExecResult) extends MatchResult {
+  private final class SealedResult(
+      inputstr: String, lastMatch: js.RegExp.ExecResult)
+      extends MatchResult {
 
-    def groupCount(): Int = ensureLastMatch.length-1
+    def groupCount(): Int = ensureLastMatch.length - 1
 
     def start(): Int = ensureLastMatch.index
     def end(): Int = start() + group().length
@@ -251,8 +250,8 @@ object Matcher {
 
         // not provided by JS RegExp, so we make up something that at least
         // will have some sound behavior from scala.util.matching.Regex
-        last(group).fold(-1) {
-          groupStr => inputstr.indexOf(groupStr, last.index)
+        last(group).fold(-1) { groupStr =>
+          inputstr.indexOf(groupStr, last.index)
         }
       }
     }

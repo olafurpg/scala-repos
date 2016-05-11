@@ -11,7 +11,9 @@ object SimulateMesosMain extends MarathonApp {
   private[this] def simulatedDriverModule: Module = {
     new AbstractModule {
       override def configure(): Unit = {
-        bind(classOf[SchedulerDriverFactory]).to(classOf[SimulatedSchedulerDriverFactory]).in(Scopes.SINGLETON)
+        bind(classOf[SchedulerDriverFactory])
+          .to(classOf[SimulatedSchedulerDriverFactory])
+          .in(Scopes.SINGLETON)
       }
     }
   }

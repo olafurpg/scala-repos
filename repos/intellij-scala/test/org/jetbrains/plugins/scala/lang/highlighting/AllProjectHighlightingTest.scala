@@ -32,24 +32,26 @@ import org.jetbrains.sbt.settings.SbtSystemSettings
 import org.junit.experimental.categories.Category
 
 /**
- * @author Alefas
- * @since 12/11/14.
- */
-
+  * @author Alefas
+  * @since 12/11/14.
+  */
 @Category(Array(classOf[SlowTests]))
-class AllProjectHighlightingTest extends ExternalSystemImportingTestCase with SbtStructureSetup {
+class AllProjectHighlightingTest
+    extends ExternalSystemImportingTestCase with SbtStructureSetup {
   override protected def getCurrentExternalProjectSettings: ExternalProjectSettings = {
     val settings = new SbtProjectSettings
     val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
-    val sdk = if (internalSdk == null) IdeaTestUtil.getMockJdk17
-    else internalSdk
+    val sdk =
+      if (internalSdk == null) IdeaTestUtil.getMockJdk17
+      else internalSdk
     val sdkType = sdk.getSdkType.asInstanceOf[JavaSdkType]
     settings.setJdk(sdk.getName)
     settings.setCreateEmptyContentRootDirectories(true)
     settings
   }
 
-  override protected def getExternalSystemId: ProjectSystemId = SbtProjectSystem.Id
+  override protected def getExternalSystemId: ProjectSystemId =
+    SbtProjectSystem.Id
 
   override protected def getExternalSystemConfigFileName: String = "build.sbt"
 
@@ -71,9 +73,11 @@ class AllProjectHighlightingTest extends ExternalSystemImportingTestCase with Sb
     importProject()
 
     extensions.inWriteAction {
-      val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
-      val sdk = if (internalSdk == null) IdeaTestUtil.getMockJdk17
-      else internalSdk
+      val internalSdk =
+        JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
+      val sdk =
+        if (internalSdk == null) IdeaTestUtil.getMockJdk17
+        else internalSdk
 
       //todo: why we need this??? Looks like SBT integration problem, as we attached SDK as setting
       if (ProjectJdkTable.getInstance().findJdk(sdk.getName) == null) {
@@ -86,19 +90,27 @@ class AllProjectHighlightingTest extends ExternalSystemImportingTestCase with Sb
   }
 
   def doRunHighlighting(): Unit = {
-    val inspectionManagerEx: InspectionManagerEx = InspectionManager.getInstance(myProject).asInstanceOf[InspectionManagerEx]
+    val inspectionManagerEx: InspectionManagerEx = InspectionManager
+      .getInstance(myProject)
+      .asInstanceOf[InspectionManagerEx]
 
-    val searchScope =
-      new SourceFilterScope(GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.projectScope(myProject),
-        ScalaFileType.SCALA_FILE_TYPE, JavaFileType.INSTANCE), myProject)
+    val searchScope = new SourceFilterScope(
+        GlobalSearchScope.getScopeRestrictedByFileTypes(
+            GlobalSearchScope.projectScope(myProject),
+            ScalaFileType.SCALA_FILE_TYPE,
+            JavaFileType.INSTANCE),
+        myProject)
 
-    val files: util.Collection[VirtualFile] = FileTypeIndex.getFiles(ScalaFileType.SCALA_FILE_TYPE, searchScope)
+    val files: util.Collection[VirtualFile] =
+      FileTypeIndex.getFiles(ScalaFileType.SCALA_FILE_TYPE, searchScope)
 
     LocalFileSystem.getInstance().refreshFiles(files)
 
-    val fileManager = PsiManager.getInstance(myProject).asInstanceOf[PsiManagerEx].getFileManager
+    val fileManager = PsiManager
+      .getInstance(myProject)
+      .asInstanceOf[PsiManagerEx]
+      .getFileManager
     val annotator = new ScalaAnnotator
-
 
     import scala.collection.JavaConversions._
 
@@ -108,26 +120,29 @@ class AllProjectHighlightingTest extends ExternalSystemImportingTestCase with Sb
 
     for ((file, index) <- files.zipWithIndex) {
       val mock = new AnnotatorHolderMock {
-        override def createErrorAnnotation(range: TextRange, message: String): Annotation = {
+        override def createErrorAnnotation(
+            range: TextRange, message: String): Annotation = {
           errorCount += 1
-          println(s"Error in ${file.getName}. Range: $range. Message: $message.")
+          println(
+              s"Error in ${file.getName}. Range: $range. Message: $message.")
           super.createErrorAnnotation(range, message)
         }
 
-        override def createErrorAnnotation(elt: PsiElement, message: String): Annotation = {
+        override def createErrorAnnotation(
+            elt: PsiElement, message: String): Annotation = {
           errorCount += 1
-          println(s"Error in ${file.getName}. Range: ${elt.getTextRange}. Message: $message.")
+          println(
+              s"Error in ${file.getName}. Range: ${elt.getTextRange}. Message: $message.")
           super.createErrorAnnotation(elt, message)
         }
       }
 
       if ((index + 1) * 100 >= (percent + 1) * size) {
-        while ((index + 1) * 100 >= (percent + 1) * size) percent += 1
+        while ( (index + 1) * 100 >= (percent + 1) * size) percent += 1
         println(s"Analyzing... $percent%")
       }
 
       val psi = fileManager.findFile(file)
-
 
       val visitor = new ScalaRecursiveElementVisitor {
         override def visitElement(element: ScalaPsiElement) {
@@ -152,7 +167,8 @@ class AllProjectHighlightingTest extends ExternalSystemImportingTestCase with Sb
     super.setUpInWriteAction()
     val projectDir: File = new File(getRootDir, getTestName(false))
     if (!projectDir.exists()) return
-    myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(projectDir)
+    myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(
+        projectDir)
     setUpSbtLauncherAndStructure(myProject)
   }
 }

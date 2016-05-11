@@ -3,10 +3,10 @@ package org.jetbrains.plugins.scala.annotator.template
 import org.jetbrains.plugins.scala.annotator.{AnnotatorTestBase, Error}
 
 /**
- * Pavel Fatin
- */
-
-class ObjectCreationImpossibleTest extends AnnotatorTestBase(ObjectCreationImpossible) {
+  * Pavel Fatin
+  */
+class ObjectCreationImpossibleTest
+    extends AnnotatorTestBase(ObjectCreationImpossible) {
   def testFineNew() {
     assertNothing(messages("class C; new C"))
     assertNothing(messages("class C; new C {}"))
@@ -58,7 +58,7 @@ class ObjectCreationImpossibleTest extends AnnotatorTestBase(ObjectCreationImpos
     }
   }
 
-  def testUndefinedAndWith(){
+  def testUndefinedAndWith() {
     val Message = ObjectCreationImpossible.message(("f: Unit", "Holder.T"))
 
     assertMatches(messages("trait T { def f }; new Object with T {}")) {
@@ -68,11 +68,12 @@ class ObjectCreationImpossibleTest extends AnnotatorTestBase(ObjectCreationImpos
 
   def testNeedsToBeAbstractPlaceDiffer() {
     val Message = ObjectCreationImpossible.message(
-      ("b: Unit", "Holder.B"), ("a: Unit", "Holder.A"))
+        ("b: Unit", "Holder.B"), ("a: Unit", "Holder.A"))
     val ReversedMessage = ObjectCreationImpossible.message(
-      ("a: Unit", "Holder.A"), ("b: Unit", "Holder.B"))
+        ("a: Unit", "Holder.A"), ("b: Unit", "Holder.B"))
 
-    assertMatches(messages("trait A { def a }; trait B { def b }; new A with B {}")) {
+    assertMatches(
+        messages("trait A { def a }; trait B { def b }; new A with B {}")) {
       case Error("A", Message) :: Nil =>
       case Error("A", ReversedMessage) :: Nil =>
     }

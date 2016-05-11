@@ -1,8 +1,8 @@
 package slick.ast
 
 /**
- * The type of a join operation.
- */
+  * The type of a join operation.
+  */
 abstract class JoinType(val sqlName: String)
 
 object JoinType {

@@ -1,7 +1,8 @@
 object Scaladoc3 {
+
   /**
-   * Foo
-   */
+    * Foo
+    */
   import scala.collection.mutable.ArrayBuffer
 
   def f {}

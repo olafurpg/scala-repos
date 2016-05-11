@@ -4,8 +4,8 @@ class SCL6198 {
 
   val row = Row(1)(Cell("a"), Cell("b"), Cell("c"))
 
-  row.values.foreach {
-    cell => println(/*start*/cell/*end*/.value)
+  row.values.foreach { cell =>
+    println( /*start*/ cell /*end*/ .value)
   }
 }
 //SCL6198.this.Cell[_]

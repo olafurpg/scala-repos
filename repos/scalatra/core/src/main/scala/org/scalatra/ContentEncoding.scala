@@ -2,9 +2,9 @@ package org.scalatra
 
 import java.io._
 import java.nio.charset.Charset
-import java.util.zip.{ DeflaterOutputStream, GZIPInputStream, GZIPOutputStream, InflaterInputStream }
-import javax.servlet.http.{ HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse, HttpServletResponseWrapper }
-import javax.servlet.{ ReadListener, ServletInputStream, ServletOutputStream, WriteListener }
+import java.util.zip.{DeflaterOutputStream, GZIPInputStream, GZIPOutputStream, InflaterInputStream}
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse, HttpServletResponseWrapper}
+import javax.servlet.{ReadListener, ServletInputStream, ServletOutputStream, WriteListener}
 
 import scala.util.Try
 
@@ -24,15 +24,18 @@ trait ContentEncoding {
 
   override def toString = name
 
-  def apply(response: HttpServletResponse): HttpServletResponse = new EncodedServletResponse(response, this)
+  def apply(response: HttpServletResponse): HttpServletResponse =
+    new EncodedServletResponse(response, this)
 
-  def apply(request: HttpServletRequest): HttpServletRequest = new DecodedServletRequest(request, this)
-
+  def apply(request: HttpServletRequest): HttpServletRequest =
+    new DecodedServletRequest(request, this)
 }
 
 object ContentEncoding {
 
-  private def create(id: String, e: OutputStream => OutputStream, d: InputStream => InputStream): ContentEncoding = {
+  private def create(id: String,
+                     e: OutputStream => OutputStream,
+                     d: InputStream => InputStream): ContentEncoding = {
     new ContentEncoding {
       override def name: String = id
       override def encode(out: OutputStream): OutputStream = e(out)
@@ -41,11 +44,15 @@ object ContentEncoding {
   }
 
   val GZip: ContentEncoding = {
-    create("gzip", out => new GZIPOutputStream(out), in => new GZIPInputStream(in))
+    create("gzip",
+           out => new GZIPOutputStream(out),
+           in => new GZIPInputStream(in))
   }
 
   val Deflate: ContentEncoding = {
-    create("deflate", out => new DeflaterOutputStream(out), in => new InflaterInputStream(in))
+    create("deflate",
+           out => new DeflaterOutputStream(out),
+           in => new InflaterInputStream(in))
   }
 
   def forName(name: String): Option[ContentEncoding] = name.toLowerCase match {
@@ -57,7 +64,8 @@ object ContentEncoding {
 
 // - Request decoding --------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
-private class DecodedServletRequest(req: HttpServletRequest, enc: ContentEncoding)
+private class DecodedServletRequest(
+    req: HttpServletRequest, enc: ContentEncoding)
     extends HttpServletRequestWrapper(req) {
 
   override lazy val getInputStream: EncodedInputStream = {
@@ -66,11 +74,11 @@ private class DecodedServletRequest(req: HttpServletRequest, enc: ContentEncodin
   }
 
   override lazy val getReader: BufferedReader = {
-    new BufferedReader(new InputStreamReader(getInputStream, getCharacterEncoding))
+    new BufferedReader(
+        new InputStreamReader(getInputStream, getCharacterEncoding))
   }
 
   override def getContentLength: Int = -1
-
 }
 
 private class EncodedInputStream(encoded: InputStream, raw: ServletInputStream)
@@ -78,18 +86,20 @@ private class EncodedInputStream(encoded: InputStream, raw: ServletInputStream)
 
   override def isFinished: Boolean = raw.isFinished
   override def isReady: Boolean = raw.isReady
-  override def setReadListener(readListener: ReadListener): Unit = raw.setReadListener(readListener)
+  override def setReadListener(readListener: ReadListener): Unit =
+    raw.setReadListener(readListener)
 
   override def read(): Int = encoded.read()
   override def read(b: Array[Byte]): Int = read(b, 0, b.length)
-  override def read(b: Array[Byte], off: Int, len: Int) = encoded.read(b, off, len)
-
+  override def read(b: Array[Byte], off: Int, len: Int) =
+    encoded.read(b, off, len)
 }
 
 // - Response encoding -------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 /** Encodes any output written to a servlet response. */
-private class EncodedServletResponse(res: HttpServletResponse, enc: ContentEncoding)
+private class EncodedServletResponse(
+    res: HttpServletResponse, enc: ContentEncoding)
     extends HttpServletResponseWrapper(res) {
 
   // Object to flush when complete, if any.
@@ -107,20 +117,22 @@ private class EncodedServletResponse(res: HttpServletResponse, enc: ContentEncod
   }
 
   override lazy val getWriter: PrintWriter = {
-    val writer = new PrintWriter(new OutputStreamWriter(getOutputStream, getCharset))
+    val writer = new PrintWriter(
+        new OutputStreamWriter(getOutputStream, getCharset))
     toFlush = Some(writer)
     writer
   }
 
   /** Returns the charset with which to encode the response. */
-  private def getCharset: Charset = (for {
-    name <- Option(getCharacterEncoding)
-    charset <- Try(Charset.forName(name)).toOption
-  } yield charset).getOrElse {
-    // The charset is either not known or not supported, defaults to ISO 8859 1, as per RFC and servlet documentation.
-    setCharacterEncoding("ISO-8859-1")
-    Charset.forName("ISO-8859-1")
-  }
+  private def getCharset: Charset =
+    (for {
+      name <- Option(getCharacterEncoding)
+      charset <- Try(Charset.forName(name)).toOption
+    } yield charset).getOrElse {
+      // The charset is either not known or not supported, defaults to ISO 8859 1, as per RFC and servlet documentation.
+      setCharacterEncoding("ISO-8859-1")
+      Charset.forName("ISO-8859-1")
+    }
 
   /** Ensures that whatever byte- or char-stream we have open is properly flushed. */
   override def flushBuffer(): Unit = {
@@ -131,7 +143,6 @@ private class EncodedServletResponse(res: HttpServletResponse, enc: ContentEncod
   // Encoded responses do not have a content length.
   override def setContentLength(i: Int) = {}
   override def setContentLengthLong(len: Long): Unit = {}
-
 }
 
 /** Wraps the specified raw and servlet output streams into one servlet output stream. */
@@ -142,7 +153,8 @@ private class EncodedOutputStream(out: OutputStream, orig: ServletOutputStream)
   // -------------------------------------------------------------------------------------------------------------------
   override def write(b: Int): Unit = out.write(b)
   override def write(b: Array[Byte]) = write(b, 0, b.length)
-  override def write(b: Array[Byte], off: Int, len: Int): Unit = out.write(b, off, len)
+  override def write(b: Array[Byte], off: Int, len: Int): Unit =
+    out.write(b, off, len)
 
   // - Cleanup ---------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
@@ -151,7 +163,7 @@ private class EncodedOutputStream(out: OutputStream, orig: ServletOutputStream)
 
   // - ServletOutputStream  --------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  override def setWriteListener(writeListener: WriteListener): Unit = orig.setWriteListener(writeListener)
+  override def setWriteListener(writeListener: WriteListener): Unit =
+    orig.setWriteListener(writeListener)
   override def isReady: Boolean = orig.isReady
-
 }

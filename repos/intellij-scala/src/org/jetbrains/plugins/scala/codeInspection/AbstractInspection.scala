@@ -5,11 +5,13 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions.VisitorWrapper
 
 /**
- * Pavel Fatin
- */
-abstract class AbstractInspection(id: String, name: String) extends LocalInspectionTool {
+  * Pavel Fatin
+  */
+abstract class AbstractInspection(id: String, name: String)
+    extends LocalInspectionTool {
   def this() {
-    this(AbstractInspection.formatId(getClass), AbstractInspection.formatName(getClass))
+    this(AbstractInspection.formatId(getClass),
+         AbstractInspection.formatName(getClass))
   }
 
   def this(name: String) {
@@ -18,7 +20,9 @@ abstract class AbstractInspection(id: String, name: String) extends LocalInspect
 
   override def getDisplayName: String = name
 
-  override final def buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean) = VisitorWrapper(actionFor(holder))
+  override final def buildVisitor(
+      holder: ProblemsHolder, isOnTheFly: Boolean) =
+    VisitorWrapper(actionFor(holder))
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any]
 }

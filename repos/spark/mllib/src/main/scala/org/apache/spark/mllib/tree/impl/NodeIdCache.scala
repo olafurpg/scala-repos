@@ -28,26 +28,27 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 
 /**
- * :: DeveloperApi ::
- * This is used by the node id cache to find the child id that a data point would belong to.
- * @param split Split information.
- * @param nodeIndex The current node index of a data point that this will update.
- */
+  * :: DeveloperApi ::
+  * This is used by the node id cache to find the child id that a data point would belong to.
+  * @param split Split information.
+  * @param nodeIndex The current node index of a data point that this will update.
+  */
 @DeveloperApi
-private[tree] case class NodeIndexUpdater(
-    split: Split,
-    nodeIndex: Int) {
+private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int) {
+
   /**
-   * Determine a child node index based on the feature value and the split.
-   * @param binnedFeatures Binned feature values.
-   * @param bins Bin information to convert the bin indices to approximate feature values.
-   * @return Child node index to update to.
-   */
-  def updateNodeIndex(binnedFeatures: Array[Int], bins: Array[Array[Bin]]): Int = {
+    * Determine a child node index based on the feature value and the split.
+    * @param binnedFeatures Binned feature values.
+    * @param bins Bin information to convert the bin indices to approximate feature values.
+    * @return Child node index to update to.
+    */
+  def updateNodeIndex(
+      binnedFeatures: Array[Int], bins: Array[Array[Bin]]): Int = {
     if (split.featureType == Continuous) {
       val featureIndex = split.feature
       val binIndex = binnedFeatures(featureIndex)
-      val featureValueUpperBound = bins(featureIndex)(binIndex).highSplit.threshold
+      val featureValueUpperBound =
+        bins(featureIndex)(binIndex).highSplit.threshold
       if (featureValueUpperBound <= split.threshold) {
         Node.leftChildIndex(nodeIndex)
       } else {
@@ -64,20 +65,19 @@ private[tree] case class NodeIndexUpdater(
 }
 
 /**
- * :: DeveloperApi ::
- * A given TreePoint would belong to a particular node per tree.
- * Each row in the nodeIdsForInstances RDD is an array over trees of the node index
- * in each tree. Initially, values should all be 1 for root node.
- * The nodeIdsForInstances RDD needs to be updated at each iteration.
- * @param nodeIdsForInstances The initial values in the cache
- *            (should be an Array of all 1's (meaning the root nodes)).
- * @param checkpointInterval The checkpointing interval
- *                           (how often should the cache be checkpointed.).
- */
+  * :: DeveloperApi ::
+  * A given TreePoint would belong to a particular node per tree.
+  * Each row in the nodeIdsForInstances RDD is an array over trees of the node index
+  * in each tree. Initially, values should all be 1 for root node.
+  * The nodeIdsForInstances RDD needs to be updated at each iteration.
+  * @param nodeIdsForInstances The initial values in the cache
+  *            (should be an Array of all 1's (meaning the root nodes)).
+  * @param checkpointInterval The checkpointing interval
+  *                           (how often should the cache be checkpointed.).
+  */
 @DeveloperApi
 private[spark] class NodeIdCache(
-  var nodeIdsForInstances: RDD[Array[Int]],
-  val checkpointInterval: Int) {
+    var nodeIdsForInstances: RDD[Array[Int]], val checkpointInterval: Int) {
 
   // Keep a reference to a previous node Ids for instances.
   // Because we will keep on re-persisting updated node Ids,
@@ -89,14 +89,14 @@ private[spark] class NodeIdCache(
   private var rddUpdateCount = 0
 
   /**
-   * Update the node index values in the cache.
-   * This updates the RDD and its lineage.
-   * TODO: Passing bin information to executors seems unnecessary and costly.
-   * @param data The RDD of training rows.
-   * @param nodeIdUpdaters A map of node index updaters.
-   *                       The key is the indices of nodes that we want to update.
-   * @param bins Bin information needed to find child node indices.
-   */
+    * Update the node index values in the cache.
+    * This updates the RDD and its lineage.
+    * TODO: Passing bin information to executors seems unnecessary and costly.
+    * @param data The RDD of training rows.
+    * @param nodeIdUpdaters A map of node index updaters.
+    *                       The key is the indices of nodes that we want to update.
+    * @param bins Bin information needed to find child node indices.
+    */
   def updateNodeIndices(
       data: RDD[BaggedPoint[TreePoint]],
       nodeIdUpdaters: Array[mutable.Map[Int, NodeIndexUpdater]],
@@ -109,21 +109,22 @@ private[spark] class NodeIdCache(
     prevNodeIdsForInstances = nodeIdsForInstances
     nodeIdsForInstances = data.zip(nodeIdsForInstances).map {
       case (point, node) => {
-        var treeId = 0
-        while (treeId < nodeIdUpdaters.length) {
-          val nodeIdUpdater = nodeIdUpdaters(treeId).getOrElse(node(treeId), null)
-          if (nodeIdUpdater != null) {
-            val newNodeIndex = nodeIdUpdater.updateNodeIndex(
-              binnedFeatures = point.datum.binnedFeatures,
-              bins = bins)
-            node(treeId) = newNodeIndex
+          var treeId = 0
+          while (treeId < nodeIdUpdaters.length) {
+            val nodeIdUpdater =
+              nodeIdUpdaters(treeId).getOrElse(node(treeId), null)
+            if (nodeIdUpdater != null) {
+              val newNodeIndex = nodeIdUpdater.updateNodeIndex(
+                  binnedFeatures = point.datum.binnedFeatures,
+                  bins = bins)
+              node(treeId) = newNodeIndex
+            }
+
+            treeId += 1
           }
 
-          treeId += 1
+          node
         }
-
-        node
-      }
     }
 
     // Keep on persisting new ones.
@@ -132,7 +133,7 @@ private[spark] class NodeIdCache(
 
     // Handle checkpointing if the directory is not None.
     if (nodeIdsForInstances.sparkContext.getCheckpointDir.nonEmpty &&
-      (rddUpdateCount % checkpointInterval) == 0) {
+        (rddUpdateCount % checkpointInterval) == 0) {
       // Let's see if we can delete previous checkpoints.
       var canDelete = true
       while (checkpointQueue.size > 1 && canDelete) {
@@ -156,8 +157,8 @@ private[spark] class NodeIdCache(
   }
 
   /**
-   * Call this after training is finished to delete any remaining checkpoints.
-   */
+    * Call this after training is finished to delete any remaining checkpoints.
+    */
   def deleteAllCheckpoints(): Unit = {
     while (checkpointQueue.nonEmpty) {
       val old = checkpointQueue.dequeue()
@@ -175,22 +176,21 @@ private[spark] class NodeIdCache(
 
 @DeveloperApi
 private[spark] object NodeIdCache {
+
   /**
-   * Initialize the node Id cache with initial node Id values.
-   * @param data The RDD of training rows.
-   * @param numTrees The number of trees that we want to create cache for.
-   * @param checkpointInterval The checkpointing interval
-   *                           (how often should the cache be checkpointed.).
-   * @param initVal The initial values in the cache.
-   * @return A node Id cache containing an RDD of initial root node Indices.
-   */
-  def init(
-      data: RDD[BaggedPoint[TreePoint]],
-      numTrees: Int,
-      checkpointInterval: Int,
-      initVal: Int = 1): NodeIdCache = {
+    * Initialize the node Id cache with initial node Id values.
+    * @param data The RDD of training rows.
+    * @param numTrees The number of trees that we want to create cache for.
+    * @param checkpointInterval The checkpointing interval
+    *                           (how often should the cache be checkpointed.).
+    * @param initVal The initial values in the cache.
+    * @return A node Id cache containing an RDD of initial root node Indices.
+    */
+  def init(data: RDD[BaggedPoint[TreePoint]],
+           numTrees: Int,
+           checkpointInterval: Int,
+           initVal: Int = 1): NodeIdCache = {
     new NodeIdCache(
-      data.map(_ => Array.fill[Int](numTrees)(initVal)),
-      checkpointInterval)
+        data.map(_ => Array.fill[Int](numTrees)(initVal)), checkpointInterval)
   }
 }

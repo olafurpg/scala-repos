@@ -37,13 +37,13 @@ import scalafx.geometry.Rectangle2D
 import scalafx.scene.Node
 
 object ImageView {
-  implicit def sfxImageView2jfx(iv: ImageView): jfxsi.ImageView = if (iv != null) iv.delegate else null
+  implicit def sfxImageView2jfx(iv: ImageView): jfxsi.ImageView =
+    if (iv != null) iv.delegate else null
 }
 
 class ImageView(override val delegate: jfxsi.ImageView = new jfxsi.ImageView())
-  extends Node(delegate)
-  with PositionDelegate[jfxsi.ImageView]
-  with SFXDelegate[jfxsi.ImageView] {
+    extends Node(delegate) with PositionDelegate[jfxsi.ImageView]
+    with SFXDelegate[jfxsi.ImageView] {
 
   /** Allocates a new ImageView object using the given image. */
   def this(image: Image) {
@@ -90,5 +90,4 @@ class ImageView(override val delegate: jfxsi.ImageView = new jfxsi.ImageView())
   def viewport_=(v: Rectangle2D) {
     viewport() = v
   }
-
 }

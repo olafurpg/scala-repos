@@ -15,5 +15,6 @@ case class I18nDomain(domain: String) {
 
   def withLang(lang: Lang): I18nDomain = withLang(lang.language)
 
-  def withLang(lang: String): I18nDomain = I18nDomain(lang + "." + commonDomain)
+  def withLang(lang: String): I18nDomain =
+    I18nDomain(lang + "." + commonDomain)
 }

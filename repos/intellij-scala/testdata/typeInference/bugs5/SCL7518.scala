@@ -12,6 +12,7 @@ object SCL7518 {
 
   val g = new G
 
-  /*start*/g.copy("text")/*end*/
+  /*start*/
+  g.copy("text") /*end*/
 }
 //Int

@@ -1,8 +1,7 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- * Copyright (C) 2012-2016 Eligotech BV.
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  * Copyright (C) 2012-2016 Eligotech BV.
+  */
 package akka.persistence.journal.leveldb
 
 import scala.concurrent.Future
@@ -12,29 +11,42 @@ import org.iq80.leveldb.DBIterator
 import akka.persistence.journal.leveldb.LeveldbJournal.ReplayedTaggedMessage
 
 /**
- * INTERNAL API.
- *
- * LevelDB backed message replay and sequence number recovery.
- */
-private[persistence] trait LeveldbRecovery extends AsyncRecovery { this: LeveldbStore ⇒
+  * INTERNAL API.
+  *
+  * LevelDB backed message replay and sequence number recovery.
+  */
+private[persistence] trait LeveldbRecovery extends AsyncRecovery {
+  this: LeveldbStore ⇒
   import Key._
 
   private lazy val replayDispatcherId = config.getString("replay-dispatcher")
-  private lazy val replayDispatcher = context.system.dispatchers.lookup(replayDispatcherId)
+  private lazy val replayDispatcher =
+    context.system.dispatchers.lookup(replayDispatcherId)
 
-  def asyncReadHighestSequenceNr(persistenceId: String, fromSequenceNr: Long): Future[Long] = {
+  def asyncReadHighestSequenceNr(
+      persistenceId: String, fromSequenceNr: Long): Future[Long] = {
     val nid = numericId(persistenceId)
     Future(readHighestSequenceNr(nid))(replayDispatcher)
   }
 
-  def asyncReplayMessages(persistenceId: String, fromSequenceNr: Long, toSequenceNr: Long, max: Long)(replayCallback: PersistentRepr ⇒ Unit): Future[Unit] = {
+  def asyncReplayMessages(persistenceId: String,
+                          fromSequenceNr: Long,
+                          toSequenceNr: Long,
+                          max: Long)(
+      replayCallback: PersistentRepr ⇒ Unit): Future[Unit] = {
     val nid = numericId(persistenceId)
-    Future(replayMessages(nid, fromSequenceNr: Long, toSequenceNr, max: Long)(replayCallback))(replayDispatcher)
+    Future(replayMessages(nid, fromSequenceNr: Long, toSequenceNr, max: Long)(
+            replayCallback))(replayDispatcher)
   }
 
-  def replayMessages(persistenceId: Int, fromSequenceNr: Long, toSequenceNr: Long, max: Long)(replayCallback: PersistentRepr ⇒ Unit): Unit = {
+  def replayMessages(
+      persistenceId: Int, fromSequenceNr: Long, toSequenceNr: Long, max: Long)(
+      replayCallback: PersistentRepr ⇒ Unit): Unit = {
     @scala.annotation.tailrec
-    def go(iter: DBIterator, key: Key, ctr: Long, replayCallback: PersistentRepr ⇒ Unit) {
+    def go(iter: DBIterator,
+           key: Key,
+           ctr: Long,
+           replayCallback: PersistentRepr ⇒ Unit) {
       if (iter.hasNext) {
         val nextEntry = iter.next()
         val nextKey = keyFromBytes(nextEntry.getKey)
@@ -60,7 +72,8 @@ private[persistence] trait LeveldbRecovery extends AsyncRecovery { this: Leveldb
       if (iter.hasNext) {
         val nextEntry = iter.peekNext()
         val nextKey = keyFromBytes(nextEntry.getKey)
-        if (key.persistenceId == nextKey.persistenceId && key.sequenceNr == nextKey.sequenceNr && isDeletionKey(nextKey)) {
+        if (key.persistenceId == nextKey.persistenceId &&
+            key.sequenceNr == nextKey.sequenceNr && isDeletionKey(nextKey)) {
           iter.next()
           true
         } else false
@@ -68,22 +81,35 @@ private[persistence] trait LeveldbRecovery extends AsyncRecovery { this: Leveldb
     }
 
     withIterator { iter ⇒
-      val startKey = Key(persistenceId, if (fromSequenceNr < 1L) 1L else fromSequenceNr, 0)
+      val startKey =
+        Key(persistenceId, if (fromSequenceNr < 1L) 1L else fromSequenceNr, 0)
       iter.seek(keyToBytes(startKey))
       go(iter, startKey, 0L, replayCallback)
     }
   }
 
-  def asyncReplayTaggedMessages(tag: String, fromSequenceNr: Long, toSequenceNr: Long, max: Long)(replayCallback: ReplayedTaggedMessage ⇒ Unit): Future[Unit] = {
+  def asyncReplayTaggedMessages(
+      tag: String, fromSequenceNr: Long, toSequenceNr: Long, max: Long)(
+      replayCallback: ReplayedTaggedMessage ⇒ Unit): Future[Unit] = {
     val tagNid = tagNumericId(tag)
-    Future(replayTaggedMessages(tag, tagNid, fromSequenceNr: Long, toSequenceNr, max: Long)(replayCallback))(replayDispatcher)
+    Future(
+        replayTaggedMessages(
+            tag, tagNid, fromSequenceNr: Long, toSequenceNr, max: Long)(
+            replayCallback))(replayDispatcher)
   }
 
-  def replayTaggedMessages(tag: String, tagNid: Int, fromSequenceNr: Long, toSequenceNr: Long, max: Long)(
-    replayCallback: ReplayedTaggedMessage ⇒ Unit): Unit = {
+  def replayTaggedMessages(tag: String,
+                           tagNid: Int,
+                           fromSequenceNr: Long,
+                           toSequenceNr: Long,
+                           max: Long)(
+      replayCallback: ReplayedTaggedMessage ⇒ Unit): Unit = {
 
     @scala.annotation.tailrec
-    def go(iter: DBIterator, key: Key, ctr: Long, replayCallback: ReplayedTaggedMessage ⇒ Unit) {
+    def go(iter: DBIterator,
+           key: Key,
+           ctr: Long,
+           replayCallback: ReplayedTaggedMessage ⇒ Unit) {
       if (iter.hasNext) {
         val nextEntry = iter.next()
         val nextKey = keyFromBytes(nextEntry.getKey)
@@ -100,7 +126,8 @@ private[persistence] trait LeveldbRecovery extends AsyncRecovery { this: Leveldb
     }
 
     withIterator { iter ⇒
-      val startKey = Key(tagNid, if (fromSequenceNr < 1L) 1L else fromSequenceNr, 0)
+      val startKey =
+        Key(tagNid, if (fromSequenceNr < 1L) 1L else fromSequenceNr, 0)
       iter.seek(keyToBytes(startKey))
       go(iter, startKey, 0L, replayCallback)
     }
@@ -110,7 +137,7 @@ private[persistence] trait LeveldbRecovery extends AsyncRecovery { this: Leveldb
     val ro = leveldbSnapshot()
     try {
       leveldb.get(keyToBytes(counterKey(persistenceId)), ro) match {
-        case null  ⇒ 0L
+        case null ⇒ 0L
         case bytes ⇒ counterFromBytes(bytes)
       }
     } finally {

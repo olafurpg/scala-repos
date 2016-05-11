@@ -19,8 +19,6 @@
  */
 package breeze.math
 
-
-
 import org.scalatest._
 import org.scalatest.junit._
 import org.scalatest.prop._
@@ -107,5 +105,4 @@ class ComplexTest extends FunSuite with Checkers {
       toLong(b)
     }
   }
-
 }

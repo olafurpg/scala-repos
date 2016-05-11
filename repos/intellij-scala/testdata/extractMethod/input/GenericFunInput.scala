@@ -32,4 +32,4 @@ class GenericFunInput {
     val u = z
   }
 }
-*/
+ */

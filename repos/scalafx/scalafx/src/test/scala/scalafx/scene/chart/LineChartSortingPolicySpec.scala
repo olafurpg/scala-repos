@@ -35,10 +35,11 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Test for [[scalafx.scene.layout.Priority]] */
 @RunWith(classOf[JUnitRunner])
-class LineChartSortingPolicySpec extends SFXEnumDelegateSpec[jfxsc.LineChart.SortingPolicy, LineChart.SortingPolicy](
-  javaClass = classOf[jfxsc.LineChart.SortingPolicy],
-  scalaClass = classOf[LineChart.SortingPolicy],
-  companion = LineChart.SortingPolicy)
+class LineChartSortingPolicySpec
+    extends SFXEnumDelegateSpec[
+        jfxsc.LineChart.SortingPolicy, LineChart.SortingPolicy](
+        javaClass = classOf[jfxsc.LineChart.SortingPolicy],
+        scalaClass = classOf[LineChart.SortingPolicy],
+        companion = LineChart.SortingPolicy)

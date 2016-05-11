@@ -36,11 +36,11 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- *
- * Test for [[scalafx.scene.control.DialogPane]].
- */
+  *
+  * Test for [[scalafx.scene.control.DialogPane]].
+  */
 @RunWith(classOf[JUnitRunner])
 class DialogPaneSpec
-  extends SimpleSFXDelegateSpec[jfxsc.DialogPane, DialogPane](
-    classOf[jfxsc.DialogPane], classOf[DialogPane])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsc.DialogPane, DialogPane](
+        classOf[jfxsc.DialogPane], classOf[DialogPane])
+    with RunOnApplicationThread

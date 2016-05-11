@@ -52,7 +52,7 @@ class DummyClass7 {
 }
 
 object DummyString {
-  def apply(str: String) : DummyString = new DummyString(str.toArray)
+  def apply(str: String): DummyString = new DummyString(str.toArray)
 }
 class DummyString(val arr: Array[Char]) {
   override val hashCode: Int = 0
@@ -67,10 +67,8 @@ class DummyClass8 extends KnownSizeEstimation {
 }
 
 class SizeEstimatorSuite
-  extends SparkFunSuite
-  with BeforeAndAfterEach
-  with PrivateMethodTester
-  with ResetSystemProperties {
+    extends SparkFunSuite with BeforeAndAfterEach with PrivateMethodTester
+    with ResetSystemProperties {
 
   override def beforeEach() {
     // Set the arch to 64-bit and compressedOops to true to get a deterministic test-case
@@ -138,15 +136,17 @@ class SizeEstimatorSuite
     assertResult(216)(SizeEstimator.estimate(Array.fill(10)(new DummyClass1)))
     assertResult(216)(SizeEstimator.estimate(Array.fill(10)(new DummyClass2)))
     assertResult(296)(SizeEstimator.estimate(Array.fill(10)(new DummyClass3)))
-    assertResult(56)(SizeEstimator.estimate(Array(new DummyClass1, new DummyClass2)))
+    assertResult(56)(
+        SizeEstimator.estimate(Array(new DummyClass1, new DummyClass2)))
 
     // Past size 100, our samples 100 elements, but we should still get the right size.
-    assertResult(28016)(SizeEstimator.estimate(Array.fill(1000)(new DummyClass3)))
-
+    assertResult(28016)(
+        SizeEstimator.estimate(Array.fill(1000)(new DummyClass3)))
 
     val arr = new Array[Char](100000)
     assertResult(200016)(SizeEstimator.estimate(arr))
-    assertResult(480032)(SizeEstimator.estimate(Array.fill(10000)(new DummyString(arr))))
+    assertResult(480032)(
+        SizeEstimator.estimate(Array.fill(10000)(new DummyString(arr))))
 
     val buf = new ArrayBuffer[DummyString]()
     for (i <- 0 until 5000) {
@@ -172,8 +172,10 @@ class SizeEstimatorSuite
 
     // TODO: If we sample 100 elements, this should always be 4176 ?
     val estimatedSize = SizeEstimator.estimate(Array.fill(1000)(d1))
-    assert(estimatedSize >= 4000, "Estimated size " + estimatedSize + " should be more than 4000")
-    assert(estimatedSize <= 4200, "Estimated size " + estimatedSize + " should be less than 4200")
+    assert(estimatedSize >= 4000,
+           "Estimated size " + estimatedSize + " should be more than 4000")
+    assert(estimatedSize <= 4200,
+           "Estimated size " + estimatedSize + " should be less than 4200")
   }
 
   test("32-bit arch") {
@@ -228,6 +230,7 @@ class SizeEstimatorSuite
   test("SizeEstimation can provide the estimated size") {
     // DummyClass8 provides its size estimation.
     assertResult(2015)(SizeEstimator.estimate(new DummyClass8))
-    assertResult(20206)(SizeEstimator.estimate(Array.fill(10)(new DummyClass8)))
+    assertResult(20206)(
+        SizeEstimator.estimate(Array.fill(10)(new DummyClass8)))
   }
 }

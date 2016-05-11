@@ -24,28 +24,29 @@ import org.apache.spark.mllib.linalg.{Matrix, SparseMatrix, Vectors}
 import org.apache.spark.rdd.RDD
 
 /**
- * Represents an entry in an distributed matrix.
- * @param i row index
- * @param j column index
- * @param value value of the entry
- */
+  * Represents an entry in an distributed matrix.
+  * @param i row index
+  * @param j column index
+  * @param value value of the entry
+  */
 @Since("1.0.0")
 case class MatrixEntry(i: Long, j: Long, value: Double)
 
 /**
- * Represents a matrix in coordinate format.
- *
- * @param entries matrix entries
- * @param nRows number of rows. A non-positive value means unknown, and then the number of rows will
- *              be determined by the max row index plus one.
- * @param nCols number of columns. A non-positive value means unknown, and then the number of
- *              columns will be determined by the max column index plus one.
- */
+  * Represents a matrix in coordinate format.
+  *
+  * @param entries matrix entries
+  * @param nRows number of rows. A non-positive value means unknown, and then the number of rows will
+  *              be determined by the max row index plus one.
+  * @param nCols number of columns. A non-positive value means unknown, and then the number of
+  *              columns will be determined by the max column index plus one.
+  */
 @Since("1.0.0")
-class CoordinateMatrix @Since("1.0.0") (
+class CoordinateMatrix @Since("1.0.0")(
     @Since("1.0.0") val entries: RDD[MatrixEntry],
     private var nRows: Long,
-    private var nCols: Long) extends DistributedMatrix {
+    private var nCols: Long)
+    extends DistributedMatrix {
 
   /** Alternative constructor leaving matrix dimensions to be determined automatically. */
   @Since("1.0.0")
@@ -72,7 +73,8 @@ class CoordinateMatrix @Since("1.0.0") (
   /** Transposes this CoordinateMatrix. */
   @Since("1.3.0")
   def transpose(): CoordinateMatrix = {
-    new CoordinateMatrix(entries.map(x => MatrixEntry(x.j, x.i, x.value)), numCols(), numRows())
+    new CoordinateMatrix(
+        entries.map(x => MatrixEntry(x.j, x.i, x.value)), numCols(), numRows())
   }
 
   /** Converts to IndexedRowMatrix. The number of columns must be within the integer range. */
@@ -80,22 +82,25 @@ class CoordinateMatrix @Since("1.0.0") (
   def toIndexedRowMatrix(): IndexedRowMatrix = {
     val nl = numCols()
     if (nl > Int.MaxValue) {
-      sys.error(s"Cannot convert to a row-oriented format because the number of columns $nl is " +
-        "too large.")
+      sys.error(
+          s"Cannot convert to a row-oriented format because the number of columns $nl is " +
+          "too large.")
     }
     val n = nl.toInt
-    val indexedRows = entries.map(entry => (entry.i, (entry.j.toInt, entry.value)))
+    val indexedRows = entries
+      .map(entry => (entry.i, (entry.j.toInt, entry.value)))
       .groupByKey()
-      .map { case (i, vectorEntries) =>
-        IndexedRow(i, Vectors.sparse(n, vectorEntries.toSeq))
+      .map {
+        case (i, vectorEntries) =>
+          IndexedRow(i, Vectors.sparse(n, vectorEntries.toSeq))
       }
     new IndexedRowMatrix(indexedRows, numRows(), n)
   }
 
   /**
-   * Converts to RowMatrix, dropping row indices after grouping by row index.
-   * The number of columns must be within the integer range.
-   */
+    * Converts to RowMatrix, dropping row indices after grouping by row index.
+    * The number of columns must be within the integer range.
+    */
   @Since("1.0.0")
   def toRowMatrix(): RowMatrix = {
     toIndexedRowMatrix().toRowMatrix()
@@ -108,24 +113,27 @@ class CoordinateMatrix @Since("1.0.0") (
   }
 
   /**
-   * Converts to BlockMatrix. Creates blocks of [[SparseMatrix]].
-   * @param rowsPerBlock The number of rows of each block. The blocks at the bottom edge may have
-   *                     a smaller value. Must be an integer value greater than 0.
-   * @param colsPerBlock The number of columns of each block. The blocks at the right edge may have
-   *                     a smaller value. Must be an integer value greater than 0.
-   * @return a [[BlockMatrix]]
-   */
+    * Converts to BlockMatrix. Creates blocks of [[SparseMatrix]].
+    * @param rowsPerBlock The number of rows of each block. The blocks at the bottom edge may have
+    *                     a smaller value. Must be an integer value greater than 0.
+    * @param colsPerBlock The number of columns of each block. The blocks at the right edge may have
+    *                     a smaller value. Must be an integer value greater than 0.
+    * @return a [[BlockMatrix]]
+    */
   @Since("1.3.0")
   def toBlockMatrix(rowsPerBlock: Int, colsPerBlock: Int): BlockMatrix = {
-    require(rowsPerBlock > 0,
-      s"rowsPerBlock needs to be greater than 0. rowsPerBlock: $rowsPerBlock")
-    require(colsPerBlock > 0,
-      s"colsPerBlock needs to be greater than 0. colsPerBlock: $colsPerBlock")
+    require(
+        rowsPerBlock > 0,
+        s"rowsPerBlock needs to be greater than 0. rowsPerBlock: $rowsPerBlock")
+    require(
+        colsPerBlock > 0,
+        s"colsPerBlock needs to be greater than 0. colsPerBlock: $colsPerBlock")
     val m = numRows()
     val n = numCols()
     val numRowBlocks = math.ceil(m.toDouble / rowsPerBlock).toInt
     val numColBlocks = math.ceil(n.toDouble / colsPerBlock).toInt
-    val partitioner = GridPartitioner(numRowBlocks, numColBlocks, entries.partitions.length)
+    val partitioner = GridPartitioner(
+        numRowBlocks, numColBlocks, entries.partitions.length)
 
     val blocks: RDD[((Int, Int), Matrix)] = entries.map { entry =>
       val blockRowIndex = (entry.i / rowsPerBlock).toInt
@@ -135,10 +143,15 @@ class CoordinateMatrix @Since("1.0.0") (
       val colId = entry.j % colsPerBlock
 
       ((blockRowIndex, blockColIndex), (rowId.toInt, colId.toInt, entry.value))
-    }.groupByKey(partitioner).map { case ((blockRowIndex, blockColIndex), entry) =>
-      val effRows = math.min(m - blockRowIndex.toLong * rowsPerBlock, rowsPerBlock).toInt
-      val effCols = math.min(n - blockColIndex.toLong * colsPerBlock, colsPerBlock).toInt
-      ((blockRowIndex, blockColIndex), SparseMatrix.fromCOO(effRows, effCols, entry))
+    }.groupByKey(partitioner).map {
+      case ((blockRowIndex, blockColIndex), entry) =>
+        val effRows =
+          math.min(m - blockRowIndex.toLong * rowsPerBlock, rowsPerBlock).toInt
+        val effCols = math
+          .min(n - blockColIndex.toLong * colsPerBlock, colsPerBlock)
+          .toInt
+          ((blockRowIndex, blockColIndex),
+           SparseMatrix.fromCOO(effRows, effCols, entry))
     }
     new BlockMatrix(blocks, rowsPerBlock, colsPerBlock, m, n)
   }
@@ -146,8 +159,9 @@ class CoordinateMatrix @Since("1.0.0") (
   /** Determines the size by computing the max row/column index. */
   private def computeSize() {
     // Reduce will throw an exception if `entries` is empty.
-    val (m1, n1) = entries.map(entry => (entry.i, entry.j)).reduce { case ((i1, j1), (i2, j2)) =>
-      (math.max(i1, i2), math.max(j1, j2))
+    val (m1, n1) = entries.map(entry => (entry.i, entry.j)).reduce {
+      case ((i1, j1), (i2, j2)) =>
+        (math.max(i1, i2), math.max(j1, j2))
     }
     // There may be empty columns at the very right and empty rows at the very bottom.
     nRows = math.max(nRows, m1 + 1L)
@@ -159,8 +173,9 @@ class CoordinateMatrix @Since("1.0.0") (
     val m = numRows().toInt
     val n = numCols().toInt
     val mat = BDM.zeros[Double](m, n)
-    entries.collect().foreach { case MatrixEntry(i, j, value) =>
-      mat(i.toInt, j.toInt) = value
+    entries.collect().foreach {
+      case MatrixEntry(i, j, value) =>
+        mat(i.toInt, j.toInt) = value
     }
     mat
   }

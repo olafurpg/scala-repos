@@ -2,16 +2,15 @@ package lila.opening
 
 import org.joda.time.DateTime
 
-case class Attempt(
-    id: String, // userId/openingId
-    openingId: Opening.ID,
-    userId: String,
-    win: Boolean,
-    date: DateTime,
-    openingRating: Int,
-    openingRatingDiff: Int,
-    userRating: Int,
-    userRatingDiff: Int) {
+case class Attempt(id: String, // userId/openingId
+                   openingId: Opening.ID,
+                   userId: String,
+                   win: Boolean,
+                   date: DateTime,
+                   openingRating: Int,
+                   openingRatingDiff: Int,
+                   userRating: Int,
+                   userRatingDiff: Int) {
 
   def loss = !win
 
@@ -43,26 +42,26 @@ object Attempt {
 
     import BSONFields._
 
-    def reads(r: BSON.Reader): Attempt = Attempt(
-      id = r str id,
-      openingId = r int openingId,
-      userId = r str userId,
-      date = r.get[DateTime](date),
-      win = r bool win,
-      openingRating = r int openingRating,
-      openingRatingDiff = r int openingRatingDiff,
-      userRating = r int userRating,
-      userRatingDiff = r int userRatingDiff)
+    def reads(r: BSON.Reader): Attempt =
+      Attempt(id = r str id,
+              openingId = r int openingId,
+              userId = r str userId,
+              date = r.get[DateTime](date),
+              win = r bool win,
+              openingRating = r int openingRating,
+              openingRatingDiff = r int openingRatingDiff,
+              userRating = r int userRating,
+              userRatingDiff = r int userRatingDiff)
 
-    def writes(w: BSON.Writer, o: Attempt) = BSONDocument(
-      id -> o.id,
-      openingId -> o.openingId,
-      userId -> o.userId,
-      date -> o.date,
-      win -> o.win,
-      openingRating -> w.int(o.openingRating),
-      openingRatingDiff -> w.int(o.openingRatingDiff),
-      userRating -> w.int(o.userRating),
-      userRatingDiff -> w.int(o.userRatingDiff))
+    def writes(w: BSON.Writer, o: Attempt) =
+      BSONDocument(id -> o.id,
+                   openingId -> o.openingId,
+                   userId -> o.userId,
+                   date -> o.date,
+                   win -> o.win,
+                   openingRating -> w.int(o.openingRating),
+                   openingRatingDiff -> w.int(o.openingRatingDiff),
+                   userRating -> w.int(o.userRating),
+                   userRatingDiff -> w.int(o.userRatingDiff))
   }
 }

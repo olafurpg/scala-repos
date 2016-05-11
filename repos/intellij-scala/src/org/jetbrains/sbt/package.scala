@@ -16,25 +16,30 @@ import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 package object sbt {
-  implicit def toIdeaFunction1[A, B](f: A => B): IdeaFunction[A, B] = new IdeaFunction[A, B] {
-    def fun(a: A) = f(a)
-  }
+  implicit def toIdeaFunction1[A, B](f: A => B): IdeaFunction[A, B] =
+    new IdeaFunction[A, B] {
+      def fun(a: A) = f(a)
+    }
 
-  implicit def toIdeaPredicate[A](f: A => Boolean): IdeaFunction[A, JavaBoolean] = new IdeaFunction[A, JavaBoolean] {
-    def fun(a: A) = JavaBoolean.valueOf(f(a))
-  }
+  implicit def toIdeaPredicate[A](
+      f: A => Boolean): IdeaFunction[A, JavaBoolean] =
+    new IdeaFunction[A, JavaBoolean] {
+      def fun(a: A) = JavaBoolean.valueOf(f(a))
+    }
 
-  implicit def toIdeaFunction2[A, B, C](f: (A, B) => C): IdeaFunction[IdeaPair[A, B], C] = new IdeaFunction[IdeaPair[A, B], C] {
-    def fun(pair: IdeaPair[A, B]) = f(pair.getFirst, pair.getSecond)
-  }
+  implicit def toIdeaFunction2[A, B, C](
+      f: (A, B) => C): IdeaFunction[IdeaPair[A, B], C] =
+    new IdeaFunction[IdeaPair[A, B], C] {
+      def fun(pair: IdeaPair[A, B]) = f(pair.getFirst, pair.getSecond)
+    }
 
   implicit class RichFile(val file: File) extends AnyVal {
     def /(path: String): File = new File(file, path)
 
-    def `<<`: File = << (1)
+    def `<<`: File = <<(1)
 
     def `<<`(level: Int): File = RichFile.parent(file, level)
 
@@ -44,7 +49,8 @@ package object sbt {
 
     def absolutePath: String = file.getAbsolutePath
 
-    def canonicalPath: String = ExternalSystemApiUtil.toCanonicalPath(file.getAbsolutePath)
+    def canonicalPath: String =
+      ExternalSystemApiUtil.toCanonicalPath(file.getAbsolutePath)
 
     def canonicalFile: File = new File(canonicalPath)
 
@@ -52,16 +58,21 @@ package object sbt {
 
     def endsWith(parts: String*): Boolean = endsWith0(file, parts.reverse)
 
-    private def endsWith0(file: File, parts: Seq[String]): Boolean = if (parts.isEmpty) true else
-      parts.head == file.getName && Option(file.getParentFile).exists(endsWith0(_, parts.tail))
+    private def endsWith0(file: File, parts: Seq[String]): Boolean =
+      if (parts.isEmpty) true
+      else
+        parts.head == file.getName &&
+        Option(file.getParentFile).exists(endsWith0(_, parts.tail))
 
     def url: String = VfsUtil.getUrlForLibraryRoot(file)
-    
-    def isAncestorOf(aFile: File): Boolean = FileUtil.isAncestor(file, aFile, true)
+
+    def isAncestorOf(aFile: File): Boolean =
+      FileUtil.isAncestor(file, aFile, true)
 
     def isUnder(root: File): Boolean = FileUtil.isAncestor(root, file, true)
 
-    def isOutsideOf(root: File): Boolean = !FileUtil.isAncestor(root, file, false)
+    def isOutsideOf(root: File): Boolean =
+      !FileUtil.isAncestor(root, file, false)
 
     def write(lines: String*) {
       writeLinesTo(file, lines: _*)
@@ -79,12 +90,13 @@ package object sbt {
   }
 
   implicit class RichVirtualFile(val entry: VirtualFile) extends AnyVal {
-    def containsDirectory(name: String): Boolean = find(name).exists(_.isDirectory)
+    def containsDirectory(name: String): Boolean =
+      find(name).exists(_.isDirectory)
 
     def containsFile(name: String): Boolean = find(name).exists(_.isFile)
 
     def find(name: String): Option[VirtualFile] = Option(entry.findChild(name))
-    
+
     def isFile: Boolean = !entry.isDirectory
   }
 
@@ -97,9 +109,10 @@ package object sbt {
   }
 
   implicit class RichBoolean(val b: Boolean) extends AnyVal {
-    def option[A](a: => A): Option[A] = if(b) Some(a) else None
+    def option[A](a: => A): Option[A] = if (b) Some(a) else None
 
-    def either[A, B](right: => B)(left: => A): Either[A, B] = if (b) Right(right) else Left(left)
+    def either[A, B](right: => B)(left: => A): Either[A, B] =
+      if (b) Right(right) else Left(left)
 
     def seq[A](a: A*): Seq[A] = if (b) Seq(a: _*) else Seq.empty
   }
@@ -117,14 +130,16 @@ package object sbt {
 
   implicit class RichOption[T](val opt: Option[T]) extends AnyVal {
     // Use for safely checking for null in chained calls
-    @inline def safeMap[A](f: T => A): Option[A] = if (opt.isEmpty) None else Option(f(opt.get))
+    @inline def safeMap[A](f: T => A): Option[A] =
+      if (opt.isEmpty) None else Option(f(opt.get))
   }
 
   def jarWith[T : ClassTag]: File = {
     val tClass = implicitly[ClassTag[T]].runtimeClass
 
     Option(PathUtil.getJarPathForClass(tClass)).map(new File(_)).getOrElse {
-      throw new RuntimeException("Jar file not found for class " + tClass.getName)
+      throw new RuntimeException(
+          "Jar file not found for class " + tClass.getName)
     }
   }
 
@@ -145,18 +160,20 @@ package object sbt {
 
   def copy(source: File, destination: File) {
     using(new BufferedInputStream(new FileInputStream(source))) { in =>
-      using(new BufferedOutputStream(new FileOutputStream(destination))) { out =>
-        var eof = false
-        while (!eof) {
-          val b = in.read()
-          if (b == -1) eof = true else out.write(b)
-        }
-        out.flush()
+      using(new BufferedOutputStream(new FileOutputStream(destination))) {
+        out =>
+          var eof = false
+          while (!eof) {
+            val b = in.read()
+            if (b == -1) eof = true else out.write(b)
+          }
+          out.flush()
       }
     }
   }
 
-  def usingTempFile[T](prefix: String, suffix: Option[String] = None)(block: File => T): T = {
+  def usingTempFile[T](prefix: String, suffix: Option[String] = None)(
+      block: File => T): T = {
     val file = FileUtil.createTempFile(prefix, suffix.orNull, true)
     try {
       block(file)

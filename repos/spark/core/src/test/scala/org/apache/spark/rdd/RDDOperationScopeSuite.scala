@@ -22,8 +22,8 @@ import org.scalatest.BeforeAndAfter
 import org.apache.spark.{Partition, SparkContext, SparkFunSuite, TaskContext}
 
 /**
- * Tests whether scopes are passed from the RDD operation to the RDDs correctly.
- */
+  * Tests whether scopes are passed from the RDD operation to the RDDs correctly.
+  */
 class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
   private var sc: SparkContext = null
   private val scope1 = new RDDOperationScope("scope1")
@@ -56,8 +56,10 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     val scope2Json = scope2.toJson
     val scope3Json = scope3.toJson
     assert(scope1Json === s"""{"id":"${scope1.id}","name":"scope1"}""")
-    assert(scope2Json === s"""{"id":"${scope2.id}","name":"scope2","parent":$scope1Json}""")
-    assert(scope3Json === s"""{"id":"${scope3.id}","name":"scope3","parent":$scope2Json}""")
+    assert(
+        scope2Json === s"""{"id":"${scope2.id}","name":"scope2","parent":$scope1Json}""")
+    assert(
+        scope3Json === s"""{"id":"${scope3.id}","name":"scope3","parent":$scope2Json}""")
     assert(RDDOperationScope.fromJson(scope1Json) === scope1)
     assert(RDDOperationScope.fromJson(scope2Json) === scope2)
     assert(RDDOperationScope.fromJson(scope3Json) === scope3)
@@ -68,11 +70,16 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     var rdd1: MyCoolRDD = null
     var rdd2: MyCoolRDD = null
     var rdd3: MyCoolRDD = null
-    RDDOperationScope.withScope(sc, "scope1", allowNesting = false, ignoreParent = false) {
+    RDDOperationScope.withScope(
+        sc, "scope1", allowNesting = false, ignoreParent = false) {
       rdd1 = new MyCoolRDD(sc)
-      RDDOperationScope.withScope(sc, "scope2", allowNesting = false, ignoreParent = false) {
+      RDDOperationScope.withScope(
+          sc, "scope2", allowNesting = false, ignoreParent = false) {
         rdd2 = new MyCoolRDD(sc)
-        RDDOperationScope.withScope(sc, "scope3", allowNesting = false, ignoreParent = false) {
+        RDDOperationScope.withScope(sc,
+                                    "scope3",
+                                    allowNesting = false,
+                                    ignoreParent = false) {
           rdd3 = new MyCoolRDD(sc)
         }
       }
@@ -92,12 +99,17 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     var rdd2: MyCoolRDD = null
     var rdd3: MyCoolRDD = null
     // allow nesting here
-    RDDOperationScope.withScope(sc, "scope1", allowNesting = true, ignoreParent = false) {
+    RDDOperationScope.withScope(
+        sc, "scope1", allowNesting = true, ignoreParent = false) {
       rdd1 = new MyCoolRDD(sc)
       // stop nesting here
-      RDDOperationScope.withScope(sc, "scope2", allowNesting = false, ignoreParent = false) {
+      RDDOperationScope.withScope(
+          sc, "scope2", allowNesting = false, ignoreParent = false) {
         rdd2 = new MyCoolRDD(sc)
-        RDDOperationScope.withScope(sc, "scope3", allowNesting = false, ignoreParent = false) {
+        RDDOperationScope.withScope(sc,
+                                    "scope3",
+                                    allowNesting = false,
+                                    ignoreParent = false) {
           rdd3 = new MyCoolRDD(sc)
         }
       }
@@ -116,11 +128,16 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     var rdd1: MyCoolRDD = null
     var rdd2: MyCoolRDD = null
     var rdd3: MyCoolRDD = null
-    RDDOperationScope.withScope(sc, "scope1", allowNesting = true, ignoreParent = false) {
+    RDDOperationScope.withScope(
+        sc, "scope1", allowNesting = true, ignoreParent = false) {
       rdd1 = new MyCoolRDD(sc)
-      RDDOperationScope.withScope(sc, "scope2", allowNesting = true, ignoreParent = false) {
+      RDDOperationScope.withScope(
+          sc, "scope2", allowNesting = true, ignoreParent = false) {
         rdd2 = new MyCoolRDD(sc)
-        RDDOperationScope.withScope(sc, "scope3", allowNesting = true, ignoreParent = false) {
+        RDDOperationScope.withScope(sc,
+                                    "scope3",
+                                    allowNesting = true,
+                                    ignoreParent = false) {
           rdd3 = new MyCoolRDD(sc)
         }
       }
@@ -131,12 +148,14 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     assert(rdd3.scope.isDefined)
     assert(rdd1.scope.get.getAllScopes.map(_.name) === Seq("scope1"))
     assert(rdd2.scope.get.getAllScopes.map(_.name) === Seq("scope1", "scope2"))
-    assert(rdd3.scope.get.getAllScopes.map(_.name) === Seq("scope1", "scope2", "scope3"))
+    assert(rdd3.scope.get.getAllScopes.map(_.name) === Seq(
+            "scope1", "scope2", "scope3"))
   }
-
 }
 
 private class MyCoolRDD(sc: SparkContext) extends RDD[Int](sc, Nil) {
   override def getPartitions: Array[Partition] = Array.empty
-  override def compute(p: Partition, context: TaskContext): Iterator[Int] = { Nil.toIterator }
+  override def compute(p: Partition, context: TaskContext): Iterator[Int] = {
+    Nil.toIterator
+  }
 }

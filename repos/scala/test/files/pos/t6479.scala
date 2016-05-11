@@ -4,13 +4,13 @@ object TailrecAfterTryCatch {
   final def good1() {
     1 match {
       case 2 => {
-        try {
-        //  return
-        } catch {
-          case e: ClassNotFoundException =>
+          try {
+            //  return
+          } catch {
+            case e: ClassNotFoundException =>
+          }
+          good1()
         }
-        good1()
-      }
     }
   }
 
@@ -18,12 +18,12 @@ object TailrecAfterTryCatch {
   final def good2() {
     //1 match {
     //  case 2 => {
-        try {
-          return
-        } catch {
-          case e: ClassNotFoundException =>
-        }
-        good2()
+    try {
+      return
+    } catch {
+      case e: ClassNotFoundException =>
+    }
+    good2()
     //  }
     //}
   }
@@ -43,14 +43,13 @@ object TailrecAfterTryCatch {
   final def bad() {
     1 match {
       case 2 => {
-        try {
-          return
-        } catch {
-          case e: ClassNotFoundException =>
+          try {
+            return
+          } catch {
+            case e: ClassNotFoundException =>
+          }
+          bad()
         }
-        bad()
-      }
     }
   }
-
 }

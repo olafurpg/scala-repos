@@ -1,4 +1,3 @@
-object PublishedMaven
-{
-	val x = 3
+object PublishedMaven {
+  val x = 3
 }

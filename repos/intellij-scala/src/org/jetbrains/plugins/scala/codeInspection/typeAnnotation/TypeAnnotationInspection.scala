@@ -14,46 +14,53 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 class TypeAnnotationInspection extends AbstractInspection {
   def actionFor(holder: ProblemsHolder) = {
-    case value: ScPatternDefinition if value.isSimple && !value.hasExplicitType =>
+    case value: ScPatternDefinition
+        if value.isSimple && !value.hasExplicitType =>
       val settings = ScalaCodeStyleSettings.getInstance(holder.getProject)
 
       inspect(value.bindings.head,
-        kindOf(value) + " value",
-        value.declaredElements.headOption.map(ScalaPsiUtil.superValsSignatures(_, withSelfType = true)).exists(_.nonEmpty),
-        value.expr.exists(isSimple),
-        requirementForProperty(value, settings),
-        settings.OVERRIDING_PROPERTY_TYPE_ANNOTATION,
-        settings.SIMPLE_PROPERTY_TYPE_ANNOTATION,
-        holder)
+              kindOf(value) + " value",
+              value.declaredElements.headOption
+                .map(ScalaPsiUtil.superValsSignatures(_, withSelfType = true))
+                .exists(_.nonEmpty),
+              value.expr.exists(isSimple),
+              requirementForProperty(value, settings),
+              settings.OVERRIDING_PROPERTY_TYPE_ANNOTATION,
+              settings.SIMPLE_PROPERTY_TYPE_ANNOTATION,
+              holder)
 
-    case variable: ScVariableDefinition if variable.isSimple && !variable.hasExplicitType =>
+    case variable: ScVariableDefinition
+        if variable.isSimple && !variable.hasExplicitType =>
       val settings = ScalaCodeStyleSettings.getInstance(holder.getProject)
 
       inspect(variable.bindings.head,
-        kindOf(variable) + " variable",
-        variable.declaredElements.headOption.map(ScalaPsiUtil.superValsSignatures(_, withSelfType = true)).exists(_.nonEmpty),
-        variable.expr.exists(isSimple),
-        requirementForProperty(variable, settings),
-        settings.OVERRIDING_PROPERTY_TYPE_ANNOTATION,
-        settings.SIMPLE_PROPERTY_TYPE_ANNOTATION,
-        holder)
+              kindOf(variable) + " variable",
+              variable.declaredElements.headOption
+                .map(ScalaPsiUtil.superValsSignatures(_, withSelfType = true))
+                .exists(_.nonEmpty),
+              variable.expr.exists(isSimple),
+              requirementForProperty(variable, settings),
+              settings.OVERRIDING_PROPERTY_TYPE_ANNOTATION,
+              settings.SIMPLE_PROPERTY_TYPE_ANNOTATION,
+              holder)
 
-    case method: ScFunctionDefinition if method.hasAssign && !method.hasExplicitType && !method.isSecondaryConstructor =>
+    case method: ScFunctionDefinition
+        if method.hasAssign && !method.hasExplicitType &&
+        !method.isSecondaryConstructor =>
       val settings = ScalaCodeStyleSettings.getInstance(holder.getProject)
 
       inspect(method.nameId,
-        kindOf(method) + " method",
-        method.superSignaturesIncludingSelfType.nonEmpty,
-        method.body.exists(isSimple),
-        requirementForMethod(method, settings),
-        settings.OVERRIDING_METHOD_TYPE_ANNOTATION,
-        settings.SIMPLE_METHOD_TYPE_ANNOTATION,
-        holder)
+              kindOf(method) + " method",
+              method.superSignaturesIncludingSelfType.nonEmpty,
+              method.body.exists(isSimple),
+              requirementForMethod(method, settings),
+              settings.OVERRIDING_METHOD_TYPE_ANNOTATION,
+              settings.SIMPLE_METHOD_TYPE_ANNOTATION,
+              holder)
   }
 
   private def isSimple(exp: ScExpression): Boolean = {
@@ -63,17 +70,20 @@ class TypeAnnotationInspection extends AbstractInspection {
     }
   }
 
-  private def requirementForProperty(property: ScMember, settings: ScalaCodeStyleSettings): Int = {
+  private def requirementForProperty(
+      property: ScMember, settings: ScalaCodeStyleSettings): Int = {
     if (property.isLocal) {
       settings.LOCAL_PROPERTY_TYPE_ANNOTATION
     } else {
       if (property.isPrivate) settings.PRIVATE_PROPERTY_TYPE_ANNOTATION
-      else if (property.isProtected) settings.PROTECTED_PROPERTY_TYPE_ANNOTATION
+      else if (property.isProtected)
+        settings.PROTECTED_PROPERTY_TYPE_ANNOTATION
       else settings.PUBLIC_PROPERTY_TYPE_ANNOTATION
     }
   }
 
-  private def requirementForMethod(method: ScFunctionDefinition, settings: ScalaCodeStyleSettings): Int = {
+  private def requirementForMethod(
+      method: ScFunctionDefinition, settings: ScalaCodeStyleSettings): Int = {
     if (method.isLocal) {
       settings.LOCAL_METHOD_TYPE_ANNOTATION
     } else {
@@ -83,9 +93,12 @@ class TypeAnnotationInspection extends AbstractInspection {
     }
   }
 
-  private def kindOf(member: ScMember) = if (member.isLocal) "Local" else {
-    if (member.isPrivate) "Private" else if (member.isProtected) "Protected" else "Public"
-  }
+  private def kindOf(member: ScMember) =
+    if (member.isLocal) "Local"
+    else {
+      if (member.isPrivate) "Private"
+      else if (member.isProtected) "Protected" else "Public"
+    }
 
   private def inspect(element: PsiElement,
                       name: String,
@@ -96,14 +109,18 @@ class TypeAnnotationInspection extends AbstractInspection {
                       simplePolicy: Int,
                       holder: ProblemsHolder) {
     if (requirement == TypeAnnotationRequirement.Required.ordinal &&
-            (!isSimple || simplePolicy == TypeAnnotationPolicy.Regular.ordinal) &&
-            (overridingPolicy == TypeAnnotationPolicy.Regular.ordinal || !isOverriding)) {
-      holder.registerProblem(element, s"$name requires an explicit type annotation (according to Code Style settings)",
-        new AddTypeAnnotationQuickFix(element))
+        (!isSimple || simplePolicy == TypeAnnotationPolicy.Regular.ordinal) &&
+        (overridingPolicy == TypeAnnotationPolicy.Regular.ordinal ||
+            !isOverriding)) {
+      holder.registerProblem(
+          element,
+          s"$name requires an explicit type annotation (according to Code Style settings)",
+          new AddTypeAnnotationQuickFix(element))
     }
   }
 
-  private class AddTypeAnnotationQuickFix(element: PsiElement) extends AbstractFixOnPsiElement("Add type annotation", element) {
+  private class AddTypeAnnotationQuickFix(element: PsiElement)
+      extends AbstractFixOnPsiElement("Add type annotation", element) {
     def doApplyFix(project: Project): Unit = {
       val elem = getElement
       ToggleTypeAnnotation.complete(AddOnlyStrategy.withoutEditor, elem)

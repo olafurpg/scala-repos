@@ -8,7 +8,7 @@ import scala.beans._
 
 object Test extends App {
   // test 1: reify
-  val tree = reify{
+  val tree = reify {
     class C(@BeanProperty @(inline @beanGetter) val x: Int)
   }.tree
   println(tree.toString)

@@ -20,9 +20,9 @@ package mapper
 import org.specs2.mutable.Specification
 
 /**
- * Systems under specification for ManyToMany.
- */
-object ManyToManySpec extends Specification  {
+  * Systems under specification for ManyToMany.
+  */
+object ManyToManySpec extends Specification {
   "ManyToMany Specification".title
   sequential
 
@@ -32,24 +32,25 @@ object ManyToManySpec extends Specification  {
   def setupDB {
     MapperRules.createForeignKeys_? = c => false
     provider.setupDB
-    Schemifier.destroyTables_!!(ignoreLogger _,  PersonCompany, Company, Person)
+    Schemifier.destroyTables_!!(ignoreLogger _, PersonCompany, Company, Person)
     Schemifier.schemify(true, ignoreLogger _, Person, Company, PersonCompany)
   }
   def createPerson = {
     val person = new Person
     person.save
-    val companies = (1 to 10).toList map { i =>
-      val c = new Company
-      c.name ()= i.toString
-      c.save
-      c
-    }
+    val companies =
+      (1 to 10).toList map { i =>
+        val c = new Company
+        c.name() = i.toString
+        c.save
+        c
+      }
     person.companies ++= companies
     person.save
     // Break some joins
     companies(3).delete_! // delete "4"
     companies(6).delete_! // delete "7"
-    person.companies.refresh  // reload joins so joinEntity.company.obj isn't cached
+    person.companies.refresh // reload joins so joinEntity.company.obj isn't cached
     person
   }
 
@@ -64,12 +65,11 @@ object ManyToManySpec extends Specification  {
       setupDB
       val person = createPerson
       val c = new Company
-      c.name ()= "new"
+      c.name() = "new"
       c.save
       person.companies.insertAll(7, Seq(c))
       person.companies(7).name.get must_== "new"
     }
-
 
 // from Florian
 
@@ -117,14 +117,13 @@ object ManyToManySpec extends Specification  {
       person.companies.length must_== 1
     }
   }
-
 }
-
-
 
 class Person extends LongKeyedMapper[Person] with IdPK with ManyToMany {
   def getSingleton = Person
-  object companies extends MappedManyToMany(PersonCompany, PersonCompany.person, PersonCompany.company, Company)
+  object companies
+      extends MappedManyToMany(
+          PersonCompany, PersonCompany.person, PersonCompany.company, Company)
 }
 object Person extends Person with LongKeyedMetaMapper[Person]
 
@@ -139,7 +138,8 @@ class PersonCompany extends Mapper[PersonCompany] {
   object person extends MappedLongForeignKey(this, Person)
   object company extends MappedLongForeignKey(this, Company)
 
-  override def toString = "PersonCompany(person.is=%s, person.obj=%s, company.is=%s, company.obj=%s)".format(person.get,person.obj,company.get,company.obj)
+  override def toString =
+    "PersonCompany(person.is=%s, person.obj=%s, company.is=%s, company.obj=%s)"
+      .format(person.get, person.obj, company.get, company.obj)
 }
 object PersonCompany extends PersonCompany with MetaMapper[PersonCompany]
-

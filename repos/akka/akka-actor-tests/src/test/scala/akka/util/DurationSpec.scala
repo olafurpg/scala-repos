@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.util
 
 import language.postfixOps
@@ -92,7 +92,5 @@ class DurationSpec extends AkkaSpec {
       dead.timeLeft should be < (1 second: Duration)
       dead2.timeLeft should be < (1 second: Duration)
     }
-
   }
-
 }

@@ -27,13 +27,10 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
       val rden: BigInt = r.d / dgcd
       val num: BigInt = rden * n + r.n * lden
       val ngcd: BigInt = num.gcd(dgcd)
-      if (ngcd == 1)
-        new BigIntRational(num, lden * r.d)
-      else
-        new BigIntRational(num / ngcd, (r.d / ngcd) * lden)
+      if (ngcd == 1) new BigIntRational(num, lden * r.d)
+      else new BigIntRational(num / ngcd, (r.d / ngcd) * lden)
     }
   }
-
 
   def -(r: BigIntRational): BigIntRational = {
     val dgcd: BigInt = d.gcd(r.d)
@@ -44,20 +41,16 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
       val rden: BigInt = r.d / dgcd
       val num: BigInt = rden * n - r.n * lden
       val ngcd: BigInt = num.gcd(dgcd)
-      if (ngcd == 1)
-        new BigIntRational(num, lden * r.d)
-      else
-        new BigIntRational(num / ngcd, (r.d / ngcd) * lden)
+      if (ngcd == 1) new BigIntRational(num, lden * r.d)
+      else new BigIntRational(num / ngcd, (r.d / ngcd) * lden)
     }
   }
-
 
   def *(r: BigIntRational): BigIntRational = {
     val a = n.gcd(r.d)
     val b = d.gcd(r.n)
     new BigIntRational((n / a) * (r.n / b), (d / b) * (r.d / a))
   }
-
 
   def /(r: BigIntRational): BigIntRational = {
     val a = n.gcd(r.n)
@@ -71,20 +64,19 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
     }
   }
 
-  def pow(exp: Int): BigIntRational = if (exp == 0) {
-    BigIntRational.One
-  } else if (exp < 0) {
-    new BigIntRational(d pow exp.abs, n pow exp.abs)
-  } else {
-    new BigIntRational(n pow exp, d pow exp)
-  }
+  def pow(exp: Int): BigIntRational =
+    if (exp == 0) {
+      BigIntRational.One
+    } else if (exp < 0) {
+      new BigIntRational(d pow exp.abs, n pow exp.abs)
+    } else {
+      new BigIntRational(n pow exp, d pow exp)
+    }
 
   def compare(r: BigIntRational): Int = {
     val dgcd = d.gcd(r.d)
-    if (dgcd == 1)
-      (n * r.d - r.n * d).signum
-    else
-      ((r.d / dgcd) * n - (d / dgcd) * r.n).signum
+    if (dgcd == 1) (n * r.d - r.n * d).signum
+    else ((r.d / dgcd) * n - (d / dgcd) * r.n).signum
   }
 
   def signum: Int = n.signum

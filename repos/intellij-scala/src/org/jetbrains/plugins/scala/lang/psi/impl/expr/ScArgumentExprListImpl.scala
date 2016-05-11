@@ -12,11 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 07.03.2008
-*/
-
-class ScArgumentExprListImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScArgumentExprList {
+  * @author Alexander Podkhalyuzin
+  * Date: 07.03.2008
+  */
+class ScArgumentExprListImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScArgumentExprList {
   override def toString: String = "ArgumentList"
 
   def invocationCount: Int = {
@@ -75,11 +75,13 @@ class ScArgumentExprListImpl(node: ASTNode) extends ScalaPsiElementImpl(node) wi
   override def addBefore(element: PsiElement, anchor: PsiElement): PsiElement = {
     if (anchor == null) {
       if (exprs.isEmpty) {
-        val par: PsiElement = findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS)
+        val par: PsiElement =
+          findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS)
         if (par == null) return super.addBefore(element, anchor)
         super.addAfter(element, par)
       } else {
-        val par: PsiElement = findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS)
+        val par: PsiElement =
+          findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS)
         if (par == null) return super.addBefore(element, anchor)
         val comma = ScalaPsiElementFactory.createComma(getManager)
         super.addAfter(par, comma)
@@ -105,7 +107,8 @@ class ScArgumentExprListImpl(node: ASTNode) extends ScalaPsiElementImpl(node) wi
     this
   }
 
-  def addExprAfter(expr: ScExpression, anchor: PsiElement): ScArgumentExprList = {
+  def addExprAfter(
+      expr: ScExpression, anchor: PsiElement): ScArgumentExprList = {
     val nextNode = anchor.getNode.getTreeNext
     val comma = ScalaPsiElementFactory.createComma(getManager)
     val space = ScalaPsiElementFactory.createNewLineNode(getManager, " ")

@@ -39,10 +39,10 @@ import akka.dispatch._
 import akka.util.Duration
 
 import blueeyes.util.Clock
-import blueeyes.core.http.{ MimeType, MimeTypes }
+import blueeyes.core.http.{MimeType, MimeTypes}
 import blueeyes.json._
 import blueeyes.bkka._
-import blueeyes.json.serialization.DefaultSerialization.{ DateTimeExtractor => _, DateTimeDecomposer => _, _ }
+import blueeyes.json.serialization.DefaultSerialization.{DateTimeExtractor => _, DateTimeDecomposer => _, _}
 
 import org.specs2.mutable.Specification
 
@@ -58,28 +58,47 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
 
   val actorSystem = ActorSystem("managedQueryModuleSpec")
   val jobActorSystem = ActorSystem("managedQueryModuleSpecJobActorSystem")
-  implicit val executionContext = ExecutionContext.defaultExecutionContext(actorSystem)
-  implicit val M: Monad[Future] with Comonad[Future] = new blueeyes.bkka.UnsafeFutureComonad(executionContext, Duration(15, "seconds"))
+  implicit val executionContext =
+    ExecutionContext.defaultExecutionContext(actorSystem)
+  implicit val M: Monad[Future] with Comonad[Future] =
+    new blueeyes.bkka.UnsafeFutureComonad(
+        executionContext, Duration(15, "seconds"))
   val defaultTimeout = Duration(90, TimeUnit.SECONDS)
 
   val jobManager: JobManager[Future] = new InMemoryJobManager[Future]
   val apiKey = "O.o"
-  val account = AccountDetails("test", "test@test.test", clock.now(), apiKey, Path.Root, AccountPlan.Free)
+  val account = AccountDetails("test",
+                               "test@test.test",
+                               clock.now(),
+                               apiKey,
+                               Path.Root,
+                               AccountPlan.Free)
   val ticker = actorSystem.actorOf(Props(new Ticker(ticks)))
 
-  def execute(numTicks: Int, ticksToTimeout: Option[Int] = None): Future[JobId] = {
-    val timeout = ticksToTimeout map { t => Duration(clock.duration * t, TimeUnit.MILLISECONDS) }
+  def execute(
+      numTicks: Int, ticksToTimeout: Option[Int] = None): Future[JobId] = {
+    val timeout =
+      ticksToTimeout map { t =>
+        Duration(clock.duration * t, TimeUnit.MILLISECONDS)
+      }
     val executionResult = for {
-      executor <- asyncExecutorFor(apiKey) leftMap { EvaluationError.invalidState }
-      ctx = EvaluationContext(apiKey, account, Path("/\\\\/\\///\\/"), Path.Root, clock.now())
-      result <- executor.execute(numTicks.toString, ctx, QueryOptions(timeout = timeout))
-    } yield result 
+      executor <- asyncExecutorFor(apiKey) leftMap {
+        EvaluationError.invalidState
+      }
+      ctx = EvaluationContext(
+          apiKey, account, Path("/\\\\/\\///\\/"), Path.Root, clock.now())
+      result <- executor.execute(
+          numTicks.toString, ctx, QueryOptions(timeout = timeout))
+    } yield result
 
     executionResult.valueOr(err => sys.error(err.toString))
   }
 
   def cancel(jobId: JobId, ticks: Int): Future[Boolean] = schedule(ticks) {
-    jobManager.cancel(jobId, "Yarrrr", yggConfig.clock.now()).map (_.fold(_ => false, _ => true)).copoint
+    jobManager
+      .cancel(jobId, "Yarrrr", yggConfig.clock.now())
+      .map(_.fold(_ => false, _ => true))
+      .copoint
   }
 
   def poll(jobId: JobId): Future[Option[(Option[MimeType], String)]] = {
@@ -87,7 +106,9 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
       case Left(_) =>
         Future(None)
       case Right((mimeType, stream)) =>
-        stream.foldLeft(new Array[Byte](0))(_ ++ _) map { data => Some(mimeType -> new String(data, "UTF-8")) }
+        stream.foldLeft(new Array[Byte](0))(_ ++ _) map { data =>
+          Some(mimeType -> new String(data, "UTF-8"))
+        }
     }
   }
 
@@ -107,8 +128,9 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
   }
 
   step {
-    actorSystem.scheduler.schedule(Duration(0, "milliseconds"), Duration(clock.duration, "milliseconds")) {
-        ticker ! Tick
+    actorSystem.scheduler.schedule(Duration(0, "milliseconds"),
+                                   Duration(clock.duration, "milliseconds")) {
+      ticker ! Tick
     }
 
     startup.copoint
@@ -170,11 +192,14 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
   }
 }
 
-trait TestManagedPlatform extends ManagedExecution with ManagedQueryModule with SchedulableFuturesModule { self =>
+trait TestManagedPlatform
+    extends ManagedExecution with ManagedQueryModule
+    with SchedulableFuturesModule {
+  self =>
   def actorSystem: ActorSystem
   implicit def executionContext: ExecutionContext
   implicit def M: Monad[Future]
-  
+
   val jobManager: JobManager[Future]
 
   type YggConfig = ManagedQueryModuleConfig
@@ -184,19 +209,23 @@ trait TestManagedPlatform extends ManagedExecution with ManagedQueryModule with 
     val clock = self.clock
   }
 
-  protected def executor(implicit shardQueryMonad: JobQueryTFMonad): QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] = {
+  protected def executor(implicit shardQueryMonad: JobQueryTFMonad)
+    : QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] = {
     new QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] {
 
       import UserQuery.Serialization._
 
       def execute(query: String, ctx: EvaluationContext, opts: QueryOptions) = {
         val numTicks = query.toInt
-        EitherT.right[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {
+        EitherT
+          .right[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {
           schedule(0) {
             StreamT.unfoldM[JobQueryTF, Slice, Int](0) {
               case i if i < numTicks =>
                 schedule(1) {
-                  Some((Slice.fromJValues(Stream(JObject("value" -> JString(".")))), i + 1))
+                  Some((Slice.fromJValues(
+                            Stream(JObject("value" -> JString(".")))),
+                        i + 1))
                 }.liftM[JobQueryT]
 
               case _ =>
@@ -208,14 +237,20 @@ trait TestManagedPlatform extends ManagedExecution with ManagedQueryModule with 
     }
   }
 
-  def asyncExecutorFor(apiKey: APIKey): EitherT[Future, String, QueryExecutor[Future, JobId]] = {
-    EitherT.right(Future(new AsyncQueryExecutor {
+  def asyncExecutorFor(apiKey: APIKey)
+    : EitherT[Future, String, QueryExecutor[Future, JobId]] = {
+    EitherT.right(
+        Future(new AsyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }
 
-  def syncExecutorFor(apiKey: APIKey): EitherT[Future, String, QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]] = {
-    EitherT.right(Future(new SyncQueryExecutor {
+  def syncExecutorFor(apiKey: APIKey): EitherT[
+      Future,
+      String,
+      QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]] = {
+    EitherT.right(
+        Future(new SyncQueryExecutor {
       val executionContext = self.executionContext
     }))
   }

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,37 +31,37 @@ import javafx.{print => jfxp}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /**
- * Companion Object for [[scalafx.print.PrintQuality]].
- */
+  * Companion Object for [[scalafx.print.PrintQuality]].
+  */
 object PrintQuality
-  extends SFXEnumDelegateCompanion[jfxp.PrintQuality, PrintQuality] {
+    extends SFXEnumDelegateCompanion[jfxp.PrintQuality, PrintQuality] {
 
   /**
-   * Specify DRAFT quality printing.
-   */
+    * Specify DRAFT quality printing.
+    */
   val Draft = new PrintQuality(jfxp.PrintQuality.DRAFT)
 
   /**
-   * Specify HIGH quality printing.
-   */
+    * Specify HIGH quality printing.
+    */
   val High = new PrintQuality(jfxp.PrintQuality.HIGH)
 
   /**
-   * Specify LOW quality printing.
-   */
+    * Specify LOW quality printing.
+    */
   val Low = new PrintQuality(jfxp.PrintQuality.LOW)
 
   /**
-   * Specify NORMAL quality printing.
-   */
+    * Specify NORMAL quality printing.
+    */
   val Normal = new PrintQuality(jfxp.PrintQuality.NORMAL)
 
-  protected override def unsortedValues: Array[PrintQuality] = Array(Draft, High, Low, Normal)
-
+  protected override def unsortedValues: Array[PrintQuality] =
+    Array(Draft, High, Low, Normal)
 }
 
 /**
- * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintQuality.html JavaFX PrintQuality]].
- */
+  * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintQuality.html JavaFX PrintQuality]].
+  */
 sealed case class PrintQuality(override val delegate: jfxp.PrintQuality)
-  extends SFXEnumDelegate[jfxp.PrintQuality]
+    extends SFXEnumDelegate[jfxp.PrintQuality]

@@ -39,13 +39,14 @@ private[r] object SQLUtils {
     new JavaSparkContext(sqlCtx.sparkContext)
   }
 
-  def createStructType(fields : Seq[StructField]): StructType = {
+  def createStructType(fields: Seq[StructField]): StructType = {
     StructType(fields)
   }
 
   // Support using regex in string interpolation
   private[this] implicit class RegexContext(sc: StringContext) {
-    def r: Regex = new Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
+    def r: Regex =
+      new Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
   }
 
   def getSQLDataType(dataType: String): DataType = {
@@ -63,24 +64,27 @@ private[r] object SQLUtils {
       case "boolean" => org.apache.spark.sql.types.BooleanType
       case "timestamp" => org.apache.spark.sql.types.TimestampType
       case "date" => org.apache.spark.sql.types.DateType
-      case r"\Aarray<(.+)${elemType}>\Z" =>
+      case r"\Aarray<(.+)${ elemType }>\Z" =>
         org.apache.spark.sql.types.ArrayType(getSQLDataType(elemType))
-      case r"\Amap<(.+)${keyType},(.+)${valueType}>\Z" =>
+      case r"\Amap<(.+)${ keyType },(.+)${ valueType }>\Z" =>
         if (keyType != "string" && keyType != "character") {
-          throw new IllegalArgumentException("Key type of a map must be string or character")
+          throw new IllegalArgumentException(
+              "Key type of a map must be string or character")
         }
-        org.apache.spark.sql.types.MapType(getSQLDataType(keyType), getSQLDataType(valueType))
-      case r"\Astruct<(.+)${fieldsStr}>\Z" =>
+        org.apache.spark.sql.types
+          .MapType(getSQLDataType(keyType), getSQLDataType(valueType))
+      case r"\Astruct<(.+)${ fieldsStr }>\Z" =>
         if (fieldsStr(fieldsStr.length - 1) == ',') {
           throw new IllegalArgumentException(s"Invaid type $dataType")
         }
         val fields = fieldsStr.split(",")
         val structFields = fields.map { field =>
           field match {
-            case r"\A(.+)${fieldName}:(.+)${fieldType}\Z" =>
+            case r"\A(.+)${ fieldName }:(.+)${ fieldType }\Z" =>
               createStructField(fieldName, fieldType, true)
 
-            case _ => throw new IllegalArgumentException(s"Invaid type $dataType")
+            case _ =>
+              throw new IllegalArgumentException(s"Invaid type $dataType")
           }
         }
         createStructType(structFields)
@@ -88,12 +92,15 @@ private[r] object SQLUtils {
     }
   }
 
-  def createStructField(name: String, dataType: String, nullable: Boolean): StructField = {
+  def createStructField(
+      name: String, dataType: String, nullable: Boolean): StructField = {
     val dtObj = getSQLDataType(dataType)
     StructField(name, dtObj, nullable)
   }
 
-  def createDF(rdd: RDD[Array[Byte]], schema: StructType, sqlContext: SQLContext): DataFrame = {
+  def createDF(rdd: RDD[Array[Byte]],
+               schema: StructType,
+               sqlContext: SQLContext): DataFrame = {
     val num = schema.fields.length
     val rowRDD = rdd.map(bytesToRow(_, schema))
     sqlContext.createDataFrame(rowRDD, schema)
@@ -115,7 +122,8 @@ private[r] object SQLUtils {
     val bis = new ByteArrayInputStream(bytes)
     val dis = new DataInputStream(bis)
     val num = SerDe.readInt(dis)
-    Row.fromSeq((0 until num).map { i =>
+    Row.fromSeq(
+        (0 until num).map { i =>
       doConversion(SerDe.readObject(dis), schema.fields(i).dataType)
     }.toSeq)
   }
@@ -153,18 +161,16 @@ private[r] object SQLUtils {
     }
   }
 
-  def loadDF(
-      sqlContext: SQLContext,
-      source: String,
-      options: java.util.Map[String, String]): DataFrame = {
+  def loadDF(sqlContext: SQLContext,
+             source: String,
+             options: java.util.Map[String, String]): DataFrame = {
     sqlContext.read.format(source).options(options).load()
   }
 
-  def loadDF(
-      sqlContext: SQLContext,
-      source: String,
-      schema: StructType,
-      options: java.util.Map[String, String]): DataFrame = {
+  def loadDF(sqlContext: SQLContext,
+             source: String,
+             schema: StructType,
+             options: java.util.Map[String, String]): DataFrame = {
     sqlContext.read.format(source).schema(schema).options(options).load()
   }
 

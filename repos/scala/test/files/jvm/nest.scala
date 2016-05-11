@@ -16,6 +16,6 @@ object Test extends App {
 
   print("Instantiating public inner class: ")
   val outer = new nest
-  val inn   = new outer.Inn(42)
+  val inn = new outer.Inn(42)
   inn.doSomething
 }

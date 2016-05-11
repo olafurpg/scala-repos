@@ -1,4 +1,4 @@
 class C extends B {
-    this: A[_] =>
-    def get = "foo"
+  this: A[_] =>
+  def get = "foo"
 }

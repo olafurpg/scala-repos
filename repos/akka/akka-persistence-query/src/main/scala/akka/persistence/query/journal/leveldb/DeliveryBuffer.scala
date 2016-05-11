@@ -6,9 +6,10 @@ package akka.persistence.query.journal.leveldb
 import akka.stream.actor.ActorPublisher
 
 /**
- * INTERNAL API
- */
-private[akka] trait DeliveryBuffer[T] { _: ActorPublisher[T] ⇒
+  * INTERNAL API
+  */
+private[akka] trait DeliveryBuffer[T] {
+  _: ActorPublisher[T] ⇒
 
   var buf = Vector.empty[T]
 
@@ -27,5 +28,4 @@ private[akka] trait DeliveryBuffer[T] { _: ActorPublisher[T] ⇒
         buf = Vector.empty
       }
     }
-
 }

@@ -18,28 +18,28 @@
 package org.apache.spark.streaming
 
 /**
- * This is a simple class that represents an absolute instant of time.
- * Internally, it represents time as the difference, measured in milliseconds, between the current
- * time and midnight, January 1, 1970 UTC. This is the same format as what is returned by
- * System.currentTimeMillis.
- */
+  * This is a simple class that represents an absolute instant of time.
+  * Internally, it represents time as the difference, measured in milliseconds, between the current
+  * time and midnight, January 1, 1970 UTC. This is the same format as what is returned by
+  * System.currentTimeMillis.
+  */
 case class Time(private val millis: Long) {
 
   def milliseconds: Long = millis
 
-  def < (that: Time): Boolean = (this.millis < that.millis)
+  def <(that: Time): Boolean = (this.millis < that.millis)
 
-  def <= (that: Time): Boolean = (this.millis <= that.millis)
+  def <=(that: Time): Boolean = (this.millis <= that.millis)
 
-  def > (that: Time): Boolean = (this.millis > that.millis)
+  def >(that: Time): Boolean = (this.millis > that.millis)
 
-  def >= (that: Time): Boolean = (this.millis >= that.millis)
+  def >=(that: Time): Boolean = (this.millis >= that.millis)
 
-  def + (that: Duration): Time = new Time(millis + that.milliseconds)
+  def +(that: Duration): Time = new Time(millis + that.milliseconds)
 
-  def - (that: Time): Duration = new Duration(millis - that.millis)
+  def -(that: Time): Duration = new Duration(millis - that.millis)
 
-  def - (that: Duration): Time = new Time(millis - that.milliseconds)
+  def -(that: Duration): Time = new Time(millis - that.milliseconds)
 
   // Java-friendlier versions of the above.
 
@@ -57,7 +57,6 @@ case class Time(private val millis: Long) {
 
   def minus(that: Duration): Time = this - that
 
-
   def floor(that: Duration): Time = {
     val t = that.milliseconds
     new Time((this.millis / t) * t)
@@ -65,7 +64,8 @@ case class Time(private val millis: Long) {
 
   def floor(that: Duration, zeroTime: Time): Time = {
     val t = that.milliseconds
-    new Time(((this.millis - zeroTime.milliseconds) / t) * t + zeroTime.milliseconds)
+    new Time(((this.millis - zeroTime.milliseconds) / t) * t +
+        zeroTime.milliseconds)
   }
 
   def isMultipleOf(that: Duration): Boolean =
@@ -76,16 +76,16 @@ case class Time(private val millis: Long) {
   def max(that: Time): Time = if (this > that) this else that
 
   def until(that: Time, interval: Duration): Seq[Time] = {
-    (this.milliseconds) until (that.milliseconds) by (interval.milliseconds) map (new Time(_))
+    (this.milliseconds) until (that.milliseconds) by (interval.milliseconds) map
+    (new Time(_))
   }
 
   def to(that: Time, interval: Duration): Seq[Time] = {
-    (this.milliseconds) to (that.milliseconds) by (interval.milliseconds) map (new Time(_))
+    (this.milliseconds) to (that.milliseconds) by (interval.milliseconds) map
+    (new Time(_))
   }
 
-
   override def toString: String = (millis.toString + " ms")
-
 }
 
 object Time {

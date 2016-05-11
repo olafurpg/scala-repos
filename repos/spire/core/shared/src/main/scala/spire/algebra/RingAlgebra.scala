@@ -1,24 +1,25 @@
 package spire
 package algebra
 
-
 /**
- * A `RingAlgebra` is a module that is also a `Rng`. An example is the Gaussian
- * numbers.
- */
+  * A `RingAlgebra` is a module that is also a `Rng`. An example is the Gaussian
+  * numbers.
+  */
 trait RingAlgebra[V, @sp R] extends Any with Module[V, R] with Rng[V]
 
 object RingAlgebra {
-  implicit def ZAlgebra[A](implicit vector0: Ring[A], scalar0: Ring[Int]): ZAlgebra[A] = new ZAlgebra[A] {
-    val vector: Ring[A] = vector0
-    val scalar: Ring[Int] = scalar0
-  }
+  implicit def ZAlgebra[A](
+      implicit vector0: Ring[A], scalar0: Ring[Int]): ZAlgebra[A] =
+    new ZAlgebra[A] {
+      val vector: Ring[A] = vector0
+      val scalar: Ring[Int] = scalar0
+    }
 }
 
 /**
- * Given any `Ring[A]` we can construct a `RingAlgebra[A, Int]`. This is
- * possible since we can define `fromInt` on `Ring` generally.
- */
+  * Given any `Ring[A]` we can construct a `RingAlgebra[A, Int]`. This is
+  * possible since we can define `fromInt` on `Ring` generally.
+  */
 trait ZAlgebra[V] extends Any with RingAlgebra[V, Int] with Ring[V] {
   implicit def vector: Ring[V]
   implicit def scalar: Ring[Int]
@@ -36,7 +37,8 @@ trait ZAlgebra[V] extends Any with RingAlgebra[V, Int] with Ring[V] {
 }
 
 /**
- * A `FieldAlgebra` is a vector space that is also a `Ring`. An example is the
- * complex numbers.
- */
-trait FieldAlgebra[V, @sp(Float, Double) F] extends Any with RingAlgebra[V, F] with VectorSpace[V, F]
+  * A `FieldAlgebra` is a vector space that is also a `Ring`. An example is the
+  * complex numbers.
+  */
+trait FieldAlgebra[V, @sp(Float, Double) F]
+    extends Any with RingAlgebra[V, F] with VectorSpace[V, F]

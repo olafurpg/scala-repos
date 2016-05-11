@@ -1,12 +1,12 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.http.javadsl.model
 
 /**
- * Represents an Http media-type. A media-type consists of a main-type and a sub-type.
- *
- */
+  * Represents an Http media-type. A media-type consists of a main-type and a sub-type.
+  *
+  */
 // Has to be defined in Scala even though it's JavaDSL because of:
 // https://issues.scala-lang.org/browse/SI-9621
 object MediaType {
@@ -15,8 +15,7 @@ object MediaType {
     def toContentType: ContentType.Binary
   }
 
-  trait NonBinary extends MediaType {
-  }
+  trait NonBinary extends MediaType {}
 
   trait WithFixedCharset extends NonBinary {
     def toContentType: ContentType.WithFixedCharset
@@ -26,30 +25,29 @@ object MediaType {
     def toContentType(charset: HttpCharset): ContentType.WithCharset
   }
 
-  trait Multipart extends WithOpenCharset {
-  }
-
+  trait Multipart extends WithOpenCharset {}
 }
 
 trait MediaType {
+
   /**
-   * The main-type of this media-type.
-   */
+    * The main-type of this media-type.
+    */
   def mainType: String
 
   /**
-   * The sub-type of this media-type.
-   */
+    * The sub-type of this media-type.
+    */
   def subType: String
 
   /**
-   * True when this media-type is generally compressible.
-   */
+    * True when this media-type is generally compressible.
+    */
   def isCompressible: Boolean
 
   /**
-   * True when this media-type is not character-based.
-   */
+    * True when this media-type is not character-based.
+    */
   def binary: Boolean
 
   def isApplication: Boolean
@@ -67,12 +65,12 @@ trait MediaType {
   def isVideo: Boolean
 
   /**
-   * Creates a media-range from this media-type.
-   */
+    * Creates a media-range from this media-type.
+    */
   def toRange: MediaRange
 
   /**
-   * Creates a media-range from this media-type with a given qValue.
-   */
+    * Creates a media-range from this media-type with a given qValue.
+    */
   def toRange(qValue: Float): MediaRange
 }

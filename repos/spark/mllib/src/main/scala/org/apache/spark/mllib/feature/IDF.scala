@@ -25,19 +25,19 @@ import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors
 import org.apache.spark.rdd.RDD
 
 /**
- * Inverse document frequency (IDF).
- * The standard formulation is used: `idf = log((m + 1) / (d(t) + 1))`, where `m` is the total
- * number of documents and `d(t)` is the number of documents that contain term `t`.
- *
- * This implementation supports filtering out terms which do not appear in a minimum number
- * of documents (controlled by the variable `minDocFreq`). For terms that are not in
- * at least `minDocFreq` documents, the IDF is found as 0, resulting in TF-IDFs of 0.
- *
- * @param minDocFreq minimum of documents in which a term
- *                   should appear for filtering
- */
+  * Inverse document frequency (IDF).
+  * The standard formulation is used: `idf = log((m + 1) / (d(t) + 1))`, where `m` is the total
+  * number of documents and `d(t)` is the number of documents that contain term `t`.
+  *
+  * This implementation supports filtering out terms which do not appear in a minimum number
+  * of documents (controlled by the variable `minDocFreq`). For terms that are not in
+  * at least `minDocFreq` documents, the IDF is found as 0, resulting in TF-IDFs of 0.
+  *
+  * @param minDocFreq minimum of documents in which a term
+  *                   should appear for filtering
+  */
 @Since("1.1.0")
-class IDF @Since("1.2.0") (@Since("1.2.0") val minDocFreq: Int) {
+class IDF @Since("1.2.0")(@Since("1.2.0") val minDocFreq: Int) {
 
   @Since("1.1.0")
   def this() = this(0)
@@ -45,23 +45,25 @@ class IDF @Since("1.2.0") (@Since("1.2.0") val minDocFreq: Int) {
   // TODO: Allow different IDF formulations.
 
   /**
-   * Computes the inverse document frequency.
-   * @param dataset an RDD of term frequency vectors
-   */
+    * Computes the inverse document frequency.
+    * @param dataset an RDD of term frequency vectors
+    */
   @Since("1.1.0")
   def fit(dataset: RDD[Vector]): IDFModel = {
-    val idf = dataset.treeAggregate(new IDF.DocumentFrequencyAggregator(
-          minDocFreq = minDocFreq))(
-      seqOp = (df, v) => df.add(v),
-      combOp = (df1, df2) => df1.merge(df2)
-    ).idf()
+    val idf = dataset
+      .treeAggregate(
+          new IDF.DocumentFrequencyAggregator(minDocFreq = minDocFreq))(
+          seqOp = (df, v) => df.add(v),
+          combOp = (df1, df2) => df1.merge(df2)
+      )
+      .idf()
     new IDFModel(idf)
   }
 
   /**
-   * Computes the inverse document frequency.
-   * @param dataset a JavaRDD of term frequency vectors
-   */
+    * Computes the inverse document frequency.
+    * @param dataset a JavaRDD of term frequency vectors
+    */
   @Since("1.1.0")
   def fit(dataset: JavaRDD[Vector]): IDFModel = {
     fit(dataset.rdd)
@@ -75,9 +77,9 @@ private object IDF {
 
     /** number of documents */
     private var m = 0L
+
     /** document frequency vector */
     private var df: BDV[Long] = _
-
 
     def this() = this(0)
 
@@ -107,7 +109,7 @@ private object IDF {
           }
         case other =>
           throw new UnsupportedOperationException(
-            s"Only sparse and dense vectors are supported but got ${other.getClass}.")
+              s"Only sparse and dense vectors are supported but got ${other.getClass}.")
       }
       m += 1L
       this
@@ -157,41 +159,43 @@ private object IDF {
 }
 
 /**
- * Represents an IDF model that can transform term frequency vectors.
- */
+  * Represents an IDF model that can transform term frequency vectors.
+  */
 @Since("1.1.0")
-class IDFModel private[spark] (@Since("1.1.0") val idf: Vector) extends Serializable {
+class IDFModel private[spark](@Since("1.1.0") val idf: Vector)
+    extends Serializable {
 
   /**
-   * Transforms term frequency (TF) vectors to TF-IDF vectors.
-   *
-   * If `minDocFreq` was set for the IDF calculation,
-   * the terms which occur in fewer than `minDocFreq`
-   * documents will have an entry of 0.
-   *
-   * @param dataset an RDD of term frequency vectors
-   * @return an RDD of TF-IDF vectors
-   */
+    * Transforms term frequency (TF) vectors to TF-IDF vectors.
+    *
+    * If `minDocFreq` was set for the IDF calculation,
+    * the terms which occur in fewer than `minDocFreq`
+    * documents will have an entry of 0.
+    *
+    * @param dataset an RDD of term frequency vectors
+    * @return an RDD of TF-IDF vectors
+    */
   @Since("1.1.0")
   def transform(dataset: RDD[Vector]): RDD[Vector] = {
     val bcIdf = dataset.context.broadcast(idf)
-    dataset.mapPartitions(iter => iter.map(v => IDFModel.transform(bcIdf.value, v)))
+    dataset.mapPartitions(
+        iter => iter.map(v => IDFModel.transform(bcIdf.value, v)))
   }
 
   /**
-   * Transforms a term frequency (TF) vector to a TF-IDF vector
-   *
-   * @param v a term frequency vector
-   * @return a TF-IDF vector
-   */
+    * Transforms a term frequency (TF) vector to a TF-IDF vector
+    *
+    * @param v a term frequency vector
+    * @return a TF-IDF vector
+    */
   @Since("1.3.0")
   def transform(v: Vector): Vector = IDFModel.transform(idf, v)
 
   /**
-   * Transforms term frequency (TF) vectors to TF-IDF vectors (Java version).
-   * @param dataset a JavaRDD of term frequency vectors
-   * @return a JavaRDD of TF-IDF vectors
-   */
+    * Transforms term frequency (TF) vectors to TF-IDF vectors (Java version).
+    * @param dataset a JavaRDD of term frequency vectors
+    * @return a JavaRDD of TF-IDF vectors
+    */
   @Since("1.1.0")
   def transform(dataset: JavaRDD[Vector]): JavaRDD[Vector] = {
     transform(dataset.rdd).toJavaRDD()
@@ -201,12 +205,12 @@ class IDFModel private[spark] (@Since("1.1.0") val idf: Vector) extends Serializ
 private object IDFModel {
 
   /**
-   * Transforms a term frequency (TF) vector to a TF-IDF vector with a IDF vector
-   *
-   * @param idf an IDF vector
-   * @param v a term frequence vector
-   * @return a TF-IDF vector
-   */
+    * Transforms a term frequency (TF) vector to a TF-IDF vector with a IDF vector
+    *
+    * @param idf an IDF vector
+    * @param v a term frequence vector
+    * @return a TF-IDF vector
+    */
   def transform(idf: Vector, v: Vector): Vector = {
     val n = v.size
     v match {
@@ -229,7 +233,7 @@ private object IDFModel {
         Vectors.dense(newValues)
       case other =>
         throw new UnsupportedOperationException(
-          s"Only sparse and dense vectors are supported but got ${other.getClass}.")
+            s"Only sparse and dense vectors are supported but got ${other.getClass}.")
     }
   }
 }

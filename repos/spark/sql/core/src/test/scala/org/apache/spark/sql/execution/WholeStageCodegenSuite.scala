@@ -37,38 +37,59 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
   test("Aggregate should be included in WholeStageCodegen") {
     val df = sqlContext.range(10).groupBy().agg(max(col("id")), avg(col("id")))
     val plan = df.queryExecution.executedPlan
-    assert(plan.find(p =>
-      p.isInstanceOf[WholeStageCodegen] &&
-        p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[TungstenAggregate]).isDefined)
+    assert(
+        plan
+          .find(p =>
+                p.isInstanceOf[WholeStageCodegen] && p
+                  .asInstanceOf[WholeStageCodegen]
+                  .child
+                  .isInstanceOf[TungstenAggregate])
+          .isDefined)
     assert(df.collect() === Array(Row(9, 4.5)))
   }
 
   test("Aggregate with grouping keys should be included in WholeStageCodegen") {
     val df = sqlContext.range(3).groupBy("id").count().orderBy("id")
     val plan = df.queryExecution.executedPlan
-    assert(plan.find(p =>
-      p.isInstanceOf[WholeStageCodegen] &&
-        p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[TungstenAggregate]).isDefined)
+    assert(
+        plan
+          .find(p =>
+                p.isInstanceOf[WholeStageCodegen] && p
+                  .asInstanceOf[WholeStageCodegen]
+                  .child
+                  .isInstanceOf[TungstenAggregate])
+          .isDefined)
     assert(df.collect() === Array(Row(0, 1), Row(1, 1), Row(2, 1)))
   }
 
   test("BroadcastHashJoin should be included in WholeStageCodegen") {
-    val rdd = sqlContext.sparkContext.makeRDD(Seq(Row(1, "1"), Row(1, "1"), Row(2, "2")))
+    val rdd = sqlContext.sparkContext.makeRDD(
+        Seq(Row(1, "1"), Row(1, "1"), Row(2, "2")))
     val schema = new StructType().add("k", IntegerType).add("v", StringType)
     val smallDF = sqlContext.createDataFrame(rdd, schema)
-    val df = sqlContext.range(10).join(broadcast(smallDF), col("k") === col("id"))
-    assert(df.queryExecution.executedPlan.find(p =>
-      p.isInstanceOf[WholeStageCodegen] &&
-        p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[BroadcastHashJoin]).isDefined)
-    assert(df.collect() === Array(Row(1, 1, "1"), Row(1, 1, "1"), Row(2, 2, "2")))
+    val df =
+      sqlContext.range(10).join(broadcast(smallDF), col("k") === col("id"))
+    assert(
+        df.queryExecution.executedPlan
+          .find(p =>
+                p.isInstanceOf[WholeStageCodegen] && p
+                  .asInstanceOf[WholeStageCodegen]
+                  .child
+                  .isInstanceOf[BroadcastHashJoin])
+          .isDefined)
+    assert(
+        df.collect() === Array(Row(1, 1, "1"), Row(1, 1, "1"), Row(2, 2, "2")))
   }
 
   test("Sort should be included in WholeStageCodegen") {
     val df = sqlContext.range(3, 0, -1).toDF().sort(col("id"))
     val plan = df.queryExecution.executedPlan
-    assert(plan.find(p =>
-      p.isInstanceOf[WholeStageCodegen] &&
-        p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[Sort]).isDefined)
+    assert(
+        plan
+          .find(p =>
+                p.isInstanceOf[WholeStageCodegen] &&
+                p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[Sort])
+          .isDefined)
     assert(df.collect() === Array(Row(1), Row(2), Row(3)))
   }
 }

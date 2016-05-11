@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.core
 
 import io.prediction.annotation.DeveloperApi
@@ -29,6 +28,7 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 abstract class BaseDataSource[TD, EI, Q, A] extends AbstractDoer {
+
   /** :: DeveloperApi ::
     * Engine developer should not use this directly. This is called by workflow
     * to read training data.

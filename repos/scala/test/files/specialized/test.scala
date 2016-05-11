@@ -4,6 +4,7 @@ object Test {
   // stack trace suppression system property, so I boosted the count.
   def main(args: Array[String]) {
     assert(runtime.BoxesRunTime.booleanBoxCount < 10,
-      "Expected no more than 10 boolean boxings, found " + runtime.BoxesRunTime.booleanBoxCount)
+           "Expected no more than 10 boolean boxings, found " +
+           runtime.BoxesRunTime.booleanBoxCount)
   }
 }

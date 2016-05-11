@@ -1,4 +1,3 @@
-
 import tools.partest.DirectTest
 
 import java.io.File
@@ -14,4 +13,3 @@ object Test extends DirectTest {
     compile("-Xdev", s"-Xplugin:$tmp", "-Xpluginsdir", tmp)
   }
 }
-

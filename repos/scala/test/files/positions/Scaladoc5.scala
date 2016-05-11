@@ -1,8 +1,6 @@
 /**
- * Foo
- */
+  * Foo
+  */
 package positions
 
-object Scaladoc5 {
-
-}
+object Scaladoc5 {}

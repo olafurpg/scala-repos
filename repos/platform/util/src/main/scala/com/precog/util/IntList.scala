@@ -27,7 +27,8 @@ import scala.annotation.tailrec
 // Once we move to 2.10, we can abstract this to a specialized-list. In 2.9,
 // specialization is just too buggy to get it working (tried).
 
-sealed trait IntList extends LinearSeq[Int] with LinearSeqOptimized[Int, IntList] { self =>
+sealed trait IntList
+    extends LinearSeq[Int] with LinearSeqOptimized[Int, IntList] { self =>
   def head: Int
   def tail: IntList
 
@@ -80,7 +81,8 @@ sealed trait IntList extends LinearSeq[Int] with LinearSeqOptimized[Int, IntList
   override protected def newBuilder = new IntListBuilder
 }
 
-final case class IntCons(override val head: Int, override val tail: IntList) extends IntList {
+final case class IntCons(override val head: Int, override val tail: IntList)
+    extends IntList {
   override def isEmpty: Boolean = false
 }
 

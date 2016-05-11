@@ -16,6 +16,7 @@ object Test {
     assert(java.lang.Float.floatToIntBits(math.signum(-0f)) == 0x80000000)
 
     assert(java.lang.Double.doubleToLongBits(math.signum(0d)) == 0x0L)
-    assert(java.lang.Double.doubleToLongBits(math.signum(-0d)) == 0x8000000000000000L)
+    assert(
+        java.lang.Double.doubleToLongBits(math.signum(-0d)) == 0x8000000000000000L)
   }
 }

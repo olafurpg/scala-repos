@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.routing
 
 import scala.collection.immutable
@@ -9,20 +8,22 @@ import scala.reflect.ClassTag
 import java.util.Arrays
 
 /**
- * Consistent Hashing node ring implementation.
- *
- * A good explanation of Consistent Hashing:
- * http://weblogs.java.net/blog/tomwhite/archive/2007/11/consistent_hash.html
- *
- * Note that toString of the ring nodes are used for the node
- * hash, i.e. make sure it is different for different nodes.
- *
- */
-class ConsistentHash[T: ClassTag] private (nodes: immutable.SortedMap[Int, T], val virtualNodesFactor: Int) {
+  * Consistent Hashing node ring implementation.
+  *
+  * A good explanation of Consistent Hashing:
+  * http://weblogs.java.net/blog/tomwhite/archive/2007/11/consistent_hash.html
+  *
+  * Note that toString of the ring nodes are used for the node
+  * hash, i.e. make sure it is different for different nodes.
+  *
+  */
+class ConsistentHash[T : ClassTag] private (
+    nodes: immutable.SortedMap[Int, T], val virtualNodesFactor: Int) {
 
   import ConsistentHash._
 
-  if (virtualNodesFactor < 1) throw new IllegalArgumentException("virtualNodesFactor must be >= 1")
+  if (virtualNodesFactor < 1)
+    throw new IllegalArgumentException("virtualNodesFactor must be >= 1")
 
   // arrays for fast binary search and access
   // nodeHashRing is the sorted hash values of the nodes
@@ -33,39 +34,45 @@ class ConsistentHash[T: ClassTag] private (nodes: immutable.SortedMap[Int, T], v
   }
 
   /**
-   * Adds a node to the node ring.
-   * Note that the instance is immutable and this
-   * operation returns a new instance.
-   */
+    * Adds a node to the node ring.
+    * Note that the instance is immutable and this
+    * operation returns a new instance.
+    */
   def :+(node: T): ConsistentHash[T] = {
     val nodeHash = hashFor(node.toString)
-    new ConsistentHash(nodes ++ ((1 to virtualNodesFactor) map { r ⇒ (concatenateNodeHash(nodeHash, r) -> node) }),
-      virtualNodesFactor)
+    new ConsistentHash(nodes ++
+                       ((1 to virtualNodesFactor) map { r ⇒
+                             (concatenateNodeHash(nodeHash, r) -> node)
+                           }),
+                       virtualNodesFactor)
   }
 
   /**
-   * Java API: Adds a node to the node ring.
-   * Note that the instance is immutable and this
-   * operation returns a new instance.
-   */
+    * Java API: Adds a node to the node ring.
+    * Note that the instance is immutable and this
+    * operation returns a new instance.
+    */
   def add(node: T): ConsistentHash[T] = this :+ node
 
   /**
-   * Removes a node from the node ring.
-   * Note that the instance is immutable and this
-   * operation returns a new instance.
-   */
+    * Removes a node from the node ring.
+    * Note that the instance is immutable and this
+    * operation returns a new instance.
+    */
   def :-(node: T): ConsistentHash[T] = {
     val nodeHash = hashFor(node.toString)
-    new ConsistentHash(nodes -- ((1 to virtualNodesFactor) map { r ⇒ concatenateNodeHash(nodeHash, r) }),
-      virtualNodesFactor)
+    new ConsistentHash(nodes --
+                       ((1 to virtualNodesFactor) map { r ⇒
+                             concatenateNodeHash(nodeHash, r)
+                           }),
+                       virtualNodesFactor)
   }
 
   /**
-   * Java API: Removes a node from the node ring.
-   * Note that the instance is immutable and this
-   * operation returns a new instance.
-   */
+    * Java API: Removes a node from the node ring.
+    * Note that the instance is immutable and this
+    * operation returns a new instance.
+    */
   def remove(node: T): ConsistentHash[T] = this :- node
 
   // converts the result of Arrays.binarySearch into a index in the nodeRing array
@@ -80,51 +87,58 @@ class ConsistentHash[T: ClassTag] private (nodes: immutable.SortedMap[Int, T], v
   }
 
   /**
-   * Get the node responsible for the data key.
-   * Can only be used if nodes exists in the node ring,
-   * otherwise throws `IllegalStateException`
-   */
+    * Get the node responsible for the data key.
+    * Can only be used if nodes exists in the node ring,
+    * otherwise throws `IllegalStateException`
+    */
   def nodeFor(key: Array[Byte]): T = {
-    if (isEmpty) throw new IllegalStateException("Can't get node for [%s] from an empty node ring" format key)
+    if (isEmpty)
+      throw new IllegalStateException(
+          "Can't get node for [%s] from an empty node ring" format key)
 
     nodeRing(idx(Arrays.binarySearch(nodeHashRing, hashFor(key))))
   }
 
   /**
-   * Get the node responsible for the data key.
-   * Can only be used if nodes exists in the node ring,
-   * otherwise throws `IllegalStateException`
-   */
+    * Get the node responsible for the data key.
+    * Can only be used if nodes exists in the node ring,
+    * otherwise throws `IllegalStateException`
+    */
   def nodeFor(key: String): T = {
-    if (isEmpty) throw new IllegalStateException("Can't get node for [%s] from an empty node ring" format key)
+    if (isEmpty)
+      throw new IllegalStateException(
+          "Can't get node for [%s] from an empty node ring" format key)
 
     nodeRing(idx(Arrays.binarySearch(nodeHashRing, hashFor(key))))
   }
 
   /**
-   * Is the node ring empty, i.e. no nodes added or all removed.
-   */
+    * Is the node ring empty, i.e. no nodes added or all removed.
+    */
   def isEmpty: Boolean = nodes.isEmpty
-
 }
 
 object ConsistentHash {
-  def apply[T: ClassTag](nodes: Iterable[T], virtualNodesFactor: Int): ConsistentHash[T] = {
-    new ConsistentHash(immutable.SortedMap.empty[Int, T] ++
-      (for {
-        node ← nodes
-        nodeHash = hashFor(node.toString)
-        vnode ← 1 to virtualNodesFactor
-      } yield (concatenateNodeHash(nodeHash, vnode) -> node)),
-      virtualNodesFactor)
+  def apply[T : ClassTag](
+      nodes: Iterable[T], virtualNodesFactor: Int): ConsistentHash[T] = {
+    new ConsistentHash(
+        immutable.SortedMap.empty[Int, T] ++
+        (for {
+              node ← nodes
+              nodeHash = hashFor(node.toString)
+              vnode ← 1 to virtualNodesFactor
+            } yield (concatenateNodeHash(nodeHash, vnode) -> node)),
+        virtualNodesFactor)
   }
 
   /**
-   * Java API: Factory method to create a ConsistentHash
-   */
-  def create[T](nodes: java.lang.Iterable[T], virtualNodesFactor: Int): ConsistentHash[T] = {
+    * Java API: Factory method to create a ConsistentHash
+    */
+  def create[T](nodes: java.lang.Iterable[T],
+                virtualNodesFactor: Int): ConsistentHash[T] = {
     import scala.collection.JavaConverters._
-    apply(nodes.asScala, virtualNodesFactor)(ClassTag(classOf[Any].asInstanceOf[Class[T]]))
+    apply(nodes.asScala, virtualNodesFactor)(
+        ClassTag(classOf[Any].asInstanceOf[Class[T]]))
   }
 
   private def concatenateNodeHash(nodeHash: Int, vnode: Int): Int = {

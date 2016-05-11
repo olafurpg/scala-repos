@@ -6,7 +6,7 @@ class Fail1 extends A {
   var x: Int
 }
 
-class Fail2 extends A { }
+class Fail2 extends A {}
 
 class Fail3 extends A {
   val x: Int = 5

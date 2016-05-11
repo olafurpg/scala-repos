@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.library
 
@@ -33,7 +33,8 @@ class WrappedDictionaryTest {
     val dict = js.Dictionary[String]()
     val map: mutable.Map[String, String] = dict
 
-    assertArrayEquals(Array[AnyRef](), js.Object.properties(dict).toArray[AnyRef])
+    assertArrayEquals(
+        Array[AnyRef](), js.Object.properties(dict).toArray[AnyRef])
 
     map += "hello" -> "world"
     assertEquals("world", dict("hello"))
@@ -41,7 +42,8 @@ class WrappedDictionaryTest {
     assertEquals("bar", dict("foo"))
     map -= "hello"
     assertFalse(dict.get("hello").isDefined)
-    assertArrayEquals(Array[AnyRef]("foo"), js.Object.properties(dict).toArray[AnyRef])
+    assertArrayEquals(
+        Array[AnyRef]("foo"), js.Object.properties(dict).toArray[AnyRef])
   }
 
   @Test def iterator(): Unit = {
@@ -57,12 +59,12 @@ class WrappedDictionaryTest {
   // Some arbitrary methods to test the builders
 
   @Test def map(): Unit = {
-    def ct[A: ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
+    def ct[A : ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
     val dict = js.Dictionary[Int]()
     dict ++= Seq("one" -> 1, "two" -> 2, "three" -> 3)
 
-    val mapChr = dict.map { case (k,v) => k(0)          -> v * 2 }
-    val mapStr = dict.map { case (k,v) => k(0).toString -> v * 2 }
+    val mapChr = dict.map { case (k, v) => k(0) -> v * 2 }
+    val mapStr = dict.map { case (k, v) => k(0).toString -> v * 2 }
 
     assertFalse(ct(mapChr).runtimeClass == classOf[js.WrappedDictionary[_]])
     assertTrue(ct(mapStr).runtimeClass == classOf[js.WrappedDictionary[_]])
@@ -73,7 +75,7 @@ class WrappedDictionaryTest {
 
   @Test def withFilter(): Unit = {
     val dict = js.Dictionary[Int]()
-    val flt = dict.withFilter { case (k,v) => v > 5 || k == "a" }
+    val flt = dict.withFilter { case (k, v) => v > 5 || k == "a" }
     def size: Int = flt.map(x => x).size
 
     assertEquals(0, size)
@@ -100,5 +102,4 @@ class WrappedDictionaryTest {
     val list = dict.to[List]
     assertEquals(3, list.size)
   }
-
 }

@@ -29,24 +29,27 @@ import org.apache.spark.util.Utils
 import org.apache.spark.util.io.ChunkedByteBuffer
 
 /**
- * Stores BlockManager blocks on disk.
- */
-private[spark] class DiskStore(conf: SparkConf, diskManager: DiskBlockManager) extends Logging {
+  * Stores BlockManager blocks on disk.
+  */
+private[spark] class DiskStore(conf: SparkConf, diskManager: DiskBlockManager)
+    extends Logging {
 
-  private val minMemoryMapBytes = conf.getSizeAsBytes("spark.storage.memoryMapThreshold", "2m")
+  private val minMemoryMapBytes =
+    conf.getSizeAsBytes("spark.storage.memoryMapThreshold", "2m")
 
   def getSize(blockId: BlockId): Long = {
     diskManager.getFile(blockId.name).length
   }
 
   /**
-   * Invokes the provided callback function to write the specific block.
-   *
-   * @throws IllegalStateException if the block already exists in the disk store.
-   */
+    * Invokes the provided callback function to write the specific block.
+    *
+    * @throws IllegalStateException if the block already exists in the disk store.
+    */
   def put(blockId: BlockId)(writeFunc: FileOutputStream => Unit): Unit = {
     if (contains(blockId)) {
-      throw new IllegalStateException(s"Block $blockId is already present in the disk store")
+      throw new IllegalStateException(
+          s"Block $blockId is already present in the disk store")
     }
     logDebug(s"Attempting to put block $blockId")
     val startTime = System.currentTimeMillis
@@ -60,16 +63,17 @@ private[spark] class DiskStore(conf: SparkConf, diskManager: DiskBlockManager) e
       try {
         Closeables.close(fileOutputStream, threwException)
       } finally {
-         if (threwException) {
+        if (threwException) {
           remove(blockId)
         }
       }
     }
     val finishTime = System.currentTimeMillis
-    logDebug("Block %s stored as %s file on disk in %d ms".format(
-      file.getName,
-      Utils.bytesToString(file.length()),
-      finishTime - startTime))
+    logDebug(
+        "Block %s stored as %s file on disk in %d ms".format(
+            file.getName,
+            Utils.bytesToString(file.length()),
+            finishTime - startTime))
   }
 
   def putBytes(blockId: BlockId, bytes: ChunkedByteBuffer): Unit = {
@@ -94,7 +98,7 @@ private[spark] class DiskStore(conf: SparkConf, diskManager: DiskBlockManager) e
         while (buf.remaining() != 0) {
           if (channel.read(buf) == -1) {
             throw new IOException("Reached EOF before filling buffer\n" +
-              s"offset=0\nfile=${file.getAbsolutePath}\nbuf.remaining=${buf.remaining}")
+                s"offset=0\nfile=${file.getAbsolutePath}\nbuf.remaining=${buf.remaining}")
           }
         }
         buf.flip()

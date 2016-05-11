@@ -16,7 +16,6 @@ class ParserUtilsBenchmark extends StdBenchAnnotations {
     pos.i += 1
     ParserUtils.isDigits(pos.inputs(idx))
   }
-
 }
 
 object ParserUtilsBenchmark {
@@ -31,8 +30,7 @@ object ParserUtilsBenchmark {
     ChannelBuffers.copiedBuffer(rnd.nextString(5), Charsets.Utf8)
   }
 
-  private val _inputs =
-    (numbers ++ strings).toIndexedSeq
+  private val _inputs = (numbers ++ strings).toIndexedSeq
 
   @State(Scope.Thread)
   class Position {
@@ -40,5 +38,4 @@ object ParserUtilsBenchmark {
 
     def inputs: IndexedSeq[ChannelBuffer] = ParserUtilsBenchmark._inputs
   }
-
 }

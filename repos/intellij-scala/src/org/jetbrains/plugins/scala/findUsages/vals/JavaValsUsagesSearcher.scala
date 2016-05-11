@@ -14,12 +14,13 @@ import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
 import org.jetbrains.plugins.scala.lang.psi.light.{PsiTypedDefinitionWrapper, StaticPsiTypedDefinitionWrapper}
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 08.09.2009
- */
-
-class JavaValsUsagesSearcher extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
-  def execute(queryParameters: ReferencesSearch.SearchParameters, consumer: Processor[PsiReference]): Boolean = {
+  * User: Alexander Podkhalyuzin
+  * Date: 08.09.2009
+  */
+class JavaValsUsagesSearcher
+    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
+  def execute(queryParameters: ReferencesSearch.SearchParameters,
+              consumer: Processor[PsiReference]): Boolean = {
     val scope = inReadAction(queryParameters.getEffectiveSearchScope)
     val element = queryParameters.getElementToSearch
     element match {
@@ -32,13 +33,16 @@ class JavaValsUsagesSearcher extends QueryExecutor[PsiReference, ReferencesSearc
             for (ref <- references) {
               inReadAction {
                 ref match {
-                  case refElement: PsiReferenceExpression if ref.getRangeInElement.contains(offsetInElement) =>
+                  case refElement: PsiReferenceExpression
+                      if ref.getRangeInElement.contains(offsetInElement) =>
                     refElement.resolve match {
                       case f: FakePsiMethod if f.navElement == vals =>
                         if (!consumer.process(refElement)) return false
-                      case t: StaticPsiTypedDefinitionWrapper if t.typedDefinition == vals =>
+                      case t: StaticPsiTypedDefinitionWrapper
+                          if t.typedDefinition == vals =>
                         if (!consumer.process(refElement)) return false
-                      case t: PsiTypedDefinitionWrapper if t.typedDefinition == vals =>
+                      case t: PsiTypedDefinitionWrapper
+                          if t.typedDefinition == vals =>
                         if (!consumer.process(refElement)) return false
                       case _ =>
                     }
@@ -49,9 +53,12 @@ class JavaValsUsagesSearcher extends QueryExecutor[PsiReference, ReferencesSearc
             true
           }
         }
-        val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-        helper.processElementsWithWord(processor, scope, name, UsageSearchContext.IN_CODE, true)
-      case wrapper: PsiTypedDefinitionWrapper => //only this is added for find usages factory
+        val helper: PsiSearchHelper =
+          PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
+        helper.processElementsWithWord(
+            processor, scope, name, UsageSearchContext.IN_CODE, true)
+      case wrapper: PsiTypedDefinitionWrapper =>
+        //only this is added for find usages factory
         val name: String = wrapper.getName
         val processor = new TextOccurenceProcessor {
           def execute(element: PsiElement, offsetInElement: Int): Boolean = {
@@ -59,13 +66,16 @@ class JavaValsUsagesSearcher extends QueryExecutor[PsiReference, ReferencesSearc
             for (ref <- references) {
               inReadAction {
                 ref match {
-                  case refElement: PsiReferenceExpression if ref.getRangeInElement.contains(offsetInElement) =>
+                  case refElement: PsiReferenceExpression
+                      if ref.getRangeInElement.contains(offsetInElement) =>
                     refElement.resolve match {
-                      case t: PsiTypedDefinitionWrapper if t.typedDefinition == wrapper.typedDefinition &&
-                        t.getName == wrapper.getName =>
+                      case t: PsiTypedDefinitionWrapper
+                          if t.typedDefinition == wrapper.typedDefinition &&
+                          t.getName == wrapper.getName =>
                         if (!consumer.process(refElement)) return false
-                      case t: StaticPsiTypedDefinitionWrapper if t.typedDefinition == wrapper.typedDefinition &&
-                        t.getName == wrapper.getName =>
+                      case t: StaticPsiTypedDefinitionWrapper
+                          if t.typedDefinition == wrapper.typedDefinition &&
+                          t.getName == wrapper.getName =>
                         if (!consumer.process(refElement)) return false
                       case _ =>
                     }
@@ -76,8 +86,10 @@ class JavaValsUsagesSearcher extends QueryExecutor[PsiReference, ReferencesSearc
             true
           }
         }
-        val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-        helper.processElementsWithWord(processor, scope, name, UsageSearchContext.IN_CODE, true)
+        val helper: PsiSearchHelper =
+          PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
+        helper.processElementsWithWord(
+            processor, scope, name, UsageSearchContext.IN_CODE, true)
       case _ => true
     }
   }
@@ -85,7 +97,9 @@ class JavaValsUsagesSearcher extends QueryExecutor[PsiReference, ReferencesSearc
   private object scalaValue {
     def unapply(td: ScTypedDefinition) = inReadAction {
       ScalaPsiUtil.nameContext(td) match {
-        case _: ScValue | _: ScVariable | _: ScClassParameter if td.getName != "" => Some(td)
+        case _: ScValue | _: ScVariable | _: ScClassParameter
+            if td.getName != "" =>
+          Some(td)
         case _ => None
       }
     }

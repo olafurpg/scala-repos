@@ -33,18 +33,19 @@ import org.apache.spark.deploy.DeployTestUtils._
 import org.apache.spark.deploy.master._
 import org.apache.spark.rpc.RpcEnv
 
-
 class MasterWebUISuite extends SparkFunSuite with BeforeAndAfter {
 
   val masterPage = mock(classOf[MasterPage])
   val master = {
     val conf = new SparkConf
     val securityMgr = new SecurityManager(conf)
-    val rpcEnv = RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityMgr)
+    val rpcEnv =
+      RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityMgr)
     val master = new Master(rpcEnv, rpcEnv.address, 0, securityMgr, conf)
     master
   }
-  val masterWebUI = new MasterWebUI(master, 0, customMasterPage = Some(masterPage))
+  val masterWebUI = new MasterWebUI(
+      master, 0, customMasterPage = Some(masterPage))
 
   before {
     masterWebUI.bind()
@@ -59,7 +60,7 @@ class MasterWebUISuite extends SparkFunSuite with BeforeAndAfter {
     val appDesc = createAppDesc()
     // use new start date so it isn't filtered by UI
     val activeApp = new ApplicationInfo(
-      new Date().getTime, "id", appDesc, new Date(), null, Int.MaxValue)
+        new Date().getTime, "id", appDesc, new Date(), null, Int.MaxValue)
     activeApp.addExecutor(worker, 2)
 
     val workers = Array[WorkerInfo](worker)
@@ -67,14 +68,21 @@ class MasterWebUISuite extends SparkFunSuite with BeforeAndAfter {
     val completedApps = Array[ApplicationInfo]()
     val activeDrivers = Array[DriverInfo]()
     val completedDrivers = Array[DriverInfo]()
-    val stateResponse = new MasterStateResponse(
-      "host", 8080, None, workers, activeApps, completedApps,
-      activeDrivers, completedDrivers, RecoveryState.ALIVE)
+    val stateResponse = new MasterStateResponse("host",
+                                                8080,
+                                                None,
+                                                workers,
+                                                activeApps,
+                                                completedApps,
+                                                activeDrivers,
+                                                completedDrivers,
+                                                RecoveryState.ALIVE)
 
     when(masterPage.getMasterState).thenReturn(stateResponse)
 
-    val resultJson = Source.fromURL(
-      s"http://localhost:${masterWebUI.boundPort}/api/v1/applications")
+    val resultJson = Source
+      .fromURL(
+          s"http://localhost:${masterWebUI.boundPort}/api/v1/applications")
       .mkString
     val parsedJson = parse(resultJson)
     val firstApp = parsedJson(0)
@@ -86,5 +94,4 @@ class MasterWebUISuite extends SparkFunSuite with BeforeAndAfter {
     assert(firstApp \ "memoryPerExecutorMB" === JInt(1234))
     assert(firstApp \ "coresPerExecutor" === JNothing)
   }
-
 }

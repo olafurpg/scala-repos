@@ -4,10 +4,11 @@ import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class ZeroIndexToHeadInspection extends OperationOnCollectionInspection {
-  override def possibleSimplificationTypes: Array[SimplificationType] = Array(ZeroIndexToHead)
+  override def possibleSimplificationTypes: Array[SimplificationType] =
+    Array(ZeroIndexToHead)
 }
 
 object ZeroIndexToHead extends SimplificationType() {
@@ -15,8 +16,11 @@ object ZeroIndexToHead extends SimplificationType() {
 
   override def getSimplification(expr: ScExpression): Option[Simplification] = {
     expr match {
-      case qual`.apply`(literal("0")) if isSeq(qual) && !isIndexedSeq(qual) =>
-        Some(replace(expr).withText(invocationText(qual, "head")).highlightFrom(qual))
+      case qual `.apply`(literal("0")) if isSeq(qual) && !isIndexedSeq(qual) =>
+        Some(
+            replace(expr)
+              .withText(invocationText(qual, "head"))
+              .highlightFrom(qual))
       case _ => None
     }
   }

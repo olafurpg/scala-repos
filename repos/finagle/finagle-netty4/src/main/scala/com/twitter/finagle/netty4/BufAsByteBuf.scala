@@ -5,9 +5,10 @@ import io.netty.buffer._
 
 private[finagle] object BufAsByteBuf {
   object Owned {
+
     /**
-     * A read-only and potentially non-copying `ByteBuf` wrapper for [[Buf]].
-     */
+      * A read-only and potentially non-copying `ByteBuf` wrapper for [[Buf]].
+      */
     def apply(buf: Buf): ByteBuf = {
       val bb = buf match {
         case _ if buf.isEmpty =>
@@ -22,13 +23,13 @@ private[finagle] object BufAsByteBuf {
 
       Unpooled.unmodifiableBuffer(bb)
     }
-
   }
 
   object Shared {
+
     /**
-     * A read-only copying `ByteBuf` wrapper for [[Buf]]
-     */
+      * A read-only copying `ByteBuf` wrapper for [[Buf]]
+      */
     def apply(buf: Buf): ByteBuf = {
       val bb = buf match {
         case _ if buf.isEmpty =>

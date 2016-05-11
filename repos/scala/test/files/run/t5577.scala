@@ -1,9 +1,4 @@
-
-
-
 import collection._
-
-
 
 object Test {
 
@@ -15,13 +10,13 @@ object Test {
   }
 
   def main(args: Array[String]) {
-    val iteratorBuilder = (new AlarmingBuffer[Int]) mapResult {
-      res => res.iterator
-    }
+    val iteratorBuilder =
+      (new AlarmingBuffer[Int]) mapResult { res =>
+        res.iterator
+      }
 
     iteratorBuilder.sizeHint(10)
     iteratorBuilder ++= (0 until 10)
     iteratorBuilder.result.foreach(println)
   }
-
 }

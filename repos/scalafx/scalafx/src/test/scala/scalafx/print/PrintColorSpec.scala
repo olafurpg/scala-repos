@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 
 /** Tests for [[scalafx.print.PrintColor]]. */
 @RunWith(classOf[JUnitRunner])
-class PrintColorSpec extends SFXEnumDelegateSpec[jfxp.PrintColor, PrintColor](
-  javaClass = classOf[jfxp.PrintColor],
-  scalaClass = classOf[PrintColor],
-  companion = PrintColor)
+class PrintColorSpec
+    extends SFXEnumDelegateSpec[jfxp.PrintColor, PrintColor](
+        javaClass = classOf[jfxp.PrintColor],
+        scalaClass = classOf[PrintColor],
+        companion = PrintColor)

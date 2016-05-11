@@ -3,6 +3,7 @@ trait SCL7413 {
 
   def foo[T](implicit l: List[T]): Option[T] = l.headOption
 
-  /*start*/foo/*end*/
+  /*start*/
+  foo /*end*/
 }
 //Option[Int]

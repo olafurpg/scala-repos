@@ -26,32 +26,33 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.apache.spark.sql.types.StructType
 
 /**
- * :: Experimental ::
- * Implements the transformations which are defined by SQL statement.
- * Currently we only support SQL syntax like 'SELECT ... FROM __THIS__ ...'
- * where '__THIS__' represents the underlying table of the input dataset.
- * The select clause specifies the fields, constants, and expressions to display in
- * the output, it can be any select clause that Spark SQL supports. Users can also
- * use Spark SQL built-in function and UDFs to operate on these selected columns.
- * For example, [[SQLTransformer]] supports statements like:
- *  - SELECT a, a + b AS a_b FROM __THIS__
- *  - SELECT a, SQRT(b) AS b_sqrt FROM __THIS__ where a > 5
- *  - SELECT a, b, SUM(c) AS c_sum FROM __THIS__ GROUP BY a, b
- */
+  * :: Experimental ::
+  * Implements the transformations which are defined by SQL statement.
+  * Currently we only support SQL syntax like 'SELECT ... FROM __THIS__ ...'
+  * where '__THIS__' represents the underlying table of the input dataset.
+  * The select clause specifies the fields, constants, and expressions to display in
+  * the output, it can be any select clause that Spark SQL supports. Users can also
+  * use Spark SQL built-in function and UDFs to operate on these selected columns.
+  * For example, [[SQLTransformer]] supports statements like:
+  *  - SELECT a, a + b AS a_b FROM __THIS__
+  *  - SELECT a, SQRT(b) AS b_sqrt FROM __THIS__ where a > 5
+  *  - SELECT a, b, SUM(c) AS c_sum FROM __THIS__ GROUP BY a, b
+  */
 @Experimental
 @Since("1.6.0")
-class SQLTransformer @Since("1.6.0") (override val uid: String) extends Transformer
-  with DefaultParamsWritable {
+class SQLTransformer @Since("1.6.0")(override val uid: String)
+    extends Transformer with DefaultParamsWritable {
 
   @Since("1.6.0")
   def this() = this(Identifiable.randomUID("sql"))
 
   /**
-   * SQL statement parameter. The statement is provided in string form.
-   * @group param
-   */
+    * SQL statement parameter. The statement is provided in string form.
+    * @group param
+    */
   @Since("1.6.0")
-  final val statement: Param[String] = new Param[String](this, "statement", "SQL statement")
+  final val statement: Param[String] =
+    new Param[String](this, "statement", "SQL statement")
 
   /** @group setParam */
   @Since("1.6.0")

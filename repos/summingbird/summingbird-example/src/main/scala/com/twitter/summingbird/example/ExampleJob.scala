@@ -25,30 +25,31 @@ import twitter4j.TwitterStreamFactory
 import twitter4j.conf.ConfigurationBuilder
 
 object StatusStreamer {
+
   /**
-   * These two items are required to run Summingbird in
-   * batch/realtime mode, across the boundary between storm and
-   * scalding jobs.
-   */
-  implicit val timeOf: TimeExtractor[Status] = TimeExtractor(_.getCreatedAt.getTime)
+    * These two items are required to run Summingbird in
+    * batch/realtime mode, across the boundary between storm and
+    * scalding jobs.
+    */
+  implicit val timeOf: TimeExtractor[Status] = TimeExtractor(
+      _.getCreatedAt.getTime)
   implicit val batcher = Batcher.ofHours(1)
 
   def tokenize(text: String): TraversableOnce[String] =
-    text.toLowerCase
-      .replaceAll("[^a-zA-Z0-9\\s]", "")
-      .split("\\s+")
+    text.toLowerCase.replaceAll("[^a-zA-Z0-9\\s]", "").split("\\s+")
 
   /**
-   * The actual Summingbird job. Notice that the execution platform
-   * "P" stays abstract. This job will work just as well in memory,
-   * in Storm or in Scalding, or in any future platform supported by
-   * Summingbird.
-   */
+    * The actual Summingbird job. Notice that the execution platform
+    * "P" stays abstract. This job will work just as well in memory,
+    * in Storm or in Scalding, or in any future platform supported by
+    * Summingbird.
+    */
   def wordCount[P <: Platform[P]](
-    source: Producer[P, Status],
-    store: P#Store[String, Long]) =
+      source: Producer[P, Status], store: P#Store[String, Long]) =
     source
       .filter(_.getText != null)
-      .flatMap { tweet: Status => tokenize(tweet.getText).map(_ -> 1L) }
+      .flatMap { tweet: Status =>
+        tokenize(tweet.getText).map(_ -> 1L)
+      }
       .sumByKey(store)
 }

@@ -7,11 +7,9 @@ trait TypeInferenceBug {
     val as1: List[(TTT, Int)] = null
 
     as1.foldLeft(bs) {
-      case (b, (a, i : Int)) =>
-        /*start*/b/*end*/
+      case (b, (a, i: Int)) =>
+        /*start*/ b /*end*/
     }
-
   }
-
 }
 //TypeInferenceBug.this.B

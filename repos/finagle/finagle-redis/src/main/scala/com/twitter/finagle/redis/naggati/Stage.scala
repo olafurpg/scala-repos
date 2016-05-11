@@ -19,19 +19,19 @@ package com.twitter.finagle.redis.naggati
 import org.jboss.netty.buffer.ChannelBuffer
 
 /**
- * The next step for processing after this stage.
- * - Incomplete: Need more data; call the same stage again later when more data arrives.
- * - GoToStage(stage): Finished with this stage; continue with another stage.
- * - Emit(obj): Complete protocol object decoded; return to the first stage and start a new object.
- */
+  * The next step for processing after this stage.
+  * - Incomplete: Need more data; call the same stage again later when more data arrives.
+  * - GoToStage(stage): Finished with this stage; continue with another stage.
+  * - Emit(obj): Complete protocol object decoded; return to the first stage and start a new object.
+  */
 sealed trait NextStep
 case object Incomplete extends NextStep
 case class GoToStage(stage: Stage) extends NextStep
 case class Emit(obj: AnyRef) extends NextStep
 
 /**
- * A decoder stage.
- */
+  * A decoder stage.
+  */
 trait Stage {
   def apply(buffer: ChannelBuffer): NextStep
 }

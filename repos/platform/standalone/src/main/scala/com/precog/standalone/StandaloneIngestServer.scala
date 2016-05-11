@@ -42,36 +42,49 @@ import org.streum.configrity.Configuration
 
 import scalaz._
 
-object StandaloneIngestServer extends StandaloneIngestServer with AkkaDefaults {
+object StandaloneIngestServer
+    extends StandaloneIngestServer with AkkaDefaults {
   val executionContext = defaultFutureDispatch
   implicit val M: Monad[Future] = new FutureMonad(executionContext)
   val clock = Clock.System
 }
 
 trait StandaloneIngestServer
-    extends BlueEyesServer
-    with EventService
-    with Logging {
+    extends BlueEyesServer with EventService with Logging {
 
   def clock: Clock
 
-  def configureEventService(config: Configuration): EventService.State  = {
+  def configureEventService(config: Configuration): EventService.State = {
     logger.debug("Starting StandaloneIngestServer with config:\n" + config)
     val apiKey = config[String]("security.masterAccount.apiKey")
 
     val apiKeyFinder = new StaticAPIKeyFinder[Future](apiKey)
-    val accountFinder = new StaticAccountFinder[Future](config[String]("security.masterAccount.accountId"), apiKey, Some("/"))
-    val permissionsFinder = new PermissionsFinder(apiKeyFinder, accountFinder, clock.instant())
-    val jobManager = new InMemoryJobManager[({ type λ[+α] = EitherT[Future, String, α] })#λ]()
+    val accountFinder = new StaticAccountFinder[Future](
+        config[String]("security.masterAccount.accountId"), apiKey, Some("/"))
+    val permissionsFinder = new PermissionsFinder(
+        apiKeyFinder, accountFinder, clock.instant())
+    val jobManager =
+      new InMemoryJobManager[({ type λ[+α] = EitherT[Future, String, α] })#λ]()
 
-    val (eventStore, stoppable) = KafkaEventStore(config.detach("eventStore"), permissionsFinder) valueOr { errors =>
-      sys.error("Could not configure event store: " + errors.list.mkString(", "))
-    }
+    val (eventStore, stoppable) =
+      KafkaEventStore(config.detach("eventStore"), permissionsFinder) valueOr {
+        errors =>
+          sys.error(
+              "Could not configure event store: " + errors.list.mkString(", "))
+      }
 
-    val serviceConfig = EventService.ServiceConfig.fromConfiguration(config) valueOr { errors =>
-      sys.error("Unable to obtain self-referential service locator for event service: %s".format(errors.list.mkString("; ")))
-    }
+    val serviceConfig =
+      EventService.ServiceConfig.fromConfiguration(config) valueOr { errors =>
+        sys.error(
+            "Unable to obtain self-referential service locator for event service: %s"
+              .format(errors.list.mkString("; ")))
+      }
 
-    buildServiceState(serviceConfig, apiKeyFinder, permissionsFinder, eventStore, jobManager, stoppable)
+    buildServiceState(serviceConfig,
+                      apiKeyFinder,
+                      permissionsFinder,
+                      eventStore,
+                      jobManager,
+                      stoppable)
   }
 }

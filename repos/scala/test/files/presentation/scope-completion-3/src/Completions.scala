@@ -6,7 +6,7 @@ abstract class Base1 {
 
   type tb1 = Int
   val vb1 = 0
-  var rb1 = 0 
+  var rb1 = 0
   def fb1 = 0
   class Cb1
   object Ob1
@@ -66,7 +66,7 @@ class Completion1 extends Base1 with Trait1 {
   override val vb3 = 12
   override var rb3 = 12
   override def fb3 = 12
-  
+
   override type tt3 = Int
   override val vt3 = 12
   override var rt3 = 12
@@ -95,12 +95,11 @@ object Completion2 extends Base1 with Trait1 {
   override val vb3 = 12
   override var rb3 = 12
   override def fb3 = 12
-  
+
   override type tt3 = Int
   override val vt3 = 12
   override var rt3 = 12
   override def ft3 = 12
-  
+
   /*_*/
 }
-

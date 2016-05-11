@@ -19,7 +19,7 @@ class Square extends AbsFun[Int, Int] {
   def apply(x: Int): Int = x * x
 
   def sum(xs: List[Int]): Int =
-    (0 /: xs) (_ + _)
+    (0 /: xs)(_ + _)
 
   def abs(m: Int): Int =
     sum(List(1, 2, 3))

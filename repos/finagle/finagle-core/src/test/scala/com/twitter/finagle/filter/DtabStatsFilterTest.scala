@@ -13,8 +13,8 @@ class DtabStatsFilterTest extends FunSuite with AssertionsForJUnit {
   test("empty Dtab.local") {
     val statsReceiver = new InMemoryStatsReceiver
     val service =
-      new DtabStatsFilter[Unit, Unit](statsReceiver.scope("prefix")) andThen
-      Service.mk[Unit, Unit](_ => Future.Unit)
+      new DtabStatsFilter[Unit, Unit](statsReceiver.scope("prefix")) andThen Service
+        .mk[Unit, Unit](_ => Future.Unit)
 
     Dtab.unwind {
       Dtab.local = Dtab.empty
@@ -28,8 +28,8 @@ class DtabStatsFilterTest extends FunSuite with AssertionsForJUnit {
   test("non-empty Dtab.local") {
     val statsReceiver = new InMemoryStatsReceiver
     val service =
-      new DtabStatsFilter[Unit, Unit](statsReceiver.scope("prefix")) andThen
-      Service.mk[Unit, Unit](_ => Future.Unit)
+      new DtabStatsFilter[Unit, Unit](statsReceiver.scope("prefix")) andThen Service
+        .mk[Unit, Unit](_ => Future.Unit)
 
     Dtab.unwind {
       Dtab.local = Dtab.read("/s=>/foo;/s=>/bar;/s=>/bah")

@@ -5,10 +5,10 @@ package scalaguide.async.websockets
 
 import akka.stream.Materializer
 import akka.stream.scaladsl._
-import play.api.http.websocket.{ TextMessage, Message }
+import play.api.http.websocket.{TextMessage, Message}
 import play.api.mvc.WebSocket.MessageFlowTransformer
 import play.api.test._
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
 
 object ScalaWebSockets extends PlaySpecification {
 
@@ -18,23 +18,28 @@ object ScalaWebSockets extends PlaySpecification {
 
   "Scala WebSockets" should {
 
-    def runWebSocket[In, Out](webSocket: WebSocket, in: Source[Message, _], expectOut: Int)(implicit mat: Materializer): Either[Result, List[Message]] = {
+    def runWebSocket[In, Out](
+        webSocket: WebSocket, in: Source[Message, _], expectOut: Int)(
+        implicit mat: Materializer): Either[Result, List[Message]] = {
       await(webSocket(FakeRequest())).right.map { flow =>
-
         // When running in the real world, if the flow cancels upstream, Play's WebSocket protocol implementation will
         // handle this and close the WebSocket, but here, that won't happen, so we redeem the future when we receive
         // enough.
         val promise = Promise[List[Message]]()
         if (expectOut == 0) promise.success(Nil)
-        val flowResult = in via flow runWith Sink.fold[(List[Message], Int), Message]((Nil, expectOut)) { (state, out) =>
-          val (result, remaining) = state
-          if (remaining == 1) {
-            promise.success(result :+ out)
+        val flowResult =
+          in via flow runWith Sink
+            .fold[(List[Message], Int), Message]((Nil, expectOut)) {
+            (state, out) =>
+              val (result, remaining) = state
+              if (remaining == 1) {
+                promise.success(result :+ out)
+              }
+              (result :+ out, remaining - 1)
           }
-          (result :+ out, remaining - 1)
-        }
         import play.api.libs.iteratee.Execution.Implicits.trampoline
-        await(Future.firstCompletedOf(Seq(promise.future, flowResult.map(_._1))))
+        await(
+            Future.firstCompletedOf(Seq(promise.future, flowResult.map(_._1))))
       }
     }
 
@@ -43,8 +48,11 @@ object ScalaWebSockets extends PlaySpecification {
       import akka.actor._
 
       "allow creating a simple echoing actor" in new WithApplication() {
-        runWebSocket(Samples.Controller1.socket, Source.single(TextMessage("foo")), 1) must beRight.like {
-          case list => list must_== List(TextMessage("I received your message: foo"))
+        runWebSocket(Samples.Controller1.socket,
+                     Source.single(TextMessage("foo")),
+                     1) must beRight.like {
+          case list =>
+            list must_== List(TextMessage("I received your message: foo"))
         }
       }
 
@@ -64,7 +72,10 @@ object ScalaWebSockets extends PlaySpecification {
         }
 
         runWebSocket(
-          WebSocket.acceptWithActor[String, String](req => out => Props(new MyActor)), Source.empty, 0
+            WebSocket.acceptWithActor[String, String](
+                req => out => Props(new MyActor)),
+            Source.empty,
+            0
         ) must beRight[List[Message]]
         await(closed.future) must_== ()
       }
@@ -81,61 +92,71 @@ object ScalaWebSockets extends PlaySpecification {
         }
 
         runWebSocket(
-          WebSocket.acceptWithActor[String, String](req => out => Props(new MyActor)), Source.maybe, 0
+            WebSocket.acceptWithActor[String, String](
+                req => out => Props(new MyActor)),
+            Source.maybe,
+            0
         ) must beRight[List[Message]]
       }
 
       "allow rejecting the WebSocket" in new WithApplication() {
-        runWebSocket(Samples.Controller2.socket, Source.empty, 0) must beLeft.which { result =>
-          result.header.status must_== FORBIDDEN
+        runWebSocket(Samples.Controller2.socket, Source.empty, 0) must beLeft.which {
+          result =>
+            result.header.status must_== FORBIDDEN
         }
       }
 
       "allow creating a json actor" in new WithApplication() {
         val json = Json.obj("foo" -> "bar")
-        runWebSocket(Samples.Controller4.socket, Source.single(TextMessage(Json.stringify(json))), 1) must beRight.which { out =>
+        runWebSocket(Samples.Controller4.socket,
+                     Source.single(TextMessage(Json.stringify(json))),
+                     1) must beRight.which { out =>
           out must_== List(TextMessage(Json.stringify(json)))
         }
       }
 
       "allow creating a higher level object actor" in new WithApplication() {
         runWebSocket(
-          Samples.Controller5.socket,
-          Source.single(TextMessage(Json.stringify(Json.toJson(Samples.Controller5.InEvent("blah"))))),
-          1
+            Samples.Controller5.socket,
+            Source.single(TextMessage(Json.stringify(
+                        Json.toJson(Samples.Controller5.InEvent("blah"))))),
+            1
         ) must beRight.which { out =>
-          out must_== List(TextMessage(Json.stringify(Json.toJson(Samples.Controller5.OutEvent("blah")))))
+          out must_== List(TextMessage(Json.stringify(
+                      Json.toJson(Samples.Controller5.OutEvent("blah")))))
         }
       }
-
     }
 
     "support iteratees" in {
 
       "iteratee1" in new WithApplication() {
-        runWebSocket(Samples.Controller6.socket, Source.empty, 1) must beRight.which { out =>
-          out must_== List(TextMessage("Hello!"))
+        runWebSocket(Samples.Controller6.socket, Source.empty, 1) must beRight.which {
+          out =>
+            out must_== List(TextMessage("Hello!"))
         }
       }
 
       "iteratee2" in new WithApplication() {
-        runWebSocket(Samples.Controller7.socket, Source.maybe, 1) must beRight.which { out =>
-          out must_== List(TextMessage("Hello!"))
+        runWebSocket(Samples.Controller7.socket, Source.maybe, 1) must beRight.which {
+          out =>
+            out must_== List(TextMessage("Hello!"))
         }
       }
 
       "iteratee3" in new WithApplication() {
-        runWebSocket(Samples.Controller8.socket, Source.single(TextMessage("foo")), 1) must beRight.which { out =>
+        runWebSocket(Samples.Controller8.socket,
+                     Source.single(TextMessage("foo")),
+                     1) must beRight.which { out =>
           out must_== List(TextMessage("I received your message: foo"))
         }
       }
-
     }
   }
 
   /**
-   * The default await timeout.  Override this to change it.
-   */
+    * The default await timeout.  Override this to change it.
+    */
   import scala.concurrent.duration._
   override implicit def defaultAwaitTimeout = 2.seconds
 }
@@ -183,7 +204,8 @@ object Samples {
     import play.api.Play.materializer
 
     def socket = WebSocket.tryAcceptWithActor[String, String] { request =>
-      Future.successful(request.session.get("user") match {
+      Future.successful(
+          request.session.get("user") match {
         case None => Left(Forbidden)
         case Some(_) => Right(MyWebSocketActor.props)
       })
@@ -212,11 +234,11 @@ object Samples {
     import play.api.Play.current
     import play.api.Play.materializer
 
-    def socket = WebSocket.acceptWithActor[JsValue, JsValue] { request => out =>
-      MyWebSocketActor.props(out)
+    def socket = WebSocket.acceptWithActor[JsValue, JsValue] {
+      request => out =>
+        MyWebSocketActor.props(out)
     }
     //#actor-json
-
   }
 
   object Controller5 {
@@ -246,7 +268,8 @@ object Samples {
     //#actor-json-frames
     import play.api.mvc.WebSocket.FrameFormatter
 
-    implicit val messageFlowTransformer = MessageFlowTransformer.jsonMessageFlowTransformer[InEvent, OutEvent]
+    implicit val messageFlowTransformer =
+      MessageFlowTransformer.jsonMessageFlowTransformer[InEvent, OutEvent]
     //#actor-json-frames
 
     //#actor-json-in-out
@@ -254,11 +277,11 @@ object Samples {
     import play.api.Play.current
     import play.api.Play.materializer
 
-    def socket = WebSocket.acceptWithActor[InEvent, OutEvent] { request => out =>
-      MyWebSocketActor.props(out)
+    def socket = WebSocket.acceptWithActor[InEvent, OutEvent] {
+      request => out =>
+        MyWebSocketActor.props(out)
     }
     //#actor-json-in-out
-
   }
 
   object Controller6 {
@@ -269,7 +292,6 @@ object Samples {
     import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
     def socket = WebSocket.using[String] { request =>
-
       // Log events to the console
       val in = Iteratee.foreach[String](println).map { _ =>
         println("Disconnected")
@@ -281,7 +303,6 @@ object Samples {
       (in, out)
     }
     //#iteratee1
-
   }
 
   object Controller7 {
@@ -291,7 +312,6 @@ object Samples {
     import play.api.libs.iteratee._
 
     def socket = WebSocket.using[String] { request =>
-
       // Just ignore the input
       val in = Iteratee.ignore[String]
 
@@ -301,7 +321,6 @@ object Samples {
       (in, out)
     }
     //#iteratee2
-
   }
 
   object Controller8 {
@@ -311,22 +330,19 @@ object Samples {
     import play.api.libs.iteratee._
     import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-    def socket =  WebSocket.using[String] { request =>
-
+    def socket = WebSocket.using[String] { request =>
       // Concurrent.broadcast returns (Enumerator, Concurrent.Channel)
       val (out, channel) = Concurrent.broadcast[String]
 
       // log the message to stdout and send response back to client
-      val in = Iteratee.foreach[String] {
-        msg => println(msg)
-          // the Enumerator returned by Concurrent.broadcast subscribes to the channel and will
-          // receive the pushed messages
-          channel push("I received your message: " + msg)
+      val in = Iteratee.foreach[String] { msg =>
+        println(msg)
+        // the Enumerator returned by Concurrent.broadcast subscribes to the channel and will
+        // receive the pushed messages
+        channel push ("I received your message: " + msg)
       }
-      (in,out)
+      (in, out)
     }
     //#iteratee3
   }
-
-
 }

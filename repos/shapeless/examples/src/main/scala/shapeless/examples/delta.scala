@@ -20,18 +20,21 @@ import shapeless._
 
 object DeltaExamples extends App {
   // A pair of arbitrary case classes
-  case class Foo(i : Int, s : String)
-  case class Bar(b : Boolean, s : String, of: Option[Bar])
+  case class Foo(i: Int, s: String)
+  case class Bar(b: Boolean, s: String, of: Option[Bar])
 
   import DeltaSyntax._
 
   assert(6 == 2.delta(8))
   assert(("foo", "bar") == "foo".delta("bar"))
-  assert(6 :: ("foo", "bar") :: HNil == (2 :: "foo" :: HNil).delta(8 :: "bar" :: HNil))
+  assert(6 :: ("foo", "bar") :: HNil == (2 :: "foo" :: HNil)
+        .delta(8 :: "bar" :: HNil))
   assert(6 :: ("foo", "bar") :: HNil == Foo(2, "foo").delta(Foo(8, "bar")))
   assert(
-    Bar(true,  "foo",  Some(Bar(true, "bar",  None))).delta(Bar(false, "food", Some(Bar(true, "barf", None)))) ==
-    false :: ("foo", "food") :: Inl(Some(true :: ("bar", "barf") :: Inl(None) :: HNil)) :: HNil
+      Bar(true, "foo", Some(Bar(true, "bar", None)))
+        .delta(Bar(false, "food", Some(Bar(true, "barf", None)))) == false :: (
+          "foo", "food") :: Inl(
+          Some(true :: ("bar", "barf") :: Inl(None) :: HNil)) :: HNil
   )
 }
 
@@ -43,16 +46,20 @@ trait Delta[In] {
 
 trait Delta0 {
   implicit def generic[F, G](
-    implicit gen: Generic.Aux[F, G], genDelta: Lazy[Delta[G]]
+      implicit gen: Generic.Aux[F, G],
+      genDelta: Lazy[Delta[G]]
   ): Delta.Aux[F, genDelta.value.Out] = new Delta[F] {
     type Out = genDelta.value.Out
 
-    def apply(before: F, after: F): Out = genDelta.value.apply(gen.to(before), gen.to(after))
+    def apply(before: F, after: F): Out =
+      genDelta.value.apply(gen.to(before), gen.to(after))
   }
 }
 
 object Delta extends Delta0 {
-  def apply[In](implicit delta: Lazy[Delta[In]]): Delta.Aux[In, delta.value.Out] = delta.value
+  def apply[In](
+      implicit delta: Lazy[Delta[In]]): Delta.Aux[In, delta.value.Out] =
+    delta.value
 
   type Aux[In, Out0] = Delta[In] { type Out = Out0 }
 
@@ -68,24 +75,28 @@ object Delta extends Delta0 {
     def apply(before: Int, after: Int): Out = after - before
   }
 
-  implicit def stringDelta: Delta.Aux[String, (String, String)] = new Delta[String] {
-    type Out = (String, String)
+  implicit def stringDelta: Delta.Aux[String, (String, String)] =
+    new Delta[String] {
+      type Out = (String, String)
 
-    def apply(before: String, after: String): (String, String) = (before, after)
-  }
+      def apply(before: String, after: String): (String, String) =
+        (before, after)
+    }
 
   implicit def optionDelta[T](
-    implicit deltaT: Lazy[Delta[T]]
-  ): Delta.Aux[Option[T], Option[deltaT.value.Out] :+: T :+: T :+: CNil] = new Delta[Option[T]] {
-    type Out = Option[deltaT.value.Out] :+: T :+: T :+: CNil
+      implicit deltaT: Lazy[Delta[T]]
+  ): Delta.Aux[Option[T], Option[deltaT.value.Out] :+: T :+: T :+: CNil] =
+    new Delta[Option[T]] {
+      type Out = Option[deltaT.value.Out] :+: T :+: T :+: CNil
 
-    def apply(before: Option[T], after: Option[T]): Out = (before, after) match {
-      case (None, None)       => Inl(None)
-      case (Some(b), Some(a)) => Inl(Some(deltaT.value.apply(b, a)))
-      case (Some(b), None)    => Inr(Inl(b))
-      case (None, Some(a))    => Inr(Inr(Inl(a)))
+      def apply(before: Option[T], after: Option[T]): Out =
+        (before, after) match {
+          case (None, None) => Inl(None)
+          case (Some(b), Some(a)) => Inl(Some(deltaT.value.apply(b, a)))
+          case (Some(b), None) => Inr(Inl(b))
+          case (None, Some(a)) => Inr(Inr(Inl(a)))
+        }
     }
-  }
 
   implicit def deriveHNil: Delta.Aux[HNil, HNil] = new Delta[HNil] {
     type Out = HNil
@@ -94,7 +105,8 @@ object Delta extends Delta0 {
   }
 
   implicit def deriveHCons[H, T <: HList](
-    implicit deltaH: Delta[H], deltaT: Lazy[Delta[T] { type Out <: HList }]
+      implicit deltaH: Delta[H],
+      deltaT: Lazy[Delta[T] { type Out <: HList }]
   ): Delta.Aux[H :: T, deltaH.Out :: deltaT.value.Out] = new Delta[H :: T] {
     type Out = deltaH.Out :: deltaT.value.Out
 
@@ -106,6 +118,7 @@ object Delta extends Delta0 {
 
 object DeltaSyntax {
   implicit class DeltaOps[In](val before: In) extends AnyVal {
-    def delta(after: In)(implicit delta: Lazy[Delta[In]]): delta.value.Out = delta.value(before, after)
+    def delta(after: In)(implicit delta: Lazy[Delta[In]]): delta.value.Out =
+      delta.value(before, after)
   }
 }

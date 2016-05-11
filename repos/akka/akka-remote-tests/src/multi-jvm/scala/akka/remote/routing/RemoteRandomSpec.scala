@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote.routing
 
 import scala.concurrent.duration._
@@ -9,7 +9,7 @@ import akka.actor.ActorRef
 import akka.actor.Address
 import akka.actor.PoisonPill
 import akka.actor.Props
-import akka.remote.testkit.{ STMultiNodeSpec, MultiNodeConfig, MultiNodeSpec }
+import akka.remote.testkit.{STMultiNodeSpec, MultiNodeConfig, MultiNodeSpec}
 import akka.routing.Broadcast
 import akka.routing.RandomPool
 import akka.routing.RoutedActorRef
@@ -44,8 +44,9 @@ class RemoteRandomMultiJvmNode2 extends RemoteRandomSpec
 class RemoteRandomMultiJvmNode3 extends RemoteRandomSpec
 class RemoteRandomMultiJvmNode4 extends RemoteRandomSpec
 
-class RemoteRandomSpec extends MultiNodeSpec(RemoteRandomMultiJvmSpec)
-  with STMultiNodeSpec with ImplicitSender with DefaultTimeout {
+class RemoteRandomSpec
+    extends MultiNodeSpec(RemoteRandomMultiJvmSpec) with STMultiNodeSpec
+    with ImplicitSender with DefaultTimeout {
   import RemoteRandomMultiJvmSpec._
 
   def initialParticipants = roles.size
@@ -59,7 +60,9 @@ class RemoteRandomSpec extends MultiNodeSpec(RemoteRandomMultiJvmSpec)
 
       runOn(fourth) {
         enterBarrier("start")
-        val actor = system.actorOf(RandomPool(nrOfInstances = 0).props(Props[SomeActor]), "service-hello")
+        val actor =
+          system.actorOf(RandomPool(nrOfInstances = 0).props(Props[SomeActor]),
+                         "service-hello")
         actor.isInstanceOf[RoutedActorRef] should ===(true)
 
         val connectionCount = 3
@@ -69,10 +72,14 @@ class RemoteRandomSpec extends MultiNodeSpec(RemoteRandomMultiJvmSpec)
           actor ! "hit"
         }
 
-        val replies: Map[Address, Int] = (receiveWhile(5.seconds, messages = connectionCount * iterationCount) {
+        val replies: Map[Address, Int] = (receiveWhile(
+            5.seconds, messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
-        }).foldLeft(Map(node(first).address -> 0, node(second).address -> 0, node(third).address -> 0)) {
-          case (replyMap, address) ⇒ replyMap + (address -> (replyMap(address) + 1))
+        }).foldLeft(Map(node(first).address -> 0,
+                        node(second).address -> 0,
+                        node(third).address -> 0)) {
+          case (replyMap, address) ⇒
+            replyMap + (address -> (replyMap(address) + 1))
         }
 
         enterBarrier("broadcast-end")

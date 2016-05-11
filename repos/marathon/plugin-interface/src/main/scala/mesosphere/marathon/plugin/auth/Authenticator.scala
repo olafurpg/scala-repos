@@ -1,6 +1,6 @@
 package mesosphere.marathon.plugin.auth
 
-import mesosphere.marathon.plugin.http.{ HttpRequest, HttpResponse }
+import mesosphere.marathon.plugin.http.{HttpRequest, HttpResponse}
 import mesosphere.marathon.plugin.plugin.Plugin
 
 import scala.concurrent.Future
@@ -40,4 +40,3 @@ trait Authenticator extends Plugin {
     */
   def handleNotAuthenticated(request: HttpRequest, response: HttpResponse)
 }
-

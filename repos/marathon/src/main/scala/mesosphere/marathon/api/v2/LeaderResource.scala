@@ -1,18 +1,17 @@
 package mesosphere.marathon.api.v2
 
-import javax.ws.rs.core.{ MediaType, Response }
-import javax.ws.rs.{ GET, DELETE, Path, Produces }
+import javax.ws.rs.core.{MediaType, Response}
+import javax.ws.rs.{GET, DELETE, Path, Produces}
 
 import com.google.inject.Inject
 import mesosphere.chaos.http.HttpConf
-import mesosphere.marathon.api.{ MarathonMediaType, LeaderInfo, RestResource }
-import mesosphere.marathon.{ MarathonSchedulerService, MarathonConf }
+import mesosphere.marathon.api.{MarathonMediaType, LeaderInfo, RestResource}
+import mesosphere.marathon.{MarathonSchedulerService, MarathonConf}
 
 @Path("v2/leader")
-class LeaderResource @Inject() (
-  leaderInfo: LeaderInfo,
-  schedulerService: MarathonSchedulerService,
-  val config: MarathonConf with HttpConf)
+class LeaderResource @Inject()(leaderInfo: LeaderInfo,
+                               schedulerService: MarathonSchedulerService,
+                               val config: MarathonConf with HttpConf)
     extends RestResource {
 
   @GET

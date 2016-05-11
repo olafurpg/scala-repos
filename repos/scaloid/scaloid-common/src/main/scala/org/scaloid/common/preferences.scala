@@ -35,26 +35,26 @@
 
 package org.scaloid.common
 
-import android.content.{ Context, SharedPreferences }
+import android.content.{Context, SharedPreferences}
 import scala.collection.JavaConversions._
 import scala.language.dynamics
 import scala.reflect._
 
 /**
- * An accessor of SharedPreferences.
- *
- * {{{
- *   val pref = Preferences
- *   val ec = pref.executionCount(0)
- *   pref.executionCount = ec + 1
- * }}}
- *
- * Refer to the URL below for more details.
- *
- * [[http://blog.scaloid.org/2013/03/dynamicly-accessing-sharedpreferences.html]]
- *
- * @param preferences
- */
+  * An accessor of SharedPreferences.
+  *
+  * {{{
+  *   val pref = Preferences
+  *   val ec = pref.executionCount(0)
+  *   pref.executionCount = ec + 1
+  * }}}
+  *
+  * Refer to the URL below for more details.
+  *
+  * [[http://blog.scaloid.org/2013/03/dynamicly-accessing-sharedpreferences.html]]
+  *
+  * @param preferences
+  */
 class Preferences(val preferences: SharedPreferences) extends Dynamic {
   def updateDynamic(name: String)(value: Any) {
     value match {
@@ -63,7 +63,8 @@ class Preferences(val preferences: SharedPreferences) extends Dynamic {
       case v: Long => preferences.edit().putLong(name, v).commit()
       case v: Boolean => preferences.edit().putBoolean(name, v).commit()
       case v: Float => preferences.edit().putFloat(name, v).commit()
-      case v: Set[String @unchecked] => preferences.edit().putStringSet(name, v).commit()
+      case v: Set[String @unchecked] =>
+        preferences.edit().putStringSet(name, v).commit()
     }
   }
 
@@ -73,7 +74,8 @@ class Preferences(val preferences: SharedPreferences) extends Dynamic {
     case v: Long => preferences.getLong(name, v).asInstanceOf[T]
     case v: Boolean => preferences.getBoolean(name, v).asInstanceOf[T]
     case v: Float => preferences.getFloat(name, v).asInstanceOf[T]
-    case v: Set[String @unchecked] => preferences.getStringSet(name, v).toSet.asInstanceOf[T]
+    case v: Set[String @unchecked] =>
+      preferences.getStringSet(name, v).toSet.asInstanceOf[T]
   }
 
   def remove(name: String) {
@@ -82,7 +84,8 @@ class Preferences(val preferences: SharedPreferences) extends Dynamic {
 
   abstract class TypedPreferences[T] extends Dynamic {
     def get(name: String): T
-    def selectDynamic(name: String): Option[T] = if (preferences.contains(name)) Some(get(name)) else None
+    def selectDynamic(name: String): Option[T] =
+      if (preferences.contains(name)) Some(get(name)) else None
   }
 
   val String = new TypedPreferences[String] {
@@ -98,7 +101,8 @@ class Preferences(val preferences: SharedPreferences) extends Dynamic {
   }
 
   val Boolean = new TypedPreferences[Boolean] {
-    override def get(name: String): Boolean = preferences.getBoolean(name, true)
+    override def get(name: String): Boolean =
+      preferences.getBoolean(name, true)
   }
 
   val Float = new TypedPreferences[Float] {
@@ -106,65 +110,65 @@ class Preferences(val preferences: SharedPreferences) extends Dynamic {
   }
 
   val StringSet = new TypedPreferences[Set[String]] {
-    override def get(name: String): Set[String] = preferences.getStringSet(name, null).toSet
+    override def get(name: String): Set[String] =
+      preferences.getStringSet(name, null).toSet
   }
 }
 
 object Preferences {
-  def apply()(implicit ctx: Context) = new Preferences(defaultSharedPreferences)
+  def apply()(implicit ctx: Context) =
+    new Preferences(defaultSharedPreferences)
 }
 
 class Extra(val activity: SActivity) extends AnyVal with Dynamic {
   def updateDynamic(name: String)(value: Any) {
     // TODO inline after https://github.com/daniel-trinh/scalariform/issues/44 is fixed 
     import android.os.Parcelable
-    activity.intent.foreach {
-      i =>
-        value match {
-          // primitives
-          case v: Boolean => i.putExtra(name, v)
-          case v: Byte => i.putExtra(name, v)
-          case v: Char => i.putExtra(name, v)
-          case v: Short => i.putExtra(name, v)
-          case v: Int => i.putExtra(name, v)
-          case v: Long => i.putExtra(name, v)
-          case v: Float => i.putExtra(name, v)
-          case v: Double => i.putExtra(name, v)
+    activity.intent.foreach { i =>
+      value match {
+        // primitives
+        case v: Boolean => i.putExtra(name, v)
+        case v: Byte => i.putExtra(name, v)
+        case v: Char => i.putExtra(name, v)
+        case v: Short => i.putExtra(name, v)
+        case v: Int => i.putExtra(name, v)
+        case v: Long => i.putExtra(name, v)
+        case v: Float => i.putExtra(name, v)
+        case v: Double => i.putExtra(name, v)
 
-          // simple types
-          case v: String => i.putExtra(name, v)
-          case v: CharSequence => i.putExtra(name, v)
-          case v: android.os.Bundle => i.putExtra(name, v)
-          case v: android.os.Parcelable => i.putExtra(name, v)
+        // simple types
+        case v: String => i.putExtra(name, v)
+        case v: CharSequence => i.putExtra(name, v)
+        case v: android.os.Bundle => i.putExtra(name, v)
+        case v: android.os.Parcelable => i.putExtra(name, v)
 
-          // array types
-          case v: Array[Boolean] => i.putExtra(name, v)
-          case v: Array[Byte] => i.putExtra(name, v)
-          case v: Array[Char] => i.putExtra(name, v)
-          case v: Array[Short] => i.putExtra(name, v)
-          case v: Array[Int] => i.putExtra(name, v)
-          case v: Array[Long] => i.putExtra(name, v)
-          case v: Array[Float] => i.putExtra(name, v)
-          case v: Array[Double] => i.putExtra(name, v)
-          case v: Array[String] => i.putExtra(name, v)
-          case v: Array[CharSequence] => i.putExtra(name, v)
-          case v: Array[Parcelable] => i.putExtra(name, v)
+        // array types
+        case v: Array[Boolean] => i.putExtra(name, v)
+        case v: Array[Byte] => i.putExtra(name, v)
+        case v: Array[Char] => i.putExtra(name, v)
+        case v: Array[Short] => i.putExtra(name, v)
+        case v: Array[Int] => i.putExtra(name, v)
+        case v: Array[Long] => i.putExtra(name, v)
+        case v: Array[Float] => i.putExtra(name, v)
+        case v: Array[Double] => i.putExtra(name, v)
+        case v: Array[String] => i.putExtra(name, v)
+        case v: Array[CharSequence] => i.putExtra(name, v)
+        case v: Array[Parcelable] => i.putExtra(name, v)
 
-          // other types
-          case v: Serializable => i.putExtra(name, v) // must be after arrays
-        }
+        // other types
+        case v: Serializable => i.putExtra(name, v) // must be after arrays
+      }
     }
   }
 
   def selectDynamic[T](name: String): Option[T] =
-    activity.intent.flatMap {
-      i =>
-        i.getExtras match {
-          case x: android.os.Bundle if x.containsKey(name) =>
-            Some(x.get(name).asInstanceOf[T])
+    activity.intent.flatMap { i =>
+      i.getExtras match {
+        case x: android.os.Bundle if x.containsKey(name) =>
+          Some(x.get(name).asInstanceOf[T])
 
-          case _ => None
-        }
+        case _ => None
+      }
     }
 
   def remove(name: String) = activity.intent.foreach { _.removeExtra(name) }
@@ -175,370 +179,410 @@ object Extra {
 }
 
 /**
- * Automatically generated enriching class of `[[https://developer.android.com/reference/android/preference/Preference.html android.preference.Preference]]`.
- */
-class RichPreference[This <: android.preference.Preference](val basis: This) extends TraitPreference[This]
+  * Automatically generated enriching class of `[[https://developer.android.com/reference/android/preference/Preference.html android.preference.Preference]]`.
+  */
+class RichPreference[This <: android.preference.Preference](val basis: This)
+    extends TraitPreference[This]
 
 /**
- * Automatically generated helper trait of `[[https://developer.android.com/reference/android/preference/Preference.html android.preference.Preference]]`. This contains several property accessors.
- */
+  * Automatically generated helper trait of `[[https://developer.android.com/reference/android/preference/Preference.html android.preference.Preference]]`. This contains several property accessors.
+  */
 trait TraitPreference[This <: android.preference.Preference] {
 
   def basis: This
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getContext() getContext()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getContext() getContext()]]`
+    */
   @inline def context = basis.getContext
 
-  @inline def defaultValue(implicit no: NoGetterForThisProperty): Nothing = throw new Error("Android does not support the getter for 'defaultValue'")
+  @inline def defaultValue(implicit no: NoGetterForThisProperty): Nothing =
+    throw new Error("Android does not support the getter for 'defaultValue'")
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setDefaultValue(java.lang.Object) setDefaultValue(java.lang.Object)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setDefaultValue(java.lang.Object) setDefaultValue(java.lang.Object)]]`
+    */
   @inline def defaultValue(p: Any) = defaultValue_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setDefaultValue(java.lang.Object) setDefaultValue(java.lang.Object)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setDefaultValue(java.lang.Object) setDefaultValue(java.lang.Object)]]`
+    */
   @inline def defaultValue_=(p: Any) = { basis.setDefaultValue(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getDependency() getDependency()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getDependency() getDependency()]]`
+    */
   @inline def dependency = basis.getDependency
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setDependency(java.lang.String) setDependency(java.lang.String)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setDependency(java.lang.String) setDependency(java.lang.String)]]`
+    */
   @inline def dependency(p: java.lang.String) = dependency_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setDependency(java.lang.String) setDependency(java.lang.String)]]`
-   */
-  @inline def dependency_=(p: java.lang.String) = { basis.setDependency(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setDependency(java.lang.String) setDependency(java.lang.String)]]`
+    */
+  @inline def dependency_=(p: java.lang.String) = {
+    basis.setDependency(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getEditor() getEditor()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getEditor() getEditor()]]`
+    */
   @inline def editor = basis.getEditor
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#isEnabled() isEnabled()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#isEnabled() isEnabled()]]`
+    */
   @inline def enabled = basis.isEnabled
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setEnabled(boolean) setEnabled(boolean)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setEnabled(boolean) setEnabled(boolean)]]`
+    */
   @inline def enabled(p: Boolean) = enabled_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setEnabled(boolean) setEnabled(boolean)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setEnabled(boolean) setEnabled(boolean)]]`
+    */
   @inline def enabled_=(p: Boolean) = { basis.setEnabled(p); basis }
 
   @inline def enable() = { basis.setEnabled(true); basis }
   @inline def disable() = { basis.setEnabled(false); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getExtras() getExtras()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getExtras() getExtras()]]`
+    */
   @inline def extras = basis.getExtras
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getFragment() getFragment()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getFragment() getFragment()]]`
+    */
   @inline def fragment = basis.getFragment
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setFragment(java.lang.String) setFragment(java.lang.String)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setFragment(java.lang.String) setFragment(java.lang.String)]]`
+    */
   @inline def fragment(p: java.lang.String) = fragment_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setFragment(java.lang.String) setFragment(java.lang.String)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setFragment(java.lang.String) setFragment(java.lang.String)]]`
+    */
   @inline def fragment_=(p: java.lang.String) = { basis.setFragment(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getIcon() getIcon()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getIcon() getIcon()]]`
+    */
   @inline def icon = basis.getIcon
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIcon(int) setIcon(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIcon(int) setIcon(int)]]`
+    */
   @inline def icon(p: Int) = icon_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIcon(int) setIcon(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIcon(int) setIcon(int)]]`
+    */
   @inline def icon_=(p: Int) = { basis.setIcon(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIcon(android.graphics.drawable.Drawable) setIcon(android.graphics.drawable.Drawable)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIcon(android.graphics.drawable.Drawable) setIcon(android.graphics.drawable.Drawable)]]`
+    */
   @inline def icon(p: android.graphics.drawable.Drawable) = icon_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIcon(android.graphics.drawable.Drawable) setIcon(android.graphics.drawable.Drawable)]]`
-   */
-  @inline def icon_=(p: android.graphics.drawable.Drawable) = { basis.setIcon(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIcon(android.graphics.drawable.Drawable) setIcon(android.graphics.drawable.Drawable)]]`
+    */
+  @inline def icon_=(p: android.graphics.drawable.Drawable) = {
+    basis.setIcon(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getIntent() getIntent()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getIntent() getIntent()]]`
+    */
   @inline def intent = basis.getIntent
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIntent(android.content.Intent) setIntent(android.content.Intent)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIntent(android.content.Intent) setIntent(android.content.Intent)]]`
+    */
   @inline def intent(p: android.content.Intent) = intent_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIntent(android.content.Intent) setIntent(android.content.Intent)]]`
-   */
-  @inline def intent_=(p: android.content.Intent) = { basis.setIntent(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setIntent(android.content.Intent) setIntent(android.content.Intent)]]`
+    */
+  @inline def intent_=(p: android.content.Intent) = {
+    basis.setIntent(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getKey() getKey()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getKey() getKey()]]`
+    */
   @inline def key = basis.getKey
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setKey(java.lang.String) setKey(java.lang.String)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setKey(java.lang.String) setKey(java.lang.String)]]`
+    */
   @inline def key(p: java.lang.String) = key_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setKey(java.lang.String) setKey(java.lang.String)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setKey(java.lang.String) setKey(java.lang.String)]]`
+    */
   @inline def key_=(p: java.lang.String) = { basis.setKey(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getLayoutResource() getLayoutResource()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getLayoutResource() getLayoutResource()]]`
+    */
   @inline def layoutResource = basis.getLayoutResource
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setLayoutResource(int) setLayoutResource(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setLayoutResource(int) setLayoutResource(int)]]`
+    */
   @inline def layoutResource(p: Int) = layoutResource_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setLayoutResource(int) setLayoutResource(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setLayoutResource(int) setLayoutResource(int)]]`
+    */
   @inline def layoutResource_=(p: Int) = { basis.setLayoutResource(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getOnPreferenceChangeListener() getOnPreferenceChangeListener()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getOnPreferenceChangeListener() getOnPreferenceChangeListener()]]`
+    */
   @inline def onPreferenceChangeListener = basis.getOnPreferenceChangeListener
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOnPreferenceChangeListener(android.preference.Preference.OnPreferenceChangeListener) setOnPreferenceChangeListener(android.preference.Preference.OnPreferenceChangeListener)]]`
-   */
-  @inline def onPreferenceChangeListener(p: android.preference.Preference.OnPreferenceChangeListener) = onPreferenceChangeListener_=(p)
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOnPreferenceChangeListener(android.preference.Preference.OnPreferenceChangeListener) setOnPreferenceChangeListener(android.preference.Preference.OnPreferenceChangeListener)]]`
+    */
+  @inline
+  def onPreferenceChangeListener(
+      p: android.preference.Preference.OnPreferenceChangeListener) =
+    onPreferenceChangeListener_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOnPreferenceChangeListener(android.preference.Preference.OnPreferenceChangeListener) setOnPreferenceChangeListener(android.preference.Preference.OnPreferenceChangeListener)]]`
-   */
-  @inline def onPreferenceChangeListener_=(p: android.preference.Preference.OnPreferenceChangeListener) = { basis.setOnPreferenceChangeListener(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOnPreferenceChangeListener(android.preference.Preference.OnPreferenceChangeListener) setOnPreferenceChangeListener(android.preference.Preference.OnPreferenceChangeListener)]]`
+    */
+  @inline
+  def onPreferenceChangeListener_=(
+      p: android.preference.Preference.OnPreferenceChangeListener) = {
+    basis.setOnPreferenceChangeListener(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getOnPreferenceClickListener() getOnPreferenceClickListener()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getOnPreferenceClickListener() getOnPreferenceClickListener()]]`
+    */
   @inline def onPreferenceClickListener = basis.getOnPreferenceClickListener
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOnPreferenceClickListener(android.preference.Preference.OnPreferenceClickListener) setOnPreferenceClickListener(android.preference.Preference.OnPreferenceClickListener)]]`
-   */
-  @inline def onPreferenceClickListener(p: android.preference.Preference.OnPreferenceClickListener) = onPreferenceClickListener_=(p)
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOnPreferenceClickListener(android.preference.Preference.OnPreferenceClickListener) setOnPreferenceClickListener(android.preference.Preference.OnPreferenceClickListener)]]`
+    */
+  @inline
+  def onPreferenceClickListener(
+      p: android.preference.Preference.OnPreferenceClickListener) =
+    onPreferenceClickListener_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOnPreferenceClickListener(android.preference.Preference.OnPreferenceClickListener) setOnPreferenceClickListener(android.preference.Preference.OnPreferenceClickListener)]]`
-   */
-  @inline def onPreferenceClickListener_=(p: android.preference.Preference.OnPreferenceClickListener) = { basis.setOnPreferenceClickListener(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOnPreferenceClickListener(android.preference.Preference.OnPreferenceClickListener) setOnPreferenceClickListener(android.preference.Preference.OnPreferenceClickListener)]]`
+    */
+  @inline
+  def onPreferenceClickListener_=(
+      p: android.preference.Preference.OnPreferenceClickListener) = {
+    basis.setOnPreferenceClickListener(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getOrder() getOrder()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getOrder() getOrder()]]`
+    */
   @inline def order = basis.getOrder
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOrder(int) setOrder(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOrder(int) setOrder(int)]]`
+    */
   @inline def order(p: Int) = order_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOrder(int) setOrder(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setOrder(int) setOrder(int)]]`
+    */
   @inline def order_=(p: Int) = { basis.setOrder(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#isPersistent() isPersistent()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#isPersistent() isPersistent()]]`
+    */
   @inline def persistent = basis.isPersistent
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setPersistent(boolean) setPersistent(boolean)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setPersistent(boolean) setPersistent(boolean)]]`
+    */
   @inline def persistent(p: Boolean) = persistent_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setPersistent(boolean) setPersistent(boolean)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setPersistent(boolean) setPersistent(boolean)]]`
+    */
   @inline def persistent_=(p: Boolean) = { basis.setPersistent(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getPreferenceManager() getPreferenceManager()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getPreferenceManager() getPreferenceManager()]]`
+    */
   @inline def preferenceManager = basis.getPreferenceManager
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#isSelectable() isSelectable()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#isSelectable() isSelectable()]]`
+    */
   @inline def selectable = basis.isSelectable
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSelectable(boolean) setSelectable(boolean)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSelectable(boolean) setSelectable(boolean)]]`
+    */
   @inline def selectable(p: Boolean) = selectable_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSelectable(boolean) setSelectable(boolean)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSelectable(boolean) setSelectable(boolean)]]`
+    */
   @inline def selectable_=(p: Boolean) = { basis.setSelectable(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getSharedPreferences() getSharedPreferences()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getSharedPreferences() getSharedPreferences()]]`
+    */
   @inline def sharedPreferences = basis.getSharedPreferences
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getShouldDisableView() getShouldDisableView()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getShouldDisableView() getShouldDisableView()]]`
+    */
   @inline def shouldDisableView = basis.getShouldDisableView
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setShouldDisableView(boolean) setShouldDisableView(boolean)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setShouldDisableView(boolean) setShouldDisableView(boolean)]]`
+    */
   @inline def shouldDisableView(p: Boolean) = shouldDisableView_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setShouldDisableView(boolean) setShouldDisableView(boolean)]]`
-   */
-  @inline def shouldDisableView_=(p: Boolean) = { basis.setShouldDisableView(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setShouldDisableView(boolean) setShouldDisableView(boolean)]]`
+    */
+  @inline def shouldDisableView_=(p: Boolean) = {
+    basis.setShouldDisableView(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getSummary() getSummary()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getSummary() getSummary()]]`
+    */
   @inline def summary = basis.getSummary
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSummary(int) setSummary(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSummary(int) setSummary(int)]]`
+    */
   @inline def summary(p: Int) = summary_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSummary(int) setSummary(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSummary(int) setSummary(int)]]`
+    */
   @inline def summary_=(p: Int) = { basis.setSummary(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSummary(java.lang.CharSequence) setSummary(java.lang.CharSequence)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSummary(java.lang.CharSequence) setSummary(java.lang.CharSequence)]]`
+    */
   @inline def summary(p: java.lang.CharSequence) = summary_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSummary(java.lang.CharSequence) setSummary(java.lang.CharSequence)]]`
-   */
-  @inline def summary_=(p: java.lang.CharSequence) = { basis.setSummary(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setSummary(java.lang.CharSequence) setSummary(java.lang.CharSequence)]]`
+    */
+  @inline def summary_=(p: java.lang.CharSequence) = {
+    basis.setSummary(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getTitle() getTitle()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getTitle() getTitle()]]`
+    */
   @inline def title = basis.getTitle
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setTitle(int) setTitle(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setTitle(int) setTitle(int)]]`
+    */
   @inline def title(p: Int) = title_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setTitle(int) setTitle(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setTitle(int) setTitle(int)]]`
+    */
   @inline def title_=(p: Int) = { basis.setTitle(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setTitle(java.lang.CharSequence) setTitle(java.lang.CharSequence)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setTitle(java.lang.CharSequence) setTitle(java.lang.CharSequence)]]`
+    */
   @inline def title(p: java.lang.CharSequence) = title_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setTitle(java.lang.CharSequence) setTitle(java.lang.CharSequence)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setTitle(java.lang.CharSequence) setTitle(java.lang.CharSequence)]]`
+    */
   @inline def title_=(p: java.lang.CharSequence) = { basis.setTitle(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getTitleRes() getTitleRes()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getTitleRes() getTitleRes()]]`
+    */
   @inline def titleRes = basis.getTitleRes
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getWidgetLayoutResource() getWidgetLayoutResource()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#getWidgetLayoutResource() getWidgetLayoutResource()]]`
+    */
   @inline def widgetLayoutResource = basis.getWidgetLayoutResource
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setWidgetLayoutResource(int) setWidgetLayoutResource(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setWidgetLayoutResource(int) setWidgetLayoutResource(int)]]`
+    */
   @inline def widgetLayoutResource(p: Int) = widgetLayoutResource_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setWidgetLayoutResource(int) setWidgetLayoutResource(int)]]`
-   */
-  @inline def widgetLayoutResource_=(p: Int) = { basis.setWidgetLayoutResource(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/Preference.html#setWidgetLayoutResource(int) setWidgetLayoutResource(int)]]`
+    */
+  @inline def widgetLayoutResource_=(p: Int) = {
+    basis.setWidgetLayoutResource(p); basis
+  }
 
-  @inline def onPreferenceChange(f: (android.preference.Preference, Any) => Boolean): This = {
-    basis.setOnPreferenceChangeListener(new android.preference.Preference.OnPreferenceChangeListener {
-      def onPreferenceChange(p1: android.preference.Preference, p2: Any): Boolean = { f(p1, p2) }
+  @inline
+  def onPreferenceChange(
+      f: (android.preference.Preference, Any) => Boolean): This = {
+    basis.setOnPreferenceChangeListener(
+        new android.preference.Preference.OnPreferenceChangeListener {
+      def onPreferenceChange(
+          p1: android.preference.Preference, p2: Any): Boolean = { f(p1, p2) }
     })
     basis
   }
 
   @inline def onPreferenceChange(f: => Boolean): This = {
-    basis.setOnPreferenceChangeListener(new android.preference.Preference.OnPreferenceChangeListener {
-      def onPreferenceChange(p1: android.preference.Preference, p2: Any): Boolean = { f }
+    basis.setOnPreferenceChangeListener(
+        new android.preference.Preference.OnPreferenceChangeListener {
+      def onPreferenceChange(
+          p1: android.preference.Preference, p2: Any): Boolean = { f }
     })
     basis
   }
 
-  @inline def onPreferenceClick(f: android.preference.Preference => Boolean): This = {
-    basis.setOnPreferenceClickListener(new android.preference.Preference.OnPreferenceClickListener {
-      def onPreferenceClick(p: android.preference.Preference): Boolean = { f(p) }
+  @inline
+  def onPreferenceClick(f: android.preference.Preference => Boolean): This = {
+    basis.setOnPreferenceClickListener(
+        new android.preference.Preference.OnPreferenceClickListener {
+      def onPreferenceClick(p: android.preference.Preference): Boolean = {
+        f(p)
+      }
     })
     basis
   }
 
   @inline def onPreferenceClick(f: => Boolean): This = {
-    basis.setOnPreferenceClickListener(new android.preference.Preference.OnPreferenceClickListener {
+    basis.setOnPreferenceClickListener(
+        new android.preference.Preference.OnPreferenceClickListener {
       def onPreferenceClick(p: android.preference.Preference): Boolean = { f }
     })
     basis
   }
-  @inline def setIntent[T: ClassTag](implicit context: Context): Unit = basis.setIntent(SIntent[T])
+  @inline def setIntent[T : ClassTag](implicit context: Context): Unit =
+    basis.setIntent(SIntent[T])
 }
 
 /**
- * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/preference/Preference.html android.preference.Preference]]`.
- */
+  * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/preference/Preference.html android.preference.Preference]]`.
+  */
 class SPreference()(implicit context: android.content.Context)
-    extends android.preference.Preference(context) with TraitPreference[SPreference] {
+    extends android.preference.Preference(context)
+    with TraitPreference[SPreference] {
 
   def basis = this
-
 }
 
 object SPreference {
@@ -547,206 +591,228 @@ object SPreference {
 
     v
   }
-
 }
 
 /**
- * Automatically generated enriching class of `[[https://developer.android.com/reference/android/preference/DialogPreference.html android.preference.DialogPreference]]`.
- */
-class RichDialogPreference[This <: android.preference.DialogPreference](val basis: This) extends TraitDialogPreference[This]
+  * Automatically generated enriching class of `[[https://developer.android.com/reference/android/preference/DialogPreference.html android.preference.DialogPreference]]`.
+  */
+class RichDialogPreference[This <: android.preference.DialogPreference](
+    val basis: This)
+    extends TraitDialogPreference[This]
 
 /**
- * Automatically generated helper trait of `[[https://developer.android.com/reference/android/preference/DialogPreference.html android.preference.DialogPreference]]`. This contains several property accessors.
- */
-trait TraitDialogPreference[This <: android.preference.DialogPreference] extends TraitPreference[This] {
+  * Automatically generated helper trait of `[[https://developer.android.com/reference/android/preference/DialogPreference.html android.preference.DialogPreference]]`. This contains several property accessors.
+  */
+trait TraitDialogPreference[This <: android.preference.DialogPreference]
+    extends TraitPreference[This] {
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialog() getDialog()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialog() getDialog()]]`
+    */
   @inline def dialog = basis.getDialog
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialogIcon() getDialogIcon()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialogIcon() getDialogIcon()]]`
+    */
   @inline def dialogIcon = basis.getDialogIcon
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogIcon(int) setDialogIcon(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogIcon(int) setDialogIcon(int)]]`
+    */
   @inline def dialogIcon(p: Int) = dialogIcon_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogIcon(int) setDialogIcon(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogIcon(int) setDialogIcon(int)]]`
+    */
   @inline def dialogIcon_=(p: Int) = { basis.setDialogIcon(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogIcon(android.graphics.drawable.Drawable) setDialogIcon(android.graphics.drawable.Drawable)]]`
-   */
-  @inline def dialogIcon(p: android.graphics.drawable.Drawable) = dialogIcon_=(p)
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogIcon(android.graphics.drawable.Drawable) setDialogIcon(android.graphics.drawable.Drawable)]]`
+    */
+  @inline def dialogIcon(p: android.graphics.drawable.Drawable) =
+    dialogIcon_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogIcon(android.graphics.drawable.Drawable) setDialogIcon(android.graphics.drawable.Drawable)]]`
-   */
-  @inline def dialogIcon_=(p: android.graphics.drawable.Drawable) = { basis.setDialogIcon(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogIcon(android.graphics.drawable.Drawable) setDialogIcon(android.graphics.drawable.Drawable)]]`
+    */
+  @inline def dialogIcon_=(p: android.graphics.drawable.Drawable) = {
+    basis.setDialogIcon(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialogLayoutResource() getDialogLayoutResource()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialogLayoutResource() getDialogLayoutResource()]]`
+    */
   @inline def dialogLayoutResource = basis.getDialogLayoutResource
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogLayoutResource(int) setDialogLayoutResource(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogLayoutResource(int) setDialogLayoutResource(int)]]`
+    */
   @inline def dialogLayoutResource(p: Int) = dialogLayoutResource_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogLayoutResource(int) setDialogLayoutResource(int)]]`
-   */
-  @inline def dialogLayoutResource_=(p: Int) = { basis.setDialogLayoutResource(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogLayoutResource(int) setDialogLayoutResource(int)]]`
+    */
+  @inline def dialogLayoutResource_=(p: Int) = {
+    basis.setDialogLayoutResource(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialogMessage() getDialogMessage()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialogMessage() getDialogMessage()]]`
+    */
   @inline def dialogMessage = basis.getDialogMessage
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogMessage(int) setDialogMessage(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogMessage(int) setDialogMessage(int)]]`
+    */
   @inline def dialogMessage(p: Int) = dialogMessage_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogMessage(int) setDialogMessage(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogMessage(int) setDialogMessage(int)]]`
+    */
   @inline def dialogMessage_=(p: Int) = { basis.setDialogMessage(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogMessage(java.lang.CharSequence) setDialogMessage(java.lang.CharSequence)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogMessage(java.lang.CharSequence) setDialogMessage(java.lang.CharSequence)]]`
+    */
   @inline def dialogMessage(p: java.lang.CharSequence) = dialogMessage_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogMessage(java.lang.CharSequence) setDialogMessage(java.lang.CharSequence)]]`
-   */
-  @inline def dialogMessage_=(p: java.lang.CharSequence) = { basis.setDialogMessage(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogMessage(java.lang.CharSequence) setDialogMessage(java.lang.CharSequence)]]`
+    */
+  @inline def dialogMessage_=(p: java.lang.CharSequence) = {
+    basis.setDialogMessage(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialogTitle() getDialogTitle()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getDialogTitle() getDialogTitle()]]`
+    */
   @inline def dialogTitle = basis.getDialogTitle
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogTitle(int) setDialogTitle(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogTitle(int) setDialogTitle(int)]]`
+    */
   @inline def dialogTitle(p: Int) = dialogTitle_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogTitle(int) setDialogTitle(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogTitle(int) setDialogTitle(int)]]`
+    */
   @inline def dialogTitle_=(p: Int) = { basis.setDialogTitle(p); basis }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogTitle(java.lang.CharSequence) setDialogTitle(java.lang.CharSequence)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogTitle(java.lang.CharSequence) setDialogTitle(java.lang.CharSequence)]]`
+    */
   @inline def dialogTitle(p: java.lang.CharSequence) = dialogTitle_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogTitle(java.lang.CharSequence) setDialogTitle(java.lang.CharSequence)]]`
-   */
-  @inline def dialogTitle_=(p: java.lang.CharSequence) = { basis.setDialogTitle(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setDialogTitle(java.lang.CharSequence) setDialogTitle(java.lang.CharSequence)]]`
+    */
+  @inline def dialogTitle_=(p: java.lang.CharSequence) = {
+    basis.setDialogTitle(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getNegativeButtonText() getNegativeButtonText()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getNegativeButtonText() getNegativeButtonText()]]`
+    */
   @inline def negativeButtonText = basis.getNegativeButtonText
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setNegativeButtonText(int) setNegativeButtonText(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setNegativeButtonText(int) setNegativeButtonText(int)]]`
+    */
   @inline def negativeButtonText(p: Int) = negativeButtonText_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setNegativeButtonText(int) setNegativeButtonText(int)]]`
-   */
-  @inline def negativeButtonText_=(p: Int) = { basis.setNegativeButtonText(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setNegativeButtonText(int) setNegativeButtonText(int)]]`
+    */
+  @inline def negativeButtonText_=(p: Int) = {
+    basis.setNegativeButtonText(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setNegativeButtonText(java.lang.CharSequence) setNegativeButtonText(java.lang.CharSequence)]]`
-   */
-  @inline def negativeButtonText(p: java.lang.CharSequence) = negativeButtonText_=(p)
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setNegativeButtonText(java.lang.CharSequence) setNegativeButtonText(java.lang.CharSequence)]]`
+    */
+  @inline def negativeButtonText(p: java.lang.CharSequence) =
+    negativeButtonText_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setNegativeButtonText(java.lang.CharSequence) setNegativeButtonText(java.lang.CharSequence)]]`
-   */
-  @inline def negativeButtonText_=(p: java.lang.CharSequence) = { basis.setNegativeButtonText(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setNegativeButtonText(java.lang.CharSequence) setNegativeButtonText(java.lang.CharSequence)]]`
+    */
+  @inline def negativeButtonText_=(p: java.lang.CharSequence) = {
+    basis.setNegativeButtonText(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getPositiveButtonText() getPositiveButtonText()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#getPositiveButtonText() getPositiveButtonText()]]`
+    */
   @inline def positiveButtonText = basis.getPositiveButtonText
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setPositiveButtonText(int) setPositiveButtonText(int)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setPositiveButtonText(int) setPositiveButtonText(int)]]`
+    */
   @inline def positiveButtonText(p: Int) = positiveButtonText_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setPositiveButtonText(int) setPositiveButtonText(int)]]`
-   */
-  @inline def positiveButtonText_=(p: Int) = { basis.setPositiveButtonText(p); basis }
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setPositiveButtonText(int) setPositiveButtonText(int)]]`
+    */
+  @inline def positiveButtonText_=(p: Int) = {
+    basis.setPositiveButtonText(p); basis
+  }
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setPositiveButtonText(java.lang.CharSequence) setPositiveButtonText(java.lang.CharSequence)]]`
-   */
-  @inline def positiveButtonText(p: java.lang.CharSequence) = positiveButtonText_=(p)
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setPositiveButtonText(java.lang.CharSequence) setPositiveButtonText(java.lang.CharSequence)]]`
+    */
+  @inline def positiveButtonText(p: java.lang.CharSequence) =
+    positiveButtonText_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setPositiveButtonText(java.lang.CharSequence) setPositiveButtonText(java.lang.CharSequence)]]`
-   */
-  @inline def positiveButtonText_=(p: java.lang.CharSequence) = { basis.setPositiveButtonText(p); basis }
-
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/DialogPreference.html#setPositiveButtonText(java.lang.CharSequence) setPositiveButtonText(java.lang.CharSequence)]]`
+    */
+  @inline def positiveButtonText_=(p: java.lang.CharSequence) = {
+    basis.setPositiveButtonText(p); basis
+  }
 }
 
 /**
- * Automatically generated enriching class of `[[https://developer.android.com/reference/android/preference/EditTextPreference.html android.preference.EditTextPreference]]`.
- */
-class RichEditTextPreference[This <: android.preference.EditTextPreference](val basis: This) extends TraitEditTextPreference[This]
+  * Automatically generated enriching class of `[[https://developer.android.com/reference/android/preference/EditTextPreference.html android.preference.EditTextPreference]]`.
+  */
+class RichEditTextPreference[This <: android.preference.EditTextPreference](
+    val basis: This)
+    extends TraitEditTextPreference[This]
 
 /**
- * Automatically generated helper trait of `[[https://developer.android.com/reference/android/preference/EditTextPreference.html android.preference.EditTextPreference]]`. This contains several property accessors.
- */
-trait TraitEditTextPreference[This <: android.preference.EditTextPreference] extends TraitDialogPreference[This] {
+  * Automatically generated helper trait of `[[https://developer.android.com/reference/android/preference/EditTextPreference.html android.preference.EditTextPreference]]`. This contains several property accessors.
+  */
+trait TraitEditTextPreference[This <: android.preference.EditTextPreference]
+    extends TraitDialogPreference[This] {
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/EditTextPreference.html#getEditText() getEditText()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/EditTextPreference.html#getEditText() getEditText()]]`
+    */
   @inline def editText = basis.getEditText
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/EditTextPreference.html#getText() getText()]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/EditTextPreference.html#getText() getText()]]`
+    */
   @inline def text = basis.getText
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/EditTextPreference.html#setText(java.lang.String) setText(java.lang.String)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/EditTextPreference.html#setText(java.lang.String) setText(java.lang.String)]]`
+    */
   @inline def text(p: java.lang.String) = text_=(p)
 
   /**
-   * Shortcut for `[[https://developer.android.com/reference/android/preference/EditTextPreference.html#setText(java.lang.String) setText(java.lang.String)]]`
-   */
+    * Shortcut for `[[https://developer.android.com/reference/android/preference/EditTextPreference.html#setText(java.lang.String) setText(java.lang.String)]]`
+    */
   @inline def text_=(p: java.lang.String) = { basis.setText(p); basis }
-
 }
 
 /**
- * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/preference/EditTextPreference.html android.preference.EditTextPreference]]`.
- */
+  * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/preference/EditTextPreference.html android.preference.EditTextPreference]]`.
+  */
 class SEditTextPreference()(implicit context: android.content.Context)
-    extends android.preference.EditTextPreference(context) with TraitEditTextPreference[SEditTextPreference] {
+    extends android.preference.EditTextPreference(context)
+    with TraitEditTextPreference[SEditTextPreference] {
 
   def basis = this
-
 }
 
 object SEditTextPreference {
@@ -755,6 +821,4 @@ object SEditTextPreference {
 
     v
   }
-
 }
-

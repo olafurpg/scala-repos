@@ -10,6 +10,6 @@ object Sub extends Super[Int] {
   // to make this work, but I consider it's best to keep this
   // let the user know Super is not the superclass anymore.
   // super[Super].superb - Vlad
-  super.superb        // okay    
+  super.superb // okay    
   override def superb: Int = super.superb // okay
 }

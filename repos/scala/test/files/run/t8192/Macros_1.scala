@@ -10,11 +10,14 @@ object Macros {
     import c.universe._
     def test(sym: ClassSymbol): Unit = {
       def fullyInitializeSymbol(sym: Symbol): Unit = {
-        val internal = c.universe.asInstanceOf[scala.reflect.internal.SymbolTable]
-        internal.definitions.fullyInitializeSymbol(sym.asInstanceOf[internal.Symbol])
+        val internal =
+          c.universe.asInstanceOf[scala.reflect.internal.SymbolTable]
+        internal.definitions.fullyInitializeSymbol(
+            sym.asInstanceOf[internal.Symbol])
       }
       def defString(sym: Symbol): String = {
-        val internal = c.universe.asInstanceOf[scala.reflect.internal.SymbolTable]
+        val internal =
+          c.universe.asInstanceOf[scala.reflect.internal.SymbolTable]
         sym.asInstanceOf[internal.Symbol].defString
       }
       def showCtor(sym: Symbol): String = {
@@ -25,7 +28,9 @@ object Macros {
       sym.info
       println(sym.toString)
       println(s"primary constructor: ${showCtor(sym.primaryConstructor)}")
-      val ctors = sym.info.members.filter(_.name == termNames.CONSTRUCTOR).map(sym => showCtor(sym))
+      val ctors = sym.info.members
+        .filter(_.name == termNames.CONSTRUCTOR)
+        .map(sym => showCtor(sym))
       ctors.toList.sorted.foreach(println)
     }
 

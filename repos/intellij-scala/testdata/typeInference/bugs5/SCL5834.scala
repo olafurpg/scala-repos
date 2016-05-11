@@ -6,6 +6,7 @@ object Colors extends Enumeration {
 object Test extends App {
   def getEnumElementByIndex[T <: Enumeration](e: T, i: Int): T#Value = e(i)
 
-  /*start*/getEnumElementByIndex(Colors, 1)/*end*/
+  /*start*/
+  getEnumElementByIndex(Colors, 1) /*end*/
 }
 //Colors.Value

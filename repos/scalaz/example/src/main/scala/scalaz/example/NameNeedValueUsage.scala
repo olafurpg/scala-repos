@@ -2,9 +2,9 @@ package scalaz.example
 
 object NameNeedValueUsage extends App {
   import scalaz._
-  
+
   def undefined = sys.error("!!")
-  
+
   class Inc {
     var i = 0
 
@@ -50,5 +50,4 @@ object NameNeedValueUsage extends App {
     val inc = new Inc
     assert(bind(Need(inc.apply()))(x => Need(x)).value == 1)
   }
-
 }

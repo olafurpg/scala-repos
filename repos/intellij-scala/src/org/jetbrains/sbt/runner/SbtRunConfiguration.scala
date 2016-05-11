@@ -24,41 +24,50 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- * Run configuration of SBT tasks.
- */
-class SbtRunConfiguration(val project: Project, val configurationFactory: ConfigurationFactory, val name: String)
-        extends ModuleBasedConfiguration[RunConfigurationModule](name, new RunConfigurationModule(project), configurationFactory) {
+  * Run configuration of SBT tasks.
+  */
+class SbtRunConfiguration(val project: Project,
+                          val configurationFactory: ConfigurationFactory,
+                          val name: String)
+    extends ModuleBasedConfiguration[RunConfigurationModule](
+        name, new RunConfigurationModule(project), configurationFactory) {
 
   /**
-   * List of task to execute in format of SBT.
-   */
+    * List of task to execute in format of SBT.
+    */
   private var tasks = ""
 
   /**
-   * Extra java options.
-   */
-  private var javaOptions = "-Xms512M -Xmx1024M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M"
+    * Extra java options.
+    */
+  private var javaOptions =
+    "-Xms512M -Xmx1024M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M"
 
   /**
-   * Environment variables.
-   */
-  private val envirnomentVariables: java.util.Map[String, String] = new mutable.HashMap[String, String]()
+    * Environment variables.
+    */
+  private val envirnomentVariables: java.util.Map[String, String] =
+    new mutable.HashMap[String, String]()
 
   override def getValidModules: util.Collection[Module] = List()
 
-  override def getState(executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+  override def getState(
+      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
     val state: SbtComandLineState = new SbtComandLineState(this, env)
-    state.setConsoleBuilder(TextConsoleBuilderFactory.getInstance.createBuilder(getProject))
+    state.setConsoleBuilder(
+        TextConsoleBuilderFactory.getInstance.createBuilder(getProject))
     state
   }
 
-  override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] = new SbtRunConfigurationEditor(project, this)
+  override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
+    new SbtRunConfigurationEditor(project, this)
 
   override def writeExternal(element: Element) {
     super.writeExternal(element)
     JDOMExternalizer.write(element, "tasks", getTasks)
     JDOMExternalizer.write(element, "vmparams", getJavaOptions)
-    EnvironmentVariablesComponent.writeExternal(element, getEnvironmentVariables)
+    EnvironmentVariablesComponent.writeExternal(
+        element, getEnvironmentVariables)
   }
 
   override def readExternal(element: Element) {
@@ -87,30 +96,37 @@ class SbtRunConfiguration(val project: Project, val configurationFactory: Config
 
   def getEnvironmentVariables = envirnomentVariables
 
-  class SbtComandLineState(configuration: SbtRunConfiguration, envirnoment: ExecutionEnvironment)
-          extends JavaCommandLineState(envirnoment) {
+  class SbtComandLineState(
+      configuration: SbtRunConfiguration, envirnoment: ExecutionEnvironment)
+      extends JavaCommandLineState(envirnoment) {
 
     def createJavaParameters(): JavaParameters = {
       val params: JavaParameters = new JavaParameters
-      val jdk: Sdk = JavaParametersUtil.createProjectJdk(configuration.getProject, null)
+      val jdk: Sdk =
+        JavaParametersUtil.createProjectJdk(configuration.getProject, null)
       try {
         jdk.getSdkType match {
-          case sdkType : AndroidSdkType =>
-            envirnomentVariables.put("ANDROID_HOME", jdk.getSdkModificator.getHomePath)
+          case sdkType: AndroidSdkType =>
+            envirnomentVariables.put(
+                "ANDROID_HOME", jdk.getSdkModificator.getHomePath)
           case _ => // do nothing
         }
       } catch {
-        case _ : NoClassDefFoundError => // no android plugin, do nothing
+        case _: NoClassDefFoundError => // no android plugin, do nothing
       }
       params.setWorkingDirectory(project.getBaseDir.getPath)
-      params.configureByProject(configuration.getProject, JavaParameters.JDK_ONLY, jdk)
-      val sbtSystemSettings: SbtSystemSettings = SbtSystemSettings.getInstance(configuration.getProject)
+      params.configureByProject(
+          configuration.getProject, JavaParameters.JDK_ONLY, jdk)
+      val sbtSystemSettings: SbtSystemSettings =
+        SbtSystemSettings.getInstance(configuration.getProject)
       if (sbtSystemSettings.getCustomLauncherEnabled) {
         params.getClassPath.add(sbtSystemSettings.getCustomLauncherPath)
-        params.setMainClass(determineMainClass(sbtSystemSettings.getCustomLauncherPath))
+        params.setMainClass(
+            determineMainClass(sbtSystemSettings.getCustomLauncherPath))
       } else {
         params.getClassPath.add(SbtRunner.getDefaultLauncher)
-        params.setMainClass(determineMainClass(SbtRunner.getDefaultLauncher.getAbsolutePath))
+        params.setMainClass(
+            determineMainClass(SbtRunner.getDefaultLauncher.getAbsolutePath))
       }
       params.setEnv(envirnomentVariables)
       params.getVMParametersList.addParametersString(javaOptions)
@@ -120,5 +136,4 @@ class SbtRunConfiguration(val project: Project, val configurationFactory: Config
 
     override def ansiColoringEnabled(): Boolean = true
   }
-
 }

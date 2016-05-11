@@ -5,7 +5,7 @@ import scala.tools.reflect.Eval
 object Test extends App {
   class C(val y: Int) {
     val code = reify {
-      reify{y}.eval
+      reify { y }.eval
     }
   }
 

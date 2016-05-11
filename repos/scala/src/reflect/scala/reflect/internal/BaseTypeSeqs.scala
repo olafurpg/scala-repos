@@ -11,20 +11,20 @@ import scala.collection.mutable
 import util.Statistics
 
 /** A base type sequence (BaseTypeSeq) is an ordered sequence spanning all the base types
- *  of a type. It characterized by the following two laws:
- *
- *  (1) Each element of `tp.baseTypeSeq`  is a basetype of `tp`
- *  (2) For each basetype `bt1` of `tp` there is an element `bt` in `tp.baseTypeSeq` such that
- *
- *      bt.typeSymbol = bt1.typeSymbol
- *      bt <: bt1
- *
- *  (3) The type symbols of different elements are different.
- *
- *  Elements in the sequence are ordered by Symbol.isLess.
- *  @note base type sequences were called closures up to 2.7.1. The name has been changed
- *  to avoid confusion with function closures.
- */
+  *  of a type. It characterized by the following two laws:
+  *
+  *  (1) Each element of `tp.baseTypeSeq`  is a basetype of `tp`
+  *  (2) For each basetype `bt1` of `tp` there is an element `bt` in `tp.baseTypeSeq` such that
+  *
+  *      bt.typeSymbol = bt1.typeSymbol
+  *      bt <: bt1
+  *
+  *  (3) The type symbols of different elements are different.
+  *
+  *  Elements in the sequence are ordered by Symbol.isLess.
+  *  @note base type sequences were called closures up to 2.7.1. The name has been changed
+  *  to avoid confusion with function closures.
+  */
 trait BaseTypeSeqs {
   this: SymbolTable =>
   import definitions._
@@ -34,13 +34,15 @@ trait BaseTypeSeqs {
     new BaseTypeSeq(parents, elems)
 
   /** Note: constructor is protected to force everyone to use the factory method newBaseTypeSeq instead.
-   *  This is necessary because when run from reflection every base type sequence needs to have a
-   *  SynchronizedBaseTypeSeq as mixin.
-   */
-  class BaseTypeSeq protected[reflect] (private[BaseTypeSeqs] val parents: List[Type], private[BaseTypeSeqs] val elems: Array[Type]) {
-  self =>
+    *  This is necessary because when run from reflection every base type sequence needs to have a
+    *  SynchronizedBaseTypeSeq as mixin.
+    */
+  class BaseTypeSeq protected[reflect](
+      private[BaseTypeSeqs] val parents: List[Type],
+      private[BaseTypeSeqs] val elems: Array[Type]) { self =>
     if (Statistics.canEnable) Statistics.incCounter(baseTypeSeqCount)
-    if (Statistics.canEnable) Statistics.incCounter(baseTypeSeqLenTotal, elems.length)
+    if (Statistics.canEnable)
+      Statistics.incCounter(baseTypeSeqLenTotal, elems.length)
 
     /** The number of types in the sequence */
     def length: Int = elems.length
@@ -53,7 +55,7 @@ trait BaseTypeSeqs {
 
     /** The type at i'th position in this sequence; lazy types are returned evaluated. */
     def apply(i: Int): Type =
-      if(pending contains i) {
+      if (pending contains i) {
         pending.clear()
         throw CyclicInheritance
       } else
@@ -64,18 +66,22 @@ trait BaseTypeSeqs {
             //Console.println("compute closure of "+this+" => glb("+variants+")")
             pending += i
             try {
-              mergePrefixAndArgs(variants, Variance.Contravariant, lubDepth(variants)) match {
-                case NoType => typeError("no common type instance of base types "+(variants mkString ", and ")+" exists.")
-                case tp0    =>
+              mergePrefixAndArgs(
+                  variants, Variance.Contravariant, lubDepth(variants)) match {
+                case NoType =>
+                  typeError(
+                      "no common type instance of base types " +
+                      (variants mkString ", and ") + " exists.")
+                case tp0 =>
                   pending(i) = false
                   elems(i) = tp0
                   tp0
               }
-            }
-            catch {
+            } catch {
               case CyclicInheritance =>
                 typeError(
-                  "computing the common type instance of base types "+(variants mkString ", and ")+" leads to a cycle.")
+                    "computing the common type instance of base types " +
+                    (variants mkString ", and ") + " leads to a cycle.")
             }
           case tp =>
             tp
@@ -84,8 +90,8 @@ trait BaseTypeSeqs {
     def rawElem(i: Int) = elems(i)
 
     /** The type symbol of the type at i'th position in this sequence;
-     *  no evaluation needed.
-     */
+      *  no evaluation needed.
+      */
     def typeSymbol(i: Int): Symbol = {
       elems(i) match {
         case RefinedType(v :: vs, _) => v.typeSymbol
@@ -110,9 +116,9 @@ trait BaseTypeSeqs {
     def updateHead(tp: Type): BaseTypeSeq = copy(tp, 0)
 
     /** Compute new base type sequence where every element is mapped
-     *  with function `f`. Lazy types are mapped but not evaluated */
+      *  with function `f`. Lazy types are mapped but not evaluated */
     def map(f: Type => Type): BaseTypeSeq = {
-	  // inlined `elems map f` for performance
+      // inlined `elems map f` for performance
       val len = length
       val arr = new Array[Type](len)
       var i = 0
@@ -139,17 +145,18 @@ trait BaseTypeSeqs {
 
     private def typeError(msg: String): Nothing =
       throw new TypeError(
-        "the type intersection "+(parents mkString " with ")+" is malformed"+
-        "\n --- because ---\n"+msg)
+          "the type intersection " + (parents mkString " with ") +
+          " is malformed" + "\n --- because ---\n" + msg)
   }
 
   /** A marker object for a base type sequence that's no yet computed.
-   *  used to catch inheritance cycles
-   */
+    *  used to catch inheritance cycles
+    */
   val undetBaseTypeSeq: BaseTypeSeq = newBaseTypeSeq(List(), Array())
 
   /** Create a base type sequence consisting of a single type */
-  def baseTypeSingletonSeq(tp: Type): BaseTypeSeq = newBaseTypeSeq(List(), Array(tp))
+  def baseTypeSingletonSeq(tp: Type): BaseTypeSeq =
+    newBaseTypeSeq(List(), Array(tp))
 
   /** Create the base type sequence of a compound type with given tp.parents */
   def compoundBaseTypeSeq(tp: Type): BaseTypeSeq = {
@@ -166,9 +173,8 @@ trait BaseTypeSeqs {
       var i = 0
       for (p <- parents) {
         val parentBts = p.dealias.baseTypeSeq // dealias need for SI-8046.
-        pbtss(i) =
-          if (parentBts eq undetBaseTypeSeq) AnyClass.info.baseTypeSeq
-          else parentBts
+        pbtss(i) = if (parentBts eq undetBaseTypeSeq) AnyClass.info.baseTypeSeq
+        else parentBts
         index(i) = 0
         i += 1
       }
@@ -188,14 +194,14 @@ trait BaseTypeSeqs {
         i = 1
         while (i < nparents) {
           val nextSym = nextTypeSymbol(i)
-          if (nextSym isLess minSym)
-            minSym = nextSym
+          if (nextSym isLess minSym) minSym = nextSym
           i += 1
         }
         var minTypes: List[Type] = List()
         def alreadyInMinTypes(tp: Type): Boolean = {
-          @annotation.tailrec def loop(tps: List[Type]): Boolean = tps match {
-            case Nil     => false
+          @annotation.tailrec
+          def loop(tps: List[Type]): Boolean = tps match {
+            case Nil => false
             case x :: xs => (tp =:= x) || loop(xs)
           }
           loop(minTypes)
@@ -206,8 +212,8 @@ trait BaseTypeSeqs {
           if (nextTypeSymbol(i) == minSym) {
             nextRawElem(i) match {
               case RefinedType(variants, decls) =>
-                for (tp <- variants)
-                  if (!alreadyInMinTypes(tp)) minTypes ::= tp
+                for (tp <- variants) if (!alreadyInMinTypes(tp))
+                  minTypes ::= tp
               case tp =>
                 if (!alreadyInMinTypes(tp)) minTypes ::= tp
             }
@@ -225,16 +231,19 @@ trait BaseTypeSeqs {
     newBaseTypeSeq(parents, elems)
   }
 
-  class MappedBaseTypeSeq(orig: BaseTypeSeq, f: Type => Type) extends BaseTypeSeq(orig.parents map f, orig.elems) {
+  class MappedBaseTypeSeq(orig: BaseTypeSeq, f: Type => Type)
+      extends BaseTypeSeq(orig.parents map f, orig.elems) {
     override def apply(i: Int) = f(orig.apply(i))
     override def rawElem(i: Int) = f(orig.rawElem(i))
     override def typeSymbol(i: Int) = orig.typeSymbol(i)
     override def toList = orig.toList map f
-    override def copy(head: Type, offset: Int) = (orig map f).copy(head, offset)
+    override def copy(head: Type, offset: Int) =
+      (orig map f).copy(head, offset)
     override def map(g: Type => Type) = lateMap(g)
     override def lateMap(g: Type => Type) = orig.lateMap(x => g(f(x)))
     override def exists(p: Type => Boolean) = elems exists (x => p(f(x)))
-    override protected def maxDepthOfElems: Depth = elems.map(x => typeDepth(f(x))).max
+    override protected def maxDepthOfElems: Depth =
+      elems.map(x => typeDepth(f(x))).max
     override def toString = elems.mkString("MBTS(", ",", ")")
   }
 
@@ -243,5 +252,6 @@ trait BaseTypeSeqs {
 
 object BaseTypeSeqsStats {
   val baseTypeSeqCount = Statistics.newCounter("#base type seqs")
-  val baseTypeSeqLenTotal = Statistics.newRelCounter("avg base type seq length", baseTypeSeqCount)
+  val baseTypeSeqLenTotal =
+    Statistics.newRelCounter("avg base type seq length", baseTypeSeqCount)
 }

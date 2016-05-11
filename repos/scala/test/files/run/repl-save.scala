@@ -2,7 +2,7 @@ import scala.tools.partest.SessionTest
 
 object Test extends SessionTest {
   def session =
-s"""|
+    s"""|
     |scala> val i = 7
     |i: Int = 7
     |

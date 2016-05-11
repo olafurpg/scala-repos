@@ -6,7 +6,8 @@ object Exclude {
     val x = 2
 
     class D {
-      /* line: 6 */x = 1
+      /* line: 6 */
+      x = 1
     }
   }
 }

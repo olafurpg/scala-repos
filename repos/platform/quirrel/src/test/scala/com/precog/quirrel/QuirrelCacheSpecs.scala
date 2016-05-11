@@ -26,17 +26,14 @@ import parser._
 import typer._
 import emitter._
 
-object QuirrelCacheSpecs extends Specification
-    with Parser
-    with Compiler
-    with TreeShaker
-    with GroupSolver
-    with LineErrors 
-    with RandomLibrarySpec {
+object QuirrelCacheSpecs
+    extends Specification with Parser with Compiler with TreeShaker
+    with GroupSolver with LineErrors with RandomLibrarySpec {
 
   import ast._
 
-  private def findNode[A](root: Expr)(pf: PartialFunction[Expr, A]): Option[A] = {
+  private def findNode[A](root: Expr)(
+      pf: PartialFunction[Expr, A]): Option[A] = {
     def loop(expr: Expr): Option[A] = {
       if (pf.isDefinedAt(expr)) {
         Some(pf(expr))
@@ -47,7 +44,7 @@ object QuirrelCacheSpecs extends Specification
           case Let(_, _, _, c1, c2) => c1 :: c2 :: Nil
           case e => e.children
         }
-            
+
         cs.iterator map loop collectFirst {
           case Some(a) => a
         }
@@ -71,10 +68,18 @@ object QuirrelCacheSpecs extends Specification
       result must haveSize(1)
       val root = result.head
 
-      val a = findNode(root) { case NumLit(loc, _) => (loc.lineNum, loc.colNum) }
-      val b = findNode(root) { case StrLit(loc, "asdf") => (loc.lineNum, loc.colNum) }
-      val c = findNode(root) { case BoolLit(loc, _) => (loc.lineNum, loc.colNum) }
-      val d = findNode(root) { case StrLit(loc, "/abc") => (loc.lineNum, loc.colNum) }
+      val a = findNode(root) {
+        case NumLit(loc, _) => (loc.lineNum, loc.colNum)
+      }
+      val b = findNode(root) {
+        case StrLit(loc, "asdf") => (loc.lineNum, loc.colNum)
+      }
+      val c = findNode(root) {
+        case BoolLit(loc, _) => (loc.lineNum, loc.colNum)
+      }
+      val d = findNode(root) {
+        case StrLit(loc, "/abc") => (loc.lineNum, loc.colNum)
+      }
 
       a must_== Some((1, 6))
       b must_== Some((2, 6))
@@ -112,8 +117,9 @@ object QuirrelCacheSpecs extends Specification
       result3 must haveSize(1)
 
       def varLoc(name: String)(e: Expr) = {
-        findNode(e) { case Dispatch(loc, Identifier(_, `name`), _) =>
-          (loc.lineNum, loc.colNum)
+        findNode(e) {
+          case Dispatch(loc, Identifier(_, `name`), _) =>
+            (loc.lineNum, loc.colNum)
         }
       }
 

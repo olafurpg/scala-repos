@@ -9,22 +9,23 @@ import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
 import org.junit.Assert
 
 /**
- * Author: Svyatoslav Ilinskiy
- * Date: 6/15/15
- */
-class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * Author: Svyatoslav Ilinskiy
+  * Date: 6/15/15
+  */
+class SingleAbstractMethodTest
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   protected override def setUp() {
     super.setUp()
 
-    val defaultProfile = ScalaCompilerConfiguration.instanceIn(getProjectAdapter).defaultProfile
+    val defaultProfile =
+      ScalaCompilerConfiguration.instanceIn(getProjectAdapter).defaultProfile
     val newSettings = defaultProfile.getSettings
     newSettings.experimental = true
     defaultProfile.setSettings(newSettings)
   }
 
   def testBasicGenerics() {
-    val code =
-      """
+    val code = """
         |trait Blargle[T] {
         |  def blargle(a: T): Unit
         |}
@@ -35,8 +36,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testTypeInference() {
-    val code =
-      """
+    val code = """
         | abstract class Foo {
         |   def bar(i: Int, j: String)
         | }
@@ -47,8 +47,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testFunctionSAM() {
-    val code =
-      """
+    val code = """
         |def z() = println()
         |val y: Runnable = z
       """.stripMargin
@@ -56,19 +55,17 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testFunctionNegOne() {
-    val code =
-      """
+    val code = """
         |def z(): Unit = println()
         |val y: Runnable = z()
       """.stripMargin
     assertMatches(messages(code)) {
-      case Error("z()", typeMismatch()) :: Error("z()", doesNotConform()):: Nil =>
+      case Error("z()", typeMismatch()) :: Error("z()", doesNotConform()) :: Nil =>
     }
   }
 
   def testFunctionNegTwo() {
-    val code =
-      """
+    val code = """
         |def z: Unit = println()
         |val y: Runnable = z
       """.stripMargin
@@ -78,8 +75,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testFunctionNegThree() {
-    val code =
-      """
+    val code = """
         |def z(): Unit = println()
         |val x = z
         |val y: Runnable = x
@@ -90,8 +86,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testSCL7686(): Unit = {
-    val code =
-      """
+    val code = """
         |trait FI { def apply(idx: Int): String }
         |val a: FI = x => "result: " + x.toString
         |println(a(5))
@@ -100,8 +95,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testUnderscoreOne() {
-    val code =
-      """
+    val code = """
         |trait Foo { def bar(i: Int, s: String): String }
         |val f: Foo = _ + _
       """.stripMargin
@@ -109,8 +103,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testUnderscoreTwo() {
-    val code =
-      """
+    val code = """
         |trait Foo { def bar(s: String): String }
         |val i: Foo = _.charAt(0).toString
       """.stripMargin
@@ -118,8 +111,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testSimpleNeg() {
-    val code =
-      """
+    val code = """
         |trait Foo { def blargle(i: Int): Unit }
         |val f: Foo = s => println(s.charAt(0))
       """.stripMargin
@@ -129,61 +121,61 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testSimpleNegWrongReturnType() {
-    val code =
-      """
+    val code = """
         |object T {
         |  trait Blergh { def apply(i: Int): String }
         |  ((j: Int) => j): Blergh
         |}
       """.stripMargin
     assertMatches(messages(code)) {
-      case Error("((j: Int) => j)", typeMismatch()) :: Error("((j: Int) => j)", doesNotConform()) ::
-        Error("j", doesNotConform()) :: Nil =>
+      case Error("((j: Int) => j)", typeMismatch()) :: Error(
+          "((j: Int) => j)",
+          doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
     }
   }
 
   def testSimpleNegWrongParamNumber() {
-    val code =
-      """
+    val code = """
         |object T {
         |  trait Blargle { def apply(i: Int, j: String): String }
         |  ((i: Int) => "aaa"): Blargle
         |}
       """.stripMargin
     assertMatches(messages(code)) {
-      case Error("((i: Int) => \"aaa\")", typeMismatch()) :: Error("((i: Int) => \"aaa\")", doesNotConform()) :: Nil =>
+      case Error("((i: Int) => \"aaa\")", typeMismatch()) :: Error(
+          "((i: Int) => \"aaa\")", doesNotConform()) :: Nil =>
     }
   }
 
   def testSimpleNegWrongParamType() {
-    val code =
-      """
+    val code = """
         |object T {
         |  trait Blargle { def apply(i: Int, j: String): String }
         |  ((i: Int, j: Int) => "aaa"): Blargle
         |}
       """.stripMargin
     assertMatches(messages(code)) {
-      case Error("((i: Int, j: Int) => \"aaa\")", typeMismatch()) :: Error("((i: Int, j: Int) => \"aaa\")", doesNotConform()) :: Nil =>
+      case Error("((i: Int, j: Int) => \"aaa\")", typeMismatch()) :: Error(
+          "((i: Int, j: Int) => \"aaa\")", doesNotConform()) :: Nil =>
     }
   }
 
   def testSimpleNegRightParamWrongReturn() {
-    val code =
-      """
+    val code = """
         |object T {
         |  trait Blergh { def apply(i: Int): String }
         |  (j => j): Blergh
         |}
       """.stripMargin
     assertMatches(messages(code)) {
-      case Error("(j => j)", typeMismatch()) :: Error("(j => j)", doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
+      case Error("(j => j)", typeMismatch()) :: Error(
+          "(j => j)",
+          doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
     }
   }
 
   def testConstructorWithArgs() {
-    val code =
-      """
+    val code = """
         |abstract class Foo(s: String) { def a(): String }
         |val f: Foo = () => ""
       """.stripMargin
@@ -193,8 +185,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testImplicitConversionWithSAM() {
-    val code =
-      """
+    val code = """
         |import scala.language.implicitConversions
         |object T {
         |  trait Foo {
@@ -214,13 +205,13 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
         |
       """.stripMargin
     assertMatches(messages(code)) {
-      case Error("() => 3", typeMismatch()) :: Error("wantString", cannotResolveReference()) :: Nil =>
+      case Error("() => 3", typeMismatch()) :: Error(
+          "wantString", cannotResolveReference()) :: Nil =>
     }
   }
 
   def testUnimplementedWithSAM(): Unit = {
-    val code =
-      """
+    val code = """
         |abstract class Foo { def a(): String }
         |val f: Foo = () => ???
       """.stripMargin
@@ -228,8 +219,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testConformance(): Unit = {
-    val code =
-      """
+    val code = """
         |trait SAAM {
         |  def sam(s: String): Object
         |}
@@ -239,8 +229,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testConformanceNeg(): Unit = {
-    val code =
-      """
+    val code = """
         |trait SAAM {
         |  def sam(s: Object): Object
         |}
@@ -257,8 +246,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testValueDiscarding(): Unit = {
-    val code =
-      """
+    val code = """
         |def goo(r: Runnable) = 2
         |
         |
@@ -268,8 +256,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testJavaGenerics(): Unit = {
-    val code =
-      """
+    val code = """
         |import java.util.concurrent.FutureTask
         |
         |new FutureTask[String](() => "hi")
@@ -278,8 +265,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testSAMMethodReference(): Unit = {
-    val code =
-      """
+    val code = """
         |trait F[T, R] {
         |  def apply(a: T): R
         |}
@@ -293,8 +279,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testExistentialBounds(): Unit = {
-    val code =
-      """
+    val code = """
         |trait Blargle[T] {
         |  def foo(a: T): String
         |}
@@ -319,8 +304,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testOverload(): Unit = {
-    val code =
-      """
+    val code = """
         |trait SAMOverload[A] {
         |  def foo(s: A): Int = ???
         |}
@@ -353,8 +337,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
     checkCodeHasNoErrors(scalaCode, Some(javaCode))
   }
 
-  val etaExpansionPrefix: String =
-    """
+  val etaExpansionPrefix: String = """
       |def a = () => println()
       |def b() = () => println()
       |def c = println()
@@ -469,8 +452,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testEtaExpansionImplicit(): Unit = {
-    val code =
-      """
+    val code = """
         |class A
         |class B
         |implicit def a2b(a: A): B = new B
@@ -489,8 +471,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
 
   //similar to testEtaExpansion11
   def testEtaExpansionUnitReturnWithParams(): Unit = {
-    val code =
-      """
+    val code = """
         |trait S {
         |  def foo(i: Int): Unit
         |}
@@ -504,8 +485,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testOverrideImplementSAM(): Unit = {
-    val code =
-      """
+    val code = """
         |val s: Bar = () => 2
         |
         |abstract class Foo {
@@ -520,8 +500,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testOverrideImplementSAM2(): Unit = {
-    val code =
-      """
+    val code = """
         |val s: Bar = () => 2
         |
         |abstract class Foo {
@@ -537,8 +516,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testSAMComparable(): Unit = {
-    val code =
-      """
+    val code = """
         |import java.util.Comparator
         |
         |val comp: Comparator[String] = (o1, o2) => o1.compareTo(o2)
@@ -547,8 +525,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testNotSAM(): Unit = {
-    val code =
-      """
+    val code = """
         |abstract class U {
         |  def foo(): Unit
         |}
@@ -559,8 +536,7 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def testSAMNumericWidening(): Unit = {
-    val code =
-      """
+    val code = """
         |  abstract class A {
         |    def foo(): Long
         |  }
@@ -606,13 +582,15 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
     checkCodeHasNoErrors(code)
   }
 
-  def checkCodeHasNoErrors(scalaCode: String, javaCode: Option[String] = None) {
+  def checkCodeHasNoErrors(
+      scalaCode: String, javaCode: Option[String] = None) {
     assertMatches(messages(scalaCode, javaCode)) {
       case Nil =>
     }
   }
 
-  def messages(@Language("Scala") scalaCode: String, javaCode: Option[String] = None): List[Message] = {
+  def messages(@Language("Scala") scalaCode: String,
+               javaCode: Option[String] = None): List[Message] = {
     javaCode match {
       case Some(s) => configureFromFileTextAdapter("dummy.java", s)
       case _ =>
@@ -632,12 +610,16 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
   }
 
   def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit]) {
-    Assert.assertTrue("actual: " + actual.toString, pattern.isDefinedAt(actual))
+    Assert.assertTrue(
+        "actual: " + actual.toString, pattern.isDefinedAt(actual))
   }
 
   def parseText(@Language("Scala") s: String): ScalaFile = {
-    PsiFileFactory.getInstance(getProjectAdapter)
-      .createFileFromText("foo" + ScalaFileType.DEFAULT_EXTENSION, ScalaFileType.SCALA_FILE_TYPE, s)
+    PsiFileFactory
+      .getInstance(getProjectAdapter)
+      .createFileFromText("foo" + ScalaFileType.DEFAULT_EXTENSION,
+                          ScalaFileType.SCALA_FILE_TYPE,
+                          s)
       .asInstanceOf[ScalaFile]
   }
 
@@ -651,4 +633,3 @@ class SingleAbstractMethodTest extends ScalaLightPlatformCodeInsightTestCaseAdap
     def unapply(s: String) = s.contains(fr)
   }
 }
-

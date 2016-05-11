@@ -10,16 +10,18 @@ object Form {
     d -> (pluralize(pattern, d) format d)
   }
 
-  def options(it: Iterable[Int], transformer: Int => Int, pattern: String) = it map { d =>
-    d -> (pluralize(pattern, transformer(d)) format transformer(d))
-  }
+  def options(it: Iterable[Int], transformer: Int => Int, pattern: String) =
+    it map { d =>
+      d -> (pluralize(pattern, transformer(d)) format transformer(d))
+    }
 
   def options(it: Iterable[Int], code: String, pattern: String) = it map { d =>
     (d + code) -> (pluralize(pattern, d) format d)
   }
 
-  def optionsDouble(it: Iterable[Double], format: Double => String) = it map { d =>
-    d -> format(d)
+  def optionsDouble(it: Iterable[Double], format: Double => String) = it map {
+    d =>
+      d -> format(d)
   }
 
   def numberIn(choices: Iterable[(Int, String)]) =
@@ -40,10 +42,11 @@ object Form {
   private def pluralize(pattern: String, nb: Double) =
     pattern.replace("{s}", (nb < 1).fold("s", ""))
 
-  private val jsonGlobalErrorRenamer = __.json update (
-    (__ \ "global").json copyFrom (__ \ "").json.pick
-  ) andThen (__ \ "").json.prune
+  private val jsonGlobalErrorRenamer =
+    __.json update ((__ \ "global").json copyFrom (__ \ "").json.pick) andThen
+    (__ \ "").json.prune
 
-  def errorsAsJson(form: play.api.data.Form[_])(implicit lang: play.api.i18n.Messages) =
+  def errorsAsJson(form: play.api.data.Form[_])(
+      implicit lang: play.api.i18n.Messages) =
     form.errorsAsJson validate jsonGlobalErrorRenamer getOrElse form.errorsAsJson
 }

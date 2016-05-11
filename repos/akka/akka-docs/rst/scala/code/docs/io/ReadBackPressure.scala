@@ -1,13 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.io
 
-import akka.actor.{ ActorRef, ActorLogging, Props, Actor, ActorSystem }
+import akka.actor.{ActorRef, ActorLogging, Props, Actor, ActorSystem}
 import akka.io.Tcp._
-import akka.io.{ Tcp, IO }
+import akka.io.{Tcp, IO}
 import java.net.InetSocketAddress
-import akka.testkit.{ ImplicitSender, TestProbe, AkkaSpec }
+import akka.testkit.{ImplicitSender, TestProbe, AkkaSpec}
 import akka.util.ByteString
 
 import scala.concurrent.Await
@@ -21,7 +21,8 @@ object PullReadingExample {
 
     override def preStart: Unit =
       //#pull-mode-bind
-      IO(Tcp) ! Bind(self, new InetSocketAddress("localhost", 0), pullMode = true)
+      IO(Tcp) ! Bind(
+          self, new InetSocketAddress("localhost", 0), pullMode = true)
     //#pull-mode-bind
 
     def receive = {
@@ -42,7 +43,6 @@ object PullReadingExample {
         listener ! ResumeAccepting(batchSize = 1)
     }
     //#pull-accepting-cont
-
   }
 
   case object Ack extends Event
@@ -54,18 +54,18 @@ object PullReadingExample {
 
     def receive = {
       case Received(data) => connection ! Write(data, Ack)
-      case Ack            => connection ! ResumeReading
+      case Ack => connection ! ResumeReading
     }
     //#pull-reading-echo
   }
-
 }
 
 class PullReadingSpec extends AkkaSpec with ImplicitSender {
 
   "demonstrate pull reading" in {
     val probe = TestProbe()
-    system.actorOf(Props(classOf[PullReadingExample.Listener], probe.ref), "server")
+    system.actorOf(
+        Props(classOf[PullReadingExample.Listener], probe.ref), "server")
     val listenAddress = probe.expectMsgType[InetSocketAddress]
 
     //#pull-mode-connect

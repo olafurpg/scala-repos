@@ -9,21 +9,28 @@ import com.intellij.util.ui.EmptyIcon
 import org.jetbrains.plugins.scala.ScalaFileType
 
 /**
- * @author Alefas
- * @since 27.03.12
- */
+  * @author Alefas
+  * @since 27.03.12
+  */
 object ScalaKeywordLookupItem {
   def getLookupElement(keyword: String, position: PsiElement): LookupElement = {
-    val keywordPsi: PsiElement = ScalaLightKeyword(position.getManager, keyword)
-    LookupElementBuilder.create(keywordPsi, keyword).withBoldness(true).withIcon(new EmptyIcon(16, 16)).
-      withInsertHandler(new KeywordInsertHandler(keyword))
+    val keywordPsi: PsiElement = ScalaLightKeyword(
+        position.getManager, keyword)
+    LookupElementBuilder
+      .create(keywordPsi, keyword)
+      .withBoldness(true)
+      .withIcon(new EmptyIcon(16, 16))
+      .withInsertHandler(new KeywordInsertHandler(keyword))
   }
 
-  class KeywordInsertHandler(keyword: String) extends InsertHandler[LookupElement] {
-    override def handleInsert(context: InsertionContext, item: LookupElement): Unit = {
+  class KeywordInsertHandler(keyword: String)
+      extends InsertHandler[LookupElement] {
+    override def handleInsert(
+        context: InsertionContext, item: LookupElement): Unit = {
       import org.jetbrains.plugins.scala.lang.completion.ScalaKeyword._
       val parentheses = Set(IF, FOR, WHILE)
-      val braces = Set(CATCH, ELSE, EXTENDS, FINALLY, FOR, FOR_SOME, NEW, TRY, DO, YIELD)
+      val braces = Set(
+          CATCH, ELSE, EXTENDS, FINALLY, FOR, FOR_SOME, NEW, TRY, DO, YIELD)
       val editor = context.getEditor
       val document = editor.getDocument
       val offset = context.getStartOffset + keyword.length
@@ -31,21 +38,27 @@ object ScalaKeywordLookupItem {
         case THIS | FALSE | TRUE | NULL | SUPER => // do nothing
         case _ =>
           def addSpace(addCompletionChar: Boolean = false) {
-            if (context.getFile.getViewProvider.getFileType != ScalaFileType.SCALA_FILE_TYPE) { // for play2 - we shouldn't add space in templates (like @if, @while etc)
+            if (context.getFile.getViewProvider.getFileType != ScalaFileType.SCALA_FILE_TYPE) {
+              // for play2 - we shouldn't add space in templates (like @if, @while etc)
               val offset = context.getStartOffset
               val docStart = Math.max(0, context.getStartOffset - 1)
 
-              val seq = context.getDocument.getCharsSequence.subSequence(docStart, offset)
+              val seq = context.getDocument.getCharsSequence
+                .subSequence(docStart, offset)
 
               if (seq.length() == 1 && seq.charAt(0) == '@') return
             }
 
             context.setAddCompletionChar(addCompletionChar)
-            if (document.getTextLength <= offset || document.getText.charAt(offset) != ' ')
+            if (document.getTextLength <= offset ||
+                document.getText.charAt(offset) != ' ')
               document.insertString(offset, " ")
             editor.getCaretModel.moveToOffset(offset + 1)
           }
-          val settings = CodeStyleSettingsManager.getInstance(context.getProject).getCurrentSettings.getCommonSettings(ScalaFileType.SCALA_LANGUAGE)
+          val settings = CodeStyleSettingsManager
+            .getInstance(context.getProject)
+            .getCurrentSettings
+            .getCommonSettings(ScalaFileType.SCALA_LANGUAGE)
           context.getCompletionChar match {
             case '(' if parentheses.contains(keyword) =>
               val add = keyword match {
@@ -80,8 +93,10 @@ object ScalaKeywordLookupItem {
             manager.commitDocument(document)
             val file = manager.getPsiFile(document)
             if (file == null) return
-            CodeStyleManager.getInstance(context.getProject).
-              adjustLineIndent(file, new TextRange(context.getStartOffset, offset))
+            CodeStyleManager
+              .getInstance(context.getProject)
+              .adjustLineIndent(
+                  file, new TextRange(context.getStartOffset, offset))
           }
       }
     }

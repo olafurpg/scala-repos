@@ -34,18 +34,22 @@ private[ui] abstract class BatchTableBase(tableId: String, batchInterval: Long) 
   }
 
   /**
-   * Return the first failure reason if finding in the batches.
-   */
-  protected def getFirstFailureReason(batches: Seq[BatchUIData]): Option[String] = {
+    * Return the first failure reason if finding in the batches.
+    */
+  protected def getFirstFailureReason(
+      batches: Seq[BatchUIData]): Option[String] = {
     batches.flatMap(_.outputOperations.flatMap(_._2.failureReason)).headOption
   }
 
   protected def getFirstFailureTableCell(batch: BatchUIData): Seq[Node] = {
-    val firstFailureReason = batch.outputOperations.flatMap(_._2.failureReason).headOption
+    val firstFailureReason =
+      batch.outputOperations.flatMap(_._2.failureReason).headOption
     firstFailureReason.map { failureReason =>
-      val failureReasonForUI = UIUtils.createOutputOperationFailureForUI(failureReason)
-      UIUtils.failureReasonCell(
-        failureReasonForUI, rowspan = 1, includeFirstLineInExpandDetails = false)
+      val failureReasonForUI =
+        UIUtils.createOutputOperationFailureForUI(failureReason)
+      UIUtils.failureReasonCell(failureReasonForUI,
+                                rowspan = 1,
+                                includeFirstLineInExpandDetails = false)
     }.getOrElse(<td>-</td>)
   }
 
@@ -54,9 +58,11 @@ private[ui] abstract class BatchTableBase(tableId: String, batchInterval: Long) 
     val formattedBatchTime = UIUtils.formatBatchTime(batchTime, batchInterval)
     val eventCount = batch.numRecords
     val schedulingDelay = batch.schedulingDelay
-    val formattedSchedulingDelay = schedulingDelay.map(SparkUIUtils.formatDuration).getOrElse("-")
+    val formattedSchedulingDelay =
+      schedulingDelay.map(SparkUIUtils.formatDuration).getOrElse("-")
     val processingTime = batch.processingDelay
-    val formattedProcessingTime = processingTime.map(SparkUIUtils.formatDuration).getOrElse("-")
+    val formattedProcessingTime =
+      processingTime.map(SparkUIUtils.formatDuration).getOrElse("-")
     val batchTimeId = s"batch-$batchTime"
 
     <td id={batchTimeId} sorttable_customkey={batchTime.toString}
@@ -89,7 +95,8 @@ private[ui] abstract class BatchTableBase(tableId: String, batchInterval: Long) 
     batchTable
   }
 
-  protected def createOutputOperationProgressBar(batch: BatchUIData): Seq[Node] = {
+  protected def createOutputOperationProgressBar(
+      batch: BatchUIData): Seq[Node] = {
     <td class="progress-cell">
       {
       SparkUIUtils.makeProgressBar(
@@ -103,15 +110,15 @@ private[ui] abstract class BatchTableBase(tableId: String, batchInterval: Long) 
   }
 
   /**
-   * Return HTML for all rows of this table.
-   */
+    * Return HTML for all rows of this table.
+    */
   protected def renderRows: Seq[Node]
 }
 
-private[ui] class ActiveBatchTable(
-    runningBatches: Seq[BatchUIData],
-    waitingBatches: Seq[BatchUIData],
-    batchInterval: Long) extends BatchTableBase("active-batches-table", batchInterval) {
+private[ui] class ActiveBatchTable(runningBatches: Seq[BatchUIData],
+                                   waitingBatches: Seq[BatchUIData],
+                                   batchInterval: Long)
+    extends BatchTableBase("active-batches-table", batchInterval) {
 
   private val firstFailureReason = getFirstFailureReason(runningBatches)
 
@@ -129,8 +136,8 @@ private[ui] class ActiveBatchTable(
   override protected def renderRows: Seq[Node] = {
     // The "batchTime"s of "waitingBatches" must be greater than "runningBatches"'s, so display
     // waiting batches before running batches
-    waitingBatches.flatMap(batch => <tr>{waitingBatchRow(batch)}</tr>) ++
-      runningBatches.flatMap(batch => <tr>{runningBatchRow(batch)}</tr>)
+    waitingBatches.flatMap(batch => <tr>{waitingBatchRow(batch)}</tr>) ++ runningBatches
+      .flatMap(batch => <tr>{runningBatchRow(batch)}</tr>)
   }
 
   private def runningBatchRow(batch: BatchUIData): Seq[Node] = {
@@ -144,7 +151,7 @@ private[ui] class ActiveBatchTable(
   }
 
   private def waitingBatchRow(batch: BatchUIData): Seq[Node] = {
-    baseRow(batch) ++ createOutputOperationProgressBar(batch) ++ <td>queued</td>++ {
+    baseRow(batch) ++ createOutputOperationProgressBar(batch) ++ <td>queued</td> ++ {
       if (firstFailureReason.nonEmpty) {
         // Waiting batches have not run yet, so must have no failure reasons.
         <td>-</td>
@@ -155,8 +162,9 @@ private[ui] class ActiveBatchTable(
   }
 }
 
-private[ui] class CompletedBatchTable(batches: Seq[BatchUIData], batchInterval: Long)
-  extends BatchTableBase("completed-batches-table", batchInterval) {
+private[ui] class CompletedBatchTable(
+    batches: Seq[BatchUIData], batchInterval: Long)
+    extends BatchTableBase("completed-batches-table", batchInterval) {
 
   private val firstFailureReason = getFirstFailureReason(batches)
 
@@ -177,13 +185,14 @@ private[ui] class CompletedBatchTable(batches: Seq[BatchUIData], batchInterval: 
 
   private def completedBatchRow(batch: BatchUIData): Seq[Node] = {
     val totalDelay = batch.totalDelay
-    val formattedTotalDelay = totalDelay.map(SparkUIUtils.formatDuration).getOrElse("-")
+    val formattedTotalDelay =
+      totalDelay.map(SparkUIUtils.formatDuration).getOrElse("-")
 
     baseRow(batch) ++ {
       <td sorttable_customkey={totalDelay.getOrElse(Long.MaxValue).toString}>
         {formattedTotalDelay}
       </td>
-    } ++ createOutputOperationProgressBar(batch)++ {
+    } ++ createOutputOperationProgressBar(batch) ++ {
       if (firstFailureReason.nonEmpty) {
         getFirstFailureTableCell(batch)
       } else {

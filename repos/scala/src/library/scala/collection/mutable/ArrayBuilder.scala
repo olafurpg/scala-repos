@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -13,47 +13,62 @@ package mutable
 import scala.reflect.ClassTag
 
 /** A builder class for arrays.
- *
- *  @since 2.8
- *
- *  @tparam T    the type of the elements for the builder.
- */
-abstract class ArrayBuilder[T] extends ReusableBuilder[T, Array[T]] with Serializable
+  *
+  *  @since 2.8
+  *
+  *  @tparam T    the type of the elements for the builder.
+  */
+abstract class ArrayBuilder[T]
+    extends ReusableBuilder[T, Array[T]] with Serializable
 
 /** A companion object for array builders.
- *
- *  @since 2.8
- */
+  *
+  *  @since 2.8
+  */
 object ArrayBuilder {
 
   /** Creates a new arraybuilder of type `T`.
-   *
-   *  @tparam T     type of the elements for the array builder, with a `ClassTag` context bound.
-   *  @return       a new empty array builder.
-   */
-  def make[T: ClassTag](): ArrayBuilder[T] = {
+    *
+    *  @tparam T     type of the elements for the array builder, with a `ClassTag` context bound.
+    *  @return       a new empty array builder.
+    */
+  def make[T : ClassTag](): ArrayBuilder[T] = {
     val tag = implicitly[ClassTag[T]]
     tag.runtimeClass match {
-      case java.lang.Byte.TYPE      => new ArrayBuilder.ofByte().asInstanceOf[ArrayBuilder[T]]
-      case java.lang.Short.TYPE     => new ArrayBuilder.ofShort().asInstanceOf[ArrayBuilder[T]]
-      case java.lang.Character.TYPE => new ArrayBuilder.ofChar().asInstanceOf[ArrayBuilder[T]]
-      case java.lang.Integer.TYPE   => new ArrayBuilder.ofInt().asInstanceOf[ArrayBuilder[T]]
-      case java.lang.Long.TYPE      => new ArrayBuilder.ofLong().asInstanceOf[ArrayBuilder[T]]
-      case java.lang.Float.TYPE     => new ArrayBuilder.ofFloat().asInstanceOf[ArrayBuilder[T]]
-      case java.lang.Double.TYPE    => new ArrayBuilder.ofDouble().asInstanceOf[ArrayBuilder[T]]
-      case java.lang.Boolean.TYPE   => new ArrayBuilder.ofBoolean().asInstanceOf[ArrayBuilder[T]]
-      case java.lang.Void.TYPE      => new ArrayBuilder.ofUnit().asInstanceOf[ArrayBuilder[T]]
-      case _                        => new ArrayBuilder.ofRef[T with AnyRef]()(tag.asInstanceOf[ClassTag[T with AnyRef]]).asInstanceOf[ArrayBuilder[T]]
+      case java.lang.Byte.TYPE =>
+        new ArrayBuilder.ofByte().asInstanceOf[ArrayBuilder[T]]
+      case java.lang.Short.TYPE =>
+        new ArrayBuilder.ofShort().asInstanceOf[ArrayBuilder[T]]
+      case java.lang.Character.TYPE =>
+        new ArrayBuilder.ofChar().asInstanceOf[ArrayBuilder[T]]
+      case java.lang.Integer.TYPE =>
+        new ArrayBuilder.ofInt().asInstanceOf[ArrayBuilder[T]]
+      case java.lang.Long.TYPE =>
+        new ArrayBuilder.ofLong().asInstanceOf[ArrayBuilder[T]]
+      case java.lang.Float.TYPE =>
+        new ArrayBuilder.ofFloat().asInstanceOf[ArrayBuilder[T]]
+      case java.lang.Double.TYPE =>
+        new ArrayBuilder.ofDouble().asInstanceOf[ArrayBuilder[T]]
+      case java.lang.Boolean.TYPE =>
+        new ArrayBuilder.ofBoolean().asInstanceOf[ArrayBuilder[T]]
+      case java.lang.Void.TYPE =>
+        new ArrayBuilder.ofUnit().asInstanceOf[ArrayBuilder[T]]
+      case _ =>
+        new ArrayBuilder.ofRef[T with AnyRef]()(
+            tag.asInstanceOf[ClassTag[T with AnyRef]])
+          .asInstanceOf[ArrayBuilder[T]]
     }
   }
 
   /** A class for array builders for arrays of reference types.
-   *
-   *  This builder can be reused.
-   *
-   *  @tparam T     type of elements for the array builder, subtype of `AnyRef` with a `ClassTag` context bound.
-   */
-  @deprecatedInheritance("ArrayBuilder.ofRef is an internal implementation not intended for subclassing.", "2.11.0")
+    *
+    *  This builder can be reused.
+    *
+    *  @tparam T     type of elements for the array builder, subtype of `AnyRef` with a `ClassTag` context bound.
+    */
+  @deprecatedInheritance(
+      "ArrayBuilder.ofRef is an internal implementation not intended for subclassing.",
+      "2.11.0")
   class ofRef[T <: AnyRef : ClassTag] extends ArrayBuilder[T] {
 
     private var elems: Array[T] = _
@@ -90,15 +105,16 @@ object ArrayBuilder {
       this
     }
 
-    override def ++=(xs: TraversableOnce[T]): this.type = (xs.asInstanceOf[AnyRef]) match {
-      case xs: WrappedArray.ofRef[_] =>
-        ensureSize(this.size + xs.length)
-        Array.copy(xs.array, 0, elems, this.size, xs.length)
-        size += xs.length
-        this
-      case _ =>
-        super.++=(xs)
-    }
+    override def ++=(xs: TraversableOnce[T]): this.type =
+      (xs.asInstanceOf[AnyRef]) match {
+        case xs: WrappedArray.ofRef[_] =>
+          ensureSize(this.size + xs.length)
+          Array.copy(xs.array, 0, elems, this.size, xs.length)
+          size += xs.length
+          this
+        case _ =>
+          super.++=(xs)
+      }
 
     def clear() { size = 0 }
 
@@ -106,8 +122,7 @@ object ArrayBuilder {
       if (capacity != 0 && capacity == size) {
         capacity = 0
         elems
-      }
-      else mkArray(size)
+      } else mkArray(size)
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -119,7 +134,9 @@ object ArrayBuilder {
   }
 
   /** A class for array builders for arrays of `byte`s. It can be reused. */
-  @deprecatedInheritance("ArrayBuilder.ofByte is an internal implementation not intended for subclassing.", "2.11.0")
+  @deprecatedInheritance(
+      "ArrayBuilder.ofByte is an internal implementation not intended for subclassing.",
+      "2.11.0")
   class ofByte extends ArrayBuilder[Byte] {
 
     private var elems: Array[Byte] = _
@@ -172,8 +189,7 @@ object ArrayBuilder {
       if (capacity != 0 && capacity == size) {
         capacity = 0
         elems
-      }
-      else mkArray(size)
+      } else mkArray(size)
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -185,7 +201,9 @@ object ArrayBuilder {
   }
 
   /** A class for array builders for arrays of `short`s. It can be reused. */
-  @deprecatedInheritance("ArrayBuilder.ofShort is an internal implementation not intended for subclassing.", "2.11.0")
+  @deprecatedInheritance(
+      "ArrayBuilder.ofShort is an internal implementation not intended for subclassing.",
+      "2.11.0")
   class ofShort extends ArrayBuilder[Short] {
 
     private var elems: Array[Short] = _
@@ -238,8 +256,7 @@ object ArrayBuilder {
       if (capacity != 0 && capacity == size) {
         capacity = 0
         elems
-      }
-      else mkArray(size)
+      } else mkArray(size)
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -251,7 +268,9 @@ object ArrayBuilder {
   }
 
   /** A class for array builders for arrays of `char`s. It can be reused. */
-  @deprecatedInheritance("ArrayBuilder.ofChar is an internal implementation not intended for subclassing.", "2.11.0")
+  @deprecatedInheritance(
+      "ArrayBuilder.ofChar is an internal implementation not intended for subclassing.",
+      "2.11.0")
   class ofChar extends ArrayBuilder[Char] {
 
     private var elems: Array[Char] = _
@@ -304,8 +323,7 @@ object ArrayBuilder {
       if (capacity != 0 && capacity == size) {
         capacity = 0
         elems
-      }
-      else mkArray(size)
+      } else mkArray(size)
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -317,7 +335,9 @@ object ArrayBuilder {
   }
 
   /** A class for array builders for arrays of `int`s. It can be reused. */
-  @deprecatedInheritance("ArrayBuilder.ofInt is an internal implementation not intended for subclassing.", "2.11.0")
+  @deprecatedInheritance(
+      "ArrayBuilder.ofInt is an internal implementation not intended for subclassing.",
+      "2.11.0")
   class ofInt extends ArrayBuilder[Int] {
 
     private var elems: Array[Int] = _
@@ -370,8 +390,7 @@ object ArrayBuilder {
       if (capacity != 0 && capacity == size) {
         capacity = 0
         elems
-      }
-      else mkArray(size)
+      } else mkArray(size)
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -383,7 +402,9 @@ object ArrayBuilder {
   }
 
   /** A class for array builders for arrays of `long`s. It can be reused. */
-  @deprecatedInheritance("ArrayBuilder.ofLong is an internal implementation not intended for subclassing.", "2.11.0")
+  @deprecatedInheritance(
+      "ArrayBuilder.ofLong is an internal implementation not intended for subclassing.",
+      "2.11.0")
   class ofLong extends ArrayBuilder[Long] {
 
     private var elems: Array[Long] = _
@@ -436,8 +457,7 @@ object ArrayBuilder {
       if (capacity != 0 && capacity == size) {
         capacity = 0
         elems
-      }
-      else mkArray(size)
+      } else mkArray(size)
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -449,7 +469,9 @@ object ArrayBuilder {
   }
 
   /** A class for array builders for arrays of `float`s. It can be reused. */
-  @deprecatedInheritance("ArrayBuilder.ofFloat is an internal implementation not intended for subclassing.", "2.11.0")
+  @deprecatedInheritance(
+      "ArrayBuilder.ofFloat is an internal implementation not intended for subclassing.",
+      "2.11.0")
   class ofFloat extends ArrayBuilder[Float] {
 
     private var elems: Array[Float] = _
@@ -502,8 +524,7 @@ object ArrayBuilder {
       if (capacity != 0 && capacity == size) {
         capacity = 0
         elems
-      }
-      else mkArray(size)
+      } else mkArray(size)
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -515,7 +536,9 @@ object ArrayBuilder {
   }
 
   /** A class for array builders for arrays of `double`s. It can be reused. */
-  @deprecatedInheritance("ArrayBuilder.ofDouble is an internal implementation not intended for subclassing.", "2.11.0")
+  @deprecatedInheritance(
+      "ArrayBuilder.ofDouble is an internal implementation not intended for subclassing.",
+      "2.11.0")
   class ofDouble extends ArrayBuilder[Double] {
 
     private var elems: Array[Double] = _
@@ -568,8 +591,7 @@ object ArrayBuilder {
       if (capacity != 0 && capacity == size) {
         capacity = 0
         elems
-      }
-      else mkArray(size)
+      } else mkArray(size)
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -633,8 +655,7 @@ object ArrayBuilder {
       if (capacity != 0 && capacity == size) {
         capacity = 0
         elems
-      }
-      else mkArray(size)
+      } else mkArray(size)
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -646,7 +667,9 @@ object ArrayBuilder {
   }
 
   /** A class for array builders for arrays of `Unit` type. It can be reused. */
-  @deprecatedInheritance("ArrayBuilder.ofUnit is an internal implementation not intended for subclassing.", "2.11.0")
+  @deprecatedInheritance(
+      "ArrayBuilder.ofUnit is an internal implementation not intended for subclassing.",
+      "2.11.0")
   class ofUnit extends ArrayBuilder[Unit] {
 
     private var size: Int = 0

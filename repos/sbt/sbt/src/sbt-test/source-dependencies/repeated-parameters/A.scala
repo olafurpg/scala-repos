@@ -1,4 +1,3 @@
-object A
-{
-	def x(i: String*) = ()
+object A {
+  def x(i: String*) = ()
 }

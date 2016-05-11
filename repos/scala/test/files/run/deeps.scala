@@ -16,7 +16,8 @@ object Test {
   def testEquals2 {
     println(Array(Array(1), Array(2)) == Array(Array(1), Array(2)))
     println(Array(Array(1), Array(2)) equals Array(Array(1), Array(2)))
-    println(Array(Array(1), Array(2)).deep equals Array(Array(1), Array(2)).deep)
+    println(
+        Array(Array(1), Array(2)).deep equals Array(Array(1), Array(2)).deep)
     println
   }
 
@@ -54,10 +55,11 @@ object Test {
 
   def testToString1 {
     def sweep(s: String) = (
-      s.replaceAll("D@[0-9a-fA-F]+", "D@0000000")
-       .replaceAll("Z@[0-9a-fA-F]+", "Z@0000000")
-       .replaceAll(";@[0-9a-fA-F]+", ";@0000000")
-    )
+        s.replaceAll("D@[0-9a-fA-F]+", "D@0000000")
+          .replaceAll("Z@[0-9a-fA-F]+", "Z@0000000")
+          .replaceAll(";@[0-9a-fA-F]+",
+                      ";@0000000")
+      )
     def test[T](a: Array[T]) {
       println(sweep(a.deep.toString))
       println(a.deep.toString)
@@ -89,7 +91,8 @@ object Test {
   }
 
   def testToString2 {
-    println(Array(Array(true, false), Array(false)).deep.mkString("[", "; ", "]"))
+    println(
+        Array(Array(true, false), Array(false)).deep.mkString("[", "; ", "]"))
     println(Array(Array('1', '2'), Array('3')).deep.mkString("[", "; ", "]"))
     println(Array(Array(1, 2), Array(3)).deep.mkString("[", "; ", "]"))
     println
@@ -103,10 +106,10 @@ object Test {
   }
 
   def main(args: Array[String]): Unit = {
-    println("testEquals1") ; testEquals1
-    println("testEquals2") ; testEquals2
-    println("testEquals3") ; testEquals3
-    println("testEquals4") ; testEquals4
+    println("testEquals1"); testEquals1
+    println("testEquals2"); testEquals2
+    println("testEquals3"); testEquals3
+    println("testEquals4"); testEquals4
     testToString1
     testToString2
     testToString3

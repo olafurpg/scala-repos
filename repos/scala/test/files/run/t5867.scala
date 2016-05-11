@@ -1,7 +1,5 @@
 import collection.mutable.UnrolledBuffer
 
-
-
 object Test {
 
   def main(args: Array[String]) {
@@ -10,5 +8,4 @@ object Test {
 
     println(dub)
   }
-
 }

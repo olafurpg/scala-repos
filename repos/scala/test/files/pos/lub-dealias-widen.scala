@@ -24,7 +24,10 @@ object Test {
 
   val p2: PLit[PAny.type] = ???
   val r2 /*: Sitelet[List[String] => String] */ // annotate type and it compiles with 2.10.0
-     = p2 >> { (xs: List[String]) => 0 }
+  =
+    p2 >> { (xs: List[String]) =>
+      0
+    }
 
   // This works after https://github.com/scala/scala/commit/a06d31f6a
   // Before: error: inferred type arguments [List[String] => String,List[String] => String]

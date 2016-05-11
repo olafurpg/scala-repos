@@ -10,9 +10,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
-class RichChannelBufferTest extends FunSuite
-  with GeneratorDrivenPropertyChecks
-{
+class RichChannelBufferTest
+    extends FunSuite with GeneratorDrivenPropertyChecks {
 
   test("toInt for 0 to Int.MaxValue") {
     import ChannelBufferUtils.{stringToChannelBuffer, channelBufferToRichChannelBuffer}
@@ -34,5 +33,4 @@ class RichChannelBufferTest extends FunSuite
         }
       }
   }
-
 }

@@ -30,18 +30,17 @@ import org.apache.spark.sql.DataFrame
 trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
 
   /**
-   * Checks "overwrite" option and params.
-   * This saves to and loads from [[tempDir]], but creates a subdirectory with a random name
-   * in order to avoid conflicts from multiple calls to this method.
-   *
-   * @param instance ML instance to test saving/loading
-   * @param testParams  If true, then test values of Params.  Otherwise, just test overwrite option.
-   * @tparam T ML instance type
-   * @return  Instance loaded from file
-   */
+    * Checks "overwrite" option and params.
+    * This saves to and loads from [[tempDir]], but creates a subdirectory with a random name
+    * in order to avoid conflicts from multiple calls to this method.
+    *
+    * @param instance ML instance to test saving/loading
+    * @param testParams  If true, then test values of Params.  Otherwise, just test overwrite option.
+    * @tparam T ML instance type
+    * @return  Instance loaded from file
+    */
   def testDefaultReadWrite[T <: Params with MLWritable](
-      instance: T,
-      testParams: Boolean = true): T = {
+      instance: T, testParams: Boolean = true): T = {
     val uid = instance.uid
     val subdirName = Identifiable.randomUID("test")
 
@@ -53,7 +52,10 @@ trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
       instance.save(path)
     }
     instance.write.overwrite().save(path)
-    val loader = instance.getClass.getMethod("read").invoke(null).asInstanceOf[MLReader[T]]
+    val loader = instance.getClass
+      .getMethod("read")
+      .invoke(null)
+      .asInstanceOf[MLReader[T]]
     val newInstance = loader.load(path)
 
     assert(newInstance.uid === instance.uid)
@@ -62,12 +64,15 @@ trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
         if (instance.isDefined(p)) {
           (instance.getOrDefault(p), newInstance.getOrDefault(p)) match {
             case (Array(values), Array(newValues)) =>
-              assert(values === newValues, s"Values do not match on param ${p.name}.")
+              assert(values === newValues,
+                     s"Values do not match on param ${p.name}.")
             case (value, newValue) =>
-              assert(value === newValue, s"Values do not match on param ${p.name}.")
+              assert(value === newValue,
+                     s"Values do not match on param ${p.name}.")
           }
         } else {
-          assert(!newInstance.isDefined(p), s"Param ${p.name} shouldn't be defined.")
+          assert(!newInstance.isDefined(p),
+                 s"Param ${p.name} shouldn't be defined.")
         }
       }
     }
@@ -79,46 +84,49 @@ trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
   }
 
   /**
-   * Default test for Estimator, Model pairs:
-   *  - Explicitly set Params, and train model
-   *  - Test save/load using [[testDefaultReadWrite()]] on Estimator and Model
-   *  - Check Params on Estimator and Model
-   *  - Compare model data
-   *
-   * This requires that the [[Estimator]] and [[Model]] share the same set of [[Param]]s.
-   *
-   * @param estimator  Estimator to test
-   * @param dataset  Dataset to pass to [[Estimator.fit()]]
-   * @param testParams  Set of [[Param]] values to set in estimator
-   * @param checkModelData  Method which takes the original and loaded [[Model]] and compares their
-   *                        data.  This method does not need to check [[Param]] values.
-   * @tparam E  Type of [[Estimator]]
-   * @tparam M  Type of [[Model]] produced by estimator
-   */
+    * Default test for Estimator, Model pairs:
+    *  - Explicitly set Params, and train model
+    *  - Test save/load using [[testDefaultReadWrite()]] on Estimator and Model
+    *  - Check Params on Estimator and Model
+    *  - Compare model data
+    *
+    * This requires that the [[Estimator]] and [[Model]] share the same set of [[Param]]s.
+    *
+    * @param estimator  Estimator to test
+    * @param dataset  Dataset to pass to [[Estimator.fit()]]
+    * @param testParams  Set of [[Param]] values to set in estimator
+    * @param checkModelData  Method which takes the original and loaded [[Model]] and compares their
+    *                        data.  This method does not need to check [[Param]] values.
+    * @tparam E  Type of [[Estimator]]
+    * @tparam M  Type of [[Model]] produced by estimator
+    */
   def testEstimatorAndModelReadWrite[
-    E <: Estimator[M] with MLWritable, M <: Model[M] with MLWritable](
+      E <: Estimator[M] with MLWritable, M <: Model[M] with MLWritable](
       estimator: E,
       dataset: DataFrame,
       testParams: Map[String, Any],
       checkModelData: (M, M) => Unit): Unit = {
     // Set some Params to make sure set Params are serialized.
-    testParams.foreach { case (p, v) =>
-      estimator.set(estimator.getParam(p), v)
+    testParams.foreach {
+      case (p, v) =>
+        estimator.set(estimator.getParam(p), v)
     }
     val model = estimator.fit(dataset)
 
     // Test Estimator save/load
     val estimator2 = testDefaultReadWrite(estimator)
-    testParams.foreach { case (p, v) =>
-      val param = estimator.getParam(p)
-      assert(estimator.get(param).get === estimator2.get(param).get)
+    testParams.foreach {
+      case (p, v) =>
+        val param = estimator.getParam(p)
+        assert(estimator.get(param).get === estimator2.get(param).get)
     }
 
     // Test Model save/load
     val model2 = testDefaultReadWrite(model)
-    testParams.foreach { case (p, v) =>
-      val param = model.getParam(p)
-      assert(model.get(param).get === model2.get(param).get)
+    testParams.foreach {
+      case (p, v) =>
+        val param = model.getParam(p)
+        assert(model.get(param).get === model2.get(param).get)
     }
 
     checkModelData(model, model2)
@@ -127,17 +135,21 @@ trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
 
 class MyParams(override val uid: String) extends Params with MLWritable {
 
-  final val intParamWithDefault: IntParam = new IntParam(this, "intParamWithDefault", "doc")
+  final val intParamWithDefault: IntParam = new IntParam(
+      this, "intParamWithDefault", "doc")
   final val intParam: IntParam = new IntParam(this, "intParam", "doc")
   final val floatParam: FloatParam = new FloatParam(this, "floatParam", "doc")
-  final val doubleParam: DoubleParam = new DoubleParam(this, "doubleParam", "doc")
+  final val doubleParam: DoubleParam = new DoubleParam(
+      this, "doubleParam", "doc")
   final val longParam: LongParam = new LongParam(this, "longParam", "doc")
-  final val stringParam: Param[String] = new Param[String](this, "stringParam", "doc")
-  final val intArrayParam: IntArrayParam = new IntArrayParam(this, "intArrayParam", "doc")
-  final val doubleArrayParam: DoubleArrayParam =
-    new DoubleArrayParam(this, "doubleArrayParam", "doc")
-  final val stringArrayParam: StringArrayParam =
-    new StringArrayParam(this, "stringArrayParam", "doc")
+  final val stringParam: Param[String] =
+    new Param[String](this, "stringParam", "doc")
+  final val intArrayParam: IntArrayParam = new IntArrayParam(
+      this, "intArrayParam", "doc")
+  final val doubleArrayParam: DoubleArrayParam = new DoubleArrayParam(
+      this, "doubleArrayParam", "doc")
+  final val stringArrayParam: StringArrayParam = new StringArrayParam(
+      this, "stringArrayParam", "doc")
 
   setDefault(intParamWithDefault -> 0)
   set(intParam -> 1)
@@ -161,8 +173,9 @@ object MyParams extends MLReadable[MyParams] {
   override def load(path: String): MyParams = super.load(path)
 }
 
-class DefaultReadWriteSuite extends SparkFunSuite with MLlibTestSparkContext
-  with DefaultReadWriteTest {
+class DefaultReadWriteSuite
+    extends SparkFunSuite with MLlibTestSparkContext
+    with DefaultReadWriteTest {
 
   test("default read/write") {
     val myParams = new MyParams("my_params")

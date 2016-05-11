@@ -6,4 +6,3 @@ class ExceptionTest {
   @throws(classOf[E])
   type t = String
 }
-

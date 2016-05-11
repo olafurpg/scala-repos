@@ -35,13 +35,12 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Glow Spec tests.
- */
+  * Glow Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class GlowSpec
-  extends SimpleSFXDelegateSpec[jfxse.Glow, Glow](classOf[jfxse.Glow], classOf[Glow])
-  with InputDelegateSpec[Glow] {
+    extends SimpleSFXDelegateSpec[jfxse.Glow, Glow](
+        classOf[jfxse.Glow], classOf[Glow]) with InputDelegateSpec[Glow] {
 
   val inputDelegate = getScalaClassInstance
-
 }

@@ -19,55 +19,66 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 
 case class DataSourceParams(
-  appId: Int,
-  cutoffTime: DateTime
-) extends Params
+    appId: Int,
+    cutoffTime: DateTime
+)
+    extends Params
 
 class DataSource(val dsp: DataSourceParams)
-  extends PDataSource[TrainingData,
-      EmptyEvaluationInfo, Query, EmptyActualResult] {
+    extends PDataSource[
+        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
-  override
-  def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData = {
     val eventsDb = Storage.getPEvents()
     val lEventsDb = Storage.getLEvents()
     logger.info(s"CleanupApp: $dsp")
 
-    val countBefore = eventsDb.find(
-      appId = dsp.appId
-    )(sc).count
+    val countBefore = eventsDb
+      .find(
+          appId = dsp.appId
+      )(sc)
+      .count
     logger.info(s"Event count before cleanup: $countBefore")
 
-    val countRemove = eventsDb.find(
-      appId = dsp.appId,
-      untilTime = Some(dsp.cutoffTime)
-    )(sc).count
+    val countRemove = eventsDb
+      .find(
+          appId = dsp.appId,
+          untilTime = Some(dsp.cutoffTime)
+      )(sc)
+      .count
     logger.info(s"Number of events to remove: $countRemove")
 
     logger.info(s"Remove events from appId ${dsp.appId}")
-    val eventsToRemove: Array[String] = eventsDb.find(
-      appId = dsp.appId,
-      untilTime = Some(dsp.cutoffTime)
-    )(sc).map { case e =>
-      e.eventId.getOrElse("")
-    }.collect
-
-    var lastFuture: Future[Boolean] = Future[Boolean] {true}
-    eventsToRemove.foreach { case eventId =>
-      if (eventId != "") {
-        lastFuture = lEventsDb.futureDelete(eventId, dsp.appId)
+    val eventsToRemove: Array[String] = eventsDb
+      .find(
+          appId = dsp.appId,
+          untilTime = Some(dsp.cutoffTime)
+      )(sc)
+      .map {
+        case e =>
+          e.eventId.getOrElse("")
       }
+      .collect
+
+    var lastFuture: Future[Boolean] = Future[Boolean] { true }
+    eventsToRemove.foreach {
+      case eventId =>
+        if (eventId != "") {
+          lastFuture = lEventsDb.futureDelete(eventId, dsp.appId)
+        }
     }
     // No, it's not correct to just wait for the last result.
     // This program only demonstrates how to remove old events.
     Await.result(lastFuture, scala.concurrent.duration.Duration(5, "minutes"))
     logger.info(s"Finish cleaning up events to appId ${dsp.appId}")
 
-    val countAfter = eventsDb.find(
-      appId = dsp.appId
-    )(sc).count
+    val countAfter = eventsDb
+      .find(
+          appId = dsp.appId
+      )(sc)
+      .count
     logger.info(s"Event count after cleanup: $countAfter")
 
     throw new StopAfterReadInterruption()
@@ -75,6 +86,7 @@ class DataSource(val dsp: DataSourceParams)
 }
 
 class TrainingData(
-) extends Serializable {
+    )
+    extends Serializable {
   override def toString = ""
 }

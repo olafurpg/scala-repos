@@ -3,7 +3,6 @@ package org.otus
 trait StateTrait {
 
   case class State(value: Int)
-
 }
 
 class StateClass extends StateTrait {
@@ -12,7 +11,8 @@ class StateClass extends StateTrait {
   def doIt(value: Int) {
     sendState(State(value))
     val x: State = new State(1)
-    /*start*/x.copy(1)/*end*/
+    /*start*/
+    x.copy(1) /*end*/
   }
 }
 //StateClass.this.State

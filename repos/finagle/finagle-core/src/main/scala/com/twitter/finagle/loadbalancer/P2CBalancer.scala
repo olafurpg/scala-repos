@@ -7,69 +7,67 @@ import com.twitter.finagle.util.Rng
 import com.twitter.util._
 
 /**
- * An O(1), concurrent, weighted least-loaded fair load balancer.
- * This uses the ideas behind "power of 2 choices" [1] combined with
- * O(1) biased coin flipping through the aliasing method, described
- * in [[com.twitter.finagle.util.Drv Drv]].
- *
- * @param activity An activity that updates with the set of
- * (node, weight) pairs over which we distribute load.
- *
- * @param maxEffort the maximum amount of "effort" we're willing to
- * expend on a load balancing decision without reweighing.
- *
- * @param rng The PRNG used for flipping coins. Override for
- * deterministic tests.
- *
- * @param statsReceiver The stats receiver to which operational
- * statistics are reported.
- *
- * [1] Michael Mitzenmacher. 2001. The Power of Two Choices in
- * Randomized Load Balancing. IEEE Trans. Parallel Distrib. Syst. 12,
- * 10 (October 2001), 1094-1104.
- */
+  * An O(1), concurrent, weighted least-loaded fair load balancer.
+  * This uses the ideas behind "power of 2 choices" [1] combined with
+  * O(1) biased coin flipping through the aliasing method, described
+  * in [[com.twitter.finagle.util.Drv Drv]].
+  *
+  * @param activity An activity that updates with the set of
+  * (node, weight) pairs over which we distribute load.
+  *
+  * @param maxEffort the maximum amount of "effort" we're willing to
+  * expend on a load balancing decision without reweighing.
+  *
+  * @param rng The PRNG used for flipping coins. Override for
+  * deterministic tests.
+  *
+  * @param statsReceiver The stats receiver to which operational
+  * statistics are reported.
+  *
+  * [1] Michael Mitzenmacher. 2001. The Power of Two Choices in
+  * Randomized Load Balancing. IEEE Trans. Parallel Distrib. Syst. 12,
+  * 10 (October 2001), 1094-1104.
+  */
 private class P2CBalancer[Req, Rep](
     protected val activity: Activity[Traversable[ServiceFactory[Req, Rep]]],
     protected val maxEffort: Int,
     protected val rng: Rng,
     protected val statsReceiver: StatsReceiver,
     protected val emptyException: NoBrokersAvailableException)
-  extends Balancer[Req, Rep]
-  with LeastLoaded[Req, Rep]
-  with P2C[Req, Rep]
-  with Updating[Req, Rep] {
+    extends Balancer[Req, Rep] with LeastLoaded[Req, Rep]
+    with P2C[Req, Rep] with Updating[Req, Rep] {
 
-  protected[this] val maxEffortExhausted = statsReceiver.counter("max_effort_exhausted")
-
+  protected[this] val maxEffortExhausted =
+    statsReceiver.counter("max_effort_exhausted")
 }
 
 /**
- * Like [[com.twitter.finagle.loadbalancer.P2CBalancer]] but
- * using the Peak EWMA load metric.
- *
- * Peak EWMA is designed to converge quickly when encountering
- * slow endpoints. It is quick to react to latency spikes, recovering
- * only cautiously. Peak EWMA takes history into account, so that
- * slow behavior is penalized relative to the supplied decay time.
- *
- * @param activity An activity that updates with the set of
- * (node, weight) pairs over which we distribute load.
- *
- * @param decayTime The window of latency observations.
- *
- * @param maxEffort the maximum amount of "effort" we're willing to
- * expend on a load balancing decision without reweighing.
- *
- * @param rng The PRNG used for flipping coins. Override for
- * deterministic tests.
- *
- * @param statsReceiver The stats receiver to which operational
- * statistics are reported.
- *
- * [1] Michael Mitzenmacher. 2001. The Power of Two Choices in
- * Randomized Load Balancing. IEEE Trans. Parallel Distrib. Syst. 12,
- * 10 (October 2001), 1094-1104.
- */
+  * Like [[com.twitter.finagle.loadbalancer.P2CBalancer]] but
+  * using the Peak EWMA load metric.
+  *
+  * Peak EWMA is designed to converge quickly when encountering
+  * slow endpoints. It is quick to react to latency spikes, recovering
+  * only cautiously. Peak EWMA takes history into account, so that
+  * slow behavior is penalized relative to the supplied decay time.
+  *
+  * @param activity An activity that updates with the set of
+  * (node, weight) pairs over which we distribute load.
+  *
+  * @param decayTime The window of latency observations.
+  *
+  * @param maxEffort the maximum amount of "effort" we're willing to
+  * expend on a load balancing decision without reweighing.
+  *
+  * @param rng The PRNG used for flipping coins. Override for
+  * deterministic tests.
+  *
+  * @param statsReceiver The stats receiver to which operational
+  * statistics are reported.
+  *
+  * [1] Michael Mitzenmacher. 2001. The Power of Two Choices in
+  * Randomized Load Balancing. IEEE Trans. Parallel Distrib. Syst. 12,
+  * 10 (October 2001), 1094-1104.
+  */
 private class P2CBalancerPeakEwma[Req, Rep](
     protected val activity: Activity[Traversable[ServiceFactory[Req, Rep]]],
     protected val decayTime: Duration,
@@ -77,13 +75,11 @@ private class P2CBalancerPeakEwma[Req, Rep](
     protected val rng: Rng,
     protected val statsReceiver: StatsReceiver,
     protected val emptyException: NoBrokersAvailableException)
-  extends Balancer[Req, Rep]
-  with PeakEwma[Req, Rep]
-  with P2C[Req, Rep]
-  with Updating[Req, Rep] {
+    extends Balancer[Req, Rep] with PeakEwma[Req, Rep]
+    with P2C[Req, Rep] with Updating[Req, Rep] {
 
-  protected[this] val maxEffortExhausted = statsReceiver.counter("max_effort_exhausted")
-
+  protected[this] val maxEffortExhausted =
+    statsReceiver.counter("max_effort_exhausted")
 }
 
 private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
@@ -102,9 +98,10 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
     require(Tau > 0)
 
     // these are all guarded by synchronization on `this`
-    private[this] var stamp: Long = epoch   // last timestamp in nanos we observed an rtt
-    private[this] var pending: Int = 0      // instantaneous rate
-    private[this] var cost: Double = 0.0    // ewma of rtt, sensitive to peaks.
+    private[this] var stamp: Long =
+      epoch // last timestamp in nanos we observed an rtt
+    private[this] var pending: Int = 0 // instantaneous rate
+    private[this] var cost: Double = 0.0 // ewma of rtt, sensitive to peaks.
 
     def rate(): Int = synchronized { pending }
 
@@ -117,10 +114,10 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
     // [1] http://www.eckner.com/papers/ts_alg.pdf
     private[this] def observe(rtt: Double): Unit = {
       val t = nanoTime()
-      val td = math.max(t-stamp, 0)
-      val w = math.exp(-td/Tau)
+      val td = math.max(t - stamp, 0)
+      val w = math.exp(-td / Tau)
       if (rtt > cost) cost = rtt
-      else cost = cost*w + rtt*(1.0-w)
+      else cost = cost * w + rtt * (1.0 - w)
       stamp = t
     }
 
@@ -131,8 +128,8 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
       // If we don't have any latency history, we penalize the host on
       // the first probe. Otherwise, we factor in our current rate
       // assuming we were to schedule an additional request.
-      if (cost == 0.0 && pending != 0) Penalty+pending
-      else cost*(pending+1)
+      if (cost == 0.0 && pending != 0) Penalty + pending
+      else cost * (pending + 1)
     }
 
     def start(): Long = synchronized {
@@ -141,18 +138,15 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
     }
 
     def end(ts: Long): Unit = synchronized {
-      val rtt = math.max(nanoTime()-ts, 0)
+      val rtt = math.max(nanoTime() - ts, 0)
       pending -= 1
       observe(rtt)
     }
   }
 
   protected case class Node(
-      factory: ServiceFactory[Req, Rep],
-      metric: Metric,
-      token: Int)
-    extends ServiceFactoryProxy[Req, Rep](factory)
-    with NodeT[Req, Rep] {
+      factory: ServiceFactory[Req, Rep], metric: Metric, token: Int)
+      extends ServiceFactoryProxy[Req, Rep](factory) with NodeT[Req, Rep] {
     type This = Node
 
     def load: Double = metric.get()
@@ -162,26 +156,28 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
       val ts = metric.start()
       super.apply(conn).transform {
         case Return(svc) =>
-          Future.value(new ServiceProxy(svc) {
+          Future.value(
+              new ServiceProxy(svc) {
             override def close(deadline: Time) =
               super.close(deadline).ensure {
                 metric.end(ts)
               }
           })
 
-        case t@Throw(_) =>
+        case t @ Throw(_) =>
           metric.end(ts)
           Future.const(t)
       }
     }
   }
 
-  protected def newNode(factory: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver): Node =
+  protected def newNode(
+      factory: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver): Node =
     Node(factory, new Metric(statsReceiver, factory.toString), rng.nextInt())
 
   protected def failingNode(cause: Throwable) = Node(
-    new FailingFactory(cause),
-    new Metric(NullStatsReceiver, "failing"),
-    0
+      new FailingFactory(cause),
+      new Metric(NullStatsReceiver, "failing"),
+      0
   )
 }

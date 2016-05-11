@@ -34,25 +34,24 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
 object SepiaTone {
-  implicit def sfxSepiaTone2jfx(st: SepiaTone): jfxse.SepiaTone = if (st != null) st.delegate else null
+  implicit def sfxSepiaTone2jfx(st: SepiaTone): jfxse.SepiaTone =
+    if (st != null) st.delegate else null
 }
 
 class SepiaTone(override val delegate: jfxse.SepiaTone = new jfxse.SepiaTone)
-  extends Effect(delegate)
-  with InputDelegate[jfxse.SepiaTone]
-  with SFXDelegate[jfxse.SepiaTone] {
+    extends Effect(delegate) with InputDelegate[jfxse.SepiaTone]
+    with SFXDelegate[jfxse.SepiaTone] {
 
   /**
-   * Creates a new instance of SepiaTone with the specified level.
-   */
+    * Creates a new instance of SepiaTone with the specified level.
+    */
   def this(level: Double) = this(new jfxse.SepiaTone(level))
 
   /**
-   * The level value, which controls the intensity of the sepia effect.
-   */
+    * The level value, which controls the intensity of the sepia effect.
+    */
   def level: DoubleProperty = delegate.levelProperty
   def level_=(v: Double) {
     level() = v
   }
-
 }

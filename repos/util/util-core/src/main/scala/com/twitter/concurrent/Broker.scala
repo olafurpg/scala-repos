@@ -8,34 +8,34 @@ import scala.collection.immutable.Queue
 import com.twitter.util.{Await, Future, Promise}
 
 /**
- * An unbuffered FIFO queue, brokered by `Offer`s. Note that the queue is
- * ordered by successful operations, not initiations, so `one` and `two`
- * may not be received in that order with this code:
- *
- * {{{
- * val b: Broker[Int]
- * b ! 1
- * b ! 2
- * }}}
- *
- * But rather we need to explicitly sequence them:
- *
- * {{{
- * val b: Broker[Int]
- * for {
- *   () <- b ! 1
- *   () <- b ! 2
- * } ()
- * }}}
- *
- * BUGS: the implementation would be much simpler in the absence of
- * cancellation.
- */
-
+  * An unbuffered FIFO queue, brokered by `Offer`s. Note that the queue is
+  * ordered by successful operations, not initiations, so `one` and `two`
+  * may not be received in that order with this code:
+  *
+  * {{{
+  * val b: Broker[Int]
+  * b ! 1
+  * b ! 2
+  * }}}
+  *
+  * But rather we need to explicitly sequence them:
+  *
+  * {{{
+  * val b: Broker[Int]
+  * for {
+  *   () <- b ! 1
+  *   () <- b ! 2
+  * } ()
+  * }}}
+  *
+  * BUGS: the implementation would be much simpler in the absence of
+  * cancellation.
+  */
 class Broker[T] {
   private[this] sealed trait State
   private[this] case object Quiet extends State
-  private[this] case class Sending(q: Queue[(Promise[Tx[Unit]], T)]) extends State
+  private[this] case class Sending(q: Queue[(Promise[Tx[Unit]], T)])
+      extends State
   private[this] case class Receiving(q: Queue[Promise[Tx[T]]]) extends State
 
   private[this] val state = new AtomicReference[State](Quiet)
@@ -43,17 +43,15 @@ class Broker[T] {
   @tailrec
   private[this] def rmElem(elem: AnyRef) {
     state.get match {
-      case s@Sending(q) =>
+      case s @ Sending(q) =>
         val nextq = q filter { _ ne elem }
         val nextState = if (nextq.isEmpty) Quiet else Sending(nextq)
-        if (!state.compareAndSet(s, nextState))
-          rmElem(elem)
+        if (!state.compareAndSet(s, nextState)) rmElem(elem)
 
-      case s@Receiving(q) =>
+      case s @ Receiving(q) =>
         val nextq = q filter { _ ne elem }
         val nextState = if (nextq.isEmpty) Quiet else Receiving(nextq)
-        if (!state.compareAndSet(s, nextState))
-          rmElem(elem)
+        if (!state.compareAndSet(s, nextState)) rmElem(elem)
 
       case Quiet => ()
     }
@@ -63,17 +61,18 @@ class Broker[T] {
     @tailrec
     def prepare() = {
       state.get match {
-        case s@Receiving(rq) =>
+        case s @ Receiving(rq) =>
           if (rq.isEmpty) throw new IllegalStateException()
           val (recvp, newq) = rq.dequeue
           val nextState = if (newq.isEmpty) Quiet else Receiving(newq)
-          if (!state.compareAndSet(s, nextState)) prepare() else {
+          if (!state.compareAndSet(s, nextState)) prepare()
+          else {
             val (sendTx, recvTx) = Tx.twoParty(msg)
             recvp.setValue(recvTx)
             Future.value(sendTx)
           }
 
-        case s@(Quiet | Sending(_)) =>
+        case s @ (Quiet | Sending(_)) =>
           val p = new Promise[Tx[Unit]]
           val elem: (Promise[Tx[Unit]], T) = (p, msg)
           p.setInterruptHandler {
@@ -94,17 +93,18 @@ class Broker[T] {
     @tailrec
     def prepare() =
       state.get match {
-        case s@Sending(sq) =>
+        case s @ Sending(sq) =>
           if (sq.isEmpty) throw new IllegalStateException()
           val ((sendp, msg), newq) = sq.dequeue
           val nextState = if (newq.isEmpty) Quiet else Sending(newq)
-          if (!state.compareAndSet(s, nextState)) prepare() else {
+          if (!state.compareAndSet(s, nextState)) prepare()
+          else {
             val (sendTx, recvTx) = Tx.twoParty(msg)
             sendp.setValue(sendTx)
             Future.value(recvTx)
           }
 
-        case s@(Quiet | Receiving(_)) =>
+        case s @ (Quiet | Receiving(_)) =>
           val p = new Promise[Tx[T]]
           p.setInterruptHandler { case _ => rmElem(p) }
           val nextState = s match {
@@ -120,45 +120,45 @@ class Broker[T] {
   /* Scala actor style / CSP syntax. */
 
   /**
-   * Send an item on the broker, returning a {{Future}} indicating
-   * completion.
-   */
+    * Send an item on the broker, returning a {{Future}} indicating
+    * completion.
+    */
   def !(msg: T): Future[Unit] = send(msg).sync()
 
   /**
-   * Like {!}, but block until the item has been sent.
-   */
+    * Like {!}, but block until the item has been sent.
+    */
   def !!(msg: T): Unit = Await.result(this ! msg)
 
   /**
-   * Retrieve an item from the broker, asynchronously.
-   */
+    * Retrieve an item from the broker, asynchronously.
+    */
   def ? : Future[T] = recv.sync()
 
   /**
-   * Retrieve an item from the broker, blocking.
-   */
+    * Retrieve an item from the broker, blocking.
+    */
   def ?? : T = Await.result(?)
 
   /* Java-friendly API */
 
   /**
-   * @see operator `!`
-   */
+    * @see operator `!`
+    */
   def sendAndSync(message: T): Future[Unit] = this ! message
 
   /**
-   * @see operator `!!`
-   */
+    * @see operator `!!`
+    */
   def sendAndAwait(message: T): Unit = this !! message
 
   /**
-   * @see operator `?`
-   */
+    * @see operator `?`
+    */
   def recvAndSync(): Future[T] = ?
 
   /**
-   * @see operator `??`
-   */
+    * @see operator `??`
+    */
   def recvAndAwait(): T = ??
 }

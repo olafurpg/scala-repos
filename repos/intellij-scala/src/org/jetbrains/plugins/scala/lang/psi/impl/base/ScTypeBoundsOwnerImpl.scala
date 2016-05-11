@@ -13,13 +13,18 @@ import org.jetbrains.plugins.scala.lang.psi.types.{Any, Nothing, ScType}
 
 trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
   //todo[CYCLIC]
-  def lowerBound: TypeResult[ScType] = wrapWith(lowerTypeElement, Nothing) flatMap ( _.getType(TypingContext.empty) )
+  def lowerBound: TypeResult[ScType] =
+    wrapWith(lowerTypeElement, Nothing) flatMap
+    (_.getType(TypingContext.empty))
 
-  def upperBound: TypeResult[ScType] = wrapWith(upperTypeElement, Any) flatMap ( _.getType(TypingContext.empty) )
+  def upperBound: TypeResult[ScType] =
+    wrapWith(upperTypeElement, Any) flatMap (_.getType(TypingContext.empty))
 
-  override def viewBound: Seq[ScType] = viewTypeElement.flatMap(_.getType(TypingContext.empty).toOption)
+  override def viewBound: Seq[ScType] =
+    viewTypeElement.flatMap(_.getType(TypingContext.empty).toOption)
 
-  override def contextBound: Seq[ScType] = contextBoundTypeElement.flatMap(_.getType(TypingContext.empty).toOption)
+  override def contextBound: Seq[ScType] =
+    contextBoundTypeElement.flatMap(_.getType(TypingContext.empty).toOption)
 
   override def upperTypeElement: Option[ScTypeElement] = {
     val tUpper = findLastChildByType[PsiElement](ScalaTokenTypes.tUPPER_BOUND)
@@ -41,7 +46,6 @@ trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
     } else None
   }
 
-
   override def viewTypeElement: Seq[ScTypeElement] = {
     for {
       v <- findChildrenByType(ScalaTokenTypes.tVIEW)
@@ -59,7 +63,8 @@ trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
 
   override def removeImplicitBounds() {
     var node = getNode.getFirstChildNode
-    while (node != null && !Set(ScalaTokenTypes.tCOLON, ScalaTokenTypes.tVIEW)(node.getElementType)) {
+    while (node != null &&
+    !Set(ScalaTokenTypes.tCOLON, ScalaTokenTypes.tVIEW)(node.getElementType)) {
       node = node.getTreeNext
     }
     if (node == null) return

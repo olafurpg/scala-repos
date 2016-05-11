@@ -41,10 +41,9 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
   //#
 
   //# pathPrefixTest-, rawPathPrefix-, rawPathPrefixTest-, pathSuffix-, pathSuffixTest-
-  val completeWithUnmatchedPath =
-    extractUnmatchedPath { p =>
-      complete(p.toString)
-    }
+  val completeWithUnmatchedPath = extractUnmatchedPath { p =>
+    complete(p.toString)
+  }
 
   //#
 
@@ -52,18 +51,15 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
     val route =
       path("foo") {
         complete("/foo")
-      } ~
-        path("foo" / "bar") {
-          complete("/foo/bar")
-        } ~
-        pathPrefix("ball") {
-          pathEnd {
-            complete("/ball")
-          } ~
-            path(IntNumber) { int =>
-              complete(if (int % 2 == 0) "even ball" else "odd ball")
-            }
+      } ~ path("foo" / "bar") {
+        complete("/foo/bar")
+      } ~ pathPrefix("ball") {
+        pathEnd {
+          complete("/ball")
+        } ~ path(IntNumber) { int =>
+          complete(if (int % 2 == 0) "even ball" else "odd ball")
         }
+      }
 
     // tests:
     Get("/") ~> route ~> check {
@@ -84,15 +80,13 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
   }
 
   "pathEnd-" in {
-    val route =
-      pathPrefix("foo") {
-        pathEnd {
-          complete("/foo")
-        } ~
-          path("bar") {
-            complete("/foo/bar")
-          }
+    val route = pathPrefix("foo") {
+      pathEnd {
+        complete("/foo")
+      } ~ path("bar") {
+        complete("/foo/bar")
       }
+    }
 
     // tests:
     Get("/foo") ~> route ~> check {
@@ -109,15 +103,13 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
   }
 
   "pathEndOrSingleSlash-" in {
-    val route =
-      pathPrefix("foo") {
-        pathEndOrSingleSlash {
-          complete("/foo")
-        } ~
-          path("bar") {
-            complete("/foo/bar")
-          }
+    val route = pathPrefix("foo") {
+      pathEndOrSingleSlash {
+        complete("/foo")
+      } ~ path("bar") {
+        complete("/foo/bar")
       }
+    }
 
     // tests:
     Get("/foo") ~> route ~> check {
@@ -134,15 +126,13 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
   }
 
   "pathPrefix-" in {
-    val route =
-      pathPrefix("ball") {
-        pathEnd {
-          complete("/ball")
-        } ~
-          path(IntNumber) { int =>
-            complete(if (int % 2 == 0) "even ball" else "odd ball")
-          }
+    val route = pathPrefix("ball") {
+      pathEnd {
+        complete("/ball")
+      } ~ path(IntNumber) { int =>
+        complete(if (int % 2 == 0) "even ball" else "odd ball")
       }
+    }
 
     // tests:
     Get("/") ~> route ~> check {
@@ -159,11 +149,11 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
   }
 
   "pathPrefixTest-" in {
-    val route =
-      pathPrefixTest("foo" | "bar") {
-        pathPrefix("foo") { completeWithUnmatchedPath } ~
-          pathPrefix("bar") { completeWithUnmatchedPath }
+    val route = pathPrefixTest("foo" | "bar") {
+      pathPrefix("foo") { completeWithUnmatchedPath } ~ pathPrefix("bar") {
+        completeWithUnmatchedPath
       }
+    }
 
     // tests:
     Get("/foo/doo") ~> route ~> check {
@@ -179,15 +169,13 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
     val route =
       pathSingleSlash {
         complete("root")
-      } ~
-        pathPrefix("ball") {
-          pathSingleSlash {
-            complete("/ball/")
-          } ~
-            path(IntNumber) { int =>
-              complete(if (int % 2 == 0) "even ball" else "odd ball")
-            }
+      } ~ pathPrefix("ball") {
+        pathSingleSlash {
+          complete("/ball/")
+        } ~ path(IntNumber) { int =>
+          complete(if (int % 2 == 0) "even ball" else "odd ball")
         }
+      }
 
     // tests:
     Get("/") ~> route ~> check {
@@ -208,15 +196,13 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
   }
 
   "pathSuffix-" in {
-    val route =
-      pathPrefix("start") {
-        pathSuffix("end") {
-          completeWithUnmatchedPath
-        } ~
-          pathSuffix("foo" / "bar" ~ "baz") {
-            completeWithUnmatchedPath
-          }
+    val route = pathPrefix("start") {
+      pathSuffix("end") {
+        completeWithUnmatchedPath
+      } ~ pathSuffix("foo" / "bar" ~ "baz") {
+        completeWithUnmatchedPath
       }
+    }
 
     // tests:
     Get("/start/middle/end") ~> route ~> check {
@@ -232,8 +218,7 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
     val route =
       pathSuffixTest(Slash) {
         complete("slashed")
-      } ~
-        complete("unslashed")
+      } ~ complete("unslashed")
 
     // tests:
     Get("/foo/") ~> route ~> check {
@@ -245,11 +230,11 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
   }
 
   "rawPathPrefix-" in {
-    val route =
-      pathPrefix("foo") {
-        rawPathPrefix("bar") { completeWithUnmatchedPath } ~
-          rawPathPrefix("doo") { completeWithUnmatchedPath }
+    val route = pathPrefix("foo") {
+      rawPathPrefix("bar") { completeWithUnmatchedPath } ~ rawPathPrefix("doo") {
+        completeWithUnmatchedPath
       }
+    }
 
     // tests:
     Get("/foobar/baz") ~> route ~> check {
@@ -262,12 +247,11 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
   }
 
   "rawPathPrefixTest-" in {
-    val route =
-      pathPrefix("foo") {
-        rawPathPrefixTest("bar") {
-          completeWithUnmatchedPath
-        }
+    val route = pathPrefix("foo") {
+      rawPathPrefixTest("bar") {
+        completeWithUnmatchedPath
       }
+    }
 
     // tests:
     Get("/foobar") ~> route ~> check {
@@ -287,19 +271,17 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
         path("foo"./) {
           // We require the explicit trailing slash in the path
           complete("OK")
-        } ~
-          path("bad-1") {
-            // MISTAKE!
-            // Missing `/` in path, causes this path to never match,
-            // because it is inside a `redirectToTrailingSlashIfMissing`
-            ???
-          } ~
-          path("bad-2/") {
-            // MISTAKE!
-            // / should be explicit as path element separator and not *in* the path element
-            // So it should be: "bad-1" /
-            ???
-          }
+        } ~ path("bad-1") {
+          // MISTAKE!
+          // Missing `/` in path, causes this path to never match,
+          // because it is inside a `redirectToTrailingSlashIfMissing`
+          ???
+        } ~ path("bad-2/") {
+          // MISTAKE!
+          // / should be explicit as path element separator and not *in* the path element
+          // So it should be: "bad-1" /
+          ???
+        }
       }
 
     // tests:
@@ -311,7 +293,7 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
       // in case the redirect can't be followed automatically:
       responseAs[String] shouldEqual {
         "This and all future requests should be directed to " +
-          "<a href=\"http://example.com/foo/\">this URI</a>."
+        "<a href=\"http://example.com/foo/\">this URI</a>."
       }
     }
 
@@ -340,16 +322,15 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
         path("foo") {
           // We require the explicit trailing slash in the path
           complete("OK")
-        } ~
-          path("bad"./) {
-            // MISTAKE!
-            // Since inside a `redirectToNoTrailingSlashIfPresent` directive
-            // the matched path here will never contain a trailing slash,
-            // thus this path will never match.
-            //
-            // It should be `path("bad")` instead.
-            ???
-          }
+        } ~ path("bad"./) {
+          // MISTAKE!
+          // Since inside a `redirectToNoTrailingSlashIfPresent` directive
+          // the matched path here will never contain a trailing slash,
+          // thus this path will never match.
+          //
+          // It should be `path("bad")` instead.
+          ???
+        }
       }
 
     // tests:
@@ -361,7 +342,7 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
       // in case the redirect can't be followed automatically:
       responseAs[String] shouldEqual {
         "This and all future requests should be directed to " +
-          "<a href=\"http://example.com/foo\">this URI</a>."
+        "<a href=\"http://example.com/foo\">this URI</a>."
       }
     }
 

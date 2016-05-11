@@ -7,21 +7,22 @@ import scala.reflect.ClassTag
 import java.io._
 
 object IO {
+
   /** Returns the lines in an input stream.
-   *  Lines do not contain the new line characters.
-   */
+    *  Lines do not contain the new line characters.
+    */
   def readLines(stream: InputStream): List[String] =
     readLines(new InputStreamReader(stream))
 
   /** Returns the lines in a string.
-   *  Lines do not contain the new line characters.
-   */
+    *  Lines do not contain the new line characters.
+    */
   def readLines(content: String): List[String] =
     readLines(new StringReader(content))
 
   /** Returns the lines in a reader.
-   *  Lines do not contain the new line characters.
-   */
+    *  Lines do not contain the new line characters.
+    */
   def readLines(reader: Reader): List[String] = {
     val br = new BufferedReader(reader)
     try {
@@ -72,26 +73,22 @@ object IO {
 
   def copyTo(in: VirtualTextFile, out: WritableVirtualTextFile): Unit = {
     val writer = out.contentWriter
-    try writeTo(in, writer)
-    finally writer.close()
+    try writeTo(in, writer) finally writer.close()
   }
 
   def copyTo(in: VirtualBinaryFile, out: WritableVirtualBinaryFile): Unit = {
     val outStream = out.outputStream
-    try writeTo(in, outStream)
-    finally outStream.close()
+    try writeTo(in, outStream) finally outStream.close()
   }
 
   def writeTo(vf: VirtualBinaryFile, out: OutputStream): Unit = {
     val in = vf.inputStream
-    try pipe(in, out)
-    finally in.close()
+    try pipe(in, out) finally in.close()
   }
 
   def writeTo(vf: VirtualTextFile, writer: Writer): Unit = {
     val reader = vf.reader
-    try pipe(reader, writer)
-    finally reader.close()
+    try pipe(reader, writer) finally reader.close()
   }
 
   /** Pipes data from `in` to `out` */
@@ -125,10 +122,10 @@ object IO {
   }
 
   /** Concatenates a bunch of VirtualTextFiles to a WritableVirtualTextFile.
-   *  Adds a '\n' after each file.
-   */
-  def concatFiles(output: WritableVirtualTextFile,
-      files: Seq[VirtualTextFile]): Unit = {
+    *  Adds a '\n' after each file.
+    */
+  def concatFiles(
+      output: WritableVirtualTextFile, files: Seq[VirtualTextFile]): Unit = {
     val out = output.contentWriter
 
     try {

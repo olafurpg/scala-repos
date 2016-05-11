@@ -11,8 +11,8 @@ import org.apache.commons.io.FileUtils
 import scala.reflect.ClassTag
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 package object template {
   def using[A <: Closeable, B](resource: A)(block: A => B): B = {
     try {
@@ -22,7 +22,8 @@ package object template {
     }
   }
 
-  def usingTempFile[T](prefix: String, suffix: Option[String] = None)(block: File => T): T = {
+  def usingTempFile[T](prefix: String, suffix: Option[String] = None)(
+      block: File => T): T = {
     val file = FileUtil.createTempFile(prefix, suffix.orNull, true)
     try {
       block(file)
@@ -31,7 +32,8 @@ package object template {
     }
   }
 
-  def usingTempDirectory[T](prefix: String, suffix: Option[String] = None)(block: File => T): T = {
+  def usingTempDirectory[T](prefix: String, suffix: Option[String] = None)(
+      block: File => T): T = {
     val directory = FileUtil.createTempDirectory(prefix, suffix.orNull, true)
     try {
       block(directory)
@@ -40,9 +42,10 @@ package object template {
     }
   }
 
-  def usingTempDirectoryWithHandler[T, Z]
-      (prefix: String, suffix: Option[String] = None)
-      (handler1: PartialFunction[Throwable, T], handler2: PartialFunction[Throwable, Z])(block: File => T): T = {
+  def usingTempDirectoryWithHandler[T, Z](
+      prefix: String, suffix: Option[String] = None)(
+      handler1: PartialFunction[Throwable, T],
+      handler2: PartialFunction[Throwable, Z])(block: File => T): T = {
     val directory = FileUtil.createTempDirectory(prefix, suffix.orNull, true)
 
     try {
@@ -65,7 +68,8 @@ package object template {
     val tClass = implicitly[ClassTag[T]].runtimeClass
 
     Option(PathUtil.getJarPathForClass(tClass)).map(new File(_)).getOrElse {
-      throw new RuntimeException("Jar file not found for class " + tClass.getName)
+      throw new RuntimeException(
+          "Jar file not found for class " + tClass.getName)
     }
   }
 
@@ -76,13 +80,15 @@ package object template {
 
     def parent: Option[File] = Option(delegate.getParentFile)
 
-    def children: Seq[File] = Option(delegate.listFiles).map(_.toSeq).getOrElse(Seq.empty)
+    def children: Seq[File] =
+      Option(delegate.listFiles).map(_.toSeq).getOrElse(Seq.empty)
 
     def directories: Seq[File] = children.filter(_.isDirectory)
-    
+
     def files: Seq[File] = children.filter(_.isFile)
 
-    def findByName(name: String): Option[File] = children.find(_.getName == name)
+    def findByName(name: String): Option[File] =
+      children.find(_.getName == name)
 
     def allFiles: Stream[File] = {
       val (files, directories) = children.toStream.span(_.isFile)

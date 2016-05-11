@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.data.view
 
 import io.prediction.data.storage.Event
@@ -32,20 +31,20 @@ class TestHBLEvents() {
   @transient lazy val eventsDb = Storage.getLEvents()
 
   def run(): Unit = {
-    val r = eventsDb.find(
-      appId = 1,
-      startTime = None,
-      untilTime = None,
-      entityType = Some("pio_user"),
-      entityId = Some("3")).toList
+    val r = eventsDb
+      .find(appId = 1,
+            startTime = None,
+            untilTime = None,
+            entityType = Some("pio_user"),
+            entityId = Some("3"))
+      .toList
     println(r)
   }
 }
 
 class TestSource(val appId: Int) {
   @transient lazy val logger = Logger[this.type]
-  @transient lazy val batchView = new LBatchView(appId,
-    None, None)
+  @transient lazy val batchView = new LBatchView(appId, None, None)
 
   def run(): Unit = {
     println(batchView.events)
@@ -70,11 +69,11 @@ object TestEventTime {
 
   def main(args: Array[String]) {
     val e = batchView.events.filter(
-      eventOpt = Some("rate"),
-      startTimeOpt = Some(new DateTime(1998, 1, 1, 0, 0))
-      // untilTimeOpt = Some(new DateTime(1997, 1, 1, 0, 0))
+        eventOpt = Some("rate"),
+        startTimeOpt = Some(new DateTime(1998, 1, 1, 0, 0))
+        // untilTimeOpt = Some(new DateTime(1997, 1, 1, 0, 0))
     )
-      // untilTimeOpt = Some(new DateTime(2000, 1, 1, 0, 0)))
+    // untilTimeOpt = Some(new DateTime(2000, 1, 1, 0, 0)))
 
     e.foreach { println }
     println()
@@ -90,5 +89,4 @@ object TestEventTime {
     val l = e.map { _.entityId }
     l.foreach { println }
   }
-
 }

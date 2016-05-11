@@ -8,8 +8,7 @@ object Test {
 
   object foo {
     class foo2 {
-      override def toString = getClass.toString//.getSimpleName
+      override def toString = getClass.toString //.getSimpleName
     }
   }
-
 }

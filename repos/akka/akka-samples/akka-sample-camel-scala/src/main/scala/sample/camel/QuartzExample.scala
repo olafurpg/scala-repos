@@ -18,9 +18,6 @@ object QuartzExample {
     def receive = {
 
       case msg => println("==============> received %s " format msg)
-
     }
-
   }
-
 }

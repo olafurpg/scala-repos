@@ -4,8 +4,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScGenericCal
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticFunction
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 object IsInstanceOfCall {
   def unapply(expression: ScExpression): Option[ScGenericCall] = {
     expression match {

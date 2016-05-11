@@ -4,6 +4,6 @@ object bug {
 
   def bar: Int = {
     var i: Int = 0;
-    foo (i);
+    foo(i);
   }
 }

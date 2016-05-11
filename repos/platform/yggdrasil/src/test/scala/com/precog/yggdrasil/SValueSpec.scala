@@ -30,11 +30,14 @@ import org.scalacheck.Arbitrary._
 class SValueSpec extends Specification {
   "set" should {
     "set properties on an object" in {
-      SObject(Map()).set(JPath(".foo.bar"), CString("baz")) must beSome(SObject(Map("foo" -> SObject(Map("bar" -> SString("baz"))))))
+      SObject(Map()).set(JPath(".foo.bar"), CString("baz")) must beSome(
+          SObject(Map("foo" -> SObject(Map("bar" -> SString("baz"))))))
     }
 
     "set array indices" in {
-      SObject(Map()).set(JPath(".foo[1].bar"), CString("baz")) must beSome(SObject(Map("foo" -> SArray(Vector(SNull, SObject(Map("bar" -> SString("baz"))))))))
+      SObject(Map()).set(JPath(".foo[1].bar"), CString("baz")) must beSome(
+          SObject(Map("foo" -> SArray(
+                      Vector(SNull, SObject(Map("bar" -> SString("baz"))))))))
     }
 
     "return None for a primitive" in {
@@ -44,7 +47,8 @@ class SValueSpec extends Specification {
 
   "structure" should {
     "return correct sequence for an array" in {
-      SArray(Vector(SBoolean(true))).structure must_== Seq((JPath("[0]"), CBoolean))
+      SArray(Vector(SBoolean(true))).structure must_==
+        Seq((JPath("[0]"), CBoolean))
     }
   }
 }

@@ -5,10 +5,12 @@ object Test extends CompilerTest {
 
   override lazy val units: List[CompilationUnit] = {
     // We can test this on JDK6.
-    javaCompilationUnits(global)(defaultMethodSource) ++ compilationUnits(global)(scalaExtendsDefault)
+    javaCompilationUnits(global)(defaultMethodSource) ++ compilationUnits(
+        global)(scalaExtendsDefault)
   }
 
-  private def defaultMethodSource = """
+  private def defaultMethodSource =
+    """
 public interface Iterator<E> {
     boolean hasNext();
     E next();
@@ -29,6 +31,5 @@ object Test {
 
   // We're only checking we that the Scala compilation unit passes refchecks
   // No further checks are needed here.
-  def check(source: String, unit: global.CompilationUnit): Unit = {
-  }
+  def check(source: String, unit: global.CompilationUnit): Unit = {}
 }

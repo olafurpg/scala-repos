@@ -5,9 +5,8 @@ import com.intellij.openapi.util.text.StringUtil
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 object InterpolatedStringFormatter extends StringFormatter {
   def format(parts: Seq[StringPart]) = {
     val toMultiline = parts.exists {
@@ -31,28 +30,35 @@ object InterpolatedStringFormatter extends StringFormatter {
     s"$prefix$quote$content$quote"
   }
 
-  def formatContent(parts: Seq[StringPart], toMultiline: Boolean = false): String = {
+  def formatContent(
+      parts: Seq[StringPart], toMultiline: Boolean = false): String = {
     val strings = parts.collect {
       case Text(s) if toMultiline => s.replace("\r", "")
-      case Text(s) => StringUtil.escapeStringCharacters(s.replaceAll("\\$", "\\$\\$"))
+      case Text(s) =>
+        StringUtil.escapeStringCharacters(s.replaceAll("\\$", "\\$\\$"))
       case it: Injection =>
         val text = it.value
-        if (it.isLiteral && !it.isFormattingRequired) text else {
+        if (it.isLiteral && !it.isFormattingRequired) text
+        else {
           val presentation =
-            if ((it.isComplexBlock || (!it.isLiteral && it.isAlphanumericIdentifier)) && noBraces(parts, it)) "$" + text else "${" + text + "}"
-          if (it.isFormattingRequired) presentation + it.format else presentation
+            if ((it.isComplexBlock ||
+                    (!it.isLiteral && it.isAlphanumericIdentifier)) &&
+                noBraces(parts, it)) "$" + text else "${" + text + "}"
+          if (it.isFormattingRequired) presentation + it.format
+          else presentation
         }
     }
     strings.mkString
   }
 
-  def noBraces(parts: Seq[StringPart], it: Injection): Boolean =  {
+  def noBraces(parts: Seq[StringPart], it: Injection): Boolean = {
     val ind = parts.indexOf(it)
     if (ind + 1 < parts.size) {
       parts(ind + 1) match {
         case Text(s) =>
-          return s.isEmpty || !ScalaNamesUtil.isIdentifier(it.text + s.charAt(0)) ||
-                s.startsWith("`") || s.exists(_ == '$')
+          return s.isEmpty ||
+          !ScalaNamesUtil.isIdentifier(it.text + s.charAt(0)) ||
+          s.startsWith("`") || s.exists(_ == '$')
         case _ =>
       }
     }

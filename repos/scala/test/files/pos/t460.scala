@@ -1,5 +1,5 @@
 object Bug460 {
-  def testFun(x : Int, y : Int) = x + y
+  def testFun(x: Int, y: Int) = x + y
   val fn = testFun _
 
   fn(1, 2) // Ok

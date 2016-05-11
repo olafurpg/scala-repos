@@ -1,13 +1,13 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.event
 
 import akka.testkit._
 import scala.concurrent.duration._
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.{Config, ConfigFactory}
 import akka.actor._
-import java.util.{ Date, GregorianCalendar, TimeZone, Calendar }
+import java.util.{Date, GregorianCalendar, TimeZone, Calendar}
 import org.scalatest.WordSpec
 import org.scalatest.Matchers
 import akka.serialization.SerializationExtension
@@ -19,7 +19,8 @@ import akka.event.Logging.Warning
 
 object LoggerSpec {
 
-  val defaultConfig = ConfigFactory.parseString("""
+  val defaultConfig =
+    ConfigFactory.parseString("""
       akka {
         stdout-loglevel = "WARNING"
         loglevel = "DEBUG"
@@ -27,7 +28,8 @@ object LoggerSpec {
       }
     """).withFallback(AkkaSpec.testConf)
 
-  val slowConfig = ConfigFactory.parseString("""
+  val slowConfig =
+    ConfigFactory.parseString("""
       akka {
         stdout-loglevel = "ERROR"
         loglevel = "ERROR"
@@ -35,7 +37,8 @@ object LoggerSpec {
       }
     """).withFallback(AkkaSpec.testConf)
 
-  val noLoggingConfig = ConfigFactory.parseString("""
+  val noLoggingConfig =
+    ConfigFactory.parseString("""
       akka {
         stdout-loglevel = "OFF"
         loglevel = "OFF"
@@ -43,15 +46,18 @@ object LoggerSpec {
       }
     """).withFallback(AkkaSpec.testConf)
 
-  val multipleConfig = ConfigFactory.parseString("""
+  val multipleConfig = ConfigFactory
+    .parseString("""
       akka {
         stdout-loglevel = "OFF"
         loglevel = "WARNING"
         loggers = ["akka.event.LoggerSpec$TestLogger1", "akka.event.LoggerSpec$TestLogger2"]
       }
-    """).withFallback(AkkaSpec.testConf)
+    """)
+    .withFallback(AkkaSpec.testConf)
 
-  val ticket3165Config = ConfigFactory.parseString("""
+  val ticket3165Config =
+    ConfigFactory.parseString("""
       akka {
         stdout-loglevel = "WARNING"
         loglevel = "DEBUG"
@@ -66,7 +72,8 @@ object LoggerSpec {
       }
     """).withFallback(AkkaSpec.testConf)
 
-  val ticket3671Config = ConfigFactory.parseString("""
+  val ticket3671Config =
+    ConfigFactory.parseString("""
       akka {
         stdout-loglevel = "WARNING"
         loglevel = "WARNING"
@@ -81,7 +88,8 @@ object LoggerSpec {
 
   class TestLogger1 extends TestLogger(1)
   class TestLogger2 extends TestLogger(2)
-  abstract class TestLogger(qualifier: Int) extends Actor with Logging.StdOutLogger {
+  abstract class TestLogger(qualifier: Int)
+      extends Actor with Logging.StdOutLogger {
     var target: Option[ActorRef] = None
     override def receive: Receive = {
       case InitializeLogger(bus) ⇒
@@ -108,7 +116,6 @@ object LoggerSpec {
           super.aroundReceive(r, msg)
         case _ ⇒ super.aroundReceive(r, msg)
       }
-
     }
   }
 
@@ -120,8 +127,10 @@ object LoggerSpec {
       val always = Map("requestId" -> reqId)
       val cmim = "Current Message in MDC"
       val perMessage = currentMessage match {
-        case `cmim` ⇒ Map[String, Any]("currentMsg" -> cmim, "currentMsgLength" -> cmim.length)
-        case _      ⇒ Map()
+        case `cmim` ⇒
+          Map[String, Any](
+              "currentMsg" -> cmim, "currentMsgLength" -> cmim.length)
+        case _ ⇒ Map()
       }
       always ++ perMessage
     }
@@ -130,7 +139,6 @@ object LoggerSpec {
       case m: String ⇒ log.warning(m)
     }
   }
-
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -138,7 +146,8 @@ class LoggerSpec extends WordSpec with Matchers {
 
   import LoggerSpec._
 
-  private def createSystemAndLogToBuffer(name: String, config: Config, shouldLog: Boolean) = {
+  private def createSystemAndLogToBuffer(
+      name: String, config: Config, shouldLog: Boolean) = {
     val out = new java.io.ByteArrayOutputStream()
     Console.withOut(out) {
       implicit val system = ActorSystem(name, config)
@@ -151,7 +160,7 @@ class LoggerSpec extends WordSpec with Matchers {
         if (shouldLog) {
           probe.fishForMessage(0.5.seconds.dilated) {
             case "Danger! Danger!" ⇒ true
-            case _                 ⇒ false
+            case _ ⇒ false
           }
         } else {
           probe.expectNoMsg(0.5.seconds.dilated)
@@ -166,7 +175,8 @@ class LoggerSpec extends WordSpec with Matchers {
   "A normally configured actor system" must {
 
     "log messages to standard output" in {
-      val out = createSystemAndLogToBuffer("defaultLogger", defaultConfig, true)
+      val out =
+        createSystemAndLogToBuffer("defaultLogger", defaultConfig, true)
       out.size should be > (0)
     }
 
@@ -187,7 +197,6 @@ class LoggerSpec extends WordSpec with Matchers {
       logMessages.last should include("msg3")
       logMessages.size should ===(3)
     }
-
   }
 
   "An actor system configured with the logging turned off" must {
@@ -234,32 +243,33 @@ class LoggerSpec extends WordSpec with Matchers {
 
         ref ! "Processing new Request"
         probe.expectMsgPF(max = 3.seconds) {
-          case w @ Warning(_, _, "Processing new Request") if w.mdc.size == 1 && w.mdc("requestId") == 1 ⇒
+          case w @ Warning(_, _, "Processing new Request")
+              if w.mdc.size == 1 && w.mdc("requestId") == 1 ⇒
         }
 
         ref ! "Processing another Request"
         probe.expectMsgPF(max = 3.seconds) {
-          case w @ Warning(_, _, "Processing another Request") if w.mdc.size == 1 && w.mdc("requestId") == 2 ⇒
+          case w @ Warning(_, _, "Processing another Request")
+              if w.mdc.size == 1 && w.mdc("requestId") == 2 ⇒
         }
 
         ref ! "Current Message in MDC"
         probe.expectMsgPF(max = 3.seconds) {
-          case w @ Warning(_, _, "Current Message in MDC") if w.mdc.size == 3 &&
-            w.mdc("requestId") == 3 &&
-            w.mdc("currentMsg") == "Current Message in MDC" &&
-            w.mdc("currentMsgLength") == 22 ⇒
+          case w @ Warning(_, _, "Current Message in MDC")
+              if w.mdc.size == 3 && w.mdc("requestId") == 3 &&
+              w.mdc("currentMsg") == "Current Message in MDC" &&
+              w.mdc("currentMsgLength") == 22 ⇒
         }
 
         ref ! "Current Message removed from MDC"
         probe.expectMsgPF(max = 3.seconds) {
-          case w @ Warning(_, _, "Current Message removed from MDC") if w.mdc.size == 1 && w.mdc("requestId") == 4 ⇒
+          case w @ Warning(_, _, "Current Message removed from MDC")
+              if w.mdc.size == 1 && w.mdc("requestId") == 4 ⇒
         }
-
       } finally {
         TestKit.shutdownActorSystem(system)
       }
     }
-
   }
 
   "Ticket 3080" must {
@@ -271,7 +281,8 @@ class LoggerSpec extends WordSpec with Matchers {
       val minutes = c.get(Calendar.MINUTE)
       val seconds = c.get(Calendar.SECOND)
       val ms = c.get(Calendar.MILLISECOND)
-      Helpers.currentTimeMillisToUTCString(timestamp) should ===(f"$hours%02d:$minutes%02d:$seconds%02d.$ms%03dUTC")
+      Helpers.currentTimeMillisToUTCString(timestamp) should ===(
+          f"$hours%02d:$minutes%02d:$seconds%02d.$ms%03dUTC")
     }
   }
 

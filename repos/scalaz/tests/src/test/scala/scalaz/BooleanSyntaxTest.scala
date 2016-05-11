@@ -7,27 +7,27 @@ object BooleanSyntaxTest extends SpecLite {
   "boolean syntax" in {
     import syntax.std.boolean._
 
-    "and" ! forAll { (p:Boolean, q:Boolean) =>
+    "and" ! forAll { (p: Boolean, q: Boolean) =>
       p /\ q == (p && q)
     }
 
-    "or" ! forAll { (p:Boolean, q:Boolean) =>
+    "or" ! forAll { (p: Boolean, q: Boolean) =>
       p \/ q == (p || q)
     }
 
-    "nand" ! forAll { (p:Boolean, q:Boolean) =>
+    "nand" ! forAll { (p: Boolean, q: Boolean) =>
       p !&& q == !(p && q)
     }
 
-    "nor" ! forAll { (p:Boolean, q:Boolean) =>
+    "nor" ! forAll { (p: Boolean, q: Boolean) =>
       p !|| q == !(p || q)
     }
 
-    "conditional" ! forAll { (p:Boolean, q:Boolean) =>
+    "conditional" ! forAll { (p: Boolean, q: Boolean) =>
       p --> q == (!p || q)
     }
 
-    "inverse conditional" ! forAll { (p:Boolean, q:Boolean) =>
+    "inverse conditional" ! forAll { (p: Boolean, q: Boolean) =>
       p <-- q == (p || !q)
     }
 
@@ -38,11 +38,11 @@ object BooleanSyntaxTest extends SpecLite {
       assert(!(false <--> true))
     }
 
-    "negate conditional" ! forAll { (p:Boolean, q:Boolean) =>
+    "negate conditional" ! forAll { (p: Boolean, q: Boolean) =>
       p -/> q == (p && !q)
     }
 
-    "negate inverse conditional" ! forAll { (p:Boolean, q:Boolean) =>
+    "negate inverse conditional" ! forAll { (p: Boolean, q: Boolean) =>
       p <\- q == (!p && q)
     }
 

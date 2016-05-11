@@ -1,3 +1,3 @@
 trait A {
-	type S
+  type S
 }

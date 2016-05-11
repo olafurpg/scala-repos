@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Framework    **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Framework    **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.jasminetest
 
@@ -21,8 +20,10 @@ import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.runtime.StackTrace
 
 /** This class is passed to the actual jasmine framework as a reporter */
-class JasmineTestReporter(taskDef: TaskDef, eventHandler: EventHandler,
-    loggers: Array[Logger], runnerDone: () => Unit) {
+class JasmineTestReporter(taskDef: TaskDef,
+                          eventHandler: EventHandler,
+                          loggers: Array[Logger],
+                          runnerDone: () => Unit) {
   private var currentSuite: Suite = _
 
   @JSExport
@@ -43,8 +44,8 @@ class JasmineTestReporter(taskDef: TaskDef, eventHandler: EventHandler,
     val results = spec.results()
     val description = spec.description
 
-    val selector =
-      new NestedTestSelector(spec.suite.getFullName(), description)
+    val selector = new NestedTestSelector(
+        spec.suite.getFullName(), description)
 
     if (results.passed) {
       eventHandler.handle(new JasmineEvent(taskDef, Status.Success, selector))
@@ -133,12 +134,9 @@ class JasmineTestReporter(taskDef: TaskDef, eventHandler: EventHandler,
                 !stackElem.getFileName.endsWith("jasmine.js"))
           }
 
-          if (stack.isEmpty)
-            log.error(s"    $message")
-          else
-            log.trace(new JasmineTestException(message, stack))
+          if (stack.isEmpty) log.error(s"    $message")
+          else log.trace(new JasmineTestException(message, stack))
         }
     }
   }
-
 }

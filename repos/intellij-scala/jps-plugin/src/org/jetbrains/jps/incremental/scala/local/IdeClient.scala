@@ -10,19 +10,23 @@ import org.jetbrains.jps.incremental.ModuleLevelBuilder.OutputConsumer
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 import org.jetbrains.jps.incremental.messages.{CompilerMessage, FileDeletedEvent, ProgressMessage}
 
-
 /**
- * Nikolay.Tropin
- * 11/18/13
- */
+  * Nikolay.Tropin
+  * 11/18/13
+  */
 abstract class IdeClient(compilerName: String,
                          context: CompileContext,
                          modules: Seq[String],
-                         consumer: OutputConsumer) extends Client {
+                         consumer: OutputConsumer)
+    extends Client {
 
   private var hasErrors = false
 
-  def message(kind: Kind, text: String, source: Option[File], line: Option[Long], column: Option[Long]) {
+  def message(kind: Kind,
+              text: String,
+              source: Option[File],
+              line: Option[Long],
+              column: Option[Long]) {
     if (kind == Kind.ERROR) {
       hasErrors = true
     }
@@ -32,17 +36,25 @@ abstract class IdeClient(compilerName: String,
     val sourcePath = source.map(file => file.getPath)
 
     context.getProjectDescriptor.getProject.getName
-    if (kind == Kind.WARNING && ScalaReflectMacroExpansionParser.isMacroMessage(text)) {
+    if (kind == Kind.WARNING &&
+        ScalaReflectMacroExpansionParser.isMacroMessage(text)) {
       ScalaReflectMacroExpansionParser.processMessage(text)
     } else {
       val withoutPointer =
         if (sourcePath.isDefined && line.isDefined && column.isDefined) {
           val lines = text.split('\n')
           lines.filterNot(_.trim == "^").mkString("\n")
-        }
-        else text
-      context.processMessage(new CompilerMessage(name, kind, withoutPointer, sourcePath.orNull,
-        -1L, -1L, -1L, line.getOrElse(-1L), column.getOrElse(-1L)))
+        } else text
+      context.processMessage(
+          new CompilerMessage(name,
+                              kind,
+                              withoutPointer,
+                              sourcePath.orNull,
+                              -1L,
+                              -1L,
+                              -1L,
+                              line.getOrElse(-1L),
+                              column.getOrElse(-1L)))
     }
   }
 
@@ -51,11 +63,16 @@ abstract class IdeClient(compilerName: String,
   }
 
   def progress(text: String, done: Option[Float]) {
-    val formattedText = if (text.isEmpty) "" else {
-      val decapitalizedText = text.charAt(0).toLower.toString + text.substring(1)
-      "%s: %s [%s]".format(compilerName, decapitalizedText, modules.mkString(", "))
-    }
-    context.processMessage(new ProgressMessage(formattedText, done.getOrElse(-1.0F)))
+    val formattedText =
+      if (text.isEmpty) ""
+      else {
+        val decapitalizedText =
+          text.charAt(0).toLower.toString + text.substring(1)
+        "%s: %s [%s]".format(
+            compilerName, decapitalizedText, modules.mkString(", "))
+      }
+    context.processMessage(
+        new ProgressMessage(formattedText, done.getOrElse(-1.0F)))
   }
 
   def debug(text: String) {
@@ -63,7 +80,8 @@ abstract class IdeClient(compilerName: String,
   }
 
   def deleted(module: File) {
-    val paths = util.Collections.singletonList(FileUtil.toCanonicalPath(module.getPath))
+    val paths =
+      util.Collections.singletonList(FileUtil.toCanonicalPath(module.getPath))
     context.processMessage(new FileDeletedEvent(paths))
   }
 

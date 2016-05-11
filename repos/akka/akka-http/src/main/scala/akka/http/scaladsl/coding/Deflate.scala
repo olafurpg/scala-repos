@@ -4,20 +4,22 @@
 
 package akka.http.scaladsl.coding
 
-import java.util.zip.{ Inflater, Deflater }
+import java.util.zip.{Inflater, Deflater}
 import akka.stream.Attributes
 import akka.stream.impl.io.ByteStringParser
-import ByteStringParser.{ ParseResult, ParseStep }
-import akka.util.{ ByteStringBuilder, ByteString }
+import ByteStringParser.{ParseResult, ParseStep}
+import akka.util.{ByteStringBuilder, ByteString}
 
 import scala.annotation.tailrec
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.HttpEncodings
 
-class Deflate(val messageFilter: HttpMessage ⇒ Boolean) extends Coder with StreamDecoder {
+class Deflate(val messageFilter: HttpMessage ⇒ Boolean)
+    extends Coder with StreamDecoder {
   val encoding = HttpEncodings.deflate
   def newCompressor = new DeflateCompressor
-  def newDecompressorStage(maxBytesPerChunk: Int) = () ⇒ new DeflateDecompressor(maxBytesPerChunk)
+  def newDecompressorStage(maxBytesPerChunk: Int) =
+    () ⇒ new DeflateDecompressor(maxBytesPerChunk)
 }
 object Deflate extends Deflate(Encoder.DefaultFilter)
 
@@ -36,17 +38,20 @@ class DeflateCompressor extends Compressor {
 
     compressWithBuffer(input, buffer) ++ finishWithBuffer(buffer)
   }
-  override final def compress(input: ByteString): ByteString = compressWithBuffer(input, newTempBuffer())
+  override final def compress(input: ByteString): ByteString =
+    compressWithBuffer(input, newTempBuffer())
   override final def flush(): ByteString = flushWithBuffer(newTempBuffer())
   override final def finish(): ByteString = finishWithBuffer(newTempBuffer())
 
-  protected def compressWithBuffer(input: ByteString, buffer: Array[Byte]): ByteString = {
+  protected def compressWithBuffer(
+      input: ByteString, buffer: Array[Byte]): ByteString = {
     require(deflater.needsInput())
     deflater.setInput(input.toArray)
     drainDeflater(deflater, buffer)
   }
   protected def flushWithBuffer(buffer: Array[Byte]): ByteString = {
-    val written = deflater.deflate(buffer, 0, buffer.length, Deflater.SYNC_FLUSH)
+    val written =
+      deflater.deflate(buffer, 0, buffer.length, Deflater.SYNC_FLUSH)
     ByteString.fromArray(buffer, 0, written)
   }
   protected def finishWithBuffer(buffer: Array[Byte]): ByteString = {
@@ -74,7 +79,10 @@ private[http] object DeflateCompressor {
   val MinBufferSize = 1024
 
   @tailrec
-  def drainDeflater(deflater: Deflater, buffer: Array[Byte], result: ByteStringBuilder = new ByteStringBuilder()): ByteString = {
+  def drainDeflater(
+      deflater: Deflater,
+      buffer: Array[Byte],
+      result: ByteStringBuilder = new ByteStringBuilder()): ByteString = {
     val len = deflater.deflate(buffer)
     if (len > 0) {
       result ++= ByteString.fromArray(buffer, 0, len)
@@ -86,7 +94,9 @@ private[http] object DeflateCompressor {
   }
 }
 
-class DeflateDecompressor(maxBytesPerChunk: Int = Decoder.MaxBytesPerChunkDefault) extends DeflateDecompressorBase(maxBytesPerChunk) {
+class DeflateDecompressor(
+    maxBytesPerChunk: Int = Decoder.MaxBytesPerChunkDefault)
+    extends DeflateDecompressorBase(maxBytesPerChunk) {
 
   override def createLogic(attr: Attributes) = new DecompressorParsingLogic {
     override val inflater: Inflater = new Inflater()
@@ -96,14 +106,16 @@ class DeflateDecompressor(maxBytesPerChunk: Int = Decoder.MaxBytesPerChunkDefaul
     }
 
     override def afterInflate = inflateState
-    override def afterBytesRead(buffer: Array[Byte], offset: Int, length: Int): Unit = {}
+    override def afterBytesRead(
+        buffer: Array[Byte], offset: Int, length: Int): Unit = {}
 
     startWith(inflateState)
   }
 }
 
-abstract class DeflateDecompressorBase(maxBytesPerChunk: Int = Decoder.MaxBytesPerChunkDefault)
-  extends ByteStringParser[ByteString] {
+abstract class DeflateDecompressorBase(
+    maxBytesPerChunk: Int = Decoder.MaxBytesPerChunkDefault)
+    extends ByteStringParser[ByteString] {
 
   abstract class DecompressorParsingLogic extends ParsingLogic {
     val inflater: Inflater
@@ -111,9 +123,11 @@ abstract class DeflateDecompressorBase(maxBytesPerChunk: Int = Decoder.MaxBytesP
     def afterBytesRead(buffer: Array[Byte], offset: Int, length: Int): Unit
     val inflateState: Inflate
 
-    abstract class Inflate(noPostProcessing: Boolean) extends ParseStep[ByteString] {
+    abstract class Inflate(noPostProcessing: Boolean)
+        extends ParseStep[ByteString] {
       override def canWorkWithPartialData = true
-      override def parse(reader: ByteStringParser.ByteReader): ParseResult[ByteString] = {
+      override def parse(
+          reader: ByteStringParser.ByteReader): ParseResult[ByteString] = {
         inflater.setInput(reader.remainingData.toArray)
 
         val buffer = new Array[Byte](maxBytesPerChunk)
@@ -124,9 +138,12 @@ abstract class DeflateDecompressorBase(maxBytesPerChunk: Int = Decoder.MaxBytesP
         if (read > 0) {
           afterBytesRead(buffer, 0, read)
           val next = if (inflater.finished()) afterInflate else this
-          ParseResult(Some(ByteString.fromArray(buffer, 0, read)), next, noPostProcessing)
+          ParseResult(Some(ByteString.fromArray(buffer, 0, read)),
+                      next,
+                      noPostProcessing)
         } else {
-          if (inflater.finished()) ParseResult(None, afterInflate, noPostProcessing)
+          if (inflater.finished())
+            ParseResult(None, afterInflate, noPostProcessing)
           else throw ByteStringParser.NeedMoreData
         }
       }

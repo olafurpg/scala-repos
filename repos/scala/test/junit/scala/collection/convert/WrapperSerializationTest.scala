@@ -21,9 +21,9 @@ class WrapperSerializationTest {
   @Test
   def test_SI8911() {
     import scala.collection.JavaConverters._
-    assert( serdes(scala.collection.mutable.ArrayBuffer(1,2).asJava) )
-    assert( serdes(Seq(1,2).asJava) )
-    assert( serdes(Set(1,2).asJava) )
-    assert( serdes(Map(1 -> "one", 2 -> "two").asJava) )
+    assert(serdes(scala.collection.mutable.ArrayBuffer(1, 2).asJava))
+    assert(serdes(Seq(1, 2).asJava))
+    assert(serdes(Set(1, 2).asJava))
+    assert(serdes(Map(1 -> "one", 2 -> "two").asJava))
   }
 }

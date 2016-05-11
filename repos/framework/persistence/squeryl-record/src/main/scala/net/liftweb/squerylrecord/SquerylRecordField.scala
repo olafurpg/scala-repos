@@ -15,22 +15,22 @@ package net.liftweb
 package squerylrecord
 
 /**
- * This trait has to be extended for new fields that
- * are derived from net.liftweb.record.BaseField or TypedField and should be used
- * in squeryl records.
- * 
- * This is necessary because the class of the field's value in the database
- * has to be known for squeryl, and this information is not directly
- * available in BaseField or TypedField.
- *
- * For all standard fields in record, there is a special handling in
- * squeryl-record. That means, for example, that you can create a subclass
- * of StringTypedField without the need to extend this trait.
- */
+  * This trait has to be extended for new fields that
+  * are derived from net.liftweb.record.BaseField or TypedField and should be used
+  * in squeryl records.
+  * 
+  * This is necessary because the class of the field's value in the database
+  * has to be known for squeryl, and this information is not directly
+  * available in BaseField or TypedField.
+  *
+  * For all standard fields in record, there is a special handling in
+  * squeryl-record. That means, for example, that you can create a subclass
+  * of StringTypedField without the need to extend this trait.
+  */
 trait SquerylRecordField {
 
   /**
-   * Should return the class of the field's value in the database.
-   */
+    * Should return the class of the field's value in the database.
+    */
   def classOfPersistentField: Class[_]
 }

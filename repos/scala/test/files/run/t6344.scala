@@ -7,17 +7,21 @@ trait Gen[A] extends Any {
 }
 class ValueInt(val x: Int) extends AnyVal with Gen[Int] {
   // Gen<java.lang.Object> ValueInt.extension$plus(int,Gen<java.lang.Object>,Gen<java.lang.Object>)
-  def plus(x1: Gen[Int], x2: Gen[Int]): Gen[Int] = new ValueInt(x + x1.x + x2.x)
+  def plus(x1: Gen[Int], x2: Gen[Int]): Gen[Int] =
+    new ValueInt(x + x1.x + x2.x)
   // int ValueInt.extension$iplus(int,int,int)
-  def iplus(x1: ValueInt, x2: ValueInt): ValueInt = new ValueInt(x + x1.x + x2.x)
+  def iplus(x1: ValueInt, x2: ValueInt): ValueInt =
+    new ValueInt(x + x1.x + x2.x)
 }
 class RefInt(val x: Int) extends AnyRef with Gen[Int] {
   def plus(x1: Gen[Int], x2: Gen[Int]): Gen[Int] = new RefInt(x + x1.x + x2.x)
   def rplus(x1: RefInt, x2: RefInt): RefInt = new RefInt(x + x1.x + x2.x)
 }
 class RefInteger(val x: java.lang.Integer) extends AnyRef with Gen[Integer] {
-  def plus(x1: Gen[Integer], x2: Gen[Integer]): Gen[Integer] = new RefInteger(x + x1.x + x2.x)
-  def bplus(x1: RefInteger, x2: RefInteger): RefInteger = new RefInteger(x + x1.x + x2.x)
+  def plus(x1: Gen[Integer], x2: Gen[Integer]): Gen[Integer] =
+    new RefInteger(x + x1.x + x2.x)
+  def bplus(x1: RefInteger, x2: RefInteger): RefInteger =
+    new RefInteger(x + x1.x + x2.x)
 }
 
 class Val[Q](val value: Int) extends AnyVal
@@ -77,14 +81,17 @@ class C6[A] {
   def f1(x1: Val[A], x2: ValAny[A], x3: ValStr[A], x4: ValA[A]) = x4
 }
 class C7 extends C6[Int] {
-  override def f1(x1: Val[Int], x2: ValAny[Int], x3: ValStr[Int], x4: ValA[Int]) =
+  override def f1(
+      x1: Val[Int], x2: ValAny[Int], x3: ValStr[Int], x4: ValA[Int]) =
     super.f1(x1, x2, x3, x4)
 }
 
 object Test {
-  def show[A: ClassTag] = {
+  def show[A : ClassTag] = {
     println(classTag[A].runtimeClass.getName)
-    classTag[A].runtimeClass.getDeclaredMethods.toList.sortBy(_.toString).flatMap(m => List(m.toString, m.toGenericString)) foreach println
+    classTag[A].runtimeClass.getDeclaredMethods.toList
+      .sortBy(_.toString)
+      .flatMap(m => List(m.toString, m.toGenericString)) foreach println
     println("")
   }
 

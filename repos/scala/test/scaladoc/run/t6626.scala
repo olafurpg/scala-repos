@@ -5,7 +5,8 @@ import scala.tools.partest.ScaladocModelTest
 
 object Test extends ScaladocModelTest {
 
-  override def code = """
+  override def code =
+    """
 
 package org.foo
 
@@ -32,11 +33,16 @@ object Foo {
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
-    val a = rootPackage._package("org")._package("foo")._object("Foo")._method("test")
+    val a = rootPackage
+      ._package("org")
+      ._package("foo")
+      ._object("Foo")
+      ._method("test")
     val throws = a.comment.get.throws
     val allbodies = Body(throws.values.flatMap(_.blocks).toSeq)
 
     val links = countLinksInBody(allbodies, _.link.isInstanceOf[LinkToTpl[_]])
-    assert(links == 2, links + " ==  2 (links to MyException and MyOtherException)")
+    assert(links == 2,
+           links + " ==  2 (links to MyException and MyOtherException)")
   }
 }

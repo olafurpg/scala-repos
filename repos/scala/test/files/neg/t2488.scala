@@ -1,5 +1,5 @@
 class C {
-  def f(a:Int, b:Int) = 1
+  def f(a: Int, b: Int) = 1
   def f() = 2
 }
 object Test extends App {

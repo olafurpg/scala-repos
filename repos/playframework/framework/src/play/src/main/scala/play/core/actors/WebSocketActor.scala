@@ -9,21 +9,26 @@ import akka.actor.Terminated
 import scala.reflect.ClassTag
 
 /**
- * Integration between Play WebSockets and actors
- */
+  * Integration between Play WebSockets and actors
+  */
 private[play] object WebSocketActor {
 
   object WebSocketActorSupervisor {
-    def props[In, Out: ClassTag](enumerator: Enumerator[In], iteratee: Iteratee[Out, Unit],
-      createHandler: ActorRef => Props) =
-      Props(new WebSocketActorSupervisor[In, Out](enumerator, iteratee, createHandler))
+    def props[In, Out : ClassTag](enumerator: Enumerator[In],
+                                  iteratee: Iteratee[Out, Unit],
+                                  createHandler: ActorRef => Props) =
+      Props(new WebSocketActorSupervisor[In, Out](
+              enumerator, iteratee, createHandler))
   }
 
   /**
-   * The actor that supervises and handles all messages to/from the WebSocket actor.
-   */
-  private class WebSocketActorSupervisor[In, Out](enumerator: Enumerator[In], iteratee: Iteratee[Out, Unit],
-      createHandler: ActorRef => Props)(implicit messageType: ClassTag[Out]) extends Actor {
+    * The actor that supervises and handles all messages to/from the WebSocket actor.
+    */
+  private class WebSocketActorSupervisor[In, Out](
+      enumerator: Enumerator[In],
+      iteratee: Iteratee[Out, Unit],
+      createHandler: ActorRef => Props)(implicit messageType: ClassTag[Out])
+      extends Actor {
 
     import context.dispatcher
 
@@ -42,7 +47,8 @@ private[play] object WebSocketActor {
     @volatile var shutdown = false
 
     // The actor to handle the WebSocket
-    val webSocketActor = context.watch(context.actorOf(createHandler(self), "handler"))
+    val webSocketActor =
+      context.watch(context.actorOf(createHandler(self), "handler"))
 
     // Use a broadcast enumerator to imperatively push messages into the WebSocket
     val channel = {
@@ -60,8 +66,7 @@ private[play] object WebSocketActor {
 
     (enumerator |>> consumer).onComplete { _ =>
       // When the WebSocket is complete, either due to an error or not, shutdown
-      if (!shutdown)
-        webSocketActor ! PoisonPill
+      if (!shutdown) webSocketActor ! PoisonPill
     }
 
     def receive = {
@@ -91,39 +96,44 @@ private[play] object WebSocketActor {
     val props = Props(new WebSocketsActor)
 
     /**
-     * Connect an actor to the WebSocket on the end of the given enumerator/iteratee.
-     *
-     * @param requestId The requestId. Used to name the actor.
-     * @param enumerator The enumerator to send messages to.
-     * @param iteratee The iteratee to consume messages from.
-     * @param createHandler A function that creates a handler to handle the WebSocket, given an actor to send messages
-     *                      to.
-     * @param messageType The type of message this WebSocket deals with.
-     */
-    case class Connect[In, Out](requestId: Long, enumerator: Enumerator[In], iteratee: Iteratee[Out, Unit],
-      createHandler: ActorRef => Props)(implicit val messageType: ClassTag[Out])
+      * Connect an actor to the WebSocket on the end of the given enumerator/iteratee.
+      *
+      * @param requestId The requestId. Used to name the actor.
+      * @param enumerator The enumerator to send messages to.
+      * @param iteratee The iteratee to consume messages from.
+      * @param createHandler A function that creates a handler to handle the WebSocket, given an actor to send messages
+      *                      to.
+      * @param messageType The type of message this WebSocket deals with.
+      */
+    case class Connect[In, Out](requestId: Long,
+                                enumerator: Enumerator[In],
+                                iteratee: Iteratee[Out, Unit],
+                                createHandler: ActorRef => Props)(
+        implicit val messageType: ClassTag[Out])
   }
 
   /**
-   * The actor responsible for creating all web sockets
-   */
+    * The actor responsible for creating all web sockets
+    */
   private class WebSocketsActor extends Actor {
     import WebSocketsActor._
 
     def receive = {
       case c @ Connect(requestId, enumerator, iteratee, createHandler) =>
         implicit val mt = c.messageType
-        context.actorOf(WebSocketActorSupervisor.props(enumerator, iteratee, createHandler),
-          requestId.toString)
+        context.actorOf(WebSocketActorSupervisor.props(
+                            enumerator, iteratee, createHandler),
+                        requestId.toString)
     }
   }
 
   /**
-   * The extension for managing WebSockets
-   */
+    * The extension for managing WebSockets
+    */
   object WebSocketsExtension extends ExtensionId[WebSocketsExtension] {
     def createExtension(system: ExtendedActorSystem) = {
-      new WebSocketsExtension(system.systemActorOf(WebSocketsActor.props, "websockets"))
+      new WebSocketsExtension(
+          system.systemActorOf(WebSocketsActor.props, "websockets"))
     }
   }
 

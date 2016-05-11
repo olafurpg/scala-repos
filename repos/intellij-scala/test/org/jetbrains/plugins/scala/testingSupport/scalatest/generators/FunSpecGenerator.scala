@@ -13,7 +13,7 @@ trait FunSpecGenerator extends ScalaTestTestCase {
 
   def addFunSpec() {
     addFileToProject("FunSpecTest.scala",
-      """
+                     """
         |import org.scalatest._
         |
         |class FunSpecTest extends FunSpec {
@@ -33,7 +33,6 @@ trait FunSpecGenerator extends ScalaTestTestCase {
         |
         |  describe("emptyScope") {}
         |}
-      """.stripMargin.trim()
-    )
+      """.stripMargin.trim())
   }
 }

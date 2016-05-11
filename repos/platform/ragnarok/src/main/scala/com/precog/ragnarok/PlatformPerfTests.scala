@@ -19,7 +19,6 @@
  */
 package com.precog.ragnarok
 
-
 object PlatformPerfTests extends PerfTestSuite {
   "billings" := {
     query("count(//billings)")
@@ -58,4 +57,3 @@ object PlatformPerfTests extends PerfTestSuite {
     query("""stdDev(//movie_ratings)""")
   }
 }
-

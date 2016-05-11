@@ -3,15 +3,15 @@
 package org.ensime.server
 
 import akka.actor.Props
-import java.net.{ InetSocketAddress, ServerSocket, Socket }
-import org.ensime.fixture.{ EnsimeConfigFixture, IsolatedEnsimeConfigFixture, IsolatedTestKitFixture }
+import java.net.{InetSocketAddress, ServerSocket, Socket}
+import org.ensime.fixture.{EnsimeConfigFixture, IsolatedEnsimeConfigFixture, IsolatedTestKitFixture}
 import org.ensime.util.EnsimeSpec
 import scala.concurrent.duration._
 import org.ensime.util.file._
-import scala.util.{ Properties, Try }
+import scala.util.{Properties, Try}
 
-class ServerStartupSpec extends EnsimeSpec
-    with IsolatedEnsimeConfigFixture
+class ServerStartupSpec
+    extends EnsimeSpec with IsolatedEnsimeConfigFixture
     with IsolatedTestKitFixture {
 
   val original = EnsimeConfigFixture.EmptyTestProject
@@ -74,7 +74,8 @@ class ServerStartupSpec extends EnsimeSpec
 
         val preferredTcp = 10004
         (config.cacheDir / "port").writeString(preferredTcp.toString)
-        val tcpHog = new ServerSocket().bind(new InetSocketAddress("127.0.0.1", preferredTcp))
+        val tcpHog = new ServerSocket()
+          .bind(new InetSocketAddress("127.0.0.1", preferredTcp))
 
         val protocol = new SwankProtocol
         system.actorOf(Props(new ServerActor(config, protocol)), "ensime-main")
@@ -94,7 +95,8 @@ class ServerStartupSpec extends EnsimeSpec
         val preferredHttp = 10003
         (config.cacheDir / "http").writeString(preferredHttp.toString)
 
-        val httpHog = new ServerSocket().bind(new InetSocketAddress("127.0.0.1", preferredHttp))
+        val httpHog = new ServerSocket()
+          .bind(new InetSocketAddress("127.0.0.1", preferredHttp))
 
         val protocol = new SwankProtocol
         system.actorOf(Props(new ServerActor(config, protocol)), "ensime-main")
@@ -105,5 +107,4 @@ class ServerStartupSpec extends EnsimeSpec
       }
     }
   }
-
 }

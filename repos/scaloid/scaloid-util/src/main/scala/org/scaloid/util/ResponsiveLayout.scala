@@ -5,12 +5,12 @@ import org.scaloid.common._
 import android.view.View
 
 /**
- * Responsive layout.
- *
- * Refer to the URL below for more details:
- *
- * [[http://blog.scaloid.org/2013/02/android-multiple-layout-directory.html]]
- */
+  * Responsive layout.
+  *
+  * Refer to the URL below for more details:
+  *
+  * [[http://blog.scaloid.org/2013/02/android-multiple-layout-directory.html]]
+  */
 class ResponsiveLayout(implicit context: Context) extends SLinearLayout {
   if (Configuration.portrait) orientation = VERTICAL
   private var first = true

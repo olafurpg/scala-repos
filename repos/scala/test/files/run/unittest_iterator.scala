@@ -1,10 +1,12 @@
 // Some iterator grouped/sliding unit tests
 object Test {
   def it = (1 to 10).iterator
-  def assertThat[T](expectedLength: Int, expectedLast: Seq[T])(it: Iterator[Seq[T]]) {
+  def assertThat[T](expectedLength: Int, expectedLast: Seq[T])(
+      it: Iterator[Seq[T]]) {
     val xs = it.toList
     def fail(msg: String) = "assertion failed on %s: %s".format(xs, msg)
-    assert(xs.size == expectedLength, fail("expected length " + expectedLength))
+    assert(
+        xs.size == expectedLength, fail("expected length " + expectedLength))
     assert(xs.last == expectedLast, fail("expected last " + expectedLast))
   }
 
@@ -39,13 +41,12 @@ object Test {
 
     // make sure it throws past the end
     val thrown = try {
-      val it = List(1,2,3).sliding(2)
+      val it = List(1, 2, 3).sliding(2)
       it.next
       it.next
       it.next
       false
-    }
-    catch {
+    } catch {
       case _: NoSuchElementException => true
     }
     assert(thrown)

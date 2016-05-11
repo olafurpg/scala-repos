@@ -11,7 +11,8 @@ package case1 {
     def g = f(Bar)
   }
   trait Foo2 extends Foo {
-    override object Bar extends Bippy {  // err
+    override object Bar extends Bippy {
+      // err
       override def f = 3
     }
   }
@@ -21,8 +22,8 @@ package case1 {
   trait Quux2 extends Quux1 { override object Bar { def g = "abc" } } // err
 
   // still can't override final objects!
-  trait Quux3 { final object Bar { } }
-  trait Quux4 extends Quux3 { override object Bar  } // err
+  trait Quux3 { final object Bar {} }
+  trait Quux4 extends Quux3 { override object Bar } // err
 }
 
 // type parameter as-seen-from business
@@ -40,7 +41,7 @@ package case2 {
 
   class P1 extends Foo[Traversable[String]]
   class P2 extends P1 {
-    override object A extends Bar[List[String]]  // err
+    override object A extends Bar[List[String]] // err
   }
 }
 

@@ -12,9 +12,14 @@ class VerifySymbols extends Phase {
   def apply(state: CompilerState) = state.map { n2 =>
     def verifyScoping(n: Node, syms: Set[TermSymbol]): Unit = n match {
       case FwdPath(s :: _) if !syms.contains(s) =>
-        val all = n2.collectAll[(TermSymbol, Node)] { case d: DefNode => d.generators }.toMap
+        val all = n2
+          .collectAll[(TermSymbol, Node)] { case d: DefNode => d.generators }
+          .toMap
         val srcDef = all.getOrElse(s, null)
-        throw new SlickTreeException("Unreachable reference to "+s+" after resolving monadic joins", n2, mark = (d => (d eq n) || (d eq srcDef)))
+        throw new SlickTreeException(
+            "Unreachable reference to " + s + " after resolving monadic joins",
+            n2,
+            mark = (d => (d eq n) || (d eq srcDef)))
       case Bind(s, from, sel: Pure) =>
         verifyScoping(from, syms)
         verifyScoping(sel, syms + s)
@@ -22,7 +27,10 @@ class VerifySymbols extends Phase {
         verifyScoping(from, syms)
         verifyScoping(sel, syms + s)
       case b @ Bind(s, _, sel) =>
-        throw new SlickTreeException("Unresolved monadic join: Non-Pure select clause in Bind "+s, b, mark = (_ eq sel))
+        throw new SlickTreeException(
+            "Unresolved monadic join: Non-Pure select clause in Bind " + s,
+            b,
+            mark = (_ eq sel))
       case f: ComplexFilteredQuery =>
         verifyScoping(f.from, syms)
         val chSyms = syms + f.generators.head._1

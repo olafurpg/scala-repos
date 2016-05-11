@@ -8,12 +8,11 @@ package reflect.internal
 package settings
 
 /** A Settings abstraction boiled out of the original highly mutable Settings
- *  class with the intention of creating an ImmutableSettings which can be used
- *  interchangeably.   Except of course without the mutants.
- */
-
+  *  class with the intention of creating an ImmutableSettings which can be used
+  *  interchangeably.   Except of course without the mutants.
+  */
 trait AbsSettings {
-  type Setting <: AbsSettingValue      // Fix to the concrete Setting type
+  type Setting <: AbsSettingValue // Fix to the concrete Setting type
 
   trait AbsSettingValue {
     type T <: Any
@@ -21,4 +20,3 @@ trait AbsSettings {
     def isDefault: Boolean
   }
 }
-

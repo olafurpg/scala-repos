@@ -34,11 +34,13 @@ import Serialize._
 object Test1_scala {
 
   private def arrayToString[A](arr: Array[A]): String =
-    arr.mkString("Array[",",","]")
+    arr.mkString("Array[", ",", "]")
 
   private def arrayEquals[A, B](a1: Array[A], a2: Array[B]): Boolean =
     (a1.length == a2.length) &&
-    (Iterator.range(0, a1.length) forall { i => a1(i) == a2(i) })
+    (Iterator.range(0, a1.length) forall { i =>
+          a1(i) == a2(i)
+        })
 
   object WeekDay extends Enumeration {
     type WeekDay = Value
@@ -62,7 +64,8 @@ object Test1_scala {
     println("e1 = " + e1)
     println("_e1 = " + _e1)
     println("e1 eq _e1: " + (e1 eq _e1) + ", _e1 eq e1: " + (_e1 eq e1))
-    println("e1 equals _e1: " + (e1 equals _e1) + ", _e1 equals e1: " + (_e1 equals e1))
+    println("e1 equals _e1: " + (e1 equals _e1) + ", _e1 equals e1: " +
+        (_e1 equals e1))
     println()
 
     // Enumeration
@@ -71,7 +74,8 @@ object Test1_scala {
     println("x7 = " + x7)
     println("y7 = " + y7)
     println("x7 eq y7: " + (x7 eq y7) + ", y7 eq x7: " + (y7 eq x7))
-    println("x7 equals y7: " + (x7 equals y7) + ", y7 equals x7: " + (y7 equals x7))
+    println("x7 equals y7: " + (x7 equals y7) + ", y7 equals x7: " +
+        (y7 equals x7))
     println()
 
     val x8 = WeekDay
@@ -79,7 +83,8 @@ object Test1_scala {
     println("x8 = " + x8)
     println("y8 = " + y8)
     println("x8 eq y8: " + (x8 eq y8) + ", y8 eq x8: " + (y8 eq x8))
-    println("x8 equals y8: " + (x8 equals y8) + ", y8 equals x8: " + (y8 equals x8))
+    println("x8 equals y8: " + (x8 equals y8) + ", y8 equals x8: " +
+        (y8 equals x8))
     println()
 
     val x9 = UP
@@ -87,7 +92,8 @@ object Test1_scala {
     println("x9 = " + x9)
     println("y9 = " + y9)
     println("x9 eq y9: " + (x9 eq y9) + ", y9 eq x9: " + (y9 eq x9))
-    println("x9 equals y9: " + (x9 equals y9) + ", y9 equals x9: " + (y9 equals x9))
+    println("x9 equals y9: " + (x9 equals y9) + ", y9 equals x9: " +
+        (y9 equals x9))
     println()
 
     val x10 = Monday
@@ -95,17 +101,23 @@ object Test1_scala {
     println("x10 = " + x10)
     println("y10 = " + y10)
     println("x10 eq y10: " + (x10 eq y10) + ", y10 eq x10: " + (y10 eq x10))
-    println("x10 equals y10: " + (x10 equals y10) + ", y10 equals x10: " + (y10 equals x10))
+    println(
+        "x10 equals y10: " + (x10 equals y10) + ", y10 equals x10: " +
+        (y10 equals x10))
     println()
 
     println("x9 eq x10: " + (x9 eq x10) + ", x10 eq x9: " + (x10 eq x9))
-    println("x9 equals x10: " + (x9 equals x10) + ", x10 equals x9: " + (x10 equals x9))
+    println("x9 equals x10: " + (x9 equals x10) + ", x10 equals x9: " +
+        (x10 equals x9))
     println("x9 eq y10: " + (x9 eq y10) + ", y10 eq x9: " + (y10 eq x9))
-    println("x9 equals y10: " + (x9 equals y10) + ", y10 equals x9: " + (y10 equals x9))
+    println("x9 equals y10: " + (x9 equals y10) + ", y10 equals x9: " +
+        (y10 equals x9))
     println()
 
     // Function
-    val f1 = { x: Int => 2 * x }
+    val f1 = { x: Int =>
+      2 * x
+    }
     val _f1: Function[Int, Int] = read(write(f1))
     println("f1 = <na>")
     println("_f1 = <na>")
@@ -117,15 +129,19 @@ object Test1_scala {
     val _xs0: List[Int] = read(write(xs0))
     println("xs0 = " + xs0)
     println("_xs0 = " + _xs0)
-    println("xs0 eq _xs0: " + (xs0 eq _xs0) + ", _xs0 eq xs0: " + (_xs0 eq xs0))
-    println("xs0 equals _xs0: " + (xs0 equals _xs0) + ", _xs0 equals xs0: " + (_xs0 equals xs0))
+    println(
+        "xs0 eq _xs0: " + (xs0 eq _xs0) + ", _xs0 eq xs0: " + (_xs0 eq xs0))
+    println(
+        "xs0 equals _xs0: " + (xs0 equals _xs0) + ", _xs0 equals xs0: " +
+        (_xs0 equals xs0))
     println()
 
     val xs1 = Nil
     val _xs1: List[Nothing] = read(write(xs1))
     println("xs1 = " + xs1)
     println("_xs1 = " + _xs1)
-    println("xs1 eq _xs1: " + (xs1 eq _xs1) + ", _xs1 eq xs1: " + (_xs1 eq xs1))
+    println(
+        "xs1 eq _xs1: " + (xs1 eq _xs1) + ", _xs1 eq xs1: " + (_xs1 eq xs1))
     println()
 
     // Option
@@ -141,21 +157,23 @@ object Test1_scala {
     println("o2 = " + o2)
     println("_o2 = " + _o2)
     println("o2 eq _o2: " + (o2 eq _o2) + ", _o2 eq o2: " + (_o2 eq o2))
-    println("o2 equals _o2: " + (o2 equals _o2) + ", _o2 equals o2: " + (_o2 equals o2))
+    println("o2 equals _o2: " + (o2 equals _o2) + ", _o2 equals o2: " +
+        (_o2 equals o2))
     println()
-/*
+    /*
     // Responder
     val r1 = Responder.constant("xyz")
     val _r1: Responder[String] = read(write(r1))
     check(r1, _r1)
-*/
+     */
     // Symbol
     val s1 = 'hello
     val _s1: Symbol = read(write(s1))
     println("s1 = " + s1)
     println("_s1 = " + _s1)
     println("s1 eq _s1: " + (s1 eq _s1) + ", _s1 eq s1: " + (_s1 eq s1))
-    println("s1 equals _s1: " + (s1 equals _s1) + ", _s1 equals s1: " + (_s1 equals s1))
+    println("s1 equals _s1: " + (s1 equals _s1) + ", _s1 equals s1: " +
+        (_s1 equals s1))
     println()
 
     // Tuple
@@ -164,10 +182,10 @@ object Test1_scala {
     println("t1 = " + t1)
     println("_t1 = " + _t1)
     println("t1 eq _t1: " + (t1 eq _t1) + ", _t1 eq t1: " + (_t1 eq t1))
-    println("t1 equals _t1: " + (t1 equals _t1) + ", _t1 equals t1: " + (_t1 equals t1))
+    println("t1 equals _t1: " + (t1 equals _t1) + ", _t1 equals t1: " +
+        (_t1 equals t1))
     println()
-  }
-  catch {
+  } catch {
     case e: Exception =>
       println("Error in Test1_scala: " + e)
       throw e
@@ -178,9 +196,7 @@ object Test1_scala {
 // Test classes in package "scala.collection.immutable"
 
 object Test2_immutable {
-  import scala.collection.immutable.{
-    BitSet, HashMap, HashSet, ListMap, ListSet, Queue, Range, SortedMap,
-    SortedSet, Stack, Stream, TreeMap, TreeSet, Vector}
+  import scala.collection.immutable.{BitSet, HashMap, HashSet, ListMap, ListSet, Queue, Range, SortedMap, SortedSet, Stack, Stream, TreeMap, TreeSet, Vector}
 
   // in alphabetic order
   try {
@@ -213,7 +229,8 @@ object Test2_immutable {
     check(xs1, _xs1)
 
     // ListMap
-    val lm1 = new ListMap[String, Int] + ("buffers" -> 20, "layers" -> 2, "title" -> 3)
+    val lm1 =
+      new ListMap[String, Int] + ("buffers" -> 20, "layers" -> 2, "title" -> 3)
     val _lm1: ListMap[String, Int] = read(write(lm1))
     check(lm1, _lm1)
 
@@ -270,8 +287,7 @@ object Test2_immutable {
     val v1 = Vector('a, 'b, 'c)
     val _v1: Vector[Symbol] = read(write(v1))
     check(v1, _v1)
-  }
-  catch {
+  } catch {
     case e: Exception =>
       println("Error in Test2_immutable: " + e)
       throw e
@@ -283,10 +299,7 @@ object Test2_immutable {
 
 object Test3_mutable {
   import scala.reflect.ClassTag
-  import scala.collection.mutable.{
-    ArrayBuffer, ArrayBuilder, ArraySeq, ArrayStack, BitSet, DoubleLinkedList,
-    HashMap, HashSet, History, LinkedHashMap, LinkedHashSet, LinkedList, ListBuffer,
-    Publisher, Queue, Stack, StringBuilder, WrappedArray, TreeSet}
+  import scala.collection.mutable.{ArrayBuffer, ArrayBuilder, ArraySeq, ArrayStack, BitSet, DoubleLinkedList, HashMap, HashSet, History, LinkedHashMap, LinkedHashSet, LinkedList, ListBuffer, Publisher, Queue, Stack, StringBuilder, WrappedArray, TreeSet}
   import scala.collection.concurrent.TrieMap
 
   // in alphabetic order
@@ -324,13 +337,13 @@ object Test3_mutable {
     bs1 += 9
     val _bs1: BitSet = read(write(bs1))
     check(bs1, _bs1)
-/*
+    /*
     // DoubleLinkedList
     val dl1 = new DoubleLinkedList[Int](2, null)
     dl1.append(new DoubleLinkedList(3, null))
     val _dl1: DoubleLinkedList[Int] = read(write(dl1))
     check(dl1, _dl1)
-*/
+     */
     // HashMap
     val hm1 = new HashMap[String, Int]
     hm1 ++= List(("A", 1), ("B", 2), ("C", 3)).iterator
@@ -348,7 +361,8 @@ object Test3_mutable {
     check(h1, _h1)
 
     // LinkedHashMap
-    { val lhm1 = new LinkedHashMap[String, Int]
+    {
+      val lhm1 = new LinkedHashMap[String, Int]
       val list = List(("Linked", 1), ("Hash", 2), ("Map", 3))
       lhm1 ++= list.iterator
       val _lhm1: LinkedHashMap[String, Int] = read(write(lhm1))
@@ -358,7 +372,8 @@ object Test3_mutable {
     }
 
     // LinkedHashSet
-    { val lhs1 = new LinkedHashSet[String]
+    {
+      val lhs1 = new LinkedHashSet[String]
       val list = List("layers", "buffers", "title")
       lhs1 ++= list.iterator
       val _lhs1: LinkedHashSet[String] = read(write(lhs1))
@@ -366,13 +381,13 @@ object Test3_mutable {
       check(lhs1.toSeq, _lhs1.toSeq) // check elements order
       check(lhs1.toSeq, list) // check elements order
     }
-/*
+    /*
     // LinkedList
     val ll1 = new LinkedList[Int](2, null)
     ll1.append(new LinkedList(3, null))
     val _ll1: LinkedList[Int] = read(write(ll1))
     check(ll1, _ll1)
-*/
+     */
     // ListBuffer
     val lb1 = new ListBuffer[String]
     lb1 ++= List("white", "black")
@@ -408,11 +423,11 @@ object Test3_mutable {
     check(ts1, _ts1)
 
     // concurrent.TrieMap
-    val ct1 = TrieMap[Int, String]() ++= Array(1 -> "one", 2 -> "two", 3 -> "three")
+    val ct1 =
+      TrieMap[Int, String]() ++= Array(1 -> "one", 2 -> "two", 3 -> "three")
     val _ct1: TrieMap[Int, String] = read(write(ct1))
     check(ct1, _ct1)
-  }
-  catch {
+  } catch {
     case e: Exception =>
       println("Error in Test3_mutable: " + e)
       throw e
@@ -426,8 +441,7 @@ class Person(_name: String) extends Serializable {
   private var name = _name
   override def toString() = name
   override def equals(that: Any): Boolean =
-    that.isInstanceOf[Person] &&
-    (name == that.asInstanceOf[Person].name)
+    that.isInstanceOf[Person] && (name == that.asInstanceOf[Person].name)
 }
 
 class Employee(_name: String) extends Serializable {
@@ -442,13 +456,12 @@ object Test5 {
   val x2 = bob
 
   try {
-    val y1: Person   = read(write(x1))
+    val y1: Person = read(write(x1))
     val y2: Employee = read(write(x2))
 
     check(x1, y1)
     check(x2, y2)
-  }
-  catch {
+  } catch {
     case e: Exception =>
       println("Error in Test5: " + e)
   }
@@ -462,22 +475,21 @@ object Test6 {
     val x = paul
   }
   object paul extends Person("Paul") {
-    val x = 4  //  bill; => StackOverflowException !!!
+    val x = 4 //  bill; => StackOverflowException !!!
   }
   val x1 = new Person("John")
   val x2 = bill
   val x3 = paul
 
   try {
-    val y1: Person   = read(write(x1))
+    val y1: Person = read(write(x1))
     val y2: Employee = read(write(x2))
-    val y3: Person   = read(write(x3))
+    val y3: Person = read(write(x3))
 
     check(x1, y1)
     check(x2, y2)
     check(x3, y3)
-  }
-  catch {
+  } catch {
     case e: Exception =>
       println("Error in Test6: " + e)
   }
@@ -487,15 +499,14 @@ object Test6 {
 // Nested objects cannot get readresolve automatically because after deserialization
 // they would be null (they are treated as lazy vals)
 class Outer extends Serializable {
-    object Inner extends Serializable
+  object Inner extends Serializable
 }
 
 object Test7 {
   val x = new Outer
   x.Inner // initialize
-  val y:Outer = read(write(x))
-  if (y.Inner == null)
-    println("Inner object is null")
+  val y: Outer = read(write(x))
+  if (y.Inner == null) println("Inner object is null")
 }
 
 // Verify that transient lazy vals don't get serialized
@@ -509,20 +520,19 @@ class WithTransient extends Serializable {
     println(a1)
     println(a2)
     if (B == null || C == null)
-     println("Transient nested object failed to serialize properly")
+      println("Transient nested object failed to serialize properly")
   }
 }
 
 object Test8 {
-    val x = new WithTransient
-    x.test
+  val x = new WithTransient
+  x.test
   try {
-    val y:WithTransient = read(write(x))
+    val y: WithTransient = read(write(x))
     y.test
-  }
-  catch {
-  case e: Exception =>
-    println("Error in Test8: " + e)
+  } catch {
+    case e: Exception =>
+      println("Error in Test8: " + e)
   }
 }
 
@@ -543,7 +553,6 @@ object Test {
 }
 
 //############################################################################
-
 
 //############################################################################
 // Test classes in package "scala.collection.parallel" and subpackages
@@ -597,7 +606,6 @@ object Test9_parallel {
     val ips = immutable.ParHashSet("one", "two")
     val _ips: immutable.ParHashSet[String] = read(write(ips))
     check(ips, _ips)
-
   } catch {
     case e: Exception =>
       println("Error in Test5_parallel: " + e)

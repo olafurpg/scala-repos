@@ -14,10 +14,12 @@ case class DottySdkDescriptor(version: Option[Version],
                               compilerFiles: Seq[File],
                               libraryFiles: Seq[File],
                               sourceFiles: Seq[File],
-                              docFiles: Seq[File]) extends SdkDescriptor {
+                              docFiles: Seq[File])
+    extends SdkDescriptor {
   override protected val languageName = "dotty"
 
-  override protected val libraryType: LibraryType[ScalaLibraryProperties] = DottyLibraryType.instance
+  override protected val libraryType: LibraryType[ScalaLibraryProperties] =
+    DottyLibraryType.instance
 
   override protected val libraryName: String = s"$languageName-sdk"
 
@@ -31,26 +33,27 @@ case class DottySdkDescriptor(version: Option[Version],
 
   def mainDottyJar = compilerFiles.find { f =>
     val fileName = f.getName
-    fileName.startsWith("dotty") && !fileName.startsWith(DottyArtifact.Interfaces.prefix)
+    fileName.startsWith("dotty") &&
+    !fileName.startsWith(DottyArtifact.Interfaces.prefix)
   }
 }
 
 object DottySdkDescriptor extends SdkDescriptorCompanion {
   override protected val requiredBinaries: Set[Artifact] = DottyArtifact.values
 
-  override protected val libraryArtifacts: Set[Artifact] =
-    Set(
+  override protected val libraryArtifacts: Set[Artifact] = Set(
       Artifact.ScalaLibrary,
       Artifact.ScalaReflect,
       DottyArtifact.Main,
       DottyArtifact.Interfaces
-    )
+  )
 
   override protected def createSdkDescriptor(version: Option[Version],
                                              compilerFiles: Seq[File],
                                              libraryFiles: Seq[File],
                                              sourceFiles: Seq[File],
                                              docFiles: Seq[File]) = {
-    DottySdkDescriptor(None, compilerFiles, libraryFiles, sourceFiles, docFiles)
+    DottySdkDescriptor(
+        None, compilerFiles, libraryFiles, sourceFiles, docFiles)
   }
 }

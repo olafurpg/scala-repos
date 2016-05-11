@@ -1,14 +1,13 @@
 package com.twitter.finagle.http.util
 
-
 object StringUtil {
 
   private val SomeIntRegex = """\A\s*(-?\d+).*\Z""".r
 
   /**
-   * Convert s to a Int liberally: initial whitespace and zeros are
-   * skipped, non-digits after the number are ignored, and the default is 0.
-   */
+    * Convert s to a Int liberally: initial whitespace and zeros are
+    * skipped, non-digits after the number are ignored, and the default is 0.
+    */
   def toSomeShort(s: String): Short = {
     SomeIntRegex.findFirstMatchIn(s) match {
       case Some(sMatch) =>
@@ -23,9 +22,9 @@ object StringUtil {
   }
 
   /**
-   * Convert s to an Int liberally: initial whitespace and zeros are
-   * skipped, non-digits after the number are ignored, and the default is 0.
-   */
+    * Convert s to an Int liberally: initial whitespace and zeros are
+    * skipped, non-digits after the number are ignored, and the default is 0.
+    */
   def toSomeInt(s: String): Int = {
     SomeIntRegex.findFirstMatchIn(s) match {
       case Some(sMatch) =>
@@ -40,9 +39,9 @@ object StringUtil {
   }
 
   /**
-   * Convert s to a Long liberally: initial whitespace and zeros are
-   * skipped, non-digits after the number are ignored, and the default is 0L.
-   */
+    * Convert s to a Long liberally: initial whitespace and zeros are
+    * skipped, non-digits after the number are ignored, and the default is 0L.
+    */
   def toSomeLong(s: String): Long = {
     SomeIntRegex.findFirstMatchIn(s) match {
       case Some(sMatch) =>
@@ -57,8 +56,8 @@ object StringUtil {
   }
 
   /**
-   * Convert s to a Boolean: True is "1", "t" or "true", false is all other values
-   */
+    * Convert s to a Boolean: True is "1", "t" or "true", false is all other values
+    */
   def toBoolean(s: String): Boolean = {
     val v = s.toLowerCase
     v == "1" || v == "t" || v == "true"

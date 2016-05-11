@@ -24,11 +24,11 @@ import org.apache.spark.launcher.LauncherProtocol._
 import org.apache.spark.util.{ThreadUtils, Utils}
 
 /**
- * A class that can be used to talk to a launcher server. Users should extend this class to
- * provide implementation for the abstract methods.
- *
- * See `LauncherServer` for an explanation of how launcher communication works.
- */
+  * A class that can be used to talk to a launcher server. Users should extend this class to
+  * provide implementation for the abstract methods.
+  *
+  * See `LauncherServer` for an explanation of how launcher communication works.
+  */
 private[spark] abstract class LauncherBackend {
 
   private var clientThread: Thread = _
@@ -78,18 +78,19 @@ private[spark] abstract class LauncherBackend {
   def isConnected(): Boolean = _isConnected
 
   /**
-   * Implementations should provide this method, which should try to stop the application
-   * as gracefully as possible.
-   */
+    * Implementations should provide this method, which should try to stop the application
+    * as gracefully as possible.
+    */
   protected def onStopRequest(): Unit
 
   /**
-   * Callback for when the launcher handle disconnects from this backend.
-   */
-  protected def onDisconnected() : Unit = { }
+    * Callback for when the launcher handle disconnects from this backend.
+    */
+  protected def onDisconnected(): Unit = {}
 
   private def fireStopRequest(): Unit = {
-    val thread = LauncherBackend.threadFactory.newThread(new Runnable() {
+    val thread = LauncherBackend.threadFactory.newThread(
+        new Runnable() {
       override def run(): Unit = Utils.tryLogNonFatalError {
         onStopRequest()
       }
@@ -104,7 +105,8 @@ private[spark] abstract class LauncherBackend {
         fireStopRequest()
 
       case _ =>
-        throw new IllegalArgumentException(s"Unexpected message type: ${m.getClass().getName()}")
+        throw new IllegalArgumentException(
+            s"Unexpected message type: ${m.getClass().getName()}")
     }
 
     override def close(): Unit = {
@@ -115,13 +117,10 @@ private[spark] abstract class LauncherBackend {
         _isConnected = false
       }
     }
-
   }
-
 }
 
 private object LauncherBackend {
 
   val threadFactory = ThreadUtils.namedThreadFactory("LauncherBackend")
-
 }

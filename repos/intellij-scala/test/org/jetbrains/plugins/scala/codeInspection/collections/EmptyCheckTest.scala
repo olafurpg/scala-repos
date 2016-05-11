@@ -3,10 +3,11 @@ package org.jetbrains.plugins.scala.codeInspection.collections
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 
 /**
- * @author Nikolay.Tropin
- */
+  * @author Nikolay.Tropin
+  */
 class EmptyCheckTest extends OperationsOnCollectionInspectionTest {
-  override val inspectionClass: Class[_ <: OperationOnCollectionInspection] = classOf[EmptyCheckInspection]
+  override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
+    classOf[EmptyCheckInspection]
 
   override def hint: String = isEmptyHint
 

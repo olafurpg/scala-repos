@@ -22,11 +22,14 @@ trait CommentFactory extends base.CommentFactoryBase {
   thisFactory: ModelFactory with CommentFactory with MemberLookup =>
 
   val global: Global
-  import global.{ Symbol, NoSymbol }
+  import global.{Symbol, NoSymbol}
 
-  protected val commentCache = mutable.HashMap.empty[(Symbol, DocTemplateImpl), Option[Comment]]
+  protected val commentCache =
+    mutable.HashMap.empty[(Symbol, DocTemplateImpl), Option[Comment]]
 
-  def comment(sym: Symbol, linkTarget: DocTemplateImpl, inTpl: DocTemplateImpl): Option[Comment] =
+  def comment(sym: Symbol,
+              linkTarget: DocTemplateImpl,
+              inTpl: DocTemplateImpl): Option[Comment] =
     commentCache.getOrElseUpdate((sym, inTpl), {
       defineComment(sym, linkTarget, inTpl)
     })
@@ -35,12 +38,13 @@ trait CommentFactory extends base.CommentFactoryBase {
     * cases we have to give some `inTpl` comments (parent class for example)
     * to the comment of the symbol.
     * This function manages some of those cases : Param accessor and Primary constructor */
-  def defineComment(sym: Symbol, linkTarget: DocTemplateImpl, inTpl: DocTemplateImpl):Option[Comment] = {
+  def defineComment(sym: Symbol,
+                    linkTarget: DocTemplateImpl,
+                    inTpl: DocTemplateImpl): Option[Comment] = {
 
     //param accessor case
     // We just need the @param argument, we put it into the body
-    if( sym.isParamAccessor &&
-        inTpl.comment.isDefined &&
+    if (sym.isParamAccessor && inTpl.comment.isDefined &&
         inTpl.comment.get.valueParams.isDefinedAt(sym.encodedName)) {
       val comContent = Some(inTpl.comment.get.valueParams(sym.encodedName))
       Some(createComment(body0 = comContent))
@@ -49,21 +53,19 @@ trait CommentFactory extends base.CommentFactoryBase {
     // Primary constructor case
     // We need some content of the class definition : @constructor for the body,
     // @param and @deprecated, we can add some more if necessary
-    else if (sym.isPrimaryConstructor && inTpl.comment.isDefined ) {
+    else if (sym.isPrimaryConstructor && inTpl.comment.isDefined) {
       val tplComment = inTpl.comment.get
       // If there is nothing to put into the comment there is no need to create it
-      if(tplComment.constructor.isDefined ||
-        tplComment.throws != Map.empty ||
-        tplComment.valueParams != Map.empty ||
-        tplComment.typeParams != Map.empty ||
-        tplComment.deprecated.isDefined
-        )
-        Some(createComment( body0 = tplComment.constructor,
-                            throws0 = tplComment.throws,
-                            valueParams0 = tplComment.valueParams,
-                            typeParams0 = tplComment.typeParams,
-                            deprecated0 = tplComment.deprecated
-                            ))
+      if (tplComment.constructor.isDefined || tplComment.throws != Map.empty ||
+          tplComment.valueParams != Map.empty ||
+          tplComment.typeParams != Map.empty ||
+          tplComment.deprecated.isDefined)
+        Some(
+            createComment(body0 = tplComment.constructor,
+                          throws0 = tplComment.throws,
+                          valueParams0 = tplComment.valueParams,
+                          typeParams0 = tplComment.typeParams,
+                          deprecated0 = tplComment.deprecated))
       else None
     }
 
@@ -72,15 +74,19 @@ trait CommentFactory extends base.CommentFactoryBase {
     else {
       val rawComment = global.expandedDocComment(sym, inTpl.sym).trim
       if (rawComment != "") {
-        val c = parse(rawComment, global.rawDocComment(sym), global.docCommentPos(sym), linkTarget)
+        val c = parse(rawComment,
+                      global.rawDocComment(sym),
+                      global.docCommentPos(sym),
+                      linkTarget)
         Some(c)
-      }
-      else None
+      } else None
     }
-
   }
 
-  protected def parse(comment: String, src: String, pos: Position, linkTarget: DocTemplateImpl): Comment = {
+  protected def parse(comment: String,
+                      src: String,
+                      pos: Position,
+                      linkTarget: DocTemplateImpl): Comment = {
     val sym = if (linkTarget eq null) NoSymbol else linkTarget.sym
     parseAtSymbol(comment, src, pos, sym)
   }
@@ -93,6 +99,6 @@ trait CommentFactory extends base.CommentFactoryBase {
     *  - Only `endOfLine` is used to mark line endings. */
   def parseWiki(string: String, pos: Position, inTpl: DocTemplateImpl): Body = {
     val sym = if (inTpl eq null) NoSymbol else inTpl.sym
-    parseWikiAtSymbol(string,pos, sym)
+    parseWikiAtSymbol(string, pos, sym)
   }
 }

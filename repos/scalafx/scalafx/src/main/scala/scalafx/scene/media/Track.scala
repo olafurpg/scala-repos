@@ -32,25 +32,27 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object Track {
-  implicit def sfxTrack2jfx(t: Track): jfxsm.Track = if (t != null) t.delegate else null
+  implicit def sfxTrack2jfx(t: Track): jfxsm.Track =
+    if (t != null) t.delegate else null
 }
 
-abstract class Track(override val delegate: jfxsm.Track) extends SFXDelegate[jfxsm.Track] {
+abstract class Track(override val delegate: jfxsm.Track)
+    extends SFXDelegate[jfxsm.Track] {
 
   /**
-   * Retrieves the name of the track.
-   */
+    * Retrieves the name of the track.
+    */
   def name = delegate.getName
 
   /**
-   * The `Locale` specifying the language and possibly the country that the `Track` contents are formatted for.
-   */
+    * The `Locale` specifying the language and possibly the country that the `Track` contents are formatted for.
+    */
   def locale = delegate.getLocale
 
   def metadata = delegate.getMetadata
 
   /**
-   * Gets the `trackID` as defined by the media container format.
-   */
+    * Gets the `trackID` as defined by the media container format.
+    */
   def trackID = delegate.getTrackID
 }

@@ -26,10 +26,9 @@ import org.apache.spark.mllib.linalg.Vectors
 class KMeansPMMLModelExportSuite extends SparkFunSuite {
 
   test("KMeansPMMLModelExport generate PMML format") {
-    val clusterCenters = Array(
-      Vectors.dense(1.0, 2.0, 6.0),
-      Vectors.dense(1.0, 3.0, 0.0),
-      Vectors.dense(1.0, 4.0, 6.0))
+    val clusterCenters = Array(Vectors.dense(1.0, 2.0, 6.0),
+                               Vectors.dense(1.0, 3.0, 0.0),
+                               Vectors.dense(1.0, 4.0, 6.0))
     val kmeansModel = new KMeansModel(clusterCenters)
 
     val modelExport = PMMLModelExportFactory.createPMMLModelExport(kmeansModel)
@@ -42,8 +41,8 @@ class KMeansPMMLModelExportSuite extends SparkFunSuite {
     assert(pmml.getDataDictionary.getNumberOfFields === clusterCenters(0).size)
     // This verify that there is a model attached to the pmml object and the model is a clustering
     // one. It also verifies that the pmml model has the same number of clusters of the spark model.
-    val pmmlClusteringModel = pmml.getModels.get(0).asInstanceOf[ClusteringModel]
+    val pmmlClusteringModel =
+      pmml.getModels.get(0).asInstanceOf[ClusteringModel]
     assert(pmmlClusteringModel.getNumberOfClusters === clusterCenters.length)
   }
-
 }

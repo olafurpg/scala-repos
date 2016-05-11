@@ -7,42 +7,43 @@ import akka.stream.Materializer
 import akka.util.ByteString
 import play.api._
 import play.api.libs.streams.Accumulator
-import scala.concurrent.{ Promise, Future }
+import scala.concurrent.{Promise, Future}
 
 trait EssentialFilter {
   def apply(next: EssentialAction): EssentialAction
 
   def asJava: play.mvc.EssentialFilter = new play.mvc.EssentialFilter {
-    override def apply(next: play.mvc.EssentialAction) = EssentialFilter.this(next).asJava
+    override def apply(next: play.mvc.EssentialAction) =
+      EssentialFilter.this(next).asJava
   }
 }
 
 /**
- * Implement this interface if you want to add a Filter to your application
- * {{{
- * object AccessLog extends Filter {
- *   override def apply(next: RequestHeader => Future[Result])(request: RequestHeader): Future[Result] = {
- * 		 val result = next(request)
- * 		 result.map { r => play.Logger.info(request + "\n\t => " + r; r }
- * 	 }
- * }
- * }}}
- */
-trait Filter extends EssentialFilter {
-  self =>
+  * Implement this interface if you want to add a Filter to your application
+  * {{{
+  * object AccessLog extends Filter {
+  *   override def apply(next: RequestHeader => Future[Result])(request: RequestHeader): Future[Result] = {
+  * 		 val result = next(request)
+  * 		 result.map { r => play.Logger.info(request + "\n\t => " + r; r }
+  * 	 }
+  * }
+  * }}}
+  */
+trait Filter extends EssentialFilter { self =>
 
   implicit def mat: Materializer
 
   /**
-   * Apply the filter, given the request header and a function to call the next
-   * operation.
-   *
-   * @param f A function to call the next opertion. Call this to continue
-   * normally with the current request. You do not need to call this function
-   * if you want to generate a result in a different way.
-   * @param rh The RequestHeader.
-   */
-  def apply(f: RequestHeader => Future[Result])(rh: RequestHeader): Future[Result]
+    * Apply the filter, given the request header and a function to call the next
+    * operation.
+    *
+    * @param f A function to call the next opertion. Call this to continue
+    * normally with the current request. You do not need to call this function
+    * if you want to generate a result in a different way.
+    * @param rh The RequestHeader.
+    */
+  def apply(f: RequestHeader => Future[Result])(
+      rh: RequestHeader): Future[Result]
 
   def apply(next: EssentialAction): EssentialAction = {
     new EssentialAction {
@@ -66,7 +67,8 @@ trait Filter extends EssentialFilter {
           // It is possible that the delegate function (the next filter in the chain) was never invoked by this Filter.
           // Therefore, as a fallback, we try to redeem the bodyAccumulator Promise here with an iteratee that consumes
           // the request body.
-          bodyAccumulator.tryComplete(resultTry.map(simpleResult => Accumulator.done(simpleResult)))
+          bodyAccumulator.tryComplete(
+              resultTry.map(simpleResult => Accumulator.done(simpleResult)))
         })
 
         Accumulator.flatten(bodyAccumulator.future.map { it =>
@@ -85,21 +87,23 @@ trait Filter extends EssentialFilter {
           }
         })
       }
-
     }
   }
 }
 
 object Filter {
-  def apply(filter: (RequestHeader => Future[Result], RequestHeader) => Future[Result])(implicit m: Materializer): Filter = new Filter {
+  def apply(filter: (RequestHeader => Future[Result],
+            RequestHeader) => Future[Result])(
+      implicit m: Materializer): Filter = new Filter {
     implicit def mat = m
-    def apply(f: RequestHeader => Future[Result])(rh: RequestHeader): Future[Result] = filter(f, rh)
+    def apply(f: RequestHeader => Future[Result])(
+        rh: RequestHeader): Future[Result] = filter(f, rh)
   }
 }
 
 /**
- * Compose the action and the Filters to create a new Action
- */
+  * Compose the action and the Filters to create a new Action
+  */
 object Filters {
   def apply(h: EssentialAction, filters: EssentialFilter*) = h match {
     case a: EssentialAction => FilterChain(a, filters.toList)
@@ -115,15 +119,17 @@ class WithFilters(filters: EssentialFilter*) extends GlobalSettings {
 }
 
 /**
- * Compose the action and the Filters to create a new Action
- */
-
+  * Compose the action and the Filters to create a new Action
+  */
 object FilterChain {
-  def apply[A](action: EssentialAction, filters: List[EssentialFilter]): EssentialAction = new EssentialAction {
+  def apply[A](
+      action: EssentialAction,
+      filters: List[EssentialFilter]): EssentialAction = new EssentialAction {
     def apply(rh: RequestHeader): Accumulator[ByteString, Result] = {
-      val chain = filters.reverse.foldLeft(action) { (a, i) => i(a) }
+      val chain = filters.reverse.foldLeft(action) { (a, i) =>
+        i(a)
+      }
       chain(rh)
     }
   }
 }
-

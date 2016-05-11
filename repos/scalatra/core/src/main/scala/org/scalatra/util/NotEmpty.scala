@@ -1,13 +1,13 @@
 package org.scalatra.util
 
 /**
- * Extractor object, useful for handling empty form parameter submissions:
- *
- * params.get("foo") match {
- *   case NotEmpty(value) => processValue(value)
- *   case _ => message("foo is required")
- * }
- */
+  * Extractor object, useful for handling empty form parameter submissions:
+  *
+  * params.get("foo") match {
+  *   case NotEmpty(value) => processValue(value)
+  *   case _ => message("foo is required")
+  * }
+  */
 object NotEmpty {
 
   def unapply(s: String): Option[String] = {
@@ -16,7 +16,8 @@ object NotEmpty {
   }
 
   def unapply(o: Option[String]): Option[String] = {
-    o flatMap { s => unapply(s) }
+    o flatMap { s =>
+      unapply(s)
+    }
   }
-
 }

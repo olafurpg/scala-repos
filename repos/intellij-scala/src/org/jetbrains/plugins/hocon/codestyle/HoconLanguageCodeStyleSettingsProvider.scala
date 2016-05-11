@@ -5,7 +5,8 @@ import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider.SettingsType
 import com.intellij.psi.codeStyle.{CodeStyleSettingsCustomizable, CommonCodeStyleSettings, DisplayPriority, LanguageCodeStyleSettingsProvider}
 import org.jetbrains.plugins.hocon.lang.HoconLanguage
 
-class HoconLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSettingsProvider {
+class HoconLanguageCodeStyleSettingsProvider
+    extends LanguageCodeStyleSettingsProvider {
   def getLanguage = HoconLanguage
 
   override def getDisplayPriority = DisplayPriority.COMMON_SETTINGS
@@ -15,9 +16,15 @@ class HoconLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSettingsPr
   private val ObjectFieldsWithColonWrap = "Object fields with ':'"
   private val ObjectFieldsWithAssignmentWrap = "Object fields with '=' or '+='"
 
-  override def customizeSettings(consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType) {
-    def showCustomOption(name: String, title: String, group: String, options: AnyRef*) =
-      consumer.showCustomOption(classOf[HoconCustomCodeStyleSettings], name, title, group, options: _*)
+  override def customizeSettings(
+      consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType) {
+    def showCustomOption(
+        name: String, title: String, group: String, options: AnyRef*) =
+      consumer.showCustomOption(classOf[HoconCustomCodeStyleSettings],
+                                name,
+                                title,
+                                group,
+                                options: _*)
 
     import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable._
     import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider.SettingsType._
@@ -26,23 +33,37 @@ class HoconLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSettingsPr
       case SPACING_SETTINGS =>
         import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SpacingOption._
 
-        consumer.showStandardOptions(List(
-          SPACE_WITHIN_BRACES,
-          SPACE_WITHIN_BRACKETS,
-          SPACE_WITHIN_METHOD_CALL_PARENTHESES,
-          SPACE_BEFORE_COMMA,
-          SPACE_AFTER_COMMA
-        ).map(_.name): _*)
+        consumer.showStandardOptions(
+            List(
+                SPACE_WITHIN_BRACES,
+                SPACE_WITHIN_BRACKETS,
+                SPACE_WITHIN_METHOD_CALL_PARENTHESES,
+                SPACE_BEFORE_COMMA,
+                SPACE_AFTER_COMMA
+            ).map(_.name): _*)
 
-        consumer.renameStandardOption(SPACE_WITHIN_BRACES.name, "Object braces")
-        consumer.renameStandardOption(SPACE_WITHIN_METHOD_CALL_PARENTHESES.name, "Include qualifier parentheses")
+        consumer.renameStandardOption(
+            SPACE_WITHIN_BRACES.name, "Object braces")
+        consumer.renameStandardOption(
+            SPACE_WITHIN_METHOD_CALL_PARENTHESES.name,
+            "Include qualifier parentheses")
 
-        showCustomOption("SPACE_BEFORE_COLON", "Before colon", SPACES_AROUND_OPERATORS)
-        showCustomOption("SPACE_AFTER_COLON", "After colon", SPACES_AROUND_OPERATORS)
-        showCustomOption("SPACE_BEFORE_ASSIGNMENT", "Before assignment ('=' and '+=')", SPACES_AROUND_OPERATORS)
-        showCustomOption("SPACE_AFTER_ASSIGNMENT", "After assignment ('=' and '+=')", SPACES_AROUND_OPERATORS)
-        showCustomOption("SPACE_BEFORE_LBRACE_AFTER_PATH", "Immediately after path expression", SPACES_BEFORE_LEFT_BRACE)
-        showCustomOption("SPACE_WITHIN_SUBSTITUTION_BRACES", "Substitution braces", SPACES_WITHIN)
+        showCustomOption(
+            "SPACE_BEFORE_COLON", "Before colon", SPACES_AROUND_OPERATORS)
+        showCustomOption(
+            "SPACE_AFTER_COLON", "After colon", SPACES_AROUND_OPERATORS)
+        showCustomOption("SPACE_BEFORE_ASSIGNMENT",
+                         "Before assignment ('=' and '+=')",
+                         SPACES_AROUND_OPERATORS)
+        showCustomOption("SPACE_AFTER_ASSIGNMENT",
+                         "After assignment ('=' and '+=')",
+                         SPACES_AROUND_OPERATORS)
+        showCustomOption("SPACE_BEFORE_LBRACE_AFTER_PATH",
+                         "Immediately after path expression",
+                         SPACES_BEFORE_LEFT_BRACE)
+        showCustomOption("SPACE_WITHIN_SUBSTITUTION_BRACES",
+                         "Substitution braces",
+                         SPACES_WITHIN)
         showCustomOption("SPACE_AFTER_QMARK", "After '?'", SPACES_OTHER)
 
       case WRAPPING_AND_BRACES_SETTINGS =>
@@ -50,41 +71,69 @@ class HoconLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSettingsPr
 
         consumer.showStandardOptions(KEEP_LINE_BREAKS.name)
 
-        showCustomOption("HASH_COMMENTS_AT_FIRST_COLUMN", "Hash comments at first column", WRAPPING_KEEP)
-        showCustomOption("DOUBLE_SLASH_COMMENTS_AT_FIRST_COLUMN", "Double slash comments at first column", WRAPPING_KEEP)
+        showCustomOption("HASH_COMMENTS_AT_FIRST_COLUMN",
+                         "Hash comments at first column",
+                         WRAPPING_KEEP)
+        showCustomOption("DOUBLE_SLASH_COMMENTS_AT_FIRST_COLUMN",
+                         "Double slash comments at first column",
+                         WRAPPING_KEEP)
 
-        showCustomOption("OBJECTS_WRAP", ObjectsWrap, null, WRAP_OPTIONS, WRAP_VALUES)
-        showCustomOption("OBJECTS_ALIGN_WHEN_MULTILINE", "Align when multiline", ObjectsWrap)
-        showCustomOption("OBJECTS_NEW_LINE_AFTER_LBRACE", "New line after '{'", ObjectsWrap)
-        showCustomOption("OBJECTS_RBRACE_ON_NEXT_LINE", "Place '}' on new line", ObjectsWrap)
+        showCustomOption(
+            "OBJECTS_WRAP", ObjectsWrap, null, WRAP_OPTIONS, WRAP_VALUES)
+        showCustomOption("OBJECTS_ALIGN_WHEN_MULTILINE",
+                         "Align when multiline",
+                         ObjectsWrap)
+        showCustomOption(
+            "OBJECTS_NEW_LINE_AFTER_LBRACE", "New line after '{'", ObjectsWrap)
+        showCustomOption("OBJECTS_RBRACE_ON_NEXT_LINE",
+                         "Place '}' on new line",
+                         ObjectsWrap)
 
-        showCustomOption("LISTS_WRAP", ListsWrap, null, WRAP_OPTIONS, WRAP_VALUES)
-        showCustomOption("LISTS_ALIGN_WHEN_MULTILINE", "Align when multiline", ListsWrap)
-        showCustomOption("LISTS_NEW_LINE_AFTER_LBRACKET", "New line after '['", ListsWrap)
-        showCustomOption("LISTS_RBRACKET_ON_NEXT_LINE", "Place ']' on new line", ListsWrap)
+        showCustomOption(
+            "LISTS_WRAP", ListsWrap, null, WRAP_OPTIONS, WRAP_VALUES)
+        showCustomOption(
+            "LISTS_ALIGN_WHEN_MULTILINE", "Align when multiline", ListsWrap)
+        showCustomOption(
+            "LISTS_NEW_LINE_AFTER_LBRACKET", "New line after '['", ListsWrap)
+        showCustomOption(
+            "LISTS_RBRACKET_ON_NEXT_LINE", "Place ']' on new line", ListsWrap)
 
-        showCustomOption("OBJECT_FIELDS_WITH_COLON_WRAP", ObjectFieldsWithColonWrap, null,
-          WRAP_OPTIONS_FOR_SINGLETON, WRAP_VALUES_FOR_SINGLETON)
-        showCustomOption("OBJECT_FIELDS_COLON_ON_NEXT_LINE", "Colon on next line", ObjectFieldsWithColonWrap)
+        showCustomOption("OBJECT_FIELDS_WITH_COLON_WRAP",
+                         ObjectFieldsWithColonWrap,
+                         null,
+                         WRAP_OPTIONS_FOR_SINGLETON,
+                         WRAP_VALUES_FOR_SINGLETON)
+        showCustomOption("OBJECT_FIELDS_COLON_ON_NEXT_LINE",
+                         "Colon on next line",
+                         ObjectFieldsWithColonWrap)
 
-        showCustomOption("OBJECT_FIELDS_WITH_ASSIGNMENT_WRAP", ObjectFieldsWithAssignmentWrap, null,
-          WRAP_OPTIONS_FOR_SINGLETON, WRAP_VALUES_FOR_SINGLETON)
-        showCustomOption("OBJECT_FIELDS_ASSIGNMENT_ON_NEXT_LINE", "Assignment operator on next line", ObjectFieldsWithAssignmentWrap)
+        showCustomOption("OBJECT_FIELDS_WITH_ASSIGNMENT_WRAP",
+                         ObjectFieldsWithAssignmentWrap,
+                         null,
+                         WRAP_OPTIONS_FOR_SINGLETON,
+                         WRAP_VALUES_FOR_SINGLETON)
+        showCustomOption("OBJECT_FIELDS_ASSIGNMENT_ON_NEXT_LINE",
+                         "Assignment operator on next line",
+                         ObjectFieldsWithAssignmentWrap)
 
-        showCustomOption("INCLUDED_RESOURCE_WRAP", "Included resource", null,
-          WRAP_OPTIONS_FOR_SINGLETON, WRAP_VALUES_FOR_SINGLETON)
+        showCustomOption("INCLUDED_RESOURCE_WRAP",
+                         "Included resource",
+                         null,
+                         WRAP_OPTIONS_FOR_SINGLETON,
+                         WRAP_VALUES_FOR_SINGLETON)
 
       case BLANK_LINES_SETTINGS =>
-
-        showCustomOption("KEEP_BLANK_LINES_IN_OBJECTS", "In objects", BLANK_LINES_KEEP)
-        showCustomOption("KEEP_BLANK_LINES_BEFORE_RBRACE", "Before '}'", BLANK_LINES_KEEP)
-        showCustomOption("KEEP_BLANK_LINES_IN_LISTS", "In lists", BLANK_LINES_KEEP)
-        showCustomOption("KEEP_BLANK_LINES_BEFORE_RBRACKET", "Before ']'", BLANK_LINES_KEEP)
+        showCustomOption(
+            "KEEP_BLANK_LINES_IN_OBJECTS", "In objects", BLANK_LINES_KEEP)
+        showCustomOption(
+            "KEEP_BLANK_LINES_BEFORE_RBRACE", "Before '}'", BLANK_LINES_KEEP)
+        showCustomOption(
+            "KEEP_BLANK_LINES_IN_LISTS", "In lists", BLANK_LINES_KEEP)
+        showCustomOption(
+            "KEEP_BLANK_LINES_BEFORE_RBRACKET", "Before ']'", BLANK_LINES_KEEP)
 
       case _ =>
-
     }
-
   }
 
   override def getDefaultCommonSettings = {

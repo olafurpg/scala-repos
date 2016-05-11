@@ -6,9 +6,12 @@ import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScNewTemplateDefinitionImp
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateDefinitionStub
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 21.12.2009
- */
-class ScNewTemplateDefinitionStubElementType extends ScTemplateDefinitionElementType[ScNewTemplateDefinition]("new template definition stub") {
-  def createPsi(stub: ScTemplateDefinitionStub): ScTemplateDefinition = new ScNewTemplateDefinitionImpl(stub)
+  * User: Alexander Podkhalyuzin
+  * Date: 21.12.2009
+  */
+class ScNewTemplateDefinitionStubElementType
+    extends ScTemplateDefinitionElementType[ScNewTemplateDefinition](
+        "new template definition stub") {
+  def createPsi(stub: ScTemplateDefinitionStub): ScTemplateDefinition =
+    new ScNewTemplateDefinitionImpl(stub)
 }

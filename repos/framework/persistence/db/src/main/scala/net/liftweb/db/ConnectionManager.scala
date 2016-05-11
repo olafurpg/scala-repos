@@ -22,11 +22,11 @@ import net.liftweb.common._
 import net.liftweb.util.ConnectionIdentifier
 
 /**
- * Vend JDBC connections
- */
+  * Vend JDBC connections
+  */
 trait ConnectionManager {
   def newConnection(name: ConnectionIdentifier): Box[Connection]
   def releaseConnection(conn: Connection)
-  def newSuperConnection(name: ConnectionIdentifier): Box[SuperConnection] = Empty
+  def newSuperConnection(name: ConnectionIdentifier): Box[SuperConnection] =
+    Empty
 }
-

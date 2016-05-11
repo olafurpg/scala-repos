@@ -3,19 +3,19 @@
 package org.ensime.sexp.formats
 
 import BigIntConvertor._
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import scala.collection.immutable.BitSet
 import org.ensime.util.EnsimeSpec
 
 class BigIntConvertorSpec extends EnsimeSpec {
   private val examples = List(
-    BitSet() -> BigInt(0),
-    BitSet(0) -> BigInt(1),
-    BitSet(1) -> BigInt(2),
-    BitSet(64) -> BigInt("18446744073709551616"),
-    BitSet(0, 64) -> BigInt("18446744073709551617"),
-    BitSet(1, 64) -> BigInt("18446744073709551618")
+      BitSet() -> BigInt(0),
+      BitSet(0) -> BigInt(1),
+      BitSet(1) -> BigInt(2),
+      BitSet(64) -> BigInt("18446744073709551616"),
+      BitSet(0, 64) -> BigInt("18446744073709551617"),
+      BitSet(1, 64) -> BigInt("18446744073709551618")
   )
 
   "BigIntConvertor" should "convert basic BigSet to BitInt" in {
@@ -31,7 +31,8 @@ class BigIntConvertorSpec extends EnsimeSpec {
   }
 }
 
-class BigIntConvertorCheck extends EnsimeSpec with GeneratorDrivenPropertyChecks {
+class BigIntConvertorCheck
+    extends EnsimeSpec with GeneratorDrivenPropertyChecks {
 
   def positiveIntStream: Arbitrary[Stream[Int]] = Arbitrary {
     Gen.containerOf[Stream, Int](Gen.chooseNum(0, 2 * Short.MaxValue))

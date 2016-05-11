@@ -62,9 +62,10 @@ trait ShowSyntax {
 }
 
 object ShowSyntax {
-  implicit def showSyntax[T](a: T)(implicit st: Show[T]): ShowSyntax = new ShowSyntax {
-    def show = st.show(a)
-  }
+  implicit def showSyntax[T](a: T)(implicit st: Show[T]): ShowSyntax =
+    new ShowSyntax {
+      def show = st.show(a)
+    }
 }
 
 trait Show[T] {
@@ -85,30 +86,31 @@ object Show extends LabelledTypeClassCompanion[Show] {
       def show(t: HNil) = ""
     }
 
-    def product[F, T <: HList](name: String, sh: Show[F], st: Show[T]) = new Show[F :: T] {
-      def show(ft: F :: T) = {
-        val head = sh.show(ft.head)
-        val tail = st.show(ft.tail)
-        if (tail.isEmpty)
-          s"$name = $head"
-        else
-          s"$name = $head, $tail"
+    def product[F, T <: HList](name: String, sh: Show[F], st: Show[T]) =
+      new Show[F :: T] {
+        def show(ft: F :: T) = {
+          val head = sh.show(ft.head)
+          val tail = st.show(ft.tail)
+          if (tail.isEmpty) s"$name = $head"
+          else s"$name = $head, $tail"
+        }
       }
-    }
 
     def emptyCoproduct = new Show[CNil] {
       def show(t: CNil) = ""
     }
 
-    def coproduct[L, R <: Coproduct](name: String, sl: => Show[L], sr: => Show[R]) = new Show[L :+: R] {
+    def coproduct[L, R <: Coproduct](
+        name: String, sl: => Show[L], sr: => Show[R]) = new Show[L :+: R] {
       def show(lr: L :+: R) = lr match {
         case Inl(l) => s"$name(${sl.show(l)})"
         case Inr(r) => s"${sr.show(r)}"
       }
     }
 
-    def project[F, G](instance: => Show[G], to: F => G, from: G => F) = new Show[F] {
-      def show(f: F) = instance.show(to(f))
-    }
+    def project[F, G](instance: => Show[G], to: F => G, from: G => F) =
+      new Show[F] {
+        def show(f: F) = instance.show(to(f))
+      }
   }
 }

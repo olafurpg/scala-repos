@@ -47,13 +47,13 @@ class AttributeSetSuite extends SparkFunSuite {
     assert(aSet.contains(bLower) === false)
   }
 
-  test("++ preserves AttributeSet")  {
+  test("++ preserves AttributeSet") {
     assert((aSet ++ bSet).contains(aUpper) === true)
     assert((aSet ++ bSet).contains(aLower) === true)
   }
 
   test("extracts all references references") {
-    val addSet = AttributeSet(Add(aUpper, Alias(bUpper, "test")()):: Nil)
+    val addSet = AttributeSet(Add(aUpper, Alias(bUpper, "test")()) :: Nil)
     assert(addSet.contains(aUpper))
     assert(addSet.contains(aLower))
     assert(addSet.contains(bUpper))

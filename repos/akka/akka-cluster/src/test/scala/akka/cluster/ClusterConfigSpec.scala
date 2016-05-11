@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.cluster
 
 import language.postfixOps
@@ -23,9 +22,12 @@ class ClusterConfigSpec extends AkkaSpec {
       LogInfo should ===(true)
       FailureDetectorConfig.getDouble("threshold") should ===(8.0 +- 0.0001)
       FailureDetectorConfig.getInt("max-sample-size") should ===(1000)
-      FailureDetectorConfig.getMillisDuration("min-std-deviation") should ===(100 millis)
-      FailureDetectorConfig.getMillisDuration("acceptable-heartbeat-pause") should ===(3 seconds)
-      FailureDetectorImplementationClass should ===(classOf[PhiAccrualFailureDetector].getName)
+      FailureDetectorConfig.getMillisDuration("min-std-deviation") should ===(
+          100 millis)
+      FailureDetectorConfig.getMillisDuration("acceptable-heartbeat-pause") should ===(
+          3 seconds)
+      FailureDetectorImplementationClass should ===(
+          classOf[PhiAccrualFailureDetector].getName)
       SeedNodes should ===(Vector.empty[Address])
       SeedNodeTimeout should ===(5 seconds)
       RetryUnsuccessfulJoinAfter should ===(10 seconds)

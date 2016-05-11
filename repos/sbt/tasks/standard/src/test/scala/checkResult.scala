@@ -6,10 +6,9 @@ package sbt
 import org.scalacheck.Prop._
 
 object checkResult {
-  def apply[T](run: => T, expected: T) =
-    {
-      ("Expected: " + expected) |:
-        (try {
+  def apply[T](run: => T, expected: T) = {
+    ("Expected: " + expected) |:
+    (try {
           val actual = run
           ("Actual: " + actual) |: (actual == expected)
         } catch {
@@ -20,5 +19,5 @@ object checkResult {
             e.printStackTrace()
             "Error in framework" |: false
         })
-    }
+  }
 }

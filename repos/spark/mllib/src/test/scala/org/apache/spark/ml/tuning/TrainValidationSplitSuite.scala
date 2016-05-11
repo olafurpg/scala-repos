@@ -29,10 +29,11 @@ import org.apache.spark.mllib.util.{LinearDataGenerator, MLlibTestSparkContext}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 
-class TrainValidationSplitSuite extends SparkFunSuite with MLlibTestSparkContext {
+class TrainValidationSplitSuite
+    extends SparkFunSuite with MLlibTestSparkContext {
   test("train validation with logistic regression") {
     val dataset = sqlContext.createDataFrame(
-      sc.parallelize(generateLogisticInput(1.0, 1.0, 100, 42), 2))
+        sc.parallelize(generateLogisticInput(1.0, 1.0, 100, 42), 2))
 
     val lr = new LogisticRegression
     val lrParamMaps = new ParamGridBuilder()
@@ -55,8 +56,15 @@ class TrainValidationSplitSuite extends SparkFunSuite with MLlibTestSparkContext
 
   test("train validation with linear regression") {
     val dataset = sqlContext.createDataFrame(
-        sc.parallelize(LinearDataGenerator.generateLinearInput(
-            6.3, Array(4.7, 7.2), Array(0.9, -1.3), Array(0.7, 1.2), 100, 42, 0.1), 2))
+        sc.parallelize(
+            LinearDataGenerator.generateLinearInput(6.3,
+                                                    Array(4.7, 7.2),
+                                                    Array(0.9, -1.3),
+                                                    Array(0.7, 1.2),
+                                                    100,
+                                                    42,
+                                                    0.1),
+            2))
 
     val trainer = new LinearRegression().setSolver("l-bfgs")
     val lrParamMaps = new ParamGridBuilder()
@@ -75,7 +83,7 @@ class TrainValidationSplitSuite extends SparkFunSuite with MLlibTestSparkContext
     assert(parent.getMaxIter === 10)
     assert(cvModel.validationMetrics.length === lrParamMaps.length)
 
-      eval.setMetricName("r2")
+    eval.setMetricName("r2")
     val cvModel2 = cv.fit(dataset)
     val parent2 = cvModel2.bestModel.parent.asInstanceOf[LinearRegression]
     assert(parent2.getRegParam === 0.001)
@@ -111,7 +119,8 @@ object TrainValidationSplitSuite {
 
   abstract class MyModel extends Model[MyModel]
 
-  class MyEstimator(override val uid: String) extends Estimator[MyModel] with HasInputCol {
+  class MyEstimator(override val uid: String)
+      extends Estimator[MyModel] with HasInputCol {
 
     override def fit(dataset: DataFrame): MyModel = {
       throw new UnsupportedOperationException

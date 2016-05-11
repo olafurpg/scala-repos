@@ -4,7 +4,7 @@ import Keys._
 object Util {
   val buildScalaVersion = System.getProperty("scala.version", "2.10.4")
   val buildScalaVersions = Seq("2.11.7", "2.10.4")
-  val javaVersion       = System.getProperty("java.version")
+  val javaVersion = System.getProperty("java.version")
 
   def loadCredentials(): List[Credentials] = {
     val mavenSettingsFile = System.getProperty("maven.settings.file")
@@ -13,16 +13,19 @@ object Util {
       try {
         import scala.xml._
         val settings = XML.loadFile(mavenSettingsFile)
-        def readServerConfig(key: String) = (settings \\ "settings" \\ "servers" \\ "server" \\ key).head.text
-        List(Credentials(
-          "Sonatype Nexus Repository Manager",
-          "oss.sonatype.org",
-          readServerConfig("username"),
-          readServerConfig("password")
-        ))
+        def readServerConfig(key: String) =
+          (settings \\ "settings" \\ "servers" \\ "server" \\ key).head.text
+        List(
+            Credentials(
+                "Sonatype Nexus Repository Manager",
+                "oss.sonatype.org",
+                readServerConfig("username"),
+                readServerConfig("password")
+            ))
       } catch {
         case ex: Exception =>
-          println("Failed to load Maven settings from " + mavenSettingsFile + ": " + ex)
+          println("Failed to load Maven settings from " + mavenSettingsFile +
+              ": " + ex)
           Nil
       }
     } else {

@@ -49,10 +49,10 @@ class AttributeSuite extends SparkFunSuite {
     val name = "age"
     val index = 0
     val metadata = Metadata.fromJson("""{"name":"age","idx":0}""")
-    val metadataWithType = Metadata.fromJson("""{"type":"numeric","name":"age","idx":0}""")
-    val attr: NumericAttribute = NumericAttribute.defaultAttr
-      .withName(name)
-      .withIndex(index)
+    val metadataWithType =
+      Metadata.fromJson("""{"type":"numeric","name":"age","idx":0}""")
+    val attr: NumericAttribute =
+      NumericAttribute.defaultAttr.withName(name).withIndex(index)
     assert(attr.attrType == AttributeType.Numeric)
     assert(attr.isNumeric)
     assert(!attr.isNominal)
@@ -67,13 +67,16 @@ class AttributeSuite extends SparkFunSuite {
     assert(field.dataType === DoubleType)
     assert(!field.nullable)
     assert(attr.withoutIndex === Attribute.fromStructField(field))
-    val existingMetadata = new MetadataBuilder()
-      .putString("name", "test")
-      .build()
-    assert(attr.toStructField(existingMetadata).metadata.getString("name") === "test")
+    val existingMetadata =
+      new MetadataBuilder().putString("name", "test").build()
+    assert(
+        attr.toStructField(existingMetadata).metadata.getString("name") === "test")
 
-    val attr2 =
-      attr.withoutName.withoutIndex.withMin(0.0).withMax(1.0).withStd(0.5).withSparsity(0.3)
+    val attr2 = attr.withoutName.withoutIndex
+      .withMin(0.0)
+      .withMax(1.0)
+      .withStd(0.5)
+      .withSparsity(0.3)
     assert(attr2.name.isEmpty)
     assert(attr2.index.isEmpty)
     assert(attr2.min === Some(0.0))
@@ -119,9 +122,9 @@ class AttributeSuite extends SparkFunSuite {
     val index = 1
     val values = Array("small", "medium", "large")
     val metadata = Metadata.fromJson(
-      """{"type":"nominal","name":"size","idx":1,"vals":["small","medium","large"]}""")
+        """{"type":"nominal","name":"size","idx":1,"vals":["small","medium","large"]}""")
     val metadataWithoutType = Metadata.fromJson(
-      """{"name":"size","idx":1,"vals":["small","medium","large"]}""")
+        """{"name":"size","idx":1,"vals":["small","medium","large"]}""")
     val attr: NominalAttribute = NominalAttribute.defaultAttr
       .withName(name)
       .withIndex(index)
@@ -139,15 +142,18 @@ class AttributeSuite extends SparkFunSuite {
     assert(attr.toMetadataImpl(withType = false) === metadataWithoutType)
     assert(attr === Attribute.fromMetadata(metadata))
     assert(attr === NominalAttribute.fromMetadata(metadataWithoutType))
-    assert(attr.withoutIndex === Attribute.fromStructField(attr.toStructField()))
+    assert(
+        attr.withoutIndex === Attribute.fromStructField(attr.toStructField()))
 
-    val attr2 = attr.withoutName.withoutIndex.withValues(attr.values.get :+ "x-large")
+    val attr2 =
+      attr.withoutName.withoutIndex.withValues(attr.values.get :+ "x-large")
     assert(attr2.name.isEmpty)
     assert(attr2.index.isEmpty)
     assert(attr2.values.get === Array("small", "medium", "large", "x-large"))
     assert(attr2.indexOf("x-large") === 3)
     assert(attr2 === Attribute.fromMetadata(attr2.toMetadataImpl()))
-    assert(attr2 === NominalAttribute.fromMetadata(attr2.toMetadataImpl(withType = false)))
+    assert(attr2 === NominalAttribute.fromMetadata(
+            attr2.toMetadataImpl(withType = false)))
   }
 
   test("bad nominal attributes") {
@@ -182,9 +188,9 @@ class AttributeSuite extends SparkFunSuite {
     val index = 2
     val values = Array("no", "yes")
     val metadata = Metadata.fromJson(
-      """{"type":"binary","name":"clicked","idx":2,"vals":["no","yes"]}""")
-    val metadataWithoutType = Metadata.fromJson(
-      """{"name":"clicked","idx":2,"vals":["no","yes"]}""")
+        """{"type":"binary","name":"clicked","idx":2,"vals":["no","yes"]}""")
+    val metadataWithoutType =
+      Metadata.fromJson("""{"name":"clicked","idx":2,"vals":["no","yes"]}""")
     val attr = BinaryAttribute.defaultAttr
       .withName(name)
       .withIndex(index)
@@ -200,7 +206,8 @@ class AttributeSuite extends SparkFunSuite {
     assert(attr.toMetadataImpl(withType = false) === metadataWithoutType)
     assert(attr === Attribute.fromMetadata(metadata))
     assert(attr === BinaryAttribute.fromMetadata(metadataWithoutType))
-    assert(attr.withoutIndex === Attribute.fromStructField(attr.toStructField()))
+    assert(
+        attr.withoutIndex === Attribute.fromStructField(attr.toStructField()))
   }
 
   test("bad binary attributes") {
@@ -211,14 +218,16 @@ class AttributeSuite extends SparkFunSuite {
 
   test("attribute from struct field") {
     val metadata = NumericAttribute.defaultAttr.withName("label").toMetadata()
-    val fldWithoutMeta = new StructField("x", DoubleType, false, Metadata.empty)
+    val fldWithoutMeta =
+      new StructField("x", DoubleType, false, Metadata.empty)
     assert(Attribute.fromStructField(fldWithoutMeta) == UnresolvedAttribute)
     val fldWithMeta = new StructField("x", DoubleType, false, metadata)
     assert(Attribute.fromStructField(fldWithMeta).isNumeric)
     // Attribute.fromStructField should accept any NumericType, not just DoubleType
     val longFldWithMeta = new StructField("x", LongType, false, metadata)
     assert(Attribute.fromStructField(longFldWithMeta).isNumeric)
-    val decimalFldWithMeta = new StructField("x", DecimalType(38, 18), false, metadata)
+    val decimalFldWithMeta =
+      new StructField("x", DecimalType(38, 18), false, metadata)
     assert(Attribute.fromStructField(decimalFldWithMeta).isNumeric)
   }
 }

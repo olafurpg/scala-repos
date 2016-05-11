@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package docs.actor
 
 import language.postfixOps
@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 
 //#imports1
 
-import org.scalatest.{ BeforeAndAfterAll, WordSpec }
+import org.scalatest.{BeforeAndAfterAll, WordSpec}
 import org.scalatest.Matchers
 import akka.testkit._
 
@@ -34,7 +34,6 @@ class SchedulerDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
       testActor ! System.currentTimeMillis
     }
     //#schedule-one-off-thunk
-
   }
 
   "schedule a recurring task" in {
@@ -52,11 +51,8 @@ class SchedulerDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
 
       //This will schedule to send the Tick-message
       //to the tickActor after 0ms repeating every 50ms
-      val cancellable =
-        system.scheduler.schedule(0 milliseconds,
-          50 milliseconds,
-          tickActor,
-          Tick)
+      val cancellable = system.scheduler.schedule(
+          0 milliseconds, 50 milliseconds, tickActor, Tick)
 
       //This cancels further Ticks to be sent
       cancellable.cancel()

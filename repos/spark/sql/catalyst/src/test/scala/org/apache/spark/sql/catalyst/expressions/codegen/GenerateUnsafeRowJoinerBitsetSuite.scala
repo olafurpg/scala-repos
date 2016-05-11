@@ -25,8 +25,8 @@ import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.Platform
 
 /**
- * A test suite for the bitset portion of the row concatenation.
- */
+  * A test suite for the bitset portion of the row concatenation.
+  */
 class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
 
   test("bitset concat: boundary size 0, 0") {
@@ -108,8 +108,14 @@ class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
 
   private def testBitsetsOnce(numFields1: Int, numFields2: Int): Unit = {
     info(s"num fields: $numFields1 and $numFields2")
-    val schema1 = StructType(Seq.tabulate(numFields1) { i => StructField(s"a_$i", IntegerType) })
-    val schema2 = StructType(Seq.tabulate(numFields2) { i => StructField(s"b_$i", IntegerType) })
+    val schema1 = StructType(
+        Seq.tabulate(numFields1) { i =>
+      StructField(s"a_$i", IntegerType)
+    })
+    val schema2 = StructType(
+        Seq.tabulate(numFields2) { i =>
+      StructField(s"b_$i", IntegerType)
+    })
 
     val row1 = createUnsafeRow(numFields1)
     val row2 = createUnsafeRow(numFields2)
@@ -129,9 +135,15 @@ class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
     val output = concater.join(row1, row2)
 
     def dumpDebug(): String = {
-      val set1 = Seq.tabulate(numFields1) { i => if (row1.isNullAt(i)) "1" else "0" }
-      val set2 = Seq.tabulate(numFields2) { i => if (row2.isNullAt(i)) "1" else "0" }
-      val out = Seq.tabulate(numFields1 + numFields2) { i => if (output.isNullAt(i)) "1" else "0" }
+      val set1 = Seq.tabulate(numFields1) { i =>
+        if (row1.isNullAt(i)) "1" else "0"
+      }
+      val set2 = Seq.tabulate(numFields2) { i =>
+        if (row2.isNullAt(i)) "1" else "0"
+      }
+      val out = Seq.tabulate(numFields1 + numFields2) { i =>
+        if (output.isNullAt(i)) "1" else "0"
+      }
 
       s"""
          |input1: ${set1.mkString}
@@ -145,7 +157,8 @@ class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
       if (i < numFields1) {
         assert(output.isNullAt(i) === row1.isNullAt(i), dumpDebug())
       } else {
-        assert(output.isNullAt(i) === row2.isNullAt(i - numFields1), dumpDebug())
+        assert(
+            output.isNullAt(i) === row2.isNullAt(i - numFields1), dumpDebug())
       }
     }
   }

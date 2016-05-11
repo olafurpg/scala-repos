@@ -79,8 +79,8 @@ object IntervalTrieSampleCheck extends Properties("IntervalSet.Sample") {
   }
 
   /**
-   * Check optimized intersects method against naive implementation using &
-   */
+ * Check optimized intersects method against naive implementation using &
+ */
   property("intersects/intersection") = forAll { (a: IntervalTrie[Long], b: IntervalTrie[Long]) =>
     val r1 = a intersects b
     val r2 = !(a & b).isEmpty
@@ -88,8 +88,8 @@ object IntervalTrieSampleCheck extends Properties("IntervalSet.Sample") {
   }
 
   /**
-   * Check optimized isSupersetOf method against naive implementation using &
-   */
+ * Check optimized isSupersetOf method against naive implementation using &
+ */
   property("isSupersetOf/intersection") = forAll { (a: IntervalTrie[Long], b: IntervalTrie[Long]) =>
     val r1 = a isSupersetOf b
     val r2 = (a & b) == b
@@ -111,4 +111,4 @@ object IntervalTrieSampleCheck extends Properties("IntervalSet.Sample") {
     a.intervalIterator.toIndexedSeq == a.intervals.toIndexedSeq
   }
 }
-*/
+ */

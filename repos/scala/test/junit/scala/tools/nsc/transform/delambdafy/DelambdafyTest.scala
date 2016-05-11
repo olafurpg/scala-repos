@@ -14,8 +14,10 @@ import org.junit.runners.JUnit4
 
 @RunWith(classOf[JUnit4])
 class DelambdafyTest {
-  def compileToMultipleOutputWithDelamdbafyMethod(): List[(String, Array[Byte])] = {
-    val codeForMultiOutput = """
+  def compileToMultipleOutputWithDelamdbafyMethod(
+      ): List[(String, Array[Byte])] = {
+    val codeForMultiOutput =
+      """
 object Delambdafy {
   type -->[D, I] = PartialFunction[D, I]
 

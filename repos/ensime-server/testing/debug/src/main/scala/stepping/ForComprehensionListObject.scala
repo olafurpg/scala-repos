@@ -19,9 +19,7 @@ object ForComprehensionListObject {
     for (n <- l) {
       n
     }
-
   }
-
 }
 
 class ForComprehensionListObject(l: List[Object]) {
@@ -35,7 +33,5 @@ class ForComprehensionListObject(l: List[Object]) {
     for (n <- l) {
       n
     }
-
   }
-
 }

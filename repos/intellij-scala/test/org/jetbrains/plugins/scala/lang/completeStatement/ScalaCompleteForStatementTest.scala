@@ -2,22 +2,20 @@ package org.jetbrains.plugins.scala
 package lang.completeStatement
 
 /**
- * @author Ksenia.Sautina
- * @since 2/25/13
- */
+  * @author Ksenia.Sautina
+  * @since 2/25/13
+  */
 class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
 
   def testForStatement1() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  def method() {
         |    for <caret>
         |  }
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  def method() {
         |    for (<caret>) {
@@ -30,16 +28,14 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
   }
 
   def testForStatement2() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  def method() {
         |    for<caret>
         |  }
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  def method() {
         |    for (<caret>) {
@@ -52,16 +48,14 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
   }
 
   def testForStatement3() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  def method() {
         |    for (<caret>
         |  }
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  def method() {
         |    for (<caret>) {
@@ -75,8 +69,7 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
   }
 
   def testForStatement4() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  def method() {
         |    for (i <- 1 to 10<caret>) {
@@ -84,8 +77,7 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
         |  }
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  def method() {
         |    for (i <- 1 to 10) {
@@ -99,16 +91,14 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
   }
 
   def testForStatement5() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  def method() {
         |    for (i <- 1 to 10) {<caret>
         |  }
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  def method() {
         |    for (i <- 1 to 10) {
@@ -122,8 +112,7 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
   }
 
   def testForStatement6() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  def method() {
         |    for (i <- 1 to 10<caret>) {
@@ -132,8 +121,7 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
         |  }
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  def method() {
         |    for (i <- 1 to 10) {
@@ -148,16 +136,14 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
   }
 
   def testForStatement7() {
-    val fileText =
-      """
+    val fileText = """
         |class B {
         |  def method() {
         |    for ()<caret>
         |  }
         |}
       """.stripMargin('|').replaceAll("\r", "").trim()
-    val resultText =
-      """
+    val resultText = """
         |class B {
         |  def method() {
         |    for (<caret>) {
@@ -169,6 +155,4 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
 
     checkScalaFileByText(fileText, resultText)
   }
-
-
 }

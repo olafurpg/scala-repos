@@ -7,8 +7,8 @@ object A {
 
 object Test extends App {
 
-    Console.println(A.x);
-    Console.println(A.y);
-    Console.println(A.z);
-    Console.println(A.s);
+  Console.println(A.x);
+  Console.println(A.y);
+  Console.println(A.z);
+  Console.println(A.s);
 }

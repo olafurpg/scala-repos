@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.util
 
@@ -45,8 +45,7 @@ class ArrayDequeTest extends AbstractCollectionTest with DequeTest {
 
     assertEquals(ad.size(), 5)
 
-    for (i <- 0 until s.size)
-      assertEquals(ad.poll(), s(i))
+    for (i <- 0 until s.size) assertEquals(ad.poll(), s(i))
 
     assertTrue(ad.isEmpty)
   }
@@ -174,7 +173,7 @@ class ArrayDequeFactory extends AbstractCollectionFactory with DequeFactory {
   override def implementationName: String =
     "java.util.ArrayDeque"
 
-  override def empty[E: ClassTag]: ju.ArrayDeque[E] =
+  override def empty[E : ClassTag]: ju.ArrayDeque[E] =
     new ju.ArrayDeque[E]
 
   def from[E](coll: ju.Collection[E]): ju.ArrayDeque[E] =

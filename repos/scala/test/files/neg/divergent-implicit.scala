@@ -8,8 +8,10 @@ object Test2 {
   class Foo
   class Bar
   class Baz
-  implicit def foo2bar(x: Foo)(implicit baz2bar: Baz => Bar): Bar = baz2bar(new Baz)
-  implicit def baz2bar(x: Baz)(implicit foo2bar: Foo => Bar): Bar = foo2bar(new Foo)
+  implicit def foo2bar(x: Foo)(implicit baz2bar: Baz => Bar): Bar =
+    baz2bar(new Baz)
+  implicit def baz2bar(x: Baz)(implicit foo2bar: Foo => Bar): Bar =
+    foo2bar(new Foo)
 
   val x: Bar = new Foo
   val y: Bar = new Baz

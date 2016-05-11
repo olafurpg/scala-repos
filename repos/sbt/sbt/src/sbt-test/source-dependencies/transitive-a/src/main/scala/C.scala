@@ -1,4 +1,3 @@
-object C
-{
-	val z = B.y.length
+object C {
+  val z = B.y.length
 }

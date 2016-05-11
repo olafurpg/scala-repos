@@ -11,10 +11,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.Annotation
 import org.jetbrains.plugins.scala.lang.parser.parsing.top.TmplDef
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 11.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 11.02.2008
+  */
 /*
  * Def ::= [{Annotation} {Modifier}]
  *          ('val' ValDef
@@ -26,22 +25,27 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.top.TmplDef
 
 object Def {
   def parse(builder: ScalaPsiBuilder): Boolean = parse(builder, isMod = true)
-  def parse(builder: ScalaPsiBuilder, isMod: Boolean): Boolean = parse(builder, isMod, isImplicit = false)
-  def parse(builder: ScalaPsiBuilder, isMod: Boolean, isImplicit: Boolean): Boolean = {
+  def parse(builder: ScalaPsiBuilder, isMod: Boolean): Boolean =
+    parse(builder, isMod, isImplicit = false)
+  def parse(builder: ScalaPsiBuilder,
+            isMod: Boolean,
+            isImplicit: Boolean): Boolean = {
     val defMarker = builder.mark
-    defMarker.setCustomEdgeTokenBinders(ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN, null)
+    defMarker.setCustomEdgeTokenBinders(
+        ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN, null)
     if (isMod || isImplicit) {
       val annotationsMarker = builder.mark
       while (Annotation.parse(builder)) {}
       annotationsMarker.done(ScalaElementTypes.ANNOTATIONS)
-      annotationsMarker.setCustomEdgeTokenBinders(ScalaTokenBinders.DEFAULT_LEFT_EDGE_BINDER, null)
+      annotationsMarker.setCustomEdgeTokenBinders(
+          ScalaTokenBinders.DEFAULT_LEFT_EDGE_BINDER, null)
       //parse modifiers
       val modifierMarker = builder.mark
       if (isMod) {
         while (Modifier.parse(builder)) {}
-      }
-      else {
-        while (builder.getTokenType == ScalaTokenTypes.kIMPLICIT || builder.getTokenType == ScalaTokenTypes.kLAZY) {
+      } else {
+        while (builder.getTokenType == ScalaTokenTypes.kIMPLICIT ||
+        builder.getTokenType == ScalaTokenTypes.kLAZY) {
           builder.advanceLexer()
         }
       }
@@ -59,8 +63,7 @@ object Def {
         if (PatDef parse builder) {
           defMarker.done(ScalaElementTypes.PATTERN_DEFINITION)
           true
-        }
-        else {
+        } else {
           defMarker.rollbackTo()
           false
         }
@@ -69,8 +72,7 @@ object Def {
         if (VarDef parse builder) {
           defMarker.done(ScalaElementTypes.VARIABLE_DEFINITION)
           true
-        }
-        else {
+        } else {
           defMarker.rollbackTo()
           false
         }
@@ -89,13 +91,12 @@ object Def {
         if (TypeDef parse builder) {
           defMarker.done(ScalaElementTypes.TYPE_DEFINITION)
           true
-        }
-        else {
+        } else {
           defMarker.rollbackTo()
           false
         }
-      case ScalaTokenTypes.kCASE | ScalaTokenTypes.kCLASS
-           | ScalaTokenTypes.kOBJECT | ScalaTokenTypes.kTRAIT =>
+      case ScalaTokenTypes.kCASE | ScalaTokenTypes.kCLASS |
+          ScalaTokenTypes.kOBJECT | ScalaTokenTypes.kTRAIT =>
         defMarker.rollbackTo()
         TmplDef parse builder
       case _ =>
@@ -104,4 +105,3 @@ object Def {
     }
   }
 }
-

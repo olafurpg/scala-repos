@@ -9,12 +9,12 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.PostfixExpr
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 28.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 28.02.2008
+  */
 object Guard {
-  def parse(builder: ScalaPsiBuilder): Boolean = parse(builder, noIf = false) //deprecated if true
+  def parse(builder: ScalaPsiBuilder): Boolean =
+    parse(builder, noIf = false) //deprecated if true
   def parse(builder: ScalaPsiBuilder, noIf: Boolean): Boolean = {
     val guardMarker = builder.mark
     builder.getTokenType match {

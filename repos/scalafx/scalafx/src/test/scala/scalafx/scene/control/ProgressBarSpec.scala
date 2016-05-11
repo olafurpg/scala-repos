@@ -35,10 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 
 /**
- * ProgressBar Spec tests.
- *
- */
+  * ProgressBar Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ProgressBarSpec
-  extends SimpleSFXDelegateSpec[jfxsc.ProgressBar, ProgressBar](classOf[jfxsc.ProgressBar], classOf[ProgressBar])
-  with RunOnApplicationThread
+    extends SimpleSFXDelegateSpec[jfxsc.ProgressBar, ProgressBar](
+        classOf[jfxsc.ProgressBar], classOf[ProgressBar])
+    with RunOnApplicationThread

@@ -2,26 +2,24 @@ package lila.video
 
 import org.joda.time.DateTime
 
-case class Video(
-    _id: Video.ID, // youtube ID
-    title: String,
-    author: String,
-    targets: List[Target],
-    tags: List[Tag],
-    lang: Lang,
-    ads: Boolean,
-    startTime: Int, // in seconds
-    metadata: Youtube.Metadata,
-    createdAt: DateTime) {
+case class Video(_id: Video.ID, // youtube ID
+                 title: String,
+                 author: String,
+                 targets: List[Target],
+                 tags: List[Tag],
+                 lang: Lang,
+                 ads: Boolean,
+                 startTime: Int, // in seconds
+                 metadata: Youtube.Metadata,
+                 createdAt: DateTime) {
 
   def id = _id
 
   def thumbnail = s"http://img.youtube.com/vi/$id/0.jpg"
 
   def similarity(other: Video) =
-    (tags intersect other.tags).size +
-      (targets intersect other.targets).size +
-      (if (author == other.author) 1 else 0)
+    (tags intersect other.tags).size + (targets intersect other.targets).size +
+    (if (author == other.author) 1 else 0)
 
   def durationString = metadata.duration.map { seconds =>
     "%02d:%02d".format(seconds / 60, seconds % 60)
@@ -37,11 +35,11 @@ object Target {
   val EXPERT = 4
 
   def name(target: Int) = target match {
-    case BEGINNER     => "beginner"
+    case BEGINNER => "beginner"
     case INTERMEDIATE => "intermediate"
-    case ADVANCED     => "advanced"
-    case EXPERT       => "expert"
-    case _            => ""
+    case ADVANCED => "advanced"
+    case EXPERT => "expert"
+    case _ => ""
   }
 }
 

@@ -18,5 +18,5 @@ object InInheritors {
     val fok = new Exception
   }
 
-  (new C).fo<caret>
+  (new C).fo < caret >
 }

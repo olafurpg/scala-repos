@@ -51,15 +51,14 @@ package object util {
     val outStream = new ByteArrayOutputStream
     try {
       var reading = true
-      while ( reading ) {
+      while (reading) {
         inStream.read() match {
           case -1 => reading = false
           case c => outStream.write(c)
         }
       }
       outStream.flush()
-    }
-    finally {
+    } finally {
       inStream.close()
     }
     new String(outStream.toByteArray, encoding)
@@ -72,15 +71,14 @@ package object util {
     val outStream = new ByteArrayOutputStream
     try {
       var reading = true
-      while ( reading ) {
+      while (reading) {
         inStream.read() match {
           case -1 => reading = false
           case c => outStream.write(c)
         }
       }
       outStream.flush()
-    }
-    finally {
+    } finally {
       inStream.close()
     }
     outStream.toByteArray
@@ -107,10 +105,13 @@ package object util {
   def sideBySide(left: Seq[String], right: Seq[String]): Seq[String] = {
     val maxLeftSize = left.map(_.length).max
     val leftPadded = left ++ Seq.fill(math.max(right.size - left.size, 0))("")
-    val rightPadded = right ++ Seq.fill(math.max(left.size - right.size, 0))("")
+    val rightPadded =
+      right ++ Seq.fill(math.max(left.size - right.size, 0))("")
 
     leftPadded.zip(rightPadded).map {
-      case (l, r) => (if (l == r) " " else "!") + l + (" " * ((maxLeftSize - l.length) + 3)) + r
+      case (l, r) =>
+        (if (l == r) " " else "!") +
+        l + (" " * ((maxLeftSize - l.length) + 3)) + r
     }
   }
 
@@ -138,13 +139,17 @@ package object util {
   // generated column names don't contain back-ticks or double-quotes.
   def usePrettyExpression(e: Expression): Expression = e transform {
     case a: Attribute => new PrettyAttribute(a)
-    case Literal(s: UTF8String, StringType) => PrettyAttribute(s.toString, StringType)
-    case Literal(v, t: NumericType) if v != null => PrettyAttribute(v.toString, t)
+    case Literal(s: UTF8String, StringType) =>
+      PrettyAttribute(s.toString, StringType)
+    case Literal(v, t: NumericType) if v != null =>
+      PrettyAttribute(v.toString, t)
     case e: GetStructField =>
       val name = e.name.getOrElse(e.childSchema(e.ordinal).name)
-      PrettyAttribute(usePrettyExpression(e.child).sql + "." + name, e.dataType)
+      PrettyAttribute(
+          usePrettyExpression(e.child).sql + "." + name, e.dataType)
     case e: GetArrayStructFields =>
-      PrettyAttribute(usePrettyExpression(e.child) + "." + e.field.name, e.dataType)
+      PrettyAttribute(
+          usePrettyExpression(e.child) + "." + e.field.name, e.dataType)
   }
 
   def quoteIdentifier(name: String): String = {
@@ -154,9 +159,9 @@ package object util {
   }
 
   /**
-   * Returns the string representation of this expression that is safe to be put in
-   * code comments of generated code.
-   */
+    * Returns the string representation of this expression that is safe to be put in
+    * code comments of generated code.
+    */
   def toCommentSafeString(str: String): String =
     str.replace("*/", "\\*\\/").replace("\\u", "\\\\u")
 

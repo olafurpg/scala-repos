@@ -7,8 +7,8 @@ object DtabStatsFilter {
   val role = Stack.Role("DtabStats")
 
   /**
-   * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.filter.DtabStatsFilter]].
-   */
+    * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.filter.DtabStatsFilter]].
+    */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module1[param.Stats, ServiceFactory[Req, Rep]] {
       val role = DtabStatsFilter.role
@@ -22,9 +22,9 @@ object DtabStatsFilter {
 }
 
 /**
- * Adds a Stat, dtab/local/size, that tracks the size of Dtab.local for all
- * requests with a non-empty Dtab.
- */
+  * Adds a Stat, dtab/local/size, that tracks the size of Dtab.local for all
+  * requests with a non-empty Dtab.
+  */
 class DtabStatsFilter[Req, Rsp](statsReceiver: StatsReceiver)
     extends SimpleFilter[Req, Rsp] {
 

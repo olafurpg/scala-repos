@@ -9,23 +9,25 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScIfStmt}
 import scala.annotation.tailrec
 
 /**
- * Nikolay.Tropin
- * 2014-06-27
- */
+  * Nikolay.Tropin
+  * 2014-06-27
+  */
 abstract class ScalaElseUnwrapperBase extends ScalaUnwrapper {
 
   override def isApplicableTo(e: PsiElement) = elseBranch(e).isDefined
 
-  override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) = elseBranch(element) match {
-    case Some((ifStmt, expr)) => unwrapElseBranch(expr, ifStmt, context)
-    case _ =>
-  }
+  override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) =
+    elseBranch(element) match {
+      case Some((ifStmt, expr)) => unwrapElseBranch(expr, ifStmt, context)
+      case _ =>
+    }
 
   protected def elseBranch(e: PsiElement): Option[(ScIfStmt, ScExpression)] = {
     if (e.isInstanceOf[ScIfStmt]) return None
 
     e.getParent match {
-      case ifSt @ ScIfStmt(_, Some(expr), _) childOf (parentIf @ ScIfStmt(_, _, Some(elseIf))) if ifSt == elseIf && e == expr =>
+      case ifSt @ ScIfStmt(_, Some(expr), _) childOf (parentIf @ ScIfStmt(
+          _, _, Some(elseIf))) if ifSt == elseIf && e == expr =>
         Some((parentIf, expr))
       case ifStmt @ ScIfStmt(_, _, Some(elseBr)) =>
         if (e.getNode.getElementType == ScalaTokenTypes.kELSE || elseBr == e)
@@ -41,5 +43,6 @@ abstract class ScalaElseUnwrapperBase extends ScalaUnwrapper {
     case _ => ifStmt
   }
 
-  protected def unwrapElseBranch(expr: ScExpression, ifStmt: ScIfStmt, context: ScalaUnwrapContext)
+  protected def unwrapElseBranch(
+      expr: ScExpression, ifStmt: ScIfStmt, context: ScalaUnwrapContext)
 }

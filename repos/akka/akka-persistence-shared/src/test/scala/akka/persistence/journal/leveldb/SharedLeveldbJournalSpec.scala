@@ -1,12 +1,11 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.persistence.journal.leveldb
 
 import akka.actor._
 import akka.persistence._
-import akka.testkit.{ TestProbe, AkkaSpec }
+import akka.testkit.{TestProbe, AkkaSpec}
 
 object SharedLeveldbJournalSpec {
   val config =
@@ -39,33 +38,37 @@ object SharedLeveldbJournalSpec {
       }
     """
 
-  class ExamplePersistentActor(probe: ActorRef, name: String) extends NamedPersistentActor(name) {
+  class ExamplePersistentActor(probe: ActorRef, name: String)
+      extends NamedPersistentActor(name) {
     override def receiveRecover = {
       case RecoveryCompleted ⇒ // ignore
-      case payload           ⇒ probe ! payload
+      case payload ⇒ probe ! payload
     }
     override def receiveCommand = {
-      case payload ⇒ persist(payload) { _ ⇒
-        probe ! payload
-      }
+      case payload ⇒
+        persist(payload) { _ ⇒
+          probe ! payload
+        }
     }
   }
 
   class ExampleApp(probe: ActorRef, storePath: ActorPath) extends Actor {
-    val p = context.actorOf(Props(classOf[ExamplePersistentActor], probe, context.system.name))
+    val p = context.actorOf(
+        Props(classOf[ExamplePersistentActor], probe, context.system.name))
 
     def receive = {
-      case ActorIdentity(1, Some(store)) ⇒ SharedLeveldbJournal.setStore(store, context.system)
-      case m                             ⇒ p forward m
+      case ActorIdentity(1, Some(store)) ⇒
+        SharedLeveldbJournal.setStore(store, context.system)
+      case m ⇒ p forward m
     }
 
     override def preStart(): Unit =
       context.actorSelection(storePath) ! Identify(1)
   }
-
 }
 
-class SharedLeveldbJournalSpec extends AkkaSpec(SharedLeveldbJournalSpec.config) with Cleanup {
+class SharedLeveldbJournalSpec
+    extends AkkaSpec(SharedLeveldbJournalSpec.config) with Cleanup {
   import SharedLeveldbJournalSpec._
 
   val systemA = ActorSystem("SysA", system.settings.config)
@@ -84,10 +87,16 @@ class SharedLeveldbJournalSpec extends AkkaSpec(SharedLeveldbJournalSpec.config)
       val probeB = new TestProbe(systemB)
 
       system.actorOf(Props[SharedLeveldbStore], "store")
-      val storePath = RootActorPath(system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress) / "user" / "store"
+      val storePath =
+        RootActorPath(system
+              .asInstanceOf[ExtendedActorSystem]
+              .provider
+              .getDefaultAddress) / "user" / "store"
 
-      val appA = systemA.actorOf(Props(classOf[ExampleApp], probeA.ref, storePath))
-      val appB = systemB.actorOf(Props(classOf[ExampleApp], probeB.ref, storePath))
+      val appA =
+        systemA.actorOf(Props(classOf[ExampleApp], probeA.ref, storePath))
+      val appB =
+        systemB.actorOf(Props(classOf[ExampleApp], probeB.ref, storePath))
 
       appA ! "a1"
       appB ! "b1"
@@ -95,8 +104,10 @@ class SharedLeveldbJournalSpec extends AkkaSpec(SharedLeveldbJournalSpec.config)
       probeA.expectMsg("a1")
       probeB.expectMsg("b1")
 
-      val recoveredAppA = systemA.actorOf(Props(classOf[ExampleApp], probeA.ref, storePath))
-      val recoveredAppB = systemB.actorOf(Props(classOf[ExampleApp], probeB.ref, storePath))
+      val recoveredAppA =
+        systemA.actorOf(Props(classOf[ExampleApp], probeA.ref, storePath))
+      val recoveredAppB =
+        systemB.actorOf(Props(classOf[ExampleApp], probeB.ref, storePath))
 
       recoveredAppA ! "a2"
       recoveredAppB ! "b2"

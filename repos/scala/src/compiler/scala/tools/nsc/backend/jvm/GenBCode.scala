@@ -3,7 +3,6 @@
  * @author  Martin Odersky
  */
 
-
 package scala
 package tools.nsc
 package backend
@@ -55,17 +54,19 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
   override def newPhase(prev: Phase) = new BCodePhase(prev)
 
-  final class PlainClassBuilder(cunit: CompilationUnit) extends SyncAndTryBuilder(cunit)
+  final class PlainClassBuilder(cunit: CompilationUnit)
+      extends SyncAndTryBuilder(cunit)
 
   class BCodePhase(prev: Phase) extends StdPhase(prev) {
 
     override def name = phaseName
-    override def description = "Generate bytecode from ASTs using the ASM library"
+    override def description =
+      "Generate bytecode from ASTs using the ASM library"
     override def erasedTypes = true
 
-    private var bytecodeWriter  : BytecodeWriter   = null
-    private var mirrorCodeGen   : JMirrorBuilder   = null
-    private var beanInfoCodeGen : JBeanInfoBuilder = null
+    private var bytecodeWriter: BytecodeWriter = null
+    private var mirrorCodeGen: JMirrorBuilder = null
+    private var beanInfoCodeGen: JBeanInfoBuilder = null
 
     /* ---------------- q1 ---------------- */
 
@@ -77,11 +78,11 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
     /* ---------------- q2 ---------------- */
 
-    case class Item2(arrivalPos:   Int,
-                     mirror:       asm.tree.ClassNode,
-                     plain:        asm.tree.ClassNode,
-                     bean:         asm.tree.ClassNode,
-                     outFolder:    scala.tools.nsc.io.AbstractFile) {
+    case class Item2(arrivalPos: Int,
+                     mirror: asm.tree.ClassNode,
+                     plain: asm.tree.ClassNode,
+                     bean: asm.tree.ClassNode,
+                     outFolder: scala.tools.nsc.io.AbstractFile) {
       def isPoison = { arrivalPos == Int.MaxValue }
     }
 
@@ -98,17 +99,17 @@ abstract class GenBCode extends BCodeSyncAndTry {
      *  @param jclassBytes bytecode emitted for the class SubItem3 represents
      */
     case class SubItem3(
-      jclassName:  String,
-      jclassBytes: Array[Byte]
+        jclassName: String,
+        jclassBytes: Array[Byte]
     )
 
     case class Item3(arrivalPos: Int,
-                     mirror:     SubItem3,
-                     plain:      SubItem3,
-                     bean:       SubItem3,
-                     outFolder:  scala.tools.nsc.io.AbstractFile) {
+                     mirror: SubItem3,
+                     plain: SubItem3,
+                     bean: SubItem3,
+                     outFolder: scala.tools.nsc.io.AbstractFile) {
 
-      def isPoison  = { arrivalPos == Int.MaxValue }
+      def isPoison = { arrivalPos == Int.MaxValue }
     }
     private val i3comparator = new java.util.Comparator[Item3] {
       override def compare(a: Item3, b: Item3) = {
@@ -133,13 +134,12 @@ abstract class GenBCode extends BCodeSyncAndTry {
           if (item.isPoison) {
             q2 add poison2
             return
-          }
-          else {
-            try   { withCurrentUnit(item.cunit)(visit(item)) }
-            catch {
+          } else {
+            try { withCurrentUnit(item.cunit)(visit(item)) } catch {
               case ex: Throwable =>
                 ex.printStackTrace()
-                error(s"Error while emitting ${item.cunit.source}\n${ex.getMessage}")
+                error(
+                    s"Error while emitting ${item.cunit.source}\n${ex.getMessage}")
             }
           }
         }
@@ -162,9 +162,9 @@ abstract class GenBCode extends BCodeSyncAndTry {
             caseInsensitively.put(lowercaseJavaClassName, claszSymbol)
           case Some(dupClassSym) =>
             reporter.warning(
-              claszSymbol.pos,
-              s"Class ${claszSymbol.javaClassName} differs only in case from ${dupClassSym.javaClassName}. " +
-              "Such classes will overwrite one another on case-insensitive filesystems."
+                claszSymbol.pos,
+                s"Class ${claszSymbol.javaClassName} differs only in case from ${dupClassSym.javaClassName}. " +
+                "Such classes will overwrite one another on case-insensitive filesystems."
             )
         }
 
@@ -187,30 +187,28 @@ abstract class GenBCode extends BCodeSyncAndTry {
         // -------------- "plain" class --------------
         val pcb = new PlainClassBuilder(cunit)
         pcb.genPlainClass(cd)
-        val outF = if (needsOutFolder) getOutFolder(claszSymbol, pcb.thisName, cunit) else null
+        val outF =
+          if (needsOutFolder) getOutFolder(claszSymbol, pcb.thisName, cunit)
+          else null
         val plainC = pcb.cnode
 
         // -------------- bean info class, if needed --------------
         val beanC =
           if (claszSymbol hasAnnotation BeanInfoAttr) {
             beanInfoCodeGen.genBeanInfoClass(
-              claszSymbol, cunit,
-              fieldSymbols(claszSymbol),
-              methodSymbols(cd)
+                claszSymbol,
+                cunit,
+                fieldSymbols(claszSymbol),
+                methodSymbols(cd)
             )
           } else null
 
-          // ----------- hand over to pipeline-2
+        // ----------- hand over to pipeline-2
 
-        val item2 =
-          Item2(arrivalPos,
-                mirrorC, plainC, beanC,
-                outF)
+        val item2 = Item2(arrivalPos, mirrorC, plainC, beanC, outF)
 
         q2 add item2 // at the very end of this method so that no Worker2 thread starts mutating before we're done.
-
       } // end of method visit(Item1)
-
     } // end of class BCodePhase.Worker1
 
     /*
@@ -225,30 +223,40 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
         // add classes to the bytecode repo before building the call graph: the latter needs to
         // look up classes and methods in the code repo.
-        if (settings.YoptAddToBytecodeRepository) q2.asScala foreach {
-          case Item2(_, mirror, plain, bean, _) =>
-            if (mirror != null) byteCodeRepository.add(mirror, ByteCodeRepository.CompilationUnit)
-            if (plain != null)  byteCodeRepository.add(plain, ByteCodeRepository.CompilationUnit)
-            if (bean != null)   byteCodeRepository.add(bean, ByteCodeRepository.CompilationUnit)
-        }
-        if (settings.YoptBuildCallGraph) q2.asScala foreach { item =>
-          // skip call graph for mirror / bean: wd don't inline into tem, and they are not used in the plain class
-          if (item.plain != null) callGraph.addClass(item.plain)
-        }
-        if (settings.YoptInlinerEnabled)
-          bTypes.inliner.runInliner()
+        if (settings.YoptAddToBytecodeRepository)
+          q2.asScala foreach {
+            case Item2(_, mirror, plain, bean, _) =>
+              if (mirror != null)
+                byteCodeRepository.add(
+                    mirror, ByteCodeRepository.CompilationUnit)
+              if (plain != null)
+                byteCodeRepository.add(
+                    plain, ByteCodeRepository.CompilationUnit)
+              if (bean != null)
+                byteCodeRepository.add(
+                    bean, ByteCodeRepository.CompilationUnit)
+          }
+        if (settings.YoptBuildCallGraph)
+          q2.asScala foreach { item =>
+            // skip call graph for mirror / bean: wd don't inline into tem, and they are not used in the plain class
+            if (item.plain != null) callGraph.addClass(item.plain)
+          }
+        if (settings.YoptInlinerEnabled) bTypes.inliner.runInliner()
         if (settings.YoptClosureInvocations)
           closureOptimizer.rewriteClosureApplyInvocations()
       }
 
       def localOptimizations(classNode: ClassNode): Unit = {
-        BackendStats.timed(BackendStats.methodOptTimer)(localOpt.methodOptimizations(classNode))
+        BackendStats.timed(BackendStats.methodOptTimer)(
+            localOpt.methodOptimizations(classNode))
       }
 
-      def setInnerClasses(classNode: ClassNode): Unit = if (classNode != null) {
-        classNode.innerClasses.clear()
-        addInnerClasses(classNode, bTypes.backendUtils.collectNestedClasses(classNode))
-      }
+      def setInnerClasses(classNode: ClassNode): Unit =
+        if (classNode != null) {
+          classNode.innerClasses.clear()
+          addInnerClasses(
+              classNode, bTypes.backendUtils.collectNestedClasses(classNode))
+        }
 
       def run() {
         runGlobalOptimizations()
@@ -258,21 +266,24 @@ abstract class GenBCode extends BCodeSyncAndTry {
           if (item.isPoison) {
             q3 add poison3
             return
-          }
-          else {
+          } else {
             try {
               localOptimizations(item.plain)
               setInnerClasses(item.plain)
               setInnerClasses(item.mirror)
               setInnerClasses(item.bean)
               addToQ3(item)
-          } catch {
-              case e: java.lang.RuntimeException if e.getMessage != null && (e.getMessage contains "too large!") =>
-                reporter.error(NoPosition,
-                  s"Could not write class ${item.plain.name} because it exceeds JVM code size limits. ${e.getMessage}")
+            } catch {
+              case e: java.lang.RuntimeException
+                  if e.getMessage != null &&
+                  (e.getMessage contains "too large!") =>
+                reporter.error(
+                    NoPosition,
+                    s"Could not write class ${item.plain.name} because it exceeds JVM code size limits. ${e.getMessage}")
               case ex: Throwable =>
                 ex.printStackTrace()
-                error(s"Error while emitting ${item.plain.name}\n${ex.getMessage}")
+                error(
+                    s"Error while emitting ${item.plain.name}\n${ex.getMessage}")
             }
           }
         }
@@ -288,40 +299,42 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
         val Item2(arrivalPos, mirror, plain, bean, outFolder) = item
 
-        val mirrorC = if (mirror == null) null else SubItem3(mirror.name, getByteArray(mirror))
-        val plainC  = SubItem3(plain.name, getByteArray(plain))
-        val beanC   = if (bean == null)   null else SubItem3(bean.name, getByteArray(bean))
+        val mirrorC =
+          if (mirror == null) null
+          else SubItem3(mirror.name, getByteArray(mirror))
+        val plainC = SubItem3(plain.name, getByteArray(plain))
+        val beanC =
+          if (bean == null) null else SubItem3(bean.name, getByteArray(bean))
 
-        if (AsmUtils.traceSerializedClassEnabled && plain.name.contains(AsmUtils.traceSerializedClassPattern)) {
+        if (AsmUtils.traceSerializedClassEnabled &&
+            plain.name.contains(AsmUtils.traceSerializedClassPattern)) {
           if (mirrorC != null) AsmUtils.traceClass(mirrorC.jclassBytes)
           AsmUtils.traceClass(plainC.jclassBytes)
           if (beanC != null) AsmUtils.traceClass(beanC.jclassBytes)
         }
 
         q3 add Item3(arrivalPos, mirrorC, plainC, beanC, outFolder)
-
       }
-
     } // end of class BCodePhase.Worker2
 
     var arrivalPos = 0
 
     /**
-     * The `run` method is overridden because the backend has a different data flow than the default
-     * phase: the backend does not transform compilation units one by one, but on all units in the
-     * same run. This allows cross-unit optimizations and running some stages of the backend
-     * concurrently on multiple units.
-     *
-     *  A run of the BCodePhase phase comprises:
-     *
-     *    (a) set-up steps (most notably supporting maps in `BCodeTypes`,
-     *        but also "the" writer where class files in byte-array form go)
-     *
-     *    (b) building of ASM ClassNodes, their optimization and serialization.
-     *
-     *    (c) tear down (closing the classfile-writer and clearing maps)
-     *
-     */
+      * The `run` method is overridden because the backend has a different data flow than the default
+      * phase: the backend does not transform compilation units one by one, but on all units in the
+      * same run. This allows cross-unit optimizations and running some stages of the backend
+      * concurrently on multiple units.
+      *
+      *  A run of the BCodePhase phase comprises:
+      *
+      *    (a) set-up steps (most notably supporting maps in `BCodeTypes`,
+      *        but also "the" writer where class files in byte-array form go)
+      *
+      *    (b) building of ASM ClassNodes, their optimization and serialization.
+      *
+      *    (c) tear down (closing the classfile-writer and clearing maps)
+      *
+      */
     override def run() {
       val bcodeStart = Statistics.startTimer(BackendStats.bcodeTimer)
 
@@ -336,11 +349,12 @@ abstract class GenBCode extends BCodeSyncAndTry {
       Statistics.stopTimer(BackendStats.bcodeInitTimer, initStart)
 
       // initBytecodeWriter invokes fullName, thus we have to run it before the typer-dependent thread is activated.
-      bytecodeWriter  = initBytecodeWriter(cleanup.getEntryPoints)
-      mirrorCodeGen   = new JMirrorBuilder
+      bytecodeWriter = initBytecodeWriter(cleanup.getEntryPoints)
+      mirrorCodeGen = new JMirrorBuilder
       beanInfoCodeGen = new JBeanInfoBuilder
 
-      val needsOutfileForSymbol = bytecodeWriter.isInstanceOf[ClassBytecodeWriter]
+      val needsOutfileForSymbol =
+        bytecodeWriter.isInstanceOf[ClassBytecodeWriter]
       buildAndSendToDisk(needsOutfileForSymbol)
 
       // closing output files.
@@ -348,17 +362,17 @@ abstract class GenBCode extends BCodeSyncAndTry {
       Statistics.stopTimer(BackendStats.bcodeTimer, bcodeStart)
 
       /* TODO Bytecode can be verified (now that all classfiles have been written to disk)
-       *
-       * (1) asm.util.CheckAdapter.verify()
-       *       public static void verify(ClassReader cr, ClassLoader loader, boolean dump, PrintWriter pw)
-       *     passing a custom ClassLoader to verify inter-dependent classes.
-       *     Alternatively,
-       *       - an offline-bytecode verifier could be used (e.g. Maxine brings one as separate tool).
-       *       - -Xverify:all
-       *
-       * (2) if requested, check-java-signatures, over and beyond the syntactic checks in `getGenericSignature()`
-       *
-       */
+     *
+     * (1) asm.util.CheckAdapter.verify()
+     *       public static void verify(ClassReader cr, ClassLoader loader, boolean dump, PrintWriter pw)
+     *     passing a custom ClassLoader to verify inter-dependent classes.
+     *     Alternatively,
+     *       - an offline-bytecode verifier could be used (e.g. Maxine brings one as separate tool).
+     *       - -Xverify:all
+     *
+     * (2) if requested, check-java-signatures, over and beyond the syntactic checks in `getGenericSignature()`
+     *
+     */
     }
 
     /*
@@ -380,7 +394,6 @@ abstract class GenBCode extends BCodeSyncAndTry {
       val writeStart = Statistics.startTimer(BackendStats.bcodeWriteTimer)
       drainQ3()
       Statistics.stopTimer(BackendStats.bcodeWriteTimer, writeStart)
-
     }
 
     /* Feed pipeline-1: place all ClassDefs on q1, recording their arrival position. */
@@ -392,16 +405,17 @@ abstract class GenBCode extends BCodeSyncAndTry {
     /* Pipeline that writes classfile representations to disk. */
     private def drainQ3() {
 
-      def sendToDisk(cfr: SubItem3, outFolder: scala.tools.nsc.io.AbstractFile) {
-        if (cfr != null){
+      def sendToDisk(
+          cfr: SubItem3, outFolder: scala.tools.nsc.io.AbstractFile) {
+        if (cfr != null) {
           val SubItem3(jclassName, jclassBytes) = cfr
           try {
             val outFile =
               if (outFolder == null) null
               else getFileForClassfile(outFolder, jclassName, ".class")
-            bytecodeWriter.writeClass(jclassName, jclassName, jclassBytes, outFile)
-          }
-          catch {
+            bytecodeWriter.writeClass(
+                jclassName, jclassName, jclassBytes, outFile)
+          } catch {
             case e: FileConflictException =>
               error(s"error writing $jclassName: ${e.getMessage}")
           }
@@ -414,13 +428,13 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
       while (moreComing) {
         val incoming = q3.poll
-        moreComing   = !incoming.isPoison
+        moreComing = !incoming.isPoison
         if (moreComing) {
           val item = incoming
           val outFolder = item.outFolder
           sendToDisk(item.mirror, outFolder)
-          sendToDisk(item.plain,  outFolder)
-          sendToDisk(item.bean,   outFolder)
+          sendToDisk(item.plain, outFolder)
+          sendToDisk(item.bean, outFolder)
           expected += 1
         }
       }
@@ -429,16 +443,15 @@ abstract class GenBCode extends BCodeSyncAndTry {
       assert(q1.isEmpty, s"Some ClassDefs remained in the first queue: $q1")
       assert(q2.isEmpty, s"Some classfiles remained in the second queue: $q2")
       assert(q3.isEmpty, s"Some classfiles weren't written to disk: $q3")
-
     }
 
     override def apply(cunit: CompilationUnit): Unit = {
 
       def gen(tree: Tree) {
         tree match {
-          case EmptyTree            => ()
+          case EmptyTree => ()
           case PackageDef(_, stats) => stats foreach gen
-          case cd: ClassDef         =>
+          case cd: ClassDef =>
             q1 add Item1(arrivalPos, cd, cunit)
             arrivalPos += 1
         }
@@ -446,17 +459,16 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
       gen(cunit.body)
     }
-
   } // end of class BCodePhase
-
 } // end of class GenBCode
 
 object GenBCode {
   def mkFlags(args: Int*) = args.foldLeft(0)(_ | _)
 
-  final val PublicStatic      = asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_STATIC
-  final val PublicStaticFinal = asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_STATIC | asm.Opcodes.ACC_FINAL
+  final val PublicStatic = asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_STATIC
+  final val PublicStaticFinal =
+    asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_STATIC | asm.Opcodes.ACC_FINAL
 
-  val CLASS_CONSTRUCTOR_NAME    = "<clinit>"
+  val CLASS_CONSTRUCTOR_NAME = "<clinit>"
   val INSTANCE_CONSTRUCTOR_NAME = "<init>"
 }

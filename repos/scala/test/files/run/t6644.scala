@@ -5,4 +5,3 @@ class Testable(val c: String) extends AnyVal {
 object Test extends App {
   assert(new Testable("").matching(true, false))
 }
-

@@ -16,5 +16,4 @@ class StreamsSpec extends Specification {
       pubr must haveClass[FuturePublisher[Int]]
     }
   }
-
 }

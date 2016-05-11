@@ -22,16 +22,18 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
- * @author Ksenia.Sautina
- * @since 4/18/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 4/18/12
+  */
 object IntroduceImplicitParameterIntention {
   def familyName = "Introduce implicit parameter"
 
-  def createExpressionToIntroduce(expr: ScFunctionExpr, withoutParameterTypes: Boolean): Either[ScExpression, String] = {
+  def createExpressionToIntroduce(
+      expr: ScFunctionExpr,
+      withoutParameterTypes: Boolean): Either[ScExpression, String] = {
     def seekParams(fun: ScFunctionExpr): mutable.HashMap[String, Int] = {
-      val map: mutable.HashMap[String, Int] = new mutable.HashMap[String, Int]()
+      val map: mutable.HashMap[String, Int] =
+        new mutable.HashMap[String, Int]()
       var clearMap = false
       val visitor = new ScalaRecursiveElementVisitor {
         override def visitReferenceExpression(expr: ScReferenceExpression) {
@@ -54,7 +56,8 @@ object IntroduceImplicitParameterIntention {
 
     @tailrec
     def isValidExpr(expr: ScExpression, paramCount: Int): Boolean = {
-      if (ScUnderScoreSectionUtil.underscores(expr).length == paramCount) return true
+      if (ScUnderScoreSectionUtil.underscores(expr).length == paramCount)
+        return true
       expr match {
         case e: ScBlockExpr if e.exprs.size == 1 =>
           isValidExpr(e.exprs(0), paramCount)
@@ -64,22 +67,27 @@ object IntroduceImplicitParameterIntention {
       }
     }
 
-    val result = expr.result.getOrElse(return Right(InspectionBundle.message("introduce.implicit.not.allowed.here")))
+    val result = expr.result.getOrElse(return Right(
+            InspectionBundle.message("introduce.implicit.not.allowed.here")))
 
     val buf = new StringBuilder
     buf.append(result.getText)
 
     val diff = result.getTextRange.getStartOffset
     var previousOffset = -1
-    var occurrences: mutable.HashMap[String, Int] = new mutable.HashMap[String, Int]
+    var occurrences: mutable.HashMap[String, Int] =
+      new mutable.HashMap[String, Int]
     occurrences = seekParams(expr)
 
     if (occurrences.isEmpty || occurrences.size != expr.parameters.size)
-      return Right(InspectionBundle.message("introduce.implicit.incorrect.count"))
+      return Right(
+          InspectionBundle.message("introduce.implicit.incorrect.count"))
 
     for (p <- expr.parameters) {
-      if (!occurrences.keySet.contains(p.name) || occurrences(p.name) < previousOffset)
-        return Right(InspectionBundle.message("introduce.implicit.incorrect.order"))
+      if (!occurrences.keySet.contains(p.name) ||
+          occurrences(p.name) < previousOffset)
+        return Right(
+            InspectionBundle.message("introduce.implicit.incorrect.order"))
       previousOffset = occurrences(p.name)
     }
 
@@ -89,7 +97,8 @@ object IntroduceImplicitParameterIntention {
       val newParam = declaredType match {
         case None => "_"
         case _ if withoutParameterTypes => "_"
-        case Some(t) if expectedType.exists(_.equiv(t.getType().getOrAny)) => "_"
+        case Some(t) if expectedType.exists(_.equiv(t.getType().getOrAny)) =>
+          "_"
         case Some(t) => s"(_: ${p.typeElement.get.getText})"
       }
 
@@ -97,39 +106,46 @@ object IntroduceImplicitParameterIntention {
       buf.replace(offset, offset + p.name.length, newParam)
     }
 
-    val newExpr = ScalaPsiElementFactory.createExpressionFromText(buf.toString(), expr.getManager)
+    val newExpr = ScalaPsiElementFactory.createExpressionFromText(
+        buf.toString(), expr.getManager)
 
     if (!isValidExpr(newExpr, expr.parameters.length))
-      return Right(InspectionBundle.message("introduce.implicit.not.allowed.here"))
+      return Right(
+          InspectionBundle.message("introduce.implicit.not.allowed.here"))
 
     Left(newExpr)
   }
-
 }
 
-class IntroduceImplicitParameterIntention extends PsiElementBaseIntentionAction {
+class IntroduceImplicitParameterIntention
+    extends PsiElementBaseIntentionAction {
   def getFamilyName = familyName
 
   override def getText: String = getFamilyName
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean = {
-    val expr: ScFunctionExpr = PsiTreeUtil.getParentOfType(element, classOf[ScFunctionExpr], false)
+  def isAvailable(
+      project: Project, editor: Editor, element: PsiElement): Boolean = {
+    val expr: ScFunctionExpr =
+      PsiTreeUtil.getParentOfType(element, classOf[ScFunctionExpr], false)
     if (expr == null) return false
 
     val range: TextRange = expr.params.getTextRange
     val offset = editor.getCaretModel.getOffset
-    if (range.getStartOffset <= offset && offset <= range.getEndOffset + 3) return true
+    if (range.getStartOffset <= offset && offset <= range.getEndOffset + 3)
+      return true
 
     false
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     def showErrorHint(hint: String) {
-      if (ApplicationManager.getApplication.isUnitTestMode) throw new RuntimeException(hint)
+      if (ApplicationManager.getApplication.isUnitTestMode)
+        throw new RuntimeException(hint)
       else HintManager.getInstance().showErrorHint(editor, hint)
     }
 
-    val expr: ScFunctionExpr = PsiTreeUtil.getParentOfType(element, classOf[ScFunctionExpr], false)
+    val expr: ScFunctionExpr =
+      PsiTreeUtil.getParentOfType(element, classOf[ScFunctionExpr], false)
     if (expr == null || !expr.isValid) return
 
     val startOffset = expr.getTextRange.getStartOffset
@@ -139,7 +155,9 @@ class IntroduceImplicitParameterIntention extends PsiElementBaseIntentionAction 
         inWriteAction {
           expr.replace(newExpr)
           editor.getCaretModel.moveToOffset(startOffset)
-          PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
+          PsiDocumentManager
+            .getInstance(project)
+            .commitDocument(editor.getDocument)
         }
       case Right(message) =>
         showErrorHint(message)

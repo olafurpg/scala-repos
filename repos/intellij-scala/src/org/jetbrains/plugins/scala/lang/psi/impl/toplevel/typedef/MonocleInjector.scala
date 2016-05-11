@@ -13,7 +13,9 @@ class MonocleInjector extends SyntheticMembersInjector {
       // Monocle lenses generation
       case obj: ScObject =>
         obj.fakeCompanionClassOrCompanionClass match {
-          case clazz: ScClass if clazz.findAnnotation("monocle.macros.Lenses") != null => mkLens(obj)
+          case clazz: ScClass
+              if clazz.findAnnotation("monocle.macros.Lenses") != null =>
+            mkLens(obj)
           case _ => Seq.empty
         }
       case _ => Seq.empty
@@ -23,18 +25,25 @@ class MonocleInjector extends SyntheticMembersInjector {
   private def mkLens(obj: ScObject): ArrayBuffer[String] = {
     val buffer = new ArrayBuffer[String]
     val clazz = obj.fakeCompanionClassOrCompanionClass.asInstanceOf[ScClass]
-    val fields = clazz.allVals.collect({ case (f: ScClassParameterImpl, _) => f }).filter(_.isCaseClassVal)
-    val prefix = Option(clazz.findAnnotation("monocle.macros.Lenses").findAttributeValue("value")) match {
+    val fields = clazz.allVals
+      .collect({ case (f: ScClassParameterImpl, _) => f })
+      .filter(_.isCaseClassVal)
+    val prefix = Option(
+        clazz
+          .findAnnotation("monocle.macros.Lenses")
+          .findAttributeValue("value")) match {
       case Some(literal: ScLiteralImpl) => literal.getValue.toString
       case _ => ""
     }
     fields.foreach({ i =>
-      val template = if (clazz.typeParameters.isEmpty)
-        s"def $prefix${i.name}: _root_.monocle.Lens[${clazz.qualifiedName}, ${i.getType(TypingContext.empty).map(_.canonicalText).getOrElse("Any")}] = ???"
-      else {
-        val tparams = s"[${clazz.typeParameters.map(_.getText).mkString(",")}]"
-        s"def $prefix${i.name}$tparams: _root_.monocle.Lens[${clazz.qualifiedName}$tparams, ${i.typeElement.get.calcType}] = ???"
-      }
+      val template =
+        if (clazz.typeParameters.isEmpty)
+          s"def $prefix${i.name}: _root_.monocle.Lens[${clazz.qualifiedName}, ${i.getType(TypingContext.empty).map(_.canonicalText).getOrElse("Any")}] = ???"
+        else {
+          val tparams =
+            s"[${clazz.typeParameters.map(_.getText).mkString(",")}]"
+          s"def $prefix${i.name}$tparams: _root_.monocle.Lens[${clazz.qualifiedName}$tparams, ${i.typeElement.get.calcType}] = ???"
+        }
       buffer += template
     })
     buffer

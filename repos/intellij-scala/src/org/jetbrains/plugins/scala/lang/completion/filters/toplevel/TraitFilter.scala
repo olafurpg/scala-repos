@@ -9,18 +9,18 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
 
 /** 
-* User: Alexander Podkhalyuzin
-* Date: 03.07.2008
-*/
-
+  * User: Alexander Podkhalyuzin
+  * Date: 03.07.2008
+  */
 class TraitFilter extends ElementFilter {
   def isAcceptable(element: Object, context: PsiElement): Boolean = {
     if (context.isInstanceOf[PsiComment]) return false
-    val (leaf, _) = processPsiLeafForFilter(getLeafByOffset(context.getTextRange.getStartOffset, context))
-    
+    val (leaf, _) = processPsiLeafForFilter(
+        getLeafByOffset(context.getTextRange.getStartOffset, context))
+
     if (leaf != null) {
       val parent = leaf.getParent
-      val tuple = ScalaCompletionUtil.getForAll(parent,leaf)
+      val tuple = ScalaCompletionUtil.getForAll(parent, leaf)
       if (tuple._1) return tuple._2
     }
     false

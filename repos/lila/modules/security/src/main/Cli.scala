@@ -1,6 +1,6 @@
 package lila.security
 
-import lila.user.{ User, UserRepo }
+import lila.user.{User, UserRepo}
 
 private[security] final class Cli extends lila.common.Cli {
 
@@ -15,15 +15,15 @@ private[security] final class Cli extends lila.common.Cli {
       }
 
     case "security" :: "grant" :: uid :: roles =>
-      perform(uid, user =>
-        UserRepo.setRoles(user.id, roles map (_.toUpperCase))
-      )
+      perform(
+          uid, user => UserRepo.setRoles(user.id, roles map (_.toUpperCase)))
   }
 
   private def perform(username: String, op: User => Funit): Fu[String] =
     UserRepo named username flatMap { userOption =>
-      userOption.fold(fufail[String]("User %s not found" format username)) { u =>
-        op(u) inject "User %s successfully updated".format(username)
+      userOption.fold(fufail[String]("User %s not found" format username)) {
+        u =>
+          op(u) inject "User %s successfully updated".format(username)
       }
     }
 }

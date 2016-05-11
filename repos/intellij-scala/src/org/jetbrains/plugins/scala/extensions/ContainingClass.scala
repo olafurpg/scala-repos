@@ -3,9 +3,8 @@ package org.jetbrains.plugins.scala.extensions
 import com.intellij.psi.{PsiClass, PsiMember}
 
 /**
- * Pavel Fatin
- */
-
+  * Pavel Fatin
+  */
 object ContainingClass {
   def unapply(e: PsiMember): Option[PsiClass] = {
     if (e == null) {

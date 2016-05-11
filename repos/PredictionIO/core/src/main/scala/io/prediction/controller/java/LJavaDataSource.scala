@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller.java
 
 import io.prediction.controller.LDataSource
@@ -28,4 +27,5 @@ import scala.reflect.ClassTag
   * @group Data Source
   */
 abstract class LJavaDataSource[TD, EI, Q, A]
-  extends LDataSource[TD, EI, Q, A]()(ClassTag.AnyRef.asInstanceOf[ClassTag[TD]])
+    extends LDataSource[TD, EI, Q, A]()(
+        ClassTag.AnyRef.asInstanceOf[ClassTag[TD]])

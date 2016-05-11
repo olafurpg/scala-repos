@@ -9,7 +9,7 @@ object Global {
 object GlobalAutoPlugin extends AutoPlugin {
 
   object autoImport {
-    lazy val globalAutoPluginSetting = settingKey[String]("A top level setting declared in a plugin.")
+    lazy val globalAutoPluginSetting =
+      settingKey[String]("A top level setting declared in a plugin.")
   }
-
 }

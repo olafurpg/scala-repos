@@ -22,7 +22,8 @@ object SCL5744 {
 
   object Main {
     val g = new G
-    /*start*/(g.foo, g.goo)/*end*/
+    /*start*/
+    (g.foo, g.goo) /*end*/
   }
 }
 //(Int, Int)

@@ -11,10 +11,11 @@ import com.intellij.openapi.externalSystem.service.project.wizard.AbstractExtern
 import com.intellij.openapi.project.Project
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class SbtProjectImportBuilder(projectDataManager: ProjectDataManager)
-  extends AbstractExternalProjectImportBuilder[SbtImportControl](projectDataManager, new SbtImportControl(), SbtProjectSystem.Id) {
+    extends AbstractExternalProjectImportBuilder[SbtImportControl](
+        projectDataManager, new SbtImportControl(), SbtProjectSystem.Id) {
 
   def getName = Sbt.Name
 

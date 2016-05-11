@@ -27,10 +27,16 @@ import java.util.concurrent.locks.ReentrantLock
 
 import scala.annotation.tailrec
 
-class AuditExecutor(val name: String, minThreads: Int, maxThreads: Int, maxQueueDepth: Option[Int], idleTimeout: Long) extends Executor {
-  private[this] val workQueue : BlockingQueue[Runnable] = maxQueueDepth.map { depth =>
-    new ArrayBlockingQueue[Runnable](depth)
-  }.getOrElse (new LinkedBlockingQueue[Runnable]())
+class AuditExecutor(val name: String,
+                    minThreads: Int,
+                    maxThreads: Int,
+                    maxQueueDepth: Option[Int],
+                    idleTimeout: Long)
+    extends Executor {
+  private[this] val workQueue: BlockingQueue[Runnable] = maxQueueDepth.map {
+    depth =>
+      new ArrayBlockingQueue[Runnable](depth)
+  }.getOrElse(new LinkedBlockingQueue[Runnable]())
 
   private[this] val threadCount = new AtomicInteger(minThreads)
   private[this] val activeThreadCount = new AtomicInteger(0)
@@ -38,7 +44,9 @@ class AuditExecutor(val name: String, minThreads: Int, maxThreads: Int, maxQueue
 
   private[this] final val threadUpdateLock = new AnyRef()
 
-  private[this] var workers = (1 to minThreads).map { i => new WorkerThread(i) }.toSet
+  private[this] var workers = (1 to minThreads).map { i =>
+    new WorkerThread(i)
+  }.toSet
   workers.foreach(_.start())
 
   private val threadMXBean = ManagementFactory.getThreadMXBean
@@ -47,7 +55,7 @@ class AuditExecutor(val name: String, minThreads: Int, maxThreads: Int, maxQueue
   def activeSize = activeThreadCount.get
 
   def execute(task: Runnable): Unit = {
-    if (! workQueue.offer(task)) {
+    if (!workQueue.offer(task)) {
       throw new RejectedExecutionException()
     }
 
@@ -110,26 +118,27 @@ class AuditExecutor(val name: String, minThreads: Int, maxThreads: Int, maxQueue
       delta
     }
 
-    override def run(): Unit = try {
-      @tailrec
-      def processQueue: Unit = {
-        val nextJob = workQueue.poll(idleTimeout, TimeUnit.MILLISECONDS)
-        if (nextJob != null) {
-          activeThreadCount.incrementAndGet()
-          try {
-            nextJob.run()
-          } finally {
-            activeThreadCount.decrementAndGet()
+    override def run(): Unit =
+      try {
+        @tailrec
+        def processQueue: Unit = {
+          val nextJob = workQueue.poll(idleTimeout, TimeUnit.MILLISECONDS)
+          if (nextJob != null) {
+            activeThreadCount.incrementAndGet()
+            try {
+              nextJob.run()
+            } finally {
+              activeThreadCount.decrementAndGet()
+            }
+            processQueue
+          } else if (shouldContinue) {
+            processQueue
           }
-          processQueue
-        } else if (shouldContinue) {
-          processQueue
         }
-      }
 
-      processQueue
-    } finally {
-      workerFinished(this)
-    }
+        processQueue
+      } finally {
+        workerFinished(this)
+      }
   }
 }

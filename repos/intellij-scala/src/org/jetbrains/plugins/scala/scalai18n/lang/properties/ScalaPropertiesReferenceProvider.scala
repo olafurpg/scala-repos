@@ -7,20 +7,20 @@ import com.intellij.util.ProcessingContext
 import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
 
 /**
- * @author Ksenia.Sautina
- * @since 7/17/12
- */
-
+  * @author Ksenia.Sautina
+  * @since 7/17/12
+  */
 class ScalaPropertiesReferenceProvider extends PsiReferenceProvider {
   override def acceptsTarget(target: PsiElement): Boolean = {
     target.isInstanceOf[IProperty]
   }
 
-  def getReferencesByElement(element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
+  def getReferencesByElement(
+      element: PsiElement, context: ProcessingContext): Array[PsiReference] = {
     object PossibleKey {
       def unapply(lit: ScLiteral): Option[String] = {
-        if (!lit.isString || lit.isMultiLineString || lit.isInstanceOf[ScInterpolatedStringLiteral])
-          return None
+        if (!lit.isString || lit.isMultiLineString ||
+            lit.isInstanceOf[ScInterpolatedStringLiteral]) return None
 
         lit.getValue match {
           case str: String if !str.contains(" ") => Some(str)

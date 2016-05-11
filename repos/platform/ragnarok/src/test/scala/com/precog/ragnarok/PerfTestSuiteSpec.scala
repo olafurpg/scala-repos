@@ -25,15 +25,14 @@ import scalaz._
 import scalaz.syntax.equal._
 import scalaz.std.anyVal._
 
-
 class PerfTestSuiteSpec extends Specification {
   implicit def perfTestEq = Equal.equalA[PerfTest]
 
-  implicit def treeEq[A: Equal] = new Equal[Tree[A]] {
+  implicit def treeEq[A : Equal] = new Equal[Tree[A]] {
     def equal(a: Tree[A], b: Tree[A]): Boolean =
       Equal[A].equal(a.rootLabel, b.rootLabel) &&
-        a.subForest.size == b.subForest.size &&
-        ((a.subForest zip b.subForest) forall (equal _).tupled)
+      a.subForest.size == b.subForest.size &&
+      ((a.subForest zip b.subForest) forall (equal _).tupled)
   }
 
   object ex extends PerfTestSuite {
@@ -46,20 +45,29 @@ class PerfTestSuiteSpec extends Specification {
     }
   }
 
-  val exInnerTest = Tree.node(RunSequential, Stream(
-      Tree.node(Group("a"), Stream(
-        Tree.node(RunSequential, Stream(
-          Tree.node(Group("b"), Stream(
-            Tree.node(RunConcurrent, Stream(
-              Tree.leaf[PerfTest](RunQuery("1")),
-              Tree.leaf[PerfTest](RunQuery("2"))
-            ))
-          )),
-          Tree.leaf[PerfTest](RunQuery("3"))
-        ))
+  val exInnerTest = Tree.node(
+      RunSequential,
+      Stream(
+          Tree.node(
+              Group("a"),
+              Stream(
+                  Tree.node(
+                      RunSequential,
+                      Stream(
+                          Tree.node(Group("b"),
+                                    Stream(
+                                        Tree.node(RunConcurrent,
+                                                  Stream(
+                                                      Tree.leaf[PerfTest](
+                                                          RunQuery("1")),
+                                                      Tree.leaf[PerfTest](
+                                                          RunQuery("2"))
+                                                  ))
+                                    )),
+                          Tree.leaf[PerfTest](RunQuery("3"))
+                      ))
+              ))
       ))
-    ))
-
 
   "the DSL" should {
     "create an initial group based on the class" in {
@@ -75,7 +83,7 @@ class PerfTestSuiteSpec extends Specification {
     }
 
     "faithfully reprsent the test suite" in {
-      ex.test.subForest must have size(1)
+      ex.test.subForest must have size (1)
 
       treeEq[PerfTest].equal(ex.test.subForest.head, exInnerTest) must beTrue
     }
@@ -86,7 +94,8 @@ class PerfTestSuiteSpec extends Specification {
       }
 
       ex2.test must beLike {
-        case Tree.Node(Group(_), Stream(Tree.Node(RunSequential, Stream(inner)))) =>
+        case Tree.Node(Group(_),
+                       Stream(Tree.Node(RunSequential, Stream(inner)))) =>
           treeEq[PerfTest].equal(ex.test, inner) must beTrue
       }
     }
@@ -102,20 +111,20 @@ class PerfTestSuiteSpec extends Specification {
     }
 
     "selecting multiple disjoint tests gives list" in {
-      val ts = ex select {
-        case (_, _: RunQuery) => true
-        case (_, _) => false
-      }
+      val ts =
+        ex select {
+          case (_, _: RunQuery) => true
+          case (_, _) => false
+        }
 
       ts must beLike {
         case Some(Tree.Node(Group(_), ts)) =>
           ts must haveTheSameElementsAs(List(
-            Tree.leaf[PerfTest](RunQuery("1")),
-            Tree.leaf[PerfTest](RunQuery("2")),
-            Tree.leaf[PerfTest](RunQuery("3"))
-          )) ^^ (treeEq[PerfTest].equal(_, _))
+                  Tree.leaf[PerfTest](RunQuery("1")),
+                  Tree.leaf[PerfTest](RunQuery("2")),
+                  Tree.leaf[PerfTest](RunQuery("3"))
+              )) ^^ (treeEq[PerfTest].equal(_, _))
       }
     }
   }
 }
-

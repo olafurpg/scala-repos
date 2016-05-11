@@ -1,10 +1,10 @@
 trait C {}
 
 class O[X]() {
-    trait I[Y] {
-        def foo(y: Y): Y = y;
-    }
-    val j:I[X] = null;
+  trait I[Y] {
+    def foo(y: Y): Y = y;
+  }
+  val j: I[X] = null;
 }
 
 object o extends O[C]() {
@@ -13,4 +13,3 @@ object o extends O[C]() {
     o.j.foo(c);
   }
 }
-

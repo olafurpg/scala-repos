@@ -10,11 +10,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.base._
 import org.jetbrains.plugins.scala.lang.structureView.itemsPresentations.impl._
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 16.05.2008
-*/
-
-class ScalaPrimaryConstructorStructureViewElement(private val element: ScPrimaryConstructor) extends ScalaStructureViewElement(element, false) {
+  * @author Alexander Podkhalyuzin
+  * Date: 16.05.2008
+  */
+class ScalaPrimaryConstructorStructureViewElement(
+    private val element: ScPrimaryConstructor)
+    extends ScalaStructureViewElement(element, false) {
 
   def getPresentation: ItemPresentation = {
     new ScalaPrimaryConstructorItemPresentation(element);

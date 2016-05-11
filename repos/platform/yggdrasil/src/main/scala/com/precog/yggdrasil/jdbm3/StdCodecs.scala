@@ -25,10 +25,9 @@ import com.precog.util._
 
 import org.joda.time.{DateTime, Period}
 
-
 /**
- * Defines a base set of codecs that are often used in `RowFormat`s.
- */
+  * Defines a base set of codecs that are often used in `RowFormat`s.
+  */
 trait StdCodecs {
   implicit def LongCodec: Codec[Long]
   implicit def DoubleCodec: Codec[Double]
@@ -39,30 +38,35 @@ trait StdCodecs {
   implicit def PeriodCodec: Codec[Period]
   implicit def BitSetCodec: Codec[BitSet]
   implicit def RawBitSetCodec: Codec[RawBitSet]
-  implicit def IndexedSeqCodec[A](implicit elemCodec: Codec[A]): Codec[IndexedSeq[A]]
-  implicit def ArrayCodec[A](implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]]
+  implicit def IndexedSeqCodec[A](
+      implicit elemCodec: Codec[A]): Codec[IndexedSeq[A]]
+  implicit def ArrayCodec[A](
+      implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]]
 
   def codecForCType(cType: CType): Codec[_] = cType match {
     case cType: CValueType[_] => codecForCValueType(cType)
     case _: CNullType => Codec.ConstCodec(true)
   }
 
-  def codecForCValueType[A](cType: CValueType[A]): Codec[A] = try { cType match {
-    case CBoolean => BooleanCodec
-    case CString => StringCodec
-    case CLong => LongCodec
-    case CDouble => DoubleCodec
-    case CNum => BigDecimalCodec
-    case CDate => DateTimeCodec
-    case CPeriod => PeriodCodec
-    case CArrayType(elemType) => ArrayCodec(codecForCValueType(elemType), elemType.manifest)
-  } } catch {
-    case ex: Throwable =>
-      println(cType)
-      throw ex
+  def codecForCValueType[A](cType: CValueType[A]): Codec[A] =
+    try {
+      cType match {
+        case CBoolean => BooleanCodec
+        case CString => StringCodec
+        case CLong => LongCodec
+        case CDouble => DoubleCodec
+        case CNum => BigDecimalCodec
+        case CDate => DateTimeCodec
+        case CPeriod => PeriodCodec
+        case CArrayType(elemType) =>
+          ArrayCodec(codecForCValueType(elemType), elemType.manifest)
+      }
+    } catch {
+      case ex: Throwable =>
+        println(cType)
+        throw ex
     }
 }
-
 
 trait RowFormatCodecs extends StdCodecs { self: RowFormat =>
   implicit def LongCodec: Codec[Long] = Codec.PackedLongCodec
@@ -74,10 +78,14 @@ trait RowFormatCodecs extends StdCodecs { self: RowFormat =>
   implicit def PeriodCodec: Codec[Period] = Codec.PeriodCodec
   // implicit def BitSetCodec: Codec[BitSet] = Codec.BitSetCodec
   //@transient implicit lazy val BitSetCodec: Codec[BitSet] = Codec.SparseBitSetCodec(columnRefs.size)
-  @transient implicit lazy val BitSetCodec: Codec[BitSet] = Codec.SparseBitSetCodec(columnRefs.size)
-  @transient implicit lazy val RawBitSetCodec: Codec[RawBitSet] = Codec.SparseRawBitSetCodec(columnRefs.size)
-  implicit def IndexedSeqCodec[A](implicit elemCodec: Codec[A]): Codec[IndexedSeq[A]] = Codec.IndexedSeqCodec(elemCodec)
-  implicit def ArrayCodec[A](implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]] = Codec.ArrayCodec(elemCodec)(m)
+  @transient implicit lazy val BitSetCodec: Codec[BitSet] =
+    Codec.SparseBitSetCodec(columnRefs.size)
+  @transient implicit lazy val RawBitSetCodec: Codec[RawBitSet] =
+    Codec.SparseRawBitSetCodec(columnRefs.size)
+  implicit def IndexedSeqCodec[A](
+      implicit elemCodec: Codec[A]): Codec[IndexedSeq[A]] =
+    Codec.IndexedSeqCodec(elemCodec)
+  implicit def ArrayCodec[A](
+      implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]] =
+    Codec.ArrayCodec(elemCodec)(m)
 }
-
-

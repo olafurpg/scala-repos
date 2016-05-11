@@ -7,6 +7,7 @@ import spire.syntax.order._
 
 object intervalGeometricPartialOrder {
   import spire.math.interval._
+
   /** Interval partial order defined as follows:
     *
     * Involving empty intervals:
@@ -21,14 +22,14 @@ object intervalGeometricPartialOrder {
     * - I < J if all x \in I, y \in J have x < y
     * - I > J if all x \in I, y \in J have x > y
     */
-  class IntervalGeometricPartialOrder[A: Order] extends PartialOrder[Interval[A]] {
+  class IntervalGeometricPartialOrder[A : Order]
+      extends PartialOrder[Interval[A]] {
     override def eqv(x: Interval[A], y: Interval[A]): Boolean = (x == y)
 
     def partialCompare(i: Interval[A], j: Interval[A]): Double = {
       import Double.NaN
       if (eqv(i, j)) return 0.0
-      if (i.isEmpty || j.isEmpty)
-        return NaN
+      if (i.isEmpty || j.isEmpty) return NaN
 
       // test if i < j
       (i.upperBound, j.lowerBound) match {
@@ -39,7 +40,7 @@ object intervalGeometricPartialOrder {
         case _ =>
       }
       // test if i > j
-        (i.lowerBound, j.upperBound) match {
+      (i.lowerBound, j.upperBound) match {
         case (Open(x), Open(y)) if x >= y => return 1.0
         case (Open(x), Closed(y)) if x >= y => return 1.0
         case (Closed(x), Open(y)) if x >= y => return 1.0
@@ -50,5 +51,6 @@ object intervalGeometricPartialOrder {
     }
   }
 
-  implicit def intervalGeometricPartialOrder[A: Order]: PartialOrder[Interval[A]] = new IntervalGeometricPartialOrder[A]
+  implicit def intervalGeometricPartialOrder[A : Order]: PartialOrder[Interval[
+          A]] = new IntervalGeometricPartialOrder[A]
 }

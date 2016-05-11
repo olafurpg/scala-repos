@@ -10,17 +10,18 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
 import org.jetbrains.plugins.scala.overrideImplement.ScalaOIUtil
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 22.09.2008
- */
-
-class ImplementMethodsQuickFix(clazz: ScTemplateDefinition) extends IntentionAction {
+  * User: Alexander Podkhalyuzin
+  * Date: 22.09.2008
+  */
+class ImplementMethodsQuickFix(clazz: ScTemplateDefinition)
+    extends IntentionAction {
   def getText: String = ScalaBundle.message("implement.methods.fix")
   def startInWriteAction: Boolean = false
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     clazz.isValid && clazz.getManager.isInProject(file) && file.isWritable
   def invoke(project: Project, editor: Editor, file: PsiFile) {
-    ScalaOIUtil.invokeOverrideImplement(project, editor, file, isImplement = true)
+    ScalaOIUtil.invokeOverrideImplement(
+        project, editor, file, isImplement = true)
   }
   def getFamilyName: String = ScalaBundle.message("implement.methods.fix")
 }

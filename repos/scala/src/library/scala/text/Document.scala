@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala.text
@@ -24,12 +24,12 @@ case class DocNest(indent: Int, doc: Document) extends Document
 case class DocCons(hd: Document, tl: Document) extends Document
 
 /**
- * A basic pretty-printing library, based on Lindig's strict version
- * of Wadler's adaptation of Hughes' pretty-printer.
- *
- * @author Michel Schinz
- * @version 1.0
- */
+  * A basic pretty-printing library, based on Lindig's strict version
+  * of Wadler's adaptation of Hughes' pretty-printer.
+  *
+  * @author Michel Schinz
+  * @version 1.0
+  */
 @deprecated("This class will be removed.", "2.11.0")
 abstract class Document {
   def ::(hd: Document): Document = DocCons(hd, this)
@@ -38,9 +38,9 @@ abstract class Document {
   def :/:(hd: String): Document = hd :: DocBreak :: this
 
   /**
-   * Format this document on `writer` and try to set line
-   * breaks so that the result fits in `width` columns.
-   */
+    * Format this document on `writer` and try to set line
+    * breaks so that the result fits in `width` columns.
+    */
   def format(width: Int, writer: Writer) {
     type FmtState = (Int, Boolean, Document)
 
@@ -52,7 +52,7 @@ abstract class Document {
       case (_, _, DocNil) :: z =>
         fits(w, z)
       case (i, b, DocCons(h, t)) :: z =>
-        fits(w, (i,b,h) :: (i,b,t) :: z)
+        fits(w, (i, b, h) :: (i, b, t) :: z)
       case (_, _, DocText(t)) :: z =>
         fits(w - t.length(), z)
       case (i, b, DocNest(ii, d)) :: z =>
@@ -68,10 +68,10 @@ abstract class Document {
     def spaces(n: Int) {
       var rem = n
       while (rem >= 16) { writer write "                "; rem -= 16 }
-      if (rem >= 8)     { writer write "        "; rem -= 8 }
-      if (rem >= 4)     { writer write "    "; rem -= 4 }
-      if (rem >= 2)     { writer write "  "; rem -= 2}
-      if (rem == 1)     { writer write " " }
+      if (rem >= 8) { writer write "        "; rem -= 8 }
+      if (rem >= 4) { writer write "    "; rem -= 4 }
+      if (rem >= 2) { writer write "  "; rem -= 2 }
+      if (rem == 1) { writer write " " }
     }
 
     def fmt(k: Int, state: List[FmtState]): Unit = state match {
@@ -105,6 +105,7 @@ abstract class Document {
 
 @deprecated("This object will be removed.", "2.11.0")
 object Document {
+
   /** The empty document */
   def empty = DocNil
 
@@ -115,9 +116,9 @@ object Document {
   def text(s: String): Document = DocText(s)
 
   /**
-   * A group, whose components will either be printed with all breaks
-   * rendered as spaces, or with all breaks rendered as line breaks.
-   */
+    * A group, whose components will either be printed with all breaks
+    * rendered as spaces, or with all breaks rendered as line breaks.
+    */
   def group(d: Document): Document = DocGroup(d)
 
   /** A nested document, which will be indented as specified. */

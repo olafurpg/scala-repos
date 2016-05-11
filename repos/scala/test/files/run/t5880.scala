@@ -1,14 +1,11 @@
-
-
 import scala.collection.JavaConversions._
-
-
 
 object Test {
 
-  def main(args:Array[String]) = {
+  def main(args: Array[String]) = {
     val tests = 5000
-    val jm: java.util.Map[Int, Int] = scala.collection.mutable.Map((0 until tests) zip (0 until tests).reverse: _*)
+    val jm: java.util.Map[Int, Int] = scala.collection.mutable
+      .Map((0 until tests) zip (0 until tests).reverse: _*)
     val es = jm.entrySet()
     val it = es.iterator
 
@@ -25,7 +22,8 @@ object Test {
       diffs.sum.toDouble / expected
     }
     def ChiSquare = {
-      val diffs = for (i <- 0 until groups) yield (hits(i) - expected) * (hits(i) - expected)
+      val diffs = for (i <- 0 until groups) yield (hits(i) - expected) *
+      (hits(i) - expected)
       diffs.sum.toDouble / expected
     }
 
@@ -37,5 +35,4 @@ object Test {
     // println(ChiSquare)
     assert(ChiSquare < 4.0, ChiSquare + " -> " + hits.mkString(", "))
   }
-
 }

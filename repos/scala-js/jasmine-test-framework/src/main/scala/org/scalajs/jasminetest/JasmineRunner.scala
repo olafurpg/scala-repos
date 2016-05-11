@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Framework    **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Framework    **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.jasminetest
 
@@ -19,7 +18,8 @@ final class JasmineRunner(
     val args: Array[String],
     val remoteArgs: Array[String],
     private[jasminetest] val classLoader: ClassLoader
-) extends Runner {
+)
+    extends Runner {
 
   private[this] var isDone = false
 
@@ -29,8 +29,7 @@ final class JasmineRunner(
 
   def tasks(taskDefs: Array[TaskDef]): Array[Task] = {
     ensureNotDone()
-    for (taskDef <- taskDefs)
-      yield new JasmineTask(this, taskDef)
+    for (taskDef <- taskDefs) yield new JasmineTask(this, taskDef)
   }
 
   def done(): String = {
@@ -54,8 +53,7 @@ final class JasmineRunner(
   }
 
   private def ensureNotDone(): Unit = {
-    if (isDone)
-      throw new IllegalStateException("Runner is done")
+    if (isDone) throw new IllegalStateException("Runner is done")
   }
 }
 
@@ -72,22 +70,26 @@ object JasmineRunner {
      * `throwable.stack` to `throwable.stackdata.stack` (when it exists).
      */
 
-    val ThrowablePrototype = js.Object.getPrototypeOf(
-        (new Throwable).asInstanceOf[js.Object]).asInstanceOf[js.Object]
+    val ThrowablePrototype = js.Object
+      .getPrototypeOf((new Throwable).asInstanceOf[js.Object])
+      .asInstanceOf[js.Object]
 
-    js.Object.defineProperty(ThrowablePrototype, "stack", js.Dynamic.literal(
-        configurable = false,
-        enumerable = false,
-        get = { (self: js.Dynamic) =>
-          self.stackdata && self.stackdata.stack
-        }: js.ThisFunction
-    ).asInstanceOf[js.PropertyDescriptor])
+    js.Object.defineProperty(ThrowablePrototype,
+                             "stack",
+                             js.Dynamic
+                               .literal(
+                                   configurable = false,
+                                   enumerable = false,
+                                   get = { (self: js.Dynamic) =>
+                                     self.stackdata && self.stackdata.stack
+                                   }: js.ThisFunction
+                               )
+                               .asInstanceOf[js.PropertyDescriptor])
   }
 
   private def handleArgs(args: Array[String]): Unit = {
     val tags = for (arg <- args) yield {
-      if (arg.startsWith("-t"))
-        arg.stripPrefix("-t")
+      if (arg.startsWith("-t")) arg.stripPrefix("-t")
       else
         throw new IllegalArgumentException(
             s"Unknown argument for JasmineFramework: $arg")

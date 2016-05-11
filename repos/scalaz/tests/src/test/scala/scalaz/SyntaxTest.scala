@@ -5,7 +5,7 @@ object SyntaxTest extends SpecLite {
     import syntax.functor._
     import std.tuple._, std.anyVal._
 
-    ((1, 2) ∘ (1 +) ∘ (1 +)) must_===((1, 4))
+    ((1, 2) ∘ (1 +) ∘ (1 +)) must_=== ((1, 4))
   }
 
   "functor syntax missing imports 1" in {

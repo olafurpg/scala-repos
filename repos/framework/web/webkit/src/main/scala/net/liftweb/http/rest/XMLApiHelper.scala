@@ -26,16 +26,16 @@ import Helpers._
 import scala.xml.{NodeSeq, Text, Elem, UnprefixedAttribute, Null, Node}
 
 /**
- * Mix this trait into your REST service provider to convert between different
- * response types and a LiftResponse. You need to define the createTag method
- * to provide a root element for your API. You may optionally override the
- * successAttrName, operationAttrName, and/or msgAttrName defs to control the
- * attributes that will be applied to your root element based on the
- * return from your API.
- *
- * For example, the following code implements a simple API that takes a comma-
- * separated string of integers and reduces them with various operations.
- *
+  * Mix this trait into your REST service provider to convert between different
+  * response types and a LiftResponse. You need to define the createTag method
+  * to provide a root element for your API. You may optionally override the
+  * successAttrName, operationAttrName, and/or msgAttrName defs to control the
+  * attributes that will be applied to your root element based on the
+  * return from your API.
+  *
+  * For example, the following code implements a simple API that takes a comma-
+  * separated string of integers and reduces them with various operations.
+  *
 <pre name="code" class="scala">
 object CalculatorApi extends XmlApiHelper {
   // Define our root tag
@@ -77,22 +77,23 @@ object CalculatorApi extends XmlApiHelper {
 &lt;api operation="sum" success="true">&lt;result>15&lt;/result>&lt;/api>
 </pre>
   * 
- */
+  */
 trait XMLApiHelper {
+
   /**
-   * Converts a boolean into a response of a root element with
-   * no contents and the "success" attribute set to the value of
-   * the "in" parameter.
-   */
+    * Converts a boolean into a response of a root element with
+    * no contents and the "success" attribute set to the value of
+    * the "in" parameter.
+    */
   implicit def boolToResponse(in: Boolean): LiftResponse =
     buildResponse(in, Empty, <xml:group/>)
 
   /**
-   * Converts a boxed boolean into a response of a root element with
-   * no contents and the "success" attribute set to the value of
-   * the "in" parameter. If the Box is a Failure, the "msg" attribute
-   * of the root element will be set to the Failure's msg value.
-   */
+    * Converts a boxed boolean into a response of a root element with
+    * no contents and the "success" attribute set to the value of
+    * the "in" parameter. If the Box is a Failure, the "msg" attribute
+    * of the root element will be set to the Failure's msg value.
+    */
   implicit def canBoolToResponse(in: Box[Boolean]): LiftResponse =
     buildResponse(in openOr false, in match {
       case Failure(msg, _, _) => Full(Text(msg))
@@ -100,14 +101,14 @@ trait XMLApiHelper {
     }, <xml:group/>)
 
   /**
-   * Converts a boxed Seq[Node] into a response. If the Box is a Full,
-   * the root element uses the contents of the Box as its contents, and
-   * sets the "success" attribute to "true". If the Box is a Failure,
-   * the "success" attribute is set to "false" and the "msg" attribute
-   * is set to the Failure's msg value. If the Box is Empty then the root
-   * element is returned with no contents and the "success" attribute set to
-   * "false".
-   */
+    * Converts a boxed Seq[Node] into a response. If the Box is a Full,
+    * the root element uses the contents of the Box as its contents, and
+    * sets the "success" attribute to "true". If the Box is a Failure,
+    * the "success" attribute is set to "false" and the "msg" attribute
+    * is set to the Failure's msg value. If the Box is Empty then the root
+    * element is returned with no contents and the "success" attribute set to
+    * "false".
+    */
   implicit def canNodeToResponse(in: Box[Seq[Node]]): LiftResponse = in match {
     case Full(n) => buildResponse(true, Empty, n)
     case Failure(msg, _, _) => buildResponse(false, Full(Text(msg)), Text(""))
@@ -115,65 +116,66 @@ trait XMLApiHelper {
   }
 
   /**
-   * Converts a Seq[Node] into a root element with the "success" attribute
-   * set to "true" and the Seq[Node] as the contents.
-   */
+    * Converts a Seq[Node] into a root element with the "success" attribute
+    * set to "true" and the Seq[Node] as the contents.
+    */
   implicit def listElemToResponse(in: Seq[Node]): LiftResponse =
     buildResponse(true, Empty, in)
 
   /**
-   * Converts a pair of (Boolean,String) into a response of a root
-   * element with no contents, the "success" attribute set to
-   * the value of the first element of the pair, and the "msg"
-   * attribute set to the value of the second element of the pair.
-   */
+    * Converts a pair of (Boolean,String) into a response of a root
+    * element with no contents, the "success" attribute set to
+    * the value of the first element of the pair, and the "msg"
+    * attribute set to the value of the second element of the pair.
+    */
   implicit def pairToResponse(in: (Boolean, String)): LiftResponse =
     buildResponse(in._1, Full(Text(in._2)), <xml:group/>)
 
   /**
-   * Converts a given LiftResponse into a Full[LiftResponse]
-   */
+    * Converts a given LiftResponse into a Full[LiftResponse]
+    */
   implicit def putResponseInBox(in: LiftResponse): Box[LiftResponse] = Full(in)
 
   /**
-   * Determines the value to place in the "operation" attribute of
-   * the root element based on the second element of the request path.
-   */
+    * Determines the value to place in the "operation" attribute of
+    * the root element based on the second element of the request path.
+    */
   protected def operation: Option[NodeSeq] =
-    (for (req <- S.request) yield req.path.partPath match {
-      case _ :: name :: _ => name
-      case _ => ""
-    }).map(Text(_))
+    (for (req <- S.request) yield
+      req.path.partPath match {
+        case _ :: name :: _ => name
+        case _ => ""
+      }).map(Text(_))
 
   /**
-   * The method that wraps the outer-most tag around the body. The success,
-   * operation and msg attributes will be merged into the returned Elem.
-   */
+    * The method that wraps the outer-most tag around the body. The success,
+    * operation and msg attributes will be merged into the returned Elem.
+    */
   def createTag(in: NodeSeq): Elem
 
   /**
-   * The name for the success attribute
-   */
+    * The name for the success attribute
+    */
   def successAttrName = "success"
 
   /**
-   * The name for the operation attribue
-   */
+    * The name for the operation attribue
+    */
   def operationAttrName = "operation"
 
   /**
-   * The name for the msg attribute
-   */
+    * The name for the msg attribute
+    */
   def msgAttrName = "msg"
 
   /**
-   * Build the Response based on Success, an optional message
-   * and the body
-   */
-  protected def buildResponse(success: Boolean, msg: Box[NodeSeq],
-                              body: NodeSeq): LiftResponse =
-    XmlResponse(createTag(body) % (successAttrName -> success) %
-            (new UnprefixedAttribute(operationAttrName, operation, Null)) %
-            (new UnprefixedAttribute(msgAttrName, msg, Null)))
+    * Build the Response based on Success, an optional message
+    * and the body
+    */
+  protected def buildResponse(
+      success: Boolean, msg: Box[NodeSeq], body: NodeSeq): LiftResponse =
+    XmlResponse(
+        createTag(body) % (successAttrName -> success) %
+        (new UnprefixedAttribute(operationAttrName, operation, Null)) %
+        (new UnprefixedAttribute(msgAttrName, msg, Null)))
 }
-

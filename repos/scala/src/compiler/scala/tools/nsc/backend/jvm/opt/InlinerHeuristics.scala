@@ -21,82 +21,133 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
 
   case class InlineRequest(callsite: Callsite, post: List[InlineRequest]) {
     // invariant: all post inline requests denote callsites in the callee of the main callsite
-    for (pr <- post) assert(pr.callsite.callsiteMethod == callsite.callee.get.callee, s"Callsite method mismatch: main $callsite - post ${pr.callsite}")
+    for (pr <- post) assert(
+        pr.callsite.callsiteMethod == callsite.callee.get.callee,
+        s"Callsite method mismatch: main $callsite - post ${pr.callsite}")
   }
 
   /**
-   * Select callsites from the call graph that should be inlined, grouped by the containing method.
-   * Cyclic inlining requests are allowed, the inliner will eliminate requests to break cycles.
-   */
+    * Select callsites from the call graph that should be inlined, grouped by the containing method.
+    * Cyclic inlining requests are allowed, the inliner will eliminate requests to break cycles.
+    */
   def selectCallsitesForInlining: Map[MethodNode, Set[InlineRequest]] = {
     // We should only create inlining requests for callsites being compiled (not for callsites in
     // classes on the classpath). The call graph may contain callsites of classes parsed from the
     // classpath. In order to get only the callsites being compiled, we start at the map of
     // compilingClasses in the byteCodeRepository.
     val compilingMethods = for {
-      classNode  <- byteCodeRepository.compilingClasses.valuesIterator
+      classNode <- byteCodeRepository.compilingClasses.valuesIterator
       methodNode <- classNode.methods.iterator.asScala
     } yield methodNode
 
-    compilingMethods.map(methodNode => {
-      var requests = Set.empty[InlineRequest]
-      callGraph.callsites(methodNode).valuesIterator foreach {
-        case callsite @ Callsite(_, _, _, Right(Callee(callee, calleeDeclClass, safeToInline, _, canInlineFromSource, calleeAnnotatedInline, _, _, callsiteWarning)), _, _, _, pos, _, _) =>
-          inlineRequest(callsite) match {
-            case Some(Right(req)) => requests += req
-            case Some(Left(w))    =>
-              if ((calleeAnnotatedInline && bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) || w.emitWarning(compilerSettings)) {
-                val annotWarn = if (calleeAnnotatedInline) " is annotated @inline but" else ""
-                val msg = s"${BackendReporting.methodSignature(calleeDeclClass.internalName, callee)}$annotWarn could not be inlined:\n$w"
-                backendReporting.inlinerWarning(callsite.callsitePosition, msg)
+    compilingMethods
+      .map(methodNode =>
+            {
+          var requests = Set.empty[InlineRequest]
+          callGraph.callsites(methodNode).valuesIterator foreach {
+            case callsite @ Callsite(_,
+                                     _,
+                                     _,
+                                     Right(Callee(callee,
+                                                  calleeDeclClass,
+                                                  safeToInline,
+                                                  _,
+                                                  canInlineFromSource,
+                                                  calleeAnnotatedInline,
+                                                  _,
+                                                  _,
+                                                  callsiteWarning)),
+                                     _,
+                                     _,
+                                     _,
+                                     pos,
+                                     _,
+                                     _) =>
+              inlineRequest(callsite) match {
+                case Some(Right(req)) => requests += req
+                case Some(Left(w)) =>
+                  if ((calleeAnnotatedInline &&
+                          bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
+                      w.emitWarning(compilerSettings)) {
+                    val annotWarn =
+                      if (calleeAnnotatedInline) " is annotated @inline but"
+                      else ""
+                    val msg = s"${BackendReporting.methodSignature(
+                        calleeDeclClass.internalName, callee)}$annotWarn could not be inlined:\n$w"
+                    backendReporting.inlinerWarning(callsite.callsitePosition,
+                                                    msg)
+                  }
+
+                case None =>
+                  if (canInlineFromSource && calleeAnnotatedInline &&
+                      !callsite.annotatedNoInline &&
+                      bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) {
+                    // if the callsite is annotated @inline, we report an inline warning even if the underlying
+                    // reason is, for example, mixed compilation (which has a separate -Yopt-warning flag).
+                    def initMsg =
+                      s"${BackendReporting.methodSignature(calleeDeclClass.internalName, callee)} is annotated @inline but cannot be inlined"
+                    def warnMsg =
+                      callsiteWarning
+                        .map(" Possible reason:\n" + _)
+                        .getOrElse("")
+                    if (doRewriteTraitCallsite(callsite))
+                      backendReporting.inlinerWarning(
+                          pos,
+                          s"$initMsg: the trait method call could not be rewritten to the static implementation method." +
+                          warnMsg)
+                    else if (!safeToInline)
+                      backendReporting.inlinerWarning(
+                          pos,
+                          s"$initMsg: the method is not final and may be overridden." +
+                          warnMsg)
+                    else
+                      backendReporting.inlinerWarning(pos,
+                                                      s"$initMsg." + warnMsg)
+                  } else if (callsiteWarning.isDefined && callsiteWarning.get
+                               .emitWarning(compilerSettings)) {
+                    // when annotatedInline is false, and there is some warning, the callsite metadata is possibly incomplete.
+                    backendReporting.inlinerWarning(
+                        pos,
+                        s"there was a problem determining if method ${callee.name} can be inlined: \n" +
+                        callsiteWarning.get)
+                  }
               }
 
-            case None =>
-              if (canInlineFromSource && calleeAnnotatedInline && !callsite.annotatedNoInline && bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) {
-                // if the callsite is annotated @inline, we report an inline warning even if the underlying
-                // reason is, for example, mixed compilation (which has a separate -Yopt-warning flag).
-                def initMsg = s"${BackendReporting.methodSignature(calleeDeclClass.internalName, callee)} is annotated @inline but cannot be inlined"
-                def warnMsg = callsiteWarning.map(" Possible reason:\n" + _).getOrElse("")
-                if (doRewriteTraitCallsite(callsite))
-                  backendReporting.inlinerWarning(pos, s"$initMsg: the trait method call could not be rewritten to the static implementation method." + warnMsg)
-                else if (!safeToInline)
-                  backendReporting.inlinerWarning(pos, s"$initMsg: the method is not final and may be overridden." + warnMsg)
-                else
-                  backendReporting.inlinerWarning(pos, s"$initMsg." + warnMsg)
-              } else if (callsiteWarning.isDefined && callsiteWarning.get.emitWarning(compilerSettings)) {
-                // when annotatedInline is false, and there is some warning, the callsite metadata is possibly incomplete.
-                backendReporting.inlinerWarning(pos, s"there was a problem determining if method ${callee.name} can be inlined: \n"+ callsiteWarning.get)
-              }
+            case Callsite(ins, _, _, Left(warning), _, _, _, pos, _, _) =>
+              if (warning.emitWarning(compilerSettings))
+                backendReporting.inlinerWarning(
+                    pos,
+                    s"failed to determine if ${ins.name} should be inlined:\n$warning")
           }
-
-        case Callsite(ins, _, _, Left(warning), _, _, _, pos, _, _) =>
-          if (warning.emitWarning(compilerSettings))
-            backendReporting.inlinerWarning(pos, s"failed to determine if ${ins.name} should be inlined:\n$warning")
-      }
-      (methodNode, requests)
-    }).filterNot(_._2.isEmpty).toMap
+          (methodNode, requests)
+      })
+      .filterNot(_._2.isEmpty)
+      .toMap
   }
 
   /**
-   * Returns the inline request for a callsite if the callsite should be inlined according to the
-   * current heuristics (`-Yopt-inline-heuristics`).
-   *
-   * The resulting inline request may contain post-inlining requests of callsites that in turn are
-   * also selected as individual inlining requests.
-   *
-   * @return `None` if this callsite should not be inlined according to the active heuristic
-   *         `Some(Left)` if the callsite cannot be inlined (for example because that would cause
-   *           an IllegalAccessError) but should be according to the heuristic
-   *           TODO: what if a downstream inline request would cause an IAE and we don't create an
-   *           InlineRequest for the original callsite? new subclass of OptimizerWarning.
-   *         `Some(Right)` if the callsite should be and can be inlined
-   */
-  def inlineRequest(callsite: Callsite): Option[Either[OptimizerWarning, InlineRequest]] = {
+    * Returns the inline request for a callsite if the callsite should be inlined according to the
+    * current heuristics (`-Yopt-inline-heuristics`).
+    *
+    * The resulting inline request may contain post-inlining requests of callsites that in turn are
+    * also selected as individual inlining requests.
+    *
+    * @return `None` if this callsite should not be inlined according to the active heuristic
+    *         `Some(Left)` if the callsite cannot be inlined (for example because that would cause
+    *           an IllegalAccessError) but should be according to the heuristic
+    *           TODO: what if a downstream inline request would cause an IAE and we don't create an
+    *           InlineRequest for the original callsite? new subclass of OptimizerWarning.
+    *         `Some(Right)` if the callsite should be and can be inlined
+    */
+  def inlineRequest(
+      callsite: Callsite): Option[Either[OptimizerWarning, InlineRequest]] = {
     val callee = callsite.callee.get
-    def requestIfCanInline(callsite: Callsite): Either[OptimizerWarning, InlineRequest] = inliner.earlyCanInlineCheck(callsite) match {
-      case Some(w) => Left(w)
-      case None => Right(InlineRequest(callsite, Nil))
-    }
+    def requestIfCanInline(
+        callsite: Callsite): Either[OptimizerWarning, InlineRequest] =
+      inliner.earlyCanInlineCheck(callsite) match {
+        case Some(w) => Left(w)
+        case None => Right(InlineRequest(callsite, Nil))
+      }
 
     compilerSettings.YoptInlineHeuristics.value match {
       case "everything" =>
@@ -104,15 +155,20 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
         else None
 
       case "at-inline-annotated" =>
-        if (callee.safeToInline && callee.annotatedInline) Some(requestIfCanInline(callsite))
+        if (callee.safeToInline && callee.annotatedInline)
+          Some(requestIfCanInline(callsite))
         else None
 
       case "default" =>
-        if (callee.safeToInline && !callee.annotatedNoInline && !callsite.annotatedNoInline) {
-          def shouldInlineHO = callee.samParamTypes.nonEmpty && (callee.samParamTypes exists {
-            case (index, _) => callsite.argInfos.contains(index)
-          })
-          if (callee.annotatedInline || callsite.annotatedInline || shouldInlineHO) Some(requestIfCanInline(callsite))
+        if (callee.safeToInline && !callee.annotatedNoInline &&
+            !callsite.annotatedNoInline) {
+          def shouldInlineHO =
+            callee.samParamTypes.nonEmpty &&
+            (callee.samParamTypes exists {
+                  case (index, _) => callsite.argInfos.contains(index)
+                })
+          if (callee.annotatedInline || callsite.annotatedInline ||
+              shouldInlineHO) Some(requestIfCanInline(callsite))
           else None
         } else None
     }
@@ -177,76 +233,103 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
   println(classesAndSamNameDesc map {
     case (cls, nme, desc) => s"""("$cls", "$nme$desc")"""
   } mkString ("", ",\n", "\n"))
-  */
+   */
   private val javaSams: Map[String, String] = Map(
-    ("java/util/function/BiConsumer", "accept(Ljava/lang/Object;Ljava/lang/Object;)V"),
-    ("java/util/function/BiFunction", "apply(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-    ("java/util/function/BiPredicate", "test(Ljava/lang/Object;Ljava/lang/Object;)Z"),
-    ("java/util/function/BinaryOperator", "apply(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-    ("java/util/function/BooleanSupplier", "getAsBoolean()Z"),
-    ("java/util/function/Consumer", "accept(Ljava/lang/Object;)V"),
-    ("java/util/function/DoubleBinaryOperator", "applyAsDouble(DD)D"),
-    ("java/util/function/DoubleConsumer", "accept(D)V"),
-    ("java/util/function/DoubleFunction", "apply(D)Ljava/lang/Object;"),
-    ("java/util/function/DoublePredicate", "test(D)Z"),
-    ("java/util/function/DoubleSupplier", "getAsDouble()D"),
-    ("java/util/function/DoubleToIntFunction", "applyAsInt(D)I"),
-    ("java/util/function/DoubleToLongFunction", "applyAsLong(D)J"),
-    ("java/util/function/DoubleUnaryOperator", "applyAsDouble(D)D"),
-    ("java/util/function/Function", "apply(Ljava/lang/Object;)Ljava/lang/Object;"),
-    ("java/util/function/IntBinaryOperator", "applyAsInt(II)I"),
-    ("java/util/function/IntConsumer", "accept(I)V"),
-    ("java/util/function/IntFunction", "apply(I)Ljava/lang/Object;"),
-    ("java/util/function/IntPredicate", "test(I)Z"),
-    ("java/util/function/IntSupplier", "getAsInt()I"),
-    ("java/util/function/IntToDoubleFunction", "applyAsDouble(I)D"),
-    ("java/util/function/IntToLongFunction", "applyAsLong(I)J"),
-    ("java/util/function/IntUnaryOperator", "applyAsInt(I)I"),
-    ("java/util/function/LongBinaryOperator", "applyAsLong(JJ)J"),
-    ("java/util/function/LongConsumer", "accept(J)V"),
-    ("java/util/function/LongFunction", "apply(J)Ljava/lang/Object;"),
-    ("java/util/function/LongPredicate", "test(J)Z"),
-    ("java/util/function/LongSupplier", "getAsLong()J"),
-    ("java/util/function/LongToDoubleFunction", "applyAsDouble(J)D"),
-    ("java/util/function/LongToIntFunction", "applyAsInt(J)I"),
-    ("java/util/function/LongUnaryOperator", "applyAsLong(J)J"),
-    ("java/util/function/ObjDoubleConsumer", "accept(Ljava/lang/Object;D)V"),
-    ("java/util/function/ObjIntConsumer", "accept(Ljava/lang/Object;I)V"),
-    ("java/util/function/ObjLongConsumer", "accept(Ljava/lang/Object;J)V"),
-    ("java/util/function/Predicate", "test(Ljava/lang/Object;)Z"),
-    ("java/util/function/Supplier", "get()Ljava/lang/Object;"),
-    ("java/util/function/ToDoubleBiFunction", "applyAsDouble(Ljava/lang/Object;Ljava/lang/Object;)D"),
-    ("java/util/function/ToDoubleFunction", "applyAsDouble(Ljava/lang/Object;)D"),
-    ("java/util/function/ToIntBiFunction", "applyAsInt(Ljava/lang/Object;Ljava/lang/Object;)I"),
-    ("java/util/function/ToIntFunction", "applyAsInt(Ljava/lang/Object;)I"),
-    ("java/util/function/ToLongBiFunction", "applyAsLong(Ljava/lang/Object;Ljava/lang/Object;)J"),
-    ("java/util/function/ToLongFunction", "applyAsLong(Ljava/lang/Object;)J"),
-    ("java/util/function/UnaryOperator", "apply(Ljava/lang/Object;)Ljava/lang/Object;"),
-    ("com/sun/javafx/css/parser/Recognizer", "recognize(I)Z"),
-    ("java/awt/KeyEventDispatcher", "dispatchKeyEvent(Ljava/awt/event/KeyEvent;)Z"),
-    ("java/awt/KeyEventPostProcessor", "postProcessKeyEvent(Ljava/awt/event/KeyEvent;)Z"),
-    ("java/io/FileFilter", "accept(Ljava/io/File;)Z"),
-    ("java/io/FilenameFilter", "accept(Ljava/io/File;Ljava/lang/String;)Z"),
-    ("java/lang/Runnable", "run()V"),
-    ("java/lang/Thread$UncaughtExceptionHandler", "uncaughtException(Ljava/lang/Thread;Ljava/lang/Throwable;)V"),
-    ("java/nio/file/DirectoryStream$Filter", "accept(Ljava/lang/Object;)Z"),
-    ("java/nio/file/PathMatcher", "matches(Ljava/nio/file/Path;)Z"),
-    ("java/time/temporal/TemporalAdjuster", "adjustInto(Ljava/time/temporal/Temporal;)Ljava/time/temporal/Temporal;"),
-    ("java/time/temporal/TemporalQuery", "queryFrom(Ljava/time/temporal/TemporalAccessor;)Ljava/lang/Object;"),
-    ("java/util/Comparator", "compare(Ljava/lang/Object;Ljava/lang/Object;)I"),
-    ("java/util/concurrent/Callable", "call()Ljava/lang/Object;"),
-    ("java/util/logging/Filter", "isLoggable(Ljava/util/logging/LogRecord;)Z"),
-    ("java/util/prefs/PreferenceChangeListener", "preferenceChange(Ljava/util/prefs/PreferenceChangeEvent;)V"),
-    ("javafx/animation/Interpolatable", "interpolate(Ljava/lang/Object;D)Ljava/lang/Object;"),
-    ("javafx/beans/InvalidationListener", "invalidated(Ljavafx/beans/Observable;)V"),
-    ("javafx/beans/value/ChangeListener", "changed(Ljavafx/beans/value/ObservableValue;Ljava/lang/Object;Ljava/lang/Object;)V"),
-    ("javafx/collections/ListChangeListener", "onChanged(Ljavafx/collections/ListChangeListener$Change;)V"),
-    ("javafx/collections/MapChangeListener", "onChanged(Ljavafx/collections/MapChangeListener$Change;)V"),
-    ("javafx/collections/SetChangeListener", "onChanged(Ljavafx/collections/SetChangeListener$Change;)V"),
-    ("javafx/event/EventHandler", "handle(Ljavafx/event/Event;)V"),
-    ("javafx/util/Builder", "build()Ljava/lang/Object;"),
-    ("javafx/util/BuilderFactory", "getBuilder(Ljava/lang/Class;)Ljavafx/util/Builder;"),
-    ("javafx/util/Callback", "call(Ljava/lang/Object;)Ljava/lang/Object;")
+      ("java/util/function/BiConsumer",
+       "accept(Ljava/lang/Object;Ljava/lang/Object;)V"),
+      ("java/util/function/BiFunction",
+       "apply(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+      ("java/util/function/BiPredicate",
+       "test(Ljava/lang/Object;Ljava/lang/Object;)Z"),
+      ("java/util/function/BinaryOperator",
+       "apply(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+      ("java/util/function/BooleanSupplier", "getAsBoolean()Z"),
+      ("java/util/function/Consumer", "accept(Ljava/lang/Object;)V"),
+      ("java/util/function/DoubleBinaryOperator", "applyAsDouble(DD)D"),
+      ("java/util/function/DoubleConsumer", "accept(D)V"),
+      ("java/util/function/DoubleFunction", "apply(D)Ljava/lang/Object;"),
+      ("java/util/function/DoublePredicate", "test(D)Z"),
+      ("java/util/function/DoubleSupplier", "getAsDouble()D"),
+      ("java/util/function/DoubleToIntFunction", "applyAsInt(D)I"),
+      ("java/util/function/DoubleToLongFunction", "applyAsLong(D)J"),
+      ("java/util/function/DoubleUnaryOperator", "applyAsDouble(D)D"),
+      ("java/util/function/Function",
+       "apply(Ljava/lang/Object;)Ljava/lang/Object;"),
+      ("java/util/function/IntBinaryOperator", "applyAsInt(II)I"),
+      ("java/util/function/IntConsumer", "accept(I)V"),
+      ("java/util/function/IntFunction", "apply(I)Ljava/lang/Object;"),
+      ("java/util/function/IntPredicate", "test(I)Z"),
+      ("java/util/function/IntSupplier", "getAsInt()I"),
+      ("java/util/function/IntToDoubleFunction", "applyAsDouble(I)D"),
+      ("java/util/function/IntToLongFunction", "applyAsLong(I)J"),
+      ("java/util/function/IntUnaryOperator", "applyAsInt(I)I"),
+      ("java/util/function/LongBinaryOperator", "applyAsLong(JJ)J"),
+      ("java/util/function/LongConsumer", "accept(J)V"),
+      ("java/util/function/LongFunction", "apply(J)Ljava/lang/Object;"),
+      ("java/util/function/LongPredicate", "test(J)Z"),
+      ("java/util/function/LongSupplier", "getAsLong()J"),
+      ("java/util/function/LongToDoubleFunction", "applyAsDouble(J)D"),
+      ("java/util/function/LongToIntFunction", "applyAsInt(J)I"),
+      ("java/util/function/LongUnaryOperator", "applyAsLong(J)J"),
+      ("java/util/function/ObjDoubleConsumer", "accept(Ljava/lang/Object;D)V"),
+      ("java/util/function/ObjIntConsumer", "accept(Ljava/lang/Object;I)V"),
+      ("java/util/function/ObjLongConsumer", "accept(Ljava/lang/Object;J)V"),
+      ("java/util/function/Predicate", "test(Ljava/lang/Object;)Z"),
+      ("java/util/function/Supplier", "get()Ljava/lang/Object;"),
+      ("java/util/function/ToDoubleBiFunction",
+       "applyAsDouble(Ljava/lang/Object;Ljava/lang/Object;)D"),
+      ("java/util/function/ToDoubleFunction",
+       "applyAsDouble(Ljava/lang/Object;)D"),
+      ("java/util/function/ToIntBiFunction",
+       "applyAsInt(Ljava/lang/Object;Ljava/lang/Object;)I"),
+      ("java/util/function/ToIntFunction", "applyAsInt(Ljava/lang/Object;)I"),
+      ("java/util/function/ToLongBiFunction",
+       "applyAsLong(Ljava/lang/Object;Ljava/lang/Object;)J"),
+      ("java/util/function/ToLongFunction",
+       "applyAsLong(Ljava/lang/Object;)J"),
+      ("java/util/function/UnaryOperator",
+       "apply(Ljava/lang/Object;)Ljava/lang/Object;"),
+      ("com/sun/javafx/css/parser/Recognizer", "recognize(I)Z"),
+      ("java/awt/KeyEventDispatcher",
+       "dispatchKeyEvent(Ljava/awt/event/KeyEvent;)Z"),
+      ("java/awt/KeyEventPostProcessor",
+       "postProcessKeyEvent(Ljava/awt/event/KeyEvent;)Z"),
+      ("java/io/FileFilter", "accept(Ljava/io/File;)Z"),
+      ("java/io/FilenameFilter", "accept(Ljava/io/File;Ljava/lang/String;)Z"),
+      ("java/lang/Runnable", "run()V"),
+      ("java/lang/Thread$UncaughtExceptionHandler",
+       "uncaughtException(Ljava/lang/Thread;Ljava/lang/Throwable;)V"),
+      ("java/nio/file/DirectoryStream$Filter", "accept(Ljava/lang/Object;)Z"),
+      ("java/nio/file/PathMatcher", "matches(Ljava/nio/file/Path;)Z"),
+      ("java/time/temporal/TemporalAdjuster",
+       "adjustInto(Ljava/time/temporal/Temporal;)Ljava/time/temporal/Temporal;"),
+      ("java/time/temporal/TemporalQuery",
+       "queryFrom(Ljava/time/temporal/TemporalAccessor;)Ljava/lang/Object;"),
+      ("java/util/Comparator",
+       "compare(Ljava/lang/Object;Ljava/lang/Object;)I"),
+      ("java/util/concurrent/Callable", "call()Ljava/lang/Object;"),
+      ("java/util/logging/Filter",
+       "isLoggable(Ljava/util/logging/LogRecord;)Z"),
+      ("java/util/prefs/PreferenceChangeListener",
+       "preferenceChange(Ljava/util/prefs/PreferenceChangeEvent;)V"),
+      ("javafx/animation/Interpolatable",
+       "interpolate(Ljava/lang/Object;D)Ljava/lang/Object;"),
+      ("javafx/beans/InvalidationListener",
+       "invalidated(Ljavafx/beans/Observable;)V"),
+      ("javafx/beans/value/ChangeListener",
+       "changed(Ljavafx/beans/value/ObservableValue;Ljava/lang/Object;Ljava/lang/Object;)V"),
+      ("javafx/collections/ListChangeListener",
+       "onChanged(Ljavafx/collections/ListChangeListener$Change;)V"),
+      ("javafx/collections/MapChangeListener",
+       "onChanged(Ljavafx/collections/MapChangeListener$Change;)V"),
+      ("javafx/collections/SetChangeListener",
+       "onChanged(Ljavafx/collections/SetChangeListener$Change;)V"),
+      ("javafx/event/EventHandler", "handle(Ljavafx/event/Event;)V"),
+      ("javafx/util/Builder", "build()Ljava/lang/Object;"),
+      ("javafx/util/BuilderFactory",
+       "getBuilder(Ljava/lang/Class;)Ljavafx/util/Builder;"),
+      ("javafx/util/Callback", "call(Ljava/lang/Object;)Ljava/lang/Object;")
   )
-  def javaSam(internalName: InternalName): Option[String] = javaSams.get(internalName)
+  def javaSam(internalName: InternalName): Option[String] =
+    javaSams.get(internalName)
 }

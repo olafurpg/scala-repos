@@ -1,6 +1,6 @@
 class A[T]
 class B {
-  def m(a: A[this.type] = new A[this.type]) { }
+  def m(a: A[this.type] = new A[this.type]) {}
 }
 
 class C {

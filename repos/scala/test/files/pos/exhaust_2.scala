@@ -1,10 +1,12 @@
 object ExhaustivityWarnBugReportMinimal {
   //sealed is needed for the warning
-  sealed trait FoundNode[T]/*presence of parameters is irrelevant*/
+  sealed trait FoundNode[T] /*presence of parameters is irrelevant*/
   // This also causes a warning:
   // sealed abstract class FoundNode[T]/*presence of parameters is irrelevant*/
-  case class FoundFilter[T](/*presence of parameters is irrelevant*/) extends FoundNode[T]
-  case class FoundTypeCase[T](/*presence of parameters is irrelevant*/) extends FoundNode[T]
+  case class FoundFilter[T]( /*presence of parameters is irrelevant*/ )
+      extends FoundNode[T]
+  case class FoundTypeCase[T]( /*presence of parameters is irrelevant*/ )
+      extends FoundNode[T]
   val f: Some[_] = ???
   f match {
     case x: Some[t] => //no warning

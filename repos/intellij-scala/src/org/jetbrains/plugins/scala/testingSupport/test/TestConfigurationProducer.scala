@@ -12,28 +12,39 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefi
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 
 /**
- * @author Roman.Shein
- *         Date: 11.12.13
- */
-abstract class TestConfigurationProducer(configurationType: ConfigurationType) extends RunConfigurationProducer[AbstractTestRunConfiguration](configurationType) with AbstractTestConfigurationProducer{
+  * @author Roman.Shein
+  *         Date: 11.12.13
+  */
+abstract class TestConfigurationProducer(configurationType: ConfigurationType)
+    extends RunConfigurationProducer[AbstractTestRunConfiguration](
+        configurationType) with AbstractTestConfigurationProducer {
 
-  protected def isObjectInheritor(clazz: ScTypeDefinition, fqn: String): Boolean = {
-    val suiteClazz = ScalaPsiManager.instance(clazz.getProject).getCachedClass(fqn, clazz.getResolveScope, ScalaPsiManager.ClassCategory.OBJECT)
+  protected def isObjectInheritor(
+      clazz: ScTypeDefinition, fqn: String): Boolean = {
+    val suiteClazz = ScalaPsiManager
+      .instance(clazz.getProject)
+      .getCachedClass(
+          fqn, clazz.getResolveScope, ScalaPsiManager.ClassCategory.OBJECT)
     if (suiteClazz == null) return false
     ScalaPsiUtil.cachedDeepIsInheritor(clazz, suiteClazz)
   }
 
-  def getLocationClassAndTest(location: Location[_ <: PsiElement]): (ScTypeDefinition, String)
+  def getLocationClassAndTest(
+      location: Location[_ <: PsiElement]): (ScTypeDefinition, String)
 
-  override def setupConfigurationFromContext(configuration: AbstractTestRunConfiguration, context: ConfigurationContext, sourceElement: Ref[PsiElement]): Boolean = {
+  override def setupConfigurationFromContext(
+      configuration: AbstractTestRunConfiguration,
+      context: ConfigurationContext,
+      sourceElement: Ref[PsiElement]): Boolean = {
     if (sourceElement.isNull) {
       false
-    }
-    else {
+    } else {
       createConfigurationByElement(context.getLocation, context) match {
-        case Some((testElement, resConfig)) if testElement != null && resConfig != null =>
+        case Some((testElement, resConfig))
+            if testElement != null && resConfig != null =>
           sourceElement.set(testElement)
-          val cfg = resConfig.getConfiguration.asInstanceOf[AbstractTestRunConfiguration]
+          val cfg = resConfig.getConfiguration
+            .asInstanceOf[AbstractTestRunConfiguration]
           configuration.setTestClassPath(cfg.getTestClassPath)
           configuration.setGeneratedName(cfg.suggestedName)
           configuration.setJavaOptions(cfg.getJavaOptions)
@@ -58,18 +69,27 @@ abstract class TestConfigurationProducer(configurationType: ConfigurationType) e
     }
   }
 
-  override def isConfigurationFromContext(configuration: AbstractTestRunConfiguration, context: ConfigurationContext): Boolean = {
+  override def isConfigurationFromContext(
+      configuration: AbstractTestRunConfiguration,
+      context: ConfigurationContext): Boolean = {
     //TODO: implement me properly
     val runnerClassName = configuration.mainClass
 
-    if (runnerClassName != null && runnerClassName == configuration.mainClass) {
-      val configurationModule: Module = configuration.getConfigurationModule.getModule
+    if (runnerClassName != null &&
+        runnerClassName == configuration.mainClass) {
+      val configurationModule: Module =
+        configuration.getConfigurationModule.getModule
       if (context.getLocation != null) {
         isConfigurationByLocation(configuration, context.getLocation)
       } else {
-        (context.getModule == configurationModule ||
-                context.getRunManager.getConfigurationTemplate(getConfigurationFactory).getConfiguration.asInstanceOf[AbstractTestRunConfiguration]
-                        .getConfigurationModule.getModule == configurationModule) && configuration.getTestClassPath == null && configuration.getTestName == null
+        (context.getModule == configurationModule || context.getRunManager
+              .getConfigurationTemplate(getConfigurationFactory)
+              .getConfiguration
+              .asInstanceOf[AbstractTestRunConfiguration]
+              .getConfigurationModule
+              .getModule == configurationModule) &&
+        configuration.getTestClassPath == null &&
+        configuration.getTestName == null
       }
     } else false
   }

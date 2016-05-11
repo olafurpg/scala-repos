@@ -1,5 +1,6 @@
 object A {
-  val comparator: /*start*/java.util.Comparator[java.lang.Boolean]/*end*/ = null
+  val comparator: /*start*/ java.util.Comparator[java.lang.Boolean] /*end*/ =
+    null
 }
 
 /*
@@ -9,4 +10,4 @@ import java.util.Comparator
 object A {
   val comparator: Comparator[Boolean] = null
 }
-*/
+ */

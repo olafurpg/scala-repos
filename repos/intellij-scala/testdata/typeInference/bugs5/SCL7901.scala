@@ -10,6 +10,6 @@ object SCL7901 {
   }
 
   val b = new B
-  val i: Int = /*start*/b.foo(new J)/*end*/
+  val i: Int = /*start*/ b.foo(new J) /*end*/
 }
 //Int

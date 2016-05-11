@@ -22,10 +22,10 @@ import org.slf4j.Logger
 import sun.misc.{Signal, SignalHandler}
 
 /**
- * Used to log signals received. This can be very useful in debugging crashes or kills.
- *
- * Inspired by Colin Patrick McCabe's similar class from Hadoop.
- */
+  * Used to log signals received. This can be very useful in debugging crashes or kills.
+  *
+  * Inspired by Colin Patrick McCabe's similar class from Hadoop.
+  */
 private[spark] object SignalLogger {
 
   private var registered = false
@@ -41,20 +41,24 @@ private[spark] object SignalLogger {
         try {
           new SignalLoggerHandler(signal, log)
         } catch {
-          case e: Exception => log.warn("Failed to register signal handler " + signal, e)
+          case e: Exception =>
+            log.warn("Failed to register signal handler " + signal, e)
         }
       }
-      log.info("Registered signal handlers for [" + signals.mkString(", ") + "]")
+      log.info(
+          "Registered signal handlers for [" + signals.mkString(", ") + "]")
     }
   }
 }
 
-private sealed class SignalLoggerHandler(name: String, log: Logger) extends SignalHandler {
+private sealed class SignalLoggerHandler(name: String, log: Logger)
+    extends SignalHandler {
 
   val prevHandler = Signal.handle(new Signal(name), this)
 
   override def handle(signal: Signal): Unit = {
-    log.error("RECEIVED SIGNAL " + signal.getNumber() + ": SIG" + signal.getName())
+    log.error(
+        "RECEIVED SIGNAL " + signal.getNumber() + ": SIG" + signal.getName())
     prevHandler.handle(signal)
   }
 }

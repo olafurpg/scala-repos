@@ -2,18 +2,18 @@
 trait Universe {
   type Name >: Null <: AnyRef with NameApi
   trait NameApi
- 
+
   type TermName >: Null <: TermNameApi with Name
   trait TermNameApi extends NameApi
 }
- 
+
 object Test extends App {
   val u: Universe = ???
   import u._
- 
+
   val ScalaName: TermName = ???
   locally {
-    
+
     ??? match {
       case Test.ScalaName => ???
     }

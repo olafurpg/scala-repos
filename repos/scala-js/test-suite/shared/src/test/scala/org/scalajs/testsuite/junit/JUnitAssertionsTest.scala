@@ -13,11 +13,11 @@ class JUnitAssertionsTest {
   private final val NotEquals = false
   private final val ShallNotPass = false
 
-  private def testIfAsserts(assertion: => Unit, shouldPass: Boolean = true): Unit = {
+  private def testIfAsserts(
+      assertion: => Unit, shouldPass: Boolean = true): Unit = {
     Try(assertion) match {
       case Success(_) =>
-        if (!shouldPass)
-          fail("Assertion should have failed.")
+        if (!shouldPass) fail("Assertion should have failed.")
 
       case Failure(assErr: AssertionError) =>
         if (shouldPass) {
@@ -40,7 +40,8 @@ class JUnitAssertionsTest {
     testIfAsserts(assertTrue("'true' did not assertTrue", false), ShallNotPass)
     testIfAsserts(assertTrue(false), ShallNotPass)
 
-    testIfAsserts(assertFalse("'false' did not assertFalse", true), ShallNotPass)
+    testIfAsserts(
+        assertFalse("'false' did not assertFalse", true), ShallNotPass)
     testIfAsserts(assertFalse(true), ShallNotPass)
   }
 
@@ -49,13 +50,16 @@ class JUnitAssertionsTest {
     testIfAsserts(assertNull("'null' did not assertNull", null))
     testIfAsserts(assertNull(null))
 
-    testIfAsserts(assertNotNull("'new Object' did not assertNotNull", new Object))
+    testIfAsserts(
+        assertNotNull("'new Object' did not assertNotNull", new Object))
     testIfAsserts(assertNotNull(new Object))
 
-    testIfAsserts(assertNull("'null' did not assertNull", new Object), ShallNotPass)
+    testIfAsserts(
+        assertNull("'null' did not assertNull", new Object), ShallNotPass)
     testIfAsserts(assertNull(new Object), ShallNotPass)
 
-    testIfAsserts(assertNotNull("'null' did not assertNotNull", null), ShallNotPass)
+    testIfAsserts(
+        assertNotNull("'null' did not assertNotNull", null), ShallNotPass)
     testIfAsserts(assertNotNull(null), ShallNotPass)
   }
 
@@ -66,10 +70,13 @@ class JUnitAssertionsTest {
     val str = "abcd"
     val nullRef: AnyRef = null
 
-    def testAssertion(expected: AnyRef, actual: AnyRef, equals: Boolean = true): Unit = {
-      testIfAsserts(assertSame("References where not equal", expected, actual), equals)
+    def testAssertion(
+        expected: AnyRef, actual: AnyRef, equals: Boolean = true): Unit = {
+      testIfAsserts(
+          assertSame("References where not equal", expected, actual), equals)
       testIfAsserts(assertSame(expected, actual), equals)
-      testIfAsserts(assertNotSame("References where equal", expected, actual), !equals)
+      testIfAsserts(
+          assertNotSame("References where equal", expected, actual), !equals)
       testIfAsserts(assertNotSame(expected, actual), !equals)
     }
 
@@ -90,10 +97,15 @@ class JUnitAssertionsTest {
     val nullRef: AnyRef = null
 
     // Object equality tests
-    def testAssertion(expected: AnyRef, actual: AnyRef, equals: Boolean = true): Unit = {
-      testIfAsserts(assertEquals(s"Asserting $expected == $actual", expected, actual), equals)
+    def testAssertion(
+        expected: AnyRef, actual: AnyRef, equals: Boolean = true): Unit = {
+      testIfAsserts(
+          assertEquals(s"Asserting $expected == $actual", expected, actual),
+          equals)
       testIfAsserts(assertEquals(expected, actual), equals)
-      testIfAsserts(assertNotEquals(s"Asserting $expected != $actual", expected, actual), !equals)
+      testIfAsserts(
+          assertNotEquals(s"Asserting $expected != $actual", expected, actual),
+          !equals)
       testIfAsserts(assertNotEquals(expected, actual), !equals)
     }
 
@@ -122,10 +134,15 @@ class JUnitAssertionsTest {
 
   @Test
   def testAssertEqualsByte(): Unit = {
-    def testByteAssertion(expected: Byte, actual: Byte, equals: Boolean = true): Unit = {
-      testIfAsserts(assertEquals(s"Asserting $expected == $actual", expected, actual), equals)
+    def testByteAssertion(
+        expected: Byte, actual: Byte, equals: Boolean = true): Unit = {
+      testIfAsserts(
+          assertEquals(s"Asserting $expected == $actual", expected, actual),
+          equals)
       testIfAsserts(assertEquals(expected, actual), equals)
-      testIfAsserts(assertNotEquals(s"Asserting $expected != $actual", expected, actual), !equals)
+      testIfAsserts(
+          assertNotEquals(s"Asserting $expected != $actual", expected, actual),
+          !equals)
       testIfAsserts(assertNotEquals(expected, actual), !equals)
     }
     testByteAssertion(0, 0)
@@ -134,15 +151,19 @@ class JUnitAssertionsTest {
     testByteAssertion(Byte.MinValue, Byte.MinValue)
     testByteAssertion(Byte.MaxValue, Byte.MaxValue)
     testByteAssertion(1, 2, NotEquals)
-
   }
 
   @Test
   def testAssertEqualsChar(): Unit = {
-    def testCharAssertion(expected: Char, actual: Char, equals: Boolean = true): Unit = {
-      testIfAsserts(assertEquals(s"Asserting $expected == $actual", expected, actual), equals)
+    def testCharAssertion(
+        expected: Char, actual: Char, equals: Boolean = true): Unit = {
+      testIfAsserts(
+          assertEquals(s"Asserting $expected == $actual", expected, actual),
+          equals)
       testIfAsserts(assertEquals(expected, actual), equals)
-      testIfAsserts(assertNotEquals(s"Asserting $expected != $actual", expected, actual), !equals)
+      testIfAsserts(
+          assertNotEquals(s"Asserting $expected != $actual", expected, actual),
+          !equals)
       testIfAsserts(assertNotEquals(expected, actual), !equals)
     }
 
@@ -156,10 +177,15 @@ class JUnitAssertionsTest {
 
   @Test
   def testAssertEqualsShort(): Unit = {
-    def testShortAssertion(expected: Short, actual: Short, equals: Boolean = true): Unit = {
-      testIfAsserts(assertEquals(s"Asserting $expected == $actual", expected, actual), equals)
+    def testShortAssertion(
+        expected: Short, actual: Short, equals: Boolean = true): Unit = {
+      testIfAsserts(
+          assertEquals(s"Asserting $expected == $actual", expected, actual),
+          equals)
       testIfAsserts(assertEquals(expected, actual), equals)
-      testIfAsserts(assertNotEquals(s"Asserting $expected != $actual", expected, actual), !equals)
+      testIfAsserts(
+          assertNotEquals(s"Asserting $expected != $actual", expected, actual),
+          !equals)
       testIfAsserts(assertNotEquals(expected, actual), !equals)
     }
     testShortAssertion(0, 0)
@@ -172,10 +198,15 @@ class JUnitAssertionsTest {
 
   @Test
   def testAssertEqualsInt(): Unit = {
-    def testIntAssertion(expected: Int, actual: Int, equals: Boolean = true): Unit = {
-      testIfAsserts(assertEquals(s"Asserting $expected == $actual", expected, actual), equals)
+    def testIntAssertion(
+        expected: Int, actual: Int, equals: Boolean = true): Unit = {
+      testIfAsserts(
+          assertEquals(s"Asserting $expected == $actual", expected, actual),
+          equals)
       testIfAsserts(assertEquals(expected, actual), equals)
-      testIfAsserts(assertNotEquals(s"Asserting $expected != $actual", expected, actual), !equals)
+      testIfAsserts(
+          assertNotEquals(s"Asserting $expected != $actual", expected, actual),
+          !equals)
       testIfAsserts(assertNotEquals(expected, actual), !equals)
     }
 
@@ -189,10 +220,15 @@ class JUnitAssertionsTest {
 
   @Test
   def testAssertEqualsLong(): Unit = {
-    def testLongAssertion(expected: Long, actual: Long, equals: Boolean = true): Unit = {
-      testIfAsserts(assertEquals(s"Asserting $expected == $actual", expected, actual), equals)
+    def testLongAssertion(
+        expected: Long, actual: Long, equals: Boolean = true): Unit = {
+      testIfAsserts(
+          assertEquals(s"Asserting $expected == $actual", expected, actual),
+          equals)
       testIfAsserts(assertEquals(expected, actual), equals)
-      testIfAsserts(assertNotEquals(s"Asserting $expected != $actual", expected, actual), !equals)
+      testIfAsserts(
+          assertNotEquals(s"Asserting $expected != $actual", expected, actual),
+          !equals)
       testIfAsserts(assertNotEquals(expected, actual), !equals)
     }
 
@@ -206,10 +242,19 @@ class JUnitAssertionsTest {
 
   @Test
   def testAssertEqualsDouble(): Unit = {
-    def testDoubleAssertion(expected: Double, actual: Double, delta: Double, equals: Boolean = true): Unit = {
-      testIfAsserts(assertEquals(s"Asserting $expected == $actual", expected, actual, delta), equals)
+    def testDoubleAssertion(expected: Double,
+                            actual: Double,
+                            delta: Double,
+                            equals: Boolean = true): Unit = {
+      testIfAsserts(
+          assertEquals(
+              s"Asserting $expected == $actual", expected, actual, delta),
+          equals)
       testIfAsserts(assertEquals(expected, actual, delta), equals)
-      testIfAsserts(assertNotEquals(s"Asserting $expected != $actual", expected, actual, delta), !equals)
+      testIfAsserts(
+          assertNotEquals(
+              s"Asserting $expected != $actual", expected, actual, delta),
+          !equals)
       testIfAsserts(assertNotEquals(expected, actual, delta), !equals)
     }
 
@@ -224,11 +269,19 @@ class JUnitAssertionsTest {
 
   @Test
   def testAssertEqualsFloat(): Unit = {
-    def testFloatAssertion(expected: Float, actual: Float, delta: Float,
-        equals: Boolean = true): Unit = {
-      testIfAsserts(assertEquals(s"Asserting $expected == $actual", expected, actual, delta), equals)
+    def testFloatAssertion(expected: Float,
+                           actual: Float,
+                           delta: Float,
+                           equals: Boolean = true): Unit = {
+      testIfAsserts(
+          assertEquals(
+              s"Asserting $expected == $actual", expected, actual, delta),
+          equals)
       testIfAsserts(assertEquals(expected, actual, delta), equals)
-      testIfAsserts(assertNotEquals(s"Asserting $expected != $actual", expected, actual, delta), !equals)
+      testIfAsserts(
+          assertNotEquals(
+              s"Asserting $expected != $actual", expected, actual, delta),
+          !equals)
       testIfAsserts(assertNotEquals(expected, actual, delta), !equals)
     }
 
@@ -248,22 +301,24 @@ class JUnitAssertionsTest {
 
     val message = "Should be different up to != operator"
 
-    def testAnyRefAssertion(expected: Array[AnyRef], actual: Array[AnyRef],
+    def testAnyRefAssertion(expected: Array[AnyRef],
+                            actual: Array[AnyRef],
                             equals: Boolean = true): Unit = {
       testIfAsserts(assertArrayEquals(message, expected, actual), equals)
       testIfAsserts(assertArrayEquals(expected, actual), equals)
     }
-    def testIntAssertion(expected: Array[Int], actual: Array[Int],
+    def testIntAssertion(expected: Array[Int],
+                         actual: Array[Int],
                          equals: Boolean = true): Unit = {
       testIfAsserts(assertArrayEquals(message, expected, actual), equals)
       testIfAsserts(assertArrayEquals(expected, actual), equals)
     }
-    def testLongAssertion(expected: Array[Long], actual: Array[Long],
+    def testLongAssertion(expected: Array[Long],
+                          actual: Array[Long],
                           equals: Boolean = true): Unit = {
       testIfAsserts(assertArrayEquals(message, expected, actual), equals)
       testIfAsserts(assertArrayEquals(expected, actual), equals)
     }
-
 
     // Array tests
     testAnyRefAssertion(arr1, arr1)
@@ -271,61 +326,76 @@ class JUnitAssertionsTest {
     testAnyRefAssertion(Array(obj1, obj2, obj2), Array(obj1, obj2, obj2))
     testAnyRefAssertion(Array(obj1), Array("0"))
     testAnyRefAssertion(Array(Array(1), Array(2, Array(3))),
-        Array(Array(1), Array(2, Array(3))))
+                        Array(Array(1), Array(2, Array(3))))
     testIntAssertion(Array(1, 2, 3), Array(1, 2, 3))
     testLongAssertion(Array(1L, 2L, 3L), Array(1L, 2L, 3L))
 
     testAnyRefAssertion(Array(obj1), Array(obj2), NotEquals)
-    testAnyRefAssertion(Array(obj1, obj2, obj2), Array(obj1, obj2, obj1), NotEquals)
+    testAnyRefAssertion(
+        Array(obj1, obj2, obj2), Array(obj1, obj2, obj1), NotEquals)
     testAnyRefAssertion(Array(obj1), Array("4"), NotEquals)
-    testAnyRefAssertion(Array(Array(2), Array(2, Array(3))), Array(Array(1),
-        Array(2, Array(3))), NotEquals)
+    testAnyRefAssertion(Array(Array(2), Array(2, Array(3))),
+                        Array(Array(1), Array(2, Array(3))),
+                        NotEquals)
     testAnyRefAssertion(Array(Array(1, 2), Array(2, Array(3))),
-        Array(Array(1), Array(2, Array(3))), NotEquals)
+                        Array(Array(1), Array(2, Array(3))),
+                        NotEquals)
     testAnyRefAssertion(Array(Array(1), Array(2, Array(3))),
-        Array(Array(1, 4), Array(2, Array(3))), NotEquals)
+                        Array(Array(1, 4), Array(2, Array(3))),
+                        NotEquals)
     testIntAssertion(Array(1, 2, 3), Array(1, 3, 3), NotEquals)
     testLongAssertion(Array(1L, 2L, 3L), Array(1L, 1L, 3L), NotEquals)
   }
 
   @Test
   def testAssertArrayEqualsDouble(): Unit = {
-    def testDoubleAssertion(expected: Array[Double], actual: Array[Double],
-        delta: Double, equals: Boolean = true): Unit = {
+    def testDoubleAssertion(expected: Array[Double],
+                            actual: Array[Double],
+                            delta: Double,
+                            equals: Boolean = true): Unit = {
       val message = "Should be different up to != operator"
-      testIfAsserts(assertArrayEquals(message, expected, actual, delta), equals)
+      testIfAsserts(
+          assertArrayEquals(message, expected, actual, delta), equals)
       testIfAsserts(assertArrayEquals(expected, actual, delta), equals)
     }
 
     testDoubleAssertion(Array(1d, 2d, 3d), Array(1d, 2d, 4d), 1d)
     testDoubleAssertion(Array(1d, 2d, 3d), Array(1d, 2d, 3.5d), 1d)
-    testDoubleAssertion(Array(1d, 2d, 3d), Array(1d, 2d, 3.5d), 0.1d, NotEquals)
-    testDoubleAssertion(Array(1d, 2d, 3d), Array(1d, 2d, 3.5d), 0.1d, NotEquals)
+    testDoubleAssertion(
+        Array(1d, 2d, 3d), Array(1d, 2d, 3.5d), 0.1d, NotEquals)
+    testDoubleAssertion(
+        Array(1d, 2d, 3d), Array(1d, 2d, 3.5d), 0.1d, NotEquals)
   }
 
   @Test
   def testAssertArrayEqualsFloats(): Unit = {
-    def testFloatAssertion(expected: Array[Float], actual: Array[Float],
-        delta: Float, equals: Boolean = true): Unit = {
+    def testFloatAssertion(expected: Array[Float],
+                           actual: Array[Float],
+                           delta: Float,
+                           equals: Boolean = true): Unit = {
       val message = "Should be different up to != operator"
-      testIfAsserts(assertArrayEquals(message, expected, actual, delta), equals)
+      testIfAsserts(
+          assertArrayEquals(message, expected, actual, delta), equals)
       testIfAsserts(assertArrayEquals(expected, actual, delta), equals)
     }
 
     testFloatAssertion(Array(1f, 2f, 3f), Array(1f, 2f, 4f), 1f)
     testFloatAssertion(Array(1f, 2f, 3f), Array(1f, 2f, 3.5f), 1f)
     testFloatAssertion(Array(1f, 2f, 3f), Array(1f, 2f, 4f), 0.11f, NotEquals)
-    testFloatAssertion(Array(1f, 2f, 3f), Array(1f, 2f, 3.5f), 0.11f, NotEquals)
+    testFloatAssertion(
+        Array(1f, 2f, 3f), Array(1f, 2f, 3.5f), 0.11f, NotEquals)
   }
 
   @Test
   def testAssertThat(): Unit = {
     testIfAsserts(assertThat("42", instanceOf[String](classOf[String])))
-    testIfAsserts(assertThat("42", instanceOf[String](classOf[Int])), ShallNotPass)
+    testIfAsserts(
+        assertThat("42", instanceOf[String](classOf[Int])), ShallNotPass)
 
     testIfAsserts(assertThat(42, instanceOf(classOf[Int])))
     testIfAsserts(assertThat(42, instanceOf[Int](classOf[Long])), ShallNotPass)
-    testIfAsserts(assertThat(42, instanceOf[Int](classOf[String])), ShallNotPass)
+    testIfAsserts(
+        assertThat(42, instanceOf[Int](classOf[String])), ShallNotPass)
 
     testIfAsserts(assertThat(Float.MaxValue, instanceOf(classOf[Float])))
     testIfAsserts(assertThat(Double.MaxValue, instanceOf(classOf[Double])))
@@ -334,30 +404,34 @@ class JUnitAssertionsTest {
   @Test
   def testExpectThrows(): Unit = {
     testIfAsserts(expectThrows(classOf[Exception], throw new Exception))
-    testIfAsserts(expectThrows(classOf[IndexOutOfBoundsException],
-        throw new IndexOutOfBoundsException))
+    testIfAsserts(
+        expectThrows(classOf[IndexOutOfBoundsException],
+                     throw new IndexOutOfBoundsException))
 
     testIfAsserts {
       val ex = expectThrows(classOf[Exception], throw new Exception("abc"))
       assertEquals(ex.getMessage, "abc")
     }
 
-    testIfAsserts(expectThrows(classOf[IndexOutOfBoundsException],
-        throw new Exception), ShallNotPass)
-    testIfAsserts(expectThrows(classOf[IndexOutOfBoundsException],()),
+    testIfAsserts(
+        expectThrows(classOf[IndexOutOfBoundsException], throw new Exception),
         ShallNotPass)
+    testIfAsserts(
+        expectThrows(classOf[IndexOutOfBoundsException], ()), ShallNotPass)
   }
 
   @Test
   def testAssertThrows(): Unit = {
     testIfAsserts(assertThrows(classOf[Exception], throw new Exception))
-    testIfAsserts(assertThrows(classOf[IndexOutOfBoundsException],
-        throw new IndexOutOfBoundsException))
+    testIfAsserts(
+        assertThrows(classOf[IndexOutOfBoundsException],
+                     throw new IndexOutOfBoundsException))
 
-    testIfAsserts(assertThrows(classOf[IndexOutOfBoundsException],
-        throw new Exception), ShallNotPass)
-    testIfAsserts(assertThrows(classOf[IndexOutOfBoundsException], ()),
+    testIfAsserts(
+        assertThrows(classOf[IndexOutOfBoundsException], throw new Exception),
         ShallNotPass)
+    testIfAsserts(
+        assertThrows(classOf[IndexOutOfBoundsException], ()), ShallNotPass)
   }
 
   @Test def testIfAssertsTest_issue_2252(): Unit = {
@@ -375,7 +449,7 @@ class JUnitAssertionsTest {
 
       case Failure(ex: AssertionError)
           if ex.getMessage == "Assertion should have failed." =>
-        // As expected
+      // As expected
 
       case Failure(ex) =>
         throw ex
@@ -383,22 +457,24 @@ class JUnitAssertionsTest {
 
     Try(testIfAsserts(throw new AssertionError)) match {
       case Success(_) =>
-        fail("testIfAsserts should not succeed with <throw new AssertionError>")
+        fail(
+            "testIfAsserts should not succeed with <throw new AssertionError>")
 
       case Failure(ex: AssertionError)
           if ex.getMessage == "Assertion should not have failed." =>
-        // As expected
+      // As expected
 
       case Failure(ex) => throw ex
     }
 
     Try(testIfAsserts(throw new AssertionError, ShallNotPass)) match {
       case Success(_) =>
-        // As expected
+      // As expected
 
       case Failure(ex: AssertionError)
           if ex.getMessage == "Assertion should have failed." =>
-        fail("testIfAsserts should have succeed with <throw new AssertionError>")
+        fail(
+            "testIfAsserts should have succeed with <throw new AssertionError>")
 
       case Failure(ex) => throw ex
     }
@@ -409,8 +485,7 @@ class JUnitAssertionsTest {
         fail("testIfAsserts should not succeed with <throw new Exception>")
 
       case Failure(ex) =>
-        if (ex ne except)
-          throw ex
+        if (ex ne except) throw ex
     }
 
     Try(testIfAsserts(throw except, ShallNotPass)) match {
@@ -418,8 +493,7 @@ class JUnitAssertionsTest {
         fail("testIfAsserts should not succeed with <throw new Exception>")
 
       case Failure(ex) =>
-        if (ex ne except)
-          throw ex
+        if (ex ne except) throw ex
     }
   }
 }

@@ -16,10 +16,10 @@ object SCL8240 {
 
     def foo(s: String) = "1"
 
-    /*start*/ foo(f.c)
+    /*start*/
+    foo(f.c)
     /*end*/
     val g: f.B = f.c
   }
-
 }
 //Int

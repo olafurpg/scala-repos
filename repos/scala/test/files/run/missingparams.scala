@@ -1,5 +1,4 @@
 /** Tests the optimiser. */
-
 final class Foo(val x: Int) {
   def filter(p: Int => Boolean) =
     if (p(x)) Some(x) else None

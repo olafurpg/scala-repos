@@ -1,4 +1,3 @@
-
 object Test {
   def main(args: Array[String]) {
     val jl = classOf[Foo].getMethod("jl", classOf[Baz[_]])
@@ -13,6 +12,6 @@ object Test {
 class Baz[T]
 
 class Foo {
-  def l(b: Baz[Long]) { }
-  def jl(b: Baz[java.lang.Long]) { }
+  def l(b: Baz[Long]) {}
+  def jl(b: Baz[java.lang.Long]) {}
 }

@@ -8,12 +8,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 
 /**
- * Nikolay.Tropin
- * 10/21/13
- */
-class ScalaRunConfigurationRefactoringListenerProvider extends RunConfigurationRefactoringElementListenerProvider {
-  private def wrap(td: ScTemplateDefinition) = new PsiClassWrapper(td, td.qualifiedName, td.name)
-  private def decorate(listener: RefactoringElementListener): RefactoringElementListener = {
+  * Nikolay.Tropin
+  * 10/21/13
+  */
+class ScalaRunConfigurationRefactoringListenerProvider
+    extends RunConfigurationRefactoringElementListenerProvider {
+  private def wrap(td: ScTemplateDefinition) =
+    new PsiClassWrapper(td, td.qualifiedName, td.name)
+  private def decorate(
+      listener: RefactoringElementListener): RefactoringElementListener = {
     if (listener == null) return null
 
     new RefactoringElementListener {

@@ -8,10 +8,9 @@ package patterns
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 
 /**
-* @author Alexander Podkhalyuzin
-*/
-
-trait ScTypedPattern extends ScBindingPattern  {
+  * @author Alexander Podkhalyuzin
+  */
+trait ScTypedPattern extends ScBindingPattern {
   def typePattern = findChild(classOf[ScTypePattern])
 }
 

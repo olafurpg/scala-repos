@@ -1,9 +1,4 @@
-
-
 import scala.collection.mutable.Queue
-
-
-
 
 class ExtQueue[T] extends Queue[T] {
   def printState {
@@ -205,7 +200,7 @@ object Test {
     assert(queue.head == 1)
     assert(queue.last == 9)
 
-    val odd = queue.dequeueAll(_ %2 == 1)
+    val odd = queue.dequeueAll(_ % 2 == 1)
     assert(odd.size == 5)
     assert(queue.length == 0)
     assert(queue.isEmpty)
@@ -289,9 +284,4 @@ object Test {
     assert(queue.head == 1)
     // well... seems to work
   }
-
 }
-
-
-
-

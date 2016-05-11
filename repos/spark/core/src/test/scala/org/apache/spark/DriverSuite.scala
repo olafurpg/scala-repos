@@ -28,13 +28,16 @@ import org.apache.spark.util.Utils
 class DriverSuite extends SparkFunSuite with Timeouts {
 
   ignore("driver should exit after finishing without cleanup (SPARK-530)") {
-    val sparkHome = sys.props.getOrElse("spark.test.home", fail("spark.test.home is not set!"))
+    val sparkHome = sys.props.getOrElse(
+        "spark.test.home", fail("spark.test.home is not set!"))
     val masters = Table("master", "local", "local-cluster[2,1,1024]")
     forAll(masters) { (master: String) =>
       val process = Utils.executeCommand(
-        Seq(s"$sparkHome/bin/spark-class", "org.apache.spark.DriverWithoutCleanup", master),
-        new File(sparkHome),
-        Map("SPARK_TESTING" -> "1", "SPARK_HOME" -> sparkHome))
+          Seq(s"$sparkHome/bin/spark-class",
+              "org.apache.spark.DriverWithoutCleanup",
+              master),
+          new File(sparkHome),
+          Map("SPARK_TESTING" -> "1", "SPARK_HOME" -> sparkHome))
       failAfter(60 seconds) { process.waitFor() }
       // Ensure we still kill the process in case it timed out
       process.destroy()
@@ -43,9 +46,9 @@ class DriverSuite extends SparkFunSuite with Timeouts {
 }
 
 /**
- * Program that creates a Spark driver but doesn't call SparkContext#stop() or
- * sys.exit() after finishing.
- */
+  * Program that creates a Spark driver but doesn't call SparkContext#stop() or
+  * sys.exit() after finishing.
+  */
 object DriverWithoutCleanup {
   def main(args: Array[String]) {
     Utils.configTestLog4j("INFO")

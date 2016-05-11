@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,4 +37,6 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 /** TransformChangedEvent Spec tests. */
 @RunWith(classOf[JUnitRunner])
 class TransformChangedEventSpec
-  extends SimpleSFXDelegateSpec[jfxst.TransformChangedEvent, TransformChangedEvent](classOf[jfxst.TransformChangedEvent], classOf[TransformChangedEvent])
+    extends SimpleSFXDelegateSpec[
+        jfxst.TransformChangedEvent, TransformChangedEvent](
+        classOf[jfxst.TransformChangedEvent], classOf[TransformChangedEvent])

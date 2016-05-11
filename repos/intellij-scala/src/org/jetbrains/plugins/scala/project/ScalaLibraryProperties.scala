@@ -7,9 +7,10 @@ import com.intellij.openapi.util.io.FileUtil._
 import com.intellij.openapi.vfs.VfsUtilCore._
 
 /**
- * @author Pavel Fatin
- */
-class ScalaLibraryProperties extends LibraryProperties[ScalaLibraryPropertiesState] {
+  * @author Pavel Fatin
+  */
+class ScalaLibraryProperties
+    extends LibraryProperties[ScalaLibraryPropertiesState] {
   var languageLevel: ScalaLanguageLevel = _
   var compilerClasspath: Seq[File] = _
 
@@ -17,21 +18,26 @@ class ScalaLibraryProperties extends LibraryProperties[ScalaLibraryPropertiesSta
 
   def loadState(state: ScalaLibraryPropertiesState) {
     languageLevel = ScalaLanguageLevel.from(state.languageLevel)
-    compilerClasspath = state.compilerClasspath.map(path => new File(urlToPath(path)))
+    compilerClasspath = state.compilerClasspath.map(
+        path => new File(urlToPath(path)))
   }
 
   def getState = {
     val state = new ScalaLibraryPropertiesState()
     state.languageLevel = languageLevel.proxy
-    state.compilerClasspath = compilerClasspath.map(file => pathToUrl(toCanonicalPath(file.getAbsolutePath))).toArray
+    state.compilerClasspath = compilerClasspath
+      .map(file => pathToUrl(toCanonicalPath(file.getAbsolutePath)))
+      .toArray
     state
   }
 
   override def equals(obj: scala.Any) = obj match {
     case that: ScalaLibraryProperties =>
-      languageLevel == that.languageLevel && compilerClasspath == that.compilerClasspath
+      languageLevel == that.languageLevel &&
+      compilerClasspath == that.compilerClasspath
     case _ => false
   }
 
-  override def hashCode() = languageLevel.hashCode * 31 + compilerClasspath.hashCode
+  override def hashCode() =
+    languageLevel.hashCode * 31 + compilerClasspath.hashCode
 }

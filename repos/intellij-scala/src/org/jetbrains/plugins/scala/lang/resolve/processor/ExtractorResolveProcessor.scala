@@ -20,7 +20,7 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
                                 refName: String,
                                 kinds: Set[ResolveTargets.Value],
                                 expected: Option[ScType])
-        extends ResolveProcessor(kinds, ref, refName) {
+    extends ResolveProcessor(kinds, ref, refName) {
 
   override def execute(element: PsiElement, state: ResolveState): Boolean = {
     val named = element.asInstanceOf[PsiNamedElement]
@@ -31,21 +31,34 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
       def resultsForTypedDef(obj: ScTypedDefinition) {
         def resultsFor(unapplyName: String) = {
           val typeResult = getFromType(state) match {
-            case Some(tp) => Success(ScProjectionType(tp, obj, superReference = false), Some(obj))
+            case Some(tp) =>
+              Success(
+                  ScProjectionType(tp, obj, superReference = false), Some(obj))
             case _ => obj.getType(TypingContext.empty)
           }
           val processor = new CollectMethodsProcessor(ref, unapplyName)
           typeResult.foreach(t => processor.processType(t, ref))
           val sigs = processor.candidatesS.flatMap {
-            case ScalaResolveResult(meth: PsiMethod, subst) => Some((meth, subst, Some(obj)))
+            case ScalaResolveResult(meth: PsiMethod, subst) =>
+              Some((meth, subst, Some(obj)))
             case _ => None
           }.toSeq
           addResults(sigs.map {
             case (m, subst, parent) =>
-              val resolveToMethod = new ScalaResolveResult(m, subst, getImports(state),
-                fromType = getFromType(state), parentElement = parent, isAccessible = accessible)
-              val resolveToNamed = new ScalaResolveResult(named, subst, getImports(state),
-                fromType = getFromType(state), parentElement = parent, isAccessible = accessible)
+              val resolveToMethod =
+                new ScalaResolveResult(m,
+                                       subst,
+                                       getImports(state),
+                                       fromType = getFromType(state),
+                                       parentElement = parent,
+                                       isAccessible = accessible)
+              val resolveToNamed =
+                new ScalaResolveResult(named,
+                                       subst,
+                                       getImports(state),
+                                       fromType = getFromType(state),
+                                       parentElement = parent,
+                                       isAccessible = accessible)
 
               resolveToMethod.copy(innerResolveResult = Option(resolveToNamed))
           })
@@ -58,9 +71,15 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
         if (candidatesSet.isEmpty) {
           obj match {
             case FakeCompanionClassOrCompanionClass(cl: ScClass)
-              if cl.tooBigForUnapply && cl.scalaLanguageLevel.exists(_ >= Scala_2_11) =>
-                addResult(new ScalaResolveResult(named, ScSubstitutor.empty, getImports(state),
-                  fromType = getFromType(state), parentElement = Option(obj), isAccessible = accessible))
+                if cl.tooBigForUnapply &&
+                cl.scalaLanguageLevel.exists(_ >= Scala_2_11) =>
+              addResult(
+                  new ScalaResolveResult(named,
+                                         ScSubstitutor.empty,
+                                         getImports(state),
+                                         fromType = getFromType(state),
+                                         parentElement = Option(obj),
+                                         isAccessible = accessible))
             case _ =>
           }
         }
@@ -83,9 +102,13 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
           r.element match {
             case fun: ScFunction =>
               val clauses = fun.paramClauses.clauses
-              if (clauses.length != 0 && clauses.apply(0).parameters.length == 1) {
-                for (paramType <- clauses(0).parameters.apply(0).getType(TypingContext.empty)
-                     if tp conforms r.substitutor.subst(paramType)) return true
+              if (clauses.length != 0 &&
+                  clauses.apply(0).parameters.length == 1) {
+                for (paramType <- clauses(0).parameters
+                                   .apply(0)
+                                   .getType(TypingContext.empty)
+                                     if tp conforms r.substitutor.subst(
+                                     paramType)) return true
               }
               false
             case _ => true
@@ -95,7 +118,8 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
         if (filtered.size == 0) candidates
         else if (filtered.size == 1) filtered
         else {
-          new MostSpecificUtil(ref, 1).mostSpecificForResolveResult(filtered, expandInnerResult = false) match {
+          new MostSpecificUtil(ref, 1).mostSpecificForResolveResult(
+              filtered, expandInnerResult = false) match {
             case Some(r) => mutable.HashSet(r)
             case None => candidates
           }

@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.Annotation
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 11.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 11.02.2008
+  */
 /*
  * Dcl ::= [{Annotation} {Modifier}]
  *          ('val' ValDcl
@@ -23,15 +22,17 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.Annotation
  */
 
 object Dcl {
-  def parse(builder: ScalaPsiBuilder): Boolean = parse(builder,isMod = true)
+  def parse(builder: ScalaPsiBuilder): Boolean = parse(builder, isMod = true)
   def parse(builder: ScalaPsiBuilder, isMod: Boolean): Boolean = {
     val dclMarker = builder.mark
-    dclMarker.setCustomEdgeTokenBinders(ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN, null)
+    dclMarker.setCustomEdgeTokenBinders(
+        ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN, null)
     if (isMod) {
       val annotationsMarker = builder.mark
       while (Annotation.parse(builder)) {}
       annotationsMarker.done(ScalaElementTypes.ANNOTATIONS)
-      annotationsMarker.setCustomEdgeTokenBinders(ScalaTokenBinders.DEFAULT_LEFT_EDGE_BINDER, null)
+      annotationsMarker.setCustomEdgeTokenBinders(
+          ScalaTokenBinders.DEFAULT_LEFT_EDGE_BINDER, null)
       //parse modifiers
       val modifierMarker = builder.mark
       while (Modifier.parse(builder)) {}
@@ -50,8 +51,7 @@ object Dcl {
         if (ValDcl parse builder) {
           dclMarker.done(ScalaElementTypes.VALUE_DECLARATION)
           true
-        }
-        else {
+        } else {
           dclMarker.rollbackTo()
           false
         }
@@ -59,8 +59,7 @@ object Dcl {
         if (VarDcl parse builder) {
           dclMarker.done(ScalaElementTypes.VARIABLE_DECLARATION)
           true
-        }
-        else {
+        } else {
           dclMarker.drop()
           false
         }
@@ -68,8 +67,7 @@ object Dcl {
         if (FunDcl parse builder) {
           dclMarker.done(ScalaElementTypes.FUNCTION_DECLARATION)
           true
-        }
-        else {
+        } else {
           dclMarker.drop()
           false
         }
@@ -77,8 +75,7 @@ object Dcl {
         if (TypeDcl parse builder) {
           dclMarker.done(ScalaElementTypes.TYPE_DECLARATION)
           true
-        }
-        else {
+        } else {
           dclMarker.drop()
           false
         }

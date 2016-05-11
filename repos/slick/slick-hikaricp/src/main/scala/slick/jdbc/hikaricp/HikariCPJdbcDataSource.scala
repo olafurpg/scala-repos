@@ -8,7 +8,9 @@ import slick.util.ConfigExtensionMethods._
 
 /** A JdbcDataSource for a HikariCP connection pool.
   * See `slick.jdbc.JdbcBackend#Database.forConfig` for documentation on the config parameters. */
-class HikariCPJdbcDataSource(val ds: com.zaxxer.hikari.HikariDataSource, val hconf: com.zaxxer.hikari.HikariConfig) extends JdbcDataSource {
+class HikariCPJdbcDataSource(val ds: com.zaxxer.hikari.HikariDataSource,
+                             val hconf: com.zaxxer.hikari.HikariConfig)
+    extends JdbcDataSource {
   def createConnection(): Connection = ds.getConnection()
   def close(): Unit = ds.close()
 }
@@ -16,16 +18,21 @@ class HikariCPJdbcDataSource(val ds: com.zaxxer.hikari.HikariDataSource, val hco
 object HikariCPJdbcDataSource extends JdbcDataSourceFactory {
   import com.zaxxer.hikari._
 
-  def forConfig(c: Config, driver: Driver, name: String, classLoader: ClassLoader): HikariCPJdbcDataSource = {
-    if(driver ne null)
-      throw new SlickException("An explicit Driver object is not supported by HikariCPJdbcDataSource")
+  def forConfig(c: Config,
+                driver: Driver,
+                name: String,
+                classLoader: ClassLoader): HikariCPJdbcDataSource = {
+    if (driver ne null)
+      throw new SlickException(
+          "An explicit Driver object is not supported by HikariCPJdbcDataSource")
     val hconf = new HikariConfig()
 
     // Connection settings
     if (c.hasPath("dataSourceClass")) {
       hconf.setDataSourceClassName(c.getString("dataSourceClass"))
     } else {
-      Option(c.getStringOr("driverClassName", c.getStringOr("driver"))).map(hconf.setDriverClassName _)
+      Option(c.getStringOr("driverClassName", c.getStringOr("driver")))
+        .map(hconf.setDriverClassName _)
     }
     hconf.setJdbcUrl(c.getStringOr("url", null))
     c.getStringOpt("user").foreach(hconf.setUsername)
@@ -37,8 +44,10 @@ object HikariCPJdbcDataSource extends JdbcDataSourceFactory {
     hconf.setValidationTimeout(c.getMillisecondsOr("validationTimeout", 1000))
     hconf.setIdleTimeout(c.getMillisecondsOr("idleTimeout", 600000))
     hconf.setMaxLifetime(c.getMillisecondsOr("maxLifetime", 1800000))
-    hconf.setLeakDetectionThreshold(c.getMillisecondsOr("leakDetectionThreshold", 0))
-    hconf.setInitializationFailFast(c.getBooleanOr("initializationFailFast", false))
+    hconf.setLeakDetectionThreshold(
+        c.getMillisecondsOr("leakDetectionThreshold", 0))
+    hconf.setInitializationFailFast(
+        c.getBooleanOr("initializationFailFast", false))
     c.getStringOpt("connectionTestQuery").foreach(hconf.setConnectionTestQuery)
     c.getStringOpt("connectionInitSql").foreach(hconf.setConnectionInitSql)
     val numThreads = c.getIntOr("numThreads", 20)
@@ -49,7 +58,9 @@ object HikariCPJdbcDataSource extends JdbcDataSourceFactory {
 
     // Equivalent of ConnectionPreparer
     hconf.setReadOnly(c.getBooleanOr("readOnly", false))
-    c.getStringOpt("isolation").map("TRANSACTION_" + _).foreach(hconf.setTransactionIsolation)
+    c.getStringOpt("isolation")
+      .map("TRANSACTION_" + _)
+      .foreach(hconf.setTransactionIsolation)
     hconf.setCatalog(c.getStringOr("catalog", null))
 
     val ds = new HikariDataSource(hconf)

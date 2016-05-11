@@ -4,9 +4,9 @@ object SCL5247 extends App {
 
   val msgUpdater = msg_= _ // This is red with type aware highlighting
 
-  /*start*/msgUpdater("bye")/*end*/
+  /*start*/
+  msgUpdater("bye") /*end*/
 
   println(msg)
-
 }
 //Unit

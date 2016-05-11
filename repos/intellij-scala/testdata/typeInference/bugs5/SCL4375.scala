@@ -7,6 +7,6 @@ class SCL4375 {
 
   def asd_=(f: Int => Unit) = 1
 
-  asd = /*start*/_ => ()/*end*/
+  asd = /*start*/ _ => () /*end*/
 }
 //(Int) => Unit

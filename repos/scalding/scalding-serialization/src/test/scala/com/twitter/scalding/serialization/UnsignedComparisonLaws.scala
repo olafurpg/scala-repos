@@ -14,7 +14,8 @@ object UnsignedComparisonLaws extends Properties("UnsignedComparisonLaws") {
       case (true, true) => cmp == java.lang.Long.compare(l1, l2)
       case (true, false) => cmp < 0 // negative is bigger
       case (false, true) => cmp > 0
-      case (false, false) => cmp == java.lang.Long.compare(l1 & Long.MaxValue, l2 & Long.MaxValue)
+      case (false, false) =>
+        cmp == java.lang.Long.compare(l1 & Long.MaxValue, l2 & Long.MaxValue)
     }
   }
   property("UnsignedIntCompare works") = forAll { (l1: Int, l2: Int) =>
@@ -23,7 +24,8 @@ object UnsignedComparisonLaws extends Properties("UnsignedComparisonLaws") {
       case (true, true) => cmp == java.lang.Integer.compare(l1, l2)
       case (true, false) => cmp < 0 // negative is bigger
       case (false, true) => cmp > 0
-      case (false, false) => cmp == java.lang.Integer.compare(l1 & Int.MaxValue, l2 & Int.MaxValue)
+      case (false, false) =>
+        cmp == java.lang.Integer.compare(l1 & Int.MaxValue, l2 & Int.MaxValue)
     }
   }
   property("UnsignedByteCompare works") = forAll { (l1: Byte, l2: Byte) =>
@@ -34,8 +36,9 @@ object UnsignedComparisonLaws extends Properties("UnsignedComparisonLaws") {
       case (true, false) => cmp < 0 // negative is bigger
       case (false, true) => cmp > 0
       // Convert to positive ints
-      case (false, false) => cmp == java.lang.Integer.compare(l1 & Byte.MaxValue, l2 & Byte.MaxValue)
+      case (false, false) =>
+        cmp == java.lang.Integer
+          .compare(l1 & Byte.MaxValue, l2 & Byte.MaxValue)
     }
   }
 }
-

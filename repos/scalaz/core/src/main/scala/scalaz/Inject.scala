@@ -3,10 +3,10 @@ package scalaz
 import std.option.{none, some}
 
 /**
- * Inject type class as described in "Data types a la carte" (Swierstra 2008).
- *
- * @see [[http://www.staff.science.uu.nl/~swier004/Publications/DataTypesALaCarte.pdf]]
- */
+  * Inject type class as described in "Data types a la carte" (Swierstra 2008).
+  *
+  * @see [[http://www.staff.science.uu.nl/~swier004/Publications/DataTypesALaCarte.pdf]]
+  */
 sealed abstract class Inject[F[_], G[_]] extends (F ~> G) {
   def apply[A](fa: F[A]): G[A] = inj(fa)
   def inj[A](fa: F[A]): G[A]
@@ -26,18 +26,21 @@ sealed abstract class InjectInstances {
       def prj[A](ga: Coproduct[F, G, A]) = ga.run.fold(some(_), _ => none)
     }
 
-  implicit def rightInjectInstance[F[_], G[_], H[_]](implicit I: Inject[F, G]) =
-      new Inject[F, Coproduct[H, G, ?]] {
-        def inj[A](fa: F[A]) = Coproduct.rightc(I.inj(fa))
-        def prj[A](ga: Coproduct[H, G, A]) = ga.run.fold(_ => none, I.prj(_))
-      }
+  implicit def rightInjectInstance[F[_], G[_], H[_]](
+      implicit I: Inject[F, G]) =
+    new Inject[F, Coproduct[H, G, ?]] {
+      def inj[A](fa: F[A]) = Coproduct.rightc(I.inj(fa))
+      def prj[A](ga: Coproduct[H, G, A]) = ga.run.fold(_ => none, I.prj(_))
+    }
 }
 
 object Inject extends InjectInstances {
-  def inject[F[_], G[_], A](ga: G[Free[F, A]])(implicit I: Inject[G, F]): Free[F, A] =
+  def inject[F[_], G[_], A](ga: G[Free[F, A]])(
+      implicit I: Inject[G, F]): Free[F, A] =
     Free[F, A](I.inj(ga))
 
-  def match_[F[_], G[_], A](fa: Free[F, A])(implicit F: Functor[F], I: Inject[G, F]): Option[G[Free[F, A]]] =
+  def match_[F[_], G[_], A](fa: Free[F, A])(
+      implicit F: Functor[F], I: Inject[G, F]): Option[G[Free[F, A]]] =
     fa.resume.fold(I.prj(_), _ => none)
 
   @inline def apply[F[_], G[_]](implicit I: Inject[F, G]): Inject[F, G] = I

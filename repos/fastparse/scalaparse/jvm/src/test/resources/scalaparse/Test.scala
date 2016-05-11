@@ -1,4 +1,3 @@
-
 class Baz {
-    ba /*caret*/r
+  ba /*caret*/ r
 }

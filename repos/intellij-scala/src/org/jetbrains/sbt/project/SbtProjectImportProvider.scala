@@ -6,10 +6,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class SbtProjectImportProvider(builder: SbtProjectImportBuilder)
-  extends AbstractExternalProjectImportProvider(builder, SbtProjectSystem.Id) {
+    extends AbstractExternalProjectImportProvider(builder, SbtProjectSystem.Id) {
 
   override def getId = Sbt.Name
 
@@ -28,8 +28,8 @@ object SbtProjectImportProvider {
   def canImport(entry: VirtualFile): Boolean = {
     if (entry.isDirectory) {
       entry.getName == Sbt.ProjectDirectory ||
-              entry.containsDirectory(Sbt.ProjectDirectory) ||
-              entry.containsFile(Sbt.BuildFile)
+      entry.containsDirectory(Sbt.ProjectDirectory) ||
+      entry.containsFile(Sbt.BuildFile)
     } else {
       entry.getName == Sbt.BuildFile
     }

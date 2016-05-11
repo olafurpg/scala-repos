@@ -35,10 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Timeline Spec tests.
- *
- *
- */
+  * Timeline Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class TimelineSpec
-  extends SimpleSFXDelegateSpec[jfxa.Timeline, Timeline](classOf[jfxa.Timeline], classOf[Timeline])
+    extends SimpleSFXDelegateSpec[jfxa.Timeline, Timeline](
+        classOf[jfxa.Timeline], classOf[Timeline])

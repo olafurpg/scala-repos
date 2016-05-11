@@ -5,10 +5,11 @@ import java.awt.event.{ItemEvent, ItemListener}
 import javax.swing._
 
 /**
- * Nikolay.Tropin
- * 2014-09-05
- */
-class DefaultValuesUsagePanel(labelText: String = "Default values:") extends JPanel {
+  * Nikolay.Tropin
+  * 2014-09-05
+  */
+class DefaultValuesUsagePanel(labelText: String = "Default values:")
+    extends JPanel {
   private val myRbModifyCalls: JRadioButton = new JRadioButton
   private val myRbAddDefaultArg: JRadioButton = new JRadioButton
 
@@ -41,9 +42,7 @@ class DefaultValuesUsagePanel(labelText: String = "Default values:") extends JPa
     myRbAddDefaultArg.addItemListener(listener)
   }
 
-
-  protected def stateModified() {
-  }
+  protected def stateModified() {}
 
   def isAddDefaultArgs: Boolean = myRbAddDefaultArg.isSelected
 

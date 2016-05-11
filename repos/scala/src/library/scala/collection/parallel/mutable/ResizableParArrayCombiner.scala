@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___     Scala API                            **
-**    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
-**  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
-** /____/\___/_/ |_/____/_/ | |                                         **
-**                          |/                                          **
+ **     ________ ___   / /  ___     Scala API                            **
+ **    / __/ __// _ | / /  / _ |    (c) 2003-2013, LAMP/EPFL             **
+ **  __\ \/ /__/ __ |/ /__/ __ |    http://scala-lang.org/               **
+ ** /____/\___/_/ |_/____/_/ | |                                         **
+ **                          |/                                          **
 \*                                                                      */
 
 package scala
@@ -14,29 +14,35 @@ import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.Task
 
 /** An array combiner that uses a chain of arraybuffers to store elements. */
-trait ResizableParArrayCombiner[T] extends LazyCombiner[T, ParArray[T], ExposedArrayBuffer[T]] {
+trait ResizableParArrayCombiner[T]
+    extends LazyCombiner[T, ParArray[T], ExposedArrayBuffer[T]] {
 
   override def sizeHint(sz: Int) = if (chain.length == 1) chain(0).sizeHint(sz)
 
   // public method with private[mutable] type ExposedArrayBuffer in parameter type; cannot be overridden.
-  final def newLazyCombiner(c: ArrayBuffer[ExposedArrayBuffer[T]]) = ResizableParArrayCombiner(c)
+  final def newLazyCombiner(c: ArrayBuffer[ExposedArrayBuffer[T]]) =
+    ResizableParArrayCombiner(c)
 
-  def allocateAndCopy = if (chain.size > 1) {
-    val arrayseq = new ArraySeq[T](size)
-    val array = arrayseq.array.asInstanceOf[Array[Any]]
+  def allocateAndCopy =
+    if (chain.size > 1) {
+      val arrayseq = new ArraySeq[T](size)
+      val array = arrayseq.array.asInstanceOf[Array[Any]]
 
-    combinerTaskSupport.executeAndWaitResult(new CopyChainToArray(array, 0, size))
+      combinerTaskSupport.executeAndWaitResult(
+          new CopyChainToArray(array, 0, size))
 
-    new ParArray(arrayseq)
-  } else { // optimisation if there is only 1 array
-    new ParArray(new ExposedArraySeq[T](chain(0).internalArray, size))
-  }
+      new ParArray(arrayseq)
+    } else {
+      // optimisation if there is only 1 array
+      new ParArray(new ExposedArraySeq[T](chain(0).internalArray, size))
+    }
 
   override def toString = "ResizableParArrayCombiner(" + size + "): " //+ chain
 
   /* tasks */
 
-  class CopyChainToArray(array: Array[Any], offset: Int, howmany: Int) extends Task[Unit, CopyChainToArray] {
+  class CopyChainToArray(array: Array[Any], offset: Int, howmany: Int)
+      extends Task[Unit, CopyChainToArray] {
     var result = ()
     def leaf(prev: Option[Unit]) = if (howmany > 0) {
       var totalleft = howmany
@@ -46,7 +52,9 @@ trait ResizableParArrayCombiner[T] extends LazyCombiner[T, ParArray[T], ExposedA
       var arrayIndex = offset
       while (totalleft > 0) {
         val currbuff = chain(buffind)
-        val chunksize = if (totalleft < (currbuff.size - ind)) totalleft else currbuff.size - ind
+        val chunksize =
+          if (totalleft < (currbuff.size - ind)) totalleft
+          else currbuff.size - ind
         val until = ind + chunksize
 
         copyChunk(currbuff.internalArray, ind, array, arrayIndex, until)
@@ -58,7 +66,11 @@ trait ResizableParArrayCombiner[T] extends LazyCombiner[T, ParArray[T], ExposedA
         ind = 0
       }
     }
-    private def copyChunk(buffarr: Array[AnyRef], buffStart: Int, ra: Array[Any], arrayStart: Int, until: Int) {
+    private def copyChunk(buffarr: Array[AnyRef],
+                          buffStart: Int,
+                          ra: Array[Any],
+                          arrayStart: Int,
+                          until: Int) {
       Array.copy(buffarr, buffStart, ra, arrayStart, until - buffStart)
     }
     private def findStart(pos: Int) = {
@@ -72,15 +84,21 @@ trait ResizableParArrayCombiner[T] extends LazyCombiner[T, ParArray[T], ExposedA
     }
     def split = {
       val fp = howmany / 2
-      List(new CopyChainToArray(array, offset, fp), new CopyChainToArray(array, offset + fp, howmany - fp))
+      List(new CopyChainToArray(array, offset, fp),
+           new CopyChainToArray(array, offset + fp, howmany - fp))
     }
-    def shouldSplitFurther = howmany > scala.collection.parallel.thresholdFromSize(size, combinerTaskSupport.parallelismLevel)
+    def shouldSplitFurther =
+      howmany > scala.collection.parallel
+        .thresholdFromSize(size, combinerTaskSupport.parallelismLevel)
   }
 }
 
 object ResizableParArrayCombiner {
-  def apply[T](c: ArrayBuffer[ExposedArrayBuffer[T]]): ResizableParArrayCombiner[T] = {
-    new { val chain = c } with ResizableParArrayCombiner[T] // was: with EnvironmentPassingCombiner[T, ParArray[T]]
+  def apply[T](
+      c: ArrayBuffer[ExposedArrayBuffer[T]]): ResizableParArrayCombiner[T] = {
+    new { val chain = c }
+    with ResizableParArrayCombiner[T] // was: with EnvironmentPassingCombiner[T, ParArray[T]]
   }
-  def apply[T](): ResizableParArrayCombiner[T] = apply(new ArrayBuffer[ExposedArrayBuffer[T]] += new ExposedArrayBuffer[T])
+  def apply[T](): ResizableParArrayCombiner[T] =
+    apply(new ArrayBuffer[ExposedArrayBuffer[T]] += new ExposedArrayBuffer[T])
 }

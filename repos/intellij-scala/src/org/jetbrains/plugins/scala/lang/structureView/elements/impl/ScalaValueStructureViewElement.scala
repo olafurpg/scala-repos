@@ -10,11 +10,12 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.structureView.itemsPresentations.impl._
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 08.05.2008
-*/
-
-class ScalaValueStructureViewElement(val element: PsiElement, val isInherited: Boolean) extends ScalaStructureViewElement(element, isInherited) {
+  * @author Alexander Podkhalyuzin
+  * Date: 08.05.2008
+  */
+class ScalaValueStructureViewElement(
+    val element: PsiElement, val isInherited: Boolean)
+    extends ScalaStructureViewElement(element, isInherited) {
   def getPresentation: ItemPresentation = {
     new ScalaValueItemPresentation(element, isInherited)
   }

@@ -17,8 +17,8 @@
 package com.twitter.summingbird.scalding
 
 import com.twitter.algebird.Semigroup
-import com.twitter.algebird.monad.{ StateWithError, Reader }
-import com.twitter.scalding.{ Dsl, TypedPipe, MapsideReduce, TupleSetter, TupleConverter }
+import com.twitter.algebird.monad.{StateWithError, Reader}
+import com.twitter.scalding.{Dsl, TypedPipe, MapsideReduce, TupleSetter, TupleConverter}
 import com.twitter.summingbird._
 import com.twitter.summingbird.option._
 import cascading.flow.FlowDef
@@ -26,23 +26,25 @@ import cascading.flow.FlowDef
 import org.slf4j.LoggerFactory
 
 trait Store[K, V] extends java.io.Serializable {
-  /**
-   * Accepts deltas along with their timestamps, returns triples of
-   * (time, K, V(aggregated up to the time)).
-   *
-   * Same return as lookup on a ScaldingService.
-   */
-  def merge(delta: PipeFactory[(K, V)],
-    sg: Semigroup[V],
-    commutativity: Commutativity,
-    reducers: Int): PipeFactory[(K, (Option[V], V))]
 
   /**
-   * This is an optional method, by default it a pass-through.
-   * it may be called by ScaldingPlatform before a key transformation
-   * that leads only to this store.
-   */
+    * Accepts deltas along with their timestamps, returns triples of
+    * (time, K, V(aggregated up to the time)).
+    *
+    * Same return as lookup on a ScaldingService.
+    */
+  def merge(delta: PipeFactory[(K, V)],
+            sg: Semigroup[V],
+            commutativity: Commutativity,
+            reducers: Int): PipeFactory[(K, (Option[V], V))]
+
+  /**
+    * This is an optional method, by default it a pass-through.
+    * it may be called by ScaldingPlatform before a key transformation
+    * that leads only to this store.
+    */
   def partialMerge[K1](delta: PipeFactory[(K1, V)],
-    sg: Semigroup[V],
-    commutativity: Commutativity): PipeFactory[(K1, V)] = delta
+                       sg: Semigroup[V],
+                       commutativity: Commutativity): PipeFactory[(K1, V)] =
+    delta
 }

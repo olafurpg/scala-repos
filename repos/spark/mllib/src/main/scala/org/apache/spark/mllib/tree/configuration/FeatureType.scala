@@ -20,8 +20,8 @@ package org.apache.spark.mllib.tree.configuration
 import org.apache.spark.annotation.Since
 
 /**
- * Enum to describe whether a feature is "continuous" or "categorical"
- */
+  * Enum to describe whether a feature is "continuous" or "categorical"
+  */
 @Since("1.0.0")
 object FeatureType extends Enumeration {
   @Since("1.0.0")

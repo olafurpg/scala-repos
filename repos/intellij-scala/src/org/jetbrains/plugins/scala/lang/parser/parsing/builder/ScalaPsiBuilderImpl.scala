@@ -11,10 +11,10 @@ import scala.collection.mutable
 /**
   * @author Alexander Podkhalyuzin
   */
-
 class ScalaPsiBuilderImpl(builder: PsiBuilder)
-  extends PsiBuilderAdapter(builder) with ScalaPsiBuilder {
-  private final val newlinesEnabled: mutable.Stack[Boolean] = new mutable.Stack[Boolean]
+    extends PsiBuilderAdapter(builder) with ScalaPsiBuilder {
+  private final val newlinesEnabled: mutable.Stack[Boolean] =
+    new mutable.Stack[Boolean]
 
   def newlineBeforeCurrentToken: Boolean = {
     countNewlineBeforeCurrentToken() > 0
@@ -35,8 +35,11 @@ class ScalaPsiBuilderImpl(builder: PsiBuilder)
     if (!ParserUtils.elementCanStartStatement(getTokenType, this)) return 0
 
     var i = 1
-    while (i < getCurrentOffset && TokenSets.WHITESPACE_OR_COMMENT_SET.contains(rawLookup(-i))) i += 1
-    val textBefore = getOriginalText.subSequence(rawTokenTypeStart(-i + 1), rawTokenTypeStart(0)).toString
+    while (i < getCurrentOffset &&
+    TokenSets.WHITESPACE_OR_COMMENT_SET.contains(rawLookup(-i))) i += 1
+    val textBefore = getOriginalText
+      .subSequence(rawTokenTypeStart(-i + 1), rawTokenTypeStart(0))
+      .toString
     if (!textBefore.contains('\n')) return 0
     val lines = s"start $textBefore end".split('\n')
     if (lines.exists(_.forall(StringUtil.isWhiteSpace))) 2

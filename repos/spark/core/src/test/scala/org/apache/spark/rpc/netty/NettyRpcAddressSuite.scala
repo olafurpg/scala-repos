@@ -31,5 +31,4 @@ class NettyRpcAddressSuite extends SparkFunSuite {
     val addr = RpcEndpointAddress(null, "test")
     assert(addr.toString === "spark-client://test")
   }
-
 }

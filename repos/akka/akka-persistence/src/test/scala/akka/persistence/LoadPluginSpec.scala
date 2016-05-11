@@ -1,7 +1,6 @@
 /**
- * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
- */
-
+  * Copyright (C) 2015-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.persistence
 
 import akka.persistence.journal.inmem.InmemJournal
@@ -20,8 +19,12 @@ object LoadJournalSpec {
   }
 }
 
-class LoadJournalSpec extends PersistenceSpec(PersistenceSpec.config("inmem", "LoadJournalSpec", extraConfig = Some(
-  """
+class LoadJournalSpec
+    extends PersistenceSpec(
+        PersistenceSpec.config(
+            "inmem",
+            "LoadJournalSpec",
+            extraConfig = Some("""
   akka.persistence.journal.inmem.class = "akka.persistence.LoadJournalSpec$JournalWithConfig"
   akka.persistence.journal.inmem.extra-property = 17
   """))) with ImplicitSender {
@@ -29,10 +32,10 @@ class LoadJournalSpec extends PersistenceSpec(PersistenceSpec.config("inmem", "L
 
   "A journal with config parameter" must {
     "be created with plugin config" in {
-      val journalRef = Persistence(system).journalFor("akka.persistence.journal.inmem")
+      val journalRef =
+        Persistence(system).journalFor("akka.persistence.journal.inmem")
       journalRef ! GetConfig
       expectMsgType[Config].getInt("extra-property") should be(17)
     }
   }
 }
-

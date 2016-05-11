@@ -1,4 +1,3 @@
-
 package disktest
 
 class Foo {

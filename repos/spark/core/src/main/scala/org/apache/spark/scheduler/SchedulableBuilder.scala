@@ -27,10 +27,10 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.Utils
 
 /**
- * An interface to build Schedulable tree
- * buildPools: build the tree nodes(pools)
- * addTaskSetManager: build the leaf nodes(TaskSetManagers)
- */
+  * An interface to build Schedulable tree
+  * buildPools: build the tree nodes(pools)
+  * addTaskSetManager: build the leaf nodes(TaskSetManagers)
+  */
 private[spark] trait SchedulableBuilder {
   def rootPool: Pool
 
@@ -40,19 +40,21 @@ private[spark] trait SchedulableBuilder {
 }
 
 private[spark] class FIFOSchedulableBuilder(val rootPool: Pool)
-  extends SchedulableBuilder with Logging {
+    extends SchedulableBuilder with Logging {
 
   override def buildPools() {
     // nothing
   }
 
-  override def addTaskSetManager(manager: Schedulable, properties: Properties) {
+  override def addTaskSetManager(
+      manager: Schedulable, properties: Properties) {
     rootPool.addSchedulable(manager)
   }
 }
 
-private[spark] class FairSchedulableBuilder(val rootPool: Pool, conf: SparkConf)
-  extends SchedulableBuilder with Logging {
+private[spark] class FairSchedulableBuilder(
+    val rootPool: Pool, conf: SparkConf)
+    extends SchedulableBuilder with Logging {
 
   val schedulerAllocFile = conf.getOption("spark.scheduler.allocation.file")
   val DEFAULT_SCHEDULER_FILE = "fairscheduler.xml"
@@ -78,7 +80,9 @@ private[spark] class FairSchedulableBuilder(val rootPool: Pool, conf: SparkConf)
         }
       }
 
-      is.foreach { i => buildFairSchedulerPool(i) }
+      is.foreach { i =>
+        buildFairSchedulerPool(i)
+      }
     } finally {
       is.foreach(_.close())
     }
@@ -89,11 +93,17 @@ private[spark] class FairSchedulableBuilder(val rootPool: Pool, conf: SparkConf)
 
   private def buildDefaultPool() {
     if (rootPool.getSchedulableByName(DEFAULT_POOL_NAME) == null) {
-      val pool = new Pool(DEFAULT_POOL_NAME, DEFAULT_SCHEDULING_MODE,
-        DEFAULT_MINIMUM_SHARE, DEFAULT_WEIGHT)
+      val pool = new Pool(DEFAULT_POOL_NAME,
+                          DEFAULT_SCHEDULING_MODE,
+                          DEFAULT_MINIMUM_SHARE,
+                          DEFAULT_WEIGHT)
       rootPool.addSchedulable(pool)
-      logInfo("Created default pool %s, schedulingMode: %s, minShare: %d, weight: %d".format(
-        DEFAULT_POOL_NAME, DEFAULT_SCHEDULING_MODE, DEFAULT_MINIMUM_SHARE, DEFAULT_WEIGHT))
+      logInfo(
+          "Created default pool %s, schedulingMode: %s, minShare: %d, weight: %d"
+            .format(DEFAULT_POOL_NAME,
+                    DEFAULT_SCHEDULING_MODE,
+                    DEFAULT_MINIMUM_SHARE,
+                    DEFAULT_WEIGHT))
     }
   }
 
@@ -112,7 +122,8 @@ private[spark] class FairSchedulableBuilder(val rootPool: Pool, conf: SparkConf)
           schedulingMode = SchedulingMode.withName(xmlSchedulingMode)
         } catch {
           case e: NoSuchElementException =>
-            logWarning("Error xml schedulingMode, using default schedulingMode")
+            logWarning(
+                "Error xml schedulingMode, using default schedulingMode")
         }
       }
 
@@ -128,25 +139,34 @@ private[spark] class FairSchedulableBuilder(val rootPool: Pool, conf: SparkConf)
 
       val pool = new Pool(poolName, schedulingMode, minShare, weight)
       rootPool.addSchedulable(pool)
-      logInfo("Created pool %s, schedulingMode: %s, minShare: %d, weight: %d".format(
-        poolName, schedulingMode, minShare, weight))
+      logInfo(
+          "Created pool %s, schedulingMode: %s, minShare: %d, weight: %d"
+            .format(poolName, schedulingMode, minShare, weight))
     }
   }
 
-  override def addTaskSetManager(manager: Schedulable, properties: Properties) {
+  override def addTaskSetManager(
+      manager: Schedulable, properties: Properties) {
     var poolName = DEFAULT_POOL_NAME
     var parentPool = rootPool.getSchedulableByName(poolName)
     if (properties != null) {
-      poolName = properties.getProperty(FAIR_SCHEDULER_PROPERTIES, DEFAULT_POOL_NAME)
+      poolName = properties.getProperty(
+          FAIR_SCHEDULER_PROPERTIES, DEFAULT_POOL_NAME)
       parentPool = rootPool.getSchedulableByName(poolName)
       if (parentPool == null) {
         // we will create a new pool that user has configured in app
         // instead of being defined in xml file
-        parentPool = new Pool(poolName, DEFAULT_SCHEDULING_MODE,
-          DEFAULT_MINIMUM_SHARE, DEFAULT_WEIGHT)
+        parentPool = new Pool(poolName,
+                              DEFAULT_SCHEDULING_MODE,
+                              DEFAULT_MINIMUM_SHARE,
+                              DEFAULT_WEIGHT)
         rootPool.addSchedulable(parentPool)
-        logInfo("Created pool %s, schedulingMode: %s, minShare: %d, weight: %d".format(
-          poolName, DEFAULT_SCHEDULING_MODE, DEFAULT_MINIMUM_SHARE, DEFAULT_WEIGHT))
+        logInfo(
+            "Created pool %s, schedulingMode: %s, minShare: %d, weight: %d"
+              .format(poolName,
+                      DEFAULT_SCHEDULING_MODE,
+                      DEFAULT_MINIMUM_SHARE,
+                      DEFAULT_WEIGHT))
       }
     }
     parentPool.addSchedulable(manager)

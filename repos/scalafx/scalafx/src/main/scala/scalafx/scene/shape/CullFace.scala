@@ -35,50 +35,52 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 object CullFace extends SFXEnumDelegateCompanion[jfxss.CullFace, CullFace] {
 
   /**
-   * Perform back-face culling.
-   *
-   * All back-faces, identified by clockwise vertex winding, will be culled.
-   */
+    * Perform back-face culling.
+    *
+    * All back-faces, identified by clockwise vertex winding, will be culled.
+    */
   val Back = new CullFace(jfxss.CullFace.BACK)
 
   /**
-   * Perform back-face culling.
-   *
-   * All back-faces, identified by clockwise vertex winding, will be culled.
-   */
-  @deprecated("Use Back instead; BACK will be removed in a future release.", "8.0.0-M4")
+    * Perform back-face culling.
+    *
+    * All back-faces, identified by clockwise vertex winding, will be culled.
+    */
+  @deprecated("Use Back instead; BACK will be removed in a future release.",
+              "8.0.0-M4")
   val BACK = Back
 
   /**
-   * Perform front-face culling.
-   *
-   * All front-faces, identified by counterclockwise vertex winding, will be culled.
-   */
+    * Perform front-face culling.
+    *
+    * All front-faces, identified by counterclockwise vertex winding, will be culled.
+    */
   val Front = new CullFace(jfxss.CullFace.FRONT)
 
   /**
-   * Perform front-face culling.
-   *
-   * All front-faces, identified by counterclockwise vertex winding, will be culled.
-   */
-  @deprecated("Use Front instead; FRONT will be removed in a future release.", "8.0.0-M4")
+    * Perform front-face culling.
+    *
+    * All front-faces, identified by counterclockwise vertex winding, will be culled.
+    */
+  @deprecated("Use Front instead; FRONT will be removed in a future release.",
+              "8.0.0-M4")
   val FRONT = Front
 
   /**
-   * Perform no face culling.
-   */
+    * Perform no face culling.
+    */
   val None = new CullFace(jfxss.CullFace.NONE)
 
   /**
-   * Perform no face culling.
-   */
-  @deprecated("Use None instead; NONE will be removed in a future release.", "8.0.0-M4")
+    * Perform no face culling.
+    */
+  @deprecated("Use None instead; NONE will be removed in a future release.",
+              "8.0.0-M4")
   val NONE = None
 
-  protected override def unsortedValues: Array[CullFace] = Array(Back, Front, None)
+  protected override def unsortedValues: Array[CullFace] =
+    Array(Back, Front, None)
 }
 
 sealed case class CullFace(override val delegate: jfxss.CullFace)
-  extends SFXEnumDelegate[jfxss.CullFace]
-
-
+    extends SFXEnumDelegate[jfxss.CullFace]

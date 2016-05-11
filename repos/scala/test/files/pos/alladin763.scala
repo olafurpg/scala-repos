@@ -1,12 +1,11 @@
 // Test from http://lrytz.github.io/scala-aladdin-bugtracker/displayItem.do%3Fid=763.html
 // and expanded with package object variants
 
-
-trait Foo { type T; def apply() : T }
+trait Foo { type T; def apply(): T }
 object e extends Foo { type T = Int; def apply() = 42 }
 
 package p {
-  trait T[X] { def O : { def apply(): X } }
+  trait T[X] { def O: { def apply(): X } }
   object `package` extends T[Int] {
     def O: { def apply(): Int } = new { def apply(): Int = 42 }
   }

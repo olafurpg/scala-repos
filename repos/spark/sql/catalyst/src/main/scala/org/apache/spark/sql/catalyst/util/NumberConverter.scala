@@ -24,13 +24,13 @@ object NumberConverter {
   private val value = new Array[Byte](64)
 
   /**
-   * Divide x by m as if x is an unsigned 64-bit integer. Examples:
-   * unsignedLongDiv(-1, 2) == Long.MAX_VALUE unsignedLongDiv(6, 3) == 2
-   * unsignedLongDiv(0, 5) == 0
-   *
-   * @param x is treated as unsigned
-   * @param m is treated as signed
-   */
+    * Divide x by m as if x is an unsigned 64-bit integer. Examples:
+    * unsignedLongDiv(-1, 2) == Long.MAX_VALUE unsignedLongDiv(6, 3) == 2
+    * unsignedLongDiv(0, 5) == 0
+    *
+    * @param x is treated as unsigned
+    * @param m is treated as signed
+    */
   private def unsignedLongDiv(x: Long, m: Int): Long = {
     if (x >= 0) {
       x / m
@@ -39,16 +39,17 @@ object NumberConverter {
       // Two's complement => x = uval - 2*MAX - 2
       // => uval = x + 2*MAX + 2
       // Now, use the fact: (a+b)/c = a/c + b/c + (a%c+b%c)/c
-      x / m + 2 * (Long.MaxValue / m) + 2 / m + (x % m + 2 * (Long.MaxValue % m) + 2 % m) / m
+      x / m + 2 * (Long.MaxValue / m) + 2 / m +
+      (x % m + 2 * (Long.MaxValue % m) + 2 % m) / m
     }
   }
 
   /**
-   * Decode v into value[].
-   *
-   * @param v is treated as an unsigned 64-bit integer
-   * @param radix must be between MIN_RADIX and MAX_RADIX
-   */
+    * Decode v into value[].
+    *
+    * @param v is treated as an unsigned 64-bit integer
+    * @param radix must be between MIN_RADIX and MAX_RADIX
+    */
   private def decode(v: Long, radix: Int): Unit = {
     var tmpV = v
     java.util.Arrays.fill(value, 0.asInstanceOf[Byte])
@@ -62,13 +63,13 @@ object NumberConverter {
   }
 
   /**
-   * Convert value[] into a long. On overflow, return -1 (as mySQL does). If a
-   * negative digit is found, ignore the suffix starting there.
-   *
-   * @param radix  must be between MIN_RADIX and MAX_RADIX
-   * @param fromPos is the first element that should be considered
-   * @return the result should be treated as an unsigned 64-bit integer.
-   */
+    * Convert value[] into a long. On overflow, return -1 (as mySQL does). If a
+    * negative digit is found, ignore the suffix starting there.
+    *
+    * @param radix  must be between MIN_RADIX and MAX_RADIX
+    * @param fromPos is the first element that should be considered
+    * @return the result should be treated as an unsigned 64-bit integer.
+    */
   private def encode(radix: Int, fromPos: Int): Long = {
     var v: Long = 0L
     val bound = unsignedLongDiv(-1 - radix, radix) // Possible overflow once
@@ -89,43 +90,45 @@ object NumberConverter {
   }
 
   /**
-   * Convert the bytes in value[] to the corresponding chars.
-   *
-   * @param radix must be between MIN_RADIX and MAX_RADIX
-   * @param fromPos is the first nonzero element
-   */
+    * Convert the bytes in value[] to the corresponding chars.
+    *
+    * @param radix must be between MIN_RADIX and MAX_RADIX
+    * @param fromPos is the first nonzero element
+    */
   private def byte2char(radix: Int, fromPos: Int): Unit = {
     var i = fromPos
     while (i < value.length) {
-      value(i) = Character.toUpperCase(Character.forDigit(value(i), radix)).asInstanceOf[Byte]
+      value(i) = Character
+        .toUpperCase(Character.forDigit(value(i), radix))
+        .asInstanceOf[Byte]
       i += 1
     }
   }
 
   /**
-   * Convert the chars in value[] to the corresponding integers. Convert invalid
-   * characters to -1.
-   *
-   * @param radix must be between MIN_RADIX and MAX_RADIX
-   * @param fromPos is the first nonzero element
-   */
+    * Convert the chars in value[] to the corresponding integers. Convert invalid
+    * characters to -1.
+    *
+    * @param radix must be between MIN_RADIX and MAX_RADIX
+    * @param fromPos is the first nonzero element
+    */
   private def char2byte(radix: Int, fromPos: Int): Unit = {
     var i = fromPos
-    while ( i < value.length) {
+    while (i < value.length) {
       value(i) = Character.digit(value(i), radix).asInstanceOf[Byte]
       i += 1
     }
   }
 
   /**
-   * Convert numbers between different number bases. If toBase>0 the result is
-   * unsigned, otherwise it is signed.
-   * NB: This logic is borrowed from org.apache.hadoop.hive.ql.ud.UDFConv
-   */
-  def convert(n: Array[Byte], fromBase: Int, toBase: Int ): UTF8String = {
-    if (fromBase < Character.MIN_RADIX || fromBase > Character.MAX_RADIX
-      || Math.abs(toBase) < Character.MIN_RADIX
-      || Math.abs(toBase) > Character.MAX_RADIX) {
+    * Convert numbers between different number bases. If toBase>0 the result is
+    * unsigned, otherwise it is signed.
+    * NB: This logic is borrowed from org.apache.hadoop.hive.ql.ud.UDFConv
+    */
+  def convert(n: Array[Byte], fromBase: Int, toBase: Int): UTF8String = {
+    if (fromBase < Character.MIN_RADIX || fromBase > Character.MAX_RADIX ||
+        Math.abs(toBase) < Character.MIN_RADIX ||
+        Math.abs(toBase) > Character.MAX_RADIX) {
       return null
     }
 
@@ -160,7 +163,7 @@ object NumberConverter {
 
     // Find the first non-zero digit or the last digits if all are zero.
     val firstNonZeroPos = {
-      val firstNonZero = value.indexWhere( _ != 0)
+      val firstNonZero = value.indexWhere(_ != 0)
       if (firstNonZero != -1) firstNonZero else value.length - 1
     }
 
@@ -171,6 +174,7 @@ object NumberConverter {
       resultStartPos = firstNonZeroPos - 1
       value(resultStartPos) = '-'
     }
-    UTF8String.fromBytes(java.util.Arrays.copyOfRange(value, resultStartPos, value.length))
+    UTF8String.fromBytes(
+        java.util.Arrays.copyOfRange(value, resultStartPos, value.length))
   }
 }

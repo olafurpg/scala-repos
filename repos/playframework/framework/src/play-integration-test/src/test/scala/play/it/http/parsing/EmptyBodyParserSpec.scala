@@ -13,11 +13,15 @@ object EmptyBodyParserSpec extends PlaySpecification {
 
   "The empty body parser" should {
 
-    def parse(bytes: ByteString, contentType: Option[String], encoding: String)(implicit mat: Materializer) = {
+    def parse(
+        bytes: ByteString, contentType: Option[String], encoding: String)(
+        implicit mat: Materializer) = {
       await(
-        BodyParsers.parse.empty(FakeRequest().withHeaders(contentType.map(CONTENT_TYPE -> _).toSeq: _*))
-          .run(Source.single(bytes))
-      )
+          BodyParsers.parse
+            .empty(FakeRequest().withHeaders(
+                    contentType.map(CONTENT_TYPE -> _).toSeq: _*))
+            .run(Source.single(bytes))
+        )
     }
 
     "parse empty bodies" in new WithApplication() {
@@ -28,6 +32,5 @@ object EmptyBodyParserSpec extends PlaySpecification {
       parse(ByteString(1), Some("application/xml"), "utf-8") must beRight(())
       parse(ByteString(1, 2, 3), None, "utf-8") must beRight(())
     }
-
   }
 }

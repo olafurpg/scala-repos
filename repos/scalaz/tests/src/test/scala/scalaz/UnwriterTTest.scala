@@ -16,13 +16,15 @@ object UnwriterTTest extends SpecLite {
   checkAll(traverse.laws[UnwriterTOptInt])
   checkAll(bitraverse.laws[UnwriterTOpt])
 
-  implicit def UnwriterArb[F[_], W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Unwriter[W, A]] =
+  implicit def UnwriterArb[F[_], W, A](
+      implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Unwriter[W, A]] =
     Applicative[Arbitrary].apply2(W, A)(Unwriter(_, _))
 
   checkAll(comonad.laws[Unwriter[Int, ?]])
 
   object instances {
-    def equal[F[_], W, A](implicit E: Equal[F[(W, A)]]) = Equal[UnwriterT[F, W, A]]
+    def equal[F[_], W, A](implicit E: Equal[F[(W, A)]]) =
+      Equal[UnwriterT[F, W, A]]
     def functor[F[_]: Functor, W] = Functor[UnwriterT[F, W, ?]]
     def apply[F[_]: Apply, W] = Apply[UnwriterT[F, W, ?]]
     def bind[F[_]: Bind, W] = Bind[UnwriterT[F, W, ?]]

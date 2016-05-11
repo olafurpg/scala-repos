@@ -12,7 +12,6 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-
 package io.prediction.controller
 
 import io.prediction.core.BaseQuerySerializer
@@ -34,4 +33,3 @@ trait CustomQuerySerializer extends BaseQuerySerializer
   */
 @deprecated("Use CustomQuerySerializer instead.", "0.9.2")
 trait WithQuerySerializer extends CustomQuerySerializer
-

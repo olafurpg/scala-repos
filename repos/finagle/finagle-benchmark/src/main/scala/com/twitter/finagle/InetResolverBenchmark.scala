@@ -7,9 +7,9 @@ import com.twitter.util.{Await, Var}
 import org.openjdk.jmh.annotations._
 
 /**
- * This is primarily a test for allocations not performance
- * so it is recommended to run with `-prof gc`.
- */
+  * This is primarily a test for allocations not performance
+  * so it is recommended to run with `-prof gc`.
+  */
 @State(Scope.Benchmark)
 class InetResolverBenchmark extends StdBenchAnnotations {
 
@@ -19,8 +19,7 @@ class InetResolverBenchmark extends StdBenchAnnotations {
   @Param(Array("api.twitter.com"))
   var hostname = ""
 
-  private[this] val inetResolver =
-    InetResolver(new InMemoryStatsReceiver())
+  private[this] val inetResolver = InetResolver(new InMemoryStatsReceiver())
 
   private[this] val timeout = 1.second
 
@@ -34,5 +33,4 @@ class InetResolverBenchmark extends StdBenchAnnotations {
   @Benchmark
   def bindHostname(): Addr =
     notPending(inetResolver.bind(hostname))
-
 }

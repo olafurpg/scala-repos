@@ -1,11 +1,12 @@
 package scalaz
 
 /**
- * Type tags that are used to discriminate between alternative type class instances.
- *
- * @see [[scalaz.Tag]] and, `@@` in the package object [[scalaz]] .
- */
+  * Type tags that are used to discriminate between alternative type class instances.
+  *
+  * @see [[scalaz.Tag]] and, `@@` in the package object [[scalaz]] .
+  */
 object Tags {
+
   /** Type tag to choose a [[scalaz.Semigroup]] instance that selects the first operand to append. */
   sealed trait FirstVal
 
@@ -47,31 +48,31 @@ object Tags {
   val Max = Tag.of[Max]
 
   /** Type tag to choose a [[scalaz.Monoid]] instance for a numeric type that performs multiplication,
-   *  rather than the default monoid for these types which by convention performs addition. */
+    *  rather than the default monoid for these types which by convention performs addition. */
   sealed trait Multiplication
 
   val Multiplication = Tag.of[Multiplication]
 
   /** Type tag to choose a [[scalaz.Monoid]] instance that inverts the operands to `append` before calling the
-   *  natural [[scalaz.Monoid]] for the type.
-   *
-   *  Example:
-   *  {{{
-   *  import scalaz.{@@, Tag, Tags, Dual}
-   *  import scalaz.std.string._
-   *  import scalaz.syntax.monoid._
-   *  import scalaz.Dual._
-   *  Dual("World!") |+| Dual("Hello, ") // "Hello, World!"
-   *  }}}
-   */
+    *  natural [[scalaz.Monoid]] for the type.
+    *
+    *  Example:
+    *  {{{
+    *  import scalaz.{@@, Tag, Tags, Dual}
+    *  import scalaz.std.string._
+    *  import scalaz.syntax.monoid._
+    *  import scalaz.Dual._
+    *  Dual("World!") |+| Dual("Hello, ") // "Hello, World!"
+    *  }}}
+    */
   sealed trait Dual
 
   val Dual = Tag.of[Dual]
 
   /** Type tag to choose as [[scalaz.Applicative]] instance that performs zipping.
-   *
-   * @see [[scalaz.std.stream.streamZipApplicative]]
-   */
+    *
+    * @see [[scalaz.std.stream.streamZipApplicative]]
+    */
   sealed trait Zip
 
   val Zip = Tag.of[Zip]
@@ -90,5 +91,4 @@ object Tags {
   sealed trait Parallel
 
   val Parallel = Tag.of[Parallel]
-
 }

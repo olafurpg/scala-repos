@@ -10,13 +10,15 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScIfStmt}
 
 /**
- * Nikolay.Tropin
- * 2014-06-27
- */
+  * Nikolay.Tropin
+  * 2014-06-27
+  */
 class ScalaElseRemover extends ScalaElseUnwrapperBase {
-  override protected def unwrapElseBranch(expr: ScExpression, ifStmt: ScIfStmt, context: ScalaUnwrapContext) = {
+  override protected def unwrapElseBranch(
+      expr: ScExpression, ifStmt: ScIfStmt, context: ScalaUnwrapContext) = {
     expr.getParent match {
-      case ifSt @ ScIfStmt(_, Some(`expr`), Some(elseExpr)) childOf (parentIf @ ScIfStmt(_, _, Some(elseIf))) if ifSt == elseIf =>
+      case ifSt @ ScIfStmt(_, Some(`expr`), Some(elseExpr)) childOf (parentIf @ ScIfStmt(
+          _, _, Some(elseIf))) if ifSt == elseIf =>
         context.setElseBranch(parentIf, elseExpr)
       case _ =>
         context.delete(ifStmt.findFirstChildByType(ScalaTokenTypes.kELSE))
@@ -24,7 +26,8 @@ class ScalaElseRemover extends ScalaElseUnwrapperBase {
     }
   }
 
-  override def collectAffectedElements(e: PsiElement, toExtract: util.List[PsiElement]) = elseBranch(e) match {
+  override def collectAffectedElements(
+      e: PsiElement, toExtract: util.List[PsiElement]) = elseBranch(e) match {
     case Some((_, ifStmt: ScIfStmt)) if ifStmt.thenBranch.isDefined =>
       super.collectAffectedElements(e, toExtract)
       ifStmt.thenBranch.get
@@ -34,6 +37,6 @@ class ScalaElseRemover extends ScalaElseUnwrapperBase {
     case _ => e
   }
 
-  override def getDescription(e: PsiElement) = CodeInsightBundle.message("remove.else")
+  override def getDescription(e: PsiElement) =
+    CodeInsightBundle.message("remove.else")
 }
-

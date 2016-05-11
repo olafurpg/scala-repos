@@ -24,8 +24,7 @@ class BufferedReader(in: Reader, sz: Int) extends Reader {
     ensureOpen()
 
     val srcBuf = buf
-    if (buf.size < readAheadLimit)
-      buf = new Array[Char](readAheadLimit)
+    if (buf.size < readAheadLimit) buf = new Array[Char](readAheadLimit)
 
     // Move data to beginning of buffer
     if (pos != 0 || (buf ne srcBuf))
@@ -85,7 +84,7 @@ class BufferedReader(in: Reader, sz: Int) extends Reader {
       // Check whether we have a \r\n. This may overrun the buffer
       // and then push a value back which may unnecessarily invalidate
       // the mark. This mimics java behavior
-      if (buf(pos-1) == '\r' && prepareRead() && buf(pos) == '\n')
+      if (buf(pos - 1) == '\r' && prepareRead() && buf(pos) == '\n')
         pos += 1 // consume '\n'
 
       res
@@ -138,8 +137,6 @@ class BufferedReader(in: Reader, sz: Int) extends Reader {
   }
 
   private def ensureOpen(): Unit = {
-    if (closed)
-      throw new IOException("Operation on closed stream")
+    if (closed) throw new IOException("Operation on closed stream")
   }
-
 }

@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.codahale.metrics.{Gauge, MetricRegistry}
 import com.google.inject.Inject
-import mesosphere.marathon.metrics.Metrics.{ Histogram, Meter, Timer, Counter }
+import mesosphere.marathon.metrics.Metrics.{Histogram, Meter, Timer, Counter}
 import org.aopalliance.intercept.MethodInvocation
 
 import scala.collection.concurrent.TrieMap
@@ -16,7 +16,7 @@ import scala.util.control.NonFatal
 /**
   * Utils for timer metrics collection.
   */
-class Metrics @Inject() (val registry: MetricRegistry) {
+class Metrics @Inject()(val registry: MetricRegistry) {
   private[this] val classNameCache = TrieMap[Class[_], String]()
 
   def timed[T](name: String)(block: => T): T = {
@@ -25,8 +25,7 @@ class Metrics @Inject() (val registry: MetricRegistry) {
     val startTime = System.nanoTime()
     try {
       block
-    }
-    finally {
+    } finally {
       timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS)
     }
   }
@@ -47,7 +46,8 @@ class Metrics @Inject() (val registry: MetricRegistry) {
     new Histogram(registry.histogram(name))
   }
 
-  @throws[IllegalArgumentException]("if this function is called multiple times for the same name.")
+  @throws[IllegalArgumentException](
+      "if this function is called multiple times for the same name.")
   def gauge[G <: Gauge[_]](name: String, gauge: G): G = {
     registry.register(name, gauge)
     gauge
@@ -67,7 +67,8 @@ class Metrics @Inject() (val registry: MetricRegistry) {
 
   private[metrics] def stripGuiceMarksFromClassName(clazz: Class[_]): String = {
     val name = clazz.getName
-    if (name.contains("$EnhancerByGuice$")) clazz.getSuperclass.getName else name
+    if (name.contains("$EnhancerByGuice$")) clazz.getSuperclass.getName
+    else name
   }
 }
 
@@ -80,16 +81,15 @@ object Metrics {
   class Timer(private[metrics] val timer: com.codahale.metrics.Timer) {
     def timeFuture[T](future: => Future[T]): Future[T] = {
       val startTime = System.nanoTime()
-      val f =
-        try future
-        catch {
-          case NonFatal(e) =>
-            timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS)
-            throw e
-        }
+      val f = try future catch {
+        case NonFatal(e) =>
+          timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS)
+          throw e
+      }
       import mesosphere.util.CallerThreadExecutionContext.callerThreadExecutionContext
       f.onComplete {
-        case _ => timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS)
+        case _ =>
+          timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS)
       }
       f
     }
@@ -98,13 +98,13 @@ object Metrics {
       val startTime = System.nanoTime()
       try {
         block
-      }
-      finally {
+      } finally {
         timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS)
       }
     }
 
-    def update(duration: FiniteDuration): Unit = timer.update(duration.toMillis, TimeUnit.MILLISECONDS)
+    def update(duration: FiniteDuration): Unit =
+      timer.update(duration.toMillis, TimeUnit.MILLISECONDS)
     def invocationCount: Long = timer.getCount
   }
 

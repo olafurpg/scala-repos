@@ -11,14 +11,17 @@ import org.jetbrains.sbt.resolvers.{SbtResolver, SbtResolverIndexesManager}
 import org.jetbrains.plugins.scala.extensions._
 
 /**
- * @author Pavel Fatin
- */
-class SbtModuleDataService extends AbstractDataService[SbtModuleData, Module](SbtModuleData.Key) {
-  override def createImporter(toImport: Seq[DataNode[SbtModuleData]],
-                              projectData: ProjectData,
-                              project: Project,
-                              modelsProvider: IdeModifiableModelsProvider): Importer[SbtModuleData] =
-    new SbtModuleDataService.Importer(toImport, projectData, project, modelsProvider)
+  * @author Pavel Fatin
+  */
+class SbtModuleDataService
+    extends AbstractDataService[SbtModuleData, Module](SbtModuleData.Key) {
+  override def createImporter(
+      toImport: Seq[DataNode[SbtModuleData]],
+      projectData: ProjectData,
+      project: Project,
+      modelsProvider: IdeModifiableModelsProvider): Importer[SbtModuleData] =
+    new SbtModuleDataService.Importer(
+        toImport, projectData, project, modelsProvider)
 }
 
 object SbtModuleDataService {
@@ -26,7 +29,8 @@ object SbtModuleDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-    extends AbstractImporter[SbtModuleData](dataToImport, projectData, project, modelsProvider) {
+      extends AbstractImporter[SbtModuleData](
+          dataToImport, projectData, project, modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach { moduleNode =>
@@ -41,7 +45,8 @@ object SbtModuleDataService {
         }
       }
 
-    private def setResolvers(module: Module, resolvers: Set[SbtResolver]): Unit = {
+    private def setResolvers(
+        module: Module, resolvers: Set[SbtResolver]): Unit = {
       SbtModule.setResolversTo(module, resolvers)
       resolvers.foreach(SbtResolverIndexesManager().add)
     }

@@ -12,15 +12,16 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 import com.twitter.scalding.source.DailySuffixTypedTsv
 
 class TypedTsvJob(args: Args) extends Job(args) {
   try {
-    TypedTsv[(String, Int)]("input0").read.write(TypedTsv[(String, Int)]("output0"))
+    TypedTsv[(String, Int)]("input0").read
+      .write(TypedTsv[(String, Int)]("output0"))
   } catch {
     case e: Exception => e.printStackTrace()
   }
@@ -28,7 +29,8 @@ class TypedTsvJob(args: Args) extends Job(args) {
 
 class TypedCsvJob(args: Args) extends Job(args) {
   try {
-    TypedCsv[(String, Int)]("input0").read.write(TypedCsv[(String, Int)]("output0"))
+    TypedCsv[(String, Int)]("input0").read
+      .write(TypedCsv[(String, Int)]("output0"))
   } catch {
     case e: Exception => e.printStackTrace()
   }
@@ -36,7 +38,8 @@ class TypedCsvJob(args: Args) extends Job(args) {
 
 class TypedPsvJob(args: Args) extends Job(args) {
   try {
-    TypedPsv[(String, Int)]("input0").read.write(TypedPsv[(String, Int)]("output0"))
+    TypedPsv[(String, Int)]("input0").read
+      .write(TypedPsv[(String, Int)]("output0"))
   } catch {
     case e: Exception => e.printStackTrace()
   }
@@ -44,7 +47,8 @@ class TypedPsvJob(args: Args) extends Job(args) {
 
 class TypedOsvJob(args: Args) extends Job(args) {
   try {
-    TypedOsv[(String, Int)]("input0").read.write(TypedOsv[(String, Int)]("output0"))
+    TypedOsv[(String, Int)]("input0").read
+      .write(TypedOsv[(String, Int)]("output0"))
   } catch {
     case e: Exception => e.printStackTrace()
   }
@@ -58,12 +62,15 @@ object DailySuffixTypedTsvJob {
   implicit val dr1 = DateRange(RichDate(strd1), RichDate(strd2))
 
   def source(str: String) = DailySuffixTypedTsv[(String, Int)](str)
-
 }
 
-class DailySuffixTypedTsvJob(args: Args) extends Job(args) with UtcDateRangeJob {
+class DailySuffixTypedTsvJob(args: Args)
+    extends Job(args) with UtcDateRangeJob {
   try {
-    DailySuffixTypedTsvJob.source("input0").read.write(TypedTsv[(String, Int)]("output0"))
+    DailySuffixTypedTsvJob
+      .source("input0")
+      .read
+      .write(TypedTsv[(String, Int)]("output0"))
   } catch {
     case e: Exception => e.printStackTrace()
   }

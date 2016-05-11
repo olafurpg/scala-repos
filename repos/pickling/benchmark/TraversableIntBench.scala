@@ -17,7 +17,8 @@ object TraversableIntBench extends scala.pickling.testing.PicklingBenchmark {
   }
 }
 
-object TraversableJavaIntBench extends scala.pickling.testing.PicklingBenchmark {
+object TraversableJavaIntBench
+    extends scala.pickling.testing.PicklingBenchmark {
   val coll = (1 to size).toVector
 
   override def run() {
@@ -32,7 +33,8 @@ object TraversableJavaIntBench extends scala.pickling.testing.PicklingBenchmark 
   }
 }
 
-object TraversableKryoIntBench extends scala.pickling.testing.PicklingBenchmark {
+object TraversableKryoIntBench
+    extends scala.pickling.testing.PicklingBenchmark {
   var ser: KryoSerializer = _
   val coll = (1 to size).toVector
 

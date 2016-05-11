@@ -35,14 +35,15 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Node Spec tests.
- */
+  * Node Spec tests.
+  */
 @RunWith(classOf[JUnitRunner])
 class NodeSpec
-  extends SimpleSFXDelegateSpec[jfxs.Node, Node](classOf[jfxs.Node], classOf[Node]) {
+    extends SimpleSFXDelegateSpec[jfxs.Node, Node](
+        classOf[jfxs.Node], classOf[Node]) {
 
-  override protected def getScalaClassInstance = new Node(getJavaClassInstance) {}
+  override protected def getScalaClassInstance =
+    new Node(getJavaClassInstance) {}
 
   override protected def getJavaClassInstance = new jfxs.Group
-
 }

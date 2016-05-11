@@ -8,9 +8,9 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
 /**
- * User: Dmitry Naydanov
- * Date: 11/5/12
- */
+  * User: Dmitry Naydanov
+  * Date: 11/5/12
+  */
 class OpenSynFileIntention extends PsiElementBaseIntentionAction {
   def getFamilyName: String = "Scala"
 
@@ -19,12 +19,16 @@ class OpenSynFileIntention extends PsiElementBaseIntentionAction {
     if (file != null) file navigate true
   }
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement) = element.getContainingFile match {
-    case scalaFile: ScalaFile if (ScalaMacroDebuggingUtil.isEnabled) && (ScalaMacroDebuggingUtil isLoaded scalaFile) =>  true
-    case _ => false
-  }
+  def isAvailable(project: Project, editor: Editor, element: PsiElement) =
+    element.getContainingFile match {
+      case scalaFile: ScalaFile
+          if (ScalaMacroDebuggingUtil.isEnabled) &&
+          (ScalaMacroDebuggingUtil isLoaded scalaFile) =>
+        true
+      case _ => false
+    }
 
   override def getText: String = "Navigate to file with macros expanded"
 
-  override def setText(text: String) { }
+  override def setText(text: String) {}
 }

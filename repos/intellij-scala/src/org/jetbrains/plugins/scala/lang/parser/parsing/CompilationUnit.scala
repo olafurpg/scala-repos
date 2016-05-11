@@ -15,7 +15,6 @@ import scala.annotation.tailrec
   * @author Alexander Podkhalyuzin
   *         Date: 05.02.2008
   */
-
 /*
  *  CompilationUnit ::= [package QualId StatementSeparator] TopStatSeq
  */
@@ -31,8 +30,10 @@ object CompilationUnit {
           case ParserState.SCRIPT_STATE =>
             Stats.trigger("scala.file.script.parsed")
             parseState = ParserState.SCRIPT_STATE
-          case ParserState.FILE_STATE if parseState != ParserState.SCRIPT_STATE => parseState = ParserState.FILE_STATE
-          case _ => 
+          case ParserState.FILE_STATE
+              if parseState != ParserState.SCRIPT_STATE =>
+            parseState = ParserState.FILE_STATE
+          case _ =>
             //that means code in the file is probably invalid, so we won't call usage trigger here
             parseState = ParserState.SCRIPT_STATE
         }
@@ -43,10 +44,9 @@ object CompilationUnit {
     //look for file package
     builder.getTokenType match {
       case ScalaTokenTypes.kPACKAGE =>
-
         /*
-        * Parse sequence of packages according to 2.8 changes
-        * */
+         * Parse sequence of packages according to 2.8 changes
+         * */
         @tailrec
         def parsePackageSequence(completed: Boolean, k: => Unit) {
           def askType = builder.getTokenType
@@ -60,31 +60,33 @@ object CompilationUnit {
               builder.error(ErrMsg("semi.expected"))
             }
             if (ScalaTokenTypes.kPACKAGE == askType &&
-              !ParserUtils.lookAhead(builder, ScalaTokenTypes.kPACKAGE, ScalaTokenTypes.kOBJECT)) {
+                !ParserUtils.lookAhead(builder,
+                                       ScalaTokenTypes.kPACKAGE,
+                                       ScalaTokenTypes.kOBJECT)) {
               // Parse package statement
               val newMarker = builder.mark
               builder.advanceLexer //package
               askType match {
                 case ScalaTokenTypes.tIDENTIFIER => {
-                  Qual_Id parse builder
-                  // Detect explicit packaging with curly braces
-                  if (ParserUtils.lookAhead(builder, ScalaTokenTypes.tLBRACE) &&
-                    !builder.getTokenText.matches(".*\n.*\n.*")) {
-                    newMarker.rollbackTo
-                    parsePackagingBody(true)
-                    k
-                  } else {
-                    parsePackageSequence(false, {
-                      newMarker.done(ScalaElementTypes.PACKAGING);
+                    Qual_Id parse builder
+                    // Detect explicit packaging with curly braces
+                    if (ParserUtils.lookAhead(builder, ScalaTokenTypes.tLBRACE) &&
+                        !builder.getTokenText.matches(".*\n.*\n.*")) {
+                      newMarker.rollbackTo
+                      parsePackagingBody(true)
                       k
-                    })
+                    } else {
+                      parsePackageSequence(false, {
+                        newMarker.done(ScalaElementTypes.PACKAGING);
+                        k
+                      })
+                    }
                   }
-                }
                 case _ => {
-                  builder error ErrMsg("package.qualID.expected")
-                  newMarker.drop
-                  parsePackageSequence(completed = true, k)
-                }
+                    builder error ErrMsg("package.qualID.expected")
+                    newMarker.drop
+                    parsePackageSequence(completed = true, k)
+                  }
               }
             } else {
               // Parse the remainder of a file

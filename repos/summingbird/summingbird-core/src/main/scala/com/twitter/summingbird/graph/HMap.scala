@@ -17,11 +17,11 @@
 package com.twitter.summingbird.graph
 
 /**
- * This is a weak heterogenous map. It uses equals on the keys,
- * so it is your responsibilty that if k: K[_] == k2: K[_] then
- * the types are actually equal (either be careful or store a
- * type identifier).
- */
+  * This is a weak heterogenous map. It uses equals on the keys,
+  * so it is your responsibilty that if k: K[_] == k2: K[_] then
+  * the types are actually equal (either be careful or store a
+  * type identifier).
+  */
 sealed abstract class HMap[K[_], V[_]] {
   type Pair[t] = (K[t], V[t])
   protected val map: Map[K[_], V[_]]
@@ -45,18 +45,21 @@ sealed abstract class HMap[K[_], V[_]] {
 
   def contains[T](id: K[T]): Boolean = get(id).isDefined
 
-  def filter(pred: GenFunction[Pair, ({ type BoolT[T] = Boolean })#BoolT]): HMap[K, V] = {
-    val filtered = map.asInstanceOf[Map[K[Any], V[Any]]].filter(pred.apply[Any])
+  def filter(pred: GenFunction[Pair, ({ type BoolT[T] = Boolean })#BoolT])
+    : HMap[K, V] = {
+    val filtered =
+      map.asInstanceOf[Map[K[Any], V[Any]]].filter(pred.apply[Any])
     HMap.from[K, V](filtered.asInstanceOf[Map[K[_], V[_]]])
   }
 
   def get[T](id: K[T]): Option[V[T]] =
     map.get(id).asInstanceOf[Option[V[T]]]
 
-  def keysOf[T](v: V[T]): Set[K[T]] = map.collect {
-    case (k, w) if v == w =>
-      k.asInstanceOf[K[T]]
-  }.toSet
+  def keysOf[T](v: V[T]): Set[K[T]] =
+    map.collect {
+      case (k, w) if v == w =>
+        k.asInstanceOf[K[T]]
+    }.toSet
 
   // go through all the keys, and find the first key that matches this
   // function and apply
@@ -71,10 +74,9 @@ sealed abstract class HMap[K[_], V[_]] {
       }
     }
 
-    map.asInstanceOf[Map[K[Any], V[Any]]].collectFirst(collector)
-      .map { kv =>
-        (this + kv, kv._1)
-      }
+    map.asInstanceOf[Map[K[Any], V[Any]]].collectFirst(collector).map { kv =>
+      (this + kv, kv._1)
+    }
   }
 
   def collect[R[_]](p: GenPartial[Pair, R]): Stream[R[_]] =
@@ -100,14 +102,14 @@ object HMap {
 }
 
 /**
- * This is a useful cache for memoizing heterogenously types functions
- */
+  * This is a useful cache for memoizing heterogenously types functions
+  */
 class HCache[K[_], V[_]]() {
   private var hmap: HMap[K, V] = HMap.empty[K, V]
 
   /**
-   * Get snapshot of the current state
-   */
+    * Get snapshot of the current state
+    */
   def snapshot: HMap[K, V] = hmap
 
   def getOrElseUpdate[T](k: K[T], v: => V[T]): V[T] =
@@ -119,4 +121,3 @@ class HCache[K[_], V[_]]() {
         res
     }
 }
-

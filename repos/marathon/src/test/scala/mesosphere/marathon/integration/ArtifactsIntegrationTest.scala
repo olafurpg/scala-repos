@@ -5,12 +5,15 @@ import java.io.File
 import com.google.common.io.Files
 
 import mesosphere.marathon.integration.setup._
-import org.scalatest.{ ConfigMap, GivenWhenThen, Matchers }
+import org.scalatest.{ConfigMap, GivenWhenThen, Matchers}
 
-class ArtifactsIntegrationTest extends IntegrationFunSuite with SingleMarathonIntegrationTest with GivenWhenThen with Matchers {
+class ArtifactsIntegrationTest
+    extends IntegrationFunSuite with SingleMarathonIntegrationTest
+    with GivenWhenThen with Matchers {
   var artifactsDir: File = Files.createTempDir()
 
-  override def extraMarathonParameters = List("--artifact_store", s"file://${artifactsDir.toString}")
+  override def extraMarathonParameters =
+    List("--artifact_store", s"file://${artifactsDir.toString}")
 
   override protected def afterAll(configMap: ConfigMap): Unit = {
     super.afterAll(configMap)
@@ -27,9 +30,8 @@ class ArtifactsIntegrationTest extends IntegrationFunSuite with SingleMarathonIn
       val result = marathon.uploadArtifact("/foo", tempFile)
 
       Then("the request should be successful")
-      result.code should be (201) // created
-    }
-    finally {
+      result.code should be(201) // created
+    } finally {
       tempFile.delete()
     }
 
@@ -37,8 +39,8 @@ class ArtifactsIntegrationTest extends IntegrationFunSuite with SingleMarathonIn
     val result = marathon.getArtifact("/foo")
 
     Then("the request should be successful")
-    result.code should be (200)
-    result.entityString should be ("foobar")
+    result.code should be(200)
+    result.entityString should be("foobar")
   }
 
   test("upload and delete an artifact") {
@@ -47,8 +49,7 @@ class ArtifactsIntegrationTest extends IntegrationFunSuite with SingleMarathonIn
       Given("an uploaded artifact")
       Files.write("foobar".getBytes, tempFile)
       marathon.uploadArtifact("/foobar", tempFile)
-    }
-    finally {
+    } finally {
       tempFile.delete()
     }
 
@@ -59,6 +60,6 @@ class ArtifactsIntegrationTest extends IntegrationFunSuite with SingleMarathonIn
     result.code should be(200)
 
     Then("the artifact should be gone")
-    marathon.getArtifact("/foobar").code should be (404)
+    marathon.getArtifact("/foobar").code should be(404)
   }
 }

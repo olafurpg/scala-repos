@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.patterns.CaseClauses
 import org.jetbrains.plugins.scala.lang.parser.util.{ParserPatcher, ParserUtils}
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 06.03.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 06.03.2008
+  */
 /*
  * BlockExpr ::= '{' CaseClauses '}'
  *             | '{' Block '}'
@@ -36,8 +35,7 @@ object BlockExpr {
           val backMarker = builder.mark
           builder.advanceLexer()
           builder.getTokenType match {
-            case ScalaTokenTypes.kCLASS |
-                 ScalaTokenTypes.kOBJECT =>
+            case ScalaTokenTypes.kCLASS | ScalaTokenTypes.kOBJECT =>
               backMarker.rollbackTo()
               Block.parse(builder)
             case _ =>

@@ -7,7 +7,7 @@ import org.parboiled2.Rule1
 import org.parboiled2._
 
 import scala.annotation.switch
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 object DescriptorParser {
   def parse(desc: String): Descriptor = {
@@ -15,7 +15,8 @@ object DescriptorParser {
     parser.Desc.run() match {
       case Success(d) => d
       case Failure(error: ParseError) =>
-        val msg = parser.formatError(error, new ErrorFormatter(showTraces = true))
+        val msg =
+          parser.formatError(error, new ErrorFormatter(showTraces = true))
         throw new Exception(s"Failed to parse descriptor: $msg")
       case Failure(other) =>
         throw new Exception("Failed to parse descriptor: ", other)
@@ -27,7 +28,8 @@ object DescriptorParser {
     parser.Type.run() match {
       case Success(d) => d
       case Failure(error: ParseError) =>
-        val msg = parser.formatError(error, new ErrorFormatter(showTraces = true))
+        val msg =
+          parser.formatError(error, new ErrorFormatter(showTraces = true))
         throw new Exception(s"Failed to parse descriptor type: $msg")
       case Failure(other) =>
         throw new Exception("Failed to parse descriptor type: ", other)
@@ -42,7 +44,8 @@ class DescriptorParser(val input: ParserInput) extends Parser {
 
   def Desc: Rule1[Descriptor] = rule {
     '(' ~ zeroOrMore(Type) ~ ')' ~ Type ~ EOI ~> {
-      (paramSeq: Seq[DescriptorType], retType: DescriptorType) => Descriptor(paramSeq.toList, retType)
+      (paramSeq: Seq[DescriptorType], retType: DescriptorType) =>
+        Descriptor(paramSeq.toList, retType)
     }
   }
 
@@ -76,11 +79,16 @@ class DescriptorParser(val input: ParserInput) extends Parser {
   }
 
   private def Package: Rule1[PackageName] = rule {
-    zeroOrMore(capture(oneOrMore(DescriptorParser.PackageNamePredicate)) ~ '/') ~> { seq: Seq[String] => PackageName(seq.toList) }
+    zeroOrMore(capture(oneOrMore(DescriptorParser.PackageNamePredicate)) ~ '/') ~> {
+      seq: Seq[String] =>
+        PackageName(seq.toList)
+    }
   }
 
   private def Array: Rule1[DescriptorType] = rule {
-    '[' ~ Type ~> { c => ArrayDescriptor(c) }
+    '[' ~ Type ~> { c =>
+      ArrayDescriptor(c)
+    }
   }
 
   private def Boolean: Rule1[ClassName] = rule { 'Z' ~ push(PrimitiveBoolean) }

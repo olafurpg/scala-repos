@@ -3,7 +3,6 @@ import Keys._
 import scalariform.formatter.ScalaFormatter
 import scalariform.formatter.preferences._
 
-
 object SourceGenerator {
 
   import ScaloidSettings._
@@ -18,8 +17,15 @@ object SourceGenerator {
   }
 
   def generateTask =
-    (moduleName, baseDirectory, sourceDirectory in Compile, extract in Scaloid, apiVersion in Scaloid, scalaVersion,streams) map {
-      (mName, baseDir, srcDir, androidClasses, androidApiVersion, scalaVersion, s) =>
+    (moduleName,
+     baseDirectory,
+     sourceDirectory in Compile,
+     extract in Scaloid,
+     apiVersion in Scaloid,
+     scalaVersion,
+     streams) map {
+      (mName, baseDir, srcDir, androidClasses, androidApiVersion, scalaVersion,
+      s) =>
         import NameFilter._
 
         if (mName == "parent") Nil
@@ -27,7 +33,8 @@ object SourceGenerator {
           val stGroupsDir = baseDir / ".." / "project" / "st"
           val templateDir = srcDir / "st"
           val relativePath = Path.relativeTo(templateDir)
-          val scalaTemplates = recursiveListFiles(templateDir, (s: String) => s.endsWith(".scala"))
+          val scalaTemplates = recursiveListFiles(
+              templateDir, (s: String) => s.endsWith(".scala"))
 
           scalaTemplates.map { (file: File) =>
             val outFile = srcDir / "scala" / relativePath(file).get
@@ -38,16 +45,16 @@ object SourceGenerator {
             val generatedCode = stg.render(file, params)
             IO.write(outFile, generatedCode)
 
-            s.log.info("Formatting: "+ outFile)
+            s.log.info("Formatting: " + outFile)
             try {
               val formattedCode = formatCode(generatedCode, scalaVersion)
               if (generatedCode != formattedCode) {
-                s.log.info("Reformatted: "+ outFile)
+                s.log.info("Reformatted: " + outFile)
                 IO.write(outFile, formattedCode)
               }
             } catch {
               case e: Throwable =>
-                s.log.error("Failed to generate "+ outFile)
+                s.log.error("Failed to generate " + outFile)
                 s.log.trace(e)
             }
 
@@ -64,12 +71,12 @@ object SourceGenerator {
 
   private def formatCode(code: String, scalaVersion: String): String = {
     ScalaFormatter.format(
-      code,
-      scalariformPreferences,
-      scalaVersion = pureScalaVersion(scalaVersion)
+        code,
+        scalariformPreferences,
+        scalaVersion = pureScalaVersion(scalaVersion)
     )
   }
 
-  private def pureScalaVersion(scalaVersion: String): String = scalaVersion.split("-").head
-
+  private def pureScalaVersion(scalaVersion: String): String =
+    scalaVersion.split("-").head
 }

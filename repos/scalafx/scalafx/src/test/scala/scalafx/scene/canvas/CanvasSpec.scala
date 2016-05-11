@@ -35,9 +35,10 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Canvas Spec tests.
- *
- */
+  * Canvas Spec tests.
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class CanvasSpec
-  extends SimpleSFXDelegateSpec[jfxsc.Canvas, Canvas](classOf[jfxsc.Canvas], classOf[Canvas])
+    extends SimpleSFXDelegateSpec[jfxsc.Canvas, Canvas](
+        classOf[jfxsc.Canvas], classOf[Canvas])

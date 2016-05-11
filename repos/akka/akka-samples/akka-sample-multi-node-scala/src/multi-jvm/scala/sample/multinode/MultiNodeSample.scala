@@ -14,7 +14,7 @@ object MultiNodeSampleConfig extends MultiNodeConfig {
 //#spec
 import akka.remote.testkit.MultiNodeSpec
 import akka.testkit.ImplicitSender
-import akka.actor.{ Props, Actor }
+import akka.actor.{Props, Actor}
 
 class MultiNodeSampleSpecMultiJvmNode1 extends MultiNodeSample
 class MultiNodeSampleSpecMultiJvmNode2 extends MultiNodeSample
@@ -27,8 +27,9 @@ object MultiNodeSample {
   }
 }
 
-class MultiNodeSample extends MultiNodeSpec(MultiNodeSampleConfig)
-  with STMultiNodeSpec with ImplicitSender {
+class MultiNodeSample
+    extends MultiNodeSpec(MultiNodeSampleConfig) with STMultiNodeSpec
+    with ImplicitSender {
 
   import MultiNodeSampleConfig._
   import MultiNodeSample._

@@ -5,7 +5,8 @@ object Test {
       def foo(t: Test2) = 1
       def foo(s: String) = false
 
-      /*start*/foo(this)/*end*/
+      /*start*/
+      foo(this) /*end*/
     }
     val x = new Test2
     println(x.b == x)

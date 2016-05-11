@@ -1,6 +1,3 @@
-
-
-
 object Test {
 
   def main(args: Array[String]) {
@@ -14,5 +11,4 @@ object Test {
     val longres = longmap.map { case (a, b) => (a, b.toString) }
     assert(longres.isInstanceOf[LongMap[_]])
   }
-
 }

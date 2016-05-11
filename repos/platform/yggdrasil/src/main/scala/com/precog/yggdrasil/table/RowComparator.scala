@@ -38,7 +38,7 @@ trait RowComparator { self =>
   final def nextLeftIndex(lmin: Int, lmax: Int, ridx: Int): Int = {
     compare(lmax, ridx) match {
       case LT => lmax + 1
-      case GT => 
+      case GT =>
         if (lmax - lmin <= 1) {
           compare(lmin, ridx) match {
             case LT => lmax
@@ -51,8 +51,8 @@ trait RowComparator { self =>
             case GT | EQ => nextLeftIndex(lmin, lmid - 1, ridx)
           }
         }
-    
-      case EQ => 
+
+      case EQ =>
         if (lmax - lmin <= 1) {
           compare(lmin, ridx) match {
             case LT => lmax
@@ -69,4 +69,3 @@ trait RowComparator { self =>
     }
   }
 }
-

@@ -1,5 +1,5 @@
 import scala.tools.nsc.Settings
-import scala.tools.nsc.interpreter.{ ILoop, replProps }
+import scala.tools.nsc.interpreter.{ILoop, replProps}
 import scala.tools.nsc.settings.ClassPathRepresentationType
 import scala.tools.partest._
 
@@ -7,11 +7,14 @@ object Test extends StoreReporterDirectTest {
   def code = ???
 
   lazy val headerLength = replProps.welcome.lines.size
-  lazy val promptLength = replProps.prompt.lines.size - 1  // extra newlines
+  lazy val promptLength = replProps.prompt.lines.size - 1 // extra newlines
 
   def compileCode(code: String, jarFileName: String) = {
-    val classpath = List(sys.props("partest.lib"), testOutput.path) mkString sys.props("path.separator")
-    compileString(newCompiler("-cp", classpath, "-d", s"${testOutput.path}/$jarFileName"))(code)
+    val classpath =
+      List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
+          "path.separator")
+    compileString(newCompiler(
+            "-cp", classpath, "-d", s"${testOutput.path}/$jarFileName"))(code)
   }
 
   // TODO flat classpath doesn't support the classpath invalidation yet so we force using the recursive one
@@ -64,14 +67,14 @@ object Test extends StoreReporterDirectTest {
       |test.Test.test()
       |""".stripMargin.trim
     val output = ILoop.run(codeToRun, settings)
-    var lines  = output.lines.drop(headerLength)
-    lines      = lines drop promptLength
-    val added  = lines.next
-    assert (
-      added.contains("Added") && added.contains("test1.jar"),
-      s"[${added}] in [${output.lines.mkString("/")}]"
+    var lines = output.lines.drop(headerLength)
+    lines = lines drop promptLength
+    val added = lines.next
+    assert(
+        added.contains("Added") && added.contains("test1.jar"),
+        s"[${added}] in [${output.lines.mkString("/")}]"
     )
-    lines      = lines drop promptLength
+    lines = lines drop promptLength
     assert {
       lines.next.contains("testing...")
     }
@@ -88,16 +91,17 @@ object Test extends StoreReporterDirectTest {
       |:require ${testOutput.path}/$jar2
       |""".stripMargin.trim
     val output = ILoop.run(codeToRun, settings)
-    var lines  = output.lines.drop(headerLength)
-    lines      = lines drop promptLength
-    val added  = lines.next
+    var lines = output.lines.drop(headerLength)
+    lines = lines drop promptLength
+    val added = lines.next
     assert {
       added.contains("Added") && added.contains("test1.jar")
     }
-    lines      = lines drop promptLength
-    val msg    = lines.next
+    lines = lines drop promptLength
+    val msg = lines.next
     assert {
-      msg.contains("test2.jar") && msg.contains("existing classpath entries conflict")
+      msg.contains("test2.jar") &&
+      msg.contains("existing classpath entries conflict")
     }
   }
 
@@ -113,13 +117,13 @@ object Test extends StoreReporterDirectTest {
       |test.Test3.test()
       |""".stripMargin.trim
     val output = ILoop.run(codeToRun, settings)
-    var lines  = output.lines.drop(headerLength)
-    lines      = lines drop promptLength
-    val added  = lines.next
+    var lines = output.lines.drop(headerLength)
+    lines = lines drop promptLength
+    val added = lines.next
     assert {
       added.contains("Added") && added.contains("test1.jar")
     }
-    lines      = lines drop (2 * promptLength + 1)
+    lines = lines drop (2 * promptLength + 1)
     assert {
       lines.next.contains("new object in existing package")
     }
@@ -127,22 +131,23 @@ object Test extends StoreReporterDirectTest {
 
   def test4(): Unit = {
     // twice the same jar should be rejected
-    val jar1   = "test1.jar"
+    val jar1 = "test1.jar"
     val codeToRun = s"""
       |:require ${testOutput.path}/$jar1
       |:require ${testOutput.path}/$jar1
       |""".stripMargin.trim
     val output = ILoop.run(codeToRun, settings)
-    var lines  = output.lines.drop(headerLength)
-    lines      = lines drop promptLength
-    val added  = lines.next
+    var lines = output.lines.drop(headerLength)
+    lines = lines drop promptLength
+    val added = lines.next
     assert {
       added.contains("Added") && added.contains("test1.jar")
     }
-    lines      = lines drop promptLength
-    val msg    = lines.next
+    lines = lines drop promptLength
+    val msg = lines.next
     assert {
-      msg.contains("test1.jar") && msg.contains("existing classpath entries conflict")
+      msg.contains("test1.jar") &&
+      msg.contains("existing classpath entries conflict")
     }
   }
 

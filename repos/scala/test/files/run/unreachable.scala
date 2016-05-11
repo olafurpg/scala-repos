@@ -9,42 +9,35 @@ object Test extends App {
 
   def unreachableIf: Int = {
     return 42
-    if (nextInt % 2 == 0)
-      0
-    else
-      1
+    if (nextInt % 2 == 0) 0
+    else 1
   }
 
   def unreachableIfBranches: Int = {
-    if (nextInt % 2 == 0)
-      return 42
-    else
-      return 42
+    if (nextInt % 2 == 0) return 42
+    else return 42
 
     return 0
   }
 
   def unreachableOneLegIf: Int = {
-    if (nextInt % 2 == 0)
-      return 42
+    if (nextInt % 2 == 0) return 42
 
     return 42
   }
 
   def unreachableLeftBranch: Int = {
-    val result = if (nextInt % 2 == 0)
-      return 42
-    else
-      42
+    val result =
+      if (nextInt % 2 == 0) return 42
+      else 42
 
     return result
   }
 
   def unreachableRightBranch: Int = {
-    val result = if (nextInt % 2 == 0)
-      42
-    else
-      return 42
+    val result =
+      if (nextInt % 2 == 0) 42
+      else return 42
 
     return result
   }
@@ -91,7 +84,7 @@ object Test extends App {
   }
 
   def unreachableSwitch: Int = {
-  	return 42
+    return 42
     val x = nextInt % 2
     x match {
       case 0 => return 0

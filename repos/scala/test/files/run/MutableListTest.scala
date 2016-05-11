@@ -1,9 +1,4 @@
-
-
-
 import scala.collection.mutable.MutableList
-
-
 
 class ExtList[T] extends MutableList[T] {
   def printState {
@@ -112,15 +107,4 @@ object Test {
     for (i <- 0 until 5) lst += i
     assert(lst.reduceLeft(_ + _) == 10)
   }
-
 }
-
-
-
-
-
-
-
-
-
-

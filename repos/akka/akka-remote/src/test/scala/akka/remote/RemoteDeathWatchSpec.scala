@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.remote
 
 import akka.testkit._
@@ -12,7 +12,8 @@ import akka.testkit.SocketUtil
 import akka.event.Logging.Warning
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class RemoteDeathWatchSpec extends AkkaSpec(ConfigFactory.parseString("""
+class RemoteDeathWatchSpec
+    extends AkkaSpec(ConfigFactory.parseString("""
 akka {
     actor {
         provider = "akka.remote.RemoteActorRefProvider"
@@ -29,12 +30,14 @@ akka {
 }
 """)) with ImplicitSender with DefaultTimeout with DeathWatchSpec {
 
-  val other = ActorSystem("other", ConfigFactory.parseString("akka.remote.netty.tcp.port=2666")
-    .withFallback(system.settings.config))
+  val other = ActorSystem("other",
+                          ConfigFactory
+                            .parseString("akka.remote.netty.tcp.port=2666")
+                            .withFallback(system.settings.config))
 
   override def beforeTermination() {
-    system.eventStream.publish(TestEvent.Mute(
-      EventFilter.warning(pattern = "received dead letter.*Disassociate")))
+    system.eventStream.publish(TestEvent.Mute(EventFilter.warning(
+                pattern = "received dead letter.*Disassociate")))
   }
 
   override def afterTermination() {
@@ -50,8 +53,10 @@ akka {
     // pick an unused port
     val port = SocketUtil.temporaryServerAddress().getPort
     // simulate de-serialized ActorRef
-    val ref = rarp.resolveActorRef(s"akka.tcp://OtherSystem@localhost:$port/user/foo/bar#1752527294")
-    system.actorOf(Props(new Actor {
+    val ref = rarp.resolveActorRef(
+        s"akka.tcp://OtherSystem@localhost:$port/user/foo/bar#1752527294")
+    system.actorOf(
+        Props(new Actor {
       context.watch(ref)
       def receive = {
         case Terminated(r) ⇒ testActor ! r
@@ -68,7 +73,8 @@ akka {
   }
 
   "receive Terminated when watched node is unknown host" in {
-    val path = RootActorPath(Address("akka.tcp", system.name, "unknownhost", 2552)) / "user" / "subject"
+    val path =
+      RootActorPath(Address("akka.tcp", system.name, "unknownhost", 2552)) / "user" / "subject"
     system.actorOf(Props(new Actor {
       context.watch(context.actorFor(path))
       def receive = {
@@ -80,7 +86,8 @@ akka {
   }
 
   "receive ActorIdentity(None) when identified node is unknown host" in {
-    val path = RootActorPath(Address("akka.tcp", system.name, "unknownhost2", 2552)) / "user" / "subject"
+    val path =
+      RootActorPath(Address("akka.tcp", system.name, "unknownhost2", 2552)) / "user" / "subject"
     system.actorSelection(path) ! Identify(path)
     expectMsg(60.seconds, ActorIdentity(path, None))
   }
@@ -88,10 +95,20 @@ akka {
   "quarantine systems after unsuccessful system message delivery if have not communicated before" in {
     // Synthesize an ActorRef to a remote system this one has never talked to before.
     // This forces ReliableDeliverySupervisor to start with unknown remote system UID.
-    val extinctPath = RootActorPath(Address("akka.tcp", "extinct-system", "localhost", SocketUtil.temporaryServerAddress().getPort)) / "user" / "noone"
+    val extinctPath =
+      RootActorPath(Address(
+              "akka.tcp",
+              "extinct-system",
+              "localhost",
+              SocketUtil.temporaryServerAddress().getPort)) / "user" / "noone"
     val transport = RARP(system).provider.transport
-    val extinctRef = new RemoteActorRef(transport, transport.localAddressForRemote(extinctPath.address),
-      extinctPath, Nobody, props = None, deploy = None)
+    val extinctRef =
+      new RemoteActorRef(transport,
+                         transport.localAddressForRemote(extinctPath.address),
+                         extinctPath,
+                         Nobody,
+                         props = None,
+                         deploy = None)
 
     val probe = TestProbe()
     probe.watch(extinctRef)
@@ -99,7 +116,7 @@ akka {
 
     probe.expectNoMsg(5.seconds)
     system.eventStream.subscribe(probe.ref, classOf[Warning])
-    probe.expectNoMsg(RARP(system).provider.remoteSettings.RetryGateClosedFor * 2)
+    probe.expectNoMsg(
+        RARP(system).provider.remoteSettings.RetryGateClosedFor * 2)
   }
-
 }

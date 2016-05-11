@@ -15,7 +15,6 @@ import org.saddle._
 import org.saddle.index.IndexTime
 import com.github.nscala_time.time.Imports._
 
-
 /** Primary parameter for [[[DataSource]]].
   *
   * @param baseDate identify the beginning of our global time window, and
@@ -35,13 +34,12 @@ import com.github.nscala_time.time.Imports._
   * <code>maxTrainingWindowSize</code>. Suppose trainingWindowSize = 50 and testing set =
   * [100, 120), the training set draws data in time range [50, 100).
   */
-
-case class DataSourceParams(
-  val appid: Int = 1008,
-  val baseDate: DateTime,
-  val fromIdx: Int,
-  val untilIdx: Int,
-  val trainingWindowSize: Int,
-  val maxTestingWindowSize: Int,
-  val marketTicker: String,
-  val tickerList: Seq[String]) extends Params {}
+case class DataSourceParams(val appid: Int = 1008,
+                            val baseDate: DateTime,
+                            val fromIdx: Int,
+                            val untilIdx: Int,
+                            val trainingWindowSize: Int,
+                            val maxTestingWindowSize: Int,
+                            val marketTicker: String,
+                            val tickerList: Seq[String])
+    extends Params {}

@@ -21,8 +21,8 @@ import org.jetbrains.jps.model.JpsProject
 import _root_.scala.collection.JavaConverters._
 
 /**
- * @author Pavel Fatin
- */
+  * @author Pavel Fatin
+  */
 class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
   override def getPresentableName = "Scala SBT builder"
 
@@ -33,9 +33,11 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
   }
 
   override def build(context: CompileContext,
-            chunk: ModuleChunk,
-            dirtyFilesHolder: DirtyFilesHolder[JavaSourceRootDescriptor, ModuleBuildTarget],
-            outputConsumer: ModuleLevelBuilder.OutputConsumer): ModuleLevelBuilder.ExitCode = {
+                     chunk: ModuleChunk,
+                     dirtyFilesHolder: DirtyFilesHolder[
+                         JavaSourceRootDescriptor, ModuleBuildTarget],
+                     outputConsumer: ModuleLevelBuilder.OutputConsumer)
+    : ModuleLevelBuilder.ExitCode = {
 
     if (isDisabled(context) || ChunkExclusionService.isExcluded(chunk))
       return ExitCode.NOTHING_DONE
@@ -47,20 +49,25 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
 
     updateSharedResources(context, chunk)
 
-    context.processMessage(new ProgressMessage("Searching for compilable files..."))
+    context.processMessage(
+        new ProgressMessage("Searching for compilable files..."))
 
     val filesToCompile = collectCompilableFiles(context, chunk)
-    if (filesToCompile.isEmpty)
-      return ExitCode.NOTHING_DONE
+    if (filesToCompile.isEmpty) return ExitCode.NOTHING_DONE
 
     // Delete dirty class files (to handle force builds and form changes)
-    BuildOperations.cleanOutputsCorrespondingToChangedFiles(context, dirtyFilesHolder)
+    BuildOperations.cleanOutputsCorrespondingToChangedFiles(
+        context, dirtyFilesHolder)
 
     val sources = filesToCompile.keySet.toSeq
 
     val modules = chunk.getModules.asScala.toSet
 
-    val client = new IdeClientSbt("scala", context, modules.map(_.getName).toSeq, outputConsumer, filesToCompile.get)
+    val client = new IdeClientSbt("scala",
+                                  context,
+                                  modules.map(_.getName).toSeq,
+                                  outputConsumer,
+                                  filesToCompile.get)
 
     logCustomSbtIncOptions(context, chunk, client)
 
@@ -78,16 +85,20 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     }
   }
 
-  override def getCompilableFileExtensions: util.List[String] = util.Arrays.asList("scala", "java")
+  override def getCompilableFileExtensions: util.List[String] =
+    util.Arrays.asList("scala", "java")
 
   // TODO Mirror file deletion (either via the outputConsumer or a custom index)
-  private def updateSharedResources(context: CompileContext, chunk: ModuleChunk) {
+  private def updateSharedResources(
+      context: CompileContext, chunk: ModuleChunk) {
     val project = context.getProjectDescriptor
 
     val resourceTargets: Seq[ResourcesTarget] = {
-      val sourceModules = SourceDependenciesProviderService.getSourceDependenciesFor(chunk)
+      val sourceModules =
+        SourceDependenciesProviderService.getSourceDependenciesFor(chunk)
       val targetType = chunk.representativeTarget.getTargetType match {
-        case JavaModuleBuildTargetType.PRODUCTION => ResourcesTargetType.PRODUCTION
+        case JavaModuleBuildTargetType.PRODUCTION =>
+          ResourcesTargetType.PRODUCTION
         case JavaModuleBuildTargetType.TEST => ResourcesTargetType.TEST
         case _ => ResourcesTargetType.PRODUCTION
       }
@@ -107,7 +118,8 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
 
       FileUtil.processFilesRecursively(root.getRootFile, new Processor[File] {
         def process(file: File) = {
-          if (file.isFile && filter.accept(file) && !excludeIndex.isExcluded(file)) {
+          if (file.isFile && filter.accept(file) &&
+              !excludeIndex.isExcluded(file)) {
             ResourceUpdater.updateResource(context, root, file, outputRoot)
           }
           true
@@ -117,11 +129,15 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
   }
 
   private def isDisabled(context: CompileContext): Boolean = {
-    projectSettings(context).getIncrementalityType != IncrementalityType.SBT || !isScalaProject(context.getProjectDescriptor.getProject)
+    projectSettings(context).getIncrementalityType != IncrementalityType.SBT ||
+    !isScalaProject(context.getProjectDescriptor.getProject)
   }
 
-  private def hasDirtyFilesOrDependencies(context: CompileContext, chunk: ModuleChunk,
-                                          dirtyFilesHolder: DirtyFilesHolder[JavaSourceRootDescriptor, ModuleBuildTarget]): Boolean = {
+  private def hasDirtyFilesOrDependencies(
+      context: CompileContext,
+      chunk: ModuleChunk,
+      dirtyFilesHolder: DirtyFilesHolder[
+          JavaSourceRootDescriptor, ModuleBuildTarget]): Boolean = {
 
     val representativeTarget = chunk.representativeTarget()
 
@@ -142,17 +158,22 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
       }
     }
 
-    if (!hasDirtyDependencies && !dirtyFilesHolder.hasDirtyFiles && !dirtyFilesHolder.hasRemovedFiles) {
+    if (!hasDirtyDependencies && !dirtyFilesHolder.hasDirtyFiles &&
+        !dirtyFilesHolder.hasRemovedFiles) {
       if (targetTimestamp.isEmpty)
-        timestamps.set(representativeTarget, context.getCompilationStartStamp(representativeTarget))
+        timestamps.set(representativeTarget,
+                       context.getCompilationStartStamp(representativeTarget))
       return false
     }
 
-    timestamps.set(representativeTarget, context.getCompilationStartStamp(representativeTarget))
+    timestamps.set(representativeTarget,
+                   context.getCompilationStartStamp(representativeTarget))
     true
   }
 
-  private def collectCompilableFiles(context: CompileContext,chunk: ModuleChunk): Map[File, BuildTarget[_ <: BuildRootDescriptor]] = {
+  private def collectCompilableFiles(
+      context: CompileContext,
+      chunk: ModuleChunk): Map[File, BuildTarget[_ <: BuildRootDescriptor]] = {
     var result = Map[File, BuildTarget[_ <: BuildRootDescriptor]]()
 
     val project = context.getProjectDescriptor
@@ -161,7 +182,8 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     val excludeIndex = project.getModuleExcludeIndex
 
     val sourceTargets = {
-      val sourceModules = SourceDependenciesProviderService.getSourceDependenciesFor(chunk)
+      val sourceModules =
+        SourceDependenciesProviderService.getSourceDependenciesFor(chunk)
       val targetType = chunk.representativeTarget.getTargetType match {
         case javaBuildTarget: JavaModuleBuildTargetType => javaBuildTarget
         case _ => JavaModuleBuildTargetType.PRODUCTION
@@ -170,7 +192,7 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     }
 
     for (target <- chunk.getTargets.asScala ++ sourceTargets;
-         root <- rootIndex.getTargetRoots(target, context).asScala) {
+    root <- rootIndex.getTargetRoots(target, context).asScala) {
       FileUtil.processFilesRecursively(root.getRootFile, new Processor[File] {
         def process(file: File) = {
           if (!excludeIndex.isExcluded(file)) {
@@ -187,21 +209,32 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     result
   }
 
-  private def moduleDependenciesIn(context: CompileContext, target: ModuleBuildTarget): Seq[ModuleBuildTarget] = {
+  private def moduleDependenciesIn(
+      context: CompileContext,
+      target: ModuleBuildTarget): Seq[ModuleBuildTarget] = {
     val dependencies = {
       val targetOutputIndex = {
-        val targets = context.getProjectDescriptor.getBuildTargetIndex.getAllTargets
+        val targets =
+          context.getProjectDescriptor.getBuildTargetIndex.getAllTargets
         new TargetOutputIndexImpl(targets, context)
       }
-      target.computeDependencies(context.getProjectDescriptor.getBuildTargetIndex, targetOutputIndex).asScala
+      target
+        .computeDependencies(context.getProjectDescriptor.getBuildTargetIndex,
+                             targetOutputIndex)
+        .asScala
     }
 
-    dependencies.filter(_.isInstanceOf[ModuleBuildTarget]).map(_.asInstanceOf[ModuleBuildTarget]).toSeq
+    dependencies
+      .filter(_.isInstanceOf[ModuleBuildTarget])
+      .map(_.asInstanceOf[ModuleBuildTarget])
+      .toSeq
   }
 
-  private def logCustomSbtIncOptions(context: CompileContext, chunk: ModuleChunk, client: Client): Unit = {
+  private def logCustomSbtIncOptions(
+      context: CompileContext, chunk: ModuleChunk, client: Client): Unit = {
     val settings = projectSettings(context).getCompilerSettings(chunk)
     val options = settings.getSbtIncrementalOptions
-    client.debug(s"Custom sbt incremental compiler options for ${chunk.getPresentableShortName}: ${options.nonDefault}")
+    client.debug(
+        s"Custom sbt incremental compiler options for ${chunk.getPresentableShortName}: ${options.nonDefault}")
   }
 }

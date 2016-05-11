@@ -20,13 +20,17 @@ object SSLConfigParserSpec extends Specification {
   "SSLConfigParser" should {
 
     def parseThis(input: String)(implicit app: play.api.Application) = {
-      val config = ConfigFactory.parseString(input).withFallback(ConfigFactory.defaultReference().getConfig("play.ws.ssl"))
+      val config = ConfigFactory
+        .parseString(input)
+        .withFallback(
+            ConfigFactory.defaultReference().getConfig("play.ws.ssl"))
       val parser = new SSLConfigParser(PlayConfig(config), app.classloader)
       parser.parse()
     }
 
     "parse ws.ssl base section" in new WithApplication() {
-      val actual = parseThis("""
+      val actual =
+        parseThis("""
                                 |default = true
                                 |protocol = TLSv1.1
                                 |checkRevocation = true
@@ -43,10 +47,15 @@ object SSLConfigParserSpec extends Specification {
       actual.revocationLists must beSome.which {
         _ must beEqualTo(Seq(new java.net.URL("http://example.com")))
       }
-      actual.enabledCipherSuites must beSome.which(_ must containTheSameElementsAs(Seq("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA")))
-      actual.enabledProtocols must beSome.which(_ must containTheSameElementsAs(Seq("TLSv1.2", "TLSv1.1", "SSLv3")))
-      actual.disabledSignatureAlgorithms must containTheSameElementsAs(Seq("md2", "md3"))
-      actual.disabledKeyAlgorithms must containTheSameElementsAs(Seq("RSA keySize < 1024"))
+      actual.enabledCipherSuites must beSome.which(
+          _ must containTheSameElementsAs(
+              Seq("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA")))
+      actual.enabledProtocols must beSome.which(
+          _ must containTheSameElementsAs(Seq("TLSv1.2", "TLSv1.1", "SSLv3")))
+      actual.disabledSignatureAlgorithms must containTheSameElementsAs(
+          Seq("md2", "md3"))
+      actual.disabledKeyAlgorithms must containTheSameElementsAs(
+          Seq("RSA keySize < 1024"))
       actual.secureRandom must beNone
     }
 
@@ -162,7 +171,8 @@ object SSLConfigParserSpec extends Specification {
     }
 
     "parse ws.ssl.keyManager section" in new WithApplication() {
-      val info = parseThis("""
+      val info =
+        parseThis("""
                               |keyManager = {
                               |  password = "changeit"
                               |  algorithm = "keyStore"
@@ -200,7 +210,5 @@ object SSLConfigParserSpec extends Specification {
                    |}
                  """.stripMargin).must(throwAn[AssertionError])
     }
-
   }
-
 }

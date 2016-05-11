@@ -4,7 +4,7 @@ object tedfdst {
   implicit def s2i(s: String): Int = 0
 
   val thiss = this
-  val y: Option[Int] = thiss(/*start*/""/*end*/)
+  val y: Option[Int] = thiss( /*start*/ "" /*end*/ )
 }
 /*
 Seq(any2ArrowAssoc,
@@ -15,4 +15,4 @@ Seq(any2ArrowAssoc,
     s2i,
     wrapString),
 Some(s2i)
-*/
+ */

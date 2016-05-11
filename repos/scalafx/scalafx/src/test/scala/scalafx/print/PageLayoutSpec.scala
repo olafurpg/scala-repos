@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,33 +35,35 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * Tests for [[scalafx.print.PageLayout]] temporarily inactive.
- *
- * When running in an enviroment with no defined printer,
- * '[[http://docs.oracle.com/javase/8/javafx/api/javafx/print/Printer.html#getDefaultPrinter--
- * Printer.getDefaultPrinter()]]' will return 'null'. Consequently, there will be a
- * 'NullPointerException'. Since JobSettings is a final class, it is not possible create a mock.
- * Therefore, it is necessary to skip the conversion tests when there is no printer defined in 
- * environment.
- */
+  * Tests for [[scalafx.print.PageLayout]] temporarily inactive.
+  *
+  * When running in an enviroment with no defined printer,
+  * '[[http://docs.oracle.com/javase/8/javafx/api/javafx/print/Printer.html#getDefaultPrinter--
+  * Printer.getDefaultPrinter()]]' will return 'null'. Consequently, there will be a
+  * 'NullPointerException'. Since JobSettings is a final class, it is not possible create a mock.
+  * Therefore, it is necessary to skip the conversion tests when there is no printer defined in 
+  * environment.
+  */
 @RunWith(classOf[JUnitRunner])
 class PageLayoutSpec
-  extends SimpleSFXDelegateSpec[jfxp.PageLayout, PageLayout](classOf[jfxp.PageLayout], classOf[PageLayout]) {
+    extends SimpleSFXDelegateSpec[jfxp.PageLayout, PageLayout](
+        classOf[jfxp.PageLayout], classOf[PageLayout]) {
 
-  val skipingMessage: String = if (jfxp.Printer.getDefaultPrinter == null
-    || jfxp.Printer.getDefaultPrinter.getDefaultPageLayout == null) {
-    "Neither Default Printer nor Page Layout defined."
-  } else {
-    ""
-  }
+  val skipingMessage: String =
+    if (jfxp.Printer.getDefaultPrinter == null ||
+        jfxp.Printer.getDefaultPrinter.getDefaultPageLayout == null) {
+      "Neither Default Printer nor Page Layout defined."
+    } else {
+      ""
+    }
 
   override val skipJfxToSfxCause = skipingMessage
 
   override val skipSfxToJfxCause = skipingMessage
 
-  override protected def getScalaClassInstance = Printer.defaultPrinter.defaultPageLayout
+  override protected def getScalaClassInstance =
+    Printer.defaultPrinter.defaultPageLayout
 
   override protected def getJavaClassInstance =
     jfxp.Printer.getDefaultPrinter.getDefaultPageLayout
-
 }

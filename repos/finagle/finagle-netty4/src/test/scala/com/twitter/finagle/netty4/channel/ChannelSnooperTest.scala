@@ -19,10 +19,14 @@ class ChannelSnooperTest extends FunSuite with MockitoSugar {
   test("ByteBufSnooper decodes and prints inbound and outbound messages") {
     var messageCount = 0
     val bbs = new ByteBufSnooper("bbs") {
-      override def dump(printer: (Channel, String) => Unit, ch: Channel, buf: ByteBuf): Unit = {
+      override def dump(printer: (Channel, String) => Unit,
+                        ch: Channel,
+                        buf: ByteBuf): Unit = {
         messageCount += 1
         assert(buf == msgBuffer)
-        super.dump( { (_: Channel, m: String) => assert(msg == m) }, ch, buf )
+        super.dump({ (_: Channel, m: String) =>
+          assert(msg == m)
+        }, ch, buf)
       }
     }
 
@@ -51,7 +55,6 @@ class ChannelSnooperTest extends FunSuite with MockitoSugar {
 
       override def printOutbound(ch: Channel, message: String): Unit =
         outboundCount += 1
-
 
       override def printer(message: String, exc: Throwable): Unit =
         exnCount += 1
@@ -130,7 +133,10 @@ class ChannelSnooperTest extends FunSuite with MockitoSugar {
   test("SimpleChannelSnooper snoops connect") {
     new InstrumentedSnooperCtx {
       assert(eventCount == 0)
-      scs.connect(ctx, new InetSocketAddress(0), new InetSocketAddress(0), mock[ChannelPromise])
+      scs.connect(ctx,
+                  new InetSocketAddress(0),
+                  new InetSocketAddress(0),
+                  mock[ChannelPromise])
       assert(eventCount == 1)
     }
   }
@@ -200,7 +206,7 @@ class ChannelSnooperTest extends FunSuite with MockitoSugar {
     }
   }
 
-  test("SimpleChannelSnooper snoops channelRead"){
+  test("SimpleChannelSnooper snoops channelRead") {
     new InstrumentedSnooperCtx {
       assert(inboundCount == 0)
       scs.channelRead(ctx, msg)

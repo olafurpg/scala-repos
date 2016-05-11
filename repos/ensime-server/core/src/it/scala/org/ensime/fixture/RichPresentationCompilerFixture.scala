@@ -18,18 +18,17 @@ import scala.tools.nsc.reporters.StoreReporter
 
 trait RichPresentationCompilerFixture {
   def withRichPresentationCompiler(
-    testCode: (TestKitFix, EnsimeConfig, RichPresentationCompiler) => Any
+      testCode: (TestKitFix, EnsimeConfig, RichPresentationCompiler) => Any
   ): Any
 }
 
 object RichPresentationCompilerFixture {
   private[fixture] def create(
-    config: EnsimeConfig,
-    search: SearchService
+      config: EnsimeConfig,
+      search: SearchService
   )(
-    implicit
-    system: ActorSystem,
-    vfs: EnsimeVFS
+      implicit system: ActorSystem,
+      vfs: EnsimeVFS
   ): RichPresentationCompiler = {
     val scalaLib = config.allJars.find(_.getName.contains("scala-library")).get
 
@@ -40,26 +39,30 @@ object RichPresentationCompilerFixture {
     settings.verbose.value = presCompLog.isDebugEnabled
     //settings.usejavacp.value = true
     settings.bootclasspath.append(scalaLib.getAbsolutePath)
-    settings.classpath.value = config.compileClasspath.mkString(File.pathSeparator)
+    settings.classpath.value = config.compileClasspath.mkString(
+        File.pathSeparator)
 
     val reporter = new StoreReporter()
     val indexer = TestProbe()
     val parent = TestProbe()
 
     new RichPresentationCompiler(
-      config, settings, reporter, parent.ref, indexer.ref, search
+        config,
+        settings,
+        reporter,
+        parent.ref,
+        indexer.ref,
+        search
     )
   }
 }
 
 trait IsolatedRichPresentationCompilerFixture
-    extends RichPresentationCompilerFixture
-    with IsolatedEnsimeVFSFixture
-    with IsolatedTestKitFixture
-    with IsolatedSearchServiceFixture {
+    extends RichPresentationCompilerFixture with IsolatedEnsimeVFSFixture
+    with IsolatedTestKitFixture with IsolatedSearchServiceFixture {
 
   override def withRichPresentationCompiler(
-    testCode: (TestKitFix, EnsimeConfig, RichPresentationCompiler) => Any
+      testCode: (TestKitFix, EnsimeConfig, RichPresentationCompiler) => Any
   ): Any = {
     withVFS { implicit vfs =>
       withTestKit { testkit =>
@@ -76,12 +79,10 @@ trait IsolatedRichPresentationCompilerFixture
       }
     }
   }
-
 }
 
 trait SharedRichPresentationCompilerFixture
-    extends RichPresentationCompilerFixture
-    with SharedTestKitFixture
+    extends RichPresentationCompilerFixture with SharedTestKitFixture
     with SharedSearchServiceFixture {
 
   private[fixture] var pc: RichPresentationCompiler = _
@@ -94,6 +95,6 @@ trait SharedRichPresentationCompilerFixture
   }
 
   override def withRichPresentationCompiler(
-    testCode: (TestKitFix, EnsimeConfig, RichPresentationCompiler) => Any
+      testCode: (TestKitFix, EnsimeConfig, RichPresentationCompiler) => Any
   ): Any = testCode(_testkit, _config, pc)
 }

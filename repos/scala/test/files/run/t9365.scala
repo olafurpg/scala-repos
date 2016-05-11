@@ -11,7 +11,8 @@ object Test {
     val dos = new ObjectOutputStream(baos)
     dos.writeObject(t)
     dos.close()
-    val dis = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()))
+    val dis = new ObjectInputStream(
+        new ByteArrayInputStream(baos.toByteArray()))
     val t1 = dis.readObject().asInstanceOf[Test]
     println(t1.foo) // was NPE
   }

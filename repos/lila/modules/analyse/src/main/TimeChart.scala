@@ -5,7 +5,7 @@ import scala.concurrent.Future
 import chess.Color
 import play.api.libs.json.Json
 
-import lila.game.{ Game, Namer }
+import lila.game.{Game, Namer}
 
 final class TimeChart(game: Game, moves: List[String]) {
 
@@ -14,8 +14,8 @@ final class TimeChart(game: Game, moves: List[String]) {
   def series = (moves.size > 3) option {
     Json stringify {
       Json.obj(
-        "white" -> points(true),
-        "black" -> points(false)
+          "white" -> points(true),
+          "black" -> points(false)
       )
     }
   }
@@ -28,9 +28,9 @@ final class TimeChart(game: Game, moves: List[String]) {
       val turn = ((ply / 2).floor + 1).toInt
       val dots = if (ply % 2 == 1) "..." else "."
       Json.obj(
-        "name" -> s"$turn$dots $san",
-        "x" -> index,
-        "y" -> (if (white) mt else -mt)
+          "name" -> s"$turn$dots $san",
+          "x" -> index,
+          "y" -> (if (white) mt else -mt)
       )
   }
 
@@ -39,7 +39,8 @@ final class TimeChart(game: Game, moves: List[String]) {
   }
 
   private val moveTimes = game.moveTimesInSeconds
-  private val indexedMoveTimes = game.moveTimesInSeconds.zipWithIndex map {
-    case (mt, i) => (mt, i + game.startedAtTurn)
-  }
+  private val indexedMoveTimes =
+    game.moveTimesInSeconds.zipWithIndex map {
+      case (mt, i) => (mt, i + game.startedAtTurn)
+    }
 }

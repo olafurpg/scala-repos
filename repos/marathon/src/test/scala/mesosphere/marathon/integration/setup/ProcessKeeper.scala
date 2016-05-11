@@ -1,12 +1,11 @@
-
 package mesosphere.marathon.integration.setup
 
 import java.io.File
-import java.util.concurrent.{ Executors, TimeUnit }
+import java.util.concurrent.{Executors, TimeUnit}
 
-import com.google.common.util.concurrent.{ AbstractIdleService, Service }
+import com.google.common.util.concurrent.{AbstractIdleService, Service}
 import com.google.inject.Guice
-import mesosphere.chaos.http.{ HttpConf, HttpModule, HttpService }
+import mesosphere.chaos.http.{HttpConf, HttpModule, HttpService}
 import mesosphere.chaos.metrics.MetricsModule
 import org.apache.commons.io.FileUtils
 import org.rogach.scallop.ScallopConf
@@ -14,11 +13,11 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.immutable.ListMap
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, ExecutionContext, Future, Promise }
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.sys.ShutdownHookThread
 import scala.sys.process._
 import scala.util.control.NonFatal
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 /**
   * Book Keeper for processes and services.
@@ -36,21 +35,30 @@ object ProcessKeeper {
   def startHttpService(port: Int, assetPath: String) = {
     startService {
       log.info(s"Start Http Service on port $port")
-      val conf = new ScallopConf(Array("--http_port", port.toString, "--assets_path", assetPath)) with HttpConf
+      val conf = new ScallopConf(
+          Array("--http_port", port.toString, "--assets_path", assetPath))
+      with HttpConf
       conf.afterInit()
-      val injector = Guice.createInjector(new MetricsModule, new HttpModule(conf), new HttpServiceTestModule)
+      val injector = Guice.createInjector(
+          new MetricsModule, new HttpModule(conf), new HttpServiceTestModule)
       injector.getInstance(classOf[HttpService])
     }
   }
 
   def startZooKeeper(port: Int, workDir: String, wipeWorkDir: Boolean = true) {
-    val args = "-Dzookeeper.jmx.log4j.disable=true" :: "org.apache.zookeeper.server.ZooKeeperServerMain" :: port.toString :: workDir :: Nil
+    val args =
+      "-Dzookeeper.jmx.log4j.disable=true" :: "org.apache.zookeeper.server.ZooKeeperServerMain" :: port.toString :: workDir :: Nil
     val workDirFile = new File(workDir)
     if (wipeWorkDir) {
       FileUtils.deleteDirectory(workDirFile)
       FileUtils.forceMkdir(workDirFile)
     }
-    startJavaProcess("zookeeper", heapInMegs = 256, args, new File("."), sys.env, _.contains("binding to port"))
+    startJavaProcess("zookeeper",
+                     heapInMegs = 256,
+                     args,
+                     new File("."),
+                     sys.env,
+                     _.contains("binding to port"))
   }
 
   def startMesosLocal(): Process = {
@@ -59,9 +67,12 @@ object ProcessKeeper {
     FileUtils.deleteDirectory(mesosWorkDirFile)
     FileUtils.forceMkdir(mesosWorkDirFile)
 
-    val credentialsPath = write(mesosWorkDirFile, fileName = "credentials", content = "principal1 secret1")
-    val aclsPath = write(mesosWorkDirFile, fileName = "acls.json", content =
-      """
+    val credentialsPath = write(mesosWorkDirFile,
+                                fileName = "credentials",
+                                content = "principal1 secret1")
+    val aclsPath = write(mesosWorkDirFile,
+                         fileName = "acls.json",
+                         content = """
         |{
         |  "run_tasks": [{
         |    "principals": { "type": "ANY" },
@@ -85,29 +96,31 @@ object ProcessKeeper {
       """.stripMargin)
 
     log.info(s">>> credentialsPath = $credentialsPath")
-    val mesosEnv = Seq(
-      ENV_MESOS_WORK_DIR -> mesosWorkDirForMesos,
-      "MESOS_LAUNCHER" -> "posix",
-      "MESOS_CONTAINERIZERS" -> "docker,mesos",
-      "MESOS_ROLES" -> "public,foo",
-      "MESOS_ACLS" -> s"file://$aclsPath",
-      "MESOS_CREDENTIALS" -> s"file://$credentialsPath")
+    val mesosEnv = Seq(ENV_MESOS_WORK_DIR -> mesosWorkDirForMesos,
+                       "MESOS_LAUNCHER" -> "posix",
+                       "MESOS_CONTAINERIZERS" -> "docker,mesos",
+                       "MESOS_ROLES" -> "public,foo",
+                       "MESOS_ACLS" -> s"file://$aclsPath",
+                       "MESOS_CREDENTIALS" -> s"file://$credentialsPath")
     startProcess(
-      "mesos",
-      Process(Seq("mesos-local", "--ip=127.0.0.1"), cwd = None, mesosEnv: _*),
-      upWhen = _.toLowerCase.contains("registered with master"))
+        "mesos",
+        Process(
+            Seq("mesos-local", "--ip=127.0.0.1"), cwd = None, mesosEnv: _*),
+        upWhen = _.toLowerCase.contains("registered with master"))
   }
 
-  def startMarathon(cwd: File, env: Map[String, String], arguments: List[String],
+  def startMarathon(cwd: File,
+                    env: Map[String, String],
+                    arguments: List[String],
                     mainClass: String = "mesosphere.marathon.Main",
                     startupLine: String = "Started ServerConnector",
                     processName: String = "marathon"): Process = {
 
     val debugArgs = List(
-      "-Dakka.loglevel=DEBUG",
-      "-Dakka.actor.debug.receive=true",
-      "-Dakka.actor.debug.autoreceive=true",
-      "-Dakka.actor.debug.lifecycle=true"
+        "-Dakka.loglevel=DEBUG",
+        "-Dakka.actor.debug.receive=true",
+        "-Dakka.actor.debug.autoreceive=true",
+        "-Dakka.actor.debug.lifecycle=true"
     )
 
     val marathonWorkDir: String = "/tmp/marathon-itest-marathon"
@@ -115,22 +128,28 @@ object ProcessKeeper {
     FileUtils.deleteDirectory(marathonWorkDirFile)
     FileUtils.forceMkdir(marathonWorkDirFile)
 
-    val secretPath = write(marathonWorkDirFile, fileName = "marathon-secret", content = "secret1")
+    val secretPath = write(
+        marathonWorkDirFile, fileName = "marathon-secret", content = "secret1")
     val authSettings = List(
-      "--mesos_authentication_principal", "principal1",
-      "--mesos_role", "foo",
-      "--mesos_authentication_secret_file", s"$secretPath"
+        "--mesos_authentication_principal",
+        "principal1",
+        "--mesos_role",
+        "foo",
+        "--mesos_authentication_secret_file",
+        s"$secretPath"
     )
 
     val argsWithMain = mainClass :: arguments ++ authSettings
 
-    startJavaProcess(
-      processName, heapInMegs = 512, /* debugArgs ++ */ argsWithMain, cwd,
-      env + (ENV_MESOS_WORK_DIR -> marathonWorkDir),
-      upWhen = _.contains(startupLine))
+    startJavaProcess(processName,
+                     heapInMegs = 512, /* debugArgs ++ */ argsWithMain,
+                     cwd,
+                     env + (ENV_MESOS_WORK_DIR -> marathonWorkDir),
+                     upWhen = _.contains(startupLine))
   }
 
-  private[this] def write(dir: File, fileName: String, content: String): String = {
+  private[this] def write(
+      dir: File, fileName: String, content: String): String = {
     val file = File.createTempFile(fileName, "", dir)
     file.deleteOnExit()
     FileUtils.write(file, content)
@@ -138,21 +157,32 @@ object ProcessKeeper {
     file.getAbsolutePath
   }
 
-  def startJavaProcess(name: String, heapInMegs: Int, arguments: List[String],
-                       cwd: File = new File("."), env: Map[String, String] = Map.empty, upWhen: String => Boolean): Process = {
-    val javaExecutable = sys.props.get("java.home").fold("java")(_ + "/bin/java")
+  def startJavaProcess(name: String,
+                       heapInMegs: Int,
+                       arguments: List[String],
+                       cwd: File = new File("."),
+                       env: Map[String, String] = Map.empty,
+                       upWhen: String => Boolean): Process = {
+    val javaExecutable =
+      sys.props.get("java.home").fold("java")(_ + "/bin/java")
     val classPath = sys.props.getOrElse("java.class.path", "target/classes")
     val memSettings = s"-Xmx${heapInMegs}m"
     // Omit the classpath in order to avoid cluttering the tests output
-    log.info(s"Start java process $name with command: ${(javaExecutable :: memSettings :: arguments).mkString(" ")}")
-    val command: List[String] = javaExecutable :: memSettings :: "-classpath" :: classPath :: arguments
+    log.info(
+        s"Start java process $name with command: ${(javaExecutable :: memSettings :: arguments)
+      .mkString(" ")}")
+    val command: List[String] =
+      javaExecutable :: memSettings :: "-classpath" :: classPath :: arguments
     val builder = Process(command, cwd, env.toList: _*)
     val process = startProcess(name, builder, upWhen)
     log.info(s"Java process $name up and running!")
     process
   }
 
-  def startProcess(name: String, processBuilder: ProcessBuilder, upWhen: String => Boolean, timeout: Duration = 30.seconds): Process = {
+  def startProcess(name: String,
+                   processBuilder: ProcessBuilder,
+                   upWhen: String => Boolean,
+                   timeout: Duration = 30.seconds): Process = {
     require(!processes.contains(name), s"Process with $name already started")
 
     sealed trait ProcessState
@@ -182,20 +212,23 @@ object ProcessKeeper {
 
       ProcessExited
     }(ExecutionContext.fromExecutor(Executors.newCachedThreadPool()))
-    val upOrExited = Future.firstCompletedOf(Seq(up.future, processExitCode))(ExecutionContext.global)
+    val upOrExited = Future.firstCompletedOf(Seq(up.future, processExitCode))(
+        ExecutionContext.global)
     Try(Await.result(upOrExited, timeout)) match {
       case Success(result) =>
         result match {
           case ProcessExited =>
-            throw new IllegalStateException(s"Process $name exited before coming up. Give up. $processBuilder")
+            throw new IllegalStateException(
+                s"Process $name exited before coming up. Give up. $processBuilder")
           case ProcessIsUp =>
             processes += name -> process
-            log.info(s"Process $name is up and running. ${processes.size} processes in total.")
+            log.info(
+                s"Process $name is up and running. ${processes.size} processes in total.")
         }
       case Failure(_) =>
         process.destroy()
         throw new IllegalStateException(
-          s"Process $name does not came up within time bounds ($timeout). Give up. $processBuilder")
+            s"Process $name does not came up within time bounds ($timeout). Give up. $processBuilder")
     }
     process
   }
@@ -242,8 +275,9 @@ object ProcessKeeper {
     }
     //retry on fail
     Try(killProcess) recover { case _ => killProcess } match {
-      case Success(value)       => processes -= name
-      case Failure(NonFatal(e)) => log.error("giving up waiting for processes to finish", e)
+      case Success(value) => processes -= name
+      case Failure(NonFatal(e)) =>
+        log.error("giving up waiting for processes to finish", e)
     }
     log.info(s"Stop Process $name: Done")
   }
@@ -261,8 +295,7 @@ object ProcessKeeper {
   def stopAllServices(): Unit = {
     services.foreach(_.stopAsync())
     services.par.foreach { service =>
-      try { service.awaitTerminated(5, TimeUnit.SECONDS) }
-      catch {
+      try { service.awaitTerminated(5, TimeUnit.SECONDS) } catch {
         case NonFatal(ex) => log.error(s"Could not stop service $service", ex)
       }
     }
@@ -280,4 +313,3 @@ object ProcessKeeper {
     shutdown()
   }
 }
-

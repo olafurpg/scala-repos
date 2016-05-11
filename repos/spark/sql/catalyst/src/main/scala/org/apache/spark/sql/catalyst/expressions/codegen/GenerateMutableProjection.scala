@@ -24,27 +24,29 @@ import org.apache.spark.sql.catalyst.expressions.aggregate.NoOp
 abstract class BaseMutableProjection extends MutableProjection
 
 /**
- * Generates byte code that produces a [[MutableRow]] object that can update itself based on a new
- * input [[InternalRow]] for a fixed set of [[Expression Expressions]].
- * It exposes a `target` method, which is used to set the row that will be updated.
- * The internal [[MutableRow]] object created internally is used only when `target` is not used.
- */
-object GenerateMutableProjection extends CodeGenerator[Seq[Expression], () => MutableProjection] {
+  * Generates byte code that produces a [[MutableRow]] object that can update itself based on a new
+  * input [[InternalRow]] for a fixed set of [[Expression Expressions]].
+  * It exposes a `target` method, which is used to set the row that will be updated.
+  * The internal [[MutableRow]] object created internally is used only when `target` is not used.
+  */
+object GenerateMutableProjection
+    extends CodeGenerator[Seq[Expression], () => MutableProjection] {
 
   protected def canonicalize(in: Seq[Expression]): Seq[Expression] =
     in.map(ExpressionCanonicalizer.execute)
 
-  protected def bind(in: Seq[Expression], inputSchema: Seq[Attribute]): Seq[Expression] =
+  protected def bind(
+      in: Seq[Expression], inputSchema: Seq[Attribute]): Seq[Expression] =
     in.map(BindReferences.bindReference(_, inputSchema))
 
-  def generate(
-      expressions: Seq[Expression],
-      inputSchema: Seq[Attribute],
-      useSubexprElimination: Boolean): (() => MutableProjection) = {
+  def generate(expressions: Seq[Expression],
+               inputSchema: Seq[Attribute],
+               useSubexprElimination: Boolean): (() => MutableProjection) = {
     create(canonicalize(bind(expressions, inputSchema)), useSubexprElimination)
   }
 
-  protected def create(expressions: Seq[Expression]): (() => MutableProjection) = {
+  protected def create(
+      expressions: Seq[Expression]): (() => MutableProjection) = {
     create(expressions, false)
   }
 
@@ -64,8 +66,10 @@ object GenerateMutableProjection extends CodeGenerator[Seq[Expression], () => Mu
           val isNull = s"isNull_$i"
           val value = s"value_$i"
           ctx.addMutableState("boolean", isNull, s"this.$isNull = true;")
-          ctx.addMutableState(ctx.javaType(e.dataType), value,
-            s"this.$value = ${ctx.defaultValue(e.dataType)};")
+          ctx.addMutableState(
+              ctx.javaType(e.dataType),
+              value,
+              s"this.$value = ${ctx.defaultValue(e.dataType)};")
           s"""
             ${ev.code}
             this.$isNull = ${ev.isNull};
@@ -73,8 +77,10 @@ object GenerateMutableProjection extends CodeGenerator[Seq[Expression], () => Mu
            """
         } else {
           val value = s"value_$i"
-          ctx.addMutableState(ctx.javaType(e.dataType), value,
-            s"this.$value = ${ctx.defaultValue(e.dataType)};")
+          ctx.addMutableState(
+              ctx.javaType(e.dataType),
+              value,
+              s"this.$value = ${ctx.defaultValue(e.dataType)};")
           s"""
             ${ev.code}
             this.$value = ${ev.value};
@@ -133,11 +139,13 @@ object GenerateMutableProjection extends CodeGenerator[Seq[Expression], () => Mu
       }
     """
 
-    logDebug(s"code for ${expressions.mkString(",")}:\n${CodeFormatter.format(code)}")
+    logDebug(
+        s"code for ${expressions.mkString(",")}:\n${CodeFormatter.format(code)}")
 
     val c = CodeGenerator.compile(code)
-    () => {
-      c.generate(ctx.references.toArray).asInstanceOf[MutableProjection]
-    }
+    () =>
+      {
+        c.generate(ctx.references.toArray).asInstanceOf[MutableProjection]
+      }
   }
 }

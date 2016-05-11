@@ -6,37 +6,36 @@ import com.twitter.util.Duration
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Latency compensation enables the modification of connection and
- * request timeouts on a per-endpoint basis.  For instance, if a
- * client has both network-local and trans-continental endpoints, a
- * reasonable latency compensator might add the speed-of-light penalty
- * when communicating with distant endpoints.
- */
+  * Latency compensation enables the modification of connection and
+  * request timeouts on a per-endpoint basis.  For instance, if a
+  * client has both network-local and trans-continental endpoints, a
+  * reasonable latency compensator might add the speed-of-light penalty
+  * when communicating with distant endpoints.
+  */
 object LatencyCompensation {
 
   object Role extends Stack.Role("LatencyCompensation")
 
   /**
-   * A compensator is a function that takes an arbitrary address metadata map
-   * and computes a latency compensation. This compensation can be added to
-   * connection and request timeouts. Latency compensation is exposed to the
-   * stack via a Stack.Param LatencyCompensation.Compensation.
-   */
+    * A compensator is a function that takes an arbitrary address metadata map
+    * and computes a latency compensation. This compensation can be added to
+    * connection and request timeouts. Latency compensation is exposed to the
+    * stack via a Stack.Param LatencyCompensation.Compensation.
+    */
   case class Compensator(compensator: Addr.Metadata => Duration) {
     def mk(): (Compensator, Stack.Param[Compensator]) =
       (this, Compensator.param)
   }
   object Compensator {
-    implicit val param =
-      Stack.Param(Compensator(_ => Duration.Zero))
+    implicit val param = Stack.Param(Compensator(_ => Duration.Zero))
   }
 
   /**
-   * If configured, overrides the default [[Compensator]] used in
-   * all un-configured clients. If a caller configures a Compensator,
-   * the override value will not be used in favor of the caller-configured
-   * value.
-   */
+    * If configured, overrides the default [[Compensator]] used in
+    * all un-configured clients. If a caller configures a Compensator,
+    * the override value will not be used in favor of the caller-configured
+    * value.
+    */
   object DefaultOverride {
     private val setting: AtomicReference[Option[Compensator]] =
       new AtomicReference[Option[Compensator]](None)
@@ -45,9 +44,9 @@ object LatencyCompensation {
     private[client] def reset() = { setting.set(None) }
 
     /**
-     * Set an override to use for un-configured clients.
-     * @return true if the override was set. false if the override was previously set.
-     */
+      * Set an override to use for un-configured clients.
+      * @return true if the override was set. false if the override was previously set.
+      */
     def set(compensator: Compensator): Boolean =
       setting.compareAndSet(None, Some(compensator))
 
@@ -55,26 +54,25 @@ object LatencyCompensation {
   }
 
   /**
-   * Set by LatencyCompensation for consumption by other modules.
-   * Do not set this Param. Instead configure a Compensator.
-   */
+    * Set by LatencyCompensation for consumption by other modules.
+    * Do not set this Param. Instead configure a Compensator.
+    */
   private[finagle] case class Compensation(howlong: Duration) {
     def mk(): (Compensation, Stack.Param[Compensation]) =
       (this, Compensation.param)
   }
   private[finagle] object Compensation {
-    implicit val param =
-      Stack.Param(Compensation(Duration.Zero))
+    implicit val param = Stack.Param(Compensation(Duration.Zero))
   }
-
 
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module[ServiceFactory[Req, Rep]] {
       val role = Role
-      val description = "Sets a latency compensation to be added based on the destination address"
+      val description =
+        "Sets a latency compensation to be added based on the destination address"
       val parameters = Seq(
-        implicitly[Stack.Param[AddrMetadata]],
-        implicitly[Stack.Param[Compensator]]
+          implicitly[Stack.Param[AddrMetadata]],
+          implicitly[Stack.Param[Compensator]]
       )
       def make(prms: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
 
@@ -92,5 +90,4 @@ object LatencyCompensation {
         Stack.Leaf(this, compensated)
       }
     }
-
 }

@@ -10,10 +10,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.params.TypeParamClause
 import org.jetbrains.plugins.scala.lang.parser.parsing.types.Type
 
 /**
-* @author Alexander Podkhalyuzin
-* Date: 13.02.2008
-*/
-
+  * @author Alexander Podkhalyuzin
+  * Date: 13.02.2008
+  */
 object TypeDef {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val faultMarker = builder.mark
@@ -32,17 +31,17 @@ object TypeDef {
         faultMarker.rollbackTo
         return false
     }
-    val isTypeParamClause = if (TypeParamClause parse builder) {
-      true
-    } else false
+    val isTypeParamClause =
+      if (TypeParamClause parse builder) {
+        true
+      } else false
     builder.getTokenType match {
       case ScalaTokenTypes.tASSIGN =>
         builder.advanceLexer //Ate =
         if (Type.parse(builder)) {
           faultMarker.drop
           return true
-        }
-        else {
+        } else {
           faultMarker.drop
           builder error ScalaBundle.message("wrong.type")
           return false

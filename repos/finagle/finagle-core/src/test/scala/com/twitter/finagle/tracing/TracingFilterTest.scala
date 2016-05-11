@@ -12,17 +12,20 @@ import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
 class TracingFilterTest
-  extends FunSuite with MockitoSugar with BeforeAndAfter with AssertionsForJUnit {
+    extends FunSuite with MockitoSugar with BeforeAndAfter
+    with AssertionsForJUnit {
 
   val serviceName = "bird"
   val service = Service.mk[Int, Int](Future.value)
-  val exceptingService = Service.mk[Int, Int]({ x => Future.exception(new Exception("bummer"))})
+  val exceptingService = Service.mk[Int, Int]({ x =>
+    Future.exception(new Exception("bummer"))
+  })
 
   var tracer: Tracer = _
   var captor: ArgumentCaptor[Record] = _
 
   override def test(testName: String, testTags: Tag*)(f: => Unit) {
-    super.test(testName, testTags:_*) {
+    super.test(testName, testTags: _*) {
       tracer = spy(new NullTracer)
       captor = ArgumentCaptor.forClass(classOf[Record])
       Trace.letTracer(tracer) { f }
@@ -44,29 +47,34 @@ class TracingFilterTest
   }
 
   def testAnnotatingTracingFilter(
-    prefix: String,
-    mkFilter: String => Filter[Int, Int, Int, Int]
+      prefix: String,
+      mkFilter: String => Filter[Int, Int, Int, Int]
   ): Unit = {
     test(s"$prefix: should trace service name") {
-      val services = record(mkFilter("")) collect {
-        case Record(_, _, Annotation.ServiceName(svc), _) => svc
-      }
+      val services =
+        record(mkFilter("")) collect {
+          case Record(_, _, Annotation.ServiceName(svc), _) => svc
+        }
       assert(services == Seq(serviceName))
     }
 
     test(s"$prefix: should trace Finagle version") {
-      val versions = record(mkFilter("1.2.3")) collect {
-        case Record(_, _, Annotation.BinaryAnnotation(key, ver), _)
-          if key == s"$prefix/finagle.version" => ver
-      }
+      val versions =
+        record(mkFilter("1.2.3")) collect {
+          case Record(_, _, Annotation.BinaryAnnotation(key, ver), _)
+              if key == s"$prefix/finagle.version" =>
+            ver
+        }
       assert(versions == Seq("1.2.3"))
     }
 
     test(s"$prefix: should trace unknown Finagle version") {
-      val versions = record(mkFilter("?")) collect {
-        case Record(_, _, Annotation.BinaryAnnotation(key, ver), _)
-          if key == s"$prefix/finagle.version" => ver
-      }
+      val versions =
+        record(mkFilter("?")) collect {
+          case Record(_, _, Annotation.BinaryAnnotation(key, ver), _)
+              if key == s"$prefix/finagle.version" =>
+            ver
+        }
       assert(versions == Seq("?"))
     }
 
@@ -79,18 +87,22 @@ class TracingFilterTest
 
     test(s"$prefix: should trace Dtab.local") {
       val dtab = Dtab.read("/fox=>/spooky;/dana=>/starbuck")
-      val dtabs = record(withDtab(dtab) andThen mkFilter("")) collect {
-        case Record(_, _, Annotation.BinaryAnnotation(key, dtab), _)
-          if key == s"$prefix/dtab.local" => dtab
-      }
+      val dtabs =
+        record(withDtab(dtab) andThen mkFilter("")) collect {
+          case Record(_, _, Annotation.BinaryAnnotation(key, dtab), _)
+              if key == s"$prefix/dtab.local" =>
+            dtab
+        }
       assert(dtabs == Seq(dtab.show))
     }
 
     test(s"$prefix: should not trace empty Dtab.local") {
-      val dtabs = record(withDtab(Dtab.empty) andThen mkFilter("")) collect {
-        case Record(_, _, Annotation.BinaryAnnotation(key, dtab), _)
-          if key == s"$prefix/dtab.local" => dtab
-      }
+      val dtabs =
+        record(withDtab(Dtab.empty) andThen mkFilter("")) collect {
+          case Record(_, _, Annotation.BinaryAnnotation(key, dtab), _)
+              if key == s"$prefix/dtab.local" =>
+            dtab
+        }
       assert(dtabs.isEmpty)
     }
   }
@@ -99,43 +111,51 @@ class TracingFilterTest
    * Client tracing
    */
 
-  def mkClient(v: String = "") = ClientTracingFilter.TracingFilter[Int, Int](serviceName, () => v)
+  def mkClient(v: String = "") =
+    ClientTracingFilter.TracingFilter[Int, Int](serviceName, () => v)
 
   testAnnotatingTracingFilter("clnt", mkClient)
 
   test("clnt: send and then recv") {
-    val annotations = record(mkClient()) collect {
-      case Record(_, _, a@Annotation.ClientSend(), _) => a
-      case Record(_, _, a@Annotation.ClientRecv(), _) => a
-    }
-    assert(annotations == Seq(Annotation.ClientSend(), Annotation.ClientRecv()))
+    val annotations =
+      record(mkClient()) collect {
+        case Record(_, _, a @ Annotation.ClientSend(), _) => a
+        case Record(_, _, a @ Annotation.ClientRecv(), _) => a
+      }
+    assert(
+        annotations == Seq(Annotation.ClientSend(), Annotation.ClientRecv()))
   }
 
   test("clnt: recv error") {
-    val annotations = recordException(mkClient()) collect {
-      case Record(_, _, a@Annotation.ClientSend(), _) => a
-      case Record(_, _, a@Annotation.ClientRecv(), _) => a
-      case Record(_, _, a@Annotation.ClientRecvError(_), _) => a
-    }
-    assert(annotations == Seq(
-      Annotation.ClientSend(),
-      Annotation.ClientRecvError("java.lang.Exception: bummer"),
-      Annotation.ClientRecv()))
+    val annotations =
+      recordException(mkClient()) collect {
+        case Record(_, _, a @ Annotation.ClientSend(), _) => a
+        case Record(_, _, a @ Annotation.ClientRecv(), _) => a
+        case Record(_, _, a @ Annotation.ClientRecvError(_), _) => a
+      }
+    assert(
+        annotations == Seq(
+            Annotation.ClientSend(),
+            Annotation.ClientRecvError("java.lang.Exception: bummer"),
+            Annotation.ClientRecv()))
   }
 
   /*
    * Server tracing
    */
 
-  def mkServer(v: String = "") = ServerTracingFilter.TracingFilter[Int, Int](serviceName, () => v)
+  def mkServer(v: String = "") =
+    ServerTracingFilter.TracingFilter[Int, Int](serviceName, () => v)
 
   testAnnotatingTracingFilter("srv", mkServer)
 
   test("srv: recv and then send") {
-    val annotations = record(mkServer()) collect {
-      case Record(_, _, a@Annotation.ServerRecv(), _) => a
-      case Record(_, _, a@Annotation.ServerSend(), _) => a
-    }
-    assert(annotations == Seq(Annotation.ServerRecv(), Annotation.ServerSend()))
+    val annotations =
+      record(mkServer()) collect {
+        case Record(_, _, a @ Annotation.ServerRecv(), _) => a
+        case Record(_, _, a @ Annotation.ServerSend(), _) => a
+      }
+    assert(
+        annotations == Seq(Annotation.ServerRecv(), Annotation.ServerSend()))
   }
 }

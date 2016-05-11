@@ -24,7 +24,6 @@ final class Boolean private () extends Comparable[Boolean] {
 
   @inline override def toString(): String =
     Boolean.toString(booleanValue)
-
 }
 
 object Boolean {

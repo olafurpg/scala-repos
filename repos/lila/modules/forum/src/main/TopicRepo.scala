@@ -17,8 +17,8 @@ object TopicRepoTroll extends TopicRepo(true)
 sealed abstract class TopicRepo(troll: Boolean) {
 
   private lazy val trollFilter = troll.fold(
-    Json.obj(),
-    Json.obj("troll" -> false)
+      Json.obj(),
+      Json.obj("troll" -> false)
   )
 
   def close(id: String, value: Boolean): Funit =
@@ -38,8 +38,8 @@ sealed abstract class TopicRepo(troll: Boolean) {
     // also take troll topic into accounts
     TopicRepoTroll.byTree(categ.slug, slug) flatMap {
       _.isDefined.fold(
-        nextSlug(categ, name, it + 1),
-        fuccess(slug)
+          nextSlug(categ, name, it + 1),
+          fuccess(slug)
       )
     }
   }
@@ -47,5 +47,6 @@ sealed abstract class TopicRepo(troll: Boolean) {
   def incViews(topic: Topic): Funit =
     $update($select(topic.id), $inc("views" -> 1))
 
-  def byCategQuery(categ: Categ) = Json.obj("categId" -> categ.slug) ++ trollFilter
+  def byCategQuery(categ: Categ) =
+    Json.obj("categId" -> categ.slug) ++ trollFilter
 }

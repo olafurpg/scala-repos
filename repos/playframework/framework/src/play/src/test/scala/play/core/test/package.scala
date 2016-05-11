@@ -3,15 +3,16 @@
  */
 package play.core
 
-import play.api.{ ApplicationLoader, BuiltInComponentsFromContext, Environment, Play }
+import play.api.{ApplicationLoader, BuiltInComponentsFromContext, Environment, Play}
 
 package object test {
 
   /**
-   * Run the given block of code with an application.
-   */
+    * Run the given block of code with an application.
+    */
   def withApplication[T](block: => T): T = {
-    val app = new BuiltInComponentsFromContext(ApplicationLoader.createContext(Environment.simple())) {
+    val app = new BuiltInComponentsFromContext(
+        ApplicationLoader.createContext(Environment.simple())) {
       def router = play.api.routing.Router.empty
     }.application
     Play.start(app)
@@ -21,5 +22,4 @@ package object test {
       Play.stop(app)
     }
   }
-
 }

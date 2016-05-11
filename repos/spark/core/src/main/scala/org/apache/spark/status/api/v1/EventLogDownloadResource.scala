@@ -29,9 +29,8 @@ import org.apache.spark.internal.Logging
 
 @Produces(Array(MediaType.APPLICATION_OCTET_STREAM))
 private[v1] class EventLogDownloadResource(
-    val uIRoot: UIRoot,
-    val appId: String,
-    val attemptId: Option[String]) extends Logging {
+    val uIRoot: UIRoot, val appId: String, val attemptId: Option[String])
+    extends Logging {
   val conf = SparkHadoopUtil.get.newConfiguration(new SparkConf)
 
   @GET
@@ -52,17 +51,18 @@ private[v1] class EventLogDownloadResource(
           } finally {
             zipStream.close()
           }
-
         }
       }
 
-      Response.ok(stream)
+      Response
+        .ok(stream)
         .header("Content-Disposition", s"attachment; filename=$fileName")
         .header("Content-Type", MediaType.APPLICATION_OCTET_STREAM)
         .build()
     } catch {
       case NonFatal(e) =>
-        Response.serverError()
+        Response
+          .serverError()
           .entity(s"Event logs are not available for app: $appId.")
           .status(Response.Status.SERVICE_UNAVAILABLE)
           .build()

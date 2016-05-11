@@ -27,5 +27,4 @@ private[v1] class OneApplicationResource(uiRoot: UIRoot) {
     val apps = uiRoot.getApplicationInfoList.find { _.id == appId }
     apps.getOrElse(throw new NotFoundException("unknown app: " + appId))
   }
-
 }

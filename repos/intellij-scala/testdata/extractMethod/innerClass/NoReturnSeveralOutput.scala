@@ -37,4 +37,4 @@ class NoReturnSeveralOutput {
     new TestMethodNameResult(x, y, z, zz)
   }
 }
-*/
+ */

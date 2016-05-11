@@ -8,21 +8,22 @@ import org.scalatest.junit.{AssertionsForJUnit, JUnitRunner}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
-class DeadlineTest 
-  extends FunSuite 
-  with AssertionsForJUnit
-  with GeneratorDrivenPropertyChecks {
+class DeadlineTest
+    extends FunSuite with AssertionsForJUnit
+    with GeneratorDrivenPropertyChecks {
 
-  val time = for (t <- Gen.choose(0L, Long.MaxValue)) yield Time.fromNanoseconds(t)
-  val dur = for (d <- Gen.choose(0L, Long.MaxValue)) yield Duration.fromNanoseconds(d)
-  val deadline = for (t <- time; d <- dur) yield Deadline(t, t+d)
+  val time = for (t <- Gen.choose(0L, Long.MaxValue)) yield
+    Time.fromNanoseconds(t)
+  val dur = for (d <- Gen.choose(0L, Long.MaxValue)) yield
+    Duration.fromNanoseconds(d)
+  val deadline = for (t <- time; d <- dur) yield Deadline(t, t + d)
 
   test("Deadline marshalling") {
     forAll(deadline) { d =>
       Deadline.tryUnmarshal(Deadline.marshal(d)) == Return(d)
     }
   }
-  
+
   test("Deadline.combined") {
     forAll(deadline, deadline) { (d1, d2) =>
       Deadline.combined(d1, d2).timestamp == (d1.timestamp max d2.timestamp) &&
@@ -31,4 +32,3 @@ class DeadlineTest
     }
   }
 }
-

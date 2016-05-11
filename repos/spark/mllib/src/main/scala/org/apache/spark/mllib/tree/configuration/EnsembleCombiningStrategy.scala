@@ -18,8 +18,8 @@
 package org.apache.spark.mllib.tree.configuration
 
 /**
- * Enum to select ensemble combining strategy for base learners
- */
+  * Enum to select ensemble combining strategy for base learners
+  */
 private[tree] object EnsembleCombiningStrategy extends Enumeration {
   type EnsembleCombiningStrategy = Value
   val Average, Sum, Vote = Value

@@ -7,6 +7,7 @@ import akka.actor.ActorRef
   * are created via `LeadershipModule.startWhenLeader()` with `considerPreparedOnStart = false`.
   */
 object PreparationMessages {
+
   /**
     * Sent to actors which are created via `LeadershipModule.startWhenLeader()` with considerPreparedOnStart = false.
     *

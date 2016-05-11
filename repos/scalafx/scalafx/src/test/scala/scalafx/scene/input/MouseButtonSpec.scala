@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Tests for [[scalafx.scene.input.MouseButton]]. */
 @RunWith(classOf[JUnitRunner])
-class MouseButtonSpec extends SFXEnumDelegateSpec[jfxsi.MouseButton, MouseButton](
-  javaClass = classOf[jfxsi.MouseButton],
-  scalaClass = classOf[MouseButton],
-  companion = MouseButton)
+class MouseButtonSpec
+    extends SFXEnumDelegateSpec[jfxsi.MouseButton, MouseButton](
+        javaClass = classOf[jfxsi.MouseButton],
+        scalaClass = classOf[MouseButton],
+        companion = MouseButton)

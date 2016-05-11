@@ -12,11 +12,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird.online.executor
 
-import java.util.concurrent.atomic.{ AtomicReference, AtomicInteger }
+import java.util.concurrent.atomic.{AtomicReference, AtomicInteger}
 
 class AtomicStateTransformer[T](initState: T) {
   private val curState = new AtomicReference(initState)
@@ -34,7 +34,10 @@ class AtomicStateTransformer[T](initState: T) {
     }
   }
 
-  final def update(oper: T => T): T = updateWithState({ x: T => (Unit, oper(x)) })._2
+  final def update(oper: T => T): T =
+    updateWithState({ x: T =>
+      (Unit, oper(x))
+    })._2
 }
 
 object InflightTuples {
@@ -47,7 +50,6 @@ object InflightTuples {
 
   // WARNING, only use this in testing!!
   def reset() = data.set(0)
-
 }
 
 case class InputState[T](state: T) {
@@ -77,13 +79,16 @@ case class InputState[T](state: T) {
   // so we increment by 1 less than the amount given
   def fanOut(by: Int) = {
     require(by >= 0, "Invalid fanout: %d, by should be >= 0".format(by))
-    require(stateTracking.get.counter == 1, "You can only call fanOut once, and must do it before acking the tuple.")
+    require(
+        stateTracking.get.counter == 1,
+        "You can only call fanOut once, and must do it before acking the tuple.")
     val incrementAmount = by - 1
     val newS = stateTracking.update(_.incrBy(incrementAmount))
     // If we incremented on something that was 0 or negative
     // And not in a failed state, then this is an error
     if ((newS.counter - incrementAmount <= 0) && !newS.failed) {
-      throw new Exception("Invalid call on an inputstate, we had already decremented to 0 and not failed.")
+      throw new Exception(
+          "Invalid call on an inputstate, we had already decremented to 0 and not failed.")
     }
     this
   }
@@ -107,6 +112,7 @@ case class InputState[T](state: T) {
 
   override def toString: String = {
     val curState = stateTracking.get
-    "Input State Wrapper(count: %d, failed: %s)".format(curState.counter, curState.failed.toString)
+    "Input State Wrapper(count: %d, failed: %s)".format(
+        curState.counter, curState.failed.toString)
   }
 }

@@ -6,7 +6,8 @@ import mesosphere.marathon.Protos.MarathonTask
   * MarathonTask is a generated final class. In order to be able to persist MarathonTasks via an EntityStore, we need
   * something that extends MarathonState – this wrapper enables this.
   */
-case class MarathonTaskState(task: MarathonTask) extends MarathonState[MarathonTask, MarathonTaskState] {
+case class MarathonTaskState(task: MarathonTask)
+    extends MarathonState[MarathonTask, MarathonTaskState] {
 
   override def mergeFromProto(message: MarathonTask): MarathonTaskState =
     MarathonTaskState(message)

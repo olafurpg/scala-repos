@@ -1,7 +1,8 @@
 import scala.tools.partest.ReplTest
 
 object Test extends ReplTest {
-  def code = """
+  def code =
+    """
 2 ; 3
 { 2 ; 3 }
 5 ; 10 ; case object Cow ; 20 ; class Moo { override def toString = "Moooooo" } ; 30 ; def bippy = {

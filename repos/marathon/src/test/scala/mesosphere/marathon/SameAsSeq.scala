@@ -1,6 +1,6 @@
 package mesosphere.marathon
 
-import org.hamcrest.{ Description, BaseMatcher }
+import org.hamcrest.{Description, BaseMatcher}
 import org.mockito.internal.matchers.Equality
 
 // WTF, this is not true:
@@ -14,4 +14,3 @@ case class SameAsSeq[T](wanted: Iterable[T]) extends BaseMatcher[Iterable[T]] {
     description.appendValue(wanted)
   }
 }
-

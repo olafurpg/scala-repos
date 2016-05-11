@@ -31,10 +31,17 @@ import org.apache.spark.util.Clock
 class DriverRunnerTest extends SparkFunSuite {
   private def createDriverRunner() = {
     val command = new Command("mainClass", Seq(), Map(), Seq(), Seq(), Seq())
-    val driverDescription = new DriverDescription("jarUrl", 512, 1, true, command)
+    val driverDescription = new DriverDescription(
+        "jarUrl", 512, 1, true, command)
     val conf = new SparkConf()
-    new DriverRunner(conf, "driverId", new File("workDir"), new File("sparkHome"),
-      driverDescription, null, "spark://1.2.3.4/worker/", new SecurityManager(conf))
+    new DriverRunner(conf,
+                     "driverId",
+                     new File("workDir"),
+                     new File("sparkHome"),
+                     driverDescription,
+                     null,
+                     "spark://1.2.3.4/worker/",
+                     new SecurityManager(conf))
   }
 
   private def createProcessBuilderAndProcess(): (ProcessBuilderLike, Process) = {
@@ -68,7 +75,11 @@ class DriverRunnerTest extends SparkFunSuite {
 
     val (processBuilder, process) = createProcessBuilderAndProcess()
     // fail, fail, fail, success
-    when(process.waitFor()).thenReturn(-1).thenReturn(-1).thenReturn(-1).thenReturn(0)
+    when(process.waitFor())
+      .thenReturn(-1)
+      .thenReturn(-1)
+      .thenReturn(-1)
+      .thenReturn(0)
     runner.runCommandWithRetry(processBuilder, p => (), supervise = true)
 
     verify(process, times(4)).waitFor()
@@ -131,11 +142,16 @@ class DriverRunnerTest extends SparkFunSuite {
       .thenReturn(-1) // fail 4
       .thenReturn(0) // success
     when(clock.getTimeMillis())
-      .thenReturn(0).thenReturn(1000) // fail 1 (short)
-      .thenReturn(1000).thenReturn(2000) // fail 2 (short)
-      .thenReturn(2000).thenReturn(10000) // fail 3 (long)
-      .thenReturn(10000).thenReturn(11000) // fail 4 (short)
-      .thenReturn(11000).thenReturn(21000) // success (long)
+      .thenReturn(0)
+      .thenReturn(1000) // fail 1 (short)
+      .thenReturn(1000)
+      .thenReturn(2000) // fail 2 (short)
+      .thenReturn(2000)
+      .thenReturn(10000) // fail 3 (long)
+      .thenReturn(10000)
+      .thenReturn(11000) // fail 4 (short)
+      .thenReturn(11000)
+      .thenReturn(21000) // success (long)
 
     runner.runCommandWithRetry(processBuilder, p => (), supervise = true)
 
@@ -144,5 +160,4 @@ class DriverRunnerTest extends SparkFunSuite {
     verify(sleeper, times(2)).sleep(1)
     verify(sleeper, times(2)).sleep(2)
   }
-
 }

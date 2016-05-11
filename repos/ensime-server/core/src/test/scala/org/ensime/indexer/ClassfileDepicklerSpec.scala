@@ -9,7 +9,8 @@ import org.ensime.vfs._
 class ClassfileDepicklerSpec extends EnsimeSpec with SharedEnsimeVFSFixture {
 
   "ClassfileDepickler" should "not depickle J2SE classes" in withVFS { vfs =>
-    new ClassfileDepickler(vfs.vres("java/lang/String.class")).scalasig should ===(None)
+    new ClassfileDepickler(vfs.vres("java/lang/String.class")).scalasig should ===(
+        None)
   }
 
   it should "support typical Scala classes" in withVFS { vfs =>
@@ -17,16 +18,18 @@ class ClassfileDepicklerSpec extends EnsimeSpec with SharedEnsimeVFSFixture {
   }
 
   it should "not expect anything in companions" in withVFS { vfs =>
-    new ClassfileDepickler(vfs.vres("scala/collection/immutable/List$.class")).scalasig should ===(None)
+    new ClassfileDepickler(vfs.vres("scala/collection/immutable/List$.class")).scalasig should ===(
+        None)
   }
 
   it should "not expect anything in closures" in withVFS { vfs =>
-    new ClassfileDepickler(vfs.vres("scala/io/Source$$anonfun$1.class")).scalasig should ===(None)
+    new ClassfileDepickler(vfs.vres("scala/io/Source$$anonfun$1.class")).scalasig should ===(
+        None)
   }
 
   it should "find type aliases" in withVFS { vfs =>
     new ClassfileDepickler(vfs.vres("scala/Predef.class")).getTypeAliases should contain(
-      RawType(s"scala.Predef$$String", Public)
+        RawType(s"scala.Predef$$String", Public)
     )
   }
 }

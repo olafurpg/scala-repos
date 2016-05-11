@@ -14,6 +14,5 @@ class ScalatraBootstrap extends LifeCycle {
     context.mount(new FilterExample, "/")
     context.mount(new AtmosphereChat, "/atmosphere")
     context.mount(new TemplateExample, "/")
-
   }
 }

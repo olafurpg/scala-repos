@@ -3,7 +3,8 @@ import scala.tools.partest.ScaladocModelTest
 
 object Test extends ScaladocModelTest {
 
-  override def code = """
+  override def code =
+    """
       package test.scaladoc {
 
         /** @groupname Z From owner chain */
@@ -64,28 +65,36 @@ object Test extends ScaladocModelTest {
     import access._
 
     // just need to check the member exists, access methods will throw an error if there's a problem
-    val base = rootPackage._package("test")._package("scaladoc")._package("groups")
+    val base =
+      rootPackage._package("test")._package("scaladoc")._package("groups")
 
     def checkGroup(mbr: MemberEntity, grp: String) =
-      assert(mbr.group == grp, "Incorrect group for " + mbr.qualifiedName + ": " + mbr.group + " instead of " + grp)
+      assert(mbr.group == grp,
+             "Incorrect group for " + mbr.qualifiedName + ": " + mbr.group +
+             " instead of " + grp)
 
     def checkGroupDesc(dtpl: DocTemplateEntity, grp: String, grpDesc: String) = {
       assert(dtpl.groupDescription(grp).isDefined,
-             "Group description for " + grp + " not defined in " + dtpl.qualifiedName)
-      assert(extractCommentText(dtpl.groupDescription(grp).get).contains(grpDesc),
-             "Group description for " + grp + " in " + dtpl.qualifiedName + " does not contain \"" + grpDesc + "\": \"" +
-             extractCommentText(dtpl.groupDescription(grp).get) + "\"")
+             "Group description for " + grp + " not defined in " +
+             dtpl.qualifiedName)
+      assert(
+          extractCommentText(dtpl.groupDescription(grp).get).contains(grpDesc),
+          "Group description for " + grp + " in " + dtpl.qualifiedName +
+          " does not contain \"" + grpDesc + "\": \"" +
+          extractCommentText(dtpl.groupDescription(grp).get) + "\"")
     }
 
     def checkGroupName(dtpl: DocTemplateEntity, grp: String, grpName: String) =
       // TODO: See why we need trim here, we already do trimming in the CommentFactory
       assert(dtpl.groupName(grp) == grpName,
-             "Group name for " + grp + " in " + dtpl.qualifiedName + " does not equal \"" + grpName + "\": \"" + dtpl.groupName(grp) + "\"")
+             "Group name for " + grp + " in " + dtpl.qualifiedName +
+             " does not equal \"" + grpName + "\": \"" + dtpl.groupName(grp) +
+             "\"")
 
     def checkGroupPrio(dtpl: DocTemplateEntity, grp: String, grpPrio: Int) =
       assert(dtpl.groupPriority(grp) == grpPrio,
-             "Group priority for " + grp + " in " + dtpl.qualifiedName + " does not equal " + grpPrio + ": " + dtpl.groupPriority(grp))
-
+             "Group priority for " + grp + " in " + dtpl.qualifiedName +
+             " does not equal " + grpPrio + ": " + dtpl.groupPriority(grp))
 
     val A = base._trait("A")
     val B = base._trait("B")
@@ -100,10 +109,12 @@ object Test extends ScaladocModelTest {
     checkGroup(C._method("bar"), "B")
     checkGroup(C._method("baz"), "C")
 
-    checkGroupDesc(A, "A", "Group A is the group that contains functions starting with f")
+    checkGroupDesc(
+        A, "A", "Group A is the group that contains functions starting with f")
     checkGroupName(A, "A", "A")
     checkGroupPrio(A, "A", 0)
-    checkGroupDesc(A, "B", "Group B is the group that contains functions starting with b")
+    checkGroupDesc(
+        A, "B", "Group B is the group that contains functions starting with b")
     checkGroupName(A, "B", "Group B has a nice new name and a high priority")
     checkGroupPrio(A, "B", -10)
     checkGroupName(A, "Z", "From owner chain")
@@ -113,7 +124,8 @@ object Test extends ScaladocModelTest {
     checkGroupPrio(B, "C", 0)
     checkGroupName(B, "Z", "From owner chain")
 
-    checkGroupDesc(C, "A", "Group A is the group that contains functions starting with f")
+    checkGroupDesc(
+        C, "A", "Group A is the group that contains functions starting with f")
     checkGroupName(C, "A", "A")
     checkGroupPrio(C, "A", 0)
     checkGroupDesc(C, "B", "Look ma, I'm overriding group descriptions!!!")

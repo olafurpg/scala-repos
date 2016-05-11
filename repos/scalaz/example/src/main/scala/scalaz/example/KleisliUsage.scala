@@ -12,19 +12,17 @@ object KleisliUsage extends App {
   // Continents contain countries. Countries contain cities.
   case class Continent(name: String, countries: List[Country] = List.empty)
   case class Country(name: String, cities: List[City] = List.empty)
-  case class City(name: String, isCapital: Boolean = false, inhabitants: Int = 20)
+  case class City(
+      name: String, isCapital: Boolean = false, inhabitants: Int = 20)
 
   val data: List[Continent] = List(
-    Continent("Europe"),
-    Continent("America",
-      List(
-        Country("USA",
-          List(
-            City("Washington"), City("New York"))))),
-    Continent("Asia",
-      List(
-        Country("India",
-          List(City("New Dehli"), City("Calcutta"))))))
+      Continent("Europe"),
+      Continent(
+          "America",
+          List(Country("USA", List(City("Washington"), City("New York"))))),
+      Continent(
+          "Asia",
+          List(Country("India", List(City("New Dehli"), City("Calcutta"))))))
 
   def continents(name: String): List[Continent] =
     data.filter(k => k.name.contains(name))
@@ -47,7 +45,8 @@ object KleisliUsage extends App {
   // the same applies to function composition with
   // <==<, <=<, composeK and compose
   val allCities = kleisli(continents) >==> countries >==> cities
-  val allCities2 = kleisli(continents) >=> kleisli(countries) >=> kleisli(cities)
+  val allCities2 =
+    kleisli(continents) >=> kleisli(countries) >=> kleisli(cities)
 
   (allCities("America")).map(println)
 

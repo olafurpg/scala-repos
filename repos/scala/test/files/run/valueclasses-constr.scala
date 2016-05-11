@@ -1,37 +1,37 @@
 package test1 {
   object TOD {
-   final val SecondsPerDay = 86400
+    final val SecondsPerDay = 86400
 
-   def apply(seconds: Int) = {
-     val n = seconds % SecondsPerDay
-     new TOD(if (n >= 0) n else n + SecondsPerDay)
-   }
+    def apply(seconds: Int) = {
+      val n = seconds % SecondsPerDay
+      new TOD(if (n >= 0) n else n + SecondsPerDay)
+    }
   }
 
-  final class TOD (val secondsOfDay: Int) extends AnyVal {
-   def hours = secondsOfDay / 3600
-   def minutes = (secondsOfDay / 60) % 60
-   def seconds = secondsOfDay % 60
+  final class TOD(val secondsOfDay: Int) extends AnyVal {
+    def hours = secondsOfDay / 3600
+    def minutes = (secondsOfDay / 60) % 60
+    def seconds = secondsOfDay % 60
 
-   override def toString = "%02d:%02d:%02d".format(hours, minutes, seconds)
+    override def toString = "%02d:%02d:%02d".format(hours, minutes, seconds)
   }
 }
 package test2 {
   object TOD {
-   final val SecondsPerDay = 86400
+    final val SecondsPerDay = 86400
 
-   def apply(seconds: Int) = {
-     val n = seconds % SecondsPerDay
-     new TOD(if (n >= 0) n else n + SecondsPerDay)
-   }
+    def apply(seconds: Int) = {
+      val n = seconds % SecondsPerDay
+      new TOD(if (n >= 0) n else n + SecondsPerDay)
+    }
   }
 
-  final class TOD private[test2] (val secondsOfDay: Int) extends AnyVal {
-   def hours = secondsOfDay / 3600
-   def minutes = (secondsOfDay / 60) % 60
-   def seconds = secondsOfDay % 60
+  final class TOD private[test2](val secondsOfDay: Int) extends AnyVal {
+    def hours = secondsOfDay / 3600
+    def minutes = (secondsOfDay / 60) % 60
+    def seconds = secondsOfDay % 60
 
-   override def toString = "%02d:%02d:%02d".format(hours, minutes, seconds)
+    override def toString = "%02d:%02d:%02d".format(hours, minutes, seconds)
   }
 
   object Client {
@@ -41,20 +41,20 @@ package test2 {
 
 package test3 {
   object TOD {
-   final val SecondsPerDay = 86400
+    final val SecondsPerDay = 86400
 
-   def apply(seconds: Int) = {
-     val n = seconds % SecondsPerDay
-     new TOD(if (n >= 0) n else n + SecondsPerDay)
-   }
+    def apply(seconds: Int) = {
+      val n = seconds % SecondsPerDay
+      new TOD(if (n >= 0) n else n + SecondsPerDay)
+    }
   }
 
   final class TOD private (val secondsOfDay: Int) extends AnyVal {
-   def hours = secondsOfDay / 3600
-   def minutes = (secondsOfDay / 60) % 60
-   def seconds = secondsOfDay % 60
+    def hours = secondsOfDay / 3600
+    def minutes = (secondsOfDay / 60) % 60
+    def seconds = secondsOfDay % 60
 
-   override def toString = "%02d:%02d:%02d".format(hours, minutes, seconds)
+    override def toString = "%02d:%02d:%02d".format(hours, minutes, seconds)
   }
 }
 
@@ -76,4 +76,3 @@ object Test extends App {
   println(x3.minutes)
   println(x3)
 }
-

@@ -4,12 +4,12 @@ package example
 import spire.implicits._
 import spire.math._
 
-
 object MandelbrotDemo {
+
   /**
-   * Compute whether the complex number c stays contained within a radius-2
-   * circle after 'limit' iterations.
-   */
+    * Compute whether the complex number c stays contained within a radius-2
+    * circle after 'limit' iterations.
+    */
   def mandelbrot(c: Complex[Double], limit: Int): Int = {
     @tailrec def loop(z: Complex[Double], n: Int): Int =
       if (n >= limit) n
@@ -20,8 +20,8 @@ object MandelbrotDemo {
   }
 
   /**
-   * Print an ASCII approximation of the 4x4 box from -2-2i to 2+2i.
-   */
+    * Print an ASCII approximation of the 4x4 box from -2-2i to 2+2i.
+    */
   def main(args: Array[String]): Unit = {
     val res = 26 // number of iterations to try before including pt in the set
     val rows = if (args.isEmpty) 20 else args(0).toInt // rows to print
@@ -51,11 +51,13 @@ object MandelbrotDemo {
 
 object Xterm {
   // r, g, b should be 0-5
-  def color(r: Int, g: Int, b: Int) = "\u001b[38;5;%dm" format (16 + b + (g * 6) + (r * 36))
+  def color(r: Int, g: Int, b: Int) =
+    "\u001b[38;5;%dm" format (16 + b + (g * 6) + (r * 36))
   def clear() = "\u001b[0m"
 
   // given things like rgb(0xffcc99) produce things like color(6, 5, 4)
-  def rgb(n: Int) = color(scale(n & 0xff0000), scale(n & 0xff00), scale(n & 0xff))
+  def rgb(n: Int) =
+    color(scale(n & 0xff0000), scale(n & 0xff00), scale(n & 0xff))
   private def scale(n: Int) = round((n * 6.0) / 255).toInt
 
   // 0-25 are colors, 26+ is clear

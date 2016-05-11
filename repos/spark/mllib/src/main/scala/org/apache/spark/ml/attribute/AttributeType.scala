@@ -20,10 +20,10 @@ package org.apache.spark.ml.attribute
 import org.apache.spark.annotation.DeveloperApi
 
 /**
- * :: DeveloperApi ::
- * An enum-like type for attribute types: [[AttributeType$#Numeric]], [[AttributeType$#Nominal]],
- * and [[AttributeType$#Binary]].
- */
+  * :: DeveloperApi ::
+  * An enum-like type for attribute types: [[AttributeType$#Numeric]], [[AttributeType$#Nominal]],
+  * and [[AttributeType$#Binary]].
+  */
 @DeveloperApi
 sealed abstract class AttributeType(val name: String)
 
@@ -55,9 +55,9 @@ object AttributeType {
   }
 
   /**
-   * Gets the [[AttributeType]] object from its name.
-   * @param name attribute type name: "numeric", "nominal", or "binary"
-   */
+    * Gets the [[AttributeType]] object from its name.
+    * @param name attribute type name: "numeric", "nominal", or "binary"
+    */
   def fromName(name: String): AttributeType = {
     if (name == Numeric.name) {
       Numeric

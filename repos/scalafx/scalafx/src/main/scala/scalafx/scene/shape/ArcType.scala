@@ -44,9 +44,9 @@ object ArcType extends SFXEnumDelegateCompanion[jfxss.ArcType, ArcType] {
   @deprecated("Use Round; ROUND will be removed in a future release", "2.2.60")
   val ROUND = Round
 
-  protected override def unsortedValues: Array[ArcType] = Array(Open, Chord, Round)
+  protected override def unsortedValues: Array[ArcType] =
+    Array(Open, Chord, Round)
 }
 
-
 sealed case class ArcType(override val delegate: jfxss.ArcType)
-  extends SFXEnumDelegate[jfxss.ArcType]
+    extends SFXEnumDelegate[jfxss.ArcType]

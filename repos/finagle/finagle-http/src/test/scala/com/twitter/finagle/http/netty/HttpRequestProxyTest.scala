@@ -8,12 +8,13 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class HttpRequestProxyTest extends FunSuite {
   test("basics") {
-    val message = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/")
+    val message =
+      new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/")
     val proxy = new HttpRequestProxy {
       final val httpRequest = message
     }
     assert(proxy.httpMessage != null)
     assert(proxy.getProtocolVersion == HttpVersion.HTTP_1_1)
-    assert(proxy.getMethod          == HttpMethod.GET)
+    assert(proxy.getMethod == HttpMethod.GET)
   }
 }

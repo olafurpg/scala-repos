@@ -1,9 +1,9 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js Test Suite        **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013, LAMP/EPFL        **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
 package org.scalajs.testsuite.javalib.lang
 
@@ -74,13 +74,15 @@ class SystemJSTest {
     assertEquals("/", get("file.separator"))
     assertEquals(":", get("path.separator"))
     assertEquals("\n", get("line.separator"))
-    assertEquals(linkingInfo.linkerVersion.getOrElse(null), get("java.vm.version"))
+    assertEquals(
+        linkingInfo.linkerVersion.getOrElse(null), get("java.vm.version"))
 
     // Defined in Build.scala and added via __ScalaJSEnv in ScalaJSPluginInternal
 
     assertEquals("testtag.value", get("scalajs.testsuite.testtag"))
 
-    val compliantAsInstanceOf = get("scalajs.compliant-asinstanceofs") == "true"
+    val compliantAsInstanceOf =
+      get("scalajs.compliant-asinstanceofs") == "true"
     if (compliantAsInstanceOf) {
       try {
         Int.box(5).asInstanceOf[String]
@@ -130,6 +132,5 @@ class SystemJSTest {
     val isInFullOpt = get("scalajs.fullopt-stage") == "true"
     assertEquals(isInFastOpt, Platform.isInFastOpt)
     assertEquals(isInFullOpt, Platform.isInFullOpt)
-
   }
 }

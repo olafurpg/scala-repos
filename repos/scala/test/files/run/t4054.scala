@@ -1,14 +1,6 @@
-
-
-
-
-
-
-
-
 object Test {
   def main(args: Array[String]) {
-    val it = Iterator.from(1).map(n => n * n).scanLeft(0)(_+_)
+    val it = Iterator.from(1).map(n => n * n).scanLeft(0)(_ + _)
 
     assert(it.next == 0)
     assert(it.next == 1)

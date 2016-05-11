@@ -3,5 +3,5 @@ class A {
 }
 class B
 object B {
-	implicit def bToA(b: B): A = new A
+  implicit def bToA(b: B): A = new A
 }

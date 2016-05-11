@@ -42,5 +42,4 @@ class Issue180Spec extends FlatSpec with RunOnApplicationThread {
     val group = new Group()
     group.parent.selectDouble("width")
   }
-
 }

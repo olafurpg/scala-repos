@@ -12,11 +12,10 @@ object Test {
 
   val s: Tagged[_MyId] = sys.exit()
 
-
-
   val x: MyId = Tag[Long, _MyId](1)
   def foo(x: MyId) = 1
   def foo(z: String) = 2
 
-  /*line: 18*/foo(Tag[Long, _MyId](1))
+  /*line: 18*/
+  foo(Tag[Long, _MyId](1))
 }

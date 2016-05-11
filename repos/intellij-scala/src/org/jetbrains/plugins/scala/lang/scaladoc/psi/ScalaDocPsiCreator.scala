@@ -14,20 +14,20 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTag
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.impl._
 
 /**
-* User: Alexander Podkhalyuzin
-* Date: 22.07.2008
-*/
-
+  * User: Alexander Podkhalyuzin
+  * Date: 22.07.2008
+  */
 object ScalaDocPsiCreator {
   import org.jetbrains.plugins.scala.lang.scaladoc.parser.ScalaDocElementTypes._
   def createElement(node: ASTNode): PsiElement =
     node.getElementType match {
-      case a: ScaladocSyntaxElementType => 
+      case a: ScaladocSyntaxElementType =>
         val element = new ScDocSyntaxElementImpl(node)
         element.setFlag(a.getFlagConst)
 
         var parentNode = node
-        while (parentNode.getTreeParent != null && parentNode.getElementType != SCALA_DOC_COMMENT) {
+        while (parentNode.getTreeParent != null &&
+        parentNode.getElementType != SCALA_DOC_COMMENT) {
           parentNode = parentNode.getTreeParent
           parentNode.getElementType match {
             case a: ScaladocSyntaxElementType =>
@@ -37,7 +37,8 @@ object ScalaDocPsiCreator {
         }
 
         element
-      case ScalaDocTokenType.DOC_INNER_CODE_TAG => new ScDocInnerCodeElementImpl(node)
+      case ScalaDocTokenType.DOC_INNER_CODE_TAG =>
+        new ScDocInnerCodeElementImpl(node)
       case DOC_TAG => new ScDocTagImpl(node)
       case DOC_INLINED_TAG => new ScDocInlinedTagImpl(node)
       case DOC_PARAM_REF => new ScDocParamRefImpl(node)
@@ -49,16 +50,19 @@ object ScalaDocPsiCreator {
 //        new ScDocTagValueImpl(node)
         var parent = node.getTreeParent
 
-        while (parent != null && parent.getPsi != null && !parent.getPsi.isInstanceOf[ScDocTag]) {
+        while (parent != null && parent.getPsi != null &&
+        !parent.getPsi.isInstanceOf[ScDocTag]) {
           parent = parent.getTreeParent
         }
 
-        if (parent != null && parent.getPsi != null &&
-                parent.getPsi.asInstanceOf[ScDocTag].name == MyScaladocParsing.THROWS_TAG) {
+        if (parent != null && parent.getPsi != null && parent.getPsi
+              .asInstanceOf[ScDocTag]
+              .name == MyScaladocParsing.THROWS_TAG) {
           new ScDocThrowTagValueImpl(node)
         } else {
           new ScDocTagValueImpl(node)
         }
-      case ScalaDocTokenType.DOC_CODE_LINK_VALUE => new ScDocResolvableCodeReferenceImpl(node)
+      case ScalaDocTokenType.DOC_CODE_LINK_VALUE =>
+        new ScDocResolvableCodeReferenceImpl(node)
     }
 }

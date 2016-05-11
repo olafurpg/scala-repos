@@ -1,10 +1,7 @@
 package lila.simul
 
 // All durations are expressed in seconds
-case class SimulClock(
-    limit: Int,
-    increment: Int,
-    hostExtraTime: Int) {
+case class SimulClock(limit: Int, increment: Int, hostExtraTime: Int) {
 
   def limitInMinutes = limit / 60
 

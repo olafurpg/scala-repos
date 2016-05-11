@@ -1,4 +1,3 @@
-
 /** Test that constructor operations are reordered correctly.  */
 class Outer {
 
@@ -18,7 +17,6 @@ class Outer {
     Console.println(global.x);
     Console.println(outer.global.x);
   }
-
 }
 
 object Test extends AnyRef with App {

@@ -7,22 +7,27 @@ import mesosphere.marathon.Protos.MarathonTask
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.StorageVersions._
 import mesosphere.marathon.test.Mockito
-import mesosphere.marathon.{ MarathonConf, MarathonSpec }
+import mesosphere.marathon.{MarathonConf, MarathonSpec}
 import mesosphere.util.state.memory.InMemoryEntity
-import mesosphere.util.state.{ PersistentEntity, PersistentStore, PersistentStoreManagement }
+import mesosphere.util.state.{PersistentEntity, PersistentStore, PersistentStoreManagement}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ GivenWhenThen, Matchers }
+import org.scalatest.{GivenWhenThen, Matchers}
 
 import scala.concurrent.Future
 
-class MigrationTest extends MarathonSpec with Mockito with Matchers with GivenWhenThen with ScalaFutures {
+class MigrationTest
+    extends MarathonSpec with Mockito with Matchers with GivenWhenThen
+    with ScalaFutures {
 
   test("migrations can be filtered by version") {
     val f = new Fixture
-    val all = f.migration.migrations.filter(_._1 > StorageVersions(0, 0, 0)).sortBy(_._1)
+    val all = f.migration.migrations
+      .filter(_._1 > StorageVersions(0, 0, 0))
+      .sortBy(_._1)
     all should have size f.migration.migrations.size.toLong
 
-    val none = f.migration.migrations.filter(_._1 > StorageVersions(Int.MaxValue, 0, 0))
+    val none =
+      f.migration.migrations.filter(_._1 > StorageVersions(Int.MaxValue, 0, 0))
     none should have size 0
 
     val some = f.migration.migrations.filter(_._1 < StorageVersions(0, 10, 0))
@@ -64,7 +69,8 @@ class MigrationTest extends MarathonSpec with Mockito with Matchers with GivenWh
     f.groupRepo.group("root") returns Future.successful(None)
     f.groupRepo.listVersions(any) returns Future.successful(Seq.empty)
 
-    val result = f.migration.applyMigrationSteps(StorageVersions(0, 8, 0)).futureValue
+    val result =
+      f.migration.applyMigrationSteps(StorageVersions(0, 8, 0)).futureValue
     result should not be 'empty
     result should be(f.migration.migrations.map(_._1).drop(1))
   }
@@ -82,7 +88,8 @@ class MigrationTest extends MarathonSpec with Mockito with Matchers with GivenWh
     }
 
     Then("Migration exits with a readable error message")
-    ex.getMessage should equal (s"Migration from versions < $minVersion is not supported. Your version: $unsupportedVersion")
+    ex.getMessage should equal(
+        s"Migration from versions < $minVersion is not supported. Your version: $unsupportedVersion")
   }
 
   test("migrate() from unsupported version exits with a readable error") {
@@ -92,14 +99,18 @@ class MigrationTest extends MarathonSpec with Mockito with Matchers with GivenWh
     f.groupRepo.rootGroup() returns Future.successful(None)
     f.groupRepo.store(any, any) returns Future.successful(Group.empty)
 
-    f.store.load("internal:storage:version") returns Future.successful(Some(InMemoryEntity(
-      id = "internal:storage:version", version = 0, bytes = minVersion.toByteArray)))
+    f.store.load("internal:storage:version") returns Future.successful(
+        Some(InMemoryEntity(id = "internal:storage:version",
+                            version = 0,
+                            bytes = minVersion.toByteArray)))
     f.store.initialize() returns Future.successful(())
 
     Given("An unsupported storage version")
     val unsupportedVersion = StorageVersions(0, 2, 0)
-    f.store.load("internal:storage:version") returns Future.successful(Some(InMemoryEntity(
-      id = "internal:storage:version", version = 0, bytes = unsupportedVersion.toByteArray)))
+    f.store.load("internal:storage:version") returns Future.successful(
+        Some(InMemoryEntity(id = "internal:storage:version",
+                            version = 0,
+                            bytes = unsupportedVersion.toByteArray)))
 
     When("A migration is approached for that version")
     val ex = intercept[RuntimeException] {
@@ -107,24 +118,35 @@ class MigrationTest extends MarathonSpec with Mockito with Matchers with GivenWh
     }
 
     Then("Migration exits with a readable error message")
-    ex.getMessage should equal (s"Migration from versions < $minVersion is not supported. Your version: $unsupportedVersion")
+    ex.getMessage should equal(
+        s"Migration from versions < $minVersion is not supported. Your version: $unsupportedVersion")
   }
 
   class Fixture {
-    trait StoreWithManagement extends PersistentStore with PersistentStoreManagement
+    trait StoreWithManagement
+        extends PersistentStore with PersistentStoreManagement
     val metrics = new Metrics(new MetricRegistry)
     val store = mock[StoreWithManagement]
     val appRepo = mock[AppRepository]
     val groupRepo = mock[GroupRepository]
     val config = mock[MarathonConf]
     val taskRepo = new TaskRepository(
-      new MarathonStore[MarathonTaskState](
-        store = store,
-        metrics = metrics,
-        newState = () => MarathonTaskState(MarathonTask.newBuilder().setId(UUID.randomUUID().toString).build()),
-        prefix = "task:"),
-      metrics
+        new MarathonStore[MarathonTaskState](
+            store = store,
+            metrics = metrics,
+            newState = () =>
+                MarathonTaskState(MarathonTask
+                      .newBuilder()
+                      .setId(UUID.randomUUID().toString)
+                      .build()),
+            prefix = "task:"),
+        metrics
     )
-    val migration = new Migration(store, appRepo, groupRepo, taskRepo, config, new Metrics(new MetricRegistry))
+    val migration = new Migration(store,
+                                  appRepo,
+                                  groupRepo,
+                                  taskRepo,
+                                  config,
+                                  new Metrics(new MetricRegistry))
   }
 }

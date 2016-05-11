@@ -1,41 +1,42 @@
 package breeze.plot
 
-
-import java.io.{File,OutputStream,FileOutputStream,IOException}
+import java.io.{File, OutputStream, FileOutputStream, IOException}
 import java.awt.Graphics2D
 
 /**
- * Utility functions for exporting a Graphics2D drawable to some eps, pdf,
- * and png.
- *
- * @author dramage, Robby McKilliam
- */
+  * Utility functions for exporting a Graphics2D drawable to some eps, pdf,
+  * and png.
+  *
+  * @author dramage, Robby McKilliam
+  */
 object ExportGraphics {
+
   /** A Drawable is any function that draws to a Graphics2D context. */
-  type Drawable = ((Graphics2D)=>Unit)
+  type Drawable = ((Graphics2D) => Unit)
 
   /**
-   * Writes the given drawable to a new file of the given name with
-   * the given dpi (for rasterized formats only).  The extension of the file
-   * determines its format, with options png, eps, svg, and pdf.
-   */
-  def writeFile(file : File, draw : Drawable, width : Int, height : Int, dpi : Int = 72) = {
+    * Writes the given drawable to a new file of the given name with
+    * the given dpi (for rasterized formats only).  The extension of the file
+    * determines its format, with options png, eps, svg, and pdf.
+    */
+  def writeFile(
+      file: File, draw: Drawable, width: Int, height: Int, dpi: Int = 72) = {
     lazy val fos = new FileOutputStream(file)
     if (file.getName.toLowerCase.endsWith(".png")) {
       try {
-        writePNG(fos,draw,width,height,dpi)
+        writePNG(fos, draw, width, height, dpi)
       } finally {
         fos.close()
       }
     } else if (file.getName.toLowerCase.endsWith(".eps")) {
       try {
-        writeEPS(fos,draw,width,height)
+        writeEPS(fos, draw, width, height)
       } finally {
         fos.close()
       }
     } else if (file.getName.toLowerCase.endsWith(".pdf")) {
       try {
-        writePDF(fos,draw,width,height)
+        writePDF(fos, draw, width, height)
       } finally {
         fos.close()
       }
@@ -46,15 +47,20 @@ object ExportGraphics {
 //        fos.close()
 //      }
     } else {
-      throw new IOException("Unrecognized file extension: should be png, svg, eps, or pdf")
+      throw new IOException(
+          "Unrecognized file extension: should be png, svg, eps, or pdf")
     }
   }
 
   /**
-   * Writes the given drawable to the given OutputStream at the given dpi,
-   * formatted as png.
-   */
-  def writePNG(out : OutputStream, draw : Drawable, width : Int, height : Int, dpi : Int = 72) {
+    * Writes the given drawable to the given OutputStream at the given dpi,
+    * formatted as png.
+    */
+  def writePNG(out: OutputStream,
+               draw: Drawable,
+               width: Int,
+               height: Int,
+               dpi: Int = 72) {
     import javax.imageio.ImageIO
     import java.awt.image.BufferedImage
 
@@ -63,7 +69,7 @@ object ExportGraphics {
     val swidth = (width * scale).toInt
     val sheight = (height * scale).toInt
 
-    val image = new BufferedImage(swidth,sheight,BufferedImage.TYPE_INT_ARGB)
+    val image = new BufferedImage(swidth, sheight, BufferedImage.TYPE_INT_ARGB)
     val g2d = image.createGraphics()
     g2d.scale(scale, scale)
     draw(g2d)
@@ -73,9 +79,9 @@ object ExportGraphics {
   }
 
   /**
-   * Writes the given drawable to the given OutputStream formatted as eps.
-   */
-  def writeEPS(out : OutputStream, draw : Drawable, width : Int, height : Int) {
+    * Writes the given drawable to the given OutputStream formatted as eps.
+    */
+  def writeEPS(out: OutputStream, draw: Drawable, width: Int, height: Int) {
     import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D
     import org.apache.xmlgraphics.java2d.GraphicContext
 
@@ -87,10 +93,10 @@ object ExportGraphics {
   }
 
   /**
-   * Writes the given drawable to the given OutputStream formatted as pdf.
-   * Contributed by Robby McKilliam.
-   */
-  def writePDF(out : OutputStream, draw : Drawable, width : Int, height : Int) {
+    * Writes the given drawable to the given OutputStream formatted as pdf.
+    * Contributed by Robby McKilliam.
+    */
+  def writePDF(out: OutputStream, draw: Drawable, width: Int, height: Int) {
     import com.lowagie.text.Document
     import com.lowagie.text.Rectangle
     import com.lowagie.text.pdf.PdfWriter
@@ -133,4 +139,3 @@ object ExportGraphics {
 //    g2d.dispose()
 //  }
 }
-

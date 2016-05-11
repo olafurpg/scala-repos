@@ -4,9 +4,9 @@ import java.io._
 import java.util.concurrent.{Executors, Future}
 
 /**
- * User: Dmitry.Naydanov
- * Date: 12.02.15.
- */
+  * User: Dmitry.Naydanov
+  * Date: 12.02.15.
+  */
 class LocalSbtWatcherExec extends SbtWatcherExec {
   private val myExecutor = Executors.newSingleThreadExecutor()
   private var descriptor: Option[MyProcessDescriptor] = None
@@ -34,7 +34,8 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
     descriptor.foreach {
       case d =>
         val process = d.getProcess
-        val writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream))
+        val writer =
+          new BufferedWriter(new OutputStreamWriter(process.getOutputStream))
 
         writer.newLine()
         writer.flush()
@@ -45,12 +46,12 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
 
   override def isRunning: Boolean = descriptor.exists(_.isRunning)
 
-
   // core server related stuff
   private val MAGIC_SLEEP_TIME_MILLIS = 150
 
   private class ProcessListener(consumer: MessageConsumer, p: Process) {
-    private val streamReader = new BufferedReader(new InputStreamReader(p.getInputStream))
+    private val streamReader = new BufferedReader(
+        new InputStreamReader(p.getInputStream))
 
     @volatile private var stop = false
 
@@ -84,22 +85,27 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
     }
   }
 
-  private class MyProcessDescriptor(private val process: Process, private val watcher: Future[_], listener: ProcessListener) {
+  private class MyProcessDescriptor(private val process: Process,
+                                    private val watcher: Future[_],
+                                    listener: ProcessListener) {
     def isRunning = !watcher.isDone
 
     def getProcess = process
 
-    def startListening() = {listener.startMain(); this}
+    def startListening() = { listener.startMain(); this }
 
     def stopListening() = listener.stopMain()
   }
 
-  private def createDescriptor(process: Process, consumer: MessageConsumer) = new MyProcessDescriptor (
-    process,
-    myExecutor.submit(new Runnable {
-      override def run() {
-        process.waitFor()
-      }
-    }), new ProcessListener(consumer, process)
-  )
+  private def createDescriptor(process: Process, consumer: MessageConsumer) =
+    new MyProcessDescriptor(
+        process,
+        myExecutor.submit(
+            new Runnable {
+          override def run() {
+            process.waitFor()
+          }
+        }),
+        new ProcessListener(consumer, process)
+    )
 }

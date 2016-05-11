@@ -1,15 +1,16 @@
 package mesosphere.marathon.core.leadership.impl
 
 import akka.actor.ActorSystem
-import akka.testkit.{ TestActorRef, TestKit }
+import akka.testkit.{TestActorRef, TestKit}
 import com.twitter.common.zookeeper.ZooKeeperClient
-import mesosphere.marathon.test.{ MarathonActorSupport, Mockito }
-import mesosphere.marathon.{ LeadershipAbdication, MarathonSpec }
-import org.apache.zookeeper.{ ZooKeeper, WatchedEvent, Watcher }
-import org.scalatest.{ BeforeAndAfter, BeforeAndAfterAll, GivenWhenThen }
+import mesosphere.marathon.test.{MarathonActorSupport, Mockito}
+import mesosphere.marathon.{LeadershipAbdication, MarathonSpec}
+import org.apache.zookeeper.{ZooKeeper, WatchedEvent, Watcher}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, GivenWhenThen}
 
 class AbdicateOnConnectionLossActorTest
-    extends MarathonActorSupport with MarathonSpec with Mockito with GivenWhenThen with BeforeAndAfter {
+    extends MarathonActorSupport with MarathonSpec with Mockito
+    with GivenWhenThen with BeforeAndAfter {
 
   test("register as zk listener on start") {
     Given("ZK and leader refs")
@@ -25,10 +26,13 @@ class AbdicateOnConnectionLossActorTest
   test("zk disconnect events lead to abdication") {
     Given("A started AbdicateOnConnectionLossActor")
     val leader = mock[LeadershipAbdication]
-    val actor = TestActorRef[AbdicateOnConnectionLossActor](AbdicateOnConnectionLossActor.props(zk, leader))
+    val actor = TestActorRef[AbdicateOnConnectionLossActor](
+        AbdicateOnConnectionLossActor.props(zk, leader))
 
     When("The actor is killed")
-    val disconnected = new WatchedEvent(Watcher.Event.EventType.None, Watcher.Event.KeeperState.Disconnected, "")
+    val disconnected = new WatchedEvent(Watcher.Event.EventType.None,
+                                        Watcher.Event.KeeperState.Disconnected,
+                                        "")
     actor.underlyingActor.watcher.process(disconnected)
 
     Then("Abdication is called")
@@ -38,10 +42,12 @@ class AbdicateOnConnectionLossActorTest
   test("other zk events do not lead to abdication") {
     Given("A started AbdicateOnConnectionLossActor")
     val leader = mock[LeadershipAbdication]
-    val actor = TestActorRef[AbdicateOnConnectionLossActor](AbdicateOnConnectionLossActor.props(zk, leader))
+    val actor = TestActorRef[AbdicateOnConnectionLossActor](
+        AbdicateOnConnectionLossActor.props(zk, leader))
 
     When("An event is fired, that is not a disconnected event")
-    val authFailed = new WatchedEvent(Watcher.Event.EventType.None, Watcher.Event.KeeperState.AuthFailed, "")
+    val authFailed = new WatchedEvent(
+        Watcher.Event.EventType.None, Watcher.Event.KeeperState.AuthFailed, "")
     actor.underlyingActor.watcher.process(authFailed)
 
     Then("Abdication is _NOT_ called")

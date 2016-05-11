@@ -52,5 +52,4 @@ class RulesTest extends FunSuite {
     flag = true
     assert(rule().contains(Issue("welp")))
   }
-
 }

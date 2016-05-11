@@ -1,6 +1,7 @@
 import scala.reflect.{ClassTag, classTag}
 
-abstract class Foo[@specialized T: ClassTag, U <: Ordered[U]](x: T, size: Int) {
+abstract class Foo[
+    @specialized T : ClassTag, U <: Ordered[U]](x: T, size: Int) {
   var y: T
   var z: T = x
 

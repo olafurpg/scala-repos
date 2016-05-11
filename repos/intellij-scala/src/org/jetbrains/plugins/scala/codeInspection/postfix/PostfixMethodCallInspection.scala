@@ -10,7 +10,9 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
-class PostfixMethodCallInspection extends AbstractInspection("UseOfPostfixMethodCall", "Use of postfix method call"){
+class PostfixMethodCallInspection
+    extends AbstractInspection(
+        "UseOfPostfixMethodCall", "Use of postfix method call") {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case pexpr: ScPostfixExpr if !safe(pexpr) =>
@@ -21,7 +23,8 @@ class PostfixMethodCallInspection extends AbstractInspection("UseOfPostfixMethod
     pexpr.getContext match {
       case _: ScParenthesisedExpr => true
       case _: ScArgumentExprList => true
-      case (_: ScAssignStmt) childOf (_: ScArgumentExprList) => true //named arguments
+      case (_: ScAssignStmt) childOf (_: ScArgumentExprList) =>
+        true //named arguments
       case _ =>
         val next = pexpr.getNextSiblingNotWhitespace
         if (next == null) return false
@@ -32,7 +35,8 @@ class PostfixMethodCallInspection extends AbstractInspection("UseOfPostfixMethod
   }
 }
 
-class AddDotFix(pexpr: ScPostfixExpr) extends AbstractFixOnPsiElement("Add dot to method call", pexpr) {
+class AddDotFix(pexpr: ScPostfixExpr)
+    extends AbstractFixOnPsiElement("Add dot to method call", pexpr) {
   def doApplyFix(project: Project) {
     val postfix = getElement
     val expr = ScalaPsiElementFactory.createEquivQualifiedReference(postfix)

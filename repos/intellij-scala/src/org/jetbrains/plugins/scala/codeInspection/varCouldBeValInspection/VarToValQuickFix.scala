@@ -11,10 +11,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariableD
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 class VarToValQuickFix(varDef: ScVariableDefinition)
-        extends AbstractFixOnPsiElement(ScalaBundle.message("convert.var.to.val"), varDef) {
+    extends AbstractFixOnPsiElement(
+        ScalaBundle.message("convert.var.to.val"), varDef) {
   def doApplyFix(project: Project): Unit = {
     val varDef = getElement
-    varDef.replace(ScalaPsiElementFactory.createValFromVarDefinition(varDef, varDef.getManager))
+    varDef.replace(ScalaPsiElementFactory.createValFromVarDefinition(
+            varDef, varDef.getManager))
   }
 }
 
@@ -23,10 +25,12 @@ class ValToVarQuickFix(valDef: ScValue) extends IntentionAction {
 
   def invoke(project: Project, editor: Editor, file: PsiFile): Unit = {
     val parent = valDef.getContext
-    valDef.replace(ScalaPsiElementFactory.createVarFromValDeclaration(valDef, valDef.getManager))
+    valDef.replace(ScalaPsiElementFactory.createVarFromValDeclaration(
+            valDef, valDef.getManager))
   }
 
-  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = file.isInstanceOf[ScalaFile]
+  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
+    file.isInstanceOf[ScalaFile]
 
   def getFamilyName: String = getText
 

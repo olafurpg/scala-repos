@@ -21,35 +21,50 @@ import com.twitter.summingbird.online.FlatMapOperation
 import com.twitter.summingbird.online.OnlineServiceFactory
 
 /**
- * A utility for converting a series of producers into a single FlatMapOperation
- * This simply folds through a list of producers converting them into an operation from T => Future[TraversableOnce[U]].
- * This allows us to combine simple map, flatmap with also left joins.
- *
- * This is platform specific, as the contents of what are in Producer's are also platform specific.
- */
+  * A utility for converting a series of producers into a single FlatMapOperation
+  * This simply folds through a list of producers converting them into an operation from T => Future[TraversableOnce[U]].
+  * This allows us to combine simple map, flatmap with also left joins.
+  *
+  * This is platform specific, as the contents of what are in Producer's are also platform specific.
+  */
 object Producer2FlatMapOperation {
+
   /**
-   * Keep the crazy casts localized in here
-   */
-  def foldOperations[T, U](producers: List[Producer[Storm, _]]): FlatMapOperation[T, U] =
-    producers.foldLeft(FlatMapOperation.identity[Any]) {
-      case (acc, p) =>
-        p match {
-          case LeftJoinedProducer(_, wrapper) =>
-            FlatMapOperation.combine(
-              acc.asInstanceOf[FlatMapOperation[Any, (Any, Any)]],
-              wrapper.asInstanceOf[OnlineServiceFactory[Any, Any]]).asInstanceOf[FlatMapOperation[Any, Any]]
-          case OptionMappedProducer(_, op) => acc.andThen(FlatMapOperation[Any, Any](op.andThen(_.iterator).asInstanceOf[Any => TraversableOnce[Any]]))
-          case FlatMappedProducer(_, op) => acc.andThen(FlatMapOperation(op).asInstanceOf[FlatMapOperation[Any, Any]])
-          case WrittenProducer(_, sinkSupplier) =>
-            acc.andThen(FlatMapOperation.write(() => sinkSupplier.toFn))
-          case IdentityKeyedProducer(_) => acc
-          case MergedProducer(_, _) => acc
-          case NamedProducer(_, _) => acc
-          case AlsoProducer(_, _) => acc
-          case Source(_) => sys.error("Should not schedule a source inside a flat mapper")
-          case Summer(_, _, _) => sys.error("Should not schedule a Summer inside a flat mapper")
-          case KeyFlatMappedProducer(_, op) => acc.andThen(FlatMapOperation.keyFlatMap[Any, Any, Any](op).asInstanceOf[FlatMapOperation[Any, Any]])
-        }
-    }.asInstanceOf[FlatMapOperation[T, U]]
+    * Keep the crazy casts localized in here
+    */
+  def foldOperations[T, U](
+      producers: List[Producer[Storm, _]]): FlatMapOperation[T, U] =
+    producers
+      .foldLeft(FlatMapOperation.identity[Any]) {
+        case (acc, p) =>
+          p match {
+            case LeftJoinedProducer(_, wrapper) =>
+              FlatMapOperation
+                .combine(acc.asInstanceOf[FlatMapOperation[Any, (Any, Any)]],
+                         wrapper.asInstanceOf[OnlineServiceFactory[Any, Any]])
+                .asInstanceOf[FlatMapOperation[Any, Any]]
+            case OptionMappedProducer(_, op) =>
+              acc.andThen(FlatMapOperation[Any, Any](op
+                        .andThen(_.iterator)
+                        .asInstanceOf[Any => TraversableOnce[Any]]))
+            case FlatMappedProducer(_, op) =>
+              acc.andThen(FlatMapOperation(op)
+                    .asInstanceOf[FlatMapOperation[Any, Any]])
+            case WrittenProducer(_, sinkSupplier) =>
+              acc.andThen(FlatMapOperation.write(() => sinkSupplier.toFn))
+            case IdentityKeyedProducer(_) => acc
+            case MergedProducer(_, _) => acc
+            case NamedProducer(_, _) => acc
+            case AlsoProducer(_, _) => acc
+            case Source(_) =>
+              sys.error("Should not schedule a source inside a flat mapper")
+            case Summer(_, _, _) =>
+              sys.error("Should not schedule a Summer inside a flat mapper")
+            case KeyFlatMappedProducer(_, op) =>
+              acc.andThen(FlatMapOperation
+                    .keyFlatMap[Any, Any, Any](op)
+                    .asInstanceOf[FlatMapOperation[Any, Any]])
+          }
+      }
+      .asInstanceOf[FlatMapOperation[T, U]]
 }

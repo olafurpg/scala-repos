@@ -11,11 +11,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocSyntaxElement
 
 /**
- * User: Dmitry Naidanov
- * Date: 11/14/11
- */
-
-class ScDocSyntaxElementImpl(node: ASTNode) extends ScalaPsiElementImpl(node) with ScDocSyntaxElement{
+  * User: Dmitry Naidanov
+  * Date: 11/14/11
+  */
+class ScDocSyntaxElementImpl(node: ASTNode)
+    extends ScalaPsiElementImpl(node) with ScDocSyntaxElement {
   override def toString = "DocSyntaxElement " + getFlags
 
   override def accept(visitor: PsiElementVisitor) {

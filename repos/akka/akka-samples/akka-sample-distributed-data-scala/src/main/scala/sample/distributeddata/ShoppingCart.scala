@@ -26,7 +26,6 @@ object ShoppingCart {
   private val readMajority = ReadMajority(timeout)
   private val writeMajority = WriteMajority(timeout)
   //#read-write-majority
-
 }
 
 class ShoppingCart(userId: String) extends Actor {
@@ -38,10 +37,11 @@ class ShoppingCart(userId: String) extends Actor {
 
   val DataKey = LWWMapKey[LineItem]("cart-" + userId)
 
-  def receive = receiveGetCart
-    .orElse[Any, Unit](receiveAddItem)
-    .orElse[Any, Unit](receiveRemoveItem)
-    .orElse[Any, Unit](receiveOther)
+  def receive =
+    receiveGetCart
+      .orElse[Any, Unit](receiveAddItem)
+      .orElse[Any, Unit](receiveRemoveItem)
+      .orElse[Any, Unit](receiveOther)
 
   //#get-cart
   def receiveGetCart: Receive = {
@@ -65,9 +65,11 @@ class ShoppingCart(userId: String) extends Actor {
   //#add-item
   def receiveAddItem: Receive = {
     case cmd @ AddItem(item) ⇒
-      val update = Update(DataKey, LWWMap.empty[LineItem], writeMajority, Some(cmd)) {
-        cart ⇒ updateCart(cart, item)
-      }
+      val update =
+        Update(DataKey, LWWMap.empty[LineItem], writeMajority, Some(cmd)) {
+          cart ⇒
+            updateCart(cart, item)
+        }
       replicator ! update
   }
   //#add-item
@@ -75,7 +77,9 @@ class ShoppingCart(userId: String) extends Actor {
   def updateCart(data: LWWMap[LineItem], item: LineItem): LWWMap[LineItem] =
     data.get(item.productId) match {
       case Some(LineItem(_, _, existingQuantity)) ⇒
-        data + (item.productId -> item.copy(quantity = existingQuantity + item.quantity))
+        data +
+        (item.productId -> item.copy(
+                quantity = existingQuantity + item.quantity))
       case None ⇒ data + (item.productId -> item)
     }
 
@@ -105,7 +109,7 @@ class ShoppingCart(userId: String) extends Actor {
   def receiveOther: Receive = {
     case _: UpdateSuccess[_] | _: UpdateTimeout[_] ⇒
     // UpdateTimeout, will eventually be replicated
-    case e: UpdateFailure[_]                       ⇒ throw new IllegalStateException("Unexpected failure: " + e)
+    case e: UpdateFailure[_] ⇒
+      throw new IllegalStateException("Unexpected failure: " + e)
   }
-
 }

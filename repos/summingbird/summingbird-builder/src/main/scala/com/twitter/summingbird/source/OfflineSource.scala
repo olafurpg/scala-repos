@@ -13,7 +13,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package com.twitter.summingbird.source
 
@@ -23,7 +23,7 @@ import com.twitter.scalding.Mappable
 
 import com.twitter.scalding.Mode
 import com.twitter.scalding.TypedPipe
-import com.twitter.summingbird.batch.{ Batcher, BatchID }
+import com.twitter.summingbird.batch.{Batcher, BatchID}
 import com.twitter.summingbird.scalding.ScaldingEnv
 import com.twitter.tormenta.spout.Spout
 
@@ -38,5 +38,6 @@ object OfflineSource {
 
 trait OfflineSource[Event] extends Serializable {
   def scaldingSource(range: DateRange): Mappable[Event]
-  def ++(spout: Spout[Event])(implicit mf: Manifest[Event]) = EventSource(this, spout)
+  def ++(spout: Spout[Event])(implicit mf: Manifest[Event]) =
+    EventSource(this, spout)
 }

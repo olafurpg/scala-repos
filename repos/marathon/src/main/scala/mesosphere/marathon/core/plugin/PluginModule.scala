@@ -8,6 +8,6 @@ class PluginModule(config: MarathonConf) {
 
   lazy val pluginManager: PluginManager = PluginManagerImpl(config)
 
-  lazy val httpRequestHandler: Seq[HttpRequestHandler] = pluginManager.plugins[HttpRequestHandler]
-
+  lazy val httpRequestHandler: Seq[HttpRequestHandler] =
+    pluginManager.plugins[HttpRequestHandler]
 }

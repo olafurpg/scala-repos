@@ -1,23 +1,27 @@
 package org.scalatra
 
-import org.scalatra.servlet.{ FileUploadSupport, MultipartConfig, SizeConstraintExceededException }
+import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintExceededException}
 
 import scala.xml.Node
 
-class FileUploadExample extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
-  configureMultipartHandling(MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
+class FileUploadExample
+    extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
+  configureMultipartHandling(
+      MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
-  def displayPage(content: Seq[Node]) = Template.page("File upload example", content, url(_, includeServletPath = false))
+  def displayPage(content: Seq[Node]) =
+    Template.page(
+        "File upload example", content, url(_, includeServletPath = false))
 
   error {
     case e: SizeConstraintExceededException =>
-      RequestEntityTooLarge(displayPage(
-        <p>The file you uploaded exceeded the 3 MB limit.</p>))
+      RequestEntityTooLarge(
+          displayPage(<p>The file you uploaded exceeded the 3 MB limit.</p>))
   }
 
   get("/") {
     displayPage(
-      <form action={ url("/upload", includeServletPath = false) } method="post" enctype="multipart/form-data">
+        <form action={ url("/upload", includeServletPath = false) } method="post" enctype="multipart/form-data">
         <p>File to upload: <input type="file" name="file"/></p>
         <p><input type="submit" value="Upload"/></p>
       </form>
@@ -34,14 +38,16 @@ class FileUploadExample extends ScalatraServlet with FileUploadSupport with Flas
   post("/") {
     fileParams.get("file") match {
       case Some(file) =>
-        Ok(file.get(), Map(
-          "Content-Type" -> (file.contentType.getOrElse("application/octet-stream")),
-          "Content-Disposition" -> ("attachment; filename=\"" + file.name + "\"")
-        ))
+        Ok(file.get(),
+           Map(
+               "Content-Type" ->
+               (file.contentType.getOrElse("application/octet-stream")),
+               "Content-Disposition" ->
+               ("attachment; filename=\"" + file.name + "\"")
+           ))
 
       case None =>
-        BadRequest(displayPage(
-          <p>
+        BadRequest(displayPage(<p>
             Hey! You forgot to select a file.
           </p>))
     }

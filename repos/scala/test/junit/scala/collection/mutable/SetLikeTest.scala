@@ -8,7 +8,8 @@ import org.junit.runners.JUnit4
 @RunWith(classOf[JUnit4])
 class SetLikeTest {
 
-  class MySet(self: Set[String]) extends Set[String] with SetLike[String, MySet] {
+  class MySet(self: Set[String])
+      extends Set[String] with SetLike[String, MySet] {
     override def -=(elem: String) = { self -= elem; this }
     override def +=(elem: String) = { self += elem; this }
 

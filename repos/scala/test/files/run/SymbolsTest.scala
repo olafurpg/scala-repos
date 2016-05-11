@@ -1,4 +1,3 @@
-
 import scala.language.reflectiveCalls
 
 class Slazz {
@@ -130,7 +129,8 @@ object Test {
     assert(lst(90) == 'lsym90)
   }
 
-  def testAnonymous { // TODO complaints classdef can't be found for some reason, runs fine in my case
+  def testAnonymous {
+    // TODO complaints classdef can't be found for some reason, runs fine in my case
     // val anon = () => {
     //   val simba = 'smba
     //   simba
@@ -204,8 +204,8 @@ object Test {
       val s1 = 's1
       def s2 = 's2
       object inner {
-	val s3 = 's3
-	val s4 = 's4
+        val s3 = 's3
+        val s4 = 's4
       }
     }
 
@@ -223,8 +223,8 @@ object Test {
       val s5 = 's5
       def s6 = 's6
       object inner2 {
-	val s7 = 's7
-	def s8 = 's8
+        val s7 = 's7
+        def s8 = 's8
       }
     }
     assert(Local.s5 == 's5)
@@ -266,17 +266,4 @@ object Test {
     assert(nested.sym1 == 'snested1)
     assert(nested.sym2 == Symbol("snested" + "2"))
   }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-

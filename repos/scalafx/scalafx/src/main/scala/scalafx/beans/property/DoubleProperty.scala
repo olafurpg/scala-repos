@@ -32,23 +32,27 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object DoubleProperty {
-  implicit def sfxDoubleProperty2jfx(dp: DoubleProperty): jfxbp.DoubleProperty = if (dp != null) dp.delegate else null
+  implicit def sfxDoubleProperty2jfx(
+      dp: DoubleProperty): jfxbp.DoubleProperty =
+    if (dp != null) dp.delegate else null
 
   /**
-   * Creates a new DoubleProperty instance using the SimpleDoubleProperty as the target.
-   *
-   * @param value the initial value
-   * @return      the observable instance
-   */
-  def apply(value: Double) = new DoubleProperty(new jfxbp.SimpleDoubleProperty(value))
+    * Creates a new DoubleProperty instance using the SimpleDoubleProperty as the target.
+    *
+    * @param value the initial value
+    * @return      the observable instance
+    */
+  def apply(value: Double) =
+    new DoubleProperty(new jfxbp.SimpleDoubleProperty(value))
 }
 
-class DoubleProperty(override val delegate: jfxbp.DoubleProperty = new jfxbp.SimpleDoubleProperty)
-  extends ReadOnlyDoubleProperty(delegate)
-  with Property[Double, Number]
-  with SFXDelegate[jfxbp.DoubleProperty] {
+class DoubleProperty(
+    override val delegate: jfxbp.DoubleProperty = new jfxbp.SimpleDoubleProperty)
+    extends ReadOnlyDoubleProperty(delegate) with Property[Double, Number]
+    with SFXDelegate[jfxbp.DoubleProperty] {
 
-  def this(bean: Object, name: String) = this(new jfxbp.SimpleDoubleProperty(bean, name))
+  def this(bean: Object, name: String) =
+    this(new jfxbp.SimpleDoubleProperty(bean, name))
 
   def this(bean: Object, name: String, initialValue: Double) =
     this(new jfxbp.SimpleDoubleProperty(bean, name, initialValue))

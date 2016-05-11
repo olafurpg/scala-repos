@@ -1,8 +1,5 @@
-class a{
-  try {
-
-  }
-  catch {
+class a {
+  try {} catch {
     case _ =>
   }
 
@@ -40,4 +37,4 @@ type
 val
 var
 while
-*/
+ */

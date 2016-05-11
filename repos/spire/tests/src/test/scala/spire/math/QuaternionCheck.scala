@@ -13,7 +13,8 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class QuaternionCheck
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   type H = Quaternion[Real]
   val zero = Quaternion.zero[Real]
@@ -109,10 +110,22 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     println(s"$label $base $gen")
     val (gr, gi, gj, gk) = (gen.r, gen.i, gen.j, gen.k)
     val (br, bi, bj, bk) = (base.r, base.i, base.j, base.k)
-    if (br != gr) println(s"  r: ${br.repr} != ${gr.repr} (${br.toRational} and ${gr.toRational}) [${(br-gr).signum}] <${br-gr}>")
-    if (bi != gi) println(s"  i: ${bi.repr} != ${gi.repr} (${bi.toRational} and ${gi.toRational}) [${(bi-gi).signum}] <${bi-gi}>")
-    if (bj != gj) println(s"  j: ${bj.repr} != ${gj.repr} (${bj.toRational} and ${gj.toRational}) [${(bj-gj).signum}] <${bj-gj}>")
-    if (bk != gk) println(s"  k: ${bk.repr} != ${gk.repr} (${bk.toRational} and ${gk.toRational}) [${(bk-gk).signum}] <${bk-gk}>")
+    if (br != gr)
+      println(
+          s"  r: ${br.repr} != ${gr.repr} (${br.toRational} and ${gr.toRational}) [${(br -
+          gr).signum}] <${br - gr}>")
+    if (bi != gi)
+      println(
+          s"  i: ${bi.repr} != ${gi.repr} (${bi.toRational} and ${gi.toRational}) [${(bi -
+          gi).signum}] <${bi - gi}>")
+    if (bj != gj)
+      println(
+          s"  j: ${bj.repr} != ${gj.repr} (${bj.toRational} and ${gj.toRational}) [${(bj -
+          gj).signum}] <${bj - gj}>")
+    if (bk != gk)
+      println(
+          s"  k: ${bk.repr} != ${gk.repr} (${bk.toRational} and ${gk.toRational}) [${(bk -
+          gk).signum}] <${bk - gk}>")
   }
 
   def inexactEq(x: H, y: H): Unit =
@@ -194,7 +207,8 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
 
     forAll { (r: Real, i: Real, j: Real, k: Real) =>
-      Quaternion(r, i, j, k) == Complex(r, i) shouldBe (j == Real.zero && k == Real.zero)
+      Quaternion(r, i, j, k) == Complex(r, i) shouldBe
+      (j == Real.zero && k == Real.zero)
     }
   }
 }

@@ -1,4 +1,3 @@
 package scaley
 
-package object funny {
-}
+package object funny {}

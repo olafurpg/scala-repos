@@ -23,7 +23,8 @@ import org.joda.time.DateTime
 
 object NumericComparisons {
 
-  @inline def compare(a: Long, b: Long): Int = if (a < b) -1 else if (a == b) 0 else 1
+  @inline def compare(a: Long, b: Long): Int =
+    if (a < b) -1 else if (a == b) 0 else 1
 
   @inline def compare(a: Long, b: Double): Int = -compare(b, a)
 
@@ -39,7 +40,8 @@ object NumericComparisons {
     }
   }
 
-  @inline def compare(a: Double, b: Double): Int = if (a < b) -1 else if (a == b) 0 else 1
+  @inline def compare(a: Double, b: Double): Int =
+    if (a < b) -1 else if (a == b) 0 else 1
 
   @inline def compare(a: Double, b: BigDecimal): Int = BigDecimal(a) compare b
 
@@ -64,8 +66,7 @@ object NumericComparisons {
     if (a + aError < b - bError) -1 else if (a - aError > b + bError) 1 else 0
   }
 
-
-  import scalaz.Ordering.{ LT, GT, EQ }
+  import scalaz.Ordering.{LT, GT, EQ}
 
   @inline def order(a: Long, b: Long): scalaz.Ordering =
     if (a < b) LT else if (a == b) EQ else GT

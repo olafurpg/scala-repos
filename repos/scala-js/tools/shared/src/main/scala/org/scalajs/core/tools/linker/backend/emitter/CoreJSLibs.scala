@@ -1,11 +1,10 @@
 /*                     __                                               *\
-**     ________ ___   / /  ___      __ ____  Scala.js tools             **
-**    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
-**  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
-** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
-**                          |/____/                                     **
+ **     ________ ___   / /  ___      __ ____  Scala.js tools             **
+ **    / __/ __// _ | / /  / _ | __ / // __/  (c) 2013-2014, LAMP/EPFL   **
+ **  __\ \/ /__/ __ |/ /__/ __ |/_// /_\ \    http://scala-js.org/       **
+ ** /____/\___/_/ |_/____/_/ | |__/ /____/                               **
+ **                          |/____/                                     **
 \*                                                                      */
-
 
 package org.scalajs.core.tools.linker.backend.emitter
 
@@ -25,14 +24,12 @@ private[scalajs] object CoreJSLibs {
 
   private type Config = (Semantics, OutputMode)
 
-  private val cachedLibByConfig =
-    mutable.HashMap.empty[Config, VirtualJSFile]
+  private val cachedLibByConfig = mutable.HashMap.empty[Config, VirtualJSFile]
 
-  private val ScalaJSEnvLines =
-    ScalaJSEnvHolder.scalajsenv.split("\n|\r\n?")
+  private val ScalaJSEnvLines = ScalaJSEnvHolder.scalajsenv.split("\n|\r\n?")
 
-  private val gitHubBaseURI =
-    new URI("https://raw.githubusercontent.com/scala-js/scala-js/")
+  private val gitHubBaseURI = new URI(
+      "https://raw.githubusercontent.com/scala-js/scala-js/")
 
   def lib(semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
     synchronized {
@@ -41,13 +38,13 @@ private[scalajs] object CoreJSLibs {
     }
   }
 
-  private def makeLib(semantics: Semantics,
-      outputMode: OutputMode): VirtualJSFile = {
+  private def makeLib(
+      semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
     new ScalaJSEnvVirtualJSFile(makeContent(semantics, outputMode))
   }
 
-  private def makeContent(semantics: Semantics,
-      outputMode: OutputMode): String = {
+  private def makeContent(
+      semantics: Semantics, outputMode: OutputMode): String = {
     // This is a basic sort-of-C-style preprocessor
 
     def getOption(name: String): String = name match {
@@ -69,50 +66,51 @@ private[scalajs] object CoreJSLibs {
     var skipping = false
     var skipDepth = 0
     val lines = for (line <- originalLines) yield {
-      val includeThisLine = if (skipping) {
-        if (line == "//!else" && skipDepth == 1) {
-          skipping = false
-          skipDepth = 0
-        } else if (line == "//!endif") {
-          skipDepth -= 1
-          if (skipDepth == 0)
+      val includeThisLine =
+        if (skipping) {
+          if (line == "//!else" && skipDepth == 1) {
             skipping = false
-        } else if (line.startsWith("//!if ")) {
-          skipDepth += 1
-        }
-        false
-      } else {
-        if (line.startsWith("//!")) {
-          if (line.startsWith("//!if ")) {
-            val Array(_, option, op, value) = line.split(" ")
-            val optionValue = getOption(option)
-            val success = op match {
-              case "==" => optionValue == value
-              case "!=" => optionValue != value
-            }
-            if (!success) {
-              skipping = true
-              skipDepth = 1
-            }
-          } else if (line == "//!else") {
-            skipping = true
-            skipDepth = 1
+            skipDepth = 0
           } else if (line == "//!endif") {
-            // nothing to do
-          } else {
-            throw new MatchError(line)
+            skipDepth -= 1
+            if (skipDepth == 0) skipping = false
+          } else if (line.startsWith("//!if ")) {
+            skipDepth += 1
           }
           false
         } else {
-          true
+          if (line.startsWith("//!")) {
+            if (line.startsWith("//!if ")) {
+              val Array(_, option, op, value) = line.split(" ")
+              val optionValue = getOption(option)
+              val success = op match {
+                case "==" => optionValue == value
+                case "!=" => optionValue != value
+              }
+              if (!success) {
+                skipping = true
+                skipDepth = 1
+              }
+            } else if (line == "//!else") {
+              skipping = true
+              skipDepth = 1
+            } else if (line == "//!endif") {
+              // nothing to do
+            } else {
+              throw new MatchError(line)
+            }
+            false
+          } else {
+            true
+          }
         }
-      }
       if (includeThisLine) line
       else "" // blank line preserves line numbers in source maps
     }
 
-    val content = lines.mkString("", "\n", "\n").replace(
-        "{{LINKER_VERSION}}", ScalaJSVersions.current)
+    val content = lines
+      .mkString("", "\n", "\n")
+      .replace("{{LINKER_VERSION}}", ScalaJSVersions.current)
 
     val content1 = outputMode match {
       case OutputMode.ECMAScript51Global =>
@@ -136,15 +134,15 @@ private[scalajs] object CoreJSLibs {
 
     outputMode match {
       case OutputMode.ECMAScript51Global | OutputMode.ECMAScript51Isolated =>
-        content1
-          .replaceAll(raw"\b(let|const)\b", "var")
+        content1.replaceAll(raw"\b(let|const)\b", "var")
 
       case OutputMode.ECMAScript6 =>
         content1
     }
   }
 
-  private class ScalaJSEnvVirtualJSFile(override val content: String) extends VirtualJSFile {
+  private class ScalaJSEnvVirtualJSFile(override val content: String)
+      extends VirtualJSFile {
     override def path: String = "scalajsenv.js"
     override def version: Option[String] = Some("")
     override def exists: Boolean = true
@@ -152,9 +150,7 @@ private[scalajs] object CoreJSLibs {
     override def toURI: URI = {
       if (!ScalaJSVersions.currentIsSnapshot)
         gitHubBaseURI.resolve(s"v${ScalaJSVersions.current}/tools/$path")
-      else
-        super.toURI
+      else super.toURI
     }
   }
-
 }

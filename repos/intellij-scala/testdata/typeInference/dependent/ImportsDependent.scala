@@ -11,6 +11,7 @@ object Test {
 
   val x: FO = 1
   val zz: SO = 1
-  /*start*/zz/*end*/
+  /*start*/
+  zz /*end*/
 }
 //Second.O

@@ -22,10 +22,10 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 import org.jetbrains.plugins.scala.util.ScalaUtils
 
 /**
- * @author Alexander Podkhalyuzin
- */
-
-abstract class IntroduceParameterTestBase extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+  * @author Alexander Podkhalyuzin
+  */
+abstract class IntroduceParameterTestBase
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   protected def folderPath = baseRootPath() + "introduceParameter/"
   private val startMarker = "/*start*/"
   private val endMarker = "/*end*/"
@@ -38,19 +38,25 @@ abstract class IntroduceParameterTestBase extends ScalaLightPlatformCodeInsightT
     import _root_.junit.framework.Assert._
     val project = getProjectAdapter
     val filePath = folderPath + getTestName(false) + ".scala"
-    val file = LocalFileSystem.getInstance.findFileByPath(filePath.replace(File.separatorChar, '/'))
+    val file = LocalFileSystem.getInstance.findFileByPath(
+        filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
+            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val startOffset = fileText.indexOf(startMarker) + startMarker.length
-    assert(startOffset != -1 + startMarker.length,
-      "Not specified start marker in test case. Use /*start*/ in scala file for this.")
+    assert(
+        startOffset != -1 + startMarker.length,
+        "Not specified start marker in test case. Use /*start*/ in scala file for this.")
     val endOffset = fileText.indexOf(endMarker)
-    assert(endOffset != -1, "Not specified end marker in test case. Use /*end*/ in scala file for this.")
+    assert(
+        endOffset != -1,
+        "Not specified end marker in test case. Use /*end*/ in scala file for this.")
 
     val fileEditorManager = FileEditorManager.getInstance(project)
-    val editor = fileEditorManager.openTextEditor(new OpenFileDescriptor(project, file, startOffset), false)
+    val editor = fileEditorManager.openTextEditor(
+        new OpenFileDescriptor(project, file, startOffset), false)
 
     var res: String = null
 
@@ -75,30 +81,53 @@ abstract class IntroduceParameterTestBase extends ScalaLightPlatformCodeInsightT
       ScalaUtils.runWriteActionDoNotRequestConfirmation(new Runnable {
         def run() {
           editor.getSelectionModel.setSelection(startOffset, endOffset)
-          ScalaRefactoringUtil.afterExpressionChoosing(project, editor, scalaFile, null, "Introduce Variable") {
+          ScalaRefactoringUtil.afterExpressionChoosing(
+              project, editor, scalaFile, null, "Introduce Variable") {
             ScalaRefactoringUtil.trimSpacesAndComments(editor, scalaFile)
             PsiDocumentManager.getInstance(project).commitAllDocuments()
             val handler = new ScalaIntroduceParameterHandler()
-            val (exprWithTypes, elems) = handler.selectedElements(scalaFile, project, editor) match {
-              case Some((x, y)) => (x, y)
-              case None => return
-            }
+            val (exprWithTypes, elems) =
+              handler.selectedElements(scalaFile, project, editor) match {
+                case Some((x, y)) => (x, y)
+                case None => return
+              }
 
             val (methodLike: ScMethodLike, returnType) =
               if (toPrimaryConstructor)
-                (PsiTreeUtil.getContextOfType(elems.head, true, classOf[ScClass]).constructor.get, StdType.ANY)
+                (PsiTreeUtil
+                   .getContextOfType(elems.head, true, classOf[ScClass])
+                   .constructor
+                   .get,
+                 StdType.ANY)
               else {
-                val fun = PsiTreeUtil.getContextOfType(elems.head, true, classOf[ScFunctionDefinition])
+                val fun = PsiTreeUtil.getContextOfType(
+                    elems.head, true, classOf[ScFunctionDefinition])
                 (fun, fun.returnType.getOrAny)
               }
-            val collectedData = handler.collectData(exprWithTypes, elems, methodLike, editor)
-            assert(collectedData.isDefined, "Could not collect data for introduce parameter")
-            val data = collectedData.get.copy(paramName = paramName, replaceAll = replaceAllOccurrences)
+            val collectedData =
+              handler.collectData(exprWithTypes, elems, methodLike, editor)
+            assert(collectedData.isDefined,
+                   "Could not collect data for introduce parameter")
+            val data = collectedData.get.copy(
+                paramName = paramName, replaceAll = replaceAllOccurrences)
 
-            val paramInfo = new ScalaParameterInfo(data.paramName, -1, data.tp, project, false, false, data.defaultArg, isIntroducedParameter = true)
-            val descriptor: ScalaMethodDescriptor = handler.createMethodDescriptor(data.methodToSearchFor, paramInfo)
-            val changeInfo = new ScalaChangeInfo(descriptor.getVisibility, data.methodToSearchFor, descriptor.getName, returnType,
-              descriptor.parameters, isDefaultParam)
+            val paramInfo =
+              new ScalaParameterInfo(data.paramName,
+                                     -1,
+                                     data.tp,
+                                     project,
+                                     false,
+                                     false,
+                                     data.defaultArg,
+                                     isIntroducedParameter = true)
+            val descriptor: ScalaMethodDescriptor =
+              handler.createMethodDescriptor(data.methodToSearchFor, paramInfo)
+            val changeInfo = new ScalaChangeInfo(descriptor.getVisibility,
+                                                 data.methodToSearchFor,
+                                                 descriptor.getName,
+                                                 returnType,
+                                                 descriptor.parameters,
+                                                 isDefaultParam)
 
             changeInfo.introducedParameterData = Some(data)
             new ScalaChangeSignatureProcessor(project, changeInfo).run()
@@ -106,9 +135,10 @@ abstract class IntroduceParameterTestBase extends ScalaLightPlatformCodeInsightT
         }
       }, project, "Test")
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
-    }
-    catch {
-      case e: Exception => assert(assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+    } catch {
+      case e: Exception =>
+        assert(
+            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

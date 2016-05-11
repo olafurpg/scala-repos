@@ -22,11 +22,13 @@ import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vectors}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
-class ElementwiseProductSuite extends SparkFunSuite with MLlibTestSparkContext {
+class ElementwiseProductSuite
+    extends SparkFunSuite with MLlibTestSparkContext {
 
-  test("elementwise (hadamard) product should properly apply vector to dense data set") {
+  test(
+      "elementwise (hadamard) product should properly apply vector to dense data set") {
     val denseData = Array(
-      Vectors.dense(1.0, 4.0, 1.9, -9.0)
+        Vectors.dense(1.0, 4.0, 1.9, -9.0)
     )
     val scalingVec = Vectors.dense(2.0, 0.5, 0.0, 0.25)
     val transformer = new ElementwiseProduct(scalingVec)
@@ -34,13 +36,15 @@ class ElementwiseProductSuite extends SparkFunSuite with MLlibTestSparkContext {
     val transformedVecs = transformedData.collect()
     val transformedVec = transformedVecs(0)
     val expectedVec = Vectors.dense(2.0, 2.0, 0.0, -2.25)
-    assert(transformedVec ~== expectedVec absTol 1E-5,
-      s"Expected transformed vector $expectedVec but found $transformedVec")
+    assert(
+        transformedVec ~== expectedVec absTol 1E-5,
+        s"Expected transformed vector $expectedVec but found $transformedVec")
   }
 
-  test("elementwise (hadamard) product should properly apply vector to sparse data set") {
+  test(
+      "elementwise (hadamard) product should properly apply vector to sparse data set") {
     val sparseData = Array(
-      Vectors.sparse(3, Seq((1, -1.0), (2, -3.0)))
+        Vectors.sparse(3, Seq((1, -1.0), (2, -3.0)))
     )
     val dataRDD = sc.parallelize(sparseData, 3)
     val scalingVec = Vectors.dense(1.0, 0.0, 0.5)
@@ -54,7 +58,9 @@ class ElementwiseProductSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after hadamard product")
 
-    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert(data2(0) ~== Vectors.sparse(3, Seq((1, 0.0), (2, -1.5))) absTol 1E-5)
+    assert((data2, data2RDD.collect()).zipped
+          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert(
+        data2(0) ~== Vectors.sparse(3, Seq((1, 0.0), (2, -1.5))) absTol 1E-5)
   }
 }

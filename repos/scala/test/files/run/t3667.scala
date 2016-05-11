@@ -29,11 +29,11 @@ object Test {
   }
 
   def ser(o: AnyRef) {
-    val oos = new java.io.ObjectOutputStream(new java.io.ByteArrayOutputStream())
+    val oos =
+      new java.io.ObjectOutputStream(new java.io.ByteArrayOutputStream())
     oos.writeObject(o)
     oos.close()
   }
-
 }
 
 class Outer4 extends Serializable {

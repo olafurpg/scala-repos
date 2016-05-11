@@ -3,7 +3,7 @@ trait Global {
   trait Symbol { def foo: Boolean }
 }
 
-trait IMain { self:  MemberHandlers =>
+trait IMain { self: MemberHandlers =>
   val global: Global
   def handlers: List[MemberHandler]
 }

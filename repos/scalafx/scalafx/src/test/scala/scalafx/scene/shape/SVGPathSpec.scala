@@ -36,10 +36,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * SVGPath Spec tests.
- *
- *
- */
+  * SVGPath Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class SVGPathSpec
-  extends SimpleSFXDelegateSpec[jfxss.SVGPath, SVGPath](classOf[jfxss.SVGPath], classOf[SVGPath])
+    extends SimpleSFXDelegateSpec[jfxss.SVGPath, SVGPath](
+        classOf[jfxss.SVGPath], classOf[SVGPath])

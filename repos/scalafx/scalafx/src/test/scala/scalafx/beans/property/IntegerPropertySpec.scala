@@ -37,10 +37,10 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 import scalafx.Includes._
 
 /**
- * IntegerProperty Spec tests.
- *
- *
- */
+  * IntegerProperty Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class IntegerPropertySpec extends FlatSpec with BeforeAndAfterEach {
   val bean = new Object()

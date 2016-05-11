@@ -25,10 +25,10 @@ object EmitManPage {
     }
     def emitText(text: AbstractText) {
       text match {
-        case seq:SeqText =>
+        case seq: SeqText =>
           seq.components foreach emitText
 
-        case seq:SeqPara =>
+        case seq: SeqPara =>
           seq.components foreach emitPara
 
         case Text(text) =>
@@ -65,7 +65,7 @@ object EmitManPage {
           emitText(text)
           out.print("\"")
 
-        case DefinitionList(definitions @ _*) =>
+        case DefinitionList(definitions @ _ *) =>
           var n = definitions.length
           for (d <- definitions) {
             out println ".TP"
@@ -100,19 +100,19 @@ object EmitManPage {
           out.print(text)
           out println "\n.fi"
 
-        case lst:BulletList =>
+        case lst: BulletList =>
           for (item <- lst.items) {
             out println ".IP"
             emitText(item)
             out.println
           }
 
-        case lst:NumberedList =>
+        case lst: NumberedList =>
           for {
             idx <- List.range(0, lst.items.length)
           } {
             val item = lst.items(idx)
-            out.println(".IP \"   " + (idx+1) + ".\"")
+            out.println(".IP \"   " + (idx + 1) + ".\"")
             emitText(item)
             out.println
           }
@@ -133,7 +133,8 @@ object EmitManPage {
     }
 
     out println ".\\\""
-    out.println(".\\\" ############################## " + section.title + " ###############################")
+    out.println(".\\\" ############################## " + section.title +
+        " ###############################")
     out println ".\\\""
     val tag = if (depth > 1) ".SS" else ".SH"
     val title =
@@ -156,21 +157,23 @@ object EmitManPage {
     out println ".\\\""
     out println ".\\\" Process this file with nroff -man scala.1"
     out println ".\\\""
-    out.println(".TH " + doc.title + " " + doc.category.id +
-                "  \"" + doc.date + "\" \"version " + doc.version +
-                "\" \"" + doc.category + "\"")
+    out.println(
+        ".TH " + doc.title + " " + doc.category.id + "  \"" + doc.date +
+        "\" \"version " + doc.version + "\" \"" + doc.category + "\"")
 
     doc.sections foreach (s => emitSection(s, 1))
   }
 
-  def main(args: Array[String]) = args match{
-    case Array(classname)           => emitManPage(classname)
-    case Array(classname, file, _*) => emitManPage(classname, new java.io.FileOutputStream(file))
-    case _                          => sys.exit(1)
+  def main(args: Array[String]) = args match {
+    case Array(classname) => emitManPage(classname)
+    case Array(classname, file, _ *) =>
+      emitManPage(classname, new java.io.FileOutputStream(file))
+    case _ => sys.exit(1)
   }
 
-  def emitManPage(classname: String, outStream: java.io.OutputStream = out.out) {
-    if(outStream != out.out) out setOut outStream
+  def emitManPage(
+      classname: String, outStream: java.io.OutputStream = out.out) {
+    if (outStream != out.out) out setOut outStream
     try {
       val cl = this.getClass.getClassLoader()
       val clasz = cl loadClass classname

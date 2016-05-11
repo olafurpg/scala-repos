@@ -74,5 +74,4 @@ class SingletonTypes211Tests {
     typed[o.type](x2)
     typed[OT](x2)
   }
-
 }

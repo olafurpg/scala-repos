@@ -12,26 +12,32 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package com.twitter.scalding
 
 object LineNumber {
+
   /**
-   * depth 0 means the StackTraceElement for the caller
-   * of this method (skipping getCurrent and the Thread.currentThread
-   */
+    * depth 0 means the StackTraceElement for the caller
+    * of this method (skipping getCurrent and the Thread.currentThread
+    */
   def getCurrent(depth: Int): StackTraceElement =
     getCurrent(depth, Thread.currentThread().getStackTrace)
 
-  private[this] def getCurrent(depth: Int, stack: Seq[StackTraceElement]): StackTraceElement =
+  private[this] def getCurrent(
+      depth: Int, stack: Seq[StackTraceElement]): StackTraceElement =
     stack(depth + 2)
 
-  def ignorePath(classPrefix: String): Option[StackTraceElement] = ignorePath(Set(classPrefix))
+  def ignorePath(classPrefix: String): Option[StackTraceElement] =
+    ignorePath(Set(classPrefix))
   def ignorePath(classPrefixes: Set[String]): Option[StackTraceElement] =
     ignorePaths(classPrefixes, Thread.currentThread().getStackTrace)
 
-  private[this] def ignorePaths(classPrefixes: Set[String], stack: Seq[StackTraceElement]): Option[StackTraceElement] =
-    stack.drop(2)
+  private[this] def ignorePaths(
+      classPrefixes: Set[String],
+      stack: Seq[StackTraceElement]): Option[StackTraceElement] =
+    stack
+      .drop(2)
       .dropWhile { ste =>
         classPrefixes.exists { prefix =>
           ste.getClassName.startsWith(prefix)
@@ -49,7 +55,8 @@ object LineNumber {
   def tryNonScaldingCaller: Option[StackTraceElement] =
     tryNonScaldingCaller(Thread.currentThread().getStackTrace)
 
-  def tryNonScaldingCaller(stack: Array[StackTraceElement]): Option[StackTraceElement] = {
+  def tryNonScaldingCaller(
+      stack: Array[StackTraceElement]): Option[StackTraceElement] = {
     /* depth = 1:
      * depth 0 => tryNonScaldingCaller
      * depth 1 => caller of this method
@@ -68,15 +75,14 @@ object LineNumber {
       if (it.hasNext) Some(it.next)
       else None
 
-    val scaldingJobCaller = headOption(stack
-      .iterator
-      .filter { se => se.getClassName.startsWith(scaldingPrefix) }
-      .filter { se =>
-        val cls = Class.forName(se.getClassName)
-        jobClass.isAssignableFrom(cls)
-      })
+    val scaldingJobCaller = headOption(
+        stack.iterator.filter { se =>
+      se.getClassName.startsWith(scaldingPrefix)
+    }.filter { se =>
+      val cls = Class.forName(se.getClassName)
+      jobClass.isAssignableFrom(cls)
+    })
 
-    scaldingJobCaller
-      .orElse(nonScalding)
+    scaldingJobCaller.orElse(nonScalding)
   }
 }

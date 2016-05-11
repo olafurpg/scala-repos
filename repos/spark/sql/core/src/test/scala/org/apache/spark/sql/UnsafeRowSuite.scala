@@ -67,30 +67,35 @@ class UnsafeRowSuite extends SparkFunSuite {
   }
 
   test("writeToStream") {
-    val row = InternalRow.apply(UTF8String.fromString("hello"), UTF8String.fromString("world"), 123)
-    val arrayBackedUnsafeRow: UnsafeRow =
-      UnsafeProjection.create(Array[DataType](StringType, StringType, IntegerType)).apply(row)
+    val row = InternalRow.apply(
+        UTF8String.fromString("hello"), UTF8String.fromString("world"), 123)
+    val arrayBackedUnsafeRow: UnsafeRow = UnsafeProjection
+      .create(Array[DataType](StringType, StringType, IntegerType))
+      .apply(row)
     assert(arrayBackedUnsafeRow.getBaseObject.isInstanceOf[Array[Byte]])
-    val (bytesFromArrayBackedRow, field0StringFromArrayBackedRow): (Array[Byte], String) = {
+    val (bytesFromArrayBackedRow, field0StringFromArrayBackedRow): (Array[Byte],
+    String) = {
       val baos = new ByteArrayOutputStream()
       arrayBackedUnsafeRow.writeToStream(baos, null)
       (baos.toByteArray, arrayBackedUnsafeRow.getString(0))
     }
-    val (bytesFromOffheapRow, field0StringFromOffheapRow): (Array[Byte], String) = {
-      val offheapRowPage = MemoryAllocator.UNSAFE.allocate(arrayBackedUnsafeRow.getSizeInBytes)
+    val (bytesFromOffheapRow, field0StringFromOffheapRow): (Array[Byte],
+    String) = {
+      val offheapRowPage =
+        MemoryAllocator.UNSAFE.allocate(arrayBackedUnsafeRow.getSizeInBytes)
       try {
         Platform.copyMemory(
-          arrayBackedUnsafeRow.getBaseObject,
-          arrayBackedUnsafeRow.getBaseOffset,
-          offheapRowPage.getBaseObject,
-          offheapRowPage.getBaseOffset,
-          arrayBackedUnsafeRow.getSizeInBytes
+            arrayBackedUnsafeRow.getBaseObject,
+            arrayBackedUnsafeRow.getBaseOffset,
+            offheapRowPage.getBaseObject,
+            offheapRowPage.getBaseOffset,
+            arrayBackedUnsafeRow.getSizeInBytes
         )
         val offheapUnsafeRow: UnsafeRow = new UnsafeRow(3)
         offheapUnsafeRow.pointTo(
-          offheapRowPage.getBaseObject,
-          offheapRowPage.getBaseOffset,
-          arrayBackedUnsafeRow.getSizeInBytes
+            offheapRowPage.getBaseObject,
+            offheapRowPage.getBaseOffset,
+            arrayBackedUnsafeRow.getSizeInBytes
         )
         assert(offheapUnsafeRow.getBaseObject === null)
         val baos = new ByteArrayOutputStream()
@@ -108,14 +113,17 @@ class UnsafeRowSuite extends SparkFunSuite {
 
   test("calling getDouble() and getFloat() on null columns") {
     val row = InternalRow.apply(null, null)
-    val unsafeRow = UnsafeProjection.create(Array[DataType](FloatType, DoubleType)).apply(row)
+    val unsafeRow = UnsafeProjection
+      .create(Array[DataType](FloatType, DoubleType))
+      .apply(row)
     assert(unsafeRow.getFloat(0) === row.getFloat(0))
     assert(unsafeRow.getDouble(1) === row.getDouble(1))
   }
 
   test("calling get(ordinal, datatype) on null columns") {
     val row = InternalRow.apply(null)
-    val unsafeRow = UnsafeProjection.create(Array[DataType](NullType)).apply(row)
+    val unsafeRow =
+      UnsafeProjection.create(Array[DataType](NullType)).apply(row)
     for (dataType <- DataTypeTestUtils.atomicTypes) {
       assert(unsafeRow.get(0, dataType) === null)
     }
@@ -123,7 +131,8 @@ class UnsafeRowSuite extends SparkFunSuite {
 
   test("createFromByteArray and copyFrom") {
     val row = InternalRow(1, UTF8String.fromString("abc"))
-    val converter = UnsafeProjection.create(Array[DataType](IntegerType, StringType))
+    val converter =
+      UnsafeProjection.create(Array[DataType](IntegerType, StringType))
     val unsafeRow = converter.apply(row)
 
     val emptyRow = UnsafeRow.createFromByteArray(64, 2)
@@ -140,7 +149,8 @@ class UnsafeRowSuite extends SparkFunSuite {
     unsafeRow.setInt(0, 2)
     assert(emptyRow.getInt(0) === 1)
 
-    val longString = UTF8String.fromString((1 to 100).map(_ => "abc").reduce(_ + _))
+    val longString =
+      UTF8String.fromString((1 to 100).map(_ => "abc").reduce(_ + _))
     val row2 = InternalRow(3, longString)
     val unsafeRow2 = converter.apply(row2)
 
@@ -161,7 +171,8 @@ class UnsafeRowSuite extends SparkFunSuite {
 
   test("calling hashCode on unsafe array returned by getArray(ordinal)") {
     val row = InternalRow.apply(new GenericArrayData(Array(1L)))
-    val unsafeRow = UnsafeProjection.create(Array[DataType](ArrayType(LongType))).apply(row)
+    val unsafeRow =
+      UnsafeProjection.create(Array[DataType](ArrayType(LongType))).apply(row)
     // Makes sure hashCode on unsafe array won't crash
     unsafeRow.getArray(0).hashCode()
   }

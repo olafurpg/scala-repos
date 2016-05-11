@@ -1,8 +1,7 @@
 package scala.reflect.reify
 package codegen
 
-trait GenPositions {
-  self: Reifier =>
+trait GenPositions { self: Reifier =>
 
   import global._
 

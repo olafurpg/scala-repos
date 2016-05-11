@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2014, ScalaFX Project
+ * Copyright (c) 2011-2014, ScalaFX Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 
 /** Tests for [[scalafx.print.PrintQuality]]. */
 @RunWith(classOf[JUnitRunner])
-class PrintQualitySpec extends SFXEnumDelegateSpec[jfxp.PrintQuality, PrintQuality](
-  javaClass = classOf[jfxp.PrintQuality],
-  scalaClass = classOf[PrintQuality],
-  companion = PrintQuality)
+class PrintQualitySpec
+    extends SFXEnumDelegateSpec[jfxp.PrintQuality, PrintQuality](
+        javaClass = classOf[jfxp.PrintQuality],
+        scalaClass = classOf[PrintQuality],
+        companion = PrintQuality)

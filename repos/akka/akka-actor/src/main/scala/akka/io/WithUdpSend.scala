@@ -1,21 +1,20 @@
 /**
- * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
- */
+  * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
+  */
 package akka.io
 
 import java.net.InetSocketAddress
-import java.nio.channels.{ SelectionKey, DatagramChannel }
-import akka.actor.{ ActorRef, ActorLogging, Actor }
-import akka.io.Udp.{ CommandFailed, Send }
+import java.nio.channels.{SelectionKey, DatagramChannel}
+import akka.actor.{ActorRef, ActorLogging, Actor}
+import akka.io.Udp.{CommandFailed, Send}
 import akka.io.SelectionHandler._
 
 import scala.util.control.NonFatal
 
 /**
- * INTERNAL API
- */
-private[io] trait WithUdpSend {
-  me: Actor with ActorLogging ⇒
+  * INTERNAL API
+  */
+private[io] trait WithUdpSend { me: Actor with ActorLogging ⇒
 
   private var pendingSend: Send = null
   private var pendingCommander: ActorRef = null
@@ -36,8 +35,7 @@ private[io] trait WithUdpSend {
       sender() ! CommandFailed(send)
 
     case send: Send if send.payload.isEmpty ⇒
-      if (send.wantsAck)
-        sender() ! send.ack
+      if (send.wantsAck) sender() ! send.ack
 
     case send: Send ⇒
       pendingSend = send
@@ -46,13 +44,16 @@ private[io] trait WithUdpSend {
         Dns.resolve(send.target.getHostName)(context.system, self) match {
           case Some(r) ⇒
             try {
-              pendingSend = pendingSend.copy(target = new InetSocketAddress(r.addr, pendingSend.target.getPort))
+              pendingSend = pendingSend.copy(target = new InetSocketAddress(
+                        r.addr, pendingSend.target.getPort))
               doSend(registration)
             } catch {
               case NonFatal(e) ⇒
                 sender() ! CommandFailed(send)
-                log.debug("Failure while sending UDP datagram to remote address [{}]: {}",
-                  send.target, e)
+                log.debug(
+                    "Failure while sending UDP datagram to remote address [{}]: {}",
+                    send.target,
+                    e)
                 retriedSend = false
                 pendingSend = null
                 pendingCommander = null

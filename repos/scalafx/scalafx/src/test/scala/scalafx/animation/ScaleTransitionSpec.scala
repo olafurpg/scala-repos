@@ -35,11 +35,11 @@ import scalafx.Includes._
 import scalafx.testutil.SimpleSFXDelegateSpec
 
 /**
- * ScaleTransition Spec tests.
- *
- *
- */
+  * ScaleTransition Spec tests.
+  *
+  *
+  */
 @RunWith(classOf[JUnitRunner])
 class ScaleTransitionSpec
-  extends SimpleSFXDelegateSpec[jfxa.ScaleTransition, ScaleTransition](
-    classOf[jfxa.ScaleTransition], classOf[ScaleTransition])
+    extends SimpleSFXDelegateSpec[jfxa.ScaleTransition, ScaleTransition](
+        classOf[jfxa.ScaleTransition], classOf[ScaleTransition])

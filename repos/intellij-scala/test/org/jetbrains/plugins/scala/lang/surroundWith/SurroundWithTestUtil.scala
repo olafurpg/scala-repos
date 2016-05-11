@@ -3,16 +3,26 @@ package lang
 package surroundWith
 
 /**
- * User: Alexander Podkhalyuzin
- * Date: 08.11.2008
- */
-
+  * User: Alexander Podkhalyuzin
+  * Date: 08.11.2008
+  */
 object SurroundWithTestUtil {
   val startMarker = "<start>"
   val endMarkers: Array[String] = Array[String]("<if>",
-    "<else>", "<while>", "<do>", "<for>", "<yield>"
-    , "<catch>", "<finally>", "<try>", "<braces>",
-    "<match>", "<parenthesis>", "<if_cond>", "<else_cond>", "<unary>")
+                                                "<else>",
+                                                "<while>",
+                                                "<do>",
+                                                "<for>",
+                                                "<yield>",
+                                                "<catch>",
+                                                "<finally>",
+                                                "<try>",
+                                                "<braces>",
+                                                "<match>",
+                                                "<parenthesis>",
+                                                "<if_cond>",
+                                                "<else_cond>",
+                                                "<unary>")
   def prepareFile(text: String): (String, Integer, Integer, Integer) = {
     var workingText = text
     val start = text.indexOf(startMarker)

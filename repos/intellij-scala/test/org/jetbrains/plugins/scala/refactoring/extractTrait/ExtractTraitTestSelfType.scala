@@ -2,14 +2,13 @@ package org.jetbrains.plugins.scala
 package refactoring.extractTrait
 
 /**
-* Nikolay.Tropin
-* 2014-06-02
-*/
+  * Nikolay.Tropin
+  * 2014-06-02
+  */
 class ExtractTraitTestSelfType extends ExtractTraitTestBase {
 
   def testMethodFromClassItself() {
-    val text =
-      """
+    val text = """
         |class A {<caret>
         |
         |  def foo() = bar()
@@ -18,8 +17,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
         |}
       """.stripMargin
 
-    val result =
-      """
+    val result = """
         |class A extends ExtractedTrait {
         |
         |  def bar() = 1
@@ -34,8 +32,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
 
     checkResult(text, result, onlyDeclarations = false, onlyFirstMember = true)
 
-    val result2 =
-      """
+    val result2 = """
         |class A extends ExtractedTrait {
         |
         |  override def foo() = bar()
@@ -53,8 +50,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
   }
 
   def testMembersFromAncestor() {
-    val text =
-      """
+    val text = """
         |class A extends AA {<caret>
         |  def foo() = bar()
         |}
@@ -64,8 +60,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
         |}
       """.stripMargin
 
-    val result =
-      """
+    val result = """
         |class A extends AA with ExtractedTrait
         |
         |trait ExtractedTrait {
@@ -81,8 +76,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
 
     checkResult(text, result, onlyDeclarations = false)
 
-    val result2 =
-      """
+    val result2 = """
         |class A extends AA with ExtractedTrait {
         |  override def foo() = bar()
         |}
@@ -101,8 +95,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
   }
 
   def testMembersFromTwoAncestors() {
-    val text =
-      """
+    val text = """
         |class A extends AA with BB {<caret>
         |  val foo = bar() + x
         |}
@@ -116,8 +109,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
         |}
       """.stripMargin
 
-    val result =
-      """
+    val result = """
         |class A extends AA with BB with ExtractedTrait
         |
         |trait ExtractedTrait {
@@ -139,8 +131,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
   }
 
   def testMembersFromTwoAncestors2() {
-    val text =
-      """
+    val text = """
         |class A extends AA {<caret>
         |  val foo = bar() + x
         |}
@@ -154,8 +145,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
         |}
       """.stripMargin
 
-    val result =
-      """
+    val result = """
         |class A extends AA with ExtractedTrait
         |
         |trait ExtractedTrait {
@@ -177,8 +167,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
   }
 
   def testMemberFromObject() {
-    val text =
-      """
+    val text = """
         |object A {
         |
         |  def foo() = bar()
@@ -187,8 +176,7 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
         |}
       """.stripMargin
 
-    val result =
-      """
+    val result = """
         |object A extends ExtractedTrait {
         |
         |  def bar() = 1

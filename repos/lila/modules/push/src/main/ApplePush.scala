@@ -6,24 +6,23 @@ import scala.util.Failure
 
 import play.api.libs.json._
 
-private final class ApplePush(
-    getDevice: String => Fu[Option[Device]],
-    system: ActorSystem,
-    certificate: InputStream,
-    password: String,
-    enabled: Boolean) {
+private final class ApplePush(getDevice: String => Fu[Option[Device]],
+                              system: ActorSystem,
+                              certificate: InputStream,
+                              password: String,
+                              enabled: Boolean) {
 
-  private val actor = system.actorOf(Props(classOf[ApnsActor], certificate, password))
+  private val actor =
+    system.actorOf(Props(classOf[ApnsActor], certificate, password))
 
   def apply(userId: String)(data: => PushApi.Data): Funit =
     getDevice(userId) map {
       _ foreach { device =>
-        if (enabled) actor ! ApplePush.Notification(
-          token = device.deviceId,
-          alert = Json.obj(
-            "title" -> data.title,
-            "body" -> data.body),
-          payload = data.payload)
+        if (enabled)
+          actor ! ApplePush.Notification(
+              token = device.deviceId,
+              alert = Json.obj("title" -> data.title, "body" -> data.body),
+              payload = data.payload)
         else logger.warn(s"Sorry $userId, apple push is disabled by config!")
       }
     }
@@ -35,7 +34,8 @@ object ApplePush {
 }
 
 // the damn API is blocking, so at least use only one thread at a time
-private final class ApnsActor(certificate: InputStream, password: String) extends Actor {
+private final class ApnsActor(certificate: InputStream, password: String)
+    extends Actor {
 
   import com.relayrides.pushy.apns._, util._
 
@@ -43,30 +43,33 @@ private final class ApnsActor(certificate: InputStream, password: String) extend
 
   def getManager = Option(manager) getOrElse {
     val m = new PushManager[SimpleApnsPushNotification](
-      ApnsEnvironment.getSandboxEnvironment(),
-      SSLContextUtil.createDefaultSSLContext(certificate, password),
-      null, // Optional: custom event loop group
-      null, // Optional: custom ExecutorService for calling listeners
-      null, // Optional: custom BlockingQueue implementation
-      new PushManagerConfiguration(),
-      "ApplePushManager")
+        ApnsEnvironment.getSandboxEnvironment(),
+        SSLContextUtil.createDefaultSSLContext(certificate, password),
+        null, // Optional: custom event loop group
+        null, // Optional: custom ExecutorService for calling listeners
+        null, // Optional: custom BlockingQueue implementation
+        new PushManagerConfiguration(),
+        "ApplePushManager")
 
-    m.registerRejectedNotificationListener(new RejectedNotificationListener[SimpleApnsPushNotification] {
+    m.registerRejectedNotificationListener(
+        new RejectedNotificationListener[SimpleApnsPushNotification] {
       override def handleRejectedNotification(
-        m: PushManager[_ <: SimpleApnsPushNotification],
-        notification: SimpleApnsPushNotification,
-        reason: RejectedNotificationReason) {
-        logger.error(s"$notification was rejected with rejection reason $reason")
+          m: PushManager[_ <: SimpleApnsPushNotification],
+          notification: SimpleApnsPushNotification,
+          reason: RejectedNotificationReason) {
+        logger.error(
+            s"$notification was rejected with rejection reason $reason")
       }
     })
-    m.registerFailedConnectionListener(new FailedConnectionListener[SimpleApnsPushNotification] {
+    m.registerFailedConnectionListener(
+        new FailedConnectionListener[SimpleApnsPushNotification] {
       override def handleFailedConnection(
-        m: PushManager[_ <: SimpleApnsPushNotification],
-        cause: Throwable) {
+          m: PushManager[_ <: SimpleApnsPushNotification], cause: Throwable) {
         logger.error(s"Can't connect because $cause")
         cause match {
           case ssl: javax.net.ssl.SSLHandshakeException =>
-            logger.error(s"This is probably a permanent failure, and we should shut down the manager")
+            logger.error(
+                s"This is probably a permanent failure, and we should shut down the manager")
           case _ =>
         }
       }
@@ -82,7 +85,6 @@ private final class ApnsActor(certificate: InputStream, password: String) extend
 
   def receive = {
     case ApplePush.Notification(token, alert, payload) =>
-
       val payloadBuilder = new ApnsPayloadBuilder()
 
       payloadBuilder.setAlertBody(Json stringify alert)
@@ -90,8 +92,8 @@ private final class ApnsActor(certificate: InputStream, password: String) extend
       payloadBuilder.addCustomProperty("data", Json stringify payload)
 
       val notif = new SimpleApnsPushNotification(
-        TokenUtil.tokenStringToByteArray(token),
-        payloadBuilder.buildWithDefaultMaximumLength())
+          TokenUtil.tokenStringToByteArray(token),
+          payloadBuilder.buildWithDefaultMaximumLength())
 
       logger.info(s"Sending alert=$alert, payload=$payload to $token")
 

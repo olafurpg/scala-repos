@@ -26,7 +26,9 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
 
 private[clustering] case class TestRow(features: Vector)
 
-class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest {
+class KMeansSuite
+    extends SparkFunSuite with MLlibTestSparkContext
+    with DefaultReadWriteTest {
 
   final val k = 5
   @transient var dataset: DataFrame = _
@@ -84,7 +86,8 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext with DefaultR
 
   test("fit & transform") {
     val predictionColName = "kmeans_prediction"
-    val kmeans = new KMeans().setK(k).setPredictionCol(predictionColName).setSeed(1)
+    val kmeans =
+      new KMeans().setK(k).setPredictionCol(predictionColName).setSeed(1)
     val model = kmeans.fit(dataset)
     assert(model.clusterCenters.length === k)
 
@@ -93,8 +96,13 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext with DefaultR
     expectedColumns.foreach { column =>
       assert(transformed.columns.contains(column))
     }
-    val clusters =
-      transformed.select(predictionColName).rdd.map(_.getInt(0)).distinct().collect().toSet
+    val clusters = transformed
+      .select(predictionColName)
+      .rdd
+      .map(_.getInt(0))
+      .distinct()
+      .collect()
+      .toSet
     assert(clusters.size === k)
     assert(clusters === Set(0, 1, 2, 3, 4))
     assert(model.computeCost(dataset) < 0.1)
@@ -106,27 +114,31 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext with DefaultR
       assert(model.clusterCenters === model2.clusterCenters)
     }
     val kmeans = new KMeans()
-    testEstimatorAndModelReadWrite(kmeans, dataset, KMeansSuite.allParamSettings, checkModelData)
+    testEstimatorAndModelReadWrite(
+        kmeans, dataset, KMeansSuite.allParamSettings, checkModelData)
   }
 }
 
 object KMeansSuite {
-  def generateKMeansData(sql: SQLContext, rows: Int, dim: Int, k: Int): DataFrame = {
+  def generateKMeansData(
+      sql: SQLContext, rows: Int, dim: Int, k: Int): DataFrame = {
     val sc = sql.sparkContext
-    val rdd = sc.parallelize(1 to rows).map(i => Vectors.dense(Array.fill(dim)((i % k).toDouble)))
+    val rdd = sc
+      .parallelize(1 to rows)
+      .map(i => Vectors.dense(Array.fill(dim)((i % k).toDouble)))
       .map(v => new TestRow(v))
     sql.createDataFrame(rdd)
   }
 
   /**
-   * Mapping from all Params to valid settings which differ from the defaults.
-   * This is useful for tests which need to exercise all Params, such as save/load.
-   * This excludes input columns to simplify some tests.
-   */
+    * Mapping from all Params to valid settings which differ from the defaults.
+    * This is useful for tests which need to exercise all Params, such as save/load.
+    * This excludes input columns to simplify some tests.
+    */
   val allParamSettings: Map[String, Any] = Map(
-    "predictionCol" -> "myPrediction",
-    "k" -> 3,
-    "maxIter" -> 2,
-    "tol" -> 0.01
+      "predictionCol" -> "myPrediction",
+      "k" -> 3,
+      "maxIter" -> 2,
+      "tol" -> 0.01
   )
 }

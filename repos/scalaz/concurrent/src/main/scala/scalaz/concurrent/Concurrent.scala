@@ -3,5 +3,4 @@ package concurrent
 
 object Concurrent extends Concurrents
 
-trait Concurrents
-  extends ActorFunctions
+trait Concurrents extends ActorFunctions

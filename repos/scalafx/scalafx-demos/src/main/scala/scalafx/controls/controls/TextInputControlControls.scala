@@ -29,7 +29,9 @@ package scalafx.controls.controls
 
 import scalafx.scene.control.{CheckBox, Label, TextInputControl}
 
-class TextInputControlControls(target: TextInputControl) extends PropertiesNodes[TextInputControl](target, "TextInputControl Properties") {
+class TextInputControlControls(target: TextInputControl)
+    extends PropertiesNodes[TextInputControl](
+        target, "TextInputControl Properties") {
 
   val chbEditable = new CheckBox {
     selected <==> target.editable
@@ -49,15 +51,16 @@ class TextInputControlControls(target: TextInputControl) extends PropertiesNodes
   }
 
   val lblSelectedTextLength = new Label
-  target.selectedText.onChange(lblSelectedTextLength.text = target.selectedText.get.length.toString)
+  target.selectedText.onChange(
+      lblSelectedTextLength.text = target.selectedText.get.length.toString)
 
   val lblSelection = new Label
-  target.selection.onChange(lblSelection.text = target.selection.value.toString)
+  target.selection.onChange(
+      lblSelection.text = target.selection.value.toString)
 
   super.addNode("Anchor", lblAnchor)
   super.addNode("Caret Position", lblCaretPosition)
   super.addNode("Length", lblLength)
   super.addNode("Selected Text Length", lblSelectedTextLength)
   super.addNode("Selection", lblSelection)
-
 }

@@ -11,9 +11,8 @@ import com.intellij.psi.tree.{IElementType, TokenSet}
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 
 /**
- * @author ilyas
- */
-
+  * @author ilyas
+  */
 object DummyASTNode extends TreeElement(ScalaElementTypes.DUMMY_ELEMENT) {
   def getText: String = null
   def removeRange(firstNodeToRemove: ASTNode, firstNodeToKeep: ASTNode) {}
@@ -25,9 +24,12 @@ object DummyASTNode extends TreeElement(ScalaElementTypes.DUMMY_ELEMENT) {
   def addChild(child: ASTNode, anchorBefore: ASTNode) {}
   def getTextLength: Int = 42
   def getChildren(filter: TokenSet) = Array[ASTNode]()
-  def addLeaf(leafType: IElementType, leafText: CharSequence, anchorBefore: ASTNode) {}
+  def addLeaf(
+      leafType: IElementType, leafText: CharSequence, anchorBefore: ASTNode) {}
   def removeChild(child: ASTNode) {}
-  def addChildren(firstChild: ASTNode, firstChildToNotAdd: ASTNode, anchorBefore: ASTNode) {}
+  def addChildren(firstChild: ASTNode,
+                  firstChildToNotAdd: ASTNode,
+                  anchorBefore: ASTNode) {}
   def findChildByType(typesSet: TokenSet) = null
   def findChildByType(elem: IElementType) = null
   def findChildByType(elem: IElementType, anchor: ASTNode) = null

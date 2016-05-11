@@ -35,10 +35,10 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.Includes._
 import scalafx.testutil.SFXEnumDelegateSpec
 
-
 /** Test for [[scalafx.scene.layout.Priority]] */
 @RunWith(classOf[JUnitRunner])
-class PrioritySpec extends SFXEnumDelegateSpec[jfxsl.Priority, Priority](
-  javaClass = classOf[jfxsl.Priority],
-  scalaClass = classOf[Priority],
-  companion = Priority)
+class PrioritySpec
+    extends SFXEnumDelegateSpec[jfxsl.Priority, Priority](
+        javaClass = classOf[jfxsl.Priority],
+        scalaClass = classOf[Priority],
+        companion = Priority)

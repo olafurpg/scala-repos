@@ -25,8 +25,10 @@ import com.codahale.metrics.{ConsoleReporter, MetricRegistry}
 import org.apache.spark.SecurityManager
 import org.apache.spark.metrics.MetricsSystem
 
-private[spark] class ConsoleSink(val property: Properties, val registry: MetricRegistry,
-    securityMgr: SecurityManager) extends Sink {
+private[spark] class ConsoleSink(val property: Properties,
+                                 val registry: MetricRegistry,
+                                 securityMgr: SecurityManager)
+    extends Sink {
   val CONSOLE_DEFAULT_PERIOD = 10
   val CONSOLE_DEFAULT_UNIT = "SECONDS"
 
@@ -38,17 +40,19 @@ private[spark] class ConsoleSink(val property: Properties, val registry: MetricR
     case None => CONSOLE_DEFAULT_PERIOD
   }
 
-  val pollUnit: TimeUnit = Option(property.getProperty(CONSOLE_KEY_UNIT)) match {
-    case Some(s) => TimeUnit.valueOf(s.toUpperCase())
-    case None => TimeUnit.valueOf(CONSOLE_DEFAULT_UNIT)
-  }
+  val pollUnit: TimeUnit =
+    Option(property.getProperty(CONSOLE_KEY_UNIT)) match {
+      case Some(s) => TimeUnit.valueOf(s.toUpperCase())
+      case None => TimeUnit.valueOf(CONSOLE_DEFAULT_UNIT)
+    }
 
   MetricsSystem.checkMinimalPollingPeriod(pollUnit, pollPeriod)
 
-  val reporter: ConsoleReporter = ConsoleReporter.forRegistry(registry)
-      .convertDurationsTo(TimeUnit.MILLISECONDS)
-      .convertRatesTo(TimeUnit.SECONDS)
-      .build()
+  val reporter: ConsoleReporter = ConsoleReporter
+    .forRegistry(registry)
+    .convertDurationsTo(TimeUnit.MILLISECONDS)
+    .convertRatesTo(TimeUnit.SECONDS)
+    .build()
 
   override def start() {
     reporter.start(pollPeriod, pollUnit)
@@ -62,4 +66,3 @@ private[spark] class ConsoleSink(val property: Properties, val registry: MetricR
     reporter.report()
   }
 }
-

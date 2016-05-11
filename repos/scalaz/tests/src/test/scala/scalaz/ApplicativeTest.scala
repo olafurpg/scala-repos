@@ -15,25 +15,28 @@ object ApplicativeTest extends SpecLite {
   import syntax.std.list._
   import syntax.applicative._
 
-  def replicateM[F[_] : Monad, A](n: Int, fa: F[A]): F[List[A]] =
+  def replicateM[F[_]: Monad, A](n: Int, fa: F[A]): F[List[A]] =
     listInstance.sequence(List.fill(n)(fa))
 
-  def filterM[F[_] : Monad, A](l: List[A], f: A => F[Boolean]): F[List[A]] =
+  def filterM[F[_]: Monad, A](l: List[A], f: A => F[Boolean]): F[List[A]] =
     l match {
       case Nil => Monad[F].point(List())
-      case h :: t => Monad[F].bind(f(h))(b => Monad[F].map(filterM(t, f))(t => if (b) h :: t else t))
+      case h :: t =>
+        Monad[F].bind(f(h))(
+            b => Monad[F].map(filterM(t, f))(t => if (b) h :: t else t))
     }
 
-  "replicateM is the same" ! forAll { (fa: Option[Int]) => forAll(Gen.choose(0, 100)) { n =>
-    fa.replicateM(n) must_===(replicateM(n, fa))
-  }}
+  "replicateM is the same" ! forAll { (fa: Option[Int]) =>
+    forAll(Gen.choose(0, 100)) { n =>
+      fa.replicateM(n) must_=== (replicateM(n, fa))
+    }
+  }
 
   "filterM is the same" ! forAll { (l: List[Int]) =>
     // don't make `None` too likely
     def pred(n: Int) = if (n < 0 && n % 2 == 0) None else Some(n % 2 == 0)
-    l.filterM(pred) must_===(filterM(l, pred))
+    l.filterM(pred) must_=== (filterM(l, pred))
   }
-
 }
 
 // vim: expandtab:ts=2:sw=2

@@ -11,5 +11,4 @@ private[internal] object FrameworkLoader {
     val ctor = parts.foldLeft(js.Dynamic.global)(_.selectDynamic(_))
     js.Dynamic.newInstance(ctor)().asInstanceOf[Framework]
   }
-
 }

@@ -5,26 +5,37 @@ import std.AllInstances._
 
 object OptionalTest extends SpecLite {
 
-  def definedTests[F[_],A](context: F[A], value: A, default: => A, alternative: => F[A])(implicit O: Optional[F], EA: Equal[A], EFA: Equal[F[A]], SA: Show[A], SFA: Show[F[A]]) = {
-    O.getOrElse(context)(default)  must_===(value)
-    O.isDefined(context)           must_===(true)
-    O.orElse(context)(alternative) must_===(context)
-    O.nonEmpty(context)            must_===(true)
-    O.isEmpty(context)             must_===(false)
-    O.?(context)(1,0)              must_===(1)
-    O.toOption(context)            must_===(Option(value))
-    O.toMaybe(context)             must_===(Maybe.just(value))
+  def definedTests[F[_], A](
+      context: F[A], value: A, default: => A, alternative: => F[A])(
+      implicit O: Optional[F],
+      EA: Equal[A],
+      EFA: Equal[F[A]],
+      SA: Show[A],
+      SFA: Show[F[A]]) = {
+    O.getOrElse(context)(default) must_=== (value)
+    O.isDefined(context) must_=== (true)
+    O.orElse(context)(alternative) must_=== (context)
+    O.nonEmpty(context) must_=== (true)
+    O.isEmpty(context) must_=== (false)
+    O.?(context)(1, 0) must_=== (1)
+    O.toOption(context) must_=== (Option(value))
+    O.toMaybe(context) must_=== (Maybe.just(value))
   }
 
-  def undefinedTests[F[_],A](context: F[A], default: A, alternative: F[A])(implicit O: Optional[F], EA: Equal[A], EFA: Equal[F[A]], SA: Show[A], SFA: Show[F[A]]) = {
-    O.getOrElse(context)(default)  must_===(default)
-    O.isDefined(context)           must_===(false)
-    O.orElse(context)(alternative) must_===(alternative)
-    O.nonEmpty(context)            must_===(false)
-    O.isEmpty(context)             must_===(true)
-    O.?(context)(1,0)              must_===(0)
-    O.toOption(context)            must_===(Option.empty[A])
-    O.toMaybe(context)             must_===(Maybe.empty[A])
+  def undefinedTests[F[_], A](
+      context: F[A], default: A, alternative: F[A])(implicit O: Optional[F],
+                                                    EA: Equal[A],
+                                                    EFA: Equal[F[A]],
+                                                    SA: Show[A],
+                                                    SFA: Show[F[A]]) = {
+    O.getOrElse(context)(default) must_=== (default)
+    O.isDefined(context) must_=== (false)
+    O.orElse(context)(alternative) must_=== (alternative)
+    O.nonEmpty(context) must_=== (false)
+    O.isEmpty(context) must_=== (true)
+    O.?(context)(1, 0) must_=== (0)
+    O.toOption(context) must_=== (Option.empty[A])
+    O.toMaybe(context) must_=== (Maybe.empty[A])
   }
 
   """\/ instance tests""" in {
@@ -58,7 +69,7 @@ object OptionalTest extends SpecLite {
   }
 
   """Validation instance tests""" in {
-    type VString[A] = Validation[String,A]
+    type VString[A] = Validation[String, A]
 
     def success(a: Int): VString[Int] = Validation.success(a)
     def failure(s: String): VString[Int] = Validation.failure(s)
@@ -91,13 +102,12 @@ object OptionalTest extends SpecLite {
 
     val value = Option(1)
 
-    ( value.getOrElse(0)      ) must_===(1)
-    ( value.isDefined         ) must_===(true)
-    ( value.orElse(Option(0)) ) must_===(value)
-    ( value.nonEmpty          ) must_===(true)
-    ( value.isEmpty           ) must_===(false)
-    ( value ? 1 | 0           ) must_===(1)
-    ( value.toOption          ) must_===(value)
+    (value.getOrElse(0)) must_=== (1)
+    (value.isDefined) must_=== (true)
+    (value.orElse(Option(0))) must_=== (value)
+    (value.nonEmpty) must_=== (true)
+    (value.isEmpty) must_=== (false)
+    (value ? 1 | 0) must_=== (1)
+    (value.toOption) must_=== (value)
   }
-
 }

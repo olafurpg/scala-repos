@@ -17,8 +17,7 @@ package io.prediction.e2.fixture
 import org.apache.spark.{SparkConf, SparkContext}
 import org.scalatest.{BeforeAndAfterAll, Suite}
 
-trait SharedSparkContext extends BeforeAndAfterAll {
-  self: Suite =>
+trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
   @transient private var _sc: SparkContext = _
 
   def sc: SparkContext = _sc
@@ -48,4 +47,3 @@ object LocalSparkContext {
     System.clearProperty("spark.driver.port")
   }
 }
-

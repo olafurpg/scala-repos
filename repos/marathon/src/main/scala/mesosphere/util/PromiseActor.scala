@@ -18,13 +18,14 @@ class PromiseActor(promise: Promise[Any]) extends Actor {
       x match {
         case Status.Failure(t) => promise.failure(t)
         case Status.Success(x) => promise.success(x)
-        case _                 => promise.success(x)
+        case _ => promise.success(x)
       }
       context.stop(self)
   }
 }
 
 object PromiseActor {
+
   /**
     * Sends the given message to the given actorRef and waits indefinitely for the response. The response
     * must be of the given type T or a `akka.actor.Status.Failure`.
@@ -33,9 +34,12 @@ object PromiseActor {
     * @param actorRef references the actor to send the message to
     * @param message the message to be send to the actor
     */
-  def askWithoutTimeout[T](actorRefFactory: ActorRefFactory, actorRef: ActorRef, message: Any): Future[T] = {
+  def askWithoutTimeout[T](actorRefFactory: ActorRefFactory,
+                           actorRef: ActorRef,
+                           message: Any): Future[T] = {
     val promise = Promise[T]()
-    val promiseActor = actorRefFactory.actorOf(Props(classOf[PromiseActor], promise))
+    val promiseActor =
+      actorRefFactory.actorOf(Props(classOf[PromiseActor], promise))
     actorRef.tell(message, promiseActor)
     promise.future
   }

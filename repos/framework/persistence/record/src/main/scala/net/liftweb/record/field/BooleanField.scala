@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package net.liftweb 
-package record 
-package field 
+package net.liftweb
+package record
+package field
 
 import scala.xml._
 import net.liftweb.common._
@@ -29,27 +29,28 @@ import S._
 import JE._
 
 trait BooleanTypedField extends TypedField[Boolean] {
-  
-  def setFromAny(in: Any): Box[Boolean] = in match{
-      case b: java.lang.Boolean => setBox(Full(b.booleanValue))
-      case Full(b: java.lang.Boolean) => setBox(Full(b.booleanValue))
-      case Some(b: java.lang.Boolean) => setBox(Full(b.booleanValue))
-      case (b: java.lang.Boolean) :: _ => setBox(Full(b.booleanValue))
-      case _ => genericSetFromAny(in)
+
+  def setFromAny(in: Any): Box[Boolean] = in match {
+    case b: java.lang.Boolean => setBox(Full(b.booleanValue))
+    case Full(b: java.lang.Boolean) => setBox(Full(b.booleanValue))
+    case Some(b: java.lang.Boolean) => setBox(Full(b.booleanValue))
+    case (b: java.lang.Boolean) :: _ => setBox(Full(b.booleanValue))
+    case _ => genericSetFromAny(in)
   }
 
-  def setFromString(s: String): Box[Boolean] = 
-    if(s == null || s.isEmpty) {
-      if(optional_?)
-    	  setBox(Empty)
-       else
-          setBox(Failure(notOptionalErrorMessage))
+  def setFromString(s: String): Box[Boolean] =
+    if (s == null || s.isEmpty) {
+      if (optional_?) setBox(Empty)
+      else setBox(Failure(notOptionalErrorMessage))
     } else {
       setBox(tryo(toBoolean(s)))
     }
 
   private def elem(attrs: SHtml.ElemAttr*) =
-      SHtml.checkbox(valueBox openOr false, (b: Boolean) => this.setBox(Full(b)), (("tabindex" -> tabIndex.toString): SHtml.ElemAttr) :: attrs.toList: _*)
+    SHtml.checkbox(
+        valueBox openOr false,
+        (b: Boolean) => this.setBox(Full(b)),
+        ( ("tabindex" -> tabIndex.toString): SHtml.ElemAttr) :: attrs.toList: _*)
 
   def toForm: Box[NodeSeq] =
     // FIXME? no support for optional_?
@@ -62,14 +63,15 @@ trait BooleanTypedField extends TypedField[Boolean] {
 
   def asJValue: JValue = valueBox.map(JBool) openOr (JNothing: JValue)
   def setFromJValue(jvalue: JValue) = jvalue match {
-    case JNothing|JNull if optional_? => setBox(Empty)
-    case JBool(b)                     => setBox(Full(b))
-    case other                        => setBox(FieldHelpers.expectedA("JBool", other))
+    case JNothing | JNull if optional_? => setBox(Empty)
+    case JBool(b) => setBox(Full(b))
+    case other => setBox(FieldHelpers.expectedA("JBool", other))
   }
 }
 
 class BooleanField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-  extends Field[Boolean, OwnerType] with MandatoryTypedField[Boolean] with BooleanTypedField {
+    extends Field[Boolean, OwnerType] with MandatoryTypedField[Boolean]
+    with BooleanTypedField {
 
   def owner = rec
 
@@ -82,7 +84,8 @@ class BooleanField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalBooleanField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-  extends Field[Boolean, OwnerType] with OptionalTypedField[Boolean] with BooleanTypedField {
+    extends Field[Boolean, OwnerType] with OptionalTypedField[Boolean]
+    with BooleanTypedField {
 
   def owner = rec
 
@@ -91,4 +94,3 @@ class OptionalBooleanField[OwnerType <: Record[OwnerType]](rec: OwnerType)
     setBox(value)
   }
 }
-

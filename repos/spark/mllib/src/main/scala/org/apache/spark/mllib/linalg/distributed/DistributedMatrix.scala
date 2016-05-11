@@ -22,8 +22,8 @@ import breeze.linalg.{DenseMatrix => BDM}
 import org.apache.spark.annotation.Since
 
 /**
- * Represents a distributively stored matrix backed by one or more RDDs.
- */
+  * Represents a distributively stored matrix backed by one or more RDDs.
+  */
 @Since("1.0.0")
 trait DistributedMatrix extends Serializable {
 
